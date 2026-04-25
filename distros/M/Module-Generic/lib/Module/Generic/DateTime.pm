@@ -19,9 +19,9 @@ BEGIN
     use warnings::register;
     use parent qw( Module::Generic );
     use vars qw( $ERROR $TS_RE $VERSION );
-    use DateTime 1.57;
-    use DateTime::Format::Strptime 1.79;
-    use DateTime::TimeZone 2.51;
+    use DateTime::Lite v0.6.3;
+    use DateTime::Format::Lite v0.1.2;
+    use DateTime::Lite::TimeZone v0.5.3;
     use Module::Generic::Global ':const';
     use Regexp::Common;
     use Scalar::Util ();
@@ -62,143 +62,6 @@ BEGIN
     our $VERSION = 'v0.6.4';
 };
 
-BEGIN
-{
-    unless( defined( &DateTime::FREEZE ) )
-    {
-        *DateTime::FREEZE = sub
-        {
-            my $self = shift( @_ );
-            my $class = ref( $self );
-            my $params = {};
-            for( qw( utc_rd_days utc_rd_secs rd_nanosecs locale tz formatter ) )
-            {
-                $params->{ $_ } = $self->{ $_ };
-            }
-            # not used yet, but may be handy in the future.
-            $params->{version} = ( $DateTime::VERSION || 'git' );
-            return( [$class, $params] );
-        };
-    }
-    unless( defined( &DateTime::THAW ) )
-    {
-        *DateTime::THAW = sub
-        {
-            my( $this, $serialiser, $ref ) = @_;
-            my( $class, $params ) = @$ref;
-            my( $locale, $tz, $formatter ) = @$params{qw( locale tz formatter )};
-            delete( $params->{version} );
-            if( ref( $locale ) eq 'ARRAY' )
-            {
-                $locale = $locale->[0] if( ref( $locale->[0] ) eq 'ARRAY' );
-                my $locale_class = $locale->[0];
-                $locale = &{"${locale_class}\::THAW"}( $locale_class, $serialiser, $locale );
-            }
-            if( ref( $tz ) eq 'ARRAY' )
-            {
-                $tz = $tz->[0] if( ref( $tz->[0] ) eq 'ARRAY' );
-                my $tz_class = $tz->[0];
-                $tz = &{"${tz_class}\::THAW"}( $tz_class, $serialiser, $tz );
-            }
-
-            my $object = bless({
-                utc_vals => [ @$params{qw(utc_rd_days utc_rd_secs rd_nanosecs)} ],
-                tz => $tz,
-            }, 'DateTime::_Thawed' );
-
-            my %formatter = defined( $params->{formatter} ) ? ( formatter => $params->{formatter} ) : ();
-            my $new       = $class->from_object(
-                object => $object,
-                locale => $locale,
-                %formatter,
-            );
-            return( $new );
-        };
-    }
-    unless( defined( &DateTime::TimeZone::FREEZE ) )
-    {
-        *DateTime::TimeZone::FREEZE = sub
-        {
-            my $self = shift;
-            my $class = ref( $self ) || $self;
-            return( [ $class, $self->name ] );
-        };
-    }
-    unless( defined( &DateTime::TimeZone::THAW ) )
-    {
-        *DateTime::TimeZone::THAW = sub
-        {
-            my( $this, $serialiser, $serial ) = @_;
-            my( $class, $tzone ) = @$serial;
-            my $self = $class->new( name => $tzone );
-            return( $self );
-        };
-    }
-
-    unless( defined( &DateTime::TimeZone::OffsetOnly::FREEZE ) )
-    {
-        *DateTime::TimeZone::OffsetOnly::FREEZE = sub
-        {
-            my( $self, undef ) = @_;
-            my $class = ref( $self );
-            return( [$class, $self->name] );
-        };
-    }
-    unless( defined( &DateTime::TimeZone::OffsetOnly::THAW ) )
-    {
-        *DateTime::TimeZone::OffsetOnly::THAW = sub
-        {
-            my( $this, $serialiser, $serial ) = @_;
-            my( $class, $name ) = @$serial;
-            my $self = $class->new( offset => $name );
-            return( $self );
-        };
-    }
-
-    unless( defined( &DateTime::Locale::FromData::FREEZE ) )
-    {
-        *DateTime::Locale::FromData::FREEZE = sub
-        {
-            my( $self, undef ) = @_;
-            my $class = ref( $self );
-            return( [$class, $self->code] );
-        };
-    }
-    unless( defined( &DateTime::Locale::FromData::THAW ) )
-    {
-        *DateTime::Locale::FromData::THAW = sub
-        {
-            my( $self, undef, $ref ) = @_;
-            my( $class, $code ) = @$ref;
-            require DateTime::Locale;
-            my $new = DateTime::Locale->load( $code );
-            return( $new );
-        };
-    }
-
-    unless( defined( &DateTime::Locale::Base::FREEZE ) )
-    {
-        *DateTime::Locale::Base::FREEZE = sub
-        {
-            my( $self, undef ) = @_;
-            my $class = ref( $self );
-            return( [$class, $self->id] );
-        };
-    }
-    unless( defined( &DateTime::Locale::Base::THAW ) )
-    {
-        *DateTime::Locale::Base::THAW = sub
-        {
-            my( $self, undef, $ref ) = @_;
-            my( $class, $id ) = @$ref;
-            require DateTime::Locale;
-            my $new = DateTime::Locale->load( $id );
-            return( $new );
-        };
-    }
-    Module::Generic->_implement_freeze_thaw( qw( DateTime::TimeZone::UTC ) );
-};
-
 use v5.26.1;
 # use strict;
 no warnings 'redefine';
@@ -214,7 +77,7 @@ sub new
     # Module::Generic::DateTime->new( $hash_ref_of_options );
     # Module::Generic::DateTime->new( %hash_of_options );
     if( scalar( @_ ) &&
-        $this->_is_a( $_[0] => 'DateTime' ) )
+        $this->_is_a( $_[0] => [qw( DateTime DateTime::Lite )] ) )
     {
         $dt = shift( @_ );
     }
@@ -233,46 +96,41 @@ sub new
 
         if( scalar( keys( %$args ) ) )
         {
-            $dt = eval
-            {
-                DateTime->new( %$opts );
-            };
-            if( $@ )
-            {
-                return( $this->error( $@ ) );
-            }
+            $dt = DateTime::Lite->new( %$opts ) || return( $this->pass_error( DateTime::Lite->error ) );
         }
 
         unless( defined( $dt ) )
         {
-            eval
+            if( !exists( $opts->{formatter} ) )
             {
-                if( !exists( $opts->{formatter} ) )
-                {
-                    $opts->{formatter} = DateTime::Format::Strptime->new(
-                        pattern => "%FT%T%z",
-                        locale => "en_GB",
-                    );
-                }
-                $dt = DateTime->now( %$opts );
-            };
-            if( $@ )
+                $opts->{formatter} = DateTime::Format::Lite->new(
+                    pattern => "%FT%T%z",
+                    locale  => "en_GB",
+                ) || return( $this->pass_error( DateTime::Format::Lite->error ) );
+            }
+            $dt = DateTime::Lite->now( %$opts );
+            if( !defined( $dt ) && DateTime::Lite->error )
             {
-                if( $@ =~ /Cannot[[:blank:]\h]+determine[[:blank:]\h]+local[[:blank:]\h]+time[[:blank:]\h]+zone/i )
+                my $err = DateTime::Lite->error;
+                if( $err->message =~ /Cannot[[:blank:]\h]+determine[[:blank:]\h]+local[[:blank:]\h]+time[[:blank:]\h]+zone/i )
                 {
                     warn( "Warning: Your system is missing key timezone components. Module::Generic::DateTime is reverting to UTC instead of local time zone." );
                     $opts->{time_zone} = 'UTC';
-                    $dt = DateTime->new( %$opts );
-                    my $dt_fmt = DateTime::Format::Strptime->new(
+                    $dt = DateTime::Lite->new( %$opts );
+                    my $dt_fmt = DateTime::Format::Lite->new(
                         pattern => '%FT%T%z',
-                        locale => 'en_GB',
+                        locale  => 'en_GB',
                     );
                     $dt->set_formatter( $dt_fmt );
                 }
                 else
                 {
-                    return( $this->error( "Error while creating a DateTime object: $@" ) );
+                    return( $this->error( "Error while creating a DateTime::Lite object: $err" ) );
                 }
+            }
+            elsif( !defined( $dt ) )
+            {
+                return( $this->error( "Unknown error occurred while creating a DateTime::Lite object." ) );
             }
         }
     }
@@ -284,39 +142,21 @@ sub as_hash { return( $_[0] ); }
 
 sub as_string { return( shift->stringify( @_ ) ); }
 
-sub datetime { return( shift->_set_get_object_without_init( 'dt' => 'DateTime' ) ); }
+sub datetime { return( shift->_set_get_object_without_init( 'dt' => [qw( DateTime DateTime::Lite )] ) ); }
 
 sub from_epoch
 {
     my $this = shift( @_ );
-    my $dt;
-    # try-catch
-    local $@;
-    eval
-    {
-        $dt = DateTime->from_epoch( @_ );
-    };
-    if( $@ )
-    {
-        return( $this->error( "Error trying to create a new DateTime object using new_from_epoch(): $@" ) );
-    }
+    my $dt   = DateTime::Lite->from_epoch( @_ ) ||
+        return( $this->error( "Error trying to create a new DateTime::Lite object using new_from_epoch(): ", DateTime::Lite->error ) );
     return( $this->new( $dt ) );
 }
 
 sub now
 {
     my $this = shift( @_ );
-    my $dt;
-    # try-catch
-    local $@;
-    eval
-    {
-        $dt = DateTime->now( @_ );
-    };
-    if( $@ )
-    {
-        return( $this->error( "Error trying to create a new DateTime object: $@" ) );
-    }
+    my $dt   = DateTime::Lite->now( @_ ) ||
+        return( $this->error( "Error trying to create a new DateTime::Lite object: ", DateTime::Lite->error ) );
     return( $this->new( $dt ) );
 }
 
@@ -332,7 +172,7 @@ sub op
     my $err_key = $class;
     my $repo = Module::Generic::Global->new( 'local_tz' => $class, key => $err_key );
 
-    if( Scalar::Util::blessed( $other ) && $other->isa( 'DateTime' ) )
+    if( Scalar::Util::blessed( $other ) && ( $other->isa( 'DateTime' ) || $other->isa( 'DateTime::Lite' ) ) )
     {
         $dt2 = $other;
     }
@@ -340,7 +180,7 @@ sub op
     {
         $dt2 = $other->{dt};
     }
-    # Might trigger an error if this does not work with DateTime, but that's the developer's problem
+    # Might trigger an error if this does not work with DateTime or DateTime::Lite, but that's the developer's problem
     elsif( Scalar::Util::blessed( $other ) )
     {
         $dt2 = $other;
@@ -351,34 +191,23 @@ sub op
         my $has_local_tz = $repo->get;
         if( !defined( $has_local_tz ) )
         {
-            # try-catch
-            local $@;
-            eval
-            {
-                $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'local' );
-            };
-
-            $has_local_tz = $@ ? 0 : 1;
+            $dt2 = DateTime::Lite->from_epoch( epoch => $other, time_zone => 'local' );
+            $has_local_tz = defined( $dt2 ) ? 0 : 1;
             $repo->set( $has_local_tz );
 
-            if( $@ )
+            if( !defined( $dt2 ) )
             {
                 warn( "Your system is missing key timezone components. ${class} is reverting to UTC instead of local time zone." );
-                $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'UTC' );
+                $dt2 = DateTime::Lite->from_epoch( epoch => $other, time_zone => 'UTC' );
             }
         }
         else
         {
-            # try-catch
-            local $@;
-            eval
+            $dt2 = DateTime::Lite->from_epoch( epoch => $other, time_zone => ( $has_local_tz ? 'local' : 'UTC' ) );
+            if( !defined( $dt2 ) )
             {
-                $dt2 = DateTime->from_epoch( epoch => $other, time_zone => ( $has_local_tz ? 'local' : 'UTC' ) );
-            };
-            if( $@ )
-            {
-                warn( "Error trying to set a DateTime object using ", ( $has_local_tz ? 'local' : 'UTC' ), " time zone" );
-                $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'UTC' );
+                warn( "Error trying to set a DateTime::Lite object using ", ( $has_local_tz ? 'local' : 'UTC' ), " time zone" );
+                $dt2 = DateTime::Lite->from_epoch( epoch => $other, time_zone => 'UTC' );
             }
         }
         $dt2->set_formatter( $self->formatter );
@@ -402,18 +231,16 @@ sub op
             $re->{tz_offset} = $re->{tz_sign} . $re->{tz_offset1} . $re->{tz_offset2};
         }
 
-        # try-catch
-        local $@;
-        eval
+        $dt2 = DateTime::Lite->new( %$hash );
+        if( $dt2 )
         {
-            $dt2 = DateTime->new( %$hash );
             $dt2->set_time_zone( $re->{tz_offset} ) if( length( $re->{tz_offset} ) );
             my $dt3 = $dt2->clone;
             $dt3->set_time_zone( 'UTC' );
-        };
-        if( $@ )
+        }
+        else
         {
-            warn( "Unable to create DateTime object from parsing '$other': $@\n" );
+            warn( "Unable to create DateTime::Lite object from parsing '$other': ", DateTime::Lite->error, "\n" );
         }
     }
     use overloading;
@@ -434,9 +261,9 @@ sub op_minus_plus
     my $err_key = $class;
     my $repo = Module::Generic::Global->new( 'local_tz' => $class, key => $err_key );
 
-    if( Scalar::Util::blessed( $other ) && $other->isa( 'DateTime::Duration' ) )
+    if( Scalar::Util::blessed( $other ) && ( $other->isa( 'DateTime::Duration' ) || $other->isa( 'DateTime::Lite::Duration' ) ) )
     {
-        ## Duration [+-] DateTime => update the datetime object in place
+        ## Duration [+-] DateTime/DateTime::Lite => update the datetime object in place
         if( $swap )
         {
             if( $op eq '-' )
@@ -463,7 +290,7 @@ sub op_minus_plus
             return( !defined( $swap ) ? $self : $self->_make_my_own( $clone ) );
         }
     }
-    elsif( Scalar::Util::blessed( $other ) && $other->isa( 'DateTime' ) )
+    elsif( Scalar::Util::blessed( $other ) && ( $other->isa( 'DateTime' ) || $other->isa( 'DateTime::Lite' ) ) )
     {
         if( $op eq '-' )
         {
@@ -478,7 +305,7 @@ sub op_minus_plus
 
     my $v;
     $v = "$other" if( !ref( $other ) || ( ref( $other ) && overload::Method( $other => '""' ) ) );
-    die( "\$other (", overload::StrVal( $other // '' ), ") is not a number, a DateTime, or a DateTime::Duration object!\n" ) if( !defined( $v ) || $v !~ /^(?:$RE{num}{real}|$RE{num}{int})$/ );
+    die( "\$other (", overload::StrVal( $other // '' ), ") is not a number, a DateTime, a DateTime::Lite, or a DateTime::Duration object!\n" ) if( !defined( $v ) || $v !~ /^(?:$RE{num}{real}|$RE{num}{int})$/ );
     my $new_dt;
     if( $op eq '-' )
     {
@@ -486,6 +313,8 @@ sub op_minus_plus
         {
             # try-catch
             local $@;
+            my $dt_class = ref( $dt1 );
+            $dt_class = 'DateTime::Lite' unless( $dt_class eq 'DateTime' || $dt_class eq 'DateTime::Lite' );
             my( $clone, $ts );
             eval
             {
@@ -494,7 +323,7 @@ sub op_minus_plus
             };
             if( $@ )
             {
-                die( "Error cloning and getting epoch value for DateTime object: $@" );
+                die( "Error cloning and getting epoch value for ${dt_class} object: $@" );
             }
 
             my $has_local_tz = $repo->get;
@@ -522,8 +351,8 @@ sub op_minus_plus
             my $new_ts = $v - $ts;
             eval
             {
-                $new_dt = DateTime->from_epoch( epoch => $new_ts, time_zone => $dt1->time_zone );
-                my $strp = DateTime::Format::Strptime->new(
+                $new_dt = $dt_class->from_epoch( epoch => $new_ts, time_zone => $dt1->time_zone );
+                my $strp = DateTime::Format::Lite->new(
                     pattern => '%s',
                     locale => 'en_GB',
                     time_zone => $new_dt->time_zone,
@@ -532,7 +361,7 @@ sub op_minus_plus
             };
             if( $@ )
             {
-                die( "Error instantiating a new DateTime object with epoch timestamp $new_ts and time zone ", $dt1->time_zone );
+                die( "Error instantiating a new ${dt_class} object with epoch timestamp $new_ts and time zone ", $dt1->time_zone );
             }
         }
         else
@@ -599,12 +428,12 @@ sub _make_my_own
 {
     my( $self, $res ) = @_;
     if( Scalar::Util::blessed( $res ) && 
-        $res->isa( 'DateTime::Duration' ) )
+        ( $res->isa( 'DateTime::Lite::Duration' ) || $res->isa( 'DateTime::Duration' ) ) )
     {
         return( Module::Generic::DateTime::Interval->new( $res ) );
     }
     elsif( Scalar::Util::blessed( $res ) && 
-           $res->isa( 'DateTime' ) )
+           ( $res->isa( 'DateTime' ) || $res->isa( 'DateTime::Lite' ) ) )
     {
         return( $self->new( $res ) );
     }
@@ -623,10 +452,10 @@ AUTOLOAD
     my $class = ref( $self ) || $self;
     if( !ref( $self ) )
     {
-        if( DateTime->can( $method ) )
+        if( DateTime::Lite->can( $method ) )
         {
-            my $rv = DateTime->$method( @_ );
-            if( Scalar::Util::blessed( $rv ) && $rv->isa( 'DateTime' ) )
+            my $rv = DateTime::Lite->$method( @_ );
+            if( Scalar::Util::blessed( $rv ) && $rv->isa( 'DateTime::Lite' ) )
             {
                 return( $class->new( $rv ) );
             }
@@ -637,12 +466,14 @@ AUTOLOAD
         }
         else
         {
-            die( "Method ${method} unsupported by DateTime\n" );
+            die( "Method ${method} unsupported by DateTime::Lite\n" );
         }
     }
-    die( "DateTime object is gone !\n" ) if( !ref( $self->{dt} ) );
+    die( "DateTime::Lite object is gone !\n" ) if( !ref( $self->{dt} ) );
     no overloading;
     my $dt = $self->{dt};
+    my $dt_class = ref( $dt ) || 'DateTime::Lite';
+    $dt_class    = 'DateTime::Lite' unless( $dt_class eq 'DateTime::Lite' || $dt_class eq 'DateTime' );
     if( $dt->can( $method ) )
     {
         my $rv;
@@ -654,13 +485,13 @@ AUTOLOAD
         };
         if( $@ )
         {
-            return( $self->error( "Error trying to call DateTime::$method with arguments: '", join( "', '", @_ ), "': $@" ) );
+            return( $self->error( "Error trying to call ${dt_class}::$method with arguments: '", join( "', '", @_ ), "': $@" ) );
         }
         return( $rv );
     }
     else
     {
-        return( $self->error( "No method \"$method\" available in DateTime" ) );
+        return( $self->error( "No method \"$method\" available in ${dt_class}" ) );
     }
 };
 
@@ -760,13 +591,17 @@ sub THAW
     local $@;
     my $dt = eval
     {
-        require DateTime;
-        DateTime->new( %$opts );
+        require DateTime::Lite;
+        DateTime::Lite->new( %$opts );
     };
     if( $@ )
     {
         require Module::Generic;
-        warn( "Error thawing the DateTime object: $@\nParameters used were: ", Module::Generic->dump( $opts ) ) if( warnings::enabled() );
+        warn( "Error thawing the DateTime::Lite object: $@\nParameters used were: ", Module::Generic->dump( $opts ) ) if( warnings::enabled() );
+    }
+    elsif( !defined( $dt ) )
+    {
+        warn( "Error thawing the DateTime::Lite object: ", DateTime::Lite->error, "\nParameters used were: ", Module::Generic->dump( $opts ) ) if( warnings::enabled() );
     }
 
     my $new;
@@ -807,7 +642,7 @@ BEGIN
         'cmp'    => '__compare_overload',
         fallback => 1,
     );
-    use DateTime;
+    use DateTime::Lite;
     use Scalar::Util ();
     use Wanted;
 };
@@ -872,7 +707,7 @@ sub __add_overload
         return( $self );
     }
     elsif( Scalar::Util::blessed( $other ) && 
-           ( $other->isa( 'DateTime::Duration' ) || $other->isa( 'Module::Generic::DateTime::Interval' ) ) )
+           ( $other->isa( 'DateTime::Lite::Duration' ) || $other->isa( 'DateTime::Duration' ) || $other->isa( 'Module::Generic::DateTime::Interval' ) ) )
     {
         $other = $other->{interval} if( $other->isa( 'Module::Generic::DateTime::Interval' ) );
         $res = $swap ? ( $other + $dur1 ) : ( $dur1 + $other );
@@ -883,7 +718,7 @@ sub __add_overload
         $other = $other + 0;
         my $d = $dur1->in_units( 'seconds' );
         my $n = $swap ? ( $other + $d ) : ( $d + $other );
-        $res = DateTime::Duration->new( seconds => $n );
+        $res = DateTime::Lite::Duration->new( seconds => $n );
         return( $self->_make_my_own( $res ) );
     }
     else
@@ -897,18 +732,18 @@ sub __compare_overload
     my( $self, $other, $swap ) = @_;
     my $d1 = $self->{interval};
     my $d2 = $self->_get_other( $other );
-    # my $dt = DateTime->now;
+    # my $dt = DateTime::Lite->now;
     ( $d1, $d2 ) = ( $d2, $d1 ) if( $swap );
     my $to_secs = sub
     {
         my $this = shift( @_ );
         if( Scalar::Util::blessed( $this ) )
         {
-            if( $this->isa( 'DateTime::Duration' ) )
+            if( $this->isa( 'DateTime::Lite::Duration' ) || $this->isa( 'DateTime::Duration' ) )
             {
                 return( $this->in_units( 'seconds' ) );
             }
-            elsif( $this->isa( 'DateTime' ) )
+            elsif( $this->isa( 'DateTime::Lite' ) || $this->isa( 'DateTime' ) )
             {
                 return( $this->epoch );
             }
@@ -935,7 +770,7 @@ sub __compare_overload
         }
     };
 
-#     return( DateTime->compare(
+#     return( DateTime::Lite->compare(
 #         $dt->clone->add_duration( $d1 ),
 #         $dt->clone->add_duration( $d2 )
 #     ) );
@@ -953,7 +788,14 @@ sub __multiply_overload
         $num = int( "$num" );
         ## If $swap is undefined, it means an assignment operation like *=
         my $clone = !defined( $swap ) ? $self->{interval} : $self->{interval}->clone;
-        $clone->multiply( $num );
+        if( $clone->isa( 'DateTime' ) )
+        {
+            $clone->multiply( $num );
+        }
+        else
+        {
+            $clone *= $num;
+        }
         return( !defined( $swap ) ? $self : $self->_make_my_own( $clone ) );
     }
     elsif( Scalar::Util::blessed( $num ) && $num->isa( 'Module::Generic::DateTime::Interval' ) )
@@ -1072,7 +914,7 @@ sub __subtract_overload
         return( $self );
     }
     elsif( Scalar::Util::blessed( $other ) && 
-           ( $other->isa( 'DateTime::Duration' ) || $other->isa( 'Module::Generic::DateTime::Interval' ) ) )
+           ( $other->isa( 'DateTime::Lite::Duration' ) || $other->isa( 'DateTime::Duration' ) || $other->isa( 'Module::Generic::DateTime::Interval' ) ) )
     {
         $other = $other->{interval} if( $other->isa( 'Module::Generic::DateTime::Interval' ) );
         $res = $swap ? ( $other - $dur1 ) : ( $dur1 - $other );
@@ -1083,7 +925,7 @@ sub __subtract_overload
         $other = $other + 0;
         my $d = $dur1->in_units( 'seconds' );
         my $n = $swap ? ( $other - $d ) : ( $d - $other );
-        $res = DateTime::Duration->new( seconds => $n );
+        $res = DateTime::Lite::Duration->new( seconds => $n );
         return( $self->_make_my_own( $res ) );
     }
     else
@@ -1113,12 +955,12 @@ sub _make_my_own
 {
     my( $self, $res ) = @_;
     if( Scalar::Util::blessed( $res ) && 
-        $res->isa( 'DateTime::Duration' ) )
+        ( $res->isa( 'DateTime::Lite::Duration' ) || $res->isa( 'DateTime::Duration' ) ) )
     {
         return( $self->new( $res ) );
     }
     elsif( Scalar::Util::blessed( $res ) && 
-           $res->isa( 'DateTime' ) )
+           ( $res->isa( 'DateTime::Lite' ) || $res->isa( 'DateTime' ) ) )
     {
         return( Module::Generic::DateTime->new( $res ) );
     }
@@ -1147,9 +989,11 @@ AUTOLOAD
     no overloading;
     my $self = shift( @_ );
     my $class = ref( $self ) || $self;
-    die( "DateTime::Duration object is gone !\n" ) if( !ref( $self->{interval} ) );
+    die( "DateTime::Lite::Duration object is gone !\n" ) if( !ref( $self->{interval} ) );
     no overloading;
     my $dur = $self->{interval};
+    my $dt_dur_class = ref( $dur ) || 'DateTime::Lite::Duration';
+    $dt_dur_class    = 'DateTime::Lite::Duration' unless( $dt_dur_class eq 'DateTime::Lite::Duration' || $dt_dur_class eq 'DateTime::Duration' );
     if( $dur->can( $method ) )
     {
         my $rv;
@@ -1161,13 +1005,13 @@ AUTOLOAD
         };
         if( $@ )
         {
-            return( $self->error( "Error trying to call DateTime::Duration::$method with arguments: '", join( "', '", @_ ), "': $@" ) );
+            return( $self->error( "Error trying to call ${dt_dur_class}::$method with arguments: '", join( "', '", @_ ), "': $@" ) );
         }
         return( $rv );
     }
     else
     {
-        return( $self->error( "No method \"$method\" available in DateTime::Duration" ) );
+        return( $self->error( "No method \"$method\" available in ${dt_dur_class}" ) );
     }
 };
 
@@ -1272,9 +1116,9 @@ If a L<DateTime> error occurs, it will be caught and an L<error|Module::Generic/
 
     my $d = Module::Generic::DateTime->now;
 
-Instantiate a new L<Module::Generic::DateTime> using the L<DateTime> method C<now>. Any parameters are passed through to L<DateTime/now>
+Instantiate a new L<Module::Generic::DateTime> using the L<DateTime::Lite> method C<now>. Any parameters are passed through to L<DateTime::Lite/now>
 
-If a L<DateTime> error occurs, it will be caught and an L<error|Module::Generic/error> will be set and C<undef> will be returned.
+If a L<DateTime::Lite> error occurs, it will be caught and an L<error|Module::Generic/error> will be set and C<undef> will be returned.
 
 =head1 METHODS
 
@@ -1394,7 +1238,7 @@ For maximum safety, users running mod_perl with threaded MPMs should ensure Perl
 
 =head1 SEE ALSO
 
-L<Module::Generic>, L<Module::Generic::DateTime::Interval>, L<DateTime>, L<DateTime::Format::Strptime>, L<DatetTime::TimeZone>
+L<Module::Generic>, L<Module::Generic::DateTime::Interval>, L<DateTime>, L<DateTime::Format::Lite>, L<DatetTime::TimeZone>
 
 =head1 AUTHOR
 

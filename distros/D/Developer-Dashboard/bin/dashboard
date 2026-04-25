@@ -386,12 +386,19 @@ dashboard - thin command switchboard for Developer Dashboard
   dashboard doctor [--fix]
   dashboard ps1 [--jobs N] [--cwd PATH] [--mode compact|extended] [--color]
   dashboard paths
+  dashboard files
   dashboard path list
   dashboard path resolve <name>
   dashboard path add <name> <path>
   dashboard path del <name>
+  dashboard path rm <name>
   dashboard path locate <term...>
   dashboard path project-root
+  dashboard file list
+  dashboard file resolve <name>
+  dashboard file add <name> <path>
+  dashboard file del <name>
+  dashboard file locate <term...>
   dashboard of [--print] [--line N] [--editor CMD] <file|scope> [pattern...]
   dashboard open-file [--print] [--line N] [--editor CMD] <file|scope> [pattern...]
   dashboard ticket [ticket-ref]

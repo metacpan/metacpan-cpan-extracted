@@ -101,7 +101,7 @@ sub as_string
             });
             $text = $fmt->format( $self->normalise->scalar );
         }
-        
+
         if( defined( $text ) && length( "$text" ) )
         {
             $str->append( join( "\n$sep", split( /\r?\n/, "$text" ) ) );

@@ -254,6 +254,41 @@ formTools = {
             value['input-value'] = form.find(':input[name=value]').val();
             element.find('span.content').text(value['input-name'] + ': ' + value['input-value']);
         }
+        else if ( value.type === 'component' && value.comp_name === 'ShowQuestion' ) {
+            value.arguments ||= {};
+            const name    = form.find(':input[name=name]').val();
+            const label   = form.find(':input[name=label]').val();
+            const choices = form.find(':input[name=choices]').val();
+
+            value.arguments.name    = name;
+            value.arguments.choices = choices;
+            value.arguments.label   = label;
+
+            const dependent_validation = form.find(':input[name=dependent_validation]');
+            if ( dependent_validation.length ) {
+                value.arguments.dependent_validation ||= {};
+                if ( dependent_validation.is(':checked') ) {
+                    value.arguments.dependent_validation.enabled = 1;
+                }
+                else {
+                    value.arguments.dependent_validation.enabled = 0;
+                }
+            }
+
+            const dependent_name = form.find(':input[name=dependent_name]');
+            if ( dependent_name.length ) {
+                value.arguments.dependent_validation ||= {};
+                value.arguments.dependent_validation.name = dependent_name.val();
+            }
+
+            const dependent_value = form.find(':input[name=dependent_value]');
+            if ( dependent_value.length ) {
+                value.arguments.dependent_validation ||= {};
+                value.arguments.dependent_validation.values = dependent_value.val();
+            }
+
+            element.find('span.content').text( 'ShowQuestion - ' + name );
+        }
 
         const show_condition = form.find(':input[name=show_condition]');
         if ( show_condition.length ) {
@@ -413,7 +448,9 @@ formTools = {
                 }
             }
             else {
-                cfhints.removeClass().addClass('invalid-feedback');
+                const wasHidden = cfhints.hasClass('hidden');
+                const addClass = (cfhints.hasClass('required') ? 'required invalid-feedback' : 'invalid-feedback') + (wasHidden ? ' hidden' : '');
+                cfhints.removeClass().addClass(addClass);
             }
         });
 

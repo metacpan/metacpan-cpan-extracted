@@ -1,0 +1,73 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+use Developer::Dashboard::CLI::Files ();
+
+# main(@ARGV)
+# Runs the files helper for Developer Dashboard.
+# Input: command-line arguments from @ARGV.
+# Output: prints the active runtime file JSON payload, then exits.
+Developer::Dashboard::CLI::Files::run_files_command( command => 'files', args => \@ARGV );
+
+__END__
+
+=pod
+
+=head1 NAME
+
+files - private runtime file helper for Developer Dashboard
+
+=head1 SYNOPSIS
+
+  dashboard files
+
+=head1 DESCRIPTION
+
+This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the main
+C<dashboard> command can expose the active runtime file set without loading the
+full runtime first.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+This staged helper exposes C<dashboard files>, the command that prints the
+active runtime file set as JSON. It is the shell-visible entrypoint for named
+runtime files such as logs, pid/state files, config files, and configured file
+aliases.
+
+=head1 WHY IT EXISTS
+
+It exists because file reporting is a built-in dashboard feature, but the
+public switchboard should only dispatch to a helper while the file runtime owns
+the lookup and serialization rules.
+
+=head1 WHEN TO USE
+
+Use this file when changing the C<dashboard files> CLI contract, the staged
+helper handoff, or the exact examples contributors use to inspect active
+runtime files from the shell.
+
+=head1 HOW TO USE
+
+Users run C<dashboard files>. The staged helper forwards the request to the
+lightweight file runtime, which collects named runtime files and configured
+aliases for the current working directory and prints that payload as JSON.
+
+=head1 WHAT USES IT
+
+It is used by users debugging file alias state and by tests that verify the
+active runtime file payload.
+
+=head1 EXAMPLES
+
+  dashboard files
+
+=for comment FULL-POD-DOC END
+
+=cut

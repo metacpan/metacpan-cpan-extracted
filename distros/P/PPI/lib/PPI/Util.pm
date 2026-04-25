@@ -7,7 +7,7 @@ use Exporter     ();
 use Digest::MD5  ();
 use Params::Util qw{_INSTANCE _SCALAR0 _ARRAY0};
 
-our $VERSION = '1.285';
+our $VERSION = '1.287';
 
 our @ISA       = 'Exporter';
 our @EXPORT_OK = qw{ _Document _slurp };
@@ -43,7 +43,7 @@ sub _Document {
 
 # Provide a simple _slurp implementation
 sub _slurp {
-	my $file = shift;
+	my $file = shift or return "_slurp() failed: no filename provided";
 	local $/ = undef;
 	local *FILE;
 	open( FILE, '<', $file ) or return "open($file) failed: $!";

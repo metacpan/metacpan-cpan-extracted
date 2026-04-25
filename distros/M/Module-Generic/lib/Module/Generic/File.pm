@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.15.1
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Version v0.15.2
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2026/01/22
+## Modified 2026/03/31
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -143,7 +143,7 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.15.1';
+    our $VERSION = 'v0.15.2';
 };
 
 use v5.12.0;
@@ -1610,7 +1610,17 @@ sub fragments { return( shift->split( remove_leading_sep => 1 ) ); }
 
 sub getc { return( shift->_filehandle_method( 'getc', 'file', @_ ) ); }
 
-sub getline { return( shift->_filehandle_method( 'getline', 'file', @_ ) ); }
+# sub getline { return( shift->_filehandle_method( 'getline', 'file', @_ ) ); }
+sub getline
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    $opts->{chomp} //= 0;
+    my $l = $self->_filehandle_method( 'getline', 'file' );
+    return if( !defined( $l ) );
+    chomp( $l ) if( $opts->{chomp} );
+    return( $l );
+}
 
 sub getlines { return( shift->_filehandle_method( 'getlines', 'file', @_ ) ); }
 
@@ -5821,7 +5831,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.15.1
+    v0.15.2
 
 =head1 DESCRIPTION
 
@@ -6108,6 +6118,10 @@ It returns an L<array object|Module::Generic::Array> of L<file objects|Module::G
 
 =head2 copy
 
+    $src->copy( $destination );
+    $src->copy( $destination, overwrite => 1 );
+    $src->copy( $destination, { overwrite => 1 } );
+
 Takes a dstination, and attempt to copy itself to the destination.
 
 If the object represents a directory and the destination exists and is also a directory, it will copy the directory below the destination.
@@ -6118,7 +6132,9 @@ If the object represents a directory and the destination exists and is also a di
 
 Of course if the destination is a regular file, undef is returned and an exception is set.
 
-If the object represents a file and the destination exists, it will copy the file under the target directory if if the destination is a directory or replace the target regular file if the destination is a regular file.
+If the object represents a file and the destination exists, it will copy the file under the target directory if the destination is a directory or replace the target regular file if the destination is a regular file.
+
+If the destination is a file, and it already exists, this will fail unless the option C<overwrite> was provided with a true value.
 
 If the object file/directory does not actually exist, this merely changes virtually its file path.
 
@@ -6415,9 +6431,22 @@ This "pushes a character with the given ordinal value back onto the given handle
 
 =head2 getline
 
+    my $line = $file->getline;
+    my $line = $file->getline( chomp => 1 );
+
 This is a thin wrapper around L<IO::Handle> method of the same name.
 
 "This works like <$io> described in C<I/O Operators> in perlop except that it's more readable and can be safely called in a list context but still returns just one line. If used as the conditional within a C<while> or C-style C<for> loop, however, you will need to emulate the functionality of <$io> with C<defined($_ = $io->getline)>."
+
+It also takes an optional hash or hash reference of the following parameters:
+
+=over 4
+
+=item * C<chomp>
+
+When provided with a true value, this will call L<perlfunc/chomp> on each line returned by C<getline>
+
+=back
 
 =head2 getlines
 

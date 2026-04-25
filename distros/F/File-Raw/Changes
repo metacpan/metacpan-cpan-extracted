@@ -1,5 +1,17 @@
 Revision history for File-Raw
 
+0.09    2026-04-25
+        - Fix build on Solaris/SunOS: drop GNU-only -Wl,--export-dynamic
+          and -Wl,-soname flags, native ld already exports by default
+        - Fix build on Windows/Cygwin: t/xs/file_api_test no longer
+          tries to link against Raw.dll (no import library shipped);
+          extract hook impl into include/file_hooks_impl.h, included
+          privately by the test extension on those platforms
+        - Skip cross-DLL hook subtests in t/012 on Windows/Cygwin where
+          each DLL has its own hook state
+        - Fix Perl_custom_op_register fallback in xop_compat.h for
+          pre-5.14 Perls
+
 0.08	2026-04-09
         - Fix more compilation issues on Cygwin: replace static XS() with XS_INTERNAL()
    	in file_api_test.c

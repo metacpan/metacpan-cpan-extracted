@@ -53,7 +53,7 @@ standard L<PPI::Statement>, L<PPI::Node> and L<PPI::Element> methods.
 use strict;
 use PPI::Statement ();
 
-our $VERSION = '1.285';
+our $VERSION = '1.287';
 
 our @ISA = "PPI::Statement";
 
@@ -128,12 +128,12 @@ sub type {
 		}
 		return 'for';
 	}
-	return {
-		%TYPES,
-		( try => 'try' ) x !!$self->presumed_features->{try},
-	}->{$content}
-	  if $Element->isa('PPI::Token::Word');
-	return 'continue'       if $Element->isa('PPI::Structure::Block');
+	if ($Element->isa('PPI::Token::Word')) {
+		return 'try'
+			if $content eq 'try' && $self->presumed_features->{try};
+		return $TYPES{$content};
+	}
+	return 'continue' if $Element->isa('PPI::Structure::Block');
 
 	# Unknown (shouldn't exist?)
 	undef;

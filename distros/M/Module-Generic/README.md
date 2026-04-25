@@ -100,7 +100,7 @@ Quick way to create a class with feature-rich methods
 
 # VERSION
 
-    v1.3.0
+    v1.3.1
 
 # DESCRIPTION
 
@@ -974,10 +974,12 @@ Provided with some optional arguments and this will instantiate a new [Module::G
 Example:
 
     my $dt = DateTime->now( time_zone => 'Asia/Tokyo' );
+    # or
+    my $dt = DateTime::Lite->now( time_zone => 'Asia/Tokyo' );
     # Returns a new Module::Generic::DateTime object
     my $d = $o->new_datetime( $dt );
 
-    # Returns a new Module::Generic::DateTime object with DateTime initiated automatically
+    # Returns a new Module::Generic::DateTime object with DateTime::Lite initiated automatically
     # to now with time zone set by default to UTC
     my $d = $o->new_datetime;
 
@@ -1870,7 +1872,7 @@ Sets or gets a code reference, acting as a callback that will be triggered upon 
 
 ## \_parse\_timestamp
 
-Provided with a string representing a date or datetime, and this will try to parse it and return a [DateTime](https://metacpan.org/pod/DateTime) object. It will also create a [DateTime::Format::Strptime](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AStrptime) to preserve the original date/datetime string representation and assign it to the [DateTime](https://metacpan.org/pod/DateTime) object. So when the [DateTime](https://metacpan.org/pod/DateTime) object is stringified, it displays the same string that was originally parsed.
+Provided with a string representing a date or datetime, and this will try to parse it and return a [DateTime::Lite](https://metacpan.org/pod/DateTime%3A%3ALite) object. It will also create a [DateTime::Format::Lite](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3ALite) to preserve the original date/datetime string representation and assign it to the [DateTime::Lite](https://metacpan.org/pod/DateTime%3A%3ALite) object. So when the [DateTime::Lite](https://metacpan.org/pod/DateTime%3A%3ALite) object is stringified, it displays the same string that was originally parsed.
 
 Supported formats are:
 
@@ -2529,13 +2531,13 @@ or
         tz => 'UTC',
     }, @_ ) ); }
 
-Provided with an object property name and asome date or datetime string and this will attempt to parse it and save it as a [DateTime](https://metacpan.org/pod/DateTime) object.
+Provided with an object property name and asome date or datetime string and this will attempt to parse it and save it as a [DateTime::Lite](https://metacpan.org/pod/DateTime%3A%3ALite) object.
 
 If the data is a 10 digits integer, this will treat it as a unix timestamp.
 
 Parsing also recognise special word such as `now`
 
-The created [DateTime](https://metacpan.org/pod/DateTime) object is associated a [DateTime::Format::Strptime](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AStrptime) object which enables the [DateTime](https://metacpan.org/pod/DateTime) object to be stringified as a unix timestamp using local time stamp, whatever it is.
+The created [DateTime::Lite](https://metacpan.org/pod/DateTime%3A%3ALite) object is associated a [DateTime::Format::Lite](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3ALite) object which enables the [DateTime::Lite](https://metacpan.org/pod/DateTime%3A%3ALite) object to be stringified as a unix timestamp using local time stamp, whatever it is.
 
 Even if there is no value set, and this method is called in chain, it returns a [Module::Generic::Null](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3ANull) whose purpose is to enable chaining without doing anything meaningful. For example, assuming the property _created_ of your object is not set yet, but in your script you call it like this:
 
@@ -2567,7 +2569,7 @@ Alternatively, you can provide an hash reference instead of a field name, and pa
 
 - `format`
 
-    An optional format that will be used to create a [DateTime::Format::Strptime](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AStrptime) that will be attached to the [DateTime](https://metacpan.org/pod/DateTime) object.
+    An optional format that will be used to create a [DateTime::Format::Lite](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3ALite) that will be attached to the [DateTime::Lite](https://metacpan.org/pod/DateTime%3A%3ALite) object.
 
 - `tz`
 
@@ -4069,7 +4071,7 @@ Supported options are:
                 # A Module::Generic::Scalar object
                 name => 'John Doe',
                 id => 'c47e1113-8336-4437-ba20-54f8cd0afb18',
-                # A DateTime object
+                # A DateTime or DateTime::Lite object
                 since => 'now',
                 # A Module::Generic::Number object
                 age => 32,

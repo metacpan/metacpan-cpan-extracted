@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## DateTime Format Lite - ~/lib/DateTime/Format/Lite.pm
-## Version v0.1.2
+## Version v0.1.3
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/04/14
-## Modified 2026/04/21
+## Modified 2026/04/23
 ## All rights reserved.
 ## 
 ## 
@@ -29,7 +29,7 @@ BEGIN
     use POSIX ();
     use Scalar::Util ();
     use Wanted;
-    our $VERSION    = 'v0.1.2';
+    our $VERSION    = 'v0.1.3';
     our @EXPORT_OK  = qw( strptime strftime );
     our $IsPurePerl;
 };
@@ -42,9 +42,11 @@ use warnings;
     my $loaded = 0;
     unless( $ENV{PERL_DATETIME_FORMAT_LITE_PP} )
     {
+        local $SIG{__WARN__} = sub{};
         local $@;
         eval
         {
+            no warnings 'redefine';
             require XSLoader;
             XSLoader::load(
                 __PACKAGE__,
@@ -654,7 +656,7 @@ sub time_zone
         }
         else
         {
-            $self->{time_zone} = DateTime::Lite::TimeZone->new( name => $tz ) ||
+            $self->{time_zone} = DateTime::Lite::TimeZone->new( name => $tz, extended => 1 ) ||
                 return( $self->pass_error( DateTime::Lite::TimeZone->error ) );
         }
     }
@@ -1159,7 +1161,7 @@ sub _munge_args
             {
                 @resolve_args = ( $abbr );
             }
-            my $candidates = DateTime::Lite::TimeZone->resolve_abbreviation( @resolve_args );
+            my $candidates = DateTime::Lite::TimeZone->resolve_abbreviation( @resolve_args, extended => 1 );
             if( !defined( $candidates ) )
             {
                 return( $self->_on_error( qq{Error resolving timezone abbreviation "$abbr": } . DateTime::Lite::TimeZone->error ) );
@@ -1227,12 +1229,15 @@ sub _munge_args
     {
         my $name = $args->{time_zone_name};
         # Normalise capitalisation unconditionally before lookup, because
-        # TimeZone->new may accept incorrect case and store it verbatim,
+        # DateTime::Lite::TimeZone->new may accept incorrect case and store it verbatim,
         # which would cause time_zone_long_name to return the un-normalised string.
         # e.g. 'asia/tokyo' or 'ASIA/TOKYO' -> 'Asia/Tokyo'
-        $name = lc( $name );
-        $name =~ s{ (^|[/_]) (.) }{ $1 . uc($2) }xge;
-        my $tz = DateTime::Lite::TimeZone->new( name => $name );
+        if( index( $name, '/' ) != -1 )
+        {
+            $name = lc( $name );
+            $name =~ s{ (^|[/_]) (.) }{ $1 . uc($2) }xge;
+        }
+        my $tz = DateTime::Lite::TimeZone->new( name => $name, extended => 1 );
         unless( $tz )
         {
             return( $self->_on_error( qq{The Olson timezone name "$args->{time_zone_name}" does not appear to be valid.} ) );
@@ -1512,7 +1517,7 @@ DateTime::Format::Lite - Parse and format datetimes with strptime patterns, retu
 
 =head1 VERSION
 
-    v0.1.2
+    v0.1.3
 
 =head1 DESCRIPTION
 

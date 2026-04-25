@@ -1,0 +1,168 @@
+#!/usr/bin/env perl
+# PODNAME: mcp-run-bash
+# ABSTRACT: MCP server that executes shell commands via bash over stdio
+
+use strict;
+use warnings;
+use MCP::Run::Bash;
+
+my %args;
+
+if (my $allowed = $ENV{MCP_RUN_ALLOWED_COMMANDS}) {
+  $args{allowed_commands} = [ grep { length } split /\s*,\s*/, $allowed ];
+}
+
+if (my $wd = $ENV{MCP_RUN_WORKING_DIRECTORY}) {
+  $args{working_directory} = $wd;
+}
+
+if (defined $ENV{MCP_RUN_TIMEOUT} && length $ENV{MCP_RUN_TIMEOUT}) {
+  $args{timeout} = $ENV{MCP_RUN_TIMEOUT} + 0;
+}
+
+$args{compress} = 1;
+if (defined $ENV{MCP_RUN_COMPRESS} && length $ENV{MCP_RUN_COMPRESS}) {
+  $args{compress} = ( $ENV{MCP_RUN_COMPRESS} =~ /^(?:1|true|yes|on)$/i ) ? 1 : 0;
+}
+
+if (my $name = $ENV{MCP_RUN_TOOL_NAME}) {
+  $args{tool_name} = $name;
+}
+
+MCP::Run::Bash->run_stdio(%args);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+mcp-run-bash - MCP server that executes shell commands via bash over stdio
+
+=head1 VERSION
+
+version 0.004
+
+=head1 SYNOPSIS
+
+  # Start with defaults (all commands allowed, 30s timeout):
+  $ mcp-run-bash
+
+  # Restrict to a set of commands:
+  $ MCP_RUN_ALLOWED_COMMANDS=ls,cat,grep mcp-run-bash
+
+  # Pin working directory and enable compressed output:
+  $ MCP_RUN_WORKING_DIRECTORY=/var/data MCP_RUN_COMPRESS=1 mcp-run-bash
+
+=head1 DESCRIPTION
+
+C<mcp-run-bash> starts an MCP (Model Context Protocol) server on stdio that
+exposes a single C<run> tool. The tool executes a command string via
+C<bash -c>, capturing stdout, stderr and exit code, and returns them to the
+MCP client.
+
+This is the entry point for wiring L<MCP::Run::Bash> into Claude Desktop,
+Claude Code or any other MCP-compatible client.
+
+=head1 NAME
+
+mcp-run-bash - MCP server that executes shell commands via bash over stdio
+
+=head1 CONFIGURATION
+
+The server is configured entirely through environment variables so it can be
+declared directly in an MCP client configuration file.
+
+=head2 Environment Variables
+
+=over 4
+
+=item C<MCP_RUN_ALLOWED_COMMANDS>
+
+Comma-separated list of command names that may be executed (matched against
+the first word of the command). When unset, all commands are allowed.
+
+=item C<MCP_RUN_WORKING_DIRECTORY>
+
+Default working directory for command execution. Overridable per-call via the
+tool's C<working_directory> argument.
+
+=item C<MCP_RUN_TIMEOUT>
+
+Default timeout in seconds. Defaults to C<30>. Overridable per-call.
+
+=item C<MCP_RUN_COMPRESS>
+
+Toggle output compression (noise filtering, line truncation) for LLM
+efficiency. B<Enabled by default> in this script — set to C<0>, C<false>,
+C<no> or C<off> to disable. Overridable per-call via the tool's C<compress>
+argument.
+
+=item C<MCP_RUN_TOOL_NAME>
+
+Name under which the tool is registered. Defaults to C<run>.
+
+=back
+
+=head1 CLAUDE DESKTOP
+
+Add to C<~/.config/claude/claude_desktop_config.json>:
+
+  {
+    "mcpServers": {
+      "run": {
+        "command": "mcp-run-bash",
+        "env": {
+          "MCP_RUN_ALLOWED_COMMANDS": "ls,cat,grep,find",
+          "MCP_RUN_WORKING_DIRECTORY": "/home/me/project"
+        }
+      }
+    }
+  }
+
+=head1 CLAUDE CODE
+
+Add to your project's C<.mcp.json>:
+
+  {
+    "mcpServers": {
+      "run": {
+        "command": "mcp-run-bash",
+        "env": {
+          "MCP_RUN_COMPRESS": "1"
+        }
+      }
+    }
+  }
+
+=head1 SEE ALSO
+
+L<MCP::Run::Bash> — the module that powers this script
+
+L<MCP::Run> — base class defining the C<run> MCP tool
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-mcp-run/issues>.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudssus.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

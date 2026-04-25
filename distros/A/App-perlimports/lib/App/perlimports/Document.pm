@@ -3,7 +3,7 @@ package App::perlimports::Document;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000058';
+our $VERSION = '0.000059';
 
 use App::perlimports::Annotations     ();
 use App::perlimports::ExportInspector ();
@@ -16,16 +16,20 @@ use MooX::StrictConstructor;
 use Path::Tiny                  qw( path );
 use PPI::Document               ();
 use PPIx::Utils::Classification qw(
+    is_class_name
     is_function_call
     is_hash_key
     is_method_call
+    is_package_declaration
 );
-use Ref::Util    qw( is_plain_arrayref is_plain_hashref );
-use Scalar::Util qw( refaddr );
+use PPIx::Utils::Traversal qw( split_nodes_on_comma );
+use Ref::Util              qw( is_plain_arrayref is_plain_hashref );
+use Scalar::Util           qw( refaddr );
 use Sub::HandlesVia;
-use Text::Diff      ();
-use Try::Tiny       qw( catch try );
-use Types::Standard qw( ArrayRef Bool HashRef InstanceOf Maybe Object Str );
+use Text::Diff ();
+use Try::Tiny  qw( catch try );
+use Types::Standard
+    qw( ArrayRef Bool HashRef InstanceOf Int Maybe Object Str );
 
 with 'App::perlimports::Role::Logger';
 
@@ -75,15 +79,32 @@ has _ignore_modules_pattern => (
     default  => sub { [] },
 );
 
+# list of PPI::Statement::Include (use, no, require)
+# (excluding pragmas, ignored modules, and 'use VERSION')
 has includes => (
     is          => 'ro',
-    isa         => ArrayRef [Object],
+    isa         => ArrayRef [Object],    # PPI::Statement::Include
     handles_via => 'Array',
     handles     => {
         all_includes => 'elements',
     },
     lazy    => 1,
     builder => '_build_includes',
+);
+
+# constant subs defined using 'use constant'
+has constants => (
+    is          => 'ro',
+    isa         => HashRef,
+    handles_via => 'Hash',
+    handles     => {
+        is_constant_name => 'exists',
+        all_constants    => 'keys',
+        _set_constants   => 'set',
+    },
+    predicate => '_has_constants',
+    lazy      => 1,
+    builder   => '_build_constants',
 );
 
 has _inspectors => (
@@ -100,6 +121,7 @@ has _inspectors => (
     default => sub { +{} },
 );
 
+# catalog of variables seen in interpolated context (string, qr, et al)
 has interpolated_symbols => (
     is      => 'ro',
     isa     => HashRef,
@@ -107,6 +129,7 @@ has interpolated_symbols => (
     builder => '_build_interpolated_symbols',
 );
 
+# (lint mode only) whether to output json (or else console text)
 has json => (
     is      => 'ro',
     isa     => Bool,
@@ -124,6 +147,7 @@ has _json_encoder => (
     },
 );
 
+# are we processing in lint mode ? (otherwise edit mode)
 has lint => (
     is      => 'ro',
     isa     => Bool,
@@ -152,15 +176,33 @@ has _never_export_modules => (
     predicate => '_has_never_export_modules',
 );
 
-has original_imports => (
+# catalog of symbols explicitly imported (by package), e.g.
+#  Carp => ['croak', ..], ...
+# in edit mode, this will be altered after processing (tidied_document)
+# to reflect what we think the import statement should be.
+has found_imports => (
     is          => 'ro',
     isa         => HashRef,
     handles_via => 'Hash',
     handles     => {
-        _reset_original_import => 'set',
+        _reset_found_import => 'set',
     },
     lazy    => 1,
-    builder => '_build_original_imports',
+    builder => '_build_found_imports',
+);
+
+has _indent => (
+    is       => 'ro',
+    isa      => Int,
+    init_arg => 'indent',
+    default  => 4,
+);
+
+has _pad_brackets => (
+    is       => 'ro',
+    isa      => Bool,
+    init_arg => 'pad_brackets',
+    default  => 0,
 );
 
 has _padding => (
@@ -177,9 +219,15 @@ has ppi_document => (
     builder => '_build_ppi_document',
 );
 
+# list of tokens in the document that -could- have come from an import
+# (but most are keywords, built-ins, lexical vars, defined funcs, etc.)
 has possible_imports => (
-    is      => 'ro',
-    isa     => ArrayRef [Object],
+    is          => 'ro',
+    isa         => ArrayRef [Object],    # isa PPI:Token:Word, :Symbol, :Magic
+    handles_via => 'Array',
+    handles     => {
+        possibly_imported_tokens => 'elements',
+    },
     lazy    => 1,
     builder => '_build_possible_imports',
 );
@@ -217,6 +265,8 @@ has _sub_exporter_export_list => (
     builder => '_build_sub_exporter_export_list',
 );
 
+# catalog of the named subs defined, e.g.
+#   new => 1, ...
 has _sub_names => (
     is          => 'ro',
     isa         => HashRef,
@@ -233,14 +283,14 @@ has _tidy_whitespace => (
     isa      => Bool,
     init_arg => 'tidy_whitespace',
     lazy     => 1,
-    default  => sub { 1 },
+    default  => 1,
 );
 
 has _verbose => (
     is       => 'ro',
     isa      => Bool,
     init_arg => 'verbose',
-    default  => sub { 0 },
+    default  => 0,
 );
 
 around BUILDARGS => sub {
@@ -376,6 +426,116 @@ sub _build_includes {
     ## use critic
 }
 
+sub _build_constants {
+    my $self = shift;
+    my %constant;
+
+    my $incs = $self->_ppi_selection->find(
+        sub {
+            $_[1]->isa('PPI::Statement::Include')
+                && $_[1]->module eq 'constant';
+        }
+    ) || [];
+
+    foreach my $inc (@$incs) {
+        next unless my @data = $self->_parse_constant($inc);
+
+        # N.B. we never alter 'use constant' imports
+        foreach my $data (@data) {
+            $constant{ $data->{name} } = $data;
+        }
+    }
+
+    $self->logger->debug("constants found: @{[sort keys %constant]}");
+
+    return \%constant;
+}
+
+# parse hashref into list of "values"; each an arrayref of tokens
+sub _parse_hashlist {
+    my ($elem) = @_;
+    return unless $elem->isa('PPI::Structure::Constructor');
+    my ($exp) = $elem->schildren;
+    return unless $exp->isa('PPI::Statement::Expression');
+    my @tokens = $exp->schildren;
+
+    # first and last commas are ignored, if no significant child exists beyond!
+    # interior serial commas are not handled properly: {a => 1, 'b', , 'c', 4}
+    return my @values = split_nodes_on_comma(@tokens);
+}
+
+# until we get a PPI::Statement::Include::Constant class
+## no critic (Subroutines::ProhibitExcessComplexity)
+sub _parse_constant {
+    my ( $self, $stm ) = @_;
+    return
+        unless $stm->isa('PPI::Statement::Include')
+        && $stm->module eq 'constant';
+
+    my ( $expected, @kv );
+
+    return unless my @args = $stm->arguments;
+    if ( @args > 1 ) {
+        my ( $word, $op, @defn ) = @args;
+
+        $expected = $op eq '=>' && $word->isa('PPI::Token::Word') && @defn;
+
+        $expected
+            ||= $word->isa('PPI::Token::Quote')
+            && ( $op eq ',' || $op eq '=>' )
+            && @defn;
+
+        @kv = ( $word, \@defn ) if $expected;
+
+    }
+    elsif ( my $first = $args[0] ) {    # @args == 1
+        if ( $first->isa('PPI::Structure::Constructor') ) {
+
+            # e.g.: use constant { FOO => 1, BAR => 3 };
+            # keys are arrayrefs, of (hopefully) a single token
+            @kv = _parse_hashlist($first);
+            $expected++;
+        }
+    }
+
+    if ( !$expected || !@kv || @kv % 2 ) {
+        $self->logger->error("failed to parse constant: $stm");
+        return;
+    }
+
+    my @constants;
+    while (@kv) {
+        my ( $word, $val ) = splice( @kv, 0, 2 );
+        if ( is_plain_arrayref($word) ) {
+            if ( @$word > 1 ) {
+                $self->logger->error("failed to parse constant: @$word");
+                next;
+            }
+            $word = $word->[0];
+        }
+
+        my $name = $word->isa('PPI::Token::Quote') ? $word->string : "$word";
+        my %data = (
+            token      => $word,
+            name       => $name,
+            definition => $val,
+        );
+
+        # position in file after which this function exists (compile time)
+        # TODO location data can become stale
+        if ( my $end = $stm->last_element ) { # likely PPI:Token:Structure ';'
+            my $loc = _elem_loc($end);
+            $data{end} = $loc->{end};
+        }
+
+        push @constants, \%data;
+    }
+
+    return @constants;
+}
+## use critic
+
+## no critic (Subroutines::ProhibitExcessComplexity)
 sub _build_possible_imports {
     my $self   = shift;
     my $before = $self->ppi_document->find(
@@ -386,6 +546,9 @@ sub _build_possible_imports {
                 || $_[1]->isa('PPI::Token::Prototype');
         }
     ) || [];
+
+    # remember referenced package namespaces and constants
+    my ( %pack, %const );
 
     my @after;
     for my $word ( @{$before} ) {
@@ -400,15 +563,55 @@ sub _build_possible_imports {
         # sub any {}
         next if $self->is_sub_name("$word");
 
+        # cant validate class/instance method names:
         next if !$word->isa('PPI::Token::Symbol') && is_method_call($word);
 
         next if $self->_is_word_interpreted_as_string($word);
 
+        next if is_package_declaration($word);
+
+        if ( my $stm = $word->statement ) {
+            my $first = $stm->schild(0);    # PPI:Element
+            if ( $stm->isa('PPI::Statement::Package') ) {
+                next if $word eq 'package' && $word == $first;
+
+            }
+            elsif ( $stm->isa('PPI::Statement::Include') ) {
+                if ( my $packname = $stm->module ) {
+                    $pack{$packname} ||= 1;    # even if its a pragma
+
+                    if ( $packname eq 'constant' ) {
+                        next unless my @data = $self->_parse_constant($stm);
+                        $const{ $_->{name} } ||= $_ for @data;
+                        next if any { $word == $_->{token} } @data;
+                    }
+
+                    my $package_bareword = $stm->schild(1);
+                    next if $word == $package_bareword;
+                }
+
+                next if $word eq 'use' && $word == $first;
+                next if $stm->pragma && $word eq 'no' && $word == $first;
+            }
+        }
+
+        next
+            if $const{"$word"}
+            && ( is_hash_key($word) || is_function_call($word) );
+        next if $pack{"$word"} && is_class_name($word);   # class method calls
+
         push @after, $word;
+    }
+
+    # safe to assume our search encountered every 'use constant' statement
+    if ( %const && !$self->_has_constants ) {
+        $self->_set_constants(%const);
+        $self->logger->debug("constants found: @{[sort keys %const]}");
     }
 
     return \@after;
 }
+## use critic
 
 sub _build_ppi_document {
     my $self = shift;
@@ -428,12 +631,12 @@ sub _build_ppi_document {
 #     POSIX => [],
 # }
 #
-# The name is a bit of a misnomer. It starts out as a list of original imports,
-# but with each include that gets processed, this list also gets updated. We do
-# this so that we can keep track of what previous modules are really importing.
-# Might not be bad to rename this.
+# In lint mode, it never changes.  In edit mode, it starts out as a list of
+# original imports, but with each include that gets processed, this list gets
+# updated. We do this so that we can keep track of what previous modules
+# are really importing, avoiding duplicate imports.
 
-sub _build_original_imports {
+sub _build_found_imports {
     my $self = shift;
 
     # We're missing requires which could be followed by an import.
@@ -461,7 +664,9 @@ sub _build_original_imports {
         my $found_for_include = _imports_for_include($include);
         if ($found_for_include) {
             if ( $imports{$pkg} ) {
-                push @{ $imports{$pkg} }, @{$found_for_include};
+                my %catalog = map { $_ => 1 } @{ $imports{$pkg} },
+                    @{$found_for_include};
+                $imports{$pkg} = [ sort keys %catalog ];
             }
             else {
                 $imports{$pkg} = $found_for_include;
@@ -543,9 +748,12 @@ sub _extract_symbols_from_snippet {
     my $casts = $doc->find('PPI::Token::Cast') || [];
     for my $cast ( @{$casts} ) {
 
-        # Optimistically avoid misinterpreting regex assertions as casts
-        # We don't want to match on "A" in the following example:
-        # if ( $thing =~ m{ \A b }x ) { ... }
+        # PPI Edge Case: False positive casts from regex assertions
+        #
+        # PPI can misinterpret regex assertions like \A as casts. We don't
+        # want to match on "A" in: if ( $thing =~ m{ \A b }x ) { ... }
+        #
+        # See also: Similar PPI edge case for quote operators at line ~596
         next if $cast eq '\\';
 
         my $full_cast   = $cast . $cast->snext_sibling;
@@ -592,6 +800,23 @@ sub _unnest_quotes {
     return @words unless $quotes;
 
     for my $q (@$quotes) {
+
+        # PPI Edge Case: False positive quote operators
+        #
+        # PPI sometimes misinterprets content inside double-quoted strings as
+        # quote operators. For example, when parsing pack("qq", ...), PPI may
+        # identify the bare "qq" as a PPI::Token::Quote even though it's just
+        # a string literal. Calling ->string on these false positives causes
+        # "Use of uninitialized value" errors because they lack actual content.
+        #
+        # Detection: Real quote operators have delimiters (e.g., q{}, qq[],
+        # qw()). False positives are just the bare operator name.
+        #
+        # See also: Similar PPI edge case handling for casts at line ~546
+        # where regex assertions like \A can be misinterpreted as casts.
+        my $quote_str = "$q";
+        next if $quote_str =~ m/\A(?:qq?|qw|qx|qr|m|s|tr|y)\z/;
+
         push @words, _extract_symbols_from_snippet("$q");
         push @words, $self->_unnest_quotes($q);
     }
@@ -737,9 +962,9 @@ sub _has_import_switches {
     # We will leave this case as broken for the time being. I'm not sure how
     # common that invocation is.
 
-    if ( exists $self->original_imports->{$module_name}
+    if ( exists $self->found_imports->{$module_name}
         && any { $_ =~ m{^[\-]} }
-        @{ $self->original_imports->{$module_name} || [] } ) {
+        @{ $self->found_imports->{$module_name} || [] } ) {
         return 1;
     }
     return 0;
@@ -849,6 +1074,23 @@ sub inspector_for {
     return $self->_get_inspector_for($module);
 }
 
+# given a PPI:Statement:Include that exists in the doc,
+# instantiate a App:perlimports:Include to process it.
+sub _include_analyzer {
+    my ( $self, $include ) = @_;
+
+    return my $e = App::perlimports::Include->new(
+        document        => $self,
+        include         => $include,
+        indent          => $self->_indent,
+        logger          => $self->logger,
+        found_imports   => $self->found_imports->{ $include->module },
+        pad_brackets    => $self->_pad_brackets,
+        pad_imports     => $self->_padding,
+        tidy_whitespace => $self->_tidy_whitespace,
+    );
+}
+
 sub tidied_document {
     return shift->_lint_or_tidy_document;
 }
@@ -860,11 +1102,12 @@ sub linter_success {
 # Kind of on odd interface, but right now we return either a tidied document or
 # the result of linting. Could probably clean this up at some point, but I'm
 # not sure yet how much the linting will change.
+# N.B. In lint mode, we never modify the document.
 sub _lint_or_tidy_document {
     my $self = shift;
 
     my $linter_error = 0;
-    my %processed;
+    my %processed;    # modules we changed/confirmed the use statement
 
 INCLUDE:
     foreach my $include ( $self->all_includes ) {
@@ -893,16 +1136,10 @@ INCLUDE:
 
         $self->logger->notice( '📦 ' . "Processing include: $include" );
 
-        my $e = App::perlimports::Include->new(
-            document         => $self,
-            include          => $include,
-            logger           => $self->logger,
-            original_imports => $self->original_imports->{ $include->module },
-            pad_imports      => $self->_padding,
-            tidy_whitespace  => $self->_tidy_whitespace,
-        );
+        my $e = $self->_include_analyzer($include);
         my $elem;
         try {
+            # may return the original include!
             $elem = $e->formatted_ppi_statement;
         }
         catch {
@@ -942,6 +1179,12 @@ INCLUDE:
             }
         }
 
+        # if the 'new' statement is actually just the original, skip!
+        if ( $elem == $include ) {
+            $processed{ $include->module } = 1;
+            next INCLUDE;
+        }
+
         ## no critic (Subroutines::ProhibitCallsToUnexportedSubs)
         # Let's see if the import itself might break something
         if ( my $err
@@ -976,29 +1219,16 @@ INCLUDE:
                         $elem->content
                     );
                     $linter_error = 1;
-                    next INCLUDE;
                 }
+                next INCLUDE;
             }
 
             $self->logger->info("resetting imports for |$elem|");
 
-            # Now reset original_imports so that we can account for any changes
-            # when processing includes further down the list.
-            my $doc = PPI::Document->new( \"$elem" );
-
-            if ( !$doc ) {
-                $self->logger->error("PPI could not parse $elem");
-            }
-            else {
-                my $new_include
-                    = $doc->find(
-                    sub { $_[1]->isa('PPI::Statement::Include') } );
-
-                $self->_reset_original_import(
-                    $include->module,
-                    _imports_for_include( $new_include->[0] )
-                );
-            }
+            $self->_reset_found_import(
+                $include->module,
+                _imports_for_include($elem)
+            );
         }
     }
 
@@ -1007,6 +1237,24 @@ INCLUDE:
     # We need to do serialize in order to preserve HEREDOCs.
     # See https://metacpan.org/pod/PPI::Document#serialize
     return $self->lint ? !$linter_error : $self->_ppi_selection->serialize;
+}
+
+# given PPI:Element, returns hashref describing location, e.g.:
+#   {start => {line => 3, column => 4}, end => {...}}
+sub _elem_loc {
+    my ($elem) = @_;
+
+    my $loc     = { start => { line => $elem->line_number } };
+    my $content = $elem->content;
+    my @lines   = split( m{\n}, $content );
+
+    if ( $lines[0] =~ m{[^\s]} ) {
+        $loc->{start}->{column} = @-;
+    }
+    $loc->{end}->{line}   = $elem->line_number + @lines - 1;
+    $loc->{end}->{column} = length( $lines[-1] );
+
+    return $loc;
 }
 
 sub _warn_diff_for_linter {
@@ -1022,19 +1270,9 @@ sub _warn_diff_for_linter {
 
     if ( $self->json ) {
 
-        my $loc     = { start => { line => $include->line_number } };
-        my $content = $include->content;
-        my @lines   = split( m{\n}, $content );
-
-        if ( $lines[0] =~ m{[^\s]} ) {
-            $loc->{start}->{column} = @-;
-        }
-        $loc->{end}->{line}   = $include->line_number + @lines - 1;
-        $loc->{end}->{column} = length( $lines[-1] );
-
         $json = {
             filename => $self->_filename,
-            location => $loc,
+            location => _elem_loc($include),
             module   => $include->module,
             reason   => $reason,
         };
@@ -1173,7 +1411,7 @@ App::perlimports::Document - Make implicit imports explicit
 
 =head1 VERSION
 
-version 0.000058
+version 0.000059
 
 =head1 MOTIVATION
 
@@ -1191,6 +1429,58 @@ Returns true if document was linted without errors, otherwise false.
 =head2 tidied_document
 
 Returns a serialized PPI document with (hopefully) tidy import statements.
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item constants
+
+Hashref catalog of detected constants in the document. So the line:
+
+ use constant FIRST_IDX => 0;
+
+results in a corresponding entry in the constants hashref:
+
+ FIRST_IDX => {
+   name        => 'FIRST_IDX', # (plain string)
+   token       => 'FIRST_IDX', # (PPI::Token::Word usually)
+   definition  => [ PPI::Token.. ],
+   end         => { line => 9, column => 32 },
+ },
+
+The C<end> is the (line, character) position of the last character of the
+constant import statement.  This might be useful since the constant is only
+defined (at compile time!) after this statement.
+(Note: locations can become stale!)
+
+The C<name> field is useful when the constant was defined using atypical
+syntax (no fat arrow), since the token doesn't stringify the same:
+
+ use constant 'FIRST_IDX', 0;
+ # token eq "'FIRST_IDX'", # (PPI::Token::Quote::Single)
+ # name  eq 'FIRST_IDX',   # same as $token->string
+
+=item includes
+
+An arrayref of L<PPI::Statement::Include> statements found in the document,
+excluding pragmas, ignored modules, and 'use VERSION' statements.
+
+=item found_imports
+
+A hashref catalog of symbols imported from each package by a use statement,
+e.g.
+
+  { Carp => ['croak', ..], ... }
+
+In lint mode, this attribute is never altered.
+
+In edit mode, when L<tidied_document> is called, with each include that gets
+processed, this list gets updated to what we think it should be.  We do this
+so that we can keep track of what previous modules are really importing, to
+avoid duplicate imports (same symbol name from different packages).
+
+=back
 
 =head1 AUTHOR
 

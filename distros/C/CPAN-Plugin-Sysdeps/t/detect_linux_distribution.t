@@ -13,12 +13,9 @@ use Test::More;
 use CPAN::Plugin::Sysdeps ();
 require_CPAN_Distribution;
 
-# Debian releases happen every two years, with a release possible
-# to be as late as in August. See https://en.wikipedia.org/wiki/Debian_version_history
-use constant DEBIAN_TRIXIE_PROBABLY_RELEASED => strftime('%F', gmtime) gt '2025-08-31';
-
 sub os_release_test ($$$$$$);
-sub set_todo_for_linuxdistroversion ($);
+sub set_todo_for_linuxdistroversion ();
+sub _is_debian_sid ();
 
 plan skip_all => "Only works on linux" if $^O ne 'linux';
 plan 'no_plan';
@@ -213,7 +210,7 @@ SKIP: {
 	} else {
 	    ok $info_os_release->{linuxdistro},         "via os-release: linuxdistro=$info_os_release->{linuxdistro}";
 	    {
-		local $TODO = set_todo_for_linuxdistroversion $info_os_release;
+		local $TODO = set_todo_for_linuxdistroversion;
 		ok $info_os_release->{linuxdistroversion},  "via os-release: linuxdistroversion=$info_os_release->{linuxdistroversion}";
 	    }
 	    if ($info_os_release->{linuxdistrocodename}) {
@@ -253,7 +250,7 @@ SKIP: {
 		diag "linuxdistrocodename comparison: lsb_release=$info_lsb_release->{linuxdistrocodename} os-release=$info_os_release->{linuxdistrocodename}";
 	    }
 	    if ($info_os_release->{linuxdistro} eq 'debian') {
-		local $TODO = set_todo_for_linuxdistroversion $info_os_release;
+		local $TODO = set_todo_for_linuxdistroversion;
 		(my $lsb_major_version = $info_lsb_release->{linuxdistroversion}) =~ s{\..*}{};
 		is $lsb_major_version, $info_os_release->{linuxdistroversion}, 'os-release vs lsb_release: compare linuxdistroversion (debian: only major version)';
 	    } elsif ($info_os_release->{linuxdistro} =~ m{^(ubuntu|fedora)$}) {
@@ -307,17 +304,20 @@ sub traverse_warnings_test {
     is_deeply \@warnings, [], "no warnings while traversing";
 }
 
-sub set_todo_for_linuxdistroversion ($) {
-    my $info = shift;
-    if (($info->{linuxdistrocodename}||'') eq 'trixie') {
-	if (DEBIAN_TRIXIE_PROBABLY_RELEASED) {
-	    diag "Author note: debian:trixie is probably released, please remove special handling";
-	    undef;
+sub set_todo_for_linuxdistroversion () {
+    _is_debian_sid() ? "debian/sid detected, VERSION_ID is usually missing" : undef;
+}
+
+{
+    my $is_debian_sid;
+    sub _is_debian_sid () {
+	return $is_debian_sid if defined $is_debian_sid;
+	my $os_release = CPAN::Plugin::Sysdeps::_get_os_release();
+	if ($os_release && $os_release->{PRETTY_NAME} =~ m{^Debian GNU/Linux .*/sid$}) {
+	    $is_debian_sid = 1;
 	} else {
-	    "debian:trixie not yet released, probably VERSION_ID is missing";
+	    $is_debian_sid = 0;
 	}
-    } else {
-	undef;
     }
 }
 

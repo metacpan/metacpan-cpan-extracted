@@ -4,11 +4,11 @@ use strict;
 use warnings;
 use File::Find ();
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 # XS methods are registered under the Chandra bootstrap.
 # Ensure the shared object is loaded.
-require Chandra;
+use Chandra;
 
 1;
 

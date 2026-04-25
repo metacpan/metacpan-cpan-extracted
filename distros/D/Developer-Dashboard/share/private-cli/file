@@ -1,0 +1,75 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+use Developer::Dashboard::CLI::Files ();
+
+# main(@ARGV)
+# Runs the file helper for Developer Dashboard.
+# Input: command-line arguments from @ARGV.
+# Output: prints file alias or lookup JSON/line output, then exits.
+Developer::Dashboard::CLI::Files::run_files_command( command => 'file', args => \@ARGV );
+
+__END__
+
+=pod
+
+=head1 NAME
+
+file - private file helper for Developer Dashboard
+
+=head1 SYNOPSIS
+
+  dashboard file <resolve|locate|add|del|list> ...
+
+=head1 DESCRIPTION
+
+This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the main
+C<dashboard> command can keep file registry operations available without
+loading the full runtime first.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+This staged helper exposes the C<dashboard file ...> subcommand family:
+resolve, locate, add, del, and list. It is the public CLI front end for saved
+file aliases and lightweight file lookup.
+
+=head1 WHY IT EXISTS
+
+It exists because file alias commands are built-ins, but the actual lookup and
+config persistence rules need to live in Perl so shell users and tests all see
+one behavior.
+
+=head1 WHEN TO USE
+
+Use this file when changing C<dashboard file> verbs, staged-helper argv
+handling, or the examples that describe file alias resolution and lookup.
+
+=head1 HOW TO USE
+
+Users run C<dashboard file E<lt>verbE<gt> ...>. The staged helper loads the
+file command runtime and prints either JSON or line-oriented output depending
+on the selected subcommand.
+
+=head1 WHAT USES IT
+
+It is used by the public file command family and by regression tests that
+verify file alias persistence, resolution, and locate behavior.
+
+=head1 EXAMPLES
+
+  dashboard file resolve global_config
+  dashboard file add notes ~/notes.txt
+  dashboard file locate notes txt
+  dashboard file list
+  dashboard file del notes
+
+=for comment FULL-POD-DOC END
+
+=cut

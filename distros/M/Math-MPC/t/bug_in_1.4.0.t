@@ -1,6 +1,6 @@
 # This script checks that the workaround for the division bug in mpc-1.4.0 at
 # https://sympa.inria.fr/sympa/arc/mpc-discuss/2026-03/msg00019.html
-# is working as intended.
+# is working as intended - irrespective of mpc version.
 
 use strict;
 use warnings;
@@ -33,6 +33,8 @@ my $op5 = Rmpc_init2($prec_op);
 my $div = Rmpc_init2($prec_op);
 my $fr = Math::MPFR::Rmpfr_init2($prec_op);
 
+my $im = Math::MPFR->new();
+
 Math::MPFR::Rmpfr_set_NV($fr, 5.6, 0); # MPFR_RNDN
 
 #####################
@@ -41,6 +43,9 @@ Math::MPFR::Rmpfr_set_NV($fr, 5.6, 0); # MPFR_RNDN
 
 Rmpc_set_ui($op1, 5, MPC_RNDNN);
 Rmpc_ui_div($rop, 1, $op1, MPC_RNDNN);
+
+RMPC_IM($im, $rop);
+cmp_ok("$im", 'eq', '-0', "Rmpc_ui_div: imaginary component of rop is -0");
 
 my $p = Rmpc_get_prec($rop);
 cmp_ok($p, '==', $prec_rop, "Rmpc_ui_div: rop precision is ok");
@@ -56,6 +61,9 @@ if($Config{nvsize} == 8) {
   Rmpc_set_ui($op2, 5, MPC_RNDNN);
   Rmpc_d_div($rop, 1.0, $op2, MPC_RNDNN);
 
+RMPC_IM($im, $rop);
+cmp_ok("$im", 'eq', '-0', "Rmpc_d_div: imaginary component of rop is -0");
+
   $p = Rmpc_get_prec($rop);
   cmp_ok($p, '==', $prec_rop, "Rmpc_d_div: rop precision is ok");
   cmp_ok(Math::MPFR::Rmpfr_get_default_prec(), '==', $mpfr_prec_default, "Rmpc_d_div: MPFR default prec is $mpfr_prec_default");
@@ -69,6 +77,9 @@ elsif($Config{nvtype} eq 'long double') {
   #####################
   Rmpc_set_ui($op2, 5, MPC_RNDNN);
   Rmpc_ld_div($rop, 1.0, $op2, MPC_RNDNN);
+
+  RMPC_IM($im, $rop);
+  cmp_ok("$im", 'eq', '-0', "Rmpc_ld_div: imaginary component of rop is -0");
 
   $p = Rmpc_get_prec($rop);
   cmp_ok($p, '==', $prec_rop, "Rmpc_ld_div: rop precision is ok");
@@ -84,6 +95,9 @@ elsif($Config{nvtype} eq 'long double') {
 
 Rmpc_set_ui($op3, 5, MPC_RNDNN);
 Rmpc_fr_div($rop, Math::MPFR->new(1), $op3, MPC_RNDNN);
+
+RMPC_IM($im, $rop);
+cmp_ok("$im", 'eq', '-0', "Rmpc_fr_div: imaginary component of rop is -0");
 
 $p = Rmpc_get_prec($rop);
 cmp_ok($p, '==', $prec_rop, "Rmpc_fr_div: rop precision is ok");
@@ -101,6 +115,9 @@ unless($@) {
   Rmpc_set_ui($op4, 5, MPC_RNDNN);
   Rmpc_sj_div($rop, 1, $op4, MPC_RNDNN);
 
+RMPC_IM($im, $rop);
+cmp_ok("$im", 'eq', '-0', "Rmpc_sj_div: imaginary component of rop is -0");
+
   $p = Rmpc_get_prec($rop);
   cmp_ok($p, '==', $prec_rop, "Rmpc_sj_div: rop precision is ok");
   cmp_ok(Math::MPFR::Rmpfr_get_default_prec(), '==', $mpfr_prec_default, "Rmpc_sj_div: MPFR default prec is $mpfr_prec_default");
@@ -115,6 +132,9 @@ unless($@) {
 Rmpc_set_ui($op5, 5, MPC_RNDNN);
 Rmpc_set_ui($div, 3, MPC_RNDNN);
 Rmpc_div($rop, $div, $op5, MPC_RNDNN);
+
+RMPC_IM($im, $rop);
+cmp_ok("$im", 'eq', '0', "Rmpc_div: imaginary component of rop is 0");
 
 $p = Rmpc_get_prec($rop);
 cmp_ok($p, '==', $prec_rop, "Rmpc_div: rop precision is ok");
@@ -138,8 +158,15 @@ cmp_ok($p, '==', $mpc_prec_default, "MPC default precision is unaltered");
 
   my $x = Math::MPC::Rmpc_init2($PREC);
   Math::MPC::Rmpc_set_ui($x, 5, $ROUND);
+
   Math::MPC::Rmpc_ui_div($x, 1, $x, $ROUND);
+  RMPC_IM($im, $x);
+  cmp_ok("$im", 'eq', '-0', "T1: Rmpc_ui_div: imaginary component of rop is -0");
+
   Math::MPC::Rmpc_ui_div($x, 1, $x, $ROUND);
+  RMPC_IM($im, $x);
+  cmp_ok("$im", 'eq', '0', "T2: Rmpc_ui_div: imaginary component of rop is 0");
+
   Math::MPC::Rmpc_atanh($x, $x, $ROUND);
   Math::MPC::Rmpc_tanh($x, $x, $ROUND);
 
@@ -162,8 +189,15 @@ cmp_ok($p, '==', $mpc_prec_default, "MPC default precision is unaltered");
 
   my $x = Math::MPC::Rmpc_init2($PREC);
   Math::MPC::Rmpc_set_ui($x, 5, $ROUND);
+
   Math::MPC::Rmpc_fr_div($x, Math::MPFR->new(1), $x, $ROUND);
+  RMPC_IM($im, $x);
+  cmp_ok("$im", 'eq', '-0', "T1: Rmpc_fr_div: imaginary component of rop is -0");
+
   Math::MPC::Rmpc_fr_div($x, Math::MPFR->new(1), $x, $ROUND);
+  RMPC_IM($im, $x);
+  cmp_ok("$im", 'eq', '0', "T2: Rmpc_fr_div: imaginary component of rop is 0");
+
   Math::MPC::Rmpc_atanh($x, $x, $ROUND);
   Math::MPC::Rmpc_tanh($x, $x, $ROUND);
 
@@ -188,7 +222,13 @@ unless($@) {
   my $x = Math::MPC::Rmpc_init2($PREC);
   Math::MPC::Rmpc_set_ui($x, 5, $ROUND);
   Math::MPC::Rmpc_sj_div($x, 1, $x, $ROUND);
+  RMPC_IM($im, $x);
+  cmp_ok("$im", 'eq', '-0', "T1: Rmpc_sj_div: imaginary component of rop is -0");
+
   Math::MPC::Rmpc_sj_div($x, 1, $x, $ROUND);
+  RMPC_IM($im, $x);
+  cmp_ok("$im", 'eq', '0', "T2: Rmpc_sj_div: imaginary component of rop is 0");
+
   Math::MPC::Rmpc_atanh($x, $x, $ROUND);
   Math::MPC::Rmpc_tanh($x, $x, $ROUND);
 
@@ -212,7 +252,13 @@ if($Config{nvsize} == 8) {
   my $x = Math::MPC::Rmpc_init2($PREC);
   Math::MPC::Rmpc_set_ui($x, 5, $ROUND);
   Math::MPC::Rmpc_d_div($x, 1.0, $x, $ROUND);
+  RMPC_IM($im, $x);
+  cmp_ok("$im", 'eq', '-0', "T1: Rmpc_d_div: imaginary component of rop is -0");
+
   Math::MPC::Rmpc_d_div($x, 1.0, $x, $ROUND);
+  RMPC_IM($im, $x);
+  cmp_ok("$im", 'eq', '0', "T2: Rmpc_d_div: imaginary component of rop is 0");
+
   Math::MPC::Rmpc_atanh($x, $x, $ROUND);
   Math::MPC::Rmpc_tanh($x, $x, $ROUND);
 
@@ -236,7 +282,13 @@ elsif($Config{nvtype} eq 'long double') {
   my $x = Math::MPC::Rmpc_init2($PREC);
   Math::MPC::Rmpc_set_ui($x, 5, $ROUND);
   Math::MPC::Rmpc_ld_div($x, 1.0, $x, $ROUND);
+  RMPC_IM($im, $x);
+  cmp_ok("$im", 'eq', '-0', "T1: Rmpc_ld_div: imaginary component of rop is -0");
+
   Math::MPC::Rmpc_ld_div($x, 1.0, $x, $ROUND);
+  RMPC_IM($im, $x);
+  cmp_ok("$im", 'eq', '0', "T2: Rmpc_ld_div: imaginary component of rop is 0");
+
   Math::MPC::Rmpc_atanh($x, $x, $ROUND);
   Math::MPC::Rmpc_tanh($x, $x, $ROUND);
 
@@ -260,7 +312,13 @@ elsif($Config{nvtype} eq 'long double') {
   my $x = Math::MPC::Rmpc_init2($PREC);
   Math::MPC::Rmpc_set_ui($x, 5, $ROUND);
   Math::MPC::Rmpc_div($x, Math::MPC->new(1), $x, $ROUND);
+  RMPC_IM($im, $x);
+  cmp_ok("$im", 'eq', '0', "T1: Rmpc_div: imaginary component of rop is 0");
+
   Math::MPC::Rmpc_div($x, Math::MPC->new(1), $x, $ROUND);
+  RMPC_IM($im, $x);
+  cmp_ok("$im", 'eq', '0', "T2: Rmpc_div: imaginary component of rop is 0");
+
   Math::MPC::Rmpc_atanh($x, $x, $ROUND);
   Math::MPC::Rmpc_tanh($x, $x, $ROUND);
 
@@ -281,8 +339,11 @@ elsif($Config{nvtype} eq 'long double') {
 {
   ##### overloaded iv div #####
   my $op = Rmpc_init2($prec_op);
-  Rmpc_set_ui($rop, 5, MPC_RNDNN);
+  Rmpc_set_ui($op, 5, MPC_RNDNN);
   my $rop = 1 / $op;
+
+  RMPC_IM($im, $rop);
+  cmp_ok("$im", 'eq', '-0', "$prec_op: overloaded integer div: imaginary component of rop is -0");
 
   $p = Rmpc_get_prec($op);
   cmp_ok($p, '==', $prec_op, "OP: overloaded integer div: precision is ok");
@@ -298,6 +359,9 @@ elsif($Config{nvtype} eq 'long double') {
   my $op = Rmpc_init2($prec_op);
   Rmpc_set_ui($op, 5, MPC_RNDNN);
   my $rop = 1.2 / $op;
+
+  RMPC_IM($im, $rop);
+  cmp_ok("$im", 'eq', '-0', "overloaded nv div: imaginary component of rop is -0");
 
   my $p = Rmpc_get_prec($op);
   cmp_ok($p, '==', $prec_op, "OP: overloaded nv div: precision is ok");
@@ -316,6 +380,9 @@ elsif($Config{nvtype} eq 'long double') {
     Rmpc_set_ui($op, 5, MPC_RNDNN);
     my $rop = Math::MPFR->new(1) / $op;
 
+  RMPC_IM($im, $rop);
+  cmp_ok("$im", 'eq', '-0', "overloaded fr div: imaginary component of rop is -0");
+
     my $p = Rmpc_get_prec($op);
     cmp_ok($p, '==', $prec_op, "OP: overloaded fr div: precision is ok");
 
@@ -327,24 +394,14 @@ elsif($Config{nvtype} eq 'long double') {
 }
 
 {
-  my $op = Rmpc_init2($prec_op);
-  Rmpc_set_ui($op, 5, MPC_RNDNN);
-  my $rop = 1 / $op;
-
-  my $p = Rmpc_get_prec($op);
-  cmp_ok($p, '==', $prec_op, "OP: overloaded integer div:  precision is ok");
-
-  $p = Rmpc_get_prec($rop);
-  cmp_ok($p, '==', $mpc_prec_default, "ROP: overloaded integer div: precision is ok");
-
-  cmp_ok(Math::MPFR::Rmpfr_get_default_prec(), '==', $mpfr_prec_default, "overloaded integer div: MPFR default prec is $mpfr_prec_default");
-}
-
-{
   ##### overloaded iv string div #####
   my $op = Rmpc_init2($prec_op);
   Rmpc_set_ui($op, 5, MPC_RNDNN);
   my $rop = "1" / $op;
+
+  # "1"/$rop is not the same as 1/$rop. See OPERATOR OVERLOADING documentation.
+  RMPC_IM($im, $rop);
+  cmp_ok("$im", 'eq', '0', "overloaded intstr div: imaginary component of rop is 0");
 
   my $p = Rmpc_get_prec($op);
   cmp_ok($p, '==', $prec_op, "OP: overloaded intstr div: precision is ok");
@@ -360,6 +417,10 @@ elsif($Config{nvtype} eq 'long double') {
   my $op = Rmpc_init2($prec_op);
   Rmpc_set_ui($op, 5, MPC_RNDNN);
   my $rop = "1.3" / $op;
+
+  # "1.3"/$rop is not the same as 1.3/$rop. See OPERATOR OVERLOADING documentation.
+  RMPC_IM($im, $rop);
+  cmp_ok("$im", 'eq', '0', "overloaded nvstr div: imaginary component of rop is 0");
 
   my $p = Rmpc_get_prec($op);
   cmp_ok($p, '==', $prec_op, "OP: overloaded nvstr div: precision is ok");

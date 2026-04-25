@@ -12,12 +12,12 @@ my $doc = App::perlimports::Document->new(
 # use POSIX (); => []
 
 is_deeply(
-    $doc->original_imports,
+    $doc->found_imports,
     {
         Carp           => undef,
         'Data::Dumper' => ['Dumper'],
         POSIX          => [],
     },
-    'original imports'
+    'found imports'
 );
 done_testing();

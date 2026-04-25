@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Skills;
 use strict;
 use warnings;
 
-our $VERSION = '3.09';
+our $VERSION = '3.14';
 
 use Getopt::Long qw(GetOptionsFromArray);
 use Cwd qw(getcwd);
@@ -223,9 +223,17 @@ sub _skills_install_summary_table {
             $_->{status} || '-',
         ]
     } _install_result_rows($result);
+    my $error = ref($result) eq 'HASH' ? $result->{error} : undef;
     my $changed = grep { ( $_->[4] || '' ) eq 'installed' || ( $_->[4] || '' ) eq 'updated' } @rows;
-    my $text = $changed ? '' : "No update.\n";
-    $text .= _render_table( [ 'Skill', 'Source', 'Before', 'After', 'Status' ], \@rows );
+    my $text = '';
+    if ( defined $error && $error ne '' ) {
+        $text .= "Error: $error";
+        $text .= "\n" if $text !~ /\n\z/;
+    }
+    elsif ( !@rows || !$changed ) {
+        $text .= "No update.\n";
+    }
+    $text .= _render_table( [ 'Skill', 'Source', 'Before', 'After', 'Status' ], \@rows ) if @rows;
     return $text;
 }
 
@@ -412,7 +420,7 @@ action parsing inline.
 
 =head1 PURPOSE
 
-This module is the command runtime behind C<dashboard skills> and the singular C<dashboard skill> alias. It owns the CLI parsing for skill install, update, uninstall, enable, disable, list, and usage; prints canonical JSON by default; renders optional table output for human inspection; and handles the internal dotted-command handoff used by C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>>.
+This module is the command runtime behind C<dashboard skills> and the singular C<dashboard skill> alias. It owns the CLI parsing for skill install, uninstall, enable, disable, list, and usage; renders table output by default for install summaries; supports C<-o json> for machine-readable install payloads; and handles the internal dotted-command handoff used by C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>>.
 
 =head1 WHY IT EXISTS
 

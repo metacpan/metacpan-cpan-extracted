@@ -6,7 +6,7 @@ BEGIN
     use lib './lib';
     use vars qw( $DEBUG );
     use open ':std' => ':utf8';
-    use DateTime;
+    use DateTime::Lite;
     use Test::More qw( no_plan );
     # 2022-12-08T20:13:09
     use Test::Time time => 1670497989;
@@ -25,24 +25,24 @@ unlink( './t/CHANGES' ) if( -e( './t/CHANGES' ) );
 my $c = Changes->new(
     file => './t/CHANGES',
     defaults => {
-        spacer1 => '    ',
-        spacer2 => ' ',
+        spacer1      => '    ',
+        spacer2      => ' ',
         group_spacer => '    ',
         # default values for Changes::Release
-        format => '%FT%T%z',
-        time_zone => 'Asia/Tokyo',
+        format       => '%FT%T%z',
+        time_zone    => 'Asia/Tokyo',
     },
     debug => $DEBUG,
 );
 isa_ok( $c, 'Changes' );
-my $now = DateTime->now;
+my $now = DateTime::Lite->now;
 SKIP:
 {
     skip( "Failed to instantiate a Changes object", 8 ) if( !defined( $c ) );
     $c->add_preamble( "Changes history for package Foo::Bar" );
     $c->add_epilogue( 'For more information, visit https://git.example.com/johndoe/Foo-Bar' );
     my $rel1 = $c->add_release(
-        version => 'v0.1.0',
+        version  => 'v0.1.0',
         datetime => '-2D',
     );
     isa_ok( $rel1 => 'Changes::Release' );
@@ -51,7 +51,7 @@ SKIP:
     my $change = $rel1->add_change( text => 'Initial release' );
     isa_ok( $change => 'Changes::Change' );
     my $rel2 = $c->add_release(
-        version => 'v0.2.0',
+        version  => 'v0.2.0',
         datetime => '-1D',
     );
     isa_ok( $rel2 => 'Changes::Release' );

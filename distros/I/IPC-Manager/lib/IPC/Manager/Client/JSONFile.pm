@@ -2,11 +2,12 @@ package IPC::Manager::Client::JSONFile;
 use strict;
 use warnings;
 
-our $VERSION = '0.000032';
+our $VERSION = '0.000033';
 
 use Carp qw/croak/;
 use Fcntl qw/:flock/;
 use File::Temp ();
+use Time::HiRes ();
 
 my $HAVE_SHA;
 BEGIN { $HAVE_SHA = eval { require Digest::SHA; Digest::SHA->import('sha256_hex'); 1 } ? 1 : 0 }
@@ -21,7 +22,6 @@ use Object::HashBase qw{
     +_cache_mtime
     +_cache_sha
     +_cache_gen
-    +_cache_time
     +_cache_sha_verified
     +_inotify
     interval
@@ -111,12 +111,13 @@ sub _cache_is_stale {
         return 0;
     }
 
-    # Fallback: compare mtime, then SHA after an interval.
-    # Mtime has only 1-second resolution on many filesystems, so
-    # cross-process writes within the same second go undetected.
-    # Once the configured interval elapses with an unchanged mtime we
-    # fall back to a SHA comparison to catch those writes.
-    my $current_mtime = (stat($self->{route}))[9] // return 1;
+    # Fallback: compare mtime (sub-second via Time::HiRes), then SHA.
+    # Time::HiRes::stat returns nanosecond-resolution mtime on filesystems
+    # that support it (most modern Linux/BSD), so same-second cross-process
+    # writes are detected by mtime alone.  When mtime equality is reported
+    # we still SHA-compare to handle filesystems that round mtime to whole
+    # seconds; SHA on small JSON state files is microseconds.
+    my $current_mtime = (Time::HiRes::stat($self->{route}))[9] // return 1;
 
     if ($current_mtime != $self->{+_CACHE_MTIME}) {
         delete $self->{+_CACHE_SHA_VERIFIED};
@@ -127,11 +128,8 @@ sub _cache_is_stale {
     # until the mtime changes again.
     return 0 if $self->{+_CACHE_SHA_VERIFIED};
 
-    # Wait for the interval before falling back to SHA.
-    my $elapsed = time() - ($self->{+_CACHE_TIME} // 0);
-    return 0 if $elapsed < ($self->{+INTERVAL} // 1);
-
-    # Interval elapsed, mtime still unchanged — compare SHA.
+    # Mtime unchanged — verify via SHA in case the filesystem rounds
+    # mtime and a same-tick write was masked.
     my $current_sha = $self->_file_sha // return 1;
     if ($current_sha ne ($self->{+_CACHE_SHA} // '')) {
         return 1;
@@ -144,10 +142,9 @@ sub _cache_is_stale {
 sub _update_cache {
     my ($self, $state) = @_;
     $self->{+_CACHE_STATE} = $state;
-    $self->{+_CACHE_MTIME} = (stat($self->{route}))[9];
+    $self->{+_CACHE_MTIME} = (Time::HiRes::stat($self->{route}))[9];
     $self->{+_CACHE_SHA}   = $self->_file_sha if $HAVE_SHA;
     $self->{+_CACHE_GEN}   = $_WRITE_GEN{$self->{route}} // 0;
-    $self->{+_CACHE_TIME}  = time();
     delete $self->{+_CACHE_SHA_VERIFIED};
 }
 
@@ -397,8 +394,9 @@ the entire file.
 
 State is cached in memory and only re-read when the file has changed.  When
 L<Linux::Inotify2> is available the file is watched for C<IN_MODIFY> /
-C<IN_CLOSE_WRITE> events; otherwise the file's mtime is compared to detect
-changes.
+C<IN_CLOSE_WRITE> events; otherwise sub-second mtime (via L<Time::HiRes>)
+is compared, with a L<Digest::SHA> tiebreaker for filesystems that round
+mtime.
 
 This protocol is simple and portable but not suited for high-throughput
 workloads; the file-level lock serialises all operations across all clients.
@@ -555,10 +553,12 @@ rewrite the entire file.
 
 State is cached in memory and only re-read from disk when a change is
 detected.  When L<Linux::Inotify2> is available, the file is watched for
-C<IN_MODIFY> / C<IN_CLOSE_WRITE> events.  Otherwise the file's mtime is
-compared against the cached value.  After each write the cache is updated
-and any self-generated inotify events are drained so the cache is not
-spuriously invalidated.
+C<IN_MODIFY> / C<IN_CLOSE_WRITE> events.  Otherwise the file's sub-second
+mtime (L<Time::HiRes::stat|Time::HiRes>) is compared against the cached
+value; on filesystems that round mtime to whole seconds a L<Digest::SHA>
+tiebreaker catches same-tick writes.  After each write the cache is
+updated and any self-generated inotify events are drained so the cache is
+not spuriously invalidated.
 
 =head1 METHODS
 

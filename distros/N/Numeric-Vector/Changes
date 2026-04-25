@@ -1,5 +1,11 @@
 Revision history for Numeric-Vector
 
+0.03    2026-04-25
+        - Add GvCV_set fallback in nvec_compat.h for Perl 5.10/5.12 where
+          the macro doesn't exist (introduced in 5.13.10). Fixes
+          "Undefined symbol: GvCV_set" load failures on those perls.
+        - Fix Perl_custom_op_register fallback in xop_compat.h
+
 0.02    2026-04-11
         - Fix "used only once" warning for imported but unused nvec_* functions
           (add GvMULTI_on after glob creation in xs_nvec_install)

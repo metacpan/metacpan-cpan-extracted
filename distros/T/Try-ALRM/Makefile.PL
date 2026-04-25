@@ -7,7 +7,7 @@ use 5.010;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Try/catch-style semantics for handling timeouts using CORE::alarm",
+  "ABSTRACT" => "Structured retry and timeout handling using CORE::alarm",
   "AUTHOR" => "oodler577 <oodler\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -18,10 +18,9 @@ my %WriteMakefileArgs = (
   "NAME" => "Try::ALRM",
   "PREREQ_PM" => {},
   "TEST_REQUIRES" => {
-    "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.00",
+  "VERSION" => "1.03",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -29,7 +28,6 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Test::Exception" => 0,
   "Test::More" => 0
 );
 

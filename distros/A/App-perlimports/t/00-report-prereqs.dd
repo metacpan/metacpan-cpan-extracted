@@ -2,7 +2,7 @@ do { my $x = {
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0',
-                                        'perl' => 'v5.10.0'
+                                        'perl' => '5.010'
                                       }
                       },
        'develop' => {
@@ -52,6 +52,7 @@ do { my $x = {
                                       'PPI' => '1.276',
                                       'PPI::Document' => '0',
                                       'PPIx::Utils::Classification' => '0',
+                                      'PPIx::Utils::Traversal' => '0',
                                       'Path::Iterator::Rule' => '0',
                                       'Path::Tiny' => '0',
                                       'Perl::Tidy' => '20220613',
@@ -66,6 +67,7 @@ do { my $x = {
                                       'Text::Diff' => '0',
                                       'Text::SimpleTable::AutoWidth' => '0',
                                       'Try::Tiny' => '0',
+                                      'Types::Common::Numeric' => '0',
                                       'Types::Standard' => '0',
                                       'feature' => '0',
                                       'perl' => 'v5.18.0',

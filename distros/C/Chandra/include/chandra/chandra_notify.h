@@ -229,6 +229,21 @@ static int chandra_notify_load_libnotify(void) {
     return 1;
 }
 
+/* Shell-escape a string for use inside single quotes.
+ * Replaces ' with '\'' (end quote, escaped quote, start quote). */
+static void _chandra_shell_escape(const char *src, char *dst, size_t dst_size) {
+    size_t j = 0;
+    for (size_t i = 0; src[i] && j < dst_size - 5; i++) {
+        if (src[i] == '\'') {
+            dst[j++] = '\''; dst[j++] = '\\';
+            dst[j++] = '\''; dst[j++] = '\'';
+        } else {
+            dst[j++] = src[i];
+        }
+    }
+    dst[j] = '\0';
+}
+
 static int chandra_notify_is_supported(void) {
     /* Try libnotify first */
     if (chandra_notify_load_libnotify()) return 1;
@@ -269,12 +284,20 @@ static int chandra_notify_send(pTHX_ ChandraNotification *notif) {
             len += snprintf(cmd + len, sizeof(cmd) - len, " -t %d", notif->timeout_ms);
         }
         
-        /* Title and body - TODO: proper shell escaping */
-        len += snprintf(cmd + len, sizeof(cmd) - len, " '%s'",
-                        notif->title ? notif->title : "");
-        
-        if (notif->body) {
-            len += snprintf(cmd + len, sizeof(cmd) - len, " '%s'", notif->body);
+        /* Title and body — shell-escape single quotes */
+        {
+            const char *title = notif->title ? notif->title : "";
+            const char *body = notif->body;
+            char escaped_title[512];
+            char escaped_body[512];
+
+            _chandra_shell_escape(title, escaped_title, sizeof(escaped_title));
+            len += snprintf(cmd + len, sizeof(cmd) - len, " '%s'", escaped_title);
+
+            if (body) {
+                _chandra_shell_escape(body, escaped_body, sizeof(escaped_body));
+                len += snprintf(cmd + len, sizeof(cmd) - len, " '%s'", escaped_body);
+            }
         }
         
         len += snprintf(cmd + len, sizeof(cmd) - len, " >/dev/null 2>&1 &");
@@ -293,12 +316,25 @@ static int chandra_notify_is_supported(void) {
 }
 
 static int chandra_notify_send(pTHX_ ChandraNotification *notif) {
-    /* TODO: Implement Windows toast notifications */
-    /* For now, use MessageBox as a very basic fallback */
-    MessageBoxA(NULL, 
-                notif->body ? notif->body : "",
-                notif->title ? notif->title : "Notification",
-                MB_OK | MB_ICONINFORMATION);
+    /* Use Shell_NotifyIcon balloon tip (Windows 7+).
+     * Full WinRT toast requires COM + IToastNotificationManager
+     * which is deferred to a future phase. */
+    NOTIFYICONDATAA nid;
+    memset(&nid, 0, sizeof(nid));
+    nid.cbSize = sizeof(NOTIFYICONDATAA);
+    nid.uID = 9999;
+    nid.uFlags = NIF_INFO | NIF_ICON;
+    nid.dwInfoFlags = NIIF_INFO;
+    nid.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+
+    if (notif->title)
+        strncpy(nid.szInfoTitle, notif->title, sizeof(nid.szInfoTitle) - 1);
+    if (notif->body)
+        strncpy(nid.szInfo, notif->body, sizeof(nid.szInfo) - 1);
+
+    Shell_NotifyIconA(NIM_ADD, &nid);
+    nid.uFlags = NIF_INFO;
+    Shell_NotifyIconA(NIM_MODIFY, &nid);
     return 1;
 }
 

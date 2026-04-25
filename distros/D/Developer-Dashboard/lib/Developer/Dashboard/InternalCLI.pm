@@ -3,7 +3,7 @@ package Developer::Dashboard::InternalCLI;
 use strict;
 use warnings;
 
-our $VERSION = '3.09';
+our $VERSION = '3.14';
 
 use File::Basename qw(dirname);
 use File::Spec;
@@ -17,7 +17,7 @@ use Developer::Dashboard::SeedSync ();
 sub helper_names {
     return qw(
       jq yq tomq propq iniq csvq xmlq
-      of open-file ticket path paths ps1
+      of open-file ticket file files path paths ps1
       encode decode indicator collector config auth init cpan page action docker serve stop restart shell doctor housekeeper skills which
       complete
     );

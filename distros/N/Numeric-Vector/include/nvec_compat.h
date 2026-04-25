@@ -129,4 +129,10 @@ static MAGIC* nvec_compat_mg_findext(pTHX_ SV *sv, int type, const MGVTBL *vtbl)
 #  endif
 #endif
 
+/* GvCV_set - introduced in 5.13.10 (first stable: 5.14). On older perls
+   it's a plain assignment to gp_cv (caller manages refcounts). */
+#ifndef GvCV_set
+#  define GvCV_set(gv, cv) (GvGP(gv)->gp_cv = (cv))
+#endif
+
 #endif /* NVEC_COMPAT_H */

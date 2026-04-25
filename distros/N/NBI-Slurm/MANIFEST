@@ -29,6 +29,7 @@ bin/rm_package
 bin/runjob
 bin/session
 bin/shelf
+bin/slurm-load
 bin/viewjobs
 bin/waitjobs
 bin/whilejob
@@ -76,6 +77,9 @@ t/06-eco.t
 t/10-hpc.t
 t/11-bins.t
 t/12-array.t
+t/13-params-array.t
+t/14-array-limit.t
+t/15-slurm-load.t
 t/20-intensive.t
 t/29-bins-pod.t
 t/30-misc.t

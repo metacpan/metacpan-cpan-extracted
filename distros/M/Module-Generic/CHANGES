@@ -1,5 +1,10 @@
 Revision history for Perl module Module::Generic
 
+v1.3.1 2026-03-31T12:23:04+0900
+    - Minor improvement of getline() in Module::Generic::File
+    - Corrected the method filetype() to check the symbolic links first.
+    - Updated dependencies now using DateTime::Lite and DateTime::Format::Lite
+
 v1.3.0 2026-03-28T10:23:07+0900
     - Added XS implementations of twelve frequently-called utility methods, providing a
       measurable performance improvement for all code inheriting from Module::Generic.

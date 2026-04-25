@@ -2,7 +2,7 @@ package Legba;
 
 use strict;
 use warnings;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 require XSLoader;
 XSLoader::load('Legba', $VERSION);
 1;

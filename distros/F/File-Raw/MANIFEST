@@ -10,6 +10,7 @@ file.c
 ignore.txt
 include/file_compat.h
 include/file_hooks.h
+include/file_hooks_impl.h
 include/ppport.h
 include/xop_compat.h
 lib/File/Raw.pm

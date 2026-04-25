@@ -97,7 +97,7 @@ SYNOPSIS
         $obj->customer->id( '44d9a3ab-32e2-4c46-b6c9-8b307f273d47' );
 
 VERSION
-        v1.3.0
+        v1.3.1
 
 DESCRIPTION
     Module::Generic as its name says it all, is a generic module to inherit
@@ -1182,10 +1182,12 @@ METHODS
     Example:
 
         my $dt = DateTime->now( time_zone => 'Asia/Tokyo' );
+        # or
+        my $dt = DateTime::Lite->now( time_zone => 'Asia/Tokyo' );
         # Returns a new Module::Generic::DateTime object
         my $d = $o->new_datetime( $dt );
 
-        # Returns a new Module::Generic::DateTime object with DateTime initiated automatically
+        # Returns a new Module::Generic::DateTime object with DateTime::Lite initiated automatically
         # to now with time zone set by default to UTC
         my $d = $o->new_datetime;
 
@@ -2268,11 +2270,11 @@ SUPPORT METHODS
 
   _parse_timestamp
     Provided with a string representing a date or datetime, and this will
-    try to parse it and return a DateTime object. It will also create a
-    DateTime::Format::Strptime to preserve the original date/datetime string
-    representation and assign it to the DateTime object. So when the
-    DateTime object is stringified, it displays the same string that was
-    originally parsed.
+    try to parse it and return a DateTime::Lite object. It will also create
+    a DateTime::Format::Lite to preserve the original date/datetime string
+    representation and assign it to the DateTime::Lite object. So when the
+    DateTime::Lite object is stringified, it displays the same string that
+    was originally parsed.
 
     Supported formats are:
 
@@ -3005,16 +3007,17 @@ SUPPORT METHODS
         }, @_ ) ); }
 
     Provided with an object property name and asome date or datetime string
-    and this will attempt to parse it and save it as a DateTime object.
+    and this will attempt to parse it and save it as a DateTime::Lite
+    object.
 
     If the data is a 10 digits integer, this will treat it as a unix
     timestamp.
 
     Parsing also recognise special word such as "now"
 
-    The created DateTime object is associated a DateTime::Format::Strptime
-    object which enables the DateTime object to be stringified as a unix
-    timestamp using local time stamp, whatever it is.
+    The created DateTime::Lite object is associated a DateTime::Format::Lite
+    object which enables the DateTime::Lite object to be stringified as a
+    unix timestamp using local time stamp, whatever it is.
 
     Even if there is no value set, and this method is called in chain, it
     returns a Module::Generic::Null whose purpose is to enable chaining
@@ -3060,7 +3063,7 @@ SUPPORT METHODS
     *   "format"
 
         An optional format that will be used to create a
-        DateTime::Format::Strptime that will be attached to the DateTime
+        DateTime::Format::Lite that will be attached to the DateTime::Lite
         object.
 
     *   "tz"
@@ -4870,7 +4873,7 @@ CLASS FUNCTIONS
                         # A Module::Generic::Scalar object
                         name => 'John Doe',
                         id => 'c47e1113-8336-4437-ba20-54f8cd0afb18',
-                        # A DateTime object
+                        # A DateTime or DateTime::Lite object
                         since => 'now',
                         # A Module::Generic::Number object
                         age => 32,

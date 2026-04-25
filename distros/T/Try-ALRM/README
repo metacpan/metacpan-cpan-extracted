@@ -1,9 +1,9 @@
 This archive contains the distribution Try-ALRM,
-version 1.00:
+version 1.03:
 
-  Try/catch-style semantics for handling timeouts using CORE::alarm
+  Structured retry and timeout handling using CORE::alarm
 
-This software is copyright (c) 2022-present by oodler577.
+This software is copyright (c) 2022 by oodler577.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -8,7 +8,7 @@ BEGIN
     use vars qw( $DEBUG );
     use Config;
     use Test::More;
-    use DateTime;
+    use DateTime::Lite;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 

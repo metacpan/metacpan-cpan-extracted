@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise.pm
-## Version v0.7.3
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Version v0.7.4
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2025/10/25
+## Modified 2026/04/24
 ## All rights reserved.
 ## 
 ## 
@@ -60,7 +60,7 @@ BEGIN
     our $EXTENSION_VARY = 1;
     our $DEFAULT_MIME_TYPE = 'application/octet-stream';
     our $SERIALISER = $Promise::Me::SERIALISER;
-    our $VERSION = 'v0.7.3';
+    our $VERSION = 'v0.7.4';
 };
 
 use strict;
@@ -1426,7 +1426,7 @@ sub send
                 reader => $io,
                 headers => $headers,
                 entity => $ent,
-            );
+            ) || return( $self->pass_error );
         }
         else
         {
@@ -1434,7 +1434,7 @@ sub send
                 reader => $io,
                 headers => $headers,
                 entity => $ent,
-            );
+            ) || return( $self->pass_error );
         }
         return( $self->pass_error ) if( !defined( $body ) );
         $total_bytes_read += $body->length;
@@ -1599,13 +1599,13 @@ sub _datetime
     my $dt;
     if( @_ )
     {
-        return( $self->error( "Object provided (", ref( $_[0] ), ") is not a DateTime or Module::Generic::DateTime object." ) ) if( !$self->_is_a( $_[0] => [qw( DateTime Module::Generic::DateTime )] ) );
+        return( $self->error( "Object provided (", ref( $_[0] ), ") is not a DateTime::Lite, DateTime or Module::Generic::DateTime object." ) ) if( !$self->_is_a( $_[0] => [qw( DateTime::Lite DateTime Module::Generic::DateTime )] ) );
         $dt = shift( @_ );
     }
     
     if( !defined( $dt ) )
     {
-        $dt = DateTime->now;
+        $dt = DateTime::Lite->now;
     }
     # We need to get the underlying DateTime object if it is wrapped inside Module::Generic::DateTime
     elsif( $dt->isa( 'Module::Generic::DateTime' ) )
@@ -1614,9 +1614,9 @@ sub _datetime
     }
     
     $dt->set_time_zone( 'GMT' );
-    my $fmt = DateTime::Format::Strptime->new(
-        pattern => '%a, %d %b %Y %H:%M:%S GMT',
-        locale  => 'en_GB',
+    my $fmt = DateTime::Format::Lite->new(
+        pattern   => '%a, %d %b %Y %H:%M:%S GMT',
+        locale    => 'en_GB',
         time_zone => 'GMT',
     );
     $dt->set_formatter( $fmt );
@@ -1997,7 +1997,7 @@ sub _read_body
         $self->_load_class( 'HTTP::Promise::MIME' ) || return( $self->pass_error );
         $mime = HTTP::Promise::MIME->new;
         $ext = $mime->suffix( $type );
-        return( $self->pass_error( $mime->error ) ) if( !defined( $ext ) );
+        return( $self->pass_error( $mime->error ) ) if( !defined( $ext ) && $mime->error );
         $ext ||= 'dat';
         my $f = $self->new_tempfile( extension => $ext ) ||
             return( $self->pass_error );
@@ -2019,7 +2019,11 @@ sub _read_body
             while( $bytes = $reader->read( $buff, $chunk_size ) )
             {
                 my $bytes_out = $io->syswrite( $buff );
-                return( $self->pass_error( $io->error ) ) if( !defined( $bytes_out ) );
+                if( !defined( $bytes_out ) )
+                {
+                    return( $self->pass_error( $io->error ) ) if( $io->error );
+                    last;
+                }
                 # We do not want to read more than we should
                 $chunk_size = ( $len - $total_bytes ) if( ( $total_bytes < $len ) && ( ( $total_bytes + $chunk_size ) > $len ) );
                 $total_bytes += $bytes;
@@ -2376,7 +2380,7 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
 
 =head1 VERSION
 
-    v0.7.3
+    v0.7.4
 
 =head1 DESCRIPTION
 
@@ -2841,9 +2845,9 @@ However, if L</use_promise> is set to false, this will return an L<HTTP::Promise
 
 =head2 httpize_datetime
 
-Provided with a L<DateTime> or L<Module::Generic::DateTime> object, and this will ensure the C<DateTime> object stringifies to a valid HTTP datetime.
+Provided with a L<DateTime::Lite>, L<DateTime> or L<Module::Generic::DateTime> object, and this will ensure the C<DateTime::Lite> or C<DateTime> object stringifies to a valid HTTP datetime.
 
-It returns the C<DateTime> object provided upon success, or upon error, sets an L<error|Module::Generic/error> and returns C<undef>
+It returns the C<DateTime::Lite> or C<DateTime> object provided upon success, or upon error, sets an L<error|Module::Generic/error> and returns C<undef>
 
 =head2 inactivity_timeout
 

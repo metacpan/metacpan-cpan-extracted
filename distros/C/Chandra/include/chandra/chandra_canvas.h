@@ -177,6 +177,24 @@ _canvas_push_op_6nv(pTHX_ AV *buf, int op, NV v1, NV v2, NV v3, NV v4, NV v5, NV
  * JavaScript Code Generation
  * ======================================================================== */
 
+/* Buffer size for stringified NVs. NV_DIG digits + sign + decimal +
+ * exponent + nul; 64 bytes is comfortable for double, long double, and
+ * __float128 (NV_DIG <= 36 in any current Perl build). */
+#define CANVAS_NV_BUFSZ 64
+
+/* Stringify an NV from cmd[idx]. Uses Gconvert which is portable across
+ * NV types (double, long double, __float128) — unlike literal "%g" in
+ * sv_catpvf, which reads only `double` from va_args and produces garbage
+ * when NV is wider. */
+static const char *
+_canvas_nv_str(pTHX_ AV *cmd, SSize_t idx, char *buf)
+{
+    SV **svp = av_fetch(cmd, idx, 0);
+    NV nv = (svp && *svp) ? SvNV(*svp) : 0.0;
+    Gconvert(nv, NV_DIG, 0, buf);
+    return buf;
+}
+
 /* Generate JS for a single command */
 static void
 _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
@@ -184,6 +202,8 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
     SV **op_svp = av_fetch(cmd, 0, 0);
     int op;
     SV **v1, **v2, **v3, **v4, **v5, **v6;
+    char b1[CANVAS_NV_BUFSZ], b2[CANVAS_NV_BUFSZ], b3[CANVAS_NV_BUFSZ];
+    char b4[CANVAS_NV_BUFSZ], b5[CANVAS_NV_BUFSZ], b6[CANVAS_NV_BUFSZ];
 
     if (!op_svp || !SvIOK(*op_svp)) return;
     op = SvIV(*op_svp);
@@ -207,15 +227,15 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             break;
 
         case CANVAS_OP_LINE_WIDTH:
-            v1 = av_fetch(cmd, 1, 0);
-            if (v1)
-                sv_catpvf(js, "%s.lineWidth=%g;", ctx, SvNV(*v1));
+            if (av_fetch(cmd, 1, 0))
+                sv_catpvf(js, "%s.lineWidth=%s;", ctx,
+                          _canvas_nv_str(aTHX_ cmd, 1, b1));
             break;
 
         case CANVAS_OP_GLOBAL_ALPHA:
-            v1 = av_fetch(cmd, 1, 0);
-            if (v1)
-                sv_catpvf(js, "%s.globalAlpha=%g;", ctx, SvNV(*v1));
+            if (av_fetch(cmd, 1, 0))
+                sv_catpvf(js, "%s.globalAlpha=%s;", ctx,
+                          _canvas_nv_str(aTHX_ cmd, 1, b1));
             break;
 
         case CANVAS_OP_LINE_CAP:
@@ -236,8 +256,11 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v3 = av_fetch(cmd, 3, 0);
             v4 = av_fetch(cmd, 4, 0);
             if (v1 && v2 && v3 && v4)
-                sv_catpvf(js, "%s.fillRect(%g,%g,%g,%g);",
-                          ctx, SvNV(*v1), SvNV(*v2), SvNV(*v3), SvNV(*v4));
+                sv_catpvf(js, "%s.fillRect(%s,%s,%s,%s);", ctx,
+                          _canvas_nv_str(aTHX_ cmd, 1, b1),
+                          _canvas_nv_str(aTHX_ cmd, 2, b2),
+                          _canvas_nv_str(aTHX_ cmd, 3, b3),
+                          _canvas_nv_str(aTHX_ cmd, 4, b4));
             break;
 
         case CANVAS_OP_STROKE_RECT:
@@ -246,8 +269,11 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v3 = av_fetch(cmd, 3, 0);
             v4 = av_fetch(cmd, 4, 0);
             if (v1 && v2 && v3 && v4)
-                sv_catpvf(js, "%s.strokeRect(%g,%g,%g,%g);",
-                          ctx, SvNV(*v1), SvNV(*v2), SvNV(*v3), SvNV(*v4));
+                sv_catpvf(js, "%s.strokeRect(%s,%s,%s,%s);", ctx,
+                          _canvas_nv_str(aTHX_ cmd, 1, b1),
+                          _canvas_nv_str(aTHX_ cmd, 2, b2),
+                          _canvas_nv_str(aTHX_ cmd, 3, b3),
+                          _canvas_nv_str(aTHX_ cmd, 4, b4));
             break;
 
         case CANVAS_OP_CLEAR_RECT:
@@ -256,8 +282,11 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v3 = av_fetch(cmd, 3, 0);
             v4 = av_fetch(cmd, 4, 0);
             if (v1 && v2 && v3 && v4)
-                sv_catpvf(js, "%s.clearRect(%g,%g,%g,%g);",
-                          ctx, SvNV(*v1), SvNV(*v2), SvNV(*v3), SvNV(*v4));
+                sv_catpvf(js, "%s.clearRect(%s,%s,%s,%s);", ctx,
+                          _canvas_nv_str(aTHX_ cmd, 1, b1),
+                          _canvas_nv_str(aTHX_ cmd, 2, b2),
+                          _canvas_nv_str(aTHX_ cmd, 3, b3),
+                          _canvas_nv_str(aTHX_ cmd, 4, b4));
             break;
 
         case CANVAS_OP_BEGIN_PATH:
@@ -272,14 +301,18 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v1 = av_fetch(cmd, 1, 0);
             v2 = av_fetch(cmd, 2, 0);
             if (v1 && v2)
-                sv_catpvf(js, "%s.moveTo(%g,%g);", ctx, SvNV(*v1), SvNV(*v2));
+                sv_catpvf(js, "%s.moveTo(%s,%s);", ctx,
+                          _canvas_nv_str(aTHX_ cmd, 1, b1),
+                          _canvas_nv_str(aTHX_ cmd, 2, b2));
             break;
 
         case CANVAS_OP_LINE_TO:
             v1 = av_fetch(cmd, 1, 0);
             v2 = av_fetch(cmd, 2, 0);
             if (v1 && v2)
-                sv_catpvf(js, "%s.lineTo(%g,%g);", ctx, SvNV(*v1), SvNV(*v2));
+                sv_catpvf(js, "%s.lineTo(%s,%s);", ctx,
+                          _canvas_nv_str(aTHX_ cmd, 1, b1),
+                          _canvas_nv_str(aTHX_ cmd, 2, b2));
             break;
 
         case CANVAS_OP_ARC:
@@ -290,9 +323,12 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v5 = av_fetch(cmd, 5, 0);
             v6 = av_fetch(cmd, 6, 0);
             if (v1 && v2 && v3 && v4 && v5)
-                sv_catpvf(js, "%s.arc(%g,%g,%g,%g,%g%s);",
-                          ctx, SvNV(*v1), SvNV(*v2), SvNV(*v3),
-                          SvNV(*v4), SvNV(*v5),
+                sv_catpvf(js, "%s.arc(%s,%s,%s,%s,%s%s);", ctx,
+                          _canvas_nv_str(aTHX_ cmd, 1, b1),
+                          _canvas_nv_str(aTHX_ cmd, 2, b2),
+                          _canvas_nv_str(aTHX_ cmd, 3, b3),
+                          _canvas_nv_str(aTHX_ cmd, 4, b4),
+                          _canvas_nv_str(aTHX_ cmd, 5, b5),
                           (v6 && SvTRUE(*v6)) ? ",true" : "");
             break;
 
@@ -302,8 +338,11 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v3 = av_fetch(cmd, 3, 0);
             v4 = av_fetch(cmd, 4, 0);
             if (v1 && v2 && v3 && v4)
-                sv_catpvf(js, "%s.rect(%g,%g,%g,%g);",
-                          ctx, SvNV(*v1), SvNV(*v2), SvNV(*v3), SvNV(*v4));
+                sv_catpvf(js, "%s.rect(%s,%s,%s,%s);", ctx,
+                          _canvas_nv_str(aTHX_ cmd, 1, b1),
+                          _canvas_nv_str(aTHX_ cmd, 2, b2),
+                          _canvas_nv_str(aTHX_ cmd, 3, b3),
+                          _canvas_nv_str(aTHX_ cmd, 4, b4));
             break;
 
         case CANVAS_OP_FILL:
@@ -326,20 +365,24 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v1 = av_fetch(cmd, 1, 0);
             v2 = av_fetch(cmd, 2, 0);
             if (v1 && v2)
-                sv_catpvf(js, "%s.translate(%g,%g);", ctx, SvNV(*v1), SvNV(*v2));
+                sv_catpvf(js, "%s.translate(%s,%s);", ctx,
+                          _canvas_nv_str(aTHX_ cmd, 1, b1),
+                          _canvas_nv_str(aTHX_ cmd, 2, b2));
             break;
 
         case CANVAS_OP_ROTATE:
-            v1 = av_fetch(cmd, 1, 0);
-            if (v1)
-                sv_catpvf(js, "%s.rotate(%g);", ctx, SvNV(*v1));
+            if (av_fetch(cmd, 1, 0))
+                sv_catpvf(js, "%s.rotate(%s);", ctx,
+                          _canvas_nv_str(aTHX_ cmd, 1, b1));
             break;
 
         case CANVAS_OP_SCALE:
             v1 = av_fetch(cmd, 1, 0);
             v2 = av_fetch(cmd, 2, 0);
             if (v1 && v2)
-                sv_catpvf(js, "%s.scale(%g,%g);", ctx, SvNV(*v1), SvNV(*v2));
+                sv_catpvf(js, "%s.scale(%s,%s);", ctx,
+                          _canvas_nv_str(aTHX_ cmd, 1, b1),
+                          _canvas_nv_str(aTHX_ cmd, 2, b2));
             break;
 
         case CANVAS_OP_FILL_CIRCLE:
@@ -347,8 +390,11 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v2 = av_fetch(cmd, 2, 0);
             v3 = av_fetch(cmd, 3, 0);
             if (v1 && v2 && v3)
-                sv_catpvf(js, "%s.beginPath();%s.arc(%g,%g,%g,0,6.283185307);%s.fill();",
-                          ctx, ctx, SvNV(*v1), SvNV(*v2), SvNV(*v3), ctx);
+                sv_catpvf(js, "%s.beginPath();%s.arc(%s,%s,%s,0,6.283185307);%s.fill();",
+                          ctx, ctx,
+                          _canvas_nv_str(aTHX_ cmd, 1, b1),
+                          _canvas_nv_str(aTHX_ cmd, 2, b2),
+                          _canvas_nv_str(aTHX_ cmd, 3, b3), ctx);
             break;
 
         case CANVAS_OP_STROKE_CIRCLE:
@@ -356,8 +402,11 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v2 = av_fetch(cmd, 2, 0);
             v3 = av_fetch(cmd, 3, 0);
             if (v1 && v2 && v3)
-                sv_catpvf(js, "%s.beginPath();%s.arc(%g,%g,%g,0,6.283185307);%s.stroke();",
-                          ctx, ctx, SvNV(*v1), SvNV(*v2), SvNV(*v3), ctx);
+                sv_catpvf(js, "%s.beginPath();%s.arc(%s,%s,%s,0,6.283185307);%s.stroke();",
+                          ctx, ctx,
+                          _canvas_nv_str(aTHX_ cmd, 1, b1),
+                          _canvas_nv_str(aTHX_ cmd, 2, b2),
+                          _canvas_nv_str(aTHX_ cmd, 3, b3), ctx);
             break;
 
         /* Phase 2: Additional path and transform operations */
@@ -368,8 +417,12 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v4 = av_fetch(cmd, 4, 0);
             v5 = av_fetch(cmd, 5, 0);
             if (v1 && v2 && v3 && v4 && v5)
-                sv_catpvf(js, "%s.arcTo(%g,%g,%g,%g,%g);",
-                          ctx, SvNV(*v1), SvNV(*v2), SvNV(*v3), SvNV(*v4), SvNV(*v5));
+                sv_catpvf(js, "%s.arcTo(%s,%s,%s,%s,%s);", ctx,
+                          _canvas_nv_str(aTHX_ cmd, 1, b1),
+                          _canvas_nv_str(aTHX_ cmd, 2, b2),
+                          _canvas_nv_str(aTHX_ cmd, 3, b3),
+                          _canvas_nv_str(aTHX_ cmd, 4, b4),
+                          _canvas_nv_str(aTHX_ cmd, 5, b5));
             break;
 
         case CANVAS_OP_BEZIER_CURVE_TO:
@@ -380,9 +433,13 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v5 = av_fetch(cmd, 5, 0);
             v6 = av_fetch(cmd, 6, 0);
             if (v1 && v2 && v3 && v4 && v5 && v6)
-                sv_catpvf(js, "%s.bezierCurveTo(%g,%g,%g,%g,%g,%g);",
-                          ctx, SvNV(*v1), SvNV(*v2), SvNV(*v3),
-                          SvNV(*v4), SvNV(*v5), SvNV(*v6));
+                sv_catpvf(js, "%s.bezierCurveTo(%s,%s,%s,%s,%s,%s);", ctx,
+                          _canvas_nv_str(aTHX_ cmd, 1, b1),
+                          _canvas_nv_str(aTHX_ cmd, 2, b2),
+                          _canvas_nv_str(aTHX_ cmd, 3, b3),
+                          _canvas_nv_str(aTHX_ cmd, 4, b4),
+                          _canvas_nv_str(aTHX_ cmd, 5, b5),
+                          _canvas_nv_str(aTHX_ cmd, 6, b6));
             break;
 
         case CANVAS_OP_QUADRATIC_CURVE_TO:
@@ -391,8 +448,11 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v3 = av_fetch(cmd, 3, 0);
             v4 = av_fetch(cmd, 4, 0);
             if (v1 && v2 && v3 && v4)
-                sv_catpvf(js, "%s.quadraticCurveTo(%g,%g,%g,%g);",
-                          ctx, SvNV(*v1), SvNV(*v2), SvNV(*v3), SvNV(*v4));
+                sv_catpvf(js, "%s.quadraticCurveTo(%s,%s,%s,%s);", ctx,
+                          _canvas_nv_str(aTHX_ cmd, 1, b1),
+                          _canvas_nv_str(aTHX_ cmd, 2, b2),
+                          _canvas_nv_str(aTHX_ cmd, 3, b3),
+                          _canvas_nv_str(aTHX_ cmd, 4, b4));
             break;
 
         case CANVAS_OP_CLIP:
@@ -411,9 +471,13 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v5 = av_fetch(cmd, 5, 0);
             v6 = av_fetch(cmd, 6, 0);
             if (v1 && v2 && v3 && v4 && v5 && v6)
-                sv_catpvf(js, "%s.transform(%g,%g,%g,%g,%g,%g);",
-                          ctx, SvNV(*v1), SvNV(*v2), SvNV(*v3),
-                          SvNV(*v4), SvNV(*v5), SvNV(*v6));
+                sv_catpvf(js, "%s.transform(%s,%s,%s,%s,%s,%s);", ctx,
+                          _canvas_nv_str(aTHX_ cmd, 1, b1),
+                          _canvas_nv_str(aTHX_ cmd, 2, b2),
+                          _canvas_nv_str(aTHX_ cmd, 3, b3),
+                          _canvas_nv_str(aTHX_ cmd, 4, b4),
+                          _canvas_nv_str(aTHX_ cmd, 5, b5),
+                          _canvas_nv_str(aTHX_ cmd, 6, b6));
             break;
 
         case CANVAS_OP_SET_TRANSFORM:
@@ -424,9 +488,13 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v5 = av_fetch(cmd, 5, 0);
             v6 = av_fetch(cmd, 6, 0);
             if (v1 && v2 && v3 && v4 && v5 && v6)
-                sv_catpvf(js, "%s.setTransform(%g,%g,%g,%g,%g,%g);",
-                          ctx, SvNV(*v1), SvNV(*v2), SvNV(*v3),
-                          SvNV(*v4), SvNV(*v5), SvNV(*v6));
+                sv_catpvf(js, "%s.setTransform(%s,%s,%s,%s,%s,%s);", ctx,
+                          _canvas_nv_str(aTHX_ cmd, 1, b1),
+                          _canvas_nv_str(aTHX_ cmd, 2, b2),
+                          _canvas_nv_str(aTHX_ cmd, 3, b3),
+                          _canvas_nv_str(aTHX_ cmd, 4, b4),
+                          _canvas_nv_str(aTHX_ cmd, 5, b5),
+                          _canvas_nv_str(aTHX_ cmd, 6, b6));
             break;
 
         case CANVAS_OP_RESET_TRANSFORM:
@@ -434,9 +502,9 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             break;
 
         case CANVAS_OP_MITER_LIMIT:
-            v1 = av_fetch(cmd, 1, 0);
-            if (v1)
-                sv_catpvf(js, "%s.miterLimit=%g;", ctx, SvNV(*v1));
+            if (av_fetch(cmd, 1, 0))
+                sv_catpvf(js, "%s.miterLimit=%s;", ctx,
+                          _canvas_nv_str(aTHX_ cmd, 1, b1));
             break;
 
         case CANVAS_OP_GLOBAL_COMP_OP:
@@ -451,8 +519,12 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v3 = av_fetch(cmd, 3, 0);
             v4 = av_fetch(cmd, 4, 0);
             if (v1 && v2 && v3 && v4)
-                sv_catpvf(js, "%s.beginPath();%s.moveTo(%g,%g);%s.lineTo(%g,%g);%s.stroke();",
-                          ctx, ctx, SvNV(*v1), SvNV(*v2), ctx, SvNV(*v3), SvNV(*v4), ctx);
+                sv_catpvf(js, "%s.beginPath();%s.moveTo(%s,%s);%s.lineTo(%s,%s);%s.stroke();",
+                          ctx, ctx,
+                          _canvas_nv_str(aTHX_ cmd, 1, b1),
+                          _canvas_nv_str(aTHX_ cmd, 2, b2), ctx,
+                          _canvas_nv_str(aTHX_ cmd, 3, b3),
+                          _canvas_nv_str(aTHX_ cmd, 4, b4), ctx);
             break;
 
         case CANVAS_OP_ROUNDED_RECT:
@@ -462,8 +534,13 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v4 = av_fetch(cmd, 4, 0);
             v5 = av_fetch(cmd, 5, 0);
             if (v1 && v2 && v3 && v4 && v5)
-                sv_catpvf(js, "%s.beginPath();%s.roundRect(%g,%g,%g,%g,%g);%s.stroke();",
-                          ctx, ctx, SvNV(*v1), SvNV(*v2), SvNV(*v3), SvNV(*v4), SvNV(*v5), ctx);
+                sv_catpvf(js, "%s.beginPath();%s.roundRect(%s,%s,%s,%s,%s);%s.stroke();",
+                          ctx, ctx,
+                          _canvas_nv_str(aTHX_ cmd, 1, b1),
+                          _canvas_nv_str(aTHX_ cmd, 2, b2),
+                          _canvas_nv_str(aTHX_ cmd, 3, b3),
+                          _canvas_nv_str(aTHX_ cmd, 4, b4),
+                          _canvas_nv_str(aTHX_ cmd, 5, b5), ctx);
             break;
 
         case CANVAS_OP_FILL_ROUNDED_RECT:
@@ -473,8 +550,13 @@ _canvas_cmd_to_js(pTHX_ SV *js, AV *cmd, const char *ctx)
             v4 = av_fetch(cmd, 4, 0);
             v5 = av_fetch(cmd, 5, 0);
             if (v1 && v2 && v3 && v4 && v5)
-                sv_catpvf(js, "%s.beginPath();%s.roundRect(%g,%g,%g,%g,%g);%s.fill();",
-                          ctx, ctx, SvNV(*v1), SvNV(*v2), SvNV(*v3), SvNV(*v4), SvNV(*v5), ctx);
+                sv_catpvf(js, "%s.beginPath();%s.roundRect(%s,%s,%s,%s,%s);%s.fill();",
+                          ctx, ctx,
+                          _canvas_nv_str(aTHX_ cmd, 1, b1),
+                          _canvas_nv_str(aTHX_ cmd, 2, b2),
+                          _canvas_nv_str(aTHX_ cmd, 3, b3),
+                          _canvas_nv_str(aTHX_ cmd, 4, b4),
+                          _canvas_nv_str(aTHX_ cmd, 5, b5), ctx);
             break;
     }
 }
@@ -499,9 +581,9 @@ _canvas_serialize_buffer(pTHX_ HV *self)
     /* Create context variable name */
     snprintf(ctx_var, sizeof(ctx_var), "_ctx_%s", canvas_id);
 
-    /* Build JS */
+    /* Build JS — wrapped in requestAnimationFrame for vsync */
     js = newSVpvs("");
-    sv_catpvf(js, "(function(){var c=document.getElementById('%s');if(!c)return;var %s=c.getContext('2d');",
+    sv_catpvf(js, "requestAnimationFrame(function(){var c=document.getElementById('%s');if(!c)return;var %s=c.getContext('2d');",
               canvas_id, ctx_var);
 
     len = av_len(buf) + 1;
@@ -512,7 +594,7 @@ _canvas_serialize_buffer(pTHX_ HV *self)
         }
     }
 
-    sv_catpvs(js, "})();");
+    sv_catpvs(js, "});");
     return js;
 }
 

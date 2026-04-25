@@ -1,5 +1,68 @@
 Revision history for Chandra
 
+0.24 2026-04-19
+  - Add Chandra::Component - Object::Proto reactive component system
+  - Components support state, lifecycle hooks (on_mount, on_unmount, on_update)
+  - data-action attribute auto-binds to on_* methods via JS bridge
+  - Child composition with automatic mount/unmount propagation
+  - Selective DOM re-rendering via $app->update on component subtree
+  - Parameterised actions (data-action="method:arg1:arg2")
+  - Fix HTML attribute escaping for onclick handlers (&quot; encoding)
+  - Add Chandra::Table - sortable, filterable, paginated data grid component
+  - Table supports client-side and server-side sorting
+  - Column filtering with text search and dropdown options
+  - Pagination with page size and navigation controls
+  - Row selection (single/multi) with checkboxes
+  - Boolean column type with checkmark display
+  - CSV export via to_csv()
+  - Dynamic data updates via set_data()
+  - Table renders using Chandra::Element for proper event wiring
+  - Partial DOM updates for Table (filters don't lose focus on sort/page/filter)
+  - Input debounce (300ms) for text filter fields
+  - Component update_part() for targeted sub-section re-rendering
+  - Add Chandra::Theme - CSS theme system with light/dark modes
+  - CSS custom properties for all design tokens (--chandra-*)
+  - Auto mode via prefers-color-scheme media query
+  - Component styles for Form, Table, buttons, inputs, scrollbars
+  - $app->theme('dark') convenience method (XS)
+  - Add Chandra::Toast - in-app toast notifications
+  - Toast types: success, error, warning, info with colour-coded accents
+  - Auto-dismiss with configurable duration (0 = persistent)
+  - Optional action button with Perl callback
+  - Stacking with max 5 visible, slide-in/out animation
+  - Click to dismiss, X button
+  - $app->toast() and $app->dismiss_toast() convenience methods (XS)
+  - Themed via CSS custom properties
+  - Add Chandra::Modal - custom HTML modal dialogs (XS)
+  - Modal show/close with backdrop, title bar, X button
+  - Confirm convenience (OK/Cancel with callbacks)
+  - Prompt convenience (text input with on_submit receiving value)
+  - Custom button definitions with class and action/handler
+  - Scale-in/out animation, auto-focus input fields
+  - Add Chandra::Form::Validator - form validation framework
+  - Built-in validators: required, pattern, minlength, maxlength, min, max, email
+  - Custom validator callbacks (Perl coderef, receives value + all data)
+  - Custom error messages per rule (required_msg, pattern_msg, etc.)
+  - Client-side validation JS with submit prevention and live blur validation
+  - Server-side validate() returns errors hashref
+  - Integrates with existing show_errors_js/clear_errors_js
+  - Add Chandra::Nav - sidebar/topbar navigation component
+  - Active item highlighting, route integration, badges, separators
+  - Collapsible sidebar with toggle button
+  - Add Chandra::Tabs - tab switching component
+  - Tab content rendered on switch, badge support, on_change callback
+  - Add Chandra::Breadcrumb - breadcrumb trail component
+  - Clickable path items with route navigation, configurable separator
+  - All three use Chandra::Element and extend Chandra::Component
+  - Page reload recovery via WKUserScript + on_reload callback
+  - Bridge JS re-injection on reload (window.chandra restored)
+  - $app->on_reload(sub { ... }) for re-mounting components after reload
+  - Fix Linux notification shell escaping (single quotes properly escaped)
+  - Bridge extension circular dependency detection with extension names in error
+  - Canvas batch rendering wrapped in requestAnimationFrame for vsync
+  - Windows Pack: Authenticode signing via signtool (sign_cert/sign_password)
+  - Windows notifications: Shell_NotifyIcon balloon tips (replaces MessageBox)
+
 0.23 2026-04-16
   - Fix t/47_clipboard.t test for empty string on FreeBSD/headless systems
   - Empty clipboard behavior is now platform-tolerant (undef or empty allowed)

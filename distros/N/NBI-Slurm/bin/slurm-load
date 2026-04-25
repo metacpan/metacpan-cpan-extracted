@@ -1,0 +1,370 @@
+#!/usr/bin/env perl
+#ABSTRACT: Summarise Slurm workload by combining sinfo node states with squeue job pressure
+#PODNAME: slurm-load
+
+use v5.12;
+use warnings;
+use Getopt::Long;
+use FindBin qw($RealBin);
+use Term::ANSIColor qw(:constants);
+
+if (-e "$RealBin/../dist.ini") {
+    say STDERR "[dev mode] Using local lib" if ($ENV{"DEBUG"});
+    use lib "$RealBin/../lib";
+}
+
+use NBI::Slurm;
+
+my $opt_tab = 0;
+my $opt_user;
+my $opt_help = 0;
+
+GetOptions(
+    't|tab'    => \$opt_tab,
+    'u|user=s' => \$opt_user,
+    'version'  => sub { say "slurm-load v", $NBI::Slurm::VERSION; exit 0 },
+    'h|help'   => \$opt_help,
+) or usage(1);
+
+usage(0) if $opt_help;
+
+for my $cmd (qw(sinfo squeue)) {
+    unless (_has_command($cmd)) {
+        say STDERR RED, "Error: ", RESET, "$cmd not found in PATH. Are you in a Slurm cluster?";
+        exit 1;
+    }
+}
+
+my $partitions = load_sinfo();
+my $jobs       = load_squeue($opt_user);
+my $rows       = build_rows($partitions, $jobs);
+
+if ($opt_tab) {
+    print_tsv($rows);
+} else {
+    print_table($rows);
+}
+
+exit 0;
+
+sub load_sinfo {
+    my %partitions;
+    my @lines = `sinfo --noheader --format='%P|%D|%T' 2>/dev/null`;
+    if ($? != 0) {
+        die "ERROR slurm-load: sinfo failed\n";
+    }
+
+    for my $line (@lines) {
+        chomp $line;
+        next unless $line =~ /\S/;
+        my ($partition, $nodes, $state) = split /\|/, $line, 3;
+        next unless defined $partition && defined $nodes && defined $state;
+
+        $partition =~ s/\*$//;
+        my $bucket = normalise_node_state($state);
+
+        $partitions{$partition}{partition} = $partition;
+        $partitions{$partition}{total} += $nodes;
+        $partitions{$partition}{$bucket} += $nodes;
+    }
+    return \%partitions;
+}
+
+sub load_squeue {
+    my ($user) = @_;
+    my %jobs;
+
+    my $cmd = "squeue --noheader --format='%P|%t|%D'";
+    $cmd .= " --user='$user'" if defined $user;
+    my @lines = `$cmd 2>/dev/null`;
+    if ($? != 0) {
+        die "ERROR slurm-load: squeue failed\n";
+    }
+
+    for my $line (@lines) {
+        chomp $line;
+        next unless $line =~ /\S/;
+        my ($partition, $state, $nodes) = split /\|/, $line, 3;
+        next unless defined $partition && defined $state && defined $nodes;
+
+        $partition =~ s/\*$//;
+        my $bucket = normalise_job_state($state);
+
+        $jobs{$partition}{partition} = $partition;
+        $jobs{$partition}{"jobs_$bucket"}++;
+        $jobs{$partition}{"nodes_$bucket"} += $nodes;
+    }
+
+    return \%jobs;
+}
+
+sub build_rows {
+    my ($partitions, $jobs) = @_;
+    my @header = qw(Partition Total Up Idle Mix Alloc Down JobsR JobsPD RunNodes PendNodes Load);
+    my @rows = (\@header);
+    my %totals = (
+        partition => 'TOTAL',
+        total => 0,
+        up => 0,
+        idle => 0,
+        mix => 0,
+        alloc => 0,
+        down => 0,
+        jobs_running => 0,
+        jobs_pending => 0,
+        nodes_running => 0,
+        nodes_pending => 0,
+    );
+
+    for my $partition (sort {
+        load_pct($partitions->{$b}) <=> load_pct($partitions->{$a}) || $a cmp $b
+    } keys %{$partitions}) {
+        my $node = $partitions->{$partition} || {};
+        my $job  = $jobs->{$partition} || {};
+
+        my $total = $node->{total} || 0;
+        my $down  = $node->{down} || 0;
+        my $idle  = $node->{idle} || 0;
+        my $mix   = $node->{mix} || 0;
+        my $alloc = $node->{alloc} || 0;
+        my $up    = $total - $down;
+        my $jobs_running  = $job->{jobs_running} || 0;
+        my $jobs_pending  = $job->{jobs_pending} || 0;
+        my $nodes_running = $job->{nodes_running} || 0;
+        my $nodes_pending = $job->{nodes_pending} || 0;
+        my $load = sprintf('%d%%', load_pct($node));
+
+        push @rows, [
+            $partition,
+            $total,
+            $up,
+            $idle,
+            $mix,
+            $alloc,
+            $down,
+            $jobs_running,
+            $jobs_pending,
+            $nodes_running,
+            $nodes_pending,
+            $load,
+        ];
+
+        $totals{total} += $total;
+        $totals{up} += $up;
+        $totals{idle} += $idle;
+        $totals{mix} += $mix;
+        $totals{alloc} += $alloc;
+        $totals{down} += $down;
+        $totals{jobs_running} += $jobs_running;
+        $totals{jobs_pending} += $jobs_pending;
+        $totals{nodes_running} += $nodes_running;
+        $totals{nodes_pending} += $nodes_pending;
+    }
+
+    if (@rows > 1) {
+        push @rows, [
+            $totals{partition},
+            $totals{total},
+            $totals{up},
+            $totals{idle},
+            $totals{mix},
+            $totals{alloc},
+            $totals{down},
+            $totals{jobs_running},
+            $totals{jobs_pending},
+            $totals{nodes_running},
+            $totals{nodes_pending},
+            sprintf('%d%%', load_pct(\%totals)),
+        ];
+    }
+
+    return \@rows;
+}
+
+sub load_pct {
+    my ($row) = @_;
+    my $total = $row->{total} || 0;
+    my $down  = $row->{down} || 0;
+    my $up    = $total - $down;
+    return 0 if $up <= 0;
+    my $busy = ($row->{mix} || 0) + ($row->{alloc} || 0);
+    return ($busy / $up) * 100;
+}
+
+sub normalise_node_state {
+    my ($state) = @_;
+    $state = lc($state // '');
+    $state =~ s/[^a-z].*$//;
+
+    return 'idle'  if $state =~ /^idle/;
+    return 'mix'   if $state =~ /^mix/;
+    return 'alloc' if $state =~ /^alloc/;
+    return 'down'  if $state =~ /^(down|drain|drng|drained|fail)/;
+    return 'alloc';
+}
+
+sub normalise_job_state {
+    my ($state) = @_;
+    $state = uc($state // '');
+
+    return 'pending' if $state eq 'PD';
+    return 'running' if $state =~ /^(R|CG|CF|SI|SO|ST)$/;
+    return 'running';
+}
+
+sub print_tsv {
+    my ($rows) = @_;
+    for my $row (@{$rows}) {
+        say join("\t", @{$row});
+    }
+}
+
+sub print_table {
+    my ($rows) = @_;
+    my @widths;
+    for my $row (@{$rows}) {
+        for my $i (0 .. $#{$row}) {
+            my $len = length($row->[$i] // '');
+            $widths[$i] = $len if !defined $widths[$i] || $len > $widths[$i];
+        }
+    }
+
+    for my $idx (0 .. $#{$rows}) {
+        my $row = $rows->[$idx];
+        my @parts;
+        for my $i (0 .. $#{$row}) {
+            my $fmt = $i == 0 ? "%-*s" : "%*s";
+            push @parts, sprintf($fmt, $widths[$i], $row->[$i]);
+        }
+
+        if ($idx == 0) {
+            say BOLD, join("  ", @parts), RESET;
+            my @rule = map { '-' x $_ } @widths;
+            say join("  ", @rule);
+            next;
+        }
+
+        if ($row->[0] eq 'TOTAL') {
+            say BOLD, join("  ", @parts), RESET;
+        } else {
+            say join("  ", @parts);
+        }
+    }
+}
+
+sub _has_command {
+    my ($cmd) = @_;
+    my $path = `command -v $cmd 2>/dev/null`;
+    return $? == 0 && $path =~ /\S/;
+}
+
+sub usage {
+    my ($exit_code) = @_;
+    print STDERR <<'END';
+slurm-load - Summarise Slurm workload by partition
+
+Usage:
+  slurm-load [options]
+
+Options:
+  -t, --tab        Print TSV instead of aligned text
+  -u, --user USER  Restrict squeue job counts to one user
+  --version        Show version and exit
+  -h, --help       Show this help and exit
+END
+    exit $exit_code;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+slurm-load - Summarise Slurm workload by combining sinfo node states with squeue job pressure
+
+=head1 VERSION
+
+version 0.21.0
+
+=head1 SYNOPSIS
+
+  slurm-load [options]
+
+=head1 DESCRIPTION
+
+This command combines C<sinfo> and C<squeue> to provide a partition-level view
+of current Slurm workload.
+
+It uses C<sinfo> to count node states per partition (idle, mixed, allocated,
+down) and C<squeue> to count running and pending jobs and requested nodes.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-t, --tab>
+
+Print tab-separated output.
+
+=item B<-u, --user USER>
+
+Restrict the C<squeue> portion of the summary to one user.
+
+=item B<--version>
+
+Show the version of the script.
+
+=item B<-h, --help>
+
+Show help and exit.
+
+=back
+
+=head1 OUTPUT
+
+The default table contains one row per partition plus a final C<TOTAL> row.
+
+=over 4
+
+=item * B<Total>
+
+Total nodes seen in C<sinfo> for that partition.
+
+=item * B<Up>
+
+Nodes that are not down/drained.
+
+=item * B<Idle>, B<Mix>, B<Alloc>, B<Down>
+
+Node counts grouped by broad Slurm state.
+
+=item * B<JobsR>, B<JobsPD>
+
+Running and pending job counts from C<squeue>.
+
+=item * B<RunNodes>, B<PendNodes>
+
+Requested node counts for running and pending jobs.
+
+=item * B<Load>
+
+Approximate node occupancy based on C<(mix + alloc) / up>.
+
+=back
+
+=head1 AUTHOR
+
+Andrea Telatin <proch@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2023-2025 by Andrea Telatin.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

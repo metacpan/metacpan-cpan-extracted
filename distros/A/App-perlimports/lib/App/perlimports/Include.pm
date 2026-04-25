@@ -2,7 +2,9 @@ package App::perlimports::Include;
 
 use Moo;
 
-our $VERSION = '0.000058';
+our $VERSION = '0.000059';
+
+## no critic (Bangs::ProhibitDebuggingModules)
 
 use Data::Dumper qw( Dumper );
 use List::Util   qw( any none uniq );
@@ -13,7 +15,7 @@ use PPIx::Utils::Classification qw( is_function_call is_perl_builtin );
 use Ref::Util                   qw( is_plain_arrayref is_plain_hashref );
 use Sub::HandlesVia;
 use Try::Tiny       qw( catch try );
-use Types::Standard qw(ArrayRef Bool HashRef InstanceOf Maybe Object Str);
+use Types::Standard qw(ArrayRef Bool HashRef InstanceOf Int Maybe Object Str);
 
 with 'App::perlimports::Role::Logger';
 
@@ -23,6 +25,8 @@ sub BUILD {
     flush_cache('is_function_call');
 }
 
+# this is a catalog of the @EXPORT's of the target module,
+# or @EXPORT_OK, or else whatever comes from "use Module;"
 has _explicit_exports => (
     is          => 'ro',
     isa         => HashRef,
@@ -110,22 +114,36 @@ has module_name => (
     default => sub { shift->_include->module },
 );
 
-has _original_imports => (
+has _found_imports => (
     is          => 'ro',
     isa         => Maybe [ArrayRef],
-    init_arg    => 'original_imports',
+    init_arg    => 'found_imports',
     handles_via => 'Array',
     handles     => {
-        _all_original_imports => 'elements',
-        _has_original_imports => 'count',
+        _all_found_imports => 'elements',
+        _has_found_imports => 'count',
     },
+);
+
+has _indent => (
+    is       => 'ro',
+    isa      => Int,
+    init_arg => 'indent',
+    default  => 4,
+);
+
+has _pad_brackets => (
+    is       => 'ro',
+    isa      => Bool,
+    init_arg => 'pad_brackets',
+    default  => 0,
 );
 
 has _pad_imports => (
     is       => 'ro',
     isa      => Bool,
     init_arg => 'pad_imports',
-    default  => sub { 1 },
+    default  => 1,
 );
 
 has _tidy_whitespace => (
@@ -133,7 +151,7 @@ has _tidy_whitespace => (
     isa      => Bool,
     init_arg => 'tidy_whitespace',
     lazy     => 1,
-    default  => sub { 1 },
+    default  => 1,
 );
 
 has _will_never_export => (
@@ -172,11 +190,11 @@ sub _build_imports {
     my %found;
 
     # Stolen from Perl::Critic::Policy::TooMuchCode::ProhibitUnfoundImport
-    for my $word ( @{ $self->_document->possible_imports } ) {
+    for my $word ( $self->_document->possibly_imported_tokens ) {
         next if exists $found{"$word"};
 
-        # No need to keep looking if we've found everything that can be
-        # imported
+        # stop if we've found everything that can be imported (every
+        # possible exported symbol is being used)
         last unless $self->_imports_remain( \%found );
 
         # We don't want (for instance) pragma names to be confused with
@@ -205,10 +223,10 @@ sub _build_imports {
 
         # Don't turn "use POSIX ();" into "use POSIX qw( sprintf );"
         # If it's a function and it's a builtin function and it's either not
-        # included in original_imports or original imports are not implicit
+        # included in found_imports or original imports are not implicit
         # then skip this.
-        if (   defined $self->_original_imports
-            && ( none { $_ eq $word } @{ $self->_original_imports } )
+        if (   defined $self->_found_imports
+            && ( none { $_ eq $word } @{ $self->_found_imports } )
             && $is_function_call
             && is_perl_builtin($word) ) {
             next;
@@ -314,6 +332,8 @@ sub _build_imports {
         }
 
         for my $found (@found_import) {
+
+            # could have been imported by another Include
             if ( !$self->_is_already_imported($found) ) {
                 $found{$found}++;
             }
@@ -364,16 +384,16 @@ sub _build_imports {
     # preserve it, rather than risk altering the behaviour of the module.
     if ( $self->_export_inspector->has_import_flags ) {
         for my $arg ( @{ $self->_export_inspector->import_flags } ) {
-            if ( defined $self->_original_imports
-                && ( any { $_ eq $arg } @{ $self->_original_imports } ) ) {
+            if ( defined $self->_found_imports
+                && ( any { $_ eq $arg } @{ $self->_found_imports } ) ) {
                 push @found, $arg;
             }
         }
     }
 
     @found = uniq _sort_symbols(@found);
-    if ( $self->_original_imports ) {
-        my @preserved = grep { m{\A[!_]} } @{ $self->_original_imports };
+    if ( $self->_found_imports ) {
+        my @preserved = grep { m{\A[!_]} } @{ $self->_found_imports };
         @found = uniq( @preserved, @found );
     }
     return \@found;
@@ -544,6 +564,9 @@ sub _build_formatted_ppi_statement {
         }
 
         if ( $self->_imports ) {
+
+            # Always emit tight brackets here; the -sbt flag passed to
+            # Perl::Tidy below controls whether padding is added.
             $import_arg = sprintf(
                 'import => [qw( %s )]',
                 join( q{ }, @{ $self->_imports } )
@@ -562,18 +585,21 @@ sub _build_formatted_ppi_statement {
 
         # save ~60ms in cases where we don't need Perl::Tidy
         require Perl::Tidy;    ## no perlimports
+        my $sbt    = $self->_pad_brackets ? 0 : 1;
+        my $indent = $self->_indent;
         Perl::Tidy::perltidy(
-            argv        => '-npro',
+            argv        => "-npro -sbt=$sbt -i=$indent",
             source      => \$statement,
             destination => \$statement
         );
     }
 
     else {
-        my $padding = $self->_pad_imports ? q{ } : q{};
+        my $padding = $self->_pad_imports  ? q{ } : q{};
+        my $bp      = $self->_pad_brackets ? q{ } : q{};
         my $template
             = $self->_isa_test_builder_module
-            ? 'use %s%s import => [ qw(%s%s%s) ];'
+            ? "use %s%s import => [${bp}qw(%s%s%s)${bp}];"
             : 'use %s%s qw(%s%s%s);';
 
         $statement = sprintf(
@@ -596,8 +622,9 @@ sub _build_formatted_ppi_statement {
             $self->module_name,
             $maybe_module_version,
         );
+        my $indent = q{ } x $self->_indent;
         for ( @{ $self->_imports } ) {
-            $statement .= "    $_\n";
+            $statement .= "$indent$_\n";
         }
         $statement .= ');';
     }
@@ -613,41 +640,48 @@ sub _imports_remain {
     return keys %{$found} < $self->_explicit_export_count;
 }
 
+# Takes a string 'use SomeModule ...', returns a PPI:Statement:Include.
+# The returned obj could be one made from the string, if its different from
+# the existing one, else it is just the original.
 sub _maybe_get_new_include {
     my $self      = shift;
     my $statement = shift;
-    my $doc       = PPI::Document->new( \$statement );
-    my $includes
-        = $doc->find( sub { $_[1]->isa('PPI::Statement::Include'); } );
-    my $rewrite = $includes->[0]->clone;
+    my $orig      = $self->_include;
+    return $orig if $statement eq $orig;    # quick exit
 
-    my $a = $self->_include . q{};
-    my $b = $rewrite . q{};
+    # Prefix newlines to reproduce original's location
+    ## no critic (BuiltinFunctions::ProhibitLvalueSubstr)
+    my $doc = do {
+        my $line = $orig->line_number || 1;
+        my $text = "\n" x $line;
+        substr( $text, -1 ) = $statement;
+        PPI::Document->new( \$text, filename => $orig->logical_filename );
+    };
+    ## use critic
 
-    # If the only difference is some whitespace before the quotes, we'll not
-    # alter the include. This reduces some of the churn. What we want to avoid
-    # is rewriting imports where the only change is to remove some whitespace
-    # padding which was specifically added by perltidy. If we keep removing
-    # changes made by perltidy this tool will be unfit to be used as a linter,
-    # because it will either force a tidy after every run or it will introduce
-    # tidying errors.
-    #
-    # So "use Foo     qw( bar );" should be considered equivalent to
-    #    "use Foo qw( bar );" because it might be in the context of
-    #
+    # Cloning is necessary because the tokens in the found statement belong
+    # to the document. When the document is destroyed, the tokens go with it.
+    # With the clone, the duplicated tokens are independent of the doc.
+    my $rewrite = do {
+        $doc->index_locations;
+        my $includes = $doc->find('Statement::Include');
+        $includes->[0]->clone;
+    };
+
+    # If the -only- difference is some whitespace before the symbol list, we
+    # keep the original statement. This is because perltidy often adds space
+    # to align successive import lists, and we don't want to fight. So:
     #    use AAAAAAA qw( thing );
-    #    use Foo     qw( bar );
-    #    use FFFFFFF qw( other );
-    #
-    #    If the existing include is something like
-    #    "use Foo    123 qw( foo );"
-    #    we should probably rewrite that since perltidy will likely rewrite
-    #    this to
-    #    "use Foo 123 qw( foo );"
+    #    use Foo     qw( bar );     <== leave this spacing alone
 
-    my $orig = $a;
-    if ( _respace_include($orig) eq $b ) {
-        return $self->_include;
+    # strip away extra spaces before the symbol list..
+    my $untidied_include = do {
+        my $string = "$orig";
+        $string =~ s{\s+(qw|\()}{ $1};
+        $string;
+    };
+    if ( "$rewrite" eq $untidied_include ) {
+        return $orig;
     }
 
     return $rewrite if $self->_tidy_whitespace;
@@ -655,20 +689,10 @@ sub _maybe_get_new_include {
     # We will return the rewritten include if a newline has been added or
     # removed. This is a formatting change that we *probably* want.
 
-    $a =~ s{\s}{}g;
-    $b =~ s{\s}{}g;
+    ( my $a = $orig . q{} )    =~ s{\s+}{}g;
+    ( my $b = $rewrite . q{} ) =~ s{\s+}{}g;
 
-    return ( $a eq $b ) ? $self->_include : $rewrite;
-}
-
-# This function takes the original include and strips away the extra spaces
-# which might have been added as formatting by perltidy. This makes it easier
-# to compare the old include with the new and decide if we really need to
-# replace it.
-sub _respace_include {
-    my $include = shift;
-    $include =~ s{\s+(qw|\()}{ $1};
-    return $include;
+    return ( $a eq $b ) ? $orig : $rewrite;
 }
 
 # If there's a different module in this document which has already imported
@@ -680,22 +704,24 @@ sub _respace_include {
 
 sub _is_already_imported {
     my $self      = shift;
-    my $symbol    = shift;
+    my $symbol    = shift;    # a string, not an object
     my $duplicate = 0;
+
+    if ( $self->_document->is_constant_name($symbol) ) {
+        $self->logger->debug("$symbol is defined as a constant");
+        return 1;
+    }
 
     foreach my $module (
         grep { $_ ne $self->module_name }
-        keys %{ $self->_document->original_imports }
+        keys %{ $self->_document->found_imports }
     ) {
         $self->logger->debug(
             "checking $module for previous imports of $symbol");
         my @imports;
-        if (
-            is_plain_arrayref(
-                $self->_document->original_imports->{$module}
-            )
-        ) {
-            @imports = @{ $self->_document->original_imports->{$module} };
+        if ( is_plain_arrayref( $self->_document->found_imports->{$module} ) )
+        {
+            @imports = @{ $self->_document->found_imports->{$module} };
             $self->logger->debug(
                 'Explicit imports found: ' . Dumper( [ sort @imports ] ) );
         }
@@ -762,7 +788,7 @@ App::perlimports::Include - Encapsulate one use statement in a document
 
 =head1 VERSION
 
-version 0.000058
+version 0.000059
 
 =head1 METHODS
 

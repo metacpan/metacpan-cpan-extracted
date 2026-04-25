@@ -32,7 +32,7 @@ perlimports - A command line utility for cleaning up imports in your Perl code
 
 =head1 VERSION
 
-version 0.000058
+version 0.000059
 
 =head1 SYNOPSIS
 
@@ -422,6 +422,29 @@ change in a subsequent release.
 
 This cannot be combined with tidying. So, passing C<--lint --inplace-edit> will
 generate an error.
+
+=head2 --indent
+
+Sets the indent width in spaces for C<qw()> import lists that are split across
+multiple lines. Defaults to the value of perltidy's C<indent-columns> setting
+(read from C<.perltidyrc> if present), or 4 if unset.
+
+    # --indent 2
+    use Foo qw(
+      bar
+      baz
+    );
+
+=head2 --[no-]pad-brackets
+
+When enabled, adds whitespace inside the square brackets of test builder import
+lists. Defaults to disabled.
+
+    # --pad-brackets
+    use Test::More import => [ qw( ok ) ];
+
+    # --no-pad-brackets
+    use Test::More import => [qw( ok )];
 
 =head2 --[no-]padding
 

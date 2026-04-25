@@ -1,3 +1,7 @@
+0.000027  2026-04-25 01:49:50-07:00 America/Los_Angeles
+
+    - Mirror the IPC-Manager test split: drop the aggregate t/SharedMem.t in favour of one .t file per subtest under t/SharedMem/, calling IPC::Manager::Test->run_one() so prove -j parallelises across subtests instead of running them serially. Bumps the IPC::Manager prereq to 0.000033 for run_one()
+
 0.000026  2026-04-19 08:38:33-07:00 America/Los_Angeles
 
 0.000001  2026-04-19 08:36:22-07:00 America/Los_Angeles

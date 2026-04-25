@@ -10,6 +10,7 @@ use Pod::Wordlist;
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
+1197072
 198982749
 49699333
 Alders
@@ -56,5 +57,6 @@ nelo
 olaf
 paul
 perlimports
+pyrrhlin
 sandboxed
 script

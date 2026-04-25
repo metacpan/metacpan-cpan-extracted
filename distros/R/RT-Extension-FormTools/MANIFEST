@@ -1,6 +1,7 @@
 bin/rt-insert-formtools-config.in
 Changes
 etc/sample_form.json
+etc/upgrade/remove_files
 ex/RT-Example-FormTools/etc/initialdata
 ex/RT-Example-FormTools/html/Example/autohandler
 ex/RT-Example-FormTools/html/Example/confirm
@@ -37,6 +38,7 @@ html/FormTools/Form
 html/FormTools/Next
 html/FormTools/ShowBanner
 html/FormTools/ShowChoices
+html/FormTools/ShowQuestion
 html/NoAuth/Helpers/FormLogo/dhandler
 html/NoAuth/js/form_tools.js
 html/Search/Elements/RoutingPickTicketCFs

@@ -1,3 +1,11 @@
+1.43
+ - Add t/overload_arith.t - where we check that overloaded arithmetic operations
+   return the same value as their respective mpc library functions.
+ - Corrections made in mpc-1.4.0 to mpc_ui_div & mpc_fr_div (re the sign of imaginary
+   zero) are now implemented for Math::MPC, irrespective of the version of the
+   underlying mpc library.
+ - Remove unused functions overload_string_orig() and _get_str from MPC.pm.
+
 1.42
  - Restructure the interpolation overloading. The only change in behaviour is
    that "@NaN@" and "@Inf@" have been replaced by "NaN" and "Inf".

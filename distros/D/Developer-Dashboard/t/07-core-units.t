@@ -21,6 +21,7 @@ use Developer::Dashboard::Config;
 use Developer::Dashboard::Doctor;
 use Developer::Dashboard::EnvAudit;
 use Developer::Dashboard::EnvLoader;
+use Developer::Dashboard::File;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::Housekeeper;
 use Developer::Dashboard::IndicatorStore;
@@ -1172,6 +1173,19 @@ my $saved_global = {
 };
 $config->save_global($saved_global);
 is_deeply( $config->load_global, $saved_global, 'save_global round-trips config content' );
+my $saved_numeric_file_alias = $config->save_global_file_alias( '123', $files->prompt_log );
+is( $saved_numeric_file_alias->{path}, $files->prompt_log, 'save_global_file_alias stores numeric file aliases' );
+my $numeric_file_alias_method = 123;
+is(
+    Developer::Dashboard::File->$numeric_file_alias_method,
+    $files->prompt_log,
+    'Developer::Dashboard::File resolves configured numeric aliases through dynamic method names',
+);
+is(
+    Developer::Dashboard::File->resolve('123'),
+    $files->prompt_log,
+    'Developer::Dashboard::File resolve returns configured numeric aliases explicitly',
+);
 my $saved_default_merge_path = $config->save_global_defaults(
     {
         default_mode => 'browse',
@@ -1210,6 +1224,9 @@ is_deeply(
                 title => 'Default Provider',
             },
         ],
+        file_aliases => {
+            123 => '$HOME/.developer-dashboard/logs/prompt.log',
+        },
     },
     'save_global_defaults preserves existing user settings while adding only missing defaults',
 );
@@ -1230,6 +1247,36 @@ is_deeply(
     $global_alias_config->path_aliases,
     { foo => File::Spec->catdir( $home, 'foo-path' ) },
     'path_aliases includes expanded global aliases when no repo override exists',
+);
+is_deeply(
+    $global_alias_config->save_global_file_alias( 'bashrc_copy', File::Spec->catfile( $home, '.bashrc.copy' ) ),
+    { name => 'bashrc_copy', path => File::Spec->catfile( $home, '.bashrc.copy' ) },
+    'save_global_file_alias stores a file alias using the same portable home-path normalization as path aliases',
+);
+is_deeply(
+    $global_alias_config->load_global->{file_aliases},
+    { bashrc_copy => '$HOME/.bashrc.copy' },
+    'save_global_file_alias persists file aliases in the writable config',
+);
+is_deeply(
+    $global_alias_config->load_global->{path_aliases},
+    { foo => '$HOME/foo-path' },
+    'save_global_file_alias leaves existing path aliases untouched in the writable config',
+);
+is_deeply(
+    $global_alias_config->global_file_aliases,
+    { bashrc_copy => File::Spec->catfile( $home, '.bashrc.copy' ) },
+    'global_file_aliases expands stored $HOME file aliases back into concrete local paths',
+);
+is_deeply(
+    $global_alias_config->file_aliases,
+    { bashrc_copy => File::Spec->catfile( $home, '.bashrc.copy' ) },
+    'file_aliases includes expanded global file aliases when no repo override exists',
+);
+is(
+    $files->resolve_file('bashrc_copy'),
+    File::Spec->catfile( $home, '.bashrc.copy' ),
+    'file registry resolves configured file aliases through Config-backed aliases',
 );
 is( $global_alias_config->web_workers, 1, 'web_workers defaults to one worker when unset' );
 is_deeply(
@@ -1297,6 +1344,16 @@ is_deeply(
     $global_alias_config->remove_global_path_alias('foo'),
     { name => 'foo', removed => 0 },
     'remove_global_path_alias is idempotent for missing aliases',
+);
+is_deeply(
+    $global_alias_config->remove_global_file_alias('bashrc_copy'),
+    { name => 'bashrc_copy', removed => 1 },
+    'remove_global_file_alias removes existing file aliases',
+);
+is_deeply(
+    $global_alias_config->remove_global_file_alias('bashrc_copy'),
+    { name => 'bashrc_copy', removed => 0 },
+    'remove_global_file_alias is idempotent for missing aliases',
 );
 $config->save_global;
 is_deeply( $config->load_global, {}, 'save_global defaults to an empty hash when no config is provided' );

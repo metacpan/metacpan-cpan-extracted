@@ -1,5 +1,9 @@
 Revision history for Horus
 
+0.08    2026-04-25
+        - Widen timestamp-comparison tolerance in t/03, t/07, t/08, t/14
+          from 1-5s to 10s to absorb gettimeofday/time() on CPAN tester environments
+
 0.07    2026-04-15
         - Fix "panic: previous op failed to extend arg stack" on -DDEBUGGING
           perls by adding EXTEND(SP, 1) before mPUSHs in custom op pp functions

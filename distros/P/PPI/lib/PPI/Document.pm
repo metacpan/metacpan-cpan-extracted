@@ -76,7 +76,7 @@ use YAML::PP                      ();
 use overload 'bool' => \&PPI::Util::TRUE;
 use overload '""'   => 'content';
 
-our $VERSION = '1.285';
+our $VERSION = '1.287';
 
 our ( $errstr, @ISA ) = ( "", "PPI::Node" );
 
@@ -149,7 +149,7 @@ oneliner)
 =head3 custom_feature_includes
 
   custom_feature_includes =>
-    { strEct => { signatures => "Syntax::Keyword::Try" } }
+    { MyStrict => { signatures => "Syntax::Keyword::Try" } }
 
 Setting custom_feature_includes with a hashref allows defining include names
 which act like pragmas that enable parsing features within their scope.
@@ -159,17 +159,17 @@ This is mostly useful when your work project has its own boilerplate module.
 It can also be provided as JSON or YAML in the environment variable
 PPI_CUSTOM_FEATURE_INCLUDES, like so:
 
-  PPI_CUSTOM_FEATURE_INCLUDES='strEct: {signatures: perl}' \
+  PPI_CUSTOM_FEATURE_INCLUDES='MyStrict: {signatures: perl}' \
     perlcritic lib/OurModule.pm
 
-  PPI_CUSTOM_FEATURE_INCLUDES='{"strEct":{"signatures":"perl"}}' \
+  PPI_CUSTOM_FEATURE_INCLUDES='{"MyStrict":{"signatures":"perl"}}' \
     perlcritic lib/OurModule.pm
 
 =head3 custom_feature_include_cb
 
   custom_feature_include_cb => sub {
     my ($statement) = @_;
-    return $statement->module eq "strEct" ? { signatures => "perl" } : ();
+    return $statement->module eq "MyStrict" ? { signatures => "perl" } : ();
   },
 
 Setting custom_feature_include_cb with a code reference causes all inspections
@@ -238,8 +238,7 @@ sub new {
 		return $document if $document;
 
 	} elsif ( _ARRAY0($source) ) {
-		$source = join '', map { "$_\n" } @$source;
-		my $document = PPI::Lexer->lex_source( $source, %attr );
+		my $document = PPI::Lexer->lex_file( $source, %attr );
 		return $document if $document;
 
 	} else {
@@ -248,13 +247,13 @@ sub new {
 
 	# Pull and store the error from the lexer
 	my $errstr;
-	if ( _INSTANCE($@, 'PPI::Exception') ) {
+	if ( PPI::Lexer->errstr ) {
+		$errstr = PPI::Lexer->errstr;
+	} elsif ( _INSTANCE($@, 'PPI::Exception') ) {
 		$errstr = $@->message;
 	} elsif ( $@ ) {
 		$errstr = $@;
 		$errstr =~ s/\sat line\s.+$//;
-	} elsif ( PPI::Lexer->errstr ) {
-		$errstr = PPI::Lexer->errstr;
 	} else {
 		$errstr = "Unknown error parsing Perl document";
 	}

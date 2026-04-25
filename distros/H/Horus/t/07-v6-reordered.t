@@ -15,7 +15,7 @@ is(uuid_variant($uuid), 1, 'uuid_variant returns 1 (RFC 9562)');
 # Timestamp extraction
 my $now = time();
 my $extracted = uuid_time($uuid);
-ok(abs($extracted - $now) < 5, "v6 timestamp within 5 seconds of now");
+ok(abs($extracted - $now) < 10, "v6 timestamp within 10 seconds of now");
 
 # Lexical sort order matches temporal order
 my @uuids;

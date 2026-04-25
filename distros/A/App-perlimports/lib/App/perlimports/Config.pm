@@ -3,11 +3,12 @@ package App::perlimports::Config;
 use Moo;
 use MooX::StrictConstructor;
 
-our $VERSION = '0.000058';
+our $VERSION = '0.000059';
 
-use List::Util      qw( uniq );
-use Path::Tiny      qw( path );
-use Types::Standard qw( ArrayRef Bool InstanceOf Str );
+use List::Util             qw( uniq );
+use Path::Tiny             qw( path );
+use Types::Common::Numeric qw( PositiveOrZeroInt );
+use Types::Standard        qw( ArrayRef Bool HashRef InstanceOf Str );
 
 has cache => (
     is      => 'ro',
@@ -102,6 +103,38 @@ has never_export => (
     isa     => ArrayRef,
     lazy    => 1,
     builder => '_build_never_export',
+);
+
+has _perltidy_options => (
+    is      => 'ro',
+    isa     => HashRef,
+    lazy    => 1,
+    default => sub {
+        require Perl::Tidy;    ## no perlimports
+        my %opts;
+        Perl::Tidy::perltidy(
+            dump_options      => \%opts,
+            dump_options_type => 'full',
+            argv              => q{},
+        );
+        return \%opts;
+    },
+);
+
+has indent => (
+    is      => 'ro',
+    isa     => PositiveOrZeroInt,
+    lazy    => 1,
+    default => sub {
+        return $_[0]->_perltidy_options->{'indent-columns'} // 4;
+    },
+);
+
+has pad_brackets => (
+    is      => 'ro',
+    isa     => Bool,
+    lazy    => 1,
+    default => 0,
 );
 
 has padding => (
@@ -201,7 +234,7 @@ App::perlimports::Config - Generic configuration options for C<perlimports>
 
 =head1 VERSION
 
-version 0.000058
+version 0.000059
 
 =head1 DESCRIPTION
 
@@ -242,11 +275,13 @@ ignore_modules                  = []
 ignore_modules_filename         = ""
 ignore_modules_pattern          = "" # regex like "^(Foo|Foo::Bar)"
 ignore_modules_pattern_filename = ""
+# indent                        = 4     # default: perltidy -i
 libs                            = ["lib", "t/lib"]
 log_filename                    = ""
 log_level                       = "warn"
 never_export_modules            = []
 never_export_modules_filename   = ""
+pad_brackets                    = false
 padding                         = true
 preserve_duplicates             = false
 preserve_unused                 = false

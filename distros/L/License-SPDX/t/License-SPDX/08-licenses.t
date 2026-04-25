@@ -8,4 +8,4 @@ use Test::NoWarnings;
 # Test.
 my $obj = License::SPDX->new;
 my @ret = $obj->licenses;
-is(@ret, 557, 'Get all licenses - count number (557).');
+is(@ret, 727, 'Get all licenses - count number (727).');

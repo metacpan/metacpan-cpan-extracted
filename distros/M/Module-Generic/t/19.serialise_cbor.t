@@ -57,7 +57,7 @@ $serialised = CBOR::XS::encode_cbor( $d );
 my $d2 = CBOR::XS::decode_cbor( $serialised );
 isa_ok( $d2 => 'Module::Generic::DateTime', 'deserialised object is Module::Generic::DateTime' );
 is( "$d2" => "$d", 'Module::Generic::DateTime test value' );
-# diag( "DateTime is: $d2" );
+# diag( "DateTime::Lite is: $d2" );
 
 my $dyn = Module::Generic::Dynamic->new({
     fname => 'John',

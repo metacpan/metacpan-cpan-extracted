@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::Cipher;
-$Crypt::OpenSSL3::Cipher::VERSION = '0.004';
+$Crypt::OpenSSL3::Cipher::VERSION = '0.005';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::Cipher - an abstraction around ciphers
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

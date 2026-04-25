@@ -280,6 +280,7 @@ use_ok('Chandra::App');
     {
         package MockWVRefresh;
         sub new { bless {}, shift }
+        sub eval_js          { push @eval_calls, $_[1] }
         sub dispatch_eval_js { push @eval_calls, $_[1] }
     }
 
@@ -292,7 +293,7 @@ use_ok('Chandra::App');
     @eval_calls = ();
     $app->refresh;
     ok(@eval_calls >= 1, 'refresh dispatches eval');
-    like($eval_calls[0], qr/Home/, 'refresh re-renders current route');
+    ok((grep { /Home/ } @eval_calls), 'refresh re-renders current route');
 }
 
 # --- refresh without routes (existing behaviour) ---
@@ -301,6 +302,7 @@ use_ok('Chandra::App');
     {
         package MockWVRefresh2;
         sub new { bless {}, shift }
+        sub eval_js          { push @eval_calls, $_[1] }
         sub dispatch_eval_js { push @eval_calls, $_[1] }
     }
 
@@ -312,7 +314,7 @@ use_ok('Chandra::App');
     @eval_calls = ();
     $app->refresh;
     ok(@eval_calls >= 1, 'refresh dispatches eval for static content');
-    like($eval_calls[0], qr/Static/, 'refresh re-renders static HTML');
+    ok((grep { /Static/ } @eval_calls), 'refresh re-renders static HTML');
 }
 
 # --- _inject_post_content_js includes router JS when routes exist ---

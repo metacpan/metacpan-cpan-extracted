@@ -88,7 +88,7 @@ use PPI::Exception  ();
 use PPI::Exception::ParserRejection ();
 use PPI::Document ();
 
-our $VERSION = '1.285';
+our $VERSION = '1.287';
 
 # The x operator cannot follow most Perl operators, implying that
 # anything beginning with x following an operator is a word.
@@ -172,6 +172,7 @@ sub new {
 		token        => undef,
 		class        => 'PPI::Token::BOM',
 		zone         => 'PPI::Token::Whitespace',
+		feature_set  => undef,
 
 		# Output token buffer
 		tokens       => [],
@@ -182,25 +183,17 @@ sub new {
 		perl6        => [],
 	}, $class;
 
-	if ( ! defined $_[1] ) {
-		# We weren't given anything
-		PPI::Exception->throw("No source provided to Tokenizer");
-
-	} elsif ( ! ref $_[1] ) {
+	if ( ! ref $_[1] ) {
 		my $source = PPI::Util::_slurp($_[1]);
-		if ( ref $source ) {
-			# Content returned by reference
-			$self->{source} = $$source;
-		} else {
-			# Errors returned as a string
-			return( $source );
-		}
+		PPI::Exception->throw("Tokenizer failed to open file: $source")
+		  if not ref $source;
+		$self->{source} = $$source;
 
 	} elsif ( _SCALAR0($_[1]) ) {
 		$self->{source} = ${$_[1]};
 
 	} elsif ( _ARRAY0($_[1]) ) {
-		$self->{source} = join '', map { "\n" } @{$_[1]};
+		$self->{source} = join '', map "$_\n", @{$_[1]};
 
 	} else {
 		# We don't support whatever this is
@@ -859,23 +852,12 @@ sub __current_token_is_forced_word {
 	return '';
 }
 
-sub _current_token_has_signatures_active {
-	my ($t) = @_;
-
-	# Get at least the three previous significant tokens, and extend the
-	# retrieval range to include at least one token that can walk the
-	# already generated tree. (i.e. has a parent)
-	my ( $tokens_to_get, @tokens ) = (3);
-	while ( !@tokens or ( $tokens[-1] and !$tokens[-1]->parent ) ) {
-		@tokens = $t->_previous_significant_tokens($tokens_to_get);
-		last if @tokens < $tokens_to_get;
-		$tokens_to_get++;
-	}
-
-	my ($closest_parented_token) = grep $_->parent, @tokens;
-	$closest_parented_token ||= $t->_document || $t->_document(PPI::Document->new);
-	return $closest_parented_token->presumed_features->{signatures}, @tokens;
+sub _features {
+	my ( $self, $arg ) = @_;
+	return $arg ? $self->{feature_set} = $arg : $self->{feature_set} || {};
 }
+
+sub _current_token_has_signatures_active { shift->{feature_set}{signatures} }
 
 1;
 

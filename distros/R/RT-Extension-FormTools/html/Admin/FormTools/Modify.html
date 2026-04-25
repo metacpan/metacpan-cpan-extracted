@@ -238,27 +238,7 @@
                       </label>
                     </div>
                   </&>
-%                 if ( %dependent_custom_fields ) {
-                  <&| /Elements/LabeledValue, Label => '' &>
-                    <div class="form-check">
-                      <input class="form-check-input" id="<% CSSClass($item) %>-depedent-validation" type="checkbox" name="dependent_validation" value="1" />
-                      <label class="form-check-label has-text-input" for="<% CSSClass($item) %>-depedent-validation">
-                        <div class="d-flex">
-                          <span class="pt-2 me-2 text-nowrap"><&|/l&>Require if</&></span>
-                          <select name="dependent_name" class="form-select text-nowrap">
-                            <option value=""><&|/l&>(no value)</&></option>
-%                         for my $name ( sort keys %dependent_custom_fields ) {
-                            <option value="<% $name %>"><% $name %></option>
-%                         }
-                          </select>
-                          <span class="pt-2 mx-2"><&|/l&>is</&></span>
-                          <select name="dependent_value" data-dependent-name="dependent_name" multiple class="form-select text-nowrap">
-                          </select>
-                        </div>
-                      </label>
-                    </div>
-                  </&>
-%                 }
+                  <& SELF:RequireCondition, For => CSSClass($item), Options => \%dependent_custom_fields &>
                   <&| /Elements/LabeledValue, Label => '' &>
                     <div class="form-check">
                       <input class="form-check-input" id="<% CSSClass($item) %>-hide" type="checkbox" name="hide" value="1" />
@@ -301,7 +281,7 @@
           <p class="m-1 p-2 border rounded">
             <span class="badge badge-primary align-text-bottom"><% $other_components{$item}{type} eq 'hidden' ? loc('Hidden') : loc('Component') %></span>
             <span class="content"><% loc($item) %></span>
-%         if ( $item eq 'Hidden' || ( $item =~ /ShowChoices|ShowBanner/ && %dependent_custom_fields ) ) {
+%         if ( $item eq 'Hidden' || ( $item eq 'ShowQuestion' ) || ( $item =~ /ShowChoices|ShowBanner/ && %dependent_custom_fields ) ) {
             <a href="#" class="edit" data-bs-toggle="modal" data-bs-target="#formtools-element-modal">
               <% GetSVGImage( Name => 'pencil', Title => loc('Edit') ) |n %>
             </a>
@@ -311,7 +291,7 @@
             </a>
           </p>
         </div>
-%       if ( $item eq 'Hidden' || ( $item =~ /ShowChoices|ShowBanner/ && %dependent_custom_fields ) ) {
+%       if ( $item eq 'Hidden' || ( $item eq 'ShowQuestion' ) || ( $item =~ /ShowChoices|ShowBanner/ && %dependent_custom_fields ) ) {
         <div class="modal fade formtools-element-modal" id="formtools-element-<% $item %>-modal" tabindex="-1" role="dialog">
           <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -330,6 +310,10 @@
                   <&| /Elements/LabeledValue, Label => loc('Value') &>
                     <input name="value" type="text" class="form-control" value="" />
                   </&>
+%               } elsif ( $item eq 'ShowQuestion' ) {
+                  <& SELF:ShowQuestion &>
+                  <& SELF:RequireCondition, For => CSSClass($item), Options => \%dependent_custom_fields &>
+                  <& SELF:ShowCondition, For => CSSClass($item), Options => \%dependent_custom_fields &>
 %               } else {
                   <& SELF:ShowCondition, For => CSSClass($item), Options => \%dependent_custom_fields &>
 %               }
@@ -419,6 +403,8 @@
                     <% loc('Component') %>
 %                 } elsif ( ( $item->{comp_name} // '' ) eq 'ShowChoices' ) {
                     <% loc('Component') %>
+%                 } elsif ( ( $item->{comp_name} // '' ) eq 'ShowQuestion' ) {
+                    <% loc('Component') %>
 %                 } elsif ( $item->{type} eq 'hidden' ) {
                     <% loc('Hidden') %>
 %                 } elsif ( RT::Extension::FormTools::is_core_field($item->{arguments}{name}) ) {
@@ -443,11 +429,13 @@
                      )
                        || $item->{comp_name} %>
                   <span class="label"><% $item->{arguments}{label} ? "($item->{arguments}{label})" : '' %></span>
+%               } elsif ( $item->{type} eq 'component' && $item->{comp_name} eq 'ShowQuestion' ) {
+                  ShowQuestion - <% $item->{arguments}{name} %>
 %               } else {
                   <% $item->{comp_name} %>
 %               }
                 </span>
-%             if ( ( $item->{type} eq 'raw_html' && ( ( $item->{wrapper} // '' ) ne 'hr' || %dependent_custom_fields ) ) || ( $item->{type} eq 'component' && ( $item->{comp_name} eq 'Field' || ( $item->{comp_name} =~ /ShowChoices|ShowBanner/ && %dependent_custom_fields ) ) ) || $item->{type} eq 'hidden' ) {
+%             if ( ( $item->{type} eq 'raw_html' && ( ( $item->{wrapper} // '' ) ne 'hr' || %dependent_custom_fields ) ) || ( $item->{type} eq 'component' && ( $item->{comp_name} eq 'Field' || ( $item->{comp_name} eq 'ShowQuestion' ) || ( $item->{comp_name} =~ /ShowChoices|ShowBanner/ && %dependent_custom_fields ) ) ) || $item->{type} eq 'hidden' ) {
                 <a href="#" class="edit" data-bs-toggle="modal" data-bs-target="#formtools-element-<% $form_page_id{$page_name} %>-<% $i %>-modal">
                   <% GetSVGImage( Name => 'pencil', Title => loc('Edit') ) |n %>
                 </a>
@@ -500,6 +488,10 @@
                       </&>
 %                     }
                       <& SELF:ShowCondition, For => "$form_page_id{$page_name}-$i", Item => $item, Options => \%dependent_custom_fields &>
+%                   } elsif ( $item->{type} eq 'component' && $item->{comp_name} eq 'ShowQuestion' ) {
+                      <& SELF:ShowQuestion, Item => $item &>
+                      <& SELF:RequireCondition, For => "$form_page_id{$page_name}-$i", Item => $item, Options => \%dependent_custom_fields &>
+                      <& SELF:ShowCondition, For => "$form_page_id{$page_name}-$i", Item => $item, Options => \%dependent_custom_fields &>
 %                   } elsif ( $item->{type} eq 'component' && $item->{comp_name} =~ /ShowChoices|ShowBanner/ ) {
                       <& SELF:ShowCondition, For => "$form_page_id{$page_name}-$i", Item => $item, Options => \%dependent_custom_fields &>
 %                   } elsif ( $item->{type} eq 'component' && $item->{comp_name} eq 'Field' ) {
@@ -541,32 +533,7 @@
                         </div>
                       </&>
 %                     if ( !RT::Extension::FormTools::is_core_field($item->{arguments}{name}) ) {
-%                     if ( %dependent_custom_fields ) {
-                      <&| /Elements/LabeledValue, Label => '' &>
-                        <div class="form-check">
-                          <input class="form-check-input" id="formtools-element-<% $form_page_id{$page_name} %>-<% $i %>-depedent-validation" type="checkbox" name="dependent_validation" value="1" <% $item->{arguments}{dependent_validation}{enabled} ? 'checked="checked"' : '' |n %> />
-                          <label class="form-check-label has-text-input" for="formtools-element-<% $form_page_id{$page_name} %>-<% $i %>-depedent-validation">
-                            <div class="d-flex">
-                              <span class="pt-2 me-2 text-nowrap"><&|/l&>Require if</&></span>
-                              <select name="dependent_name" class="form-select text-nowrap selectpicker w-auto">
-                                <option value=""><&|/l&>(no value)</&></option>
-%                             for my $name ( sort keys %dependent_custom_fields ) {
-                                <option value="<% $name %>" <% ($item->{arguments}{dependent_validation}{name} // '') eq $name ? 'selected="selected"' : '' |n %>><% $name %></option>
-%                             }
-                              </select>
-                              <span class="pt-2 mx-2"><&|/l&>is</&></span>
-                              <select name="dependent_value" data-dependent-name="dependent_name" multiple class="form-select text-nowrap selectpicker">
-%                             if ( my $name = $item->{arguments}{dependent_validation}{name} ) {
-%                               for my $value ( @{ $dependent_custom_fields{$name} || [] } ) {
-                                  <option value="<% $value %>" <% grep( { $value eq $_ } @{$item->{arguments}{dependent_validation}{values} || []} ) ? 'selected="selected"' : '' |n %>><% $value %></option>
-%                               }
-%                             }
-                              </select>
-                            </div>
-                          </label>
-                        </div>
-                      </&>
-%                     }
+                      <& SELF:RequireCondition, For => "$form_page_id{$page_name}-$i", Item => $item, Options => \%dependent_custom_fields &>
 %                     }
 
                       <&| /Elements/LabeledValue, Label => '' &>
@@ -828,11 +795,20 @@ while ( my $cf = $cfs->Next ) {
 }
 
 my %other_components = (
-    ShowBanner  => { type => 'component', comp_name => 'ShowBanner' },
-    ShowChoices => { type => 'component', comp_name => 'ShowChoices' },
-    Hidden      => { type => 'hidden' },
+    ShowBanner   => { type => 'component', comp_name => 'ShowBanner' },
+    ShowChoices  => { type => 'component', comp_name => 'ShowChoices' },
+    ShowQuestion => { type => 'component', comp_name => 'ShowQuestion' },
+    Hidden       => { type => 'hidden' },
 );
 
+$m->callback(
+    CallbackName    => 'MassageComponents',
+    HTMLComponents  => \@html_components,
+    CoreComponents  => \@core_components,
+    CustomFields    => \@custom_fields,
+    OtherComponents => \%other_components,
+    QueueObj        => $queue,
+);
 
 # if this is a new form without any pages create default pages and save
 unless ( $form->{'formtools-pages'} ) {
@@ -871,6 +847,17 @@ my @form_pages
 
 my %form_page_id = map { $_ => CSSClass($_) } @form_pages;
 my $active_context = { tab => $ActiveTab || $form_page_id{$form_pages[0]} };
+
+# add any question components to dependent_custom_fields
+my @question_components;
+for my $page ( @form_pages ) {
+    push @question_components,
+        grep { $_->{comp_name} && ( $_->{comp_name} eq 'ShowQuestion' ) }
+            @{ $form->{'formtools-pages'}{$page}{content} || [] };
+}
+for my $question ( @question_components ) {
+    $dependent_custom_fields{ $question->{arguments}{name} } = [ grep { $_ } split "\n", $question->{arguments}{choices} ];
+}
 </%INIT>
 <%ARGS>
 $id => undef
@@ -878,6 +865,42 @@ $ActiveTab => ''
 $Update => undef
 $AddPage => undef
 </%ARGS>
+
+<%METHOD RequireCondition>
+<&| /Elements/LabeledValue, Label => '' &>
+  <div class="form-check">
+    <input class="form-check-input" id="formtools-element-<% $For %>-dependent-validation" type="checkbox" name="dependent_validation" value="1" <% $Item->{arguments}{dependent_validation}{enabled} ? 'checked="checked"' : '' |n %> />
+    <label class="form-check-label has-text-input" for="formtools-element-<% $For %>-dependent-validation">
+    <div class="d-flex">
+      <span class="pt-2 me-2 text-nowrap"><&|/l&>Require if</&></span>
+      <select name="dependent_name" class="form-select text-nowrap <% $ARGS{Item} ? 'selectpicker' : '' %>">
+        <option value=""><&|/l&>(no value)</&></option>
+% for my $name ( sort keys %$Options ) {
+        <option value="<% $name %>" <% ($Item->{arguments}{dependent_validation}{name} // '') eq $name ? 'selected="selected"' : '' |n %>><% $name %></option>
+% }
+      </select>
+      <span class="pt-2 mx-2"><&|/l&>is</&></span>
+      <select name="dependent_value" data-dependent-name="dependent_name" multiple class="form-select text-nowrap <% $ARGS{Item} ? 'selectpicker' : '' %>">
+% if ( my $name = $Item->{arguments}{dependent_validation}{name} ) {
+%   for my $value ( @{ $Options->{$name} || [] } ) {
+        <option value="<% $value %>" <% grep( { $value eq $_ } @{$Item->{arguments}{dependent_validation}{values} || []} ) ? 'selected="selected"' : '' |n %>><% $value %></option>
+%   }
+% }
+      </select>
+    </div>
+    </label>
+  </div>
+</&>
+<%INIT>
+return unless %$Options;
+</%INIT>
+
+<%ARGS>
+$For  => ''
+$Item => {}
+$Options
+</%ARGS>
+</%METHOD>
 
 <%METHOD ShowCondition>
 
@@ -915,5 +938,32 @@ return unless %$Options;
 $For  => ''
 $Item => {}
 $Options
+</%ARGS>
+</%METHOD>
+
+<%METHOD ShowQuestion>
+<&| /Elements/LabeledValue, Label => loc("Name") &>
+  <input name="name" class="form-control" value="<% $Item->{arguments}->{name} // '' %>" pattern="[\w\d ]+" />
+  <span class="form-text cfhints my-1 d-inline-block">
+    <% loc('Name can only contain letters, numbers, and spaces') %>
+  </span>
+</&>
+<&| /Elements/LabeledValue, Label => loc("Label") &>
+  <input name="label" class="form-control" value="<% $Item->{arguments}->{label} // '' %>" />
+</&>
+<&| /Elements/LabeledValue, Label => loc('Choices') &>
+  <textarea name="choices" class="form-control" rows="<% $choices_rows %>"><% $Item->{arguments}->{choices} // '' %></textarea>
+  <span class="form-text cfhints my-1 d-inline-block">
+    <% loc('Add each choice on its own line') %>
+  </span>
+</&>
+<%INIT>
+my $choices_rows = scalar( grep { $_ } split( "\n", $Item->{arguments}->{choices} // '' ) ) || 5;
+$choices_rows = 10
+  if $choices_rows > 10;
+</%INIT>
+
+<%ARGS>
+$Item => {}
 </%ARGS>
 </%METHOD>

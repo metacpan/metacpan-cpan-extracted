@@ -19,12 +19,14 @@ apkfile
 app.psgi
 aptfile
 bin/dashboard
+blogs/2026-04-24-introducing-developer-dashboard.md
 brewfile
 cpanfile
 dnfile
 doc/architecture.md
 doc/command-suggestions.md
 doc/docker-service-toggle.md
+doc/file-inventory-api.md
 doc/housekeeper-rotation.md
 doc/housekeeper-temp-cleanup.md
 doc/install-bootstrap.md
@@ -53,6 +55,7 @@ lib/Developer/Dashboard.pm
 lib/Developer/Dashboard/ActionRunner.pm
 lib/Developer/Dashboard/Auth.pm
 lib/Developer/Dashboard/CLI/Complete.pm
+lib/Developer/Dashboard/CLI/Files.pm
 lib/Developer/Dashboard/CLI/OpenFile.pm
 lib/Developer/Dashboard/CLI/Paths.pm
 lib/Developer/Dashboard/CLI/Progress.pm
@@ -111,6 +114,8 @@ share/private-cli/decode
 share/private-cli/docker
 share/private-cli/doctor
 share/private-cli/encode
+share/private-cli/file
+share/private-cli/files
 share/private-cli/housekeeper
 share/private-cli/indicator
 share/private-cli/iniq

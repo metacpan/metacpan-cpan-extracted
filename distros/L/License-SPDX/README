@@ -17,7 +17,7 @@ SYNOPSIS
 DESCRIPTION
     Object for SPDX licenses handling is using license data from
     <https://github.com/spdx/license-list-data> repository. Actual version
-    is 3.20.
+    is 3.28.0.
 
 METHODS
   "new"
@@ -186,10 +186,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2023 Michal Josef Špaček
+    © 2023-2026 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.06
+    0.07
 

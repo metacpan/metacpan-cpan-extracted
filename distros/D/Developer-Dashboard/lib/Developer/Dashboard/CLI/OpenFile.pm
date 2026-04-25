@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::OpenFile;
 use strict;
 use warnings;
 
-our $VERSION = '3.09';
+our $VERSION = '3.14';
 
 use Archive::Zip qw(:ERROR_CODES :CONSTANTS);
 use Cwd qw(cwd);
@@ -17,6 +17,8 @@ use JSON::XS qw(decode_json);
 use LWP::UserAgent;
 use URI::Escape qw(uri_escape_utf8);
 
+use Developer::Dashboard::Config;
+use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::PathRegistry;
 
 our @EXPORT_OK = qw(run_open_file_command build_path_registry);
@@ -253,6 +255,7 @@ sub _resolve_open_file_matches {
     my (%args) = @_;
     my $paths = $args{paths} || die 'Missing path registry';
     my @argv  = @{ $args{args} || [] };
+    my ( $files, $config ) = _open_file_registries( paths => $paths );
 
     my $first = shift @argv;
     my $line  = 0;
@@ -266,6 +269,11 @@ sub _resolve_open_file_matches {
 
     if ( defined $first && -f $first ) {
         return ( $line, $first );
+    }
+
+    if ( defined $first ) {
+        my $resolved_file = eval { $files->resolve_file($first) };
+        return ( $line, $resolved_file ) if defined $resolved_file && $resolved_file ne '' && -f $resolved_file;
     }
 
     if ( defined $first ) {
@@ -286,6 +294,11 @@ sub _resolve_open_file_matches {
 
     if ( $scope && -d $scope ) {
         @patterns = @argv;
+        my $relative_match = _scope_relative_path_match(
+            scope   => $scope,
+            pattern => \@patterns,
+        );
+        return ( $line, $relative_match ) if defined $relative_match;
     }
     else {
         $scope = $paths->current_project_root || cwd();
@@ -319,6 +332,36 @@ sub _resolve_open_file_matches {
         entries  => \@entries,
     );
     return ( $line, @files );
+}
+
+# _open_file_registries(%args)
+# Builds the config-backed path and file registries used by the open-file command.
+# Input: hash containing the active path registry under "paths".
+# Output: file registry object plus config object with configured aliases loaded.
+sub _open_file_registries {
+    my (%args) = @_;
+    my $paths = $args{paths} || die 'Missing path registry';
+    my $files = Developer::Dashboard::FileRegistry->new( paths => $paths );
+    my $config = Developer::Dashboard::Config->new( files => $files, paths => $paths );
+    $paths->register_named_paths( $config->path_aliases );
+    $files->register_named_files( $config->file_aliases );
+    return ( $files, $config );
+}
+
+# _scope_relative_path_match(%args)
+# Resolves an exact relative file path inside one search scope before regex fallback search.
+# Input: scope directory path and pattern array reference representing one relative path.
+# Output: exact file path string or undef when the pattern list is not one existing relative file.
+sub _scope_relative_path_match {
+    my (%args) = @_;
+    my $scope    = $args{scope}   || return;
+    my @patterns = @{ $args{pattern} || [] };
+    return if !@patterns;
+    return if grep { !defined $_ || $_ eq '' } @patterns;
+
+    my $relative = File::Spec->catfile(@patterns);
+    my $target   = File::Spec->catfile( $scope, $relative );
+    return -f $target ? $target : undef;
 }
 
 # _named_source_matches(%args)
@@ -710,12 +753,15 @@ Use this file when changing regex matching, how Java source is found, how Perl m
 =head1 HOW TO USE
 
 Call C<run_open_file_command> with the raw argv array from the helper command,
-or use the lower-level lookup routines from tests. Direct file paths and
-C<file:line> targets are handled immediately. Scoped lookup mode treats the
-first non-option argument as the search root or saved alias and every remaining
-argument as a case-insensitive regex that must match the candidate path. A
-single hit opens or prints that file, while multiple hits are ranked and shown
-as a chooser or plain list. Perl module lookup maps C<Foo::Bar> to
+or use the lower-level lookup routines from tests. Direct file paths,
+configured file aliases, and C<file:line> targets are handled immediately.
+Scoped lookup mode treats the first non-option argument as the search root or
+saved alias and every remaining argument as a case-insensitive regex that must
+match the candidate path, except when those remaining arguments join into one
+existing relative file path inside the resolved scope. In that exact-file case,
+the helper opens the scoped file directly instead of falling back to regex
+search. A single hit opens or prints that file, while multiple hits are ranked
+and shown as a chooser or plain list. Perl module lookup maps C<Foo::Bar> to
 C<Foo/Bar.pm>; Java lookup maps dotted class names to C<.java> source files,
 source archives, or cached Maven source jars before the helper decides whether
 to print the path or exec the configured editor.
@@ -731,6 +777,8 @@ print-vs-editor flows.
 
   dashboard open-file path/to/file.txt
   dashboard open-file lib 'OpenFile\.pm$'
+  dashboard of notes
+  dashboard of foobar 456.txt
   dashboard of . "Ok\.js$"
   dashboard open-file javax.jws.WebService
   dashboard of Developer::Dashboard::CLI::Paths

@@ -503,6 +503,50 @@ SH
 
     my $env_prefix = join ' ',
       map { sprintf q{%s='%s'}, $_->{key}, $_->{value} } (
+        { key => 'HOME',                       value => $home },
+        { key => 'PATH',                       value => $fake_bin . ':' . ( $ENV{PATH} || '' ) },
+        { key => 'SHELL',                      value => '/bin/sh' },
+        { key => 'DD_INSTALL_PREFERRED_SHELL', value => '/bin/zsh' },
+        { key => 'DD_INSTALL_OS_OVERRIDE',     value => 'darwin' },
+      );
+
+    my ( $stdout, $stderr, $exit ) = capture {
+        system( 'sh', '-c', "$env_prefix '$install_sh'" );
+    };
+    is( $exit >> 8, 0, 'install.sh succeeds when sh runs the installer for a zsh user' )
+      or diag $stdout . $stderr;
+
+    my $zshrc = File::Spec->catfile( $home, '.zshrc' );
+    my $profile = File::Spec->catfile( $home, '.profile' );
+    ok( -f $zshrc, 'install.sh still targets ~/.zshrc when the preferred shell is zsh even if sh runs the installer' );
+    like(
+        _slurp($zshrc),
+        qr/eval "\$\(\"[^\"]*\/dashboard" shell zsh\)"/,
+        'install.sh appends the zsh bootstrap to ~/.zshrc when the preferred shell is zsh',
+    );
+    unlike(
+        ( -f $profile ? _slurp($profile) : '' ),
+        qr/eval "\$\(\"[^\"]*\/dashboard" shell sh\)"/,
+        'install.sh does not leak the fallback sh bootstrap into ~/.profile for zsh users',
+    );
+    like(
+        $stdout,
+        qr/Shell setup was written to: \Q$zshrc\E/s,
+        'install.sh reports the zsh rc file when the preferred shell is zsh',
+    );
+}
+
+{
+    my $home = tempdir( CLEANUP => 1 );
+    my $fake_bin = tempdir( CLEANUP => 1 );
+    my $log = File::Spec->catfile( $home, 'install.log' );
+    _seed_fake_install_commands(
+        fake_bin => $fake_bin,
+        log      => $log,
+    );
+
+    my $env_prefix = join ' ',
+      map { sprintf q{%s='%s'}, $_->{key}, $_->{value} } (
         { key => 'HOME',                   value => $home },
         { key => 'PATH',                   value => $fake_bin . ':' . ( $ENV{PATH} || '' ) },
         { key => 'SHELL',                  value => '/bin/sh' },

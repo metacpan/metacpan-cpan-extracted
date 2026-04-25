@@ -15,14 +15,15 @@ my $ret_hr = $obj->exception('LLVM-exception');
 is_deeply(
 	$ret_hr,
 	{
-		'reference' => './LLVM-exception.json',
+		'reference' => 'https://spdx.org/licenses/LLVM-exception.html',
 		'isDeprecatedLicenseId' => $false,
-		'detailsUrl' => './LLVM-exception.html',
-		'referenceNumber' => 14,
+		'detailsUrl' => 'https://spdx.org/licenses/LLVM-exception.json',
+		'referenceNumber' => 82,
 		'name' => 'LLVM Exception',
 		'licenseExceptionId' => 'LLVM-exception',
 		'seeAlso' => [
 			'http://llvm.org/foundation/relicensing/LICENSE.txt',
+			'https://web.archive.org/web/20240423023852/https://foundation.llvm.org/relicensing/LICENSE.txt',
 		],
 	},
 	'Look for LLVM license exception.',

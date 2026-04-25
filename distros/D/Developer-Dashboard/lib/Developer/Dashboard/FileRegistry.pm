@@ -3,9 +3,11 @@ package Developer::Dashboard::FileRegistry;
 use strict;
 use warnings;
 
-our $VERSION = '3.09';
+our $VERSION = '3.14';
 
 use File::Spec;
+use File::Find ();
+use Developer::Dashboard::Config ();
 
 # new(%args)
 # Constructs a logical file registry.
@@ -14,7 +16,11 @@ use File::Spec;
 sub new {
     my ( $class, %args ) = @_;
     my $paths = $args{paths} || die 'Missing paths registry';
-    return bless { paths => $paths }, $class;
+    return bless {
+        paths                  => $paths,
+        named_files            => {},
+        configured_named_files => {},
+    }, $class;
 }
 
 # paths()
@@ -22,6 +28,120 @@ sub new {
 # Input: none.
 # Output: Developer::Dashboard::PathRegistry object.
 sub paths { $_[0]->{paths} }
+
+# register_named_files($aliases)
+# Registers config-backed named file aliases for later resolution.
+# Input: hash reference of alias names to absolute file paths.
+# Output: invocant.
+sub register_named_files {
+    my ( $self, $aliases ) = @_;
+    return $self if ref($aliases) ne 'HASH';
+    for my $name ( keys %{$aliases} ) {
+        next if !defined $name || $name eq '';
+        my $path = $aliases->{$name};
+        next if !defined $path || $path eq '';
+        $self->{named_files}{$name} = $path;
+    }
+    return $self;
+}
+
+# unregister_named_file($name)
+# Removes one registered named file alias when present.
+# Input: alias name string.
+# Output: invocant.
+sub unregister_named_file {
+    my ( $self, $name ) = @_;
+    return $self if !defined $name || $name eq '';
+    delete $self->{named_files}{$name};
+    delete $self->{configured_named_files}{$name};
+    return $self;
+}
+
+# named_files()
+# Returns the registered named file aliases.
+# Input: none.
+# Output: hash reference of alias names to file paths.
+sub named_files {
+    my ($self) = @_;
+    $self->_load_configured_named_files;
+    return {
+        %{ $self->{configured_named_files} || {} },
+        %{ $self->{named_files}            || {} },
+    };
+}
+
+# all_files()
+# Returns the complete runtime file inventory plus registered aliases.
+# Input: none.
+# Output: hash reference of file keys to absolute file paths.
+sub all_files {
+    my ($self) = @_;
+    $self->_load_configured_named_files;
+    my %all = %{ $self->all_file_aliases };
+    for my $name ( keys %{ $self->named_files } ) {
+        $all{$name} = $self->named_files->{$name};
+    }
+    return \%all;
+}
+
+# all_file_aliases()
+# Returns the runtime named file inventory exposed by dashboard file list.
+# Input: none.
+# Output: hash reference of built-in logical file names to absolute file paths.
+sub all_file_aliases {
+    my ($self) = @_;
+    return {
+        prompt_log      => $self->prompt_log,
+        collector_log   => $self->collector_log,
+        dashboard_log   => $self->dashboard_log,
+        global_config   => $self->global_config,
+        dashboard_index => $self->dashboard_index,
+        auth_log        => $self->auth_log,
+        web_pid         => $self->web_pid,
+        web_state       => $self->web_state,
+    };
+}
+
+# locate_files(@terms)
+# Locates matching files below the current directory.
+# Input: one or more non-empty search terms.
+# Output: ordered list of matching file paths.
+sub locate_files {
+    my ( $self, @terms ) = @_;
+    @terms = grep { defined && $_ ne '' } @terms;
+    return () if !@terms;
+    return $self->locate_files_under( $self->paths->cwd, @terms );
+}
+
+# locate_files_under($root, @terms)
+# Locates matching files beneath one root directory using case-insensitive term matches.
+# Input: root directory path plus one or more search terms.
+# Output: ordered unique list of matching file paths.
+sub locate_files_under {
+    my ( $self, $root, @terms ) = @_;
+    @terms = grep { defined && $_ ne '' } @terms;
+    return () if !defined $root || $root eq '' || !-d $root || !@terms;
+
+    my @found;
+    File::Find::find(
+        {
+            no_chdir => 1,
+            wanted   => sub {
+                return if !-f $_;
+                my $path = $File::Find::name;
+                my $name = $_;
+                for my $term (@terms) {
+                    return if $name !~ /\Q$term\E/i && $path !~ /\Q$term\E/i;
+                }
+                push @found, $path;
+            },
+        },
+        $root,
+    );
+
+    my %seen;
+    return grep { !$seen{$_}++ } sort @found;
+}
 
 # resolve_file($name)
 # Resolves a logical file name or absolute path to a concrete file path.
@@ -31,9 +151,24 @@ sub resolve_file {
     my ( $self, $name ) = @_;
 
     return $name if File::Spec->file_name_is_absolute($name);
+    return $self->{named_files}{$name} if exists $self->{named_files}{$name};
+    $self->_load_configured_named_files;
+    return $self->{configured_named_files}{$name} if exists $self->{configured_named_files}{$name};
     return $self->$name() if $self->can($name);
 
     die "Unknown file name '$name'";
+}
+
+# _load_configured_named_files()
+# Lazily loads config-backed file aliases into the registry when they have not
+# already been registered explicitly.
+# Input: none.
+# Output: invocant.
+sub _load_configured_named_files {
+    my ($self) = @_;
+    my $config = Developer::Dashboard::Config->new( files => $self, paths => $self->paths );
+    $self->{configured_named_files} = $config->file_aliases;
+    return $self;
 }
 
 # read($name)

@@ -773,6 +773,7 @@ subtest 'CBOR' => sub
     
         SKIP:
         {
+            local $SIG{__WARN__} = sub{};
             eval( "use IO::Compress::Brotli; use IO::Uncompress::Brotli;" );
             skip( "IO::Compress::Brotli or IO::Uncompress::Brotli is not installed on your system.", 1 ) if( $@ );
             # try-catch
@@ -792,6 +793,7 @@ subtest 'CBOR' => sub
 
         SKIP:
         {
+            local $SIG{__WARN__} = sub{};
             eval( "use Compress::LZW;" );
             skip( "Compress::LZW is not installed on your system.", 1 ) if( $@ );
             # try-catch
@@ -811,6 +813,7 @@ subtest 'CBOR' => sub
 
         SKIP:
         {
+            local $SIG{__WARN__} = sub{};
             eval( "use MIME::QuotedPrint;" );
             skip( "MIME::QuotedPrint is not installed on your system.", 1 ) if( $@ );
             # try-catch
@@ -1546,6 +1549,7 @@ subtest 'Sereal' => sub
     
         SKIP:
         {
+            local $SIG{__WARN__} = sub{};
             eval( "use IO::Compress::Brotli; use IO::Uncompress::Brotli;" );
             skip( "IO::Compress::Brotli or IO::Uncompress::Brotli is not installed on your system.", 1 ) if( $@ );
             # try-catch
@@ -1565,6 +1569,7 @@ subtest 'Sereal' => sub
 
         SKIP:
         {
+            local $SIG{__WARN__} = sub{};
             eval( "use Compress::LZW;" );
             skip( "Compress::LZW is not installed on your system.", 1 ) if( $@ );
             # try-catch
@@ -1584,6 +1589,7 @@ subtest 'Sereal' => sub
 
         SKIP:
         {
+            local $SIG{__WARN__} = sub{};
             eval( "use MIME::QuotedPrint;" );
             skip( "MIME::QuotedPrint is not installed on your system.", 1 ) if( $@ );
             # try-catch
@@ -2334,6 +2340,7 @@ subtest 'Storable' => sub
     
         SKIP:
         {
+            local $SIG{__WARN__} = sub{};
             eval( "use IO::Compress::Brotli; use IO::Uncompress::Brotli;" );
             skip( "IO::Compress::Brotli or IO::Uncompress::Brotli is not installed on your system.", 1 ) if( $@ );
             # try-catch
@@ -2353,6 +2360,7 @@ subtest 'Storable' => sub
 
         SKIP:
         {
+            local $SIG{__WARN__} = sub{};
             eval( "use Compress::LZW;" );
             skip( "Compress::LZW is not installed on your system.", 1 ) if( $@ );
             # try-catch
@@ -2372,6 +2380,7 @@ subtest 'Storable' => sub
 
         SKIP:
         {
+            local $SIG{__WARN__} = sub{};
             eval( "use MIME::QuotedPrint;" );
             skip( "MIME::QuotedPrint is not installed on your system.", 1 ) if( $@ );
             # try-catch

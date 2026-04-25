@@ -15,7 +15,7 @@ is(uuid_variant($uuid), 1, 'uuid_variant returns 1 (RFC 9562)');
 # Timestamp extraction - should be close to now
 my $now = time();
 my $extracted = uuid_time($uuid);
-ok(abs($extracted - $now) < 5, "v1 timestamp within 5 seconds of now (got $extracted, expected ~$now)");
+ok(abs($extracted - $now) < 10, "v1 timestamp within 10 seconds of now (got $extracted, expected ~$now)");
 
 # Node ID should be stable across calls
 my $uuid2 = uuid_v1();

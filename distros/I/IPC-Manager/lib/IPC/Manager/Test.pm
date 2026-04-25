@@ -20,23 +20,43 @@ sub run_all {
     my $protocol = $params{protocol} or croak "'protocol' is required";
     ipcm_default_protocol($protocol);
 
-    local $SIG{ALRM} = sub { confess("Test timed out after 180 seconds") };
-    alarm 180;
-
     for my $test ($class->tests) {
-        my $pid = fork // die "Could not fork: $!";
-        if ($pid) {
-            waitpid($pid, 0);
-            next;
-        }
+        $class->_run_subtest_in_child($test);
+    }
+}
 
-        my $ok  = eval { subtest $test => $class->can($test); 1 };
-        my $err = $@;
-        warn $err unless $ok;
-        exit($ok ? 0 : 255);
+sub run_one {
+    my $class  = shift;
+    my %params = @_;
+
+    my $protocol = $params{protocol} or croak "'protocol' is required";
+    my $test     = $params{test}     or croak "'test' is required";
+
+    croak "No such test '$test'" unless $test =~ m/^test_/ && $class->can($test);
+
+    ipcm_default_protocol($protocol);
+
+    $class->_run_subtest_in_child($test);
+}
+
+sub _run_subtest_in_child {
+    my ($class, $test) = @_;
+
+    my $timeout = $ENV{IPC_MANAGER_TEST_TIMEOUT} || 180;
+    local $SIG{ALRM} = sub { confess("Subtest '$test' timed out after ${timeout} seconds") };
+
+    my $pid = fork // die "Could not fork: $!";
+    if ($pid) {
+        alarm $timeout;
+        waitpid($pid, 0);
+        alarm 0;
+        return;
     }
 
-    alarm 0;
+    my $ok  = eval { subtest $test => $class->can($test); 1 };
+    my $err = $@;
+    warn $err unless $ok;
+    exit($ok ? 0 : 255);
 }
 
 sub tests {
@@ -574,14 +594,17 @@ sub test_sync_request_peer_exits_after_response {
 
         # Wait for the service process to die and the bus to deregister it.
         # waitpid the child the spawn started, so peer_active() definitively
-        # reports gone by the time await_response runs.
+        # reports gone by the time await_response runs.  Prefer blocking
+        # waitpid for direct children; fall back to a short poll otherwise.
         my $svc_pid = $handle->child_pid;
         if (defined $svc_pid) {
-            for (1 .. 50) {
-                last unless pid_is_running($svc_pid);
-                Time::HiRes::sleep(0.05);
+            my $r = waitpid($svc_pid, 0);
+            if ($r == -1) {
+                for (1 .. 50) {
+                    last unless pid_is_running($svc_pid);
+                    Time::HiRes::sleep(0.05);
+                }
             }
-            waitpid($svc_pid, POSIX::WNOHANG());
         }
         else {
             Time::HiRes::sleep(1);
@@ -1036,21 +1059,21 @@ sub test_intercept_errors {
     ok(-e $interval_survived, "on_interval survived exception and kept firing");
 
     # 2) on_peer_delta: connect a peer — triggers an exception, but service
-    #    should keep running
+    #    should keep running.  The follow-up sync_request below is FIFO-
+    #    serialised behind the peer-delta dispatch, so by the time the
+    #    response arrives the peer_delta callback has already fired (and
+    #    been intercepted).
     my $extra = ipcm_connect('ie_extra' => $handle->ipcm_info);
-    Time::HiRes::sleep(0.5);
     $extra->disconnect;
-    Time::HiRes::sleep(0.3);
 
-    # Verify service is still alive after peer_delta exception
     my $resp = $handle->sync_request(ie_svc => 'ping');
     is($resp->{response}, 'ok', "Service survived on_peer_delta exception");
 
-    # 3) on_general_message: send a plain message that throws
+    # 3) on_general_message: send a plain message that throws.  Same FIFO
+    # ordering argument: by the time the next sync_request returns, the
+    # general_message callback has already fired (and been intercepted).
     $handle->client->send_message(ie_svc => {action => 'crash'});
-    Time::HiRes::sleep(0.5);
 
-    # Verify service is still alive after general_message exception
     my $resp2 = $handle->sync_request(ie_svc => 'ping');
     is($resp2->{response}, 'ok', "Service survived on_general_message exception");
 

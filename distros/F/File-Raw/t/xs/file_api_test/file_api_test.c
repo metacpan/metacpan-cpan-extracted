@@ -25,6 +25,21 @@
 /* Include the file hooks C API */
 #include "file_hooks.h"
 
+/*
+ * Windows / Cygwin can't link unresolved references against Raw.dll
+ * without an import library that we don't ship. On those platforms
+ * pull in the hook implementation directly so this extension links
+ * cleanly. The hook state is then private to this extension's image,
+ * so the cross-DLL subtests in t/012-file-xs-api.t skip there.
+ *
+ * On Unix (Linux/FreeBSD/macOS/etc.), the dynamic loader resolves the
+ * undefined references against Raw.so at runtime — so we want the
+ * symbols to stay external and not get a private copy.
+ */
+#if defined(_WIN32) || defined(__CYGWIN__)
+#  include "file_hooks_impl.h"
+#endif
+
 /* =========================================
  * Test hook functions
  * =========================================

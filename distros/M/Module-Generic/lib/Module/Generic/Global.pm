@@ -1437,7 +1437,9 @@ sub _serialise
 {
     my $self = shift( @_ );
     my $data = shift( @_ );
-    return( '' ) if( !CORE::length( $data ) );
+    return( '' ) if( !CORE::defined( $data ) );
+    return( '' ) if( Scalar::Util::blessed( $data ) && $data->isa( 'Module::Generic::Null' ) );
+    return( '' ) if( !CORE::length( $data // '' ) );
     my $serialiser = $self->{serialiser} || $DEFAULT_SERIALISER || 'Storable::Improved';
     if( $serialiser eq 'CBOR' || $serialiser eq 'CBOR::XS' )
     {

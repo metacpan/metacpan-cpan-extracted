@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Paths;
 use strict;
 use warnings;
 
-our $VERSION = '3.09';
+our $VERSION = '3.14';
 
 use Cwd qw(cwd);
 use File::Basename qw(basename);
@@ -67,16 +67,19 @@ sub run_paths_command {
         return 1;
     }
     if ( $action eq 'add' ) {
-        my $name = shift @argv || die "Usage: dashboard path add <name> <path>\n";
-        my $path = shift @argv || die "Usage: dashboard path add <name> <path>\n";
+        my ( $name, $path ) = _normalize_add_arguments(@argv);
         my $saved = $config->save_global_path_alias( $name, $path );
         $paths->register_named_paths( { $name => $path } );
         $saved->{resolved} = $paths->resolve_dir($name);
         print json_encode($saved);
         return 1;
     }
-    if ( $action eq 'del' ) {
-        my $name = shift @argv || die "Usage: dashboard path del <name>\n";
+    if ( $action eq 'del' || $action eq 'rm' ) {
+        my $name = _normalize_delete_argument(
+            paths  => $paths,
+            config => $config,
+            name   => shift(@argv),
+        );
         my $deleted = $config->remove_global_path_alias($name);
         $paths->unregister_named_path($name);
         print json_encode($deleted);
@@ -93,7 +96,60 @@ sub run_paths_command {
         return 1;
     }
 
-    die "Usage: dashboard path <resolve|locate|cdr|complete-cdr|add|del|project-root|list> ...\n";
+    die "Usage: dashboard path <resolve|locate|cdr|complete-cdr|add|del|rm|project-root|list> ...\n";
+}
+
+# _normalize_add_arguments(@argv)
+# Expands dashboard path add shorthand so "." points at the current working
+# directory and a lone "." also derives the alias name from that directory.
+# Input: raw argv entries that follow "dashboard path add".
+# Output: alias name string plus target path string.
+sub _normalize_add_arguments {
+    my (@argv) = @_;
+    die "Usage: dashboard path add <name> <path>\n" if !@argv;
+
+    if ( @argv == 1 && $argv[0] eq '.' ) {
+        my $cwd = cwd();
+        return ( basename($cwd), $cwd );
+    }
+
+    my $name = shift @argv || die "Usage: dashboard path add <name> <path>\n";
+    my $path = shift @argv || die "Usage: dashboard path add <name> <path>\n";
+    $path = cwd() if $path eq '.';
+    return ( $name, $path );
+}
+
+# _normalize_delete_argument(%args)
+# Expands dashboard path del/rm shorthand so "." removes the alias that points
+# at the current working directory.
+# Input: hash containing the path registry under "paths", the config under
+# "config", and the raw alias token under "name".
+# Output: alias name string to remove.
+sub _normalize_delete_argument {
+    my (%args) = @_;
+    my $paths  = $args{paths}  || die "Missing paths registry\n";
+    my $config = $args{config} || die "Missing config\n";
+    my $name   = $args{name};
+    die "Usage: dashboard path del <name>\n" if !defined $name || $name eq '';
+    return $name if $name ne '.';
+
+    my $cwd = cwd();
+    my %aliases = %{ $config->path_aliases || {} };
+    my $preferred = basename($cwd);
+    if ( exists $aliases{$preferred} ) {
+        my $resolved = eval { $paths->_expand_home( $aliases{$preferred} ) };
+        $resolved = $aliases{$preferred} if !defined $resolved || $resolved eq '';
+        return $preferred if $resolved eq $cwd;
+    }
+    for my $candidate ( sort keys %aliases ) {
+        my $target = $aliases{$candidate};
+        next if !defined $target || $target eq '';
+        my $resolved = eval { $paths->_expand_home($target) };
+        $resolved = $target if !defined $resolved || $resolved eq '';
+        return $candidate if $resolved eq $cwd;
+    }
+
+    return basename($cwd);
 }
 
 # _build_paths()
@@ -280,7 +336,7 @@ It exists because path reporting and shell-navigation semantics should live in P
 
 =head1 WHEN TO USE
 
-Use this file when changing the output of C<dashboard paths>, the behavior of C<dashboard path resolve/add/del/list/project-root>, the C<cdr> payload contract consumed by shell helpers, or the completion candidates exposed to C<cdr>, C<dd_cdr>, and C<which_dir>.
+Use this file when changing the output of C<dashboard paths>, the behavior of C<dashboard path resolve/add/del/rm/list/project-root>, the C<cdr> payload contract consumed by shell helpers, or the completion candidates exposed to C<cdr>, C<dd_cdr>, and C<which_dir>.
 
 =head1 HOW TO USE
 
@@ -311,6 +367,8 @@ output.
   dashboard path cdr project alpha ".*service"
   dashboard path complete-cdr 2 cdr project alp
   dashboard path add work ~/projects/work
+  dashboard path add .
+  dashboard path rm work
   dashboard path list
 
 =for comment FULL-POD-DOC END

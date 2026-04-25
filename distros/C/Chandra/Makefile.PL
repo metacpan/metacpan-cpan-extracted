@@ -94,6 +94,7 @@ WriteMakefile(
         'IO::Socket::UNIX' => 0,
         'IO::Select'       => 0,
         'File::Raw'        => '0.08',
+        'Object::Proto'    => '0.16'
     },
     TEST_REQUIRES     => {
         'Test::More' => 0,

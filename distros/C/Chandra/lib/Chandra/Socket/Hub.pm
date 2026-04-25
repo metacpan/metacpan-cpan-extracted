@@ -6,9 +6,9 @@ use warnings;
 use IO::Select;
 use Chandra::Socket::Connection;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
-require Chandra;
+use Chandra;
 
 # All socket helpers implemented as C functions in
 # include/chandra/chandra_socket_hub.h

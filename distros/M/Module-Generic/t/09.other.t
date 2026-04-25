@@ -42,7 +42,7 @@ my $rv = $o->_load_class( 'Module::Generic::File', qw( file cwd ), { caller => '
 diag( "Unable to load Module::Generic::File: ", $o->error ) if( $DEBUG && !defined( $rv ) );
 ok( $rv, '_load_class Module::Generic::File' );
 
-# DateTime
+# DateTime::Lite
 subtest 'parse datetime' => sub
 {
     my $dates = [
@@ -196,7 +196,7 @@ subtest 'parse datetime' => sub
             $o->debug(0);
         }
         diag( "Failed to get the datetime object -> ", $o->error ) if( !defined( $dt ) );
-        isa_ok( $dt, 'DateTime', "DateTime object for $def->{test}" );
+        isa_ok( $dt, 'DateTime::Lite', "DateTime::Lite object for $def->{test}" );
         is( "$dt", $def->{expect}, "stringification for $def->{test}" );
     }
 };

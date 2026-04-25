@@ -21,7 +21,7 @@ BEGIN
     use vars qw( $VERSION $VERSION_CLASS $DEFAULT_DATETIME_FORMAT );
     use Changes::Group;
     use Changes::Version;
-    use DateTime;
+    use DateTime::Lite;
     use Wanted;
     our $VERSION_CLASS = 'Changes::Version';
     our $DEFAULT_DATETIME_FORMAT = '%FT%T%z';
@@ -40,7 +40,7 @@ sub init
     $self->{datetime_formatter} = undef;
     $self->{defaults}       = undef;
     $self->{elements}       = [];
-    # DateTime format
+    # DateTime::Lite format
     $self->{format}         = undef;
     $self->{line}           = undef;
     $self->{nl}             = "\n";
@@ -133,7 +133,7 @@ sub as_string
         {
             $cache = $self->{raw};
         }
-        
+
         my $lines = $self->new_array( $cache->scalar );
         $self->elements->foreach(sub
         {
@@ -166,9 +166,9 @@ sub as_string
     }
     if( !defined( $dt ) || !length( "$dt" ) )
     {
-        $dt = DateTime->now;
+        $dt = DateTime::Lite->now;
     }
-    
+
     my $fmt_pattern = $self->format;
     $fmt_pattern = $DEFAULT_DATETIME_FORMAT if( defined( $fmt_pattern ) && $fmt_pattern eq 'default' );
     my $tz = $self->time_zone;
@@ -189,7 +189,7 @@ sub as_string
         };
         if( $@ )
         {
-            warn( "Warning only: error trying to set the time zone '", $tz->name, "' (", overload::StrVal( $tz ), ") to DateTime object: $@\n" ) if( $self->_warnings_is_enabled( 'Changes' ) );
+            warn( "Warning only: error trying to set the time zone '", $tz->name, "' (", overload::StrVal( $tz ), ") to DateTime::Lite object: $@\n" ) if( $self->_warnings_is_enabled( 'Changes' ) );
         }
     }
     if( defined( $fmt_pattern ) && 
@@ -199,17 +199,22 @@ sub as_string
         local $@;
         eval
         {
-            require DateTime::Format::Strptime;
-            my $dt_fmt = DateTime::Format::Strptime->new(
-                pattern => $fmt_pattern,
-                locale => 'en_GB',
-            );
-            $dt->set_formatter( $dt_fmt );
+            require DateTime::Format::Lite;
         };
         if( $@ )
         {
-            return( $self->error( "Error trying to set formatter for format '${fmt_pattern}': $@" ) );
+            return( $self->error( "Unable to load DateTime::Format::Lite: $@" ) );
         }
+        my $dt_fmt = DateTime::Format::Lite->new(
+            pattern => $fmt_pattern,
+            locale  => 'en_GB',
+        );
+        if( !defined( $dt_fmt ) && DateTime::Format::Lite->error )
+        {
+            return( $self->error( "Error trying to set formatter for format '${fmt_pattern}': ", DateTime::Format::Lite->error ) );
+        }
+        $dt->set_formatter( $dt_fmt ) ||
+            return( $self->error( "Error trying to set formatter for format '${fmt_pattern}': ", DateTime::Format::Lite->error ) );
     }
     my $nl = $self->nl;
     my $lines = $self->new_array;
@@ -458,24 +463,19 @@ sub time_zone
     if( @_ )
     {
         my $v = shift( @_ );
-        if( $self->_is_a( $v => 'DateTime::TimeZone' ) )
+        if( $self->_is_a( $v => 'DateTime::Lite::TimeZone' ) )
         {
             $self->{time_zone} = $v;
         }
         else
         {
-            $self->_load_class( 'DateTime::TimeZone' ) || return( $self->pass_error );
-            # try-catch
-            local $@;
-            eval
+            $self->_load_class( 'DateTime::Lite::TimeZone' ) || return( $self->pass_error );
+            my $tz = DateTime::Lite::TimeZone->new( name => "$v" );
+            if( !defined( $tz ) && DateTime::Lite::TimeZone->error )
             {
-                my $tz = DateTime::TimeZone->new( name => "$v" );
-                $self->{time_zone} = $tz;
-            };
-            if( $@ )
-            {
-                return( $self->error( "Error setting time zone for '$v': $@" ) );
+                return( $self->error( "Error setting time zone for '$v': ", DateTime::Lite::TimeZone->error ) );
             }
+            $self->{time_zone} = $tz;
         }
         $self->reset(1);
     }
@@ -527,9 +527,9 @@ Changes::Release - Release object class
         datetime => '2022-11-17T08:12:42+0900',
         datetime_formatter => sub
         {
-            my $dt = shift( @_ ) || DateTime->now;
-            require DateTime::Format::Strptime;
-            my $fmt = DateTime::Format::Strptime->new(
+            my $dt = shift( @_ ) || DateTime::Lite->now;
+            require DateTime::Format::Lite;
+            my $fmt = DateTime::Format::Lite->new(
                 pattern => '%FT%T%z',
                 locale => 'en_GB',
             );
@@ -608,15 +608,15 @@ However, most format are supported including ISO8601 format and L<W3CDTF format|
 
 Note that if you use a relative datetime format such as C<-2D> for 2 days ago, the datetime format will be set to a unix timestamp, and in that case you need to also specify the C<format> option with the desired datetime format.
 
-You can alternatively directly set a L<DateTime> object.
+You can alternatively directly set a L<DateTime::Lite> object.
 
-It returns a L<DateTime> object whose L<date formatter|DateTime::Format::Strptime> object is set to the same format as provided. This ensures that any stringification of the L<DateTime> object reverts back to the string as found in the C<Changes> file or as provided by the user.
+It returns a L<DateTime::Lite> object whose L<date formatter|DateTime::Format::Lite> object is set to the same format as provided. This ensures that any stringification of the L<DateTime::Lite> object reverts back to the string as found in the C<Changes> file or as provided by the user.
 
 =head2 datetime_formatter
 
 Sets or gets a code reference callback to be used when formatting the release datetime. This allows you to use alternative formatter and greater control over the formatting of the release datetime.
 
-This code is called with a L<DateTime> object, and it must return a L<DateTime> object. Any other value will be discarded and it will fallback on setting up a L<DateTime> with current date and time using UTC as time zone and C<$DEFAULT_DATETIME_FORMAT> as default datetime format.
+This code is called with a L<DateTime::Lite> object, and it must return a L<DateTime::Lite> object. Any other value will be discarded and it will fallback on setting up a L<DateTime::Lite> with current date and time using UTC as time zone and C<$DEFAULT_DATETIME_FORMAT> as default datetime format.
 
 The code executed may die if needed and any exception will be caught and a warning will be issued if L<warnings> are enabled for L<Changes>.
 
@@ -663,7 +663,7 @@ Sets or gets an L<array object|Module::Generic::Array> of all the elements withi
 
 =head2 format
 
-Sets or gets a L<DateTime> format to be used with L<DateTime::Format::Strptime>. See L<DateTime::Format::Strptime/"STRPTIME PATTERN TOKENS"> for details on possible patterns.
+Sets or gets a L<DateTime::Lite> format to be used with L<DateTime::Format::Lite>. See L<DateTime::Format::Lite/"TOKENS"> for details on possible patterns.
 
 You can also specify an alternative formatter with L</datetime_formatter>
 
@@ -737,7 +737,7 @@ This is an alias for L</delete_group>
 
 =head2 set_default_format
 
-Sets the default L<DateTime> format pattern used by L<DateTime::Format::Strptime>. This default value used is C<$DEFAULT_DATETIME_FORMAT>, which, by default is: C<%FT%T%z>, i.e. something that would look like C<2022-12-06T20:13:09+0900>
+Sets the default L<DateTime::Lite> format pattern used by L<DateTime::Format::Lite>. This default value used is C<$DEFAULT_DATETIME_FORMAT>, which, by default is: C<%FT%T%z>, i.e. something that would look like C<2022-12-06T20:13:09+0900>
 
 =head2 spacer
 
@@ -749,9 +749,9 @@ It returns a L<scalar object|Module::Generic::Scalar>
 
 =head2 time_zone
 
-Sets or gets a time zone to use for the release date. A valid time zone can either be an olson time zone string such as C<Asia/Tokyo>, or an L<DateTime::TimeZone> object.
+Sets or gets a time zone to use for the release date. A valid time zone can either be an olson time zone string such as C<Asia/Tokyo>, or an L<DateTime::Lite::TimeZone> object.
 
-It returns a L<DateTime::TimeZone> object upon success, or an L<error|Module::Generic/error> if an error occurred.
+It returns a L<DateTime::Lite::TimeZone> object upon success, or an L<error|Module::Generic/error> if an error occurred.
 
 =head2 version
 

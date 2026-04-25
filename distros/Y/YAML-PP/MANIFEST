@@ -9,6 +9,7 @@ META.yml
 Makefile.PL
 Makefile.dev
 README.md
+SECURITY.md
 bin/yamlpp-events
 bin/yamlpp-highlight
 bin/yamlpp-load
@@ -107,6 +108,7 @@ t/54.glob.t
 t/55.flow.t
 t/56.force-flow.t
 t/57.dup-keys.t
+t/58.max-depth.t
 t/data/include/circular1.yaml
 t/data/include/circular2.yaml
 t/data/include/include.yaml

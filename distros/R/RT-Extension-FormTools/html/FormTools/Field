@@ -14,6 +14,7 @@ $enabled_by         => []
 $container_selector => undef
 $after_label        => ''
 $after_input        => ''
+$HasQuestion        => {}
 </%args>
 <%init>
 use RT::Extension::FormTools;
@@ -102,6 +103,15 @@ if ( $render_as !~ /readonly/ ) {
     }
 }
 
+$m->callback(
+    CallbackName => 'MassageFieldDefault',
+    Name         => $name,
+    FieldType    => $field_type,
+    Default      => \$default,
+    QueueObj     => $queue,
+    CustomField  => $cf,
+);
+
 $default = '' unless defined $default;
 
 </%init>
@@ -158,7 +168,7 @@ $default = '' unless defined $default;
     FullWidth => 1,
 &>
 % if ( $ARGS{validation} ) {
-  <span class="cfhints my-1 d-inline-block required">
+  <span class="form-text cfhints my-1 d-inline-block required">
     <% loc('Required') %>
   </span>
 % }
@@ -175,7 +185,6 @@ $default = '' unless defined $default;
 % }
 % if ( $ARGS{dependent_validation} && $ARGS{dependent_validation}{enabled} && $ARGS{dependent_validation}{name} ) {
 %   my $dependent_cf = RT::CustomField->new($session{CurrentUser});
-%   $dependent_cf = RT::CustomField->new( $session{'CurrentUser'} );
 %   $dependent_cf->SetContextObject($ticket);
 
 %   # try loading CFs for this Queue, followed by Global, followed by any CF of given $name
@@ -184,6 +193,10 @@ $default = '' unless defined $default;
 %   $dependent_cf->LoadByName( Name => $ARGS{dependent_validation}{name}, LookupType => RT::Ticket->CustomFieldLookupType ) unless ( $dependent_cf->id );
 %   if ( $dependent_cf->Id ) {
     data-dependent-name="<% GetCustomFieldInputName( Object => $ticket, CustomField => $dependent_cf ) %>"
+    data-dependent-values="<% JSON($ARGS{dependent_validation}{values} || []) %>"
+%   }
+%   elsif ( my $show_question = $HasQuestion->{ $ARGS{dependent_validation}{name} } ) {
+    data-dependent-name="<% $show_question %>"
     data-dependent-values="<% JSON($ARGS{dependent_validation}{values} || []) %>"
 %   }
 % }
@@ -223,7 +236,6 @@ $Token              => ''
 <div>
 <& /Ticket/Elements/AddAttachments, Token => $Token, QueueObj => $queue, FullWidth => 1 &>
 </div>
-<input type="hidden" class="hidden" name="Token" value="<% $Token %>" />
 
 % } elsif ($render_as eq 'hidden') {
 
@@ -287,8 +299,11 @@ $Token              => ''
 %      if (my $msg = $m->notes('InvalidField-' . $cf->Id)) {
             <span class="cfinvalidfield my-1 d-inline-block"><% $msg %></span>
 %      } elsif ($cf->FriendlyPattern) {
-            <span class="cfhints my-1 d-inline-block">
-              <% $cf->FriendlyPattern %>
+%        my $cf_required          = $ARGS{validation} || ( $ARGS{dependent_validation} && $ARGS{dependent_validation}{enabled} && $ARGS{dependent_validation}{name} );
+%        my $pattern              = $cf->Pattern;
+%        my $pattern_allows_empty = '' =~ m/$pattern/ ? 1 : 0;
+            <span class="form-text cfhints my-1 d-inline-block<% ($cf_required || !$pattern_allows_empty) ? ' required' : '' %>">
+              <% $cf->FriendlyPattern . ( $cf_required && $pattern_allows_empty ? ' - ' . loc('Required') : '' ) %>
             </span>
 %      }
 % } elsif ($render_as =~  /^boolean/i)  {
@@ -352,7 +367,7 @@ $Token              => ''
 % if (  ( !$cf || !$cf->FriendlyPattern ) && ( $ARGS{validation}
 %    || ( $ARGS{dependent_validation} && $ARGS{dependent_validation}{enabled} && $ARGS{dependent_validation}{name} ) )
 % ) {
-    <span class="cfhints my-1 d-inline-block required">
+    <span class="form-text cfhints my-1 d-inline-block required">
       <% loc('Required') %>
     </span>
 % }

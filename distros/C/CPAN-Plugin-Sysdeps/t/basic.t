@@ -18,5 +18,7 @@ my $cpandist = CPAN::Distribution->new(
 				       ID => 'X/XX/XXX/Cairo-1.0.tar.gz',
 				       CONTAINSMODS => { Cairo => undef },
 				      );
+ok !$p->{_mapper_ran}, 'mapper did not yet ran';
 $p->post_get($cpandist);
-
+ok $p->{_mapper_ran}, 'mapper ran';
+is $p->_dist_get_base_id($cpandist), 'Cairo-1.0', '_get_base_id call';

@@ -3,20 +3,16 @@ use warnings;
 use ExtUtils::MakeMaker;
 use Config;
 
-# File::Raw exports its C API symbols via dl_load_flags { 0x01 } (RTLD_GLOBAL).
-# This means on ELF platforms (Linux, FreeBSD, etc.) we do NOT need to link
-# against Raw.so directly - the symbols are globally available at runtime
-# as long as File::Raw is loaded first.
+# File::Raw exports its C API via dl_load_flags { 0x01 } (RTLD_GLOBAL) on ELF
+# platforms; macOS uses flat namespace. On both, the test extension's undefined
+# references to file_set_read_hook() etc. resolve at runtime against Raw.so,
+# so no explicit linking is needed.
 #
-# On macOS, flat namespace makes symbols visible without any special handling.
-# On Windows, we still need explicit linking.
-
-my $extra_libs = '';
-
-if ($^O eq 'MSWin32' || $^O eq 'cygwin' || $^O eq 'msys') {
-    my $raw_dir = '../../../blib/arch/auto/File/Raw';
-    $extra_libs = "-L$raw_dir -lRaw";
-}
+# On Windows / Cygwin we don't ship an import library for Raw.dll, so
+# file_api_test.c #includes "file_hooks_impl.h" under #ifdef _WIN32/__CYGWIN__
+# to get a private copy of the hook implementation. The cross-DLL subtests in
+# t/012-file-xs-api.t skip on those platforms (each DLL ends up with its own
+# hook state).
 
 my %makefile_args = (
     NAME              => 'file_api_test',
@@ -25,7 +21,6 @@ my %makefile_args = (
     ABSTRACT          => 'Test module for File::Raw hooks C API',
     AUTHOR            => 'LNATION <email@lnation.org>',
     LICENSE           => 'perl',
-    LIBS              => [$extra_libs],
     DEFINE            => '',
     INC               => '-I. -I../../.. -I../../../include',
     C                 => ['file_api_test.c'],

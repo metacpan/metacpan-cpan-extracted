@@ -6,7 +6,7 @@ BEGIN
     use lib './lib';
     use vars qw( $DEBUG );
     use open ':std' => ':utf8';
-    use DateTime;
+    use DateTime::Lite;
     use Test::More qw( no_plan );
     use Module::Generic::File qw( file );
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;

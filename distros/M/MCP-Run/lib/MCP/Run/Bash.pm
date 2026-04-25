@@ -1,5 +1,5 @@
 package MCP::Run::Bash;
-our $VERSION = '0.001';
+our $VERSION = '0.004';
 use Mojo::Base 'MCP::Run', -signatures;
 
 # ABSTRACT: MCP server that executes commands via bash
@@ -92,7 +92,7 @@ MCP::Run::Bash - MCP server that executes commands via bash
 
 =head1 VERSION
 
-version 0.001
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -158,7 +158,7 @@ Torsten Raudssus <torsten@raudssus.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

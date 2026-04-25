@@ -3,7 +3,7 @@ package Developer::Dashboard::SkillManager;
 use strict;
 use warnings;
 
-our $VERSION = '3.09';
+our $VERSION = '3.14';
 
 use Cwd qw(realpath);
 use File::Copy qw(copy);
@@ -919,8 +919,26 @@ sub _dependency_progress_label {
           if defined $result->{skip_reason} && $result->{skip_reason} ne '';
         return "$label (skipped: $file not present)";
     }
+    if ( ref($result) eq 'HASH' && defined $result->{error} && $result->{error} ne '' ) {
+        my $error = $self->_progress_error_text( $result->{error} );
+        return "$label from $path (error: $error)" if -f $path;
+        return "$label (error: $error)";
+    }
     return "$label from $path" if -f $path;
     return $label;
+}
+
+# _progress_error_text($error)
+# Compacts one install error into a single visible task-board line.
+# Input: raw error string from one dependency or source install step.
+# Output: single-line error summary string.
+sub _progress_error_text {
+    my ( $self, $error ) = @_;
+    return 'unknown failure' if !defined $error || $error eq '';
+    $error =~ s/\s+/ /g;
+    $error =~ s/\A\s+//;
+    $error =~ s/\s+\z//;
+    return $error;
 }
 
 # _progress_emit($event)

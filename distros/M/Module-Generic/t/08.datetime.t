@@ -5,9 +5,9 @@ use warnings;
 use Config;
 use Cwd qw( abs_path );
 use lib abs_path( './lib' );
-use DateTime;
-use DateTime::Duration;
-use DateTime::Format::Strptime;
+use DateTime::Lite;
+use DateTime::Lite::Duration;
+use DateTime::Format::Lite;
 
 BEGIN
 {
@@ -16,30 +16,30 @@ BEGIN
 
 my $hash =
 {
-    year => 2021,
-    month => 3,
-    day => 31,
-    hour => 9,
+    year   => 2021,
+    month  => 3,
+    day    => 31,
+    hour   => 9,
     minute => 12,
     second => 10,
     time_zone => 'Asia/Tokyo',
 };
-my $dt = DateTime->new( %$hash );
-my $fmt = DateTime::Format::Strptime->new(
+my $dt = DateTime::Lite->new( %$hash );
+my $fmt = DateTime::Format::Lite->new(
     pattern => '%Y-%m-%d %H:%M:%S',
-    locale => 'en_GB',
+    locale  => 'en_GB',
 );
 $dt->set_formatter( $fmt );
-# my $dt2 = DateTime->now( time_zone => 'local' );
-# my $dt2 = DateTime->now( time_zone => 'Asia/Tokyo' );
-## my $dt2 = DateTime->now( time_zone => 'GMT' );
-my $dt2 = DateTime->new(
-    year => 2021,
-    month => 3,
-    day => 19,
-    hour => 12,
-    minute => 8,
-    second => 15,
+# my $dt2 = DateTime::Lite->now( time_zone => 'local' );
+# my $dt2 = DateTime::Lite->now( time_zone => 'Asia/Tokyo' );
+## my $dt2 = DateTime::Lite->now( time_zone => 'GMT' );
+my $dt2 = DateTime::Lite->new(
+    year      => 2021,
+    month     => 3,
+    day       => 19,
+    hour      => 12,
+    minute    => 8,
+    second    => 15,
     time_zone => 'UTC',
 );
 $dt2->set_formatter( $fmt );
@@ -58,7 +58,7 @@ ok( $dbt1 > $iso, "is $dbt1 (" . overload::StrVal( $dbt1 ) . ") greater than $is
 ok( !( $dbt1 > $iso2 ), "is $dbt1 (" . overload::StrVal( $dbt1 ) . ") greater than $iso2 (" . overload::StrVal( $iso2 ) . ") ?" );
 # diag( "Comparing object to string (with iso)" );
 ok( $dbt1 > $iso3, "is $dbt1 (" . overload::StrVal( $dbt1 ) . ") greater than $iso3 (" . overload::StrVal( $iso3 ) . ") ?" );
-my $dur = DateTime::Duration->new( days => 2 );
+my $dur = DateTime::Lite::Duration->new( days => 2 );
 
 # diag( "\nUsing Module::Generic::DateTime." );
 my $res = ( $dbt2 + $dur );
@@ -69,16 +69,16 @@ ok( $res->stringify eq '2021-03-21 12:08:15' );
 
 $res = ( $dbt1 - $dbt2 );
 isa_ok( $res, 'Module::Generic::DateTime::Interval', "Subtract \$dbt2 ($dbt2) from \$dbt1 ($dbt1)" );
-# diag( "DateTime duration dump:\n", $res->dump );
+# diag( "DateTime::Lite duration dump:\n", $res->dump );
 
 is( $res->weeks, 1, "Number of weeks" );
 $res->weeks( 2 );
-# diag( "DateTime duration dump:\n", $res->dump );
+# diag( "DateTime::Lite duration dump:\n", $res->dump );
 # diag( "Increasing number of days using lvalue..." );
 $res->days = 3;
 is( $res->days, 3, "Number of days" );
 # $res->days++;
-# diag( "DateTime duration dump:\n", $res->dump );
+# diag( "DateTime::Lite duration dump:\n", $res->dump );
 # diag( "Multiplying duration $res by 2 using *" );
 my $res2 = ( $res * 2 );
 # diag( "Multiplying duration $res by 2 using *=" );
@@ -92,7 +92,7 @@ $dbt1 -= 2;
 $dbt1 += 4;
 # diag( "After addition assignment: $dbt1" );
 
-my $dt_now2 = DateTime->now;
+my $dt_now2 = DateTime::Lite->now;
 my $now2 = Module::Generic::DateTime->new;
 isa_ok( $now2 => 'Module::Generic::DateTime' );
 is( $now2->year, $dt_now2->year, 'default year' );

@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::PKey::Context;
-$Crypt::OpenSSL3::PKey::Context::VERSION = '0.004';
+$Crypt::OpenSSL3::PKey::Context::VERSION = '0.005';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::PKey::Context - An operation using a PKey
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -72,45 +72,7 @@ version 0.004
 
 =head2 generate
 
-=head2 get_dh_kdf_md
-
-=head2 get_dh_kdf_oid
-
-=head2 get_dh_kdf_outlen
-
-=head2 get_dh_kdf_type
-
-=head2 get_ecdh_cofactor_mode
-
-=head2 get_ecdh_kdf_md
-
-=head2 get_ecdh_kdf_outlen
-
-=head2 get_ecdh_kdf_type
-
-=head2 get_group_name
-
-=head2 get_id
-
-=head2 get_keygen_info
-
 =head2 get_param
-
-=head2 get_rsa_mgf1_md
-
-=head2 get_rsa_mgf1_md_name
-
-=head2 get_rsa_oaep_label
-
-=head2 get_rsa_oaep_md
-
-=head2 get_rsa_oaep_md_name
-
-=head2 get_rsa_padding
-
-=head2 get_rsa_pss_saltlen
-
-=head2 get_signature_md
 
 =head2 is_a
 
@@ -118,99 +80,9 @@ version 0.004
 
 =head2 paramgen_init
 
-=head2 set_dh_kdf_md
-
-=head2 set_dh_kdf_oid
-
-=head2 set_dh_kdf_outlen
-
-=head2 set_dh_kdf_type
-
-=head2 set_dh_nid
-
-=head2 set_dh_pad
-
-=head2 set_dh_paramgen_generator
-
-=head2 set_dh_paramgen_gindex
-
-=head2 set_dh_paramgen_prime_len
-
-=head2 set_dh_paramgen_seed
-
-=head2 set_dh_paramgen_subprime_len
-
-=head2 set_dh_paramgen_type
-
-=head2 set_dh_rfc5114
-
-=head2 set_dhx_rfc5114
-
-=head2 set_dsa_paramgen_bits
-
-=head2 set_dsa_paramgen_gindex
-
-=head2 set_dsa_paramgen_md
-
-=head2 set_dsa_paramgen_md_props
-
-=head2 set_dsa_paramgen_q_bits
-
-=head2 set_dsa_paramgen_seed
-
-=head2 set_dsa_paramgen_type
-
-=head2 set_ec_param_enc
-
-=head2 set_ec_paramgen_curve_nid
-
-=head2 set_ecdh_cofactor_mode
-
-=head2 set_ecdh_kdf_md
-
-=head2 set_ecdh_kdf_outlen
-
-=head2 set_ecdh_kdf_type
-
-=head2 set_group_name
-
-=head2 set_hkdf_key
-
-=head2 set_hkdf_md
-
-=head2 set_hkdf_mode
-
-=head2 set_hkdf_salt
-
-=head2 set_id
-
-=head2 set_kem_op
-
-=head2 set_mac_key
-
 =head2 set_params
 
-=head2 set_rsa_keygen_bits
-
-=head2 set_rsa_keygen_primes
-
-=head2 set_rsa_mgf1_md
-
-=head2 set_rsa_mgf1_md_name
-
-=head2 set_rsa_oaep_label
-
-=head2 set_rsa_oaep_md
-
-=head2 set_rsa_oaep_md_name
-
-=head2 set_rsa_padding
-
-=head2 set_rsa_pss_saltlen
-
 =head2 set_signature
-
-=head2 set_signature_md
 
 =head2 sign
 

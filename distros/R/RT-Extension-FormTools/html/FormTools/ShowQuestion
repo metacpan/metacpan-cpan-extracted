@@ -1,0 +1,55 @@
+<&| /Elements/LabeledValue, Label => $label || $name &>
+  <div data-name="<% $name %>"
+% if ( $ARGS{dependent_validation} && $ARGS{dependent_validation}{enabled} && $ARGS{dependent_validation}{name} ) {
+%   my $dependent_cf = RT::CustomField->new( $session{CurrentUser} );
+%   $dependent_cf->SetContextObject($ticket);
+
+%   # try loading CFs for this Queue, followed by Global, followed by any CF of given $name
+%   $dependent_cf->LoadByName( Name => $ARGS{dependent_validation}{name}, Queue => $queue->id ) if (defined $queue);
+%   $dependent_cf->LoadByName( Name => $ARGS{dependent_validation}{name}, Queue => 0 ) unless ( $dependent_cf->id );
+%   $dependent_cf->LoadByName( Name => $ARGS{dependent_validation}{name}, LookupType => RT::Ticket->CustomFieldLookupType ) unless ( $dependent_cf->id );
+%   if ( $dependent_cf->Id ) {
+    data-dependent-name="<% GetCustomFieldInputName( Object => $ticket, CustomField => $dependent_cf ) %>"
+    data-dependent-values="<% JSON($ARGS{dependent_validation}{values} || []) %>"
+%   }
+%   elsif ( my $show_question = $HasQuestion->{ $ARGS{dependent_validation}{name} } ) {
+    data-dependent-name="<% $show_question %>"
+    data-dependent-values="<% JSON($ARGS{dependent_validation}{values} || []) %>"
+%   }
+% }
+  >
+    <select name="<% $name %>" class="form-select selectpicker">
+        <option value="" <% $value eq '' ? 'selected' : '' %>>
+          (<% loc('no value') %>)
+        </option>
+% foreach my $choice ( grep { $_ } split( "\n", $choices ) ) {
+        <option value="<% $choice %>" <% $value eq $choice ? 'selected' : '' %>>
+          <% $choice %>
+        </option>
+% }
+    </select>
+% if ( $ARGS{dependent_validation} && $ARGS{dependent_validation}{enabled} && $ARGS{dependent_validation}{name} ) {
+    <span class="form-text cfhints my-1 d-inline-block required">
+      <% loc('Required') %>
+    </span>
+% }
+  </div>
+</&>
+<%INIT>
+my $queue  = $m->notes('queue');
+my $ticket = $m->notes('ticket');
+
+$m->notes( questions_on_page => [ @{ $m->notes('questions_on_page') || [] }, $name ] );
+
+my $request_args = $DECODED_ARGS;
+if ( exists $request_args->{$name} ) {
+    $value = $request_args->{$name};
+}
+</%INIT>
+<%ARGS>
+$label
+$choices
+$name
+$value => ''
+$HasQuestion => {}
+</%ARGS>

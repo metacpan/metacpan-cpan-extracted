@@ -70,7 +70,7 @@ my $skills_pod = _extract_pod($skills_pm);
 
 like( $pm, qr/our \$VERSION = '([^']+)'/, 'main module declares a version' );
 my ($version) = $pm =~ /our \$VERSION = '([^']+)'/;
-is( $version, '3.09', 'repo version bumped for skill install table update-all summaries' );
+is( $version, '3.14', 'repo version bumped for preferred-shell install bootstrap targeting' );
 like( $pm, qr/^\Q$version\E$/m, 'main POD version matches the module version' );
 if ( $dist ne '' ) {
     like( $dist, qr/^version = \Q$version\E$/m, 'dist.ini version matches the module version in the source tree' );

@@ -1243,3 +1243,241 @@ CODE:
 }
 OUTPUT:
     RETVAL
+
+ # ---- validate(\%data) — validate form data, returns hashref or undef ----
+
+SV *
+validate(self, data_rv)
+    SV *self
+    SV *data_rv
+CODE:
+{
+    HV *hv = (HV *)SvRV(self);
+    HV *data;
+    HV *errors;
+    SV **fields_svp;
+    AV *fields;
+    SSize_t i, flen;
+    int has_errors = 0;
+
+    if (!SvROK(data_rv) || SvTYPE(SvRV(data_rv)) != SVt_PVHV)
+        croak("validate() requires a hashref");
+    data = (HV *)SvRV(data_rv);
+
+    fields_svp = hv_fetchs(hv, "_fields", 0);
+    if (!fields_svp || !SvROK(*fields_svp))
+        XSRETURN_UNDEF;
+    fields = (AV *)SvRV(*fields_svp);
+
+    errors = newHV();
+    flen = av_len(fields) + 1;
+
+    for (i = 0; i < flen; i++) {
+        SV **fsvp = av_fetch(fields, i, 0);
+        HV *field_hv, *opts_hv;
+        SV **type_svp, **name_svp, **opts_svp, **val_svp;
+        const char *fname, *ftype;
+        STRLEN fname_len;
+        const char *value = "";
+        STRLEN value_len = 0;
+
+        if (!fsvp || !SvROK(*fsvp)) continue;
+        field_hv = (HV *)SvRV(*fsvp);
+
+        type_svp = hv_fetchs(field_hv, "type", 0);
+        name_svp = hv_fetchs(field_hv, "name", 0);
+        opts_svp = hv_fetchs(field_hv, "opts", 0);
+        if (!name_svp || !SvOK(*name_svp)) continue;
+        fname = SvPV(*name_svp, fname_len);
+
+        ftype = (type_svp && SvOK(*type_svp)) ? SvPV_nolen(*type_svp) : "text";
+        if (strEQ(ftype, "hidden") || strEQ(ftype, "submit") || strEQ(ftype, "group"))
+            continue;
+
+        opts_hv = (opts_svp && SvROK(*opts_svp) && SvTYPE(SvRV(*opts_svp)) == SVt_PVHV)
+            ? (HV *)SvRV(*opts_svp) : NULL;
+        if (!opts_hv) continue;
+
+        /* Get value from data */
+        val_svp = hv_fetch(data, fname, (I32)fname_len, 0);
+        if (val_svp && SvOK(*val_svp))
+            value = SvPV(*val_svp, value_len);
+
+        /* Required */
+        {
+            SV **req = hv_fetchs(opts_hv, "required", 0);
+            if (req && SvTRUE(*req) && value_len == 0) {
+                SV **msg = hv_fetchs(opts_hv, "required_msg", 0);
+                SV **label = hv_fetchs(opts_hv, "label", 0);
+                SV *err;
+                if (msg && SvOK(*msg)) {
+                    err = newSVsv(*msg);
+                } else if (label && SvOK(*label)) {
+                    err = newSVpvf("%s is required", SvPV_nolen(*label));
+                } else {
+                    err = newSVpvf("%s is required", fname);
+                }
+                hv_store(errors, fname, (I32)fname_len, err, 0);
+                has_errors = 1;
+                continue;
+            }
+        }
+
+        if (value_len == 0) continue; /* Not required and empty */
+
+        /* Minlength */
+        {
+            SV **ml = hv_fetchs(opts_hv, "minlength", 0);
+            if (ml && SvOK(*ml)) {
+                IV min = SvIV(*ml);
+                if ((IV)value_len < min) {
+                    SV **msg = hv_fetchs(opts_hv, "minlength_msg", 0);
+                    SV *err = (msg && SvOK(*msg)) ? newSVsv(*msg)
+                        : newSVpvf("Must be at least %" IVdf " characters", min);
+                    hv_store(errors, fname, (I32)fname_len, err, 0);
+                    has_errors = 1;
+                    continue;
+                }
+            }
+        }
+
+        /* Maxlength */
+        {
+            SV **ml = hv_fetchs(opts_hv, "maxlength", 0);
+            if (ml && SvOK(*ml)) {
+                IV max = SvIV(*ml);
+                if ((IV)value_len > max) {
+                    SV **msg = hv_fetchs(opts_hv, "maxlength_msg", 0);
+                    SV *err = (msg && SvOK(*msg)) ? newSVsv(*msg)
+                        : newSVpvf("Must be at most %" IVdf " characters", max);
+                    hv_store(errors, fname, (I32)fname_len, err, 0);
+                    has_errors = 1;
+                    continue;
+                }
+            }
+        }
+
+        /* Pattern — compile regex and match */
+        {
+            SV **pat = hv_fetchs(opts_hv, "pattern", 0);
+            if (pat && SvOK(*pat)) {
+                SV *val_sv = sv_2mortal(newSVpvn(value, value_len));
+                SV *re_sv;
+                int matched;
+
+                /* If pattern is already a qr//, use it; else compile as string */
+                if (SvROK(*pat) && SvTYPE(SvRV(*pat)) == SVt_REGEXP) {
+                    re_sv = *pat;
+                } else {
+                    /* Compile string pattern to regex via eval */
+                    SV *code = sv_2mortal(newSVpvf("qr/%s/", SvPV_nolen(*pat)));
+                    re_sv = eval_pv(SvPV_nolen(code), 0);
+                    if (SvTRUE(ERRSV)) {
+                        sv_setsv(ERRSV, &PL_sv_undef);
+                        re_sv = NULL;
+                    }
+                }
+
+                matched = 0;
+                if (re_sv) {
+                    REGEXP *rx = SvRX(re_sv);
+                    if (rx) {
+                        matched = pregexec(rx, SvPV_nolen(val_sv),
+                                          SvPV_nolen(val_sv) + value_len,
+                                          SvPV_nolen(val_sv), 0, val_sv, 1);
+                    }
+                }
+
+                if (!matched) {
+                    SV **msg = hv_fetchs(opts_hv, "pattern_msg", 0);
+                    SV *err = (msg && SvOK(*msg)) ? newSVsv(*msg)
+                        : newSVpvs("Invalid format");
+                    hv_store(errors, fname, (I32)fname_len, err, 0);
+                    has_errors = 1;
+                    continue;
+                }
+            }
+        }
+
+        /* Min (numeric) */
+        {
+            SV **mn = hv_fetchs(opts_hv, "min", 0);
+            if (mn && SvOK(*mn)) {
+                NV min_val = SvNV(*mn);
+                NV val_num = SvNV(newSVpvn(value, value_len));
+                if (val_num < min_val) {
+                    SV **msg = hv_fetchs(opts_hv, "min_msg", 0);
+                    SV *err = (msg && SvOK(*msg)) ? newSVsv(*msg)
+                        : newSVpvf("Must be at least %g", (double)min_val);
+                    hv_store(errors, fname, (I32)fname_len, err, 0);
+                    has_errors = 1;
+                    continue;
+                }
+            }
+        }
+
+        /* Max (numeric) */
+        {
+            SV **mx = hv_fetchs(opts_hv, "max", 0);
+            if (mx && SvOK(*mx)) {
+                NV max_val = SvNV(*mx);
+                NV val_num = SvNV(newSVpvn(value, value_len));
+                if (val_num > max_val) {
+                    SV **msg = hv_fetchs(opts_hv, "max_msg", 0);
+                    SV *err = (msg && SvOK(*msg)) ? newSVsv(*msg)
+                        : newSVpvf("Must be at most %g", (double)max_val);
+                    hv_store(errors, fname, (I32)fname_len, err, 0);
+                    has_errors = 1;
+                    continue;
+                }
+            }
+        }
+
+        /* Email */
+        if (strEQ(ftype, "email")) {
+            /* Basic check: has @ and . after @ */
+            const char *at = memchr(value, '@', value_len);
+            if (!at || at == value || !memchr(at + 1, '.', value_len - (at - value) - 1)) {
+                SV **msg = hv_fetchs(opts_hv, "email_msg", 0);
+                SV *err = (msg && SvOK(*msg)) ? newSVsv(*msg)
+                    : newSVpvs("Invalid email address");
+                hv_store(errors, fname, (I32)fname_len, err, 0);
+                has_errors = 1;
+                continue;
+            }
+        }
+
+        /* Custom validator callback */
+        {
+            SV **vcb = hv_fetchs(opts_hv, "validate", 0);
+            if (vcb && SvOK(*vcb) && SvROK(*vcb) && SvTYPE(SvRV(*vcb)) == SVt_PVCV) {
+                int count;
+                SV *result;
+                dSP;
+                ENTER; SAVETMPS;
+                PUSHMARK(SP);
+                XPUSHs(sv_2mortal(newSVpvn(value, value_len)));
+                XPUSHs(data_rv);
+                PUTBACK;
+                count = call_sv(*vcb, G_SCALAR | G_EVAL);
+                SPAGAIN;
+                result = (count > 0) ? POPs : &PL_sv_undef;
+                if (SvOK(result) && SvTRUE(result)) {
+                    hv_store(errors, fname, (I32)fname_len, newSVsv(result), 0);
+                    has_errors = 1;
+                }
+                PUTBACK;
+                FREETMPS; LEAVE;
+            }
+        }
+    }
+
+    if (has_errors) {
+        RETVAL = newRV_noinc((SV *)errors);
+    } else {
+        SvREFCNT_dec((SV *)errors);
+        RETVAL = &PL_sv_undef;
+    }
+}
+OUTPUT:
+    RETVAL

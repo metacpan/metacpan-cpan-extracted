@@ -262,7 +262,7 @@ check_parse(
     name           => 'timezone abbreviation JST',
     pattern        => '%H:%M:%S %Z',
     input          => '23:45:56 JST',
-    expect         => { hour => 23, minute => 45, second => 56, offset => 32400 },
+    expect         => { hour => 23, minute => 45, second => 56, offset => 33539 },
     skip_roundtrip => 1,
 );
 

@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps;
 use strict;
 use warnings;
 
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 use List::Util 'first';
 
@@ -157,6 +157,8 @@ sub new {
 	 linuxdistroversion  => $linuxdistroversion,
 	 linuxdistrocodename => $linuxdistrocodename,
 	 mapping             => \@mapping,
+	 _mapper_ran         => 0,
+	 _containsmods_warned => 0,
 	);
     my $self = bless \%config, $class;
     if (eval { require Hash::Util; 1 }) {
@@ -165,9 +167,30 @@ sub new {
     $self;
 }
 
-# CPAN.pm plugin hook method
+# CPAN.pm plugin hook method (primary)
 sub post_get {
     my($self, $dist) = @_;
+    $self->_maybe_run_mapper($dist);
+}
+
+# CPAN.pm plugin hook method (secondary, needed only for the "cpan ." workaround)
+sub pre_make {
+    my($self, $dist) = @_;
+    $self->_maybe_run_mapper($dist);
+}
+
+# Helpers/Internal functions/methods
+sub _maybe_run_mapper {
+    my($self, $dist) = @_;
+    if (!$self->{_mapper_ran}) {
+	$self->_run_mapper($dist);
+    }
+}
+
+sub _run_mapper {
+    my($self, $dist) = @_;
+
+    $self->{_mapper_ran} = 1;
 
     my @packages = $self->_map_cpandist($dist);
     if (@packages) {
@@ -190,7 +213,6 @@ sub post_get {
     }
 }
 
-# Helpers/Internal functions/methods
 sub _detect_linux_distribution {
     my $info = _detect_linux_distribution_os_release();
     return $info if $info;
@@ -201,8 +223,7 @@ sub _detect_linux_distribution {
     }
 }
 
-sub _detect_linux_distribution_os_release {
-    my %info;
+sub _get_os_release {
     for my $candidate_file (@OS_RELEASE_PATH_CANDIDATES) {
 	if (open my $fh, '<', $candidate_file) {
 	    my %c;
@@ -211,15 +232,23 @@ sub _detect_linux_distribution_os_release {
 		    $c{$k} = $v;
 		}
 	    }
-	    $info{linuxdistro} = $c{ID};
-	    $info{linuxdistroversion} = $c{VERSION_ID};
-	    $info{linuxdistrocodename} = $c{VERSION_CODENAME};
-	    # heuristics
-	    if (!defined $info{linuxdistrocodename} && $info{linuxdistro} eq 'debian' && $c{VERSION} =~ m{^\d+\s+\((.+)\)$}) {
-		$info{linuxdistrocodename} = $1;
-	    }
-	    return \%info;
+	    return \%c;
 	}
+    }
+}
+
+sub _detect_linux_distribution_os_release {
+    my $c = _get_os_release();
+    if ($c) {
+	my %info;
+	$info{linuxdistro} = $c->{ID};
+	$info{linuxdistroversion} = $c->{VERSION_ID};
+	$info{linuxdistrocodename} = $c->{VERSION_CODENAME};
+	# heuristics
+	if (!defined $info{linuxdistrocodename} && $info{linuxdistro} eq 'debian' && $c->{VERSION} =~ m{^\d+\s+\((.+)\)$}) {
+	    $info{linuxdistrocodename} = $1;
+	}
+	return \%info;
     }
     undef;
 }
@@ -269,6 +298,8 @@ sub _detect_linux_distribution_fallback {
 		 11 => 'bullseye',
 		 12 => 'bookworm',
 		 13 => 'trixie',
+		 14 => 'forky',
+		 15 => 'duke',
 		}->{$info{linuxdistroversion}};
 	    return \%info;
 	} elsif ($line =~ m{^(Ubuntu) (\d+\.\d+)}) {
@@ -282,6 +313,7 @@ sub _detect_linux_distribution_fallback {
 		 '20.04' => 'focal',
 		 '22.04' => 'jammy',
 		 '24.04' => 'noble',
+		 '26.04' => 'resolute',
 		}->{$info{linuxdistroversion}};
 	    return \%info;
 	} else {
@@ -337,20 +369,49 @@ sub _debug {
     }
 }
 
-sub _map_cpandist {
+sub _dist_get_base_id {
     my($self, $dist) = @_;
 
     # compat for older CPAN.pm (1.76)
     if (!$dist->can('base_id')) {
-	no warnings 'once';
-	*CPAN::Distribution::base_id = sub {
-	    my $self = shift;
-	    my $id = $self->id();
-	    my $base_id = File::Basename::basename($id);
-	    $base_id =~ s{\.(?:tar\.(bz2|gz|Z)|t(?:gz|bz)|zip)$}{}i;
-	    return $base_id;
-	};
+	my $id = $dist->id();
+	my $base_id = File::Basename::basename($id);
+	$base_id =~ s{\.(?:tar\.(bz2|gz|Z)|t(?:gz|bz)|zip)$}{}i;
+	return $base_id;
     }
+
+    $dist->base_id();
+}
+
+sub _dist_containsmods {
+    my($self, $dist) = @_;
+    my @containsmods = $dist->containsmods;
+    if (!@containsmods && $self->_dist_get_base_id($dist) eq '.') {
+	if (defined $ENV{CPAN_PLUGIN_SYSDEPS_MODULE}) {
+	    return $ENV{CPAN_PLUGIN_SYSDEPS_MODULE};
+	}
+	my $id = $dist->id();
+	if (!$self->{_containsmods_warned}++) {
+	    warn <<EOF;
+WARNING: running in local directory '$id'. Please define the environment
+         variable CPAN_PLUGIN_SYSDEPS_MODULE to the primary module of
+         the tested distribution.
+EOF
+	}
+    }
+    @containsmods;
+}
+
+sub _map_cpandist {
+    my($self, $dist) = @_;
+
+    my $get_base_id = do {
+	my $cached_base_id;
+	sub {
+	    return $cached_base_id if defined $cached_base_id;
+	    $cached_base_id = $self->_dist_get_base_id($dist);
+	};
+    };
 
     # smartmatch for regexp/string/array without ~~, 5.8.x compat!
     # also add support for numerical comparisons
@@ -395,10 +456,10 @@ sub _map_cpandist {
 		my $match = $entry->[++$map_i];
 		$self->_debug(' ' x $level . " match '$key' against '", $match, "'");
 		if ($key eq 'cpandist') {
-		    return 0 if !$smartmatch->($dist->base_id, $match) && !$TRAVERSE_ONLY;
+		    return 0 if !$smartmatch->($get_base_id->(), $match) && !$TRAVERSE_ONLY;
 		} elsif ($key eq 'cpanmod') {
 		    my $found = 0;
-		    for my $mod ($dist->containsmods) {
+		    for my $mod ($self->_dist_containsmods($dist)) {
 			$self->_debug(' ' x $level . "  found module '$mod' in dist, check now against '", $match, "'");
 			if ($smartmatch->($mod, $match)) {
 			    $found = 1;
@@ -1054,6 +1115,18 @@ root. To avoid the need to enter a password either make sure that
 running the installer program (C<apt-get> or so) is made password-less
 in the F<sudoers> file, or run a wrapper like
 L<sudo_keeper|https://github.com/eserte/srezic-misc/blob/master/scripts/sudo_keeper>.
+
+=item * Install local directories using C<cpan .>
+
+C<CPAN.pm> has limited support for installing locally available
+directories. A possible use case is to do a C<git clone> of a module
+repository and install it directly from the cloned directory. However,
+in this scenario C<CPAN::Plugin::Sysdeps> has no information about the
+installed software, especially not the distribution name and its
+contained modules, and therefore cannot apply its mapping. To work
+around this limitation it's possible to set the environment variable
+C<CPAN_PLUGIN_SYSDEPS_MODULE> to the primary module of the
+distribution.
 
 =item * Error handling
 

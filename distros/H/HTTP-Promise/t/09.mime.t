@@ -20,7 +20,7 @@ BEGIN
 
 my $m = HTTP::Promise::MIME->new;
 isa_ok( $m => [qw( HTTP::Promise::MIME )] );
-is( $m->types->length, 767, 'mime types inline' );
+is( $m->types->length, 825, 'mime types inline' );
 
 my $f = file( __FILE__ )->parent->child( 'mime.types' );
 my $m2 = HTTP::Promise::MIME->new( $f );

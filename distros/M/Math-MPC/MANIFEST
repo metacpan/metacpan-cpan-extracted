@@ -47,11 +47,11 @@ t/mpc_trig.t
 t/new_in_1.1.0.t
 t/new_in_1.1.1.t
 t/new_in_1.3.0.t
-t/new_in_1.3.0_alt.t
 t/new_in_1.3.2.t
 t/NOK_and_POK.t
 t/out_str1.t
 t/out_str2.t
+t/overload_arith.t
 t/overload_mpfr.t
 t/overload_switch.t
 t/pod.t

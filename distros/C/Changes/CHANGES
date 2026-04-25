@@ -1,5 +1,20 @@
 Revision history for Perl module Changes
 
+v0.4.2 2026-04-25T17:40:05+0900
+    - Updated the minimum perl version requirement to v5.28.0 in line with
+      Module::Generic (version v1.3.1)
+    - Updated the version requirement for DateTime::Lite to 0.6.5
+    - Added .gitlab-ci.yml covering Perl 5.28 through 5.40, plus a threaded
+      perl job, to catch various kinds of regression before CPAN release.
+
+v0.4.1 2026-04-25T09:18:03+0900
+    - Corrected dependency requirements for Module::Generic to v1.3.1 to rely properly
+      on DateTime::Lite
+    - Changed the required version for DateTime::Lite from v0.6.4 to v0.6.5.
+
+v0.4.0 2026-04-24T12:39:00+0900
+    - Updating dependencies
+
 v0.3.6 2025-07-28T14:03:23+0900
     - Corrected minor issues in Changes::Version and Changes::Change
 

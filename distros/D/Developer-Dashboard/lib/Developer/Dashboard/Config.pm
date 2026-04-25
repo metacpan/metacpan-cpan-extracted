@@ -3,7 +3,7 @@ package Developer::Dashboard::Config;
 use strict;
 use warnings;
 
-our $VERSION = '3.09';
+our $VERSION = '3.14';
 
 use File::Spec;
 use Cwd qw(cwd);
@@ -243,6 +243,17 @@ sub path_aliases {
     return $self->_expand_path_aliases( $cfg->{path_aliases} );
 }
 
+# file_aliases()
+# Returns configured file aliases from merged configuration.
+# Input: none.
+# Output: hash reference of file aliases.
+sub file_aliases {
+    my ($self) = @_;
+    my $cfg = $self->merged;
+    return {} if ref( $cfg->{file_aliases} ) ne 'HASH';
+    return $self->_expand_path_aliases( $cfg->{file_aliases} );
+}
+
 # global_path_aliases()
 # Returns only the user-global configured path aliases.
 # Input: none.
@@ -252,6 +263,17 @@ sub global_path_aliases {
     my $cfg = $self->load_global;
     return {} if ref( $cfg->{path_aliases} ) ne 'HASH';
     return $self->_expand_path_aliases( $cfg->{path_aliases} );
+}
+
+# global_file_aliases()
+# Returns only the user-global configured file aliases.
+# Input: none.
+# Output: hash reference of global file aliases.
+sub global_file_aliases {
+    my ($self) = @_;
+    my $cfg = $self->load_global;
+    return {} if ref( $cfg->{file_aliases} ) ne 'HASH';
+    return $self->_expand_path_aliases( $cfg->{file_aliases} );
 }
 
 # web_workers()
@@ -415,6 +437,46 @@ sub remove_global_path_alias {
     my $cfg = $self->_load_writable_global;
     $cfg->{path_aliases} = {} if ref( $cfg->{path_aliases} ) ne 'HASH';
     my $removed = delete $cfg->{path_aliases}{$name} ? 1 : 0;
+    $self->save_global($cfg);
+
+    return {
+        name    => $name,
+        removed => $removed,
+    };
+}
+
+# save_global_file_alias($name, $path)
+# Persists or updates a user-global file alias without disturbing other config domains.
+# Input: alias name string and target file path string.
+# Output: hash reference containing the stored alias mapping.
+sub save_global_file_alias {
+    my ( $self, $name, $path ) = @_;
+    die 'Missing file alias name' if !defined $name || $name eq '';
+    die 'Missing file alias target' if !defined $path || $path eq '';
+
+    my $cfg = $self->_load_writable_global;
+    $cfg->{file_aliases} = {} if ref( $cfg->{file_aliases} ) ne 'HASH';
+    my $stored_path = $self->_normalize_home_path($path);
+    $cfg->{file_aliases}{$name} = $stored_path;
+    $self->save_global($cfg);
+
+    return {
+        name => $name,
+        path => $self->_expand_config_path($stored_path),
+    };
+}
+
+# remove_global_file_alias($name)
+# Deletes a user-global file alias when present and otherwise remains idempotent.
+# Input: alias name string.
+# Output: hash reference containing alias name and removal flag.
+sub remove_global_file_alias {
+    my ( $self, $name ) = @_;
+    die 'Missing file alias name' if !defined $name || $name eq '';
+
+    my $cfg = $self->_load_writable_global;
+    $cfg->{file_aliases} = {} if ref( $cfg->{file_aliases} ) ne 'HASH';
+    my $removed = delete $cfg->{file_aliases}{$name} ? 1 : 0;
     $self->save_global($cfg);
 
     return {

@@ -24,7 +24,7 @@ path - private path helper for Developer Dashboard
 
 =head1 SYNOPSIS
 
-  dashboard path <resolve|locate|add|del|project-root|list> ...
+  dashboard path <resolve|locate|add|del|rm|project-root|list> ...
 
 =head1 DESCRIPTION
 
@@ -37,7 +37,7 @@ loading the full runtime first.
 =head1 PURPOSE
 
 This staged helper exposes the C<dashboard path ...> subcommand family:
-resolve, locate, cdr, complete-cdr, add, del, project-root, and list. It is the public CLI
+resolve, locate, cdr, complete-cdr, add, del, rm, project-root, and list. It is the public CLI
 front end for saved path aliases, layered runtime path discovery, and the
 payload generation used by shell navigation helpers.
 
@@ -75,8 +75,10 @@ lookup, current-directory fallback, and multiple-match behavior.
 
   dashboard path resolve dashboards
   dashboard path add work ~/projects/work
+  dashboard path add .
   dashboard path cdr work alpha red
   dashboard path complete-cdr 2 cdr work alp
+  dashboard path rm work
   dashboard path list
   dashboard path project-root
 

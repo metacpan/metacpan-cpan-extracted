@@ -55,7 +55,7 @@ my %WriteMakefileArgs = (
         'warnings'                   => 0,
         'warnings::register'         => 0,
         # DateTime::Lite ecosystem
-        'DateTime::Lite'             => 'v0.6.3',
+        'DateTime::Lite'             => 'v0.6.5',
         'DateTime::Locale::FromCLDR' => 'v0.8.2',
         'Exporter'                   => 0,
         'Locale::Unicode'            => 'v0.4.0',

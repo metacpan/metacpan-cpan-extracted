@@ -330,6 +330,23 @@ WEBVIEW_API int webview_init(struct webview *w) {
   ((void(*)(id, SEL, id))objc_msgSend)(userController, sel_registerName("addUserScript:"),
                windowExternalOverrideScript);
 
+  /* Reload detection: this WKUserScript fires on EVERY page load
+   * (including reload). It always signals Perl; the C-side callback
+   * uses a flag to distinguish first load from reload. */
+  {
+    id reloadScript = ((id(*)(id, SEL))objc_msgSend)(
+        (id)objc_getClass("WKUserScript"), sel_registerName("alloc"));
+    ((void(*)(id, SEL, id, int, int))objc_msgSend)(
+        reloadScript,
+        sel_registerName("initWithSource:injectionTime:forMainFrameOnly:"),
+        get_nsstring(
+          "window.external.invoke('{\"type\":\"pageload\"}');"
+        ),
+        WKUserScriptInjectionTimeAtDocumentStart, 0);
+    ((void(*)(id, SEL, id))objc_msgSend)(userController, sel_registerName("addUserScript:"),
+                 reloadScript);
+  }
+
   id config = ((id(*)(id, SEL))objc_msgSend)((id)objc_getClass("WKWebViewConfiguration"),
                            sel_registerName("new"));
 

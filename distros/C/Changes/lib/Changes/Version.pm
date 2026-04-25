@@ -211,7 +211,7 @@ sub as_string
                 {
                     return( $str * 1 );
                 }
-                
+
                 if( $self->pretty && index( $str, '_' ) == -1 && !( length( [split( /\./, $str )]->[1] ) % 3 ) )
                 {
                     # $str = join( '_', grep{ $_ ne ''} split( /(...)/, $str ) );
@@ -951,7 +951,7 @@ sub _compare
     {
         ( $left, $right ) = ( $right, $left );
     }
-    
+
     unless( _verify( $left ) )
     {
         warn( "Invalid version for left argument: ", ( $swap ? 'format' : 'object ' . overload::StrVal( $left ) ), "." );
@@ -1040,7 +1040,7 @@ sub _compute
         # return( $swap ? $other : $self );
         return;
     }
-    
+
     if( $swap )
     {
         return( ref( $rv ) ? $rv->scalar : $rv );
@@ -1058,7 +1058,7 @@ sub _compute
         {
             $new_val = int( $rv );
         }
-        
+
         if( $new_val < 0 )
         {
             $new->_bubble( $frag, $new_val );
@@ -1131,7 +1131,7 @@ sub _inc_dec
     {
         $op eq 'inc' ? $n++ : $n--;
     }
-    
+
     if( defined( $coderef ) )
     {
         $coderef->( $self, $n );

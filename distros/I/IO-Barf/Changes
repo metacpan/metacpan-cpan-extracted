@@ -1,3 +1,10 @@
+0.12 2026-04-25T11:49:34+02:00
+ - Add File::Raw to SEE ALSO section in doc.
+ - Add File::Raw to first benchmark and retest.
+ - Add File::Raw to second benchmark and retest.
+ - Sort SEE ALSO section modules.
+ - Update copyright years.
+
 0.11 2024-11-26T11:06:18+01:00
  - Rename example files to better name.
  - Update Module::Install to 1.21 version.

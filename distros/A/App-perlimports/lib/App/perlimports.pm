@@ -3,7 +3,7 @@ package App::perlimports;
 use strict;
 use warnings;
 
-our $VERSION = '0.000058';
+our $VERSION = '0.000059';
 
 1;
 
@@ -21,7 +21,7 @@ App::perlimports - Make implicit imports explicit
 
 =head1 VERSION
 
-version 0.000058
+version 0.000059
 
 =head1 DESCRIPTION
 

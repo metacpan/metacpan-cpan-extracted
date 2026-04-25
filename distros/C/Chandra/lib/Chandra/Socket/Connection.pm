@@ -6,11 +6,11 @@ use warnings;
 use Cpanel::JSON::XS ();
 use POSIX ();
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 # XS methods are registered under the Chandra bootstrap.
 # Ensure the shared object is loaded.
-require Chandra;
+use Chandra;
 
 our $_xs_json = Cpanel::JSON::XS->new->utf8->allow_nonref->allow_blessed->convert_blessed;
 

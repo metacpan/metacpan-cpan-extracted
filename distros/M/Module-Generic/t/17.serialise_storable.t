@@ -57,7 +57,7 @@ $serialised = Storable::Improved::freeze( $d );
 my $d2 = Storable::Improved::thaw( $serialised );
 isa_ok( $d2 => 'Module::Generic::DateTime', 'deserialised object is Module::Generic::DateTime' );
 is( "$d2" => "$d", 'Module::Generic::DateTime test value' );
-# diag( "DateTime is: $d2" );
+# diag( "DateTime::Lite is: $d2" );
 
 my $dyn = Module::Generic::Dynamic->new({
     fname => 'John',

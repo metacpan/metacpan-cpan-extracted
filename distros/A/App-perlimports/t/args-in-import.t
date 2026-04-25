@@ -16,8 +16,8 @@ my ($doc) = doc(
 );
 
 is_deeply(
-    $doc->original_imports->{'Test2::V0'},
+    $doc->found_imports->{'Test2::V0'},
     [ '-no_pragmas', '!meta', 'diag', 'done_testing', 'is' ],
-    'original_imports'
+    'found_imports'
 );
 done_testing();

@@ -23,3 +23,8 @@ You are expert Perl developer "Exodist" (Chad Granum). Write code following his 
 
 - Make a distinct commit for each change.
 - Exception: if fixing a bug introduced by a recent commit that has not yet been pushed to origin, amend that commit instead of creating a new one.
+
+## Related Distributions
+
+- This dist depends on `IPC::Manager` (at `../IPC-Manager/`). It subclasses `IPC::Manager::Client` and uses `IPC::Manager::Message`, `IPC::Manager::Serializer::JSON`, and the `IPC::Manager::Test` integration harness from there.
+- Whenever you change this repo, check `../IPC-Manager/` for matching updates — and whenever the parent dist changes, check here. Things that commonly propagate: the `IPC::Manager::Client` base-class interface, `IPC::Manager::Message` shape, serializer behavior, `viable()` / `_viable()` semantics, the `IPC::Manager::Test` harness contract, minimum prereq versions, and any doc/POD cross-references.

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise/Headers.pm
-## Version v0.3.2
+## Version v0.3.3
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/21
-## Modified 2025/10/25
+## Modified 2026/04/24
 ## All rights reserved.
 ## 
 ## 
@@ -46,7 +46,7 @@ BEGIN
     use constant CRLF => "\015\012";
     our $EXCEPTION_CLASS = 'HTTP::Promise::Exception';
     our $SUPPORTED = {};
-    our $VERSION = 'v0.3.2';
+    our $VERSION = 'v0.3.3';
 };
 
 use strict;
@@ -1633,12 +1633,12 @@ sub _date_header
         my $opts = $self->_get_args_as_hash( @_ );
         $opts->{time_zone} = 'GMT' if( !defined( $opts->{time_zone} ) || !length( $opts->{time_zone} ) );
         require Module::Generic::DateTime;
-        require DateTime::Format::Strptime;
+        require DateTime::Format::Lite;
         if( ref( $this ) && Scalar::Util::blessed( $this ) && $this->isa( 'Module::Generic::DateTime' ) )
         {
             # Ok, pass through
         }
-        elsif( ref( $this ) && Scalar::Util::blessed( $this ) && $this->isa( 'DateTime' ) )
+        elsif( ref( $this ) && Scalar::Util::blessed( $this ) && ( $this->isa( 'DateTime::Lite' ) || $this->isa( 'DateTime' ) ) )
         {
             $this = Module::Generic::DateTime->new( $this );
         }
@@ -1665,18 +1665,18 @@ sub _date_header
         eval
         {
             $this->set_time_zone( 'GMT' );
-            my $fmt = DateTime::Format::Strptime->new(
-                pattern => '%a, %d %b %Y %H:%M:%S GMT',
-                locale  => 'en_GB',
-                time_zone => 'GMT',
-            );
-            $this->set_formatter( $fmt );
-            $self->header( $f => $this );
         };
         if( $@ )
         {
-            return( $self->error( "An error occurred while trying to format the datetime '$this': $@" ) );
+            return( $self->error( "An error occurred while trying to set the timezone GMT on the datetime object '$this': $@" ) );
         }
+        my $fmt = DateTime::Format::Lite->new(
+            pattern   => '%a, %d %b %Y %H:%M:%S GMT',
+            locale    => 'en_GB',
+            time_zone => 'GMT',
+        ) || return( $self->error( "An error occurred while trying to format the datetime '$this': ", DateTime::Format::Lite->error ) );
+        $this->set_formatter( $fmt );
+        $self->header( $f => $this );
         return( $this );
     }
     else
@@ -1704,7 +1704,7 @@ sub _date_header
                 require Module::Generic;
                 my $dt = Module::Generic->_parse_timestamp( "$v" );
                 return( $self->pass_error( Module::Generic->error ) ) if( !defined( $dt ) );
-                my $fmt = DateTime::Format::Strptime->new( pattern => '%s' );
+                my $fmt = DateTime::Format::Lite->new( pattern => '%s' );
                 $dt->set_formatter( $fmt );
                 $v = Module::Generic::DateTime->new( $dt );
             }
@@ -2248,7 +2248,7 @@ HTTP::Promise::Headers - HTTP Headers Class
 
 =head1 VERSION
 
-    v0.3.2
+    v0.3.3
 
 =head1 DESCRIPTION
 
@@ -3045,9 +3045,9 @@ This is an alias for L</content_security_policy_report_only>
 
 =head2 date
 
-This sets or gets the C<Date> header value. It takes a date string value, a unix timestamp or a L<DateTime> value.
+This sets or gets the C<Date> header value. It takes a date string value, a unix timestamp or a L<DateTime::Lite> value, or a L<DateTime> value.
 
-If no value is provided, it returns the current value of the C<Date> header field as a L<DateTime> object.
+If no value is provided, it returns the current value of the C<Date> header field as a L<DateTime::Lite> object.
 
 =head2 device_memory
 
@@ -3123,9 +3123,9 @@ See also L<rfc draft|https://tools.ietf.org/html/draft-ietf-httpbis-expect-ct-08
 
 =head2 expires
 
-This sets or gets the C<Expires> header value. It takes a date string value, a unix timestamp or a L<DateTime> value.
+This sets or gets the C<Expires> header value. It takes a date string value, a unix timestamp or a L<DateTime::Lite>, or a L<DateTime> value.
 
-If no value is provided, it returns the current value of the C<Date> header field as a L<DateTime> object.
+If no value is provided, it returns the current value of the C<Date> header field as a L<DateTime::Lite> object.
 
 For example:
 
@@ -3191,9 +3191,9 @@ See also L<rfc7232, section 3.1|https://tools.ietf.org/html/rfc7232#section-3.1>
 
 =head2 if_modified_since
 
-This sets or gets the C<If-Modified-Since> header value. It takes a date string value, a unix timestamp or a L<DateTime> value.
+This sets or gets the C<If-Modified-Since> header value. It takes a date string value, a unix timestamp or a L<DateTime::Lite>, or a L<DateTime> value.
 
-If no value is provided, it returns the current value of the C<Date> header field as a L<DateTime> object.
+If no value is provided, it returns the current value of the C<Date> header field as a L<DateTime::Lite> object.
 
 For example:
 
@@ -3225,9 +3225,9 @@ See also L<rfc7233, section 3.2|https://tools.ietf.org/html/rfc7233#section-3.2>
 
 =head2 if_unmodified_since
 
-This sets or gets the C<If-Unmodified-Since> header value. It takes a date string value, a unix timestamp or a L<DateTime> value.
+This sets or gets the C<If-Unmodified-Since> header value. It takes a date string value, a unix timestamp or a L<DateTime::Lite>, or a L<DateTime> value.
 
-If no value is provided, it returns the current value of the C<Date> header field as a L<DateTime> object.
+If no value is provided, it returns the current value of the C<Date> header field as a L<DateTime::Lite> object.
 
 For example:
 
@@ -3256,9 +3256,9 @@ See also L<rfc7230, section A.1.2|https://tools.ietf.org/html/rfc7230#section-A.
 
 =head2 last_modified
 
-This sets or gets the C<Last-Modified> header value. It takes a date string value, a unix timestamp or a L<DateTime> value.
+This sets or gets the C<Last-Modified> header value. It takes a date string value, a unix timestamp or a L<DateTime::Lite>, or a L<DateTime> value.
 
-If no value is provided, it returns the current value of the C<Date> header field as a L<DateTime> object.
+If no value is provided, it returns the current value of the C<Date> header field as a L<DateTime::Lite> object.
 
 For example:
 

@@ -2,7 +2,7 @@ package IPC::Manager::Service::Echo;
 use strict;
 use warnings;
 
-our $VERSION = '0.000032';
+our $VERSION = '0.000033';
 
 use Object::HashBase qw{
     <name

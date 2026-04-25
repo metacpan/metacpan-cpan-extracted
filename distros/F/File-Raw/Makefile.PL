@@ -4,15 +4,16 @@ use warnings;
 use ExtUtils::MakeMaker;
 use Config;
 
-# Platform-specific linker flags for symbol export
+# Platform-specific linker flags for symbol export.
+#
+# Solaris/SunOS use their own native ld (not GNU ld) which rejects both
+# --export-dynamic and -soname. Their default behaviour already exports
+# symbols, so we leave $Config{lddlflags} alone there. OpenBSD's ld is
+# also non-GNU and gets the same treatment.
 my %platform_args;
 if ($^O eq 'linux' || $^O eq 'freebsd' || $^O eq 'netbsd' ||
-    $^O eq 'solaris' || $^O eq 'sunos' || $^O eq 'dragonfly') {
+    $^O eq 'dragonfly') {
     $platform_args{LDDLFLAGS} = $Config{lddlflags} . ' -Wl,--export-dynamic -Wl,-soname,Raw.so';
-}
-elsif ($^O eq 'openbsd') {
-    # OpenBSD ld does not support --export-dynamic or -soname (not GNU ld)
-    $platform_args{LDDLFLAGS} = $Config{lddlflags};
 }
 elsif ($^O eq 'MSWin32' || $^O eq 'cygwin' || $^O eq 'msys') {
     $platform_args{LDDLFLAGS} = ($Config{lddlflags} || '') . ' -Wl,--export-all-symbols';

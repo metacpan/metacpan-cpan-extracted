@@ -77,11 +77,7 @@ sub _get_path_value {
         if ($segment->{type} eq 'index') {
             return undef unless ref $cursor eq 'ARRAY';
 
-            my $idx = $segment->{value};
-            my $numeric = int($idx);
-            if ($idx =~ /^-?\d+$/) {
-                $numeric += @$cursor if $numeric < 0;
-            }
+            my $numeric = _normalize_path_array_index($segment->{value}, scalar @$cursor);
 
             return undef if $numeric < 0 || $numeric > $#$cursor;
 
@@ -175,11 +171,7 @@ sub _set_path_value {
         if ($segment->{type} eq 'index') {
             return unless ref $cursor eq 'ARRAY';
 
-            my $idx = $segment->{value};
-            my $numeric = int($idx);
-            if ($idx =~ /^-?\d+$/) {
-                $numeric += @$cursor if $numeric < 0;
-            }
+            my $numeric = _normalize_path_array_index($segment->{value}, scalar @$cursor);
 
             return if $numeric < 0;
 
@@ -199,6 +191,17 @@ sub _set_path_value {
     }
 
     return;
+}
+
+sub _normalize_path_array_index {
+    my ($idx, $array_size) = @_;
+
+    my $numeric = int($idx);
+    if ($idx =~ /^-?\d+$/) {
+        $numeric += $array_size if $numeric < 0;
+    }
+
+    return $numeric;
 }
 
 sub _parse_path_segments {

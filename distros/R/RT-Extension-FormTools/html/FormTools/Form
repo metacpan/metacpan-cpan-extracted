@@ -27,6 +27,7 @@ my $header_component = $self_service ? '/SelfService/Elements/Header' : '/Elemen
 
 my %cfs = map { $_ => 1} @{ $m->notes('cfs_on_page') || [] };
 my %core_fields = map { $_ => 1} @{ $m->notes('core_fields_on_page') || [] };
+my %question_fields = map { $_ => 1} @{ $m->notes('questions_on_page') || [] };
 
 my %request_args = %$DECODED_ARGS;
 
@@ -56,11 +57,15 @@ if ($real_next) {
 
     my %labels = map { $_->{arguments}{name} => $_->{arguments}{label} }
         grep { ( $_->{comp_name} // '' ) eq 'Field' && $_->{arguments}{name} && $_->{arguments}{label} }
-        map { @{ $_->{content} } } values %{ $form_config->{'formtools-pages'} };
+        map { @{ $_->{content} } } grep { $_->{content} } values %{ $form_config->{'formtools-pages'} };
 
+    # user filling out form needs SeeQueue right for TicketCustomFields to return cfs
+    # for validation we load the queue with system user to ensure it validates cfs
+    my $system_queue_obj = RT::Queue->new( RT->SystemUser );
+    $system_queue_obj->Load( $queue->Id );
     my ($status, @msg) = $m->comp(
         '/Elements/ValidateCustomFields',
-        CustomFields    => $queue->TicketCustomFields,
+        CustomFields    => $system_queue_obj->TicketCustomFields,
         ARGSRef         => \%request_args,
         Labels          => \%labels,
     );
@@ -103,6 +108,10 @@ foreach my $key (keys %request_args) {
 foreach my $key (keys %request_args) {
    next unless RT::Extension::FormTools::is_core_field($key);
    delete $request_args{$key} if ($core_fields{$key});
+}
+
+foreach my $key (keys %request_args) {
+   delete $request_args{$key} if ($question_fields{$key});
 }
 
 # Add in any @results passed in. These should not be errors,

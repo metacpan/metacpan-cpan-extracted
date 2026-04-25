@@ -388,9 +388,9 @@ Module::Generic::TieHash - Generic Tie Hash Mechanism for Object Oriented Hashes
 
 =head1 SYNOPSIS
 
-    use DateTime;
+    use DateTime::Lite;
     my $tie = tie( my %hash, 'Module::Generic::TieHash', { key_object => 1 } );
-    my $now = DateTime->now;
+    my $now = DateTime::Lite->now;
     my $array = [];
     my $ref = {};
     my $scalar = \"Hello";

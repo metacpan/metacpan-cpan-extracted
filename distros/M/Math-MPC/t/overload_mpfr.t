@@ -16,8 +16,6 @@ my $ok;
 # The release of mpc-1.4.0 corrects some earlier mishandling of signed zero.
 # However we have the tests pass if their results match the value  that the
 # underlying mpc library expects:
-my $variable_result = '(2 0)';
-$variable_result = '(2 -0)' if Math::MPC::MPC_VERSION >= 66560;
 
 my $rop = $mpc / Math::MPFR->new(7);
 cmp_ok(ref($rop), 'eq', 'Math::MPC', "overloaded div returns Math::MPC::object");
@@ -43,9 +41,9 @@ if($Math::MPFR::VERSION >= '4.47') {
 
   my $rop = Math::MPFR->new(42) / $mpc;
   cmp_ok(ref($rop), 'eq', 'Math::MPC', "overloaded div (inverted) returns Math::MPC object");
-  cmp_ok(p($rop), 'eq', $variable_result, "overloaded div (inverted) returns correct value");
+  cmp_ok(p($rop), 'eq', '(2 -0)', "overloaded div (inverted) returns correct value");
   Rmpc_ui_div($rop, 42, $mpc, MPC_RNDNN);
-  cmp_ok(p($rop), 'eq', $variable_result, "agreement with Rmpc_ui_div");
+  cmp_ok(p($rop), 'eq', '(2 -0)', "agreement with Rmpc_ui_div");
 
   $rop = Math::MPFR->new(42) * $mpc;
   $ok = '(8.82e2 0)';
@@ -153,7 +151,7 @@ if($Math::MPFR::VERSION >= '4.47') {
   $mpfr = Math::MPFR->new(7.0);
   $mpfr /= Math::MPC->new(3.5);
   cmp_ok(ref($mpfr), 'eq', 'Math::MPC', "MPFR /= MPC returns Math::MPC object");
-  cmp_ok(p($mpfr), 'eq', $variable_result, "MPC /= MPFR works correctly");
+  cmp_ok(p($mpfr), 'eq', '(2 -0)', "MPC /= MPFR works correctly");
   cmp_ok(p($mpfr), 'eq', p(Math::MPFR->new(7.0) / Math::MPC->new(3.5)), "MPC /= MPFR double-check ok");
 
   $mpfr = Math::MPFR->new(7.0);

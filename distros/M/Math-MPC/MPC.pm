@@ -176,7 +176,7 @@ if(MPC_HEADER_V >= 66304) {
 }
 
     @Math::MPC::EXPORT_OK = (@tagged, @radius, @ball);
-    our $VERSION = '1.42';
+    our $VERSION = '1.43';
     #$VERSION = eval $VERSION;
 
     Math::MPC->DynaLoader::bootstrap($VERSION);
@@ -293,11 +293,6 @@ sub overload_not_equiv {
     return 1;
 }
 
-sub overload_string_orig {
-     return "(" . _get_str($_[0], 10, 0, Rmpc_get_default_rounding_mode()) . ")";
-
-}
-
 sub overload_string {
   my $t = Math::MPFR::Rmpfr_init();
 
@@ -305,17 +300,6 @@ sub overload_string {
   my $ret = "($t ";
   RMPC_IM($t, $_[0]);
   return $ret . "$t)";
-}
-
-### Was originally called Rmpc_get_str ###
-sub _get_str {
-    my ($r_s, $i_s) = c_string($_[0], $_[1], $_[2], $_[3]);
-    # Changed to stay in step with change to mpc_out_str() format
-    #my $sep = $i_s =~ /\-/ ? ' -I*' : ' +I*';
-    #$i_s =~ s/\-//;
-    #my $s = $r_s . $sep . $i_s;
-    #return $s;
-    return $r_s . " " . $i_s;
 }
 
 sub c_string {

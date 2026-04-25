@@ -262,7 +262,21 @@ chandra_ext_topo_sort(pTHX_ int *out_count, const char **err_msg)
     Safefree(queue);
 
     if (count != _ext_count) {
-        *err_msg = "Chandra::Bridge::Extension: circular dependency detected";
+        /* List the extensions stuck in the cycle */
+        int *visited;
+        int pos;
+        Newxz(visited, _ext_count, int);
+        for (i = 0; i < count; i++) visited[result[i]] = 1;
+        pos = snprintf(_err_buf, sizeof(_err_buf),
+            "Chandra::Bridge::Extension: circular dependency involving: ");
+        for (i = 0; i < _ext_count && pos < (int)sizeof(_err_buf) - 20; i++) {
+            if (!visited[i]) {
+                if (pos > 60) pos += snprintf(_err_buf + pos, sizeof(_err_buf) - pos, ", ");
+                pos += snprintf(_err_buf + pos, sizeof(_err_buf) - pos, "%s", _ext_list[i].name);
+            }
+        }
+        Safefree(visited);
+        *err_msg = _err_buf;
         Safefree(result);
         return NULL;
     }

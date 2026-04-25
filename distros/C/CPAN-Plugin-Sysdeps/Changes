@@ -1,5 +1,12 @@
 Revision history for Perl extension CPAN::Plugin::Sysdeps.
 
+0.82  2026-04-24
+	- new environment variable CPAN_PLUGIN_SYSDEPS_MODULE
+	- fallback detection for debian:forky and ubuntu:resolute
+	- mapping update
+	- more robust tests regarding debian/sid detection
+	- CI updates
+
 0.81  2026-04-23
 	- add support for Alpine Linux
 	- various mapping updates (a.o. from zhmylove)

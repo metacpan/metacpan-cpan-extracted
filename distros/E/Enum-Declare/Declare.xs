@@ -3,6 +3,7 @@
 #include "callparser1.h"
 #include "XSUB.h"
 #include "object_types.h"
+#include <stdbool.h>
 
 #ifndef XS_INTERNAL
 #define XS_INTERNAL(name) static XSPROTO(name)

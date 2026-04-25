@@ -68,7 +68,7 @@ my $tests =
             millisecond => 0,
             offset => 32400,
         },
-        q{2019-06-20 11:02:36.306917+09} => {
+        q{2019-06-20 11:02:36.306917000+0900} => {
             year => 2019,
             month => 6,
             day => 20,
@@ -77,7 +77,7 @@ my $tests =
             second => 36,
             microsecond => 306917,
             offset => 32400,
-            expected => q{2019-06-20 11:02:36.306917+0900},
+            expected => q{2019-06-20 11:02:36.306917000+0900},
         },
         q{2019-06-20T11:08:27} =>
         {
@@ -420,7 +420,7 @@ my $tests =
             tz => 'UTC',
             millisecond => 0,
         },
-        q{1669607845.5000} =>
+        q{1669607845.500000000} =>
         {
             year => 2022,
             month => 11,
@@ -525,7 +525,8 @@ foreach my $type ( sort( keys( %$tests ) ) )
                     diag( "'japan' regexp is -> ", $ref->{japan} );
                 }
             }
-            isa_ok( $dt => 'DateTime' );
+            isa_ok( $dt => 'DateTime::Lite', "Parsing \"$str\" returned a DateTime::Lite object" ) ||
+                diag( $o->error );
             SKIP:
             {
                 skip( "Failed to instantiate DateTime object for test type $type and date string '$str'", ( scalar( keys( %$def ) ) + 1 ) ) if( !defined( $dt ) || !ref( $dt ) );
@@ -545,7 +546,7 @@ foreach my $type ( sort( keys( %$tests ) ) )
                     }
                     elsif( $k eq 'era' )
                     {
-                        # do nothing in fact, because DateTime does not support this
+                        # do nothing in fact, because DateTime::Lite does not support this
                     }
                     elsif( $dt->can( $k ) )
                     {
@@ -553,7 +554,7 @@ foreach my $type ( sort( keys( %$tests ) ) )
                     }
                     else
                     {
-                        warn( "Unsupported method '$k' in DateTime for test of type $type and date string '$str'\n" );
+                        warn( "Unsupported method '$k' in DateTime::Lite for test of type $type and date string '$str'\n" );
                     }
                 }
             };

@@ -93,3 +93,17 @@ input[name=show_condition] {
 .formtools-item .value .custom-control.custom-checkbox {
     margin-top: 5px;
 }
+
+.formtools-item div.col:has(span.required:not(.hidden)) span.rt-label::after {
+    color: var(--bs-form-invalid-color);
+    content: ' *';
+}
+
+/* Bootstrap's invalid-feedback display rule requires the span to be a sibling of the
+ * invalid input, but some field types (e.g. DateTime) wrap the input in extra divs,
+ * breaking that sibling relationship. This rule uses :has() to show the hint span
+ * whenever any input inside the field container is invalid, regardless of nesting. */
+.was-validated [data-name]:has(:invalid) > span.required.invalid-feedback:not(.hidden) {
+    display: block;
+}
+

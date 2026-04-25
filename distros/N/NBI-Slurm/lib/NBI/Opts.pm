@@ -53,7 +53,7 @@ sub _yell {
 }
 sub new {
     my $class = shift @_;
-    my ($queue, $memory, $threads, $opts_array, $tmpdir, $hours, $email_address, $email_when, $files, $placeholder, $start_time, $start_date) = (undef) x 12;
+    my ($queue, $memory, $threads, $opts_array, $tmpdir, $hours, $email_address, $email_when, $files, $placeholder, $start_time, $start_date, $params_array, $params_rows, $array_offset, $array_tasks) = (undef) x 16;
     
     # Descriptive instantiation with parameters -param => value
     if (substr($_[0], 0, 1) eq '-') {
@@ -135,6 +135,38 @@ sub new {
                 } else {
                     $files = $data{$i};
                 }
+
+            # PARAMS ARRAY
+            } elsif ($i =~ /^-params_array/) {
+                next unless defined $data{$i};
+                $params_array = $data{$i};
+
+            # PARAMS ARRAY ROW COUNT
+            } elsif ($i =~ /^-params_rows/) {
+                next unless defined $data{$i};
+                if ($data{$i} =~ /^\d+$/) {
+                    $params_rows = $data{$i};
+                } else {
+                    confess "ERROR NBI::Seq: -params_rows expects an integer\n";
+                }
+
+            # ARRAY OFFSET
+            } elsif ($i =~ /^-array_offset/) {
+                next unless defined $data{$i};
+                if ($data{$i} =~ /^\d+$/) {
+                    $array_offset = $data{$i};
+                } else {
+                    confess "ERROR NBI::Seq: -array_offset expects an integer\n";
+                }
+
+            # ARRAY TASK COUNT
+            } elsif ($i =~ /^-array_tasks/) {
+                next unless defined $data{$i};
+                if ($data{$i} =~ /^\d+$/) {
+                    $array_tasks = $data{$i};
+                } else {
+                    confess "ERROR NBI::Seq: -array_tasks expects an integer\n";
+                }
                 
             # START TIME
             } elsif ($i =~ /^-start_time/) {
@@ -164,6 +196,10 @@ sub new {
     $self->email_type = defined $email_when ? $email_when : "none";
     $self->files = defined $files ? $files : [];
     $self->placeholder = defined $placeholder ?  $placeholder : "#FILE#";
+    $self->params_array = defined $params_array ? $params_array : undef;
+    $self->params_rows = defined $params_rows ? $params_rows : 0;
+    $self->{array_offset} = defined $array_offset ? $array_offset : 0;
+    $self->{array_tasks} = defined $array_tasks ? $array_tasks : 0;
     # Set options
     $self->opts = defined $$opts_array[0] ? $opts_array : [];
     # Begin time (optional)
@@ -228,6 +264,16 @@ sub placeholder : lvalue {
     $self->{placeholder} = $new_val if (defined $new_val);
     return $self->{placeholder};
 }
+sub params_array : lvalue {
+    my ($self, $new_val) = @_;
+    $self->{params_array} = $new_val if (defined $new_val);
+    return $self->{params_array};
+}
+sub params_rows : lvalue {
+    my ($self, $new_val) = @_;
+    $self->{params_rows} = $new_val if (defined $new_val);
+    return $self->{params_rows};
+}
 sub start_time : lvalue {
     my ($self, $new_val) = @_;
     $self->{start_time} = _parse_start_time($new_val) if defined $new_val;
@@ -243,7 +289,21 @@ sub start_date : lvalue {
 sub is_array {
     # Check if the job is an array
     my $self = shift @_;
+    return $self->is_files_array() || $self->is_params_array();
+}
+sub is_files_array {
+    my $self = shift @_;
     return scalar @{$self->{files}} > 0;
+}
+sub is_params_array {
+    my $self = shift @_;
+    return defined $self->{params_array} && $self->{params_rows} > 0;
+}
+sub array_size {
+    my $self = shift @_;
+    return scalar @{$self->{files}} if $self->is_files_array();
+    return $self->{params_rows} if $self->is_params_array();
+    return 0;
 }
 sub hours : lvalue {
     # Update memory
@@ -330,7 +390,8 @@ sub header {
 
     # Job array
     if ($self->is_array()) {
-        my $len = scalar @{$self->{files}} - 1;
+        my $tasks = $self->{array_tasks} > 0 ? $self->{array_tasks} : $self->array_size();
+        my $len = $tasks - 1;
         $str .= "#SBATCH --array=0-$len\n";
     }
     # Begin time
@@ -496,7 +557,7 @@ NBI::Opts - A class for representing a the SLURM options for NBI::Slurm
 
 =head1 VERSION
 
-version 0.20.1
+version 0.21.0
 
 =head1 SYNOPSIS
 
@@ -575,6 +636,16 @@ The type of email notifications to receive (e.g., "NONE", "BEGIN", "END", "FAIL"
 
 An array reference containing input files or file patterns for the job.
 
+=item * B<-params_array> (string, optional)
+
+Path to a TSV file used to drive a parameter-based array job. Each non-empty,
+non-comment row becomes one array task.
+
+=item * B<-params_rows> (integer, optional)
+
+Number of usable rows in C<-params_array>. This is used to size the SLURM
+array when the TSV has already been validated by the caller.
+
 =item * B<-placeholder> (string, optional)
 
 A placeholder string to be used in the command for input files. Default is "#FILE#".
@@ -651,6 +722,20 @@ Accessor method for the input file placeholder.
   $opts->placeholder = "{INPUT}";
   my $placeholder = $opts->placeholder;
 
+=head2 params_array
+
+Accessor method for the params-array TSV path.
+
+  $opts->params_array = "/path/to/params.tsv";
+  my $params_file = $opts->params_array;
+
+=head2 params_rows
+
+Accessor method for the number of usable rows in the params-array TSV.
+
+  $opts->params_rows = 24;
+  my $rows = $opts->params_rows;
+
 =head2 start_time
 
 Accessor for the job start time (24h format). Triggers C<--begin> in the script header.
@@ -687,9 +772,29 @@ Get the number of additional SLURM options.
 
 =head2 is_array
 
-Check if the job is an array job (has multiple input files).
+Check if the job is an array job. This returns true for both file-based arrays
+and params-array jobs.
 
   my $is_array = $opts->is_array;
+
+=head2 is_files_array
+
+Check if the job is a file-based array job driven by C<-files>.
+
+  my $is_files_array = $opts->is_files_array;
+
+=head2 is_params_array
+
+Check if the job is a params-array job driven by C<-params_array>.
+
+  my $is_params_array = $opts->is_params_array;
+
+=head2 array_size
+
+Return the number of tasks in the current array job, regardless of whether it
+is driven by C<-files> or C<-params_array>.
+
+  my $array_size = $opts->array_size;
 
 =head2 view
 
@@ -720,8 +825,6 @@ Parse memory input and convert to megabytes.
 =head2 _time_to_hour
 
 Convert time input to hours.
-
-=cut
 
 =head1 AUTHOR
 

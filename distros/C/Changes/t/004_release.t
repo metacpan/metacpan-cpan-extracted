@@ -5,7 +5,7 @@ BEGIN
     use warnings;
     use lib './lib';
     use vars qw( $DEBUG );
-    use DateTime;
+    use DateTime::Lite;
     use Test::More qw( no_plan );
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
@@ -22,22 +22,22 @@ my $r = Changes::Release->new(
     datetime => '2022-11-17T08:12:42+0900',
     datetime_formatter => sub
     {
-        my $dt = shift( @_ ) || DateTime->now;
-        require DateTime::Format::Strptime;
-        my $fmt = DateTime::Format::Strptime->new(
+        my $dt = shift( @_ ) || DateTime::Lite->now;
+        require DateTime::Format::Lite;
+        my $fmt = DateTime::Format::Lite->new(
             pattern => '%FT%T%z',
-            locale => 'en_GB',
+            locale  => 'en_GB',
         );
         $dt->set_formatter( $fmt );
         $dt->set_time_zone( 'Asia/Tokyo' );
         return( $dt );
     },
-    format => '%FT%T%z',
-    note => 'Initial release',
-    spacer => "\t",
+    format    => '%FT%T%z',
+    note      => 'Initial release',
+    spacer    => "\t",
     time_zone => 'Asia/Tokyo',
-    version => 'v0.1.0',
-    debug => $DEBUG,
+    version   => 'v0.1.0',
+    debug     => $DEBUG,
 );
 isa_ok( $r, 'Changes::Release' );
 
@@ -63,14 +63,14 @@ can_ok( $r, 'version' );
 is( $r->as_string, "v0.1.0\t2022-11-17T08:12:42+0900 Initial release\n", 'as_string' );
 isa_ok( $r->changes, 'Module::Generic::Array' );
 is( $r->changes->length, 0, 'changes size' );
-isa_ok( $r->datetime, 'DateTime', 'datetime returns a DateTime object' );
+isa_ok( $r->datetime, 'DateTime::Lite', 'datetime returns a DateTime::Lite object' );
 is( $r->datetime, '2022-11-17T08:12:42+0900', 'datetime' );
 is( ref( $r->datetime_formatter ), 'CODE', 'datetime_formatter' );
 is( $r->format, '%FT%T%z', 'format' );
 is( $r->note, 'Initial release', 'note' );
 is( $r->raw, undef, 'raw' );
 is( $r->spacer, "\t", 'spacer' );
-isa_ok( $r->time_zone, 'DateTime::TimeZone', 'time_zone returns a DateTime::TimeZone object' );
+isa_ok( $r->time_zone, 'DateTime::Lite::TimeZone', 'time_zone returns a DateTime::Lite::TimeZone object' );
 is( $r->time_zone->name, 'Asia/Tokyo', 'time_zone' );
 isa_ok( $r->version, 'Changes::Version', 'version returns a Changes::Version object' );
 my $v = $r->version;

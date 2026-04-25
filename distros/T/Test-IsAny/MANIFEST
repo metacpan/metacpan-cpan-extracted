@@ -1,0 +1,12 @@
+.perltidyrc
+.tidyallrc
+lib/Test/IsAny.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-test.t
+t/95-tidyall.t
+t/96-perl-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

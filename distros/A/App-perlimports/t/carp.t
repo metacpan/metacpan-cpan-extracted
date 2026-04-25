@@ -59,9 +59,9 @@ croak('oof');
 EOF
 
     is_deeply(
-        $doc->original_imports->{Carp},
+        $doc->found_imports->{Carp},
         undef,
-        'original imports'
+        'found imports'
     );
 
     eq_or_diff(
@@ -71,9 +71,9 @@ EOF
     );
 
     is_deeply(
-        $doc->original_imports,
+        $doc->found_imports,
         { Carp => ['croak'] },
-        'original imports updated'
+        'found imports updated'
     );
 };
 

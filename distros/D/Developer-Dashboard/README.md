@@ -22,7 +22,7 @@ optional hook results from `~/.developer-dashboard/cli/doctor.d` so users can
 layer in more site-specific checks later.
 
 Frequently used built-in helpers such as `jq`, `yq`, `tomq`, `propq`, `iniq`,
-`csvq`, `xmlq`, `of`, and `open-file` are staged privately under
+`csvq`, `xmlq`, `of`, `open-file`, `file`, and `files` are staged privately under
 `~/.developer-dashboard/cli/dd/` and dispatched by `dashboard` without
 polluting the global `PATH`. That keeps dashboard-owned built-ins separate from
 user commands and hooks under `~/.developer-dashboard/cli/`. Compatibility
@@ -237,6 +237,9 @@ generic package names.
 - `dashboard of` and `dashboard open-file`
   Resolve direct files, `file:line` references, Perl module names, Java class names, and recursive file-pattern matches under a resolved scope so the dashboard can shorten navigation work across different stacks.
 
+- `dashboard file` and `dashboard files`
+  Persist and inspect config-backed named file aliases, paralleling the existing path alias flow while targeting files instead of directories.
+
 - `dashboard jq`, `dashboard yq`, `dashboard tomq`, and `dashboard propq`
   Parse JSON, YAML, TOML, and Java properties input, then optionally extract a dotted path and print a scalar or canonical JSON, giving the CLI a small data-inspection toolkit that fits naturally into shell workflows. Compatibility names `pjq`, `pyq`, `ptomq`, and `pjp` still normalize through `dashboard` for backward compatibility, but they are no longer shipped as standalone executables.
 
@@ -244,9 +247,9 @@ generic package names.
   Parse INI, CSV, and XML file input with dotted path extraction.
 
 - private `~/.developer-dashboard/cli/dd/*` built-in helpers plus `~/.developer-dashboard/cli/dd/_dashboard-core`
-  Provide dashboard-managed helper assets without installing generic command names into the global PATH. Query/open-file/ticket/path/prompt helpers keep their own dedicated helper bodies, while the remaining built-in commands stage thin wrappers that hand off to the shared private `_dashboard-core` runtime.
+  Provide dashboard-managed helper assets without installing generic command names into the global PATH. Query/open-file/ticket/path/file/prompt helpers keep their own dedicated helper bodies, while the remaining built-in commands stage thin wrappers that hand off to the shared private `_dashboard-core` runtime.
 
-Only `dashboard` is intended to be the public CPAN-facing command-line entrypoint. The real built-in command bodies now live outside `bin/dashboard` under `share/private-cli/`, then stage into `~/.developer-dashboard/cli/dd/` on demand. Generic helper names such as `ticket`, `of`, `open-file`, `jq`, `yq`, `tomq`, `propq`, `iniq`, `csvq`, `xmlq`, `path`, and `paths` are intentionally kept out of the installed global PATH to avoid polluting the wider Perl and shell ecosystem while still keeping dashboard-owned commands separate from user commands under `~/.developer-dashboard/cli/`. While those staged helpers run, their process title is normalized to the public `developer-dashboard ...` form so `ps` output shows the user-facing command instead of the staged helper path.
+Only `dashboard` is intended to be the public CPAN-facing command-line entrypoint. The real built-in command bodies now live outside `bin/dashboard` under `share/private-cli/`, then stage into `~/.developer-dashboard/cli/dd/` on demand. Generic helper names such as `ticket`, `of`, `open-file`, `jq`, `yq`, `tomq`, `propq`, `iniq`, `csvq`, `xmlq`, `path`, `paths`, `file`, and `files` are intentionally kept out of the installed global PATH to avoid polluting the wider Perl and shell ecosystem while still keeping dashboard-owned commands separate from user commands under `~/.developer-dashboard/cli/`. While those staged helpers run, their process title is normalized to the public `developer-dashboard ...` form so `ps` output shows the user-facing command instead of the staged helper path.
 
 - `dashboard ticket`
   Creates or reuses a tmux session for the requested ticket reference, seeds `TICKET_REF` plus dashboard-friendly branch aliases into that session environment, and attaches to it through a dashboard-managed private helper instead of a public standalone binary.
@@ -623,7 +626,8 @@ operating-system account password only for package-manager work,
 bootstraps user-space Perl tooling under `~/perl5` with
 `cpanm --no-wget --notest --local-lib-contained "$HOME/perl5" local::lib App::cpanminus`,
 appends exactly one `local::lib` bootstrap line to `~/.bashrc`, `~/.zshrc`, or
-`~/.profile` depending on the active shell, keeps bash login shells wired by
+`~/.profile` depending on the preferred login shell even when the installer is
+run through `sh`, keeps bash login shells wired by
 bridging `~/.profile` to `~/.bashrc`, prefers Homebrew Perl on macOS when
 `brew --prefix perl` exposes a brewed interpreter, bootstraps a user-space
 `perlbrew` Perl on Debian-family, Alpine, or Fedora hosts when the system Perl
@@ -822,7 +826,13 @@ Inspect resolved paths:
 dashboard paths
 dashboard path resolve bookmarks_root
 dashboard path add foobar /tmp/foobar
+dashboard path add .
 dashboard path del foobar
+dashboard path rm foobar
+dashboard files
+dashboard file add notes ~/notes.txt
+dashboard file resolve notes
+dashboard file del notes
 dashboard which jq
 dashboard which layered-tool
 dashboard which nest.level1.level2.here
@@ -847,8 +857,23 @@ which_dir foobar alpha
 
 Use `Developer::Dashboard::Folder` for runtime path helpers. It resolves the
 same runtime, bookmark, config, and configured alias names exposed by
-`dashboard paths`, including names such as `docker`, without relying on
+`dashboard paths`, and therefore backs the same folder-oriented flow that
+`cdr` and `which_dir` use, including names such as `docker`, without relying on
 unscoped CPAN-global module names.
+
+`dashboard path add .` saves the current working directory under its basename.
+`dashboard path add <name> .` uses the current working directory as the target
+for an explicit alias. `dashboard path del .` and `dashboard path rm .` remove
+the alias that points at the current working directory instead of treating `.`
+as a literal error token.
+
+Use `Developer::Dashboard::File` for runtime file helpers. It resolves the
+same built-in and config-backed file aliases exposed by `dashboard files` and
+`dashboard file list`, supports direct reads and writes through one public
+wrapper, and keeps file alias behavior parallel with the folder/path contract.
+It is the file-side twin of the existing Folder contract in the same way that
+`dashboard of` and `dashboard open-file` are the file-side twins of
+`cdr` and `which_dir`.
 
 If you need the full `dashboard paths` payload in Perl, call
 `Developer::Dashboard::Folder->all` or
@@ -857,6 +882,34 @@ manually. If you want a fresh `PathRegistry` object from that public Folder
 inventory, call `Developer::Dashboard::PathRegistry->new_from_all_folders`.
 If you want a collector store that uses the same Folder-derived runtime roots,
 call `Developer::Dashboard::Collector->new_from_all_folders`.
+If you need the full `dashboard files` payload in Perl, call
+`Developer::Dashboard::File->all` or
+`Developer::Dashboard::FileRegistry->all_files` instead of rebuilding the hash
+manually.
+
+File aliases follow the same effective-config write rules as path aliases.
+`dashboard file add <name> <path>` writes to the deepest participating config
+layer, keeps `$HOME/...` storage portable when the target lives under the
+current home directory, updates existing aliases idempotently, and lets
+`dashboard file resolve <name>`, `dashboard of <name>`, or
+`Developer::Dashboard::File->resolve($name)` read that alias back later.
+When the alias name is a valid Perl method token,
+`Developer::Dashboard::File->$name()` also works directly. When the alias is
+numeric such as `123`, use a scalar method name like
+`my $name = 123; Developer::Dashboard::File->$name()` because bare `->123`
+is not valid Perl syntax. `dashboard files` prints the full built-in plus
+configured file inventory, while `dashboard file list` prints only the named
+configured file aliases.
+
+`dashboard of` and `dashboard open-file` now treat configured file aliases as
+direct file targets before they fall back to Perl-module, Java-class, or regex
+search behavior. If the first token resolves as a saved path alias and the
+remaining tokens join into one existing relative file path inside that aliased
+directory, `dashboard of <path-alias> <relative-file>` opens that exact file
+instead of treating the remaining tokens as regex patterns. That means flows
+such as `dashboard file add 123 /tmp/123.txt` followed by `dashboard of 123`,
+or `dashboard path add foobar .` followed by `dashboard of foobar 456.txt`,
+now resolve the exact configured or scoped file target directly.
 
 The hashed `state_root`, `collectors_root`, `indicators_root`, and
 `sessions_root` paths live under the shared temp state tree, not inside the
@@ -884,6 +937,10 @@ dashboard shell sh
 dashboard shell ps
 ```
 
+The generated zsh bootstrap now loads `compinit` before any `compdef`
+registration, so a fresh macOS zsh shell can evaluate it without raising
+`command not found: compdef`.
+
 Audit runtime permissions:
 
 ```bash
@@ -896,6 +953,8 @@ Resolve or open files from the CLI:
 ```bash
 dashboard of --print My::Module
 dashboard open-file --print com.example.App
+dashboard of --print notes
+dashboard of --print foobar 456.txt
 dashboard open-file --print path/to/file.txt
 dashboard open-file --print bookmarks api-dashboard
 ```
@@ -1410,7 +1469,7 @@ The public `dashboard` entrypoint also stays thin for all built-in commands.
 It only stages and execs helper assets from `share/private-cli/`: dedicated
 helper bodies for `dashboard jq`, `dashboard yq`, `dashboard of`,
 `dashboard open-file`, `dashboard ticket`, `dashboard path`, `dashboard
-paths`, and `dashboard ps1`, plus thin wrappers for the remaining built-ins
+paths`, `dashboard file`, `dashboard files`, and `dashboard ps1`, plus thin wrappers for the remaining built-ins
 that hand off to the shared private `_dashboard-core` runtime. The shipped
 starter bookmark source lives under `share/seeded-pages/`, and the shipped
 helper scripts live under `share/private-cli/`, so neither bookmark bodies nor

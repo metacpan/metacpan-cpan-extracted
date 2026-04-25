@@ -90,7 +90,7 @@ Runs on **Perl ≥ 5.14**.
 #### Alpine Linux
 
 ```bash
-apk add jq-lite
+apk add perl-jq-lite
 ```
 
 ---

@@ -27,15 +27,15 @@ Module::Generic::DateTime::Interval - An Enhanced DateTime::Duration Object
     $int->years = 10;
     my $years = $int->years;
 
-    my $dt = DateTime->now;
-    my $dt2 = DateTime->now->add( days => 10 );
+    my $dt = DateTime::Lite->now;
+    my $dt2 = DateTime::Lite->now->add( days => 10 );
     # Get an Module::Generic::DateTime::Interval object
     my $int = $dt2 - $dt;
     print $int->days, "\n"; # 10
 
 =head1 DESCRIPTION
 
-L<Module::Generic::DateTime::Interval> is a thin wrapper around L<DateTime::Duration> to provide enhance features. All other regular method calls of L<DateTime::Duration> are passed through to it via C<AUTOLOAD>.
+L<Module::Generic::DateTime::Interval> is a thin wrapper around L<DateTime::Lite::Duration> to provide enhance features. All other regular method calls of L<DateTime::Lite::Duration> are passed through to it via C<AUTOLOAD>.
 
 This interval object is overloaded and allows the following operations: C<+>, C<->, C<*>, C<comparison>
 
@@ -143,7 +143,7 @@ Instances of C<Module::Generic::DateTime> and C<Module::Generic::DateTime::Inter
 
 =head1 SEE ALSO
 
-L<Module::Generic>, L<Module::Generic::DateTime>, L<DateTime>, L<DateTime::Format::Strptime>, L<DateTime::TimeZone>
+L<Module::Generic>, L<Module::Generic::DateTime>, L<DateTime::Lite>, L<DateTime::Format::Lite>, L<DateTime::Lite::TimeZone>
 
 =head1 AUTHOR
 

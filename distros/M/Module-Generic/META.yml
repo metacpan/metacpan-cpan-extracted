@@ -36,9 +36,9 @@ requires:
   Config: '0'
   Data::Dump: '1.23'
   Data::UUID: '1.226'
-  DateTime: '1.57'
-  DateTime::Format::Strptime: '1.79'
-  DateTime::TimeZone: '2.51'
+  DateTime::Format::Lite: v0.1.2
+  DateTime::Lite: v0.6.3
+  DateTime::Lite::TimeZone: v0.5.3
   DateTime::TimeZone::Catalog::Extend: v0.3.0
   Devel::StackTrace: '0'
   Encode: '0'
@@ -70,7 +70,7 @@ requires:
   URI::Escape: '5.09'
   URI::file: '5.09'
   Wanted: v0.1.0
-  XSLoader: '0.31'
+  XSLoader: '0.24'
   common::sense: '0'
   overload: '0'
   overloading: '0'
@@ -83,5 +83,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/Module-Generic/issues
   repository: https://gitlab.com/jackdeguest/Module-Generic
-version: v1.3.0
+version: v1.3.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

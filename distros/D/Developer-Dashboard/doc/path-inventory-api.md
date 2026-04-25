@@ -3,6 +3,9 @@
 Use the public path inventory methods when Perl code needs the same resolved
 path hashes printed by the CLI.
 
+The file side of the same contract lives behind `Developer::Dashboard::File`
+and `Developer::Dashboard::FileRegistry`.
+
 Full `dashboard paths` payload:
 
 ```perl
@@ -40,6 +43,32 @@ use Developer::Dashboard::Collector;
 my $collectors = Developer::Dashboard::Collector->new_from_all_folders;
 ```
 
+Compatibility file wrapper:
+
+```perl
+use Developer::Dashboard::File;
+
+my $all_files = Developer::Dashboard::File->all;
+my $notes     = Developer::Dashboard::File->resolve('notes');
+my $name      = 123;
+my $numeric   = Developer::Dashboard::File->$name();
+```
+
+Direct file registry constructor:
+
+```perl
+use Developer::Dashboard::PathRegistry;
+use Developer::Dashboard::FileRegistry;
+
+my $paths = Developer::Dashboard::PathRegistry->new(
+    home => $ENV{HOME},
+);
+my $files = Developer::Dashboard::FileRegistry->new(
+    paths => $paths,
+);
+my $all = $files->all_files;
+```
+
 The hashed temp-backed `state_root`, `collectors_root`, `indicators_root`, and
 `sessions_root` paths are recreated automatically if a reboot or temp cleanup
 removes them. The path registry also rewrites the matching `runtime.json`
@@ -64,4 +93,6 @@ my $aliases = $paths->all_path_aliases;
 These methods are the public library entrypoints. Avoid reaching into
 `Developer::Dashboard::CLI::Paths` private helper functions or rebuilding the
 hash shape manually. Use `Developer::Dashboard::EnvAudit` when you need env
-provenance rather than path inventory.
+provenance rather than path inventory. For file aliases, prefer
+`Developer::Dashboard::File` or `Developer::Dashboard::FileRegistry` instead
+of reaching into `Developer::Dashboard::CLI::OpenFile` private helper logic.

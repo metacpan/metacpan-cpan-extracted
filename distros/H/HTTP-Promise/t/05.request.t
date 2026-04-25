@@ -75,12 +75,15 @@ is( $r2->uri, '/', 'uri' );
 is( $r2->protocol, 'HTTP/1.1', 'protocol' );
 is( $r2->header( 'Accept-Encoding' ), $req->header( 'Accept-Encoding' ), 'header Accept-Encoding' );
 
-$rv = $req->uri({ foo => 'bar'});
-ok( !defined( $rv ), 'bad uri assignment rejected' );
-like( $req->error->message, qr/URI value provided '(?:.*?)' does not look like an URI/, 'bad uri error' );
-$rv = $req->uri( ['foo'] );
-ok( !defined( $rv ), 'bad uri assignment rejected' );
-like( $req->error->message, qr/URI value provided '(?:.*?)' does not look like an URI/, 'bad uri error' );
+{
+    local $SIG{__WARN__} = sub{};
+    $rv = $req->uri({ foo => 'bar'});
+    ok( !defined( $rv ), 'bad uri assignment rejected' );
+    like( $req->error->message, qr/URI value provided '(?:.*?)' does not look like an URI/, 'bad uri error' );
+    $rv = $req->uri( ['foo'] );
+    ok( !defined( $rv ), 'bad uri assignment rejected' );
+    like( $req->error->message, qr/URI value provided '(?:.*?)' does not look like an URI/, 'bad uri error' );
+}
 
 $req = HTTP::Promise::Request->new;
 is( $req->as_string, "GET / HTTP/1.1${CRLF}${CRLF}" );
@@ -114,11 +117,14 @@ is( $r2->uri, undef, 'undefined uri' );
 is( $r2->protocol, undef, 'undefined protocol' );
 is( $r2->header( 'Accept-Encoding' ), $req->header( 'Accept-Encoding' ) );
 
-$r2 = HTTP::Promise::Request->parse( 'unknown' );
-ok( !defined( $r2 ), 'file "unknown" does not exists (string must be passed as reference)' );
-$r2 = HTTP::Promise::Request->parse( \"get / HTTP/1.0${CRLF}${CRLF}", debug => $DEBUG );
-ok( !defined( $r2 ), 'unknown bad http method name' );
-like( HTTP::Promise::Request->error->message, qr/Invalid parameters received/, 'bad headers error message' );
+{
+    local $SIG{__WARN__} = sub{};
+    $r2 = HTTP::Promise::Request->parse( 'unknown' );
+    ok( !defined( $r2 ), 'file "unknown" does not exists (string must be passed as reference)' );
+    $r2 = HTTP::Promise::Request->parse( \"get / HTTP/1.0${CRLF}${CRLF}", debug => $DEBUG );
+    ok( !defined( $r2 ), 'unknown bad http method name' );
+    like( HTTP::Promise::Request->error->message, qr/Invalid parameters received/, 'bad headers error message' );
+}
 $r2 = HTTP::Promise::Request->parse( \"METHONLY / HTTP/1.0${CRLF}${CRLF}", debug => $DEBUG );
 # diag( "Error parsing non-standard http method name 'methonly': ", HTTP::Promise::Request->error ) if( !defined( $r2 ) && $DEBUG );
 # ok( !defined( $r2 ), 'unknown bad http method name (2)' );

@@ -6,15 +6,21 @@
     form_config => $form_config,
 &>
 
+% $m->callback( CallbackName => 'BeforeFormContent', ARGSRef => \%ARGS, FormConfig => $form_config, FormName => $form_name, PageName => $page, QueueObj => $queue_obj );
+
 % # Build the current page here dyamically from config
 % my $button_label = loc('Next');
-% foreach my $element ( @{$form_config->{'formtools-pages'}{$page}{'content'}} ) {
+% foreach my $element ( @{$form_config->{'formtools-pages'}{$page}{'content'} || []} ) {
 
 <div class="formtools-item"
 % my $args = $element->{arguments} || {};
 % if ( $args->{show_condition} && $args->{show_condition}{enabled} && $args->{show_condition}{name} ) {
 %   if ( my $show_cf = $load_cf->($args->{show_condition}{name}) ) {
     data-show-condition-name="<% GetCustomFieldInputName( Object => RT::Ticket->new($session{CurrentUser}), CustomField => $show_cf ) %>"
+    data-show-condition-values="<% JSON($args->{show_condition}{values} || []) %>"
+%   }
+%   elsif ( my $show_question = $has_question{ $args->{show_condition}{name} } ) {
+    data-show-condition-name="<% $show_question %>"
     data-show-condition-values="<% JSON($args->{show_condition}{values} || []) %>"
 %   }
 % }
@@ -29,7 +35,7 @@
             . '" value="' . $element->{'input-value'} . '"  />');
     }
     elsif ( $element->{type} eq 'component' ) {
-        $m->comp('/FormTools/' . $element->{comp_name}, %{$element->{arguments}}, Token => $ARGS{Token}, AttachedFilenames => $ARGS{AttachedFilenames} );
+        $m->comp('/FormTools/' . $element->{comp_name}, %{$element->{arguments}}, Token => $ARGS{Token}, AttachedFilenames => $ARGS{AttachedFilenames}, HasQuestion => \%has_question );
     }
 
     if ( $element->{type} eq 'hidden'
@@ -42,6 +48,8 @@
 </div>
 
 % }
+
+% $m->callback( CallbackName => 'AfterFormContent', ARGSRef => \%ARGS, FormConfig => $form_config, FormName => $form_name, PageName => $page, QueueObj => $queue_obj );
 
 % if ( $form_config->{'formtools-pages'}{$page}{'next'} ) {
  <& /FormTools/Next, Label => $button_label, Back => $show_back, Name => 'Submit' &>
@@ -118,10 +126,10 @@ jQuery(function () {
                 else if ( target.find('input[type=radio]').length ) {
                     target.find('input[type=radio][value=""]').prop('checked', false).attr('disabled', true);
                 }
-                target.find(':input:visible').attr('required', true);
-                target.find('.cfhints.required').removeClass('hidden');
+                target.find(':input:visible').not('.items-placeholder').attr('required', true);
+                target.find('span.required').removeClass('hidden');
                 if ( target.closest('form').hasClass('was-validated') ) {
-                    target.find('.cfhints.required').removeClass('').addClass('required invalid-feedback')
+                    target.find('span.required').addClass('invalid-feedback');
                 }
             }
             else {
@@ -131,8 +139,8 @@ jQuery(function () {
                 else if ( target.find('input[type=radio]').length ) {
                     target.find('input[type=radio][value=""]').attr('disabled', false);
                 }
-                target.find(':input:visible').attr('required', false);
-                target.find('.cfhints.required').removeClass().addClass('cfhints my-1 d-inline-block required hidden');
+                target.find(':input:visible').not('.items-placeholder').attr('required', false);
+                target.find('span.required').addClass('hidden');
             }
         };
         jQuery(':input[type!=hidden][name="' + dependent_name +'"]').change(syncValidation).change();
@@ -189,7 +197,7 @@ jQuery(function () {
                     target.closest('.formtools-item').removeClass('hidden');
 
                     // Set required attribute on newly visible required fields
-                    target.closest('.formtools-item').find('[data-name]:has(.required) :input, :input.required').attr('required', true);
+                    target.closest('.formtools-item').find('[data-name]:has(.required) :input:not(.items-placeholder), :input.required:not(.items-placeholder)').attr('required', true);
 
                     changed = 1;
                 }
@@ -275,9 +283,6 @@ else {
     Abort('Form not found');
 }
 
-if ( ref $ARGS{Token} && ref $ARGS{Token} eq 'ARRAY' ) {
-    $ARGS{Token} = $ARGS{Token}->[0];
-}
 if ( $ARGS{Attach} ) {
     my $cgi_object        = $m->cgi_object;
     my $attach_filehandle = $cgi_object->upload('Attach');
@@ -290,6 +295,7 @@ elsif ( ! $ARGS{Token} ) {
     # call ProcessAttachments to generate a unique token for this form load
     ProcessAttachments( ARGSRef => \%ARGS );
 }
+$DECODED_ARGS->{Token}   = $ARGS{Token};
 $ARGS{AttachedFilenames} = join ', ', keys %{ $session{'Attachments'}{ $ARGS{Token} } || {} };
 
 $m->callback( CallbackName => 'AfterFormConfigLoaded', ARGSRef => \%ARGS, FormConfig => $form_config );
@@ -354,7 +360,7 @@ foreach my $page_index ( @form_pages ) {
 $show_back = 1 if $index > 0;
 
 # Did the user click Back?
-if ( $ARGS{Back} and $ARGS{Back} eq 'Back' ) {
+if ( $ARGS{Back} ) {
     # Avoid trying to go back again
     delete $ARGS{Back};
 
@@ -365,9 +371,13 @@ if ( $ARGS{Back} and $ARGS{Back} eq 'Back' ) {
     $_form_tools_next = '';
     delete $ARGS{'_form_tools_next'} if $ARGS{'_form_tools_next'};
 
+    # user filling out form needs SeeQueue right for TicketCustomFields to return cfs
+    # for validation we load the queue with system user to ensure it validates cfs
+    my $system_queue_obj = RT::Queue->new( RT->SystemUser );
+    $system_queue_obj->Load( $queue_obj->Id );
     my ($status, @msg) = $m->comp(
         '/Elements/ValidateCustomFields',
-        CustomFields    => $queue_obj->TicketCustomFields,
+        CustomFields    => $system_queue_obj->TicketCustomFields,
         ARGSRef         => \%ARGS,
     );
 
@@ -426,10 +436,22 @@ my $load_cf = sub {
     return $cf_map{$name}->Id ? $cf_map{$name} : undef;
 };
 
+my %has_question;
+my @question_components;
+for my $page ( @form_pages ) {
+    push @question_components,
+        map { $_->{arguments}{name} }
+            grep { $_->{comp_name} && ( $_->{comp_name} eq 'ShowQuestion' ) }
+                @{ $form_config->{'formtools-pages'}{$page}{content} || [] };
+}
+for my $question ( @question_components ) {
+    $has_question{$question} = $question;
+}
+
 if ( $create_ticket ) {
     # Drop conditionally hidden fields
     for my $page ( keys %{ $form_config->{'formtools-pages'} || {} } ) {
-        for my $element ( @{$form_config->{'formtools-pages'}{$page}{'content'}} ) {
+        for my $element ( @{$form_config->{'formtools-pages'}{$page}{'content'} || []} ) {
             my $args = $element->{arguments} || {};
             next unless $args->{name};
             if ( $args->{show_condition} && $args->{show_condition}{enabled} && $args->{show_condition}{name} ) {

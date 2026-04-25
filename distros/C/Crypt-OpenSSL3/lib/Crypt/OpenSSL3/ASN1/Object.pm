@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::ASN1::Object;
-$Crypt::OpenSSL3::ASN1::Object::VERSION = '0.004';
+$Crypt::OpenSSL3::ASN1::Object::VERSION = '0.005';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::ASN1::Object - An ASN Object Identifier
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 METHODS
 

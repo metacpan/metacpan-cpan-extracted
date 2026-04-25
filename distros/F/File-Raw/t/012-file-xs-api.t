@@ -52,6 +52,15 @@ pass('file_api_test loaded');
 
 my $tempdir = tempdir(CLEANUP => 1);
 
+# Whether the test extension and File::Raw share hook state. On Unix the
+# dynamic loader resolves file_api_test's undefined references against
+# Raw.so at runtime (RTLD_GLOBAL on ELF, flat namespace on macOS). On
+# Windows / Cygwin we don't ship an import library for Raw.dll, so the
+# test extension carries its own private copy of the hook implementation
+# and the cross-DLL subtests below skip.
+my $cross_dll_hook_state =
+    !($^O eq 'MSWin32' || $^O eq 'cygwin' || $^O eq 'msys');
+
 # ============================================
 # Test C API functions exist
 # ============================================
@@ -111,6 +120,9 @@ subtest 'hook installation from C' => sub {
 # ============================================
 
 subtest 'C read hook with file I/O' => sub {
+    plan skip_all => "cross-DLL hook state not shared on $^O"
+        unless $cross_dll_hook_state;
+
     File::Raw::clear_hooks('read');
 
     my $testfile = "$tempdir/c_read_hook.txt";
@@ -126,6 +138,9 @@ subtest 'C read hook with file I/O' => sub {
 };
 
 subtest 'C write hook with file I/O' => sub {
+    plan skip_all => "cross-DLL hook state not shared on $^O"
+        unless $cross_dll_hook_state;
+
     File::Raw::clear_hooks('write');
 
     # Install lowercase hook from C
@@ -145,6 +160,9 @@ subtest 'C write hook with file I/O' => sub {
 # ============================================
 
 subtest 'encoding simulation with C hooks' => sub {
+    plan skip_all => "cross-DLL hook state not shared on $^O"
+        unless $cross_dll_hook_state;
+
     File::Raw::clear_hooks('read');
     File::Raw::clear_hooks('write');
 
@@ -196,6 +214,9 @@ subtest 'hook pointer retrieval' => sub {
 # ============================================
 
 subtest 'Perl and C hook interop' => sub {
+    plan skip_all => "cross-DLL hook state not shared on $^O"
+        unless $cross_dll_hook_state;
+
     File::Raw::clear_hooks('read');
 
     # Set hook via C

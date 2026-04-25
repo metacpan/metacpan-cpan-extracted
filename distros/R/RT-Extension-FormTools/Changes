@@ -1,5 +1,19 @@
 Revision history for RT-Extension-FormTools
 
+2.05 2026-04-24
+ - Add ShowQuestion component for conditionally displaying fields in admin UI and form pages
+ - Add MassageComponents callback to FormTools palette
+ - Add MassageFieldDefault callback to Field component
+ - Let validated custom fields be required when shown conditionally (bug reported by Grant Emsley)
+ - Add required indicator to labels for required fields
+ - Ensure invalid-feedback element shows for all custom field types
+ - Improve validation of conditionally required fields
+ - Ensure back button works for non-English locales (bug reported by Michael Loos)
+ - Ensure CF validation works without SeeQueue right
+ - Guard against form page with no content
+ - Ensure value ref is array not file upload object (bug reported by Michael Loos)
+ - Ignore blank lines in choices for ShowQuestion
+
 2.04 2026-01-16
  - Fix issue with required html custom fields breaking the required field logic on the page
 

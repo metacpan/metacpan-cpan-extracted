@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Finfo.pm
-## Version v0.5.5
+## Version v0.5.6
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2026/03/09
+## Modified 2026/04/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -63,7 +63,7 @@ BEGIN
     };
     our %EXPORT_TAGS = ( all => [qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE )] );
     our @EXPORT_OK = qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE );
-    our $VERSION = 'v0.5.5';
+    our $VERSION = 'v0.5.6';
 };
 
 use v5.26.1;
@@ -156,6 +156,10 @@ sub filetype
     {
         return( FILETYPE_NOFILE );
     }
+    elsif( -l( $file ) )
+    {
+        return( FILETYPE_LNK );
+    }
     elsif( -f( _ ) )
     {
         return( FILETYPE_REG );
@@ -163,10 +167,6 @@ sub filetype
     elsif( -d( _ ) )
     {
         return( FILETYPE_DIR );
-    }
-    elsif( -l( _ ) )
-    {
-        return( FILETYPE_LNK );
     }
     elsif( -p( _ ) )
     {
@@ -423,8 +423,8 @@ sub _datetime
     return( $self->error( "No epoch time was provided." ) ) if( !length( $t ) );
     return( $self->error( "Invalid epoch time provided \"$t\"." ) ) if( $t !~ /^\d+$/ );
     my $class = ref( $self ) || $self;
-    $self->_load_class( 'DateTime' ) || return( $self->pass_error );
-    $self->_load_class( 'DateTime::Format::Strptime' ) || return( $self->pass_error );
+    $self->_load_class( 'DateTime::Lite' ) || return( $self->pass_error );
+    $self->_load_class( 'DateTime::Format::Lite' ) || return( $self->pass_error );
     $self->_load_class( 'Module::Generic::DateTime' ) || return( $self->pass_error );
     # my $err_key = $class;
     # Previous approach
@@ -443,14 +443,14 @@ sub _datetime
             local $@;
             eval
             {
-                $dt = DateTime->from_epoch( epoch => $t, time_zone => 'local' );
+                $dt = DateTime::Lite->from_epoch( epoch => $t, time_zone => 'local' );
                 $has_local_tz = 1;
             };
             if( $@ )
             {
                 $has_local_tz = 0;
                 warn( "Your system is missing key timezone components. ${class}::_datetime is reverting to UTC instead of local time zone.\n" );
-                $dt = DateTime->from_epoch( epoch => $t, time_zone => 'UTC' );
+                $dt = DateTime::Lite->from_epoch( epoch => $t, time_zone => 'UTC' );
             }
             $repo->set( $has_local_tz );
             # unlocks automatically at end of scope.
@@ -464,12 +464,17 @@ sub _datetime
         local $@;
         eval
         {
-            $dt = DateTime->from_epoch( epoch => $t, time_zone => ( $has_local_tz ? 'local' : 'UTC' ) );
+            $dt = DateTime::Lite->from_epoch( epoch => $t, time_zone => ( $has_local_tz ? 'local' : 'UTC' ) );
         };
         if( $@ )
         {
-            warn( "Error trying to set a DateTime object using ", ( $has_local_tz ? 'local' : 'UTC' ), " time zone\n" );
-            $dt = DateTime->from_epoch( epoch => $t, time_zone => 'UTC' );
+            warn( "Error trying to set a DateTime::Lite object using ", ( $has_local_tz ? 'local' : 'UTC' ), " time zone\n" );
+            $dt = DateTime::Lite->from_epoch( epoch => $t, time_zone => 'UTC' );
+        }
+        elsif( !$dt && DateTime::Lite->error )
+        {
+            warn( "Error trying to set a DateTime::Lite object using ", ( $has_local_tz ? 'local' : 'UTC' ), " time zone: ", DateTime::Lite->error, "\n" );
+            $dt = DateTime::Lite->from_epoch( epoch => $t, time_zone => 'UTC' );
         }
     }
 
@@ -478,7 +483,7 @@ sub _datetime
     my $o;
     eval
     {
-        my $fmt = DateTime::Format::Strptime->new(
+        my $fmt = DateTime::Format::Lite->new(
             pattern => '%s',
         );
         $dt->set_formatter( $fmt );
@@ -576,7 +581,7 @@ Module::Generic::Finfo - File Info Object Class
 
     use Module::Generic::Finfo qw( :all );
     my $finfo = Module::Generic::Finfo->new( '/some/file/path.html' );
-    # Get access time as a DateTime object
+    # Get access time as a DateTime::Lite object
     $finfo->atime;
     # Block site
     $finfo->blksize;
@@ -590,7 +595,7 @@ Module::Generic::Finfo - File Info Object Class
     $finfo->can_write;
     $finfo->can_exec;
     $finfo->csize;
-    # Inode change time as a DateTime object
+    # Inode change time as a DateTime::Lite object
     $finfo->ctime;
     $finfo->dev;
     if( $finfo->exists )
@@ -654,7 +659,7 @@ Module::Generic::Finfo - File Info Object Class
 
 =head1 VERSION
 
-    v0.5.5
+    v0.5.6
 
 =head1 DESCRIPTION
 
@@ -670,7 +675,7 @@ This instantiate an object that is used to access other key methods. It takes a 
 
 =head2 atime
 
-Returns the file last access time as a L<Module::Generic::DateTime> object, which stringifies to its value in second since epoch. L<Module::Generic::DateTime> is just a thin wrapper around L<DateTime> to allow a L<DateTime> to be used in comparison with another non L<DateTime> value.
+Returns the file last access time as a L<Module::Generic::DateTime> object, which stringifies to its value in second since epoch. L<Module::Generic::DateTime> is just a thin wrapper around L<DateTime::Lite> to allow a L<DateTime::Lite> to be used in comparison with another non L<DateTime::Lite> value.
 
 For example:
 
@@ -714,7 +719,7 @@ Returns the total size of file, in bytes. Same as L</size>
 
 =head2 ctime
 
-Returns the file inode change time as a L<Module::Generic::DateTime> object, which stringifies to its value in second since epoch. L<Module::Generic::DateTime> is just a thin wrapper around L<DateTime> to allow a L<DateTime> to be used in comparison with another non L<DateTime> value.
+Returns the file inode change time as a L<Module::Generic::DateTime> object, which stringifies to its value in second since epoch. L<Module::Generic::DateTime> is just a thin wrapper around L<DateTime::Lite> to allow a L<DateTime::Lite> to be used in comparison with another non L<DateTime::Lite> value.
 
 =head2 dev
 
@@ -826,7 +831,7 @@ Takes a mode string (e.g., C<rw-r--r-->) of a file or directory, and converts it
 
 =head2 mtime
 
-Returns the file last modify time as a L<Module::Generic::DateTime> object, which stringifies to its value in second since epoch. L<Module::Generic::DateTime> is just a wrapper around L<DateTime> to allow a L<DateTime> to be used in comparison with another non L<DateTime> value.
+Returns the file last modify time as a L<Module::Generic::DateTime> object, which stringifies to its value in second since epoch. L<Module::Generic::DateTime> is just a wrapper around L<DateTime::Lite> to allow a L<DateTime::Lite> to be used in comparison with another non L<DateTime::Lite> value.
 
 =head2 name
 
@@ -935,7 +940,7 @@ The C<has_local_tz> value in L</_datetime>, indicating system timezone support, 
     use threads;
     my $finfo = Module::Generic::Finfo->new( "example.txt" );
     my $atime = $finfo->atime; # Sets shared has_local_tz
-    my $dt = Module::Generic::DateTime->new( DateTime->now );
+    my $dt = Module::Generic::DateTime->new( DateTime::Lite->now );
     $dt->epoch; # Reuses has_local_tz
 
 The C<local_tz> namespace is highly specific, ensuring negligible risk of collisions with unrelated modules.
@@ -958,7 +963,7 @@ File metadata (e.g., L</filepath>, internal C<_data> array) is stored per-object
 
 =item * B<External Libraries>
 
-Methods like L</mime_type> use L<Module::Generic::File::Magic>, which is thread-safe as they operate on per-object state. L</_datetime> uses L<DateTime> and L<DateTime::Format::Strptime>, both thread-safe when combined with L<Module::Generic::Global>’s locking for C<has_local_tz>.
+Methods like L</mime_type> use L<Module::Generic::File::Magic>, which is thread-safe as they operate on per-object state. L</_datetime> uses L<DateTime::Lite> and L<DateTime::Format::Lite>, both thread-safe when combined with L<Module::Generic::Global>’s locking for C<has_local_tz>.
 
 =item * B<Serialisation>
 

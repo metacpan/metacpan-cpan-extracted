@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.81';
+our $VERSION = '0.82';
 
 # shortcuts
 #  os and distros
@@ -24,6 +24,8 @@ use constant before_ubuntu_jammy   => (linuxdistrocodename => [qw(squeeze precis
 use constant before_debian_bookworm=> (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial stretch bionic buster focal bullseye jammy)]);
 use constant before_ubuntu_noble   => (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial stretch bionic buster focal bullseye jammy bookworm)]);
 use constant before_debian_trixie  => (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial stretch bionic buster focal bullseye jammy bookworm noble)]);
+use constant before_ubuntu_resolute=> (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial stretch bionic buster focal bullseye jammy bookworm noble trixie)]);
+use constant before_debian_forky   => (linuxdistrocodename => [qw(squeeze precise wheezy trusty jessie xenial stretch bionic buster focal bullseye jammy bookworm noble trixie resolute)]);
 use constant like_fedora => (linuxdistro => '~fedora');
 use constant like_alpine => (linuxdistro => '~alpine');
 #  package shortcuts
@@ -3272,6 +3274,13 @@ sub mapping {
 	[package => 'libspread1-dev']],
        # not available in wheezy and later
       ]],
+
+     [cpanmod => 'SPVM',
+      # BSD make does not work anymore, see https://github.com/yuki-kimoto/SPVM/issues/856
+      [os_freebsd,   [package => 'gmake']],
+      [os_dragonfly, [package => 'gmake']],
+      [os_openbsd,   [package => 'gmake']],
+     ],
 
      [cpanmod => 'Store::CouchDB',
       # tests pass also without, but most tests are skipped

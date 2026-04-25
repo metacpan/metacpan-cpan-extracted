@@ -1,3 +1,8 @@
+0.21.0	2026-04-24
+
+* Added 'slurm-status'
+* Improved array support
+
 0.20.1	2026-04-22
 
 * Fixed sorting in 'viewjobs'

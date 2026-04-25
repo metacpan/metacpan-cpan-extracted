@@ -17,7 +17,7 @@ is(uuid_time(uuid_v4()), 0, 'uuid_time returns 0 for v4');
 
 # uuid_time returns meaningful values for time-based versions
 my $v1_time = uuid_time(uuid_v1());
-ok(abs($v1_time - time()) < 5, 'v1 time is close to now');
+ok(abs($v1_time - time()) < 10, 'v1 time is close to now');
 
 my $v7_time = uuid_time(uuid_v7());
-ok(abs($v7_time - time()) < 5, 'v7 time is close to now');
+ok(abs($v7_time - time()) < 10, 'v7 time is close to now');

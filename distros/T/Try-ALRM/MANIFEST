@@ -16,9 +16,14 @@ releases/Try-ALRM-0.81.tar.gz
 releases/Try-ALRM-0.82.tar.gz
 releases/Try-ALRM-0.99.tar.gz
 releases/Try-ALRM-1.00.tar.gz
+releases/Try-ALRM-1.01.tar.gz
+releases/Try-ALRM-1.02.tar.gz
+releases/Try-ALRM-1.03.tar.gz
 t/01-basic.t
 t/02-basic.t
 t/03-basic.t
 t/04-retry.t
 t/05-basic-finally.t
+t/06-correctness-regressions.t
+t/07-composability.t
 t/release-kwalitee.t

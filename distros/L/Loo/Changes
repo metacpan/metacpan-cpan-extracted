@@ -32,3 +32,13 @@ Revision history for Loo
 
 0.11	2026/04/17
 	- Fix deparsing of custom ops
+
+0.12	2026/04/25
+	- Fix OP_EMPTYAVHV version guard from >= 36 to >= 38 (introduced in
+	  5.38, was breaking builds on 5.36 across Solaris and Linux)
+	- Fix custom op name lookup on 5.14-5.18: use Perl_custom_op_xop
+	  which handles both Perl_custom_op_register (PL_custom_ops) and
+	  legacy PL_custom_op_names registrations
+	- Add custom op name fallback for 5.10-5.12 via Perl_custom_op_name
+	  (legacy PL_custom_op_names only; XOP infrastructure doesn't exist)
+

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package YAML::PP::Dumper;
 
-our $VERSION = 'v0.39.0'; # VERSION
+our $VERSION = 'v0.40.0'; # VERSION
 
 use Scalar::Util qw/ blessed refaddr reftype /;
 use YAML::PP;

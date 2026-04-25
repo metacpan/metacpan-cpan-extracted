@@ -1,3 +1,58 @@
+3.14  2026-04-24
+
+    - changed `install.sh` to choose `~/.bashrc`, `~/.zshrc`, or `~/.profile`
+      from the preferred login shell even when the installer itself is run
+      through plain `sh`
+    - added a regression gate so `curl ... | sh` style installs no longer leak
+      the fallback `dashboard shell sh` bootstrap into `~/.profile` for zsh
+      users
+
+3.13  2026-04-24
+
+    - fixed the generated `dashboard shell zsh` bootstrap so it initializes
+      `compinit` before any `compdef` registrations in fresh zsh shells
+    - tightened gate hygiene by removing stale extracted
+      `Developer-Dashboard-*` build trees instead of leaving them behind as
+      false-clean artifacts
+
+3.12  2026-04-24
+
+    - changed `dashboard of` and `dashboard open-file` to resolve configured
+      file aliases as direct file targets before module or regex lookup
+    - changed path-alias scoped open-file flows so `dashboard of <alias>
+      <relative-file>` opens an exact relative file inside the aliased folder
+      before falling back to regex search
+    - added explicit `Developer::Dashboard::File->resolve($name)` support and
+      coverage for dynamic numeric alias lookups through the public file
+      wrapper
+    - added focused smoke, unit, and open-file resolver coverage for direct
+      file aliases, path-alias scoped exact files, and Perl-side numeric alias
+      access
+
+3.11  2026-04-24
+
+    - changed `dashboard path add .` to save the current working directory
+      under its basename instead of treating `.` as an invalid path token
+    - changed `dashboard path add <name> .` to use the current working
+      directory as the target path shorthand for explicit aliases
+    - changed `dashboard path del .` and `dashboard path rm .` to remove the
+      alias that points at the current working directory, and added `rm` as a
+      public alias for `del`
+    - added focused CLI smoke and refactor coverage for the current-directory
+      shorthand and the new `path rm` command spelling
+
+3.10  2026-04-24
+
+    - added `dashboard file ...` and `dashboard files` as file-oriented twins
+      of the existing path alias commands
+    - added config-backed named file alias persistence, resolution, listing,
+      and Perl API coverage through `Developer::Dashboard::File` and
+      `Developer::Dashboard::FileRegistry`
+    - staged private `file` and `files` helpers under
+      `~/.developer-dashboard/cli/dd/` so the public entrypoint stays thin
+    - added smoke, unit, loader, and refactor coverage for file alias CLI
+      flows, config storage, helper staging, and public module behavior
+
 3.09  2026-04-23
 
     - changed `dashboard skills install` to default to table output and require

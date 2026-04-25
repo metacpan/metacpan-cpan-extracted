@@ -1,0 +1,480 @@
+#!/usr/bin/env perl
+# PODNAME: mcp-run-compress
+# ABSTRACT: Wrap a shell command through MCP::Run::Compress for LLM-friendly output
+
+use strict;
+use warnings;
+use Getopt::Long qw( GetOptions );
+use MIME::Base64 qw( encode_base64 decode_base64 );
+use JSON::MaybeXS ();
+use Path::Tiny qw( path );
+use MCP::Run::Bash;
+use MCP::Run::Compress;
+
+my ( $hook, $b64, $install, $help, $filter_files, $cmd_b64 );
+GetOptions(
+  'hook'           => \$hook,
+  'b64=s'          => \$b64,
+  'install-claude' => \$install,
+  'filter-files'   => \$filter_files,
+  'cmd-b64=s'      => \$cmd_b64,
+  'help|h'         => \$help,
+) or do { print_help(); exit 2 };
+
+if ($hook)         { exit run_hook() }
+if (defined $b64)  { exit run_command($b64) }
+if ($filter_files) { exit run_filter_files( $cmd_b64, @ARGV ) }
+if ($install)      { exit install_claude() }
+
+print_help();
+exit 0;
+
+# 'docker' means: install_claude writes a hook that spawns a docker
+# container, and --hook emits a pipe-through-docker rewrite instead of
+# a --b64 self-wrap. Baked into the Docker image via ENV; unset on a
+# native Perl install. Override manually by exporting the env var.
+sub install_mode {
+  return $ENV{MCP_RUN_COMPRESS_INSTALL_MODE} // 'native';
+}
+
+sub image_ref {
+  return $ENV{MCP_RUN_COMPRESS_IMAGE} // 'raudssus/mcp-run-compress:latest';
+}
+
+sub _json {
+  return JSON::MaybeXS->new( utf8 => 1, canonical => 1, convert_blessed => 1 );
+}
+
+sub run_hook {
+  my ( $self ) = @_;
+  my $json = _json();
+  my $raw  = do { local $/; <STDIN> };
+  my $in   = eval { $json->decode($raw) } || {};
+  my $cmd  = $in->{tool_input}{command};
+
+  my $bypass =
+       !defined $cmd
+    || !length $cmd
+    || $in->{tool_input}{run_in_background}
+    || $cmd =~ /\bmcp-run-compress\b/;
+
+  my $out = {
+    hookSpecificOutput => {
+      hookEventName => 'PreToolUse',
+    },
+  };
+
+  if ( !$bypass && $cmd =~ /\A\s*no-compress\s+(.+)\z/s ) {
+    $out->{hookSpecificOutput}{updatedInput} = { command => $1 };
+    $bypass = 1;
+  }
+
+  unless ($bypass) {
+    my $encoded  = encode_base64( $cmd, '' );
+    my $rewrite  = install_mode() eq 'docker'
+      ? docker_pipe_rewrite($encoded)
+      : "mcp-run-compress --b64 $encoded";
+    $out->{hookSpecificOutput}{updatedInput} = { command => $rewrite };
+  }
+
+  print $json->encode($out);
+  return 0;
+}
+
+# Emitted when the hook is running inside the Docker image. The rewritten
+# command runs the user's original bash on the HOST (host cwd, host env,
+# host binaries — `git`, `dzil`, etc. all work), then streams stdout and
+# stderr into the docker image for compression. The host only needs bash,
+# coreutils (mktemp, base64) and docker — no Perl.
+sub docker_pipe_rewrite {
+  my ($encoded) = @_;
+  my $image = image_ref();
+  # base64 alphabet is [A-Za-z0-9+/=] so single-quote wrapping is safe.
+  return join( ' ',
+    q({),
+    q(__o=$(mktemp) && __e=$(mktemp) || exit 1;),
+    q(trap 'rm -f "$__o" "$__e"' EXIT;),
+    qq(bash -c "\$(printf %s '$encoded' | base64 -d)" >"\$__o" 2>"\$__e";),
+    q(__ec=$?;),
+    qq(docker run --rm -v "\$__o:/in/stdout:ro" -v "\$__e:/in/stderr:ro" '$image' --filter-files --cmd-b64 '$encoded' /in/stdout /in/stderr;),
+    q(exit $__ec;),
+    q(}),
+  );
+}
+
+sub run_filter_files {
+  my ( $encoded, $stdout_path, $stderr_path ) = @_;
+  unless ( defined $stdout_path && defined $stderr_path ) {
+    print STDERR "mcp-run-compress: --filter-files needs STDOUT_PATH STDERR_PATH\n";
+    return 2;
+  }
+  my $command = defined $encoded ? decode_base64($encoded) : '';
+  my $stdout  = path($stdout_path)->slurp_raw;
+  my $stderr  = path($stderr_path)->slurp_raw;
+
+  my $compressor = MCP::Run::Compress->new;
+  my ( $o, $e ) = $compressor->compress( $command, $stdout, $stderr );
+
+  if ( length $o ) {
+    print STDOUT $o;
+    print STDOUT "\n" unless $o =~ /\n\z/;
+  }
+  if ( length $e ) {
+    print STDERR $e;
+    print STDERR "\n" unless $e =~ /\n\z/;
+  }
+  return 0;
+}
+
+sub run_command {
+  my ( $encoded ) = @_;
+  my $command = decode_base64($encoded);
+
+  my $server = MCP::Run::Bash->new;
+  my $result = $server->execute( $command, undef, 1800 );
+
+  my $compressor = MCP::Run::Compress->new;
+  my ( $stdout, $stderr ) = $compressor->compress(
+    $command,
+    $result->{stdout} // '',
+    $result->{stderr} // '',
+  );
+
+  if ( length $stdout ) {
+    print STDOUT $stdout;
+    print STDOUT "\n" unless $stdout =~ /\n\z/;
+  }
+  if ( length $stderr ) {
+    print STDERR $stderr;
+    print STDERR "\n" unless $stderr =~ /\n\z/;
+  }
+  if ( defined $result->{error} ) {
+    print STDERR "mcp-run-compress: $result->{error}\n";
+  }
+
+  return $result->{exit_code} // 1;
+}
+
+sub install_claude {
+  my $file = path( $ENV{HOME} // glob('~'), '.claude', 'settings.json' );
+  my $json = JSON::MaybeXS->new(
+    utf8            => 1,
+    pretty          => 1,
+    canonical       => 1,
+    convert_blessed => 1,
+  );
+
+  my $cfg = {};
+  if ( $file->exists ) {
+    my $raw = $file->slurp_utf8;
+    $cfg = $json->decode($raw) if length $raw;
+  }
+
+  $cfg->{hooks}             //= {};
+  $cfg->{hooks}{PreToolUse} //= [];
+
+  for my $group ( @{ $cfg->{hooks}{PreToolUse} } ) {
+    next unless ref $group eq 'HASH' && ( $group->{matcher} // '' ) eq 'Bash';
+    for my $h ( @{ $group->{hooks} // [] } ) {
+      next unless ref $h eq 'HASH';
+      if ( ( $h->{command} // '' ) =~ /\bmcp-run-compress\b/ ) {
+        print "Already installed in $file\n";
+        return 0;
+      }
+    }
+  }
+
+  my $hook_cmd = install_mode() eq 'docker'
+    ? 'docker run --rm -i ' . image_ref() . ' --hook'
+    : 'mcp-run-compress --hook';
+
+  push @{ $cfg->{hooks}{PreToolUse} }, {
+    matcher => 'Bash',
+    hooks   => [ { type => 'command', command => $hook_cmd } ],
+  };
+
+  $file->parent->mkpath unless $file->parent->exists;
+  $file->spew_utf8( $json->encode($cfg) );
+  print "Installed PreToolUse hook in $file\n";
+
+  my $skill = $file->parent->child(
+    'skills', 'bash-output-is-compressed-prefix-no-compress-to-bypass', 'SKILL.md',
+  );
+  $skill->parent->mkpath unless $skill->parent->exists;
+  $skill->spew_utf8(<<'SKILL');
+---
+name: bash-output-is-compressed-prefix-no-compress-to-bypass
+description: READ THIS BEFORE RUNNING ANY Bash TOOL COMMAND. Every Bash tool call is routed through the mcp-run-compress hook, which strips columns, noise, and truncates long output so you see a compressed view — NOT the real shell output. If you need raw unfiltered output (full `ls -l` columns, verbose logs, exact byte counts, etc.), prefix the command with `no-compress ` for that single invocation.
+---
+
+Every Bash command you run is silently rewritten by a PreToolUse hook into
+`mcp-run-compress --b64 <...>`, which filters and truncates the output.
+
+To get the real, unmodified output for one command, prefix it with `no-compress `:
+
+    no-compress ls -l
+    no-compress cat /var/log/syslog
+    no-compress dmesg
+
+The hook strips the prefix and runs the rest raw. Use it whenever compressed
+output would hide something you actually need to see.
+SKILL
+  print "Installed skill at $skill\n";
+
+  return 0;
+}
+
+sub print_help {
+  print <<'HELP';
+mcp-run-compress — wrap a shell command through MCP::Run::Compress filters
+so the output is LLM-friendly (noise stripped, long output truncated).
+
+INSTALL MODES
+
+  Two install modes, selected automatically by the environment:
+
+    native   User has Perl and installed MCP::Run (via cpanm / Dist::Zilla).
+             The hook is `mcp-run-compress --hook` and rewrites bash
+             commands to `mcp-run-compress --b64 <…>`, all in-process.
+
+    docker   User has only Docker (no Perl). The hook is
+             `docker run --rm -i raudssus/mcp-run-compress --hook` and
+             rewrites bash commands to a small shell snippet that runs
+             the original command on the HOST and pipes stdout/stderr
+             through a Docker container for compression.
+
+  The mode is selected by the MCP_RUN_COMPRESS_INSTALL_MODE env var.
+  The Docker image sets this to `docker` in its ENV; native installs
+  leave it unset (default `native`). Override manually if you need to.
+
+USAGE
+
+  mcp-run-compress --b64 <BASE64>
+      Decode the base64-encoded command, execute it, and emit the compressed
+      stdout/stderr with the original exit code. Used by the native-mode
+      hook rewrite.
+
+  mcp-run-compress --filter-files --cmd-b64 <BASE64> STDOUT_PATH STDERR_PATH
+      Read captured stdout and stderr from two files, compress them using
+      the decoded command as context, emit compressed stdout to fd 1 and
+      compressed stderr to fd 2. Used by the docker-mode hook rewrite
+      (the host runs the original command and mounts the temp files into
+      the container).
+
+  mcp-run-compress --hook
+      Claude Code PreToolUse hook mode. Reads the hook invocation JSON on
+      stdin, emits a response JSON on stdout that rewrites the Bash tool's
+      `command`. The exact rewrite depends on the install mode (see
+      above). Background jobs (`run_in_background: true`) and already-
+      wrapped commands are passed through untouched.
+
+  mcp-run-compress --install-claude
+      Patch ~/.claude/settings.json to register the hook as a PreToolUse
+      hook on the Bash tool. The hook command written into settings.json
+      matches the current install mode. Idempotent.
+
+  mcp-run-compress [--help]
+      Print this help.
+
+ENV VARS
+
+  MCP_RUN_COMPRESS_INSTALL_MODE   `native` (default) or `docker`.
+  MCP_RUN_COMPRESS_IMAGE          Docker image ref for the hook command
+                                  and for the pipe-through container.
+                                  Defaults to `raudssus/mcp-run-compress:latest`
+                                  but the shipped Docker image pins this
+                                  to the exact version that built it.
+
+MANUAL INSTALL
+
+  Add this block to ~/.claude/settings.json (merge with existing hooks):
+
+    {
+      "hooks": {
+        "PreToolUse": [
+          {
+            "matcher": "Bash",
+            "hooks": [
+              { "type": "command", "command": "mcp-run-compress --hook" }
+            ]
+          }
+        ]
+      }
+    }
+
+  From then on every Bash tool call is rewritten to:
+
+      mcp-run-compress --b64 <base64 of your command>
+
+  which executes via IPC::Open3, routes stdout/stderr through the
+  MCP::Run::Compress filter pipeline, and emits the compressed streams
+  with the original exit code — transparent to Claude Code.
+
+NOTES
+
+  * The hook only rewrites the Bash `command`; it does not set a
+    permission decision, so the usual allow/deny prompts keep firing.
+  * Background commands (`run_in_background: true`) and commands that
+    already reference `mcp-run-compress` are not rewritten.
+  * Prefix a command with `no-compress ` to bypass compression for that
+    single invocation — the hook strips the prefix and runs the rest raw.
+    `--install-claude` also drops a minimal skill at
+    ~/.claude/skills/bash-output-is-compressed-prefix-no-compress-to-bypass/
+    that tells Claude about it.
+
+SEE ALSO
+  MCP::Run::Compress, MCP::Run::Bash, mcp-run-bash
+HELP
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+mcp-run-compress - Wrap a shell command through MCP::Run::Compress for LLM-friendly output
+
+=head1 VERSION
+
+version 0.004
+
+=head1 SYNOPSIS
+
+  # One-shot install (Docker, no Perl needed)
+  docker run --rm -v "$HOME:$HOME" -e HOME="$HOME" \
+      raudssus/mcp-run-compress --install-claude
+
+  # One-shot install (native Perl)
+  cpanm MCP::Run
+  mcp-run-compress --install-claude
+
+  # Bypass compression for a single Bash call
+  no-compress ls -l
+
+=head1 DESCRIPTION
+
+Registers a C<PreToolUse> hook on Claude Code's C<Bash> tool that rewrites
+every command so its output is passed through L<MCP::Run::Compress>. 30+
+command-specific filters strip noise (C<make> "Entering directory"),
+reduce columns (C<ls -l> to type+name), drop progress lines (C<cpanm>,
+C<cargo>, C<npm>), and cap long output with head+tail. Prefix a command
+with C<no-compress > to bypass the filter for a single invocation.
+
+=head1 NAME
+
+mcp-run-compress - Claude Code PreToolUse hook that compresses Bash output
+
+=head1 MODES
+
+Two install modes, selected by the C<MCP_RUN_COMPRESS_INSTALL_MODE> env
+var:
+
+=over 4
+
+=item C<native> (default)
+
+The hook is C<mcp-run-compress --hook> and rewrites commands to
+C<mcp-run-compress --b64 E<lt>...E<gt>>. Everything runs in one Perl process.
+
+=item C<docker>
+
+The hook is C<docker run --rm -i raudssus/mcp-run-compress --hook> and
+rewrites commands to a host-side shell snippet that runs the original
+command on the host, captures its output into temp files, and mounts
+those into a Docker container for compression. The host needs only
+C<bash>, C<mktemp>, C<base64>, and C<docker> — no Perl.
+
+=back
+
+The shipped Docker image bakes C<MCP_RUN_COMPRESS_INSTALL_MODE=docker>
+into its runtime ENV, so C<--install-claude> run inside the container
+produces the Docker-mode hook automatically. Native C<cpanm> installs
+leave the var unset.
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<--install-claude>
+
+Patch C<~/.claude/settings.json> to register the hook (idempotent), and
+drop a minimal skill under
+C<~/.claude/skills/bash-output-is-compressed-prefix-no-compress-to-bypass/>
+that tells Claude about the C<no-compress > bypass prefix. The hook
+command written into C<settings.json> matches the current install mode.
+
+=item C<--hook>
+
+Claude Code C<PreToolUse> hook entry point. Reads the hook invocation
+JSON on stdin, emits a response JSON on stdout with an C<updatedInput>
+that rewrites the Bash C<command> according to the install mode.
+Background jobs (C<run_in_background: true>) and already-wrapped
+commands pass through unchanged.
+
+=item C<--b64 BASE64>
+
+Native-mode executor. Decode the base64 command, run it via
+L<MCP::Run::Bash>, compress stdout and stderr, emit them with the
+original exit code.
+
+=item C<--filter-files --cmd-b64 BASE64 STDOUT_PATH STDERR_PATH>
+
+Docker-mode filter. Read captured stdout and stderr from two files,
+compress them using the decoded command as context, emit compressed
+stdout to fd 1 and compressed stderr to fd 2. Invoked by the
+pipe-through-docker rewrite.
+
+=item C<--help>
+
+Print a more detailed help message.
+
+=back
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item C<MCP_RUN_COMPRESS_INSTALL_MODE>
+
+C<native> (default) or C<docker>. Controls both the hook command written
+by C<--install-claude> and the rewrite produced by C<--hook>.
+
+=item C<MCP_RUN_COMPRESS_IMAGE>
+
+Image reference used by the docker-mode hook. Defaults to
+C<raudssus/mcp-run-compress:latest>. The shipped Docker image pins this
+to the exact version that built it, so C<--install-claude> from inside
+the container writes a versioned hook.
+
+=back
+
+=head1 SEE ALSO
+
+L<MCP::Run::Compress>, L<MCP::Run::Bash>, L<mcp-run-bash>
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-mcp-run/issues>.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudssus.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

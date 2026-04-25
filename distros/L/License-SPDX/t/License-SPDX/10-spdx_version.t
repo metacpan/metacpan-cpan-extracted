@@ -8,4 +8,4 @@ use Test::NoWarnings;
 # Test.
 my $obj = License::SPDX->new;
 my $ret = $obj->spdx_version;
-is($ret, '3.21', 'SPDX license version (3.21).');
+is($ret, '3.28.0', 'SPDX license version (3.28.0).');

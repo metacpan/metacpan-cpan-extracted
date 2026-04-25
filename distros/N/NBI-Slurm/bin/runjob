@@ -40,6 +40,7 @@ my $name;
 my $email_address = $config->{'email'} // undef;
 my $mail_type = $config->{'email_type'} // "none";
 my $opt_placeholder = $config->{'placeholder'} // "#FILE#";
+my $params_array_file;
 my $command;
 my $verbose;
 my $debug;
@@ -52,7 +53,7 @@ GetOptions(
     'm|memory=s'    => \$memory,
     'c|cores|threads=i' => \$threads,
     'q|queue=s'     => \$queue,
-    'T|t|time=s'      => \$time,
+    'T|time=s'      => \$time,
     'w|tmpdir=s'    => \$tmpdir,
     'n|name=s'      => \$name,
     'r|run'         => \$run,
@@ -60,6 +61,7 @@ GetOptions(
     'e|mail-type=s' => \$mail_type, # 'BEGIN,END,FAIL,REQUEUE,ALL'
     'after=s'       => \@afterok,
     'f|files=s'       => \my @files,
+    'p|params-array=s' => \$params_array_file,
     'placeholder=s' => \$opt_placeholder,
     'gpu'           => \$gpu,
     'option=s'      => \@slurm_options,
@@ -84,8 +86,17 @@ my $time_hours = NBI::Opts::_time_to_hour($time);
 $queue = update_queue($queue, $time_hours);
 $command = join(" ", @ARGV);
 usage(1) unless ($command);
- 
+
+if (@files and defined $params_array_file) {
+    say STDERR RED, BOLD, "ERROR:", RESET, " --files and --params-array are mutually exclusive";
+    exit 1;
+}
+
 my @abs_files = get_abs_files(@files);
+my ($params_array_abs, $params_rows) = get_params_array_info($params_array_file, $command);
+my $total_array_tasks = @abs_files ? scalar(@abs_files) : $params_rows;
+my $array_task_limit = get_array_task_limit($config);
+my @array_chunks = build_array_chunks($total_array_tasks, $array_task_limit);
 
 
 if ($verbose) {
@@ -97,6 +108,9 @@ if ($verbose) {
     say STDERR YELLOW, "Tmpdir:     ", RESET, $tmpdir // "(not set)";
     say STDERR YELLOW, "Name:       ", RESET, $name // "(not set)";
     say STDERR YELLOW, "Command:    ", RESET, $command // "(not set)";
+    say STDERR YELLOW, "Params TSV: ", RESET, $params_array_abs if defined $params_array_abs;
+    say STDERR YELLOW, "Array size: ", RESET, $total_array_tasks if $total_array_tasks;
+    say STDERR YELLOW, "Array cap:  ", RESET, $array_task_limit if defined $array_task_limit;
 }
 # Check threadshours
 if (-d $time) {
@@ -161,20 +175,6 @@ if (not NBI::Slurm::valid_queue($queue)) {
     
 }
 
-my $opts = NBI::Opts->new(
-    -queue => $queue,
-    -threads => $threads,
-    -memory => $memory,
-    -time   => $time,
-    -tmpdir => $tmpdir,
-    -email_address => $email_address,
-    -email_type => $mail_type,
-    -opts => \@additional_opts,
-    -files => \@abs_files,
-    -placeholder => $opt_placeholder,
-);
-
-
 # Eco scheduling
 # eco_default from config defaults to 1 (on) if not explicitly set
 my $eco_default = defined $config->{eco_default} ? $config->{eco_default} : $NBI::EcoScheduler::DEFAULTS{eco_default};
@@ -183,33 +183,10 @@ my $use_eco = $opt_no_eco ? 0
             :               $eco_default;
 
 if ($use_eco) {
-    if (defined $opts->{start_time} || defined $opts->{start_date}) {
+    if (defined $config->{start_time} || defined $config->{start_date}) {
         say STDERR YELLOW, "[eco] --begin already set explicitly, ignoring eco scheduling", RESET;
-    } else {
-        my ($begin_epoch, $tier) = NBI::EcoScheduler::find_eco_begin($opts->hours, $config);
-        if (defined $begin_epoch) {
-            my $begin_str = NBI::EcoScheduler::epoch_to_slurm($begin_epoch);
-            my $delay     = NBI::EcoScheduler::format_delay($begin_epoch);
-            # Store directly since the parsers accept already-normalised YYYY-MM-DD / HH:MM:SS
-            ($opts->{start_date}, $opts->{start_time}) = split /T/, $begin_str;
-            my $tier_warn = $tier == 2 ? " (job may overrun eco window)"
-                          : $tier == 3 ? " (job may overlap peak hours — best available)"
-                          :              "";
-            say STDERR GREEN, "[eco] Job scheduled for $begin_str (in $delay)$tier_warn", RESET;
-        } else {
-            say STDERR YELLOW, "[eco] No eco slot found in lookahead period, submitting immediately", RESET;
-        }
     }
 }
-
-if ($verbose) {
-    say STDERR GREEN, "CONFIG:\n", RESET;
-    xdump($config);
-    print STDERR "\n";
-    #say STDERR GREEN, "OPTS:\n", RESET;
-    say STDERR $opts->view();
-}
-
 
 sub xdump {
     my ($hash_of_hashes, $indent) = @_;
@@ -226,51 +203,118 @@ sub xdump {
 }
 
 
-# If the command starts with a number, it might be a typo like -t 8h instead
-my $job = NBI::Job->new(
-    -name => $name,
-    -command =>  "cd \"$user_current_dir\"",
-    -opts => $opts,
-);
-if ($debug) {
-    say STDERR YELLOW, "JOB:\n", RESET, Dumper($job);
+if (@array_chunks > 1) {
+    say STDERR YELLOW, "[array] Splitting $total_array_tasks tasks into ", scalar(@array_chunks), " jobs", RESET;
 }
-$job->append_command($command);
-if ($verbose and not $run) {
-    say STDERR GREEN, "JOB SCRIPT\n", RESET;
-    say STDERR $job->script();
+
+my @jobs;
+my $name_width = scalar(@array_chunks) > 1 ? length(scalar(@array_chunks)) : 0;
+for my $chunk_idx (0 .. $#array_chunks) {
+    my ($array_offset, $chunk_tasks) = @{$array_chunks[$chunk_idx]};
+    my @job_files = @abs_files;
+    my $job_params_array = $params_array_abs;
+    my $job_params_rows = $params_rows;
+    my $job_array_offset = 0;
+
+    if (@abs_files && @array_chunks > 1) {
+        @job_files = @abs_files[$array_offset .. ($array_offset + $chunk_tasks - 1)];
+    } elsif (defined $params_array_abs) {
+        $job_array_offset = $array_offset;
+    }
+
+    my $job_name = $name;
+    if (@array_chunks > 1) {
+        $job_name = sprintf("%s.part%0*d", $name, $name_width, $chunk_idx + 1);
+    }
+
+    my $opts = NBI::Opts->new(
+        -queue => $queue,
+        -threads => $threads,
+        -memory => $memory,
+        -time   => $time,
+        -tmpdir => $tmpdir,
+        -email_address => $email_address,
+        -email_type => $mail_type,
+        -opts => \@additional_opts,
+        -files => \@job_files,
+        -params_array => $job_params_array,
+        -params_rows => $job_params_rows,
+        -placeholder => $opt_placeholder,
+        -array_offset => $job_array_offset,
+        -array_tasks => $chunk_tasks,
+    );
+
+    if ($use_eco) {
+        my ($begin_epoch, $tier) = NBI::EcoScheduler::find_eco_begin($opts->hours, $config);
+        if (defined $begin_epoch) {
+            my $begin_str = NBI::EcoScheduler::epoch_to_slurm($begin_epoch);
+            my $delay     = NBI::EcoScheduler::format_delay($begin_epoch);
+            ($opts->{start_date}, $opts->{start_time}) = split /T/, $begin_str;
+            my $tier_warn = $tier == 2 ? " (job may overrun eco window)"
+                          : $tier == 3 ? " (job may overlap peak hours — best available)"
+                          :              "";
+            say STDERR GREEN, "[eco] Job scheduled for $begin_str (in $delay)$tier_warn", RESET if $chunk_idx == 0;
+        } else {
+            say STDERR YELLOW, "[eco] No eco slot found in lookahead period, submitting immediately", RESET if $chunk_idx == 0;
+        }
+    }
+
+    if ($verbose) {
+        say STDERR GREEN, "CONFIG:\n", RESET if $chunk_idx == 0;
+        xdump($config) if $chunk_idx == 0;
+        print STDERR "\n" if $chunk_idx == 0;
+        say STDERR $opts->view();
+    }
+
+    my $job = NBI::Job->new(
+        -name => $job_name,
+        -command =>  "cd \"$user_current_dir\"",
+        -opts => $opts,
+    );
+    if ($debug) {
+        say STDERR YELLOW, "JOB:\n", RESET, Dumper($job);
+    }
+    $job->append_command($command);
+    push @jobs, $job;
 }
 
 
 my $err = 0;
 if ($run) {
-    
-    if (my $j = $job->run()) {
-        
-        if ($verbose) {
-            #say STDERR GREEN, "JOB OBJECT:\n", RESET;
-            say STDERR $job->view();
+    my @job_ids;
+    for my $job (@jobs) {
+        my $j = $job->run();
+        if ($j) {
+            if ($verbose) {
+                say STDERR $job->view();
+            }
+            push @job_ids, $j;
+        } else {
+            say STDERR RED, "Job not submitted: $j", RESET;
+            if ($verbose) {
+                say STDERR $job->view();
+            }
+            $err = 1;
+            last;
         }
-
-        say "$j";
-    } else {
-        say STDERR RED, "Job not submitted: $j", RESET;
-        if ($verbose) {
-            #say STDERR RED, "JOB OBJECT:\n", RESET;
-            say STDERR $job->view();
-        }
-        $err = 1;
+    }
+    if (!$err) {
+        say $_ for @job_ids;
     }
 } else {
-    say STDERR GREEN, "JOB SCRIPT:\n", RESET;
-    say $job->script();
+    for my $idx (0 .. $#jobs) {
+        say STDERR GREEN, "JOB SCRIPT\n", RESET if @jobs == 1;
+        say STDERR GREEN, "JOB SCRIPT ", ($idx + 1), "/", scalar(@jobs), "\n", RESET if @jobs > 1;
+        say $jobs[$idx]->script();
+    }
 }
 
 
 if ($err) {
     exit 1;
-} else {
-    say STDERR GREEN, "Job sumbitted: ", $job->jobid, RESET, "\t(", $job->name, ")", RESET;
+} elsif ($run) {
+    my @submitted = map { $_->jobid } @jobs;
+    say STDERR GREEN, "Jobs submitted: ", join(",", @submitted), RESET;
 }
 sub usage {
     say STDERR <<END;
@@ -286,7 +330,11 @@ sub usage {
     -r, --run        Run the job (otherwise, just print the script)
     -f, --files      Input files for array (either specify -f as many times as needed or
                      use a _quoted_ pattern like "*.fasta" to include multiple files)
+    -p, --params-array
+                     TSV file for array jobs; refer to columns as ##1##, ##2##, ...
+                     Mutually exclusive with --files
     --placeholder    Placeholder for array input files [default: #FILE#]
+                     Ignored when --params-array is used
     --gpu            Request GPU resources (adds --gres=gpu:1)
     --option VALUE   Additional SLURM options (can be used multiple times)
     --eco            Schedule job in next low-energy window (overrides eco_default=0)
@@ -382,6 +430,101 @@ sub get_abs_files {
     return @abs_files;
 }
 
+sub get_params_array_info {
+    my ($file, $command) = @_;
+    return (undef, 0) unless defined $file;
+
+    unless (-e $file) {
+        say STDERR RED, BOLD, "ERROR:", RESET, " $file does not exist!";
+        exit 1;
+    }
+
+    my $abs_file = abs_path($file);
+    open(my $fh, "<", $abs_file) or do {
+        say STDERR RED, BOLD, "ERROR:", RESET, " Cannot read $abs_file: $!";
+        exit 1;
+    };
+
+    my %placeholders;
+    while ($command =~ /##(\d+)##/g) {
+        $placeholders{$1} = 1;
+    }
+    my $max_placeholder = 0;
+    for my $n (keys %placeholders) {
+        $max_placeholder = $n if $n > $max_placeholder;
+    }
+    if ($max_placeholder == 0) {
+        say STDERR RED, BOLD, "ERROR:", RESET, " --params-array requires placeholders like ##1## in the command";
+        exit 1;
+    }
+
+    my $rows = 0;
+    while (my $line = <$fh>) {
+        chomp $line;
+        $line =~ s/\r$//;
+        next if $line =~ /^\s*$/;
+        next if $line =~ /^\s*#/;
+        my @fields = split /\t/, $line, -1;
+        if (scalar(@fields) < $max_placeholder) {
+            say STDERR RED, BOLD, "ERROR:", RESET, " $abs_file row ", ($rows + 1), " has ", scalar(@fields), " columns but the command requires ##$max_placeholder##";
+            exit 1;
+        }
+        $rows++;
+    }
+    close $fh;
+
+    if ($rows == 0) {
+        say STDERR RED, BOLD, "ERROR:", RESET, " $abs_file does not contain any usable TSV rows";
+        exit 1;
+    }
+
+    return ($abs_file, $rows);
+}
+
+sub build_array_chunks {
+    my ($total_tasks, $task_limit) = @_;
+    return ([0, 0]) unless $total_tasks;
+    return ([0, $total_tasks]) unless defined $task_limit && $task_limit > 0 && $total_tasks > $task_limit;
+
+    my @chunks;
+    for (my $offset = 0; $offset < $total_tasks; $offset += $task_limit) {
+        my $chunk_tasks = $task_limit;
+        my $remaining = $total_tasks - $offset;
+        $chunk_tasks = $remaining if $remaining < $chunk_tasks;
+        push @chunks, [$offset, $chunk_tasks];
+    }
+    return @chunks;
+}
+
+sub get_array_task_limit {
+    my ($config) = @_;
+
+    if (defined $ENV{NBI_MAX_ARRAY_SIZE} && $ENV{NBI_MAX_ARRAY_SIZE} =~ /^\d+$/ && $ENV{NBI_MAX_ARRAY_SIZE} > 0) {
+        return $ENV{NBI_MAX_ARRAY_SIZE};
+    }
+    if (defined $config->{max_array_size} && $config->{max_array_size} =~ /^\d+$/ && $config->{max_array_size} > 0) {
+        return $config->{max_array_size};
+    }
+
+    my $output = `scontrol show config 2>/dev/null`;
+    return undef if $? != 0 || !$output;
+
+    my @limits;
+    if ($output =~ /^MaxArraySize\s*=\s*(\d+)/m) {
+        push @limits, $1 if $1 > 0;
+    }
+    if ($output =~ /max_array_tasks=(\d+)/) {
+        push @limits, $1 if $1 > 0;
+    }
+    return undef unless @limits;
+
+    my $limit = shift @limits;
+    for my $candidate (@limits) {
+        $limit = $candidate if $candidate < $limit;
+    }
+    return $limit;
+}
+
 __END__
 
 =pod
@@ -394,7 +537,7 @@ runjob - Run a job in the cluster using NBI::Slurm
 
 =head1 VERSION
 
-version 0.20.1
+version 0.21.0
 
 =head1 SYNOPSIS
 
@@ -447,10 +590,19 @@ Specifies the temporary (working) directory for the job. The default value is "/
 Specifies input files or file patterns for the job. This option can be used multiple times.
 You can use quoted patterns like "*.fasta" to include multiple files matching the pattern.
 
+=item B<-p, --params-array> FILE
+
+Specifies a TSV file to drive a SLURM array job. Each non-empty, non-comment row
+becomes one array task, and columns are exposed in the command as placeholders like
+C<##1##>, C<##2##>, and C<##3##>.
+
+Mutually exclusive with C<--files>.
+
 =item B<--placeholder> STR [default: C<#FILE#>]
 
 Specifies a placeholder string to be used in the command for input files. 
-If not provided, the default placeholder is "#FILE#".
+If not provided, the default placeholder is "#FILE#". Ignored when using
+C<--params-array>.
 
 =item B<-a, --email-address> STR
 

@@ -1,3 +1,79 @@
+Revision history for MCP-Run
+
+0.004     2026-04-25 04:02:17Z
+
+  - Add C<validator> attribute to MCP::Run and MCP::Run::Bash. A coderef
+    can be provided to perform custom command validation before execution.
+    Return C<"1"> to allow, any other defined value to deny with a reason
+    string. Undefined return is treated as denied.
+  - Add parsed_command filter matching in MCP::Run::Compress using
+    Getopt::Long for order-independent flag parsing. New filters can use
+    C<< parsed_command->{program => 'git', subcommand => 'diff', flags => { stat => 1 } } >>
+    instead of regex C<< command => '^git\s+diff\b' >>.
+  - Add C<git diff --stat> filter with compact "N+M- filename" format.
+  - Add filters: C<netstat>, C<ip addr/route/link>, C<mount>, C<lsblk>, C<blkid>.
+  - Convert all existing filters (git, docker, kubectl, cargo, terraform,
+    helm, npm, pip, pytest, curl, wget, ansible-playbook, rsync, iptables,
+    ping, etc.) to use parsed_command approach.
+
+0.003     2026-04-24 19:22:16Z
+  - Ship a Docker image (raudssus/mcp-run-compress) so the Claude Code
+    hook can be installed without a Perl toolchain on the host. The
+    image is a multi-stage Dockerfile (perl:5.40-slim builder +
+    slim runtime) with ENTRYPOINT mcp-run-compress
+    - New env var MCP_RUN_COMPRESS_INSTALL_MODE selects `native`
+      (default, in-process wrapper) or `docker` (pipe-through-docker).
+      The shipped image bakes the var to `docker`, native Perl installs
+      leave it unset, so the same `--install-claude` call produces the
+      right hook in either context
+    - New env var MCP_RUN_COMPRESS_IMAGE overrides the image ref the
+      docker-mode hook uses. The shipped image pins itself to the exact
+      version that built it, so `--install-claude` from inside the
+      container writes a versioned hook into ~/.claude/settings.json
+    - In docker mode, --hook rewrites Bash commands to a small host-side
+      snippet that runs the original command on the host (host cwd,
+      host env, host binaries) and streams stdout/stderr through a
+      docker container for compression — the host only needs bash,
+      coreutils (mktemp, base64) and docker
+    - New --filter-files mode reads captured stdout/stderr from two
+      files and emits compressed streams; used by the docker rewrite
+    - Dist::Zilla release hook (maint/release-after.pl) builds and
+      pushes both :VERSION and :latest tags to Docker Hub as part of
+      `dzil release`, and uploads the CPAN tarball to the matching
+      GitHub release
+  - Declare JSON::MaybeXS and Path::Tiny as explicit runtime prereqs
+    (previously pulled in transitively)
+  - Add POD to bin/mcp-run-compress, rewrite README.md around the
+    Docker-first install flow
+
+0.002     2026-04-24 17:57:40Z
+
+  - Add bin/mcp-run-bash — stdio entry point for MCP::Run::Bash,
+    configurable via MCP_RUN_ALLOWED_COMMANDS, MCP_RUN_WORKING_DIRECTORY,
+    MCP_RUN_TIMEOUT, MCP_RUN_COMPRESS and MCP_RUN_TOOL_NAME env vars.
+    Compression is enabled by default; disable with MCP_RUN_COMPRESS=0
+  - Add MCP::Run::run_stdio convenience constructor
+  - Add bin/mcp-run-compress — wrap a shell command through
+    MCP::Run::Compress filters. Ships a Claude Code PreToolUse hook
+    (--hook) plus an --install-claude flag that registers the hook
+    in ~/.claude/settings.json so every Bash tool call gets its
+    output compressed automatically
+    - Prefix a Bash command with `no-compress ` to bypass compression
+      for that single invocation — the hook strips the prefix and
+      passes the raw command through unwrapped
+    - --install-claude also drops a minimal skill at
+      ~/.claude/skills/bash-output-is-compressed-prefix-no-compress-to-bypass/
+      that teaches Claude about the bypass
+
+  - Add MCP::Run::Compress for automatic output compression
+    - 8-stage filter pipeline (strip_ansi, match_output, transform,
+      strip_lines, keep_lines, truncate, head/tail, max_lines, on_empty)
+    - 30+ command-specific filters (ls, git, make, docker, kubectl, etc.)
+    - Output detection to differentiate command output formats
+    - Per-server and per-tool-call compression toggle
+  - Add MCP::Run::Compress::Filters.pod documentation
+  - Add Text::Trim dependency
+
 0.001     2026-02-25 01:32:04Z
 
   - Initial release

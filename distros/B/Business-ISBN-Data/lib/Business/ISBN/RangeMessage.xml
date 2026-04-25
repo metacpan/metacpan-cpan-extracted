@@ -17,8 +17,8 @@
 ]>
 <ISBNRangeMessage>
   <MessageSource>International ISBN Agency</MessageSource>
-  <MessageSerialNumber>4f84e98c-eda2-4bbc-b5d0-d441ff681f9c</MessageSerialNumber>
-  <MessageDate>Sat, 11 Apr 2026 05:27:01 BST</MessageDate>
+  <MessageSerialNumber>39703730-1fd8-4a64-88c4-6bf16572188a</MessageSerialNumber>
+  <MessageDate>Fri, 24 Apr 2026 05:40:23 BST</MessageDate>
   <EAN.UCCPrefixes>
     <EAN.UCC>
       <Prefix>978</Prefix>
@@ -1741,11 +1741,11 @@
       <Agency>Indonesia</Agency>
       <Rules>
         <Rule>
-          <Range>0000000-0499999</Range>
+          <Range>0000000-0599999</Range>
           <Length>2</Length>
         </Rule>
         <Rule>
-          <Range>0500000-1999999</Range>
+          <Range>0600000-1999999</Range>
           <Length>0</Length>
         </Rule>
         <Rule>

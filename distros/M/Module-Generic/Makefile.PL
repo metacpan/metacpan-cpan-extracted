@@ -38,9 +38,9 @@ my %WriteMakefileArgs = (
         'Config'                => 0,
         'Data::Dump'            => '1.23',
         'Data::UUID'            => '1.226',
-        'DateTime'              => '1.57',
-        'DateTime::Format::Strptime' => '1.79',
-        'DateTime::TimeZone'    => '2.51',
+        'DateTime::Lite'        => 'v0.6.3',
+        'DateTime::Format::Lite'=> 'v0.1.2',
+        'DateTime::Lite::TimeZone' => 'v0.5.3',
         'DateTime::TimeZone::Catalog::Extend' => 'v0.3.0',
         'Devel::StackTrace'     => 0,
         'Errno'                 => 0,
@@ -76,7 +76,7 @@ my %WriteMakefileArgs = (
         'URI::Escape'           => '5.09',
         'URI::file'             => '5.09',
         'Wanted'                => 'v0.1.0',
-        'XSLoader'              => '0.31',
+        'XSLoader'              => '0.24',
     },
     TEST_REQUIRES =>
     {

@@ -305,8 +305,8 @@ sub _mock_app {
     $app->{_started} = 1;
     $app->set_content('<h1>Static</h1>');
     $app->refresh;
-    ok(scalar @{$app->{_webview}{dispatch_eval_js}} >= 1, 'refresh dispatches eval');
-    like($app->{_webview}{dispatch_eval_js}[0], qr/Static/, 'refresh contains static content');
+    ok(scalar @{$app->{_webview}{eval_js}} >= 1, 'refresh dispatches eval');
+    ok((grep { /Static/ } @{$app->{_webview}{eval_js}}), 'refresh contains static content');
 }
 
 # === refresh with routes re-renders current route ===
@@ -316,8 +316,8 @@ sub _mock_app {
     $app->route('/page' => sub { '<p>Page Content</p>' });
     $app->{_current_route} = '/page';
     $app->refresh;
-    ok(scalar @{$app->{_webview}{dispatch_eval_js}} >= 1, 'refresh with route dispatches eval');
-    like($app->{_webview}{dispatch_eval_js}[0], qr/Page Content/, 'refresh renders route content');
+    ok(scalar @{$app->{_webview}{eval_js}} >= 1, 'refresh with route dispatches eval');
+    ok((grep { /Page Content/ } @{$app->{_webview}{eval_js}}), 'refresh renders route content');
 }
 
 # === navigate before started only stores route ===

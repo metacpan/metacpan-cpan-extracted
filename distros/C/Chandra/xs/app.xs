@@ -224,6 +224,119 @@ CODE:
 OUTPUT:
     RETVAL
 
+ # ---- theme($name_or_hashref) ----
+
+SV *
+theme(self, theme_arg)
+    SV *self
+    SV *theme_arg
+CODE:
+{
+    /* Call Chandra::Theme->apply($self, $theme_arg) */
+    int count;
+    dSP;
+    ENTER; SAVETMPS;
+    PUSHMARK(SP);
+    XPUSHs(sv_2mortal(newSVpvs("Chandra::Theme")));
+    XPUSHs(self);
+    XPUSHs(theme_arg);
+    PUTBACK;
+
+    /* Ensure Chandra::Theme is loaded */
+    load_module(PERL_LOADMOD_NOIMPORT,
+                newSVpvs("Chandra::Theme"), NULL);
+
+    count = call_method("apply", G_SCALAR | G_EVAL);
+    SPAGAIN;
+    if (SvTRUE(ERRSV)) {
+        POPs;
+        warn("Chandra::App::theme: %s", SvPV_nolen(ERRSV));
+        sv_setsv(ERRSV, &PL_sv_undef);
+    } else if (count > 0) {
+        POPs;
+    }
+    PUTBACK;
+    FREETMPS; LEAVE;
+
+    RETVAL = SvREFCNT_inc(self);
+}
+OUTPUT:
+    RETVAL
+
+ # ---- toast($message, %opts) ----
+
+SV *
+toast(self, message, ...)
+    SV *self
+    SV *message
+CODE:
+{
+    /* Call Chandra::Toast->show($self, $message, @rest) */
+    int count;
+    int i;
+    dSP;
+    ENTER; SAVETMPS;
+    PUSHMARK(SP);
+    XPUSHs(sv_2mortal(newSVpvs("Chandra::Toast")));
+    XPUSHs(self);
+    XPUSHs(message);
+    for (i = 2; i < items; i++) {
+        XPUSHs(ST(i));
+    }
+    PUTBACK;
+
+    load_module(PERL_LOADMOD_NOIMPORT,
+                newSVpvs("Chandra::Toast"), NULL);
+
+    count = call_method("show", G_SCALAR | G_EVAL);
+    SPAGAIN;
+    if (SvTRUE(ERRSV)) {
+        RETVAL = &PL_sv_undef;
+        if (count > 0) POPs;
+        warn("Chandra::App::toast: %s", SvPV_nolen(ERRSV));
+        sv_setsv(ERRSV, &PL_sv_undef);
+    } else if (count > 0) {
+        RETVAL = SvREFCNT_inc(POPs);
+    } else {
+        RETVAL = &PL_sv_undef;
+    }
+    PUTBACK;
+    FREETMPS; LEAVE;
+}
+OUTPUT:
+    RETVAL
+
+ # ---- dismiss_toast($id) ----
+
+SV *
+dismiss_toast(self, toast_id)
+    SV *self
+    SV *toast_id
+CODE:
+{
+    dSP;
+    ENTER; SAVETMPS;
+    PUSHMARK(SP);
+    XPUSHs(sv_2mortal(newSVpvs("Chandra::Toast")));
+    XPUSHs(self);
+    XPUSHs(toast_id);
+    PUTBACK;
+
+    load_module(PERL_LOADMOD_NOIMPORT,
+                newSVpvs("Chandra::Toast"), NULL);
+
+    call_method("dismiss", G_DISCARD | G_EVAL);
+    if (SvTRUE(ERRSV)) {
+        warn("Chandra::App::dismiss_toast: %s", SvPV_nolen(ERRSV));
+        sv_setsv(ERRSV, &PL_sv_undef);
+    }
+    FREETMPS; LEAVE;
+
+    RETVAL = SvREFCNT_inc(self);
+}
+OUTPUT:
+    RETVAL
+
  # ---- js($js_string) ----
 
 SV *
@@ -1138,6 +1251,9 @@ CODE:
         }
     }
 
+    /* Reload detection is handled natively via WKUserScript in webview-cocoa.c
+     * (runs at document start on every page load including reload). */
+
     done_inject_pcj:
     ;
 }
@@ -1749,6 +1865,21 @@ CODE:
 OUTPUT:
     RETVAL
 
+ # ---- on_reload($coderef) ----
+
+SV *
+on_reload(self, cb)
+    SV *self
+    SV *cb
+CODE:
+{
+    HV *hv = (HV *)SvRV(self);
+    (void)hv_stores(hv, "_on_reload", SvREFCNT_inc(cb));
+    RETVAL = SvREFCNT_inc(self);
+}
+OUTPUT:
+    RETVAL
+
  # ---- refresh() ----
 
 SV *
@@ -1763,6 +1894,18 @@ CODE:
     SV **wv_svp = hv_fetchs(hv, "_webview", 0);
 
     if (!wv_svp || !SvOK(*wv_svp)) goto done_refresh;
+
+    /* Reset injected flags so toast/modal re-inject their JS */
+    _toast_injected = 0;
+    _modal_injected = 0;
+
+    /* Re-inject the bridge JS (window.chandra) — lost on page reload */
+    {
+        PerlChandra *pc = CHANDRA_PC_FROM_APP(self);
+        if (pc && pc->initialized) {
+            webview_eval(&pc->wv, CHANDRA_BRIDGE_JS);
+        }
+    }
 
     if (routes_svp && SvROK(*routes_svp) && cr_svp && SvOK(*cr_svp)) {
         /* Re-render current route */
@@ -1789,19 +1932,20 @@ CODE:
         sv_catpvs(js, "');document.close();");
         SvREFCNT_dec(escaped);
 
+        /* Use eval_js (synchronous) so bridge is ready before on_reload fires */
         ENTER; SAVETMPS;
         PUSHMARK(SP);
         XPUSHs(*wv_svp);
         XPUSHs(sv_2mortal(js));
         PUTBACK;
-        call_method("dispatch_eval_js", G_DISCARD);
+        call_method("eval_js", G_DISCARD);
         FREETMPS; LEAVE;
 
-        /* Re-inject post content JS */
+        /* Re-inject post content JS (also synchronous) */
         ENTER; SAVETMPS;
         PUSHMARK(SP);
         XPUSHs(self);
-        XPUSHs(sv_2mortal(newSViv(1)));
+        XPUSHs(sv_2mortal(newSViv(0)));  /* 0 = use eval_js, not dispatch */
         PUTBACK;
         call_method("_inject_post_content_js", G_DISCARD);
         FREETMPS; LEAVE;
@@ -1818,13 +1962,13 @@ CODE:
         XPUSHs(*wv_svp);
         XPUSHs(sv_2mortal(js));
         PUTBACK;
-        call_method("dispatch_eval_js", G_DISCARD);
+        call_method("eval_js", G_DISCARD);
         FREETMPS; LEAVE;
 
         ENTER; SAVETMPS;
         PUSHMARK(SP);
         XPUSHs(self);
-        XPUSHs(sv_2mortal(newSViv(1)));
+        XPUSHs(sv_2mortal(newSViv(0)));  /* 0 = synchronous */
         PUTBACK;
         call_method("_inject_post_content_js", G_DISCARD);
         FREETMPS; LEAVE;
@@ -2043,6 +2187,33 @@ CODE:
         FREETMPS; LEAVE;
     }
     (void)hv_stores(hv, "_started", newSViv(1));
+
+    /* Bind __chandra_refresh for reload recovery */
+    {
+        SV *refresh_cb;
+        CV *refresh_cv;
+
+        /* Store self as refresh target */
+        {
+            SV *target_sv = get_sv("Chandra::App::_refresh_target", GV_ADD);
+            sv_setsv(target_sv, self);
+        }
+
+        refresh_cv = newXS(NULL, xs_chandra_refresh_cb, __FILE__);
+        refresh_cb = newRV_noinc((SV *)refresh_cv);
+
+        {
+            dSP;
+            ENTER; SAVETMPS;
+            PUSHMARK(SP);
+            XPUSHs(*wv_svp);
+            XPUSHs(sv_2mortal(newSVpvs("__chandra_refresh")));
+            XPUSHs(sv_2mortal(refresh_cb));
+            PUTBACK;
+            call_method("bind", G_DISCARD);
+            FREETMPS; LEAVE;
+        }
+    }
 
     /* Activate pending tray */
     {

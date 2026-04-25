@@ -11,12 +11,52 @@ use Test::More;
 my $rop = Math::MPC->new();
 my $op1  = Math::MPC->new(-0.3, 1.2);
 my $op2 = Math::MPC->new(6.2, -2.6);
+my($re, $im, $re_, $im_) = ( Math::MPFR->new(), Math::MPFR->new(),
+                             Math::MPFR->new(), Math::MPFR->new() );
+################################################################################
+# In response to the insanity of this script's test failures at (eg):          #
+# https://www.cpantesters.org/cpan/report/668b5284-3bfe-11f1-b982-cfed6d8775ea #
+# we start with some completely insane tests.                                  #
+################################################################################
 
 my $ok = 0;
-if($op1 == Math::MPC->new(-0.3, 1.2)) { $ok = 1 }
-cmp_ok($ok, '==', 1, "SANITY TEST 1 (rewritten)");
+if($op1 == $op1) { $ok = 1 }
+cmp_ok($ok, '==', 1, "SANITY TEST 1");
+if(!$ok) {
+  Math::MPC::RMPC_RE($re, $op1);
+  Math::MPC::RMPC_IM($im, $op1);
+  warn "\n SANITY TEST 1:  $re $im\n";
+}
 
-#cmp_ok($op1, '==', Math::MPC->new(-0.3, 1.2), "SANITY TEST 1");
+$ok = 0;
+if($op1 == Math::MPC->new(-0.3, 1.2)) { $ok = 1 }
+cmp_ok($ok, '==', 1, "SANITY TEST 2");
+if(!$ok) {
+  Math::MPC::RMPC_RE($re, $op1);
+  Math::MPC::RMPC_IM($im, $op1);
+  Math::MPC::RMPC_RE($re_, Math::MPC->new(-0.3, 1.2));
+  Math::MPC::RMPC_IM($im_, Math::MPC->new(-0.3, 1.2));
+  warn "\n SANITY TEST 2: $re $im versus $re_ $im_\n";
+  cmp_ok($re, '==', $re_, "SANITY TEST 2A");
+  cmp_ok($im, '==', $im_, "SANITY TEST 2B");
+}
+
+$ok = 0;
+if(Math::MPC->new(-0.3, 1.2) == $op1) { $ok = 1 }
+cmp_ok($ok, '==', 1, "SANITY TEST 3");
+if(!$ok) {
+  Math::MPC::RMPC_RE($re, $op1);
+  Math::MPC::RMPC_IM($im, $op1);
+  Math::MPC::RMPC_RE($re_, Math::MPC->new(-0.3, 1.2));
+  Math::MPC::RMPC_IM($im_, Math::MPC->new(-0.3, 1.2));
+  warn "\n SANITY TEST 3: $re $im versus $re_ $im_\n";
+  cmp_ok($re, '==', $re_, "SANITY TEST 3A");
+  cmp_ok($im, '==', $im_, "SANITY TEST 3B");
+}
+
+##################################
+# End of completely insane tests #
+##################################
 
 my $inf_mpfr = Math::MPFR->new(); # NaN
 my $nan = Math::MPFR::Rmpfr_get_NV($inf_mpfr, 0);

@@ -4,7 +4,7 @@ package YAML::PP::Schema;
 use B;
 use Module::Load qw//;
 
-our $VERSION = 'v0.39.0'; # VERSION
+our $VERSION = 'v0.40.0'; # VERSION
 
 use YAML::PP::Common qw/ YAML_PLAIN_SCALAR_STYLE /;
 

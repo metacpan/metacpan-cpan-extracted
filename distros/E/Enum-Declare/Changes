@@ -1,5 +1,8 @@
 Revision history for Enum-Declare
 
+0.08	2026-04-25
+	- Include <stdbool.h> in Declare.xs so bool/true/false compile 
+
 0.07	2026-04-16
 	- Bump min Devel::CallParser version to 0.004
 

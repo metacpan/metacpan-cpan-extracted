@@ -62,7 +62,7 @@ diag( "Error deserialising Module::Generic::DateTime" ) if( !defined( $d2 ) );
 # diag( "Deserialised data is '$d2'" );
 # isa_ok( $d2 => 'Module::Generic::DateTime', 'deserialised object is Module::Generic::DateTime' );
 is( "$d2" => "$d", 'Module::Generic::DateTime test value' );
-# diag( "DateTime is: $d2" );
+# diag( "DateTime::Lite is: $d2" );
 
 my $dyn = Module::Generic::Dynamic->new({
     fname => 'John',

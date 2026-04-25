@@ -3,7 +3,7 @@ package Chandra::Pack;
 use strict;
 use warnings;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use File::Raw qw(import);
 use Cwd ();
@@ -316,6 +316,18 @@ sub build_windows {
 
     # Assets
     $self->_copy_assets(file_join($app_dir, 'assets')) if $self->{assets};
+
+    # Authenticode signing if cert provided
+    if ($self->{sign_cert}) {
+        my $exe = file_join($app_dir, lc($safe) . '.bat');
+        my $cert = $self->{sign_cert};
+        my $pass = $self->{sign_password};
+        my @cmd = ('signtool', 'sign', '/f', $cert, '/fd', 'SHA256', '/tr',
+                   'http://timestamp.digicert.com', '/td', 'SHA256');
+        push @cmd, '/p', $pass if $pass;
+        push @cmd, $exe;
+        system(@cmd) == 0 or warn "Chandra::Pack: signtool signing failed\n";
+    }
 
     return {
         success  => 1,

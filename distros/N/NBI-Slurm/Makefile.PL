@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
     "bin/runjob",
     "bin/session",
     "bin/shelf",
+    "bin/slurm-load",
     "bin/viewjobs",
     "bin/waitjobs",
     "bin/whilejob",
@@ -43,7 +44,7 @@ my %WriteMakefileArgs = (
     "Storable" => 0,
     "Text::ASCIITable" => "0.22"
   },
-  "VERSION" => "0.20.1",
+  "VERSION" => "0.21.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

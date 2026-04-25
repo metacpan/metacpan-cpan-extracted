@@ -55,12 +55,12 @@ use_ok('Chandra::Socket::Token');
 
 # === Rotation resets expires_at ===
 {
-	my $tm = Chandra::Socket::Token->new(ttl => 0.2);
+	my $tm = Chandra::Socket::Token->new(ttl => 1);
 	sleep(0.1);
 	ok(!$tm->expired, 'not expired before rotation');
 	$tm->rotate;
 	ok(!$tm->expired, 'not expired after rotation (ttl reset)');
-	sleep(0.25);
+	sleep(1.2);
 	ok($tm->expired, 'expired after new ttl elapses');
 }
 

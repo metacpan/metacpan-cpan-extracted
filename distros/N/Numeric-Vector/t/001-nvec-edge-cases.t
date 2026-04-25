@@ -6,11 +6,11 @@ use_ok('Numeric::Vector');
 
 my $eps = 1e-10;
 
+no warnings 'redefine';
 sub approx_eq {
     my ($a, $b, $msg) = @_;
     ok(abs($a - $b) < $eps, $msg // "approx equal: $a ≈ $b");
 }
-
 # ============================================
 # Empty vector edge cases
 # ============================================

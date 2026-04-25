@@ -1,0 +1,66 @@
+{
+   "abstract" : "check if a value is any of the given values",
+   "author" : [
+      "Gabor Szabo <szabgab@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-IsAny",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Code::TidyAll" : "0",
+            "Test::Perl::Critic" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "List::MoreUtils" : "0",
+            "Test::Builder" : "1.001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.00"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/szabgab/Test-IsAny"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/szabgab/Test-IsAny.git",
+         "web" : "https://github.com/szabgab/Test-IsAny",
+         "x_license" : "https://dev.perl.org/licenses/"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "Gabor Szabo <szabgab@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

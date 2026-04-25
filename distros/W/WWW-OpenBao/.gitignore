@@ -1,0 +1,29 @@
+# Claude Code — commit: skills/, agents/, hooks/, settings.json
+# Ignore: local overrides, credentials, session data
+
+# Tracked: shared config & extensibility
+!/.claude/
+.claude/*
+!.claude/settings.json
+!.claude/settings.local.json
+!.claude/agents/
+!.claude/agents/**
+!.claude/skills/
+!.claude/skills/**
+!.claude/hooks/
+!.claude/hooks/**
+
+# Local overrides (machine-specific)
+.claude/*.local.*
+.claude/local/
+
+# Credentials & session state (never track)
+.claude/.credentials.json
+.claude/statsig/
+.claude/todos/
+.claude/projects/
+
+WWW-OpenBao-*
+.build
+.env
+.env.*

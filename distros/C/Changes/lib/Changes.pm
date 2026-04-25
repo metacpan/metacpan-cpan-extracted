@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Changes file management - ~/lib/Changes.pm
-## Version v0.3.6
-## Copyright(c) 2023 DEGUEST Pte. Ltd.
+## Version v0.4.2
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/12/09
-## Modified 2025/07/28
+## Modified 2026/04/25
 ## All rights reserved
 ## 
 ## 
@@ -49,7 +49,7 @@ BEGIN
     (?<r_tz_space>[[:blank:]\h]+)
     (?<r_tz>\S+)
     /x;
-    our $VERSION = 'v0.3.6';
+    our $VERSION = 'v0.4.2';
 };
 
 use strict;
@@ -150,7 +150,7 @@ sub as_string
     {
         $lines->push( $preamble->scalar );
     }
-    
+
     $self->elements->foreach(sub
     {
         my $str;
@@ -401,67 +401,57 @@ sub parse
             /msx )
         {
             my $re = { %+ };
-            # Create the DateTime object
-            $self->_load_class( 'DateTime' ) || return( $self->pass_error );
-            $self->_load_class( 'DateTime::TimeZone' ) || return( $self->pass_error );
-            $self->_load_class( 'DateTime::Format::Strptime' ) || return( $self->pass_error );
+            # Create the DateTime::Lite object
+            $self->_load_class( 'DateTime::Lite' ) || return( $self->pass_error );
+            $self->_load_class( 'DateTime::Lite::TimeZone' ) || return( $self->pass_error );
+            $self->_load_class( 'DateTime::Format::Lite' ) || return( $self->pass_error );
             my( $dt, $tz, $fmt );
             # try-catch
             local $@;
-            $tz = eval
+            $tz = DateTime::Lite::TimeZone->new( name => $re->{r_tz} );
+            if( !defined( $tz ) && DateTime::Lite::TimeZone->error )
             {
-                DateTime::TimeZone->new( name => $re->{r_tz} );
-            };
-            if( $@ )
-            {
-                if( $@ =~ /The[[:blank:]\h]+timezone[[:blank:]\h]+'(?:.*?)'[[:blank:]\h]+could[[:blank:]\h]+not[[:blank:]\h]+be[[:blank:]\h]+loaded/i )
+                if( DateTime::Lite::TimeZone->error->message =~ /Unknown[[:blank:]\h]+time[[:blank:]\h]+zone[[:blank:]\h]+/i )
                 {
                     warn( "Warning only: invalid time zone '$re->{r_tz}' specified in release at line ", ( $i + 1 ), "\n" ) if( $self->_warnings_is_enabled );
-                    $tz = DateTime::TimeZone->new( name => 'UTC' );
+                    $tz = DateTime::Lite::TimeZone->new( name => 'UTC' );
                 }
                 else
                 {
-                    warn( "Warning only: error trying to instantiate a new DateTime::TimeZone object with time zone '$re->{r_tz}': $@\n" ) if( $self->_warnings_is_enabled );
-                    $tz = DateTime::TimeZone->new( name => 'UTC' );
+                    warn( "Warning only: error trying to instantiate a new DateTime::Lite::TimeZone object with time zone '$re->{r_tz}': ", DateTime::Lite->error->message, "\n" ) if( $self->_warnings_is_enabled );
+                    $tz = DateTime::Lite::TimeZone->new( name => 'UTC' );
                 }
             }
-            
-            
-            # try-catch
-            $fmt = eval
+
+
+            $fmt = DateTime::Format::Lite->new(
+                pattern => "%F$re->{r_dt_space}%T$re->{r_tz_space}%O",
+            );
+            if( !defined( $fmt ) && DateTime::Format::Lite->error )
             {
-                DateTime::Format::Strptime->new(
-                    pattern => "%F$re->{r_dt_space}%T$re->{r_tz_space}%O",
-                );
-            };
-            if( $@ )
-            {
-                warn( "Error only: failed to create a DateTime::Format::Strptime with pattern '%F$re->{r_dt_space}%T$re->{r_tz_space}%Z': $@\n" ) if( $self->_warnings_is_enabled );
-                $fmt = DateTime::Format::Strptime->new(
+                warn( "Error only: failed to create a DateTime::Format::Lite with pattern '%F$re->{r_dt_space}%T$re->{r_tz_space}%Z': ", DateTime::Format::Lite->error->message, "\n" ) if( $self->_warnings_is_enabled );
+                $fmt = DateTime::Format::Lite->new(
                     pattern => "%F %T %O",
                 );
             }
-            
+
             # try-catch
-            eval
+            $dt = DateTime::Lite->new(
+                year      => $re->{r_year},
+                month     => $re->{r_month},
+                day       => $re->{r_day},
+                hour      => $re->{r_hour},
+                minute    => $re->{r_minute},
+                second    => $re->{r_second},
+                time_zone => $tz,
+            );
+            $dt->set_formatter( $fmt );
+            if( !defined( $dt ) && DateTime::Lite->error )
             {
-                $dt = DateTime->new(
-                    year => $re->{r_year},
-                    month => $re->{r_month},
-                    day => $re->{r_day},
-                    hour => $re->{r_hour},
-                    minute => $re->{r_minute},
-                    second => $re->{r_second},
-                    time_zone => $tz,
-                );
-                $dt->set_formatter( $fmt );
-            };
-            if( $@ )
-            {
-                warn( "Warning only: error trying to instantiate a DateTime value based on the date and time of the release at line ", ( $i + 1 ), ": $@\n" ) if( $self->_warnings_is_enabled );
-                $dt = DateTime->now( time_zone => $tz );
+                warn( "Warning only: error trying to instantiate a DateTime::Lite value based on the date and time of the release at line ", ( $i + 1 ), ": ", DateTime::Lite->error->message, "\n" ) if( $self->_warnings_is_enabled );
+                $dt = DateTime::Lite->now( time_zone => $tz );
             }
-            
+
             if( !$nls->is_empty )
             {
                 $elements->push( $nls->list );
@@ -469,9 +459,9 @@ sub parse
             }
             undef( $group );
             $release = $self->new_release(
-                version => $re->{r_vers},
+                version  => $re->{r_vers},
                 datetime => $dt,
-                spacer => $re->{v_space},
+                spacer   => $re->{v_space},
                 ( defined( $re->{r_note} ) ? ( note => $re->{r_note} ) : () ),
                 raw => $l,
                 line => ( $i + 1 ),
@@ -644,7 +634,7 @@ sub parse
                 line => ( $i + 1 ),
                 debug => $debug,
             ) || return( $self->pass_error );
-            
+
             if( defined( $group ) )
             {
                 if( !$nls->is_empty )
@@ -831,9 +821,9 @@ sub preset
             # for Changes::Release
             datetime_formatter => sub
             {
-                my $dt = shift( @_ ) || DateTime->now;
-                require DateTime::Format::Strptime;
-                my $fmt = DateTime::Format::Strptime->new(
+                my $dt = shift( @_ ) || DateTime::Lite->now;
+                require DateTime::Format::Lite;
+                my $fmt = DateTime::Format::Lite->new(
                     pattern => '%FT%T%z',
                     locale => 'en_GB',
                 );
@@ -891,23 +881,20 @@ sub time_zone
     if( @_ )
     {
         my $v = shift( @_ );
-        if( $self->_is_a( $v => 'DateTime::TimeZone' ) )
+        if( $self->_is_a( $v => 'DateTime::Lite::TimeZone' ) )
         {
             $self->{time_zone} = $v;
         }
         else
         {
-            $self->_load_class( 'DateTime::TimeZone' ) || return( $self->pass_error );
+            $self->_load_class( 'DateTime::Lite::TimeZone' ) || return( $self->pass_error );
             # try-catch
             local $@;
-            eval
+            my $tz = DateTime::Lite::TimeZone->new( name => "$v" );
+            $self->{time_zone} = $tz;
+            if( !defined( $tz ) && DateTime::Lite::TimeZone->error )
             {
-                my $tz = DateTime::TimeZone->new( name => "$v" );
-                $self->{time_zone} = $tz;
-            };
-            if( $@ )
-            {
-                return( $self->error( "Error setting time zone for '$v': $@" ) );
+                return( $self->error( "Error setting time zone for '$v': ", DateTime::Lite::TimeZone->error->message ) );
             }
         }
         # $self->reset(1);
@@ -995,7 +982,7 @@ Changes - Changes file management
 
 =head1 VERSION
 
-    v0.3.6
+    v0.4.2
 
 =head1 DESCRIPTION
 
@@ -1083,9 +1070,9 @@ Default is C<undef>, which means no default value is set.
             # for Changes::Release
             datetime_formatter => sub
             {
-                my $dt = shift( @_ ) || DateTime->now;
-                require DateTime::Format::Strptime;
-                my $fmt = DateTime::Format::Strptime->new(
+                my $dt = shift( @_ ) || DateTime::Lite->now;
+                require DateTime::Format::Lite;
+                my $fmt = DateTime::Format::Lite->new(
                     pattern => '%FT%T%z',
                     locale => 'en_GB',
                 );
@@ -1229,11 +1216,11 @@ This is an alias for L</as_string>
 
 =head2 time_zone
 
-Sets or gets a time zone to use for the release date. A valid time zone can either be an olson time zone string such as C<Asia/Tokyo>, or an L<DateTime::TimeZone> object.
+Sets or gets a time zone to use for the release date. A valid time zone can either be an olson time zone string such as C<Asia/Tokyo>, or an L<DateTime::Lite::TimeZone> object.
 
 If set, it will be passed to all new L<Changes::Release> object upon parsing with L</parse>
 
-It returns a L<DateTime::TimeZone> object upon success, or an L<error|Module::Generic/error> if an error occurred.
+It returns a L<DateTime::Lite::TimeZone> object upon success, or an L<error|Module::Generic/error> if an error occurred.
 
 =head2 type
 

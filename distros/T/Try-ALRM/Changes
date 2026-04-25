@@ -64,3 +64,12 @@ Revision history for Perl extension Try::ALRM.
 
 1.00 Sat Dec 20 11:04:00 2026
 	- AI assisted POD update
+
+1.01 Sat Apr 25 05:00:00 2026
+	- AI assisted correctness checks, fixes, POD updates, added test
+
+1.02 Sat Apr 25 05:15:00 2026
+	- add composable timeout support (nested retry/try_once)
+
+1.03 Sat Apr 25 05:45:00 2026
+	- updated POD about composability

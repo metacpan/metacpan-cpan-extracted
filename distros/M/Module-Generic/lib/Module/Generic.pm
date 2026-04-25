@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v1.3.0
+## Version v1.3.1
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2026/03/28
+## Modified 2026/03/31
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -103,7 +103,7 @@ BEGIN
         )
     )/;
     our $XS_LOADED = 0;
-    our $VERSION   = 'v1.3.0';
+    our $VERSION   = 'v1.3.1';
 };
 
 # Load the XS shared library (Generic.so) which provides faster implementations of
@@ -9300,7 +9300,7 @@ sub dumper
         local $Data::Dumper::Sortkeys = sub
         {
             my $h = shift( @_ );
-            return( [ sort( grep{ ref( $h->{ $_ } ) !~ /^(DateTime|DateTime\:\:)/ } keys( %$h ) ) ] );
+            return( [ sort( grep{ ref( $h->{ $_ } ) !~ /^(DateTime\:\:Lite|DateTime\:\:Lite\:\:|DateTime|DateTime\:\:)/ } keys( %$h ) ) ] );
         };
         Data::Dumper::Dumper( @_ );
     };
@@ -10988,27 +10988,26 @@ sub _parse_timestamp
     my $class = ref( $self ) || $self;
     # Load the regular expressions
     $self->_get_datetime_regexp;
-    $self->_load_class( 'DateTime::Format::Strptime' ) || return( $self->pass_error );
+    $self->_load_class( 'DateTime::Format::Lite' ) || return( $self->pass_error );
     # We set this has a distinctive key across all process and threads since this value is ubiquitous
     my $repo = Module::Generic::Global->new( 'globals' => $class, key => 'has_local_tz' );
     my $HAS_LOCAL_TZ = $repo->get;
     my $tz;
-    # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
     # "Cannot determine local time zone"
     if( !defined( $HAS_LOCAL_TZ ) )
     {
-        $self->_load_class( 'DateTime::TimeZone' ) || return( $self->pass_error );
+        $self->_load_class( 'DateTime::Lite::TimeZone' ) || return( $self->pass_error );
         $repo->lock;
         # try-catch
         local $@;
         eval
         {
-            $tz = DateTime::TimeZone->new( name => 'local' );
+            $tz = DateTime::Lite::TimeZone->new( name => 'local' );
             $HAS_LOCAL_TZ = 1;
         };
-        if( $@ )
+        if( $@ || !defined( $tz ) )
         {
-            $tz = DateTime::TimeZone->new( name => 'UTC' );
+            $tz = DateTime::Lite::TimeZone->new( name => 'UTC' );
             $HAS_LOCAL_TZ = 0;
             warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" ) if( $self->_warnings_is_enabled );
         }
@@ -11022,11 +11021,20 @@ sub _parse_timestamp
             local $@;
             eval
             {
-                $tz = DateTime::TimeZone->new( name => "$params->{tz}" );
+                $tz = DateTime::Lite::TimeZone->new( name => "$params->{tz}" );
             };
+            my $err;
             if( $@ )
             {
-                my $err = ( Scalar::Util::blessed( $@ ) && $@->isa( 'Specio::Exception' ) ) ? $@->as_string : $@;
+                $err = $@;
+            }
+            elsif( !defined( $tz ) && DateTime::Lite::TimeZone->error )
+            {
+                $err = DateTime::Lite::TimeZone->error;
+            }
+
+            if( defined( $err ) )
+            {
                 warn( "Failed setting the specified time zone $params->{tz}: $err" ) if( $self->_warnings_is_enabled );
             }
         }
@@ -11038,26 +11046,18 @@ sub _parse_timestamp
         eval
         {
             $tz = ( CORE::exists( $params->{tz} ) && CORE::defined( $params->{tz} ) && $params->{tz} )
-                ? DateTime::TimeZone->new( name => "$params->{tz}" )
-                : DateTime::TimeZone->new( name => ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ) );
+                ? DateTime::Lite::TimeZone->new( name => "$params->{tz}" )
+                : DateTime::Lite::TimeZone->new( name => ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ) );
         };
-        if( $@ )
+        if( $@ || !$tz )
         {
             warn( "Error trying to set a DateTime object using ", ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ), " time zone: $@" );
-            $tz = DateTime::TimeZone->new( name => 'UTC' );
+            $tz = DateTime::Lite::TimeZone->new( name => 'UTC' );
         }
     }
 
     $self->__message( 104, "Using time zone '", ( defined( $tz ) ? $tz->name : 'undef' ), "'" );
-    # my $tz = DateTime::TimeZone->new( name => 'Europe/Berlin' );
-    unless( DateTime->can( 'TO_JSON' ) )
-    {
-        no warnings 'once';
-        *DateTime::TO_JSON = sub
-        {
-            return( $_[0]->stringify );
-        };
-    }
+    # my $tz = DateTime::Lite::TimeZone->new( name => 'Europe/Berlin' );
     my $error = 0;
     # For some Japanese here
     use utf8;
@@ -11065,7 +11065,7 @@ sub _parse_timestamp
     {
         pattern   => '%Y-%m-%d %T',
         time_zone => $tz->name,
-        on_error => 'croak',
+        on_error  => 'croak',
     };
 
     my $fmt =
@@ -11075,7 +11075,7 @@ sub _parse_timestamp
         time_zone => $tz->name,
     };
 
-    my $formatter = 'DateTime::Format::Strptime';
+    my $formatter = 'DateTime::Format::Lite';
 
     my $roman2regular =
     {
@@ -11159,20 +11159,15 @@ sub _parse_timestamp
             elsif( CORE::defined( $re->{tz2} ) && length( $re->{tz2} ) )
             {
                 $self->__message( 105, "\tFound timezone as alias '", ( $re->{tz2} // 'undef' ), "'" );
-                $self->_load_class( 'DateTime::TimeZone::Catalog::Extend' ) ||
-                    warn( "Warning only: could not load module DateTime::TimeZone::Catalog::Extend: ", $self->error, "\n" ) if( $self->_warnings_is_enabled );
-                my $map = DateTime::TimeZone::Catalog::Extend->zone_map;
-                $opt->{zone_map} = $map;
-
                 # try-catch
                 local $@;
                 eval
                 {
-                    $tz = DateTime::TimeZone->new( name => $re->{tz2} );
+                    $tz = DateTime::Lite::TimeZone->new( name => $re->{tz2} , extended => 1);
                 };
-                if( $@ )
+                if( $@ || !defined( $tz ) )
                 {
-                    warn( "Warning only: error trying to set the time zone object using '$re->{tz2}': $@\n" ) if( $self->_warnings_is_enabled );
+                    warn( "Warning only: error trying to set the time zone object using '$re->{tz2}': ", ( $@ || DateTime::Lite::TimeZone->error ), "\n" ) if( $self->_warnings_is_enabled );
                 }
                 push( @buff, ( $re->{blank2} // '' ) . '%O' );
                 push( @buff_fmt, ( $re->{blank2} // '' ) . $re->{tz2} );
@@ -11228,7 +11223,7 @@ sub _parse_timestamp
         # $opt->{pattern} = $fmt->{pattern} = join( $re->{d_sep}, qw( %Y %m %d ) ) . $re->{sep} . $re->{time};
         $opt->{pattern} = $fmt->{pattern} = join( $re->{d_sep}, qw( %Y %m %d ) ) . $re->{sep} . '%T';
         $str = join( $re->{d_sep}, @$re{qw( year month day )} ) . $re->{sep} . $re->{time};
-        my $dt = DateTime->now( time_zone => $tz );
+        my $dt = DateTime::Lite->now( time_zone => $tz );
         my $offset = $dt->offset;
         # e.g. 9 or possibly 9.5
         my $offset_hour = ( $offset / 3600 );
@@ -11306,20 +11301,15 @@ sub _parse_timestamp
             }
             elsif( CORE::defined( $re->{tz2} ) && length( $re->{tz2} ) )
             {
-                $self->_load_class( 'DateTime::TimeZone::Catalog::Extend' ) ||
-                    warn( "Warning only: could not load module DateTime::TimeZone::Catalog::Extend: ", $self->error, "\n" ) if( $self->_warnings_is_enabled );
-                my $map = DateTime::TimeZone::Catalog::Extend->zone_map;
-                $opt->{zone_map} = $map;
-
                 # try-catch
                 local $@;
                 eval
                 {
-                    $tz = DateTime::TimeZone->new( name => $re->{tz2} );
+                    $tz = DateTime::Lite::TimeZone->new( name => $re->{tz2}, extended => 1 );
                 };
-                if( $@ )
+                if( $@ || !defined( $tz ) )
                 {
-                    warn( "Warning only: error trying to set the time zone object using '$re->{tz2}': $@\n" ) if( $self->_warnings_is_enabled );
+                    warn( "Warning only: error trying to set the time zone object using '$re->{tz2}': ", ( $@ || DateTime::Lite::TimeZone->error->message ), "\n" ) if( $self->_warnings_is_enabled );
                 }
                 push( @buff, ( $re->{blank2} // '' ) . '%O' );
                 push( @buff_fmt, ( $re->{blank2} // '' ) . $re->{tz2} );
@@ -11359,20 +11349,15 @@ sub _parse_timestamp
         push( @buff_fmt, @buff );
         if( length( $re->{tz} // '' ) )
         {
-            $self->_load_class( 'DateTime::TimeZone::Catalog::Extend' ) ||
-                warn( "Warning only: could not load module DateTime::TimeZone::Catalog::Extend: ", $self->error, "\n" ) if( $self->_warnings_is_enabled );
-            my $map = DateTime::TimeZone::Catalog::Extend->zone_map;
-            $opt->{zone_map} = $map;
-
             # try-catch
             local $@;
             eval
             {
-                $tz = DateTime::TimeZone->new( name => $re->{tz} );
+                $tz = DateTime::Lite::TimeZone->new( name => $re->{tz}, extended => 1 );
             };
-            if( $@ )
+            if( $@ || !defined( $tz ) )
             {
-                warn( "Warning only: error trying to set the time zone object using '$re->{tz}': $@\n" ) if( $self->_warnings_is_enabled );
+                warn( "Warning only: error trying to set the time zone object using '$re->{tz}': ", ( $@ || DateTime::Lite::TimeZone->error ), "\n" ) if( $self->_warnings_is_enabled );
             }
             push( @buff, '%O' . ( $re->{blank5} // '' ) );
             push( @buff_fmt, $re->{tz} . ( $re->{blank5} // '' ) );
@@ -11616,19 +11601,20 @@ sub _parse_timestamp
         $self->__message( 104, "Unix timestamp found with regexp captured -> ", sub{ $self->Module::Generic::dump( $re ) } );
         # try-catch
         local $@;
-        my $dt;
-        eval
+        my $dt = DateTime::Lite->from_epoch( epoch => $str, time_zone => $tz ) ||
+            return( $self->pass_error( DateTime::Lite->error ) );
+
+        my $strp = eval
         {
-            $dt = DateTime->from_epoch( epoch => $str, time_zone => $tz );
             $opt->{pattern} = ( CORE::index( $str, '.' ) != -1 ? '%s.%' . CORE::length( $re->{milli} ) . 'N' : '%s' );
             $self->__message( 104, "Calling formatter with pattern '$opt->{pattern}'" );
-            my $strp = DateTime::Format::Strptime->new( %$opt );
-            $dt->set_formatter( $strp );
+            DateTime::Format::Lite->new( %$opt );
         };
-        if( $@ )
+        if( $@ || !defined( $strp ) )
         {
-            return( $self->error( "An error occurred while parsing the time stamp based on the unix timestamp '$str': $@" ) );
+            return( $self->error( "An error occurred while parsing the time stamp based on the unix timestamp '$str': ", ( $@ || DateTime::Format::Lite->error ) ) );
         }
+        $dt->set_formatter( $strp );
         return( $dt );
     }
     # NOTE: PARSE_DATETIME_RELATIVE_RE
@@ -11655,20 +11641,21 @@ sub _parse_timestamp
         local $@;
         eval
         {
-            $dt = DateTime->from_epoch( epoch => $ts, time_zone => $tz );
+            $dt = DateTime::Lite->from_epoch( epoch => $ts, time_zone => $tz );
         };
-        if( $@ )
+        if( $@ || !defined( $tz ) )
         {
-            # Exception raised by DateTime::TimeZone::Local
-            if( $@ =~ /Cannot[[:blank:]\h]+determine[[:blank:]\h]+local[[:blank:]\h]+time[[:blank:]\h]+zone/i )
+            # Exception raised by DateTime::Lite::TimeZone
+            my $err = ( $@ || DateTime::Lite::TimeZone->error );
+            if( $err =~ /Cannot[[:blank:]\h]+determine[[:blank:]\h]+local[[:blank:]\h]+time[[:blank:]\h]+zone/i )
             {
                 warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" ) if( $self->_warnings_is_enabled );
-                $dt = DateTime->from_epoch( epoch => $ts, time_zone => 'UTC' );
+                $dt = DateTime::Lite->from_epoch( epoch => $ts, time_zone => 'UTC' );
                 return( $dt );
             }
             else
             {
-                return( $self->error( "An error occurred while trying to create a DateTime object with the relative timestamp '$str' that translated into the unix time stamp '$ts': $@" ) );
+                return( $self->error( "An error occurred while trying to create a DateTime::Lite object with the relative timestamp '$str' that translated into the unix time stamp '$ts': $err" ) );
             }
         }
         return( $dt );
@@ -11676,7 +11663,7 @@ sub _parse_timestamp
     # NOTE: now
     elsif( lc( $str ) eq 'now' )
     {
-        $dt = DateTime->now( time_zone => $tz );
+        $dt = DateTime::Lite->now( time_zone => $tz );
         return( $dt );
     }
     else
@@ -11684,13 +11671,14 @@ sub _parse_timestamp
         return( '' );
     }
 
+    $self->__message( 105, "Instantiating datetime parser with options -> ", sub{ $self->dump( $opt ) } );
+    my $strp = DateTime::Format::Lite->new( %$opt ) ||
+        return( $self->pass_error( DateTime::Format::Lite->error ) );
     my $dt;
     # try-catch
     local $@;
     eval
     {
-        $self->__message( 105, "Instantiating datetime parser with options -> ", sub{ $self->dump( $opt ) } );
-        my $strp = DateTime::Format::Strptime->new( %$opt );
         $dt = $strp->parse_datetime( $str );
         $self->__message( 105, "Parser returned datetime object '", $self->_str_val( $dt // 'undef' ), "'" );
         $self->__message( 105, "Instantiating datetime formatter with options -> ", sub{ $self->dump( $fmt ) } );
@@ -11699,10 +11687,11 @@ sub _parse_timestamp
         $dt->set_formatter( $strp2 ) if( $dt );
         $self->__message( 105, "Returning datetime object '", ( defined( $dt ) ? $self->_str_val( $dt // 'undef' ) : 'undef' ), "'" );
     };
-    if( $@ )
+    if( $@ || !defined( $dt ) )
     {
-        $self->__message( 105, "Error creating a DateTime object with the timestamp '$str': $@" );
-        return( $self->error( "Error creating a DateTime object with the timestamp '$str': $@" ) );
+        my $err = ( $@ || $strp->error );
+        $self->__message( 105, "Error creating a DateTime::Lite object with the timestamp '$str': $err" );
+        return( $self->error( "Error creating a DateTime::Lite object with the timestamp '$str': $err" ) );
     }
     return( $dt );
 }
@@ -11783,7 +11772,7 @@ sub _set_get_datetime : lvalue
         $callbacks = $def->{callback} if( CORE::exists( $def->{callback} ) && ref( $def->{callback} ) eq 'HASH' );
         $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
         $check = CORE::delete( $def->{check} ) if( CORE::exists( $def->{check} ) && ref( $def->{check} ) eq 'CODE' );
-        # The optional format for DateTime::Format::Strptime
+        # The optional format for DateTime::Format::Lite
         $fmt = CORE::delete( $def->{format} ) if( CORE::exists( $def->{format} ) && CORE::length( $def->{format} // '' ) );
         if( CORE::exists( $def->{tz} ) && CORE::length( $def->{tz} // '' ) )
         {
@@ -11804,20 +11793,20 @@ sub _set_get_datetime : lvalue
         my $now;
         if( Scalar::Util::blessed( $time ) )
         {
-            return( $self->error( "Object provided as value for $field, but this is not a DateTime or a Module::Generic::DateTime object" ) ) if( !$time->isa( 'DateTime' ) && !$time->isa( 'Module::Generic::DateTime' ) );
+            return( $self->error( "Object provided as value for $field, but this is not a DateTime::Lite, a DateTime or a Module::Generic::DateTime object" ) ) if( !$time->isa( 'DateTime::Lite' ) && !$time->isa( 'DateTime' ) && !$time->isa( 'Module::Generic::DateTime' ) );
             $data->{ $field } = $time;
             if( defined( $fmt ) )
             {
-                $self->_load_class( 'DateTime::Format::Strptime' ) || return( $self->pass_error );
+                $self->_load_class( 'DateTime::Format::Lite' ) || return( $self->pass_error );
                 # try-catch
                 local $@;
                 my $strp = eval
                 {
-                    DateTime::Format::Strptime->new( pattern => $fmt );
+                    DateTime::Format::Lite->new( pattern => $fmt );
                 };
                 if( $@ )
                 {
-                    return( $self->error( "Error getting the DateTime::Format::Strptime object for format '$fmt': $@" ) );
+                    return( $self->error( "Error getting the DateTime::Format::Lite object for format '$fmt': $@" ) );
                 }
     
                 eval
@@ -11826,16 +11815,16 @@ sub _set_get_datetime : lvalue
                 };
                 if( $@ )
                 {
-                    return( $self->error( "Error setting the formatter DateTime::Format::Strptime on the DateTime object: $@" ) );
+                    return( $self->error( "Error setting the formatter DateTime::Format::Lite on the DateTime::Lite object: $@" ) );
                 }
             }
             return( $data->{ $field } );
         }
         elsif( $time =~ /^\d+$/ && $time !~ /^\d{1,10}$/ )
         {
-            return( $self->error( "DateTime value ($time) provided for field $field does not look like a unix timestamp" ) );
+            return( $self->error( "DateTime::Lite value ($time) provided for field $field does not look like a unix timestamp" ) );
         }
-        # Parsed successfully and transformed into a DateTime object
+        # Parsed successfully and transformed into a DateTime::Lite object
         elsif( $now = $self->_parse_timestamp( $time, ( CORE::defined( $opts ) ? ( %$opts ) : () ) ) )
         {
             # Found a parsed datetime value
@@ -11843,29 +11832,26 @@ sub _set_get_datetime : lvalue
             # return( $now );
         }
 
-        unless( Scalar::Util::blessed( $now ) && ( $now->isa( 'DateTime' ) || $now->isa( 'Module::Generic::DateTime' ) ) )
+        unless( Scalar::Util::blessed( $now ) && ( $now->isa( 'DateTime::Lite' ) || $now->isa( 'DateTime' ) || $now->isa( 'Module::Generic::DateTime' ) ) )
         {
             # We set this has a distinctive key across all process and threads since this value is ubiquitous
             my $repo = Module::Generic::Global->new( 'globals' => $class, key => 'has_local_tz' );
             my $HAS_LOCAL_TZ = $repo->get;
-            $self->_load_class( 'DateTime' ) || return( $self->pass_error );
+            $self->_load_class( 'DateTime::Lite' ) || return( $self->pass_error );
             if( !defined( $HAS_LOCAL_TZ ) )
             {
-                $self->_load_class( 'DateTime::TimeZone' ) || return( $self->pass_error );
+                $self->_load_class( 'DateTime::Lite::TimeZone' ) || return( $self->pass_error );
                 $repo->lock;
-                # try-catch
-                local $@;
-                local $SIG{__WARN__} = sub{};
-                eval
+                $tz = DateTime::Lite::TimeZone->new( name => 'local' );
+                if( !defined( $tz ) )
                 {
-                    $tz = DateTime::TimeZone->new( name => 'local' );
-                    $HAS_LOCAL_TZ = 1;
-                };
-                if( $@ )
-                {
-                    $tz = DateTime::TimeZone->new( name => 'UTC' );
+                    $tz = DateTime::Lite::TimeZone->new( name => 'UTC' );
                     $HAS_LOCAL_TZ = 0;
                     warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" ) if( $self->_warnings_is_enabled );
+                }
+                else
+                {
+                    $HAS_LOCAL_TZ = 1;
                 }
                 $repo->set( $HAS_LOCAL_TZ );
 
@@ -11874,35 +11860,23 @@ sub _set_get_datetime : lvalue
                     CORE::defined( $opts->{tz} ) && 
                     CORE::length( $opts->{tz} ) )
                 {
-                    # try-catch
-                    local $@;
-                    local $SIG{__WARN__} = sub{};
-                    eval
+                    $tz = DateTime::Lite::TimeZone->new( name => "$opts->{tz}" );
+                    if( !defined( $tz ) )
                     {
-                        $tz = DateTime::TimeZone->new( name => "$opts->{tz}" );
-                    };
-                    if( $@ )
-                    {
-                        warn( "Failed setting the specified time zone $opts->{tz}: $@\n" ) if( $self->_warnings_is_enabled );
+                        warn( "Failed setting the specified time zone $opts->{tz}: ", DateTime::Lite::TimeZone->error, "\n" ) if( $self->_warnings_is_enabled );
                     }
                 }
             }
             else
             {
-                # try-catch
-                local $@;
-                local $SIG{__WARN__} = sub{};
-                eval
+                $now = ( CORE::defined( $opts ) && CORE::exists( $opts->{tz} ) && CORE::defined( $opts->{tz} ) && CORE::length( $opts->{tz} ) )
+                    ? DateTime::Lite->from_epoch( epoch => $time, time_zone => "$opts->{tz}" )
+                    : DateTime::Lite->from_epoch( epoch => $time, time_zone => ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ) );
+                
+                if( !defined( $now ) )
                 {
-                    $now = ( CORE::defined( $opts ) && CORE::exists( $opts->{tz} ) && CORE::defined( $opts->{tz} ) && CORE::length( $opts->{tz} ) )
-                        ? DateTime->from_epoch( epoch => $time, time_zone => "$opts->{tz}" )
-                        : DateTime->from_epoch( epoch => $time, time_zone => ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ) );
-                };
-                if( $@ )
-                {
-                    my $err = ( Scalar::Util::blessed( $@ ) && $@->isa( 'Specio::Exception' ) ) ? $@->as_string : $@;
-                    warn( "Error trying to set a DateTime object using ", ( ( CORE::defined( $opts ) && CORE::exists( $opts->{tz} ) && CORE::defined( $opts->{tz} ) && CORE::length( $opts->{tz} ) ) ? $opts->{tz} : ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ) ), " time zone -> ", $err ) if( $self->_warnings_is_enabled );
-                    $now = DateTime->from_epoch( epoch => $time, time_zone => 'UTC' );
+                    warn( "Error trying to set a DateTime::Lite object using ", ( ( CORE::defined( $opts ) && CORE::exists( $opts->{tz} ) && CORE::defined( $opts->{tz} ) && CORE::length( $opts->{tz} ) ) ? $opts->{tz} : ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ) ), " time zone -> ", DateTime::Lite->error ) if( $self->_warnings_is_enabled );
+                    $now = DateTime::Lite->from_epoch( epoch => $time, time_zone => 'UTC' );
                 }
             }
         }
@@ -11910,45 +11884,27 @@ sub _set_get_datetime : lvalue
         # We only set a default formatter if one was not set already
         if( defined( $fmt ) )
         {
-            $self->_load_class( 'DateTime::Format::Strptime' ) || return( $self->pass_error );
-            # try-catch
-            local $@;
-            local $SIG{__WARN__} = sub{};
-            my $strp = eval
+            $self->_load_class( 'DateTime::Format::Lite' ) || return( $self->pass_error );
+            my $strp = DateTime::Format::Lite->new( pattern => $fmt );
+            if( !defined( $strp ) )
             {
-                DateTime::Format::Strptime->new( pattern => $fmt );
-            };
-            if( $@ )
-            {
-                return( $self->error( "Error getting the DateTime::Format::Strptime object for format '$fmt': $@" ) );
+                return( $self->error( "Error getting the DateTime::Format::Lite object for format '$fmt': ", DateTime::Format::Lite->error  ) );
             }
 
-            eval
-            {
-                $now->set_formatter( $strp );
-            };
-            if( $@ )
-            {
-                return( $self->error( "Error setting the formatter DateTime::Format::Strptime on the DateTime object: $@" ) );
-            }
+            $now->set_formatter( $strp ) ||
+                return( $self->error( "Error setting the formatter DateTime::Format::Lite on the DateTime::Lite object: $@" ) );
         }
         elsif( !$now->formatter )
         {
-            $self->_load_class( 'DateTime::Format::Strptime' ) || return( $self->pass_error );
-            # try-catch
-            local $@;
-            local $SIG{__WARN__} = sub{};
-            eval
+            $self->_load_class( 'DateTime::Format::Lite' ) || return( $self->pass_error );
+            my $strp = DateTime::Format::Lite->new(
+                pattern => '%s',
+                locale  => 'en_GB',
+            );
+            $now->set_formatter( $strp );
+            if( !defined( $strp ) )
             {
-                my $strp = DateTime::Format::Strptime->new(
-                    pattern => '%s',
-                    locale => 'en_GB',
-                );
-                $now->set_formatter( $strp );
-            };
-            if( $@ )
-            {
-                warn( "Error creating DateTime object: $@\n" ) if( $self->_warnings_is_enabled );
+                warn( "Error creating DateTime::Lite object: ", DateTime::Format::Lite->error, "\n" ) if( $self->_warnings_is_enabled );
             }
         }
         return( $now );
@@ -11965,7 +11921,7 @@ sub _set_get_datetime : lvalue
             }
             elsif( defined( $data->{ $field } ) && 
                    length( $data->{ $field } ) && 
-                   !$self->_is_a( $data->{ $field }, 'DateTime' ) )
+                   !$self->_is_a( $data->{ $field }, 'DateTime::Lite' ) )
             {
                 my $now = $process->( $data->{ $field } ) || return( $self->pass_error );
                 $data->{ $field } = $now;
@@ -12040,7 +11996,7 @@ sub _set_get_datetime : lvalue
             }
             elsif( defined( $data->{ $field } ) && 
                    length( $data->{ $field } ) && 
-                   !$self->_is_a( $data->{ $field }, 'DateTime' ) )
+                   !$self->_is_a( $data->{ $field }, 'DateTime::Lite' ) )
             {
                 my $now = $process->( $data->{ $field } ) || return( $self->pass_error );
                 $data->{ $field } = $now;
@@ -12608,7 +12564,7 @@ sub AUTOLOAD : lvalue
     $self = shift( @_ ) if( Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'Module::Generic' ) );
     my( $class, $meth );
     $class = ref( $self ) || $self;
-    # Leave this commented out as we need it a little bit lower
+    # Leave this here as we need it a little bit lower
     my( $pkg, $file, $line ) = caller();
     my $sub = ( caller(1) )[3];
     no overloading;
@@ -13216,7 +13172,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v1.3.0
+    v1.3.1
 
 =head1 DESCRIPTION
 
@@ -14152,10 +14108,12 @@ Provided with some optional arguments and this will instantiate a new L<Module::
 Example:
 
     my $dt = DateTime->now( time_zone => 'Asia/Tokyo' );
+    # or
+    my $dt = DateTime::Lite->now( time_zone => 'Asia/Tokyo' );
     # Returns a new Module::Generic::DateTime object
     my $d = $o->new_datetime( $dt );
 
-    # Returns a new Module::Generic::DateTime object with DateTime initiated automatically
+    # Returns a new Module::Generic::DateTime object with DateTime::Lite initiated automatically
     # to now with time zone set by default to UTC
     my $d = $o->new_datetime;
 
@@ -15107,7 +15065,7 @@ Sets or gets a code reference, acting as a callback that will be triggered upon 
 
 =head2 _parse_timestamp
 
-Provided with a string representing a date or datetime, and this will try to parse it and return a L<DateTime> object. It will also create a L<DateTime::Format::Strptime> to preserve the original date/datetime string representation and assign it to the L<DateTime> object. So when the L<DateTime> object is stringified, it displays the same string that was originally parsed.
+Provided with a string representing a date or datetime, and this will try to parse it and return a L<DateTime::Lite> object. It will also create a L<DateTime::Format::Lite> to preserve the original date/datetime string representation and assign it to the L<DateTime::Lite> object. So when the L<DateTime::Lite> object is stringified, it displays the same string that was originally parsed.
 
 Supported formats are:
 
@@ -15822,13 +15780,13 @@ or
         tz => 'UTC',
     }, @_ ) ); }
 
-Provided with an object property name and asome date or datetime string and this will attempt to parse it and save it as a L<DateTime> object.
+Provided with an object property name and asome date or datetime string and this will attempt to parse it and save it as a L<DateTime::Lite> object.
 
 If the data is a 10 digits integer, this will treat it as a unix timestamp.
 
 Parsing also recognise special word such as C<now>
 
-The created L<DateTime> object is associated a L<DateTime::Format::Strptime> object which enables the L<DateTime> object to be stringified as a unix timestamp using local time stamp, whatever it is.
+The created L<DateTime::Lite> object is associated a L<DateTime::Format::Lite> object which enables the L<DateTime::Lite> object to be stringified as a unix timestamp using local time stamp, whatever it is.
 
 Even if there is no value set, and this method is called in chain, it returns a L<Module::Generic::Null> whose purpose is to enable chaining without doing anything meaningful. For example, assuming the property I<created> of your object is not set yet, but in your script you call it like this:
 
@@ -15862,7 +15820,7 @@ The object property name
 
 =item * C<format>
 
-An optional format that will be used to create a L<DateTime::Format::Strptime> that will be attached to the L<DateTime> object.
+An optional format that will be used to create a L<DateTime::Format::Lite> that will be attached to the L<DateTime::Lite> object.
 
 =item * C<tz>
 
@@ -17467,7 +17425,7 @@ Will use the method L</_set_get_boolean>
         # A Module::Generic::Scalar object
         name => 'John Doe',
         id => 'c47e1113-8336-4437-ba20-54f8cd0afb18',
-        # A DateTime object
+        # A DateTime or DateTime::Lite object
         since => 'now',
         # A Module::Generic::Number object
         age => 32,

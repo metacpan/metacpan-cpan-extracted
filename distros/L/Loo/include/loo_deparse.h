@@ -783,9 +783,9 @@ ddc_deparse_op(pTHX_ OP *o, DDCDeparse *ctx)
             }
         }
 
-        /* Optimised-away OP_EMPTYAVHV (5.36+): the peephole may null
+        /* Optimised-away OP_EMPTYAVHV (5.38+): the peephole may null
            the empty hash/array constructor.  Emit {} or []. */
-#if PERL_VERSION >= 36
+#if PERL_VERSION >= 38
         if (was == OP_EMPTYAVHV) {
 #ifdef OPpEMPTYAVHV_IS_HV
             if (o->op_private & OPpEMPTYAVHV_IS_HV)
@@ -992,8 +992,8 @@ ddc_deparse_op(pTHX_ OP *o, DDCDeparse *ctx)
     }
 #endif
 
-    /* ── OP_EMPTYAVHV: empty anon hash/array {} or [] (5.36+) ── */
-#if PERL_VERSION >= 36
+    /* ── OP_EMPTYAVHV: empty anon hash/array {} or [] (5.38+) ── */
+#if PERL_VERSION >= 38
     case OP_EMPTYAVHV: {
 #ifdef OPpEMPTYAVHV_IS_HV
         if (o->op_private & OPpEMPTYAVHV_IS_HV)
@@ -3029,25 +3029,24 @@ ddc_deparse_op(pTHX_ OP *o, DDCDeparse *ctx)
     case OP_CUSTOM: {
         const char *name = NULL;
 
-#if PERL_VERSION >= 20
-        /* 5.20+ : XopENTRYCUSTOM looks up the XOP by ppaddr */
-        name = XopENTRYCUSTOM(o, xop_name);
-#elif PERL_VERSION >= 14
+#if PERL_VERSION >= 14
+        /* 5.14+ : Perl_custom_op_xop resolves the XOP for both new-style
+           (Perl_custom_op_register → PL_custom_ops) and legacy
+           (PL_custom_op_names) registrations.  XopENTRYCUSTOM is just
+           sugar over this call introduced in 5.20. */
         {
-            /* 5.14-5.18 : Perl_custom_op_xop may not exist;
-               fall back to PL_custom_op_names hash */
-            SV **svp;
-            IV  key = PTR2IV(o->op_ppaddr);
-            char buf[32];
-            int  klen;
-
-            klen = my_snprintf(buf, sizeof(buf), "%" IVdf, key);
-            if (PL_custom_op_names &&
-                (svp = hv_fetch(PL_custom_op_names, buf, klen, 0)))
-                name = SvPV_nolen(*svp);
+            const XOP *xop = Perl_custom_op_xop(aTHX_ o);
+            if (xop && xop->xop_name)
+                name = xop->xop_name;
         }
+#elif PERL_VERSION >= 10
+        /* 5.10-5.12 : XOP doesn't exist; Perl_custom_op_name is the only
+           API and only sees legacy PL_custom_op_names registrations.
+           Returns "custom" when unregistered — handled by the strEQ
+           check below. */
+        name = Perl_custom_op_name(aTHX_ o);
 #endif
-        if (!name)
+        if (!name || !*name || strEQ(name, "custom"))
             name = "custom_op";
 
         ddc_emit_keyword(aTHX_ ctx, name, strlen(name));

@@ -112,16 +112,8 @@ sub new {
     # If there is then replace /placeholder/ with ${selected_file}
 
     if ($self->opts->is_array()) {
-        my $placeholder = $self->opts->placeholder;
-        # Double escape the backslash for regex
-        my $regex_placeholder = $placeholder;
-        $regex_placeholder =~ s/\\/\\\\/g;
-        my $count = 0;
         for my $cmd (@{$self->{commands}}) {
-            if ($cmd =~ $self->opts->placeholder) {
-                $count++;
-            }
-            $cmd =~ s/\Q$regex_placeholder\E/\${selected_file}/g;
+            _replace_array_placeholders($self, \$cmd);
         }
     }
     return $self;
@@ -213,8 +205,7 @@ sub errorfile : lvalue {
 sub append_command {
     my ($self, $new_command) = @_;
     if ($self->opts->is_array()) {
-        my $placeholder = $self->opts->placeholder;
-        $new_command =~ s/\Q$placeholder\E/\${selected_file}/g;
+        _replace_array_placeholders($self, \$new_command);
     }
     push @{$self->{commands}}, $new_command;
 }
@@ -222,8 +213,7 @@ sub append_command {
 sub prepend_command {
     my ($self, $new_command) = @_;
     if ($self->opts->is_array()) {
-        my $placeholder = $self->opts->placeholder;
-        $new_command =~ s/\Q$placeholder\E/\${selected_file}/g;
+        _replace_array_placeholders($self, \$new_command);
     }
     unshift @{$self->{commands}}, $new_command;
 }
@@ -282,44 +272,87 @@ sub script {
     $script =~ s/NBI_SLURM_OUT/$file_out/g;
     $script =~ s/NBI_SLURM_ERR/$file_err/g;
     
-    my $replacements = 0;
-    my $placeholder = $self->opts->placeholder;
-    
-    if ($self->opts->is_array()) {
-  
-        # Prepend strings to array $self->{commands}
-        # Escape spaces in each file
-        my @prepend = ();
-        my $self_files = $self->opts->files;
-        for my $file (@{$self_files}) {
-            $file =~ s/ /\\ /g;
-        }
-        my $files_list = join(" ", @{$self_files});
-        my $list = "self_files=($files_list)";
-        push(@prepend, "# Job array list", "$list", "selected_file=\${self_files[\$SLURM_ARRAY_TASK_ID]}");
-        
-        # Prepend the array to the commands
-        unshift @{$self->{commands}}, @prepend;
+    my @commands = @{$self->{commands}};
 
- 
-        
+    if ($self->opts->is_array()) {
+        my @prepend = _array_prelude($self);
+        unshift @commands, @prepend;
     }
     if ($self->opts->is_array()) {
-        # check if at least one command containts ${selected_file}
-        my $selected_file = 0;
-        for my $cmd (@{$self->{commands}}) {
-            if ($cmd =~ /\$\{selected_file\}/) {
-                $selected_file = 1;
+        my $has_array_variable = 0;
+        for my $cmd (@commands) {
+            if ($self->opts->is_files_array() && $cmd =~ /\$\{selected_file\}/) {
+                $has_array_variable = 1;
+                last;
+            }
+            if ($self->opts->is_params_array() && $cmd =~ /\$\{param_\d+\}/) {
+                $has_array_variable = 1;
                 last;
             }
         }
-        if ($selected_file == 0) {
-            confess "ERROR NBI::Job: No command contains the placeholder:" . $self->opts->placeholder . "\n";
+        if ($has_array_variable == 0) {
+            if ($self->opts->is_files_array()) {
+                confess "ERROR NBI::Job: No command contains the placeholder:" . $self->opts->placeholder . "\n";
+            }
+            confess "ERROR NBI::Job: No command contains params-array placeholders like ##1##\n";
         }
     }    
 
-    $script .= join("\n", @{$self->{commands}});
+    $script .= join("\n", @commands);
     return $header . $script . "\n";
+}
+
+sub _replace_array_placeholders {
+    my ($self, $command_ref) = @_;
+    if ($self->opts->is_files_array()) {
+        my $placeholder = $self->opts->placeholder;
+        $$command_ref =~ s/\Q$placeholder\E/\${selected_file}/g;
+    }
+    if ($self->opts->is_params_array()) {
+        $$command_ref =~ s/##(\d+)##/\${param_$1}/g;
+    }
+}
+
+sub _array_prelude {
+    my ($self) = @_;
+    my @index_prelude = ('nbi_array_index=$SLURM_ARRAY_TASK_ID');
+    if ($self->opts->{array_offset} && $self->opts->{array_offset} > 0) {
+        @index_prelude = ("nbi_array_index=\$((SLURM_ARRAY_TASK_ID + " . $self->opts->{array_offset} . "))");
+    }
+    if ($self->opts->is_files_array()) {
+        my $self_files = $self->opts->files;
+        my @escaped_files = @{$self_files};
+        for my $file (@escaped_files) {
+            $file =~ s/ /\\ /g;
+        }
+        my $files_list = join(" ", @escaped_files);
+        return (
+            "# Job array list",
+            @index_prelude,
+            "self_files=($files_list)",
+            "selected_file=\${self_files[\$nbi_array_index]}",
+        );
+    }
+    if ($self->opts->is_params_array()) {
+        my $params_file = _shell_single_quote($self->opts->params_array);
+        my $perl_loader = q{use strict;use warnings;my ($file,$task_id)=@ARGV;open my $fh,"<",$file or die "Cannot open $file: $!\n";my $row_idx=0;while (my $line=<$fh>) { chomp $line; $line =~ s/\r$//; next if $line =~ /^\s*$/; next if $line =~ /^\s*#/; if ($row_idx == $task_id) { my @fields = split /\t/, $line, -1; for my $field (@fields) { print $field, "\0"; } exit 0; } $row_idx++; } die "No params row for task_id=$task_id in $file\n";};
+        return (
+            "# Job array params",
+            @index_prelude,
+            "params_file=$params_file",
+            "mapfile -d '' -t params < <(perl -e '$perl_loader' \"\$params_file\" \"\$nbi_array_index\")",
+            "for i in \"\${!params[@]}\"; do",
+            "    printf -v \"param_\$((i + 1))\" '%s' \"\${params[\$i]}\"",
+            "done",
+        );
+    }
+    return ();
+}
+
+sub _shell_single_quote {
+    my ($value) = @_;
+    $value =~ s/'/'\"'\"'/g;
+    return "'$value'";
 }
 
 sub run {
@@ -433,7 +466,7 @@ NBI::Job - A class for representing a job for NBI::Slurm
 
 =head1 VERSION
 
-version 0.20.1
+version 0.21.0
 
 =head1 DESCRIPTION
 
@@ -616,8 +649,6 @@ Return a string representation of the job object.
 
   my $job_info = $job->view;
   print $job_info;
-
-=cut
 
 =head1 AUTHOR
 

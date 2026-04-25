@@ -1,5 +1,8 @@
 Revision history for Parse-LocalDistribution
 
+0.21 2026/04/24
+  - ignore META files if they are symlinks
+
 0.20 2024/10/06
   - accept META_CONTENT as an arg to avoid reevaluation of a META file
 

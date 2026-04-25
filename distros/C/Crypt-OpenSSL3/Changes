@@ -1,5 +1,13 @@
 Revision history for Crypt-OpenSSL3
 
+0.005     2026-04-25 10:43:07+02:00 Europe/Brussels
+          - Adapt to OpenSSL 4.0
+          - Make set_alpn_protos take a list of protocols
+          - Remove copy_session_id
+          - Add get_{min,max}_proto_version to ssl object
+          - Remove various get/set methods on PKey::Context in favor of get_param/set_param
+          - Duplicate distinguishing id before transfering ownership
+
 0.004     2026-04-13 20:13:47+02:00 Europe/Brussels
           - Add sign_init_ex to MD::Context
           - Only enable X509::VerifyParam::get_purpose on OpenSSL 3.5+

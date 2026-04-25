@@ -22,7 +22,7 @@ DateTime::Format::Lite - Parse and format datetimes with strptime patterns, retu
 
 # VERSION
 
-    v0.1.2
+    v0.1.3
 
 # DESCRIPTION
 

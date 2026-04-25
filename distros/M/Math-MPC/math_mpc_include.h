@@ -85,10 +85,18 @@ _DO_COMPLEX_H            : Automatically defined if at least one of Math::Comple
 DIVISION_BUG_*           : These macros (DIVISION_BUG_DECL, DIVISION_BUG_PRE(op) &
                            DIVISION_BUG_POST) handle a bug in mpc_ui_div & mpc_fr_div
                            that exists in mpc-1.4.0. If the underlying mpc library is
-                           not version 1.4.0, then these macros are no-ops. See:
+                           not version 1.4.0, then these macros do nothing. See:
                            https://sympa.inria.fr/sympa/arc/mpc-discuss/2026-03/msg00019.html
 
-*************************************************/
+DIV_CORRECTION_*         : Correction to mpc_fr_div and mpc_iv_div with pre-1.4.0
+                           mpc libraries only. When the Math::MPC object divisor's
+                           imaginary component is 0, the imaginary component of the
+                           quotient will be zero. The DIV_CORRECTION_DECL and
+                           DIV_CORRECTION_POST macros ensure that the sign of that
+                           zero is correct. These macros do nothing if the version
+                           of the underlying mpc library is >= 1.4.0.
+
+***********************************************/
 
 #include <stdio.h>
 
@@ -246,4 +254,18 @@ typedef __float128 float128;
 #  define DIVISION_BUG_PRE(op)
 #  define DIVISION_BUG_POST
 
+#endif
+
+#if MPC_VERSION < 66560 /* Fix mpc_ui_div() and mpc_fr_div() sign of imaginary zero. (Pre mpc-1.4.0 only) */
+#  define DIV_CORRECTION_DECL(op)                                   \
+   int make_correction = 0;                                     \
+   if(!mpfr_cmp_ui(MPC_IM(op),0) && !mpfr_signbit(MPC_IM(op)))  \
+      make_correction = 1;
+
+#  define DIV_CORRECTION_POST(rop)                 \
+   if(make_correction)                             \
+      mpfr_neg(MPC_IM(rop),MPC_IM(rop), MPFR_RNDN); /* MPC_IM(rop) is zero, but needs to be negated */
+#else
+#  define DIV_CORRECTION_DECL(op)
+#  define DIV_CORRECTION_POST(rop)
 #endif

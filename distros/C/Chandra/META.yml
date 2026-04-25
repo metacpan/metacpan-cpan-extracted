@@ -23,7 +23,8 @@ requires:
   File::Raw: '0.08'
   IO::Select: '0'
   IO::Socket::UNIX: '0'
+  Object::Proto: '0.16'
   perl: '5.010'
 resources: {}
-version: '0.23'
+version: '0.24'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

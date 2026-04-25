@@ -3,7 +3,7 @@ use strict;
 
 package RT::Extension::FormTools;
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 RT->AddStyleSheets('rt-extension-formtools.css');
 RT->AddJavaScript('rt-extension-formtools.js');
@@ -141,7 +141,7 @@ information and create a ticket.
 
 Works with RT 6.0.0 and newer.
 
-Install RT::Extension::FormTools 1.18 for older RTs.
+Install the most recent 1.* version for older RTs.
 
 =head1 INSTALLATION
 
@@ -215,6 +215,38 @@ you could define it like this:
     <p>You can review your ticket regarding
     <a href="/Ticket/Display.html?id={$TicketId}">{$TicketSubject}</a>
     and check there for status updates. You should also receive email.</p>
+
+=head4 ShowQuestion
+
+The ShowQuestion component adds a standalone dropdown question to your form.
+Unlike custom fields, ShowQuestion is not backed by an RT field - the answer
+is not stored on the created ticket. It is useful for gathering information
+that controls which other fields are shown or required.
+
+When configuring a ShowQuestion component, provide:
+
+=over
+
+=item Name
+
+A short identifier, used internally to reference this question. May contain
+letters, numbers, and spaces.
+
+=item Label
+
+The question text displayed to the user above the dropdown.
+
+=item Choices
+
+The list of options to present in the dropdown, one per line. Blank lines
+are ignored.
+
+=back
+
+Once a ShowQuestion is placed anywhere in the form, its name becomes
+available in the conditional display and conditional required settings of
+other components, just like a custom field name. This lets you show or
+require fields based on the user's answer.
 
 =head3 Description
 

@@ -82,6 +82,8 @@ my @perl_scripts = (
       of
       open-file
       ticket
+      file
+      files
       path
       paths
       ps1

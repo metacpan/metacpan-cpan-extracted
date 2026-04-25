@@ -112,4 +112,48 @@ subtest 'format_result: error' => sub {
   ok $result->{isError}, 'isError is true for failure';
 };
 
+subtest 'validator: allowed' => sub {
+  my $server = MCP::Run::Bash->new(
+    name      => 'TestServer',
+    validator => sub {
+      my ($cmd, $dir) = @_;
+      return 1 if $cmd =~ /^echo|^pwd/;
+      return "blocked: $cmd";
+    },
+  );
+  my $tool   = $server->tools->[0];
+  my $result = $tool->call({command => 'echo ok'}, {});
+  like $result->{content}[0]{text}, qr/Exit code: 0/, 'allowed command runs';
+};
+
+subtest 'validator: denied with reason' => sub {
+  my $server = MCP::Run::Bash->new(
+    name      => 'TestServer',
+    validator => sub {
+      my ($cmd, $dir) = @_;
+      return 1 if $cmd =~ /^echo|^pwd/;
+      return "security policy forbids this";
+    },
+  );
+  my $tool   = $server->tools->[0];
+  my $result = $tool->call({command => 'rm -rf /'}, {});
+  like $result->{content}[0]{text}, qr/Command security policy forbids this/, 'blocked with reason';
+  ok $result->{isError}, 'isError set for blocked command';
+};
+
+subtest 'validator: denied without reason' => sub {
+  my $server = MCP::Run::Bash->new(
+    name      => 'TestServer',
+    validator => sub {
+      my ($cmd, $dir) = @_;
+      return 1 if $cmd =~ /^echo/;
+      return;
+    },
+  );
+  my $tool   = $server->tools->[0];
+  my $result = $tool->call({command => 'rm -rf /'}, {});
+  like $result->{content}[0]{text}, qr/Command denied/, 'blocked without reason';
+  ok $result->{isError}, 'isError set for blocked command';
+};
+
 done_testing;

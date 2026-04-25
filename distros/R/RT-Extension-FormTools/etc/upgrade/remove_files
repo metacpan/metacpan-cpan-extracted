@@ -1,0 +1,7 @@
+package Module::Install::RTx;
+
+@remove_files = (
+    'html/Callbacks/FormTools/Elements/Tabs/SelfService',
+);
+
+1;

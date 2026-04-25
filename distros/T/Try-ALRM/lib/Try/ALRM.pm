@@ -3,16 +3,22 @@ use warnings;
 
 package Try::ALRM;
 
-our $VERSION = q{1.00};
+# ABSTRACT: Structured retry and timeout handling using CORE::alarm
+
+our $VERSION = q{1.03};
 
 use Exporter qw/import/;
+use Scalar::Util qw/refaddr/;
+use Time::HiRes qw/time/;
+
 our @EXPORT    = qw(try_once retry ALRM finally timeout tries);
 our @EXPORT_OK = qw(try_once retry ALRM finally timeout tries);
 
 our $TIMEOUT = 60;
 our $TRIES   = 3;
 
-# setter/getter for $Try::ALRM::TIMEOUT
+my @ALARM_STACK;
+
 sub timeout (;$) {
     my $timeout = shift;
     if ( defined $timeout ) {
@@ -22,7 +28,6 @@ sub timeout (;$) {
     return $TIMEOUT;
 }
 
-# setter/getter for $Try::ALRM::TRIES
 sub tries (;$) {
     my $tries = shift;
     if ( defined $tries ) {
@@ -32,253 +37,333 @@ sub tries (;$) {
     return $TRIES;
 }
 
-#NOTE: C<try_once> a case of C<retry>, where C<< tries => 1 >>.
 sub try_once (&;@) {
-    &retry( @_, tries => 1 );    #&retry, bypasses prototype
+    my $block = shift;
+    &retry( $block, @_, tries => 1 );    # bypass prototype intentionally
 }
 
-sub retry(&;@) {
-    unshift @_, q{retry};        # adding marker, will be key for this &
-    my %TODO = @_;
-    my $TODO = \%TODO;
+sub retry (&;@) {
+    my $block = shift;
 
-    my $RETRY   = $TODO->{retry}   // sub { };       # defaults to no-op
-    my $ALRM    = $TODO->{ALRM}    // $SIG{ALRM};    # local ALRM defaults to global $SIG{ALRM}
-    my $timeout = $TODO->{timeout} // $TIMEOUT;
-    my $tries   = $TODO->{tries}   // $TRIES;
-    my $FINALLY = $TODO->{finally} // sub { };
+    my $spec = _parse_retry_args(@_);
 
-    local $TIMEOUT = $timeout;                       # make available to timeout(;$)
-    local $TRIES   = $tries;                         # make available to tries(;$)
+    my $retry_block   = $block;
+    my $alarm_block   = $spec->{ALRM};
+    my $finally_block = $spec->{finally} || sub { };
 
-    my ( $attempts, $succeeded );
+    my $timeout = exists $spec->{timeout} ? $spec->{timeout} : $TIMEOUT;
+    my $tries   = exists $spec->{tries}   ? $spec->{tries}   : $TRIES;
 
-  TIMED_ATTEMPTS:
-    for my $attempt ( 1 .. $TRIES ) {
+    _assert_timeout($timeout);
+    _assert_tries($tries);
+
+    local $TIMEOUT = $timeout;
+    local $TRIES   = $tries;
+
+    my $attempts  = 0;
+    my $succeeded = 0;
+    my $error;
+
+    ATTEMPT:
+    for my $attempt ( 1 .. $tries ) {
         $attempts = $attempt;
-        my $retry = 0;
 
-        # NOTE: handler always becomes a local wrapper
-        local $SIG{ALRM} = sub {
-            ++$retry;
-            if ( ref($ALRM) =~ m/^CODE$|::/ ) {
-                $ALRM->($attempt);
-            }
+        my $alarm_token = bless \( my $token = "Try::ALRM timeout" ),
+            'Try::ALRM::_Timeout';
+
+        local $SIG{ALRM} = \&_dispatch_alarm;
+
+        my $frame = _push_alarm_frame(
+            timeout => $timeout,
+            attempt => $attempt,
+            handler => $alarm_block,
+            token   => $alarm_token,
+        );
+
+        my $ok = eval {
+            $retry_block->($attempt);
+            _pop_alarm_frame($frame);
+            1;
         };
 
-        # actual alarm code
-        alarm($timeout);
-        $RETRY->($attempt);
-        alarm 0;
-        unless ( $retry == 1 ) {
-            ++$succeeded;
-            last;
+        my $eval_error = $@;
+
+        _pop_alarm_frame($frame);
+
+        if ($ok) {
+            $succeeded = 1;
+            last ATTEMPT;
         }
+
+        if (
+            ref($eval_error)
+            && ref($eval_error) eq 'Try::ALRM::_Timeout'
+            && refaddr($eval_error) == refaddr($alarm_token)
+        ) {
+            next ATTEMPT;
+        }
+
+        $error = $eval_error || 'Unknown error';
+        last ATTEMPT;
     }
 
-    # "finally" (defaults to no-op 'sub {}' if block is not defined)
-    $FINALLY->( $attempts, $succeeded );
+    my $finally_error;
+    eval {
+        $finally_block->( $attempts, $succeeded );
+        1;
+    } or do {
+        $finally_error = $@ || 'Unknown error';
+    };
+
+    die $error         if defined $error;
+    die $finally_error if defined $finally_error;
+
+    return;
 }
 
 sub ALRM (&;@) {
-    unshift @_, q{ALRM};
-    return @_;
+    return ALRM => @_;
 }
 
 sub finally (&;@) {
-    unshift @_, q{finally};    # create marker, will be key for &
-    return @_;
+    return finally => @_;
 }
 
-# internal method, validation
+sub _push_alarm_frame {
+    my %frame = @_;
+
+    $frame{deadline} = time() + $frame{timeout};
+
+    push @ALARM_STACK, \%frame;
+    _reset_alarm();
+
+    return \%frame;
+}
+
+sub _pop_alarm_frame {
+    my $frame = shift;
+
+    return unless $frame;
+
+    @ALARM_STACK = grep {
+        refaddr($_) != refaddr($frame)
+    } @ALARM_STACK;
+
+    _reset_alarm();
+
+    return;
+}
+
+sub _dispatch_alarm {
+    my $now = time();
+
+    my @expired = sort {
+        $a->{deadline} <=> $b->{deadline}
+    } grep {
+        $_->{deadline} <= $now
+    } @ALARM_STACK;
+
+    unless (@expired) {
+        _reset_alarm();
+        return;
+    }
+
+    my $frame = $expired[0];
+
+    if ( ref( $frame->{handler} ) eq 'CODE' ) {
+        $frame->{handler}->( $frame->{attempt} );
+    }
+
+    die $frame->{token};
+}
+
+sub _reset_alarm {
+    CORE::alarm(0);
+
+    return unless @ALARM_STACK;
+
+    my ($next) = sort {
+        $a->{deadline} <=> $b->{deadline}
+    } @ALARM_STACK;
+
+    my $remaining = $next->{deadline} - time();
+
+    if ( $remaining <= 0 ) {
+        CORE::alarm(1);
+        return;
+    }
+
+    CORE::alarm( _ceil($remaining) );
+
+    return;
+}
+
+sub _ceil {
+    my $value = shift;
+
+    return int($value) == $value ? int($value) : int($value) + 1;
+}
+
+sub _parse_retry_args {
+    my @args = @_;
+
+    die "Odd number of arguments to retry\n" if @args % 2;
+
+    my %spec;
+
+    while (@args) {
+        my ( $key, $value ) = splice @args, 0, 2;
+
+        die "Unknown retry argument '$key'\n"
+            unless $key eq 'ALRM'
+                || $key eq 'finally'
+                || $key eq 'timeout'
+                || $key eq 'tries';
+
+        die "Duplicate retry argument '$key'\n"
+            if exists $spec{$key};
+
+        if ( $key eq 'ALRM' || $key eq 'finally' ) {
+            die "$key must be a CODE reference\n"
+                unless ref($value) eq 'CODE';
+        }
+
+        $spec{$key} = $value;
+    }
+
+    return \%spec;
+}
+
 sub _assert_timeout {
     my $timeout = shift;
-    if ( int $timeout <= 0 ) {
-        die qq{timeout must be an integer >= 1!\n};
-    }
+
+    die qq{timeout must be an integer >= 1!\n}
+        unless defined $timeout
+            && $timeout =~ /\A[1-9][0-9]*\z/;
 }
 
-# internal method, validation
 sub _assert_tries {
-    my $timeout = shift;
-    if ( int $timeout <= 0 ) {
-        die qq{timeout must be an integer >= 1!\n};
-    }
+    my $tries = shift;
+
+    die qq{tries must be an integer >= 1!\n}
+        unless defined $tries
+            && $tries =~ /\A[1-9][0-9]*\z/;
 }
 
-__PACKAGE__
+__PACKAGE__;
 
 __END__
 
-=encoding UTF-8
-
 =head1 NAME
 
-Try::ALRM - Try/catch-style semantics for handling timeouts using CORE::alarm
-
-=head1 SYNOPSIS
-
-C<Try::ALRM> provides a structured, readable way to use C<alarm> and
-C<$SIG{ALRM}> without scattering signal handlers, local variables, and
-cleanup logic throughout your code.
-
-The primary entry point is C<retry>, which retries a block multiple times
-when an alarm fires:
-
-    use Try::ALRM;
-
-    retry {
-      my ($attempts) = @_;
-      printf "Attempt %d/%d...\n", $attempts, tries;
-      sleep 5;
-    }
-    ALRM {
-      my ($attempts) = @_;
-      print "\tTIMED OUT";
-      if ($attempts < tries) {
-        print " - retrying...\n";
-      } else {
-        print " - giving up...\n";
-      }
-    }
-    finally {
-      my ($attempts, $successful) = @_;
-      my $limit   = tries;
-      my $timeout = timeout;
-
-      if ($successful) {
-        print "Succeeded after $attempts attempts\n";
-      } else {
-        print "Failed after $limit attempts\n";
-      }
-    }
-    timeout => 3,
-    tries   => 4;
-
-=head2 Single-attempt usage
-
-C<try_once> is a reduced form of C<retry> equivalent to C<< tries => 1 >>.
-It exists because “retry” can read awkwardly when no retry is intended.
-
-    try_once {
-      my ($attempts) = @_;
-      print "Doing something that might timeout...\n";
-      sleep 6;
-    }
-    ALRM {
-      print "Wake up!\n";
-    }
-    finally {
-      my ($attempts, $successful) = @_;
-      print $successful ? "Completed\n" : "Timed out\n";
-    }
-    timeout => 1;
-
-=head1 IMPROVEMENT OVER RAW alarm
-
-=head2 Traditional alarm usage
-
-    local $SIG{ALRM} = sub {
-        print "Wake up!\n";
-    };
-
-    alarm 1;
-    print "Doing something that might timeout...\n";
-    sleep 6;
-    alarm 0;
-
-This works, but quickly becomes hard to reason about when retries,
-cleanup, or shared state are involved.
-
-=head2 Equivalent Try::ALRM version
-
-    try_once {
-      print "Doing something that might timeout...\n";
-      sleep 6;
-    }
-    ALRM {
-      print "Wake up!\n";
-    }
-    timeout => 1;
-
-What improved:
-
-=over 4
-
-=item *
-Signal handling is localized and declarative
-
-=item *
-C<alarm 0> cleanup is automatic
-
-=item *
-Retry and finalization hooks are explicit
-
-=item *
-Control flow reads top-to-bottom
-
-=back
+Try::ALRM - Structured retry and timeout handling using CORE::alarm
 
 =head1 DESCRIPTION
 
 C<Try::ALRM> provides try/catch-like semantics around C<alarm>.
-Because C<ALRM> signals are localized and expected, they can be treated
-as a form of exception without using C<die>.
 
 Internally, this module uses Perl prototypes to coerce lexical blocks
-into C<CODE> references, in the same spirit as L<Try::Tiny>. The result
-is a structured syntax:
+into C<CODE> references, in the same spirit as L<Try::Tiny>. The public
+syntax remains compact:
 
     retry { ... }
     ALRM  { ... }
     finally { ... }
+    timeout => 5,
+    tries   => 10;
 
-This structure improves readability without changing the underlying
-mechanics of C<alarm> or C<$SIG{ALRM}>.
+Timeouts are handled by a localized C<$SIG{ALRM}> handler. When the
+alarm fires, the optional C<ALRM> block is executed and the current
+attempt is immediately aborted. If retry attempts remain, C<retry>
+continues with the next attempt.
+
+The active alarm is always cleared before control leaves the attempt,
+whether the block succeeds, times out, or dies for another reason.
+
+C<retry> and C<try_once> may be nested. Active timeout scopes are tracked
+internally so an inner timeout does not permanently cancel an outer one.
+
+C<retry> and C<try_once> may be nested. Timeout scopes are tracked so
+that inner timeouts do not cancel outer ones. When multiple timeouts are
+active, the earliest deadline wins.
 
 =head1 EXPORTS
 
 This module exports six keywords.
 
-B<NOTE>: Either C<try_once> or C<retry> is required. They are mutually
-exclusive.
-
 =head2 try_once BLOCK
 
 Runs BLOCK once with an alarm set to the current timeout value.
 
-If an alarm fires, the C<ALRM> block is executed (if provided), followed
-by C<finally>. The alarm is always cleared automatically.
+C<try_once> is equivalent to:
+
+    retry { ... } tries => 1;
+
+If an alarm fires, the optional C<ALRM> block is executed, followed by
+C<finally> if provided.
 
 =head2 retry BLOCK
 
 Runs BLOCK up to C<tries> times. Each attempt receives the current
-attempt count via C<@_>.
+attempt number via C<@_>.
 
 Retries stop when either:
 
 =over 4
 
 =item *
+
 The block completes without an alarm
 
 =item *
+
 The retry limit is reached
+
+=item *
+
+The block dies for a non-timeout reason
 
 =back
 
+If BLOCK dies for a non-timeout reason, C<finally> is still executed
+before the original exception is rethrown.
+
+Nested C<retry> and C<try_once> blocks operate independently. An inner
+timeout only affects its own scope, while outer timeouts remain active.
+If an outer timeout expires during an inner block, it is propagated
+through the inner scope.
+
+
 =head2 ALRM BLOCK
 
-Optional handler executed when an alarm fires. Receives the current
-attempt count.
+Optional handler executed when an alarm fires.
+
+Receives the current attempt number:
+
+    ALRM {
+      my ($attempt) = @_;
+      warn "Attempt $attempt timed out\n";
+    }
+
+After C<ALRM> runs, the current attempt is aborted and C<retry> moves to
+the next attempt if one remains.
 
 =head2 finally BLOCK
 
-Optional block executed unconditionally at the end.
+Optional block executed unconditionally after all attempts are complete,
+or after a non-timeout exception interrupts retry processing.
 
 Receives:
 
     my ($attempts, $successful) = @_;
+
+C<$attempts> is the number of attempts actually made.
+
+C<$successful> is true if one attempt completed without timing out or
+throwing an exception.
+
+If both the main block and C<finally> die, the main block's exception is
+preserved and rethrown.
 
 =head2 timeout INT
 
@@ -288,13 +373,17 @@ May also be supplied as a trailing modifier:
 
     try_once { ... } timeout => 2;
 
+The value must be an integer greater than or equal to 1.
+
 =head2 tries INT
 
-Getter/setter for retry limit.
+Getter/setter for the default retry limit.
 
 May also be supplied as a trailing modifier:
 
     retry { ... } tries => 5;
+
+The value must be an integer greater than or equal to 1.
 
 =head1 PACKAGE ENVIRONMENT
 
@@ -303,15 +392,20 @@ The following package variables are exposed:
 =over 4
 
 =item *
+
 C<$Try::ALRM::TIMEOUT>
 
 =item *
+
 C<$Try::ALRM::TRIES>
 
 =back
 
-They may be set globally, lexically (via setters), or temporarily via
-trailing modifiers.
+They may be set globally through the C<timeout> and C<tries> setters.
+
+During a C<retry> or C<try_once> block, trailing C<timeout> and C<tries>
+modifiers are localized so calls to C<timeout> and C<tries> inside user
+blocks reflect the active values.
 
 =head1 TRAILING MODIFIERS
 
@@ -325,30 +419,43 @@ Trailing modifiers are written as key/value pairs after the final block:
     }
     finally {
       ...
-    } timeout => 5, tries => 10;
+    }
+    timeout => 5,
+    tries   => 10;
 
-This mirrors Perl constructs like C<map> and C<grep>.
-
-=head1 WHY USE THIS MODULE?
-
-C<Try::ALRM> does not replace C<alarm>.
-It makes C<alarm>-based logic:
+Valid trailing keys are:
 
 =over 4
 
 =item *
-Easier to read
+
+C<ALRM>
 
 =item *
-Safer to modify
+
+C<finally>
 
 =item *
-Less error-prone
+
+C<timeout>
 
 =item *
-More expressive
+
+C<tries>
 
 =back
+
+Unknown keys, duplicate keys, invalid timeout values, and invalid retry
+counts are rejected.
+
+=head1 COMPOSABILITY
+
+C<Try::ALRM> supports nested usage of C<retry> and C<try_once>. Each block
+maintains its own timeout context, allowing helper functions and inner
+operations to define their own time limits without interfering with
+outer control flow.
+
+When multiple timeouts are active, the soonest deadline is enforced.
 
 =head1 BUGS
 
@@ -382,4 +489,3 @@ Copyright (C) 2022-Present by Brett Estrade
 
 This library is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.
-

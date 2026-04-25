@@ -429,7 +429,7 @@ package_runner_prefix() {
 }
 
 choose_rc_file() {
-    shell_name=$(basename "${SHELL:-sh}")
+    shell_name=$(preferred_shell_name)
     case "$shell_name" in
         bash)
             printf '%s\n' "$HOME/.bashrc"
@@ -457,7 +457,7 @@ choose_rc_file() {
 }
 
 choose_activation_file() {
-    shell_name=$(basename "${SHELL:-sh}")
+    shell_name=$(preferred_shell_name)
     case "$shell_name" in
         bash)
             printf '%s\n' "$HOME/.profile"
@@ -473,7 +473,7 @@ choose_activation_file() {
 }
 
 ensure_shell_activation_bridge() {
-    shell_name=$(basename "${SHELL:-sh}")
+    shell_name=$(preferred_shell_name)
     case "$shell_name" in
         bash)
             append_block_once \
@@ -484,6 +484,57 @@ ensure_shell_activation_bridge() {
 fi'
             ;;
     esac
+}
+
+preferred_shell_path() {
+    if [ -n "${DD_INSTALL_PREFERRED_SHELL:-}" ]; then
+        printf '%s\n' "$DD_INSTALL_PREFERRED_SHELL"
+        return 0
+    fi
+
+    if [ -n "${SHELL:-}" ]; then
+        printf '%s\n' "$SHELL"
+        return 0
+    fi
+
+    user_name=$(id -un 2>/dev/null || true)
+    if [ -n "$user_name" ] && command -v getent >/dev/null 2>&1; then
+        passwd_entry=$(getent passwd "$user_name" 2>/dev/null || true)
+        if [ -n "$passwd_entry" ]; then
+            printf '%s\n' "$passwd_entry" | awk -F: 'NF { print $NF; exit }'
+            return 0
+        fi
+    fi
+
+    if [ -n "$user_name" ] && command -v dscl >/dev/null 2>&1; then
+        user_shell=$(dscl . -read "/Users/$user_name" UserShell 2>/dev/null | awk '/UserShell:/ { print $2; exit }')
+        if [ -n "$user_shell" ]; then
+            printf '%s\n' "$user_shell"
+            return 0
+        fi
+    fi
+
+    if [ -n "$user_name" ] && [ -r /etc/passwd ]; then
+        passwd_shell=$(awk -F: -v user="$user_name" '$1 == user { print $NF; exit }' /etc/passwd)
+        if [ -n "$passwd_shell" ]; then
+            printf '%s\n' "$passwd_shell"
+            return 0
+        fi
+    fi
+
+    printf '%s\n' '/bin/sh'
+}
+
+preferred_shell_name() {
+    shell_path=$(preferred_shell_path)
+    shell_name=$(basename "$shell_path")
+    case "$shell_name" in
+        bash|zsh)
+            printf '%s\n' "$shell_name"
+            return 0
+            ;;
+    esac
+    printf '%s\n' 'sh'
 }
 
 perl_meets_minimum() {
@@ -776,19 +827,7 @@ install_dashboard() {
 }
 
 shell_bootstrap_target() {
-    shell_name=$(basename "${SHELL:-sh}")
-    case "$shell_name" in
-        bash)
-            printf '%s\n' 'bash'
-            return 0
-            ;;
-        zsh)
-            printf '%s\n' 'zsh'
-            return 0
-            ;;
-    esac
-
-    printf '%s\n' 'sh'
+    preferred_shell_name
 }
 
 shell_command_runner() {

@@ -15,6 +15,8 @@ use lib 'lib';
 use Developer::Dashboard::CLI::OpenFile qw(build_path_registry run_open_file_command);
 use Developer::Dashboard::CLI::Query qw(run_query_command);
 use Developer::Dashboard::CLI::Which ();
+use Developer::Dashboard::Config;
+use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::JSON qw(json_decode);
 
 local $ENV{HOME} = tempdir(CLEANUP => 1);
@@ -45,6 +47,29 @@ my ( $line_from_file, @file_match ) = Developer::Dashboard::CLI::OpenFile::_reso
 );
 is( $line_from_file, 0, 'plain file resolution has no line override' );
 is_deeply( \@file_match, [$notes_file], 'plain file resolution returns the file path' );
+
+my $config_files = Developer::Dashboard::FileRegistry->new( paths => $registry );
+my $config       = Developer::Dashboard::Config->new( files => $config_files, paths => $registry );
+$config->save_global_path_alias( 'sample-project', $project_root );
+$config->save_global_file_alias( 'notes-alias',    $notes_file );
+
+my ( $line_from_file_alias, @file_alias_match ) = Developer::Dashboard::CLI::OpenFile::_resolve_open_file_matches(
+    paths => $registry,
+    args  => ['notes-alias'],
+);
+is( $line_from_file_alias, 0, 'file-alias resolution has no line override' );
+is_deeply( \@file_alias_match, [$notes_file], 'file-alias resolution returns the configured file target' );
+
+my ( $line_from_scoped_relative_file, @scoped_relative_file_match ) = Developer::Dashboard::CLI::OpenFile::_resolve_open_file_matches(
+    paths => $registry,
+    args  => [ 'sample-project', 'alpha-notes.txt' ],
+);
+is( $line_from_scoped_relative_file, 0, 'path-alias scoped relative file lookup has no line override' );
+is_deeply(
+    \@scoped_relative_file_match,
+    [$notes_file],
+    'path-alias scoped relative file lookup returns the exact relative file under the aliased scope',
+);
 
 my $perl_lib = File::Spec->catdir( $project_root, 'lib', 'My' );
 make_path($perl_lib);

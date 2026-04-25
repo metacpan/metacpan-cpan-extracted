@@ -1,5 +1,8 @@
 Revision history for Perl module Business::ISBN::Data
 
+20260424.001 2026-04-24T14:49:48Z
+	* data update for 2026-04-24
+
 20260416.001 2026-04-16T14:26:58Z
 	* stop unintended autovivification of ISBN_RANGE_MESSAGE (#236)
 
@@ -22,7 +25,7 @@ Revision history for Perl module Business::ISBN::Data
 	* data update for 2026-03-26
 
 20260325.001 2026-03-25T08:53:25Z
-	* date update for 2026-03-25
+	* data update for 2026-03-25
 
 20260321.001 2026-03-22T17:08:17Z
 	* data update for 2026-03-17
@@ -49,7 +52,7 @@ Revision history for Perl module Business::ISBN::Data
 	* data update for 2026-02-03
 
 20260123.001 2026-01-23T14:43:28Z
-	* data update 2026-01-23
+	* Data update 2026-01-23
 
 20260122.001 2026-01-22T11:54:50Z
 	* data update for 2026-01-22
@@ -157,10 +160,10 @@ Revision history for Perl module Business::ISBN::Data
 	* data update for 2025-04-18
 
 20250416.001 2025-04-16T05:46:53Z
-	* data update 2025-04-16
+	* Data update 2025-04-16
 
 20250411.001 2025-04-11T17:39:39Z
-	* Data update for 205-04-11
+	* data update for 205-04-11
 
 20250322.001 2025-03-22T05:59:36Z
 	* data update for 2025-03-21
@@ -199,10 +202,10 @@ Revision history for Perl module Business::ISBN::Data
 	* data update for 2024-12-20
 
 20241206.001 2024-12-07T16:13:59Z
-	* Data update for 2024-12-06
+	* data update for 2024-12-06
 
 20241205.001 2024-12-05T04:10:05Z
-	* 2024-12-04 data update
+	* data update for 2024-12-04
 
 20241130.001 2024-11-30T11:38:06Z
 	* data update for 2024-11-30
@@ -268,8 +271,8 @@ Revision history for Perl module Business::ISBN::Data
 	* data update for 2024-07-18
 
 20240716.001 2024-07-16T15:45:27Z
-	* Data update for 2024-07-16
-	* this distribution now uses GitHub Attestions. See README.pod.
+	* data update for 2024-07-16
+	* This distribution now uses GitHub Attestions. See README.pod.
 
 20240710.001 2024-07-10T10:46:31Z
 	* data update for 2024-07-10
@@ -278,7 +281,7 @@ Revision history for Perl module Business::ISBN::Data
 	* data update for 2024-07-09
 
 20240614.001 2024-06-14T20:50:14Z
-	* Data update for 2024-06-14
+	* data update for 2024-06-14
 
 20240601.001 2024-06-01T13:28:51Z
 	* data update for 2024-06-01
@@ -302,22 +305,22 @@ Revision history for Perl module Business::ISBN::Data
 	* data update for 2024-04-13
 
 20240323.001 2024-03-23T08:30:28Z
-	* Data update for 2023-03-23
+	* data update for 2023-03-23
 
 20240321.001 2024-03-21T07:16:25Z
-	* Data update for 2024-03-21
+	* data update for 2024-03-21
 
 20240313.001 2024-03-13T08:28:48Z
-	* Data update for 2024-03-13
+	* data update for 2024-03-13
 
 20240308.001 2024-03-08T08:32:18Z
-	* Data update for 2024-03-08
+	* data update for 2024-03-08
 
 20240302.001 2024-03-02T23:33:19Z
-	* Data update for 2024-03-02
+	* data update for 2024-03-02
 
 20240229.001 2024-02-29T21:17:00Z
-	* Data update for 2024-02-29 (Leap day!)
+	* data update for 2024-02-29 (Leap day!)
 
 20240209.001 2024-02-09T21:13:28Z
 	* data update for 2024-02-09
@@ -326,16 +329,16 @@ Revision history for Perl module Business::ISBN::Data
 	* data update for 2024-02-06
 
 20240126.001 2024-01-26T04:20:55Z
-	* Data update for 2024-01-25
+	* data update for 2024-01-25
 
 20240123.001 2024-01-23T14:52:26Z
-	* Data update for 2024-01-23
+	* data update for 2024-01-23
 
 20240116.001 2024-01-16T14:01:15Z
 	* Data upate for 2024-01-16
 
 20240111.001 2024-01-11T19:06:03Z
-	* Data update for 2014-01-11
+	* data update for 2014-01-11
 
 20231220.001 2023-12-21T08:59:21Z
 	* data update for 2023-12-20
@@ -347,7 +350,7 @@ Revision history for Perl module Business::ISBN::Data
 	* data update for 2023-11-30
 
 20231125.001 2023-11-25T07:20:29Z
-	* Data update for 2023-11-25
+	* data update for 2023-11-25
 
 20231118.001 2023-11-18T09:36:00Z
 	* data update for 2023-11-18
@@ -359,13 +362,13 @@ Revision history for Perl module Business::ISBN::Data
 	* data update for 2023-11-10
 
 20231102.001 2023-11-02T05:03:05Z
-	* Data update for 2023-11-02
+	* data update for 2023-11-02
 
 20231031.001 2023-10-31T14:31:39Z
-	* Data update for 2023-10-31
+	* data update for 2023-10-31
 
 20231020.001 2023-10-20T08:12:42Z
-	* Data update for 2023-10-20
+	* data update for 2023-10-20
 
 20231013.001 2023-10-13T12:09:42Z
 	* data update for 2023-10-13
@@ -374,68 +377,67 @@ Revision history for Perl module Business::ISBN::Data
 	* data update for 2023-10-10
 
 20231006.001 2023-10-08T02:04:15Z
-
 	* data update for 2023-10-06
 
 20230926.001 2023-09-26T09:01:09Z
-	* Data update for 2023-09-26
+	* data update for 2023-09-26
 
 20230923.001 2023-09-23T19:43:19Z
-	* Data update for 20230923
+	* data update for 20230923
 
 20230922.001 2023-09-23T00:18:18Z
-	* Data update for 20230922
+	* data update for 20230922
 
 20230907.001 2023-09-07T09:34:02Z
 	* data update for 2023-09-07
 
 20230904.001 2023-09-05T01:54:08Z
-	* Data update for 2023-09-04
+	* data update for 2023-09-04
 
 20230830.001 2023-08-30T11:43:37Z
-	Data update for 2023-08-30
+	* data update for 2023-08-30
 
 20230822.001 2023-08-22T05:23:14Z
-	* Data update for 2023-08-22
+	* data update for 2023-08-22
 
 20230811.001 2023-08-11T09:23:24Z
-	* Data update for 2023-08-11
+	* data update for 2023-08-11
 
 20230729.001 2023-07-29T20:53:52Z
-	* Data update for 2023-07-29
+	* data update for 2023-07-29
 
 20230719.001 2023-07-19T19:30:03Z
-	* Data update for 2023-07-19
+	* data update for 2023-07-19
 
 20230718.001 2023-07-18T19:22:42Z
-	* Data update for 20230718.001
+	* data update for 20230718.001
 
 20230714.001 2023-07-14T07:35:39Z
-	* Data update for 20230707
+	* data update for 20230707
 
 20230707.001 2023-07-07T03:52:07Z
-	* Data update for 20230707
+	* data update for 20230707
 
 20230626.001 2023-06-26T15:49:00Z
-	* Data update for 20230626
+	* data update for 20230626
 
 20230528.001 2023-05-28T21:01:11Z
 	* Update for 2023-05-28
 
 20230516.001 2023-05-16T15:09:45Z
-	* Data update for May 16, 2023
+	* data update for May 16, 2023
 
 20230426.002 2023-05-04T04:20:45Z
 	* fix a problem with the MANIFEST (#30). No data updates.
 
 20230426.001 2023-04-26T20:39:21Z
-	Data update for 20230426
+	* data update for 2023-04-26
 
 20230410.001 2023-04-10T06:25:50Z
-	* Data update for 2023-04-10
+	* data update for 2023-04-10
 
 20230331.001 2023-04-03T05:04:52Z
-	* Data update for 2023-03-30
+	* data update for 2023-03-30
 
 20230322.001 2023-03-22T18:22:12Z
 	* ISBN data for 2023-03-22
@@ -479,7 +481,7 @@ Revision history for Perl module Business::ISBN::Data
 
 20210112.001 2021-01-19T14:48:12Z
 	* freshen distro, dump Travis CI, add Github Actions
-	* Update to latest Business::ISBN::Data
+	* Update to the latest Business::ISBN::Data
 
 20191107 2019-12-11T20:04:42Z
 	* Peter Williams fixed the 978/979 distinction (GitHub #5)
@@ -496,8 +498,8 @@ Revision history for Perl module Business::ISBN::Data
 	* Update to the latest data (2014-09-10)
 
 20120719.01 - 2012-07-26
-	Specify the Test::More version so I can use subtest.
-	No code or feature changes
+	* Specify the Test::More version so I can use subtest.
+	* No code or feature changes
 
 20120719 - 2012-07-23
 	* Support data from RangeMessage.xml. You can use the latest
@@ -512,20 +514,20 @@ Revision history for Perl module Business::ISBN::Data
 20081020 - 2008-10-20
 	* Updated publisher codes thanks to Yakov Shafranovich
 	* Version number is now the update date of the module,
-	in YYYYMMDD. This not the date of the ISBN Agency
+	in YYYYMMDD. This is not the date of the ISBN Agency
 	updates though.
 
 1.17 - 2007-10-27
-	* Update to docs to point to latest URL for ISBN International
+	* Update the docs to point to the latest URL for ISBN International
 
 1.16 - 2007-10-25
-	* distro cleanups. No need to upgrade.:wq
+	* distro cleanups. No need to upgrade.
 
 1.15 - 2007-08-31
-	[BUGFIX] RT #29078: Fix publihser ranges for Greece
+	* RT #29078: Fix publisher ranges for Greece
 
 1.14 - 2007-05-18
-	* *Added 7000-8499 range from Greece (960) to fix RT #27107
+	* Added 7000-8499 range from Greece (960) to fix RT #27107
 
 1.13 - 2007-01-09
 	* updated copyright and license info
@@ -572,7 +574,7 @@ Revision history for Perl module Business::ISBN::Data
 	* Updated publisher ranges
 
 1.03 - 2002-11-25
-	* fixed Makefile to install in right place
+	* fixed Makefile to install in the right place
 
 1.02 - 2002-11-25
 	* this is the first release as a separate module

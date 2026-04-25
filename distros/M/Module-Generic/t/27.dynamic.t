@@ -1,3 +1,4 @@
+#!perl
 BEGIN
 {
     use strict;
@@ -41,7 +42,7 @@ subtest 'dynamic class creation' => sub
     is( $obj->metadata->sku, 'ABC123', 'Nested method works' );
     isa_ok( $obj->tags, 'Module::Generic::Array', 'Array method returns array object' );
     is( $obj->tags->length, 2, 'Array length correct' );
-    isa_ok( $obj->created, 'DateTime', 'Datetime method returns DateTime object' );
+    isa_ok( $obj->created, 'DateTime::Lite', 'Datetime method returns DateTime::Lite object' );
     is( $obj->created->year, 2023, 'Datetime year correct' );
     isa_ok( $obj->is_active, 'Module::Generic::Boolean', 'Boolean method returns boolean object' );
     is( $obj->is_active, 1, 'Boolean value correct' );
@@ -154,7 +155,7 @@ subtest 'serialization' => sub
     is( $new_obj->metadata->sku, 'XYZ789', 'Deserialised nested object preserved' );
     isa_ok( $new_obj->tags, 'Module::Generic::Array', 'Deserialised array preserved' );
     is( $new_obj->tags->length, 2, 'Deserialised array length correct' );
-    isa_ok( $new_obj->created, 'DateTime', 'Deserialised datetime preserved' );
+    isa_ok( $new_obj->created, 'DateTime::Lite', 'Deserialised datetime preserved' );
     is( $new_obj->created->year, 2023, 'Deserialised datetime year correct' );
     isa_ok( $new_obj->is_active, 'Module::Generic::Boolean', 'Deserialised boolean preserved' );
     is( $new_obj->is_active, 1, 'Deserialised boolean value correct' );

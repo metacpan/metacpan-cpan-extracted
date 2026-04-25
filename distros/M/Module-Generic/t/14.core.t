@@ -10,7 +10,7 @@ BEGIN
     use Test::More;
     # 2021-11-01T08:12:10
     use Test::Time time => 1635754330;
-    use DateTime;
+    use DateTime::Lite;
     # use Nice::Try;
     use Scalar::Util;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
@@ -165,27 +165,27 @@ is( ref( $cb ), 'CODE', '_set_get_code' );
 my $cbv = $o->callback->();
 is( $cbv, 2, '_set_get_code exec value' );
 
-# NOTE: DateTime
+# NOTE: DateTime::Lite
 my $now = time();
 $o->created = 'now';
 my $dt = $o->created;
 $dt->set_time_zone( 'UTC' );
-isa_ok( $dt, 'DateTime', '_set_get_datetime as lvalue' );
+isa_ok( $dt, 'DateTime::Lite', '_set_get_datetime as lvalue' );
 SKIP:
 {
     # try-catch
     local $@;
     if( !eval
     {
-        my $dt2 = DateTime->from_epoch( epoch => $now, time_zone => $dt->time_zone );
+        my $dt2 = DateTime::Lite->from_epoch( epoch => $now, time_zone => $dt->time_zone );
         diag( "created is '", $dt->iso8601, "' vs '", $dt2->iso8601, "'" ) if( $DEBUG );
         ok( ( $dt->ymd eq $dt2->ymd && $dt->hour == $dt2->hour && $dt->minute == $dt2->minute ), 'datetime value' );
         $o->created( '+1d' );
-        my $dt4 = DateTime->now( time_zone => $dt->time_zone )->add( days => 1 );
+        my $dt4 = DateTime::Lite->now( time_zone => $dt->time_zone )->add( days => 1 );
         $dt4->truncate( to => 'minute' );
         my $dt3 = $o->created->set_time_zone( 'UTC' );
         $dt3->truncate( to => 'minute' );
-        isa_ok( $dt3, 'DateTime', '_set_get_datetime' );
+        isa_ok( $dt3, 'DateTime::Lite', '_set_get_datetime' );
         is( $dt3->iso8601, $dt4->iso8601, '_set_get_datetime value' );
     })
     {
@@ -299,7 +299,7 @@ $v = $o->value;
 isa_ok( $v, 'Module::Generic::Scalar', '_set_get_scalar_as_object' );
 is( $v, 'pending', '_set_get_scalar_as_object value' );
 
-# NOTE: DateTime
+# NOTE: DateTime::Lite
 $dt = $o->datetime;
 is( $dt, undef, 'lvalue->get -> undef' );
 # $o->debug(4);
@@ -319,7 +319,7 @@ if( !eval
     like( $@->message, qr/Value provided is not a datetime./, 'lvalue -> fatal error' );
 }
 
-$now = DateTime->now;
+$now = DateTime::Lite->now;
 # try-catch
 if( !eval
 {
@@ -330,10 +330,10 @@ if( !eval
 }
 $o->fatal(0);
 my $dt2 = $o->datetime;
-isa_ok( $dt2, 'DateTime', 'lvalue->get is a DateTime object' );
+isa_ok( $dt2, 'DateTime::Lite', 'lvalue->get is a DateTime::Lite object' );
 # is( ( $dt2->epoch - $now->epoch ), 10, 'lvalue->get' );
 is( $dt2, $now, 'lvalue->get' );
-my $now2 = DateTime->now->add( hours => 1 );
+my $now2 = DateTime::Lite->now->add( hours => 1 );
 isnt( $now2, $now, "new datetime ($now2) isnt same as old datetime ($now)" );
 my $now3 = $o->datetime( $now2 );
 is( $now3, $now2, 'lvalue->set( $value ) -> return value' );
@@ -957,7 +957,7 @@ sub datetime : lvalue { return( shift->_lvalue({
     set => sub
     {
         my( $self, @args ) = @_;
-        if( $self->_is_a( $args[0] => 'DateTime' ) )
+        if( $self->_is_a( $args[0] => 'DateTime::Lite' ) )
         {
             return( $self->{datetime} = shift( @args ) );
         }

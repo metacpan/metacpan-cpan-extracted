@@ -269,11 +269,56 @@ SV   *chandra_error_format_js(pTHX_ HV *err);
 
 static SV *perl_callback = NULL;
 static PerlInterpreter *my_perl_interp = NULL;
+static int _chandra_page_loaded = 0;
 
 /* ---- Webview ↔ Perl callback bridges ---- */
 
 static void external_invoke_cb(struct webview *w, const char *arg) {
     dTHX;
+
+    /* Intercept pageload signal from WKUserScript (fires on every page load).
+     * Skip the first one (initial render). On subsequent loads (reload),
+     * call refresh() to restore the app content. */
+    if (arg && strstr(arg, "\"type\":\"pageload\"")) {
+        if (_chandra_page_loaded) {
+            /* Reset flag BEFORE refresh so the document.write inside
+             * refresh() triggers another pageload that we skip (first load). */
+            _chandra_page_loaded = 0;
+
+            SV *target = get_sv("Chandra::App::_refresh_target", 0);
+            if (target && SvOK(target)) {
+                HV *app_hv;
+                SV **reload_cb;
+
+                dSP;
+                ENTER; SAVETMPS;
+                PUSHMARK(SP);
+                XPUSHs(target);
+                PUTBACK;
+                call_method("refresh", G_DISCARD | G_EVAL);
+                if (SvTRUE(ERRSV)) sv_setsv(ERRSV, &PL_sv_undef);
+                FREETMPS; LEAVE;
+
+                /* Call on_reload callback if registered */
+                app_hv = (HV *)SvRV(target);
+                reload_cb = hv_fetchs(app_hv, "_on_reload", 0);
+                if (reload_cb && SvOK(*reload_cb) && SvROK(*reload_cb)) {
+                    dSP;
+                    ENTER; SAVETMPS;
+                    PUSHMARK(SP);
+                    XPUSHs(target);
+                    PUTBACK;
+                    call_sv(SvRV(*reload_cb), G_DISCARD | G_EVAL);
+                    if (SvTRUE(ERRSV)) sv_setsv(ERRSV, &PL_sv_undef);
+                    FREETMPS; LEAVE;
+                }
+            }
+        } else {
+            _chandra_page_loaded = 1;
+        }
+        return;
+    }
+
     if (perl_callback && SvOK(perl_callback)) {
         dSP;
         ENTER; SAVETMPS;
@@ -356,6 +401,29 @@ static XS(xs_chandra_navigate_cb)
             XPUSHs(ST(0));
             PUTBACK;
             call_method("navigate", G_DISCARD);
+            FREETMPS; LEAVE;
+        }
+    }
+    XSRETURN_EMPTY;
+}
+
+/* ---- Static XS callback for App reload/refresh ---- */
+
+static XS(xs_chandra_refresh_cb)
+{
+    dXSARGS;
+    PERL_UNUSED_VAR(cv);
+    PERL_UNUSED_VAR(items);
+    {
+        SV *target = get_sv("Chandra::App::_refresh_target", 0);
+        if (target && SvOK(target)) {
+            dSP;
+            ENTER; SAVETMPS;
+            PUSHMARK(SP);
+            XPUSHs(target);
+            PUTBACK;
+            call_method("refresh", G_DISCARD | G_EVAL);
+            if (SvTRUE(ERRSV)) sv_setsv(ERRSV, &PL_sv_undef);
             FREETMPS; LEAVE;
         }
     }

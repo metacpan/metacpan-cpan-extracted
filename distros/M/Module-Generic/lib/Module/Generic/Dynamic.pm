@@ -444,7 +444,7 @@ sub AUTOLOAD
             {
                 $handler = '_set_get_number';
             }
-            elsif( $self->_is_a( $$first_arg => [qw( DateTime Module::Generic::DateTime )] ) )
+            elsif( $self->_is_a( $$first_arg => [qw( DateTime::Lite DateTime Module::Generic::DateTime )] ) )
             {
                 $handler = '_set_get_datetime';
             }

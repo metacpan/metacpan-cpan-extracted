@@ -871,6 +871,33 @@ my $foobar_resolved = _run("$perl -I'$lib' '$dashboard' path resolve foobar");
 is( $foobar_resolved, $custom_path_root . "\n", 'dashboard path resolve supports user-defined aliases' );
 my $path_list = _run("$perl -I'$lib' '$dashboard' path list");
 like( $path_list, qr/"foobar"\s*:\s*"\Q$custom_path_root\E"/, 'dashboard path list includes user-defined aliases' );
+my $dot_current_path_root = File::Spec->catdir( $ENV{HOME}, 'dot-current-path-root' );
+make_path($dot_current_path_root);
+my $path_add_dot = _run("cd '$dot_current_path_root' && $perl -I'$lib' '$dashboard' path add .");
+like( $path_add_dot, qr/"name"\s*:\s*"dot-current-path-root"/, 'dashboard path add . derives the alias name from the current directory basename' );
+like( $path_add_dot, qr/\Q$dot_current_path_root\E/, 'dashboard path add . stores the current directory as the alias target' );
+my $dot_current_resolved = _run("$perl -I'$lib' '$dashboard' path resolve dot-current-path-root");
+is_same_path_output( $dot_current_resolved, "$dot_current_path_root\n", 'dashboard path add . resolves back to the current directory' );
+my $path_add_named_dot = _run("cd '$dot_current_path_root' && $perl -I'$lib' '$dashboard' path add right-here .");
+like( $path_add_named_dot, qr/"name"\s*:\s*"right-here"/, 'dashboard path add NAME . keeps the explicit alias name' );
+like( $path_add_named_dot, qr/\Q$dot_current_path_root\E/, 'dashboard path add NAME . uses the current directory as the target path' );
+my $custom_file_target = File::Spec->catfile( $ENV{HOME}, 'custom-notes.txt' );
+open my $custom_file_target_fh, '>', $custom_file_target or die "Unable to write $custom_file_target: $!";
+print {$custom_file_target_fh} "notes\n";
+close $custom_file_target_fh;
+my $file_add = _run("$perl -I'$lib' '$dashboard' file add notes '$custom_file_target'");
+like( $file_add, qr/"name"\s*:\s*"notes"/, 'dashboard file add stores a custom file alias' );
+like( $file_add, qr/\Q$custom_file_target\E/, 'dashboard file add reports the stored target file' );
+open my $global_file_config_fh, '<', $global_config_file or die "Unable to read $global_config_file: $!";
+my $global_file_config = do { local $/; <$global_file_config_fh> };
+close $global_file_config_fh;
+like( $global_file_config, qr/"notes"\s*:\s*"\$HOME\/custom-notes\.txt"/, 'dashboard file add stores home-relative file aliases using $HOME in global config' );
+my $notes_resolved = _run("$perl -I'$lib' '$dashboard' file resolve notes");
+is( $notes_resolved, $custom_file_target . "\n", 'dashboard file resolve supports user-defined file aliases' );
+my $file_list = _run("$perl -I'$lib' '$dashboard' file list");
+like( $file_list, qr/"notes"\s*:\s*"\Q$custom_file_target\E"/, 'dashboard file list includes user-defined file aliases' );
+my $of_file_alias = _run("$perl -I'$lib' '$dashboard' of --print notes");
+is( $of_file_alias, $custom_file_target . "\n", 'dashboard of resolves configured file aliases directly' );
 {
     my $layered_path_home = tempdir( CLEANUP => 1 );
     local $ENV{HOME} = $layered_path_home;
@@ -1139,6 +1166,9 @@ like( $zsh_bootstrap, qr/add-zsh-hook precmd _dd_update_prompt/, 'dashboard shel
 like( $zsh_bootstrap, qr/ps1 --jobs \$\{#jobstates\} --mode compact/, 'dashboard shell zsh bootstrap uses zsh job counts for prompt rendering' );
 like( $zsh_bootstrap, qr/path cdr/, 'dashboard shell zsh bootstrap keeps the cdr path helper functions' );
 like( $zsh_bootstrap, qr/\bd2\(\)\s*\{/, 'dashboard shell zsh bootstrap exposes the d2 shortcut helper' );
+like( $zsh_bootstrap, qr/autoload -Uz compinit/, 'dashboard shell zsh bootstrap loads compinit for fresh shells before completion setup' );
+like( $zsh_bootstrap, qr{whence compdef >/dev/null 2>&1}, 'dashboard shell zsh bootstrap checks whether compdef is already available' );
+like( $zsh_bootstrap, qr/\bcompinit\b/, 'dashboard shell zsh bootstrap initializes zsh completion when compdef is missing' );
 like( $zsh_bootstrap, qr/compdef _dashboard_complete_zsh dashboard d2/, 'dashboard shell zsh bootstrap wires tab completion for dashboard and d2' );
 like( $zsh_bootstrap, qr/compdef _dashboard_complete_cdr_zsh cdr dd_cdr which_dir/, 'dashboard shell zsh bootstrap wires cdr-family tab completion' );
 like( $zsh_bootstrap, qr/d2\(\)\s*\{\s*'\Q$dashboard\E'\s+"\$@"/s, 'dashboard shell zsh bootstrap dispatches d2 through the dashboard entrypoint directly' );
@@ -1181,6 +1211,17 @@ like( $path_del, qr/"name"\s*:\s*"foobar"/, 'dashboard path del reports the remo
 like( $path_del, qr/"removed"\s*:\s*1/, 'dashboard path del removes existing aliases' );
 my $path_del_again = _run("$perl -I'$lib' '$dashboard' path del foobar");
 like( $path_del_again, qr/"removed"\s*:\s*0/, 'dashboard path del is idempotent for missing aliases' );
+my $path_del_dot = _run("cd '$dot_current_path_root' && $perl -I'$lib' '$dashboard' path del .");
+like( $path_del_dot, qr/"name"\s*:\s*"dot-current-path-root"/, 'dashboard path del . removes the alias that points at the current directory' );
+like( $path_del_dot, qr/"removed"\s*:\s*1/, 'dashboard path del . removes the current-directory alias' );
+my $path_rm = _run("$perl -I'$lib' '$dashboard' path rm right-here");
+like( $path_rm, qr/"name"\s*:\s*"right-here"/, 'dashboard path rm aliases the delete command' );
+like( $path_rm, qr/"removed"\s*:\s*1/, 'dashboard path rm removes named aliases' );
+my $file_del = _run("$perl -I'$lib' '$dashboard' file del notes");
+like( $file_del, qr/"name"\s*:\s*"notes"/, 'dashboard file del reports the removed alias' );
+like( $file_del, qr/"removed"\s*:\s*1/, 'dashboard file del removes existing aliases' );
+my $file_del_again = _run("$perl -I'$lib' '$dashboard' file del notes");
+like( $file_del_again, qr/"removed"\s*:\s*0/, 'dashboard file del is idempotent for missing aliases' );
 
 my $docker_green_root = File::Spec->catdir( $ENV{HOME}, '.developer-dashboard', 'config', 'docker', 'green' );
 make_path($docker_green_root);
@@ -1449,6 +1490,63 @@ like(
     qr/demo-skill-two-repo\s+file:\/\/\Q$second_skill_repo\E\s+1\.01\s+1\.01\s+no update/,
     'bare dashboard skills install table reports unchanged before and after .env versions',
 );
+my $fake_apt = File::Spec->catfile( $fake_bin, 'apt-get' );
+open my $fake_apt_fh, '>', $fake_apt or die "Unable to write $fake_apt: $!";
+print {$fake_apt_fh} <<"SH";
+#!/bin/sh
+printf 'apt exploded for %s\\n' "\$*" >&2
+exit 1
+SH
+close $fake_apt_fh;
+chmod 0755, $fake_apt or die "Unable to chmod $fake_apt: $!";
+my $fake_dpkg_query = File::Spec->catfile( $fake_bin, 'dpkg-query' );
+open my $fake_dpkg_query_fh, '>', $fake_dpkg_query or die "Unable to write $fake_dpkg_query: $!";
+print {$fake_dpkg_query_fh} <<"SH";
+#!/bin/sh
+exit 1
+SH
+close $fake_dpkg_query_fh;
+chmod 0755, $fake_dpkg_query or die "Unable to chmod $fake_dpkg_query: $!";
+my $failing_skill_repo = File::Spec->catdir( $skill_repo_root, 'failing-apt-skill' );
+make_path( File::Spec->catdir( $failing_skill_repo, 'config' ) );
+open my $failing_skill_env_fh, '>', File::Spec->catfile( $failing_skill_repo, '.env' ) or die "Unable to write failing skill .env: $!";
+print {$failing_skill_env_fh} "VERSION=1.00\n";
+close $failing_skill_env_fh;
+open my $failing_skill_config_fh, '>', File::Spec->catfile( $failing_skill_repo, 'config', 'config.json' )
+  or die "Unable to write failing skill config: $!";
+print {$failing_skill_config_fh} "{}\n";
+close $failing_skill_config_fh;
+open my $failing_skill_apt_fh, '>', File::Spec->catfile( $failing_skill_repo, 'aptfile' )
+  or die "Unable to write failing skill aptfile: $!";
+print {$failing_skill_apt_fh} "dd-smoke-fail-package\n";
+close $failing_skill_apt_fh;
+{
+    my $cwd_before_failing_skill_repo = getcwd();
+    chdir $failing_skill_repo or die "Unable to chdir to $failing_skill_repo: $!";
+    my ( $stdout, $stderr, $exit ) = capture {
+        system 'git', 'init', '--quiet';
+        return $? >> 8 if $? != 0;
+        system 'git', 'config', 'user.email', 'test@example.com';
+        return $? >> 8 if $? != 0;
+        system 'git', 'config', 'user.name', 'Test';
+        return $? >> 8 if $? != 0;
+        system 'git', 'add', '.';
+        return $? >> 8 if $? != 0;
+        system 'git', 'commit', '-m', 'Initial failing apt skill';
+        return $? >> 8;
+    };
+    is( $exit, 0, 'failing apt skill fixture repository initializes cleanly for install error reporting coverage' )
+      or diag $stdout . $stderr;
+    chdir $cwd_before_failing_skill_repo or die "Unable to chdir back to $cwd_before_failing_skill_repo: $!";
+}
+my ( $failed_skill_stdout, $failed_skill_stderr, $failed_skill_exit ) = capture {
+    local $ENV{DEVELOPER_DASHBOARD_PROGRESS} = 1;
+    system 'sh', '-c', "PATH='$fake_bin':\"\$PATH\" $perl -I'$lib' '$dashboard' skills install 'file://$failing_skill_repo'";
+};
+is( $failed_skill_exit >> 8, 1, 'dashboard skills install exits non-zero when aptfile installation fails' );
+like( $failed_skill_stderr, qr/\[X\] Install aptfile dependencies from .*failing-apt-skill.*aptfile \(error: Failed to install skill apt dependencies .*?\)/, 'dashboard skills install progress prints the failure reason directly on the failed aptfile row' );
+like( $failed_skill_stdout, qr/^Error: Failed to install skill apt dependencies /m, 'dashboard skills install table mode prints the install error instead of a no-update summary when installation fails' );
+unlike( $failed_skill_stdout, qr/No update\./, 'dashboard skills install does not claim no update when installation failed' );
 
 my $manifest_global_skill_repo = File::Spec->catdir( $ENV{HOME}, 'manifest-global-skill-fixture' );
 make_path($manifest_global_skill_repo);
@@ -1653,6 +1751,10 @@ my $jq_scope_ok_json = File::Spec->catfile( $jq_scope_js_root, 'ok.json' );
 open my $jq_scope_ok_json_fh, '>', $jq_scope_ok_json or die "Unable to write $jq_scope_ok_json: $!";
 print {$jq_scope_ok_json_fh} "{\"ok\":true}\n";
 close $jq_scope_ok_json_fh;
+my $jq_scope_exact = File::Spec->catfile( $jq_scope_root, '456.txt' );
+open my $jq_scope_exact_fh, '>', $jq_scope_exact or die "Unable to write $jq_scope_exact: $!";
+print {$jq_scope_exact_fh} "exact\n";
+close $jq_scope_exact_fh;
 my $jq_scope_jquery = File::Spec->catfile( $jq_scope_js_root, 'jquery.js' );
 open my $jq_scope_jquery_fh, '>', $jq_scope_jquery or die "Unable to write $jq_scope_jquery: $!";
 print {$jq_scope_jquery_fh} "window.jquery = true;\n";
@@ -1667,6 +1769,12 @@ close $fake_editor_log_fh;
 is($fake_editor_args, "./cli/jq ./public/js/jq.js\n", 'dashboard of . jq opens the selected jq helper and jq.js before jquery.js');
 my $ok_regex_scope = _run("cd '$jq_scope_root' && $perl -I'$repo/lib' '$repo/bin/dashboard' of --print . 'Ok\\.js\$'");
 is( $ok_regex_scope, "./public/js/ok.js\n", 'dashboard of . treats scope keywords as regexes, so Ok\\.js$ matches ok.js but not ok.json' );
+my $scoped_exact_file = _run("cd '$jq_scope_root' && $perl -I'$lib' '$dashboard' path add jq-scope . >/dev/null && $perl -I'$repo/lib' '$repo/bin/dashboard' of --print jq-scope 456.txt");
+is(
+    $scoped_exact_file,
+    $jq_scope_exact . "\n",
+    'dashboard of path aliases resolves exact relative file targets inside the aliased folder',
+);
 
 my $of_print = _run("$perl -I'$lib' '$dashboard' of --print '$open_root' alpha");
 like($of_print, qr/\Q$open_target\E/, 'dashboard of is shorthand for open-file');

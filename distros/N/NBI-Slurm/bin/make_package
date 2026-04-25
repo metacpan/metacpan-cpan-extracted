@@ -177,7 +177,7 @@ make_package - Install a "package" in the NBI HPC using a singularity image
 
 =head1 VERSION
 
-version 0.20.1
+version 0.21.0
 
 =head1 SYNOPSIS
 
