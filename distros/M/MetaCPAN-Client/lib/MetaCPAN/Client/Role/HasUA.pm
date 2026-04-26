@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Role::HasUA;
 # ABSTRACT: Role for supporting user-agent attribute
-$MetaCPAN::Client::Role::HasUA::VERSION = '2.040000';
+$MetaCPAN::Client::Role::HasUA::VERSION = '2.041000';
 use Moo::Role;
 use Carp;
 use HTTP::Tiny;
@@ -60,7 +60,7 @@ MetaCPAN::Client::Role::HasUA - Role for supporting user-agent attribute
 
 =head1 VERSION
 
-version 2.040000
+version 2.041000
 
 =head1 ATTRIBUTES
 

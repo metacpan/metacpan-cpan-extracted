@@ -7,6 +7,7 @@ META.yml
 Makefile.PL
 README
 dist.ini
+examples/nested.pl
 examples/retry.pl
 examples/timeout.pl
 examples/try-tiny.pl
@@ -19,6 +20,8 @@ releases/Try-ALRM-1.00.tar.gz
 releases/Try-ALRM-1.01.tar.gz
 releases/Try-ALRM-1.02.tar.gz
 releases/Try-ALRM-1.03.tar.gz
+releases/Try-ALRM-1.04.tar.gz
+releases/Try-ALRM-1.05.tar.gz
 t/01-basic.t
 t/02-basic.t
 t/03-basic.t

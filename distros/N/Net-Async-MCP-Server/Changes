@@ -1,0 +1,9 @@
+Revision history for Net-Async-MCP-Server
+
+0.001     2026-04-26 03:50:13Z
+
+  - Initial release
+  - Net::Async::MCP::Server - async MCP server base class
+  - Built on IO::Async and Future::AsyncAwait
+  - Handles JSON-RPC requests (initialize, tools/list, tools/call, ping)
+  - Transport::Stdio for stdio-based MCP communication

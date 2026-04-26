@@ -43,7 +43,7 @@ Perl code itself.
 use strict;
 use PPI::Statement ();
 
-our $VERSION = '1.287';
+our $VERSION = '1.291';
 
 our @ISA = "PPI::Statement";
 

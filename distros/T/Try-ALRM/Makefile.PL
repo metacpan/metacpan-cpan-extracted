@@ -18,9 +18,10 @@ my %WriteMakefileArgs = (
   "NAME" => "Try::ALRM",
   "PREREQ_PM" => {},
   "TEST_REQUIRES" => {
-    "Test::More" => 0
+    "Test::More" => "0.96",
+    "Try::Tiny" => 0
   },
-  "VERSION" => "1.03",
+  "VERSION" => "1.05",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -28,7 +29,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Test::More" => 0
+  "Test::More" => "0.96",
+  "Try::Tiny" => 0
 );
 
 

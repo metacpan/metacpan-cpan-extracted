@@ -1,34 +1,38 @@
 use strict;
 use warnings;
 
+use Test2::V0;
+
 use Parallel::Subs;
-use Test::More tests => 12;
 
-test_with(1);
-test_with(5);
-
-exit;
-
-sub test_with {
-
-    my $n = shift || 1;
-
+subtest 'single job with callback' => sub {
     my $p = Parallel::Subs->new();
-    for ( 1 .. $n ) {
+    $p->add(
+        sub { return { number => 1 } },
+        sub {
+            my $result = shift;
+            is $result->{number}, 1, "callback receives correct result";
+        }
+    );
+    $p->wait_for_all();
+};
+
+subtest 'multiple jobs with callbacks' => sub {
+    my $n = 5;
+    my $p = Parallel::Subs->new();
+
+    for my $i ( 1 .. $n ) {
         $p->add(
-            sub {
-                my $time = int( rand(2) );
-                sleep($time);
-                return { number => $n, time => $time };
-            },
+            sub { return { number => $i } },
             sub {
                 my $result = shift;
-                is $result->{number} => $n;
-                cmp_ok $result->{time}, '<=', 2;
+                is $result->{number}, $i, "callback $i receives number=$i";
             }
         );
     }
-    note "running $n job(s) in parallel";
-    $p->wait_for_all();
-}
 
+    note "running $n jobs in parallel";
+    $p->wait_for_all();
+};
+
+done_testing;

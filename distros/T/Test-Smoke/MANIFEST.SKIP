@@ -16,6 +16,7 @@ blib/
 \.gitattributes
 pm_to_blib
 ^Makefile$
+Makefile\.old
 MYMETA\..+
 cover_db/
 sandbox/
@@ -24,3 +25,5 @@ sandbox/
 Makefile.PL.bak
 Test-Smoke-
 smokecurrent
+^local/
+

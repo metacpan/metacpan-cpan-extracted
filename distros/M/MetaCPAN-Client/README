@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.040000
+    version 2.041000
 
 SYNOPSIS
 
@@ -115,13 +115,6 @@ METHODS
 
     Returns a MetaCPAN::Client::ResultSet object containing
     MetaCPAN::Client::Favorite results.
-
- rating
-
-        my $rating = $mcpan->rating({ distribution => 'Moose' });
-
-    Returns a MetaCPAN::Client::ResultSet object containing
-    MetaCPAN::Client::Rating results.
 
  release
 
@@ -240,8 +233,9 @@ METHODS
 
  all
 
-    Retrieve all matches for authors/modules/distributions/favorites or
-    releases.
+    Retrieve all matches for
+    authors/modules/distributions/favorites/files/permissions/packages/covers/cves
+    or releases.
 
         my $all_releases = $mcpan->all('releases')
 

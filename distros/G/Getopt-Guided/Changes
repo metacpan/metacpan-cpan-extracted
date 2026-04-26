@@ -1,5 +1,10 @@
 Release history for Getopt-Guided
 
+v3.2.0    2026-04-26T07:30:33Z
+          - Introduce HASH destination reference type
+          - Introduce map option argument indicator
+          - Use Test2::V1 in some test scripts
+
 v3.1.2    2026-03-15T08:36:58Z
           - Fix readopts() return value
           - Increase readopts() test coverage

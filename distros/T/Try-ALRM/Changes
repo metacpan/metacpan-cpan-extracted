@@ -73,3 +73,18 @@ Revision history for Perl extension Try::ALRM.
 
 1.03 Sat Apr 25 05:45:00 2026
 	- updated POD about composability
+
+1.04 Sat Apr 25 15:00:00 2026
+        - Try::ALRM blocks can be nested
+	- Try::ALRM blocks can work with Try::Tiny, Perl >= 5.34 try, and eval{...}
+	- tests added for nesting and use with Try::Tiny, Perl >= 5.34 try
+	- updated POD about composability and use with Try::Tiny or Perl try
+        - added tests for use with Try::Tiny and Perl >= 5.34 try
+
+1.05 Sat Apr 25 15:01:00 2026
+	- Fixed POD error
+        - Try::ALRM blocks can be nested
+	- Try::ALRM blocks can work with Try::Tiny, Perl try, and eval{...}
+	- added tests for nesting, use with Try::Tiny, Perl try, and eval{...}
+	- added nesting example in examples directory
+	- updated POD about composability and use with Try::Tiny, Perl try, and eval{...}

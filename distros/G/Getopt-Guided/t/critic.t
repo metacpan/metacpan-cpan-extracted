@@ -1,7 +1,4 @@
-use strict;
-use warnings;
-
-use Test::More import => [ qw( plan ) ];
+use Test2::V1 -pragmas, qw( plan );
 
 BEGIN {
   plan skip_all => 'Not release testing context'
@@ -10,6 +7,7 @@ BEGIN {
     unless -e '.perlcriticrc'
 }
 
-use Test::Needs qw( Test::Perl::Critic );
+use Test2::Require::Module 'Test::Perl::Critic';
+use Test::Perl::Critic;
 
 Test::Perl::Critic::all_critic_ok( 'Makefile.PL', 't', 'lib', grep { -d } qw( xt bin script ) )

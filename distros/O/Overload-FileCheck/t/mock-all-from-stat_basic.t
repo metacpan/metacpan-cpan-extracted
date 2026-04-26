@@ -27,6 +27,7 @@ my $fake_files = {
     'regular.file' => stat_as_file( size => 666 ),
     'empty.file'   => stat_as_file(),
     'my.socket'    => stat_as_socket(),
+    'my.fifo'      => stat_as_fifo(),
 };
 
 # move to DATA
@@ -134,8 +135,16 @@ __DATA__
 -S 'my.socket'
 !-s 'my.socket'
 
-# a zero stat
-!-e 'zero'
+# a FIFO (named pipe)
+-e 'my.fifo'
+!-d 'my.fifo'
+!-f 'my.fifo'
+-p 'my.fifo'
+!-S 'my.fifo'
+!-s 'my.fifo'
+
+# a zero stat (stat succeeded with all-zero fields — file exists but has no type)
+-e 'zero'
 !-f 'zero'
 !-l 'zero'
 !-d 'zero'

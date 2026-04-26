@@ -127,23 +127,23 @@ Use a Virtual Machine like VirtualBox or Docker to use on Windows, with a Linux 
 
    You can also look for information at:
 
-   * **Manual** - [https://github.com/richcsst/Graphics-Framebuffer/blob/master/MANUAL.md](https://github.com/richcsst/Graphics-Framebuffer/blob/master/MANUAL.md) - A separate indexed manual written in GitHub markdown.  The module POD still exists, but this is easier to read.
+   * **Manual** - [MANUAL.md](https://github.com/richcsst/Graphics-Framebuffer/blob/master/MANUAL.md) - A separate indexed manual written in GitHub markdown.  The module POD still exists, but this is easier to read.
 
-   * **MetaCPAN** - [https://metacpan.org/pod/Graphics::Framebuffer](https://metacpan.org/pod/Graphics::Framebuffer)
+   * **MetaCPAN** - [MetaCPAN - Graphics::Framebuffer](https://metacpan.org/pod/Graphics::Framebuffer)
 
-   * **YouTube** - [https://www.youtube.com/watch?v=X8RpFBq6F9I](https://www.youtube.com/watch?v=X8RpFBq6F9I)
+   * **YouTube** - [YouTube](https://www.youtube.com/watch?v=X8RpFBq6F9I)
 
-   * **GitHub** - [https://github.com/richcsst/Graphics-Framebuffer](https://github.com/richcsst/Graphics-Framebuffer)
+   * **GitHub** - [GitHub - Graphics-Framebuffer](https://github.com/richcsst/Graphics-Framebuffer)
 
-   * **GitHub Clone** - [https://github.com/richcsst/Graphics-Framebuffer.git](https://github.com/richcsst/Graphics-Framebuffer.git)
+   * **GitHub Clone** - https://github.com/richcsst/Graphics-Framebuffer.git
 
-   * **Mario Roy's Multiprocessing Examples** - [https://github.com/marioroy/mce-examples](https://github.com/marioroy/mce-examples)
+   * **Mario Roy's Multiprocessing Examples** - [MCE Examples](https://github.com/marioroy/mce-examples)
 
 ![Divider](pics/pink.jpg?raw=true "Divider")
 
 ## LICENSE AND COPYRIGHT
 
-   Copyright © 2013-2026 Richard Kelsch
+   Copyright © 2003-2026 Richard Kelsch
 
    This program is free software; you can redistribute it and/or modify it under the terms of either: the GNU General Public License as published by the Free Software Foundation; or the Artistic License.
 

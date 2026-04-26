@@ -40,7 +40,11 @@ $dash_e_mocked = CHECK_IS_TRUE;
 is [ -e "/this/is/there" ], [ 1 ], "-e CHECK_IS_TRUE";
 
 $dash_e_mocked = CHECK_IS_FALSE;
-is [ -e "/this/is/not/there" ], [ undef ], "-e CHECK_IS_FALSE";
+{
+    my $r = -e "/this/is/not/there";
+    ok( !$r, "-e CHECK_IS_FALSE is false" );
+    ok( defined($r), "-e CHECK_IS_FALSE is defined ('' not undef)" );
+}
 
 done_testing;
 exit;

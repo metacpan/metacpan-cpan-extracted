@@ -4,9 +4,6 @@ use warnings;
 my $TIMEOUT = 60;
 my $TRIES   = 3;
 
-#TODO: get this in lib/Try/ALRM.pm
-#TODO: update unit tests for 'retry'
-
 use Try::ALRM qw/tries timeout/;
 
 Try::ALRM::retry {
@@ -26,13 +23,11 @@ Try::ALRM::ALRM {
 }
 Try::ALRM::finally {
     my ( $attempts, $success ) = @_;    # @_ is populated as described in this line
-    my $tries   = tries;                # will be 3
-    my $timeout = timeout;              # will be 4
+    my $tries   = tries;                # will be 1
+    my $timeout = timeout;              # will be 3
     printf qq{%s after %d of %d attempts (timeout of %d)\n}, ($success) ? q{Success} : q{Failure}, $attempts, $tries, $timeout;
 }
 timeout => 3, tries => 1;
-
-#Maybe TODO: timeout to be a subroutine or array of numbers that match with the retry?
 
 __END__
 

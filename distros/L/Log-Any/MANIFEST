@@ -8,7 +8,6 @@ META.yml
 Makefile.PL
 README
 cpanfile
-lib/Log/.gitignore
 lib/Log/Any.pm
 lib/Log/Any/Adapter.pm
 lib/Log/Any/Adapter/Base.pm

@@ -5,7 +5,7 @@ use warnings;
 package Log::Any::Adapter::Util;
 
 # ABSTRACT: Common utility functions for Log::Any
-our $VERSION = '1.719';
+our $VERSION = '1.720';
 
 use Exporter;
 our @ISA = qw/Exporter/;
@@ -241,7 +241,7 @@ Log::Any::Adapter::Util - Common utility functions for Log::Any
 
 =head1 VERSION
 
-version 1.719
+version 1.720
 
 =head1 DESCRIPTION
 

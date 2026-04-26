@@ -1,0 +1,104 @@
+#!/usr/bin/perl
+# PODNAME: papersway-ws-cmd
+# ABSTRACT: i3 workspace buttons protocol program for papersway
+#
+# Copyright (C) 2026  Sean Whitton <spwhitton@spwhitton.name>
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at
+# your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+
+use 5.032;
+use warnings;
+
+use JSON;
+use AnyEvent;
+use AnyEvent::I3 qw(:all);
+
+$| = 1;
+
+my $wmipc = AnyEvent::I3->new( $ENV{SWAYSOCK} // $ENV{I3SOCK} );
+$wmipc->connect->recv or die "couldn't connect to WM IPC socket";
+
+my $event = AnyEvent::condvar;
+
+# Print current workspaces before receiving any events so that we don't have
+# an empty set of workspace buttons on startup.
+$event->send;
+
+# Print the current workspaces every time something about workspaces changes.
+$wmipc->subscribe({
+    workspace => sub { $event->send }, output => sub { $event->send }
+})->recv->{success} or die "couldn't subscribe to window manager events";
+
+for (;;) {
+    $event->recv;
+    $event = AnyEvent::condvar;
+
+    my @workspaces = $wmipc->get_workspaces->recv->@*;
+    @workspaces = grep $_->{name} !~ /\A\*(\d+|bury-tmp)\*\z/, @workspaces;
+    @workspaces = () if @workspaces == 1;
+    print encode_json(\@workspaces) . "\n";
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+papersway-ws-cmd - i3 workspace buttons protocol program for papersway
+
+=head1 VERSION
+
+version 3.000
+
+=head1 SYNOPSIS
+
+B<papersway-ws-cmd>
+
+=head1 DESCRIPTION
+
+This is an i3 workspace buttons protocol program for use with papersway.  It
+filters out papersway's hidden workspaces from the list of workspace buttons
+to display, and shows no buttons in the case that there is just one non-hidden
+workspace.
+
+=head1 OPTIONS
+
+None.
+
+=head1 USAGE
+
+When using papersway with i3, set the workspace_command configuration option
+for i3bar to this program.  See papersway(1) for an example.
+
+=head1 SEE ALSO
+
+papersway(1)
+
+=head1 AUTHOR
+
+Sean Whitton <spwhitton@spwhitton.name>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2019-2026 by Sean Whitton <spwhitton@spwhitton.name>.
+
+This is free software, licensed under:
+
+  The GNU General Public License, Version 3, June 2007
+
+=cut

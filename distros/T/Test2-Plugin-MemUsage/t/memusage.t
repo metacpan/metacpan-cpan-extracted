@@ -16,6 +16,10 @@ BEGIN {
     Test2::Plugin::MemUsage->import();
 
     def ok => (scalar(@CALLBACKS), "importing the module does add a callback");
+
+    Test2::Plugin::MemUsage->import();
+
+    def ok => (scalar(@CALLBACKS) == 1, "second import is a no-op (callback registered once)");
 }
 
 use Test2::Tools::Basic;
@@ -53,9 +57,9 @@ is(
             rss     => ['16604', 'kB'],
         };
         field harness_job_fields => [
-            {name => 'mem_rss',  details => '16604kB'},
-            {name => 'mem_size', details => '25176kB'},
-            {name => 'mem_peak', details => '25176kB'},
+            {name => 'mem_rss',  details => '16604kB', data => {value => 16604, units => 'kB'}},
+            {name => 'mem_size', details => '25176kB', data => {value => 25176, units => 'kB'}},
+            {name => 'mem_peak', details => '25176kB', data => {value => 25176, units => 'kB'}},
         ];
         etc;
     },

@@ -1,0 +1,9 @@
+runtime:
+  requires:
+    perl: '5.010001'
+    Carp: 0
+    Exporter: 0
+test:
+  requires:
+    Test::More: '0.47'
+

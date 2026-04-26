@@ -1,4 +1,34 @@
-Revision history for Overload-FileCheck
+Revision history for Colon-Config
+
+0.005     2026-04-26 09:28:44+02:00 Europe/Vienna
+
+- add configurable separator support (optional third argument to read)
+- add pure Perl fallback when XS cannot be loaded ($BACKEND variable)
+- add read_pp() as public API for the pure Perl implementation
+- add $field argument support to read_pp() to match XS behavior
+- add `use 5.010` to Colon::Config module to declare minimum Perl version
+- fix threaded perl support (pTHX_ for internal helpers)
+- fix STRLEN type safety on 64-bit platforms
+- fix NULL pointer comparison in XS parser
+- fix namespace in error messages (Colon::Config, not Config::Colon)
+- fix embedded \r handling in pure Perl fallback
+- fix numeric string validation for field argument (looks_like_number)
+- fix croak on negative field index in read()
+- fix Windows compatibility by using croak() macro instead of Perl_croak()
+- fix Perl 5.10.0 compatibility by adding ppport.h for newSVpvn_flags
+- fix read_pp() to strip all trailing \r, not just one
+- fix read_pp() whitespace handling to match XS (only space/tab, not \s)
+- fix read_pp() XS/PP byte-level parity for whitespace and special chars
+- fix read_pp() separator validation to match XS behavior
+- fix read_pp() field validation to match XS behavior
+- fix read_pp() to suppress warnings on int() conversion of field argument
+- remove Carp and Scalar::Util dependencies from read_pp() validation
+- C89 compliance fixes for older compilers (block-comment style, decl-before-stmt)
+- improve documentation with custom separator examples
+- add test coverage for '#' character inside values
+- replace Travis CI with GitHub Actions workflow
+- add XS portability lint and edge case tests
+- add CI matrix: Linux (Perl 5.10–devel), macOS, Windows
 
 0.004     2018-12-28 10:33:56-07:00 America/Denver
 

@@ -27,8 +27,8 @@ on test => sub {
   # Tricked by "# TODO: better range handling"
   requires 'Test::Fatal'  => ( $] < 5.012000 ? '== 0.017' : '0' );
   requires 'Test::More'   => '1.001005';                             # Subtests accept args
-  requires 'Test::Needs'  => '0';
   requires 'Test::Output' => '0';
   requires 'Test::Script' => '1.31';
-  requires 'Test::Warn'   => '0'
+  requires 'Test::Warn'   => '0';
+  requires 'Test2::V1'    => '0'
 }

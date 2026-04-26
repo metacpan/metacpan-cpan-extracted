@@ -1,5 +1,20 @@
 Revision history for App::papersway
 
+3.000     2026-04-25 16:20:14+01:00 Europe/London
+    - Rename arguments to 'workspace' and 'move-to-workspace' commands:
+      'prev'->'prev_on_output', 'next'->'next_on_output'.
+    - Restrict 'workspace' and 'move-to-workspace' commands to current output.
+
+    - New options --cols-min-width, --with-ws-cmd.
+    - New i3 workspace buttons protocol program, papersway-ws-cmd.
+    - Say to set 'default_orientation' to 'horizontal' in one's Sway/i3 config.
+
+    - i3 compat: Ensure that hiding containers doesn't change which workspace
+      'workspace back_and_forth' will switch to.
+    - i3 compat: Fix moving hidden containers to a fresh workspace on restart.
+    - Fix switching to the last focused workspace when it has fallen empty.
+    - Improve burying workspaces & columns with multiple outputs.
+
 2.003     2025-11-25 11:08:01+00:00 Europe/London
     - New 'bury-column' command.
     - Fix 'workspace back_and_forth' after burying.

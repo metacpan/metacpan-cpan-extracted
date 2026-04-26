@@ -32,6 +32,7 @@ sub new {
     $self->{_ua} = HTTP::Tiny->new(
         agent => $self->agent_string(),
         ( $self->ua_timeout ? (timeout => $self->ua_timeout) : () ),
+        keep_alive => 0,
     );
 
     return $self;

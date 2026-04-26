@@ -14,12 +14,27 @@
 #include <XSUB.h>
 #include <embed.h>
 
+#include <errno.h>
+
 #include "FileCheck.h"
 
-/*
-*  Macro to make the moking process easier
-*     for now keep them there, so we can hack them in the same file
-*/
+/* Per-interpreter data for ithreads safety.
+ * Under ithreads each interpreter gets its own copy of this struct,
+ * so mock state in one thread cannot race with another. */
+typedef struct {
+    OverloadFTOps *overload_ft;
+    int            debug;
+} my_cxt_t;
+
+START_MY_CXT
+
+/* Convenience aliases — require dMY_CXT in calling scope */
+#define gl_overload_ft  (MY_CXT.overload_ft)
+#define gl_debug        (MY_CXT.debug)
+
+#define OFC_DEBUG(...) STMT_START { if (gl_debug) PerlIO_printf(PerlIO_stderr(), __VA_ARGS__); } STMT_END
+
+/* Macros to simplify OP overloading */
 
 /* generic macro with args */
 #define _CALL_REAL_PP(zOP) (* ( gl_overload_ft->op[zOP].real_pp ) )(aTHX)
@@ -34,19 +49,17 @@
   gl_overload_ft->op[op_type].real_pp = PL_ppaddr[op_type]; \
   PL_ppaddr[op_type] = f;
 
-/* TODO: need to improve for Perl <= 5.014 */
 #define RETURN_CALL_REAL_OP_IF_CALL_WITH_DEFGV() STMT_START { \
     if (gl_overload_ft->op[OP_STAT].is_mocked) { \
       SV *arg = *PL_stack_sp; GV *gv; \
       if ( SvTYPE(arg) == SVt_PVAV ) arg = arg + AvMAX( arg ); \
-      /* GV *gv =  MAYBE_DEREF_GV(arg); */ \
       if ( PL_op->op_flags & OPf_REF ) \
         gv = cGVOP_gv; \
       else { \
         gv = MAYBE_DEREF_GV(arg); \
        } \
-      /* printf ("### XXX ---> arg %d %p vs GV %p vs defgv %p \n", SvFLAGS(arg), *PL_stack_sp, gv, PL_defgv ); */ \
-      /* get the GV from the arg if it s not a GV */ \
+      OFC_DEBUG("DEFGV check: arg flags=%lu stack_sp=%p gv=%p defgv=%p\n", \
+        (unsigned long)SvFLAGS(arg), (void*)*PL_stack_sp, (void*)gv, (void*)PL_defgv); \
       if ( SvTYPE(arg) == SVt_NULL || gv == PL_defgv ) { \
         return CALL_REAL_OP(); \
       } \
@@ -56,20 +69,17 @@
 /* a Stat_t struct has 13 elements */
 #define STAT_T_MAX 13
 
-/* ----------- start there --------------- */
-
-OverloadFTOps  *gl_overload_ft = 0;
-
 /*
 * common helper to callback the pure perl function Overload::FileCheck::_check
 *   and get the mocked value for the -X check
 *
 *  1 check is true  -> OP returns Yes
 *  0 check is false -> OP returns No
-*  TODO:            -> OP returns undef
+* -2 check is null  -> OP returns undef (CHECK_IS_NULL)
 * -1 fallback to the original OP
 */
-int _overload_ft_ops() {
+int _overload_ft_ops(pTHX) {
+  dMY_CXT;
   SV *const arg = *PL_stack_sp;
   int optype = PL_op->op_type;  /* this is the current op_type we are mocking */
   int check_status = -1;        /* 1 -> YES ; 0 -> FALSE ; -1 -> delegate */
@@ -94,24 +104,40 @@ int _overload_ft_ops() {
   if (count != 1)
     croak("No return value from Overload::FileCheck::_check for OP #%d\n", optype);
 
-  check_status = POPi; /* TOOO pop on SV* for true / false & co */
+  {
+    SV *result_sv = POPs;
+    if (!SvOK(result_sv))
+      check_status = -2;  /* undef => CHECK_IS_NULL */
+    else
+      check_status = SvIV(result_sv);
+  }
 
-  /* printf ("######## The result is %d /// OPTYPE is %d\n", check_status, optype); */
+  OFC_DEBUG("_overload_ft_ops: result=%d optype=%d\n", check_status, optype);
 
-  PUTBACK;
-  FREETMPS;
-  LEAVE;
+  LEAVE_PRESERVING_ERRNO();
 
   return check_status;
 }
 
-SV* _overload_ft_ops_sv() {
+/*
+* NV-specific helper for -M, -C, -A ops.
+*
+* _check() returns a (status, value) pair for NV ops to avoid the -1
+* sentinel collision: FALLBACK_TO_REAL_OP is -1, but -1.0 is a valid
+* NV result (file modified exactly 1 day in the future).
+*
+* Returns:
+*   *status_out = -1  -> FALLBACK_TO_REAL_OP (nv_out is unused)
+*   *status_out = -2  -> CHECK_IS_NULL / undef (nv_out is unused)
+*   *status_out =  1  -> success, *nv_out has the value
+*/
+void _overload_ft_ops_nv(pTHX_ int *status_out, NV *nv_out) {
+  dMY_CXT;
   SV *const arg = *PL_stack_sp;
-  int optype = PL_op->op_type;  /* this is the current op_type we are mocking */
-  SV *status;        /* 1 -> YES ; 0 -> FALSE ; -1 -> delegate */
+  int optype = PL_op->op_type;
+  int count;
 
   dSP;
-  int count;
 
   ENTER;
   SAVETMPS;
@@ -123,23 +149,39 @@ SV* _overload_ft_ops_sv() {
 
   PUTBACK;
 
-  count = call_pv("Overload::FileCheck::_check", G_SCALAR);
+  count = call_pv("Overload::FileCheck::_check", G_ARRAY);
 
   SPAGAIN;
 
-  if (count != 1)
+  if (count < 1)
     croak("No return value from Overload::FileCheck::_check for OP #%d\n", optype);
 
-  status = POPs;
-  SvREFCNT_inc( status );
+  if (count == 1) {
+    /* Single return: FALLBACK_TO_REAL_OP or CHECK_IS_NULL */
+    SV *sv = POPs;
+    if (!SvOK(sv))
+      *status_out = -2;  /* undef => CHECK_IS_NULL */
+    else
+      *status_out = SvIV(sv);  /* -1 for FALLBACK, -2 for NULL */
+    *nv_out = 0;
+  }
+  else if (count == 2) {
+    /* Pair return: (status_code, nv_value) */
+    SV *value_sv = POPs;
+    SV *status_sv = POPs;
+    *status_out = SvIV(status_sv);
+    *nv_out = SvNV(value_sv);
+  }
+  else {
+    /* Pop excess values to avoid stack corruption */
+    int orig_count = count;
+    while (count-- > 0) (void)POPs;
+    croak("Overload::FileCheck::_check returned %d values for NV OP #%d, expected 1 or 2\n", orig_count, optype);
+  }
 
-  /* printf ("######## The result is %d /// OPTYPE is %d\n", check_status, optype); */
+  OFC_DEBUG("_overload_ft_ops_nv: status=%d optype=%d\n", *status_out, optype);
 
-  PUTBACK;
-  FREETMPS;
-  LEAVE;
-
-  return status;
+  LEAVE_PRESERVING_ERRNO();
 }
 
 /*
@@ -156,6 +198,7 @@ SV* _overload_ft_ops_sv() {
   if (SvIOK(rsv)) st = SvIV( rsv ); \
   else if (SvUOK(rsv)) st = SvUV( rsv ); \
   else if (SvNOK(rsv)) st = SvNV( rsv ); \
+  else if (SvPOK(rsv) && looks_like_number(rsv)) st = SvNV( rsv ); \
   else croak("Overload::FileCheck - Item %d is not numeric...\n", ix);
 
 
@@ -165,7 +208,8 @@ SV* _overload_ft_ops_sv() {
 *
 *   Note: we could also call a dedicated function as _check_stat
 */
-int _overload_ft_stat(Stat_t *stat, int *size) {
+int _overload_ft_stat(pTHX_ Stat_t *stat, int *size) {
+  dMY_CXT;
   SV *const arg = *PL_stack_sp;
   int optype = PL_op->op_type;  /* this is the current op_type we are mocking */
   int check_status = -1;        /* 1 -> YES ; 0 -> FALSE ; -1 -> delegate */
@@ -194,7 +238,7 @@ int _overload_ft_stat(Stat_t *stat, int *size) {
 
   /* popping the stack from last entry to first */
   if (count == 2) sv = POPs; /* RvAV */
-  check_status = POPi; /* TOOO pop on SV* for true / false & co */
+  check_status = POPi;
 
   *size = -1; /* by default it fails */
 
@@ -215,8 +259,8 @@ int _overload_ft_stat(Stat_t *stat, int *size) {
       croak( "Overload::FileCheck::_check need to return an array ref" );
 
     av_size = AvFILL(stat_array);
-    if ( av_size > 0 && av_size != ( STAT_T_MAX - 1 ) )
-      croak( "Overload::FileCheck::_check: Array should contain 13 elements" );
+    if ( av_size >= 0 && av_size != ( STAT_T_MAX - 1 ) )
+      croak( "Overload::FileCheck::_check: Array should contain 0 or 13 elements, got %d", av_size + 1 );
 
     *size = av_size; /* store the av_size */
     if ( av_size > 0 ) {
@@ -241,33 +285,32 @@ int _overload_ft_stat(Stat_t *stat, int *size) {
 
   }
 
-  PUTBACK;
-  FREETMPS;
-  LEAVE;
+  LEAVE_PRESERVING_ERRNO();
 
   return check_status;
 }
 
 
 /* a generic OP to overload the FT OPs returning yes or no */
-/* FIXME also need to handle undef */
 PP(pp_overload_ft_yes_no) {
+  dMY_CXT;
   int check_status;
 
-  assert( gl_overload_ft );
+  if (!gl_overload_ft)
+    croak("Overload::FileCheck: internal state not initialized (gl_overload_ft is NULL)");
 
   /* not currently mocked */
   RETURN_CALL_REAL_OP_IF_UNMOCK();
   RETURN_CALL_REAL_OP_IF_CALL_WITH_DEFGV();
 
-  check_status = _overload_ft_ops();
+  check_status = _overload_ft_ops(aTHX);
 
   {
     FT_SETUP_dSP_IF_NEEDED;
 
-    if ( check_status == 1 ) FT_RETURNYES;
-    if ( check_status == 0 ) FT_RETURNUNDEF;
-    /* if ( check_status == -1 ) FT_RETURNUNDEF; */ /* TODO */
+    if ( check_status == 1 )  FT_RETURNYES;
+    if ( check_status == 0 )  FT_RETURNNO;
+    if ( check_status == -2 ) FT_RETURNUNDEF; /* CHECK_IS_NULL */
   }
 
   /* fallback */
@@ -275,74 +318,97 @@ PP(pp_overload_ft_yes_no) {
 }
 
 PP(pp_overload_ft_int) {
+  dMY_CXT;
   int check_status;
+  int saved_errno;
 
-  assert( gl_overload_ft );
+  if (!gl_overload_ft)
+    croak("Overload::FileCheck: internal state not initialized (gl_overload_ft is NULL)");
 
   /* not currently mocked */
   RETURN_CALL_REAL_OP_IF_UNMOCK();
   RETURN_CALL_REAL_OP_IF_CALL_WITH_DEFGV();
 
-  check_status = _overload_ft_ops();
+  check_status = _overload_ft_ops(aTHX);
 
-  /* SETERRNO(EEXIST,RMS_FEX); */ /* TODO */
   if ( check_status == -1 )
     return CALL_REAL_OP();
+
+  if ( check_status == -2 ) { /* CHECK_IS_NULL */
+    FT_SETUP_dSP_IF_NEEDED;
+    FT_RETURNUNDEF;
+  }
+
+  /* Save errno — sv_setiv() and FT_RETURN_TARG can trigger allocations
+   * or other Perl internals that clobber errno. */
+  saved_errno = errno;
 
   {
     dTARGET;
     FT_SETUP_dSP_IF_NEEDED;
 
-    /* TODO this is over simplistic some OPs can return one NV instead of IV */
     sv_setiv(TARG, (IV) check_status);
+    errno = saved_errno;
     FT_RETURN_TARG;
   }
 }
 
 PP(pp_overload_ft_nv) {
-  SV *status;
+  dMY_CXT;
+  int check_status;
+  NV nv_value;
+  int saved_errno;
 
-  assert( gl_overload_ft );
+  if (!gl_overload_ft)
+    croak("Overload::FileCheck: internal state not initialized (gl_overload_ft is NULL)");
 
   /* not currently mocked */
   RETURN_CALL_REAL_OP_IF_UNMOCK();
   RETURN_CALL_REAL_OP_IF_CALL_WITH_DEFGV();
 
-  status = _overload_ft_ops_sv();
+  /* _overload_ft_ops_nv uses G_ARRAY and a status code to avoid the -1
+   * sentinel collision: FALLBACK_TO_REAL_OP is -1, but -1.0 is a valid
+   * NV result (e.g. file modified exactly 1 day in the future). */
+  _overload_ft_ops_nv(aTHX_ &check_status, &nv_value);
 
-  if ( SvIOK(status) && SvIV(status) == -1 )
+  if ( check_status == -1 )
     return CALL_REAL_OP();
 
-  if ( SvNOK(status) && SvNV(status) == -1 )
-    return CALL_REAL_OP();
+  if ( check_status == -2 ) { /* CHECK_IS_NULL */
+    FT_SETUP_dSP_IF_NEEDED;
+    FT_RETURNUNDEF;
+  }
+
+  /* Save errno — sv_setnv() and FT_RETURN_TARG can trigger allocations
+   * or other Perl internals that clobber errno. */
+  saved_errno = errno;
 
   {
     dTARGET;
     FT_SETUP_dSP_IF_NEEDED;
 
-    if ( SvNOK(status) )
-      sv_setnv(TARG, (NV) SvNV(status) );
-    else if ( SvIOK(status) )
-      sv_setiv(TARG, (IV) SvIV(status) );
-
+    sv_setnv(TARG, nv_value);
+    errno = saved_errno;
     FT_RETURN_TARG;
   }
 }
 
 PP(pp_overload_stat) { /* stat & lstat */
+  dMY_CXT;
   Stat_t mocked_stat = { 0 };  /* fake stats */
   int check_status = 0;
   int size;
 
 
-  assert( gl_overload_ft );
+  if (!gl_overload_ft)
+    croak("Overload::FileCheck: internal state not initialized (gl_overload_ft is NULL)");
 
   /* not currently mocked */
   RETURN_CALL_REAL_OP_IF_UNMOCK();
   RETURN_CALL_REAL_OP_IF_CALL_WITH_DEFGV();
 
   /* calling with our own tmp stat struct, instead of passing directly PL_statcache: more control */
-  check_status = _overload_ft_stat(&mocked_stat, &size);
+  check_status = _overload_ft_stat(aTHX_ &mocked_stat, &size);
 
   /* explicit ask for fallback */
   if ( check_status == -1 )
@@ -364,8 +430,6 @@ PP(pp_overload_stat) { /* stat & lstat */
       dSP;
 
       /* drop & replace our stack first element with *_ */
-      /* Unexpected warning: Attempt to free unreferenced scalar: SV 0x119bd80. */
-      //SV *previous_stack = sv_2mortal(POPs); /* what do we want to do with this ? */
       SV *previous_stack = POPs;
 
       /* copy the content of mocked_stat to PL_statcache */
@@ -440,7 +504,7 @@ mock_op(optype)
       Overload::FileCheck::_xs_unmock_op             = 2
  CODE:
  {
-     /* mylogger = INT2PTR(MyLogger*, SvIV(SvRV(self))); */
+      dMY_CXT;
       int opid = 0;
 
       if ( ! SvIOK(optype) )
@@ -477,12 +541,18 @@ OUTPUT:
 
 
 BOOT:
-    if (!gl_overload_ft) {
+    {
          HV *stash;
          SV *sv;
          int ix = 0;
+         const char *debug_env;
 
+         MY_CXT_INIT;
          Newxz( gl_overload_ft, 1, OverloadFTOps);
+
+         debug_env = getenv("OVERLOAD_FILECHECK_DEBUG");
+         if (debug_env && *debug_env && *debug_env != '0')
+           gl_debug = 1;
 
          stash = gv_stashpvn("Overload::FileCheck", 19, TRUE);
 
@@ -491,7 +561,7 @@ BOOT:
          /* provide constants to standardize return values from mocked functions */
          newCONSTSUB(stash, "CHECK_IS_TRUE",         &PL_sv_yes );   /* could use newSViv(1) or &PL_sv_yes */
          newCONSTSUB(stash, "CHECK_IS_FALSE",        &PL_sv_no );    /* could use newSViv(0) or &PL_sv_no  */
-         newCONSTSUB(stash, "CHECK_IS_NULL",         &PL_sv_undef ); /* FIXME: need to handle this as a valid answer */
+         newCONSTSUB(stash, "CHECK_IS_NULL",         &PL_sv_undef );
          newCONSTSUB(stash, "FALLBACK_TO_REAL_OP",  newSVnv(-1) );
 
          /* provide constants to add entry in a fake stat array */
@@ -560,4 +630,27 @@ BOOT:
 
     }
 
+#ifdef USE_ITHREADS
+
+void
+CLONE(...)
+CODE:
+{
+    MY_CXT_CLONE;
+    /* Parent's overload_ft pointer was shallow-copied by MY_CXT_CLONE.
+     * Allocate a fresh struct for the child interpreter: copy the saved
+     * real_pp pointers (they're the same per-process) but start with
+     * all ops unmocked — each thread manages its own mock state. */
+    {
+        OverloadFTOps *parent_ft = gl_overload_ft;
+        int i;
+        Newxz(gl_overload_ft, 1, OverloadFTOps);
+        for (i = 0; i < OP_MAX; i++) {
+            gl_overload_ft->op[i].real_pp = parent_ft->op[i].real_pp;
+            /* is_mocked stays 0 from Newxz */
+        }
+    }
+}
+
+#endif
 

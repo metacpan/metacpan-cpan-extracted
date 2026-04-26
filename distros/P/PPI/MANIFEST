@@ -308,6 +308,7 @@ t/data/26_bom/utf8.dump
 t/data/27_complete/01y_helloworld.code
 t/data/27_complete/02n_helloworld.code
 t/data/basic.pl
+t/data/elem-loc.pl
 t/data/filename.pl
 t/data/test2.txt
 t/feature_tracking.t
@@ -320,6 +321,7 @@ t/lib/PPI/Test/pragmas.pm
 t/marpa.t
 t/perf.t
 t/ppi_element.t
+t/ppi_element_flush.t
 t/ppi_element_replace.t
 t/ppi_lexer.t
 t/ppi_node.t

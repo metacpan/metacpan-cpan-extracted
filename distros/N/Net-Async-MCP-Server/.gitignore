@@ -1,0 +1,83 @@
+# Perl / Dist::Zilla distribution
+
+# Build artifacts
+.build/
+_build/
+blib/
+/pm_to_blib
+/MANIFEST
+/MANIFEST.bak
+
+# Generated metadata
+/META.json
+/META.yml
+/MYMETA.*
+
+# Coverage
+/cover_db/
+/.last_cover_stats
+
+# Release artifacts — add your dist name here to ignore dzil build output
+# e.g. Net-Async-MCP-Server-*
+Net-Async-MCP-Server-*
+[Dd]ist-*
+
+# Carton / Dependency Manager
+/local/
+/.carmel/
+/cpanfile.snapshot
+
+# Perl build artifacts
+*.o
+*.bs
+*.pm.tdy
+
+# Devel::NYTProf
+nytprof.out
+
+# Temp files
+*.tmp
+*.temp
+
+# Editor & IDE
+*.swp
+*.swo
+*.bak
+*.old
+.vscode/
+.idea/
+.history/
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.envrc
+
+# Claude Code — commit: skills/, agents/, hooks/, settings.json
+# Ignore: local overrides, credentials, session data
+
+# Tracked: shared config & extensibility
+!/.claude/
+.claude/*
+!.claude/settings.json
+!.claude/settings.local.json
+!.claude/agents/
+!.claude/agents/**
+!.claude/skills/
+!.claude/skills/**
+!.claude/hooks/
+!.claude/hooks/**
+
+# Local overrides (machine-specific)
+.claude/*.local.*
+.claude/local/
+
+# Credentials & session state (never track)
+.claude/.credentials.json
+.claude/statsig/
+.claude/todos/
+.claude/projects/

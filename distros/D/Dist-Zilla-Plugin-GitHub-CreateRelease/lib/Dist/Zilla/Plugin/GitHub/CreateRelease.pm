@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Dist::Zilla::Plugin::GitHub::CreateRelease;
-our $VERSION = '0.0007'; # VERSION
+our $VERSION = '0.0008'; # VERSION
 
 # ABSTRACT: Create a GitHub Release
 
@@ -338,7 +338,7 @@ Dist::Zilla::Plugin::GitHub::CreateRelease - Create a GitHub Release
 
 =head1 VERSION
 
-version 0.0007
+version 0.0008
 
 =head1 SYNOPSIS
 
@@ -540,7 +540,7 @@ Timothy Legge
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Timothy Legge.
+This software is copyright (c) 2026 by Timothy Legge.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -13,8 +13,16 @@ my @files = (
     't/00-report-prereqs.t',
     't/backslash-r.t',
     't/basic.t',
+    't/comment-in-value.t',
+    't/custom-separator.t',
+    't/edge-cases.t',
+    't/error-messages.t',
     't/example-fruits.t',
+    't/parity.t',
     't/passwd-read.t',
+    't/pp-fallback.t',
+    't/pp-separator-validation.t',
+    't/read-pp-field.t',
     't/use-field.t',
     't/utf-8.t'
 );

@@ -5,7 +5,7 @@ package Try::ALRM;
 
 # ABSTRACT: Structured retry and timeout handling using CORE::alarm
 
-our $VERSION = q{1.03};
+our $VERSION = q{1.05};
 
 use Exporter qw/import/;
 use Scalar::Util qw/refaddr/;
@@ -365,7 +365,7 @@ throwing an exception.
 If both the main block and C<finally> die, the main block's exception is
 preserved and rethrown.
 
-=head2 timeout INT
+=head2 timeout => INT
 
 Getter/setter for the default timeout in seconds.
 
@@ -375,7 +375,7 @@ May also be supplied as a trailing modifier:
 
 The value must be an integer greater than or equal to 1.
 
-=head2 tries INT
+=head2 tries => INT
 
 Getter/setter for the default retry limit.
 
@@ -456,6 +456,160 @@ operations to define their own time limits without interfering with
 outer control flow.
 
 When multiple timeouts are active, the soonest deadline is enforced.
+
+=head1 USING WITH Try::Tiny, C<try> keyword, and C<eval{...}>
+
+C<Try::ALRM> provides timeout and retry behavior, but B<does not catch
+ordinary exceptions> (C<die>). To handle exceptions, wrap your code with
+L<Try::Tiny> or Perl's built-in C<try> feature.
+
+Because C<Try::Alarm> is orthogonal to C<try>, however it is provided,
+below show examples of using C<Try::ALRM>'s functionality with general
+exception handling capablities.
+
+=head2 Using Try::Tiny
+
+    use Try::Tiny;
+    use Try::ALRM qw/tries timeout/;
+
+    Try::ALRM::retry {
+        my ($attempt) = @_;
+
+        try {
+            print "Attempt $attempt...\n";
+
+            die "boom" if $attempt == 1;
+
+            sleep 5;  # may trigger timeout
+
+            print "Work completed\n";
+        }
+        catch {
+            warn "\tException caught: $_";
+            die $_;   # rethrow (this will NOT trigger retry; it escapes)
+        };
+    }
+    Try::ALRM::ALRM {
+        my ($attempt) = @_;
+        print "\tTimed out on attempt $attempt\n";
+    }
+    Try::ALRM::finally {
+        my ($attempts, $success) = @_;
+        print $success ? "Success\n" : "Failure\n";
+    }
+    timeout => 3,
+    tries   => 2;
+
+=head2 Using Perl C<try> (5.34+)
+
+    use feature 'try';
+    no warnings 'experimental::try';
+
+    use Try::ALRM qw/tries timeout/;
+
+    Try::ALRM::retry {
+        my ($attempt) = @_;
+
+        try {
+            print "Attempt $attempt...\n";
+
+            die "boom" if $attempt == 1;
+
+            sleep 5;
+
+            print "Work completed\n";
+        }
+        catch ($e) {
+            warn "\tException caught: $e";
+            die $e;   # rethrow (this will NOT trigger retry; it escapes)
+        }
+    }
+    Try::ALRM::ALRM {
+        my ($attempt) = @_;
+        print "\tTimed out on attempt $attempt\n";
+    }
+    Try::ALRM::finally {
+        my ($attempts, $success) = @_;
+        print $success ? "Success\n" : "Failure\n";
+    }
+    timeout => 3,
+    tries   => 2;
+
+=head2 Notes
+
+=over 4
+
+=item *
+
+C<Try::ALRM> handles timeouts and retry logic only.
+
+=item *
+
+C<Try::Tiny> or C<try> should be used to catch exceptions.
+
+=item *
+
+If you catch an exception and rethrow it:
+
+    die $_;
+
+the exception will escape the retry block. C<Try::ALRM> does not
+currently retry on ordinary exceptions, only on timeouts.
+
+=item *
+
+If you swallow the exception, the attempt is treated as successful.
+
+=back
+
+=head2 Using C<eval{ ... }>
+
+    use Try::ALRM qw/tries timeout/;
+
+    Try::ALRM::retry {
+        my ($attempt) = @_;
+
+        eval {
+            print "Attempt $attempt...\n";
+
+            die "boom" if $attempt == 1;
+
+            sleep 5;  # may trigger timeout
+
+            print "Work completed\n";
+        };
+
+        if ($@) {
+            warn "\tException caught: $@";
+            # swallow it -> Try::ALRM sees success
+        }
+    }
+    Try::ALRM::finally {
+        my ($attempts, $success) = @_;
+        print $success ? "Success\n" : "Failure\n";
+    }
+    timeout => 3,
+    tries   => 2;
+
+=head3 Notes on C<eval>
+
+=over 4
+
+=item *
+
+If you do not check C<$@>, the exception is silently ignored and the
+attempt is treated as successful.
+
+=item *
+
+If you rethrow the exception:
+
+    die $@;
+
+it will escape the retry block. C<Try::ALRM> does not retry on ordinary
+exceptions.
+
+=back
 
 =head1 BUGS
 

@@ -88,7 +88,7 @@ use PPI::Exception  ();
 use PPI::Exception::ParserRejection ();
 use PPI::Document ();
 
-our $VERSION = '1.287';
+our $VERSION = '1.291';
 
 # The x operator cannot follow most Perl operators, implying that
 # anything beginning with x following an operator is a word.
@@ -190,7 +190,8 @@ sub new {
 		$self->{source} = $$source;
 
 	} elsif ( _SCALAR0($_[1]) ) {
-		$self->{source} = ${$_[1]};
+		PPI::Exception->throw("Did not pass a string: ${$_[1]}")
+			if _SCALAR0( $self->{source} = ${$_[1]} );
 
 	} elsif ( _ARRAY0($_[1]) ) {
 		$self->{source} = join '', map "$_\n", @{$_[1]};

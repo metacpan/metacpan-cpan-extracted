@@ -108,6 +108,14 @@ foreach my $f (qw{alpha1 alpha2 alpha3}) {
     );
 }
 
+# string-encoded numbers should be coerced transparently (like Perl does)
+{
+    my $string_stat = [ stat('string.nums') ];
+    is scalar @$string_stat, 13, "stat with string-encoded numbers returns 13 elements";
+    is $string_stat->[0], 1000, "string '1000' coerced to numeric for st_dev";
+    is $string_stat->[7], 4096, "string '4096' coerced to numeric for st_size";
+}
+
 foreach my $d (@FAKE_DIR) {
     is [ stat($d) ], stat_for_a_directory(), "stat_for_a_directory - $d";
     ok !-d $d, "!-d $d - we are just mocking the stats";
@@ -170,6 +178,9 @@ sub my_stat {
     return { st_dev => 42 } if $f eq 'hash.stat.1';
     return { st_dev => 42, st_atime => 1520000000 } if $f eq 'hash.stat.2';
     return { st_dev => 42, whatever => 1520000000 } if $f eq 'hash.stat.broken';
+
+    # stat array built from string-encoded numbers (e.g. parsed from text)
+    return [ ("1000") x 7, "4096", ("0") x 5 ] if $f eq 'string.nums';
 
     return 666 if $f eq 'evil';
 

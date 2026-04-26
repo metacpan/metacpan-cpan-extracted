@@ -8,9 +8,10 @@ META.json
 META.yml
 Makefile.PL
 README
-TODO
+TAGS
 bin/papersway
 bin/papersway-msg
+bin/papersway-ws-cmd
 dist.ini
 lib/App/papersway.pm
 t/author-pod-coverage.t

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Request;
 # ABSTRACT: Object used for making requests to MetaCPAN
-$MetaCPAN::Client::Request::VERSION = '2.040000';
+$MetaCPAN::Client::Request::VERSION = '2.041000';
 use Moo;
 use Carp;
 use JSON::MaybeXS qw<decode_json encode_json is_bool>;
@@ -262,7 +262,7 @@ sub _build_query_element {
     my ($key) = keys %{$args};
     my $val = $args->{$key};
 
-    is_bool($val) or !is_ref($val) and $val =~ /[\w\*]/
+    ( is_bool($val) or (!is_ref($val) and $val =~ /[\w\*]/) )
         or croak 'Wrong type of query arguments';
 
     my $wildcard = $val =~ /[*?]/;
@@ -286,7 +286,7 @@ MetaCPAN::Client::Request - Object used for making requests to MetaCPAN
 
 =head1 VERSION
 
-version 2.040000
+version 2.041000
 
 =head1 ATTRIBUTES
 

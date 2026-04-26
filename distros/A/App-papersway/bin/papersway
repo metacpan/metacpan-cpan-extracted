@@ -2,7 +2,7 @@
 # PODNAME: papersway
 # ABSTRACT: PaperWM-like scrollable tiling window management for Sway/i3wm
 #
-# Copyright (C) 2019-2025  Sean Whitton <spwhitton@spwhitton.name>
+# Copyright (C) 2019-2026  Sean Whitton <spwhitton@spwhitton.name>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ use AnyEvent;
 use AnyEvent::I3 qw(:all);
 use Getopt::Long;
 use Sys::Hostname;
-use POSIX qw(floor mkfifo);
+use POSIX qw(mkfifo);
 use File::Basename qw(basename dirname);
 use File::Spec::Functions qw(catfile);
 use List::Util qw(first min max zip);
@@ -36,17 +36,22 @@ use Data::Dumper;
 $| = 1;
 $Data::Dumper::Sortkeys = 1;
 
-my ($pipe, $i3status, $debug);
-
-my $init_cols = 2;
+my ($pipe, $i3status, $debug, $with_ws_cmd, $user_cols, $cols_min_width);
 
 GetOptions
-  'debug!'    => \$debug,
-  'i3status!' => \$i3status,
-  'cols=i'    => \$init_cols,
+  'debug!'	     => \$debug,
+  'i3status!'	     => \$i3status,
+  'with-ws-cmd!'     => \$with_ws_cmd,
+  'cols=i'	     => \$user_cols,
+  'cols-min-width=i' => \$cols_min_width,
   or die "failed to parse command line options";
 
-$init_cols >= 2 or die "papersway: --cols must be at least 2\n";
+$user_cols && $cols_min_width
+  and die "papersway: --cols incompatible with --cols-min-width\n";
+unless ($cols_min_width) {
+    $user_cols //= 2;
+    $user_cols >= 2 or die "papersway: --cols must be at least 2\n";
+}
 
 sub debugsay {
     return unless $debug;
@@ -70,8 +75,8 @@ if ($i3status) {
     }
 }
 
-my (%paper_ws, $focused_ws, $last_focused_ws, %output_widths,
-    %col_rows, %col_w, %col_wide, $caffe_id, $caffe_name);
+my (%paper_ws, $focused_ws, $last_focused_ws, $caffe_id, $caffe_name,
+    %output_init_cols, %col_rows, %col_w, %col_wide);
 
 my $have_sway = !!$ENV{SWAYSOCK};
 my $wm_ipc_socket = $have_sway ? $ENV{SWAYSOCK} : $ENV{I3SOCK};
@@ -180,7 +185,7 @@ $wmipc->subscribe({
 	if ($ignore_events || !$e->{change}) {
 	    return;
 	} elsif ($e->{change} eq "focus" && $e->{current}) {
-	    $last_focused_ws = $focused_ws;
+	    $last_focused_ws = $paper_ws{$focused_ws};
 	    $focused_ws = $e->{current}{id};
 	    # If this is one of our workspaces, then we must normalise:
 	    # containers might have moved to or from here in our absence.
@@ -193,7 +198,7 @@ $wmipc->subscribe({
 	} elsif ($e->{change} eq "init" && $e->{current}
 		 && grep $_ eq $e->{current}{name}, @all_workspaces) {
 	    init_ws($e->{current}{id}, name => $e->{current}{name},
-		    ncols => $init_cols, output => $e->{current}{output});
+		    output => $e->{current}{output});
 	} elsif ($e->{change} eq "rename"
 		 && exists $paper_ws{$e->{current}{id}}) {
 	    $paper_ws{$e->{current}{id}}{name} = $e->{current}{name};
@@ -205,38 +210,51 @@ $wmipc->subscribe({
 	    signal_i3status();
 	}
     },
+
+    # Update values in %output_init_cols and $paper_ws{*}{output} values.
+    output => sub { queue_event shift },
 })->recv->{success} or die "couldn't subscribe to window manager events";
 
 # Determine the initial state -- the WM might just have been reloaded.
 # Move any previously-hidden containers to a fresh workspace for perusal.
+my @old_ids;
 for_each_node {
     my $node = shift;
     if ($node->{type} eq "output") {
-	$output_widths{$node->{name}} = $node->{rect}{width};
-    } elsif ($node->{type} eq "workspace"
-	     && grep $_ eq $node->{name}, @all_workspaces) {
-	my $entry = init_ws($node->{id}, name => $node->{name},
-			    output => $node->{output});
-	sync_cols($node => $entry);
-	$entry->{ncols} = max $init_cols, scalar $entry->{cols}->@*;
+	sync_output($node);
+    } elsif ($node->{type} eq "workspace") {
+	if (grep $_ eq $node->{name}, @all_workspaces) {
+	    my $entry = init_ws($node->{id}, name => $node->{name},
+				output => $node->{output});
+	    sync_cols($node => $entry);
+	} elsif ($node->{name} =~ /\A\*(\d+)\*\z/) {
+	    push @old_ids, map $_->{id}, $node->{floating_nodes}->@*;
+	}
     } elsif (grep $_ eq "caffeinated", $node->{marks}->@*) {
 	register_caffeinated($node);
     }
 };
-my @old_ids;
+while (my ($id, $entry) = each %paper_ws) {
+    $entry->{ncols} = max $output_init_cols{$entry->{output}},
+      scalar $entry->{cols}->@*;
+}
 for ($wmipc->get_workspaces->recv->@*) {
-    $focused_ws = $last_focused_ws = $_->{id} if $_->{focused};
-    push @old_ids, $1 if $_->{name} =~ /\A\*(\d+)\*\z/;
+    $_->{focused} or next;
+    $focused_ws = $_->{id};
+    $last_focused_ws = $paper_ws{$focused_ws};
+    last;
 }
 if (@old_ids) {
     fresh_workspace(go => 1);
     $cmds->cmd(
 	map("[con_id=$_] move container workspace current, floating disable",
-	    @old_ids),
+	    @old_ids),		#                          ^^^^^^^^^^^^^^^^
+				#                          Somehow has no
+				#                          effect under i3.
 	"focus child");
 }
 $cmds->cmd("bar bar-0 workspace_buttons no")
-  if $have_sway && $i3status && !$debug;
+  if $have_sway && $i3status && !$debug && !$with_ws_cmd;
 $cmds->flush;
 debugsay "initialised";
 debugdump [\%paper_ws], [qw(*paper_ws)];
@@ -263,7 +281,7 @@ my $i3status_wrapper = $i3status && AnyEvent->io(
 	my ($statusline) = (<$pipe> =~ /^,?(.*)/);
 	my $blocks = eval { decode_json $statusline } // return;
 
-	if ($focused_ws && keys %paper_ws > 1) {
+	if ($focused_ws && !$with_ws_cmd && keys %paper_ws > 1) {
 	    my @disp;
 	    foreach my $key (sorted_paper_ws()) {
 		push @disp,
@@ -287,7 +305,7 @@ my $i3status_wrapper = $i3status && AnyEvent->io(
 	    my $disp;
 	    if (!@left && !@right && (!@cols || !widep($cols[0]))) {
 		$disp = sprintf "<b>%s</b>",
-		  join " ", ("\x{2021}")x$ws->{ncols};
+		  join " ", ("\x{2021}")x$ws->ncols;
 	    } else {
 		$disp = sprintf "<b>%s</b>", nwin(@cols);
 		$disp = sprintf "%s %s", nwin(@left), $disp if @left;
@@ -365,16 +383,25 @@ sub sync_cols {
     }
 }
 
+sub sync_output {
+    my $node = shift;
+    $output_init_cols{$node->{name}} = $user_cols
+      // max 2, int $node->{rect}{width}/$cols_min_width;
+}
+
 sub normalise_ws_cols {
     my $ws = $paper_ws{$focused_ws};
     my $floating_focus;
     my $old_cols = $ws->{cols};
-    my $old_i = shift // focused_col_idx($ws);
-    my $old_wide = widep($ws->{focused_col});
+    my $old_i = shift // $ws->{focused_col} && focused_col_idx($ws);
+    my $old_wide = $ws->{focused_col} && widep($ws->{focused_col});
     for_each_node {
 	my $node = shift;
-	if ($node->{id} == $focused_ws) {
+	if ($node->{type} eq "output") {
+	    sync_output($node);
+	} elsif ($node->{id} == $focused_ws) {
 	    sync_cols($node => $ws);
+	    $ws->{output} = $node->{output};
 	    my $first_focus = $node->{focus}->[0];
 	    $floating_focus = ! grep $_ == $first_focus, $ws->{cols}->@*;
 	    goto DONE;
@@ -413,8 +440,8 @@ sub normalise_ws_cols {
 
     # Push columns off if there are too many columns.
     # This should never change which container is focused.
-    if ((my $n = widep($ws->{focused_col}) || $old_wide
-	 ? @$cols-1 : @$cols-$ws->{ncols})
+    if ((my $n = $ws->{focused_col} && widep($ws->{focused_col}) || $old_wide
+	 ? @$cols-1 : @$cols-$ws->ncols)
 	> 0) {
 	my $left = $i;
 	my $right = $#$cols-$i;
@@ -436,12 +463,12 @@ sub normalise_ws_cols {
     $avail_l = avail_from($ws->{off_left});
     my $avail_r = avail_from($ws->{off_right});
 
-    if ((!@$cols || !widep($ws->{focused_col}) && $ws->{ncols} > @$cols)
+    if ((!@$cols || !widep($ws->{focused_col}) && $ws->ncols > @$cols)
 	&& ($avail_l || $avail_r)) {
 	# Pull columns in if there are too few columns but some available.
 	# Want the focused column, after pulls, to be the $old_i'th.
 	my ($from_l, $from_r);
-	my $want = $ws->{ncols} - @$cols;
+	my $want = $ws->ncols - @$cols;
 	# When we lose columns, the focused column either moves left or
 	# stays the same.  So always $old_i >= $i.
 	if ($old_i > $i) {
@@ -510,7 +537,7 @@ sub normalise_ws_cols {
 {
     # Simple class to batch up commands before sending them.
     package App::papersway::cmds;
-$App::papersway::cmds::VERSION = '2.003';
+$App::papersway::cmds::VERSION = '3.000';
 sub new {
 	bless { cmds => [], need_ignore => 0, need_signal => 0 } => shift
     };
@@ -586,7 +613,7 @@ sub process_msg {
 		    push $ws->{off_left}->@*, @pushed, $pulled;
 		    $cmds->cmd_ign(map hide_con($_), @pushed);
 
-		    my $n = min $ws->{ncols}-1, avail_from($ws->{off_right});
+		    my $n = min $ws->ncols-1, avail_from($ws->{off_right});
 		    $cmds->cmd_ign(n_from_r($ws, $n), ("focus left")x$n)
 		      if $n > 0;
 		} else {
@@ -628,7 +655,7 @@ sub process_msg {
 		    $cmds->cmd_ign(hide_con($pushed));
 
 		    my $n
-		      = min $ws->{ncols}-@$cols, avail_from($ws->{off_right});
+		      = min $ws->ncols-@$cols, avail_from($ws->{off_right});
 		    $cmds->cmd_ign(n_from_r($ws, $n), ("focus left")x$n)
 		      if $n > 0;
 		}
@@ -646,7 +673,7 @@ sub process_msg {
 		    push $ws->{off_right}->@*, reverse(@pushed), $pulled;
 		    $cmds->cmd_ign(map hide_con($_), @pushed);
 
-		    my $n = min $ws->{ncols}-1, avail_from($ws->{off_left});
+		    my $n = min $ws->ncols-1, avail_from($ws->{off_left});
 		    $cmds->cmd_ign(n_from_l($ws, $n), ("focus right")x$n)
 		      if $n > 0;
 		} else {
@@ -690,7 +717,7 @@ sub process_msg {
 		    $cmds->cmd_ign(hide_con($pushed));
 
 		    my $n
-		      = min $ws->{ncols}-@$cols, avail_from($ws->{off_left});
+		      = min $ws->ncols-@$cols, avail_from($ws->{off_left});
 		    $cmds->cmd_ign(n_from_l($ws, $n), ("focus right")x$n)
 		      if $n > 0;
 		}
@@ -710,7 +737,7 @@ sub process_msg {
 	$ws->{last_dir} = $dir eq "right" ? 1 : -1;
 	$cmds->flush;
     } elsif ($cmd =~ /^cols (incr|decr)$/
-	     && ($ws->{ncols} > 2 || $1 eq "incr")) {
+	     && ($ws->ncols > 2 || $1 eq "incr")) {
 	$ws->{ncols} += $1 eq "incr" ? 1 : -1;
 	normalise_ws_cols();
 	$cmds->need_signal;
@@ -819,7 +846,7 @@ sub process_msg {
 
     # Basic purpose of this wrapper command is to prevent accidentally
     # moving to one of the holding workspaces using Sway's own commands.
-    elsif ($cmd =~ /^(move-to-)?workspace (prev|next)$/) {
+    elsif ($cmd =~ /^(move-to-)?workspace (prev|next)_on_output$/) {
 	my ($move, $dir) = (!!$1, $2);
 	my $orig_focused = $ws->{focused_col};
 
@@ -832,11 +859,12 @@ sub process_msg {
 	    normalise_ws_cols($col_wide{$orig_focused});
 	}
 
-	my @keys = sorted_paper_ws();
+	my @keys = grep $paper_ws{$_}{output} eq $ws->{output},
+	  sorted_paper_ws();
 	my $k = first { $keys[$_] == $focused_ws } 0..$#keys;
 	if ($dir eq "next" && $k < $#keys || $dir eq "prev" && $k > 0) {
-	    my @cmds = "workspace $dir";
-	    $last_focused_ws = $focused_ws;
+	    my @cmds = "workspace ${dir}_on_output";
+	    $last_focused_ws = $paper_ws{$focused_ws};
 	    $focused_ws = $keys[$dir eq "next" ? $k+1 : $k-1];
 	    if ($move) {
 		push @cmds, show_con($orig_focused);
@@ -882,10 +910,11 @@ sub fresh_workspace {
 	# will take us to.  In the case that !$opts{go}, can use C-i M-; to
 	# move any other wanted containers over, before a final C-i ;.
 	#
-	# There is a relevant i3/Sway difference here:
-	#     <https://github.com/swaywm/sway/issues/6081>.
-	# (Our use of hide_con elsewhere assumes Sway's behaviour.  Possibly
-	# we should write wrapper code that can handle either case.)
+	# This is implemented in such a way as to avoid running into a
+	# difference in behaviour between i3 and Sway: with i3 but not Sway,
+	# 'move container to workspace foo' means that a subsequent
+	# 'workspace back_and_forth' will switch to workspace foo.
+	# See <https://github.com/swaywm/sway/issues/6081>.
 
 	if ($opts{ign}) {
 	    # Slower implementation but which doesn't rely on the monitoring
@@ -905,7 +934,7 @@ sub fresh_workspace {
 	    for ($wmipc->get_workspaces->recv->@*) {
 		next unless $_->{focused};
 		init_ws(($new_ws = $_->{id}), name => $_->{name},
-			ncols => $init_cols, output => $ws->{output});
+			output => $ws->{output});
 		$col_w{$to_send} = $_->{rect}{width} if $opts{send};
 		last;
 	    }
@@ -918,7 +947,7 @@ sub fresh_workspace {
 	    if ($opts{go}) {
 		delete $paper_ws{$focused_ws}
 		  unless @$cols > ($opts{send} && !$did_early_hide);
-		$last_focused_ws = $focused_ws;
+		$last_focused_ws = $paper_ws{$focused_ws};
 		$focused_ws = $new_ws;
 	    } else {
 		$cmds->cmd_ign("workspace back_and_forth");
@@ -986,21 +1015,26 @@ sub compact_workspaces {
 # Bury to the left end of the list, not the right end, because we create fresh
 # workspaces to the right.
 sub bury_workspace {
-    my @workspaces = sorted_paper_ws();
-    1 < @workspaces < @all_workspaces or return;
-    (my $k = first { $workspaces[$_] == $focused_ws } 0..$#workspaces) // die;
+    my @all_ws = sorted_paper_ws();
+    (my $k = first { $all_ws[$_] == $focused_ws } 0..$#all_ws) // die;
     $k > 0 or return;
+    my $o = $paper_ws{$focused_ws}{output};
+    my @output_ws = grep $paper_ws{$_}{output} eq $o, @all_ws[0..$k-1];
+    0 < @output_ws < @all_ws < @all_workspaces or return;
     my $to_bury = $focused_ws;
-    $focused_ws = $workspaces[$k-1];
-    $last_focused_ws = $workspaces[max $k-2, 0]
-      if $focused_ws == $last_focused_ws;
+    $focused_ws = pop @output_ws;
+    $last_focused_ws = $paper_ws{
+	pop @output_ws
+	// (first { $paper_ws{$_}{output} eq $o } @all_ws[$k+1..$#all_ws])
+	// (first { $paper_ws{$_}{output} ne $o } @all_ws)
+    } if $focused_ws == $last_focused_ws->{id};
 
     my @pairs;
 
     my $i = 0;
-    unshift @pairs, [$workspaces[$i], $all_workspaces[++$i]]
+    unshift @pairs, [$all_ws[$i], $all_workspaces[++$i]]
       while $i < $k
-      && $paper_ws{$workspaces[$i]}{name} eq $all_workspaces[$i];
+      && $paper_ws{$all_ws[$i]}{name} eq $all_workspaces[$i];
 
     my @cmds = ("rename workspace to *bury-tmp*",
 		(map sprintf("rename workspace %s to %s",
@@ -1012,7 +1046,7 @@ sub bury_workspace {
     $cmds->cmd_ign(@cmds,
 		   # This fixes 'workspace back_and_forth' post-burying: Sway
 		   # tracks the most recent other workspace by name, not ID.
-		   "workspace $paper_ws{$last_focused_ws}{name}",
+		   "workspace $last_focused_ws->{name}",
 		   "workspace $paper_ws{$focused_ws}{name}");
 
     normalise_ws_cols();	# for the workspace switch
@@ -1103,11 +1137,21 @@ sub hide_con {
     # is that upon one of these events, other containers start resizing their
     # contents before we get a chance to push/pull containers.  We then do
     # that, and the other containers resize right back to where they were.
-    sprintf +("[con_id=%s] ".join ", ",
-	      "floating enable",
-	      "resize set %dpx 100ppt",
-	      "move container to workspace %s"),
-		$_[0], $col_w{$_[0]}, "*$_[0]*";
+    (sprintf +("[con_id=%s] ".join ", ",
+	       "floating enable",
+	       "resize set %dpx 100ppt",
+	       "move container to workspace %s"),
+     $_[0], $col_w{$_[0]}, "*$_[0]*"),
+       # With i3 (but not Sway), 'move container to workspace foo'
+       # means that a subsequent 'workspace back_and_forth' will switch
+       # to workspace foo, but we don't ever want to switch to the
+       # hidden workspaces.  These two commands should ensure that any
+       # subsequent 'workspace back_and_forth' will always switch to
+       # $last_focused_ws (& they are harmless under Sway).
+       # See also <https://github.com/swaywm/sway/issues/6081>.
+       "workspace $last_focused_ws->{name}",
+       "workspace $paper_ws{$focused_ws}{name}"
+
 }
 
 sub show_con {
@@ -1118,10 +1162,25 @@ sub show_con {
       "focus";
 }
 
+{
+    # Class representing entries in %paper_ws.
+    package App::papersway::paper_ws;
+$App::papersway::paper_ws::VERSION = '3.000';
+    # We can't always populate this value when a workspace is initialised
+    # because we might not know the output's width yet.  This happens when
+    # initialising a new workspace on a newly enabled output.
+    sub ncols {
+	my $ws = shift;
+	$ws->{ncols} //= $output_init_cols{$ws->{output}}
+    }
+}
+
 sub init_ws {
     my $id = shift;
-    $paper_ws{$id} =
-      { cols => [], off_left => [], off_right => [], last_dir => 1, @_ }
+    bless +($paper_ws{$id} = { id => $id,
+			       cols => [], off_left => [], off_right => [],
+			       last_dir => 1, @_ }
+	) => "App::papersway::paper_ws"
 }
 
 sub ws_name {
@@ -1148,11 +1207,11 @@ papersway - PaperWM-like scrollable tiling window management for Sway/i3wm
 
 =head1 VERSION
 
-version 2.003
+version 3.000
 
 =head1 SYNOPSIS
 
-B<papersway> [B<--i3status>] [B<--cols=>I<N>] [B<--debug>]
+B<papersway> [B<--i3status>] [B<--cols=>I<N>|B<--cols-min-width=>I<N>] [B<--with-ws-cmd>] [B<--debug>]
 
 =head1 DESCRIPTION
 
@@ -1172,6 +1231,18 @@ Start a background instance of B<i3status>, filter and print its output.
 =item B<--cols=>I<N>
 
 Set the number of columns on a new workspace.  The default, and minimum, is 2.
+Incompatible with I<--cols-min-width>.
+
+=item B<--cols-min-width=>I<N>
+
+Set the number of columns on a new workspace to be the maximum that will fit
+while maintaining a column width of at least I<N> pixels (with Sway,
+implicitly scaled by the output's scale factor).  Incompatible with I<--cols>.
+
+=item B<--with-ws-cmd>
+
+Don't hide the workspace buttons, and when I<--i3status>, don't include
+information about workspaces in the status output.
 
 =item B<--debug>
 
@@ -1187,12 +1258,26 @@ F<~/.config/i3/config>, as appropriate.
 
 =head2 Activation
 
-The recommended way to activate papersway is by using it as your bar command:
+The recommended way to activate papersway is by using it as your bar command.
+For Sway,
 
 =over 4
 
     bar {
         status_command papersway --i3status
+
+        # [ .. further bar options .. ]
+    }
+
+=back
+
+and for i3,
+
+=over 4
+
+    bar {
+        status_command papersway --i3status --with-ws-cmd
+        workspace_command papersway-ws-cmd
 
         # [ .. further bar options .. ]
     }
@@ -1235,10 +1320,10 @@ Here are some sample bindings to get you started.
     bindsym $mod+minus exec papersway-msg cols decr
     bindsym $mod+equal exec papersway-msg cols incr
 
-    bindsym $mod+u exec papersway-msg workspace prev
-    bindsym $mod+i exec papersway-msg workspace next
-    bindsym $mod+Shift+u exec papersway-msg move-to-workspace prev
-    bindsym $mod+Shift+i exec papersway-msg move-to-workspace next
+    bindsym $mod+u exec papersway-msg workspace prev_on_output
+    bindsym $mod+i exec papersway-msg workspace next_on_output
+    bindsym $mod+Shift+u exec papersway-msg move-to-workspace prev_on_output
+    bindsym $mod+Shift+i exec papersway-msg move-to-workspace next_on_output
 
     bindsym $mod+c [con_mark=caffeinated] inhibit_idle none; \
         inhibit_idle open, mark caffeinated
@@ -1262,6 +1347,10 @@ Set I<focus_wrapping> to I<no>.
 
 =item
 
+Set I<default_orientation> to I<horizontal>.
+
+=item
+
 Leave I<workspace_layout> with its default value, I<default>.
 
 =back
@@ -1276,7 +1365,7 @@ Sean Whitton <spwhitton@spwhitton.name>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019-2025 by Sean Whitton <spwhitton@spwhitton.name>.
+This software is Copyright (c) 2019-2026 by Sean Whitton <spwhitton@spwhitton.name>.
 
 This is free software, licensed under:
 

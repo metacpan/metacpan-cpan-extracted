@@ -5,7 +5,7 @@ use warnings;
 
 package Getopt::Guided;
 
-$Getopt::Guided::VERSION = 'v3.1.2';
+$Getopt::Guided::VERSION = 'v3.2.0';
 
 # Options Delimiter constant
 sub OD () { '-' }
@@ -14,7 +14,7 @@ sub EOOD () { '--' }
 # Flag Indicator Character Class constant
 sub FICC () { '[!+]' }
 # Option-Argument Indicator Character Class constant
-sub OAICC () { '[,:]' }
+sub OAICC () { '[,:=]' }
 # Perl boolean true constant ( IV == 1 )
 sub TRUE () { !!1 }
 # Perl boolean false constant
@@ -115,10 +115,18 @@ sub getopts ( $\%;\@ ) {
       if ( $indicator eq ':' ) {
         # Standard behaviour: Overwrite option-argument
         $opts->{ $name } = $value
-      } else {
-        # Create and fill list of option-arguments ( $indicator eq ',' )
+      } elsif ( $indicator eq ',' ) {
+        # Create and fill list of option-arguments
         $opts->{ $name } = [] unless exists $opts->{ $name };
         push @{ $opts->{ $name } }, $value
+      } else {
+        # Create and fill list of option-arguments ( $indicator eq '=' )
+        $opts->{ $name } = {} unless exists $opts->{ $name };
+        if ( $value =~ m/\A ([^=]*) = (.*) \z/x ) {
+          $opts->{ $name }->{ $1 } = $2
+        } else {
+          @error = ( 'option requires a key=value argument', $name ), last
+        }
       }
     } else {
       # Case: Option is a flag
@@ -183,22 +191,22 @@ sub processopts ( \@@ ) {
     # the empty string (not undef!) as the value for the indicator
     my ( $name, $indicator ) = split //, $_[ $i ];
     if ( exists $opts{ $name } ) {
-      my $value         = delete $opts{ $name };
-      my $dest          = $_[ $i + 1 ];
-      my $dest_ref_type = ref $dest;
-      if ( $dest_ref_type eq 'SCALAR' ) {
-        ${ $dest } = $value
-      } elsif ( $dest_ref_type eq 'ARRAY' and $indicator eq ',' ) {
-        @{ $dest } = @$value
-      } elsif ( $dest_ref_type eq 'CODE' ) {
-        # Callbacks are called in scalar context
-        # If EOOD is the return value of the callback,
-        # processopts() will terminate early. The return value will be
-        # a special TRUE value. Using $name is not sufficient because 0 and 1
-        # a posible values for $name.
-        return ( OD . $name )
-          if ( $dest->( $value, $name, $indicator ) // '' ) eq EOOD
-      } else {
+      my $value = delete $opts{ $name };
+      my $dest  = $_[ $i + 1 ];
+      # Do not use $_ on purpose
+      # https://dev.to/matthewpersico/yet-another-perl-switch-statement-54h3
+      for my $dest_ref_type ( ref $dest ) {
+        $dest_ref_type eq 'SCALAR' and ${ $dest } = $value, last;
+        $dest_ref_type eq 'ARRAY'  and $indicator eq ',' and @{ $dest } = @$value, last;
+        $dest_ref_type eq 'HASH'   and $indicator eq '=' and %{ $dest } = %$value, last;
+        if ( $dest_ref_type eq 'CODE' ) {
+          # Callbacks are called in scalar context
+          # If EOOD is the return value of the callback,
+          # processopts() will terminate early. The return value will be
+          # a special TRUE value. Using $name is not sufficient because 0 and 1
+          # are posible values for $name.
+          ( $dest->( $value, $name, $indicator ) // '' ) eq EOOD ? return ( OD . $name ) : last
+        }
         croakf "'%s' is an unsupported destination reference type for the '%s' indicator", $dest_ref_type, $indicator
       }
     }

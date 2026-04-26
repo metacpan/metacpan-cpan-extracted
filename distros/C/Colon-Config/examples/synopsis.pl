@@ -86,4 +86,22 @@ is $hash = Colon::Config::read_as_hash( $data, 99 ), {
     'mum' => undef,
 } or diag explain $hash;
 
+# custom separator support
+
+my $csv = <<EOS;
+name;age;city
+alice;30;paris
+bob;25;london
+EOS
+
+is Colon::Config::read($csv, 0, ";"),
+    [ name => 'age;city', alice => '30;paris', bob => '25;london' ],
+    "semicolon separator, field=0 (full value after first separator)"
+    or diag explain Colon::Config::read($csv, 0, ";");
+
+is Colon::Config::read_as_hash($csv, 2, ";"),
+    { name => 'city', alice => 'paris', bob => 'london' },
+    "semicolon separator, field=2 via read_as_hash"
+    or diag explain Colon::Config::read_as_hash($csv, 2, ";");
+
 done_testing;

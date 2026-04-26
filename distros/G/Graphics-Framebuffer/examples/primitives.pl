@@ -20,7 +20,7 @@ use constant {
 # use Data::Dumper;$Data::Dumper::Sortkeys=1; $Data::Dumper::Purity=1; $Data::Dumper::Deepcopy=1;
 
 BEGIN {
-    our $VERSION = '6.14';
+    our $VERSION = '6.15';
 }
 
 our $F;
@@ -295,9 +295,9 @@ if (grep(/Texture|Blit|Rotate|Flipping|Monochrome|Mode Drawing|Animated|Replace/
     foreach my $file (@files) {
         next if ($file =~ /^\.+/ || $file =~ /Test/i || -d "$images_path/$file"); # Ignore the test pattern and directories
         if ($file =~ /\.gif$/i) {
-            print_it($F, "Loading Animation > $file", '00FFFFFF', undef, 1);
             my $image;
             if ($XX > 320) { # Only load native for larger screens
+				print_it($F, "Loading Animation (native size) > $file", '00FFFFFF', undef, 1);
                 $image = $F->load_image(
                     {
                         'file'   => "$images_path/$file",
@@ -306,6 +306,7 @@ if (grep(/Texture|Blit|Rotate|Flipping|Monochrome|Mode Drawing|Animated|Replace/
                 );
                 push(@ANIM,$image);
             }
+            print_it($F, "Loading Animation (full screen) > $file", '00FFFFFF', undef, 1);
             $image = $F->load_image(
                 {
                     'width'  => $XX,
@@ -350,14 +351,14 @@ foreach my $name (@order) {
                 $F->cls();
                 $F->acceleration(PERL);
                 $func{$name}->($name . ' -> Pure-Perl');
-                $F->_flush_screen();
+				$F->acceleration(SOFTWARE);
             }
         } else {
             $F->cls();
             $F->acceleration(SOFTWARE);
             $func{$name}->($name . ' -> C Accelerated');
-            $F->_flush_screen();
         }
+		$F->_flush_screen();
         sleep $delay unless($name =~ /Plot|Lines|Poly|Boxes|Circles|Ellipses|Arcs|Beziers|Pies/);
     }
 }
@@ -1217,12 +1218,12 @@ sub hatch_filled_ellipses {
         );
         $F->ellipse(
             {
-                'x' => int(rand($XX)),
-                'y' => int(rand($YY)),
+                'x'       => int(rand($XX)),
+                'y'       => int(rand($YY)),
                 'xradius' => rand($center_x),
                 'yradius' => rand($center_y),
-                'filled' => 1,
-                'hatch' => $HATCHES[int(rand(scalar(@HATCHES)))],
+                'filled'  => 1,
+                'hatch'   => $HATCHES[int(rand(scalar(@HATCHES)))],
             }
         );
     }
@@ -1291,9 +1292,9 @@ sub polygons {
     while (time < $s) {
         $F->set_color(
             {
-                'red' => int(rand(256)),
+                'red'   => int(rand(256)),
                 'green' => int(rand(256)),
-                'blue' => int(rand(256)),
+                'blue'  => int(rand(256)),
             }
         );
         my $points = 4;
@@ -1585,10 +1586,10 @@ sub flood_fill {
         $F->polygon(
             {
                 'coordinates' => [
-                    440 * $xm,
-                    190 * $ym,
+                    440  * $xm,
+                    190  * $ym,
                     3040 * $xm,
-                    160 * $xm,
+                    160  * $xm,
                     2320 * $xm,
                     $YY,
                     1920 * $xm,
@@ -1613,7 +1614,7 @@ sub flood_fill {
                     2540 * $xm,
                     1140 * $ym,
                     1940 * $xm,
-                    340 * $ym,
+                    340  * $ym,
                     1200 * $xm,
                     1000 * $ym
                 ],
@@ -1631,8 +1632,8 @@ sub flood_fill {
         $F->circle(
             {
                 'x'      => 1200 * $xm,
-                'y'      => 640 * $ym,
-                'radius' => 200 * $xm,
+                'y'      => 640  * $ym,
+                'radius' => 200  * $xm,
             }
         );
 
@@ -2285,9 +2286,6 @@ sub print_it {
     my $acc = $fb->acceleration();
     $fb->acceleration(SOFTWARE);
     unless ($XX <= 320) {
-
-        #        $fb->or_mode();
-
         my $b = $fb->ttf_print(
             {
                 'x'            => 5 * $xm,
@@ -2295,7 +2293,7 @@ sub print_it {
                 'height'       => max(9,  20 * $ym),
                 'wscale'       => 1.25,
                 'color'        => $color,
-                'text'         => uc($message),
+                'text'         => $message,
                 'bounding_box' => 1,
                 'center'       => CENTER_X,
                 'antialias'    => 0
@@ -2304,8 +2302,8 @@ sub print_it {
 
         $fb->clip_set(
             {
-                'x' => 0,
-                'y' => 0,
+                'x'  => 0,
+                'y'  => 0,
                 'xx' => $XX,
                 'yy' => $b->{'pheight'} * .75,
             }
@@ -2330,28 +2328,6 @@ sub print_it {
     $fb->_flush_screen();
     $fb->acceleration($acc);
 } ## end sub print_it
-
-# The data below is used for the Moire subroutine
-
-__DATA__
-4
-9
-6
-5
-1
-2
-8
-3
-7
-4
-9
-6
-5
-1
-2
-8
-3
-7
 
 __END__
 

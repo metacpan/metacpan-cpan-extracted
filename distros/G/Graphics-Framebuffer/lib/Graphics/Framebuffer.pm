@@ -190,6 +190,24 @@ Indicates if C code or hardware acceleration is being used.
 
 =back
 
+* B<IS_VBOX>
+
+This is a boolean variable that is normally FALSE unless running inside of VirtualBox, else it is TRUE.
+
+Later versions of VirtualBox (from 7.6.6 and above) do not properly flush the framebuffer to the physical framebuffer properly.  This causes jittery output and perceived unfinished output.  Using "_flush_screen" seems to force the update.  This variable allows you to code accordingly.
+
+* B<LAST_FLUSHED>
+
+This contains the timestamp (with high resolution accuracy) of the last time the screen was flushed.  This allows you to throttle flushing to avoid bottlenecks.  For example:
+
+=over 6
+
+ if ($FB->{'IS_VBOX'}) {
+     $FB->_flush_screen() if ((time - (1/15)) > $FB->{'LAST_FLUSHED'}); # Will only flush every 15th of a second.
+ }
+
+=back
+
 Many of the parameters you pass to the "new" method are also special variables.
 
 =cut
@@ -414,7 +432,7 @@ BEGIN {
     require Exporter;
 
     # set the version for version checking
-    our $VERSION   = '6.98';
+    our $VERSION   = '6.99';
     our @ISA       = qw(Exporter);
     our @EXPORT_OK = qw(
       FBIOGET_VSCREENINFO
@@ -502,7 +520,7 @@ use Inline C => <<'C_CODE', 'name' => 'Graphics::Framebuffer', 'VERSION' => $VER
 /* Copyright 2018-2026 Richard Kelsch, All Rights Reserved
    See the Perl documentation for Graphics::Framebuffer for licensing information.
 
-   Version:  6.98
+   Version:  6.99
 
    You may wonder why the stack is so heavily used when the global structures
    have the needed values.  Well, the module can emulate another graphics mode
@@ -4345,7 +4363,6 @@ sub plot {
     } ## end else [ if ($self->{'ACCELERATED'...})]
     $self->{'X'} = $x;
     $self->{'Y'} = $y;
-    $self->_flush_screen() if ($self->{'IS_VBOX'});
 } ## end sub plot
 
 =head2 setpixel
@@ -4622,7 +4639,6 @@ sub drawto {
 
     if ($self->{'ACCELERATED'}) {
         c_line($self->{'SCREEN'}, $start_x, $start_y, $x_end, $y_end, $x_clip, $y_clip, $xx_clip, $yy_clip, $self->{'INT_RAW_FOREGROUND_COLOR'}, $self->{'INT_RAW_BACKGROUND_COLOR'}, $self->{'COLOR_ALPHA'}, $self->{'DRAW_MODE'}, $self->{'BYTES'}, $self->{'BITS'}, $self->{'BYTES_PER_LINE'}, $self->{'XOFFSET'}, $self->{'YOFFSET'}, $antialiased,);
-        $self->_flush_screen() if ($self->{'IS_VBOX'});
     } else {
         my $width;
         my $height;
@@ -4757,18 +4773,16 @@ sub _flush_screen {
     # Since the framebuffer is mappeed as a string device, Perl buffers the output, and this must be flushed.
     my $self = shift;
 
-    if ($self->{'LAST_FLUSHED'} <= time) {
-        if ($self->{'DEVICE'} eq 'EMULATED') {
-            select(STDERR);
-            $| = 1;
-        } else {
-            select($self->{'FB'}) if (defined($self->{'FB'}));
-            $| = 1;
-            $self->{'FB'}->flush();
-			$self->vsync();
-        }
-        $self->{'LAST_FLUSHED'} = time + (1/15);
-    }
+	if ($self->{'DEVICE'} eq 'EMULATED') {
+		select(STDERR);
+		$| = 1;
+	} else {
+		select($self->{'FB'}) if (defined($self->{'FB'}));
+		$| = 1;
+		$self->{'FB'}->flush();
+		$self->vsync();
+	}
+	$self->{'LAST_FLUSHED'} = time;
 } ## end sub _flush_screen
 
 sub _adj_plot {
@@ -6745,7 +6759,6 @@ sub fill {
             $self->blit_write($saved);
         } else {
             c_fill($self->{'SCREEN'}, $x, $y, $x_clip, $y_clip, $xx_clip, $yy_clip, $self->{'INT_RAW_FOREGROUND_COLOR'}, $self->{'INT_RAW_BACKGROUND_COLOR'}, $color_alpha, $self->{'DRAW_MODE'}, $bytes, $self->{'BITS'}, $self->{'BYTES_PER_LINE'}, $self->{'XOFFSET'}, $self->{'YOFFSET'},);
-            $self->_flush_screen() if ($self->{'IS_VBOX'});
         }
     } ## end else
 } ## end sub fill
@@ -7145,7 +7158,6 @@ sub blit_read {
             $scrn .= substr($fb,  $idx, $W);
         }
     } ## end else [ if ($h > 1 && $self->{...})]
-    $self->_flush_screen() if ($self->{'IS_VBOX'});
     return ({ 'x' => $x, 'y' => $y, 'width' => $w, 'height' => $h, 'image' => $scrn });
 } ## end sub blit_read
 
@@ -7320,7 +7332,6 @@ sub blit_write {
             $self->_fix_mapping();
         }
     } ## end else [ if ($self->{'ACCELERATED'...})]
-    $self->_flush_screen() if ($self->{'IS_VBOX'});
 } ## end sub blit_write
 
 sub _blit_adjust_for_clipping {
@@ -7547,7 +7558,6 @@ sub blit_transform {
         warn __LINE__ . " $@\n", Imager->errstr() if ($@ && $self->{'SHOW_ERRORS'});
 
         $data = $self->_convert_24_to_16($data, RGB) if ($self->{'BITS'} == 16);
-        $self->_flush_screen() if ($self->{'IS_VBOX'});
         return (
             {
                 'x'      => $params->{'merge'}->{'dest_blit_data'}->{'x'},
@@ -7585,7 +7595,6 @@ sub blit_transform {
                 $new = "$image";
             }
         } ## end else [ if ($self->{'ACCELERATED'...})]
-        $self->_flush_screen() if ($self->{'IS_VBOX'});
         return (
             {
                 'x'      => $params->{'blit_data'}->{'x'},
@@ -7625,7 +7634,6 @@ sub blit_transform {
                 $data = $self->{'RAW_BACKGROUND_COLOR'} x (($wh**2) * $bytes);
 
                 c_rotate($image, $data, $width, $height, $wh, $degrees, $bytes, $bits);
-                $self->_flush_screen() if ($self->{'IS_VBOX'});
                 return (
                     {
                         'x'      => $params->{'blit_data'}->{'x'},
@@ -7669,7 +7677,6 @@ sub blit_transform {
             };
             warn __LINE__ . " $@\n", Imager->errstr() if ($@ && $self->{'SHOW_ERRORS'});
         } ## end else
-        $self->_flush_screen() if ($self->{'IS_VBOX'});
         return (
             {
                 'x'      => $params->{'blit_data'}->{'x'},
@@ -7714,7 +7721,6 @@ sub blit_transform {
         };
         warn __LINE__ . " $@\n", Imager->errstr() if ($@ && $self->{'SHOW_ERRORS'});
         $data = $self->_convert_24_to_16($data, $self->{'COLOR_ORDER'}) if ($self->{'BITS'} == 16);
-        $self->_flush_screen() if ($self->{'IS_VBOX'});
         return (
             {
                 'x'      => $params->{'blit_data'}->{'x'},
@@ -7736,7 +7742,6 @@ sub blit_transform {
         if ($params->{'center'} == CENTER_Y || $params->{'center'} == CENTER_XY) {
             $y = $self->{'Y_CLIP'} + int(($YY - $height) / 2);
         }
-        $self->_flush_screen() if ($self->{'IS_VBOX'});
         return (
             {
                 'x'      => $x,
@@ -7912,7 +7917,6 @@ sub monochrome {
     }
     if ($self->{'ACCELERATED'}) {
         c_monochrome($params->{'image'}, $size, $color_order, $inc, $params->{'bits'});
-        $self->_flush_screen() if ($self->{'IS_VBOX'});
         return ($params->{'image'});
     } else {
         for (my $byte = 0; $byte < length($params->{'image'}); $byte += $inc) {
@@ -7948,7 +7952,6 @@ sub monochrome {
             } ## end else [ if ($inc == 2) ]
         } ## end for (my $byte = 0; $byte...)
     } ## end else [ if ($self->{'ACCELERATED'...})]
-    $self->_flush_screen() if ($self->{'IS_VBOX'});
     return ($params->{'image'});
 } ## end sub monochrome
 
@@ -9816,7 +9819,7 @@ Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONT
 
 =head1 VERSION
 
-Version 6.98 (Apr 22, 2026)
+Version 6.99 (Apr 25, 2026)
 
 =head1 THANKS
 

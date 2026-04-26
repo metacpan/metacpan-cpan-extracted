@@ -177,6 +177,7 @@ SKIP: {
 SKIP: {
     my $curlbin = whereis('curl');
     skip("Could not find curl", 3) if !$curlbin;
+    skip("curl is from /snap, skipping", 3) if $curlbin =~ m{^/snap/};
     my $curl_version = qx{$curlbin --version};
     my $cv = $curl_version =~ m{curl ([0-9.]+)} ? $1 : '0';
 
@@ -208,6 +209,7 @@ SKIP: {
 SKIP: {
     my $curlbin = whereis('curl');
     skip("Could not find curl", 3) if !$curlbin;
+    skip("curl is from /snap, skipping", 3) if $curlbin =~ m{^/snap/};
     my $curl_version = qx{$curlbin --version};
     my $cv = $curl_version =~ m{curl ([0-9.]+)} ? $1 : '0';
 

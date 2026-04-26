@@ -1027,8 +1027,8 @@ sub perlio_only {
         helptext   => "Do not set the test suite environment to stdio.",
         configtext => "Run the test suite without \$ENV{PERLIO}=='stdio'?",
         configtype => 'prompt_yn',
-        configalt  => sub { [qw/ N y /] },
-        configdft  => sub {'n'},
+        configalt  => sub { [qw/ Y n /] },
+        configdft  => sub {'Y'},
     );
 }
 

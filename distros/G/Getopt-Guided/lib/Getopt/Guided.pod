@@ -16,13 +16,13 @@ EXIT_USAGE) are exported on request.
 
   use Getopt::Guided qw( getopts );
 
-  my @argv = qw( -d dv1 -c -va av1 -ddv2 -a av2 -d -- -vv v1 v2 );
+  my @argv = qw( -e ek1=ev1 -d dv1 -c -va av1 -ddv2 -a av2 -d -- -eek2=ev2 -vv v1 v2 );
 
   # If omitted @argv defaults to @ARGV
-  getopts( 'a:bcd,v+', my %opts, @argv );
+  getopts( 'a:e=bcd,v+', my %opts, @argv );
 
   # Parse result
-  # %opts == ( a => 'av2', c => !!1, d => [ 'dv1', 'dv2', '--' ], v => 3 )
+  # %opts == ( a => 'av2', c => !!1, d => [ qw( dv1 dv2 -- ) ], e => { ek1 => 'ev1', ek2 => 'ev2' }, v => 3 )
   # @argv == ( 'v1', 'v2' )
 
   # ---
@@ -82,13 +82,16 @@ The options specification C<$spec> is the first parameter of the C<getopts()>
 function.  It is a non-empty string containing the option names (the single
 alphanumeric characters) recognized by the C<getopts()> function.
 
-If an option name ("a") is followed by a colon (C<:>) character or a comma
-(C<,>) character, the option should have an option-argument which either
-shall be supplied as a separate argument ("-a foo") or shall be part of the
-same argument string as the option name ("-afoo").  We call an option whose
-option name is followed by a colon/comma "option-argument indicator" a "common
-option"/"list option". A list option is sometimes called "multi-value option".
-The POSIX standard knows only common options.
+If an option name ("a") is followed by a colon (C<:>) character, a comma
+(C<,>) character, or an equal sign (C<=>) character, the option should
+have an option-argument which either shall be supplied as a separate
+argument ("-a foo") or shall be part of the same argument string as the
+option name ("-afoo").  We call an option whose option name is followed by a
+colon/comma/equal sign "option-argument indicator" a common/list/map option. A
+list option is sometimes called "multi-value option".  The option-argument
+of a map option is a string of the form "key=value". The equal sign is
+required. Both the key and the value can be empty.  The POSIX standard knows
+only common options.
 
 An option that does not require an option-argument is called a flag. The flag
 name can optionally be followed by an exclamation mark (C<!>) character or
@@ -104,6 +107,7 @@ function. It is an empty hash (passed by reference) that stores the parse
 result of the C<getopts()> function. Each hash key refers to an option
 name and the corresponding hash value refers to the option-argument value
 (or the flag value). The hash value of a list option is an array reference.
+The hash value of a map option is a hash reference.
 
 =head1 COMMAND-LINE ARGUMENTS LIST
 
@@ -140,7 +144,8 @@ C<%opts> before it warns and returns false.
 
 If a common option is repeated, its option-arguments overwrite each other
 and the last option-argument wins.  If a list option is repeated, its
-option-arguments are pushed onto a list.
+option-arguments are pushed onto a list. If a map option is repeated, its
+option-arguments are parsed into key-value pairs and are added to a map.
 
 The appearance of a flag on the command line sets its value (initial value)
 to true (C<!!1>).  If a flag with no flag-type indicator is repeated, its
@@ -162,7 +167,7 @@ parameters form a non-empty list with an even number of elements. Each
 even-numbered element represents a single "option specification".  The element
 that follows such an option specification (an odd-numbered element) is called
 its "option destination". The destination has to be a SCALAR, an ARRAY,
-or a CODE reference.
+a HASH, or a CODE reference.
 
 The option specification/option destination pairs are applied in order to
 the parse result. This feature can be used to implement best practices such
@@ -172,11 +177,16 @@ as ensuring that a "-V" (version) option should have a higher precedence
   processopts @argv, 'V' => sub { ... }, 'h' => sub { ... };
 
 If an option belongs to the parse result and its destination is a SCALAR
-reference, this reference points to the option-argument value (or the
-flag value).
+reference, this reference points to the value of the corresponding C<%opts>
+name-value map entry.
 
 If a list option belongs to the parse result and its destination is an ARRAY
-reference, this reference points to the list of option-argument values.
+reference, this reference points to the list value of the corresponding
+C<%opts> name-value map entry.
+
+If a map option belongs to the parse result and its destination is a HASH
+reference, this reference points to the hash value of the corresponding
+C<%opts> name-value map entry.
 
 If an option belongs to the parse result and its destination is a CODE
 reference, the corresponding anonymous callback function is called with the

@@ -11,6 +11,8 @@
 #define isEOL(c) ((c >= 0xa) && (c <= 0xd ) || (c == 0x85))
 #define isEOL_UTF8(c) (isEOL(c) || c == 0x2028 || c == 0x2029)
 
+// isutf8 space function?
+
 char* _minify_ascii(pTHX_ char* src, STRLEN len, STRLEN* packed) {
 
   char* dest;
@@ -95,7 +97,7 @@ STATIC U8* _minify_utf8(pTHX_ U8* src, STRLEN len, STRLEN* packed) {
     return dest;
   }
 
-  while (len > 0) {
+  while (src < end) {
 
     UV c = *src;
 
@@ -106,22 +108,13 @@ STATIC U8* _minify_utf8(pTHX_ U8* src, STRLEN len, STRLEN* packed) {
     else {
       STRLEN skip;
       c = utf8_to_uvchr_buf(src, end, &skip);
-      if (c == 0) {
-        c = *src;
-      }
-      if ((int) skip > 0) {
-        src += skip;
-        len -= skip;
+
+      if (skip == (STRLEN) -1) {
+        croak_nocontext("Malformed UTF-8 %s", src);
       }
       else {
-        src ++;
-        len --;
-      }
-      if (len < 0) {
-        croak("UTF-8 character overflow");
-        src = end;
-        len = 0;
-        trailing = NULL;
+        src += skip;
+        len -= skip;
       }
     }
 

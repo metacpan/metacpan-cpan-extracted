@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Project
+  xmlns="http://usefulinc.com/ns/doap#"
+  xmlns:dc="http://purl.org/dc/terms/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  >
+  <name>Text-Minify-XS</name>
+  <shortdesc>Remove indentation and trailing whitespace from multi-line text</shortdesc>
+  <category rdfs:label="compression" />
+  <category rdfs:label="minify" />
+  <category rdfs:label="minification" />
+  <category rdfs:label="string" />
+  <category rdfs:label="text" />
+  <category rdfs:label="trim" />
+  <category rdfs:label="whitespace" />
+  <developer>
+    <foaf:Person>
+      <foaf:name>Robert Rothenberg</foaf:name>
+      <foaf:mbox rdf:resource="mailto:rrwo@cpan.org" />
+    </foaf:Person>
+  </developer>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Karl Williamson</foaf:name>
+      <foaf:mbox rdf:resource="mailto:kwh@cpan.org" />
+    </foaf:Person>
+  </helper>
+  <license rdf:resource="http://www.perlfoundation.org/artistic_license_2_0" />
+  <homepage rdf:resource="https://metacpan.org/release/Text-Minify-XS" />
+  <bug-database rdf:resource="https://github.com/robrwo/Text-Minify-XS/issues" />
+  <repository>
+    <GitRepository>
+      <browse rdf:resource="https://github.com/robrwo/Text-Minify-XS" />
+      <location rdf:resource="git://github.com/robrwo/Text-Minify-XS.git" />
+    </GitRepository>
+  </repository>
+  <programming-language>Perl</programming-language>
+</Project>

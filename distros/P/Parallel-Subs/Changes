@@ -1,3 +1,57 @@
+0.003     2026-04-26 09:39:13+02:00 Europe/Vienna
+
+    [Features]
+    - Add named jobs: add() now accepts an optional leading string name,
+      and result($name) retrieves a job's result by name. Named and unnamed
+      jobs can be mixed freely; results() still returns all results in
+      insertion order.
+    - Add per-job timeout support via SIGALRM (timeout => N constructor option).
+      Each child process is killed after N seconds. In optimized mode, the
+      timeout covers the grouped jobs within each fork.
+
+    [Bug Fixes]
+    - Safe error handling in run_on_finish: a failing job no longer dies
+      inside the parent's wait loop and aborts sibling collection.
+    - Preserve return values in wait_for_all_optimized() so grouped jobs
+      retain their individual results.
+    - Invoke callbacks as each job completes rather than after all jobs
+      finish — callbacks now fire in completion order.
+    - Fix memory leak: break circular reference between $self and
+      Parallel::ForkManager's run_on_finish closure using Scalar::Util::weaken.
+    - Fix callback indexing bug in wait_for_all() that could skip or misalign
+      callbacks with their corresponding job results.
+    - Fix unnecessary empty forks in wait_for_all_optimized() when the number
+      of jobs is fewer than available CPUs.
+    - Validate constructor options (max_process, max_process_per_cpu, max_memory,
+      timeout) are positive numbers — previously zero or negative values passed
+      silently to Parallel::ForkManager with undefined behavior.
+    - Validate callback argument in add() is a CODE reference — previously
+      non-CODE callbacks were silently ignored at execution time.
+    - Warn when max_memory is used on non-Linux platforms (requires
+      Sys::Statistics::Linux::MemStats) instead of silently falling back.
+
+    [Documentation]
+    - Improve POD structure: add DESCRIPTION and METHODS sections, fix
+      formatting issues, add missing semicolon in SYNOPSIS example.
+    - Document named-jobs API and timeout option in POD/README.
+    - Add CLAUDE.md with project guidelines for AI-assisted development
+      (excluded from CPAN release via dist.ini PruneFiles, along with
+      the .claude/ directory).
+    - Add AI policy document.
+
+    [Testing]
+    - Modernize test suite from Test::More to Test2::V0.
+    - Add comprehensive tests for callbacks, edge cases, memory leaks,
+      named jobs, error handling, and timeout behavior.
+
+    [CI/Infrastructure]
+    - Switch from Travis CI to GitHub Actions.
+    - Use dynamic Perl version matrix (5.14+) via perl-actions/perl-versions.
+    - Run in perldocker/perl-tester containers for reproducible builds.
+    - Use install-with-cpm with a dedicated CI cpanfile.
+    - Restrict Dist::Zilla build to Perl >= 5.20; older Perls run prove directly.
+    - Clean up stale test dependencies from CI cpanfile.
+
 0.002     2018-03-20 14:16:28-06:00 America/Denver
 
 0.001     2018-02-16 15:34:46-07:00 America/Denver

@@ -71,20 +71,22 @@ sub new {
     my $class = shift;
     my $self = $class->SUPER::new(@_);
 
-    $self->{_poster} = Test::Smoke::Poster->new(
-        $self->option('poster') => $self->options,
+    if (defined($self->option('qfile'))) {
+        $self->{_poster} = Test::Smoke::Poster->new(
+            $self->option('poster') => $self->options,
 
-        # We will need to fake 'ddir' in order to get the reports from the
-        # archive
-        ddir => $self->option('adir'),
-        v    => $self->option('verbose'),
-    );
-    $self->{_queue} = Test::Smoke::PostQueue->new(
-        adir   => $self->option('adir'),
-        qfile  => $self->option('qfile'),
-        v      => $self->option('verbose'),
-        poster => $self->poster,
-    );
+            # We will need to fake 'ddir' in order to get the reports from the
+            # archive
+            ddir => $self->option('adir'),
+            v    => $self->option('verbose'),
+        );
+        $self->{_queue} = Test::Smoke::PostQueue->new(
+            adir   => $self->option('adir'),
+            qfile  => $self->option('qfile'),
+            v      => $self->option('verbose'),
+            poster => $self->poster,
+        );
+    }
 
     return $self;
 }
@@ -98,6 +100,7 @@ Try to send all items in the queue and remove items that are no longer in the ar
 sub run {
     my $self = shift;
 
+    return unless defined($self->{_queue});
     $self->queue->handle();
     $self->queue->purge();
 }

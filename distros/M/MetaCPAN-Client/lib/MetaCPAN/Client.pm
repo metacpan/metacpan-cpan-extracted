@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client;
 # ABSTRACT: A comprehensive, DWIM-featured client to the MetaCPAN API
-$MetaCPAN::Client::VERSION = '2.040000';
+$MetaCPAN::Client::VERSION = '2.041000';
 use Moo;
 use Carp;
 use JSON::MaybeXS qw< JSON >;
@@ -17,7 +17,6 @@ use MetaCPAN::Client::Module;
 use MetaCPAN::Client::File;
 use MetaCPAN::Client::Favorite;
 use MetaCPAN::Client::Pod;
-use MetaCPAN::Client::Rating;
 use MetaCPAN::Client::Release;
 use MetaCPAN::Client::Mirror;
 use MetaCPAN::Client::Package;
@@ -32,7 +31,7 @@ has request => (
 );
 
 my @supported_searches = qw<
-    author distribution favorite module rating release mirror file permission package cover cve
+    author distribution favorite module release mirror file permission package cover cve
 >;
 
 sub BUILDARGS {
@@ -135,17 +134,6 @@ sub favorite {
     return $self->_search( 'favorite', $args, $params );
 }
 
-sub rating {
-    my $self   = shift;
-    my $args   = shift;
-    my $params = shift;
-
-    is_hashref($args)
-        or croak 'rating takes a hash ref as parameter';
-
-    return _empty_result_set('rating');
-}
-
 sub release {
     my $self   = shift;
     my $arg    = shift;
@@ -204,10 +192,10 @@ sub all {
     # dispatches to to check types (using the global supported types array).
     $type =~ s/s$//;
 
-    $params and !is_hashref($params)
-        and croak "all: params must be a hashref";
+    is_hashref($params)
+        or croak "all: params must be a hashref";
 
-    if ( $params->{fields} and !is_arrayref($params->{fields}) ) {
+    if ( exists $params->{fields} and !is_arrayref($params->{fields}) ) {
         $params->{fields} = [ split /,/ => $params->{fields} ];
     }
 
@@ -469,7 +457,7 @@ MetaCPAN::Client - A comprehensive, DWIM-featured client to the MetaCPAN API
 
 =head1 VERSION
 
-version 2.040000
+version 2.041000
 
 =head1 SYNOPSIS
 
@@ -577,13 +565,6 @@ Returns a L<MetaCPAN::Client::File> object.
 
 Returns a L<MetaCPAN::Client::ResultSet> object containing
 L<MetaCPAN::Client::Favorite> results.
-
-=head2 rating
-
-    my $rating = $mcpan->rating({ distribution => 'Moose' });
-
-Returns a L<MetaCPAN::Client::ResultSet> object containing
-L<MetaCPAN::Client::Rating> results.
 
 =head2 release
 
@@ -700,7 +681,8 @@ Returns a L<MetaCPAN::Client::DownloadURL> object
 
 =head2 all
 
-Retrieve all matches for authors/modules/distributions/favorites or releases.
+Retrieve all matches for
+authors/modules/distributions/favorites/files/permissions/packages/covers/cves or releases.
 
     my $all_releases = $mcpan->all('releases')
 

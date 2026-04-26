@@ -1,6 +1,6 @@
 #! perl -w
 use strict;
-use v5.10;
+use v5.14;
 use ExtUtils::MakeMaker 6.55_03;
 use Config;
 
@@ -174,7 +174,7 @@ my %wm = (
                   . 'Nicholas Clark <nick@plum.flirble.org> and '
                   . 'Abe Timmerman <abeltje@cpan.org>',
     ABSTRACT_FROM    => 'lib/Test/Smoke.pm',
-    MIN_PERL_VERSION => '5.010',
+    MIN_PERL_VERSION => '5.014',
     LICENSE          => "perl_5",
 
     dist => {

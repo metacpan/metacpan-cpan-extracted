@@ -1,3 +1,6 @@
+v0.906.0 2026-04-26 11:12:32+02:00
+ - Fix detecting floats in YAML 1.2 Core Schema (issue#125)
+
 v0.905.0 2026-04-24 09:37:22+02:00
  - Fix memory leak for trailing UTF8 octets (PR#123)
 

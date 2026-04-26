@@ -525,12 +525,8 @@ sub make_test {
     $self->tty( "\n Tests start here:\n" );
 
     # No use testing different io layers without PerlIO
-    # just output 'stdio' for mkovz.pl
-    my @layers = ( ($config_args =~ /-Uuseperlio\b/) || $self->{defaultenv} )
-        ? qw( stdio )
-        : $self->{perlio_only}
-            ? qw( perlio )
-            : qw( stdio perlio );
+    # just output 'stdio' for tssendrpt.pl
+    my @layers = qw/ perlio /;
 
     my @locales;
     if ( !($config_args =~ /-Uuseperlio\b/ || $self->{defaultenv}) &&
@@ -866,7 +862,7 @@ sub _run_TEST_target {
         $self->log_debug($_);
         skip_filter( $_ ) and next;
 
-        # make mkovz.pl's life easier
+        # make tssendrpt.pl life easier
         s/(.)(TSTENV\s+=\s+\w+)/$1\n$2/;
 
         if (m/^u=.*tests=/) {

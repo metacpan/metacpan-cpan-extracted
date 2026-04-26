@@ -12,13 +12,16 @@ t/data/.config/brokenrc
 t/data/.config/finerc
 t/data/script/broken
 t/data/script/fine
-t/extension.t
+t/extensions/list.t
+t/extensions/map.t
+t/extensions/others.t
 t/load.t
 t/print_version_info.t
 t/processopts.t
 t/readopts.t
 t/script.t
 t/standard.t
+t/synopsis.t
 t/validation.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -322,6 +322,7 @@ sub splash {
     $self->_perl_logo();
 	$self->_coin();
     $self->normal_mode();
+	$self->_flush_screen();
 	sleep $wait;
 } ## end sub splash
 

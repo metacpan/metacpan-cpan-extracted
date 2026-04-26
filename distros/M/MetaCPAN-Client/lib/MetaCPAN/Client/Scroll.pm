@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Scroll;
 # ABSTRACT: A MetaCPAN::Client scroller
-$MetaCPAN::Client::Scroll::VERSION = '2.040000';
+$MetaCPAN::Client::Scroll::VERSION = '2.041000';
 use Moo;
 use Carp;
 use Ref::Util qw< is_hashref >;
@@ -107,7 +107,7 @@ sub BUILDARGS {
     $args{_buffer}    = $content->{hits}{hits};
 
     $args{aggregations} = $content->{aggregations}
-        if $content->{aggregations} and is_hashref( $content->{aggregations} );
+        if exists $content->{aggregations} and is_hashref( $content->{aggregations} );
 
     return \%args;
 }
@@ -187,7 +187,7 @@ MetaCPAN::Client::Scroll - A MetaCPAN::Client scroller
 
 =head1 VERSION
 
-version 2.040000
+version 2.041000
 
 =head1 METHODS
 

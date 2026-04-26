@@ -2,6 +2,9 @@
 use strict;
 
 use Test::More;
+if ($^O eq 'MSWin32') {
+    plan skip_all => 'PostQueue->handle() flock/truncate sequence unreliable on Win32';
+}
 use Test::NoWarnings ();
 
 use File::Spec::Functions;
@@ -10,6 +13,7 @@ use File::Path qw< mkpath >;
 
 use Test::Smoke::App::Options;
 use Test::Smoke::App::HandleQueue;
+use Test::Smoke::PostQueue;
 
 my $commit = '9d4a846c758608a6297babf9582967e036edfa1f';
 my $non_commit = '9d4a846c758608a6297babf9582967e036edfa20';
@@ -21,6 +25,27 @@ my $qfile = catfile($tempdir, "${prefix}.qfile");
 prepare_archive($adir, $commit);
 prepare_queue($qfile, $commit, $non_commit);
 
+# Test that HandleQueue works gracefully when qfile is not configured.
+# This must run first, before any PostQueue singleton is created.
+{
+    local @ARGV = (
+        '--adir',  $adir,
+        '--smokedb_url', 'http://localhost/report',
+        '--poster' => 'HTTP::Tiny',
+        # no --qfile
+    );
+    my $app;
+    eval {
+        $app = Test::Smoke::App::HandleQueue->new(
+            Test::Smoke::App::Options->handlequeue_config
+        );
+    };
+    is($@, '', "HandleQueue->new() does not die when qfile is not configured");
+    isa_ok($app, 'Test::Smoke::App::HandleQueue');
+
+    my $result = eval { $app->run(); 1 };
+    is($@, '', "HandleQueue->run() does not die when qfile is not configured");
+}
 
 {
     no warnings 'redefine';

@@ -1,5 +1,14 @@
 Revision history for Dist-Zilla-Plugin-GitHub-CreateRelease
 
+0.0008 -- Sat Apr 25 10:26:13 ADT 2026
+
+    [Significant Changes from 0.0007]
+
+    Module::Signature requirment has been removed
+
+    [Detailed Change Log]
+    - 30d9d17 Remove Module::Signature requirement
+
 0.0007 -- Sun Jan 21 22:21:03 AST 2024
 
     [Detailed Change Log]

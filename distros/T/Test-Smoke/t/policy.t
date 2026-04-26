@@ -61,7 +61,7 @@ sub run_tests {
 
     foreach my $conf ( @$this_test ) {
         my $config_args = $old_config_args;
-        # Try not to add spurious spaces as it confuses mkovz.pl
+        # Try not to add spurious spaces as it confuses tssendrpt.pl
         length $conf and $config_args .= " $conf";
         $pobj->reset_rules;
         $pobj->set_rules( $_ ) for @$substs;

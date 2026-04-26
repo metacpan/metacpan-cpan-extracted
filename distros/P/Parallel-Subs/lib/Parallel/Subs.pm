@@ -1,10 +1,12 @@
 package Parallel::Subs;
-$Parallel::Subs::VERSION = '0.002';
+$Parallel::Subs::VERSION = '0.003';
 use strict;
 use warnings;
 
+use Carp qw(croak);
 use Parallel::ForkManager;
-use Sys::Info;
+use Scalar::Util qw(weaken);
+
 
 # ABSTRACT: Simple way to run subs in parallel and process their return value in perl
 
@@ -23,17 +25,43 @@ sub _init {
     my ( $self, %opts ) = @_;
 
     $self->_pfork(%opts);
-    $self->{result} = {};
+    $self->{timeout}  = $opts{timeout};
+    $self->{result}   = {};
+    $self->{failures} = [];
+
+    # Use a weak reference to break the circular reference:
+    # $self -> {pfork} -> run_on_finish closure -> $self
+    my $weak_self = $self;
+    weaken($weak_self);
+
     $self->{pfork}->run_on_finish(
         sub {
             my ( $pid, $exit, $id, $exit_signal, $core_dump, $data ) = @_;
-            die "Failed to process on one job, stop here !"
-              if $exit || $exit_signal;
-            $self->{result}->{$id} = $data->{result};
+            return unless $weak_self;
+            if ( $exit || $exit_signal ) {
+                my $error = ( $data && $data->{error} ) ? $data->{error} : undef;
+                push @{ $weak_self->{failures} }, {
+                    id     => $id,
+                    pid    => $pid,
+                    exit   => $exit,
+                    signal => $exit_signal,
+                    error  => $error,
+                };
+            }
+            else {
+                $weak_self->{result}->{$id} = $data->{result};
+
+                # Fire callback immediately as each job completes
+                my $cb = $weak_self->{callbacks}[ $id - 1 ];
+                if ( $cb && ref $cb eq 'CODE' ) {
+                    $cb->( $data->{result} );
+                }
+            }
         }
     );
     $self->{jobs}      = [];
     $self->{callbacks} = [];
+    $self->{named}     = {};
 
     return $self;
 }
@@ -41,13 +69,21 @@ sub _init {
 sub _pfork {
     my ( $self, %opts ) = @_;
 
+    for my $opt (qw(max_process max_process_per_cpu max_memory timeout)) {
+        croak "$opt must be a positive number"
+          if defined $opts{$opt} && $opts{$opt} <= 0;
+    }
+
     my $cpu;
     if ( defined $opts{max_process} ) {
         $cpu = $opts{max_process};
     }
     else {
         my $factor = $opts{max_process_per_cpu} || 1;
-        eval { $cpu = Sys::Info->new()->device('CPU')->count() * $factor; };
+        eval {
+            require Sys::Info;
+            $cpu = Sys::Info->new()->device('CPU')->count() * $factor;
+        };
     }
     if ( defined $opts{max_memory} ) {
         my $free_mem;
@@ -55,19 +91,18 @@ sub _pfork {
             require Sys::Statistics::Linux::MemStats;
             $free_mem = Sys::Statistics::Linux::MemStats->new->get->{realfree};
         };
-        my $max_mem = $opts{max_memory} * 1024;  # 1024 **2 = 1 GO => expr in Kb
+        my $max_mem = $opts{max_memory} * 1024;  # express in Kb
         my $cpu_for_mem;
         if ($@) {
-
-#warn "Cannot guess amount of available free memory need Sys::Statistics::Linux::MemStats\n";
+            warn "max_memory option requires Sys::Statistics::Linux::MemStats "
+              . "(Linux only); falling back to max_process=2 on this platform\n";
             $cpu_for_mem = 2;
         }
         else {
             $cpu_for_mem = int( $free_mem / $max_mem );
         }
 
-        # min
-        $cpu = ( $cpu_for_mem < $cpu ) ? $cpu_for_mem : $cpu;
+        $cpu = $cpu_for_mem if !defined $cpu || $cpu_for_mem < $cpu;
     }
     $cpu ||= 1;
 
@@ -83,14 +118,36 @@ sub _pfork {
 
 
 sub add {
-    my ( $self, $code, $test ) = @_;
+    my $self = shift;
 
-    return unless $code && ref $code eq 'CODE';
+    # Optional name as first argument (non-reference string)
+    my $user_name;
+    if ( @_ >= 2 && defined $_[0] && !ref $_[0] ) {
+        $user_name = shift;
+    }
+
+    my ( $code, $callback ) = @_;
+
+    croak "add() requires a CODE reference as first argument"
+      unless $code && ref $code eq 'CODE';
+    croak "callback must be a CODE reference"
+      if defined $callback && ref $callback ne 'CODE';
+
+    if ( defined $user_name ) {
+        croak "duplicate job name '$user_name'"
+          if exists $self->{named}{$user_name};
+    }
+
+    my $position = scalar( @{ $self->{jobs} } ) + 1;
     push(
         @{ $self->{jobs} },
-        { name => ( scalar( @{ $self->{jobs} } ) + 1 ), code => $code }
+        { name => $position, code => $code }
     );
-    push( @{ $self->{callbacks} }, $test );
+    push( @{ $self->{callbacks} }, $callback );
+
+    if ( defined $user_name ) {
+        $self->{named}{$user_name} = $position;
+    }
 
     return $self;
 }
@@ -126,23 +183,22 @@ sub wait_for_all_optimized {
         my ( $from, $to ) = @_;
 
         return sub {
-
-            #print "subprocess from $from to $to\n";
+            my %results;
             for ( my $i = $from ; $i <= $to ; ++$i ) {
-
-                #print "running job $i\n";
-                $original_jobs[$i]->{code}->();
+                $results{ $original_jobs[$i]->{name} } =
+                  $original_jobs[$i]->{code}->();
             }
-            return;
+            return \%results;
         };
     };
 
     my ( $from, $to ) = ( 0, 0 );
     foreach my $id ( 1 .. $cpu ) {
+        last if $from >= scalar @original_jobs;
+
         $to = $from + $jobs_per_cpu - 1;
         $to = scalar(@original_jobs) - 1 if $to >= scalar(@original_jobs);
 
-        #print "FROM $from - TO $to\n";
         my $sub = $generate_sub->( $from, $to );
 
         push @new_jobs, { name => $id, code => $sub };
@@ -151,7 +207,17 @@ sub wait_for_all_optimized {
 
     $self->{jobs} = \@new_jobs;
 
-    return $self->wait_for_all();
+    $self->run();
+
+    # Unpack grouped results back into individual job results
+    my %unpacked;
+    for my $group_result ( values %{ $self->{result} } ) {
+        next unless ref $group_result eq 'HASH';
+        %unpacked = ( %unpacked, %$group_result );
+    }
+    $self->{result} = \%unpacked;
+
+    return $self;
 }
 
 
@@ -159,18 +225,46 @@ sub run {
     my ($self) = @_;
 
     return unless scalar @{ $self->{jobs} };
+    $self->{failures} = [];
+
     my $pfm = $self->{pfork};
     for my $job ( @{ $self->{jobs} } ) {
         $pfm->start( $job->{name} ) and next;
-        my $job_result = $job->{code}();
 
-        # can be used to stop on first error
-        my $job_error = 0;
-        $pfm->finish( $job_error, { result => $job_result } );
+        if ( my $timeout = $self->{timeout} ) {
+            $SIG{ALRM} = sub {
+                die "Job '$job->{name}' timed out after ${timeout}s\n";
+            };
+            alarm($timeout);
+        }
+
+        my $job_result;
+        my $ok = eval {
+            $job_result = $job->{code}->();
+            1;
+        };
+        alarm(0) if $self->{timeout};
+        if ($ok) {
+            $pfm->finish( 0, { result => $job_result } );
+        }
+        else {
+            $pfm->finish( 1, { error => "$@" } );
+        }
     }
 
     # wait for all jobs
     $pfm->wait_all_children;
+
+    if ( @{ $self->{failures} } ) {
+        my @msgs;
+        for my $f ( @{ $self->{failures} } ) {
+            my $msg = "job $f->{id} (pid $f->{pid}): exit=$f->{exit}";
+            $msg .= " signal=$f->{signal}" if $f->{signal};
+            $msg .= " error=$f->{error}"   if $f->{error};
+            push @msgs, $msg;
+        }
+        die "Job failures:\n  " . join( "\n  ", @msgs ) . "\n";
+    }
 
     return $self->{result};
 }
@@ -179,37 +273,10 @@ sub run {
 sub wait_for_all {
     my ($self) = @_;
 
-    # run callbacks
-    die "Cannot run callbacks" unless $self->run();
-
     return $self unless $self->total_jobs;
-    my $c = 0;
 
-    my $results = $self->results();
-
-    foreach my $callback ( @{ $self->{callbacks} } ) {
-        next unless $callback;
-        die "cannot find result for #${c}" unless exists $results->[$c];
-        my $res = $results->[ $c++ ];
-
-        if ( ref $callback eq 'HASH' ) {
-
-            # internal mechanism
-            return
-              unless defined $callback->{test} && defined $callback->{args};
-
-            my @args = ( $res, @{ $callback->{args} } );
-            my $t    = $callback->{test};
-            my $str  = join( ', ', map { "\$args[$_]" } ( 0 .. $#args ) );
-            eval "$t(" . $str . ")";
-        }
-        elsif ( ref $callback eq 'CODE' ) {
-
-            # execute user function
-            $callback->($res);
-        }
-
-    }
+    # Callbacks are fired in run_on_finish as each job completes
+    $self->run();
 
     return $self;
 }
@@ -222,6 +289,18 @@ sub results {
       map  { $self->{result}{$_} }
       sort { int($a) <=> int($b) } keys %{ $self->{result} };
     return \@sorted;
+}
+
+
+sub result {
+    my ( $self, $name ) = @_;
+
+    croak "result() requires a job name" unless defined $name;
+
+    my $position = $self->{named}{$name};
+    croak "unknown job name '$name'" unless defined $position;
+
+    return $self->{result}{$position};
 }
 
 1;
@@ -238,30 +317,17 @@ Parallel::Subs - Simple way to run subs in parallel and process their return val
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
-=head1 DESCRIPTION
-
-Parallel::Subs is a simple object interface used to launch test in parallel.
-It uses Parallel::ForkManager to launch subs in parallel and get the results.
-
-=head1 NAME
-Parallel::Subs - simple object interface to launch subs in parallel
-and process their return values.
-
-=head1 Usage
-
-You could also use the result returned by the function run in custom child process
-from the main process by providing a second optional sub to process the results
-
-=head2 The basics
+=head1 SYNOPSIS
 
     use Parallel::Subs;
 
     my $p = Parallel::Subs->new();
     #    or Parallel::Subs->new( max_process => N )
     #    or Parallel::Subs->new( max_process_per_cpu => P )
-    #    or Parallel::Subs->new( max_memory => M );
+    #    or Parallel::Subs->new( max_memory => M )
+    #    or Parallel::Subs->new( timeout => T );
 
     # add a first sub which will be launched by its own kid
     $p->add(  
@@ -273,7 +339,7 @@ from the main process by providing a second optional sub to process the results
     # add a second sub
     $p->add(
         sub { print "Hello from kid $$\n" }
-     )
+     );
     $p->add( \&do_something );
 
     # Trigger all the subs to run in parallel using a limited number of process
@@ -297,7 +363,7 @@ which can make your code easier to read.
      ->add( sub{ print "Hello from kid $$\n" } )
      ->wait_for_all();
      # or ->wait_for_all_optimized(); # beta - group jobs and run one single fork per/cpu
-    
+
     print qq[This is done.\n];
 
 =head2 Run subs in parallel and use their return values
@@ -309,7 +375,7 @@ which can make your code easier to read.
     sub work_to_do {
         my ( $a, $b ) = @_;
         return sub {
-            note "Running in parallel from process $$";
+            print "Running in parallel from process $$\n";
             # need some time to execute...
             # return 42;
             # return { value => 42 };
@@ -347,58 +413,117 @@ which can make your code easier to read.
 
     $p->wait_for_all();
 
+=head2 Named jobs
+
+You can give jobs a name and retrieve their results by name instead of position.
+
+    use Parallel::Subs;
+
+    my $p = Parallel::Subs->new();
+    $p->add( 'users',  sub { fetch_users()  } );
+    $p->add( 'orders', sub { fetch_orders() } );
+    $p->wait_for_all();
+
+    my $users  = $p->result('users');
+    my $orders = $p->result('orders');
+
+Named and unnamed jobs can be mixed freely. C<results()> always returns
+all results in insertion order regardless of naming.
+
+=head1 DESCRIPTION
+
+Parallel::Subs is a simple object interface used to launch tasks in parallel.
+It uses L<Parallel::ForkManager> to run subroutines in child processes and
+collect their return values.
+
+You can also provide a second optional sub (callback) to process the result
+returned by each child process from the main process.
+
+=head1 NAME
+
+Parallel::Subs - simple object interface to launch subs in parallel
+and process their return values.
+
 =head1 METHODS
 
 =head2 new
 
 Create a new Parallel::Subs object.
 
-By default it will use the number of cores you have as a maximum limit of parallelized job,
-but you can control this value with two options :
+By default it will use the number of CPU cores as the maximum number of parallel jobs.
+You can control this with the following options:
 
-- max_process : set the maximum process to this value
+=over 4
 
-- max_process_per_cpu : set the maximum process per cpu, this value
-will be multiplied by the number of cpu ( core ) avaiable on your server
+=item * C<max_process> -set the maximum number of parallel processes directly
 
-- max_memory : in MB per job. Will use the minimum between #cpu and total memory available / max_memory
+=item * C<max_process_per_cpu> -multiplied by the number of CPU cores
 
-    my $p = Parallel::Subs->new()
-        or Parallel::Subs->new( max_process => N )
-        or Parallel::Subs->new( max_process_per_cpu => P )
-        or Parallel::Subs->new( max_memory => M );
+=item * C<max_memory> -in MB per job. Uses the minimum between the number of CPUs
+and total available memory / max_memory (Linux only, requires
+L<Sys::Statistics::Linux::MemStats>)
 
-=head2 $p->add($code, [$callback])
+=item * C<timeout> -in seconds. If a child process takes longer than this,
+it is killed via C<SIGALRM>. Applies to each fork individually (in optimized
+mode, the timeout covers the grouped jobs within each fork).
 
-You can add some sub to be run in parallel.
+=back
+
+    my $p = Parallel::Subs->new();
+    my $p = Parallel::Subs->new( max_process => 4 );
+    my $p = Parallel::Subs->new( max_process_per_cpu => 2 );
+    my $p = Parallel::Subs->new( max_memory => 512 );
+    my $p = Parallel::Subs->new( timeout => 30 );
+
+=head2 $p->add([$name], $code, [$callback])
+
+Add a sub to be run in parallel. An optional name (string) can be provided
+as the first argument to identify this job for later retrieval via C<result()>.
 
     $p->add( sub { 1 } );
     $p->add( sub { return { 1..6 } }, sub { my $result = shift; ... } );
+    $p->add( 'fetch_users', sub { ... } );
+    $p->add( 'compute', sub { heavy_calc() }, sub { process(shift) } );
 
 =head2 $p->total_jobs
 
-    return the total number of jobs
+Returns the total number of jobs added so far.
 
 =head2 $p->wait_for_all_optimized
 
-    similar to wait_for_all but the goal is to reduce the number of fork
-    by grouping tasks together to be run by the same process
+Similar to C<wait_for_all> but reduces the number of forks by grouping
+tasks together to be run by the same process.
 
-    For now this does not support callback. This is still in beta testing.
+B<Beta>: does not support callbacks. Callbacks will be cleared with a warning.
 
 =head2 $p->run
 
-will run and wait for all jobs added
-you do not need to use this method except if you prefer to add jobs yourself and manipulate the results
+Runs all added jobs in parallel and waits for them to complete.
+Returns the raw results hashref (keyed by job name).
+You typically don't need this method directly -use C<wait_for_all> instead.
 
 =head2 $p->wait_for_all
 
-    no process will be executed until you call this function
-    which will then trigger parallel jobs and wait for all of them to finish    
+Triggers all added jobs to run in parallel and waits for them to finish.
+Callbacks (if any) are invoked as each job completes, not after all jobs
+finish. This means callbacks fire in completion order, which may differ
+from the order jobs were added.
+Returns C<$self> for chaining.
 
 =head2 $p->results
 
-    get an array of results, in the same order of jobs
+Returns an array reference of results, in the same order as jobs were added.
+
+=head2 $p->result($name)
+
+Returns the result for a named job. The name must have been provided
+when the job was added via C<add()>.
+
+    $p->add( 'fetch_users', sub { get_users() } );
+    $p->wait_for_all();
+    my $users = $p->result('fetch_users');
+
+Croaks if the name is unknown.
 
 =head1 AUTHOR
 

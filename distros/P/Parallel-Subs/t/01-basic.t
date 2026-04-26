@@ -1,103 +1,65 @@
 use strict;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok 'Parallel::Subs';
+use Parallel::Subs;
 
-my @tests = (
+# Constructor with various options
+my @option_sets = (
     {},
     { max_process         => 1 },
     { max_process_per_cpu => 2 },
     { max_memory          => 128 },
 );
 
-foreach my $opts (@tests) {
+for my $opts (@option_sets) {
+    my $label = %$opts ? join( ', ', map { "$_ => $opts->{$_}" } keys %$opts ) : 'defaults';
 
     my $p = Parallel::Subs->new(%$opts);
-    isa_ok $p, 'Parallel::Subs', "new with " . join( ' => ', %$opts );
-    ok $p->add( sub { 1 } ),        "can add a scalar job";
-    ok $p->add( sub { "string"; } ), "can add a string job";
-    ok $p->add( sub { { hash => 42 }; } ), "can add a hash job";
-    ok $p->add( sub { [ 1 .. 5 ]; } ), "can add an array job";
-    ok $p->run(), "can run test in parallel";
+    isa_ok $p, 'Parallel::Subs';
 
-    is_deeply $p->results(),
-      [
-        1, 'string',
-        { 'hash' => 42 },
-        [
-            1,
-            2,
-            3,
-            4,
-            5
-        ]
-      ],
-      "can get results from jobs";
+    ok $p->add( sub { 1 } ),                     "add scalar job ($label)";
+    ok $p->add( sub { "string" } ),               "add string job ($label)";
+    ok $p->add( sub { { hash => 42 } } ),          "add hash job ($label)";
+    ok $p->add( sub { [ 1 .. 5 ] } ),              "add array job ($label)";
+    ok $p->run(),                                   "run ($label)";
+
+    is $p->results(), [
+        1,
+        'string',
+        { hash => 42 },
+        [ 1 .. 5 ],
+    ], "results match ($label)";
 }
 
-# create a new object
-my $p = Parallel::Subs->new();
+# Multiple jobs returning hashes — no sleeps needed
+subtest 'multiple hash-returning jobs' => sub {
+    my $p = Parallel::Subs->new();
 
-for my $job (qw/a list of jobs to run/) {
-    ok $p->add( sub { compute_this_job($job); } ), "can add job $job";
-}
-
-ok $p->run(), "can run test in parallel";
-
-is_deeply $p->results(),
-  [
-    {
-        'time'                => 1,
-        'job'                 => 'a',
-        'your data key for a' => 1
-    },
-    {
-        'time'                   => 1,
-        'job'                    => 'list',
-        'your data key for list' => 4
-    },
-    {
-        'time'                 => 2,
-        'your data key for of' => 2,
-        'job'                  => 'of'
-    },
-    {
-        'time'                   => 1,
-        'your data key for jobs' => 4,
-        'job'                    => 'jobs'
-    },
-    {
-        'your data key for to' => 2,
-        'time'                 => 2,
-        'job'                  => 'to'
-    },
-    {
-        'your data key for run' => 3,
-        'time'                  => 0,
-        'job'                   => 'run'
+    my @words = qw(a list of jobs to run);
+    for my $word (@words) {
+        ok $p->add( sub { compute($word) } ), "add job '$word'";
     }
-  ],
-  "can get results for all tests";
+
+    ok $p->run(), "run all jobs";
+
+    my $results = $p->results();
+    is scalar @$results, scalar @words, "got one result per job";
+
+    for my $i ( 0 .. $#words ) {
+        is $results->[$i]{job}, $words[$i], "result $i has correct job name";
+        is $results->[$i]{"your data key for $words[$i]"}, length( $words[$i] ),
+            "result $i has correct computed value";
+    }
+};
 
 done_testing;
-exit;
 
-sub compute_this_job {
-    my $job = shift || '';
-
-    my $time = int( length($job) % 3 );
-
-    # start some job
-    sleep($time);
-    print '- finish job ' . $job . "\n";
-
-    # will never stop at the same time
+sub compute {
+    my $word = shift || '';
     return {
-        job    => $job, 'your data key for ' . $job => length($job),
-        'time' => $time
+        job                        => $word,
+        "your data key for $word"  => length($word),
     };
 }
-
-

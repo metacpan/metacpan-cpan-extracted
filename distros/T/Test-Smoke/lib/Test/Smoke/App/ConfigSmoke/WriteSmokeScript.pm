@@ -11,6 +11,7 @@ use Cwd;
 use File::Spec;
 use POSIX qw/ strftime /;
 use Test::Smoke::App::Options;
+use Test::Smoke::LogMixin;
 use Test::Smoke::Util::FindHelpers qw/ whereis /;
 
 =head1 NAME
@@ -39,7 +40,7 @@ sub write_smoke_script {
     elsif ($^O eq 'VMS') {
         $self->{_smoke_script} = $self->prefix . '.com';
         $self->{_smoke_script_abs} = Cwd::abs_path($self->smoke_script);
-        print "$^O not (fully) supported yet.\n";
+        $self->log_warn("%s not (fully) supported yet.", $^O);
     }
     else {
         $self->{_smoke_script} = $self->prefix . '.sh';
@@ -58,7 +59,7 @@ sub write_as_shell {
     my $self = shift;
     my ($cronbin, $crontime) = @_;
 
-    print "\n-- Write shell script --\n";
+    $self->log_info("-- Write shell script --");
 
     $crontime ||= '22:25';
     my $cronline = $self->schedule_entry_crontab($cronbin, $crontime);
@@ -130,15 +131,15 @@ EO_SH
     if (open(my $fh, '>', $jcl)) {
         print {$fh} $smoke_script;
         close($fh) or do {
-            print "!!!!!\nProblem: cannot close($jcl): $!\n!!!!!\n";
+            $self->log_warn("Problem: cannot close(%s): %s", $jcl, $!);
             die "Please, fix yourself.\n";
         };
 
-        chmod(0755, $jcl) or warn "Cannot chmod 0755 $jcl: $!";
-        print "  >> Created '$jcl'\n";
+        chmod(0755, $jcl) or $self->log_warn("Cannot chmod 0755 %s: %s", $jcl, $!);
+        $self->log_info("  >> Created '%s'", $jcl);
     }
     else {
-        print "!!!!!\nProblem: cannot create($jcl): $!\n!!!!!\n";
+        $self->log_warn("Problem: cannot create(%s): %s", $jcl, $!);
         die "Please, fix yourself.\n";
     }
 }
@@ -224,15 +225,15 @@ EO_BAT
     if (open(my $fh, '>', $jcl)) {
         print {$fh} $smoke_script;
         close($fh) or do {
-            print "!!!!!\nProblem: cannot close($jcl): $!\n!!!!!\n";
+            $self->log_warn("Problem: cannot close(%s): %s", $jcl, $!);
             die "Please, fix yourself.\n";
         };
 
-        chmod(0755, $jcl) or warn "Cannot chmod 0755 $jcl: $!";
-        print "  >> Created '$jcl'\n";
+        chmod(0755, $jcl) or $self->log_warn("Cannot chmod 0755 %s: %s", $jcl, $!);
+        $self->log_info("  >> Created '%s'", $jcl);
     }
     else {
-        print "!!!!!\nProblem: cannot create($jcl): $!\n!!!!!\n";
+        $self->log_warn("Problem: cannot create(%s): %s", $jcl, $!);
         die "Please, fix yourself.\n";
     }
 }

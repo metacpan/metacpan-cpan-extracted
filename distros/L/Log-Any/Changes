@@ -2,6 +2,10 @@ Revision history for Log-Any
 
 ** denotes an incompatible change
 
+1.720     2026-04-25 12:58:08+02:00 Europe/Vienna
+
+  - This release contains some performance improvements. Thanks @XSven! [Github #116]
+
 1.719     2026-03-16 08:53:34-05:00 America/Chicago
 
   This release contains fixes for test failures and documentation.

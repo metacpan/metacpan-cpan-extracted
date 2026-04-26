@@ -1,3 +1,14 @@
+1.87 2026-04-??
+ - Do not dual test with PERLIO=stdio anymore, force PERLIO=perlio
+ - Replace raw print/warn with LogMixin in WriteSmokeScript.pm thanks to Nicolas
+ - Fix: HandleQueue gracefully handles missing qfile configuration thanks to Nicolas
+ - Fix tests on Windows
+ - Modernize CI: multi-perl matrix, multi-OS, author tests
+
+1.86 2026-04-25
+ - keep_alive => 0 to HTTP::Tiny to do not reuse connection
+ - Skip curl test if snap install GH#21 thanks to report from Jim Keenan
+
 1.85 2026-04-23
  - Fix renice invokation
  - Copy also tshandlequeue.pl GH#23 thanks to report from Jim Keenan 

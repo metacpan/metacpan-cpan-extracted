@@ -76,7 +76,7 @@ use YAML::PP                      ();
 use overload 'bool' => \&PPI::Util::TRUE;
 use overload '""'   => 'content';
 
-our $VERSION = '1.287';
+our $VERSION = '1.291';
 
 our ( $errstr, @ISA ) = ( "", "PPI::Node" );
 
@@ -149,12 +149,17 @@ oneliner)
 =head3 custom_feature_includes
 
   custom_feature_includes =>
-    { MyStrict => { signatures => "Syntax::Keyword::Try" } }
+    { $my_custom_pragma_name => { $feature_name => $feature_provider } }
+  
+  # e.g.
+  custom_feature_includes =>
+    { MyStrict => { try => "Syntax::Keyword::Try" } }
 
 Setting custom_feature_includes with a hashref allows defining include names
-which act like pragmas that enable parsing features within their scope.
-
-This is mostly useful when your work project has its own boilerplate module.
+which act like pragmas that enable parsing features within their scope. This
+is mostly useful when your work project has its own boilerplate module. The
+provider is either perl, or the name of a cpan module that implements the
+feature.
 
 It can also be provided as JSON or YAML in the environment variable
 PPI_CUSTOM_FEATURE_INCLUDES, like so:
@@ -653,7 +658,10 @@ sub index_locations {
 	my ($first, $location) = ();
 	foreach ( 0 .. $#tokens ) {
 		my $Token = $tokens[$_];
-		next if $Token->{_location};
+		if ($Token->{_location}) {
+			$location = $Token->{_location};
+			next;
+		}
 
 		# Found the first Token without a location
 		# Calculate the new location if needed.

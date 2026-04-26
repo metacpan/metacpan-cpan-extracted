@@ -1,5 +1,14 @@
 Change log for Graphics::Framebuffer
 
+6.99   April 25, 2026
+
+       Removed the VirtualBox babysitting code and left the screen flushing
+	   up to the user instead.  The variable 'IS_VBOX' can be used for
+	   detection in your own code.
+	   
+	   Two special variables 'IS_VBOX' and 'LAST_FLUSHED' have been added to
+	   the MANUAL.md file.
+
 6.98   April 22, 2026
 
        Changes to the splash screen.

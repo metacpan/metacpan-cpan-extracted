@@ -1,5 +1,5 @@
 This archive contains the distribution Try-ALRM,
-version 1.03:
+version 1.05:
 
   Structured retry and timeout handling using CORE::alarm
 

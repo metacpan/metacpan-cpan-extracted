@@ -2,204 +2,261 @@ use strict;
 use warnings;
 
 use Test::More;
-use Try::ALRM;
+use Try::Tiny;
+use Try::ALRM qw/tries timeout/;
 
-subtest 'outer timeout survives inner try_once' => sub {
-    my @events;
+subtest 'nested blocks restore tries and timeout' => sub {
+    my @seen;
 
-    retry {
-        my ($attempt) = @_;
+    Try::ALRM::retry {
+        my ($outer_attempt) = @_;
 
-        push @events, "outer-start-$attempt";
+        push @seen, [ 'outer start', tries, timeout ];
 
-        try_once {
-            push @events, 'inner-start';
-            sleep 0;
-            push @events, 'inner-end';
+        Try::ALRM::retry {
+            push @seen, [ 'inner retry', tries, timeout ];
         }
-        timeout => 1;
+        Try::ALRM::finally {
+            my ( $attempts, $success ) = @_;
+            push @seen, [ 'inner finally', $attempts, $success ? 1 : 0 ];
+        }
+        timeout => 2,
+        tries   => 1;
 
-        sleep 2;
-
-        push @events, 'outer-after-sleep';
+        push @seen, [ 'outer after inner', tries, timeout ];
     }
-    ALRM {
-        my ($attempt) = @_;
-        push @events, "outer-alarm-$attempt";
-    }
-    finally {
+    Try::ALRM::finally {
         my ( $attempts, $success ) = @_;
-        push @events, "outer-finally-$attempts-$success";
-    }
-    timeout => 1,
-    tries   => 1;
-
-    is_deeply(
-        \@events,
-        [
-            'outer-start-1',
-            'inner-start',
-            'inner-end',
-            'outer-alarm-1',
-            'outer-finally-1-0',
-        ],
-        'inner try_once does not cancel outer timeout'
-    );
-};
-
-subtest 'inner timeout does not corrupt outer finally accounting' => sub {
-    my @events;
-
-    retry {
-        my ($outer_attempt) = @_;
-        push @events, "outer-start-$outer_attempt";
-
-        try_once {
-            push @events, 'inner-start';
-            sleep 2;
-            push @events, 'inner-after-sleep';
-        }
-        ALRM {
-            my ($inner_attempt) = @_;
-            push @events, "inner-alarm-$inner_attempt";
-        }
-        finally {
-            my ( $inner_attempts, $inner_success ) = @_;
-            push @events, "inner-finally-$inner_attempts-$inner_success";
-        }
-        timeout => 1;
-
-        push @events, 'outer-after-inner';
-    }
-    ALRM {
-        my ($outer_attempt) = @_;
-        push @events, "outer-alarm-$outer_attempt";
-    }
-    finally {
-        my ( $outer_attempts, $outer_success ) = @_;
-        push @events, "outer-finally-$outer_attempts-$outer_success";
+        push @seen, [ 'outer finally', $attempts, $success ? 1 : 0 ];
     }
     timeout => 5,
     tries   => 1;
 
     is_deeply(
-        \@events,
+        \@seen,
         [
-            'outer-start-1',
-            'inner-start',
-            'inner-alarm-1',
-            'inner-finally-1-0',
-            'outer-after-inner',
-            'outer-finally-1-1',
+            [ 'outer start',       1, 5 ],
+            [ 'inner retry',       1, 2 ],
+            [ 'inner finally',     1, 1 ],
+            [ 'outer after inner', 1, 5 ],
+            [ 'outer finally',     1, 1 ],
         ],
-        'inner timeout is contained and outer block can still succeed'
+        'inner block does not corrupt outer context'
     );
 };
 
-subtest 'nested retry can timeout and retry independently' => sub {
-    my @events;
+subtest 'inner timeout does not corrupt outer context' => sub {
+    my @seen;
 
-    retry {
-        my ($outer_attempt) = @_;
-        push @events, "outer-start-$outer_attempt";
+    Try::ALRM::retry {
+        push @seen, [ 'outer start', tries, timeout ];
 
-        retry {
-            my ($inner_attempt) = @_;
-            push @events, "inner-start-$inner_attempt";
-
-            if ( $inner_attempt == 1 ) {
-                sleep 2;
-                push @events, 'inner-after-timeout';
-            }
-
-            push @events, "inner-success-$inner_attempt";
+        Try::ALRM::retry {
+            sleep 2;
         }
-        ALRM {
-            my ($inner_attempt) = @_;
-            push @events, "inner-alarm-$inner_attempt";
+        Try::ALRM::ALRM {
+            push @seen, [ 'inner alarm', tries, timeout ];
         }
-        finally {
-            my ( $inner_attempts, $inner_success ) = @_;
-            push @events, "inner-finally-$inner_attempts-$inner_success";
+        Try::ALRM::finally {
+            my ( $attempts, $success ) = @_;
+            push @seen, [ 'inner finally', $attempts, $success ? 1 : 0 ];
         }
         timeout => 1,
-        tries   => 2;
+        tries   => 1;
 
-        push @events, 'outer-after-inner';
+        push @seen, [ 'outer after inner', tries, timeout ];
     }
-    ALRM {
-        my ($outer_attempt) = @_;
-        push @events, "outer-alarm-$outer_attempt";
-    }
-    finally {
-        my ( $outer_attempts, $outer_success ) = @_;
-        push @events, "outer-finally-$outer_attempts-$outer_success";
+    Try::ALRM::finally {
+        my ( $attempts, $success ) = @_;
+        push @seen, [ 'outer finally', $attempts, $success ? 1 : 0 ];
     }
     timeout => 5,
     tries   => 1;
 
     is_deeply(
-        \@events,
+        \@seen,
         [
-            'outer-start-1',
-            'inner-start-1',
-            'inner-alarm-1',
-            'inner-start-2',
-            'inner-success-2',
-            'inner-finally-2-1',
-            'outer-after-inner',
-            'outer-finally-1-1',
+            [ 'outer start',       1, 5 ],
+            [ 'inner alarm',       1, 1 ],
+            [ 'inner finally',     1, 0 ],
+            [ 'outer after inner', 1, 5 ],
+            [ 'outer finally',     1, 1 ],
         ],
-        'inner retry timeout/retry cycle does not corrupt outer retry'
+        'inner timeout leaves outer tries/timeout intact'
     );
 };
 
-subtest 'outer timeout can expire while inner scope is active' => sub {
-    my @events;
+subtest 'Try::Tiny swallowed exception is treated as success' => sub {
+    my $attempts = 0;
+    my $caught   = 0;
+    my $success;
 
-    retry {
-        my ($outer_attempt) = @_;
-        push @events, "outer-start-$outer_attempt";
+    Try::ALRM::retry {
+        $attempts++;
 
-        try_once {
-            push @events, 'inner-start';
-            sleep 3;
-            push @events, 'inner-after-sleep';
+        try {
+            die "boom\n";
         }
-        ALRM {
-            my ($inner_attempt) = @_;
-            push @events, "inner-alarm-$inner_attempt";
-        }
-        finally {
-            my ( $inner_attempts, $inner_success ) = @_;
-            push @events, "inner-finally-$inner_attempts-$inner_success";
-        }
-        timeout => 5;
+        catch {
+            $caught++;
+        };
+    }
+    Try::ALRM::finally {
+        my ( undef, $s ) = @_;
+        $success = $s;
+    }
+    timeout => 2,
+    tries   => 3;
 
-        push @events, 'outer-after-inner';
-    }
-    ALRM {
-        my ($outer_attempt) = @_;
-        push @events, "outer-alarm-$outer_attempt";
-    }
-    finally {
-        my ( $outer_attempts, $outer_success ) = @_;
-        push @events, "outer-finally-$outer_attempts-$outer_success";
-    }
-    timeout => 1,
-    tries   => 1;
+    is $attempts, 1, 'did not retry swallowed exception';
+    is $caught,   1, 'exception was caught';
+    ok $success,     'swallowed exception counts as success';
+};
 
-    is_deeply(
-        \@events,
-        [
-            'outer-start-1',
-            'inner-start',
-            'outer-alarm-1',
-            'inner-finally-1-0',
-            'outer-finally-1-0',
-        ],
-        'outer timeout wins if it expires while inner scope is active'
-    );
+subtest 'Try::Tiny rethrown exception escapes' => sub {
+    my $attempts = 0;
+
+    my $ok = eval {
+        Try::ALRM::retry {
+            $attempts++;
+
+            try {
+                die "boom\n";
+            }
+            catch {
+                die $_;
+            };
+        }
+        timeout => 2,
+        tries   => 3;
+
+        1;
+    };
+
+    ok !$ok, 'rethrown exception escaped';
+    like $@, qr/boom/, 'exception text preserved';
+    is $attempts, 1, 'ordinary exception is not retried by Try::ALRM';
+};
+
+subtest 'Perl try works when supported' => sub {
+    SKIP: {
+        eval q{
+            use feature 'try';
+            no warnings 'experimental::try';
+            1;
+        } or skip "Perl try/catch not supported by this Perl: $@", 1;
+
+        my $result = eval q{
+            use feature 'try';
+            no warnings 'experimental::try';
+
+            my $attempts = 0;
+            my $success;
+
+            Try::ALRM::retry {
+                $attempts++;
+
+                try {
+                    die "boom\n";
+                }
+                catch ($e) {
+                    # Swallow exception; Try::ALRM should see success.
+                }
+            }
+            Try::ALRM::finally {
+                my (undef, $s) = @_;
+                $success = $s;
+            }
+            timeout => 2,
+            tries   => 3;
+
+            [ $attempts, $success ? 1 : 0 ];
+        };
+
+        die $@ if $@;
+
+        is_deeply(
+            $result,
+            [ 1, 1 ],
+            'Perl try/catch composes when the exception is handled'
+        );
+    }
+};
+
+subtest 'eval interaction matches documented behavior' => sub {
+
+    subtest 'eval swallows exception => treated as success (no retry)' => sub {
+        my $attempts = 0;
+        my $success;
+
+        Try::ALRM::retry {
+            $attempts++;
+
+            eval {
+                die "boom\n";
+            };
+
+            # swallow (do not rethrow)
+        }
+        Try::ALRM::finally {
+            my ( undef, $s ) = @_;
+            $success = $s;
+        }
+        timeout => 2,
+        tries   => 3;
+
+        is $attempts, 1, 'no retry when eval swallows exception';
+        ok $success,     'swallowed exception counts as success';
+    };
+
+    subtest 'eval + rethrow => exception escapes (no retry)' => sub {
+        my $attempts = 0;
+
+        my $ok = eval {
+            Try::ALRM::retry {
+                $attempts++;
+
+                eval {
+                    die "boom\n";
+                };
+
+                die $@ if $@;   # rethrow
+            }
+            timeout => 2,
+            tries   => 3;
+
+            1;
+        };
+
+        ok !$ok, 'rethrown exception escaped retry block';
+        like $@, qr/boom/, 'exception text preserved';
+        is $attempts, 1, 'no retry on ordinary exception';
+    };
+
+    subtest 'eval without checking $@ => silent success' => sub {
+        my $attempts = 0;
+        my $success;
+
+        Try::ALRM::retry {
+            $attempts++;
+
+            eval {
+                die "boom\n";
+            };
+
+            # no $@ check at all
+        }
+        Try::ALRM::finally {
+            my ( undef, $s ) = @_;
+            $success = $s;
+        }
+        timeout => 2,
+        tries   => 3;
+
+        is $attempts, 1, 'no retry when $@ is ignored';
+        ok $success,     'ignored exception treated as success';
+    };
+
 };
 
 done_testing;

@@ -1,30 +1,27 @@
-use strict;
-use warnings;
+use Test2::V1
+  -target => { MODULE => 'Getopt::Guided' },
+  -pragmas,
+  qw( dies is imported_ok like ok plan subtest );
+BEGIN { MODULE->import( 'getopts' ) }
 
-use Test::More import => [ qw( BAIL_OUT like ok plan subtest use_ok ) ], tests => 3;
-use Test::Fatal qw( exception );
+plan 3;
 
-my $module;
-
-BEGIN {
-  $module = 'Getopt::Guided';
-  use_ok $module, qw( getopts ) or BAIL_OUT "Cannot load module '$module'!"
-}
+imported_ok 'getopts';
 
 subtest 'Validate $spec parameter' => sub {
   plan tests => 6;
 
   local @ARGV = ();
   my %opts;
-  like exception { getopts undef, %opts }, qr/\A\$spec parameter isn't a non-empty string of alphanumeric/,
+  like dies { getopts undef, %opts }, qr/\A\$spec parameter isn't a non-empty string of alphanumeric/,
     'Undefined value is not allowed';
-  like exception { getopts '', %opts }, qr/\A\$spec parameter isn't a non-empty string of alphanumeric/,
+  like dies { getopts '', %opts }, qr/\A\$spec parameter isn't a non-empty string of alphanumeric/,
     'Empty value is not allowed';
-  like exception { getopts 'a:-b', %opts }, qr/\A\$spec parameter isn't a non-empty string of alphanumeric/,
+  like dies { getopts 'a:-b', %opts }, qr/\A\$spec parameter isn't a non-empty string of alphanumeric/,
     "'-' character is not allowed";
-  like exception { getopts ':a:b', %opts }, qr/\A\$spec parameter isn't a non-empty string of alphanumeric/,
+  like dies { getopts ':a:b', %opts }, qr/\A\$spec parameter isn't a non-empty string of alphanumeric/,
     "Leading ':' character is not allowed";
-  like exception { getopts 'aba:', %opts }, qr/\A\$spec parameter contains option 'a' multiple times/,
+  like dies { getopts 'aba:', %opts }, qr/\A\$spec parameter contains option 'a' multiple times/,
     'Same option character is not allowed';
   ok getopts( 'a:b', %opts ), 'Succeeded'
 };
@@ -34,6 +31,5 @@ subtest 'Validate $opts parameter' => sub {
 
   local @ARGV = ();
   my %opts = ( a => 'foo' );
-  like exception { getopts 'a:b', %opts }, qr/\A\%\$opts parameter isn't an empty hash/,
-    'Result %opts hash has to be empty'
+  like dies { getopts 'a:b', %opts }, qr/\A\%\$opts parameter isn't an empty hash/, 'Result %opts hash has to be empty'
 }

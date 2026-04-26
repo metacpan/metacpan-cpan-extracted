@@ -55,7 +55,6 @@ lib/MetaCPAN/Client/Module.pm
 lib/MetaCPAN/Client/Package.pm
 lib/MetaCPAN/Client/Permission.pm
 lib/MetaCPAN/Client/Pod.pm
-lib/MetaCPAN/Client/Rating.pm
 lib/MetaCPAN/Client/Release.pm
 lib/MetaCPAN/Client/Request.pm
 lib/MetaCPAN/Client/ResultSet.pm
@@ -79,7 +78,6 @@ t/api/module.t
 t/api/package.t
 t/api/permission.t
 t/api/pod.t
-t/api/rating.t
 t/api/release.t
 t/api/reverse-dependencies.t
 t/entity.t

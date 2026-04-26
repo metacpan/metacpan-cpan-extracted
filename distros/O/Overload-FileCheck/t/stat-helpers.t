@@ -34,6 +34,7 @@ is stat_as_symlink(),   [ 0, 0, S_IFLNK,  (0) x 10 ], 'stat_as_symlink';
 is stat_as_socket(),    [ 0, 0, S_IFSOCK, (0) x 10 ], 'stat_as_socket';
 is stat_as_chr(),       [ 0, 0, S_IFCHR,  (0) x 10 ], 'stat_as_chr';
 is stat_as_block(),     [ 0, 0, S_IFBLK,  (0) x 10 ], 'stat_as_block';
+is stat_as_fifo(),      [ 0, 0, S_IFIFO,  (0) x 10 ], 'stat_as_fifo';
 
 if ( $> == 0 ) {
     my ($username, $gid) = (getpwuid $>)[0, 3];
@@ -99,5 +100,39 @@ $expect->[10] = 10;
 is stat_as_file( atime => 8, mtime => 9, ctime => 10 ), $expect, 'atime + mtime + ctime';
 
 is stat_as_file( perms => 0755 ), [ 0, 0, S_IFREG | 0755, (0) x 10 ], 'stat_as_file with perms 0755';
+
+# dev, ino, nlink, rdev — previously silently ignored
+$expect = [@regular_file];
+$expect->[0] = 42;
+is stat_as_file( dev => 42 ), $expect, 'dev';
+
+$expect = [@regular_file];
+$expect->[1] = 99999;
+is stat_as_file( ino => 99999 ), $expect, 'ino';
+
+$expect = [@regular_file];
+$expect->[3] = 3;
+is stat_as_file( nlink => 3 ), $expect, 'nlink';
+
+$expect = [@regular_file];
+$expect->[6] = 7;
+is stat_as_file( rdev => 7 ), $expect, 'rdev';
+
+$expect = [@regular_file];
+$expect->[11] = 4096;
+is stat_as_file( blksize => 4096 ), $expect, 'blksize';
+
+$expect = [@regular_file];
+$expect->[12] = 8;
+is stat_as_file( blocks => 8 ), $expect, 'blocks';
+
+# st_ prefix variants
+$expect = [@regular_file];
+$expect->[0] = 55;
+is stat_as_file( st_dev => 55 ), $expect, 'st_dev prefix';
+
+$expect = [@regular_file];
+$expect->[3] = 2;
+is stat_as_file( ST_NLINK => 2 ), $expect, 'ST_NLINK uppercase prefix';
 
 done_testing;

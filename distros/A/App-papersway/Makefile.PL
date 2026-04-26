@@ -15,7 +15,8 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "App-papersway",
   "EXE_FILES" => [
     "bin/papersway",
-    "bin/papersway-msg"
+    "bin/papersway-msg",
+    "bin/papersway-ws-cmd"
   ],
   "LICENSE" => "gpl",
   "MIN_PERL_VERSION" => "5.032",
@@ -34,7 +35,7 @@ my %WriteMakefileArgs = (
     "Sys::Hostname" => 0,
     "warnings" => 0
   },
-  "VERSION" => "2.003",
+  "VERSION" => "3.000",
   "test" => {
     "TESTS" => "t/*.t"
   }

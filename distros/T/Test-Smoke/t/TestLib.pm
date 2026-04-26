@@ -159,8 +159,9 @@ sub find_a_patch {
     my $patch_bin;
     foreach my $patch (qw( gpatch npatch patch )) {
         $patch_bin = whereis( $patch ) or next;
-        my $version = `$patch_bin --version 2>&1`;
-        $? or return $patch_bin;
+        my $quoted  = $patch_bin =~ /\s/ ? qq{"$patch_bin"} : $patch_bin;
+        my $version = `$quoted --version 2>&1`;
+        $? or return $quoted;
     }
 }
 
@@ -172,8 +173,9 @@ Check C<< wheris( 'gzip' ) >> or C<< eval{ require Compress::Zlib } >>.
 
 sub find_unzip {
     my $unzip = whereis( 'gzip' );
+    my $qunzip = defined $unzip && $unzip =~ /\s/ ? qq{"$unzip"} : $unzip;
 
-    my $dounzip = $unzip ? "$unzip -cd " : "";
+    my $dounzip = $unzip ? "$qunzip -cd " : "";
 
     unless ( $dounzip ) {
         eval { require Compress::Zlib };
@@ -231,11 +233,13 @@ Find either B<gzip>/B<tar> or B<Compress::Zlib>/B<Archive::Tar>
 
 sub find_untargz {
     my $tar = whereis( 'tar' );
+    my $qtar = defined $tar && $tar =~ /\s/ ? qq{"$tar"} : $tar;
 
     my $uncompress = '';
     if ( $tar ) {
         my $zip = whereis( 'gzip' );
-        $uncompress = "$zip -cd %s | $tar -xf -" if $zip;
+        my $qzip = defined $zip && $zip =~ /\s/ ? qq{"$zip"} : $zip;
+        $uncompress = "$qzip -cd %s | $qtar -xf -" if $zip;
     }
 
     unless ( $uncompress ) {
@@ -251,7 +255,7 @@ sub find_untargz {
     }
 
     if ( $tar && !$uncompress ) { # try tar by it self
-        $uncompress = "$tar -xzf %s";
+        $uncompress = "$qtar -xzf %s";
     }
 
     return $uncompress;

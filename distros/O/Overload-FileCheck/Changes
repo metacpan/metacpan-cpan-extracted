@@ -1,5 +1,57 @@
 Revision history for Overload-FileCheck
 
+0.015     2026-04-26 09:46:08+02:00 Europe/Vienna
+
+  [New features]
+  - feat: add mock_file_check_guard() for scope-based cleanup
+  - feat: add stat_as_fifo() helper for named pipe mocking
+  - feat: support CHECK_IS_NULL return from mock callbacks (treats target as non-existent)
+
+  [Bug fixes - errno preservation]
+  - fix: preserve errno through XS scope cleanup in stat/file-check paths
+  - fix: preserve errno through pp_overload_ft_int (-s handler)
+  - fix: preserve errno through pp_overload_ft_nv (-M, -A, -C handlers)
+  - fix: auto-set errno (ENOENT) for int ops returning CHECK_IS_FALSE
+
+  [Bug fixes - operator behavior]
+  - fix: enable -T, -B and other uppercase file-test operators
+  - fix: eliminate -B double-dispatch through the mock system
+  - fix: return CHECK_IS_NULL for -B/-T on non-existent mock files to avoid double-dispatch
+  - fix: restore @stat guard in -B handler to prevent undef warning
+  - fix: correct -e false negative for stat results with mode 0
+  - fix: use stat (not lstat) for -p/-S/-b/-c in _check_from_stat
+  - fix: use stat (not lstat) for -u, -g, -k in mock_all_from_stat
+  - fix: resolve -1 sentinel collision for NV ops (-M, -C, -A)
+  - fix: handle non-numeric SV types in pp_overload_ft_nv
+  - fix: CHECK_IS_FALSE now returns a defined false value instead of undef
+
+  [Bug fixes - input validation / API hardening]
+  - fix: croak on trailing dash-option without CODE ref in import list
+  - fix: croak on unknown options in stat_as_* helpers
+  - fix: croak on unknown user/group names in stat helpers
+  - fix: accept bare (non-st_) keys in hash stat mocks
+  - fix: accept string-encoded numbers in stat array validation
+  - fix: add missing dev/ino/nlink/rdev defaults to stat_as_* helpers
+  - fix: preserve original key when looking up stat slot in _stat_for
+  - refactor: use Carp::croak instead of die in public API
+
+  [Bug fixes - thread / re-entrancy safety]
+  - fix: isolate gl_overload_ft per interpreter via MY_CXT for ithreads safety
+  - fix: make _check() re-entrant safe for nested mock callbacks
+  - fix: replace assert() with runtime croak for gl_overload_ft null checks
+  - fix: release SV refcount in pp_overload_ft_nv before all return paths
+  - fix: save original count before drain loop in _overload_ft_ops_nv croak
+
+  [Internals / cleanup]
+  - refactor: extract LEAVE_PRESERVING_ERRNO macro for errno-safe scope exits
+  - refactor: extract _resolve_check / _normalize_and_validate_check helpers
+  - refactor: replace _check_from_stat if/elsif chain with a dispatch table
+  - refactor: build %REVERSE_MAP eagerly at module load
+  - cleanup: remove debug printfs, dead code, and stale TODOs from XS
+  - cleanup: remove unused offset field from OverloadFTOps struct
+  - refactor: update stale GitHub URLs from CpanelInc to cpan-authors
+  - fix: remove stale docs and fix POD typo
+
 0.014     2026-02-22 10:19:05-07:00 America/Denver
 
 - fix: prevent filehandle reference leak in $_last_call_for

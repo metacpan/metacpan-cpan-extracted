@@ -29,7 +29,7 @@ use PPI::Util       ();
 use PPI::Node       ();
 use PPI::Singletons '%_PARENT', '%_POSITION_CACHE';
 
-our $VERSION = '1.287';
+our $VERSION = '1.291';
 
 our $errstr = "";
 
@@ -801,7 +801,7 @@ sub _flush_locations {
 			next unless refaddr($Token) == refaddr($start);
 
 			# Found the start. Flush its location
-			delete $$Token->{_location};
+			delete $Token->{_location};
 			last;
 		}
 	}

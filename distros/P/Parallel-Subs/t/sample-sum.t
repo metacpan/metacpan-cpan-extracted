@@ -1,55 +1,36 @@
 use strict;
 use warnings;
 
-use Test::More;
-
-use_ok 'Parallel::Subs';
+use Test2::V0;
 
 use Parallel::Subs;
 
-my $sum;
+subtest 'callbacks accumulate results' => sub {
+    my $sum = 0;
 
-sub work_to_do {
-    my ( $a, $b ) = @_;
-    return sub {
-    	note "Running in parallel from process $$";
-        # need some time to execute...
-        # return 42;
-        # return { value => 42 };
-        # return [ 1..9 ];
-        return $a * $b;
+    my $p = Parallel::Subs->new();
+    $p->add(
+        sub { return { number => 1 } },
+        sub {
+            my $result = shift;
+            $sum += $result->{number};
         }
-}
+    )
+    ->add( _multiply( 1, 2 ),  sub { $sum += shift } )
+    ->add( _multiply( 3, 4 ),  sub { $sum += shift } )
+    ->add( _multiply( 5, 6 ),  sub { $sum += shift } )
+    ->add( _multiply( 7, 8 ),  sub { $sum += shift } )
+    ->add( _multiply( 9, 10 ), sub { $sum += shift } );
 
-sub read_result {
-    my $result = shift;
+    $p->wait_for_all();
 
-    $sum += $result;
-}
-
-my $p = Parallel::Subs->new();
-$p->add(
-    sub {
-        my $time = int( rand(2) );
-        sleep($time);
-        return { number => 1, time => $time };
-    },
-    sub {
-        # run from the main process once the kid process has finished its work
-        #   to access return values from previous sub
-        my $result = shift;
-        $sum += $result->{number};
-
-        return;
-    }
-    )->add( work_to_do( 1, 2 ), \&read_result )
-    ->add( work_to_do( 3, 4 ),  \&read_result )
-    ->add( work_to_do( 5, 6 ),  \&read_result )
-    ->add( work_to_do( 7, 8 ),  \&read_result )
-    ->add( work_to_do( 9, 10 ), \&read_result );
-
-$p->wait_for_all();
-
-is $sum, 191;
+    # 1 + (1*2) + (3*4) + (5*6) + (7*8) + (9*10) = 1 + 2 + 12 + 30 + 56 + 90 = 191
+    is $sum, 191, "sum of all callback results";
+};
 
 done_testing;
+
+sub _multiply {
+    my ( $a, $b ) = @_;
+    return sub { return $a * $b };
+}

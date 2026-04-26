@@ -17,7 +17,7 @@ use Test2::Plugin::NoWarnings;
 use Overload::FileCheck q{:all};
 
 my $FILE_CHECK;
-$FILE_CHECK = $1 if $0 =~ qr{t/test-(\w).t$};
+$FILE_CHECK = $1 if $0 =~ qr{t/test-(\w)(?:-uppercase)?\.t$};
 
 skip_all "This test is designed to be run from one of the symlink: t/test-s.t ..." unless $FILE_CHECK;
 

@@ -20,12 +20,9 @@ typedef struct {
 /* this could be an array but for now let's keep it as a struct */
 typedef struct {
 	OPMocked op[OP_MAX]; /* int for now.. could use function later */
-	int offset;
 } OverloadFTOps;
 
 /* function prototypes */
-
-/* TODO maybe move somewhere else... */
 
 /******************************************************************************/
 /*** helpers stolen from pp_sys.c ****/
@@ -159,5 +156,17 @@ S_ft_return_bool(pTHX_ SV *ret) {
 #  endif /* Gid_t_size */
 
 /*** end of helpers from handy.h ****/
+
+/******************************************************************************/
+/*** errno-safe scope cleanup ***/
+/******************************************************************************/
+
+/* Save errno across PUTBACK/FREETMPS/LEAVE — those can invoke DESTROY or
+ * other Perl code that clobbers errno set by the mock callback. */
+#define LEAVE_PRESERVING_ERRNO() STMT_START { \
+    int _saved_errno = errno; \
+    PUTBACK; FREETMPS; LEAVE; \
+    errno = _saved_errno; \
+} STMT_END
 
 #endif /* XS_FILE_CHECK_H */
