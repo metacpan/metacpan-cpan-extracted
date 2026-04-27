@@ -1,0 +1,101 @@
+BATsh Kurzreferenz [DE] Deutsch
+=================================
+
+BATsh ist eine zweisprachige Shell, die cmd.exe- und bash/sh-Syntax
+im selben Skript ausfuehrt. Das erste Token jeder Zeile bestimmt den Modus.
+
+1. Moduserkennung
+------------------
+  ECHO hello          -> cmd.exe-Modus (erstes Token vollstaendig grossgeschrieben)
+  echo hello          -> bash/sh-Modus (erstes Token enthaelt Kleinbuchstaben)
+  # Kommentar         -> Kommentar (ignoriert)
+  :: Kommentar        -> Kommentar (CMD-Stil, ignoriert)
+  REM Kommentar       -> Kommentar (CMD-Stil, ignoriert)
+
+2. Shell starten
+-----------------
+  perl lib/BATsh.pm                    # Interaktive REPL
+  perl lib/BATsh.pm script.batsh       # Skriptdatei ausfuehren
+  perl lib/BATsh.pm -e "echo hallo"    # Einzeiler
+
+  Ueber die Perl-API:
+    use BATsh;
+    BATsh->run('script.batsh');
+    BATsh->run_string("echo hallo");
+    BATsh->repl();
+
+3. Umgebungsvariablen-Bruecke
+-------------------------------
+  CMD- und SH-Bloecke teilen Variablen ueber Perls %ENV.
+
+  export FOO=hallo   # SH setzt FOO
+  ECHO %FOO%         # CMD liest FOO ueber die Bruecke (Windows)
+
+  SET BAR=welt       # CMD setzt BAR
+  echo $BAR          # SH liest BAR ueber die Bruecke
+
+4. SETLOCAL / ENDLOCAL
+-----------------------
+  SETLOCAL           # %ENV-Schnappschuss speichern
+  SET TMP=local_val
+  ECHO %TMP%
+  ENDLOCAL           # %ENV wiederherstellen (TMP verschwindet)
+
+  Geltungsbereiche koennen verschachtelt werden.
+
+5. Verschachtelung (gemischter Modus)
+--------------------------------------
+  Blockkonstrukte muessen korrekt gepaart sein.
+  Zeilen im gemischten Modus innerhalb eines Blocks sind erlaubt.
+
+  for x in 1 2; do   # SH oeffnet Block
+      ECHO item $x   # CMD-Zeile im SH-Block (unveraendert weitergegeben)
+  done               # SH schliesst Block
+
+  CMD-Schluesselwoerter: IF/ENDIF  FOR/NEXT  WHILE/WEND  DO/LOOP
+  SH-Schluesselwoerter:  if/fi  for/done  while/done  until/done
+                         case/esac  { }
+
+6. Subroutinen-Definitionen
+-----------------------------
+  :GREET
+  echo "Hallo $BATSH_ARG1"
+  RET
+
+  Labels beginnen mit : und enden mit RET oder RETURN.
+  Der Koerper wird vor der Ausfuehrung extrahiert.
+
+7. CALL und source
+-------------------
+  CALL :GREET welt       # Subroutine mit Argument aufrufen
+  CALL andere.batsh      # Andere .batsh-Datei einbinden (CMD)
+  source andere.batsh    # Andere .batsh-Datei einbinden (SH)
+  . andere.batsh         # POSIX-Punkt-Notation
+
+  Argumente: $BATSH_ARG1 .. $BATSH_ARGn  (%BATSH_ARG1% in CMD)
+  Anzahl:    $BATSH_ARGC
+
+8. Perl-API
+-----------
+  BATsh->run($file)            # .batsh-Datei ausfuehren
+  BATsh->run_string($source)   # Quellzeichenkette ausfuehren
+  BATsh->run_lines(@lines)     # Zeilen-Array ausfuehren
+  BATsh->repl()                # Interaktive REPL
+  BATsh->classify_token($tok)  # Gibt 'CMD' oder 'SH' zurueck
+  BATsh->setlocal()            # %ENV-Schnappschuss
+  BATsh->endlocal()            # %ENV wiederherstellen
+  BATsh->call_sub($lbl, @args) # Subroutine aufrufen
+  BATsh->source_file($file)    # .batsh-Datei einbinden
+  BATsh->version()             # Versionszeichenkette
+
+9. Plattform-Hinweise
+----------------------
+  Windows: CMD- und SH-Bloecke laufen in reinem Perl -- kein externes cmd.exe/bash/sh noetig.
+  UNIX:    CMD- und SH-Bloecke laufen in reinem Perl -- kein externes cmd.exe/bash/sh noetig.
+
+10. Anforderungen
+------------------
+  Perl 5.005_03 oder hoeher. Nur Kernmodule (File::Spec, Carp).
+  Keine CPAN-Abhaengigkeiten.
+
+Siehe auch: https://metacpan.org/dist/BATsh

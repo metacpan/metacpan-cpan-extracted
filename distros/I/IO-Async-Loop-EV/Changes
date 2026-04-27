@@ -1,5 +1,16 @@
 Revision history for IO-Async-Loop-EV
 
+0.04    2026-04-26
+        [CHANGES]
+         * General module refresh
+            + use v5.20
+            + signatures
+            + tests using Test2::V0
+
+        [BUGFIXES]
+         * Use refaddr rather than stringification to make hash keys for IO
+           handles, in case of rebless (as in the case for SSL)
+
 0.03    2020-05-05
         [CHANGES]
          * Support IO::Async 0.76

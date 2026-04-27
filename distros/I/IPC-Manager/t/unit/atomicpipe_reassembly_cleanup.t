@@ -1,5 +1,5 @@
 use Test2::V0;
-use Test2::Require::Module 'Atomic::Pipe' => '0.022';
+use Test2::Require::Module 'Atomic::Pipe' => '0.026';
 
 use Atomic::Pipe;
 use IPC::Manager::Client::AtomicPipe;

@@ -1,3 +1,9 @@
+0.05 2026-04-26T16:41:37+02:00
+ - Add support for parsing of dashes instead of spaces in field 008. New
+   'mode_strict' (0) constructor parameter for parsing with/without dashes.
+ - Catch parsing errors and generate only main one.
+ - Update copyright years.
+
 0.04 2025-11-14T16:12:35+01:00
  - API change: Parameter 'leader' isn't required in constructor. Only for
    parse() method.

@@ -1,6 +1,6 @@
 package Langertha::Role::ParallelToolUse;
 # ABSTRACT: Role for an engine that supports parallel tool calling control
-our $VERSION = '0.404';
+our $VERSION = '0.500';
 use Moose::Role;
 
 has parallel_tool_use => (
@@ -41,7 +41,7 @@ Langertha::Role::ParallelToolUse - Role for an engine that supports parallel too
 
 =head1 VERSION
 
-version 0.404
+version 0.500
 
 =head2 parallel_tool_use
 

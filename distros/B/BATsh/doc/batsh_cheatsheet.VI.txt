@@ -1,0 +1,96 @@
+BATsh Bang Cheat Sheet [VI] Tieng Viet
+=======================================
+
+BATsh la mot shell song ngu chay ca cu phap cmd.exe va bash/sh
+trong cung mot script. Token dau tien cua moi dong xac dinh che do.
+
+1. Phat hien che do
+--------------------
+  ECHO hello          -> che do cmd.exe (token dau tien toan chu hoa)
+  echo hello          -> che do bash/sh (token dau tien co chu thuong)
+  # binh luan         -> binh luan (bo qua)
+  :: binh luan        -> binh luan (kieu CMD, bo qua)
+  REM binh luan       -> binh luan (kieu CMD, bo qua)
+
+2. Khoi dong Shell
+-------------------
+  perl lib/BATsh.pm                    # REPL tuong tac
+  perl lib/BATsh.pm script.batsh       # chay file script
+  perl lib/BATsh.pm -e "echo xin chao" # lenh mot dong
+
+  Tu Perl API:
+    use BATsh;
+    BATsh->run('script.batsh');
+    BATsh->run_string("echo xin chao");
+    BATsh->repl();
+
+3. Cau noi bien moi truong
+----------------------------
+  Cac khoi CMD va SH chia se bien qua %ENV cua Perl.
+
+  export FOO=xin_chao # SH dat FOO
+  ECHO %FOO%          # CMD doc FOO qua cau noi (Windows)
+
+  SET BAR=the_gioi    # CMD dat BAR
+  echo $BAR           # SH doc BAR qua cau noi
+
+4. SETLOCAL / ENDLOCAL
+-----------------------
+  SETLOCAL           # luu anh chup %ENV
+  SET TMP=gia_tri_cuc_bo
+  ECHO %TMP%
+  ENDLOCAL           # khoi phuc %ENV (TMP bien mat)
+
+  Pham vi co the long nhau.
+
+5. Long nhau (Che do hon hop)
+------------------------------
+  Cac cau truc khoi phai duoc ghep cap dung.
+
+  for x in 1 2; do   # SH mo khoi
+      ECHO item $x   # dong CMD trong khoi SH
+  done               # SH dong khoi
+
+  Tu khoa CMD: IF/ENDIF  FOR/NEXT  WHILE/WEND  DO/LOOP
+  Tu khoa SH:  if/fi  for/done  while/done  until/done  case/esac  { }
+
+6. Dinh nghia Chương trinh con
+-------------------------------
+  :GREET
+  echo "Xin chao $BATSH_ARG1"
+  RET
+
+7. CALL va source
+------------------
+  CALL :GREET the_gioi   # goi chương trinh con voi tham so
+  CALL khac.batsh        # them/chay file .batsh khac (CMD)
+  source khac.batsh      # them/chay file .batsh khac (SH)
+  . khac.batsh           # ky hieu cham POSIX
+
+  Tham so: $BATSH_ARG1 .. $BATSH_ARGn  (%BATSH_ARG1% trong CMD)
+  So luong: $BATSH_ARGC
+
+8. Perl API
+-----------
+  BATsh->run($file)            # chay file .batsh
+  BATsh->run_string($source)   # chay chuoi nguon
+  BATsh->run_lines(@lines)     # chay mang dong
+  BATsh->repl()                # REPL tuong tac
+  BATsh->classify_token($tok)  # tra ve 'CMD' hoac 'SH'
+  BATsh->setlocal()            # anh chup %ENV
+  BATsh->endlocal()            # khoi phuc %ENV
+  BATsh->call_sub($lbl, @args) # goi chương trinh con
+  BATsh->source_file($file)    # them file .batsh
+  BATsh->version()             # chuoi phien ban
+
+9. Ghi chu nen tang
+--------------------
+  Windows: Ca hai khoi CMD va SH chay bang Perl thuan tuy -- khong can cmd.exe/bash/sh ngoai.
+  UNIX:    Ca hai khoi CMD va SH chay bang Perl thuan tuy -- khong can cmd.exe/bash/sh ngoai.
+
+10. Yeu cau
+-----------
+  Perl 5.005_03 tro len. Chi module loi (File::Spec, Carp).
+  Khong phu thuoc CPAN.
+
+Xem them: https://metacpan.org/dist/BATsh

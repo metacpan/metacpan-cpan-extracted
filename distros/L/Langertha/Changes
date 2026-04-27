@@ -1,5 +1,146 @@
 Revision history for Langertha
 
+0.500     2026-04-26 18:50:51Z
+
+    !!! Heads-up for callers upgrading from 0.404 — items marked [BREAKING]
+    !!! below may need code changes; everything else is additive.
+
+    [BREAKING] Langertha::Response->tool_calls is now ArrayRef[Langertha::
+      ToolCall] (was ArrayRef[HashRef]). Code that read $r->tool_calls->[0]
+      ->{name}/->{arguments}/->{id}/->{synthetic} as hash keys must switch
+      to ->name / ->arguments / ->id / ->synthetic method calls. The
+      Response constructor still accepts the old HashRef form and upgrades
+      transparently (BUILDARGS), so passing tool_calls in is unchanged;
+      only consumption changed. tool_call_args() is unchanged.
+
+    [BREAKING] Langertha::Engine::Whisper no longer extends
+      Langertha::Engine::OpenAI. It now extends the new
+      Langertha::Engine::TranscriptionBase, so a Whisper instance no
+      longer has simple_chat / chat_f / chat_with_tools_f / embedding /
+      simple_image / Tools / ImageGeneration / Embedding methods.
+      Existing code that called only transcription methods is unaffected.
+      To get a Whisper handle from an OpenAI engine without restating
+      credentials use the new $openai->whisper attribute.
+
+    [BREAKING] Langertha::Role::ResponseFormat::decode_loose_json is now
+      a method on the role, not a free function. Code that called
+      Langertha::Role::ResponseFormat::decode_loose_json($text) directly
+      must switch to $engine->decode_loose_json($text). This makes it
+      overridable per engine for providers that need a custom strategy.
+      The standalone Langertha::Util that briefly existed has been
+      removed for the same reason.
+
+    - New Langertha::Engine::TranscriptionBase: slim base class for
+      OpenAI-shape transcription-only engines (composes OpenAICompatible,
+      OpenAPI, Models, Transcription, Capabilities — no Chat / Tools /
+      Embedding / ImageGeneration). Whisper now extends it.
+
+    - Langertha::Engine::OpenAI gained a `whisper` lazy attribute that
+      returns a Langertha::Engine::TranscriptionBase configured with the
+      parent's api_key/url and `whisper-1` as transcription_model.
+      `$openai->whisper->simple_transcription($file)` is the canonical
+      way to use OpenAI's hosted Whisper from a chat-side engine.
+
+    - New Langertha::Role::Capabilities, composed by Langertha::Role::
+      Chat (and therefore present on every engine via composition). One
+      central role-to-flag map drives engine_capabilities; engines
+      override via `around engine_capabilities` for wire-reality
+      corrections. Capabilities reported by each role:
+        Chat            -> chat
+        Streaming       -> streaming
+        Tools           -> tools_native + tool_choice_{auto,any,none,named}
+        HermesTools     -> tools_hermes
+        ResponseFormat  -> response_format_json_object/json_schema
+        Embedding       -> embedding
+        Transcription   -> transcription
+        ImageGeneration -> image_generation
+        Temperature     -> temperature
+        Seed            -> seed
+        ContextSize     -> context_size
+        ResponseSize    -> response_size
+        SystemPrompt    -> system_prompt
+        ParallelToolUse -> parallel_tool_use
+      The earlier `does()`-based heuristic in Role::Chat is gone;
+      `$engine->supports($cap)` is the canonical query.
+
+    - Langertha::Tool gained from_mcp (camelCase inputSchema), from_gemini
+      (flat `parameters`), to_gemini, to_mcp, to_json_schema. from_hash
+      now auto-detects MCP / Anthropic / Gemini shapes in addition to
+      OpenAI. This kills the input_schema/inputSchema/parameters/
+      function.parameters chaos that used to live in chat_f.
+
+    - Langertha::ToolCall gained a `synthetic` boolean attribute (false
+      by default) and a from_gemini constructor; ToolCall->extract now
+      pulls Gemini functionCall parts out of candidates[0].content.parts.
+
+    - Langertha::Response.tool_calls is now populated by every native
+      tool-calling engine (OpenAICompatible, AnthropicBase, Gemini,
+      Ollama) as well as the chat_f synthetic-tool fallback path. Single
+      source of truth — same shape regardless of provider.
+      Langertha::Response gained tool_call($name) returning the matching
+      Langertha::ToolCall object (vs. tool_call_args returning args).
+
+    - Langertha::Stream::Chunk gained an optional tool_calls attribute
+      (ArrayRef[Langertha::ToolCall]). Langertha::Role::Chat got
+      aggregate_tool_calls($chunks) for collecting them after a stream
+      ends. Per-engine streaming tool-call delta accumulation will land
+      incrementally; the structures are in place.
+
+    - Langertha::Engine::AnthropicBase, Langertha::Engine::Gemini, and
+      Langertha::Engine::Ollama now compose Langertha::Role::
+      ResponseFormat. Anthropic emulates response_format via a
+      synthesized tool plus forced tool_choice (the chat_response parser
+      lifts the resulting tool_use input back into Response.content as
+      JSON). Gemini translates response_format into generationConfig
+      (responseMimeType + responseSchema). Ollama translates into the
+      `format` parameter (string 'json' for json_object, schema HashRef
+      for json_schema). The legacy Ollama json_format attribute still
+      works as a fallback when response_format isn't set.
+
+    - Langertha::Engine::OpenAIBase now composes Langertha::Role::ResponseFormat,
+      so every OpenAI-compatible engine (Perplexity, DeepSeek, Groq, Mistral,
+      MiniMax, Cerebras, OpenRouter, Replicate, HuggingFace, AKIOpenAI,
+      TSystems, Scaleway, Ollama-OpenAI, vLLM, SGLang, LlamaCpp, NousResearch)
+      accepts a response_format constructor argument. Removed redundant
+      individual ResponseFormat composition from those engines.
+    - Langertha::ToolChoice gained to_perplexity (string-only API: auto/none/
+      required, named coerces to required) and to_gemini (toolConfig.
+      functionCallingConfig with mode AUTO/ANY/NONE plus allowed_function_names
+      for named forcing) serializers.
+    - Langertha::Engine::Gemini chat_request and chat_stream_request now
+      translate tool_choice in any input shape (canonical / OpenAI / Anthropic)
+      into Gemini's toolConfig payload.
+    - Langertha::Role::Chat got chat_f, a named-arguments async entry point:
+      $engine->chat_f(messages => [...], tools => [...], tool_choice => ...,
+      response_format => ...). simple_chat_f delegates to it; existing
+      @messages-style call sites are unchanged. Forced-named tool calls on
+      engines that lack native named-tool-forcing but support json_schema
+      response_format (currently Perplexity) are auto-rewritten through the
+      response_format path; the response text is loose-parsed (handles
+      ```json fences and prose-wrapped JSON) and a synthetic tool_calls
+      entry is attached so callers see the same shape regardless of provider.
+    - Langertha::Response gained a tool_calls attribute and tool_call_args
+      accessor; clone_with carries tool_calls through.
+    - Langertha::Role::Chat exposes engine_capabilities (default derived from
+      role composition) and a supports($cap) helper so software can query
+      what the engine can honour before sending parameters.
+    - Langertha::Role::ResponseFormat gained decode_loose_json($text), a
+      tolerant decoder for structured-output responses that may be wrapped
+      in code fences or prose.
+    - New Langertha::Engine::TSystems for the T-Systems AI Foundation
+      Services / LLM Hub OpenAI-compatible endpoint
+      (https://llm-server.llmhub.t-systems.net/v2). Bearer auth via
+      LANGERTHA_TSYSTEMS_API_KEY, default model gpt-oss-120b (T-Cloud,
+      Germany; reliable tool calling), supports chat, streaming, tool
+      calling, embeddings (default text-embedding-bge-m3) and structured
+      output. GDPR-compliant; T-Cloud models are processed in Germany,
+      hyperscaler models in the EU.
+    - New Langertha::Engine::Scaleway for Scaleway Generative APIs
+      (https://api.scaleway.ai/v1) — EU-hosted, drop-in OpenAI-compatible
+      replacement. Bearer auth via LANGERTHA_SCALEWAY_API_KEY, default
+      model llama-3.1-8b-instruct, supports chat, streaming, tool
+      calling, embeddings and structured output.
+
 0.404     2026-04-21 14:06:44Z
 
     - New Langertha::Content role and Langertha::Content::Image value object

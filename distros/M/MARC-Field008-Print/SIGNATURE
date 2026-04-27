@@ -1,0 +1,55 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 5a97a0032f253ea867cda2adc2178d3d89a3fcd2265955e7a02731f184f64d65 Changes
+SHA256 f41ca75591a4efed31ac3636bc9c73b6df01e611e26a9d91a61deee01101f6fe LICENSE
+SHA256 f99c6837c81c901296d769daa97b032e88d3e3a7182d806e180b8a0ec9fdee53 MANIFEST
+SHA256 a7c63f1d9069e8baa609438710252ed11649e4f31c1fbd0ae9531dd38e8c3450 META.yml
+SHA256 70323fd04fd312639305025634cb2f4bf8d2faa13d2510666f072030a12fcfe4 Makefile.PL
+SHA256 0e530388144622cff7ddc58c5ecbb5d748804892f7ca3e131c7c66a08fd59390 Print.pm
+SHA256 7ebbd1d5d31b3f153fc7105abafd16336f4774463a3847e4ad5b81f715cf9e53 README
+SHA256 4e279196d9b8c03b8c0bcf1c7f3a9de571abc2dd40342df7249a2e412fe577b4 examples/print_data_marc_field008.pl
+SHA256 237d44eced2eb7446af0aae5415b90559076bfd592a4d90f558f4a6a6ea39ee7 examples/print_data_marc_field008_raw.pl
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 26200b61663d6cd748f6d53b05a0b049f51dadb1080dba4c5af1aed5887f4ba2 t/MARC-Field008-Print/01-use.t
+SHA256 3603048ae16dbd20a4cd83ecefaee41429295df77fce87cf75e5fdc59fe4b6ec t/MARC-Field008-Print/02-version.t
+SHA256 54317226706e6dfcae2930057eaf2992eb93e805336daf32d15d2cb43106ec7f t/MARC-Field008-Print/03-new.t
+SHA256 e5617c5f00d63b67658303e8954c3f6c9a42b22a85cd7a283b9412d616f5e3be xt/MARC-Field008-Print/01-pod_coverage.t
+SHA256 6ef380121d3ad4495d20ae9f5398e4b083b2fd0639573a17ef9f88cf907894e4 xt/MARC-Field008-Print/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEECAMiMrHl7JYa0rZPZ58rGyDXs5UFAmnuLN8ACgkQZ58rGyDX
+s5UXmAwA1drUzNgv4apzENa8i9lfsa+cydDyMULiQIZ9VZW+WG0UrTQdxihNUVQS
+Jti97QIQKQL5HfYb5UoRnY4jxnGHIcdoE+zSqJRktKFINq4AQaamalH7GQxWZTja
+trFRAE/ZDZOY4obskD5QrgdIAb8WZmowHXnz1U+RzslIoCP0NVcAK1FQQxSNrulz
+HnXSIjixxsaCMWV7pDmlfnuypBu46LB/Bfw2s6ow0kJzrBVPlr13uGKKXy1HIFrs
+KkrcLuLR9DvD0wzE8b0JZkuhe2+4IEE2TOzuI57HlAGunc86f16R99tqBQEv0VcB
+gneXINtwecNuAibzzrL9qElbG4R+MxcZ0VVwfE45El5laL0B9qEdUovemseZjF3k
+DtVRp+g5dbobyMiFbHs3cw3lP8+4mVT0xbxQ9bsgkHdsWuncKhEXgvLxV7VY6srh
+BCAjzYFN4pNo1wo3k/qfp3SL7SKs6rfZDBW4sll7UXAcuEDozkj3U9cfWmGYdm/j
+Rz211Uk6
+=qBnf
+-----END PGP SIGNATURE-----

@@ -80,8 +80,8 @@ typedef struct {
     uint64_t stat_pop_ok;    /* 216 */
     uint64_t stat_push_full; /* 224 */
     uint64_t stat_pop_empty; /* 232 */
-    uint32_t stat_recoveries;/* 240 */
-    uint8_t  _pad3[12];      /* 244-255 */
+    uint64_t stat_recoveries;/* 240 */
+    uint8_t  _pad3[8];       /* 248-255 */
 } QueueHeader;
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
@@ -194,7 +194,7 @@ static inline void queue_recover_stale_mutex(QueueHeader *hdr, uint32_t observed
         return;
     __atomic_add_fetch(&hdr->stat_recoveries, 1, __ATOMIC_RELAXED);
     if (__atomic_load_n(&hdr->mutex_waiters, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->mutex, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+        syscall(SYS_futex, &hdr->mutex, FUTEX_WAKE, 1, NULL, NULL, 0);
 }
 
 static inline void queue_mutex_lock(QueueHeader *hdr) {
@@ -283,6 +283,30 @@ static inline void queue_make_deadline(double timeout, struct timespec *deadline
 
 #define QUEUE_ERR(fmt, ...) do { if (errbuf) snprintf(errbuf, QUEUE_ERR_BUFLEN, fmt, ##__VA_ARGS__); } while(0)
 
+static inline void queue_init_new_header(void *base, uint32_t cap, uint64_t arena_cap,
+                                          uint32_t slots_off, uint32_t arena_off,
+                                          uint32_t mode, uint64_t total_size) {
+    QueueHeader *hdr = (QueueHeader *)base;
+    memset(hdr, 0, sizeof(QueueHeader));
+    hdr->magic      = QUEUE_MAGIC;
+    hdr->version    = QUEUE_VERSION;
+    hdr->mode       = mode;
+    hdr->capacity   = cap;
+    hdr->total_size = total_size;
+    hdr->slots_off  = slots_off;
+    hdr->arena_off  = arena_off;
+    hdr->arena_cap  = arena_cap;
+    #define INIT_SEQ(STYPE, C) do { \
+        STYPE *s = (STYPE *)((char *)base + slots_off); \
+        for (uint32_t _i = 0; _i < (C); _i++) s[_i].sequence = _i; \
+    } while(0)
+    if      (mode == QUEUE_MODE_INT)   INIT_SEQ(QueueIntSlot,   cap);
+    else if (mode == QUEUE_MODE_INT32) INIT_SEQ(QueueInt32Slot, cap);
+    else if (mode == QUEUE_MODE_INT16) INIT_SEQ(QueueInt16Slot, cap);
+    #undef INIT_SEQ
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
+}
+
 static QueueHandle *queue_create(const char *path, uint32_t capacity,
                                   uint32_t mode, uint64_t arena_cap_hint,
                                   char *errbuf) {
@@ -324,6 +348,7 @@ static QueueHandle *queue_create(const char *path, uint32_t capacity,
             QUEUE_ERR("mmap(anonymous): %s", strerror(errno));
             return NULL;
         }
+        queue_init_new_header(base, cap, arena_cap, slots_off, arena_off, mode, total_size);
     } else {
         /* File-backed shared mmap */
         int fd = open(path, O_RDWR | O_CREAT, 0666);
@@ -371,10 +396,13 @@ static QueueHandle *queue_create(const char *path, uint32_t capacity,
                          hdr->capacity > 0 &&
                          (hdr->capacity & (hdr->capacity - 1)) == 0 &&
                          hdr->total_size == (uint64_t)st.st_size &&
-                         hdr->slots_off == sizeof(QueueHeader));
-            if (mode == QUEUE_MODE_STR && valid)
-                valid = (hdr->arena_off > 0 &&
+                         hdr->slots_off == sizeof(QueueHeader) &&
+                         hdr->capacity <= (hdr->total_size - hdr->slots_off) / slot_size);
+            if (mode == QUEUE_MODE_STR && valid) {
+                uint64_t slots_end = hdr->slots_off + (uint64_t)hdr->capacity * slot_size;
+                valid = (hdr->arena_off >= slots_end &&
                          hdr->arena_off + hdr->arena_cap <= hdr->total_size);
+            }
             if (!valid) {
                 QUEUE_ERR("%s: invalid or incompatible queue file", path);
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
@@ -386,34 +414,9 @@ static QueueHandle *queue_create(const char *path, uint32_t capacity,
             goto setup_handle;
         }
 
+        queue_init_new_header(base, cap, arena_cap, slots_off, arena_off, mode, total_size);
         flock(fd, LOCK_UN);
         close(fd);
-    }
-
-    /* Initialize new queue (anonymous or new file) */
-    {
-        QueueHeader *hdr = (QueueHeader *)base;
-        memset(hdr, 0, sizeof(QueueHeader));
-        hdr->magic     = QUEUE_MAGIC;
-        hdr->version   = QUEUE_VERSION;
-        hdr->mode      = mode;
-        hdr->capacity  = cap;
-        hdr->total_size = total_size;
-        hdr->slots_off = slots_off;
-        hdr->arena_off = arena_off;
-        hdr->arena_cap = arena_cap;
-
-        /* Initialize Vyukov sequence numbers for integer modes */
-        #define INIT_SEQ(STYPE, BASE, OFF, CAP) do { \
-            STYPE *s = (STYPE *)((char *)(BASE) + (OFF)); \
-            for (uint32_t _i = 0; _i < (CAP); _i++) s[_i].sequence = _i; \
-        } while(0)
-        if      (mode == QUEUE_MODE_INT)   INIT_SEQ(QueueIntSlot,   base, slots_off, cap);
-        else if (mode == QUEUE_MODE_INT32) INIT_SEQ(QueueInt32Slot, base, slots_off, cap);
-        else if (mode == QUEUE_MODE_INT16) INIT_SEQ(QueueInt16Slot, base, slots_off, cap);
-        #undef INIT_SEQ
-
-        __atomic_thread_fence(__ATOMIC_SEQ_CST);
     }
 
 setup_handle:;
@@ -465,7 +468,7 @@ static QueueHandle *queue_create_memfd(const char *name, uint32_t capacity,
         total_size = slots_off + (uint64_t)cap * slot_size;
     }
 
-    int fd = memfd_create(name ? name : "queue", MFD_CLOEXEC);
+    int fd = memfd_create(name ? name : "queue", MFD_CLOEXEC | MFD_ALLOW_SEALING);
     if (fd < 0) { QUEUE_ERR("memfd_create: %s", strerror(errno)); return NULL; }
 
     if (ftruncate(fd, (off_t)total_size) < 0) {
@@ -473,38 +476,21 @@ static QueueHandle *queue_create_memfd(const char *name, uint32_t capacity,
         close(fd); return NULL;
     }
 
+    /* Seal size against ftruncate-based SIGBUS attacks via SCM_RIGHTS peers. */
+    (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
+
     void *base = mmap(NULL, (size_t)total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) {
         QUEUE_ERR("mmap(memfd): %s", strerror(errno));
         close(fd); return NULL;
     }
 
-    QueueHeader *hdr = (QueueHeader *)base;
-    memset(hdr, 0, sizeof(QueueHeader));
-    hdr->magic     = QUEUE_MAGIC;
-    hdr->version   = QUEUE_VERSION;
-    hdr->mode      = mode;
-    hdr->capacity  = cap;
-    hdr->total_size = total_size;
-    hdr->slots_off = slots_off;
-    hdr->arena_off = arena_off;
-    hdr->arena_cap = arena_cap;
-
-    #define INIT_SEQ(STYPE, BASE, OFF, CAP) do { \
-        STYPE *s = (STYPE *)((char *)(BASE) + (OFF)); \
-        for (uint32_t _i = 0; _i < (CAP); _i++) s[_i].sequence = _i; \
-    } while(0)
-    if      (mode == QUEUE_MODE_INT)   INIT_SEQ(QueueIntSlot,   base, slots_off, cap);
-    else if (mode == QUEUE_MODE_INT32) INIT_SEQ(QueueInt32Slot, base, slots_off, cap);
-    else if (mode == QUEUE_MODE_INT16) INIT_SEQ(QueueInt16Slot, base, slots_off, cap);
-    #undef INIT_SEQ
-
-    __atomic_thread_fence(__ATOMIC_SEQ_CST);
+    queue_init_new_header(base, cap, arena_cap, slots_off, arena_off, mode, total_size);
 
     QueueHandle *h = (QueueHandle *)calloc(1, sizeof(QueueHandle));
     if (!h) { munmap(base, (size_t)total_size); close(fd); return NULL; }
 
-    h->hdr        = hdr;
+    h->hdr        = (QueueHeader *)base;
     h->slots      = (char *)base + slots_off;
     h->arena      = (mode == QUEUE_MODE_STR) ? (char *)base + arena_off : NULL;
     h->mmap_size  = (size_t)total_size;
@@ -541,16 +527,23 @@ static QueueHandle *queue_open_fd(int fd, uint32_t mode, char *errbuf) {
     }
 
     QueueHeader *hdr = (QueueHeader *)base;
+    uint64_t slot_size = (mode == QUEUE_MODE_INT)   ? sizeof(QueueIntSlot)
+                       : (mode == QUEUE_MODE_INT32) ? sizeof(QueueInt32Slot)
+                       : (mode == QUEUE_MODE_INT16) ? sizeof(QueueInt16Slot)
+                       :                              sizeof(QueueStrSlot);
     int valid = (hdr->magic == QUEUE_MAGIC &&
                  hdr->version == QUEUE_VERSION &&
                  hdr->mode == mode &&
                  hdr->capacity > 0 &&
                  (hdr->capacity & (hdr->capacity - 1)) == 0 &&
                  hdr->total_size == (uint64_t)st.st_size &&
-                 hdr->slots_off == sizeof(QueueHeader));
-    if (mode == QUEUE_MODE_STR && valid)
-        valid = (hdr->arena_off > 0 &&
+                 hdr->slots_off == sizeof(QueueHeader) &&
+                 hdr->capacity <= (hdr->total_size - hdr->slots_off) / slot_size);
+    if (mode == QUEUE_MODE_STR && valid) {
+        uint64_t slots_end = hdr->slots_off + (uint64_t)hdr->capacity * slot_size;
+        valid = (hdr->arena_off >= slots_end &&
                  hdr->arena_off + hdr->arena_cap <= hdr->total_size);
+    }
     if (!valid) {
         QUEUE_ERR("fd %d: invalid or incompatible queue", fd);
         munmap(base, map_size);
@@ -758,12 +751,13 @@ static inline int queue_str_push_locked(QueueHandle *h, const char *str,
     if (len > QUEUE_STR_LEN_MASK) return -2;
 
     if (hdr->tail - hdr->head >= h->capacity) {
-        hdr->stat_push_full++;
+        __atomic_add_fetch(&hdr->stat_push_full, 1, __ATOMIC_RELAXED);
         return 0;
     }
 
     uint32_t alloc = (len + 7) & ~7u;
     if (alloc == 0) alloc = 8;
+    if (alloc > h->arena_cap) return -2;
     uint32_t saved_wpos = hdr->arena_wpos;
     uint32_t pos = saved_wpos;
     uint64_t skip = alloc;
@@ -781,7 +775,7 @@ static inline int queue_str_push_locked(QueueHandle *h, const char *str,
             pos = 0;
             skip = alloc;
         } else {
-            hdr->stat_push_full++;
+            __atomic_add_fetch(&hdr->stat_push_full, 1, __ATOMIC_RELAXED);
             return 0;
         }
     }
@@ -798,7 +792,7 @@ static inline int queue_str_push_locked(QueueHandle *h, const char *str,
     hdr->arena_wpos = pos + alloc;
     hdr->arena_used += (uint32_t)skip;
     hdr->tail++;
-    hdr->stat_push_ok++;
+    __atomic_add_fetch(&hdr->stat_push_ok, 1, __ATOMIC_RELAXED);
     return 1;
 }
 
@@ -817,7 +811,7 @@ static inline int queue_str_pop_locked(QueueHandle *h, const char **out_str,
     QueueHeader *hdr = h->hdr;
 
     if (hdr->tail == hdr->head) {
-        hdr->stat_pop_empty++;
+        __atomic_add_fetch(&hdr->stat_pop_empty, 1, __ATOMIC_RELAXED);
         return 0;
     }
 
@@ -840,7 +834,7 @@ static inline int queue_str_pop_locked(QueueHandle *h, const char **out_str,
         hdr->arena_wpos = 0;
 
     hdr->head++;
-    hdr->stat_pop_ok++;
+    __atomic_add_fetch(&hdr->stat_pop_ok, 1, __ATOMIC_RELAXED);
     return 1;
 }
 
@@ -936,8 +930,16 @@ static void queue_str_clear(QueueHandle *h) {
     hdr->arena_wpos = 0;
     hdr->arena_used = 0;
     queue_mutex_unlock(hdr);
-    queue_wake_producers(hdr);
-    queue_wake_consumers(hdr);
+    /* clear is a bulk transition — wake every blocked producer and
+     * consumer so they re-evaluate state, not just one of each. */
+    if (__atomic_load_n(&hdr->push_waiters, __ATOMIC_RELAXED) > 0) {
+        __atomic_add_fetch(&hdr->push_futex, 1, __ATOMIC_RELEASE);
+        syscall(SYS_futex, &hdr->push_futex, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+    }
+    if (__atomic_load_n(&hdr->pop_waiters, __ATOMIC_RELAXED) > 0) {
+        __atomic_add_fetch(&hdr->pop_futex, 1, __ATOMIC_RELEASE);
+        syscall(SYS_futex, &hdr->pop_futex, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+    }
 }
 
 /* Peek: read front element without consuming (exact, under mutex). */
@@ -979,13 +981,17 @@ static inline int queue_str_push_front(QueueHandle *h, const char *str,
 
     uint64_t size = hdr->tail - hdr->head;
     if (size >= h->capacity) {
-        hdr->stat_push_full++;
+        __atomic_add_fetch(&hdr->stat_push_full, 1, __ATOMIC_RELAXED);
         queue_mutex_unlock(hdr);
         return 0;
     }
 
     uint32_t alloc = (len + 7) & ~7u;
     if (alloc == 0) alloc = 8;
+    if (alloc > h->arena_cap) {
+        queue_mutex_unlock(hdr);
+        return -2;
+    }
     uint32_t saved_wpos = hdr->arena_wpos;
     uint32_t pos = saved_wpos;
     uint64_t skip = alloc;
@@ -1003,7 +1009,7 @@ static inline int queue_str_push_front(QueueHandle *h, const char *str,
             pos = 0;
             skip = alloc;
         } else {
-            hdr->stat_push_full++;
+            __atomic_add_fetch(&hdr->stat_push_full, 1, __ATOMIC_RELAXED);
             queue_mutex_unlock(hdr);
             return 0;
         }
@@ -1021,7 +1027,7 @@ static inline int queue_str_push_front(QueueHandle *h, const char *str,
 
     hdr->arena_wpos = pos + alloc;
     hdr->arena_used += (uint32_t)skip;
-    hdr->stat_push_ok++;
+    __atomic_add_fetch(&hdr->stat_push_ok, 1, __ATOMIC_RELAXED);
 
     queue_mutex_unlock(hdr);
     queue_wake_consumers(hdr);
@@ -1069,7 +1075,7 @@ static inline int queue_str_pop_back(QueueHandle *h, const char **out_str,
     queue_mutex_lock(hdr);
 
     if (hdr->tail == hdr->head) {
-        hdr->stat_pop_empty++;
+        __atomic_add_fetch(&hdr->stat_pop_empty, 1, __ATOMIC_RELAXED);
         queue_mutex_unlock(hdr);
         return 0;
     }
@@ -1105,7 +1111,7 @@ static inline int queue_str_pop_back(QueueHandle *h, const char **out_str,
     if (hdr->arena_used == 0)
         hdr->arena_wpos = 0;
 
-    hdr->stat_pop_ok++;
+    __atomic_add_fetch(&hdr->stat_pop_ok, 1, __ATOMIC_RELAXED);
     queue_mutex_unlock(hdr);
     queue_wake_producers(hdr);
     return 1;
@@ -1174,12 +1180,13 @@ static inline void queue_notify(QueueHandle *h) {
     }
 }
 
-/* Consume notification counter. Call from event-loop callback before pop. */
-static inline void queue_eventfd_consume(QueueHandle *h) {
-    if (h->notify_fd >= 0) {
-        uint64_t val;
-        ssize_t __attribute__((unused)) rc = read(h->notify_fd, &val, sizeof(val));
-    }
+/* Consume notification counter. Call from event-loop callback before pop.
+ * Returns the accumulated counter, or -1 on error / no eventfd. */
+static inline int64_t queue_eventfd_consume(QueueHandle *h) {
+    if (h->notify_fd < 0) return -1;
+    uint64_t val = 0;
+    if (read(h->notify_fd, &val, sizeof(val)) != sizeof(val)) return -1;
+    return (int64_t)val;
 }
 
 #endif /* QUEUE_H */

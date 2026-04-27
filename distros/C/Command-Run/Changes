@@ -1,5 +1,12 @@
 Revision history for Perl extension Command-Run
 
+1.00 2026-04-27T01:50:48Z
+
+    - Tmpfile: probe fd-path with the actual allocated fd to detect
+      FreeBSD without fdescfs (where /dev/fd/0,1,2 exist but /dev/fd/N
+      for N>2 do not); prefer /proc/self/fd over /dev/fd; path() now
+      returns undef when no usable fd-path is available
+
 0.9903 2026-02-21T10:10:36Z
 
     - Add nofork option for fork-free code reference execution

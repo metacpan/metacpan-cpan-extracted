@@ -69,9 +69,10 @@ new_from_fd(class, fd)
 void
 DESTROY(self)
     SV *self
-  PREINIT:
-    EXTRACT_HANDLE("Data::Sync::Shared::Semaphore", self);
   CODE:
+    if (!SvROK(self)) return;
+    SyncHandle *h = INT2PTR(SyncHandle*, SvIV(SvRV(self)));
+    if (!h) return;
     sv_setiv(SvRV(self), 0);
     sync_destroy(h);
 
@@ -191,6 +192,7 @@ eventfd(self)
     EXTRACT_HANDLE("Data::Sync::Shared::Semaphore", self);
   CODE:
     RETVAL = sync_create_eventfd(h);
+    if (RETVAL < 0) croak("eventfd: %s", strerror(errno));
   OUTPUT:
     RETVAL
 
@@ -241,7 +243,7 @@ sync(self)
   PREINIT:
     EXTRACT_HANDLE("Data::Sync::Shared::Semaphore", self);
   CODE:
-    sync_msync(h);
+    if (sync_msync(h) != 0) croak("msync: %s", strerror(errno));
 
 void
 unlink(self_or_class, ...)
@@ -270,13 +272,13 @@ stats(self)
     SyncHeader *hdr = h->hdr;
     hv_store(hv, "value", 5, newSVuv(sync_sem_value(h)), 0);
     hv_store(hv, "max", 3, newSVuv(hdr->param), 0);
-    hv_store(hv, "waiters", 7, newSVuv(hdr->waiters), 0);
+    hv_store(hv, "waiters", 7, newSVuv((UV)__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED)), 0);
     hv_store(hv, "mmap_size", 9, newSVuv((UV)h->mmap_size), 0);
-    hv_store(hv, "acquires", 8, newSVuv((UV)hdr->stat_acquires), 0);
-    hv_store(hv, "releases", 8, newSVuv((UV)hdr->stat_releases), 0);
-    hv_store(hv, "waits", 5, newSVuv((UV)hdr->stat_waits), 0);
-    hv_store(hv, "timeouts", 8, newSVuv((UV)hdr->stat_timeouts), 0);
-    hv_store(hv, "recoveries", 10, newSVuv(hdr->stat_recoveries), 0);
+    hv_store(hv, "acquires", 8, newSVuv((UV)__atomic_load_n(&hdr->stat_acquires, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "releases", 8, newSVuv((UV)__atomic_load_n(&hdr->stat_releases, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "waits", 5, newSVuv((UV)__atomic_load_n(&hdr->stat_waits, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "timeouts", 8, newSVuv((UV)__atomic_load_n(&hdr->stat_timeouts, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "recoveries", 10, newSVuv((UV)__atomic_load_n(&hdr->stat_recoveries, __ATOMIC_RELAXED)), 0);
     RETVAL = newRV_noinc((SV *)hv);
   OUTPUT:
     RETVAL
@@ -330,9 +332,10 @@ new_from_fd(class, fd)
 void
 DESTROY(self)
     SV *self
-  PREINIT:
-    EXTRACT_HANDLE("Data::Sync::Shared::Barrier", self);
   CODE:
+    if (!SvROK(self)) return;
+    SyncHandle *h = INT2PTR(SyncHandle*, SvIV(SvRV(self)));
+    if (!h) return;
     sv_setiv(SvRV(self), 0);
     sync_destroy(h);
 
@@ -378,6 +381,16 @@ parties(self)
   OUTPUT:
     RETVAL
 
+bool
+is_broken(self)
+    SV *self
+  PREINIT:
+    EXTRACT_HANDLE("Data::Sync::Shared::Barrier", self);
+  CODE:
+    RETVAL = sync_barrier_is_broken(h) ? 1 : 0;
+  OUTPUT:
+    RETVAL
+
 void
 reset(self)
     SV *self
@@ -413,6 +426,7 @@ eventfd(self)
     EXTRACT_HANDLE("Data::Sync::Shared::Barrier", self);
   CODE:
     RETVAL = sync_create_eventfd(h);
+    if (RETVAL < 0) croak("eventfd: %s", strerror(errno));
   OUTPUT:
     RETVAL
 
@@ -463,7 +477,7 @@ sync(self)
   PREINIT:
     EXTRACT_HANDLE("Data::Sync::Shared::Barrier", self);
   CODE:
-    sync_msync(h);
+    if (sync_msync(h) != 0) croak("msync: %s", strerror(errno));
 
 void
 unlink(self_or_class, ...)
@@ -493,11 +507,11 @@ stats(self)
     hv_store(hv, "parties", 7, newSVuv(hdr->param), 0);
     hv_store(hv, "arrived", 7, newSVuv(sync_barrier_arrived(h)), 0);
     hv_store(hv, "generation", 10, newSVuv(sync_barrier_generation(h)), 0);
-    hv_store(hv, "waiters", 7, newSVuv(hdr->waiters), 0);
+    hv_store(hv, "waiters", 7, newSVuv((UV)__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED)), 0);
     hv_store(hv, "mmap_size", 9, newSVuv((UV)h->mmap_size), 0);
-    hv_store(hv, "waits", 5, newSVuv((UV)hdr->stat_waits), 0);
-    hv_store(hv, "releases", 8, newSVuv((UV)hdr->stat_releases), 0);
-    hv_store(hv, "timeouts", 8, newSVuv((UV)hdr->stat_timeouts), 0);
+    hv_store(hv, "waits", 5, newSVuv((UV)__atomic_load_n(&hdr->stat_waits, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "releases", 8, newSVuv((UV)__atomic_load_n(&hdr->stat_releases, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "timeouts", 8, newSVuv((UV)__atomic_load_n(&hdr->stat_timeouts, __ATOMIC_RELAXED)), 0);
     RETVAL = newRV_noinc((SV *)hv);
   OUTPUT:
     RETVAL
@@ -549,9 +563,10 @@ new_from_fd(class, fd)
 void
 DESTROY(self)
     SV *self
-  PREINIT:
-    EXTRACT_HANDLE("Data::Sync::Shared::RWLock", self);
   CODE:
+    if (!SvROK(self)) return;
+    SyncHandle *h = INT2PTR(SyncHandle*, SvIV(SvRV(self)));
+    if (!h) return;
     sv_setiv(SvRV(self), 0);
     sync_destroy(h);
 
@@ -690,6 +705,7 @@ eventfd(self)
     EXTRACT_HANDLE("Data::Sync::Shared::RWLock", self);
   CODE:
     RETVAL = sync_create_eventfd(h);
+    if (RETVAL < 0) croak("eventfd: %s", strerror(errno));
   OUTPUT:
     RETVAL
 
@@ -740,7 +756,7 @@ sync(self)
   PREINIT:
     EXTRACT_HANDLE("Data::Sync::Shared::RWLock", self);
   CODE:
-    sync_msync(h);
+    if (sync_msync(h) != 0) croak("msync: %s", strerror(errno));
 
 void
 unlink(self_or_class, ...)
@@ -775,11 +791,11 @@ stats(self)
     hv_store(hv, "state", 5, newSVpv(state, 0), 0);
     hv_store(hv, "readers", 7,
         newSVuv(val < SYNC_RWLOCK_WRITER_BIT ? val : 0), 0);
-    hv_store(hv, "waiters", 7, newSVuv(hdr->waiters), 0);
+    hv_store(hv, "waiters", 7, newSVuv((UV)__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED)), 0);
     hv_store(hv, "mmap_size", 9, newSVuv((UV)h->mmap_size), 0);
-    hv_store(hv, "acquires", 8, newSVuv((UV)hdr->stat_acquires), 0);
-    hv_store(hv, "releases", 8, newSVuv((UV)hdr->stat_releases), 0);
-    hv_store(hv, "recoveries", 10, newSVuv(hdr->stat_recoveries), 0);
+    hv_store(hv, "acquires", 8, newSVuv((UV)__atomic_load_n(&hdr->stat_acquires, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "releases", 8, newSVuv((UV)__atomic_load_n(&hdr->stat_releases, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "recoveries", 10, newSVuv((UV)__atomic_load_n(&hdr->stat_recoveries, __ATOMIC_RELAXED)), 0);
     RETVAL = newRV_noinc((SV *)hv);
   OUTPUT:
     RETVAL
@@ -831,9 +847,10 @@ new_from_fd(class, fd)
 void
 DESTROY(self)
     SV *self
-  PREINIT:
-    EXTRACT_HANDLE("Data::Sync::Shared::Condvar", self);
   CODE:
+    if (!SvROK(self)) return;
+    SyncHandle *h = INT2PTR(SyncHandle*, SvIV(SvRV(self)));
+    if (!h) return;
     sv_setiv(SvRV(self), 0);
     sync_destroy(h);
 
@@ -918,6 +935,7 @@ eventfd(self)
     EXTRACT_HANDLE("Data::Sync::Shared::Condvar", self);
   CODE:
     RETVAL = sync_create_eventfd(h);
+    if (RETVAL < 0) croak("eventfd: %s", strerror(errno));
   OUTPUT:
     RETVAL
 
@@ -968,7 +986,7 @@ sync(self)
   PREINIT:
     EXTRACT_HANDLE("Data::Sync::Shared::Condvar", self);
   CODE:
-    sync_msync(h);
+    if (sync_msync(h) != 0) croak("msync: %s", strerror(errno));
 
 void
 unlink(self_or_class, ...)
@@ -995,14 +1013,14 @@ stats(self)
   CODE:
     HV *hv = newHV();
     SyncHeader *hdr = h->hdr;
-    hv_store(hv, "waiters", 7, newSVuv(hdr->waiters), 0);
-    hv_store(hv, "signals", 7, newSVuv(hdr->stat_signals), 0);
+    hv_store(hv, "waiters", 7, newSVuv((UV)__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "signals", 7, newSVuv((UV)__atomic_load_n(&hdr->stat_signals, __ATOMIC_RELAXED)), 0);
     hv_store(hv, "mmap_size", 9, newSVuv((UV)h->mmap_size), 0);
-    hv_store(hv, "acquires", 8, newSVuv((UV)hdr->stat_acquires), 0);
-    hv_store(hv, "releases", 8, newSVuv((UV)hdr->stat_releases), 0);
-    hv_store(hv, "waits", 5, newSVuv((UV)hdr->stat_waits), 0);
-    hv_store(hv, "timeouts", 8, newSVuv((UV)hdr->stat_timeouts), 0);
-    hv_store(hv, "recoveries", 10, newSVuv(hdr->stat_recoveries), 0);
+    hv_store(hv, "acquires", 8, newSVuv((UV)__atomic_load_n(&hdr->stat_acquires, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "releases", 8, newSVuv((UV)__atomic_load_n(&hdr->stat_releases, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "waits", 5, newSVuv((UV)__atomic_load_n(&hdr->stat_waits, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "timeouts", 8, newSVuv((UV)__atomic_load_n(&hdr->stat_timeouts, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "recoveries", 10, newSVuv((UV)__atomic_load_n(&hdr->stat_recoveries, __ATOMIC_RELAXED)), 0);
     RETVAL = newRV_noinc((SV *)hv);
   OUTPUT:
     RETVAL
@@ -1054,9 +1072,10 @@ new_from_fd(class, fd)
 void
 DESTROY(self)
     SV *self
-  PREINIT:
-    EXTRACT_HANDLE("Data::Sync::Shared::Once", self);
   CODE:
+    if (!SvROK(self)) return;
+    SyncHandle *h = INT2PTR(SyncHandle*, SvIV(SvRV(self)));
+    if (!h) return;
     sv_setiv(SvRV(self), 0);
     sync_destroy(h);
 
@@ -1125,6 +1144,7 @@ eventfd(self)
     EXTRACT_HANDLE("Data::Sync::Shared::Once", self);
   CODE:
     RETVAL = sync_create_eventfd(h);
+    if (RETVAL < 0) croak("eventfd: %s", strerror(errno));
   OUTPUT:
     RETVAL
 
@@ -1175,7 +1195,7 @@ sync(self)
   PREINIT:
     EXTRACT_HANDLE("Data::Sync::Shared::Once", self);
   CODE:
-    sync_msync(h);
+    if (sync_msync(h) != 0) croak("msync: %s", strerror(errno));
 
 void
 unlink(self_or_class, ...)
@@ -1209,13 +1229,13 @@ stats(self)
     else state = "running";
     hv_store(hv, "state", 5, newSVpv(state, 0), 0);
     hv_store(hv, "is_done", 7, newSVuv(val == SYNC_ONCE_DONE), 0);
-    hv_store(hv, "waiters", 7, newSVuv(hdr->waiters), 0);
+    hv_store(hv, "waiters", 7, newSVuv((UV)__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED)), 0);
     hv_store(hv, "mmap_size", 9, newSVuv((UV)h->mmap_size), 0);
-    hv_store(hv, "acquires", 8, newSVuv((UV)hdr->stat_acquires), 0);
-    hv_store(hv, "releases", 8, newSVuv((UV)hdr->stat_releases), 0);
-    hv_store(hv, "waits", 5, newSVuv((UV)hdr->stat_waits), 0);
-    hv_store(hv, "timeouts", 8, newSVuv((UV)hdr->stat_timeouts), 0);
-    hv_store(hv, "recoveries", 10, newSVuv(hdr->stat_recoveries), 0);
+    hv_store(hv, "acquires", 8, newSVuv((UV)__atomic_load_n(&hdr->stat_acquires, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "releases", 8, newSVuv((UV)__atomic_load_n(&hdr->stat_releases, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "waits", 5, newSVuv((UV)__atomic_load_n(&hdr->stat_waits, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "timeouts", 8, newSVuv((UV)__atomic_load_n(&hdr->stat_timeouts, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "recoveries", 10, newSVuv((UV)__atomic_load_n(&hdr->stat_recoveries, __ATOMIC_RELAXED)), 0);
     RETVAL = newRV_noinc((SV *)hv);
   OUTPUT:
     RETVAL

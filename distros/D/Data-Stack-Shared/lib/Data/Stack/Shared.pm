@@ -1,7 +1,7 @@
 package Data::Stack::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require XSLoader;
 XSLoader::load('Data::Stack::Shared', $VERSION);
@@ -48,10 +48,37 @@ Data::Stack::Shared - Shared-memory LIFO stack for Linux
 
 =head1 DESCRIPTION
 
-LIFO stack in shared memory. CAS-based lock-free push/pop on an
-atomic top index. Futex blocking when empty or full.
+LIFO stack in shared memory. CAS-based position handout on an atomic
+top index, paired with a per-slot publication state machine (see
+L</Concurrency>). Futex blocking when empty or full.
 
 B<Linux-only>. Requires 64-bit Perl.
+
+=head2 Concurrency
+
+Push and pop are safe under multi-producer / multi-consumer workloads.
+Each slot carries a 64-bit control word (state + generation) that acts
+as a publication gate: a pusher atomically transitions the slot through
+C<empty → writing → filled>, and a popper transitions it through
+C<filled → reading → empty> with the generation bumped on completion.
+A consumer that claims position C<t-1> via the C<top> CAS therefore
+always observes the matching pusher's transition to C<filled> before
+reading the value. C<peek> is a seqlock-style read: it retries if the
+slot transitions during the read and returns false if the top changes
+concurrently beyond the retry budget.
+
+C<drain> is safe under concurrent C<push>/C<pop>, but it spin-waits on
+slots whose pusher is mid-publish; a pusher crash between its position
+CAS and the publish leaves drain blocked on that slot. Use C<drain> for
+orderly draining, not as a crash-recovery primitive.
+
+=head2 Compatibility
+
+File format bumped to v2 in this release (per-slot control array added
+for MPMC safety). Opening a v1 file (magic C<STK1>) created by
+Data::Stack::Shared C<E<lt>= 0.02> will croak on header validation.
+Re-create the stack with the new version; anonymous and memfd-backed
+usage is unaffected.
 
 =head2 Variants
 
@@ -149,12 +176,17 @@ L<Data::Heap::Shared> - priority queue
 
 L<Data::Graph::Shared> - directed weighted graph
 
+L<Data::BitSet::Shared> - shared bitset (lock-free per-bit ops)
+
+L<Data::RingBuffer::Shared> - fixed-size overwriting ring buffer
+
 =head1 AUTHOR
 
 vividsnow
 
 =head1 LICENSE
 
-Same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
 
 =cut

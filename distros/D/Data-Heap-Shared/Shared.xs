@@ -201,6 +201,7 @@ eventfd(self)
     EXTRACT_HEAP(self);
   CODE:
     RETVAL = heap_create_eventfd(h);
+    if (RETVAL < 0) croak("eventfd: %s", strerror(errno));
   OUTPUT:
     RETVAL
 
@@ -251,7 +252,7 @@ sync(self)
   PREINIT:
     EXTRACT_HEAP(self);
   CODE:
-    heap_msync(h);
+    if (heap_msync(h) != 0) croak("msync: %s", strerror(errno));
 
 void
 unlink(self_or_class, ...)
@@ -260,7 +261,7 @@ unlink(self_or_class, ...)
     const char *p;
     if (sv_isobject(self_or_class)) {
         HeapHandle *h = INT2PTR(HeapHandle*, SvIV(SvRV(self_or_class)));
-        if (!h) croak("destroyed object");
+        if (!h) croak("Attempted to use a destroyed object");
         p = h->path;
     } else {
         if (items < 2) croak("Usage: ...->unlink($path)");
@@ -279,11 +280,11 @@ stats(self)
     HeapHeader *hdr = h->hdr;
     hv_store(hv, "size", 4, newSVuv(heap_size(h)), 0);
     hv_store(hv, "capacity", 8, newSVuv((UV)hdr->capacity), 0);
-    hv_store(hv, "pushes", 6, newSVuv((UV)hdr->stat_pushes), 0);
-    hv_store(hv, "pops", 4, newSVuv((UV)hdr->stat_pops), 0);
-    hv_store(hv, "waits", 5, newSVuv((UV)hdr->stat_waits), 0);
-    hv_store(hv, "timeouts", 8, newSVuv((UV)hdr->stat_timeouts), 0);
-    hv_store(hv, "recoveries", 10, newSVuv(hdr->stat_recoveries), 0);
+    hv_store(hv, "pushes", 6, newSVuv((UV)__atomic_load_n(&hdr->stat_pushes, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "pops", 4, newSVuv((UV)__atomic_load_n(&hdr->stat_pops, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "waits", 5, newSVuv((UV)__atomic_load_n(&hdr->stat_waits, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "timeouts", 8, newSVuv((UV)__atomic_load_n(&hdr->stat_timeouts, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "recoveries", 10, newSVuv((UV)__atomic_load_n(&hdr->stat_recoveries, __ATOMIC_RELAXED)), 0);
     hv_store(hv, "mmap_size", 9, newSVuv((UV)h->mmap_size), 0);
     RETVAL = newRV_noinc((SV *)hv);
   OUTPUT:

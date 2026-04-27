@@ -95,6 +95,8 @@ Croaks if:
 
 =over 4
 
+=item * A named parameter is unknown or out of range
+
 =item * The string cannot be parsed in the specified format
 
 =item * Date or time components are out of valid ranges
@@ -164,7 +166,7 @@ C<tz_annotation>. The following components may be present:
 
 =over 4
 
-=item * C<year> - Four-digit year (1-9999)
+=item * C<year> - Year (1-9999)
 
 =item * C<month> - Month (1-12)
 
@@ -200,6 +202,8 @@ C<[Europe/Stockholm]>). Informational only; does not affect C<tz_offset>.
 Croaks if:
 
 =over 4
+
+=item * A named parameter is unknown or out of range
 
 =item * The string cannot be parsed in the specified format
 
@@ -312,13 +316,7 @@ Croaks if:
 
 =item * C<$time> is outside the supported range
 
-=item * C<format> is unknown
-
-=item * C<offset> is out of range (-1439 to 1439)
-
-=item * C<precision> is out of range (0-9)
-
-=item * C<nanosecond> is out of range (0-999999999)
+=item * A named parameter is unknown or out of range
 
 =back
 
@@ -469,8 +467,7 @@ default format is C<RFC3339>.
 
 ANSI C C<asctime()> / C<ctime()> format.
 
-  DDD MMM _D HH:MM:SS YYYY
-  DDD MMM DD HH:MM:SS YYYY
+  DDD MMM (_D|DD) HH:MM:SS YYYY
 
 Where C<_D> is a space-padded single-digit day.
 
@@ -591,6 +588,7 @@ Default date format used by Git.
 
 B<Parsing>:
 
+  Mon Dec 1 03:04:05 2024 +0100
   Mon Dec 24 15:30:45 2012 +0100
 
 Timezone offset format: C<±HHMM>
@@ -758,6 +756,7 @@ Date format popularized by Ruby on Rails and Twitter.
 
 B<Parsing>:
 
+  Mon Dec 01 03:04:05 +0100 2024
   Mon Dec 24 15:30:45 +0100 2012
 
 Timezone offset format: C<±HHMM>
@@ -776,10 +775,8 @@ B<Limitations>: Fractional seconds are not supported.
 
 The C<date(1)> command output format as defined by POSIX.
 
-  DDD MMM _D HH:MM:SS (±HHMM|UTC|GMT|abbrev) YYYY
-  DDD MMM DD HH:MM:SS (±HHMM|UTC|GMT|abbrev) YYYY
-  DDD MMM _D HH:MM:SS YYYY (±HHMM|UTC|GMT|abbrev)
-  DDD MMM DD HH:MM:SS YYYY (±HHMM|UTC|GMT|abbrev)
+  DDD MMM (_D|DD) HH:MM:SS (±HHMM|UTC|GMT|abbrev) YYYY
+  DDD MMM (_D|DD) HH:MM:SS YYYY (±HHMM|UTC|GMT|abbrev)
 
 Where C<_D> is a space-padded single-digit day.
 
@@ -789,7 +786,9 @@ Accepts the timezone before or after the year. Accepts numeric offsets,
 UTC designators (C<UTC>, C<GMT>), and timezone abbreviations. Abbreviations 
 are returned in C<tz_abbrev> without resolution.
 
+  Mon Dec  1 03:04:05 2024 UTC
   Mon Dec 24 15:30:45 2012 UTC
+  Mon Dec  1 03:04:05 UTC 2024
   Mon Dec 24 15:30:45 UTC 2012
 
 Timezone offset format: C<±HHMM>

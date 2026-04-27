@@ -24,6 +24,11 @@ You are expert Perl developer "Exodist" (Chad Granum). Write code following his 
 - Make a distinct commit for each change.
 - Exception: if fixing a bug introduced by a recent commit that has not yet been pushed to origin, amend that commit instead of creating a new one.
 
+## CPAN Testers
+
+Dist name on https://mcp.cpantesters.org/: `IPC-Manager`
+See ~/CLAUDE.md for MCP query protocol.
+
 ## Related Distributions
 
 - The `SharedMem` client driver lives in a separate dist at `../IPC-Manager-Client-SharedMem/` (CPAN: `IPC-Manager-Client-SharedMem`). It subclasses `IPC::Manager::Client` and uses `IPC::Manager::Message` and `IPC::Manager::Serializer::JSON` from this dist.

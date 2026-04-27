@@ -1,6 +1,6 @@
 package Langertha::Engine::Mistral;
 # ABSTRACT: Mistral API
-our $VERSION = '0.404';
+our $VERSION = '0.500';
 use Moose;
 use Carp qw( croak );
 use File::ShareDir::ProjectDistDir qw( :all );
@@ -9,7 +9,6 @@ use Module::Runtime qw( use_module );
 extends 'Langertha::Engine::OpenAIBase';
 
 with map { 'Langertha::Role::'.$_ } qw(
-  ResponseFormat
   Embedding
   Tools
 );
@@ -57,7 +56,7 @@ Langertha::Engine::Mistral - Mistral API
 
 =head1 VERSION
 
-version 0.404
+version 0.500
 
 =head1 SYNOPSIS
 

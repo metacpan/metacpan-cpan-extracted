@@ -1,10 +1,11 @@
 package Langertha::Knarr::Handler::Code;
 # ABSTRACT: Coderef-backed Knarr handler for fakes, tests, and custom logic
-our $VERSION = '1.001';
+our $VERSION = '1.100';
 use Moose;
 use Future;
 use Future::AsyncAwait;
 use Langertha::Knarr::Stream;
+use Langertha::Knarr::Response;
 
 with 'Langertha::Knarr::Handler';
 
@@ -26,13 +27,14 @@ has stream_code => (
 has models => (
   is => 'ro',
   isa => 'ArrayRef',
-  default => sub { [ { id => 'steerboard-code', object => 'model' } ] },
+  default => sub { [ { id => 'knarr-code', object => 'model' } ] },
 );
 
 async sub handle_chat_f {
   my ($self, $session, $request) = @_;
   my $out = $self->code->( $session, $request );
-  return { content => "$out", model => $request->model // 'steerboard-code' };
+  my $r = Langertha::Knarr::Response->coerce($out);
+  return $r->clone_with( model => $r->model // $request->model // 'knarr-code' );
 }
 
 async sub handle_stream_f {
@@ -62,7 +64,7 @@ Langertha::Knarr::Handler::Code - Coderef-backed Knarr handler for fakes, tests,
 
 =head1 VERSION
 
-version 1.001
+version 1.100
 
 =head1 SYNOPSIS
 
@@ -98,7 +100,7 @@ per call, C<undef> to signal end.
 =head2 models
 
 Optional. Arrayref of model descriptors. Defaults to a single
-C<steerboard-code> entry.
+C<knarr-code> entry.
 
 =head1 SUPPORT
 

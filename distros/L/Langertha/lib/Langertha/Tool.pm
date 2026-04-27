@@ -1,6 +1,6 @@
 package Langertha::Tool;
 # ABSTRACT: Immutable canonical tool definition with cross-provider format conversion
-our $VERSION = '0.404';
+our $VERSION = '0.500';
 use Moose;
 
 has name => (
@@ -52,11 +52,43 @@ sub from_anthropic {
   );
 }
 
-# Generic: try OpenAI shape first, fall back to Anthropic.
-sub from_hash {
+# MCP server tool definition: name + description + inputSchema (camelCase).
+sub from_mcp {
   my ($class, $hash) = @_;
   return undef unless ref($hash) eq 'HASH';
-  return $class->from_openai($hash) if ($hash->{type} // '') eq 'function';
+  my $name = $hash->{name} // '';
+  return undef unless length $name;
+  return $class->new(
+    name         => $name,
+    description  => ( $hash->{description} // '' ),
+    input_schema => ( $hash->{inputSchema} || $hash->{input_schema} || $class->_empty_schema ),
+  );
+}
+
+# Gemini functionDeclarations: name + description + parameters (flat).
+sub from_gemini {
+  my ($class, $hash) = @_;
+  return undef unless ref($hash) eq 'HASH';
+  my $name = $hash->{name} // '';
+  return undef unless length $name;
+  return $class->new(
+    name         => $name,
+    description  => ( $hash->{description} // '' ),
+    input_schema => ( $hash->{parameters} || $class->_empty_schema ),
+  );
+}
+
+# Generic: figure out the wire shape and route accordingly. Order matters —
+# we test the most specific markers first.
+sub from_hash {
+  my ($class, $hash) = @_;
+  return $hash if ref($hash) && eval { $hash->isa(__PACKAGE__) };
+  return undef unless ref($hash) eq 'HASH';
+  return $class->from_openai($hash)    if ( $hash->{type} // '' ) eq 'function';
+  return $class->from_mcp($hash)       if ref( $hash->{inputSchema} )  eq 'HASH';
+  return $class->from_anthropic($hash) if ref( $hash->{input_schema} ) eq 'HASH';
+  return $class->from_gemini($hash)    if ref( $hash->{parameters} )   eq 'HASH';
+  # Last resort: name-only / schemaless
   return $class->from_anthropic($hash);
 }
 
@@ -97,6 +129,36 @@ sub to_anthropic {
 
 sub to_ollama { $_[0]->to_openai }
 
+sub to_gemini {
+  my ($self) = @_;
+  return {
+    name        => $self->name,
+    description => $self->description,
+    parameters  => $self->input_schema,
+  };
+}
+
+sub to_mcp {
+  my ($self) = @_;
+  return {
+    name        => $self->name,
+    description => $self->description,
+    inputSchema => $self->input_schema,
+  };
+}
+
+# Shape used inside OpenAI's response_format => { type=>'json_schema',
+# json_schema => { ... } } — and the basis of the chat_f forced-tool
+# fallback path.
+sub to_json_schema {
+  my ($self) = @_;
+  return {
+    name        => $self->name,
+    description => $self->description,
+    schema      => $self->input_schema,
+  };
+}
+
 # Canonical hash (matches the legacy Input::Tools->normalize_tools shape).
 sub to_hash {
   my ($self) = @_;
@@ -122,7 +184,7 @@ Langertha::Tool - Immutable canonical tool definition with cross-provider format
 
 =head1 VERSION
 
-version 0.404
+version 0.500
 
 =head1 SUPPORT
 

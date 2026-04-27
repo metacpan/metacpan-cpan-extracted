@@ -148,9 +148,10 @@ SKIP: {
         run { $redis->connect };
         is(\@events, ['connect'], 'initial connect');
 
-        # Force disconnect by closing socket
+        # Force disconnect by closing socket (simulate what _reader_fatal does)
         close $redis->{socket};
-        $redis->{connected} = 0;
+        $redis->{connected}    = 0;
+        $redis->{_socket_live} = 0;
 
         # Next command should trigger reconnect
         my $result = run { $redis->ping };

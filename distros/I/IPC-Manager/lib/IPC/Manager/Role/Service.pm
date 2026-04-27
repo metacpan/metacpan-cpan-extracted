@@ -2,7 +2,7 @@ package IPC::Manager::Role::Service;
 use strict;
 use warnings;
 
-our $VERSION = '0.000033';
+our $VERSION = '0.000035';
 
 # Not included in role:
 use Carp qw/croak/;
@@ -226,6 +226,10 @@ sub send_response {
 
     $payload{ipcm_error} = $error if defined $error;
 
+    # Inside a service the client is non-blocking. send_message
+    # honors send_blocking and dispatches through the outbox; the
+    # event loop drains. No call site needs to know which mode the
+    # client is in.
     $self->client->send_message($peer, \%payload);
 }
 
@@ -390,13 +394,28 @@ sub watch {
         my $reaped = $self->reap_children;
         $activity{pids} = $reaped if $reaped && keys %$reaped;
 
-        my $select = $self->select;
+        # Drain any queued outbound messages first; a previous
+        # iteration may have left bytes pending and the kernel may
+        # have made room while we were not looking.
+        $client->drain_pending if $client->have_pending_sends;
 
-        if ($select) {
-            if ($select->can_read($cycle)) {
+        my $select_r = $self->select;
+        my $select_w = $self->select_write;    # undef when no backlog
+
+        if ($select_r || $select_w) {
+            require IO::Select;
+            my ($r, $w) = IO::Select->select($select_r, $select_w, undef, $cycle);
+
+            if ($r && @$r) {
                 @messages = $client->get_messages;
                 $client->reset_handles_for_peer_change if $client->have_handles_for_peer_change;
             }
+
+            # If any writable handle fired, drain again. This is the
+            # portability path: on platforms where the FIFO buffer
+            # cannot grow past the kernel default, the loop wakes the
+            # moment room appears.
+            $client->drain_pending if $w && @$w;
         }
         else {
             @messages = $client->get_messages;
@@ -428,7 +447,7 @@ sub watch {
 
         return \%activity if keys %activity;
 
-        tinysleep($cycle) unless $select;
+        tinysleep($cycle) unless $select_r || $select_w;
     }
 }
 
@@ -447,6 +466,13 @@ sub run {
     }
 
     my $start_res = $self->_run_on_start();
+
+    # Inside the service event loop, sends never block: the loop
+    # drains the outbox each iteration when needed. Clients that do
+    # not consume Role::Outbox treat this as a no-op. Done AFTER
+    # _run_on_start so startup-time sends keep the simpler
+    # synchronous semantics that custom services may depend on.
+    $self->client->set_send_blocking(0);
 
     # If there was an exception on startup we do not keep going
     die "Exception in process startup, aborting" unless $start_res->{ok};
@@ -503,6 +529,21 @@ sub run {
     }
 
     $self->_run_on_cleanup();
+
+    # Drain any queued outbound IPC sends before terminating
+    # workers / returning. Sends queued during the last loop
+    # iteration (e.g. the response to a 'terminate' request) must
+    # reach the peer before this process exits, or the caller will
+    # see 'peer went away while awaiting response'. Loop with a
+    # 5-second deadline so a wedged peer cannot wedge our exit.
+    {
+        my $client   = $self->client;
+        my $deadline = time + 5;
+        while ($client->have_pending_sends && time < $deadline) {
+            $client->drain_pending or last;
+            tinysleep(0.01) if $client->have_pending_sends;
+        }
+    }
 
     $self->terminate_workers();
 

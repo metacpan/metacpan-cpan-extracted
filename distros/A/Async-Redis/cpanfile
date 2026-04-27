@@ -3,6 +3,7 @@ requires 'perl', '5.018';
 requires 'Future', '0.49';
 requires 'Future::AsyncAwait', '0.66';
 requires 'Future::IO', '0.23';
+requires 'Future::Selector', '0.05';
 requires 'Protocol::Redis';
 requires 'IO::Socket::INET';
 requires 'Socket';

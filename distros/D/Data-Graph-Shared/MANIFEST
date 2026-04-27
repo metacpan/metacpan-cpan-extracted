@@ -17,7 +17,25 @@ MANIFEST.SKIP
 README
 Shared.xs
 t/01-basic.t
+t/02-review-fixes.t
+t/03-lifecycle.t
+t/eventfd_set.t
+t/pod_synopsis.t
+t/version_check.t
+xt/asan.t
+xt/cloexec_exec.t
+xt/concurrent_open.t
+xt/crash_recovery.t
+xt/eg_runs.t
 xt/fd_leak.t
+xt/fd_validation.t
+xt/invalid_args.t
+xt/manifest_vs_git.t
+xt/memfd_seal.t
+xt/mmap_leak.t
 xt/stress.t
+xt/truncation.t
+xt/tsan.t
+xt/valgrind.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

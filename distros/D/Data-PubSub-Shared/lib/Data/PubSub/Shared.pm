@@ -1,7 +1,7 @@
 package Data::PubSub::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load('Data::PubSub::Shared', $VERSION);
@@ -301,6 +301,14 @@ L<Data::Stack::Shared> - LIFO stack
 L<Data::Deque::Shared> - double-ended queue
 
 L<Data::Log::Shared> - append-only log (WAL)
+
+L<Data::Heap::Shared> - priority queue
+
+L<Data::Graph::Shared> - directed weighted graph
+
+L<Data::BitSet::Shared> - shared bitset (lock-free per-bit ops)
+
+L<Data::RingBuffer::Shared> - fixed-size overwriting ring buffer
 
 =head1 AUTHOR
 

@@ -49,7 +49,7 @@ my $WORKERS = $ENV{STRESS_WORKERS} || 4;
     }
 
     my $ok = 1;
-    for (@pids) { waitpid($_, 0); $ok = 0 if $? >> 8 }
+    for (@pids) { waitpid($_, 0); $ok = 0 if $? }
 
     ok $ok, "sem guard fork: $WORKERS workers x $per cycles";
     is $sem->value, 4, "sem guard fork: value == max after contention";
@@ -103,7 +103,7 @@ my $WORKERS = $ENV{STRESS_WORKERS} || 4;
     }
 
     my $ok = 1;
-    for (@pids) { waitpid($_, 0); $ok = 0 if $? >> 8 }
+    for (@pids) { waitpid($_, 0); $ok = 0 if $? }
 
     ok $ok, "rwlock guard fork: $WORKERS workers x $per mixed cycles";
     my $s = $rw->stats;

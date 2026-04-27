@@ -1,5 +1,9 @@
 Revision history for SVGPDF
 
+1.000	2025-04-26
+
+	- Release 1.000.
+
 0.092.3 2025-04-23
 
 	- Add PDF::Builder version to diag.

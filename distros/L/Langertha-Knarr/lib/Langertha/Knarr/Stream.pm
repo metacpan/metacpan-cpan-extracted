@@ -1,9 +1,42 @@
 package Langertha::Knarr::Stream;
 # ABSTRACT: Async chunk iterator returned by streaming Knarr handlers
-our $VERSION = '1.001';
+our $VERSION = '1.100';
 use Moose;
 use Future;
 
+
+sub from_callback {
+  my ($class, $setup) = @_;
+  my @queue;
+  my $pending;
+  my $finished = 0;
+  my $error;
+
+  my $deliver = sub {
+    my ($v) = @_;
+    if ( $pending ) { my $p = $pending; $pending = undef; $p->done($v) }
+    else            { push @queue, $v }
+  };
+
+  my $emit = sub {
+    my ($chunk) = @_;
+    return unless defined $chunk && length $chunk;
+    $deliver->($chunk);
+  };
+  my $done = sub { $finished = 1; $deliver->(undef) };
+  my $fail = sub { $error = $_[0] // 'unknown error'; $finished = 1; $deliver->(undef) };
+
+  $setup->($emit, $done, $fail);
+
+  return $class->new(
+    source => sub {
+      if ( @queue )    { return Future->done( shift @queue ) }
+      if ( $finished ) { return $error ? Future->fail($error) : Future->done(undef) }
+      $pending = Future->new;
+      return $pending;
+    },
+  );
+}
 
 # Two ways to construct:
 #  1) generator => sub { ... }     — sync coderef returning next string or undef
@@ -45,7 +78,7 @@ Langertha::Knarr::Stream - Async chunk iterator returned by streaming Knarr hand
 
 =head1 VERSION
 
-version 1.001
+version 1.100
 
 =head1 SYNOPSIS
 
@@ -99,6 +132,28 @@ when the stream is exhausted.
 
 Convenience constructor that builds a stream from a fixed list of
 chunk strings.
+
+=head2 from_callback
+
+    my $stream = Langertha::Knarr::Stream->from_callback( sub {
+        my ($emit, $done, $fail) = @_;
+        my $f = $engine->simple_chat_stream_realtime_f(
+            sub { $emit->( $_[0]->content ) },
+            @messages,
+        );
+        $f->on_done( $done );
+        $f->on_fail( $fail );
+        $f->retain;
+    });
+
+Builds a stream backed by a callback-driven producer. The setup sub
+receives three callbacks — C<$emit-E<gt>($chunk)>, C<$done-E<gt>()>,
+C<$fail-E<gt>($err)> — and is expected to wire them to the underlying
+async source. Internally maintains a queue and pending Future so the
+consumer side can sit on C<next_chunk_f> without polling.
+
+This is the canonical replacement for the queue/pending/finished/error
+pump that engine-backed handlers used to inline.
 
 =head1 SUPPORT
 

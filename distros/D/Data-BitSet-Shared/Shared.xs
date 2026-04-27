@@ -229,7 +229,7 @@ sync(self)
   PREINIT:
     EXTRACT_BS(self);
   CODE:
-    bs_msync(h);
+    if (bs_msync(h) != 0) croak("msync: %s", strerror(errno));
 
 void
 unlink(self_or_class, ...)
@@ -238,7 +238,7 @@ unlink(self_or_class, ...)
     const char *p;
     if (sv_isobject(self_or_class)) {
         BsHandle *h = INT2PTR(BsHandle*, SvIV(SvRV(self_or_class)));
-        if (!h) croak("destroyed object");
+        if (!h) croak("Attempted to use a destroyed object");
         p = h->path;
     } else {
         if (items < 2) croak("Usage: ...->unlink($path)");
@@ -256,9 +256,9 @@ stats(self)
     HV *hv = newHV();
     hv_store(hv, "capacity", 8, newSVuv((UV)h->hdr->capacity), 0);
     hv_store(hv, "count", 5, newSVuv((UV)bs_count(h)), 0);
-    hv_store(hv, "sets", 4, newSVuv((UV)h->hdr->stat_sets), 0);
-    hv_store(hv, "clears", 6, newSVuv((UV)h->hdr->stat_clears), 0);
-    hv_store(hv, "toggles", 7, newSVuv((UV)h->hdr->stat_toggles), 0);
+    hv_store(hv, "sets", 4, newSVuv((UV)__atomic_load_n(&h->hdr->stat_sets, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "clears", 6, newSVuv((UV)__atomic_load_n(&h->hdr->stat_clears, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "toggles", 7, newSVuv((UV)__atomic_load_n(&h->hdr->stat_toggles, __ATOMIC_RELAXED)), 0);
     hv_store(hv, "mmap_size", 9, newSVuv((UV)h->mmap_size), 0);
     RETVAL = newRV_noinc((SV *)hv);
   OUTPUT:

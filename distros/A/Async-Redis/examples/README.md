@@ -22,6 +22,29 @@ docker compose -f examples/docker-compose.yml down -v
 
 ## Examples
 
+### async-job-queue
+
+A small CLI demo that queues a burst of Redis list jobs, processes them with
+multiple async workers, and prints heartbeat lines while workers wait in
+`BLPOP` or simulate slow work.
+
+```bash
+REDIS_HOST=localhost perl examples/async-job-queue/app.pl
+```
+
+See [async-job-queue/README.md](async-job-queue/README.md) for details.
+
+### bulk-insert
+
+A CLI demo that inserts many TTL'd Redis keys in concurrent batches while a
+separate heartbeat connection keeps printing progress and Redis ping latency.
+
+```bash
+REDIS_HOST=localhost perl examples/bulk-insert/app.pl --count 10000 --heartbeat 0.05
+```
+
+See [bulk-insert/README.md](bulk-insert/README.md) for details.
+
 ### slow-redis
 
 Demonstrates non-blocking I/O by intentionally delaying each request by 1 second.
@@ -54,6 +77,18 @@ REDIS_HOST=localhost pagi-server \
 ```
 
 See [pagi-chat/README.md](pagi-chat/README.md) for details.
+
+### stress
+
+A CLI harness that runs all major Async::Redis features under load
+with periodic CLIENT KILL chaos and integrity verification. Used both
+as a soak test and a CI smoke gate.
+
+```bash
+REDIS_HOST=localhost ./examples/stress/stress --duration 60 --kill-interval 10
+```
+
+See [stress/README.md](stress/README.md) for output format and exit codes.
 
 ## Environment Variables
 

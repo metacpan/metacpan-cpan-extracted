@@ -103,7 +103,7 @@ diag "stress: $WORKERS workers x $MSGS msgs each = $total total, cap=$CAP";
     my $all_ok = 1;
     for my $pid (@sub_pids) {
         waitpid($pid, 0);
-        $all_ok = 0 if ($? >> 8) != 0;
+        $all_ok = 0 if $? != 0;
     }
     ok $all_ok, "broadcast: all $WORKERS subscribers accounted for all $total msgs";
     unlink $path;

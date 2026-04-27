@@ -1,0 +1,96 @@
+BATsh Helaian Rujukan [MY] Bahasa Melayu
+==========================================
+
+BATsh ialah shell dwibahasa yang menjalankan sintaks cmd.exe dan bash/sh
+dalam skrip yang sama. Token pertama setiap baris menentukan mod.
+
+1. Pengesanan Mod
+-----------------
+  ECHO hello          -> mod cmd.exe (token pertama semua huruf besar)
+  echo hello          -> mod bash/sh (token pertama mengandungi huruf kecil)
+  # ulasan            -> ulasan (diabaikan)
+  :: ulasan           -> ulasan (gaya CMD, diabaikan)
+  REM ulasan          -> ulasan (gaya CMD, diabaikan)
+
+2. Memulakan Shell
+------------------
+  perl lib/BATsh.pm                    # REPL interaktif
+  perl lib/BATsh.pm script.batsh       # jalankan fail skrip
+  perl lib/BATsh.pm -e "echo helo"     # arahan satu baris
+
+  Daripada API Perl:
+    use BATsh;
+    BATsh->run('script.batsh');
+    BATsh->run_string("echo helo");
+    BATsh->repl();
+
+3. Jambatan Pemboleh Ubah Persekitaran
+---------------------------------------
+  Blok CMD dan SH berkongsi pemboleh ubah melalui %ENV Perl.
+
+  export FOO=helo    # SH menetapkan FOO
+  ECHO %FOO%         # CMD membaca FOO melalui jambatan (Windows)
+
+  SET BAR=dunia      # CMD menetapkan BAR
+  echo $BAR          # SH membaca BAR melalui jambatan
+
+4. SETLOCAL / ENDLOCAL
+-----------------------
+  SETLOCAL           # cempadan %ENV
+  SET TMP=nilai_lokal
+  ECHO %TMP%
+  ENDLOCAL           # pulihkan %ENV (TMP hilang)
+
+  Skop boleh disarangkan.
+
+5. Sarang (Mod Campuran)
+-------------------------
+  Struktur blok mesti dipasangkan dengan betul.
+
+  for x in 1 2; do   # SH buka blok
+      ECHO item $x   # baris CMD dalam blok SH
+  done               # SH tutup blok
+
+  Kata kunci CMD: IF/ENDIF  FOR/NEXT  WHILE/WEND  DO/LOOP
+  Kata kunci SH:  if/fi  for/done  while/done  until/done  case/esac  { }
+
+6. Definisi Subrutin
+---------------------
+  :GREET
+  echo "Helo $BATSH_ARG1"
+  RET
+
+7. CALL dan source
+-------------------
+  CALL :GREET dunia      # panggil subrutin dengan argumen
+  CALL lain.batsh        # sertakan fail .batsh lain (CMD)
+  source lain.batsh      # sertakan fail .batsh lain (SH)
+  . lain.batsh           # notasi titik POSIX
+
+  Argumen: $BATSH_ARG1 .. $BATSH_ARGn  (%BATSH_ARG1% dalam CMD)
+  Bilangan: $BATSH_ARGC
+
+8. API Perl
+-----------
+  BATsh->run($file)            # jalankan fail .batsh
+  BATsh->run_string($source)   # jalankan rentetan sumber
+  BATsh->run_lines(@lines)     # jalankan tatasusunan baris
+  BATsh->repl()                # REPL interaktif
+  BATsh->classify_token($tok)  # kembalikan 'CMD' atau 'SH'
+  BATsh->setlocal()            # cempadan %ENV
+  BATsh->endlocal()            # pulihkan %ENV
+  BATsh->call_sub($lbl, @args) # panggil subrutin
+  BATsh->source_file($file)    # sertakan fail .batsh
+  BATsh->version()             # rentetan versi
+
+9. Nota Platform
+----------------
+  Windows: Blok CMD dan SH berjalan dalam Perl tulen -- tidak perlu cmd.exe/bash/sh luaran.
+  UNIX:    Blok CMD dan SH berjalan dalam Perl tulen -- tidak perlu cmd.exe/bash/sh luaran.
+
+10. Keperluan
+-------------
+  Perl 5.005_03 atau lebih tinggi. Modul teras sahaja (File::Spec, Carp).
+  Tiada kebergantungan CPAN.
+
+Lihat juga: https://metacpan.org/dist/BATsh

@@ -119,9 +119,10 @@ SKIP: {
         # Set key in db 2
         run { $redis->set('auth:reconnect:key', 'val') };
 
-        # Force disconnect
+        # Force disconnect (simulate what _reader_fatal does)
         close $redis->{socket};
-        $redis->{connected} = 0;
+        $redis->{connected}    = 0;
+        $redis->{_socket_live} = 0;
 
         # Command should reconnect and still be in db 2
         my $val = run { $redis->get('auth:reconnect:key') };

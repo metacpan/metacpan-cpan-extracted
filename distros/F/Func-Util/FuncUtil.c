@@ -1528,8 +1528,13 @@ static OP* type_predicate_call_checker(pTHX_ OP *entersubop, GV *namegv, SV *cko
         OpMORESIB_set(pushop, cvop);
         OpLASTSIB_set(arg, NULL);
 
-        /* Create unary custom op with arg as child */
-        OP *newop = newUNOP(OP_CUSTOM, 0, arg);
+        /* Create unary custom op with arg as child.
+           Build as OP_NULL first, then convert to OP_CUSTOM — calling
+           newUNOP(OP_CUSTOM, ...) directly trips the
+           Perl_newUNOP: Assertion `(PL_opargs[type] & OA_CLASS_MASK) == OA_UNOP'
+           on -DDEBUGGING perls because OP_CUSTOM has no fixed class. */
+        OP *newop = newUNOP(OP_NULL, 0, arg);
+        newop->op_type   = OP_CUSTOM;
         newop->op_ppaddr = pp_func;
 
         op_free(entersubop);

@@ -2,7 +2,7 @@ package Func::Util;
 
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 # DynaLoader with RTLD_GLOBAL so our C API symbols (funcutil_register_export_xs,
 # funcutil_register_predicate_xs, etc.) are visible to other XS modules that

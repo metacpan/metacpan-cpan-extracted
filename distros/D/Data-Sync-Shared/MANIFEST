@@ -43,17 +43,36 @@ t/05-once.t
 t/06-eventfd.t
 t/07-new-features.t
 t/08-errors.t
+t/pod_synopsis.t
+t/version_check.t
 xt/acquire_n_stress.t
 xt/asan.t
+xt/cloexec_exec.t
+xt/concurrent_open.t
 xt/cppcheck.t
 xt/crash_recovery.t
+xt/eg_runs.t
+xt/eintr.t
+xt/ev_eventfd.t
+xt/eventfd_anyevent.t
+xt/eventfd_fork.t
 xt/fd_leak.t
+xt/fd_validation.t
 xt/guard_stress.t
+xt/invalid_args.t
 xt/lifecycle.t
+xt/manifest_vs_git.t
+xt/memfd_seal.t
+xt/mmap_leak.t
 xt/persistence.t
+xt/reader_starvation_guard.t
 xt/rwlock_starvation.t
 xt/signal_safety.t
+xt/sigterm_cleanup.t
 xt/stress.t
+xt/truncation.t
+xt/tsan.t
 xt/valgrind.t
+xt/writer_crash_recovery.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

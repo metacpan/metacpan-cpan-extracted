@@ -83,8 +83,19 @@ EXPORTS
 
     ipcm_default_serializer($serializer)
 
-      Get or set the default serializer. 'JSON' is the default unless this
-      is changed.
+    ipcm_default_serializer([$class, %args])
+
+    ipcm_default_serializer($class, %args)
+
+      Get or set the default serializer. The default is 'JSON::Zstd' when
+      Compress::Zstd 0.20 or newer is installed, otherwise 'JSON'.
+
+      The setter accepts either a class string (uses class methods, no
+      construction) or an arrayref whose first element is the class and
+      whose remaining elements are constructor arguments. The arrayref form
+      (or the flat-list spelling, which is treated identically) builds and
+      caches a single shared instance keyed on ($class, %args); subsequent
+      ipcm_spawn / ipcm_connect calls with the same spec reuse it.
 
     $ipcm = ipcm_spawn()
 
@@ -107,6 +118,12 @@ EXPORTS
       You can set the serializer with the serializer => $CLASS option.
       'IPC::Manager::Serializer::' will be prefixed onto the class name
       unless it is already present, or if the class name starts with '+'.
+      To configure a serializer that takes constructor arguments (for
+      example to set a custom compression level or dictionary on
+      IPC::Manager::Serializer::JSON::Zstd) pass an arrayref of [$class,
+      %args]: serializer => ['JSON::Zstd', level => 9]. The arrayref form
+      builds a single cached instance shared across all peer connections;
+      the string form keeps using class methods directly.
 
       You can pick a protocol with the protocol => $CLASS option.
       'IPC::Manager::Client::' will be prefixed onto the class name unless
@@ -138,9 +155,13 @@ EXPORTS
           '["PROTOCOL_CLASS", "SERIALIZER_CLASS", "ROUTE"]'
 
       The protocol should always be an IPC::Manager::Client subclass. The
-      serializer should always be an IPC::Manager::Serializer subclass. The
-      route is protocol specific, it may be a file, a directory, a DBI DSN
-      string, etc.
+      serializer slot may be a class string, in which case the receiver
+      uses class methods on it, or a [$class, %args] arrayref, in which
+      case the receiver constructs (and caches) a configured instance. The
+      connection info string itself is always plain JSON; only message
+      payloads carried over the chosen protocol are subject to the
+      serializer's encoding (e.g. zstd compression). The route is protocol
+      specific, it may be a file, a directory, a DBI DSN string, etc.
 
     $con = ipcm_reconnect($name => $info)
 
@@ -233,6 +254,16 @@ CLIENT PROTOCOLS
       This uses a directory as the 'route'. This uses unix sockets, one per
       client. Messages are sent by writing them to the correct clients
       socket. (Multiple writer, single reader).
+
+    ConnectionUnix
+
+      IPC::Manager::Client::ConnectionUnix
+
+      Like UnixSocket but uses SOCK_STREAM connection-oriented UNIX
+      sockets. Each client either listens for incoming connections
+      (default) or registers as a non-listener and may only be reached via
+      connections it has itself initiated. Per-connection management
+      methods are provided by IPC::Manager::Role::Client::Connection.
 
  DBI Based
 

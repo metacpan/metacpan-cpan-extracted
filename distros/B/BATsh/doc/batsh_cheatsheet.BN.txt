@@ -1,0 +1,94 @@
+BATsh চিট শিট [BN] বাংলা
+==============================
+
+BATsh হল একটি দ্বিভাষিক শেল যা cmd.exe এবং bash/sh সিনট্যাক্স
+একই স্ক্রিপ্টে চালায়। প্রতিটি লাইনের প্রথম টোকেন মোড নির্ধারণ করে।
+
+1. মোড সন্ধান
+--------------
+  ECHO hello          -> cmd.exe মোড (প্রথম টোকেন সব বড় হাতের)
+  echo hello          -> bash/sh মোড (প্রথম টোকেনে ডানডিরঠ আছে)
+  # মন্তব্য           -> মন্তব্য (উপেক্ষিত)
+  :: মন্তব্য          -> মন্তব্য (CMD ধারা, উপেক্ষিত)
+  REM মন্তব্য         -> মন্তব্য (CMD ধারা, উপেক্ষিত)
+
+2. শেল শুরু করা
+-----------------
+  perl lib/BATsh.pm                      # ইন্টারর্যাক্টিভ REPL
+  perl lib/BATsh.pm script.batsh         # স্ক্রিপ্ট ফাইল চালান
+  perl lib/BATsh.pm -e "echo namaskar"   # এক-লাইনের কমান্ড
+
+  Perl API থেকে:
+    use BATsh;
+    BATsh->run('script.batsh');
+    BATsh->run_string("echo namaskar");
+    BATsh->repl();
+
+3. পরিবেশ ভেরিয়েবল সেতু
+---------------------------------
+  CMD এবং SH ব্লক Perl-এর %ENV-এর মাধ্যমে ভেরিয়েবল শেয়ার করে।
+
+  export FOO=namaskar  # SH FOO সেট করে
+  ECHO %FOO%           # CMD সেতুর মাধ্যমে FOO পড়ে (Windows)
+
+  SET BAR=prithibi     # CMD BAR সেট করে
+  echo $BAR            # SH সেতুর মাধ্যমে BAR পড়ে
+
+4. SETLOCAL / ENDLOCAL
+-----------------------
+  SETLOCAL           # %ENV স্ন্যাপশট
+  SET TMP=স্থানীয়
+  ECHO %TMP%
+  ENDLOCAL           # %ENV পুনরুদ্ধার (TMP মুছে যায়)
+
+5. নেস্টিং (মিশ্র মোড)
+------------------------
+  ব্লক কাঠামো সঠিকভাবে যুগ্ম হতে হবে।
+
+  for x in 1 2; do   # SH ব্লক খোলে
+      ECHO item $x   # SH ব্লকে CMD লাইন
+  done               # SH ব্লক বন্ধ
+
+  CMD কীওয়ার্ড: IF/ENDIF  FOR/NEXT  WHILE/WEND  DO/LOOP
+  SH  কীওয়ার্ড: if/fi  for/done  while/done  until/done  case/esac  { }
+
+6. সাবরুটিন সংজ্ঞা
+-------------------------
+  :GREET
+  echo "Namaskar $BATSH_ARG1"
+  RET
+
+7. CALL এবং source
+------------------
+  CALL :GREET prithibi   # আর্গুমেন্ট সহ সাবরুটিন কল করুন
+  CALL onno.batsh        # অন্য .batsh ফাইল যোগ করুন (CMD)
+  source onno.batsh      # অন্য .batsh ফাইল যোগ করুন (SH)
+  . onno.batsh           # POSIX ডট নোটেশন
+
+  আর্গুমেন্ট: $BATSH_ARG1 .. $BATSH_ARGn  (CMD-তে %BATSH_ARG1%)
+  সংখ্যা: $BATSH_ARGC
+
+8. Perl API
+-----------
+  BATsh->run($file)            # .batsh ফাইল চালান
+  BATsh->run_string($source)   # সোর্স স্ট্রিং চালান
+  BATsh->run_lines(@lines)     # লাইন অ্যারে চালান
+  BATsh->repl()                # ইন্টারর্যাক্টিভ REPL
+  BATsh->classify_token($tok)  # 'CMD' বা 'SH' ফেরত দেয়
+  BATsh->setlocal()            # %ENV স্ন্যাপশট
+  BATsh->endlocal()            # %ENV পুনরুদ্ধার
+  BATsh->call_sub($lbl, @args) # সাবরুটিন কল
+  BATsh->source_file($file)    # .batsh ফাইল যোগ
+  BATsh->version()             # সংস্করণ স্ট্রিং
+
+9. প্লাটফর্ম নোট
+-----------------
+  Windows: CMD এবং SH উভয় সেকশনই বিশুদ্ধ Perl-এ চলে -- বাইরের cmd.exe/bash/sh দরকার নেই।
+  UNIX:    CMD এবং SH উভয় সেকশনই বিশুদ্ধ Perl-এ চলে -- বাইরের cmd.exe/bash/sh দরকার নেই।
+
+10. প্রয়োজনীয়তা
+------------------
+  Perl 5.005_03 বা উচ্চতর। শুধু কোর মডিউল (File::Spec, Carp)।
+  কোনো CPAN নির্ভরতা নেই।
+
+আরও দেখুন: https://metacpan.org/dist/BATsh

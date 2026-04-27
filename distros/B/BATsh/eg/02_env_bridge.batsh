@@ -1,0 +1,17 @@
+# BATsh example 02: Environment variable bridge
+# Run: perl lib/BATsh.pm eg/02_env_bridge.batsh
+# Variables set in CMD are readable in SH and vice versa.
+# All via BATsh::Env -- no external shell needed.
+
+# SH sets GREETING
+export GREETING=hello_from_sh
+echo "SH set: GREETING=$GREETING"
+
+# CMD reads GREETING, sets FAREWELL
+@ECHO OFF
+ECHO CMD reads: GREETING=%GREETING%
+SET FAREWELL=goodbye_from_cmd
+
+# SH reads FAREWELL
+echo "SH reads: FAREWELL=$FAREWELL"
+echo "Bridge round-trip complete."

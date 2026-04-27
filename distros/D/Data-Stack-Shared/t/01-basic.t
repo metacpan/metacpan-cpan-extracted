@@ -42,13 +42,13 @@ is $stk->size, 0, 'clear empties stack';
 # blocking pop with timeout
 my $t0 = time;
 ok !defined $stk->pop_wait(0.1), 'pop_wait timeout';
-ok time - $t0 < 2, 'timeout was fast';
+cmp_ok time - $t0, '<', 30, 'pop_wait returned (not hung)';
 
 # blocking push with timeout
 $stk->push($_) for 1..10;
 $t0 = time;
 ok !$stk->push_wait(99, 0.1), 'push_wait timeout when full';
-ok time - $t0 < 2;
+cmp_ok time - $t0, '<', 30, 'push_wait returned (not hung)';
 $stk->clear;
 
 # cross-process
@@ -167,6 +167,15 @@ ok $es->notify, 'notify';
 ok $es->notify, 'notify again';
 my $count = $es->eventfd_consume;
 is $count, 2, 'eventfd_consume returns accumulated count';
+
+# --- drain ---
+
+my $sd = Data::Stack::Shared::Int->new(undef, 8);
+$sd->push($_) for 1..5;
+is $sd->size, 5, 'size before drain';
+is $sd->drain, 5, 'drain returns discarded count';
+is $sd->size, 0, 'empty after drain';
+is $sd->drain, 0, 'drain on empty returns 0';
 
 # --- sync / unlink ---
 

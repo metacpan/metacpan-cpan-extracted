@@ -20,7 +20,7 @@ SKIP: {
     run { $redis2->connect };
 
     # Cleanup
-    run { $redis->del('conflict:key', 'conflict:counter') };
+    run { $redis->del('conflict:key', 'conflict:counter', 'conflict:watched', 'conflict:poisoned') };
 
     subtest 'WATCH conflict returns undef' => sub {
         run { $redis->set('conflict:key', 'original') };
@@ -64,6 +64,55 @@ SKIP: {
         is($value, 'raced', 'race condition winner persisted');
     };
 
+    # Regression test for a subtle state leak in watch_multi().
+    #
+    # watch_multi() does:
+    #   1. WATCH key(s)
+    #   2. read current values
+    #   3. invoke the user callback
+    #   4. then start MULTI/EXEC
+    #
+    # If the callback dies in step 3, the client must still UNWATCH and
+    # clear its local state. Otherwise the connection is "poisoned": a later,
+    # unrelated MULTI/EXEC on the same socket can abort after another client
+    # touches the previously watched key.
+    #
+    # The important assertion here is not just !$redis->watching. We also
+    # mutate the old watched key from a second connection and then prove a
+    # fresh transaction on the original connection still succeeds. That shows
+    # the server-side WATCH was actually unwound, not just the local flag.
+    subtest 'watch_multi callback failure unwatches connection' => sub {
+        run { $redis->set('conflict:watched', '0') };
+        run { $redis->del('conflict:poisoned') };
+
+        my $error;
+        eval {
+            await_f($redis->watch_multi(['conflict:watched'], async sub {
+                my ($tx, $watched) = @_;
+                is($watched->{'conflict:watched'}, '0', 'got watched value before callback dies');
+                die "callback boom";
+            }));
+            1;
+        } or $error = $@;
+
+        like("$error", qr/callback boom/, 'callback failure propagated');
+        ok(!$redis->watching, 'local watch state cleared after callback failure');
+
+        # Touch the old watched key from another client. A leaked WATCH on the
+        # original connection would make the EXEC below return undef.
+        run { $redis2->set('conflict:watched', '1') };
+
+        run { $redis->multi_start() };
+        run { $redis->command('SET', 'conflict:poisoned', 'ok') };
+        my $results = run { $redis->exec() };
+
+        ok(defined $results, 'later transaction succeeds after callback failure');
+        is($results, ['OK'], 'later EXEC applies queued write');
+
+        my $value = run { $redis->get('conflict:poisoned') };
+        is($value, 'ok', 'later transaction persisted value');
+    };
+
     subtest 'retry pattern on conflict' => sub {
         run { $redis->set('conflict:counter', '0') };
 
@@ -99,7 +148,7 @@ SKIP: {
     };
 
     # Cleanup
-    run { $redis->del('conflict:key', 'conflict:counter') };
+    run { $redis->del('conflict:key', 'conflict:counter', 'conflict:watched', 'conflict:poisoned') };
 }
 
 done_testing;

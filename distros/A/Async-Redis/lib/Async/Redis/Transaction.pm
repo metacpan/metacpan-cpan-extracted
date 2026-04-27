@@ -53,9 +53,47 @@ __END__
 
 Async::Redis::Transaction - Transaction command collector
 
+=head1 SYNOPSIS
+
+    my $results = await $redis->multi(async sub {
+        my ($tx) = @_;
+        $tx->set('key', 'value');
+        $tx->incr('counter');
+    });
+
+    my $watched = await $redis->watch_multi(['counter'], async sub {
+        my ($tx, $values) = @_;
+        $tx->set('counter', $values->{counter} + 1);
+    });
+
 =head1 DESCRIPTION
 
 This class collects commands during a transaction callback. Commands
 are queued locally and then sent as MULTI/commands.../EXEC.
+
+Transaction command calls do not return per-command Futures. Redis returns
+their actual results from C<EXEC>, in the same order the commands were queued.
+
+=head1 METHODS
+
+=head2 command
+
+    $tx->command('SET', 'key', 'value');
+
+Queue an explicit command.
+
+=head2 AUTOLOAD
+
+Any Redis command can be called directly and is queued by name:
+
+    $tx->set('key', 'value');
+    $tx->hset('hash', 'field', 'value');
+
+=head2 commands
+
+    my @commands = $tx->commands;
+
+Return queued commands as arrayrefs. This is used internally by
+L<Async::Redis>.
 
 =cut

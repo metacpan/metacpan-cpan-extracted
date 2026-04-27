@@ -4,8 +4,11 @@
  * Multiple writers append variable-length entries via CAS on tail offset.
  * Readers replay from any offset. Entries persist until explicit reset.
  *
- * Entry format: [uint32_t length][data bytes] — no alignment padding.
+ * Entry format: [uint32_t length][data bytes][padding to 4-byte alignment].
  * length is written AFTER data, acting as a commit flag (0 = uncommitted).
+ * Padding ensures the next uint32_t length is naturally aligned — required
+ * for atomic load/store on strict-alignment ISAs (ARM64 LDAR/STLR trap on
+ * unaligned addresses with SIGBUS).
  */
 
 #ifndef LOG_H
@@ -47,7 +50,7 @@ typedef struct {
     uint64_t tail;             /* 64: byte offset past last entry (CAS target) */
     uint64_t count;            /* 72: number of committed entries */
     uint32_t waiters;          /* 80: blocked tailers */
-    uint32_t _pad1;            /* 84 */
+    uint32_t wake_seq;         /* 84: FUTEX_WAIT target (avoids 64-bit count wraparound) */
     uint64_t stat_appends;     /* 88 */
     uint64_t stat_waits;       /* 96 */
     uint64_t stat_timeouts;    /* 104 */
@@ -96,8 +99,10 @@ static inline int64_t log_append(LogHandle *h, const void *data, uint32_t len) {
     if (len == 0) return -1;  /* 0 is the uncommitted marker */
 
     LogHeader *hdr = h->hdr;
-    if (len > UINT32_MAX - LOG_ENTRY_HDR) return -1;
-    uint32_t entry_size = LOG_ENTRY_HDR + len;
+    if (len > UINT32_MAX - LOG_ENTRY_HDR - 3U) return -1;
+    /* Pad total entry size up to 4-byte boundary so the next entry's
+     * length field is naturally aligned for atomic ops on ARM64. */
+    uint32_t entry_size = (LOG_ENTRY_HDR + len + 3U) & ~3U;
 
     for (;;) {
         uint64_t t = __atomic_load_n(&hdr->tail, __ATOMIC_RELAXED);
@@ -108,16 +113,15 @@ static inline int64_t log_append(LogHandle *h, const void *data, uint32_t len) {
             uint8_t *slot = h->data + t;
             /* write data first */
             memcpy(slot + LOG_ENTRY_HDR, data, len);
-            /* release fence ensures data visible before commit */
-            __atomic_thread_fence(__ATOMIC_RELEASE);
-            /* commit: write len (non-zero = committed) */
-            memcpy(slot, &len, LOG_ENTRY_HDR);
+            /* commit: atomic release store of len — readers acquire-load it. */
+            __atomic_store_n((uint32_t *)slot, len, __ATOMIC_RELEASE);
 
             __atomic_add_fetch(&hdr->count, 1, __ATOMIC_RELEASE);
             __atomic_add_fetch(&hdr->stat_appends, 1, __ATOMIC_RELAXED);
+            __atomic_add_fetch(&hdr->wake_seq, 1, __ATOMIC_RELEASE);
 
             if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
-                syscall(SYS_futex, &hdr->count, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+                syscall(SYS_futex, &hdr->wake_seq, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 
             return (int64_t)t;
         }
@@ -138,16 +142,16 @@ static inline int log_read(LogHandle *h, uint64_t offset,
     if (offset + LOG_ENTRY_HDR > h->hdr->data_size) return 0;
 
     uint8_t *slot = h->data + offset;
-    uint32_t len;
-    memcpy(&len, slot, LOG_ENTRY_HDR);
-    __atomic_thread_fence(__ATOMIC_ACQUIRE);
+    /* Atomic acquire-load pairs with writer's __atomic_store_n RELEASE. */
+    uint32_t len = __atomic_load_n((const uint32_t *)slot, __ATOMIC_ACQUIRE);
     if (len == 0) return 0;  /* uncommitted */
 
     if (offset + LOG_ENTRY_HDR + len > t) return 0;
 
     *out_data = slot + LOG_ENTRY_HDR;
     *out_len = len;
-    *next_off = offset + LOG_ENTRY_HDR + len;
+    /* Advance past entry + alignment padding (matches log_append). */
+    *next_off = offset + (((uint64_t)LOG_ENTRY_HDR + len + 3U) & ~(uint64_t)3U);
     return 1;
 }
 
@@ -182,6 +186,7 @@ static inline int log_wait(LogHandle *h, uint64_t expected_count, double timeout
 
     for (;;) {
         __atomic_add_fetch(&h->hdr->waiters, 1, __ATOMIC_RELEASE);
+        uint32_t seq = __atomic_load_n(&h->hdr->wake_seq, __ATOMIC_ACQUIRE);
         uint64_t cur = __atomic_load_n(&h->hdr->count, __ATOMIC_ACQUIRE);
         if (cur == expected_count) {
             struct timespec *pts = NULL;
@@ -193,8 +198,7 @@ static inline int log_wait(LogHandle *h, uint64_t expected_count, double timeout
                 }
                 pts = &rem;
             }
-            syscall(SYS_futex, &h->hdr->count, FUTEX_WAIT,
-                    (uint32_t)(cur & 0xFFFFFFFF), pts, NULL, 0);
+            syscall(SYS_futex, &h->hdr->wake_seq, FUTEX_WAIT, seq, pts, NULL, 0);
         }
         __atomic_sub_fetch(&h->hdr->waiters, 1, __ATOMIC_RELAXED);
         if (log_entry_count(h) != expected_count) return 1;
@@ -222,6 +226,21 @@ static inline void log_init_header(void *base, uint64_t total, uint64_t data_siz
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
 
+/* Validate a mapped header (shared by log_create reopen and log_open_fd). */
+static inline int log_validate_header(const LogHeader *hdr, uint64_t file_size) {
+    if (hdr->magic != LOG_MAGIC) return 0;
+    if (hdr->version != LOG_VERSION) return 0;
+    if (hdr->data_size == 0) return 0;
+    if (hdr->data_size > UINT64_MAX - sizeof(LogHeader)) return 0;
+    if (hdr->total_size != file_size) return 0;
+    if (hdr->data_off != sizeof(LogHeader)) return 0;
+    if (hdr->total_size != sizeof(LogHeader) + hdr->data_size) return 0;
+    /* Runtime-state sanity: tail and truncation must not exceed data_size. */
+    if (hdr->tail > hdr->data_size) return 0;
+    if (hdr->truncation > hdr->data_size) return 0;
+    return 1;
+}
+
 static inline LogHandle *log_setup(void *base, size_t ms, const char *path, int bfd) {
     LogHeader *hdr = (LogHeader *)base;
     LogHandle *h = (LogHandle *)calloc(1, sizeof(LogHandle));
@@ -232,6 +251,9 @@ static inline LogHandle *log_setup(void *base, size_t ms, const char *path, int 
     h->path = path ? strdup(path) : NULL;
     h->notify_fd = -1;
     h->backing_fd = bfd;
+    /* Log is append-only: hint sequential access so the kernel prefetcher
+     * reads ahead on large scans (read_entry, each_entry). Best-effort. */
+    (void)madvise(base, ms, MADV_SEQUENTIAL);
     return h;
 }
 
@@ -259,6 +281,10 @@ static LogHandle *log_create(const char *path, uint64_t data_size, char *errbuf)
             LOG_ERR("fstat: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
         int is_new = (st.st_size == 0);
+        if (!is_new && (uint64_t)st.st_size < sizeof(LogHeader)) {
+            LOG_ERR("%s: file too small (%lld)", path, (long long)st.st_size);
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
             LOG_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
@@ -266,9 +292,7 @@ static LogHandle *log_create(const char *path, uint64_t data_size, char *errbuf)
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
         if (base == MAP_FAILED) { LOG_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
         if (!is_new) {
-            LogHeader *hdr = (LogHeader *)base;
-            if (hdr->magic != LOG_MAGIC || hdr->version != LOG_VERSION ||
-                hdr->total_size != (uint64_t)st.st_size) {
+            if (!log_validate_header((LogHeader *)base, (uint64_t)st.st_size)) {
                 LOG_ERR("invalid log file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN); close(fd);
@@ -285,9 +309,10 @@ static LogHandle *log_create_memfd(const char *name, uint64_t data_size, char *e
     if (data_size == 0) { LOG_ERR("data_size must be > 0"); return NULL; }
     if (data_size > UINT64_MAX - sizeof(LogHeader)) { LOG_ERR("data_size too large"); return NULL; }
     uint64_t total = sizeof(LogHeader) + data_size;
-    int fd = memfd_create(name ? name : "log", MFD_CLOEXEC);
+    int fd = memfd_create(name ? name : "log", MFD_CLOEXEC | MFD_ALLOW_SEALING);
     if (fd < 0) { LOG_ERR("memfd_create: %s", strerror(errno)); return NULL; }
     if (ftruncate(fd, (off_t)total) < 0) { LOG_ERR("ftruncate: %s", strerror(errno)); close(fd); return NULL; }
+    (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
     void *base = mmap(NULL, (size_t)total, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { LOG_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
     log_init_header(base, total, data_size);
@@ -302,9 +327,7 @@ static LogHandle *log_open_fd(int fd, char *errbuf) {
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { LOG_ERR("mmap: %s", strerror(errno)); return NULL; }
-    LogHeader *hdr = (LogHeader *)base;
-    if (hdr->magic != LOG_MAGIC || hdr->version != LOG_VERSION ||
-        hdr->total_size != (uint64_t)st.st_size) {
+    if (!log_validate_header((LogHeader *)base, (uint64_t)st.st_size)) {
         LOG_ERR("invalid log"); munmap(base, ms); return NULL;
     }
     int myfd = fcntl(fd, F_DUPFD_CLOEXEC, 0);
@@ -326,8 +349,9 @@ static void log_reset(LogHandle *h) {
     __atomic_store_n(&h->hdr->truncation, 0, __ATOMIC_RELEASE);
     __atomic_store_n(&h->hdr->tail, 0, __ATOMIC_RELEASE);
     __atomic_store_n(&h->hdr->count, 0, __ATOMIC_RELEASE);
+    __atomic_add_fetch(&h->hdr->wake_seq, 1, __ATOMIC_RELEASE);
     if (__atomic_load_n(&h->hdr->waiters, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &h->hdr->count, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+        syscall(SYS_futex, &h->hdr->wake_seq, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
 
 /* Concurrency-safe truncate: mark entries before offset as invalid.
@@ -348,7 +372,7 @@ static inline uint64_t log_truncation(LogHandle *h) {
 }
 
 static int log_create_eventfd(LogHandle *h) {
-    if (h->notify_fd >= 0) close(h->notify_fd);
+    if (h->notify_fd >= 0) return h->notify_fd;
     int efd = eventfd(0, EFD_NONBLOCK|EFD_CLOEXEC);
     if (efd < 0) return -1;
     h->notify_fd = efd; return efd;
@@ -363,6 +387,6 @@ static int64_t log_eventfd_consume(LogHandle *h) {
     if (read(h->notify_fd, &v, sizeof(v)) != sizeof(v)) return -1;
     return (int64_t)v;
 }
-static void log_msync(LogHandle *h) { msync(h->hdr, h->mmap_size, MS_SYNC); }
+static int log_msync(LogHandle *h) { return msync(h->hdr, h->mmap_size, MS_SYNC); }
 
 #endif /* LOG_H */

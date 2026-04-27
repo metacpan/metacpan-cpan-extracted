@@ -20,8 +20,13 @@
 #define COLOURING_CLASS_LEN  17
 
 /* ── Message store (set from Perl side) ───────────────────────── */
+/* Holds a refcount-managed reference to the user's message hash so
+ * the underlying HV stays alive after set_messages() returns. */
 
-static HV * MESSAGES;
+static SV * MESSAGES_REF = NULL;
+
+#define MESSAGES \
+	((MESSAGES_REF && SvROK(MESSAGES_REF)) ? (HV*)SvRV(MESSAGES_REF) : NULL)
 
 /* ── Bless a hash into the caller's class ─────────────────────── */
 
@@ -38,29 +43,24 @@ static SV * xs_new(SV * class, HV * hash) {
 
 static int numIs(SV * num) {
 	dTHX;
-	char * str = SvPV_nolen(num);
-	char tmp[256];
-	int i;
-	tmp[0] = '\0';
-	for (i = 0; str[i]; i++) {
-		int j = 0;
-		while (str[i] >= '0' && str[i] <= '9') {
-			tmp[j] = str[i];
-			i++;
-			j++;
-		}
-		break;
-	}
-	return strlen(tmp) >= 1 ? 1 : 0;
+	if (!num || !SvOK(num)) return 0;
+	/* looks_like_number is Perl's portable, bounds-safe numeric test
+	 * (handles ints, floats, scientific notation, Unicode digits). The
+	 * previous hand-rolled scanner had an unbounded write into a
+	 * fixed-size stack buffer — a stack-smash on long all-digit input. */
+	return looks_like_number(num) ? 1 : 0;
 }
 
 /* ── Scale a value that may be a percentage ───────────────────── */
 
 static double xs_scaled(SV * num, int size) {
 	dTHX;
-	char * number = SvPV_nolen(num);
+	STRLEN len;
+	char * number = SvPV(num, len);
 	double n = atof(number);
-	if (number[strlen(number)] == '%') {
+	/* Percent suffix: check the last *character*, not the trailing
+	 * NUL (`number[strlen(number)]` always reads '\0'). */
+	if (len > 0 && number[len - 1] == '%') {
 		return (n * size) / 100;
 	}
 	return n;
@@ -113,7 +113,10 @@ static SV * xs_convert_colour(const char * colour) {
 static SV * xs_new_color(SV * class, SV * colour, SV * a) {
 	dTHX;
 	HV * hash = newHV();
-	if (SvTYPE(SvRV(colour)) == SVt_PVAV) {
+	/* Branch on whether colour is a [r,g,b(,a)] arrayref or a string
+	 * like "#fff" / "rgb(...)". Crucially, SvRV() is undefined on a
+	 * non-reference SV — guard with SvROK first. */
+	if (SvROK(colour) && SvTYPE(SvRV(colour)) == SVt_PVAV) {
 		if (av_len((AV*)SvRV(colour)) == 3) {
 			a = av_pop((AV*)SvRV(colour));
 		}
@@ -151,10 +154,13 @@ static SV * xs_ensure_obj(SV * class, SV * colour) {
 }
 
 /* ── Convenience: class SV from constant ──────────────────────── */
+/* Mortalised so callers don't have to remember to free it. The hot
+ * path (custom ops + helper methods) was previously leaking one SV
+ * per invocation. */
 
 static SV * xs_class_sv(void) {
 	dTHX;
-	return newSVpv(COLOURING_CLASS, COLOURING_CLASS_LEN);
+	return sv_2mortal(newSVpv(COLOURING_CLASS, COLOURING_CLASS_LEN));
 }
 
 #endif /* COLOURING_IN_H */

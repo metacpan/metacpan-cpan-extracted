@@ -1,0 +1,94 @@
+BATsh Cheat Sheet [TH] ภาษาไทย
+==============================
+
+BATsh คือเซลล์สองภาษาที่รันทั้งไวยากรณ์ cmd.exe และ bash/sh
+ในสคริปต์เดียวกัน โทเคนแรกของแต่ละบรรทัดกำหนดโหมด
+
+1. การตรวจจับโหมด
+------------------
+  ECHO hello          -> โหมด cmd.exe (โทเคนแรกเป็นตัวพิมพ์ใหญ่ทั้งหมด)
+  echo hello          -> โหมด bash/sh (โทเคนแรกมีตัวพิมพ์เล็ก)
+  # คอมเมนต์      -> คอมเมนต์ (ไม่ใส่ใจ)
+  :: คอมเมนต์     -> คอมเมนต์แบบ CMD (ไม่ใส่ใจ)
+  REM คอมเมนต์    -> คอมเมนต์แบบ CMD (ไม่ใส่ใจ)
+
+2. เริ่มต้น Shell
+-----------------
+  perl lib/BATsh.pm                    # REPL แบบโต้ตอบ
+  perl lib/BATsh.pm script.batsh       # รันไฟล์สคริปต์
+  perl lib/BATsh.pm -e "echo sawasdee" # คำสั่งบรรทัดเดียว
+
+  จาก Perl API:
+    use BATsh;
+    BATsh->run('script.batsh');
+    BATsh->run_string("echo sawasdee");
+    BATsh->repl();
+
+3. สะพานตัวแปรสภาพแวดล้อม
+---------------------------------
+  บล็อก CMD และ SH แชร์ตัวแปรผ่าน %ENV ของ Perl
+
+  export FOO=sawasdee  # SH กำหนด FOO
+  ECHO %FOO%           # CMD อ่าน FOO ผ่านสะพาน (Windows)
+
+  SET BAR=lok          # CMD กำหนด BAR
+  echo $BAR            # SH อ่าน BAR ผ่านสะพาน
+
+4. SETLOCAL / ENDLOCAL
+-----------------------
+  SETLOCAL           # บันทึก %ENV
+  SET TMP=kha
+  ECHO %TMP%
+  ENDLOCAL           # คืนค่า %ENV (TMP หายไป)
+
+5. การซ้อน (โหมดผสม)
+---------------------------
+  โครงสร้างบล็อกต้องจับคู่อย่างถูกต้อง
+
+  for x in 1 2; do   # SH เปิดบล็อก
+      ECHO item $x   # บรรทัด CMD ในบล็อก SH
+  done               # SH ปิดบล็อก
+
+  คีย์เวิร์ด CMD: IF/ENDIF  FOR/NEXT  WHILE/WEND  DO/LOOP
+  คีย์เวิร์ด SH:  if/fi  for/done  while/done  until/done  case/esac  { }
+
+6. นิยามฟังก์ชันย่อย
+--------------------------
+  :GREET
+  echo "Sawasdee $BATSH_ARG1"
+  RET
+
+7. CALL และ source
+------------------
+  CALL :GREET lok        # เรียกฟังก์ชันย่อยพร้อมอาร์กิวเมนต์
+  CALL aun.batsh         # รวมไฟล์ .batsh อื่น (CMD)
+  source aun.batsh       # รวมไฟล์ .batsh อื่น (SH)
+  . aun.batsh            # สัญลักษณ์จุด POSIX
+
+  อาร์กิวเมนต์: $BATSH_ARG1 .. $BATSH_ARGn  (%BATSH_ARG1% ใน CMD)
+  จำนวน: $BATSH_ARGC
+
+8. Perl API
+-----------
+  BATsh->run($file)            # รันไฟล์ .batsh
+  BATsh->run_string($source)   # รันสตริงต้นทาง
+  BATsh->run_lines(@lines)     # รันอาร์เรย์ของบรรทัด
+  BATsh->repl()                # REPL แบบโต้ตอบ
+  BATsh->classify_token($tok)  # คืนค่า 'CMD' หรือ 'SH'
+  BATsh->setlocal()            # บันทึก %ENV
+  BATsh->endlocal()            # คืนค่า %ENV
+  BATsh->call_sub($lbl, @args) # เรียกฟังก์ชันย่อย
+  BATsh->source_file($file)    # รวมไฟล์ .batsh
+  BATsh->version()             # สตริงเวอร์ชัน
+
+9. หมายเหตุแพลตฟอร์ม
+---------------------
+  Windows: บล็อก CMD และ SH ทำงานบน Perl ล้วน -- ไม่ต้องการ cmd.exe/bash/sh ภายนอก
+  UNIX:    บล็อก CMD และ SH ทำงานบน Perl ล้วน -- ไม่ต้องการ cmd.exe/bash/sh ภายนอก
+
+10. ความต้องการ
+-----------------
+  Perl 5.005_03 ขึ้นไป เฉพาะโมดูลหลัก (File::Spec, Carp)
+  ไม่มีการพึ่งพา CPAN
+
+ดูเพิ่มเติม: https://metacpan.org/dist/BATsh

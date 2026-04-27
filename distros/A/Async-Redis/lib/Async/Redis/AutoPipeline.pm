@@ -5,8 +5,9 @@ use warnings;
 use 5.018;
 
 use Future;
+use Future::AsyncAwait;
 use Future::IO;
-use Scalar::Util qw(blessed);
+use Async::Redis::Error::Disconnected;
 
 sub new {
     my ($class, %args) = @_;
@@ -74,47 +75,72 @@ sub _do_flush {
     $self->{_flushing} = 0;
 }
 
+# Detach and return all queued-but-not-yet-flushed commands. Caller is
+# responsible for failing their futures. Called by Async::Redis::_reader_fatal
+# when the connection dies before a scheduled flush.
+sub _detach_queued {
+    my ($self) = @_;
+    my $queued = $self->{_queue} // [];
+    $self->{_queue} = [];
+    $self->{_flush_pending} = 0;
+    return $queued;
+}
+
 sub _send_batch {
     my ($self, $batch) = @_;
-
     my $redis = $self->{redis};
 
-    # Build pipeline commands
-    my @commands = map { $_->{cmd} } @$batch;
+    my @commands = map { $_->{cmd}    } @$batch;
     my @futures  = map { $_->{future} } @$batch;
 
-    # Execute pipeline and distribute results
-    # Keep reference to the pipeline future to prevent it from being lost
-    my $pipeline_f = $redis->_execute_pipeline(\@commands);
+    my $submit = (async sub {
+        my $buffer = '';
+        my @deadlines;
+        for my $cmd (@commands) {
+            $buffer .= $redis->_build_command(@$cmd);
+            push @deadlines, $redis->_calculate_deadline(@$cmd);
+        }
 
-    $pipeline_f->on_done(sub {
-        my ($results) = @_;
+        await $redis->_with_write_gate(sub {
+            return (async sub {
+                if (!$redis->{_socket_live}) {
+                    if ($redis->_reconnect_enabled) {
+                        await $redis->_ensure_connected;
+                    } else {
+                        die Async::Redis::Error::Disconnected->new(
+                            message => "Not connected",
+                        );
+                    }
+                }
+                for my $i (0 .. $#commands) {
+                    $redis->_add_inflight(
+                        $futures[$i],
+                        $commands[$i][0],
+                        [ @{$commands[$i]}[1..$#{$commands[$i]}] ],
+                        $deadlines[$i],
+                        'fail',
+                    );
+                }
+                await $redis->_send($buffer);
+            })->();
+        });
 
-        for my $i (0 .. $#$results) {
-            my $result = $results->[$i];
-            my $future = $futures[$i];
+        $redis->_ensure_reader;
+    })->();
 
-            # Check if result is an error object (from pipeline inline capture)
-            if (blessed($result) && $result->isa('Async::Redis::Error')) {
-                $future->fail($result);
-            }
-            else {
-                $future->done($result);
-            }
+    # Transport failure on submit cascades to every future that wasn't
+    # already failed by _reader_fatal.
+    $submit->on_fail(sub {
+        my ($err) = @_;
+        for my $f (@futures) {
+            $f->fail($err) unless $f->is_ready;
         }
     });
 
-    $pipeline_f->on_fail(sub {
-        my ($error) = @_;
-
-        # Transport failure - fail all futures
-        for my $future (@futures) {
-            $future->fail($error) unless $future->is_ready;
-        }
-    });
-
-    # Retain the future to keep the async operation alive
-    $pipeline_f->retain;
+    # Ownership: the client's Future::Selector (_tasks) owns this submit
+    # task. Any caller currently awaiting inside run_until_ready sees a
+    # submit failure propagated via the selector. No ->retain needed.
+    $redis->{_tasks}->add(data => 'autopipe-submit', f => $submit);
 }
 
 1;
@@ -142,10 +168,25 @@ without changing the caller's API.
 
 When C<auto_pipeline =E<gt> 1>:
 
-1. Commands queue locally instead of sending immediately
-2. A "next tick" callback is scheduled
-3. When event loop yields, all queued commands flush as pipeline
-4. Responses distributed to original futures
+=over 4
+
+=item 1.
+
+Commands queue locally instead of sending immediately.
+
+=item 2.
+
+A next-tick flush is scheduled with C<< Future::IO->sleep(0) >>.
+
+=item 3.
+
+When the event loop yields, queued commands flush as a pipeline.
+
+=item 4.
+
+Responses are distributed to the original command futures.
+
+=back
 
 =head2 Invariants
 
@@ -157,7 +198,7 @@ When C<auto_pipeline =E<gt> 1>:
 
 =item * Depth limit triggers multiple batches if exceeded
 
-=item * C<Future::IO-E<gt>later> is non-blocking next-tick
+=item * C<< Future::IO->sleep(0) >> provides the non-blocking yield point
 
 =back
 

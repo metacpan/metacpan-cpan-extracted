@@ -2,7 +2,7 @@ package Data::Buffer::Shared::U64;
 use strict;
 use warnings;
 use Data::Buffer::Shared;
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 sub import {
     $^H{"Data::Buffer::Shared::U64/buf_u64_get"} = 1;
@@ -31,4 +31,5 @@ sub import {
     $^H{"Data::Buffer::Shared::U64/buf_u64_atomic_xor"} = 1;
 }
 
+*memfd = \&fd;
 1;

@@ -116,6 +116,39 @@ SKIP: {
         is($exists, 0, 'key deleted');
     };
 
+    subtest 'prefix applied to newly-covered commands (Task 22)' => sub {
+        my $raw = Async::Redis->new(host => $ENV{REDIS_HOST} // 'localhost');
+        run { $raw->connect };
+
+        my $r = Async::Redis->new(
+            host   => $ENV{REDIS_HOST} // 'localhost',
+            prefix => 'p22test:',
+        );
+        run { $r->connect };
+
+        run { $r->pfadd('myset', 'elem1') };
+        my $exists_pf = run { $raw->exists('p22test:myset') };
+        ok $exists_pf, 'PFADD key was prefixed';
+
+        run { $r->setbit('bitkey', 0, 1) };
+        my $exists_bit = run { $raw->exists('p22test:bitkey') };
+        ok $exists_bit, 'SETBIT key was prefixed';
+
+        # PFCOUNT: all args are keys, so they get prefixed
+        my $count = run { $r->pfcount('myset') };
+        ok defined $count, 'PFCOUNT executed with prefixed key';
+
+        # HSTRLEN
+        run { $r->hset('myhash22', 'field', 'value') };
+        my $hlen = run { $r->hstrlen('myhash22', 'field') };
+        is $hlen, 5, 'HSTRLEN with prefixed key';
+
+        # Cleanup
+        run { $raw->del('p22test:myset', 'p22test:bitkey', 'p22test:myhash22') };
+        $r->disconnect;
+        $raw->disconnect;
+    };
+
     subtest 'no prefix when disabled' => sub {
         my $no_prefix = Async::Redis->new(host => $ENV{REDIS_HOST} // 'localhost');
         run { $no_prefix->connect };

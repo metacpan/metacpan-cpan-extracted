@@ -34,7 +34,7 @@ my $cpandist = CPAN::Distribution->new(
 	"TIME" => 1777023381
     }, 'CPAN::Distrostatus'),
 );
-ok !$p->{_mapper_ran}, 'mapper did not yet ran';
+is_deeply $p->{_mapper_ran}, {}, 'mapper did not yet ran';
 {
     my @warnings;
     local $SIG{__WARN__} = sub { push @warnings, @_ };
@@ -44,12 +44,12 @@ ok !$p->{_mapper_ran}, 'mapper did not yet ran';
     is $p->_dist_get_base_id($cpandist), '.', '_dist_get_base_id indicates local directory';
     is_deeply [$p->_dist_containsmods($cpandist)], [], 'no containsmods found';
 }
-ok $p->{_mapper_ran}, 'mapper ran';
+ok $p->{_mapper_ran}{"/home/user/src/CPAN/XML-Parser/."}, 'mapper ran';
 undef $p;
 
 {
     my $p2 = CPAN::Plugin::Sysdeps->new('batch', 'dryrun');
-    ok !$p2->{_mapper_ran}, 'mapper did not yet ran';
+    is_deeply $p2->{_mapper_ran}, {}, 'mapper did not yet ran';
     local $ENV{CPAN_PLUGIN_SYSDEPS_MODULE} = 'XML::Parser';
     {
 	my @warnings;
@@ -61,5 +61,5 @@ undef $p;
 	is $p2->_dist_get_base_id($cpandist), '.', '_dist_get_base_id still indicates local directory'; # may change if something like CPAN_PLUGIN_SYSDEPS_DIST_ID or so was implemented and used
 	is_deeply [$p2->_dist_containsmods($cpandist)], ['XML::Parser'], 'found injected module in containsmods';
     }
-    ok $p2->{_mapper_ran}, 'mapper ran';
+    ok $p2->{_mapper_ran}{"/home/user/src/CPAN/XML-Parser/."}, 'mapper ran';
 }

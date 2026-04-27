@@ -86,7 +86,8 @@ typedef struct {
     uint64_t stat_waits;     /* 104 */
     uint64_t stat_timeouts;  /* 112 */
     uint32_t stat_signals;   /* 120 */
-    uint8_t  _pad1[4];       /* 124-127 */
+    uint32_t rwlock_writers_waiting; /* 124: RWLock write-preferring yield signal
+                                             (writers only, not readers) */
 } SyncHeader;
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
@@ -165,7 +166,7 @@ static inline void sync_recover_stale_mutex(SyncHeader *hdr, uint32_t observed) 
         return;
     __atomic_add_fetch(&hdr->stat_recoveries, 1, __ATOMIC_RELAXED);
     if (__atomic_load_n(&hdr->mutex_waiters, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->mutex, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+        syscall(SYS_futex, &hdr->mutex, FUTEX_WAKE, 1, NULL, NULL, 0);
 }
 
 static inline void sync_mutex_lock(SyncHeader *hdr) {
@@ -234,10 +235,16 @@ static inline void sync_recover_stale_rwlock(SyncHeader *hdr, uint32_t observed)
 static inline void sync_rwlock_rdlock(SyncHeader *hdr) {
     uint32_t *lock = &hdr->value;
     uint32_t *w = &hdr->waiters;
+    uint32_t *writers_waiting = &hdr->rwlock_writers_waiting;
     for (int spin = 0; ; spin++) {
         uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
-        if (cur < SYNC_RWLOCK_WRITER_BIT) {
+        /* Write-preferring: yield to parked writers when lock is free. */
+        if (cur > 0 && cur < SYNC_RWLOCK_WRITER_BIT) {
             if (__atomic_compare_exchange_n(lock, &cur, cur + 1,
+                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                return;
+        } else if (cur == 0 && !__atomic_load_n(writers_waiting, __ATOMIC_RELAXED)) {
+            if (__atomic_compare_exchange_n(lock, &cur, 1,
                     1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
                 return;
         }
@@ -247,16 +254,27 @@ static inline void sync_rwlock_rdlock(SyncHeader *hdr) {
         }
         __atomic_add_fetch(w, 1, __ATOMIC_RELAXED);
         cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
-        if (cur >= SYNC_RWLOCK_WRITER_BIT) {
+        /* Sleep when write-locked OR yielding to parked writers (cur==0) */
+        if (cur >= SYNC_RWLOCK_WRITER_BIT || cur == 0) {
             long rc = syscall(SYS_futex, lock, FUTEX_WAIT, cur,
                               &sync_lock_timeout, NULL, 0);
             if (rc == -1 && errno == ETIMEDOUT) {
                 __atomic_sub_fetch(w, 1, __ATOMIC_RELAXED);
-                uint32_t val = __atomic_load_n(lock, __ATOMIC_RELAXED);
-                if (val >= SYNC_RWLOCK_WRITER_BIT) {
-                    uint32_t pid = val & SYNC_RWLOCK_PID_MASK;
-                    if (!sync_pid_alive(pid))
-                        sync_recover_stale_rwlock(hdr, val);
+                if (cur >= SYNC_RWLOCK_WRITER_BIT) {
+                    uint32_t val = __atomic_load_n(lock, __ATOMIC_RELAXED);
+                    if (val >= SYNC_RWLOCK_WRITER_BIT) {
+                        uint32_t pid = val & SYNC_RWLOCK_PID_MASK;
+                        if (!sync_pid_alive(pid))
+                            sync_recover_stale_rwlock(hdr, val);
+                    }
+                } else {
+                    /* Yielding to writers timed out — optimistically drop one
+                     * writers_waiting to recover from potentially-crashed
+                     * parked writer. A live writer just re-increments. */
+                    uint32_t wc = __atomic_load_n(writers_waiting, __ATOMIC_RELAXED);
+                    while (wc > 0 && !__atomic_compare_exchange_n(
+                            writers_waiting, &wc, wc - 1,
+                            1, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {}
                 }
                 spin = 0;
                 continue;
@@ -267,10 +285,14 @@ static inline void sync_rwlock_rdlock(SyncHeader *hdr) {
     }
 }
 
-/* Timed rdlock: returns 1 on success, 0 on timeout. timeout<0 = infinite. */
+/* Timed rdlock: returns 1 on success, 0 on timeout. timeout<0 = infinite.
+ * No try-lock fast-path: would bypass write-preference when cur==0 &&
+ * writers_waiting > 0. Main loop's first iteration handles the uncontended
+ * case at ~same cost. */
 static inline int sync_rwlock_rdlock_timed(SyncHeader *hdr, double timeout) {
-    if (sync_rwlock_try_rdlock(hdr)) return 1;
-    if (timeout == 0) return 0;
+    if (timeout == 0) {
+        return sync_rwlock_try_rdlock(hdr);
+    }
 
     uint32_t *lock = &hdr->value;
     uint32_t *w = &hdr->waiters;
@@ -278,10 +300,15 @@ static inline int sync_rwlock_rdlock_timed(SyncHeader *hdr, double timeout) {
     int has_deadline = (timeout > 0);
     if (has_deadline) sync_make_deadline(timeout, &deadline);
 
+    uint32_t *writers_waiting = &hdr->rwlock_writers_waiting;
     for (int spin = 0; ; spin++) {
         uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
-        if (cur < SYNC_RWLOCK_WRITER_BIT) {
+        if (cur > 0 && cur < SYNC_RWLOCK_WRITER_BIT) {
             if (__atomic_compare_exchange_n(lock, &cur, cur + 1,
+                    1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
+                return 1;
+        } else if (cur == 0 && !__atomic_load_n(writers_waiting, __ATOMIC_RELAXED)) {
+            if (__atomic_compare_exchange_n(lock, &cur, 1,
                     1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
                 return 1;
         }
@@ -291,27 +318,39 @@ static inline int sync_rwlock_rdlock_timed(SyncHeader *hdr, double timeout) {
         }
         __atomic_add_fetch(w, 1, __ATOMIC_RELAXED);
         cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
-        if (cur >= SYNC_RWLOCK_WRITER_BIT) {
+        if (cur >= SYNC_RWLOCK_WRITER_BIT || cur == 0) {
             struct timespec *pts = NULL;
+            /* Cap wait at SYNC_LOCK_TIMEOUT_SEC so stale-holder recovery
+             * runs periodically even with a user-supplied deadline. */
             if (has_deadline) {
                 if (!sync_remaining_time(&deadline, &remaining)) {
                     __atomic_sub_fetch(w, 1, __ATOMIC_RELAXED);
                     return 0;
                 }
-                pts = &remaining;
+                if (remaining.tv_sec >= SYNC_LOCK_TIMEOUT_SEC)
+                    pts = (struct timespec *)&sync_lock_timeout;
+                else
+                    pts = &remaining;
             } else {
                 pts = (struct timespec *)&sync_lock_timeout;
             }
             long rc = syscall(SYS_futex, lock, FUTEX_WAIT, cur, pts, NULL, 0);
             if (rc == -1 && errno == ETIMEDOUT) {
                 __atomic_sub_fetch(w, 1, __ATOMIC_RELAXED);
-                if (!has_deadline) {
+                if (cur >= SYNC_RWLOCK_WRITER_BIT) {
                     uint32_t val = __atomic_load_n(lock, __ATOMIC_RELAXED);
                     if (val >= SYNC_RWLOCK_WRITER_BIT) {
                         uint32_t pid = val & SYNC_RWLOCK_PID_MASK;
                         if (!sync_pid_alive(pid))
                             sync_recover_stale_rwlock(hdr, val);
                     }
+                } else {
+                    /* Yielding to writer timed out — drop one writers_waiting
+                     * to recover from a potentially-crashed parked writer. */
+                    uint32_t wc = __atomic_load_n(writers_waiting, __ATOMIC_RELAXED);
+                    while (wc > 0 && !__atomic_compare_exchange_n(
+                            writers_waiting, &wc, wc - 1,
+                            1, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {}
                 }
                 spin = 0;
                 continue;
@@ -338,6 +377,7 @@ static inline void sync_rwlock_rdunlock(SyncHeader *hdr) {
 static inline void sync_rwlock_wrlock(SyncHeader *hdr) {
     uint32_t *lock = &hdr->value;
     uint32_t *w = &hdr->waiters;
+    uint32_t *writers_waiting = &hdr->rwlock_writers_waiting;
     uint32_t mypid = SYNC_RWLOCK_WR((uint32_t)getpid());
     for (int spin = 0; ; spin++) {
         uint32_t expected = 0;
@@ -349,12 +389,14 @@ static inline void sync_rwlock_wrlock(SyncHeader *hdr) {
             continue;
         }
         __atomic_add_fetch(w, 1, __ATOMIC_RELAXED);
+        __atomic_add_fetch(writers_waiting, 1, __ATOMIC_RELAXED);
         uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
         if (cur != 0) {
             long rc = syscall(SYS_futex, lock, FUTEX_WAIT, cur,
                               &sync_lock_timeout, NULL, 0);
             if (rc == -1 && errno == ETIMEDOUT) {
                 __atomic_sub_fetch(w, 1, __ATOMIC_RELAXED);
+                __atomic_sub_fetch(writers_waiting, 1, __ATOMIC_RELAXED);
                 uint32_t val = __atomic_load_n(lock, __ATOMIC_RELAXED);
                 if (val >= SYNC_RWLOCK_WRITER_BIT) {
                     uint32_t pid = val & SYNC_RWLOCK_PID_MASK;
@@ -366,6 +408,7 @@ static inline void sync_rwlock_wrlock(SyncHeader *hdr) {
             }
         }
         __atomic_sub_fetch(w, 1, __ATOMIC_RELAXED);
+        __atomic_sub_fetch(writers_waiting, 1, __ATOMIC_RELAXED);
         spin = 0;
     }
 }
@@ -377,6 +420,7 @@ static inline int sync_rwlock_wrlock_timed(SyncHeader *hdr, double timeout) {
 
     uint32_t *lock = &hdr->value;
     uint32_t *w = &hdr->waiters;
+    uint32_t *writers_waiting = &hdr->rwlock_writers_waiting;
     uint32_t mypid = SYNC_RWLOCK_WR((uint32_t)getpid());
     struct timespec deadline, remaining;
     int has_deadline = (timeout > 0);
@@ -392,34 +436,41 @@ static inline int sync_rwlock_wrlock_timed(SyncHeader *hdr, double timeout) {
             continue;
         }
         __atomic_add_fetch(w, 1, __ATOMIC_RELAXED);
+        __atomic_add_fetch(writers_waiting, 1, __ATOMIC_RELAXED);
         uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
         if (cur != 0) {
             struct timespec *pts = NULL;
+            /* Cap wait at SYNC_LOCK_TIMEOUT_SEC so stale-holder recovery
+             * runs periodically even with a user-supplied deadline. */
             if (has_deadline) {
                 if (!sync_remaining_time(&deadline, &remaining)) {
                     __atomic_sub_fetch(w, 1, __ATOMIC_RELAXED);
+                    __atomic_sub_fetch(writers_waiting, 1, __ATOMIC_RELAXED);
                     return 0;
                 }
-                pts = &remaining;
+                if (remaining.tv_sec >= SYNC_LOCK_TIMEOUT_SEC)
+                    pts = (struct timespec *)&sync_lock_timeout;
+                else
+                    pts = &remaining;
             } else {
                 pts = (struct timespec *)&sync_lock_timeout;
             }
             long rc = syscall(SYS_futex, lock, FUTEX_WAIT, cur, pts, NULL, 0);
             if (rc == -1 && errno == ETIMEDOUT) {
                 __atomic_sub_fetch(w, 1, __ATOMIC_RELAXED);
-                if (!has_deadline) {
-                    uint32_t val = __atomic_load_n(lock, __ATOMIC_RELAXED);
-                    if (val >= SYNC_RWLOCK_WRITER_BIT) {
-                        uint32_t pid = val & SYNC_RWLOCK_PID_MASK;
-                        if (!sync_pid_alive(pid))
-                            sync_recover_stale_rwlock(hdr, val);
-                    }
+                __atomic_sub_fetch(writers_waiting, 1, __ATOMIC_RELAXED);
+                uint32_t val = __atomic_load_n(lock, __ATOMIC_RELAXED);
+                if (val >= SYNC_RWLOCK_WRITER_BIT) {
+                    uint32_t pid = val & SYNC_RWLOCK_PID_MASK;
+                    if (!sync_pid_alive(pid))
+                        sync_recover_stale_rwlock(hdr, val);
                 }
                 spin = 0;
                 continue;
             }
         }
         __atomic_sub_fetch(w, 1, __ATOMIC_RELAXED);
+        __atomic_sub_fetch(writers_waiting, 1, __ATOMIC_RELAXED);
         spin = 0;
     }
 }
@@ -615,15 +666,10 @@ static inline void sync_sem_release_n(SyncHandle *h, uint32_t n) {
 /* Drain: acquire all available permits at once, return count acquired */
 static inline uint32_t sync_sem_drain(SyncHandle *h) {
     SyncHeader *hdr = h->hdr;
-    for (;;) {
-        uint32_t cur = __atomic_load_n(&hdr->value, __ATOMIC_RELAXED);
-        if (cur == 0) return 0;
-        if (__atomic_compare_exchange_n(&hdr->value, &cur, 0,
-                1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
-            __atomic_add_fetch(&hdr->stat_acquires, 1, __ATOMIC_RELAXED);
-            return cur;
-        }
-    }
+    uint32_t cur = __atomic_exchange_n(&hdr->value, 0, __ATOMIC_ACQUIRE);
+    if (cur == 0) return 0;
+    __atomic_add_fetch(&hdr->stat_acquires, 1, __ATOMIC_RELAXED);
+    return cur;
 }
 
 static inline uint32_t sync_sem_value(SyncHandle *h) {
@@ -635,8 +681,17 @@ static inline uint32_t sync_sem_value(SyncHandle *h) {
  *
  * param = number of parties
  * value = arrived count (0..param)
- * generation = increments each time barrier trips
+ * generation = bit 31: "broken" flag (set on timeout)
+ *              bits 0..30: generation counter (bumped each trip/reset)
+ *
+ * Timeout breaks the barrier permanently; all waiters return -1 and all
+ * future wait() calls also return -1 until sync_barrier_reset() is called.
+ * This mirrors pthread_barrier "broken" semantics and avoids the race where
+ * a timed-out waiter's reset raced with new-generation arrivals.
  * ================================================================ */
+
+#define SYNC_BARRIER_BROKEN_BIT 0x80000000U
+#define SYNC_BARRIER_GEN_MASK   0x7FFFFFFFU
 
 static inline int sync_barrier_wait(SyncHandle *h, double timeout) {
     SyncHeader *hdr = h->hdr;
@@ -644,21 +699,34 @@ static inline int sync_barrier_wait(SyncHandle *h, double timeout) {
 
     if (timeout == 0) return -1;  /* non-blocking probe: can't rendezvous instantly */
 
-    uint32_t gen = __atomic_load_n(&hdr->generation, __ATOMIC_ACQUIRE);
+    uint32_t gen_raw = __atomic_load_n(&hdr->generation, __ATOMIC_ACQUIRE);
+    if (gen_raw & SYNC_BARRIER_BROKEN_BIT) return -1;  /* already broken */
+
     uint32_t arrived = __atomic_add_fetch(&hdr->value, 1, __ATOMIC_ACQ_REL);
 
     if (arrived == parties) {
-        /* Last to arrive — trip the barrier */
+        /* Last to arrive — trip the barrier. CAS preserves broken bit invariant. */
         __atomic_store_n(&hdr->value, 0, __ATOMIC_RELEASE);
-        __atomic_add_fetch(&hdr->generation, 1, __ATOMIC_RELEASE);
+        for (;;) {
+            uint32_t old_g = __atomic_load_n(&hdr->generation, __ATOMIC_RELAXED);
+            if (old_g & SYNC_BARRIER_BROKEN_BIT) {
+                __atomic_add_fetch(&hdr->stat_timeouts, 1, __ATOMIC_RELAXED);
+                if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
+                    syscall(SYS_futex, &hdr->generation, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+                return -1;
+            }
+            uint32_t new_g = (old_g + 1) & SYNC_BARRIER_GEN_MASK;
+            if (__atomic_compare_exchange_n(&hdr->generation, &old_g, new_g,
+                    0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
+                break;
+        }
         __atomic_add_fetch(&hdr->stat_releases, 1, __ATOMIC_RELAXED);
-        /* Wake all waiters */
         if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
             syscall(SYS_futex, &hdr->generation, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
         return 1;  /* leader */
     }
 
-    /* Not last — wait for generation to change */
+    /* Not last — wait for generation to change or broken bit to appear */
     __atomic_add_fetch(&hdr->stat_waits, 1, __ATOMIC_RELAXED);
 
     struct timespec deadline, remaining;
@@ -666,8 +734,9 @@ static inline int sync_barrier_wait(SyncHandle *h, double timeout) {
     if (has_deadline) sync_make_deadline(timeout, &deadline);
 
     for (;;) {
-        uint32_t cur_gen = __atomic_load_n(&hdr->generation, __ATOMIC_ACQUIRE);
-        if (cur_gen != gen) return 0;  /* barrier tripped */
+        uint32_t cur_raw = __atomic_load_n(&hdr->generation, __ATOMIC_ACQUIRE);
+        if (cur_raw & SYNC_BARRIER_BROKEN_BIT) return -1;  /* broken */
+        if (cur_raw != gen_raw) return 0;  /* barrier tripped */
 
         __atomic_add_fetch(&hdr->waiters, 1, __ATOMIC_RELAXED);
 
@@ -675,38 +744,54 @@ static inline int sync_barrier_wait(SyncHandle *h, double timeout) {
         if (has_deadline) {
             if (!sync_remaining_time(&deadline, &remaining)) {
                 __atomic_sub_fetch(&hdr->waiters, 1, __ATOMIC_RELAXED);
-                __atomic_add_fetch(&hdr->stat_timeouts, 1, __ATOMIC_RELAXED);
-                /* Break the barrier — reset arrived before bumping
-                 * generation so new arrivals see value=0. CAS on
-                 * generation ensures only one process does the reset. */
-                __atomic_store_n(&hdr->value, 0, __ATOMIC_RELEASE);
-                uint32_t cur_g = gen;
-                if (__atomic_compare_exchange_n(&hdr->generation, &cur_g,
-                        gen + 1, 0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) {
-                    syscall(SYS_futex, &hdr->generation, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+                /* Try to break the barrier. If CAS fails with BROKEN_BIT
+                 * clear, only gen changed — our cohort tripped → return 0.
+                 * If CAS fails with BROKEN_BIT set, current state is
+                 * broken (whether by us, another waiter, or trip+re-break)
+                 * → return -1, matching the non-timeout path. */
+                uint32_t g = gen_raw;
+                if (!__atomic_compare_exchange_n(&hdr->generation, &g,
+                        gen_raw | SYNC_BARRIER_BROKEN_BIT,
+                        0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)
+                    && !(g & SYNC_BARRIER_BROKEN_BIT)) {
+                    return 0;
                 }
-                return -1;  /* timeout */
+                __atomic_add_fetch(&hdr->stat_timeouts, 1, __ATOMIC_RELAXED);
+                syscall(SYS_futex, &hdr->generation, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+                return -1;
             }
             pts = &remaining;
         }
 
-        syscall(SYS_futex, &hdr->generation, FUTEX_WAIT, gen, pts, NULL, 0);
+        syscall(SYS_futex, &hdr->generation, FUTEX_WAIT, gen_raw, pts, NULL, 0);
         __atomic_sub_fetch(&hdr->waiters, 1, __ATOMIC_RELAXED);
     }
 }
 
 static inline uint32_t sync_barrier_generation(SyncHandle *h) {
-    return __atomic_load_n(&h->hdr->generation, __ATOMIC_RELAXED);
+    return __atomic_load_n(&h->hdr->generation, __ATOMIC_RELAXED) & SYNC_BARRIER_GEN_MASK;
 }
 
 static inline uint32_t sync_barrier_arrived(SyncHandle *h) {
     return __atomic_load_n(&h->hdr->value, __ATOMIC_RELAXED);
 }
 
+static inline int sync_barrier_is_broken(SyncHandle *h) {
+    return (__atomic_load_n(&h->hdr->generation, __ATOMIC_RELAXED)
+            & SYNC_BARRIER_BROKEN_BIT) != 0;
+}
+
 static inline void sync_barrier_reset(SyncHandle *h) {
     SyncHeader *hdr = h->hdr;
     __atomic_store_n(&hdr->value, 0, __ATOMIC_RELEASE);
-    __atomic_add_fetch(&hdr->generation, 1, __ATOMIC_RELEASE);
+    /* Bump gen and clear broken bit in one CAS */
+    for (;;) {
+        uint32_t old_g = __atomic_load_n(&hdr->generation, __ATOMIC_RELAXED);
+        uint32_t new_g = ((old_g & SYNC_BARRIER_GEN_MASK) + 1) & SYNC_BARRIER_GEN_MASK;
+        if (__atomic_compare_exchange_n(&hdr->generation, &old_g, new_g,
+                0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
+            break;
+    }
     if (__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED) > 0)
         syscall(SYS_futex, &hdr->generation, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
 }
@@ -883,14 +968,17 @@ static inline int sync_once_enter(SyncHandle *h, double timeout) {
 
         __atomic_add_fetch(&hdr->waiters, 1, __ATOMIC_RELAXED);
 
-        struct timespec *pts = NULL;
+        /* Always cap at SYNC_LOCK_TIMEOUT_SEC so stale-initializer recovery
+         * runs periodically even when the caller specifies infinite timeout. */
+        struct timespec *pts = (struct timespec *)&sync_lock_timeout;
         if (has_deadline) {
             if (!sync_remaining_time(&deadline, &remaining)) {
                 __atomic_sub_fetch(&hdr->waiters, 1, __ATOMIC_RELAXED);
                 __atomic_add_fetch(&hdr->stat_timeouts, 1, __ATOMIC_RELAXED);
                 return 0;
             }
-            pts = &remaining;
+            if (remaining.tv_sec < SYNC_LOCK_TIMEOUT_SEC)
+                pts = &remaining;
         }
 
         syscall(SYS_futex, &hdr->value, FUTEX_WAIT, val, pts, NULL, 0);
@@ -1047,13 +1135,14 @@ static SyncHandle *sync_create_memfd(const char *name, uint32_t type,
 
     uint64_t total_size = sizeof(SyncHeader);
 
-    int fd = memfd_create(name ? name : "sync", MFD_CLOEXEC);
+    int fd = memfd_create(name ? name : "sync", MFD_CLOEXEC | MFD_ALLOW_SEALING);
     if (fd < 0) { SYNC_ERR("memfd_create: %s", strerror(errno)); return NULL; }
 
     if (ftruncate(fd, (off_t)total_size) < 0) {
         SYNC_ERR("ftruncate(memfd): %s", strerror(errno));
         close(fd); return NULL;
     }
+    (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
 
     void *base = mmap(NULL, (size_t)total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) {
@@ -1151,7 +1240,7 @@ static void sync_destroy(SyncHandle *h) {
  * ================================================================ */
 
 static int sync_create_eventfd(SyncHandle *h) {
-    if (h->notify_fd >= 0) close(h->notify_fd);
+    if (h->notify_fd >= 0) return h->notify_fd;
     int efd = eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
     if (efd < 0) return -1;
     h->notify_fd = efd;
@@ -1175,8 +1264,8 @@ static int64_t sync_eventfd_consume(SyncHandle *h) {
  * Misc
  * ================================================================ */
 
-static void sync_msync(SyncHandle *h) {
-    msync(h->hdr, h->mmap_size, MS_SYNC);
+static int sync_msync(SyncHandle *h) {
+    return msync(h->hdr, h->mmap_size, MS_SYNC);
 }
 
 #endif /* SYNC_H */

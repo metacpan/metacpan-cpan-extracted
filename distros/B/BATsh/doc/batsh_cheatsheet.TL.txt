@@ -1,0 +1,95 @@
+BATsh Cheat Sheet [TL] Filipino
+=================================
+
+Ang BATsh ay isang dalawang-wikang shell na nagpapatakbo ng cmd.exe
+at bash/sh na syntax sa iisang script. Ang unang token ng bawat linya
+ang nagtatakda ng mode.
+
+1. Pagtuklas ng Mode
+---------------------
+  ECHO hello          -> cmd.exe mode (unang token puro malaking titik)
+  echo hello          -> bash/sh mode (unang token may maliit na titik)
+  # komento           -> komento (hindi pinapansin)
+  :: komento          -> komento (estilo ng CMD, hindi pinapansin)
+  REM komento         -> komento (estilo ng CMD, hindi pinapansin)
+
+2. Pagsisimula ng Shell
+------------------------
+  perl lib/BATsh.pm                    # interactive na REPL
+  perl lib/BATsh.pm script.batsh       # patakbuhin ang script file
+  perl lib/BATsh.pm -e "echo kumusta"  # isang linyang utos
+
+  Mula sa Perl API:
+    use BATsh;
+    BATsh->run('script.batsh');
+    BATsh->run_string("echo kumusta");
+    BATsh->repl();
+
+3. Tulay ng Environment Variable
+----------------------------------
+  Ang CMD at SH blocks ay nagbabahagi ng mga variable sa pamamagitan ng %ENV ng Perl.
+
+  export FOO=kumusta  # itinakda ng SH ang FOO
+  ECHO %FOO%          # binabasa ng CMD ang FOO sa pamamagitan ng tulay (Windows)
+
+  SET BAR=mundo       # itinakda ng CMD ang BAR
+  echo $BAR           # binabasa ng SH ang BAR sa pamamagitan ng tulay
+
+4. SETLOCAL / ENDLOCAL
+-----------------------
+  SETLOCAL           # larawan ng %ENV
+  SET TMP=lokal
+  ECHO %TMP%
+  ENDLOCAL           # ibalik ang %ENV (mawawala ang TMP)
+
+5. Pagtatago (Mixed Mode)
+--------------------------
+  Ang mga block construct ay dapat tamang ipares.
+
+  for x in 1 2; do   # binubuksan ng SH ang block
+      ECHO item $x   # linya ng CMD sa loob ng SH block
+  done               # isinasara ng SH ang block
+
+  CMD keywords: IF/ENDIF  FOR/NEXT  WHILE/WEND  DO/LOOP
+  SH  keywords: if/fi  for/done  while/done  until/done  case/esac  { }
+
+6. Mga Kahulugan ng Subroutine
+--------------------------------
+  :GREET
+  echo "Kumusta $BATSH_ARG1"
+  RET
+
+7. CALL at source
+------------------
+  CALL :GREET mundo      # tumawag ng subroutine na may argumento
+  CALL iba.batsh         # isama/patakbuhin ang isa pang .batsh file (CMD)
+  source iba.batsh       # isama/patakbuhin ang isa pang .batsh file (SH)
+  . iba.batsh            # POSIX na tuldok na notasyon
+
+  Mga argumento: $BATSH_ARG1 .. $BATSH_ARGn  (%BATSH_ARG1% sa CMD)
+  Bilang:        $BATSH_ARGC
+
+8. Perl API
+-----------
+  BATsh->run($file)            # patakbuhin ang .batsh file
+  BATsh->run_string($source)   # patakbuhin ang source string
+  BATsh->run_lines(@lines)     # patakbuhin ang array ng mga linya
+  BATsh->repl()                # interactive na REPL
+  BATsh->classify_token($tok)  # ibalik ang 'CMD' o 'SH'
+  BATsh->setlocal()            # larawan ng %ENV
+  BATsh->endlocal()            # ibalik ang %ENV
+  BATsh->call_sub($lbl, @args) # tumawag ng subroutine
+  BATsh->source_file($file)    # isama ang .batsh file
+  BATsh->version()             # string ng bersyon
+
+9. Mga Tala sa Platform
+------------------------
+  Windows: Parehong CMD at SH na seksyon ay tumatakbo sa purong Perl -- walang kailangan na cmd.exe/bash/sh.
+  UNIX:    Parehong CMD at SH na seksyon ay tumatakbo sa purong Perl -- walang kailangan na cmd.exe/bash/sh.
+
+10. Mga Kinakailangan
+---------------------
+  Perl 5.005_03 o mas mataas. Mga core module lamang (File::Spec, Carp).
+  Walang CPAN na dependensya.
+
+Tingnan din: https://metacpan.org/dist/BATsh

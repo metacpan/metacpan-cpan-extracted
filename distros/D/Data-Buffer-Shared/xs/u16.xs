@@ -176,7 +176,7 @@ unlink(SV* self_or_class, ...)
             if (items < 2) croak("Usage: Data::Buffer::Shared::U16->unlink($path)");
             p = SvPV_nolen(ST(1));
         }
-        unlink(p);
+        if (unlink(p) != 0) croak("unlink(%s): %s", p, strerror(errno));
 
 UV
 ptr(SV* self_sv)
@@ -372,5 +372,25 @@ wait_notify(SV* self_sv)
         int64_t val = buf_wait_notify(h);
         if (val < 0) XSRETURN_UNDEF;
         RETVAL = newSViv(val);
+    OUTPUT:
+        RETVAL
+
+void
+sync(SV* self_sv)
+    CODE:
+        EXTRACT_BUF("Data::Buffer::Shared::U16", self_sv);
+        if (buf_msync(h) != 0) croak("Data::Buffer::Shared::U16 sync: %s", strerror(errno));
+
+SV*
+stats(SV* self_sv)
+    CODE:
+        EXTRACT_BUF("Data::Buffer::Shared::U16", self_sv);
+        HV *hv = newHV();
+        hv_store(hv, "capacity",   8, newSVuv((UV)h->hdr->capacity), 0);
+        hv_store(hv, "elem_size",  9, newSVuv((UV)h->hdr->elem_size), 0);
+        hv_store(hv, "mmap_size",  9, newSVuv((UV)h->mmap_size), 0);
+        hv_store(hv, "variant_id",10, newSVuv((UV)h->hdr->variant_id), 0);
+        hv_store(hv, "recoveries",10, newSVuv((UV)__atomic_load_n(&h->hdr->stat_recoveries, __ATOMIC_RELAXED)), 0);
+        RETVAL = newRV_noinc((SV*)hv);
     OUTPUT:
         RETVAL

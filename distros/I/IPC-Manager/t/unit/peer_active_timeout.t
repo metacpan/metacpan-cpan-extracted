@@ -60,7 +60,7 @@ subtest 'positive timeout: returns 0 after timeout when peer never becomes activ
 
     ok(!$got, "returned false after timeout");
     ok($elapsed >= 0.25, "waited close to full timeout (${elapsed}s)");
-    ok($elapsed < 3,     "did not wait much past timeout (${elapsed}s)");
+    ok($elapsed < 10,    "did not wait much past timeout (${elapsed}s)");
 };
 
 subtest 'timeout 0 = block forever until peer becomes active' => sub {

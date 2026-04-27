@@ -1,0 +1,94 @@
+BATsh Хуудас Хуудас [MN] Монгол
+==============================
+
+BATsh нь нэг скриптэд cmd.exe ба bash/sh синтаксийг ажиллуулдаг хоёр хэлтэй шелл байна.
+Мөр мөрний эхний токен гүйцэтгийг тодорхойло.
+
+1. Гүйцэт илрүүлэх
+--------------------------
+  ECHO hello          -> cmd.exe гүйцэт (эхний токен бүхэлдээ том)
+  echo hello          -> bash/sh гүйцэт (эхний токен жижиг агуулдаа)
+  # тайлбар            -> тайлбар (харгалдаа)
+  :: тайлбар           -> тайлбар (CMD хэлбэр, харгалдаа)
+  REM тайлбар          -> тайлбар (CMD хэлбэр, харгалдаа)
+
+2. Шелл эхлүүлэх
+------------------
+  perl lib/BATsh.pm                    # харилцан REPL
+  perl lib/BATsh.pm script.batsh       # скрипт файл ажилуулах
+  perl lib/BATsh.pm -e "echo sain baina uu" # нэг мөрег тушаал
+
+  Perl API-аас:
+    use BATsh;
+    BATsh->run('script.batsh');
+    BATsh->run_string("echo sain baina uu");
+    BATsh->repl();
+
+3. Орчин хүчилсийн гүүр
+---------------------------------
+  CMD ба SH блокууд Perl ийн %ENV-гээр хүчилсээр дамжаалаа.
+
+  export FOO=sain      # SH FOO-г тохирно
+  ECHO %FOO%           # CMD гүүрээр FOO уншийх (Windows)
+
+  SET BAR=delkhii      # CMD BAR-г тохирно
+  echo $BAR            # SH гүүрээр BAR уншийх
+
+4. SETLOCAL / ENDLOCAL
+-----------------------
+  SETLOCAL           # %ENV агшаалангуйийг хадгалах
+  SET TMP=орон
+  ECHO %TMP%
+  ENDLOCAL           # %ENV сэргээлэх (TMP алга болно)
+
+5. Дээд блок (холилсон гүйцэт)
+---------------------------------
+  Блок бүтэц зөв харгалзан байх гэдэг.
+
+  for x in 1 2; do   # SH блок нээх
+      ECHO item $x   # SH блокт CMD мөр
+  done               # SH блок хаах
+
+  CMD: IF/ENDIF  FOR/NEXT  WHILE/WEND  DO/LOOP
+  SH:  if/fi  for/done  while/done  until/done  case/esac  { }
+
+6. Дэд процедур тодорхойлох
+-------------------------------------
+  :GREET
+  echo "Sain baina uu $BATSH_ARG1"
+  RET
+
+7. CALL ба source
+------------------
+  CALL :GREET delkhii    # аргументтайгаар дэд процедурийг дуудах
+  CALL oor.batsh         # өөр .batsh файл оруулах (CMD)
+  source oor.batsh       # өөр .batsh файл оруулах (SH)
+  . oor.batsh            # POSIX цэгтэш тэмдэглэлт
+
+  Аргумент: $BATSH_ARG1 .. $BATSH_ARGn  (%BATSH_ARG1% CMD-д)
+  Тоо: $BATSH_ARGC
+
+8. Perl API
+-----------
+  BATsh->run($file)            # .batsh файл ажилуулах
+  BATsh->run_string($source)   # эх мөрийг ажилуулах
+  BATsh->run_lines(@lines)     # мөрнүүдийг ажилуулах
+  BATsh->repl()                # харилцан REPL
+  BATsh->classify_token($tok)  # 'CMD' эсвэл 'SH' буцаах
+  BATsh->setlocal()            # %ENV агшаалангуй
+  BATsh->endlocal()            # %ENV сэргээлэх
+  BATsh->call_sub($lbl, @args) # дэд процедур дуудах
+  BATsh->source_file($file)    # .batsh файл оруулах
+  BATsh->version()             # хувилгаарийн мөр
+
+9. Платформын тайлбар
+-----------------------------
+  Windows: CMD болон SH хэсгүүд цэвэр Perl-д ажилладаг -- гадаад cmd.exe/bash/sh хэрэггүй.
+  UNIX:    CMD болон SH хэсгүүд цэвэр Perl-д ажилладаг -- гадаад cmd.exe/bash/sh хэрэггүй.
+
+10. Шаардлага
+-----------
+  Perl 5.005_03 ба дээш. Зөвхөн цөмхийг хэрэглэхгүй (File::Spec, Carp).
+  CPAN хамааралалт хэрэггүй.
+
+Мөн үзээрийг хара: https://metacpan.org/dist/BATsh

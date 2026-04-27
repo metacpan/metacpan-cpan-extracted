@@ -60,7 +60,7 @@ diag "int stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every 
     my $all_ok = 1;
     for my $pid (@cpids) {
         waitpid($pid, 0);
-        $all_ok = 0 if ($? >> 8) != 0;
+        $all_ok = 0 if $? != 0;
     }
     my $dt = time - $t0;
     waitpid($_, 0) for @wpids;
@@ -178,7 +178,7 @@ diag "int stress: $CLIENTS clients x $MSGS msgs, $WORKERS workers, cancel every 
     my $all_ok = 1;
     for my $pid (@cpids) {
         waitpid($pid, 0);
-        $all_ok = 0 if ($? >> 8) != 0;
+        $all_ok = 0 if $? != 0;
     }
     waitpid $spid, 0;
 

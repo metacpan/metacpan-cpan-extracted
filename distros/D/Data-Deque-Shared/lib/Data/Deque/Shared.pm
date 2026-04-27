@@ -1,10 +1,11 @@
 package Data::Deque::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 require XSLoader;
 XSLoader::load('Data::Deque::Shared', $VERSION);
 @Data::Deque::Shared::Int::ISA = ('Data::Deque::Shared');
+@Data::Deque::Shared::Str::ISA = ('Data::Deque::Shared');
 1;
 __END__
 
@@ -25,6 +26,11 @@ Data::Deque::Shared - Shared-memory double-ended queue for Linux
     say $dq->pop_front;   # 0
     say $dq->pop_back;    # 2
 
+    # String variant (fixed max_len per entry)
+    my $sq = Data::Deque::Shared::Str->new(undef, 100, 64);
+    $sq->push_back("hello");
+    say $sq->pop_front;   # hello
+
     # blocking with timeout
     $dq->push_back_wait(42, 5.0);
     my $v = $dq->pop_front_wait(5.0);
@@ -40,7 +46,37 @@ Data::Deque::Shared - Shared-memory double-ended queue for Linux
 Double-ended queue (deque) in shared memory. Ring buffer with CAS-based
 push/pop at both ends. Futex blocking when empty or full.
 
-B<Linux-only>. Requires 64-bit Perl.
+B<Linux-only>. Requires 64-bit Perl. Capacity must be E<lt>= 2^31.
+
+Used only as a FIFO (C<push_back> + C<pop_front>), it's effectively a
+fixed-slot lock-free string queue: 1.3x-4.7x faster than
+L<Data::Queue::Shared::Str> under multi-producer contention, at the cost
+of per-slot fixed memory (C<capacity × max_len>).
+
+=head2 Concurrency
+
+Push and pop are safe under multi-producer / multi-consumer workloads.
+Each slot carries a 64-bit control word (state + generation) that acts
+as a publication gate: a pusher atomically transitions the slot through
+C<empty → writing → filled>, and a popper transitions it through
+C<filled → reading → empty> with the generation bumped on completion.
+A consumer that claims position C<n> via the head/tail CAS therefore
+always observes the publication transition of the corresponding push
+before reading the value.
+
+C<drain> is safe under concurrent C<push>/C<pop>, but it will spin-wait
+on any slot whose pusher is mid-publish; if that pusher has crashed
+between winning its position CAS and publishing the slot value, drain
+will block indefinitely on that slot. Use C<drain> for orderly draining,
+not as a crash-recovery primitive.
+
+=head2 Compatibility
+
+File format bumped to v2 in this release (per-slot control array added
+for MPMC safety). Opening a v1 file (magic C<DEQ1>) created by
+Data::Deque::Shared C<E<lt>= 0.02> will croak on header validation.
+Re-create the deque with the new version; anonymous and memfd-backed
+usage is unaffected.
 
 =head1 METHODS
 
@@ -112,12 +148,21 @@ L<Data::HashMap::Shared> - concurrent hash table
 
 L<Data::PubSub::Shared> - publish-subscribe ring
 
+L<Data::Heap::Shared> - priority queue
+
+L<Data::Graph::Shared> - directed weighted graph
+
+L<Data::BitSet::Shared> - shared bitset (lock-free per-bit ops)
+
+L<Data::RingBuffer::Shared> - fixed-size overwriting ring buffer
+
 =head1 AUTHOR
 
 vividsnow
 
 =head1 LICENSE
 
-Same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
 
 =cut

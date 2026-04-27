@@ -89,13 +89,13 @@ use Data::PubSub::Shared;
         my $sub = $child->subscribe;
         my $count = 0;
         for (1..50) {
-            my $v = $sub->poll_wait(2);
+            my $v = $sub->poll_wait(30);
             $count++ if defined $v;
         }
         exit($count == 50 ? 0 : 1);
     }
 
-    select(undef, undef, undef, 0.05);
+    select(undef, undef, undef, 0.5);
     for my $i (1..50) {
         $ps->publish("concurrent-$i");
     }

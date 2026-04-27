@@ -1,0 +1,106 @@
+NAME
+    Data::Heap::Shared - Shared-memory binary min-heap (priority queue) for
+    Linux
+
+SYNOPSIS
+        use Data::Heap::Shared;
+
+        my $heap = Data::Heap::Shared->new(undef, 1000);
+        $heap->push(3, 300);   # priority=3, value=300
+        $heap->push(1, 100);
+        $heap->push(2, 200);
+
+        my ($pri, $val) = $heap->pop;   # (1, 100) — lowest priority first
+        my ($pri, $val) = $heap->peek;  # (2, 200) — without removing
+
+        # blocking pop
+        my ($pri, $val) = $heap->pop_wait(5.0);
+
+DESCRIPTION
+    Binary min-heap in shared memory. Elements are "(priority, value)"
+    integer pairs. Lowest priority pops first.
+
+    Mutex-protected push/pop with sift-up/sift-down. PID-based stale mutex
+    recovery. Futex blocking when empty.
+
+    Crash safety: if a process dies while holding the heap mutex (mid-push
+    or mid-pop), the mutex is recovered via PID detection, but the heap data
+    may be in an inconsistent state (partially sifted). Callers should
+    "clear" and rebuild if crash recovery is triggered in a critical
+    application.
+
+    Linux-only. Requires 64-bit Perl.
+
+METHODS
+        $heap->push($priority, $value);          # returns bool
+        my ($pri, $val) = $heap->pop;            # returns () if empty
+        my ($pri, $val) = $heap->pop_wait;       # blocking
+        my ($pri, $val) = $heap->pop_wait($t);   # with timeout
+        my ($pri, $val) = $heap->peek;           # without removing
+
+        $heap->size;  $heap->capacity;  $heap->is_empty;  $heap->is_full;
+        $heap->clear;  $heap->stats;  $heap->path;  $heap->memfd;
+        $heap->sync;   $heap->unlink;
+
+        # constructors
+        $heap = Data::Heap::Shared->new_memfd($name, $capacity);
+        $heap = Data::Heap::Shared->new_from_fd($fd);
+
+        # eventfd
+        $heap->eventfd;  $heap->eventfd_set($fd);  $heap->fileno;
+        $heap->notify;   $heap->eventfd_consume;
+
+STATS
+    stats() returns: "size", "capacity", "pushes", "pops", "waits",
+    "timeouts", "recoveries", "mmap_size".
+
+BENCHMARKS
+    Single-process (500K ops, x86_64 Linux, Perl 5.40):
+
+        push (sequential)       5.3M/s
+        pop (drain)             2.5M/s
+        push+pop (interleaved)  2.5M/s
+        peek                    4.9M/s
+
+    Multi-process (4 workers, 100K ops each, cap=64):
+
+        push+pop                3.1M/s aggregate
+
+SECURITY
+    The mmap region is writable by all processes that open it. Do not share
+    backing files with untrusted processes.
+
+SEE ALSO
+    Data::Stack::Shared - LIFO stack
+
+    Data::Deque::Shared - double-ended queue
+
+    Data::Queue::Shared - FIFO queue
+
+    Data::ReqRep::Shared - request-reply
+
+    Data::Pool::Shared - fixed-size object pool
+
+    Data::Log::Shared - append-only log (WAL)
+
+    Data::Buffer::Shared - typed shared array
+
+    Data::Sync::Shared - synchronization primitives
+
+    Data::HashMap::Shared - concurrent hash table
+
+    Data::PubSub::Shared - publish-subscribe ring
+
+    Data::Graph::Shared - directed weighted graph
+
+    Data::BitSet::Shared - shared bitset (lock-free per-bit ops)
+
+    Data::RingBuffer::Shared - fixed-size overwriting ring buffer
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

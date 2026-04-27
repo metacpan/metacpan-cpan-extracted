@@ -1,11 +1,12 @@
 package Langertha::Knarr::Protocol::Anthropic;
 # ABSTRACT: Anthropic-compatible wire protocol (/v1/messages) for Knarr
 
-our $VERSION = '1.001';
+our $VERSION = '1.100';
 use Moose;
 use JSON::MaybeXS;
 use Time::HiRes qw( time );
 use Langertha::Knarr::Request;
+use Langertha::Knarr::Response;
 
 with 'Langertha::Knarr::Protocol';
 
@@ -26,7 +27,6 @@ with 'Langertha::Knarr::Protocol';
 # frames around the stream — the runtime will call format_stream_open / _close.
 # ----------------------
 
-has steerboard => ( is => 'ro', weak_ref => 1 );
 has _json => ( is => 'ro', default => sub { JSON::MaybeXS->new( utf8 => 1, canonical => 1 ) } );
 
 sub protocol_name { 'anthropic' }
@@ -70,23 +70,32 @@ sub parse_chat_request {
     max_tokens  => $data->{max_tokens},
     system      => $system_str,
     tools       => $data->{tools},
+    tool_choice => $data->{tool_choice},
     extra       => { forward_headers => \%fwd },
   );
 }
 
 sub format_chat_response {
   my ($self, $response, $request) = @_;
-  my $content = ref $response eq 'HASH' ? $response->{content} : "$response";
-  my $model   = ( ref $response eq 'HASH' && $response->{model} ) || $request->model || 'steerboard';
+  my $r = Langertha::Knarr::Response->coerce($response);
+  my @blocks;
+  push @blocks, { type => 'text', text => $r->content } if length $r->content;
+  push @blocks, map { $_->to_anthropic_block } @{ $r->tool_calls };
+  push @blocks, { type => 'text', text => '' } unless @blocks;
+  my $stop_reason = $r->finish_reason
+                 // ( $r->has_tool_calls ? 'tool_use' : 'end_turn' );
+  my $usage = $r->usage && $r->usage->can('to_anthropic_format')
+    ? $r->usage->to_anthropic_format
+    : { input_tokens => 0, output_tokens => 0 };
   my $payload = {
     id      => _msg_id(),
     type    => 'message',
     role    => 'assistant',
-    model   => $model,
-    content => [ { type => 'text', text => $content } ],
-    stop_reason   => 'end_turn',
+    model   => $r->model // $request->model // 'unknown',
+    content => \@blocks,
+    stop_reason   => $stop_reason,
     stop_sequence => undef,
-    usage   => { input_tokens => 0, output_tokens => 0 },
+    usage   => $usage,
   };
   return ( 200, { 'Content-Type' => 'application/json' }, $self->_json->encode($payload) );
 }
@@ -100,7 +109,7 @@ sub _sse_event {
 sub format_stream_open {
   my ($self, $request) = @_;
   my $id = _msg_id();
-  my $model = $request->model // 'steerboard';
+  my $model = $request->model // 'unknown';
   return join( '',
     $self->_sse_event( message_start => {
       type    => 'message_start',
@@ -158,7 +167,7 @@ Langertha::Knarr::Protocol::Anthropic - Anthropic-compatible wire protocol (/v1/
 
 =head1 VERSION
 
-version 1.001
+version 1.100
 
 =head1 DESCRIPTION
 

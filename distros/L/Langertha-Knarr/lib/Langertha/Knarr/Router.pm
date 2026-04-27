@@ -1,5 +1,5 @@
 package Langertha::Knarr::Router;
-our $VERSION = '1.001';
+our $VERSION = '1.100';
 # ABSTRACT: Model name to Langertha engine routing with caching
 use Moo;
 use Carp qw( croak );
@@ -203,7 +203,7 @@ Langertha::Knarr::Router - Model name to Langertha engine routing with caching
 
 =head1 VERSION
 
-version 1.001
+version 1.100
 
 =head1 SYNOPSIS
 

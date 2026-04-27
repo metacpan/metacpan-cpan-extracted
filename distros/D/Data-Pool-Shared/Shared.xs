@@ -6,6 +6,18 @@
 #include "ppport.h"
 #include "pool.h"
 
+/* slot_sv lifetime magic: returned scalar pins the pool object alive by
+ * holding an incremented refcount, released when the scalar is freed. */
+static int pool_scalar_magic_free(pTHX_ SV *sv, MAGIC *mg) {
+    PERL_UNUSED_ARG(sv);
+    if (mg->mg_obj) SvREFCNT_dec(mg->mg_obj);
+    return 0;
+}
+
+static const MGVTBL pool_scalar_magic_vtbl = {
+    NULL, NULL, NULL, NULL, pool_scalar_magic_free, NULL, NULL, NULL
+};
+
 #define EXTRACT_POOL(sv) \
     if (!sv_isobject(sv) || !sv_derived_from(sv, "Data::Pool::Shared")) \
         croak("Expected a Data::Pool::Shared object"); \
@@ -262,6 +274,7 @@ eventfd(self)
     EXTRACT_POOL(self);
   CODE:
     RETVAL = pool_create_eventfd(h);
+    if (RETVAL < 0) croak("eventfd: %s", strerror(errno));
   OUTPUT:
     RETVAL
 
@@ -312,7 +325,7 @@ sync(self)
   PREINIT:
     EXTRACT_POOL(self);
   CODE:
-    pool_msync(h);
+    if (pool_msync(h) != 0) croak("msync: %s", strerror(errno));
 
 void
 unlink(self_or_class, ...)
@@ -341,16 +354,16 @@ stats(self)
     PoolHeader *hdr = h->hdr;
     hv_store(hv, "capacity", 8, newSVuv((UV)hdr->capacity), 0);
     hv_store(hv, "elem_size", 9, newSVuv(hdr->elem_size), 0);
-    hv_store(hv, "used", 4, newSVuv(__atomic_load_n(&hdr->used, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "used", 4, newSVuv((UV)__atomic_load_n(&hdr->used, __ATOMIC_RELAXED)), 0);
     hv_store(hv, "available", 9,
-        newSVuv((UV)hdr->capacity - __atomic_load_n(&hdr->used, __ATOMIC_RELAXED)), 0);
-    hv_store(hv, "waiters", 7, newSVuv(hdr->waiters), 0);
+        newSVuv((UV)hdr->capacity - (UV)__atomic_load_n(&hdr->used, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "waiters", 7, newSVuv((UV)__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED)), 0);
     hv_store(hv, "mmap_size", 9, newSVuv((UV)h->mmap_size), 0);
-    hv_store(hv, "allocs", 6, newSVuv((UV)hdr->stat_allocs), 0);
-    hv_store(hv, "frees", 5, newSVuv((UV)hdr->stat_frees), 0);
-    hv_store(hv, "waits", 5, newSVuv((UV)hdr->stat_waits), 0);
-    hv_store(hv, "timeouts", 8, newSVuv((UV)hdr->stat_timeouts), 0);
-    hv_store(hv, "recoveries", 10, newSVuv(hdr->stat_recoveries), 0);
+    hv_store(hv, "allocs", 6, newSVuv((UV)__atomic_load_n(&hdr->stat_allocs, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "frees", 5, newSVuv((UV)__atomic_load_n(&hdr->stat_frees, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "waits", 5, newSVuv((UV)__atomic_load_n(&hdr->stat_waits, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "timeouts", 8, newSVuv((UV)__atomic_load_n(&hdr->stat_timeouts, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "recoveries", 10, newSVuv((UV)__atomic_load_n(&hdr->stat_recoveries, __ATOMIC_RELAXED)), 0);
     RETVAL = newRV_noinc((SV *)hv);
   OUTPUT:
     RETVAL
@@ -402,7 +415,11 @@ free_n(self, slots_av)
         Newx(buf, len, uint64_t);
         for (SSize_t i = 0; i < len; i++) {
             SV **svp = av_fetch(av, i, 0);
-            buf[i] = svp ? (uint64_t)SvUV(*svp) : 0;
+            if (!svp || !SvOK(*svp)) {
+                Safefree(buf);
+                croak("free_n: undef slot at index %ld", (long)i);
+            }
+            buf[i] = (uint64_t)SvUV(*svp);
         }
         RETVAL = pool_free_n(h, buf, (uint32_t)len);
         Safefree(buf);
@@ -471,6 +488,9 @@ slot_sv(self, slot)
     SvLEN_set(RETVAL, 0);
     SvCUR_set(RETVAL, h->hdr->elem_size);
     SvPOK_on(RETVAL);
+    /* Pin pool alive while this SV is referenced — magic before READONLY */
+    MAGIC *mg = sv_magicext(RETVAL, NULL, PERL_MAGIC_ext, &pool_scalar_magic_vtbl, NULL, 0);
+    mg->mg_obj = SvREFCNT_inc_simple_NN(self);
     SvREADONLY_on(RETVAL);
   OUTPUT:
     RETVAL

@@ -1,5 +1,13 @@
 Revision history for Data-HashMap-Shared
 
+0.07  2026-04-26
+    - anonymous mmap; new memfd/new from fd/sync
+    - sharded sync iterates all shards
+    - rwlock writers waiting split + crash recovery
+    - utf8-flag hash miss fix; header validation
+    - aarch64 CI matrix
+
+
 0.06  2026-04-15
     - Clarify new_sharded $max_entries is per-shard
     - Improve benchmark tables in POD

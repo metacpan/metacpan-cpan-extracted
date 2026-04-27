@@ -1,6 +1,6 @@
 use Test2::V0;
 
-use Test2::Require::Module 'Atomic::Pipe' => '0.022';
+use Test2::Require::Module 'Atomic::Pipe' => '0.026';
 
 use IPC::Manager::Client::AtomicPipe;
 use IPC::Manager::Serializer::JSON;

@@ -18,6 +18,9 @@ our @EXPORT_OK = qw(
     delay
     redis_host
     redis_port
+    inject_eof
+    inject_unexpected_frame
+    force_read_timeout
 );
 
 our %EXPORT_TAGS = (
@@ -160,6 +163,36 @@ async sub delay {
     await Future::IO->sleep($seconds);
 }
 
+# Force EOF on the socket under the reader. Next read returns 0 bytes,
+# triggering the reader's EOF handling path. Uses shutdown() rather
+# than close() so the file descriptor stays valid for Future::IO's
+# select loop — close() on an fh that Future::IO has an active poller
+# on leaves a stale watcher whose fileno is undef, which taints select()
+# with uninit warnings.
+sub inject_eof {
+    my ($redis) = @_;
+    shutdown($redis->{socket}, 2) if $redis->{socket};
+}
+
+# Feed bytes directly into the parser, bypassing the socket. Useful
+# for exercising the reader's decode/dispatch path with a crafted frame.
+sub inject_unexpected_frame {
+    my ($redis, $raw_bytes) = @_;
+    $redis->{parser}->parse($raw_bytes) if $redis->{parser};
+}
+
+# Synthesize a fatal timeout directly. Routes through the detach-first
+# _reader_fatal path so the typed Async::Redis::Error::Timeout is
+# propagated to all inflight futures (not a generic cancellation).
+sub force_read_timeout {
+    my ($redis) = @_;
+    require Async::Redis::Error::Timeout;
+    $redis->_reader_fatal(Async::Redis::Error::Timeout->new(
+        message => "synthetic timeout for test",
+        timeout => 0,
+    ));
+}
+
 1;
 
 __END__
@@ -236,6 +269,27 @@ Returns the Redis host from REDIS_HOST env var (default: localhost).
 =item redis_port()
 
 Returns the Redis port from REDIS_PORT env var (default: 6379).
+
+=item inject_eof($redis)
+
+Force EOF on the underlying socket via C<shutdown(..., 2)> so the next
+sysread returns 0 bytes. Triggers the reader's EOF handling path. Used
+in adverse-interleaving tests to simulate abrupt server disconnect.
+C<shutdown> is used in preference to C<close> so the file descriptor
+stays valid for any active Future::IO poller watching the socket.
+
+=item inject_unexpected_frame($redis, $raw_bytes)
+
+Feed raw bytes directly into the RESP parser, bypassing the socket.
+Useful for exercising the reader's decode/dispatch path with a crafted
+or malformed frame without needing a live server to send it.
+
+=item force_read_timeout($redis)
+
+Synthesize a fatal timeout by calling C<_reader_fatal> with a typed
+C<Async::Redis::Error::Timeout> object. All inflight futures receive
+the typed error via the detach-first path rather than generic
+cancellation.
 
 =back
 

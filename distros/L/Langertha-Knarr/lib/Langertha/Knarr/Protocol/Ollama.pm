@@ -1,12 +1,13 @@
 package Langertha::Knarr::Protocol::Ollama;
 # ABSTRACT: Ollama-compatible wire protocol (/api/chat, /api/tags) for Knarr
 
-our $VERSION = '1.001';
+our $VERSION = '1.100';
 use Moose;
 use JSON::MaybeXS;
 use Time::HiRes qw( time );
 use POSIX qw( strftime );
 use Langertha::Knarr::Request;
+use Langertha::Knarr::Response;
 
 with 'Langertha::Knarr::Protocol';
 
@@ -18,7 +19,6 @@ with 'Langertha::Knarr::Protocol';
 # Content-Type stays application/x-ndjson (or application/json with chunked).
 # ----------------------
 
-has steerboard => ( is => 'ro', weak_ref => 1 );
 has _json => ( is => 'ro', default => sub { JSON::MaybeXS->new( utf8 => 1, canonical => 1 ) } );
 
 sub protocol_name { 'ollama' }
@@ -45,25 +45,34 @@ sub parse_chat_request {
     @msgs = ( { role => 'user', content => $data->{prompt} } );
   }
   return Langertha::Knarr::Request->new(
-    protocol => 'ollama',
-    raw      => $data,
-    model    => $data->{model},
-    messages => \@msgs,
-    stream   => exists $data->{stream} ? ( $data->{stream} ? 1 : 0 ) : 1,  # Ollama defaults to stream
-    temperature => $data->{options}{temperature},
+    protocol        => 'ollama',
+    raw             => $data,
+    model           => $data->{model},
+    messages        => \@msgs,
+    stream          => exists $data->{stream} ? ( $data->{stream} ? 1 : 0 ) : 1,  # Ollama defaults to stream
+    temperature     => $data->{options}{temperature},
+    tools           => $data->{tools},
+    response_format => $data->{format},
   );
 }
 
 sub format_chat_response {
   my ($self, $response, $request) = @_;
-  my $content = ref $response eq 'HASH' ? $response->{content} : "$response";
+  my $r = Langertha::Knarr::Response->coerce($response);
+  my $message = { role => 'assistant', content => $r->content };
+  $message->{tool_calls} = [ map { $_->to_ollama } @{ $r->tool_calls } ]
+    if $r->has_tool_calls;
   my $payload = {
-    model      => $request->model // 'steerboard',
+    model      => $r->model // $request->model // 'unknown',
     created_at => _ts(),
-    message    => { role => 'assistant', content => $content },
+    message    => $message,
     done       => JSON::MaybeXS::true(),
-    done_reason => 'stop',
+    done_reason => $r->finish_reason // 'stop',
   };
+  if ( $r->usage && $r->usage->can('to_ollama_format') ) {
+    my $u = $r->usage->to_ollama_format;
+    $payload->{$_} = $u->{$_} for keys %$u;
+  }
   return ( 200, { 'Content-Type' => 'application/json' }, $self->_json->encode($payload) );
 }
 
@@ -80,7 +89,7 @@ sub format_models_response {
 sub format_stream_chunk {
   my ($self, $delta_text, $request) = @_;
   my $payload = {
-    model      => $request->model // 'steerboard',
+    model      => $request->model // 'unknown',
     created_at => _ts(),
     message    => { role => 'assistant', content => $delta_text },
     done       => JSON::MaybeXS::false(),
@@ -93,7 +102,7 @@ sub stream_content_type { 'application/x-ndjson' }
 sub format_stream_done {
   my ($self, $request) = @_;
   my $payload = {
-    model      => $request->model // 'steerboard',
+    model      => $request->model // 'unknown',
     created_at => _ts(),
     message    => { role => 'assistant', content => '' },
     done       => JSON::MaybeXS::true(),
@@ -117,7 +126,7 @@ Langertha::Knarr::Protocol::Ollama - Ollama-compatible wire protocol (/api/chat,
 
 =head1 VERSION
 
-version 1.001
+version 1.100
 
 =head1 DESCRIPTION
 

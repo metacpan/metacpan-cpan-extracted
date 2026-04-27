@@ -1,0 +1,92 @@
+BATsh អ្នឹកស្រួល [KM] ភាសាខ្មែរ
+==============================
+
+BATsh គឺជាសែលត្តរសងខ្នានល្បិស័ល្រែក cmd.exe នឹង bash/sh
+នៅក្នុងសក្រិបិតត្វ្យតាមួយគ្នា। ទោក័នតិកតាមួយនៃលឃិត្ឥកាលត់តើមោតផ័រ।
+
+1. ការស័ងកើតមោត
+------------------
+  ECHO hello          -> មោត cmd.exe (ទោក័នតិកត័លទាមុនជាែក័ល)
+  echo hello          -> មោត bash/sh (ទោក័នតិកមានក័លតូច)
+  # ក័ណត់           -> ក័ណត់ (លែកអើស)
+  :: ក័ណត់          -> ក័ណត់ (CMD, លែកអើស)
+  REM ក័ណត់         -> ក័ណត់ (CMD, លែកអើស)
+
+2. ចាम្បើករែ Shell
+------------------
+  perl lib/BATsh.pm                    # REPL ផ័ល័អាចារយ
+  perl lib/BATsh.pm script.batsh       # ដោរតើសក្រិបិត
+  perl lib/BATsh.pm -e "echo chomnob"  # ប័ណតាតាមួយមួយ
+
+  ពី Perl API:
+    use BATsh;
+    BATsh->run('script.batsh');
+    BATsh->run_string("echo chomnob");
+    BATsh->repl();
+
+3. សែតុ ត័វ័រនៅក្នុងបរិស្ថាន
+----------------------------------------
+  ប័ណ័ក័រ CMD នឹង SH ចំស្នើរត័វ័រក័ន័ឥនើយ %ENV ស័បើល់អ្នកបើល់
+
+  export FOO=chomnob   # SH កំណត់ FOO
+  ECHO %FOO%           # CMD អានសែតុ FOO (Windows)
+
+  SET BAR=lok          # CMD កំណត់ BAR
+  echo $BAR            # SH អានសែតុ BAR
+
+4. SETLOCAL / ENDLOCAL
+-----------------------
+  SETLOCAL           # អ័តតែនៅក្នុង %ENV
+  SET TMP=តម្លែ
+  ECHO %TMP%
+  ENDLOCAL           # ប័លាស័ក័រលើអិត %ENV
+
+5. ការតំសែរ (មោតឆ្លេស)
+-----------------------
+  for x in 1 2; do   # SH បើកប័ណតា
+      ECHO item $x   # ប័ណតា CMD នៅក្នុងប័ណតា SH
+  done               # SH បទាប័ណតា
+
+  CMD: IF/ENDIF  FOR/NEXT  WHILE/WEND  DO/LOOP
+  SH:  if/fi  for/done  while/done  until/done  case/esac  { }
+
+6. ការកំណត់អនុក្រម
+-------------------------
+  :GREET
+  echo "Chomnob $BATSH_ARG1"
+  RET
+
+7. CALL នឹង source
+------------------
+  CALL :GREET lok        # ហើអនុក្រម ត្រឹមជម៝តផ័រ
+  CALL phaseh.batsh      # ដោរហើសក្រិបិត .batsh ផសើង (CMD)
+  source phaseh.batsh    # ដោរហើសក្រិបិត .batsh ផសើង (SH)
+  . phaseh.batsh         # សញ្ញា POSIX
+
+  ជម៝ត: $BATSH_ARG1 .. $BATSH_ARGn  (%BATSH_ARG1% នៅក្នុង CMD)
+  ចំនួន: $BATSH_ARGC
+
+8. Perl API
+-----------
+  BATsh->run($file)            # ដោរសក្រិបិត .batsh
+  BATsh->run_string($source)   # ដោរសក្រិបិតសក័រក័រ
+  BATsh->run_lines(@lines)     # ដោរប័គាថទែត
+  BATsh->repl()                # REPL ផ័ល័អាចារយ
+  BATsh->classify_token($tok)  # ត័រលឹក 'CMD' តើ 'SH'
+  BATsh->setlocal()            # អ័តតែនៅក្នុង %ENV
+  BATsh->endlocal()            # ប័លាស័ក័រលើអិត %ENV
+  BATsh->call_sub($lbl, @args) # ហើអនុក្រម
+  BATsh->source_file($file)    # ដោរសក្រិបិត .batsh ផសើង
+  BATsh->version()             # កើន់ប័ភ័ត
+
+9. កំណត់សម័កភ្ណាបក័ររ
+---------------------------------
+  Windows: ផ្នែក CMD និង SH ដំណើរការក្នុង Perl សុទ្ធ -- មិនត្រូវការ cmd.exe/bash/sh ខាងក្រៅទេ។
+  UNIX:    ផ្នែក CMD និង SH ដំណើរការក្នុង Perl សុទ្ធ -- មិនត្រូវការ cmd.exe/bash/sh ខាងក្រៅទេ។
+
+10. ត្រូវការ
+-----------
+  Perl 5.005_03 តាម អកគង័ពាថមួយ। តែមានត័រត័កក័អតឹតជាែនកែលសាក័រញែក (File::Spec, Carp)।
+  គ្មានការអាស័អឆ្នើនៅលើ CPAN।
+
+មើលស្វែគត់: https://metacpan.org/dist/BATsh

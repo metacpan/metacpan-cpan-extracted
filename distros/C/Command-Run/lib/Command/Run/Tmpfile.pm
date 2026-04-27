@@ -9,20 +9,24 @@ use IO::File;
 use IO::Handle;
 
 my $fdpath;
-BEGIN {
-    $fdpath = sub {
-	for my $path (qw(/dev/fd /proc/self/fd)) {
-	    -r "$path/0" and return $path;
-	}
-	undef;
-    }->();
-}
 
 sub new {
     my $class = shift;
     my $fh = new_tmpfile IO::File or die "new_tmpfile: $!\n";
     $fh->fcntl(F_SETFD, 0) or die "fcntl F_SETFD: $!\n";
     binmode $fh, ':encoding(utf8)';
+    # Determine usable fd-path on first instantiation, using the fd we
+    # just allocated.  Checking only "$path/0" is insufficient on
+    # FreeBSD where /dev/fd/0,1,2 always exist as device nodes but
+    # /dev/fd/N (N>2) requires fdescfs to be mounted.
+    $fdpath //= do {
+	my $fd = $fh->fileno;
+	my $found;
+	for my $path (qw(/proc/self/fd /dev/fd)) {
+	    -r "$path/$fd" and do { $found = $path; last };
+	}
+	$found // '';
+    };
     bless { FH => $fh }, $class;
 }
 
@@ -67,7 +71,8 @@ sub fd {
 
 sub path {
     my $obj = shift;
-    sprintf "$fdpath/%d", $obj->fd;
+    return undef unless $fdpath;
+    sprintf "%s/%d", $fdpath, $obj->fd;
 }
 
 1;
@@ -142,6 +147,10 @@ Return the file descriptor number.
 =item B<path>()
 
 Return the file descriptor path (e.g., C</dev/fd/3>).
+On the first call to C<new>, the module probes for a usable file
+descriptor path by checking C</proc/self/fd/N> and C</dev/fd/N> for
+the just-allocated fd.  If neither is available (for example on
+FreeBSD without C<fdescfs> mounted), C<path> returns C<undef>.
 
 =back
 

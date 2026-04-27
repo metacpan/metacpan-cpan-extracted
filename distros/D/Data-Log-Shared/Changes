@@ -1,5 +1,12 @@
 Revision history for Data::Log::Shared
 
+0.03  2026-04-26
+    - memfd sealing + factored validate header
+    - atomic commit word
+    - 4-byte entry alignment (ARM64 SIGBUS fix)
+    - idempotent eventfd; aarch64 CI matrix
+
+
 0.02  2026-04-12
     - Add truncate/truncation for concurrency-safe log trimming
     - each_entry auto-skips truncated entries

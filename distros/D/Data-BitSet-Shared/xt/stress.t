@@ -23,6 +23,6 @@ for (1..$WORKERS) {
     push @pids, $pid;
 }
 my $fails = 0;
-waitpid($_, 0), $fails += ($? >> 8) != 0 for @pids;
+waitpid($_, 0), $fails += $? != 0 for @pids;
 is $fails, 0, "no worker failures";
 done_testing;

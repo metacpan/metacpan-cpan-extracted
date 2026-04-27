@@ -116,6 +116,7 @@ eventfd(self)
     EXTRACT_DEQ(self);
   CODE:
     RETVAL = deq_create_eventfd(h);
+    if (RETVAL < 0) croak("eventfd: %s", strerror(errno));
   OUTPUT:
     RETVAL
 
@@ -166,7 +167,7 @@ sync(self)
   PREINIT:
     EXTRACT_DEQ(self);
   CODE:
-    deq_msync(h);
+    if (deq_msync(h) != 0) croak("msync: %s", strerror(errno));
 
 void
 unlink(self_or_class, ...)
@@ -175,7 +176,7 @@ unlink(self_or_class, ...)
     const char *p;
     if (sv_isobject(self_or_class)) {
         DeqHandle *h = INT2PTR(DeqHandle*, SvIV(SvRV(self_or_class)));
-        if (!h) croak("destroyed object");
+        if (!h) croak("Attempted to use a destroyed object");
         p = h->path;
     } else {
         if (items < 2) croak("Usage: ...->unlink($path)");
@@ -194,10 +195,10 @@ stats(self)
     DeqHeader *hdr = h->hdr;
     hv_store(hv, "size", 4, newSVuv((UV)deq_size(h)), 0);
     hv_store(hv, "capacity", 8, newSVuv((UV)hdr->capacity), 0);
-    hv_store(hv, "pushes", 6, newSVuv((UV)hdr->stat_pushes), 0);
-    hv_store(hv, "pops", 4, newSVuv((UV)hdr->stat_pops), 0);
-    hv_store(hv, "waits", 5, newSVuv((UV)hdr->stat_waits), 0);
-    hv_store(hv, "timeouts", 8, newSVuv((UV)hdr->stat_timeouts), 0);
+    hv_store(hv, "pushes", 6, newSVuv((UV)__atomic_load_n(&hdr->stat_pushes, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "pops", 4, newSVuv((UV)__atomic_load_n(&hdr->stat_pops, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "waits", 5, newSVuv((UV)__atomic_load_n(&hdr->stat_waits, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "timeouts", 8, newSVuv((UV)__atomic_load_n(&hdr->stat_timeouts, __ATOMIC_RELAXED)), 0);
     hv_store(hv, "mmap_size", 9, newSVuv((UV)h->mmap_size), 0);
     RETVAL = newRV_noinc((SV *)hv);
   OUTPUT:
@@ -347,5 +348,237 @@ pop_back_wait(self, ...)
     if (items > 1) timeout = SvNV(ST(1));
     int64_t v;
     RETVAL = deq_pop_wait(h, &v, 1, timeout) ? newSViv((IV)v) : &PL_sv_undef;
+  OUTPUT:
+    RETVAL
+
+MODULE = Data::Deque::Shared  PACKAGE = Data::Deque::Shared::Str
+
+PROTOTYPES: DISABLE
+
+SV *
+new(class, path, capacity, max_len)
+    const char *class
+    SV *path
+    UV capacity
+    UV max_len
+  PREINIT:
+    char errbuf[DEQ_ERR_BUFLEN];
+  CODE:
+    if (max_len == 0) croak("max_len must be > 0");
+    if (max_len > (UV)(UINT32_MAX - sizeof(uint32_t)))
+        croak("max_len too large");
+    uint32_t elem_size = (uint32_t)(sizeof(uint32_t) + max_len);
+    const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
+    DeqHandle *h = deq_create(p, capacity, elem_size, DEQ_VAR_STR, errbuf);
+    if (!h) croak("Data::Deque::Shared::Str->new: %s", errbuf);
+    MAKE_OBJ(class, h);
+  OUTPUT:
+    RETVAL
+
+SV *
+new_memfd(class, name, capacity, max_len)
+    const char *class
+    const char *name
+    UV capacity
+    UV max_len
+  PREINIT:
+    char errbuf[DEQ_ERR_BUFLEN];
+  CODE:
+    if (max_len == 0) croak("max_len must be > 0");
+    if (max_len > (UV)(UINT32_MAX - sizeof(uint32_t)))
+        croak("max_len too large");
+    uint32_t elem_size = (uint32_t)(sizeof(uint32_t) + max_len);
+    DeqHandle *h = deq_create_memfd(name, capacity, elem_size, DEQ_VAR_STR, errbuf);
+    if (!h) croak("Data::Deque::Shared::Str->new_memfd: %s", errbuf);
+    MAKE_OBJ(class, h);
+  OUTPUT:
+    RETVAL
+
+SV *
+new_from_fd(class, fd)
+    const char *class
+    int fd
+  PREINIT:
+    char errbuf[DEQ_ERR_BUFLEN];
+  CODE:
+    DeqHandle *h = deq_open_fd(fd, DEQ_VAR_STR, errbuf);
+    if (!h) croak("Data::Deque::Shared::Str->new_from_fd: %s", errbuf);
+    MAKE_OBJ(class, h);
+  OUTPUT:
+    RETVAL
+
+bool
+push_back(self, val)
+    SV *self
+    SV *val
+  PREINIT:
+    EXTRACT_DEQ(self);
+  CODE:
+    STRLEN slen;
+    const char *s = SvPV(val, slen);
+    uint32_t max_len = h->elem_size - sizeof(uint32_t);
+    if (slen > max_len) slen = max_len;
+    uint8_t *buf;
+    Newxz(buf, h->elem_size, uint8_t);
+    uint32_t l32 = (uint32_t)slen;
+    memcpy(buf, &l32, sizeof(uint32_t));
+    memcpy(buf + sizeof(uint32_t), s, slen);
+    RETVAL = deq_try_push_back(h, buf, h->elem_size);
+    Safefree(buf);
+  OUTPUT:
+    RETVAL
+
+bool
+push_front(self, val)
+    SV *self
+    SV *val
+  PREINIT:
+    EXTRACT_DEQ(self);
+  CODE:
+    STRLEN slen;
+    const char *s = SvPV(val, slen);
+    uint32_t max_len = h->elem_size - sizeof(uint32_t);
+    if (slen > max_len) slen = max_len;
+    uint8_t *buf;
+    Newxz(buf, h->elem_size, uint8_t);
+    uint32_t l32 = (uint32_t)slen;
+    memcpy(buf, &l32, sizeof(uint32_t));
+    memcpy(buf + sizeof(uint32_t), s, slen);
+    RETVAL = deq_try_push_front(h, buf, h->elem_size);
+    Safefree(buf);
+  OUTPUT:
+    RETVAL
+
+bool
+push_back_wait(self, val, ...)
+    SV *self
+    SV *val
+  PREINIT:
+    EXTRACT_DEQ(self);
+    double timeout = -1;
+  CODE:
+    if (items > 2) timeout = SvNV(ST(2));
+    STRLEN slen;
+    const char *s = SvPV(val, slen);
+    uint32_t max_len = h->elem_size - sizeof(uint32_t);
+    if (slen > max_len) slen = max_len;
+    uint8_t *buf;
+    Newxz(buf, h->elem_size, uint8_t);
+    uint32_t l32 = (uint32_t)slen;
+    memcpy(buf, &l32, sizeof(uint32_t));
+    memcpy(buf + sizeof(uint32_t), s, slen);
+    RETVAL = deq_push_wait(h, buf, h->elem_size, 0, timeout);
+    Safefree(buf);
+  OUTPUT:
+    RETVAL
+
+bool
+push_front_wait(self, val, ...)
+    SV *self
+    SV *val
+  PREINIT:
+    EXTRACT_DEQ(self);
+    double timeout = -1;
+  CODE:
+    if (items > 2) timeout = SvNV(ST(2));
+    STRLEN slen;
+    const char *s = SvPV(val, slen);
+    uint32_t max_len = h->elem_size - sizeof(uint32_t);
+    if (slen > max_len) slen = max_len;
+    uint8_t *buf;
+    Newxz(buf, h->elem_size, uint8_t);
+    uint32_t l32 = (uint32_t)slen;
+    memcpy(buf, &l32, sizeof(uint32_t));
+    memcpy(buf + sizeof(uint32_t), s, slen);
+    RETVAL = deq_push_wait(h, buf, h->elem_size, 1, timeout);
+    Safefree(buf);
+  OUTPUT:
+    RETVAL
+
+SV *
+pop_front(self)
+    SV *self
+  PREINIT:
+    EXTRACT_DEQ(self);
+  CODE:
+    uint8_t *buf;
+    Newx(buf, h->elem_size, uint8_t);
+    if (deq_try_pop_front(h, buf)) {
+        uint32_t len;
+        memcpy(&len, buf, sizeof(uint32_t));
+        uint32_t max_len = h->elem_size - sizeof(uint32_t);
+        if (len > max_len) len = max_len;
+        RETVAL = newSVpvn((char *)buf + sizeof(uint32_t), len);
+    } else {
+        RETVAL = &PL_sv_undef;
+    }
+    Safefree(buf);
+  OUTPUT:
+    RETVAL
+
+SV *
+pop_back(self)
+    SV *self
+  PREINIT:
+    EXTRACT_DEQ(self);
+  CODE:
+    uint8_t *buf;
+    Newx(buf, h->elem_size, uint8_t);
+    if (deq_try_pop_back(h, buf)) {
+        uint32_t len;
+        memcpy(&len, buf, sizeof(uint32_t));
+        uint32_t max_len = h->elem_size - sizeof(uint32_t);
+        if (len > max_len) len = max_len;
+        RETVAL = newSVpvn((char *)buf + sizeof(uint32_t), len);
+    } else {
+        RETVAL = &PL_sv_undef;
+    }
+    Safefree(buf);
+  OUTPUT:
+    RETVAL
+
+SV *
+pop_front_wait(self, ...)
+    SV *self
+  PREINIT:
+    EXTRACT_DEQ(self);
+    double timeout = -1;
+  CODE:
+    if (items > 1) timeout = SvNV(ST(1));
+    uint8_t *buf;
+    Newx(buf, h->elem_size, uint8_t);
+    if (deq_pop_wait(h, buf, 0, timeout)) {
+        uint32_t len;
+        memcpy(&len, buf, sizeof(uint32_t));
+        uint32_t max_len = h->elem_size - sizeof(uint32_t);
+        if (len > max_len) len = max_len;
+        RETVAL = newSVpvn((char *)buf + sizeof(uint32_t), len);
+    } else {
+        RETVAL = &PL_sv_undef;
+    }
+    Safefree(buf);
+  OUTPUT:
+    RETVAL
+
+SV *
+pop_back_wait(self, ...)
+    SV *self
+  PREINIT:
+    EXTRACT_DEQ(self);
+    double timeout = -1;
+  CODE:
+    if (items > 1) timeout = SvNV(ST(1));
+    uint8_t *buf;
+    Newx(buf, h->elem_size, uint8_t);
+    if (deq_pop_wait(h, buf, 1, timeout)) {
+        uint32_t len;
+        memcpy(&len, buf, sizeof(uint32_t));
+        uint32_t max_len = h->elem_size - sizeof(uint32_t);
+        if (len > max_len) len = max_len;
+        RETVAL = newSVpvn((char *)buf + sizeof(uint32_t), len);
+    } else {
+        RETVAL = &PL_sv_undef;
+    }
+    Safefree(buf);
   OUTPUT:
     RETVAL

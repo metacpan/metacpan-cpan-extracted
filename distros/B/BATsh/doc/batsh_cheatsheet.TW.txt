@@ -1,0 +1,99 @@
+BATsh 速查表 [TW] 繁體中文
+==============================
+
+BATsh 是一個雙語 Shell，可在同一腳本中同時執行 cmd.exe 和 bash/sh 語法。
+每行的第一個語彙基元決定執行模式。
+
+1. 模式判斷
+-----------
+  ECHO hello          -> cmd.exe 模式（第一個語彙基元全部大寫）
+  echo hello          -> bash/sh 模式（第一個語彙基元含有小寫字母）
+  # 注解              -> 注解（略過）
+  :: 注解             -> 注解（CMD 風格，略過）
+  REM 注解            -> 注解（CMD 風格，略過）
+
+2. 啟動 Shell
+--------------
+  perl lib/BATsh.pm                    # 互動式 REPL
+  perl lib/BATsh.pm script.batsh       # 執行腳本檔案
+  perl lib/BATsh.pm -e "echo hello"    # 內嵌單行命令
+
+  透過 Perl API：
+    use BATsh;
+    BATsh->run('script.batsh');
+    BATsh->run_string("echo hello");
+    BATsh->repl();
+
+3. 環境變數橋接
+---------------
+  CMD 區塊和 SH 區塊透過 Perl 的 %ENV 共用變數。
+
+  export FOO=hello   # SH 設定 FOO
+  ECHO %FOO%         # CMD 透過橋接讀取 FOO（Windows）
+
+  SET BAR=world      # CMD 設定 BAR
+  echo $BAR          # SH 透過橋接讀取 BAR
+
+4. SETLOCAL / ENDLOCAL
+-----------------------
+  SETLOCAL           # 快照 %ENV
+  SET TMP=local_val
+  ECHO %TMP%
+  ENDLOCAL           # 還原 %ENV（TMP 消失）
+
+  支援巢狀。
+
+5. 巢狀（混合模式）
+--------------------
+  區塊結構必須正確配對。巢狀區塊內允許混合模式行。
+
+  for x in 1 2; do   # SH 開啟區塊
+      ECHO item $x   # CMD 行（在 SH 區塊內原樣傳遞）
+  done               # SH 關閉區塊
+
+  CMD 關鍵字: IF/ENDIF  FOR/NEXT  WHILE/WEND  DO/LOOP
+  SH  關鍵字: if/fi  for/done  while/done  until/done  case/esac  { }
+
+6. 子程序定義
+--------------
+  :GREET
+  echo "Hello $BATSH_ARG1"
+  RET
+
+  標籤以 : 開頭，以 RET 或 RETURN 結束。
+  主體在執行前擷取（不內嵌執行）。
+
+7. CALL 和 source
+------------------
+  CALL :GREET world      # 帶參數呼叫子程序
+  CALL other.batsh       # 包含/執行另一個 .batsh 檔案（CMD）
+  source other.batsh     # 包含/執行另一個 .batsh 檔案（SH）
+  . other.batsh          # POSIX 點號寫法
+
+  參數: $BATSH_ARG1 .. $BATSH_ARGn  （CMD 中用 %BATSH_ARG1%）
+  個數: $BATSH_ARGC
+
+8. Perl API
+------------
+  BATsh->run($file)            # 執行 .batsh 檔案
+  BATsh->run_string($source)   # 執行來源字串
+  BATsh->run_lines(@lines)     # 執行行陣列
+  BATsh->repl()                # 互動式 REPL
+  BATsh->classify_token($tok)  # 傳回 'CMD' 或 'SH'
+  BATsh->setlocal()            # 快照 %ENV
+  BATsh->endlocal()            # 還原 %ENV
+  BATsh->call_sub($lbl, @args) # 呼叫子程序
+  BATsh->source_file($file)    # 包含 .batsh 檔案
+  BATsh->version()             # 版本字串
+
+9. 平台說明
+-----------
+  Windows: CMD 與 SH 區塊均以純 Perl 執行 -- 無需外部 cmd.exe/bash/sh。
+  UNIX:    CMD 與 SH 區塊均以純 Perl 執行 -- 無需外部 cmd.exe/bash/sh。
+
+10. 執行需求
+------------
+  Perl 5.005_03 或更新版本。僅使用核心模組（File::Spec, Carp）。
+  無需 CPAN 相依套件。
+
+參見: https://metacpan.org/dist/BATsh

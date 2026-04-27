@@ -1,7 +1,7 @@
 package Data::Pool::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require XSLoader;
 XSLoader::load('Data::Pool::Shared', $VERSION);
@@ -266,8 +266,11 @@ Returns a read-only scalar whose PV points directly into the shared
 memory slot. Reading the scalar reads the slot with no C<memcpy>.
 Useful for large slots where avoiding copy matters.
 
-The scalar must not outlive the pool object. To modify the slot,
-use C<set()>.
+The scalar holds a reference to the pool object, keeping it alive
+for as long as the scalar (or any copy of it) is live. However, the
+scalar still reflects the current contents of the slot: if the slot
+is C<free()>d and later re-allocated, reads will see the new data.
+To modify the slot, use C<set()>.
 
 =head2 Status
 
@@ -426,6 +429,10 @@ L<Data::PubSub::Shared> - publish-subscribe ring
 L<Data::Heap::Shared> - priority queue
 
 L<Data::Graph::Shared> - directed weighted graph
+
+L<Data::BitSet::Shared> - shared bitset (lock-free per-bit ops)
+
+L<Data::RingBuffer::Shared> - fixed-size overwriting ring buffer
 
 =head1 AUTHOR
 

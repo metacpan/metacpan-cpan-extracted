@@ -46,6 +46,11 @@ t/07-variants.t
 t/08-take-flush-mmap.t
 t/09-touch-reserve-stats.t
 t/10-edge-cases.t
+t/11-anonymous.t
+t/12-utf8-flag.t
+t/13-memfd.t
+t/pod_synopsis.t
+t/version_check.t
 typemap
 xs/i16.xs
 xs/i16s.xs
@@ -57,6 +62,30 @@ xs/si.xs
 xs/si16.xs
 xs/si32.xs
 xs/ss.xs
+xt/asan.t
+xt/cloexec_exec.t
+xt/concurrent_open.t
+xt/crash_recovery.t
+xt/eacces.t
+xt/eg_runs.t
+xt/fd_leak.t
+xt/fd_validation.t
+xt/fork_live.t
+xt/invalid_args.t
+xt/manifest_vs_git.t
+xt/memfd_seal.t
+xt/mmap_leak.t
+xt/mpmc_fuzz.t
+xt/reader_starvation_guard.t
+xt/rwlock_scaling.t
+xt/stale_recovery_crash.t
+xt/torn_write.t
+xt/truncation.t
+xt/tsan.t
+xt/unicode_keys.t
+xt/valgrind.t
+xt/valgrind_mp.t
+xt/writer_crash_recovery.t
 xxhash.h
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

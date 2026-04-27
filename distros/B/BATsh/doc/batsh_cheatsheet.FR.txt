@@ -1,0 +1,100 @@
+BATsh Aide-memoire [FR] Francais
+=================================
+
+BATsh est un shell bilingue qui execute la syntaxe cmd.exe et bash/sh
+dans le meme script. Le premier token de chaque ligne determine le mode.
+
+1. Detection du mode
+---------------------
+  ECHO hello          -> mode cmd.exe  (premier token tout en majuscules)
+  echo hello          -> mode bash/sh  (premier token contient minuscules)
+  # commentaire       -> commentaire (ignore)
+  :: commentaire      -> commentaire (style CMD, ignore)
+  REM commentaire     -> commentaire (style CMD, ignore)
+
+2. Demarrage du shell
+----------------------
+  perl lib/BATsh.pm                    # REPL interactif
+  perl lib/BATsh.pm script.batsh       # executer un fichier script
+  perl lib/BATsh.pm -e "echo bonjour"  # ligne unique en ligne
+
+  Depuis l'API Perl :
+    use BATsh;
+    BATsh->run('script.batsh');
+    BATsh->run_string("echo bonjour");
+    BATsh->repl();
+
+3. Pont de variables d'environnement
+--------------------------------------
+  Les blocs CMD et SH partagent les variables via %ENV de Perl.
+
+  export FOO=bonjour  # SH definit FOO
+  ECHO %FOO%          # CMD lit FOO via le pont (Windows)
+
+  SET BAR=monde       # CMD definit BAR
+  echo $BAR           # SH lit BAR via le pont
+
+4. SETLOCAL / ENDLOCAL
+-----------------------
+  SETLOCAL           # instantane de %ENV
+  SET TMP=local_val
+  ECHO %TMP%
+  ENDLOCAL           # restaure %ENV (TMP disparait)
+
+  Les portees peuvent etre imbriquees.
+
+5. Imbrication (mode mixte)
+----------------------------
+  Les constructions de blocs doivent etre correctement appariees.
+  Les lignes en mode mixte a l'interieur d'un bloc sont acceptees.
+
+  for x in 1 2; do   # SH ouvre le bloc
+      ECHO item $x   # ligne CMD dans le bloc SH (transmise telle quelle)
+  done               # SH ferme le bloc
+
+  Mots-cles CMD : IF/ENDIF  FOR/NEXT  WHILE/WEND  DO/LOOP
+  Mots-cles SH  : if/fi  for/done  while/done  until/done  case/esac  { }
+
+6. Definitions de sous-routines
+---------------------------------
+  :GREET
+  echo "Bonjour $BATSH_ARG1"
+  RET
+
+  Les etiquettes commencent par : et se terminent par RET ou RETURN.
+  Le corps est extrait avant l'execution (non execute en ligne).
+
+7. CALL et source
+------------------
+  CALL :GREET monde      # appeler une sous-routine avec argument
+  CALL autre.batsh       # inclure/executer un autre fichier .batsh (CMD)
+  source autre.batsh     # inclure/executer un autre fichier .batsh (SH)
+  . autre.batsh          # notation point POSIX
+
+  Arguments : $BATSH_ARG1 .. $BATSH_ARGn  (%BATSH_ARG1% en CMD)
+  Nombre    : $BATSH_ARGC
+
+8. API Perl
+-----------
+  BATsh->run($file)            # executer un fichier .batsh
+  BATsh->run_string($source)   # executer une chaine source
+  BATsh->run_lines(@lines)     # executer un tableau de lignes
+  BATsh->repl()                # REPL interactif
+  BATsh->classify_token($tok)  # retourne 'CMD' ou 'SH'
+  BATsh->setlocal()            # instantane de %ENV
+  BATsh->endlocal()            # restaure %ENV
+  BATsh->call_sub($lbl, @args) # appeler une sous-routine
+  BATsh->source_file($file)    # inclure un fichier .batsh
+  BATsh->version()             # chaine de version
+
+9. Notes de plateforme
+-----------------------
+  Windows : Les blocs CMD et SH s'executent en Perl pur -- aucun cmd.exe/bash/sh externe requis.
+  UNIX    : Les blocs CMD et SH s'executent en Perl pur -- aucun cmd.exe/bash/sh externe requis.
+
+10. Conditions requises
+------------------------
+  Perl 5.005_03 ou superieur. Modules de base uniquement (File::Spec, Carp).
+  Aucune dependance CPAN.
+
+Voir aussi : https://metacpan.org/dist/BATsh

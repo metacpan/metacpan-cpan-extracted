@@ -1,3 +1,9 @@
+0.046 2025-04-27
+  [Changes]
+    * Minimalize source files.
+0.045 2025-04-27
+  [Changes]
+    * Change warning ccflags from ccflags to warn_ccflags to support MSVC.
 0.044 2025-04-07
   [Internal Changes]
     * Clean up RE2.config by removing redundant link flags and boilerplate as the SPVM core now handles them.

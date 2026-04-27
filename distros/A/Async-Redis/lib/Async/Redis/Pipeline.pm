@@ -160,16 +160,26 @@ Async::Redis::Pipeline - Command pipelining
 
 Pipeline collects multiple Redis commands and executes them in a single
 network round-trip, significantly reducing latency for bulk operations.
+Pipeline objects are single-use; after C<execute>, additional queued commands
+are rejected and another C<execute> returns an empty result.
 
 =head2 Error Handling
 
 Two distinct failure modes:
 
-1. **Command-level Redis errors** (WRONGTYPE, OOM): Captured inline in
-   result array. Pipeline continues. Check each slot for Error objects.
+=over 4
 
-2. **Transport failures** (connection loss, timeout): Entire pipeline
-   fails. Cannot determine which commands succeeded.
+=item 1.
+
+B<Command-level Redis errors> (WRONGTYPE, OOM): captured inline in the result
+array. The pipeline continues. Check each slot for error objects.
+
+=item 2.
+
+B<Transport failures> (connection loss, timeout): the entire pipeline fails.
+The client cannot determine which commands succeeded on the server.
+
+=back
 
 =head1 METHODS
 
@@ -181,12 +191,19 @@ Two distinct failure modes:
     );
 
 Create a new pipeline. Usually called via C<< $redis->pipeline >>.
+C<max_depth> defaults to the parent Redis object's C<pipeline_depth>.
 
 =head2 command
 
     $pipe->command('SET', 'key', 'value');
 
 Queue a command explicitly.
+
+=head2 add
+
+    $pipe->add('SET', 'key', 'value');
+
+Backward-compatible alias for queuing an explicit command.
 
 =head2 AUTOLOAD
 

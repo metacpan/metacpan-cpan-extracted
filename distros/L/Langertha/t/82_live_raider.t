@@ -15,8 +15,10 @@ BEGIN {
   push @available, 'openai'    if $ENV{TEST_LANGERTHA_OPENAI_API_KEY};
   push @available, 'deepseek'  if $ENV{TEST_LANGERTHA_DEEPSEEK_API_KEY};
   push @available, 'minimax'   if $ENV{TEST_LANGERTHA_MINIMAX_API_KEY};
+  push @available, 'tsystems'  if $ENV{TEST_LANGERTHA_TSYSTEMS_API_KEY};
+  push @available, 'scaleway'  if $ENV{TEST_LANGERTHA_SCALEWAY_API_KEY};
   unless (@available) {
-    plan skip_all => 'No TEST_LANGERTHA_*_API_KEY env vars set (need anthropic, openai, deepseek, or minimax)';
+    plan skip_all => 'No TEST_LANGERTHA_*_API_KEY env vars set (need anthropic, openai, deepseek, minimax, tsystems, or scaleway)';
   }
   eval {
     require IO::Async::Loop;
@@ -196,6 +198,28 @@ async sub run_tests {
       ));
     };
     diag "MiniMax error: $@" if $@;
+  }
+
+  if ($ENV{TEST_LANGERTHA_TSYSTEMS_API_KEY}) {
+    require Langertha::Engine::TSystems;
+    eval {
+      await test_raider('TSystems', Langertha::Engine::TSystems->new(
+        api_key => $ENV{TEST_LANGERTHA_TSYSTEMS_API_KEY},
+        model => 'gpt-oss-120b', mcp_servers => [$mcp],
+      ));
+    };
+    diag "TSystems error: $@" if $@;
+  }
+
+  if ($ENV{TEST_LANGERTHA_SCALEWAY_API_KEY}) {
+    require Langertha::Engine::Scaleway;
+    eval {
+      await test_raider('Scaleway', Langertha::Engine::Scaleway->new(
+        api_key => $ENV{TEST_LANGERTHA_SCALEWAY_API_KEY},
+        model => 'llama-3.1-8b-instruct', mcp_servers => [$mcp],
+      ));
+    };
+    diag "Scaleway error: $@" if $@;
   }
 }
 

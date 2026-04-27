@@ -1,6 +1,6 @@
 package Langertha::Role::HTTP;
 # ABSTRACT: Role for HTTP APIs
-our $VERSION = '0.404';
+our $VERSION = '0.500';
 use Moose::Role;
 
 use Carp qw( croak );
@@ -147,7 +147,7 @@ Langertha::Role::HTTP - Role for HTTP APIs
 
 =head1 VERSION
 
-version 0.404
+version 0.500
 
 =head2 url
 

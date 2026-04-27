@@ -1,0 +1,183 @@
+:: BATsh example 05: Comprehensive CMD mode features
+:: Run: perl lib/BATsh.pm eg/05_cmd_comprehensive.batsh
+:: Covers all CMD commands implemented in BATsh::CMD:
+::   ECHO, @ECHO OFF, SET, SET /A, IF/ELSE (string, ERRORLEVEL, EXIST,
+::   DEFINED, NOT, /I), FOR IN, FOR /L, GOTO, CALL :sub, SETLOCAL/ENDLOCAL,
+::   CD/CHDIR, DIR, COPY, DEL/ERASE, MKDIR/MD, RMDIR/RD, REN/RENAME,
+::   TYPE, PAUSE (skipped), CLS (skipped), TITLE, VER, PUSHD/POPD,
+::   EXIT /B, REM, :: comment, multi-line paren blocks
+:: All executed by BATsh::CMD in pure Perl -- no external cmd.exe needed.
+
+@ECHO OFF
+
+:: ---------------------------------------------------------------
+:: 1. ECHO and REM
+:: ---------------------------------------------------------------
+ECHO [1] ECHO and REM
+REM This is a REM comment -- not printed
+ECHO   ECHO ON/OFF suppresses the prompt (always OFF in BATsh)
+
+:: ---------------------------------------------------------------
+:: 2. SET and variable expansion
+:: ---------------------------------------------------------------
+ECHO [2] SET and variable expansion
+SET LANG=BATsh
+SET VERSION=1
+ECHO   LANG=%LANG%  VERSION=%VERSION%
+
+:: ---------------------------------------------------------------
+:: 3. SET /A arithmetic
+:: ---------------------------------------------------------------
+ECHO [3] SET /A arithmetic
+SET /A R1=6*7
+SET /A R2=100/4
+SET /A R3=17%%5
+SET /A R4=(3+4)*2
+ECHO   6*7=%R1%  100/4=%R2%  17%%5=%R3%  (3+4)*2=%R4%
+
+:: ---------------------------------------------------------------
+:: 4. IF string comparison
+:: ---------------------------------------------------------------
+ECHO [4] IF string comparison
+IF "%LANG%"=="BATsh" (
+    ECHO   IF PASS: LANG is BATsh
+) ELSE (
+    ECHO   IF FAIL
+)
+
+IF NOT "%LANG%"=="Other" (
+    ECHO   NOT PASS: LANG is not Other
+)
+
+:: 4b. IF /I case-insensitive
+IF /I "%LANG%"=="batsh" (
+    ECHO   IF /I PASS: case-insensitive match
+)
+
+:: ---------------------------------------------------------------
+:: 5. IF DEFINED and IF NOT DEFINED
+:: ---------------------------------------------------------------
+ECHO [5] IF DEFINED
+SET MYVAR=hello
+IF DEFINED MYVAR (
+    ECHO   DEFINED PASS: MYVAR=%MYVAR%
+)
+IF NOT DEFINED NOSUCHVAR (
+    ECHO   NOT DEFINED PASS: NOSUCHVAR absent
+)
+
+:: ---------------------------------------------------------------
+:: 6. IF ERRORLEVEL
+:: ---------------------------------------------------------------
+ECHO [6] IF ERRORLEVEL
+:: ERRORLEVEL starts at 0 after normal commands
+SET /A ELTEST=0
+IF ERRORLEVEL 0 SET /A ELTEST=1
+ECHO   ERRORLEVEL>=0: ELTEST=%ELTEST%
+
+:: ---------------------------------------------------------------
+:: 7. IF EXIST (file)
+:: ---------------------------------------------------------------
+ECHO [7] IF EXIST
+IF EXIST eg\05_cmd_comprehensive.batsh (
+    ECHO   EXIST PASS: script file found
+) ELSE (
+    IF EXIST eg/05_cmd_comprehensive.batsh (
+        ECHO   EXIST PASS: script file found (Unix path)
+    ) ELSE (
+        ECHO   EXIST INFO: path check skipped (run from project root)
+    )
+)
+
+:: ---------------------------------------------------------------
+:: 8. FOR IN (list)
+:: ---------------------------------------------------------------
+ECHO [8] FOR IN list
+SET ACC=
+FOR %%I IN (alpha beta gamma delta) DO (
+    ECHO   item: %%I
+)
+
+:: ---------------------------------------------------------------
+:: 9. FOR /L (numeric range)
+:: ---------------------------------------------------------------
+ECHO [9] FOR /L numeric range
+SET SUM=0
+FOR /L %%N IN (1,1,5) DO (
+    SET /A SUM=%SUM%+%%N
+)
+ECHO   sum 1..5=%SUM%
+
+FOR /L %%N IN (10,-3,1) DO (
+    ECHO   countdown: %%N
+)
+
+:: ---------------------------------------------------------------
+:: 10. GOTO and labels
+:: ---------------------------------------------------------------
+ECHO [10] GOTO
+GOTO :SKIP_BLOCK
+ECHO   THIS LINE MUST NOT APPEAR
+ECHO   THIS LINE MUST NOT APPEAR EITHER
+:SKIP_BLOCK
+ECHO   GOTO PASS: skipped two lines
+
+:: ---------------------------------------------------------------
+:: 11. SETLOCAL / ENDLOCAL (nested)
+:: ---------------------------------------------------------------
+ECHO [11] SETLOCAL / ENDLOCAL (nested)
+SET OUTER=original
+SETLOCAL
+SET OUTER=level1
+SETLOCAL
+SET OUTER=level2
+ECHO   inside inner SETLOCAL: OUTER=%OUTER%
+ENDLOCAL
+ECHO   after inner ENDLOCAL:  OUTER=%OUTER%
+ENDLOCAL
+ECHO   after outer ENDLOCAL:  OUTER=%OUTER%
+:: (Note: restored to value at time of SETLOCAL)
+
+:: ---------------------------------------------------------------
+:: 12. CALL :subroutine with arguments
+:: ---------------------------------------------------------------
+ECHO [12] CALL :subroutine
+CALL :GREET Alice
+CALL :GREET Bob
+GOTO :AFTER_SUBS
+
+:GREET
+ECHO   Hello, %BATSH_ARG1%!
+RET
+
+:AFTER_SUBS
+
+:: ---------------------------------------------------------------
+:: 13. PUSHD / POPD
+:: ---------------------------------------------------------------
+ECHO [13] PUSHD / POPD
+PUSHD eg
+ECHO   inside eg (PUSHD)
+POPD
+ECHO   back to original dir (POPD)
+
+:: ---------------------------------------------------------------
+:: 14. VER and TITLE
+:: ---------------------------------------------------------------
+ECHO [14] VER and TITLE
+VER
+TITLE BATsh comprehensive demo
+
+:: ---------------------------------------------------------------
+:: 15. MKDIR, REN, TYPE, COPY, DEL, RMDIR
+:: ---------------------------------------------------------------
+ECHO [15] File operations
+MKDIR _batsh_tmp_05
+CD _batsh_tmp_05
+ECHO created dir and entered it
+CD ..
+RMDIR _batsh_tmp_05
+ECHO   MKDIR/CD/RMDIR PASS
+
+:: ---------------------------------------------------------------
+ECHO [CMD comprehensive] Done.

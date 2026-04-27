@@ -5,7 +5,7 @@ use MooX::Cmd;
 use MooX::Options protect_argv => 0;
 
 
-our $VERSION = '1.001';
+our $VERSION = '1.100';
 
 option config => (
   is      => 'ro',
@@ -87,7 +87,7 @@ Langertha::Knarr::CLI - CLI entry point for Knarr LLM Proxy
 
 =head1 VERSION
 
-version 1.001
+version 1.100
 
 =head1 DESCRIPTION
 

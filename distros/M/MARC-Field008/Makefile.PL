@@ -27,6 +27,7 @@ requires 'Data::MARC::Field008::Map' => 0.03;
 requires 'Data::MARC::Field008::MixedMaterial' => 0.03;
 requires 'Data::MARC::Field008::Music' => 0.03;
 requires 'Data::MARC::Field008::VisualMaterial' => 0.03;
+requires 'English' => 0;
 requires 'Error::Pure' => 0;
 requires 'List::Util' => 1.33;
 requires 'Mo::utils' => 0.08;
@@ -41,7 +42,7 @@ test_requires 'Test::MockObject' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.04';
+version '0.05';
 
 # Run.
 WriteAll();

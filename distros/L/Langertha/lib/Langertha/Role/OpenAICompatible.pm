@@ -1,11 +1,13 @@
 package Langertha::Role::OpenAICompatible;
 # ABSTRACT: Role for OpenAI-compatible API format
-our $VERSION = '0.404';
+our $VERSION = '0.500';
 use Moose::Role;
 use File::ShareDir::ProjectDistDir qw( :all );
 use Carp qw( croak );
 use JSON::MaybeXS;
 use Langertha::ToolChoice;
+use Langertha::Response;
+use Langertha::ToolCall;
 
 
 has api_key => (
@@ -157,7 +159,7 @@ sub chat_response {
   my $data = $self->parse_response($response);
   my $choice = $data->{choices}[0];
   my $msg = $choice->{message} || {};
-  require Langertha::Response;
+  my @tcs = Langertha::ToolCall->extract($data);
   return Langertha::Response->new(
     content       => $msg->{content} // '',
     raw           => $data,
@@ -167,6 +169,7 @@ sub chat_response {
     $data->{usage} ? ( usage => $data->{usage} ) : (),
     $data->{created} ? ( created => $data->{created} ) : (),
     defined $msg->{reasoning_content} ? ( thinking => $msg->{reasoning_content} ) : (),
+    @tcs ? ( tool_calls => [ @tcs ] ) : (),
   );
 }
 
@@ -364,7 +367,7 @@ Langertha::Role::OpenAICompatible - Role for OpenAI-compatible API format
 
 =head1 VERSION
 
-version 0.404
+version 0.500
 
 =head1 SYNOPSIS
 

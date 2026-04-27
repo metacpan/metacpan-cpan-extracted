@@ -46,3 +46,44 @@ jobs:
         run: |
           ASAN_LIB=$(cc -print-file-name=libasan.so)
           LD_PRELOAD=$ASAN_LIB ASAN_OPTIONS=detect_leaks=0 make test
+
+  test-arm:
+    runs-on: ubuntu-24.04-arm
+    name: ARM64 / Linux
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.40'
+      - run: cpanm -n Devel::PPPort
+      - run: perl Makefile.PL && make && make test
+
+  test-ubsan:
+    runs-on: ubuntu-latest
+    name: UBSan
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.40'
+      - run: cpanm -n Devel::PPPort
+      - run: perl Makefile.PL OPTIMIZE='-g -fsanitize=undefined -fno-omit-frame-pointer'
+      - run: make
+      - name: test under UBSan
+        run: |
+          UBSAN_LIB=$(cc -print-file-name=libubsan.so)
+          LD_PRELOAD=$UBSAN_LIB UBSAN_OPTIONS=print_stacktrace=1:halt_on_error=1 make test
+
+  test-xt:
+    runs-on: ubuntu-latest
+    name: AUTHOR_TESTING (xt/)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.40'
+      - run: cpanm -n Devel::PPPort BSD::Resource Time::HiRes
+      - run: perl Makefile.PL && make
+      - run: AUTHOR_TESTING=1 prove -b -j2 xt/*.t
+        env:
+          AUTHOR_TESTING: 1

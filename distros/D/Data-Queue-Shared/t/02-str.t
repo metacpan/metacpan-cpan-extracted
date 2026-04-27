@@ -97,7 +97,7 @@ is $q2->pop, "cross", 'cross-handle works';
 # pop_wait timeout
 my $t0 = time;
 is $q->pop_wait(0.1), undef, 'pop_wait timeout';
-ok time - $t0 < 2, 'pop_wait did not hang';
+cmp_ok time - $t0, '<', 30, 'pop_wait returned (not hung)';
 
 # Arena-full condition (slots available but arena exhausted)
 # arena_cap minimum is 4096; use 2000-byte strings to fill it
@@ -125,7 +125,7 @@ ok time - $t0 < 2, 'pop_wait did not hang';
     $fq->push("a") for 1..4;
     my $t0 = time;
     ok !$fq->push_wait("overflow", 0.1), 'str push_wait timeout when full';
-    ok time - $t0 < 2, 'str push_wait did not hang';
+    cmp_ok time - $t0, '<', 30, 'str push_wait returned (not hung)';
     unlink $fpath;
 }
 

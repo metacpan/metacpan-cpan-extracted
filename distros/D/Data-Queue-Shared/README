@@ -68,6 +68,18 @@ DESCRIPTION
         string storage. Supports UTF-8 flag preservation. Optimal for
         messages, serialized data, filenames.
 
+        Memory-efficient for mixed lengths (short + occasional long strings
+        share the arena), but throughput degrades under heavy multi-producer
+        contention because all pushes serialize on one mutex.
+
+        For fixed-length FIFO workloads that need maximum throughput: use
+        Data::Deque::Shared::Str with only "push_back" / "pop_front". It's
+        fixed-slot-per-entry (memory use = capacity × max_len), uses a
+        per-slot publication state machine instead of a shared mutex, and
+        measures 1.3x-4.7x faster than Queue::Str depending on contention (1
+        vs 8 writers, 32-byte payloads, single box). Use that if your
+        messages share an upper bound and you want lock-free-style scaling.
+
   Features
     *   File-backed mmap for cross-process sharing
 
@@ -281,6 +293,33 @@ BENCHMARKS
     *   3.3x faster batch ops (single mutex hold vs per-item)
 
     *   True concurrent MPMC (MCE::Queue is workers-to-manager only)
+
+SEE ALSO
+    Data::Buffer::Shared - typed shared array
+
+    Data::HashMap::Shared - concurrent hash table
+
+    Data::PubSub::Shared - publish-subscribe ring
+
+    Data::ReqRep::Shared - request-reply
+
+    Data::Sync::Shared - synchronization primitives
+
+    Data::Pool::Shared - fixed-size object pool
+
+    Data::Stack::Shared - LIFO stack
+
+    Data::Deque::Shared - double-ended queue
+
+    Data::Log::Shared - append-only log (WAL)
+
+    Data::Heap::Shared - priority queue
+
+    Data::Graph::Shared - directed weighted graph
+
+    Data::BitSet::Shared - shared bitset (lock-free per-bit ops)
+
+    Data::RingBuffer::Shared - fixed-size overwriting ring buffer
 
 AUTHOR
     vividsnow

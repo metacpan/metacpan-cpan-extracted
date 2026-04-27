@@ -49,4 +49,16 @@ is($buf->get(5), "xx", 'set_slice[0]');
 is($buf->get(6), "yy", 'set_slice[1]');
 is($buf->get(7), "zz", 'set_slice[2]');
 
+# new_memfd + new_from_fd round-trip (Str variant requires max_len arg)
+{
+    my $a = Data::Buffer::Shared::Str->new_memfd("strfd", 10, 16);
+    $a->set(0, "hello");
+    my $fd = $a->memfd;
+    ok defined $fd && $fd >= 0, 'memfd returned';
+    my $b = Data::Buffer::Shared::Str->new_from_fd($fd, 16);
+    is $b->get(0), "hello", 'new_from_fd shares state';
+    $b->set(1, "world");
+    is $a->get(1), "world", 'reverse view';
+}
+
 done_testing;

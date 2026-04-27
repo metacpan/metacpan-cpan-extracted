@@ -1,5 +1,13 @@
 Revision history for Data-PubSub-Shared
 
+0.04  2026-04-26
+    - create: init header under flock
+    - harden DESTROY (handles + subscribers)
+    - factor MAKE OBJ macro
+    - eventfd consume returns accumulated count
+    - stat recoveries uint64 t; aarch64 CI matrix
+
+
 0.03  2026-04-12
     - Add SEE ALSO cross-links to family modules
 

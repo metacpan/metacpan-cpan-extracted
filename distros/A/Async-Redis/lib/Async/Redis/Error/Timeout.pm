@@ -4,8 +4,6 @@ use strict;
 use warnings;
 use 5.018;
 
-our $VERSION = '0.001';
-
 use parent 'Async::Redis::Error';
 
 sub command        { shift->{command} }

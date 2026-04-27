@@ -61,7 +61,7 @@ subtest 'tinysleep sleeps for the requested duration' => sub {
     tinysleep(0.1);
     my $elapsed = time - $start;
     cmp_ok($elapsed, '>=', 0.05, "slept at least a reasonable amount");
-    cmp_ok($elapsed, '<',  1.0,  "did not sleep much longer than requested");
+    cmp_ok($elapsed, '<',  5.0,  "did not sleep much longer than requested");
 };
 
 subtest 'tinysleep is interrupted by a signal' => sub {

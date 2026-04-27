@@ -78,18 +78,24 @@ $i64->free($s);
 my $f64 = Data::Pool::Shared::F64->new(undef, 4);
 $s = $f64->alloc;
 
+# Use string->NV so literals produce real Inf/NaN under -Duselongdouble
+# (where 9e999 would fit in long double and not overflow to Inf).
+my $posinf = "Inf"  + 0;
+my $neginf = "-Inf" + 0;
+my $nan    = "NaN"  + 0;
+
 # Infinity
-$f64->set($s, 9e999);
+$f64->set($s, $posinf);
 my $v = $f64->get($s);
-ok $v == 9e999, "F64 +Inf";
+ok $v == $posinf, "F64 +Inf";
 
 # -Infinity
-$f64->set($s, -9e999);
+$f64->set($s, $neginf);
 $v = $f64->get($s);
-ok $v == -9e999, "F64 -Inf";
+ok $v == $neginf, "F64 -Inf";
 
 # NaN
-$f64->set($s, 9e999 / 9e999);
+$f64->set($s, $nan);
 $v = $f64->get($s);
 ok $v != $v, "F64 NaN (NaN != NaN)";
 
@@ -200,6 +206,26 @@ like $@, qr/not allocated/, "slot_sv not allocated";
 $s = $pool->alloc;
 ok $pool->free($s), "first free ok";
 ok !$pool->free($s), "double free returns false";
+
+# slot_sv pins pool alive across pool-object scope exit
+{
+    my $sv;
+    {
+        my $p = Data::Pool::Shared->new(undef, 1, 16);
+        my $ps = $p->alloc;
+        $p->set($ps, "pintest\0\0\0\0\0\0\0\0\0");
+        $sv = $p->slot_sv($ps);
+    } # $p out of scope — magic must hold pool alive via refcount
+    is substr($sv, 0, 7), "pintest", "slot_sv pins pool across scope exit";
+}
+
+# free_n croaks on undef slot (Pass 10 hardening)
+eval { $pool->free_n([undef]) };
+like $@, qr/undef slot/, "free_n croaks on undef element";
+my @slots = map $pool->alloc, 1..3;
+eval { $pool->free_n([$slots[0], undef, $slots[2]]) };
+like $@, qr/undef slot/, "free_n croaks mid-array on undef";
+is $pool->free_n([$slots[0], $slots[1], $slots[2]]), 3, "free_n clean array works";
 
 # free_n with non-arrayref
 eval { $pool->free_n("not an array") };

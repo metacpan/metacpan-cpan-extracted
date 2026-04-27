@@ -2,7 +2,7 @@ package IPC::Manager::Service::Handle;
 use strict;
 use warnings;
 
-our $VERSION = '0.000033';
+our $VERSION = '0.000035';
 
 use Carp qw/croak/;
 use Time::HiRes qw/time/;
@@ -94,11 +94,27 @@ sub sync_request {
     return $self->await_response($id, $timeout);
 }
 
+# Returns true if the named peer is still considered live for the purpose
+# of expecting a response.  Protocols that advertise suspend_supported let
+# peers suspend cleanly (pidfile dropped) or restart under a new pid while
+# the registration stays in place — a missing pid or a pid mismatch is
+# therefore not a failure on its own, only full unregistration is.
+# Protocols without suspend treat a dead or missing pid as a permanent loss.
+sub _pending_peer_active {
+    my $self = shift;
+    my ($peer, $pid) = @_;
+
+    my $client = $self->client;
+
+    return $client->peer_exists($peer) ? 1 : 0 if $client->suspend_supported;
+    return $client->pid_is_running($pid) ? 1 : 0 if defined $pid;
+    return $client->peer_active($peer);
+}
+
 sub await_response {
     my $self = shift;
     my ($id, $timeout) = @_;
 
-    my $client   = $self->client;
     my $interval = $self->{+INTERVAL};
     my $deadline = defined($timeout) ? time + $timeout : undef;
 
@@ -107,37 +123,17 @@ sub await_response {
         return $out[0] if @out;
 
         my ($peer, $pid) = $self->pending_response_peer($id);
-        if ($peer) {
-            # Protocols that advertise suspend_supported let peers suspend
-            # cleanly (pidfile dropped) or restart under a new pid while the
-            # registration stays in place.  A missing pid or a pid mismatch
-            # is therefore not a failure on its own — only full
-            # unregistration is.  Protocols without suspend treat a dead or
-            # missing pid as a permanent loss.
-            my $active;
-            if ($client->suspend_supported) {
-                $active = $client->peer_exists($peer) ? 1 : 0;
-            }
-            elsif (defined $pid) {
-                $active = $client->pid_is_running($pid) ? 1 : 0;
-            }
-            else {
-                $active = $client->peer_active($peer);
-            }
+        if ($peer && !$self->_pending_peer_active($peer, $pid)) {
+            # Race: the peer may have sent its response and then exited
+            # before we polled for it.  The peer-active check now reports
+            # gone, but the response can still be sitting in the transport
+            # waiting to be ingested.  Do one final non-blocking drain and
+            # re-check before declaring the request lost.
+            $self->poll(0);
+            @out = $self->get_response($id);
+            return $out[0] if @out;
 
-            unless ($active) {
-                # Race: the peer may have sent its response and then
-                # exited before we polled for it.  The peer-active check
-                # now reports gone, but the response can still be sitting
-                # in the transport waiting to be ingested.  Do one final
-                # non-blocking drain and re-check before declaring the
-                # request lost.
-                $self->poll(0);
-                @out = $self->get_response($id);
-                return $out[0] if @out;
-
-                croak "peer '$peer' went away while awaiting response '$id'";
-            }
+            croak "peer '$peer' went away while awaiting response '$id'";
         }
 
         my $wait = $interval;
@@ -155,10 +151,74 @@ sub await_response {
 
 sub await_all_responses {
     my $self = shift;
+    my ($timeout) = @_;
 
-    $self->poll while $self->have_pending_responses;
+    my $deadline = defined($timeout) ? time + $timeout : undef;
+
+    while ($self->have_pending_responses) {
+        if ($self->_have_gone_pending_peers) {
+            # Drain once more in case responses raced peer disappearance.
+            $self->poll(0);
+            last unless $self->have_pending_responses;
+
+            my @gone = $self->_gone_pending_peers;
+            if (@gone) {
+                my %seen;
+                my @uniq = grep { !$seen{$_}++ } map { $_->[0] } @gone;
+                croak "peer(s) '" . join(", ", @uniq) . "' went away while awaiting responses";
+            }
+        }
+
+        my $wait = $self->{+INTERVAL};
+        if (defined $deadline) {
+            my $remaining = $deadline - time;
+            croak "await_all_responses: timed out after ${timeout}s with pending responses"
+                if $remaining <= 0;
+            $wait = $remaining if $remaining < $wait;
+        }
+
+        $self->poll($wait);
+    }
 
     return;
+}
+
+# Returns a list of [peer, pid] tuples for pending responses whose peer is
+# no longer considered active.
+sub _gone_pending_peers {
+    my $self = shift;
+
+    my @gone;
+    for my $entry (values %{$self->{_RESPONSES} // {}}) {
+        next if defined $entry->{response};
+        push @gone, [$entry->{peer}, $entry->{pid}]
+            unless $self->_pending_peer_active($entry->{peer}, $entry->{pid});
+    }
+    for my $entry (values %{$self->{_RESPONSE_HANDLER} // {}}) {
+        next unless defined $entry;
+        push @gone, [$entry->{peer}, $entry->{pid}]
+            unless $self->_pending_peer_active($entry->{peer}, $entry->{pid});
+    }
+    return @gone;
+}
+
+# Boolean fast path for "is any pending response's peer gone?".  Short-
+# circuits on the first hit so we skip _pending_peer_active probes (which
+# can hit the FS / DB) for every other pending response.  Use this when
+# the caller only needs the yes/no; collect names via _gone_pending_peers
+# only after this confirms there is at least one.
+sub _have_gone_pending_peers {
+    my $self = shift;
+
+    for my $entry (values %{$self->{_RESPONSES} // {}}) {
+        next if defined $entry->{response};
+        return 1 unless $self->_pending_peer_active($entry->{peer}, $entry->{pid});
+    }
+    for my $entry (values %{$self->{_RESPONSE_HANDLER} // {}}) {
+        next unless defined $entry;
+        return 1 unless $self->_pending_peer_active($entry->{peer}, $entry->{pid});
+    }
+    return 0;
 }
 
 sub messages {
@@ -373,7 +433,14 @@ Honors the same C<$timeout> and peer-death semantics as C<sync_request>.
 
 =item $self->await_all_responses()
 
-Waits for all pending responses to arrive.
+=item $self->await_all_responses($timeout)
+
+Waits for all pending responses to arrive.  If C<$timeout> is provided,
+throws after that many seconds with pending responses still outstanding.
+
+Honors the same peer-death semantics as C<await_response>: if any pending
+peer goes away (after a final drain) before its response arrives, this
+throws C<< "peer(s) '...' went away while awaiting responses" >>.
 
 =item @messages = $self->messages()
 

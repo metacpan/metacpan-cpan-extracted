@@ -57,7 +57,7 @@ my $cli = Data::ReqRep::Shared::Client->new($path);
         exit 0;
     }
 
-    my @items = $srv->recv_wait_multi(10, 2.0);
+    my @items = $srv->recv_wait_multi(10, 30.0);
     ok scalar @items >= 2, 'recv_wait_multi: got at least 1 pair';
     ok scalar @items <= 8, 'recv_wait_multi: got at most 4 pairs';
 
@@ -74,8 +74,10 @@ my $cli = Data::ReqRep::Shared::Client->new($path);
 
 # recv_wait_multi timeout
 {
+    my $t0 = time;
     my @empty = $srv->recv_wait_multi(10, 0.01);
     is scalar @empty, 0, 'recv_wait_multi timeout: empty list';
+    cmp_ok time - $t0, '<', 30, 'recv_wait_multi returned (not hung)';
 }
 
 # drain

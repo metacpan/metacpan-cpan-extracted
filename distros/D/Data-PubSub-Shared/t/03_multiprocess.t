@@ -20,7 +20,7 @@ use Data::PubSub::Shared;
         my $sub = $child_ps->subscribe;
         my @got;
         for (1..5) {
-            my $v = $sub->poll_wait(2);
+            my $v = $sub->poll_wait(30);
             push @got, $v if defined $v;
         }
         # Signal success via exit code
@@ -28,7 +28,7 @@ use Data::PubSub::Shared;
     }
 
     # Parent: publish
-    select(undef, undef, undef, 0.05);  # let child subscribe
+    select(undef, undef, undef, 0.5);  # let child subscribe
     $ps->publish($_) for 1..5;
     waitpid($pid, 0);
     is $? >> 8, 0, 'child received all 5 int messages';
@@ -48,13 +48,13 @@ use Data::PubSub::Shared;
         my $sub = $child_ps->subscribe;
         my @got;
         for (1..3) {
-            my $v = $sub->poll_wait(2);
+            my $v = $sub->poll_wait(30);
             push @got, $v if defined $v;
         }
         exit(join(',', @got) eq 'foo,bar,baz' ? 0 : 1);
     }
 
-    select(undef, undef, undef, 0.05);
+    select(undef, undef, undef, 0.5);
     $ps->publish("foo");
     $ps->publish("bar");
     $ps->publish("baz");
@@ -75,19 +75,19 @@ use Data::PubSub::Shared;
         if ($pid == 0) {
             my $child_ps = Data::PubSub::Shared::Int->new($path, 256);
             my $sub = $child_ps->subscribe;
-            my $v = $sub->poll_wait(2);
+            my $v = $sub->poll_wait(30);
             exit(defined $v && $v == 42 ? 0 : 1);
         }
         push @pids, $pid;
     }
 
-    select(undef, undef, undef, 0.05);
+    select(undef, undef, undef, 0.5);
     $ps->publish(42);
 
     my $all_ok = 1;
     for my $pid (@pids) {
         waitpid($pid, 0);
-        $all_ok = 0 if $? >> 8 != 0;
+        $all_ok = 0 if $? != 0;
     }
     ok $all_ok, '3 child subscribers all received same message';
     unlink $path;

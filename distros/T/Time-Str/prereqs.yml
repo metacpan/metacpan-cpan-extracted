@@ -6,4 +6,6 @@ runtime:
 test:
   requires:
     Test::More: '0.47'
+    Test::Number::Delta: '1.06'
+    Test::Fatal: '0.006'
 

@@ -10,6 +10,7 @@ WriteMakefile(
     ABSTRACT_FROM    => 'lib/Heap/PQ.pm',
     LICENSE          => 'perl',
     MIN_PERL_VERSION => '5.010',
+    macro            => { TARFLAGS   => "--format=ustar -c -v -f" },
     OBJECT           => 'HeapPQ$(OBJ_EXT)',
     C                => ['HeapPQ.c'],
     XS               => {},

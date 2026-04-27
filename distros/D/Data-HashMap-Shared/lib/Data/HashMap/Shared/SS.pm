@@ -2,7 +2,7 @@ package Data::HashMap::Shared::SS;
 use strict;
 use warnings;
 use Data::HashMap::Shared;
-our $VERSION = '0.02';
+our $VERSION = '0.07';
 
 sub import {
     $^H{"Data::HashMap::Shared::SS/shm_ss_put"}        = 1;

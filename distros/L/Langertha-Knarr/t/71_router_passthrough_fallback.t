@@ -24,11 +24,16 @@ use Langertha::Knarr::Handler::Router;
   package MockEngine;
   use Moose;
   use Future;
-  sub simple_chat_f {
-    my ($self, @msgs) = @_;
+  sub chat_f {
+    my ($self, %args) = @_;
+    my @msgs = @{ $args{messages} || [] };
     my $last = $msgs[-1];
     my $text = ref $last ? ($last->{content} // '') : "$last";
     return Future->done("ENGINE: $text");
+  }
+  sub simple_chat_f {
+    my ($self, @msgs) = @_;
+    return $self->chat_f( messages => \@msgs );
   }
   __PACKAGE__->meta->make_immutable;
 }
@@ -60,7 +65,7 @@ my $session = Langertha::Knarr::Session->new( id => 's' );
     messages => [ { role => 'user', content => 'hi' } ],
   );
   my $r = $h->handle_chat_f( $session, $req_known )->get;
-  is( $r->{content}, 'ENGINE: hi', 'known model goes to engine' );
+  is( $r->content, 'ENGINE: hi', 'known model goes to engine' );
 
   my $req_unknown = Langertha::Knarr::Request->new(
     protocol => 'openai',
@@ -86,7 +91,7 @@ my $session = Langertha::Knarr::Session->new( id => 's' );
     messages => [ { role => 'user', content => 'hi' } ],
   );
   my $r1 = $h->handle_chat_f( $session, $req_known )->get;
-  is( $r1->{content}, 'ENGINE: hi', 'known still uses engine when passthrough configured' );
+  is( $r1->content, 'ENGINE: hi', 'known still uses engine when passthrough configured' );
   is( scalar @{ $pt->calls }, 0, 'passthrough not called for known model' );
 
   # Unknown falls through.
@@ -96,7 +101,7 @@ my $session = Langertha::Knarr::Session->new( id => 's' );
     messages => [ { role => 'user', content => 'hi' } ],
   );
   my $r2 = $h->handle_chat_f( $session, $req_unknown )->get;
-  is( $r2->{content}, 'PASSTHROUGH: gpt-mystery', 'unknown falls through' );
+  is( $r2->content, 'PASSTHROUGH: gpt-mystery', 'unknown falls through' );
   is( scalar @{ $pt->calls }, 1, 'passthrough called once' );
   is( $pt->calls->[0], 'gpt-mystery', 'passthrough received the model name' );
 }

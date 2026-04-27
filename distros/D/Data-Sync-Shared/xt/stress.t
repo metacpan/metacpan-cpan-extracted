@@ -34,7 +34,7 @@ diag "stress: $WORKERS workers x $OPS ops each";
     my $ok = 1;
     for my $pid (@pids) {
         waitpid($pid, 0);
-        $ok = 0 if ($? >> 8) != 0;
+        $ok = 0 if $? != 0;
     }
 
     ok $ok, "sem contention: all $WORKERS workers completed $OPS ops";
@@ -136,7 +136,7 @@ diag "stress: $WORKERS workers x $OPS ops each";
     my $ok = 1;
     for my $pid (@pids) {
         waitpid($pid, 0);
-        $ok = 0 if ($? >> 8) != 0;
+        $ok = 0 if $? != 0;
     }
 
     open my $in, '<', $datafile;
@@ -183,7 +183,7 @@ diag "stress: $WORKERS workers x $OPS ops each";
     my $ok = 1;
     for my $pid (@pids) {
         waitpid($pid, 0);
-        $ok = 0 if ($? >> 8) != 0;
+        $ok = 0 if $? != 0;
     }
 
     ok $ok, "barrier stress: $parties parties x $rounds rounds";
@@ -254,7 +254,7 @@ diag "stress: $WORKERS workers x $OPS ops each";
         my $init_count = 0;
         for my $pid (@pids) {
             waitpid($pid, 0);
-            $init_count++ if ($? >> 8) == 1;
+            $init_count++ if $? == 256;
         }
 
         $failures++ if $init_count != 1;

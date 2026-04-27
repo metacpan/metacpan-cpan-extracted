@@ -7,6 +7,15 @@ use Test::More;
 # Check if modules can load BEFORE running any tests
 # This avoids "Bad plan" errors when skip_all is needed
 BEGIN {
+    # Cygwin/Windows can't link the test extension against Util.dll without
+    # an import library that we don't ship. Skip outright instead of letting
+    # the dlopen failure consume Cygwin fork resources and corrupt later
+    # tests in the run.
+    if ($^O eq 'cygwin' || $^O eq 'MSWin32' || $^O eq 'msys') {
+        plan skip_all => "export-registry XS test cannot link against Util.dll on $^O";
+        exit 0;
+    }
+
     # Try to load util first
     eval { require Func::Util };
     if ($@) {

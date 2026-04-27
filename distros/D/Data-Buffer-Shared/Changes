@@ -1,5 +1,12 @@
 Revision history for Data-Buffer-Shared
 
+0.03  2026-04-26
+    - new from fd dups fd; sync/stats/memfd aliases
+    - rwlock writers waiting split + crash recovery
+    - idempotent eventfd; unlink croaks on failure
+    - aarch64 CI matrix
+
+
 0.02  2026-04-12
     - Fix DESTROY ordering (zero IV before free)
     - Add SEE ALSO cross-links to family modules

@@ -6,7 +6,7 @@ use WorePAN;
 use Getopt::Long;
 use Pod::Usage;
 
-GetOptions(\my %opts, qw/help version|v verbose cpan_only/);
+GetOptions(\my %opts, qw/help version|v verbose cpan_only allow_dev/);
 
 my $root = pop @ARGV;
 my @targets = @ARGV;
@@ -25,6 +25,7 @@ WorePAN->new(
   no_network => 0,
   use_backpan => !$opts{cpan_only},
   verbose => $opts{verbose},
+  developer_releases => $opts{allow_dev},
 );
 
 exit 0;
@@ -45,6 +46,10 @@ worepan - yet another CLI to create a DarkPAN
 =head2 cpan_only
 
 If set, WorePAN won't try to fetch a distribution from BackPAN even if it's not found on CPAN.
+
+=head2 allow_dev
+
+If set, WorePAN accepts developer releases too.
 
 =head2 verbose
 

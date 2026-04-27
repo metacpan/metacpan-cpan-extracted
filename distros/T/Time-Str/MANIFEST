@@ -25,6 +25,8 @@ t/RFC3339.t
 t/RFC4287.t
 t/RubyDate.t
 t/UnixDate.t
+t/Util.pm
 t/W3CDTF.t
+t/api.t
 xt/author/00-compile.t
 xt/author/pod-syntax.t

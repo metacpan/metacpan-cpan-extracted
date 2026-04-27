@@ -1,4 +1,12 @@
 Revision history for Data::Graph::Shared
 
+0.02  2026-04-26
+    - atomic RMW + lifecycle parity
+    - REQUIRE NODE macro; notify() returns bool
+    - eventfd consume returns SV*
+    - hoist Perl alloc out of neighbors mutex
+    - idempotent eventfd; aarch64 CI matrix
+
+
 0.01  2026-04-12
     - Initial release

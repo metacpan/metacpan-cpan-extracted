@@ -2,9 +2,9 @@ use 5.005;
 use strict;
 use warnings;
 
-# ABSTRACT: Module signature file manipulation
+# ABSTRACT: DEPRECATED Module signature file manipulation
 package Module::Signature;
-our $VERSION = '0.93'; #VERSION
+our $VERSION = '0.95'; #VERSION
 
 use vars qw($VERSION $SIGNATURE @ISA @EXPORT_OK);
 use vars qw($Preamble $Cipher $Debug $Verbose $Timeout $AUTHOR);
@@ -469,14 +469,11 @@ sub _sign_gpg {
 
     my $key_id;
     my $key_name;
-    # This doesn't work because the output from verify goes to STDERR.
-    # If I try to redirect it using "--logger-fd 1" it just hangs.
-    # WTF?
-    my @verify = `$gpg --batch --verify $SIGNATURE`;
-    while (@verify) {
-        if (/key ID ([0-9A-F]+)$/) {
+    my @verify = `$gpg --batch --logger-fd 1 --verify $SIGNATURE`;
+    foreach (@verify) {
+        if (/key(?: ID)? ([0-9A-F]+)$/) {
             $key_id = $1;
-        } elsif (/signature from "(.+)"$/) {
+        } elsif (/signature from "(.+)"(?: \[[a-z]+\])?$/) {
             $key_name = $1;
         }
     }
@@ -485,7 +482,7 @@ sub _sign_gpg {
     my $found_key;
     if (defined $key_id && defined $key_name) {
         my $keyserver = _keyserver($version);
-        while (`$gpg --batch --keyserver=$keyserver --search-keys '$key_name'`) {
+        foreach (`$gpg --batch --keyserver=$keyserver --search-keys '$key_name'`) {
             if (/^\(\d+\)/) {
                 $found_name = 0;
             } elsif ($found_name) {
@@ -711,11 +708,11 @@ __END__
 
 =head1 NAME
 
-Module::Signature - Module signature file manipulation
+Module::Signature - DEPRECATED Module signature file manipulation
 
 =head1 VERSION
 
-version 0.93
+version 0.95
 
 =head1 SYNOPSIS
 
@@ -771,6 +768,21 @@ files. Users verifying old SHA1 signature files will receive a warning.
 =head1 NAME
 
 Module::Signature - Module signature file manipulation
+
+=head1 DEPRECATION NOTICE
+
+B<Module::Signature> has been deprecated because it does not provide
+the user with the security assurance that its usage would imply.
+
+Module authors, who have used B<Module::Signature>, have not always
+replaced their keys before they expire. Depending on a user's
+configuration it can cause issues with the installation of those modules.
+
+In addition, since it was written, the key server infrastructure has changed
+and the ability to securely find keys has greatly diminished.
+
+Module authors should remove the SIGNATURE file when they upload new versions
+to PAUSE. Module users should uninstall B<Module::Signature>.
 
 =head1 VARIABLES
 
@@ -1052,7 +1064,7 @@ Audrey Tang <cpan@audreyt.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by waved.
+This software is copyright (c) 2026 by waved.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

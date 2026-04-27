@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Cover;
 # ABSTRACT: A Cover data object
-$MetaCPAN::Client::Cover::VERSION = '2.041000';
+$MetaCPAN::Client::Cover::VERSION = '2.042000';
 use Moo;
 
 with 'MetaCPAN::Client::Role::Entity';
@@ -43,7 +43,7 @@ MetaCPAN::Client::Cover - A Cover data object
 
 =head1 VERSION
 
-version 2.041000
+version 2.042000
 
 =head1 SYNOPSIS
 

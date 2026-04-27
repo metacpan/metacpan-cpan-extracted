@@ -85,8 +85,8 @@ typedef struct {
 
     /* ---- Cache line 3 (192-255): stats ---- */
     uint64_t stat_publish_ok;  /* 192 */
-    uint32_t stat_recoveries;  /* 200 */
-    uint8_t  _pad3[52];        /* 204-255 */
+    uint64_t stat_recoveries;  /* 200 */
+    uint8_t  _pad3[48];        /* 208-255 */
 } PubSubHeader;
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
@@ -211,7 +211,7 @@ static inline void pubsub_recover_stale_mutex(PubSubHeader *hdr, uint32_t observ
         return;
     __atomic_add_fetch(&hdr->stat_recoveries, 1, __ATOMIC_RELAXED);
     if (__atomic_load_n(&hdr->mutex_waiters, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->mutex, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+        syscall(SYS_futex, &hdr->mutex, FUTEX_WAKE, 1, NULL, NULL, 0);
 }
 
 static inline void pubsub_mutex_lock(PubSubHeader *hdr) {
@@ -297,10 +297,19 @@ static inline int pubsub_validate_header(PubSubHeader *hdr, uint32_t mode,
         hdr->total_size != file_size ||
         hdr->slots_off != sizeof(PubSubHeader))
         return 0;
+    /* Slot array must fit within file. */
+    uint64_t slot_size = (mode == PUBSUB_MODE_INT)   ? sizeof(PubSubIntSlot)
+                       : (mode == PUBSUB_MODE_INT32) ? sizeof(PubSubInt32Slot)
+                       : (mode == PUBSUB_MODE_INT16) ? sizeof(PubSubInt16Slot)
+                       :                               sizeof(PubSubStrSlot);
+    if (hdr->capacity > (hdr->total_size - hdr->slots_off) / slot_size)
+        return 0;
     if (mode == PUBSUB_MODE_STR) {
         if (hdr->data_off == 0 || hdr->msg_size == 0 || hdr->arena_cap == 0)
             return 0;
-        if (hdr->data_off + hdr->arena_cap > hdr->total_size)
+        uint64_t slots_end = hdr->slots_off + (uint64_t)hdr->capacity * slot_size;
+        if (hdr->data_off < slots_end ||
+            hdr->data_off + hdr->arena_cap > hdr->total_size)
             return 0;
     }
     return 1;
@@ -403,6 +412,8 @@ static PubSubHandle *pubsub_create(const char *path, uint32_t capacity,
             PUBSUB_ERR("mmap(anonymous): %s", strerror(errno));
             return NULL;
         }
+        pubsub_init_header(base, mode, cap, total_size, slots_off, data_off,
+                            msg_size, arena_cap);
     } else {
         int fd = open(path, O_RDWR | O_CREAT, 0666);
         if (fd < 0) { PUBSUB_ERR("open(%s): %s", path, strerror(errno)); return NULL; }
@@ -449,12 +460,11 @@ static PubSubHandle *pubsub_create(const char *path, uint32_t capacity,
             return pubsub_init_handle(base, map_size, mode, path);
         }
 
+        pubsub_init_header(base, mode, cap, total_size, slots_off, data_off,
+                            msg_size, arena_cap);
         flock(fd, LOCK_UN);
         close(fd);
     }
-
-    pubsub_init_header(base, mode, cap, total_size, slots_off, data_off,
-                        msg_size, arena_cap);
 
     PubSubHandle *h = pubsub_init_handle(base, (size_t)total_size, mode, path);
     if (!h) { munmap(base, (size_t)total_size); return NULL; }
@@ -476,13 +486,14 @@ static PubSubHandle *pubsub_create_memfd(const char *name, uint32_t capacity,
     uint64_t slots_off, data_off, arena_cap, total_size;
     pubsub_calc_layout(cap, mode, msg_size, &slots_off, &data_off, &arena_cap, &total_size);
 
-    int fd = memfd_create(name ? name : "pubsub", MFD_CLOEXEC);
+    int fd = memfd_create(name ? name : "pubsub", MFD_CLOEXEC | MFD_ALLOW_SEALING);
     if (fd < 0) { PUBSUB_ERR("memfd_create: %s", strerror(errno)); return NULL; }
 
     if (ftruncate(fd, (off_t)total_size) < 0) {
         PUBSUB_ERR("ftruncate(memfd): %s", strerror(errno));
         close(fd); return NULL;
     }
+    (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
 
     void *base = mmap(NULL, (size_t)total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) {
@@ -715,6 +726,7 @@ DEFINE_INT_PUBSUB(int16, PubSubInt16Slot, int16_t, uint32_t, int32_t)
 /* Publish one Str message while mutex is already held (no lock/wake). */
 static inline int pubsub_str_publish_locked(PubSubHandle *h, const char *str,
                                              uint32_t len, bool utf8) {
+    if (len > PUBSUB_STR_LEN_MASK) return -1;
     if (len > h->msg_size) return -1;
 
     PubSubHeader *hdr = h->hdr;
@@ -729,6 +741,7 @@ static inline int pubsub_str_publish_locked(PubSubHandle *h, const char *str,
 
     uint32_t alloc = (len + 7) & ~7u;
     if (alloc == 0) alloc = 8;
+    if (alloc > h->arena_cap) return -1;
     uint32_t apos = __atomic_load_n(&hdr->arena_wpos, __ATOMIC_RELAXED);
     if ((uint64_t)apos + alloc > h->arena_cap)
         apos = 0;
@@ -915,11 +928,11 @@ static inline void pubsub_notify(PubSubHandle *h) {
     }
 }
 
-static inline void pubsub_eventfd_consume(PubSubHandle *h) {
-    if (h->notify_fd >= 0) {
-        uint64_t val;
-        ssize_t __attribute__((unused)) rc = read(h->notify_fd, &val, sizeof(val));
-    }
+static inline int64_t pubsub_eventfd_consume(PubSubHandle *h) {
+    if (h->notify_fd < 0) return -1;
+    uint64_t val = 0;
+    if (read(h->notify_fd, &val, sizeof(val)) != sizeof(val)) return -1;
+    return (int64_t)val;
 }
 
 static inline void pubsub_sub_eventfd_consume(PubSubSub *sub) {

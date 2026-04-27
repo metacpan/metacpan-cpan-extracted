@@ -1,3 +1,11 @@
+1.0.3   2026-04-26
+
+- Bugfix for BSD-ish platforms. The bug ended up being more of a re-write :-)
+  It's also worth nothing that the bug had been around for aaaages and I was
+  completely stumped. No-one I asked for help had been able to figure it out
+  either. Copilot did. I have carefully reviewed what it wrote, and made sure
+  it was thoroughly tested and human-readable.
+
 1.0.2   2023-04-14
 
 - Be more careful about the order in which we kill processes

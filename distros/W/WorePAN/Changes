@@ -1,5 +1,8 @@
 Revision history for WorePAN
 
+0.19 2026/04/26
+  - add boolean option to allow developer releases (XSven++)
+
 0.18 2024/10/19
   - use secure transport
 

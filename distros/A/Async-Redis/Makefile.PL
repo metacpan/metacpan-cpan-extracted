@@ -21,6 +21,7 @@ my %WriteMakefileArgs = (
     "Future" => "0.49",
     "Future::AsyncAwait" => "0.66",
     "Future::IO" => "0.23",
+    "Future::Selector" => "0.05",
     "IO::Socket::INET" => 0,
     "Protocol::Redis" => 0,
     "Socket" => 0,
@@ -30,9 +31,9 @@ my %WriteMakefileArgs = (
     "Test2::V0" => 0,
     "Test::Lib" => 0
   },
-  "VERSION" => "0.001007",
+  "VERSION" => "0.002000",
   "test" => {
-    "TESTS" => "t/*.t t/01-unit/*.t t/10-connection/*.t t/20-commands/*.t t/30-pipeline/*.t t/40-transactions/*.t t/50-pubsub/*.t t/60-scripting/*.t t/70-blocking/*.t t/80-scan/*.t t/90-pool/*.t t/91-reliability/*.t t/92-concurrency/*.t t/93-binary/*.t t/93-socket-cleanup/*.t t/94-observability/*.t t/99-integration/*.t"
+    "TESTS" => "t/*.t t/00-pod/*.t t/01-unit/*.t t/10-connection/*.t t/20-commands/*.t t/30-pipeline/*.t t/40-transactions/*.t t/50-pubsub/*.t t/60-scripting/*.t t/70-blocking/*.t t/80-scan/*.t t/90-pool/*.t t/91-reliability/*.t t/92-concurrency/*.t t/93-binary/*.t t/93-socket-cleanup/*.t t/94-observability/*.t t/99-integration/*.t"
   }
 );
 
@@ -42,6 +43,7 @@ my %FallbackPrereqs = (
   "Future" => "0.49",
   "Future::AsyncAwait" => "0.66",
   "Future::IO" => "0.23",
+  "Future::Selector" => "0.05",
   "IO::Socket::INET" => 0,
   "Protocol::Redis" => 0,
   "Socket" => 0,

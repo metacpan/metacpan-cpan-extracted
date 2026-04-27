@@ -22,7 +22,7 @@ my $sb = Langertha::Knarr->new(
   port    => 0,
 );
 
-my $proto = Langertha::Knarr::Protocol::OpenAI->new( steerboard => $sb );
+my $proto = Langertha::Knarr::Protocol::OpenAI->new;
 
 # Routes registered
 my $routes = $proto->protocol_routes;
@@ -50,7 +50,7 @@ is( scalar @{ $req->messages }, 1, 'one message' );
 my $session = $sb->session;
 my $f = $handler->handle_chat_f( $session, $req );
 my $response = $f->get;
-is( $response->{content}, 'echo: hello', 'handler echoed' );
+is( $response->content, 'echo: hello', 'handler echoed' );
 
 # Format response
 my ($status, $headers, $out) = $proto->format_chat_response( $response, $req );

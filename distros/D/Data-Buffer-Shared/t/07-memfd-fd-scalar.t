@@ -53,6 +53,26 @@ use Data::Buffer::Shared::Str;
     is($buf1->get(1), 777, 'new_from_fd: writes visible to original');
 }
 
+# === new_from_fd: caller retains fd ownership ===
+# Regression: new_from_fd must duplicate the fd internally so the caller's
+# fd remains valid after the returned buffer is destroyed. Matches the
+# convention in Data::BitSet::Shared / Data::Stack::Shared / Data::RingBuffer::Shared.
+{
+    my $buf1 = Data::Buffer::Shared::I64->new_memfd("own_test", 8);
+    $buf1->set(0, 4242);
+    my $caller_fd = POSIX::dup($buf1->fd);
+    ok($caller_fd >= 0, 'caller dup');
+
+    {
+        my $buf2 = Data::Buffer::Shared::I64->new_from_fd($caller_fd);
+        is($buf2->get(0), 4242, 'buf2 sees initial value');
+    }  # buf2 DESTROY must NOT close caller_fd
+
+    my $buf3 = Data::Buffer::Shared::I64->new_from_fd($caller_fd);
+    is($buf3->get(0), 4242, 'caller_fd still valid after buf2 destroy');
+    POSIX::close($caller_fd);
+}
+
 # === fd returns undef for file-backed and anon ===
 {
     use File::Temp qw(tmpnam);

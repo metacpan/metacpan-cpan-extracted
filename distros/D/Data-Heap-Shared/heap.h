@@ -60,8 +60,8 @@ typedef struct {
     uint64_t stat_pops;        /* 88 */
     uint64_t stat_waits;       /* 96 */
     uint64_t stat_timeouts;    /* 104 */
-    uint32_t stat_recoveries;  /* 112 */
-    uint8_t  _pad1[12];        /* 116-127 */
+    uint64_t stat_recoveries;  /* 112 */
+    uint8_t  _pad1[8];         /* 120-127 */
 } HeapHeader;
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
@@ -112,8 +112,12 @@ static inline void heap_mutex_lock(HeapHeader *hdr) {
                 uint32_t pid = cur & HEAP_MUTEX_PID;
                 if (!heap_pid_alive(pid)) {
                     if (__atomic_compare_exchange_n(&hdr->mutex, &cur, 0,
-                            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
+                            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) {
                         __atomic_add_fetch(&hdr->stat_recoveries, 1, __ATOMIC_RELAXED);
+                        /* Wake one waiter so recovery latency is not bounded by the 2s timeout. */
+                        if (__atomic_load_n(&hdr->mutex_waiters, __ATOMIC_RELAXED) > 0)
+                            syscall(SYS_futex, &hdr->mutex, FUTEX_WAKE, 1, NULL, NULL, 0);
+                    }
                 }
             }
         }
@@ -283,6 +287,21 @@ static inline void heap_init_header(void *base, uint64_t total, uint64_t capacit
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
 
+/* Validate a mapped header (shared by heap_create reopen and heap_open_fd). */
+static inline int heap_validate_header(const HeapHeader *hdr, uint64_t file_size) {
+    if (hdr->magic != HEAP_MAGIC) return 0;
+    if (hdr->version != HEAP_VERSION) return 0;
+    if (hdr->capacity == 0) return 0;
+    if (hdr->capacity > (UINT64_MAX - sizeof(HeapHeader)) / sizeof(HeapEntry)) return 0;
+    if (hdr->total_size != file_size) return 0;
+    if (hdr->data_off != sizeof(HeapHeader)) return 0;
+    uint64_t exp_total = sizeof(HeapHeader) + hdr->capacity * sizeof(HeapEntry);
+    if (hdr->total_size != exp_total) return 0;
+    /* Runtime-state sanity: size must not exceed capacity (corrupted file). */
+    if (hdr->size > hdr->capacity) return 0;
+    return 1;
+}
+
 static inline HeapHandle *heap_setup(void *base, size_t ms, const char *path, int bfd) {
     HeapHeader *hdr = (HeapHeader *)base;
     HeapHandle *h = (HeapHandle *)calloc(1, sizeof(HeapHandle));
@@ -320,6 +339,10 @@ static HeapHandle *heap_create(const char *path, uint64_t capacity, char *errbuf
         struct stat st;
         if (fstat(fd, &st) < 0) { HEAP_ERR("fstat: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
         int is_new = (st.st_size == 0);
+        if (!is_new && (uint64_t)st.st_size < sizeof(HeapHeader)) {
+            HEAP_ERR("%s: file too small (%lld)", path, (long long)st.st_size);
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
             HEAP_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
@@ -327,9 +350,7 @@ static HeapHandle *heap_create(const char *path, uint64_t capacity, char *errbuf
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
         if (base == MAP_FAILED) { HEAP_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
         if (!is_new) {
-            HeapHeader *hdr = (HeapHeader *)base;
-            if (hdr->magic != HEAP_MAGIC || hdr->version != HEAP_VERSION ||
-                hdr->total_size != (uint64_t)st.st_size) {
+            if (!heap_validate_header((HeapHeader *)base, (uint64_t)st.st_size)) {
                 HEAP_ERR("invalid heap file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN); close(fd);
@@ -348,9 +369,10 @@ static HeapHandle *heap_create_memfd(const char *name, uint64_t capacity, char *
         HEAP_ERR("capacity overflow"); return NULL;
     }
     uint64_t total = sizeof(HeapHeader) + capacity * sizeof(HeapEntry);
-    int fd = memfd_create(name ? name : "heap", MFD_CLOEXEC);
+    int fd = memfd_create(name ? name : "heap", MFD_CLOEXEC | MFD_ALLOW_SEALING);
     if (fd < 0) { HEAP_ERR("memfd_create: %s", strerror(errno)); return NULL; }
     if (ftruncate(fd, (off_t)total) < 0) { HEAP_ERR("ftruncate: %s", strerror(errno)); close(fd); return NULL; }
+    (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
     void *base = mmap(NULL, (size_t)total, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { HEAP_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
     heap_init_header(base, total, capacity);
@@ -365,9 +387,7 @@ static HeapHandle *heap_open_fd(int fd, char *errbuf) {
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { HEAP_ERR("mmap: %s", strerror(errno)); return NULL; }
-    HeapHeader *hdr = (HeapHeader *)base;
-    if (hdr->magic != HEAP_MAGIC || hdr->version != HEAP_VERSION ||
-        hdr->total_size != (uint64_t)st.st_size) {
+    if (!heap_validate_header((HeapHeader *)base, (uint64_t)st.st_size)) {
         HEAP_ERR("invalid heap"); munmap(base, ms); return NULL;
     }
     int myfd = fcntl(fd, F_DUPFD_CLOEXEC, 0);
@@ -394,7 +414,7 @@ static void heap_clear(HeapHandle *h) {
 }
 
 static int heap_create_eventfd(HeapHandle *h) {
-    if (h->notify_fd >= 0) close(h->notify_fd);
+    if (h->notify_fd >= 0) return h->notify_fd;
     int efd = eventfd(0, EFD_NONBLOCK|EFD_CLOEXEC);
     if (efd < 0) return -1;
     h->notify_fd = efd; return efd;
@@ -409,6 +429,6 @@ static int64_t heap_eventfd_consume(HeapHandle *h) {
     if (read(h->notify_fd, &v, sizeof(v)) != sizeof(v)) return -1;
     return (int64_t)v;
 }
-static void heap_msync(HeapHandle *h) { msync(h->hdr, h->mmap_size, MS_SYNC); }
+static int heap_msync(HeapHandle *h) { return msync(h->hdr, h->mmap_size, MS_SYNC); }
 
 #endif /* HEAP_H */

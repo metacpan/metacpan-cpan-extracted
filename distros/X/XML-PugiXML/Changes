@@ -1,5 +1,10 @@
 Revision history for XML-PugiXML
 
+0.04  2026-04-26
+    - Stale-handle checks on secondary node arguments
+    - NODE_* type constants; Attr::set_name
+    - std::exception fallback in XPath try/catch
+
 0.03  2026-03-16
     - Fix XSUB stack panic on Perl 5.42+ (RC stack)
     - Fix floating-point test comparison portability

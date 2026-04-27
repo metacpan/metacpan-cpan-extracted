@@ -2,9 +2,9 @@ MODULE = Data::HashMap::Shared    PACKAGE = Data::HashMap::Shared::SS
 PROTOTYPES: DISABLE
 
 SV*
-new(char* class, char* path, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0)
+new(char* class, SV* path_sv, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0)
     CODE:
-        char errbuf[SHM_ERR_BUFLEN]; ShmHandle* map = shm_ss_create(path, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, errbuf);
+        char errbuf[SHM_ERR_BUFLEN]; const char* path = SvOK(path_sv) ? SvPV_nolen(path_sv) : NULL; ShmHandle* map = shm_ss_create(path, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, errbuf);
         if (!map) croak("HashMap::Shared::SS: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
     OUTPUT:
@@ -18,6 +18,43 @@ new_sharded(char* class, char* path_prefix, UV num_shards, UV max_entries, UV lr
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
     OUTPUT:
         RETVAL
+
+
+SV*
+new_memfd(char* class, SV* name_sv, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0)
+    CODE:
+        char errbuf[SHM_ERR_BUFLEN];
+        const char* name = SvOK(name_sv) ? SvPV_nolen(name_sv) : NULL;
+        ShmHandle* map = shm_ss_create_memfd(name, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, errbuf);
+        if (!map) croak("Data::HashMap::Shared::SS: %s", errbuf[0] ? errbuf : "unknown error");
+        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
+    OUTPUT:
+        RETVAL
+
+SV*
+new_from_fd(char* class, int fd)
+    CODE:
+        char errbuf[SHM_ERR_BUFLEN];
+        ShmHandle* map = shm_ss_open_fd(fd, errbuf);
+        if (!map) croak("Data::HashMap::Shared::SS: %s", errbuf[0] ? errbuf : "unknown error");
+        RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
+    OUTPUT:
+        RETVAL
+
+IV
+memfd(SV* self_sv)
+    CODE:
+        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
+        RETVAL = h->backing_fd;
+    OUTPUT:
+        RETVAL
+
+
+void
+sync(SV* self_sv)
+    CODE:
+        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
+        if (shm_msync(h) != 0) croak("Data::HashMap::Shared::SS sync: %s", strerror(errno));
 
 void
 DESTROY(SV* self_sv)
@@ -621,7 +658,7 @@ SV*
 path(SV* self_sv)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
-        RETVAL = newSVpv(h->path, 0);
+        RETVAL = h->path ? newSVpv(h->path, 0) : &PL_sv_undef;
     OUTPUT:
         RETVAL
 

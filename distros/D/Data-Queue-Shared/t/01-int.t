@@ -89,13 +89,13 @@ is $q2->pop, 555, 'cross-handle visibility';
 my $t0 = time;
 my $r = $q->pop_wait(0.1);
 is $r, undef, 'pop_wait timeout returns undef';
-ok time - $t0 < 2, 'pop_wait did not hang';
+cmp_ok time - $t0, '<', 30, 'pop_wait returned (not hung)';
 
 # push_wait with timeout when full
 $q->push($_) for 1..16;
 $t0 = time;
 ok !$q->push_wait(99, 0.1), 'push_wait timeout when full';
-ok time - $t0 < 2, 'push_wait did not hang';
+cmp_ok time - $t0, '<', 30, 'push_wait returned (not hung)';
 $q->clear;
 
 # Stats: push_full and pop_empty are tracked

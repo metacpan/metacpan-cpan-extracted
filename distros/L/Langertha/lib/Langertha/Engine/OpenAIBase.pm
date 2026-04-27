@@ -1,6 +1,6 @@
 package Langertha::Engine::OpenAIBase;
 # ABSTRACT: Base class for OpenAI-compatible engines
-our $VERSION = '0.404';
+our $VERSION = '0.500';
 use Moose;
 use Carp qw( croak );
 use Module::Runtime qw( use_module );
@@ -14,6 +14,7 @@ with map { 'Langertha::Role::'.$_ } qw(
   Temperature
   ResponseSize
   SystemPrompt
+  ResponseFormat
   Streaming
   Chat
 );
@@ -43,7 +44,7 @@ Langertha::Engine::OpenAIBase - Base class for OpenAI-compatible engines
 
 =head1 VERSION
 
-version 0.404
+version 0.500
 
 =head1 SYNOPSIS
 
@@ -85,13 +86,19 @@ L<Langertha::Engine::Groq>, L<Langertha::Engine::Mistral>,
 L<Langertha::Engine::Cerebras>, L<Langertha::Engine::MiniMax>,
 L<Langertha::Engine::NousResearch>, L<Langertha::Engine::OpenRouter>,
 L<Langertha::Engine::Replicate>, L<Langertha::Engine::HuggingFace>,
-L<Langertha::Engine::Perplexity>, L<Langertha::Engine::AKIOpenAI>
+L<Langertha::Engine::Perplexity>, L<Langertha::Engine::AKIOpenAI>,
+L<Langertha::Engine::TSystems>, L<Langertha::Engine::Scaleway>
 
 =item * Self-hosted — L<Langertha::Engine::OllamaOpenAI>,
 L<Langertha::Engine::vLLM>, L<Langertha::Engine::SGLang>,
-L<Langertha::Engine::LlamaCpp>
+L<Langertha::Engine::LlamaCpp>, L<Langertha::Engine::LMStudioOpenAI>
 
 =back
+
+For transcription-only engines (Whisper-style) see
+L<Langertha::Engine::TranscriptionBase>; that base does I<not>
+compose Chat/Tools/Embedding/ImageGeneration so callers get a focused
+audio-transcription handle.
 
 =head2 default_model
 

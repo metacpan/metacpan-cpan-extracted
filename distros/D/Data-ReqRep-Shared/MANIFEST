@@ -30,18 +30,36 @@ t/03_stress.t
 t/04_batch.t
 t/05_errors.t
 t/06_int.t
+t/pod_synopsis.t
+t/version_check.t
 typemap
+xt/arena_fragmentation.t
 xt/asan.t
+xt/cancel_waiting.t
+xt/cloexec_exec.t
 xt/concurrent_cancel.t
+xt/concurrent_open.t
 xt/crash_recovery.t
+xt/eg_runs.t
+xt/fd_leak.t
+xt/fd_validation.t
+xt/graceful_shutdown.t
+xt/invalid_args.t
 xt/large_messages.t
+xt/latency_p99.t
 xt/leaktest.t
 xt/lifecycle.t
 xt/lifecycle_int.t
+xt/manifest_vs_git.t
+xt/memfd_seal.t
+xt/mmap_leak.t
 xt/pod.t
 xt/pod_coverage.t
 xt/stress.t
 xt/stress_int.t
+xt/throughput.t
+xt/truncation.t
+xt/tsan.t
 xt/valgrind.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

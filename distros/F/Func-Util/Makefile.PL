@@ -4,11 +4,13 @@ use warnings;
 use ExtUtils::MakeMaker;
 use Config;
 
-# Platform-specific linker flags for symbol export
-# Other XS modules can use funcutil_callbacks.h to register C-level callbacks
+# Platform-specific linker flags for symbol export.
+# Other XS modules can use funcutil_callbacks.h to register C-level callbacks.
+# Solaris/SunOS use their own native ld (not GNU ld) which rejects
+# --export-dynamic; their default behaviour already exports symbols.
 my %platform_args;
 if ($^O eq 'linux' || $^O eq 'freebsd' || $^O eq 'openbsd' || $^O eq 'netbsd' ||
-    $^O eq 'solaris' || $^O eq 'sunos' || $^O eq 'dragonfly') {
+    $^O eq 'dragonfly') {
     $platform_args{LDDLFLAGS} = $Config{lddlflags} . ' -Wl,--export-dynamic';
 }
 elsif ($^O eq 'MSWin32' || $^O eq 'cygwin' || $^O eq 'msys') {

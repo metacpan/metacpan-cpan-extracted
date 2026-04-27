@@ -1,0 +1,250 @@
+NAME
+    MARC::Field008::Print - MARC 008 field class for print.
+
+SYNOPSIS
+     use MARC::Field008::Print;
+
+     my $obj = MARC::Field008::Print->new(%params);
+     my @ret = $obj->print($field008_obj);
+     my $ret = $obj->print($field008_obj);
+
+METHODS
+  "new"
+     my $obj = MARC::Field008::Print->new(%params);
+
+    Constructor.
+
+    *       "lang"
+
+            Language of texts in ISO 639-1 format.
+
+            Possible values are:
+
+            *   "en"
+
+            *   "cs"
+
+            Default value is undef, try to use language from locales.
+
+    *       "mode_ansi"
+
+            Mode for ANSI color support:
+
+             1 - ANSI color support enabled.
+             0 - ANSI color support disabled.
+
+            When is undefined, env variables "COLOR" or "NO_COLOR" could
+            control ANSI color support. See Check::Term::Color.
+
+            Default value is undef.
+
+    *       "mode_desc"
+
+            Use description instead of raw leader values.
+
+            Default value is 1.
+
+    *       "output_separator"
+
+            Output separator used in scalar context of "print()" method.
+
+            Default value is "\n".
+
+    Returns instance of object.
+
+  "print"
+     my @ret = $obj->print($field008_obj);
+     my $ret = $obj->print($field008_obj);
+
+    Process Data::MARC::Field008 instance to output print. In scalar context
+    compose printing output as one string. In array context compose list of
+    printing lines.
+
+    Color (ANSI colors) output is controlled by 'mode_ansi' parameter or env
+    variables "COLOR" and "NO_COLOR".
+
+    Returns string in scalar context. Returns array of string in array
+    context.
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+             From Mo::utils::check_bool():
+                     Parameter 'mode_ansi' must be a bool (0/1).
+                             Value: %s
+                     Parameter 'mode_desc' must be a bool (0/1).
+                             Value: %s
+             From Mo::utils::Language::check_language_639_1():
+                     Parameter 'lang' doesn't contain valid ISO 639-1 code.
+                             Codeset: %s
+                             Value: %s
+             Cannot load 'Term::ANSIColor' module.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Data::MARC::Field008;
+     use Data::MARC::Field008::Book;
+     use MARC::Field008::Print;
+
+     # Print object.
+     my $print = MARC::Field008::Print->new(
+             'lang' => 'en',
+     );
+
+     # Data object.
+     my $data_marc_field008 = Data::MARC::Field008->new(
+             'cataloging_source' => ' ',
+             'date_entered_on_file' => '830304',
+             'date1' => '1982',
+             'date2' => '    ',
+             'language' => 'cze',
+             'material' => Data::MARC::Field008::Book->new(
+                     'biography' => ' ',
+                     'conference_publication' => '0',
+                     'festschrift' => '|',
+                     'form_of_item' => ' ',
+                     'government_publication' => 'u',
+                     'illustrations' => 'a   ',
+                     'index' => '0',
+                     'literary_form' => '|',
+                     'nature_of_content' => '    ',
+                     #         89012345678901234
+                     'raw' => 'a         u0|0 | ',
+                     'target_audience' => ' ',
+             ),
+             'material_type' => 'book',
+             'modified_record' => ' ',
+             'place_of_publication' => 'xr ',
+             #         0123456789012345678901234567890123456789
+             'raw' => '830304s1982    xr a         u0|0 | cze  ',
+             'type_of_date' => 's',
+     );
+
+     # Print to output.
+     print scalar $print->print($data_marc_field008), "\n";
+
+     # Output:
+     # Date entered on file: 830304
+     # Type of date/Publication status: Single known date/probable date
+     # Date 1: 1982
+     # Date 2:     
+     # Place of publication, production, or execution: xr 
+     # Material: book
+     # Illustrations: Illustrations
+     # Target audience: Unknown or not specified
+     # Form of item: None of the following
+     # Nature of contents: 
+     # Government publication: Unknown if item is government publication
+     # Conference publication: Not a conference publication
+     # Festschrift: No attempt to code
+     # Index: No index
+     # Literary form: No attempt to code
+     # Biography: No biographical material
+     # Language: cze
+     # Modified record: Not modified
+     # Cataloging source: National bibliographic agency
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Data::MARC::Field008;
+     use Data::MARC::Field008::Book;
+     use MARC::Field008::Print;
+     use Unicode::UTF8 qw(encode_utf8);
+
+     # Print object.
+     my $print = MARC::Field008::Print->new(
+             'lang' => 'cs',
+             'mode_desc' => 0,
+     );
+
+     # Data object.
+     my $data_marc_field008 = Data::MARC::Field008->new(
+             'cataloging_source' => ' ',
+             'date_entered_on_file' => '830304',
+             'date1' => '1982',
+             'date2' => '    ',
+             'language' => 'cze',
+             'material' => Data::MARC::Field008::Book->new(
+                     'biography' => ' ',
+                     'conference_publication' => '0',
+                     'festschrift' => '|',
+                     'form_of_item' => ' ',
+                     'government_publication' => 'u',
+                     'illustrations' => 'a   ',
+                     'index' => '0',
+                     'literary_form' => '|',
+                     'nature_of_content' => '    ',
+                     #         89012345678901234
+                     'raw' => 'a         u0|0 | ',
+                     'target_audience' => ' ',
+             ),
+             'material_type' => 'book',
+             'modified_record' => ' ',
+             'place_of_publication' => 'xr ',
+             #         0123456789012345678901234567890123456789
+             'raw' => '830304s1982    xr a         u0|0 | cze  ',
+             'type_of_date' => 's',
+     );
+
+     # Print to output.
+     print encode_utf8(scalar $print->print($data_marc_field008)), "\n";
+
+     # Output:
+     # Datum uložení do souboru: 830304
+     # Typ data/publikační status: s
+     # Datum 1: 1982
+     # Datum 2:     
+     # Místo vydání, produkce nebo realizace: xr 
+     # Materiál: book
+     # Ilustrace: a
+     # Uživatelské určení:  
+     # Forma popisné jednotky:  
+     # Povaha obsahu: 
+     # Vládní publikace: u
+     # Publikace z konference: 0
+     # Jubilejní sborník: |
+     # Rejstřík: 0
+     # Literární forma: |
+     # Biografie:  
+     # Jazyk dokumentu: cze
+     # Modifikace záznamu:  
+     # Zdroj katalogizace:
+
+DEPENDENCIES
+    Check::Term::Color, Class::Utils, English, Error::Pure.
+    MARC::Field008::L10N, Mo::utils, Mo::utils::Language.
+
+    And optional Term::ANSIColor for ANSI color support.
+
+SEE ALSO
+    Data::MARC::Field008
+        Data object for MARC field 008.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/MARC-Field008-Print>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2025-2026 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+ACKNOWLEDGEMENTS
+    Development of this software has been made possible by institutional
+    support for the long-term strategic development of the National Library
+    of the Czech Republic as a research organization provided by the
+    Ministry of Culture of the Czech Republic (DKRVO 2024–2028), Area 11:
+    Linked Open Data.
+
+VERSION
+    0.01
+

@@ -43,20 +43,54 @@ sub _run_subtest_in_child {
     my ($class, $test) = @_;
 
     my $timeout = $ENV{IPC_MANAGER_TEST_TIMEOUT} || 180;
-    local $SIG{ALRM} = sub { confess("Subtest '$test' timed out after ${timeout} seconds") };
 
     my $pid = fork // die "Could not fork: $!";
-    if ($pid) {
-        alarm $timeout;
-        waitpid($pid, 0);
-        alarm 0;
-        return;
+    if (!$pid) {
+        # Become the leader of a new process group so the parent can kill
+        # the whole subtree (services, workers, double-forked daemons) on
+        # timeout via kill(-$$).  POSIX::setpgid(0, 0) is a no-op on platforms
+        # without process groups; ignore failures rather than abort.
+        eval { POSIX::setpgid(0, 0) };
+
+        my $ok  = eval { subtest $test => $class->can($test); 1 };
+        my $err = $@;
+        warn $err unless $ok;
+        exit($ok ? 0 : 255);
+    }
+    # Mirror the setpgid in the parent to close the race where the parent
+    # signals before the child runs setpgid itself.  Either side wins; both
+    # idempotent.
+    eval { POSIX::setpgid($pid, $pid) };
+
+    # Parent.  On timeout, kill the subtest child (and the process group it
+    # leads) before confessing so any grandchildren — service processes,
+    # workers, etc. — are reaped instead of being orphaned to keep writing
+    # Test2::IPC events into the parent's tempdir, which would later trip
+    # "Leftover files in the directory" bailouts at process exit.
+    my $timed_out = 0;
+    local $SIG{ALRM} = sub { $timed_out = 1 };
+
+    alarm $timeout;
+    waitpid($pid, 0);
+    alarm 0;
+
+    if ($timed_out) {
+        local $SIG{ALRM} = 'IGNORE';
+        kill 'TERM', $pid, -$pid;
+        # Give the child a moment to exit cleanly, then escalate.
+        my $deadline = Time::HiRes::time() + 2;
+        while (kill(0, $pid) && Time::HiRes::time() < $deadline) {
+            last if waitpid($pid, POSIX::WNOHANG()) > 0;
+            Time::HiRes::sleep(0.05);
+        }
+        if (kill(0, $pid)) {
+            kill 'KILL', $pid, -$pid;
+            waitpid($pid, 0);
+        }
+        confess("Subtest '$test' timed out after ${timeout} seconds");
     }
 
-    my $ok  = eval { subtest $test => $class->can($test); 1 };
-    my $err = $@;
-    warn $err unless $ok;
-    exit($ok ? 0 : 255);
+    return;
 }
 
 sub tests {
@@ -131,7 +165,7 @@ sub test_generic {
     is($info, $guard->info, "Stringifies");
     like(
         IPC::Manager::Serializer::JSON->deserialize($info),
-        [ipcm_default_protocol(), "IPC::Manager::Serializer::JSON", $guard->route],
+        [ipcm_default_protocol(), $guard->serializer, $guard->route],
         "Got a useful info string"
     );
     note("Info: $info");

@@ -1,4 +1,10 @@
 Revision history for Data::BitSet::Shared
 
+0.02  2026-04-26
+    - memfd sealing + factored validate header
+    - aarch64 CI matrix
+    - xt/ test parity
+
+
 0.01  2026-04-12
     - Initial release

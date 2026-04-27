@@ -156,6 +156,23 @@ our %KEY_POSITIONS = (
     'FCALL'     => \&_keys_for_eval,
     'FCALL_RO'  => \&_keys_for_eval,
 
+    # HyperLogLog commands
+    'PFADD'     => sub { (0) },
+    'PFCOUNT'   => sub { (0 .. $#_) },
+    'PFMERGE'   => sub { (0 .. $#_) },
+
+    # Bit commands (first arg is key)
+    'GETBIT'    => sub { (0) },
+    'SETBIT'    => sub { (0) },
+    'BITCOUNT'  => sub { (0) },
+    'BITPOS'    => sub { (0) },
+
+    # Hash length
+    'HSTRLEN'   => sub { (0) },
+
+    # Sorted set multi-score lookup
+    'ZMSCORE'   => sub { (0) },
+
     # BITOP - skip operation arg
     'BITOP'     => sub { (1 .. $#_) },
 

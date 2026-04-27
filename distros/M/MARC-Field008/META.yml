@@ -36,6 +36,7 @@ requires:
   Data::MARC::Field008::MixedMaterial: 0.03
   Data::MARC::Field008::Music: 0.03
   Data::MARC::Field008::VisualMaterial: 0.03
+  English: 0
   Error::Pure: 0
   List::Util: 1.33
   Mo::utils: 0.08
@@ -46,4 +47,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/MARC-Field008
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/MARC-Field008
-version: '0.04'
+version: '0.05'

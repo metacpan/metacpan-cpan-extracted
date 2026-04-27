@@ -103,17 +103,56 @@ Async::Redis::Iterator - Cursor-based SCAN iterator
 
 Iterator provides async cursor-based iteration over Redis SCAN commands:
 
-- SCAN: Iterate all keys
-- HSCAN: Iterate hash fields
-- SSCAN: Iterate set members
-- ZSCAN: Iterate sorted set members with scores
+=over 4
 
-=head2 Behavior
+=item * C<SCAN> - iterate keys
 
-- Returns batches of elements, not individual items
-- Cursor managed internally
-- C<next> returns undef when iteration complete
-- Safe during key modifications (may see duplicates or miss keys)
-- C<count> is a hint, not a guarantee
+=item * C<HSCAN> - iterate hash field/value pairs
+
+=item * C<SSCAN> - iterate set members
+
+=item * C<ZSCAN> - iterate sorted set members and scores as a flat list
+
+=back
+
+=head1 METHODS
+
+=head2 next
+
+    my $batch = await $iter->next;
+
+Return the next batch as an arrayref, or C<undef> when the scan is complete and
+there are no elements in the final batch. Redis may return empty intermediate
+batches; those are returned as empty arrayrefs and are still truthy in Perl.
+
+=head2 reset
+
+    $iter->reset;
+
+Reset the cursor to zero so iteration can start again.
+
+=head2 cursor
+
+Return the current Redis cursor.
+
+=head2 done
+
+Return true after Redis has returned cursor C<0>.
+
+=head1 BEHAVIOR
+
+=over 4
+
+=item * Returns batches of elements, not individual items
+
+=item * Cursor managed internally
+
+=item * C<next> returns C<undef> when iteration is complete
+
+=item * Safe during key modifications, but Redis may return duplicates or miss keys
+
+=item * C<count> is a hint, not a guarantee
+
+=back
 
 =cut

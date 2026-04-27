@@ -16,14 +16,28 @@
 #  define OpSIBLING(o)      ((o)->op_sibling)
 #endif
 
-/* ══════════════════════════════════════════════════════════════════
- *  pp functions — one per method
- * ══════════════════════════════════════════════════════════════════ */
+/* Peek the invocant without disturbing the mark/stack. */
+#define COLOURING_PEEK_INVOCANT() \
+    ((PL_markstack_ptr > PL_markstack)                                        \
+        && ((PL_stack_base + *PL_markstack_ptr + 1) <= PL_stack_sp)           \
+        ? *(PL_stack_base + *PL_markstack_ptr + 1)                            \
+        : NULL)
+
+/* If the invocant isn't a Colouring::In::XS object (or subclass), fall
+ * through to the original OP_ENTERSUB pp so unrelated callers behave. */
+#define COLOURING_GUARD_INVOCANT() STMT_START {                                \
+    SV * _self = COLOURING_PEEK_INVOCANT();                                    \
+    if (!_self || !sv_isobject(_self)                                          \
+        || !sv_derived_from(_self, COLOURING_CLASS)) {                         \
+        return PL_ppaddr[OP_ENTERSUB](aTHX);                                   \
+    }                                                                          \
+} STMT_END
 
 /* ── Format ops (self → string) ───────────────────────────────── */
 
 static OP * pp_colouring_toHEX(pTHX) {
 	dSP;
+	COLOURING_GUARD_INVOCANT();
 	I32 ax      = POPMARK;
 	SV **mark   = PL_stack_base + ax;
 	I32 items   = (I32)(SP - mark);
@@ -47,6 +61,7 @@ static OP * pp_colouring_toHEX(pTHX) {
 
 static OP * pp_colouring_toRGB(pTHX) {
 	dSP;
+	COLOURING_GUARD_INVOCANT();
 	I32 ax      = POPMARK;
 	SV **mark   = PL_stack_base + ax;
 	SV * self   = *(mark + 1);
@@ -71,6 +86,7 @@ static OP * pp_colouring_toRGB(pTHX) {
 
 static OP * pp_colouring_toRGBA(pTHX) {
 	dSP;
+	COLOURING_GUARD_INVOCANT();
 	I32 ax      = POPMARK;
 	SV **mark   = PL_stack_base + ax;
 	SV * self   = *(mark + 1);
@@ -87,6 +103,7 @@ static OP * pp_colouring_toRGBA(pTHX) {
 
 static OP * pp_colouring_toHSL(pTHX) {
 	dSP;
+	COLOURING_GUARD_INVOCANT();
 	I32 ax      = POPMARK;
 	SV **mark   = PL_stack_base + ax;
 	SV * self   = *(mark + 1);
@@ -105,6 +122,7 @@ static OP * pp_colouring_toHSL(pTHX) {
 
 static OP * pp_colouring_toHSV(pTHX) {
 	dSP;
+	COLOURING_GUARD_INVOCANT();
 	I32 ax      = POPMARK;
 	SV **mark   = PL_stack_base + ax;
 	SV * self   = *(mark + 1);
@@ -123,6 +141,7 @@ static OP * pp_colouring_toHSV(pTHX) {
 
 static OP * pp_colouring_toCSS(pTHX) {
 	dSP;
+	COLOURING_GUARD_INVOCANT();
 	I32 ax      = POPMARK;
 	SV **mark   = PL_stack_base + ax;
 	SV * self   = *(mark + 1);
@@ -145,6 +164,7 @@ static OP * pp_colouring_toCSS(pTHX) {
 
 static OP * pp_colouring_toTerm(pTHX) {
 	dSP;
+	COLOURING_GUARD_INVOCANT();
 	I32 ax      = POPMARK;
 	SV **mark   = PL_stack_base + ax;
 	SV * self   = *(mark + 1);
@@ -161,6 +181,7 @@ static OP * pp_colouring_toTerm(pTHX) {
 
 static OP * pp_colouring_toOnTerm(pTHX) {
 	dSP;
+	COLOURING_GUARD_INVOCANT();
 	I32 ax      = POPMARK;
 	SV **mark   = PL_stack_base + ax;
 	SV * self   = *(mark + 1);
@@ -179,6 +200,7 @@ static OP * pp_colouring_toOnTerm(pTHX) {
 
 static OP * pp_colouring_lighten(pTHX) {
 	dSP;
+	COLOURING_GUARD_INVOCANT();
 	I32 ax      = POPMARK;
 	SV **mark   = PL_stack_base + ax;
 	I32 items   = (I32)(SP - mark);
@@ -206,6 +228,7 @@ static OP * pp_colouring_lighten(pTHX) {
 
 static OP * pp_colouring_darken(pTHX) {
 	dSP;
+	COLOURING_GUARD_INVOCANT();
 	I32 ax      = POPMARK;
 	SV **mark   = PL_stack_base + ax;
 	I32 items   = (I32)(SP - mark);
@@ -233,6 +256,7 @@ static OP * pp_colouring_darken(pTHX) {
 
 static OP * pp_colouring_fade(pTHX) {
 	dSP;
+	COLOURING_GUARD_INVOCANT();
 	I32 ax      = POPMARK;
 	SV **mark   = PL_stack_base + ax;
 	SV * colour = *(mark + 1);
@@ -253,6 +277,7 @@ static OP * pp_colouring_fade(pTHX) {
 
 static OP * pp_colouring_fadeout(pTHX) {
 	dSP;
+	COLOURING_GUARD_INVOCANT();
 	I32 ax      = POPMARK;
 	SV **mark   = PL_stack_base + ax;
 	I32 items   = (I32)(SP - mark);
@@ -280,6 +305,7 @@ static OP * pp_colouring_fadeout(pTHX) {
 
 static OP * pp_colouring_fadein(pTHX) {
 	dSP;
+	COLOURING_GUARD_INVOCANT();
 	I32 ax      = POPMARK;
 	SV **mark   = PL_stack_base + ax;
 	I32 items   = (I32)(SP - mark);
@@ -307,6 +333,7 @@ static OP * pp_colouring_fadein(pTHX) {
 
 static OP * pp_colouring_saturate(pTHX) {
 	dSP;
+	COLOURING_GUARD_INVOCANT();
 	I32 ax      = POPMARK;
 	SV **mark   = PL_stack_base + ax;
 	I32 items   = (I32)(SP - mark);
@@ -334,6 +361,7 @@ static OP * pp_colouring_saturate(pTHX) {
 
 static OP * pp_colouring_desaturate(pTHX) {
 	dSP;
+	COLOURING_GUARD_INVOCANT();
 	I32 ax      = POPMARK;
 	SV **mark   = PL_stack_base + ax;
 	I32 items   = (I32)(SP - mark);
@@ -361,6 +389,7 @@ static OP * pp_colouring_desaturate(pTHX) {
 
 static OP * pp_colouring_greyscale(pTHX) {
 	dSP;
+	COLOURING_GUARD_INVOCANT();
 	I32 ax      = POPMARK;
 	SV **mark   = PL_stack_base + ax;
 	SV * colour = *(mark + 1);
@@ -380,6 +409,7 @@ static OP * pp_colouring_greyscale(pTHX) {
 
 static OP * pp_colouring_mix(pTHX) {
 	dSP;
+	COLOURING_GUARD_INVOCANT();
 	I32 ax       = POPMARK;
 	SV **mark    = PL_stack_base + ax;
 	I32 items    = (I32)(SP - mark);
@@ -407,6 +437,7 @@ static OP * pp_colouring_mix(pTHX) {
 
 static OP * pp_colouring_tint(pTHX) {
 	dSP;
+	COLOURING_GUARD_INVOCANT();
 	I32 ax      = POPMARK;
 	SV **mark   = PL_stack_base + ax;
 	I32 items   = (I32)(SP - mark);
@@ -431,6 +462,7 @@ static OP * pp_colouring_tint(pTHX) {
 
 static OP * pp_colouring_shade(pTHX) {
 	dSP;
+	COLOURING_GUARD_INVOCANT();
 	I32 ax      = POPMARK;
 	SV **mark   = PL_stack_base + ax;
 	I32 items   = (I32)(SP - mark);
@@ -457,6 +489,7 @@ static OP * pp_colouring_shade(pTHX) {
 
 static OP * pp_colouring_colour(pTHX) {
 	dSP;
+	COLOURING_GUARD_INVOCANT();
 	I32 ax      = POPMARK;
 	SV **mark   = PL_stack_base + ax;
 	SV * self   = *(mark + 1);

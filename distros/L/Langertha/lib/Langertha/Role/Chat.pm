@@ -1,11 +1,15 @@
 package Langertha::Role::Chat;
 # ABSTRACT: Role for APIs with normal chat functionality
-our $VERSION = '0.404';
+our $VERSION = '0.500';
 use Moose::Role;
 use Future::AsyncAwait;
 use Carp qw( croak );
+use JSON::MaybeXS;
 use Log::Any qw( $log );
 use Scalar::Util qw( blessed );
+use Langertha::ToolChoice;
+use Langertha::Tool;
+use Langertha::Role::Capabilities;
 
 requires qw(
   chat_request
@@ -14,6 +18,9 @@ requires qw(
 
 
 sub content_format { 'openai' }
+
+
+with 'Langertha::Role::Capabilities';
 
 
 has chat_model => (
@@ -157,22 +164,79 @@ sub _build__async_http {
 async sub simple_chat_f {
   my ( $self, @messages ) = @_;
   $log->debugf("[%s] simple_chat_f with %d message(s)", ref $self, scalar @messages);
-  my $request = $self->chat(@messages);
+  return await $self->chat_f( messages => \@messages );
+}
 
-  my $response = await $self->_async_http->do_request(
-    request => $request,
-  );
+async sub chat_f {
+  my ( $self, %opts ) = @_;
+
+  my $messages = delete $opts{messages} // [];
+  my @messages = ref $messages eq 'ARRAY' ? @$messages : ($messages);
+
+  # Auto-fallback: forced named tool on an engine that cannot do
+  # native named-tool-forcing but supports json_schema response_format.
+  # Rewrite tools+tool_choice into a response_format and remember the
+  # tool name so we can synthesize a tool_calls entry afterwards.
+  my $synth_tool_name;
+  if ( exists $opts{tool_choice}
+    && exists $opts{tools}
+    && !$self->supports('tool_choice_named')
+    && $self->supports('response_format_json_schema')
+  ) {
+    my $tc = Langertha::ToolChoice->from_hash( $opts{tool_choice} );
+    if ( $tc && $tc->type eq 'tool' && defined $tc->name && length $tc->name ) {
+      my $name = $tc->name;
+      my ($tool) =
+        grep { defined $_ && $_->name eq $name }
+        map  { Langertha::Tool->from_hash($_) }
+        @{ $opts{tools} };
+      if ($tool) {
+        delete $opts{tools};
+        delete $opts{tool_choice};
+        $opts{response_format} = {
+          type        => 'json_schema',
+          json_schema => {
+            %{ $tool->to_json_schema },
+            strict => JSON->true,
+          },
+        };
+        $synth_tool_name = $name;
+        $log->debugf("[%s] forced-tool fallback: tool '%s' rerouted via response_format",
+          ref $self, $name);
+      }
+    }
+  }
+
+  my $request = $self->chat_request( $self->chat_messages(@messages), %opts );
+
+  my $response = await $self->_async_http->do_request( request => $request );
 
   unless ($response->is_success) {
     die "".(ref $self)." request failed: ".$response->status_line;
   }
 
   my $result = $request->response_call->($response);
-  if ($self->can('has_rate_limit') && $self->has_rate_limit && ref $result && $result->isa('Langertha::Response')) {
-    $result = $result->clone_with(rate_limit => $self->rate_limit);
+
+  if ( $synth_tool_name && blessed($result) && $result->isa('Langertha::Response') ) {
+    my $args = $self->decode_loose_json( $result->content );
+    if ( defined $args ) {
+      $result = $result->clone_with(
+        tool_calls => [{
+          name      => $synth_tool_name,
+          arguments => $args,
+          synthetic => 1,
+        }],
+      );
+    }
+  }
+
+  if ( $self->can('has_rate_limit') && $self->has_rate_limit
+       && ref $result && $result->isa('Langertha::Response') ) {
+    $result = $result->clone_with( rate_limit => $self->rate_limit );
   }
   return $result;
 }
+
 
 
 sub simple_chat_stream_f {
@@ -231,6 +295,18 @@ async sub simple_chat_stream_realtime_f {
   return ($content, \@all_chunks);
 }
 
+sub aggregate_tool_calls {
+  my ( $self, $chunks ) = @_;
+  return [] unless ref($chunks) eq 'ARRAY';
+  my @tcs;
+  for my $c (@$chunks) {
+    next unless eval { $c->has_tool_calls };
+    push @tcs, @{ $c->tool_calls };
+  }
+  return \@tcs;
+}
+
+
 
 sub _process_stream_buffer {
   my ($self, $buffer_ref, $format, $final) = @_;
@@ -281,7 +357,7 @@ Langertha::Role::Chat - Role for APIs with normal chat functionality
 
 =head1 VERSION
 
-version 0.404
+version 0.500
 
 =head1 SYNOPSIS
 
@@ -410,6 +486,39 @@ in order.
 Async version of L</simple_chat>. Returns a L<Future> that resolves to the
 response text. Uses L<Net::Async::HTTP> internally; loaded lazily on first call.
 
+For requests that need named arguments (tools, tool_choice,
+response_format, etc.) use L</chat_f>; C<simple_chat_f> delegates to it.
+
+=head2 chat_f
+
+    my $response = await $engine->chat_f(
+      messages       => [ ... ],
+      tools          => [ $tool, ... ],
+      tool_choice    => { type => 'tool', name => 'extract' },
+      response_format => { ... },
+      # any other engine-specific extras pass straight through
+    );
+
+Async I<single-turn> chat with named arguments. Returns a L<Future>
+resolving to a L<Langertha::Response>. The caller is responsible for
+acting on any C<tool_calls> the engine emits — C<chat_f> does not
+loop. For the multi-turn MCP tool-calling loop use
+L<Langertha::Role::Tools/chat_with_tools_f> instead.
+
+C<tools> in C<chat_f> can be a mix of provider-shape HashRefs
+(OpenAI, Anthropic, MCP, Gemini); the engine's C<chat_request> handles
+the per-provider serialization. The L<Langertha::Tool> value object is
+the canonical normalizer (C<from_hash> accepts every shape, the
+C<to_PROVIDER> methods produce the wire payload).
+
+When the caller asks for a forced named tool on an engine that cannot
+do native named-tool-forcing but supports C<json_schema>
+response_format (currently L<Langertha::Engine::Perplexity>), the
+request is automatically rewritten to use the JSON Schema path and the
+response is loose-parsed; the resulting L<Langertha::Response> exposes
+the parsed arguments via L<Langertha::Response/tool_call_args> with
+C<synthetic =E<gt> 1> on the synthesized tool_call entry.
+
 =head2 simple_chat_stream_f
 
     my ($content, $chunks) = $engine->simple_chat_stream_f(@messages)->get;
@@ -417,6 +526,22 @@ response text. Uses L<Net::Async::HTTP> internally; loaded lazily on first call.
 Async streaming without a real-time callback. Convenience wrapper around
 L</simple_chat_stream_realtime_f> with C<undef> as the callback. Returns a
 L<Future> that resolves to C<($content, \@chunks)>.
+
+=head2 aggregate_tool_calls
+
+    my $tool_calls = $engine->aggregate_tool_calls( $chunks );
+
+Walks an ArrayRef of L<Langertha::Stream::Chunk> objects and returns
+the flat list of L<Langertha::ToolCall> objects collected from any
+chunks that carry C<tool_calls>. Returns an empty ArrayRef if none of
+the chunks emitted tool calls.
+
+This is the streaming counterpart to L<Langertha::Response/tool_calls>.
+Engines that need to assemble fragmented tool-call deltas (OpenAI's
+C<delta.tool_calls> stream, Anthropic's C<input_json_delta>) are
+expected to do that assembly inside C<parse_stream_chunk> and attach
+the finished L<Langertha::ToolCall> to the relevant chunk; this
+helper just collects them.
 
 =head2 simple_chat_stream_realtime_f
 
@@ -451,6 +576,65 @@ Wire format for multimodal content blocks. Controls how
 L<Langertha::Content> objects embedded in a message's C<content> arrayref
 are serialized during L</chat_messages>. Defaults to C<'openai'>; overridden
 by L<Langertha::Engine::AnthropicBase> and L<Langertha::Engine::Gemini>.
+
+=head2 engine_capabilities
+
+    my $caps = $engine->engine_capabilities;
+    if ( $caps->{tool_choice_named} ) { ... }
+
+Returns a HashRef of capability flags so callers can avoid passing
+parameters the engine cannot honour.
+
+The base implementation reports only what L<Langertha::Role::Chat>
+itself provides (C<chat>). Every other capability-bearing role
+(L<Langertha::Role::Tools>, L<Langertha::Role::ResponseFormat>,
+L<Langertha::Role::Streaming>, L<Langertha::Role::Embedding>,
+L<Langertha::Role::Transcription>, L<Langertha::Role::ImageGeneration>,
+L<Langertha::Role::HermesTools>, L<Langertha::Role::Temperature>,
+L<Langertha::Role::Seed>, L<Langertha::Role::ContextSize>,
+L<Langertha::Role::ResponseSize>, L<Langertha::Role::SystemPrompt>,
+L<Langertha::Role::ParallelToolUse>) hangs its own contribution into
+this method via C<around engine_capabilities>. Engines override (also
+via C<around>) when the wire reality differs from the role inventory
+— for example to clear C<tool_choice_named> on providers that only
+accept string forms.
+
+Common keys produced by the bundled roles:
+
+=over
+
+=item * C<chat> — C<simple_chat>/C<simple_chat_f> work
+
+=item * C<streaming> — C<chat_stream_request> is wired up
+
+=item * C<tools_native> — engine accepts a C<tools> array on the wire
+
+=item * C<tools_hermes> — tools are injected via Hermes-style XML
+prompt rather than (or in addition to) the native API
+
+=item * C<tool_choice_auto> / C<tool_choice_any> / C<tool_choice_none> —
+which string-form C<tool_choice> values are accepted
+
+=item * C<tool_choice_named> — C<{type =E<gt> 'tool', name =E<gt> '...'}>
+forcing works (possibly translated internally — Gemini routes named
+tools through C<allowed_function_names>, for example)
+
+=item * C<response_format_json_object> — C<{type =E<gt> 'json_object'}>
+
+=item * C<response_format_json_schema> — JSON Schema structured output
+
+=item * C<embedding>, C<transcription>, C<image_generation> — auxiliary
+capabilities matching the corresponding roles
+
+=item * C<temperature>, C<seed>, C<context_size>, C<response_size>,
+C<system_prompt>, C<parallel_tool_use> — generation-parameter knobs
+the engine will honour
+
+=back
+
+Callers should treat the hash as advisory — a missing key means
+"unknown / unsupported", a true value means "the engine claims it
+will honour this".
 
 =head1 SEE ALSO
 

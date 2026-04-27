@@ -5,7 +5,7 @@ use English;
 use Error::Pure::Utils qw(clean);
 use MARC::Leader;
 use MARC::Field008;
-use Test::More 'tests' => 92;
+use Test::More 'tests' => 116;
 use Test::NoWarnings;
 
 # Test.
@@ -40,6 +40,40 @@ is($ret->material_type, 'book', 'Get material type (book).');
 is($ret->modified_record, ' ', 'Get modified record ( ).');
 is($ret->place_of_publication, 'xr ', 'Get place of publication (xr ).');
 is($ret->raw, $field_008.'  ', 'Get raw ('.$field_008.'  ).');
+is($ret->type_of_date, 's', 'Get type of date (s).');
+
+# Test.
+## cnb000000096 with dashes in field 008.
+$leader = MARC::Leader->new->parse('     nam a22        4500');
+$obj = MARC::Field008->new(
+	'leader' => $leader,
+);
+$field_008 = '830304s1982----xr-a---------u0|0-|-cze';
+$ret = $obj->parse($field_008);
+isa_ok($ret, 'Data::MARC::Field008');
+is($ret->cataloging_source, ' ', 'Get cataloging source ( ).');
+is($ret->date_entered_on_file, '830304', 'Get date entered on file (830304).');
+is($ret->date1, '1982', 'Get date1 (1982).');
+is($ret->date2, '    ', 'Get date2 (    ).');
+is($ret->language, 'cze', 'Get language (cze).');
+isa_ok($ret->material, 'Data::MARC::Field008::Book');
+is($ret->material->biography, ' ', 'Get book material biography ( ).');
+is($ret->material->conference_publication, 0, 'Get book material conference publication (0).');
+is($ret->material->festschrift, '|', 'Get book material festschrift (|).');
+is($ret->material->form_of_item, ' ', 'Get book material form of item ( ).');
+is($ret->material->government_publication, 'u', 'Get book material government publication (u).');
+is($ret->material->illustrations, 'a   ', 'Get book material illustration (a   ).');
+is($ret->material->index, 0, 'Get book material index (0).');
+is($ret->material->literary_form, '|', 'Get book material literary form (|).');
+is($ret->material->nature_of_content, '    ', 'Get book material nature of content (    ).');
+$material_raw = 'a         u0|0 | ';
+is($ret->material->raw, $material_raw, 'Get book material raw ('.$material_raw.').');
+is($ret->material->target_audience, ' ', 'Get book material target audience ( ).');
+is($ret->material_type, 'book', 'Get material type (book).');
+is($ret->modified_record, ' ', 'Get modified record ( ).');
+is($ret->place_of_publication, 'xr ', 'Get place of publication (xr ).');
+my $right_field_008 = '830304s1982    xr a         u0|0 | cze';
+is($ret->raw, $right_field_008.'  ', 'Get raw ('.$field_008.'  ).');
 is($ret->type_of_date, 's', 'Get type of date (s).');
 
 # Test.
@@ -195,4 +229,19 @@ eval {
 };
 is($EVAL_ERROR, "Parameter 'leader' is required.\n",
 	"Parameter 'leader' is required.");
+clean();
+
+# Test.
+## cnb000000096 with dashes in field 008 and strict mode.
+$leader = MARC::Leader->new->parse('     nam a22        4500');
+$obj = MARC::Field008->new(
+	'leader' => $leader,
+	'mode_strict' => 1,
+);
+$field_008 = '830304s1982----xr-a---------u0|0-|-cze';
+eval {
+	$obj->parse($field_008);
+};
+is($EVAL_ERROR, "Couldn't parse MARC 008 field.\n",
+	"Couldn't parse MARC 008 field.");
 clean();

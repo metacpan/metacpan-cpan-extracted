@@ -2,7 +2,7 @@ package IPC::Manager::Base::FS;
 use strict;
 use warnings;
 
-our $VERSION = '0.000033';
+our $VERSION = '0.000035';
 
 use File::Spec;
 
@@ -240,8 +240,10 @@ sub requeue_message {
     my $self = shift;
     $self->pid_check;
     open(my $fh, '>>', $self->resume_file) or die "Could not open resume file: $!";
+    binmode($fh);
     for my $msg (@_) {
-        print $fh $self->{+SERIALIZER}->serialize($msg), "\n";
+        my $bytes = $self->{+SERIALIZER}->serialize($msg);
+        print $fh pack('N', length $bytes), $bytes;
     }
     close($fh);
 }
@@ -255,8 +257,22 @@ sub read_resume_file {
     return @out unless -e $rf;
 
     open(my $fh, '<', $rf) or die "Could not open resume file: $!";
-    while (my $line = <$fh>) {
-        push @out => IPC::Manager::Message->new($self->{+SERIALIZER}->deserialize($line));
+    binmode($fh);
+    while (1) {
+        my $hdr;
+        my $r = read($fh, $hdr, 4);
+        last unless defined $r && $r > 0;
+        die "Truncated resume file header (got $r bytes)" if $r != 4;
+        my ($len) = unpack('N', $hdr);
+        my $bytes = '';
+        my $need = $len;
+        while ($need) {
+            my $got = read($fh, $bytes, $need, length $bytes);
+            die "Truncated resume file payload (wanted $len, got " . length($bytes) . ")"
+                unless defined $got && $got > 0;
+            $need -= $got;
+        }
+        push @out => IPC::Manager::Message->new($self->{+SERIALIZER}->deserialize($bytes));
     }
     close($fh);
 

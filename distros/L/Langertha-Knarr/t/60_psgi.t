@@ -24,7 +24,7 @@ my $sb = Langertha::Knarr->new(
   port => 0,
 );
 
-my $app = Langertha::Knarr::PSGI->new( steerboard => $sb )->to_app;
+my $app = Langertha::Knarr::PSGI->new( knarr => $sb )->to_app;
 my $test = Plack::Test->create($app);
 
 # Non-streaming OpenAI

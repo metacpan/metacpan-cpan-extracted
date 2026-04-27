@@ -1,0 +1,356 @@
+=pod
+
+=head1 NAME
+
+Async::Redis::Cookbook - Practical Async::Redis recipes
+
+=head1 SYNOPSIS
+
+This cookbook shows small, copyable Async::Redis patterns. The examples are
+written for use inside an C<async sub>:
+
+=over 4
+
+=item * C<$redis> is a connected L<Async::Redis> client.
+
+=item * C<$host> and C<$port> are the Redis endpoint.
+
+=item * C<$prefix> is a unique key prefix for the example.
+
+=item * C<Future>, C<Future::AsyncAwait>, C<Future::IO>, C<Async::Redis>, and
+C<Async::Redis::Pool> are loaded where needed.
+
+=back
+
+The C<die> checks are intentional. They keep the cookbook examples executable
+by C<t/00-pod/cookbook-examples.t> so the documentation does not drift away
+from the implementation.
+
+=head1 RECIPES
+
+=head2 Connect And Ping
+
+Create a client, connect explicitly, use it, then disconnect when done.
+
+=for cookbook-test connect_and_ping
+
+    my $client = Async::Redis->new(
+        host            => $host,
+        port            => $port,
+        connect_timeout => 2,
+    );
+
+    await $client->connect;
+    my $pong = await $client->ping;
+    die "expected PONG" unless $pong eq 'PONG';
+
+    $client->disconnect;
+
+=for cookbook-test-end connect_and_ping
+
+=head2 Basic GET/SET
+
+Most command methods return a Future. Inside an C<async sub>, C<await> the
+result.
+
+=for cookbook-test basic_get_set
+
+    await $redis->set("$prefix:hello", 'world');
+
+    my $value = await $redis->get("$prefix:hello");
+    die "unexpected value: $value" unless $value eq 'world';
+
+=for cookbook-test-end basic_get_set
+
+=head2 Run Independent Commands Concurrently
+
+Start independent commands before awaiting them, then use
+C<< Future->needs_all >> to wait for all results. Responses are matched to the
+right Futures in command order by Async::Redis.
+
+=for cookbook-test concurrent_commands
+
+    my @futures = (
+        $redis->set("$prefix:k1", 'v1'),
+        $redis->set("$prefix:k2", 'v2'),
+        $redis->incr("$prefix:counter"),
+        $redis->get("$prefix:k1"),
+    );
+
+    my ($set1, $set2, $count, $value) = await Future->needs_all(@futures);
+
+    die "first SET failed"  unless $set1 eq 'OK';
+    die "second SET failed" unless $set2 eq 'OK';
+    die "INCR failed"      unless $count == 1;
+    die "GET failed"       unless $value eq 'v1';
+
+=for cookbook-test-end concurrent_commands
+
+=head2 Batch A Known Set Of Commands With A Pipeline
+
+Use an explicit pipeline when you already know the full batch of commands.
+
+=for cookbook-test explicit_pipeline
+
+    my $pipe = $redis->pipeline;
+
+    $pipe->set("$prefix:pipe:a", 'one');
+    $pipe->set("$prefix:pipe:b", 'two');
+    $pipe->get("$prefix:pipe:a");
+    $pipe->incr("$prefix:pipe:counter");
+
+    my $results = await $pipe->execute;
+
+    die "pipeline SET a failed" unless $results->[0] eq 'OK';
+    die "pipeline SET b failed" unless $results->[1] eq 'OK';
+    die "pipeline GET failed"   unless $results->[2] eq 'one';
+    die "pipeline INCR failed"  unless $results->[3] == 1;
+
+=for cookbook-test-end explicit_pipeline
+
+=head2 Use Auto-Pipeline For Burst Writes
+
+Use C<< auto_pipeline => 1 >> when application code naturally fires many
+commands in the same event-loop tick. Async::Redis batches them without
+changing the command API.
+
+=for cookbook-test auto_pipeline_burst
+
+    my $batched = Async::Redis->new(
+        host          => $host,
+        port          => $port,
+        auto_pipeline => 1,
+    );
+    await $batched->connect;
+
+    my @writes = map {
+        $batched->set("$prefix:auto:$_", "value-$_", ex => 60)
+    } 1 .. 25;
+
+    await Future->needs_all(@writes);
+
+    my $value = await $batched->get("$prefix:auto:25");
+    die "auto-pipeline write missing" unless $value eq 'value-25';
+
+    $batched->disconnect;
+
+=for cookbook-test-end auto_pipeline_burst
+
+=head2 Use A Dedicated Connection For BLPOP Workers
+
+Blocking Redis commands block their Redis connection, not the Perl process.
+Give each worker its own connection so other clients can keep doing useful
+work.
+
+=for cookbook-test blpop_worker_connection
+
+    my $worker = Async::Redis->new(host => $host, port => $port);
+    await $worker->connect;
+
+    my $pop_f = $worker->blpop("$prefix:jobs", 2);
+
+    await Future::IO->sleep(0);
+    await $redis->rpush("$prefix:jobs", 'job-1');
+
+    my $popped = await $pop_f;
+    die "BLPOP did not return a list/key pair"
+        unless ref($popped) eq 'ARRAY' && @$popped == 2;
+    die "wrong queue" unless $popped->[0] eq "$prefix:jobs";
+    die "wrong job"   unless $popped->[1] eq 'job-1';
+
+    $worker->disconnect;
+
+=for cookbook-test-end blpop_worker_connection
+
+=head2 Read Pub/Sub Messages With The Iterator API
+
+Iterator mode is direct: await C<next> whenever you are ready for another
+message.
+
+=for cookbook-test pubsub_iterator
+
+    my $publisher = Async::Redis->new(host => $host, port => $port);
+    my $subscriber = Async::Redis->new(host => $host, port => $port);
+    await Future->needs_all($publisher->connect, $subscriber->connect);
+
+    my $sub = await $subscriber->subscribe("$prefix:events");
+    my $next = $sub->next;
+
+    await $publisher->publish("$prefix:events", 'hello');
+    my $msg = await $next;
+
+    die "wrong channel" unless $msg->{channel} eq "$prefix:events";
+    die "wrong data"    unless $msg->{data} eq 'hello';
+
+    await $sub->unsubscribe;
+    $publisher->disconnect;
+    $subscriber->disconnect;
+
+=for cookbook-test-end pubsub_iterator
+
+=head2 Read Pub/Sub Messages With A Callback
+
+Callback mode is useful for listeners that should run in the background. Always
+install C<on_error> so fatal listener errors are visible in your application.
+
+=for cookbook-test pubsub_callback
+
+    my $publisher = Async::Redis->new(host => $host, port => $port);
+    my $subscriber = Async::Redis->new(host => $host, port => $port);
+    await Future->needs_all($publisher->connect, $subscriber->connect);
+
+    my $sub = await $subscriber->subscribe("$prefix:callback");
+    my $done = Future->new;
+
+    $sub->on_error(sub {
+        my ($sub, $err) = @_;
+        $done->fail($err) unless $done->is_ready;
+    });
+
+    $sub->on_message(sub {
+        my ($sub, $msg) = @_;
+        $done->done($msg->{data}) unless $done->is_ready;
+    });
+
+    await $publisher->publish("$prefix:callback", 'callback-data');
+
+    my $data = await Future->wait_any(
+        $done,
+        Future::IO->sleep(2)->then(sub { Future->fail('callback timed out') }),
+    );
+    die "wrong callback data" unless $data eq 'callback-data';
+
+    await $sub->unsubscribe;
+    $publisher->disconnect;
+    $subscriber->disconnect;
+
+=for cookbook-test-end pubsub_callback
+
+=head2 Use MULTI/EXEC With The Callback API
+
+The callback receives a transaction collector. Commands queued on C<$tx> do
+not return per-command Futures; Redis returns the results from C<EXEC>.
+
+=for cookbook-test transaction_multi
+
+    my $results = await $redis->multi(async sub {
+        my ($tx) = @_;
+        $tx->set("$prefix:tx:counter", 0);
+        $tx->incr("$prefix:tx:counter");
+        $tx->incr("$prefix:tx:counter");
+        $tx->get("$prefix:tx:counter");
+    });
+
+    die "transaction SET failed" unless $results->[0] eq 'OK';
+    die "first INCR failed"      unless $results->[1] == 1;
+    die "second INCR failed"     unless $results->[2] == 2;
+    die "transaction GET failed" unless $results->[3] eq '2';
+
+=for cookbook-test-end transaction_multi
+
+=head2 Use WATCH With C<watch_multi>
+
+C<watch_multi> reads watched values, lets you queue a transaction, and returns
+C<undef> if Redis aborts because another client changed a watched key.
+
+=for cookbook-test optimistic_watch_multi
+
+    await $redis->set("$prefix:balance", 100);
+
+    my $results = await $redis->watch_multi(["$prefix:balance"], async sub {
+        my ($tx, $watched) = @_;
+        my $current = $watched->{"$prefix:balance"};
+
+        die "unexpected watched value" unless $current eq '100';
+
+        $tx->decrby("$prefix:balance", 25);
+        $tx->get("$prefix:balance");
+    });
+
+    die "WATCH transaction aborted" unless defined $results;
+    die "DECRBY failed" unless $results->[0] == 75;
+    die "GET failed"    unless $results->[1] eq '75';
+
+=for cookbook-test-end optimistic_watch_multi
+
+=head2 Register And Run Lua Scripts Explicitly
+
+Register scripts with C<define_command>, then run them explicitly with
+C<run_script>. Script names are per client instance; they are not installed as
+Perl methods.
+
+=for cookbook-test lua_define_command
+
+    $redis->define_command(cookbook_incrby => {
+        keys => 1,
+        lua  => <<'LUA',
+            local current = tonumber(redis.call('GET', KEYS[1]) or 0)
+            local next_value = current + tonumber(ARGV[1])
+            redis.call('SET', KEYS[1], next_value)
+            return next_value
+    LUA
+    });
+
+    my $result = await $redis->run_script(
+        'cookbook_incrby',
+        "$prefix:lua:counter",
+        7,
+    );
+
+    die "script returned wrong value" unless $result == 7;
+
+=for cookbook-test-end lua_define_command
+
+=head2 Use A Pool With C<with>
+
+C<with> is the preferred pool API because it releases the connection even when
+your callback dies.
+
+=for cookbook-test pool_with
+
+    my $pool = Async::Redis::Pool->new(
+        host => $host,
+        port => $port,
+        min  => 1,
+        max  => 2,
+    );
+
+    my $value = await $pool->with(async sub {
+        my ($conn) = @_;
+        await $conn->set("$prefix:pool:key", 'pooled');
+        return await $conn->get("$prefix:pool:key");
+    });
+
+    die "pool returned wrong value" unless $value eq 'pooled';
+
+    my $stats = $pool->stats;
+    die "pool leaked active connection" unless $stats->{active} == 0;
+
+    $pool->shutdown;
+
+=for cookbook-test-end pool_with
+
+=head1 PITFALLS
+
+=over 4
+
+=item * Do not share one connection between a C<BLPOP> worker and unrelated
+commands. The connection is blocked until Redis replies.
+
+=item * Do not mix C<next> and C<on_message> on the same subscription.
+Callback mode is sticky.
+
+=item * Do not return dirty connections to a pool. Use C<< $pool->with(...) >>
+or let the pool destroy/clean dirty connections on release.
+
+=item * Do not rely on C<prefix> as a security boundary. Use Redis ACLs or
+separate databases for tenant isolation.
+
+=back
+
+=head1 SEE ALSO
+
+L<Async::Redis>, L<Async::Redis::Pool>, L<Async::Redis::Subscription>,
+L<Async::Redis::Script>
+
+=cut

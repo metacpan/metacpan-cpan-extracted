@@ -80,6 +80,11 @@ DEFINE_PS_KW(str, "Str", lag,     1, build_kw_1arg)
     PubSubHandle *h = INT2PTR(PubSubHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed %s object", classname)
 
+#define MAKE_OBJ(class, ptr) \
+    SV *ref = newRV_noinc(newSViv(PTR2IV(ptr))); \
+    sv_bless(ref, gv_stashpv(class, GV_ADD)); \
+    RETVAL = ref
+
 #define EXTRACT_SUB(classname, sv) \
     if (!sv_isobject(sv) || !sv_derived_from(sv, classname)) \
         croak("Expected a %s object", classname); \
@@ -116,10 +121,7 @@ new(class, path, capacity)
     const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
     PubSubHandle *h = pubsub_create(p, (uint32_t)capacity, PUBSUB_MODE_INT, 0, errbuf);
     if (!h) croak("Data::PubSub::Shared::Int->new: %s", errbuf);
-    SV *obj = newSViv(PTR2IV(h));
-    SV *ref = newRV_noinc(obj);
-    sv_bless(ref, gv_stashpv(class, GV_ADD));
-    RETVAL = ref;
+    MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
 
@@ -133,10 +135,7 @@ new_memfd(class, name, capacity)
   CODE:
     PubSubHandle *h = pubsub_create_memfd(name, (uint32_t)capacity, PUBSUB_MODE_INT, 0, errbuf);
     if (!h) croak("Data::PubSub::Shared::Int->new_memfd: %s", errbuf);
-    SV *obj = newSViv(PTR2IV(h));
-    SV *ref = newRV_noinc(obj);
-    sv_bless(ref, gv_stashpv(class, GV_ADD));
-    RETVAL = ref;
+    MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
 
@@ -149,10 +148,7 @@ new_from_fd(class, fd)
   CODE:
     PubSubHandle *h = pubsub_open_fd(fd, PUBSUB_MODE_INT, errbuf);
     if (!h) croak("Data::PubSub::Shared::Int->new_from_fd: %s", errbuf);
-    SV *obj = newSViv(PTR2IV(h));
-    SV *ref = newRV_noinc(obj);
-    sv_bless(ref, gv_stashpv(class, GV_ADD));
-    RETVAL = ref;
+    MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
 
@@ -169,9 +165,10 @@ memfd(self)
 void
 DESTROY(self)
     SV *self
-  PREINIT:
-    EXTRACT_HANDLE("Data::PubSub::Shared::Int", self);
   CODE:
+    if (!SvROK(self)) return;
+    PubSubHandle *h = INT2PTR(PubSubHandle*, SvIV(SvRV(self)));
+    if (!h) return;
     sv_setiv(SvRV(self), 0);
     pubsub_destroy(h);
 
@@ -223,10 +220,7 @@ subscribe(self)
     PubSubSub *sub = pubsub_subscribe(h, 0);
     if (!sub) croak("subscribe: out of memory");
     sub->userdata = (void *)newSVsv(self);
-    SV *obj = newSViv(PTR2IV(sub));
-    SV *ref = newRV_noinc(obj);
-    sv_bless(ref, gv_stashpv("Data::PubSub::Shared::Int::Sub", GV_ADD));
-    RETVAL = ref;
+    MAKE_OBJ("Data::PubSub::Shared::Int::Sub", sub);
   OUTPUT:
     RETVAL
 
@@ -239,10 +233,7 @@ subscribe_all(self)
     PubSubSub *sub = pubsub_subscribe(h, 1);
     if (!sub) croak("subscribe_all: out of memory");
     sub->userdata = (void *)newSVsv(self);
-    SV *obj = newSViv(PTR2IV(sub));
-    SV *ref = newRV_noinc(obj);
-    sv_bless(ref, gv_stashpv("Data::PubSub::Shared::Int::Sub", GV_ADD));
-    RETVAL = ref;
+    MAKE_OBJ("Data::PubSub::Shared::Int::Sub", sub);
   OUTPUT:
     RETVAL
 
@@ -362,13 +353,16 @@ fileno(self)
   OUTPUT:
     RETVAL
 
-void
+SV *
 eventfd_consume(self)
     SV *self
   PREINIT:
     EXTRACT_HANDLE("Data::PubSub::Shared::Int", self);
   CODE:
-    pubsub_eventfd_consume(h);
+    int64_t v = pubsub_eventfd_consume(h);
+    RETVAL = (v >= 0) ? newSViv((IV)v) : &PL_sv_undef;
+  OUTPUT:
+    RETVAL
 
 void
 notify(self)
@@ -383,9 +377,10 @@ MODULE = Data::PubSub::Shared  PACKAGE = Data::PubSub::Shared::Int::Sub
 void
 DESTROY(self)
     SV *self
-  PREINIT:
-    EXTRACT_SUB("Data::PubSub::Shared::Int::Sub", self);
   CODE:
+    if (!SvROK(self)) return;
+    PubSubSub *sub = INT2PTR(PubSubSub*, SvIV(SvRV(self)));
+    if (!sub) return;
     sv_setiv(SvRV(self), 0);
     if (sub->userdata) SvREFCNT_dec((SV *)sub->userdata);
     pubsub_sub_destroy(sub);
@@ -546,10 +541,12 @@ poll_cb(self, cb)
     RETVAL = 0;
     while (pubsub_int_poll(sub, &value)) {
         dSP;
+        ENTER; SAVETMPS;
         PUSHMARK(SP);
         mXPUSHi((IV)value);
         PUTBACK;
         call_sv(cb, G_DISCARD);
+        FREETMPS; LEAVE;
         RETVAL++;
     }
   OUTPUT:
@@ -602,10 +599,7 @@ new(class, path, capacity, ...)
     const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
     PubSubHandle *h = pubsub_create(p, (uint32_t)capacity, PUBSUB_MODE_STR, msg_size, errbuf);
     if (!h) croak("Data::PubSub::Shared::Str->new: %s", errbuf);
-    SV *obj = newSViv(PTR2IV(h));
-    SV *ref = newRV_noinc(obj);
-    sv_bless(ref, gv_stashpv(class, GV_ADD));
-    RETVAL = ref;
+    MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
 
@@ -621,10 +615,7 @@ new_memfd(class, name, capacity, ...)
     msg_size = (items > 3) ? (uint32_t)SvUV(ST(3)) : 0;
     PubSubHandle *h = pubsub_create_memfd(name, (uint32_t)capacity, PUBSUB_MODE_STR, msg_size, errbuf);
     if (!h) croak("Data::PubSub::Shared::Str->new_memfd: %s", errbuf);
-    SV *obj = newSViv(PTR2IV(h));
-    SV *ref = newRV_noinc(obj);
-    sv_bless(ref, gv_stashpv(class, GV_ADD));
-    RETVAL = ref;
+    MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
 
@@ -637,10 +628,7 @@ new_from_fd(class, fd)
   CODE:
     PubSubHandle *h = pubsub_open_fd(fd, PUBSUB_MODE_STR, errbuf);
     if (!h) croak("Data::PubSub::Shared::Str->new_from_fd: %s", errbuf);
-    SV *obj = newSViv(PTR2IV(h));
-    SV *ref = newRV_noinc(obj);
-    sv_bless(ref, gv_stashpv(class, GV_ADD));
-    RETVAL = ref;
+    MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
 
@@ -657,9 +645,10 @@ memfd(self)
 void
 DESTROY(self)
     SV *self
-  PREINIT:
-    EXTRACT_HANDLE("Data::PubSub::Shared::Str", self);
   CODE:
+    if (!SvROK(self)) return;
+    PubSubHandle *h = INT2PTR(PubSubHandle*, SvIV(SvRV(self)));
+    if (!h) return;
     sv_setiv(SvRV(self), 0);
     pubsub_destroy(h);
 
@@ -742,10 +731,7 @@ subscribe(self)
     PubSubSub *sub = pubsub_subscribe(h, 0);
     if (!sub) croak("subscribe: out of memory");
     sub->userdata = (void *)newSVsv(self);
-    SV *obj = newSViv(PTR2IV(sub));
-    SV *ref = newRV_noinc(obj);
-    sv_bless(ref, gv_stashpv("Data::PubSub::Shared::Str::Sub", GV_ADD));
-    RETVAL = ref;
+    MAKE_OBJ("Data::PubSub::Shared::Str::Sub", sub);
   OUTPUT:
     RETVAL
 
@@ -758,10 +744,7 @@ subscribe_all(self)
     PubSubSub *sub = pubsub_subscribe(h, 1);
     if (!sub) croak("subscribe_all: out of memory");
     sub->userdata = (void *)newSVsv(self);
-    SV *obj = newSViv(PTR2IV(sub));
-    SV *ref = newRV_noinc(obj);
-    sv_bless(ref, gv_stashpv("Data::PubSub::Shared::Str::Sub", GV_ADD));
-    RETVAL = ref;
+    MAKE_OBJ("Data::PubSub::Shared::Str::Sub", sub);
   OUTPUT:
     RETVAL
 
@@ -893,13 +876,16 @@ fileno(self)
   OUTPUT:
     RETVAL
 
-void
+SV *
 eventfd_consume(self)
     SV *self
   PREINIT:
     EXTRACT_HANDLE("Data::PubSub::Shared::Str", self);
   CODE:
-    pubsub_eventfd_consume(h);
+    int64_t v = pubsub_eventfd_consume(h);
+    RETVAL = (v >= 0) ? newSViv((IV)v) : &PL_sv_undef;
+  OUTPUT:
+    RETVAL
 
 void
 notify(self)
@@ -914,9 +900,10 @@ MODULE = Data::PubSub::Shared  PACKAGE = Data::PubSub::Shared::Str::Sub
 void
 DESTROY(self)
     SV *self
-  PREINIT:
-    EXTRACT_SUB("Data::PubSub::Shared::Str::Sub", self);
   CODE:
+    if (!SvROK(self)) return;
+    PubSubSub *sub = INT2PTR(PubSubSub*, SvIV(SvRV(self)));
+    if (!sub) return;
     sv_setiv(SvRV(self), 0);
     if (sub->userdata) SvREFCNT_dec((SV *)sub->userdata);
     pubsub_sub_destroy(sub);
@@ -1104,12 +1091,14 @@ poll_cb(self, cb)
     RETVAL = 0;
     while (pubsub_str_poll(sub, &str, &len, &utf8) == 1) {
         dSP;
+        ENTER; SAVETMPS;
         SV *sv = newSVpvn(str, len);
         if (utf8) SvUTF8_on(sv);
         PUSHMARK(SP);
         mXPUSHs(sv);
         PUTBACK;
         call_sv(cb, G_DISCARD);
+        FREETMPS; LEAVE;
         RETVAL++;
     }
   OUTPUT:
@@ -1165,10 +1154,7 @@ new(class, path, capacity)
     const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
     PubSubHandle *h = pubsub_create(p, (uint32_t)capacity, PUBSUB_MODE_INT32, 0, errbuf);
     if (!h) croak("Data::PubSub::Shared::Int32->new: %s", errbuf);
-    SV *obj = newSViv(PTR2IV(h));
-    SV *ref = newRV_noinc(obj);
-    sv_bless(ref, gv_stashpv(class, GV_ADD));
-    RETVAL = ref;
+    MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
 
@@ -1182,10 +1168,7 @@ new_memfd(class, name, capacity)
   CODE:
     PubSubHandle *h = pubsub_create_memfd(name, (uint32_t)capacity, PUBSUB_MODE_INT32, 0, errbuf);
     if (!h) croak("Data::PubSub::Shared::Int32->new_memfd: %s", errbuf);
-    SV *obj = newSViv(PTR2IV(h));
-    SV *ref = newRV_noinc(obj);
-    sv_bless(ref, gv_stashpv(class, GV_ADD));
-    RETVAL = ref;
+    MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
 
@@ -1198,10 +1181,7 @@ new_from_fd(class, fd)
   CODE:
     PubSubHandle *h = pubsub_open_fd(fd, PUBSUB_MODE_INT32, errbuf);
     if (!h) croak("Data::PubSub::Shared::Int32->new_from_fd: %s", errbuf);
-    SV *obj = newSViv(PTR2IV(h));
-    SV *ref = newRV_noinc(obj);
-    sv_bless(ref, gv_stashpv(class, GV_ADD));
-    RETVAL = ref;
+    MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
 
@@ -1218,9 +1198,10 @@ memfd(self)
 void
 DESTROY(self)
     SV *self
-  PREINIT:
-    EXTRACT_HANDLE("Data::PubSub::Shared::Int32", self);
   CODE:
+    if (!SvROK(self)) return;
+    PubSubHandle *h = INT2PTR(PubSubHandle*, SvIV(SvRV(self)));
+    if (!h) return;
     sv_setiv(SvRV(self), 0);
     pubsub_destroy(h);
 
@@ -1272,10 +1253,7 @@ subscribe(self)
     PubSubSub *sub = pubsub_subscribe(h, 0);
     if (!sub) croak("subscribe: out of memory");
     sub->userdata = (void *)newSVsv(self);
-    SV *obj = newSViv(PTR2IV(sub));
-    SV *ref = newRV_noinc(obj);
-    sv_bless(ref, gv_stashpv("Data::PubSub::Shared::Int32::Sub", GV_ADD));
-    RETVAL = ref;
+    MAKE_OBJ("Data::PubSub::Shared::Int32::Sub", sub);
   OUTPUT:
     RETVAL
 
@@ -1288,10 +1266,7 @@ subscribe_all(self)
     PubSubSub *sub = pubsub_subscribe(h, 1);
     if (!sub) croak("subscribe_all: out of memory");
     sub->userdata = (void *)newSVsv(self);
-    SV *obj = newSViv(PTR2IV(sub));
-    SV *ref = newRV_noinc(obj);
-    sv_bless(ref, gv_stashpv("Data::PubSub::Shared::Int32::Sub", GV_ADD));
-    RETVAL = ref;
+    MAKE_OBJ("Data::PubSub::Shared::Int32::Sub", sub);
   OUTPUT:
     RETVAL
 
@@ -1411,13 +1386,16 @@ fileno(self)
   OUTPUT:
     RETVAL
 
-void
+SV *
 eventfd_consume(self)
     SV *self
   PREINIT:
     EXTRACT_HANDLE("Data::PubSub::Shared::Int32", self);
   CODE:
-    pubsub_eventfd_consume(h);
+    int64_t v = pubsub_eventfd_consume(h);
+    RETVAL = (v >= 0) ? newSViv((IV)v) : &PL_sv_undef;
+  OUTPUT:
+    RETVAL
 
 void
 notify(self)
@@ -1432,9 +1410,10 @@ MODULE = Data::PubSub::Shared  PACKAGE = Data::PubSub::Shared::Int32::Sub
 void
 DESTROY(self)
     SV *self
-  PREINIT:
-    EXTRACT_SUB("Data::PubSub::Shared::Int32::Sub", self);
   CODE:
+    if (!SvROK(self)) return;
+    PubSubSub *sub = INT2PTR(PubSubSub*, SvIV(SvRV(self)));
+    if (!sub) return;
     sv_setiv(SvRV(self), 0);
     if (sub->userdata) SvREFCNT_dec((SV *)sub->userdata);
     pubsub_sub_destroy(sub);
@@ -1595,10 +1574,12 @@ poll_cb(self, cb)
     RETVAL = 0;
     while (pubsub_int32_poll(sub, &value)) {
         dSP;
+        ENTER; SAVETMPS;
         PUSHMARK(SP);
         mXPUSHi((IV)value);
         PUTBACK;
         call_sv(cb, G_DISCARD);
+        FREETMPS; LEAVE;
         RETVAL++;
     }
   OUTPUT:
@@ -1649,10 +1630,7 @@ new(class, path, capacity)
     const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
     PubSubHandle *h = pubsub_create(p, (uint32_t)capacity, PUBSUB_MODE_INT16, 0, errbuf);
     if (!h) croak("Data::PubSub::Shared::Int16->new: %s", errbuf);
-    SV *obj = newSViv(PTR2IV(h));
-    SV *ref = newRV_noinc(obj);
-    sv_bless(ref, gv_stashpv(class, GV_ADD));
-    RETVAL = ref;
+    MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
 
@@ -1666,10 +1644,7 @@ new_memfd(class, name, capacity)
   CODE:
     PubSubHandle *h = pubsub_create_memfd(name, (uint32_t)capacity, PUBSUB_MODE_INT16, 0, errbuf);
     if (!h) croak("Data::PubSub::Shared::Int16->new_memfd: %s", errbuf);
-    SV *obj = newSViv(PTR2IV(h));
-    SV *ref = newRV_noinc(obj);
-    sv_bless(ref, gv_stashpv(class, GV_ADD));
-    RETVAL = ref;
+    MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
 
@@ -1682,10 +1657,7 @@ new_from_fd(class, fd)
   CODE:
     PubSubHandle *h = pubsub_open_fd(fd, PUBSUB_MODE_INT16, errbuf);
     if (!h) croak("Data::PubSub::Shared::Int16->new_from_fd: %s", errbuf);
-    SV *obj = newSViv(PTR2IV(h));
-    SV *ref = newRV_noinc(obj);
-    sv_bless(ref, gv_stashpv(class, GV_ADD));
-    RETVAL = ref;
+    MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
 
@@ -1702,9 +1674,10 @@ memfd(self)
 void
 DESTROY(self)
     SV *self
-  PREINIT:
-    EXTRACT_HANDLE("Data::PubSub::Shared::Int16", self);
   CODE:
+    if (!SvROK(self)) return;
+    PubSubHandle *h = INT2PTR(PubSubHandle*, SvIV(SvRV(self)));
+    if (!h) return;
     sv_setiv(SvRV(self), 0);
     pubsub_destroy(h);
 
@@ -1756,10 +1729,7 @@ subscribe(self)
     PubSubSub *sub = pubsub_subscribe(h, 0);
     if (!sub) croak("subscribe: out of memory");
     sub->userdata = (void *)newSVsv(self);
-    SV *obj = newSViv(PTR2IV(sub));
-    SV *ref = newRV_noinc(obj);
-    sv_bless(ref, gv_stashpv("Data::PubSub::Shared::Int16::Sub", GV_ADD));
-    RETVAL = ref;
+    MAKE_OBJ("Data::PubSub::Shared::Int16::Sub", sub);
   OUTPUT:
     RETVAL
 
@@ -1772,10 +1742,7 @@ subscribe_all(self)
     PubSubSub *sub = pubsub_subscribe(h, 1);
     if (!sub) croak("subscribe_all: out of memory");
     sub->userdata = (void *)newSVsv(self);
-    SV *obj = newSViv(PTR2IV(sub));
-    SV *ref = newRV_noinc(obj);
-    sv_bless(ref, gv_stashpv("Data::PubSub::Shared::Int16::Sub", GV_ADD));
-    RETVAL = ref;
+    MAKE_OBJ("Data::PubSub::Shared::Int16::Sub", sub);
   OUTPUT:
     RETVAL
 
@@ -1895,13 +1862,16 @@ fileno(self)
   OUTPUT:
     RETVAL
 
-void
+SV *
 eventfd_consume(self)
     SV *self
   PREINIT:
     EXTRACT_HANDLE("Data::PubSub::Shared::Int16", self);
   CODE:
-    pubsub_eventfd_consume(h);
+    int64_t v = pubsub_eventfd_consume(h);
+    RETVAL = (v >= 0) ? newSViv((IV)v) : &PL_sv_undef;
+  OUTPUT:
+    RETVAL
 
 void
 notify(self)
@@ -1916,9 +1886,10 @@ MODULE = Data::PubSub::Shared  PACKAGE = Data::PubSub::Shared::Int16::Sub
 void
 DESTROY(self)
     SV *self
-  PREINIT:
-    EXTRACT_SUB("Data::PubSub::Shared::Int16::Sub", self);
   CODE:
+    if (!SvROK(self)) return;
+    PubSubSub *sub = INT2PTR(PubSubSub*, SvIV(SvRV(self)));
+    if (!sub) return;
     sv_setiv(SvRV(self), 0);
     if (sub->userdata) SvREFCNT_dec((SV *)sub->userdata);
     pubsub_sub_destroy(sub);
@@ -2079,10 +2050,12 @@ poll_cb(self, cb)
     RETVAL = 0;
     while (pubsub_int16_poll(sub, &value)) {
         dSP;
+        ENTER; SAVETMPS;
         PUSHMARK(SP);
         mXPUSHi((IV)value);
         PUTBACK;
         call_sv(cb, G_DISCARD);
+        FREETMPS; LEAVE;
         RETVAL++;
     }
   OUTPUT:

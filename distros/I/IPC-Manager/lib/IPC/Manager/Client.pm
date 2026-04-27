@@ -2,7 +2,7 @@ package IPC::Manager::Client;
 use strict;
 use warnings;
 
-our $VERSION = '0.000033';
+our $VERSION = '0.000035';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed weaken/;
@@ -20,6 +20,7 @@ use Object::HashBase qw{
     <serializer
     +reconnect
     <stats
+    +creator_pid
 };
 
 my ($PID, @LOCAL);
@@ -57,6 +58,13 @@ sub have_ready_messages   { croak "Not Implemented" }
 sub have_handles_for_select { 0 }
 sub handles_for_select      { croak "Not Implemented" }
 
+# When a client multiplexes a dynamic set of handles (sockets accepted at
+# runtime, etc.) consumers of handles_for_select cannot cache an IO::Select
+# object: handles added after the cache was built would be missed.  Clients
+# that mutate their handle set during normal operation should override this
+# to return true so consumers know to rebuild.
+sub have_dynamic_handles_for_select { 0 }
+
 sub suspend_supported             { 1 }
 sub have_handles_for_peer_change  { 0 }
 sub reset_handles_for_peer_change { croak "Not Implemented" }
@@ -72,6 +80,31 @@ sub spawn        { croak "Not Implemented" }
 sub write_stats  { croak "Not Implemented" }
 sub all_stats    { croak "Not Implemented" }
 sub _viable      { croak "Not Implemented" }
+
+# Outbox API defaults.
+#
+# Clients backed by memory or DB stores cannot EAGAIN at the
+# granularity of a single message; they get this no-op fallback so
+# service code can call the outbox API uniformly. Clients backed by
+# a kernel transport (FIFO, datagram socket) override these by
+# consuming IPC::Manager::Role::Outbox.
+sub try_send_message {
+    my $self = shift;
+    $self->send_message(@_);
+    return 1;
+}
+
+sub pending_sends         { 0 }
+sub have_pending_sends    { 0 }
+sub pending_sends_to      { 0 }
+sub drain_pending         { 0 }
+sub have_writable_handles { 0 }
+sub writable_handles      { () }
+
+sub send_blocking     { 1 }
+sub set_send_blocking { return }
+
+sub can_send_to { 1 }
 
 sub viable {
     my $self_or_class = shift;
@@ -108,6 +141,15 @@ sub init {
     croak "'id' may not begin with an underscore" if $id =~ m/^_/;
 
     $self->{+PID} //= $$;
+
+    # CREATOR_PID is the pid that originally constructed this
+    # client. It NEVER changes after init, even when init runs
+    # again post-fork (Object::HashBase calls init from the parent
+    # constructor; subclasses or post-fork resets may also run init
+    # later). DESTROY uses this to refuse FIFO/socket cleanup in a
+    # process that merely inherited the client object across fork.
+    $self->{+CREATOR_PID} //= $$;
+
     $self->{+STATS} = $self->read_stats if $self->{+RECONNECT};
     $self->{+STATS} //= {read => {}, sent => {}};
 }
@@ -283,7 +325,11 @@ sub suspend {
 
 sub DESTROY {
     my $self = shift;
-    return unless $self->{+PID} && $self->{+PID} == $$;
+    # CREATOR_PID is sticky (set once in init, never overwritten on
+    # post-fork resets). +PID gets refreshed in forked children, so
+    # using it here would let DESTROY in a child unlink the FIFO/socket
+    # the parent still owns. Compare creator pid instead.
+    return unless $self->{+CREATOR_PID} && $self->{+CREATOR_PID} == $$;
     local $@;
     eval { $self->disconnect;  1 } or warn $@;
     eval { $self->write_stats; 1 } or warn $@ unless $self->{+DISCONNECTED};

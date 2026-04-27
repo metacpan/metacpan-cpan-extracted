@@ -1,11 +1,11 @@
 package Langertha::Knarr::Handler::Router;
 # ABSTRACT: Knarr handler that resolves model names via Langertha::Knarr::Router and dispatches to engines
-our $VERSION = '1.001';
+our $VERSION = '1.100';
 use Moose;
 use Future;
 use Future::AsyncAwait;
-use Scalar::Util qw( blessed );
 use Langertha::Knarr::Stream;
+use Langertha::Knarr::Response;
 
 with 'Langertha::Knarr::Handler';
 
@@ -45,14 +45,13 @@ async sub handle_chat_f {
   my ($self, $session, $request) = @_;
   my ($engine, $canonical_model) = $self->_resolve( $request->model );
   unless ( $engine ) {
-    return await $self->passthrough->handle_chat_f( $session, $request );
+    return Langertha::Knarr::Response->coerce(
+      await $self->passthrough->handle_chat_f( $session, $request )
+    );
   }
-  my @msgs = @{ $request->messages };
-  my $response = await $engine->simple_chat_f( @msgs );
-  my $content = blessed($response) ? "$response"
-              : ref $response eq 'HASH' ? ( $response->{content} // '' )
-              : "$response";
-  return { content => $content, model => $canonical_model };
+  my $response = await $engine->chat_f( $request->chat_f_args($engine) );
+  my $r = Langertha::Knarr::Response->coerce($response);
+  return $r->clone_with( model => $canonical_model );
 }
 
 async sub handle_stream_f {
@@ -63,43 +62,29 @@ async sub handle_stream_f {
     return await $self->passthrough->handle_stream_f( $session, $request );
   }
 
-  unless ( $engine->can('simple_chat_stream_realtime_f') && $engine->can('chat_stream_request') ) {
+  unless ( _supports_streaming($engine) ) {
     my $r = await $self->handle_chat_f($session, $request);
-    return Langertha::Knarr::Stream->from_list( $r->{content} );
+    return Langertha::Knarr::Stream->from_list( $r->content );
   }
 
-  my @queue;
-  my $pending;
-  my $finished = 0;
-  my $error;
+  return Langertha::Knarr::Stream->from_callback( sub {
+    my ($emit, $done, $fail) = @_;
+    my $cb = sub {
+      my ($chunk) = @_;
+      my $text = ref $chunk && $chunk->can('content') ? $chunk->content : "$chunk";
+      $emit->($text);
+    };
+    my $f = $engine->simple_chat_stream_realtime_f( $cb, @{ $request->messages } );
+    $f->on_done( $done );
+    $f->on_fail( $fail );
+    $f->retain;
+  });
+}
 
-  my $deliver = sub {
-    my ($v) = @_;
-    if ( $pending ) { my $p = $pending; $pending = undef; $p->done($v) }
-    else            { push @queue, $v }
-  };
-
-  my $cb = sub {
-    my ($chunk) = @_;
-    my $text = blessed($chunk) && $chunk->can('content') ? $chunk->content : "$chunk";
-    return unless defined $text && length $text;
-    $deliver->($text);
-  };
-
-  my @msgs = @{ $request->messages };
-  my $f = $engine->simple_chat_stream_realtime_f( $cb, @msgs );
-  $f->on_done( sub { $finished = 1; $deliver->(undef) } );
-  $f->on_fail( sub { $error = $_[0]; $finished = 1; $deliver->(undef) } );
-  $f->retain;
-
-  return Langertha::Knarr::Stream->new(
-    source => sub {
-      if ( @queue )    { return Future->done( shift @queue ) }
-      if ( $finished ) { return $error ? Future->fail($error) : Future->done(undef) }
-      $pending = Future->new;
-      return $pending;
-    },
-  );
+sub _supports_streaming {
+  my ($engine) = @_;
+  return $engine->supports('streaming') if $engine->can('supports');
+  return $engine->can('simple_chat_stream_realtime_f') && $engine->can('chat_stream_request');
 }
 
 sub list_models {
@@ -123,7 +108,7 @@ Langertha::Knarr::Handler::Router - Knarr handler that resolves model names via 
 
 =head1 VERSION
 
-version 1.001
+version 1.100
 
 =head1 SYNOPSIS
 

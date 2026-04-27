@@ -1,0 +1,143 @@
+:: BATsh example 07: Mixed CMD + SH comprehensive demo
+:: Run: perl lib/BATsh.pm eg/07_mixed_comprehensive.batsh
+:: Demonstrates CMD and SH sections interleaving within one script,
+:: sharing state via BATsh::Env (the variable bridge).
+:: No external cmd.exe, bash, or sh is required -- pure Perl throughout.
+
+@ECHO OFF
+ECHO [Mixed 1] CMD initialises variables
+SET APP=BATsh
+SET COUNTER=0
+SET /A COUNTER=%COUNTER%+1
+ECHO   APP=%APP%  COUNTER=%COUNTER%
+
+echo "[Mixed 2] SH reads CMD variables"
+echo "  APP=$APP  COUNTER=$COUNTER"
+COUNTER=$(( COUNTER + 1 ))
+export COUNTER
+RESULT=$(echo "computed_in_sh")
+export RESULT
+echo "  COUNTER now $COUNTER  RESULT=$RESULT"
+
+@ECHO OFF
+ECHO [Mixed 3] CMD reads SH variables
+ECHO   COUNTER=%COUNTER%
+ECHO   RESULT=%RESULT%
+SET /A COUNTER=%COUNTER%+1
+ECHO   COUNTER incremented to %COUNTER%
+
+echo "[Mixed 4] SH arithmetic then back to CMD"
+SUM=0
+for N in 1 2 3 4 5; do
+    SUM=$(( SUM + N ))
+done
+export SUM
+echo "  SH sum 1..5 = $SUM"
+
+@ECHO OFF
+ECHO [Mixed 5] CMD reads SH-computed SUM=%SUM%
+SET /A DOUBLED=%SUM%*2
+ECHO   CMD doubled SUM: DOUBLED=%DOUBLED%
+
+echo "[Mixed 6] SH conditionals using CMD-set DOUBLED"
+if [ $DOUBLED -gt 50 ]; then
+    echo "  DOUBLED=$DOUBLED > 50"
+else
+    echo "  DOUBLED=$DOUBLED <= 50 (PASS)"
+fi
+
+case $APP in
+    BATsh) echo "  case PASS: APP=$APP" ;;
+    *)     echo "  case FAIL" ;;
+esac
+
+@ECHO OFF
+ECHO [Mixed 7] CMD FOR /L, accumulate in SH
+SET PARTS=
+FOR /L %%I IN (1,1,4) DO (
+    SET PARTS=%PARTS%%%I
+)
+ECHO   CMD accumulated PARTS=%PARTS%
+
+echo "[Mixed 8] SH reads PARTS=$PARTS"
+LEN=0
+for C in $PARTS; do
+    LEN=$(( LEN + 1 ))
+done
+export PARTS_COPY=$PARTS
+
+@ECHO OFF
+ECHO [Mixed 9] CMD subroutine called from CMD section
+CALL :CMD_GREET World
+GOTO :AFTER_CMD_SUB
+
+:CMD_GREET
+ECHO   CMD sub: Hello %BATSH_ARG1%!
+RET
+
+:AFTER_CMD_SUB
+
+echo "[Mixed 10] SH subroutine called from SH section"
+CALL :SH_GREET Universe
+GOTO :AFTER_SH_SUB
+
+:SH_GREET
+echo "  SH sub: Greetings $BATSH_ARG1!"
+return 0
+RET
+
+:AFTER_SH_SUB
+
+@ECHO OFF
+ECHO [Mixed 11] SETLOCAL isolates CMD vars from SH bridge
+SET ISOLATE=cmd_original
+SETLOCAL
+SET ISOLATE=cmd_local
+ECHO   inside SETLOCAL: ISOLATE=%ISOLATE%
+ENDLOCAL
+ECHO   after ENDLOCAL:  ISOLATE=%ISOLATE%
+
+echo "[Mixed 12] SH sees ISOLATE=$ISOLATE (pre-SETLOCAL value)"
+
+@ECHO OFF
+ECHO [Mixed 13] CMD nested FOR loops
+:: Note: nested FOR with SET inside paren body has env-expansion limits;
+:: demonstrate with independent loops instead.
+SET NR=
+FOR %%A IN (P Q R) DO SET NR=%NR%%%A
+ECHO   CMD FOR IN accumulate: NR=%NR%
+SET NL=0
+FOR /L %%I IN (1,1,4) DO SET /A NL=%NL%+%%I
+ECHO   CMD FOR /L sum 1..4: NL=%NL%
+
+echo "[Mixed 14] SH nested loops"
+GRID=
+for ROW in a b; do
+    for COL in 1 2; do
+        GRID="${GRID}${ROW}${COL}"
+    done
+done
+export GRID
+echo "  SH grid: $GRID"
+
+@ECHO OFF
+ECHO [Mixed 15] CMD reads SH-built GRID=%GRID%
+
+echo "[Mixed 16] Error status bridge"
+false
+SH_STATUS=$?
+export SH_STATUS
+echo "  SH false gave status=$SH_STATUS"
+
+@ECHO OFF
+ECHO   CMD sees SH_STATUS=%SH_STATUS%
+IF "%SH_STATUS%"=="1" (
+    ECHO   CMD IF PASS: SH false reported correctly
+)
+
+echo "[Mixed 17] Final summary"
+echo "  APP=$APP"
+echo "  SUM=$SUM  DOUBLED=$DOUBLED"
+echo "  GRID=$GRID"
+echo "  PARTS_COPY=$PARTS_COPY"
+echo "[Mixed comprehensive] Done."

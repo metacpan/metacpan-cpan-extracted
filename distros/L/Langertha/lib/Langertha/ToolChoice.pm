@@ -1,6 +1,6 @@
 package Langertha::ToolChoice;
 # ABSTRACT: Immutable canonical tool-selection policy with cross-provider conversion
-our $VERSION = '0.404';
+our $VERSION = '0.500';
 use Moose;
 use Moose::Util::TypeConstraints qw( enum );
 
@@ -98,6 +98,38 @@ sub to_anthropic {
   return undef;
 }
 
+sub to_perplexity {
+  my ($self) = @_;
+  # Perplexity only accepts string forms: none / auto / required.
+  # Named-tool forcing is not supported on the wire — engine layer
+  # is expected to switch to a response_format-based path when a
+  # named tool is requested. We coerce here so callers that ignore
+  # capabilities still get *something* sensible.
+  return 'none'     if $self->type eq 'none';
+  return 'auto'     if $self->type eq 'auto';
+  return 'required';
+}
+
+sub to_gemini {
+  my ($self) = @_;
+  # Gemini uses toolConfig.functionCallingConfig:
+  #   { mode => AUTO|ANY|NONE, allowed_function_names => [...] }
+  return { functionCallingConfig => { mode => 'NONE' } } if $self->type eq 'none';
+  return { functionCallingConfig => { mode => 'AUTO' } } if $self->type eq 'auto';
+  return { functionCallingConfig => { mode => 'ANY'  } } if $self->type eq 'any';
+  if ( $self->type eq 'tool' ) {
+    return { functionCallingConfig => { mode => 'AUTO' } }
+      unless defined $self->name && length $self->name;
+    return {
+      functionCallingConfig => {
+        mode                   => 'ANY',
+        allowed_function_names => [ $self->name ],
+      },
+    };
+  }
+  return undef;
+}
+
 sub to_hash {
   my ($self) = @_;
   return { type => $self->type, ( defined $self->name ? ( name => $self->name ) : () ) };
@@ -118,7 +150,7 @@ Langertha::ToolChoice - Immutable canonical tool-selection policy with cross-pro
 
 =head1 VERSION
 
-version 0.404
+version 0.500
 
 =head1 SUPPORT
 

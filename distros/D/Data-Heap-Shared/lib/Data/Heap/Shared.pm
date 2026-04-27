@@ -1,7 +1,7 @@
 package Data::Heap::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 require XSLoader;
 XSLoader::load('Data::Heap::Shared', $VERSION);
 1;
@@ -111,12 +111,17 @@ L<Data::PubSub::Shared> - publish-subscribe ring
 
 L<Data::Graph::Shared> - directed weighted graph
 
+L<Data::BitSet::Shared> - shared bitset (lock-free per-bit ops)
+
+L<Data::RingBuffer::Shared> - fixed-size overwriting ring buffer
+
 =head1 AUTHOR
 
 vividsnow
 
 =head1 LICENSE
 
-Same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
 
 =cut

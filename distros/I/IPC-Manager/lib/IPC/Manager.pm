@@ -3,9 +3,10 @@ use strict;
 use warnings;
 use feature qw/state/;
 
-our $VERSION = '0.000033';
+our $VERSION = '0.000035';
 
 use Carp qw/croak/;
+use Scalar::Util qw/blessed/;
 
 use Role::Tiny();
 
@@ -59,15 +60,15 @@ sub _parse_cinfo {
     }
     elsif (!$rtype) {
         ($protocol, $serializer, $route) = @{IPC::Manager::Serializer::JSON->deserialize($cinfo)};
-        $protocol   = _parse_protocol($protocol);
-        $serializer = _parse_serializer($serializer);
     }
     else {
         croak "Not sure what to do with $cinfo";
     }
 
+    $protocol   = _parse_protocol($protocol);
+    $serializer = _parse_serializer($serializer);
+
     require_mod($protocol);
-    require_mod($serializer);
 
     return ($protocol, $serializer, $route);
 }
@@ -78,10 +79,43 @@ sub _parse_protocol {
     return $protocol;
 }
 
+sub _serializer_class {
+    my $name = shift;
+    $name = "IPC::Manager::Serializer::$name"
+        unless $name =~ s/^\+// || $name =~ m/^IPC::Manager::Serializer::/;
+    return $name;
+}
+
+my %SERIALIZER_CACHE;
+
+sub _serializer_cache_key {
+    my ($class, @args) = @_;
+    my %h = @args;
+    return join(
+        "\0",
+        $class,
+        map { ($_, defined $h{$_} ? $h{$_} : "\0\0undef\0\0") } sort keys %h,
+    );
+}
+
 sub _parse_serializer {
-    my $serializer = shift;
-    $serializer = "IPC::Manager::Serializer::$serializer" unless $serializer =~ s/^\+// || $serializer =~ m/^IPC::Manager::Serializer::/;
-    return $serializer;
+    my $spec = shift;
+
+    return $spec if blessed $spec;
+
+    if (ref($spec) eq 'ARRAY') {
+        my ($class, @args) = @$spec;
+        $class = _serializer_class($class);
+        require_mod($class);
+        my $key = _serializer_cache_key($class, @args);
+        return $SERIALIZER_CACHE{$key} //= $class->new(@args);
+    }
+
+    croak "Don't know how to interpret serializer spec '$spec'" if ref $spec;
+
+    my $class = _serializer_class($spec);
+    require_mod($class);
+    return $class;
 }
 
 sub _connect {
@@ -108,6 +142,7 @@ sub ipcm_default_protocol_list {
     state $default = [
         'AtomicPipe',
         'UnixSocket',
+        'ConnectionUnix',
         'SQLite',
         'PostgreSQL',
         'MariaDB',
@@ -127,14 +162,21 @@ sub ipcm_default_protocol_list {
     return $default;
 }
 
+sub _pick_default_serializer {
+    return 'JSON::Zstd'
+        if eval { require IPC::Manager::Serializer::JSON::Zstd; IPC::Manager::Serializer::JSON::Zstd->viable };
+    return 'JSON';
+}
+
 sub ipcm_default_serializer {
-    state $default = 'JSON';
+    state $default;
 
     if (@_) {
-        my $serializer = _parse_serializer(@_);
-        require_mod($serializer);
-        $default = $serializer;
+        my $spec = @_ == 1 ? $_[0] : [@_];
+        $default = _parse_serializer($spec);
     }
+
+    $default //= _pick_default_serializer();
 
     return $default;
 }
@@ -168,7 +210,6 @@ sub ipcm_spawn {
     }
 
     $serializer = _parse_serializer($serializer);
-    require_mod($serializer);
 
     my ($route, $stash) = $protocol->spawn(%params, serializer => $serializer);
 
@@ -277,8 +318,19 @@ Default set of protocols to try, in the order they should be tried.
 
 =item ipcm_default_serializer($serializer)
 
-Get or set the default serializer. 'JSON' is the default unless this is
-changed.
+=item ipcm_default_serializer([$class, %args])
+
+=item ipcm_default_serializer($class, %args)
+
+Get or set the default serializer. The default is C<'JSON::Zstd'> when
+L<Compress::Zstd> 0.20 or newer is installed, otherwise C<'JSON'>.
+
+The setter accepts either a class string (uses class methods, no
+construction) or an arrayref whose first element is the class and whose
+remaining elements are constructor arguments. The arrayref form (or the
+flat-list spelling, which is treated identically) builds and caches a
+single shared instance keyed on C<($class, %args)>; subsequent
+C<ipcm_spawn> / C<ipcm_connect> calls with the same spec reuse it.
 
 =item $ipcm = ipcm_spawn()
 
@@ -299,7 +351,13 @@ sent to the PID for all clients when the instance is shut down.
 
 You can set the serializer with the C<< serializer => $CLASS >> option.
 'IPC::Manager::Serializer::' will be prefixed onto the class name unless it is
-already present, or if the class name starts with '+'.
+already present, or if the class name starts with '+'. To configure a
+serializer that takes constructor arguments (for example to set a custom
+compression level or dictionary on
+L<IPC::Manager::Serializer::JSON::Zstd>) pass an arrayref of
+C<< [$class, %args] >>: C<< serializer => ['JSON::Zstd', level => 9] >>. The
+arrayref form builds a single cached instance shared across all peer
+connections; the string form keeps using class methods directly.
 
 You can pick a protocol with the C<< protocol => $CLASS >> option.
 'IPC::Manager::Client::' will be prefixed onto the class name unless it is
@@ -329,8 +387,13 @@ arrayref.
     '["PROTOCOL_CLASS", "SERIALIZER_CLASS", "ROUTE"]'
 
 The protocol should always be an L<IPC::Manager::Client> subclass. The
-serializer should always be an L<IPC::Manager::Serializer> subclass. The route
-is protocol specific, it may be a file, a directory, a DBI DSN string, etc.
+serializer slot may be a class string, in which case the receiver uses class
+methods on it, or a C<< [$class, %args] >> arrayref, in which case the
+receiver constructs (and caches) a configured instance. The connection info
+string itself is always plain JSON; only message payloads carried over the
+chosen protocol are subject to the serializer's encoding (e.g. zstd
+compression). The route is protocol specific, it may be a file, a directory,
+a DBI DSN string, etc.
 
 =item $con = ipcm_reconnect($name => $info)
 
@@ -422,6 +485,16 @@ L<IPC::Manager::Client::UnixSocket>
 This uses a directory as the 'route'. This uses unix sockets, one per client.
 Messages are sent by writing them to the correct clients socket.  (Multiple
 writer, single reader).
+
+=item ConnectionUnix
+
+L<IPC::Manager::Client::ConnectionUnix>
+
+Like UnixSocket but uses C<SOCK_STREAM> connection-oriented UNIX sockets.
+Each client either listens for incoming connections (default) or registers as
+a non-listener and may only be reached via connections it has itself
+initiated.  Per-connection management methods are provided by
+L<IPC::Manager::Role::Client::Connection>.
 
 =back
 

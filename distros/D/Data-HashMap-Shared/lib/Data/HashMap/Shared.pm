@@ -1,7 +1,7 @@
 package Data::HashMap::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 require XSLoader;
 XSLoader::load('Data::HashMap::Shared', $VERSION);
@@ -111,11 +111,22 @@ B<Linux-only>. Requires 64-bit Perl.
 =head2 Constructor
 
     my $map = Data::HashMap::Shared::II->new($path, $max_entries);
+    my $map = Data::HashMap::Shared::II->new(undef, $max_entries);    # anonymous
     my $map = Data::HashMap::Shared::II->new($path, $max_entries, $max_size);
     my $map = Data::HashMap::Shared::II->new($path, $max_entries, $max_size, $ttl);
     my $map = Data::HashMap::Shared::II->new($path, $max_entries, $max_size, $ttl, $lru_skip);
+    my $map = Data::HashMap::Shared::II->new_memfd($name, $max_entries, ...); # memfd-backed
+    my $map = Data::HashMap::Shared::II->new_from_fd($fd);            # reopen memfd
+    my $fd  = $map->memfd;                                            # -1 if not memfd
 
-Creates or opens a shared hash map backed by file C<$path>.
+Creates or opens a shared hash map backed by file C<$path>. Passing C<undef>
+as the path creates an anonymous C<MAP_SHARED|MAP_ANONYMOUS> mapping that is
+inherited across C<fork> but has no filesystem presence.
+
+C<new_memfd> creates an unlinked memfd-backed map whose file descriptor
+can be passed to another process (via C<SCM_RIGHTS>, C<fork>+C<exec>, or
+duped+open). C<new_from_fd> reopens such a descriptor. Both require a
+64-bit Perl on Linux (C<memfd_create(2)>).
 C<$max_entries>, C<$max_size>, C<$ttl>, and C<$lru_skip> are used only when
 creating a new file; when opening an existing one, all parameters are read
 from the stored header and the constructor arguments are ignored.
@@ -140,6 +151,31 @@ correctness. Set to 0 for strict LRU ordering.
 
 B<Zero-cost when disabled>: with both C<$max_size=0> and C<$ttl=0>, the fast
 lock-free read path is used. The only overhead is a branch (predicted away).
+
+=head2 String Keys and UTF-8
+
+String-key variants (C<SS>, C<SI>, C<IS>, C<I16S>, C<I32S>, C<SI16>, C<SI32>)
+compare keys as raw bytes: two keys are the same entry if and only if they
+contain the same byte sequence. The SV UTF-8 flag is stored alongside the
+key so retrieval round-trips it to the returned SV, but it is B<not> part
+of key identity. Consequences:
+
+=over
+
+=item *
+
+ASCII keys with a toggled UTF-8 flag hash and match the same entry
+(C<use utf8>, C<utf8::upgrade>, and C<utf8::downgrade> on ASCII are all
+equivalent from the map's point of view).
+
+=item *
+
+Non-ASCII keys with different byte encodings are B<distinct>. C<"caf\xe9">
+(latin-1, 4 bytes) and C<"café"> with C<use utf8> (5 UTF-8 bytes) are two
+different keys. If your input comes in mixed encodings, normalize with
+C<Encode::encode_utf8> before use.
+
+=back
 
 =head2 Sharding
 
@@ -355,6 +391,10 @@ L<Data::Log::Shared> - append-only log (WAL)
 L<Data::Heap::Shared> - priority queue
 
 L<Data::Graph::Shared> - directed weighted graph
+
+L<Data::BitSet::Shared> - shared bitset (lock-free per-bit ops)
+
+L<Data::RingBuffer::Shared> - fixed-size overwriting ring buffer
 
 =head1 AUTHOR
 

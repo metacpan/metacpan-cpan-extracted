@@ -14,8 +14,11 @@ SKIP: {
     };
     skip "Redis not available: $@", 1 unless $redis;
 
+    my $redis2 = Async::Redis->new(host => $ENV{REDIS_HOST} // 'localhost');
+    run { $redis2->connect };
+
     # Cleanup
-    run { $redis->del('discard:key') };
+    run { $redis->del('discard:key', 'discard:after_watch') };
 
     subtest 'DISCARD aborts transaction' => sub {
         run { $redis->set('discard:key', 'original') };
@@ -42,20 +45,26 @@ SKIP: {
         is($value, 'after_discard', 'value set correctly');
     };
 
-    subtest 'DISCARD preserves WATCH' => sub {
+    subtest 'DISCARD clears WATCH' => sub {
         run { $redis->set('discard:key', 'watched') };
+        run { $redis->del('discard:after_watch') };
 
         run { $redis->watch('discard:key') };
         run { $redis->multi_start() };
         run { $redis->command('SET', 'discard:key', 'in_tx') };
         run { $redis->discard() };
 
-        # Watch should still be active
-        ok($redis->watching, 'still watching after DISCARD');
+        ok(!$redis->watching, 'not watching after DISCARD');
 
-        # Clear watch
-        run { $redis->unwatch() };
-        ok(!$redis->watching, 'not watching after UNWATCH');
+        # Prove Redis also cleared the server-side WATCH. If DISCARD leaked
+        # the watch, this later transaction would abort after redis2 writes.
+        run { $redis2->set('discard:key', 'changed') };
+        run { $redis->multi_start() };
+        run { $redis->command('SET', 'discard:after_watch', 'ok') };
+        my $results = run { $redis->exec() };
+
+        ok(defined $results, 'later transaction succeeds after DISCARD');
+        is($results, ['OK'], 'later EXEC applies queued write');
     };
 
     subtest 'in_multi flag cleared after DISCARD' => sub {
@@ -67,7 +76,7 @@ SKIP: {
     };
 
     # Cleanup
-    run { $redis->del('discard:key') };
+    run { $redis->del('discard:key', 'discard:after_watch') };
 }
 
 done_testing;

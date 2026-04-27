@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "IO::Async" => "0.802",
     "IO::Async::SSL" => 0,
     "JSON::MaybeXS" => 0,
-    "Langertha" => "0.401",
+    "Langertha" => "0.500",
     "Log::Any" => 0,
     "MIME::Base64" => 0,
     "Module::Runtime" => 0,
@@ -53,7 +53,7 @@ my %WriteMakefileArgs = (
     "Path::Tiny" => 0,
     "Test2::Suite" => 0
   },
-  "VERSION" => "1.001",
+  "VERSION" => "1.100",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -70,7 +70,7 @@ my %FallbackPrereqs = (
   "IO::Async" => "0.802",
   "IO::Async::SSL" => 0,
   "JSON::MaybeXS" => 0,
-  "Langertha" => "0.401",
+  "Langertha" => "0.500",
   "Log::Any" => 0,
   "MIME::Base64" => 0,
   "Module::Runtime" => 0,

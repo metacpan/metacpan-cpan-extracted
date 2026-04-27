@@ -2,7 +2,7 @@ package XML::PugiXML;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load('XML::PugiXML', $VERSION);
@@ -38,7 +38,7 @@ XML::PugiXML - Perl binding for pugixml C++ XML parser
     # Modification
     my $new = $root->append_child('item');
     $new->set_text('World');
-    $new->set_attr('id', '2');  # Convenience method
+    $new->set_attr('id', '2');
     $doc->save_file('output.xml');
 
     # Formatting options
@@ -61,7 +61,9 @@ are automatically upgraded to UTF-8, and all outputs are UTF-8 flagged.
 
 =item new()
 
-Create a new empty XML document.
+Create a new empty XML document. Subclassing is not supported: the
+returned object is always blessed into C<XML::PugiXML> regardless of
+the calling class.
 
 =item load_file($path, $parse_options?)
 
@@ -86,9 +88,9 @@ Optional $indent (default "\t") and $flags (default FORMAT_DEFAULT).
 =item reset()
 
 Clear the document, removing all nodes. Existing Node and Attr
-handles become stale -- accessing them will croak with
-"Stale node/attribute handle". Use C<valid()> to check without croaking.
-The same applies after C<load_file()> or C<load_string()> replaces content.
+handles become stale: accessing them croaks with "Stale node/attribute
+handle". Use C<valid()> to check without croaking. The same applies
+after C<load_file()> or C<load_string()> replaces content.
 
 =item root()
 
@@ -101,16 +103,19 @@ Get a direct child by name.
 =item select_node($xpath)
 
 Execute XPath query, return single result. Returns an
-C<XML::PugiXML::Node> or C<XML::PugiXML::Attr> depending on the query.
+C<XML::PugiXML::Node> or C<XML::PugiXML::Attr> depending on the query,
+or C<undef> if there is no match.
 
 =item select_nodes($xpath)
 
 Execute XPath query, return list of results. Returns a mix of
 C<XML::PugiXML::Node> and C<XML::PugiXML::Attr> objects as appropriate.
+Empty list if no match.
 
 =item compile_xpath($xpath)
 
-Compile an XPath expression for repeated use. Returns an XML::PugiXML::XPath object.
+Compile an XPath expression for repeated use. Returns an
+C<XML::PugiXML::XPath> object.
 
 =back
 
@@ -137,6 +142,22 @@ No formatting (compact output).
 =item FORMAT_WRITE_BOM()
 
 Write BOM (byte order mark).
+
+=item FORMAT_INDENT_ATTRIBUTES()
+
+Indent each attribute on its own line (adds to other format flags).
+
+=back
+
+=head3 Node Type Constants
+
+=over 4
+
+=item NODE_NULL, NODE_DOCUMENT, NODE_ELEMENT, NODE_PCDATA
+
+=item NODE_CDATA, NODE_COMMENT, NODE_PI, NODE_DECLARATION, NODE_DOCTYPE
+
+Integer values returned by C<< $node->type >>.
 
 =back
 
@@ -167,6 +188,11 @@ Parse CDATA sections.
 =item PARSE_WS_PCDATA()
 
 Preserve whitespace-only PCDATA nodes.
+
+=item PARSE_WS_PCDATA_SINGLE()
+
+Preserve whitespace-only PCDATA only when it is the sole child of its
+parent (a leaner alternative to PARSE_WS_PCDATA).
 
 =item PARSE_ESCAPES()
 
@@ -200,8 +226,8 @@ Get node name, value, or text content.
 
 =item type()
 
-Return the node type as an integer. Values:
-0=null, 1=document, 2=element, 3=pcdata, 4=cdata, 5=comment, 6=pi, 7=declaration.
+Return the node type as an integer. Compare against the C<NODE_*>
+constants listed under L</"Node Type Constants">.
 
 =item path($delimiter?)
 
@@ -209,7 +235,9 @@ Return the absolute XPath path to this node. Default delimiter is '/'.
 
 =item hash()
 
-Return a hash value for this node. Useful for comparison.
+Return a hash value derived from the node's internal pointer. Useful
+for handle-identity comparison within a process. B<Not> stable across
+process runs; do not persist.
 
 =item offset_debug()
 
@@ -247,7 +275,12 @@ Get a named child node.
 
 =item children($name?)
 
-Return list of child nodes, optionally filtered by name.
+Return list of child nodes, optionally filtered by name. All node
+types are returned; under C<PARSE_WS_PCDATA> or similar, PCDATA,
+comment, and PI nodes appear too. Filter by C<< ->type >> to keep
+only elements:
+
+    grep { $_->type == XML::PugiXML::NODE_ELEMENT() } $node->children
 
 =item find_child_by_attribute($tag, $attr_name, $attr_value)
 
@@ -311,7 +344,7 @@ Add a comment node with the given content.
 
 =item append_pi($target, $data?)
 
-Add a processing instruction. E.g., C<< <?target data?> >>
+Add a processing instruction (e.g., C<< <?target data?> >>).
 
 =item remove_child($node)
 
@@ -369,6 +402,10 @@ Return the parent element node that owns this attribute.
 =item set_value($value)
 
 Set attribute value.
+
+=item set_name($name)
+
+Set attribute name. Returns true on success.
 
 =item valid()
 
@@ -447,13 +484,18 @@ See F<bench/benchmark.pl> for details.
 
 =head1 SECURITY
 
-This module uses pugixml which does NOT process external entities (XXE)
-by default, making it safe against XXE attacks.
+pugixml does not process external entities (XXE) and is therefore
+safe against XXE attacks by default.
 
 =head1 THREAD SAFETY
 
-Different document instances can be used in different threads safely.
-Concurrent access to the same document from multiple threads is not safe.
+Different document instances may be used concurrently from different
+threads. Concurrent access to the same document is not safe.
+
+=head1 SEE ALSO
+
+L<Alien::pugixml>, L<XML::LibXML>, the pugixml home page at
+L<https://pugixml.org/>.
 
 =head1 AUTHOR
 

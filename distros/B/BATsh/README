@@ -1,0 +1,80 @@
+NAME
+    BATsh - Bilingual Shell: cmd.exe and bash in one script (self-contained)
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+      use BATsh;
+
+      BATsh->run('myscript.batsh');
+      BATsh->run_string('echo hello from sh');
+      BATsh->repl();
+
+DESCRIPTION
+    BATsh is a self-contained bilingual shell interpreter written in pure
+    Perl. It implements both the cmd.exe command set and the sh/bash command
+    set entirely in Perl -- no external cmd.exe, bash, or sh is required.
+
+    Scripts are divided into CMD sections (uppercase first token) and SH
+    sections (lowercase first token). Both sections share a common variable
+    store via BATsh::Env, so variables set in a CMD section are immediately
+    visible in the next SH section and vice versa.
+
+CMD MODE
+    Any line whose first token is all uppercase (A-Z, 0-9, path chars) is a
+    CMD line. CMD sections are executed by BATsh::CMD, which implements:
+
+      ECHO, @ECHO OFF/ON
+      SET VAR=value, SET /A expr
+      IF "A"=="B" ... ELSE ..., IF EXIST, IF DEFINED, IF ERRORLEVEL
+      FOR %%V IN (list) DO ..., FOR /L %%V IN (s,step,e) DO ...
+      GOTO :label, :label
+      CALL :label [args], CALL file.batsh
+      SETLOCAL, ENDLOCAL
+      CD, DIR, COPY, DEL, MOVE, MKDIR, RMDIR, REN, TYPE
+      PAUSE, EXIT, CLS, TITLE, VER, PUSHD, POPD
+
+SH MODE
+    Any line whose first token contains a lowercase letter is a SH line. SH
+    sections are executed by BATsh::SH, which implements:
+
+      VAR=value, export VAR=value, unset VAR
+      echo, printf
+      if/then/elif/else/fi
+      for VAR in list; do ... done
+      while condition; do ... done
+      until condition; do ... done
+      case $var in pattern) ... ;; esac
+      test / [ ... ]  (file tests, string, integer comparisons)
+      cd, pwd, exit, true, false, :, read, shift
+      $(( arithmetic )), $( command substitution )
+      ${VAR}, ${VAR:-default}, ${VAR:=default}
+      source / . file
+
+REQUIREMENTS
+    Perl 5.005_03 or later. Core modules only. No external shell required.
+
+BUGS AND LIMITATIONS
+    The built-in CMD interpreter does not support all cmd.exe extensions
+    (e.g. FOR /F with complex token options, delayed expansion with !VAR!).
+
+    The built-in SH interpreter does not support pipelines (|), redirection
+    (> >> <), background execution (&), or here-documents (<<).
+
+    Section boundary detection is token-based (uppercase vs. lowercase first
+    token). Mixed-case first tokens are treated as SH.
+
+    Please report bugs via the issue tracker:
+    <https://github.com/ina-cpan/BATsh/issues>
+
+SEE ALSO
+    BATsh::CMD, BATsh::SH, BATsh::Env
+
+AUTHOR
+    INABA Hitoshi <ina@cpan.org>
+
+LICENSE
+    This software is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

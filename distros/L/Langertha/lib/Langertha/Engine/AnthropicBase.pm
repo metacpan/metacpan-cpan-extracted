@@ -1,10 +1,13 @@
 package Langertha::Engine::AnthropicBase;
 # ABSTRACT: Base class for Anthropic-compatible engines
-our $VERSION = '0.404';
+our $VERSION = '0.500';
 use Moose;
 use Carp qw( croak );
 use JSON::MaybeXS;
 use Langertha::ToolChoice;
+use Langertha::Tool;
+use Langertha::Response;
+use Langertha::ToolCall;
 
 extends 'Langertha::Engine::Remote';
 
@@ -14,6 +17,7 @@ with map { 'Langertha::Role::'.$_ } qw(
   Temperature
   ResponseSize
   SystemPrompt
+  ResponseFormat
   Streaming
   Tools
 );
@@ -65,6 +69,13 @@ sub default_model { croak "".(ref $_[0])." requires model to be set" }
 
 sub chat_request {
   my ( $self, $messages, %extra ) = @_;
+
+  # Anthropic has no native response_format. Translate json_object /
+  # json_schema response_format hashes into a synthesized tool + forced
+  # named tool_choice; the response parser will pull the structured
+  # output out of the resulting tool_use block.
+  $self->_translate_response_format(\%extra);
+
   $self->_normalize_tool_params(\%extra);
   my @msgs;
   my $system = "";
@@ -93,6 +104,45 @@ sub chat_request {
     $system ? ( system => $system ) : (),
     %extra,
   );
+}
+
+# Anthropic has no response_format; emulate via a synthetic tool plus
+# a forced tool_choice. The response_call will detect the synthetic
+# tool_use block and lift its input back into the response content.
+my $SYNTH_RF_TOOL_NAME = '__langertha_response_format__';
+
+sub _translate_response_format {
+  my ( $self, $extra ) = @_;
+  return unless $self->has_response_format;
+  my $rf = $self->response_format;
+  return unless ref($rf) eq 'HASH';
+  my $type = $rf->{type} // '';
+
+  my ( $name, $schema, $description );
+  if ( $type eq 'json_schema' && ref( $rf->{json_schema} ) eq 'HASH' ) {
+    my $js = $rf->{json_schema};
+    $name        = $js->{name} // $SYNTH_RF_TOOL_NAME;
+    $schema      = $js->{schema};
+    $description = $js->{description};
+  }
+  elsif ( $type eq 'json_object' ) {
+    $name   = $SYNTH_RF_TOOL_NAME;
+    $schema = { type => 'object', additionalProperties => JSON->true };
+  }
+  else {
+    return;
+  }
+  return unless ref($schema) eq 'HASH';
+
+  my $tool = Langertha::Tool->new(
+    name         => $name,
+    input_schema => $schema,
+    ( defined $description ? ( description => $description ) : () ),
+  )->to_anthropic;
+
+  $extra->{tools} ||= [];
+  push @{ $extra->{tools} }, $tool;
+  $extra->{tool_choice} = { type => 'tool', name => $name };
 }
 
 # Normalize tool_choice (any accepted format -> Anthropic native) and fold
@@ -124,7 +174,14 @@ sub chat_response {
   my $text = join('', map { $_->{text} // '' } grep { $_->{type} eq 'text' } @blocks);
   my @thinking = map { $_->{thinking} // '' } grep { $_->{type} eq 'thinking' } @blocks;
   my $thinking = @thinking ? join("\n", @thinking) : undef;
-  require Langertha::Response;
+  my @tcs = Langertha::ToolCall->extract($data);
+
+  # If the caller asked for a response_format and we routed it through a
+  # synthesized tool, lift the tool_use input back into the content as
+  # JSON so callers can treat it like any other structured-output result.
+  if ( $self->has_response_format && @tcs ) {
+    $text = $self->json->encode( $tcs[0]->arguments );
+  }
   return Langertha::Response->new(
     content       => $text,
     raw           => $data,
@@ -133,6 +190,7 @@ sub chat_response {
     defined $data->{stop_reason} ? ( finish_reason => $data->{stop_reason} ) : (),
     $data->{usage} ? ( usage => $data->{usage} ) : (),
     defined $thinking ? ( thinking => $thinking ) : (),
+    @tcs ? ( tool_calls => [ @tcs ] ) : (),
   );
 }
 
@@ -379,7 +437,7 @@ Langertha::Engine::AnthropicBase - Base class for Anthropic-compatible engines
 
 =head1 VERSION
 
-version 0.404
+version 0.500
 
 =head1 SYNOPSIS
 

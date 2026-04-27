@@ -1,5 +1,5 @@
 package Langertha::Knarr::Tracing;
-our $VERSION = '1.001';
+our $VERSION = '1.100';
 # ABSTRACT: Automatic Langfuse tracing per proxy request
 use Moo;
 use Time::HiRes qw( gettimeofday );
@@ -7,6 +7,9 @@ use Carp qw( croak );
 use JSON::MaybeXS ();
 use MIME::Base64 qw( encode_base64 );
 use Log::Any qw( $log );
+use HTTP::Request ();
+use Net::Async::HTTP;
+use IO::Async::Loop;
 
 
 has config => (
@@ -205,41 +208,51 @@ sub end_trace {
 }
 
 
+has _loop => (
+  is      => 'lazy',
+  builder => sub { IO::Async::Loop->new },
+);
+
+has _http => (
+  is      => 'lazy',
+  builder => sub {
+    my ($self) = @_;
+    my $h = Net::Async::HTTP->new( user_agent => 'Langertha-Knarr', timeout => 5 );
+    $self->_loop->add($h);
+    return $h;
+  },
+);
+
 sub flush {
   my ($self) = @_;
   return unless $self->_enabled;
   my $batch = $self->_batch;
   return unless @$batch;
-
-  eval {
-    require LWP::UserAgent;
-    my $ua = LWP::UserAgent->new(
-      agent   => 'Langertha-Knarr/0.001',
-      timeout => 5,
-    );
-
-    my $auth = encode_base64($self->_public_key . ':' . $self->_secret_key, '');
-    my $body = $self->_json->encode({ batch => $batch });
-
-    my $request = HTTP::Request->new(
-      POST => $self->_url . '/api/public/ingestion',
-      [
-        'Content-Type'  => 'application/json',
-        'Authorization' => 'Basic ' . $auth,
-      ],
-      $body,
-    );
-
-    my $response = $ua->request($request);
-    unless ($response->is_success) {
-      $log->warnf("Langfuse ingestion failed: %s", $response->status_line);
-    }
-  };
-  if ($@) {
-    $log->warnf("Langfuse flush error: %s", $@);
-  }
-
   $self->_batch([]);
+
+  my $auth = encode_base64($self->_public_key . ':' . $self->_secret_key, '');
+  my $body = $self->_json->encode({ batch => $batch });
+  my $req  = HTTP::Request->new(
+    POST => $self->_url . '/api/public/ingestion',
+    [
+      'Content-Type'  => 'application/json',
+      'Authorization' => 'Basic ' . $auth,
+    ],
+    $body,
+  );
+
+  my $f = $self->_http->do_request( request => $req );
+  $f->on_done(sub {
+    my ($resp) = @_;
+    return if $resp->is_success;
+    $log->warnf("Langfuse ingestion failed: %s", $resp->status_line);
+  });
+  $f->on_fail(sub {
+    my ($err) = @_;
+    $log->warnf("Langfuse flush error: %s", $err);
+  });
+  $f->retain;
+  return;
 }
 
 
@@ -257,7 +270,7 @@ Langertha::Knarr::Tracing - Automatic Langfuse tracing per proxy request
 
 =head1 VERSION
 
-version 1.001
+version 1.100
 
 =head1 SYNOPSIS
 

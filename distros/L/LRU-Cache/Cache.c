@@ -38,12 +38,12 @@
 
 /* ============================================
    Entry struct with inline key (#2, #9)
-   Key bytes stored directly in struct tail —
+   Key bytes stored directly in struct tail --
    eliminates SV allocation and SvPV dereference
    on every hash_find comparison.
    ============================================ */
 typedef struct lru_entry {
-    /* Hot fields for hash_find — packed in first cache line (#12) */
+    /* Hot fields for hash_find -- packed in first cache line (#12) */
     U32               hash;       /* Cached hash value */
     U32               klen;       /* Key byte length */
     struct lru_entry *hash_next;  /* Hash chain (singly-linked) */
@@ -107,7 +107,7 @@ static MGVTBL lru_cache_vtbl = {
 
 /* ============================================
    Fast cache extraction (#1, #10)
-   Single mg_find — no vtbl loop, UNLIKELY on
+   Single mg_find -- no vtbl loop, UNLIKELY on
    error paths.  PERL_STATIC_INLINE for hot paths.
    ============================================ */
 PERL_STATIC_INLINE LRUCache* get_lru_cache(pTHX_ SV *obj) {
@@ -179,7 +179,7 @@ PERL_STATIC_INLINE void lru_push_front(LRUCache *c, LRUEntry *e) {
 }
 
 PERL_STATIC_INLINE void lru_promote(LRUCache *c, LRUEntry *e) {
-    if (LIKELY(e == c->head)) return;  /* already MRU — fast path */
+    if (LIKELY(e == c->head)) return;  /* already MRU -- fast path */
     lru_unlink(c, e);
     lru_push_front(c, e);
 }
@@ -188,7 +188,7 @@ PERL_STATIC_INLINE void lru_promote(LRUCache *c, LRUEntry *e) {
    Hash table operations (#2 inline key compare)
    ============================================ */
 
-/* Find — compares inline key bytes directly, no SvPV */
+/* Find -- compares inline key bytes directly, no SvPV */
 PERL_STATIC_INLINE LRUEntry* hash_find(LRUCache *c, const char *kpv,
                                         STRLEN klen, U32 hash)
 {
@@ -281,7 +281,7 @@ static IV next_pow2(IV n) {
 }
 
 /* ============================================
-   Eviction — removes LRU tail entry
+   Eviction -- removes LRU tail entry
    ============================================ */
 static void lru_evict(pTHX_ LRUCache *c) {
     LRUEntry *victim = c->tail;
@@ -332,7 +332,7 @@ static void lru_set_internal(pTHX_ LRUCache *c, const char *kpv,
     e = hash_find(c, kpv, klen, hash);
 
     if (e) {
-        /* Update existing — reuse SV body in-place (#13) */
+        /* Update existing -- reuse SV body in-place (#13) */
         sv_setsv(e->value, value);
         lru_promote(c, e);
     } else {
@@ -344,7 +344,7 @@ static void lru_set_internal(pTHX_ LRUCache *c, const char *kpv,
         if (UNLIKELY(c->size >= c->rehash_threshold))
             lru_rehash(c);
 
-        /* Allocate entry with inline key (#2) — no key SV needed */
+        /* Allocate entry with inline key (#2) -- no key SV needed */
         e = entry_alloc(c, (U32)klen);
         e->hash  = hash;
         e->klen  = (U32)klen;
@@ -871,7 +871,7 @@ XS_EXTERNAL(XS_LRU__Cache_import) {
 }
 
 /* ============================================
-   Destructor — frees active entries + freelist
+   Destructor -- frees active entries + freelist
    ============================================ */
 static int lru_cache_free(pTHX_ SV *sv, MAGIC *mg) {
     LRUCache *c = (LRUCache*)mg->mg_ptr;

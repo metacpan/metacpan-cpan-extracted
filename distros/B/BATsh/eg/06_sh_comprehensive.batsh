@@ -1,0 +1,223 @@
+#!/bin/sh
+# BATsh example 06: Comprehensive SH mode features
+# Run: perl lib/BATsh.pm eg/06_sh_comprehensive.batsh
+# Covers all SH commands implemented in BATsh::SH:
+#   echo, printf, export, unset, cd/pwd, exit, true/false, :,
+#   read (stdin skipped in batch), shift, local, set,
+#   test/[ ] (string, numeric, file operators),
+#   if/elif/else/fi, for/do/done, while/do/done, until/do/done,
+#   case/esac, break, continue, return,
+#   $((arithmetic)), $(command substitution),
+#   ${VAR:-default}, ${VAR:=assign}, ${VAR},
+#   source/., variable assignment, $?, $BATSH_ARG*
+# All executed by BATsh::SH in pure Perl -- no external bash/sh needed.
+
+# ---------------------------------------------------------------
+# 1. echo and printf
+# ---------------------------------------------------------------
+echo "[1] echo and printf"
+echo "  plain echo"
+printf "  printf: %s = %d\n" "answer" 42
+
+# ---------------------------------------------------------------
+# 2. Variable assignment and expansion
+# ---------------------------------------------------------------
+echo "[2] Variables"
+GREETING=hello
+NAME=BATsh
+echo "  GREETING=$GREETING  NAME=$NAME"
+echo "  concatenation: ${GREETING}_${NAME}"
+
+# ---------------------------------------------------------------
+# 3. export and unset
+# ---------------------------------------------------------------
+echo "[3] export / unset"
+export EXP_VAR=exported
+echo "  EXP_VAR=$EXP_VAR"
+unset EXP_VAR
+echo "  after unset: EXP_VAR=${EXP_VAR:-<unset>}"
+
+# ---------------------------------------------------------------
+# 4. ${VAR:-default}, ${VAR:=assign}
+# ---------------------------------------------------------------
+echo "[4] Parameter expansion"
+echo "  undef with default:  ${UNDEF_VAR:-fallback}"
+echo "  assign if unset:     ${AUTO_SET:=auto_value}"
+echo "  AUTO_SET is now:     $AUTO_SET"
+
+# ---------------------------------------------------------------
+# 5. Arithmetic $(( ))
+# ---------------------------------------------------------------
+echo "[5] Arithmetic"
+A=7
+B=3
+echo "  A=$A B=$B"
+echo "  A+B=$(( A + B ))"
+echo "  A*B=$(( A * B ))"
+echo "  A/B=$(( A / B ))"
+echo "  A%B=$(( A % B ))"
+echo "  (A+B)*2=$(( (A + B) * 2 ))"
+
+# ---------------------------------------------------------------
+# 6. Command substitution $( )
+# ---------------------------------------------------------------
+echo "[6] Command substitution"
+UPPER=$(echo "hello world")
+echo "  captured: $UPPER"
+COUNT=$(echo "one two three")
+echo "  count expr: $COUNT"
+
+# ---------------------------------------------------------------
+# 7. test / [ ] -- string operators
+# ---------------------------------------------------------------
+echo "[7] test string operators"
+X=hello
+if [ "$X" = "hello" ]; then
+    echo "  = PASS"
+fi
+if [ "$X" != "world" ]; then
+    echo "  != PASS"
+fi
+if [ -n "$X" ]; then
+    echo "  -n PASS (non-empty)"
+fi
+EMPTY=
+if [ -z "$EMPTY" ]; then
+    echo "  -z PASS (empty string)"
+fi
+
+# ---------------------------------------------------------------
+# 8. test / [ ] -- numeric operators
+# ---------------------------------------------------------------
+echo "[8] test numeric operators"
+N=5
+if [ $N -eq 5 ]; then echo "  -eq PASS"; fi
+if [ $N -ne 3 ]; then echo "  -ne PASS"; fi
+if [ $N -gt 4 ]; then echo "  -gt PASS"; fi
+if [ $N -ge 5 ]; then echo "  -ge PASS"; fi
+if [ $N -lt 6 ]; then echo "  -lt PASS"; fi
+if [ $N -le 5 ]; then echo "  -le PASS"; fi
+
+# ---------------------------------------------------------------
+# 9. test / [ ] -- file operators
+# ---------------------------------------------------------------
+echo "[9] test file operators"
+if [ -f "eg/06_sh_comprehensive.batsh" ]; then
+    echo "  -f PASS: script file exists"
+elif [ -f "eg/04_sh_features.batsh" ]; then
+    echo "  -f PASS: at least one eg file found"
+else
+    echo "  -f INFO: run from project root for file tests"
+fi
+if [ -d "eg" ]; then
+    echo "  -d PASS: eg directory exists"
+fi
+
+# ---------------------------------------------------------------
+# 10. true, false, :
+# ---------------------------------------------------------------
+echo "[10] true / false / :"
+if true; then echo "  true PASS"; fi
+if false; then echo "  false FAIL"; else echo "  false correctly not taken"; fi
+:
+echo "  : (no-op) PASS"
+
+# ---------------------------------------------------------------
+# 11. if / elif / else
+# ---------------------------------------------------------------
+echo "[11] if/elif/else"
+V=2
+if [ $V -eq 1 ]; then
+    echo "  one"
+elif [ $V -eq 2 ]; then
+    echo "  two (PASS)"
+elif [ $V -eq 3 ]; then
+    echo "  three"
+else
+    echo "  other"
+fi
+
+# ---------------------------------------------------------------
+# 12. for loop
+# ---------------------------------------------------------------
+echo "[12] for loop"
+RESULT=
+for ITEM in A B C D E; do
+    RESULT="${RESULT}${ITEM}"
+done
+echo "  accumulated: $RESULT"
+
+# ---------------------------------------------------------------
+# 13. for with break and continue
+# ---------------------------------------------------------------
+echo "[13] for with break/continue"
+for I in 1 2 3 4 5 6; do
+    if [ $I -eq 2 ]; then continue; fi
+    if [ $I -eq 5 ]; then break; fi
+    echo "  I=$I"
+done
+
+# ---------------------------------------------------------------
+# 14. while loop
+# ---------------------------------------------------------------
+echo "[14] while loop"
+N=1
+while [ $N -le 5 ]; do
+    echo "  N=$N"
+    N=$(( N + 1 ))
+done
+
+# ---------------------------------------------------------------
+# 15. until loop
+# ---------------------------------------------------------------
+echo "[15] until loop"
+U=3
+until [ $U -le 0 ]; do
+    echo "  U=$U"
+    U=$(( U - 1 ))
+done
+
+# ---------------------------------------------------------------
+# 16. case / esac
+# ---------------------------------------------------------------
+echo "[16] case/esac"
+for WORD in apple banana cherry other; do
+    case $WORD in
+        apple)   echo "  apple: fruit A" ;;
+        banana)  echo "  banana: fruit B" ;;
+        cherry)  echo "  cherry: fruit C" ;;
+        *)       echo "  $WORD: unknown" ;;
+    esac
+done
+
+# ---------------------------------------------------------------
+# 17. return from subroutine (SH section, called from CMD CALL)
+# ---------------------------------------------------------------
+echo "[17] return (demonstrated in mixed mode in eg/07)"
+# In pure SH sections, subroutines are invoked via CMD-section CALL.
+# See eg/07_mixed_comprehensive.batsh for CALL :sub / return examples.
+echo "  (skipped: use eg/07 for subroutine demos)" 
+
+# ---------------------------------------------------------------
+# 18. $? last exit status
+# ---------------------------------------------------------------
+echo "[18] last exit status via $?"
+true
+echo "  after true:  status=$?"
+false
+echo "  after false: status=$?"
+
+# ---------------------------------------------------------------
+# 19. shift (demonstrated in mixed mode)
+# ---------------------------------------------------------------
+echo "[19] shift -- see eg/07 for full demo via CALL :sub"
+echo "  (shift is effective inside subroutines invoked by CMD CALL)" 
+
+# ---------------------------------------------------------------
+# 20. local variable (demonstrated in mixed mode)
+# ---------------------------------------------------------------
+echo "[20] local -- see eg/07 for full demo via CALL :sub"
+echo "  (local is effective inside subroutines invoked by CMD CALL)" 
+
+# ---------------------------------------------------------------
+echo "[SH comprehensive] Done."

@@ -1,0 +1,44 @@
+#!/bin/sh
+# BATsh example 04: SH mode features (BATsh::SH)
+# Run: perl lib/BATsh.pm eg/04_sh_features.batsh
+
+# for loop
+echo "for loop:"
+for x in A B C D E; do
+    echo "  $x"
+done
+
+# while loop with arithmetic
+echo "while loop:"
+N=1
+while [ $N -le 5 ]; do
+    echo "  N=$N"
+    N=$(( N + 1 ))
+done
+
+# if / elif / else
+echo "if/elif/else:"
+V=2
+if [ $V -eq 1 ]; then
+    echo "  one"
+elif [ $V -eq 2 ]; then
+    echo "  two"
+else
+    echo "  other"
+fi
+
+# case
+echo "case:"
+W=banana
+case $W in
+    apple)  echo "  apple" ;;
+    banana) echo "  banana" ;;
+    *)      echo "  other" ;;
+esac
+
+# arithmetic
+R=$(( 6 * 7 ))
+echo "6 * 7 = $R"
+
+# variable default
+echo "default: ${UNDEFINED_VAR:-fallback}"

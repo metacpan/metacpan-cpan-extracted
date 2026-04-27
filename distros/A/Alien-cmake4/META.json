@@ -76,7 +76,7 @@
          "url" : "https://github.com/michal-josef-spacek/Alien-cmake4"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.84",
       "requires" : {

@@ -1,6 +1,6 @@
 package Langertha::Knarr;
 # ABSTRACT: Universal LLM hub — proxy, server, and translator across OpenAI/Anthropic/Ollama/A2A/ACP/AG-UI
-our $VERSION = '1.001';
+our $VERSION = '1.100';
 use Moose;
 use Future::AsyncAwait;
 use IO::Async::Loop;
@@ -131,7 +131,7 @@ sub _build_protocol_objects {
   for my $name ( @{ $self->protocols } ) {
     my $class = $name =~ /::/ ? $name : "Langertha::Knarr::Protocol::$name";
     use_module($class);
-    push @objs, $class->new( steerboard => $self );
+    push @objs, $class->new;
   }
   return \@objs;
 }
@@ -468,7 +468,7 @@ Langertha::Knarr - Universal LLM hub — proxy, server, and translator across Op
 
 =head1 VERSION
 
-version 1.001
+version 1.100
 
 =head1 SYNOPSIS
 

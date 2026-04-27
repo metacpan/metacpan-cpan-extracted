@@ -1,5 +1,14 @@
 Revision history for Data-Queue-Shared
 
+0.03  2026-04-26
+    - create: init under flock; mutex recovery wakes 1
+    - queue str clear wakes all producers/consumers
+    - eventfd consume returns accumulated count
+    - harden DESTROY; factor MAKE OBJ macro
+    - hoist SV construction out of pop multi/drain mutex
+    - stat recoveries uint64 t; aarch64 CI matrix
+
+
 0.02  2026-04-12
     - Add SEE ALSO cross-links to family modules
 

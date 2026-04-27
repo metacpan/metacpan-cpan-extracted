@@ -65,6 +65,44 @@ is(Langertha::ToolChoice->from_hash('none')->type,     'none', "'none' -> type=n
   is_deeply $tc->to_anthropic, { type => 'none' };
 }
 
+# --- Perplexity serializer ---
+{
+  is( Langertha::ToolChoice->auto->to_perplexity, 'auto', 'perplexity auto' );
+  is( Langertha::ToolChoice->none->to_perplexity, 'none', 'perplexity none' );
+  is( Langertha::ToolChoice->any->to_perplexity,  'required', 'perplexity any -> required' );
+  is( Langertha::ToolChoice->specific('foo')->to_perplexity, 'required',
+    'perplexity named coerced to required (string-only API)' );
+}
+
+# --- Gemini serializer ---
+{
+  is_deeply(
+    Langertha::ToolChoice->auto->to_gemini,
+    { functionCallingConfig => { mode => 'AUTO' } },
+    'gemini auto',
+  );
+  is_deeply(
+    Langertha::ToolChoice->none->to_gemini,
+    { functionCallingConfig => { mode => 'NONE' } },
+    'gemini none',
+  );
+  is_deeply(
+    Langertha::ToolChoice->any->to_gemini,
+    { functionCallingConfig => { mode => 'ANY' } },
+    'gemini any',
+  );
+  is_deeply(
+    Langertha::ToolChoice->specific('extract')->to_gemini,
+    { functionCallingConfig => { mode => 'ANY', allowed_function_names => ['extract'] } },
+    'gemini named -> ANY + allowlist',
+  );
+  is_deeply(
+    Langertha::ToolChoice->new( type => 'tool' )->to_gemini,
+    { functionCallingConfig => { mode => 'AUTO' } },
+    'gemini named without name falls back to AUTO',
+  );
+}
+
 # --- ParallelToolUse alias support via BUILDARGS ---
 use Langertha::Role::ParallelToolUse;
 {

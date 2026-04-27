@@ -3,6 +3,8 @@ use warnings;
 
 use Capture::Tiny qw(capture);
 use Config;
+use IPC::Open3;
+use Symbol qw(gensym);
 use Test::Differences;
 use Test::More;
 
@@ -13,6 +15,26 @@ my @perl = (
     '-e',
     'App::ptimeout::_run(@ARGV)',
 );
+
+sub _run_with_stdin {
+    my(%args) = @_;
+
+    my $stderr = gensym;
+    my $pid = open3(my $stdin, my $stdout, $stderr, @{$args{command}});
+
+    if(exists($args{input})) {
+        print {$stdin} $args{input};
+    } elsif($args{wait_before_close}) {
+        sleep $args{wait_before_close};
+    }
+    close $stdin;
+
+    my $stdout_text = do { local $/; <$stdout> };
+    my $stderr_text = do { local $/; <$stderr> };
+    waitpid($pid, 0);
+
+    return ($stdout_text, $stderr_text, $? >> 8);
+}
 
 my($stdout, $stderr, $status) = capture(sub {
     system(
@@ -67,6 +89,38 @@ eq_or_diff(
     [$status, $stderr, $stdout],
     [3,       '',      "starting\n"],
     "correct status and output when there's a funky exit status and no timeout"
+);
+
+($stdout, $stderr, $status) = _run_with_stdin(
+    command => [
+        @perl,
+        1,
+        $Config{perlpath},
+        '-e',
+        'my $line = <STDIN>; print "got input\n" if defined $line;',
+    ],
+    wait_before_close => 2,
+);
+eq_or_diff(
+    [$status, $stderr, $stdout],
+    [124,     "timed out\n", ""],
+    "interactive programs time out while waiting for input"
+);
+
+($stdout, $stderr, $status) = _run_with_stdin(
+    command => [
+        @perl,
+        5,
+        $Config{perlpath},
+        '-e',
+        'my $line = <STDIN>; print "got input\n" if defined $line;',
+    ],
+    input => "\n",
+);
+eq_or_diff(
+    [$status, $stderr, $stdout],
+    [0,       '',      "got input\n"],
+    "interactive programs exit normally once input arrives"
 );
 
 done_testing;

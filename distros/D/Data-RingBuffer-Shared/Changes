@@ -1,4 +1,11 @@
 Revision history for Data::RingBuffer::Shared
 
+0.02  2026-04-26
+    - memfd sealing + factored validate header
+    - dedicated futex word
+    - v2 layout with per-slot publication seqlock (MPMC-safe reads)
+    - idempotent eventfd; aarch64 CI matrix
+
+
 0.01  2026-04-13
     - Initial release

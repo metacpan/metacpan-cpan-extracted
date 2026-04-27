@@ -1,5 +1,8 @@
 Revision history for Perl extension Geo::IP2Proxy
 
+3.61  Mon April 27 16:00:00 2026
+      Fixed documentation
+      
 3.60  Fri April 24 16:00:00 2026
       Support new proxy type "AIC" in "isProxy" function
 

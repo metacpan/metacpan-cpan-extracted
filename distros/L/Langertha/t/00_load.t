@@ -40,7 +40,9 @@ my @modules = qw(
   Langertha::Engine::OllamaOpenAI
   Langertha::Engine::Perplexity
   Langertha::Engine::Replicate
+  Langertha::Engine::Scaleway
   Langertha::Engine::SGLang
+  Langertha::Engine::TSystems
   Langertha::Engine::vLLM
   Langertha::Engine::Whisper
   Langertha::Raider

@@ -83,7 +83,7 @@ append(self, data)
     STRLEN len;
     const char *buf = SvPV(data, len);
     if (len == 0) croak("append: data must not be empty");
-    if (len > (STRLEN)(UINT32_MAX - LOG_ENTRY_HDR))
+    if (len > (STRLEN)(UINT32_MAX - LOG_ENTRY_HDR - 3))
         croak("append: data too large");
     int64_t off = log_append(h, buf, (uint32_t)len);
     RETVAL = (off >= 0) ? newSViv((IV)off) : &PL_sv_undef;
@@ -213,6 +213,7 @@ eventfd(self)
     EXTRACT_LOG(self);
   CODE:
     RETVAL = log_create_eventfd(h);
+    if (RETVAL < 0) croak("eventfd: %s", strerror(errno));
   OUTPUT:
     RETVAL
 
@@ -263,7 +264,7 @@ sync(self)
   PREINIT:
     EXTRACT_LOG(self);
   CODE:
-    log_msync(h);
+    if (log_msync(h) != 0) croak("msync: %s", strerror(errno));
 
 void
 unlink(self_or_class, ...)
@@ -272,7 +273,7 @@ unlink(self_or_class, ...)
     const char *p;
     if (sv_isobject(self_or_class)) {
         LogHandle *h = INT2PTR(LogHandle*, SvIV(SvRV(self_or_class)));
-        if (!h) croak("destroyed object");
+        if (!h) croak("Attempted to use a destroyed object");
         p = h->path;
     } else {
         if (items < 2) croak("Usage: ...->unlink($path)");
@@ -293,10 +294,10 @@ stats(self)
     hv_store(hv, "tail", 4, newSVuv((UV)log_tail_offset(h)), 0);
     hv_store(hv, "count", 5, newSVuv((UV)log_entry_count(h)), 0);
     hv_store(hv, "available", 9, newSVuv((UV)log_available(h)), 0);
-    hv_store(hv, "waiters", 7, newSVuv(hdr->waiters), 0);
-    hv_store(hv, "appends", 7, newSVuv((UV)hdr->stat_appends), 0);
-    hv_store(hv, "waits", 5, newSVuv((UV)hdr->stat_waits), 0);
-    hv_store(hv, "timeouts", 8, newSVuv((UV)hdr->stat_timeouts), 0);
+    hv_store(hv, "waiters", 7, newSVuv(__atomic_load_n(&hdr->waiters, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "appends", 7, newSVuv((UV)__atomic_load_n(&hdr->stat_appends, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "waits", 5, newSVuv((UV)__atomic_load_n(&hdr->stat_waits, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "timeouts", 8, newSVuv((UV)__atomic_load_n(&hdr->stat_timeouts, __ATOMIC_RELAXED)), 0);
     hv_store(hv, "mmap_size", 9, newSVuv((UV)h->mmap_size), 0);
     RETVAL = newRV_noinc((SV *)hv);
   OUTPUT:

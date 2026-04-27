@@ -1,5 +1,13 @@
 Revision history for Data::Deque::Shared
 
+0.03  2026-04-26
+    - MPMC per-slot state machine + file format v2
+    - strict fd validation
+    - Str variant (fixed-max-length strings)
+    - idempotent eventfd; drain() test coverage
+    - aarch64 CI matrix
+
+
 0.02  2026-04-12
     - Add drain() — concurrency-safe alternative to clear()
 

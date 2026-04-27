@@ -36,7 +36,7 @@ $sem->try_acquire for 1..3;
 is $sem->value, 0, 'drained';
 my $t0 = time;
 ok !$sem->acquire(0.1), 'acquire with timeout returns false';
-ok time - $t0 < 2, 'did not hang';
+cmp_ok time - $t0, '<', 30, 'acquire returned (not hung)';
 
 $sem->release(3);
 

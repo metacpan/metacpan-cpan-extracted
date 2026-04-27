@@ -1,5 +1,17 @@
 Revision history for LRU-Cache
 
+0.05    2026-04-27
+        - Fix t/007-map-grep.t on Perl 5.8.x: replace `// "UNDEF"`
+          (defined-or, 5.10+) with an explicit `defined(...) ? ... : ...`
+          form so the test parses on 5.8 (where // is regex match,
+          which cascaded into "Global symbol requires explicit package
+          name" errors at later lines and failed the whole file).
+        - Fix Perl_custom_op_register fallback in xop_compat.h for
+          pre-5.14 Perls: replace the broken fixed-arity macro with a
+          real function whose signature matches native 5.14+; the
+          C compiler then handles aTHX_ expansion at the call site.
+          silence MSVC codepage-932 warnings on Windows builds.
+
 0.01    2026-04-06
         - Initial release, port of lru from Ancient dist
 

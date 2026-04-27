@@ -5,7 +5,7 @@ package Try::ALRM;
 
 # ABSTRACT: Structured retry and timeout handling using CORE::alarm
 
-our $VERSION = q{1.05};
+our $VERSION = q{1.06};
 
 use Exporter qw/import/;
 use Scalar::Util qw/refaddr/;

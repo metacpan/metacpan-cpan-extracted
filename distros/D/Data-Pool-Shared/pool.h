@@ -74,8 +74,8 @@ typedef struct {
     uint64_t stat_frees;     /* 88 */
     uint64_t stat_waits;     /* 96 */
     uint64_t stat_timeouts;  /* 104 */
-    uint32_t stat_recoveries;/* 112 */
-    uint8_t  _pad2[12];      /* 116-127 */
+    uint64_t stat_recoveries;/* 112 */
+    uint8_t  _pad2[8];       /* 120-127 */
 } PoolHeader;
 
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
@@ -398,10 +398,9 @@ static inline uint32_t pool_recover_stale(PoolHandle *h) {
 
 static inline void pool_calc_layout(uint64_t capacity, uint32_t elem_size,
                                      uint64_t *bitmap_off, uint64_t *owners_off,
-                                     uint64_t *data_off, uint64_t *total_size,
-                                     uint32_t *bitmap_words_out) {
-    uint32_t bwords = (uint32_t)((capacity + 63) / 64);
-    uint64_t bitmap_sz = (uint64_t)bwords * 8;
+                                     uint64_t *data_off, uint64_t *total_size) {
+    uint64_t bwords = (capacity + 63) / 64;
+    uint64_t bitmap_sz = bwords * 8;
     uint64_t owners_sz = POOL_ALIGN8(capacity * 4);
     uint64_t data_sz   = (uint64_t)capacity * elem_size;
 
@@ -409,7 +408,6 @@ static inline void pool_calc_layout(uint64_t capacity, uint32_t elem_size,
     *owners_off   = *bitmap_off + bitmap_sz;
     *data_off     = *owners_off + owners_sz;
     *total_size   = *data_off + data_sz;
-    *bitmap_words_out = bwords;
 }
 
 /* ================================================================
@@ -442,6 +440,27 @@ static inline void pool_init_header(void *base, uint64_t total,
 
 /* Max capacity to prevent bitmap_words (uint32_t) truncation */
 #define POOL_MAX_CAPACITY ((uint64_t)UINT32_MAX * 64)
+
+/* Validate header: magic, version, variant, sizes, AND layout offsets. */
+static inline int pool_validate_header(const PoolHeader *hdr, uint64_t file_size,
+                                        uint32_t expected_variant) {
+    if (hdr->magic != POOL_MAGIC) return 0;
+    if (hdr->version != POOL_VERSION) return 0;
+    if (hdr->variant_id != expected_variant) return 0;
+    if (hdr->capacity == 0 || hdr->capacity > POOL_MAX_CAPACITY) return 0;
+    if (hdr->elem_size == 0) return 0;
+    if (hdr->capacity > (UINT64_MAX - sizeof(PoolHeader)) / hdr->elem_size) return 0;
+    if (hdr->total_size != file_size) return 0;
+
+    uint64_t bm_off, own_off, dat_off, total;
+    pool_calc_layout(hdr->capacity, hdr->elem_size, &bm_off, &own_off, &dat_off, &total);
+
+    if (hdr->bitmap_off != bm_off) return 0;
+    if (hdr->owners_off != own_off) return 0;
+    if (hdr->data_off   != dat_off) return 0;
+    if (hdr->total_size != total)   return 0;
+    return 1;
+}
 
 static inline PoolHandle *pool_setup_handle(void *base, size_t map_size,
                                              const char *path, int backing_fd) {
@@ -476,8 +495,7 @@ static PoolHandle *pool_create(const char *path, uint64_t capacity,
     }
 
     uint64_t bm_off, own_off, dat_off, total;
-    uint32_t bwords;
-    pool_calc_layout(capacity, elem_size, &bm_off, &own_off, &dat_off, &total, &bwords);
+    pool_calc_layout(capacity, elem_size, &bm_off, &own_off, &dat_off, &total);
 
     int fd = -1;
     int anonymous = (path == NULL);
@@ -529,13 +547,7 @@ static PoolHandle *pool_create(const char *path, uint64_t capacity,
         }
 
         if (!is_new) {
-            PoolHeader *hdr = (PoolHeader *)base;
-            int valid = (hdr->magic == POOL_MAGIC &&
-                         hdr->version == POOL_VERSION &&
-                         hdr->variant_id == variant_id &&
-                         hdr->capacity > 0 &&
-                         hdr->total_size == (uint64_t)st.st_size);
-            if (!valid) {
+            if (!pool_validate_header((PoolHeader *)base, (uint64_t)st.st_size, variant_id)) {
                 POOL_ERR("%s: invalid or incompatible pool file", path);
                 munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
@@ -570,16 +582,19 @@ static PoolHandle *pool_create_memfd(const char *name, uint64_t capacity,
     }
 
     uint64_t bm_off, own_off, dat_off, total;
-    uint32_t bwords;
-    pool_calc_layout(capacity, elem_size, &bm_off, &own_off, &dat_off, &total, &bwords);
+    pool_calc_layout(capacity, elem_size, &bm_off, &own_off, &dat_off, &total);
 
-    int fd = memfd_create(name ? name : "pool", MFD_CLOEXEC);
+    int fd = memfd_create(name ? name : "pool", MFD_CLOEXEC | MFD_ALLOW_SEALING);
     if (fd < 0) { POOL_ERR("memfd_create: %s", strerror(errno)); return NULL; }
 
     if (ftruncate(fd, (off_t)total) < 0) {
         POOL_ERR("ftruncate(memfd): %s", strerror(errno));
         close(fd); return NULL;
     }
+
+    /* Seal against shrink/grow to block ftruncate-based SIGBUS attacks via
+     * SCM_RIGHTS-shared fds. Peers can still write; only size is immutable. */
+    (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
 
     void *base = mmap(NULL, (size_t)total, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) {
@@ -614,13 +629,7 @@ static PoolHandle *pool_open_fd(int fd, uint32_t variant_id, char *errbuf) {
         return NULL;
     }
 
-    PoolHeader *hdr = (PoolHeader *)base;
-    int valid = (hdr->magic == POOL_MAGIC &&
-                 hdr->version == POOL_VERSION &&
-                 hdr->variant_id == variant_id &&
-                 hdr->capacity > 0 &&
-                 hdr->total_size == (uint64_t)st.st_size);
-    if (!valid) {
+    if (!pool_validate_header((PoolHeader *)base, (uint64_t)st.st_size, variant_id)) {
         POOL_ERR("fd %d: invalid or incompatible pool", fd);
         munmap(base, map_size);
         return NULL;
@@ -650,7 +659,7 @@ static void pool_destroy(PoolHandle *h) {
  * ================================================================ */
 
 static int pool_create_eventfd(PoolHandle *h) {
-    if (h->notify_fd >= 0) close(h->notify_fd);
+    if (h->notify_fd >= 0) return h->notify_fd;
     int efd = eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
     if (efd < 0) return -1;
     h->notify_fd = efd;
@@ -670,8 +679,8 @@ static int64_t pool_eventfd_consume(PoolHandle *h) {
     return (int64_t)val;
 }
 
-static void pool_msync(PoolHandle *h) {
-    msync(h->hdr, h->mmap_size, MS_SYNC);
+static int pool_msync(PoolHandle *h) {
+    return msync(h->hdr, h->mmap_size, MS_SYNC);
 }
 
 /* ================================================================

@@ -23,6 +23,8 @@ BEGIN {
   push @available, 'replicate'   if $ENV{TEST_LANGERTHA_REPLICATE_API_KEY};
   push @available, 'huggingface' if $ENV{TEST_LANGERTHA_HUGGINGFACE_API_KEY};
   push @available, 'aki'        if $ENV{TEST_LANGERTHA_AKI_API_KEY};
+  push @available, 'tsystems'    if $ENV{TEST_LANGERTHA_TSYSTEMS_API_KEY};
+  push @available, 'scaleway'    if $ENV{TEST_LANGERTHA_SCALEWAY_API_KEY};
   push @available, 'ollama'      if $ENV{TEST_LANGERTHA_OLLAMA_URL};
   push @available, 'vllm'      if $ENV{TEST_LANGERTHA_VLLM_URL} && $ENV{TEST_LANGERTHA_VLLM_TOOL_CALL_PARSER};
   unless (@available) {
@@ -276,6 +278,30 @@ async sub run_tests {
       ));
     };
     diag "vLLM/$model error: $@" if $@;
+  }
+
+  # --- TSystems ---
+  if ($ENV{TEST_LANGERTHA_TSYSTEMS_API_KEY}) {
+    require Langertha::Engine::TSystems;
+    eval {
+      await test_engine('TSystems', Langertha::Engine::TSystems->new(
+        api_key => $ENV{TEST_LANGERTHA_TSYSTEMS_API_KEY},
+        model => 'gpt-oss-120b', mcp_servers => [$mcp],
+      ));
+    };
+    diag "TSystems error: $@" if $@;
+  }
+
+  # --- Scaleway ---
+  if ($ENV{TEST_LANGERTHA_SCALEWAY_API_KEY}) {
+    require Langertha::Engine::Scaleway;
+    eval {
+      await test_engine('Scaleway', Langertha::Engine::Scaleway->new(
+        api_key => $ENV{TEST_LANGERTHA_SCALEWAY_API_KEY},
+        model => 'llama-3.1-8b-instruct', mcp_servers => [$mcp],
+      ));
+    };
+    diag "Scaleway error: $@" if $@;
   }
 
   # --- AKI.IO (via OpenAI-compatible API, HermesTools) ---

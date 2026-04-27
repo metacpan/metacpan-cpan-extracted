@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::ResultSet;
 # ABSTRACT: A Result Set
-$MetaCPAN::Client::ResultSet::VERSION = '2.041000';
+$MetaCPAN::Client::ResultSet::VERSION = '2.042000';
 use Moo;
 use Carp;
 
@@ -68,9 +68,10 @@ sub BUILDARGS {
 
     return \%args;
 }
+
 sub BUILD {
     my ( $self ) = @_;
-    $self->class; # vifify and validate
+    $self->class; # vivify and validate
 }
 
 sub next {
@@ -91,8 +92,7 @@ sub aggregations {
 
 sub _build_class {
     my $self = shift;
-    my $type = $self->type eq 'cve' ? 'CVE' : ( ucfirst $self->type );
-    return 'MetaCPAN::Client::' . $type;
+    return 'MetaCPAN::Client::' . ucfirst $self->type;
 }
 
 1;
@@ -109,7 +109,7 @@ MetaCPAN::Client::ResultSet - A Result Set
 
 =head1 VERSION
 
-version 2.041000
+version 2.042000
 
 =head1 DESCRIPTION
 

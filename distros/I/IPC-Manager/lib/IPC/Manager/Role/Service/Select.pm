@@ -2,7 +2,7 @@ package IPC::Manager::Role::Service::Select;
 use strict;
 use warnings;
 
-our $VERSION = '0.000033';
+our $VERSION = '0.000035';
 
 # Not included in role:
 use Carp qw/croak/;
@@ -18,18 +18,56 @@ sub clear_serviceselect_fields {
     delete $self->{_SELECT};
 }
 
+# Returns true when the underlying client multiplexes a handle set that may
+# change during normal operation (e.g. accepted SOCK_STREAM connections).
+# Defaults to consulting the client; consumers that don't have a client
+# accessor get the safe answer (false).
+sub have_dynamic_handles_for_select {
+    my $self = shift;
+    return 0 unless $self->can('client');
+    my $client = $self->client or return 0;
+    return 0 unless $client->can('have_dynamic_handles_for_select');
+    return $client->have_dynamic_handles_for_select ? 1 : 0;
+}
+
 sub select {
     my $self = shift;
 
-    return $self->{_SELECT} if exists $self->{_SELECT};
+    my $dynamic = $self->have_dynamic_handles_for_select;
+
+    return $self->{_SELECT} if !$dynamic && exists $self->{_SELECT};
 
     my @handles = $self->select_handles;
-    return $self->{_SELECT} = undef unless @handles;
+    unless (@handles) {
+        $self->{_SELECT} = undef unless $dynamic;
+        return undef;
+    }
 
     require IO::Select;
     my $s = IO::Select->new;
     $s->add(@handles);
-    return $self->{_SELECT} = $s;
+
+    $self->{_SELECT} = $s unless $dynamic;
+    return $s;
+}
+
+# Build a fresh IO::Select for the client's writable handles, or
+# return undef when no peer has a backlog. Built fresh per call
+# because the writable-handle set tracks the outbox, which is
+# transient by design.
+sub select_write {
+    my $self = shift;
+    my $client = $self->client;
+
+    return undef unless $client->have_writable_handles;
+
+    my @handles = $client->writable_handles;
+    return undef unless @handles;
+
+    require IO::Select;
+    my $s = IO::Select->new;
+    $s->add(@handles);
+    return $s;
 }
 
 1;

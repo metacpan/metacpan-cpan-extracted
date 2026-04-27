@@ -1,0 +1,140 @@
+BATsh チートシート [JA] 日本語
+==============================
+
+BATshは、cmd.exeとbash/shの両方の構文を同一スクリプトで実行できる
+バイリンガルシェルです。スクリプトはセクションに分割され、各セクションは
+対応するシェルにそのまま渡されます。
+
+1. モード判定
+--------------
+  セクションの最初の実質的な行の「最初のトークン」がモードを決定します。
+
+  CMDモード: 最初のトークンが [A-Z 0-9 _ - \ / : . @ %] のみで構成され、
+             かつ少なくとも1文字の大文字A-Zを含む。
+
+    ECHO hello              -> CMDセクション (cmd.exe)
+    SET FOO=bar baz         -> CMDセクション (値部分は判定しない)
+    @ECHO OFF               -> CMDセクション
+    IF "%X%"=="Y" (         -> CMDセクション
+
+  SHモード: それ以外（小文字を含む、または英字がない）。
+
+    echo hello              -> SHセクション (bash/sh)
+    export FOO=bar          -> SHセクション
+    if [ -f "$f" ]; then    -> SHセクション
+    #!/bin/sh               -> SHセクション (シバンはSH行)
+
+  コメントと空行は現在のセクションに吸収されます。
+  コメント構文:
+    ::           CMD形式コメント
+    REM ...      CMD形式コメント（大文字小文字不問）
+    @REM ...     CMD形式コメント
+    # ...        SH形式コメント（#!シバンは除く）
+
+2. シェルの起動
+----------------
+  perl lib/BATsh.pm                    # 対話型REPL
+  perl lib/BATsh.pm script.batsh       # スクリプトファイルの実行
+  perl lib/BATsh.pm -e "echo hello"    # インラインワンライナー
+
+  PerlAPIから:
+    use BATsh;
+    BATsh->run('script.batsh');
+    BATsh->run_string("echo hello");
+    BATsh->repl();
+
+3. 環境変数ブリッジ
+--------------------
+  各セクション実行前に、BATshは現在の%ENVをプリアンブルとして注入します
+  （CMDにはSET、SHにはexport）。実行後に最終環境を%ENVに読み戻します。
+
+  export FOO=hello   # SHがFOOをセット
+  ECHO %FOO%         # CMDがブリッジ経由でFOOを参照（Windows）
+
+  SET BAR=world      # CMDがBARをセット
+  echo $BAR          # SHがブリッジ経由でBARを参照
+
+4. SETLOCAL / ENDLOCAL
+-----------------------
+  SETLOCAL           # %ENVのスナップショットを保存（BATshが管理）
+  SET TMP=local_val
+  ECHO %TMP%
+  ENDLOCAL           # %ENVを復元（TMPは消える）
+
+  ネスト可能です。
+
+5. セクション境界の検出
+------------------------
+  セクションはブロック深さが0に戻り、かつ次の実質的な行が異なるモードに
+  なった時点で終了します。
+
+  CMDセクション: 引用符外の ( と ) の深さを追跡:
+
+    IF "%X%"=="Y" (     <- ブロック開始（深さ1）
+        ECHO yes
+    ) ELSE (            <- 閉じて再開（深さ>=1を維持）
+        ECHO no
+    )                   <- ブロック終了（深さ0）-> セクション境界
+
+  SHセクション: キーワード深さを追跡:
+
+    for x in 1 2; do   <- ブロック開始（深さ1）
+        echo $x
+    done                <- ブロック終了（深さ0）-> セクション境界
+
+  開いたブロック内の行は、最初のトークンが他のモードに見えても
+  現在のセクションに吸収されます:
+
+    for x in A B; do
+        ECHO $x         <- 大文字だがSHブロック内 -> SHセクションのまま
+    done
+
+  SHキーワード対:
+    オープナー(+1): if  for  while  until  case  function  select  {
+    クローザー(-1): fi  done  esac  }
+    中立     ( 0): then  do  else  elif
+
+6. サブルーチン定義
+--------------------
+  :GREET
+  echo "Hello $BATSH_ARG1"
+  RET
+
+  ラベルは:で始まり、RETまたはRETURNで終わります。
+  本体は実行前に抽出されます（インラインでは実行されません）。
+  本体にはCMD行、SH行、または混合を含めることができます。
+
+7. CALLとsource
+----------------
+  CALL :GREET world      # 引数付きでサブルーチンを呼び出す
+  CALL other.batsh       # 別の.batshファイルをインクルード（CMD）
+  source other.batsh     # 別の.batshファイルをインクルード（SH）
+  . other.batsh          # POSIXのドット記法
+
+  引数: $BATSH_ARG1 .. $BATSH_ARGn  （CMDでは %BATSH_ARG1%）
+  個数: $BATSH_ARGC
+
+8. Perl API
+------------
+  BATsh->run($file)            # .batshファイルを実行
+  BATsh->run_string($source)   # ソース文字列を実行
+  BATsh->run_lines(@lines)     # 行配列を実行
+  BATsh->repl()                # 対話型REPL
+  BATsh->classify_token($tok)  # 'CMD'または'SH'を返す
+  BATsh->setlocal()            # %ENVをスナップショット
+  BATsh->endlocal()            # %ENVを復元
+  BATsh->call_sub($lbl, @args) # サブルーチンを呼び出す
+  BATsh->source_file($file)    # .batshファイルをインクルード
+  BATsh->version()             # バージョン文字列
+
+9. プラットフォーム注記
+------------------------
+  Windows: CMDセクションもSHセクションも純粋なPerlで動作 -- 外部のcmd.exe/bash/shは不要。
+  UNIX:    CMDセクションもSHセクションも純粋なPerlで動作 -- 外部のcmd.exe/bash/shは不要。
+
+10. 動作環境
+-------------
+  Perl 5.005_03以降。コアモジュールのみ（File::Spec, Carp）。
+  CPANの依存モジュール不要。
+
+参照: https://metacpan.org/dist/BATsh

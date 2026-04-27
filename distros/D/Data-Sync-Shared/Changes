@@ -1,5 +1,13 @@
 Revision history for Data-Sync-Shared
 
+0.04  2026-04-26
+    - RWLock write-preferring + writers waiting split
+    - Barrier broken-on-timeout + is broken()
+    - sync() croaks; harden DESTROY
+    - sync sem drain: CAS-loop -> atomic exchange
+    - idempotent eventfd; aarch64 CI matrix
+
+
 0.03  2026-04-13
     - Add SEE ALSO cross-links to all family modules
 

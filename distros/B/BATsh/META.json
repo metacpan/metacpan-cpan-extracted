@@ -1,0 +1,99 @@
+{
+    "name" : "BATsh",
+    "version" : "0.01",
+    "abstract" : "Bilingual Shell: cmd.exe and bash in one script",
+    "author" : [
+        "ina <ina@cpan.org>"
+    ],
+    "dynamic_config" : 1,
+    "generated_by" : "pmake.bat",
+    "license" : [
+        "perl_5"
+    ],
+    "meta-spec" : {
+        "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+        "version" : 2
+    },
+    "release_status" : "stable",
+    "resources" : {
+        "license" : [
+            "http://dev.perl.org/licenses/"
+        ],
+        "bugtracker" : {
+            "web" : "https://github.com/ina-cpan/BATsh/issues"
+        },
+        "repository" : {
+            "url"  : "https://github.com/ina-cpan/BATsh",
+            "web"  : "https://github.com/ina-cpan/BATsh",
+            "type" : "git"
+        }
+    },
+    "prereqs" : {
+        "build" : {
+            "requires" : {
+                "Carp" : "0",
+                "File::Copy" : "2.02",
+                "File::Path" : "1.0401",
+                "File::Spec" : "0",
+                "perl" : "5.00503",
+                "strict" : "1.01",
+                "vars" : "0",
+                "warnings" : "0"
+            }
+        },
+        "configure" : {
+            "requires" : {
+                "Carp" : "0",
+                "File::Copy" : "2.02",
+                "File::Path" : "1.0401",
+                "File::Spec" : "0",
+                "perl" : "5.00503",
+                "strict" : "1.01",
+                "vars" : "0",
+                "warnings" : "0"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+                "Carp" : "0",
+                "File::Copy" : "2.02",
+                "File::Path" : "1.0401",
+                "File::Spec" : "0",
+                "perl" : "5.00503",
+                "strict" : "1.01",
+                "vars" : "0",
+                "warnings" : "0"
+            }
+        },
+        "test" : {
+            "requires" : {
+                "Carp" : "0",
+                "File::Copy" : "2.02",
+                "File::Path" : "1.0401",
+                "File::Spec" : "0",
+                "perl" : "5.00503",
+                "strict" : "1.01",
+                "vars" : "0",
+                "warnings" : "0"
+            }
+        }
+    },
+    "provides" : {
+        "BATsh" : {
+            "file" : "lib/BATsh.pm",
+            "version" : "0.01"
+        },
+        "BATsh::CMD" : {
+            "file" : "lib/BATsh/CMD.pm",
+            "version" : "0.01"
+        },
+        "BATsh::Env" : {
+            "file" : "lib/BATsh/Env.pm",
+            "version" : "0.01"
+        },
+        "BATsh::SH" : {
+            "file" : "lib/BATsh/SH.pm",
+            "version" : "0.01"
+        }
+    }
+}

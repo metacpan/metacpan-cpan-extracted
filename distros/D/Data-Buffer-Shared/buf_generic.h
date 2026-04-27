@@ -64,9 +64,11 @@ typedef struct {
     /* ---- Cache line 1 (64-127): seqlock + rwlock + mutable state ---- */
     uint32_t seq;             /* 64: seqlock counter, odd = writer active */
     uint32_t rwlock;          /* 68: 0=unlocked, readers=1..0x7FFFFFFF, writer=0x80000000|pid */
-    uint32_t rwlock_waiters;  /* 72 */
+    uint32_t rwlock_waiters;  /* 72: wake-target counter (readers+writers) */
     uint32_t stat_recoveries; /* 76 */
-    uint64_t _reserved1[6];   /* 80-127 */
+    uint32_t rwlock_writers_waiting; /* 80: reader yield signal (writers only) */
+    uint32_t _pad2;           /* 84 */
+    uint64_t _reserved1[5];   /* 88-127 */
 } BufHeader;
 
 BUF_STATIC_ASSERT(sizeof(BufHeader) == 128, "BufHeader must be exactly 128 bytes (2 cache lines)");
@@ -127,13 +129,14 @@ static const struct timespec buf_lock_timeout = { BUF_LOCK_TIMEOUT_SEC, 0 };
 static inline void buf_rwlock_rdlock(BufHeader *hdr) {
     uint32_t *lock = &hdr->rwlock;
     uint32_t *waiters = &hdr->rwlock_waiters;
+    uint32_t *writers_waiting = &hdr->rwlock_writers_waiting;
     for (int spin = 0; ; spin++) {
         uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
         if (cur > 0 && cur < BUF_RWLOCK_WRITER_BIT) {
             if (__atomic_compare_exchange_n(lock, &cur, cur + 1,
                     1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
                 return;
-        } else if (cur == 0 && !__atomic_load_n(waiters, __ATOMIC_RELAXED)) {
+        } else if (cur == 0 && !__atomic_load_n(writers_waiting, __ATOMIC_RELAXED)) {
             if (__atomic_compare_exchange_n(lock, &cur, 1,
                     1, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED))
                 return;
@@ -147,13 +150,22 @@ static inline void buf_rwlock_rdlock(BufHeader *hdr) {
         if (cur >= BUF_RWLOCK_WRITER_BIT || cur == 0) {
             long rc = syscall(SYS_futex, lock, FUTEX_WAIT, cur,
                               &buf_lock_timeout, NULL, 0);
-            if (rc == -1 && errno == ETIMEDOUT && cur >= BUF_RWLOCK_WRITER_BIT) {
+            if (rc == -1 && errno == ETIMEDOUT) {
                 __atomic_sub_fetch(waiters, 1, __ATOMIC_RELAXED);
-                uint32_t val = __atomic_load_n(lock, __ATOMIC_RELAXED);
-                if (val >= BUF_RWLOCK_WRITER_BIT) {
-                    uint32_t pid = val & BUF_RWLOCK_PID_MASK;
-                    if (!buf_pid_alive(pid))
-                        buf_recover_stale_lock(hdr, val);
+                if (cur >= BUF_RWLOCK_WRITER_BIT) {
+                    uint32_t val = __atomic_load_n(lock, __ATOMIC_RELAXED);
+                    if (val >= BUF_RWLOCK_WRITER_BIT) {
+                        uint32_t pid = val & BUF_RWLOCK_PID_MASK;
+                        if (!buf_pid_alive(pid))
+                            buf_recover_stale_lock(hdr, val);
+                    }
+                } else {
+                    /* Yielding to writer timed out — drop one writers_waiting
+                     * to recover from a potentially-crashed parked writer. */
+                    uint32_t wc = __atomic_load_n(writers_waiting, __ATOMIC_RELAXED);
+                    while (wc > 0 && !__atomic_compare_exchange_n(
+                            writers_waiting, &wc, wc - 1,
+                            1, __ATOMIC_RELAXED, __ATOMIC_RELAXED)) {}
                 }
                 spin = 0;
                 continue;
@@ -173,6 +185,7 @@ static inline void buf_rwlock_rdunlock(BufHeader *hdr) {
 static inline void buf_rwlock_wrlock(BufHeader *hdr) {
     uint32_t *lock = &hdr->rwlock;
     uint32_t *waiters = &hdr->rwlock_waiters;
+    uint32_t *writers_waiting = &hdr->rwlock_writers_waiting;
     uint32_t mypid = BUF_RWLOCK_WR((uint32_t)getpid());
     for (int spin = 0; ; spin++) {
         uint32_t expected = 0;
@@ -184,12 +197,14 @@ static inline void buf_rwlock_wrlock(BufHeader *hdr) {
             continue;
         }
         __atomic_add_fetch(waiters, 1, __ATOMIC_RELAXED);
+        __atomic_add_fetch(writers_waiting, 1, __ATOMIC_RELAXED);
         uint32_t cur = __atomic_load_n(lock, __ATOMIC_RELAXED);
         if (cur != 0) {
             long rc = syscall(SYS_futex, lock, FUTEX_WAIT, cur,
                               &buf_lock_timeout, NULL, 0);
             if (rc == -1 && errno == ETIMEDOUT) {
                 __atomic_sub_fetch(waiters, 1, __ATOMIC_RELAXED);
+                __atomic_sub_fetch(writers_waiting, 1, __ATOMIC_RELAXED);
                 uint32_t val = __atomic_load_n(lock, __ATOMIC_RELAXED);
                 if (val >= BUF_RWLOCK_WRITER_BIT) {
                     uint32_t pid = val & BUF_RWLOCK_PID_MASK;
@@ -201,6 +216,7 @@ static inline void buf_rwlock_wrlock(BufHeader *hdr) {
             }
         }
         __atomic_sub_fetch(waiters, 1, __ATOMIC_RELAXED);
+        __atomic_sub_fetch(writers_waiting, 1, __ATOMIC_RELAXED);
         spin = 0;
     }
 }
@@ -292,6 +308,10 @@ static BufHandle *buf_create_map(const char *path, uint64_t capacity,
         return NULL;
     }
 
+    if (!created && st.st_size > 0 && (uint64_t)st.st_size < sizeof(BufHeader)) {
+        snprintf(errbuf, BUF_ERR_BUFLEN, "%s: file too small (%lld)", path, (long long)st.st_size);
+        flock(fd, LOCK_UN); close(fd); return NULL;
+    }
     if (created || st.st_size == 0) {
         if (ftruncate(fd, (off_t)total_size) < 0) {
             snprintf(errbuf, BUF_ERR_BUFLEN, "ftruncate(%s): %s", path, strerror(errno));
@@ -398,7 +418,6 @@ static BufHandle *buf_create_anon(uint64_t capacity, uint32_t elem_size,
         return NULL;
     }
     uint64_t total_size = data_off + capacity * elem_size;
-    if (total_size == 0) total_size = data_off;
 
     void *base = mmap(NULL, (size_t)total_size, PROT_READ | PROT_WRITE,
                        MAP_SHARED | MAP_ANONYMOUS, -1, 0);
@@ -444,9 +463,8 @@ static BufHandle *buf_create_memfd(const char *name, uint64_t capacity,
         return NULL;
     }
     uint64_t total_size = data_off + capacity * elem_size;
-    if (total_size == 0) total_size = data_off;
 
-    int fd = (int)syscall(SYS_memfd_create, name, 0);
+    int fd = (int)syscall(SYS_memfd_create, name, MFD_CLOEXEC | MFD_ALLOW_SEALING);
     if (fd < 0) {
         snprintf(errbuf, BUF_ERR_BUFLEN, "memfd_create: %s", strerror(errno));
         return NULL;
@@ -456,6 +474,7 @@ static BufHandle *buf_create_memfd(const char *name, uint64_t capacity,
         close(fd);
         return NULL;
     }
+    (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
 
     void *base = mmap(NULL, (size_t)total_size, PROT_READ | PROT_WRITE,
                        MAP_SHARED, fd, 0);
@@ -534,17 +553,25 @@ static BufHandle *buf_open_fd(int fd, uint32_t elem_size, uint32_t variant_id,
         goto fail;
     }
     if (hdr->elem_size == 0 ||
-        hdr->data_off < sizeof(BufHeader) ||
-        hdr->data_off >= (uint64_t)st.st_size ||
+        hdr->data_off != sizeof(BufHeader) ||
+        hdr->total_size != (uint64_t)st.st_size ||
         hdr->capacity > ((uint64_t)st.st_size - hdr->data_off) / hdr->elem_size) {
         snprintf(errbuf, BUF_ERR_BUFLEN, "fd=%d: corrupt header", fd);
         goto fail;
     }
 
     {
+        int myfd = fcntl(fd, F_DUPFD_CLOEXEC, 0);
+        if (myfd < 0) {
+            snprintf(errbuf, BUF_ERR_BUFLEN, "fcntl(F_DUPFD_CLOEXEC, fd=%d): %s",
+                     fd, strerror(errno));
+            munmap(base, (size_t)st.st_size);
+            return NULL;
+        }
         BufHandle *h = (BufHandle *)calloc(1, sizeof(BufHandle));
         if (!h) {
             snprintf(errbuf, BUF_ERR_BUFLEN, "calloc: out of memory");
+            close(myfd);
             munmap(base, (size_t)st.st_size);
             return NULL;
         }
@@ -552,7 +579,7 @@ static BufHandle *buf_open_fd(int fd, uint32_t elem_size, uint32_t variant_id,
         h->data = (char *)base + hdr->data_off;
         h->mmap_size = (size_t)st.st_size;
         h->path = NULL;
-        h->fd = fd;
+        h->fd = myfd;
         h->efd = -1;
         return h;
     }
@@ -562,10 +589,17 @@ fail:
     return NULL;
 }
 
+/* ---- msync ---- */
+
+static inline int buf_msync(BufHandle *h) {
+    if (!h || !h->hdr) return 0;
+    return msync(h->hdr, h->mmap_size, MS_SYNC);
+}
+
 /* ---- Eventfd integration (opt-in notifications) ---- */
 
 static int buf_create_eventfd(BufHandle *h) {
-    if (h->efd >= 0 && h->efd_owned) close(h->efd);
+    if (h->efd >= 0) return h->efd;
     int efd = eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
     if (efd < 0) return -1;
     h->efd = efd;

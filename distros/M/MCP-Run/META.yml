@@ -22,7 +22,7 @@ resources:
   bugtracker: https://github.com/Getty/p5-mcp-run/issues
   homepage: https://github.com/Getty/p5-mcp-run
   repository: https://github.com/Getty/p5-mcp-run.git
-version: '0.004'
+version: '0.100'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -284,7 +284,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.004'
+          tag: '0.100'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

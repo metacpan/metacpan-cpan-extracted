@@ -71,8 +71,9 @@ SKIP: {
         my $tracer = MockTracer->new;
 
         my $redis = Async::Redis->new(
-            host        => $ENV{REDIS_HOST} // 'localhost',
-            otel_tracer => $tracer,
+            host              => $ENV{REDIS_HOST} // 'localhost',
+            otel_tracer       => $tracer,
+            otel_include_args => 1,
         );
         run { $redis->connect };
         run { $redis->set('trace:key', 'value') };

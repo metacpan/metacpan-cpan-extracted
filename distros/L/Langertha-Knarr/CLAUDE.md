@@ -39,11 +39,14 @@ usage data, cache_control, and all protocol-specific metadata.
 - **Langertha::Knarr** — IO::Async server, dispatch, raw passthrough
 - **Langertha::Knarr::Config** — YAML config loader, validation, env scanning
 - **Langertha::Knarr::Router** — Model → Engine routing with caching + auto-discovery
-- **Langertha::Knarr::Tracing** — Langfuse trace/generation per request
+- **Langertha::Knarr::Request** — Normalized request value object (protocol, messages, tools, tool_choice, response_format, …)
+- **Langertha::Knarr::Response** — Normalized response value object (content, model, usage, tool_calls, finish_reason); `coerce()` upgrades any legacy shape
+- **Langertha::Knarr::Stream** — Async chunk iterator; `from_list`, `from_callback` constructors
+- **Langertha::Knarr::Tracing** — Langfuse trace/generation per request (async flush via Net::Async::HTTP)
 - **Langertha::Knarr::RequestLog** — JSONL per-request logging
-- **Langertha::Knarr::Protocol::OpenAI** — `/v1/chat/completions`, `/v1/models`, `/v1/embeddings`
+- **Langertha::Knarr::Protocol::OpenAI** — `/v1/chat/completions`, `/v1/models`
 - **Langertha::Knarr::Protocol::Anthropic** — `/v1/messages`
-- **Langertha::Knarr::Protocol::Ollama** — `/api/chat`, `/api/tags`, `/api/ps`
+- **Langertha::Knarr::Protocol::Ollama** — `/api/chat`, `/api/generate`, `/api/tags`, `/api/version`
 - **Langertha::Knarr::Protocol::A2A** — Google Agent2Agent JSON-RPC
 - **Langertha::Knarr::Protocol::ACP** — BeeAI/Linux Foundation ACP
 - **Langertha::Knarr::Protocol::AGUI** — CopilotKit AG-UI
@@ -73,7 +76,7 @@ usage data, cache_control, and all protocol-specific metadata.
 
 ## OOP Framework
 
-- **Moose**: Knarr.pm, Handler role, all Handler::* modules, Protocol::* modules, Request, Session, Stream
+- **Moose**: Knarr.pm, Handler role, all Handler::* modules, Protocol::* modules, Request, Response, Session, Stream
 - **Moo**: CLI, Config, Router, Tracing, RequestLog
 
 CLI uses MooX::Cmd + MooX::Options.

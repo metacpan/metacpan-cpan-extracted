@@ -56,7 +56,7 @@ my %WriteMakefileArgs = (
     "Module::Runtime" => 0,
     "Test2::Suite" => 0
   },
-  "VERSION" => "0.404",
+  "VERSION" => "0.500",
   "test" => {
     "TESTS" => "t/*.t"
   }

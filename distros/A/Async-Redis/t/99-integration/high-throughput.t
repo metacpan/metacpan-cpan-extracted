@@ -1,11 +1,23 @@
 #!/usr/bin/env perl
 # Test: High throughput pipeline operations
+#
+# Gated behind RELEASE_TESTING because the assertions are hard
+# ops/sec thresholds (>=10k for SET/GET pipelines, >=5k for mixed).
+# Those numbers depend on the test environment — a busy CI host or a
+# slow VM can dip below the threshold even when the library itself
+# is fine, producing false-negative smoker reports. Pipeline
+# correctness (commands return, results in order, error objects
+# round-trip) is exercised by t/30-pipeline/. Run this with
+# RELEASE_TESTING=1 on a quiet box before cutting a release.
 use strict;
 use warnings;
 use Test2::V0;
 use Test::Lib;
 use Test::Async::Redis qw(skip_without_redis await_f cleanup_keys run);
 use Time::HiRes qw(time);
+
+plan skip_all => 'set RELEASE_TESTING=1 to run high-throughput perf assertions'
+    unless $ENV{RELEASE_TESTING};
 
 SKIP: {
     my $redis = skip_without_redis();

@@ -13,9 +13,9 @@
     if (!h) croak("Attempted to use a destroyed %s object", classname)
 
 #define MAKE_OBJ(class, ptr) \
-    SV *obj = newSViv(PTR2IV(ptr)); \
-    SV *ref = newRV_noinc(obj); \
-    sv_bless(ref, gv_stashpv(class, GV_ADD))
+    SV *ref = newRV_noinc(newSViv(PTR2IV(ptr))); \
+    sv_bless(ref, gv_stashpv(class, GV_ADD)); \
+    RETVAL = ref
 
 MODULE = Data::ReqRep::Shared  PACKAGE = Data::ReqRep::Shared
 
@@ -38,7 +38,6 @@ new(class, path, req_cap, resp_slots, resp_size, ...)
                                      (uint32_t)resp_size, arena_cap, errbuf);
     if (!h) croak("Data::ReqRep::Shared->new: %s", errbuf);
     MAKE_OBJ(class, h);
-    RETVAL = ref;
   OUTPUT:
     RETVAL
 
@@ -58,7 +57,6 @@ new_memfd(class, name, req_cap, resp_slots, resp_size, ...)
                                            (uint32_t)resp_size, arena_cap, errbuf);
     if (!h) croak("Data::ReqRep::Shared->new_memfd: %s", errbuf);
     MAKE_OBJ(class, h);
-    RETVAL = ref;
   OUTPUT:
     RETVAL
 
@@ -72,7 +70,6 @@ new_from_fd(class, fd)
     ReqRepHandle *h = reqrep_open_fd(fd, REQREP_MODE_STR, errbuf);
     if (!h) croak("Data::ReqRep::Shared->new_from_fd: %s", errbuf);
     MAKE_OBJ(class, h);
-    RETVAL = ref;
   OUTPUT:
     RETVAL
 
@@ -89,9 +86,10 @@ memfd(self)
 void
 DESTROY(self)
     SV *self
-  PREINIT:
-    EXTRACT_HANDLE("Data::ReqRep::Shared", self);
   CODE:
+    if (!SvROK(self)) return;
+    ReqRepHandle *h = INT2PTR(ReqRepHandle*, SvIV(SvRV(self)));
+    if (!h) return;
     sv_setiv(SvRV(self), 0);
     reqrep_destroy(h);
 
@@ -146,19 +144,40 @@ recv_multi(self, count)
     uint64_t id;
     bool utf8;
   PPCODE:
+    /* Hoist Perl SV construction out of process-shared futex mutex. */
+    struct { char *buf; uint32_t len; uint64_t id; bool utf8; } *items_buf = NULL;
+    UV n = 0;
     int last_r = 0;
+    int oom = 0;
+    if (count > 0) {
+        items_buf = (void *)malloc((size_t)count * sizeof(*items_buf));
+        if (!items_buf) croak("Data::ReqRep::Shared: out of memory");
+    }
     reqrep_mutex_lock(h->hdr);
     for (UV i = 0; i < count; i++) {
         last_r = reqrep_recv_locked(h, &str, &len, &utf8, &id);
         if (last_r <= 0) break;
-        SV *sv = newSVpvn(str, len);
-        if (utf8) SvUTF8_on(sv);
-        mXPUSHs(sv);
-        mXPUSHu((UV)id);
+        char *c = (char *)malloc(len ? len : 1);
+        if (!c) { oom = 1; break; }
+        if (len) memcpy(c, str, len);
+        items_buf[n].buf = c;
+        items_buf[n].len = len;
+        items_buf[n].id = id;
+        items_buf[n].utf8 = utf8;
+        n++;
     }
     reqrep_mutex_unlock(h->hdr);
     reqrep_wake_producers(h->hdr);
-    if (last_r == -1) croak("Data::ReqRep::Shared: out of memory");
+    EXTEND(SP, (SSize_t)(2 * n));
+    for (UV j = 0; j < n; j++) {
+        SV *sv = newSVpvn(items_buf[j].buf, items_buf[j].len);
+        if (items_buf[j].utf8) SvUTF8_on(sv);
+        PUSHs(sv_2mortal(sv));
+        PUSHs(sv_2mortal(newSVuv((UV)items_buf[j].id)));
+        free(items_buf[j].buf);
+    }
+    free(items_buf);
+    if (last_r == -1 || oom) croak("Data::ReqRep::Shared: out of memory");
 
 void
 recv_wait_multi(self, count, ...)
@@ -183,18 +202,40 @@ recv_wait_multi(self, count, ...)
         mXPUSHs(sv);
         mXPUSHu((UV)id);
     }
-    /* Grab up to count-1 more non-blocking */
+    /* Grab up to count-1 more non-blocking — hoist SV construction out of lock. */
+    struct { char *buf; uint32_t len; uint64_t id; bool utf8; } *items_buf = NULL;
+    UV n = 0;
+    int last_r2 = 0;
+    int oom = 0;
+    if (count > 1) {
+        items_buf = (void *)malloc((size_t)(count - 1) * sizeof(*items_buf));
+        if (!items_buf) croak("Data::ReqRep::Shared: out of memory");
+    }
     reqrep_mutex_lock(h->hdr);
     for (UV i = 1; i < count; i++) {
-        int r2 = reqrep_recv_locked(h, &str, &len, &utf8, &id);
-        if (r2 <= 0) break;
-        SV *sv = newSVpvn(str, len);
-        if (utf8) SvUTF8_on(sv);
-        mXPUSHs(sv);
-        mXPUSHu((UV)id);
+        last_r2 = reqrep_recv_locked(h, &str, &len, &utf8, &id);
+        if (last_r2 <= 0) break;
+        char *c = (char *)malloc(len ? len : 1);
+        if (!c) { oom = 1; break; }
+        if (len) memcpy(c, str, len);
+        items_buf[n].buf = c;
+        items_buf[n].len = len;
+        items_buf[n].id = id;
+        items_buf[n].utf8 = utf8;
+        n++;
     }
     reqrep_mutex_unlock(h->hdr);
     reqrep_wake_producers(h->hdr);
+    EXTEND(SP, (SSize_t)(2 * n));
+    for (UV j = 0; j < n; j++) {
+        SV *sv = newSVpvn(items_buf[j].buf, items_buf[j].len);
+        if (items_buf[j].utf8) SvUTF8_on(sv);
+        PUSHs(sv_2mortal(sv));
+        PUSHs(sv_2mortal(newSVuv((UV)items_buf[j].id)));
+        free(items_buf[j].buf);
+    }
+    free(items_buf);
+    if (last_r2 == -1 || oom) croak("Data::ReqRep::Shared: out of memory");
 
 void
 drain(self, ...)
@@ -208,17 +249,37 @@ drain(self, ...)
     uint32_t max_count;
   PPCODE:
     max_count = (items > 1) ? (uint32_t)SvUV(ST(1)) : UINT32_MAX;
+    /* Hoist SV construction out of the mutex (see recv_multi). */
+    struct drain_item { char *buf; uint32_t len; uint64_t id; bool utf8; struct drain_item *next; } *drained_head = NULL, *drained_tail = NULL;
+    UV drained_n = 0;
+    int last_r = 0;
+    int oom = 0;
     reqrep_mutex_lock(h->hdr);
     while (max_count-- > 0) {
-        int r = reqrep_recv_locked(h, &str, &len, &utf8, &id);
-        if (r <= 0) break;
-        SV *sv = newSVpvn(str, len);
-        if (utf8) SvUTF8_on(sv);
-        mXPUSHs(sv);
-        mXPUSHu((UV)id);
+        last_r = reqrep_recv_locked(h, &str, &len, &utf8, &id);
+        if (last_r <= 0) break;
+        struct drain_item *it = (struct drain_item *)malloc(sizeof(*it));
+        char *c = (char *)malloc(len ? len : 1);
+        if (!it || !c) { free(it); free(c); oom = 1; break; }
+        if (len) memcpy(c, str, len);
+        it->buf = c; it->len = len; it->id = id; it->utf8 = utf8; it->next = NULL;
+        if (drained_tail) drained_tail->next = it; else drained_head = it;
+        drained_tail = it;
+        drained_n++;
     }
     reqrep_mutex_unlock(h->hdr);
     reqrep_wake_producers(h->hdr);
+    EXTEND(SP, (SSize_t)(2 * drained_n));
+    while (drained_head) {
+        struct drain_item *it = drained_head; drained_head = it->next;
+        SV *sv = newSVpvn(it->buf, it->len);
+        if (it->utf8) SvUTF8_on(sv);
+        PUSHs(sv_2mortal(sv));
+        PUSHs(sv_2mortal(newSVuv((UV)it->id)));
+        free(it->buf);
+        free(it);
+    }
+    if (last_r == -1 || oom) croak("Data::ReqRep::Shared: out of memory");
 
 bool
 reply(self, id, value)
@@ -337,15 +398,15 @@ stats(self)
     hv_store(hv, "resp_data_max", 13, newSVuv(h->resp_data_max), 0);
     hv_store(hv, "mmap_size", 9, newSVuv((UV)h->mmap_size), 0);
     hv_store(hv, "arena_cap", 9, newSVuv(h->req_arena_cap), 0);
-    hv_store(hv, "arena_used", 10, newSVuv(hdr->arena_used), 0);
-    hv_store(hv, "requests", 8, newSVuv((UV)hdr->stat_requests), 0);
-    hv_store(hv, "replies", 7, newSVuv((UV)hdr->stat_replies), 0);
-    hv_store(hv, "send_full", 9, newSVuv((UV)hdr->stat_send_full), 0);
-    hv_store(hv, "recv_empty", 10, newSVuv(hdr->stat_recv_empty), 0);
-    hv_store(hv, "recoveries", 10, newSVuv(hdr->stat_recoveries), 0);
-    hv_store(hv, "recv_waiters", 12, newSVuv(hdr->recv_waiters), 0);
-    hv_store(hv, "send_waiters", 12, newSVuv(hdr->send_waiters), 0);
-    hv_store(hv, "slot_waiters", 12, newSVuv(hdr->slot_waiters), 0);
+    hv_store(hv, "arena_used", 10, newSVuv((UV)__atomic_load_n(&hdr->arena_used, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "requests", 8, newSVuv((UV)__atomic_load_n(&hdr->stat_requests, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "replies", 7, newSVuv((UV)__atomic_load_n(&hdr->stat_replies, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "send_full", 9, newSVuv((UV)__atomic_load_n(&hdr->stat_send_full, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "recv_empty", 10, newSVuv((UV)__atomic_load_n(&hdr->stat_recv_empty, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "recoveries", 10, newSVuv((UV)__atomic_load_n(&hdr->stat_recoveries, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "recv_waiters", 12, newSVuv((UV)__atomic_load_n(&hdr->recv_waiters, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "send_waiters", 12, newSVuv((UV)__atomic_load_n(&hdr->send_waiters, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "slot_waiters", 12, newSVuv((UV)__atomic_load_n(&hdr->slot_waiters, __ATOMIC_RELAXED)), 0);
     RETVAL = newRV_noinc((SV *)hv);
   OUTPUT:
     RETVAL
@@ -389,13 +450,16 @@ fileno(self)
   OUTPUT:
     RETVAL
 
-void
+SV *
 eventfd_consume(self)
     SV *self
   PREINIT:
     EXTRACT_HANDLE("Data::ReqRep::Shared", self);
   CODE:
-    reqrep_eventfd_consume(h);
+    int64_t v = reqrep_eventfd_consume(h);
+    RETVAL = (v >= 0) ? newSViv((IV)v) : &PL_sv_undef;
+  OUTPUT:
+    RETVAL
 
 void
 notify(self)
@@ -435,13 +499,16 @@ reply_fileno(self)
   OUTPUT:
     RETVAL
 
-void
+SV *
 reply_eventfd_consume(self)
     SV *self
   PREINIT:
     EXTRACT_HANDLE("Data::ReqRep::Shared", self);
   CODE:
-    reqrep_reply_eventfd_consume(h);
+    int64_t v = reqrep_reply_eventfd_consume(h);
+    RETVAL = (v >= 0) ? newSViv((IV)v) : &PL_sv_undef;
+  OUTPUT:
+    RETVAL
 
 void
 reply_notify(self)
@@ -465,7 +532,6 @@ new(class, path)
     ReqRepHandle *h = reqrep_open(p, REQREP_MODE_STR, errbuf);
     if (!h) croak("Data::ReqRep::Shared::Client->new: %s", errbuf);
     MAKE_OBJ(class, h);
-    RETVAL = ref;
   OUTPUT:
     RETVAL
 
@@ -479,7 +545,6 @@ new_from_fd(class, fd)
     ReqRepHandle *h = reqrep_open_fd(fd, REQREP_MODE_STR, errbuf);
     if (!h) croak("Data::ReqRep::Shared::Client->new_from_fd: %s", errbuf);
     MAKE_OBJ(class, h);
-    RETVAL = ref;
   OUTPUT:
     RETVAL
 
@@ -496,9 +561,10 @@ memfd(self)
 void
 DESTROY(self)
     SV *self
-  PREINIT:
-    EXTRACT_HANDLE("Data::ReqRep::Shared::Client", self);
   CODE:
+    if (!SvROK(self)) return;
+    ReqRepHandle *h = INT2PTR(ReqRepHandle*, SvIV(SvRV(self)));
+    if (!h) return;
     sv_setiv(SvRV(self), 0);
     reqrep_destroy(h);
 
@@ -514,7 +580,7 @@ send(self, value)
     const char *str = SvPV(value, len);
     bool utf8 = SvUTF8(value) ? true : false;
     int r = reqrep_try_send(h, str, (uint32_t)len, utf8, &id);
-    if (r == -2) croak("Data::ReqRep::Shared::Client: request too long (max 2GB)");
+    if (r == -2) croak("Data::ReqRep::Shared::Client: request too long (exceeds arena capacity or 2GB mask)");
     RETVAL = (r == 1) ? newSVuv((UV)id) : &PL_sv_undef;
   OUTPUT:
     RETVAL
@@ -533,7 +599,7 @@ send_wait(self, value, ...)
     const char *str = SvPV(value, len);
     bool utf8 = SvUTF8(value) ? true : false;
     int r = reqrep_send_wait(h, str, (uint32_t)len, utf8, &id, timeout);
-    if (r == -2) croak("Data::ReqRep::Shared::Client: request too long (max 2GB)");
+    if (r == -2) croak("Data::ReqRep::Shared::Client: request too long (exceeds arena capacity or 2GB mask)");
     RETVAL = (r == 1) ? newSVuv((UV)id) : &PL_sv_undef;
   OUTPUT:
     RETVAL
@@ -550,7 +616,7 @@ send_notify(self, value)
     const char *str = SvPV(value, len);
     bool utf8 = SvUTF8(value) ? true : false;
     int r = reqrep_try_send(h, str, (uint32_t)len, utf8, &id);
-    if (r == -2) croak("Data::ReqRep::Shared::Client: request too long (max 2GB)");
+    if (r == -2) croak("Data::ReqRep::Shared::Client: request too long (exceeds arena capacity or 2GB mask)");
     if (r == 1) {
         reqrep_notify(h);
         RETVAL = newSVuv((UV)id);
@@ -574,7 +640,7 @@ send_wait_notify(self, value, ...)
     const char *str = SvPV(value, len);
     bool utf8 = SvUTF8(value) ? true : false;
     int r = reqrep_send_wait(h, str, (uint32_t)len, utf8, &id, timeout);
-    if (r == -2) croak("Data::ReqRep::Shared::Client: request too long (max 2GB)");
+    if (r == -2) croak("Data::ReqRep::Shared::Client: request too long (exceeds arena capacity or 2GB mask)");
     if (r == 1) {
         reqrep_notify(h);
         RETVAL = newSVuv((UV)id);
@@ -644,7 +710,7 @@ req(self, value)
     const char *str = SvPV(value, len);
     bool utf8 = SvUTF8(value) ? true : false;
     int r = reqrep_request(h, str, (uint32_t)len, utf8, &out_str, &out_len, &out_utf8, -1);
-    if (r == -2) croak("Data::ReqRep::Shared::Client: request too long (max 2GB)");
+    if (r == -2) croak("Data::ReqRep::Shared::Client: request too long (exceeds arena capacity or 2GB mask)");
     if (r == 1) {
         RETVAL = newSVpvn(out_str, out_len);
         if (out_utf8) SvUTF8_on(RETVAL);
@@ -669,7 +735,7 @@ req_wait(self, value, timeout)
     const char *str = SvPV(value, len);
     bool utf8 = SvUTF8(value) ? true : false;
     int r = reqrep_request(h, str, (uint32_t)len, utf8, &out_str, &out_len, &out_utf8, timeout);
-    if (r == -2) croak("Data::ReqRep::Shared::Client: request too long (max 2GB)");
+    if (r == -2) croak("Data::ReqRep::Shared::Client: request too long (exceeds arena capacity or 2GB mask)");
     if (r == 1) {
         RETVAL = newSVpvn(out_str, out_len);
         if (out_utf8) SvUTF8_on(RETVAL);
@@ -722,15 +788,15 @@ stats(self)
     hv_store(hv, "resp_data_max", 13, newSVuv(h->resp_data_max), 0);
     hv_store(hv, "mmap_size", 9, newSVuv((UV)h->mmap_size), 0);
     hv_store(hv, "arena_cap", 9, newSVuv(h->req_arena_cap), 0);
-    hv_store(hv, "arena_used", 10, newSVuv(hdr->arena_used), 0);
-    hv_store(hv, "requests", 8, newSVuv((UV)hdr->stat_requests), 0);
-    hv_store(hv, "replies", 7, newSVuv((UV)hdr->stat_replies), 0);
-    hv_store(hv, "send_full", 9, newSVuv((UV)hdr->stat_send_full), 0);
-    hv_store(hv, "recv_empty", 10, newSVuv(hdr->stat_recv_empty), 0);
-    hv_store(hv, "recoveries", 10, newSVuv(hdr->stat_recoveries), 0);
-    hv_store(hv, "recv_waiters", 12, newSVuv(hdr->recv_waiters), 0);
-    hv_store(hv, "send_waiters", 12, newSVuv(hdr->send_waiters), 0);
-    hv_store(hv, "slot_waiters", 12, newSVuv(hdr->slot_waiters), 0);
+    hv_store(hv, "arena_used", 10, newSVuv((UV)__atomic_load_n(&hdr->arena_used, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "requests", 8, newSVuv((UV)__atomic_load_n(&hdr->stat_requests, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "replies", 7, newSVuv((UV)__atomic_load_n(&hdr->stat_replies, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "send_full", 9, newSVuv((UV)__atomic_load_n(&hdr->stat_send_full, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "recv_empty", 10, newSVuv((UV)__atomic_load_n(&hdr->stat_recv_empty, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "recoveries", 10, newSVuv((UV)__atomic_load_n(&hdr->stat_recoveries, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "recv_waiters", 12, newSVuv((UV)__atomic_load_n(&hdr->recv_waiters, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "send_waiters", 12, newSVuv((UV)__atomic_load_n(&hdr->send_waiters, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "slot_waiters", 12, newSVuv((UV)__atomic_load_n(&hdr->slot_waiters, __ATOMIC_RELAXED)), 0);
     RETVAL = newRV_noinc((SV *)hv);
   OUTPUT:
     RETVAL
@@ -815,13 +881,16 @@ fileno(self)
   OUTPUT:
     RETVAL
 
-void
+SV *
 eventfd_consume(self)
     SV *self
   PREINIT:
     EXTRACT_HANDLE("Data::ReqRep::Shared::Client", self);
   CODE:
-    reqrep_reply_eventfd_consume(h);
+    int64_t v = reqrep_reply_eventfd_consume(h);
+    RETVAL = (v >= 0) ? newSViv((IV)v) : &PL_sv_undef;
+  OUTPUT:
+    RETVAL
 
 void
 notify(self)
@@ -866,7 +935,6 @@ new(class, path, req_cap, resp_slots)
     ReqRepHandle *h = reqrep_create_int(p, (uint32_t)req_cap, (uint32_t)resp_slots, errbuf);
     if (!h) croak("Data::ReqRep::Shared::Int->new: %s", errbuf);
     MAKE_OBJ(class, h);
-    RETVAL = ref;
   OUTPUT:
     RETVAL
 
@@ -882,7 +950,6 @@ new_memfd(class, name, req_cap, resp_slots)
     ReqRepHandle *h = reqrep_create_int_memfd(name, (uint32_t)req_cap, (uint32_t)resp_slots, errbuf);
     if (!h) croak("Data::ReqRep::Shared::Int->new_memfd: %s", errbuf);
     MAKE_OBJ(class, h);
-    RETVAL = ref;
   OUTPUT:
     RETVAL
 
@@ -896,7 +963,6 @@ new_from_fd(class, fd)
     ReqRepHandle *h = reqrep_open_fd(fd, REQREP_MODE_INT, errbuf);
     if (!h) croak("Data::ReqRep::Shared::Int->new_from_fd: %s", errbuf);
     MAKE_OBJ(class, h);
-    RETVAL = ref;
   OUTPUT:
     RETVAL
 
@@ -913,9 +979,10 @@ memfd(self)
 void
 DESTROY(self)
     SV *self
-  PREINIT:
-    EXTRACT_HANDLE("Data::ReqRep::Shared::Int", self);
   CODE:
+    if (!SvROK(self)) return;
+    ReqRepHandle *h = INT2PTR(ReqRepHandle*, SvIV(SvRV(self)));
+    if (!h) return;
     sv_setiv(SvRV(self), 0);
     reqrep_destroy(h);
 
@@ -1037,10 +1104,10 @@ stats(self)
     hv_store(hv, "replies", 7, newSVuv((UV)__atomic_load_n(&hdr->stat_replies, __ATOMIC_RELAXED)), 0);
     hv_store(hv, "send_full", 9, newSVuv((UV)__atomic_load_n(&hdr->stat_send_full, __ATOMIC_RELAXED)), 0);
     hv_store(hv, "recv_empty", 10, newSVuv(__atomic_load_n(&hdr->stat_recv_empty, __ATOMIC_RELAXED)), 0);
-    hv_store(hv, "recoveries", 10, newSVuv(hdr->stat_recoveries), 0);
-    hv_store(hv, "send_waiters", 12, newSVuv(hdr->send_waiters), 0);
-    hv_store(hv, "recv_waiters", 12, newSVuv(hdr->recv_waiters), 0);
-    hv_store(hv, "slot_waiters", 12, newSVuv(hdr->slot_waiters), 0);
+    hv_store(hv, "recoveries", 10, newSVuv(__atomic_load_n(&hdr->stat_recoveries, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "send_waiters", 12, newSVuv(__atomic_load_n(&hdr->send_waiters, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "recv_waiters", 12, newSVuv(__atomic_load_n(&hdr->recv_waiters, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "slot_waiters", 12, newSVuv(__atomic_load_n(&hdr->slot_waiters, __ATOMIC_RELAXED)), 0);
     RETVAL = newRV_noinc((SV *)hv);
   OUTPUT:
     RETVAL
@@ -1091,13 +1158,16 @@ fileno(self)
   OUTPUT:
     RETVAL
 
-void
+SV *
 eventfd_consume(self)
     SV *self
   PREINIT:
     EXTRACT_HANDLE("Data::ReqRep::Shared::Int", self);
   CODE:
-    reqrep_eventfd_consume(h);
+    int64_t v = reqrep_eventfd_consume(h);
+    RETVAL = (v >= 0) ? newSViv((IV)v) : &PL_sv_undef;
+  OUTPUT:
+    RETVAL
 
 void
 notify(self)
@@ -1137,13 +1207,16 @@ reply_fileno(self)
   OUTPUT:
     RETVAL
 
-void
+SV *
 reply_eventfd_consume(self)
     SV *self
   PREINIT:
     EXTRACT_HANDLE("Data::ReqRep::Shared::Int", self);
   CODE:
-    reqrep_reply_eventfd_consume(h);
+    int64_t v = reqrep_reply_eventfd_consume(h);
+    RETVAL = (v >= 0) ? newSViv((IV)v) : &PL_sv_undef;
+  OUTPUT:
+    RETVAL
 
 void
 reply_notify(self)
@@ -1183,7 +1256,6 @@ new(class, path)
     ReqRepHandle *h = reqrep_open(p, REQREP_MODE_INT, errbuf);
     if (!h) croak("Data::ReqRep::Shared::Int::Client->new: %s", errbuf);
     MAKE_OBJ(class, h);
-    RETVAL = ref;
   OUTPUT:
     RETVAL
 
@@ -1197,7 +1269,6 @@ new_from_fd(class, fd)
     ReqRepHandle *h = reqrep_open_fd(fd, REQREP_MODE_INT, errbuf);
     if (!h) croak("Data::ReqRep::Shared::Int::Client->new_from_fd: %s", errbuf);
     MAKE_OBJ(class, h);
-    RETVAL = ref;
   OUTPUT:
     RETVAL
 
@@ -1214,9 +1285,10 @@ memfd(self)
 void
 DESTROY(self)
     SV *self
-  PREINIT:
-    EXTRACT_HANDLE("Data::ReqRep::Shared::Int::Client", self);
   CODE:
+    if (!SvROK(self)) return;
+    ReqRepHandle *h = INT2PTR(ReqRepHandle*, SvIV(SvRV(self)));
+    if (!h) return;
     sv_setiv(SvRV(self), 0);
     reqrep_destroy(h);
 
@@ -1257,7 +1329,7 @@ get(self, id)
     int64_t value;
   CODE:
     int r = reqrep_int_try_get(h, (uint64_t)id, &value);
-    if (r == -1) croak("invalid slot index");
+    if (r == -1) croak("Data::ReqRep::Shared::Int::Client: invalid slot index");
     RETVAL = (r == 1) ? newSViv((IV)value) : &PL_sv_undef;
   OUTPUT:
     RETVAL
@@ -1273,7 +1345,7 @@ get_wait(self, id, ...)
   CODE:
     if (items > 2) timeout = SvNV(ST(2));
     int r = reqrep_int_get_wait(h, (uint64_t)id, &value, timeout);
-    if (r == -1) croak("invalid slot index");
+    if (r == -1) croak("Data::ReqRep::Shared::Int::Client: invalid slot index");
     RETVAL = (r == 1) ? newSViv((IV)value) : &PL_sv_undef;
   OUTPUT:
     RETVAL
@@ -1387,7 +1459,7 @@ stats(self)
     hv_store(hv, "resp_slots", 10, newSVuv(h->resp_slots), 0);
     hv_store(hv, "requests", 8, newSVuv((UV)__atomic_load_n(&hdr->stat_requests, __ATOMIC_RELAXED)), 0);
     hv_store(hv, "replies", 7, newSVuv((UV)__atomic_load_n(&hdr->stat_replies, __ATOMIC_RELAXED)), 0);
-    hv_store(hv, "recoveries", 10, newSVuv(hdr->stat_recoveries), 0);
+    hv_store(hv, "recoveries", 10, newSVuv(__atomic_load_n(&hdr->stat_recoveries, __ATOMIC_RELAXED)), 0);
     RETVAL = newRV_noinc((SV *)hv);
   OUTPUT:
     RETVAL
@@ -1432,13 +1504,16 @@ fileno(self)
   OUTPUT:
     RETVAL
 
-void
+SV *
 eventfd_consume(self)
     SV *self
   PREINIT:
     EXTRACT_HANDLE("Data::ReqRep::Shared::Int::Client", self);
   CODE:
-    reqrep_reply_eventfd_consume(h);
+    int64_t v = reqrep_reply_eventfd_consume(h);
+    RETVAL = (v >= 0) ? newSViv((IV)v) : &PL_sv_undef;
+  OUTPUT:
+    RETVAL
 
 void
 notify(self)

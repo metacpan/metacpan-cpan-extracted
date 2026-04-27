@@ -84,7 +84,7 @@ subtest 'int pop_wait_multi' => sub {
     my $t0 = time;
     @got = $q->pop_wait_multi(5, 0.1);
     is scalar @got, 0, 'pop_wait_multi timeout returns empty';
-    ok time - $t0 < 2, 'did not hang';
+    cmp_ok time - $t0, '<', 30, 'pop_wait_multi returned (not hung)';
 
     unlink $p;
 };

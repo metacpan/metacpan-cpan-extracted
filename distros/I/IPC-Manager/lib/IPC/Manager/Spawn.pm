@@ -2,7 +2,7 @@ package IPC::Manager::Spawn;
 use strict;
 use warnings;
 
-our $VERSION = '0.000033';
+our $VERSION = '0.000035';
 
 use POSIX();
 use Time::HiRes();
@@ -133,6 +133,17 @@ sub wait {
         eval { $client->disconnect; 1 } or warn $@;
     }
 
+    # Bound the peer-disappear loop.  The poll used to be unbounded with a
+    # 1-second sleep — a wedged service or a slow filesystem on a CPAN
+    # smoker could trap shutdown indefinitely.  After the deadline we stop
+    # waiting for clean disconnect and force the reap path to clean up
+    # whatever pids we've seen.
+    my $peer_timeout = $params{peer_timeout}
+        // $ENV{IPC_MANAGER_SPAWN_PEER_TIMEOUT}
+        // 60;
+    my $peer_deadline = Time::HiRes::time() + $peer_timeout;
+    my @last_found;
+
     while (1) {
         my @found;
         for my $peer ($con->peers) {
@@ -144,6 +155,13 @@ sub wait {
         }
 
         last unless @found;
+        @last_found = @found;
+
+        if (Time::HiRes::time() >= $peer_deadline) {
+            warn "IPC::Manager::Spawn: gave up waiting for clients to disconnect after ${peer_timeout}s: "
+                . join(', ' => sort @found) . "\n";
+            last;
+        }
 
         print STDERR "Waiting for clients to go away: " . join(', ' => sort @found) . "\n" if $self->{+DEBUG};
         sleep 1;
@@ -370,7 +388,16 @@ temporary database.
 
 =item $spawn->wait($con)
 
-Wait for all clients to disconnect.
+=item $spawn->wait($con, peer_timeout => $seconds)
+
+=item $spawn->wait($con, child_pids => \%pids)
+
+Wait for all clients to disconnect, then reap any known child PIDs.
+
+The peer-disconnect poll is bounded by C<peer_timeout> seconds (default
+60, also overridable via C<$ENV{IPC_MANAGER_SPAWN_PEER_TIMEOUT}>); if any
+peers remain registered when the deadline elapses, a warning is emitted
+and shutdown proceeds to the child reap loop instead of polling forever.
 
 =back
 

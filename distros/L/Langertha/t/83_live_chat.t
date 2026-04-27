@@ -20,6 +20,8 @@ BEGIN {
   push @available, 'openrouter'   if $ENV{TEST_LANGERTHA_OPENROUTER_API_KEY};
   push @available, 'nousresearch' if $ENV{TEST_LANGERTHA_NOUSRESEARCH_API_KEY};
   push @available, 'aki'          if $ENV{TEST_LANGERTHA_AKI_API_KEY};
+  push @available, 'tsystems'     if $ENV{TEST_LANGERTHA_TSYSTEMS_API_KEY};
+  push @available, 'scaleway'     if $ENV{TEST_LANGERTHA_SCALEWAY_API_KEY};
   push @available, 'ollama'       if $ENV{TEST_LANGERTHA_OLLAMA_URL};
   push @available, 'ollamaopenai' if $ENV{TEST_LANGERTHA_OLLAMA_URL};
   push @available, 'vllm'         if $ENV{TEST_LANGERTHA_VLLM_URL};
@@ -157,6 +159,22 @@ if ($ENV{TEST_LANGERTHA_AKI_API_KEY}) {
   require Langertha::Engine::AKI;
   test_chat('AKI', Langertha::Engine::AKI->new(
     api_key => $ENV{TEST_LANGERTHA_AKI_API_KEY},
+  ));
+}
+
+# --- TSystems ---
+if ($ENV{TEST_LANGERTHA_TSYSTEMS_API_KEY}) {
+  require Langertha::Engine::TSystems;
+  test_chat('TSystems', Langertha::Engine::TSystems->new(
+    api_key => $ENV{TEST_LANGERTHA_TSYSTEMS_API_KEY},
+  ));
+}
+
+# --- Scaleway ---
+if ($ENV{TEST_LANGERTHA_SCALEWAY_API_KEY}) {
+  require Langertha::Engine::Scaleway;
+  test_chat('Scaleway', Langertha::Engine::Scaleway->new(
+    api_key => $ENV{TEST_LANGERTHA_SCALEWAY_API_KEY},
   ));
 }
 

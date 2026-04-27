@@ -1,0 +1,100 @@
+BATsh 치트 시트 [KO] 한국어
+==============================
+
+BATsh는 같은 스크립트에서 cmd.exe와 bash/sh 구문을 모두 실행할 수 있는
+이중 언어 셸입니다. 각 줄의 첫 번째 토큰이 실행 모드를 결정합니다.
+
+1. 모드 감지
+------------
+  ECHO hello          -> cmd.exe 모드 (첫 번째 토큰이 모두 대문자)
+  echo hello          -> bash/sh 모드 (첫 번째 토큰에 소문자 포함)
+  # 주석              -> 주석 (무시)
+  :: 주석             -> 주석 (CMD 스타일, 무시)
+  REM 주석            -> 주석 (CMD 스타일, 무시)
+
+2. 셸 시작
+----------
+  perl lib/BATsh.pm                    # 대화형 REPL
+  perl lib/BATsh.pm script.batsh       # 스크립트 파일 실행
+  perl lib/BATsh.pm -e "echo hello"    # 인라인 한 줄 명령
+
+  Perl API에서:
+    use BATsh;
+    BATsh->run('script.batsh');
+    BATsh->run_string("echo hello");
+    BATsh->repl();
+
+3. 환경 변수 브리지
+-------------------
+  CMD 블록과 SH 블록은 Perl의 %ENV를 통해 변수를 공유합니다.
+
+  export FOO=hello   # SH가 FOO 설정
+  ECHO %FOO%         # CMD가 브리지를 통해 FOO 읽기 (Windows)
+
+  SET BAR=world      # CMD가 BAR 설정
+  echo $BAR          # SH가 브리지를 통해 BAR 읽기
+
+4. SETLOCAL / ENDLOCAL
+-----------------------
+  SETLOCAL           # %ENV 스냅샷 저장
+  SET TMP=local_val
+  ECHO %TMP%
+  ENDLOCAL           # %ENV 복원 (TMP 사라짐)
+
+  중첩 가능합니다.
+
+5. 중첩 (혼합 모드)
+-------------------
+  블록 구조는 올바르게 쌍을 이루어야 합니다.
+  중첩 블록 내의 혼합 모드 줄이 허용됩니다.
+
+  for x in 1 2; do   # SH가 블록 시작
+      ECHO item $x   # SH 블록 내 CMD 줄 (그대로 전달)
+  done               # SH가 블록 종료
+
+  CMD 키워드: IF/ENDIF  FOR/NEXT  WHILE/WEND  DO/LOOP
+  SH  키워드: if/fi  for/done  while/done  until/done  case/esac  { }
+
+6. 서브루틴 정의
+----------------
+  :GREET
+  echo "Hello $BATSH_ARG1"
+  RET
+
+  레이블은 :로 시작하고 RET 또는 RETURN으로 끝납니다.
+  본문은 실행 전에 추출됩니다 (인라인으로 실행되지 않음).
+
+7. CALL 및 source
+------------------
+  CALL :GREET world      # 인수와 함께 서브루틴 호출
+  CALL other.batsh       # 다른 .batsh 파일 포함/실행 (CMD)
+  source other.batsh     # 다른 .batsh 파일 포함/실행 (SH)
+  . other.batsh          # POSIX 점 표기법
+
+  인수: $BATSH_ARG1 .. $BATSH_ARGn  (CMD에서는 %BATSH_ARG1%)
+  개수: $BATSH_ARGC
+
+8. Perl API
+-----------
+  BATsh->run($file)            # .batsh 파일 실행
+  BATsh->run_string($source)   # 소스 문자열 실행
+  BATsh->run_lines(@lines)     # 줄 배열 실행
+  BATsh->repl()                # 대화형 REPL
+  BATsh->classify_token($tok)  # 'CMD' 또는 'SH' 반환
+  BATsh->setlocal()            # %ENV 스냅샷
+  BATsh->endlocal()            # %ENV 복원
+  BATsh->call_sub($lbl, @args) # 서브루틴 호출
+  BATsh->source_file($file)    # .batsh 파일 포함
+  BATsh->version()             # 버전 문자열
+
+9. 플랫폼 참고 사항
+-------------------
+  Windows: CMD와 SH 모두 순수 Perl로 실행 -- 외부 cmd.exe/bash/sh 불필요.
+  UNIX:    CMD와 SH 모두 순수 Perl로 실행 -- 외부 cmd.exe/bash/sh 불필요.
+
+10. 요구 사항
+-------------
+  Perl 5.005_03 이상. 핵심 모듈만 사용 (File::Spec, Carp).
+  CPAN 의존성 불필요.
+
+참조: https://metacpan.org/dist/BATsh

@@ -1,6 +1,6 @@
 #MIT License
 #
-#Copyright (c) 2024 IP2Location.com
+#Copyright (c) 2026 IP2Location.com
 #
 #Permission is hereby granted, free of charge, to any person obtaining a copy
 #of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ use strict;
 use vars qw(@ISA $VERSION @EXPORT);
 use Math::BigInt;
 
-$VERSION = '3.50';
+$VERSION = '3.61';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -1240,7 +1240,7 @@ This pure Perl module uses a file based IP2Proxy .BIN database available at L<IP
 
 =head1 DESCRIPTION
 
-This Perl module provides quick reverse lookup of IP addresses to detect VPN servers, open proxies, web proxies, Tor exit nodes, search engine robots, data center ranges, residential proxies, consumer privacy networks, and enterprise private networks using IP2Proxy BIN databases. Other available information includes proxy type, country, state, city, ISP, domain name, usage type, AS number, AS name, threat, last seen date, provider name and fraud score.
+This Perl module provides quick reverse lookup of IP addresses to detect VPN servers, open proxies, web proxies, Tor exit nodes, search engine robots, AI crawlers, data center ranges, residential proxies, consumer privacy networks, and enterprise private networks using IP2Proxy BIN databases. Other available information includes proxy type, country, state, city, ISP, domain name, usage type, AS number, AS name, threat, last seen date, provider name and fraud score.
 
 This pure Perl module uses a file based IP2Proxy .BIN database available at L<IP2Proxy Product Page|https://www.ip2location.com/database/ip2proxy> upon subscription. You can visit L<Libraries|https://www.ip2location.com/development-libraries> to download sample BIN files. IP2Proxy supports both IPv4 and IPv6 addressing.
 
@@ -1288,6 +1288,7 @@ Returns the proxy type of proxy's IP address or domain name. Returns "-" if not 
   RES   Residential Proxies. [PX10+]
   CPN   Consumer Privacy Networks. [PX11+]
   EPN   Enterprise Private Networks. [PX11+]
+  AIC   AI Crawlers. [PX12+]
 
 =item $countryshort = $obj->getCountryShort( $ip );
 
@@ -1317,18 +1318,20 @@ Returns the domain name of proxy's IP address or domain name. Returns "-" if not
 
 Returns the ISP's usage type of proxy's IP address or domain name. Returns "-" if not a proxy.
 
-  COM   Commercial
-  ORG   Organization
-  GOV   Government
-  MIL   Military
-  EDU   University/College/School
-  LIB   Library
-  CDN   Content Delivery Network
-  ISP   Fixed Line ISP
-  MOB   Mobile ISP
-  DCH   Data Center/Web Hosting/Transit
-  SES   Search Engine Spider
-  RSV   Reserved
+  COM       Commercial
+  ORG       Organization
+  GOV       Government
+  MIL       Military
+  EDU       University/College/School
+  LIB       Library
+  CDN       Content Delivery Network
+  ISP       Fixed Line ISP
+  MOB       Mobile ISP
+  ISP/MOB   Fixed Line or Mobile ISP
+  DCH       Data Center/Web Hosting/Transit
+  SES       Search Engine Spider
+  SES/AIC   Search Engine Spider / AI Crawlers
+  RSV       Reserved
 
 =item $asn = $obj->getASN( $ip );
 
@@ -1386,11 +1389,11 @@ L<IP2Proxy Product|https://www.ip2location.com/database/ip2proxy>
 
 =head1 VERSION
 
-3.50
+3.61
 
 =head1 AUTHOR
 
-Copyright (c) 2025 IP2Location.com
+Copyright (c) 2026 IP2Location.com
 
 All rights reserved. This package is free software. It is licensed under the MIT. See the LICENSE file for full license information.
 

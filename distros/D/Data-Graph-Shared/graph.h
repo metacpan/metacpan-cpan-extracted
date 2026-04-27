@@ -125,9 +125,12 @@ static inline void graph_mutex_lock(GraphHeader *hdr) {
                               &graph_lock_timeout, NULL, 0);
             if (rc == -1 && errno == ETIMEDOUT && cur >= GRAPH_MUTEX_BIT) {
                 uint32_t pid = cur & GRAPH_MUTEX_PID;
-                if (!graph_pid_alive(pid))
+                if (!graph_pid_alive(pid) &&
                     __atomic_compare_exchange_n(&hdr->mutex, &cur, 0,
-                            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED);
+                            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) {
+                    /* Recovered — wake one waiter so it can proceed. */
+                    syscall(SYS_futex, &hdr->mutex, FUTEX_WAKE, 1, NULL, NULL, 0);
+                }
             }
         }
         __atomic_sub_fetch(&hdr->mutex_waiters, 1, __ATOMIC_RELAXED);
@@ -152,19 +155,19 @@ static inline int graph_bit_set(uint64_t *bm, uint32_t idx) {
 
 static inline int32_t graph_bit_alloc(uint64_t *bm, uint32_t bwords, uint32_t max) {
     for (uint32_t w = 0; w < bwords; w++) {
-        uint64_t word = bm[w];
+        uint64_t word = __atomic_load_n(&bm[w], __ATOMIC_RELAXED);
         if (word == ~(uint64_t)0) continue;
         int bit = __builtin_ctzll(~word);
         uint32_t idx = w * 64 + bit;
         if (idx >= max) return -1;
-        bm[w] |= (uint64_t)1 << bit;
+        __atomic_fetch_or(&bm[w], (uint64_t)1 << bit, __ATOMIC_RELEASE);
         return (int32_t)idx;
     }
     return -1;
 }
 
 static inline void graph_bit_free(uint64_t *bm, uint32_t idx) {
-    bm[idx / 64] &= ~((uint64_t)1 << (idx % 64));
+    __atomic_fetch_and(&bm[idx / 64], ~((uint64_t)1 << (idx % 64)), __ATOMIC_RELEASE);
 }
 
 /* ================================================================
@@ -176,7 +179,7 @@ static inline int32_t graph_add_node_locked(GraphHandle *h, int64_t data) {
     if (idx < 0) return -1;
     h->node_data[idx] = data;
     h->node_heads[idx] = GRAPH_NONE;
-    h->hdr->node_count++;
+    __atomic_fetch_add(&h->hdr->node_count, 1, __ATOMIC_RELAXED);
     return idx;
 }
 
@@ -190,7 +193,7 @@ static inline int graph_add_edge_locked(GraphHandle *h, uint32_t src, uint32_t d
     h->edges[eidx].weight = weight;
     h->edges[eidx].next = h->node_heads[src];
     h->node_heads[src] = (uint32_t)eidx;
-    h->hdr->edge_count++;
+    __atomic_fetch_add(&h->hdr->edge_count, 1, __ATOMIC_RELAXED);
     return 1;
 }
 
@@ -202,13 +205,39 @@ static inline int graph_remove_node_locked(GraphHandle *h, uint32_t node) {
     while (eidx != GRAPH_NONE) {
         uint32_t next = h->edges[eidx].next;
         graph_bit_free(h->edge_bitmap, eidx);
-        h->hdr->edge_count--;
+        __atomic_fetch_sub(&h->hdr->edge_count, 1, __ATOMIC_RELAXED);
         eidx = next;
     }
     h->node_heads[node] = GRAPH_NONE;
     graph_bit_free(h->node_bitmap, node);
-    h->hdr->node_count--;
+    __atomic_fetch_sub(&h->hdr->node_count, 1, __ATOMIC_RELAXED);
     return 1;
+}
+
+/* Like remove_node_locked, but also splices every other node's adjacency
+ * list to drop edges pointing TO `node` (incoming edges). O(N+E). */
+static inline int graph_remove_node_full_locked(GraphHandle *h, uint32_t node) {
+    if (node >= h->hdr->max_nodes) return 0;
+    if (!graph_bit_set(h->node_bitmap, node)) return 0;
+    uint32_t max_n = h->hdr->max_nodes;
+    for (uint32_t src = 0; src < max_n; src++) {
+        if (src == node) continue;
+        if (!graph_bit_set(h->node_bitmap, src)) continue;
+        uint32_t *slot = &h->node_heads[src];
+        uint32_t eidx = *slot;
+        while (eidx != GRAPH_NONE) {
+            uint32_t next = h->edges[eidx].next;
+            if (h->edges[eidx].dst == node) {
+                *slot = next;
+                graph_bit_free(h->edge_bitmap, eidx);
+                __atomic_fetch_sub(&h->hdr->edge_count, 1, __ATOMIC_RELAXED);
+            } else {
+                slot = &h->edges[eidx].next;
+            }
+            eidx = next;
+        }
+    }
+    return graph_remove_node_locked(h, node);
 }
 
 /* ================================================================
@@ -218,7 +247,7 @@ static inline int graph_remove_node_locked(GraphHandle *h, uint32_t node) {
 static inline int32_t graph_add_node(GraphHandle *h, int64_t data) {
     graph_mutex_lock(h->hdr);
     int32_t r = graph_add_node_locked(h, data);
-    h->hdr->stat_ops++;
+    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     graph_mutex_unlock(h->hdr);
     return r;
 }
@@ -226,7 +255,7 @@ static inline int32_t graph_add_node(GraphHandle *h, int64_t data) {
 static inline int graph_add_edge(GraphHandle *h, uint32_t src, uint32_t dst, int64_t weight) {
     graph_mutex_lock(h->hdr);
     int r = graph_add_edge_locked(h, src, dst, weight);
-    h->hdr->stat_ops++;
+    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     graph_mutex_unlock(h->hdr);
     return r;
 }
@@ -234,7 +263,15 @@ static inline int graph_add_edge(GraphHandle *h, uint32_t src, uint32_t dst, int
 static inline int graph_remove_node(GraphHandle *h, uint32_t node) {
     graph_mutex_lock(h->hdr);
     int r = graph_remove_node_locked(h, node);
-    h->hdr->stat_ops++;
+    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
+    graph_mutex_unlock(h->hdr);
+    return r;
+}
+
+static inline int graph_remove_node_full(GraphHandle *h, uint32_t node) {
+    graph_mutex_lock(h->hdr);
+    int r = graph_remove_node_full_locked(h, node);
+    __atomic_fetch_add(&h->hdr->stat_ops, 1, __ATOMIC_RELAXED);
     graph_mutex_unlock(h->hdr);
     return r;
 }
@@ -244,28 +281,12 @@ static inline int graph_has_node(GraphHandle *h, uint32_t node) {
     return graph_bit_set(h->node_bitmap, node);
 }
 
-static inline int64_t graph_node_data(GraphHandle *h, uint32_t node) {
-    return h->node_data[node];
-}
-
-static inline void graph_set_node_data(GraphHandle *h, uint32_t node, int64_t data) {
-    graph_mutex_lock(h->hdr);
-    h->node_data[node] = data;
-    graph_mutex_unlock(h->hdr);
-}
-
-/* Returns count of neighbors written to out_dst/out_weight (up to max_out).
- * Call with out_dst=NULL to just count. */
-static inline uint32_t graph_neighbors(GraphHandle *h, uint32_t node,
-                                        uint32_t *out_dst, int64_t *out_weight,
-                                        uint32_t max_out) {
+/* Caller must hold graph_mutex and have verified node is live via bitmap. */
+static inline uint32_t graph_degree(GraphHandle *h, uint32_t node) {
+    if (node >= h->hdr->max_nodes) return 0;
     uint32_t count = 0;
     uint32_t eidx = h->node_heads[node];
     while (eidx != GRAPH_NONE) {
-        if (out_dst && count < max_out) {
-            out_dst[count] = h->edges[eidx].dst;
-            out_weight[count] = h->edges[eidx].weight;
-        }
         count++;
         eidx = h->edges[eidx].next;
     }
@@ -278,6 +299,90 @@ static inline uint32_t graph_neighbors(GraphHandle *h, uint32_t node,
 
 #define GRAPH_ERR(fmt, ...) do { if (errbuf) snprintf(errbuf, GRAPH_ERR_BUFLEN, fmt, ##__VA_ARGS__); } while(0)
 
+static inline uint64_t graph_total_size(uint32_t max_nodes, uint32_t max_edges) {
+    uint32_t nb = (max_nodes + 63) / 64;
+    uint32_t eb = (max_edges + 63) / 64;
+    uint64_t node_data_off   = sizeof(GraphHeader);
+    uint64_t node_heads_off  = node_data_off + (uint64_t)max_nodes * sizeof(int64_t);
+    uint64_t node_bitmap_off = node_heads_off + (uint64_t)max_nodes * sizeof(uint32_t);
+    uint64_t edge_data_off   = node_bitmap_off + (uint64_t)nb * 8;
+    uint64_t edge_bitmap_off = edge_data_off + (uint64_t)max_edges * sizeof(GraphEdge);
+    return edge_bitmap_off + (uint64_t)eb * 8;
+}
+
+static inline void graph_init_header(void *base, uint32_t max_nodes, uint32_t max_edges,
+                                      uint64_t total) {
+    uint32_t nb = (max_nodes + 63) / 64;
+    uint64_t node_data_off   = sizeof(GraphHeader);
+    uint64_t node_heads_off  = node_data_off + (uint64_t)max_nodes * sizeof(int64_t);
+    uint64_t node_bitmap_off = node_heads_off + (uint64_t)max_nodes * sizeof(uint32_t);
+    uint64_t edge_data_off   = node_bitmap_off + (uint64_t)nb * 8;
+    uint64_t edge_bitmap_off = edge_data_off + (uint64_t)max_edges * sizeof(GraphEdge);
+
+    GraphHeader *hdr = (GraphHeader *)base;
+    memset(base, 0, (size_t)total);
+    hdr->magic           = GRAPH_MAGIC;
+    hdr->version         = GRAPH_VERSION;
+    hdr->max_nodes       = max_nodes;
+    hdr->max_edges       = max_edges;
+    hdr->total_size      = total;
+    hdr->node_data_off   = node_data_off;
+    hdr->node_heads_off  = node_heads_off;
+    hdr->node_bitmap_off = node_bitmap_off;
+    hdr->edge_data_off   = edge_data_off;
+    hdr->edge_bitmap_off = edge_bitmap_off;
+    uint32_t *heads = (uint32_t *)((uint8_t *)base + node_heads_off);
+    for (uint32_t i = 0; i < max_nodes; i++) heads[i] = GRAPH_NONE;
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
+}
+
+static inline GraphHandle *graph_setup(void *base, size_t map_size,
+                                        const char *path, int backing_fd) {
+    GraphHeader *hdr = (GraphHeader *)base;
+    GraphHandle *h = (GraphHandle *)calloc(1, sizeof(GraphHandle));
+    if (!h) {
+        munmap(base, map_size);
+        if (backing_fd >= 0) close(backing_fd);
+        return NULL;
+    }
+    h->hdr          = hdr;
+    h->node_data    = (int64_t *)((uint8_t *)base + hdr->node_data_off);
+    h->node_heads   = (uint32_t *)((uint8_t *)base + hdr->node_heads_off);
+    h->node_bitmap  = (uint64_t *)((uint8_t *)base + hdr->node_bitmap_off);
+    h->edges        = (GraphEdge *)((uint8_t *)base + hdr->edge_data_off);
+    h->edge_bitmap  = (uint64_t *)((uint8_t *)base + hdr->edge_bitmap_off);
+    h->node_bwords  = (hdr->max_nodes + 63) / 64;
+    h->edge_bwords  = (hdr->max_edges + 63) / 64;
+    h->mmap_size    = map_size;
+    h->path         = path ? strdup(path) : NULL;
+    h->notify_fd    = -1;
+    h->backing_fd   = backing_fd;
+    return h;
+}
+
+/* Validate a mapped header (shared by graph_create reopen and graph_open_fd). */
+static inline int graph_validate_header(const GraphHeader *hdr, uint64_t file_size) {
+    if (hdr->magic != GRAPH_MAGIC) return 0;
+    if (hdr->version != GRAPH_VERSION) return 0;
+    if (hdr->max_nodes == 0 || hdr->max_edges == 0) return 0;
+    if (hdr->max_nodes > 0x7FFFFFFFu || hdr->max_edges > 0x7FFFFFFFu) return 0;
+    if (hdr->total_size != file_size) return 0;
+    if (hdr->total_size != graph_total_size(hdr->max_nodes, hdr->max_edges)) return 0;
+
+    uint32_t nb = (hdr->max_nodes + 63) / 64;
+    uint64_t exp_node_data   = sizeof(GraphHeader);
+    uint64_t exp_node_heads  = exp_node_data  + (uint64_t)hdr->max_nodes * sizeof(int64_t);
+    uint64_t exp_node_bitmap = exp_node_heads + (uint64_t)hdr->max_nodes * sizeof(uint32_t);
+    uint64_t exp_edge_data   = exp_node_bitmap + (uint64_t)nb * 8;
+    uint64_t exp_edge_bitmap = exp_edge_data   + (uint64_t)hdr->max_edges * sizeof(GraphEdge);
+    if (hdr->node_data_off   != exp_node_data)   return 0;
+    if (hdr->node_heads_off  != exp_node_heads)  return 0;
+    if (hdr->node_bitmap_off != exp_node_bitmap) return 0;
+    if (hdr->edge_data_off   != exp_edge_data)   return 0;
+    if (hdr->edge_bitmap_off != exp_edge_bitmap) return 0;
+    return 1;
+}
+
 static GraphHandle *graph_create(const char *path, uint32_t max_nodes, uint32_t max_edges,
                                   char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
@@ -286,16 +391,7 @@ static GraphHandle *graph_create(const char *path, uint32_t max_nodes, uint32_t 
     if (max_nodes > UINT32_MAX - 63) { GRAPH_ERR("max_nodes too large"); return NULL; }
     if (max_edges > UINT32_MAX - 63) { GRAPH_ERR("max_edges too large"); return NULL; }
 
-    uint32_t nb = (max_nodes + 63) / 64;
-    uint32_t eb = (max_edges + 63) / 64;
-
-    uint64_t node_data_off   = sizeof(GraphHeader);
-    uint64_t node_heads_off  = node_data_off + (uint64_t)max_nodes * sizeof(int64_t);
-    uint64_t node_bitmap_off = node_heads_off + (uint64_t)max_nodes * sizeof(uint32_t);
-    uint64_t edge_data_off   = node_bitmap_off + (uint64_t)nb * 8;
-    uint64_t edge_bitmap_off = edge_data_off + (uint64_t)max_edges * sizeof(GraphEdge);
-    uint64_t total           = edge_bitmap_off + (uint64_t)eb * 8;
-
+    uint64_t total = graph_total_size(max_nodes, max_edges);
     int anonymous = (path == NULL);
     int fd = -1;
     size_t map_size;
@@ -312,6 +408,10 @@ static GraphHandle *graph_create(const char *path, uint32_t max_nodes, uint32_t 
         struct stat st;
         if (fstat(fd, &st) < 0) { GRAPH_ERR("fstat: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
         int is_new = (st.st_size == 0);
+        if (!is_new && (uint64_t)st.st_size < sizeof(GraphHeader)) {
+            GRAPH_ERR("%s: file too small (%lld)", path, (long long)st.st_size);
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
             GRAPH_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
@@ -319,55 +419,53 @@ static GraphHandle *graph_create(const char *path, uint32_t max_nodes, uint32_t 
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
         if (base == MAP_FAILED) { GRAPH_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
         if (!is_new) {
-            GraphHeader *hdr = (GraphHeader *)base;
-            if (hdr->magic != GRAPH_MAGIC || hdr->version != GRAPH_VERSION ||
-                hdr->total_size != (uint64_t)st.st_size) {
+            if (!graph_validate_header((GraphHeader *)base, (uint64_t)st.st_size)) {
                 GRAPH_ERR("invalid graph file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN); close(fd);
-            goto setup;
+            return graph_setup(base, map_size, path, -1);
         }
     }
-
-    {
-        GraphHeader *hdr = (GraphHeader *)base;
-        memset(base, 0, (size_t)total);
-        hdr->magic           = GRAPH_MAGIC;
-        hdr->version         = GRAPH_VERSION;
-        hdr->max_nodes       = max_nodes;
-        hdr->max_edges       = max_edges;
-        hdr->total_size      = total;
-        hdr->node_data_off   = node_data_off;
-        hdr->node_heads_off  = node_heads_off;
-        hdr->node_bitmap_off = node_bitmap_off;
-        hdr->edge_data_off   = edge_data_off;
-        hdr->edge_bitmap_off = edge_bitmap_off;
-        /* init all node heads to GRAPH_NONE */
-        uint32_t *heads = (uint32_t *)((uint8_t *)base + node_heads_off);
-        for (uint32_t i = 0; i < max_nodes; i++) heads[i] = GRAPH_NONE;
-        __atomic_thread_fence(__ATOMIC_SEQ_CST);
-    }
+    graph_init_header(base, max_nodes, max_edges, total);
     if (fd >= 0) { flock(fd, LOCK_UN); close(fd); }
+    return graph_setup(base, map_size, path, -1);
+}
 
-setup:;
-    {
-        GraphHeader *hdr = (GraphHeader *)base;
-        GraphHandle *h = (GraphHandle *)calloc(1, sizeof(GraphHandle));
-        if (!h) { munmap(base, map_size); return NULL; }
-        h->hdr          = hdr;
-        h->node_data    = (int64_t *)((uint8_t *)base + hdr->node_data_off);
-        h->node_heads   = (uint32_t *)((uint8_t *)base + hdr->node_heads_off);
-        h->node_bitmap  = (uint64_t *)((uint8_t *)base + hdr->node_bitmap_off);
-        h->edges        = (GraphEdge *)((uint8_t *)base + hdr->edge_data_off);
-        h->edge_bitmap  = (uint64_t *)((uint8_t *)base + hdr->edge_bitmap_off);
-        h->node_bwords  = (hdr->max_nodes + 63) / 64;
-        h->edge_bwords  = (hdr->max_edges + 63) / 64;
-        h->mmap_size    = map_size;
-        h->path         = path ? strdup(path) : NULL;
-        h->notify_fd    = -1;
-        h->backing_fd   = -1;
-        return h;
+static GraphHandle *graph_create_memfd(const char *name, uint32_t max_nodes, uint32_t max_edges,
+                                        char *errbuf) {
+    if (errbuf) errbuf[0] = '\0';
+    if (max_nodes == 0) { GRAPH_ERR("max_nodes must be > 0"); return NULL; }
+    if (max_edges == 0) { GRAPH_ERR("max_edges must be > 0"); return NULL; }
+    if (max_nodes > UINT32_MAX - 63 || max_edges > UINT32_MAX - 63) {
+        GRAPH_ERR("max_nodes/max_edges too large"); return NULL;
     }
+    uint64_t total = graph_total_size(max_nodes, max_edges);
+    int fd = memfd_create(name ? name : "graph", MFD_CLOEXEC | MFD_ALLOW_SEALING);
+    if (fd < 0) { GRAPH_ERR("memfd_create: %s", strerror(errno)); return NULL; }
+    if (ftruncate(fd, (off_t)total) < 0) {
+        GRAPH_ERR("ftruncate: %s", strerror(errno)); close(fd); return NULL;
+    }
+    (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
+    void *base = mmap(NULL, (size_t)total, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+    if (base == MAP_FAILED) { GRAPH_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
+    graph_init_header(base, max_nodes, max_edges, total);
+    return graph_setup(base, (size_t)total, NULL, fd);
+}
+
+static GraphHandle *graph_open_fd(int fd, char *errbuf) {
+    if (errbuf) errbuf[0] = '\0';
+    struct stat st;
+    if (fstat(fd, &st) < 0) { GRAPH_ERR("fstat: %s", strerror(errno)); return NULL; }
+    if ((uint64_t)st.st_size < sizeof(GraphHeader)) { GRAPH_ERR("too small"); return NULL; }
+    size_t ms = (size_t)st.st_size;
+    void *base = mmap(NULL, ms, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+    if (base == MAP_FAILED) { GRAPH_ERR("mmap: %s", strerror(errno)); return NULL; }
+    if (!graph_validate_header((GraphHeader *)base, (uint64_t)st.st_size)) {
+        GRAPH_ERR("invalid graph"); munmap(base, ms); return NULL;
+    }
+    int myfd = fcntl(fd, F_DUPFD_CLOEXEC, 0);
+    if (myfd < 0) { GRAPH_ERR("fcntl: %s", strerror(errno)); munmap(base, ms); return NULL; }
+    return graph_setup(base, ms, NULL, myfd);
 }
 
 static void graph_destroy(GraphHandle *h) {
@@ -377,6 +475,32 @@ static void graph_destroy(GraphHandle *h) {
     if (h->hdr) munmap(h->hdr, h->mmap_size);
     free(h->path);
     free(h);
+}
+
+static inline int graph_msync(GraphHandle *h) {
+    if (!h || !h->hdr) return 0;
+    return msync(h->hdr, h->mmap_size, MS_SYNC);
+}
+
+static int graph_create_eventfd(GraphHandle *h) {
+    if (h->notify_fd >= 0) return h->notify_fd;
+    int efd = eventfd(0, EFD_NONBLOCK|EFD_CLOEXEC);
+    if (efd < 0) return -1;
+    h->notify_fd = efd;
+    return efd;
+}
+
+static int graph_notify(GraphHandle *h) {
+    if (h->notify_fd < 0) return 0;
+    uint64_t v = 1;
+    return write(h->notify_fd, &v, sizeof(v)) == sizeof(v);
+}
+
+static int64_t graph_eventfd_consume(GraphHandle *h) {
+    if (h->notify_fd < 0) return -1;
+    uint64_t v = 0;
+    if (read(h->notify_fd, &v, sizeof(v)) != sizeof(v)) return -1;
+    return (int64_t)v;
 }
 
 #endif /* GRAPH_H */

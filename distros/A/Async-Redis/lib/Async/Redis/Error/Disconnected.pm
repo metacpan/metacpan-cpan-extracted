@@ -4,8 +4,6 @@ use strict;
 use warnings;
 use 5.018;
 
-our $VERSION = '0.001';
-
 use parent 'Async::Redis::Error';
 
 sub queue_size { shift->{queue_size} }
@@ -20,14 +18,15 @@ Async::Redis::Error::Disconnected - Disconnected exception
 
 =head1 DESCRIPTION
 
-Thrown when a command is issued while disconnected and the
-command queue is full (cannot queue for later execution).
+Thrown when an operation cannot proceed because the client, pool, or socket is
+disconnected. Examples include issuing a command without an active connection
+when reconnect is disabled, pool shutdown, or a fatal reader failure.
 
 =head1 ATTRIBUTES
 
 =over 4
 
-=item queue_size - Current size of command queue
+=item queue_size - Legacy field for callers that track queued work
 
 =back
 

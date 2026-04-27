@@ -1,11 +1,13 @@
 package Langertha::Engine::Ollama;
 # ABSTRACT: Ollama API
-our $VERSION = '0.404';
+our $VERSION = '0.500';
 use Moose;
 use File::ShareDir::ProjectDistDir qw( :all );
 use Carp qw( croak );
 use JSON::MaybeXS;
 use Module::Runtime qw( use_module );
+use Langertha::Response;
+use Langertha::ToolCall;
 
 use Langertha::Engine::OllamaOpenAI;
 
@@ -22,6 +24,7 @@ with map { 'Langertha::Role::'.$_ } qw(
   KeepAlive
   Chat
   Embedding
+  ResponseFormat
   Streaming
   Tools
 );
@@ -84,11 +87,31 @@ sub embedding_response {
 
 sub chat_request {
   my ( $self, $messages, %extra ) = @_;
+
+  # Translate response_format -> Ollama's format parameter. Ollama
+  # accepts either the literal string 'json' or a JSON-Schema HashRef.
+  # Fall back to legacy json_format attribute when response_format is
+  # not set.
+  my $format;
+  if ( $self->has_response_format ) {
+    my $rf = $self->response_format;
+    my $type = ref($rf) eq 'HASH' ? ( $rf->{type} // '' ) : '';
+    if ( $type eq 'json_object' ) {
+      $format = 'json';
+    }
+    elsif ( $type eq 'json_schema'
+        && ref( $rf->{json_schema} ) eq 'HASH'
+        && ref( $rf->{json_schema}{schema} ) eq 'HASH' ) {
+      $format = $rf->{json_schema}{schema};
+    }
+  }
+  $format = 'json' if !defined $format && $self->json_format;
+
   return $self->generate_request( chat => sub { $self->chat_response(shift) },
     model => $self->chat_model,
     messages => $messages,
     stream => JSON->false,
-    $self->json_format ? ( format => 'json' ) : (),
+    defined $format ? ( format => $format ) : (),
     defined $self->get_keep_alive ? ( keep_alive => $self->get_keep_alive ) : (),
     options => {
       $self->has_temperature ? ( temperature => $self->temperature ) : (),
@@ -118,7 +141,7 @@ sub chat_response {
   }
   $timing = undef unless %$timing;
 
-  require Langertha::Response;
+  my @tcs = Langertha::ToolCall->extract($data);
   return Langertha::Response->new(
     content       => $msg->{content} // '',
     raw           => $data,
@@ -127,6 +150,7 @@ sub chat_response {
     $usage ? ( usage => $usage ) : (),
     $timing ? ( timing => $timing ) : (),
     $data->{created_at} ? ( created => $data->{created_at} ) : (),
+    @tcs ? ( tool_calls => [ @tcs ] ) : (),
   );
 }
 
@@ -309,7 +333,7 @@ Langertha::Engine::Ollama - Ollama API
 
 =head1 VERSION
 
-version 0.404
+version 0.500
 
 =head1 SYNOPSIS
 

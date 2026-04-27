@@ -1,6 +1,6 @@
 package Langertha::ToolCall;
 # ABSTRACT: Immutable canonical tool invocation emitted by an LLM
-our $VERSION = '0.404';
+our $VERSION = '0.500';
 use Moose;
 use JSON::MaybeXS qw( encode_json decode_json );
 
@@ -22,6 +22,18 @@ has id => (
   isa     => 'Str',
   default => '',
 );
+
+# True when this call was synthesized by Langertha (e.g. forced-tool
+# rewrite via response_format on engines without native named-tool
+# forcing) rather than emitted directly by the model. Useful for
+# callers that want to distinguish "the model decided to call this"
+# from "we asked it to and parsed the result back into a tool_call".
+has synthetic => (
+  is      => 'ro',
+  isa     => 'Bool',
+  default => 0,
+);
+
 
 sub _decode_args {
   my ($args) = @_;
@@ -75,6 +87,22 @@ sub from_ollama {
   );
 }
 
+# Gemini: a single functionCall part inside candidates[0].content.parts[]:
+#   { "functionCall": { "name": "x", "args": { ... } } }
+sub from_gemini {
+  my ($class, $part) = @_;
+  return undef unless ref($part) eq 'HASH';
+  my $fc = $part->{functionCall};
+  return undef unless ref($fc) eq 'HASH';
+  my $name = $fc->{name} // '';
+  return undef unless length $name;
+  return $class->new(
+    name      => $name,
+    arguments => ( ref( $fc->{args} ) eq 'HASH' ? $fc->{args} : {} ),
+    id        => ( $fc->{id} // '' ),
+  );
+}
+
 # Pull every tool call out of an upstream response, in any of the formats
 # we know about. Returns a list of ToolCall objects (possibly empty).
 sub extract {
@@ -98,6 +126,14 @@ sub extract {
   # Anthropic shape: content[*] where type=tool_use
   if ( ref( $raw->{content} ) eq 'ARRAY' ) {
     return grep { defined } map { $class->from_anthropic($_) } @{ $raw->{content} };
+  }
+
+  # Gemini shape: candidates[0].content.parts[*].functionCall
+  if ( ref( $raw->{candidates} ) eq 'ARRAY'
+    && ref( $raw->{candidates}[0]{content}{parts} ) eq 'ARRAY' ) {
+    return grep { defined }
+      map { $class->from_gemini($_) }
+      @{ $raw->{candidates}[0]{content}{parts} };
   }
 
   return ();
@@ -184,7 +220,15 @@ Langertha::ToolCall - Immutable canonical tool invocation emitted by an LLM
 
 =head1 VERSION
 
-version 0.404
+version 0.500
+
+=head2 synthetic
+
+Boolean. True when the tool call was synthesized by Langertha — for
+example when L<Langertha::Role::Chat/chat_f> rewrote a forced named
+tool into a C<response_format> JSON Schema request and parsed the
+output back into a C<ToolCall>. False (the default) for native model
+output.
 
 =head1 SUPPORT
 

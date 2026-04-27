@@ -2,7 +2,7 @@ package Data::Buffer::Shared::F64;
 use strict;
 use warnings;
 use Data::Buffer::Shared;
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 sub import {
     $^H{"Data::Buffer::Shared::F64/buf_f64_get"} = 1;
@@ -23,4 +23,5 @@ sub import {
     $^H{"Data::Buffer::Shared::F64/buf_f64_set_raw"} = 1;
 }
 
+*memfd = \&fd;
 1;

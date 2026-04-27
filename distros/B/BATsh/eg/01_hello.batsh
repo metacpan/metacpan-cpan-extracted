@@ -1,0 +1,10 @@
+# BATsh example 01: Hello World
+# Run: perl lib/BATsh.pm eg/01_hello.batsh
+# No external shell needed -- BATsh::SH and BATsh::CMD handle everything.
+
+echo "Hello from SH mode (BATsh::SH)"
+
+@ECHO OFF
+ECHO Hello from CMD mode (BATsh::CMD)
+
+echo "Done."

@@ -126,49 +126,56 @@ subtest '_handle_fatal_error fires on_error with subscription as first arg' => s
     like($args_seen[1], qr/oops/, 'second arg is error');
 };
 
-subtest '_dispatch_frame routes to on_message when set' => sub {
+subtest '_dispatch_frame queues message in callback mode (driver consumes)' => sub {
+    # After the unified-reader refactor, _dispatch_frame always queues
+    # regardless of mode. The callback driver (_start_driver) dequeues and
+    # invokes _on_message; _dispatch_frame is mode-agnostic.
     my $redis = Async::Redis->new(host => 'localhost');
     my $sub = Async::Redis::Subscription->new(redis => $redis);
 
-    my $seen;
-    $sub->on_message(sub { $seen = $_[1]; 'cb-return' });
+    $sub->on_message(sub { 1 });   # set callback mode
 
     my $frame = [ 'message', 'chan', 'payload' ];
     my $result = $sub->_dispatch_frame($frame);
 
-    is($seen->{type},    'message', 'callback received type');
-    is($seen->{channel}, 'chan',    'callback received channel');
-    is($seen->{data},    'payload', 'callback received data');
-    is($seen->{pattern}, undef,     'pattern is undef on non-pmessage');
-    is($result,          'cb-return', 'dispatch returns callback result');
+    # Message must be in the queue for the driver to dequeue.
+    is(scalar @{$sub->{_pending_messages}}, 1, 'message buffered in queue');
+    is($sub->{_pending_messages}[0]{type},    'message', 'correct type');
+    is($sub->{_pending_messages}[0]{channel}, 'chan',    'correct channel');
+    is($sub->{_pending_messages}[0]{data},    'payload', 'correct data');
+    # _dispatch_frame returns undef (no Future) when queued synchronously.
+    is($result, undef, 'dispatch returns undef (queued synchronously)');
 };
 
-subtest '_dispatch_frame returns Future when callback returns Future (backpressure signal)' => sub {
-    my $redis = Async::Redis->new(host => 'localhost');
+subtest '_dispatch_frame: depth backpressure applies in callback mode too' => sub {
+    # Backpressure Future is returned when queue is at depth — same path
+    # in both modes since _dispatch_frame is now mode-agnostic.
+    my $redis = bless { message_queue_depth => 1 }, 'Async::Redis';
     my $sub = Async::Redis::Subscription->new(redis => $redis);
 
-    my $gate = Future->new;
-    $sub->on_message(sub { $gate });
+    $sub->on_message(sub { 1 });   # set callback mode
 
-    my $frame = [ 'message', 'chan', 'payload' ];
-    my $result = $sub->_dispatch_frame($frame);
+    # First message fills the queue.
+    my $r1 = $sub->_dispatch_frame([ 'message', 'ch', 'v1' ]);
+    is($r1, undef, 'first dispatch returns undef (queued)');
+    is(scalar @{$sub->{_pending_messages}}, 1, 'queue at depth');
 
-    ok(Scalar::Util::blessed($result) && $result->isa('Future'),
-        '_dispatch_frame returns callback Future through _invoke_user_callback');
-    is($result, $gate, 'returned Future is the one the callback returned');
-    ok(!$result->is_ready, 'Future is still pending');
+    # Second message exceeds depth — should return a Future.
+    my $r2 = $sub->_dispatch_frame([ 'message', 'ch', 'v2' ]);
+    ok(ref($r2) && $r2->isa('Future'), 'second dispatch returns Future (at depth)');
+    is(scalar @{$sub->{_pending_messages}}, 1, 'queue still at depth (v2 held)');
 };
 
-subtest '_dispatch_frame falls through to _deliver_message when no callback' => sub {
+subtest '_dispatch_frame queues message for iterator consumers when no callback' => sub {
     my $redis = Async::Redis->new(host => 'localhost');
     my $sub = Async::Redis::Subscription->new(redis => $redis);
 
     my $frame = [ 'message', 'chan', 'payload' ];
     my $result = $sub->_dispatch_frame($frame);
 
-    # With no callback, the message is buffered for next() consumers
-    is(scalar @{$sub->{_message_queue}}, 1, 'message buffered in queue');
-    is($sub->{_message_queue}[0]{data}, 'payload', 'buffered message data');
+    # With no callback, the message is queued for next() consumers.
+    is(scalar @{$sub->{_pending_messages}}, 1, 'message buffered in queue');
+    is($sub->{_pending_messages}[0]{data}, 'payload', 'buffered message data');
     is($result, undef, 'dispatch returns undef on fallthrough');
 };
 

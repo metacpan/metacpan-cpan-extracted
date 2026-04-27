@@ -1,5 +1,12 @@
 Revision history for Data::Pool::Shared
 
+0.03  2026-04-26
+    - -Duselongdouble test fix (RT#176378)
+    - fd validation hardening
+    - stat recoveries uint64 t
+    - idempotent eventfd; aarch64 CI matrix
+
+
 0.02  2026-04-13
     - Add SEE ALSO cross-links to all family modules
     - Fix eventfd_set self-assignment guard

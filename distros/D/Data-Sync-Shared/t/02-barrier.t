@@ -68,16 +68,22 @@ is $bar->arrived, 0, 'arrived starts at 0';
     my $t0 = time;
     my $r = $b->wait(0.2);
     is $r, -1, 'wait timeout returns -1';
-    ok time - $t0 < 2, 'did not hang';
+    cmp_ok time - $t0, '<', 30, 'wait returned (not hung)';
 }
 
-# Timeout resets arrived count (barrier stays usable)
+# Timeout breaks the barrier; reset() restores usability.
+# New semantics (pthread_barrier_t-style): timeout permanently breaks the
+# barrier. All subsequent wait() calls return -1 until reset() is called.
 {
     my $b = Data::Sync::Shared::Barrier->new(undef, 2);
-    $b->wait(0.1);  # times out, arrived should be reset
-    is $b->arrived, 0, 'timeout resets arrived count';
+    is $b->wait(0.1), -1, 'timeout returns -1';
+    ok $b->is_broken, 'barrier is broken after timeout';
+    is $b->wait(0.1), -1, 'subsequent wait on broken barrier returns -1';
 
-    # Barrier should still be usable
+    $b->reset;
+    ok !$b->is_broken, 'reset clears broken state';
+    is $b->arrived, 0, 'reset clears arrived count';
+
     my $pid = fork // die "fork: $!";
     if ($pid == 0) {
         $b->wait(5.0);
@@ -85,7 +91,7 @@ is $bar->arrived, 0, 'arrived starts at 0';
     }
     my $r = $b->wait(5.0);
     waitpid($pid, 0);
-    is $? >> 8, 0, 'barrier usable after timeout';
+    is $? >> 8, 0, 'barrier usable after reset';
 }
 
 # wait(0) is non-blocking

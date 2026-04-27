@@ -122,7 +122,7 @@ like $@, qr/Usage/, 'class unlink without path croaks';
     my $ok = 1;
     for my $pid (@pids) {
         waitpid($pid, 0);
-        $ok = 0 if ($? >> 8) != 0;
+        $ok = 0 if $? != 0;
     }
 
     ok $ok, 'concurrent open: 5 processes opened same file';

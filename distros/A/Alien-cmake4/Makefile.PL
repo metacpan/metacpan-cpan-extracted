@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
 		'Test::More' => 0,
 		'Test::NoWarnings' => 0,
 	},
-	'VERSION' => '0.01',
+	'VERSION' => '0.02',
 	'test' => {
 		'RECURSIVE_TEST_FILES' => 1,
 	}

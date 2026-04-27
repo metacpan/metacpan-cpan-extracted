@@ -39,7 +39,7 @@ for my $w (1..$WORKERS) {
 my $fails = 0;
 for (@pids) {
     waitpid($_, 0);
-    $fails++ if ($? >> 8) != 0;
+    $fails++ if $? != 0;
 }
 my $dt = time - $t0;
 
@@ -74,7 +74,7 @@ for my $w (1..$WORKERS) {
 $fails = 0;
 for (@pids) {
     waitpid($_, 0);
-    $fails++ if ($? >> 8) != 0;
+    $fails++ if $? != 0;
 }
 $dt = time - $t0;
 
@@ -112,7 +112,7 @@ for my $w (1..$WORKERS) {
 $fails = 0;
 for (@pids) {
     waitpid($_, 0);
-    $fails++ if ($? >> 8) != 0;
+    $fails++ if $? != 0;
 }
 $dt = time - $t0;
 

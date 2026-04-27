@@ -1,7 +1,8 @@
 package Langertha::Stream::Chunk;
 # ABSTRACT: Represents a single chunk from a streaming response
-our $VERSION = '0.404';
+our $VERSION = '0.500';
 use Moose;
+use Langertha::ToolCall;
 
 
 has content => (
@@ -45,6 +46,13 @@ has usage => (
   predicate => 'has_usage',
 );
 
+has tool_calls => (
+  is        => 'ro',
+  isa       => 'Maybe[ArrayRef[Langertha::ToolCall]]',
+  predicate => 'has_tool_calls',
+);
+
+
 
 
 __PACKAGE__->meta->make_immutable;
@@ -63,7 +71,7 @@ Langertha::Stream::Chunk - Represents a single chunk from a streaming response
 
 =head1 VERSION
 
-version 0.404
+version 0.500
 
 =head1 SYNOPSIS
 
@@ -110,6 +118,14 @@ to check availability.
 The reason the stream ended: C<stop>, C<length>, C<tool_calls>, etc.
 Provider-specific values are preserved as-is. C<undef> on non-final chunks.
 Use C<has_finish_reason> to check availability.
+
+=head2 tool_calls
+
+Optional ArrayRef of L<Langertha::ToolCall> objects associated with
+this chunk. Populated when the engine emits tool-call information
+mid-stream (e.g. Anthropic's C<content_block_stop> for a C<tool_use>
+block, or the final OpenAI delta carrying assembled tool_calls). Most
+chunks have no tool calls — use C<has_tool_calls> to check.
 
 =head2 usage
 

@@ -1,3 +1,69 @@
+# Claude Code — commit: skills/, agents/, hooks/, settings.json
+# Ignore: local overrides, credentials, session data
+
+# Tracked: shared config & extensibility
+!/.claude/
+.claude/*
+!.claude/settings.json
+!.claude/settings.local.json
+!.claude/agents/
+!.claude/agents/**
+!.claude/skills/
+!.claude/skills/**
+!.claude/hooks/
+!.claude/hooks/**
+
+# Local overrides (machine-specific)
+.claude/*.local.*
+.claude/local/
+
+# Credentials & session state (never track)
+.claude/.credentials.json
+.claude/statsig/
+.claude/todos/
+.claude/projects/
+
+# Perl / Dist::Zilla distribution
+
+# Build artifacts
+.build/
+_build/
+blib/
+/pm_to_blib
+/MANIFEST
+/MANIFEST.bak
+
+# Generated metadata
+/META.json
+/META.yml
+
+# Coverage
+/cover_db/
+
+# Release artifacts (Dist-Name-X.Y.Z)
+[Dd]ist-*/
+
+# Carton / Dependency Manager
+/local/
+/.carmel/
+/cpanfile.snapshot
+
+# Editor & IDE
+*.swp
+*.swo
+*.bak
+*.old
+.vscode/
+.idea/
+.history/
+*.code-workspace
+
+# OS
+.DS_Store
+
+# Environment
+.env
+.envrc
 # Dist::Zilla build artifacts
 Langertha-Knarr-*/
 *.tar.gz
@@ -34,8 +100,4 @@ docker-compose.override.yaml
 .DS_Store
 Thumbs.db
 
-# Claude Code session data
-.claude/memory/
-.claude/plans/
-.claude/settings.local.json
 .devcontainer.json

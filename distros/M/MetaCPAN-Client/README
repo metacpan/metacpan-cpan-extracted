@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.041000
+    version 2.042000
 
 SYNOPSIS
 
@@ -89,7 +89,7 @@ METHODS
 
         my $cve = $mcpan->cve('CPANSA-DBD-SQLite-2019-5018');
 
-    Returns a MetaCPAN::Client::CVE object.
+    Returns a MetaCPAN::Client::Cve object.
 
  distribution
 

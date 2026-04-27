@@ -1,0 +1,152 @@
+NAME
+    Data::Stack::Shared - Shared-memory LIFO stack for Linux
+
+SYNOPSIS
+        use Data::Stack::Shared;
+
+        my $stk = Data::Stack::Shared::Int->new(undef, 100);
+        $stk->push(42);
+        $stk->push(99);
+        say $stk->pop;       # 99 (LIFO)
+        say $stk->peek;      # 42
+        say $stk->size;      # 1
+
+        # blocking with timeout
+        $stk->push_wait(42, 5.0);
+        my $val = $stk->pop_wait(5.0);
+
+        # string variant
+        my $ss = Data::Stack::Shared::Str->new(undef, 50, 256);
+        $ss->push("hello");
+        say $ss->pop;
+
+        # anonymous / memfd / file-backed
+        my $s = Data::Stack::Shared::Int->new('/tmp/stk.shm', 100);
+        $s = Data::Stack::Shared::Int->new(undef, 100);
+        $s = Data::Stack::Shared::Int->new_memfd("my_stk", 100);
+        my $fd = $s->memfd;
+        $s = Data::Stack::Shared::Int->new_from_fd($fd);
+
+DESCRIPTION
+    LIFO stack in shared memory. CAS-based position handout on an atomic top
+    index, paired with a per-slot publication state machine (see
+    "Concurrency"). Futex blocking when empty or full.
+
+    Linux-only. Requires 64-bit Perl.
+
+  Concurrency
+    Push and pop are safe under multi-producer / multi-consumer workloads.
+    Each slot carries a 64-bit control word (state + generation) that acts
+    as a publication gate: a pusher atomically transitions the slot through
+    "empty → writing → filled", and a popper transitions it through "filled
+    → reading → empty" with the generation bumped on completion. A consumer
+    that claims position "t-1" via the "top" CAS therefore always observes
+    the matching pusher's transition to "filled" before reading the value.
+    "peek" is a seqlock-style read: it retries if the slot transitions
+    during the read and returns false if the top changes concurrently beyond
+    the retry budget.
+
+    "drain" is safe under concurrent "push"/"pop", but it spin-waits on
+    slots whose pusher is mid-publish; a pusher crash between its position
+    CAS and the publish leaves drain blocked on that slot. Use "drain" for
+    orderly draining, not as a crash-recovery primitive.
+
+  Compatibility
+    File format bumped to v2 in this release (per-slot control array added
+    for MPMC safety). Opening a v1 file (magic "STK1") created by
+    Data::Stack::Shared "<= 0.02" will croak on header validation. Re-create
+    the stack with the new version; anonymous and memfd-backed usage is
+    unaffected.
+
+  Variants
+    "Data::Stack::Shared::Int" - int64_t values
+    "Data::Stack::Shared::Str" - fixed-length strings
+
+METHODS
+  Push / Pop
+        my $ok  = $stk->push($val);               # non-blocking
+        $ok     = $stk->push_wait($val);           # blocking (infinite)
+        $ok     = $stk->push_wait($val, $timeout); # blocking with timeout
+
+        my $val = $stk->pop;                       # non-blocking, undef if empty
+        $val    = $stk->pop_wait;                  # blocking (infinite)
+        $val    = $stk->pop_wait($timeout);        # blocking with timeout
+
+        $val    = $stk->peek;                      # read top without removing
+
+  Status
+        my $n   = $stk->size;
+        my $cap = $stk->capacity;
+        my $ok  = $stk->is_empty;
+        my $ok  = $stk->is_full;
+        $stk->clear;                               # empty (NOT concurrency-safe)
+        my $n = $stk->drain;                       # empty (concurrency-safe, returns count)
+
+  Common
+        my $p  = $stk->path;
+        my $fd = $stk->memfd;
+        $stk->sync;
+        $stk->unlink;
+        my $s  = $stk->stats;
+
+  eventfd
+        my $fd = $stk->eventfd;
+        $stk->eventfd_set($fd);
+        my $fd = $stk->fileno;
+        $stk->notify;
+        my $n  = $stk->eventfd_consume;
+
+STATS
+    stats() returns: "size", "capacity", "pushes", "pops", "waits",
+    "timeouts", "mmap_size".
+
+SECURITY
+    The mmap region is writable by all processes that open it. Do not share
+    backing files with untrusted processes.
+
+BENCHMARKS
+    Single-process (1M ops, x86_64 Linux, Perl 5.40):
+
+        Int push + pop          6.4M/s
+        Int push (fill) + pop   6.4M/s
+        Int peek               13.0M/s
+        Str push + pop (48B)    4.7M/s
+
+    Multi-process (8 workers, 200K ops each, cap=64):
+
+        Int push + pop          5.0M/s aggregate
+
+SEE ALSO
+    Data::Deque::Shared - double-ended queue (deque)
+
+    Data::Queue::Shared - FIFO queue
+
+    Data::ReqRep::Shared - request-reply
+
+    Data::Pool::Shared - fixed-size object pool
+
+    Data::Log::Shared - append-only log (WAL)
+
+    Data::Buffer::Shared - typed shared array
+
+    Data::Sync::Shared - synchronization primitives
+
+    Data::HashMap::Shared - concurrent hash table
+
+    Data::PubSub::Shared - publish-subscribe ring
+
+    Data::Heap::Shared - priority queue
+
+    Data::Graph::Shared - directed weighted graph
+
+    Data::BitSet::Shared - shared bitset (lock-free per-bit ops)
+
+    Data::RingBuffer::Shared - fixed-size overwriting ring buffer
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

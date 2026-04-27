@@ -2200,9 +2200,17 @@ static OP* pp_heap_func_type(pTHX) {
     RETURN;
 }
 
-/* Call checkers for function-style calls (Heap::PQ::push($h,$v) and imported heap_push($h,$v)) */
+/* Call checkers for function-style calls (Heap::PQ::push($h,$v) and imported heap_push($h,$v))
+ *
+ * pad_alloc was promoted to public Perl API in 5.15.1 (per ppport.h). On older
+ * Perls the symbol isn't exported by libperl, so the bare reference would be
+ * unresolved at dlopen time even though the call_checker code is dead unless
+ * cv_set_call_checker fires (5.14+). To keep the module loadable on those
+ * Perls, the optimisation is gated on >= 5.16 and the checkers degrade to a
+ * no-op rewrite (returning the original entersub) below that. */
 typedef OP* (*heap_ppfunc)(pTHX);
 
+#if PERL_VERSION_GE(5,16,0)
 static OP* heap_call_checker_1arg(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) {
     heap_ppfunc ppfunc = (heap_ppfunc)SvIVX(ckobj);
     OP *pushop, *cvop, *heapop;
@@ -2264,6 +2272,18 @@ static OP* heap_call_checker_2arg(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) {
     op_free(entersubop);
     return newop;
 }
+#else /* pre-5.16: no pad_alloc — leave the optree alone */
+static OP* heap_call_checker_1arg(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) {
+    PERL_UNUSED_ARG(namegv);
+    PERL_UNUSED_ARG(ckobj);
+    return entersubop;
+}
+static OP* heap_call_checker_2arg(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) {
+    PERL_UNUSED_ARG(namegv);
+    PERL_UNUSED_ARG(ckobj);
+    return entersubop;
+}
+#endif /* PERL_VERSION_GE(5,16,0) */
 
 /* XS Functions */
 XS_EXTERNAL(XS_heap_new) {

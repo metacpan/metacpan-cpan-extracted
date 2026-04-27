@@ -25,5 +25,5 @@ requires:
 resources:
   bugtracker: https://github.com/DrHyde/perl-modules-App-ptimeout/issues
   repository: https://github.com/DrHyde/perl-modules-App-ptimeout
-version: v1.0.2
+version: v1.0.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

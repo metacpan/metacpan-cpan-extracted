@@ -1,5 +1,19 @@
 Revision history for Func-Util
 
+0.03    2026-04-27
+        - Attempt to Fix Windows/Cygwin build failure in t/xs/funcutil_export_test, Explicit import added.
+
+0.02    2026-04-26
+        - Fix Perl_xs_boot_epilog fallback in funcutil_compat.h for
+          pre-5.22 Perls.
+        - Fix Perl_custom_op_register fallback in xop_compat.h for
+          pre-5.14 Perls
+        - Fix Perl_newUNOP assertion crash on -DDEBUGGING perls (5.18+):
+          construct the negate-style custom op as OP_NULL first, then
+          set op_type = OP_CUSTOM, mirroring the binop/listop path.
+        - Fix build on Solaris/SunOS: drop GNU-only -Wl,--export-dynamic
+          flag from LDDLFLAGS; native ld already exports by default.
+
 0.01    2026-04-08
         First version, port of util from Ancient dist.
 

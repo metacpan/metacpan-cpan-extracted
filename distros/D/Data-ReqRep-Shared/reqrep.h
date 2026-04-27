@@ -224,7 +224,7 @@ static inline void reqrep_recover_stale_mutex(ReqRepHeader *hdr, uint32_t observ
         return;
     __atomic_add_fetch(&hdr->stat_recoveries, 1, __ATOMIC_RELAXED);
     if (__atomic_load_n(&hdr->mutex_waiters, __ATOMIC_RELAXED) > 0)
-        syscall(SYS_futex, &hdr->mutex, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+        syscall(SYS_futex, &hdr->mutex, FUTEX_WAKE, 1, NULL, NULL, 0);
 }
 
 static inline void reqrep_mutex_lock(ReqRepHeader *hdr) {
@@ -405,9 +405,19 @@ static int reqrep_validate_header(ReqRepHeader *hdr, size_t file_size, uint32_t 
     if (hdr->req_slots_off != sizeof(ReqRepHeader)) return 0;
     if (hdr->resp_slots == 0) return 0;
     if (hdr->resp_stride < sizeof(RespSlotHeader)) return 0;
+    /* Compute end of req slots area; req_arena and resp must come after it. */
+    uint64_t req_slot_size = (expected_mode == REQREP_MODE_STR)
+                           ? sizeof(ReqSlot) : sizeof(ReqIntSlot);
+    uint64_t req_slots_end = (uint64_t)hdr->req_slots_off
+                           + (uint64_t)hdr->req_cap * req_slot_size;
+    if (req_slots_end > hdr->total_size) return 0;
     if (expected_mode == REQREP_MODE_STR) {
+        if (hdr->req_arena_off < req_slots_end) return 0;
         if ((uint64_t)hdr->req_arena_off + hdr->req_arena_cap > hdr->total_size) return 0;
+        /* resp must not overlap arena */
+        if (hdr->resp_off < (uint64_t)hdr->req_arena_off + hdr->req_arena_cap) return 0;
     }
+    if (hdr->resp_off < req_slots_end) return 0;
     if ((uint64_t)hdr->resp_off + (uint64_t)hdr->resp_slots * hdr->resp_stride > hdr->total_size) return 0;
     return 1;
 }
@@ -440,29 +450,34 @@ static void reqrep_init_header(void *base, uint32_t req_cap, uint32_t resp_slots
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
 
-static void reqrep_compute_layout(uint32_t req_cap, uint32_t resp_slots_n,
-                                   uint32_t resp_data_max, uint64_t arena_hint,
-                                   uint32_t *out_req_slots_off, uint32_t *out_req_arena_off,
-                                   uint32_t *out_req_arena_cap, uint32_t *out_resp_off,
-                                   uint32_t *out_resp_stride, uint64_t *out_total_size) {
+/* Returns 0 on success, -1 on overflow (offsets would exceed UINT32_MAX). */
+static int reqrep_compute_layout(uint32_t req_cap, uint32_t resp_slots_n,
+                                  uint32_t resp_data_max, uint64_t arena_hint,
+                                  uint32_t *out_req_slots_off, uint32_t *out_req_arena_off,
+                                  uint32_t *out_req_arena_cap, uint32_t *out_resp_off,
+                                  uint32_t *out_resp_stride, uint64_t *out_total_size) {
     uint32_t req_slots_off = sizeof(ReqRepHeader);
     uint64_t slots_end = (uint64_t)req_slots_off + (uint64_t)req_cap * sizeof(ReqSlot);
-    uint32_t req_arena_off = (uint32_t)((slots_end + 7) & ~(uint64_t)7);
+    uint64_t req_arena_off_64 = (slots_end + 7) & ~(uint64_t)7;
+    if (req_arena_off_64 > UINT32_MAX) return -1;
+    uint32_t req_arena_off = (uint32_t)req_arena_off_64;
 
+    if (arena_hint > UINT32_MAX) return -1;
     uint32_t req_arena_cap = (uint32_t)arena_hint;
     if (req_arena_cap < 4096) req_arena_cap = 4096;
 
     uint32_t resp_stride = (sizeof(RespSlotHeader) + resp_data_max + 63) & ~63u;
     uint64_t resp_off_64 = ((uint64_t)req_arena_off + req_arena_cap + 63) & ~(uint64_t)63;
-    uint32_t resp_off = (uint32_t)resp_off_64;
+    if (resp_off_64 > UINT32_MAX) return -1;
     uint64_t total_size = resp_off_64 + (uint64_t)resp_slots_n * resp_stride;
 
     *out_req_slots_off = req_slots_off;
     *out_req_arena_off = req_arena_off;
     *out_req_arena_cap = req_arena_cap;
-    *out_resp_off      = resp_off;
+    *out_resp_off      = (uint32_t)resp_off_64;
     *out_resp_stride   = resp_stride;
     *out_total_size    = total_size;
+    return 0;
 }
 
 static ReqRepHandle *reqrep_create(const char *path, uint32_t req_cap,
@@ -478,9 +493,12 @@ static ReqRepHandle *reqrep_create(const char *path, uint32_t req_cap,
 
     uint32_t req_slots_off, req_arena_off, req_arena_cap, resp_off, resp_stride;
     uint64_t total_size;
-    reqrep_compute_layout(req_cap, resp_slots_n, resp_data_max, arena_hint,
-                           &req_slots_off, &req_arena_off, &req_arena_cap,
-                           &resp_off, &resp_stride, &total_size);
+    if (reqrep_compute_layout(req_cap, resp_slots_n, resp_data_max, arena_hint,
+                               &req_slots_off, &req_arena_off, &req_arena_cap,
+                               &resp_off, &resp_stride, &total_size) < 0) {
+        REQREP_ERR("layout overflow: req_cap/arena_hint too large for uint32 offsets");
+        return NULL;
+    }
 
     int anonymous = (path == NULL);
     size_t map_size;
@@ -494,6 +512,9 @@ static ReqRepHandle *reqrep_create(const char *path, uint32_t req_cap,
             REQREP_ERR("mmap(anonymous): %s", strerror(errno));
             return NULL;
         }
+        reqrep_init_header(base, req_cap, resp_slots_n, resp_data_max, total_size,
+                            req_slots_off, req_arena_off, req_arena_cap,
+                            resp_off, resp_stride);
     } else {
         int fd = open(path, O_RDWR | O_CREAT, 0666);
         if (fd < 0) { REQREP_ERR("open(%s): %s", path, strerror(errno)); return NULL; }
@@ -542,13 +563,12 @@ static ReqRepHandle *reqrep_create(const char *path, uint32_t req_cap,
             return h;
         }
 
+        reqrep_init_header(base, req_cap, resp_slots_n, resp_data_max, total_size,
+                            req_slots_off, req_arena_off, req_arena_cap,
+                            resp_off, resp_stride);
         flock(fd, LOCK_UN);
         close(fd);
     }
-
-    reqrep_init_header(base, req_cap, resp_slots_n, resp_data_max, total_size,
-                        req_slots_off, req_arena_off, req_arena_cap,
-                        resp_off, resp_stride);
 
     ReqRepHandle *h = reqrep_setup_handle(base, map_size, path, -1);
     if (!h) { munmap(base, map_size); return NULL; }
@@ -611,17 +631,21 @@ static ReqRepHandle *reqrep_create_memfd(const char *name, uint32_t req_cap,
 
     uint32_t req_slots_off, req_arena_off, req_arena_cap, resp_off, resp_stride;
     uint64_t total_size;
-    reqrep_compute_layout(req_cap, resp_slots_n, resp_data_max, arena_hint,
-                           &req_slots_off, &req_arena_off, &req_arena_cap,
-                           &resp_off, &resp_stride, &total_size);
+    if (reqrep_compute_layout(req_cap, resp_slots_n, resp_data_max, arena_hint,
+                               &req_slots_off, &req_arena_off, &req_arena_cap,
+                               &resp_off, &resp_stride, &total_size) < 0) {
+        REQREP_ERR("layout overflow: req_cap/arena_hint too large for uint32 offsets");
+        return NULL;
+    }
 
-    int fd = memfd_create(name ? name : "reqrep", MFD_CLOEXEC);
+    int fd = memfd_create(name ? name : "reqrep", MFD_CLOEXEC | MFD_ALLOW_SEALING);
     if (fd < 0) { REQREP_ERR("memfd_create: %s", strerror(errno)); return NULL; }
 
     if (ftruncate(fd, (off_t)total_size) < 0) {
         REQREP_ERR("ftruncate(memfd): %s", strerror(errno));
         close(fd); return NULL;
     }
+    (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
 
     void *base = mmap(NULL, (size_t)total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) {
@@ -707,6 +731,8 @@ static inline int reqrep_send_locked(ReqRepHandle *h, const char *str,
 
     uint32_t alloc = (len + 7) & ~7u;
     if (alloc == 0) alloc = 8;
+    /* Single message must fit arena; else overflow into response slots. */
+    if (alloc > h->req_arena_cap) return -2;
     uint32_t pos = hdr->arena_wpos;
     uint64_t skip = alloc;
 
@@ -740,7 +766,7 @@ static inline int reqrep_send_locked(ReqRepHandle *h, const char *str,
     hdr->arena_wpos = pos + alloc;
     hdr->arena_used += (uint32_t)skip;
     hdr->req_tail++;
-    hdr->stat_requests++;
+    __atomic_add_fetch(&hdr->stat_requests, 1, __ATOMIC_RELAXED);
     return 1;
 }
 
@@ -833,7 +859,10 @@ static inline int reqrep_recv_locked(ReqRepHandle *h, const char **out_str,
     *out_str = h->copy_buf;
     *out_len = len;
 
-    hdr->arena_used -= slot->arena_skip;
+    if (hdr->arena_used >= slot->arena_skip)
+        hdr->arena_used -= slot->arena_skip;
+    else
+        hdr->arena_used = 0;
     if (hdr->arena_used == 0)
         hdr->arena_wpos = 0;
 
@@ -1144,11 +1173,11 @@ static inline void reqrep_notify(ReqRepHandle *h) {
     }
 }
 
-static inline void reqrep_eventfd_consume(ReqRepHandle *h) {
-    if (h->notify_fd >= 0) {
-        uint64_t val;
-        ssize_t __attribute__((unused)) rc = read(h->notify_fd, &val, sizeof(val));
-    }
+static inline int64_t reqrep_eventfd_consume(ReqRepHandle *h) {
+    if (h->notify_fd < 0) return -1;
+    uint64_t val = 0;
+    if (read(h->notify_fd, &val, sizeof(val)) != sizeof(val)) return -1;
+    return (int64_t)val;
 }
 
 static inline int reqrep_reply_eventfd_create(ReqRepHandle *h) {
@@ -1170,28 +1199,31 @@ static inline void reqrep_reply_notify(ReqRepHandle *h) {
     }
 }
 
-static inline void reqrep_reply_eventfd_consume(ReqRepHandle *h) {
-    if (h->reply_fd >= 0) {
-        uint64_t val;
-        ssize_t __attribute__((unused)) rc = read(h->reply_fd, &val, sizeof(val));
-    }
+static inline int64_t reqrep_reply_eventfd_consume(ReqRepHandle *h) {
+    if (h->reply_fd < 0) return -1;
+    uint64_t val = 0;
+    if (read(h->reply_fd, &val, sizeof(val)) != sizeof(val)) return -1;
+    return (int64_t)val;
 }
 
 /* ================================================================
  * Int mode: lock-free Vyukov MPMC request queue, inline int64 response
  * ================================================================ */
 
-static void reqrep_int_compute_layout(uint32_t req_cap, uint32_t resp_slots_n,
-                                       uint32_t *out_req_slots_off, uint32_t *out_resp_off,
-                                       uint32_t *out_resp_stride, uint64_t *out_total_size) {
+/* Returns 0 on success, -1 on overflow. */
+static int reqrep_int_compute_layout(uint32_t req_cap, uint32_t resp_slots_n,
+                                      uint32_t *out_req_slots_off, uint32_t *out_resp_off,
+                                      uint32_t *out_resp_stride, uint64_t *out_total_size) {
     uint32_t req_slots_off = sizeof(ReqRepHeader);
     uint64_t slots_end = (uint64_t)req_slots_off + (uint64_t)req_cap * sizeof(ReqIntSlot);
     uint32_t resp_stride = (sizeof(RespSlotHeader) + sizeof(int64_t) + 63) & ~63u;
     uint64_t resp_off = (slots_end + 63) & ~(uint64_t)63;
+    if (resp_off > UINT32_MAX) return -1;
     *out_req_slots_off = req_slots_off;
     *out_resp_off      = (uint32_t)resp_off;
     *out_resp_stride   = resp_stride;
     *out_total_size    = resp_off + (uint64_t)resp_slots_n * resp_stride;
+    return 0;
 }
 
 static void reqrep_int_init_header(void *base, uint32_t req_cap, uint32_t resp_slots_n,
@@ -1233,8 +1265,11 @@ static ReqRepHandle *reqrep_create_int(const char *path, uint32_t req_cap,
 
     uint32_t req_slots_off, resp_off, resp_stride;
     uint64_t total_size;
-    reqrep_int_compute_layout(req_cap, resp_slots_n, &req_slots_off,
-                               &resp_off, &resp_stride, &total_size);
+    if (reqrep_int_compute_layout(req_cap, resp_slots_n, &req_slots_off,
+                                   &resp_off, &resp_stride, &total_size) < 0) {
+        REQREP_ERR("layout overflow: req_cap too large for uint32 offsets");
+        return NULL;
+    }
 
     int anonymous = (path == NULL);
     size_t map_size;
@@ -1268,7 +1303,10 @@ static ReqRepHandle *reqrep_create_int(const char *path, uint32_t req_cap,
             flock(fd, LOCK_UN); close(fd);
             return reqrep_setup_handle(base, map_size, path, -1);
         }
+        reqrep_int_init_header(base, req_cap, resp_slots_n, total_size,
+                                req_slots_off, resp_off, resp_stride);
         flock(fd, LOCK_UN); close(fd);
+        return reqrep_setup_handle(base, map_size, path, -1);
     }
 
     reqrep_int_init_header(base, req_cap, resp_slots_n, total_size,
@@ -1285,14 +1323,18 @@ static ReqRepHandle *reqrep_create_int_memfd(const char *name, uint32_t req_cap,
 
     uint32_t req_slots_off, resp_off, resp_stride;
     uint64_t total_size;
-    reqrep_int_compute_layout(req_cap, resp_slots_n, &req_slots_off,
-                               &resp_off, &resp_stride, &total_size);
+    if (reqrep_int_compute_layout(req_cap, resp_slots_n, &req_slots_off,
+                                   &resp_off, &resp_stride, &total_size) < 0) {
+        REQREP_ERR("layout overflow: req_cap too large for uint32 offsets");
+        return NULL;
+    }
 
-    int fd = memfd_create(name ? name : "reqrep_int", MFD_CLOEXEC);
+    int fd = memfd_create(name ? name : "reqrep_int", MFD_CLOEXEC | MFD_ALLOW_SEALING);
     if (fd < 0) { REQREP_ERR("memfd_create: %s", strerror(errno)); return NULL; }
     if (ftruncate(fd, (off_t)total_size) < 0) {
         REQREP_ERR("ftruncate: %s", strerror(errno)); close(fd); return NULL;
     }
+    (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
     void *base = mmap(NULL, (size_t)total_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { REQREP_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
 

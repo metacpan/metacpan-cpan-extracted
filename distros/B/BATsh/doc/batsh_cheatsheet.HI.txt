@@ -1,0 +1,94 @@
+BATsh Cheat Sheet [HI] हिंदी
+==============================
+
+BATsh एक द्विभाषी शेल है जो cmd.exe और bash/sh सिंटैक्स
+एक ही स्क्रिप्ट में चलाता है। प्रत्येक पंक्ति का पहला टोकन मोड निर्धारित करता है।
+
+1. मोड पहचान
+--------------
+  ECHO hello          -> cmd.exe मोड (पहला टोकन पूरी तरह अपरकेस)
+  echo hello          -> bash/sh मोड (पहला टोकन में लोवरकेस है)
+  # टिप्पणी           -> टिप्पणी (अनदेखा)
+  :: टिप्पणी          -> टिप्पणी (CMD शैली, अनदेखा)
+  REM टिप्पणी         -> टिप्पणी (CMD शैली, अनदेखा)
+
+2. शेल शुरू करना
+-------------------
+  perl lib/BATsh.pm                     # इंटरैक्टिव REPL
+  perl lib/BATsh.pm script.batsh        # स्क्रिप्ट फ़ाइल चलाएं
+  perl lib/BATsh.pm -e "echo namaste"   # एक-पंक्ति आदेश
+
+  Perl API से:
+    use BATsh;
+    BATsh->run('script.batsh');
+    BATsh->run_string("echo namaste");
+    BATsh->repl();
+
+3. पर्यावरण चर सेतु
+--------------------------
+  CMD और SH ब्लॉक Perl के %ENV के जरिए चर साझा करते हैं।
+
+  export FOO=namaste   # SH ने FOO सेट किया
+  ECHO %FOO%           # CMD सेतु से FOO पढ़ता है (Windows)
+
+  SET BAR=duniya       # CMD ने BAR सेट किया
+  echo $BAR            # SH सेतु से BAR पढ़ता है
+
+4. SETLOCAL / ENDLOCAL
+-----------------------
+  SETLOCAL           # %ENV का स्नैपशॉट
+  SET TMP=स्थानीय
+  ECHO %TMP%
+  ENDLOCAL           # %ENV पुनर्स्थापित (करें TMP गायब)
+
+5. नेस्टिंग (मिश्रित मोड)
+--------------------------
+  ब्लॉक संरचनाएं सही तरीके से जोड़ी बनानी चाहिए।
+
+  for x in 1 2; do   # SH ब्लॉक खोलता है
+      ECHO item $x   # SH ब्लॉक में CMD पंक्ति
+  done               # SH ब्लॉक बंद करता है
+
+  CMD कीवर्ड: IF/ENDIF  FOR/NEXT  WHILE/WEND  DO/LOOP
+  SH  कीवर्ड: if/fi  for/done  while/done  until/done  case/esac  { }
+
+6. सबरूटीन परिभाषाएं
+--------------------------
+  :GREET
+  echo "Namaste $BATSH_ARG1"
+  RET
+
+7. CALL और source
+-------------------
+  CALL :GREET duniya     # तर्क के साथ सबरूटीन कॉल करें
+  CALL anya.batsh        # अन्य .batsh फ़ाइल शामिल करें (CMD)
+  source anya.batsh      # अन्य .batsh फ़ाइल शामिल करें (SH)
+  . anya.batsh           # POSIX डॉट नोटेशन
+
+  तर्क: $BATSH_ARG1 .. $BATSH_ARGn  (CMD में %BATSH_ARG1%)
+  गिनती: $BATSH_ARGC
+
+8. Perl API
+-----------
+  BATsh->run($file)            # .batsh फ़ाइल चलाएं
+  BATsh->run_string($source)   # स्रोत स्ट्रिंग चलाएं
+  BATsh->run_lines(@lines)     # पंक्ति सरणी चलाएं
+  BATsh->repl()                # इंटरैक्टिव REPL
+  BATsh->classify_token($tok)  # 'CMD' या 'SH' लौटाएं
+  BATsh->setlocal()            # %ENV स्नैपशॉट
+  BATsh->endlocal()            # %ENV पुनर्स्थापित
+  BATsh->call_sub($lbl, @args) # सबरूटीन कॉल करें
+  BATsh->source_file($file)    # .batsh फ़ाइल शामिल करें
+  BATsh->version()             # वर्षन स्ट्रिंग
+
+9. प्लेटफ़ॉर्म नोट्स
+-----------------
+  Windows: CMD और SH दोनों सेक्शन शुद्ध Perl में चलते हैं -- बाहरी cmd.exe/bash/sh की जरूरत नहीं।
+  UNIX:    CMD और SH दोनों सेक्शन शुद्ध Perl में चलते हैं -- बाहरी cmd.exe/bash/sh की जरूरत नहीं।
+
+10. आवश्यकताएं
+-----------------
+  Perl 5.005_03 या उच्चतर। केवल कोर मॉड्यूल (File::Spec, Carp)।
+  कोई CPAN निर्भरता नहीं।
+
+देखें भी: https://metacpan.org/dist/BATsh

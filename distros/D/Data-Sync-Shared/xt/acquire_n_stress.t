@@ -35,7 +35,7 @@ diag "acquire_n stress: $WORKERS workers x $OPS ops";
     }
 
     my $ok = 1;
-    for (@pids) { waitpid($_, 0); $ok = 0 if $? >> 8 }
+    for (@pids) { waitpid($_, 0); $ok = 0 if $? }
 
     ok $ok, "fixed-N: all workers completed";
     is $sem->value, $max, "fixed-N: final value == $max";
@@ -69,7 +69,7 @@ diag "acquire_n stress: $WORKERS workers x $OPS ops";
     }
 
     my $ok = 1;
-    for (@pids) { waitpid($_, 0); $ok = 0 if $? >> 8 }
+    for (@pids) { waitpid($_, 0); $ok = 0 if $? }
 
     ok $ok, "try_acquire_n: all workers completed";
     is $sem->value, $max, "try_acquire_n: final value == $max";
@@ -104,7 +104,7 @@ diag "acquire_n stress: $WORKERS workers x $OPS ops";
     }
 
     my $ok = 1;
-    for (@pids) { waitpid($_, 0); $ok = 0 if $? >> 8 }
+    for (@pids) { waitpid($_, 0); $ok = 0 if $? }
 
     ok $ok, "mixed acquire: all workers completed";
     is $sem->value, $max, "mixed acquire: final value == $max";
@@ -132,7 +132,7 @@ diag "acquire_n stress: $WORKERS workers x $OPS ops";
     }
 
     my $ok = 1;
-    for (@pids) { waitpid($_, 0); $ok = 0 if $? >> 8 }
+    for (@pids) { waitpid($_, 0); $ok = 0 if $? }
 
     ok $ok, "drain+release: all workers completed";
     is $sem->value, $max, "drain+release: final value == $max";
@@ -161,7 +161,7 @@ diag "acquire_n stress: $WORKERS workers x $OPS ops";
     }
 
     my $ok = 1;
-    for (@pids) { waitpid($_, 0); $ok = 0 if $? >> 8 }
+    for (@pids) { waitpid($_, 0); $ok = 0 if $? }
 
     ok $ok, "guard acquire_n + exception: all workers completed";
     is $sem->value, $max, "guard acquire_n + exception: value == $max";

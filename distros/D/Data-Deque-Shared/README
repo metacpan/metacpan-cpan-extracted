@@ -11,6 +11,11 @@ SYNOPSIS
         say $dq->pop_front;   # 0
         say $dq->pop_back;    # 2
 
+        # String variant (fixed max_len per entry)
+        my $sq = Data::Deque::Shared::Str->new(undef, 100, 64);
+        $sq->push_back("hello");
+        say $sq->pop_front;   # hello
+
         # blocking with timeout
         $dq->push_back_wait(42, 5.0);
         my $v = $dq->pop_front_wait(5.0);
@@ -25,7 +30,35 @@ DESCRIPTION
     Double-ended queue (deque) in shared memory. Ring buffer with CAS-based
     push/pop at both ends. Futex blocking when empty or full.
 
-    Linux-only. Requires 64-bit Perl.
+    Linux-only. Requires 64-bit Perl. Capacity must be <= 2^31.
+
+    Used only as a FIFO ("push_back" + "pop_front"), it's effectively a
+    fixed-slot lock-free string queue: 1.3x-4.7x faster than
+    Data::Queue::Shared::Str under multi-producer contention, at the cost of
+    per-slot fixed memory ("capacity × max_len").
+
+  Concurrency
+    Push and pop are safe under multi-producer / multi-consumer workloads.
+    Each slot carries a 64-bit control word (state + generation) that acts
+    as a publication gate: a pusher atomically transitions the slot through
+    "empty → writing → filled", and a popper transitions it through "filled
+    → reading → empty" with the generation bumped on completion. A consumer
+    that claims position "n" via the head/tail CAS therefore always observes
+    the publication transition of the corresponding push before reading the
+    value.
+
+    "drain" is safe under concurrent "push"/"pop", but it will spin-wait on
+    any slot whose pusher is mid-publish; if that pusher has crashed between
+    winning its position CAS and publishing the slot value, drain will block
+    indefinitely on that slot. Use "drain" for orderly draining, not as a
+    crash-recovery primitive.
+
+  Compatibility
+    File format bumped to v2 in this release (per-slot control array added
+    for MPMC safety). Opening a v1 file (magic "DEQ1") created by
+    Data::Deque::Shared "<= 0.02" will croak on header validation. Re-create
+    the deque with the new version; anonymous and memfd-backed usage is
+    unaffected.
 
 METHODS
   Push / Pop
@@ -88,9 +121,18 @@ SEE ALSO
 
     Data::PubSub::Shared - publish-subscribe ring
 
+    Data::Heap::Shared - priority queue
+
+    Data::Graph::Shared - directed weighted graph
+
+    Data::BitSet::Shared - shared bitset (lock-free per-bit ops)
+
+    Data::RingBuffer::Shared - fixed-size overwriting ring buffer
+
 AUTHOR
     vividsnow
 
 LICENSE
-    Same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
 

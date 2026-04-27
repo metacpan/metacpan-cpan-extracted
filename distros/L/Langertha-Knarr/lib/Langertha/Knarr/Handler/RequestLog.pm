@@ -1,11 +1,11 @@
 package Langertha::Knarr::Handler::RequestLog;
 # ABSTRACT: Decorator handler that writes per-request JSON logs via Knarr::RequestLog
-our $VERSION = '1.001';
+our $VERSION = '1.100';
 use Moose;
 use Future;
 use Future::AsyncAwait;
-use Scalar::Util qw( blessed );
 use Langertha::Knarr::Stream;
+use Langertha::Knarr::Response;
 
 with 'Langertha::Knarr::Handler';
 
@@ -44,14 +44,6 @@ sub _open {
   );
 }
 
-sub _result_text {
-  my ($self, $r) = @_;
-  return ''  unless defined $r;
-  return $r  unless ref $r;
-  return $r->{content} // '' if ref $r eq 'HASH';
-  return blessed($r) ? "$r" : '';
-}
-
 async sub handle_chat_f {
   my ($self, $session, $request) = @_;
   my $handle = $self->_open($request);
@@ -62,7 +54,12 @@ async sub handle_chat_f {
   }
   return await $f->then( sub {
     my ($r) = @_;
-    $self->request_log->end_request( $handle, output => $self->_result_text($r) );
+    my $resp = Langertha::Knarr::Response->coerce($r);
+    $self->request_log->end_request(
+      $handle,
+      output => $resp->content,
+      ( $resp->usage ? ( usage => $resp->usage ) : () ),
+    );
     return Future->done($r);
   })->else( sub {
     my ($err) = @_;
@@ -131,7 +128,7 @@ Langertha::Knarr::Handler::RequestLog - Decorator handler that writes per-reques
 
 =head1 VERSION
 
-version 1.001
+version 1.100
 
 =head1 SYNOPSIS
 

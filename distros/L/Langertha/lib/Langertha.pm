@@ -1,6 +1,6 @@
 package Langertha;
 # ABSTRACT: The clan of fierce vikings with 🪓 and 🛡️ to AId your rAId
-our $VERSION = '0.404';
+our $VERSION = '0.500';
 use utf8;
 use strict;
 use warnings;
@@ -156,7 +156,7 @@ Langertha - The clan of fierce vikings with 🪓 and 🛡️ to AId your rAId
 
 =head1 VERSION
 
-version 0.404
+version 0.500
 
 =head1 SYNOPSIS
 
@@ -360,7 +360,17 @@ Resolves and constructs an engine instance in one call.
 
 =item * L<Langertha::Engine::AKIOpenAI> - AKI.IO via OpenAI-compatible API
 
-=item * L<Langertha::Engine::Whisper> - OpenAI Whisper speech-to-text
+=item * L<Langertha::Engine::TSystems> - T-Systems AI Foundation Services / LLM Hub (EU/Germany)
+
+=item * L<Langertha::Engine::Scaleway> - Scaleway Generative APIs (EU)
+
+=item * L<Langertha::Engine::TranscriptionBase> - Slim base for OpenAI-shape
+transcription-only engines (no chat / tools / embeddings / image generation).
+L<Langertha::Engine::OpenAI> exposes a C<whisper> attribute returning an
+instance of this class bound to the parent's C<api_key> / C<url>.
+
+=item * L<Langertha::Engine::Whisper> - Self-hosted Whisper-compatible
+transcription server (extends TranscriptionBase)
 
 =back
 
@@ -370,7 +380,13 @@ Roles provide composable functionality to engines:
 
 =over 4
 
-=item * L<Langertha::Role::Chat> - Synchronous and async chat methods
+=item * L<Langertha::Role::Capabilities> - C<engine_capabilities> registry
+plus C<supports($cap)> helper, composed by L<Langertha::Role::Chat>
+
+=item * L<Langertha::Role::Chat> - Synchronous and async chat methods,
+including C<chat_f(messages =E<gt> [...], tools =E<gt> [...], tool_choice
+=E<gt> ..., response_format =E<gt> ...)> for single-turn structured
+calls and C<aggregate_tool_calls(\@chunks)> for streaming
 
 =item * L<Langertha::Role::HTTP> - HTTP request/response handling
 
@@ -399,6 +415,9 @@ Roles provide composable functionality to engines:
 =item * L<Langertha::Role::Transcription> - Audio transcription
 
 =item * L<Langertha::Role::Tools> - Tool/function calling
+
+=item * L<Langertha::Role::HermesTools> - Hermes-style tool calling via
+C<E<lt>tool_callE<gt>> XML tags for models without native API tool support
 
 =item * L<Langertha::Role::ImageGeneration> - Image generation
 
@@ -440,13 +459,31 @@ These classes wrap an engine with optional overrides and plugin lifecycle hooks:
 
 =over 4
 
-=item * L<Langertha::Response> - LLM response with content, usage, and rate limit metadata
+=item * L<Langertha::Response> - LLM response with content, usage, and rate
+limit metadata; C<tool_calls> is an ArrayRef of L<Langertha::ToolCall> and
+the single source of truth for both native and synthesized tool calls
+
+=item * L<Langertha::ToolCall> - Canonical tool invocation produced by an
+LLM, with C<synthetic> flag for forced-tool fallbacks
+
+=item * L<Langertha::ToolChoice> - Canonical tool-selection policy with
+per-provider serializers (C<to_openai>, C<to_anthropic>, C<to_gemini>,
+C<to_perplexity>)
+
+=item * L<Langertha::Tool> - Canonical tool definition with cross-provider
+serializers (C<to_openai>, C<to_anthropic>, C<to_gemini>, C<to_mcp>,
+C<to_json_schema>) and accepting constructors (C<from_openai>,
+C<from_anthropic>, C<from_mcp>, C<from_gemini>, C<from_hash>)
+
+=item * L<Langertha::Content> / L<Langertha::Content::Image> -
+Provider-agnostic vision input
 
 =item * L<Langertha::RateLimit> - Normalized rate limit data from HTTP response headers
 
 =item * L<Langertha::Stream> - Iterator over streaming chunks
 
-=item * L<Langertha::Stream::Chunk> - A single chunk from a streaming response
+=item * L<Langertha::Stream::Chunk> - A single chunk from a streaming
+response (with optional C<tool_calls> for engines that emit them mid-stream)
 
 =item * L<Langertha::Raider> - Autonomous agent with history and tool calling
 

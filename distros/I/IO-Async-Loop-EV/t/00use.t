@@ -1,10 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.20;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( "IO::Async::Loop::EV" );
+require IO::Async::Loop::EV;
 
+pass( 'Modules loaded' );
 done_testing;

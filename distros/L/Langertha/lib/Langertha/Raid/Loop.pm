@@ -1,6 +1,6 @@
 package Langertha::Raid::Loop;
 # ABSTRACT: Looping Raid orchestrator
-our $VERSION = '0.404';
+our $VERSION = '0.500';
 use Moose;
 use Future::AsyncAwait;
 use Carp qw( croak );
@@ -102,7 +102,7 @@ Langertha::Raid::Loop - Looping Raid orchestrator
 
 =head1 VERSION
 
-version 0.404
+version 0.500
 
 =head1 SYNOPSIS
 

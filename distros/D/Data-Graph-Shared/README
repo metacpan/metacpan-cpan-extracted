@@ -1,0 +1,124 @@
+NAME
+    Data::Graph::Shared - Shared-memory directed weighted graph for Linux
+
+SYNOPSIS
+        use Data::Graph::Shared;
+
+        my $g = Data::Graph::Shared->new(undef, 100, 500);  # 100 nodes, 500 edges
+        my $a = $g->add_node(10);    # returns node index
+        my $b = $g->add_node(20);
+        my $c = $g->add_node(30);
+
+        $g->add_edge($a, $b, 5);     # a→b weight 5
+        $g->add_edge($a, $c, 3);     # a→c weight 3
+        $g->add_edge($b, $c, 1);     # b→c weight 1
+
+        my @nbrs = $g->neighbors($a);  # ([1,5], [2,3]) — [dst, weight] pairs
+        say $g->degree($a);            # 2
+        say $g->node_data($a);         # 10
+
+        $g->remove_node($b);          # removes node and outgoing edges
+
+DESCRIPTION
+    Directed weighted graph in shared memory. Nodes allocated from a bitmap
+    pool, edges stored as adjacency lists in a separate edge pool.
+    Mutex-protected mutations with PID-based stale recovery.
+
+    Note: "remove_node" removes the node and its outgoing edges only.
+    Incoming edges from other nodes are NOT automatically removed (this is
+    an O(1) design choice) — their "dst" is left dangling until the slot's
+    bit is reused. Use "remove_node_full" when this matters; it additionally
+    splices incoming edges in O(N+E).
+
+    Linux-only. Requires 64-bit Perl.
+
+METHODS
+  Constructors
+        my $g = Data::Graph::Shared->new($path, $max_nodes, $max_edges);  # file-backed
+        my $g = Data::Graph::Shared->new(undef, $max_nodes, $max_edges);  # anonymous
+        my $g = Data::Graph::Shared->new_memfd($name, $max_nodes, $max_edges);
+        my $g = Data::Graph::Shared->new_from_fd($fd);                    # reopen memfd
+
+  Operations
+        my $id = $g->add_node($data);            # returns node index or undef
+        $g->add_edge($src, $dst);                # weight defaults to 1
+        $g->add_edge($src, $dst, $weight);
+        $g->remove_node($id);                    # O(1) — outgoing edges only
+        $g->remove_node_full($id);               # O(N+E) — also splices incoming
+        $g->has_node($id);
+        $g->node_data($id);
+        $g->set_node_data($id, $data);
+        my @pairs = $g->neighbors($id);          # list of [$dst, $weight]
+        $g->each_neighbor($id, sub { my ($dst, $w) = @_ });
+        $g->degree($id);
+        my @ids = $g->nodes;                     # all node indices
+        $g->node_count;  $g->edge_count;
+        $g->max_nodes;   $g->max_edges;
+
+  Lifecycle
+        $g->path;              # backing file path, or undef for anon/memfd
+        $g->memfd;             # memfd fd (-1 for file-backed/anon)
+        $g->stats;             # diagnostic hashref
+        $g->sync;              # msync mmap to backing store
+        $g->unlink;            # remove backing file
+        Class->unlink($path);  # class-method form
+
+  Event Loop Integration
+        my $fd = $g->eventfd;         # lazy-create eventfd, returns fd
+        $g->eventfd_set($fd);         # attach an external eventfd
+        my $fd = $g->fileno;          # current eventfd fd, or -1
+        $g->notify;                   # write 1 to eventfd (caller signals update)
+        my $n = $g->eventfd_consume;  # read+reset eventfd counter
+
+BENCHMARKS
+    Single-process (10K ops, x86_64 Linux, Perl 5.40):
+
+        add_node            3.9M/s
+        add_edge (random)   2.3M/s
+        has_node           13.3M/s
+        node_data           5.5M/s
+        neighbors           2.6M/s
+        degree              5.6M/s
+
+STATS
+    stats() returns: "node_count", "edge_count", "max_nodes", "max_edges",
+    "ops", "mmap_size".
+
+SECURITY
+    The mmap region is writable by all processes that open it. Do not share
+    backing files with untrusted processes.
+
+SEE ALSO
+    Data::Heap::Shared - priority queue (for Dijkstra, Prim, etc.)
+
+    Data::Pool::Shared - fixed-size object pool
+
+    Data::HashMap::Shared - concurrent hash table
+
+    Data::Buffer::Shared - typed shared array
+
+    Data::Queue::Shared - FIFO queue
+
+    Data::Stack::Shared - LIFO stack
+
+    Data::Deque::Shared - double-ended queue
+
+    Data::Log::Shared - append-only log
+
+    Data::Sync::Shared - synchronization primitives
+
+    Data::PubSub::Shared - publish-subscribe ring
+
+    Data::ReqRep::Shared - request-reply
+
+    Data::BitSet::Shared - shared bitset (lock-free per-bit ops)
+
+    Data::RingBuffer::Shared - fixed-size overwriting ring buffer
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

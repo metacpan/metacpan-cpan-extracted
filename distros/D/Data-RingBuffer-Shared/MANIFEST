@@ -1,4 +1,5 @@
 .github/workflows/ci.yml
+bench/baseline.pl
 bench/single.pl
 Changes
 eg/basic.pl
@@ -21,7 +22,37 @@ README
 ring.h
 Shared.xs
 t/01-basic.t
+t/02-multi-process.t
+t/03-edge-cases.t
+t/04-edges.t
+t/eventfd_set.t
+t/pod_synopsis.t
+t/version_check.t
+xt/abi_skew.t
+xt/asan.t
+xt/cloexec.t
+xt/cloexec_exec.t
+xt/concurrent_open.t
+xt/cross_module_fd.t
+xt/eg_runs.t
+xt/epoch_boundary.t
 xt/fd_leak.t
+xt/fd_validation.t
+xt/fork_bomb.t
+xt/fuzz_header.t
+xt/hostile_bless.t
+xt/invalid_args.t
+xt/manifest_vs_git.t
+xt/map_shared_proof.t
+xt/memfd_seal.t
+xt/mmap_leak.t
+xt/multiwriter_seq.t
+xt/persistence_roundtrip.t
+xt/reader_livelock.t
+xt/seq_wraparound.t
 xt/stress.t
+xt/timeout_validation.t
+xt/truncation.t
+xt/valgrind.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

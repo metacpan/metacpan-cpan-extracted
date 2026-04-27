@@ -7,7 +7,7 @@ use utf8;
 
 class  SVGPDF;
 
-our $VERSION = '0.092.3';
+our $VERSION = '1.000';
 
 =head1 NAME
 
@@ -1019,7 +1019,7 @@ L<https://github.com/sciurius/perl-SVGPDF/issues>.
 
 =head1 LICENSE
 
-Copyright (C) 2022,2024 Johan Vromans,
+Copyright (C) 2022,2026 Johan Vromans,
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided under the terms of the Simplified

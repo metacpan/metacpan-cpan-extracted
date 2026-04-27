@@ -1,6 +1,6 @@
 package SPVM::Resource::RE2;
 
-our $VERSION = "0.044";
+our $VERSION = "0.046";
 
 1;
 
@@ -198,7 +198,7 @@ C++17
 
 All files of C<Google/RE2> is copied by the following steps into the C<src> directory.
 
-  rsync -av --exclude='*.h' .tmp/re2/ lib/SPVM/Resource/RE2.native/src/
+  rsync -avm --include='*/' --include='*.cc' --exclude='*' .tmp/re2/ lib/SPVM/Resource/RE2.native/src/
 
 The source files that is used in the config are extracted by the following command.
 

@@ -74,24 +74,94 @@ LUA
         $r->disconnect;
     };
 
-    subtest 'define_command with install option' => sub {
+    subtest 'define_command rejects install option' => sub {
         my $r = Async::Redis->new(host => $ENV{REDIS_HOST} // 'localhost');
         run { $r->connect };
 
-        $r->define_command(custom_set => {
-            keys    => 1,
-            lua     => 'return redis.call("SET", KEYS[1], ARGV[1])',
-            install => 1,
+        like(
+            dies {
+                $r->define_command(custom_set => {
+                    keys    => 1,
+                    lua     => 'return redis.call("SET", KEYS[1], ARGV[1])',
+                    install => 1,
+                });
+            },
+            qr/install option is not supported.*run_script/s,
+            'dies with explicit run_script guidance',
+        );
+
+        ok(!$r->can('custom_set'), 'unsupported install does not create a method');
+        is($r->get_script('custom_set'), undef, 'unsupported install does not register script');
+
+        $r->disconnect;
+    };
+
+    subtest 'scripts remain scoped to their defining instance' => sub {
+        my $r1 = Async::Redis->new(host => $ENV{REDIS_HOST} // 'localhost');
+        my $r2 = Async::Redis->new(host => $ENV{REDIS_HOST} // 'localhost');
+        run { $r1->connect };
+        run { $r2->connect };
+
+        $r1->define_command(instance_only => {
+            keys    => 0,
+            lua     => 'return "r1"',
         });
 
-        # Call as method
-        my $result = run { $r->custom_set('inst:key', 'inst:value') };
-        is($result, 'OK', 'installed method works');
+        ok($r1->get_script('instance_only'), 'defining instance has script');
+        is($r2->get_script('instance_only'), undef, 'other instance cannot see script');
+        ok(!$r1->can('instance_only'), 'script is not visible as a method');
+        ok(!$r2->can('instance_only'), 'other instance also has no method');
+        is(run { $r1->run_script('instance_only') }, 'r1', 'defining instance can run script explicitly');
 
-        my $val = run { $r->get('inst:key') };
-        is($val, 'inst:value', 'installed method set the value');
+        like(
+            dies { run { $r2->run_script('instance_only') } },
+            qr/Unknown script.*instance_only/,
+            'other instance cannot run script without registering it',
+        );
 
-        run { cleanup_keys($r, 'inst:*') };
+        $r1->disconnect;
+        $r2->disconnect;
+    };
+
+    subtest 'same script name is resolved per instance' => sub {
+        my $r1 = Async::Redis->new(host => $ENV{REDIS_HOST} // 'localhost');
+        my $r2 = Async::Redis->new(host => $ENV{REDIS_HOST} // 'localhost');
+        run { $r1->connect };
+        run { $r2->connect };
+
+        $r1->define_command(shared_script_name => {
+            keys    => 0,
+            lua     => 'return "one"',
+        });
+
+        $r2->define_command(shared_script_name => {
+            keys    => 0,
+            lua     => 'return "two"',
+        });
+
+        is(run { $r1->run_script('shared_script_name') }, 'one', 'first instance uses first script');
+        is(run { $r2->run_script('shared_script_name') }, 'two', 'second instance uses second script');
+
+        $r1->disconnect;
+        $r2->disconnect;
+    };
+
+    subtest 'scripts do not affect method introspection' => sub {
+        my $r = Async::Redis->new(host => $ENV{REDIS_HOST} // 'localhost');
+        run { $r->connect };
+
+        ok($r->can('get'), 'normal Redis command methods remain visible');
+        ok(Async::Redis->can('new'), 'normal class methods remain visible');
+
+        $r->define_command(run_only => {
+            keys => 0,
+            lua  => 'return "run_only"',
+        });
+
+        ok(!$r->can('run_only'), 'registered script is not visible as method');
+        ok(!Async::Redis->can('run_only'), 'registered script does not affect class can');
+        is(run { $r->run_script('run_only') }, 'run_only', 'registered script still works via run_script');
+
         $r->disconnect;
     };
 

@@ -12,12 +12,13 @@ use Data::MARC::Field008::Map 0.03;
 use Data::MARC::Field008::MixedMaterial 0.03;
 use Data::MARC::Field008::Music 0.03;
 use Data::MARC::Field008::VisualMaterial 0.03;
+use English;
 use Error::Pure qw(err);
 use List::Util 1.33 qw(any);
 use Mo::utils 0.08 qw(check_bool check_isa check_required);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -32,6 +33,9 @@ sub new {
 	# Leader.
 	$self->{'leader'} = undef;
 
+	# Mode strict.
+	$self->{'mode_strict'} = 0;
+
 	# Verbose mode.
 	$self->{'verbose'} = 0;
 
@@ -44,6 +48,9 @@ sub new {
 
 	# Check 'leader'.
 	check_isa($self, 'leader', 'Data::MARC::Leader');
+
+	# Check 'mode_strict'.
+	check_bool($self, 'mode_strict');
 
 	# Check 'verbose'.
 	check_bool($self, 'verbose');
@@ -62,6 +69,11 @@ sub parse {
 		$field_008 .= (' ' x (40 - length($field_008)));
 	}
 
+	# XXX Dashes are spaces.
+	if (! $self->{'mode_strict'}) {
+		$field_008 =~ s/-/\ /msg;
+	}
+
 	# Check length.
 	if (length($field_008) > 40) {
 		err 'Bad length of MARC 008 field.',
@@ -72,21 +84,27 @@ sub parse {
 		print "Field 008: |$field_008|\n";
 	}
 
-	my %params = (
-		'raw' => $field_008,
+	my $field_008_obj = eval {
+		my %params = (
+			'raw' => $field_008,
 
-		'date_entered_on_file' => (substr $field_008, 0, 6),
-		'type_of_date' => (substr $field_008, 6, 1),
-		'date1' => (substr $field_008, 7, 4),
-		'date2' => (substr $field_008, 11, 4),
-		'place_of_publication' => (substr $field_008, 15, 3),
-		$self->_parse_different($field_008),
-		'language' => (substr $field_008, 35, 3),
-		'modified_record' => (substr $field_008, 38, 1),
-		'cataloging_source' => (substr $field_008, 39, 1),
-	);
+			'date_entered_on_file' => (substr $field_008, 0, 6),
+			'type_of_date' => (substr $field_008, 6, 1),
+			'date1' => (substr $field_008, 7, 4),
+			'date2' => (substr $field_008, 11, 4),
+			'place_of_publication' => (substr $field_008, 15, 3),
+			$self->_parse_different($field_008),
+			'language' => (substr $field_008, 35, 3),
+			'modified_record' => (substr $field_008, 38, 1),
+			'cataloging_source' => (substr $field_008, 39, 1),
+		);
+		Data::MARC::Field008->new(%params);
+	};
+	if ($EVAL_ERROR) {
+		err "Couldn't parse MARC 008 field.";
+	}
 
-	return Data::MARC::Field008->new(%params);
+	return $field_008_obj;
 }
 
 sub serialize {
@@ -392,6 +410,15 @@ It's required for parse() method only.
 
 Default is undef.
 
+=item * C<mode_strict>
+
+Strict mode for parsing.
+
+In not strict mode, parser could parse MARC field 008 with dashes instead of
+spaces,
+
+Default is 0.
+
 =item * C<verbose>
 
 Verbose mode.
@@ -442,7 +469,8 @@ Returns string.
          From Mo::utils::check_required():
                  Parameter 'leader' is required.
 
-         Errors from L<Data::MARC::Field008>, see documentation.
+         Couldn't parse MARC 008 field.
+         (Errors in stack trace are from L<Data::MARC::Field008>, see documentation.)
 
  serialize():
          Bad 'Data::MARC::Field008' instance to serialize.
@@ -589,7 +617,7 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2025 Michal Josef Špaček
+© 2025-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
@@ -602,6 +630,6 @@ the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

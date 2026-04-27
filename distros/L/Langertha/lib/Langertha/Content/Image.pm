@@ -1,6 +1,6 @@
 package Langertha::Content::Image;
 # ABSTRACT: Canonical image content block with cross-provider conversion (OpenAI / Anthropic / Gemini)
-our $VERSION = '0.404';
+our $VERSION = '0.500';
 use Moose;
 use Carp qw( croak );
 use MIME::Base64 qw( encode_base64 decode_base64 );
@@ -204,7 +204,7 @@ Langertha::Content::Image - Canonical image content block with cross-provider co
 
 =head1 VERSION
 
-version 0.404
+version 0.500
 
 =head1 SYNOPSIS
 

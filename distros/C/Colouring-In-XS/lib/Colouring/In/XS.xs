@@ -16,14 +16,21 @@ FALLBACK: TRUE
 void
 set_messages(...)
 	CODE:
-		AV * array = av_make(items, MARK+1);
-		MESSAGES = (HV*)SvRV(av_pop(array));
+		SV * msgs = (items > 0) ? ST(items - 1) : NULL;
+		if (msgs && SvROK(msgs) && SvTYPE(SvRV(msgs)) == SVt_PVHV) {
+			SvREFCNT_dec(MESSAGES_REF);
+			MESSAGES_REF = newRV_inc(SvRV(msgs));
+		}
 
 SV *
 new(...)
 	CODE:
-		SV * colour = ST(1);
-		SV * a = (items > 2) && SvOK(ST(2)) ? ST(2) : newSViv(1);
+		SV * colour;
+		SV * a;
+		if (items < 2)
+			croak("Usage: %s->new(colour [, alpha])", COLOURING_CLASS);
+		colour = ST(1);
+		a = (items > 2) && SvOK(ST(2)) ? ST(2) : sv_2mortal(newSViv(1));
 		RETVAL = xs_new_color(ST(0), colour, a);
 	OUTPUT:
 		RETVAL
@@ -97,7 +104,7 @@ toCSS(self, ...)
 	SV * self
 	CODE:
 		int r = items > 1 ? SvIV(ST(1)) : 0;
-		int s = items > 2 ? SvIV(ST(1)) : 0;
+		int s = items > 2 ? SvIV(ST(2)) : 0;
 		colouring_rgba_t c = xs_extract_rgba(self);
 		double alpha = colouring_round(c.a, r);
 		if (alpha == 1) {
@@ -170,7 +177,9 @@ toHEX(self, ...)
 	CODE:
 		char css[8];
 		colouring_rgba_t c = xs_extract_rgba(self);
-		int force_long = SvTRUE(ST(1)) && SvTYPE(ST(1)) == SVt_IV;
+		int force_long = (items > 1)
+			&& SvTRUE(ST(1))
+			&& SvTYPE(ST(1)) == SVt_IV;
 		colouring_fmt_hex(c, css, sizeof(css), force_long);
 		RETVAL = newSVpvn(css, strlen(css));
 	OUTPUT:
@@ -205,7 +214,7 @@ lighten(colour, amt, ...)
 	SV * colour
 	SV * amt
 	CODE:
-		SV * class = newSVpv("Colouring::In::XS", 17);
+		SV * class = sv_2mortal(newSVpv("Colouring::In::XS", 17));
 		int relative = items > 2 && SvOK(ST(2)) && strcmp(SvPV_nolen(ST(2)), "relative") == 0;
 		double amount = colouring_depercent(SvPV_nolen(amt));
 		colouring_rgba_t c;
@@ -221,7 +230,7 @@ darken(colour, amt, ...)
 	SV * colour
 	SV * amt
 	CODE:
-		SV * class = newSVpv("Colouring::In::XS", 17);
+		SV * class = sv_2mortal(newSVpv("Colouring::In::XS", 17));
 		int relative = items > 2 && SvOK(ST(2)) && strcmp(SvPV_nolen(ST(2)), "relative") == 0;
 		double amount = colouring_depercent(SvPV_nolen(amt));
 		colouring_rgba_t c;
@@ -237,7 +246,7 @@ fade(colour, amt, ...)
 	SV * colour
 	SV * amt
 	CODE:
-		SV * class = newSVpv("Colouring::In::XS", 17);
+		SV * class = sv_2mortal(newSVpv("Colouring::In::XS", 17));
 		double amount = colouring_depercent(SvPV_nolen(amt));
 		colouring_rgba_t c;
 		colour = xs_ensure_obj(class, colour);
@@ -252,7 +261,7 @@ fadeout(colour, amt, ...)
 	SV * colour
 	SV * amt
 	CODE:
-		SV * class = newSVpv("Colouring::In::XS", 17);
+		SV * class = sv_2mortal(newSVpv("Colouring::In::XS", 17));
 		int relative = items > 2 && SvOK(ST(2)) && strcmp(SvPV_nolen(ST(2)), "relative") == 0;
 		double amount = colouring_depercent(SvPV_nolen(amt));
 		colouring_rgba_t c;
@@ -268,7 +277,7 @@ fadein(colour, amt, ...)
 	SV * colour
 	SV * amt
 	CODE:
-		SV * class = newSVpv("Colouring::In::XS", 17);
+		SV * class = sv_2mortal(newSVpv("Colouring::In::XS", 17));
 		int relative = items > 2 && SvOK(ST(2)) && strcmp(SvPV_nolen(ST(2)), "relative") == 0;
 		double amount = colouring_depercent(SvPV_nolen(amt));
 		colouring_rgba_t c;
@@ -284,10 +293,10 @@ mix(colour1, colour2, ...)
 	SV * colour1
 	SV * colour2
 	CODE:
-		SV * class = newSVpv("Colouring::In::XS", 17);
+		SV * class = sv_2mortal(newSVpv("Colouring::In::XS", 17));
 		int weight = 50;
 		colouring_rgba_t c1, c2, out;
-		if (SvOK(ST(2)) && SvIV(ST(2)) != 0) {
+		if (items > 2 && SvOK(ST(2)) && SvIV(ST(2)) != 0) {
 			weight = SvIV(ST(2));
 		}
 		colour1 = xs_ensure_obj(class, colour1);
@@ -303,11 +312,11 @@ SV *
 tint(colour, ...)
 	SV * colour
 	CODE:
-		SV * class = newSVpv("Colouring::In::XS", 17);
+		SV * class = sv_2mortal(newSVpv("Colouring::In::XS", 17));
 		int weight = 50;
 		colouring_rgba_t c, out;
-		if (SvOK(ST(2)) && SvIV(ST(2)) != 0) {
-			weight = SvIV(ST(2));
+		if (items > 1 && SvOK(ST(1)) && SvIV(ST(1)) != 0) {
+			weight = SvIV(ST(1));
 		}
 		colour = xs_ensure_obj(class, colour);
 		c = xs_extract_rgba(colour);
@@ -320,11 +329,11 @@ SV *
 shade(colour, ...)
 	SV * colour
 	CODE:
-		SV * class = newSVpv("Colouring::In::XS", 17);
+		SV * class = sv_2mortal(newSVpv("Colouring::In::XS", 17));
 		int weight = 50;
 		colouring_rgba_t c, out;
-		if (SvOK(ST(2)) && SvIV(ST(2)) != 0) {
-			weight = SvIV(ST(2));
+		if (items > 1 && SvOK(ST(1)) && SvIV(ST(1)) != 0) {
+			weight = SvIV(ST(1));
 		}
 		colour = xs_ensure_obj(class, colour);
 		c = xs_extract_rgba(colour);
@@ -338,7 +347,7 @@ saturate(colour, amt, ...)
 	SV * colour
 	SV * amt
 	CODE:
-		SV * class = newSVpv("Colouring::In::XS", 17);
+		SV * class = sv_2mortal(newSVpv("Colouring::In::XS", 17));
 		int relative = items > 2 && SvOK(ST(2)) && strcmp(SvPV_nolen(ST(2)), "relative") == 0;
 		double amount = colouring_depercent(SvPV_nolen(amt));
 		colouring_rgba_t c;
@@ -354,7 +363,7 @@ desaturate(colour, amt, ...)
 	SV * colour
 	SV * amt
 	CODE:
-		SV * class = newSVpv("Colouring::In::XS", 17);
+		SV * class = sv_2mortal(newSVpv("Colouring::In::XS", 17));
 		int relative = items > 2 && SvOK(ST(2)) && strcmp(SvPV_nolen(ST(2)), "relative") == 0;
 		double amount = colouring_depercent(SvPV_nolen(amt));
 		colouring_rgba_t c;
@@ -369,7 +378,7 @@ SV *
 greyscale(colour)
 	SV * colour
 	CODE:
-		SV * class = newSVpv("Colouring::In::XS", 17);
+		SV * class = sv_2mortal(newSVpv("Colouring::In::XS", 17));
 		colouring_rgba_t c;
 		colour = xs_ensure_obj(class, colour);
 		c = xs_extract_rgba(colour);
@@ -394,8 +403,11 @@ SV *
 get_message(msg)
 	SV * msg
 	CODE:
-		char * key = SvPV_nolen(msg);
-		RETVAL = *hv_fetch(MESSAGES, key, strlen(key), 0);
+		HV * msgs = MESSAGES;
+		STRLEN klen;
+		const char * key = SvPV(msg, klen);
+		SV ** slot = msgs ? hv_fetch(msgs, key, klen, 0) : NULL;
+		RETVAL = (slot && *slot) ? newSVsv(*slot) : &PL_sv_undef;
 	OUTPUT:
 		RETVAL
 

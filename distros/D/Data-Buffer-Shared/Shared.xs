@@ -96,16 +96,6 @@ static int build_kw_4arg(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nar
     return KEYWORD_PLUGIN_EXPR;
 }
 
-static int build_kw_1arg_list(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata) {
-    (void)nargs;
-    const char *func = (const char *)hookdata;
-    OP *map_op = args[0]->op;
-    OP *cvref = newCVREF(0, newGVOP(OP_GV, 0, gv_fetchpv(func, GV_ADD, SVt_PVCV)));
-    OP *arglist = op_append_elem(OP_LIST, map_op, cvref);
-    *out = op_convert_list(OP_ENTERSUB, OPf_STACKED | OPf_WANT_LIST, arglist);
-    return KEYWORD_PLUGIN_EXPR;
-}
-
 static int build_kw_3arg_list(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata) {
     (void)nargs;
     const char *func = (const char *)hookdata;

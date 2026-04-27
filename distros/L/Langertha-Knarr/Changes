@@ -1,5 +1,80 @@
 Revision history for Langertha-Knarr
 
+1.100     2026-04-26 20:36:43Z
+
+    - Langertha floor 0.500 — for ToolCall/Usage value objects,
+      capability registry, and chat_f named-args entry point.
+
+    - New Langertha::Knarr::Response value object: single shape every
+      handler returns and every protocol formatter consumes. Carries
+      content, model, usage (Langertha::Usage), tool_calls
+      (ArrayRef[Langertha::ToolCall]), finish_reason, raw. coerce()
+      upgrades legacy returns (bare string, {content,model} hashref,
+      Langertha::Response) so handlers can hand back whatever is
+      convenient and the dispatcher normalizes once at the boundary.
+      11 blessed/ref-HASH triplets across the handler/decorator/protocol
+      tree replaced with a single typed call site.
+
+    - Generation parameters now reach the engine. Handler::Engine and
+      Handler::Router call $engine->chat_f(messages=>..., tools=>...,
+      tool_choice=>..., response_format=>..., temperature=>...,
+      max_tokens=>...) instead of the old simple_chat_f(@msgs) which
+      silently dropped everything. Knarr::Request gained chat_f_args($engine)
+      that builds the named-arg list capability-aware (consults
+      $engine->supports($cap) so unsupported params are dropped before
+      reaching engines that would reject them).
+
+    - Knarr::Request gained tool_choice and response_format as
+      first-class attributes; OpenAI/Anthropic/Ollama parsers populate
+      them from the wire body.
+
+    - Tool calls are surfaced in proxy responses. Configured (non-
+      passthrough) routes that produce tool_calls now serialize them
+      into OpenAI message.tool_calls (with finish_reason: tool_calls),
+      Anthropic content[] tool_use blocks (stop_reason adapts), and
+      Ollama message.tool_calls. Previous behaviour: silently dropped.
+
+    - Real usage in proxy responses. When the engine reports a
+      Langertha::Usage, OpenAI / Anthropic / Ollama formatters serialize
+      via to_openai_format / to_anthropic_format / to_ollama_format
+      instead of emitting hardcoded zeros. Tracing's end_trace gets the
+      Usage object too — Langfuse generations now carry real token
+      counts.
+
+    - Tracing flush is async via Net::Async::HTTP. The previous
+      LWP::UserAgent call blocked the IO::Async event loop on every
+      end_trace; the new flush fires the request and returns
+      immediately, with a warn-on-fail logger attached.
+
+    - Streaming pump consolidated into Knarr::Stream::from_callback.
+      Removes ~50 lines of duplicated queue/pending/finished/error
+      bookkeeping from Handler::Engine and Handler::Router.
+
+    - supports()-aware streaming detection. The old
+      $engine->can('simple_chat_stream_realtime_f') heuristic now
+      defers to $engine->supports('streaming') when available
+      (Langertha 0.500+) and falls back to the can()-check for older
+      engines.
+
+    - Dead steerboard attribute removed from all six Protocol classes
+      (never read), and Knarr.pm no longer threads $self into
+      protocol-object construction. Knarr::PSGI's constructor argument
+      renamed steerboard => knarr.
+
+    - 'steerboard' string fallbacks replaced with 'unknown' (model
+      default) and 'knarr-code' / 'knarr-raider' (handler defaults).
+
+    - Removed unused handle_embedding_f / handle_transcription_f stubs
+      from the Handler role (no protocol parser, no test, no caller —
+      revisit when a concrete embedding/transcription routing strategy
+      exists).
+
+    - Tests grew from 343 to 360. New: t/15_response.t (value-object
+      contract), t/25_chat_f_params.t (param forwarding + capability
+      gating + tool_calls survival through Engine handler),
+      t/26_tool_calls_routing.t (OpenAI/Anthropic/Ollama formatter
+      output), t/27_usage_routing.t (usage serializer roundtrip).
+
 1.001     2026-04-12 22:22:19Z
 
     - Raw passthrough: unconfigured models are now piped 1:1 as raw

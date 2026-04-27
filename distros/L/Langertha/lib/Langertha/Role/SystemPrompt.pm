@@ -1,6 +1,6 @@
 package Langertha::Role::SystemPrompt;
 # ABSTRACT: Role for APIs with system prompt
-our $VERSION = '0.404';
+our $VERSION = '0.500';
 use Moose::Role;
 
 has system_prompt => (
@@ -25,7 +25,7 @@ Langertha::Role::SystemPrompt - Role for APIs with system prompt
 
 =head1 VERSION
 
-version 0.404
+version 0.500
 
 =head2 system_prompt
 

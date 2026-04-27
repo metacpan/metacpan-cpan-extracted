@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps;
 use strict;
 use warnings;
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 use List::Util 'first';
 
@@ -157,7 +157,7 @@ sub new {
 	 linuxdistroversion  => $linuxdistroversion,
 	 linuxdistrocodename => $linuxdistrocodename,
 	 mapping             => \@mapping,
-	 _mapper_ran         => 0,
+	 _mapper_ran         => {},
 	 _containsmods_warned => 0,
 	);
     my $self = bless \%config, $class;
@@ -182,7 +182,7 @@ sub pre_make {
 # Helpers/Internal functions/methods
 sub _maybe_run_mapper {
     my($self, $dist) = @_;
-    if (!$self->{_mapper_ran}) {
+    if (!$self->{_mapper_ran}{$dist->id}) {
 	$self->_run_mapper($dist);
     }
 }
@@ -190,7 +190,7 @@ sub _maybe_run_mapper {
 sub _run_mapper {
     my($self, $dist) = @_;
 
-    $self->{_mapper_ran} = 1;
+    $self->{_mapper_ran}{$dist->id} = 1;
 
     my @packages = $self->_map_cpandist($dist);
     if (@packages) {

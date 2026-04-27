@@ -1,7 +1,7 @@
 package Data::BitSet::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 require XSLoader;
 XSLoader::load('Data::BitSet::Shared', $VERSION);
 
@@ -154,12 +154,15 @@ L<Data::Heap::Shared> - priority queue
 
 L<Data::Graph::Shared> - directed weighted graph
 
+L<Data::RingBuffer::Shared> - fixed-size overwriting ring buffer
+
 =head1 AUTHOR
 
 vividsnow
 
 =head1 LICENSE
 
-Same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
 
 =cut

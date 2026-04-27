@@ -1,18 +1,14 @@
 package Langertha::Knarr::Protocol::OpenAI;
 # ABSTRACT: OpenAI-compatible wire protocol (chat/completions, models) for Knarr
 
-our $VERSION = '1.001';
+our $VERSION = '1.100';
 use Moose;
 use JSON::MaybeXS;
 use Time::HiRes qw( time );
 use Langertha::Knarr::Request;
+use Langertha::Knarr::Response;
 
 with 'Langertha::Knarr::Protocol';
-
-has steerboard => (
-  is => 'ro',
-  weak_ref => 1,
-);
 
 has _json => (
   is => 'ro',
@@ -38,36 +34,46 @@ sub parse_chat_request {
     $fwd{$h} = $v if defined $v && length $v;
   }
   return Langertha::Knarr::Request->new(
-    protocol    => 'openai',
-    raw         => $data,
-    model       => $data->{model},
-    messages    => $data->{messages} || [],
-    stream      => $data->{stream}      ? 1 : 0,
-    temperature => $data->{temperature},
-    max_tokens  => $data->{max_tokens},
-    tools       => $data->{tools},
-    session_id  => $data->{user} // scalar( $http_req->header('X-Session-Id') ),
-    extra       => { forward_headers => \%fwd },
+    protocol        => 'openai',
+    raw             => $data,
+    model           => $data->{model},
+    messages        => $data->{messages} || [],
+    stream          => $data->{stream}      ? 1 : 0,
+    temperature     => $data->{temperature},
+    max_tokens      => $data->{max_tokens},
+    tools           => $data->{tools},
+    tool_choice     => $data->{tool_choice},
+    response_format => $data->{response_format},
+    session_id      => $data->{user} // scalar( $http_req->header('X-Session-Id') ),
+    extra           => { forward_headers => \%fwd },
   );
 }
 
 sub format_chat_response {
   my ($self, $response, $request) = @_;
-  my $content = ref $response eq 'HASH' ? $response->{content} : "$response";
-  my $model   = ( ref $response eq 'HASH' && $response->{model} ) || $request->model || 'steerboard';
+  my $r = Langertha::Knarr::Response->coerce($response);
+  my $message = { role => 'assistant', content => $r->content };
+  my $finish = $r->finish_reason // 'stop';
+  if ( $r->has_tool_calls ) {
+    $message->{tool_calls} = [ map { $_->to_openai } @{ $r->tool_calls } ];
+    $finish = 'tool_calls';
+  }
+  my $usage = $r->usage && $r->usage->can('to_openai_format')
+    ? $r->usage->to_openai_format
+    : { prompt_tokens => 0, completion_tokens => 0, total_tokens => 0 };
   my $payload = {
     id      => 'chatcmpl-' . int( time() * 1000 ),
     object  => 'chat.completion',
     created => int( time() ),
-    model   => $model,
+    model   => $r->model // $request->model // 'unknown',
     choices => [
       {
         index   => 0,
-        message => { role => 'assistant', content => $content },
-        finish_reason => 'stop',
+        message => $message,
+        finish_reason => $finish,
       },
     ],
-    usage => { prompt_tokens => 0, completion_tokens => 0, total_tokens => 0 },
+    usage => $usage,
   };
   return ( 200, { 'Content-Type' => 'application/json' }, $self->_json->encode($payload) );
 }
@@ -87,7 +93,7 @@ sub format_stream_chunk {
     id => 'chatcmpl-stream',
     object  => 'chat.completion.chunk',
     created => int( time() ),
-    model   => $request->model // 'steerboard',
+    model   => $request->model // 'unknown',
     choices => [ { index => 0, delta => { content => $delta_text }, finish_reason => undef } ],
   };
   return "data: " . $self->_json->encode($payload) . "\n\n";
@@ -108,7 +114,7 @@ Langertha::Knarr::Protocol::OpenAI - OpenAI-compatible wire protocol (chat/compl
 
 =head1 VERSION
 
-version 1.001
+version 1.100
 
 =head1 DESCRIPTION
 
@@ -125,8 +131,10 @@ L<Langertha::Knarr> instance.
 =back
 
 Streaming uses the standard SSE chunk format with C<data: [DONE]> as
-the terminator. Tool calls and tool choice pass through unchanged via
-the request's C<raw> hash.
+the terminator. C<tools>, C<tool_choice>, and C<response_format> are
+extracted into L<Langertha::Knarr::Request> attributes and forwarded to
+the engine via C<chat_f>. Tool-call responses are serialised into
+C<message.tool_calls> with C<finish_reason: "tool_calls">.
 
 =head1 SUPPORT
 

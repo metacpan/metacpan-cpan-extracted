@@ -1,4 +1,123 @@
-Revision history for Future-IO-Redis
+Revision history for Async-Redis
+
+0.002000  2026-04-26
+    - Architectural: unified single-reader socket ownership model
+        - One reader loop dispatches frames to inflight queue or active
+          subscription by frame type and connection mode
+        - Pipelines, auto-pipeline, and pubsub all participate in the
+          same FIFO via inflight entries; the _reading_responses flag
+          is removed
+        - Every submission goes through a write gate so inflight
+          registration order matches wire-write order
+        - Callback-driven subscriptions consume from an internal message
+          queue rather than reading the socket directly; subscribe /
+          psubscribe / ssubscribe route through _execute_command and
+          the unified reader
+    - Architectural: structured-concurrency contract via Future::Selector
+        - New Future::Selector field (_tasks) owns every fire-and-forget
+          background task on the client (reader, reconnect, autopipeline
+          submits, subscription callback driver). Replaces the previous
+          slot-per-task / ->retain pattern.
+        - Reader failure now propagates to any caller awaiting inside
+          the scope. Previously, an unhandled exception in the reader
+          left awaiting callers hanging while the client reported
+          connected=1; awaits now fail with the typed error.
+        - User-initiated disconnect takes a distinct path from
+          _reader_fatal: drains write-gate waiters with a typed
+          Disconnected error and cancels any in-flight reconnect task,
+          so commands suspended on the write gate unwind instead of
+          staying parked.
+        - Adds Future::Selector 0.05 as a runtime dependency.
+    - Security: TLS identity enforced by default
+        - SSL_hostname and SSL_verifycn_name set when connecting by
+          hostname. IP literals verify against IP SAN by default (fails
+          if the cert has no IP SAN for the connected address). New
+          verify_hostname option for opt-out when connecting by IP to a
+          hostname-only cert.
+    - Security: failed handshake no longer leaves object connected
+        - connect() rolls back (reset + typed error) on AUTH/SELECT
+          failure
+        - Password "0" is now sent correctly (was silently skipped by
+          truthy guard)
+    - Correctness: blocking command deadlines
+        - BLMPOP/BZMPOP read timeout from position 0 (was last)
+        - Server timeout 0 means indefinite (no client-side deadline)
+        - WAIT, WAITAOF, XREAD BLOCK, XREADGROUP BLOCK all covered
+    - Correctness: subscription lifecycle
+        - _close (intentional) distinct from _fail_fatal (unrecoverable);
+          iterator next() returns undef vs typed error accordingly
+        - Reconnect uses _pause_for_reconnect / _resume_after_reconnect
+          verbs that preserve replay state; _resume_after_reconnect
+          sets in_pubsub=1 before replay to mirror initial-subscribe
+          timing
+        - Identity-guarded parent-slot clearing prevents stale _close
+          from wiping a newer subscription
+    - Correctness: pool release and shutdown
+        - Double-release is a loud no-op (was silent double-push into
+          idle)
+        - Shutdown flag rejects further acquires; active releases are
+          destroyed
+        - refaddr-based identity (was stringification)
+        - release(undef) is a silent no-op
+    - Correctness: timeout and reset invariant
+        - _await_with_deadline non-throwing helper replaces the
+          wait_any + throwing await pattern that silently skipped
+          timeout cleanup
+        - _reader_fatal detaches inflight before closing the socket so
+          the typed error is preserved; idempotent via
+          _fatal_in_progress guard under eval+finally
+    - Correctness: transaction state cleanup
+        - watch() and multi_start() now set their state flags only
+          after the underlying command succeeds (previously set the
+          flag, then awaited; a failed command left the client claiming
+          to be in MULTI/WATCH state)
+        - watch_multi() unwinds WATCH on a callback die (previously a
+          callback exception left the connection holding watches; the
+          next command on the client would hit a poisoned state)
+        - DISCARD now correctly clears the watching flag (Redis DISCARD
+          drops watches; the client previously claimed to still be
+          watching)
+    - Breaking: removed `install` option from define_command
+        - The option used to install the script as a method on the
+          Async::Redis class. Pass `install => 1` now dies with a clear
+          message pointing callers at run_script(); use that or hold
+          the returned Async::Redis::Script directly.
+    - Privacy: OTel command arguments no longer in spans by default
+        - otel_include_args now defaults to 0; pass 1 to re-enable
+    - Added: message_queue_depth constructor option (default 1)
+    - Added: key prefixing for PFADD, PFCOUNT, PFMERGE, GETBIT, SETBIT,
+      BITCOUNT, BITPOS, HSTRLEN, ZMSCORE
+    - Added: Async::Redis::Cookbook (POD) — runnable, tested recipes
+      for connection management, pipelines, transactions, pubsub,
+      pool, scripts, and observability.
+    - Added: examples/ — async job queue, bulk insert, and a stress
+      harness (examples/stress/) that drives all major features under
+      load with chaos injection (CLIENT KILL) and integrity verification.
+    - Added: GitHub Actions CI workflow (thanks @GaNardelli, PR #4)
+      runs the full test suite with RELEASE_TESTING=1 against a
+      Dockerized Redis on every push and pull request.
+    - Documentation: TASK LIFECYCLE POD section explaining the
+      Future::Selector contract; user-disconnect vs reader-fatal path
+      distinction; broad POD review and corrections across the public
+      surface.
+
+0.001008  2026-04-22
+    - Bug Fix: _reconnect no longer spins forever on permanent failure
+        - New reconnect_max_attempts constructor option (default 10;
+          0 = unlimited). Once exceeded, _reconnect dies with an
+          Async::Redis::Error::Disconnected; the failure propagates
+          through _reconnect_pubsub to the Subscription's read loop,
+          where it routes to on_fail / on_error per existing contract.
+        - Previously, an unreachable Redis would cause _reconnect to
+          loop with exponential backoff (capped at reconnect_delay_max
+          = 60s) indefinitely, with no way for a consumer to tell
+          "reconnecting" from "broken".
+    - Bug Fix: _reconnect_attempt resets to 0 on successful reconnect
+        - Previously the counter only incremented, so cumulative
+          reconnects across a long-running process caused subsequent
+          backoff delays to start from an ever-larger base
+          (0.1 * 2^N where N was total historical reconnects). Now
+          each successful reconnect resets the counter to 0.
 
 0.001007  2026-04-21
     - Feature: Callback-driven Subscription delivery

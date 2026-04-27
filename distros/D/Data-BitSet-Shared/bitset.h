@@ -186,6 +186,21 @@ static inline void bs_init_header(void *base, uint64_t total, uint64_t capacity,
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
 
+/* Validate a mapped header (shared by bs_create reopen and bs_open_fd). */
+static inline int bs_validate_header(const BsHeader *hdr, uint64_t file_size) {
+    if (hdr->magic != BS_MAGIC) return 0;
+    if (hdr->version != BS_VERSION) return 0;
+    if (hdr->capacity == 0) return 0;
+    if (hdr->capacity > (uint64_t)(UINT32_MAX - 63) * 64) return 0;
+    if (hdr->total_size != file_size) return 0;
+    if (hdr->data_off != sizeof(BsHeader)) return 0;
+    uint32_t exp_nw = (uint32_t)((hdr->capacity + 63) / 64);
+    if (hdr->num_words != exp_nw) return 0;
+    uint64_t exp_total = sizeof(BsHeader) + (uint64_t)exp_nw * 8;
+    if (hdr->total_size != exp_total) return 0;
+    return 1;
+}
+
 static inline BsHandle *bs_setup(void *base, size_t ms, const char *path, int bfd) {
     BsHeader *hdr = (BsHeader *)base;
     BsHandle *h = (BsHandle *)calloc(1, sizeof(BsHandle));
@@ -221,6 +236,10 @@ static BsHandle *bs_create(const char *path, uint64_t capacity, char *errbuf) {
         struct stat st;
         if (fstat(fd, &st) < 0) { BS_ERR("fstat: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
         int is_new = (st.st_size == 0);
+        if (!is_new && (uint64_t)st.st_size < sizeof(BsHeader)) {
+            BS_ERR("%s: file too small (%lld)", path, (long long)st.st_size);
+            flock(fd, LOCK_UN); close(fd); return NULL;
+        }
         if (is_new && ftruncate(fd, (off_t)total) < 0) {
             BS_ERR("ftruncate: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL;
         }
@@ -228,9 +247,7 @@ static BsHandle *bs_create(const char *path, uint64_t capacity, char *errbuf) {
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
         if (base == MAP_FAILED) { BS_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
         if (!is_new) {
-            BsHeader *hdr = (BsHeader *)base;
-            if (hdr->magic != BS_MAGIC || hdr->version != BS_VERSION ||
-                hdr->total_size != (uint64_t)st.st_size) {
+            if (!bs_validate_header((BsHeader *)base, (uint64_t)st.st_size)) {
                 BS_ERR("invalid bitset file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN); close(fd);
@@ -248,9 +265,10 @@ static BsHandle *bs_create_memfd(const char *name, uint64_t capacity, char *errb
     uint32_t nw = (uint32_t)((capacity + 63) / 64);
     if (capacity > (uint64_t)(UINT32_MAX - 63) * 64) { BS_ERR("capacity too large"); return NULL; }
     uint64_t total = sizeof(BsHeader) + (uint64_t)nw * 8;
-    int fd = memfd_create(name ? name : "bitset", MFD_CLOEXEC);
+    int fd = memfd_create(name ? name : "bitset", MFD_CLOEXEC | MFD_ALLOW_SEALING);
     if (fd < 0) { BS_ERR("memfd_create: %s", strerror(errno)); return NULL; }
     if (ftruncate(fd, (off_t)total) < 0) { BS_ERR("ftruncate: %s", strerror(errno)); close(fd); return NULL; }
+    (void)fcntl(fd, F_ADD_SEALS, F_SEAL_SHRINK | F_SEAL_GROW);
     void *base = mmap(NULL, (size_t)total, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { BS_ERR("mmap: %s", strerror(errno)); close(fd); return NULL; }
     bs_init_header(base, total, capacity, nw);
@@ -265,9 +283,7 @@ static BsHandle *bs_open_fd(int fd, char *errbuf) {
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { BS_ERR("mmap: %s", strerror(errno)); return NULL; }
-    BsHeader *hdr = (BsHeader *)base;
-    if (hdr->magic != BS_MAGIC || hdr->version != BS_VERSION ||
-        hdr->total_size != (uint64_t)st.st_size) {
+    if (!bs_validate_header((BsHeader *)base, (uint64_t)st.st_size)) {
         BS_ERR("invalid bitset"); munmap(base, ms); return NULL;
     }
     int myfd = fcntl(fd, F_DUPFD_CLOEXEC, 0);
@@ -283,6 +299,6 @@ static void bs_destroy(BsHandle *h) {
     free(h);
 }
 
-static void bs_msync(BsHandle *h) { msync(h->hdr, h->mmap_size, MS_SYNC); }
+static int bs_msync(BsHandle *h) { return msync(h->hdr, h->mmap_size, MS_SYNC); }
 
 #endif /* BITSET_H */

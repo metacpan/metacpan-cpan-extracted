@@ -1,22 +1,23 @@
 use strict;
 use warnings;
 use Test::More;
-use FindBin;
 
 plan skip_all => 'set VALGRIND=1 to run' unless $ENV{VALGRIND};
 
-my $valgrind = `which valgrind 2>/dev/null`;
-chomp $valgrind;
-plan skip_all => 'valgrind not found' unless $valgrind && -x $valgrind;
+my $vg = `which valgrind 2>/dev/null`;
+chomp $vg;
+plan skip_all => 'valgrind not found' unless $vg && -x $vg;
 
-my @tests = glob("$FindBin::Bin/../t/*.t");
+my @tests = glob("t/*.t");
 plan tests => scalar @tests;
 
-for my $t (@tests) {
-    my $out = `$valgrind --leak-check=full --error-exitcode=99 perl -Iblib/lib -Iblib/arch $t 2>&1`;
-    my $rc = $? >> 8;
-    my ($errs) = $out =~ /ERROR SUMMARY: (\d+)/;
-    $errs //= -1;
-    ok($rc != 99 && $errs == 0, "$t under valgrind")
-        or diag "exit=$rc errors=$errs\n" . substr($out, -2000);
+for my $t (sort @tests) {
+    my $name = $t; $name =~ s{.*/}{};
+    my $out = `valgrind --leak-check=full --error-exitcode=42 --errors-for-leak-kinds=definite perl -Mblib $t 2>&1`;
+    my $exit = $? >> 8;
+    my $ok = ($exit != 42);
+    ok $ok, "valgrind: $name" or do {
+        my @lines = grep { /ERROR SUMMARY|definitely lost|Invalid/ } split /\n/, $out;
+        diag join("\n", @lines);
+    };
 }

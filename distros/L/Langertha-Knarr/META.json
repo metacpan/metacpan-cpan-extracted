@@ -42,7 +42,7 @@
             "IO::Async" : "0.802",
             "IO::Async::SSL" : "0",
             "JSON::MaybeXS" : "0",
-            "Langertha" : "0.401",
+            "Langertha" : "0.500",
             "Log::Any" : "0",
             "MIME::Base64" : "0",
             "Module::Runtime" : "0",
@@ -79,7 +79,7 @@
       "x_IRC" : "irc://irc.perl.org/#langertha",
       "x_IRC_user" : "Getty"
    },
-   "version" : "1.001",
+   "version" : "1.100",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -428,7 +428,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "1.001",
+                  "tag" : "1.100",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -572,7 +572,7 @@
    },
    "x_authority" : "cpan:GETTY",
    "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -30,6 +30,15 @@ METHODS
 
             Default is undef.
 
+    *       "mode_strict"
+
+            Strict mode for parsing.
+
+            In not strict mode, parser could parse MARC field 008 with
+            dashes instead of spaces,
+
+            Default is 0.
+
     *       "verbose"
 
             Verbose mode.
@@ -75,7 +84,8 @@ ERRORS
              From Mo::utils::check_required():
                      Parameter 'leader' is required.
 
-             Errors from L<Data::MARC::Field008>, see documentation.
+             Couldn't parse MARC 008 field.
+             (Errors in stack trace are from L<Data::MARC::Field008>, see documentation.)
 
      serialize():
              Bad 'Data::MARC::Field008' instance to serialize.
@@ -199,7 +209,7 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2025 Michal Josef Špaček
+    © 2025-2026 Michal Josef Špaček
 
     BSD 2-Clause License
 
@@ -211,5 +221,5 @@ ACKNOWLEDGEMENTS
     Linked Open Data.
 
 VERSION
-    0.04
+    0.05
 

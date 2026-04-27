@@ -21,7 +21,7 @@
       },
       "develop" : {
          "requires" : {
-            "Atomic::Pipe" : "0.022",
+            "Atomic::Pipe" : "0.026",
             "DBD::MariaDB" : "1.00",
             "DBD::Pg" : "v3.5.0",
             "DBD::mysql" : "4.00",
@@ -36,6 +36,7 @@
       },
       "runtime" : {
          "recommends" : {
+            "Compress::Zstd" : "0.20",
             "Digest::SHA" : "0"
          },
          "requires" : {
@@ -62,7 +63,7 @@
             "perl" : "5.012000"
          },
          "suggests" : {
-            "Atomic::Pipe" : "0.022",
+            "Atomic::Pipe" : "0.026",
             "DBD::MariaDB" : "1.00",
             "DBD::Pg" : "v3.5.0",
             "DBD::mysql" : "4.00",
@@ -92,7 +93,7 @@
          "url" : "https://github.com/exodist/IPC-Manager/"
       }
    },
-   "version" : "0.000033",
+   "version" : "0.000035",
    "x_generated_by_perl" : "v5.42.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

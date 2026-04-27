@@ -68,7 +68,10 @@ subtest 'LRU::Cache->get with missing keys in map' => sub {
     $cache->set("present", 42);
     
     my @keys = ("present", "missing", "also_missing");
-    my @values = map { $cache->get($_) // "UNDEF" } @keys;
+    my @values = map {
+        my $v = $cache->get($_);
+        defined($v) ? $v : "UNDEF";
+    } @keys;
     is_deeply(\@values, [42, "UNDEF", "UNDEF"], 'get handles missing keys in map');
 };
 

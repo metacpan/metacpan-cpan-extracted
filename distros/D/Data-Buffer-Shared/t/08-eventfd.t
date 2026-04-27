@@ -84,17 +84,14 @@ use Data::Buffer::Shared::I64;
     is($val, 1, 'shared eventfd: notify on one, wait on other');
 }
 
-# === create_eventfd replaces previous (owned) ===
+# === create_eventfd is idempotent: second call returns same fd ===
 {
     my $buf = Data::Buffer::Shared::I64->new_anon(10);
-    $buf->create_eventfd;
+    my $efd1 = $buf->create_eventfd;
     $buf->notify;
-    # second create closes old, creates new (counter resets)
     my $efd2 = $buf->create_eventfd;
-    ok($efd2 >= 0, 'second create_eventfd works');
-    is($buf->eventfd, $efd2, 'eventfd returns latest');
-    # old notifications gone (new eventfd has counter 0)
-    ok(!defined $buf->wait_notify, 'new eventfd: old notifications cleared');
+    is($efd2, $efd1, 'create_eventfd is idempotent');
+    is($buf->wait_notify, 1, 'notifications persist across idempotent create');
 }
 
 done_testing;

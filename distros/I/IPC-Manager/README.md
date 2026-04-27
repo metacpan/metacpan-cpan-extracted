@@ -76,9 +76,18 @@ for you:
 
 - $serializer = ipcm\_default\_serializer()
 - ipcm\_default\_serializer($serializer)
+- ipcm\_default\_serializer(\[$class, %args\])
+- ipcm\_default\_serializer($class, %args)
 
-    Get or set the default serializer. 'JSON' is the default unless this is
-    changed.
+    Get or set the default serializer. The default is `'JSON::Zstd'` when
+    [Compress::Zstd](https://metacpan.org/pod/Compress%3A%3AZstd) 0.20 or newer is installed, otherwise `'JSON'`.
+
+    The setter accepts either a class string (uses class methods, no
+    construction) or an arrayref whose first element is the class and whose
+    remaining elements are constructor arguments. The arrayref form (or the
+    flat-list spelling, which is treated identically) builds and caches a
+    single shared instance keyed on `($class, %args)`; subsequent
+    `ipcm_spawn` / `ipcm_connect` calls with the same spec reuse it.
 
 - $ipcm = ipcm\_spawn()
 - $ipcm = ipcm\_spawn(protocol => $PROTOCOL)
@@ -96,7 +105,13 @@ for you:
 
     You can set the serializer with the `serializer => $CLASS` option.
     'IPC::Manager::Serializer::' will be prefixed onto the class name unless it is
-    already present, or if the class name starts with '+'.
+    already present, or if the class name starts with '+'. To configure a
+    serializer that takes constructor arguments (for example to set a custom
+    compression level or dictionary on
+    [IPC::Manager::Serializer::JSON::Zstd](https://metacpan.org/pod/IPC%3A%3AManager%3A%3ASerializer%3A%3AJSON%3A%3AZstd)) pass an arrayref of
+    `[$class, %args]`: `serializer => ['JSON::Zstd', level => 9]`. The
+    arrayref form builds a single cached instance shared across all peer
+    connections; the string form keeps using class methods directly.
 
     You can pick a protocol with the `protocol => $CLASS` option.
     'IPC::Manager::Client::' will be prefixed onto the class name unless it is
@@ -126,8 +141,13 @@ for you:
         '["PROTOCOL_CLASS", "SERIALIZER_CLASS", "ROUTE"]'
 
     The protocol should always be an [IPC::Manager::Client](https://metacpan.org/pod/IPC%3A%3AManager%3A%3AClient) subclass. The
-    serializer should always be an [IPC::Manager::Serializer](https://metacpan.org/pod/IPC%3A%3AManager%3A%3ASerializer) subclass. The route
-    is protocol specific, it may be a file, a directory, a DBI DSN string, etc.
+    serializer slot may be a class string, in which case the receiver uses class
+    methods on it, or a `[$class, %args]` arrayref, in which case the
+    receiver constructs (and caches) a configured instance. The connection info
+    string itself is always plain JSON; only message payloads carried over the
+    chosen protocol are subject to the serializer's encoding (e.g. zstd
+    compression). The route is protocol specific, it may be a file, a directory,
+    a DBI DSN string, etc.
 
 - $con = ipcm\_reconnect($name => $info)
 
@@ -213,6 +233,16 @@ directory structure of some kind.
     This uses a directory as the 'route'. This uses unix sockets, one per client.
     Messages are sent by writing them to the correct clients socket.  (Multiple
     writer, single reader).
+
+- ConnectionUnix
+
+    [IPC::Manager::Client::ConnectionUnix](https://metacpan.org/pod/IPC%3A%3AManager%3A%3AClient%3A%3AConnectionUnix)
+
+    Like UnixSocket but uses `SOCK_STREAM` connection-oriented UNIX sockets.
+    Each client either listens for incoming connections (default) or registers as
+    a non-listener and may only be reached via connections it has itself
+    initiated.  Per-connection management methods are provided by
+    [IPC::Manager::Role::Client::Connection](https://metacpan.org/pod/IPC%3A%3AManager%3A%3ARole%3A%3AClient%3A%3AConnection).
 
 ## DBI Based
 

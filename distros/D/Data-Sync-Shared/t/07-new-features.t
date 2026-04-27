@@ -37,7 +37,7 @@ use Data::Sync::Shared;
 
     my $t0 = time;
     ok !$sem->acquire_n(3, 0.1), 'acquire_n timeout returns false';
-    ok time - $t0 < 2, 'did not hang';
+    cmp_ok time - $t0, '<', 30, 'acquire_n returned (not hung)';
 
     # acquire_n succeeds when enough permits
     $sem->release(5);

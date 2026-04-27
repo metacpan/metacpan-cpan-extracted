@@ -4,8 +4,6 @@ use strict;
 use warnings;
 use 5.018;
 
-our $VERSION = '0.001';
-
 use overload
     '""'     => 'stringify',
     bool     => sub { 1 },

@@ -7,10 +7,10 @@ use 5.018;
 use Future;
 use Future::AsyncAwait;
 use Future::IO;
+use Scalar::Util qw(refaddr);
 use Async::Redis;
+use Async::Redis::Error::Disconnected;
 use Async::Redis::Error::Timeout;
-
-our $VERSION = '0.001';
 
 sub new {
     my ($class, %args) = @_;
@@ -39,9 +39,10 @@ sub new {
         on_dirty => $pool_args{on_dirty} // 'destroy',
 
         # Pool state
-        _idle    => [],   # Available connections
-        _active  => {},   # Connections in use (conn => 1)
-        _waiters => [],   # Futures waiting for connection
+        _idle     => [],   # Available connections
+        _active   => {},   # Connections in use (refaddr => conn)
+        _waiters  => [],   # Futures waiting for connection
+        _shutdown => 0,    # Set by shutdown(); blocks new acquires
         _pending         => [],   # Background futures (creation, cleanup)
         _creating        => 0,    # Connections currently being created
         _total_created   => 0,
@@ -110,6 +111,12 @@ sub _clear_all_connections {
 async sub acquire {
     my ($self) = @_;
 
+    if ($self->{_shutdown}) {
+        die Async::Redis::Error::Disconnected->new(
+            message => "Pool is shut down",
+        );
+    }
+
     # Check for fork - clear pool if PID changed
     $self->_check_fork;
 
@@ -120,7 +127,7 @@ async sub acquire {
         # Health check
         my $healthy = await $self->_health_check($conn);
         if ($healthy) {
-            $self->{_active}{"$conn"} = $conn;
+            $self->{_active}{refaddr($conn)} = $conn;
             return $conn;
         }
 
@@ -147,7 +154,7 @@ async sub acquire {
             die $error;
         }
 
-        $self->{_active}{"$conn"} = $conn;
+        $self->{_active}{refaddr($conn)} = $conn;
         return $conn;
     }
 
@@ -183,7 +190,7 @@ async sub acquire {
 sub release {
     my ($self, $conn) = @_;
 
-    return unless $conn;
+    return unless defined $conn;
 
     # Check for fork - if forked, don't return to pool
     if ($self->_check_fork) {
@@ -191,8 +198,18 @@ sub release {
         return;
     }
 
-    # Remove from active
-    delete $self->{_active}{"$conn"};
+    my $id = refaddr($conn);
+    unless (exists $self->{_active}{$id}) {
+        warn "Pool: release called on unknown or already-released connection";
+        return;
+    }
+    delete $self->{_active}{$id};
+
+    # After shutdown, destroy instead of pooling
+    if ($self->{_shutdown}) {
+        $self->_destroy_connection($conn);
+        return;
+    }
 
     # Check if connection is dirty
     if ($conn->is_dirty) {
@@ -225,7 +242,7 @@ sub _return_to_pool {
     # Give to waiting acquirer if any
     if (@{$self->{_waiters}}) {
         my $waiter = shift @{$self->{_waiters}};
-        $self->{_active}{"$conn"} = $conn;
+        $self->{_active}{refaddr($conn)} = $conn;
         $waiter->done($conn);
         return;
     }
@@ -398,15 +415,12 @@ async sub with {
     return $result;
 }
 
-# Shutdown the pool
-async sub shutdown {
+# Shutdown the pool — synchronous. Blocks new acquires, fails waiters,
+# closes idle connections. Active connections are destroyed when released.
+sub shutdown {
     my ($self) = @_;
-
-    # Cancel waiters
-    for my $waiter (@{$self->{_waiters}}) {
-        $waiter->fail("Pool shutting down") unless $waiter->is_ready;
-    }
-    $self->{_waiters} = [];
+    return if $self->{_shutdown};
+    $self->{_shutdown} = 1;
 
     # Close idle connections
     for my $conn (@{$self->{_idle}}) {
@@ -414,7 +428,13 @@ async sub shutdown {
     }
     $self->{_idle} = [];
 
-    # Active connections will be closed when released
+    # Fail all pending acquire waiters
+    for my $waiter (@{$self->{_waiters}}) {
+        $waiter->fail(Async::Redis::Error::Disconnected->new(
+            message => "Pool is shutting down",
+        )) unless $waiter->is_ready;
+    }
+    $self->{_waiters} = [];
 }
 
 1;
@@ -446,9 +466,107 @@ Async::Redis::Pool - Connection pool for Async::Redis
 
 =head1 DESCRIPTION
 
-Manages a pool of Redis connections with automatic dirty detection.
+Manages a pool of Redis connections with automatic dirty detection. Pool-specific
+options are consumed by C<Async::Redis::Pool>; all other constructor arguments
+are passed through to C<< Async::Redis->new >>.
 
-=head2 Connection Cleanliness
+=head1 CONSTRUCTOR
+
+=head2 new
+
+    my $pool = Async::Redis::Pool->new(
+        host            => 'localhost',
+        min             => 2,
+        max             => 10,
+        acquire_timeout => 5,
+        cleanup_timeout => 5,
+        on_dirty        => 'destroy',
+    );
+
+Options:
+
+=over 4
+
+=item min
+
+Minimum desired pool size. Default: 1. The pool creates replacement
+connections after dirty connections are destroyed if the total drops below
+this value.
+
+=item max
+
+Maximum number of active, idle, and currently-creating connections. Default: 10.
+
+=item acquire_timeout
+
+Seconds to wait for a connection when the pool is at capacity. Default: 5.
+Timeouts throw L<Async::Redis::Error::Timeout>.
+
+=item cleanup_timeout
+
+Seconds to allow a best-effort cleanup command such as C<DISCARD> or
+C<UNWATCH>. Default: 5.
+
+=item on_dirty
+
+Dirty connection policy. Default: C<destroy>.
+
+C<destroy> closes dirty connections instead of returning them to the pool.
+
+C<cleanup> attempts bounded cleanup only for transaction/watch state. PubSub
+connections and connections with pending responses are still destroyed.
+
+=item idle_timeout
+
+Accepted as a pool option but not currently enforced.
+
+=back
+
+=head1 METHODS
+
+=head2 acquire
+
+    my $redis = await $pool->acquire;
+
+Return a healthy L<Async::Redis> connection from the pool, creating one if the
+pool is below C<max>. The caller must later call C<release>.
+
+=head2 release
+
+    $pool->release($redis);
+
+Return a connection to the pool. Dirty connections are either destroyed or
+cleaned according to C<on_dirty>.
+
+=head2 with
+
+    my $result = await $pool->with(async sub {
+        my ($redis) = @_;
+        return await $redis->get('key');
+    });
+
+Acquire a connection, run the callback, and release the connection even if the
+callback dies. This is the recommended public API.
+
+=head2 stats
+
+    my $stats = $pool->stats;
+
+Returns a hashref with C<active>, C<idle>, C<waiting>, C<total>, and
+C<destroyed> counts.
+
+=head2 shutdown
+
+    $pool->shutdown;
+
+Stop new acquires, fail pending waiters, and close idle connections. Active
+connections are destroyed when they are released.
+
+=head2 min / max
+
+Return the configured pool size limits.
+
+=head1 CONNECTION CLEANLINESS
 
 A connection is "dirty" if it has state that could affect the next user:
 
@@ -465,9 +583,11 @@ A connection is "dirty" if it has state that could affect the next user:
 =back
 
 Dirty connections are destroyed by default. The cost of a new TCP handshake
-is far less than the risk of data corruption.
+is far less than the risk of data corruption. With C<< on_dirty => 'cleanup' >>,
+the pool attempts C<DISCARD> and/or C<UNWATCH> only when it can prove those are
+the only dirty states present.
 
-=head2 The with() Pattern
+=head1 RECOMMENDED USAGE
 
 Always prefer C<with()> over manual acquire/release:
 

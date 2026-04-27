@@ -1,7 +1,7 @@
 package Data::Sync::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load('Data::Sync::Shared', $VERSION);
@@ -53,10 +53,11 @@ sub Data::Sync::Shared::Condvar::wait_while {
     }
     while ($pred->()) {
         if (defined $deadline) {
-            require Time::HiRes;
             my $remaining = $deadline - Time::HiRes::time();
             return 0 if $remaining <= 0;
-            $self->wait($remaining) or return 0;
+            $self->wait($remaining);
+            # Fall through to re-check predicate even on timeout — the
+            # condition may have cleared just before our deadline expired.
         } else {
             $self->wait;
         }
@@ -301,13 +302,16 @@ C<$parties> must be >= 2.
     my $r = $bar->wait($timeout); # with timeout
 
 Returns: 1 = leader (last to arrive), 0 = non-leader, -1 = timeout.
-On timeout, the barrier is broken (reset to 0 arrived, generation
-bumped) and all other waiting parties are released.
+On timeout the barrier is permanently broken: C<wait> returns C<-1> for
+the timing-out party and all other waiters, and every subsequent C<wait>
+also returns C<-1> until C<reset> is called. This matches POSIX
+C<pthread_barrier_t> broken semantics.
 
     my $gen = $bar->generation;    # how many times barrier has tripped
     my $n   = $bar->arrived;       # currently arrived count
     my $n   = $bar->parties;       # party count
-    $bar->reset;                   # force-reset barrier state
+    $bar->is_broken;               # true if timeout broke the barrier
+    $bar->reset;                   # clear broken state + bump generation
 
 =head2 Data::Sync::Shared::RWLock
 
@@ -457,6 +461,10 @@ L<Data::Log::Shared> - append-only log (WAL)
 L<Data::Heap::Shared> - priority queue
 
 L<Data::Graph::Shared> - directed weighted graph
+
+L<Data::BitSet::Shared> - shared bitset (lock-free per-bit ops)
+
+L<Data::RingBuffer::Shared> - fixed-size overwriting ring buffer
 
 =head1 AUTHOR
 

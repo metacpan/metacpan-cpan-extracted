@@ -1,6 +1,6 @@
 package Langertha::Knarr::Handler::A2AClient;
 # ABSTRACT: Steerboard handler that consumes a remote A2A (Agent2Agent) agent
-our $VERSION = '1.001';
+our $VERSION = '1.100';
 use Moose;
 use Future::AsyncAwait;
 use JSON::MaybeXS;
@@ -8,6 +8,7 @@ use HTTP::Request;
 use Data::UUID;
 use Net::Async::HTTP;
 use IO::Async::Loop;
+use Langertha::Knarr::Response;
 
 with 'Langertha::Knarr::Handler';
 
@@ -88,7 +89,11 @@ async sub handle_chat_f {
     die "A2A error: " . ( $data->{error}{message} // 'unknown' ) . "\n";
   }
   my $text = $self->_extract_text( $data->{result} );
-  return { content => $text, model => $self->model_id };
+  return Langertha::Knarr::Response->new(
+    content => $text,
+    model   => $self->model_id,
+    raw     => $data,
+  );
 }
 
 sub list_models {
@@ -111,7 +116,7 @@ Langertha::Knarr::Handler::A2AClient - Steerboard handler that consumes a remote
 
 =head1 VERSION
 
-version 1.001
+version 1.100
 
 =head1 SYNOPSIS
 

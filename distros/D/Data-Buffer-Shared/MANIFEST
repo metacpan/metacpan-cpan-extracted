@@ -66,6 +66,9 @@ t/07-memfd-fd-scalar.t
 t/08-eventfd.t
 t/09-review-fixes.t
 t/10-coverage-gaps.t
+t/11-sync-stats.t
+t/pod_synopsis.t
+t/version_check.t
 xs/f32.xs
 xs/f64.xs
 xs/i16.xs
@@ -77,5 +80,25 @@ xs/u16.xs
 xs/u32.xs
 xs/u64.xs
 xs/u8.xs
+xt/asan.t
+xt/binary_data.t
+xt/cloexec_exec.t
+xt/concurrent_open.t
+xt/eg_runs.t
+xt/enospc.t
+xt/fd_leak.t
+xt/fd_validation.t
+xt/invalid_args.t
+xt/longdouble_f64.t
+xt/manifest_vs_git.t
+xt/memfd_seal.t
+xt/mmap_leak.t
+xt/reader_starvation_guard.t
+xt/scm_rights.t
+xt/sigbus_on_truncate.t
+xt/truncation.t
+xt/tsan.t
+xt/valgrind.t
+xt/writer_crash_recovery.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

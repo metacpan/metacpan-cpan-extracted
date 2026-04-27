@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client;
 # ABSTRACT: A comprehensive, DWIM-featured client to the MetaCPAN API
-$MetaCPAN::Client::VERSION = '2.041000';
+$MetaCPAN::Client::VERSION = '2.042000';
 use Moo;
 use Carp;
 use JSON::MaybeXS qw< JSON >;
@@ -23,7 +23,7 @@ use MetaCPAN::Client::Package;
 use MetaCPAN::Client::Permission;
 use MetaCPAN::Client::ResultSet;
 use MetaCPAN::Client::Cover;
-use MetaCPAN::Client::CVE;
+use MetaCPAN::Client::Cve;
 
 has request => (
     is      => 'ro',
@@ -192,8 +192,9 @@ sub all {
     # dispatches to to check types (using the global supported types array).
     $type =~ s/s$//;
 
-    is_hashref($params)
-        or croak "all: params must be a hashref";
+    if ( $params and !is_hashref($params) ) {
+        croak "all: params must be a hashref";
+    }
 
     if ( exists $params->{fields} and !is_arrayref($params->{fields}) ) {
         $params->{fields} = [ split /,/ => $params->{fields} ];
@@ -295,13 +296,13 @@ sub _get {
         or croak sprintf( 'Failed to fetch %s (%s)', ucfirst($type), $arg );
 
     $type = 'DownloadURL' if $type eq 'download_url';
-    my $class = 'MetaCPAN::Client::' . ucfirst($type);
 
+    # deal with API response inconsistency
     if ( $type eq 'cve' and is_hashref($response) and is_arrayref($response->{cve} ) ) {
-        $class =~ s/Cve/CVE/;
         $response = $response->{cve}[0];
     }
 
+    my $class = 'MetaCPAN::Client::' . ucfirst($type);
     return $class->new_from_request($response, $self);
 }
 
@@ -457,7 +458,7 @@ MetaCPAN::Client - A comprehensive, DWIM-featured client to the MetaCPAN API
 
 =head1 VERSION
 
-version 2.041000
+version 2.042000
 
 =head1 SYNOPSIS
 
@@ -539,7 +540,7 @@ Returns a L<MetaCPAN::Client::Cover> object.
 
     my $cve = $mcpan->cve('CPANSA-DBD-SQLite-2019-5018');
 
-Returns a L<MetaCPAN::Client::CVE> object.
+Returns a L<MetaCPAN::Client::Cve> object.
 
 =head2 distribution
 

@@ -276,6 +276,7 @@ is $resp, 'world', 'got response';
     my $ecli = Data::ReqRep::Shared::Client->new($epath);
     $ecli->req_eventfd_set($req_efd);  # set request notification fd
     $ecli->eventfd_set($rep_efd);      # set reply notification fd
+    is $ecli->req_fileno, $req_efd, 'client req_fileno matches set fd';
 
     my $eid = $ecli->send("efd_test");
     ok defined $eid, 'eventfd test: send ok';
@@ -293,6 +294,16 @@ is $resp, 'world', 'got response';
 
     waitpid $pid, 0;
     $esrv->unlink;
+}
+
+# reply_eventfd_consume drains the server-side reply notification counter
+{
+    my $rsrv = Data::ReqRep::Shared->new(undef, 8, 4, 256);
+    my $rfd = $rsrv->reply_eventfd;
+    ok $rfd >= 0, 'reply_eventfd';
+    $rsrv->reply_notify for 1..3;
+    my $count = $rsrv->reply_eventfd_consume;
+    is $count, 3, 'reply_eventfd_consume returns accumulated count';
 }
 
 # Arena wraparound: fill arena, consume, refill

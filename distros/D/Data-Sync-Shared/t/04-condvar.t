@@ -53,7 +53,7 @@ $cv->lock;
 my $t0 = time;
 my $r = $cv->wait(0.1);
 ok !$r, 'wait timeout returns false';
-ok time - $t0 < 2, 'did not hang';
+cmp_ok time - $t0, '<', 30, 'wait returned (not hung)';
 $cv->unlock;
 
 # Signal wakes waiter

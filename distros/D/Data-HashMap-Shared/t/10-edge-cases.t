@@ -781,7 +781,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $map = Data::HashMap::Shared::II->new($path, 10000, 0, 2);
     shm_ii_put $map, $_, $_ * 10 for 1..5;
     shm_ii_put_ttl $map, 99, 990, 0;  # permanent entry
-    sleep 4;
+    sleep 6;  # 3x TTL — robust against smoker clock jitter
     # keys 1-5 expired, key 99 still live
     my ($k, $v) = shm_ii_pop $map;
     is($k, 99, 'pop on TTL map skips expired, returns live entry');

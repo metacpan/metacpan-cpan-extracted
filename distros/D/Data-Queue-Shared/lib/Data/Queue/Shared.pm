@@ -1,7 +1,7 @@
 package Data::Queue::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require XSLoader;
 XSLoader::load('Data::Queue::Shared', $VERSION);
@@ -111,6 +111,18 @@ Same API as Int. Values outside the type range are silently truncated
 Uses a futex-based mutex with a circular arena for variable-length string
 storage. Supports UTF-8 flag preservation. Optimal for messages,
 serialized data, filenames.
+
+Memory-efficient for mixed lengths (short + occasional long strings share
+the arena), but throughput degrades under heavy multi-producer contention
+because all pushes serialize on one mutex.
+
+B<For fixed-length FIFO workloads that need maximum throughput:> use
+L<Data::Deque::Shared::Str> with only C<push_back> / C<pop_front>. It's
+fixed-slot-per-entry (memory use = capacity × max_len), uses a per-slot
+publication state machine instead of a shared mutex, and measures
+1.3x-4.7x faster than Queue::Str depending on contention (1 vs 8 writers,
+32-byte payloads, single box). Use that if your messages share an upper
+bound and you want lock-free-style scaling.
 
 =back
 
@@ -366,6 +378,14 @@ L<Data::Stack::Shared> - LIFO stack
 L<Data::Deque::Shared> - double-ended queue
 
 L<Data::Log::Shared> - append-only log (WAL)
+
+L<Data::Heap::Shared> - priority queue
+
+L<Data::Graph::Shared> - directed weighted graph
+
+L<Data::BitSet::Shared> - shared bitset (lock-free per-bit ops)
+
+L<Data::RingBuffer::Shared> - fixed-size overwriting ring buffer
 
 =head1 AUTHOR
 

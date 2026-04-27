@@ -1,5 +1,9 @@
 Revision history for Heap-PQ
 
+0.04  2026-04-27
+      - Gate the call-checker optree rewrites behind
+        PERL_VERSION_GE(5,16,0). pad_alloc()
+
 0.03  2026-04-08
       - Fix newUNOP(OP_CUSTOM)/newBINOP(OP_CUSTOM) assertion failure on
         debug perl builds (5.16, 5.18). Create ops as OP_NULL first,

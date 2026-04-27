@@ -174,8 +174,11 @@ METHODS
     memory slot. Reading the scalar reads the slot with no "memcpy". Useful
     for large slots where avoiding copy matters.
 
-    The scalar must not outlive the pool object. To modify the slot, use
-    set().
+    The scalar holds a reference to the pool object, keeping it alive for as
+    long as the scalar (or any copy of it) is live. However, the scalar
+    still reflects the current contents of the slot: if the slot is free()d
+    and later re-allocated, reads will see the new data. To modify the slot,
+    use set().
 
   Status
         my $ok  = $pool->is_allocated($idx);
@@ -305,6 +308,10 @@ SEE ALSO
     Data::Heap::Shared - priority queue
 
     Data::Graph::Shared - directed weighted graph
+
+    Data::BitSet::Shared - shared bitset (lock-free per-bit ops)
+
+    Data::RingBuffer::Shared - fixed-size overwriting ring buffer
 
 AUTHOR
     vividsnow

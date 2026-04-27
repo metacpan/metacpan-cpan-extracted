@@ -1,0 +1,42 @@
+:: BATsh example 03: CMD mode features (BATsh::CMD)
+:: Run: perl lib/BATsh.pm eg/03_cmd_features.batsh
+:: Demonstrates IF/ELSE, FOR, GOTO, SET /A, SETLOCAL
+
+@ECHO OFF
+
+:: SET and ECHO
+SET NAME=BATsh
+ECHO Name = %NAME%
+
+:: IF / ELSE
+IF "%NAME%"=="BATsh" (
+    ECHO IF: PASS
+) ELSE (
+    ECHO IF: FAIL
+)
+
+:: FOR loop
+ECHO Items:
+FOR %%I IN (alpha beta gamma) DO ECHO   %%I
+
+:: FOR /L loop
+ECHO Counting:
+SET SUM=0
+FOR /L %%N IN (1,1,5) DO (
+    SET /A SUM=%SUM%+%%N
+)
+ECHO Sum 1..5 = %SUM%
+
+:: SETLOCAL / ENDLOCAL
+SET OUTER=original
+SETLOCAL
+SET OUTER=modified
+ECHO Inside SETLOCAL: %OUTER%
+ENDLOCAL
+ECHO After ENDLOCAL: %OUTER%
+
+:: GOTO
+GOTO :DONE
+ECHO This line is skipped.
+:DONE
+ECHO After GOTO.

@@ -1,0 +1,142 @@
+BATsh Cheat Sheet [EN] English
+==============================
+
+BATsh is a bilingual shell that runs cmd.exe and bash/sh syntax in the
+same script.  The script is divided into sections; each section is
+executed verbatim by the appropriate shell.
+
+1. Mode Detection
+-----------------
+  The FIRST TOKEN of the first substantive line of a section determines
+  which shell executes that section:
+
+  CMD mode: first token is entirely [A-Z 0-9 _ - \ / : . @ %]
+            AND contains at least one uppercase letter A-Z.
+
+    ECHO hello          -> CMD section (cmd.exe)
+    SET FOO=bar baz     -> CMD section  (value part not tested)
+    @ECHO OFF           -> CMD section
+    IF "%X%"=="Y" (     -> CMD section
+
+  SH mode: anything else (any lowercase letter, or no letter at all).
+
+    echo hello          -> SH section  (bash/sh)
+    export FOO=bar      -> SH section
+    if [ -f "$f" ]; then  -> SH section
+    #!/bin/sh           -> SH section  (shebang is a SH line)
+
+  Comments and blank lines are absorbed into the current section.
+  Comment syntax:
+    ::           CMD-style comment
+    REM ...      CMD-style comment (case-insensitive)
+    @REM ...     CMD-style comment
+    # ...        SH-style comment  (NOT #! shebang)
+
+2. Starting the Shell
+----------------------
+  perl lib/BATsh.pm               # interactive REPL
+  perl lib/BATsh.pm script.batsh  # run a script file
+  perl lib/BATsh.pm -e "echo hi"  # inline one-liner
+
+  From Perl:
+    use BATsh;
+    BATsh->run('script.batsh');
+    BATsh->run_string("echo hello");
+    BATsh->repl();
+
+3. Environment Variable Bridge
+--------------------------------
+  Before each section runs, BATsh injects the current %ENV as preamble
+  (SET lines for CMD, export lines for SH).  After the section, the
+  shell's final environment is read back into %ENV.
+
+  export FOO=hello   # SH sets FOO
+  ECHO %FOO%         # CMD reads FOO via bridge (Windows)
+
+  SET BAR=world      # CMD sets BAR
+  echo $BAR          # SH reads BAR via bridge
+
+4. SETLOCAL / ENDLOCAL
+-----------------------
+  SETLOCAL           # snapshot %ENV (handled by BATsh, not cmd.exe)
+  SET TMP=local_val
+  ECHO %TMP%
+  ENDLOCAL           # restore %ENV (TMP is gone)
+
+  Scopes may be nested.
+
+5. Section Boundary Detection
+------------------------------
+  A section ends when its block depth returns to zero AND the next
+  substantive line belongs to a different mode.
+
+  CMD sections track unquoted ( and ) depth:
+
+    IF "%X%"=="Y" (     <- opens block (depth 1)
+        ECHO yes
+    ) ELSE (            <- closes and reopens (depth stays >=1)
+        ECHO no
+    )                   <- closes block (depth 0) -> section may end
+
+  SH sections track keyword depth:
+
+    for x in 1 2; do   <- opens block (depth 1)
+        echo $x
+    done                <- closes block (depth 0) -> section may end
+
+  Lines inside an open block are absorbed into the current section even
+  if their first token looks like the other mode.  This allows:
+
+    for x in A B; do
+        ECHO $x          <- uppercase inside SH block: still SH section
+    done
+
+  SH keyword pairs:
+    Openers (+1): if  for  while  until  case  function  select  {
+    Closers (-1): fi  done  esac  }
+    Neutral ( 0): then  do  else  elif
+
+6. Subroutine Definitions
+--------------------------
+  :GREET
+  echo "Hello $BATSH_ARG1"
+  RET
+
+  Labels begin with : and end with RET or RETURN.
+  The body is extracted before execution (not run inline).
+  The body may contain CMD lines, SH lines, or a mixture.
+
+7. CALL and source
+-------------------
+  CALL :GREET world      # call subroutine with argument
+  CALL other.batsh       # include/run another .batsh file (CMD)
+  source other.batsh     # include/run another .batsh file (SH)
+  . other.batsh          # POSIX dot notation
+
+  Arguments: $BATSH_ARG1 .. $BATSH_ARGn  /%BATSH_ARG1%/ in CMD
+  Count:     $BATSH_ARGC
+
+8. Perl API
+------------
+  BATsh->run($file)            # run a .batsh file
+  BATsh->run_string($source)   # run source string
+  BATsh->run_lines(@lines)     # run array of lines
+  BATsh->repl()                # interactive REPL
+  BATsh->classify_token($tok)  # 'CMD' or 'SH'
+  BATsh->setlocal()            # snapshot %ENV
+  BATsh->endlocal()            # restore %ENV
+  BATsh->call_sub($lbl, @args) # call subroutine
+  BATsh->source_file($file)    # include .batsh file
+  BATsh->version()             # version string
+
+9. Platform Notes
+------------------
+  Windows: Both CMD and SH sections run in pure Perl -- no external cmd.exe, bash, or sh needed.
+  UNIX:    Both CMD and SH sections run in pure Perl -- no external cmd.exe, bash, or sh needed.
+
+10. Requirements
+-----------------
+  Perl 5.005_03 or later.  Core modules only (File::Spec, Carp).
+  No CPAN dependencies.
+
+See also: https://metacpan.org/dist/BATsh

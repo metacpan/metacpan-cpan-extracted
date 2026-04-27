@@ -1,5 +1,5 @@
 package MCP::Run::Compress;
-our $VERSION = '0.004';
+our $VERSION = '0.100';
 use Mojo::Base -base;
 
 # ABSTRACT: Output compression for LLMs
@@ -102,6 +102,7 @@ sub register_filter {
     filter_stderr       => $args{filter_stderr}       // 0,
     output_detect       => $args{output_detect}       // undef,
     transform           => $args{transform}           // undef,
+    command_transform  => $args{command_transform}   // undef,
   };
 
   return;
@@ -800,6 +801,25 @@ sub _build_default_filters {
     max_lines => 30,
   );
 
+  # git commit: transform Co-Authored-By
+  $self->register_filter(
+    parsed_command => {
+      program    => 'git',
+      subcommand => 'commit',
+    },
+    command_transform => sub {
+      my ($cmd) = @_;
+      my $model = $ENV{CO_AUTHORED_BY} || $ENV{ANTHROPIC_MODEL};
+      return $cmd unless $model;
+      if ($cmd =~ /Co-Authored-By:/i) {
+        $cmd =~ s/Co-Authored-By: [^\n]+/Co-Authored-By: $model/g;
+      } else {
+        $cmd =~ s/(")\s*$/$1\n\nCo-Authored-By: $model/m;
+      }
+      return $cmd;
+    },
+  );
+
   return;
 }
 
@@ -842,6 +862,11 @@ sub compress {
 
     $matched_filter = $filter;
     last;  # Found matching filter
+  }
+
+  # Apply command_transform if any filter has it and env var allows it
+  if ($matched_filter && $matched_filter->{command_transform} && !$ENV{MCP_RUN_COMPRESS_NO_CO_AUTHORED}) {
+    $command = $matched_filter->{command_transform}->($command);
   }
 
   if (!$matched_filter) {
@@ -947,6 +972,164 @@ sub compress {
   return ($out, $err);
 }
 
+sub process {
+  my ($self, $command, $stdout, $stderr) = @_;
+
+  my $matched_filter;
+  my $parsed = $self->_parse_command($command);
+
+  for my $key (keys %{$self->filters}) {
+    my $filter = $self->filters->{$key};
+
+    my $matches = 0;
+
+    if (my $pc = $filter->{parsed_command}) {
+      $matches = 1 if $self->_match_parsed_command($pc, $parsed);
+    }
+    elsif ($command =~ /$key/) {
+      $matches = 1;
+    }
+
+    next unless $matches;
+
+    if (my $detect = $filter->{output_detect}) {
+      my @lines = split(/\n/, $stdout);
+      my $has_match = grep { /$detect/ } @lines;
+      unless ($has_match) {
+        next;
+      }
+    }
+
+    $matched_filter = $filter;
+    last;
+  }
+
+  my ($out, $err) = ($stdout, $stderr // '');
+
+  if ($matched_filter && $matched_filter->{command_transform} && !$ENV{MCP_RUN_COMPRESS_NO_CO_AUTHORED}) {
+    $command = $matched_filter->{command_transform}->($command);
+  }
+
+  if (!$matched_filter) {
+    return { command => $command, stdout => $out, stderr => $err };
+  }
+
+  if ($matched_filter->{filter_stderr}) {
+    $out .= "\n$err" if length $err;
+    $err = '';
+  }
+
+  if ($matched_filter->{strip_ansi}) {
+    $out =~ s/\x1b\[[0-9;]*[a-zA-Z]//g;
+    $err =~ s/\x1b\[[0-9;]*[a-zA-Z]//g;
+  }
+
+  for my $match (@{$matched_filter->{match_output} // []}) {
+    if ($out =~ /$match->{pattern}/) {
+      return { command => $command, stdout => $match->{message}, stderr => $err };
+    }
+  }
+
+  if ($matched_filter->{transform}) {
+    $out = join("\n", map { $matched_filter->{transform}->($_) } split(/\n/, $out));
+  }
+
+  if (@{$matched_filter->{strip_lines_matching} // []}) {
+    my @out_lines = split(/\n/, $out);
+    @out_lines = grep {
+      my $keep = 1;
+      for my $pattern (@{$matched_filter->{strip_lines_matching}}) {
+        if (/$pattern/) {
+          $keep = 0;
+          last;
+        }
+      }
+      $keep;
+    } @out_lines;
+    $out = join("\n", @out_lines);
+  }
+
+  if (@{$matched_filter->{keep_lines_matching} // []}) {
+    my @out_lines = split(/\n/, $out);
+    @out_lines = grep {
+      my $keep = 0;
+      for my $pattern (@{$matched_filter->{keep_lines_matching}}) {
+        if (/$pattern/) {
+          $keep = 1;
+          last;
+        }
+      }
+      $keep;
+    } @out_lines;
+    $out = join("\n", @out_lines);
+  }
+
+  if ($matched_filter->{truncate_lines_at} > 0) {
+    my $max = $matched_filter->{truncate_lines_at};
+    $out = join("\n", map { length $_ > $max ? substr($_, 0, $max) . '...' : $_ } split(/\n/, $out));
+    $err = join("\n", map { length $_ > $max ? substr($_, 0, $max) . '...' : $_ } split(/\n/, $err)) if length $err;
+  }
+
+  if ($matched_filter->{head_lines} > 0) {
+    my @lines = split(/\n/, $out);
+    my $head = $matched_filter->{head_lines};
+    my $tail = $matched_filter->{tail_lines} // 0;
+    my $omit = @lines - $head - $tail;
+    if ($omit > 0 && $tail > 0) {
+      $out = (join("\n", @lines[0..$head-1])) . "\n... $omit lines omitted ...\n" . (join("\n", @lines[-$tail..-1]));
+    }
+    elsif ($omit > 0) {
+      $out = join("\n", @lines[0..min($head, @lines)-1]);
+    }
+  }
+  elsif ($matched_filter->{tail_lines} > 0) {
+    my @lines = split(/\n/, $out);
+    $out = join("\n", @lines[-min($matched_filter->{tail_lines}, @lines)..-1]);
+  }
+
+  if ($matched_filter->{max_lines} > 0) {
+    my @out_lines = split(/\n/, $out);
+    if (@out_lines > $matched_filter->{max_lines}) {
+      $out = join("\n", @out_lines[0..$matched_filter->{max_lines}-1]) . "\n... " . (@out_lines - $matched_filter->{max_lines}) . " more lines ...";
+    }
+  }
+
+  if (!length trim($out) && $matched_filter->{on_empty}) {
+    $out = $matched_filter->{on_empty};
+  }
+
+  return { command => $command, stdout => $out, stderr => $err };
+}
+
+sub transform_command {
+  my ($self, $command) = @_;
+  return $command if $ENV{MCP_RUN_COMPRESS_NO_CO_AUTHORED};
+
+  my $parsed = $self->_parse_command($command);
+
+  for my $key (keys %{$self->filters}) {
+    my $filter = $self->filters->{$key};
+
+    my $matches = 0;
+
+    if (my $pc = $filter->{parsed_command}) {
+      $matches = 1 if $self->_match_parsed_command($pc, $parsed);
+    }
+    elsif ($command =~ /$key/) {
+      $matches = 1;
+    }
+
+    next unless $matches;
+
+    if ($filter->{command_transform}) {
+      $command = $filter->{command_transform}->($command);
+      last;  # Only apply first matching command_transform
+    }
+  }
+
+  return $command;
+}
+
 1;
 
 __END__
@@ -961,7 +1144,7 @@ MCP::Run::Compress - Output compression for LLMs
 
 =head1 VERSION
 
-version 0.004
+version 0.100
 
 =head1 SYNOPSIS
 

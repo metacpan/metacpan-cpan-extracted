@@ -362,6 +362,8 @@ subtest 'list_models URL correctness for all OpenAICompatible engines' => sub {
     [ 'Langertha::Engine::AKIOpenAI',    qr{aki\.io/v1/models$} ],
     [ 'Langertha::Engine::DeepSeek',     qr{deepseek\.com/models$} ],
     [ 'Langertha::Engine::Mistral',      qr{mistral\.ai/v1/models$} ],
+    [ 'Langertha::Engine::Scaleway',     qr{scaleway\.ai/v1/models$} ],
+    [ 'Langertha::Engine::TSystems',     qr{llmhub\.t-systems\.net/v2/models$} ],
   );
 
   plan tests => scalar(@engines) * 2;

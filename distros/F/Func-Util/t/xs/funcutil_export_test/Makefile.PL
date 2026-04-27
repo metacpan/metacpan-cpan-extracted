@@ -1,9 +1,25 @@
 use strict;
 use warnings;
-use ExtUtils::MakeMaker;
+# WriteEmptyMakefile is in @EXPORT_OK, not @EXPORT — without the explicit
+# import the Windows/Cygwin skip-branch below dies with
+# "Undefined subroutine &main::WriteEmptyMakefile".
+use ExtUtils::MakeMaker qw(WriteMakefile WriteEmptyMakefile);
 use Config;
 
-# Platform-specific linking against Func::Util shared library
+# Skip building this test helper entirely on Windows/Cygwin: linking
+# against Util.dll requires an import library we don't ship, the runtime
+# load fails ("No such process"), and the failed dlopen poisons Cygwin
+# fork resources for later tests in the run. The corresponding test
+# (t/011-util-export-registry-xs.t) skips on those platforms.
+if ($^O eq 'MSWin32' || $^O eq 'cygwin' || $^O eq 'msys') {
+    WriteEmptyMakefile(
+        NAME    => 'funcutil_export_test',
+        VERSION => '0.01',
+    );
+    exit 0;
+}
+
+# Platform-specific linking against Func::Util shared library.
 # Func::Util uses DynaLoader with RTLD_GLOBAL, so its symbols are globally
 # visible at runtime. We just need the build-time linker to accept unresolved
 # symbols that will be satisfied by RTLD_GLOBAL at load time.
@@ -17,11 +33,6 @@ if ($^O eq 'linux' || $^O eq 'freebsd' || $^O eq 'openbsd' || $^O eq 'netbsd' ||
     # relative path that the runtime linker can't resolve. Instead, allow
     # unresolved symbols at link time; they'll be satisfied by RTLD_GLOBAL.
     $extra_ldflags = '-Wl,--allow-shlib-undefined';
-}
-elsif ($^O eq 'MSWin32' || $^O eq 'cygwin' || $^O eq 'msys') {
-    # Windows/Cygwin: no RTLD_GLOBAL, must link directly against the DLL
-    my $dll_ext = $Config{dlext} || 'dll';
-    $extra_ldfrom = "../../../blib/arch/auto/Func/Util/Util.$dll_ext";
 }
 # macOS/darwin: no special linking needed (flat namespace + RTLD_GLOBAL)
 

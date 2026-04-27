@@ -1,9 +1,20 @@
+# *SVGPDF - Produce PDF from SVG images*
+
+![Version](https://img.shields.io/github/v/release/sciurius/SVGPDF)
+![GitHub issues](https://img.shields.io/github/issues/sciurius/SVGPDF)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
+![Language Perl](https://img.shields.io/badge/Language-Perl-blue)
+
 # SVGPDF
 
-**WARNING** This is a work in progress and probably not useful yet.
+This module implements a subset of SVG to produce PDF XObjects. It
+works with PDF::API and PDF::Builder.
 
-This module implements a subset of SVG, sufficient to
-produce PDF XObjects from some SVG data.
+**NOTICE:** While providing useful support for basic SVG
+functionality, this library is far from a complete implementation of
+SVG or CSS. Many SVG files found _in the wild_ will work, but others
+will find it lacks needed features. Use at your own risk,
+understanding what SVG features you need and what SVGPDF provides.
 
 # INSTALLATION
 
@@ -13,7 +24,9 @@ To install this module, run the following commands:
 	make
 	make test
 	make install
-
+	
+You also need PDF::API2 version 2.043 or later, or PDF::Builder 3.027
+or later.
 
 # SUPPORT AND DOCUMENTATION
 
@@ -30,7 +43,7 @@ GitHub.
 
 # COPYRIGHT AND LICENCE
 
-Copyright (C) 2022,2024 Johan Vromans
+Copyright (C) 2022,2026 Johan Vromans
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided under the terms of the Simplified

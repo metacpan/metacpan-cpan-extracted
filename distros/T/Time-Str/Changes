@@ -1,2 +1,5 @@
+0.02 2026-04-27
+ - Added missing Test::Number::Delta to test prerequisites.
+
 0.01 2026-04-26
   - Initial CPAN release.

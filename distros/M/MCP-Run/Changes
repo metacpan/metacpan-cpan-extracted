@@ -1,5 +1,7 @@
 Revision history for MCP-Run
 
+0.100     2026-04-27 02:36:52Z
+
 0.004     2026-04-25 04:02:17Z
 
   - Add C<validator> attribute to MCP::Run and MCP::Run::Bash. A coderef

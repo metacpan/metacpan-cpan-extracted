@@ -1,5 +1,9 @@
 Revision history for Colouring-In-XS
 
+0.10    2026-04-26
+        Memory-safety fixes addressing CPAN-tester SEGVs on threaded
+        and longdouble Perls (5.10–5.43) on Linux/OpenBSD.
+
 0.09    2026-03-29
         Fix SEGV when SV type is not SVt_PV in xs_ensure_obj and xs_new (e.g. hash values on older Perls).
         Fix desaturate test tolerance for floating-point rounding on i686/longdouble platforms.

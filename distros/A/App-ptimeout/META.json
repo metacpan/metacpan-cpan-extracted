@@ -49,6 +49,6 @@
          "url" : "https://github.com/DrHyde/perl-modules-App-ptimeout"
       }
    },
-   "version" : "v1.0.2",
+   "version" : "v1.0.3",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

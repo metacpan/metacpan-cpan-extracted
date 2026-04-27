@@ -1,6 +1,6 @@
 package Langertha::Engine::MiniMax;
 # ABSTRACT: MiniMax API (OpenAI-compatible)
-our $VERSION = '0.404';
+our $VERSION = '0.500';
 use Moose;
 use Carp qw( croak );
 
@@ -8,7 +8,6 @@ extends 'Langertha::Engine::OpenAIBase';
 
 with map { 'Langertha::Role::'.$_ } qw(
   StaticModels
-  ResponseFormat
   Tools
 );
 
@@ -58,7 +57,7 @@ Langertha::Engine::MiniMax - MiniMax API (OpenAI-compatible)
 
 =head1 VERSION
 
-version 0.404
+version 0.500
 
 =head1 SYNOPSIS
 

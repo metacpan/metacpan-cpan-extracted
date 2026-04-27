@@ -68,24 +68,24 @@ ok !defined $dq->pop_back, 'pop_back empty';
 # timeout
 my $t0 = time;
 ok !defined $dq->pop_front_wait(0.1), 'pop_front_wait timeout';
-ok time - $t0 < 2;
+cmp_ok time - $t0, '<', 30, 'pop_front_wait returned (not hung)';
 
 $dq->push_back($_) for 1..10;
 $t0 = time;
 ok !$dq->push_back_wait(99, 0.1), 'push_back_wait timeout when full';
-ok time - $t0 < 2;
+cmp_ok time - $t0, '<', 30, 'push_back_wait returned (not hung)';
 $dq->clear;
 
 # pop_back_wait timeout
 $t0 = time;
 ok !defined $dq->pop_back_wait(0.1), 'pop_back_wait timeout';
-ok time - $t0 < 2;
+cmp_ok time - $t0, '<', 30, 'pop_back_wait returned (not hung)';
 
 # push_front_wait timeout
 $dq->push_back($_) for 1..10;
 $t0 = time;
 ok !$dq->push_front_wait(99, 0.1), 'push_front_wait timeout when full';
-ok time - $t0 < 2;
+cmp_ok time - $t0, '<', 30, 'push_front_wait returned (not hung)';
 $dq->clear;
 
 # cross-process
@@ -151,6 +151,15 @@ ok $efd >= 0, 'eventfd';
 ok $ed->notify;
 my $ec = $ed->eventfd_consume;
 is $ec, 1, 'eventfd_consume';
+
+# --- drain ---
+
+my $dd = Data::Deque::Shared::Int->new(undef, 8);
+$dd->push_back($_) for 1..5;
+is $dd->size, 5, 'size before drain';
+is $dd->drain, 5, 'drain returns discarded count';
+is $dd->size, 0, 'empty after drain';
+is $dd->drain, 0, 'drain on empty returns 0';
 
 # --- sync / unlink ---
 

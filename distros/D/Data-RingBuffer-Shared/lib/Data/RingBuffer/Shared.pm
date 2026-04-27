@@ -1,7 +1,7 @@
 package Data::RingBuffer::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 require XSLoader;
 XSLoader::load('Data::RingBuffer::Shared', $VERSION);
 @Data::RingBuffer::Shared::Int::ISA = ('Data::RingBuffer::Shared');
@@ -181,6 +181,7 @@ vividsnow
 
 =head1 LICENSE
 
-Same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
 
 =cut

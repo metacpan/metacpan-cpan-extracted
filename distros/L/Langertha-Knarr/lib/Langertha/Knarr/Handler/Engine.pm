@@ -1,11 +1,11 @@
 package Langertha::Knarr::Handler::Engine;
 # ABSTRACT: Knarr handler that proxies directly to a Langertha engine
-our $VERSION = '1.001';
+our $VERSION = '1.100';
 use Moose;
 use Future;
 use Future::AsyncAwait;
-use Scalar::Util qw( blessed );
 use Langertha::Knarr::Stream;
+use Langertha::Knarr::Response;
 
 with 'Langertha::Knarr::Handler';
 
@@ -31,63 +31,38 @@ sub _model_id {
 
 async sub handle_chat_f {
   my ($self, $session, $request) = @_;
-  my @msgs = @{ $request->messages };
-  my $response = await $self->engine->simple_chat_f(@msgs);
-  my $content = blessed($response) ? "$response" : ( ref $response eq 'HASH' ? ( $response->{content} // '' ) : "$response" );
-  return { content => $content, model => $self->_model_id };
+  my $response = await $self->engine->chat_f( $request->chat_f_args($self->engine) );
+  my $r = Langertha::Knarr::Response->coerce($response);
+  return $r->clone_with( model => $r->model // $self->_model_id );
 }
 
 async sub handle_stream_f {
   my ($self, $session, $request) = @_;
   my $engine = $self->engine;
-  unless ( $engine->can('simple_chat_stream_realtime_f') && $engine->can('chat_stream_request') ) {
+  unless ( _supports_streaming($engine) ) {
     # Engine doesn't support native streaming — fall back to single-chunk.
     my $r = await $self->handle_chat_f($session, $request);
-    return Langertha::Knarr::Stream->from_list( $r->{content} );
+    return Langertha::Knarr::Stream->from_list( $r->content );
   }
 
-  my @queue;
-  my $pending;     # Future awaiting the next chunk
-  my $finished = 0;
-  my $error;
+  return Langertha::Knarr::Stream->from_callback( sub {
+    my ($emit, $done, $fail) = @_;
+    my $cb = sub {
+      my ($chunk) = @_;
+      my $text = ref $chunk && $chunk->can('content') ? $chunk->content : "$chunk";
+      $emit->($text);
+    };
+    my $f = $engine->simple_chat_stream_realtime_f( $cb, @{ $request->messages } );
+    $f->on_done( $done );
+    $f->on_fail( $fail );
+    $f->retain;
+  });
+}
 
-  my $deliver = sub {
-    my ($value) = @_;
-    if ( $pending ) {
-      my $p = $pending; $pending = undef;
-      $p->done($value);
-    } else {
-      push @queue, $value;
-    }
-  };
-
-  my $cb = sub {
-    my ($chunk) = @_;
-    my $text = blessed($chunk) && $chunk->can('content') ? $chunk->content : "$chunk";
-    return unless defined $text && length $text;
-    $deliver->($text);
-  };
-
-  my @msgs = @{ $request->messages };
-  my $f = $engine->simple_chat_stream_realtime_f( $cb, @msgs );
-  $f->on_done( sub { $finished = 1; $deliver->(undef) } );
-  $f->on_fail( sub { $error = $_[0]; $finished = 1; $deliver->(undef) } );
-  $f->retain;
-
-  return Langertha::Knarr::Stream->new(
-    source => sub {
-      if ( @queue ) {
-        my $v = shift @queue;
-        return Future->done($v);
-      }
-      if ( $finished ) {
-        return Future->fail($error) if $error;
-        return Future->done(undef);
-      }
-      $pending = Future->new;
-      return $pending;
-    },
-  );
+sub _supports_streaming {
+  my ($engine) = @_;
+  return $engine->supports('streaming') if $engine->can('supports');
+  return $engine->can('simple_chat_stream_realtime_f') && $engine->can('chat_stream_request');
 }
 
 sub list_models {
@@ -110,7 +85,7 @@ Langertha::Knarr::Handler::Engine - Knarr handler that proxies directly to a Lan
 
 =head1 VERSION
 
-version 1.001
+version 1.100
 
 =head1 SYNOPSIS
 
@@ -130,10 +105,14 @@ version 1.001
 =head1 DESCRIPTION
 
 Wraps a single L<Langertha::Engine::*> instance and exposes it as a
-Knarr handler. Streaming requests use the engine's
-C<simple_chat_stream_realtime_f> for native token-by-token streaming
-through Knarr's chunked response pump; engines that don't support
-streaming fall back to a single-chunk emission.
+Knarr handler. Non-streaming requests are dispatched via
+C<< $engine->chat_f >> with the full set of generation parameters
+(C<tools>, C<tool_choice>, C<response_format>, C<temperature>,
+C<max_tokens>) forwarded from the client request — subject to the
+engine's reported capabilities. Streaming requests use
+C<simple_chat_stream_realtime_f> for native token-by-token delivery;
+engines that don't support streaming fall back to a single-chunk
+emission.
 
 For routing across multiple engines based on model name, use
 L<Langertha::Knarr::Handler::Router> with a L<Langertha::Knarr::Router>
@@ -142,8 +121,8 @@ config instead.
 =head2 engine
 
 Required. Any object consuming L<Langertha::Role::Chat>. Streaming
-support requires the engine to also implement
-C<simple_chat_stream_realtime_f> (most Langertha engines do).
+support is detected via C<< $engine->supports('streaming') >> (Langertha
+0.500+) or the presence of C<simple_chat_stream_realtime_f>.
 
 =head2 model_id
 

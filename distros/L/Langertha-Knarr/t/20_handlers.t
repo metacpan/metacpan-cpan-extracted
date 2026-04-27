@@ -9,16 +9,21 @@ use Langertha::Knarr::Request;
 use Langertha::Knarr::Handler::Engine;
 use Langertha::Knarr::Handler::Raider;
 
-# --- Mock engine: implements simple_chat_f ---
+# --- Mock engine: implements chat_f (named-args) and simple_chat_f (positional) ---
 {
   package MockEngine;
   use Moose;
   has chat_model => ( is => 'ro', isa => 'Str', default => 'mock-1' );
-  sub simple_chat_f {
-    my ($self, @msgs) = @_;
+  sub chat_f {
+    my ($self, %args) = @_;
+    my @msgs = @{ $args{messages} || [] };
     my $last = $msgs[-1];
     my $text = ref $last ? ($last->{content} // '') : "$last";
     return Future->done( "engine-said: $text" );
+  }
+  sub simple_chat_f {
+    my ($self, @msgs) = @_;
+    return $self->chat_f( messages => \@msgs );
   }
   __PACKAGE__->meta->make_immutable;
 }
@@ -45,7 +50,7 @@ use Langertha::Knarr::Handler::Raider;
     messages => [ { role => 'user', content => 'ping' } ],
   );
   my $r = $h->handle_chat_f( $session, $req )->get;
-  is( $r->{content}, 'engine-said: ping', 'engine handler proxies' );
+  is( $r->content, 'engine-said: ping', 'engine handler proxies' );
   is( $h->list_models->[0]{id}, 'mock-1', 'model id from engine' );
 }
 
@@ -72,9 +77,9 @@ use Langertha::Knarr::Handler::Raider;
   my $r2 = $h->handle_chat_f( $s1, $req2 )->get;
   my $r3 = $h->handle_chat_f( $s2, $req1 )->get;
 
-  is( $r1->{content}, 'raider-turn-1: first',  'session a turn 1' );
-  is( $r2->{content}, 'raider-turn-2: second', 'session a turn 2 (same raider)' );
-  is( $r3->{content}, 'raider-turn-1: first',  'session b uses fresh raider' );
+  is( $r1->content, 'raider-turn-1: first',  'session a turn 1' );
+  is( $r2->content, 'raider-turn-2: second', 'session a turn 2 (same raider)' );
+  is( $r3->content, 'raider-turn-1: first',  'session b uses fresh raider' );
   is( scalar @created, 2, 'two raiders created (one per session)' );
 }
 

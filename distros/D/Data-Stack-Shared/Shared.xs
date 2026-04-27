@@ -118,6 +118,7 @@ eventfd(self)
     EXTRACT_STK(self);
   CODE:
     RETVAL = stk_create_eventfd(h);
+    if (RETVAL < 0) croak("eventfd: %s", strerror(errno));
   OUTPUT:
     RETVAL
 
@@ -168,7 +169,7 @@ sync(self)
   PREINIT:
     EXTRACT_STK(self);
   CODE:
-    stk_msync(h);
+    if (stk_msync(h) != 0) croak("msync: %s", strerror(errno));
 
 void
 unlink(self_or_class, ...)
@@ -177,7 +178,7 @@ unlink(self_or_class, ...)
     const char *p;
     if (sv_isobject(self_or_class)) {
         StkHandle *h = INT2PTR(StkHandle*, SvIV(SvRV(self_or_class)));
-        if (!h) croak("destroyed object");
+        if (!h) croak("Attempted to use a destroyed object");
         p = h->path;
     } else {
         if (items < 2) croak("Usage: ...->unlink($path)");
@@ -196,10 +197,10 @@ stats(self)
     StkHeader *hdr = h->hdr;
     hv_store(hv, "size", 4, newSVuv(stk_size(h)), 0);
     hv_store(hv, "capacity", 8, newSVuv((UV)hdr->capacity), 0);
-    hv_store(hv, "pushes", 6, newSVuv((UV)hdr->stat_pushes), 0);
-    hv_store(hv, "pops", 4, newSVuv((UV)hdr->stat_pops), 0);
-    hv_store(hv, "waits", 5, newSVuv((UV)hdr->stat_waits), 0);
-    hv_store(hv, "timeouts", 8, newSVuv((UV)hdr->stat_timeouts), 0);
+    hv_store(hv, "pushes", 6, newSVuv((UV)__atomic_load_n(&hdr->stat_pushes, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "pops", 4, newSVuv((UV)__atomic_load_n(&hdr->stat_pops, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "waits", 5, newSVuv((UV)__atomic_load_n(&hdr->stat_waits, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "timeouts", 8, newSVuv((UV)__atomic_load_n(&hdr->stat_timeouts, __ATOMIC_RELAXED)), 0);
     hv_store(hv, "mmap_size", 9, newSVuv((UV)h->mmap_size), 0);
     RETVAL = newRV_noinc((SV *)hv);
   OUTPUT:
@@ -384,11 +385,10 @@ push(self, val)
     uint32_t max_len = h->elem_size - sizeof(uint32_t);
     if (slen > max_len) slen = max_len;
     uint8_t *buf;
-    Newx(buf, h->elem_size, uint8_t);
+    Newxz(buf, h->elem_size, uint8_t);
     uint32_t l32 = (uint32_t)slen;
     memcpy(buf, &l32, sizeof(uint32_t));
     memcpy(buf + sizeof(uint32_t), s, slen);
-    if (slen < max_len) memset(buf + sizeof(uint32_t) + slen, 0, max_len - slen);
     RETVAL = stk_try_push(h, buf, h->elem_size);
     Safefree(buf);
   OUTPUT:
@@ -408,11 +408,10 @@ push_wait(self, val, ...)
     uint32_t max_len = h->elem_size - sizeof(uint32_t);
     if (slen > max_len) slen = max_len;
     uint8_t *buf;
-    Newx(buf, h->elem_size, uint8_t);
+    Newxz(buf, h->elem_size, uint8_t);
     uint32_t l32 = (uint32_t)slen;
     memcpy(buf, &l32, sizeof(uint32_t));
     memcpy(buf + sizeof(uint32_t), s, slen);
-    if (slen < max_len) memset(buf + sizeof(uint32_t) + slen, 0, max_len - slen);
     RETVAL = stk_push(h, buf, h->elem_size, timeout);
     Safefree(buf);
   OUTPUT:

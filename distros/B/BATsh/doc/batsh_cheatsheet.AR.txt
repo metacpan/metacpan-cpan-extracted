@@ -1,0 +1,99 @@
+BATsh ورقة الغش [AR] العربية
+==============================
+
+BATsh هو صدفة ثنائية اللغة تشغّل كلاً من بنية cmd.exe و bash/sh
+في نفس السكريبت، الرمز الأول في كل سطر يحدد الوضع.
+
+1. اكتشاف الوضع
+-----------------
+  ECHO hello          -> وضع cmd.exe (الرمز الأول بالكامل بالأحرف الكبيرة)
+  echo hello          -> وضع bash/sh (الرمز الأول يحتوي على أحرف صغيرة)
+  # تعليق              -> تعليق (متجاهل)
+  :: تعليق             -> تعليق (نمط CMD, متجاهل)
+  REM تعليق            -> تعليق (نمط CMD, متجاهل)
+
+2. تشغيل الصدفة
+-----------------
+  perl lib/BATsh.pm                    # REPL تفاعلي
+  perl lib/BATsh.pm script.batsh       # تشغيل ملف سكريبت
+  perl lib/BATsh.pm -e "echo marhaba"  # سطر واحد
+
+  من Perl API:
+    use BATsh;
+    BATsh->run('script.batsh');
+    BATsh->run_string("echo marhaba");
+    BATsh->repl();
+
+3. جسر متغيرات البيئة
+------------------------------
+  تشترك كتل CMD و SH في المتغيرات عبر %ENV في Perl.
+
+  export FOO=marhaba   # SH يحدد FOO
+  ECHO %FOO%           # CMD يقرأ FOO عبر الجسر (Windows)
+
+  SET BAR=alam         # CMD يحدد BAR
+  echo $BAR            # SH يقرأ BAR عبر الجسر
+
+4. SETLOCAL / ENDLOCAL
+-----------------------
+  SETLOCAL           # لقطة ل %ENV
+  SET TMP=محلي
+  ECHO %TMP%
+  ENDLOCAL           # استعادة %ENV (يختفي TMP)
+
+  يمكن تداخل النطاقات.
+
+5. التداخل (الوضع المختلط)
+-------------------------------
+  يجب أن تقترن تراكيب الكتلة بشكل صحيح.
+
+  for x in 1 2; do   # SH يفتح الكتلة
+      ECHO item $x   # سطر CMD داخل كتلة SH
+  done               # SH يغلق الكتلة
+
+  كلمات مفتاحية CMD: IF/ENDIF  FOR/NEXT  WHILE/WEND  DO/LOOP
+  كلمات مفتاحية SH:  if/fi  for/done  while/done  until/done
+                         case/esac  { }
+
+6. تعريفات البروتين الفرعية
+------------------------------
+  :GREET
+  echo "Marhaba $BATSH_ARG1"
+  RET
+
+  تبدأ التسميات ب : وتنتهي ب RET أو RETURN.
+
+7. CALL و source
+------------------
+  CALL :GREET alam       # استدعاء بروتين فرعي بحجة
+  CALL akhar.batsh       # تضمين/تشغيل ملف .batsh آخر (CMD)
+  source akhar.batsh     # تضمين/تشغيل ملف .batsh آخر (SH)
+  . akhar.batsh          # تدوين النقطة POSIX
+
+  الحجج: $BATSH_ARG1 .. $BATSH_ARGn  (%BATSH_ARG1% في CMD)
+  العدد: $BATSH_ARGC
+
+8. Perl API
+-----------
+  BATsh->run($file)            # تشغيل ملف .batsh
+  BATsh->run_string($source)   # تشغيل سلسلة مصدر
+  BATsh->run_lines(@lines)     # تشغيل مصفوفة أسطر
+  BATsh->repl()                # REPL تفاعلي
+  BATsh->classify_token($tok)  # يعيد 'CMD' أو 'SH'
+  BATsh->setlocal()            # لقطة %ENV
+  BATsh->endlocal()            # استعادة %ENV
+  BATsh->call_sub($lbl, @args) # استدعاء بروتين فرعي
+  BATsh->source_file($file)    # تضمين ملف .batsh
+  BATsh->version()             # سلسلة الإصدار
+
+9. ملاحظات المنصة
+------------------
+  Windows: كلا قسمي CMD وSH يعملان بـPerl خالص -- لا حاجة لـcmd.exe أو bash أو sh خارجي.
+  UNIX:    كلا قسمي CMD وSH يعملان بـPerl خالص -- لا حاجة لـcmd.exe أو bash أو sh خارجي.
+
+10. المتطلبات
+--------------
+  Perl 5.005_03 أو أحدث. وحدات نووية فقط (File::Spec, Carp).
+  لا تبعيات CPAN.
+
+انظر أيضاً: https://metacpan.org/dist/BATsh

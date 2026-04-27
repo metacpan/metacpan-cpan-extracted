@@ -1,0 +1,99 @@
+BATsh Lembar Contekan [ID] Bahasa Indonesia
+============================================
+
+BATsh adalah shell bilingual yang menjalankan sintaks cmd.exe dan bash/sh
+dalam satu skrip. Token pertama setiap baris menentukan mode eksekusi.
+
+1. Pendeteksian Mode
+---------------------
+  ECHO hello          -> mode cmd.exe (token pertama semua huruf kapital)
+  echo hello          -> mode bash/sh (token pertama ada huruf kecil)
+  # komentar          -> komentar (diabaikan)
+  :: komentar         -> komentar (gaya CMD, diabaikan)
+  REM komentar        -> komentar (gaya CMD, diabaikan)
+
+2. Menjalankan Shell
+---------------------
+  perl lib/BATsh.pm                    # REPL interaktif
+  perl lib/BATsh.pm script.batsh       # menjalankan file skrip
+  perl lib/BATsh.pm -e "echo hello"    # satu baris perintah
+
+  Dari Perl API:
+    use BATsh;
+    BATsh->run('script.batsh');
+    BATsh->run_string("echo hello");
+    BATsh->repl();
+
+3. Jembatan Variabel Lingkungan
+--------------------------------
+  Variabel dari blok CMD dan SH dibagi melalui %ENV Perl.
+
+  export FOO=hello   # SH mengatur FOO
+  ECHO %FOO%         # CMD membaca FOO melalui jembatan (Windows)
+
+  SET BAR=world      # CMD mengatur BAR
+  echo $BAR          # SH membaca BAR melalui jembatan
+
+4. SETLOCAL / ENDLOCAL
+-----------------------
+  SETLOCAL           # simpan snapshot %ENV
+  SET TMP=local_val
+  ECHO %TMP%
+  ENDLOCAL           # pulihkan %ENV (TMP hilang)
+
+  Mendukung penyarangan (nesting).
+
+5. Penyarangan (Mode Campuran)
+-------------------------------
+  Konstruksi blok harus dipasangkan dengan benar.
+  Baris mode berbeda di dalam blok diteruskan apa adanya.
+
+  for x in 1 2; do   # SH membuka blok
+      ECHO item $x   # baris CMD di dalam blok SH
+  done               # SH menutup blok
+
+  Kata kunci CMD: IF/ENDIF  FOR/NEXT  WHILE/WEND  DO/LOOP
+  Kata kunci SH:  if/fi  for/done  while/done  until/done
+                  case/esac  { }
+
+6. Definisi Subrutin
+---------------------
+  :GREET
+  echo "Hello $BATSH_ARG1"
+  RET
+
+  Label dimulai dengan : dan diakhiri dengan RET atau RETURN.
+
+7. CALL dan source
+-------------------
+  CALL :GREET world      # panggil subrutin dengan argumen
+  CALL other.batsh       # sertakan file .batsh lain (CMD)
+  source other.batsh     # sertakan file .batsh lain (SH)
+  . other.batsh          # notasi titik POSIX
+
+  Argumen: $BATSH_ARG1 .. $BATSH_ARGn  (%BATSH_ARG1% di CMD)
+  Jumlah:  $BATSH_ARGC
+
+8. Perl API
+------------
+  BATsh->run($file)            # jalankan file .batsh
+  BATsh->run_string($source)   # jalankan string sumber
+  BATsh->run_lines(@lines)     # jalankan array baris
+  BATsh->repl()                # REPL interaktif
+  BATsh->classify_token($tok)  # kembalikan 'CMD' atau 'SH'
+  BATsh->setlocal()            # snapshot %ENV
+  BATsh->endlocal()            # pulihkan %ENV
+  BATsh->call_sub($lbl, @args) # panggil subrutin
+  BATsh->source_file($file)    # sertakan file .batsh
+  BATsh->version()             # string versi
+
+9. Catatan Platform
+--------------------
+  Windows: Blok CMD dan SH berjalan di Perl murni -- tidak perlu cmd.exe/bash/sh eksternal.
+  UNIX:    Blok CMD dan SH berjalan di Perl murni -- tidak perlu cmd.exe/bash/sh eksternal.
+
+10. Persyaratan
+----------------
+  Perl 5.005_03 atau lebih baru. Hanya modul inti (File::Spec, Carp).
+
+Lihat juga: https://metacpan.org/dist/BATsh

@@ -1,7 +1,7 @@
 package Data::Graph::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 require XSLoader;
 XSLoader::load('Data::Graph::Shared', $VERSION);
 
@@ -56,18 +56,29 @@ bitmap pool, edges stored as adjacency lists in a separate edge pool.
 Mutex-protected mutations with PID-based stale recovery.
 
 B<Note>: C<remove_node> removes the node and its outgoing edges only.
-Incoming edges from other nodes are NOT automatically removed — callers
-must remove them explicitly if needed. This is an O(1) design choice;
-full incoming-edge cleanup would require O(E) traversal.
+Incoming edges from other nodes are NOT automatically removed (this is
+an O(1) design choice) — their C<dst> is left dangling until the slot's
+bit is reused. Use C<remove_node_full> when this matters; it additionally
+splices incoming edges in O(N+E).
 
 B<Linux-only>. Requires 64-bit Perl.
 
 =head1 METHODS
 
+=head2 Constructors
+
+    my $g = Data::Graph::Shared->new($path, $max_nodes, $max_edges);  # file-backed
+    my $g = Data::Graph::Shared->new(undef, $max_nodes, $max_edges);  # anonymous
+    my $g = Data::Graph::Shared->new_memfd($name, $max_nodes, $max_edges);
+    my $g = Data::Graph::Shared->new_from_fd($fd);                    # reopen memfd
+
+=head2 Operations
+
     my $id = $g->add_node($data);            # returns node index or undef
     $g->add_edge($src, $dst);                # weight defaults to 1
     $g->add_edge($src, $dst, $weight);
-    $g->remove_node($id);
+    $g->remove_node($id);                    # O(1) — outgoing edges only
+    $g->remove_node_full($id);               # O(N+E) — also splices incoming
     $g->has_node($id);
     $g->node_data($id);
     $g->set_node_data($id, $data);
@@ -77,7 +88,23 @@ B<Linux-only>. Requires 64-bit Perl.
     my @ids = $g->nodes;                     # all node indices
     $g->node_count;  $g->edge_count;
     $g->max_nodes;   $g->max_edges;
-    $g->path;        $g->stats;
+
+=head2 Lifecycle
+
+    $g->path;              # backing file path, or undef for anon/memfd
+    $g->memfd;             # memfd fd (-1 for file-backed/anon)
+    $g->stats;             # diagnostic hashref
+    $g->sync;              # msync mmap to backing store
+    $g->unlink;            # remove backing file
+    Class->unlink($path);  # class-method form
+
+=head2 Event Loop Integration
+
+    my $fd = $g->eventfd;         # lazy-create eventfd, returns fd
+    $g->eventfd_set($fd);         # attach an external eventfd
+    my $fd = $g->fileno;          # current eventfd fd, or -1
+    $g->notify;                   # write 1 to eventfd (caller signals update)
+    my $n = $g->eventfd_consume;  # read+reset eventfd counter
 
 =head1 BENCHMARKS
 
@@ -124,12 +151,17 @@ L<Data::PubSub::Shared> - publish-subscribe ring
 
 L<Data::ReqRep::Shared> - request-reply
 
+L<Data::BitSet::Shared> - shared bitset (lock-free per-bit ops)
+
+L<Data::RingBuffer::Shared> - fixed-size overwriting ring buffer
+
 =head1 AUTHOR
 
 vividsnow
 
 =head1 LICENSE
 
-Same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
 
 =cut

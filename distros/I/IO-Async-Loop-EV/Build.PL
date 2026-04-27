@@ -1,3 +1,4 @@
+use v5;
 use strict;
 use warnings;
 
@@ -6,13 +7,15 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'IO::Async::Loop::EV',
    requires => {
+      'perl' => '5.020',
+
       'IO::Async::Loop' => '0.49',
       'IO::Async::Metrics' => 0,
       'EV' => 0,
    },
    test_requires => {
       'IO::Async::LoopTests' => '0.76',
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

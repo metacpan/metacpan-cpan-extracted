@@ -78,6 +78,8 @@ FUNCTIONS
    Errors
     Croaks if:
 
+    *   A named parameter is unknown or out of range
+
     *   The string cannot be parsed in the specified format
 
     *   Date or time components are out of valid ranges
@@ -136,7 +138,7 @@ FUNCTIONS
     All values are numeric except "tz_utc", "tz_abbrev", and
     "tz_annotation". The following components may be present:
 
-    *   "year" - Four-digit year (1-9999)
+    *   "year" - Year (1-9999)
 
     *   "month" - Month (1-12)
 
@@ -168,6 +170,8 @@ FUNCTIONS
 
    Errors
     Croaks if:
+
+    *   A named parameter is unknown or out of range
 
     *   The string cannot be parsed in the specified format
 
@@ -268,13 +272,7 @@ FUNCTIONS
 
     *   $time is outside the supported range
 
-    *   "format" is unknown
-
-    *   "offset" is out of range (-1439 to 1439)
-
-    *   "precision" is out of range (0-9)
-
-    *   "nanosecond" is out of range (0-999999999)
+    *   A named parameter is unknown or out of range
 
    Examples
         # RFC 3339 (default)
@@ -406,8 +404,7 @@ SUPPORTED FORMATS
   ANSIC (alias: ctime)
     ANSI C asctime() / ctime() format.
 
-      DDD MMM _D HH:MM:SS YYYY
-      DDD MMM DD HH:MM:SS YYYY
+      DDD MMM (_D|DD) HH:MM:SS YYYY
 
     Where "_D" is a space-padded single-digit day.
 
@@ -523,6 +520,7 @@ SUPPORTED FORMATS
 
     Parsing:
 
+      Mon Dec 1 03:04:05 2024 +0100
       Mon Dec 24 15:30:45 2012 +0100
 
     Timezone offset format: "Â±HHMM"
@@ -684,6 +682,7 @@ SUPPORTED FORMATS
 
     Parsing:
 
+      Mon Dec 01 03:04:05 +0100 2024
       Mon Dec 24 15:30:45 +0100 2012
 
     Timezone offset format: "Â±HHMM"
@@ -701,10 +700,8 @@ SUPPORTED FORMATS
   Unix
     The date(1) command output format as defined by POSIX.
 
-      DDD MMM _D HH:MM:SS (Â±HHMM|UTC|GMT|abbrev) YYYY
-      DDD MMM DD HH:MM:SS (Â±HHMM|UTC|GMT|abbrev) YYYY
-      DDD MMM _D HH:MM:SS YYYY (Â±HHMM|UTC|GMT|abbrev)
-      DDD MMM DD HH:MM:SS YYYY (Â±HHMM|UTC|GMT|abbrev)
+      DDD MMM (_D|DD) HH:MM:SS (Â±HHMM|UTC|GMT|abbrev) YYYY
+      DDD MMM (_D|DD) HH:MM:SS YYYY (Â±HHMM|UTC|GMT|abbrev)
 
     Where "_D" is a space-padded single-digit day.
 
@@ -714,7 +711,9 @@ SUPPORTED FORMATS
     UTC designators ("UTC", "GMT"), and timezone abbreviations.
     Abbreviations are returned in "tz_abbrev" without resolution.
 
+      Mon Dec  1 03:04:05 2024 UTC
       Mon Dec 24 15:30:45 2012 UTC
+      Mon Dec  1 03:04:05 UTC 2024
       Mon Dec 24 15:30:45 UTC 2012
 
     Timezone offset format: "Â±HHMM"

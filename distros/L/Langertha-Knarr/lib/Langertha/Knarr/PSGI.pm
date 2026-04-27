@@ -1,6 +1,6 @@
 package Langertha::Knarr::PSGI;
 # ABSTRACT: PSGI adapter for Langertha::Knarr (buffered, no streaming)
-our $VERSION = '1.001';
+our $VERSION = '1.100';
 use Moose;
 use JSON::MaybeXS;
 use Langertha::Knarr::Request;
@@ -10,9 +10,9 @@ use Langertha::Knarr::Request;
 # Streaming requests are coerced into buffered responses: the full body is
 # assembled (open + chunks + close + done) before being returned to the
 # PSGI server. Use the native Net::Async::HTTP::Server entrypoint
-# (Steerboard->run) if you need real streaming.
+# (Langertha::Knarr->run) if you need real streaming.
 
-has steerboard => ( is => 'ro', required => 1 );
+has knarr => ( is => 'ro', required => 1 );
 
 has _json => (
   is => 'ro',
@@ -46,7 +46,7 @@ sub _read_body {
 
 sub _handle_psgi {
   my ($self, $env) = @_;
-  my $sb = $self->steerboard;
+  my $sb = $self->knarr;
   my $method = $env->{REQUEST_METHOD};
   my $path   = $env->{PATH_INFO} // '/';
 
@@ -123,7 +123,7 @@ Langertha::Knarr::PSGI - PSGI adapter for Langertha::Knarr (buffered, no streami
 
 =head1 VERSION
 
-version 1.001
+version 1.100
 
 =head1 SYNOPSIS
 
@@ -131,7 +131,7 @@ version 1.001
     use Langertha::Knarr::PSGI;
 
     my $knarr = Langertha::Knarr->new( handler => $handler );
-    my $app = Langertha::Knarr::PSGI->new( steerboard => $knarr )->to_app;
+    my $app = Langertha::Knarr::PSGI->new( knarr => $knarr )->to_app;
     # $app is now a Plack-compatible coderef
 
     # Run with any PSGI server:
@@ -151,10 +151,9 @@ just drives the inner stream to completion in a blocking loop and
 returns the full assembled body. Use the native
 L<Langertha::Knarr/run> entry point if you need real-time streaming.
 
-=head2 steerboard
+=head2 knarr
 
-Required. The L<Langertha::Knarr> instance to expose. (Attribute name
-preserved from the upstream Steerboard prototype.)
+Required. The L<Langertha::Knarr> instance to expose.
 
 =head2 to_app
 

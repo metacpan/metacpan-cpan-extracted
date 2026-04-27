@@ -585,9 +585,18 @@ ok(!defined $invalid_attr, 'invalid attr returns undef');
 {
     my $doc = XML::PugiXML->new;
     $doc->load_string('<root big="9223372036854775807" ubig="18446744073709551615"/>');
-    is($doc->root->attr('big')->as_llong, 9223372036854775807, 'as_llong works');
-    # as_ullong might overflow on some systems, just check it doesn't crash
-    ok(defined $doc->root->attr('ubig')->as_ullong, 'as_ullong works');
+    SKIP: {
+        # On 32-bit Perl, the literal 9223372036854775807 silently overflows
+        # to a float; the XS returns a string, which can't be compared to it.
+        require Config;
+        skip 'as_llong needs 64-bit Perl', 2 if $Config::Config{ivsize} < 8;
+        is($doc->root->attr('big')->as_llong, 9223372036854775807, 'as_llong works');
+        ok(defined $doc->root->attr('ubig')->as_ullong, 'as_ullong works');
+    }
+    # On 32-bit Perl the as_llong/as_ullong methods return a string —
+    # exercise that path generically.
+    ok($doc->root->attr('big')->as_llong, 'as_llong returns truthy');
+    ok($doc->root->attr('ubig')->as_ullong, 'as_ullong returns truthy');
 }
 
 # Test compiled XPath
@@ -842,10 +851,13 @@ ok(!defined $invalid_attr, 'invalid attr returns undef');
     my $doc = XML::PugiXML->new;
     $doc->load_string('<root><item/></root>');
 
-    my $offset = $doc->root->child('item')->offset_debug;
-    ok(defined $offset, 'offset_debug returns value');
-    # The exact offset depends on pugixml internals, just verify it's reasonable
-    ok($offset >= 0, 'offset_debug is non-negative');
+    my $parsed_offset = $doc->root->child('item')->offset_debug;
+    ok(defined $parsed_offset, 'offset_debug returns value');
+    ok($parsed_offset >= 0, 'parsed node has non-negative offset');
+
+    # Constructed nodes have no source offset; pugixml returns -1.
+    my $constructed = $doc->root->append_child('built');
+    is($constructed->offset_debug, -1, 'constructed node offset_debug is -1');
 }
 
 #--------------------------------------------------
@@ -1272,6 +1284,118 @@ ok(!defined $invalid_attr, 'invalid attr returns undef');
     utf8::upgrade($text);
     $doc->root->set_text($text);
     like($doc->root->text, qr/n.c/, 'set_text with UTF-8 works');
+}
+
+#--------------------------------------------------
+# NODE_* type constants
+#--------------------------------------------------
+{
+    is(XML::PugiXML::NODE_NULL(),        0, 'NODE_NULL');
+    is(XML::PugiXML::NODE_DOCUMENT(),    1, 'NODE_DOCUMENT');
+    is(XML::PugiXML::NODE_ELEMENT(),     2, 'NODE_ELEMENT');
+    is(XML::PugiXML::NODE_PCDATA(),      3, 'NODE_PCDATA');
+    is(XML::PugiXML::NODE_CDATA(),       4, 'NODE_CDATA');
+    is(XML::PugiXML::NODE_COMMENT(),     5, 'NODE_COMMENT');
+    is(XML::PugiXML::NODE_PI(),          6, 'NODE_PI');
+    is(XML::PugiXML::NODE_DECLARATION(), 7, 'NODE_DECLARATION');
+    is(XML::PugiXML::NODE_DOCTYPE(),     8, 'NODE_DOCTYPE');
+
+    my $doc = XML::PugiXML->new;
+    $doc->load_string('<root>text</root>');
+    is($doc->root->type, XML::PugiXML::NODE_ELEMENT(), 'element type matches constant');
+    is($doc->root->first_child->type, XML::PugiXML::NODE_PCDATA(), 'pcdata type matches constant');
+}
+
+#--------------------------------------------------
+# New format/parse constants
+#--------------------------------------------------
+{
+    ok(defined XML::PugiXML::FORMAT_INDENT_ATTRIBUTES(), 'FORMAT_INDENT_ATTRIBUTES defined');
+    ok(defined XML::PugiXML::PARSE_WS_PCDATA_SINGLE(),   'PARSE_WS_PCDATA_SINGLE defined');
+
+    my $doc = XML::PugiXML->new;
+    $doc->load_string('<root a="1" b="2"/>');
+    my $out = $doc->to_string("  ", XML::PugiXML::FORMAT_INDENT()
+                                  | XML::PugiXML::FORMAT_INDENT_ATTRIBUTES());
+    like($out, qr/\n.*a="1"/, 'FORMAT_INDENT_ATTRIBUTES wraps attrs');
+}
+
+#--------------------------------------------------
+# Attr::set_name
+#--------------------------------------------------
+{
+    my $doc = XML::PugiXML->new;
+    $doc->load_string('<root old="v"/>');
+    my $attr = $doc->root->attr('old');
+    ok($attr->set_name('renamed'), 'set_name returns true');
+    is($attr->name, 'renamed', 'attr name updated');
+    is($doc->root->attr('renamed')->value, 'v', 'value preserved after rename');
+    ok(!defined $doc->root->attr('old'), 'old name no longer present');
+}
+
+#--------------------------------------------------
+# Stale-handle checks on secondary node arguments
+#--------------------------------------------------
+{
+    my $doc = XML::PugiXML->new;
+    $doc->load_string('<root><a/><b/></root>');
+    my $a = $doc->root->child('a');
+    my $b = $doc->root->child('b');
+    $doc->reset;
+    $doc->load_string('<root><x/></root>');
+    my $root = $doc->root;
+
+    eval { $root->insert_child_before('y', $a); };
+    like($@, qr/Stale/, 'insert_child_before croaks on stale ref');
+
+    eval { $root->insert_child_after('y', $a); };
+    like($@, qr/Stale/, 'insert_child_after croaks on stale ref');
+
+    eval { $root->remove_child($a); };
+    like($@, qr/Stale/, 'remove_child croaks on stale arg');
+
+    eval { $root->append_copy($a); };
+    like($@, qr/Stale/, 'append_copy croaks on stale source');
+
+    eval { $root->prepend_copy($a); };
+    like($@, qr/Stale/, 'prepend_copy croaks on stale source');
+
+    eval { $root->insert_copy_before($a, $b); };
+    like($@, qr/Stale/, 'insert_copy_before croaks on stale arg');
+
+    eval { $root->insert_copy_after($a, $b); };
+    like($@, qr/Stale/, 'insert_copy_after croaks on stale arg');
+
+    # Independently verify the ref_node check fires when only ref is stale
+    # (the cases above all stale both args, so the source check fires first).
+    my $fresh = $root->append_child('fresh');
+    eval { $root->insert_copy_before($fresh, $a); };
+    like($@, qr/Stale/, 'insert_copy_before croaks on stale ref_node only');
+    eval { $root->insert_copy_after($fresh, $a); };
+    like($@, qr/Stale/, 'insert_copy_after croaks on stale ref_node only');
+}
+
+#--------------------------------------------------
+# Attr stale after load_string reload
+#--------------------------------------------------
+{
+    my $doc = XML::PugiXML->new;
+    $doc->load_string('<root id="1"/>');
+    my $attr = $doc->root->attr('id');
+    $doc->load_string('<root/>');
+    eval { $attr->value; };
+    like($@, qr/Stale attribute handle/, 'attr stale after load_string reload');
+    ok(!$attr->valid, 'valid() false on attr after reload');
+}
+
+#--------------------------------------------------
+# doc->child after reset
+#--------------------------------------------------
+{
+    my $doc = XML::PugiXML->new;
+    $doc->load_string('<root><item/></root>');
+    $doc->reset;
+    ok(!defined $doc->child('root'), 'doc->child returns undef after reset');
 }
 
 done_testing;

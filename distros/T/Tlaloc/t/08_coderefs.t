@@ -216,11 +216,12 @@ subtest 'named sub reference' => sub {
 };
 
 subtest 'method reference' => sub {
-    package TestClass {
+    {
+        package TestClass;
         sub new { bless {}, shift }
         sub method { return "method result" }
     }
-    
+
     my $obj = TestClass->new();
     my $method_ref = $obj->can('method');
     

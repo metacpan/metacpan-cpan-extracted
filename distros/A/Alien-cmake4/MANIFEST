@@ -4,6 +4,7 @@ cmake4.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+README.md
 t/Alien-cmake4/01-use.t
 t/Alien-cmake4/02-version.t
 t/Alien-cmake4/03-diag.t

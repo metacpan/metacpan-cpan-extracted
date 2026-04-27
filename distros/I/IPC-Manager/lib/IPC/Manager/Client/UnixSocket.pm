@@ -2,10 +2,11 @@ package IPC::Manager::Client::UnixSocket;
 use strict;
 use warnings;
 
-our $VERSION = '0.000033';
+our $VERSION = '0.000035';
 
 use File::Spec;
 use Carp qw/croak/;
+use Errno qw/EAGAIN EWOULDBLOCK/;
 use POSIX qw/mkfifo/;
 use IO::Socket::UNIX 1.55 qw/SOCK_DGRAM/;
 
@@ -15,6 +16,9 @@ use Object::HashBase qw{
     +socket
     +socket_cache
 };
+
+use Role::Tiny::With;
+with 'IPC::Manager::Role::Outbox';
 
 sub _viable { require IO::Socket::UNIX; IO::Socket::UNIX->VERSION('1.55'); 1 }
 
@@ -103,23 +107,94 @@ sub get_messages {
     return $self->sort_messages(@out);
 }
 
+sub _peer_socket {
+    my ($self, $peer) = @_;
+
+    my $sock = $self->peer_exists($peer) or return undef;
+
+    return $self->{+SOCKET_CACHE}->{$sock} //= do {
+        my $w = IO::Socket::UNIX->new(
+            Type     => SOCK_DGRAM,
+            Peer     => $sock,
+            Blocking => $self->send_blocking ? 1 : 0,
+        ) or die "Cannot connect to socket: $!";
+        $w;
+    };
+}
+
+sub _outbox_set_blocking {
+    my ($self, $bool) = @_;
+    for my $s (values %{$self->{+SOCKET_CACHE} // {}}) {
+        $s->blocking($bool ? 1 : 0);
+    }
+}
+
+sub _outbox_can_send {
+    my ($self, $peer) = @_;
+
+    my $s = $self->_peer_socket($peer) or return 0;
+
+    require IO::Select;
+    my $sel = IO::Select->new($s);
+    return $sel->can_write(0) ? 1 : 0;
+}
+
+sub _outbox_try_write {
+    my ($self, $peer, $payload) = @_;
+
+    $self->pid_check;
+    my $s = $self->_peer_socket($peer)
+        or die "'$peer' is not a valid message recipient";
+
+    my $rc = $s->send($payload);
+    if (defined $rc) {
+        $self->{+STATS}->{sent}->{$peer}++;
+        return 1;
+    }
+    return 0 if $! == EAGAIN || $! == EWOULDBLOCK;
+    die "Cannot send message: $!";
+}
+
+sub _outbox_writable_handle {
+    my ($self, $peer) = @_;
+    return $self->_peer_socket($peer);
+}
+
 sub send_message {
     my $self = shift;
     my $msg  = $self->build_message(@_);
 
     my $peer_id = $msg->to or croak "No peer specified";
+    my $payload = $self->{+SERIALIZER}->serialize($msg);
 
     $self->pid_check;
-    my $sock = $self->peer_exists($peer_id) or die "'$peer_id' is not a valid message recipient";
 
-    my $s = $self->{+SOCKET_CACHE}->{$sock} //= IO::Socket::UNIX->new(
-        Type => SOCK_DGRAM,
-        Peer => $sock,
-    ) or die "Cannot connect to socket: $!";
+    if ($self->send_blocking) {
+        $self->_drain_blocking($peer_id) if $self->pending_sends_to($peer_id);
 
-    $s->send($self->{+SERIALIZER}->serialize($msg) . "\n") or die "Cannot send message: $!";
+        my $s = $self->_peer_socket($peer_id)
+            or die "'$peer_id' is not a valid message recipient";
 
-    $self->{+STATS}->{sent}->{$msg->{to}}++;
+        $s->send($payload) or die "Cannot send message: $!";
+        $self->{+STATS}->{sent}->{$peer_id}++;
+        return 1;
+    }
+
+    return $self->try_send_message($peer_id, $payload);
+}
+
+sub _drain_blocking {
+    my ($self, $peer) = @_;
+
+    my $s = $self->_peer_socket($peer) or return;
+
+    while ($self->{_OUTBOX}{$peer} && @{$self->{_OUTBOX}{$peer}}) {
+        my $entry = shift @{$self->{_OUTBOX}{$peer}};
+        my ($payload) = @$entry;
+        $s->send($payload) or die "Cannot send message: $!";
+        $self->{+STATS}->{sent}->{$peer}++;
+    }
+    delete $self->{_OUTBOX}{$peer};
 }
 
 1;

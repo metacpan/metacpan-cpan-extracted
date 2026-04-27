@@ -1,0 +1,133 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use FindBin qw($Bin);
+use lib "$Bin/lib";
+use lib "$Bin/../../lib";  # for Async::Redis from this checkout
+
+use Getopt::Long qw(GetOptions);
+use Pod::Usage qw(pod2usage);
+
+use Stress::Harness;
+
+my %opts = (
+    host             => $ENV{REDIS_HOST} // 'localhost',
+    port             => $ENV{REDIS_PORT} // 6379,
+    duration         => 0,
+    pool_size        => 8,
+    blocker_count    => 4,
+    kv_buckets       => 64,
+    channel_count    => 16,
+    kill_interval    => 30,
+    recovery_window  => 5,
+    command_deadline => 10,
+    seed             => 0,
+    jsonl_fd         => 1,
+    no_verify        => 0,
+    no_banner        => 0,
+    quiet            => 0,
+    help             => 0,
+);
+
+GetOptions(
+    'host=s'             => \$opts{host},
+    'port=i'             => \$opts{port},
+    'duration=i'         => \$opts{duration},
+    'pool-size=i'        => \$opts{pool_size},
+    'blocker-count=i'    => \$opts{blocker_count},
+    'kv-buckets=i'       => \$opts{kv_buckets},
+    'channel-count=i'    => \$opts{channel_count},
+    'kill-interval=i'    => \$opts{kill_interval},
+    'recovery-window=i'  => \$opts{recovery_window},
+    'command-deadline=i' => \$opts{command_deadline},
+    'seed=i'             => \$opts{seed},
+    'jsonl-fd=i'         => \$opts{jsonl_fd},
+    'no-verify'          => \$opts{no_verify},
+    'no-banner'          => \$opts{no_banner},
+    'quiet'              => \$opts{quiet},
+    'help'               => \$opts{help},
+) or pod2usage(-exitval => 3, -output => \*STDERR);
+
+if ($opts{help}) {
+    pod2usage(-exitval => 0, -verbose => 1, -output => \*STDOUT);
+    exit 0;
+}
+
+srand($opts{seed}) if $opts{seed};
+
+open(my $jsonl_fh, '>&=', $opts{jsonl_fd})
+    or die "cannot open jsonl-fd $opts{jsonl_fd}: $!";
+
+unless ($opts{no_banner}) {
+    print STDERR "stress harness: host=$opts{host} port=$opts{port} "
+                ."duration=$opts{duration}s kill-interval=$opts{kill_interval}s "
+                ."verify=" . ($opts{no_verify} ? 'off' : 'on') . "\n";
+}
+
+my $harness = Stress::Harness->new(
+    host             => $opts{host},
+    port             => $opts{port},
+    duration_s       => $opts{duration},
+    pool_size        => $opts{pool_size},
+    blocker_count    => $opts{blocker_count},
+    kv_buckets       => $opts{kv_buckets},
+    channel_count    => $opts{channel_count},
+    kill_interval    => $opts{kill_interval},
+    recovery_window  => $opts{recovery_window},
+    command_deadline => $opts{command_deadline},
+    verify           => !$opts{no_verify},
+    jsonl_fh         => $jsonl_fh,
+    stderr_fh        => \*STDERR,
+    quiet            => $opts{quiet},
+);
+
+local $SIG{INT}  = sub { $harness->stop_for_signal };
+local $SIG{TERM} = sub { $harness->stop_for_signal };
+
+my $exit = $harness->run;
+exit $exit;
+
+__END__
+
+=head1 NAME
+
+stress - Async::Redis stress harness
+
+=head1 SYNOPSIS
+
+  stress [options]
+
+  Options:
+    --host HOST              Redis host (default: $REDIS_HOST or localhost)
+    --port PORT              Redis port (default: $REDIS_PORT or 6379)
+    --duration SECS          Run for N seconds; 0 = forever (default: 0)
+    --pool-size N            Pool connections (default: 8)
+    --blocker-count N        Blocking consumer count (default: 4)
+    --kv-buckets N           KV bucket key count (default: 64)
+    --channel-count N        Pubsub channel count (default: 16)
+    --kill-interval SECS     Chaos kill interval; 0 disables chaos (default: 30)
+    --recovery-window SECS   Window after kill where errors are expected (default: 5)
+    --command-deadline SECS  Per-command deadline (default: 10)
+    --seed SEED              RNG seed for deterministic chaos
+    --jsonl-fd FD            File descriptor for JSONL output (default: 1)
+    --no-verify              Skip integrity checks
+    --no-banner              Skip startup banner on stderr
+    --quiet                  Suppress live human stderr output
+    --help                   Show this help
+
+=head1 EXIT CODES
+
+  0 - Clean exit, zero integrity violations
+  1 - Integrity violation
+  2 - Hang detection (workload future did not unwind within --command-deadline)
+  3 - Configuration error
+
+=head1 EXAMPLES
+
+  # CI smoke gate
+  ./examples/stress/stress --duration 60 --kill-interval 10
+
+  # Long soak
+  ./examples/stress/stress --kill-interval 30 --quiet > stress.jsonl
+
+=cut

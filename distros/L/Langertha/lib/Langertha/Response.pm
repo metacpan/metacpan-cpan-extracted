@@ -1,7 +1,8 @@
 package Langertha::Response;
 # ABSTRACT: LLM response with metadata
-our $VERSION = '0.404';
+our $VERSION = '0.500';
 use Moose;
+use Langertha::ToolCall;
 
 use overload
   '""' => sub { $_[0]->content },
@@ -76,12 +77,60 @@ has rate_limit => (
   predicate => 'has_rate_limit',
 );
 
+has tool_calls => (
+  is        => 'ro',
+  isa       => 'Maybe[ArrayRef[Langertha::ToolCall]]',
+  predicate => 'has_tool_calls',
+);
+
+around BUILDARGS => sub {
+  my ( $orig, $class, @args ) = @_;
+  my $params = $class->$orig(@args);
+
+  # Accept legacy ArrayRef[HashRef] input by upgrading to ToolCall objects.
+  if ( ref( $params->{tool_calls} ) eq 'ARRAY' ) {
+    $params->{tool_calls} = [
+      map {
+        ref($_) && eval { $_->isa('Langertha::ToolCall') }
+          ? $_
+          : Langertha::ToolCall->new(
+              name      => ( $_->{name} // '' ),
+              arguments => ( ref( $_->{arguments} ) eq 'HASH' ? $_->{arguments} : {} ),
+              id        => ( $_->{id} // '' ),
+              synthetic => ( $_->{synthetic} ? 1 : 0 ),
+            );
+      } @{ $params->{tool_calls} }
+    ];
+  }
+  return $params;
+};
+
+
+
+sub tool_call {
+  my ( $self, $name ) = @_;
+  my $tcs = $self->tool_calls or return undef;
+  return undef unless @$tcs;
+  return $tcs->[0] unless defined $name;
+  for my $tc (@$tcs) {
+    return $tc if $tc->name eq $name;
+  }
+  return undef;
+}
+
+
+sub tool_call_args {
+  my ( $self, $name ) = @_;
+  my $tc = $self->tool_call($name) or return undef;
+  return $tc->arguments;
+}
+
 
 
 sub clone_with {
   my ( $self, %overrides ) = @_;
   my %args = (content => $self->content);
-  for my $attr (qw( raw id model finish_reason usage timing created thinking rate_limit )) {
+  for my $attr (qw( raw id model finish_reason usage timing created thinking rate_limit tool_calls )) {
     my $pred = "has_$attr";
     $args{$attr} = $self->$attr if $self->$pred;
   }
@@ -145,7 +194,7 @@ Langertha::Response - LLM response with metadata
 
 =head1 VERSION
 
-version 0.404
+version 0.500
 
 =head1 SYNOPSIS
 
@@ -208,6 +257,37 @@ Timing information as a HashRef. Currently only populated by Ollama.
 =head2 created
 
 Unix timestamp of when the response was created.
+
+=head2 tool_calls
+
+ArrayRef of L<Langertha::ToolCall> objects extracted from the
+response, when the engine produced any. Single source of truth for
+"what tool calls did the model emit" — both native provider tool
+calling and synthesized fallbacks (forced-name via response_format)
+land here in the same shape.
+
+For backward compatibility C<BUILDARGS> upgrades plain HashRefs
+(C<{ name =E<gt> ..., arguments =E<gt> ..., id =E<gt> ..., synthetic =E<gt> ... }>)
+into L<Langertha::ToolCall> objects automatically; new code should
+construct the objects directly.
+
+=head2 tool_call
+
+    my $tc = $response->tool_call;          # first tool call
+    my $tc = $response->tool_call($name);   # named lookup
+
+Returns the L<Langertha::ToolCall> for the first tool call (or the
+first matching C<$name>), or C<undef> when no tool calls were
+produced.
+
+=head2 tool_call_args
+
+    my $args = $response->tool_call_args;            # first tool call
+    my $args = $response->tool_call_args($name);     # named lookup
+
+Returns the C<arguments> HashRef of the first tool call, or of the
+first tool call matching C<$name>. Returns C<undef> when no tool
+calls were produced.
 
 =head2 rate_limit
 

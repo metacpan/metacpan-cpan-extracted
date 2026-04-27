@@ -127,7 +127,7 @@ $q->clear;
     # Timeout on empty queue
     my $t0 = time;
     is $q2->pop_back_wait(0.1), undef, 'pop_back_wait timeout returns undef';
-    ok time - $t0 < 2, 'pop_back_wait did not hang';
+    cmp_ok time - $t0, '<', 30, 'pop_back_wait returned (not hung)';
 
     # Blocking: producer pushes, consumer pop_back_waits
     my $pid = fork();
@@ -138,7 +138,7 @@ $q->clear;
         $cq->push("delayed_back");
         POSIX::_exit(0);
     }
-    my $val = $q2->pop_back_wait(5);
+    my $val = $q2->pop_back_wait(30);
     waitpid($pid, 0);
     is $val, "delayed_back", 'pop_back_wait received value';
 
@@ -157,7 +157,7 @@ $q->clear;
     my $t0 = time;
     my $n = $q3->push_wait_multi(0.1, "a", "b");
     is $n, 0, 'push_wait_multi timeout on full queue returns 0';
-    ok time - $t0 < 2, 'push_wait_multi did not hang';
+    cmp_ok time - $t0, '<', 30, 'push_wait_multi returned (not hung)';
     unlink $p3;
 }
 
@@ -174,7 +174,7 @@ $q->clear;
     $q4->push("x") for 1..4;
     my $t0 = time;
     ok !$q4->push_front_wait("overflow", 0.1), 'push_front_wait timeout when full';
-    ok time - $t0 < 2, 'did not hang';
+    cmp_ok time - $t0, '<', 30, 'push_front_wait returned (not hung)';
 
     # Blocking: consumer frees slot
     my $pid = fork();

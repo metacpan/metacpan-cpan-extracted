@@ -1,0 +1,99 @@
+BATsh Hizli Basvuru [TR] Turkce
+=================================
+
+BATsh, cmd.exe ve bash/sh sozdizimini ayni betikte calistiran
+iki dilli bir kabuktur. Her satirin ilk belirteci modu belirler.
+
+1. Mod Tespiti
+--------------
+  ECHO hello          -> cmd.exe modu (ilk belirtec tamamen buyuk harf)
+  echo hello          -> bash/sh modu (ilk belirtec kucuk harf icerir)
+  # yorum             -> yorum (yoksayilir)
+  :: yorum            -> yorum (CMD stili, yoksayilir)
+  REM yorum           -> yorum (CMD stili, yoksayilir)
+
+2. Kabugu Baslatma
+-------------------
+  perl lib/BATsh.pm                    # etkilesimli REPL
+  perl lib/BATsh.pm script.batsh       # betik dosyasi calistirma
+  perl lib/BATsh.pm -e "echo merhaba"  # tek satirlik komut
+
+  Perl API'sinden:
+    use BATsh;
+    BATsh->run('script.batsh');
+    BATsh->run_string("echo merhaba");
+    BATsh->repl();
+
+3. Ortam Degiskeni Koprusu
+---------------------------
+  CMD ve SH bloklari degiskenleri Perl'in %ENV'i uzerinden paylasiр.
+
+  export FOO=merhaba  # SH, FOO'yu ayarlar
+  ECHO %FOO%          # CMD, kopru uzerinden FOO'yu okur (Windows)
+
+  SET BAR=dunya       # CMD, BAR'i ayarlar
+  echo $BAR           # SH, kopru uzerinden BAR'i okur
+
+4. SETLOCAL / ENDLOCAL
+-----------------------
+  SETLOCAL           # %ENV anlık goruntusu
+  SET TMP=yerel_deger
+  ECHO %TMP%
+  ENDLOCAL           # %ENV'i geri yukler (TMP kaybolur)
+
+  Kapsamlar ic ice olabilir.
+
+5. Ic Ice Bloкlar (Karisik Mod)
+---------------------------------
+  Blok yapilari dogru eslesmeli. Ic ice bloklarda karisik mod satirlari kabul edilir.
+
+  for x in 1 2; do   # SH blok acar
+      ECHO item $x   # SH blogunda CMD satiri
+  done               # SH blok kapar
+
+  CMD anahtar sozcukleri: IF/ENDIF  FOR/NEXT  WHILE/WEND  DO/LOOP
+  SH  anahtar sozcukleri: if/fi  for/done  while/done  until/done
+                          case/esac  { }
+
+6. Alt Yordam Tanimlamalari
+-----------------------------
+  :GREET
+  echo "Merhaba $BATSH_ARG1"
+  RET
+
+  Etiketler : ile baslar ve RET veya RETURN ile biter.
+
+7. CALL ve source
+------------------
+  CALL :GREET dunya      # argumanla alt yordam cagirma
+  CALL diger.batsh       # baska .batsh dosyasini dahil etme (CMD)
+  source diger.batsh     # baska .batsh dosyasini dahil etme (SH)
+  . diger.batsh          # POSIX nokta gosterimi
+
+  Argumanlar: $BATSH_ARG1 .. $BATSH_ARGn  (%BATSH_ARG1% CMD'de)
+  Sayisi:     $BATSH_ARGC
+
+8. Perl API
+-----------
+  BATsh->run($file)            # .batsh dosyasi calistir
+  BATsh->run_string($source)   # kaynak dizgisi calistir
+  BATsh->run_lines(@lines)     # satir dizisi calistir
+  BATsh->repl()                # etkilesimli REPL
+  BATsh->classify_token($tok)  # 'CMD' veya 'SH' dondurur
+  BATsh->setlocal()            # %ENV ani goruntusu
+  BATsh->endlocal()            # %ENV geri yukle
+  BATsh->call_sub($lbl, @args) # alt yordam cagir
+  BATsh->source_file($file)    # .batsh dosyasini dahil et
+  BATsh->version()             # surum dizgisi
+
+9. Platform Notlari
+--------------------
+  Windows: CMD ve SH bloklari saf Perl ile calisir -- harici cmd.exe/bash/sh gerekmez.
+  UNIX:    CMD ve SH bloklari saf Perl ile calisir -- harici cmd.exe/bash/sh gerekmez.
+
+10. Gereksinimler
+-----------------
+  Perl 5.005_03 veya uzeri. Yalnizca cekirdek moduller (File::Spec, Carp).
+  CPAN bagimliligi yok.
+
+Ayrica bakiniz: https://metacpan.org/dist/BATsh

@@ -119,6 +119,7 @@ eventfd(self)
     EXTRACT_RING(self);
   CODE:
     RETVAL = ring_create_eventfd(h);
+    if (RETVAL < 0) croak("eventfd: %s", strerror(errno));
   OUTPUT:
     RETVAL
 
@@ -169,7 +170,7 @@ sync(self)
   PREINIT:
     EXTRACT_RING(self);
   CODE:
-    ring_msync(h);
+    if (ring_msync(h) != 0) croak("msync: %s", strerror(errno));
 
 void
 unlink(self_or_class, ...)
@@ -178,7 +179,7 @@ unlink(self_or_class, ...)
     const char *p;
     if (sv_isobject(self_or_class)) {
         RingHandle *h = INT2PTR(RingHandle*, SvIV(SvRV(self_or_class)));
-        if (!h) croak("destroyed object");
+        if (!h) croak("Attempted to use a destroyed object");
         p = h->path;
     } else {
         if (items < 2) croak("Usage: ...->unlink($path)");
@@ -198,9 +199,9 @@ stats(self)
     hv_store(hv, "size", 4, newSVuv((UV)ring_size(h)), 0);
     hv_store(hv, "capacity", 8, newSVuv((UV)hdr->capacity), 0);
     hv_store(hv, "head", 4, newSVuv((UV)ring_head(h)), 0);
-    hv_store(hv, "count", 5, newSVuv((UV)__atomic_load_n(&hdr->count, __ATOMIC_RELAXED)), 0);
-    hv_store(hv, "writes", 6, newSVuv((UV)hdr->stat_writes), 0);
-    hv_store(hv, "overwrites", 10, newSVuv((UV)hdr->stat_overwrites), 0);
+    hv_store(hv, "count", 5, newSVuv((UV)__atomic_load_n(&hdr->count, __ATOMIC_ACQUIRE)), 0);
+    hv_store(hv, "writes", 6, newSVuv((UV)__atomic_load_n(&hdr->stat_writes, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "overwrites", 10, newSVuv((UV)__atomic_load_n(&hdr->stat_overwrites, __ATOMIC_RELAXED)), 0);
     hv_store(hv, "mmap_size", 9, newSVuv((UV)h->mmap_size), 0);
     RETVAL = newRV_noinc((SV *)hv);
   OUTPUT:

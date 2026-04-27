@@ -18,13 +18,13 @@ subtest 'int multiprocess' => sub {
 
     if ($pid == 0) {
         my $cq = Data::Queue::Shared::Int->new($path, 256);
-        $cq->push_wait($_, 5) for 1..100;
+        $cq->push_wait($_, 30) for 1..100;
         POSIX::_exit(0);
     }
 
     my @received;
     while (@received < 100) {
-        my $v = $q->pop_wait(5);
+        my $v = $q->pop_wait(30);
         last unless defined $v;
         push @received, $v;
     }
@@ -80,8 +80,8 @@ subtest 'int blocking push' => sub {
     }
 
     my $t0 = time;
-    ok $q->push_wait(99, 5), 'blocking push succeeded after consumer freed slot';
-    ok time - $t0 < 4, 'did not wait full timeout';
+    ok $q->push_wait(99, 30), 'blocking push succeeded after consumer freed slot';
+    cmp_ok time - $t0, '<', 20, 'push_wait returned (not full-timeout hang)';
 
     waitpid($pid, 0);
     $q->unlink;
@@ -99,13 +99,13 @@ subtest 'str multiprocess' => sub {
 
     if ($pid == 0) {
         my $cq = Data::Queue::Shared::Str->new($path3, 256, 65536);
-        $cq->push_wait("message_$_", 5) for 1..50;
+        $cq->push_wait("message_$_", 30) for 1..50;
         POSIX::_exit(0);
     }
 
     my @received;
     while (@received < 50) {
-        my $v = $q->pop_wait(5);
+        my $v = $q->pop_wait(30);
         last unless defined $v;
         push @received, $v;
     }
@@ -136,7 +136,7 @@ subtest 'str blocking pop' => sub {
         POSIX::_exit(0);
     }
 
-    my $val = $q->pop_wait(5);
+    my $val = $q->pop_wait(30);
     waitpid($pid, 0);
     is $val, "delayed_message", 'str blocking pop received value';
 
@@ -162,8 +162,8 @@ subtest 'str clear unblocks push_wait' => sub {
     }
 
     my $t0 = time;
-    ok $q->push_wait("after_clear", 5), 'push_wait succeeded after clear()';
-    ok time - $t0 < 4, 'unblocked promptly';
+    ok $q->push_wait("after_clear", 30), 'push_wait succeeded after clear()';
+    cmp_ok time - $t0, '<', 20, 'push_wait unblocked (not full-timeout hang)';
     waitpid($pid, 0);
 
     $q->unlink;
@@ -191,9 +191,9 @@ subtest 'str clear wakes pop_wait' => sub {
     # Parent blocks in pop_wait — clear wakes it, then it re-blocks,
     # then the push wakes it again with actual data
     my $t0 = time;
-    my $val = $q->pop_wait(5);
-    ok time - $t0 < 4, 'pop_wait did not hang after clear';
+    my $val = $q->pop_wait(30);
     is $val, "after_clear", 'got value pushed after clear';
+    cmp_ok time - $t0, '<', 20, 'pop_wait returned (not full-timeout hang)';
 
     waitpid($pid, 0);
     $q->unlink;

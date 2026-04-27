@@ -144,9 +144,18 @@ SEE ALSO
 
     Data::HashMap::Shared - concurrent hash table
 
+    Data::Heap::Shared - priority queue
+
+    Data::Graph::Shared - directed weighted graph
+
+    Data::BitSet::Shared - shared bitset (lock-free per-bit ops)
+
+    Data::RingBuffer::Shared - fixed-size overwriting ring buffer
+
 AUTHOR
     vividsnow
 
 LICENSE
-    Same terms as Perl itself.
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
 

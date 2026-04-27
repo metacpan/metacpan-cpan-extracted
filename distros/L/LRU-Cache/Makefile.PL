@@ -10,6 +10,7 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM    => 'lib/LRU/Cache.pm',
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.008003',
+    macro            => { TARFLAGS   => "--format=ustar -c -v -f" },
     C                => ['Cache.c'],
     OBJECT           => '$(O_FILES)',
     INC              => '-I. -Iinclude',

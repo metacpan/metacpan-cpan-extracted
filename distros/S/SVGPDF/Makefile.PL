@@ -28,7 +28,7 @@ WriteMakefile(
     NAME                => 'SVGPDF',
     AUTHOR              => 'Johan Vromans <jvromans@squirrel.nl>',
     VERSION             => $version,
-    ABSTRACT            => 'SVG renderer for PDF::API2',
+    ABSTRACT            => 'SVG renderer for PDF::API2 and PDF:Builder',
     LICENSE             => 'freebsd',
     PL_FILES            => {},
     MIN_PERL_VERSION    => 5.026000,

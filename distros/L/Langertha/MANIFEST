@@ -84,6 +84,9 @@ lib/Langertha/Engine/Perplexity.pm
 lib/Langertha/Engine/Remote.pm
 lib/Langertha/Engine/Replicate.pm
 lib/Langertha/Engine/SGLang.pm
+lib/Langertha/Engine/Scaleway.pm
+lib/Langertha/Engine/TSystems.pm
+lib/Langertha/Engine/TranscriptionBase.pm
 lib/Langertha/Engine/Whisper.pm
 lib/Langertha/Engine/vLLM.pm
 lib/Langertha/ImageGen.pm
@@ -105,6 +108,7 @@ lib/Langertha/RateLimit.pm
 lib/Langertha/Request/HTTP.pm
 lib/Langertha/Response.pm
 lib/Langertha/Result.pm
+lib/Langertha/Role/Capabilities.pm
 lib/Langertha/Role/Chat.pm
 lib/Langertha/Role/ContextSize.pm
 lib/Langertha/Role/Embedding.pm
@@ -178,8 +182,11 @@ t/71_raider_engine_catalog.t
 t/72_langfuse.t
 t/75_think_tag.t
 t/76_tool_choice_normalization.t
+t/77_response_format_loose_json.t
 t/77_utf8_handling.t
 t/78_content_image.t
+t/78_engine_capabilities.t
+t/79_response_tool_calls.t
 t/80_live_tool_calling.t
 t/81_live_aki.t
 t/82_live_embedding.t

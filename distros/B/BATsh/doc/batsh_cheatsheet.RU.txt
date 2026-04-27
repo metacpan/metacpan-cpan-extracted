@@ -1,0 +1,100 @@
+BATsh Shpargalka [RU] Russkiy
+==============================
+
+BATsh -- dvuyazychnyy shell, kotoryy vypolnyayet sintaksis cmd.exe i bash/sh
+v odnom skripte. Pervyy token kazhdoy stroki opredelyayet rezhim.
+
+1. Opredeleniye rezhima
+------------------------
+  ECHO hello          -> rezhim cmd.exe (pervyy token vse velikiye bukvy)
+  echo hello          -> rezhim bash/sh (pervyy token soderzhit strochnyye)
+  # kommentariy       -> kommentariy (ignoriruется)
+  :: kommentariy      -> kommentariy (stil CMD, ignoriruется)
+  REM kommentariy     -> kommentariy (stil CMD, ignoriruется)
+
+2. Zapusk shell
+---------------
+  perl lib/BATsh.pm                    # interaktivnyy REPL
+  perl lib/BATsh.pm script.batsh       # vypolnit fayл skripta
+  perl lib/BATsh.pm -e "echo privet"   # odnostrochnaya komanda
+
+  Cherez API Perl:
+    use BATsh;
+    BATsh->run('script.batsh');
+    BATsh->run_string("echo privet");
+    BATsh->repl();
+
+3. Most peremennykh sredy
+--------------------------
+  Bloki CMD i SH razdelyayut peremennыye cherez %ENV Perl.
+
+  export FOO=privet  # SH ustanavlivayet FOO
+  ECHO %FOO%         # CMD chitayet FOO cherez most (Windows)
+
+  SET BAR=mir        # CMD ustanavlivayet BAR
+  echo $BAR          # SH chitayet BAR cherez most
+
+4. SETLOCAL / ENDLOCAL
+-----------------------
+  SETLOCAL           # snimok %ENV
+  SET TMP=lokal
+  ECHO %TMP%
+  ENDLOCAL           # vosstanovleniye %ENV (TMP ischezayet)
+
+  Oblasti mogut byt vlozhennыmi.
+
+5. Vlozhennye bloki (smeshannыy rezhim)
+----------------------------------------
+  Blokovыye konstruktsii dolzhnы byt pravilno soparyenы.
+  Stroki smeshannogo rezhima vnutri bloka dopustimы.
+
+  for x in 1 2; do   # SH otkrыvayet blok
+      ECHO item $x   # stroka CMD vnutri bloka SH
+  done               # SH zakrыvayet blok
+
+  Klyuchevyye slova CMD: IF/ENDIF  FOR/NEXT  WHILE/WEND  DO/LOOP
+  Klyuchevyye slova SH:  if/fi  for/done  while/done  until/done
+                         case/esac  { }
+
+6. Opredeleniye podprogramm
+-----------------------------
+  :GREET
+  echo "Privet $BATSH_ARG1"
+  RET
+
+  Metki nachinayutsya s : i zakanchivayutsya RET ili RETURN.
+
+7. CALL i source
+-----------------
+  CALL :GREET mir        # vызov podprogrammы s argumentom
+  CALL drugoy.batsh      # vklyucheniye faylа .batsh (CMD)
+  source drugoy.batsh    # vklyucheniye faylа .batsh (SH)
+  . drugoy.batsh         # POSIX tochechnaya zapis
+
+  Argumentы: $BATSH_ARG1 .. $BATSH_ARGn  (%BATSH_ARG1% v CMD)
+  Kolichestvo: $BATSH_ARGC
+
+8. Perl API
+-----------
+  BATsh->run($file)            # vыpolnit fayл .batsh
+  BATsh->run_string($source)   # vыpolnit stroku istochnika
+  BATsh->run_lines(@lines)     # vыpolnit massiv strok
+  BATsh->repl()                # interaktivnыy REPL
+  BATsh->classify_token($tok)  # vozvrashchayet 'CMD' ili 'SH'
+  BATsh->setlocal()            # snimok %ENV
+  BATsh->endlocal()            # vosstanovleniye %ENV
+  BATsh->call_sub($lbl, @args) # vyzov podprogrammy
+  BATsh->source_file($file)    # vklyucheniye fayla .batsh
+  BATsh->version()             # stroka versii
+
+9. Primechaniya po platformam
+------------------------------
+  Windows: Bloki CMD i SH rabotayut na chistom Perl -- vneshniy cmd.exe/bash/sh ne nuzhen.
+  UNIX:    Bloki CMD i SH rabotayut na chistom Perl -- vneshniy cmd.exe/bash/sh ne nuzhen.
+
+10. Trebovaniya
+---------------
+  Perl 5.005_03 ili vыshe. Tolko modulit yadra (File::Spec, Carp).
+  Zavisimosti CPAN ne nuzhny.
+
+Sm. takzhe: https://metacpan.org/dist/BATsh

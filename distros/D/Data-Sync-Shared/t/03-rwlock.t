@@ -123,6 +123,33 @@ ok $mrw->memfd >= 0, 'memfd returns valid fd';
 my $mrw2 = Data::Sync::Shared::RWLock->new_from_fd($mrw->memfd);
 ok $mrw2, 'new_from_fd';
 
+# rdlock_timed / wrlock_timed — non-croaking timeout variants
+{
+    my $rw2 = Data::Sync::Shared::RWLock->new(undef);
+
+    # Available → succeeds
+    ok $rw2->rdlock_timed(0.1), 'rdlock_timed succeeds when free';
+    $rw2->rdunlock;
+    ok $rw2->wrlock_timed(0.1), 'wrlock_timed succeeds when free';
+    $rw2->wrunlock;
+
+    # Contended → returns false without croaking
+    my $pid = fork // die;
+    if ($pid == 0) {
+        $rw2->wrlock;
+        sleep 1;
+        $rw2->wrunlock;
+        _exit(0);
+    }
+    select(undef, undef, undef, 0.1);   # let child grab the lock
+    ok !$rw2->rdlock_timed(0.1), 'rdlock_timed returns false on contention';
+    ok !$rw2->wrlock_timed(0.1), 'wrlock_timed returns false on contention';
+    waitpid($pid, 0);
+    # After child releases, locks are available again
+    ok $rw2->wrlock_timed(0.1), 'wrlock_timed succeeds after contender releases';
+    $rw2->wrunlock;
+}
+
 # Unlink
 $rw->unlink;
 ok !-f $path, 'unlink removed file';

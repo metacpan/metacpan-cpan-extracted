@@ -86,6 +86,11 @@ DEFINE_Q_KW(str, "Str", size, 1, build_kw_1arg)
     QueueHandle *h = INT2PTR(QueueHandle*, SvIV(SvRV(sv))); \
     if (!h) croak("Attempted to use a destroyed %s object", classname)
 
+#define MAKE_OBJ(class, ptr) \
+    SV *ref = newRV_noinc(newSViv(PTR2IV(ptr))); \
+    sv_bless(ref, gv_stashpv(class, GV_ADD)); \
+    RETVAL = ref
+
 MODULE = Data::Queue::Shared  PACKAGE = Data::Queue::Shared::Int
 
 PROTOTYPES: DISABLE
@@ -124,10 +129,7 @@ new(class, path, capacity)
     const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
     QueueHandle *h = queue_create(p, (uint32_t)capacity, QUEUE_MODE_INT, 0, errbuf);
     if (!h) croak("Data::Queue::Shared::Int->new: %s", errbuf);
-    SV *obj = newSViv(PTR2IV(h));
-    SV *ref = newRV_noinc(obj);
-    sv_bless(ref, gv_stashpv(class, GV_ADD));
-    RETVAL = ref;
+    MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
 
@@ -141,10 +143,7 @@ new_memfd(class, name, capacity)
   CODE:
     QueueHandle *h = queue_create_memfd(name, (uint32_t)capacity, QUEUE_MODE_INT, 0, errbuf);
     if (!h) croak("Data::Queue::Shared::Int->new_memfd: %s", errbuf);
-    SV *obj = newSViv(PTR2IV(h));
-    SV *ref = newRV_noinc(obj);
-    sv_bless(ref, gv_stashpv(class, GV_ADD));
-    RETVAL = ref;
+    MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
 
@@ -157,10 +156,7 @@ new_from_fd(class, fd)
   CODE:
     QueueHandle *h = queue_open_fd(fd, QUEUE_MODE_INT, errbuf);
     if (!h) croak("Data::Queue::Shared::Int->new_from_fd: %s", errbuf);
-    SV *obj = newSViv(PTR2IV(h));
-    SV *ref = newRV_noinc(obj);
-    sv_bless(ref, gv_stashpv(class, GV_ADD));
-    RETVAL = ref;
+    MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
 
@@ -177,9 +173,10 @@ memfd(self)
 void
 DESTROY(self)
     SV *self
-  PREINIT:
-    EXTRACT_HANDLE("Data::Queue::Shared::Int", self);
   CODE:
+    if (!SvROK(self)) return;
+    QueueHandle *h = INT2PTR(QueueHandle*, SvIV(SvRV(self)));
+    if (!h) return;
     sv_setiv(SvRV(self), 0);
     queue_destroy(h);
 
@@ -191,7 +188,6 @@ push(self, value)
     EXTRACT_HANDLE("Data::Queue::Shared::Int", self);
   CODE:
     RETVAL = queue_int_try_push(h, (int64_t)value);
-
   OUTPUT:
     RETVAL
 
@@ -219,7 +215,6 @@ push_wait(self, value, ...)
   CODE:
     if (items > 2) timeout = SvNV(ST(2));
     RETVAL = queue_int_push_wait(h, (int64_t)value, timeout);
-
   OUTPUT:
     RETVAL
 
@@ -355,13 +350,13 @@ stats(self)
     hv_store(hv, "size", 4, newSVuv((UV)queue_int_size(h)), 0);
     hv_store(hv, "capacity", 8, newSVuv(h->capacity), 0);
     hv_store(hv, "mmap_size", 9, newSVuv((UV)h->mmap_size), 0);
-    hv_store(hv, "push_ok", 7, newSVuv((UV)hdr->stat_push_ok), 0);
-    hv_store(hv, "pop_ok", 6, newSVuv((UV)hdr->stat_pop_ok), 0);
-    hv_store(hv, "push_full", 9, newSVuv((UV)hdr->stat_push_full), 0);
-    hv_store(hv, "pop_empty", 9, newSVuv((UV)hdr->stat_pop_empty), 0);
-    hv_store(hv, "recoveries", 10, newSVuv(hdr->stat_recoveries), 0);
-    hv_store(hv, "push_waiters", 12, newSVuv(hdr->push_waiters), 0);
-    hv_store(hv, "pop_waiters", 11, newSVuv(hdr->pop_waiters), 0);
+    hv_store(hv, "push_ok", 7, newSVuv((UV)__atomic_load_n(&hdr->stat_push_ok, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "pop_ok", 6, newSVuv((UV)__atomic_load_n(&hdr->stat_pop_ok, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "push_full", 9, newSVuv((UV)__atomic_load_n(&hdr->stat_push_full, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "pop_empty", 9, newSVuv((UV)__atomic_load_n(&hdr->stat_pop_empty, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "recoveries", 10, newSVuv((UV)__atomic_load_n(&hdr->stat_recoveries, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "push_waiters", 12, newSVuv((UV)__atomic_load_n(&hdr->push_waiters, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "pop_waiters", 11, newSVuv((UV)__atomic_load_n(&hdr->pop_waiters, __ATOMIC_RELAXED)), 0);
     RETVAL = newRV_noinc((SV *)hv);
   OUTPUT:
     RETVAL
@@ -466,13 +461,16 @@ fileno(self)
   OUTPUT:
     RETVAL
 
-void
+SV *
 eventfd_consume(self)
     SV *self
   PREINIT:
     EXTRACT_HANDLE("Data::Queue::Shared::Int", self);
   CODE:
-    queue_eventfd_consume(h);
+    int64_t v = queue_eventfd_consume(h);
+    RETVAL = (v >= 0) ? newSViv((IV)v) : &PL_sv_undef;
+  OUTPUT:
+    RETVAL
 
 void
 notify(self)
@@ -500,10 +498,7 @@ new(class, path, capacity, ...)
     const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
     QueueHandle *h = queue_create(p, (uint32_t)capacity, QUEUE_MODE_STR, arena_cap, errbuf);
     if (!h) croak("Data::Queue::Shared::Str->new: %s", errbuf);
-    SV *obj = newSViv(PTR2IV(h));
-    SV *ref = newRV_noinc(obj);
-    sv_bless(ref, gv_stashpv(class, GV_ADD));
-    RETVAL = ref;
+    MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
 
@@ -522,10 +517,7 @@ new_memfd(class, name, capacity, ...)
         arena_cap = (uint64_t)capacity * 256;
     QueueHandle *h = queue_create_memfd(name, (uint32_t)capacity, QUEUE_MODE_STR, arena_cap, errbuf);
     if (!h) croak("Data::Queue::Shared::Str->new_memfd: %s", errbuf);
-    SV *obj = newSViv(PTR2IV(h));
-    SV *ref = newRV_noinc(obj);
-    sv_bless(ref, gv_stashpv(class, GV_ADD));
-    RETVAL = ref;
+    MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
 
@@ -538,10 +530,7 @@ new_from_fd(class, fd)
   CODE:
     QueueHandle *h = queue_open_fd(fd, QUEUE_MODE_STR, errbuf);
     if (!h) croak("Data::Queue::Shared::Str->new_from_fd: %s", errbuf);
-    SV *obj = newSViv(PTR2IV(h));
-    SV *ref = newRV_noinc(obj);
-    sv_bless(ref, gv_stashpv(class, GV_ADD));
-    RETVAL = ref;
+    MAKE_OBJ(class, h);
   OUTPUT:
     RETVAL
 
@@ -558,9 +547,10 @@ memfd(self)
 void
 DESTROY(self)
     SV *self
-  PREINIT:
-    EXTRACT_HANDLE("Data::Queue::Shared::Str", self);
   CODE:
+    if (!SvROK(self)) return;
+    QueueHandle *h = INT2PTR(QueueHandle*, SvIV(SvRV(self)));
+    if (!h) return;
     sv_setiv(SvRV(self), 0);
     queue_destroy(h);
 
@@ -577,7 +567,6 @@ push(self, value)
     int r = queue_str_try_push(h, str, (uint32_t)len, utf8);
     if (r == -2) croak("Data::Queue::Shared::Str: string too long (max 2GB)");
     RETVAL = (r == 1);
-
   OUTPUT:
     RETVAL
 
@@ -617,7 +606,6 @@ push_wait(self, value, ...)
     int r = queue_str_push_wait(h, str, (uint32_t)len, utf8, timeout);
     if (r == -2) croak("Data::Queue::Shared::Str: string too long (max 2GB)");
     RETVAL = (r == 1);
-
   OUTPUT:
     RETVAL
 
@@ -679,18 +667,39 @@ pop_multi(self, count)
     uint32_t len;
     bool utf8;
   PPCODE:
+    /* Hoist Perl SV construction out of the process-shared mutex:
+     * newSVpvn can longjmp on OOM and deadlock peers on the futex. */
+    struct { char *buf; uint32_t len; bool utf8; } *items_buf = NULL;
+    UV n = 0;
     int last_r = 0;
+    int oom = 0;
+    if (count > 0) {
+        items_buf = (void *)malloc((size_t)count * sizeof(*items_buf));
+        if (!items_buf) croak("Data::Queue::Shared::Str: out of memory");
+    }
     queue_mutex_lock(h->hdr);
     for (UV i = 0; i < count; i++) {
         last_r = queue_str_pop_locked(h, &str, &len, &utf8);
         if (last_r <= 0) break;
-        SV *sv = newSVpvn(str, len);
-        if (utf8) SvUTF8_on(sv);
-        mXPUSHs(sv);
+        char *c = (char *)malloc(len ? len : 1);
+        if (!c) { oom = 1; break; }
+        if (len) memcpy(c, str, len);
+        items_buf[n].buf = c;
+        items_buf[n].len = len;
+        items_buf[n].utf8 = utf8;
+        n++;
     }
     queue_mutex_unlock(h->hdr);
     queue_wake_producers(h->hdr);
-    if (last_r == -1) croak("Data::Queue::Shared::Str: out of memory");
+    EXTEND(SP, (SSize_t)n);
+    for (UV j = 0; j < n; j++) {
+        SV *sv = newSVpvn(items_buf[j].buf, items_buf[j].len);
+        if (items_buf[j].utf8) SvUTF8_on(sv);
+        PUSHs(sv_2mortal(sv));
+        free(items_buf[j].buf);
+    }
+    free(items_buf);
+    if (last_r == -1 || oom) croak("Data::Queue::Shared::Str: out of memory");
 
 UV
 size(self)
@@ -779,14 +788,14 @@ stats(self)
     hv_store(hv, "capacity", 8, newSVuv(h->capacity), 0);
     hv_store(hv, "mmap_size", 9, newSVuv((UV)h->mmap_size), 0);
     hv_store(hv, "arena_cap", 9, newSVuv((UV)h->arena_cap), 0);
-    hv_store(hv, "arena_used", 10, newSVuv(hdr->arena_used), 0);
-    hv_store(hv, "push_ok", 7, newSVuv((UV)hdr->stat_push_ok), 0);
-    hv_store(hv, "pop_ok", 6, newSVuv((UV)hdr->stat_pop_ok), 0);
-    hv_store(hv, "push_full", 9, newSVuv((UV)hdr->stat_push_full), 0);
-    hv_store(hv, "pop_empty", 9, newSVuv((UV)hdr->stat_pop_empty), 0);
-    hv_store(hv, "recoveries", 10, newSVuv(hdr->stat_recoveries), 0);
-    hv_store(hv, "push_waiters", 12, newSVuv(hdr->push_waiters), 0);
-    hv_store(hv, "pop_waiters", 11, newSVuv(hdr->pop_waiters), 0);
+    hv_store(hv, "arena_used", 10, newSVuv(__atomic_load_n(&hdr->arena_used, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "push_ok", 7, newSVuv((UV)__atomic_load_n(&hdr->stat_push_ok, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "pop_ok", 6, newSVuv((UV)__atomic_load_n(&hdr->stat_pop_ok, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "push_full", 9, newSVuv((UV)__atomic_load_n(&hdr->stat_push_full, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "pop_empty", 9, newSVuv((UV)__atomic_load_n(&hdr->stat_pop_empty, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "recoveries", 10, newSVuv((UV)__atomic_load_n(&hdr->stat_recoveries, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "push_waiters", 12, newSVuv((UV)__atomic_load_n(&hdr->push_waiters, __ATOMIC_RELAXED)), 0);
+    hv_store(hv, "pop_waiters", 11, newSVuv((UV)__atomic_load_n(&hdr->pop_waiters, __ATOMIC_RELAXED)), 0);
     RETVAL = newRV_noinc((SV *)hv);
   OUTPUT:
     RETVAL
@@ -857,18 +866,36 @@ drain(self, ...)
     uint32_t max_count;
   PPCODE:
     max_count = (items > 1) ? (uint32_t)SvUV(ST(1)) : UINT32_MAX;
+    /* Hoist SV construction out of the mutex (see pop_multi). */
+    struct drain_item { char *buf; uint32_t len; bool utf8; struct drain_item *next; } *drained_head = NULL, *drained_tail = NULL;
+    UV drained_n = 0;
     int last_r = 0;
+    int oom = 0;
     queue_mutex_lock(h->hdr);
     while (max_count-- > 0) {
         last_r = queue_str_pop_locked(h, &str, &len, &utf8);
         if (last_r <= 0) break;
-        SV *sv = newSVpvn(str, len);
-        if (utf8) SvUTF8_on(sv);
-        mXPUSHs(sv);
+        struct drain_item *it = (struct drain_item *)malloc(sizeof(*it));
+        char *c = (char *)malloc(len ? len : 1);
+        if (!it || !c) { free(it); free(c); oom = 1; break; }
+        if (len) memcpy(c, str, len);
+        it->buf = c; it->len = len; it->utf8 = utf8; it->next = NULL;
+        if (drained_tail) drained_tail->next = it; else drained_head = it;
+        drained_tail = it;
+        drained_n++;
     }
     queue_mutex_unlock(h->hdr);
     queue_wake_producers(h->hdr);
-    if (last_r == -1) croak("Data::Queue::Shared::Str: out of memory");
+    EXTEND(SP, (SSize_t)drained_n);
+    while (drained_head) {
+        struct drain_item *it = drained_head; drained_head = it->next;
+        SV *sv = newSVpvn(it->buf, it->len);
+        if (it->utf8) SvUTF8_on(sv);
+        PUSHs(sv_2mortal(sv));
+        free(it->buf);
+        free(it);
+    }
+    if (last_r == -1 || oom) croak("Data::Queue::Shared::Str: out of memory");
 
 void
 pop_wait_multi(self, count, ...)
@@ -1005,13 +1032,16 @@ fileno(self)
   OUTPUT:
     RETVAL
 
-void
+SV *
 eventfd_consume(self)
     SV *self
   PREINIT:
     EXTRACT_HANDLE("Data::Queue::Shared::Str", self);
   CODE:
-    queue_eventfd_consume(h);
+    int64_t v = queue_eventfd_consume(h);
+    RETVAL = (v >= 0) ? newSViv((IV)v) : &PL_sv_undef;
+  OUTPUT:
+    RETVAL
 
 void
 notify(self)

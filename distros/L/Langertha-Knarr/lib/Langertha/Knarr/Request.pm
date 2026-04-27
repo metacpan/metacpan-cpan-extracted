@@ -1,6 +1,6 @@
 package Langertha::Knarr::Request;
 # ABSTRACT: Normalized chat request shared across all Knarr protocols
-our $VERSION = '1.001';
+our $VERSION = '1.100';
 use Moose;
 
 
@@ -40,6 +40,16 @@ has tools => (
   default => sub { undef },
 );
 
+has tool_choice => (
+  is => 'ro',
+  default => sub { undef },
+);
+
+has response_format => (
+  is => 'ro',
+  default => sub { undef },
+);
+
 has system => (
   is => 'ro',
   isa => 'Maybe[Str]',
@@ -70,6 +80,21 @@ has extra => (
   default => sub { {} },
 );
 
+
+sub chat_f_args {
+  my ($self, $engine) = @_;
+  my $supports = $engine && $engine->can('supports')
+    ? sub { $engine->supports($_[0]) }
+    : sub { 1 };
+  my @args = ( messages => $self->messages );
+  push @args, tools           => $self->tools           if $self->tools           && $supports->('tools_native');
+  push @args, tool_choice     => $self->tool_choice     if defined $self->tool_choice && $supports->('tools_native');
+  push @args, response_format => $self->response_format if defined $self->response_format;
+  push @args, temperature     => $self->temperature     if defined $self->temperature && $supports->('temperature');
+  push @args, max_tokens      => $self->max_tokens      if defined $self->max_tokens  && $supports->('response_size');
+  return @args;
+}
+
 __PACKAGE__->meta->make_immutable;
 1;
 
@@ -85,7 +110,7 @@ Langertha::Knarr::Request - Normalized chat request shared across all Knarr prot
 
 =head1 VERSION
 
-version 1.001
+version 1.100
 
 =head1 DESCRIPTION
 
@@ -117,10 +142,12 @@ ArrayRef of message hashes (C<< { role => ..., content => ... } >>).
 
 Boolean. Whether the client requested streaming.
 
-=head2 temperature, max_tokens, tools, system
+=head2 temperature, max_tokens, tools, tool_choice, response_format, system
 
 Optional generation parameters and tool definitions, if the protocol
-extracted them.
+extracted them. C<tool_choice> and C<response_format> are passed to
+L<Langertha::Engine> via C<chat_f> in their canonical form; Langertha
+normalizes them to the target engine's wire format.
 
 =head2 session_id
 
@@ -136,6 +163,19 @@ that need to forward without re-encoding.
 =head2 extra
 
 Per-protocol scratch space (e.g. JSON-RPC id for A2A, run_id for ACP).
+
+=head2 chat_f_args
+
+    my @args = $request->chat_f_args($engine);
+    my $r    = await $engine->chat_f(@args);
+
+Builds a named-argument list suitable for L<Langertha::Role::Chat/chat_f>.
+Always includes C<messages>; conditionally adds C<tools>, C<tool_choice>,
+C<response_format>, C<temperature>, C<max_tokens> when set on the request
+B<and> the engine reports support for the matching capability via
+C<< $engine->supports($cap) >>. Engines without C<supports()> get every
+defined parameter — older Langertha versions accepted unknown args
+silently.
 
 =head1 SUPPORT
 

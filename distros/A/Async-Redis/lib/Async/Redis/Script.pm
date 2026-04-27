@@ -161,13 +161,14 @@ Execute on a specific Redis connection. Useful for:
 
 =over 4
 
-=item * Running in pipelines
-
 =item * Using with connection pools
 
 =item * Scripts created without a default connection
 
 =back
+
+For explicit pipelines, register the script with C<define_command> and use
+C<< $pipeline->run_script($name, ...) >>.
 
 =head2 call
 
@@ -213,6 +214,12 @@ Returns the expected number of keys, or 'dynamic' if variable.
     my $desc = $script->description;
 
 Returns the description string (if provided).
+
+=head2 redis
+
+    my $redis = $script->redis;
+
+Returns the default Redis connection associated with the script, if any.
 
 =head1 EVALSHA OPTIMIZATION
 

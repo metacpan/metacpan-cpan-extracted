@@ -1,9 +1,12 @@
 package Langertha::Engine::Gemini;
 # ABSTRACT: Google Gemini API
-our $VERSION = '0.404';
+our $VERSION = '0.500';
 use Moose;
 use Carp qw( croak );
 use JSON::MaybeXS;
+use Langertha::ToolChoice;
+use Langertha::Response;
+use Langertha::ToolCall;
 
 extends 'Langertha::Engine::Remote';
 
@@ -13,6 +16,7 @@ with map { 'Langertha::Role::'.$_ } qw(
   Temperature
   ResponseSize
   SystemPrompt
+  ResponseFormat
   Streaming
   Tools
 );
@@ -42,6 +46,16 @@ sub default_model { 'gemini-2.5-flash' }
 
 sub chat_request {
   my ( $self, $messages, %extra ) = @_;
+
+  # Translate tool_choice (canonical / OpenAI / Anthropic shapes) into
+  # Gemini's toolConfig.functionCallingConfig form.
+  if ( exists $extra{tool_choice} && defined $extra{tool_choice} ) {
+    my $tc = Langertha::ToolChoice->from_hash( delete $extra{tool_choice} );
+    if ($tc) {
+      my $cfg = $tc->to_gemini;
+      $extra{toolConfig} = $cfg if $cfg;
+    }
+  }
 
   # Convert messages to Gemini format
   my @gemini_contents;
@@ -87,6 +101,23 @@ sub chat_request {
   }
   if ($self->has_temperature) {
     $generation_config{temperature} = $self->temperature;
+  }
+
+  # Translate response_format -> Gemini's generationConfig.responseSchema /
+  # responseMimeType. Accepts the OpenAI-shape response_format hash so that
+  # callers can hand the same payload to any engine.
+  if ( $self->has_response_format ) {
+    my $rf = $self->response_format;
+    my $type = ref($rf) eq 'HASH' ? ( $rf->{type} // '' ) : '';
+    if ( $type eq 'json_object' ) {
+      $generation_config{responseMimeType} = 'application/json';
+    }
+    elsif ( $type eq 'json_schema'
+        && ref( $rf->{json_schema} ) eq 'HASH'
+        && ref( $rf->{json_schema}{schema} ) eq 'HASH' ) {
+      $generation_config{responseMimeType} = 'application/json';
+      $generation_config{responseSchema}   = $rf->{json_schema}{schema};
+    }
   }
 
   $request_body{generationConfig} = \%generation_config if %generation_config;
@@ -142,7 +173,7 @@ sub chat_response {
     };
   }
 
-  require Langertha::Response;
+  my @tcs = Langertha::ToolCall->extract($data);
   return Langertha::Response->new(
     content       => $text,
     raw           => $data,
@@ -150,6 +181,7 @@ sub chat_response {
     defined $finish_reason ? ( finish_reason => $finish_reason ) : (),
     $usage ? ( usage => $usage ) : (),
     defined $thinking ? ( thinking => $thinking ) : (),
+    @tcs ? ( tool_calls => [ @tcs ] ) : (),
   );
 }
 
@@ -157,6 +189,15 @@ sub stream_format { 'sse' }
 
 sub chat_stream_request {
   my ( $self, $messages, %extra ) = @_;
+
+  # Same tool_choice translation as chat_request.
+  if ( exists $extra{tool_choice} && defined $extra{tool_choice} ) {
+    my $tc = Langertha::ToolChoice->from_hash( delete $extra{tool_choice} );
+    if ($tc) {
+      my $cfg = $tc->to_gemini;
+      $extra{toolConfig} = $cfg if $cfg;
+    }
+  }
 
   # Convert messages to Gemini format (same as non-streaming)
   my @gemini_contents;
@@ -386,7 +427,7 @@ Langertha::Engine::Gemini - Google Gemini API
 
 =head1 VERSION
 
-version 0.404
+version 0.500
 
 =head1 SYNOPSIS
 

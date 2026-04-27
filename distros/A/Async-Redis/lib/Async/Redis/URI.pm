@@ -4,8 +4,6 @@ use strict;
 use warnings;
 use 5.018;
 
-our $VERSION = '0.001';
-
 # URL decode
 sub _decode {
     my ($str) = @_;

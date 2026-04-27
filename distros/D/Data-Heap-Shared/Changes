@@ -1,5 +1,11 @@
 Revision history for Data::Heap::Shared
 
+0.03  2026-04-26
+    - memfd sealing + factored validate header
+    - stale-mutex wake; stat recoveries uint64 t
+    - idempotent eventfd; aarch64 CI matrix
+
+
 0.02  2026-04-12
     - Make clear() concurrency-safe (mutex-protected)
 

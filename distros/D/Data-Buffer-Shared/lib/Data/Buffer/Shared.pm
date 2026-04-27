@@ -1,7 +1,7 @@
 package Data::Buffer::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require XSLoader;
 XSLoader::load('Data::Buffer::Shared', $VERSION);
@@ -100,6 +100,35 @@ B<Linux-only>. Requires 64-bit Perl.
 
 =back
 
+=head2 Constructors
+
+    my $buf = Data::Buffer::Shared::I64->new($path, $capacity);         # file-backed
+    my $buf = Data::Buffer::Shared::I64->new_anon($capacity);           # anonymous
+    my $buf = Data::Buffer::Shared::I64->new_memfd($name, $capacity);   # memfd
+    my $buf = Data::Buffer::Shared::I64->new_from_fd($fd);              # reopen memfd
+
+The C<Str> variant takes an additional C<$max_len> argument giving the
+per-element fixed byte width:
+
+    my $buf = Data::Buffer::Shared::Str->new($path, $capacity, $max_len);
+    my $buf = Data::Buffer::Shared::Str->new_anon($capacity, $max_len);
+    my $buf = Data::Buffer::Shared::Str->new_memfd($name, $capacity, $max_len);
+    my $buf = Data::Buffer::Shared::Str->new_from_fd($fd, $max_len);
+
+C<new_from_fd> duplicates the caller's fd internally; the caller keeps
+ownership of the passed fd. The C<Str> variant requires the same
+C<$max_len> the original was created with — there is no header field
+storing it.
+
+=head2 Lifecycle
+
+    my $p  = $buf->path;    # backing file path, or undef for anon/memfd
+    my $fd = $buf->fd;      # memfd fd, or undef for anon/file-backed
+    my $fd = $buf->memfd;   # alias of fd() for sibling-module parity
+    $buf->sync;             # msync(MS_SYNC) mmap to backing store
+    $buf->unlink;           # remove backing file
+    my $h = $buf->stats;    # diagnostic hashref
+
 =head2 API
 
 Replace C<xx> with variant prefix: C<i8>, C<u8>, C<i16>, C<u16>,
@@ -115,13 +144,34 @@ Integer variants also have:
     my $n = buf_xx_incr $buf, $idx;          # atomic increment, returns new value
     my $n = buf_xx_decr $buf, $idx;          # atomic decrement
     my $n = buf_xx_add $buf, $idx, $delta;   # atomic add
-    my $ok = buf_xx_cas $buf, $idx, $old, $new;  # compare-and-swap
+    my $ok = buf_xx_cas $buf, $idx, $old, $new;          # compare-and-swap
+    my $p = buf_xx_cmpxchg $buf, $idx, $old, $new;       # CAS, returns prior value
+    my $n = buf_xx_atomic_and $buf, $idx, $mask;         # atomic AND (integer variants)
+    my $n = buf_xx_atomic_or  $buf, $idx, $mask;         # atomic OR
+    my $n = buf_xx_atomic_xor $buf, $idx, $mask;         # atomic XOR
+
+Raw / bulk:
+
+    my $raw = buf_xx_get_raw $buf, $from, $count;        # bulk bytes, seqlock-guarded
+    buf_xx_set_raw $buf, $from, $raw;                    # bulk bytes, write-locked
+    $buf->add_slice($from, \@deltas);                    # batch atomic add (integer variants)
+    my $ptr = buf_xx_ptr $buf;           # raw pointer to data, for FFI use
+    my $ptr = buf_xx_ptr_at $buf, $idx;  # pointer to element at index
+
+Zero-copy (numeric variants):
+
+    my $sv = $buf->as_scalar;   # mmap-aliased read-only scalar ref
 
 Diagnostics:
 
     my $c = buf_xx_capacity $buf;
     my $s = buf_xx_mmap_size $buf;
     my $e = buf_xx_elem_size $buf;
+    my $h = $buf->stats;    # hashref: capacity/elem_size/mmap_size/variant_id/recoveries
+
+Persistence:
+
+    $buf->sync;             # msync(MS_SYNC) mmap to backing store
 
 Explicit locking (for batch operations):
 
@@ -149,6 +199,14 @@ L<Data::Stack::Shared> - LIFO stack
 L<Data::Deque::Shared> - double-ended queue
 
 L<Data::Log::Shared> - append-only log (WAL)
+
+L<Data::Heap::Shared> - priority queue
+
+L<Data::Graph::Shared> - directed weighted graph
+
+L<Data::RingBuffer::Shared> - fixed-size overwriting ring buffer
+
+L<Data::BitSet::Shared> - shared bitset (lock-free per-bit ops)
 
 =head1 AUTHOR
 

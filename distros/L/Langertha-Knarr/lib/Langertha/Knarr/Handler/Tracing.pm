@@ -1,11 +1,11 @@
 package Langertha::Knarr::Handler::Tracing;
 # ABSTRACT: Decorator handler that records every request as a Langfuse trace
-our $VERSION = '1.001';
+our $VERSION = '1.100';
 use Moose;
 use Future;
 use Future::AsyncAwait;
-use Scalar::Util qw( blessed );
 use Langertha::Knarr::Stream;
+use Langertha::Knarr::Response;
 
 with 'Langertha::Knarr::Handler';
 
@@ -52,12 +52,15 @@ sub _open_trace {
   );
 }
 
-sub _result_text {
-  my ($self, $r) = @_;
-  return ''  unless defined $r;
-  return $r  unless ref $r;
-  return $r->{content} // '' if ref $r eq 'HASH';
-  return blessed($r) ? "$r" : '';
+sub _close_trace {
+  my ($self, $trace, $r) = @_;
+  my $resp = Langertha::Knarr::Response->coerce($r);
+  $self->tracing->end_trace(
+    $trace,
+    output => $resp->content,
+    model  => $resp->model,
+    ( $resp->usage ? ( usage => $resp->usage ) : () ),
+  );
 }
 
 async sub handle_chat_f {
@@ -70,11 +73,7 @@ async sub handle_chat_f {
   }
   my $f = $result->then( sub {
     my ($r) = @_;
-    $self->tracing->end_trace(
-      $trace,
-      output => $self->_result_text($r),
-      model  => ( ref($r) eq 'HASH' ? $r->{model} : undef ),
-    );
+    $self->_close_trace( $trace, $r );
     return Future->done($r);
   })->else( sub {
     my ($err) = @_;
@@ -148,7 +147,7 @@ Langertha::Knarr::Handler::Tracing - Decorator handler that records every reques
 
 =head1 VERSION
 
-version 1.001
+version 1.100
 
 =head1 SYNOPSIS
 

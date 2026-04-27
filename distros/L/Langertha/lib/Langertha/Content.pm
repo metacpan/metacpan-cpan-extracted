@@ -1,6 +1,6 @@
 package Langertha::Content;
 # ABSTRACT: Base role for canonical multimodal content blocks with cross-provider serialization
-our $VERSION = '0.404';
+our $VERSION = '0.500';
 use Moose::Role;
 
 requires qw( to_openai to_anthropic to_gemini );
@@ -20,7 +20,7 @@ Langertha::Content - Base role for canonical multimodal content blocks with cros
 
 =head1 VERSION
 
-version 0.404
+version 0.500
 
 =head1 SYNOPSIS
 

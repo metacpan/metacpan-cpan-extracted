@@ -1,6 +1,6 @@
 package MCP::Run::Compress::Filters;
 # ABSTRACT: Command Output Compression Reference
-our $VERSION = '0.004';
+our $VERSION = '0.100';
 
 
 1;
@@ -17,7 +17,7 @@ MCP::Run::Compress::Filters - Command Output Compression Reference
 
 =head1 VERSION
 
-version 0.004
+version 0.100
 
 =head1 DESCRIPTION
 
