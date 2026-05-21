@@ -5,19 +5,19 @@ package Graphics::Toolkit::Color::Space::Util;
 use v5.12;
 use warnings;
 use Exporter 'import';
-our @EXPORT_OK = qw/round_int round_decimals mod_real min max uniq mult_matrix_vector_3 is_nr/;
+our @EXPORT_OK = qw/min max uniq round_int round_decimals mod_real gamma_correct mult_matrix_vector_3 is_nr number_re/;
 our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
 #### lists #############################################################
-sub max {
-    my $v = shift;
-    for (@_) { next unless defined $_; $v = $_ if $v < $_ }
-    return $v;
-}
-
 sub min {
     my $v = shift;
     for (@_) { next unless defined $_; $v = $_ if $v > $_ }
+    return $v;
+}
+
+sub max {
+    my $v = shift;
+    for (@_) { next unless defined $_; $v = $_ if $v < $_ }
     return $v;
 }
 
@@ -42,13 +42,21 @@ sub round_decimals {
     return  round_int( $nr * $precision ) / $precision;
 }
 
-
 sub mod_real { # real value modulo
     return 0 unless defined $_[1] and $_[1];
     return  $_[0] - (int($_[0] / $_[1]) * $_[1]);
 }
 
-sub is_nr { $_[0] =~ /^\-?\d+(\.\d+)?$/ }
+sub gamma_correct { # spow: sign preserving power function
+    my ($base, $exponent) = @_;
+    return $base ** $exponent if $base >= 0;
+    return -((-$base) ** $exponent);
+}
+
+my $number_re = qr/^\-?(?:\d+|(?:\d*\.\d+))(?:e-?\d+)?$/;
+
+sub number_re { $number_re }
+sub is_nr { ($_[0] =~ $number_re) ? 1 : 0 }
 
 #### color computation #################################################
 sub mult_matrix_vector_3 {

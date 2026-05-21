@@ -60,8 +60,13 @@ sub new ($class, %argv) {
         static_install => 1,
         use_install_command => 0,
         default_resolvers => 1,
+        report_perl_version => !$class->maybe_ci,
         %argv
     }, $class;
+}
+
+sub maybe_ci ($class) {
+    !!grep $ENV{$_}, qw(CI AUTOMATED_TESTING AUTHOR_TESTING);
 }
 
 sub _normalize_progress ($self, $progress) {
@@ -107,7 +112,7 @@ sub _warn_deprecated_top_level_option ($self, $option) {
 }
 
 sub _progress_default ($self) {
-    !WIN32 && !$ENV{CI} && !$self->{verbose} && -t STDERR && terminal_width > 60 ? "tty" : "plain";
+    !WIN32 && !$self->maybe_ci && !$self->{verbose} && -t STDERR && terminal_width > 60 ? "tty" : "plain";
 }
 
 sub parse_options ($self, @argv) {
@@ -174,6 +179,7 @@ sub parse_options ($self, @argv) {
         "pp|pureperl|pureperl-only" => \($self->{pureperl_only}),
         "static-install!" => \($self->{static_install}),
         "use-install-command!" => \($self->{use_install_command}),
+        "report-perl-version!" => \($self->{report_perl_version}),
         "top-level-phase=s" => \$top_level_phase,
         "top-level-relationship=s" => \$top_level_relationship,
         "with-all" => sub (@) {
@@ -211,7 +217,7 @@ sub parse_options ($self, @argv) {
     if (WIN32 and $self->{workers} != 1) {
         die "The number of workers must be 1 under WIN32 environment.\n";
     }
-    if ($self->{pureperl_only} or !$self->{notest} or $self->{man_pages}) {
+    if ($self->{pureperl_only} or !$self->{notest} or $self->{man_pages} or $self->{use_install_command}) {
         $self->{prebuilt} = 0;
     }
 
@@ -329,7 +335,10 @@ sub cmd_install ($self) {
     my $work_dir = File::Spec->catdir($self->{home}, "work", "$now.$$");
     my $cache_dir = File::Spec->catdir($self->{home}, "cache");
 
-    my $ctx = App::cpm::Context->new(log_file => $log_file);
+    my $ctx = App::cpm::Context->new(
+        log_file => $log_file,
+        report_perl_version => $self->{report_perl_version},
+    );
     $ctx->{logger}->symlink_to("$self->{home}/build.log");
     my $trial = $App::cpm::TRIAL ? '-TRIAL' : '';
     $ctx->log("Running cpm $App::cpm::VERSION$trial ($0) on perl $Config{version} built for $Config{archname} ($^X)");
@@ -603,9 +612,9 @@ sub locate_dependency_file ($self) {
             my $base = App::cpm::Util::maybe_abs($self->{local_lib});
             $ENV{PATH} = join $Config{path_sep}, File::Spec->catdir($base, "bin"), ( $ENV{PATH} ? $ENV{PATH} : () );
             $ENV{PERL5LIB} = join $Config{path_sep}, File::Spec->catdir($base, "lib", "perl5"), ( $ENV{PERL5LIB} ? $ENV{PERL5LIB} : ());
-            if ($build_file eq "Makefile.PL") {
+            if ($self->{use_install_command} && $build_file eq "Makefile.PL") {
                 push @cmd, "INSTALL_BASE=$base";
-            } else {
+            } elsif ($self->{use_install_command}) {
                 push @cmd, "--install_base", $base;
             }
         }
@@ -662,9 +671,9 @@ sub load_dependency_file ($self, $ctx) {
             package => $package,
             version_range => $options->{version},
             dev => $options->{dev},
-            reinstall => $options->{git} ? 1 : 0,
+            reinstall => $package ne "perl" && ($self->{reinstall} || $options->{git}) ? 1 : 0,
         };
-        if ($options->{git}) {
+        if ($req->{reinstall}) {
             push @reinstall, $req;
         } else {
             push @package, $req;
@@ -834,7 +843,7 @@ Options:
       --prebuilt, --no-prebuilt
         save builds for CPAN distributions; and later, install the prebuilts if available
         default: on; you can also set $ENV{PERL_CPM_PREBUILT} false to disable this option.
-        usage of --test and/or --man-pages disables this option.
+        usage of --test, --man-pages, and/or --use-install-command disables this option.
       --target-perl=VERSION  (EXPERIMENTAL)
         install modules as if version is your perl is VERSION
       --mirror=URL
@@ -873,6 +882,8 @@ Options:
         no-op compatibility option, will be removed in a future release
       --show-build-log-on-failure
         show build.log on failure, default: off
+      --report-perl-version, --no-report-perl-version
+        report your local perl version as part of User-Agent, default: on unless CI is enabled
       --configure-timeout=sec, --build-timeout=sec, --test-timeout=sec
         specify configure/build/test timeout second, default: 60sec, 3600sec, 1800sec
       --progress=auto|tty|plain

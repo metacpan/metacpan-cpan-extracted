@@ -4,41 +4,56 @@ Chess4p, a library for chess related functionality.
 
 =head1 SYNOPSIS
 
-use Chess4p;
+The functionality is split into these modules:
 
-use Chess4p::Common qw(...);
-
-$board = Chess4p::Board->fromFen();
-
-$board->push_move(Chess4p::Move->new(E2, E4);
-
-$board->fen();
-
-$board->ascii();
-
-$board->pop_move();
-
-...
-
-=head1 DESCRIPTION
-
-Features include legal move generation, perft testing, UCI move input/output.
-
-Planned features include SAN move input/output and PGN parsing.
-
-Only 64-bit systems are supported.
-
-=head1 SEE ALSO
 
 =over 4
 
+=item L<Chess4p::Perft>
+
+Perft calculation.
+
+=item L<Chess4p::Pgn::Reader>
+
+Read PGN files.
+
 =item L<Chess4p::Board>
+
+Essential board position functionality.
 
 =item L<Chess4p::Move>
 
+Small and simple Move class.
+
 =item L<Chess4p::Common>
 
+Constants needed by other modules.
+
 =back
+
+
+
+=head1 DESCRIPTION
+
+Features include legal move generation, perft testing,
+UCI move input/output, SAN move input/output and PGN parsing.
+
+Planned features include EPD's, support for the Fischer Random variant,
+binary encoding of position and move.
+
+For details, see the docs for the different sub-modules.
+
+
+=head1 LIMITATIONS
+
+Only 64-bit systems are supported.
+
+
+=head1 SEE ALSO
+
+The code is hosted here:
+https://codeberg.org/ejner/chess4p
+
 
 =head1 AUTHOR
 
@@ -65,9 +80,8 @@ BEGIN {
 
 use lib '.';
 
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.4';
 
-use Chess4p::Common;
 use Chess4p::Move;
 use Chess4p::Board;
 

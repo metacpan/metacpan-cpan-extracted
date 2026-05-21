@@ -13,6 +13,7 @@
 ^EV-cares-
 ^bench/
 ^_Inline/
+^xt/
 ~$
 \.bak$
 \.swp$

@@ -4,11 +4,12 @@ author:
   - 'Kazuho Oku <kazuhooku gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: 6.36
+  Test::Warn: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.17'
+generated_by: 'Module::Install version 1.21'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,4 +26,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/kazuho/p5-Parallel-Scoreboard
-version: '0.08'
+version: '0.09'

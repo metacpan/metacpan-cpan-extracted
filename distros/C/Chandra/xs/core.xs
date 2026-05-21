@@ -383,7 +383,7 @@ CODE:
         SV **app_svp = hv_fetchs(bind_hv, "app", 0);
         if (app_svp && SvOK(*app_svp)
             && SvRV(*app_svp) == SvRV(self)) {
-            /* Same app object — reuse existing bind */
+            /* Same app object - reuse existing bind */
             (void)hv_stores(bind_hv, "app", newSVsv(self));
             need_new = 0;
         }

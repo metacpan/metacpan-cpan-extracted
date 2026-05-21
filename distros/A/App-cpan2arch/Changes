@@ -1,0 +1,37 @@
+Revision history for App::cpan2arch
+
+v1.1.0    2026-05-21T09:14:02Z
+          - Be more lightweight, so make caching as optional and move M::UA::C +
+            CHI to runtime recommends
+          - Remove unnecessary Encode + Encode::Locale because cpan2arch does no
+            Unicode manipulation in @ARGV
+          - Move Cpanel::JSON::XS to runtime recommends since there's no real time
+            gain (Mojo::JSON suffices)
+          - Move Term::ReadKey to runtime recommends + document, so one can choose
+            whether a larger table is desired
+          - Remove lexical var dupe (CheckPackages.pm)
+          - Fix wrong PACKAGER environment var in documentation
+
+v1.0.2    2026-05-16T01:21:00Z
+          - Initialize M::UA::C's mcpan + arch instances only one time, so --clear
+            is consistent and cache is not cleared multiple times. It seems there
+            is another significant real time improvement, which makes sense since
+            there was probably overhead when creating multiple instances in
+            _get_json() :)
+          - Remove 'version' + M::CoreList version constraints since min perl
+            (v5.42.0) ships with 'version' 0.9933 and M::CoreList version suffices
+          - Improve _get_corelist() error handling and fallback to the current
+            perl version instead of exiting (Module::CoreList)
+          - Use default TTY width in normal_comp test (01-offline.t)
+          - Update READMEs
+
+v1.0.1    2026-05-14T00:40:43Z
+          - Query all perl-* pages from Arch's Official API rather than only the
+            first page, reducing individual API searches and network IO
+            (real time improvement of ~40% in PKGBUILD generation + online tests!)
+          - Trim whitespace + remove newlines from optdepends descriptions
+          - Fix missing author in GH issues link
+          - Add PKGBUILD example in documentation
+
+v1.0.0    2026-05-12T21:00:42Z
+          - Initial release

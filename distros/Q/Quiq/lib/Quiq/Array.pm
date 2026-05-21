@@ -37,7 +37,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.237';
+our $VERSION = '1.238';
 
 use Encode ();
 use Quiq::Reference;
@@ -1077,7 +1077,7 @@ sub restore {
 
 =head1 VERSION
 
-1.237
+1.238
 
 =head1 AUTHOR
 

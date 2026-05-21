@@ -1,0 +1,17 @@
+Changes
+Makefile.PL
+MANIFEST			This list of files
+Nobody-0.01/META.json
+Nobody-0.01/META.yml
+Nobody/Auto.pm
+Nobody/Exes.pm
+Nobody/JSON.pm
+Nobody/PP.pm
+Nobody/Util.pm
+README
+README.md
+t/01-util.t
+t/02-json.t
+Tie/ArrayNoNull.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

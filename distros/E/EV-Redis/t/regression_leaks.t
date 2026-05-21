@@ -107,4 +107,21 @@ my %connect_info = $redis_server->connect_info;
     like $@, qr/'path' must be a defined string/, 'path => undef croaks';
 }
 
+# Test Case 6: N sequential connect/disconnect cycles on the same object.
+# Catches cumulative state leaks (cb_queue residue, counter drift, timer leaks).
+{
+    my $r = EV::Redis->new(on_error => sub { });
+    for my $i (1..20) {
+        $r->connect_unix($connect_info{sock});
+        my $done = 0;
+        $r->ping(sub { $done = 1; $r->disconnect });
+        my $timer = EV::timer 1, 0, sub { EV::break };
+        EV::run;
+        ok $done, "cycle $i: ping completed";
+        is $r->pending_count, 0, "cycle $i: pending_count is 0";
+        is $r->waiting_count, 0, "cycle $i: waiting_count is 0";
+        ok !$r->is_connected, "cycle $i: disconnected";
+    }
+}
+
 done_testing;

@@ -20,11 +20,15 @@ Lingua::RO::Numbers - Convert numeric values into their Romanian string equivale
 
 =head1 VERSION
 
-Version 0.22
+Version 0.23
 
 =cut
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
+
+#===========================================================================
+# Data tables
+#===========================================================================
 
 # Numbers => text
 our %DIGITS;
@@ -39,37 +43,41 @@ our %DIGITS;
   șaptesprezece
   optsprezece
   nouăsprezece
-  );
+);
 
 # Text => numbers
 our %WORDS;
-@WORDS{map { _remove_diacritics($_) } values %DIGITS} = keys %DIGITS;
+@WORDS{ map { _remove_diacritics($_) } values %DIGITS } = keys %DIGITS;
 @WORDS{qw(o un doua cin sai ob)} = (1, 1, 2, 5, 6, 8);
 
 # Colocvial
 @WORDS{qw(unspe doispe treispe paispe cinspe cinsprezece saispe saptespe saptuspe optspe optuspe nouaspe)} =
   (11, 12, 13, 14, 15, 15, 16, 17, 17, 18, 18, 19);
 
-# This array contains number greater than 99 and it's used to convert numbers into text
+# This array contains numbers greater than 99 and it's used to convert numbers into text
 our @BIGNUMS = (
-                {num => 10**2,  sg => 'suta',        pl => 'sute', fem => 1},
-                {num => 10**3,  sg => 'mie',         pl => 'mii',  fem => 1},
-                {num => 10**6,  sg => 'milion',      pl => 'milioane'},
-                {num => 10**9,  sg => 'miliard',     pl => 'miliarde'},
-                {num => 10**12, sg => 'bilion',      pl => 'bilioane'},
-                {num => 10**15, sg => 'biliard',     pl => 'biliarde'},
-                {num => 10**18, sg => 'trilion',     pl => 'trilioane'},
-                {num => 10**21, sg => 'triliard',    pl => 'triliarde'},
-                {num => 10**24, sg => 'cvadrilion',  pl => 'cvadrilioane'},
-                {num => 10**27, sg => 'cvadriliard', pl => 'cvadriliarde'},
-                {num => 'inf',  sg => 'inifinit',    pl => 'infinit'},
-               );
+    { num => 10**2,  sg => 'suta',        pl => 'sute',        fem => 1 },
+    { num => 10**3,  sg => 'mie',         pl => 'mii',         fem => 1 },
+    { num => 10**6,  sg => 'milion',      pl => 'milioane'               },
+    { num => 10**9,  sg => 'miliard',     pl => 'miliarde'               },
+    { num => 10**12, sg => 'bilion',      pl => 'bilioane'               },
+    { num => 10**15, sg => 'biliard',     pl => 'biliarde'               },
+    { num => 10**18, sg => 'trilion',     pl => 'trilioane'              },
+    { num => 10**21, sg => 'triliard',    pl => 'triliarde'              },
+    { num => 10**24, sg => 'cvadrilion',  pl => 'cvadrilioane'           },
+    { num => 10**27, sg => 'cvadriliard', pl => 'cvadriliarde'           },
+    { num => 'inf',  sg => 'infinit',     pl => 'infinit'                },
+);
 
 # This hash is a reversed version of the above array and it's used to convert text into numbers
 our %BIGWORDS = (map { $_->{sg} => $_->{num}, $_->{pl} => $_->{num} } @BIGNUMS);
 
 # Change 'suta' to 'sută'
-$BIGNUMS[0]{'sg'} = 'sută';
+$BIGNUMS[0]{sg} = 'sută';
+
+#===========================================================================
+# POD
+#===========================================================================
 
 =head1 SYNOPSIS
 
@@ -146,18 +154,22 @@ Converts a Romanian text into its numeric value.
 
 =cut
 
+#===========================================================================
+# Public methods
+#===========================================================================
+
 sub new {
     my ($class, %opts) = @_;
 
     my $self = bless {
-                      diacritics          => 1,
-                      invalid_number      => undef,
-                      negative_sign       => 'minus',
-                      decimal_point       => 'virgulă',
-                      thousands_separator => '',
-                      infinity            => 'infinit',
-                      not_a_number        => 'NaN',
-                     }, $class;
+        diacritics          => 1,
+        invalid_number      => undef,
+        negative_sign       => 'minus',
+        decimal_point       => 'virgulă',
+        thousands_separator => '',
+        infinity            => 'infinit',
+        not_a_number        => 'NaN',
+    }, $class;
 
     foreach my $key (keys %{$self}) {
         if (exists $opts{$key}) {
@@ -172,18 +184,10 @@ sub new {
     return $self;
 }
 
-# This function it's an interface to a private function
+# This function is an interface to a private function
 # which converts a mathematical number into its Romanian equivalent text.
 sub number_to_ro {
-    my ($self, $number, %opts);
-
-    if (ref $_[0] eq __PACKAGE__) {
-        ($self, $number) = @_;
-    }
-    else {
-        ($number, %opts) = @_;
-        $self = __PACKAGE__->new(%opts);
-    }
+    my ($self, $number) = _get_self_and_arg(@_);
 
     my $word_number = $self->_number_to_ro($number + 0);
 
@@ -192,45 +196,46 @@ sub number_to_ro {
     }
 
     # Return the text-number
-    $word_number;
+    return $word_number;
 }
 
-# This function it's an interface to a private function
+# This function is an interface to a private function
 # which converts a Romanian text-number into its mathematical value.
 sub ro_to_number {
-    my ($self, $text, %opts);
+    my ($self, $text) = _get_self_and_arg(@_);
 
-    if (ref $_[0] eq __PACKAGE__) {
-        ($self, $text) = @_;
-    }
-    else {
-        ($text, %opts) = @_;
-        $self = __PACKAGE__->new(%opts);
-    }
-
-    (    # Decode the text unless it is already UTF-8
-       $] >= 5.0080001 ? utf8::is_utf8($text) : do {
-           require Encode;
-           Encode::is_utf8($text);
-         }
-    )
-      || do {
+    # Decode the text unless it is already UTF-8
+    utf8::is_utf8($text) || do {
         require Encode;
         $text = Encode::decode_utf8($text);
-      };
+    };
 
     # Return the number
-    $self->_ro_to_number($text);
+    return $self->_ro_to_number($text);
+}
+
+#===========================================================================
+# Private helpers
+#===========================================================================
+
+# Helper to support both object-oriented and functional calling styles.
+# Returns ($self, $arg) in both cases.
+sub _get_self_and_arg {
+    if (ref $_[0] eq __PACKAGE__) {
+        return ($_[0], $_[1]);
+    }
+    my ($arg, %opts) = @_;
+    return (__PACKAGE__->new(%opts), $arg);
 }
 
 # This function removes the Romanian diacritics from a given text.
 sub _remove_diacritics {
     my ($text) = @_;
     $text =~ tr{ăâșțî}{aasti};
-    $text;
+    return $text;
 }
 
-# This functions removes irrelevant characters from a text
+# This function removes irrelevant characters from a text.
 sub _normalize_text {
 
     # Lowercase and remove the diacritics
@@ -239,11 +244,10 @@ sub _normalize_text {
     # Replace irrelevant characters with a space
     $text =~ tr/a-z / /c;
 
-    # Return the normalized text
-    $text;
+    return $text;
 }
 
-# This function adds together a list of numbers
+# This function adds together a list of numbers.
 sub _add_numbers {
     my (@nums) = @_;
 
@@ -277,18 +281,15 @@ sub _add_numbers {
         $num += $i;
     }
 
-    $num;
+    return $num;
 }
 
-# This function converts a Romanian
-# text-number into a mathematical number.
+# This function converts a Romanian text-number into a mathematical number.
 sub _ro_to_number {
     my ($self, $text) = @_;
 
     # When no text has been provided
-    if (not defined $text) {
-        return;
-    }
+    return if not defined $text;
 
     # If a thousand separator is defined, remove it from text
     if (defined($self->{thousands_separator}) and length($self->{thousands_separator})) {
@@ -304,11 +305,10 @@ sub _ro_to_number {
     my @nums;    # numbers
     my @decs;    # decimal numbers
 
-    my $neg  = 0;    # bool -- true when the number is negative
-    my $adec = 0;    # bool -- true after the decimal point
-
-    my $amount = 0;  # int -- current number
-    my $factor = 1;  # int -- multiplication factor
+    my $neg    = 0;    # bool -- true when the number is negative
+    my $adec   = 0;    # bool -- true after the decimal point
+    my $amount = 0;    # int -- current number
+    my $factor = 1;    # int -- multiplication factor
 
     if (@words) {
 
@@ -335,35 +335,30 @@ sub _ro_to_number {
         }
     }
 
-    # Iterate over the @words
-    while (
-        @words and (
+    # Iterate over the words
+    WORD: while (@words) {
 
-            # It's a small number (lower than 100)
-            do {
-                $factor = exists($WORDS{$words[0]}) ? 1 : $words[0] =~ s/zeci\z// ? 10 : 0;
-                $factor && do { $amount = shift @words };
-                $factor;
-            }
-
-            # It's a big number (e.g.: milion)
-            or @words && exists($BIGWORDS{$words[0]}) && do {
-                $factor = $BIGWORDS{shift @words};
-            }
-
-            # Ignore invalid words
-            or do {
-                shift @words;
-                next;
-            }
-        )
-      ) {
+        # It's a small number (lower than 100)
+        if (exists $WORDS{$words[0]}) {
+            $amount = shift @words;
+            $factor = 1;
+        }
+        elsif ($words[0] =~ s/zeci\z//) {
+            $amount = shift @words;
+            $factor = 10;
+        }
+        # It's a big number (e.g.: milion)
+        elsif (exists $BIGWORDS{$words[0]}) {
+            $factor = $BIGWORDS{shift @words};
+        }
+        # Ignore invalid words
+        else {
+            shift @words;
+            next WORD;
+        }
 
         # Take and multiply the current number
-        my $num =
-          exists($WORDS{$amount})
-          ? $WORDS{$amount} * $factor
-          : next;    # skip invalid words
+        my $num = exists($WORDS{$amount}) ? $WORDS{$amount} * $factor : next WORD;
 
         # Check for some word-joining tokens
         if (@words) {
@@ -401,7 +396,7 @@ sub _ro_to_number {
     }
 
     # Return undef when no number has been converted
-    @nums || return;
+    return if not @nums;
 
     # Add all the numbers together (if any)
     my $num = _add_numbers(@nums);
@@ -420,29 +415,29 @@ sub _ro_to_number {
     }
 
     # Return the number
-    $neg ? -$num : $num + 0;
+    return $neg ? -$num : $num + 0;
 }
 
-# This function converts numbers
-# into their Romanian equivalent text.
+# This function converts numbers into their Romanian equivalent text.
 sub _number_to_ro {
     my ($self, $number) = @_;
 
     my @words;
-    if (exists $DIGITS{$number}) {    # example: 8
+
+    if (exists $DIGITS{$number}) {        # example: 8
         push @words, $DIGITS{$number};
     }
-    elsif (lc($number) eq 'nan') {    # not a number (NaN)
+    elsif (lc($number) eq 'nan') {        # not a number (NaN)
         return $self->{not_a_number};
     }
-    elsif ($number == 9**9**9) {      # number is infinit
+    elsif ($number == 9**9**9) {          # number is infinite
         return $self->{infinity};
     }
-    elsif ($number < 0) {             # example: -43
+    elsif ($number < 0) {                 # example: -43
         push @words, $self->{negative_sign};
         push @words, $self->_number_to_ro(abs($number));
     }
-    elsif ($number != int($number)) {    # example: 0.123 or 12.43
+    elsif ($number != int($number)) {     # example: 0.123 or 12.43
         my $l = length($number) - 2;
 
         if ((length($number) - length(int $number) - 1) < 1) {    # special case
@@ -456,53 +451,56 @@ sub _number_to_ro {
 
             until ($number == int($number)) {
                 $number *= 10;
-                $number = sprintf('%.*f', --$l, $number);         # because of imprecise multiplication
+                $number = sprintf('%.*f', --$l, $number);    # because of imprecise multiplication
                 push @words, $DIGITS{0} if $number < 1;
             }
+
             push @words, $self->_number_to_ro(int $number);
         }
     }
-    elsif ($number >= $BIGNUMS[0]{num}) {                         # i.e.: >= 100
-        foreach my $i (0 .. $#BIGNUMS - 1) {
-            my $j = $#BIGNUMS - $i;
+    elsif ($number >= $BIGNUMS[0]{num}) {    # i.e.: >= 100
+        foreach my $j (reverse 1 .. $#BIGNUMS) {
+            next unless $number >= $BIGNUMS[$j - 1]{num}
+                     && $number <= $BIGNUMS[$j]{num};
 
-            if ($number >= $BIGNUMS[$j - 1]{num} && $number <= $BIGNUMS[$j]{num}) {
-                my $cat = int $number / $BIGNUMS[$j - 1]{num};
-                $number -= $BIGNUMS[$j - 1]{num} * int($number / $BIGNUMS[$j - 1]{num});
+            my $cat = int $number / $BIGNUMS[$j - 1]{num};
+            $number -= $BIGNUMS[$j - 1]{num} * int($number / $BIGNUMS[$j - 1]{num});
 
-                my @of = $cat <= 2 ? () : do {
-                    my @w = exists $DIGITS{$cat} ? $DIGITS{$cat} : ($self->_number_to_ro($cat), 'de');
-                    if (@w > 2) {
-                        $w[-2] = 'două' if $w[-2] eq $DIGITS{2};
-                    }
-                    @w;
-                };
-
-                if ($cat >= 100 && $cat < 1_000) {
-                    my $rest = $cat - 100 * int($cat / 100);
-                    if (@of and $rest != 0 and exists $DIGITS{$rest}) {
-                        splice @of, -1;    # remove 'de'
-                    }
+            my @of = $cat <= 2 ? () : do {
+                my @w = exists $DIGITS{$cat}
+                    ? $DIGITS{$cat}
+                    : ($self->_number_to_ro($cat), 'de');
+                if (@w > 2) {
+                    $w[-2] = 'două' if $w[-2] eq $DIGITS{2};
                 }
+                @w;
+            };
 
-                push @words,
-                    $cat == 1 ? ($BIGNUMS[$j - 1]{fem} ? 'o' : 'un', $BIGNUMS[$j - 1]{sg})
-                  : $cat == 2 ? ('două', $BIGNUMS[$j - 1]{pl})
-                  :             (@of, $BIGNUMS[$j - 1]{pl});
-
-                if ($number > 0) {
-                    $words[-1] .= $self->{thousands_separator} if $BIGNUMS[$j]{num} > 1_000;
-                    push @words, $self->_number_to_ro($number);
+            if ($cat >= 100 && $cat < 1_000) {
+                my $rest = $cat - 100 * int($cat / 100);
+                if (@of and $rest != 0 and exists $DIGITS{$rest}) {
+                    splice @of, -1;    # remove 'de'
                 }
-
-                last;
             }
+
+            push @words,
+                $cat == 1 ? ($BIGNUMS[$j - 1]{fem} ? 'o' : 'un', $BIGNUMS[$j - 1]{sg})
+              : $cat == 2 ? ('două', $BIGNUMS[$j - 1]{pl})
+              :             (@of,    $BIGNUMS[$j - 1]{pl});
+
+            if ($number > 0) {
+                $words[-1] .= $self->{thousands_separator} if $BIGNUMS[$j]{num} > 1_000;
+                push @words, $self->_number_to_ro($number);
+            }
+
+            last;
         }
     }
     elsif ($number > 19 && $number < 100) {    # example: 42
-        my $cat = int $number / 10;
-        push @words, ($cat == 2 ? 'două' : $cat == 6 ? 'șai' : $DIGITS{$cat}) . 'zeci',
-          ($number % 10 != 0 ? ('și', $DIGITS{$number % 10}) : ());
+        my $cat  = int($number / 10);
+        my $tens = ($cat == 2 ? 'două' : $cat == 6 ? 'șai' : $DIGITS{$cat}) . 'zeci';
+        push @words, $tens;
+        push @words, 'și', $DIGITS{$number % 10} if $number % 10 != 0;
     }
     else {                                     # doesn't look like a number
         return $self->{invalid_number};
@@ -513,7 +511,7 @@ sub _number_to_ro {
 
 =head1 AUTHOR
 
-Daniel Șuteu, C<< <trizen at protonmail.com> >>
+Daniel Șuteu, C<< <trizen at cpan.org> >>
 
 =head1 SUPPORT
 

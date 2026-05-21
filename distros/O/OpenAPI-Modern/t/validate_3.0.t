@@ -20,13 +20,12 @@ use Clone 'clone';
 
 my $doc_uri_rel = Mojo::URL->new('/api');
 my $doc_uri = $doc_uri_rel->to_abs(Mojo::URL->new('http://example.com'));
-my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
 $::TYPE = 'mojo';
 
 subtest 'basic request validation with a v3.0.x OAD' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(<<'YAML'));
+    openapi_schema => decode_yaml(<<'YAML'));
 openapi: 3.0.3
 info:
   title: Test API
@@ -112,7 +111,7 @@ YAML
 
 subtest 'upgrading from 3.0' => sub {
   # example taken from https://learn.openapis.org/upgrading/v3.0-to-v3.1.html
-  my $doc_3_0 = JSON::Schema::Modern::Document::OpenAPI->new(schema => $yamlpp->load_string(<<'YAML'));
+  my $doc_3_0 = JSON::Schema::Modern::Document::OpenAPI->new(schema => decode_yaml(<<'YAML'));
 ---
 openapi: 3.0.3
 info:
@@ -164,7 +163,7 @@ YAML
 
   like(
     dies {
-      my $doc_3_0 = JSON::Schema::Modern::Document::OpenAPI->new(schema => $yamlpp->load_string(OPENAPI_PREAMBLE."\npaths: {}\n"));
+      my $doc_3_0 = JSON::Schema::Modern::Document::OpenAPI->new(schema => decode_yaml(OPENAPI_PREAMBLE."\npaths: {}\n"));
       $doc_3_0->upgrade('3.0.4');
     },
     qr/^\Qdowngrading is not supported\E/,
@@ -173,7 +172,7 @@ YAML
 
   cmp_result(
     my $schema_3_1 = $doc_3_0->upgrade('3.1'),
-    my $expected_schema_3_1 = $yamlpp->load_string(<<'YAML'),
+    my $expected_schema_3_1 = decode_yaml(<<'YAML'),
 openapi: 3.1.2
 info:
   title: Test API

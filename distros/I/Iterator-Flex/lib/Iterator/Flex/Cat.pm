@@ -7,9 +7,10 @@ use strict;
 use warnings;
 use experimental qw( signatures declared_refs refaliasing );
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
-use Iterator::Flex::Utils qw( RETURN STATE EXHAUSTION :IterAttrs :IterStates can_meth );
+use Iterator::Flex::Utils
+  qw( RETURN STATE EXHAUSTION :IterAttrs :IterStates can_meth throw_failure );
 use Iterator::Flex::Factory 'to_iterator';
 use parent 'Iterator::Flex::Base';
 use List::Util 'all';
@@ -211,7 +212,7 @@ Iterator::Flex::Cat - An iterator which concatenates a set of iterators
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 METHODS
 

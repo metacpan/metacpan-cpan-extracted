@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Lightweight DateTime Alternative - ~/lib/DateTime/Lite/TimeZone.pm
-## Version v0.5.4
+## Version v0.5.8
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/04/03
-## Modified 2026/04/23
+## Modified 2026/05/20
 ## All rights reserved
 ## 
 ## 
@@ -87,7 +87,7 @@ BEGIN
     #     time_zone => 'UTC',
     # )->utc_rd_as_seconds == 62_135_683_200
     use constant UNIX_TO_RD => 62_135_683_200;
-    our $VERSION = 'v0.5.4';
+    our $VERSION = 'v0.5.8';
     our $DEBUG   = 0;
     our $DBH     = {};
     # Cached prepared statements, keyed by db file path then by statement ID:
@@ -199,6 +199,19 @@ sub new
     my $extended    = delete( $args{extended} )      // 0;
     my $latitude    = delete( $args{latitude} )      // delete( $args{lat} );
     my $longitude   = delete( $args{longitude} )     // delete( $args{lon} );
+    my $fatal       = delete( $args{fatal} )         // ( $FATAL_EXCEPTIONS // 0 );
+
+    # After extracting all known keys, %args must be empty
+    if( scalar( keys( %args ) ) )
+    {
+        my @unknown = sort( keys( %args ) );
+        return( $class->error( sprintf(
+            "Unknown argument%s passed to %s->new: %s",
+            scalar( @unknown ) > 1 ? 's' : '',
+            $class,
+            join( ', ', map{ qq{'$_'} } @unknown ),
+        ) ) );
+    }
 
     # If latitude and longitude are provided instead of a name, resolve the
     # nearest IANA timezone using the coordinates stored in the zones table.
@@ -233,8 +246,6 @@ sub new
         return( $tz );
     }
 
-    $args{fatal} //= ( $FATAL_EXCEPTIONS // 0 );
-
     # Special cases: floating, UTC, and local never need a DB lookup
     if( $name eq 'local' )
     {
@@ -249,7 +260,7 @@ sub new
         my $local_name = $class->_resolve_local_tz_name ||
             return( $class->error( "Cannot determine local time zone. Please set \$ENV{TZ}." ) );
         # Recurse with the resolved name
-        return( $class->new( name => $local_name, %args ) );
+        return( $class->new( name => $local_name, fatal => $fatal, use_cache_mem => $use_cache, extended => $extended ) );
     }
 
     if( $name eq 'floating' )
@@ -261,7 +272,7 @@ sub new
             is_utc      => 0,
             is_olson    => 0,
             has_dst     => 0,
-            fatal       => $args{fatal},
+            fatal       => $fatal,
         }, $class ) );
     }
 
@@ -274,7 +285,7 @@ sub new
             is_utc      => 1,
             is_olson    => 0,
             has_dst     => 0,
-            fatal       => $args{fatal},
+            fatal       => $fatal,
         }, $class ) );
     }
 
@@ -291,7 +302,7 @@ sub new
             is_olson     => 0,
             has_dst      => 0,
             fixed_offset => $offset,
-            fatal        => $args{fatal},
+            fatal        => $fatal,
         }, $class ) );
     }
 
@@ -303,7 +314,7 @@ sub new
         is_olson    => 1,
         has_dst     => 0,
         _zone_id    => undef,
-        fatal       => $args{fatal},
+        fatal       => $fatal,
     }, $class );
 
     # Resolve aliases (such as "US/Eastern" -> "America/New_York")
@@ -332,7 +343,8 @@ sub new
             {
                 return( $self->error( "Timezone abbreviation '$name' is ambiguous (maps to multiple UTC offsets). Use resolve_abbreviation() with a utc_offset filter to disambiguate." ) );
             }
-            return( $class->new( name => $candidates->[0]->{zone_name}, %args ) );
+            # Passing the 'extended' property here does not matter much since the candidate zone found is already a canonical IANA zone, but we pass it anyway to be consistent.
+            return( $class->new( name => $candidates->[0]->{zone_name}, fatal => $fatal, use_cache_mem => $use_cache, extended => $extended ) );
         }
     }
     return( $self->error( "Unknown time zone '$name'." ) ) unless( $ref );
@@ -657,6 +669,52 @@ sub error
         }
     }
     return( ref( $self ) ? $self->{error} : $ERROR );
+}
+
+sub extended_aliases
+{
+    # Can be called as class method, instance method, or plain function.
+    my $class_or_self = shift( @_ );
+    local $@;
+    my $sth;
+    unless( $sth = $class_or_self->_get_cached_statement( 'all_extended_aliases' ) )
+    {
+        my $dbh = $class_or_self->_dbh || return( $class_or_self->pass_error );
+        my $query = q{SELECT abbreviation AS alias_name, zone_name FROM v_extended_alias ORDER BY alias_name};
+        $sth = eval
+        {
+            $dbh->prepare( $query );
+        } || return( $class_or_self->error( "Error preparing the query to get all extended timezone aliases: ", ( $@ || $dbh->errstr ), "\nSQL query was $query" ) );
+        $class_or_self->_set_cached_statement( all_extended_aliases => $sth );
+    }
+
+    my $rv = eval{ $sth->execute };
+    if( $@ )
+    {
+        $sth->finish;
+        return( $class_or_self->error( "Error executing the query to get all extended timezone aliases: $@", "\nSQL query was ", $sth->{Statement} ) );
+    }
+    elsif( !defined( $rv ) )
+    {
+        $sth->finish;
+        return( $class_or_self->error( "Error executing the query to get all extended timezone aliases: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
+    }
+
+    my $all = eval{ $sth->fetchall_arrayref([0,1]) };
+    if( $@ )
+    {
+        $sth->finish;
+        return( $class_or_self->error( "Error retrieving all timezone extended aliases: $@", "\nSQL query was ", $sth->{Statement} ) );
+    }
+    # We check for definedness, which means an error in DBI
+    elsif( !defined( $all ) && $sth->errstr )
+    {
+        $sth->finish;
+        return( $class_or_self->error( "Error retrieving all timezone extended aliases: ", $sth->errstr, "\nSQL query was ", $sth->{Statement} ) );
+    }
+    $sth->finish;
+    my $aliases = +{map{ $_->[0] => $_->[1] } @$all};
+    return( wantarray() ? %$aliases : $aliases );
 }
 
 sub fatal
@@ -1061,7 +1119,7 @@ sub pass_error
         $self->{error} = ${ $pack . '::ERROR' } = ( defined( $class ) ? bless( $err => $class ) : $err );
         $self->{error}->code( $code ) if( defined( $code ) && $self->{error}->can( 'code' ) );
 
-        if( $self->{fatal} || ( defined( ${"${class}\::FATAL_EXCEPTIONS"} ) && ${"${class}\::FATAL_EXCEPTIONS"} ) )
+        if( $self->{fatal} || ( defined( ${"${pack}\::FATAL_EXCEPTIONS"} ) && ${"${pack}\::FATAL_EXCEPTIONS"} ) )
         {
             die( $self->{error} );
         }
@@ -2808,10 +2866,86 @@ SQL
     return( $row->{name} );
 }
 
+# _posix_offset_to_utc( $raw )
+# Converts a POSIX TZ offset string (e.g. "5", "-10:30", "+9:30") to
+# seconds east of UTC.
+# POSIX convention is the inverse of the ISO 8601 convention: a positive
+# POSIX offset means WEST of UTC (e.g. "EST5" = UTC-5).
+sub _posix_offset_to_utc
+{
+    my( $self, $raw ) = @_;
+    # Positive POSIX value = west = negative UTC offset
+    my $sign = ( $raw =~ s/^-// ) ? 1 : -1;
+    $raw =~ s/^\+//;
+    my( $h, $m, $s ) = split( /:/, $raw );
+    return( $sign * ( ( $h // 0 ) * 3600 + ( $m // 0 ) * 60 + ( $s // 0 ) ) );
+}
+
+# _posix_rule_to_unix( $rule, $year, $wall_offset )
+# Computes the UTC Unix timestamp of a POSIX DST transition in a given year.
+# $rule is a Mm.w.d[/time] string (the only form present in tzdata 2026a).
+# $wall_offset is the UTC offset IN EFFECT when this transition occurs
+# (standard time offset for the start rule, DST offset for the end rule).
+sub _posix_rule_to_unix
+{
+    my( $self, $rule, $year, $wall_offset ) = @_;
+
+    # Only Mm.w.d form is supported (covers 100% of 2026a footer rules).
+    return unless( $rule =~ /\AM(\d{1,2})\.(\d)\.(\d)(?:\/(.+))?\z/ );
+
+    my( $mon, $week, $dow, $time_s ) = ( int($1), int($2), int($3), $4 );
+
+    # Default wall-clock transition time is 02:00 (7200 seconds).
+    my $wall_time = 7200;
+    if( defined( $time_s ) )
+    {
+        # Per RFC 9636 s3.3.2, time may be negative or exceed 24 h (v3+).
+        my $tsign = ( $time_s =~ s/^-// ) ? -1 : 1;
+        $time_s =~ s/^\+//;
+        my( $th, $tm, $ts ) = split( /:/, $time_s );
+        $wall_time = $tsign * ( ( $th // 0 ) * 3600 + ( $tm // 0 ) * 60 + ( $ts // 0 ) );
+    }
+
+    # Days in each month for $year
+    my @mlen = ( 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 );
+    $mlen[1] = 29 if( $year % 4 == 0 && ( $year % 100 != 0 || $year % 400 == 0 ) );
+
+    # UTC timestamp of January 1 of $year
+    require Time::Local;
+    my $jan1 = Time::Local::timegm( 0, 0, 0, 1, 0, $year );
+
+    # UTC timestamp of the first day of $mon
+    my $days_before = 0;
+    $days_before += $mlen[$_] for 0 .. $mon - 2;
+    my $first_of_month = $jan1 + $days_before * 86400;
+
+    # Day of week of the first day of $mon (0 = Sunday)
+    my $first_dow = ( gmtime( $first_of_month ) )[6];
+
+    # Find the first occurrence of $dow in this month
+    my $diff = ( $dow - $first_dow + 7 ) % 7;
+    my $mday  = 1 + $diff;
+
+    if( $week == 5 )
+    {
+        # Week 5 = last occurrence: advance by 7-day steps while still in month
+        while( $mday + 7 <= $mlen[$mon - 1] ) { $mday += 7 }
+    }
+    else
+    {
+        $mday += ( $week - 1 ) * 7;
+    }
+
+    # UTC = midnight UTC of that day + wall_time - utc_offset_in_effect
+    return( $first_of_month + ( $mday - 1 ) * 86400 + $wall_time - $wall_offset );
+}
+
 # _posix_tz_lookup( $unix_secs, $footer_tz_string )
 #
-# Thin wrapper around the XS function DateTime::Lite::posix_tz_lookup(), which
-# is implemented in dtl_posix.h using IANA tzcode (public domain).
+# When XS is available, this is a thin wrapper around the XS function
+# DateTime::Lite::posix_tz_lookup(), which is implemented in dtl_posix.h using IANA
+# tzcode (public domain).
+# Falls back to the pure-Perl implementation when XS is not available.
 # Returns { offset, is_dst, short_name } or undef on parse error.
 #
 # The three pure-Perl helpers that this replaces
@@ -2821,7 +2955,114 @@ SQL
 sub _posix_tz_lookup
 {
     my( $self, $unix_secs, $tz_string ) = @_;
-    return( DateTime::Lite::posix_tz_lookup( $self, $unix_secs, $tz_string ) );
+    unless( $DateTime::Lite::IsPurePerl )
+    {
+        return( DateTime::Lite::posix_tz_lookup( $self, $unix_secs, $tz_string ) );
+    }
+
+    # NOTE: Pure-Perl fallback
+    # Handles all footer formats present in tzdata 2026a:
+    #   - Fixed offset only:   "JST-9", "<+0545>-5:45"
+    #   - DST with Mm.w.d:     "EST5EDT,M3.2.0,M11.1.0"
+    #   - Quoted names:        "<+1245>-12:45<+1345>,M9.5.0/2:45,M4.1.0/3:45"
+    my $tz_str = $tz_string;
+
+    # Parse the standard time abbreviation (quoted <n> or bare letters)
+    my $std_name;
+    if( $tz_str =~ /\A<([^>]+)>/ )
+    {
+        $std_name = $1;
+        $tz_str   = substr( $tz_str, length( $& ) );
+    }
+    elsif( $tz_str =~ /\A([A-Za-z]{3,})/ )
+    {
+        $std_name = $1;
+        $tz_str   = $';
+    }
+    else
+    {
+        return;
+    }
+
+    # Parse the standard time offset (mandatory, POSIX sign convention)
+    $tz_str =~ /\A([+-]?\d{1,3}(?::\d{2}(?::\d{2})?)?)/ or return;
+    my $std_offset = $self->_posix_offset_to_utc( $1 );
+    $tz_str = $';
+
+    # No DST suffix -> always standard time
+    unless( length( $tz_str ) )
+    {
+        return({
+            offset     => $std_offset,
+            is_dst     => 0,
+            short_name => $std_name,
+        });
+    }
+
+    # Parse the DST abbreviation
+    my $dst_name;
+    if( $tz_str =~ /\A<([^>]+)>/ )
+    {
+        $dst_name = $1;
+        $tz_str   = substr( $tz_str, length( $& ) );
+    }
+    elsif( $tz_str =~ /\A([A-Za-z]{3,})/ )
+    {
+        $dst_name = $1;
+        $tz_str   = $';
+    }
+    else
+    {
+        return({
+            offset     => $std_offset,
+            is_dst     => 0,
+            short_name => $std_name,
+        });
+    }
+
+    # Optional DST offset (defaults to standard + 1 hour)
+    my $dst_offset = $std_offset + 3600;
+    if( $tz_str =~ /\A([+-]?\d{1,3}(?::\d{2}(?::\d{2})?)?)/ )
+    {
+        $dst_offset = $self->_posix_offset_to_utc( $1 );
+        $tz_str     = $';
+    }
+
+    # DST transition rules (mandatory for correct DST handling)
+    unless( $tz_str =~ /\A,(.+),(.+)\z/ )
+    {
+        return({
+            offset     => $std_offset,
+            is_dst     => 0,
+            short_name => $std_name,
+        });
+    }
+
+    my( $start_rule, $end_rule ) = ( $1, $2 );
+    my $year = ( gmtime( $unix_secs ) )[5] + 1900;
+
+    my $dst_start = $self->_posix_rule_to_unix( $start_rule, $year, $std_offset );
+    my $dst_end   = $self->_posix_rule_to_unix( $end_rule,   $year, $dst_offset );
+
+    return unless( defined( $dst_start ) && defined( $dst_end ) );
+
+    my $is_dst;
+    if( $dst_start < $dst_end )
+    {
+        # Northern hemisphere: DST is active between start and end
+        $is_dst = ( $unix_secs >= $dst_start && $unix_secs < $dst_end ) ? 1 : 0;
+    }
+    else
+    {
+        # Southern hemisphere: DST is active outside the start..end range
+        $is_dst = ( $unix_secs >= $dst_start || $unix_secs < $dst_end ) ? 1 : 0;
+    }
+
+    return({
+        offset     => ( $is_dst ? $dst_offset : $std_offset ),
+        is_dst     => $is_dst,
+        short_name => ( $is_dst ? $dst_name   : $std_name   ),
+    });
 }
 
 # Resolve an alias (such as "US/Eastern") to its canonical zone name.
@@ -3228,7 +3469,7 @@ DateTime::Lite::TimeZone - Lightweight timezone support for DateTime::Lite
 
 =head1 VERSION
 
-    v0.5.4
+    v0.5.8
 
 =head1 DESCRIPTION
 
@@ -3259,7 +3500,7 @@ This would return an hash reference with the following information:
        is_canonical => 0,
     }
 
-You can also returns all the timezones for a country code:
+You can also return all the timezones for a country code:
 
     my $array_ref = $cldr->timezones( territory => 'US' );
 
@@ -3461,7 +3702,7 @@ Detection is version-aware. Thus:
 
 =over 8
 
-=item * on SQLite with version E<gt>= 3.35.0, the special système table C<pragma_function_list> is queried for C<sqrt> before any UDF is registered, to ensure a native function is used in priority.
+=item * on SQLite with version E<gt>= 3.35.0, the special systeme table C<pragma_function_list> is queried for C<sqrt> before any UDF is registered, to ensure a native function is used in priority.
 
 =item * on SQLite with version E<lt> 3.35.0, where the math functions did not yet exist, UDFs are registered directly without querying C<pragma_function_list>.
 
@@ -3661,8 +3902,7 @@ For example, using the C<locale> C<en>:
     my $cldr = Locale::Unicode::Data->new;
     my $ref  = $cldr->territory_l10n( locale => 'en', territory => 'JP', alt => undef );
 
-# Returns an hash reference like this:
-
+    # Returns an hash reference like this:
     {
        terr_l10n_id    => 13385,
        locale          => 'en',
@@ -3717,6 +3957,33 @@ See L<rfc9636, section 3.1|https://www.rfc-editor.org/rfc/rfc9636.html#name-tzif
     my $ex = $zone->error;
 
 Returns the last L<exception object|DateTime::Lite::Exception>, if any.
+
+=head2 extended_aliases
+
+    my $aliases = DateTime::Lite::TimeZone->extended_aliases;
+    my $aliases = $tz->extended_aliases;
+
+    # Checking for errors too
+    my $aliases  = DateTime::Lite::TimeZone->extended_aliases ||
+        die( DateTime::Lite::TimeZone->error );
+    my( %aliases ) = DateTime::Lite::TimeZone->extended_aliases ||
+        die( DateTime::Lite::TimeZone->error );
+    my $aliases    = $zone->extended_aliases ||
+        die( $zone->error );
+    my( %aliases ) = $zone->extended_aliases ||
+        die( $zone->error );
+
+This can be called as an instance method, or as a class function.
+
+This returns a hash of all the extended zones aliases to their corresponding canonical names.
+
+For example:
+
+    JST -> Asia/Tokyo
+
+In scalar context, it returns an hash reference, and in list context, it returns an hash.
+
+If an error occurred, this sets an L<exception object|DateTime::Lite::Exception>, and returns C<undef> in scalar context, and an empty list in list context. The exception object can then be retrieved with L</error>
 
 =head2 fatal
 
@@ -3776,7 +4043,7 @@ This takes a canonical timezone or a timezone alias, and returns true if the val
 
 This sets an L<exception object|DateTime::Lite::Exception>, an returns an error only if no value was provided, so you may want to check if the value returned is defined.
 
-Contrary to C<DateTime::TimeZone>, passin a L<DateTime::TimeZone::Alias> does not make that zone valid. This class, adhere strictly to the IANA time zones.
+Contrary to C<DateTime::TimeZone>, passing a L<DateTime::TimeZone::Alias> does not make that zone valid. This class, adhere strictly to the IANA time zones.
 
 =head2 isstd_count
 
@@ -4213,7 +4480,7 @@ This fetches the latest C<tzcode> and C<tzdata> release from IANA, verifies the 
 
 =head1 SQL SCHEMA
 
-The SQLite SQL schema is available in the file C<scripts/cldr-schema.sql>
+The SQLite SQL schema is available in the file C<scripts/tz_schema.sql>
 
 The data are populated into the SQLite database using the script located in C<scripts/build_tz_database.pl> and the data accessible from L<https://ftp.iana.org/tz/releases>
 
@@ -4555,7 +4822,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 Copyright(c) 2026 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

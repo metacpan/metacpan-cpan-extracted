@@ -1,0 +1,34 @@
+{
+  "cases": [
+    {
+      "id": "level-a-simple",
+      "path": "t/fixtures/simple.pl",
+      "expected_level": "A",
+      "expected_level_when_baseline_mismatch": "C"
+    },
+    {
+      "id": "level-b-dynamic",
+      "path": "t/fixtures/dynamic.pl",
+      "expected_level": "B",
+      "expected_level_when_baseline_mismatch": "C"
+    },
+    {
+      "id": "nasty-tie",
+      "path": "t/fixtures/nasty_tie.pl",
+      "expected_level": "B",
+      "expected_level_when_baseline_mismatch": "C"
+    },
+    {
+      "id": "nasty-overload",
+      "path": "t/fixtures/nasty_overload.pl",
+      "expected_level": "B",
+      "expected_level_when_baseline_mismatch": "C"
+    },
+    {
+      "id": "nasty-typeglob-local",
+      "path": "t/fixtures/nasty_typeglob_local.pl",
+      "expected_level": "B",
+      "expected_level_when_baseline_mismatch": "C"
+    }
+  ]
+}

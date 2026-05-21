@@ -22,7 +22,7 @@ done_testing();
 
 #----------------------------------------------------------------------
 
-package Mockee;
+package Mockee; ## no critic (Modules::RequireFilenameMatchesPackage)
 
 our $VERSION;
 BEGIN { $VERSION = 1 };
@@ -31,7 +31,7 @@ sub good { 1 }
 
 #----------------------------------------------------------------------
 
-package MockeeWithDestroy;
+package MockeeWithDestroy; ## no critic (Modules::RequireFilenameMatchesPackage)
 
 our $VERSION;
 BEGIN { $VERSION = 1 };

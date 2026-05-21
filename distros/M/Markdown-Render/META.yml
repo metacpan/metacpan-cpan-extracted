@@ -22,18 +22,18 @@ no_index:
 provides:
   Markdown::Render:
     file: lib/Markdown/Render.pm
-    version: v2.0.3
+    version: v2.0.4
 requires:
-  CLI::Simple: '0'
-  CLI::Simple::Constants: '0'
-  Class::Accessor::Fast: '0'
-  Config::Tiny: '0'
-  Date::Format: '0'
-  HTTP::Request: '0'
-  IO::Scalar: '0'
-  JSON: '0'
-  LWP::UserAgent: '0'
-  Readonly: '0'
+  CLI::Simple: v1.0.11
+  CLI::Simple::Constants: v1.0.11
+  Class::Accessor::Fast: '0.51'
+  Config::Tiny: '2.30'
+  Date::Format: '2.24'
+  IO::Scalar: '2.113'
+  IO::Socket::SSL: '0'
+  JSON: '4.10'
+  Net::SSLeay: '0'
+  Readonly: '2.05'
   perl: '5.016'
-version: v2.0.3
+version: v2.0.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -797,4 +797,49 @@ SKIP: {
     $helper->disconnect;
 }
 
+# Test: manual reconnect inside on_disconnect honours
+# resume_waiting_on_reconnect=0 by clearing the wait queue.
+{
+    my $r = EV::Redis->new(
+        on_error                    => sub { },
+        max_pending                 => 1,
+        resume_waiting_on_reconnect => 0,
+    );
+
+    my $helper = EV::Redis->new(path => $connect_info{sock});
+    $r->connect_unix($connect_info{sock});
+
+    my $client_id;
+    my $cv = EV::timer 0.5, 0, sub { EV::break };
+    $r->command('CLIENT', 'ID', sub { $client_id = $_[0]; EV::break });
+    EV::run;
+    undef $cv;
+    ok defined $client_id, 'got client id for r';
+
+    my @results;
+    $r->on_disconnect(sub {
+        $r->connect_unix($connect_info{sock});  # manual reconnect mid-disconnect
+    });
+
+    # Issue: cmd1 (pending), cmd2 (waiting because max_pending=1)
+    $r->command('GET', 'soak', sub { push @results, ['cmd1', @_]; });
+    $r->command('GET', 'soak', sub { push @results, ['cmd2', @_]; });
+
+    # Now sever the original connection — fires on_disconnect → manual reconnect
+    $helper->command('CLIENT', 'KILL', 'ID', $client_id, sub {});
+
+    my $w; $w = EV::timer 1.5, 0, sub { undef $w; EV::break };
+    EV::run;
+
+    my ($cmd2) = grep { $_->[0] eq 'cmd2' } @results;
+    ok $cmd2, 'cmd2 received a callback';
+    ok defined $cmd2->[2],
+        'cmd2 callback received a disconnect error (not silently forwarded on new connection)';
+    is $r->waiting_count, 0, 'wait queue cleared after manual reconnect';
+
+    $r->on_disconnect(undef);
+    $r->disconnect;
+    $helper->disconnect;
+}
+
 done_testing;

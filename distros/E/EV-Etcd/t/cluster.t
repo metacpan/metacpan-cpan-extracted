@@ -72,35 +72,14 @@ SKIP: {
     ok(ref($member->{peer_urls}) eq 'ARRAY', 'member has peer_urls array');
 }
 
-# Test 7-9: member_remove with invalid ID (should fail gracefully)
-my $fake_member_id = 999999999;
-$client->member_remove($fake_member_id, sub {
-    my ($resp, $err) = @_;
-    ok($err, 'member_remove with invalid ID returns error');
-    ok(ref($err) eq 'HASH', 'error is a hashref');
-    ok(exists $err->{code}, 'error has code field');
-    diag("Expected error for invalid member_remove: $err->{status} - $err->{message}") if $err;
-    EV::break;
-});
-my $t2 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
-EV::run;
-
-# Test 10-12: member_update with invalid ID (should fail gracefully)
-$client->member_update($fake_member_id, ['http://127.0.0.1:12345'], sub {
-    my ($resp, $err) = @_;
-    ok($err, 'member_update with invalid ID returns error');
-    ok(ref($err) eq 'HASH', 'error is a hashref');
-    ok(exists $err->{code}, 'error has code field');
-    diag("Expected error for invalid member_update: $err->{status} - $err->{message}") if $err;
-    EV::break;
-});
-my $t3 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
-EV::run;
-
-# Test 13-15: member_add (adding a learner member)
-# Note: This adds a learner member that won't actually connect (non-existent peer URL)
-# We test that the API works correctly; cleanup happens at the end
-my $added_member_id;
+# Test 7-9: member_add (adding a learner member). Run before the
+# invalid-id tests below — etcd 3.5 in some containers (Debian bookworm)
+# closes the gRPC connection on member_remove/update with an invalid id,
+# which would derail any subsequent legitimate cluster op.
+# Cleanup happens in END block so the learner is removed even if a later
+# step times out.
+our $added_member_id;
+our $cluster_client = $client;
 $client->member_add(['http://127.0.0.1:12380'], { is_learner => 1 }, sub {
     my ($resp, $err) = @_;
     ok(!$err, 'member_add (learner) succeeded');
@@ -115,33 +94,62 @@ $client->member_add(['http://127.0.0.1:12380'], { is_learner => 1 }, sub {
     }
     EV::break;
 });
-my $t4 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
+my $t1b = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
 
-# Test 16-18: member_promote (promoting a learner requires it to be caught up)
-# Since our learner is fake (not actually running), this should fail gracefully
+# Test 10-12: member_promote (promoting a learner requires it to be caught up)
+# Since our learner is fake (not actually running), this should fail gracefully.
 SKIP: {
     skip "no learner member to promote", 3 unless $added_member_id;
 
     $client->member_promote($added_member_id, sub {
         my ($resp, $err) = @_;
-        # Expecting error since the learner isn't actually running
         ok($err, 'member_promote fails for non-running learner (expected)');
         ok(ref($err) eq 'HASH', 'error is a hashref');
         ok(exists $err->{code}, 'error has code field');
         diag("Expected error for promote: $err->{status} - $err->{message}") if $err;
-
-        # Cleanup: remove the learner member
-        if ($added_member_id) {
-            $client->member_remove($added_member_id, sub {
-                my ($r, $e) = @_;
-                diag($e ? "Cleanup: failed to remove learner" : "Cleanup: removed learner member");
-            });
-        }
         EV::break;
     });
     my $t5 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
     EV::run;
+}
+
+# Test 13-15: member_remove with invalid ID (should fail gracefully)
+my $fake_member_id = 999999999;
+$client->member_remove($fake_member_id, sub {
+    my ($resp, $err) = @_;
+    ok($err, 'member_remove with invalid ID returns error');
+    ok(ref($err) eq 'HASH', 'error is a hashref');
+    ok(exists $err->{code}, 'error has code field');
+    diag("Expected error for invalid member_remove: $err->{status} - $err->{message}") if $err;
+    EV::break;
+});
+my $t2 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
+EV::run;
+
+# Test 16-18: member_update with invalid ID (should fail gracefully)
+$client->member_update($fake_member_id, ['http://127.0.0.1:12345'], sub {
+    my ($resp, $err) = @_;
+    ok($err, 'member_update with invalid ID returns error');
+    ok(ref($err) eq 'HASH', 'error is a hashref');
+    ok(exists $err->{code}, 'error has code field');
+    diag("Expected error for invalid member_update: $err->{status} - $err->{message}") if $err;
+    EV::break;
+});
+my $t3 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
+EV::run;
+
+# Guaranteed learner cleanup — fires even if member_promote timed out above.
+END {
+    if ($added_member_id && $cluster_client) {
+        $cluster_client->member_remove($added_member_id, sub {
+            my ($r, $e) = @_;
+            diag($e ? "Cleanup: failed to remove learner" : "Cleanup: removed learner member");
+            EV::break;
+        });
+        my $te = EV::timer(5, 0, sub { EV::break });
+        EV::run;
+    }
 }
 
 done_testing();

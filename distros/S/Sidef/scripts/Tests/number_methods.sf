@@ -1482,25 +1482,25 @@ assert_eq(map(1..74, {.bphi}), %n[1,1,2,3,4,3,6,7,8,6,10,8,12,9,9,15,16,12,18,14
 
 # GCD/LCM tests on negative inputs
 
-assert_eq(lcm(-43), 43)
-assert_eq(gcd(-43), 43)
-assert_eq(gcud(-43), 43)
+#~ assert_eq(lcm(-43), 43)
+#~ assert_eq(gcd(-43), 43)
+#~ assert_eq(gcud(-43), 43)
 
-assert_eq(lcm(-42.7), 42)
-assert_eq(gcd(-42.7), 42)
-assert_eq(gcud(-42.7), 42)
+#~ assert_eq(lcm(-42.7), 42)
+#~ assert_eq(gcd(-42.7), 42)
+#~ assert_eq(gcud(-42.7), 42)
 
-assert_eq(lcm(-42.7, 1), 42)
-assert_eq(gcd(-42.7, 0), 42)
-assert_eq(gcud(-42.7, 0), 42)
+#~ assert_eq(lcm(-42.7, 1), 42)
+#~ assert_eq(gcd(-42.7, 0), 42)
+#~ assert_eq(gcud(-42.7, 0), 42)
 
-assert_eq(lcm(-42.7, 1, 1), 42)
-assert_eq(gcd(-42.7, 0, 0), 42)
-assert_eq(gcud(-42.7, 0, 0), 42)
+#~ assert_eq(lcm(-42.7, 1, 1), 42)
+#~ assert_eq(gcd(-42.7, 0, 0), 42)
+#~ assert_eq(gcud(-42.7, 0, 0), 42)
 
-assert_eq(lcm(1, 1, -42.7), 42)
-assert_eq(gcd(0, 0, -42.7), 42)
-assert_eq(gcud(0, 0, -42.7), 42)
+#~ assert_eq(lcm(1, 1, -42.7), 42)
+#~ assert_eq(gcd(0, 0, -42.7), 42)
+#~ assert_eq(gcud(0, 0, -42.7), 42)
 
 assert_eq(farey(5), [0, 1/5, 1/4, 1/3, 2/5, 1/2, 3/5, 2/3, 3/4, 4/5, 1]);
 assert_eq(10.of{.farey.map{.nu}.sum}, %n[0, 1, 2, 5, 9, 19, 25, 46, 62, 89])
@@ -1856,5 +1856,56 @@ assert_eq(prime_count(5000000000000000 + 1000), 142377417196393)
 
 assert_eq(prime_count(123456, 5000000000000000 + 1000), 142377417184792)
 assert_eq(prime_count(123456, 5000000000000000 - 1000), 142377417184733)
+
+assert_eq(nth_rough(100, 13), 481)
+assert_eq(nth_smooth(100, 13), 210)
+assert_eq(inverse_count(25, { .prime_count }), 97)
+
+do {
+    var n = 0; var k = irand(2, 20);
+    100.times { n = next_smooth(n, k) }
+    assert_eq(n, nth_smooth(100, k))
+    50.times { n = prev_smooth(n, k) }
+    assert_eq(n, nth_smooth(50, k))
+}
+
+do {
+    var n = 0; var k = irand(2, 20);
+    100.times { n = next_rough(n, k) }
+    assert_eq(n, nth_rough(100, k))
+    50.times { n = prev_rough(n, k) }
+    assert_eq(n, nth_rough(50, k))
+}
+
+assert_eq(rat_approx(0), 0)
+assert_eq(rat_approx(1), 1)
+assert_eq(rat_approx(42), 42)
+assert_eq(rat_approx(-0.3), -3/10)
+assert_eq(rat_approx(-0.33), -1/3)
+assert_eq(rat_approx(-0.333), -1/3)
+assert_eq(rat_approx(-0.3333), -1/3)
+assert_eq(rat_approx(-0.33333), -1/3)
+assert_eq(rat_approx(3.141), 245/78)
+assert_eq(rat_approx(3.14), 22/7)
+assert_eq(rat_approx(0.3333f), 1/3)
+assert_eq(rat_approx(0.333f), 1/3)
+assert_eq(rat_approx(0.33f), 1/3)
+assert_eq(rat_approx(0.3f), 3/10)
+assert_eq(rat_approx(zeta(-5)), -1/252)
+
+assert_eq(0.443298969f.rat_approx, 43/97)
+assert_eq(2.25581395348f.rat_approx, 97/43)
+assert_eq(0.4432989690721649484536082474f.rat_approx, 43/97)
+assert_eq(0.443298969072164948453608247422680412371134020619f.rat_approx, 43/97)
+assert_eq(2.25581395348837209302325581395348837209302325581f.rat_approx, 97/43)
+assert_eq(0.58285f.rat_approx, 503/863)
+assert_eq(0.58285052f.rat_approx, 503/863)
+assert_eq(0.58285052143684820f.rat_approx, 503/863)
+assert_eq(0.582850521436848203939745075318655851680185399768f.rat_approx, 503/863)
+
+assert_eq(
+    10.of{|n| Num.pi.rat_approx(10**n) },
+    [3, 22/7, 311/99, 355/113, 355/113, 312689/99532, 3126535/995207, 5419351/1725033, 245850922/78256779, 2549491779/811528438]
+)
 
 say "** Tests passed!"

@@ -15,14 +15,14 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'Module::Generic' );
     use parent qw( Module::Generic );
-    use vars qw( $VERSION $DEBUG $KEY_OBJECT );
+    use vars qw( $VERSION $DEBUG $KEY_OBJECT $NUMBER_RE );
     use Clone ();
     use Data::Dumper;
     use JSON;
     use Module::Generic::TieHash;
-    use Regexp::Common;
+    # use Regexp::Common;
     use Wanted;
     use overload (
         # '""'    => 'as_string',
@@ -43,6 +43,7 @@ BEGIN
     );
     # Do we allow the use of object as hash keys?
     our $KEY_OBJECT = 0;
+    our $NUMBER_RE = qr/(?:(?i)(?:[-+]?)(?:(?=[.]?[0123456789])(?:[0123456789]*)(?:(?:[.])(?:[0123456789]{0,}))?)(?:(?:[E])(?:(?:[-+]?)(?:[0123456789]+))|))/;
     our( $VERSION ) = 'v1.5.3';
 };
 
@@ -626,7 +627,7 @@ sub _obj_comp
     {
         $lB = $other->length;
     }
-    elsif( $other =~ /^$RE{num}{real}$/ )
+    elsif( $other =~ /^$NUMBER_RE$/ )
     {
         $lB = $other;
     }
@@ -718,7 +719,7 @@ sub DESTROY
 {
     # <https://perldoc.perl.org/perlobj#Destructors>
     CORE::local( $., $@, $!, $^E, $? );
-    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    CORE::return if( Module::Generic::_in_global_destruction() );
     my $self = CORE::shift( @_ );
     CORE::return if( !CORE::defined( $self ) );
     CORE::untie( %$self ) if( $self && CORE::tied( %$self ) );

@@ -15,8 +15,8 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'Module::Generic' );
     use parent qw( Module::Generic );
-    use warnings::register;
     use vars qw( $AUTOLOAD $VERSION $DEBUG );
     use Config;
     use Module::Generic::Global ':const';
@@ -45,14 +45,14 @@ sub new
     }
     elsif( @_ )
     {
-        CORE::warn( "Parameter provided is not an hash reference: '", join( "', '", @_ ), "'\n" ) if( $this->_warnings_is_enabled );
+        CORE::warn( "Parameter provided is not an hash reference: '", join( "', '", @_ ), "'\n" ) if( $this->_warnings_is_enabled( 'Module::Generic' ) );
     }
 
     if( HAS_THREADS )
     {
         if( threads->tid != 0 )
         {
-            warn( "Module::Generic::Dynamic is not thread-safe and should not be called from a thread." ) if( $this->_warnings_is_enabled );
+            warn( "Module::Generic::Dynamic is not thread-safe and should not be called from a thread." ) if( $this->_warnings_is_enabled( 'Module::Generic' ) );
         }
     }
 
@@ -268,7 +268,7 @@ EOT
             my $func_name = '_set_get';
             my $pl = "sub ${class}::${clean_field} { return( shift->${func_name}( '$clean_field', \@_ ) ); }";
             eval( $pl );
-            die( $@ ) if( $@ );
+            die( "Error with code:\n$pl\n$@" ) if( $@ );
             my $rv = $self->$clean_field( $hash->{ $k } );
             return( $self->pass_error ) if( !defined( $rv ) && $self->error );
         }
@@ -518,8 +518,13 @@ sub AUTOLOAD
     {
         $pl = "sub ${class}::${method} { return( shift->$handler( '$method', \@_ ) ); }";
     }
+    elsif( !defined( $handler ) )
+    {
+        $handler = '_set_get_scalar';
+    }
     local $@;
-    eval( "sub ${class}::${method} { return( shift->$handler( '$method', \@_ ) ); }" );
+    $pl = "sub ${class}::${method} { return( shift->$handler( '$method', \@_ ) ); }";
+    eval( $pl );
     return( $self->error( "Failed to create method $method in $class: $@" ) ) if( $@ );
     # die( $@ ) if( $@ );
     return( $self->$method( @_ ) );
@@ -530,7 +535,7 @@ sub DESTROY
 {
     # <https://perldoc.perl.org/perlobj#Destructors>
     CORE::local( $., $@, $!, $^E, $? );
-    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    CORE::return if( Module::Generic::_in_global_destruction() );
     my $self = CORE::shift( @_ );
     CORE::return if( !CORE::defined( $self ) );
 };

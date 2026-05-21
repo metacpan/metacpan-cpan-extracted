@@ -3,10 +3,11 @@ use strict;
 use warnings;
 use PDL;
 use PDL::NiceSlice;
+use FindBin;
 use Physics::Ellipsometry::VASE;
 
 my $vase = Physics::Ellipsometry::VASE->new(layers => 1);
-$vase->load_data('t/data/sample.dat');
+$vase->load_data("$FindBin::Bin/sample.dat");
 
 sub model {
     my ($params, $x) = @_;
@@ -31,11 +32,14 @@ my $fit_params = $vase->fit($initial_params);
 
 my ($a, $b, $c, $d) = list $fit_params;
 print "Fit results:\n";
-print "  Psi   = $a - $b * wavelength\n";
-print "  Delta = $c + $d * wavelength\n";
+printf "  Psi   = %.6f - %.6f * wavelength\n", $a, $b;
+printf "  Delta = %.6f + %.6f * wavelength\n", $c, $d;
+printf "  MSE   = %.6f\n", $vase->mse($fit_params, nparams => 4);
+printf "  Iterations: %d\n", $vase->{iters};
 
 # Save plot to PNG
-$vase->plot($fit_params, output => 'fit_result.png');
+$vase->plot($fit_params, output => "$FindBin::Bin/fit_result.png");
 
 # Save plot to PDF
-$vase->plot($fit_params, output => 'fit_result.pdf', title => 'Linear Model Fit');
+$vase->plot($fit_params, output => "$FindBin::Bin/fit_result.pdf",
+    title => 'Linear Model Fit');

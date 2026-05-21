@@ -1,5 +1,18 @@
 Revision history for Perl extension SQL::SimpleOps.
 
+2026.131.1 Mon May 11 18:28:09 2026
+	- fix: missed schema name for postgres database; by CCELSO
+
+2026.129.1 Sat May 9 15:53:50 2026
+	- news: Option: 'alias_with_as' added; by CCELSO
+	- news: Option: 'dsname' added; by CCELSO
+	- news: Option: 'ignore_plugin' added; by CCELSO
+	- news: Option: 'message_warning_off' added; by CCELSO
+	- news: Standard DBI connector support added; by CCELSO
+	- news: Folder 'examples' added; by CCELSO
+	- fix: Trap exceptions and errors in blessing plugin process; by CCELSO
+	- change: Enforce to use the schema and server, overlay plugin definition if mapped as options; by CCELSO
+	
 2026.101.1 Sat Apr 11 08:04:04 PM -03 2026
 	- fix: where format error, the 'and/or' without additional clause; by CCELSO
 	- fix: clause where: "fld => []" (empty) is "fld is null"; by CCELSO
@@ -99,18 +112,18 @@ Revision history for Perl extension SQL::SimpleOps.
 	- news: standardization for CPAN Module Project; by CCELSO
 
 2022.046.1 Tue Feb 15 00:00:00 2022
-	- news: postgres support added; by CCELSO
-	- news: sqlite3 support added; by CCELSO
-	- news: sqlite2 support removed; by CCELSO
+	- news: DBD::PG (postgres) support added; by CCELSO
+	- news: DBD::SQLite3 support added; by CCELSO
+	- news: DBD::SQLite2 support removed; by CCELSO
 
 2019.352.1 Wed Dec 18 00:00:00 2019
 	- news: aliases_table support addd
 	- fix: syslog null line; by CCELSO
 
 2009.314.1 Tue Nov 10 00:00:00 2009
-	- news: sqlite2 support added; by CCELSO
+	- news: DBD:SQLite2 support added; by CCELSO
 
 2008.109.1 Fri Apr 18 00:00:00 2022
-	- news: initial version, mysql support only; created by CCELSO
+	- news: initial version, DBD::mysql support only; created by CCELSO
 
 ENDED

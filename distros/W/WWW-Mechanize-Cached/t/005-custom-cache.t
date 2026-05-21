@@ -3,7 +3,7 @@ use warnings FATAL => 'all';
 
 use Test::More;
 use Test::RequiresInternet ( 'www.wikipedia.com' => 443 );
-use WWW::Mechanize::Cached;
+use WWW::Mechanize::Cached ();
 
 # Google is a poor choice for this set of tests, as the main page google.com redirects, and the page it redirects
 # to specifies "do not cache", and doesn't return a content-length.

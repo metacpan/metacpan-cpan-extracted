@@ -1,5 +1,28 @@
 Revision history for the Perl extension Win32.
 
+0.62    [2026-05-11]
+- revert SvUTF8 flagging in wstr_to_sv and my_ansipath under CP_UTF8 ACP;
+  make t/Unicode.t pass under CP_UTF8 ACP [PR/57]
+
+0.61    [2026-05-10]
+- handle CP_UTF8 system codepage in wstr_to_sv and my_ansipath [PR/53]
+- fix inverted SKIP condition for non-English locale in t/HttpGetFile.t [PR/55]
+- fix t/GetCurrentThreadId.t fork-emulation detection by sisyphus [PR/45]
+
+0.60    [2026-05-05]
+        - add LICENSE and modernize README [PR/51]
+        - update Microsoft doc URLs to learn.microsoft.com
+
+0.59_02 [2026-05-04]
+        - detect newer Windows 10/11, Windows Server 2019/2022/2025, and
+          Server SAC releases by Markus Demml [PR/42]
+        - fix 64-bit registry constant by jkahrman [PR/37]
+        - follow-up to 64-bit registry fix by Tony Cook [PR/39]
+        - fix memory deallocation for WinHttpGetProxyForUrl strings [PR/49]
+        - include t/HttpGetFile.t in MANIFEST so it ships in the CPAN tarball [PR/50]
+        - convert tests to Test::More by Graham Knop [PR/35]
+        - clarify documentation of minor versions by Ferenc Erki [PR/25]
+
 0.59    [2022-05-05]
         - add Win32::GetChipArch and use it in Win32::GetOSName to support arm/arm64
           architecture by Pierrick Bouvier [PR/34]
@@ -176,7 +199,7 @@ Revision history for the Perl extension Win32.
 	- Use uppercase environment variable names in t/Unicode.t
 	  because the MSWin32 doesn't care, and Cygwin only works
 	  with the uppercased version.
-	- new t/Names.t test (from Sébastien Aperghis-Tramoni)
+	- new t/Names.t test (from SÃ©bastien Aperghis-Tramoni)
 
 0.30	[2007-06-25]
 	- Fixed t/Unicode.t test for Cygwin (with help from Jerry D. Hedden).

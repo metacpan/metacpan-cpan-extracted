@@ -3,9 +3,14 @@ package Developer::Dashboard::CLI::Complete;
 use strict;
 use warnings;
 
-our $VERSION = '3.14';
+our $VERSION = '3.90';
 
+use Developer::Dashboard::Collector;
+use Developer::Dashboard::Config;
+use Developer::Dashboard::FileRegistry;
+use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::CLI::Suggest;
+use Developer::Dashboard::CLI::Ticket ();
 
 # complete(%args)
 # Returns shell-completion candidates for one dashboard command line snapshot.
@@ -28,6 +33,28 @@ sub complete {
             $suggest->skill_commands,
         );
     }
+    elsif ( ( $words[1] || '' ) =~ /\A(?:workspace|ticket)\z/ && $index == 2 ) {
+        my $provider = $args{ticket_sessions} || \&_ticket_sessions;
+        @candidates = $provider->();
+    }
+    elsif (
+        ( $words[1] || '' ) =~ /\A(?:restart|stop)\z/
+        && ( $words[2] || '' ) eq 'collector'
+        && $index == 3
+      )
+    {
+        my $provider = $args{collector_names} || \&_collector_names;
+        @candidates = $provider->();
+    }
+    elsif (
+        ( $words[1] || '' ) =~ /\A(?:log|logs)\z/
+        && ( $words[2] || '' ) eq 'collector'
+        && $index == 3
+      )
+    {
+        my $provider = $args{collector_names} || \&_collector_names;
+        @candidates = $provider->();
+    }
     else {
         @candidates = _subcommand_candidates( $words[1] || '' );
     }
@@ -46,6 +73,7 @@ sub _subcommand_candidates {
     return qw(install enable disable uninstall list usage) if $command eq 'skills' || $command eq 'skill';
     return qw(compose list enable disable) if $command eq 'docker';
     return qw(list resolve add del locate project-root) if $command eq 'path';
+    return qw(web collector) if $command eq 'restart' || $command eq 'stop' || $command eq 'log' || $command eq 'logs';
     return qw(set list refresh-core) if $command eq 'indicator';
     return qw(write-result status list job output inspect log run start stop restart) if $command eq 'collector';
     return qw(init show) if $command eq 'config';
@@ -55,6 +83,47 @@ sub _subcommand_candidates {
     return qw(logs workers) if $command eq 'serve';
     return qw(bash zsh sh ps powershell pwsh) if $command eq 'shell';
     return ();
+}
+
+# _ticket_sessions()
+# Returns the current tmux session names for dashboard ticket completion.
+# Input: none.
+# Output: ordered list of session name strings.
+sub _ticket_sessions {
+    return Developer::Dashboard::CLI::Ticket::list_sessions();
+}
+
+# _collector_names()
+# Returns the union of configured and persisted collector names for completion.
+# Input: none.
+# Output: ordered list of collector name strings.
+sub _collector_names {
+    my $home = $ENV{HOME} || '';
+    my $paths = Developer::Dashboard::PathRegistry->new(
+        home            => $home,
+        workspace_roots => [ grep { defined && -d } map { "$home/$_" } qw(projects src work) ],
+        project_roots   => [ grep { defined && -d } map { "$home/$_" } qw(projects src work) ],
+    );
+    my $files = Developer::Dashboard::FileRegistry->new( paths => $paths );
+    my $config = Developer::Dashboard::Config->new(
+        files => $files,
+        paths => $paths,
+    );
+    my $collector = Developer::Dashboard::Collector->new( paths => $paths );
+
+    my %seen;
+    my @names;
+    for my $job ( @{ $config->collectors } ) {
+        my $name = ref($job) eq 'HASH' ? $job->{name} : undef;
+        next if !defined $name || $name eq '' || $seen{$name}++;
+        push @names, $name;
+    }
+    for my $status ( $collector->list_collectors ) {
+        my $name = ref($status) eq 'HASH' ? $status->{name} : undef;
+        next if !defined $name || $name eq '' || $seen{$name}++;
+        push @names, $name;
+    }
+    return @names;
 }
 
 1;

@@ -1,0 +1,15 @@
+Revision history for Object::PadX::Enum
+
+0.02    2026-05-13
+        Silence xsubpp "Please specify prototyping behavior" warning by
+        adding `PROTOTYPES: DISABLE` to Enum.xs.
+        Fix t/02-fields-methods.t parse failure on perls older than
+        5.26.2 by dropping the empty `()` signature from a method
+        declaration.
+
+0.01    2026-05-12
+        First version. Two keywords: `enum NAME { ... }` and `item NAME(...)`.
+        Auto-injects `$ordinal :reader` and installs per-value accessors
+        plus `values`, `from_ordinal`, `from_name` class methods.
+        Supports `:isa(CLASS)` / `:extends(CLASS)` and `:does(ROLE)`
+        class-level attributes on `enum`, optionally with VERSION.

@@ -37,7 +37,7 @@ requires:
   IRI: 0.005
   JSON: 0
   LWP::UserAgent: 0
-  List::MoreUtils: 0
+  List::Util: '1.56'
   Math::Cartesian::Product: 1.008
   Module::Pluggable: 0
   Moo: 2.000002
@@ -67,4 +67,4 @@ resources:
   homepage: https://metacpan.org/release/Attean
   license: http://dev.perl.org/licenses/
   repository: https://github.com/kasei/attean/
-version: '0.034'
+version: '0.038'

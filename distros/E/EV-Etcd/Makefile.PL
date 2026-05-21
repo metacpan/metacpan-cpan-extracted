@@ -32,7 +32,8 @@ sub try_compile {
     open my $fh, '>', "$tmpdir/test.c" or return 0;
     print $fh $code;
     close $fh;
-    return system("cc $cflags -Werror=implicit-function-declaration -c $tmpdir/test.c -o $tmpdir/test.o 2>/dev/null") == 0;
+    my $cc = $Config{cc} || 'cc';
+    return system("$cc $cflags -Werror=implicit-function-declaration -c $tmpdir/test.c -o $tmpdir/test.o 2>/dev/null") == 0;
 }
 
 my $all_cflags = "$grpc_cflags $protobuf_c_cflags";
@@ -88,6 +89,12 @@ WriteMakefile(
     AUTHOR            => 'vividsnow',
     LICENSE           => 'perl_5',
     MIN_PERL_VERSION  => '5.010',
+
+    # Explicit module map — without this, MakeMaker's auto-detection picks
+    # up the top-level bench.pl script and tries to install it as a library.
+    PM => {
+        'lib/EV/Etcd.pm' => '$(INST_LIB)/EV/Etcd.pm',
+    },
 
     PREREQ_PM => {
         'EV' => 0,

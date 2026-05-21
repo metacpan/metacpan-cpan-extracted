@@ -1,5 +1,5 @@
 package Net::OpenSSH::More;
-$Net::OpenSSH::More::VERSION = '1.00';
+$Net::OpenSSH::More::VERSION = '1.01';
 #ABSTRACT: Net::OpenSSH submodule with many useful features
 
 use strict;
@@ -7,16 +7,16 @@ use warnings;
 
 use parent 'Net::OpenSSH';
 
-use Data::UUID        ();
-use Expect            ();
-use File::HomeDir     ();
-use File::Temp        ();
-use Fcntl             ();
-use IO::Pty           ();
-use IO::Socket::INET  ();
-use IO::Socket::INET6 ();
-use IO::Stty          ();
-use List::Util qw{first};
+use Data::UUID         ();
+use Expect             ();
+use File::HomeDir      ();
+use File::Temp         ();
+use Fcntl              ();
+use IO::Pty            ();
+use IO::Socket::INET   ();
+use IO::Socket::INET6  ();
+use IO::Stty           ();
+use List::Util         qw{first};
 use Net::DNS::Resolver ();
 use Net::IP            ();
 use Time::HiRes        ();
@@ -69,7 +69,8 @@ my $resolve_login_method = sub {
     return $chosen         if $chosen;
     return 'SSH_AUTH_SOCK' if $ENV{'SSH_AUTH_SOCK'};
     my $fallback_path = "$opts->{'home'}/.ssh/id";
-    ( $opts->{'key_path'} ) = map { "${fallback_path}_$_" } ( first { -s "${fallback_path}_$_" } qw{dsa rsa ecdsa} );
+    my $key_type      = first { -s "${fallback_path}_$_" } qw{ed25519 ecdsa rsa dsa};
+    $opts->{'key_path'} = "${fallback_path}_${key_type}" if defined $key_type;
 
     $die_no_trace->('No key_path or password specified and no active SSH agent; cannot connect') if !$opts->{'key_path'};
     $check_local_perms->( $opts->{'key_path'}, 0600 )                                            if $opts->{'key_path'};
@@ -678,14 +679,14 @@ Net::OpenSSH::More - Net::OpenSSH submodule with many useful features
 
 =head1 VERSION
 
-version 1.00
+version 1.01
 
 =head1 SYNOPSIS
 
     use Net::OpenSSH::More;
     my $ssh = Net::OpenSSH::More->new(
-		'host'     => 'some.host.test',
-		'port'     => 69420,
+        'host'     => 'some.host.test',
+        'port'     => 69420,
         'user'     => 'azurediamond',
         'password' => 'hunter2',
     );
@@ -695,14 +696,40 @@ version 1.00
 
 Submodule of Net::OpenSSH that contains many methods that were
 otherwise left "as an exercise to the reader" in the parent module.
+
 Highlights:
-* Persistent terminal via expect for very fast execution, less forking.
-* Usage of File::Temp and auto-cleanup to prevent lingering ctl_path cruft.
-* Ability to manipulate incoming text while streaming the output of commands.
-* Run perl subroutine refs you write locally but execute remotely.
-* Many shortcut methods for common system administration tasks
-* Registration method for commands to run upon DESTROY/before disconnect.
-* Automatic reconnection ability upon connection loss
+
+=over 4
+
+=item
+
+Persistent terminal via expect for very fast execution, less forking.
+
+=item
+
+Usage of File::Temp and auto-cleanup to prevent lingering ctl_path cruft.
+
+=item
+
+Ability to manipulate incoming text while streaming the output of commands.
+
+=item
+
+Run perl subroutine refs you write locally but execute remotely.
+
+=item
+
+Many shortcut methods for common system administration tasks
+
+=item
+
+Registration method for commands to run upon DESTROY/before disconnect.
+
+=item
+
+Automatic reconnection ability upon connection loss
+
+=back
 
 =head1 NAME
 
@@ -720,26 +747,67 @@ your username, host, port, etc. when this problem is solved much more easily
 by forcing that separation on the caller's end.
 
 ACCEPTS:
-* %opts - <HASH> A hash of key value pairs corresponding to the what you would normally pass in to Net::OpenSSH,
-  along with the following keys:
-  * use_persistent_shell - Whether or not to setup Expect to watch a persistent TTY. Less stable, but faster.
-  * expect_timeout - When the above is active, how long should we wait before your program prints something
-    before bailing out?
-  * no_agent - Pass in a truthy value to disable the SSH agent. By default the agent is enabled.
-  * die_on_drop - If, for some reason, the connection drops, just die instead of attempting reconnection.
-  * output_prefix - If given, is what we will tack onto the beginning of any output via diag method.
-    useful for streaming output to say, a TAP consumer (test) via passing in '# ' as prefix.
-  * debug - Pass in a truthy value to enable certain diag statements I've added in the module and pass -v to ssh.
-  * home - STRING corresponding to an absolute path to something that "looks like" a homedir. Defaults to the user's homedir.
-    useful in cases where you say, want to load SSH keys from a different path without changing assumptions about where
-    keys exist in a homedir on your average OpenSSH using system.
-  * no_cache - Pass in a truthy value to disable caching the connection and object, indexed by host string.
-    useful if for some reason you need many separate connections to test something. Make sure your MAX_SESSIONS is set sanely
-    in sshd_config if you use this extensively.
-  * retry_interval - In the case that sshd is not up on the remote host, how long to wait while before reattempting connection.
-    defaults to 6s. We retry $RETRY_MAX times, so this means waiting a little over a minute for SSH to come up by default.
-	If your situation requires longer intervals, pass in something longer.
-  * retry_max - Number of times to retry when a connection fails. Defaults to 10.
+
+=over 4
+
+=item
+
+%opts - <HASH> A hash of key value pairs corresponding to the what you would normally pass in to Net::OpenSSH,
+along with the following keys:
+
+=over 4
+
+=item
+
+use_persistent_shell - Whether or not to setup Expect to watch a persistent TTY. Less stable, but faster.
+
+=item
+
+expect_timeout - When the above is active, how long should we wait before your program prints something
+before bailing out?
+
+=item
+
+no_agent - Pass in a truthy value to disable the SSH agent. By default the agent is enabled.
+
+=item
+
+die_on_drop - If, for some reason, the connection drops, just die instead of attempting reconnection.
+
+=item
+
+output_prefix - If given, is what we will tack onto the beginning of any output via diag method.
+useful for streaming output to say, a TAP consumer (test) via passing in '# ' as prefix.
+
+=item
+
+debug - Pass in a truthy value to enable certain diag statements I've added in the module and pass -v to ssh.
+
+=item
+
+home - STRING corresponding to an absolute path to something that "looks like" a homedir. Defaults to the user's homedir.
+useful in cases where you say, want to load SSH keys from a different path without changing assumptions about where
+keys exist in a homedir on your average OpenSSH using system.
+
+=item
+
+no_cache - Pass in a truthy value to disable caching the connection and object, indexed by host string.
+useful if for some reason you need many separate connections to test something. Make sure your MAX_SESSIONS is set sanely
+in sshd_config if you use this extensively.
+
+=item
+
+retry_interval - In the case that sshd is not up on the remote host, how long to wait while before reattempting connection.
+defaults to 6s. We retry $RETRY_MAX times, so this means waiting a little over a minute for SSH to come up by default.
+your situation requires longer intervals, pass in something longer.
+
+=item
+
+retry_max - Number of times to retry when a connection fails. Defaults to 10.
+
+=back
+
+=back
 
 RETURNS a Net::OpenSSH::More object.
 
@@ -749,7 +817,7 @@ We attempt to authenticate using the following details, and in this order:
 1) Use supplied key_path.
 2) Use supplied password.
 3) Use existing SSH agent (SSH_AUTH_SOCK environment variable)
-4) Use keys that may exist in $HOME/.ssh - id_rsa, id_dsa and id_ecdsa (in that order).
+4) Use keys that may exist in $HOME/.ssh - id_ed25519, id_ecdsa, id_rsa and id_dsa (in that order).
 
 If all methods therein fail, we will die, as nothing will likely work at that point.
 It is important to be aware of this if your remove host has something like fail2ban or cPHulkd
@@ -968,6 +1036,15 @@ L<Net::OpenSSH::More::Linux|Net::OpenSSH::More::Linux>
 
 =back
 
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/troglodyne-internet-widgets/perl-Net-Openssh-More/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
 =head1 AUTHORS
 
 Current Maintainers:
@@ -980,21 +1057,11 @@ George S. Baugh <teodesian@gmail.com>
 
 =back
 
-=head1 CONTRIBUTORS
+=head1 CONTRIBUTOR
 
-=for stopwords Andy Baugh teo
-
-=over 4
-
-=item *
+=for stopwords Andy Baugh
 
 Andy Baugh <andy@troglodyne.net>
-
-=item *
-
-teo <Andy Baugh>
-
-=back
 
 =head1 COPYRIGHT AND LICENSE
 

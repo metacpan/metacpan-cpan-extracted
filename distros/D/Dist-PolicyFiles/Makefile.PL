@@ -59,10 +59,11 @@ my %prereq_build = (
 if ($ENV{AUTHOR_TESTING}) {
   print "Author tests enabled (AUTHOR_TESTING is true)\n";
   add_mods(\%test_requires, {
-                             'Pod::Wordlist'  => '1.27',
-                             'Test::Kwalitee' => '1.26',
-                             'Test::Pod'      => '1.22',
-                             'Test::Spelling' => '0.25',
+                             'Pod::Wordlist'       => '1.27',
+                             'Test::Pod::Coverage' => '1.08',
+                             'Test::Kwalitee'      => '1.26',
+                             'Test::Pod'           => '1.22',
+                             'Test::Spelling'      => '0.25',
                             }
           );
 }

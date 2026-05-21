@@ -1,5 +1,213 @@
 Revision history for Email-Abuse-Investigator
 
+0.09	Fri May 15 08:24:33 EDT 2026
+
+  [Bug Fixes]
+
+  - Fixed t/function.t section 28 (_analyse_domain) failing after
+    2026-05-14: the WHOIS stub used hardcoded creation and expiry dates
+    (2025-11-15 and 2026-11-15) that fell outside the 180-day
+    recently_registered window and caused the registered/expiry
+    assertions to fail.  Replaced with dynamic dates computed at
+    runtime (10 days ago and 365 days from now) and changed the
+    assertions to match against the computed values rather than
+    literal strings.  Also escaped the @ in the stub registrar abuse
+    address inside the interpolating heredoc.
+
+0.08	Wed May 13 19:05:54 EDT 2026
+
+  [Enhancements]
+
+  - Added test dashboard at https://nigelhorne.github.io/Email-Abuse-Investigator/coverage/
+
+  - Added fuzz testing
+
+  - domain_expires_soon logic was broken, since it ignored the seconds field
+
+  - Added -i / --interactive flag to submit_abuse_report.pl, modelled on
+    rm -i.  When set, the script prompts for confirmation before sending
+    each abuse report.  The recipient address and the reason for contacting
+    them (the role string) are displayed, followed by a "Send? [y/N]"
+    prompt.  Only reports answered with "y" are sent; all others are
+    skipped and noted in the output but not counted as failures.  Has no
+    effect in --dry-run mode.  Reads confirmation from /dev/tty directly
+    via a new _read_tty() helper sub so the prompt works correctly when
+    the email is supplied on stdin, and so the prompt logic is testable
+    without a pseudo-terminal.
+
+  - Added t/submit_script.t: a new black-box test suite for
+    submit_abuse_report.pl that runs the script as a subprocess via
+    IPC::Open3.  Covers --dry-run output, --interactive with --dry-run
+    (no prompt shown), the no-contacts unresolved domain listing, spoofed
+    From: domain exclusion from the unresolved list, and --help
+    documentation of --interactive.  The suite skips automatically if the
+    script's dependencies are not installed, so it is safe to add to the
+    distribution without breaking CI on minimal Perl installs.
+
+  - Added abuse contacts for major URL shorteners to %PROVIDER_ABUSE.
+    Previously URL shorteners were only flagged as a risk indicator;
+    the module fell back to WHOIS which returned the registrar (e.g.
+    Gandi for is.gd), who correctly responded that they have no control
+    over how the shortener service is used.  The shortener operator is
+    the right contact.  Entries added: is.gd, bit.ly/bitly.com,
+    tinyurl.com, ow.ly (Hootsuite), buff.ly (Buffer), rb.gy, cutt.ly,
+    shorturl.at.
+
+  - Added major delivery company domains (fedex.com, ups.com, dhl.com,
+    usps.com, royalmail.com) to %TRUSTED_DOMAINS.  These domains appear
+    as URL hosts in delivery-impersonation spam (the spammer links to
+    the real fedex.com to make the message look legitimate) but the
+    delivery company is the victim of impersonation, not a party to
+    report.  Their registrar (CSC Global) was generating false positive
+    abuse contacts.
+
+  - Added Dynadot to %PROVIDER_ABUSE as a form-only entry.  Dynadot
+    explicitly rejects email abuse reports per their autoresponse,
+    directing reporters to their web form instead:
+      dynadot.com -> https://www.dynadot.com/report-abuse
+    Discovered via a real autoresponse received during testing.
+
+  - Added role string display cap to abuse_contacts().  When multiple
+    distinct routes converge on the same abuse address and the joined
+    role string would exceed 80 characters, it is summarised as
+    "N routes: type1, type2, ..." (e.g. "4 routes: Sending ISP, URL
+    host, Account provider, DKIM signer").  The full detail is always
+    available via the roles arrayref for callers that need it; only the
+    role (singular) display string is capped.  This keeps the dry-run
+    footer and live-run output readable when Google or Microsoft is
+    identified via four or more independent discovery routes.
+
+  - Added unresolved_contacts() public method to Email::Abuse::Investigator.
+    Returns a list of hashrefs describing domains and URL hosts found in
+    the message for which no abuse contact could be determined -- i.e.
+    they are not in %PROVIDER_ABUSE and produced no usable result from
+    IP or domain WHOIS.  Domains whose only source is a spoofable
+    sending header (From:, Return-Path:, Sender:) are excluded, as are
+    domains already covered by abuse_contacts() or form_contacts().
+    Each hashref contains domain, type (url_host or domain), and source.
+    submit_abuse_report.pl now delegates its _print_unresolved() helper
+    to this method rather than reimplementing the filtering logic inline.
+
+  - Added new constructor options to allow per-object override or
+    replacement of the three built-in lookup tables:
+    provider_abuse
+    trusted_domains
+    url_shorteners
+    The behaviour is merge (caller entries added on top of the built-in defaults).
+    All options are also readable from an Object::Configure
+    configuration file.  The three tables are now stored per-object
+    so two objects with different overrides are fully independent.
+
+  - Replaced alarm()-based read timeout in _raw_whois() with IO::Select
+    so that WHOIS queries time out reliably on Windows and threaded Perls.
+    The magic numbers 43 (WHOIS port) and 4096 (read chunk) are now
+    Readonly constants $WHOIS_PORT and $WHOIS_READ_CHUNK.
+
+  - Added --bcc [ADDRESS] option to submit_abuse_report.pl.  When given,
+    a blind carbon copy of every outgoing report is sent to ADDRESS.  If
+    ADDRESS is omitted, the copy goes to the --from address, which is the
+    common case for keeping a personal record of what was sent.  The BCC
+    is implemented as a second SMTP RCPT TO envelope recipient with no
+    Bcc: header in the message, so the primary abuse contact never sees
+    the monitoring address.  In --dry-run mode the BCC address is shown
+    in the output header but no mail is sent.
+
+  When the analysis finds domains or URL hosts in the message but cannot determine
+    an abuse contact for them, they are now listed so the user knows where
+    to look for manual follow-up.  The list appears in three places: after
+    the "No abuse contacts could be determined" message, at the end of
+    --dry-run output, and at the end of a live run summary.  Domains whose
+    only source is a spoofable sending header (From:, Return-Path:,
+    Sender:) are excluded -- these are innocent victims of address forgery
+    rather than parties to investigate.  Domains already covered by
+    abuse_contacts() or form_contacts() are also excluded to avoid
+    redundancy.  Discovered via a spam from nced.edu.kw (spoofed) that
+    contained mailto:gyomu@tolde.co.jp and http://www.toolde.co.jp in the
+    body -- both genuine spam contact points that previously produced no
+    output at all.
+
+    - Added cross-message CHI cache to avoid redundant network lookups across
+    multiple messages processed in the same run.  A shared in-memory CHI
+    instance (TTL 1 hour) is initialised on first call to new() when CHI
+    is installed.  IP WHOIS results are cached under "whois_ip:$ip",
+    domain analysis under "dom:$domain", and DNS resolution under
+    "resolve:$host".  Failed DNS lookups are cached as an empty string
+    and returned as undef on subsequent calls so the resolver is not
+    retried.  Gracefully degrades to the existing per-message cache when
+    CHI is not installed.
+
+  - Added IPv6 support throughout.  The @PRIVATE_RANGES table now covers
+    fe80::/10 (link-local), 2001:db8::/32 (RFC 3849 documentation range),
+    and 64:ff9b::/96 (NAT64 well-known prefix), in addition to the
+    loopback and ULA ranges already present.  @RECEIVED_IP_RE now includes
+    a bracketed IPv6 pattern so IPv6 addresses are extracted from
+    Received: headers.  _extract_ip_from_received() accepts colon-
+    containing addresses without IPv4 validation.  _resolve_host() tries
+    an AAAA query after a failed A query when Net::DNS is available.
+    _raw_whois() uses IO::Socket::IP (dual-stack) in preference to
+    IO::Socket::INET when that module is installed.
+
+  - Added multipart recursion guard.  _decode_multipart() now accepts a
+    $depth parameter (starting at 0 from _split_message()).  When depth
+    reaches MAX_MULTIPART_DEPTH (Readonly constant, value 20) the method
+    carps and returns immediately rather than recursing further, preventing
+    stack exhaustion on pathological crafted messages with deeply nested
+    MIME structures.
+
+  - Added Domain::PublicSuffix support to _registrable().  When
+    Domain::PublicSuffix is installed, get_root_domain() is used for
+    accurate eTLD+1 normalisation covering the full Public Suffix List.
+    The existing heuristic (handling co.uk, com.au, and similar common
+    two-label ccTLD second-levels) is retained as a fallback when the
+    module is absent.
+
+  - Added parallel DNS resolution via AnyEvent::DNS.  When AnyEvent::DNS
+    is installed and a message contains more than one unique URL hostname,
+    _extract_and_resolve_urls() fires all A queries concurrently via a
+    condvar and pre-populates the host cache before the sequential
+    enrichment loop runs.  Falls back transparently to sequential
+    resolution when AnyEvent::DNS is not installed or the host list
+    contains only one entry.
+
+  - Added input sanitisation to parse_email().  The raw message text is
+    stripped of characters outside [\x09\x0A\x0D\x20-\x7E\x80-\xFF]
+    (i.e. C0 controls other than tab, LF, and CR, and the DEL character)
+    before storage in _raw and header parsing.  High bytes (0x80-0xFF)
+    are preserved to avoid corrupting valid UTF-8 content in headers and
+    bodies.
+
+  - Added _sanitise_output() private function.  Strips C0 control
+    characters (0x01-0x08, 0x0B, 0x0C, 0x0E-0x1F) and DEL (0x7F) from
+    any user-derived string before it is written to report() or
+    abuse_report_text() output.  Tabs, LF, and CR are preserved.  High
+    bytes (0x80-0xFF) are preserved for UTF-8 content.  Applied to all
+    user-derived fields: IP info, organisation names, registrar names,
+    flag detail strings, and header values.
+
+  - Added Object::Configure integration to new().  The constructor now
+    calls Object::Configure::configure($class, $params) after parameter
+    validation, allowing per-class defaults to be loaded from a
+    configuration file.  The returned hashref overlays the caller-supplied
+    parameters before the object is blessed.
+
+  - Added new Readonly constants: $MAX_MULTIPART_DEPTH (20),
+    $CACHE_TTL_SECS (3600), $DEFAULT_TIMEOUT (10), $WHOIS_PORT (43),
+    $WHOIS_READ_CHUNK (4096), $WHOIS_RAW_MAX (2048), $RECENT_REG_DAYS
+    (180), $EXPIRY_WARN_DAYS (30), $SECS_PER_DAY (86400),
+    $DATE_SKEW_DAYS (7), $TZ_MAX_POS_MINS (840), $TZ_MAX_NEG_MINS (720),
+    $SCORE_HIGH (9), $SCORE_MEDIUM (5), $SCORE_LOW (2), %FLAG_WEIGHT,
+    $ROLE_MAX_LEN (80), $ROLE_WRAP_LEN (66).  All previously magic
+    numbers have been removed from the code body.
+
+  [Bug Fixes]
+
+  - Fixed NumericBoundary mutator in SchemaExtractor incorrectly treating
+    the < operator in file open (open $fh, '<', $path) and readline
+    (<$fh>) expressions as numeric comparisons, generating spurious
+    mutant variants for those operators.
+
+  - Wrap in eval to catch 'Connection reset by peer' thrown by Fatal/autodie
+
 0.07	Mon Mar 30 08:45:04 EDT 2026
 
   Bug fixes
@@ -102,7 +310,7 @@ Revision history for Email-Abuse-Investigator
     form-only contacts with their form URL, paste hint, and upload hint.
 
   - Added MANUAL ACTION REQUIRED -- WEB FORM SUBMISSION block to the
-    --dry-run footer of submit_abuse_report.pl, listing form-only contacts
+    --dry-run footer of submit_abuse_report, listing form-only contacts
     separately from email recipients so the user knows which parties require
     manual browser submission.
 
@@ -144,7 +352,7 @@ Revision history for Email-Abuse-Investigator
 
   - Added form_domain field to form_contacts() hashrefs, surfaced as
     Domain/URL in report(), Domain in abuse_report_text(), and Domain in
-    the --dry-run footer of submit_abuse_report.pl.  Providers such as
+    the --dry-run footer of submit_abuse_report.  Providers such as
     MarkMonitor and GoDaddy have a dedicated "Domain or URL" field in their
     web forms; this field gives the user the exact value to paste into it
     without having to work it out from context.
@@ -171,7 +379,7 @@ Revision history for Email-Abuse-Investigator
 
   - Fixed Wide character in syswrite error when submitting reports for
     messages whose decoded subject line contains non-ASCII characters (e.g.
-    emoji).  submit_abuse_report.pl uses "use utf8" and
+    emoji).  submit_abuse_report uses "use utf8" and
     "use open qw(:std :encoding(UTF-8))", which causes all string operations
     to produce Unicode-flagged strings.  Net::SMTP->datasend() calls
     syswrite() on a raw socket and cannot handle wide characters.
@@ -253,7 +461,7 @@ Revision history for Email-Abuse-Investigator
     roles are now accumulated rather than dropped.  Each hashref in the
     returned list gains a 'roles' arrayref holding the individual role
     strings, and 'role' (singular) is set to their join(' and ', ...) for
-    backward compatibility.  The dry-run footer in submit_abuse_report.pl
+    backward compatibility.  The dry-run footer in submit_abuse_report
     now reflects this: a merged entry shows both roles on one line and the
     total line reads "N recipients (M contact routes merged)" when merging
     has occurred.
@@ -335,7 +543,7 @@ Revision history for Email-Abuse-Investigator
        domain analysis pipeline via the new dkim_domains arrayref in the
        auth results hashref.
 
-  - The --dry-run output of submit_abuse_report.pl now appends a compact
+  - The --dry-run output of submit_abuse_report now appends a compact
     recipient summary at the foot of the report:
 
         Total: 2 recipients

@@ -9,7 +9,7 @@ use URI::Encode qw/uri_encode/;
 BEGIN {
 	use Exporter ();
 	use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
-	$VERSION     = v1.1.1;
+	$VERSION = v1.2.0;
 	@ISA         = qw(Exporter);
 	#Give a hoot don't pollute, do not export more than needed by default
 	@EXPORT      = qw();
@@ -17,6 +17,16 @@ BEGIN {
 	%EXPORT_TAGS = ();
 }
 
+# not an object metohd
+# build JSON object for encode/decode, disallow nonref
+# to match previous non object usage, APIs should be returning
+# JSON arrays or JSON objects
+sub _build_json {
+	# utf8: encode/decode operates on byte strings. HTTP::Request requires
+	# bytes; without this, non-ASCII payloads carry the utf8 flag and trip
+	# "HTTP::Message content must be bytes".
+	JSON->new->utf8->allow_nonref(0);
+}
 sub _debug
 {
 	my ($self, @lines) = @_;
@@ -90,15 +100,30 @@ sub _encode
 {
 	my ($self, $obj) = @_;
 
+	# Validate input ourselves rather than relying on JSON backend's
+	# allow_nonref(0). Modern JSON::PP/JSON::XS default allow_nonref to
+	# true and may ignore allow_nonref(0); error message text also varies
+	# across backends. Guarantee consistent behavior + errstr here.
+	unless (ref($obj) eq 'HASH' || ref($obj) eq 'ARRAY') {
+		$self->{has_error}    = 1;
+		$self->{error_string} = 'hash- or arrayref expected (not a simple scalar, use allow_nonref to allow this)';
+		$self->_debug("Error serializing json from \$obj:" . $self->{error_string});
+		return undef; ## no critic (ProhibitExplicitReturnUndef)
+	}
+
 	my $json = undef;
 	eval {
-		$json = to_json($obj);
+		$self->{_json} ||= _build_json();
+		$json = $self->{_json}->encode($obj);
 		$self->_debug("JSON created: $json");
 	} or do {
 		if ($@) {
 			$self->{has_error} = 1;
 			$self->{error_string} = $@;
-			$self->{error_string} =~ s/\s+at\s+\S+\s+line\s+\d+\.?\s*//;
+			# Strip Perl's "at FILE line N" location, optional ", <FH> line/chunk N"
+			# suffix Perl appends when <> was active, and any multi-line carp
+			# stack trace that follows. /s lets .* span newlines.
+			$self->{error_string} =~ s/\s+at\s+\S+\s+line\s+\d+(?:,\s+\S+\s+(?:line|chunk)\s+\d+)?\..*\z//s;
 			$self->_debug("Error serializing json from \$obj:" . $self->{error_string});
 		}
 	};
@@ -114,13 +139,17 @@ sub _decode
 	eval {
 		$json = $self->{predecodehook}->($json)
 			 if defined($self->{predecodehook});
-		$obj = from_json($json);
+		$self->{_json} ||= _build_json();
+		$obj = $self->{_json}->decode($json);
 		$self->_debug("Deserializing successful:",Dumper($obj));
 	} or do {
 		if ($@) {
 			$self->{has_error} = 1;
 			$self->{error_string} = $@;
-			$self->{error_string} =~ s/\s+at\s+\S+\s+line\s+\d+\.?\s*//;
+			# Strip Perl's "at FILE line N" location, optional ", <FH> line/chunk N"
+			# suffix Perl appends when <> was active, and any multi-line carp
+			# stack trace that follows. /s lets .* span newlines.
+			$self->{error_string} =~ s/\s+at\s+\S+\s+line\s+\d+(?:,\s+\S+\s+(?:line|chunk)\s+\d+)?\..*\z//s;
 			$self->_debug("Error deserializing: ".$self->{error_string});
 		}
 	};
@@ -130,7 +159,7 @@ sub _decode
 sub new
 {
 	my ($class, $base_url, %parameters) = @_;
-	return undef unless $base_url;
+	return undef unless $base_url; ## no critic (ProhibitExplicitReturnUndef)
 
 	my %ua_opts = %parameters;
 	map { delete $parameters{$_}; } qw(user pass realm debug predecodehook);
@@ -163,6 +192,12 @@ sub get
 		$path .= "?".join("&", @qp);
 	}
 	$self->_http_req("GET", $path, undef, $apphdr);
+}
+
+sub patch
+{
+	my ($self, $path, $data, $apphdr) = @_;
+	$self->_http_req("PATCH", $path, $data, $apphdr);
 }
 
 sub put
@@ -298,12 +333,12 @@ being decoded.
 
 =back
 
-=head2 get|post|put|del
+=head2 get|post|patch|put|del
 
-Perform an HTTP action (GET|POST|PUT|DELETE) against the given API. All methods
-take the B<path> to the API endpoint as the first parameter. The B<put()> and
+Perform an HTTP action (GET|POST|PATCH|PUT|DELETE) against the given API. All methods
+take the B<path> to the API endpoint as the first parameter. The B<patch()>, B<put()> and
 B<post()> methods also accept a second B<data> parameter, which should be a reference
-to be serialized into JSON for POST/PUTing to the endpoint.
+to be serialized into JSON for POST/PATCH/PUTing to the endpoint.
 
 All methods also accept an optional B<apphdr> parameter in the last position, which
 is a hashref.  The referenced hash contains header names and values that will be
@@ -327,6 +362,13 @@ this will be turned into querystring parameters, with URI encoded values.
   my $obj = $api->get('/objects/1');
   # Automatically add + encode querystring params
   my $obj = $api->get('/objects/1', { param => 'value' });
+
+=head2 patch
+
+Performs an HTTP PATCH on the given B<path>, with the provided B<data>. Like
+B<get>, this will append path to the end of the B<base_url>.
+
+  $api->patch('/objects/', $obj);
 
 =head2 put
 

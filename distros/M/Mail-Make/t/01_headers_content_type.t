@@ -18,7 +18,7 @@ use warnings;
 
 BEGIN
 {
-    use ok( 'Mail::Make::Headers::ContentType' );
+    use_ok( 'Mail::Make::Headers::ContentType' ) or BAIL_OUT( 'Unable to load Mail::Make::Headers::ContentType' );
 };
 
 # NOTE: Construction

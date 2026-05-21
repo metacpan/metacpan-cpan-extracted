@@ -23,5 +23,31 @@ $server->tool(
     return $promise;
   }
 );
+$server->tool(
+  name         => 'echo_log',
+  description  => 'Echo the input text and log a notification',
+  input_schema => {type => 'object', properties => {msg => {type => 'string'}}, required => ['msg']},
+  code         => sub ($tool, $args) {
+    $tool->context->notify('notifications/message', {level => 'info', data => $args->{msg}});
+    return "Echo: $args->{msg}";
+  }
+);
+$server->tool(
+  name        => 'reload',
+  description => 'Broadcast a tools list_changed notification',
+  code        => sub ($tool, $args) {
+    $server->notify_list_changed('tools');
+    return 'reloaded';
+  }
+);
+$server->tool(
+  name         => 'echo_progress',
+  description  => 'Echo the input text and report progress',
+  input_schema => {type => 'object', properties => {msg => {type => 'string'}}, required => ['msg']},
+  code         => sub ($tool, $args) {
+    $tool->context->notify_progress(0.5, 1, 'half');
+    return "Echo: $args->{msg}";
+  }
+);
 
 $server->to_stdio;

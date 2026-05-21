@@ -5,7 +5,7 @@ BEGIN
     use warnings;
     use lib './lib';
     use open ':std' => ':utf8';
-    use vars qw( $DEBUG );
+    use vars qw( $DEBUG $dt_class );
     use utf8;
     use version;
     use Test::More;
@@ -18,11 +18,22 @@ BEGIN
     {
         plan skip_all => 'Weird memory bug out of my control on OpenBSD for v5.12.0 to 5';
     }
-    # I am getting weird error like:
-    # perl(74608) in free(): bogus pointer (double free?) 0xfcc0f72e800
-    # that are most likely coming from DateTime, so I am switching for testing to its pure-perl equivalent
-    $ENV{PERL_DATETIME_PP} = 1;
-    use DateTime;
+
+    # NOTE: We support both DateTime::Lite (preferred for speed) and DateTime.
+    # If neither is installed, the tests are skipped. This avoids a circular dependency
+    # between DateTime::Locale::FromCLDR and DateTime::Lite.
+    if( eval{ require DateTime::Lite; 1 } )
+    {
+        $dt_class = 'DateTime::Lite';
+    }
+    elsif( eval{ require DateTime; 1 } )
+    {
+        $dt_class = 'DateTime';
+    }
+    else
+    {
+        plan skip_all => 'Neither DateTime::Lite nor DateTime is installed; cannot run interval diff tests';
+    }
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
@@ -38,12 +49,12 @@ use utf8;
 my $locale = DateTime::Locale::FromCLDR->new( 'en' );
 isa_ok( $locale, 'DateTime::Locale::FromCLDR' );
 
-my $year = DateTime->now->year;
+my $year = $dt_class->now->year;
 my( $dt1, $dt2, $diff );
 
 # NOTE: Different era
 diag( "Testing different eras" ) if( $DEBUG );
-$dt1 = DateTime->new(
+$dt1 = $dt_class->new(
     year => -1,
     month => 1,
     day => 1,
@@ -52,7 +63,7 @@ $dt1 = DateTime->new(
     second => 0,
     time_zone => 'floating',
 );
-$dt2 = DateTime->new(
+$dt2 = $dt_class->new(
     year => $year,
     month => 1,
     day => 1,
@@ -69,7 +80,7 @@ is( $diff, 'G', 'G' );
 
 # NOTE: Different years
 diag( "Testing different years" ) if( $DEBUG );
-$dt1 = DateTime->new(
+$dt1 = $dt_class->new(
     year => $year,
     month => 1,
     day => 1,
@@ -78,7 +89,7 @@ $dt1 = DateTime->new(
     second => 0,
     time_zone => 'floating',
 );
-$dt2 = DateTime->new(
+$dt2 = $dt_class->new(
     year => ( $year + 1 ),
     month => 1,
     day => 1,
@@ -95,7 +106,7 @@ is( $diff, 'y', 'y' );
 
 # NOTE: Different months
 diag( "Testing different months" ) if( $DEBUG );
-$dt1 = DateTime->new(
+$dt1 = $dt_class->new(
     year => $year,
     month => 1,
     day => 1,
@@ -104,7 +115,7 @@ $dt1 = DateTime->new(
     second => 0,
     time_zone => 'floating',
 );
-$dt2 = DateTime->new(
+$dt2 = $dt_class->new(
     year => $year,
     month => 2,
     day => 2,
@@ -121,7 +132,7 @@ is( $diff, 'M', 'M' );
 
 # NOTE: Different days
 diag( "Testing different days" ) if( $DEBUG );
-$dt1 = DateTime->new(
+$dt1 = $dt_class->new(
     year => $year,
     month => 1,
     day => 1,
@@ -130,7 +141,7 @@ $dt1 = DateTime->new(
     second => 0,
     time_zone => 'floating',
 );
-$dt2 = DateTime->new(
+$dt2 = $dt_class->new(
     year => $year,
     month => 1,
     day => 2,
@@ -147,7 +158,7 @@ is( $diff, 'd', 'd' );
 
 # NOTE: morning vs afternoon
 diag( "Testing AM/PM" ) if( $DEBUG );
-$dt1 = DateTime->new(
+$dt1 = $dt_class->new(
     year => $year,
     month => 1,
     day => 1,
@@ -156,7 +167,7 @@ $dt1 = DateTime->new(
     second => 0,
     time_zone => 'floating',
 );
-$dt2 = DateTime->new(
+$dt2 = $dt_class->new(
     year => $year,
     month => 1,
     day => 1,
@@ -178,7 +189,7 @@ is( $diff, 'B', 'B' );
 
 # NOTE: Different periods of the day
 diag( "Testing different periods of the day" ) if( $DEBUG );
-$dt1 = DateTime->new(
+$dt1 = $dt_class->new(
     year => $year,
     month => 1,
     day => 1,
@@ -187,7 +198,7 @@ $dt1 = DateTime->new(
     second => 0,
     time_zone => 'floating',
 );
-$dt2 = DateTime->new(
+$dt2 = $dt_class->new(
     year => $year,
     month => 1,
     day => 1,
@@ -205,7 +216,7 @@ is( $diff, 'h', 'h' );
 
 # NOTE: Different hours
 diag( "Testing different hours" ) if( $DEBUG );
-$dt1 = DateTime->new(
+$dt1 = $dt_class->new(
     year => $year,
     month => 1,
     day => 1,
@@ -214,7 +225,7 @@ $dt1 = DateTime->new(
     second => 0,
     time_zone => 'floating',
 );
-$dt2 = DateTime->new(
+$dt2 = $dt_class->new(
     year => $year,
     month => 1,
     day => 1,
@@ -231,7 +242,7 @@ is( $diff, 'h', 'h' );
 
 # NOTE: Different minutes
 diag( "Testing different minutes" ) if( $DEBUG );
-$dt1 = DateTime->new(
+$dt1 = $dt_class->new(
     year => $year,
     month => 1,
     day => 1,
@@ -240,7 +251,7 @@ $dt1 = DateTime->new(
     second => 0,
     time_zone => 'floating',
 );
-$dt2 = DateTime->new(
+$dt2 = $dt_class->new(
     year => $year,
     month => 1,
     day => 1,

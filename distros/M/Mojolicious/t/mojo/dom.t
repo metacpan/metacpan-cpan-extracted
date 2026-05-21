@@ -327,6 +327,20 @@ EOF
   is $dom->at('script')->text, "alert('lalala');", 'right script content';
 };
 
+subtest 'Script tag with HTML comment containing nested script tags' => sub {
+  my $dom = Mojo::DOM->new(q{<script> console.log("<!--"); </script>});
+  is $dom->at('script')->text, ' console.log("<!--"); ', 'right script content';
+
+  $dom = Mojo::DOM->new(q{<script> console.log("<!-- <script> -->"); </script>});
+  is $dom->at('script')->text, ' console.log("<!-- <script> -->"); ', 'right script content';
+
+  $dom = Mojo::DOM->new(q{<script> console.log("<!-- <script> </script>"); </script>});
+  is $dom->at('script')->text, ' console.log("<!-- <script> </script>"); ', 'right script content';
+
+  $dom = Mojo::DOM->new(q{<script> console.log("<!-- <script> </script> -->"); </script>});
+  is $dom->at('script')->text, ' console.log("<!-- <script> </script> -->"); ', 'right script content';
+};
+
 subtest 'HTML5 (unquoted values)' => sub {
   my $dom = Mojo::DOM->new('<div id = test foo ="bar" class=tset bar=/baz/ value baz=//>works</div>');
   is $dom->at('#test')->text,                'works', 'right text';
@@ -1274,6 +1288,25 @@ EOF
   is $dom->at('#♥ ~ *:nth-last-child(2)')->text,      'F',   'right text';
 };
 
+subtest 'Whitespace as descendant combinator' => sub {
+  my $dom = Mojo::DOM->new("<ul> <li>Ax1</li> </ul>");
+  is $dom->at("ul li")->text,    'Ax1', 'space combinator';
+  is $dom->at("ul\tli")->text,   'Ax1', 'tab combinator';
+  is $dom->at("ul \tli")->text,  'Ax1', 'space + tab combinator';
+  is $dom->at("ul\t li")->text,  'Ax1', 'tab + space combinator';
+  is $dom->at("ul\t\tli")->text, 'Ax1', 'multiple tab combinator';
+  is $dom->at("ul\nli")->text,   'Ax1', 'newline combinator';
+  is $dom->at("ul\rli")->text,   'Ax1', 'carriage return combinator';
+  is $dom->at("ul\fli")->text,   'Ax1', 'form feed combinator';
+
+  my $multi = Mojo::DOM->new("<ul><li>A</li><li>B</li></ul>");
+  is_deeply $multi->find("ul\tli")->map('text')->to_array, ['A', 'B'], 'find with tab combinator';
+
+  my $child = Mojo::DOM->new("<ul><li>Ax1</li></ul>");
+  is $child->at("ul\t>\tli")->text, 'Ax1', 'tabs around child combinator';
+  is $child->at("ul\n>\nli")->text, 'Ax1', 'newlines around child combinator';
+};
+
 subtest 'Scoped selectors' => sub {
   my $dom = Mojo::DOM->new(<<EOF);
 <p>Zero</p>
@@ -1775,14 +1808,12 @@ subtest 'Real world JavaScript and CSS' => sub {
         alert('<123>');
       }
     </script>
-    < sCriPt two="23" >if (b > c) { alert('&<ohoh>') }</scRiPt  >
   <body>Foo!</body>
 EOF
   is $dom->find('html > body')->[0]->text,         'Foo!',                             'right text';
   is $dom->find('html > head > style')->[0]->text, "#style { foo: style('<test>'); }", 'right text';
   is $dom->find('html > head > script')->[0]->text, "\n      if (a < b) {\n        alert('<123>');\n      }\n    ",
     'right text';
-  is $dom->find('html > head > script')->[1]->text, "if (b > c) { alert('&<ohoh>') }", 'right text';
 };
 
 subtest 'More real world JavaScript' => sub {
@@ -1819,12 +1850,11 @@ subtest 'Even more real world JavaScript' => sub {
   <body>Bar</body>
 </html>
 EOF
-  is $dom->at('title')->text,                              'Foo',          'right text';
-  is $dom->find('html > head > script')->[0]->attr('src'), '/js/one.js',   'right attribute';
-  is $dom->find('html > head > script')->[1]->attr('src'), '/js/two.js',   'right attribute';
-  is $dom->find('html > head > script')->[2]->attr('src'), '/js/three.js', 'right attribute';
-  is $dom->find('html > head > script')->[2]->text,        "\n  ",         'no text';
-  is $dom->at('html > body')->text,                        'Bar',          'right text';
+  is $dom->at('title')->text,                              'Foo',                                 'right text';
+  is $dom->find('html > head > script')->[0]->attr('src'), '/js/one.js',                          'right attribute';
+  is $dom->find('html > head > script')->[1]->attr('src'), '/js/two.js',                          'right attribute';
+  is $dom->find('html > head > script')->[2]->attr('src'), '/js/three.js',                        'right attribute';
+  is $dom->find('html > head > script')->[2]->text, "\n  </head>\n  <body>Bar</body>\n</html>\n", 'raw content to EOF';
 };
 
 subtest 'Inline DTD' => sub {
@@ -2567,10 +2597,9 @@ subtest 'Dot and hash in class and id attributes' => sub {
 
 subtest 'Extra whitespace' => sub {
   my $dom = Mojo::DOM->new('< span>a< /span><b >b</b><span >c</ span>');
-  is $dom->at('span')->text,     'a',                                    'right text';
-  is $dom->at('span + b')->text, 'b',                                    'right text';
-  is $dom->at('b + span')->text, 'c',                                    'right text';
-  is "$dom",                     '<span>a</span><b>b</b><span>c</span>', 'right result';
+  is $dom->at('b')->text,        'b',                                                  'right text';
+  is $dom->at('b + span')->text, 'c',                                                  'right text';
+  is "$dom",                     '&lt; span&gt;a&lt; /span&gt;<b>b</b><span>c</span>', 'right result';
 };
 
 subtest 'Selectors with leading and trailing whitespace' => sub {
@@ -2592,8 +2621,8 @@ subtest '"0"' => sub {
 
 subtest 'Not self-closing' => sub {
   my $dom = Mojo::DOM->new('<div />< div ><pre />test</div >123');
-  is $dom->at('div > div > pre')->text, 'test',                                     'right text';
-  is "$dom",                            '<div><div><pre>test</pre></div>123</div>', 'right result';
+  is $dom->at('div > pre')->text, 'test',                                       'right text';
+  is "$dom",                      '<div>&lt; div &gt;<pre>test</pre></div>123', 'right result';
   $dom = Mojo::DOM->new('<p /><svg><circle /><circle /></svg>');
   is $dom->find('p > svg > circle')->size, 2,                                                      'two circles';
   is "$dom",                               '<p><svg><circle></circle><circle></circle></svg></p>', 'right result';
@@ -2640,13 +2669,26 @@ subtest 'Comments' => sub {
   my $dom = Mojo::DOM->new(<<EOF);
 <!-- HTML5 -->
 <!-- bad idea -- HTML5 -->
-<!-- HTML4 -- >
-<!-- bad idea -- HTML4 -- >
 EOF
   is $dom->tree->[1][1], ' HTML5 ',             'right comment';
   is $dom->tree->[3][1], ' bad idea -- HTML5 ', 'right comment';
-  is $dom->tree->[5][1], ' HTML4 ',             'right comment';
-  is $dom->tree->[7][1], ' bad idea -- HTML4 ', 'right comment';
+};
+
+subtest 'Comment is not terminated by "-- >"' => sub {
+  my $dom = Mojo::DOM->new('<!-- a > -- > b <blink>c</blink> -->');
+  is $dom->at('blink'),  undef,                           'blink element is inside comment';
+  is $dom->tree->[1][1], ' a > -- > b <blink>c</blink> ', 'right comment';
+};
+
+subtest 'Abrupt and bang-terminated comments' => sub {
+  my $dom = Mojo::DOM->new("<!DOCTYPE html>\n<!--> <p>OK</p> <!-- -->");
+  is $dom->at('p')->text, 'OK', 'abrupt empty comment closure';
+
+  $dom = Mojo::DOM->new("<!DOCTYPE html>\n<!---> <p>OK</p> <!-- -->");
+  is $dom->at('p')->text, 'OK', 'dash-terminated empty comment';
+
+  $dom = Mojo::DOM->new("<!DOCTYPE html>\n<!-- --!> <p>OK</p> <!-- -->");
+  is $dom->at('p')->text, 'OK', 'bang-terminated comment';
 };
 
 subtest 'Huge number of attributes' => sub {
@@ -3023,6 +3065,19 @@ EOF
   is $dom->at('.test')->text, 'works', 'right text';
 };
 
+subtest '"<" followed by space is not a tag opener' => sub {
+  my $dom = Mojo::DOM->new('if a < script then="<!--"> </script> <p>FAIL</p>-->');
+  is_deeply $dom->find('script, p')->map('to_string')->to_array, [], 'fragment contains no tags, just a comment';
+
+  $dom = Mojo::DOM->new('a < b');
+  is "$dom", 'a &lt; b', 'right result';
+  is_deeply $dom->find('*')->to_array, [], 'no elements';
+
+  $dom = Mojo::DOM->new('a < b <p>ok</p>');
+  is_deeply $dom->find('*')->map('tag')->to_array, ['p'], 'only one element';
+  is $dom->at('p')->text, 'ok', 'right text';
+};
+
 subtest 'XML name characters' => sub {
   my $dom = Mojo::DOM->new->xml(1)->parse('<Foo><1a>foo</1a></Foo>');
   is $dom->at('Foo')->text, '<1a>foo</1a>',                        'right text';
@@ -3090,6 +3145,20 @@ EOF
 EOF
   like $dom->at('script')->text, qr/console\.log.+scriptxyz is safe/s, 'right text';
   like $dom->at('div')->text,    qr/^\s+$/s,                           'right text';
+};
+
+subtest 'Descendant combinator chain with non-matching selector' => sub {
+  my $dom = Mojo::DOM->new('<div> ' x 100 . '</div> ' x 100);
+  is_deeply $dom->find('#gobbledygook * * * *')->map(sub { $_->to_string })->to_array, [],
+    'non-existent elements have no descendants';
+  is $dom->at('#gobbledygook * * * *'), undef, 'no match';
+
+  is_deeply $dom->find('* * * * #gobbledygook')->map(sub { $_->to_string })->to_array, [],
+    'non-existent elements have no ancestors';
+  is $dom->at('* * * * #gobbledygook'), undef, 'no match';
+
+  my $exists = Mojo::DOM->new('<div id="x"><a><b><c><d>ok</d></c></b></a></div>');
+  is $exists->at('#x * * * *')->text, 'ok', 'matching id still resolves descendants';
 };
 
 subtest 'Unknown CSS selector' => sub {

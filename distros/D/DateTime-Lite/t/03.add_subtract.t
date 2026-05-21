@@ -2,13 +2,22 @@
 ##----------------------------------------------------------------------------
 ## Lightweight DateTime Alternative - t/03.add_subtract.t
 ##----------------------------------------------------------------------------
+BEGIN
+{
+    use strict;
+    use warnings;
+    use lib './lib';
+    use Test::More;
+};
+
 use strict;
 use warnings;
-use lib './lib';
-use Test::More;
 
-use_ok( 'DateTime::Lite' ) or BAIL_OUT( 'Cannot load DateTime::Lite' );
-use_ok( 'DateTime::Lite::Duration' ) or BAIL_OUT( 'Cannot load DateTime::Lite::Duration' );
+BEGIN
+{
+    use_ok( 'DateTime::Lite' ) or BAIL_OUT( 'Cannot load DateTime::Lite' );
+    use_ok( 'DateTime::Lite::Duration' ) or BAIL_OUT( 'Cannot load DateTime::Lite::Duration' );
+};
 
 # NOTE: add() / subtract() - simple cases
 subtest 'add() / subtract() - simple cases' => sub

@@ -2,6 +2,7 @@ package Crypt::DSA;
 
 use 5.006;
 use strict;
+use warnings;
 use Digest::SHA qw( sha1 );
 use Carp qw( croak );
 use Crypt::DSA::KeyChain;
@@ -9,7 +10,7 @@ use Crypt::DSA::Key;
 use Crypt::DSA::Signature;
 use Crypt::DSA::Util qw( bitsize bin2mp mod_inverse mod_exp makerandom );
 
-our $VERSION = '1.19'; #VERSION
+our $VERSION = '1.20'; #VERSION
 
 use vars qw( $VERSION );
 

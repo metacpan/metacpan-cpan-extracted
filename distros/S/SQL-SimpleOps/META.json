@@ -58,6 +58,6 @@
          "web" : "https://sourceforge.net/projects/csi-sql-simpleops/"
       }
    },
-   "version" : "v2026.101.1",
+   "version" : "v2026.131.1",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

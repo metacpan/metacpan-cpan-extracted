@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/sdt/Email-Sender-Transport-Mailgun/workflows/test/badge.svg)](https://github.com/sdt/Email-Sender-Transport-Mailgun/actions)
+[![Actions Status](https://github.com/sdt/Email-Sender-Transport-Mailgun/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/sdt/Email-Sender-Transport-Mailgun/actions?workflow=test)
 # NAME
 
 Email::Sender::Transport::Mailgun - Mailgun transport for Email::Sender
@@ -41,9 +41,16 @@ or [WWW::Mailgun](https://metacpan.org/pod/WWW%3A%3AMailgun).
 
 The attributes all correspond directly to Mailgun parameters.
 
-## api\_key
+## api\_key / api\_key\_path
 
 Mailgun API key. See [https://documentation.mailgun.com/en/latest/api-intro.html#authentication-1](https://documentation.mailgun.com/en/latest/api-intro.html#authentication-1)
+
+Must specify one of these, but not both.
+
+The `api_key` parameter contains the literal api key as a string.
+
+If you have your api key stored in a file, such as a Docker Secret, you can
+instead put the full path in `api_key_path`.
 
 ## domain
 
@@ -119,6 +126,7 @@ To specify any of the attributes above, prepend the attribute name with
 `EMAIL_SENDER_TRANSPORT_`.
 
 - EMAIL\_SENDER\_TRANSPORT\_api\_key
+- EMAIL\_SENDER\_TRANSPORT\_api\_key\_path
 - EMAIL\_SENDER\_TRANSPORT\_domain
 - EMAIL\_SENDER\_TRANSPORT\_deliverytime
 - EMAIL\_SENDER\_TRANSPORT\_dkim

@@ -83,6 +83,28 @@ END   { unlink("@{[__FILE__]}.txt") }
     sub {1},
     sub {1},
     sub {1},
+# 61
+    sub { open(FILE61,"@{[__FILE__]}.txt"); my $r=mb::getc(\*FILE61);                                                     close(FILE61); $r eq 'A'  },
+    sub { open(FILE62,"@{[__FILE__]}.txt"); my $a=mb::getc(\*FILE62); my $r=mb::getc(\*FILE62);                           close(FILE62); $r eq 'ƒ¿' },
+    sub { open(FILE63,"@{[__FILE__]}.txt"); my $a=mb::getc(\*FILE63); my $b=mb::getc(\*FILE63); my $r=mb::getc(\*FILE63); close(FILE63); $r eq '‚ ' },
+    sub {1},
+    sub {1},
+    sub {1},
+    sub {1},
+    sub {1},
+    sub {1},
+    sub {1},
+# 71
+    sub { open(FILE71,"@{[__FILE__]}.txt"); my $r=mb::getc \*FILE71;                                                   close(FILE71); $r eq 'A'  },
+    sub { open(FILE72,"@{[__FILE__]}.txt"); my $a=mb::getc \*FILE72; my $r=mb::getc \*FILE72;                          close(FILE72); $r eq 'ƒ¿' },
+    sub { open(FILE73,"@{[__FILE__]}.txt"); my $a=mb::getc \*FILE73; my $b=mb::getc \*FILE73; my $r=mb::getc \*FILE73; close(FILE73); $r eq '‚ ' },
+    sub {1},
+    sub {1},
+    sub {1},
+    sub {1},
+    sub {1},
+    sub {1},
+    sub {1},
 #
 );
 

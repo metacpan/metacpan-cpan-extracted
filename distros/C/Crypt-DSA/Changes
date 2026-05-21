@@ -1,5 +1,15 @@
 Revision history for Perl extension Crypt-DSA
 
+1.20 -- Fri May 15 19:00:36 ADT 2026
+
+    - This module is now makred as deprecated.  Crypt-DSA-GMP is a possible replacement.
+    - Improve the call to IPC::Open3::open3
+    - Security Fix CVE-2026-8704: replace two arg open
+    - Security Fix CVE-2026-8700: replace rand()
+    - Add a security policy
+    - Add use warnings
+    - Fixes #86424: typo fix
+
 1.19 -- Wed Dec 04 10:49:10 AST 2024
 
     [Changes since 1.17]

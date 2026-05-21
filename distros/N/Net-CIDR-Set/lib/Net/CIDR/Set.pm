@@ -13,7 +13,7 @@ use overload '""' => 'as_string';
 
 use namespace::autoclean;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 
 {
@@ -436,7 +436,7 @@ Net::CIDR::Set - Manipulate sets of IP addresses
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =head1 SYNOPSIS
 
@@ -773,7 +773,9 @@ value is C<0> which provides the most general formatting.
 =head1 SOURCE
 
 The development version is on github at L<https://github.com/robrwo/perl-Net-CIDR-Set>
-and may be cloned from L<git://github.com/robrwo/perl-Net-CIDR-Set.git>
+and may be cloned from L<https://github.com/robrwo/perl-Net-CIDR-Set.git>
+
+See F<CONTRIBUTING.md> for more information.
 
 =head1 SUPPORT
 
@@ -798,7 +800,7 @@ then see F<SECURITY.md> for instructions how to report security vulnerabilities.
 
 Andy Armstrong <andy@hexten.net>
 
-The current maintainer is Robert Rothenberg <rrwo@cpan.org>.
+The current maintainer is Robert Rothenberg <perl@rhizomnic.com>.
 
 The encode and decode routines were stolen en masse from Douglas Wilson's L<Net::CIDR::Lite>.
 
@@ -818,7 +820,7 @@ Brian Gottreu <gottreu@cpan.org>
 
 =item *
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 =item *
 
@@ -828,7 +830,7 @@ Stig Palmquist <stigtsp@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2009, 2014, 2025 by Message Systems, Inc.
+This software is copyright (c) 2009, 2014, 2025-2026 by Message Systems, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

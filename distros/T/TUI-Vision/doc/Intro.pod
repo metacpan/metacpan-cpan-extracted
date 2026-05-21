@@ -1,0 +1,90 @@
+=pod
+
+=head1 INTRODUCTION
+
+=head2 TUI-Vision
+
+Starting in 2025, I made the previously private project public after 
+successfully porting the Turbo Vision C++ framework to Perl for the target 
+platform Windows 10 and 11 (after two failed attempts, see commits history for 
+details). 
+
+=head3 Installation and Usage
+
+The port can be installed via CPAN (Comprehensive Perl Archive Network). Simply
+run the following command:
+
+  cpan install TurboVision
+
+A simple example to create an application with Turbo Vision in Perl:
+
+  use TUI::App;
+
+  my $app = TApplication->new();
+  $app->run();
+
+=head2 Key Features of TUI-Vision
+
+=over
+
+=item B<Compatibility>
+
+The port supports 32-bit and 64-bit Strawberry Perl versions >= 5.10 and covers 
+a wide range of Windows systems (Please note that not all combinations of 
+Windows versions and Perl versions could be checked by me).
+
+=item B<User Interfaces>
+
+All original user interface elements such as edit fields, list boxes, 
+checkboxes, radio buttons, and menus are available in Perl and offer full mouse 
+support (in the future, so please don't be angry that this is in progress; see 
+L<Coverage|/Source Module Inventory>).
+
+=item B<Extensibility>
+
+A I<Moo/s/e> based toolkit was used to ensure that the applications remain 
+efficient and portable. The toolkit enables developers to extend the 
+functionality of TUI-Vision easily and efficiently. The L<UNIVERSAL::Object> 
+package (by default), L<Moo>, L<Moos> and L<Moose> are currently supported. 
+
+L<Moo> and L<Moose> are widely used libraries with a well-known API. It is 
+important to note that L<Moo> and L<Moose> are not required as prerequisites! 
+The default toolkit and L<Moos> is compatible for our API and implemented 
+in pure Perl. 
+
+It's up to you what you want to use. Simply C<use Moo> in your application, 
+instead of C<use TUI::toolkit> if you want to use L<Moo>. TUI-Vision will then 
+use L<Moo> in its entirety (the same applies to L<Moose> and L<Moos>, of 
+course). 
+
+=back
+
+=head3 Documentation and Support
+
+Detailed documentation and examples can be found in the CPAN or GitHub 
+repository of this port.
+
+Please note that this is a very recent version of the port of the 
+Turbo Vision C++ framework to Perl. Although I have done my best to create a 
+stable and functional version, there may still be bugs and instabilities.
+
+However, I do my best to answer questions and bug fixes quickly and reliably. 
+Your feedback is extremely valuable to continuously improve the quality and 
+stability of this port. Please do not hesitate to contact me if you have any 
+problems or questions. For this use the GitHub issue tracker and the Github 
+discussion channel.
+
+I hope this port will facilitate the development of text-based applications in 
+Perl on Windows systems and look forward to feedback and contributions from the 
+developer community.
+
+=head1 Copyright and License
+
+Copyright (c) 1990-1994, 1997 by Borland International
+
+Copyright (c) 2021-2026 the AUTHORS and CONTRIBUTORS as listed in the sources.
+
+This software is licensed under the MIT license (see the LICENSE file, which is 
+part of the distribution). 
+
+=cut

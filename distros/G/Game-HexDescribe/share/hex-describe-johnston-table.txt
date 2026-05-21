@@ -865,19 +865,19 @@
 1,<li>[[same monsters] final room]<ul><li>[[same monsters] boss]</li><li>[[same monsters] treasure]</li></ul></li>
 
 ;cave map with 5 rooms
-1,<img class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&seed=$seed&caves=1]]" alt="5 room cave" title="5 room cave"/>
+1,<img loading="lazy" class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&seed=$seed&caves=1]]" alt="5 room cave" title="5 room cave"/>
 
 ;cave map with 7 rooms
-1,<img class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&rooms=7&seed=$seed&caves=1]]" alt="7 room cave" title="7 room cave"/>
+1,<img loading="lazy" class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&rooms=7&seed=$seed&caves=1]]" alt="7 room cave" title="7 room cave"/>
 
 ;cave map with 10 rooms
-1,<img class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&rooms=10&seed=$seed&caves=1]]" alt="10 room cave" title="10 room cave"/>
+1,<img loading="lazy" class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&rooms=10&seed=$seed&caves=1]]" alt="10 room cave" title="10 room cave"/>
 
 ;cave map with 12 rooms
-1,<img class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&rooms=12&seed=$seed&caves=1]]" alt="12 room cave" title="12 room cave"/>
+1,<img loading="lazy" class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&rooms=12&seed=$seed&caves=1]]" alt="12 room cave" title="12 room cave"/>
 
 ;cave map with 14 rooms
-1,<img class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&rooms=14&seed=$seed&caves=1]]" alt="14 room cave" title="14 room cave"/>
+1,<img loading="lazy" class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&rooms=14&seed=$seed&caves=1]]" alt="14 room cave" title="14 room cave"/>
 
 #VAT
 ;vat entrance

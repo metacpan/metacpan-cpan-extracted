@@ -20,8 +20,8 @@ HV *leader_key_to_hv(pTHX_ V3electionpb__LeaderKey *lk) {
              lk->name.data ? newSVpvn((const char *)lk->name.data, lk->name.len) : newSVpvn("", 0), 0);
     hv_store(hv, "key", 3,
              lk->key.data ? newSVpvn((const char *)lk->key.data, lk->key.len) : newSVpvn("", 0), 0);
-    hv_store(hv, "rev", 3, newSViv(lk->rev), 0);
-    hv_store(hv, "lease", 5, newSViv(lk->lease), 0);
+    hv_store(hv, "rev", 3, newSVi64(lk->rev), 0);
+    hv_store(hv, "lease", 5, newSVi64(lk->lease), 0);
     return hv;
 }
 
@@ -115,21 +115,24 @@ void observe_rearm_recv(pTHX_ observe_call_t *oc) {
     grpc_call_error err = grpc_call_start_batch(oc->call, &op, 1, &oc->base, NULL);
     if (err != GRPC_CALL_OK) {
         oc->active = 0;
-        CALL_SIMPLE_ERROR_CALLBACK(oc->callback, "Observe rearm failed");
+        CALL_STATUS_ERROR_CALLBACK(oc->callback, GRPC_STATUS_INTERNAL, "Observe rearm failed", "observe");
         cleanup_observe(aTHX_ oc);
     }
 }
 
-/* Cleanup observe and remove from client list */
-void cleanup_observe(pTHX_ observe_call_t *oc) {
-    ev_etcd_t *client = oc->client;
+static void observe_call_free(pTHX_ observe_call_t *oc) {
+    if (oc->params.name) Safefree(oc->params.name);
+    Safefree(oc);
+}
 
+/* See cleanup_watch — same dual-ownership pattern */
+void cleanup_observe(pTHX_ observe_call_t *oc) {
+    if (!oc->client_owns) return;
+
+    ev_etcd_t *client = oc->client;
     observe_call_t **op = &client->observes;
     while (*op) {
-        if (*op == oc) {
-            *op = oc->next;
-            break;
-        }
+        if (*op == oc) { *op = oc->next; break; }
         op = &(*op)->next;
     }
 
@@ -139,32 +142,38 @@ void cleanup_observe(pTHX_ observe_call_t *oc) {
     grpc_metadata_array_destroy(&oc->trailing_metadata);
     if (oc->recv_buffer) {
         grpc_byte_buffer_destroy(oc->recv_buffer);
+        oc->recv_buffer = NULL;
     }
     grpc_slice_unref(oc->status_details);
     if (oc->call) {
         grpc_call_unref(oc->call);
+        oc->call = NULL;
     }
     SvREFCNT_dec(oc->callback);
+    oc->callback = NULL;
+    oc->active = 0;
+    oc->client_owns = 0;
 
-    if (oc->params.name) {
-        Safefree(oc->params.name);
-    }
+    if (!oc->perl_owns) observe_call_free(aTHX_ oc);
+}
 
-    Safefree(oc);
+void observe_call_perl_release(pTHX_ observe_call_t *oc) {
+    oc->perl_owns = 0;
+    if (!oc->client_owns) observe_call_free(aTHX_ oc);
 }
 
 /* Process LeaderResponse for observe stream */
 void process_observe_response(pTHX_ observe_call_t *oc) {
     if (!oc->recv_buffer) {
         oc->active = 0;
-        CALL_SIMPLE_ERROR_CALLBACK(oc->callback, "No observe response received");
+        CALL_STATUS_ERROR_CALLBACK(oc->callback, GRPC_STATUS_INTERNAL, "No observe response received", "observe");
         return;
     }
 
     grpc_byte_buffer_reader reader;
     if (!grpc_byte_buffer_reader_init(&reader, oc->recv_buffer)) {
         oc->active = 0;
-        CALL_SIMPLE_ERROR_CALLBACK(oc->callback, "Failed to read observe response buffer");
+        CALL_STATUS_ERROR_CALLBACK(oc->callback, GRPC_STATUS_INTERNAL, "Failed to read observe response buffer", "observe");
         return;
     }
 
@@ -177,7 +186,7 @@ void process_observe_response(pTHX_ observe_call_t *oc) {
 
     if (!resp) {
         oc->active = 0;
-        CALL_SIMPLE_ERROR_CALLBACK(oc->callback, "Failed to parse observe response");
+        CALL_STATUS_ERROR_CALLBACK(oc->callback, GRPC_STATUS_INTERNAL, "Failed to parse observe response", "observe");
         return;
     }
 
@@ -236,7 +245,7 @@ static void observe_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revents)
         grpc_byte_buffer_destroy(send_buffer);
         oc->active = 0;
         client->in_callback = 1;
-        CALL_SIMPLE_ERROR_CALLBACK(oc->callback, "Observe reconnect failed");
+        CALL_STATUS_ERROR_CALLBACK(oc->callback, GRPC_STATUS_INTERNAL, "Observe reconnect failed", "observe");
         client->in_callback = 0;
         if (!client->active) {
             finish_client_destroy(aTHX_ client);
@@ -258,7 +267,7 @@ static void observe_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revents)
     if (err != GRPC_CALL_OK) {
         STREAMING_CALL_BATCH_ERROR(oc);
         client->in_callback = 1;
-        CALL_SIMPLE_ERROR_CALLBACK(oc->callback, "Observe reconnect batch failed");
+        CALL_STATUS_ERROR_CALLBACK(oc->callback, GRPC_STATUS_INTERNAL, "Observe reconnect batch failed", "observe");
         client->in_callback = 0;
         if (!client->active) {
             finish_client_destroy(aTHX_ client);

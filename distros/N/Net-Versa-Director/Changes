@@ -1,5 +1,12 @@
 Revision history for Net-Versa-Director
 
+0.005000  2026-05-18 16:57:39+02:00 Europe/Vienna
+    - add get_device_configuration method
+    - update link to the Versa REST API docs
+    - update note about Versa Director version for development and testing
+    - change error handling to return Net::Versa::Director::Exception objects
+      which stringify to a useful error message but keep all informations returned
+
 0.004000  2025-11-04 13:26:19+01:00 Europe/Vienna
     - change list_device_interfaces to return all interface types not just vni
       This is a breaking change which changes the return value from arrayref

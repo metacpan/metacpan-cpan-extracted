@@ -72,12 +72,10 @@ test_psgi
           'expected metrics'
           or note( explain \@metrics );
 
+        # Note that the remote_addr was not logged because no secure_set_key was specified.
+
         cmp_deeply \@logs,
           bag(
-            {
-                level   => 'error',
-                message => re('Ouch psgi\.request\.remote_addr'),
-            },
             {
                 level   => 'error',
                 message => re('Ouch psgi\.worker.pid'),

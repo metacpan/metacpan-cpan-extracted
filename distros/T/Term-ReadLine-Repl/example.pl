@@ -1,127 +1,61 @@
 #!/usr/bin/env perl
-
-use warnings;
 use strict;
+use warnings;
 
-use Getopt::Long;
-use Data::Dumper;
-
-use lib './lib';
+#use lib './lib';  # Uncomment to run from the repo root without installing
 use Term::ReadLine::Repl;
 
-my %O = (
-    dry => 1,
-);
+# In-memory note storage for this session.
+my @notes;
 
-# Used for both regular getopts cli args parse and repl -flags parsing.
-sub get_opts_parse {
-    GetOptions(\%O,
-        'dry|n!',
-        'force',
-        'mem_buffer=i',
-        'timeout=i',
-        'verbose!',
-    ) or die "cant!";
-}
+my $repl = Term::ReadLine::Repl->new({
+    name        => 'notes',
+    prompt      => '[%s]>',
+    passthrough => 1,
+    hist_file   => "$ENV{HOME}/.notes_repl_history",
+    cmd_schema  => {
 
-sub custom_logic {
-    my $args = shift;
+        # Add a note.  All words after 'add' become the note text.
+        add => {
+            exec => sub {
+                my @words = @_;
+                unless (@words) {
+                    print "Usage: add <text>\n";
+                    return;
+                }
+                push @notes, join(' ', @words);
+                printf "Note %d saved.\n", scalar @notes;
+            },
+        },
 
-    print Dumper \%O;
+        # List all saved notes with index numbers.
+        list => {
+            exec => sub {
+                unless (@notes) {
+                    print "No notes yet. Use 'add <text>' to create one.\n";
+                    return;
+                }
+                printf "%2d. %s\n", $_ + 1, $notes[$_] for 0 .. $#notes;
+            },
+        },
 
-    # Testing return
-    if ($args->[0] eq 'test') {
-        return {
-            action => 'next'
-        };
-    }
+        # Remove a note by its index number.
+        remove => {
+            exec => sub {
+                my ($id) = @_;
+                unless (defined $id && $id =~ /^\d+$/ && $id >= 1 && $id <= @notes) {
+                    printf "Usage: remove <1-%d>\n", scalar @notes || 1;
+                    return;
+                }
+                my $removed = splice(@notes, $id - 1, 1);
+                print "Removed: $removed\n";
+            },
+            # Tab completion hints for the first argument position.
+            args => [{ '1' => undef, '2' => undef, '3' => undef,
+                       '4' => undef, '5' => undef }],
+        },
 
-    if ($args->[0] eq 'end') {
-        return {
-            action => 'last'
-        };
-    }
+    },
+});
 
-    if ($args->[0] eq 'fart') {
-        return {
-            schema => {
-                blah => {
-                    exec => sub {print "fart\n";},
-                    args => [{
-                        refresh => undef,
-                    }] 
-                } 
-            } 
-        };
-    }
-}
-
-sub get_stats {
-    my $arg = shift;
-
-    if ($arg eq 'a') {
-        print "a\n";
-        return;
-    }
-    print "1,2,3,4,5\n";
-}
-
-#my $term = Term::ReadLine::Repl->new(
-#    {
-#        name => 'myrepl',
-#        prompt => '(%s)>',
-#        cmd_schema => {
-#            stats => {
-#                exec => \&get_stats,
-#                args => [{
-#                    refresh => undef,
-#                    host => 'hostname',
-#                    guest => 'guestname',
-#                    list => 'host|guest',
-#                    cluster => undef,
-#                }, 
-#                { 
-#                    test => undef,
-#                    another => undef,
-#                }],
-#            },
-#            xml => {
-#                exec => \&list_items,
-#                args => [{refresh=>undef, 'cluster|host'=>undef, 'hostname'=>undef}],
-#            }
-#        },
-#        passthrough => 1,
-#        get_opts => \&get_opts_parse,
-#        custom_logic => \&custom_logic,
-#    }
-#);
-
-# A simple repl
-my $term = Term::ReadLine::Repl->new(
-    {
-        name => 'myrepl',
-        cmd_schema => {
-            ls => { 
-                exec => sub {my @list = qw(a b c); print for @list},  # Coderef to custom function for cmd
-            }
-        }
-    }
-);   
-
-## A simple repl
-#my $term = Term::ReadLine::Repl->new(
-#    {
-#        name => 'myrepl',
-#        cmd_schema => {
-#            ls => { 
-#                exec => sub {my @list = qw(a b c); print for @list},  # Coderef to custom function for cmd
-#            }
-#        }
-#    }
-#);   
-
-#print Dumper $term;
-
-$term->run();
-
-
+$repl->run();

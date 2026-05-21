@@ -1,5 +1,13 @@
 Revision history for Data-Path-XS
 
+0.03  2026-04-28
+    - Fix keyword API parent-type dispatch (numeric-looking hash keys)
+    - Fix UTF-8 hash key support across all APIs
+    - Fix tied/magical container error messages
+    - Fix VALIDATE_COMPILED_PATH SvIOK guard against uninit warnings
+    - Add eg/ runnable examples and xt/ author-test suite
+    - Documentation and test coverage improvements
+
 0.02  2026-03-16
     - Fix keyword pathset void context overhead
     - Validate XS::Parse::Keyword::Builder in Makefile.PL

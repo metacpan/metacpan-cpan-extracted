@@ -33,6 +33,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Excel::Writer::XLSX" : "1.12",
             "JSON::Validator" : "5.14",
             "JSON::XS" : "4.03",
             "Path::Tiny" : "0.144",
@@ -50,19 +51,19 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/mrueda/omop-csv-validator/issues"
+         "web" : "https://github.com/CNAG-Biomedical-Informatics/omop-csv-validator/issues"
       },
-      "homepage" : "https://github.com/mrueda/omop-csv-validator",
+      "homepage" : "https://github.com/CNAG-Biomedical-Informatics/omop-csv-validator",
       "license" : [
          "http://www.opensource.org/licenses/artistic-license-2.0"
       ],
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/mrueda/omop-csv-validator.git",
-         "web" : "https://github.com/mrueda/omop-csv-validator"
+         "url" : "https://github.com/CNAG-Biomedical-Informatics/omop-csv-validator.git",
+         "web" : "https://github.com/CNAG-Biomedical-Informatics/omop-csv-validator"
       }
    },
-   "version" : "0.03",
+   "version" : "0.05",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

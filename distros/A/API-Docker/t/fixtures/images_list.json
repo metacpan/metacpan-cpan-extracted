@@ -1,0 +1,28 @@
+[
+  {
+    "Id": "sha256:abc123def456789abc123def456789abc123def456789abc123def456789abcd",
+    "ParentId": "",
+    "RepoTags": ["nginx:latest", "nginx:1.25"],
+    "RepoDigests": ["nginx@sha256:abc123"],
+    "Created": 1705300000,
+    "Size": 187654321,
+    "SharedSize": 75000000,
+    "VirtualSize": 187654321,
+    "Labels": {
+      "maintainer": "NGINX"
+    },
+    "Containers": 2
+  },
+  {
+    "Id": "sha256:def789ghi012345def789ghi012345def789ghi012345def789ghi012345defg",
+    "ParentId": "",
+    "RepoTags": ["redis:7"],
+    "RepoDigests": ["redis@sha256:def789"],
+    "Created": 1705200000,
+    "Size": 130000000,
+    "SharedSize": 50000000,
+    "VirtualSize": 130000000,
+    "Labels": {},
+    "Containers": 1
+  }
+]

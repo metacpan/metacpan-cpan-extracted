@@ -6,11 +6,11 @@ use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use Ref::Util;
 use Scalar::Util;
-use Iterator::Flex::Utils qw( NEXT _SELF );
+use Iterator::Flex::Utils qw( NEXT _SELF throw_failure );
 
 use Role::Tiny;
 use experimental 'signatures';
@@ -65,7 +65,7 @@ Iterator::Flex::Role::Next::ClosedSelf - Role for closure iterator which closes 
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 METHODS
 

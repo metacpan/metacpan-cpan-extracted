@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Project
+  xmlns="http://usefulinc.com/ns/doap#"
+  xmlns:dc="http://purl.org/dc/terms/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  >
+  <name>Net-Statsd-Lite</name>
+  <shortdesc>A StatsD client that supports multimetric packets</shortdesc>
+  <category rdfs:label="client" />
+  <category rdfs:label="StatsD" />
+  <category rdfs:label="metrics" />
+  <category rdfs:label="monitoring" />
+  <developer>
+    <foaf:Person>
+      <foaf:name>Robert Rothenberg</foaf:name>
+      <foaf:mbox rdf:resource="mailto:perl@rhizomnic.com" />
+    </foaf:Person>
+  </developer>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Michael R. Davis</foaf:name>
+      <foaf:mbox rdf:resource="mailto:mrdvt@cpan.org" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Toby Inkster</foaf:name>
+      <foaf:mbox rdf:resource="mailto:tobyink@cpan.org" />
+    </foaf:Person>
+  </helper>
+  <license rdf:resource="http://www.perlfoundation.org/artistic_license_2_0" />
+  <homepage rdf:resource="https://metacpan.org/release/Net-Statsd-Lite" />
+  <bug-database rdf:resource="https://github.com/robrwo/Net-Statsd-Lite/issues" />
+  <repository>
+    <GitRepository>
+      <browse rdf:resource="https://github.com/robrwo/Net-Statsd-Lite" />
+      <location rdf:resource="git://github.com/robrwo/Net-Statsd-Lite.git" />
+    </GitRepository>
+  </repository>
+  <programming-language>Perl</programming-language>
+</Project>

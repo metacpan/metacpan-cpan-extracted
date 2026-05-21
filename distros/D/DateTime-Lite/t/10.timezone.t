@@ -2,15 +2,24 @@
 ##----------------------------------------------------------------------------
 ## Lightweight DateTime Alternative - t/10.timezone.t
 ##----------------------------------------------------------------------------
+BEGIN
+{
+    use strict;
+    use warnings;
+    use lib './lib';
+    use Test::More;
+    use Scalar::Util ();
+    use Time::Local qw( timegm );
+};
+
 use strict;
 use warnings;
-use lib './lib';
-use Test::More;
-use Scalar::Util ();
-use Time::Local qw( timegm );
 
-use_ok( 'DateTime::Lite' ) or BAIL_OUT( 'Cannot load DateTime::Lite' );
-use_ok( 'DateTime::Lite::TimeZone' ) or BAIL_OUT( 'Cannot load DateTime::Lite::TimeZone' );
+BEGIN
+{
+    use_ok( 'DateTime::Lite' ) or BAIL_OUT( 'Cannot load DateTime::Lite' );
+    use_ok( 'DateTime::Lite::TimeZone' ) or BAIL_OUT( 'Cannot load DateTime::Lite::TimeZone' );
+};
 
 # NOTE: Constructor - special zones
 subtest 'Constructor - special zones' => sub
@@ -292,6 +301,23 @@ subtest 'Error handling' => sub
     ok( defined( DateTime::Lite::TimeZone->error ),               'Unknown TZ: error set' );
     like( DateTime::Lite::TimeZone->error . '',
           qr/Unknown time zone/,                                  'Unknown TZ: error message' );
+};
+
+# NOTE: Error handling: unknown arguments
+subtest 'Error handling: unknown arguments' => sub
+{
+    my $tz;
+    {
+        local $SIG{__WARN__} = sub{};
+        $tz = DateTime::Lite::TimeZone->new( name => 'UTC', Names => 'UTC' );
+    }
+    ok( !defined( $tz ), 'new(): unknown arg returns undef' );
+    like( DateTime::Lite::TimeZone->error . '', qr/unknown argument/i, 'new(): error mentions unknown argument' );
+    like( DateTime::Lite::TimeZone->error . '', qr/'Names'/, "new(): error names the offending key" );
+
+    # Valid args still work
+    $tz = DateTime::Lite::TimeZone->new( name => 'UTC' );
+    ok( defined( $tz ), 'new(): valid args still work' );
 };
 
 # NOTE: POSIX footer lookup for future dates beyond stored transitions

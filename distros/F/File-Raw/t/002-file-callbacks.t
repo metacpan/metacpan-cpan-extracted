@@ -241,12 +241,12 @@ subtest 'map_lines empty file' => sub {
 };
 
 # ============================================
-# register_line_callback tests
+# register_predicate tests
 # ============================================
 
 subtest 'register custom callback' => sub {
     # Register a custom predicate
-    File::Raw::register_line_callback('has_vowels', sub {
+    File::Raw::register_predicate('has_vowels', sub {
         shift =~ /[aeiou]/i;
     });
 
@@ -257,26 +257,26 @@ subtest 'register custom callback' => sub {
 };
 
 subtest 'register overwrites existing' => sub {
-    File::Raw::register_line_callback('custom_test', sub { 0 });
+    File::Raw::register_predicate('custom_test', sub { 0 });
     my $r1 = File::Raw::grep_lines($test_file, 'custom_test');
     is(scalar(@$r1), 0, 'first callback matches nothing');
 
-    File::Raw::register_line_callback('custom_test', sub { 1 });
+    File::Raw::register_predicate('custom_test', sub { 1 });
     my $r2 = File::Raw::grep_lines($test_file, 'custom_test');
     is(scalar(@$r2), 9, 'replaced callback matches all');
 };
 
-subtest 'register_line_callback requires coderef' => sub {
-    eval { File::Raw::register_line_callback('bad', 'not a coderef') };
+subtest 'register_predicate requires coderef' => sub {
+    eval { File::Raw::register_predicate('bad', 'not a coderef') };
     like($@, qr/coderef/, 'dies without coderef');
 };
 
 # ============================================
-# list_line_callbacks tests
+# list_predicates tests
 # ============================================
 
-subtest 'list_line_callbacks' => sub {
-    my $list = File::Raw::list_line_callbacks();
+subtest 'list_predicates' => sub {
+    my $list = File::Raw::list_predicates();
     is(ref($list), 'ARRAY', 'returns arrayref');
 
     # Check builtins exist

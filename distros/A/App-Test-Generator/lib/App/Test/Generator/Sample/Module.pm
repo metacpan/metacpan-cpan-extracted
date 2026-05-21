@@ -5,7 +5,7 @@ use warnings;
 use Carp    qw(croak);
 use Readonly;
 
-our $VERSION = '0.33';
+our $VERSION = '0.38';
 
 # --------------------------------------------------
 # Validation constants — centralised so that changes
@@ -26,7 +26,7 @@ Test::App::Generator::Sample::Module - Example module for schema extraction test
 
 =head1 VERSION
 
-Version 0.33
+Version 0.38
 
 =head1 SYNOPSIS
 

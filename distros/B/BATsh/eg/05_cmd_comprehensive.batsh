@@ -181,3 +181,28 @@ ECHO   MKDIR/CD/RMDIR PASS
 
 :: ---------------------------------------------------------------
 ECHO [CMD comprehensive] Done.
+
+:: ----------------------------------------------------------------
+:: 9. Pipeline (|)
+:: ----------------------------------------------------------------
+ECHO [9] Pipeline (pipe via temporary file)
+ECHO hello BATsh | perl -e "while(<STDIN>){chomp;print uc($_).chr(10)}"
+
+:: ----------------------------------------------------------------
+:: 10. SET /P (interactive prompt -- value piped from echo for demo)
+:: ----------------------------------------------------------------
+ECHO [10] SET /P (interactive input demo via echo pipe not available in batch)
+:: SET /P reads from STDIN; in a real script: SET /P NAME=Enter name:
+:: For automated demo we pre-set the variable:
+SET DEMO_NAME=BATsh_User
+ECHO SET /P would store user input; demo value: %DEMO_NAME%
+
+:: ----------------------------------------------------------------
+:: 11. Batch-parameter tilde modifiers (%~dp0, %~n0, %~x0, etc.)
+:: ----------------------------------------------------------------
+ECHO [11] Batch-parameter tilde modifiers
+ECHO   Script path ^(^%0^): %0
+ECHO   Drive+dir  ^(^%~dp0^): %~dp0
+ECHO   Name only  ^(^%~n0^): %~n0
+ECHO   Extension  ^(^%~x0^): %~x0
+ECHO   Full path  ^(^%~f0^): %~f0

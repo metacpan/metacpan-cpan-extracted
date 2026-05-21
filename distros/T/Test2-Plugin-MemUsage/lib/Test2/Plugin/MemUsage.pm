@@ -2,7 +2,7 @@ package Test2::Plugin::MemUsage;
 use strict;
 use warnings;
 
-our $VERSION = '0.002004';
+our $VERSION = '0.002006';
 
 use Test2::API qw/test2_add_callback_exit/;
 
@@ -40,7 +40,7 @@ sub _collect_proc {
     return %mem;
 }
 
-sub ps_command { "ps -o rss=,vsz= -p $$" }
+sub ps_command { "ps -o rss= -o vsz= -p $$" }
 
 sub _collect_ps {
     my $cmd = ps_command();
@@ -74,7 +74,8 @@ sub _collect_win32 {
 }
 
 sub _collector_for_os {
-    my $os = shift // $^O;
+    my $os = shift;
+    $os = $^O unless defined $os;
     return \&_collect_proc  if $os eq 'linux' || $os eq 'cygwin' || $os eq 'gnukfreebsd';
     return \&_collect_ps    if $os eq 'darwin' || $os =~ /bsd$/
                              || $os eq 'solaris' || $os eq 'aix' || $os eq 'hpux';
@@ -94,7 +95,8 @@ sub _augment_peak {
     my %mem = @_;
     return %mem if !exists $mem{peak} || $mem{peak}->[0] ne 'NA';
 
-    my $kb = _maxrss_kb() // return %mem;
+    my $kb = _maxrss_kb();
+    return %mem unless defined $kb;
     $mem{peak} = [$kb, 'kB'];
     return %mem;
 }
@@ -104,7 +106,8 @@ sub collect_mem {
     my %mem = $c ? $c->() : ();
 
     unless (%mem) {
-        my $kb = _maxrss_kb() // return ();
+        my $kb = _maxrss_kb();
+        return () unless defined $kb;
         %mem = _empty_mem();
         $mem{peak} = [$kb, 'kB'];
         return %mem;

@@ -1,3 +1,6 @@
+v0.907.0 2026-05-10 19:47:04+02:00
+ - Turn off cyclic references by default
+
 v0.906.0 2026-04-26 11:12:32+02:00
  - Fix detecting floats in YAML 1.2 Core Schema (issue#125)
 

@@ -9,7 +9,7 @@ use Test::More tests => 2 + (5 * 9 * $Iterations);
 
 BEGIN 
 {
-  require 't/test-lib.pl';
+  require './t/test-lib.pl';
   use_ok('Rose::DB::Object');
   use_ok('Rose::DB::Object::Manager');
 }

@@ -2,7 +2,7 @@ package IPC::Manager::Base::DBI;
 use strict;
 use warnings;
 
-our $VERSION = '0.000035';
+our $VERSION = '0.000037';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
@@ -31,6 +31,11 @@ sub ready_messages   { $_[0]->_get_message_ids ? 1 : 0 }
 sub dbh {
     my $this = shift;
     my (%params) = @_;
+
+    if ($params{dbh}) {
+        $this->{+DBH} = $params{dbh} if blessed($this);
+        return $params{dbh};
+    }
 
     if (blessed($this) && $this->{+DBH}) {
         $this->pid_check;
@@ -71,6 +76,11 @@ sub dbh {
     $this->{+DBH} = $dbh if blessed($this);
 
     return $dbh;
+}
+
+sub route_from_dbh {
+    my ($class_or_self, $dbh) = @_;
+    return "dbi:" . $dbh->{Driver}->{Name} . ":" . $dbh->{Name};
 }
 
 sub init_db {
@@ -114,7 +124,16 @@ sub init {
     my $e   = $self->escape;
 
     if ($row) {
-        my $sth = $dbh->prepare("UPDATE ipcm_peers SET ${e}active${e} = ?, ${e}pid${e} = ? WHERE ${e}id${e} = ?");
+        # Predecessor died without pre_disconnect_hook (SIGKILL etc).
+        # Reap stale inbox + stats; suspended rows (pid IS NULL) are left alone.
+        if ($row->{pid} && !$self->pid_is_running($row->{pid})) {
+            my $del_msgs  = $dbh->prepare("DELETE FROM ipcm_messages WHERE ${e}to${e} = ?")               or die $dbh->errstr;
+            my $clr_stats = $dbh->prepare("UPDATE ipcm_peers SET ${e}stats${e} = NULL WHERE ${e}id${e} = ?") or die $dbh->errstr;
+            $del_msgs->execute($self->{+ID})  or die $dbh->errstr;
+            $clr_stats->execute($self->{+ID}) or die $dbh->errstr;
+        }
+
+        my $sth = $dbh->prepare("UPDATE ipcm_peers SET ${e}active${e} = ?, ${e}pid${e} = ?, ${e}suspend_expires${e} = NULL WHERE ${e}id${e} = ?") or die $dbh->errstr;
         $sth->execute(time, $self->{+PID}, $self->{+ID}) or die $dbh->errstr;
     }
     else {
@@ -168,10 +187,46 @@ sub peers {
 
     my $dbh = $self->dbh;
     my $e   = $self->escape;
-    my $sth = $dbh->prepare("SELECT ${e}id${e} FROM ipcm_peers WHERE ${e}id${e} != ? AND active IS NOT NULL ORDER BY ${e}id${e} ASC") or die $dbh->errstr;
+    my $sth = $dbh->prepare("SELECT ${e}id${e}, ${e}pid${e} FROM ipcm_peers WHERE ${e}id${e} != ? AND active IS NOT NULL ORDER BY ${e}id${e} ASC") or die $dbh->errstr;
     $sth->execute($self->{+ID});
 
-    return map { $_->[0] } @{$sth->fetchall_arrayref([0])};
+    my @out;
+    while (my $row = $sth->fetchrow_arrayref) {
+        my ($id, $pid) = @$row;
+        next if $pid && !$self->pid_is_running($pid);
+        push @out => $id;
+    }
+
+    return @out;
+}
+
+sub peer_left {
+    my $self = shift;
+
+    my $dbh = $self->dbh;
+    my $e   = $self->escape;
+
+    my $sth = $dbh->prepare("SELECT ${e}id${e}, ${e}pid${e} FROM ipcm_peers WHERE ${e}id${e} != ? AND active IS NOT NULL") or die $dbh->errstr;
+    $sth->execute($self->{+ID}) or die $dbh->errstr;
+
+    my @dead;
+    while (my $row = $sth->fetchrow_arrayref) {
+        my ($id, $pid) = @$row;
+        next unless $pid;
+        next if $self->pid_is_running($pid);
+        push @dead => $id;
+    }
+
+    return 0 unless @dead;
+
+    my $del_peers = $dbh->prepare("DELETE FROM ipcm_peers WHERE ${e}id${e} = ?")    or die $dbh->errstr;
+    my $del_msgs  = $dbh->prepare("DELETE FROM ipcm_messages WHERE ${e}to${e} = ?") or die $dbh->errstr;
+    for my $id (@dead) {
+        $del_msgs->execute($id)  or die $dbh->errstr;
+        $del_peers->execute($id) or die $dbh->errstr;
+    }
+
+    return scalar @dead;
 }
 
 sub peer_pid {
@@ -272,17 +327,38 @@ sub pre_disconnect_hook {
 
     my $dbh = $self->dbh;
     my $e   = $self->escape;
-    my $sth = $dbh->prepare("UPDATE ipcm_peers SET ${e}pid${e} = NULL, active = NULL WHERE ${e}id${e} = ?") or die $dbh->errstr;
+    my $sth = $dbh->prepare("UPDATE ipcm_peers SET ${e}pid${e} = NULL, ${e}active${e} = NULL, ${e}suspend_expires${e} = NULL WHERE ${e}id${e} = ?") or die $dbh->errstr;
     $sth->execute($self->{+ID}) or die $dbh->errstr;
 }
 
 sub pre_suspend_hook {
     my $self = shift;
+    my (%params) = @_;
+
+    my $expires_at = $params{expires_at};
 
     my $dbh = $self->dbh;
     my $e   = $self->escape;
-    my $sth = $dbh->prepare("UPDATE ipcm_peers SET ${e}pid${e} = NULL WHERE ${e}id${e} = ?") or die $dbh->errstr;
-    $sth->execute($self->{+ID}) or die $dbh->errstr;
+
+    my $sth = $dbh->prepare("UPDATE ipcm_peers SET ${e}pid${e} = NULL, ${e}suspend_expires${e} = ? WHERE ${e}id${e} = ?") or die $dbh->errstr;
+    $sth->execute(defined($expires_at) ? $expires_at + 0 : undef, $self->{+ID}) or die $dbh->errstr;
+}
+
+sub peer_suspend_expires {
+    my $self = shift;
+    my ($peer_id) = @_;
+    return undef unless defined $peer_id && length $peer_id;
+
+    my $dbh = $self->dbh;
+    my $e   = $self->escape;
+
+    my $sth = $dbh->prepare("SELECT ${e}suspend_expires${e} FROM ipcm_peers WHERE ${e}id${e} = ?") or die $dbh->errstr;
+    $sth->execute($peer_id) or die $dbh->errstr;
+
+    my $row = $sth->fetchrow_arrayref;
+    $sth->finish;
+    return undef unless $row && defined $row->[0];
+    return $row->[0] + 0;
 }
 
 1;
@@ -338,6 +414,33 @@ example mysql and sqlite use '`', but postgresql uses '"'.
 
 Used during spawn to put the necessary tables into the database if they are not
 already present.
+
+You may pass C<< dbh => $dbh >> to reuse an already-connected DBI handle
+instead of having C<init_db> open one from the DSN.
+
+=item $dbh = $class_or_obj->dbh(dbh => $dbh)
+
+=item $dbh = $obj->dbh
+
+=item $dbh = $class->dbh(dsn => $dsn, user => $u, pass => $p, attrs => \%a)
+
+Get the database handle. When called with a C<< dbh => $dbh >> parameter
+the supplied handle is returned (and cached on an instance) without
+consulting the DSN. Without that parameter, an instance returns its cached
+handle if it is still active, otherwise reconnects via C<< DBI->connect >>
+using the instance's stored DSN / user / pass / attrs. As a class method
+this unconditionally opens a fresh connection from the supplied parameters.
+
+=item $route = $class_or_obj->route_from_dbh($dbh)
+
+Reassemble a route from a connected DBI handle. The default builds
+C<< "dbi:$drv:$name" >> from C<< $dbh->{Driver}{Name} >> and
+C<< $dbh->{Name} >>. L<IPC::Manager::Client::SQLite> overrides this to
+return the bare db file path because that is its route format.
+
+This is what C<ipcm_spawn(dbh => $dbh)> calls to derive the route stored on
+the resulting Spawn object's info string. See
+L<IPC::Manager/"Spawning against an existing DBI handle">.
 
 =item $password = $con->pass
 

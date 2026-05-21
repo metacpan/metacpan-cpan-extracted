@@ -4,7 +4,7 @@ use Test2AndUtils;
 use Crypt::SecretBuffer qw( secret NONBLOCK );
 use IO::Handle;
 use File::Temp qw(tempfile);
-use Time::HiRes qw( sleep );
+use Time::HiRes qw( time sleep );
 
 # Test normal file handle reading
 subtest 'append_console_line with file' => sub {
@@ -116,6 +116,98 @@ subtest 'parent/child pipe communication' => sub {
    close($read_fh);
 };
 
+subtest unicode => sub {
+   my ($read_fh, $write_fh)= pipe_with_data();
+
+   my $pid = fork();
+   die "Cannot fork: $!" unless defined $pid;
+
+   if ($pid == 0) {
+      # Child process
+      binmode($write_fh, ':encoding(utf-8)');
+      print $write_fh "unicode \x{100} \x{1000}\n";
+      exit(0);
+   }
+
+   # Parent process
+   my $buf = Crypt::SecretBuffer->new();
+   my $result = $buf->append_console_line($read_fh, utf8 => 1);
+
+   is($result, T, 'append_console_line returns true when reading from child process pipe');
+   note 'contents: "'.$buf->unmask_to(\&escape_nonprintable).'"';
+   is($buf->span(encoding => 'UTF-8')->cmp("unicode \x{100} \x{1000}"), 0,
+      'buffer contains correct utf8 data from child process');
+   waitpid($pid, 0);
+   close($read_fh);
+};
+
+use Socket qw(AF_UNIX SOCK_STREAM PF_UNSPEC );
+subtest 'timeout loop' => sub {
+   pipe(my $input_r,  my $input_w) or die "Cannot create pipe: $!";
+   # Use socketpair for control because it is select()able on Win32
+   socketpair(my $parent, my $child, AF_UNIX, SOCK_STREAM, PF_UNSPEC)
+      or die "socketpair: $!";
+   $_->autoflush(1) for $input_w, $parent, $child;
+   
+   my $ppid= $$;
+   my $pid = fork();
+   die "Cannot fork: $!" unless defined $pid;
+   if ($pid == 0) {
+      # Child process (or thread on Win32)
+      $input_w->print("secret ");
+      sleep 1;
+      $input_w->print("from child process\n");
+      # Wait up to 10 seconds for message from main thread
+      # that the test is done, else kill parent process.
+      my $rfd= '';
+      vec($rfd, fileno($child), 1)= 1;
+      my $n= select($rfd, undef, undef, 10);
+      if ($n <= 0) {
+         # timeout.  stop parent from hanging forever.
+         note "child killing parent";
+         kill TERM => $ppid;
+      }
+      note "child exits cleanly";
+      exit 0;
+   }
+
+   # Parent process
+   pipe(my $prompt_r, my $prompt_w) or die "Cannot create pipe: $!";
+   my $buf = Crypt::SecretBuffer->new();
+   my $timeouts= 0;
+   my $result;
+   my %state;
+   while (1) {
+      my $start_t= time;
+      $!= 0;
+      $result = $buf->append_console_line(
+         input_fh => $input_r, prompt_fh => $prompt_w,
+         prompt => 'password: ',
+         timeout => .2, state => \%state
+      );
+      note sprintf("append_console_line = %s, errno = %s, chars = %d, elapsed %.3f",
+         (defined $result? $result : '<undef>'), $!, $buf->length, (time - $start_t));
+      last if defined $result or !$!{EINTR};
+      ++$timeouts;
+   }
+
+   is($result, T, 'append_console_line returns true when reading from child process pipe');
+   ok($timeouts > 0, 'more than one timeout');
+   is($buf->length, 25, 'buffer contains correct number of characters from child process');
+   $prompt_w->close;
+   my $prompt_buf= do { local $/; <$prompt_r> };
+   is( $prompt_buf, "password: \n", 'prompt got written once' );
+
+   $buf->{stringify_mask} = undef;
+   is("$buf", 'secret from child process', 'content from child process is correct');
+
+   # inform child that we can exit cleanly
+   note "send done";
+   send($parent, "done", 0);
+   note "waitpid...\n";
+   waitpid($pid, 0) or die "waitpid: $!";
+   is( $?, 0, 'child exited cleanly' );
+};
 
 # Main test block for TTY functionality
 subtest 'TTY functionality' => sub {

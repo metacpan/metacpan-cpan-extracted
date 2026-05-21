@@ -8,8 +8,8 @@ $| = 1;
 
 my $ch;
 $ch = EV::ClickHouse->new(
-    host            => $ENV{CLICKHOUSE_HOST} // '127.0.0.1',
-    port            => $ENV{CLICKHOUSE_PORT} // 8123,
+    host            => $ENV{CLICKHOUSE_HOST} // $ENV{TEST_CLICKHOUSE_HOST} // '127.0.0.1',
+    port            => $ENV{CLICKHOUSE_PORT} // $ENV{TEST_CLICKHOUSE_PORT} // 8123,
     connect_timeout => 5,
     on_connect => sub { print "Connected\n" },
     on_error   => sub {

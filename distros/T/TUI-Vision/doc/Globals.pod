@@ -1,0 +1,236 @@
+=pod
+
+=head1 GLOBAL VARIABLES
+
+This document lists global variables used across the TUI framework.
+
+It is divided into two sections:
+
+=over 4
+
+=item * A grouped overview for orientation
+
+=item * A complete alphabetical reference table
+
+=back
+
+The alphabetical table is the authoritative source.
+
+=head1 GROUPED OVERVIEW
+
+This section provides a conceptual overview of important groups of global
+variables. Each entry includes a short description to give immediate
+context. For a complete and authoritative inventory, see the
+alphabetical reference table below.
+
+=head2 Application and Desktop
+
+These variables represent the global application state and the top-level
+UI containers. They define the structural backbone of a running TUI
+application.
+
+ $application        Current application instance
+ $deskTop            Desktop container reference
+ $menuBar            Menu bar reference
+ $statusLine         Status line reference
+ $pending            Pending event object
+
+=head2 Screen and Display
+
+These variables describe the current screen configuration, cursor
+behavior and low-level display state. They are maintained by the screen
+driver and affect how views are rendered and updated.
+
+ $screenWidth        Current screen width in characters
+ $screenHeight       Current screen height in characters
+ $screenMode         Active screen mode (color, mono, resolution)
+ $screenBuffer       Internal screen buffer storage
+ $startupMode        Screen mode active at program startup
+ $startupCursor      Cursor state at program startup
+ $cursorLines        Cursor shape definition
+ $checkSnow          Snow check flag for screen output
+ $clearOnSuspend     Clear screen when application is suspended
+ $hiResScreen        High resolution screen mode flag
+
+=head2 Event and Input Handling
+
+This group tracks the current input state and supports event processing.
+Most variables are maintained by the event queue and input drivers.
+
+ $curMouse           Current mouse state
+ $lastMouse          Previous mouse state
+ $downMouse          Mouse button down state
+ $downTicks          Tick counter since mouse button press
+ $autoDelay          Auto-repeat start delay
+ $autoTicks          Auto-repeat tick counter
+ $doubleDelay        Double-click delay
+ $repeatDelay        Auto-repeat delay
+
+=head2 Mouse Support
+
+These variables reflect the availability and configuration of mouse
+hardware and drivers. They allow the framework to adapt to different
+hardware capabilities.
+
+ $mouse              Mouse driver instance
+ $mouseEvents        Mouse events enabled flag
+ $mouseReverse       Reversed mouse button mapping flag
+ $buttonCount        Number of detected mouse buttons
+ $handlerInstalled   Mouse handler installed flag
+ $noMouse            Mouse hardware unavailable flag
+
+=head2 Dialogs and Text Resources
+
+This group contains shared text resources used by dialogs and message
+boxes. Centralizing these variables ensures consistent wording across
+the user interface.
+
+ $okText             OK button label
+ $cancelText         Cancel button label
+ $confirmText        Confirmation dialog title
+ $informationText    Information dialog title
+ $warningText        Warning dialog title
+ $errorText          Error dialog title
+ $exitText           Exit command label
+
+=head1 COMPLETE ALPHABETICAL REFERENCE
+
+The following table lists all global variables used across the framework,
+sorted alphabetically by variable name. This table is the authoritative
+inventory.
+
+  Name                 Module                 Description
+  -------------------  ---------------------  ----------------------------------
+  %ITEMS               TNSCollection          Internal collection items storage
+
+  @consoleHandle       HardwareInfo::Win32    Console handle list
+  @crInfo              HardwareInfo::Win32    Console cursor information
+  @irBuffer            HardwareInfo::Win32    Input record buffer
+  @sbInfo              HardwareInfo::Win32    Screen buffer information
+
+  $amText              TFileInfoPane          AM time indicator
+  $appPalette          TProgram               Active application palette index
+  $application         TProgram               Current application instance
+  $autoDelay           TEventQueue            Auto-repeat start delay
+  $autoTicks           TEventQueue            Auto-repeat tick counter
+
+  $button              TCheckBoxes            Checkbox item pattern
+  $button              TRadioButtons          Radio button item pattern
+  $buttonCount         THWMouse               Number of detected mouse buttons
+
+  $cancelText          MsgBoxText             Cancel button label
+  $changeDirTitle      TChDirDialog           Dialog title text
+  $checkSnow           TScreen                Snow check flag for screen output
+  $chdirText           TChDirDialog           Change directory action label
+  $clearOnSuspend      TScreen                Clear screen on suspend flag
+  $clearText           TFileDialog            Clear action label
+  $closeIcon           TFrame                 Close window icon
+  $commandSetChanged   TView                  Command set modified flag
+  $confirmText         MsgBoxText             Confirmation dialog title
+  $consoleMode         HardwareInfo::Win32    Current console mode flags
+  $ctrlBreakHit        TSystemError           Ctrl-Break interrupt detected
+  $curCommandSet       TView                  Current default command set
+  $curMouse            TEventQueue            Current mouse state
+  $cursorLines         TScreen                Cursor shape definition
+
+  $defaultBkgrnd       TDeskTop               Default desktop background char
+  $deskTop             TProgram               Desktop container reference
+  $dirNameText         TChDirDialog           Directory name label
+  $dirTreeText         TChDirDialog           Directory tree label
+  $doubleDelay         TEventQueue            Double-click delay
+  $downMouse           TEventQueue            Mouse-down state
+  $downTicks           TEventQueue            Ticks since mouse press
+  $dragIcon            TFrame                 Drag window icon
+  $drives              TDirListBox            Drives label text
+  $drivesText          TChDirDialog           Drives label
+
+  $emptyText           TListViewer            Empty list placeholder text
+  $errorAttr           TView                  Error display attribute
+  $errorText           MsgBoxText             Error dialog title
+  $exitText            TProgram               Exit command label text
+
+  $filesText           TFileDialog            Files section label
+  $firstDir            TDirListBox            First directory tree element
+  $frameChars          TFrame                 Frame drawing characters
+  $frameChars          TMenuView              Menu frame drawing characters
+
+  $graphics            TDirListBox            Directory tree graphics characters
+
+  $handlerInstalled    THWMouse               Mouse handler installed flag
+  $helpText            TChDirDialog           Help label
+  $hChars              TScrollBar             Horizontal scrollbar characters
+  $hiResScreen         TScreen                High resolution screen flag
+  $hintSeparator       TStatusLine            Hint separator text
+  $historyBlock        HistList               History storage reference
+  $historySize         HistList               Initial history size
+  $historyUsed         HistList               Used history entries count
+
+  $icon                THistory               History indicator icon
+  $informationText     MsgBoxText             Information dialog title
+  $initFrame           TFrame                 Frame initialization table
+  $insertState         HardwareInfo::Win32    Insert/overwrite input mode
+  $invalidDriveText    TFileDialog            Invalid drive message
+  $invalidFileText     TFileDialog            Invalid file message
+  $invalidText         TChDirDialog           Invalid directory message
+
+  $lastDir             TDirListBox            Last directory tree element
+  $lastMouse           TEventQueue            Previous mouse state
+  $leftArrow           TInputLine             Left overflow indicator
+
+  $markers             TButton                Button marker characters
+  $menuBar             TProgram               Menu bar reference
+  $middleDir           TDirListBox            Middle directory tree element
+  $minWinSize          TWindow                Minimum window size
+  $months              TFileInfoPane          Month name list
+  $mouse               TEventQueue            Mouse driver instance
+  $mouseEvents         TEventQueue            Mouse events enabled flag
+  $mouseReverse        TEventQueue            Reversed mouse buttons flag
+  $noMouse             THWMouse               Mouse hardware unavailable flag
+
+  $okText              MsgBoxText             OK button label
+  $okText              TChDirDialog           OK button label
+  $okText              TFileDialog            OK button label
+  $openText            TFileDialog            Open action label
+  $ownerGroup          TGroup                 Current owner group reference
+  $ownsConsole         HardwareInfo::Win32    Console ownership flag
+
+  $pathDir             TDirListBox            Path directory prefix graphics
+  $pending             TProgram               Pending event object
+  $pendingEvent        HardwareInfo::Win32    Pending console event indicator
+  $platform            HardwareInfo::Win32    Platform identifier string
+  $pmText              TFileInfoPane          PM time indicator
+
+  $repeatDelay         TEventQueue            Auto-repeat delay
+  $revertText          TChDirDialog           Revert action label
+  $rightArrow          TInputLine             Right overflow indicator
+
+  $saveCtrlBreak       TSystemError           Saved Ctrl-Break state
+  $screenBuffer        TScreen                Screen buffer storage
+  $screenHeight        TScreen                Screen height in characters
+  $screenMode          TScreen                Current screen mode
+  $screenWidth         TScreen                Screen width in characters
+  $shadowAttr          TView                  Shadow attribute
+  $shadowSize          TView                  Default shadow size
+  $shadows             TButton                Button shadow characters
+  $showMarkers         TView                  Marker visibility flag
+  $specialChars        TView                  Special navigation characters
+  $startupCursor       TScreen                Startup cursor state
+  $startupMode         TScreen                Startup screen mode
+  $statusLine          TProgram               Status line reference
+
+  $tooManyFiles        TFileList              Too many files message
+
+  $unZoomIcon          TFrame                 Unzoom window icon
+
+  $vChars              TScrollBar             Vertical scrollbar characters
+
+  $warningText         MsgBoxText             Warning dialog title
+  $zoomIcon            TFrame                 Zoom window icon
+
+=head1 SEE ALSO
+
+L<TUI::Manual::Reference::Constants>,
+L<TUI::Manual::Reference::Events>,
+L<TUI::Manual::Reference::Screen>
+
+=cut

@@ -1,13 +1,14 @@
 package Crypt::DSA::Util;
 
 use strict;
+use warnings;
 use Math::BigInt 1.78 try => 'GMP, Pari';
 use Crypt::URandom qw (urandom);
 
 use Fcntl;
 use Carp qw( croak );
 
-our $VERSION = '1.19'; #VERSION
+our $VERSION = '1.20'; #VERSION
 
 use vars qw( $VERSION @ISA @EXPORT_OK );
 use Exporter;
@@ -82,7 +83,7 @@ sub isprime_algorithms_with_perl {
 	while $p2 <= $n1;
     $p2 /= 2;
 
-    # number of interations:  5 for 260-bit numbers, go up to 25 for smaller
+    # number of iterations:  5 for 260-bit numbers, go up to 25 for smaller
     my $last_witness = 5;
     $last_witness += (260 - $p2index) / 13 if $p2index < 260;
 

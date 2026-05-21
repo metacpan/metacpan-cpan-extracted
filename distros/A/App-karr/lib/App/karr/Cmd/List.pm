@@ -1,7 +1,7 @@
 # ABSTRACT: List tasks with filtering and sorting
 
 package App::karr::Cmd::List;
-our $VERSION = '0.102';
+our $VERSION = '0.205';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -10,6 +10,7 @@ use MooX::Options (
 use App::karr::Role::BoardAccess;
 use App::karr::Role::Output;
 use App::karr::Task;
+use App::karr::Config;
 
 with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output';
 
@@ -102,10 +103,7 @@ sub execute {
 
 sub _load_tasks {
   my ($self) = @_;
-  my $dir = $self->tasks_dir;
-  return () unless $dir->exists;
-  my @files = sort $dir->children(qr/\.md$/);
-  return map { App::karr::Task->from_file($_) } @files;
+  return $self->load_tasks;
 }
 
 sub _filter {
@@ -113,7 +111,7 @@ sub _filter {
   my @filtered = @$tasks;
 
   # Exclude archived by default
-  @filtered = grep { $_->status ne 'archived' } @filtered;
+  @filtered = grep { !App::karr::Config->is_terminal_status($_->status) } @filtered;
 
   if ($self->status) {
     my %statuses = map { $_ => 1 } split /,/, $self->status;
@@ -153,8 +151,8 @@ sub _sort {
   if ($field eq 'id') {
     @sorted = sort { $a->id <=> $b->id } @$tasks;
   } elsif ($field eq 'priority') {
-    my %pri = (low => 0, medium => 1, high => 2, critical => 3);
-    @sorted = sort { ($pri{$a->priority} // 0) <=> ($pri{$b->priority} // 0) } @$tasks;
+    my %pri = App::karr::Config->priority_order;
+    @sorted = sort { ($pri{$a->priority} // 2) <=> ($pri{$b->priority} // 2) } @$tasks;
   } else {
     @sorted = sort { ($a->$field // '') cmp ($b->$field // '') } @$tasks;
   }
@@ -176,7 +174,7 @@ App::karr::Cmd::List - List tasks with filtering and sorting
 
 =head1 VERSION
 
-version 0.102
+version 0.205
 
 =head1 SYNOPSIS
 
@@ -226,11 +224,11 @@ L<App::karr::Cmd::Create>, L<App::karr::Cmd::Pick>
 =head2 Issues
 
 Please report bugs and feature requests on GitHub at
-L<https://github.com/Getty/p5-app-karr/issues>.
+L<https://github.com/Getty/karr/issues>.
 
 =head2 IRC
 
-Join C<#ai> on C<irc.perl.org> or message Getty directly.
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -238,7 +236,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

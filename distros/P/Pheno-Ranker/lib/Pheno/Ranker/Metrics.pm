@@ -6,9 +6,6 @@ use autodie;
 use feature qw(say);
 
 #use Data::Dumper;
-use File::HomeDir;
-use File::Path            qw(make_path);
-use File::Spec::Functions qw(catdir);
 use Math::CDF             qw(pnorm pbinom);
 use Statistics::Descriptive;
 
@@ -18,16 +15,30 @@ our @EXPORT =
 
 use constant DEVEL_MODE => 0;
 
-# Define a hidden directory in the user's home for Inline's compiled code
-my $inline_dir = catdir( File::HomeDir->my_home, '.Inline' );
+BEGIN {
+    require Config;
+    require File::HomeDir;
+    require File::Path;
+    require File::Spec::Functions;
+    require Inline;
 
-# Create the directory if it does not exist
-unless ( -d $inline_dir ) {
-    make_path($inline_dir) or die "Cannot create directory $inline_dir: $!";
+    # Define a hidden directory in the user's home for Inline's compiled code.
+    # Include the distribution, Perl version, and architecture to avoid reusing
+    # cached Inline objects compiled for a different Perl ABI.
+    my $inline_dir = File::Spec::Functions::catdir(
+        File::HomeDir->my_home,
+        '.Inline',
+        'Pheno-Ranker',
+        "perl-$Config::Config{version}",
+        $Config::Config{archname}
+    );
+
+    File::Path::make_path($inline_dir)
+      unless -d $inline_dir;
+
+    # Configure Inline C before the compile-time Inline binding below.
+    Inline->import( C => Config => directory => $inline_dir );
 }
-
-# Configure Inline C to use this directory
-use Inline C => Config => directory => $inline_dir;
 
 # Inline C implementation using XS style (old-style syntax)
 use Inline C => <<'END_C';

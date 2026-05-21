@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::Needs { 'LWP::UserAgent' => '6.37' };
+use Test::Needs {'LWP::UserAgent' => '6.37'};
 
 use Test::More tests => 45;
 use lib 't/lib';
@@ -12,7 +12,7 @@ use File::Temp qw(tempfile);
 use MIME::Base64;
 
 my $daemon = TestServer::BasicTests->new;
-my $base = $daemon->start;
+my $base   = $daemon->start;
 
 note "Will access HTTP server at $base\n";
 
@@ -30,7 +30,7 @@ $req->header(X_Foo => "Bar");
 $res = $ua->request($req);
 
 ok($res->is_error);
-is($res->code,    404);
+is($res->code, 404);
 like($res->message, qr/not\s+found/i);
 
 # we also expect a few headers
@@ -61,20 +61,20 @@ ok($res->is_success);
 is($res->code,    200);
 is($res->message, "OK");
 
-$_      = $res->content;
+$_ = $res->content;
 my @accept = /^Accept:\s*(.*)/mg;
 
-like($_,      qr/^From:\s*gisle\@aas\.no\n/m);
-like($_,      qr/^Host:/m);
+like($_, qr/^From:\s*gisle\@aas\.no\n/m);
+like($_, qr/^Host:/m);
 is(scalar @accept, 3);
-like($_,      qr/^Accept:\s*text\/html/m);
-like($_,      qr/^Accept:\s*text\/plain/m);
-like($_,      qr/^Accept:\s*image\/\*/m);
-like($_,      qr/^If-Modified-Since:\s*\w{3},\s+\d+/m);
-like($_,      qr/^Long-Text:\s*This.*broken between/m);
-like($_,      qr/^Foo-Bar:\s*1\n/m);
-like($_,      qr/^X-Foo:\s*Bar\n/m);
-like($_,      qr/^User-Agent:\s*Mozilla\/0.01/m);
+like($_, qr/^Accept:\s*text\/html/m);
+like($_, qr/^Accept:\s*text\/plain/m);
+like($_, qr/^Accept:\s*image\/\*/m);
+like($_, qr/^If-Modified-Since:\s*\w{3},\s+\d+/m);
+like($_, qr/^Long-Text:\s*This.*broken between/m);
+like($_, qr/^Foo-Bar:\s*1\n/m);
+like($_, qr/^X-Foo:\s*Bar\n/m);
+like($_, qr/^User-Agent:\s*Mozilla\/0.01/m);
 
 # Try it with the higher level 'get' interface
 $res = $ua->get(
@@ -86,14 +86,15 @@ $res = $ua->get(
 );
 
 #$res->dump;
-is($res->code,    200);
+is($res->code, 200);
 like($res->content, qr/^From: gisle\@aas.no$/m);
 
 #----------------------------------------------------------------
 note "Send file...\n";
 
 {
-    my ($fh, $filename) = tempfile( 'http-daemon-test-XXXXXX', TMPDIR => 1, SUFFIX => '.html' );
+    my ($fh, $filename)
+        = tempfile('http-daemon-test-XXXXXX', TMPDIR => 1, SUFFIX => '.html');
     binmode $fh;
     print $fh <<"EOT";
 <html><title>En pr\xF8ve</title>
@@ -103,7 +104,8 @@ er sikkert nok i massevis.
 EOT
     close $fh;
 
-    $req = HTTP::Request->new(GET => $daemon->url("/file", { file => $filename }));
+    $req
+        = HTTP::Request->new(GET => $daemon->url("/file", {file => $filename}));
     $res = $ua->request($req);
 
     #print $res->as_string;
@@ -112,7 +114,7 @@ EOT
     is($res->content_type,   'text/html');
     is($res->content_length, 147);
     is($res->title,          "En pr\xF8ve");
-    like($res->content,      qr/\xE5 v\xE6re/);
+    like($res->content, qr/\xE5 v\xE6re/);
 
     unlink $filename;
 
@@ -162,6 +164,7 @@ is($res->code, 401);
 $auth = MIME::Base64::encode("user:passwd");
 
 $req->header(Authorization => 'Basic ' . $auth);
+
 # Then illegal credentials
 $res = $ua->request($req);
 is($res->code, 401);
@@ -211,5 +214,5 @@ note "Terminating server...\n";
 $req = HTTP::Request->new(GET => $daemon->url("/quit"));
 $res = $ua->request($req);
 
-is($res->code,    503);
+is($res->code, 503);
 like($res->content, qr/Bye, bye/);

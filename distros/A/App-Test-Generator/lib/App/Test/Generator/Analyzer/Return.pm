@@ -14,11 +14,11 @@ Readonly my $WEIGHT_RETURNS_PROPERTY => 20;
 Readonly my $WEIGHT_RETURNS_SELF     => 15;
 Readonly my $WEIGHT_RETURNS_CONSTANT => 10;
 
-our $VERSION = '0.33';
+our $VERSION = '0.38';
 
 =head1 VERSION
 
-Version 0.33
+Version 0.38
 
 =head1 DESCRIPTION
 
@@ -151,7 +151,7 @@ sub analyze {
 	# --------------------------------------------------
 	# Detect: return of a constant literal — quoted string,
 	# numeric literal, or undef. All indicate the method
-	# returns a fixed value rather than computed state.
+	# returns a fixed value rather than a computed state.
 	# --------------------------------------------------
 	if($source =~ /return\s+(?:['"\d]|undef\b)/) {
 		$method->add_evidence(
@@ -163,5 +163,15 @@ sub analyze {
 
 	return;
 }
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright 2025-2026 Nigel Horne.
+
+Usage is subject to GPL2 licence terms.
+If you use it,
+please let me know.
+
+=cut
 
 1;

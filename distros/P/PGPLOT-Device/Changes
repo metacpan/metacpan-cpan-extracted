@@ -1,5 +1,18 @@
 Revision history for PGPLOT-Device
 
+0.14      2026-04-27 11:10:15 EDT
+
+
+  [ENHANCEMENT]
+
+    * new class method, devices(), returns a list of available PGPLOT
+      devices.
+
+  [BUILD]
+
+    * test failed if /xs and /xw devices were not available.
+
+
 0.13      2026-03-30 14:47:47 EDT
 
   [BACKINCOMPAT]

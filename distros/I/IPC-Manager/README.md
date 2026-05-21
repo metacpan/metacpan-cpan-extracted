@@ -93,6 +93,7 @@ for you:
 - $ipcm = ipcm\_spawn(protocol => $PROTOCOL)
 - $ipcm = ipcm\_spawn(protocols => \\@PROTOCOLS)
 - $ipcm = ipcm\_spawn(serializer => 'JSON', guard => 1, signal => $SIGNAL)
+- $ipcm = ipcm\_spawn(dbh => $dbh)
 
     This will create a new data store for IPC. By default it will be temporary and
     will be destroyed when the $ipcm object falls out of scope.
@@ -125,6 +126,40 @@ for you:
     list: `protocols => [ 'AtomicPipe', 'UnixSocket', 'PostgreSQL', ... ]`.
     The first viable protocol will be used.
 
+    **Spawning against an existing DBI handle.**
+    For DBI-backed protocols you may pass `dbh => $dbh` instead of letting
+    the protocol bootstrap its own database. The protocol is auto-detected from
+    `$dbh->{Driver}{Name}` using this map:
+
+        Pg      -> IPC::Manager::Client::PostgreSQL
+        MariaDB -> IPC::Manager::Client::MariaDB
+        mysql   -> IPC::Manager::Client::MariaDB   (see DBD::mysql note below)
+        SQLite  -> IPC::Manager::Client::SQLite
+
+    You can still pass `protocol => $CLASS` alongside `dbh => $dbh` to
+    override the auto-detection.
+
+    `ipcm_spawn` runs `init_db` against the supplied handle to create the
+    `ipcm_peers` and `ipcm_messages` tables, then returns a Spawn object whose
+    route is reassembled from `$dbh->{Driver}{Name}` and `$dbh->{Name}`
+    so that the `$ipcm->info` string is still usable by peers reconnecting
+    from another process (each peer constructs its own DBI handle from the
+    reassembled DSN — the in-process handle is not, and cannot be, shared
+    across processes).
+
+    Useful for embedding IPC::Manager inside an application that already owns a
+    DBI connection without forcing it to bootstrap a separate one (e.g. you
+    already have a long-lived $dbh in a web app and want to use the same
+    database for IPC).
+
+    **DBD::mysql note.**
+    `IPC::Manager::Client::MySQL` is built against [DBD::MariaDB](https://metacpan.org/pod/DBD%3A%3AMariaDB), not
+    [DBD::mysql](https://metacpan.org/pod/DBD%3A%3Amysql). If you happen to pass in a `$dbh` whose driver name is
+    `mysql`, it is tolerated — the auto-detect map points it at the MariaDB
+    client class and things will normally work — but `DBD::mysql` is not in
+    the dependency list and is not exercised by the test suite, so this path
+    is best-effort only. Prefer [DBD::MariaDB](https://metacpan.org/pod/DBD%3A%3AMariaDB).
+
     The object returned is an instance of [IPC::Manager::Spawn](https://metacpan.org/pod/IPC%3A%3AManager%3A%3ASpawn).
 
 - $con = ipcm\_connect($name => $info)
@@ -148,6 +183,19 @@ for you:
     chosen protocol are subject to the serializer's encoding (e.g. zstd
     compression). The route is protocol specific, it may be a file, a directory,
     a DBI DSN string, etc.
+
+- $con = ipcm\_connect($name, undef, dbh => $dbh)
+- $con = ipcm\_reconnect($name, undef, dbh => $dbh)
+
+    For DBI-backed protocols you may pass a pre-connected `$dbh` in place of an
+    `$info` string. The protocol is auto-detected from `$dbh->{Driver}{Name}`
+    (same map as documented under `ipcm_spawn`), the route is reassembled from
+    `$dbh->{Driver}{Name} + $dbh->{Name}` for storage in the resulting
+    Client object, and the Client reuses the supplied handle directly instead of
+    calling `DBI->connect`.
+
+    The same `DBD::mysql`-is-tolerated-not-supported caveat applies — see the
+    `ipcm_spawn` section above.
 
 - $con = ipcm\_reconnect($name => $info)
 

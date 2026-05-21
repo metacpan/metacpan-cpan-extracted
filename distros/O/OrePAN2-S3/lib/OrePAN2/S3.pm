@@ -4,32 +4,35 @@ use strict;
 use warnings;
 
 use Amazon::Credentials;
-use Amazon::S3;
-use Archive::Tar;
+use Amazon::S3::Lite;
 use Carp;
-use Carp::Always;
+use CLI::Simple::Utils qw(choose);
+use CLI::Simple::Constants qw(:booleans);
 use Data::Dumper;
-use DarkPAN::Utils qw(parse_distribution_path);
-use DarkPAN::Utils::Docs;
 use English qw(-no_match_vars);
+use Encode qw(encode_utf8);
 use File::Basename qw(basename);
 use File::Temp qw(tempfile);
 use JSON;
-use OrePAN2::Index;
+use List::Util qw(pairs);
 use Scalar::Util qw(openhandle);
-use Template;
-use YAML;
 
 use Readonly;
 
 Readonly::Scalar our $PACKAGE_INDEX  => '02packages.details.txt.gz';
 Readonly::Scalar our $DEFAULT_CONFIG => $ENV{HOME} . '/.orepan2-s3.json';
-Readonly::Scalar our $TRUE           => 1;
-Readonly::Scalar our $FALSE          => 0;
+Readonly::Scalar our $METACPAN_URL   => 'https://metacpan.org/pod';
+Readonly::Scalar our $AUTHOR_PATH    => 'D/DU/DUMMY';
+
+use Role::Tiny::With;
+
+with 'OrePAN2::S3::Role::Inject';
+with 'OrePAN2::S3::Role::Delete';
+with 'OrePAN2::S3::Role::UploadArtifacts';
 
 use parent qw(CLI::Simple);
 
-our $VERSION = '1.0.4';
+our $VERSION = '1.2.1';
 
 __PACKAGE__->use_log4perl( level => 'info' );
 
@@ -60,6 +63,34 @@ sub slurp_file {
     if $json;
 
   return wantarray ? split /\n/xsm, $content : $content;
+}
+
+########################################################################
+sub write_config {
+########################################################################
+  my ( $self, $config ) = @_;
+
+  my $file = $self->get_config_file;
+
+  croak "ERROR: no config file set or config not found\n"
+    if !$file || !-e $file;
+
+  croak "ERROR: $file is not writable\n"
+    if !-w $file;
+
+  my $full_config = slurp_file( $file, $TRUE );  # slurp as JSON
+  my $profile_name //= $self->get_profile_name // 'default';
+
+  $full_config->{$profile_name} = $config;
+
+  open my $fh, '>', $file
+    or croak "ERROR: Could not open $file for writing: $OS_ERROR\n";
+
+  print {$fh} JSON->new->pretty->encode($full_config);
+
+  close $fh;
+
+  return;
 }
 
 ########################################################################
@@ -98,56 +129,54 @@ sub fetch_config {
 }
 
 ########################################################################
-sub get_bucket {
+sub init_s3 {
 ########################################################################
   my ($self) = @_;
 
-  my $config = $self->get_config;
-
-  my ( $bucket_name, $prefix, $profile ) = @{ $config->{AWS} }{qw(bucket prefix profile)};
-
-  my $s3 = $self->get_s3;
-
+  my $config      = $self->get_config;
   my $credentials = $self->get_credentials;
 
-  if ( !$s3 ) {
-    $s3 = Amazon::S3->new( credentials => $credentials );
-    $self->set_s3($s3);
-  }
+  my $region = $config->{AWS}{region} // $credentials->get_region // $ENV{AWS_REGION} // $ENV{AWS_DEFAULT_REGION}
+    // 'us-east-1';
 
-  return $s3->bucket($bucket_name);
+  my $s3 = Amazon::S3::Lite->new(
+    { region      => $region,
+      credentials => $credentials,
+    }
+  );
+
+  $self->set_s3($s3);
+
+  return;
 }
 
 ########################################################################
 sub fetch_orepan_index {
 ########################################################################
-  my ( $self, $unlink ) = @_;
-
-  $unlink //= $TRUE;
+  my ($self) = @_;
 
   my ( $fh, $filename ) = tempfile(
     'XXXXXX',
     SUFFIX => '.gz',
-    UNLINK => $unlink,
+    UNLINK => $FALSE,
   );
 
   my $config = $self->get_config;
 
-  my $object = sprintf '%s/modules/%s', $config->{AWS}->{prefix}, $PACKAGE_INDEX;
-
-  my $bucket = $self->get_bucket;
-  $bucket->get_key_filename( $object, GET => $filename );
+  my $key = sprintf '%s/modules/%s', $config->{AWS}{prefix}, $PACKAGE_INDEX;
+  $self->get_s3->get_object( $self->get_bucket_name, $key, filename => $filename );
 
   return $filename;
 }
 
 ########################################################################
-sub invalidate_index {
+sub cmd_invalidate_index {
 ########################################################################
   my ($self) = @_;
 
-  # TBD
-  return;
+  warn "Not implemented yet\n";
+
+  return $SUCCESS;
 }
 
 ########################################################################
@@ -183,22 +212,99 @@ sub _upload_html {
   croak sprintf '%s not found', $file
     if !ref $file && !-e $file;
 
-  my $attr = { 'content-type' => 'text/html' };
+  my $content = ref $file ? ${$file} : slurp_file($file);
+  my $encoded = encode_utf8($content);
+  $self->get_s3->put_object( $self->get_bucket_name, $key, $encoded, content_type => 'text/html', );
 
-  my $bucket = $self->get_bucket();
+  return;
+}
 
-  if ( ref $file ) {
-    $bucket->add_key( $key, ${$file}, $attr );
-  }
-  else {
-    $bucket->add_key_filename( $key, $file, $attr );
-  }
+# should be a method of OrePAN2::Index (someday)
+########################################################################
+sub _packages_for_archive {
+########################################################################
+  my ( $self, $index, $archive_path ) = @_;
+
+  return grep {
+    my ( undef, $path ) = $index->lookup($_);
+    $path eq $archive_path;
+  } $index->packages;
+}
+
+########################################################################
+sub update_index {
+########################################################################
+  my ( $self, $code ) = @_;
+
+  require IO::Compress::Gzip;
+  require OrePAN2::Index;
+
+  my $config = $self->get_config;
+  my $prefix = $config->{AWS}{prefix};
+
+  my $index_file = $self->fetch_orepan_index;
+  my $index      = OrePAN2::Index->new;
+  $index->load($index_file);
+  unlink $index_file;
+
+  $code->($index);
+
+  my $gz_content;
+  my $gz = IO::Compress::Gzip->new( \$gz_content ) or die "gzip failed\n";
+  $gz->print( $index->as_string );
+  $gz->close;
+
+  my $index_key = sprintf '%s/modules/02packages.details.txt.gz', $prefix;
+  $self->get_s3->put_object( $self->get_bucket_name, $index_key, $gz_content, content_type => 'application/gzip', );
+
+  $self->get_logger->info( sprintf 'updated index at %s', $index_key );
 
   return;
 }
 
 ########################################################################
-sub upload_index {
+sub scan_provides {
+########################################################################
+  my ( $self, $file ) = @_;
+
+  require Archive::Tar;
+  require CPAN::Meta;
+
+  my $tar = Archive::Tar->new;
+  $tar->read($file);
+
+  # find the top-level prefix, e.g. "CPAN-Maker-1.8.2"
+  my ($entry) = grep { $_->name =~ m{/META\.(?:json|yml|yaml)$}xsm } $tar->get_files;
+
+  if ( !$entry ) {
+    $self->get_logger->warn("no META file found in $file");
+    return {};
+  }
+
+  my ($prefix) = ( split m{/}xsm, $entry->name )[0];
+
+  for my $metafile (qw(META.json META.yml META.yaml)) {
+    my $content = eval { $tar->get_content("$prefix/$metafile") };
+    next if !$content;
+
+    my $meta = eval { CPAN::Meta->load_string($content) };
+    next if !$meta || $EVAL_ERROR;
+
+    return $meta->{provides} if $meta->{provides};
+  }
+
+  # Should not happen - injecting tarballs we create with CPAN::Maker
+  $self->get_logger->warn("META found but no provides in $file");
+
+  return {};
+}
+
+########################################################################
+# COMMANDS
+########################################################################
+
+########################################################################
+sub cmd_upload_index {
 ########################################################################
   my ( $self, $index ) = @_;
 
@@ -212,11 +318,13 @@ sub upload_index {
 }
 
 ########################################################################
-sub show_orepan_index {
+sub cmd_show_orepan_index {
 ########################################################################
   my ($self) = @_;
 
   my $file = $self->fetch_orepan_index;
+
+  require OrePAN2::Index;
 
   my $index = OrePAN2::Index->new();
 
@@ -224,13 +332,17 @@ sub show_orepan_index {
 
   my $listing = $index->as_string;
 
+  unlink $file;
+
   return $self->send_output($listing);
 }
 
 ########################################################################
-sub create_docs {
+sub cmd_create_docs {
 ########################################################################
   my ($self) = @_;
+
+  require DarkPAN::Utils;
 
   my ($distribution) = $self->get_args();
   $distribution //= $self->get_distribution();
@@ -238,36 +350,48 @@ sub create_docs {
   die "use -d or pass distribution name as an argument\n"
     if !$distribution;
 
-  $distribution = basename($distribution);
+  my ( $key_prefix, $version ) = DarkPAN::Utils::parse_distribution_path($distribution);
 
-  if ( $distribution !~ /^D\/DU/xsm ) {
-    $distribution = sprintf 'D/DU/DUMMY/%s', $distribution;
-  }
+  my $dpu = choose {
+    if ( -e $distribution && $distribution !~ /^(?:http|D\/DU)/xsm ) {
+      require Archive::Tar;
 
-  my ( $key_prefix, $version ) = parse_distribution_path($distribution);
+      my $tar = Archive::Tar->new;
+      $tar->read($distribution);
+      return DarkPAN::Utils->new( package => $tar );
+    }
+
+    $distribution = basename($distribution);
+
+    if ( $distribution !~ /^http/xsm ) {
+      $distribution = sprintf 'D/DU/DUMMY/%s', $distribution;
+    }
+
+    my $orepan_url = $self->get_url // $self->get_config->{url};
+
+    die "use --url or set url in config\n"
+      if !$orepan_url;
+
+    my $dpu = DarkPAN::Utils->new( base_url => $orepan_url );
+
+    $dpu->fetch_package($distribution);
+
+    return $dpu;
+  };
 
   my $module_name = $key_prefix;
   $module_name =~ s/\-/::/gxsm;
-
-  my $orepan_url = $self->get_url // $self->get_config->{url};
-
-  die "use --url or set url in config\n"
-    if !$orepan_url;
-
-  my $dpu = DarkPAN::Utils->new( base_url => $orepan_url );
-
-  $dpu->fetch_package($distribution);
 
   my $file = $dpu->extract_module( $distribution, $module_name );
 
   if ( $self->get_upload ) {
     if ($file) {
       $self->upload_html(
-        name    => "$key_prefix.html",
-        content => $file,
-        prefix  => $key_prefix,
-        pod     => $TRUE,
-        wrap    => $TRUE,
+        name         => "$key_prefix.html",
+        content      => $file,
+        prefix       => $key_prefix,
+        wrap         => $TRUE,
+        distribution => basename($distribution),
       );
     }
   }
@@ -284,10 +408,10 @@ sub create_docs {
 
   if ( $self->get_upload && $readme ) {
     $self->upload_html(
-      name    => 'README.html',
-      content => $readme,
-      prefix  => $key_prefix,
-      wrap    => $TRUE,
+      name     => 'README.html',
+      markdown => $readme,
+      prefix   => $key_prefix,
+      wrap     => $TRUE,
     );
   }
   elsif ($readme) {
@@ -307,24 +431,45 @@ sub upload_html {
 ########################################################################
   my ( $self, %args ) = @_;
 
-  my ( $content, $pod, $prefix, $name ) = @args{qw(content pod prefix name)};
+  my ( $content, $prefix, $name, $markdown, $distribution ) = @args{qw(content prefix name markdown distribution)};
 
-  my $perldoc_url_prefix = $self->get_config->{perldoc_url_prefix};
+  my $perldoc_url_distros = $self->get_config->{perldoc_url_distros} // [];
+  my $perldoc_url_prefix;
 
-  my $docs = DarkPAN::Utils::Docs->new( text => $content, url_prefix => $perldoc_url_prefix );
+  if ($distribution) {
+    foreach my $p ( pairs @{$perldoc_url_distros} ) {
 
-  if ($pod) {
-    $docs->parse_pod;
+      my ( $pattern, $flags ) = @{$p};
+      my $qr = qr/(?$flags:$pattern)/;
+      next if $distribution !~ $qr;
+
+      $perldoc_url_prefix = $self->get_config->{perldoc_url_prefix};
+      last;
+    }
   }
-  else {
-    $docs->to_html;
-  }
 
-  my $html = $docs->get_html;
+  $perldoc_url_prefix //= $METACPAN_URL;
+
+  my $html = choose {
+    if ($markdown) {
+      require Text::Markdown::Discount;
+
+      Text::Markdown::Discount::markdown($markdown);
+    }
+
+    require DarkPAN::Utils::Docs;
+
+    my $docs = DarkPAN::Utils::Docs->new(
+      text       => $content,
+      url_prefix => $perldoc_url_prefix,
+    );
+
+    return $docs->get_html;
+  };
 
   if ( $args{wrap} ) {
     $html = <<"END_OF_HTML";
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <html>
  <head>
    <title>README</title>
@@ -352,15 +497,17 @@ sub look_for_object {
   my $key = sprintf 'docs/%s/%s', $prefix, $name;
 
   return sprintf '/docs/%s/%s', $prefix, $name
-    if $self->get_bucket->head_key($key);
+    if $self->get_s3->head_object( $self->get_bucket_name, $key );
 
   return;
 }
 
 ########################################################################
-sub create_index {
+sub cmd_create_index {
 ########################################################################
   my ($self) = @_;
+
+  require DarkPAN::Utils;
 
   my $config = $self->get_config;
 
@@ -368,9 +515,11 @@ sub create_index {
 
   my $repo = $self->parse_index($file);
 
+  unlink $file;
+
   $self->get_logger->debug( Dumper( [ repo => $repo ] ) );
 
-  no strict 'refs';  ## no critic
+  no strict 'refs'; ## no critic
 
   *{'utils::module_name'} = sub {
     my ( $self, $distribution ) = @_;
@@ -386,19 +535,18 @@ sub create_index {
   my $sections = $config->{custom_sections} // {};
 
   foreach my $var ( keys %{$sections} ) {
-    my ( $qr, $flags ) = @{ $sections->{$var} };
-    $sections->{$var} = [ $qr, $flags, eval "qr/$qr/$flags" ];
+    my ( $pattern, $flags ) = @{ $sections->{$var} };
+
+    my $qr = qr/(?$flags:$pattern)/;
+    $sections->{$var} = [ $pattern, $flags, $qr ];
   }
 
   my %readme_links;
   my %pod_links;
 
-  my %app_plugins;
-  my %plugins;
-
   foreach my $distribution ( keys %{$repo} ) {
 
-    my ($distribution_name) = parse_distribution_path($distribution);
+    my ($distribution_name) = DarkPAN::Utils::parse_distribution_path($distribution);
 
     my $readme = $self->look_for_object( $distribution_name, 'README.html' );
 
@@ -439,6 +587,8 @@ sub create_index {
   $self->get_logger->trace( Dumper( [ params => $params ] ) );
 
   my $text = $self->get_template;
+
+  require Template;
 
   my $template = Template->new();
 
@@ -490,6 +640,8 @@ sub parse_index {
 ########################################################################
   my ( $self, $file ) = @_;
 
+  require OrePAN2::Index;
+
   my $index = OrePAN2::Index->new();
 
   $index->load($file);
@@ -509,13 +661,13 @@ sub parse_index {
 }
 
 ########################################################################
-sub download_orepan_index {
+sub cmd_download_orepan_index {
 ########################################################################
   my ($self) = @_;
 
   my $filename = eval { return $self->fetch_orepan_index(); };
 
-  die "could not download $PACKAGE_INDEX\n$EVAL_ERROR"
+  die "ERROR: Could not download $PACKAGE_INDEX\n$EVAL_ERROR"
     if !$filename || !-s "$filename";
 
   rename $filename, $PACKAGE_INDEX;
@@ -535,8 +687,16 @@ sub init {
   my $profile = $config->{AWS}->{profile};
 
   my $credentials = Amazon::Credentials->new( profile => $profile );
-
   $self->set_credentials($credentials);
+
+  my $bucket_name = $self->get_bucket_name // $config->{AWS}->{bucket};
+
+  $self->set_bucket_name($bucket_name);
+
+  $self->init_s3;
+
+  my $author_path = $config->{author_path} // $AUTHOR_PATH;
+  $self->set_author_path($author_path);
 
   $self->fetch_template;
 
@@ -557,9 +717,7 @@ sub fetch_template {
     $template = $index->{template};
   }
 
-  my $fh = *DATA;
-
-  my $index_template = slurp_file( $template // $fh );
+  my $index_template = $template eq 'default' ? slurp_file(*DATA) : slurp_file($template);
 
   $index_template =~ s/\n\n=pod.*$/\n/xsm;
 
@@ -573,6 +731,8 @@ sub extract_from_tarball {
 ########################################################################
   my ( $tarball, $file ) = @_;
 
+  require Archive::Tar;
+
   my $t = Archive::Tar->new;
 
   $t->read( $tarball, 1 )
@@ -584,9 +744,7 @@ sub extract_from_tarball {
   croak "file not found ($prefix/$file)"
     if !$t->contains_file("$prefix/$file");
 
-  my $content = eval { return Load( $t->get_content("$prefix/$file") ); };
-
-  return $content;
+  return $t->get_content("$prefix/$file");
 }
 
 ########################################################################
@@ -596,6 +754,7 @@ sub main {
     option_specs => [
       qw(
         help|h
+        bucket-name|b=s
         config-file|c=s
         output|o=s
         profile|p=s
@@ -611,17 +770,21 @@ sub main {
       profile_name => 'default',
       profile      => $ENV{AWS_PROFILE}
     },
-    extra_options => [qw(config s3 credentials template)],
+    extra_options => [qw(config credentials template author_path s3)],
     commands      => {
-      'create-docs'   => \&create_docs,
-      create          => \&create_index,
-      show            => \&show_orepan_index,
-      download        => \&download_orepan_index,
-      upload          => \&upload_index,
+      'create-docs'   => \&cmd_create_docs,
+      create          => \&cmd_create_index,
+      delete          => \&cmd_delete,
+      download        => \&cmd_download_orepan_index,
       'dump-template' => sub {
         print {*STDOUT} shift->get_template;
         return 0;
-      }
+      },
+      inject             => \&cmd_inject,
+      'invalidate-index' => \&cmd_invalidate_index,
+      show               => \&cmd_show_orepan_index,
+      upload             => \&cmd_upload_index,
+      'upload-artifacts' => \&cmd_upload_artifacts,
     },
   );
 
@@ -631,7 +794,7 @@ sub main {
 1;
 
 __DATA__
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML>
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-15">
@@ -686,55 +849,103 @@ __DATA__
 
 =head1 NAME
 
- orepan2-s3
+ OrePAN2::S3 - Manage a DarkPAN CPAN mirror on Amazon S3
+
+=head1 SYNOPSIS
+
+  # via the bash wrapper (recommended)
+  orepan2-s3 add My-Dist-1.0.tar.gz
+  orepan2-s3 index
+
+  # or directly via the modulino
+  orepan2-s3-index create --upload
+
+  # add and index a new distribution
+  orepan2-s3-index inject My-App-1.0.0.tar.gz
+
+  # upload artifacts listed in config file
+  orepan2-s3-index upload-artifacts
 
 =head1 DESCRIPTION
 
-This script is used to add distributions to your own DarkPAN
+This class is used to add distributions to your own DarkPAN
 repository housed on Amazon's S3 storage. It leverages L<OrePAN2> to
 create and maintain your own DarkPAN repository. You can read more
 about setting up a DarkPAN on Amazon using S3 + Cloudfront
 L<here|https://github.com/rlauer6/OrePAN2-S3/blob/master/README.md>.
 
+You can read more about creating a secure static website using Amazon
+S3 L<here|https://blog.tbcdevelopmentgroup.com/2025-02-18-post.html>.
+
 =head1 USAGE
 
- orepan2-s3.pl Options Command
+ orepan2-s3 options command
 
 Perl script for maintaining a DarkPAN mirror using S3 + CloudFront.
 
-I<NOTE: C<orepan2-s3> is the bash script that calls this Perl
-script. The documentation here refers to the Perl script, however you
-should use the bash script for adding and deleting CPAN distributions from your DarkPAN repo.>
+I<NOTE: C<orepan2-s3> is the bash script that calls this Perl class
+that doubles as a modulino.  The documentation here refers to the
+script (not the class)>.
 
-=head2 Commmands
+=head2 Options
+
+ -h, --help           Display this help message
+ -b, --bucket-name    Overrides bucket in configuration
+ -c, --config-file    Name of the configuration file (default: ~/.orepan2-s3.json)
+ -o, --output         Name of the output file
+ -p, --profile        Your AWS profile if not provided in configuration
+ -n, --profile-name   Name of a profile inside the config file
+ -t, --template       Name of a template that will be used as the index.html page
+ -d, --distribution   Path to distribution tarball
+ -u, --upload         Upload files after processing (for create-index, create-docs)
+ -U, --url            Cloudfront URL
+
+=head2 Commands
 
 =over 5
 
 =item * create - Create a new F<index.html> from the mirror's manifest file.
 
-=item * download - Download the mirror's manifest file (F<02packages.details.text.gz>).
+=item * delete - Delete a distribution from repo and reindex
+
+=item * download - Download the mirror's manifest file (F<02packages.details.txt.gz>).
+
+=item * inject - Uploads a tarball and adds to the DarkPAN index
 
 =item * show - Print the manifest file to STDOUT or a file.
-
-=item * upload - Upload the index.html file to the mirror's root.
 
 =item * dump-template - Outputs the default index.html template.
 
 =item * create-docs - parse distribution looking for a README.md and/or pod
 
+=item * invalidate-index - I<not currently implemented>
+
+=item * upload - Upload the index.html file to the mirror's root.
+
+=item * upload-artifacts - Uploads the files listed in the C<index: files:> section of the config file.
+
 =back
 
-=head2 Options
+=head2 Notes
 
- -h, --help           Display this help message
- -c, --config-file    Name of the configuration file (default: ~/.orepan2-s3.json)
- -o, --output         Name of the output file
- -p, --profile        Your AWS profile if not provide in configuration
- -n  --profile-name   Name of a profile inside the config file
- -t, --template       Name of a template that will be used as the index.html page
- -d, --distribution   Path to distribution tarball
- -u, --upload         Upload files after processing (for create-index, create-docs)
- -U, --url            Cloudfront URL
+=over 5
+
+=item The preferred way of using this utility is through the bash wrapper.
+
+I<The following commands are available only through the C<orepan2-s3>
+bash wrapper, not the modulino directly:>
+
+=over 5
+
+=item * add {file} - inject a tarball into the repository and re-index
+
+=item * delete {file} - remove a distribution and re-index
+
+=item * invalidate - invalidate the CloudFront cache
+
+=back
+
+=back
 
 =head2 Configuration File
 
@@ -745,6 +956,7 @@ S3 repository. The format should look something like this:
   {
       "default" : "bedrock",
       "tbc" : {
+          "author_path": "D/DU/DUMMY",
           "AWS": {
               "profile" : "prod",
               "region" : "us-east-1",
@@ -756,6 +968,7 @@ S3 repository. The format should look something like this:
           }
       },
       "bedrock" : {
+          "author_path": "D/DU/DUMMY",
           "index" : {
               "template" : "/path/to/template",
               "files": {
@@ -777,12 +990,17 @@ S3 repository. The format should look something like this:
   }
 
 Each profile can contain the keys described below. If you only have one
-profile you don't need place it in a 'default' section.
+profile you don't need to place it in a 'default' section.
 
 The value for the 'default' key can be the name of a profile or a hash
 of the profile.
 
 =over 5
+
+=item author_path 
+
+Overrides default C<D/DU/DUMMY>. For a personal DarkPAN you should
+place all modules in one path.
 
 =item index
 
@@ -796,9 +1014,9 @@ The name of a template file that will be parsed and uploaded as
 F</index.html>. If you do not provide a template file a default
 template is used. The default template is a L<Template::Toolkit> style
 template. To see the default template use the C<dump-template> command
-to the F<orepan2-index> script.
+to the F<orepan2-s3-index> script.
 
- orepan2-index dump-template
+ orepan2-s3-index dump-template
 
 The templating process is provided with these variables:
 
@@ -807,7 +1025,7 @@ The templating process is provided with these variables:
 =item utils
 
 A blessed reference to an object with one method (C<module_name>) that
-returns a verison of the module name suitable for use as unique CSS id.
+returns a version of the module name suitable for use as unique CSS id.
 
 =item repo
 
@@ -843,7 +1061,7 @@ want uploaded to your S3 bucket.
 
 Example:
 
- "files" { 
+ "files": { 
     "/home/rlauer/git/some-project/foo.css" : "/css/foo.css",
     "/home/rlauer/git/some-project/foo.js" : "/javascript/foo.js"
  }
@@ -888,7 +1106,7 @@ C<OrePAN2::S3> is designed to work with CloudFront + Amazon
 S3. CloudFront is a CDN and will read content from your S3 bucket when
 clients make HTTP requests. CloudFront will cache content to avoid
 costly reads to the S3 bucket. If you change some of the static assets
-(like the index page) you make want to invalidate the cache to see
+(like the index page) you may want to invalidate the cache to see
 your new assets. You could wait until the cache is updated (the
 default time is 24 hours)...but why?  The script will automatically
 invalidate the cache for you if you tell it what assets to invalidate
@@ -907,7 +1125,7 @@ each month. Thereafter each path costs $0.005 per path.>
 
 This section contains key/value pairs where the key is the name of a
 variable that will be exposed to your template and the values
-are a two element array that contains a regular expresssion and
+are a two element array that contains a regular expression and
 possible regexp flags. The script will use the regexp to filter your
 distributions and add them to a hash whose name is the key you
 provided.
@@ -950,11 +1168,11 @@ Example:
 
 =head1 AUTHOR
 
-Rob Lauer - <bigfoot@cpan.org>
+Rob Lauer - <rlauer@treasurersbriefcase.com>
 
 =head1 SEE ALSO
 
-L<OrePAN2>, L<Amazon::S3>
+L<OrePAN2>, L<Amazon::S3::Lite>, L<DarkPAN::Utils>, L<CLI::Simple>, L<Template>
 
 =head1 LICENSE
 

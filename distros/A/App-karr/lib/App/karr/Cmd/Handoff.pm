@@ -1,7 +1,7 @@
 # ABSTRACT: Hand off a task for review
 
 package App::karr::Cmd::Handoff;
-our $VERSION = '0.102';
+our $VERSION = '0.205';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -53,16 +53,14 @@ sub execute {
 
   my $id = $args_ref->[0] or die "Usage: karr handoff ID --claim NAME [--note TEXT] [--block REASON] [--release]\n";
 
-  my $config = App::karr::Config->new(
-    file => $self->board_dir->child('config.yml'),
-  );
+  my $ec = $self->store->effective_config;
 
   my $task = $self->find_task($id);
   die "Task $id not found\n" unless $task;
 
   # Validate claim ownership
   if ($task->has_claimed_by && $task->claimed_by ne $self->claim) {
-    my $timeout = $self->_parse_timeout($config->claim_timeout);
+    my $timeout = $self->_parse_timeout($ec->{claim_timeout} // '1h');
     unless ($self->_claim_expired($task, $timeout)) {
       die sprintf "Task %d is claimed by %s\n", $task->id, $task->claimed_by;
     }
@@ -98,7 +96,7 @@ sub execute {
     $task->claimed_at(undef);
   }
 
-  $task->save;
+  $self->save_task($task);
 
   $self->sync_after;
 
@@ -129,7 +127,7 @@ App::karr::Cmd::Handoff - Hand off a task for review
 
 =head1 VERSION
 
-version 0.102
+version 0.205
 
 =head1 SYNOPSIS
 
@@ -173,11 +171,11 @@ L<App::karr::Cmd::Edit>, L<App::karr::Cmd::Log>
 =head2 Issues
 
 Please report bugs and feature requests on GitHub at
-L<https://github.com/Getty/p5-app-karr/issues>.
+L<https://github.com/Getty/karr/issues>.
 
 =head2 IRC
 
-Join C<#ai> on C<irc.perl.org> or message Getty directly.
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -185,7 +183,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

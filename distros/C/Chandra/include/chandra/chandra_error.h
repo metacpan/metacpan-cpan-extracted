@@ -1,5 +1,5 @@
 /*
- * chandra_error.h — Chandra::Error in C
+ * chandra_error.h - Chandra::Error in C
  *
  * Implements: on_error, clear_handlers, handlers, capture,
  *             stack_trace, format_text, format_js_console
@@ -12,7 +12,7 @@
 #include "chandra.h"
 
 /* ================================================================
- * Implementation-only section — compiled only in Chandra.xs
+ * Implementation-only section - compiled only in Chandra.xs
  * (CHANDRA_XS_IMPLEMENTATION is defined there before including us)
  * ================================================================ */
 #ifdef CHANDRA_XS_IMPLEMENTATION

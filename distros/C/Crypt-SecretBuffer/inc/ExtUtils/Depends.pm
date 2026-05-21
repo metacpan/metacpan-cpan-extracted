@@ -97,6 +97,9 @@ sub add_exported_c_api {
 			or die "Can't parse C function prototype '$fn_name'.  Expected at least two words before argument list";
 		$fn_name= pop @parts;
 	}
+	# Which module exports it?  Default to main 'name' (e.g. Example.so or Example.xs.dll).
+	# With XSMULTI, the author will need to specity which module is exporting the C functions.
+	$attrs{module} ||= $self->{name};
 	push @{$self->{c_api}}, { %attrs, name => $fn_name };
 }
 
@@ -118,6 +121,12 @@ sub install {
 	foreach my $f (@_) {
 		$self->add_pm ($f, $self->installed_filename ($f));
 	}
+}
+
+sub _is_gcc {
+	require Config;
+	return ($Config::Config{cc} || '') =~ /\bg(?:cc|\+\+)\b/i
+	    || ($Config::Config{ld} || '') =~ /\bg(?:cc|\+\+)\b/i;
 }
 
 sub save_config {
@@ -154,12 +163,6 @@ EOF
 	# this crappy code.  we don't worry about portable pathnames,
 	# as the old code didn't either.
 	(my $mdir = $self->{name}) =~ s{::}{/}g;
-	my $mod_lib_fname;
-	if ($has_c_api) {
-		require DynaLoader;
-		($mod_lib_fname)= $mdir =~ m,([^/]+)$,;
-		$mod_lib_fname= DynaLoader::mod2fname($mod_lib_fname) if DynaLoader->can('mod2fname');
-	}
 	print $file <<"EOT";
 
 	\$CORE = undef;
@@ -171,11 +174,50 @@ EOF
 	}
 
 	sub deps { \@{ \$self->{deps} }; }
+EOT
+
+	print $file <<"EOT" if $has_c_api;
+	# Given a perl Module::Name, determine what shared library name DynaLoader
+	# wants to load for it, and then resolve the absolute path to that file.
+	# For Windows, return the name of the import library (.lib or .a) instead
+	# of the name of the shared lib (.dll) itself, because that's what belongs
+	# on the linker line.
+	# It would be much preferable to determine the file name being generated
+	# by MakeMaker ahead of time, but I can't find any way to extract that
+	# piece of knowledge from MakeMaker, and besides which MakeMaker hasn't
+	# been invoked yet and we don't have all the parameters to do so.
+	sub _resolve_lib_for_module {
+		my (\$mod)= \@_;
+		my (\$mod_lib_basename)= (\$mod =~ m,([^:]+)\\z,);
+		\$mod_lib_basename= DynaLoader::mod2fname(\$mod_lib_basename) if DynaLoader->can('mod2fname');
+		my \@search= map File::Spec->catdir(\$_, qw( auto @{[ join ' ', split /::/, $self->{name} ]} )), \@INC;
+		my \$path= DynaLoader::dl_findfile(map("-L\$_", \@search), \$mod_lib_basename)
+			or die "Can't locate shared library for module \$mod (looked for \$mod_lib_basename.\$DynaLoader::dl_dlext)";
 	
+		# On win32, need to reference the '.a' or '.lib' file instead of the '.dll'
+		if (\$^O eq 'MSWin32') {
+			my (\$vol,\$dirs,\$file) = File::Spec->splitpath(\$path);
+			(my \$base= \$file) =~ s/\.[^.]+\\z//; # remove file extension
+			for ("\$base.lib",      # MSVC
+			     "\$file.a",        # MinGW
+			     # Try some others for good measure
+			     "\$file.lib", "\$base.a"
+			) {
+				my \$p= File::Spec->catpath(\$vol, \$dirs, \$_);
+				return \$p if -f \$p;
+			}
+			warn "Can't determine import library name from \$path; didn't find \$base.lib or \$file.a in \$dirs";
+			return undef;
+		}
+		return \$path;
+	}
+
+EOT
+	print $file <<"EOT";
 	sub _maybe_quote_path {
 		return \$_[0] =~ / /? qq{"\$_[0]"} : \$_[0]
 	}
-
+	
 	sub Inline {
 		my (\$class, \$lang) = \@_;
 		
@@ -193,37 +235,23 @@ EOF
 		
 		# Convert typemaps to absolute paths
 		\$_= File::Spec->rel2abs(\$_, \$instpath) for \@{ \$vars->{TYPEMAPS} };
-		
-		# If this module exports C API functions from its library, need to add
+
+EOT
+	print $file <<"EOT" if $has_c_api;
+		# This module exports C API functions from its library, so need to add
 		# the XS library itself to the libs.
-		if (\$self->{c_api}) {
-			require DynaLoader;
-			my \@search= map File::Spec->catdir(\$_, qw( auto @{[ join ' ', split /::/, $self->{name} ]} )), \@INC;
-			my \$path= DynaLoader::dl_findfile(map("-L\$_", \@search), "$mod_lib_fname")
-				or die "Can't locate shared library for module \$class (looked for $mod_lib_fname.\$DynaLoader::dl_dlext)";
-			my (\$vol,\$dirs,\$file) = File::Spec->splitpath(\$path);
-			\$dirs =~ s,[\\\\/]\$,,; # remove trailing slash
-			
-			# On win32, need to reference the '.a' or '.lib' file instead of the '.dll'
-			if (\$^O eq 'MSWin32') {
-				my \$libfile= substr(\$file, 0, -1-length \$DynaLoader::dl_dlext);
-				if (-f File::Spec->catpath(\$vol, \$dirs, "\$libfile.lib")) { # MSVC
-					\$file= "\$libfile.lib";
-				} elsif (-f File::Spec->catpath(\$vol, \$dirs, "\$libfile.a")) { # MinGW
-					\$file= "\$libfile.a";
-				} else {
-					warn "Can't determine import library name from \$path; didn't find \$libfile.lib or \$libfile.a in \$dirs";
-				}
-			}
-			my \$libpath = File::Spec->catpath(\$vol,\$dirs,'');
-			\$vars->{LIBS}= "-L"._maybe_quote_path(\$libpath)." -l\$file \$vars->{LIBS}";
-		}
+		require DynaLoader;
+		my %distinct_modules;
+		\$distinct_modules{\$_->{module}}++ for \@{ \$self->{c_api} };
+		my \@libs= grep defined, map _resolve_lib_for_module(\$_), sort keys %distinct_modules;
+		\$vars->{LIBS}= join(' ', map _maybe_quote_path(\$_), \@libs, grep length, \$vars->{LIBS});
+
+EOT
+	print $file <<"EOT";
 		return \$vars;
 	}
+1;
 EOT
-
-	print $file "\n1;\n";
-
 	close $file;
 
 	# we need to ensure that the file we just created gets put into
@@ -264,8 +292,7 @@ sub load {
 		if $@ and exists ${"$depinstallfiles\::"}{deps};
 
 	my (@typemaps, $inc, $libs);
-	my $inline = eval { $depinstallfiles->Inline('C') };
-	if (!$@) {
+	if (my $inline = eval { $depinstallfiles->Inline('C') }) {
 		$inc = $inline->{INC} || '';
 		$libs = $inline->{LIBS} || '';
 		@typemaps = @{ $inline->{TYPEMAPS} || [] };
@@ -366,6 +393,18 @@ sub get_makefile_vars {
 	if ($self->{c_api}) {
 		$vars{FUNCLIST} = [ map $_->{name}, @{ $self->{c_api} } ];
 		$vars{DL_FUNCS} = { $self->{name} => [] };
+		# For completeness, ask gcc to emit an import library for the .dll.
+		# This isn't strictly necessary when the same gcc toolchain will be
+		# used for all future linking (which should be the case for perl
+		# modules) but just sort of "doing it by the book" when there are
+		# consumers for a dll's functions.
+		# The MSVC toolchain always exports import library (.lib) files.
+		if ($^O eq 'MSWin32' && $self->_is_gcc) {
+			$vars{dynamic_lib} ||= {};
+			my $old = $vars{dynamic_lib}{OTHERLDFLAGS} || '';
+			$vars{dynamic_lib}{OTHERLDFLAGS} = join ' ', grep length,
+				$old, '-Wl,--out-implib,$(INST_DYNAMIC).a';
+		}
 	}
 
 	%vars;

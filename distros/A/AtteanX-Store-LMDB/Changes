@@ -4,6 +4,18 @@ AtteanX::Store::LMDB
 Created:      2020-05-29
 Home page:    <http://search.cpan.org/dist/AtteanX::Store::LMDB/>
 Bug tracker:  <https://github.com/kasei/atteanx-store-lmdb/issues>
+Maintainer:   Gregory Todd Williams <mailto:gwilliams@cpan.org>
+
+0.003  2026-05-19
+
+ - (Update) Add attean_lmdb_create as installed script.
+ - (Update) Allow 1-arg construction of AtteanX::Store::LMDB with filename.
+
+0.002  2026-05-08
+
+ - (Update) Remove use of Test::Modern in tests.
+ - (Update) Update Makefile.PL to use GNU tar on MacOS when creating new
+   releases.
 
 0.001  2020-11-30
 

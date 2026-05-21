@@ -1,4 +1,10 @@
 #+prefix:user:uid:gid:directory:dash:prepend:
+=alice:alice:1001:1001:t/fixtures/domains/realhome:::
+=group775:gw:1002:1002:t/fixtures/domains/perms775:::
+=sticky:st:1003:1003:t/fixtures/domains/permssticky:::
+=noread:nr:1004:1004:t/fixtures/domains/noread:::
+=bare:bare:1010:1010:t/fixtures/domains/bare-vpop:::
 +example.com-:example.com:89:89:t/fixtures/domains/example.com:-::
 +luser-:vpopmail:89:89:t/fixtures/domains/example.com:-:luser-
++catchall-:catchall:90:90:t/fixtures/domains/catchall.example:-:catchall-
 .

@@ -166,7 +166,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- drop_zones() — list registered selectors ----
+ # ---- drop_zones() - list registered selectors ----
 
 void
 drop_zones(self)
@@ -274,7 +274,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- _dispatch(json_sv) — called from JS via __chandra_dragdrop bind ----
+ # ---- _dispatch(json_sv) - called from JS via __chandra_dragdrop bind ----
 
 void
 _dispatch(self, json_sv)
@@ -513,7 +513,7 @@ CODE:
     ;
 }
 
- # ---- js_code() — returns JavaScript for drag & drop handling ----
+ # ---- js_code() - returns JavaScript for drag & drop handling ----
 
 SV *
 js_code(self)
@@ -716,7 +716,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- inject() — inject JS via app->eval ----
+ # ---- inject() - inject JS via app->eval ----
 
 SV *
 inject(self)

@@ -1,10 +1,17 @@
 #!perl -w
 use strict;
 use Test::More;
+use version;
 
 use Imager::File::HEIF;
 use Imager::Test qw(test_image is_image_similar);
 use lib 't/lib';
+
+-d "testout" or mkdir "testout";
+Imager->open_log(log => "testout/20write.log");
+
+my $ver = Imager::File::HEIF->libversion();
+my $over = version->new($ver);
 
 {
   my $im = test_image;
@@ -51,7 +58,11 @@ use lib 't/lib';
      "write single gray image")
     or diag $im2->errstr;
   ok(length $data, "actually wrote something (gray)");
-  is(substr($data, 4, 8), 'ftypheic', "got a HEIC file");
+  # prior to libheif 1.20 the main brand was incorrectly "heic"
+  # but should apparently be "heix", since monochrome isn't part
+  # of the base profile
+  # https://github.com/strukturag/libheif/issues/1765
+  like(substr($data, 4, 8), qr/^ftyphei[cx]$/, "got a HEIC file");
 
   my $res = Imager->new;
   ok($res->read(data => \$data, type => "heif"),
@@ -84,6 +95,23 @@ SKIP:
 }
 
 SKIP:
+{ # tags
+  $over >= v1.15.0
+    or skip "need 1.15.0 for aspect ration", 5;
+  my $im = test_image();
+  my $data;
+  ok($im->write(data => \$data, type => "heif",
+                i_xres => 3, i_yres => 2),
+     "write with resolution tags");
+  my $rd = Imager->new;
+  ok($rd->read(data => \$data, type => "heif"),
+     "read it back");
+  is($rd->tags(name => "i_xres"), 3, "i_xres right");
+  is($rd->tags(name => "i_yres"), 2, "i_yres right");
+  is($rd->tags(name => "i_aspect_only"), 1, "i_aspect_only set");
+}
+
+SKIP:
 {
   my @cmp;
   push @cmp, test_image();
@@ -104,6 +132,136 @@ SKIP:
     is_image_similar($res[$i], $cmp, 8_000_000,
                      "check image $i");
   }
+}
+
+SKIP:
+{
+  # look for a non-HEVC encoder
+  my ($enc) = grep $_->compression ne "hevc"
+    && Imager::File::HEIF->have_decoder_for($_->compression),
+    Imager::File::HEIF->encoders;
+  $enc or skip "only hevc available for both encode and decode", 1;
+  my $cmp = test_image();
+  my $data;
+  note "compression format ", $enc->compression;
+  ok($cmp->write(data => \$data, type => "heif",
+                 heif_compression => $enc->compression),
+     "write with non-HEVC compression");
+  my $res = Imager->new;
+  # we might not have a decoder for this, even if we have an
+  # encoder... fix once we can list decoders
+  ok($res->read(data => \$data, type => "heif"),
+     "read it back again ".$enc->compression)
+    or diag $res->errstr;
+  is($res->getwidth, $cmp->getwidth, "check width");
+  is($res->getheight, $cmp->getheight, "check height");
+  is($res->getchannels, $cmp->getchannels, "check channels");
+  # this random format might produce worse results than hevc
+  is_image_similar($res, $cmp, 10_000_000, "check image matches roughly");
+
+  $cmp = $cmp->copy;
+  note "encoder ", $enc->id;
+  undef $data;
+  ok($cmp->write(data => \$data, type => "heif",
+                 heif_encoder => $enc->id),
+     "write using a specified encoder")
+    or die $cmp->errstr;
+  ok($res->read(data => \$data, type => "heif"),
+     "read it back again");
+  is($res->getwidth, $cmp->getwidth, "check width");
+  is($res->getheight, $cmp->getheight, "check height");
+  is($res->getchannels, $cmp->getchannels, "check channels");
+  # this random format might produce worse results than hevc
+  is_image_similar($res, $cmp, 10_000_000, "check image matches roughly");
+
+  $cmp = $cmp->copy;
+  ok($cmp->write(data => \$data, type => "heif",
+                 heif_encoder => $enc->id,
+                heif_compression => $enc->compression),
+     "write using a specified encoder and compression")
+    or die $cmp->errstr;
+  ok($res->read(data => \$data, type => "heif"),
+     "read it back again");
+  is($res->getwidth, $cmp->getwidth, "check width");
+  is($res->getheight, $cmp->getheight, "check height");
+  is($res->getchannels, $cmp->getchannels, "check channels");
+  # this random format might produce worse results than hevc
+  is_image_similar($res, $cmp, 10_000_000, "check image matches roughly");
+
+  $cmp = $cmp->copy; # strip tags
+  undef $data;
+  ok(!$cmp->write(data => \$data, type => "heif",
+                  heif_encoder => $enc->id,
+                  heif_compression => "hevc"),
+     "fail to write with encoder/compression mismatch");
+  like($cmp->errstr, qr/no encoder named '.*' found with compression '.*'/,
+       "check message");
+}
+{
+  # write with an undefined compression
+  my $cmp = test_image;
+  my $data;
+  ok(!$cmp->write(data => \$data, type => "heif",
+                  heif_compression => "not a compression"),
+     "fail to write with bad compression");
+  like($cmp->errstr, qr/Unknown heif compression 'not a compression'/,
+       "check message");
+
+  # unknown encoder
+  $cmp = $cmp->copy; # strip tags
+  undef $data;
+  ok(!$cmp->write(data => \$data, type => "heif",
+                  heif_encoder => "not an encoder"),
+     "write with unknown encoder");
+  like($cmp->errstr, qr/no encoder named 'not an encoder' found/,
+       "check message");
+}
+
+SKIP:
+{
+  ok(Imager::File::HEIF->have_encoder_for("hevc"),
+     "yes, we have a HEVC encoder");
+  my %comp = map {$_ => 1 }
+    grep $_ ne "undefined", Imager::File::HEIF->compression_names;
+  for my $enc (Imager::File::HEIF->encoders) {
+    delete $comp{$enc->compression};
+  }
+  %comp
+    or skip "Amazingly, you can use all compression methods", 1;
+  my ($comp) = keys %comp; # we can't compress this
+  ok(!Imager::File::HEIF->have_encoder_for($comp),
+     "can't encode $comp");
+}
+
+SKIP:
+{
+  my @enc = Imager::File::HEIF->encoders("hevc");
+  $enc[0]->id eq "x265"
+    or skip "need x265 to test parameters", 1;
+  my $data;
+  my $src = test_image();
+  ok($src->write(data => \$data, type => "heif",
+                 heif_chroma => "444"),
+     "write with custom string parameter");
+
+  $data = "";
+  $src = $src->copy;
+  ok(!$src->write(data => \$data, type => "heif",
+                  heif_chroma => "bad chroma"),
+     "fail to write with bad custom string parameter");
+
+  $data = "";
+  $src = $src->copy;
+  ok($src->write(data => \$data, type => "heif",
+                 heif_complexity => 1),
+     "write with custom integer parameter")
+    or diag $src->errstr;
+
+  $data = "";
+  $src = $src->copy;
+  ok(!$src->write(data => \$data, type => "heif",
+                  heif_complexity => 101),
+     "fail to write with bad custom integer parameter");
 }
 
 done_testing();

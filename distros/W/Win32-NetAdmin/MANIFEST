@@ -1,8 +1,10 @@
 Changes
+LICENSE
 MANIFEST
 META.yml
 Makefile.PL
 NetAdmin.pm
 NetAdmin.xs
+README.md
 ppport.h
 t/netadmin.t

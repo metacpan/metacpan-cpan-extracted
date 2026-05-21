@@ -1,6 +1,6 @@
 package Alien::cmake4;
 
-use base qw(Alien::Base);
+use parent qw(Alien::Base);
 use strict;
 use warnings;
 
@@ -8,7 +8,7 @@ use 5.008001;
 
 use Path::Tiny qw(path);
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 sub alien_helper {
 	return {

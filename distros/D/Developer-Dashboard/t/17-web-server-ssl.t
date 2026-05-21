@@ -11,6 +11,7 @@ BEGIN {
 }
 
 use Capture::Tiny qw(capture);
+use Errno qw(EADDRINUSE);
 use File::Path qw(make_path remove_tree);
 use File::Spec;
 use File::Temp qw(tempdir tempfile);
@@ -18,15 +19,16 @@ use IO::Socket::INET;
 use IO::Socket::SSL ();
 use HTTP::Request::Common qw(GET);
 use LWP::UserAgent;
-use Plack::Test;
 use Socket qw(AF_UNIX PF_UNSPEC SOCK_STREAM);
 use Test::More;
 use Time::HiRes qw(sleep);
 
 use lib 'lib';
+use lib 't/lib';
 
 use Developer::Dashboard::Web::Server;
 use Developer::Dashboard::Web::DancerApp;
+use Local::PSGITest;
 
 sub _openssl_cert_text {
     my ($cert_file) = @_;
@@ -126,11 +128,30 @@ OPENSSL_CONFIG
 {
     package Local::FrontendListener;
 
-    sub new { bless {}, shift }
+    sub new {
+        my ($class) = @_;
+        open my $fh, '<', File::Spec->devnull or die "Unable to open fake frontend listener handle: $!";
+        return bless $fh, $class;
+    }
 
     sub accept { return; }
+}
 
-    sub close { return 1; }
+{
+    package Local::MarkerRunner;
+
+    sub new {
+        my ( $class, %args ) = @_;
+        return bless \%args, $class;
+    }
+
+    sub run {
+        my ($self) = @_;
+        open my $fh, '>>', $self->{marker} or die "Unable to append SSL runner marker $self->{marker}: $!";
+        print {$fh} "ran\n" or die "Unable to write SSL runner marker $self->{marker}: $!";
+        close $fh or die "Unable to close SSL runner marker $self->{marker}: $!";
+        return 1;
+    }
 }
 
 # Test 1: Self-signed cert generation
@@ -430,7 +451,7 @@ OPENSSL_CONFIG
     ok($psgi_app, 'PSGI app created');
     ok(ref($psgi_app) eq 'CODE', 'PSGI app is a code reference');
     
-    test_psgi $psgi_app, sub {
+    Local::PSGITest::test_psgi $psgi_app, sub {
         my ($cb) = @_;
         my $http_request = GET 'http://127.0.0.1:17891/?from=http';
         my $http_response = $cb->($http_request);
@@ -706,6 +727,15 @@ OPENSSL_CONFIG
         'previous-signal chaining returns success for non-code non-default handlers'
     );
 
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Web::Server::_waitpid = sub { return 0 };
+        ok(
+            Developer::Dashboard::Web::Server::_wait_for_managed_child(1234),
+            '_wait_for_managed_child tolerates nonterminal waitpid responses during best-effort cleanup',
+        );
+    }
+
     my $default_signal_pid = fork();
     die "Unable to fork default signal test child: $!" if !defined $default_signal_pid;
     if ( !$default_signal_pid ) {
@@ -717,7 +747,149 @@ OPENSSL_CONFIG
     is( ($? >> 8), 0, 'TERM helper returns when TERM is ignored in the child process' );
 }
 
-# Test 13: Live SSL frontend redirects plain HTTP and still serves HTTPS on the public port
+# Test 13: Direct SSL backend and listener helpers stay explicit outside the forked frontend loop
+{
+    my $temp_home = tempdir(CLEANUP => 1);
+    local $ENV{HOME} = $temp_home;
+
+    my ( $marker_fh, $marker_file ) = tempfile();
+    close $marker_fh or die "Unable to close SSL marker file $marker_file: $!";
+
+    my $server = Developer::Dashboard::Web::Server->new(
+        app     => Local::SSLTestApp->new,
+        host    => '127.0.0.1',
+        port    => 17893,
+        workers => 1,
+        ssl     => 1,
+    );
+    my $daemon = Developer::Dashboard::Web::Server::Daemon->new(
+        host          => '127.0.0.1',
+        port          => 17893,
+        internal_host => '127.0.0.1',
+        internal_port => 17894,
+    );
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Web::Server::_build_runner = sub {
+            return Local::MarkerRunner->new( marker => $marker_file );
+        };
+        is(
+            $server->_run_ssl_backend_process($daemon),
+            0,
+            'SSL backend child helper returns a zero exit code after the backend runner finishes cleanly',
+        );
+    }
+
+    open my $marker_reader, '<', $marker_file or die "Unable to read SSL runner marker $marker_file: $!";
+    my $marker_text = do {
+        local $/;
+        <$marker_reader>;
+    };
+    close $marker_reader or die "Unable to close SSL runner marker reader $marker_file: $!";
+    is( $marker_text, "ran\n", 'SSL backend child helper runs the PSGI backend before returning to the caller' );
+}
+
+{
+    my $temp_home = tempdir(CLEANUP => 1);
+    local $ENV{HOME} = $temp_home;
+
+    my $server = Developer::Dashboard::Web::Server->new(
+        app     => Local::SSLTestApp->new,
+        host    => '127.0.0.1',
+        port    => 17894,
+        workers => 1,
+        ssl     => 1,
+    );
+    my $daemon = Developer::Dashboard::Web::Server::Daemon->new(
+        host          => '127.0.0.1',
+        port          => 17894,
+        internal_host => '127.0.0.1',
+        internal_port => 17895,
+    );
+
+    {
+        no warnings 'redefine';
+        my @stopped;
+        local *IO::Socket::INET::new = sub {
+            $! = EADDRINUSE;
+            return;
+        };
+        local *Developer::Dashboard::Web::Server::_stop_ssl_backend = sub {
+            my ( $pid, $reaped_children ) = @_;
+            push @stopped, [ $pid, ref($reaped_children) ];
+            return 1;
+        };
+
+        my $ok = eval {
+            $server->_open_ssl_frontend_listener_or_die(
+                daemon          => $daemon,
+                backend_pid     => 4242,
+                reaped_children => {},
+            );
+            1;
+        };
+        ok( !$ok, 'SSL frontend helper dies when it cannot bind the public SSL listener socket' );
+        like( $@, qr/Unable to bind SSL frontend on 127\.0\.0\.1:17894:/, 'SSL frontend helper reports the bind failure explicitly' );
+        is( scalar @stopped, 1, 'SSL frontend helper stops the backend child before surfacing the listener bind failure' );
+        is( $stopped[0][0], 4242, 'backend stop helper receives the backend pid on listener bind failure' );
+        is( $stopped[0][1], 'HASH', 'backend stop helper receives the reaped-child tracking hash on listener bind failure' );
+    }
+}
+
+# Test 14: Forked SSL frontend still reaps the backend child and exits cleanly
+{
+    my $temp_home = tempdir(CLEANUP => 1);
+    local $ENV{HOME} = $temp_home;
+
+    my ( $marker_fh, $marker_file ) = tempfile();
+    close $marker_fh or die "Unable to close SSL marker file $marker_file: $!";
+
+    my $server = Developer::Dashboard::Web::Server->new(
+        app     => Local::SSLTestApp->new,
+        host    => '127.0.0.1',
+        port    => 17895,
+        workers => 1,
+        ssl     => 1,
+    );
+    my $daemon = Developer::Dashboard::Web::Server::Daemon->new(
+        host          => '127.0.0.1',
+        port          => 17895,
+        internal_host => '127.0.0.1',
+        internal_port => 17896,
+    );
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Web::Server::_build_runner = sub {
+            return Local::MarkerRunner->new( marker => $marker_file );
+        };
+        local *IO::Socket::INET::new = sub {
+            return Local::FrontendListener->new;
+        };
+        local *Local::FrontendListener::accept = sub {
+            sleep 0.05;
+            $SIG{CHLD}->() if ref( $SIG{CHLD} ) eq 'CODE';
+            return;
+        };
+
+        is(
+            $server->_serve_ssl_frontend($daemon),
+            1,
+            'SSL frontend returns cleanly after reaping the backend child through the local CHLD handler',
+        );
+    }
+
+    open my $marker_reader, '<', $marker_file or die "Unable to read SSL runner marker $marker_file: $!";
+    my $marker_text = do {
+        local $/;
+        <$marker_reader>;
+    };
+    close $marker_reader or die "Unable to close SSL runner marker reader $marker_file: $!";
+    is( $marker_text, "ran\n", 'forked SSL frontend still runs the backend child process before the frontend loop exits' );
+}
+
+# Test 15: Live SSL frontend redirects plain HTTP and still serves HTTPS on the public port
 {
     my $temp_home = tempdir(CLEANUP => 1);
     local $ENV{HOME} = $temp_home;

@@ -10,6 +10,7 @@ use Config::JFDI;
 use Carp qw(confess);
 use AtteanX::Endpoint;
 use LWP::MediaTypes qw(add_type);
+use Plack::Middleware::LogErrors;
 
 add_type( 'application/rdf+xml' => qw(rdf xrdf rdfx) );
 add_type( 'text/turtle' => qw(ttl) );

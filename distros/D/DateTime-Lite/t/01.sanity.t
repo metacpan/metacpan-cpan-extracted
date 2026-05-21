@@ -2,12 +2,21 @@
 ##----------------------------------------------------------------------------
 ## Lightweight DateTime Alternative - t/01.sanity.t
 ##----------------------------------------------------------------------------
+BEGIN
+{
+    use strict;
+    use warnings;
+    use lib './lib';
+    use Test::More;
+};
+
 use strict;
 use warnings;
-use lib './lib';
-use Test::More;
 
-use_ok( 'DateTime::Lite' ) or BAIL_OUT( 'Cannot load DateTime::Lite' );
+BEGIN
+{
+    use_ok( 'DateTime::Lite' ) or BAIL_OUT( 'Cannot load DateTime::Lite' );
+};
 
 # To generate this list:
 # perl -lnE '/^sub\s+(?!new|[A-Z]|_)([a-z]\w*)\b(?!.*;)/ and $seen{$1}++; END { say "can_ok( \$dt, \''$_\'' );" for sort( keys( %seen ) ) }' ./lib/DateTime/Lite.pm
@@ -278,7 +287,7 @@ subtest 'Error handling: missing year' => sub
     # error() emits a warning by design; suppress it to keep TAP clean.
     my $dt;
     {
-        local $SIG{__WARN__} = sub{};
+        no warnings 'DateTime::Lite';
         $dt = DateTime::Lite->new( month => 3 );
     }
     ok( !defined( $dt ), 'new() without year returns undef' );
@@ -292,11 +301,42 @@ subtest 'Error handling: invalid day' => sub
 {
     my $dt;
     {
-        local $SIG{__WARN__} = sub{};
+        no warnings 'DateTime::Lite';
         $dt = DateTime::Lite->new( year => 2025, month => 2, day => 30 );
     }
     ok( !defined( $dt ), 'new() with Feb 30 returns undef' );
     ok( defined( DateTime::Lite->error ), 'error() is set for invalid day' );
+};
+
+# NOTE: Error handling: unknown arguments
+subtest 'Error handling: unknown arguments' => sub
+{
+    # DateTime::Lite->new
+    my $dt;
+    {
+        no warnings 'DateTime::Lite';
+        $dt = DateTime::Lite->new( year => 2025, years => 1 );
+    }
+    ok( !defined( $dt ), 'new(): unknown arg returns undef' );
+    like( DateTime::Lite->error . '', qr/unknown argument/i, 'new(): error mentions unknown argument' );
+    like( DateTime::Lite->error . '', qr/'years'/, "new(): error names the offending key" );
+
+    # DateTime::Lite->from_epoch
+    {
+        no warnings 'DateTime::Lite';
+        $dt = DateTime::Lite->from_epoch( epoch => 0, epoche => 0 );
+    }
+    ok( !defined( $dt ), 'from_epoch(): unknown arg returns undef' );
+    like( DateTime::Lite->error . '', qr/'epoche'/, "from_epoch(): error names the offending key" );
+
+    # DateTime::Lite->from_object
+    {
+        no warnings 'DateTime::Lite';
+        my $src = DateTime::Lite->new( year => 2025, time_zone => 'UTC' );
+        $dt = DateTime::Lite->from_object( object => $src, bogus => 1 );
+    }
+    ok( !defined( $dt ), 'from_object(): unknown arg returns undef' );
+    like( DateTime::Lite->error . '', qr/'bogus'/, "from_object(): error names the offending key" );
 };
 
 done_testing;

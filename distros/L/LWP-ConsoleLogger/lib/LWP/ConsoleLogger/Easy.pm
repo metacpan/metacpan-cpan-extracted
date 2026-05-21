@@ -3,7 +3,7 @@ package LWP::ConsoleLogger::Easy;
 use strict;
 use warnings;
 
-our $VERSION = '1.000001';
+our $VERSION = '1.000002';
 
 use HTTP::Request             ();
 use HTTP::Response            ();
@@ -116,7 +116,7 @@ LWP::ConsoleLogger::Easy - Easy LWP tracing and debugging
 
 =head1 VERSION
 
-version 1.000001
+version 1.000002
 
 =head1 SYNOPSIS
 

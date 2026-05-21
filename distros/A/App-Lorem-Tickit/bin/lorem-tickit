@@ -1,0 +1,103 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::Lorem::Tickit;
+
+our $VERSION = 0.01;
+
+# Run.
+exit App::Lorem::Tickit->new->run;
+
+# Print version.
+sub VERSION_MESSAGE {
+	print $VERSION."\n";
+	exit 0;
+}
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+lorem-tickit - Tickit application with lorem ipsum generator.
+
+=head1 SYNOPSIS
+
+ lorem-tickit [-h] [--version]
+
+=head1 DESCRIPTION
+
+This application is an interactive L<Tickit> lorem ipsum generator.
+
+=head1 ARGUMENTS
+
+=over 8
+
+=item * C<-h>
+
+Print help.
+
+=item * C<--version>
+
+Print version of script.
+
+=back
+
+=head1 CONTROLS
+
+=over 8
+
+=item * C<Tab>, arrows
+
+Select setting.
+
+=item * C<+>, C<->
+
+Increase or decrease selected count.
+
+=item * C<Enter>, C<Space>
+
+Use selected generator.
+
+=item * C<q>
+
+Quit.
+
+=back
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/App-Lorem-Tickit>
+
+=head1 SEE ALSO
+
+=over
+
+=item L<Lorem|https://flathub.org/en/apps/org.gnome.design.Lorem>
+
+Simple app to generate the well-known Lorem Ipsum placeholder text.
+
+=back
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2026 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 VERSION
+
+0.01
+
+=cut

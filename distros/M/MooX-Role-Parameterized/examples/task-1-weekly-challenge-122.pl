@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+use v5.12;
 use warnings;
 use strict;
 use feature qw{ say };
@@ -48,16 +49,15 @@ use feature qw{ say };
 }
 
 sub stream_average {
-    my ($stream) = @_;
-    my $count    = 0;
-    my $sum      = 0;
-    while (1) {
+    my ( $stream, $iterations ) = @_;
+    my $count = 0;
+    my $sum   = 0;
+    while ( $count < $iterations ) {
         ++$count;
         my $n = $stream->next;
         $sum += $n;
         say $count, "\t$n\t$sum / $count\t", $sum / $count;
-        sleep 1;
     }
 }
 
-stream_average( 'Stream::TenPlusTen'->new() );
+stream_average( 'Stream::TenPlusTen'->new(), 10 );

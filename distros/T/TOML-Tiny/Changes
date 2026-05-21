@@ -1,3 +1,7 @@
+0.21 2026-05-10
+
+- removed TOML::Parser from required prerequisites (GH#44) (Karen Etheridge)
+
 0.20 2025-03-25
 - Fix parsing of quoted keys (GH#41) (Ian Jackson)
 - Fix writing of more kinds of quote-needing keys (GH#40) (Ian Jackson)

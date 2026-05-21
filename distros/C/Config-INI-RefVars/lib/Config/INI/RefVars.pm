@@ -9,7 +9,7 @@ use feature ":5.10";
 use Config;
 use File::Spec::Functions qw(catdir rel2abs splitpath);
 
-our $VERSION = '0.21';
+our $VERSION = '0.24';
 
 use constant DFLT_TOCOPY_SECTION  => "__TOCOPY__";
 
@@ -522,7 +522,7 @@ Config::INI::RefVars - INI file reader that supports make-style variable referen
 
 =head1 VERSION
 
-Version 0.21
+Version 0.24
 
 =head1 SYNOPSIS
 
@@ -701,8 +701,9 @@ executed if the variable is not yet defined.
 
 =item C<??=>
 
-This works similar to C<?=>: the assignment is only executed if the variable
-is not yet defined or if its current, non-expanded value is an empty string.
+This works similarly to the C<?=> operator: the assignment is only executed if
+the variable is not yet defined or if its current, non-expanded value is an
+empty string.
 
 This allows you to set a default value for an environment variable:
 
@@ -1142,7 +1143,9 @@ But in global mode the result is:
      sec        => {x => 'y'}
    }
 
-For a local copy of a global variable, use assignment operator C<:=>.
+To create a local copy of a global variable, use the assignment operator C<:=>
+instead of a simple C<=>, since the latter can sometimes lead to undesirable
+results (see example below).
 
 B<NOTE:>
 In some special cases, variables have different values in standard mode than in global mode.
@@ -1551,7 +1554,8 @@ Other modules handling INI files:
 
 L<Config::INI>,
 L<Config::INI::Tiny>,
-L<Config::IniFiles>, and many more.
+L<Config::IniFiles>,
+L<Config::Tiny> and many more.
 
 
 =head1 AUTHOR

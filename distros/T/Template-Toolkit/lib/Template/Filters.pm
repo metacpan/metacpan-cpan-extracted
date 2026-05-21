@@ -297,8 +297,9 @@ sub url_filter {
 #------------------------------------------------------------------------
 # html_filter()                                         [% FILTER html %]
 #
-# Convert any '<', '>' or '&' characters to the HTML equivalents, '&lt;',
-# '&gt;' and '&amp;', respectively.
+# Convert any '<', '>', '&', '"' or "'" characters to the HTML
+# equivalents, '&lt;', '&gt;', '&amp;', '&quot;' and '&#39;',
+# respectively.
 #------------------------------------------------------------------------
 
 sub html_filter {
@@ -308,6 +309,7 @@ sub html_filter {
         s/</&lt;/g;
         s/>/&gt;/g;
         s/"/&quot;/g;
+        s/'/&#39;/g;
     }
     return $text;
 }
@@ -316,8 +318,8 @@ sub html_filter {
 #------------------------------------------------------------------------
 # xml_filter()                                           [% FILTER xml %]
 #
-# Same as the html filter, but adds the conversion of ' to &apos; which
-# is native to XML.
+# Same as the html filter, but uses &apos; for single quotes (the XML
+# named entity) instead of &#39; (the numeric reference used for HTML).
 #------------------------------------------------------------------------
 
 sub xml_filter {
@@ -521,8 +523,9 @@ sub truncate_filter_factory {
     $len  = $TRUNCATE_LENGTH unless defined $len;
     $char = $TRUNCATE_ADDON  unless defined $char;
 
-    # Length of char is the minimum length
-    my $lchar = length $char;
+    # Calculate visual length of the addon, treating HTML character entity
+    # references (e.g. &hellip; &#8230; &#x2026;) as single characters
+    my $lchar = _visual_length($char);
     if ($len < $lchar) {
         $char  = substr($char, 0, $len);
         $lchar = $len;
@@ -530,11 +533,45 @@ sub truncate_filter_factory {
 
     return sub {
         my $text = shift;
-        return $text if length $text <= $len;
-        return substr($text, 0, $len - $lchar) . $char;
-
-
+        return $text if _visual_length($text) <= $len;
+        return _truncate_visual($text, $len - $lchar) . $char;
     }
+}
+
+
+#------------------------------------------------------------------------
+# _visual_length($str)
+#
+# Returns the "visual" length of a string, counting each HTML character
+# entity reference (&name; &#digits; &#xhex;) as a single character.
+#------------------------------------------------------------------------
+
+sub _visual_length {
+    my $str = shift;
+    (my $copy = $str) =~ s/&(?:[a-zA-Z][a-zA-Z0-9]*|#[0-9]+|#x[0-9a-fA-F]+);/_/g;
+    return length $copy;
+}
+
+
+#------------------------------------------------------------------------
+# _truncate_visual($str, $maxlen)
+#
+# Truncates $str to at most $maxlen visual characters, treating HTML
+# character entity references as single characters and never splitting
+# one in the middle.
+#------------------------------------------------------------------------
+
+sub _truncate_visual {
+    my ($str, $maxlen) = @_;
+    my $result = '';
+    my $vlen   = 0;
+
+    while ($str =~ /\G(&(?:[a-zA-Z][a-zA-Z0-9]*|#[0-9]+|#x[0-9a-fA-F]+);|.)/gs) {
+        last if $vlen >= $maxlen;
+        $result .= $1;
+        $vlen++;
+    }
+    return $result;
 }
 
 
@@ -753,7 +790,7 @@ are added to the standard filters which are available by default.
     $filters = Template::Filters->new({
         FILTERS => {
             'sfilt1' =>   \&static_filter,
-            'dfilt1' => [ \&dyanamic_filter_factory, 1 ],
+            'dfilt1' => [ \&dynamic_filter_factory, 1 ],
         },
     });
 

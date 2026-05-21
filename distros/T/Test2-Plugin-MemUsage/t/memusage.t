@@ -32,7 +32,12 @@ is(Test2::Plugin::MemUsage->proc_file(), "/proc/$$/status", "Correct procfile");
 my $events = intercept {
     sub {
         no warnings 'redefine';
-        local *Test2::Plugin::MemUsage::proc_file = sub { 't/procfile' };
+        # Force the linux procfile collector regardless of host OS so the
+        # mocked t/procfile drives the assertions below.
+        local *Test2::Plugin::MemUsage::_collector_for_os
+            = sub { \&Test2::Plugin::MemUsage::_collect_proc };
+        local *Test2::Plugin::MemUsage::_maxrss_kb = sub { undef };
+        local *Test2::Plugin::MemUsage::proc_file  = sub { 't/procfile' };
         my $ctx = context();
         $CALLBACKS[0]->($ctx);
         $ctx->release;

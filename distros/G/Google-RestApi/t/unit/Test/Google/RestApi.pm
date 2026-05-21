@@ -3,6 +3,7 @@ package Test::Google::RestApi;
 use Test::Unit::Setup;
 
 use HTTP::Status qw( :constants );
+use Encode qw( encode is_utf8 );
 
 use Google::RestApi::Types qw( :all );
 
@@ -73,13 +74,13 @@ sub _constructor : Tests(8) {
 my @_temp_configs;
 
 sub _write_temp_config {
-  my ($data) = @_;
+  my ($data, $dir) = @_;
   require File::Basename;
   require File::Temp;
   require YAML::Any;
   require FindBin;
   require File::Spec;
-  my $dir = File::Spec->catdir($FindBin::RealBin, 'etc');
+  $dir //= File::Spec->catdir($FindBin::RealBin, 'etc');
   my $fh = File::Temp->new(SUFFIX => '.yaml', DIR => $dir, UNLINK => 1);
   print $fh YAML::Any::Dump($data);
   $fh->flush();
@@ -121,6 +122,66 @@ sub auth : Tests(4) {
 
   $api = RestApi->new(%auth);
   throws_ok sub { $api->auth()->account_file() }, qr/unable to resolve/i, 'Bad account file should throw';
+
+  return;
+}
+
+# token_file path resolution: absolute paths pass through, bare names resolve
+# against the auth config_file's dir first, then the main config_file's dir.
+sub auth_token_file_paths : Tests(4) {
+  my $self = shift;
+
+  require File::Basename;
+  require File::Spec;
+  my $token_name = File::Basename::basename(mock_token_file());
+
+  my $main_abs = _write_temp_config({
+    auth => {
+      class         => 'OAuth2Client',
+      client_id     => 'x',
+      client_secret => 'x',
+      token_file    => mock_token_file(),
+    },
+  });
+  isa_ok RestApi->new(config_file => $main_abs)->auth(), OAuth2Client,
+    'Absolute token_file in main YAML resolves';
+
+  my $main_rel = _write_temp_config({
+    auth => {
+      class         => 'OAuth2Client',
+      client_id     => 'x',
+      client_secret => 'x',
+      token_file    => $token_name,
+    },
+  });
+  isa_ok RestApi->new(config_file => $main_rel)->auth(), OAuth2Client,
+    'Relative token_file in main YAML resolves against main config dir';
+
+  # Separate auth config_file in same dir as the token; main config elsewhere.
+  # Token must resolve against the auth config_file's dir.
+  my $auth_with_token = _write_temp_config({
+    client_id     => 'x',
+    client_secret => 'x',
+    token_file    => $token_name,
+  });
+  my $main_elsewhere = _write_temp_config({
+    auth => { class => 'OAuth2Client', config_file => $auth_with_token },
+  }, File::Spec->tmpdir);
+  isa_ok RestApi->new(config_file => $main_elsewhere)->auth(), OAuth2Client,
+    'Relative token_file resolves against auth config_file dir';
+
+  # Separate auth config_file in a dir that does NOT contain the token; main
+  # config in the dir that does. Token must fall back to main config dir.
+  my $auth_elsewhere = _write_temp_config({
+    client_id     => 'x',
+    client_secret => 'x',
+    token_file    => $token_name,
+  }, File::Spec->tmpdir);
+  my $main_with_token = _write_temp_config({
+    auth => { class => 'OAuth2Client', config_file => $auth_elsewhere },
+  });
+  isa_ok RestApi->new(config_file => $main_with_token)->auth(), OAuth2Client,
+    'Relative token_file falls back to main config dir when auth dir lacks it';
 
   return;
 }
@@ -254,7 +315,120 @@ sub max_attempts : Tests(4) {
   is $api->max_attempts(1), 1, "Setting max attempts to 1 is 1";
   is $api->max_attempts(), 1, "Querying max attempts default is still 1";
   is $api->max_attempts(0), 4, "Setting max attempts default is 4";
-  
+
+  return;
+}
+
+# Covers: outgoing request header declares UTF-8, request bodies are emitted
+# as UTF-8 bytes (not doubly-encoded / not Latin-1), and UTF-8 response bodies
+# round-trip back to correctly-flagged Perl strings.
+sub utf8_content_type_header : Tests(2) {
+  my $self = shift;
+
+  my $captured_req;
+  $self->_sub_override('Furl', 'request', sub {
+    (undef, $captured_req) = @_;
+    return Furl::Response->new(1, 200, 'OK', [], '{}');
+  });
+
+  my $api = mock_rest_api();
+  $api->api(method => 'post', uri => 'https://x', content => { k => 'v' });
+
+  is $captured_req->header('Content-Type'), 'application/json; charset=utf-8',
+    'Content-Type header declares UTF-8 charset';
+
+  # No body, no Content-Type header should be set.
+  $api->api(uri => 'https://x');
+  is $captured_req->header('Content-Type'), undef,
+    'No Content-Type header when there is no request body';
+
+  return;
+}
+
+sub utf8_request_body_encodes : Tests(3) {
+  my $self = shift;
+
+  my $captured_req;
+  $self->_sub_override('Furl', 'request', sub {
+    (undef, $captured_req) = @_;
+    return Furl::Response->new(1, 200, 'OK', [], '{}');
+  });
+
+  my $api = mock_rest_api();
+  my $input = "caf\x{e9} \x{65e5}\x{672c}\x{8a9e} \x{1f3b5}";  # café 日本語 🎵
+  $api->api(method => 'post', uri => 'https://x', content => { title => $input });
+
+  my $body = $captured_req->content();
+  ok !is_utf8($body), 'Request body is bytes (utf8 flag off)';
+
+  # The body should contain the input re-encoded as UTF-8 bytes. Decoding them
+  # back yields the original characters.
+  my $decoded_body = eval { Encode::decode('UTF-8', $body, Encode::FB_CROAK) };
+  ok !$@, 'Request body decodes as valid UTF-8';
+  like $decoded_body, qr/\Q$input\E/,
+    'Request body preserves non-ASCII characters (caf\x{e9} 日本語 🎵)';
+
+  return;
+}
+
+sub utf8_response_decodes : Tests(4) {
+  my $self = shift;
+
+  my $expected = "caf\x{e9} \x{65e5}\x{672c}\x{8a9e} \x{1f3b5}";  # café 日本語 🎵
+  my $json_text = qq({"title":"$expected","count":3});
+  my $body_bytes = encode('UTF-8', $json_text);
+
+  $self->_sub_override('Furl', 'request', sub {
+    return Furl::Response->new(
+      1, 200, 'OK',
+      ['Content-Type' => 'application/json; charset=utf-8'],
+      $body_bytes,
+    );
+  });
+
+  my $api = mock_rest_api();
+  my $got = $api->api(uri => 'https://x');
+
+  is $got->{title}, $expected, 'Non-ASCII response value decodes to original characters';
+  ok is_utf8($got->{title}), 'Decoded response string has utf8 flag set';
+  is length($got->{title}), length($expected),
+    'Decoded string length is in characters, not bytes';
+  is $got->{count}, 3, 'ASCII fields alongside non-ASCII also decode correctly';
+
+  return;
+}
+
+sub utf8_roundtrip_mixed_scripts : Tests(2) {
+  my $self = shift;
+
+  # Latin-1 diacritics, CJK, RTL (Hebrew + Arabic), and a 4-byte emoji.
+  my %sent = (
+    latin  => "caf\x{e9} na\x{ef}ve r\x{e9}sum\x{e9}",
+    cjk    => "\x{65e5}\x{672c}\x{8a9e} \x{4e2d}\x{6587}",
+    rtl    => "\x{5e9}\x{5dc}\x{5d5}\x{5dd} \x{645}\x{631}\x{62d}\x{628}\x{627}",
+    emoji  => "\x{1f3b5}\x{1f3a7}\x{1f4fb}",
+    ascii  => "plain",
+  );
+
+  my $captured_req;
+  $self->_sub_override('Furl', 'request', sub {
+    (undef, $captured_req) = @_;
+    # Echo the request body back as the response, simulating a server that
+    # preserves what we sent.
+    my $bytes = $captured_req->content();
+    return Furl::Response->new(
+      1, 200, 'OK',
+      ['Content-Type' => 'application/json; charset=utf-8'],
+      $bytes,
+    );
+  });
+
+  my $api = mock_rest_api();
+  my $got = $api->api(method => 'post', uri => 'https://x', content => \%sent);
+
+  is_deeply $got, \%sent, 'Mixed-script structure round-trips unchanged';
+  ok is_utf8($got->{cjk}), 'Returned CJK string has utf8 flag set';
+
   return;
 }
 

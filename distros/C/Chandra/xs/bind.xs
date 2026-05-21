@@ -126,7 +126,7 @@ CODE:
         RETVAL = newRV_noinc((SV *)ret);
     }
     else if (!SvROK(decoded) || SvTYPE(SvRV(decoded)) != SVt_PVHV) {
-        /* Not a hash — raw */
+        /* Not a hash - raw */
         HV *ret = newHV();
         (void)hv_stores(ret, "type", newSVpvs("raw"));
         (void)hv_stores(ret, "data", SvREFCNT_inc(json_str));
@@ -301,7 +301,7 @@ CODE:
             }
         }
         else {
-            /* Unknown type — raw */
+            /* Unknown type - raw */
             HV *ret = newHV();
             (void)hv_stores(ret, "type", newSVpvs("raw"));
             (void)hv_stores(ret, "data", SvREFCNT_inc(json_str));

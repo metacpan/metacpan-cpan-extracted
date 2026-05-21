@@ -1,3 +1,46 @@
+0.08 2026-05-08T09:46:06+02:00
+ - Add processing of WHITESPACE in Tokenizer. And move error with
+   whitespace from Tokenizer to Parser.
+ - Add validation error for '´'.
+ - Add validation error for comma in number.
+ - Allow '´' in APOS_AUX token as apostrophe in Tokenizer.
+ - Allow ',' in NUMBER token as dot in Toknenizer.
+ - Change Tokenizer to not ignore whitespace in ALPHA_SPEC.
+ - Fix FORM after the ALPHA_SPEC.
+
+0.07 2026-05-05T19:26:11+02:00
+ - Add tests for apostrophe.
+ - Add tests for ast() method.
+ - Add validation error for bad apostrophe character.
+ - Add validation error for bad quotation mark character.
+ - Allow '/' in name.
+ - Allow alternative apostrophe in tokenizer (&apos; and ’ and `).
+ - Allow alternative quotation marks in tokenizer (“ and '').
+ - Fix whitespace error in '94(437.13 Jičín) "1939/1945"'.
+ - Improve test messages.
+
+0.06 2026-05-02T16:50:33+02:00
+ - Add processing of error params in error().
+ - Allow name in group.
+ - Allow quotes in name.
+ - Allow space on the end of name.
+ - Change error for alphabetical token on the begin.
+
+0.05 2026-05-02T13:12:12+02:00
+ - Add test for tokenization of group.
+ - Add test for tokenization of name only.
+ - Add test for tokenization with + operator.
+ - Allow # in name.
+ - Allow + in name.
+ - Allow , in name.
+ - Allow name with space on the begin.
+ - Fix form after the name.
+ - Fix space in name.
+
+0.04 2026-04-28T16:27:57+02:00
+ - Add detection of space, which is not allowed.
+ - Add tests for invalid UDC string.
+
 0.03 2026-03-26T19:43:52+01:00
  - Add description for LBRACK and RBRACK tokens.
  - Add some tests for tokenizer.

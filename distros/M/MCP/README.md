@@ -13,6 +13,8 @@ specification is getting regular updates which we will implement. Breaking chang
 
   * Tool calling, prompts and resources
   * Streamable HTTP and Stdio transports
+  * Notifications for list changes (tools, prompts, resources)
+  * Progress tracking for long-running operations
   * Scalable with pre-forking web server and async tools using promises
   * HTTP client for testing
   * Can be embedded in Mojolicious web apps
@@ -50,6 +52,33 @@ app->start;
 ```
 
 Authentication can be added by the web application, just like for any other route.
+
+## Server-to-Client Streaming
+
+The HTTP transport can optionally accept `GET` requests to open a long-lived SSE stream the server can push
+notifications to, and `DELETE` requests to terminate a session. This requires per-process state and is not
+compatible with pre-forking web servers, so it is opt-in.
+
+```perl
+use Mojolicious::Lite -signatures;
+
+use MCP::Server;
+
+my $server = MCP::Server->new;
+$server->tool(
+  name         => 'echo',
+  description  => 'Echo the input text',
+  input_schema => {type => 'object', properties => {msg => {type => 'string'}}, required => ['msg']},
+  code         => sub ($tool, $args) {
+    $tool->context->notify('notifications/message', {level => 'info', data => "Echoing: $args->{msg}"});
+    return "Echo: $args->{msg}";
+  }
+);
+
+any '/mcp' => $server->to_action({streaming => 1});
+
+app->start;
+```
 
 ## Stdio Transport
 

@@ -7,7 +7,7 @@ use lib 't';
 use TestHelper;
 
 require_pg;
-plan tests => 17;
+plan tests => 21;
 
 # prepare + query_prepared
 with_pg(cb => sub {
@@ -65,6 +65,23 @@ with_pg(cb => sub {
                 ok(!exists $meta->{paramtypes}, 'describe zero-field: no paramtypes key');
                 EV::break;
             });
+        });
+    });
+});
+
+# describe_prepared("") -- the unnamed/anonymous prepared statement
+with_pg(cb => sub {
+    my ($pg) = @_;
+    $pg->prepare("", "select \$1::int as anon_n", sub {
+        my (undef, $err) = @_; die $err if $err;
+        $pg->describe_prepared("", sub {
+            my ($meta, $e) = @_;
+            ok(!$e, 'describe anonymous: no error');
+            is($meta->{nparams}, 1, 'describe anonymous: 1 param');
+            is($meta->{nfields}, 1, 'describe anonymous: 1 field');
+            is($meta->{fields}[0]{name}, 'anon_n',
+               'describe anonymous: field name');
+            EV::break;
         });
     });
 });

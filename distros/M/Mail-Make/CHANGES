@@ -1,5 +1,24 @@
 Revision history for Perl module Mail::Make
 
+v0.23.0 2026-05-11T12:12:22+0900
+    - html_to_inline(): new method; parses an HTML string, fetches all external
+      assets (images, body backgrounds, optionally CSS via embed_css), rewrites
+      their URLs to cid: references, and attaches each asset as an inline part;
+      supports file:// URIs, per-instance in-memory cache, and optional persistent
+      disk cache with If-None-Match / If-Modified-Since conditional requests
+    - url_to_inline(): new method; fetches an HTML page from a URL then delegates to
+      html_to_inline(); base_url is deduced automatically from the page URL directory
+      if not provided explicitly
+    - build(): new keys html_to_inline and url_to_inline, forwarded to the respective
+      methods
+    - as_entity(): restructured MIME tree for plain + html + inline:
+      multipart/alternative( text/plain, multipart/related( text/html, images ) )
+      instead of the previous multipart/related wrapping multipart/alternative;
+      inline parts without a Content-ID now return an explicit error
+    - related(): new method; sets the HTML body and attaches inline parts in one call;
+      requires cid: references to already be present in the HTML
+    - build(): new key related, forwarded to related()
+
 v0.22.0 2026-03-18T09:12:20+0900
     - Mail::Make::build(): added 'attach' parameter supporting a single
       file path, an arrayref of file paths, an arrayref of hash references,

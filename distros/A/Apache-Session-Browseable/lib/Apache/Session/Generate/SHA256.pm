@@ -3,9 +3,9 @@ package Apache::Session::Generate::SHA256;
 
 use strict;
 use vars qw($VERSION);
-use Digest::SHA qw(sha256 sha256_hex sha256_base64);
+use Crypt::URandom;
 
-$VERSION = '1.2.2';
+$VERSION = '1.3.19';
 
 sub generate {
     my $session = shift;
@@ -15,13 +15,21 @@ sub generate {
         $length = $session->{args}->{IDLength};
     }
 
-    $session->{data}->{_session_id} = substr(
-        Digest::SHA::sha256_hex(
-            Digest::SHA::sha256_hex( time() . {} . rand() . $$ )
-        ),
-        0, $length
-    );
-
+    eval {
+        $session->{data}->{_session_id} = substr(
+            unpack( 'H*', Crypt::URandom::urandom( int( ( $length + 1 ) / 2 ) ) ),
+            0, $length
+        );
+    };
+    if ($@) {
+        require Digest::SHA;
+        $session->{data}->{_session_id} = substr(
+            Digest::SHA::sha256_hex(
+                Digest::SHA::sha256_hex( time() . {} . rand() . $$ )
+            ),
+            0, $length
+        );
+    }
 }
 
 sub validate {

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.81.
+signed via the Module::Signature module, version 0.93.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,59 +12,62 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 c0c499f54d97fade273e2550b7274aac7a30ff81 Changes
-SHA1 646c198992a5832c120744011c9cde303eebe4ad LICENSE
-SHA1 639d1bf158729cf8c19abafba6a71c6db0edb60f MANIFEST
-SHA1 9a9f3be365e447f737e2959310b41d7575297bde META.yml
-SHA1 538553ebd8b0233ea9bab9bdf7a2703977e6a926 Makefile.PL
-SHA1 60630918f4f3f6cc3bd47312143b833bbf0208ff README.md
-SHA1 05a17c51aceb6435a1eac17137f19911a09e5050 inc/Module/Install.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 dc73c2baf4357ad1cc884146147f557a50a29300 inc/Module/Install/Base.pm
-SHA1 c7f311a5bc5a7f96e9105d5f16a0e13fc596899d inc/Module/Install/Can.pm
-SHA1 470809a1dbe03e197e74dde79c6af40b5f7f9b26 inc/Module/Install/DOAPChangeSets.pm
-SHA1 8c8f9ff5b0a536af59814e16a901ce39fbc23299 inc/Module/Install/Fetch.pm
-SHA1 4f77eb02e104324b08a047585c498146b045613b inc/Module/Install/Makefile.pm
-SHA1 2f5be6af6098acf6d786a4a7299a34d0c6c04ef9 inc/Module/Install/Metadata.pm
-SHA1 f7882569ead92975e7559e169c2a2e86c3de1e57 inc/Module/Install/Share.pm
-SHA1 aa6723cc4a8d4475026f6ceb28e1f16459e8a11b inc/Module/Install/Win32.pm
-SHA1 6661285caedfe012cb5a1ca915a422ffc292ae2b inc/Module/Install/WriteAll.pm
-SHA1 e854e152322a355b9d195920c2dd4a26ee78b608 lib/AtteanX/Endpoint.pm
-SHA1 078450ece1f78535d63b1020cde797a5a40ce8b5 meta/changes.ttl
-SHA1 e0ed180620d47f429917d290445ac27b13173f89 scripts/endpoint.psgi
-SHA1 19ac766464ef05698ac985e2a42e87dbb7912f3f share/endpoint/index.html
-SHA1 6dd0cf355b49dcb0fdfe9203c68917d5320584f8 share/endpoint/results.html
-SHA1 c40ebad09f7e1d92ad0228a0625d730ba2f57b84 share/endpoint/www/css/docs.css
-SHA1 398bae2ae66a19ab8976036b50a2d20041b67fe5 share/endpoint/www/css/sparqlcolors.css
-SHA1 aa6874f2bad5f0b75b0ff52760f5e6b48ec933ae share/endpoint/www/favicon.ico
-SHA1 13fece7654a01193013d3d96528c851bfc79a300 share/endpoint/www/js/codemirror.js
-SHA1 d372c911fcc2bd030da800fdeedfbcd6b0100c83 share/endpoint/www/js/editor.js
-SHA1 551ff99056361eebfba2a32ea7445502a6eb4f21 share/endpoint/www/js/highlight.js
-SHA1 5bff996ab2564db1a998de30cb9e1ae07cbe62b5 share/endpoint/www/js/mirrorframe.js
-SHA1 d7540f8390913afc0d58484bf5161cf9b9aad9f8 share/endpoint/www/js/parsecss.js
-SHA1 a0028275114eaedf7ddcf57976c99c32ecb2c1d3 share/endpoint/www/js/parsedummy.js
-SHA1 39383cdfc93568cc5673e2b71f681e2811fb5463 share/endpoint/www/js/parsehtmlmixed.js
-SHA1 d5319247a4b26cafccfd4f26621918f0f4d22ef4 share/endpoint/www/js/parsejavascript.js
-SHA1 c6597fb9a5c7969237f7f039f2d0bc6968ef7ce7 share/endpoint/www/js/parsesparql.js
-SHA1 ae75f537ad61277a21a8ec423f5deffed8454e22 share/endpoint/www/js/parsexml.js
-SHA1 85cdbc16cd1581f441480d91fa5c0a50f234ff0b share/endpoint/www/js/select.js
-SHA1 d3261a5ddb7e5835c7abed5d5c343f0ef98637a5 share/endpoint/www/js/sparql_form.js
-SHA1 19cc324cce7165c868a60d523b2462c648f20887 share/endpoint/www/js/stringstream.js
-SHA1 5fdb14f3db575d0ce6a7113f96ea5a530f4f1941 share/endpoint/www/js/tokenize.js
-SHA1 7f581a2b4647f1214d1bc3160eb4e166a1261e4f share/endpoint/www/js/tokenizejavascript.js
-SHA1 9bba7456d4a25b23e805bc2d1d5bde61371c4e82 share/endpoint/www/js/undo.js
-SHA1 26ff15a8f6c196e8bd9f5d7e7b628a6ee9b0dfaa share/endpoint/www/js/unittests.js
-SHA1 201409b1d00a8df0b65b00a1b92ab62d9e0bbd7a share/endpoint/www/js/util.js
-SHA1 ba3972579f5adab59fefb48dee2f8d59247e37e6 t/00.load.t
-SHA1 6c81693f964d4569f641101787e648b6a8a16272 t/simple.t
-SHA1 61bf86179ce63f1148d1fb8c7a4c57bee395f7fc xt/pod-coverage.t
-SHA1 6387af7a5fde0747be5bc9ad2ec15ca9759bd95a xt/pod.t
+SHA256 ccfb5ea49a666965eeea1627d109f494361740f6aaf64bebd182383713fb1edc Changes
+SHA256 16cccd7c76676a966578b6965170aa1386bf6e725a891686368a46bcbe3bd07d LICENSE
+SHA256 8f3f745e7738a7942fe90088d47b447af8c226f4e658e7ab5ece704ac7786120 MANIFEST
+SHA256 a574737ad69c817dcebcb1c031bdc47a8ba89615a692241a463b24c7ce77ab97 META.yml
+SHA256 20ef7439fc392e108230ebfa675229f4932b0f0d13750abaf2fa1b0d29014c16 Makefile.PL
+SHA256 8014e34aa7627ca93bd5dd7140616634abebf133b1bb398afa3342fceea27399 README.md
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 668306ae2fad17b3049f885251b8679497c4eb8d5c4b0d13f5c95bda331d1f00 inc/Module/Install/DOAPChangeSets.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 63ec8405523ae67c33823dcf4b136a46f0711fb17a8b58b49ddd922ed6b69611 inc/Module/Install/Scripts.pm
+SHA256 b986592700675e11c2c62cb41fa24d9f4d15e077a0d317f372efcaa78d68a1d9 inc/Module/Install/Share.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 ffee183c74ae6862b141b7eb608453253e8cb40c62dbcb27e983f1af72cf675f lib/AtteanX/Endpoint.pm
+SHA256 36d8bfb97bffbc267ca3cd5eacdc2e0d40b6a9a46b4b843c875b26e8e5c809e8 meta/changes.ttl
+SHA256 de96338e5357d3c5df86e363565d68816bbd6ba0d1aee138e7dc16b149aa084c scripts/endpoint.psgi
+SHA256 abfb9b04bcdef9a10cf6543471fdbad1fdef193942b67b8e2d5780e64d344cb6 share/endpoint/index.html
+SHA256 e69caef172ec6314b1b4b69816263d699e6a05e25295afb1b0f02441425341ce share/endpoint/results.html
+SHA256 148eabf663f91b87a7ebc86009ba599dbef41b5bbc01f1ad545942ecae8ef61f share/endpoint/www/css/docs.css
+SHA256 91d7fc5249933db30dd0657c9a93d875488b9767ec18af8e0b03c7a361dea926 share/endpoint/www/css/sparqlcolors.css
+SHA256 dfba29d03ee7b7a2a51ebb5500fb034ddfb35b3fe44a3619e1a96a6389de19fc share/endpoint/www/favicon.ico
+SHA256 e5bb9e9ece76ff87ee59273ae4349042bea3f937a7441d8fda7fc5d3a3d197b9 share/endpoint/www/js/codemirror.js
+SHA256 7d4f32f5ff170e4727093c549c5c483a8b9e058f0387053865f80b181ea730ad share/endpoint/www/js/editor.js
+SHA256 ad0655918fc9b59693a4374930a0fc5752fcaf46bc06157e2a303cff5f20edad share/endpoint/www/js/highlight.js
+SHA256 f2a94d9ec5b53ad58f58dc02e78717b9ce27e9e23fb4d01b169bb64a26f70d1b share/endpoint/www/js/mirrorframe.js
+SHA256 90b5d652ec5ef41e1fd693cd7e0d1c56f6134b44159b1cf3d4353ed46bb2860d share/endpoint/www/js/parsecss.js
+SHA256 085ed3937d56e8d7721d026277fb3a97da4873aecd2e6b719a287496775b06a9 share/endpoint/www/js/parsedummy.js
+SHA256 23e3804668969fb98b989a7982b9fe00a9446102a2b5a12e95f3d3e5ce1d92bc share/endpoint/www/js/parsehtmlmixed.js
+SHA256 212506b040c885b825031e0e994fcbb9f2a5ac268ccfc4aa144647dbbccc5ed5 share/endpoint/www/js/parsejavascript.js
+SHA256 8f1008011c217d799b225c0d906a740b5034d87679dadf46212576de3199f6c7 share/endpoint/www/js/parsesparql.js
+SHA256 1f1b0bfab402f57c19cecb652ca68b05e0895a1bd6830afab8b277a9a2e0281e share/endpoint/www/js/parsexml.js
+SHA256 165cb522044a7d5bffaa3dc489f841e5e5504f8ac01dfe87160f74c29e9e010a share/endpoint/www/js/select.js
+SHA256 fadbc674c5af65f5725e0854d95eee6753295bb51c2225d6361f00a5593ae638 share/endpoint/www/js/sparql_form.js
+SHA256 7c9286894772caedca1af04c44eadb290492ccbc1fcf6cea92cbfae189ab0571 share/endpoint/www/js/stringstream.js
+SHA256 5860fb4ad9f72176bd206e64434b82c4c16eb7fe8c420896d0c8412bcc2a6669 share/endpoint/www/js/tokenize.js
+SHA256 c45f8ffc9182d1ed35ebb748c23d0fb9e792c7857b464f9c53ddcc04eb67890f share/endpoint/www/js/tokenizejavascript.js
+SHA256 89e8b157fc38f9f8a0915b427ea76c4c5ffb1e0a5ed89bf0cf72c46f039d304d share/endpoint/www/js/undo.js
+SHA256 0fe5b25dfe5f752c073a4c85c068188dfa9cbfc8c3a28f47257a644c6616c07b share/endpoint/www/js/unittests.js
+SHA256 228bfbcab8da6ae5f2509c4070c38cd046fb567452318f4987fdfe7a1171d01b share/endpoint/www/js/util.js
+SHA256 cc74b5c5b2528279562fad5e9b9202f4b98c97f34ce46ea550c0a7a4fbd49261 t/00.load.t
+SHA256 7b79c513cfc7ca7a9f235aaadc3c4b2804406195be7a3224d6d464f9e3355467 t/gsp-custom-endpoint.t
+SHA256 d3abdca00ff72c165180929878b8bd396103652b101f15a3e97edbaf50d8d526 t/gsp-read-only.t
+SHA256 958d138fceaf60d42ce1457dac56536ccb8571ba69e28b72135534e630ba1e27 t/gsp.t
+SHA256 239a7ac72217994e513340d67f96ed6e457d438a42ae7dd85cfa5783cec7002b t/simple.t
+SHA256 81dae5e652e694c2acc7d105e32ba5f69edc343b22b2e1d47f95fdef8b441cd3 xt/pod-coverage.t
+SHA256 2b04b20ff767801fde2fb6435361dc8ca0a9b60dda6cb0bbd18dd52962e1c1a3 xt/pod.t
 -----BEGIN PGP SIGNATURE-----
-Comment: GPGTools - http://gpgtools.org
 
-iEYEARECAAYFAlnyCuwACgkQhPK6VMqoyC1DXwCcDnvOYVW7g092trkfG/w9l0Rt
-DrwAn3gTRxb770EnaSywBir0XrE5PDW7
-=/Ref
+iF0EAREDAB0WIQSC+8GhU5AgVmDLxA+E8rpUyqjILQUCag8a+QAKCRCE8rpUyqjI
+Lde8AKCn5LE7QbZyJ1C5S5XNK/I/JqBBvACdFaCBz9V0XlkwMkNtQxCihT07Ego=
+=e1eh
 -----END PGP SIGNATURE-----

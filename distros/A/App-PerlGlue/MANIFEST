@@ -1,0 +1,14 @@
+bin/perlglue
+Changes
+lib/App/PerlGlue.pm
+Makefile.PL
+MANIFEST
+README.md
+t/00-load.t
+t/cli-case.t
+t/cli-csv.t
+t/cli-lines.t
+t/cli-version-help.t
+t/cli.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

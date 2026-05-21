@@ -3893,8 +3893,17 @@ void xs_jit_memoize(pTHX_ XS_JIT_Builder* b, const char* func_name,
         xs_jit_line(aTHX_ b, "SV** val_svp = av_fetch(cached_av, 1, 0);");
         {
             char ttl_cond[128];
+            /* `<= ttl` rather than `< ttl`: with time()'s 1-second
+             * granularity, the strict-less-than form means "TTL=1 is
+             * valid only if both the store and the lookup land in the
+             * same wall-clock second", which is consistently false on
+             * slower CI machines that tick over between consecutive
+             * calls (CPAN reports df52f1c0 / a9655479, Sep 2026).
+             * Using `<= ttl` makes a TTL of N seconds actually mean
+             * "valid for at least N seconds" - matches user intuition
+             * and what other CPAN memoize-with-TTL implementations do. */
             snprintf(ttl_cond, sizeof(ttl_cond),
-                     "ts_svp && val_svp && (time(NULL) - SvIV(*ts_svp)) < %ld", (long)ttl);
+                     "ts_svp && val_svp && (time(NULL) - SvIV(*ts_svp)) <= %ld", (long)ttl);
             xs_jit_if(aTHX_ b, ttl_cond);
         }
         xs_jit_line(aTHX_ b, "SvREFCNT_dec(cache_key);");

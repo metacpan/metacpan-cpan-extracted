@@ -1,6 +1,6 @@
 package Google::RestApi::Auth::ServiceAccount;
 
-our $VERSION = '2.2.2';
+our $VERSION = '2.2.3';
 
 use Google::RestApi::Setup;
 
@@ -12,11 +12,12 @@ sub new {
   my $class = shift;
 
   my %p = @_;
-  # order is important, resolve the overall config file first.
+  # config_file must be resolved before merge_config_file can read it.
   resolve_config_file_path(\%p, 'config_file');
-  resolve_config_file_path(\%p, 'account_file');
-  
   my $self = merge_config_file(%p);
+  # account_file may have come from the YAML; resolve relative names against
+  # the auth config_file's dir first, then the caller-supplied config_dir.
+  resolve_config_file_path($self, 'account_file');
   state $check = signature(
     bless => !!0,
     named => [

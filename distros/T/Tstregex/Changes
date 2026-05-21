@@ -1,0 +1,60 @@
+Revision history for tstregex
+
+1.03  2026-05-19
+      - Fix Windows case-insensitivity issue in MANIFEST.
+      - Ensure lib/Tstregex.pm is properly indexed with capital T.
+      - Fix the stubs for windows and Linux
+
+1.02  2026-05-19
+      - Rename module to Tstregex to fix MetaCPAN indexing issue.
+      - Keep command line script as 'tstregex' (lowercase) for user convenience.
+      
+1.01  2023-05-09
+    - Fixed start-state variable init in case of multiple pattern test
+
+1.00  2026-04-23
+    - Final code cleanup and production release.
+    - Verified 100% QA pass rate on both Linux and Windows Terminal.
+
+0.10  2026-04-20
+    - Implemented $SIG{__DIE__} handling to capture native Perl syntax errors.
+    - Integrated diagnostic feedback for unmatched parentheses to prevent 
+      unhandled crashes.
+
+0.08  2026-04-15
+    - Refactored Makefile.PL for Windows/Strawberry Perl compatibility.
+    - Shielded Unix-style symlinks (ln -s) behind OS-detection logic.
+    - Resolved Gmake Error 255 for Windows environments.
+
+0.07  2026-04-10
+    - Final cleanup of DATA section and resolved syntax conflicts with 
+      parentheses delimiters.
+    - Organized tests into thematic files.
+
+0.06  2026-04-09
+    - Integrated "Death Tests" to detect catastrophic backtracking (ReDoS) 
+      and exponential complexity.
+
+0.05  2026-04-08
+    - Expanded support for complex assertions (Lookaheads).
+    - Added support for specialized characters, including the Euro symbol (€).
+
+0.04  2026-04-06
+    - Implemented "Nibbling" engine with precise cursor tracking.
+    - Added "HERE" marker for exact failure character identification.
+
+0.03  2026-04-04
+    - Fixed scanner conflicts for curly brace quantifiers (e.g., {2,4}).
+    - Prevented delimiter confusion during quantification scanning.
+
+0.02  2026-04-02
+    - Introduced "Smart Scanner" for unwrap regex logic.
+    - Supported various delimiters (//, m!!, m{}) and modifier extraction (isx).
+
+0.01  2026-03-28
+    - Formally modularized script into TstRegex.pm.
+    - Decoupled testing logic from the __DATA__ section.
+
+0.00_1  2026-03-15
+    - Genesis: Initial procedural script for regex validation.
+    - Preliminary version delivered to Regexp-Debugger developer for review.

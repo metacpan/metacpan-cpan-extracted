@@ -1,4 +1,3 @@
-#!/usr/bin/perl
 
 use utf8;
 use 5.006;
@@ -9,7 +8,7 @@ use Module::Build;
 my $builder = Module::Build->new(
     module_name       => 'Lingua::RO::Numbers',
     license           => 'artistic_2',
-    dist_author       => q{Daniel "Trizen" Șuteu <trizenx@gmail.com>},
+    dist_author       => q<Daniel Șuteu <trizen@cpan.org>>,
     dist_version_from => 'lib/Lingua/RO/Numbers.pm',
     dist_abstract     => 'Convert numeric values into their Romanian string equivalents and viceversa',
     release_status    => 'stable',
@@ -21,6 +20,8 @@ my $builder = Module::Build->new(
                        'Test::More' => 0,
                       },
 
+    sign              => 1,
+    dynamic_config    => 0,
     extra_manify_args => { utf8 => 1 },
 
     meta_merge => {
@@ -29,7 +30,7 @@ my $builder = Module::Build->new(
                                 }
                   },
     requires => {
-                 'perl'     => 5.006,
+                 'perl'     => 5.0080001,
                  'utf8'     => 0,
                  'strict'   => 0,
                  'warnings' => 0,

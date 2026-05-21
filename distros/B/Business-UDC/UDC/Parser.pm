@@ -13,7 +13,7 @@ use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(parse);
 
-our $VERSION = 0.03;
+our $VERSION = 0.08;
 
 sub parse {
 	my $input = shift;
@@ -26,8 +26,18 @@ sub parse {
 	}
 
 	my $tokens = tokenize($input);
+	my $normalized_tokens = [];
+	foreach my $tok_hr (@{$tokens}) {
+		my %parse_tok = %{$tok_hr};
+		_check_whitespace_token(\%parse_tok);
+		_check_apos_aux_tokens(\%parse_tok);
+		_check_aux_time_tokens(\%parse_tok);
+		_check_number_token(\%parse_tok);
+		_normalize_alpha_spec_token(\%parse_tok);
+		push @{$normalized_tokens}, \%parse_tok;
+	}
 	my $state = {
-		'tokens' => $tokens,
+		'tokens' => $normalized_tokens,
 		'pos' => 0,
 	};
 
@@ -44,6 +54,100 @@ sub parse {
 		'tokens' => $tokens,
 		'ast' => $ast,
 	};
+}
+
+sub _check_whitespace_token {
+	my $tok = shift;
+
+	if ($tok->{'type'} ne 'WHITESPACE') {
+		return;
+	}
+
+	err "Whitespace is not allowed in UDC string.",
+		'position' => $tok->{'pos'},
+		'character' => substr($tok->{'value'}, 0, 1),
+	;
+}
+
+sub _check_apos_aux_tokens {
+	my $tok = shift;
+
+	if ($tok->{'type'} ne 'APOS_AUX') {
+		return;
+	}
+	if (substr($tok->{'value'}, 0, 1) eq "'") {
+		return;
+	}
+
+	my ($character) = $tok->{'value'} =~ /^(&apos;|.)/us;
+	err 'Bad apostrophe character.',
+		'character' => $character,
+		'position' => $tok->{'pos'},
+	;
+
+	return;
+}
+
+sub _check_aux_time_tokens {
+	my $tok = shift;
+
+	if ($tok->{'type'} ne 'AUX_TIME') {
+		return;
+	}
+
+	my ($left, $left_length) = _time_quote_at_start($tok->{'value'});
+	if ($left ne '"') {
+		err 'Bad quotation mark character.',
+			'character' => $left,
+			'position' => $tok->{'pos'},
+		;
+	}
+
+	my ($right, $right_length) = _time_quote_at_end($tok->{'value'});
+	if ($right ne '"') {
+		err 'Bad quotation mark character.',
+			'character' => $right,
+			'position' => $tok->{'pos'} + length($tok->{'value'}) - $right_length,
+		;
+	}
+
+	return;
+}
+
+sub _check_number_token {
+	my $tok = shift;
+
+	if ($tok->{'type'} ne 'NUMBER') {
+		return;
+	}
+	if ($tok->{'value'} !~ /,/) {
+		return;
+	}
+
+	err 'Bad dot character in number.',
+		'position' => $tok->{'pos'} + index($tok->{'value'}, ','),
+		'character' => ',',
+	;
+}
+
+sub _time_quote_at_start {
+	my $value = shift;
+
+	if (substr($value, 0, 2) eq "''") {
+		return ("''", 2);
+	}
+
+	return (substr($value, 0, 1), 1);
+}
+
+sub _time_quote_at_end {
+	my $value = shift;
+
+	if (substr($value, -2) eq "''") {
+		return ("''", 2);
+	}
+
+	return (substr($value, -1), 1);
 }
 
 sub _consume {
@@ -172,7 +276,10 @@ sub _parse_primary {
 	}
 
 	if ($tok->{'type'} eq 'ALPHA_SPEC') {
-		err "Alphabetical specification '$tok->{'value'}' cannot appear standalone.";
+		err "Alphabetical specification cannot appear standalone.",
+			'position' => $tok->{'pos'},
+			'value' => $tok->{'value'},
+		;
 	}
 
 	if ($tok->{'type'} eq 'APOS_AUX') {
@@ -354,6 +461,33 @@ sub _peek {
 	my $state = shift;
 
 	return $state->{'tokens'}[$state->{'pos'}];
+}
+
+sub _normalize_alpha_spec_token {
+	my $tok = shift;
+
+	if ($tok->{'type'} ne 'ALPHA_SPEC') {
+		return;
+	}
+
+	my ($value, $pos) = _trim_alpha_spec_value($tok);
+	$tok->{'pos'} = $pos;
+	$tok->{'value'} = $value;
+
+	return;
+}
+
+sub _trim_alpha_spec_value {
+	my $tok = shift;
+	my $value = $tok->{'value'};
+	my $pos = $tok->{'pos'};
+
+	if ($value =~ s/^(\s+)//) {
+		$pos += length($1);
+	}
+	$value =~ s/\s+\z//;
+
+	return ($value, $pos);
 }
 
 sub _split_trailing_apos_aux {

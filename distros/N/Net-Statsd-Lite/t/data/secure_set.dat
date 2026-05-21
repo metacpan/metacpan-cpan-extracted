@@ -1,0 +1,24 @@
+#!perl
+
+use utf8;
+
+use v5.14;
+use warnings;
+
+[
+    {
+        description => "set",
+        autoflush   => 1,
+        prefix      => 'foo.',
+        input       => [ [qw/ secure_set_add addresses 192.168.0.1 /], ],
+        output      => "foo.addresses:cVZufAMigy4uVz2uxj/iBD/IrbPZQ6dUY1bmbnGhl7M|s\n",
+    },
+    {
+        description => "set (utf8 value)",
+        autoflush   => 1,
+        prefix      => 'foo.',
+        input       => [ [ qw/ secure_set_add places Äland/, ], ],
+        output      => "foo.places:DZ6FMrloTk69XUdDQIZirj9GtQNdqvSheMQ4YPMIyNE|s\n",
+    },
+
+]

@@ -68,10 +68,11 @@ CONSTRUCTOR
 
         my $red = Graphics::Toolkit::Color->new(          255, 0, 0 );
         my $red = Graphics::Toolkit::Color->new(         [255, 0, 0]);   # does the same
-        my $red = Graphics::Toolkit::Color->new( 'RGB',   255, 0, 0 );   # named ARRAY syntax
+        my $red = Graphics::Toolkit::Color->new( 'RGB',   255, 0, 0 );   # named list syntax
         my $red = Graphics::Toolkit::Color->new(  RGB =>  255, 0, 0 );   # with fat comma
-        my $red = Graphics::Toolkit::Color->new([ RGB =>  255, 0, 0]);   # and brackets
+        my $red = Graphics::Toolkit::Color->new([ RGB =>  255, 0, 0]);   # named ARRAY
         my $red = Graphics::Toolkit::Color->new(  RGB => [255, 0, 0]);   # separate name and values
+        my $red = Graphics::Toolkit::Color->new([ RGB => [255, 0, 0]]);  # even inside an ARRAY
         my $red = Graphics::Toolkit::Color->new(  YUV => .299,-0.168736, .5); # same color in YUV
 
   new('rgb($r,$g,$b)')
@@ -113,17 +114,42 @@ CONSTRUCTOR
     Get a color by name from a specific scheme or standard as provided by an
     external module Graphics::ColorNames::* , which has to be installed
     separately or with Bundle::Graphics::ColorNames. See all scheme names
-    here . The color name will be normalized as above.
+    here. The color name will be normalized as described above.
 
         my $color = Graphics::Toolkit::Color->new('SVG:green');
-        my @schemes = Graphics::ColorNames::all_schemes();    # look up the installed
+        my @schemes = Graphics::ColorNames::all_schemes();    # list installed schemes
+
+  new( color => .., range => .., raw => ..)
+    In the rare occasion you are given a color definition with values in a
+    none standard range, you will need a mechanism to tell GTC what ranges
+    to use when reading the color definition. This is also important in
+    combination with wider gamut spaces such as *ProPhotoRGB* that use
+    either normalized values or several huge none standard ranges, in order
+    to get a similar resolution for the normal colors as stadard RGB.
+
+    Just use the named argument *color* and give it a scalar color
+    definition as described above. The second argument that can be "range".
+
+        my $color = Graphics::Toolkit::Color->new( 
+                     color => [AppleRGB => [1438, 374, 8285]], range => 2**32
+        );
+
+    The second reason to use the color argument is to combine it with raw.
+    Then the values will be not be clamped into range, taken as is. You
+    might want to use the argument *raw* also on the method *values*. This
+    is the only way to calculate with imaginary colors. But please note this
+    might cause some functions not to work as intended.
+
+        my $color = Graphics::Toolkit::Color->new( 
+                     color => {r => 0, g => 0, b => 256}, raw => 1
+        );
 
   color
     If writing
 
         Graphics::Toolkit::Color->new( ...);
 
-    is too much typing work for you or takes up to much space in the code
+    is too much typing work for you or takes up too much space in the code
     file, import the subroutine "color", which accepts all the same
     arguments as "new".
 
@@ -132,13 +158,14 @@ CONSTRUCTOR
         my $darkblue = color([20, 20, 250]);
 
 GETTER
-    giving access to different parts of the objects data.
+    giving access to different parts of the objects data or calculating
+    properties based on it.
 
   values
     Returns the numeric values of the color, held by the object. The method
-    accepts five optional, named arguments: "in" (color space), "as"
-    (format), "range", "precision" and "suffix". In most cases, only the
-    first one is needed.
+    accepts six optional, named arguments: "in" (color space), "as"
+    (format), "range", "precision", "suffix". and *raw*. In most cases, only
+    the first one is needed.
 
     When given no arguments, the method returns a list with the integer
     values: "red", "green" and "blue" in 0 .. 255 range, since *RGB* is the
@@ -146,21 +173,22 @@ GETTER
 
     If one positional argument is provided, the values get converted into
     the color space of the given name. The same is done when using the named
-    argument "in" (full explanation behind the link). The named argument
-    "range" is also explained in its own section. Please note you have to
-    use the "range" argument only, if you like to deviate from the value
-    ranges defined by the chosen color space.
+    argument "in" (full explanation behind the link).
 
-    The maybe most characteristic argument for this method is "as", which
-    enables all the same numeric formats the constructor method "new"
-    accepts. *GTC* is built with the design principle of total
-    serialisation. This means: every contructor input format can be
-    reproduced by a getter method and vice versa. These formats are: 'list'
-    (default), C'<named_array'>, 'hash', 'char_hash', 'named_string',
-    'css_string', 'array' (RGB only) and 'hex_string' (RGB only). The
-    remaining two. "name" and "full:name" are produce by the method "name".
-    Format names are case insensitive. For more explanations, please see:
-    formats section in GTC::Space::Hub.
+    The named argument "range" is also explained in its own section. Please
+    note you have to use the "range" argument only, if you like to deviate
+    from the value ranges defined by the chosen color space.
+
+    Maybe the most characteristic argument of this method is "as", which
+    selects the format of the output. *GTC* is built with the design
+    principle of total serialisation or *idempotent* data format. This
+    means: every contructor input format can be reproduced by a getter
+    method and vice versa. These formats are: 'list' (default),
+    C'<named_array'>, 'hash', 'char_hash', 'named_string', 'css_string',
+    'array' (RGB only) and 'hex_string' (RGB only). The remaining two:
+    "name" and "full:name" are produce by the method "name". Format names
+    are case insensitive. For more explanations, please see: formats section
+    in GTC::Space::Hub.
 
     "precision" is a more exotic argument, but sometimes you need to escape
     the numeric precision, set by a color spaces definition. For instance
@@ -173,7 +201,12 @@ GETTER
     In the same way you can atach a little strings per value by using the
     "suffix" argument. Normally these are percentage signs but in some
     spaces, where they appear by default you can surpress them by adding
-    "suffix => ''",
+    "suffix => ''".
+
+    The last argument is "raw" which takes any perlish boolean true value,
+    since it defaults to false (0). When true the values will not be clamped
+    into range and might be outof gamut. Its only useful if you want the
+    unsanitized input converted as output.
 
         $blue->values();                                      # 0, 0, 255
         $blue->values( in => 'RGB', as => 'list');            # 0, 0, 255 # explicit arguments
@@ -278,23 +311,31 @@ GETTER
         $d = $color->distance( to => $c2, select => [qw/r g b b/]); # double the weight of blue value differences
 
   is_in_gamut
-    Takes any here described color definition and returns a perlish pseudo
-    boolean (zero or one). It will tell you if the color is within the
-    gamut, of the color space, the color was defined in. Or in simpler
-    terms: are the color values within the accepted ranges? Some spaces
-    exclude certain value combinations. This is the way to ensure you got a
-    valid color definition. Since the GTC "CONSTRUCTOR" clamps out of shape
-    values, and forces them to be in gamut - this method is only needed to
-    ensure that there is nothing to clamp and the constructor did not change
-    any value.
+    Takes any color definition *new* would accept and returns a perlish
+    pseudo boolean (zero or one). That will tell you, if the color is within
+    the gamut (value range) of a color space. This can be either the color
+    space the color was defined in or you choose the space by the argument
+    "in".
 
-    If it is too clumsy for you to use an existing color object to check if
-    another color is valid: use th importable routine with the same name.
+    If you omit a color definition, the current color held by the object
+    will be checked against that space. But you can also use the argument
+    *color* to provide the color definition and additional information.
 
-        if ($color->is_in_gamut([ RGB =>  255, 0, 0])){         # it has to be ..
+    The optional argument "range" overrides the default range definition of
+    the space the color is defined in.
+
+    The optional argument "raw" defaults to true, unlike within the method
+    *new*. But you can still set it false for the unlikely occasion you want
+    to clamp the values to the boundaries of the space the color was defined
+    in and then convert it into the selected space in order to check if the
+    clamped color fits there.
+
+        $color->is_in_gamut( in => 'okLab');                    # does convert clamp $color?
+        $color->is_in_gamut([ RGB =>  255, 0, 0]);              # will new clamp this color?
 
         use Graphics::Toolkit::Color qw/is_in_gamut/;
-        if (is_in_gamut('rgb: 0, 0, 300')){                     # too much blue ..
+        if (is_in_gamut('rgb: 0, 0, 300')){                     # false, 300 has to be clamped to 255
+        is_in_gamut(color =>'rgb: 0, 0, 0', in =>'ProPhotoRGB') # black is always included
 
 SINGLE COLOR
     These methods generate one new color object that is related to the
@@ -304,6 +345,20 @@ SINGLE COLOR
     functional programming style as well as method stacking like:
 
         $color->add_value( saturation => 5)->invert->mix( to => 'green');
+
+  apply
+    Creates a new GTC color object with recalculated values. Each
+    calculation is triggered by one named argument and currently is only one
+    possible. *gamma* triggers a gamma correction which can be reversed with
+    the inverse argument. Use an ARRAY ref to apply each color value with a
+    different gamma. The argument "in" determines in which space the
+    carlculation takes place:
+
+        my $linear_blue = $blue->apply( gamma => 2.2 );         # is same the as :
+        my $linear_blue = $blue->apply( gamma => {r => 2.2, g =>2.2, b => 2.2}, in => 'RGB' );
+
+    Applying a gamma value mages only sense in euclidean spaces with the
+    origin in one corner of the space like *RGB* or *CIEXYZ*.
 
   set_value
     Creates a new GTC color object that shares some values with the current
@@ -338,20 +393,6 @@ SINGLE COLOR
         my $blue2 = $blue->add_value( blue => 10 );             # bluer than blue ?
         my $blue3 = $blue->add_value( l => 10, in => 'LAB' );   # lighter color according CIELAB
 
-  apply
-    Creates a new GTC color object with recalculated values. Each
-    calculation is triggered by one named argument and currently is only one
-    possible. *gamma* triggers a gamma correction which can be reversed with
-    the inverse argument. Use an ARRAY ref to apply each color value with a
-    different gamma. The argument "in" determines in which space the
-    carlculation takes place:
-
-        my $linear_blue = $blue->apply( gamma => 2.2 );         # is same the as :
-        my $linear_blue = $blue->apply( gamma => {r => 2.2, g =>2.2, b => 2.2}, in => 'RGB' );
-
-    Applying a gamma value mages only sense in euclidean spaces with the
-    origin in one corner of the space like *RGB* or *CIEXYZ*.
-
   mix
     Create a new GTC object, that has the average values between the calling
     object and another color (or several colors). It accepts three named
@@ -368,13 +409,13 @@ SINGLE COLOR
     remaining percentage to 100 is the share of the color, held by the
     caller object. This would be naturally nothing, if the "amount" is
     greater than hundret. When mixing more than two colors at once, "amount"
-    accpets also an ARRAY of share values that will applied in the same
+    accpets also an ARRAY of share values that will be applied in the same
     order as the colors of the "to" argument. Their sum can reach easily
     values greater than 100. In that case again the calling object gets no
     share. If the amount-sum is greater than 100, than the amounts will be
     recalculated, keeping the ratios but leaving out the calling color. If
-    you mix mor than two colors, but provide only one scalar amout value,
-    then will be applied to all mixed in colors.
+    you mix more than two colors, but provide only one scalar amount value,
+    then it will be applied to all mixed in colors.
 
         $blue->mix( $silver );                                         # 50% silver, 50% blue
         $blue->mix( to => 'silver', amount => 60 );                    # 60% silver, 40% blue
@@ -385,13 +426,16 @@ SINGLE COLOR
         $blue->mix( to => {H => 120, S =>100, L => 50}, in => 'HSV' ); # teal =      50% green, 50% blue
 
   invert
-    Computes the a new color object, where all values are inverted according
-    to the ranges of the chosen color space (see "in"). It takes only one
-    optional, positional argument, a space name.
+    Computes a new color object, where all or some values are inverted
+    according to the ranges of the chosen color space (see "in"). It takes
+    two optional, positional arguments, a space name and axis names.
 
-        my $black = $white->invert();         # to state the obvious
-        my $blue = $yellow->invert( 'LUV' );  # invert in LUV space
-        $yellow->invert( in => 'LUV' );       # would work too
+        my $black = $white->invert();                   # to state the obvious
+        my $gray = $gray->invert();                     # changed nothing
+        my $blue = $yellow->invert( 'LUV' );            # invert in LUV space
+        $yellow->invert( in => 'LUV' );                 # would work too
+        $yellow->invert( in => 'HSL', only => 'hue' );  # same result as $yellow->complement();
+        $yellow->invert( in => 'HSL', only => [qw/s l/] ); # invert only saturation and lightness
 
 COLOR SETS
     construct several interrelated color objects at once.
@@ -405,7 +449,7 @@ COLOR SETS
     One singular, positional argument defines the number of produced colors,
     same as the named argument "steps" would have. If you want to get
     'triadic' colors, choose 3 as an argument for "steps" - 4 would get you
-    the 'tetradic' colors, .... and so on. The given color is always the
+    the 'quadratic' colors, .... and so on. The given color is always the
     last in the row of produced complementary colors.
 
     If you need split-complementary colors, just use the "tilt" argument,
@@ -428,11 +472,10 @@ COLOR SETS
     "saturation" (or "s") move it away or negative values toward the central
     column and "lightness" (or "l") move it up and down.
 
-        my @colors = $c->complement( 4 );                       # 'tetradic' colors
+        my @colors = $c->complement( 4 );                       # 'quadratic' colors
         my @colors = $c->complement( steps => 4, tilt => 4 );   # split-complementary colors
-        my @colors = $c->complement( steps => 3, tilt => { move => 2, target => {l => -10}} );
-        my @colors = $c->complement( steps => 3, tilt => { move => 2,
-                                                         target => { h => 20, s=> -5, l => -10 } });
+        my @colors = $c->complement( steps => 3, tilt => 2, target => { l => -10 } );
+        my @colors = $c->complement( steps => 3, tilt => 2, target => { h => 20, s=> -5, l => -10 });
 
   gradient
     Creates a gradient (a list of color objects that build a transition)
@@ -465,8 +508,8 @@ COLOR SETS
 
   cluster
     Computes a set of colors that are all similar but not the same. The
-    method accepts three named arguments: "radius", "distance" and "in", of
-    which the first two are required.
+    method accepts three named arguments: "radius", "minimal_distance" and
+    "in", of which the first two are required.
 
     The produced colors form a ball or cuboid in a color space around the
     given color, depending on what the argument "radius" got. If it is a
@@ -475,8 +518,8 @@ COLOR SETS
 
     The minimal distance between any two colors of a cluster is set by the
     "minimal_distance" argument, which is computed the same way as the
-    method "distance", in has a short alias "min_d". In a cuboid shaped
-    cluster- the colors will form a cubic grid - inside the ball shaped
+    method "minimal_distance", it has a short alias "min_d". In a cuboid
+    shaped cluster, colors will form a cubic grid - inside the ball shaped
     cluster they form a cuboctahedral grid, which is packed tighter, but
     still obeys the minimal distance.
 
@@ -486,23 +529,29 @@ COLOR SETS
 ARGUMENTS
     Some named arguments of the above listed methods reappear in several
     methods. Thus they are explained here once. Please note that you must
-    NOT wrap the named args in curly braces (HASH ref).
+    NOT wrap the named args in curly braces (HASH ref) but you may if you
+    prefer to do so.
 
   in
     The named argument *in* expects the name of a color space as listed
     here. The default color space in this module is *RGB*. Depending on the
-    chosen space, the results of all methods can be very different, since
-    colors are arranged there very differently and have different distances
-    to each other. Some colors might not even exist in some spaces.
+    chosen space, the results of methods can be very different, since colors
+    are arranged very differently and have different distances to each
+    other. Some colors might not even exist in some spaces (they are out of
+    gamut).
+
+    The following methods accept the *in* argument: "values", "is_in_gamut",
+    "distance", "apply", "set_value", "add_value", "mix", "invert",
+    "gradient", "cluster".
 
   range
     Every color space comes with range definitions for its values. For
     instance *red*, *green* and *blue* in *RGB* go usually from zero to 255
     (0..255). In order to change that, many methods accept the named
-    argument "range". When only one interger value provided, it changes the
-    upper bound on all three axis and as lower bound is assumed zero. Let's
-    say you need *RGB16* values with a range of 0 .. 65536, then you type
-    "range => 65536" or "range => 2**16".
+    argument "range". When only one integer value is provided, it changes
+    the upper bound on all three axis and as lower bound is assumed zero.
+    Let's say you need *RGB16* values with a range of 0 .. 65536, then you
+    type "range => 65536" or "range => 2**16".
 
     If you provide an ARRAY ref you can change the upper bounds of all axis
     individually and in order to change even the lower boundaries, use ARRAY
@@ -511,14 +560,31 @@ ARGUMENTS
     .. 100 but keep the other two untouched you would have to insert: "range
     => [[-100,100],100,100]".
 
+    The following methods accept the *range* argument: new, "values",
+    "is_in_gamut", "distance".
+
   to
     This argument receives a second or target color. It may come in form of
     another GTC object or a color definition that is acceptable to the
     constructor. But it has to be a scalar (string or (HASH) reference), not
     a value list or hash.
 
+    The following methods accept the *to* argument: "distance", "mix",
+    "gradient".
+
+  raw
+    This argument is a perlish pseudo boolean (0 or 1). But since it
+    defaults to 0, you use it only with 1 or a fitting word string. It
+    signifies that the color values will not be clamped into gamut and maybe
+    not even rounded.
+
+    The following methods accept the *raw* argument: new, "values",
+    "is_in_gamut".
+
 SEE ALSO
     *   PDL::Transform::Color
+
+    *   PDL::Graphics::ColorSpace
 
     *   Color::Scheme
 

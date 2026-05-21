@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1
-#                   and LibVirt version v11.10.0
+#                   and LibVirt version v12.3.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -16,12 +16,12 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad;
 
-class Sys::Async::Virt::NodeDevice v0.2.3;
+class Sys::Async::Virt::NodeDevice v0.6.3;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v11.10.1;
+use Protocol::Sys::Virt::Remote::XDR v12.3.0;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -36,128 +36,132 @@ use constant {
 };
 
 
-field $_id :param :reader;
+field $_rpc_id :param :reader;
 field $_client :param :reader;
+
+method name() {
+    return $_rpc_id->{name};
+}
 
 
 method create($flags = 0) {
     return $_client->_call(
         $remote->PROC_NODE_DEVICE_CREATE,
-        { name => $_id, flags => $flags // 0 }, empty => 1 );
+        { name => $_rpc_id, flags => $flags // 0 }, empty => 1 );
 }
 
 async method create_xml($flags = 0) {
     return await $_client->_call(
         $remote->PROC_NODE_DEVICE_CREATE_XML,
-        { xml_desc => $_id, flags => $flags // 0 }, unwrap => 'dev' );
+        { xml_desc => $_rpc_id, flags => $flags // 0 }, unwrap => 'dev' );
 }
 
 async method define_xml($flags = 0) {
     return await $_client->_call(
         $remote->PROC_NODE_DEVICE_DEFINE_XML,
-        { xml_desc => $_id, flags => $flags // 0 }, unwrap => 'dev' );
+        { xml_desc => $_rpc_id, flags => $flags // 0 }, unwrap => 'dev' );
 }
 
 method destroy() {
     return $_client->_call(
         $remote->PROC_NODE_DEVICE_DESTROY,
-        { name => $_id }, empty => 1 );
+        { name => $_rpc_id }, empty => 1 );
 }
 
 method detach_flags($driverName, $flags = 0) {
     return $_client->_call(
         $remote->PROC_NODE_DEVICE_DETACH_FLAGS,
-        { name => $_id, driverName => $driverName, flags => $flags // 0 }, empty => 1 );
+        { name => $_rpc_id, driverName => $driverName, flags => $flags // 0 }, empty => 1 );
 }
 
 method dettach() {
     return $_client->_call(
         $remote->PROC_NODE_DEVICE_DETTACH,
-        { name => $_id }, empty => 1 );
+        { name => $_rpc_id }, empty => 1 );
 }
 
 async method get_autostart() {
     return await $_client->_call(
         $remote->PROC_NODE_DEVICE_GET_AUTOSTART,
-        { name => $_id }, unwrap => 'autostart' );
+        { name => $_rpc_id }, unwrap => 'autostart' );
 }
 
 async method get_parent() {
     return await $_client->_call(
         $remote->PROC_NODE_DEVICE_GET_PARENT,
-        { name => $_id }, unwrap => 'parentName' );
+        { name => $_rpc_id }, unwrap => 'parentName' );
 }
 
 async method get_xml_desc($flags = 0) {
     return await $_client->_call(
         $remote->PROC_NODE_DEVICE_GET_XML_DESC,
-        { name => $_id, flags => $flags // 0 }, unwrap => 'xml' );
+        { name => $_rpc_id, flags => $flags // 0 }, unwrap => 'xml' );
 }
 
 async method is_active() {
     return await $_client->_call(
         $remote->PROC_NODE_DEVICE_IS_ACTIVE,
-        { name => $_id }, unwrap => 'active' );
+        { name => $_rpc_id }, unwrap => 'active' );
 }
 
 async method is_persistent() {
     return await $_client->_call(
         $remote->PROC_NODE_DEVICE_IS_PERSISTENT,
-        { name => $_id }, unwrap => 'persistent' );
+        { name => $_rpc_id }, unwrap => 'persistent' );
 }
 
 async method list_caps() {
     return await $_client->_call(
         $remote->PROC_NODE_DEVICE_LIST_CAPS,
-        { name => $_id, maxnames => $remote->NODE_DEVICE_CAPS_LIST_MAX }, unwrap => 'names' );
+        { name => $_rpc_id, maxnames => $remote->NODE_DEVICE_CAPS_LIST_MAX }, unwrap => 'names' );
 }
 
 async method lookup_by_name() {
     return await $_client->_call(
         $remote->PROC_NODE_DEVICE_LOOKUP_BY_NAME,
-        { name => $_id }, unwrap => 'dev' );
+        { name => $_rpc_id }, unwrap => 'dev' );
 }
 
 async method lookup_scsi_host_by_wwn($wwpn, $flags = 0) {
     return await $_client->_call(
         $remote->PROC_NODE_DEVICE_LOOKUP_SCSI_HOST_BY_WWN,
-        { wwnn => $_id, wwpn => $wwpn, flags => $flags // 0 }, unwrap => 'dev' );
+        { wwnn => $_rpc_id, wwpn => $wwpn, flags => $flags // 0 }, unwrap => 'dev' );
 }
 
 async method num_of_caps() {
     return await $_client->_call(
         $remote->PROC_NODE_DEVICE_NUM_OF_CAPS,
-        { name => $_id }, unwrap => 'num' );
+        { name => $_rpc_id }, unwrap => 'num' );
 }
 
 method reattach() {
     return $_client->_call(
         $remote->PROC_NODE_DEVICE_RE_ATTACH,
-        { name => $_id }, empty => 1 );
+        { name => $_rpc_id }, empty => 1 );
 }
 
 method reset() {
     return $_client->_call(
         $remote->PROC_NODE_DEVICE_RESET,
-        { name => $_id }, empty => 1 );
+        { name => $_rpc_id }, empty => 1 );
 }
 
 method set_autostart($autostart) {
     return $_client->_call(
         $remote->PROC_NODE_DEVICE_SET_AUTOSTART,
-        { name => $_id, autostart => $autostart }, empty => 1 );
+        { name => $_rpc_id, autostart => $autostart }, empty => 1 );
 }
 
 method undefine($flags = 0) {
     return $_client->_call(
         $remote->PROC_NODE_DEVICE_UNDEFINE,
-        { name => $_id, flags => $flags // 0 }, empty => 1 );
+        { name => $_rpc_id, flags => $flags // 0 }, empty => 1 );
 }
 
 method update($xml_desc, $flags = 0) {
     return $_client->_call(
         $remote->PROC_NODE_DEVICE_UPDATE,
-        { name => $_id, xml_desc => $xml_desc, flags => $flags // 0 }, empty => 1 );
+        { name => $_rpc_id, xml_desc => $xml_desc, flags => $flags // 0 }, empty => 1 );
 }
 
 
@@ -173,7 +177,7 @@ Sys::Async::Virt::NodeDevice - Client side proxy to remote LibVirt host device
 
 =head1 VERSION
 
-v0.2.3
+v0.6.3
 
 =head1 SYNOPSIS
 
@@ -186,6 +190,12 @@ v0.2.3
 =head2 new
 
 =head1 METHODS
+
+=head2 name
+
+  $name = $dev->name;
+
+Returns the name of the device.
 
 =head2 create
 
@@ -343,6 +353,15 @@ See documentation of L<virNodeDeviceUpdate|https://libvirt.org/html/libvirt-libv
 
 =head1 CONSTANTS
 
+
+   my $value = Sys::Async::Virt::NodeDevice->XML_INACTIVE;
+
+   # - or -
+
+   my $value = $dev->XML_INACTIVE;
+
+
+
 =over 8
 
 =item XML_INACTIVE
@@ -370,7 +389,7 @@ L<LibVirt|https://libvirt.org>, L<Sys::Virt>
 =head1 LICENSE AND COPYRIGHT
 
 
-  Copyright (C) 2024-2025 Erik Huelsmann
+  Copyright (C) 2024-2026 Erik Huelsmann
 
 All rights reserved. This program is free software;
 you can redistribute it and/or modify it under the same terms as Perl itself.

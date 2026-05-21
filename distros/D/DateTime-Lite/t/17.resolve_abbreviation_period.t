@@ -20,19 +20,26 @@
 ##   3. last_trans_time DESC   (most persistent use first, among tied groups)
 ##   4. zone_name ASC          (deterministic final tie-breaker)
 ##----------------------------------------------------------------------------
+BEGIN
+{
+    use strict;
+    use warnings;
+    use lib './lib';
+    use Test::More;
+    use Scalar::Util qw( looks_like_number );
+    use Time::Local qw( timegm );
+    local $@;
+    eval{ require DBI; require DBD::SQLite };
+    plan( skip_all => 'DBI and DBD::SQLite are required for this test' ) if( $@ );
+};
+
 use strict;
 use warnings;
-use lib './lib';
-use Test::More;
-use Scalar::Util qw( looks_like_number );
-use Time::Local qw( timegm );
 
 BEGIN
 {
-    eval{ require DBI; require DBD::SQLite };
-    plan( skip_all => 'DBI and DBD::SQLite are required for this test' ) if( $@ );
     use_ok( 'DateTime::Lite::TimeZone' ) || BAIL_OUT( 'Cannot load DateTime::Lite::TimeZone' );
-}
+};
 
 # NOTE: Helper: extract zone names from a result arrayref in order
 sub zone_names

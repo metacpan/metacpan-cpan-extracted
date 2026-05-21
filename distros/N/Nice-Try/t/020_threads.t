@@ -17,7 +17,7 @@ BEGIN
     use constant THREADED => $Config{useithreads};
     use Test::More qw( no_plan );
     use Nice::Try;
-    use Want;
+    use Wanted;
     our $DEBUG = 0;
 };
 
@@ -40,25 +40,25 @@ SKIP:
             # most likely because wantarray thinks the callers expects a scalar in return
             # while in reality, the caller is calling tryme() in void context
             # This issue does not produce if we use 'forks' instead of 'threads'
-#             my $expect = Want::want( 'LIST' )
+#             my $expect = Wanted::want( 'LIST' )
 #                 ? 'LIST'
-#                 : Want::want( 'HASH' )
+#                 : Wanted::want( 'HASH' )
 #                     ? 'HASH'
-#                     : Want::want( 'ARRAY' )
+#                     : Wanted::want( 'ARRAY' )
 #                         ? 'ARRAY'
-#                         : Want::want( 'OBJECT' )
+#                         : Wanted::want( 'OBJECT' )
 #                             ? 'OBJECT'
-#                             : Want::want( 'CODE' )
+#                             : Wanted::want( 'CODE' )
 #                                 ? 'CODE'
-#                                 : Want::want( 'REFSCALAR' )
+#                                 : Wanted::want( 'REFSCALAR' )
 #                                     ? 'REFSCALAR'
-#                                     : Want::want( 'BOOLEAN' )
+#                                     : Wanted::want( 'BOOLEAN' )
 #                                         ? 'BOOLEAN'
-#                                         : Want::want( 'GLOB' )
+#                                         : Wanted::want( 'GLOB' )
 #                                             ? 'GLOB'
-#                                             : Want::want( 'SCALAR' )
+#                                             : Wanted::want( 'SCALAR' )
 #                                                 ? 'SCALAR'
-#                                                 : Want::want( 'VOID' )
+#                                                 : Wanted::want( 'VOID' )
 #                                                     ? 'VOID'
 #                                                     : '';
             # diag( "Caller expects '$expect'" ) if( $DEBUG );

@@ -4,7 +4,7 @@
       "mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -32,7 +32,7 @@
             "Class::Method::Modifiers" : "1.05"
          },
          "requires" : {
-            "Exporter" : "5.57",
+            "Exporter" : "0",
             "perl" : "5.006"
          }
       },
@@ -58,7 +58,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#moose"
    },
-   "version" : "2.002004",
-   "x_serialization_backend" : "JSON::PP version 4.04",
+   "version" : "2.002005",
+   "x_serialization_backend" : "JSON::PP version 4.18",
    "x_static_install" : 1
 }

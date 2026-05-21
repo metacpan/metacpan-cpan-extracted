@@ -20,7 +20,7 @@ use warnings;
 
 BEGIN
 {
-    use ok( 'Mail::Make::Headers::Subject' );
+    use_ok( 'Mail::Make::Headers::Subject' ) or BAIL_OUT( 'Unable to load Mail::Make::Headers::Subject' );
 };
 
 # NOTE: Helper: decode an RFC 2047 encoded-word back to raw bytes for comparison
@@ -38,7 +38,7 @@ sub ew_decode
     return( $str );
 }
 
-# NOTE: 1. Pure ASCII - no encoding applied
+# NOTE: pure ASCII: unchanged
 subtest 'pure ASCII: unchanged' => sub
 {
     my $s = Mail::Make::Headers::Subject->new;
@@ -46,6 +46,7 @@ subtest 'pure ASCII: unchanged' => sub
     is( $s->as_string, 'Quarterly Report', 'pure ASCII passes through unchanged' );
 };
 
+# NOTE: pure ASCII: empty string
 subtest 'pure ASCII: empty string' => sub
 {
     my $s = Mail::Make::Headers::Subject->new;
@@ -53,6 +54,7 @@ subtest 'pure ASCII: empty string' => sub
     is( $s->as_string, '', 'empty string passes through unchanged' );
 };
 
+# NOTE: pure ASCII: printable symbols
 subtest 'pure ASCII: printable symbols' => sub
 {
     my $s = Mail::Make::Headers::Subject->new;
@@ -62,7 +64,7 @@ subtest 'pure ASCII: printable symbols' => sub
     unlike( $out, qr/=\?/, 'no encoded-word markers present' );
 };
 
-# NOTE: 2. Non-ASCII - encoding applied
+# NOTE: non-ASCII: encoded-word markers present
 subtest 'non-ASCII: encoded-word markers present' => sub
 {
     my $s = Mail::Make::Headers::Subject->new;
@@ -72,6 +74,7 @@ subtest 'non-ASCII: encoded-word markers present' => sub
     like( $out, qr/\?=$/,          'encoded-word properly closed' );
 };
 
+# NOTE: non-ASCII: French accents round-trip
 subtest 'non-ASCII: French accents round-trip' => sub
 {
     my $s    = Mail::Make::Headers::Subject->new;
@@ -82,6 +85,7 @@ subtest 'non-ASCII: French accents round-trip' => sub
     is( $decoded, $orig, 'French text round-trips correctly' );
 };
 
+# NOTE: non-ASCII: Japanese round-trip
 subtest 'non-ASCII: Japanese round-trip' => sub
 {
     my $s    = Mail::Make::Headers::Subject->new;
@@ -93,6 +97,7 @@ subtest 'non-ASCII: Japanese round-trip' => sub
     is( $decoded, $orig, 'Japanese text round-trips correctly' );
 };
 
+# NOTE: non-ASCII: Arabic round-trip
 subtest 'non-ASCII: Arabic round-trip' => sub
 {
     my $s    = Mail::Make::Headers::Subject->new;
@@ -103,7 +108,7 @@ subtest 'non-ASCII: Arabic round-trip' => sub
     is( $decoded, $orig, 'Arabic text round-trips correctly' );
 };
 
-# NOTE: 3. Encoded-word length constraints
+# NOTE: encoded-word: each word <= 75 chars
 subtest 'encoded-word: each word <= 75 chars' => sub
 {
     my $s = Mail::Make::Headers::Subject->new;
@@ -116,6 +121,7 @@ subtest 'encoded-word: each word <= 75 chars' => sub
     }
 };
 
+# NOTE: encoded-word: no UTF-8 sequence split across words
 subtest 'encoded-word: no UTF-8 sequence split across words' => sub
 {
     my $s = Mail::Make::Headers::Subject->new;
@@ -128,7 +134,7 @@ subtest 'encoded-word: no UTF-8 sequence split across words' => sub
     is( $decoded, $orig, 'no sequence split: round-trip correct for 96-byte CJK string' );
 };
 
-# NOTE: 4. Folding
+# NOTE: folding: CRLF SP between encoded-words
 subtest 'folding: CRLF SP between encoded-words' => sub
 {
     my $s = Mail::Make::Headers::Subject->new;
@@ -145,6 +151,7 @@ subtest 'folding: CRLF SP between encoded-words' => sub
     }
 };
 
+# NOTE: folding: folded value decodes correctly
 subtest 'folding: folded value decodes correctly' => sub
 {
     my $s    = Mail::Make::Headers::Subject->new;
@@ -156,7 +163,7 @@ subtest 'folding: folded value decodes correctly' => sub
     is( $decoded, $orig, 'multi-word folded subject decodes back to original' );
 };
 
-# NOTE: 5. Decode method
+# NOTE: decode: handles ?B? (Base64) form
 subtest 'decode: handles ?B? (Base64) form' => sub
 {
     my $s       = Mail::Make::Headers::Subject->new;
@@ -165,6 +172,7 @@ subtest 'decode: handles ?B? (Base64) form' => sub
     is( $decoded, 'Hello World', '?B? decoded correctly' );
 };
 
+# NOTE: decode: handles ?Q? (Quoted-Printable) form
 subtest 'decode: handles ?Q? (Quoted-Printable) form' => sub
 {
     my $s       = Mail::Make::Headers::Subject->new;
@@ -174,6 +182,7 @@ subtest 'decode: handles ?Q? (Quoted-Printable) form' => sub
     is( $decoded, "Caf\x{e9}", '?Q? decoded correctly' );
 };
 
+# NOTE: decode: collapses whitespace between encoded-words (RFC 2047 §6.2)
 subtest 'decode: collapses whitespace between encoded-words (RFC 2047 §6.2)' => sub
 {
     my $s   = Mail::Make::Headers::Subject->new;
@@ -185,13 +194,14 @@ subtest 'decode: collapses whitespace between encoded-words (RFC 2047 §6.2)' =>
     is( $dec, "\x{3053}\x{3093}\x{306b}\x{3061}\x{306f}", 'inter-word whitespace discarded: こんにちは' );
 };
 
+# NOTE: decode: pure ASCII passthrough
 subtest 'decode: pure ASCII passthrough' => sub
 {
     my $s = Mail::Make::Headers::Subject->new;
     is( $s->decode( 'Hello World' ), 'Hello World', 'plain ASCII decoded unchanged' );
 };
 
-# NOTE: 6. Accessors
+# NOTE: value() getter returns Perl string, not encoded form
 subtest 'value() getter returns Perl string, not encoded form' => sub
 {
     my $s    = Mail::Make::Headers::Subject->new;
@@ -202,12 +212,14 @@ subtest 'value() getter returns Perl string, not encoded form' => sub
     isnt( $s->as_string, $orig, 'as_string() returns encoded form (different)' );
 };
 
+# NOTE: field_name
 subtest 'field_name' => sub
 {
     my $s = Mail::Make::Headers::Subject->new;
     is( $s->field_name, 'Subject', 'field_name() returns Subject' );
 };
 
+# NOTE: cache invalidation on re-assignment
 subtest 'cache invalidation on re-assignment' => sub
 {
     my $s = Mail::Make::Headers::Subject->new;
@@ -220,7 +232,7 @@ subtest 'cache invalidation on re-assignment' => sub
     like( $decoded, qr/Second/, 'new encoded value contains new content after decode' );
 };
 
-# NOTE: 7. Integration: Mail::Make uses Subject encoding for subject()
+# NOTE: Mail::Make: ASCII subject passed through unchanged
 subtest 'Mail::Make: ASCII subject passed through unchanged' => sub
 {
     use Mail::Make;
@@ -234,6 +246,7 @@ subtest 'Mail::Make: ASCII subject passed through unchanged' => sub
     like( $str, qr/Subject: Plain ASCII Subject/, 'ASCII subject in message unchanged' );
 };
 
+# NOTE: Mail::Make: non-ASCII subject encoded
 subtest 'Mail::Make: non-ASCII subject encoded' => sub
 {
     use Mail::Make;
@@ -248,6 +261,7 @@ subtest 'Mail::Make: non-ASCII subject encoded' => sub
     unlike( $str, qr/Subject:.*\x{30cb}/,   'raw Japanese bytes not present unencoded' );
 };
 
+# NOTE: Mail::Make: long non-ASCII subject folded
 subtest 'Mail::Make: long non-ASCII subject folded' => sub
 {
     use Mail::Make;
@@ -263,8 +277,7 @@ subtest 'Mail::Make: long non-ASCII subject folded' => sub
     # Verify the encoded-words are all within 75 chars
     for my $ew ( $str =~ /(=\?[^?]+\?[BbQq]\?[^?]*\?=)/g )
     {
-        ok( length( $ew ) <= 75,
-            "encoded-word in message is <= 75 chars (got " . length($ew) . ")" );
+        ok( length( $ew ) <= 75, "encoded-word in message is <= 75 chars (got " . length($ew) . ")" );
     }
 };
 

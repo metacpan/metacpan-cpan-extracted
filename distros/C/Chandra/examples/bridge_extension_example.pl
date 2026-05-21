@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 #
-# Example: Bridge Extension — Task Manager
+# Example: Bridge Extension - Task Manager
 #
 # Demonstrates Chandra::Bridge::Extension with both inline JS
 # registration and register_file, plus App->extend_bridge.

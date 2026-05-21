@@ -1,63 +1,65 @@
 ## SECURITY_CHECKS.md
 
 # Pre-Build Security Validation Protocol
+
 **Role:** AI Security Auditor
 **Objective:** Execute 3-tier security validation before running `dzil build`.
-**Mandate:** If any "Critical" check fails, the build MUST be aborted.
----## 1. OpenSSF Scorecard (Automated Supply Chain Check)**Tool:** `scorecard` CLI
+**Mandate:** If any critical check fails, the build must be aborted.
+
+## 1. OpenSSF Scorecard
+
+**Tool:** `scorecard` CLI
+
 **Execution:**
+
 ```bash
-scorecard --repo=https://github.com/[owner]/[repo] --format json > scorecard_results.json
+bash -ic "scorecard --repo=github.com/manif3station/developer-dashboard"
+```
 
-AI Instructions:
+**AI instructions:**
 
-* Scan scorecard_results.json for any check with a score < 5.
-* Fail Build if: Maintained score is 0 or Dangerous-Workflow is detected.
-* Action: Fix branch protection or pin dependencies by hash if flagged.
+* Record every failing or unknown check after the local repo gates, commit, and push are complete.
+* Fail the delivery loop immediately for repo-side security regressions such as `Dangerous-Workflow`, `Pinned-Dependencies`, or other newly introduced workflow and dependency issues.
+* Treat `Branch-Protection`, `Code-Review`, `CI-Tests`, `Signed-Releases`, and `CII-Best-Practices` as real Scorecard checks, but distinguish checkout-fixable items from GitHub settings, merge history, release history, or external badge enrollment.
+* `Signed-Releases` in this repository is backed by the tag-triggered GitHub workflow at `.github/workflows/release-github.yml`; push a `vX.XX` tag when the signed GitHub release needs to exist for Scorecard to observe it.
 
-------------------------------
-## 2. OWASP ASVS Level 1 (Technical Control Verification)
-Tool: owasp-asvs-check (or manual audit against ASVS_L1_Checklist.json)
-Execution:
-Verify the following "Bare Minimum" controls are implemented in the code:
+## 2. OWASP ASVS Level 1
 
-* V2.1.1 (Auth): Verify all pages require authentication except those specifically public.
-* V5.1.3 (Input): Verify all input data is validated against a strict allowlist.
-* V13.2.1 (API): Verify all API responses include the X-Content-Type-Options: nosniff header.
+**Tool:** manual audit against the repo security checks
 
-AI Instructions:
+**Execution:**
 
-* Perform a grep-based audit on the lib/ directory for these controls.
-* Fail Build if: Raw SQL queries are found without parameterization (V5.3.1).
+Verify the following minimum controls are implemented in the code:
 
-------------------------------
-## 3. OpenSSF Best Practices (Project Hygiene)
-Tool: Best Practices Badge API
-Execution:
+* `V2.1.1` auth: all non-public pages must require authentication.
+* `V5.1.3` input validation: request data must be validated against strict allowlists.
+* `V13.2.1` API responses: security headers such as `X-Content-Type-Options: nosniff` must be present.
 
-curl -s "https://coreinfrastructure.org[ID].json" | jq '.badge_level'
+**AI instructions:**
 
-AI Instructions:
+* Perform the required grep-based audit across `lib/`, `bin/`, `doc/`, and `t/`.
+* Fail immediately if raw SQL paths, missing auth gates, unsafe redirects, directory traversal, or secret leaks are introduced.
 
-* Ensure the project has at least a "passing" status.
-* Manual Verification: Confirm SECURITY.md exists and contains a clear vulnerability disclosure policy.
-* Fail Build if: No SECURITY.md is found in the repository root.
+## 3. OpenSSF Best Practices
 
-------------------------------
+**Tool:** OpenSSF Best Practices badge program
+
+**Execution:**
+
+The Scorecard `CII-Best-Practices` check uses the badge state published by the OpenSSF Best Practices service for the repository URL.
+
+**AI instructions:**
+
+* Ensure `SECURITY.md` exists and contains a clear vulnerability disclosure policy.
+* Keep project docs consistent with the badge requirements, but do not pretend the badge is satisfied until the repository is actually enrolled at `bestpractices.dev`.
+* If the project is not yet registered with the OpenSSF Best Practices program, record that as an external follow-up instead of claiming the repo-side work is complete.
+
 ## Final Build Trigger
-ONLY if all above checks pass, proceed to:
 
-dzil build
+Proceed to `dzil build` only after the security gates above and the repository test and coverage gates are green.
 
+## Integration Tips
 
-### Integration Tips
-*   **Automation:** You can have the AI agent run these commands sequentially. For the **OpenSSF Scorecard**, the CLI can be installed via Go or run as a Docker container.
-*   **DistZilla Integration:** To make this even more robust, you can add `[Run::BeforeBuild]` to your `dist.ini` file to force these checks:
-    ```ini
-    [Run::BeforeBuild]
-    run = ./scripts/run_security_checks.sh
-    ```
-*   **The "Passing" Badge:** If you haven't yet, you must register your project at [bestpractices.coreinfrastructure.org](https://coreinfrastructure.org) to get the Project ID needed for the API check.
-
-Would you like me to help you write the **shell script** that the AI agent would actually execute to automate these checks?
-
+* Automation: the AI agent can run these checks sequentially.
+* Dist::Zilla integration: if checkout automation is needed later, wire a dedicated security script through `[Run::BeforeBuild]` in `dist.ini`.
+* Badge program: register the project at `https://www.bestpractices.dev/` when you want Scorecard to move the `CII-Best-Practices` check above zero.

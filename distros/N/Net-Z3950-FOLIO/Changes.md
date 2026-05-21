@@ -1,5 +1,9 @@
 # Revision history for Perl extension Net::Z3950::FOLIO.
 
+## 4.4.1 (Thu 30 Apr 2026 13:06:47 BST)
+
+* Re-release of v4.4.0, because I somehow left the old version number v4.3.0 in that release. This time it's 4.4.1. Thanks to Michelle Suranofsky for spotting this in the comments to ZF-122.
+
 ## 4.4.0 (Thu 16 Apr 2026 18:06:42 BST)
 
 * Add holdings `hrid` to the GraphQL query. (Related to ZF-114.)

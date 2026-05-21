@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(hg log:*)",
+      "Bash(hg summary:*)",
+      "Bash(hg diff:*)",
+      "Bash(find:*)",
+      "Bash(make test:*)",
+      "Bash(TEST_AUTHOR=1 prove:*)",
+      "Bash(TEST_POD=1 TEST_CRITIC=1 TEST_AUTHOR=1 make test:*)",
+      "Bash(TEST_POD=1 prove:*)",
+      "Bash(make)",
+      "Bash(TEST_POD=1 perl:*)",
+      "Bash(make clean:*)",
+      "Bash(perl Makefile.PL:*)",
+      "Bash(xml2rfc:*)",
+      "Bash(TEST_AUTHOR=1 TEST_POD=1 TEST_CRITIC=1 make test:*)"
+    ]
+  }
+}

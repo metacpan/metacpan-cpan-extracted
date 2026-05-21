@@ -1,9 +1,7 @@
 use v5.36;
 use Test2::V0;
 use Test2::Tools::Compare qw( array all_items hash );
-use Test2::Plugin::DieOnFail;
 use Net::Versa::Director;
-use Data::Dumper;
 
 skip_all "environment variables not set"
     unless (exists $ENV{NET_VERSA_DIRECTOR_HOSTNAME}
@@ -38,7 +36,7 @@ SKIP: {
     );
 }
 
-like (
+is (
     dies {
         my $director = Net::Versa::Director->new(
             server      => 'https://' . $ENV{NET_VERSA_DIRECTOR_HOSTNAME} . ':9183',
@@ -47,16 +45,18 @@ like (
         );
         $director->login('non-existing-client-id', 'client-secret');
     },
-    hash {
-        field 'error'               => 'invalid_client';
-        field 'error_description'   => D();
+    object {
+        prop isa => 'Net::Versa::Director::Exception::OAuth';
 
-        end();
+        call error              => 'invalid_client';
+        call error_description  => 'Client authentication failed (e.g., unknown client, no client authentication included, or unsupported authentication method).';
+
+        call as_string          => 'Client authentication failed (e.g., unknown client, no client authentication included, or unsupported authentication method).';
     },
     'OAuth authentication with valid user/pass but invalid client id throws exception'
 );
 
-like (
+is (
     dies {
         my $director = Net::Versa::Director->new(
             server      => 'https://' . $ENV{NET_VERSA_DIRECTOR_HOSTNAME} . ':9183',
@@ -65,11 +65,13 @@ like (
         );
         $director->login($ENV{NET_VERSA_DIRECTOR_CLIENT_ID}, $ENV{NET_VERSA_DIRECTOR_CLIENT_SECRET});
     },
-    hash {
-        field 'error'               => 'invalid_grant';
-        field 'error_description'   => D();
+    object {
+        prop isa => 'Net::Versa::Director::Exception::OAuth';
 
-        end();
+        call error              => 'invalid_grant';
+        call error_description  => L();
+
+        call as_string          => L();
     },
     'OAuth authentication with invalid user/pass but valid client id/secret throws exception'
 );
@@ -80,15 +82,20 @@ my $director = Net::Versa::Director->new(
     passwd      => $ENV{NET_VERSA_DIRECTOR_PASSWORD},
 );
 
-like (
+is (
     dies {
         $director->get_director_info;
     },
-    hash {
-        field 'error'               => 'invalid_request';
-        field 'error_description'   => D();
+    object {
+        prop isa => 'Net::Versa::Director::Exception::Basic';
 
-        end();
+        call code               => 4001;
+        call description        => "Invalid user name or password.";
+        call http_status_code   => 401;
+        call message            => "Unauthenticated";
+        call more_info          => "http://nms.versa.com/errors/4001";
+
+        call as_string          => "Invalid user name or password.";
     },
     'OAuth API call before login throws exception'
 );
@@ -98,8 +105,7 @@ ok(
     lives {
         $login_response = $director->login($ENV{NET_VERSA_DIRECTOR_CLIENT_ID}, $ENV{NET_VERSA_DIRECTOR_CLIENT_SECRET});
     },
-    "OAuth login successful")
-    || note(Dumper($@));
+    "OAuth login successful");
 
 # ensure that the maximum number of access-tokens of the client isn't exceeded
 END {
@@ -136,21 +142,41 @@ is($device_workflows, array  {
         etc();
     }, 'list_device_workflows returns arrayref of hashes');
 
-like (
+is (
     dies {
         $director->get_device_workflow('non-existing');
     },
-    hash {
-        field 'error'               => D();
-        field 'exception'           => D();
-        field 'http_status_code'    => D();
-        field 'message'             => D();
-        field 'path'                => D();
-        field 'timestamp'           => D();
+    object {
+        prop isa                => 'Net::Versa::Director::Exception::VNMS';
 
-        end();
+        call error              => 'Not Found';
+        call exception          => 'com.versa.vnms.common.exception.VOAEException';
+        call http_status_code   => 404;
+        call message            => ' device work flow non-existing does not exist ';
+        call path               => '/vnms/sdwan/workflow/devices/device/non-existing';
+        call timestamp          => L();
+
+        call as_string          => " device work flow non-existing does not exist ";
     },
     "get_device_workflow for non-existing workflow throws exception"
+);
+
+is (
+    dies {
+        $director->_create('/api/operational/system/package-info', {});
+    },
+    object {
+        prop isa                => 'Net::Versa::Director::Exception::Basic';
+
+        call code               => 403;
+        call description        => 'User does not have access';
+        call http_status_code   => 403;
+        call message            => 403;
+        call more_info          => 'http://nms.versa.com/errors/403';
+
+        call as_string          => "User does not have access";
+    },
+    "incorrect operation throws correct exception"
 );
 
 SKIP: {
@@ -196,6 +222,13 @@ SKIP: {
             };
             etc();
         }, 'list_device_networks returns arrayref of hashrefs');
+
+    ok(
+        lives {
+            is(my $config = $director->get_device_configuration($appliance->{name}), match qr/^devices \{/,
+                "get_device_configuration returns current device configuration");
+        },
+        "get_device_configuration doesn't throw exception");
 }
 
 done_testing();

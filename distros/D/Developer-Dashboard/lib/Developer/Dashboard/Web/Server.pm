@@ -3,9 +3,10 @@ package Developer::Dashboard::Web::Server;
 use strict;
 use warnings;
 
-our $VERSION = '3.14';
+our $VERSION = '3.90';
 
 use Capture::Tiny qw(capture);
+use Errno qw(EINTR);
 use File::Spec;
 use File::Temp qw(tempfile);
 use IO::Select;
@@ -13,11 +14,13 @@ use IO::Socket::INET;
 use Plack::Runner;
 use Socket qw(MSG_PEEK);
 
+use Developer::Dashboard::Platform qw(is_windows);
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::Web::DancerApp;
 use Developer::Dashboard::Web::Server::Daemon;
 
 our $SSL_BACKEND_PID;
+our $SSL_SHUTDOWN_REQUESTED;
 our %SSL_PREVIOUS_SIGNAL;
 
 # new(%args)
@@ -165,13 +168,15 @@ sub _build_runner {
     my $listen_port = $self->{ssl} && $daemon->can('internal_sockport') && defined $daemon->internal_sockport
       ? $daemon->internal_sockport
       : $daemon->sockport;
+    my $server_name = is_windows() ? 'Standalone' : 'Starman';
     my @options = (
-        '--server', 'Starman',
+        '--server', $server_name,
         '--host',   $listen_host,
         '--port',   $listen_port,
         '--env',    'deployment',
-        '--workers', $self->{workers},
     );
+
+    push @options, '--workers', $self->{workers} if !is_windows();
 
     if ( $self->{ssl} ) {
         my ( $cert, $key ) = get_ssl_cert_paths();
@@ -195,11 +200,8 @@ sub _serve_ssl_frontend {
     die "Unable to fork SSL backend process: $!" if !defined $backend_pid;
 
     if ( !$backend_pid ) {
-        my $runner = $self->_build_runner($daemon);
-        my $app = $self->psgi_app;
-        $runner->run($app);
-        # uncoverable statement
-        exit 0;
+        my $exit_code = $self->_run_ssl_backend_process($daemon);
+        exit $exit_code; # uncoverable statement
     }
 
     my $previous_term = $SIG{TERM};
@@ -214,27 +216,34 @@ sub _serve_ssl_frontend {
     local $SIG{TERM} = \&_ssl_term_handler;
     local $SIG{INT}  = \&_ssl_int_handler;
     local $SIG{HUP}  = \&_ssl_hup_handler;
+    local $SSL_SHUTDOWN_REQUESTED = 0;
+    my %reaped_children;
+    local $SIG{CHLD} = sub {
+        while (1) {
+            my $reaped = _waitpid( -1, 1 );
+            last if $reaped <= 0;
+            $reaped_children{$reaped} = 1;
+        }
+        return;
+    };
 
-    my $listener = IO::Socket::INET->new(
-        LocalAddr => $daemon->sockhost,
-        LocalPort => $daemon->sockport,
-        Proto     => 'tcp',
-        ReuseAddr => 1,
-        Listen    => 128,
+    my $listener = $self->_open_ssl_frontend_listener_or_die(
+        daemon          => $daemon,
+        backend_pid     => $backend_pid,
+        reaped_children => \%reaped_children,
     );
-    if ( !$listener ) {
-        # uncoverable statement
-        _stop_ssl_backend($backend_pid);
-        # uncoverable statement
-        die "Unable to bind SSL frontend on $self->{host}:$self->{port}: $!";
-    }
 
-    while ( my $client = $listener->accept ) {
+    while (1) {
+        last if $SSL_SHUTDOWN_REQUESTED;
+        my $client = $listener->accept;
+        if ( !defined $client ) {
+            next if $! == EINTR && !$SSL_SHUTDOWN_REQUESTED;
+            last;
+        }
         my $pid = fork();
         die "Unable to fork SSL frontend connection handler: $!" if !defined $pid;
         if ($pid) {
             close $client;
-            while ( waitpid( -1, 1 ) > 0 ) { }
             next;
         }
 
@@ -250,9 +259,44 @@ sub _serve_ssl_frontend {
     }
 
     close $listener;
-    _stop_ssl_backend($backend_pid);
-    waitpid( $backend_pid, 0 );
+    _stop_ssl_backend( $backend_pid, \%reaped_children );
+    _wait_for_managed_child( $backend_pid, \%reaped_children );
     return 1;
+}
+
+# _run_ssl_backend_process($daemon)
+# Runs the internal SSL PSGI backend inside the forked child process and
+# returns its exit code to the immediate caller.
+# Input: daemon descriptor object.
+# Output: numeric process exit code.
+sub _run_ssl_backend_process {
+    my ( $self, $daemon ) = @_;
+    my $runner = $self->_build_runner($daemon);
+    my $app = $self->psgi_app;
+    $runner->run($app);
+    return 0;
+}
+
+# _open_ssl_frontend_listener_or_die(%args)
+# Opens the public SSL frontend listener or stops the backend child and dies
+# with an explicit bind error when the public socket cannot be reserved.
+# Input: daemon descriptor, backend pid integer, and reaped-child hash ref.
+# Output: bound listener socket handle.
+sub _open_ssl_frontend_listener_or_die {
+    my ( $self, %args ) = @_;
+    my $daemon          = $args{daemon}          || die 'Missing SSL frontend daemon descriptor';
+    my $backend_pid     = $args{backend_pid};
+    my $reaped_children = $args{reaped_children};
+    my $listener = IO::Socket::INET->new(
+        LocalAddr => $daemon->sockhost,
+        LocalPort => $daemon->sockport,
+        Proto     => 'tcp',
+        ReuseAddr => 1,
+        Listen    => 128,
+    );
+    return $listener if $listener;
+    _stop_ssl_backend( $backend_pid, $reaped_children );
+    die "Unable to bind SSL frontend on $self->{host}:$self->{port}: $!";
 }
 
 # _handle_ssl_frontend_client(%args)
@@ -393,16 +437,40 @@ sub _proxy_streams {
     return 1;
 }
 
-# _stop_ssl_backend($pid)
+# _stop_ssl_backend($pid, $reaped_children)
 # Terminates the internal SSL backend process used by the public SSL frontend.
-# Input: backend pid integer.
+# Input: backend pid integer and optional hash reference of already reaped
+# child pids.
 # Output: true value.
 sub _stop_ssl_backend {
-    my ($pid) = @_;
+    my ( $pid, $reaped_children ) = @_;
     return 1 if !$pid;
     kill 15, $pid;
-    waitpid( $pid, 0 );
+    _wait_for_managed_child( $pid, $reaped_children );
     return 1;
+}
+
+# _wait_for_managed_child($pid, $reaped_children)
+# Waits for one managed child process unless a local SIGCHLD handler has
+# already reaped it.
+# Input: child pid integer and optional hash reference of already reaped pids.
+# Output: true value.
+sub _wait_for_managed_child {
+    my ( $pid, $reaped_children ) = @_;
+    return 1 if !$pid;
+    return 1 if ref($reaped_children) eq 'HASH' && $reaped_children->{$pid};
+    my $waited = _waitpid( $pid, 0 );
+    return 1 if $waited == $pid || $waited == -1;
+    return 1;
+}
+
+# _waitpid($pid, $flags)
+# Wraps Perl waitpid so tests can force one child-wait return path directly.
+# Input: pid integer and wait flags integer.
+# Output: waitpid return integer.
+sub _waitpid {
+    my ( $pid, $flags ) = @_;
+    return waitpid( $pid, $flags );
 }
 
 # _ssl_term_handler()
@@ -439,6 +507,7 @@ sub _ssl_hup_handler {
 # Output: true value.
 sub _handle_ssl_signal {
     my ($name) = @_;
+    $SSL_SHUTDOWN_REQUESTED = 1;
     _stop_ssl_backend($SSL_BACKEND_PID);
     return _run_previous_signal( $SSL_PREVIOUS_SIGNAL{$name} );
 }

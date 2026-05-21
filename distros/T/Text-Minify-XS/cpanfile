@@ -40,6 +40,8 @@ on 'develop' => sub {
   requires "Software::Security::Policy::Individual" => "0.10";
   requires "Test2::Require::AuthorTesting" => "0";
   requires "Test2::Tools::Basic" => "1.302200";
+  requires "Test2::Tools::Warnings" => "0";
+  requires "Test2::V0" => "0";
   requires "Test::CPAN::Changes" => "0.500002";
   requires "Test::CleanNamespaces" => "0.15";
   requires "Test::DistManifest" => "0";
@@ -62,4 +64,5 @@ on 'develop' => sub {
   requires "Test::TrailingSpace" => "0.0203";
   requires "Test::Vars" => "0.015";
   requires "Test::XS::Check" => "0";
+  requires "utf8" => "0";
 };

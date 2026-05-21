@@ -13,6 +13,7 @@ use Plack::Test;
 use lib "t/lib";
 use MockStatsd;
 
+my $key   = "NotRandomButUsedForTesting";
 my $stats = MockStatsd->new;
 
 my @logs;
@@ -28,7 +29,7 @@ my $handler = builder {
         };
     };
 
-    enable "Statsd", client => $stats;
+    enable "Statsd", client => $stats, secure_set_key => $key;
     enable "ContentLength";
     enable "Head";
 
@@ -38,6 +39,13 @@ my $handler = builder {
         my $type   = Plack::MIME->mime_type($path);
         my $client = $env->{'psgix.monitor.statsd'};
         my $code   = $env->{REQUEST_METHOD} =~ /^\w+$/a ? 200 : 405;
+
+        if ( my $secure_set_add = $env->{'psgix.monitor.statsd_secure_set_add'} ) {
+            if ( $code == 405 ) {
+                $secure_set_add->( "myapp.bloop", $code );
+            }
+        }
+
         return [
             $client ? $code : 500,
             [ 'Content-Type' => $type || 'text/plain; charset=utf8' ], ['Ok']
@@ -64,7 +72,7 @@ test_psgi
             [ 'timing_ms', 'psgi.response.time',           ignore(), ],
             [ 'timing_ms', 'psgi.request.content-length',  0, ],
             [ 'increment', 'psgi.request.method.HEAD', ],
-            [ 'set_add',   'psgi.request.remote_addr',     '127.0.0.1', ],
+            [ 'set_add',   'psgi.request.remote_addr',     'js820mxh6fLaHApvAScB3tEV2EfqwTE1EFEO6m4Z+Mo', ],
             [ 'timing_ms', 'psgi.response.content-length', 0, ],
             [ 'increment', 'psgi.response.content-type.text.plain', ],
             [ 'increment', 'psgi.response.status.200', ],
@@ -91,7 +99,7 @@ test_psgi
             [ 'timing_ms', 'psgi.response.time',           ignore(), ],
             [ 'timing_ms', 'psgi.request.content-length',  0, ],
             [ 'increment', 'psgi.request.method.HEAD', ],
-            [ 'set_add',   'psgi.request.remote_addr',     '127.0.0.1', ],
+            [ 'set_add',   'psgi.request.remote_addr',     'js820mxh6fLaHApvAScB3tEV2EfqwTE1EFEO6m4Z+Mo', ],
             [ 'timing_ms', 'psgi.response.content-length', 0, ],
             [ 'increment', 'psgi.response.content-type.text.plain', ],
             [ 'increment', 'psgi.response.status.200', ],
@@ -122,7 +130,7 @@ test_psgi
             [ 'increment', 'psgi.request.content-type.text.x-something', ],
 
             # Note: the mock class throws an error so no method is logged
-            [ 'set_add',   'psgi.request.remote_addr',     '127.0.0.1', ],
+            [ 'set_add',   'psgi.request.remote_addr',     'js820mxh6fLaHApvAScB3tEV2EfqwTE1EFEO6m4Z+Mo', ],
             [ 'timing_ms', 'psgi.response.content-length', 2, ],
             [ 'increment', 'psgi.response.content-type.text.plain', ],
             [ 'increment', 'psgi.response.status.200', ],
@@ -158,7 +166,7 @@ test_psgi
             [ 'timing_ms', 'psgi.response.time',           ignore(), ],
             [ 'timing_ms', 'psgi.request.content-length',  0, ],
             [ 'increment', 'psgi.request.method.HEAD', ],
-            [ 'set_add',   'psgi.request.remote_addr',     '127.0.0.1', ],
+            [ 'set_add',   'psgi.request.remote_addr',     'js820mxh6fLaHApvAScB3tEV2EfqwTE1EFEO6m4Z+Mo', ],
             [ 'timing_ms', 'psgi.response.content-length', 0, ],
             [ 'increment', 'psgi.response.content-type.image.vnd-microsoft-icon', ],
             [ 'increment', 'psgi.response.status.200', ],
@@ -188,11 +196,12 @@ test_psgi
             [ 'timing_ms', 'psgi.response.time',          ignore(), ],
             [ 'timing_ms', 'psgi.request.content-length', 0, ],
             [ 'increment', 'psgi.request.method.other', ],
-            [ 'set_add',   'psgi.request.remote_addr',     '127.0.0.1', ],
+            [ 'set_add',   'psgi.request.remote_addr',     'js820mxh6fLaHApvAScB3tEV2EfqwTE1EFEO6m4Z+Mo', ],
             [ 'set_add',   'psgi.worker.pid',              ignore() ],
             [ 'timing_ms', 'psgi.response.content-length', 2, ],
             [ 'increment', 'psgi.response.content-type.text.plain', ],
             [ 'increment', 'psgi.response.status.405', ],
+            [ 'set_add',   'myapp.bloop', 'bqMM4853fKBb2orwCgX7HyCblTqnZk6Sw80WRkflLOs' ],
           ),
           'expected metrics'
           or note( explain \@metrics );

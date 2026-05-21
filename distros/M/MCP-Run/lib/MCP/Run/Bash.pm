@@ -1,5 +1,5 @@
 package MCP::Run::Bash;
-our $VERSION = '0.100';
+our $VERSION = '0.103';
 use Mojo::Base 'MCP::Run', -signatures;
 
 # ABSTRACT: MCP server that executes commands via bash
@@ -92,7 +92,7 @@ MCP::Run::Bash - MCP server that executes commands via bash
 
 =head1 VERSION
 
-version 0.100
+version 0.103
 
 =head1 SYNOPSIS
 
@@ -154,7 +154,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,5 +1,5 @@
 package Email::Sender::Transport::Mailgun;
-our $VERSION = "0.05";
+our $VERSION = "0.06";
 
 use Moo;
 with 'Email::Sender::Transport';
@@ -21,13 +21,20 @@ use MooX::Types::MooseLike::Base    qw( ArrayRef Enum Str);
   no Moo;
 }
 
-has [qw( api_key domain )] => (
+# One of these must be set
+has [qw( api_key api_key_path )] => (
+    is => 'ro',
+    predicate => 1,
+    isa => Str,
+);
+
+has domain => (
     is => 'ro',
     required => 1,
     isa => Str,
 );
 
-has [qw( tag )] => (
+has tag => (
     is => 'ro',
     predicate => 1,
     isa => ArrayRef[Str],
@@ -90,6 +97,22 @@ has json => (
     is => 'lazy',
     builder => sub { JSON::MaybeXS->new },
 );
+
+sub BUILD {
+    my ($self, $args) = @_;
+
+    # Must have either api_key or api_key_path, but not both
+    if (exists $args->{api_key}) {
+        if (exists $args->{api_key_path}) {
+            die 'api_key and api_key_path cannot be used at the same time';
+        }
+    }
+    else {
+        if (!exists $args->{api_key_path}) {
+            die 'Must specify one of api_key or api_key_path';
+        }
+    }
+}
 
 # https://documentation.mailgun.com/en/latest/api-sending.html#sending
 sub send_email {
@@ -158,6 +181,24 @@ sub failure {
     });
 }
 
+sub _api_key {
+    my $self = shift;
+
+    if ($self->has_api_key) {
+        return $self->api_key;
+    }
+
+    # Slurp the api key from the file at api_key_path
+    my $path = $self->api_key_path;
+    open(my $fh, '<', $path) or die "Opening $path: $!";
+    local $/ = undef;
+    my $api_key = <$fh>;
+    die "Reading $path: $!" unless defined $api_key;
+    close($fh) or die "Closing $path: $!";
+    chomp $api_key;
+    return $api_key;
+}
+
 sub _build_uri {
     my $self = shift;
 
@@ -166,7 +207,7 @@ sub _build_uri {
 
     # Percent-escape anything other than alphanumeric and - _ . ~
     # https://github.com/sdt/Email-Sender-Transport-Mailgun/issues/4
-    my $api_key = $self->api_key;
+    my $api_key = $self->_api_key;
     $api_key =~ s/[^-_.~0-9a-zA-Z]/sprintf('%%%02x',ord($&))/eg;
 
     # adapt endpoint based on region setting.
@@ -226,9 +267,16 @@ or L<WWW::Mailgun>.
 
 The attributes all correspond directly to Mailgun parameters.
 
-=head2 api_key
+=head2 api_key / api_key_path
 
 Mailgun API key. See L<https://documentation.mailgun.com/en/latest/api-intro.html#authentication-1>
+
+Must specify one of these, but not both.
+
+The C<api_key> parameter contains the literal api key as a string.
+
+If you have your api key stored in a file, such as a Docker Secret, you can
+instead put the full path in C<api_key_path>.
 
 =head2 domain
 
@@ -306,6 +354,8 @@ C<EMAIL_SENDER_TRANSPORT_>.
 =over
 
 =item EMAIL_SENDER_TRANSPORT_api_key
+
+=item EMAIL_SENDER_TRANSPORT_api_key_path
 
 =item EMAIL_SENDER_TRANSPORT_domain
 

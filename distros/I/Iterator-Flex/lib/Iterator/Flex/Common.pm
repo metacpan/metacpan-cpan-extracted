@@ -8,7 +8,7 @@ use warnings;
 
 use experimental qw( postderef signatures );
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use Exporter 'import';
 
@@ -702,7 +702,7 @@ Iterator::Flex::Common - Iterator Generators and Adapters
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 SYNOPSIS
 
@@ -963,7 +963,7 @@ See L<Iterator::Flex::Buffer> for more details.
 
   $iterator = iflatten( $iterable, ?\%pars );
 
-For each value that C<$iterable> yields, iterate over it if its an
+For each value that C<$iterable> yields, iterate over it if it is an
 iterable, otherwise return it.
 
 For example,

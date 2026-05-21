@@ -78,12 +78,10 @@ survives across devices or a fresh install:
 
 ## Files
 
-| Path | Description |
-|------|-------------|
-| `~/.config/drive_player/config.yaml` | OAuth credentials, log level, folder list |
-| `~/.config/drive_player/token.dat` | OAuth2 token cache |
-| `~/.local/share/drive_player/music.db` | SQLite track library |
-| `~/.local/share/drive_player/drive_player.log` | Application log |
+- `~/.config/drive_player/config.yaml` — OAuth credentials, log level, folder list
+- `~/.config/drive_player/token.dat` — OAuth2 token cache
+- `~/.local/share/drive_player/music.db` — SQLite track library
+- `~/.local/share/drive_player/drive_player.log` — Application log
 
 ## License
 

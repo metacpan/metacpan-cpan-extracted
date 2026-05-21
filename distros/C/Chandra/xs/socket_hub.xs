@@ -387,7 +387,7 @@ CODE:
 {
     while (1) {
         _hub_do_poll(aTHX_ self);
-        /* Small sleep to avoid CPU spin — 10ms */
+        /* Small sleep to avoid CPU spin - 10ms */
         {
             struct timeval tv;
             tv.tv_sec = 0;

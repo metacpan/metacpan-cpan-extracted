@@ -4,7 +4,7 @@ XML::PP - A simple XML parser
 
 # VERSION
 
-Version 0.07
+Version 0.08
 
 # SYNOPSIS
 
@@ -67,102 +67,110 @@ The returned structure is a hash reference with the following fields:
 
 ## collapse\_structure
 
-Collapse an XML-like structure into a simplified hash (like [XML::Simple](https://metacpan.org/pod/XML%3A%3ASimple)).
+Collapses a parsed XML tree into a simplified nested hash,
+similar in spirit to [XML::Simple](https://metacpan.org/pod/XML%3A%3ASimple).
+It is designed to be called on the output of `parse()`,
+and the two methods compose cleanly as a pipeline.
+
+### Purpose
+
+Transforms the verbose node-and-children structure produced by `parse()`
+into a compact hash that is easier to address with ordinary Perl hash
+syntax.
+Each element's tag name becomes a hash key and its text content becomes
+the corresponding value.
+Nested elements are recursed into rather than flattened.
+
+### Arguments
+
+- `$node` (required)
+
+    A hash reference representing a parsed XML node,
+    as returned by `parse()`.
+    Must contain a defined `name` key and a `children` array reference.
+    Returns an empty hash reference immediately if any of the following are
+    true: `$node` is not a hash reference; `$node` has no defined `name`
+    key; `$node` has no `children` key.
+
+### Returns
+
+A hash reference whose single top-level key is the element's tag name.
+Its value is a hash of collapsed children where each child's tag name maps
+to its text content or to a recursively collapsed sub-hash.
+
+If two or more children share the same tag name their values are collected
+into an array reference in document order rather than overwriting each other.
+
+Children whose text content is undefined or the empty string are silently
+omitted.
+Children with no tag name (bare text nodes) are silently skipped.
+Attributes of child elements are not included in the collapsed output; use
+the raw tree from `parse()` if attribute values are needed.
+
+### Example
 
     use XML::PP;
 
-    my $input = {
-        name => 'note',
-        children => [
-            { name => 'to', children => [ { text => 'Tove' } ] },
-            { name => 'from', children => [ { text => 'Jani' } ] },
-            { name => 'heading', children => [ { text => 'Reminder' } ] },
-            { name => 'body', children => [ { text => 'Don\'t forget me this weekend!' } ] },
-        ],
-        attributes => { id => 'n1' },
-    };
+    my $parser = XML::PP->new();
+    my $xml    = '<note id="1">'
+               .   '<to>Tove</to>'
+               .   '<from>Jani</from>'
+               .   '<heading>Reminder</heading>'
+               .   '<body>Don\'t forget me this weekend!</body>'
+               . '</note>';
 
-    my $result = collapse_structure($input);
+    my $tree   = $parser->parse($xml);
+    my $result = $parser->collapse_structure($tree);
 
-    # Output:
-    # {
+    # $result = {
     #     note => {
     #         to      => 'Tove',
     #         from    => 'Jani',
     #         heading => 'Reminder',
-    #         body    => 'Don\'t forget me this weekend!',
+    #         body    => "Don't forget me this weekend!",
     #     }
     # }
 
-The `collapse_structure` subroutine takes a nested hash structure (representing an XML-like data structure) and collapses it into a simplified hash where each child element is mapped to its name as the key, and the text content is mapped as the corresponding value. The final result is wrapped in a `note` key, which contains a hash of all child elements.
+    print $result->{note}{to};       # Tove
+    print $result->{note}{heading};  # Reminder
 
-This subroutine is particularly useful for flattening XML-like data into a more manageable hash format, suitable for further processing or display.
+    # Repeated child elements become an array reference:
+    my $list   = $parser->parse('<list><item>a</item><item>b</item></list>');
+    my $flat   = $parser->collapse_structure($list);
+    print $flat->{list}{item}[0];    # a
+    print $flat->{list}{item}[1];    # b
 
-`collapse_structure` accepts a single argument:
+### API specification
 
-- `$node` (Required)
-
-    A hash reference representing a node with the following structure:
-
-        {
-            name      => 'element_name',  # Name of the element (e.g., 'note', 'to', etc.)
-            children  => [                # List of child elements
-                { name => 'child_name', children => [{ text => 'value' }] },
-                ...
-            ],
-            attributes => { ... },        # Optional attributes for the element
-            ns_uri => ... ,               # Optional namespace URI
-            ns => ... ,                   # Optional namespace
-        }
-
-    The `children` key holds an array of child elements. Each child element may have its own `name` and `text`, and the function will collapse all text values into key-value pairs.
-
-The subroutine returns a hash reference that represents the collapsed structure, where the top-level key is `note` and its value is another hash containing the child elements' names as keys and their corresponding text values as values.
-
-For example:
+#### Input
 
     {
-        note => {
-            to      => 'Tove',
-            from    => 'Jani',
-            heading => 'Reminder',
-            body    => 'Don\'t forget me this weekend!',
-        }
+        node => {
+            type      => HASHREF,
+            required  => 1,
+            callbacks => {
+                'has defined name key' => sub {
+                    ref $_[0] eq 'HASH' && defined $_[0]->{name}
+                },
+                'has children key' => sub {
+                    ref $_[0] eq 'HASH' && exists $_[0]->{children}
+                },
+            },
+        },
     }
 
-- Basic Example:
+#### Output
 
-    Given the following input structure:
+    {
+        type => HASHREF,
+        min  => 1,
+    }
 
-        my $input = {
-            name => 'note',
-            children => [
-                { name => 'to', children => [ { text => 'Tove' } ] },
-                { name => 'from', children => [ { text => 'Jani' } ] },
-                { name => 'heading', children => [ { text => 'Reminder' } ] },
-                { name => 'body', children => [ { text => 'Don\'t forget me this weekend!' } ] },
-            ],
-        };
-
-    Calling `collapse_structure` will return:
-
-        {
-            note => {
-                to      => 'Tove',
-                from    => 'Jani',
-                heading => 'Reminder',
-                body    => 'Don\'t forget me this weekend!',
-            }
-        }
-
-## \_parse\_node
-
-    my $node = $self->_parse_node($xml_ref, $nsmap);
-
-Recursively parses an individual XML node.
-This method is used internally by the `parse` method.
-It handles the parsing of tags, attributes, text nodes, and child elements.
-It also manages namespaces and handles self-closing tags.
+The returned hash reference always has exactly one top-level key (the root
+element's tag name) whose value is a plain hash reference of collapsed
+children.
+An empty hash reference `{}` is returned when the input fails the guard
+conditions.
 
 # AUTHOR
 
@@ -170,7 +178,6 @@ Nigel Horne, `<njh at nigelhorne.com>`
 
 # SEE ALSO
 
-- Test coverage report: [https://nigelhorne.github.io/XML-PP/coverage/](https://nigelhorne.github.io/XML-PP/coverage/)
 - [XML::LibXML](https://metacpan.org/pod/XML%3A%3ALibXML)
 - [XML::Simple](https://metacpan.org/pod/XML%3A%3ASimple)
 
@@ -178,15 +185,10 @@ Nigel Horne, `<njh at nigelhorne.com>`
 
 This module is provided as-is without any warranty.
 
-# LICENSE AND COPYRIGHT
+# LICENCE AND COPYRIGHT
 
-Copyright 2025 Nigel Horne.
+Copyright 2025-2026 Nigel Horne.
 
-Usage is subject to licence terms.
-
-The licence terms of this software are as follows:
-
-- Personal single user, single computer use: GPL2
-- All other users (including Commercial, Charity, Educational, Government)
-  must apply in writing for a licence for use from Nigel Horne at the
-  above e-mail.
+Usage is subject to GPL2 licence terms.
+If you use it,
+please let me know.

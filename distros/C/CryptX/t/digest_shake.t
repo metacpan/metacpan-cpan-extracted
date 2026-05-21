@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 16;
+use Test::More tests => 28;
 
 use Crypt::Digest::SHAKE;
 
@@ -50,4 +50,60 @@ is(unpack("H*", Crypt::Digest::SHAKE->new(256)->add("A" x 307)->done(69)), "dbf9
 {
   my $hex = substr(unpack("H*", Crypt::Digest::SHAKE->new(128)->add("A" x 307)->done(999)), -100);
   is($hex, "868064bc8e37bd63713aa58ee7dae1c8d022aab26f079b13dfbc6c986a2d0200b046a99ed716380f691b7d15689236a0a8e6");
+}
+
+{
+  my @cases = (
+    {
+      label => 'done(-1)',
+      check => 'croaks',
+      action => sub { Crypt::Digest::SHAKE->new(128)->done(-1) },
+      re => qr/^FATAL: output length too large\b/,
+    },
+    {
+      label => 'done(oversized string)',
+      check => 'croaks',
+      action => sub { Crypt::Digest::SHAKE->new(128)->done("18446744073709551615") },
+      re => qr/^FATAL: output length too large\b/,
+    },
+    {
+      label => 'done(1000000001)',
+      check => 'croaks',
+      action => sub { Crypt::Digest::SHAKE->new(128)->done(1000000001) },
+      re => qr/^FATAL: output length too large\b/,
+    },
+    {
+      label => 'done(0)',
+      check => 'croaks',
+      action => sub { Crypt::Digest::SHAKE->new(128)->done(0) },
+      re => qr/^FATAL: invalid output length\b/,
+    },
+    {
+      label => 'done(1.5)',
+      check => 'coerces via unsigned long',
+      action => sub { Crypt::Digest::SHAKE->new(128)->done(1.5) },
+      len => 1,
+    },
+  );
+
+  for my $case (@cases) {
+    my $out;
+    my $ok = eval { $out = $case->{action}->(); 1 };
+    if (exists $case->{len}) {
+      ok($ok, "$case->{label} succeeds");
+      is(length($out), $case->{len}, "$case->{label} $case->{check}");
+    }
+    else {
+      ok(!$ok, "$case->{label} $case->{check}");
+      like($@, $case->{re}, "$case->{label} croak text");
+    }
+  }
+}
+
+{
+  my $d = Crypt::Digest::SHAKE->new(128);
+  my $first = $d->add("abc")->done(4);
+  eval { $d->add("x"); 1 };
+  like($@, qr/^FATAL: cannot add after done; call reset first\b/, 'add after done croaks');
+  is($d->reset->add("abc")->done(4), $first, 'reset re-enables add after done');
 }

@@ -1,4 +1,4 @@
-# Copyright (c) 2024-2025 Philipp Schafft <lion@cpan.org>
+# Copyright (c) 2024-2026 Philipp Schafft <lion@cpan.org>
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -53,7 +53,7 @@ use constant { # Taken from Data::Identifier
     WK_TAGPOOL_POOL                 => '1f30649d-eb55-48cb-93d7-6d6fcba23909',
 };
 
-our $VERSION = v0.16;
+our $VERSION = v0.17;
 
 our %_digest_name_converter = ( # stolen from Data::URIID::Result
     fc('md5')   => 'md-5-128',
@@ -708,6 +708,32 @@ sub editor {
 }
 
 # ----------------
+#@returns File::Information::Inode
+sub inode {
+    # TODO: Consider this for the public API.
+    my ($self) = @_;
+
+    return $self if $self->isa('File::Information::Inode');
+
+    if (defined(my $inode = eval {$self->parent->inode})) {
+        return $inode;
+    }
+
+    croak 'Invalid request: No inode for this object';
+}
+
+sub peek {
+    # TODO: Consider this for the public API.
+    my ($self, %opts) = @_;
+    my $res;
+
+    if (defined($res = eval { $self->parent->peek(%opts) })) {
+        return $res;
+    }
+
+    return $self->inode->peek(%opts);
+}
+
 sub _to_di {
     my ($uuid) = @_;
     state $cache = {};
@@ -1026,7 +1052,7 @@ File::Information::Base - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.16
+version v0.17
 
 =head1 SYNOPSIS
 
@@ -1468,7 +1494,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024-2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2024-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

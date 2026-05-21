@@ -379,7 +379,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- list() — return array of hashrefs ----
+ # ---- list() - return array of hashrefs ----
 
 void
 list(self)
@@ -590,7 +590,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- js_code() — returns JavaScript for shortcut handling ----
+ # ---- js_code() - returns JavaScript for shortcut handling ----
 
 SV *
 js_code(self)
@@ -705,7 +705,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- inject() — inject JS via app->eval ----
+ # ---- inject() - inject JS via app->eval ----
 
 SV *
 inject(self)

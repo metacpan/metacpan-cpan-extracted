@@ -4,6 +4,7 @@ author:
   - 'Andrew Speer <andrew.speer@isolutions.com.au>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -19,12 +20,11 @@ no_index:
     - inc
 requires:
   Plack: '0'
-  Test::Simple: '0.44'
   WebDyne: '0'
   perl: '5.006'
 resources:
   homepage: https://github.com/aspeer/pm-Task-WebDyne-Plack
   license: http://dev.perl.org/licenses/
   repository: https://github.com/aspeer/pm-Task-WebDyne-Plack.git
-version: '0.003'
+version: '0.004'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

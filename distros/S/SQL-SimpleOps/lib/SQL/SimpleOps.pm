@@ -93,7 +93,7 @@
 		$err
 	);
 
-	our $VERSION = "2026.101.1";
+	our $VERSION = "2026.131.1";
 
 	our @EXPORT_OK = @EXPORT;
 
@@ -169,7 +169,7 @@
 		"016" => { T=>"W", M=>"[%s] Key is missing, option 'force' is required" },
 		"017" => { T=>"E", M=>"[%s] Fields is missing" },
 		"018" => { T=>"E", M=>"[%s] Fields Format error, must be hash-pairs or arrayref" },
-		"019" => { T=>"E", M=>"[%s] Interface '%s::%s' missing" },
+		"019" => { T=>"W", M=>"[%s] Interface '%s::%s' missing" },
 		"020" => { T=>"E", M=>"[%s] Where Clause invalid" },
 		"021" => { T=>"E", M=>"[%s] Where invalid, must be single-value or array" },
 		"022" => { T=>"E", M=>"[%s] Database is not open" },
@@ -263,7 +263,7 @@ sub new()
 	}
 
 	## check database
-	if (!defined($self->{argv}{db}) || $self->{argv}{db} eq "")
+	if ((!defined($self->{argv}{db}) || $self->{argv}{db} eq "") && !defined($self->{argv}{dsname}))
 	{
 		&_setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"001");
 		return undef;
@@ -339,52 +339,63 @@ sub new()
 	$self->{argv}{interface_options}{PrintError} = 0 if (!defined($self->{argv}{interface_options}{PrintError}));
 
 	## standards plugins
-	if	(grep(/^$self->{argv}{driver}$/i,"mysql","mariadb"))			{$self->{init}{plugin_id} = "MySQL";}
-	elsif	(grep(/^$self->{argv}{driver}$/i,"pg","postgres","postsql","pgsql"))	{$self->{init}{plugin_id} = "PG";}
-	elsif	(grep(/^$self->{argv}{driver}$/i,"sqlite","sqlite3"))			{$self->{init}{plugin_id} = "SQLite";}
-	else										{$self->{init}{plugin_id} = $self->{argv}{driver};}
+	if (!$self->{argv}{ignore_plugin})
+	{
+		if	(grep(/^$self->{argv}{driver}$/i,"mysql","mariadb"))			{$self->{init}{plugin_id} = "MySQL";}
+		elsif	(grep(/^$self->{argv}{driver}$/i,"pg","postgres","postsql","pgsql"))	{$self->{init}{plugin_id} = "PG";}
+		elsif	(grep(/^$self->{argv}{driver}$/i,"sqlite","sqlite3"))			{$self->{init}{plugin_id} = "SQLite";}
+		elsif	(grep(/^$self->{argv}{driver}$/i,"odbc"))				{$self->{init}{plugin_id} = "ODBC";}
+		else										{$self->{init}{plugin_id} = $self->{argv}{driver};}
 
-	## load pluging
-	my $fn;
-	my $plugin = $SQL_SIMPLE_CLASS."::".$self->{argv}{interface}."::".$self->{init}{plugin_id};
-	foreach my $dir(@INC)
-	{
-		$fn = File::Spec->catdir($dir,split(/::/,$plugin)).".pm";
-		last if (stat($fn));
-		$fn = "";
-	}
-	if ($fn eq "")
-	{
-		&_setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"019",$self->{argv}{interface},$self->{init}{plugin_id});
-		return undef;
-	}
-	eval { require $fn; };
-	if ($@)
-	{
-		&_setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"035",$self->{argv}{interface},$self->{init}{plugin_id},$@);
-		return undef;
-	}
-	$self->{init}{plugin_fh} = $plugin->new(sql_simple => $self);
-	if (!defined($self->{init}{plugin_fh}))
-	{
-		&_setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"035",$self->{argv}{interface},$self->{init}{plugin_id},$@);
-		return undef;
+		## load pluging
+		my $fn;
+		my $plugin = $SQL_SIMPLE_CLASS."::".$self->{argv}{interface}."::".$self->{init}{plugin_id};
+		foreach my $dir(@INC)
+		{
+			$fn = File::Spec->catdir($dir,split(/::/,$plugin)).".pm";
+			next if (!stat($fn));
+
+			## load plugin if exists
+			eval
+			{
+				require $fn;
+				$self->{init}{plugin_fh} = $plugin->new(sql_simple => $self);
+			};
+			if ($@)
+			{
+				&_setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"035",$self->{argv}{interface},$self->{init}{plugin_id},$@);
+				return undef;
+			}
+			if (!defined($self->{init}{plugin_fh}))
+			{
+				&_setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"035",$self->{argv}{interface},$self->{init}{plugin_id},$@);
+				return undef;
+			}
+			last;
+		}
+		&_setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"019",$self->{argv}{interface},$self->{init}{plugin_id}) if (!defined($self->{init}{plugin_fh}));
+
+		$self->{init}{test_server} = 1 if (defined($self->{argv}{server}) && $self->{argv}{server} ne "");
+
+		## test server, the 'test_server' env must be defined on plugin
+		if ($self->{init}{test_server})
+		{
+			if (!defined($self->{argv}{server}) || $self->{argv}{server} eq "")
+			{
+				&_setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"002");
+				return undef;
+			}
+			if (defined($self->{argv}{port}) && $self->{argv}{port} ne "" && (($self->{argv}{port} =~ /^\D+$/) || ($self->{argv}{port} < 1 || $self->{argv}{port} > 65535)))
+			{
+				&_setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"029");
+				return undef;
+			}
+		}
 	}
 
-	## test server, the 'test_server' env must be defined on plugin
-	if ($self->{init}{test_server})
-	{
-		if ($self->{argv}{server} eq "")
-		{
-			&_setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"002");
-			return undef;
-		}
-		if ($self->{argv}{port} ne "" && (($self->{argv}{port} =~ /^\D+$/) || ($self->{argv}{port} < 1 || $self->{argv}{port} > 65535)))
-		{
-			&_setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"029");
-			return undef;
-		}
-	}
+	## review the defaults flags plugins args versus args envs
+	$self->{init}{alias_with_as} = $self->{argv}{alias_with_as} if (defined($self->{argv}{alias_with_as}));
+	$self->{init}{schema} = 1 if (defined($self->{argv}{schema}) && $self->{argv}{schema} ne "");
 
 	## new object
 	my $bless = bless($self,$class);
@@ -409,10 +420,17 @@ sub Open()
 	my $self = shift;
 
 	$self->_resetSession();
-	if ($self->{init}{plugin_fh}->can('Open') && $self->{init}{plugin_fh}->Open())
+	if ($self->{init}{plugin_fh})
 	{
-		$self->_setMessage("open",SQL_SIMPLE_RC_SYNTAX,"037",$self->{argv}{interface},$self->{argv}{driver},$self->getMessage());
-		return SQL_SIMPLE_RC_SYNTAX;
+		if ($self->{init}{plugin_fh}->can('Open') && $self->{init}{plugin_fh}->Open())
+		{
+			$self->_setMessage("open",SQL_SIMPLE_RC_SYNTAX,"037",$self->{argv}{interface},$self->{argv}{driver},$self->getMessage());
+			return SQL_SIMPLE_RC_SYNTAX;
+		}
+	}
+	else
+	{
+		$self->{argv}{dsname} = $self->{argv}{interface}.':'.$self->{argv}{driver}.':'.$self->{argv}{dsname};
 	}
 	if ($self->{argv}{interface} =~ /^dbi$/i)
 	{
@@ -461,7 +479,7 @@ sub SelectCursor()
 	## define the command in load
 	$self->{work}{command} = SQL_SIMPLE_ALIAS_SELECT;
 
-	if ($self->{init}{plugin_fh}->can('SelectCursor') && $self->{init}{plugin_fh}->SelectCursor($argv))
+	if ($self->{init}{plugin_fh} && $self->{init}{plugin_fh}->can('SelectCursor') && $self->{init}{plugin_fh}->SelectCursor($argv))
 	{
 		$self->_setMessage("select",SQL_SIMPLE_RC_SYNTAX,"037",$self->{argv}{interface},$self->{argv}{driver},$self->getMessage());
 		return SQL_SIMPLE_RC_SYNTAX;
@@ -802,7 +820,7 @@ sub Select()
 	## define the command in load
 	$self->{work}{command} = SQL_SIMPLE_ALIAS_SELECT;
 
-	if ($self->{init}{plugin_fh}->can('Select') && $self->{init}{plugin_fh}->Select($argv))
+	if ($self->{init}{plugin_fh} && $self->{init}{plugin_fh}->can('Select') && $self->{init}{plugin_fh}->Select($argv))
 	{
 		$self->_setMessage("select",SQL_SIMPLE_RC_SYNTAX,"037",$self->{argv}{interface},$self->{argv}{driver},$self->getMessage());
 		return SQL_SIMPLE_RC_SYNTAX;
@@ -1133,7 +1151,7 @@ sub _Select()
 	$sql .= " ORDER BY ".join(", ",@order) if (@order);
 	$sql .= " LIMIT ".$argv->{limit} if (defined($argv->{limit}) && $argv->{limit} > 0);
 
-	## cross check cursor_key v buffer_hashkey
+	## cross check cursor_key vs buffer_hashkey
 	$self->{work}{cursor_key_vs_hashkey} = 0;
 	if (defined($argv->{buffer_hashkey}))
 	{
@@ -1215,7 +1233,7 @@ sub Delete()
 	## define the command in load
 	$self->{work}{command} = SQL_SIMPLE_ALIAS_DELETE;
 
-	if ($self->{init}{plugin_fh}->can('Delete') && $self->{init}{plugin_fh}->Delete($argv))
+	if ($self->{init}{plugin_fh} && $self->{init}{plugin_fh}->can('Delete') && $self->{init}{plugin_fh}->Delete($argv))
 	{
 		$self->_setMessage("delete",SQL_SIMPLE_RC_SYNTAX,"037",$self->{argv}{interface},$self->{argv}{driver},$self->getMessage());
 		return SQL_SIMPLE_RC_SYNTAX;
@@ -1252,8 +1270,16 @@ sub _Delete()
 		return SQL_SIMPLE_RC_SYNTAX;
 	}
 
+	## make tables
+	my @tables;
+	foreach my $table(@{$self->{work}{tables_inuse}})
+	{
+		push(@tables,$self->_getSchemaName().$table);
+	}
+
 	## build sql command
-	my $sql = "DELETE FROM ".join(", ",@{$self->{work}{tables_inuse}});
+	my $sql = "DELETE FROM ".join(", ",@tables);
+	#my $sql = "DELETE FROM ".join(", ",@{$self->{work}{tables_inuse}});
 	$sql .= " WHERE ".$where if ($where);
 
 	return SQL_SIMPLE_RC_ERROR if ($self->_Call(
@@ -1296,7 +1322,7 @@ sub Insert()
 	## define the command in load
 	$self->{work}{command} = SQL_SIMPLE_ALIAS_INSERT;
 
-	if ($self->{init}{plugin_fh}->can('Insert') && $self->{init}{plugin_fh}->Insert($argv))
+	if ($self->{init}{plugin_fh} && $self->{init}{plugin_fh}->can('Insert') && $self->{init}{plugin_fh}->Insert($argv))
 	{
 		$self->_setMessage("insert",SQL_SIMPLE_RC_SYNTAX,"037",$self->{argv}{interface},$self->{argv}{driver},$self->getMessage());
 		return SQL_SIMPLE_RC_SYNTAX;
@@ -1406,8 +1432,16 @@ sub _Insert()
 		push(@values, (@fields == 1) ? "(".join("),(",@value_).")" : "(".join(",",@value_).")" ) if (@value_);
 	}
 
+	## make tables
+	my @tables;
+	foreach my $table(@{$self->{work}{tables_inuse}})
+	{
+		push(@tables,$self->_getSchemaName().$table);
+	}
+
 	## build sql
-	my $sql = "INSERT INTO ".join(", ",@{$self->{work}{tables_inuse}})." (".join(",",@fields).") VALUES ".join(",",@values);
+	my $sql = "INSERT INTO ".join(", ",@tables)." (".join(",",@fields).") VALUES ".join(",",@values);
+	#my $sql = "INSERT INTO ".join(", ",@{$self->{work}{tables_inuse}})." (".join(",",@fields).") VALUES ".join(",",@values);
 	if (defined($argv->{conflict}))
 	{
 		my @conflict;
@@ -1457,7 +1491,7 @@ sub Update()
 	## define the command in load
 	$self->{work}{command} = SQL_SIMPLE_ALIAS_UPDATE;
 
-	if ($self->{init}{plugin_fh}->can('Update') && $self->{init}{plugin_fh}->Update($argv))
+	if ($self->{init}{plugin_fh} && $self->{init}{plugin_fh}->can('Update') && $self->{init}{plugin_fh}->Update($argv))
 	{
 		$self->_setMessage("update",SQL_SIMPLE_RC_SYNTAX,"037",$self->{argv}{interface},$self->{argv}{driver},$self->getMessage());
 		return SQL_SIMPLE_RC_SYNTAX;
@@ -1623,8 +1657,7 @@ sub Call()
 	$self->Open() if (!defined($self->{init}{dbh}));
 
 	## define the command in load
-
-	if ($self->{init}{plugin_fh}->can('Call') && $self->{init}{plugin_fh}->Call($argv))
+	if ($self->{init}{plugin_fh} && $self->{init}{plugin_fh}->can('Call') && $self->{init}{plugin_fh}->Call($argv))
 	{
 		$self->_setMessage("call",SQL_SIMPLE_RC_SYNTAX,"037",$self->{argv}{interface},$self->{argv}{driver},$self->getMessage());
 		return SQL_SIMPLE_RC_SYNTAX;
@@ -1727,7 +1760,7 @@ sub _Call()
 	}
 
 	## run-PreFetch if exists
-	if ($self->{init}{plugin_fh}->can('PreFetch') && $self->{init}{plugin_fh}->PreFetch($argv))
+	if ($self->{init}{plugin_fh} && $self->{init}{plugin_fh}->can('PreFetch') && $self->{init}{plugin_fh}->PreFetch($argv))
 	{
 		$self->_setMessage("prefetch",SQL_SIMPLE_RC_SYNTAX,"037",$self->{argv}{interface},$self->{argv}{driver},$self->getMessage());
 		return SQL_SIMPLE_RC_SYNTAX;
@@ -2395,7 +2428,7 @@ sub getLastSave()
 sub getAliasTable()
 {
 	my $self = shift;
-	return $self->_getAliasTable(@_,{schema=>defined($self->{init}{schema})});
+	return $self->_getAliasTable(@_,{schema=>$self->{init}{schema}});
 }
 
 sub _getAliasTable()
@@ -2417,9 +2450,9 @@ sub _getSchemaName()
 	my $self = shift;
 	my $argv = shift;
 
-	return "" if (!$argv->{schema});
-	return "" if (!defined($self->{argv}{schema}));
-	return $self->{argv}{schema}.".";
+	return $argv->{schema}."." if (defined($argv->{schema}) && $argv->{schema} ne "");
+	return $self->{argv}{schema}."." if (defined($self->{argv}{schema}) && $self->{argv}{schema} ne "" && $self->{init}{schema});
+	return "";
 }
 
 ##############################################################################
@@ -2748,8 +2781,8 @@ sub _setMessage()
 
 	if (!defined($rc))
 	{
-		return $self->_setMessage($command,$self->{init}{dbh}->err+0,"099",$self->{init}{dbh}->errstr()) if (defined($self->{init}{dbh}) && $self->{init}{dbh}->err);
-		return $self->_setMessage($command,$DBI::err+0,"099",$DBI::errstr) if ($DBI::err);
+		return $self->_setMessage($command,$self->{init}{dbh}->err+0,"099",'dbh['.$self->{init}{dbh}->errstr().']') if (defined($self->{init}{dbh}) && $self->{init}{dbh}->err);
+		return $self->_setMessage($command,$DBI::err+0,"099",'dbi['.$DBI::errstr.']') if ($DBI::err);
 
 		$err = 0;
 		$errstr = "";
@@ -2763,7 +2796,8 @@ sub _setMessage()
 
 	if ($self->{argv}{message_log})
 	{
-		print STDERR $errstr."\n" if ($self->{argv}{message_log} & SQL_SIMPLE_LOG_STD);
+		print STDERR $errstr."\n" if ($self->{argv}{message_log} & SQL_SIMPLE_LOG_STD &&
+			($SQL_SIMPLE_TABLE_OF_MSGS{$code}{T} ne "W" || !$self->{argv}{message_warning_off}));
 
 		if ($self->{argv}{message_log} & SQL_SIMPLE_LOG_SYS)
 		{

@@ -10,6 +10,10 @@ param(
 
     [string]$StatusRoot = "",
 
+    [string]$BootstrapScript = "",
+
+    [switch]$UseInstallBootstrap,
+
     [switch]$SkipCpanmTests,
 
     [switch]$KeepTemp
@@ -384,6 +388,95 @@ function Copy-TarballToLocalTemp {
     return $destination
 }
 
+# Purpose: run the checkout bootstrap installer inside the Windows smoke guest.
+# Input: a local tarball path plus an optional bootstrap script path.
+# Output: installs Developer Dashboard through install.ps1 or throws on failure.
+function Invoke-InstallBootstrap {
+    param(
+        [Parameter(Mandatory = $true)][string]$LocalTarball,
+        [Parameter(Mandatory = $true)][string]$InstallerPath
+    )
+
+    if (-not (Test-Path $InstallerPath)) {
+        throw "Bootstrap installer does not exist: $InstallerPath"
+    }
+
+    $env:DD_INSTALL_CPAN_TARGET = $LocalTarball
+    $env:DD_INSTALL_BOOTSTRAP_SCRIPT = $InstallerPath
+    try {
+        $wrapperPath = Join-Path ([System.IO.Path]::GetTempPath()) "dd-install-bootstrap-wrapper.ps1"
+        @"
+Get-Content -Raw -LiteralPath `$env:DD_INSTALL_BOOTSTRAP_SCRIPT | Invoke-Expression
+"@ | Set-Content -Path $wrapperPath -Encoding UTF8
+
+        Invoke-LoggedCommand -Label "run install.ps1 bootstrap" -Command @(
+            "powershell.exe",
+            "-NoLogo",
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            $wrapperPath
+        )
+    }
+    finally {
+        Remove-Item Env:DD_INSTALL_CPAN_TARGET -ErrorAction SilentlyContinue
+        Remove-Item Env:DD_INSTALL_BOOTSTRAP_SCRIPT -ErrorAction SilentlyContinue
+        Remove-Item $wrapperPath -ErrorAction SilentlyContinue
+    }
+}
+
+# Purpose: prove that a brand-new profile-loaded PowerShell session can resolve
+# the installed dashboard command after install.ps1 completes.
+# Input: none.
+# Output: returns nothing or throws when the fresh session cannot resolve
+# dashboard, print a version, restart the runtime, install the browser skill,
+# and run dashboard logs successfully.
+function Assert-FreshPowerShellDashboardBootstrap {
+    $freshSessionScript = @'
+$ErrorActionPreference = "Stop"
+Write-Output "DASHBOARD_SOURCE_START"
+(Get-Command dashboard -ErrorAction Stop).Source
+Write-Output "DASHBOARD_VERSION_START"
+dashboard version
+if ($LASTEXITCODE -ne 0) { throw "dashboard version failed with exit code $LASTEXITCODE" }
+Write-Output "DASHBOARD_RESTART_START"
+dashboard restart
+if ($LASTEXITCODE -ne 0) { throw "dashboard restart failed with exit code $LASTEXITCODE" }
+Write-Output "DASHBOARD_RESTART_END"
+Write-Output "DASHBOARD_SKILL_INSTALL_BROWSER_START"
+dashboard skills install browser
+if ($LASTEXITCODE -ne 0) { throw "dashboard skills install browser failed with exit code $LASTEXITCODE" }
+Write-Output "DASHBOARD_SKILL_INSTALL_BROWSER_END"
+Write-Output "DASHBOARD_LOGS_START"
+dashboard logs
+if ($LASTEXITCODE -ne 0) { throw "dashboard logs failed with exit code $LASTEXITCODE" }
+Write-Output "DASHBOARD_LOGS_END"
+'@
+
+    $freshSessionScriptPath = Join-Path ([System.IO.Path]::GetTempPath()) "dd-fresh-session-bootstrap.ps1"
+    try {
+        Set-Content -Path $freshSessionScriptPath -Value $freshSessionScript -Encoding UTF8
+        $freshSessionOutput = & powershell.exe -NoLogo -File $freshSessionScriptPath | Out-String
+        if ($LASTEXITCODE -ne 0) {
+            throw "fresh profile-loaded PowerShell dashboard check failed with exit code $LASTEXITCODE"
+        }
+    }
+    finally {
+        Remove-Item $freshSessionScriptPath -ErrorAction SilentlyContinue
+    }
+
+    Invoke-AssertContains -Text $freshSessionOutput -Fragment "DASHBOARD_SOURCE_START" -Label "fresh PowerShell dashboard bootstrap"
+    Invoke-AssertContains -Text $freshSessionOutput -Fragment "dashboard.bat" -Label "fresh PowerShell dashboard bootstrap"
+    Invoke-AssertContains -Text $freshSessionOutput -Fragment "DASHBOARD_VERSION_START" -Label "fresh PowerShell dashboard bootstrap"
+    Invoke-AssertContains -Text $freshSessionOutput -Fragment "DASHBOARD_RESTART_START" -Label "fresh PowerShell dashboard bootstrap"
+    Invoke-AssertContains -Text $freshSessionOutput -Fragment "DASHBOARD_RESTART_END" -Label "fresh PowerShell dashboard bootstrap"
+    Invoke-AssertContains -Text $freshSessionOutput -Fragment "DASHBOARD_SKILL_INSTALL_BROWSER_START" -Label "fresh PowerShell dashboard bootstrap"
+    Invoke-AssertContains -Text $freshSessionOutput -Fragment "DASHBOARD_SKILL_INSTALL_BROWSER_END" -Label "fresh PowerShell dashboard bootstrap"
+    Invoke-AssertContains -Text $freshSessionOutput -Fragment "DASHBOARD_LOGS_START" -Label "fresh PowerShell dashboard bootstrap"
+    Invoke-AssertContains -Text $freshSessionOutput -Fragment "DASHBOARD_LOGS_END" -Label "fresh PowerShell dashboard bootstrap"
+}
+
 # Purpose: write the current Windows smoke phase into the shared status root
 # when one is available.
 # Input: short phase string.
@@ -441,39 +534,64 @@ function Disable-WindowsFirewallForSmoke {
     )
 }
 
-$Perl = Get-PerlBin -Requested $PerlBin
-Set-StrawberryPath -ResolvedPerl $Perl
-$Cpanm = Install-CpanmIfMissing -ResolvedPerl $Perl
-Disable-WindowsFirewallForSmoke
-
 if (-not (Test-Path $Tarball)) {
     throw "Tarball does not exist: $Tarball"
 }
 
 Write-PhaseStatus -Phase "prepare-local-tarball"
 $LocalTarball = Copy-TarballToLocalTemp -SourceTarball $Tarball
-$cpanmLog = Join-Path ([System.IO.Path]::GetTempPath()) ("dd-win-cpanm-" + [guid]::NewGuid().ToString("N") + ".log")
-if ($StatusRoot -ne "" -and (Test-Path $StatusRoot)) {
-    $cpanmLog = Join-Path $StatusRoot "cpanm-install.log"
-}
-try {
-    Write-PhaseStatus -Phase "install-tarball"
-    $cpanmCommand = @($Cpanm, "--verbose")
-    if ($SkipCpanmTests) {
-        $cpanmCommand += "--notest"
+
+if ($UseInstallBootstrap) {
+    if ($BootstrapScript -eq "") {
+        $scriptRoot = Split-Path -Parent $PSCommandPath
+        $repoInstaller = Join-Path (Split-Path -Parent (Split-Path -Parent $scriptRoot)) "install.ps1"
+        if (Test-Path $repoInstaller) {
+            $BootstrapScript = $repoInstaller
+        }
+        else {
+            $tempInstaller = Join-Path ([System.IO.Path]::GetTempPath()) "install.ps1"
+            if (Test-Path $tempInstaller) {
+                $BootstrapScript = $tempInstaller
+            }
+        }
     }
-    $cpanmCommand += $LocalTarball
-    Invoke-LoggedCommand -Label "install Developer Dashboard tarball with cpanm" -Command $cpanmCommand -LogPath $cpanmLog
+
+    Write-PhaseStatus -Phase "install-bootstrap"
+    Invoke-InstallBootstrap -LocalTarball $LocalTarball -InstallerPath $BootstrapScript
+    Write-PhaseStatus -Phase "verify-fresh-powershell-bootstrap"
+    Assert-FreshPowerShellDashboardBootstrap
+    $Perl = Get-PerlBin -Requested $PerlBin
+    Set-StrawberryPath -ResolvedPerl $Perl
 }
-catch {
+else {
+    $Perl = Get-PerlBin -Requested $PerlBin
+    Set-StrawberryPath -ResolvedPerl $Perl
+    $Cpanm = Install-CpanmIfMissing -ResolvedPerl $Perl
+    $cpanmLog = Join-Path ([System.IO.Path]::GetTempPath()) ("dd-win-cpanm-" + [guid]::NewGuid().ToString("N") + ".log")
+    if ($StatusRoot -ne "" -and (Test-Path $StatusRoot)) {
+        $cpanmLog = Join-Path $StatusRoot "cpanm-install.log"
+    }
+    try {
+        Write-PhaseStatus -Phase "install-tarball"
+        $cpanmCommand = @($Cpanm, "--verbose")
+        if ($SkipCpanmTests) {
+            $cpanmCommand += "--notest"
+        }
+        $cpanmCommand += $LocalTarball
+        Invoke-LoggedCommand -Label "install Developer Dashboard tarball with cpanm" -Command $cpanmCommand -LogPath $cpanmLog
+    }
+    catch {
+        Copy-StatusArtifact -SourcePath $cpanmLog -DestinationName "cpanm-install.log"
+        if (Test-Path $cpanmLog) {
+            $cpanmTranscript = Get-Content -Path $cpanmLog -Raw
+            throw "$($_.Exception.Message)`n$cpanmTranscript"
+        }
+        throw
+    }
     Copy-StatusArtifact -SourcePath $cpanmLog -DestinationName "cpanm-install.log"
-    if (Test-Path $cpanmLog) {
-        $cpanmTranscript = Get-Content -Path $cpanmLog -Raw
-        throw "$($_.Exception.Message)`n$cpanmTranscript"
-    }
-    throw
 }
-Copy-StatusArtifact -SourcePath $cpanmLog -DestinationName "cpanm-install.log"
+
+Disable-WindowsFirewallForSmoke
 
 Write-PhaseStatus -Phase "locate-dashboard-bin"
 $Dashboard = Get-DashboardBin -Requested $DashboardBin
@@ -605,15 +723,22 @@ run-strawberry-smoke.ps1 - verify the built tarball under Strawberry Perl and Po
 =head1 SYNOPSIS
 
   powershell -ExecutionPolicy Bypass -File integration/windows/run-strawberry-smoke.ps1 -Tarball C:\path\Developer-Dashboard-*.tar.gz
+  powershell -ExecutionPolicy Bypass -File integration/windows/run-strawberry-smoke.ps1 -Tarball C:\path\Developer-Dashboard-*.tar.gz -UseInstallBootstrap -BootstrapScript C:\path\install.ps1
 
 =head1 DESCRIPTION
 
-This script installs the built C<Developer::Dashboard> tarball with C<cpanm>
-under Strawberry Perl, verifies C<dashboard shell ps> and C<dashboard ps1>,
-checks one PowerShell-backed collector command, starts the dashboard web
-service, exercises one saved Ajax PowerShell handler through
+This script normally installs the built C<Developer::Dashboard> tarball with
+C<cpanm> under Strawberry Perl, verifies C<dashboard shell ps> and
+C<dashboard ps1>, checks one PowerShell-backed collector command, starts the
+dashboard web service, exercises one saved Ajax PowerShell handler through
 C<Invoke-WebRequest>, and optionally dumps DOM through Edge or Chrome when a
 browser binary is present on the Windows host.
+
+When C<-UseInstallBootstrap> is set, the script runs the checkout
+F<install.ps1> bootstrap first, points C<DD_INSTALL_CPAN_TARGET> at the local
+staged tarball, and executes that bootstrap through a streamed
+C<Invoke-Expression> wrapper so the full Windows bootstrap path is exercised
+before the same dashboard verification steps continue.
 
 =cut
 #>

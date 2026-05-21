@@ -55,7 +55,7 @@ use RT::Shredder;
 
 package RT::Extension::MergeUsers;
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 =head1 NAME
 
@@ -908,7 +908,7 @@ sub TweakRoleLimitArgs {
 
     my $column = $type ? $class->Role($type)->{Column} : undef;
 
-    # if it's equality op and search by Email or Name then we can preload user
+    # if it's equality op and search by Email or Name then we can preload user/group
     # we do it to help some DBs better estimate number of rows and get better plans
     if ( $args{OPERATOR} =~ /^(!?)=$/
         && ( !$args{FIELD} || $args{FIELD} eq 'id' || $args{FIELD} eq 'Name' || $args{FIELD} eq 'EmailAddress' ) )
@@ -920,14 +920,34 @@ sub TweakRoleLimitArgs {
             : $args{FIELD} eq 'EmailAddress' ? 'LoadByEmail'
             :                                  'Load';
         $o->$method( $args{VALUE} );
+
+        my @ids;
         if ( $o->id ) {
-            $args{FIELD} = 'id';
             if ( my $merged_users = $o->FirstAttribute('MergedUsers') ) {
-                $args{VALUE} = [ $o->id, @{ $merged_users->Content } ];
-                $args{OPERATOR} = $is_negative ? 'NOT IN' : 'IN';
+                push @ids, $o->id, @{ $merged_users->Content };
             }
             else {
-                $args{VALUE} = $o->id;
+                push @ids, $o->id;
+            }
+        }
+
+        # also look up a user-defined group with this name, mirroring what
+        # RoleLimit does since a user and group can share a name;
+        # only applies when FIELD is Name (or empty, which is treated as Name)
+        if ( !$args{FIELD} || $args{FIELD} eq 'Name' ) {
+            my $group = RT::Group->new( $self->CurrentUser );
+            $group->LoadUserDefinedGroup( $args{VALUE} );
+            push @ids, $group->id if $group->id;
+        }
+
+        if ( @ids ) {
+            $args{FIELD} = 'id';
+            if ( @ids == 1 ) {
+                $args{VALUE} = $ids[0];
+            }
+            else {
+                $args{VALUE}    = \@ids;
+                $args{OPERATOR} = $is_negative ? 'NOT IN' : 'IN';
             }
         }
     }

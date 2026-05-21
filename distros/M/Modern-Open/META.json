@@ -1,6 +1,6 @@
 {
     "name" : "Modern-Open",
-    "version" : "0.14",
+    "version" : "0.15",
     "abstract" : "Autovivification, Autodie, and 3-args open support",
     "author" : [
         "ina <ina@cpan.org>"
@@ -19,52 +19,53 @@
         "license" : [
             "http://dev.perl.org/licenses/"
         ],
+        "bugtracker" : {
+            "web" : "https://github.com/ina-cpan/Modern-Open/issues"
+        },
         "repository" : {
-            "url" : "https://github.com/ina-cpan/Modern-Open"
+            "url"  : "https://github.com/ina-cpan/Modern-Open",
+            "web"  : "https://github.com/ina-cpan/Modern-Open",
+            "type" : "git"
         }
     },
     "prereqs" : {
         "build" : {
             "requires" : {
-                "ExtUtils::MakeMaker" : "5.4302",
                 "Fcntl" : "1.03",
-                "File::Basename" : "2.6",
-                "File::Copy" : "2.02",
-                "File::Path" : "1.0401",
-                "FindBin" : "1.42",
-                "Socket" : "0",
-                "lib" : "0",
                 "perl" : "5.00503",
-                "strict" : "1.01"
+                "strict" : "1.01",
+                "vars" : "0"
             }
         },
         "configure" : {
             "requires" : {
-                "ExtUtils::MakeMaker" : "5.4302",
                 "Fcntl" : "1.03",
-                "File::Basename" : "2.6",
-                "File::Copy" : "2.02",
-                "File::Path" : "1.0401",
-                "FindBin" : "1.42",
-                "Socket" : "0",
-                "lib" : "0",
                 "perl" : "5.00503",
-                "strict" : "1.01"
+                "strict" : "1.01",
+                "vars" : "0"
             }
         },
         "runtime" : {
             "requires" : {
-                "ExtUtils::MakeMaker" : "5.4302",
                 "Fcntl" : "1.03",
-                "File::Basename" : "2.6",
-                "File::Copy" : "2.02",
-                "File::Path" : "1.0401",
-                "FindBin" : "1.42",
-                "Socket" : "0",
-                "lib" : "0",
                 "perl" : "5.00503",
-                "strict" : "1.01"
+                "strict" : "1.01",
+                "vars" : "0"
             }
+        },
+        "test" : {
+            "requires" : {
+                "Fcntl" : "1.03",
+                "perl" : "5.00503",
+                "strict" : "1.01",
+                "vars" : "0"
+            }
+        }
+    },
+    "provides" : {
+        "Modern::Open" : {
+            "file" : "lib/Modern/Open.pm",
+            "version" : "0.15"
         }
     }
 }

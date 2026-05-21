@@ -1,7 +1,9 @@
 Changes for Crypt::ScryptKDF
-TODO:
-        - solaris: cannot find include file: <stdint.h> - http://ppm4.activestate.com/sun4-solaris/5.14/1400/M/MI/MIK/Crypt-ScryptKDF-0.008.d/log-20130618T103930.txt
-        
+
+0.011   2026/05/16
+        - fix CVE-2026-8647
+        - add SECURITY.md
+
 0.010   2015/11/28
         - consistently use UNIX newlines
 

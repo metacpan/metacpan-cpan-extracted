@@ -9,7 +9,8 @@ use HTTP::Response;
 
 sub dispatch {
     my $self = shift;
-    my ($c, $method, $uri, $request) = @_;
+    my ($c, $request) = @_;
+    my $uri = $request->uri;
 
     if ($uri eq '/content-length') {
         my $res = HTTP::Response->new(200);

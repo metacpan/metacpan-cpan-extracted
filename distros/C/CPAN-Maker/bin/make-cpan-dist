@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 # -*- mode: sh; -*-
 
 ########################################################################
@@ -143,8 +143,8 @@ filter_file_list() {
     return 1
   fi
 
-  file_list_sorted=$(mktemp)
-  exclude_list_sorted=$(mktemp)
+  file_list_sorted=$(make_temp)
+  exclude_list_sorted=$(make_temp)
 
   export LC_ALL=C
 
@@ -152,8 +152,6 @@ filter_file_list() {
   sort -u $exclude_list > $exclude_list_sorted
 
   comm -23 $file_list_sorted $exclude_list_sorted > "$file_list";
-
-  rm $file_list_sorted $exclude_list_sorted
 }
 
 ########################################################################
@@ -167,31 +165,55 @@ function FATAL_ERROR {
 ########################################################################
 function ERROR {
 ########################################################################
-    [ "$LOG_LEVEL" -ge 1 ] && 2>&1 echo "** ERROR: $1 **" && return
+    LOG_LEVEL="${LOG_LEVEL:-1}"
+    _LOG "$1" ERROR 1
+    return
 }
 
 ########################################################################
 function INFO {
 ########################################################################
-    [ "$LOG_LEVEL" -ge 2 ] && 2>&1 echo "INFO: $1" && return
+    LOG_LEVEL="${LOG_LEVEL:-1}"
+    _LOG "$1" INFO 2
+    return
 }
 
 ########################################################################
 function WARN {
 ########################################################################
-    [ "$LOG_LEVEL" -ge 3 ] && 2>&1 echo "WARN: $1" && return
+    LOG_LEVEL="${LOG_LEVEL:-1}"
+    _LOG "$1" WARN 3
+
+    return
+}
+
+########################################################################
+function _LOG {
+########################################################################
+    message="${1:-}"
+    levelstr="${2:-DEBUG}"
+    LOG_LEVEL="${LOG_LEVEL:-1}"
+
+    if [[ $(($LOG_LEVEL + 0))  -ge $3 ]]; then
+        echo >&2 "$levelstr: $message"
+    fi
+
 }
 
 ########################################################################
 function DEBUG {
 ########################################################################
-    [ $LOG_LEVEL -ge 4 ] && 2>&1 echo "DEBUG: $1" && return
+    LOG_LEVEL="${LOG_LEVEL:-1}"
+    _LOG "$1" DEBUG 4
+    return
 }
 
 ########################################################################
 function TRACE {
 ########################################################################
-    [ "$LOG_LEVEL" -ge 5 ] && 2>&1 echo "TRACE: $1" && return
+    LOG_LEVEL="${LOG_LEVEL:-1}"
+    _LOG "$1" TRACE 5
+    return
 }
 
 # look for project home directory from here back, sets PROJECT_HOME
@@ -221,21 +243,33 @@ function find_git_home {
     done
 }
 
-# cleanup on exit
+########################################################################
+function make_temp {
+########################################################################
+    local tmp
+    tmp="$(mktemp "$@")"
+    CLEANFILES+=("$tmp")
+    echo "$tmp"
+}
+
 ########################################################################
 function cleanup {
 ########################################################################
-    [[ -n "$NOCLEANUP" ]] && return;
+    # Safely check NOCLEANUP in case it's unbound when exiting early
+    [[ -n "${NOCLEANUP:-}" ]] && return
 
-    [[ -n "$testsfile"     ]] && rm -f "$testsfile"
-    [[ -n "$package_files" ]] && rm -f "$package_files"
-    [[ -n "$exe_files"     ]] && rm -f "$exe_files"
-    [[ -n "$scripts"       ]] && rm -f "$scripts"
-    [[ -n "$depfile"       ]] && rm -f "$depfile"
-    [[ -n "$resources"     ]] && rm -f "$resources"
-    [[ -n "$builddir"      ]] && rm -rf "$builddir"
-    [[ -n "$tmp_gitdir"    ]] && rm -rf "$tmp_gitdir"
-    [[ -n "workdir"        ]] && find "$workdir" -maxdepth 1 -name '*.tmp' -exec rm -f {} \;
+    for item in "${CLEANFILES[@]:-}"; do
+        if [[ -d "$item" ]]; then
+            rm -rf "$item"
+        elif [[ -f "$item" ]]; then
+            rm -f "$item"
+        fi
+    done
+
+    # Retain your dynamic sweep for the temporary workdir files
+    if [[ -n "${workdir:-}" ]] && [[ -d "$workdir" ]]; then
+        find "$workdir" -maxdepth 1 -name '*.tmp' -exec rm -f {} \;
+    fi
 }
 
 # default dependency finder
@@ -245,8 +279,8 @@ function perl_requires {
 
     if [[ -e "$REQUIRES" ]]; then
         cat $REQUIRES
-    elif [[ -n "/home/rlauer/bin/scandeps-static.pl" ]]; then
-        "/home/rlauer/bin/scandeps-static.pl" -r "$1" 
+    elif [[ -n "@PERL_REQUIRES@" ]]; then
+        "@PERL_REQUIRES@" -r "$1" 
     else
         ERROR "no scandeps-static.pl found!"
         FATAL_ERROR "Install Module::ScanDeps::Static use the -r option to provide your own dependency checker"
@@ -265,8 +299,8 @@ function get_module_versions {
         return;
     fi
 
-    modules=$(mktemp)
-    
+    modules=$(make_temp)
+
     sort -u "$infile" | perl -npe 's/^perl\(//; s/\)\s*$//;' >$modules;
 
     while read -r a; do 
@@ -276,7 +310,7 @@ function get_module_versions {
 	if test -n "$ANY_VERSION"; then
 	    echo "$module 0"
 	elif test -n "$a" && ! test -n "$version"; then
-	    echo $module | /usr/bin/env perl -I "$perl5libdir" \
+	    echo $module | @perlenv@ -I "$perl5libdir" \
             -ne 'chomp; $m=$_; eval "require $m"; $v = eval "\$${m}::VERSION"; print "$m ",$v||0,"\n";' || true;
 	else
 	    echo "$module $version";
@@ -294,12 +328,11 @@ function scan() {
     requires_file="$2";
     
     if [ "$PERL_REQUIRES" = "SCANDEPS" ]; then
-        if [[ -z "" ]]; then
+        if [[ -z "@scandeps@" ]]; then
             FATAL_ERROR "no scandeps.pl found!"
         else
-            set -o pipefail
-            INFO "Scanning () $scan_target..."
-            if !  -R $scan_target | perl -npe "s/^\'(.*?)\'.*\$/\$1/;" | awk '{print $1}' >> $requires_file; then
+            INFO "Scanning (@scandeps@) $scan_target..."
+            if ! @scandeps@ -R $scan_target | perl -npe "s/^\'(.*?)\'.*\$/\$1/;" | awk '{print $1}' >> $requires_file; then
                 FATAL_ERROR "could not resolve dependencies for $scan_target"
             else
                 DEBUG $(echo "SCAN:" && cat $requires_file)
@@ -310,7 +343,7 @@ function scan() {
             NOCORE="--no-core"
         fi
 
-        /home/rlauer/bin/scandeps-static.pl $NO_INCLUDE_REQUIRE $NOCORE -r $scan_target >> $requires_file
+        @PERL_REQUIRES@ $NO_INCLUDE_REQUIRE $NOCORE -r $scan_target >> $requires_file
         DEBUG $(echo "SCAN:" && cat $requires_file)
     fi
 }
@@ -319,7 +352,7 @@ function scan() {
 function executables() {
 ########################################################################
     executables="$1";
-    filelist="$2";
+    filelist="${2-}";
 
     if [[ -n "$filelist" ]] && [[ -n "$executables" ]]; then
         if [[ -d "${PROJECT_HOME}/$executables" ]]; then
@@ -334,14 +367,18 @@ function executables() {
     fi
 }
 
-# +--------------------+
-# | SCRIPT STARTS HERE |
-# +--------------------+
+# +-------------------------+
+# | MAIN SCRIPT STARTS HERE |
+# +-------------------------+
+
+set -euo pipefail
+declare -a CLEANFILES=()
+trap cleanup EXIT
 
 # optional
-GIT=$(command -v git);
-PERLTIDY=$(command -v perltidy);
-TREE=$(command -v tree);
+GIT=$(command -v git || true);
+PERLTIDY=$(command -v perltidy || true);
+TREE=$(command -v tree || true);
 
 # required
 PERL=$(command -v perl);
@@ -504,6 +541,16 @@ while getopts "?Aa:b:B:cC:d:D:E:e:f:F:g:hH:kl:L:m:M:no:OpP:r:R:sS:t:T:vV:xY:y:zZ
     esac
 done
 
+NOCLEANUP="${NOCLEANUP:-}"
+VERBOSE="${VERBOSE:-}"
+SKIP_TESTS="${SKIP_TESTS:-}"
+PRESERVE_MAKEFILE="${PRESERVE_MAKEFILE:-}"
+CREATE_BUILDSPEC="${CREATE_BUILDSPEC:-}"
+BUILDSPEC="${BUILDSPEC:-}"
+DEBUG="${DEBUG:-}"
+testsfile="${testsfile:-}"
+testsdir="${testsdir:-}"
+LOG_LEVEL="${LOG_LEVEL:-1}";
 
 if [[ -n "$CREATE_BUILDSPEC" ]] && [[ -z "$OVERWRITE" ]]; then
     if [[ -e "$CREATE_BUILDSPEC" ]]; then
@@ -519,10 +566,9 @@ if [[ -n "$DEBUG" ]]; then
     fi
 fi     
 
-LOG_LEVEL=${LOG_LEVEL:-1};
 re='^[0-9]+$'
 
-if ! [[ $LOG_LEVEL =~ $re ]] ; then
+if ! [[ "$LOG_LEVEL" =~ $re ]] ; then
    FATAL_ERROR "$LOG_LEVEL must be a number between 1 and 5"
 fi
 
@@ -536,6 +582,11 @@ if [[ -n "$BUILDSPEC" ]]; then
     PROJECT_HOME="$PROJECT_HOME" $MAKE_CPAN_DIST -b $BUILDSPEC $DRYRUN
     exit $?;
 fi
+
+MODULE="${MODULE:-}"
+description="${description:-}"
+author="${author:-}"
+email="${email:-}"
 
 [[ -z "$MODULE" ]] && usage "no module specified";
 
@@ -554,17 +605,18 @@ if [[ -z "$author" ]]; then
     [[ -z "$author" ]] && usage "no author specified";
 fi
 
-recurse_directories=${recurse_directories:-yes}
+recurse_directories="${recurse_directories:-yes}"
 
 # tarball destination directory
-destdir=${destdir:-$(pwd)}
+destdir="${destdir:-$(pwd)}"
+git_project="${git_project:-}"
 
 if [[ -n "$git_project" ]]; then
-    tmp_gitdir=$(mktemp -d)
-    PROJECT_HOME=$tmp_gitdir
+    tmp_gitdir=$(make_temp -d)
+
+    PROJECT_HOME="$tmp_gitdir"
     $GIT clone $git_project $PROJECT_HOME
     cd $PROJECT_HOME
-    set -e -o pipeline
 
     if [[ -e configure.ac ]]; then
         autoreconf -i --force && ./configure --with-perlibdir=yes && make
@@ -578,6 +630,11 @@ elif [[ -z "$PROJECT_HOME" ]]; then
       fi
     fi
 fi
+
+dependency_file="${dependency_file:-}"
+test_dependency_file="${test_dependency_file:-}"
+build_requires="${build_requires:-}"
+recommends_file="${recommends_file:-}"
 
 if [[ -n "$dependency_file" ]]; then
   if [[ "$dependency_file" != /* ]]; then
@@ -620,14 +677,18 @@ if [[ -n "$recommends_file" ]]; then
   fi
 fi
 
+CORE_MODULES="${CORE_MODULES:-}"
+
 if [[ -n "$dependency_file" ]]; then
     if [[ -z "$CORE_MODULES" ]]; then
         CORE_MODULES="--no-core-modules"
     fi
 else
     # default: do not include core modules
-    CORE_MODULES=${CORE_MODULES:---no-core-modules}
+    CORE_MODULES="${CORE_MODULES:---no-core-modules}"
 fi
+
+PROJECT_HOME="${PROJECT_HOME:-}"
 
 if [[ -z "$PROJECT_HOME" ]]; then
     usage "PROJECT_HOME is not defined!"
@@ -642,17 +703,15 @@ echo "      BUILD REQUIRES: $build_requires"
 echo "          RECOMMENDS: $recommends_file"
 
 # typical directory within project tree containing Perl modules
-perl5libdir=${perl5libdir:-src/main/perl/lib}
+perl5libdir="${perl5libdir:-src/main/perl/lib}"
 if ! [[ -d "${PROJECT_HOME}/$perl5libdir" ]]; then
       perl5libdir="."
 fi
 
 # program that will provide the dependency list
-PERL_REQUIRES=${PERL_REQUIRES:-perl_requires}
+PERL_REQUIRES="${PERL_REQUIRES:-perl_requires}"
 
-builddir=$(mktemp -d)
-
-trap cleanup EXIT
+builddir=$(make_temp -d)
 
 module_file="$(module2path $MODULE)"
 
@@ -664,19 +723,23 @@ if ! [[ -e "${PROJECT_HOME}/${perl5libdir}/$module_file" ]]; then
     FATAL_ERROR "no "${PROJECT_HOME}/${perl5libdir}/$module_file" found!"
 fi
 
+EXTRA="${EXTRA:-}"
+
 if [[ -s "$EXTRA" ]]; then
     EXTRA_PATH="$EXTRA";
 
     while IFS=' ' read -r a b
     do
-        INFO "$a $b"
-        
+        DEBUG "$a $b"
+
         if [[ -f "${PROJECT_HOME}/$a" ]]; then
             if [[ -n "$b" ]]; then
-                dir=$(dirname $b)
+                dir="$(dirname $b)"
                 test -d $builddir/$dir || mkdir -p $builddir/$dir
+            else
+                dir=""
             fi
-            
+
             cp ${PROJECT_HOME}/$a $builddir/$dir
         else
             FATAL_ERROR "file [${PROJECT_HOME}/$a] not found?"
@@ -687,45 +750,50 @@ elif [[ -n "$EXTRA" ]]; then
 fi
 
 workdir=$(pwd)
-package_files=$(mktemp)
+package_files=$(make_temp)
 
 ########################################################################
 # gather executables - files must be executable if they are going to be packaged
 ########################################################################
-exe_files=$(mktemp)
+exe_files=$(make_temp)
 
 # default is yes
+maxdepth="${maxdepth:-}"
+
 if [ ! "$recurse_directories" = "yes" ]; then
     maxdepth='-maxdepth 1'
 fi
 
-all_files=$(mktemp)
-executables $bindir $all_files
-EXEC_PATH=$bindir
+bindir="${bindir:-}"
+all_files="$(make_temp)"
 
+executables $bindir $all_files
+EXEC_PATH="$bindir"
+
+scriptsdir="${scriptsdir:-}"
 executables $scriptsdir $all_files
-SCRIPTS_PATH=$scriptsdir
+SCRIPTS_PATH="$scriptsdir"
 
 if [[ -s "$all_files" ]]; then
     sort -u $all_files > $exe_files
 fi
 
+exclude_list="${exclude_list:-}"
 if [[ -n "$exclude_list" ]]; then
     filter_file_list $exe_files $exclude_list
 fi
 
-if [[ -z "$NOCLEANUP" ]]; then
-    rm $all_files
-fi
 
 ########################################################################
 # resources
+RESOURCES="${RESOURCES:-}"
+
 if [[  -e "resources" ]]; then
     RESOURCES="resources"
 elif [[ -z "$RESOURCES" ]]; then
     if [[ -d "$PROJECT_HOME/.git" ]]; then
-        URL="$(git config --get remote.origin.web)";
-        resources=$(mktemp)
+        URL="$(git config --get remote.origin.web || true)";
+        resources=$(make_temp)
 
         URL=$URL perl -MJSON -e \
         'print JSON->new->pretty->encode({ repository => { web => "$ENV{URL}", type => "git" }, homepage => "", bugtracker => { web => ""}});' > $resources
@@ -736,6 +804,8 @@ fi
 # set 'recurse' to 'no' and 'provides' to some value to specify your
 # own set of files to package
 
+provides="${provides:-}"
+
 if [[ "$recurse_directories" = "yes" ]]; then
     find -L ${PROJECT_HOME}/${perl5libdir} \
          -not -path '*/.git/*' -type f \
@@ -745,7 +815,8 @@ else
     if [[ -s "$provides" ]]; then
         echo "$MODULE" >>$provides
         # build index once
-        _module_index=$(mktemp)
+        _module_index=$(make_temp)
+
         root="${PROJECT_HOME}/${perl5libdir}/"
         build_module_index "$root" "$_module_index"
         
@@ -768,6 +839,8 @@ if [[ -e "$exclude_list" ]]; then
 fi
 
 for a in $(cat $package_files | sort -u); do
+    a="${a:-}"
+
     DEBUG "provides: [$a]"
 
     if ! [[ -e "$a" ]]; then
@@ -775,7 +848,7 @@ for a in $(cat $package_files | sort -u); do
         exit 1;
     fi
 
-    required_module=${a##${PROJECT_HOME}/${perl5libdir}/}
+    required_module="${a##${PROJECT_HOME}/${perl5libdir}/}"
 
     if test -n "$required_module"; then
         # only .pm, ignore .pod files
@@ -783,7 +856,7 @@ for a in $(cat $package_files | sort -u); do
             echo $required_module >> ${workdir}/provides.tmp
         fi
         # ...but make sure they are in the distribution
-        mkdir -p $(dirname ${builddir}/lib/$required_module)
+        mkdir -p $(dirname ${builddir}/lib/$required_module) || true
         cp $a ${builddir}/lib/$required_module
     fi
 done
@@ -848,7 +921,7 @@ if [[ -z "$provides" ]]; then
     cat ${workdir}/provides.tmp | perl -npe 's/\//::/g; s/\.pm$//;' | sort -u > ${workdir}/provides
 else
     # make sure provides is sorted
-    sorted_provides=$(mktemp)
+    sorted_provides=$(make_temp)
     sort -u provides > $sorted_provides;
     mv $sorted_provides provides
 fi
@@ -862,8 +935,9 @@ else
     has_perl_version=$(cat ${workdir}/requires.tmp | grep '^perl' | awk '{print $2}')
 fi
 
-depfile=$(mktemp)
-awk '{print $1}' ${workdir}/requires.tmp | sort -u | grep -v '^perl' > $depfile
+depfile=$(make_temp)
+
+awk '{print $1}' ${workdir}/requires.tmp | sort -u | grep -v '^perl' > $depfile || true
 
 # remove provided files from required list
 
@@ -880,8 +954,8 @@ if [[ -n "$testsdir" ]]; then
     if [[ -d "${PROJECT_HOME}/$testsdir" ]]; then
         TESTS_PATH="$testsdir"
 
-        testsfile=$(mktemp);
-
+        testsfile=$(make_temp);
+  
         find -L "${PROJECT_HOME}/$testsdir" -not -path '*/.git/*' -type f -name '*.t' > $testsfile
 
         if ! [[ -e "$testsfile" ]]; then
@@ -943,10 +1017,12 @@ fi
 
 [[ -n "$DEBUG" ]] && EXTRA_OPTIONS="--debug"
 
+ANY_VERSION="${ANY_VERSION:-}"
 if [[ -z "$ANY_VERSION" ]]; then
     REQUIRE_VERSION="-R"
 fi
 
+POSTAMBLE="${POSTAMBLE:-}"
 # extra Makefile instructions
 if [[ -e "$POSTAMBLE" ]]; then
     cp "$POSTAMBLE" "$builddir/postamble"
@@ -958,6 +1034,19 @@ export PROJECT_HOME=$PROJECT_HOME
 if [[ $recurse_directories = "yes" ]]; then
    RECURSE="--recurse";
 fi
+
+TESTS_PATH="${TESTS_PATH:-}"
+VERSION_FROM="${VERSION_FROM:-}"
+OVERWRITE="${OVERWRITE:-}"
+RESOURCES="${RESOURCES:-}"
+PL_FILES="${PL_FILES:-}"
+EXTRA_OPTIONS="${EXTRA_OPTIONS:-}"
+RECOMMENDS="${RECOMMENDS:-}"
+TEST_REQUIRES="${TEST_REQUIRES:-}"
+BUILD_REQUIRES="${BUILD_REQUIRES:-}"
+REQUIRE_VERSION="${REQUIRE_VERSION:-}"
+RECURSE="${RECURSE:-}"
+MODULE_PATH="${MODULE_PATH:-}"
 
 [[  -n "$EXEC_PATH"    ]] && EXEC_PATH="--exec-path=$EXEC_PATH"
 [[  -n "$SCRIPTS_PATH" ]] && SCRIPTS_PATH="--scripts-path=$SCRIPTS_PATH"
@@ -1000,6 +1089,7 @@ cmd=(
 if ! PROJECT_HOME="$PROJECT_HOME" "${cmd[@]}" > "$builddir/Makefile.PL"; then
     FATAL_ERROR "could not create Makefile.PL" 1
 fi
+
 
 # if that was successful, then try to build the distribution
 if ! [[ -e "$builddir/Makefile.PL" ]]; then

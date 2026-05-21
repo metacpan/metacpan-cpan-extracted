@@ -14,6 +14,7 @@ build_requires:
   Test::More: '1.302162'
   Test::Pod: '1.52'
   Test::Time: '0'
+  URI: '0'
   open: '0'
   utf8: '0'
 configure_requires:
@@ -31,41 +32,37 @@ no_index:
     - inc
 requires:
   Apache::Test: '0'
-  Class::Load: '0.25'
   Clone: '0.43'
   Config: '0'
   Data::Dump: '1.23'
   Data::UUID: '1.226'
   DateTime::Format::Lite: v0.1.2
-  DateTime::Lite: v0.6.3
-  DateTime::Lite::TimeZone: v0.5.3
-  DateTime::TimeZone::Catalog::Extend: v0.3.0
+  DateTime::Lite: v0.7.0
   Devel::StackTrace: '0'
   Encode: '0'
   Errno: '0'
-  Exporter: '5.70'
+  Exporter: '5.66'
   Fcntl: '0'
-  File::Basename: '2.85'
+  File::Basename: '2.84'
   File::Copy: '0'
   File::DosGlob: '0'
   File::Glob: '0'
   File::Spec: '3.73'
   File::Which: '0'
-  I18N::Langinfo: '0.17'
+  I18N::Langinfo: 0.08_02
   IO::Dir: '1.41'
-  IO::File: '1.41'
+  IO::File: '1.16'
   IO::Scalar: '2.113'
-  IPC::SysV: '2.09'
+  IPC::SysV: '2.03'
   JSON: '4.03'
   JSON::XS: '4.03'
   List::Util: '1.56'
   Module::Metadata: '1.000037'
-  POSIX: 1.53_01
-  Regexp::Common: '2017060201'
+  POSIX: '1.30'
   Scalar::Util: '1.50'
-  Storable::Improved: v0.1.3
+  Storable::Improved: v0.1.4
   Sub::Util: '1.54'
-  Tie::Hash: '1.05'
+  Tie::Hash: '1.04'
   Time::HiRes: '0'
   URI::Escape: '5.09'
   URI::file: '5.09'
@@ -75,13 +72,13 @@ requires:
   overload: '0'
   overloading: '0'
   parent: '0'
-  perl: '5.028000'
+  perl: '5.016000'
   strict: '0'
   utf8: '0'
   version: '0'
   warnings: '0'
 resources:
-  bugtracker: https://gitlab.com/jackdeguest/Module-Generic/issues
-  repository: https://gitlab.com/jackdeguest/Module-Generic
-version: v1.3.1
+  bugtracker: https://gitlab.com/deguest/Module-Generic/issues
+  repository: https://gitlab.com/deguest/Module-Generic
+version: v1.5.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

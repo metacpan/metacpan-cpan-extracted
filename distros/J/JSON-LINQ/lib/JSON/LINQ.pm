@@ -1,7 +1,7 @@
 package JSON::LINQ;
 ######################################################################
 #
-# JSON::LINQ - LINQ-style query interface for JSON and JSONL files
+# JSON::LINQ - LINQ-style query interface for JSON, JSONL, and LTSV files
 #
 # https://metacpan.org/dist/JSON-LINQ
 #
@@ -24,10 +24,13 @@ BEGIN { pop @INC if $INC[-1] eq '.' }
 
 use Carp qw(croak);
 
-use vars qw($VERSION);
-$VERSION = '1.00';
+use vars qw($VERSION $_fh_seq);
+$VERSION = '1.02';
 $VERSION = $VERSION;
 # $VERSION self-assignment suppresses "used only once" warning under strict.
+$_fh_seq = 0;
+$_fh_seq = $_fh_seq;
+# $_fh_seq self-assignment suppresses "used only once" warning under strict.
 
 ###############################################################################
 # JSON Boolean type objects (merged from mb::JSON)
@@ -35,7 +38,7 @@ $VERSION = $VERSION;
 
 package JSON::LINQ::Boolean;
 use vars qw($VERSION);
-$VERSION = '1.00';
+$VERSION = '1.02';
 $VERSION = $VERSION;
 
 use overload
@@ -250,6 +253,30 @@ sub From {
     die "From() requires ARRAY reference";
 }
 
+# _open_fh - open a file for reading ('<') or writing ('>') and return a
+# filehandle reference that works on all supported Perl versions.
+#
+# A unique numbered package glob is used on all Perl versions to guarantee
+# that concurrent From* iterators (e.g. inside Join/GroupJoin) each get their
+# own IO slot.  (\do{local *_} always resolves to *main::_ and causes
+# IO-slot collision; lexical filehandles via eval-string are avoided because
+# they are unreliable with a variable $mode on some Windows Perls.)
+#
+# $raw: if true, binmode is called after open so that raw bytes are
+# read/written on all platforms, preventing \r\n <-> \n translation on
+# Windows.  Pass 0 for text-mode files such as CSV, where the OS-level
+# \r\n -> \n conversion is desired.
+sub _open_fh {
+    my($mode, $file, $raw) = @_;
+    $_fh_seq++;
+    my $seq = $_fh_seq;
+    my $fhn = "JSON::LINQ::FH::H${seq}";
+    my $arg = ($mode eq '>') ? ">$file" : "< $file";
+    { no strict 'refs'; open($fhn, $arg) or die "Cannot open '$file': $!" }
+    if ($raw) { no strict 'refs'; binmode(*{$fhn}) }
+    return $fhn;
+}
+
 # FromJSON - read a JSON file containing a top-level array of objects
 # Each element of the array becomes one item in the sequence.
 # The file must contain a single JSON array: [ {...}, {...}, ... ]
@@ -257,18 +284,11 @@ sub From {
 sub FromJSON {
     my($class, $file) = @_;
 
-    my $fh;
-    if ($] >= 5.006) {
-        eval q{ open($fh, '<', $file) } or die "Cannot open '$file': $!";
-    }
-    else {
-        $fh = \do { local *_ };
-        open($fh, "< $file") or die "Cannot open '$file': $!";
-    }
-    binmode $fh;    # Raw bytes; handles UTF-8 without UTF-8 flag
+    my $fhn = _open_fh('<', $file, 1);
 
-    my $content = do { local $/; <$fh> };
-    close $fh;
+    my $content;
+    { no strict 'refs'; local $/; $content = readline(*{$fhn}) }
+    { no strict 'refs'; close($fhn) }
 
     my $data = eval { _json_decode($content) };
     die "JSON::LINQ::FromJSON: cannot parse '$file': $@" if $@;
@@ -298,18 +318,11 @@ sub FromJSON {
 sub FromJSONL {
     my($class, $file) = @_;
 
-    my $fh;
-    if ($] >= 5.006) {
-        eval q{ open($fh, '<', $file) } or die "Cannot open '$file': $!";
-    }
-    else {
-        $fh = \do { local *_ };
-        open($fh, "< $file") or die "Cannot open '$file': $!";
-    }
-    binmode $fh;    # Raw bytes; handles UTF-8 without UTF-8 flag
+    my $fhn = _open_fh('<', $file, 1);
 
     return $class->new(sub {
-        while (my $line = <$fh>) {
+        no strict 'refs';
+        while (my $line = readline(*{$fhn})) {
             chomp $line;
             $line =~ s/\r\z//;          # Strip CR for CRLF files
             next unless length $line;
@@ -323,7 +336,7 @@ sub FromJSONL {
             }
             return $val;
         }
-        close $fh;
+        close($fhn);
         return undef;
     });
 }
@@ -350,6 +363,146 @@ sub FromJSONString {
     return $class->new(sub {
         return undef if $i >= scalar(@$records);
         return $records->[$i++];
+    });
+}
+
+###############################################################################
+# CSV parsing helpers (RFC 4180 compliant)
+###############################################################################
+
+# _parse_csv_line - split one CSV line into a list of fields
+# Handles: quoted fields, embedded commas, escaped double-quotes (""),
+# configurable separator (default: comma).
+# Does NOT handle embedded newlines (multi-line quoted fields).
+sub _parse_csv_line {
+    my($line, $sep) = @_;
+    $sep = ',' unless defined $sep;
+    my @fields = ();
+    $line =~ s{\r\n\z|\r\z|\n\z}{};
+    my $pos = 0;
+    my $len = length($line);
+    while ($pos <= $len) {
+        if ($pos < $len && substr($line, $pos, 1) eq '"') {
+            $pos++;
+            my $field = '';
+            while ($pos < $len) {
+                my $c = substr($line, $pos, 1);
+                if ($c eq '"') {
+                    $pos++;
+                    if ($pos < $len && substr($line, $pos, 1) eq '"') {
+                        $field .= '"';
+                        $pos++;
+                    }
+                    else {
+                        last;
+                    }
+                }
+                else {
+                    $field .= $c;
+                    $pos++;
+                }
+            }
+            push @fields, $field;
+            $pos++ if $pos < $len && substr($line, $pos, 1) eq $sep;
+        }
+        else {
+            my $start = $pos;
+            while ($pos < $len && substr($line, $pos, 1) ne $sep) {
+                $pos++;
+            }
+            push @fields, substr($line, $start, $pos - $start);
+            $pos++;
+        }
+    }
+    return @fields;
+}
+
+# _format_csv_field - quote a single value for CSV output if necessary
+sub _format_csv_field {
+    my($value, $sep) = @_;
+    $sep = ',' unless defined $sep;
+    $value = '' unless defined $value;
+    if ($value =~ /["\n\r]/ || index($value, $sep) >= 0) {
+        $value =~ s/"/""/g;
+        return '"' . $value . '"';
+    }
+    return $value;
+}
+
+# FromCSV - read a CSV (Comma-Separated Values) file
+# The first line is used as the header row (column names) unless the
+# C<headers> option is supplied.
+# Options:
+#   sep         => $char     field separator (default: ',')
+#   headers     => \@cols    explicit column names (skip auto-detect from file)
+#   skip_header => 1         skip the first line even when headers is given
+sub FromCSV {
+    my($class, $file, %opts) = @_;
+    my $sep     = defined $opts{sep}     ? $opts{sep}     : ',';
+    my $headers = $opts{headers};
+    my $skip    = $opts{skip_header};
+
+    my $fhn = _open_fh('<', $file, 0);
+
+    my @cols = ();
+    if (!defined $headers) {
+        my $hdr;
+        { no strict 'refs'; $hdr = readline(*{$fhn}) }
+        if (defined $hdr) {
+            @cols = _parse_csv_line($hdr, $sep);
+        }
+    }
+    else {
+        @cols = @{$headers};
+        if ($skip) {
+            no strict 'refs'; readline(*{$fhn});
+        }
+    }
+
+    my $iter = sub {
+        no strict 'refs';
+        my $line = readline(*{$fhn});
+        if (!defined $line) {
+            close($fhn);
+            return undef;
+        }
+        $line =~ s{\r\n\z|\r\z|\n\z}{};
+        return undef if $line eq '';
+        my @vals = _parse_csv_line($line, $sep);
+        my %rec  = ();
+        for my $i (0 .. $#cols) {
+            $rec{ $cols[$i] } = $vals[$i];
+        }
+        return { %rec };
+    };
+    return $class->new($iter);
+}
+
+# FromLTSV - read an LTSV (Labeled Tab-Separated Values) file
+# Each line is a record of "label:value" fields separated by tabs.
+# Empty lines are skipped.  Memory-efficient: one line at a time.
+# This method is provided so JSON::LINQ can JOIN with LTSV data sources
+# without requiring LTSV::LINQ to be installed.
+sub FromLTSV {
+    my($class, $file) = @_;
+
+    my $fhn = _open_fh('<', $file, 1);
+
+    return $class->new(sub {
+        no strict 'refs';
+        while (my $line = readline(*{$fhn})) {
+            chomp $line;
+            $line =~ s/\r\z//;  # Remove CR for CRLF files on any platform
+            next unless length $line;
+
+            my %record = map {
+                /\A(.+?):(.*)\z/ ? ($1, $2) : ()
+            } split /\t/, $line;
+
+            return { %record } if %record;
+        }
+        close($fhn);
+        return undef;
     });
 }
 
@@ -1347,29 +1500,22 @@ sub DefaultIfEmpty {
 # ToJSON - write sequence as a JSON array file
 # Each element is encoded as JSON; the result is a JSON array.
 sub ToJSON {
-    my($self, $filename) = @_;
+    my($self, $file) = @_;
 
-    my $fh;
-    if ($] >= 5.006) {
-        eval q{ open($fh, '>', $filename) } or die "Cannot open '$filename': $!";
-    }
-    else {
-        $fh = \do { local *_ };
-        open($fh, "> $filename") or die "Cannot open '$filename': $!";
-    }
-    binmode $fh;    # Write raw UTF-8 bytes
+    my $fhn = _open_fh('>', $file, 1);
 
-    print $fh "[\n";
+    { no strict 'refs'; print {*{$fhn}} "[\n" }
     my $first = 1;
     $self->ForEach(sub {
         my $record = shift;
-        print $fh ",\n" unless $first;
+        no strict 'refs';
+        print {*{$fhn}} ",\n" unless $first;
         $first = 0;
-        print $fh _json_encode($record);
+        print {*{$fhn}} _json_encode($record);
     });
-    print $fh "\n]\n";
+    { no strict 'refs'; print {*{$fhn}} "\n]\n" }
 
-    close $fh;
+    { no strict 'refs'; close($fhn) }
     return 1;
 }
 
@@ -1377,24 +1523,132 @@ sub ToJSON {
 # Each element is encoded as one line of JSON.
 # This is streaming-friendly and memory-efficient.
 sub ToJSONL {
-    my($self, $filename) = @_;
+    my($self, $file) = @_;
 
-    my $fh;
-    if ($] >= 5.006) {
-        eval q{ open($fh, '>', $filename) } or die "Cannot open '$filename': $!";
-    }
-    else {
-        $fh = \do { local *_ };
-        open($fh, "> $filename") or die "Cannot open '$filename': $!";
-    }
-    binmode $fh;    # Write raw UTF-8 bytes
+    my $fhn = _open_fh('>', $file, 1);
 
     $self->ForEach(sub {
         my $record = shift;
-        print $fh _json_encode($record), "\n";
+        no strict 'refs';
+        print {*{$fhn}} _json_encode($record), "\n";
     });
 
-    close $fh;
+    { no strict 'refs'; close($fhn) }
+    return 1;
+}
+
+# ToLTSV - write sequence as an LTSV (Labeled Tab-Separated Values) file.
+# Each element must be a HASH reference.
+# Tab/CR/LF in values are sanitized to a single space to keep the file
+# structurally valid.  This method is provided so a JSON::LINQ pipeline
+# can emit LTSV output without requiring LTSV::LINQ.
+#
+# Options (key => value pairs after $filename):
+#   label_order => \@labels   emit only these labels in this order;
+#                             labels not present in the record are skipped.
+#   headers     => \@labels   alias for label_order.
+#
+# Without label_order/headers, all keys are emitted alphabetically.
+sub ToLTSV {
+    my($self, $file, %opt) = @_;
+
+    # Resolve label_order / headers alias
+    my $label_order = $opt{label_order} || $opt{headers} || undef;
+
+    my $fhn = _open_fh('>', $file, 1);
+
+    $self->ForEach(sub {
+        my $record = shift;
+        # LTSV spec: tab is the field separator; newline terminates the record.
+        # Sanitize values to prevent structural corruption of the output file.
+        my @keys = $label_order
+            ? grep { exists $record->{$_} } @$label_order
+            : sort keys %$record;
+        my $line = join("\t", map {
+            my $v = defined($record->{$_}) ? $record->{$_} : '';
+            $v =~ s/[\t\n\r]/ /g;
+            "$_:$v"
+        } @keys);
+        no strict 'refs';
+        print {*{$fhn}} $line, "\n";
+    });
+
+    { no strict 'refs'; close($fhn) }
+    return 1;
+}
+
+###############################################################################
+# CSV Output
+###############################################################################
+
+# ToCSV - write the sequence as a CSV file.
+# Elements that are HASH references are written as named-column rows;
+# scalar elements are written one-per-line without a header.
+#
+# Options (key => value pairs after $filename):
+#   sep          => $char       field separator (default: ',')
+#   headers      => \@cols      emit only these columns in this order
+#   label_order  => \@cols      alias for headers
+#   no_header    => 1           suppress the header row entirely
+sub ToCSV {
+    my($self, $file, %opts) = @_;
+    my $sep       = defined $opts{sep}         ? $opts{sep}         : ',';
+    my $headers   = defined $opts{headers}     ? $opts{headers}
+                  : defined $opts{label_order} ? $opts{label_order}
+                  : undef;
+    my $no_header = $opts{no_header};
+
+    # Materialise the sequence so we can inspect the first element before
+    # writing the header.
+    my @items = ();
+    my $iter  = $self->iterator;
+    while (defined(my $e = $iter->())) {
+        push @items, $e;
+    }
+
+    my $fhn = _open_fh('>', $file, 0);
+
+    unless ($no_header) {
+        my @cols = ();
+        if (defined $headers) {
+            @cols = @{$headers};
+        }
+        elsif (@items && ref($items[0]) eq 'HASH') {
+            @cols = sort keys %{ $items[0] };
+        }
+
+        if (@cols) {
+            { no strict 'refs'; print {*{$fhn}} join($sep, map { _format_csv_field($_, $sep) } @cols) . "\n" }
+            for my $item (@items) {
+                if (ref($item) eq 'HASH') {
+                    no strict 'refs';
+                    print {*{$fhn}} join($sep, map {
+                        _format_csv_field($item->{$_}, $sep)
+                    } @cols) . "\n";
+                }
+                else {
+                    no strict 'refs'; print {*{$fhn}} _format_csv_field($item, $sep) . "\n";
+                }
+            }
+            { no strict 'refs'; close($fhn) }
+            return 1;
+        }
+        # else: scalar sequence with no header -- fall through to no_header path
+    }
+
+    # no_header path (or scalar sequence)
+    for my $item (@items) {
+        if (ref($item) eq 'HASH') {
+            my @cols = sort keys %{$item};
+            { no strict 'refs'; print {*{$fhn}} join($sep, map {
+                _format_csv_field($item->{$_}, $sep)
+            } @cols) . "\n" }
+        }
+        else {
+            { no strict 'refs'; print {*{$fhn}} _format_csv_field($item, $sep) . "\n" }
+        }
+    }
+    { no strict 'refs'; close($fhn) }
     return 1;
 }
 
@@ -1521,11 +1775,11 @@ sub ThenByNumDescending { my($s, $k)=@_; $s->_thenby($k, -1, 'num') }
 
 =head1 NAME
 
-JSON::LINQ - LINQ-style query interface for JSON and JSONL files
+JSON::LINQ - LINQ-style query interface for JSON, JSONL, LTSV, and CSV files
 
 =head1 VERSION
 
-Version 1.00
+Version 1.02
 
 =head1 SYNOPSIS
 
@@ -1567,6 +1821,51 @@ Version 1.00
   JSON::LINQ->From(\@results)->ToJSON("output.json");
   JSON::LINQ->From(\@results)->ToJSONL("output.jsonl");
 
+  # Read/write CSV files (Comma-Separated Values)
+  my @rows = JSON::LINQ->FromCSV("access.csv")
+      ->Where(sub { $_[0]{status} eq '200' })
+      ->ToArray();
+  JSON::LINQ->From(\@rows)->ToCSV("filtered.csv");
+
+  # JOIN a JSON file (main) with a CSV lookup table
+  my $depts = JSON::LINQ->FromCSV("departments.csv");
+  my @joined = JSON::LINQ->FromJSON("employees.json")
+      ->Join($depts,
+          sub { $_[0]{dept_id} },
+          sub { $_[0]{id}      },
+          sub { { name => $_[0]{name}, dept => $_[1]{name} } })
+      ->ToArray();
+
+  # CSV to JSON conversion
+  JSON::LINQ->FromCSV("data.csv")
+      ->Where(sub { $_[0]{active} eq '1' })
+      ->ToJSON("active.json");
+
+  # Read/write LTSV files (Labeled Tab-Separated Values)
+  my @rows = JSON::LINQ->FromLTSV("access.ltsv")
+      ->Where(sub { $_[0]{status} eq '200' })
+      ->ToArray();
+  JSON::LINQ->From(\@rows)->ToLTSV("filtered.ltsv");
+
+  # JOIN a JSON file (main) with an LTSV file (sub-table)
+  my $depts = JSON::LINQ->FromLTSV("departments.ltsv");
+  my @joined = JSON::LINQ->FromJSON("employees.json")
+      ->Join($depts,
+          sub { $_[0]{dept_id} },
+          sub { $_[0]{id}      },
+          sub { { name => $_[0]{name}, dept => $_[1]{name} } })
+      ->ToArray();
+
+  # JOIN an LTSV file (main) with a JSON file (sub-table)
+  my $prices = JSON::LINQ->FromJSON("prices.json");
+  my @priced = JSON::LINQ->FromLTSV("orders.ltsv")
+      ->Join($prices,
+          sub { $_[0]{sku} },
+          sub { $_[0]{sku} },
+          sub { { order_id => $_[0]{id},
+                  amount   => $_[0]{qty} * $_[1]{price} } })
+      ->ToArray();
+
   # Boolean values
   my $rec = { active => JSON::LINQ::true, count => 0 };
   JSON::LINQ->From([$rec])->ToJSON("output.json");
@@ -1580,7 +1879,7 @@ Version 1.00
 
 =item * L</INCLUDED DOCUMENTATION> -- eg/ samples and doc/ cheat sheets
 
-=item * L</METHODS> -- Complete method reference (63 methods)
+=item * L</METHODS> -- Complete method reference (67 methods)
 
 =item * L</EXAMPLES> -- Practical examples
 
@@ -1592,6 +1891,8 @@ Version 1.00
 
 =item * L</DIAGNOSTICS> -- Error messages
 
+=item * L</LIMITATIONS AND KNOWN ISSUES>
+
 =item * L</BUGS>
 
 =item * L</SEE ALSO>
@@ -1600,23 +1901,25 @@ Version 1.00
 
 =head1 DESCRIPTION
 
-JSON::LINQ provides a LINQ-style query interface for JSON and JSONL
-(JSON Lines) files. It is the JSON counterpart of L<LTSV::LINQ>, sharing
-the same 60-method LINQ API and adding three JSON-specific I/O methods.
+JSON::LINQ provides a LINQ-style query interface for JSON, JSONL
+(JSON Lines), and LTSV (Labeled Tab-Separated Values) files. It is
+the JSON counterpart of L<LTSV::LINQ>, sharing the same LINQ API and
+adding JSON-specific I/O methods.
 
 Key features:
 
 =over 4
 
-=item * B<Lazy evaluation> - O(1) memory for JSONL streaming; JSON arrays
-are loaded once then iterated lazily
+=item * B<Lazy evaluation> - O(1) memory for JSONL and LTSV streaming;
+JSON arrays are loaded once then iterated lazily
 
 =item * B<Method chaining> - Fluent, readable query composition
 
 =item * B<DSL syntax> - Simple key-value filtering
 
-=item * B<63 LINQ methods> - 60 from LTSV::LINQ + FromJSON, FromJSONL,
-FromJSONString, ToJSON, ToJSONL
+=item * B<67 LINQ methods> - including JSON I/O (FromJSON, FromJSONL,
+FromJSONString, ToJSON, ToJSONL), LTSV I/O (FromLTSV, ToLTSV),
+CSV I/O (FromCSV, ToCSV), and all 60 methods from L<LTSV::LINQ>
 
 =item * B<Pure Perl> - No XS dependencies
 
@@ -1635,6 +1938,10 @@ FromJSONString, ToJSON, ToJSONL
 =item * B<FromJSONL($file)> - JSONL file (one JSON value per line)
 
 =item * B<FromJSONString($json)> - JSON string (array or object)
+
+=item * B<FromLTSV($file)> - LTSV file (Labeled Tab-Separated Values)
+
+=item * B<FromCSV($file)> - CSV file (Comma-Separated Values; also TSV via sep option)
 
 =item * B<From(\@array)> - In-memory Perl array
 
@@ -1675,17 +1982,21 @@ memory efficiency of C<LTSV::LINQ>'s C<FromLTSV>.
 =head2 What is LINQ?
 
 LINQ (Language Integrated Query) is the Microsoft .NET query API.
-This module brings the same 60-method LINQ interface to JSON data in Perl.
+This module brings the same LINQ interface to JSON data in Perl.
 See L<LTSV::LINQ> for a detailed description of the LINQ design philosophy.
 
 =head1 INCLUDED DOCUMENTATION
 
 The C<eg/> directory contains sample programs:
 
-  eg/01_json_query.pl     FromJSON/Where/Select/OrderByDescending/Distinct/ToLookup
-  eg/02_jsonl_query.pl    FromJSONL streaming, GroupBy, aggregation
-  eg/03_grouping.pl       GroupBy, ToLookup, GroupJoin, SelectMany
-  eg/04_sorting.pl        OrderBy/ThenBy multi-key sort
+  eg/01_json_query.pl       FromJSON/Where/Select/OrderByDescending/Distinct/ToLookup
+  eg/02_jsonl_query.pl      FromJSONL streaming, GroupBy, aggregation, ToJSONL
+  eg/03_grouping.pl         GroupBy, ToLookup, GroupJoin, SelectMany, Join
+  eg/04_sorting.pl          OrderBy/ThenBy multi-key sort, OrderByNum vs OrderByStr
+  eg/05_json_ltsv_join.pl   JOIN main JSON x sub-table LTSV
+  eg/06_ltsv_json_join.pl   JOIN main LTSV x sub-table JSON
+  eg/07_csv_query.pl        FromCSV/Where/Select/GroupBy/OrderByNum/ToCSV
+  eg/08_csv_json_join.pl    JOIN main CSV x sub-table JSON, CSV to JSON conversion
 
 The C<doc/> directory contains JSON::LINQ cheat sheets in 21 languages:
 
@@ -1701,7 +2012,7 @@ The C<doc/> directory contains JSON::LINQ cheat sheets in 21 languages:
   doc/json_linq_cheatsheet.HI.txt   Hindi
   doc/json_linq_cheatsheet.BN.txt   Bengali
   doc/json_linq_cheatsheet.TR.txt   Turkish
-  doc/json_linq_cheatsheet.MY.txt   Malay
+  doc/json_linq_cheatsheet.MY.txt   Burmese
   doc/json_linq_cheatsheet.TL.txt   Filipino
   doc/json_linq_cheatsheet.KM.txt   Khmer
   doc/json_linq_cheatsheet.MN.txt   Mongolian
@@ -1709,18 +2020,18 @@ The C<doc/> directory contains JSON::LINQ cheat sheets in 21 languages:
   doc/json_linq_cheatsheet.SI.txt   Sinhala
   doc/json_linq_cheatsheet.UR.txt   Urdu
   doc/json_linq_cheatsheet.UZ.txt   Uzbek
-  doc/json_linq_cheatsheet.BM.txt   Burmese
+  doc/json_linq_cheatsheet.BM.txt   Malay
 
 =head1 METHODS
 
 =head2 Complete Method Reference
 
-This module implements 63 LINQ methods organized into 15 categories.
+This module implements 67 LINQ methods organized into 15 categories.
 In addition, C<true> and C<false> boolean accessor functions are provided.
 
 =over 4
 
-=item * B<Data Sources (7)>: From, FromJSON, FromJSONL, FromJSONString, Range, Empty, Repeat
+=item * B<Data Sources (9)>: From, FromJSON, FromJSONL, FromJSONString, FromLTSV, FromCSV, Range, Empty, Repeat
 
 =item * B<Filtering (1)>: Where (with DSL)
 
@@ -1746,7 +2057,7 @@ In addition, C<true> and C<false> boolean accessor functions are provided.
 
 =item * B<Aggregation (7)>: Count, Sum, Min, Max, Average, AverageOrDefault, Aggregate
 
-=item * B<Conversion (8)>: ToArray, ToList, ToDictionary, ToLookup, ToJSON, ToJSONL, DefaultIfEmpty
+=item * B<Conversion (9)>: ToArray, ToList, ToDictionary, ToLookup, ToJSON, ToJSONL, ToLTSV, ToCSV, DefaultIfEmpty
 
 =item * B<Utility (1)>: ForEach
 
@@ -1776,6 +2087,12 @@ B<File format:>
 The entire file is read into memory and parsed once. For large files,
 consider JSONL format with C<FromJSONL> for streaming access.
 
+B<Concurrent use (e.g. Join/GroupJoin):> On Perl 5.006 and later,
+each call to C<FromJSON> uses a distinct numbered filehandle slot, so
+multiple iterators may be open simultaneously without interference.
+On Perl 5.005_03, a unique numbered package glob is used per call
+(JSON::LINQ::FH::H1, JSON::LINQ::FH::H2, ...) to achieve the same safety.
+
 =item B<FromJSONL($filename)>
 
 Read a JSONL (JSON Lines) file. Each non-empty line is parsed as a
@@ -1795,6 +2112,12 @@ usage for arbitrarily large files.
 Invalid JSON lines produce a warning and are skipped rather than
 aborting the entire sequence.
 
+B<Concurrent use (e.g. Join/GroupJoin):> On Perl 5.006 and later,
+each call to C<FromJSONL> uses a distinct numbered filehandle slot, so
+multiple iterators may be open simultaneously without interference.
+On Perl 5.005_03, a unique numbered package glob is used per call
+(JSON::LINQ::FH::H1, JSON::LINQ::FH::H2, ...) to achieve the same safety.
+
 =item B<FromJSONString($json)>
 
 Create a query from a JSON string. Accepts a JSON array (each element
@@ -1802,6 +2125,166 @@ becomes one sequence item) or a JSON object (single-element sequence).
 
   my $q = JSON::LINQ->FromJSONString('[{"id":1},{"id":2}]');
   my $q = JSON::LINQ->FromJSONString('{"id":1,"name":"Alice"}');
+
+=back
+
+=head2 LTSV Interoperability
+
+To make it easy to JOIN JSON data with LTSV master/lookup tables (or vice
+versa) without requiring L<LTSV::LINQ> to be installed, JSON::LINQ ships
+with built-in LTSV I/O methods. The LTSV format is described at
+L<http://ltsv.org/>.
+
+=over 4
+
+=item B<FromLTSV($filename)>
+
+Read an LTSV (Labeled Tab-Separated Values) file. Each line is split on
+TAB, and each field is split on the first colon to produce a label/value
+pair. The result is a sequence of hash references.
+
+  my $q = JSON::LINQ->FromLTSV("departments.ltsv");
+
+B<File format:>
+
+  id:1<TAB>name:Engineering<TAB>head:Alice
+  id:2<TAB>name:Sales<TAB>head:Bob
+
+C<FromLTSV> reads lazily (one line at a time), so memory usage is O(1)
+even for very large files. Empty lines are skipped. CR is stripped to
+handle CRLF files on any platform.
+
+B<Concurrent use (e.g. Join/GroupJoin):> On Perl 5.006 and later,
+each call to C<FromLTSV> uses a distinct numbered filehandle slot, so
+multiple iterators may be open simultaneously without interference.
+On Perl 5.005_03, a unique numbered package glob is used per call
+(JSON::LINQ::FH::H1, JSON::LINQ::FH::H2, ...) to achieve the same safety.
+
+=item B<ToLTSV($filename)>
+
+=item B<ToLTSV($filename, label_order =E<gt> \@labels)>
+
+=item B<ToLTSV($filename, headers =E<gt> \@labels)>
+
+Write the sequence as an LTSV file. Each element must be a HASH reference.
+TAB, CR, and LF in values are sanitized to a single space to keep the file
+structurally valid.
+
+  $query->ToLTSV("output.ltsv");
+
+B<Output format (default - all keys, alphabetical):>
+
+  age:30<TAB>name:Alice
+  age:25<TAB>name:Bob
+
+B<label_order> (or its alias B<headers>) specifies which labels to emit and
+in what order. Labels not present in a record are silently skipped.
+
+  $query->ToLTSV("output.ltsv", label_order => [qw(name age)]);
+  $query->ToLTSV("output.ltsv", headers     => [qw(name age)]);
+
+B<Output format (with label_order):>
+
+  name:Alice<TAB>age:30
+  name:Bob<TAB>age:25
+
+=back
+
+=head2 CSV Interoperability
+
+CSV (Comma-Separated Values) is the most widely used format for tabular
+data exchange. C<FromCSV> and C<ToCSV> let a JSON::LINQ pipeline read
+from and write to CSV files without requiring any extra CPAN module.
+
+The separator character defaults to C<','> but can be set to C<"\t"> to
+handle TSV (Tab-Separated Values) files, or any other single character.
+
+=over 4
+
+=item B<FromCSV($filename)>
+
+=item B<FromCSV($filename, sep =E<gt> $char)>
+
+=item B<FromCSV($filename, headers =E<gt> \@cols)>
+
+=item B<FromCSV($filename, headers =E<gt> \@cols, skip_header =E<gt> 1)>
+
+Read a CSV file. The first line is used as the header row (column names),
+and each subsequent data row is returned as a hash reference with those
+column names as keys.
+
+B<Options:>
+
+=over 4
+
+=item C<sep> - Field separator character (default: C<','>). Use C<"\t"> for TSV.
+
+=item C<headers> - Array reference of column names. When given, the first
+data line is treated as data rather than a header. Combine with
+C<skip_header =E<gt> 1> to skip an existing header row in the file.
+
+=item C<skip_header> - If true, skip the first line of the file even when
+C<headers> is given.
+
+=back
+
+  # Standard CSV with header row
+  my $q = JSON::LINQ->FromCSV("data.csv");
+
+  # Tab-separated (TSV)
+  my $q = JSON::LINQ->FromCSV("data.tsv", sep => "\t");
+
+  # Headerless CSV with explicit column names
+  my $q = JSON::LINQ->FromCSV("noheader.csv",
+      headers => [qw(name age city)]);
+
+C<FromCSV> reads the file lazily (one line at a time), providing O(1)
+memory usage for arbitrarily large files.
+
+B<RFC 4180 compliance:> Quoted fields (including fields containing
+the separator, double-quotes escaped as C<"">, or newline characters)
+are handled correctly. See L</LIMITATIONS AND KNOWN ISSUES> for the
+one known exception (multi-line quoted fields).
+
+B<Concurrent use (e.g. Join/GroupJoin):> Each call to C<FromCSV> uses a
+unique numbered package glob (JSON::LINQ::FH::H1, H2, ...) on all Perl
+versions, so multiple CSV iterators may be open simultaneously without
+interference.
+
+=item B<ToCSV($filename)>
+
+=item B<ToCSV($filename, sep =E<gt> $char)>
+
+=item B<ToCSV($filename, headers =E<gt> \@cols)>
+
+=item B<ToCSV($filename, label_order =E<gt> \@cols)>
+
+=item B<ToCSV($filename, no_header =E<gt> 1)>
+
+Write the sequence as a CSV file.
+
+B<Options:>
+
+=over 4
+
+=item C<sep> - Field separator character (default: C<','>).
+
+=item C<headers> - Array reference of column names that controls which keys
+are written and in what order. Also serves as the header row.
+
+=item C<label_order> - Alias for C<headers>.
+
+=item C<no_header> - If true, suppress the header row entirely.
+
+=back
+
+  $query->ToCSV("output.csv");
+  $query->ToCSV("output.tsv", sep => "\t");
+  $query->ToCSV("output.csv", headers => [qw(name age city)]);
+
+When C<headers>/C<label_order> is not supplied and elements are HASH
+references, column names are taken from the first record's keys in
+alphabetical order.
 
 =back
 
@@ -1857,8 +2340,8 @@ in numeric and boolean context.
 
 =head2 All Other Methods
 
-All 60 LINQ methods from L<LTSV::LINQ> are available unchanged.
-Please refer to L<LTSV::LINQ> for complete documentation of:
+All other LINQ methods are inherited from L<LTSV::LINQ> and behave
+identically. Please refer to L<LTSV::LINQ> for complete documentation of:
 
 Where, Select, SelectMany, Concat, Zip, Take, Skip, TakeWhile,
 SkipWhile, OrderBy, OrderByDescending, OrderByStr, OrderByStrDescending,
@@ -1926,6 +2409,148 @@ ToLookup, DefaultIfEmpty, ForEach.
       })
       ->ToJSONL("output.jsonl");
 
+=head2 JOIN: JSON (main) with LTSV (sub-table)
+
+A common pattern: the primary records live in a JSON file, and a small
+lookup table is maintained in LTSV format. The example below reads
+employees from a JSON file and joins them against a department lookup
+table in LTSV format.
+
+  # employees.json
+  # [
+  #   {"id":1,"name":"Alice","dept_id":10},
+  #   {"id":2,"name":"Bob",  "dept_id":20},
+  #   {"id":3,"name":"Carol","dept_id":10}
+  # ]
+  #
+  # departments.ltsv
+  # id:10<TAB>name:Engineering
+  # id:20<TAB>name:Sales
+
+  my $depts = JSON::LINQ->FromLTSV("departments.ltsv");
+
+  my @joined = JSON::LINQ->FromJSON("employees.json")
+      ->Join($depts,
+          sub { $_[0]{dept_id} },     # outer key (JSON side)
+          sub { $_[0]{id}      },     # inner key (LTSV side)
+          sub { { name => $_[0]{name},
+                  dept => $_[1]{name} } })
+      ->OrderBy(sub { $_[0]{name} })
+      ->ToArray();
+
+  # @joined == ({name=>"Alice", dept=>"Engineering"},
+  #             {name=>"Bob",   dept=>"Sales"},
+  #             {name=>"Carol", dept=>"Engineering"})
+
+=head2 JOIN: LTSV (main) with JSON (sub-table)
+
+The opposite pattern: the primary records are in an LTSV log file (often
+high-volume, append-only), and the lookup table is in JSON.
+
+  # orders.ltsv
+  # id:1001<TAB>sku:A100<TAB>qty:2
+  # id:1002<TAB>sku:B200<TAB>qty:1
+  # id:1003<TAB>sku:A100<TAB>qty:5
+  #
+  # prices.json
+  # [
+  #   {"sku":"A100","price":300},
+  #   {"sku":"B200","price":1200}
+  # ]
+
+  my $prices = JSON::LINQ->FromJSON("prices.json");
+
+  my @priced = JSON::LINQ->FromLTSV("orders.ltsv")
+      ->Join($prices,
+          sub { $_[0]{sku} },                       # outer key (LTSV)
+          sub { $_[0]{sku} },                       # inner key (JSON)
+          sub { { order_id => $_[0]{id},
+                  amount   => $_[0]{qty} * $_[1]{price} } })
+      ->ToArray();
+
+  # @priced == ({order_id=>1001, amount=>600},
+  #             {order_id=>1002, amount=>1200},
+  #             {order_id=>1003, amount=>1500})
+
+C<Join> builds a hash from the inner (sub-table) sequence, so it is
+efficient even when the outer sequence is large and read lazily.
+
+C<Join> builds a hash from the inner (sub-table) sequence, so it is
+efficient even when the outer sequence is large and read lazily.
+
+=head2 Basic CSV Query
+
+  use JSON::LINQ;
+
+  # sales.csv:
+  #   name,amount,category
+  #   Alice,1500,A
+  #   Bob,800,B
+  #   Carol,2000,A
+
+  my @high_sales = JSON::LINQ->FromCSV("sales.csv")
+      ->Where(sub { $_[0]{amount} > 1000 })
+      ->OrderByNumDescending(sub { $_[0]{amount} })
+      ->ToArray();
+
+=head2 DSL Filtering on CSV
+
+  my @tokyo = JSON::LINQ->FromCSV("users.csv")
+      ->Where(city => 'Tokyo')
+      ->ToArray();
+
+=head2 Grouping and Aggregation on CSV
+
+  my @by_category = JSON::LINQ->FromCSV("sales.csv")
+      ->GroupBy(sub { $_[0]{category} })
+      ->Select(sub {
+          my $g = shift;
+          {
+              Category => $g->{Key},
+              Count    => scalar(@{$g->{Elements}}),
+              Total    => JSON::LINQ->From($g->{Elements})
+                              ->Sum(sub { $_[0]{amount} }),
+          }
+      })
+      ->OrderByStrDescending(sub { $_[0]{Total} })
+      ->ToArray();
+
+=head2 JOIN Two CSV Files
+
+  # orders.csv: id,customer_id,amount
+  # customers.csv: id,name,city
+
+  my $orders    = JSON::LINQ->FromCSV("orders.csv");
+  my $customers = JSON::LINQ->FromCSV("customers.csv");
+
+  my @joined = $orders->Join(
+      $customers,
+      sub { $_[0]{customer_id} },
+      sub { $_[0]{id} },
+      sub { { Name => $_[1]{name}, Amount => $_[0]{amount} } }
+  )->ToArray();
+
+=head2 TSV Support
+
+  my @data = JSON::LINQ->FromCSV("data.tsv", sep => "\t")
+      ->Where(status => 'active')
+      ->ToArray();
+
+=head2 CSV Round-Trip (Filter and Write)
+
+  JSON::LINQ->FromCSV("input.csv")
+      ->Where(sub { $_[0]{active} eq '1' })
+      ->ToCSV("active.csv");
+
+=head2 CSV to JSON Conversion
+
+  JSON::LINQ->FromCSV("data.csv")
+      ->Select(sub {
+          my $r = shift;
+          return { %$r, processed => JSON::LINQ::true };
+      })
+      ->ToJSON("data.json");
+
 =head2 In-Memory Array Query
 
   my @data = (
@@ -1974,13 +2599,22 @@ JSON::LINQ and LTSV::LINQ are parallel modules sharing the same LINQ API.
   LTSV::LINQ  - LINQ for LTSV (Labeled Tab-Separated Values) files
   JSON::LINQ  - LINQ for JSON and JSONL files
 
-Both provide the same 60 LINQ methods. JSON::LINQ adds:
+Both share the same LINQ API. JSON::LINQ adds the following I/O methods
+on top of LTSV::LINQ's interface:
 
   FromJSON($file)         - read JSON array file
   FromJSONL($file)        - read JSONL file (streaming)
   FromJSONString($json)   - read JSON string
+  FromLTSV($file)         - read LTSV file (streaming)
+  FromCSV($file)          - read CSV file (streaming, RFC 4180)
   ToJSON($file)           - write JSON array file
   ToJSONL($file)          - write JSONL file
+  ToLTSV($file)           - write LTSV file (streaming)
+  ToCSV($file)            - write CSV file
+
+C<FromLTSV>, C<ToLTSV>, C<FromCSV>, and C<ToCSV> are provided so a
+JSON::LINQ pipeline can JOIN against (or emit into) LTSV and CSV files
+without requiring LTSV::LINQ or CSV::LINQ to be installed.
 
 The internal iterator architecture is identical: each operator returns a
 new query object wrapping a closure.
@@ -1989,8 +2623,12 @@ new query object wrapping a closure.
 
   FromJSONL  - O(1) per record: one line at a time
   FromJSON   - O(n): entire file loaded once, then lazy iteration
+  FromLTSV   - O(1) per record: one line at a time
+  FromCSV    - O(1) per record: one line at a time
   ToJSON     - O(n): entire sequence collected for array output
   ToJSONL    - O(1) per record: streaming write
+  ToLTSV     - O(1) per record: streaming write
+  ToCSV      - O(n): entire sequence collected before writing header
 
 =head1 COMPATIBILITY
 
@@ -2018,11 +2656,43 @@ The built-in parser has the same limitations as mb::JSON 0.06:
 
 =back
 
+=head2 Iterator Protocol and JSON null
+
+The internal iterator protocol uses C<undef> to signal end-of-sequence.
+As a consequence, an C<undef> value (i.e. a decoded JSON C<null>) cannot
+appear as a I<top-level element> of a sequence: it would be
+indistinguishable from EOF and the sequence would be silently truncated
+at that point.
+
+This affects C<Select> in particular: a selector that returns C<undef>
+for some elements will terminate the sequence early.
+
+  # JSON: [{"v":1},{"v":null},{"v":3}]
+  JSON::LINQ->FromJSON("data.json")
+            ->Select(sub { $_[0]{v} })
+            ->ToArray;
+  # returns (1) - sequence stops at the undef from the second record
+
+C<Where> is unaffected when filtering hash records (the hashref itself
+is the element, not its C<v> field), but a C<Select> that projects a
+nullable field will be truncated at the first C<null>. Workarounds:
+
+=over 4
+
+=item * Project to a sentinel value: C<< Select(sub { defined $_[0]{v} ? $_[0]{v} : '' }) >>
+
+=item * Wrap each element in a hashref so the element itself is never undef.
+
+=back
+
+C<DefaultIfEmpty(undef)> is similarly affected: a default of C<undef>
+is silently lost. Use a non-undef sentinel (C<0>, C<''>, C<{}>) instead.
+
 =head1 DIAGNOSTICS
 
 =over 4
 
-=item C<JSON::LINQ::FromJSON: cannot parse '$file': ...>
+=item C<JSON::LINQ::FromJSON: cannot parse '$file': $@>
 
 The file exists but does not contain valid JSON.
 
@@ -2031,23 +2701,19 @@ The file exists but does not contain valid JSON.
 The file contains valid JSON but the top-level value is a string, number,
 or boolean, not an array or object.
 
-=item C<JSON::LINQ::FromJSONL: skipping invalid JSON line: ...>
+=item C<JSON::LINQ::FromJSONL: skipping invalid JSON line: $@>
 
 A line in a JSONL file could not be parsed. The line is skipped with a
 warning; processing continues.
+
+=item C<JSON::LINQ::FromJSONString: cannot parse JSON: $@>
+
+The supplied JSON string is not valid JSON.
 
 =item C<JSON::LINQ::_json_decode: ...>
 
 Internal JSON parsing error.  The message includes the specific unexpected
 token or an indication of where parsing stopped.
-
-=item C<JSON::LINQ::FromJSON: cannot parse '$file': $@>
-
-The file exists but its content is not valid JSON.
-
-=item C<JSON::LINQ::FromJSONString: cannot parse JSON: $@>
-
-The supplied JSON string is not valid JSON.
 
 =item C<JSON::LINQ::_json_decode: expected ',' or ']' in array>
 
@@ -2068,6 +2734,7 @@ A JSON object key was not a quoted string.
 =item C<JSON::LINQ::_json_decode: trailing garbage: >
 
 Extra text was found after a successfully parsed top-level JSON value.
+The message is followed by the first 20 characters of the unexpected text.
 
 =item C<JSON::LINQ::_json_decode: unexpected end of input>
 
@@ -2076,6 +2743,7 @@ The JSON text ended before a complete value was parsed.
 =item C<JSON::LINQ::_json_decode: unexpected token: >
 
 An unrecognised token was encountered while parsing JSON.
+The message is followed by the first 20 characters of the unexpected text.
 
 =item C<JSON::LINQ::_json_decode: unterminated string>
 
@@ -2083,11 +2751,13 @@ A JSON string was not closed with a double-quote.
 
 =item C<Cannot open '$file': $!>
 
-Thrown by C<FromJSON> or C<FromJSONL> when the specified file cannot be opened.
+Thrown by C<FromJSON>, C<FromJSONL>, C<FromLTSV>, or C<FromCSV> when the input file
+cannot be opened.
 
 =item C<Cannot open '$filename': $!>
 
-Thrown by C<ToJSON> or C<ToJSONL> when the output file cannot be opened.
+Thrown by C<ToJSON>, C<ToJSONL>, C<ToLTSV>, or C<ToCSV> when the output file
+cannot be opened.
 
 =item C<From() requires ARRAY reference>
 
@@ -2123,12 +2793,38 @@ Thrown by C<First()> or C<Last()> with a predicate when no element matches.
 
 Thrown by C<SelectMany()> when the selector function returns a non-array value.
 
-Internal JSON parsing error. The message includes the erroneous token or
-an indication of where parsing stopped.
-
 =back
 
 All other error messages are identical to L<LTSV::LINQ>.
+
+=head1 LIMITATIONS AND KNOWN ISSUES
+
+=over 4
+
+=item * B<Iterator Consumption>
+
+Query objects can only be consumed once. The iterator is exhausted after
+terminal operations (C<ToArray>, C<Count>, C<Sum>, C<ToCSV>, etc.).
+Create a new query or save the C<ToArray()> result to reuse data.
+
+=item * B<Undef Values>
+
+Due to the iterator-based design, C<undef> signals end-of-sequence.
+A C<Select> selector that returns C<undef> will terminate the sequence
+early. See L</Iterator Protocol and JSON null> for details and workarounds.
+
+=item * B<Multi-line CSV Fields>
+
+C<FromCSV> reads the file one line at a time. RFC 4180 quoted fields
+that contain embedded newlines (multi-line fields) are not yet
+supported. Single-line quoted fields containing commas and escaped
+double-quotes (C<"">) are handled correctly.
+
+=item * B<No Parallel Execution>
+
+All operations execute sequentially in a single thread.
+
+=back
 
 =head1 BUGS
 
@@ -2140,9 +2836,13 @@ Please report bugs to C<ina@cpan.org>.
 
 =item * L<LTSV::LINQ> - The LTSV counterpart of this module
 
+=item * L<CSV::LINQ> - LINQ-style query interface for CSV files
+
 =item * L<mb::JSON> - The JSON encoder/decoder this module's parser is derived from
 
 =item * JSONL specification: L<https://jsonlines.org/>
+
+=item * RFC 4180 (CSV): L<https://www.ietf.org/rfc/rfc4180.txt>
 
 =item * Microsoft LINQ documentation: L<https://learn.microsoft.com/en-us/dotnet/csharp/linq/>
 

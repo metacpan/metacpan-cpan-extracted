@@ -23,7 +23,7 @@ my $t='Connect to database for placeholder testing';
 isnt ($dbh, undef, $t);
 
 my $pgversion = $dbh->{pg_server_version};
-if ($pgversion >= 80100) {
+if ($pgversion >= 80100 and $pgversion < 19000) {
   $dbh->do('SET escape_string_warning = false');
 }
 
@@ -687,7 +687,8 @@ SKIP: {
 $dbh->rollback();
 
 SKIP: {
-    skip 'Cannot adjust standard_conforming_strings for testing on this version of Postgres', 4 if $pgversion < 80200;
+    skip 'Cannot adjust standard_conforming_strings for testing on this version of Postgres', 4
+        if $pgversion < 80200 or $pgversion >= 19000;
     $t='Backslash quoting inside single quotes is parsed correctly with standard_conforming_strings off';
     $dbh->do(q{SET standard_conforming_strings = 'off'});
     eval {

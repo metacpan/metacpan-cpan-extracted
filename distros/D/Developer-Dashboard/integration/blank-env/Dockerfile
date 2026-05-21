@@ -1,4 +1,4 @@
-FROM ubuntu:24.04@sha256:84e77dee7d1bc93fb029a45e3c6cb9d8aa4831ccfcc7103d36e876938d28895b
+FROM perl:5.38-bookworm@sha256:5800ef250168cb5447f6e71c8ee7e067acc601394a9ed283c694a7ecc2512a71
 
 ENV PERL_MM_USE_DEFAULT=1 \
     NONINTERACTIVE_TESTING=1 \
@@ -14,7 +14,11 @@ RUN apt-get update \
         fonts-liberation \
         git \
         iproute2 \
+        libexpat1-dev \
+        libssl-dev \
+        pkg-config \
         procps \
+        zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
 RUN cpanm --notest \

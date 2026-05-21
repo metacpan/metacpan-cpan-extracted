@@ -285,61 +285,6 @@ int eax_decrypt_verify_memory(int cipher,
  int eax_test(void);
 #endif /* EAX MODE */
 
-#ifdef LTC_OCB_MODE
-typedef struct {
-   unsigned char     L[MAXBLOCKSIZE],         /* L value */
-                     Ls[32][MAXBLOCKSIZE],    /* L shifted by i bits to the left */
-                     Li[MAXBLOCKSIZE],        /* value of Li [current value, we calc from previous recall] */
-                     Lr[MAXBLOCKSIZE],        /* L * x^-1 */
-                     R[MAXBLOCKSIZE],         /* R value */
-                     checksum[MAXBLOCKSIZE];  /* current checksum */
-
-   symmetric_ECB     key;                     /* scheduled key for cipher */
-   unsigned long     block_index;             /* index # for current block */
-   int               block_len;               /* length of block */
-} ocb_state;
-
-int ocb_init(ocb_state *ocb, int cipher,
-             const unsigned char *key, unsigned long keylen, const unsigned char *nonce);
-
-int ocb_encrypt(ocb_state *ocb, const unsigned char *pt, unsigned char *ct);
-int ocb_decrypt(ocb_state *ocb, const unsigned char *ct, unsigned char *pt);
-
-int ocb_done_encrypt(ocb_state *ocb,
-                     const unsigned char *pt,  unsigned long ptlen,
-                           unsigned char *ct,
-                           unsigned char *tag, unsigned long *taglen);
-
-int ocb_done_decrypt(ocb_state *ocb,
-                     const unsigned char *ct,  unsigned long ctlen,
-                           unsigned char *pt,
-                     const unsigned char *tag, unsigned long taglen, int *stat);
-
-int ocb_encrypt_authenticate_memory(int cipher,
-    const unsigned char *key,    unsigned long keylen,
-    const unsigned char *nonce,
-    const unsigned char *pt,     unsigned long ptlen,
-          unsigned char *ct,
-          unsigned char *tag,    unsigned long *taglen);
-
-int ocb_decrypt_verify_memory(int cipher,
-    const unsigned char *key,    unsigned long keylen,
-    const unsigned char *nonce,
-    const unsigned char *ct,     unsigned long ctlen,
-          unsigned char *pt,
-    const unsigned char *tag,    unsigned long taglen,
-          int           *stat);
-
-int ocb_test(void);
-
-/* internal functions */
-void ocb_shift_xor(ocb_state *ocb, unsigned char *Z);
-int ocb_ntz(unsigned long x);
-int s_ocb_done(ocb_state *ocb, const unsigned char *pt, unsigned long ptlen,
-               unsigned char *ct, unsigned char *tag, unsigned long *taglen, int mode);
-
-#endif /* LTC_OCB_MODE */
-
 #ifdef LTC_OCB3_MODE
 typedef struct {
    unsigned char     Offset_0[MAXBLOCKSIZE],       /* Offset_0 value */
@@ -458,6 +403,7 @@ int ccm_test(void);
 void gcm_gf_mult(const unsigned char *a, const unsigned char *b, unsigned char *c);
 #endif
 
+int gcm_hw_pmul_is_supported(void);
 
 /* table shared between GCM and LRW */
 #if defined(LTC_GCM_TABLES) || defined(LTC_LRW_TABLES) || ((defined(LTC_GCM_MODE) || defined(LTC_GCM_MODE)) && defined(LTC_FAST))
@@ -560,11 +506,13 @@ int chacha20poly1305_test(void);
 
 int siv_encrypt_memory(                int  cipher,
                        const unsigned char *key,    unsigned long  keylen,
+                             unsigned long adnum,
                        const unsigned char *ad[],   unsigned long  adlen[],
                        const unsigned char *pt,     unsigned long  ptlen,
                              unsigned char *ct,     unsigned long *ctlen);
 int siv_decrypt_memory(                int  cipher,
                        const unsigned char *key,    unsigned long  keylen,
+                             unsigned long adnum,
                        const unsigned char *ad[],   unsigned long  adlen[],
                        const unsigned char *ct,     unsigned long  ctlen,
                              unsigned char *pt,     unsigned long *ptlen);
@@ -572,6 +520,7 @@ int siv_memory(                int  cipher,           int  direction,
                const unsigned char *key,    unsigned long  keylen,
                const unsigned char *in,     unsigned long  inlen,
                      unsigned char *out,    unsigned long *outlen,
+                     unsigned long adnum,
                                    ...) LTC_NULL_TERMINATED;
 int siv_test(void);
 

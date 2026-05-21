@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use Scalar::Util qw(blessed);
 use XS::JIT;
@@ -533,9 +533,17 @@ sub compile {
         $analysis{needs_headers} = 1;
     }
 
-    # Async Pool support: enable thread pool integration
+    # Async Pool support: enable thread pool integration.
+    # Disabled on Windows - Pool uses pthread + eventfd, neither of
+    # which exists there. (Future/Pool deserve a Win32 port; not in
+    # the 0.14 minimum-viable Windows scope.)
     if ($self->{_async_enabled}) {
-        $analysis{needs_async_pool} = 1;
+        if ($^O eq 'MSWin32') {
+            warn "Hypersonic: async pool not supported on Windows; "
+               . "ignoring.\n";
+        } else {
+            $analysis{needs_async_pool} = 1;
+        }
     }
 
     # Classify middleware as builder (inline C) or Perl (call_sv)
@@ -861,6 +869,15 @@ sub compile {
         }
     }
 
+    # Windows: link Winsock so socket()/recv()/send()/etc. resolve in
+    # the JIT-compiled .so. The select backend already adds this, but
+    # belt-and-braces - the main compile uses these symbols too.
+    if ($^O eq 'MSWin32') {
+        my $ld = $compile_opts{extra_ldflags} // '';
+        $compile_opts{extra_ldflags} = $ld . ' -lws2_32'
+            unless $ld =~ /-lws2_32\b/;
+    }
+
     XS::JIT->compile(%compile_opts);
 
     # Store function references
@@ -903,15 +920,37 @@ sub _generate_server_code {
     # Check if we have any dynamic routes
     my $has_dynamic = grep { $_->{dynamic} } @{$self->{routes}};
 
-    # Common includes
+    # Common includes - portable across POSIX and Windows. On Windows
+    # we substitute Winsock for netinet/socket/unistd, and define a
+    # couple of compatibility macros so the rest of the codegen can
+    # stay POSIX-shaped.
     $builder->line('#include <string.h>')
-      ->line('#include <unistd.h>')
-      ->line('#include <fcntl.h>')
       ->line('#include <errno.h>')
-      ->line('#include <sys/socket.h>')
-      ->line('#include <sys/types.h>')
-      ->line('#include <netinet/in.h>')
-      ->line('#include <netinet/tcp.h>');
+      ->raw(<<'C');
+#ifdef _WIN32
+#  define WIN32_LEAN_AND_MEAN
+#  include <winsock2.h>
+#  include <ws2tcpip.h>
+#  include <io.h>
+#  define close(fd) closesocket(fd)
+   /* Windows has no O_NONBLOCK / fcntl(F_SETFL, O_NONBLOCK); use
+    * ioctlsocket(FIONBIO) instead. Wrap both fcntl invocations the
+    * codegen emits so they vanish on Windows. */
+#  define hs_set_nonblocking(fd) do { u_long _m = 1; ioctlsocket((fd), FIONBIO, &_m); } while(0)
+   /* sockets don't raise SIGPIPE on Windows. */
+#  ifndef MSG_NOSIGNAL
+#    define MSG_NOSIGNAL 0
+#  endif
+#else
+#  include <unistd.h>
+#  include <fcntl.h>
+#  include <sys/socket.h>
+#  include <sys/types.h>
+#  include <netinet/in.h>
+#  include <netinet/tcp.h>
+#  define hs_set_nonblocking(fd) do { int _f = fcntl((fd), F_GETFL, 0); fcntl((fd), F_SETFL, _f | O_NONBLOCK); } while(0)
+#endif
+C
 
     # Backend-specific includes
     $builder->line($backend->includes);
@@ -1762,19 +1801,18 @@ sub _gen_event_loop {
           ->line('break;')
         ->endif
         ->blank
-        ->comment('Set non-blocking')
-        ->line('int flags = fcntl(client_fd, F_GETFL, 0);')
-        ->line('fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);')
+        ->comment('Set non-blocking (hs_set_nonblocking handles Win/POSIX divergence)')
+        ->line('hs_set_nonblocking(client_fd);')
         ->blank
         ->comment('Disable Nagle')
         ->line('int one = 1;')
-        ->line('setsockopt(client_fd, IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));')
+        ->line('setsockopt(client_fd, IPPROTO_TCP, TCP_NODELAY, (const char*)&one, sizeof(one));')
         ->blank
         ->comment('Set receive timeout for security')
         ->line('struct timeval tv;')
         ->line('tv.tv_sec = RECV_TIMEOUT;')
         ->line('tv.tv_usec = 0;')
-        ->line('setsockopt(client_fd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));')
+        ->line('setsockopt(client_fd, SOL_SOCKET, SO_RCVTIMEO, (const char*)&tv, sizeof(tv));')
         ->blank
         ->comment('Track connection for keep-alive timeout')
         ->line('track_connection(client_fd, now);')
@@ -3260,7 +3298,17 @@ sub run {
     my $host    = $opts{host}    // $self->{host};
     my $port    = $opts{port}    // $self->{port};
     my $workers = $opts{workers} // 1;
-    
+
+    # Windows lacks fork(); the multi-worker model assumes SO_REUSEPORT
+    # + fork()-per-worker so the kernel can balance connections. With
+    # neither primitive available the only safe behavior is single
+    # process. Warn loudly so users know they're not getting the
+    # workers they asked for.
+    if ($^O eq 'MSWin32' && $workers > 1) {
+        warn "Hypersonic: Windows lacks fork(); forcing workers=1.\n";
+        $workers = 1;
+    }
+
     # Protocol mode indication
     my $mode = $self->{http2} ? "HTTP/2" : ($self->{tls} ? "HTTPS/TLS" : "HTTP");
     print "Hypersonic listening on $host:$port ($mode, pure C event loop, $workers workers)\n";
@@ -4404,7 +4452,7 @@ Native execution on Apple M1, single worker, plaintext "Hello, World!" response:
 
     Framework       Language        Req/sec     Latency     Relative
     ----------------------------------------------------------------
-    Hypersonic      Perl (JIT→C)    266,076     0.34ms      1.87x
+    Hypersonic      Perl (JIT->C)    266,076     0.34ms      1.87x
     Actix-web       Rust            238,454     0.40ms      1.68x
     Gin             Go              141,943     1.02ms      1.00x
     FastAPI         Python/uvicorn   11,677     8.56ms      0.08x

@@ -20,6 +20,7 @@ no_index:
     - inc
     - t
 requires:
+  Excel::Writer::XLSX: '1.12'
   JSON::Validator: '5.14'
   JSON::XS: '4.03'
   Path::Tiny: '0.144'
@@ -27,10 +28,10 @@ requires:
   Text::CSV_XS: '1.50'
   perl: '5.026000'
 resources:
-  bugtracker: https://github.com/mrueda/omop-csv-validator/issues
-  homepage: https://github.com/mrueda/omop-csv-validator
+  bugtracker: https://github.com/CNAG-Biomedical-Informatics/omop-csv-validator/issues
+  homepage: https://github.com/CNAG-Biomedical-Informatics/omop-csv-validator
   license: http://www.opensource.org/licenses/artistic-license-2.0
-  repository: https://github.com/mrueda/omop-csv-validator.git
-version: '0.03'
+  repository: https://github.com/CNAG-Biomedical-Informatics/omop-csv-validator.git
+version: '0.05'
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

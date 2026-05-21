@@ -1,0 +1,57 @@
+{
+   "abstract" : "Perl extension for libconfig",
+   "author" : [
+      "Cnangel <cnangel@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Conf-Libconfig",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Devel::CheckLib" : "1.16"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XSLoader" : "0.05",
+            "perl" : "5.006001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0.10",
+            "Test::Exception" : "0.25",
+            "Test::More" : "0.60",
+            "Test::Warn" : "0.10"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/cnangel/Conf-Libconfig"
+      }
+   },
+   "version" : "v1.1.2",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

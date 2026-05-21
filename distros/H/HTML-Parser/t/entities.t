@@ -2,8 +2,9 @@ use strict;
 use warnings;
 use utf8;
 
-use HTML::Entities qw(decode_entities encode_entities encode_entities_numeric);
-use Test::More tests => 31;
+use HTML::Entities
+    qw(_decode_entities decode_entities encode_entities encode_entities_numeric);
+use Test::More tests => 32;
 
 my $x = "V&aring;re norske tegn b&oslash;r &#230res";
 
@@ -94,6 +95,21 @@ is($x, $ent);
 
     ok(!$error, "decode_entities() when processing a key as input");
     is($got, (values %hash)[0], "decode_entities() decodes a key properly");
+}
+
+# CVE-2026-8829
+# _decode_entities heap-use-after-free when the input SV is the same SV as
+# a self-referential entity value. The payload must be large enough to
+# force grow_gap() to realloc the SV's PV; the fix copies the entity value
+# into an owned buffer so repl is not left pointing at the freed allocation.
+{
+    my $prefix_a = "A" x 32;
+    my $suffix_b = "B" x 8192;
+    my %h;
+    $h{foo} = $prefix_a . "&foo;" . $suffix_b;
+    _decode_entities($h{foo}, \%h);
+    is($h{foo}, ("A" x 64) . "&foo;" . ("B" x 16384),
+        "_decode_entities() with self-aliased entity hash value");
 }
 
 # From: Bill Simpson-Young <bill.simpson-young@cmis.csiro.au>

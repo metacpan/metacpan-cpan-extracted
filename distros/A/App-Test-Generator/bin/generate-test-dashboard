@@ -5,22 +5,27 @@
 set -uo pipefail
 
 export GITHUB_REPOSITORY=${GITHUB_REPOSITORY:-"nigelhorne/App-Test-Generator"}
+PATH="./bin:$PATH"	# Prefer programs in our repo, to ensure the latest version where applicable
 
 set -e
 
 # --- Step 0: Cleanup old data ---
 echo "Cleaning up old coverage, LCSAJ, and mutation data..."
-rm -rf cover_db coverage lcsaj mutation_html mutation.json cover_html t/tmp_*.t
+# Preserve LCSAJ hits across runs, same as mutation.json
+if [ -f cover_html/lcsaj_hits.json ]; then
+	cp cover_html/lcsaj_hits.json /tmp/lcsaj_hits_prev.json
+fi
+rm -rf cover_db coverage lcsaj mutation_html cover_html t/tmp_*.t
 
 # --- Step 1: Build blib if needed ---
 echo "Building blib..."
 perl Makefile.PL && make
 
-export PERL5OPT='-Ilib'
-
 # --- Step 2: Run tests under Devel::Cover ---
 echo "Running tests with Devel::Cover..."
-cover -test -outputdir cover_html -select '^lib/'
+# Derive lib/ select pattern from repo name (e.g. CGI-Info -> CGI/Info)
+MODULE_PATH=$(echo "${GITHUB_REPOSITORY#*/}" | sed 's|-|/|g')
+cover -test -outputdir cover_html -select "$MODULE_PATH"
 
 # --- Step 3: Generate JSON coverage report ---
 echo "Generating JSON coverage report..."
@@ -45,7 +50,7 @@ fi
 echo "LCSAJ_TARGETS=$LCSAJ_TARGETS"
 mkdir -p coverage
 # PERL5LIB must be set separately from PERL5OPT so lib/ is in @INC when the debugger module initialises, before -Mblib takes effect
-PERL5LIB="./lib:./blib/lib" PERL5OPT="-d:App::Test::Generator::LCSAJ::Runtime" prove -l t
+PERL5LIB="./lib:./blib/lib" PERL5OPT="-d:App::Test::Generator::LCSAJ::Runtime" prove -Ilib t
 
 # --- Step 5b: Merge per-process LCSAJ hit files ---
 echo "Merging LCSAJ hits..."
@@ -65,6 +70,18 @@ perl -MJSON::MaybeXS -MFile::Slurp -e '
 
 # --- Step 5c: Verify LCSAJ hits ---
 echo "Checking LCSAJ hits..."
+# Merge previous LCSAJ hits for files not in this run
+if [ -f /tmp/lcsaj_hits_prev.json ]; then
+	perl -MJSON::MaybeXS -MFile::Slurp -e '
+		my $prev = decode_json(read_file("/tmp/lcsaj_hits_prev.json"));
+		my $curr = -f "cover_html/lcsaj_hits.json"
+			? decode_json(read_file("cover_html/lcsaj_hits.json"))
+			: {};
+		# curr entries take priority; prev fills in missing files
+		my %merged = (%{$prev}, %{$curr});
+		write_file("cover_html/lcsaj_hits.json", encode_json(\%merged));
+	'
+fi
 if [ -f cover_html/lcsaj_hits.json ]; then
 	echo "lcsaj_hits.json exists, size $(wc -c < cover_html/lcsaj_hits.json) bytes"
 	perl -MJSON::MaybeXS -MFile::Slurp -e '
@@ -91,27 +108,31 @@ echo "${LCSAJ_TARGETS:0:500}"
 # --- Step 6: Run mutation analysis ---
 echo "Running mutation analysis..."
 mkdir -p mutation_html/lib cover_html
-bin/test-generator-mutate \
-    -v \
-    --lib lib \
-    --tests t \
-    --json mutation.json \
-    --mutation_level=fast \
-    --cover_json cover_html/cover.json \
-    --lcsaj_root cover_html/mutation_html/lib \
-    --lcsaj_hits cover_html/lcsaj_hits.json < /dev/null
-    # --min-score 85
+test-generator-mutate \
+	-v \
+	--lib lib \
+	--tests t \
+	--json mutation.json \
+	--mutation_level=fast \
+	--cover_json cover_html/cover.json \
+	--lcsaj_root cover_html/mutation_html/lib \
+	--changed_only \
+	--lcsaj_hits cover_html/lcsaj_hits.json < /dev/null
+	# --min-score 85
 
 set -e
 
 # --- Step 7: Create the test dashboard ---
-# --generate_mutant_tests=t writes TODO stubs for surviving mutants.
+# --generate_mutant_tests=xt writes TODO stubs for surviving mutants.
 # --generate_test=mutant attempts runnable YAML schemas for NUM_BOUNDARY
 # survivors via SchemaExtractor where confidence is sufficient.
 # --generate_fuzz augments existing t/conf/ schemas with boundary values
 # from surviving mutants, writing timestamped copies for t/fuzz.t.
-bin/test-generator-index \
-	--generate_mutant_tests=t \
+echo "Creating the LCSAJ files..."
+perl -Ilib $(which instrument-modules)
+echo "Creating the dashboard..."
+test-generator-index \
+	--generate_mutant_tests=xt \
 	--generate_test=mutant \
 	--generate_fuzz
 

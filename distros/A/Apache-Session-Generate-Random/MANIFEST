@@ -7,9 +7,9 @@ META.yml
 Makefile.PL
 README.md
 SECURITY.md
-SIGNATURE
 cpanfile
 dist.ini
+doap.xml
 lib/Apache/Session/Generate/Random.pm
 lib/Apache/SessionX/Generate/Random.pm
 t/00-report-prereqs.dd

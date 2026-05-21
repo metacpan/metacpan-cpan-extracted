@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 9;
 use List::Util::PP qw(zip zip_longest zip_shortest);
 
 is_deeply( [zip ()], [],
@@ -9,6 +9,12 @@ is_deeply( [zip ()], [],
 
 is_deeply( [zip ['a'..'c']], [ ['a'], ['b'], ['c'] ],
   'zip of one list returns a list of singleton lists' );
+
+is_deeply( [zip ['one'], [1]], [ [one => 1] ],
+  'zip of two single-element lists returns a single-element list of pairs' );
+
+is_deeply( [zip_shortest ['one'], [1]], [ [one => 1] ],
+  'zip_shortest of two single-element lists returns a single-element list of pairs' );
 
 is_deeply( [zip ['one', 'two'], [1, 2]], [ [one => 1], [two => 2] ],
   'zip of two lists returns a list of pair lists' );

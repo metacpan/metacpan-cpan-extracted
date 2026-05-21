@@ -1,0 +1,110 @@
+NAME
+    Text::Template::Permute - Template for generating permutation of text
+
+VERSION
+    This document describes version 0.004 of Text::Template::Permute (from
+    Perl distribution Text-Template-Permute), released on 2026-02-21.
+
+SYNOPSIS
+     use Text::Template::Permute;
+
+     my $td = Text::Template::Permute->new(
+     );
+
+     $td->template(<<'TEMPLATE');
+     Create an image of the boy and animal together.
+     {{comment: pose}}{{pick: The boy is standing, holding the animal|The boy is sitting, the animal is standing on the boy's lap}}.
+     {{comment: clothing}}{{permute: |Change the boy's clothes to random children clothing.}}
+     {{comment: size clue}}The animal is only as large as the boy's hand.
+     {{comment: style, mood}}Make sure style is 3d cartoon.
+     Horizontal angle: {{pick once: front view|three quarter view}}.
+     Plain white background.
+     TEMPLATE
+
+     my @res = $td->process;
+
+DESCRIPTION
+    This module can produce an array of permuted text from a single
+    template. A template is text which contains zero or more directives in
+    the form of:
+
+     {{COMMAND[ OPTIONS ]:[ARGS]}}
+
+    Known commands:
+
+    *   comment
+
+        Directives will be ignored and regarded as an empty string.
+
+    *   permute
+
+        Permute the text items separated by "|".
+
+        Comment in the form of "/* ... */" is allowed which will be removed
+        first before splitting the items.
+
+        Example:
+
+         Good {{permute: morning|afternoon|night}}, Mr Smith!
+         It is {{permute: so nice|very nice}} to meet you.
+
+    *   pick
+
+        Available option: "once".
+
+        Pick one of alternative text separated by "|".
+
+        Comment in the form of "/* ... */" is allowed which will be removed
+        first before splitting the alternatives.
+
+        Example:
+
+         Hello, {{pick: Mr|Mrs}} Smith!
+
+        The "once" option makes the alternative picked once and will be the
+        same in all permutations.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Text-Template-Permute>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Text-Template-Permute>.
+
+SEE ALSO
+    Text::Glob::Expand
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Text-Template-Permute
+    >
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

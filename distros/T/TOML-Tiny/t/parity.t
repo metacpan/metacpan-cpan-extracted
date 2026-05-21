@@ -8,6 +8,12 @@ use Test2::V0;
 use Data::Dumper;
 use TOML::Tiny::Parser;
 
+BEGIN {
+  eval { require TOML::Parser; };
+  plan skip_all => 'TOML::Parser required for parity testing'
+    if $@ and not $ENV{AUTHOR_TESTING} and not -d '.git';
+}
+
 my $toml = do{ local $/; <DATA> };
 
 subtest 'TOML::Parser' => sub{

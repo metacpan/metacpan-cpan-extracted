@@ -3,22 +3,31 @@
 use strict;
 use warnings;
 use Test::More;
+use File::Spec;
 use File::Temp qw(tempdir);
+# JITted .dll files stay locked on Windows; let the OS reap %TEMP% so
+# File::Temp does not carp on every cleanup attempt.
+$File::Temp::KEEP_ALL = 1 if $^O =~ /^(MSWin32|cygwin|msys)$/;
 
-BEGIN {
-    use_ok('XS::JIT::Header');
+# Skip-all decisions MUST happen before any test (including use_ok)
+# emits a result, otherwise Test::More reports "Bad plan. You planned
+# 0 tests but ran 1" (CPAN report a9655479, Sep 2026).
+#
+# `>/dev/null 2>&1` is a Unix-shell redirect; on Windows cmd.exe
+# `/dev/null` is not a path and the redirect emits "The system cannot
+# find the path specified". Use File::Spec->devnull for portability.
+my $devnull = File::Spec->devnull;
+my $has_compiler = 0;
+for my $cc (qw(cc gcc clang)) {
+    my $rv = system("$cc --version >$devnull 2>$devnull");
+    if (defined $rv && $rv != -1 && ($rv >> 8) == 0) {
+        $has_compiler = 1;
+        last;
+    }
 }
+plan skip_all => 'No C compiler available' unless $has_compiler;
 
-# Skip if we can't find a C compiler
-my $has_compiler = eval {
-    system("cc --version >/dev/null 2>&1") == 0 ||
-    system("gcc --version >/dev/null 2>&1") == 0 ||
-    system("clang --version >/dev/null 2>&1") == 0;
-};
-
-unless ($has_compiler) {
-    plan skip_all => 'No C compiler available';
-}
+use_ok('XS::JIT::Header');
 
 my $cache_dir = tempdir(CLEANUP => 1);
 

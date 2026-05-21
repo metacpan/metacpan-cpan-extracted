@@ -1,0 +1,62 @@
+File-Raw-Hash
+
+A File::Raw plugin that computes cryptographic and integrity digests
+of file contents in the same pass File::Raw is already making. The
+bytes flow through unchanged; the digest is delivered via a caller-
+supplied scalar or hash reference.
+
+    use File::Raw qw(import);
+    use File::Raw::Hash;
+
+    # Single algorithm, scalar destination.
+    my $bytes = file_slurp("input.bin",
+        plugin => 'hash', algo => 'sha256', into => \my $digest);
+
+    # Multiple algorithms in one pass.
+    my %digests;
+    file_slurp("input.bin",
+        plugin => 'hash',
+        algos  => [qw(sha256 md5 crc32)],
+        into   => \%digests);
+
+    # Streaming: each_line digests the file in chunks; RAM stays
+    # bounded regardless of file size.
+    each_line("huge.log", sub { ... },
+        plugin => 'hash', algo => 'sha256', into => \my $d);
+
+ALGORITHMS
+
+    sha256, sha512, sha1, md5, crc32, xxh64, blake3
+
+HMAC
+
+    Pass hmac_key => $key to switch sha256/sha512/sha1/md5 into RFC
+    2104 HMAC mode. crc32, xxh64, and blake3 reject hmac_key with a
+    named error.
+
+OUTPUT FORMATS
+
+    hex (default), HEX, base64, base64url, raw
+
+DEPENDENCIES
+
+    File::Raw 0.11+. No external library dependency: every algorithm
+    is a vendored, public-domain reference implementation. Builds
+    against any C99 compiler; no OpenSSL, no libsodium.
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DOCUMENTATION
+
+    perldoc File::Raw::Hash
+
+LICENSE
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+Licensed under the Artistic License 2.0 (GPL Compatible).

@@ -4,11 +4,14 @@ use strict;
 use 5.006;
 use Carp qw(carp);
 use base 'Exporter';
-use LWP::Simple qw($ua);
-use URI::Escape qw(uri_escape);
+use IO::Socket::INET;
+use Qmail::Deliverable::Status qw(:status);
 
-our @EXPORT_OK = qw/qmail_local deliverable/;
-our %EXPORT_TAGS = (all => \@EXPORT_OK);
+our @EXPORT_OK   = ( qw(qmail_local deliverable), @Qmail::Deliverable::Status::STATUS, );
+our %EXPORT_TAGS = (
+    all    => \@EXPORT_OK,
+    status => \@Qmail::Deliverable::Status::STATUS,
+);
 
 our $SERVER = "127.0.0.1:8998";
 our $ERROR;
@@ -17,28 +20,67 @@ our $ERROR;
 my $atext = "[A-Za-z0-9!#\$%&\'*+\/=?^_\`{|}~-]";
 my $valid = qr/^(?!.*\@.*\@)($atext+(?:[\@.]$atext+)*)\.?\z/;
 
-sub _remote {
-    my ($command, $arg) = @_;
+sub _uri_escape {
+    my ($value) = @_;
+    $value =~ s/([^A-Za-z0-9\-\._~])/sprintf("%%%02X", ord($1))/eg;
+    return $value;
+}
 
-    my $server = ref($SERVER) eq 'CODE'
+sub _http_request {
+    my ( $server, $command, $arg ) = @_;
+    my ( $host, $port ) = $server =~ /^([A-Za-z0-9_.-]+):([0-9]+)\z/
+        or return ( undef, undef, "invalid server address" );
+
+    my $sock = IO::Socket::INET->new(
+        PeerAddr => $host,
+        PeerPort => $port,
+        Proto    => 'tcp',
+        Timeout  => 5,
+    ) or return ( undef, undef, $! );
+
+    my $request = join "",
+        "GET /qd1/$command?" . _uri_escape($arg) . " HTTP/1.0\r\n",
+        "Host: $host:$port\r\n",
+        "Connection: close\r\n",
+        "\r\n";
+
+    print {$sock} $request or return ( undef, undef, $! );
+
+    my $response = do { local $/; <$sock> };
+    close $sock;
+    return ( undef, undef, "empty response" ) if not defined $response;
+
+    my ( $headers, $body ) = split /\r?\n\r?\n/, $response, 2;
+    return ( undef, undef, "malformed response" ) if not defined $body;
+
+    my ($status_line) = split /\r?\n/, $headers, 2;
+    my ($code)        = $status_line =~ /^HTTP\/\d+\.\d+\s+([0-9]+)\b/
+        or return ( undef, undef, "malformed response" );
+
+    return ( $code, $body, $status_line );
+}
+
+sub _remote {
+    my ( $command, $arg ) = @_;
+
+    my $server =
+        ref($SERVER) eq 'CODE'
         ? $SERVER->()
         : $SERVER;
 
-    if (not defined $server) {
+    if ( not defined $server ) {
         $ERROR = "No SERVER defined; connection not attempted";
         return "\0";
     }
 
-    my $response = $ua->get(
-        "http://$server/qd1/$command?" . uri_escape($arg)
-    );
-
-    my $code = $response->code;
-    return undef if $code == 204;  # rpc undef
-
-    my $sl = $response->status_line;
-    if ($code == 200) {
-        return $response->content;
+    my ( $code, $body, $sl ) = _http_request( $server, $command, $arg );
+    if ( not defined $code ) {
+        carp $ERROR = "Server $server unreachable or broken! ($sl)";
+        return "\0";
+    }
+    return undef if $code == 204;    # rpc undef
+    if ( $code == 200 ) {
+        return $body;
     }
 
     carp $ERROR = "Server $server unreachable or broken! ($sl)";
@@ -46,9 +88,9 @@ sub _remote {
 }
 
 sub qmail_local {
-    my ($in) = @_;
-    my ($address) = lc($in) =~ /$valid/ or
-        do { carp "Invalid address: $in"; return; };
+    my ($in)      = @_;
+    my ($address) = lc($in) =~ /$valid/
+        or do { carp "Invalid address: $in"; return; };
 
     # This we can do locally. Let's not waste HTTP requests :)
     return $address if $address !~ /\@/;
@@ -59,14 +101,14 @@ sub qmail_local {
 }
 
 sub deliverable {
-    my ($in) = @_;
+    my ($in)      = @_;
     my ($address) = lc($in) =~ /$valid/
         or do { carp "Invalid address: $in"; return; };
 
     my $rv = _remote 'deliverable', $address;
-    return 0x2f if not defined $rv;  # shouldn't happen
-    return 0x2f if not length $rv;   # shouldn't happen
-    return 0x2f if $rv eq "\0";
+    return QD_CLIENT_FAILURE if not defined $rv;    # shouldn't happen
+    return QD_CLIENT_FAILURE if not length $rv;     # shouldn't happen
+    return QD_CLIENT_FAILURE if $rv eq "\0";
 
     return $rv;
 }
@@ -91,8 +133,6 @@ Qmail::Deliverable::Client - Client for qmail-deliverabled
 
 Qmail::Deliverable comes with a daemon program called qmail-deliverabled. This
 module is a front end to it.
-
-This module requires LWP (libwww-perl), available from CPAN.
 
 =head2 Error reporting
 
@@ -135,10 +175,21 @@ failure.
 
 =item deliverable $local
 
-As Qmail::Deliverable::deliverable. Warns and returns 0x2f on communication
-failure.
+As Qmail::Deliverable::deliverable. Warns and returns
+C<QD_CLIENT_FAILURE> (0x2f) on communication failure.
 
 =back
+
+=head2 Status codes
+
+Status-code constants are re-exported under the C<:status> tag from
+L<Qmail::Deliverable::Status>. Loading them does not pull in any of
+C<Qmail::Deliverable>'s privileged code:
+
+    use Qmail::Deliverable::Client qw(deliverable :status);
+
+    my $rv = deliverable $address;
+    warn "daemon down" if $rv == QD_CLIENT_FAILURE;
 
 =head1 PERFORMANCE
 
@@ -162,6 +213,26 @@ under which license terms it was distributed. Alternatively, a distributor may
 choose to replace the LICENSE section of the documentation and/or include a
 LICENSE file to reflect the license(s) they chose to redistribute under.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Juerd Waalboer <#####@juerd.nl>
+=over 4
+
+=item *
+
+Juerd Waalboer <#####@juerd.nl> (original author)
+
+=item *
+
+Matt Simerson <msimerson@cpan.org> (current maintainer)
+
+=back
+
+=head1 CONTRIBUTORS
+
+=over 4
+
+=item *
+
+Martin Sluka
+
+=back

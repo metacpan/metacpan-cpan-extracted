@@ -29,7 +29,6 @@
       "develop" : {
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
-            "Software::Security::Policy::Individual" : "0",
             "Test::EOF" : "0",
             "Test::EOL" : "0",
             "Test::More" : "0.88",
@@ -50,7 +49,7 @@
    "provides" : {
       "Module::Signature" : {
          "file" : "lib/Module/Signature.pm",
-         "version" : "0.95"
+         "version" : "0.96"
       }
    },
    "release_status" : "stable",
@@ -64,7 +63,7 @@
          "web" : "https://github.com/audreyt/module-signature"
       }
    },
-   "version" : "0.95",
+   "version" : "0.96",
    "x_contributors" : [
       "Audrey Tang <audreyt@audreyt.org>",
       "Baldur Kristinsson <baldur.kristinsson@gmail.com>",

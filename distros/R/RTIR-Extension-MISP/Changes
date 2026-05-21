@@ -1,5 +1,18 @@
 Revision history for RTIR-Extension-MISP
 
+1.00 2026-05-05
+ - Update for compatibility with RT 6
+ - Add MISPEventDetails page layout widget and ShowMISPEventDetails element
+   following the RT 6 pattern; replaces the RightColumnEnd callback approach
+ - Move ProcessArguments callback to Ticket/Display.html where it actually fires
+ - Fix BeforeMISPSync/AfterMISPSync named callbacks by passing CallbackPage explicitly
+ - Show graceful error message in widget TitleBox when MISP is unreachable
+
+0.03 2026-05-04
+ - Add BeforeMISPSync and AfterMISPSync Mason callbacks around MISP event
+   create/update to allow customization of data sent to and received from MISP
+   (thanks to Marius Urkis <marius@urkis.lt>)
+
 0.02 2021-10-27
  - Support putting MISP ID custom fields in custom field groupings
  - Document optional custom field grouping configuration

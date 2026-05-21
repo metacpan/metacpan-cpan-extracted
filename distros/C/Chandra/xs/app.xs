@@ -126,7 +126,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- bind($name, $coderef) — calls _xs_bind_method directly ----
+ # ---- bind($name, $coderef) - calls _xs_bind_method directly ----
 
 SV *
 bind(self, name_sv, callback)
@@ -466,7 +466,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- _match_route($path) — returns ($handler, %params) or () ----
+ # ---- _match_route($path) - returns ($handler, %params) or () ----
 
 void
 _match_route(self, path_sv)
@@ -484,7 +484,7 @@ PPCODE:
     path = SvPV(path_sv, path_len);
 
     if (!routes_svp || !SvROK(*routes_svp)) {
-        /* No routes — set empty opts and return nothing */
+        /* No routes - set empty opts and return nothing */
         (void)hv_stores(hv, "_current_route_opts", newRV_noinc((SV *)newHV()));
         XSRETURN(0);
     }
@@ -612,12 +612,12 @@ PPCODE:
         }
     }
 
-    /* No match — set empty opts */
+    /* No match - set empty opts */
     (void)hv_stores(hv, "_current_route_opts", newRV_noinc((SV *)newHV()));
     XSRETURN(0);
 }
 
- # ---- _render_route_body($path) — renders body HTML without layout ----
+ # ---- _render_route_body($path) - renders body HTML without layout ----
 
 SV *
 _render_route_body(self, path_sv)
@@ -641,7 +641,7 @@ CODE:
     SPAGAIN;
 
     if (count > 0) {
-        /* Pop all results — first is handler, rest are key-value pairs */
+        /* Pop all results - first is handler, rest are key-value pairs */
         int i;
         SV **results;
         Newx(results, count, SV *);
@@ -672,7 +672,7 @@ CODE:
         if (nf_svp && SvOK(*nf_svp) && SvROK(*nf_svp)) {
             handler = newSVsv(*nf_svp);
         } else {
-            /* Default 404 handler — just return the string */
+            /* Default 404 handler - just return the string */
             SvREFCNT_dec((SV *)params_hv);
             if (handler) SvREFCNT_dec(handler);
             RETVAL = newSVpvs("<h1>404 - Not Found</h1>");
@@ -731,7 +731,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- _render_route($path) — renders full HTML with layout ----
+ # ---- _render_route($path) - renders full HTML with layout ----
 
 SV *
 _render_route(self, path_sv)
@@ -801,7 +801,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- _router_js() — returns the client-side router JS ----
+ # ---- _router_js() - returns the client-side router JS ----
 
 SV *
 _router_js(...)
@@ -1307,7 +1307,7 @@ CODE:
             PUTBACK;
             FREETMPS; LEAVE;
 
-            /* Escape both — direct C call */
+            /* Escape both - direct C call */
             body_escaped = chandra_escape_js(aTHX_ body_sv);
             SvREFCNT_dec(body_sv);
 
@@ -1361,7 +1361,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- eval($js) — direct webview_eval ----
+ # ---- eval($js) - direct webview_eval ----
 
 SV *
 eval(self, js_sv)
@@ -1386,7 +1386,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- dispatch_eval($js) — direct webview_dispatch ----
+ # ---- dispatch_eval($js) - direct webview_dispatch ----
 
 void
 dispatch_eval(self, js_sv)
@@ -1473,7 +1473,7 @@ CODE:
     SvREFCNT_dec(js);
 }
 
- # ---- set_title($title) — direct webview_set_title ----
+ # ---- set_title($title) - direct webview_set_title ----
 
 SV *
 set_title(self, title_sv)
@@ -1588,7 +1588,7 @@ CODE:
     }
 }
 
- # ---- inject_css($css) — direct webview_inject_css ----
+ # ---- inject_css($css) - direct webview_inject_css ----
 
 SV *
 inject_css(self, css_sv)
@@ -1613,7 +1613,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- fullscreen($enable) — direct webview_set_fullscreen ----
+ # ---- fullscreen($enable) - direct webview_set_fullscreen ----
 
 SV *
 fullscreen(self, ...)
@@ -1638,7 +1638,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- set_color($r, $g, $b, $a) — direct webview_set_color ----
+ # ---- set_color($r, $g, $b, $a) - direct webview_set_color ----
 
 SV *
 set_color(self, r, g, b, ...)
@@ -1666,7 +1666,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- terminate() — direct webview_terminate ----
+ # ---- terminate() - direct webview_terminate ----
 
 void
 terminate(self)
@@ -1687,7 +1687,7 @@ CODE:
     }
 }
 
- # ---- init() — delegates to webview's init (needs _xs_init_bind + Bridge) ----
+ # ---- init() - delegates to webview's init (needs _xs_init_bind + Bridge) ----
 
 SV *
 init(self)
@@ -1711,7 +1711,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- loop($blocking) — direct webview_loop ----
+ # ---- loop($blocking) - direct webview_loop ----
 
 int
 loop(self, ...)
@@ -1725,7 +1725,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- exit() — direct webview_exit ----
+ # ---- exit() - direct webview_exit ----
 
 void
 exit(self)
@@ -1899,7 +1899,7 @@ CODE:
     _toast_injected = 0;
     _modal_injected = 0;
 
-    /* Re-inject the bridge JS (window.chandra) — lost on page reload */
+    /* Re-inject the bridge JS (window.chandra) - lost on page reload */
     {
         PerlChandra *pc = CHANDRA_PC_FROM_APP(self);
         if (pc && pc->initialized) {
@@ -2253,7 +2253,7 @@ CODE:
                     sv_setsv(target_sv, self);
                 }
 
-                /* Create XS callback — no eval_pv needed */
+                /* Create XS callback - no eval_pv needed */
                 nav_cv = newXS(NULL, xs_chandra_navigate_cb, __FILE__);
                 nav_cb = newRV_noinc((SV *)nav_cv);
 
@@ -2430,7 +2430,7 @@ CODE:
     (void)hv_stores(hv, "_started", newSViv(0));
 }
 
- # ---- notify(%args) — send a desktop notification ----
+ # ---- notify(%args) - send a desktop notification ----
 
 int
 notify(self, ...)
@@ -2470,7 +2470,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- shortcuts() — lazy accessor for Chandra::Shortcut instance ----
+ # ---- shortcuts() - lazy accessor for Chandra::Shortcut instance ----
 
 SV *
 shortcuts(self)
@@ -2505,7 +2505,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- shortcut($combo, $handler, %opts) — convenience method ----
+ # ---- shortcut($combo, $handler, %opts) - convenience method ----
 
 SV *
 shortcut(self, combo_sv, handler, ...)
@@ -2550,7 +2550,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- shortcut_map(\%map) — bulk registration ----
+ # ---- shortcut_map(\%map) - bulk registration ----
 
 SV *
 shortcut_map(self, map_sv)
@@ -2602,7 +2602,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- store($name) — persistent key-value store for this app ----
+ # ---- store($name) - persistent key-value store for this app ----
  # Caches the Chandra::Store instance on the self hash under _store_ or
  # _store_<name>.  Derives the store name from the app title when no
  # explicit name is given, mirroring the Perl version exactly.
@@ -2711,7 +2711,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- open_window(%args) — create a child window ----
+ # ---- open_window(%args) - create a child window ----
 
 SV *
 open_window(self, ...)
@@ -2759,7 +2759,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- windows() — return all child windows ----
+ # ---- windows() - return all child windows ----
 
 void
 windows(self)
@@ -2782,7 +2782,7 @@ PPCODE:
     }
 }
 
- # ---- window_by_id($id) — find child window by ID ----
+ # ---- window_by_id($id) - find child window by ID ----
 
 SV *
 window_by_id(self, id_sv)
@@ -2819,7 +2819,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- window_count() — return number of child windows ----
+ # ---- window_count() - return number of child windows ----
 
 int
 window_count(self)
@@ -2839,7 +2839,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- on_close($coderef) — register close handler for main window ----
+ # ---- on_close($coderef) - register close handler for main window ----
 
 SV *
 on_close(self, handler)
@@ -2854,7 +2854,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- assets($root, prefix => $pfx) — lazy Chandra::Assets accessor ----
+ # ---- assets($root, prefix => $pfx) - lazy Chandra::Assets accessor ----
 
 SV *
 assets(self, ...)
@@ -2906,7 +2906,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- clipboard() — returns Chandra::Clipboard class for convenience ----
+ # ---- clipboard() - returns Chandra::Clipboard class for convenience ----
 
 SV *
 clipboard(self)
@@ -2920,7 +2920,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- drag_drop() — lazy Chandra::DragDrop accessor ----
+ # ---- drag_drop() - lazy Chandra::DragDrop accessor ----
 
 SV *
 drag_drop(self)
@@ -2956,7 +2956,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- on_file_drop($coderef) — convenience for drag_drop->on_file_drop ----
+ # ---- on_file_drop($coderef) - convenience for drag_drop->on_file_drop ----
 
 SV *
 on_file_drop(self, callback)
@@ -2989,7 +2989,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- drop_zone($selector, $coderef) — convenience for drag_drop->add_drop_zone ----
+ # ---- drop_zone($selector, $coderef) - convenience for drag_drop->add_drop_zone ----
 
 SV *
 drop_zone(self, selector, callback)
@@ -3023,7 +3023,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- context_menu_instance() — lazy Chandra::ContextMenu accessor ----
+ # ---- context_menu_instance() - lazy Chandra::ContextMenu accessor ----
 
 SV *
 context_menu_instance(self)
@@ -3059,7 +3059,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- context_menu(selector, items_or_cb) — convenience method ----
+ # ---- context_menu(selector, items_or_cb) - convenience method ----
 
 SV *
 context_menu(self, selector, items_or_cb)
@@ -3114,7 +3114,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- splash(%args) — convenience wrapper for Chandra::Splash ----
+ # ---- splash(%args) - convenience wrapper for Chandra::Splash ----
 
 SV *
 splash(self, ...)

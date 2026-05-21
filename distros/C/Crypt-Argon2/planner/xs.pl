@@ -5,24 +5,19 @@ load_extension('Dist::Build::XS');
 load_extension('Dist::Build::XS::Conf');
 
 my @sources = map { "src/$_.c" } qw{argon2 core encoding thread blake2/blake2b switch};
-
-sub add_source {
-	my ($name, $input_base, @flags) = @_;
-	push @sources, {
-		source  => "src/$input_base.c",
-		object  => "src/$name.o",
-		flags   => \@flags,
-		defines => { fill_segment => "fill_segment_$name" },
-	};
-}
+push @sources, { source => "src/ref.c", defines => { fill_segment => 'fill_segment_ref' } };
 
 sub try_optimized {
 	my ($name, $flag, $code) = @_;
-	my $can_build = try_compile_run(source => $code, define => "HAVE_\U$name", extra_compiler_flags => [ $flag ]);
-	add_source($name, 'opt', $flag) if $can_build;
+	if (try_compile_run(source => $code, define => "HAVE_\U$name", extra_compiler_flags => [ $flag ])) {
+		push @sources, {
+			source  => "src/opt.c",
+			object  => "src/$name.o",
+			flags   => [ $flag ],
+			defines => { fill_segment => "fill_segment_$name" },
+		};
+	}
 }
-
-add_source('ref', 'ref');
 
 my $has_sse3 = try_optimized('sse3', '-msse3', <<'EOF');
 #include <immintrin.h>

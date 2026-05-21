@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '3.14';
+our $VERSION = '3.90';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -138,7 +138,7 @@ sub list_indicators {
         closedir $dh;
     }
 
-    return sort { ($a->{priority} || 999) <=> ($b->{priority} || 999) || $a->{name} cmp $b->{name} } values %items;
+    return sort { $self->_indicator_sort_cmp( $a, $b ) } values %items;
 }
 
 # sync_collectors($jobs)
@@ -153,6 +153,7 @@ sub sync_collectors {
 
     my @written;
     my %active_collectors;
+    my $collector_order = 0;
     for my $job ( @{$jobs} ) {
         next if ref($job) ne 'HASH';
         next if ref( $job->{indicator} ) ne 'HASH';
@@ -183,28 +184,73 @@ sub sync_collectors {
         }
         my $candidate = $self->collector_indicator_candidate(
             $job,
+            collector_order => $collector_order,
             existing => $effective_existing,
             status   => defined $effective_existing->{status} && $effective_existing->{status} ne '' ? $effective_existing->{status} : 'missing',
         );
         my $comparison_existing = ref($local_existing) eq 'HASH' && %{ $local_existing }
           ? $local_existing
           : $existing;
-        if ( !$self->_indicator_matches( $comparison_existing, $candidate ) ) {
-            my @preserve_existing = $healed_from_inherited ? () : qw(status updated_at stale);
+        my @preserve_existing = $healed_from_inherited ? () : qw(status updated_at stale);
+        if (
+            ( $effective_existing->{managed_by_collector} || 0 )
+            && ( $effective_existing->{collector_name} || '' ) eq $job->{name}
+            && !$self->_is_placeholder_missing_indicator($effective_existing)
+        ) {
             if (
-                defined $candidate->{icon_template}
-                && $candidate->{icon_template} ne ''
-                && defined $effective_existing->{icon_template}
-                && $effective_existing->{icon_template} eq $candidate->{icon_template}
+                exists $effective_existing->{configured_label}
+                && ( defined $effective_existing->{configured_label} ? $effective_existing->{configured_label} : '' )
+                    eq $candidate->{configured_label}
+                && ( defined $effective_existing->{label} ? $effective_existing->{label} : '' ) ne $candidate->{configured_label}
             ) {
-                push @preserve_existing, qw(icon icon_template);
+                push @preserve_existing, 'label';
             }
+            if (
+                exists $effective_existing->{configured_alias}
+                && ( defined $effective_existing->{configured_alias} ? $effective_existing->{configured_alias} : '' )
+                    eq $candidate->{configured_alias}
+                && ( defined $effective_existing->{alias} ? $effective_existing->{alias} : '' ) ne $candidate->{configured_alias}
+            ) {
+                push @preserve_existing, 'alias';
+            }
+            if (
+                exists $effective_existing->{configured_page_status_icon}
+                && ( defined $effective_existing->{configured_page_status_icon} ? $effective_existing->{configured_page_status_icon} : '' )
+                    eq $candidate->{configured_page_status_icon}
+                && ( defined $effective_existing->{page_status_icon} ? $effective_existing->{page_status_icon} : '' ) ne $candidate->{configured_page_status_icon}
+            ) {
+                push @preserve_existing, 'page_status_icon';
+            }
+            if (
+                exists $effective_existing->{configured_icon}
+                && ( defined $effective_existing->{configured_icon} ? $effective_existing->{configured_icon} : '' )
+                    eq $candidate->{configured_icon}
+                && ( defined $effective_existing->{icon} ? $effective_existing->{icon} : '' ) ne $candidate->{configured_icon}
+            ) {
+                push @preserve_existing, 'icon';
+            }
+        }
+        if (
+            defined $candidate->{icon_template}
+            && $candidate->{icon_template} ne ''
+            && defined $effective_existing->{icon_template}
+            && $effective_existing->{icon_template} eq $candidate->{icon_template}
+        ) {
+            push @preserve_existing, qw(icon icon_template);
+        }
+        my %comparison_candidate = %{$candidate};
+        for my $field (@preserve_existing) {
+            next if !exists $comparison_existing->{$field};
+            $comparison_candidate{$field} = $comparison_existing->{$field};
+        }
+        if ( !$self->_indicator_matches( $comparison_existing, \%comparison_candidate ) ) {
             push @written, $self->set_indicator(
                 $candidate->{name},
                 %{$candidate},
                 _preserve_existing_fields => \@preserve_existing,
             );
         }
+        $collector_order++;
     }
 
     for my $indicator ( $self->list_indicators ) {
@@ -247,11 +293,21 @@ sub collector_indicator_candidate {
         %{$indicator},
         name                 => $name,
         label                => $label,
+        configured_label     => $label,
+        configured_alias     => exists $indicator->{alias} ? ( defined $indicator->{alias} ? $indicator->{alias} : '' ) : '',
+        configured_page_status_icon => exists $indicator->{page_status_icon}
+          ? ( defined $indicator->{page_status_icon} ? $indicator->{page_status_icon} : '' )
+          : '',
         status               => exists $opts{status}
           ? $opts{status}
           : defined $existing->{status} && $existing->{status} ne ''
           ? $existing->{status}
           : 'missing',
+        collector_order      => defined $opts{collector_order}
+          ? $opts{collector_order}
+          : exists $existing->{collector_order}
+          ? $existing->{collector_order}
+          : undef,
         collector_name       => $job->{name},
         managed_by_collector => 1,
         prompt_visible       => exists $indicator->{prompt_visible}
@@ -271,10 +327,14 @@ sub collector_indicator_candidate {
             $preserved_icon = $existing->{icon};
         }
         $candidate{icon_template} = $indicator->{icon};
+        $candidate{configured_icon} = $indicator->{icon};
         $candidate{icon}          = $preserved_icon;
     }
     else {
         delete $candidate{icon_template};
+        $candidate{configured_icon} = exists $indicator->{icon}
+          ? ( defined $indicator->{icon} ? $indicator->{icon} : '' )
+          : '';
         if ( exists $indicator->{icon} ) {
             $candidate{icon} = defined $indicator->{icon} ? $indicator->{icon} : '';
         }
@@ -404,7 +464,7 @@ sub refresh_core_indicators {
 sub page_header_items {
     my ($self) = @_;
     my @items;
-    for my $indicator ( sort { $a->{name} cmp $b->{name} } $self->list_indicators ) {
+    for my $indicator ( $self->list_indicators ) {
         next if exists $indicator->{prompt_visible} && !$indicator->{prompt_visible};
         my $alias = defined $indicator->{alias} && $indicator->{alias} ne ''
           ? $indicator->{alias}
@@ -465,7 +525,8 @@ sub _page_status_icon {
 sub _indicator_matches {
     my ( $self, $existing, $candidate ) = @_;
     return 0 if ref($existing) ne 'HASH' || ref($candidate) ne 'HASH';
-    for my $key ( qw(name label alias icon icon_template status priority prompt_visible page_status_icon collector_name managed_by_collector) ) {
+    for my $key ( qw(name label alias icon icon_template configured_label configured_alias configured_icon configured_page_status_icon status priority prompt_visible page_status_icon collector_name collector_order managed_by_collector) ) {
+        next if $key eq 'collector_order' && ( !exists $existing->{$key} || !defined $existing->{$key} || $existing->{$key} eq '' );
         my $left  = exists $existing->{$key}  ? $existing->{$key}  : undef;
         my $right = exists $candidate->{$key} ? $candidate->{$key} : undef;
         $left  = '' if !defined $left;
@@ -473,6 +534,30 @@ sub _indicator_matches {
         return 0 if $left ne $right;
     }
     return 1;
+}
+
+# _indicator_sort_cmp($left, $right)
+# Compares two indicator records for prompt and page-header ordering while
+# keeping managed collector indicators in configured collector-array order.
+# Input: two indicator hash references.
+# Output: negative, zero, or positive integer suitable for Perl sort.
+sub _indicator_sort_cmp {
+    my ( $self, $left, $right ) = @_;
+    my $left_priority = $left->{priority} || 999;
+    my $right_priority = $right->{priority} || 999;
+    my $priority_cmp = $left_priority <=> $right_priority;
+    return $priority_cmp if $priority_cmp;
+
+    my $left_collector = ( $left->{managed_by_collector} || 0 ) ? 1 : 0;
+    my $right_collector = ( $right->{managed_by_collector} || 0 ) ? 1 : 0;
+    if ( $left_collector && $right_collector ) {
+        my $left_order = defined $left->{collector_order} ? $left->{collector_order} : 999;
+        my $right_order = defined $right->{collector_order} ? $right->{collector_order} : 999;
+        my $collector_cmp = $left_order <=> $right_order;
+        return $collector_cmp if $collector_cmp;
+    }
+
+    return ( $left->{name} || '' ) cmp ( $right->{name} || '' );
 }
 
 # _local_indicator($name)

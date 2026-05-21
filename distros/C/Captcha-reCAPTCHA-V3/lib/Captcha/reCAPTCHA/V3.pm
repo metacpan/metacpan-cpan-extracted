@@ -1,13 +1,12 @@
 package Captcha::reCAPTCHA::V3;
-use 5.008001;
+require 5.10.1;
 use strict;
 use warnings;
 
-our $VERSION = "0.06";
+our $VERSION = "0.12";
 
 use Carp qw(carp croak);
-use JSON qw(decode_json);
-use LWP::UserAgent;
+use JSON::PP qw(decode_json);
 
 use overload(
     '""'  => sub { $_[0]->name() },
@@ -20,25 +19,25 @@ sub new {
     my %attr  = @_;
 
     # Initialize the values for API
-    $self->{'sitekey'}    = $attr{'sitekey'}    || '';    # No need to set sitekey in server-side
-    $self->{'secret'}     = $attr{'secret'}     || croak "missing param 'secret'";
-    $self->{'query_name'} = $attr{'query_name'} || 'g-recaptcha-response';
+    $self->{sitekey}    = $attr{sitekey}    || '';    # No need to set sitekey in server-side
+    $self->{secret}     = $attr{secret}     || croak "missing param 'secret'";
+    $self->{query_name} = $attr{query_name} || 'g-recaptcha-response';
 
-    $self->{'widget_api'} = 'https://www.google.com/recaptcha/api.js';
-    $self->{'verify_api'} = 'https://www.google.com/recaptcha/api/siteverify';
+    $self->{widget_api} = 'https://www.google.com/recaptcha/api.js';
+    $self->{verify_api} = 'https://www.google.com/recaptcha/api/siteverify';
     return $self;
 }
 
 sub name {
     my $self = shift;
-    return $self->{'query_name'} unless my $value = shift;
-    $self->{'query_name'} = $value;
+    return $self->{query_name} unless my $value = shift;
+    $self->{query_name} = $value;
 }
 
 sub sitekey {
     my $self = shift;
-    return $self->{'sitekey'} unless my $value = shift;
-    $self->{'sitekey'} = $value;
+    return $self->{sitekey} unless my $value = shift;
+    $self->{sitekey} = $value;
 }
 
 # verifiers =======================================================================
@@ -47,35 +46,48 @@ sub verify {
     my $response = shift;
     croak "Extra arguments have been set." if @_;
 
-    my $params = {
-        secret   => $self->{'secret'},
-        response => $response || croak "missing response token",
-    };
+    if ( _has_curl() ) {
+        my $cmd = sprintf(
+            q{curl -sS -X POST %s -d secret=%s -d response=%s},
+            $self->{verify_api},
+            _shell_escape($self->{secret}),
+            _shell_escape($response),
+        );
 
-    my $ua = LWP::UserAgent->new();
+        my $json = `$cmd`or croak "Failed to execute curl command: $cmd";
+        return decode_json($json);
+    }elsif ( !_has_lwp_https() ) {
+        croak "LWP::UserAgent and LWP::Protocol::https are required to verify reCAPTCHA response."; 
+    }
 
-    # Enable LWP debugging
-    use LWP::Debug qw(+);
+    eval {
+        require LWP::UserAgent;
+        require LWP::Protocol::https;
+    } or croak "LWP::UserAgent and LWP::Protocol::https are required to verify reCAPTCHA response.";
 
-    my $res = $ua->post( $self->{'verify_api'}, $params );
-    if  ( $res->is_success ) {
-        return decode_json( $res->decoded_content );
-    } else {
-        croak $res->status_line;
-    } 
+    my $ua = LWP::UserAgent->new;
+    my $res = $ua->post(
+        $self->{verify_api},{
+            secret   => $self->{secret},
+            response => $response,
+        },
+    );
+
+    my $json = $res->decoded_content;
+    return decode_json($json);
 }
 
 sub deny_by_score {
     my $self     = shift;
     my %attr     = @_;
-    my $response = $attr{'response'} || croak "missing response token";
-    my $score    = $attr{'score'}    || 0.5;
+    my $response = $attr{response} || croak "missing response token";
+    my $score    = $attr{score}    || 0.5;
     croak "invalid score was set: $score" if $score < 0 or 1 < $score;
 
     my $content = $self->verify($response);
-    if ( $content->{'success'} and $content->{'score'} == 1 || $content->{'score'} < $score ) {
+    if ( $content->{success} and $content->{score} == 1 || $content->{score} < $score ) {
         unshift @{ $content->{'error-codes'} }, 'too-low-score';
-        $content->{'success'} = 0;
+        $content->{success} = 0;
     }
     return $content;
 }
@@ -83,7 +95,7 @@ sub deny_by_score {
 sub verify_or_die {
     my $self    = shift;
     my $content = $self->deny_by_score(@_);
-    return $content if $content->{'success'};
+    return $content if $content->{success};
     die 'fail to verify reCAPTCHA: ', $content->{'error-codes'}[0], "\n";
 }
 
@@ -91,14 +103,14 @@ sub verify_or_die {
 sub scriptURL {
     my $self    = shift;
     my %attr    = @_;
-    my $sitekey = $attr{'sitekey'} || $self->{'sitekey'} || croak "missing 'sitekey'";
-    return $self->{'widget_api'} . "?render=$sitekey";
+    my $sitekey = $attr{sitekey} || $self->{sitekey} || croak "missing 'sitekey'";
+    return $self->{widget_api} . "?render=$sitekey";
 }
 
 sub scriptTag {
     my $self    = shift;
     my %attr    = @_;
-    my $sitekey = $attr{'sitekey'} || $self->{'sitekey'} || croak "missing 'sitekey'";
+    my $sitekey = $attr{sitekey} || $self->{sitekey} || croak "missing 'sitekey'";
     my $url     = $self->scriptURL( sitekey => $sitekey );
     return qq|<script src="$url" defer></script>|;
 }
@@ -106,7 +118,7 @@ sub scriptTag {
 sub scripts {
     my $self    = shift;
     my %attr    = @_;
-    my $sitekey = $attr{'sitekey'} || $self->{'sitekey'} || croak "missing 'sitekey'";
+    my $sitekey = $attr{sitekey} || $self->{sitekey} || croak "missing 'sitekey'";
     my $simple  = $self->scriptTag(@_);
     my $id      = $attr{'id'} or croak "missing the id for Form tag";
     my $action  = $attr{'action'} || 'homepage';
@@ -128,6 +140,23 @@ rf.onsubmit = function(event){
 }
 </script>
 EOL
+}
+
+# utils =======================================================================
+sub _shell_escape {
+    my ($s) = @_;
+    $s //= '';
+    $s =~ s/'/'"'"'/g;
+    return "'$s'";
+}
+
+sub _has_curl {
+    if ( $^O eq 'MSWin32' ) {   # Windows
+         return 1 if system("curl --version >nul 2>&1") == 0;
+    } else {    # Unix-like
+         return 1 if system("curl --version >/dev/null 2>&1") == 0;
+    }
+    return 0;
 }
 
 1;

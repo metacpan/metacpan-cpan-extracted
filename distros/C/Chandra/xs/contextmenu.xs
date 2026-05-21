@@ -203,7 +203,7 @@ CODE:
         if (!l_svp || !SvOK(*l_svp)) continue;
         if (!strEQ(SvPV_nolen(*l_svp), label)) continue;
 
-        /* Found it — apply key => value pairs */
+        /* Found it - apply key => value pairs */
         {
             I32 k;
             for (k = 2; k + 1 < items; k += 2) {
@@ -309,7 +309,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- items() — return items arrayref ----
+ # ---- items() - return items arrayref ----
 
 SV *
 get_items(self)
@@ -326,7 +326,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- attachments() — return list of attached selectors ----
+ # ---- attachments() - return list of attached selectors ----
 
 void
 attachments(self)
@@ -384,7 +384,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- js_code() — generate the JS injection code ----
+ # ---- js_code() - generate the JS injection code ----
 
 SV *
 js_code(self)
@@ -628,7 +628,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- _dispatch(json_sv) — handle messages from JS bridge ----
+ # ---- _dispatch(json_sv) - handle messages from JS bridge ----
 
 void
 _dispatch(self, json_sv)
@@ -726,7 +726,7 @@ CODE:
             }
         }
     }
-    /* Context menu request — dynamic items or show static */
+    /* Context menu request - dynamic items or show static */
     else if (strEQ(type, "contextmenu")) {
         SV **x_svp = hv_fetchs(event_hv, "x", 0);
         SV **y_svp = hv_fetchs(event_hv, "y", 0);
@@ -815,7 +815,7 @@ CODE:
                 SvREFCNT_dec(dyn_items);
             }
         } else {
-            /* Static menu — show via JS */
+            /* Static menu - show via JS */
             SV *show_js = newSVpvf("window.__chandraCtxShow(%g,%g);", x, y);
             SV **app_svp = hv_fetchs(hv, "app", 0);
             if (app_svp && SvOK(*app_svp)) {
@@ -835,7 +835,7 @@ CODE:
     SvREFCNT_dec(event_sv);
 }
 
- # ---- inject() — bind dispatch + inject JS ----
+ # ---- inject() - bind dispatch + inject JS ----
 
 SV *
 inject(self)

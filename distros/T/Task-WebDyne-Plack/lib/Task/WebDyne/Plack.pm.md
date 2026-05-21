@@ -5,21 +5,18 @@ Task::WebDyne::Plack - Optional Plack integration for WebDyne
 
 # SYNOPSIS
 
-module synopsis
 ```bash
-#  Using CPAN
-#
 cpan Task::WebDyne::Plack
 
-
-#  Using CPANMinus
-#
 cpanm Task::WebDyne::Plack
 ```
 
 # DESCRIPTION
 
-Task::WebDyne::Plack install WebDyne and Plack (including Starman) modules
+This is a Task-style distribution that exists to pull in the optional
+WebDyne + Plack dependency set used for WebDyne Plack deployments.
+
+It does not provide runtime functionality beyond declaring prerequisites.
 
 # AUTHOR
 

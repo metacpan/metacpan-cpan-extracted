@@ -25,7 +25,7 @@ has constants_csv_path =>
 	required	=> 0,
 );
 
-our $VERSION = '1.15';
+our $VERSION = '1.17';
 
 # -----------------------------------------------
 
@@ -160,12 +160,10 @@ sub populate_topics_table
 	my($regexp) = qr/($special_para_names)/o;
 
 	my($id);
-	my($text, $title);
+	my($text, $title, $temp_text, $temp_title);
 
 	for my $index (0 .. $#$data)
 	{
-		# Node keys: created modified text title.
-
 		$text	= $$data[$index]{text};
 		$title	= $$data[$index]{title};
 
@@ -176,13 +174,17 @@ sub populate_topics_table
 			next;
 		}
 
-		$self -> logger -> info("populate_topics_table(). Missing text @ line: $index. title: $title"), next if (! defined $text);
-		$self -> logger -> info("populate_topics_table(). Missing prefix @ line: $index. title: $title"), next if ($text !~ m/^\"\"\"\no (.+)$/s);
+		$temp_text	= $text		|| '';
+		$temp_title	= $title	|| '';
+
+		$self -> logger -> debug("Skipping paragraph: temp_text: =>$temp_text<=. temp_title: =>$temp_title<=") if (! ($temp_text && $temp_title) );
+		$self -> logger -> info("populate_topics_table(). Missing title @ line: $index. name: $title"),	next if (! defined $title);
+		$self -> logger -> info("populate_topics_table(). Missing text @ line: $index. text: $text"),	next if ($text !~ m/^\"\"\"\no (.+)$/s);
 
 		$$record{parent_id}	= $root_id;
-		$$record{title}		= $title;
 		$text				= $1 if ($text =~ m/^\"\"\"\n(.+)$/s);
 		$$record{text}		= $text;
+		$$record{title}		= $title;
 		$id					= $self -> insert_hashref($table_name, $record);
 	}
 

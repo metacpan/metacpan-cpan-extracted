@@ -1763,8 +1763,17 @@ static OP* pp_nv_delete(pTHX) {
         }
     }
 
+    /* Push (not set) the result. The op's contract is "consume 2,
+     * produce 1" (net stack effect -1). After SP -= 2, SP sits at
+     * the slot below the original two args; SETi here would only
+     * overwrite that slot without advancing SP, leaving net -2. The
+     * immediate consumer (padsv_store) usually still reads the right
+     * value, but under PERL_RC_STACK + DEBUGGING an outer scope's
+     * rpp_popfree_to_NN sees the stack one slot below where it
+     * expects and asserts (`sp <= PL_stack_sp`). XPUSHi advances SP
+     * so the net effect is correctly -1. */
     SPAGAIN;
-    SETi(deleted);
+    XPUSHi(deleted);
     RETURN;
 }
 

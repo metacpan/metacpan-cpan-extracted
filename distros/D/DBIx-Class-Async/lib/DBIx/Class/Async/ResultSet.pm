@@ -1,7 +1,11 @@
 package DBIx::Class::Async::ResultSet;
 
-$DBIx::Class::Async::ResultSet::VERSION   = '0.65';
-$DBIx::Class::Async::ResultSet::AUTHORITY = 'cpan:MANWAR';
+use strict;
+use warnings;
+use version;
+
+our $VERSION   = qv('v1.0.3');
+our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
@@ -9,7 +13,7 @@ DBIx::Class::Async::ResultSet - Non-blocking resultset proxy with Future-based e
 
 =head1 VERSION
 
-Version 0.65
+Version v1.0.3
 
 =head1 SYNOPSIS
 
@@ -34,8 +38,6 @@ return a L<Future> object instead of raw data.
 
 =cut
 
-use strict;
-use warnings;
 use utf8;
 use v5.14;
 

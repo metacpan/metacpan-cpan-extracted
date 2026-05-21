@@ -1,5 +1,8 @@
 use 5.006;
+use Config;
 use ExtUtils::MakeMaker;
+use File::Temp qw(tempdir);
+use Text::ParseWords qw(shellwords);
 
 
 print "Net::CUPS Configuration\n";
@@ -50,6 +53,8 @@ $config{INC} = `cups-config --cflags`;
 
 ## Grab the LIBS ...
 $config{LIBS} = `cups-config --libs`;
+
+my $image_value_prefix = detect_image_value_prefix(\%config);
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
@@ -112,12 +117,6 @@ if  (eval {require ExtUtils::Constant; 1}) {
 		{ name => "CUPS_GET_DEVICES", macro => "1" },
 		{ name => "CUPS_GET_PPDS", macro => "1" },
 		{ name => "CUPS_GET_PRINTERS", macro => "1" },
-		{ name => "CUPS_IMAGE_BLACK", macro => "1" },
-		{ name => "CUPS_IMAGE_CMY", macro => "1" },
-		{ name => "CUPS_IMAGE_CMYK", macro => "1" },
-		{ name => "CUPS_IMAGE_RGB", macro => "1" },
-		{ name => "CUPS_IMAGE_RGB_CMYK", macro => "1" },
-		{ name => "CUPS_IMAGE_WHITE", macro => "1" },
 		{ name => "CUPS_ISO8859_1", macro => "1" },
 		{ name => "CUPS_ISO8859_10", macro => "1" },
 		{ name => "CUPS_ISO8859_11", macro => "1" },
@@ -547,6 +546,14 @@ if  (eval {require ExtUtils::Constant; 1}) {
 		{ name => "PPD_UI_PICKONE", macro => "1" },
 		{ name => "PPD_VERSION", macro => "1" } );
 
+
+  foreach my $prefix ( qw( CUPS CF ) ) {
+    foreach my $suffix ( qw( BLACK CMY CMYK RGB RGB_CMYK WHITE ) ) {
+        push @names, { name => "${prefix}_IMAGE_$suffix", macro => "1", value=>"${image_value_prefix}_IMAGE_$suffix" },
+    }
+  }
+
+
   ExtUtils::Constant::WriteConstants(
                                      NAME         => 'Net::CUPS',
                                      NAMES        => \@names,
@@ -565,3 +572,65 @@ else {
   }
 }
 
+sub detect_image_value_prefix {
+  my ($config) = @_;
+
+  print "Checking cupsfilters image constant names ... ";
+  foreach my $prefix (qw( CF CUPS )) {
+    if( can_compile_image_constant($config, "${prefix}_IMAGE_BLACK") ) {
+      print "$prefix\n";
+      return $prefix;
+    }
+  }
+
+  die "failed.\nCould not compile either CF_IMAGE_BLACK or CUPS_IMAGE_BLACK.\n";
+}
+
+sub can_compile_image_constant {
+  my ($config, $constant) = @_;
+
+  my $dir = tempdir("net-cups-compile-XXXXXX", TMPDIR => 1, CLEANUP => 1);
+  my $source = "$dir/image_constant.c";
+
+  open my $fh, ">", $source or die "Cannot write $source: $!";
+  print $fh <<"EOF";
+#include <cups/cups.h>
+#if (CUPS_VERSION_MAJOR > 1) || (CUPS_VERSION_MINOR > 5)
+#include <cupsfilters/image.h>
+#else
+#include <cups/image.h>
+#endif
+int net_cups_image_constant_probe(void) { return $constant; }
+EOF
+  close $fh or die "Cannot close $source: $!";
+
+  my @cflags = shellwords($config->{INC} || "");
+  if( eval { require ExtUtils::CBuilder; 1 } ) {
+    my $builder = ExtUtils::CBuilder->new(quiet => 1);
+    if( $builder->have_compiler ) {
+      my $ok = eval {
+        $builder->compile(
+          source => $source,
+          extra_compiler_flags => \@cflags,
+        );
+        1;
+      };
+
+      return $ok ? 1 : 0;
+    }
+  }
+
+  my $object = "$dir/image_constant$Config{obj_ext}";
+  my @ccflags = shellwords($Config{ccflags} || "");
+  my $ok = system(
+    $Config{cc} || "cc",
+    @ccflags,
+    @cflags,
+    "-c",
+    $source,
+    "-o",
+    $object,
+    );
+
+  return $ok == 0 ? 1 : 0;
+}

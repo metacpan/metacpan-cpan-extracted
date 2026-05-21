@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1
-#                   and LibVirt version v11.10.0
+#                   and LibVirt version v12.3.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -16,7 +16,7 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad ':experimental(inherit_field)';
 
-class Sys::Async::Virt::Connection v0.2.3;
+class Sys::Async::Virt::Connection v0.6.3;
 
 field $_in  :inheritable = undef;
 field $_out :inheritable = undef;
@@ -32,7 +32,9 @@ use Log::Any qw($log);
 
 method _finalize_io() {
     $_eof = 1;
-    $_write_f->cancel;
+    $_write_f->fail( 'closed' ) unless $_write_f->is_ready;
+    $_read_f->fail( 'closed' )  unless $_read_f->is_ready;
+    $_read_f  = Future->fail( 'closed' );
     $_write_f = Future->fail( 'closed' );
 }
 
@@ -62,25 +64,33 @@ method is_write_eof() {
     return $_eof;
 }
 
+method _read_internal( $len ) {
+    Future::IO->read_exactly( $_in, $len )
+}
+
 async method read($type, $len) {
     die $log->fatal( "Unsupported transfer type $type" ) unless $type eq 'data';
-    return undef if $_eof;
+    return (undef, 1) if $_eof;
 
     $log->trace( "Starting read of length $len" );
-    $_read_f = $_read_f->then(sub { Future::IO->read_exactly( $_in, $len ) });
+    $_read_f = $_read_f->then(sub { $self->_read_internal( $len ) });
 
     my $data = await $_read_f;
     $log->trace( "Finished read of length $len" );
     $_eof = not defined $data;
 
-    return $data;
+    return ($data, 0);
+}
+
+method _write_internal( $data ) {
+    Future::IO->write_exactly( $_out, $data )
 }
 
 method _write_chunk($data) {
     die "Write to closed file" if $_eof;
 
     $log->trace( 'Low-level write of ' . length($data) . ' bytes' );
-    $_write_f = $_write_f->then(sub { Future::IO->write_exactly( $_out, $data ) });
+    $_write_f = $_write_f->then(sub { $self->_write_internal( $data ) });
     return $_write_f;
 }
 
@@ -116,7 +126,7 @@ Sys::Async::Virt::Connection - Connection to LibVirt server (abstract
 
 =head1 VERSION
 
-v0.2.3
+v0.6.3
 
 =head1 SYNOPSIS
 
@@ -173,7 +183,7 @@ L<LibVirt|https://libvirt.org>, L<Sys::Virt>
 =head1 LICENSE AND COPYRIGHT
 
 
-  Copyright (C) 2024-2025 Erik Huelsmann
+  Copyright (C) 2024-2026 Erik Huelsmann
 
 All rights reserved. This program is free software;
 you can redistribute it and/or modify it under the same terms as Perl itself.

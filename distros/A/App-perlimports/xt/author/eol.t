@@ -102,7 +102,6 @@ my @files = (
     't/symbol-as-method-call.t',
     't/symbol-in-export.t',
     't/test-builder.t',
-    't/test-most.t',
     't/tie.t',
     't/typeglob.t',
     't/unnest-quotes.t',

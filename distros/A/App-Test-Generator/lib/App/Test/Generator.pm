@@ -37,7 +37,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.33';
+our $VERSION = '0.38';
 
 use constant {
 	DEFAULT_ITERATIONS => 30,
@@ -156,7 +156,7 @@ App::Test::Generator - Fuzz Testing, Mutation Testing, LCSAJ Metrics and Test Da
 
 =head1 VERSION
 
-Version 0.33
+Version 0.38
 
 =head1 SYNOPSIS
 
@@ -1611,8 +1611,13 @@ sub generate
 		if($schema_file) {
 			($module = basename($schema_file)) =~ s/\.(conf|pl|pm|yml|yaml)$//;
 			$module =~ s/-/::/g;
+			# Guard against Perl builtin function names being mistaken
+			# for module names — builtins have no module to load
+			if(_is_perl_builtin($module)) {
+				undef $module;
+			}
 		}
-	} elsif($module eq 'builtin') {
+	} elsif($module eq $MODULE_BUILTIN) {
 		undef $module;
 	}
 
@@ -2112,6 +2117,61 @@ sub generate
 }
 
 # --- Helpers for rendering data structures into Perl code for the generated test ---
+
+# --------------------------------------------------
+# _is_perl_builtin
+#
+# Purpose:    Return true if a string is the name of
+#             a Perl core builtin function, to prevent
+#             it being used as a module name in
+#             use_ok() calls in generated tests.
+#
+# Entry:      $name - the string to check.
+# Exit:       Returns 1 if builtin, 0 otherwise.
+# Side effects: None.
+# --------------------------------------------------
+sub _is_perl_builtin {
+	my $name = $_[0];
+	return 0 unless defined $name;
+
+	state %BUILTINS = map { $_ => 1 } qw(
+		abs accept alarm atan2 bind binmode bless
+		caller chdir chmod chomp chop chown chr chroot
+		close closedir connect cos crypt
+		dbmclose dbmopen defined delete die do dump
+		each endgrent endhostent endnetent endprotoent endpwent endservent
+		eof eval exec exists exit exp
+		fcntl fileno flock fork format formline
+		getc getgrent getgrgid getgrnam gethostbyaddr gethostbyname
+		gethostent getlogin getnetbyaddr getnetbyname getnetent
+		getpeername getpgrp getppid getpriority getprotobyname
+		getprotobynumber getprotoent getpwent getpwnam getpwuid
+		getservbyname getservbyport getservent getsockname getsockopt
+		glob gmtime goto grep
+		hex
+		index int ioctl
+		join
+		keys kill
+		last lc lcfirst length link listen local localtime log lstat
+		map mkdir msgctl msgget msgrcv msgsnd my
+		next no
+		oct open opendir ord our
+		pack pipe pop pos print printf prototype push
+		quotemeta
+		rand read readdir readline readlink readpipe recv redo
+		ref rename require reset return reverse rewinddir rindex rmdir
+		say scalar seek seekdir select semctl semget semop send
+		setgrent sethostent setnetent setpgrp setpriority setprotoent
+		setpwent setservent setsockopt shift shmctl shmget shmread
+		shmwrite shutdown sin sleep socket socketpair sort splice split
+		sprintf sqrt srand stat study sub substr symlink syscall
+		sysopen sysread sysseek system syswrite
+		tell telldir tie tied time times truncate
+		uc ucfirst umask undef unlink unpack unshift untie use
+		utime values vec wait waitpid wantarray warn write
+	);
+	return $BUILTINS{lc $name} // 0;
+}
 
 # --------------------------------------------------
 # _load_schema

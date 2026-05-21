@@ -9,11 +9,11 @@ use Readonly;
 Readonly my $HIGH_CONFIDENCE_THRESHOLD   => 40;
 Readonly my $MEDIUM_CONFIDENCE_THRESHOLD => 20;
 
-our $VERSION = '0.33';
+our $VERSION = '0.38';
 
 =head1 VERSION
 
-Version 0.33
+Version 0.38
 
 =cut
 
@@ -62,8 +62,9 @@ sub add_evidence {
 
 	# Validate category — must be one of the three recognised kinds
 	my %valid_categories = map { $_ => 1 } qw(return input effect);
-	croak "Invalid evidence category '$args{category}'"
-		unless $valid_categories{ $args{category} // '' };
+
+	my $cat = $args{category} // '';
+	croak "Invalid evidence category '$cat'" unless $valid_categories{$cat};
 
 	# Validate signal — must be a known signal name to catch typos early.
 	# Signals are per-category; we validate the full set across all categories.
@@ -73,8 +74,9 @@ sub add_evidence {
 		input_validated input_typed input_optional
 		has_side_effect no_side_effect
 	);
-	croak "Invalid evidence signal '$args{signal}'"
-		unless $valid_signals{ $args{signal} // '' };
+
+	my $sig = $args{signal} // '';
+	croak "Invalid evidence signal '$sig'" unless $valid_signals{$sig};
 
 	push @{ $self->{evidence} }, {
 		category => $args{category},

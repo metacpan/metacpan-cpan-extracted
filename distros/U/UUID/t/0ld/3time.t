@@ -1,7 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
-use MyNote;
+use MyTest;
 use UUID ();
 
 my ($bin, $t, $str);

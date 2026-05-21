@@ -1,3 +1,9 @@
+0.09 2026-04-28T13:24:15+02:00
+ - Add 'mode_strict' constructor parameter for strict mode in parsing.
+   Actually consumes dashes instead of spaces in leader field.
+ - Catch parsing errors and generate only main one.
+ - Regen README file.
+
 0.08 2026-01-07T16:43:31+01:00
  - Add errors for bad numbers in leader.
  - Add missing return in internal method.

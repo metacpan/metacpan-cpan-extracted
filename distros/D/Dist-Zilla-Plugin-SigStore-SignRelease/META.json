@@ -1,0 +1,78 @@
+{
+   "abstract" : "Sign Release with SigStore",
+   "author" : [
+      "Timothy Legge <timlegge@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.038, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-SigStore-SignRelease",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Software::Security::Policy::Individual" : "0",
+            "Test::EOF" : "0",
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.17",
+            "Test::TrailingSpace" : "0.0203"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Convert::ASN1" : "0",
+            "Crypt::OpenSSL::X509" : "0",
+            "Dist::Zilla::Plugin::UploadToCPAN" : "0",
+            "File::Slurper" : "0",
+            "File::Which" : "0",
+            "JSON::MaybeXS" : "0",
+            "MIME::Base64" : "0",
+            "Moose" : "0",
+            "Try::Tiny" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.020",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::SigStore::SignRelease" : {
+         "file" : "lib/Dist/Zilla/Plugin/SigStore/SignRelease.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/timlegge/perl-Dist-Zilla-Plugin-SigStore/issues"
+      },
+      "homepage" : "https://metacpan.org/dist/Dist-Zilla-Plugin-SigStore",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/timlegge/perl-Dist-Zilla-Plugin-SigStore.git",
+         "web" : "https://github.com/timlegge/perl-Dist-Zilla-Plugin-SigStore"
+      }
+   },
+   "version" : "0.05",
+   "x_generated_by_perl" : "v5.42.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

@@ -1,8 +1,8 @@
 NAME
-    JSON::LINQ - LINQ-style query interface for JSON and JSONL files
+    JSON::LINQ - LINQ-style query interface for JSON, JSONL, LTSV, and CSV files
 
 VERSION
-    Version 1.00
+    Version 1.02
 
 SYNOPSIS
         use JSON::LINQ;
@@ -17,6 +17,11 @@ SYNOPSIS
         # Read JSONL (JSON Lines) file - streaming, one object per line
         my @errors = JSON::LINQ->FromJSONL("events.jsonl")
             ->Where(sub { $_[0]{level} eq 'ERROR' })
+            ->ToArray();
+
+        # Read LTSV (Labeled Tab-Separated Values) file - streaming
+        my @rows = JSON::LINQ->FromLTSV("access.ltsv")
+            ->Where(sub { $_[0]{status} eq '200' })
             ->ToArray();
 
         # DSL syntax for simple filtering
@@ -39,25 +44,75 @@ SYNOPSIS
             ->OrderByDescending(sub { $_[0]{Total} })
             ->ToArray();
 
-        # Write results back as JSON or JSONL
+        # Write results back as JSON, JSONL, LTSV, or CSV
         JSON::LINQ->From(\@results)->ToJSON("output.json");
         JSON::LINQ->From(\@results)->ToJSONL("output.jsonl");
+        JSON::LINQ->From(\@results)->ToLTSV("output.ltsv");
+        JSON::LINQ->From(\@results)->ToCSV("output.csv");
+
+        # Read CSV (Comma-Separated Values) file - streaming
+        my @rows = JSON::LINQ->FromCSV("access.csv")
+            ->Where(sub { $_[0]{status} eq '200' })
+            ->ToArray();
+
+        # CSV with options
+        my $q = JSON::LINQ->FromCSV("data.tsv", sep => "\t");
+        my $q = JSON::LINQ->FromCSV("noheader.csv",
+            headers => [qw(name age city)]);
+
+        # Write CSV with column order control
+        JSON::LINQ->From(\@results)->ToCSV("out.csv",
+            headers => [qw(name age city)]);
+        JSON::LINQ->From(\@results)->ToCSV("out.tsv",
+            sep => "\t", no_header => 1);
+
+        # JOIN: main CSV x sub-table JSON (price master)
+        my $prices = JSON::LINQ->FromJSON("prices.json");
+        my @priced = JSON::LINQ->FromCSV("orders.csv")
+            ->Join($prices,
+                sub { $_[0]{sku} },
+                sub { $_[0]{sku} },
+                sub { { order_id => $_[0]{id},
+                        amount   => $_[0]{qty} * $_[1]{price} } })
+            ->ToArray();
+
+        # JOIN: main JSON table x sub-table LTSV (department lookup)
+        my $depts = JSON::LINQ->FromLTSV("departments.ltsv");
+        my @joined = JSON::LINQ->FromJSON("employees.json")
+            ->Join($depts,
+                sub { $_[0]{dept_id} },
+                sub { $_[0]{id}      },
+                sub { { name => $_[0]{name}, dept => $_[1]{name} } })
+            ->ToArray();
+
+        # JOIN: main LTSV log x sub-table JSON (price master)
+        my $prices = JSON::LINQ->FromJSON("prices.json");
+        my @priced = JSON::LINQ->FromLTSV("orders.ltsv")
+            ->Join($prices,
+                sub { $_[0]{sku} },
+                sub { $_[0]{sku} },
+                sub { { order_id => $_[0]{id},
+                        amount   => $_[0]{qty} * $_[1]{price} } })
+            ->ToArray();
 
         # Boolean values
         my $rec = { active => JSON::LINQ::true, count => 0 };
 
 DESCRIPTION
-    JSON::LINQ provides a LINQ-style query interface for JSON and JSONL
-    (JSON Lines) files.  It is the JSON counterpart of LTSV::LINQ, sharing
-    the same 60-method LINQ API and adding JSON-specific I/O methods.
+    JSON::LINQ provides a LINQ-style query interface for JSON, JSONL
+    (JSON Lines), LTSV (Labeled Tab-Separated Values), and CSV
+    (Comma-Separated Values) files.  It is the JSON counterpart of
+    LTSV::LINQ, sharing the same LINQ API and adding JSON, LTSV, and
+    CSV I/O methods.
 
     Key features:
 
-    * Lazy evaluation - O(1) memory for JSONL streaming
+    * Lazy evaluation - O(1) memory for JSONL, LTSV, and CSV streaming
     * Method chaining - Fluent, readable query composition
     * DSL syntax - Simple key-value filtering without code references
-    * 63 LINQ methods - including JSON-specific I/O (FromJSON, FromJSONL,
-      FromJSONString, ToJSON, ToJSONL) and all 60 methods from LTSV::LINQ
+    * 67 LINQ methods - including JSON I/O (FromJSON, FromJSONL,
+      FromJSONString, ToJSON, ToJSONL), LTSV I/O (FromLTSV, ToLTSV),
+      CSV I/O (FromCSV, ToCSV), and all 60 methods from LTSV::LINQ
     * Built-in JSON parser - No CPAN JSON module required
     * Pure Perl - No XS dependencies
     * Perl 5.005_03+ - Works on ancient and modern Perl
@@ -65,10 +120,14 @@ DESCRIPTION
 INCLUDED DOCUMENTATION
     The eg/ directory contains sample programs:
 
-        eg/01_json_query.pl    FromJSON/Where/Select/OrderByDescending/Distinct/ToLookup
-        eg/02_jsonl_query.pl   FromJSONL streaming, GroupBy, aggregation, ToJSONL
-        eg/03_grouping.pl      GroupBy, ToLookup, GroupJoin, SelectMany, Join
-        eg/04_sorting.pl       OrderBy/ThenBy multi-key sort, OrderByNum vs OrderByStr
+        eg/01_json_query.pl       FromJSON/Where/Select/OrderByDescending/Distinct/ToLookup
+        eg/02_jsonl_query.pl      FromJSONL streaming, GroupBy, aggregation, ToJSONL
+        eg/03_grouping.pl         GroupBy, ToLookup, GroupJoin, SelectMany, Join
+        eg/04_sorting.pl          OrderBy/ThenBy multi-key sort, OrderByNum vs OrderByStr
+        eg/05_json_ltsv_join.pl   JOIN main JSON x sub-table LTSV
+        eg/06_ltsv_json_join.pl   JOIN main LTSV x sub-table JSON
+        eg/07_csv_query.pl        FromCSV/Where/Select/GroupBy/OrderByNum/ToCSV
+        eg/08_csv_json_join.pl    JOIN main CSV x sub-table JSON, CSV to JSON conversion
 
     The doc/ directory contains JSON::LINQ cheat sheets in 21 languages:
 
@@ -84,7 +143,7 @@ INCLUDED DOCUMENTATION
         doc/json_linq_cheatsheet.HI.txt   Hindi
         doc/json_linq_cheatsheet.BN.txt   Bengali
         doc/json_linq_cheatsheet.TR.txt   Turkish
-        doc/json_linq_cheatsheet.MY.txt   Malay
+        doc/json_linq_cheatsheet.MY.txt   Burmese
         doc/json_linq_cheatsheet.TL.txt   Filipino
         doc/json_linq_cheatsheet.KM.txt   Khmer
         doc/json_linq_cheatsheet.MN.txt   Mongolian
@@ -92,12 +151,15 @@ INCLUDED DOCUMENTATION
         doc/json_linq_cheatsheet.SI.txt   Sinhala
         doc/json_linq_cheatsheet.UR.txt   Urdu
         doc/json_linq_cheatsheet.UZ.txt   Uzbek
-        doc/json_linq_cheatsheet.BM.txt   Burmese
+        doc/json_linq_cheatsheet.BM.txt   Malay
 
 TARGET USE CASES
     * Querying JSON API response files
     * Streaming analysis of JSONL log files
-    * Data transformation pipelines (JSON in, JSON/JSONL out)
+    * Joining JSON master tables with LTSV log files (or vice versa)
+    * Reading and writing CSV/TSV files with LINQ-style queries
+    * Cross-format data pipelines (CSV in, JSON out; JSON in, CSV out)
+    * Data transformation pipelines (JSON in, JSON/JSONL/LTSV/CSV out)
     * In-memory array queries using LINQ-style API
     * Systems where no CPAN JSON module is available
 
@@ -113,6 +175,27 @@ DATA SOURCES
     FromJSONString($json)
         Parse a JSON string and iterate its elements.
 
+    FromLTSV($file)
+        Read an LTSV (Labeled Tab-Separated Values) file.  Each line is
+        split on TAB, and each field on the first colon, producing a hash
+        reference per record.  Lazy: one line at a time.  O(1) memory.
+
+    FromCSV($file)
+    FromCSV($file, sep => $char)
+    FromCSV($file, headers => \@cols)
+    FromCSV($file, headers => \@cols, skip_header => 1)
+        Read a CSV (Comma-Separated Values) file.  The first line is used
+        as the header row (column names), and each data row is returned as
+        a hash reference.  Lazy: one line at a time.  O(1) memory.
+        RFC 4180 compliant: handles quoted fields containing commas and
+        escaped double-quotes ("").
+
+        Options:
+          sep         => $char   field separator (default: ','); use "\t" for TSV
+          headers     => \@cols  explicit column names (first line used as data,
+                                 not as header)
+          skip_header => 1       skip the first line even when headers is given
+
     From(\@array)
         Query an in-memory Perl array.
 
@@ -125,9 +208,9 @@ DATA SOURCES
     Repeat($element, $count)
         Repeat one element N times.
 
-LINQ METHODS (63)
-    Data Sources:  From, FromJSON, FromJSONL, FromJSONString,
-                   Range, Empty, Repeat
+LINQ METHODS (67)
+    Data Sources:  From, FromJSON, FromJSONL, FromJSONString, FromLTSV,
+                   FromCSV, Range, Empty, Repeat
     Filtering:     Where (with DSL key=>value form)
     Projection:    Select, SelectMany
     Concatenation: Concat, Zip
@@ -144,8 +227,42 @@ LINQ METHODS (63)
                    Single, SingleOrDefault, ElementAt, ElementAtOrDefault
     Aggregation:   Count, Sum, Min, Max, Average, AverageOrDefault, Aggregate
     Conversion:    ToArray, ToList, ToDictionary, ToLookup,
-                   ToJSON, ToJSONL, DefaultIfEmpty
+                   ToJSON, ToJSONL, ToLTSV, ToCSV, DefaultIfEmpty
     Utility:       ForEach
+
+OUTPUT METHODS
+    ToLTSV($file)
+    ToLTSV($file, label_order => \@labels)
+    ToLTSV($file, headers => \@labels)
+        Write the sequence as an LTSV file.  Each element must be a hash
+        reference.  TAB, CR, and LF in values are sanitized to a single
+        space to preserve the LTSV record structure.
+
+        Options:
+          label_order => \@labels   emit only these labels in this order;
+                                    labels absent from a record are skipped
+          headers     => \@labels   alias for label_order
+
+        Without label_order/headers, all keys are emitted alphabetically.
+
+    ToCSV($file)
+    ToCSV($file, sep => $char)
+    ToCSV($file, headers => \@cols)
+    ToCSV($file, label_order => \@cols)
+    ToCSV($file, no_header => 1)
+        Write the sequence as a CSV file.  Elements that are hash
+        references are written as named-column rows; scalar elements are
+        written one-per-line without a header.
+
+        Options:
+          sep          => $char   field separator (default: ',')
+          headers      => \@cols  emit only these columns in this order;
+                                  also used as the header row
+          label_order  => \@cols  alias for headers
+          no_header    => 1       suppress the header row entirely
+
+        Without headers/label_order, column names are taken from the first
+        record's keys in alphabetical order.
 
 INSTALLATION
     Standard CPAN installation:
@@ -172,14 +289,29 @@ LIMITATIONS
       large files where streaming matters.
     * The built-in JSON parser does not support surrogate pairs
       (\uD800-\uDFFF) or circular reference detection in encoding.
+    * ToLTSV sanitizes TAB/CR/LF in field values to single space to
+      preserve the LTSV record/field structure.
+    * ToCSV materialises the entire sequence before writing (to detect
+      column names from the first record for the header row).
+    * FromCSV reads one line at a time; CSV fields that span multiple
+      lines (embedded newlines in quoted fields) are not supported.
+    * The iterator protocol uses undef to signal end-of-sequence, so
+      a JSON null cannot appear as a top-level element of a sequence.
+      A Select() that projects a nullable JSON field will be truncated
+      at the first null.  Project to a sentinel value (0, '', or {}),
+      or wrap each element in a hashref so the element itself is
+      never undef.  See "Iterator Protocol and JSON null" in the POD.
 
 AUTHOR
     INABA Hitoshi <ina@cpan.org>
 
 SEE ALSO
     LTSV::LINQ  - The LTSV counterpart of this module
+    CSV::LINQ   - LINQ-style query interface for CSV files
     mb::JSON    - The JSON encoder/decoder this module's parser derives from
     JSONL spec  - https://jsonlines.org/
+    LTSV spec   - http://ltsv.org/
+    RFC 4180    - https://www.ietf.org/rfc/rfc4180.txt
     LINQ ref    - https://docs.microsoft.com/dotnet/api/system.linq
 
 COPYRIGHT AND LICENSE

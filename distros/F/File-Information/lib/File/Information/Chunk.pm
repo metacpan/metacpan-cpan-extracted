@@ -1,4 +1,4 @@
-# Copyright (c) 2024-2025 Philipp Schafft <lion@cpan.org>
+# Copyright (c) 2024-2026 Philipp Schafft <lion@cpan.org>
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -16,7 +16,7 @@ use parent 'File::Information::Base';
 use Carp;
 use Fcntl qw(SEEK_SET);
 
-our $VERSION = v0.16;
+our $VERSION = v0.17;
 
 my %_properties = (
     chunk_cachehash     => {},
@@ -94,6 +94,15 @@ sub _new {
     return $self;
 }
 
+#@returns File::Information::Deep
+sub deep {
+    my ($self, %opts) = @_;
+    # TODO: Consider this for the public API.
+    return $self->{deep} if defined $self->{deep};
+    return $opts{default} if exists $opts{no_defaults};
+    return $self->{deep} = File::Information::Deep->_new(instance => $self->instance, parent => $self);
+}
+
 1;
 
 __END__
@@ -108,7 +117,7 @@ File::Information::Chunk - generic module for extracting information from filesy
 
 =head1 VERSION
 
-version v0.16
+version v0.17
 
 =head1 SYNOPSIS
 
@@ -136,7 +145,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024-2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2024-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

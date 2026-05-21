@@ -1,6 +1,7 @@
-package App::FatPacker::Simple 0.20;
-use v5.16;
+package App::FatPacker::Simple v1.0.0;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
 
 use App::FatPacker;
 use Config;
@@ -21,13 +22,13 @@ our $IGNORE_FILE = [
     qr/install\.json$/,
 ];
 
-sub new {
-    my ($class, @argv) = @_;
+our $TRIAL = 0;
+
+sub new ($class, @argv) {
     bless { @argv }, $class;
 }
 
-sub parse_options {
-    my ($self, @argv) = @_;
+sub parse_options ($self, @argv) {
     my $parser = Getopt::Long::Parser->new(
         config => [qw(no_auto_abbrev no_ignore_case)],
     );
@@ -35,11 +36,11 @@ sub parse_options {
         \@argv,
         "d|dir=s"       => \(my $dir = 'lib,fatlib,local,extlib'),
         "e|exclude=s"   => \(my $exclude),
-        "h|help"        => sub { $self->show_help; exit 1 },
+        "h|help"        => sub (@) { $self->show_help; exit 1 },
         "o|output=s"    => \(my $output),
         "q|quiet"       => \(my $quiet),
         "s|strict"      => \(my $strict),
-        "v|version"     => sub { printf "%s %s\n", __PACKAGE__, __PACKAGE__->VERSION; exit },
+        "v|version"     => sub (@) { printf "%s %s\n", __PACKAGE__, __PACKAGE__->VERSION; exit },
         "color!"        => \(my $color = 1),
         "shebang=s"     => \(my $custom_shebang),
         "exclude-strip=s@" => \(my $exclude_strip),
@@ -53,7 +54,7 @@ sub parse_options {
     $self->{strict}     = $strict;
     $self->{color}      = $color;
     $self->{custom_shebang} = $custom_shebang;
-    $self->{exclude_strip}  = [map { qr/$_/ } @{$exclude_strip || []}];
+    $self->{exclude_strip}  = [map { qr/$_/ } ($exclude_strip || [])->@*];
     $self->{exclude}    = [];
     if (!$no_perl_strip) {
         $self->{perl_strip} = Perl::Strip->new($cache ? (cache => $cache) : ());
@@ -64,7 +65,7 @@ sub parse_options {
                 $e, inc => $self->{dir},
             );
             if (my $files = $dist->files) {
-                push @{$self->{exclude}}, @$files;
+                push $self->{exclude}->@*, $files->@*;
             } else {
                 $self->warning("Missing $e in $dir");
             }
@@ -73,7 +74,7 @@ sub parse_options {
     $self;
 }
 
-sub show_help {
+sub show_help ($self) {
     open my $fh, '>', \my $out;
     Pod::Usage::pod2usage
         exitval => 'noexit',
@@ -87,12 +88,11 @@ sub show_help {
     print $out;
 }
 
-sub warning {
-    my ($self, $msg) = @_;
+sub warning ($self, $msg) {
     chomp $msg;
     my $color = $self->{color}
-              ? sub { "\e[31m$_[0]\e[m", "\n" }
-              : sub { "$_[0]\n" };
+              ? sub ($text) { "\e[31m$text\e[m", "\n" }
+              : sub ($text) { "$text\n" };
     if ($self->{strict}) {
         die $color->("=> ERROR $msg");
     } elsif (!$self->{quiet}) {
@@ -100,16 +100,14 @@ sub warning {
     }
 }
 
-sub debug {
-    my ($self, $msg) = @_;
+sub debug ($self, $msg) {
     chomp $msg;
     if (!$self->{quiet}) {
         warn "-> $msg\n";
     }
 }
 
-sub output_filename {
-    my $self = shift;
+sub output_filename ($self) {
     return $self->{output} if $self->{output};
 
     my $script = File::Basename::basename $self->{script};
@@ -122,8 +120,7 @@ sub output_filename {
     }
 }
 
-sub run {
-    my $self = shift;
+sub run ($self) {
     my $fatpacked = $self->fatpack_file($self->{script});
     my $output_filename = $self->output_filename;
     open my $fh, ">", $output_filename
@@ -137,19 +134,17 @@ sub run {
 
 # In order not to depend on App::FatPacker internals,
 # we use only App::FatPacker::fatpack_code method.
-sub fatpack_file {
-    my ($self, $file) = @_;
+sub fatpack_file ($self, $file) {
     my ($shebang, $script) = $self->load_main_script($file);
     $shebang = $self->{custom_shebang} if $self->{custom_shebang};
     my %files;
-    $self->collect_files($_, \%files) for @{ $self->{dir} };
+    $self->collect_files($_, \%files) for $self->{dir}->@*;
     my $fatpacker = App::FatPacker->new;
     return join "\n", $shebang, $fatpacker->fatpack_code(\%files), $script;
 }
 
 # almost copy from App::FatPacker::load_main_script
-sub load_main_script {
-    my ($self, $file) = @_;
+sub load_main_script ($self, $file) {
     open my $fh, "<", $file or die "Cannot open '$file': $!\n";
     my @lines = <$fh>;
     my @shebang;
@@ -162,15 +157,14 @@ sub load_main_script {
     ((join "", @shebang), (join "", @lines));
 }
 
-sub load_file {
-    my ($self, $absolute, $relative, $original) = @_;
+sub load_file ($self, $absolute, $relative, $original) {
 
     my $content = do {
         open my $fh, "<", $absolute or die "Cannot open '$absolute': $!\n";
         local $/; <$fh>;
     };
 
-    if ($self->{perl_strip} and !grep { $original =~ $_ } @{$self->{exclude_strip}}) {
+    if ($self->{perl_strip} and !grep { $original =~ $_ } $self->{exclude_strip}->@*) {
         $self->debug("fatpack $relative (with perl-strip)");
         return $self->{perl_strip}->strip($content);
     } else {
@@ -179,8 +173,7 @@ sub load_file {
     }
 }
 
-sub collect_files {
-    my ($self, $dir, $files) = @_;
+sub collect_files ($self, $dir, $files) {
 
     my $absolute_dir = Cwd::abs_path($dir);
     # When $dir is not an archlib,
@@ -189,16 +182,16 @@ sub collect_files {
     my $skip_dir = File::Spec->catdir($absolute_dir, $Config{archname});
     $skip_dir = qr/\Q$skip_dir\E/;
 
-    my $find = sub {
+    my $find = sub (@) {
         return unless -f $_;
-        for my $ignore (@$IGNORE_FILE) {
+        for my $ignore ($IGNORE_FILE->@*) {
             $_ =~ $ignore and return;
         }
         my $original = $_;
         my $absolute = Cwd::abs_path($original);
         return if $absolute =~ $skip_dir;
         my $relative = File::Spec::Unix->abs2rel($absolute, $absolute_dir);
-        for my $exclude (@{$self->{exclude}}) {
+        for my $exclude ($self->{exclude}->@*) {
             if ($absolute eq $exclude) {
                 $self->debug("exclude $relative");
                 return;
@@ -213,8 +206,7 @@ sub collect_files {
     File::Find::find({wanted => $find, no_chdir => 1}, $dir);
 }
 
-sub build_dir {
-    my ($self, $dir_string) = @_;
+sub build_dir ($self, $dir_string) {
     my @dir;
     for my $d (grep -d, split /,/, $dir_string) {
         my $try = File::Spec->catdir($d, "lib/perl5");
@@ -300,6 +292,13 @@ L<App::FatPacker>
 L<App::depak>
 
 L<Perl::Strip>
+
+=head1 ARTIFACT ATTESTATIONS
+
+GitHub Artifact Attestations are generated for release tarballs uploaded to
+CPAN. If you care about provenance for the uploaded tarballs, see:
+
+L<https://github.com/skaji/App-FatPacker-Simple/attestations>
 
 =head1 COPYRIGHT AND LICENSE
 

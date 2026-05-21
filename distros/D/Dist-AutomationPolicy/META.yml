@@ -1,0 +1,62 @@
+---
+abstract: 'generate and parse distribution automation policies'
+author:
+  - 'Robert Rothenberg <perl@rhizomnic.com>'
+build_requires:
+  ExtUtils::MakeMaker: '7.22'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Metadata: '1.000015'
+  Path::Tiny: '0.130'
+  Test2::Tools::Compare: '0'
+  Test2::V0: '0'
+  Test::File::ShareDir: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - AI
+  - policy
+  - LLM
+  - policy
+  - automation
+  - policy
+  - code
+  - generation
+  - metadata
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-AutomationPolicy
+provides:
+  Dist::AutomationPolicy:
+    file: lib/Dist/AutomationPolicy.pm
+    version: v0.2.2
+requires:
+  Carp: '0'
+  File::ShareDir: '0'
+  JSON: '0'
+  JSON::Schema::Validate: v0.7.0
+  Moo: '0'
+  Path::Tiny: '0.130'
+  PerlX::Maybe: '0'
+  experimental: '0'
+  namespace::clean: '0'
+  perl: v5.24.0
+resources:
+  bugtracker: https://github.com/robrwo/perl-Dist-AutomationPolicy/issues
+  repository: git://github.com/robrwo/perl-Dist-AutomationPolicy.git
+version: v0.2.2
+x_authority: cpan:RRWO
+x_contributors:
+  - 'Leon Timmermans <fawaka@gmail.com>'
+x_generated_by_perl: v5.42.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: Artistic-2.0

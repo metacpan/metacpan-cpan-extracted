@@ -1,5 +1,5 @@
 package Audio::Nama;
-our $VERSION = "1.602";
+our $VERSION = "1.603";
 use v5.36;
 #use Carp::Always;
 no warnings qw(uninitialized syntax);
@@ -33,11 +33,12 @@ use Storable qw(thaw);
 use Term::ReadLine;
 use Text::Diff;
 use Text::Format;
-use Tickit;
 use Tickit::Async;
-use Tickit::Widgets qw(Static ScrollBox VBox);
-use Audio::Nama::Entry; # modified Tickit::Widget::Entry to bind printable keys
-use Tickit::Widget::Entry::Plugin::Completion;
+use Tickit::Widget::Scroller::Item::Text;
+### We use our versions of these modules
+use Audio::Nama::Entry;      # modified Tickit::Widget::Entry to bind printable keys
+use Audio::Nama::Completion; # modified Tickit::Widget::Entry::Plugin::Completion for directory handling
+use Audio::Nama::Console;	  # modified Tickit::Widget::Console to avoid redefine warnings
 use Tie::Simple;
 use Try::Tiny;
 use Path::Tiny;
@@ -163,11 +164,11 @@ sub main {
 	nama_cmd($config->{execute_on_project_load});
 	nama_cmd($config->{opts}->{X});
 	reconfigure_engine();
-	if (not $ti{3}){
+	if (not $ti{3}){ # no user tracks
 		say "Enter command to begin or type 'h' for help.";
 		$this_track = $tn{Main};
 	}
-	create_entry_widget();
+	show_prompt();
 	$ui->loop();
 }
 
@@ -457,7 +458,7 @@ import_audio:
     Import a sound file (wav, ogg, mp3, etc.) to the
     current track, resampling it if necessary. The 
     imported file is set as current version.
-  short: import
+  short: imp import
   parameters: <string:full_path_to_file> [ <integer:frequency> ]
   example: |
     import /home/samples/bells.flac 
@@ -3708,7 +3709,7 @@ _add_track: /add_track\b/ | /add\b/ | /new\b/ { "add_track" }
 _add_midi_track: /add_midi_track\b/ | /amt\b/ { "add_midi_track" } 
 _add_tracks: /add_tracks\b/ { "add_tracks" } 
 _link_track: /link_track\b/ | /link\b/ { "link_track" } 
-_import_audio: /import_audio\b/ | /import\b/ { "import_audio" } 
+_import_audio: /import_audio\b/ | /imp\b/ | /import\b/ { "import_audio" } 
 _import_midi: /import_midi\b/ | /im\b/ { "import_midi" } 
 _route_track: /route_track\b/ | /route\b/ | /rt\b/ { "route_track" } 
 _set_track: /set_track\b/ { "set_track" } 
@@ -4507,7 +4508,6 @@ realtime_profile: nonrealtime # other choices: realtime or auto
 
 use_metronome: 0
 
-use_autocomplete_popup: 0
 press_space_to_start_transport: 1 
 
 # The buffer size settings below apply only when JACK is *not* used

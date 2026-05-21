@@ -16,6 +16,9 @@ like( "$@", qr/^mock is not allowed in strict mode. Please use define or redefin
 eval { $mocker->noop('foo') };
 like( "$@", qr/^noop is not allowed in strict mode. Please use define or redefine at/, "noop croaks in strict mode." );
 
+eval { $mocker->mock_all() };
+like( "$@", qr/^mock_all is not allowed in strict mode. Please use redefine at/, "mock_all croaks in strict mode." );
+
 $mocker->define( 'foo', "abc" );
 is( Mockee->foo, "abc", "define is allowed in strict mode." );
 
@@ -48,7 +51,7 @@ done_testing();
 
 #----------------------------------------------------------------------
 
-package Mockee;
+package Mockee; ## no critic (Modules::RequireFilenameMatchesPackage)
 
 our $VERSION;
 BEGIN { $VERSION = 1 }

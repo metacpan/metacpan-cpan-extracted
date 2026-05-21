@@ -10,6 +10,7 @@ build_requires:
   File::Spec: '0'
   File::Temp: '0'
   Future::AsyncAwait: '0'
+  Math::Base36: '0.07'
   SQL::Translator: '0.11018'
   Test::Exception: '0'
   Test::More: '0'
@@ -29,55 +30,55 @@ no_index:
 provides:
   DBIx::Class::Async:
     file: lib/DBIx/Class/Async.pm
-    version: '0.65'
+    version: v1.0.3
   DBIx::Class::Async::Exception:
     file: lib/DBIx/Class/Async/Exception.pm
-    version: '0.65'
+    version: v1.0.3
   DBIx::Class::Async::Exception::AmbiguousColumn:
     file: lib/DBIx/Class/Async/Exception/AmbiguousColumn.pm
-    version: '0.65'
+    version: v1.0.3
   DBIx::Class::Async::Exception::Factory:
     file: lib/DBIx/Class/Async/Exception/Factory.pm
-    version: '0.65'
+    version: v1.0.3
   DBIx::Class::Async::Exception::MissingColumn:
     file: lib/DBIx/Class/Async/Exception/MissingColumn.pm
-    version: '0.65'
+    version: v1.0.3
   DBIx::Class::Async::Exception::NoSuchRelationship:
     file: lib/DBIx/Class/Async/Exception/NoSuchRelationship.pm
-    version: '0.65'
+    version: v1.0.3
   DBIx::Class::Async::Exception::NotInStorage:
     file: lib/DBIx/Class/Async/Exception/NotInStorage.pm
-    version: '0.65'
+    version: v1.0.3
   DBIx::Class::Async::Exception::RelationshipAsColumn:
     file: lib/DBIx/Class/Async/Exception/RelationshipAsColumn.pm
-    version: '0.65'
+    version: v1.0.3
   DBIx::Class::Async::ResultSet:
     file: lib/DBIx/Class/Async/ResultSet.pm
-    version: '0.65'
+    version: v1.0.3
   DBIx::Class::Async::ResultSet::Pager:
     file: lib/DBIx/Class/Async/ResultSet/Pager.pm
-    version: '0.65'
+    version: v1.0.3
   DBIx::Class::Async::ResultSetColumn:
     file: lib/DBIx/Class/Async/ResultSetColumn.pm
-    version: '0.65'
+    version: v1.0.3
   DBIx::Class::Async::Row:
     file: lib/DBIx/Class/Async/Row.pm
-    version: '0.65'
+    version: v1.0.3
   DBIx::Class::Async::Schema:
     file: lib/DBIx/Class/Async/Schema.pm
-    version: '0.65'
+    version: v1.0.3
   DBIx::Class::Async::SelectNormaliser:
     file: lib/DBIx/Class/Async/SelectNormaliser.pm
-    version: '0.65'
+    version: v1.0.3
   DBIx::Class::Async::Storage:
     file: lib/DBIx/Class/Async/Storage.pm
-    version: '0.65'
+    version: v1.0.3
   DBIx::Class::Async::Storage::DBI:
     file: lib/DBIx/Class/Async/Storage/DBI.pm
-    version: '0.65'
+    version: v1.0.3
   DBIx::Class::Async::Storage::DBI::Cursor:
     file: lib/DBIx/Class/Async/Storage/DBI/Cursor.pm
-    version: '0.65'
+    version: v1.0.3
 requires:
   CHI: '0'
   Carp: '0'
@@ -97,8 +98,9 @@ requires:
   Type::Params: '0'
   Types::Standard: '0'
   perl: '5.014'
+  version: '0.77'
 resources:
   bugtracker: https://github.com/manwar/DBIx-Class-Async/issues
   repository: https://github.com/manwar/DBIx-Class-Async.git
-version: '0.65'
+version: v1.0.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

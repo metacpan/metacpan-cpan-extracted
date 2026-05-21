@@ -2,7 +2,7 @@ MODULE = Chandra    PACKAGE = Chandra::Notify
 
 PROTOTYPES: DISABLE
 
- # ---- _xs_is_supported() — check if notifications are available ----
+ # ---- _xs_is_supported() - check if notifications are available ----
 
 int
 _xs_is_supported()
@@ -13,7 +13,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- _xs_send(\%args) — send a notification ----
+ # ---- _xs_send(\%args) - send a notification ----
 
 int
 _xs_send(args_hv)

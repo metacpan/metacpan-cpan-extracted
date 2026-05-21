@@ -25,7 +25,7 @@ my $file = "test/textReader/countries.xml";
   my $reader = XML::LibXML::Reader->new(location => $file, {expand_entities => 1});
   isa_ok($reader, "XML::LibXML::Reader");
   is($reader->read, 1, "read");
-  is($reader->byteConsumed, 488, "byteConsumed");
+  is($reader->byteConsumed, -s $file, "byteConsumed");
   is($reader->attributeCount, 0, "attributeCount");
   is($reader->baseURI, $file, "baseURI");
   is($reader->encoding, 'UTF-8', "encoding");

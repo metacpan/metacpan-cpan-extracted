@@ -3,13 +3,22 @@
 ## Lightweight DateTime Alternative - t/13.bcp47_tz.t
 ## Tests for BCP47 -u-tz- locale extension timezone inference
 ##----------------------------------------------------------------------------
+BEGIN
+{
+    use strict;
+    use warnings;
+    use lib './lib';
+    use Test::More;
+};
+
 use strict;
 use warnings;
-use lib './lib';
-use Test::More;
 
-use_ok( 'DateTime::Lite' ) or BAIL_OUT( 'Cannot load DateTime::Lite' );
-use_ok( 'DateTime::Lite::TimeZone' ) or BAIL_OUT( 'Cannot load DateTime::Lite::TimeZone' );
+BEGIN
+{
+    use_ok( 'DateTime::Lite' ) or BAIL_OUT( 'Cannot load DateTime::Lite' );
+    use_ok( 'DateTime::Lite::TimeZone' ) or BAIL_OUT( 'Cannot load DateTime::Lite::TimeZone' );
+};
 
 # NOTE: BCP47 -u-tz- extension: timezone inferred from locale
 subtest 'BCP47 -u-tz- inferred when no time_zone given' => sub
@@ -172,7 +181,10 @@ subtest 'last_day_of_month() infers timezone from -u-tz- extension' => sub
         month  => 4,
         locale => 'en-US-u-tz-usnyc',
     );
-    ok( defined( $dt ), 'last_day_of_month() succeeds with BCP47 tz locale' );
+    if( !ok( defined( $dt ), 'last_day_of_month() succeeds with BCP47 tz locale' ) )
+    {
+        diag( "Error instanciating an DateTime::Lite->last_day_of_month object: ", DateTime::Lite->last_day_of_month->error );
+    }
     is( $dt->time_zone_long_name, 'America/New_York',
         'last_day_of_month() timezone inferred as America/New_York from -u-tz-usnyc' );
     is( $dt->day, 30, 'last_day_of_month() correct day (April has 30 days)' );

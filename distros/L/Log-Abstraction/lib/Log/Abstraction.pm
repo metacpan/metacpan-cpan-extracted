@@ -1,7 +1,5 @@
 package Log::Abstraction;
 
-# TODO: add a minimum logging level
-
 use strict;
 use warnings;
 use Carp;	# Import Carp for warnings
@@ -14,19 +12,17 @@ use Return::Set;
 use Scalar::Util 'blessed';	# Import Scalar::Util for object reference checking
 use Sys::Syslog 0.28;	# Import Sys::Syslog for syslog support
 
-=encoding utf-8
-
 =head1 NAME
 
 Log::Abstraction - Logging Abstraction Layer
 
 =head1 VERSION
 
-0.27
+0.28
 
 =cut
 
-our $VERSION = 0.27;
+our $VERSION = 0.28;
 
 =head1 SYNOPSIS
 
@@ -116,6 +112,8 @@ The code will be called with a hashref containing:
 
 =item * message - an arrayref of messages
 
+=item * ctx - passed to C<new()>, a argument that can help to give context to the caller
+
 =back
 
 =item * an object
@@ -191,7 +189,7 @@ sub new {
 
 	if((scalar(@_) == 1) && (ref($_[0]) ne 'HASH')) {
 		$args{'logger'} = shift;
-	} elsif(my $params = Params::Get::get_params(undef, @_)) {
+	} elsif(my $params = Params::Get::get_params(undef, \@_)) {
 		%args = %{$params};
 	}
 
@@ -217,17 +215,19 @@ sub new {
 	}
 
 	if(!defined($class)) {
-		if((scalar keys %args) > 0) {
-			# Using Log::Abstraction:new(), not Log::Abstraction->new()
-			carp(__PACKAGE__, ' use ->new() not ::new() to instantiate');
-			return;
-		}
-
-		# FIXME: this only works when no arguments are given
+		# Using Log::Abstraction:new(), not Log::Abstraction->new()
 		$class = __PACKAGE__;
 	} elsif(Scalar::Util::blessed($class)) {
 		# If $class is an object, clone it with new arguments
 		my $clone = bless { %{$class}, %args }, ref($class);
+		if(my $level = $args{'level'}) {
+			# The clone is at a different level
+			$level = lc($level);
+			if(!defined($syslog_values{$level})) {
+				Carp::croak("$class: invalid syslog level '$level'");
+			}
+			$clone->{level} = $syslog_values{$level};
+		}
 		$clone->{messages} = [ @{$class->{messages}} ];	# Deep copy
 		return $clone;
 	}
@@ -277,6 +277,8 @@ sub new {
 		level => $syslog_values{$args{'level'}},
 	}, $class;
 }
+
+=encoding utf-8
 
 =head2 _sanitize_email_header
 
@@ -343,7 +345,7 @@ sub _log {
 	}
 
 	if(!defined($syslog_values{$level})) {
-		Carp::Croak(ref($self), ": Invalid level '$level'");	# "Can't happen"
+		Carp::croak(ref($self), ": Invalid level '$level'");	# "Can't happen"
 	}
 
 	if($syslog_values{$level} > $self->{'level'}) {
@@ -368,19 +370,23 @@ sub _log {
 		$class = '';
 	}
 
-	my $timestamp = strftime "%Y-%m-%d %H:%M:%S", localtime;
+	my $timestamp = strftime '%Y-%m-%d %H:%M:%S', localtime;
 
 	if(my $logger = $self->{'logger'}) {
 		if(ref($logger) eq 'CODE') {
 			# If logger is a code reference, call it with log details
-			$logger->({
+			my $args = {
 				class => blessed($self) || __PACKAGE__,
 				file => (caller(1))[1],
 				# function => (caller(1))[3],
 				line => (caller(1))[2],
 				level => $level,
-				message => \@messages,
-			});
+				message => \@messages
+			};
+			if(my $ctx = $self->{ctx}) {
+				$args->{ctx} = $ctx;
+			};
+			$logger->($args);
 		} elsif(ref($logger) eq 'ARRAY') {
 			# If logger is an array reference, push the log message to the array
 			push @{$logger}, { level => $level, message => $str };
@@ -410,7 +416,7 @@ sub _log {
 			if(my $array = $logger->{'array'}) {
 				push @{$array}, { level => $level, message => $str };
 			}
-			if($logger->{'sendmail'}->{'to'}) {
+			if(exists($logger->{'sendmail'}) && exists($logger->{'sendmail'}->{'to'})) {
 				# Send an email
 				# TODO: throttle the number of emails
 				if((!defined($logger->{'sendmail'}->{'level'})) ||
@@ -493,10 +499,10 @@ sub _log {
 				$format =~ s/%message%/$str/g;
 				$format =~ s/%callstack%/$callstack/g;
 				$format =~ s/%timestamp%/$timestamp/g;
-				$format =~ s/%env_(\w+)%/$ENV{$1}/g;
+				$format =~ s/%env_(\w+)%/$ENV{$1} \/\/ ''/ge;
 
 				print $fout "$format\n" or Carp::croak(ref($self), ": Can't write to file descriptor: $!");
-			} elsif((!$logger->{'file'}) && (!$logger->{'syslog'}) && (!$logger->{'sendmail'})) {
+			} elsif(!$logger->{'file'} && !$logger->{'array'} && !$logger->{'syslog'} && !exists($logger->{'sendmail'}) && !$logger->{'fd'}) {
 				croak(ref($self), ": Don't know how to deal with the $level message");
 			}
 		} elsif(!ref($logger)) {
@@ -511,7 +517,7 @@ sub _log {
 				$format =~ s/%message%/$str/g;
 				$format =~ s/%callstack%/$callstack/g;
 				$format =~ s/%timestamp%/$timestamp/g;
-				$format =~ s/%env_(\w+)%/$ENV{$1}/g;
+				$format =~ s/%env_(\w+)%/$ENV{$1} \/\/ ''/ge;
 
 				print $fout "$format\n" or Carp::croak(ref($self), ": Can't write to $logger: $!");
 				close $fout;
@@ -561,7 +567,7 @@ sub _log {
 			$format =~ s/%message%/$str/g;
 			$format =~ s/%callstack%/$callstack/g;
 			$format =~ s/%timestamp%/$timestamp/g;
-			$format =~ s/%env_(\w+)%/$ENV{$1}/g;
+			$format =~ s/%env_(\w+)%/$ENV{$1} \/\/ ''/ge;
 
 			print $fout "$format\n" or Carp::croak("ref($self): Can't write to ", $self->{'file'}, ": $!");
 			close $fout;
@@ -583,7 +589,7 @@ sub _log {
 		$format =~ s/%message%/$str/g;
 		$format =~ s/%callstack%/$callstack/g;
 		$format =~ s/%timestamp%/$timestamp/g;
-		$format =~ s/%env_(\w+)%/$ENV{$1}/g;
+		$format =~ s/%env_(\w+)%/$ENV{$1} \/\/ ''/ge;
 
 		print $fout "$format\n" or Carp::croak(ref($self), ": Can't write to file descriptor: $!");
 	}
@@ -682,7 +688,7 @@ sub notice {
 
 Logs an error message. This method also supports logging to syslog if configured.
 If not logging mechanism is set,
-falls back to C<Croak>.
+falls back to C<croak>.
 
 =cut
 
@@ -734,6 +740,7 @@ falls back to C<Carp>.
 sub warn {
 	my $self = shift;
 
+	return if(scalar(@_) == 0);
 	$self->_high_priority('warn', @_);
 }
 
@@ -747,30 +754,45 @@ sub _high_priority
 {
 	my $self = shift;
 	my $level = shift;	# 'warn' or 'error'
-	my $params = Params::Get::get_params('warning', @_);	# Get parameters
 
-	# Validate input parameters
-	return unless ($params && (ref($params) eq 'HASH'));
+	return if(scalar(@_) == 0);	# No message - return quickly
 
-	# Only logging things higher than warn level
+	# Only logging things at warning or higher
 	return if($syslog_values{$level} > $WARNING);
 
-	my $warning = $params->{warning};
-	if(!defined($warning)) {
-		if(scalar(@_) && !ref($_[0])) {
-			# Given an array
-			$warning = join('', @_);
-		} else {
-			return;
+	my $warning;
+
+	# Check if called as warn(warning => ...) or warn('plain', 'args')
+	my $params;
+	eval { $params = Params::Get::get_params('warning', @_) };
+	if($@ || !$params || ref($params) ne 'HASH' || !exists($params->{warning})) {
+		# Plain list form — join directly
+		$warning = join('', grep { defined } @_);
+		return unless length($warning);
+	} else {
+		$warning = $params->{warning};
+		return unless defined($warning);
+		if(ref($warning) eq 'ARRAY') {
+			$warning = join('', grep { defined } @{$warning});
 		}
 	}
-	if(ref($warning) eq 'ARRAY') {
-		# Given "message => [ ref to array ]"
-		$warning = join('', @{$warning});
+
+	if($params && ref($params) eq 'HASH' && exists($params->{warning})) {
+		$warning = $params->{warning};
+		return unless defined($warning);	# warn(warning => undef) → no-op
+		if(ref($warning) eq 'ARRAY') {
+			# Given "warning => [ ref to array ]"
+			$warning = join('', grep { defined } @{$warning});
+		}
+	} else {
+		# Plain list: warn('This ', 'is ', 'a ', 'list')
+		# Filter undefs and join
+		$warning = join('', grep { defined } @_);
+		return unless length($warning);		# all-undef list → no-op
 	}
 
 	if($self eq __PACKAGE__) {
-		# If called from a class method, use Croak/Carp to warn
+		# If called from a class method, use croak/carp to warn
 		if($syslog_values{$level} <= $ERROR) {
 			Carp::croak($warning);
 		}
@@ -782,13 +804,13 @@ sub _high_priority
 	$self->_log($level, $warning);
 
 	if($syslog_values{$level} <= $ERROR) {
-		# Fall back to Croak if no logger or syslog is defined
-		if($self->{'croak_on_error'} || !defined($self->{logger})) {
+		# Fall back to croak if no logger or syslog is defined
+		if($self->{'croak_on_error'} || (!defined($self->{logger}) && (!defined($self->{array})))) {
 			Carp::croak($warning);
 		}
 	}
 
-	if($self->{'carp_on_warn'} || !defined($self->{logger})) {
+	if($self->{'carp_on_warn'} || (!defined($self->{logger}) && (!defined($self->{array})))) {
 		# Fallback to Carp if no logger or syslog is defined
 		Carp::carp($warning);
 	}
@@ -799,7 +821,7 @@ sub DESTROY {
 	my $self = $_[0];
 
 	if($self->{_syslog_opened}) {
-		closelog();
+		Sys::Syslog::closelog();
 		delete $self->{_syslog_opened};
 	}
 }
@@ -812,7 +834,7 @@ Nigel Horne C<njh@nigelhorne.com>
 
 =over 4
 
-=item * Test coverage report: L<https://nigelhorne.github.io/Log-Abstraction/coverage/>
+=item * L<Test Dashboard|https://nigelhorne.github.io/Log-Abstraction/coverage/>
 
 =back
 
@@ -856,8 +878,9 @@ L<http://deps.cpantesters.org/?module=Log::Abstraction>
 
 Copyright (C) 2025-2026 Nigel Horne
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
 
 =cut
 

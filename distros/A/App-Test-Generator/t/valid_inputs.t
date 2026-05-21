@@ -1,8 +1,9 @@
 #!/usr/bin/env perl
+
 use strict;
 use warnings;
 
-use Test::DescribeMe qw(extended);
+# use Test::DescribeMe qw(extended);
 use Test::Most;
 use File::Temp qw(tempdir);
 

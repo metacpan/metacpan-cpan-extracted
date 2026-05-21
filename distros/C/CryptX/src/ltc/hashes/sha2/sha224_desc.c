@@ -27,7 +27,7 @@ const struct ltc_hash_descriptor sha224_desc =
     NULL
 };
 
-#if defined LTC_SHA256_X86
+#if defined LTC_SHA224_X86
 
 #if !defined (LTC_S_X86_CPUID)
 #define LTC_S_X86_CPUID

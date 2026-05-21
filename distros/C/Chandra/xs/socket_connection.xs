@@ -400,7 +400,7 @@ CODE:
 
     payload_len = SvCUR(payload);
 
-    /* pack('N', length) . payload — build frame in C */
+    /* pack('N', length) . payload - build frame in C */
     len_buf[0] = (payload_len >> 24) & 0xFF;
     len_buf[1] = (payload_len >> 16) & 0xFF;
     len_buf[2] = (payload_len >> 8) & 0xFF;
@@ -411,7 +411,7 @@ CODE:
     SvREFCNT_dec(payload);
     frame_len = SvCUR(frame);
 
-    /* Ignore SIGPIPE during syswrite — portable across OS */
+    /* Ignore SIGPIPE during syswrite - portable across OS */
     {
         SigpipeGuard spg;
         SV *written_sv;

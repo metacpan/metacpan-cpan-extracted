@@ -1,0 +1,14 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	perl Makefile.PL INSTALLDIRS=vendor
+
+override_dh_auto_test:
+	$(MAKE) test
+
+# Skip dh_perl on non-Debian systems where dpkg doesn't track Perl
+override_dh_perl:
+	@echo "Skipping dh_perl (not on Debian)"

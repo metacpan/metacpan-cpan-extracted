@@ -79,6 +79,7 @@ lib/Langertha/Engine/Ollama.pm
 lib/Langertha/Engine/OllamaOpenAI.pm
 lib/Langertha/Engine/OpenAI.pm
 lib/Langertha/Engine/OpenAIBase.pm
+lib/Langertha/Engine/OpenAIResponses.pm
 lib/Langertha/Engine/OpenRouter.pm
 lib/Langertha/Engine/Perplexity.pm
 lib/Langertha/Engine/Remote.pm
@@ -170,6 +171,7 @@ t/44_streaming_future.t
 t/45_async_await.t
 t/46_gemini_requests.t
 t/50_list_models.t
+t/60_responses_requests.t
 t/60_tool_calling.t
 t/61_tool_calling_openai.t
 t/62_tool_calling_gemini.t
@@ -194,6 +196,7 @@ t/82_live_raider.t
 t/83_live_chat.t
 t/83_live_minimax.t
 t/84_live_imagegen.t
+t/85_live_responses.t
 t/85_raider_result.t
 t/86_raider_self_tools.t
 t/87_raider_plugins.t
@@ -219,6 +222,9 @@ t/data/mistral_models.json
 t/data/ollama_tool_call_response.json
 t/data/ollama_tool_result_response.json
 t/data/openai_models.json
+t/data/responses_api_text.json
+t/data/responses_api_toolcall.json
+t/data/responses_api_toolcall_toplevel.json
 t/data/testfile
 t/lib/LangerthaX/Engine/TestEngine.pm
 t/lib/Test/MockAsyncHTTP.pm

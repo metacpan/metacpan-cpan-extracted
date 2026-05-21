@@ -35,7 +35,7 @@ BEGIN
 }
 
 # module/package version
-$VERSION = '0.49';
+$VERSION = '0.50';
 
 # file creation mode (octal, a la chmod)
 $FILEMODE = 0660;

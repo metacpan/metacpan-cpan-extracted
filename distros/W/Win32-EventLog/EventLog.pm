@@ -1,7 +1,7 @@
 #
 # EventLog.pm
 #
-# Creates an object oriented interface to the Windows NT Evenlog
+# Creates an object oriented interface to the Windows NT event log
 # Written by Jesse Dougherty
 #
 
@@ -9,7 +9,7 @@ package Win32::EventLog;
 
 use strict;
 use vars qw($VERSION $AUTOLOAD @ISA @EXPORT $GetMessageText);
-$VERSION = '0.077';
+$VERSION = '0.079';
 
 require Exporter;
 require DynaLoader;
@@ -227,7 +227,7 @@ __END__
 
 =head1 NAME
 
-Win32::EventLog - Process Win32 Event Logs from Perl
+Win32::EventLog - Process Win32 Event Logs
 
 =head1 SYNOPSIS
 
@@ -459,13 +459,15 @@ file $dest exists, the function will fail.
 
 =head1 BUGS
 
-None currently known.
+See L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Win32-EventLog>
 
 The test script for 'make test' should be re-written to use the
 EventLog object.
 
 =head1 AUTHOR
 
-Original code by Jesse Dougherty for HiP Communications. Additional
-fixes and updates attributed to Martin Pauley
-<martin.pauley@ulsterbank.ltd.uk>) and Bret Giddings (bret@essex.ac.uk).
+Original code by Jesse Dougherty for HiP Communications.
+
+Additional fixes and updates attributed to Martin Pauley
+(<martin.pauley@ulsterbank.ltd.uk>), Bret Giddings (<bret@essex.ac.uk>)
+and Olivier MenguE<eacute> (<dolmen@cpan.org>).

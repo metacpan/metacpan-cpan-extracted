@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::DescribeMe qw(extended);	# New features
+# use Test::DescribeMe qw(extended);	# New features
 use File::Temp qw(tempfile);
 use Test::Most;
 use YAML::XS qw(LoadFile);

@@ -1,0 +1,98 @@
+name: testsuite
+
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+
+jobs:
+
+  # a cheap and easy job to avoid checking all Perl versions
+  ubuntu:
+    env:
+      PERL_USE_UNSAFE_INC: 0
+      AUTHOR_TESTING: 1
+      AUTOMATED_TESTING: 1
+      RELEASE_TESTING: 1
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - run: perl -V
+      - name: install dependencies
+        uses: perl-actions/install-with-cpm@v1.8
+        with:
+          install: |
+            Module::Build
+            JSON
+            LWP::UserAgent
+            URI::Encode
+            Test::Fake::HTTPD
+            IO::Capture
+            Test::More
+            Test::Pod::Coverage
+      - run: perl Build.PL
+      - run: ./Build
+      - run: ./Build test
+
+  perl:
+    env:
+      # some plugins still needs this to run their tests...
+      PERL_USE_UNSAFE_INC: 0
+      AUTHOR_TESTING: 1
+      AUTOMATED_TESTING: 1
+      RELEASE_TESTING: 1
+
+    runs-on: ubuntu-latest
+
+    needs: [ubuntu]
+
+    strategy:
+      fail-fast: false
+      matrix:
+        perl-version:
+          - '5.38'
+          - '5.36'
+          - '5.34'
+          - '5.32'
+          - '5.30'
+          - '5.28'
+          - '5.26'
+          - '5.24'
+          - '5.22'
+          - '5.20'
+          - '5.18'
+          - '5.16'
+          - '5.14'
+          - '5.12'
+          - '5.10'
+
+    container:
+      image: perldocker/perl-tester:${{ matrix.perl-version }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - run: perl -V
+      - name: install dependencies
+        # cpanm rather than cpm here: cpm's bootstrap script needs Perl
+        # >= 5.24 and would refuse to run on the older matrix entries.
+        uses: perl-actions/install-with-cpanm@v1
+        with:
+          # perldocker container runs as root and ships no sudo binary
+          sudo: false
+          install: |
+            Module::Build
+            JSON
+            LWP::UserAgent
+            URI::Encode
+            Test::Fake::HTTPD
+            IO::Capture
+            Test::More
+            Test::Pod::Coverage
+      - run: perl Build.PL
+      - run: ./Build
+      - run: ./Build test

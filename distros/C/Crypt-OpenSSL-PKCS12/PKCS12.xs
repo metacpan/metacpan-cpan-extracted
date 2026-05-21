@@ -452,7 +452,7 @@ int dump_certs_pkeys_bags(pTHX_ BIO *bio, CONST_STACK_OF(PKCS12_SAFEBAG) *bags, 
   return 1;
 }
 
-int dump_certs_keys_p12(pTHX_ BIO *bio, PKCS12 *p12, char *pass, int passlen, int options, char *pempass, HV * orig_hash) {
+int dump_certs_keys_p12(pTHX_ BIO *bio, PKCS12 *p12, const char *pass, int passlen, int options, char *pempass, HV * orig_hash) {
 
   STACK_OF(PKCS7) *asafes;
   STACK_OF(PKCS12_SAFEBAG) *bags;
@@ -679,7 +679,11 @@ void print_attribute(pTHX_ BIO *out, CONST_ASN1_TYPE *av, char **attribute)
 
   case V_ASN1_OCTET_STRING:
     if(*attribute != NULL) {
-      Renew(*attribute, av->value.octet_string->length * 4, char);
+      if (av->value.octet_string->length < 0 ||
+          av->value.octet_string->length > INT_MAX / 4)
+        croak("OCTET STRING attribute length out of range (got %d)",
+              av->value.octet_string->length);
+      Renew(*attribute, (size_t)av->value.octet_string->length * 4, char);
       get_hex(*attribute, av->value.octet_string->data, av->value.octet_string->length);
     } else {
       hex_prin(out, av->value.octet_string->data,
@@ -690,7 +694,11 @@ void print_attribute(pTHX_ BIO *out, CONST_ASN1_TYPE *av, char **attribute)
 
   case V_ASN1_BIT_STRING:
     if(*attribute != NULL) {
-      Renew(*attribute, av->value.bit_string->length *4, char);
+      if (av->value.bit_string->length < 0 ||
+          av->value.bit_string->length > INT_MAX / 4)
+        croak("BIT STRING attribute length out of range (got %d)",
+              av->value.bit_string->length);
+      Renew(*attribute, (size_t)av->value.bit_string->length * 4, char);
       get_hex(*attribute, av->value.bit_string->data, av->value.bit_string->length);
     } else {
       hex_prin(out, av->value.bit_string->data,
@@ -1122,31 +1130,58 @@ as_string(pkcs12)
   RETVAL
 
 SV*
-mac_ok(pkcs12, pwd = "")
+mac_ok(pkcs12, pwd = &PL_sv_undef)
   Crypt::OpenSSL::PKCS12 pkcs12
-  char *pwd
+  SV *pwd
+
+  PREINIT:
+  STRLEN pwd_len = 0;
+  const char *pwd_str = "";
 
   CODE:
 
-  if (!(PKCS12_verify_mac(pkcs12, pwd, strlen(pwd)))) {
-    croak("PKCS12_verify_mac: \n%s", ssl_error(aTHX));
+  if (SvOK(pwd)) {
+    pwd_str = SvPV(pwd, pwd_len);
+    if (pwd_len > (STRLEN)INT_MAX)
+      croak("password length exceeds INT_MAX");
   }
 
-  RETVAL = (PKCS12_verify_mac(pkcs12, pwd, strlen(pwd))) ? &PL_sv_yes : &PL_sv_no;
+  if (!(PKCS12_verify_mac(pkcs12, pwd_str, (int)pwd_len)))
+    croak("PKCS12_verify_mac: \n%s", ssl_error(aTHX));
+
+  RETVAL = &PL_sv_yes;
 
   OUTPUT:
   RETVAL
 
 SV*
-changepass(pkcs12, oldpwd = "", newpwd = "")
+changepass(pkcs12, oldpwd = &PL_sv_undef, newpwd = &PL_sv_undef)
   Crypt::OpenSSL::PKCS12 pkcs12
-  char *oldpwd
-  char *newpwd
+  SV *oldpwd
+  SV *newpwd
+
+  PREINIT:
+  STRLEN oldpwd_len = 0, newpwd_len = 0;
+  const char *oldpwd_str = "";
+  const char *newpwd_str = "";
 
   CODE:
 
-  if (!(PKCS12_newpass(pkcs12, oldpwd, newpwd))) {
-    warn("PKCS12_newpass: %s %s\n%s", oldpwd, newpwd, ssl_error(aTHX));
+  if (SvOK(oldpwd)) {
+    oldpwd_str = SvPV(oldpwd, oldpwd_len);
+    if (memchr(oldpwd_str, '\0', oldpwd_len) != NULL)
+      croak("old PKCS12 password contains embedded NUL byte; "
+            "PKCS12_newpass() uses strlen() and would silently truncate it");
+  }
+  if (SvOK(newpwd)) {
+    newpwd_str = SvPV(newpwd, newpwd_len);
+    if (memchr(newpwd_str, '\0', newpwd_len) != NULL)
+      croak("new PKCS12 password contains embedded NUL byte; "
+            "PKCS12_newpass() uses strlen() and would silently truncate it");
+  }
+
+  if (!(PKCS12_newpass(pkcs12, oldpwd_str, newpwd_str))) {
+    warn("PKCS12_newpass failed: %s", ssl_error(aTHX));
     RETVAL = &PL_sv_no;
   } else {
     RETVAL = &PL_sv_yes;
@@ -1156,10 +1191,10 @@ changepass(pkcs12, oldpwd = "", newpwd = "")
   RETVAL
 
 SV*
-create(pkcs12, cert_chain_pem = "", pk = "", pass = 0, file = 0, name = "PKCS12 Certificate")
+create(pkcs12, cert_chain_pem = "", pk = "", pass = &PL_sv_undef, file = 0, name = "PKCS12 Certificate")
   char *cert_chain_pem
   char *pk
-  char *pass
+  SV *pass
   char *file
   char *name
 
@@ -1168,12 +1203,21 @@ create(pkcs12, cert_chain_pem = "", pk = "", pass = 0, file = 0, name = "PKCS12 
   EVP_PKEY* pkey;
   PKCS12 *p12;
   STACK_OF(X509) *cert_chain = NULL;
+  STRLEN pass_len = 0;
+  const char *pass_str = NULL;
 
   CODE:
 
+  if (SvOK(pass)) {
+    pass_str = SvPV(pass, pass_len);
+    if (memchr(pass_str, '\0', pass_len) != NULL)
+      croak("PKCS12 password contains embedded NUL byte; "
+            "PKCS12_create() uses strlen() and would silently truncate it");
+  }
+
   pkey       = _load_pkey(pk, PEM_read_bio_PrivateKey);
   cert_chain = _load_cert_chain(cert_chain_pem, PEM_X509_INFO_read_bio);
-  p12        = PKCS12_create(pass, name, pkey, sk_X509_shift(cert_chain), cert_chain, 0, 0, 0, 0, 0);
+  p12        = PKCS12_create(pass_str, name, pkey, sk_X509_shift(cert_chain), cert_chain, 0, 0, 0, 0, 0);
 
   if (!p12) {
     ERR_print_errors_fp(stderr);
@@ -1196,10 +1240,10 @@ create(pkcs12, cert_chain_pem = "", pk = "", pass = 0, file = 0, name = "PKCS12 
 
 
 SV*
-create_as_string(pkcs12, cert_chain_pem = "", pk = "", pass = 0, name = "PKCS12 Certificate")
+create_as_string(pkcs12, cert_chain_pem = "", pk = "", pass = &PL_sv_undef, name = "PKCS12 Certificate")
   char *cert_chain_pem
   char *pk
-  char *pass
+  SV *pass
   char *name
 
   PREINIT:
@@ -1207,12 +1251,21 @@ create_as_string(pkcs12, cert_chain_pem = "", pk = "", pass = 0, name = "PKCS12 
   EVP_PKEY* pkey;
   PKCS12 *p12;
   STACK_OF(X509) *cert_chain = NULL;
+  STRLEN pass_len = 0;
+  const char *pass_str = NULL;
 
   CODE:
 
+  if (SvOK(pass)) {
+    pass_str = SvPV(pass, pass_len);
+    if (memchr(pass_str, '\0', pass_len) != NULL)
+      croak("PKCS12 password contains embedded NUL byte; "
+            "PKCS12_create() uses strlen() and would silently truncate it");
+  }
+
   pkey       = _load_pkey(pk, PEM_read_bio_PrivateKey);
   cert_chain = _load_cert_chain(cert_chain_pem, PEM_X509_INFO_read_bio);
-  p12        = PKCS12_create(pass, name, pkey, sk_X509_shift(cert_chain), cert_chain, 0, 0, 0, 0, 0);
+  p12        = PKCS12_create(pass_str, name, pkey, sk_X509_shift(cert_chain), cert_chain, 0, 0, 0, 0, 0);
 
   if (!p12) {
     ERR_print_errors_fp(stderr);
@@ -1229,22 +1282,30 @@ create_as_string(pkcs12, cert_chain_pem = "", pk = "", pass = 0, name = "PKCS12 
   RETVAL
 
 SV*
-certificate(pkcs12, pwd = "")
+certificate(pkcs12, pwd = &PL_sv_undef)
   Crypt::OpenSSL::PKCS12 pkcs12
-  char *pwd
+  SV *pwd
 
   PREINIT:
   BIO *bio;
   STACK_OF(PKCS7) *asafes = NULL;
+  STRLEN pwd_len = 0;
+  const char *pwd_str = "";
 
   CODE:
+
+  if (SvOK(pwd)) {
+    pwd_str = SvPV(pwd, pwd_len);
+    if (pwd_len > (STRLEN)INT_MAX)
+      croak("password length exceeds INT_MAX");
+  }
 
   CHECK_OPEN_SSL(bio = BIO_new(BIO_s_mem()));
 
   if ((asafes = PKCS12_unpack_authsafes(pkcs12)) == NULL)
         RETVAL = newSVpvn("",0);
 
-  dump_certs_keys_p12(aTHX_ bio, pkcs12, pwd, strlen(pwd), CLCERTS|NOKEYS, NULL, NULL);
+  dump_certs_keys_p12(aTHX_ bio, pkcs12, pwd_str, (int)pwd_len, CLCERTS|NOKEYS, NULL, NULL);
 
   RETVAL = extractBioString(aTHX_ bio);
 
@@ -1252,22 +1313,30 @@ certificate(pkcs12, pwd = "")
   RETVAL
 
 SV*
-ca_certificate(pkcs12, pwd = "")
+ca_certificate(pkcs12, pwd = &PL_sv_undef)
   Crypt::OpenSSL::PKCS12 pkcs12
-  char *pwd
+  SV *pwd
 
   PREINIT:
   BIO *bio;
   STACK_OF(PKCS7) *asafes = NULL;
+  STRLEN pwd_len = 0;
+  const char *pwd_str = "";
 
   CODE:
+
+  if (SvOK(pwd)) {
+    pwd_str = SvPV(pwd, pwd_len);
+    if (pwd_len > (STRLEN)INT_MAX)
+      croak("password length exceeds INT_MAX");
+  }
 
   CHECK_OPEN_SSL(bio = BIO_new(BIO_s_mem()));
 
   if ((asafes = PKCS12_unpack_authsafes(pkcs12)) == NULL)
         RETVAL = newSVpvn("",0);
 
-  dump_certs_keys_p12(aTHX_ bio, pkcs12, pwd, strlen(pwd), CACERTS|NOKEYS, NULL, NULL);
+  dump_certs_keys_p12(aTHX_ bio, pkcs12, pwd_str, (int)pwd_len, CACERTS|NOKEYS, NULL, NULL);
 
   RETVAL = extractBioString(aTHX_ bio);
 
@@ -1275,33 +1344,43 @@ ca_certificate(pkcs12, pwd = "")
   RETVAL
 
 SV*
-private_key(pkcs12, pwd = "")
+private_key(pkcs12, pwd = &PL_sv_undef)
   Crypt::OpenSSL::PKCS12 pkcs12
-  char *pwd
+  SV *pwd
 
   PREINIT:
   BIO *bio;
+  STRLEN pwd_len = 0;
+  const char *pwd_str = "";
 
   CODE:
+
+  if (SvOK(pwd)) {
+    pwd_str = SvPV(pwd, pwd_len);
+    if (pwd_len > (STRLEN)INT_MAX)
+      croak("password length exceeds INT_MAX");
+  }
 
   CHECK_OPEN_SSL(bio = BIO_new(BIO_s_mem()));
 
   PKCS12_unpack_authsafes(pkcs12);
 
-  dump_certs_keys_p12(aTHX_ bio, pkcs12, pwd, strlen(pwd), NOCERTS, NULL, NULL);
+  dump_certs_keys_p12(aTHX_ bio, pkcs12, pwd_str, (int)pwd_len, NOCERTS, NULL, NULL);
 
   RETVAL = extractBioString(aTHX_ bio);
 
   OUTPUT:
   RETVAL
 
-HV* info_as_hash(pkcs12, pwd = "")
+HV* info_as_hash(pkcs12, pwd = &PL_sv_undef)
   Crypt::OpenSSL::PKCS12 pkcs12
-  char *pwd
+  SV *pwd
 
   PREINIT:
   BIO *bio;
   STACK_OF(PKCS7) *asafes = NULL;
+  STRLEN pwd_len = 0;
+  const char *pwd_str = "";
 
   CONST_ASN1_INTEGER *tmaciter;
 #if OPENSSL_VERSION_NUMBER > 0x10100000L
@@ -1313,6 +1392,11 @@ HV* info_as_hash(pkcs12, pwd = "")
 #endif
 
   CODE:
+  if (SvOK(pwd)) {
+    pwd_str = SvPV(pwd, pwd_len);
+    if (pwd_len > (STRLEN)INT_MAX)
+      croak("password length exceeds INT_MAX");
+  }
   RETVAL = newHV();
 
   CHECK_OPEN_SSL(bio = BIO_new(BIO_s_mem()));
@@ -1353,7 +1437,7 @@ HV* info_as_hash(pkcs12, pwd = "")
 
   if((hv_store(RETVAL, "mac", strlen("mac"), newRV_inc((SV *) mac), 0)) == NULL)
     croak("unable to add MAC to the hash");
-  dump_certs_keys_p12(aTHX_ bio, pkcs12, pwd, strlen(pwd), INFO, NULL, RETVAL);
+  dump_certs_keys_p12(aTHX_ bio, pkcs12, pwd_str, (int)pwd_len, INFO, NULL, RETVAL);
 
   SV * end = extractBioString(aTHX_ bio);
 
@@ -1369,13 +1453,15 @@ HV* info_as_hash(pkcs12, pwd = "")
   RETVAL
 
 SV*
-info(pkcs12, pwd = "")
+info(pkcs12, pwd = &PL_sv_undef)
   Crypt::OpenSSL::PKCS12 pkcs12
-  char *pwd
+  SV *pwd
 
   PREINIT:
   BIO *bio;
   STACK_OF(PKCS7) *asafes = NULL;
+  STRLEN pwd_len = 0;
+  const char *pwd_str = "";
 
   CONST_ASN1_INTEGER *tmaciter;
 #if OPENSSL_VERSION_NUMBER > 0x10100000L
@@ -1385,6 +1471,12 @@ info(pkcs12, pwd = "")
   CONST_ASN1_OCTET_STRING *tsalt;
 #endif
   CODE:
+
+  if (SvOK(pwd)) {
+    pwd_str = SvPV(pwd, pwd_len);
+    if (pwd_len > (STRLEN)INT_MAX)
+      croak("password length exceeds INT_MAX");
+  }
 
   CHECK_OPEN_SSL(bio = BIO_new(BIO_s_mem()));
 
@@ -1409,7 +1501,7 @@ info(pkcs12, pwd = "")
   BIO_printf(bio, "MAC Iteration %ld\n",
         tmaciter != NULL ? ASN1_INTEGER_get(tmaciter) : 1L);
   /* If we enter empty password try no password first */
-  if (!PKCS12_verify_mac(pkcs12, pwd, -1)) {
+  if (!PKCS12_verify_mac(pkcs12, pwd_str, (int)pwd_len)) {
     BIO_printf(bio, "Mac verify error: invalid password?\n");
     ERR_print_errors(bio);
     goto end;
@@ -1417,7 +1509,7 @@ info(pkcs12, pwd = "")
   BIO_printf(bio, "MAC verified OK\n");
   end:
 #endif
-  dump_certs_keys_p12(aTHX_ bio, pkcs12, pwd, strlen(pwd), INFO, NULL, NULL);
+  dump_certs_keys_p12(aTHX_ bio, pkcs12, pwd_str, (int)pwd_len, INFO, NULL, NULL);
 
   RETVAL = extractBioString(aTHX_ bio);
 

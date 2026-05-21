@@ -187,12 +187,14 @@ REVISIONS
     [MetaYAML]
     [MetaJSON]
     [License]
-    [ReadmeAnyFromPod]
+    [Pod2Readme]
     [PodSyntaxTests]
     [Test::ReportPrereqs]
     [Test::Compile]
         xt_mode = 1
 
+    [MetaMergeFile]
+    [PrereqsFile]
     [MakeMaker]
     [Manifest]
     [PruneCruft]
@@ -204,8 +206,6 @@ REVISIONS
     [TestRelease]
     [ConfirmRelease]
     [UploadToCPAN]
-    [MetaMergeFile]
-    [PrereqsFile]
     [MetaNoIndex]
         directory = t
         directory = xt

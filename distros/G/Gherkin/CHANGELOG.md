@@ -8,12 +8,33 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 
 ## [Unreleased]
 
+## [39.1.0] - 2026-05-06
+### Added
+- (i18n) Expanded Turkish keywords ([#567](https://github.com/cucumber/gherkin/pull/567))
+
+### Changed
+- [Ruby, Python, JavaScript, Perl, C++, .NET] Optimise parser class/speed by removing redundant null `#detach` method ([#561](https://github.com/cucumber/gherkin/pull/561)).
+- [Ruby] Changed `ParserMessageStream` to accept keyword arguments allowing the `Gherkin` class methods to be slightly more optimal ([#560](https://github.com/cucumber/gherkin/pull/560)).
+
+### Fixed
+- [c] Fixed memory leak with respect to the pickle ast ids.
+- [c] Fixed potential read past null terminator. Fixed allocation of more memory than necessary ([#559](https://github.com/cucumber/gherkin/pull/559)).
+- [PHP] Fix PHP 8.4 deprecation warnings ([#550](https://github.com/cucumber/gherkin/pull/550)).
+- [cpp] Added missing include guard in parser.hpp ([#554](https://github.com/cucumber/gherkin/pull/554))
+- [cpp] Removed unreachable code in parser.hpp ([#554](https://github.com/cucumber/gherkin/pull/554))
+
+### Removed
+- [Python] Drop support for python 3.9.
+
 ## [39.0.0] - 2026-03-01
 ### Added
 - (i18n) Added Korean translation of "Rule" ([#544](https://github.com/cucumber/gherkin/pull/544))
 
 ### Changed
 - [PHP] Require PHP 8.2+ in CI and in composer.json.
+
+### Fixed
+- [cpp] Removed unused vector_type definition ([#549](https://github.com/cucumber/gherkin/pull/549)).
 
 ### Security
 - [Python] Fixed hidden file reading behavior in `Parser.parse` ([#541](https://github.com/cucumber/gherkin/pull/541)).
@@ -890,7 +911,8 @@ This document is formatted according to the principles of [Keep A CHANGELOG](htt
 ### Changed
 - First release
 
-[Unreleased]: https://github.com/cucumber/gherkin/compare/v39.0.0...HEAD
+[Unreleased]: https://github.com/cucumber/gherkin/compare/v39.1.0...HEAD
+[39.1.0]: https://github.com/cucumber/gherkin/compare/v39.0.0...v39.1.0
 [39.0.0]: https://github.com/cucumber/gherkin/compare/v38.0.0...v39.0.0
 [38.0.0]: https://github.com/cucumber/gherkin/compare/v37.0.1...v38.0.0
 [37.0.1]: https://github.com/cucumber/gherkin/compare/v37.0.0...v37.0.1

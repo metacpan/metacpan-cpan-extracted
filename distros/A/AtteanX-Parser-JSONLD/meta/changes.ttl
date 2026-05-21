@@ -28,7 +28,20 @@ my:project
 	:bug-database			<https://github.com/kasei/atteanx-parser-jsonld/issues> ;
 	doap:download-page		<http://search.cpan.org/dist/AtteanX-Parser-JSONLD/> ;
 	doap:download-mirror	<http://kasei.us/code/files/> ;
-	:release				my:v_0-001 ;
+	:release				my:v_0-001 , my:v_0-002 ;
+	.
+
+my:v_0-002
+	a					:Version ;
+	dc:issued			"2026-05-06"^^xsd:date ;
+	:revision			"0.002" ;
+	dcs:changeset [
+		dcs:item
+			[ a dcs:Update ; rdfs:label "Update Makefile.PL to use GNU tar on MacOS when creating new releases." ] ,
+			[ a dcs:Update ; rdfs:label "Use v5.18 throughout the module (#4 from @gregoa)." ] ,
+			[ a dcs:Update ; rdfs:label "Improve naming terminology in README and POD (#3)." ] ,
+			[ a dcs:Update ; rdfs:label "Fix typo in references to JSON-LD 1.1 (#2)." ]
+	]
 	.
 
 my:v_0-001

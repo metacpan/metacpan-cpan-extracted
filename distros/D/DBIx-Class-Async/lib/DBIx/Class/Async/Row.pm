@@ -1,7 +1,11 @@
 package DBIx::Class::Async::Row;
 
-$DBIx::Class::Async::Row::VERSION   = '0.65';
-$DBIx::Class::Async::Row::AUTHORITY = 'cpan:MANWAR';
+use strict;
+use warnings;
+use version;
+
+our $VERSION   = qv('v1.0.3');
+our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
@@ -9,7 +13,7 @@ DBIx::Class::Async::Row - Asynchronous Row object representing a single database
 
 =head1 VERSION
 
-Version 0.65
+Version v1.0.3
 
 =head1 SYNOPSIS
 
@@ -138,8 +142,6 @@ Shorthand for C<< $row->related_resultset($rel)->create($data) >>.
 
 =cut
 
-use strict;
-use warnings;
 use utf8;
 use v5.14;
 

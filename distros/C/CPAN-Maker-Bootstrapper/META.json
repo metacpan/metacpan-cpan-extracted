@@ -1,0 +1,132 @@
+{
+   "abstract" : "CPAN::Maker::Bootstrapper",
+   "author" : [
+      "Rob Lauer <rclauer@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "CPAN-Maker-Bootstrapper",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "LLM::API" : "v1.0.0",
+            "Term::ANSIColor" : "0"
+         },
+         "requires" : {
+            "CLI::Simple" : "v2.0.0",
+            "CPAN::Maker" : "v1.9.0",
+            "Class::Accessor::Fast" : "0.51",
+            "Config::Tiny" : "2.30",
+            "Email::Valid" : "1.204",
+            "File::Copy::Recursive" : "0.45",
+            "File::HomeDir" : "1.006",
+            "File::ShareDir" : "1.118",
+            "JSON::PP" : "0",
+            "Markdown::Render" : "0",
+            "Module::Metadata" : "0",
+            "Pod::Extract" : "0",
+            "Pod::Markdown" : "0",
+            "Readonly" : "2.05",
+            "Role::Tiny" : "0",
+            "Role::Tiny::With" : "2.002004",
+            "Text::ASCIITable" : "0.22",
+            "Text::Markdown::Discount" : "0",
+            "YAML::Tiny" : "1.76",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {}
+      }
+   },
+   "provides" : {
+      "CPAN::Maker::Bootstrapper" : {
+         "file" : "lib/CPAN/Maker/Bootstrapper.pm",
+         "version" : "v2.0.2"
+      },
+      "CPAN::Maker::Bootstrapper::ConfigReader" : {
+         "file" : "lib/CPAN/Maker/Bootstrapper/ConfigReader.pm",
+         "version" : "0"
+      },
+      "CPAN::Maker::Bootstrapper::Constants" : {
+         "file" : "lib/CPAN/Maker/Bootstrapper/Constants.pm",
+         "version" : "0"
+      },
+      "CPAN::Maker::Bootstrapper::Role::CreateConfig" : {
+         "file" : "lib/CPAN/Maker/Bootstrapper/Role/CreateConfig.pm",
+         "version" : "0"
+      },
+      "CPAN::Maker::Bootstrapper::Role::Init" : {
+         "file" : "lib/CPAN/Maker/Bootstrapper/Role/Init.pm",
+         "version" : "0"
+      },
+      "CPAN::Maker::Bootstrapper::Role::Installer" : {
+         "file" : "lib/CPAN/Maker/Bootstrapper/Role/Installer.pm",
+         "version" : "0"
+      },
+      "CPAN::Maker::Bootstrapper::Role::LLM::Annotator" : {
+         "file" : "lib/CPAN/Maker/Bootstrapper/Role/LLM/Annotator.pm",
+         "version" : "0"
+      },
+      "CPAN::Maker::Bootstrapper::Role::LLM::Models" : {
+         "file" : "lib/CPAN/Maker/Bootstrapper/Role/LLM/Models.pm",
+         "version" : "0"
+      },
+      "CPAN::Maker::Bootstrapper::Role::LLM::ReleaseNotes" : {
+         "file" : "lib/CPAN/Maker/Bootstrapper/Role/LLM/ReleaseNotes.pm",
+         "version" : "0"
+      },
+      "CPAN::Maker::Bootstrapper::Role::LLM::Reviewer" : {
+         "file" : "lib/CPAN/Maker/Bootstrapper/Role/LLM/Reviewer.pm",
+         "version" : "0"
+      },
+      "CPAN::Maker::Bootstrapper::Role::LLM::Utils" : {
+         "file" : "lib/CPAN/Maker/Bootstrapper/Role/LLM/Utils.pm",
+         "version" : "0"
+      },
+      "CPAN::Maker::Bootstrapper::Role::ScaffoldImporter" : {
+         "file" : "lib/CPAN/Maker/Bootstrapper/Role/ScaffoldImporter.pm",
+         "version" : "0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "rclauer@gmail.com",
+         "web" : "http://github.com/rlauer6/CPAN-Maker-Bootstrapper/issues"
+      },
+      "homepage" : "http://github.com/rlauer6/CPAN-Maker-Bootstrapper",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rlauer6/CPAN-Maker-Bootstrapper.git",
+         "web" : "http://github.com/rlauer6/CPAN-Maker-Bootstrapper"
+      }
+   },
+   "version" : "v2.0.2",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

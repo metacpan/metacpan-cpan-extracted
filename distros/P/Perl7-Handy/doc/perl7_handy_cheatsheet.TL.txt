@@ -1,0 +1,156 @@
+======================================================================
+ Perl7::Handy Cheat Sheet                           [TL] Filipino
+======================================================================
+
+[ 1. Installation ]
+
+  I-install:
+    cpan Perl7::Handy
+
+  Gamitin sa script:
+    use Perl7::Handy;
+
+  Epekto (Perl 5.010001 pataas):
+    * use strict               -- nagpapatupad ng deklarasyon ng variable
+    * use warnings             -- nagbubukas ng mga babala
+    * no bareword::filehandles -- tinatanggihan ang estilo ng open(FILE,...)
+    * no multidimensional      -- nino-off ang emulasyon ng $hash{a,b}
+    * use feature qw(signatures)  (Perl 5.020+)
+    * no feature qw(indirect)     (Perl 5.031009+)
+
+  Epekto (Perl 5.005_03 -- 5.008):
+    * use strict
+    * open/opendir/sysopen/pipe/socket/accept na may autovivification
+    # socket() ay hindi nag-autodie sa kabiguan (nagbabalik ng false sa void context)
+    * $; trap batay sa tie (pinipigilan ang emulasyon ng multi-dimensional array)
+
+[ 2. open() -- autovivification ]
+
+  my $fh;
+  open($fh, "< file.txt");   # basahin
+  open($fh, "> file.txt");   # isulat (palitan)
+  open($fh, ">> file.txt");  # idagdag
+  open($fh, "+< file.txt");  # basahin/isulat
+  while (my $line = readline($fh)) { ... }
+  print $fh "text\n";
+  close($fh);
+
+  # tinanggihan ang bareword handle:
+  open(FILE, "< file.txt");   # dies: Use of bareword handle in open
+
+[ 3. open() -- 3-arg ]
+
+  my $fh;
+  open($fh, '<',  "file.txt");   # basahin
+  open($fh, '>',  "file.txt");   # isulat (palitan)
+  open($fh, '>>', "file.txt");   # idagdag
+  open($fh, '+<', "file.txt");   # basahin/isulat
+  open($fh, '+>', "file.txt");   # basahin/isulat (palitan)
+  open($fh, '-|', "cmd");        # basahin mula sa pipe ng utos
+  open($fh, '|-', "cmd");        # isulat sa pipe ng utos
+
+[ 4. opendir() / sysopen() ]
+
+  my $dh;
+  opendir($dh, "/path/to/dir");
+  while (my $e = readdir($dh)) {
+      next if $e eq '.' or $e eq '..';
+      print "$e\n";
+  }
+  closedir($dh);
+
+  use Fcntl qw(O_RDONLY O_WRONLY O_CREAT O_TRUNC);
+  my $fh;
+  sysopen($fh, "file.txt", O_RDONLY);
+  sysopen($fh, "file.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+
+[ 5. pipe() ]
+
+  my($reader, $writer);
+  pipe($reader, $writer);
+  if (my $pid = fork()) {
+      close($writer);
+      while (my $line = readline($reader)) { print $line }
+      close($reader);
+  } else {
+      close($reader);
+      print $writer "Kumusta mula sa prosesong bata\n";
+      close($writer);
+      exit 0;
+  }
+
+[ 6. socket() / accept() ]
+
+  use Socket qw(AF_INET SOCK_STREAM sockaddr_in inet_aton);
+  my $server;
+  socket($server, AF_INET, SOCK_STREAM, 0);
+  # Tandaan: Hindi nag-autodie ang socket() sa kabiguan; suriin ang return value nang malinaw.
+  my $client;
+  accept($client, $server);
+
+[ 7. no bareword::filehandles ]
+
+  # tinanggihan ang bareword handle:
+  open(FILE, "< file.txt");    # error: Bareword filehandle
+  print FILE "hello\n";        # error: Bareword filehandle
+
+  # gumamit ng lexical na variable:
+  my $fh;
+  open($fh, "< file.txt");
+  print $fh "hello\n";
+  close($fh);
+
+[ 8. no multidimensional ]
+
+  # naka-off ang emulasyon ng multi-dimensional hash:
+  my %h;
+  $h{1,2} = "val";    # error: Use of multidimensional array emulation
+
+  # gumamit ng malinaw na susi:
+  $h{"$x,$y"} = "val";
+
+[ 9. Signatures (Perl 5.020+) ]
+
+  # awtomatikong pinagana ang mga signature; pinigilan ang mga babala
+  use Perl7::Handy;
+
+  sub greet($name) { return "Hello, $name!" }
+  sub add($x, $y)  { return $x + $y }
+
+[ 10. no indirect (Perl 5.031009+) ]
+
+  # naka-off ang indirect na syntax ng object:
+  my $obj = new MyClass;   # error: indirect syntax
+
+  # gumamit ng direktang syntax:
+  my $obj = MyClass->new;
+
+[ 11. CVE-2016-1238 ]
+
+  # Inaalis ng Perl7::Handy ang kasalukuyang direktoryo mula sa @INC sa startup.
+  # BEGIN { pop @INC if $INC[-1] eq '.' }
+
+[ 12. Talahanayan ng compatibility ]
+
+  Feature              5.005_03  5.006-009  5.010+  5.020+  5.031009+
+  -------------------  --------  ---------  ------  ------  ---------
+  strict               yes       yes        yes     yes     yes
+  warnings             no        yes        yes     yes     yes
+  autovivif. open()    yes       yes        yes*    yes*    yes*
+  no bareword FH       emulated  emulated   yes     yes     yes
+  no multidim.         tie       tie        yes     yes     yes
+  signatures           no        no         no      yes     yes
+  no indirect          no        no         no      no      yes
+
+[ 13. Official resources ]
+
+  Perl7::Handy (MetaCPAN):
+    https://metacpan.org/dist/Perl7-Handy
+
+  bareword::filehandles:
+    https://metacpan.org/dist/bareword-filehandles
+
+  INABA Hitoshi (ina) on CPAN:
+    https://metacpan.org/author/INA
+
+======================================================================

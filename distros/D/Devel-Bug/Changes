@@ -1,0 +1,37 @@
+Revision history for Devel-Bug
+
+0.08  2026-05-18
+    - Raise MIN_PERL_VERSION to 5.020; no Perl version below 5.20 has ever passed
+      CPAN Testers across any release.
+    - Simplify lvalue sub: use inline my declarations, drop package variable workarounds.
+
+0.07  2026-05-17
+    - Move local() for lvalue package variables to sub scope (not if-block scope),
+      fixing "Bizarre copy of ARRAY in block exit" on Perl 5.14-5.18.
+
+0.06  2026-05-17
+    - Fix lvalue sub failures on Perl 5.12-5.16: use localized package variables
+      (@lvArray, $lvScalar) instead of lexicals or deref expressions, avoiding both
+      "Can't return a temporary from lvalue subroutine" and "Bizarre copy of ARRAY".
+
+0.05  2026-05-16
+    - Refactor lvalue sub to return deref expressions (@$r, $$r) instead of
+      named lexicals, to fix "Can't return a temporary from lvalue subroutine"
+      on Perl 5.8-5.12.
+    - Fix ambiguous bare caller in import().
+
+0.04  2026-05-15
+    - Skip Data::Dump and Term::Size::Perl tests when not installed (optional deps).
+
+0.03  2026-05-15
+    - Fix @info{(CALLER_INFO)} hash slice to avoid scalar-context warning on older Perls.
+    - Fix lvalue sub to avoid "Bizarre copy of ARRAY in return" on affected Perl versions.
+    - Add GitHub repository and RT bugtracker to META_MERGE resources.
+
+0.02  2026-05-14
+    - Fix PAX headers in dist tarball (use GNU tar on macOS).
+    - Add LICENSE, SECURITY.md, CONTRIBUTING.md.
+    - Add provides and GNU tar to Makefile.PL.
+
+0.01  2026-04-29
+    - Initial release.

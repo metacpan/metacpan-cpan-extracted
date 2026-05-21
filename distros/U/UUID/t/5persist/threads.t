@@ -38,8 +38,7 @@ BEGIN {
 
 use threads;
 use threads::shared;
-use Test::More;
-use MyNote;
+use MyTest;
 use Try::Tiny;
 
 use vars qw(@OPTS);

@@ -1,5 +1,5 @@
 package Crypt::Argon2;
-$Crypt::Argon2::VERSION = '0.030';
+$Crypt::Argon2::VERSION = '0.031';
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ our @EXPORT_OK = qw/
 	argon2id_raw argon2id_pass argon2id_verify
 	argon2i_raw argon2i_pass argon2i_verify
 	argon2d_raw argon2_pass argon2_verify
-	argon2_needs_rehash argon2_types/;
+	argon2_needs_rehash argon2_types argon2_implementation/;
 use XSLoader;
 XSLoader::load(__PACKAGE__, __PACKAGE__->VERSION || 0);
 
@@ -53,7 +53,7 @@ Crypt::Argon2 - Perl interface to the Argon2 key derivation functions
 
 =head1 VERSION
 
-version 0.030
+version 0.031
 
 =head1 SYNOPSIS
 
@@ -156,6 +156,10 @@ This function checks if a password-encoded string needs a rehash. It will return
 
 This returns all supported argon2 subtypes. Currently that's C<'argon2id'>, C<'argon2i'> and C<'argon2d'>.
 
+=head2 argon2_implementation
+
+This returns the implementation that is used. Possible values include C<"avx512">, C<"avx2">, C<"sse3">, and C<"reference">.
+
 =head2 ACKNOWLEDGEMENTS
 
 This module is based on the reference implementation as can be found at L<https://github.com/P-H-C/phc-winner-argon2>.
@@ -196,7 +200,7 @@ An implementation of scrypt, a older scheme that also tries to be memory hard.
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

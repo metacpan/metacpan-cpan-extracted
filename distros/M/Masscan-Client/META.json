@@ -4,7 +4,7 @@
       "Heitor Gouvea <hgouvea@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,17 +32,24 @@
       },
       "runtime" : {
          "requires" : {
-            "JSON" : "0",
-            "Moose" : "0",
-            "MooseX::AttributeShortcuts" : "0",
-            "MooseX::StrictConstructor" : "0",
-            "MooseX::Types::Moose" : "0",
-            "MooseX::Types::Structured" : "0",
-            "Net::DNS" : "0"
+            "Data::Validate::Domain" : "0.15",
+            "Data::Validate::IP" : "0.31",
+            "JSON" : "4.11",
+            "Log::Log4perl" : "1.57",
+            "Log::Log4perl::Appender::ScreenColoredLevels::UsingMyColors" : "0.117",
+            "Moose" : "2.4000",
+            "MooseX::AttributeShortcuts" : "0.037",
+            "MooseX::StrictConstructor" : "0.21",
+            "MooseX::Types::Moose" : "0.51",
+            "MooseX::Types::Structured" : "0.36",
+            "Net::DNS" : "1.54",
+            "Try::Catch" : "v1.1.0",
+            "namespace::autoclean" : "0.31",
+            "perl" : "5.020000"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.2",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.21",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

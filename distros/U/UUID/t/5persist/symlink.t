@@ -3,24 +3,23 @@
 #
 use strict;
 use warnings;
-use Test::More;
-use MyNote;
-use Config;
 use File::Spec ();
-use File::Temp ();
-
-use vars qw(@OPTS $TMPDIR $TARG $FULL);
 
 BEGIN {
     my $eummh = File::Spec->catfile(qw(ulib EUMM.h));
     open my $fh, '<', $eummh or die "open: $eummh: $!";
     my $conf = join '', <$fh>;
     return 1 if $conf =~ /define HAVE_SYMLINK/;
-    plan skip_all => 'no symlinks';
+    print "1..0 # SKIP no symlinks\n";
+    exit 0;
 }
 
+use MyTest;
+use File::Temp ();
+use vars qw(@OPTS $TMPDIR $TARG $FULL);
+
 BEGIN {
-    $TMPDIR = File::Temp::tempdir(CLEANUP => 1);
+    $TMPDIR = File::Temp::tempdir('UUID-test-XXXXXXXX', TMPDIR => 1, CLEANUP => 1);
     ok -d $TMPDIR, 'tmpdir exists';
 
     $TARG = 'foo.txt';

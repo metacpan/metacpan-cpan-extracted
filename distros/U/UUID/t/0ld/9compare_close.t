@@ -1,6 +1,7 @@
 use warnings;
-use Test::More tests => 52;
+use MyTest;
 use UUID 'uuid';
+plan tests => 52;
 
 
 # core dumps seemed to be triggered mainly when
@@ -22,4 +23,4 @@ for my $n ( 1 .. 50 ) {
     ok 1, "close $n";
 }
 
-exit 0;
+done_testing;

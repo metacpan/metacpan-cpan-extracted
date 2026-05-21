@@ -23,10 +23,9 @@ for my $l (@lookups) {
         my ($status, @txt) = @_;
         if ($status == ARES_SUCCESS) {
             for my $rec (@txt) {
-                next unless $label eq 'SPF'   && $rec =~ /^v=spf/
-                         || $label eq 'DMARC' && $rec =~ /^v=DMARC/
-                         || $label eq 'DKIM'  && $rec =~ /^v=DKIM/
-                         || $label eq 'DKIM';  # DKIM records vary
+                # SPF/DMARC are version-prefixed; DKIM records vary, print all
+                next if $label eq 'SPF'   && $rec !~ /^v=spf/i;
+                next if $label eq 'DMARC' && $rec !~ /^v=DMARC/i;
                 printf "%-6s %s\n  %s\n", $label, $name, $rec;
             }
         } else {

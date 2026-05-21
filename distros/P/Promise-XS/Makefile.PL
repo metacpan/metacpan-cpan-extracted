@@ -25,6 +25,7 @@ WriteMakefile(
        AUTHOR         => [
             'Felipe Gasper (FELIPE)',
             'Tom van der Woerdt <tomvanderwoerdt@sd.apple.com>',
+	    'Takahiro Shimizu (ANATOFUZ)',
         ],
       ) : ()
     ),
@@ -40,8 +41,8 @@ WriteMakefile(
         resources => {
             repository => {
                 type => 'git',
-                url => 'git://github.com/FGasper/p5-Promise-XS.git',
-                web => 'https://github.com/FGasper/p5-Promise-XS',
+                url => 'git://github.com/AnaTofuZ/p5-Promise-XS.git',
+                web => 'https://github.com/AnaTofuZ/p5-Promise-XS',
             },
             bugtracker => {
                 web => 'https://github.com/FGasper/p5-Promise-XS/issues',

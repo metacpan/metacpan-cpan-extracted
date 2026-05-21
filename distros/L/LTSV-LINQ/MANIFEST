@@ -22,6 +22,7 @@ t/0009-v102-methods.t
 t/0011-groupjoin.t
 t/0012-v103-ordering.t
 t/0013-v104-thenby.t
+t/0014-concurrent-fh.t
 t/9001-load.t
 t/9010-encoding.t
 t/9020-perl5compat.t

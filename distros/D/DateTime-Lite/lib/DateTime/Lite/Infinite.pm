@@ -383,7 +383,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 Copyright(c) 2026 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

@@ -26,7 +26,7 @@ existing test-file that illustrates the bug or desired feature.
 Using the bugtracker is preferable to emailing the maintainer, as identified
 in the AUTHOR section of the POD.  But if you are unable to use the
 bugtracker, then you may email the current maintainer,
-Robert Rothenberg <rrwo@cpan.org>.
+Robert Rothenberg <perl@rhizomnic.com>.
 
 ### Reporting Security Vulnerabilities
 

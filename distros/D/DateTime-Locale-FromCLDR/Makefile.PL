@@ -37,11 +37,13 @@ my %WriteMakefileArgs = (
     },
     TEST_REQUIRES =>
     {
-        'lib'           => '0.63',
+        'lib'           => 0,
         'utf8'          => 0,
         'version'       => 0,
-        # 2008-02-29
-        'DateTime'      => '0.42',
+        # NOTE: DateTime::Lite and DateTime are intentionally not declared here to avoid
+        # a circular dependency with DateTime::Lite. The DST tests detect whichever is
+        # available at runtime; if neither is installed, the tests are skipped.
+        # 'DateTime::Lite' => 0,
         # Foreign key constraints since SQLite v3.6.19 (2009-10-14)
         # DBD::SQLite 1.27 (2009-11-23)
         'DBD::SQLite'   => '1.27',

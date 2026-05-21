@@ -20,5 +20,5 @@ Failing that manual install:
     make test
     make install
 
-If installing manually dependecies will have to be installed
+If installing manually dependencies will have to be installed
 individually.

@@ -1,12 +1,15 @@
-0.0.4	2025-09-29  Released-By: Volodymyr Pidgornyi
-	- Minor CPAN compatibility fixes.
+0.0.5	2026-05-20 Released-By: Volodymyr Pidgornyi
+	- new getter methods added
 
-0.0.3	2025-09-18  Released-By: Volodymyr Pidgornyi
+0.0.4	2025-09-29 Released-By: Volodymyr Pidgornyi
+	- minor CPAN compatibility fixes
+
+0.0.3	2025-09-18 Released-By: Volodymyr Pidgornyi
 	- PAUSE compatibility issues fixed
 
-0.0.2	2025-09-18  Released-By: Volodymyr Pidgornyi
+0.0.2	2025-09-18 Released-By: Volodymyr Pidgornyi
 	- sayf() method added
-        - Initial public release
+        - initial public release
 
-0.0.1	2025-08-18  Released-By: Volodymyr Pidgornyi
-        - Initial release
+0.0.1	2025-08-18 Released-By: Volodymyr Pidgornyi
+        - initial release

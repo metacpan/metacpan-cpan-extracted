@@ -22,7 +22,7 @@ no_index:
 requires:
   Carp: '0'
   Locale::AU: '0'
-  Locale::CA: '0'
+  Locale::CA: '0.09'
   Locale::Object::Country: '0'
   Locale::US: '0'
   Object::Configure: '0'
@@ -34,5 +34,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Address-Parser-Country
   homepage: https://metacpan.org/pod/Geo::Address::Parser::Country
   repository: git://github.com/nigelhorne/Geo-Address-Parser-Country.git
-version: '0.02'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

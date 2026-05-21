@@ -15,6 +15,15 @@
   # From a JSON string
   my $q = JSON::LINQ->FromJSONString('[{"id":1},{"id":2}]');
 
+  # From an LTSV file (label:value, TAB-separated, streaming)
+  my $q = JSON::LINQ->FromLTSV('data.ltsv');
+  # From a CSV file (first row = header, streaming)
+  my $q = JSON::LINQ->FromCSV('data.csv');
+  my $q = JSON::LINQ->FromCSV('data.csv', sep => "\t");        # TSV
+  my $q = JSON::LINQ->FromCSV('f.csv', headers=>[qw(a b c)]); # headerless
+  my $q = JSON::LINQ->FromCSV('f.csv', headers=>[qw(a b c)],  # skip existing
+                               skip_header=>1);
+
   # From an in-memory array
   my $q = JSON::LINQ->From(\@array);
 
@@ -124,6 +133,35 @@
               orders => [ $i_group->ToArray() ] } }
   )
 
+  # JOIN: main JSON x sub-table LTSV (department lookup)
+  my $depts = JSON::LINQ->FromLTSV('departments.ltsv');
+  JSON::LINQ->FromJSON('employees.json')
+      ->Join($depts,
+          sub { $_[0]{dept_id} },
+          sub { $_[0]{id}      },
+          sub { { name => $_[0]{name}, dept => $_[1]{name} } })
+      ->ToArray();
+
+  # JOIN: main LTSV x sub-table JSON (price master)
+  my $prices = JSON::LINQ->FromJSON('prices.json');
+  JSON::LINQ->FromLTSV('orders.ltsv')
+      ->Join($prices,
+          sub { $_[0]{sku} },
+          sub { $_[0]{sku} },
+          sub { { order_id => $_[0]{id},
+                  amount   => $_[0]{qty} * $_[1]{price} } })
+      ->ToArray();
+
+  # JOIN: main CSV x sub-table JSON (price master)
+  my $prices = JSON::LINQ->FromJSON('prices.json');
+  JSON::LINQ->FromCSV('orders.csv')
+      ->Join($prices,
+          sub { $_[0]{sku} },
+          sub { $_[0]{sku} },
+          sub { { order_id => $_[0]{id},
+                  amount   => $_[0]{qty} * $_[1]{price} } })
+      ->ToArray();
+
 [ 9. Aggregation (terminal methods) ]
 
   ->ToArray()                            # collect all elements
@@ -172,6 +210,14 @@
              sub { $_[0]{name} })
   ->ToJSON('output.json')               # write as JSON array file
   ->ToJSONL('output.jsonl')             # write as JSONL file
+  ->ToLTSV('output.ltsv')                        # write as LTSV file (all keys, alphabetical)
+  ->ToLTSV('out.ltsv', label_order=>[qw(a b c)]) # emit specified labels in order
+  ->ToLTSV('out.ltsv', headers    =>[qw(a b c)]) # alias for label_order
+  ->ToCSV('output.csv')                                   # write as CSV file (all keys, alphabetical)
+  ->ToCSV('out.csv', headers    =>[qw(a b c)])            # emit specified columns in order
+  ->ToCSV('out.csv', label_order=>[qw(a b c)])            # alias for headers
+  ->ToCSV('out.csv', sep=>"\t")                           # TSV output
+  ->ToCSV('out.csv', no_header=>1)                        # suppress header row
 
 [ 12. Boolean Values ]
 

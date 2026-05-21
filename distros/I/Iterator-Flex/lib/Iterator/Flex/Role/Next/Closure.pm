@@ -6,9 +6,9 @@ use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
-use Iterator::Flex::Utils 'NEXT';
+use Iterator::Flex::Utils 'NEXT', 'throw_failure';
 use Scalar::Util;
 use Role::Tiny;
 use experimental 'signatures';
@@ -63,7 +63,7 @@ Iterator::Flex::Role::Next::Closure - Construct a next() method for iterators wi
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 METHODS
 

@@ -18,7 +18,8 @@ SYNOPSIS
         $kafka->connect(sub {
             $kafka->produce('my-topic', 'key', 'value', sub {
                 my ($result, $err) = @_;
-                say "produced at offset " . $result->{topics}[0]{partitions}[0]{base_offset};
+                my $off = $result->{topics}[0]{partitions}[0]{base_offset};
+                print "produced at offset $off\n";
             });
         });
 
@@ -45,7 +46,7 @@ DESCRIPTION
 
     *   EV::Kafka::Conn (XS) -- single broker TCP connection with protocol
         encoding/decoding, correlation ID matching, pipelining, optional TLS
-        and SASL/PLAIN authentication.
+        and SASL (PLAIN, SCRAM-SHA-256/512) authentication.
 
     *   EV::Kafka::Client (Perl) -- cluster management with metadata
         discovery, broker connection pooling, partition leader routing,
@@ -61,19 +62,22 @@ DESCRIPTION
     *   Metadata-driven partition leader routing
 
     *   Producer: acks modes (-1/0/1), key-based partitioning (murmur2),
-        headers, fire-and-forget (acks=0)
+        headers, fire-and-forget (acks=0), idempotent producer with
+        epoch-bump recovery, transactional / exactly-once stream processing
 
     *   Consumer: manual partition assignment, offset tracking, poll-based
-        message delivery
+        message delivery; consumer groups with
+        JoinGroup/SyncGroup/Heartbeat, sticky partition assignment, offset
+        commit/fetch, automatic rebalancing, session-expiry recovery
 
-    *   Consumer groups: JoinGroup/SyncGroup/Heartbeat, sticky partition
-        assignment, offset commit/fetch, automatic rebalancing
+    *   Compression: lz4, gzip, zstd, snappy (each gated by build-time
+        library detection)
 
-    *   TLS (OpenSSL) and SASL/PLAIN authentication
+    *   TLS (OpenSSL) and SASL/PLAIN, SCRAM-SHA-256/512 (with full RFC 5802
+        server-signature verification)
 
-    *   Automatic reconnection at the connection layer
-
-    *   Bootstrap broker failover (tries all listed brokers)
+    *   Automatic reconnection at the connection layer; bootstrap-broker
+        failover; periodic metadata refresh
 
 ANYEVENT INTEGRATION
     AnyEvent has EV as one of its backends, so EV::Kafka can be used in
@@ -117,7 +121,8 @@ CLUSTER CLIENT METHODS
         Skip TLS certificate verification.
 
     sasl => \%opts
-        Enable SASL authentication. Supports PLAIN mechanism:
+        Enable SASL authentication. Supported mechanisms: "PLAIN",
+        "SCRAM-SHA-256", "SCRAM-SHA-512".
 
             sasl => { mechanism => 'PLAIN', username => 'user', password => 'pass' }
 
@@ -134,12 +139,15 @@ CLUSTER CLIENT METHODS
 
     compression => 'Str'
         Compression type for produce batches: 'lz4' (requires liblz4),
-        'gzip' (requires zlib), or "undef" for none.
+        'gzip' (requires zlib), 'zstd' (requires libzstd), 'snappy'
+        (requires libsnappy), or "undef" for none.
 
     idempotent => Bool (default 0)
         Enable idempotent producer. Calls "InitProducerId" on connect and
         sets producer_id/epoch/sequence in each RecordBatch for exactly-once
-        delivery (broker-side deduplication).
+        delivery (broker-side deduplication). Only one batch per (topic,
+        partition) is in-flight at a time when this is enabled, to prevent
+        sequence-number aliasing on retry.
 
     transactional_id => 'Str'
         Enable transactional producer. Implies idempotent. Required for
@@ -160,7 +168,8 @@ CLUSTER CLIENT METHODS
         Message delivery callback for consumer operations.
 
     fetch_max_wait_ms => Int (default 500)
-        Maximum time the broker waits for "fetch_min_bytes" of data.
+        Maximum time the broker waits to accumulate "fetch_min_bytes" of
+        data before returning a fetch response.
 
     fetch_max_bytes => Int (default 1048576)
         Maximum bytes per fetch response.
@@ -169,14 +178,18 @@ CLUSTER CLIENT METHODS
         Minimum bytes before the broker responds to a fetch.
 
     metadata_refresh => Int (default 300)
-        Metadata refresh interval in seconds (reserved, not yet wired).
+        Periodic metadata refresh interval in seconds. Set to 0 to disable.
+        Refreshes happen in the background, so consumers and producers pick
+        up leader changes without waiting for a request to fail first.
 
-    loop => EV::Loop
-        EV loop to use. Default: "EV::default_loop".
+    loop => $ev_loop
+        EV loop object to use. Default: "EV::default_loop".
 
-  connect($cb)
+  connect([$cb])
     Connect to the cluster. Connects to the first available bootstrap
-    broker, fetches cluster metadata, then fires "$cb-"($metadata)>.
+    broker, fetches cluster metadata, then fires $cb->($metadata). On
+    bootstrap-broker failure the next address is tried; if all fail, the
+    "on_error" handler fires.
 
         $kafka->connect(sub {
             my $meta = shift;
@@ -251,9 +264,11 @@ CLUSTER CLIENT METHODS
         });
 
   error_name($code)
-    Convert a Kafka numeric error code to its name.
+    Convert a Kafka numeric error code to its name. Callable as a method or
+    class function.
 
-        EV::Kafka::Client::error_name(3)  # "UNKNOWN_TOPIC_OR_PARTITION"
+        $kafka->error_name(3);                  # "UNKNOWN_TOPIC_OR_PARTITION"
+        EV::Kafka::Client::error_name(3);       # same
 
   poll([$cb])
     Fetch messages from assigned partitions. Calls "on_message" for each
@@ -261,9 +276,10 @@ CLUSTER CLIENT METHODS
 
         my $timer = EV::timer 0, 0.1, sub { $kafka->poll };
 
-  subscribe($topic, ..., %opts)
-    Join a consumer group and subscribe to topics. The group protocol
-    handles partition assignment automatically.
+  subscribe(@topics, %opts)
+    Join a consumer group and subscribe to one or more topics. The list of
+    topic names comes first, followed by option key/value pairs. The group
+    protocol handles partition assignment automatically.
 
         $kafka->subscribe('topic-a', 'topic-b',
             group_id           => 'my-group',
@@ -356,7 +372,8 @@ LOW-LEVEL CONNECTION METHODS
         });
 
     Options: "acks" (default 1), "headers" (hashref), "timestamp" (epoch ms,
-    default now), "compression" ('none', 'lz4'; requires LZ4 at build time).
+    default now), "compression" ('none', 'lz4', 'gzip', 'zstd', 'snappy';
+    each requires its respective library at build time).
 
   produce_batch($topic, $partition, \@records, [\%opts,] [$cb])
     Produce multiple records in a single RecordBatch. Each record is "{key,
@@ -368,8 +385,10 @@ LOW-LEVEL CONNECTION METHODS
             { key => 'k2', value => 'v2' },
         ], sub { my ($result, $err) = @_ });
 
-  fetch($topic, $partition, $offset, $cb, [$max_bytes])
-    Fetch messages from a partition starting at $offset.
+  fetch($topic, $partition, $offset, [\%opts,] $cb)
+    Fetch messages from a partition starting at $offset. %opts may set
+    "max_bytes" (per-partition cap, default 1 MiB), "max_wait_ms" (broker
+    block-time, default 500), "min_bytes" (default 1).
 
         $conn->fetch('topic', 0, 0, sub {
             my ($result, $err) = @_;
@@ -379,9 +398,10 @@ LOW-LEVEL CONNECTION METHODS
             }
         });
 
-  fetch_multi(\%topics, $cb, [$max_bytes])
+  fetch_multi(\%topics, [\%opts,] $cb)
     Multi-partition fetch in a single request. Groups multiple
-    topic-partitions into one Fetch call to the broker.
+    topic-partitions into one Fetch call to the broker. %opts accepts the
+    same keys as "fetch".
 
         $conn->fetch_multi({
             'topic-a' => [{ partition => 0, offset => 10 },
@@ -389,7 +409,9 @@ LOW-LEVEL CONNECTION METHODS
             'topic-b' => [{ partition => 0, offset => 0 }],
         }, sub { my ($result, $err) = @_ });
 
-    Used internally by poll() to batch fetches by broker leader.
+    Used internally by poll() to batch fetches by broker leader, with
+    "max_bytes"/"max_wait_ms"/"min_bytes" taken from the cluster client
+    config.
 
   list_offsets($topic, $partition, $timestamp, $cb)
     Get offsets by timestamp. Use -2 for earliest, -1 for latest.
@@ -421,10 +443,9 @@ LOW-LEVEL CONNECTION METHODS
         my $vers = $conn->api_versions;
         # { 0 => 7, 1 => 11, 3 => 8, ... }
 
-  on_error([$cb])
-  on_connect([$cb])
-  on_disconnect([$cb])
-    Set handler callbacks. Pass "undef" to clear.
+  on_error([$cb]), on_connect([$cb]), on_disconnect([$cb])
+    Set connection-level handler callbacks. Call with no argument or "undef"
+    to clear.
 
   client_id($id)
     Set the client identifier.
@@ -545,13 +566,18 @@ ERROR HANDLING
         0   No error
         1   OFFSET_OUT_OF_RANGE
         3   UNKNOWN_TOPIC_OR_PARTITION
-        6   NOT_LEADER_OR_FOLLOWER
-        15  COORDINATOR_NOT_AVAILABLE
-        16  NOT_COORDINATOR
-        25  UNKNOWN_MEMBER_ID
-        27  REBALANCE_IN_PROGRESS
+        6   NOT_LEADER_OR_FOLLOWER       (retried by the producer)
+        15  COORDINATOR_NOT_AVAILABLE    (retried)
+        16  NOT_COORDINATOR              (retried)
+        22  ILLEGAL_GENERATION           (group rejoin)
+        25  UNKNOWN_MEMBER_ID            (group rejoin)
+        27  REBALANCE_IN_PROGRESS        (group rejoin)
         36  TOPIC_ALREADY_EXISTS
-        79  MEMBER_ID_REQUIRED
+        45  OUT_OF_ORDER_SEQUENCE_NUMBER (idempotent: epoch bump)
+        46  DUPLICATE_SEQUENCE_NUMBER    (idempotent: epoch bump)
+        79  MEMBER_ID_REQUIRED           (group rejoin with assigned id)
+
+    Use EV::Kafka::Client::error_name($code) for the full list.
 
     When a broker disconnects mid-flight, all pending callbacks receive
     "(undef, "connection closed by broker")" or "(undef, "disconnected")".
@@ -686,25 +712,28 @@ COOKBOOK
 
 BENCHMARKS
     Measured on Linux with TCP loopback to Redpanda, 100-byte values, Perl
-    5.40.2, 50K messages ("bench/benchmark.pl"):
+    5.40.2, 20K messages ("bench/benchmark.pl"):
 
-        Pipeline produce (acks=1)    68K msg/sec     7.4 MB/s
-        Fire-and-forget (acks=0)    100K msg/sec    11.0 MB/s
-        Fetch throughput             31K msg/sec     3.4 MB/s
-        Sequential round-trip        19K msg/sec    54 us avg latency
-        Metadata request             25K req/sec    41 us avg latency
+        Pipeline produce (acks=1)   100K msg/sec    11.0 MB/s
+        Fire-and-forget (acks=0)    120K msg/sec    13.2 MB/s
+        Sequential round-trip        24K msg/sec    42 us avg latency
+        Metadata request             21K req/sec    47 us avg latency
 
     Throughput by value size (pipelined, acks=1):
 
-           10 bytes    61K msg/sec      0.9 MB/s
-          100 bytes    68K msg/sec      7.4 MB/s
-         1000 bytes    50K msg/sec     50.2 MB/s
-        10000 bytes    18K msg/sec    178.5 MB/s
+           10 bytes   105K msg/sec      1.5 MB/s
+          100 bytes   100K msg/sec     10.5 MB/s
+         1000 bytes    70K msg/sec     70.7 MB/s
+        10000 bytes    20K msg/sec    202.0 MB/s
+
+    Latency histogram (20K round-trips, acks=1, "bench/latency.pl"):
+
+        median: 39 us    p90: 59 us    p95: 75 us    p99: 122 us
 
     Pipeline produce throughput is limited by Perl callback overhead per
     message. Fire-and-forget mode ("acks=0") skips the response cycle
-    entirely, reaching ~100K msg/sec. Sequential round-trip (one produce,
-    wait for ack, repeat) measures raw broker latency at ~54 microseconds.
+    entirely, reaching ~120K msg/sec. Sequential round-trip (one produce,
+    wait for ack, repeat) measures raw broker latency around 39us median.
 
     The fetch path is sequential (fetch, process, fetch again) which
     introduces one round-trip per batch. With larger "max_bytes" and dense
@@ -743,35 +772,26 @@ KAFKA PROTOCOL
     complexity.
 
 LIMITATIONS
-    *   LZ4 and gzip compression -- supported when built with liblz4 and
-        zlib. snappy and zstd are not implemented.
+    *   Blocking DNS for hostnames -- numeric IPv4/IPv6 literals take a fast
+        path ("AI_NUMERICHOST") and never block. Non-literal hostnames call
+        "getaddrinfo" synchronously, blocking the EV loop until the resolver
+        responds. For fully non-blocking operation against named brokers,
+        pre-resolve in Perl-land.
 
-    *   Transactions / EOS -- "begin_transaction",
-        "send_offsets_to_transaction", "commit_transaction",
-        "abort_transaction" provide full exactly-once stream processing.
-        "InitProducerId", "AddPartitionsToTxn", "TxnOffsetCommit", "EndTxn"
-        are all wired. Requires "transactional_id" in constructor.
-
-    *   No GSSAPI/OAUTHBEARER -- SASL/PLAIN and SCRAM-SHA-256/512 are
-        supported. GSSAPI (Kerberos) and OAUTHBEARER are not implemented.
-
-    *   Sticky partition assignment -- assignments are preserved across
-        rebalances where possible. New partitions are distributed to the
-        least-loaded member. Overloaded members shed excess partitions.
-
-    *   Blocking DNS resolution -- "getaddrinfo" is called synchronously in
-        "conn_start_connect". For fully non-blocking operation, use IP
-        addresses instead of hostnames.
+    *   No GSSAPI/OAUTHBEARER -- only SASL/PLAIN and SCRAM-SHA-256/512 are
+        implemented.
 
     *   No flexible API versions -- all API versions are capped below the
         flexible-version threshold to avoid compact string/array encoding.
-        This limits interoperability with very new protocol features but
-        works with all Kafka 0.11+ and Redpanda brokers.
+        Works with Kafka 0.11+ and Redpanda; loses access to a few newer
+        protocol features.
 
-    *   Limited produce retry -- transient errors (NOT_LEADER,
+    *   Producer retry policy -- transient errors (NOT_LEADER,
         COORDINATOR_NOT_AVAILABLE) trigger metadata refresh and up to 3
-        retries with backoff. Non-retriable errors are surfaced to the
-        callback immediately.
+        retries with backoff. Hard idempotent errors (OUT_OF_ORDER_SEQUENCE,
+        DUPLICATE_SEQUENCE) trigger one InitProducerId-with-fresh-epoch
+        recovery attempt. Other broker errors are surfaced to the callback
+        immediately.
 
 AUTHOR
     vividsnow

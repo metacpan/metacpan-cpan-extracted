@@ -172,11 +172,10 @@ subtest 'error handling' => sub
     # Test invalid hash ref input
     my $obj;
     {
-        local *STDERR;
-        open my $fh, '>', \my $stderr;
-        local *STDERR = $fh;
+        my $warning = '';
+        local $SIG{__WARN__} = sub{ $warning = join( '', @_ ); };
         $obj = Module::Generic::Dynamic->new( 'invalid' );
-        like( $stderr, qr/Parameter provided is not an hash reference/, 'Non-hash input triggers warning' );
+        like( $warning, qr/Parameter provided is not an hash reference/, 'Non-hash input triggers warning' );
     }
     ok( $obj, 'Object created despite invalid input' );
 

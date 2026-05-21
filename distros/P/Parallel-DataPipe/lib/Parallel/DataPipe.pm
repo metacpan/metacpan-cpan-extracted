@@ -1,6 +1,6 @@
 package Parallel::DataPipe;
 
-our $VERSION='0.12';
+our $VERSION='0.14';
 use 5.8.0;
 use strict;
 use warnings;
@@ -175,56 +175,88 @@ sub init_serializer {
     }
 }
 
-
 # this subroutine reads data from pipe and converts it to perl reference
 # or scalar - if size is negative
 # it always expects size of frozen scalar so it know how many it should read
 # to feed thaw
 sub _get_data {
-    my ($self,$fh) = @_;
-    my ($data_size,$data);
-    $fh->sysread($data_size,4);
-    $data_size = unpack("l",$data_size);
-    return undef if $data_size == _EOF_; # this if for process_data terminating
-    if ($data_size == 0) {
+    use bytes;
+    my ( $self, $fh ) = @_;
+    my ( $data_size, $data );
+
+    # read 4-byte size header; a short or zero-byte read is an error
+    my $header;
+    my $got = $fh->sysread( $header, 4 );
+
+    die "sysread failed: $!" unless defined $got;
+    die "unexpected EOF reading frame header" unless $got == 4;
+
+    $data_size = unpack( "l", $header );
+
+    return undef
+      if $data_size == _EOF_;    # this is for process_data terminating
+
+    if ( $data_size == 0 ) {
         $data = '';
-    } else {
+    }
+    else {
         my $length = abs($data_size);
         my $offset = 0;
-        # allocate all the buffer for $data beforehand
-        $data = sprintf("%${length}s","");
-        while ($offset < $length) {
-            my $chunk_size = min(PIPE_MAX_CHUNK_SIZE,$length-$offset);
-            $fh->sysread(my $buf,$chunk_size);
-            # use lvalue form of substr to copy data in preallocated buffer
-            substr($data,$offset,$chunk_size) = $buf;
-            $offset += $chunk_size;
+        $data = "\0" x $length; # pre-allocate buffer
+
+        while ( $offset < $length ) {
+            my $chunk_size = min( PIPE_MAX_CHUNK_SIZE, $length - $offset );
+            my $got = $fh->sysread( $data, $chunk_size, $offset );
+
+            die "sysread failed: $!" unless defined $got;
+            die "unexpected EOF reading payload" unless $got;
+
+            $offset += $got;  # advance by actual, not requested
         }
-        $data = $self->thaw($data) if $data_size<0;
+
+        $data = $self->thaw($data) if $data_size < 0;
     }
+
     return $data;
 }
 
 # this subroutine serialize data reference. otherwise
 # it puts negative size of scalar and scalar itself to pipe.
 sub _put_data {
-    my ($self,$fh,$data) = @_;
-    unless (defined($data)) {
-        $fh->syswrite(pack("l", _EOF_));
+    use bytes;
+    my ( $self, $fh, $data ) = @_;
+
+    unless ( defined($data) ) {
+        my $written = $fh->syswrite( pack( "l", _EOF_ ) );
+        die "syswrite failed: $!" unless defined $written;
+        die "short syswrite on EOF marker" unless $written == 4;
+
         return;
     }
+
     my $length = length($data);
-    if (ref($data)) {
-        $data = $self->freeze($data);
+
+    if ( ref($data) ) {
+        $data   = $self->freeze($data);
         $length = -length($data);
     }
-    $fh->syswrite(pack("l", $length));
+
+    {
+        my $written = $fh->syswrite( pack( "l", $length ) );
+        die "syswrite failed: $!" unless defined $written;
+        die "short syswrite on frame header" unless $written == 4;
+    }
+    
     $length = abs($length);
     my $offset = 0;
-    while ($offset < $length) {
-        my $chunk_size = min(PIPE_MAX_CHUNK_SIZE,$length-$offset);
-        $fh->syswrite(substr($data,$offset,$chunk_size));
-        $offset += $chunk_size;
+
+    while ( $offset < $length ) {
+        my $chunk_size = min( PIPE_MAX_CHUNK_SIZE, $length - $offset );
+        my $written = $fh->syswrite( $data, $chunk_size, $offset );
+
+        die "syswrite failed: $!" unless defined $written;
+
+        $offset += $written;    # advance by actual, not requested
     }
 }
 
@@ -353,8 +385,8 @@ sub new {
 }
 
 sub DESTROY {
-	my $self = shift;
-    return unless $self->{mypid} == $$;
+    my $self = shift;
+    return unless defined( $self->{mypid} ) && $self->{mypid} == $$;
     $self->_kill_data_processors;
     #semctl($self->{sem_id},0,IPC_RMID,0);
 }

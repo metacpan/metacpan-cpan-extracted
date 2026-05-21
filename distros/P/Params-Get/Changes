@@ -1,5 +1,11 @@
 Revision history for Params-Get
 
+0.14	Tue May 19 21:40:21 EDT 2026
+	Document the default argument
+	Sanity check $default
+	Bug fixed where named-parameter extraction was mishandling hashref arguments in certain calling conventions,
+		where the default was the key to the wanted hash value
+
 0.13	Mon Aug  4 16:59:56 EDT 2025
 	Back out 0.12, too much breakage
 

@@ -2,7 +2,7 @@
 
 =head1 DESCRIPTION
 
-Check interoperability with Moo.
+Check interoperability with Moose.
 
 =cut
 

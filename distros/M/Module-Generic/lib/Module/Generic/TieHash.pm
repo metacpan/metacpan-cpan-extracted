@@ -14,8 +14,8 @@ package Module::Generic::TieHash;
 BEGIN
 {
     use strict;
-    use warnings::register;
     use warnings;
+    warnings::register_categories( 'Module::Generic' );
     use vars qw( $VERSION $PAUSED $MOD_PERL );
     use Scalar::Util ();
     # When true _exclude returns always false.
@@ -50,7 +50,7 @@ sub TIEHASH
     $opts = shift( @_ ) if( @_ );
     if( ( Scalar::Util::reftype( $opts ) // '' ) ne 'HASH' )
     {
-        warn( "Parameters provided ($opts) is not an hash reference.\n" ) if( warnings::enabled() );
+        warn( "Parameters provided ($opts) is not an hash reference.\n" ) if( warnings::enabled( 'Module::Generic' ) );
         return;
     }
     my $disable = [];

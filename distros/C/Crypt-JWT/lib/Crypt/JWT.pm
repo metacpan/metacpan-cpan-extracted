@@ -3,7 +3,7 @@ package Crypt::JWT;
 use strict;
 use warnings;
 
-our $VERSION = '0.037';
+our $VERSION = '0.038';
 
 use Exporter 'import';
 our %EXPORT_TAGS = ( all => [qw(decode_jwt encode_jwt)] );
@@ -11,7 +11,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw();
 
 use Carp;
-use Crypt::Misc qw(decode_b64u encode_b64u);
+use Crypt::Misc qw(decode_b64u encode_b64u slow_eq);
 use JSON qw(decode_json encode_json);
 use Crypt::PK::RSA;
 use Crypt::PK::ECC;
@@ -23,6 +23,21 @@ use Crypt::AuthEnc::GCM qw(gcm_encrypt_authenticate gcm_decrypt_verify);
 use Crypt::Mac::HMAC qw(hmac);
 use Compress::Raw::Zlib;
 use Scalar::Util qw(looks_like_number);
+
+# DoS guards on decode
+our $MAX_PBES2_ITER     = 3_000_000;         # max accepted PBES2 'p2c' (iteration count)
+our $MAX_INFLATED_SIZE  = 10 * 1024 * 1024;  # max accepted size of payload after 'zip' inflation
+
+# Key-strength minimums. Values lower than the RFC 7518 strict requirement
+# but high enough that the cryptographic security argument holds (see
+# SECURITY CONSIDERATIONS in the POD). Tunable at startup if a deployer has
+# a stronger or weaker policy.
+our $MIN_HMAC_KEY_LEN   = 4;                 # minimum HMAC key length (bytes) for HS256/HS384/HS512
+our $MIN_RSA_BITS       = 2048;              # minimum RSA modulus size (bits) for RS*/PS*/RSA-OAEP*/RSA1_5
+
+# Compact-serialization token shape; precompiled to avoid rebuilding per decode_jwt() call.
+my $TOKEN_RE_STRICT  = qr/^([a-zA-Z0-9_-]+)=*\.([a-zA-Z0-9_-]*)=*\.([a-zA-Z0-9_-]*)=*(?:\.([a-zA-Z0-9_-]+)=*\.([a-zA-Z0-9_-]+)=*)?$/;
+my $TOKEN_RE_PADDING = qr/^([a-zA-Z0-9_-]+=*)\.([a-zA-Z0-9_-]*=*)\.([a-zA-Z0-9_-]*=*)(?:\.([a-zA-Z0-9_-]+=*)\.([a-zA-Z0-9_-]+=*))?$/;
 
 # JWS: https://tools.ietf.org/html/rfc7515
 # JWE: https://tools.ietf.org/html/rfc7516
@@ -36,22 +51,30 @@ sub _prepare_rsa_key {
   croak "JWT: undefined RSA key" unless defined $key;
   croak "JWT: invalid RSA key (cannot be scalar)" unless ref $key;
   # we need Crypt::PK::RSA object
-  return $key                       if ref($key) eq 'Crypt::PK::RSA';
-  return Crypt::PK::RSA->new($key)  if ref($key) eq 'HASH' || ref($key) eq 'SCALAR';
-  return Crypt::PK::RSA->new(@$key) if ref($key) eq 'ARRAY';
-  # handle also: Crypt::OpenSSL::RSA, Crypt::X509, Crypt::OpenSSL::X509
-  my $str;
-  if (ref($key) eq 'Crypt::OpenSSL::RSA') {
-    # https://metacpan.org/pod/Crypt::OpenSSL::RSA
-    $str = $key->is_private ? $key->get_private_key_string : $key->get_public_key_string;
+  my $pk;
+  if    (ref($key) eq 'Crypt::PK::RSA')                 { $pk = $key }
+  elsif (ref($key) eq 'HASH' || ref($key) eq 'SCALAR')  { $pk = Crypt::PK::RSA->new($key) }
+  elsif (ref($key) eq 'ARRAY')                          { $pk = Crypt::PK::RSA->new(@$key) }
+  else {
+    # handle also: Crypt::OpenSSL::RSA, Crypt::X509, Crypt::OpenSSL::X509
+    my $str;
+    if (ref($key) eq 'Crypt::OpenSSL::RSA') {
+      # https://metacpan.org/pod/Crypt::OpenSSL::RSA
+      $str = $key->is_private ? $key->get_private_key_string : $key->get_public_key_string;
+    }
+    elsif (ref($key) =~ /^Crypt::(X509|OpenSSL::X509)$/) {
+      # https://metacpan.org/pod/Crypt::X509
+      # https://metacpan.org/pod/Crypt::OpenSSL::X509
+      $str = $key->pubkey;
+    }
+    $pk = Crypt::PK::RSA->new(\$str) if defined $str && !ref($str);
   }
-  elsif (ref($key) =~ /^Crypt::(X509|OpenSSL::X509)$/) {
-    # https://metacpan.org/pod/Crypt::X509
-    # https://metacpan.org/pod/Crypt::OpenSSL::X509
-    $str = $key->pubkey;
-  }
-  return Crypt::PK::RSA->new(\$str) if defined $str && !ref($str);
-  croak "JWT: invalid RSA key";
+  croak "JWT: invalid RSA key" unless $pk;
+  # RFC 7518 sec 3.3: "A key of size 2048 bits or larger MUST be used".
+  # Check via Crypt::PK::RSA->size which returns the modulus size in bytes.
+  my $bits = $pk->size * 8;
+  croak "JWT: RSA modulus too small ($bits bits, minimum $MIN_RSA_BITS)" if $bits < $MIN_RSA_BITS;
+  return $pk;
 }
 
 sub _prepare_ecc_key {
@@ -117,7 +140,26 @@ sub _kid_lookup {
   my $found;
   if (exists $kid_keys->{keys} && ref $kid_keys->{keys} eq 'ARRAY') {
     #FORMAT: { keys => [ {kid=>'A', kty=>?, ...}, {kid=>'B', kty=>?, ...} ] }
-    for (@{$kid_keys->{keys}}) {
+    my @keys = @{$kid_keys->{keys}};
+
+    # Sanity-check the keyset before lookup. Both checks defend against
+    # ambiguous keysets where the lookup result depends on iteration order
+    # (a possible alg-confusion vector).
+    #   1. Duplicate kids: a token's 'kid' header must resolve to one key.
+    #   2. Mixed symmetry: a keyset that contains BOTH symmetric (kty=oct)
+    #      and asymmetric (RSA/EC/OKP) keys lets an attacker pick the type
+    #      that suits a forged token.
+    my (%seen_kid, $has_oct, $has_asym);
+    for my $k (@keys) {
+      if (defined $k->{kid}) {
+        croak "JWT: kid_keys contains duplicate kid '$k->{kid}'" if $seen_kid{$k->{kid}}++;
+      }
+      $has_oct  = 1 if ($k->{kty} || '') eq 'oct';
+      $has_asym = 1 if ($k->{kty} || '') =~ /^(RSA|EC|OKP)$/;
+    }
+    croak "JWT: kid_keys mixes symmetric (oct) and asymmetric keys" if $has_oct && $has_asym;
+
+    for (@keys) {
       if ($_->{kid} && $_->{kty} && $_->{kid} eq $kid) {
         $found = $_;
         last;
@@ -163,6 +205,82 @@ sub _add_claims {
   $payload->{nbf} = $now + $args{relative_nbf} if defined $args{relative_nbf};
 }
 
+sub _check_jwk_constraints {
+  # RFC 7517 sections 4.2/4.3/4.4: enforce JWK metadata when the key is supplied as
+  # a JWK hash (either via 'key' directly or resolved via 'kid_keys'). For
+  # non-JWK key forms (Crypt::PK::* objects, scalar refs, bare HMAC scalars)
+  # there is no metadata to consult and we silently skip.
+  my ($key, $alg, $what) = @_;   # $what is 'JWS' or 'JWE'
+  return unless ref $key eq 'HASH';
+
+  # 'alg' (sec 4.4): if present, must match. For JWS the same RSA/EC key can
+  # legitimately verify across different hash sizes within the same family
+  # (PS256 key verifying a PS384 token, ES512 key verifying an ES256 token,
+  # etc.) - see RFC 7520 examples. So JWS matches by family (HS/RS/PS/ES/
+  # EdDSA), while JWE - where a different alg means a different padding or
+  # wrap mechanism, not just a hash size - still requires exact match.
+  if (defined $key->{alg}) {
+    my $jwk_alg = $key->{alg};
+    my $ok;
+    if ($what eq 'JWS') {
+      my $fam_of = sub { $_[0] =~ /^(HS|RS|PS|ES|EdDSA)/ ? $1 : $_[0] };
+      $ok = $fam_of->($jwk_alg) eq $fam_of->($alg);
+    }
+    else {
+      $ok = $jwk_alg eq $alg;
+    }
+    croak "$what: JWK 'alg' ($jwk_alg) does not match token alg ($alg)" unless $ok;
+  }
+
+  # 'use' (sec 4.2): 'sig' for JWS verify, 'enc' for JWE decrypt
+  my $expected_use = $what eq 'JWS' ? 'sig' : 'enc';
+  if (defined $key->{use} && $key->{use} ne $expected_use) {
+    croak "$what: JWK 'use' ($key->{use}) does not allow $expected_use op";
+  }
+
+  # 'key_ops' (sec 4.3): if present, must include the operation we are about to do
+  if (ref $key->{key_ops} eq 'ARRAY') {
+    my @want = $what eq 'JWS' ? ('verify') : ('decrypt', 'unwrapKey', 'deriveKey', 'deriveBits');
+    my %ops  = map { $_ => 1 } @{$key->{key_ops}};
+    my $found = 0;
+    $found ||= $ops{$_} for @want;
+    croak "$what: JWK 'key_ops' [@{$key->{key_ops}}] does not include any of: @want" unless $found;
+  }
+
+  # EC self-consistency: an EC JWK's 'alg' implies a specific curve per
+  # RFC 7518 sec 3.4. If the JWK's 'crv' disagrees with what the 'alg'
+  # demands, the JWK is malformed and we refuse to use it. ES521 is
+  # accepted as a historical alias for ES512 (used in some older test
+  # vectors and implementations).
+  if (($key->{kty} || '') eq 'EC' && defined $key->{alg} && defined $key->{crv}) {
+    my %ec_curve_for = (
+      ES256  => 'P-256',
+      ES256K => 'secp256k1',
+      ES384  => 'P-384',
+      ES512  => 'P-521',
+      ES521  => 'P-521',
+    );
+    if (exists $ec_curve_for{$key->{alg}}) {
+      croak "$what: JWK alg/crv mismatch ($key->{alg} requires $ec_curve_for{$key->{alg}}, got $key->{crv})"
+        if $ec_curve_for{$key->{alg}} ne $key->{crv};
+    }
+    elsif ($key->{alg} =~ /^ES/) {
+      croak "$what: JWK has unknown ECDSA alg '$key->{alg}'";
+    }
+  }
+}
+
+sub _check_accepted {
+  my ($what, $value, $check) = @_;
+  return unless defined $check;
+  my $r = ref $check;
+  if    ($r eq 'Regexp') { croak "JWT: $what '$value' does not match accepted_$what" if $value !~ $check }
+  elsif ($r eq 'ARRAY')  { my %ok = map { $_ => 1 } @$check;
+                           croak "JWT: $what '$value' not in accepted_$what" unless $ok{$value} }
+  elsif (!$r)            { croak "JWT: $what '$value' not accepted_$what" if $value ne $check }
+  else                   { croak "JWT: accepted_$what must be Regexp, ARRAY ref, or Scalar (got $r)" }
+}
+
 sub _verify_header {
   my ($header, %args) = @_;
 
@@ -193,6 +311,13 @@ sub _verify_header {
 
 }
 
+sub _check_numeric_date {
+  my ($payload, $claim) = @_;
+  my $value = $payload->{$claim};
+  croak "JWT: $claim claim must be a NumericDate"
+    if !defined($value) || ref($value) || "$value" !~ /\A(?:0|[1-9][0-9]*)(?:\.[0-9]+)?\z/;
+}
+
 sub _verify_claims {
   my ($payload, %args) = @_;
 
@@ -215,6 +340,7 @@ sub _verify_claims {
   ### exp
   if(defined $payload->{exp}) {
     if (!defined $args{verify_exp} || $args{verify_exp}==1) {
+      _check_numeric_date($payload, 'exp');
       croak "JWT: exp claim check failed ($payload->{exp}/$leeway vs. $now)" if $payload->{exp} + $leeway <= $now;
     }
   }
@@ -225,6 +351,7 @@ sub _verify_claims {
   ### nbf
   if(defined $payload->{nbf}) {
     if (!defined $args{verify_nbf} || $args{verify_nbf}==1) {
+      _check_numeric_date($payload, 'nbf');
       croak "JWT: nbf claim check failed ($payload->{nbf}/$leeway vs. $now)" if $payload->{nbf} - $leeway > $now;
     }
   }
@@ -236,6 +363,7 @@ sub _verify_claims {
   if (exists $args{verify_iat}) { #default (non existing verify_iat) == no iat check
     if(defined $payload->{iat}) {
       if (!defined $args{verify_iat} || $args{verify_iat}==1) {
+        _check_numeric_date($payload, 'iat');
         croak "JWT: iat claim check failed ($payload->{iat}/$leeway vs. $now)" if $payload->{iat} - $leeway > $now;
       }
     }
@@ -321,10 +449,15 @@ sub _payload_zip {
 sub _payload_unzip {
   my ($payload, $z) = @_;
   if ($z eq "DEF") {
-    my $d = Compress::Raw::Zlib::Inflate->new(-Bufsize => 1024, -WindowBits => -&MAX_WBITS());
+    my $d = Compress::Raw::Zlib::Inflate->new(
+      -Bufsize     => $MAX_INFLATED_SIZE,
+      -WindowBits  => -&MAX_WBITS(),
+      -LimitOutput => 1,
+    );
     my $output = '';
-    $d->inflate($payload, $output);
-    croak "JWT: inflate failed" unless $output;
+    my $status = $d->inflate($payload, $output);
+    croak "JWT: inflated payload exceeds limit ($MAX_INFLATED_SIZE bytes)" if $status == Z_BUF_ERROR;
+    croak "JWT: inflate failed (status=$status)" if $status != Z_STREAM_END;
     $payload = $output;
   }
   else {
@@ -377,7 +510,8 @@ sub _encrypt_jwe_cek {
   }
 
   if ($alg =~ /^A(128|192|256)KW$/) {
-    $ecek = aes_key_wrap(_prepare_oct_key($key), $cek);
+    # RFC 7518 sec 4.4 wraps via "AES Key Wrap algorithm specified in RFC 3394"
+    $ecek = aes_key_wrap(_prepare_oct_key($key), $cek, 'AES', 0);
     return ($cek, $ecek);
   }
   elsif ($alg =~ /^A(128|192|256)GCMKW$/) {
@@ -423,13 +557,15 @@ sub _decrypt_jwe_cek {
     return _prepare_oct_key($key);
   }
   elsif ($alg =~ /^A(128|192|256)KW$/) {
-    return aes_key_unwrap(_prepare_oct_key($key), $ecek);
+    return aes_key_unwrap(_prepare_oct_key($key), $ecek, 'AES', 0);
   }
   elsif ($alg =~ /^A(128|192|256)GCMKW$/) {
     return gcm_key_unwrap(_prepare_oct_key($key), $ecek, decode_b64u($hdr->{tag}), decode_b64u($hdr->{iv}));
   }
   elsif ($alg =~ /^PBES2-HS(512|384|256)\+A(128|192|256)KW$/) {
-    return pbes2_key_unwrap(_prepare_oct_key($key), $ecek, $alg, decode_b64u($hdr->{p2s}), $hdr->{p2c});
+    my $p2c = $hdr->{p2c};
+    croak "JWE: invalid p2c" unless looks_like_number($p2c) && $p2c >= 1 && $p2c <= $MAX_PBES2_ITER;
+    return pbes2_key_unwrap(_prepare_oct_key($key), $ecek, $alg, decode_b64u($hdr->{p2s}), $p2c);
   }
   elsif ($alg =~ /^RSA(-OAEP|-OAEP-256|1_5)$/) {
     $key = _prepare_rsa_key($key);
@@ -469,7 +605,12 @@ sub _encrypt_jwe_payload {
     my $m = Crypt::Mode::CBC->new('AES');
     my $ct = $m->encrypt($payload, $aes_key, $iv);
     my $aad_len = length($aad);
-    my $mac_input = $aad . $iv . $ct . pack('N2', ($aad_len / 2147483647)*8, ($aad_len % 2147483647)*8);
+    # RFC 7518 5.2.2.1: AL = AAD length in bits as 64-bit big-endian.
+    # Split aad_len*8 into two 32-bit halves; both intermediate values
+    # stay within 32-bit range, so this is safe on 32-bit Perl too.
+    my $al_hi = $aad_len >> 29;
+    my $al_lo = ($aad_len & 0x1FFFFFFF) << 3;
+    my $mac_input = $aad . $iv . $ct . pack('N2', $al_hi, $al_lo);
     my $mac = hmac($hash, $mac_key, $mac_input);
     my $sig_len = length($mac) / 2;
     my $sig = substr($mac, 0, $sig_len);
@@ -495,11 +636,16 @@ sub _decrypt_jwe_payload {
     my $aes_key = substr($cek, $key_len, $key_len);
     croak "JWE: wrong AES key length ($key_len vs. $size)" unless $key_len == $size;
     my $aad_len = length($aad); # AAD == original encoded header
-    my $mac_input = $aad . $iv . $ct . pack('N2', ($aad_len / 2147483647)*8, ($aad_len % 2147483647)*8);
+    # RFC 7518 5.2.2.1: AL = AAD length in bits as 64-bit big-endian.
+    # Split aad_len*8 into two 32-bit halves; both intermediate values
+    # stay within 32-bit range, so this is safe on 32-bit Perl too.
+    my $al_hi = $aad_len >> 29;
+    my $al_lo = ($aad_len & 0x1FFFFFFF) << 3;
+    my $mac_input = $aad . $iv . $ct . pack('N2', $al_hi, $al_lo);
     my $mac = hmac($hash, $mac_key, $mac_input);
     my $sig_len = length($mac) / 2;
     my $sig = substr($mac, 0, $sig_len);
-    croak "JWE: tag mismatch" unless $sig eq $tag;
+    croak "JWE: tag mismatch" unless slow_eq($sig, $tag);
     my $m = Crypt::Mode::CBC->new('AES');
     my $pt = $m->decrypt($ct, $aes_key, $iv);
     return $pt;
@@ -570,25 +716,22 @@ sub _decode_jwe {
   }
   croak "JWE: missing key" if !defined $key;
 
-  my $aa = $args{accepted_alg};
-  if (ref($aa) eq 'Regexp') {
-    croak "JWE: alg '$header->{alg}' does not match accepted_alg" if $header->{alg} !~ $aa;
-  }
-  elsif ($aa && (ref($aa) eq 'ARRAY' || !ref($aa))) {
-    my %acca = ref $aa ? map { $_ => 1 } @$aa : ( $aa => 1 );
-    croak "JWE: alg '$header->{alg}' not in accepted_alg" if !$acca{$header->{alg}};
-  }
+  _check_accepted('alg', $header->{alg}, $args{accepted_alg});
+  _check_accepted('enc', $header->{enc}, $args{accepted_enc});
+  # For 'dir' the JWK is used directly as the CEK, so its 'alg' field (when
+  # present) names the content-encryption algorithm (the JWE 'enc'), not
+  # 'dir' itself. RFC 7518 sec 3.4.2 / common JWK convention.
+  my $effective_alg = defined $header->{alg} && $header->{alg} eq 'dir' ? $header->{enc} : $header->{alg};
+  _check_jwk_constraints($key, $effective_alg, 'JWE');
 
-  my $ae = $args{accepted_enc};
-  if (ref($ae) eq 'Regexp') {
-    croak "JWE: enc '$header->{enc}' does not match accepted_enc" if $header->{enc} !~ $ae;
-  }
-  elsif ($ae && (ref($ae) eq 'ARRAY' || !ref($ae))) {
-    my %acce = ref $ae ? map { $_ => 1 } @$ae : ( $ae => 1 );
-    croak "JWE: enc '$header->{enc}' not in accepted_enc" if !$acce{$header->{enc}};
-  }
-
-  $header = { %$shared_unprotected, %$unprotected, %$header }; # merge headers
+  # SECURITY INVARIANT: merge order matters. The protected header (%$header)
+  # MUST come last so its values win over the unprotected/shared-unprotected
+  # ones (which travel outside the AEAD and are attacker-mutable). Crypto-
+  # critical fields - 'alg', 'enc', 'epk', 'p2c', 'p2s', 'iv', 'tag', 'zip',
+  # 'apu', 'apv' - are read from this merged hash by _decrypt_jwe_cek and
+  # below; flipping the order, or letting _decrypt_jwe_cek run against an
+  # attacker-controlled header, breaks the JWE security model.
+  $header = { %$shared_unprotected, %$unprotected, %$header };
   my $cek = _decrypt_jwe_cek($ecek, $key, $header);
   my $aad = defined $b64u_aad ? "$b64u_header.$b64u_aad" : $b64u_header;
   my $payload = _decrypt_jwe_payload($cek, $header->{enc}, $aad, $ct, $iv, $tag);
@@ -606,6 +749,7 @@ sub _sign_jws {
   my $data = "$b64u_header.$b64u_payload";
   if ($alg =~ /^HS(256|384|512)$/) { # HMAC integrity
     $key = _prepare_oct_key($key);
+    croak "JWS: HMAC key shorter than minimum ($MIN_HMAC_KEY_LEN bytes)" if length($key) < $MIN_HMAC_KEY_LEN;
     $sig = hmac("SHA$1", $key, $data);
   }
   elsif ($alg =~ /^RS(256|384|512)/) { # RSA+PKCS1-V1_5 signatures
@@ -641,7 +785,8 @@ sub _verify_jws {
   }
   elsif ($alg =~ /^HS(256|384|512)$/) { # HMAC integrity
     $key = _prepare_oct_key($key);
-    return 1 if $sig eq hmac("SHA$1", $key, $data);
+    croak "JWS: HMAC key shorter than minimum ($MIN_HMAC_KEY_LEN bytes)" if length($key) < $MIN_HMAC_KEY_LEN;
+    return 1 if slow_eq($sig, hmac("SHA$1", $key, $data));
   }
   elsif ($alg =~ /^RS(256|384|512)/) { # RSA+PKCS1-V1_5 signatures
     my $hash = "SHA$1";
@@ -706,17 +851,7 @@ sub _decode_jws {
     croak "JWS: alg 'none' not allowed" if $alg eq 'none' && !$args{allow_none};
     croak "JWS: alg 'none' expects no signature" if $alg eq 'none' && defined $b64u_sig && length($b64u_sig) > 0;
 
-    my $aa = $args{accepted_alg};
-    if (ref $aa eq 'Regexp') {
-      croak "JWS: alg '$alg' does not match accepted_alg" if $alg !~ $aa;
-    }
-    elsif (ref $aa eq 'ARRAY') {
-      my %acca = map { $_ => 1 } @$aa;
-      croak "JWS: alg '$alg' not in accepted_alg" if !$acca{$alg};
-    }
-    elsif (defined $aa) {
-      croak "JWS: alg '$alg' not accepted_alg" if $aa ne $alg;
-    }
+    _check_accepted('alg', $alg, $args{accepted_alg});
 
     if ($alg ne 'none') {
       my $key;
@@ -742,6 +877,7 @@ sub _decode_jws {
         $key = $k;
       }
       croak "JWS: missing key" if !defined $key;
+      _check_jwk_constraints($key, $alg, 'JWS');
 
       my $valid = _verify_jws($b64u_header, $b64u_payload, $b64u_sig, $alg, $key);
       croak "JWS: invalid signature" if !$valid;
@@ -819,9 +955,7 @@ sub decode_jwt {
   if (!$args{token}) {
     croak "JWT: missing token";
   }
-  my $token_re = $args{tolerate_padding}
-    ? qr/^([a-zA-Z0-9_-]+=*)\.([a-zA-Z0-9_-]*=*)\.([a-zA-Z0-9_-]*=*)(?:\.([a-zA-Z0-9_-]+=*)\.([a-zA-Z0-9_-]+=*))?$/
-    : qr/^([a-zA-Z0-9_-]+)=*\.([a-zA-Z0-9_-]*)=*\.([a-zA-Z0-9_-]*)=*(?:\.([a-zA-Z0-9_-]+)=*\.([a-zA-Z0-9_-]+)=*)?$/;
+  my $token_re = $args{tolerate_padding} ? $TOKEN_RE_PADDING : $TOKEN_RE_STRICT;
   if ($args{token} =~ $token_re) {
     if (defined($5) && length($5) > 0) {
         # JWE token (5 segments)
@@ -888,9 +1022,9 @@ Implements B<JSON Web Token (JWT)> - L<https://tools.ietf.org/html/rfc7519>.
 The implementation covers not only B<JSON Web Signature (JWS)> - L<https://tools.ietf.org/html/rfc7515>,
 but also B<JSON Web Encryption (JWE)> - L<https://tools.ietf.org/html/rfc7516>.
 
-The module implements B<all (100%) algorithms> defined in L<https://tools.ietf.org/html/rfc7518> - B<JSON Web Algorithms (JWA)>.
+The module implements all algorithms defined in L<https://tools.ietf.org/html/rfc7518> - B<JSON Web Algorithms (JWA)>.
 
-This module supports B<Compact JWS/JWE> and B<Flattened JWS/JWE JSON> serialization, general JSON serialization is not supported yet.
+This module supports B<Compact JWS/JWE> and B<Flattened JWS/JWE JSON> serialization. General (multi-recipient) JSON serialization is not supported.
 
 =head1 EXPORT
 
@@ -908,7 +1042,12 @@ Or all of them at once:
 
 =head2 decode_jwt
 
- my $data = decode_jwt(%named_args);
+ my $data              = decode_jwt(%named_args);
+ my ($header, $data)   = decode_jwt(%named_args, decode_header=>1);
+
+Returns the decoded payload (in scalar context) or the decoded header
+followed by the decoded payload (when C<decode_header =E<gt> 1>). Croaks
+on any verification, decryption, or claim-check failure.
 
 Named arguments:
 
@@ -916,13 +1055,15 @@ Named arguments:
 
 =item token
 
-Mandatory argument, a string with either JWS or JWE JSON Web Token.
+Mandatory. The serialized JWS or JWE token as a string. Both compact
+(C<.>-separated, 3 segments for JWS / 5 for JWE) and flattened JSON
+serialization are accepted.
 
- ### JWS token example (3 segments)
+ ### JWS compact (3 segments)
  $t = "eyJhbGciOiJIUzI1NiJ9.dGVzdA.ujBihtLSr66CEWqN74SpLUkv28lra_CeHnxLmLNp4Jo";
  my $data = decode_jwt(token=>$t, key=>$k);
 
- ### JWE token example (5 segments)
+ ### JWE compact (5 segments)
  $t = "eyJlbmMiOiJBMTI4R0NNIiwiYWxnIjoiQTEyOEtXIn0.UusxEbzhGkORxTRq0xkFKhvzPrXb9smw.VGfOuq0Fxt6TsdqLZUpnxw.JajIQQ.pkKZ7MHS0XjyGmRsqgom6w";
  my $data = decode_jwt(token=>$t, key=>$k);
 
@@ -931,12 +1072,41 @@ Mandatory argument, a string with either JWS or JWE JSON Web Token.
 A key used for token decryption (JWE) or token signature validation (JWS).
 The value depends on the C<alg> token header value.
 
+B<Since: 0.038> B<SECURITY:> how the C<key> argument is shaped matters.
+
+=over
+
+=item *
+
+A bare scalar (e.g. C<'secret'>) is always interpreted as a raw octet
+string (HMAC secret, AES key, etc.).
+
+=item *
+
+PEM, DER, and JWK-JSON key material B<must> be passed as a SCALAR ref
+(C<\$pem>) or as an appropriate key object - never as a bare string.
+
+=item *
+
+If a public-key string is mistakenly passed as a bare scalar and
+C<accepted_alg> is not set, an attacker who flips the token's C<alg> to
+C<HS*> can forge a signature using the public-key bytes as the HMAC
+secret (the so-called "alg confusion" attack).
+
+=item *
+
+For defense in depth, B<always> pin the algorithm with C<accepted_alg>.
+
+=back
+
+Overview of supported keys:
+
  JWS alg header      key value
  ------------------  ----------------------------------
  none                no key required
- HS256               string (raw octects) of any length (or perl HASH ref with JWK, kty=>'oct')
- HS384               dtto
- HS512               dtto
+ HS256               string (raw octets) of any length (or perl HASH ref with JWK, kty=>'oct')
+ HS384               same as HS256
+ HS512               same as HS256
  RS256               public RSA key, perl HASH ref with JWK key structure,
                      a reference to SCALAR string with PEM or DER or JSON/JWK data,
                      object: Crypt::PK::RSA, Crypt::OpenSSL::RSA, Crypt::X509 or Crypt::OpenSSL::X509
@@ -955,16 +1125,16 @@ The value depends on the C<alg> token header value.
 
  JWE alg header      key value
  ------------------  ----------------------------------
- dir                 string (raw octects) or perl HASH ref with JWK, kty=>'oct', length depends on 'enc' algorithm
- A128KW              string (raw octects) 16 bytes (or perl HASH ref with JWK, kty=>'oct')
- A192KW              string (raw octects) 24 bytes (or perl HASH ref with JWK, kty=>'oct')
- A256KW              string (raw octects) 32 bytes (or perl HASH ref with JWK, kty=>'oct')
- A128GCMKW           string (raw octects) 16 bytes (or perl HASH ref with JWK, kty=>'oct')
- A192GCMKW           string (raw octects) 24 bytes (or perl HASH ref with JWK, kty=>'oct')
- A256GCMKW           string (raw octects) 32 bytes (or perl HASH ref with JWK, kty=>'oct')
- PBES2-HS256+A128KW  string (raw octects) of any length (or perl HASH ref with JWK, kty=>'oct')
- PBES2-HS384+A192KW  string (raw octects) of any length (or perl HASH ref with JWK, kty=>'oct')
- PBES2-HS512+A256KW  string (raw octects) of any length (or perl HASH ref with JWK, kty=>'oct')
+ dir                 string (raw octets) or perl HASH ref with JWK, kty=>'oct', length depends on 'enc' algorithm
+ A128KW              string (raw octets) 16 bytes (or perl HASH ref with JWK, kty=>'oct')
+ A192KW              string (raw octets) 24 bytes (or perl HASH ref with JWK, kty=>'oct')
+ A256KW              string (raw octets) 32 bytes (or perl HASH ref with JWK, kty=>'oct')
+ A128GCMKW           string (raw octets) 16 bytes (or perl HASH ref with JWK, kty=>'oct')
+ A192GCMKW           string (raw octets) 24 bytes (or perl HASH ref with JWK, kty=>'oct')
+ A256GCMKW           string (raw octets) 32 bytes (or perl HASH ref with JWK, kty=>'oct')
+ PBES2-HS256+A128KW  string (raw octets) of any length (or perl HASH ref with JWK, kty=>'oct')
+ PBES2-HS384+A192KW  string (raw octets) of any length (or perl HASH ref with JWK, kty=>'oct')
+ PBES2-HS512+A256KW  string (raw octets) of any length (or perl HASH ref with JWK, kty=>'oct')
  RSA-OAEP            private RSA key, perl HASH ref with JWK key structure,
                      a reference to SCALAR string with PEM or DER or JSON/JWK data,
                      an instance of Crypt::PK::RSA or Crypt::OpenSSL::RSA
@@ -1036,7 +1206,7 @@ Examples with RSA keys:
    dq  => "s9lAH9fggBsoFR8Oac2R_E...T2kGOhvIllTE1efA6huUvMfBcpn8lqW6vzzYY5SSF7pMd_agI3G8IbpBUb0JiraRNUfLhc",
    qi  => "GyM_p6JrXySiz1toFgKbWV...4ypu9bMWx3QJBfm0FoYzUIZEVEcOqwmRN81oDAaaBk0KWGDjJHDdDmFW3AN7I-pux_mHZG",
  };
- my $data = decode_jwt(token=>$t, key=>$rsa_priv});
+ my $data = decode_jwt(token=>$t, key=>$rsa_priv);
 
 Examples with ECC keys:
 
@@ -1067,15 +1237,16 @@ Examples with ECC keys:
    y   => "4Etl6SRW2YiLUrN5vfvVHuhp7x8PxltmWWlbbM4IFyM",
    d   => "870MB6gfuTJ4HtUnUvYMyJpr5eUZNP4Bk43bVdj3eAE",
  };
- my $data = decode_jwt(token=>$t, key=>$ecc_priv});
+ my $data = decode_jwt(token=>$t, key=>$ecc_priv);
 
 =item keypass
 
-When 'key' parameter is an encrypted private RSA or ECC key this optional parameter may contain a password for private key decryption.
+Optional. When the C<key> parameter is an encrypted private RSA or ECC
+key (PEM/DER), this parameter holds the password used to decrypt it.
 
 =item kid_keys
 
-This parametes can be either a JWK Set JSON string (see RFC7517) or a perl HASH ref with JWK Set structure like this:
+This parameter can be either a JWK Set JSON string (see RFC7517) or a perl HASH ref with JWK Set structure like this:
 
   my $keylist = {
     keys => [
@@ -1100,78 +1271,117 @@ The structure described above is used e.g. by L<https://www.googleapis.com/oauth
 
   use Mojo::UserAgent;
   my $ua = Mojo::UserAgent->new;
-  my $google_keys => $ua->get('https://www.googleapis.com/oauth2/v2/certs')->result->json;
+  my $google_keys = $ua->get('https://www.googleapis.com/oauth2/v2/certs')->result->json;
   my $payload = decode_jwt(token => $t, kid_keys => $google_keys);
 
-B<SINCE 0.019> we also support alternative structure used e.g. by L<https://www.googleapis.com/oauth2/v1/certs>:
+B<Since: 0.019> An alternative structure (used e.g. by L<https://www.googleapis.com/oauth2/v1/certs>) is also accepted:
 
   use LWP::Simple;
   my $google_certs = get('https://www.googleapis.com/oauth2/v1/certs');
   my $payload = decode_jwt(token => $t, kid_keys => $google_certs);
 
-When the token header contains C<kid> item the corresponding key is looked up in C<kid_keys> list and used for token
-decoding (you do not need to pass the explicit key via C<key> parameter). Add a kid header using L</"extra_headers">.
+When the token header contains a C<kid> item, the corresponding key is looked up in the C<kid_keys> list and used for token
+decoding (you do not need to pass the explicit key via the C<key> parameter). Add a C<kid> header on the encode side via L</extra_headers>.
 
-B<INCOMPATIBLE CHANGE in 0.023:> When C<kid_keys> is specified it croaks if token header does not contain C<kid> value or
-if C<kid> was not found in C<kid_keys>.
+B<INCOMPATIBLE CHANGE Since: 0.023> When C<kid_keys> is specified, decoding croaks if the token header does not contain a C<kid> value or
+if the C<kid> was not found in C<kid_keys>.
 
 =item key_from_jwk_header
 
-B<SINCE 0.023>
+B<Since: 0.023>
 
-C<1> - use C<jwk> header value for validating JWS signature if neither C<key> nor C<kid_keys> specified, B<BEWARE: DANGEROUS, UNSECURE!!!>
+C<1> - use C<jwk> header value for validating JWS signature if neither C<key> nor C<kid_keys> specified, B<BEWARE: DANGEROUS, INSECURE.>
 
 C<0> (default) - ignore C<jwk> header value when validating JWS signature
 
-Keep in mind that enabling C<key_from_jwk_header> requires C<jwk> header to exist and be an valid RSA/ECDSA public key (otherwise it croaks).
+Keep in mind that enabling C<key_from_jwk_header> requires the C<jwk> header to exist and to be a valid RSA/ECDSA public key (otherwise it croaks).
 
 =item allow_none
 
-C<1> - accept JWS tokens with C<none> 'alg' header value (which means that token has no signature), B<BEWARE: DANGEROUS, UNSECURE!!!>
+C<1> - accept JWS tokens with C<none> 'alg' header value (which means that token has no signature), B<BEWARE: DANGEROUS, INSECURE.>
 
 C<0> (default) - do not allow JWS with C<none> 'alg' header value
 
 =item ignore_signature
 
-C<1> - do not check signature on JWS tokens, B<BEWARE: DANGEROUS, UNSECURE!!!>
+C<1> - do not check signature on JWS tokens, B<BEWARE: DANGEROUS, INSECURE.>
 
 C<0> (default) - check signature on JWS tokens
 
 =item accepted_alg
 
-C<undef> (default) means accept all 'alg' algorithms except 'none' (for accepting 'none' use C<allow_none>)
+B<Since: 0.038> B<SECURITY:> strongly recommended. Pinning C<accepted_alg> to
+the algorithm (or family) you actually expect prevents "alg confusion"
+attacks where a forged token swaps the C<alg> header to a different family
+- see the SECURITY note under C<key>.
 
-C<string> name of accepted 'alg' algorithm (only one)
+Accepted value types:
 
-C<ARRAY ref> a list of accepted 'alg' algorithms
+=over
 
-C<Regexp> that has to match 'alg' algorithm name
+=item *
 
- my $payload = decode_jwt(token=>$t, key=>$k, accepted_alg=>'HS256');
- #or
- my $payload = decode_jwt(token=>$t, key=>$k, accepted_alg=>['HS256','HS384']);
- #or
- my $payload = decode_jwt(token=>$t, key=>$k, accepted_alg=>qr/^HS(256|384|512)$/);
+C<undef> (default) - accept all C<alg> algorithms except C<none> (for accepting C<none> use C<allow_none>)
+
+=item *
+
+Scalar string - the single accepted C<alg> name
+
+=item *
+
+ARRAY ref - list of accepted C<alg> names
+
+=item *
+
+C<Regexp> - the C<alg> value must match this regexp
+
+=back
+
+Example:
+
+  my $payload = decode_jwt(token=>$t, key=>$k, accepted_alg=>'HS256');
+  my $payload = decode_jwt(token=>$t, key=>$k, accepted_alg=>['HS256','HS384']);
+  my $payload = decode_jwt(token=>$t, key=>$k, accepted_alg=>qr/^HS(256|384|512)$/);
+
+B<INCOMPATIBLE CHANGE Since: 0.038> Any other argument type (HASH ref,
+CODE ref, GLOB ref, etc.) now croaks at decode time; previously such typos
+silently became no-ops on the JWE side.
 
 =item accepted_enc
 
-C<undef> (default) means accept all 'enc' algorithms
+JWE only. Restricts which content-encryption algorithms are accepted.
 
-C<string> name of accepted 'enc' algorithm (only one)
+Accepted value types (same shape as L</accepted_alg>):
 
-C<ARRAY ref> a list of accepted 'enc' algorithms
+=over
 
-C<Regexp> that has to match 'enc' algorithm name
+=item *
 
- my $payload = decode_jwt(token=>$t, key=>$k, accepted_enc=>'A192GCM');
- #or
- my $payload = decode_jwt(token=>$t, key=>$k, accepted_enc=>['A192GCM','A256GCM']);
- #or
- my $payload = decode_jwt(token=>$t, key=>$k, accepted_enc=>qr/^A(128|192|256)GCM$/);
+C<undef> (default) - accept all C<enc> algorithms
+
+=item *
+
+Scalar string - the single accepted C<enc> name
+
+=item *
+
+ARRAY ref - list of accepted C<enc> names
+
+=item *
+
+C<Regexp> - the C<enc> value must match this regexp
+
+=back
+
+Example:
+
+  my $payload = decode_jwt(token=>$t, key=>$k, accepted_enc=>'A192GCM');
+  my $payload = decode_jwt(token=>$t, key=>$k, accepted_enc=>['A192GCM','A256GCM']);
+  my $payload = decode_jwt(token=>$t, key=>$k, accepted_enc=>qr/^A(128|192|256)GCM$/);
 
 =item decode_payload
 
-C<0> - do not decode payload, return it as a raw string (octects).
+C<0> - do not decode payload, return it as a raw string (octets).
 
 C<1> - decode payload from JSON string, return it as perl hash ref (or array ref) - decode_json failure means fatal error (croak).
 
@@ -1179,76 +1389,91 @@ C<undef> (default) - if possible decode payload from JSON string, if decode_json
 
 =item decode_header
 
-C<0> (default) - do not return decoded header as a return value of decode_jwt()
+C<0> (default) - C<decode_jwt> returns just the decoded payload (scalar
+context).
 
-C<1> - return decoded header as a return value of decode_jwt()
+C<1> - C<decode_jwt> returns C<($header, $payload)>; useful when you need
+to inspect the JWT header (e.g. C<alg>, C<kid>, C<typ>).
 
- my $payload = decode_jwt(token=>$t, key=>$k);
- #or
+ my $payload            = decode_jwt(token=>$t, key=>$k);
  my ($header, $payload) = decode_jwt(token=>$t, key=>$k, decode_header=>1);
 
 =item verify_iss
 
-B<INCOMPATIBLE CHANGE in 0.024:> If C<verify_iss> is specified and
-claim C<iss> (Issuer) is completely missing it is a failure since 0.024
+B<INCOMPATIBLE CHANGE Since: 0.024> If C<verify_iss> is specified and the
+C<iss> (Issuer) claim is completely missing, verification fails.
 
 C<CODE ref> - subroutine (with 'iss' claim value passed as argument) should return C<true> otherwise verification fails
 
 C<Regexp ref> - 'iss' claim value has to match given regexp otherwise verification fails
 
-C<Scalar> - 'iss' claim value has to be equal to given string (since 0.029)
+C<Scalar> - 'iss' claim value has to be equal to given string. B<Since: 0.029>
 
 C<undef> (default) - do not verify 'iss' claim
 
 =item verify_aud
 
-B<INCOMPATIBLE CHANGE in 0.024:> If C<verify_aud> is specified and
-claim C<aud> (Audience) is completely missing it is a failure since 0.024
+B<INCOMPATIBLE CHANGE Since: 0.024> If C<verify_aud> is specified and the
+C<aud> (Audience) claim is completely missing, verification fails.
 
 C<CODE ref> - subroutine (with 'aud' claim value passed as argument) should return C<true> otherwise verification fails
 
 C<Regexp ref> - 'aud' claim value has to match given regexp otherwise verification fails
 
-C<Scalar> - 'aud' claim value has to be equal to given string (since 0.029)
+C<Scalar> - 'aud' claim value has to be equal to given string. B<Since: 0.029>
 
 C<undef> (default) - do not verify 'aud' claim
 
-B<SINCE 0.036> we handle 'aud' claim when it contains an array of strings. In this case, the check should succeed if at least one
-value from the array matches. All checks (CODE, Regexp, Scalar) are performed individually against each member of the array of strings.
+B<Since: 0.036> The C<aud> claim may also be an array of strings. The
+check succeeds if at least one array element matches; the configured check
+(CODE, Regexp, Scalar) is applied individually to each element.
 
 =item verify_sub
 
-B<INCOMPATIBLE CHANGE in 0.024:> If C<verify_sub> is specified and
-claim C<sub> (Subject) is completely missing it is a failure since 0.024
+B<INCOMPATIBLE CHANGE Since: 0.024> If C<verify_sub> is specified and the
+C<sub> (Subject) claim is completely missing, verification fails.
 
 C<CODE ref> - subroutine (with 'sub' claim value passed as argument) should return C<true> otherwise verification fails
 
 C<Regexp ref> - 'sub' claim value has to match given regexp otherwise verification fails
 
-C<Scalar> - 'sub' claim value has to be equal to given string (since 0.029)
+C<Scalar> - 'sub' claim value has to be equal to given string. B<Since: 0.029>
 
 C<undef> (default) - do not verify 'sub' claim
 
 =item verify_jti
 
-B<INCOMPATIBLE CHANGE in 0.024:> If C<verify_jti> is specified and
-claim C<jti> (JWT ID) is completely missing it is a failure since 0.024
+B<INCOMPATIBLE CHANGE Since: 0.024> If C<verify_jti> is specified and the
+C<jti> (JWT ID) claim is completely missing, verification fails.
 
 C<CODE ref> - subroutine (with 'jti' claim value passed as argument) should return C<true> otherwise verification fails
 
 C<Regexp ref> - 'jti' claim value has to match given regexp otherwise verification fails
 
-C<Scalar> - 'jti' claim value has to be equal to given string (since 0.029)
+C<Scalar> - 'jti' claim value has to be equal to given string. B<Since: 0.029>
 
 C<undef> (default) - do not verify 'jti' claim
 
 =item verify_iat
 
-C<undef> - Issued At 'iat' claim must be valid (not in the future) if present
+B<NOTE:> C<verify_iat> is asymmetric with C<verify_nbf>/C<verify_exp>.
+Omitting the key entirely (the true default) means "no iat check".
+Passing C<verify_iat =E<gt> undef> is B<not> the same as omitting it - it
+explicitly enables the present-but-must-be-valid check below.
 
-C<0> (default) - ignore 'iat' claim
+C<undef> - "validate-if-present" mode: if the payload contains an 'iat'
+claim it must not be in the future (modulo C<leeway>), otherwise
+verification croaks; if 'iat' is absent, no error is raised. Useful when
+you want to honor an issuer's 'iat' when they provide one but not insist
+on it being there.
 
-C<1> - require valid 'iat' claim
+C<0> - ignore 'iat' claim (same as omitting the key)
+
+C<1> - require valid 'iat' claim: payload must contain 'iat' and it must
+not be in the future (modulo C<leeway>); croaks otherwise.
+
+If the C<verify_iat> key is not passed at all, no iat check is performed
+regardless of whether the payload contains an 'iat' claim.
 
 =item verify_nbf
 
@@ -1272,13 +1497,13 @@ Tolerance in seconds related to C<verify_exp>, C<verify_nbf> and C<verify_iat>. 
 
 =item ignore_claims
 
-C<1> - do not check claims (iat, exp, nbf, iss, aud, sub, jti), B<BEWARE: DANGEROUS, UNSECURE!!!>
+C<1> - do not check claims (iat, exp, nbf, iss, aud, sub, jti), B<BEWARE: DANGEROUS, INSECURE.>
 
 C<0> (default) - check claims
 
 =item verify_typ
 
-B<SINCE 0.036>
+B<Since: 0.036>
 
 C<CODE ref> - subroutine (with 'typ' header parameter value passed as argument) should return C<true> otherwise verification fails
 
@@ -1290,9 +1515,18 @@ C<undef> (default) - do not verify 'typ' header parameter
 
 =item tolerate_padding
 
-C<0> (default) - ignore Base64 padding characters when validating signature
+B<Since: 0.037> (semantics clarified B<Since: 0.038>). Both modes accept tokens whose segments include trailing C<=> Base64 padding
+characters (which are not produced by spec-compliant encoders); they differ
+only in what gets fed to the signature check.
 
-C<1> - take account of Base64 padding characters when validating signature
+C<0> (default) - strip C<=> padding from each segment B<before> computing
+the signature input. Compatible with the strict RFC 7515 producer (no
+padding signed). If the producer signed the I<padded> form, signature
+verification will fail in this mode.
+
+C<1> - keep C<=> padding as part of the signature input. Required to verify
+tokens produced by libraries (some Java implementations) that include
+padding in the bytes that were signed.
 
 =back
 
@@ -1300,21 +1534,24 @@ C<1> - take account of Base64 padding characters when validating signature
 
  my $token = encode_jwt(%named_args);
 
+Returns the encoded JWT as a string - either compact serialization (the
+default; three or five C<.>-separated segments) or flattened JSON
+serialization (when C<serialization =E<gt> 'flattened'>; a JSON object).
+Croaks on bad arguments or unsupported algorithm combinations.
+
 Named arguments:
 
 =over
 
 =item payload
 
-Value of this mandatory parameter can be a string/buffer or HASH ref or ARRAY ref
+Mandatory. Accepts a string (raw bytes), a HASH ref, or an ARRAY ref.
+HASH ref and ARRAY ref payloads are serialized as JSON strings; string
+payloads are passed through verbatim.
 
- my $token = encode_jwt(payload=>"any raw data", key=>$k, alg=>'HS256');
- #or
- my $token = encode_jwt(payload=>{a=>1,b=>2}, key=>$k, alg=>'HS256');
- #or
- my $token = encode_jwt(payload=>[11,22,33,44], key=>$k, alg=>'HS256');
-
-HASH refs and ARRAY refs payloads are serialized as JSON strings
+ my $token = encode_jwt(payload=>"any raw data",  key=>$k, alg=>'HS256');
+ my $token = encode_jwt(payload=>{a=>1, b=>2},    key=>$k, alg=>'HS256');
+ my $token = encode_jwt(payload=>[11,22,33,44],   key=>$k, alg=>'HS256');
 
 =item alg
 
@@ -1378,9 +1615,9 @@ A key used for token encryption (JWE) or token signing (JWS). The value depends 
  JWS alg header      key value
  ------------------  ----------------------------------
  none                no key required
- HS256               string (raw octects) of any length (or perl HASH ref with JWK, kty=>'oct')
- HS384               dtto
- HS512               dtto
+ HS256               string (raw octets) of any length (or perl HASH ref with JWK, kty=>'oct')
+ HS384               same as HS256
+ HS512               same as HS256
  RS256               private RSA key, perl HASH ref with JWK key structure,
                      a reference to SCALAR string with PEM or DER or JSON/JWK data,
                      object: Crypt::PK::RSA, Crypt::OpenSSL::RSA, Crypt::X509 or Crypt::OpenSSL::X509
@@ -1399,16 +1636,16 @@ A key used for token encryption (JWE) or token signing (JWS). The value depends 
 
  JWE alg header      key value
  ------------------  ----------------------------------
- dir                 string (raw octects) or perl HASH ref with JWK, kty=>'oct', length depends on 'enc' algorithm
- A128KW              string (raw octects) 16 bytes (or perl HASH ref with JWK, kty=>'oct')
- A192KW              string (raw octects) 24 bytes (or perl HASH ref with JWK, kty=>'oct')
- A256KW              string (raw octects) 32 bytes (or perl HASH ref with JWK, kty=>'oct')
- A128GCMKW           string (raw octects) 16 bytes (or perl HASH ref with JWK, kty=>'oct')
- A192GCMKW           string (raw octects) 24 bytes (or perl HASH ref with JWK, kty=>'oct')
- A256GCMKW           string (raw octects) 32 bytes (or perl HASH ref with JWK, kty=>'oct')
- PBES2-HS256+A128KW  string (raw octects) of any length (or perl HASH ref with JWK, kty=>'oct')
- PBES2-HS384+A192KW  string (raw octects) of any length (or perl HASH ref with JWK, kty=>'oct')
- PBES2-HS512+A256KW  string (raw octects) of any length (or perl HASH ref with JWK, kty=>'oct')
+ dir                 string (raw octets) or perl HASH ref with JWK, kty=>'oct', length depends on 'enc' algorithm
+ A128KW              string (raw octets) 16 bytes (or perl HASH ref with JWK, kty=>'oct')
+ A192KW              string (raw octets) 24 bytes (or perl HASH ref with JWK, kty=>'oct')
+ A256KW              string (raw octets) 32 bytes (or perl HASH ref with JWK, kty=>'oct')
+ A128GCMKW           string (raw octets) 16 bytes (or perl HASH ref with JWK, kty=>'oct')
+ A192GCMKW           string (raw octets) 24 bytes (or perl HASH ref with JWK, kty=>'oct')
+ A256GCMKW           string (raw octets) 32 bytes (or perl HASH ref with JWK, kty=>'oct')
+ PBES2-HS256+A128KW  string (raw octets) of any length (or perl HASH ref with JWK, kty=>'oct')
+ PBES2-HS384+A192KW  string (raw octets) of any length (or perl HASH ref with JWK, kty=>'oct')
+ PBES2-HS512+A256KW  string (raw octets) of any length (or perl HASH ref with JWK, kty=>'oct')
  RSA-OAEP            public RSA key, perl HASH ref with JWK key structure,
                      a reference to SCALAR string with PEM or DER or JSON/JWK data,
                      an instance of Crypt::PK::RSA or Crypt::OpenSSL::RSA
@@ -1423,11 +1660,12 @@ A key used for token encryption (JWE) or token signing (JWS). The value depends 
 
 =item keypass
 
-When 'key' parameter is an encrypted private RSA or ECC key this optional parameter may contain a password for private key decryption.
+Optional. When the C<key> parameter is an encrypted private RSA or ECC
+key (PEM/DER), this parameter holds the password used to decrypt it.
 
 =item allow_none
 
-C<1> - allow JWS with C<none> 'alg' header value (which means that token has no signature), B<BEWARE: DANGEROUS, UNSECURE!!!>
+C<1> - allow JWS with C<none> 'alg' header value (which means that token has no signature), B<BEWARE: DANGEROUS, INSECURE.>
 
 C<0> (default) - do not allow JWS with C<none> 'alg' header value
 
@@ -1438,28 +1676,32 @@ This optional parameter may contain a HASH ref with items that will be added to 
 If you want to use PBES2-based 'alg' like C<PBES2-HS512+A256KW> you can set PBES2 salt len (p2s) in bytes and
 iteration count (p2c) via C<extra_headers> like this:
 
- my $token = encode_jwt(payload=>$p, key=>$k, alg=>'PBES2-HS512+A256KW', extra_headers=>{p2c=8000, p2s=>32});
+ my $token = encode_jwt(payload=>$p, key=>$k, alg=>'PBES2-HS512+A256KW', extra_headers=>{p2c=>8000, p2s=>32});
  #NOTE: handling of p2s header is a special case, in the end it is replaced with the generated salt
 
-You can also use this to specify a kid value (see L</"kid_keys">)
+You can also use this to specify a C<kid> value (see L</kid_keys>):
 
- my $token = encode_jwt(payload=>$p, key=>$k, alg => 'RS256', extra_headers=>{kid=>'key1'});
+ my $token = encode_jwt(payload=>$p, key=>$k, alg=>'RS256', extra_headers=>{kid=>'key1'});
 
 =item unprotected_headers
 
-A hash with additional integrity unprotected headers - JWS and JWE (not available for C<compact> serialization);
+A HASH ref with additional integrity-unprotected headers (JWS and JWE).
+Not available for C<compact> serialization.
 
 =item shared_unprotected_headers
 
-A hash with additional integrity unprotected headers - JWE only (not available for C<compact> serialization);
+A HASH ref with additional integrity-unprotected headers (JWE only).
+Not available for C<compact> serialization.
 
 =item aad
 
-Additional Authenticated Data - scalar value with any (even raw octects) data - JWE only (not available for C<compact> serialization);
+Additional Authenticated Data: a scalar of arbitrary bytes that is
+authenticated but not encrypted (JWE only).
+Not available for C<compact> serialization.
 
 =item serialization
 
-Specify serialization method: C<compat> (= default) for Compact JWS/JWE serialization or C<flattened> for Flattened JWS/JWE JSON serialization.
+Specify serialization method: C<compact> (default) for Compact JWS/JWE serialization or C<flattened> for Flattened JWS/JWE JSON serialization.
 
 General JSON serialization is not supported yet.
 
@@ -1473,23 +1715,97 @@ Compression method, currently 'deflate' is the only one supported. C<undef> (def
 
 =item auto_iat
 
-C<1> - set 'iat' (Issued At) claim to current time (epoch seconds since 1970) at the moment of token encoding
+C<1> - set the C<iat> (Issued At) claim to the current time (epoch
+seconds since 1970) at the moment of token encoding.
 
-C<0> (default) - do not set 'iat' claim
+C<0> (default) - do not set the C<iat> claim.
 
-NOTE: claims are part of the payload and can be used only if the payload is a HASH ref!
+B<NOTE:> takes effect only when the C<payload> argument is a HASH ref;
+silently ignored for string/ARRAY-ref payloads. Same applies to
+C<relative_exp> and C<relative_nbf>.
 
 =item relative_exp
 
-Set 'exp' claim (Expiration Time) to current time + C<relative_exp> value (in seconds).
-
-NOTE: claims are part of the payload and can be used only if the payload is a HASH ref!
+Set the C<exp> (Expiration Time) claim to current time + C<relative_exp>
+value (in seconds). See note under C<auto_iat> about HASH-ref payloads.
 
 =item relative_nbf
 
-Set 'nbf' claim (Not Before) to current time + C<relative_nbf> value (in seconds).
+Set the C<nbf> (Not Before) claim to current time + C<relative_nbf>
+value (in seconds). See note under C<auto_iat> about HASH-ref payloads.
 
-NOTE: claims are part of the payload and can be used only if the payload is a HASH ref!
+=back
+
+=head1 SECURITY CONSIDERATIONS
+
+=head2 Configuration knobs
+
+The library exposes four tunable package variables. Set them once at
+program startup (typically in a C<BEGIN> block) before any
+C<encode_jwt>/C<decode_jwt> call.
+
+=over
+
+=item C<$Crypt::JWT::MAX_PBES2_ITER> (default C<3_000_000>)
+
+Maximum accepted PBES2 C<p2c> (iteration count) on decode. Caps CPU time
+spent on PBKDF2 for an attacker-controlled token. B<Since: 0.038>
+
+=item C<$Crypt::JWT::MAX_INFLATED_SIZE> (default C<10 * 1024 * 1024>)
+
+Maximum size (in bytes) of a payload after C<zip=DEF> inflation. Caps
+memory blow-up from "zip-bomb" tokens. B<Since: 0.038>
+
+=item C<$Crypt::JWT::MIN_HMAC_KEY_LEN> (default C<4>)
+
+Minimum HMAC key length (bytes) for HS256/384/512. See L</Key-strength
+minimums> below for the rationale and recommended override values.
+B<Since: 0.038>
+
+=item C<$Crypt::JWT::MIN_RSA_BITS> (default C<2048>)
+
+Minimum RSA modulus size (bits). Applies to all RSA-based algorithms
+(RS256/384/512, PS256/384/512, RSA-OAEP, RSA-OAEP-256, RSA1_5).
+B<Since: 0.038>
+
+=back
+
+=head2 Key-strength minimums
+
+The library enforces the following minimums; tokens that try to sign or
+verify with weaker keys are rejected with a croak. Both knobs are package
+variables and can be tuned at startup if a deployer has a stricter or
+looser policy.
+
+=over
+
+=item *
+
+B<HMAC keys for HSE<lt>nE<gt>:> minimum length B<4 bytes> (overridable via
+C<$Crypt::JWT::MIN_HMAC_KEY_LEN>). Applies to C<encode_jwt> and
+C<decode_jwt> on the HS256 / HS384 / HS512 paths. Tokens that try to sign
+or verify with a shorter key are rejected with a croak.
+
+B<CAUTION:> this default is intentionally B<much lower> than RFC 7518
+section 3.2, which requires the key to be at least the size of the hash
+output (32 / 48 / 64 bytes for HS256 / HS384 / HS512). The 4-byte floor is
+a backward-compatibility compromise - the library has long accepted short
+keys and many existing deployments rely on that - that just blocks the
+most trivially weak keys (single characters, two-letter strings) while
+leaving the policy decision in the deployer's hands.
+Cryptographically, HMAC security is bounded by the entropy of the key:
+16 random bytes (128 bits) is the smallest size that gives a comfortable
+security margin against brute-force key recovery; below that you start
+losing real security.
+
+=item *
+
+B<RSA modulus size:> minimum B<2048 bits> (overridable via
+C<$Crypt::JWT::MIN_RSA_BITS>). Applies to RS256/384/512, PS256/384/512,
+RSA-OAEP, RSA-OAEP-256, and RSA1_5 - both signing/encryption and
+verification/decryption. RSA keys with smaller moduli are rejected. This
+matches RFC 7518 section 3.3: "A key of size 2048 bits or larger MUST be
+used with these algorithms".
 
 =back
 
@@ -1503,4 +1819,4 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 COPYRIGHT
 
-Copyright (c) 2015-2025 DCIT, a.s. L<https://www.dcit.cz> / Karel Miko
+Copyright (c) 2015-2026 DCIT, a.s. L<https://www.dcit.cz> / Karel Miko

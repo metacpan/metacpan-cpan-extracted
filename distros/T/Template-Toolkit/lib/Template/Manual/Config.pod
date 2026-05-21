@@ -565,6 +565,31 @@ The template processor will raise a file exception if it detects
 direct or indirect recursion into a template.  Setting this option to
 any true value will allow templates to include each other recursively.
 
+=head2 EXPOSE_BLOCKS
+
+The C<EXPOSE_BLOCKS> option is unset by default and will make C<BLOCK>s
+in templates visible as pseudo-files under the C<template name> virtual
+directory.
+
+This enables the L<fragment pattern|https://htmx.org/essays/template-fragments/>,
+allowing partial rendering of a template, or rendering of a named section of a 
+template.
+
+Given the following template file (named F<index.html>)
+
+	<html>
+		[% BLOCK frag %]
+			[% DEFAULT text="hello world" %]
+			<div>[% text | html %]</div>
+		[% END %]
+		[% PROCESS frag %]
+		[% PROCESS frag text="foo is the new bar" %]
+	</html>
+
+when processed as F<index.html> will output the 2 C<div>s wrapped in C<html> tags,
+but when processed as F<index.html/frag>, will output only the C<div> from the 
+F<frag> C<BLOCK>.
+		
 =head1 Template Variables
 
 =head2 VARIABLES
@@ -1221,7 +1246,7 @@ By default the Template Toolkit will silently ignore the use of undefined
 variables (a bad design decision that I regret).
 
 When the C<STRICT> option is set, the use of any undefined variables or
-values will cause an exception to be throw.  The exception will have a
+values will cause an exception to be thrown.  The exception will have a
 C<type> of C<var.undef> and a message of the form
 "undefined variable: xxx".
 
@@ -1640,7 +1665,7 @@ reference and is assumed to be static.
         FILTERS => {
             'sfilt1' =>   \&static_filter,      # static
             'sfilt2' => [ \&static_filter, 0 ], # same as above
-            'dfilt1' => [ \&dyanamic_filter_factory, 1 ],
+            'dfilt1' => [ \&dynamic_filter_factory, 1 ],
         },
     });
 

@@ -26,8 +26,7 @@ BEGIN {
 use threads;
 use threads::shared;
 use Thread::Semaphore;
-use Test::More;
-use MyNote;
+use MyTest;
 
 use vars qw(@OPTS);
 
@@ -101,19 +100,18 @@ sub doit {
     note "requesting $i";
     $mutex->down;
     note "generating $i";
-    my $uu = uuid4();
+    for ( 1 .. 500 ) {
+        my $uu = uuid4();
+        { lock $seen; ++$seen->{$uu} }
+    }
     note "releasing $i";
     $mutex->up;
-    note $uu;
-    lock $seen;
-    note "recording $i";
-    ++$seen->{$uu};
 }
 
-is scalar(keys %$seen), 10, 'no dupes';
-if ((scalar keys %$seen) != 0) {
-    note "$_  $seen->{$_}"
-        for sort keys %$seen;
-}
+is scalar(keys %$seen), 5000, 'no dupes';
+#if ((scalar keys %$seen) != 0) {
+#    note "$_  $seen->{$_}"
+#        for sort keys %$seen;
+#}
 
 done_testing;

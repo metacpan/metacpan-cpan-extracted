@@ -51,7 +51,7 @@ WriteMakefile(
         provides => {
             'EV::Pg' => {
                 file    => 'lib/EV/Pg.pm',
-                version => '0.03',
+                version => MM->parse_version('lib/EV/Pg.pm'),
             },
         },
     },

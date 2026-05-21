@@ -1,12 +1,12 @@
 package Muster::Hook::Template;
-$Muster::Hook::Template::VERSION = '0.93';
+$Muster::Hook::Template::VERSION = '0.9501';
 =head1 NAME
 
 Muster::Hook::Template - Muster template directive.
 
 =head1 VERSION
 
-version 0.93
+version 0.9501
 
 =head1 DESCRIPTION
 

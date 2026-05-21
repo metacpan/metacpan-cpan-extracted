@@ -8,7 +8,7 @@ plan tests => 28;
 
 use_ok('Chandra::Socket::Token');
 
-# === Zero grace period — previous never valid ===
+# === Zero grace period - previous never valid ===
 {
 	my $tm = Chandra::Socket::Token->new(grace => 0);
 	my $old = $tm->current;
@@ -19,7 +19,7 @@ use_ok('Chandra::Socket::Token');
 	ok(!$tm->in_grace, 'not in grace with zero grace');
 }
 
-# === Very short TTL — rapid expiry ===
+# === Very short TTL - rapid expiry ===
 {
 	my $tm = Chandra::Socket::Token->new(ttl => 0.05);
 	my $tok = $tm->current;

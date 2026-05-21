@@ -1,4 +1,4 @@
-![ANSIEncode Logo](images/ANSI-Encode.png?raw=true "ANSIEncode Logo Title Text 1")
+![ANSIEncode Logo](pics/ANSI-Encode.png?raw=true "ANSIEncode Logo Title Text 1")
 
 # THE HISTORY OF Term::ANSIEncode
 

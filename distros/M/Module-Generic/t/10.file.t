@@ -288,7 +288,7 @@ is( $f4->code, 410, 'code: file is gone' );
 my $here = cwd();
 is( $here, Cwd::cwd(), 'cwd' );
 {
-    no warnings 'Module::Generic::File';
+    no warnings 'Module::Generic';
     ok( !$f4->chdir, 'file cannot chdir' );
 }
 use utf8;

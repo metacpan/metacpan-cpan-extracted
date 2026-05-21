@@ -6,7 +6,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp qw[carp croak confess cluck longmess shortmess];
-our $VERSION = 35;
+our $VERSION = 36;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -26,7 +26,7 @@ use IO::Socket::SSL;
 use YAML::Syck;
 use MIME::Base64;
 use File::Copy;
-use Scalar::Util qw(looks_like_number);
+use Scalar::Util qw(looks_like_number weaken);
 
 # For turning off SSL session cache
 use Readonly;
@@ -106,9 +106,18 @@ sub run($self) {
         $self->_init();
     }
 
+    my $nextdebugfile = 0;
+
     while($self->{keepRunning}) {
+        my $now = time;
+
+        if($now > $nextdebugfile) {
+            $nextdebugfile = $now + 10;
+            $self->_saveDebugFile();
+        }
+
         # Check for shutdown time
-        if($self->{shutdowntime} && $self->{shutdowntime} < time) {
+        if($self->{shutdowntime} && $self->{shutdowntime} < $now) {
             print STDERR "Shutdown time has arrived!\n";
             $self->{keepRunning} = 0;
         }
@@ -286,10 +295,34 @@ sub runShutdown($self) {
         # Try to notify the client (may or may not work);
         $self->_evalsyswrite($self->{clients}->{$cid}->{socket}, "\r\nQUIT\r\n");
 
+        # Remove from the selector AND explicitly close — relying on Perl GC was
+        # leaving handles (and thus OS file descriptors) alive whenever IO::Select
+        # still held a reference, particularly for IO::Socket::SSL handles.
+        eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
+            $self->{selector}->remove($self->{clients}->{$cid}->{socket});
+        };
+        $self->_safeCloseSocket($self->{clients}->{$cid}->{socket});
         delete $self->{clients}->{$cid};
     }
     print "All clients removed\n";
 
+    # Close the listening sockets too so the next process can re-bind without
+    # waiting for the kernel to release the port / unix-socket inode.
+    foreach my $listener (@{$self->{tcpsockets}}) {
+        $self->_safeCloseSocket($listener);
+    }
+    $self->{tcpsockets} = [];
+
+    return;
+}
+
+sub _saveDebugFile($self) {
+    if(defined($self->{config}->{debugfile})) {
+        if(open(my $ofh, '>', $self->{config}->{debugfile})) {
+            print $ofh Dumper($self->{clients});
+            close $ofh;
+        }
+    }
     return;
 }
 
@@ -340,6 +373,26 @@ sub _getTime($self) {
     my $now = time + $self->{timeoffset};
 
     return $now;
+}
+
+# Returns a process-monotonic serial number used to make client CIDs unique.
+sub _nextClientSerial($self) {
+    $self->{clientSerial}++;
+    return $self->{clientSerial};
+}
+
+# Best-effort socket close that never throws. SSL sockets get SSL_no_shutdown so
+# we don't block trying to send a TLS close_notify to a peer that's already gone.
+sub _safeCloseSocket($self, $socket) {
+    return if(!defined($socket));
+    eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
+        if(ref($socket) =~ /^IO::Socket::SSL/) {
+            $socket->close(SSL_no_shutdown => 1, SSL_fast_shutdown => 1);
+        } else {
+            $socket->close;
+        }
+    };
+    return;
 }
 
 sub _slurpBinFile($self, $fname) {
@@ -539,6 +592,17 @@ sub _init($self) {
         $self->{config}->{authtimeout} = 15;
     }
 
+    # Sensible safety-net defaults so that a config which omits these still
+    # disconnects hung peers instead of leaking FDs forever. Operators should
+    # still set explicit values in their config; these only protect against
+    # accidental omission.
+    if(!defined($self->{config}->{pingtimeout})) {
+        $self->{config}->{pingtimeout} = 180;
+    }
+    if(!defined($self->{config}->{interclackspingtimeout})) {
+        $self->{config}->{interclackspingtimeout} = 60;
+    }
+
     if(!defined($self->{config}->{deletedcachetime})) {
         $self->{config}->{deletedcachetime} = 60 * 60; # 1 hour
     }
@@ -558,6 +622,21 @@ sub _init($self) {
         $self->{config}->{interclacksreadfailtimeout} = 60; # 60 seconds for interclacks (higher latency)
     }
 
+    # Stalled-write detection: how long we'll keep a client around when we have
+    # data we want to send to them but every syswrite() returns EAGAIN (or 0
+    # bytes) — i.e., the kernel's send buffer is full and the peer isn't
+    # draining it. Distinct from readfailtimeout (which catches "selector says
+    # readable but no data") and pingtimeout (which the client can disable via
+    # NOPING). This one cannot be disabled by NOPING because it doesn't depend
+    # on the client sending us anything; it triggers when we cannot deliver
+    # data we already have queued.
+    if(!defined($self->{config}->{stalledwritetimeout})) {
+        $self->{config}->{stalledwritetimeout} = 60;
+    }
+    if(!defined($self->{config}->{interclacksstalledwritetimeout})) {
+        $self->{config}->{interclacksstalledwritetimeout} = 120; # interclacks links may have higher latency
+    }
+
     # Init run() variables
     $self->{savecache} = 0;
     $self->{lastsavecache} = 0;
@@ -571,6 +650,10 @@ sub _init($self) {
     $self->{keepRunning} = 1;
     $self->{nextcachecleanup} = 0;
     $self->{initHasRun} = 1;
+    # Process-monotonic serial used to make every accepted client's CID unique,
+    # even when the kernel reuses ephemeral ports or many connections arrive in
+    # the same wall-clock second.
+    $self->{clientSerial} = 0;
 
     my @tcpsockets;
 
@@ -582,7 +665,7 @@ sub _init($self) {
             my $tcp = IO::Socket::IP->new(
                 LocalHost => $ip,
                 LocalPort => $config->{port},
-                Listen => 20, # Listen queue of 20, just in case multiple clients try to connect at the same time
+                Listen => 128, # Larger backlog so a burst of connects doesn't get rejected before the accept-drain loop runs
                 Blocking => 0,
                 ReuseAddr => 1,
                 Proto => 'tcp',
@@ -631,7 +714,7 @@ sub _init($self) {
             my $tcp = IO::Socket::UNIX->new(
                 Type => SOCK_STREAM(),
                 Local => $socket,
-                Listen => 20, # Listen queue of 20, just in case multiple clients try to connect at the same time
+                Listen => 128, # Larger backlog so a burst of connects doesn't get rejected before the accept-drain loop runs
                 #Blocking => 0,
             ) or croak($ERRNO);
             $tcp->blocking(0);
@@ -663,8 +746,16 @@ sub _init($self) {
     $SIG{PIPE} = 'IGNORE';
 
 
-    $SIG{INT} = sub { $self->{keepRunning} = 0; };
-    $SIG{TERM} = sub { $self->{keepRunning} = 0; };
+    # Weaken the captured $self so the signal handlers don't keep the server hash
+    # alive for the rest of the process. Without weakening, the closures stored in
+    # %SIG hold a strong reference to $self, which prevents GC of the top-level
+    # container even after the caller drops its reference. Inner contents (clients,
+    # sockets, cache) are unaffected either way; this only matters when a process
+    # creates/discards multiple Server instances (e.g. a supervised reload).
+    my $weakself = $self;
+    weaken($weakself);
+    $SIG{INT}  = sub { $weakself->{keepRunning} = 0 if(defined($weakself)); };
+    $SIG{TERM} = sub { $weakself->{keepRunning} = 0 if(defined($weakself)); };
 
     # Restore persistance file if required
     if($self->{persistance}) {
@@ -923,8 +1014,13 @@ sub _addInterclacksLink($self) {
                                                            SSL_verify_mode => SSL_VERIFY_NONE,
                 );
                 if(!$encrypted) {
-                    print "startSSL failed: ", $SSL_ERROR, "\n";
-                    next;
+                    # Bare `next` was a bug here — there is no enclosing loop. Without an
+                    # explicit close the failed-handshake $msocket leaks a file descriptor.
+                    # Return cleanly; the next reconnect attempt will be scheduled by
+                    # nextinterclackscheck below.
+                    print STDERR "startSSL failed (interclacks master): ", $SSL_ERROR, "\n";
+                    $self->_safeCloseSocket($msocket);
+                    return;
                 }
             }
 
@@ -949,6 +1045,7 @@ sub _addInterclacksLink($self) {
                 authtimeout => $now + $self->{config}->{authtimeout},
                 authok => 0,
                 failtime => 0,
+                writefailtime => 0,  # streak-start time for stalled writes; 0 = no streak in progress
                 outmessages => [],
                 inmessages => [],
                 messagedelay => 0,
@@ -979,18 +1076,45 @@ sub _addInterclacksLink($self) {
 sub _addNewClients($self) {
     my $now = $self->_getTime();
     foreach my $tcpsocket (@{$self->{tcpsockets}}) {
-        my $clientsocket = $tcpsocket->accept;
-        if(defined($clientsocket)) {
+        # Drain the listen queue rather than accepting one connection per iteration.
+        # The listener is non-blocking, so accept() returns undef once the queue is empty.
+        # This prevents a burst of connects from being rejected at the kernel level when
+        # the backlog fills up while the main loop is busy elsewhere.
+        my $acceptedThisCycle = 0;
+        while(1) {
+            # Hard cap to keep one rogue burst from monopolising the loop and starving
+            # existing clients. Any remaining pending connects will be picked up in the
+            # next runOnce() iteration.
+            last if($acceptedThisCycle >= 64);
+
+            my $clientsocket = $tcpsocket->accept;
+            if(!defined($clientsocket)) {
+                # EAGAIN/EWOULDBLOCK (no more pending) or a transient error like
+                # ECONNABORTED (peer RST between the kernel queueing the connection
+                # and our accept). Either way, stop draining this listener.
+                last;
+            }
+            $acceptedThisCycle++;
+
             $clientsocket->blocking(0);
+
+            # Build a guaranteed-unique CID. The previous "$now:$rand(1_000_000)" scheme
+            # had a 50% birthday collision chance after ~1180 connects in the same
+            # second, and TCP CIDs based on $peerhost:$peerport collide whenever the
+            # kernel reuses an ephemeral port. A process-monotonic serial fixes both.
+            my $serial = $self->_nextClientSerial();
             my ($cid, $chost, $cport);
             if(ref $tcpsocket eq 'IO::Socket::UNIX') {
                 $chost = 'unixdomainsocket';
-                $cport = $now . ':' . int(rand(1_000_000));
+                $cport = $now . ':' . $serial;
             } else {
                 ($chost, $cport) = ($clientsocket->peerhost, $clientsocket->peerport);
+                # Append the serial so a reused ephemeral port can never alias an
+                # existing or recently-disconnected client.
+                $cport .= ':' . $serial;
             }
-            print "Got a new client $chost:$cport!\n";
             $cid = "$chost:$cport";
+            print "Got a new client $cid!\n";
             foreach my $debugcid (keys %{$self->{clients}}) {
                 if($self->{clients}->{$debugcid}->{mirror}) {
                     $self->{clients}->{$debugcid}->{outbuffer} .= "DEBUG CONNECTED=" . $cid . "\r\n";
@@ -1019,14 +1143,18 @@ sub _addNewClients($self) {
                                                             },
                 );
                 if(!$encrypted) {
-                    print "startSSL failed: ", $SSL_ERROR, "\n";
+                    # Critical: must close the accepted FD here. Without this every
+                    # failed handshake (port scan, RST during handshake, mismatched
+                    # cert, slow client) leaks one OS file descriptor. After enough
+                    # leaks the process hits RLIMIT_NOFILE and accept() begins
+                    # returning undef forever, which looks like the server has hung.
+                    print STDERR "startSSL failed for $cid: ", $SSL_ERROR, "\n";
+                    $self->_safeCloseSocket($clientsocket);
                     next;
                 }
             }
 
             $clientsocket->blocking(0);
-            #binmode($clientsocket, ':bytes');
-            #$clientsocket->{clacks_cid} = $cid;
             my %tmp = (
                 buffer  => '',
                 charbuffer => [],
@@ -1047,6 +1175,7 @@ sub _addNewClients($self) {
                 authtimeout => $now + $self->{config}->{authtimeout},
                 authok => 0,
                 failtime => 0,
+                writefailtime => 0,  # streak-start time for stalled writes; 0 = no streak in progress
                 outmessages => [],
                 inmessages => [],
                 inmessagedelay => 0,
@@ -1062,13 +1191,25 @@ sub _addNewClients($self) {
                 $tmp{authok} = 1;
                 $tmp{outbuffer} .= "OVERHEAD M debugmode_auth_not_really_required\r\n"
             }
+
+            # Defence in depth: the serial counter already guarantees uniqueness, but if
+            # something ever did produce a duplicate CID we must NOT silently overwrite
+            # the existing entry — that would leak the previous socket from the selector
+            # forever. Log loudly, close the new socket, and drop it. The server keeps
+            # running (no die/croak — see feedback memory).
+            if(defined($self->{clients}->{$cid})) {
+                print STDERR "INTERNAL: duplicate CID $cid generated; dropping new connection to avoid orphaning the existing one.\n";
+                $self->_safeCloseSocket($clientsocket);
+                next;
+            }
+
             $self->{clients}->{$cid} = \%tmp;
             $clientsocket->_setClientID($cid);
             $self->{selector}->add($clientsocket);
             $self->{workCount}++;
         }
     }
-    
+
     return;
 }
 
@@ -1080,10 +1221,31 @@ sub _disconnectClients($self) {
     my $interclackspingtime = $now - $self->{config}->{interclackspingtimeout};
     my $interclackspinginterval = $now - int($self->{config}->{interclackspingtimeout} / 3);
     foreach my $cid (keys %{$self->{clients}}) {
-        if(!$self->{clients}->{$cid}->{socket}->connected) {
-            push @{$self->{toremove}}, $cid;
-            next;
-        }
+        # NOTE: We deliberately do NOT call $socket->connected here.
+        #
+        # IO::Socket::connected is a thin wrapper around getpeername(), which
+        # returns the cached peer address as long as the kernel still has any
+        # connection state for the socket. That means it returns TRUE in exactly
+        # the cases we most want to detect:
+        #   - peer closed cleanly (TCP FIN / Unix EOF, socket in CLOSE_WAIT)
+        #   - peer process crashed (kernel sent FIN on its behalf)
+        #   - peer machine vanished without sending FIN (TCP only; getpeername
+        #     keeps returning the cached address indefinitely)
+        # It only returns FALSE on RST (TCP) or never-connected sockets — and
+        # those cases are already detected by the other three paths below:
+        #   - sysread() returning 0 in _clientInput  -> EOF / FIN / EOF-on-RST
+        #   - syswrite() returning EPIPE/ECONNRESET in _clientOutput
+        #   - the 60s server-side NOP\r\n keepalive in _clientOutput, which
+        #     forces a syswrite even on idle connections so a dead peer is
+        #     surfaced within 60 seconds without depending on client traffic
+        # Using $socket->connected here gave a misleading "alive" signal in
+        #   exactly the scenarios it was supposed to catch (FIN/CLOSE_WAIT),
+        #   so it's been removed. Both TCP and Unix-domain-socket peers are
+        #   now detected exclusively via the I/O paths.
+        #if(!$self->{clients}->{$cid}->{socket}->connected) {
+        #    push @{$self->{toremove}}, $cid;
+        #    next;
+        #}
         if(!$self->{clients}->{$cid}->{interclacks}) {
             if($self->{clients}->{$cid}->{lastping} > 0 && $self->{clients}->{$cid}->{lastping} < $pingtime) {
                 $self->_evalsyswrite($self->{clients}->{$cid}->{socket}, "\r\nTIMEOUT\r\n");
@@ -1103,6 +1265,26 @@ sub _disconnectClients($self) {
             $self->{clients}->{$cid}->{outbuffer} .= "PING\r\n";
         }
 
+        # Stalled-write check: we have data we want to send but every syswrite
+        # has been failing (EAGAIN / 0 bytes) since writefailtime — i.e., the
+        # client isn't draining their kernel receive buffer. After
+        # stalledwritetimeout seconds of no forward progress, give up. NOPING
+        # does NOT bypass this: it's about delivery capacity, not heartbeat.
+        if($self->{clients}->{$cid}->{writefailtime} > 0) {
+            my $stalledtimeout = $self->{clients}->{$cid}->{interclacks}
+                ? $self->{config}->{interclacksstalledwritetimeout}
+                : $self->{config}->{stalledwritetimeout};
+            if(($now - $self->{clients}->{$cid}->{writefailtime}) > $stalledtimeout) {
+                print STDERR "Client $cid stalled write for >${stalledtimeout}s — disconnecting\n";
+                # _evalsyswrite is best-effort here; if the kernel buffer is
+                # already full this notification will just be discarded, which
+                # is fine — we're tearing the connection down anyway.
+                $self->_evalsyswrite($self->{clients}->{$cid}->{socket}, "\r\nTIMEOUT\r\n");
+                push @{$self->{toremove}}, $cid;
+                next;
+            }
+        }
+
         if(!$self->{clients}->{$cid}->{authok} && $self->{clients}->{$cid}->{authtimeout} < $now) {
             # Authentication timeout!
             push @{$self->{toremove}}, $cid;
@@ -1115,14 +1297,20 @@ sub _disconnectClients($self) {
         # protocol in some cases (auth failure, etc)
         $self->_outboxToClientBuffer();
         for(1..5) {
-            my @flushed;
+            my $anyremaining = 0;
+            my %flushed;
             foreach my $cid (@{$self->{toremove}}) {
-                next if(contains($cid, \@flushed));
-                push @flushed, $cid;
+                next if($flushed{$cid});
+                $flushed{$cid} = 1;
+                next if(!defined($self->{clients}->{$cid}));
                 next if(!length($self->{clients}->{$cid}->{outbuffer}));
+                $anyremaining = 1;
                 print "Flushing $cid for removal...\n";
                 $self->_clientOutput($cid);
             }
+            # Break out of the flush loop as soon as every outbuffer is drained,
+            # rather than always sleeping the full 5*20ms = 100ms per disconnect batch.
+            last if(!$anyremaining);
             sleep(0.02);
         }
     }
@@ -1145,7 +1333,14 @@ sub _disconnectClients($self) {
                 $self->{interclackslock} = 0;
             }
 
-            $self->{selector}->remove($self->{clients}->{$cid}->{socket});
+            # Always remove from selector AND explicitly close. Without the close,
+            # IO::Select keeps the handle reference alive (so GC never fires), the
+            # OS FD stays open, and after enough churn the process hits its FD limit.
+            my $socket = $self->{clients}->{$cid}->{socket};
+            eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
+                $self->{selector}->remove($socket);
+            };
+            $self->_safeCloseSocket($socket);
             delete $self->{clients}->{$cid};
             #print "# Clients left: ", scalar keys %{$self->{clients}}, "\n";
         }
@@ -1276,37 +1471,65 @@ sub _clientOutput($self, $forceclientid = '') {
         };
         if($EVAL_ERROR) {
             print STDERR "Write error: $EVAL_ERROR\n";
+            # Peer is unreachable; discard any pending bytes so the flush loop
+            # in _disconnectClients() doesn't burn its full 5*20ms budget
+            # retrying syswrites that will never succeed.
+            $self->{clients}->{$cid}->{outbuffer} = '';
             push @{$self->{toremove}}, $cid;
             next;
         }
         if(!defined($written)) {
             # syswrite returned undef - check error type
             if($ERRNO{EPIPE}) {
-                # Peer closed connection
+                # Peer closed connection — discard the outbuffer for the same
+                # reason as above (no point trying to deliver to a dead peer
+                # 5 times in the upcoming flush loop).
                 print STDERR "Client $cid: connection closed by peer (EPIPE)\n";
+                $self->{clients}->{$cid}->{outbuffer} = '';
                 push @{$self->{toremove}}, $cid;
                 next;
             } elsif(!$ERRNO{EAGAIN} && !$ERRNO{EWOULDBLOCK}) {
-                # Other permanent error
+                # Other permanent error (ECONNRESET, ENOTCONN, etc.) — same
+                # treatment: connection is gone, drop pending data.
                 print STDERR "Write error for $cid: $ERRNO\n";
+                $self->{clients}->{$cid}->{outbuffer} = '';
                 push @{$self->{toremove}}, $cid;
                 next;
             }
-            # EAGAIN/EWOULDBLOCK - try again later
+            # EAGAIN/EWOULDBLOCK - kernel send buffer is full and the peer
+            # isn't draining it right now. Start (or continue) the stalled-
+            # write streak; _disconnectClients() will pull the plug if it
+            # exceeds stalledwritetimeout. We don't reset it here — only a
+            # successful (>0 byte) write resets the counter.
+            if($self->{clients}->{$cid}->{writefailtime} == 0) {
+                $self->{clients}->{$cid}->{writefailtime} = $now;
+            }
             next;
         }
         if(!$self->{clients}->{$cid}->{socket}->opened || $self->{clients}->{$cid}->{socket}->error) {
             print STDERR "Socket error for $cid\n";
+            # Socket is in an error state; discard the outbuffer.
+            $self->{clients}->{$cid}->{outbuffer} = '';
             push @{$self->{toremove}}, $cid;
             next;
         }
 
         if(defined($written) && $written) {
+            # Forward progress (any number of bytes accepted by the kernel)
+            # clears the stalled-write streak. Even a small partial write means
+            # the peer is reading.
+            $self->{clients}->{$cid}->{writefailtime} = 0;
             if(length($self->{clients}->{$cid}->{outbuffer}) == $written) {
                 $self->{clients}->{$cid}->{outbuffer} = '';
             } else {
                 $self->{clients}->{$cid}->{outbuffer} = substr($self->{clients}->{$cid}->{outbuffer}, $written);
-            }   
+            }
+        } elsif(defined($written) && $written == 0) {
+            # Defined but zero bytes is rare on Linux but possible on some
+            # platforms (treat as "no progress" — same semantics as EAGAIN).
+            if($self->{clients}->{$cid}->{writefailtime} == 0) {
+                $self->{clients}->{$cid}->{writefailtime} = $now;
+            }
         }
     }
 
@@ -1814,6 +2037,7 @@ sub _handleMessageControl($self, $cid, $inmsg) {
                                                 "MONITOR=" . $self->{clients}->{$lmccid}->{mirror} . ";" .
                                                 "LASTPING=" . $self->{clients}->{$lmccid}->{lastping} . ";" .
                                                 "LASTINTERCLACKSPING=" . $self->{clients}->{$lmccid}->{lastinterclacksping} . ";" .
+                                                "WRITEFAILTIME=" . $self->{clients}->{$lmccid}->{writefailtime} . ";" .
                                                 "\r\n";
         }
         $self->{clients}->{$cid}->{outbuffer} .= "CLIENTLISTEND\r\n";

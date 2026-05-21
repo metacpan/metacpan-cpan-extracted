@@ -19,18 +19,17 @@ my %WriteMakefileArgs = (
         'ExtUtils::MakeMaker' => '6.64',
     },
     TEST_REQUIRES => {
-        'Capture::Tiny'         => '0',
+        'Capture::Tiny'         => '0.50',
         'File::Spec'            => '0',
         'File::Spec::Functions' => '0',
-        'Path::Tiny'            => '0',
+        'Path::Tiny'            => '0.150',
         'Test2::V1'             => '0',
 
     },
     PREREQ_PM => {
         'File::Basename'           => '0',
         'File::Spec'               => '0',
-        'Getopt::Long::More'       => '0',
-        'Object::Pad'              => '0.800',
+        'Object::Pad'              => '0.825',
         'Pod::Markdown::Githubert' => '0.05',
         'Pod::Usage'               => '0',
     },
@@ -42,7 +41,6 @@ my %WriteMakefileArgs = (
                     eg
                     examples
                     share
-                    t
                     xt
                 >
             ],
@@ -53,6 +51,7 @@ my %WriteMakefileArgs = (
                     'App::CPANTS::Lint' => '0',
                     'Data::Printer'     => '0',
                     'Devel::Cover'      => '0',
+                    'Devel::NYTProf'    => '0',
                     'Perl::Critic'      => '0',
                     'Perl::Tidy'        => '0',
                 },
@@ -63,6 +62,11 @@ my %WriteMakefileArgs = (
                     'Test::Pod'           => '0',
                     'Test::Pod::Coverage' => '0',
                     'Test::Spelling'      => '0',
+                },
+            },
+            runtime => {
+                recommends => {
+                    'Getopt::Long::More' => '0.007',
                 },
             },
         },
@@ -79,6 +83,7 @@ my %WriteMakefileArgs = (
         x_contributors => [
             q{ryoskzypu <ryoskzypu@proton.me>},
         ],
+        x_spdx_expression => 'MIT-0',
     },
 );
 

@@ -2,6 +2,8 @@ use 5.008004;
 use ExtUtils::MakeMaker;
 use File::ShareDir::Install;
 
+os_unsupported if $^O eq 'MSWin32';
+
 install_share 'share';
 
 WriteMakefile(
@@ -58,6 +60,8 @@ run:
 
 upload:
 	rsync --archive --itemize-changes share/*.txt sibirocobombus:campaignwiki.org/contrib
+	ssh sibirocobombus make text-mapper
+	ssh sibirocobombus.root systemctl restart text-mapper
 EOT
   return join "\n", @ret;
 }

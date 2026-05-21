@@ -1,7 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
-use MyNote;
+use MyTest;
 
 use vars '@OPTS';
 
@@ -30,6 +29,17 @@ is variant($bin), 1, 'correct variant';
 my $foo;
 unparse($bin, $foo);
 is $foo, $str, 'unparse';
+note $foo;
+
+# --- degenerate case
+$str = uuid3( '' => 'www.example.com' );
+ok defined($str),      'degen defined';
+ok length($str) == 36, 'degen length';
+ok !parse($str, $bin), 'degen parsable';
+is type($bin), 3,      'degen type';
+is variant($bin), 1,   'degen variant';
+unparse($bin, $foo);
+is $foo, $str, 'degen unparse';
 note $foo;
 
 done_testing;

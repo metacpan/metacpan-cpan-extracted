@@ -1,6 +1,6 @@
 package Text::CSV_XS;
 
-# Copyright (c) 2007-2025 H.Merijn Brand.  All rights reserved.
+# Copyright (c) 2007-2026 H.Merijn Brand.  All rights reserved.
 # Copyright (c) 1998-2001 Jochen Wiedmann. All rights reserved.
 # Copyright (c) 1997 Alan Citterman.       All rights reserved.
 #
@@ -23,7 +23,7 @@ use XSLoader;
 use Carp;
 
 use vars qw( $VERSION @ISA @EXPORT_OK %EXPORT_TAGS );
-$VERSION = "1.61";
+$VERSION = "1.62";
 @ISA     = qw( Exporter );
 XSLoader::load ("Text::CSV_XS", $VERSION);
 
@@ -187,7 +187,7 @@ sub new {
     my $proto = shift;
     my $class = ref $proto || $proto	or  return;
     @_ > 0 &&   ref $_[0] ne "HASH"	and return;
-    my $attr  = shift || {};
+    my $attr  = shift || +{};
     my %attr  = map {
 	my $k = m/^[a-zA-Z]\w+$/ ? lc $_ : $_;
 	exists $attr_alias{$k} and $k = $attr_alias{$k};
@@ -1100,7 +1100,7 @@ sub say {
 sub print_hr {
     my ($self, $io, $hr) = @_;
     $self->{'_COLUMN_NAMES'} or croak ($self->SetDiag (3009));
-    ref $hr eq "HASH"      or croak ($self->SetDiag (3010));
+    ref $hr eq "HASH"        or croak ($self->SetDiag (3010));
     $self->print ($io, [ map { $hr->{$_} } $self->column_names () ]);
     } # print_hr
 
@@ -1208,7 +1208,16 @@ sub fragment {
 my $csv_usage = q{usage: my $aoa = csv (in => $file);};
 
 sub _csv_attr {
-    my %attr = (@_ == 1 && ref $_[0] eq "HASH" ? %{$_[0]} : @_) or croak ();
+    my %attr;
+    if (@_ == 1 && ref $_[0] eq "HASH") {
+	%attr = %{$_[0]};
+	}
+    elsif (scalar @_ % 2) {
+	croak (Text::CSV_XS->SetDiag (1502));
+	}
+    else {
+	%attr = @_;
+	}
 
     $attr{'binary'}     = 1;
     $attr{'strict_eol'} = 1;
@@ -5332,7 +5341,7 @@ L</csv> function. See ChangeLog releases 0.25 and on.
 
 =head1 COPYRIGHT AND LICENSE
 
- Copyright (C) 2007-2025 H.Merijn Brand.  All rights reserved.
+ Copyright (C) 2007-2026 H.Merijn Brand.  All rights reserved.
  Copyright (C) 1998-2001 Jochen Wiedmann. All rights reserved.
  Copyright (C) 1997      Alan Citterman.  All rights reserved.
 

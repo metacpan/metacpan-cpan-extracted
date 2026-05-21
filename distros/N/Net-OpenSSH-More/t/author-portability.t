@@ -11,6 +11,8 @@ use warnings;
 
 use Test::More;
 
-use Test::Portability::Files;
+eval 'use Test::Portability::Files';
+plan skip_all => 'Test::Portability::Files required for testing portability'
+    if $@;
 
 run_tests();

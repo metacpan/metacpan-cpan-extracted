@@ -1,0 +1,122 @@
+{
+   "abstract" : "generate PKGBUILD from CPAN metadata",
+   "author" : [
+      "ryoskzypu <ryoskzypu@proton.me>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-cpan2arch",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "eg",
+         "examples",
+         "share",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "App::CPANTS::Lint" : "0",
+            "Data::Printer" : "0",
+            "Devel::Cover" : "0",
+            "Devel::NYTProf" : "0",
+            "Perl::Critic" : "0",
+            "Perl::Tidy" : "0"
+         },
+         "requires" : {
+            "Test::CPAN::Changes" : "0",
+            "Test::Kwalitee" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Spelling" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "CHI" : "0.61",
+            "Cpanel::JSON::XS" : "4.40",
+            "Data::Printer" : "1.002001",
+            "Getopt::Long::More" : "0.007",
+            "Mojo::UserAgent::Cached" : "1.25",
+            "Term::ReadKey" : "2.38"
+         },
+         "requires" : {
+            "Archive::Tar" : "0",
+            "Capture::Tiny" : "0.50",
+            "Devel::CheckBin" : "0.04",
+            "File::Basename" : "0",
+            "File::Spec::Functions" : "0",
+            "IO::Socket::SSL" : "2.098",
+            "List::Compare" : "0.55",
+            "List::Util" : "0",
+            "Module::CoreList" : "0",
+            "Mojo::Log" : "0",
+            "Mojo::Promise" : "0",
+            "Mojo::UserAgent" : "0",
+            "Mojolicious" : "9.45",
+            "Object::Pad" : "0.825",
+            "Path::Tiny" : "0.150",
+            "Pod::Usage" : "0",
+            "Scalar::Util" : "0",
+            "Software::LicenseUtils" : "0.104007",
+            "Term::Table" : "0",
+            "Time::Piece" : "0",
+            "perl" : "5.042000",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CHI" : "0.61",
+            "Data::Printer" : "1.002001",
+            "Mojo::UserAgent::Cached" : "1.25"
+         },
+         "requires" : {
+            "Capture::Tiny" : "0.50",
+            "Devel::CheckBin" : "0.04",
+            "Path::Tiny" : "0.150",
+            "Test2::V1" : "0",
+            "Text::Diff" : "1.45",
+            "builtin" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ryoskzypu/App-cpan2arch/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ryoskzypu/App-cpan2arch.git",
+         "web" : "https://github.com/ryoskzypu/App-cpan2arch"
+      }
+   },
+   "version" : "v1.1.0",
+   "x_contributors" : [
+      "ryoskzypu <ryoskzypu@proton.me>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_spdx_expression" : "MIT-0"
+}

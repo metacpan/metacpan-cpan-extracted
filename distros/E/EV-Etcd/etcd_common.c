@@ -77,10 +77,10 @@ SV* kv_to_hashref(pTHX_ Mvccpb__KeyValue *kv) {
              kv->key.data ? newSVpvn((char *)kv->key.data, kv->key.len) : newSVpvn("", 0), 0);
     hv_store(hv, "value", 5,
              kv->value.data ? newSVpvn((char *)kv->value.data, kv->value.len) : newSVpvn("", 0), 0);
-    hv_store(hv, "create_revision", 15, newSViv(kv->create_revision), 0);
-    hv_store(hv, "mod_revision", 12, newSViv(kv->mod_revision), 0);
-    hv_store(hv, "version", 7, newSViv(kv->version), 0);
-    hv_store(hv, "lease", 5, newSViv(kv->lease), 0);
+    hv_store(hv, "create_revision", 15, newSVi64(kv->create_revision), 0);
+    hv_store(hv, "mod_revision", 12, newSVi64(kv->mod_revision), 0);
+    hv_store(hv, "version", 7, newSVi64(kv->version), 0);
+    hv_store(hv, "lease", 5, newSVi64(kv->lease), 0);
 
     return newRV_noinc((SV *)hv);
 }
@@ -108,10 +108,10 @@ void add_header_to_hv(pTHX_ HV *result, Etcdserverpb__ResponseHeader *header) {
     if (!header) return;
 
     HV *hv = newHV();
-    hv_store(hv, "cluster_id", 10, newSVuv(header->cluster_id), 0);
-    hv_store(hv, "member_id", 9, newSVuv(header->member_id), 0);
-    hv_store(hv, "revision", 8, newSViv(header->revision), 0);
-    hv_store(hv, "raft_term", 9, newSVuv(header->raft_term), 0);
+    hv_store(hv, "cluster_id", 10, newSVu64(header->cluster_id), 0);
+    hv_store(hv, "member_id", 9, newSVu64(header->member_id), 0);
+    hv_store(hv, "revision", 8, newSVi64(header->revision), 0);
+    hv_store(hv, "raft_term", 9, newSVu64(header->raft_term), 0);
     hv_store(result, "header", 6, newRV_noinc((SV *)hv), 0);
 }
 

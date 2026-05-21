@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-#-*- mode: sh; -*-
-
-perl -MCLI::Simple -e CLI::Simple::example
-

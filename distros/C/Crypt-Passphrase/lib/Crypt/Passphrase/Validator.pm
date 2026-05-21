@@ -1,16 +1,17 @@
 package Crypt::Passphrase::Validator;
-$Crypt::Passphrase::Validator::VERSION = '0.022';
+$Crypt::Passphrase::Validator::VERSION = '0.023';
 use strict;
 use warnings;
 
 our @CARP_NOT = 'Crypt::Passphrase';
 
 sub secure_compare {
-	my ($self, $left, $right) = @_;
-	return if length $left != length $right;
-	my $r = 0;
+	my ($self, $up, $down) = @_;
+	my $r = length $up != length $down;
+	my $left = $up . $down;
+	my $right = $down . $up;
 	$r |= ord(substr $left, $_, 1) ^ ord(substr $right, $_, 1) for 0 .. length($left) - 1;
-	return $r == 0 ? 1 : undef;
+	return $r == 0;
 }
 
 1;
@@ -29,7 +30,7 @@ Crypt::Passphrase::Validator - Base class for Crypt::Passphrase validators
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 DESCRIPTION
 

@@ -10,6 +10,7 @@ BEGIN
     use lib './lib';
     use vars qw( $DEBUG );
     use Test::More;
+    use Module::Generic::File qw( tempfile );
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
@@ -18,10 +19,10 @@ use warnings;
 
 BEGIN
 {
-    use ok( 'Mail::Make' );
+    use_ok( 'Mail::Make' ) or BAIL_OUT( 'Unable to load Mail::Make' );
 };
 
-# NOTE: Fluent interface
+# NOTE: fluent: basic plain text message
 subtest 'fluent: basic plain text message' => sub
 {
     my $mail = Mail::Make->new( ( $DEBUG ? ( debug => $DEBUG ) : () ) )
@@ -32,14 +33,15 @@ subtest 'fluent: basic plain text message' => sub
     ok( defined( $mail ), 'fluent construction succeeds' );
     my $str = $mail->as_string;
     ok( defined( $str ) && !ref( $str ), 'as_string returns string' );
-    like( $str, qr/From: sender\@example\.com/,     'From header present' );
-    like( $str, qr/To: recipient\@example\.com/,    'To header present' );
-    like( $str, qr/Subject: Test Subject/,           'Subject header present' );
-    like( $str, qr/MIME-Version: 1\.0/,              'MIME-Version header present' );
-    like( $str, qr/Content-Type: text\/plain/,       'text/plain Content-Type present' );
-    like( $str, qr/Hello, plain text!/,              'body content present' );
+    like( $str, qr/From: sender\@example\.com/,  'From header present' );
+    like( $str, qr/To: recipient\@example\.com/, 'To header present' );
+    like( $str, qr/Subject: Test Subject/,       'Subject header present' );
+    like( $str, qr/MIME-Version: 1\.0/,          'MIME-Version header present' );
+    like( $str, qr/Content-Type: text\/plain/,   'text/plain Content-Type present' );
+    like( $str, qr/Hello, plain text!/,          'body content present' );
 };
 
+# NOTE: fluent: method chaining returns $self
 subtest 'fluent: method chaining returns $self' => sub
 {
     my $mail = Mail::Make->new;
@@ -53,6 +55,7 @@ subtest 'fluent: method chaining returns $self' => sub
     is( ref( $rv ), 'Mail::Make', 'plain() returns $self' );
 };
 
+# NOTE: fluent: multiple To recipients
 subtest 'fluent: multiple To recipients' => sub
 {
     my $mail = Mail::Make->new
@@ -65,6 +68,7 @@ subtest 'fluent: multiple To recipients' => sub
     like( $str, qr/To: b\@example\.com, c\@example\.com/, 'multiple recipients joined' );
 };
 
+# NOTE: fluent: CC and BCC
 subtest 'fluent: CC and BCC' => sub
 {
     my $mail = Mail::Make->new
@@ -79,6 +83,7 @@ subtest 'fluent: CC and BCC' => sub
     like( $str, qr/Bcc: d\@example\.com/, 'Bcc header present' );
 };
 
+# NOTE: fluent: plain + html creates multipart/alternative
 subtest 'fluent: plain + html creates multipart/alternative' => sub
 {
     my $mail = Mail::Make->new
@@ -93,12 +98,12 @@ subtest 'fluent: plain + html creates multipart/alternative' => sub
     like( $str, qr/html version/,           'html part present' );
 };
 
+# NOTE: fluent: attach_inline with CID
 subtest 'fluent: attach_inline with CID' => sub
 {
-    use File::Temp qw( tempfile );
-    my( $fh, $path ) = tempfile( UNLINK => 1 );
-    print { $fh } "PNG data";
-    close( $fh );
+    my $path = tempfile( cleanup => 1, open => 1 );
+    $path->print( "PNG data" );
+    $path->close;
 
     my $mail = Mail::Make->new
         ->from(    'a@example.com' )
@@ -114,32 +119,36 @@ subtest 'fluent: attach_inline with CID' => sub
     my $str = $mail->as_string;
     ok( defined( $str ), 'as_string succeeds' );
     like( $str, qr/Content-ID: <logo\@example\.com>/, 'Content-ID present' );
-    like( $str, qr/Content-Disposition: inline/,       'inline disposition present' );
+    like( $str, qr/Content-Disposition: inline/,      'inline disposition present' );
 };
 
+# NOTE: fluent: attach_inline requires cid
 subtest 'fluent: attach_inline requires cid' => sub
 {
-    use File::Temp qw( tempfile );
-    my( $fh, $path ) = tempfile( UNLINK => 1 );
-    close( $fh );
+    my $path = tempfile( cleanup => 1, open => 1 );
+    $path->close;
     my $mail = Mail::Make->new;
     # Silence warnings output
-    local $SIG{__WARN__} = sub{};
+    no warnings 'Mail::Make';
+    # local $SIG{__WARN__} = sub{};
     my $rv   = $mail->attach_inline( type => 'image/png', path => $path );
     ok( !defined( $rv ), 'attach_inline() without cid returns error' );
     like( $mail->error, qr/'id' or 'cid' is required/i, 'error message correct' );
 };
 
+# NOTE: fluent: attach requires data or path
 subtest 'fluent: attach requires data or path' => sub
 {
     my $mail = Mail::Make->new;
     # Silence warnings output
-    local $SIG{__WARN__} = sub{};
+    # local $SIG{__WARN__} = sub{};
+    no warnings 'Mail::Make';
     my $rv   = $mail->attach( type => 'image/png' );
     ok( !defined( $rv ), 'attach() without data/path returns error' );
     like( $mail->error, qr/'data' or 'path' is required/i, 'error message correct' );
 };
 
+# NOTE: fluent: extra header via header()
 subtest 'fluent: extra header via header()' => sub
 {
     my $mail = Mail::Make->new
@@ -152,17 +161,19 @@ subtest 'fluent: extra header via header()' => sub
     like( $str, qr/X-Mailer: Mail::Make v0\.1\.0/, 'extra header present' );
 };
 
+# NOTE: fluent: no parts returns error from as_string
 subtest 'fluent: no parts returns error from as_string' => sub
 {
     my $mail = Mail::Make->new->from( 'a@example.com' )->to( 'b@example.com' );
     # Silence warnings output
-    local $SIG{__WARN__} = sub{};
+    # local $SIG{__WARN__} = sub{};
+    no warnings 'Mail::Make';
     my $str  = $mail->as_string;
     ok( !defined( $str ), 'as_string fails with no body parts' );
     like( $mail->error, qr/No body parts/i, 'error mentions No body parts' );
 };
 
-# NOTE: build() class method
+# NOTE: build: basic usage
 subtest 'build: basic usage' => sub
 {
     my $mail = Mail::Make->build(
@@ -177,6 +188,7 @@ subtest 'build: basic usage' => sub
     like( $str, qr/Build method body/, 'body content present' );
 };
 
+# NOTE: build: to as array ref
 subtest 'build: to as array ref' => sub
 {
     my $mail = Mail::Make->build(
@@ -191,6 +203,7 @@ subtest 'build: to as array ref' => sub
     like( $str, qr/c\@example\.com/, 'second recipient present' );
 };
 
+# NOTE: build: extra headers hash
 subtest 'build: extra headers hash' => sub
 {
     my $mail = Mail::Make->build(
@@ -205,6 +218,7 @@ subtest 'build: extra headers hash' => sub
     like( $str, qr/X-Custom: hello/, 'extra header present in output' );
 };
 
+# NOTE: build: reply_to and sender
 subtest 'build: reply_to and sender' => sub
 {
     my $mail = Mail::Make->build(
@@ -220,12 +234,12 @@ subtest 'build: reply_to and sender' => sub
     like( $str, qr/Sender: sender\@example\.com/,  'Sender present' );
 };
 
+# NOTE: build: attach single scalar shorthand
 subtest 'build: attach single scalar shorthand' => sub
 {
-    use File::Temp qw( tempfile );
-    my( $fh, $path ) = tempfile( SUFFIX => '.pdf', UNLINK => 1 );
-    print { $fh } "%PDF-1.4 fake pdf content";
-    close( $fh );
+    my $path = tempfile( extension => 'pdf', cleanup => 1, open => 1 );
+    $path->print( "%PDF-1.4 fake pdf content" );
+    $path->close;
 
     my $mail = Mail::Make->build(
         from    => 'a@example.com',
@@ -241,15 +255,15 @@ subtest 'build: attach single scalar shorthand' => sub
     like( $str, qr/multipart\/mixed/, 'multipart/mixed structure assembled' );
 };
 
+# NOTE: build: attach arrayref of scalars
 subtest 'build: attach arrayref of scalars' => sub
 {
-    use File::Temp qw( tempfile );
-    my( $fh1, $path1 ) = tempfile( SUFFIX => '.pdf', UNLINK => 1 );
-    print { $fh1 } "%PDF-1.4 first";
-    close( $fh1 );
-    my( $fh2, $path2 ) = tempfile( SUFFIX => '.pdf', UNLINK => 1 );
-    print { $fh2 } "%PDF-1.4 second";
-    close( $fh2 );
+    my $path1 = tempfile( extension => 'pdf', cleanup => 1, open => 1 );
+    $path1->print( "%PDF-1.4 first" );
+    $path1->close;
+    my $path2 = tempfile( extension => 'pdf', cleanup => 1, open => 1 );
+    $path2->print( "%PDF-1.4 second" );
+    $path2->close;
 
     my $mail = Mail::Make->build(
         from    => 'a@example.com',
@@ -266,15 +280,15 @@ subtest 'build: attach arrayref of scalars' => sub
     is( $attachment_count, 2, 'two attachment parts present' );
 };
 
+# NOTE: build: attach arrayref of hashrefs
 subtest 'build: attach arrayref of hashrefs' => sub
 {
-    use File::Temp qw( tempfile );
-    my( $fh1, $path1 ) = tempfile( SUFFIX => '.pdf', UNLINK => 1 );
-    print { $fh1 } "%PDF-1.4 first";
-    close( $fh1 );
-    my( $fh2, $path2 ) = tempfile( SUFFIX => '.pdf', UNLINK => 1 );
-    print { $fh2 } "%PDF-1.4 second";
-    close( $fh2 );
+    my $path1 = tempfile( extension => 'pdf', cleanup => 1, open => 1 );
+    $path1->print( "%PDF-1.4 first" );
+    $path1->close;
+    my $path2 = tempfile( extension => 'pdf', cleanup => 1, open => 1 );
+    $path2->print( "%PDF-1.4 second" );
+    $path2->close;
 
     my $mail = Mail::Make->build(
         from    => 'a@example.com',
@@ -295,15 +309,15 @@ subtest 'build: attach arrayref of hashrefs' => sub
     is( $attachment_count, 2, 'two attachment parts present' );
 };
 
+# NOTE: build: attach mixed arrayref
 subtest 'build: attach mixed arrayref' => sub
 {
-    use File::Temp qw( tempfile );
-    my( $fh1, $path1 ) = tempfile( SUFFIX => '.pdf', UNLINK => 1 );
-    print { $fh1 } "%PDF-1.4 first";
-    close( $fh1 );
-    my( $fh2, $path2 ) = tempfile( SUFFIX => '.pdf', UNLINK => 1 );
-    print { $fh2 } "%PDF-1.4 second";
-    close( $fh2 );
+    my $path1 = tempfile( extension => 'pdf', cleanup => 1, open => 1 );
+    $path1->print( "%PDF-1.4 first" );
+    $path1->close;
+    my $path2 = tempfile( extension => 'pdf', cleanup => 1, open => 1 );
+    $path2->print( "%PDF-1.4 second" );
+    $path2->close;
 
     my $mail = Mail::Make->build(
         from    => 'a@example.com',
@@ -323,7 +337,7 @@ subtest 'build: attach mixed arrayref' => sub
     is( $attachment_count, 2, 'two attachment parts present' );
 };
 
-# NOTE: as_entity
+# NOTE: as_entity returns Mail::Make::Entity
 subtest 'as_entity returns Mail::Make::Entity' => sub
 {
     my $mail = Mail::Make->new

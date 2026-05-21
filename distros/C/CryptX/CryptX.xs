@@ -25,31 +25,95 @@
 #include "tomcrypt.h"
 #include "tommath.h"
 
+STATIC int cryptx_internal_input_has_no_payload(const char *in, STRLEN len) {
+  STRLEN i;
+  int saw_formatting = 0;
+
+  if (in == NULL || len == 0) return 0;
+
+  for (i = 0; i < len; i++) {
+    if (in[i] == '=') {
+      saw_formatting = 1;
+      continue;
+    }
+    if (in[i] == ' ' || in[i] == '\t' || in[i] == '\n' || in[i] == '\r') {
+      saw_formatting = 1;
+      continue;
+    }
+    return 0;
+  }
+  return saw_formatting;
+}
+
 typedef adler32_state           *Crypt__Checksum__Adler32;
 typedef crc32_state             *Crypt__Checksum__CRC32;
 
-typedef ccm_state               *Crypt__AuthEnc__CCM;
-typedef eax_state               *Crypt__AuthEnc__EAX;
-typedef gcm_state               *Crypt__AuthEnc__GCM;
-typedef chacha20poly1305_state  *Crypt__AuthEnc__ChaCha20Poly1305;
-typedef ocb3_state              *Crypt__AuthEnc__OCB;
+typedef struct cryptx_authenc_ccm_struct {
+  ccm_state state;
+  int finalized;
+} *Crypt__AuthEnc__CCM;
+typedef struct cryptx_authenc_eax_struct {
+  eax_state state;
+  int finalized;
+} *Crypt__AuthEnc__EAX;
+typedef struct cryptx_authenc_gcm_struct {
+  gcm_state state;
+  int finalized;
+} *Crypt__AuthEnc__GCM;
+typedef struct cryptx_authenc_chacha20poly1305_struct {
+  chacha20poly1305_state state;
+  int finalized;
+} *Crypt__AuthEnc__ChaCha20Poly1305;
+typedef struct cryptx_authenc_ocb_struct {
+  ocb3_state state;
+  int finalized;
+} *Crypt__AuthEnc__OCB;
 
 typedef chacha_state            *Crypt__Stream__ChaCha;
+typedef chacha_state            *Crypt__Stream__XChaCha;
 typedef salsa20_state           *Crypt__Stream__Salsa20;
+typedef salsa20_state           *Crypt__Stream__XSalsa20;
 typedef sosemanuk_state         *Crypt__Stream__Sosemanuk;
 typedef rabbit_state            *Crypt__Stream__Rabbit;
 typedef rc4_state               *Crypt__Stream__RC4;
 typedef sober128_state          *Crypt__Stream__Sober128;
 
-typedef f9_state                *Crypt__Mac__F9;
-typedef hmac_state              *Crypt__Mac__HMAC;
-typedef omac_state              *Crypt__Mac__OMAC;
-typedef pelican_state           *Crypt__Mac__Pelican;
-typedef pmac_state              *Crypt__Mac__PMAC;
-typedef xcbc_state              *Crypt__Mac__XCBC;
-typedef poly1305_state          *Crypt__Mac__Poly1305;
-typedef blake2smac_state        *Crypt__Mac__BLAKE2s;
-typedef blake2bmac_state        *Crypt__Mac__BLAKE2b;
+typedef struct cryptx_mac_f9_struct {
+  f9_state state;
+  int finalized;
+} *Crypt__Mac__F9;
+typedef struct cryptx_mac_hmac_struct {
+  hmac_state state;
+  int finalized;
+} *Crypt__Mac__HMAC;
+typedef struct cryptx_mac_omac_struct {
+  omac_state state;
+  int finalized;
+} *Crypt__Mac__OMAC;
+typedef struct cryptx_mac_pelican_struct {
+  pelican_state state;
+  int finalized;
+} *Crypt__Mac__Pelican;
+typedef struct cryptx_mac_pmac_struct {
+  pmac_state state;
+  int finalized;
+} *Crypt__Mac__PMAC;
+typedef struct cryptx_mac_xcbc_struct {
+  xcbc_state state;
+  int finalized;
+} *Crypt__Mac__XCBC;
+typedef struct cryptx_mac_poly1305_struct {
+  poly1305_state state;
+  int finalized;
+} *Crypt__Mac__Poly1305;
+typedef struct cryptx_mac_blake2s_struct {
+  blake2smac_state state;
+  int finalized;
+} *Crypt__Mac__BLAKE2s;
+typedef struct cryptx_mac_blake2b_struct {
+  blake2bmac_state state;
+  int finalized;
+} *Crypt__Mac__BLAKE2b;
 
 typedef struct cipher_struct {          /* used by Crypt::Cipher */
   symmetric_key skey;
@@ -59,12 +123,570 @@ typedef struct cipher_struct {          /* used by Crypt::Cipher */
 typedef struct digest_struct {          /* used by Crypt::Digest */
   hash_state state;
   struct ltc_hash_descriptor *desc;
+  int finalized;
 } *Crypt__Digest;
 
-typedef struct digest_shake_struct {    /* used by Crypt::Digest::SHAKE */
+STATIC int cryptx_internal_noclone_hash(const char *name) {
+  if (name == NULL) return 0;
+  return strcmp(name, "sha1") == 0
+      || strcmp(name, "sha224") == 0
+      || strcmp(name, "sha256") == 0;
+}
+
+typedef struct digest_shake_struct {    /* used by Crypt::Digest::SHAKE, TurboSHAKE, KangarooTwelve */
   hash_state state;
   int num;
+  int squeezing;
 } *Crypt__Digest__SHAKE;
+typedef struct digest_shake_struct *Crypt__Digest__TurboSHAKE;
+typedef struct digest_shake_struct *Crypt__Digest__KangarooTwelve;
+
+/* --- Crypt::ASN1 helper -------------------------------------------------- */
+static const char * const s_asn1_class_names[] = {
+    "UNIVERSAL", "APPLICATION", "CONTEXT_SPECIFIC", "PRIVATE"
+};
+
+typedef struct { int int_fmt; int bin_fmt; int dt_fmt; HV *oidmap; } asn1_opts_t;
+/* int_fmt: 0=decimal(default)  1=hex  2=bytes */
+/* bin_fmt: 0=raw(default)      1=hex  2=base64 */
+/* dt_fmt:  0=rfc3339(default)  1=epoch */
+
+static SV * s_asn1_oid_name_sv(pTHX_ HV *oidmap, SV *oid_sv)
+{
+    STRLEN len = 0;
+    const char *oid = NULL;
+    SV **name_sv = NULL;
+
+    if (!oidmap || !oid_sv || !SvOK(oid_sv)) return NULL;
+
+    oid = SvPV(oid_sv, len);
+    name_sv = hv_fetch(oidmap, oid, (I32)len, 0);
+    if (!name_sv || !SvOK(*name_sv)) return NULL;
+
+    return newSVsv(*name_sv);
+}
+
+/* Encode binary data according to bin_fmt */
+static SV * s_asn1_bin_sv(pTHX_ const void *data, unsigned long size, int bin_fmt)
+{
+    if (!data || size == 0) return newSVpvn("", 0);
+    if (bin_fmt == 1) { /* hex */
+        SV *s;
+        unsigned long outlen = size * 2 + 1;
+        char *buf; Newz(0, buf, outlen, char);
+        { unsigned long ol = outlen; base16_encode((const unsigned char*)data, size, buf, &ol, 0); }
+        s = newSVpvn(buf, size * 2); Safefree(buf);
+        return s;
+    } else if (bin_fmt == 2) { /* base64 */
+        SV *s;
+        unsigned long outlen = ((size + 2) / 3) * 4 + 4;
+        char *buf; Newz(0, buf, outlen, char);
+        base64_encode((const unsigned char*)data, size, buf, &outlen);
+        s = newSVpvn(buf, outlen); Safefree(buf);
+        return s;
+    }
+    return newSVpvn((const char *)data, size); /* raw */
+}
+
+/* Convert Gregorian date+time to Unix epoch (portable, no timegm needed) */
+static IV s_asn1_to_epoch(unsigned YYYY, unsigned MM, unsigned DD,
+                           unsigned hh, unsigned mm, unsigned ss,
+                           unsigned off_dir, unsigned off_hh, unsigned off_mm)
+{
+    long y = YYYY, m = MM, d = DD;
+    long days;
+    IV epoch, offset;
+    if (m <= 2) { y--; m += 12; }
+    days = 365*y + y/4 - y/100 + y/400 + (153*m - 457)/5 + d - 719469;
+    epoch = (IV)days * 86400 + (IV)hh * 3600 + (IV)mm * 60 + (IV)ss;
+    offset = (IV)(off_hh * 3600 + off_mm * 60);
+    /* off_dir: 0 = '+' (local ahead of UTC, subtract to get UTC)
+     *          1 = '-' (local behind UTC, add to get UTC) */
+    epoch += (off_dir ? offset : -offset);
+    return epoch;
+}
+
+static SV * s_ltc_asn1_to_perl(pTHX_ ltc_asn1_list *node, asn1_opts_t opts)
+{
+    AV *av = newAV();
+    while (node != NULL && node->type != LTC_ASN1_EOL) {
+        HV   *hv         = newHV();
+        SV   *value_sv   = NULL;
+        const char *type_str   = "UNKNOWN";
+        const char *format_str = "unknown";
+        switch (node->type) {
+            case LTC_ASN1_BOOLEAN:
+                type_str = "BOOLEAN"; format_str = "bool";
+                if (node->data) value_sv = newSViv(*(int *)node->data ? 1 : 0);
+                break;
+            case LTC_ASN1_INTEGER: {
+                mp_int *mpi = (mp_int *)node->data;
+                type_str = "INTEGER";
+                if (mpi) {
+                    if (opts.int_fmt == 2) { /* bytes */
+                        if (mp_isneg(mpi)) {
+                            SvREFCNT_dec(hv);
+                            croak("FATAL: asn1_decode_der: negative INTEGER cannot be represented with int=>'bytes'");
+                        }
+                        format_str = "bytes";
+                        if (mp_iszero(mpi)) {
+                            value_sv = newSVpvn("\0", 1);
+                        } else {
+                            unsigned long usize = mp_ubin_size(mpi);
+                            unsigned char *ubuf; Newz(0, ubuf, usize, unsigned char);
+                            { mp_err me = mp_to_ubin(mpi, ubuf, usize, NULL); PERL_UNUSED_VAR(me); }
+                            value_sv = newSVpvn((char *)ubuf, usize); Safefree(ubuf);
+                        }
+                    } else {
+                        int radix = (opts.int_fmt == 1) ? 16 : 10;
+                        int len;
+                        char *buf;
+                        format_str = (opts.int_fmt == 1) ? "hex" : "decimal";
+                        len = mp_count_bits(mpi) / (opts.int_fmt == 1 ? 4 : 3) + 4;
+                        Newz(0, buf, len, char);
+                        { mp_err me = mp_to_radix(mpi, buf, len, NULL, radix); PERL_UNUSED_VAR(me); }
+                        if (opts.int_fmt == 1) { /* lowercase hex */
+                            char *p; for (p = buf; *p; p++) if (*p >= 'A' && *p <= 'F') *p += 32;
+                        }
+                        value_sv = newSVpv(buf, 0); Safefree(buf);
+                    }
+                }
+                break;
+            }
+            case LTC_ASN1_SHORT_INTEGER: {
+                type_str = "INTEGER";
+                if (node->data) {
+                    unsigned long v = *(unsigned long *)node->data;
+                    if (opts.int_fmt == 1) { /* hex */
+                        char buf[32];
+                        format_str = "hex";
+                        snprintf(buf, sizeof(buf), "%lx", v);
+                        value_sv = newSVpv(buf, 0);
+                    } else if (opts.int_fmt == 2) { /* bytes */
+                        unsigned char b[8], be[8];
+                        int n = 0, k;
+                        unsigned long tmp = v;
+                        format_str = "bytes";
+                        while (tmp) { b[n++] = (unsigned char)(tmp & 0xff); tmp >>= 8; }
+                        if (!n) { b[0] = 0; n = 1; }
+                        for (k = 0; k < n; k++) be[k] = b[n - 1 - k];
+                        value_sv = newSVpvn((char *)be, n);
+                    } else {
+                        format_str = "decimal";
+                        value_sv = newSVuv((UV)v);
+                    }
+                }
+                break;
+            }
+            case LTC_ASN1_BIT_STRING: {
+                unsigned char *bits = (unsigned char *)node->data;
+                unsigned long nbits = node->size, nbytes = (nbits + 7) / 8;
+                type_str = "BIT_STRING";
+                format_str = (opts.bin_fmt == 1) ? "hex" : (opts.bin_fmt == 2) ? "base64" : "bytes";
+                if (bits && nbytes > 0) {
+                    unsigned long i;
+                    unsigned char *packed;
+                    Newz(0, packed, nbytes, unsigned char);
+                    for (i = 0; i < nbits; i++)
+                        if (bits[i]) packed[i/8] |= (unsigned char)(0x80u >> (i%8));
+                    value_sv = s_asn1_bin_sv(aTHX_ packed, nbytes, opts.bin_fmt);
+                    Safefree(packed);
+                }
+                hv_stores(hv, "bits", newSVuv((UV)nbits));
+                break;
+            }
+            case LTC_ASN1_RAW_BIT_STRING: {
+                unsigned long nbits_raw = node->size;
+                unsigned long nbytes_raw = (nbits_raw + 7) / 8;
+                type_str = "BIT_STRING";
+                format_str = (opts.bin_fmt == 1) ? "hex" : (opts.bin_fmt == 2) ? "base64" : "bytes";
+                value_sv = s_asn1_bin_sv(aTHX_ node->data, nbytes_raw, opts.bin_fmt);
+                hv_stores(hv, "bits", newSVuv((UV)nbits_raw));
+                break;
+            }
+            case LTC_ASN1_OCTET_STRING:
+                type_str = "OCTET_STRING";
+                format_str = (opts.bin_fmt == 1) ? "hex" : (opts.bin_fmt == 2) ? "base64" : "bytes";
+                value_sv = s_asn1_bin_sv(aTHX_ node->data, node->size, opts.bin_fmt);
+                break;
+            case LTC_ASN1_NULL:
+                type_str = "NULL"; format_str = "null";
+                break;
+            case LTC_ASN1_OBJECT_IDENTIFIER: {
+                unsigned long *oid = (unsigned long *)node->data;
+                type_str = "OID"; format_str = "oid";
+                if (oid && node->size > 0) {
+                    unsigned long i; SV *s = newSVpvn("", 0);
+                    for (i = 0; i < node->size; i++) {
+                        if (i > 0) sv_catpv(s, "."); sv_catpvf(s, "%lu", oid[i]);
+                    }
+                    value_sv = s;
+                    {
+                        SV *name_sv = s_asn1_oid_name_sv(aTHX_ opts.oidmap, value_sv);
+                        if (name_sv) hv_stores(hv, "name", name_sv);
+                    }
+                }
+                break;
+            }
+            case LTC_ASN1_IA5_STRING:
+                type_str = "IA5_STRING"; format_str = "string";
+                if (node->data && node->size > 0) value_sv = newSVpvn((char *)node->data, node->size);
+                break;
+            case LTC_ASN1_PRINTABLE_STRING:
+                type_str = "PRINTABLE_STRING"; format_str = "string";
+                if (node->data && node->size > 0) value_sv = newSVpvn((char *)node->data, node->size);
+                break;
+            case LTC_ASN1_TELETEX_STRING:
+                type_str = "TELETEX_STRING"; format_str = "string";
+                if (node->data && node->size > 0) value_sv = newSVpvn((char *)node->data, node->size);
+                break;
+            case LTC_ASN1_UTF8_STRING: {
+                wchar_t *wstr = (wchar_t *)node->data;
+                type_str = "UTF8_STRING"; format_str = "utf8";
+                if (wstr && node->size > 0) {
+                    unsigned long i;
+                    SV *s = newSVpvn("", 0); SvUTF8_on(s);
+                    for (i = 0; i < node->size; i++) {
+                        U8 ubuf[UTF8_MAXBYTES + 1];
+                        U8 *end = uvchr_to_utf8(ubuf, (UV)wstr[i]);
+                        sv_catpvn(s, (char *)ubuf, end - ubuf);
+                    }
+                    value_sv = s;
+                }
+                break;
+            }
+            case LTC_ASN1_UTCTIME: {
+                ltc_utctime *t = (ltc_utctime *)node->data;
+                type_str = "UTCTIME";
+                if (t) {
+                    unsigned YYYY = (t->YY >= 50) ? 1900 + t->YY : 2000 + t->YY;
+                    if (opts.dt_fmt == 1) { /* epoch */
+                        format_str = "epoch";
+                        value_sv = newSViv(s_asn1_to_epoch(YYYY, t->MM, t->DD, t->hh, t->mm, t->ss,
+                                                            t->off_dir, t->off_hh, t->off_mm));
+                    } else { /* rfc3339 */
+                        char buf[32];
+                        format_str = "rfc3339";
+                        if (t->off_dir == 0 && t->off_hh == 0 && t->off_mm == 0)
+                            snprintf(buf, sizeof(buf), "%04u-%02u-%02uT%02u:%02u:%02uZ",
+                                     YYYY, t->MM, t->DD, t->hh, t->mm, t->ss);
+                        else
+                            snprintf(buf, sizeof(buf), "%04u-%02u-%02uT%02u:%02u:%02u%c%02u:%02u",
+                                     YYYY, t->MM, t->DD, t->hh, t->mm, t->ss,
+                                     t->off_dir ? '-' : '+', t->off_hh, t->off_mm);
+                        value_sv = newSVpv(buf, 0);
+                    }
+                }
+                break;
+            }
+            case LTC_ASN1_GENERALIZEDTIME: {
+                ltc_generalizedtime *t = (ltc_generalizedtime *)node->data;
+                type_str = "GENERALIZEDTIME";
+                if (t) {
+                    if (opts.dt_fmt == 1) { /* epoch */
+                        format_str = "epoch";
+                        value_sv = newSViv(s_asn1_to_epoch(t->YYYY, t->MM, t->DD, t->hh, t->mm, t->ss,
+                                                            t->off_dir, t->off_hh, t->off_mm));
+                    } else { /* rfc3339 */
+                        char buf[48];
+                        int pos;
+                        format_str = "rfc3339";
+                        pos = snprintf(buf, sizeof(buf), "%04u-%02u-%02uT%02u:%02u:%02u",
+                                       t->YYYY, t->MM, t->DD, t->hh, t->mm, t->ss);
+                        if (t->fs > 0)
+                            pos += snprintf(buf + pos, sizeof(buf) - pos, ".%u", t->fs);
+                        if (t->off_dir == 0 && t->off_hh == 0 && t->off_mm == 0)
+                            snprintf(buf + pos, sizeof(buf) - pos, "Z");
+                        else
+                            snprintf(buf + pos, sizeof(buf) - pos, "%c%02u:%02u",
+                                     t->off_dir ? '-' : '+', t->off_hh, t->off_mm);
+                        value_sv = newSVpv(buf, 0);
+                    }
+                }
+                break;
+            }
+            case LTC_ASN1_SEQUENCE:
+                type_str = "SEQUENCE"; format_str = "array";
+                value_sv = node->child ? newRV_noinc(s_ltc_asn1_to_perl(aTHX_ node->child, opts)) : newRV_noinc((SV *)newAV());
+                break;
+            case LTC_ASN1_SET:
+            case LTC_ASN1_SETOF:
+                type_str = "SET"; format_str = "array";
+                value_sv = node->child ? newRV_noinc(s_ltc_asn1_to_perl(aTHX_ node->child, opts)) : newRV_noinc((SV *)newAV());
+                break;
+            case LTC_ASN1_CUSTOM_TYPE: {
+                unsigned int cls = (unsigned int)node->klass;
+                type_str = "CUSTOM";
+                hv_stores(hv, "class",       newSVpv((cls < 4) ? s_asn1_class_names[cls] : "UNKNOWN", 0));
+                hv_stores(hv, "constructed", newSViv(node->pc == LTC_ASN1_PC_CONSTRUCTED ? 1 : 0));
+                hv_stores(hv, "tag",         newSVuv((UV)node->tag));
+                if (node->pc == LTC_ASN1_PC_CONSTRUCTED && node->child) {
+                    format_str = "array";
+                    value_sv = newRV_noinc(s_ltc_asn1_to_perl(aTHX_ node->child, opts));
+                } else if (node->data && node->size > 0) {
+                    format_str = (opts.bin_fmt == 1) ? "hex" : (opts.bin_fmt == 2) ? "base64" : "bytes";
+                    value_sv = s_asn1_bin_sv(aTHX_ node->data, node->size, opts.bin_fmt);
+                }
+                break;
+            }
+            default:
+                /* Unknown ltc_asn1_type — skip rather than emit unroundtrippable node */
+                SvREFCNT_dec(hv);
+                node = node->next;
+                continue;
+        }
+        hv_stores(hv, "type",   newSVpv(type_str,   0));
+        hv_stores(hv, "format", newSVpv(format_str, 0));
+        hv_stores(hv, "value",  value_sv ? value_sv : newSV(0));
+        av_push(av, newRV_noinc((SV *)hv));
+        node = node->next;
+    }
+    return (SV *)av;
+}
+/* --- end Crypt::ASN1 decoder helper -------------------------------------- */
+
+/* --- Crypt::ASN1 encoder helpers ----------------------------------------- */
+
+/* Write DER length to buf, return bytes written (buf must be >= 5 bytes) */
+static unsigned long s_asn1_put_der_length(pTHX_ unsigned char *buf, unsigned long len)
+{
+    if (len > 0xffffffffUL) {
+        croak("FATAL: asn1_encode: DER length exceeds 0xffffffff bytes");
+    }
+    if (len < 128) {
+        buf[0] = (unsigned char)len;
+        return 1;
+    } else if (len <= 0xffUL) {
+        buf[0] = 0x81; buf[1] = (unsigned char)len;
+        return 2;
+    } else if (len <= 0xffffUL) {
+        buf[0] = 0x82;
+        buf[1] = (unsigned char)(len >> 8);
+        buf[2] = (unsigned char)(len & 0xff);
+        return 3;
+    } else if (len <= 0xffffffUL) {
+        buf[0] = 0x83;
+        buf[1] = (unsigned char)(len >> 16);
+        buf[2] = (unsigned char)((len >> 8) & 0xff);
+        buf[3] = (unsigned char)(len & 0xff);
+        return 4;
+    }
+    buf[0] = 0x84;
+    buf[1] = (unsigned char)(len >> 24);
+    buf[2] = (unsigned char)((len >> 16) & 0xff);
+    buf[3] = (unsigned char)((len >> 8) & 0xff);
+    buf[4] = (unsigned char)(len & 0xff);
+    return 5;
+}
+
+/* Append single-byte tag + DER length + content to SV */
+static void s_asn1_append_tlv(pTHX_ SV *out, unsigned char tag,
+                               const void *content, unsigned long clen)
+{
+    unsigned char lbuf[5];
+    unsigned long llen = s_asn1_put_der_length(aTHX_ lbuf, clen);
+    sv_catpvn(out, (char *)&tag, 1);
+    sv_catpvn(out, (char *)lbuf, llen);
+    if (clen > 0 && content) sv_catpvn(out, (const char *)content, clen);
+}
+
+/* Append multi-byte tag (for CUSTOM) + DER length + content to SV */
+static void s_asn1_append_custom_tlv(pTHX_ SV *out,
+                                      unsigned int klass, unsigned int pc,
+                                      unsigned long tag,
+                                      const void *content, unsigned long clen)
+{
+    unsigned char tbuf[12], lbuf[5];
+    unsigned long tlen, llen;
+    unsigned char first = (unsigned char)(((klass & 0x3) << 6) | ((pc & 0x1) << 5));
+
+    if (tag < 31) {
+        tbuf[0] = first | (unsigned char)tag;
+        tlen = 1;
+    } else {
+        unsigned char tmp[10];
+        int n = 0, i;
+        unsigned long t = tag;
+        tbuf[0] = first | 0x1f;
+        /* base-128 big-endian */
+        do { tmp[n++] = (unsigned char)(t & 0x7f); t >>= 7; } while (t > 0);
+        tlen = 1;
+        for (i = n - 1; i >= 0; i--) tbuf[tlen++] = tmp[i] | (i > 0 ? 0x80 : 0x00);
+    }
+    llen = s_asn1_put_der_length(aTHX_ lbuf, clen);
+    sv_catpvn(out, (char *)tbuf, tlen);
+    sv_catpvn(out, (char *)lbuf, llen);
+    if (clen > 0 && content) sv_catpvn(out, (const char *)content, clen);
+}
+
+/* Forward declarations */
+static void s_asn1_encode_node(pTHX_ SV *out, HV *node);
+
+static void s_asn1_encode_nodes(pTHX_ SV *out, AV *nodes)
+{
+    I32 i, len = av_top_index(nodes);
+    for (i = 0; i <= len; i++) {
+        SV **elem = av_fetch(nodes, i, 0);
+        if (!elem || !SvROK(*elem) || SvTYPE(SvRV(*elem)) != SVt_PVHV) continue;
+        s_asn1_encode_node(aTHX_ out, (HV *)SvRV(*elem));
+    }
+}
+
+static void s_asn1_encode_node(pTHX_ SV *out, HV *node)
+{
+    SV **sv_type = hv_fetchs(node, "type", 0);
+    SV **sv_value = hv_fetchs(node, "value", 0);
+    const char *type;
+
+    if (!sv_type || !SvOK(*sv_type)) croak("FATAL: asn1_encode: node missing 'type'");
+    type = SvPV_nolen(*sv_type);
+
+    if (strEQ(type, "BOOLEAN")) {
+        int val = (sv_value && SvOK(*sv_value)) ? SvIV(*sv_value) : 0;
+        unsigned char c = val ? 0xFF : 0x00;
+        s_asn1_append_tlv(aTHX_ out, 0x01, &c, 1);
+    }
+    else if (strEQ(type, "NULL")) {
+        s_asn1_append_tlv(aTHX_ out, 0x05, NULL, 0);
+    }
+    else if (strEQ(type, "INTEGER")) {
+        STRLEN slen; const char *str;
+        mp_int mpi; int rv;
+        unsigned long outlen; unsigned char *buf;
+
+        if (!sv_value || !SvOK(*sv_value)) croak("FATAL: asn1_encode: INTEGER missing value");
+        str = SvPV(*sv_value, slen);
+
+        if (mp_init(&mpi) != MP_OKAY) croak("FATAL: asn1_encode: mp_init failed");
+        if (mp_read_radix(&mpi, str, 10) != MP_OKAY) { mp_clear(&mpi); croak("FATAL: asn1_encode: invalid INTEGER value '%s'", str); }
+
+        rv = der_length_integer(&mpi, &outlen);
+        if (rv != CRYPT_OK) { mp_clear(&mpi); croak("FATAL: asn1_encode: der_length_integer failed"); }
+
+        Newx(buf, outlen, unsigned char);
+        rv = der_encode_integer(&mpi, buf, &outlen);
+        mp_clear(&mpi);
+        if (rv != CRYPT_OK) { Safefree(buf); croak("FATAL: asn1_encode: der_encode_integer failed"); }
+
+        sv_catpvn(out, (char *)buf, outlen);
+        Safefree(buf);
+    }
+    else if (strEQ(type, "OID")) {
+        STRLEN slen; const char *str; const char *p;
+        unsigned long words[64], nwords = 0, outlen;
+        unsigned char *buf; int rv;
+
+        if (!sv_value || !SvOK(*sv_value)) croak("FATAL: asn1_encode: OID missing value");
+        str = SvPV(*sv_value, slen);
+
+        p = str;
+        while (*p && nwords < 64) {
+            words[nwords++] = strtoul(p, (char **)&p, 10);
+            if (*p == '.') p++;
+        }
+        if (nwords < 2) croak("FATAL: asn1_encode: OID must have at least 2 arcs");
+
+        rv = der_length_object_identifier(words, nwords, &outlen);
+        if (rv != CRYPT_OK) croak("FATAL: asn1_encode: der_length_object_identifier failed");
+
+        Newx(buf, outlen, unsigned char);
+        rv = der_encode_object_identifier(words, nwords, buf, &outlen);
+        if (rv != CRYPT_OK) { Safefree(buf); croak("FATAL: asn1_encode: der_encode_object_identifier failed"); }
+
+        sv_catpvn(out, (char *)buf, outlen);
+        Safefree(buf);
+    }
+    else if (strEQ(type, "OCTET_STRING")) {
+        STRLEN vlen = 0;
+        const char *data = (sv_value && SvOK(*sv_value)) ? SvPVbyte(*sv_value, vlen) : "";
+        s_asn1_append_tlv(aTHX_ out, 0x04, data, (unsigned long)vlen);
+    }
+    else if (strEQ(type, "BIT_STRING")) {
+        STRLEN vlen = 0;
+        const char *data = (sv_value && SvOK(*sv_value)) ? SvPVbyte(*sv_value, vlen) : "";
+        SV **sv_bits = hv_fetchs(node, "bits", 0);
+        unsigned long nbits = (sv_bits && SvOK(*sv_bits)) ? (unsigned long)SvUV(*sv_bits) : (unsigned long)(vlen * 8);
+        unsigned long nbytes = (nbits + 7) / 8;
+        unsigned char unused = (nbytes > 0) ? (unsigned char)(8 * nbytes - nbits) : 0;
+        unsigned long content_len = 1 + nbytes;
+        unsigned char *content;
+
+        Newxz(content, content_len, unsigned char);
+        content[0] = unused;
+        if (nbytes > 0 && vlen > 0) {
+            Copy(data, content + 1, nbytes < (unsigned long)vlen ? nbytes : (unsigned long)vlen, unsigned char);
+            if (unused > 0) content[nbytes] &= (unsigned char)(0xFF << unused);
+        }
+        s_asn1_append_tlv(aTHX_ out, 0x03, content, content_len);
+        Safefree(content);
+    }
+    else if (strEQ(type, "UTF8_STRING")) {
+        STRLEN vlen = 0;
+        const char *data = (sv_value && SvOK(*sv_value)) ? SvPVutf8(*sv_value, vlen) : "";
+        s_asn1_append_tlv(aTHX_ out, 0x0C, data, (unsigned long)vlen);
+    }
+    else if (strEQ(type, "IA5_STRING")) {
+        STRLEN vlen = 0;
+        const char *data = (sv_value && SvOK(*sv_value)) ? SvPVbyte(*sv_value, vlen) : "";
+        s_asn1_append_tlv(aTHX_ out, 0x16, data, (unsigned long)vlen);
+    }
+    else if (strEQ(type, "PRINTABLE_STRING")) {
+        STRLEN vlen = 0;
+        const char *data = (sv_value && SvOK(*sv_value)) ? SvPVbyte(*sv_value, vlen) : "";
+        s_asn1_append_tlv(aTHX_ out, 0x13, data, (unsigned long)vlen);
+    }
+    else if (strEQ(type, "TELETEX_STRING")) {
+        STRLEN vlen = 0;
+        const char *data = (sv_value && SvOK(*sv_value)) ? SvPVbyte(*sv_value, vlen) : "";
+        s_asn1_append_tlv(aTHX_ out, 0x14, data, (unsigned long)vlen);
+    }
+    else if (strEQ(type, "UTCTIME")) {
+        STRLEN vlen = 0;
+        const char *data = (sv_value && SvOK(*sv_value)) ? SvPV(*sv_value, vlen) : "";
+        s_asn1_append_tlv(aTHX_ out, 0x17, data, (unsigned long)vlen);
+    }
+    else if (strEQ(type, "GENERALIZEDTIME")) {
+        STRLEN vlen = 0;
+        const char *data = (sv_value && SvOK(*sv_value)) ? SvPV(*sv_value, vlen) : "";
+        s_asn1_append_tlv(aTHX_ out, 0x18, data, (unsigned long)vlen);
+    }
+    else if (strEQ(type, "SEQUENCE") || strEQ(type, "SET")) {
+        unsigned char tag = strEQ(type, "SEQUENCE") ? 0x30 : 0x31;
+        if (sv_value && SvROK(*sv_value) && SvTYPE(SvRV(*sv_value)) == SVt_PVAV) {
+            SV *content = newSVpvn("", 0);
+            s_asn1_encode_nodes(aTHX_ content, (AV *)SvRV(*sv_value));
+            { STRLEN clen; const char *cdata = SvPV(content, clen);
+              s_asn1_append_tlv(aTHX_ out, tag, cdata, (unsigned long)clen); }
+            SvREFCNT_dec(content);
+        } else {
+            s_asn1_append_tlv(aTHX_ out, tag, NULL, 0);
+        }
+    }
+    else if (strEQ(type, "CUSTOM")) {
+        SV **sv_class  = hv_fetchs(node, "class", 0);
+        SV **sv_constr = hv_fetchs(node, "constructed", 0);
+        SV **sv_tag    = hv_fetchs(node, "tag", 0);
+        unsigned int klass = (sv_class && SvOK(*sv_class)) ? (unsigned int)SvIV(*sv_class) : 2;
+        unsigned int pc    = (sv_constr && SvOK(*sv_constr) && SvIV(*sv_constr)) ? 1 : 0;
+        unsigned long tag  = (sv_tag && SvOK(*sv_tag)) ? (unsigned long)SvUV(*sv_tag) : 0;
+
+        if (pc && sv_value && SvROK(*sv_value) && SvTYPE(SvRV(*sv_value)) == SVt_PVAV) {
+            SV *content = newSVpvn("", 0);
+            s_asn1_encode_nodes(aTHX_ content, (AV *)SvRV(*sv_value));
+            { STRLEN clen; const char *cdata = SvPV(content, clen);
+              s_asn1_append_custom_tlv(aTHX_ out, klass, pc, tag, cdata, (unsigned long)clen); }
+            SvREFCNT_dec(content);
+        } else {
+            STRLEN vlen = 0;
+            const char *data = (sv_value && SvOK(*sv_value)) ? SvPVbyte(*sv_value, vlen) : "";
+            s_asn1_append_custom_tlv(aTHX_ out, klass, pc, tag, data, (unsigned long)vlen);
+        }
+    }
+    else {
+        croak("FATAL: asn1_encode: unsupported type '%s'", type);
+    }
+}
+/* --- end Crypt::ASN1 encoder helpers ------------------------------------- */
 
 typedef struct cbc_struct {             /* used by Crypt::Mode::CBC */
   int cipher_id, cipher_rounds;
@@ -171,6 +793,22 @@ typedef struct x25519_struct {          /* used by Crypt::PK::X25519 */
   int initialized;
 } *Crypt__PK__X25519;
 
+typedef struct ed448_struct {           /* used by Crypt::PK::Ed448 */
+  prng_state pstate;
+  int pindex;
+  IV last_pid;
+  curve448_key key;
+  int initialized;
+} *Crypt__PK__Ed448;
+
+typedef struct x448_struct {            /* used by Crypt::PK::X448 */
+  prng_state pstate;
+  int pindex;
+  IV last_pid;
+  curve448_key key;
+  int initialized;
+} *Crypt__PK__X448;
+
 STATIC int cryptx_internal_password_cb_getpw(void **p, unsigned long *l, void *u) {
   dTHX; /* fetch context */
   SV *passwd = u;
@@ -218,7 +856,33 @@ STATIC void cryptx_internal_pk_prng_reseed(prng_state *state, int pindex, IV *la
   if (rv != CRYPT_OK) croak("FATAL: PRNG_add_entropy failed: %s", error_to_string(rv));
   rv = prng_descriptor[pindex].ready(state);
   if (rv != CRYPT_OK) croak("FATAL: PRNG_ready failed: %s", error_to_string(rv));
+  zeromem(entropy_buf, sizeof(entropy_buf));
   *last_pid = curpid;
+}
+
+STATIC void cryptx_internal_prng_done(struct prng_struct *prng) {
+  if (prng != NULL && prng->desc != NULL && prng->desc->done != NULL) {
+    (void)prng->desc->done(&prng->state);
+  }
+}
+
+STATIC void cryptx_internal_prng_reseed(struct prng_struct *prng) {
+  dTHX; /* fetch context */
+  IV curpid = (IV)PerlProc_getpid();
+  unsigned char entropy_buf[40];
+  int rv;
+
+  if (prng == NULL || prng->desc == NULL || prng->last_pid == curpid) return;
+
+  if (rng_get_bytes(entropy_buf, sizeof(entropy_buf), NULL) != sizeof(entropy_buf)) {
+    croak("FATAL: rng_get_bytes failed");
+  }
+  rv = prng->desc->add_entropy(entropy_buf, sizeof(entropy_buf), &prng->state);
+  zeromem(entropy_buf, sizeof(entropy_buf));
+  if (rv != CRYPT_OK) croak("FATAL: PRNG_add_entropy failed: %s", error_to_string(rv));
+  rv = prng->desc->ready(&prng->state);
+  if (rv != CRYPT_OK) croak("FATAL: PRNG_ready failed: %s", error_to_string(rv));
+  prng->last_pid = curpid;
 }
 
 STATIC void cryptx_internal_password_cb_free(void *p) {
@@ -372,7 +1036,7 @@ STATIC int cryptx_internal_ecc_set_curve_from_SV(ecc_key *key, SV *curve)
 
   if (!SvOK(curve)) croak("FATAL: undefined curve");
 
-  if (SvPOK(curve)) {
+  if (SvPOK_spec(curve)) {
     /* string */
     ptr_crv = SvPV(curve, len_crv);
     if ((hc = get_hv("Crypt::PK::ECC::curve", 0)) == NULL) croak("FATAL: no curve register");
@@ -392,7 +1056,7 @@ STATIC int cryptx_internal_ecc_set_curve_from_SV(ecc_key *key, SV *curve)
     croak("FATAL: curve has to be a string or a hashref");
   }
 
-  if (SvPOK(sv_crv)) {
+  if (SvPOK_spec(sv_crv)) {
     /* string - curve name */
     const ltc_ecc_curve *cu;
     ptr_crv = SvPV(sv_crv, len_crv);
@@ -474,19 +1138,22 @@ MODULE = CryptX       PACKAGE = Crypt::Misc
 PROTOTYPES: DISABLE
 
 SV *
-_radix_to_bin(char *in, int radix)
+_radix_to_bin(SV *in, int radix)
     CODE:
     {
-        STRLEN len;
+        STRLEN in_len, len;
         unsigned char *out_data;
+        char *in_data;
         mp_int mpi;
 
-        if (in == NULL) XSRETURN_UNDEF;
+        if (!SvPOK_spec(in) || radix < 2 || radix > 64) XSRETURN_UNDEF;
+        in_data = SvPVbyte(in, in_len);
+        if (in_len > 0 && memchr(in_data, '\0', in_len) != NULL) XSRETURN_UNDEF;
         if (mp_init(&mpi) != MP_OKAY) XSRETURN_UNDEF;
-        if (strlen(in) == 0) {
+        if (in_len == 0) {
           RETVAL = newSVpvn("", 0);
         }
-        else if (mp_read_radix(&mpi, in, radix) == MP_OKAY) {
+        else if (mp_read_radix(&mpi, in_data, radix) == MP_OKAY) {
           len = mp_ubin_size(&mpi);
           if (len == 0) {
             RETVAL = newSVpvn("", 0);
@@ -522,7 +1189,7 @@ _bin_to_radix(SV *in, int radix)
         mp_err merr;
         int digits = 0;
 
-        if (!SvPOK(in) || radix < 2 || radix > 64) XSRETURN_UNDEF;
+        if (!SvPOK_spec(in) || radix < 2 || radix > 64) XSRETURN_UNDEF;
         in_data = (unsigned char *) SvPVbyte(in, len);
         if (mp_init_multi(&mpi, &tmp, NULL) != MP_OKAY) XSRETURN_UNDEF;
         if (len == 0) {
@@ -575,7 +1242,7 @@ encode_b64(SV * in)
         unsigned char *in_data;
         char *out_data;
 
-        if (!SvPOK(in)) XSRETURN_UNDEF;
+        if (!SvPOK_spec(in)) XSRETURN_UNDEF;
         in_data = (unsigned char *) SvPVbyte(in, in_len);
         if (in_len == 0) {
           RETVAL = newSVpvn("", 0);
@@ -611,12 +1278,13 @@ decode_b64(SV * in)
         unsigned char *out_data;
         char *in_data;
 
-        if (!SvPOK(in)) XSRETURN_UNDEF;
+        if (!SvPOK_spec(in)) XSRETURN_UNDEF;
         in_data = SvPVbyte(in, in_len);
         if (in_len == 0) {
           RETVAL = newSVpvn("", 0);
         }
         else {
+          if (cryptx_internal_input_has_no_payload(in_data, in_len)) XSRETURN_UNDEF;
           out_len = (unsigned long)in_len;
           RETVAL = NEWSV(0, out_len); /* avoid zero! */
           SvPOK_only(RETVAL);
@@ -649,7 +1317,7 @@ encode_b32r(SV *in)
         char *out_data;
         int id = -1, err;
 
-        if (!SvPOK(in)) XSRETURN_UNDEF;
+        if (!SvPOK_spec(in)) XSRETURN_UNDEF;
         if (ix == 0) id = BASE32_RFC4648;
         if (ix == 1) id = BASE32_BASE32HEX;
         if (ix == 2) id = BASE32_ZBASE32;
@@ -689,7 +1357,7 @@ decode_b32r(SV *in)
         char *in_data;
         int id = -1, err;
 
-        if (!SvPOK(in)) XSRETURN_UNDEF;
+        if (!SvPOK_spec(in)) XSRETURN_UNDEF;
         if (ix == 0) id = BASE32_RFC4648;
         if (ix == 1) id = BASE32_BASE32HEX;
         if (ix == 2) id = BASE32_ZBASE32;
@@ -700,6 +1368,7 @@ decode_b32r(SV *in)
           RETVAL = newSVpvn("", 0);
         }
         else {
+          if (cryptx_internal_input_has_no_payload(in_data, in_len)) XSRETURN_UNDEF;
           out_len = (unsigned long)in_len;
           RETVAL = NEWSV(0, out_len); /* avoid zero! */
           SvPOK_only(RETVAL);
@@ -722,7 +1391,7 @@ increment_octets_le(SV * in)
         STRLEN len, i = 0;
         unsigned char *out_data, *in_data;
 
-        if (!SvPOK(in)) XSRETURN_UNDEF;
+        if (!SvPOK_spec(in)) XSRETURN_UNDEF;
         in_data = (unsigned char *)SvPVbyte(in, len);
         if (len == 0) {
           RETVAL = newSVpvn("", 0);
@@ -754,7 +1423,7 @@ increment_octets_be(SV * in)
         STRLEN len, i = 0;
         unsigned char *out_data, *in_data;
 
-        if (!SvPOK(in)) XSRETURN_UNDEF;
+        if (!SvPOK_spec(in)) XSRETURN_UNDEF;
         in_data = (unsigned char *)SvPVbyte(in, len);
         if (len == 0) {
           RETVAL = newSVpvn("", 0);
@@ -779,10 +1448,33 @@ increment_octets_be(SV * in)
     OUTPUT:
         RETVAL
 
+SV *
+slow_eq(SV *a, SV *b)
+    CODE:
+    {
+        STRLEN a_len, b_len;
+        unsigned char *a_data, *b_data;
+        const void *first;
+        int result = 0;
+
+        if (!SvPOK_spec(a) || !SvPOK_spec(b)) XSRETURN_UNDEF;
+        a_data = (unsigned char *)SvPVbyte(a, a_len);
+        b_data = (unsigned char *)SvPVbyte(b, b_len);
+        first = a_data;
+        if (a_len != b_len) { first = b_data; result = 1; }
+        result |= mem_neq(first, b_data, b_len);
+        RETVAL = newSViv(result == 0 ? 1 : 0);
+    }
+    OUTPUT:
+        RETVAL
+
 ###############################################################################
 
+INCLUDE: inc/CryptX_ASN1.xs.inc
 INCLUDE: inc/CryptX_Digest.xs.inc
 INCLUDE: inc/CryptX_Digest_SHAKE.xs.inc
+INCLUDE: inc/CryptX_Digest_TurboSHAKE.xs.inc
+INCLUDE: inc/CryptX_Digest_KangarooTwelve.xs.inc
 INCLUDE: inc/CryptX_Cipher.xs.inc
 
 INCLUDE: inc/CryptX_Checksum_Adler32.xs.inc
@@ -793,9 +1485,12 @@ INCLUDE: inc/CryptX_AuthEnc_GCM.xs.inc
 INCLUDE: inc/CryptX_AuthEnc_OCB.xs.inc
 INCLUDE: inc/CryptX_AuthEnc_CCM.xs.inc
 INCLUDE: inc/CryptX_AuthEnc_ChaCha20Poly1305.xs.inc
+INCLUDE: inc/CryptX_AuthEnc_SIV.xs.inc
 
 INCLUDE: inc/CryptX_Stream_ChaCha.xs.inc
+INCLUDE: inc/CryptX_Stream_XChaCha.xs.inc
 INCLUDE: inc/CryptX_Stream_Salsa20.xs.inc
+INCLUDE: inc/CryptX_Stream_XSalsa20.xs.inc
 INCLUDE: inc/CryptX_Stream_RC4.xs.inc
 INCLUDE: inc/CryptX_Stream_Sober128.xs.inc
 INCLUDE: inc/CryptX_Stream_Sosemanuk.xs.inc
@@ -828,6 +1523,8 @@ INCLUDE: inc/CryptX_PK_DH.xs.inc
 INCLUDE: inc/CryptX_PK_ECC.xs.inc
 INCLUDE: inc/CryptX_PK_Ed25519.xs.inc
 INCLUDE: inc/CryptX_PK_X25519.xs.inc
+INCLUDE: inc/CryptX_PK_Ed448.xs.inc
+INCLUDE: inc/CryptX_PK_X448.xs.inc
 
 INCLUDE: inc/CryptX_KeyDerivation.xs.inc
 

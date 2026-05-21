@@ -1,5 +1,24 @@
 Revision history for Iterator-Flex
 
+0.34      2026-04-27 18:16:21 EDT
+
+  [BUGFIX]
+
+    * igrep/Grep and the foreach iterator method returned early if the iterator stream
+      contained a false value.
+
+    * imap skips empty list results rather than returning premature
+      undef values.
+
+    * the drain iterator method, itake/Take, ichunk/Chunk, and
+      icache/Cache validate capacity parameters
+
+    * construct_from_iterable didn't consistently validate its options
+
+  [DOCUMENTATION]
+
+    * Fix typos in documentation and test descriptions.
+
 0.33      2025-12-18 12:38:43 EST
 
   [ENHANCEMENT]

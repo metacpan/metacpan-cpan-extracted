@@ -13,11 +13,15 @@ use parent qw(Exporter);
 
 our @EXPORT_OK = qw( slurp slurp_json dump_json normalize_options dmp choose);
 
-our $VERSION = '1.0.12';
+our $VERSION = '2.0.2';
 
 ########################################################################
-sub choose (&) { return $_[0]->(); } ## no critic
+sub choose(&) { ## no critic
 ########################################################################
+  my @result = shift->();
+
+  return wantarray ? @result : $result[0];
+}
 
 ########################################################################
 sub dmp {
@@ -107,9 +111,9 @@ __END__
 
 =pod
 
-=head1 NAAME
+=head1 NAME
 
- CLI::Simple::Utils
+ CLI::Simple::Utils - Useful utility functions for CLI::Simple-based applications
 
 =head1 SYNOPSIS
 
@@ -163,8 +167,10 @@ L<https://dev.perl.org/licenses/> for more information.
 
 =head1 AUTHOR
 
-Rob Lauer - <bigfoot@cpan.org>
+Rob Lauer - <rlauer@treasurersbriefcase.com>
 
 =head1 SEE ALSO
- 
+
+L<CLI::Simple>
+
 =cut

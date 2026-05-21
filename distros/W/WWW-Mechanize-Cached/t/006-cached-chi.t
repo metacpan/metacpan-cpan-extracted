@@ -4,7 +4,7 @@ use strict;
 use warnings FATAL => 'all';
 
 use Test::More;
-use Test::Requires 'CHI';
+use Test::Needs qw( CHI );
 use Test::RequiresInternet ( 'www.wikipedia.com' => 443 );
 
 # Google is a poor choice for this set of tests, as the main page google.com redirects, and the page it redirects

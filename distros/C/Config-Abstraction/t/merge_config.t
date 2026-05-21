@@ -60,10 +60,11 @@ subtest 'deep nested merge' => sub {
 
 	$merged = $conf->merge_defaults(defaults => $a, deep => 1);
 
-	isnt($merged->{outer}{inner}{setting1}, 'yes', 'loses original setting1');
+	ok(!exists $merged->{outer}{inner}{setting1}, 'loses original setting1');
+	ok(exists $merged->{outer}{inner}{setting2});
+	ok(exists $merged->{outer}{inner}{setting3});
 	is($merged->{outer}{inner}{setting2}, 'maybe', 'overrides setting2');
 	is($merged->{outer}{inner}{setting3}, 'sure', 'adds setting3');
-
 };
 
 done_testing();

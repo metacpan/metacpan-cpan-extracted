@@ -1,36 +1,38 @@
 ---
-abstract: 'Router module using Ragel finite state machine'
+abstract: 'High-performance URL router built on a Ragel-generated state machine'
 author:
-  - 'Yegor Korablev <egor@cpan.org>'
+  - vividsnow
 build_requires:
   Devel::Size: '0'
   Encode: '0'
-  FindBin: '0'
+  ExtUtils::MakeMaker: '0'
   Test::LeakTrace: '0'
   Test::More: '0'
   URI::Escape::XS: '0'
-  lib: '0'
-  utf8: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Router-Ragel
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Router::Ragel:
+    file: lib/Router/Ragel.pm
+    version: '0.02'
 requires:
   Inline: '0'
   Inline::C: '0'
   Inline::Filters::Ragel: '0'
   perl: '5.010'
-  strict: '0'
-  warnings: '0'
 resources:
   bugtracker: https://github.com/vividsnow/Router-Ragel/issues
-  repository: git://github.com/vividsnow/Router-Ragel.git
-version: '0.01'
-x_generated_by_perl: v5.40.0
-x_serialization_backend: 'YAML::Tiny version 1.76'
-x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+  repository: https://github.com/vividsnow/Router-Ragel.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

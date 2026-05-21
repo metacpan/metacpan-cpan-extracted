@@ -1,0 +1,96 @@
+#!/usr/bin/env perl
+
+# Copyright (C) 2016--2026 Karl Wette
+#
+# This file is part of App::PDFLibrarian.
+#
+# App::PDFLibrarian is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or (at
+# your option) any later version.
+#
+# App::PDFLibrarian is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with App::PDFLibrarian. If not, see <http://www.gnu.org/licenses/>.
+
+use strict;
+use warnings;
+
+use Carp;
+use File::Copy;
+use File::Spec;
+use File::stat;
+use FindBin qw($Script);
+use Getopt::Long qw(:config no_ignore_case);
+use Pod::Usage;
+
+FindBin::again();
+
+use App::PDFLibrarian;
+use App::PDFLibrarian::Library qw(pdf_is_in_library cleanup_links);
+
+=pod
+
+=head1 NAME
+
+B<pdf-lbr-remove-pdf> - Remove a PDF file from the PDF library.
+
+=head1 SYNOPSIS
+
+B<pdf-lbr-remove-pdf> B<--version>
+B<pdf-lbr-remove-pdf> B<--help>|B<-h>
+
+B<pdf-lbr-remove-pdf> [B<-o> I<output-directory>] I<link>
+
+=head1 DESCRIPTION
+
+B<pdf-lbr-remove-pdf> removes a PDF file, given by a I<link> in the PDF links directory, from the PDF library.
+
+The PDF file is moved to the directory I<output-directory>, or else to the user's home directory.
+
+=head1 PART OF
+
+App::PDFLibrarian
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016--2026 Karl Wette. Licensed under the GNU General Public License, version 3 or later.
+
+=cut
+
+# handle help options
+my ($version, $help, $outdir);
+GetOptions(
+           "version" => \$version,
+           "help|h" => \$help,
+           "output-directory|o=s" => \$outdir,
+          ) or croak "$Script: could not parse options";
+if ($version) { print "App::PDFLibrarian version $App::PDFLibrarian::VERSION\n"; exit 1; }
+pod2usage(-verbose => 2, -exitval => 1) if ($help);
+$outdir = $ENV{HOME} unless defined($outdir);
+
+# check input
+croak "$Script: '$outdir' is not a directory" unless -d $outdir;
+croak "$Script: requires a single argument" unless @ARGV == 1;
+my $pdflink = $ARGV[0];
+croak "$Script: '$pdflink' is not in the PDF library" unless pdf_is_in_library($pdflink);
+croak "$Script: '$pdflink' is not a symbolic link" unless -l $pdflink;
+
+# try to resolve symbolic link
+my $pdffile = readlink($pdflink) or croak "$Script: could not resolve '$pdflink': %!";
+croak "$Script: '$pdflink' is not in the PDF library" unless pdf_is_in_library($pdffile);
+
+# move PDF file to output directory, with same name as link
+my ($linkvol, $linkdir, $linkfile) = File::Spec->splitpath($pdflink);
+my $removedpdffile = File::Spec->catfile($outdir, $linkfile);
+move($pdffile, $removedpdffile) or croak "$Script: could not move '$pdffile' to '$removedpdffile': $!";
+print STDERR "$Script: removed PDF file to '$removedpdffile'\n";
+
+# cleanup PDF links directory
+cleanup_links();
+
+exit 0;

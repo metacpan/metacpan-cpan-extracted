@@ -46,16 +46,16 @@ sub _detect_openssl {
 }
 
 my $want_ssl = $ENV{EV_REDIS_SSL};
-my ($has_ssl, $ssl_cflags, $ssl_libs) = (0, '', '');
+my ($has_ssl, $ssl_cflags, $ssl_libs, $ssl_detected) = (0, '', '', undef);
 
 if (!defined $want_ssl || $want_ssl) {
-    my $ssl = _detect_openssl();
-    if ($ssl) {
+    $ssl_detected = _detect_openssl();
+    if ($ssl_detected) {
         $has_ssl = 1;
-        if (ref $ssl eq 'HASH') {
-            ($ssl_cflags, $ssl_libs) = ($ssl->{cflags}, $ssl->{libs});
+        if (ref $ssl_detected eq 'HASH') {
+            ($ssl_cflags, $ssl_libs) = ($ssl_detected->{cflags}, $ssl_detected->{libs});
         } else {
-            ($ssl_cflags, $ssl_libs) = ("-I$ssl/include", "-L$ssl/lib -lssl -lcrypto");
+            ($ssl_cflags, $ssl_libs) = ("-I$ssl_detected/include", "-L$ssl_detected/lib -lssl -lcrypto");
         }
     } elsif ($want_ssl) {
         die "EV_REDIS_SSL=1 but OpenSSL not found. Install OpenSSL development headers or set OPENSSL_PREFIX.\n";
@@ -82,9 +82,8 @@ if ($^O =~ m/bsd$/ && $^O !~ m/gnukfreebsd$/) {
 my @make_args = ('-C', 'deps/hiredis', 'static');
 if ($has_ssl) {
     push @make_args, 'USE_SSL=1';
-    my $ssl_prefix = _detect_openssl();
-    if (defined $ssl_prefix && !ref $ssl_prefix) {
-        push @make_args, "OPENSSL_PREFIX=$ssl_prefix";
+    if (defined $ssl_detected && !ref $ssl_detected) {
+        push @make_args, "OPENSSL_PREFIX=$ssl_detected";
     }
 }
 
@@ -170,11 +169,14 @@ WriteMakefile(
     },
 );
 
-# hiredis is built during Makefile.PL; provide a no-op rule
+# hiredis is built during Makefile.PL; provide a no-op rule.
+# Also make Redis.xs depend on src/EV__Redis.xs so editing the source
+# triggers a rebuild without re-running `perl Makefile.PL`.
 sub MY::postamble {
     my @targets;
     for my $lib (@myextlib) {
         push @targets, "$lib :\n\t\@echo \"$lib already built\"\n";
     }
+    push @targets, "Redis.xs : src/EV__Redis.xs\n\t\$(CP) src/EV__Redis.xs Redis.xs\n";
     return join "\n", @targets;
 }

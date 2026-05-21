@@ -1,5 +1,6 @@
 bin/xmlpp-cli
 Changes
+cpanfile
 lib/XML/PP.pm
 LICENSE
 Makefile.PL
@@ -7,16 +8,22 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
 scripts/generate_index.pl
+t/00-load.t
 t/30-basics.t
 t/collapse.t
+t/edge_cases.t
 t/entities.t
 t/eof.t
 t/eol.t
+t/extended_tests.t
+t/function.t
+t/integration.t
 t/no404s.t
 t/parse.t
 t/pod-cm.t
 t/pod-coverage.t
 t/pod-synopsis.t
 t/prereq.t
+t/unit.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

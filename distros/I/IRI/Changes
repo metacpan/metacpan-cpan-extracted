@@ -6,6 +6,12 @@ Home page:    <http://search.cpan.org/dist/IRI/>
 Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=IRI>
 Maintainer:   Gregory Todd Williams <mailto:gwilliams@cpan.org>
 
+0.014  2026-05-04
+
+ - (Update) New version to address bad SIGNATURE in 0.13 release.
+ - (Update) Update Makefile.PL to use GNU tar on MacOS when creating new
+   releases.
+
 0.013  2024-09-29
 
  - (Update) New version to address bad data in META.yml in 0.12 release.

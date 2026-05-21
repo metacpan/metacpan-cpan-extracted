@@ -1,10 +1,13 @@
 Changes
+lib/Parallel/DataPipe.pm
 Makefile.PL
 MANIFEST
 README
-t/pod.t
+t/framing-edge-cases.t
+t/large-payload-integrity.t
 t/Parallel-DataPipe.t
+t/pod.t
 t/style-trailing-space.t
-lib/Parallel/DataPipe.pm
+THANKS
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

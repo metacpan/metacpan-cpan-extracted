@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2002-2025 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2002-2026 National Marrow Donor Program. All rights reserved.
 #
 # For a description of this program, please refer to the POD documentation
 # embedded at the bottom of the file (e.g. perldoc ecs_setup).
@@ -434,6 +434,13 @@ $CFGFMT = "%-20s | %-14s | %s\n";
   'daemon may also send a READY (heartbeat) meta-message to the other',
   'node.  The recommended T_CHK value for EMDIS is 7200.'
   ],
+ T_INBOUND =>
+ ['inbound processing time limit (seconds) during each scan interval',
+  'A T_INBOUND value >= 0 sets a time limit on inbound processing during',
+  'each scan interval, making it possible to reserve the remaining time',
+  'during each interval for outbound processing.  If configured, it should',
+  'be set to a value less than T_SCN.'
+  ],
  T_MSG_PROC =>
  ['time limit (seconds) for message processing',
   ''
@@ -450,19 +457,19 @@ $CFGFMT = "%-20s | %-14s | %s\n";
  T_SCN =>
  ['seconds between scans of email inbox',
   'The ecs_scan_mail daemon scans the ECS email inbox every T_SCN',
-  'seconds.  The recommend T_SCN value for EMDIS is 3600.'
+  'seconds.  The recommended T_SCN value for EMDIS is 3600.'
   ],
-  LOG_LEVEL =>
-  ['Level for writing a log entry',
-   'If the error level is beyond this log level, the error will be',
-   'written to the LOG_FILE. Valid log levels are:',
-   '1=info | 2=warning | 3=error | 4=fatal'
+ LOG_LEVEL =>
+ ['Level for writing a log entry',
+  'If the error level is beyond this log level, the error will be',
+  'written to the LOG_FILE. Valid log levels are:',
+  '1=info | 2=warning | 3=error | 4=fatal'
   ],
-  MAIL_LEVEL =>
-  ['Level for sending an admin email',
-   'If the error level is beyond this email level, the error will be',
-   'send to the admin email address (ADM_ADDR). Valid log levels are:',
-   '1=info | 2=warning | 3=error | 4=fatal'
+ MAIL_LEVEL =>
+ ['Level for sending an admin email',
+  'If the error level is beyond this email level, the error will be',
+  'send to the admin email address (ADM_ADDR). Valid log levels are:',
+  '1=info | 2=warning | 3=error | 4=fatal'
   ],
 );
 
@@ -523,6 +530,7 @@ ask('T_CHK');
 ask('T_SCN');
 $cfg->{T_MSG_PROC} = $cfg->{T_SCN}
     unless $cfg->{T_MSG_PROC} and $cfg->{T_MSG_PROC} < $cfg->{T_SCN};
+ask('T_INBOUND');
 ask('ADAPTER_CMD');
 ask('ALWAYS_ACK');
 ask('GNU_TAR');
@@ -831,6 +839,7 @@ EOF
     print CFG cfgline('THIS_NODE');
     print CFG cfgline('T_CHK');
     print CFG cfgline('T_SCN');
+    print CFG cfgline('T_INBOUND');
     print CFG '#', sprintf($CFGFMT, 'ERR_FILE', 'ecs.err', 'ECS error file');
     print CFG '#', sprintf($CFGFMT, 'LOG_FILE', 'ecs.log', 'ECS log file');
     print CFG cfgline('ADM_ADDR');

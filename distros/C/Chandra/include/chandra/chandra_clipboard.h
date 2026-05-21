@@ -1,5 +1,5 @@
 /*
- * chandra_clipboard.h — System clipboard access
+ * chandra_clipboard.h - System clipboard access
  *
  * Platform support:
  *   - macOS: NSPasteboard (Cocoa)
@@ -34,12 +34,12 @@ static int   chandra_clipboard_has_image(pTHX);
 static void  chandra_clipboard_clear(pTHX);
 
 /* ================================================================
- * Implementation — compiled only in Chandra.xs
+ * Implementation - compiled only in Chandra.xs
  * ================================================================ */
 #ifdef CHANDRA_XS_IMPLEMENTATION
 
 /* ============================================================================
- * macOS Implementation — NSPasteboard
+ * macOS Implementation - NSPasteboard
  * ============================================================================ */
 #if defined(WEBVIEW_COCOA)
 
@@ -361,7 +361,7 @@ static void chandra_clipboard_clear(pTHX) {
 }
 
 /* ============================================================================
- * Linux Implementation — GTK clipboard
+ * Linux Implementation - GTK clipboard
  * ============================================================================ */
 #elif defined(WEBVIEW_GTK)
 
@@ -373,7 +373,7 @@ static void chandra_clipboard_ensure_gtk(void) {
     static int inited = 0;
     if (!inited) {
         if (!gtk_init_check(NULL, NULL)) {
-            /* GTK init failed — clipboard won't work */
+            /* GTK init failed - clipboard won't work */
         }
         inited = 1;
     }
@@ -440,7 +440,7 @@ static char *chandra_clipboard_get_html(pTHX) {
 }
 
 static int chandra_clipboard_set_html(pTHX_ const char *html, STRLEN len) {
-    /* GTK doesn't have a simple set_html — use target list approach */
+    /* GTK doesn't have a simple set_html - use target list approach */
     /* For simplicity, store as text with text/html target */
     GtkClipboard *cb;
 
@@ -523,7 +523,7 @@ static void chandra_clipboard_clear(pTHX) {
 }
 
 /* ============================================================================
- * Windows Implementation — Win32 clipboard API (stub)
+ * Windows Implementation - Win32 clipboard API (stub)
  * ============================================================================ */
 #elif defined(WEBVIEW_EDGE)
 

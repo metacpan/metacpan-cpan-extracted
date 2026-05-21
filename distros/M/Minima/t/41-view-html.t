@@ -1,5 +1,6 @@
 use v5.40;
 use Test2::V0;
+use utf8;
 
 use Minima::App;
 use Minima::View::HTML;
@@ -136,25 +137,91 @@ my $app = Minima::App->new(
     my $view = Minima::View::HTML->new(app => $app);
     my $t_home = $dir->child('home.ht');
     $view->add_directory('.');
+    $view->set_template('home');
+
+    # default data
+    $t_home->spew('[% d %]');
+    $view->set_default_data({ d => 'default' });
+    is( $view->render, 'default', 'passes default data' );
 
     # pass on render
-    $view->set_template('home');
-    $t_home->spew('[% d %]');
-    is( $view->render({ d => 'secret' }), 'secret', 'passes data' );
+    is( $view->render({ d => 'secret' }), 'secret',
+        'passes and merges data on render' );
 
     # managed data
     $t_home->spew('[% view.title %]');
     $view->set_title('secret title');
-    is( $view->render, 'secret title', 'passes view data' );
+    is( $view->render, 'secret title', 'passes view title' );
+
+    $view->set_title('a');
+    $view->set_compound_title('b');
+    my $c = 'a • b';
+    utf8::encode($c);
+    is( $view->render, $c, 'sets compound title' );
+    $view->set_title(undef);
+    $view->set_compound_title('a');
+    is( $view->render, 'a', 'sets compound title as main, if no main' );
+
+    $t_home->spew('[% view.description %]');
+    $view->set_description('secret desc');
+    is( $view->render, 'secret desc', 'passes view description' );
+
+    $t_home->spew('[% view.header_scripts.join %]');
+    $view->add_header_script('hsa');
+    $view->add_header_script('hsb');
+    is( $view->render, 'hsa hsb', 'passes header scripts' );
+
+    $t_home->spew('[% view.header_css.join %]');
+    $view->add_header_css('hca');
+    $view->add_header_css('hcb');
+    is( $view->render, 'hca hcb', 'passes header css' );
+
+    $t_home->spew('[% view.scripts.join %]');
+    $view->add_script('sa');
+    $view->add_script('sb');
+    is( $view->render, 'sa sb', 'passes scripts' );
+
+    # managed common settings
+    $t_home->spew('[% view.settings.block_indexing %]');
+    $view->set_block_indexing(-1);
+    is( $view->render, -1, 'sets block_indexing setting' );
+
+    $t_home->spew('[% view.settings.theme_color %]');
+    $view->set_theme_color(-1);
+    is( $view->render, -1, 'sets theme_color setting' );
 
     # config
     $t_home->spew('%% view.title');
-    is( $view->render, 'secret title', 'handles outline tags' );
+    $view->set_title('t');
+    is( $view->render, 't', 'handles outline tags' );
     $config->{tt} = { OUTLINE_TAG => '@@'}; # break default '%%'
-    isnt( $view->render, 'secret title', 'allows config overwrites' );
+    isnt( $view->render, 't', 'allows config overwrites' );
+    delete $config->{tt};
+
+    {
+        # Reads data from config
+        $config->{default_title}  = '_t';
+        $config->{block_indexing} = '_i';
+        $config->{name_as_class}  = '_n';
+        $config->{theme_color}    = '_c';
+        $t_home->spew(<<~T);
+            %% view.title
+            %% view.settings.block_indexing
+            %% view.settings.name_as_class
+            %% view.settings.theme_color
+            T
+
+        my $view = Minima::View::HTML->new(app => $app);
+        $view->set_template('home');
+        $view->add_directory('.');
+        like( $view->render, qr/_t/, 'reads title from config' );
+        like( $view->render, qr/_i/, 'reads block_indexing from config' );
+        like( $view->render, qr/_n/, 'reads name_as_class from config' );
+        like( $view->render, qr/_c/, 'reads theme_color from config' );
+    }
 
     # CSS
-    $t_home->spew('@@ view.classes');
+    $t_home->spew('%% view.classes');
     is( $view->render, 'home', 'outputs template name as css class' );
 
     $view->set_name_as_class(0);

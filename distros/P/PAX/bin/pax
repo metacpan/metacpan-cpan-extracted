@@ -1,0 +1,67 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use PAX::CLI;
+
+exit PAX::CLI->run(@ARGV);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+pax - public build and run switchboard for PAX
+
+=head1 SYNOPSIS
+
+  pax build [options] [entrypoint]
+  pax run [options] [entrypoint] [-- args...]
+  pax build -I lib -MDateTime -e 'print DateTime->now'
+  pax run -I lib -MDateTime -e 'print DateTime->now'
+  /path/to/pax /path/to/script.pl [script-args...]
+
+=head1 DESCRIPTION
+
+The public C<pax> entrypoint stays intentionally small.
+
+It only:
+
+=over 4
+
+=item *
+
+bootstraps the repository C<lib/> path when running from a checkout
+
+=item *
+
+hands the public CLI contract to C<PAX::CLI>
+
+=item *
+
+keeps the user-visible command surface at C<build> and C<run>
+
+=back
+
+The compiler, packager, runtime, and diagnostic logic live in the Perl modules
+under C<lib/PAX/>. This script is only the stable front door.
+
+When the executable is used as a shebang target, C<PAX::CLI> also accepts a
+plain Perl script path and runs that file directly as interpreter-mode
+execution.
+
+=head1 HOW TO USE
+
+Use this script as the public C<pax> executable. For normal operation call
+C<pax build> or C<pax run>. For interpreter mode, point a Perl shebang at the
+installed binary or invoke it directly with a script path.
+
+=head1 WHAT USES IT
+
+Operators invoke this file directly, standalone self-hosting tests compile it,
+and shebang-driven scripts can use it as a Perl-compatible front door.
+
+=cut

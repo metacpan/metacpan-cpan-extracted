@@ -15,55 +15,56 @@ DESCRIPTION
     This module is used to generate the policy files CONTRIBUTING.md and
     SECURITY.md. It comes with the dist-policyfiles command line tool.
 
-  METHODS
-   "new(*NAMED_ARGUMENTS*"
-    The constructor "new()" accepts the following named arguments, where
-    "login" and "module" are mandatory:
+  Methods
+   Constructor
+    new(*NAMED_ARGUMENTS*)
+        The constructor new() accepts the following named arguments, where
+        "login" and "module" are mandatory:
 
-    "dir"
-        Optional. Directory where the policy files should be written. By
-        default, this is the current working directory. See also accessor of
-        the same name.
+        "dir"
+            Optional. Directory where the policy files should be written. By
+            default, this is the current working directory. See also
+            accessor of the same name.
 
-    "email"
-        Optional. User's email address. If not specified, "new()" tries to
-        read it from comments in HOME/.ssh/config (see
-        GitHub::Config::SSH::UserData).
+        "email"
+            Optional. User's email address. If not specified, new() tries to
+            read it from comments in HOME/.ssh/config (see
+            GitHub::Config::SSH::UserData).
 
-        See also the accessor method of the same name.
+            See also the accessor method of the same name.
 
-    "full_name"
-        Optional. User's full name. If not specified, "new()" tries to read
-        it from comments in HOME/.ssh/config (see
-        GitHub::Config::SSH::UserData).
+        "full_name"
+            Optional. User's full name. If not specified, new() tries to
+            read it from comments in HOME/.ssh/config (see
+            GitHub::Config::SSH::UserData).
 
-        See also the accessor method of the same name.
+            See also the accessor method of the same name.
 
-    "login"
-        Mandatory. User's github login name.
+        "login"
+            Mandatory. User's github login name.
 
-        See also the accessor method of the same name.
+            See also the accessor method of the same name.
 
-    "module"
-        Mandatory. Module name.
+        "module"
+            Mandatory. Module name.
 
-        See also the accessor method of the same name.
+            See also the accessor method of the same name.
 
-    "prefix"
-        Optional. Prefix for repo name, see method "create_security_md()".
-        Default is an empty string.
+        "prefix"
+            Optional. Prefix for repo name, see method create_security_md().
+            Default is an empty string.
 
-        See also the accessor method of the same name.
+            See also the accessor method of the same name.
 
-    "uncapitalize"
-        Optional. Set this to *"true"* if your repo name is lower case, see
-        method "create_security_md()". Default is *"false"*.
+        "uncapitalize"
+            Optional. Set this to *"true"* if your repo name is lower case,
+            see method create_security_md(). Default is *"false"*.
 
-        See also the accessor method of the same name.
+            See also the accessor method of the same name.
 
-   Generation of policy files
-    "create_contrib_md(*CONTRIB_MD_TMPL*)"
-    "create_contrib_md()"
+  Generation of policy files
+    create_contrib_md(*CONTRIB_MD_TMPL*)
+    create_contrib_md()
         Creates CONTRIBUTING.md in directory "dir" (see corresponding
         constructor argument). Optional argument *"CONTRIB_MD_TMPL"* is the
         name of a template file (see Text::Template) for this policy. If
@@ -88,15 +89,15 @@ DESCRIPTION
 
                https://github.com/jd/My-Great-Module/issues
 
-            See method "create_security_md()" for information on how the
-            repo name is generated.
+            See method create_security_md() for information on how the repo
+            name is generated.
 
         $module
 
-    "create_security_md(*NAMED_ARGUMENTS*)"
+    create_security_md(*NAMED_ARGUMENTS*)
         Creates SECURITY.md in directory "dir" (see corresponding
         constructor argument). The arguments accepted by this method are
-        exactly the same as those accepted by the "new()" method of
+        exactly the same as those accepted by the new() method of
         Software::Security::Policy::Individual.
 
         However, there are the following defaults:
@@ -132,28 +133,43 @@ DESCRIPTION
         To completely disable one of these arguments, set it to "undef" or
         an empty string.
 
-   Accessors
-    "dir()"
+   Other Methods
+    cpan_rt_url()
+        Returns the CPAN's request tracker URL, e.g.:
+
+           "https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dist-PolicyFiles"
+
+    dir()
         Returns the value passed via the constructor argument "dir" or the
         default value '.'.
 
-    "email()"
+    email()
         Returns the user's email address.
 
-    "full_name()"
+    full_name()
         Returns the user's full name.
 
-    "login()"
+    github_url()
+        Returns the github repo URL, e.g.:
+
+           "https://github.com/klaus-rindfrey/perl-dist-policyfiles"
+
+    login()
         Returns the value passed via the constructor argument "login".
 
-    "module()"
+    module()
         Returns the value passed via the constructor argument "module".
 
-    "prefix()"
+    prefix()
         Returns the value passed via the constructor argument "prefix" or
         the default value (empty string).
 
-    "uncapitalize()"
+    repo_name()
+        Returns the github repo name, e.g.:
+
+           "perl-dist-policyfiles"
+
+    uncapitalize()
         Returns the value passed via the constructor argument "uncapitalize"
         or the default value (*"false"*).
 

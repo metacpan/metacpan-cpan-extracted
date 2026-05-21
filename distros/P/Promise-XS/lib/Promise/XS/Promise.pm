@@ -55,21 +55,6 @@ but for now this is what’s what.
 
 =cut
 
-# Lifted from Promises::collect
-sub all {
-    my $all_done = Promise::XS::resolved();
-
-    for my $p (@_[1 .. $#_]) {
-        my @results;
-        $all_done = $all_done->then( sub {
-            @results = @_;
-            return $p;
-        } )->then(sub{ ( @results, [ @_ ] ) } );
-    }
-
-    return $all_done;
-}
-
 # Lifted from Promise::ES6
 sub race {
     my $deferred = Promise::XS::Deferred::create();

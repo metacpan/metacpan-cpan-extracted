@@ -1,30 +1,47 @@
 #!/usr/bin/perl -Tw
 use strict;
 
-use HTTP::Daemon;
-use HTTP::Status;
-use URI::Escape qw(uri_unescape);
+use IO::Socket::INET;
+use POSIX ();
 use Qmail::Deliverable ':all';
 use Getopt::Long;
 Getopt::Long::Configure("bundling");
 
-my ($listen, $pidfile, $verbose, $stop, $foreground);
-$listen = "127.0.0.1:8998";
+my ( $pidfile, $verbose, $stop, $foreground );
+my $listen = "127.0.0.1:8998";
 
-if (@ARGV and $ARGV[0] !~ /^-/) {
-    warn "WARNING: Using deprecated old style command line argument parsing. Update your startup scripts!\n";
-
-    ($listen, $pidfile) = @ARGV;
-} else {
-    GetOptions(
-        "help|h"       => sub { die "Use 'man qmail-deliverabled' for full documentation.\n" },
-        "verbose|v"    => \$verbose,
-        "listen|l=s"   => \$listen,
-        "pidfile|p:s"  => \$pidfile,
-        "stop"         => \$stop,
-        "foreground|f" => \$foreground,
-    ) or exit 255;
+sub _uri_unescape {
+    my ($value) = @_;
+    $value =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/eg;
+    return $value;
 }
+
+sub _send_response {
+    my ( $sock, $code, $message, $body ) = @_;
+    $body = '' if not defined $body;
+    my $response = join "",
+        "HTTP/1.0 $code $message\r\n",
+        "Content-Length: " . length($body) . "\r\n",
+        "Content-Type: text/plain\r\n",
+        "Connection: close\r\n",
+        "\r\n",
+        $body;
+    print {$sock} $response;
+}
+
+sub _send_error {
+    my ( $sock, $code, $message ) = @_;
+    _send_response( $sock, $code, $message, "$code $message\n" );
+}
+
+GetOptions(
+    "help|h"       => sub { die "Use 'man qmail-deliverabled' for full documentation.\n" },
+    "verbose|v"    => \$verbose,
+    "listen|l=s"   => \$listen,
+    "pidfile|p:s"  => \$pidfile,
+    "stop"         => \$stop,
+    "foreground|f" => \$foreground,
+) or exit 255;
 
 ($listen) = $listen =~ /^(stop|[0-9.]+:[0-9]+)$/
     or die "Listen argument must be ip:port!\n";
@@ -36,7 +53,7 @@ if ($pidfile) {
 
 chdir '/';
 
-if ($stop or $listen eq 'stop') {
+if ( $stop or $listen eq 'stop' ) {
     die "Cannot --stop without --pidfile.\n" if not $pidfile;
     open my $fh, '<', $pidfile or die "Could not open pidfile $pidfile: $!\n";
     my $pid = readline $fh;
@@ -50,27 +67,48 @@ if ($stop or $listen eq 'stop') {
     exit;
 }
 
-
-fork && exit unless $foreground;
-
-$verbose && print "My PID is $$.\n";
-
-my $d = HTTP::Daemon->new(
-    LocalAddr => $listen,
+# Bind the listener before daemonizing so any "address already in use"
+# error surfaces in the foreground where the operator can see it.
+my ( $listen_host, $listen_port ) = $listen =~ /^([0-9.]+):([0-9]+)\z/
+    or die "Listen argument must be ip:port!\n";
+my $d = IO::Socket::INET->new(
+    LocalAddr => $listen_host,
+    LocalPort => $listen_port,
+    Proto     => 'tcp',
+    Listen    => 5,
     ReuseAddr => 1,
-) or die "Could not start daemon ($!)";
+) or die "Could not start daemon ($!)\n";
 
-if ($pidfile) {
-    open my $fh, '>', $pidfile or die "Could not open pidfile $pidfile: $!\n";
-    print { $fh } $$;
-    close $fh or die "Could not write to pidfile $pidfile: $!\n";
+daemonize() unless $foreground;
+
+# pidfile is written AFTER daemonization so it records the final PID.
+# Only the surviving (grand)child reaches this point.
+my $cleanup_pidfile;
+
+END {
+    unlink $cleanup_pidfile
+        if defined $cleanup_pidfile && -e $cleanup_pidfile;
 }
 
-$SIG{HUP} = sub {
+if ($pidfile) {
+    open my $fh, '>', $pidfile
+        or die "Could not open pidfile $pidfile: $!\n";
+    print {$fh} $$
+        or die "Could not write to pidfile $pidfile: $!\n";
+    close $fh
+        or die "Could not close pidfile $pidfile: $!\n";
+    $cleanup_pidfile = $pidfile;
+}
+
+$SIG{TERM} = $SIG{INT} = sub { exit 0 };
+$SIG{HUP}  = sub {
     warn "SIGHUP received.\n";
     reread_config;
     warn "Qmail configuration reloaded.\n";
 };
+$SIG{PIPE} = 'IGNORE';    # broken client mid-response should not kill us
+
+$verbose && print "My PID is $$.\n";
 
 my ($base0) = $0 =~ /([\x20-\x7f]+)/;
 my %counter;
@@ -78,54 +116,96 @@ $counter{yes} = $counter{no} = 0;
 
 $| = 1;
 
-for (;;) {
+for ( ;; ) {
     $verbose && printf "Listening on %s.\n", $listen;
-    while (my $c = $d->accept) {
+    while ( my $c = $d->accept ) {
         $verbose && printf "Accepted request from %vd.\n", $c->peeraddr;
-        while (my $r = $c->get_request) {
-            if ($r->method ne 'GET' or $r->uri->path !~ m[^/qd1/]) {
-                $verbose && printf "Not a qd request: %s %s\n", $r->method, $r->uri->path;
-                $c->send_error(RC_FORBIDDEN);
+        my $request_line = <$c>;
+        if ( not defined $request_line ) {
+            $c->close;
+            undef($c);
+            next;
+        }
+
+        while ( my $line = <$c> ) {
+            last if $line =~ /^\r?\n\z/;
+        }
+
+        my ( $method, $target ) = $request_line =~ /^([A-Z]+) ([\x21-\x7e]+) HTTP\/1\.[01]\r?\n\z/;
+        if ( not defined $method or $method ne 'GET' or $target !~ m[^/qd1/] ) {
+            $verbose && print "Not a qd request.\n";
+            _send_error( $c, 403, "Forbidden" );
+            $c->close;
+            undef($c);
+            next;
+        }
+
+        my ( $command, $raw_query ) = $target =~ m{\A/qd1/([A-Za-z_]+)(?:\?(.*))?\z};
+        if ( not defined $command ) {
+            $verbose && print "Not a qd request.\n";
+            _send_error( $c, 403, "Forbidden" );
+            $c->close;
+            undef($c);
+            next;
+        }
+
+        my $arg =
+            defined $raw_query && length $raw_query
+            ? _uri_unescape($raw_query)
+            : "\0";
+
+        ($arg) = $arg =~ /^([\x20-\x7e]*)\z/ or do {
+            $verbose && print "Invalid data received.\n";
+            _send_error( $c, 400, "Bad Request" );
+            $c->close;
+            undef($c);
+            next;
+        };
+
+        my $rv;
+        if ( $command eq 'qmail_local' ) {
+            $verbose && printf "qmail_local('%s') => ", $arg;
+            $rv = eval { qmail_local($arg) };
+            if ($@) {
+                $verbose && warn "qmail_local error: $@";
+                _send_error( $c, 500, "Internal Server Error" );
+                $c->close;
+                undef($c);
                 next;
             }
-            my (undef, undef, $command) = split m[/], $r->uri->path;
-
-            my $arg = uri_unescape($r->uri->query) || "\0";
-
-            ($arg) = $arg =~ /^([\x20-\x7e]*)\z/ or do {
-                $verbose && print "Invalid data received.\n";
-                $c->send_error(RC_BAD_REQUEST);
-                next;
-            };
-
-            my $rv;
-            if ($command eq 'qmail_local') {
-                $verbose && printf "qmail_local('%s') => ", $arg;
-                $rv = eval { qmail_local($arg) };
-                $verbose && printf "%s\n", $rv;
-            } elsif ($command eq 'deliverable') {
-                $verbose && printf "deliverable('%s') => ", $arg;
-                $rv = eval { deliverable($arg) };
-                $verbose && printf "0x%02x\n", $rv;
-                $counter{yes}++ if $rv;
-                $counter{no}++ if not $rv;
-                my $total = $counter{yes} + $counter{no};
-                $0 = sprintf "$base0 yes=%d(%.1f%%), no=%d(%.1f%%), total=%d",
-                    $counter{yes}, $counter{yes}/$total*100,
-                    $counter{no},  $counter{no} /$total*100,
-                    $total;
-
-            } else {
-                $verbose && print "Unknown command: %s\n", $command;
-                $c->send_error(RC_FORBIDDEN);
+            $verbose && printf "%s\n", defined $rv ? $rv : '(undef)';
+        }
+        elsif ( $command eq 'deliverable' ) {
+            $verbose && printf "deliverable('%s') => ", $arg;
+            $rv = eval { deliverable($arg) };
+            if ($@) {
+                $verbose && warn "deliverable error: $@";
+                _send_error( $c, 500, "Internal Server Error" );
+                $c->close;
+                undef($c);
                 next;
             }
-            if (defined $rv) {
-                $c->send_response( HTTP::Response->new(200, "OK", undef, $rv) );
-            } else {
-                $c->send_response( HTTP::Response->new(204, "UNDEF", undef, "undef") );
-            }
-
+            $verbose && printf "%s\n", defined $rv ? sprintf( "0x%02x", $rv ) : '(undef)';
+            $counter{yes}++ if $rv;
+            $counter{no}++  if !$rv;
+            my $total = $counter{yes} + $counter{no};
+            $0 = sprintf "$base0 yes=%d(%.1f%%), no=%d(%.1f%%), total=%d",
+                $counter{yes}, $counter{yes} / $total * 100,
+                $counter{no},  $counter{no} / $total * 100,
+                $total;
+        }
+        else {
+            $verbose && printf "Unknown command: %s\n", $command;
+            _send_error( $c, 403, "Forbidden" );
+            $c->close;
+            undef($c);
+            next;
+        }
+        if ( defined $rv ) {
+            _send_response( $c, 200, "OK", $rv );
+        }
+        else {
+            _send_response( $c, 204, "UNDEF", '' );
         }
         $c->close;
         undef($c);
@@ -133,11 +213,31 @@ for (;;) {
     sleep 5;
 }
 
+# Standard double-fork daemonization: detaches from the controlling terminal,
+# becomes its own session leader, and redirects standard handles to /dev/null
+# so output from libraries doesn't end up on a terminal that no longer cares.
+sub daemonize {
+    my $pid = fork;
+    die "fork: $!\n" if not defined $pid;
+    exit 0           if $pid;               # original parent exits
+
+    POSIX::setsid() != -1 or die "setsid: $!\n";
+
+    $pid = fork;
+    die "fork: $!\n" if not defined $pid;
+    exit 0           if $pid;               # session leader exits
+
+    open STDIN,  '<', '/dev/null' or die "reopen STDIN: $!\n";
+    open STDOUT, '>', '/dev/null' or die "reopen STDOUT: $!\n";
+    open STDERR, '>', '/dev/null' or die "reopen STDERR: $!\n";
+    umask 0;
+}
+
 __END__
 
 =head1 NAME
 
-qmail-deliverabled - Deliverabitily check daemon
+qmail-deliverabled - Deliverability check daemon
 
 =head1 USAGE
 
@@ -156,13 +256,26 @@ qmail-deliverabled - Deliverabitily check daemon
 Exposes the Qmail::Deliverable functions C<qmail_local> and C<deliverable>
 over HTTP. Typically requires root access for file permissions.
 
-Requires the HTTP::Daemon module, available from CPAN.
-
 Use only with a ::Client of the same version. Returns 403 FORBIDDEN on error,
 any error.
 
 A simple init.d-style script is provided in the .tar.gz, in the init.d
 directory.
+
+=head1 SIGNALS
+
+=over 4
+
+=item SIGHUP
+
+Re-read C</var/qmail/control/locals>, C</var/qmail/control/virtualdomains>,
+and C</var/qmail/users/assign> without restarting.
+
+=item SIGTERM, SIGINT
+
+Shut down cleanly. The pidfile (if any) is removed before exit.
+
+=back
 
 =head1 CAVEATS
 
@@ -170,7 +283,9 @@ The PIDFILE is not used to avoid concurrent processes: it's perfectly fine to
 have multiple qmail-deliverableds running on different addresses or ports, but
 make sure each combination has its own PIDFILE.
 
-Verbose mode may get messy.
+Verbose mode is only useful when also running with C<--foreground>; once
+daemonized, standard handles are redirected to /dev/null and verbose output
+is silently discarded.
 
 =head1 LEGAL
 
@@ -188,9 +303,29 @@ under which license terms it was distributed. Alternatively, a distributor may
 choose to replace the LICENSE section of the documentation and/or include a
 LICENSE file to reflect the license(s) they chose to redistribute under.
 
-=head1 AUTHOR
+=head1 AUTHORS
 
-Juerd Waalboer <#####@juerd.nl>
+=over 4
+
+=item *
+
+Juerd Waalboer <#####@juerd.nl> (original author)
+
+=item *
+
+Matt Simerson <msimerson@cpan.org> (current maintainer)
+
+=back
+
+=head1 CONTRIBUTORS
+
+=over 4
+
+=item *
+
+Martin Sluka
+
+=back
 
 =head1 SEE ALSO
 

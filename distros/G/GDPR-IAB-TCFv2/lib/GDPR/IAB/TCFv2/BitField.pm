@@ -1,5 +1,5 @@
-package GDPR::IAB::TCFv2::BitField;
-use strict;
+package GDPR::IAB::TCFv2::BitField 0.520;
+use v5.12;
 use warnings;
 use integer;
 use bytes;
@@ -8,77 +8,104 @@ use GDPR::IAB::TCFv2::BitUtils qw<is_set>;
 use Carp                       qw<croak>;
 
 sub Parse {
-    my ( $klass, %args ) = @_;
+  my ($klass, %args) = @_;
 
-    croak "missing 'data'"      unless defined $args{data};
-    croak "missing 'data_size'" unless defined $args{data_size};
-    croak "missing 'max_id'"
-      unless defined $args{max_id};
+  croak "missing 'data'"      unless defined $args{data};
+  croak "missing 'data_size'" unless defined $args{data_size};
+  croak "missing 'max_id'"    unless defined $args{max_id};
 
-    croak "missing 'options'"      unless defined $args{options};
-    croak "missing 'options.json'" unless defined $args{options}->{json};
+  croak "missing 'options'"      unless defined $args{options};
+  croak "missing 'options.json'" unless defined $args{options}->{json};
 
-    my $data      = $args{data};
-    my $data_size = $args{data_size};
-    my $offset    = 0;
-    my $max_id    = $args{max_id};
-    my $options   = $args{options};
+  my $data      = $args{data};
+  my $data_size = $args{data_size};
+  my $offset    = $args{offset} // 0;
+  my $max_id    = $args{max_id};
+  my $options   = $args{options};
 
-    # add 7 to force rounding to next integer value
-    my $bytes_required = ( $max_id + 7 ) / 8;
+  croak
+    "a BitField for $max_id bits requires a consent string of at least @{[ $offset + $max_id ]} bits. This consent string only had @{[ $data_size << 3 ]} bits"
+    if $offset + $max_id > ($data_size << 3);
 
-    croak
-      "a BitField for $max_id requires a consent string of $bytes_required bytes. This consent string had $data_size"
-      if $data_size < $bytes_required;
+  my $self = {data => $data, offset => $offset, max_id => $max_id, options => $options,};
 
-    my $self = {
-        data    => substr( $data, $offset, $max_id ),
-        max_id  => $max_id,
-        options => $options,
-    };
+  bless $self, $klass;
 
-    bless $self, $klass;
-
-    return ( $self, $offset + $max_id );
+  return ($self, $offset + $max_id);
 }
 
 sub max_id {
-    my $self = shift;
+  my $self = shift;
 
-    return $self->{max_id};
+  return $self->{max_id};
 }
 
 sub contains {
-    my ( $self, $id ) = @_;
+  my ($self, $id) = @_;
 
-    croak "invalid vendor id $id: must be positive integer bigger than 0"
-      if $id < 1;
+  croak "invalid vendor id $id: must be positive integer bigger than 0" if $id < 1;
 
-    return if $id > $self->{max_id};
+  return if $id > $self->{max_id};
 
-    return is_set( $self->{data}, $id - 1 );
+  return is_set($self->{data}, $self->{offset} + $id - 1);
+}
+
+sub all {
+  my $self = shift;
+
+  my $bitstring = unpack("B*", substr($self->{data}, $self->{offset} >> 3));
+  $bitstring = substr($bitstring, $self->{offset} & 7, $self->{max_id});
+
+  my @set_bits;
+  while ($bitstring =~ /1/g) {
+    push @set_bits, pos($bitstring);
+  }
+
+  return \@set_bits;
 }
 
 sub TO_JSON {
-    my $self = shift;
+  my ($self, $filter_id) = @_;
 
-    my @data = split //, $self->{data};
+  if (defined $filter_id) {
+    my $val = $self->contains($filter_id);
 
-    if ( !!$self->{options}->{json}->{compact} ) {
-        return [ grep { $data[ $_ - 1 ] } 1 .. $self->{max_id} ];
+    if (!!$self->{options}->{json}->{compact}) {
+      return $val ? [$filter_id] : [];
     }
 
-    my ( $false, $true ) = @{ $self->{options}->{json}->{boolean_values} };
+    my ($false, $true) = @{$self->{options}->{json}->{boolean_values}};
+    my $bool_val = $val ? $true : $false;
 
-    if ( !!$self->{options}->{json}->{verbose} ) {
-        return { map { $_ => $data[ $_ - 1 ] ? $true : $false }
-              1 .. $self->{max_id} };
+    if (!!$self->{options}->{json}->{verbose}) {
+      return {$filter_id => $bool_val};
     }
 
-    return {
-        map  { $_ => $true }
-        grep { $data[ $_ - 1 ] } 1 .. $self->{max_id}
-    };
+    return $val ? {$filter_id => $true} : {};
+  }
+
+  if (!!$self->{options}->{json}->{compact}) {
+    return $self->all;
+  }
+
+  my $bitstring = unpack("B*", substr($self->{data}, $self->{offset} >> 3));
+  $bitstring = substr($bitstring, $self->{offset} & 7, $self->{max_id});
+
+  my ($false, $true) = @{$self->{options}->{json}->{boolean_values}};
+
+  if (!!$self->{options}->{json}->{verbose}) {
+    my %map = map { $_ => $false } 1 .. $self->{max_id};
+    while ($bitstring =~ /1/g) {
+      $map{pos($bitstring)} = $true;
+    }
+    return \%map;
+  }
+
+  my %map;
+  while ($bitstring =~ /1/g) {
+    $map{pos($bitstring)} = $true;
+  }
+  return \%map;
 }
 
 1;
@@ -86,26 +113,29 @@ __END__
 
 =head1 NAME
 
-GDPR::IAB::TCFv2::BitField - Transparency & Consent String version 2 bitfield parser
+GDPR::IAB::TCFv2::BitField - TCF v2.3 bitfield parser
 
 =head1 SYNOPSIS
 
-    my $data = unpack "B*", decode_base64url('tcf v2 consent string base64 encoded');
+    use GDPR::IAB::TCFv2::BitField;
+    my $data = '...'; # raw binary data
     
-    my $max_id_consent = << get 16 bits from $data offset 213 >>
+    my $max_id_consent = 100;
 
-    my $bit_field = GDPR::IAB::TCFv2::BitField->Parse(
-        data      => substr($data, OFFSET),
+    my ($bit_field) = GDPR::IAB::TCFv2::BitField->Parse(
+        data      => $data,
         data_size => length($data),
         max_id    => $max_id_consent,
-        options   => { json => ... },
+        options   => { json => {} },
     );
 
-    say "bit field contains id 284" if $bit_field->contains(284);
+    if ($bit_field->contains(284)) {
+        # ...
+    }
 
 =head1 CONSTRUCTOR
 
-Constructor C<Parse> receives an hash of 4 parameters: 
+Constructor C<Parse> receives a hash of 5 parameters: 
 
 =over
 
@@ -116,6 +146,10 @@ Key C<data> is the binary data
 =item *
 
 Key C<data_size> is the original binary data size
+
+=item *
+
+Key C<offset> is the bit offset. Optional (defaults to 0).
 
 =item *
 

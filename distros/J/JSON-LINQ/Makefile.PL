@@ -1,11 +1,12 @@
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
+BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
+BEGIN { pop @INC if $INC[-1] eq '.' }
 use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{JSON::LINQ},
-    'VERSION'   => q{1.00},
-    'ABSTRACT'  => q{LINQ-style query interface for JSON and JSONL files},
+    'VERSION'   => q{1.02},
+    'ABSTRACT'  => q{LINQ-style query interface for JSON, JSONL, and LTSV files},
     'PREREQ_PM' => {
         'Carp' => '0',
         'perl' => '5.00503',
@@ -44,15 +45,15 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'provides' => {
             'JSON::LINQ' => {
                 'file'    => 'lib/JSON/LINQ.pm',
-                'version' => '1.00',
+                'version' => '1.02',
             },
             'JSON::LINQ::Boolean' => {
                 'file'    => 'lib/JSON/LINQ.pm',
-                'version' => '1.00',
+                'version' => '1.02',
             },
             'JSON::LINQ::Ordered' => {
                 'file'    => 'lib/JSON/LINQ.pm',
-                'version' => '1.00',
+                'version' => '1.02',
             }
         },
     };

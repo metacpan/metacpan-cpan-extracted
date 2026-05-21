@@ -1,0 +1,64 @@
+{
+   "abstract" : "syntactic sugar for enum-like singleton-bearing Object::Pad classes",
+   "author" : [
+      "Davenonymous <perl@davenonymous.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Object-PadX-Enum",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Object::Pad::ExtensionBuilder" : "0",
+            "XS::Parse::Keyword::Builder" : "0.48"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.12",
+            "Object::Pad::ExtensionBuilder" : "0",
+            "XS::Parse::Keyword::Builder" : "0.48"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Object::Pad" : "0.825",
+            "XS::Parse::Keyword" : "0.48",
+            "XSLoader" : "0",
+            "perl" : "5.022"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davenonymous/perl-object-padx-enum/issues"
+      },
+      "homepage" : "https://github.com/davenonymous/perl-object-padx-enum",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/davenonymous/perl-object-padx-enum.git",
+         "web" : "https://github.com/davenonymous/perl-object-padx-enum"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

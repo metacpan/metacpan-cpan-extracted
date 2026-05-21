@@ -8,7 +8,7 @@ use Scalar::Util qw(isweak refaddr);
 
 BEGIN 
 {
-  require 't/test-lib.pl';
+  require './t/test-lib.pl';
   use_ok('Rose::DB::Object');
 }
 

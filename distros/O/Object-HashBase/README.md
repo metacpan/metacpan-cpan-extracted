@@ -310,6 +310,53 @@ This does not create any methods for you, it just adds the `FOO` constant.
 This enforces that the getter and setter generated for `foo` will NOT use
 [Class::XSAccessor](https://metacpan.org/pod/Class%3A%3AXSAccessor) even if it is installed.
 
+# ISA AND ROLE PREFIXES
+
+Two import prefixes provide shortcuts for declaring parent classes and
+consuming roles.
+
+## PARENT PREFIX: @
+
+    use Object::HashBase qw/@Some::Parent::Class foo bar/;
+
+This loads `Some::Parent::Class` and pushes it onto `@ISA`. Equivalent to:
+
+    use parent 'Some::Parent::Class';
+    use Object::HashBase qw/foo bar/;
+
+Multiple parents can be declared:
+
+    use Object::HashBase qw/@Parent::A @Parent::B foo/;
+
+The prefix may be combined freely with attribute declarations in any order;
+parents are processed first regardless of position.
+
+## ROLE PREFIX: &
+
+    use Object::HashBase qw/&Some::Role::Name foo/;
+
+This consumes a [Role::Tiny](https://metacpan.org/pod/Role%3A%3ATiny) role that itself uses [Object::HashBase](https://metacpan.org/pod/Object%3A%3AHashBase). The
+role's constants are copied into the consumer immediately so the
+`$self->{+FOO}` pattern resolves at compile time. The actual role
+composition via `Role::Tiny->apply_roles_to_package` is deferred until
+the end of the consumer's compile scope, so the consumer's own methods are
+present when role methods are composed (correct method-modifier and
+required-method semantics).
+
+Requirements:
+
+- [Role::Tiny](https://metacpan.org/pod/Role%3A%3ATiny) 1.003000 or newer must be installed. It is not a hard
+dependency of [Object::HashBase](https://metacpan.org/pod/Object%3A%3AHashBase); it is loaded on demand when the `&`
+prefix is used.
+- Perl 5.10 or newer. The compile-scope deferral relies on the lexically-scoped
+`%^H` hints hash, which was made reliable in 5.10.
+- The target package must be a Role::Tiny role that itself uses
+[Object::HashBase](https://metacpan.org/pod/Object%3A%3AHashBase).
+
+If a sub of the same name as a role constant already exists in the consumer
+package, the existing sub is kept and the role constant is not copied. No
+warning is issued.
+
 # SUBCLASSING
 
 You can subclass an existing HashBase class.
@@ -319,6 +366,32 @@ You can subclass an existing HashBase class.
 
 The base class is added to `@ISA` for you, and all constants from base classes
 are added to subclasses automatically.
+
+# USING IN A ROLE
+
+Object::HashBase can be used inside a [Role::Tiny](https://metacpan.org/pod/Role%3A%3ATiny) role:
+
+    package My::Role;
+    use Role::Tiny;
+    use Object::HashBase qw/foo -bar/;
+
+    sub greet { "hello " . $_[0]->{+FOO} }
+
+When the package being imported into is a Role::Tiny role, Object::HashBase
+skips injection of `new()`, `add_pre_init`, `add_post_init`,
+`_pre_init`, and `_post_init`. Only accessor methods and constants are
+installed.
+
+**Important:** `use Role::Tiny;` must appear **before** `use Object::HashBase`
+in the role package. Object::HashBase detects the role status of the target
+package at import time; if Role::Tiny has not yet been loaded, the target
+will be treated as a plain class and `new()` and the init hooks will be
+injected.
+
+Consumers compose the role with the `&` prefix (recommended) or with a
+direct `with()` call. The `&` prefix copies the role's constants into the
+consumer at compile time, which is required for the `$self->{+FOO}`
+pattern in consumer methods to resolve.
 
 # GETTING A LIST OF ATTRIBUTES FOR A CLASS
 
@@ -332,6 +405,10 @@ Object::HashBase class.
     the object. This list is returned in the attribute definition order, parent
     class attributes are listed before subclass attributes. Duplicate attributes
     will be removed before the list is returned.
+
+    Attributes from roles composed via the `&` prefix are included in the
+    returned list, ordered before the consumer's own attributes at the same ISA
+    level.
 
     **Note:** This list is used in the `$class->new(\@ARRAY)` constructor to
     determine the attribute to which each value will be paired.

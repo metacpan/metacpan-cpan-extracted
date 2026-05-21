@@ -19,10 +19,7 @@ my @files = (
     't/02-minify_utf8.t',
     't/03-minify_ascii.t',
     't/04-undef.t',
-    't/10-overflow.t',
-    't/author-leaks.t',
-    't/author-ppport.t',
-    't/author-xs-check.t'
+    't/10-overflow.t'
 );
 
 file_scripts_ok($_, { scripts => \@scxs } ) for @files;

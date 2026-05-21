@@ -10,6 +10,7 @@ use Exporter qw(import);	# Required for @EXPORT_OK
 use Encode qw(decode_utf8);
 use List::Util 1.33 qw(any);	# Required for memberof validation
 use Params::Get 0.13;
+use Readonly::Values::Boolean;
 use Scalar::Util;
 use Unicode::GCString;
 
@@ -22,11 +23,11 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 =head1 VERSION
 
-Version 0.30
+Version 0.32
 
 =cut
 
-our $VERSION = '0.30';
+our $VERSION = '0.32';
 
 =head1 SYNOPSIS
 
@@ -92,6 +93,22 @@ This function takes two mandatory arguments:
 A reference to a hash that defines the validation rules for each parameter.
 The keys of the hash are the parameter names, and the values are either a string representing the parameter type or a reference to a hash containing more detailed rules.
 
+As an alternative the schema may be supplied as an B<arrayref of parameter
+hashrefs>, where every element describes one parameter and carries a mandatory
+C<name> key:
+
+  $schema = [
+    { name => 'username', type => 'string', min => 3, max => 50 },
+    { name => 'age',      type => 'integer', min => 0, max => 150 },
+    { name => 'role',     type => 'string', optional => 1, default => 'user' },
+  ];
+
+The arrayref form is normalised to the standard hashref form before any further
+processing.  It is particularly useful when declaration order matters (e.g.
+for positional or mixed calling conventions used by some CPAN modules).  The
+C<name> key is consumed during normalisation and does not appear as a
+validation rule.
+
 For some sort of compatibility with L<Data::Processor>,
 it is possible to wrap the schema within a hash like this:
 
@@ -141,7 +158,7 @@ Custom types allow you to define validation rules once and reuse them throughout
 making your validation logic more maintainable and readable.
 
 Each custom type is defined as a hash reference containing the same validation rules available for regular parameters
-(C<type>, C<min>, C<max>, C<matches>, C<memberof>, C<enum>, C<notmemberof>, C<callback>, etc.).
+(C<type>, C<min>, C<max>, C<matches>, C<memberof>, C<values>, C<enum>, C<notmemberof>, C<callback>, etc.).
 
   my $custom_types = {
     email => {
@@ -208,6 +225,22 @@ A type can be an arrayref when a parameter could have different types (e.g. a st
     ]
   };
 
+As a shorthand, C<type> itself may be an arrayref of type name strings (a I<union type>)
+when all other constraints are shared between the alternatives:
+
+  $schema = {
+    data => { type => ['string', 'arrayref'] },
+    id   => { type => ['string', 'integer'], optional => 1 },
+  };
+
+This is equivalent to the full array-of-rules form but more concise.
+Every other key in the rule hash (C<optional>, C<min>, C<max>, C<matches>, etc.)
+is inherited by each candidate type and validated independently against it.
+Type names are tried left-to-right; the first match wins and its coercion
+(e.g. numeric types) is propagated back to the caller.
+If the value fails all candidate types, validation croaks with a message
+listing the union members.
+
 =item * C<can>
 
 The parameter must be an object that understands the method C<can>.
@@ -267,6 +300,10 @@ serve conflicting purposes - C<memberof> defines an explicit whitelist while C<m
 define ranges.
 
 =item * C<enum>
+
+Same as C<memberof>.
+
+=item * C<values>
 
 Same as C<memberof>.
 
@@ -354,7 +391,7 @@ the validated output.
 This flag has no effect on numeric types (C<integer>, C<number>, C<float>) as numbers
 do not have case.
 
-=item * C<min>
+=item * C<min>/C<minimum>
 
 The minimum length (for strings in characters not bytes), value (for numbers) or number of keys (for hashrefs).
 
@@ -378,6 +415,10 @@ For routines and methods that take positional args,
 this integer value defines which position the argument will be in.
 If this is set for all arguments,
 C<validate_strict> will return a reference to an array, rather than a reference to a hash.
+
+=item * C<regex>
+
+Synonym of matches
 
 =item * C<description>
 
@@ -434,6 +475,15 @@ The code will be called with two arguments: the value of the parameter and hash 
 
   my $result = validate_strict(schema => $schema, input => { make_optional => 1 });
 
+If the parameter is not optional, it can be passed an undef value, which will not flag an error.
+This is by design.
+So this will not say that the required parameter 's' is missing:
+
+    validate_strict(
+        schema => { s => { type => 'string' } },
+        input  => { s => undef },
+    );
+
 =item * C<default>
 
 Populate missing optional parameters with the specified value.
@@ -488,8 +538,7 @@ You can validate nested hashrefs and arrayrefs using the C<schema> property:
                     min => 1 # At least one hobby
                 }
             }
-        },
-        metadata => {
+        }, metadata => {
             type => 'hashref',
             schema => {
                 created => { type => 'string' },
@@ -593,7 +642,7 @@ sanitizing user input, and converting between data formats.
     matches => qr/^\d{10}$/
   }
 
-The C<transform> function is applied to the value before any validation checks (C<min>, C<max>,
+The C<transform> function is applied to the value before any validation checks (C<min>/C<minimum>, C<max>,
 C<matches>, C<callback>, etc.), ensuring that validation rules are checked against the cleaned data.
 
 Transformations work with all parameter types including nested structures:
@@ -604,8 +653,7 @@ Transformations work with all parameter types including nested structures:
       name => {
         type => 'string',
         transform => sub { trim($_[0]) }
-      },
-      email => {
+      }, email => {
         type => 'string',
         transform => sub { lc(trim($_[0])) }
       }
@@ -642,7 +690,7 @@ Many validators also allow a code ref to be passed so that you can create your o
 
 =item * C<validator>
 
-A synonym of Cvalidate>, for compatibility with L<Data::Processor>.
+A synonym of C<validate>, for compatibility with L<Data::Processor>.
 
 =item * C<cross_validation>
 
@@ -968,6 +1016,12 @@ sub validate_strict
 
 	return $args if(!defined($schema));	# No schema, allow all arguments
 
+	# Accept arrayref schema: [{ name=>'param', type=>'...', ... }, ...]
+	# Normalise to the standard named-parameter hashref form before further processing.
+	if(ref($schema) eq 'ARRAY') {
+		$schema = _schema_from_arrayref($schema, $logger);
+	}
+
 	# Check if schema and args are references to hashes
 	if(ref($schema) ne 'HASH') {
 		_error($logger, 'validate_strict: schema must be a hash reference');
@@ -981,6 +1035,10 @@ sub validate_strict
 		$schema_description = $schema->{'description'};
 		$error_msg = $schema->{'error_msg'};
 		$schema = $schema->{'members'};
+		# The members value may also be in arrayref form
+		if(ref($schema) eq 'ARRAY') {
+			$schema = _schema_from_arrayref($schema, $logger);
+		}
 	}
 
 	if(exists($params->{'args'}) && (!defined($args))) {
@@ -1107,6 +1165,7 @@ sub validate_strict
 				if(exists($rules->{'default'})) {
 					# Populate missing optional parameters with the specified output values
 					$validated_args{$key} = $rules->{'default'};
+					next;	# default wins; do not fall through to the schema branch
 				}
 
 				if($rules->{'schema'}) {
@@ -1119,30 +1178,52 @@ sub validate_strict
 			}
 		} elsif((ref($args) eq 'HASH') && !exists($args->{$key})) {
 			# The parameter is required
+			# Use exists rather than defined, so that an undefined value can be passed, but the key is there
 			_error($logger, "$rule_description: Required parameter '$key' is missing");
+		}
+
+		# Normalise union type shorthand: { type => ['string', 'integer'], ... }
+		# into the array-of-rules form that the ARRAY handler below already supports.
+		# Each candidate type inherits all other constraints from the parent rule
+		# (min, max, matches, optional, etc.) so they are each fully validated.
+		# Must run after optional/transform handling above but before rule dispatch below.
+		if(ref($rules) eq 'HASH' && ref($rules->{'type'}) eq 'ARRAY') {
+			my %base = %{$rules};
+			my @type_list = @{delete $base{'type'}};
+			if(!@type_list) {
+				_error($logger, "$rule_description: Parameter '$key': union type list must not be empty");
+			}
+			# Expand into one full rule hash per candidate type
+			$rules = [ map { { %base, type => $_ } } @type_list ];
 		}
 
 		# Validate based on rules
 		if(ref($rules) eq 'HASH') {
-			if(defined(my $min = $rules->{'min'}) && defined(my $max = $rules->{'max'})) {
+			if(defined(my $min = $rules->{'min'} // $rules->{'minimum'}) && defined(my $max = $rules->{'max'})) {
 				if($min > $max) {
 					_error($logger, "validate_strict($key): min must be <= max ($min > $max)");
 				}
 			}
 
-			if($rules->{'memberof'}) {
-				if(defined(my $min = $rules->{'min'})) {
-					_error($logger, "validate_strict($key): min ($min) makes no sense with memberof");
+			# memberof and its synonym enum cannot be combined with min or max
+			if($rules->{'memberof'} || $rules->{'enum'} || $rules->{'values'}) {
+				if(defined(my $min = $rules->{'min'} // $rules->{'minimum'})) {
+					_error($logger, "validate_strict($key): min ($min) makes no sense with memberof/enum/values");
 				}
 				if(defined(my $max = $rules->{'max'})) {
-					_error($logger, "validate_strict($key): max ($max) makes no sense with memberof");
+					_error($logger, "validate_strict($key): max ($max) makes no sense with memberof/enum/values");
 				}
 			}
 
 			foreach my $rule_name (keys %$rules) {
 				my $rule_value = $rules->{$rule_name};
 
-				if((ref($rule_value) eq 'CODE') && ($rule_name ne 'validate') && ($rule_name ne 'callback') && ($rule_name ne 'validator')) {
+				if((ref($rule_value) eq 'CODE')
+					&& ($rule_name ne 'validate')
+					&& ($rule_name ne 'callback')
+					&& ($rule_name ne 'validator')
+					&& ($rule_name ne 'transform')	# already applied before this loop
+					&& ($rule_name ne 'optional')) {	# already applied before this loop
 					$rule_value = &{$rule_value}($value, $args);
 				}
 
@@ -1161,7 +1242,7 @@ sub validate_strict
 						unless((ref($value) eq '') || (defined($value) && length($value))) {	# Allow undef for optional strings
 							_error($logger, $rules->{'error_msg'} || "$rule_description: Parameter '$key' must be a string");
 						}
-					} elsif($type eq 'integer') {
+					} elsif(($type eq 'integer') || ($type eq 'int')) {
 						if(!defined($value)) {
 							next;	# Skip if number is undefined
 						}
@@ -1173,7 +1254,7 @@ sub validate_strict
 							}
 						}
 						$value = int($value); # Coerce to integer
-					} elsif(($type eq 'number') || ($type eq 'float')) {
+					} elsif(($type eq 'number') || ($type eq 'float') || ($type eq 'num') || ($type eq 'double')) {
 						if(!defined($value)) {
 							next;	# Skip if number is undefined
 						}
@@ -1212,19 +1293,15 @@ sub validate_strict
 						if(!defined($value)) {
 							next;	# Skip if bool is undefined
 						}
-						if(($value eq 'true') || ($value eq 'on') || ($value eq 'yes')) {
-							$value = 1;
-						} elsif(($value eq 'false') || ($value eq 'off') || ($value eq 'no')) {
-							$value = 0;
-						}
-						if(($value ne '1') && ($value ne '0')) {	# Do string compare
+						if(defined(my $b = $Readonly::Values::Boolean::booleans{$value})) {
+							$value = $b;
+						} else {
 							if($rules->{'error_msg'}) {
 								_error($logger, $rules->{'error_msg'});
 							} else {
 								_error($logger, "$rule_description: Parameter '$key' ($value) must be a boolean");
 							}
 						}
-						$value = int($value);	# Coerce to integer
 					} elsif($type eq 'coderef') {
 						if(!defined($value)) {
 							next;	# Skip if code is undefined
@@ -1233,7 +1310,7 @@ sub validate_strict
 							if($rules->{'error_msg'}) {
 								_error($logger, $rules->{'error_msg'});
 							} else {
-								_error($logger, "$rule_description: Parameter '$key' must be a coderef");
+								_error($logger, "$rule_description: Parameter '$key' must be a coderef, not a ref to " . ref($value));
 							}
 						}
 					} elsif($type eq 'object') {
@@ -1261,13 +1338,13 @@ sub validate_strict
 					} else {
 						_error($logger, "$rule_description: Unknown type '$type'");
 					}
-				} elsif($rule_name eq 'min') {
+				} elsif(($rule_name eq 'min') || ($rule_name eq 'minimum')) {
 					if(!defined($rules->{'type'})) {
 						_error($logger, "$rule_description: Don't know type of '$key' to determine its minimum value $rule_value");
 					}
 					my $type = lc($rules->{'type'});
-					if(exists($custom_types->{$type}->{'min'})) {
-						$rule_value = $custom_types->{$type}->{'min'};
+					if(exists($custom_types->{$type}->{'min'}) || exists($custom_types->{$type}->{minimum})) {
+						$rule_value = $custom_types->{$type}->{'min'} // $custom_types->{$type}->{minumum};
 						$type = $custom_types->{$type}->{'type'};
 					}
 					if(($type eq 'string') || ($type eq 'str')) {
@@ -1424,7 +1501,7 @@ sub validate_strict
 					} else {
 						_error($logger, "$rule_description: Parameter '$key' of type '$type' has meaningless max value $rule_value");
 					}
-				} elsif($rule_name eq 'matches') {
+				} elsif(($rule_name eq 'matches') || ($rule_name eq 'regex')) {
 					if(!defined($value)) {
 						next;	# Skip if string is undefined
 					}
@@ -1477,7 +1554,7 @@ sub validate_strict
 						}
 						$invalid_args{$key} = 1;
 					}
-				} elsif(($rule_name eq 'memberof') || ($rule_name eq 'enum')) {
+				} elsif(($rule_name eq 'memberof') || ($rule_name eq 'enum') || ($rule_name eq 'values')) {
 					if(!defined($value)) {
 						next;	# Skip if string is undefined
 					}
@@ -1630,6 +1707,8 @@ sub validate_strict
 					}
 				} elsif($rule_name eq 'optional') {
 					# Already handled at the beginning of the loop
+				} elsif($rule_name eq 'nullable') {
+					# Already handled at the beginning of the loop (same as optional)
 				} elsif($rule_name eq 'default') {
 					# Handled earlier
 				} elsif($rule_name eq 'error_msg') {
@@ -1655,7 +1734,22 @@ sub validate_strict
 					if(($rules->{'type'} eq 'arrayref') || ($rules->{'type'} eq 'ArrayRef')) {
 						if(ref($value) eq 'ARRAY') {
 							foreach my $member(@{$value}) {
-								if(!validate_strict({ input => { $key => $member }, schema => { $key => $rule_value }, custom_types => $custom_types })) {
+								# Distinguish two schema forms:
+								# (a) Rule hash   — has a top-level 'type' key, e.g. { type=>'string', matches=>qr/.../ }
+								#     → validate each element against that rule directly.
+								# (b) Field-schema hash — keys are field names whose values are rule hashes,
+								#     e.g. { name=>{type=>'string'}, age=>{type=>'integer'} }
+								#     → validate each hashref element against the field schema directly.
+								my $is_field_schema = (ref($rule_value) eq 'HASH') && !exists($rule_value->{'type'});
+								my %inner = (custom_types => $custom_types);
+								if($is_field_schema) {
+									$inner{input}  = $member;
+									$inner{schema} = $rule_value;
+								} else {
+									$inner{input}  = { $key => $member };
+									$inner{schema} = { $key => $rule_value };
+								}
+								if(!validate_strict(\%inner)) {
 									$invalid_args{$key} = 1;
 								}
 							}
@@ -1663,10 +1757,10 @@ sub validate_strict
 							_error($logger, "$rule_description: nested schema: Parameter '$value' must be an arrayref");
 						}
 					} elsif($rules->{'type'} eq 'hashref') {
-						if(ref($value) eq 'HASH') {
+						if(ref($rule_value) eq 'HASH') {
 							# Apply nested defaults before validation
 							my $nested_with_defaults = _apply_nested_defaults($value, $rule_value);
-							if(scalar keys(%{$value})) {
+							if(scalar keys(%{$nested_with_defaults})) {
 								if(my $new_args = validate_strict({ input => $nested_with_defaults, schema => $rule_value, custom_types => $custom_types })) {
 									$value = $new_args;
 								} else {
@@ -1690,6 +1784,7 @@ sub validate_strict
 						_error($logger, "$rule_description: Parameter '$key': 'validate' only supports coderef, not " . ref($rule_value) // $rule_value);
 					}
 				} elsif ($rule_name eq 'callback') {
+					# Custom validation code
 					unless (defined &$rule_value) {
 						_error($logger, "$rule_description: callback for '$key' must be a code reference");
 					}
@@ -1715,7 +1810,9 @@ sub validate_strict
 			}
 		} elsif(ref($rules) eq 'ARRAY') {
 			if(scalar(@{$rules})) {
-				# An argument can be one of several different type
+				# An argument can be one of several different types.
+				# This path handles both explicit array-of-rules schemas and the
+				# normalised form of union type shorthand (type => ['a', 'b', ...]).
 				my $rc = 0;
 				my @types;
 				foreach my $rule(@{$rules}) {
@@ -1728,10 +1825,14 @@ sub validate_strict
 						next;
 					}
 					push @types, $rule->{'type'};
+					my $result;
 					eval {
-						validate_strict({ input => { $key => $value }, schema => { $key => $rule }, logger => undef, custom_types => $custom_types });
+						$result = validate_strict({ input => { $key => $value }, schema => { $key => $rule }, logger => undef, custom_types => $custom_types });
 					};
 					if(!$@) {
+						# Capture coercion performed by the successful sub-validation
+						# (e.g. integer/number coercion) so the outer scope sees it.
+						$value = $result->{$key} if(defined($result));
 						$rc = 1;
 						last;
 					}
@@ -1777,7 +1878,11 @@ sub validate_strict
 	if($are_positional_args == 1) {
 		my @rc;
 		foreach my $key (keys %{$schema}) {
-			if(my $value = delete $validated_args{$key}) {
+			# Use exists() rather than if(my $value = ...) so that falsy but
+			# valid coerced values (integer 0, empty string, undef from an
+			# absent optional) are not silently dropped from the return array.
+			if(exists $validated_args{$key}) {
+				my $value = delete $validated_args{$key};
 				my $position = $schema->{$key}->{'position'};
 				if(defined($rc[$position])) {
 					_error($logger, "$schema_description: $key: position $position appears twice");
@@ -1788,6 +1893,35 @@ sub validate_strict
 		return \@rc;
 	}
 	return \%validated_args;
+}
+
+# _schema_from_arrayref($arrayref, $logger)
+#
+# Normalise an arrayref schema:
+#   [ { name => 'param', type => 'string', ... }, ... ]
+# to the standard named-parameter hashref form:
+#   { param => { type => 'string', ... }, ... }
+#
+# The 'name' key is consumed during conversion and does not become a rule.
+# Croaks if any element is not a hashref, is missing 'name', or if a name
+# appears more than once.
+sub _schema_from_arrayref
+{
+	my ($arrayref, $logger) = @_;
+
+	my %schema;
+	foreach my $spec (@{$arrayref}) {
+		_error($logger, "validate_strict: each arrayref schema element must be a hashref")
+			unless ref($spec) eq 'HASH';
+		_error($logger, "validate_strict: arrayref schema element must have a 'name' key")
+			unless exists($spec->{'name'});
+		my %rule = %{$spec};
+		my $name = delete $rule{'name'};
+		_error($logger, "validate_strict: duplicate parameter '$name' in arrayref schema")
+			if exists($schema{$name});
+		$schema{$name} = \%rule;
+	}
+	return \%schema;
 }
 
 # Return number of visible characters not number of bytes
@@ -2017,18 +2151,23 @@ Nigel Horne, C<< <njh at nigelhorne.com> >>
 
     [PARAM_NAME, VALUE, TYPE_NAME, CONSTRAINT_VALUE]
 
-    ValidationRule ::= SimpleType | ComplexRule
+    ValidationRule ::= SimpleType | ComplexRule | UnionType
 
     SimpleType ::= string | integer | number | arrayref | hashref | coderef | object
 
+    UnionType ::= seq SimpleType    -- at least two members; written as type => ['a', 'b']
+
     ComplexRule == [
-        type: TYPE_NAME;
+        type: SimpleType | UnionType;
         min: ℕ₁;
         max: ℕ₁;
         optional: 𝔹;
         matches: REGEX;
+        regex: REGEX;
         nomatch: REGEX;
-        memberof: seq VALUE;
+	memberof: seq VALUE;
+        enum: seq VALUE;
+        values: seq VALUE;
         notmemberof: seq VALUE;
         callback: FUNCTION;
         isa: TYPE_NAME;
@@ -2043,8 +2182,8 @@ Nigel Horne, C<< <njh at nigelhorne.com> >>
 
     ∀ rule: ComplexRule •
       rule.min ≤ rule.max ∧
-      ¬(rule.memberof ∧ rule.min) ∧
-      ¬(rule.memberof ∧ rule.max) ∧
+      ¬((rule.memberof ∨ rule.enum ∨ rule.values) ∧ rule.min) ∧
+      ¬((rule.memberof ∨ rule.enum ∨ rule.values) ∧ rule.max) ∧
       ¬(rule.notmemberof ∧ rule.min) ∧
       ¬(rule.notmemberof ∧ rule.max)
 
@@ -2154,7 +2293,9 @@ L<http://deps.cpantesters.org/?module=Params::Validate::Strict>
 
 Copyright 2025-2026 Nigel Horne.
 
-This program is released under the following licence: GPL2
+This program is released under the following licence: GPL2.
+If you use it,
+please let me know.
 
 =cut
 

@@ -256,7 +256,7 @@ PPCODE:
 
     if (!root_svp || !SvOK(*root_svp)) XSRETURN(0);
 
-    /* Call File::Raw::readdir($root) — capture result before returning to our stack */
+    /* Call File::Raw::readdir($root) - capture result before returning to our stack */
     {
         dSP;
         int count;

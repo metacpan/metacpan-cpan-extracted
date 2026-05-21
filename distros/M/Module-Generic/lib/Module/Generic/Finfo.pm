@@ -13,10 +13,10 @@
 package Module::Generic::Finfo;
 BEGIN
 {
-    use v5.26.1;
+    use v5.16.0;
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'Module::Generic' );
     use parent qw( Module::Generic );
     use vars qw( $VERSION );
     use File::Basename ();
@@ -66,7 +66,6 @@ BEGIN
     our $VERSION = 'v0.5.6';
 };
 
-use v5.26.1;
 use strict;
 no warnings 'redefine';
 
@@ -348,7 +347,7 @@ sub DESTROY
 {
     # <https://perldoc.perl.org/perlobj#Destructors>
     CORE::local( $., $@, $!, $^E, $? );
-    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    CORE::return if( Module::Generic::_in_global_destruction() );
     my $self = CORE::shift( @_ );
     CORE::return if( !CORE::defined( $self ) );
     my $repo = Module::Generic::Global->new( 'local_tz' => 'system' );

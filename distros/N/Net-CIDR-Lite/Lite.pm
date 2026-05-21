@@ -4,7 +4,7 @@ use strict;
 use vars qw($VERSION);
 use Carp qw(confess);
 
-$VERSION = '0.23';
+$VERSION = '0.24';
 
 my %masks;
 my @fields = qw(PACK UNPACK NBITS MASKS);
@@ -37,7 +37,9 @@ sub add {
     my ($ip, $mask) = split "/", shift;
     $self->_init($ip) || confess "Can't determine ip format" unless %$self;
     confess "Bad mask $mask"
-        unless $mask =~ /^\d+$/ and $mask <= $self->{NBITS}-8;
+        unless defined $mask
+        and $mask =~ /\A(?:0|[1-9][0-9]*)\z/
+        and $mask <= $self->{NBITS}-8;
     $mask += 8;
     my $start = $self->{PACK}->($ip) & $self->{MASKS}[$mask]
         or confess "Bad ip address: $ip";
@@ -181,7 +183,7 @@ sub _pack_ipv4 {
     my @nums = split /\./, shift(), -1;
     return unless @nums == 4;
     for (@nums) {
-        return unless /^\d{1,3}$/ and !/^0\d{1,2}$/ and $_ <= 255;
+        return unless /\A[0-9]{1,3}\z/ and !/\A0[0-9]{1,2}\z/ and $_ <= 255;
     }
     pack("CC*", 0, @nums);
 }
@@ -192,15 +194,15 @@ sub _unpack_ipv4 {
 
 sub _pack_ipv6 {
     my $ip = shift;
-    $ip =~ s/^::$/::0/;
-    return if $ip =~ /^:/ and $ip !~ s/^::/:/;
-    return if $ip =~ /:$/ and $ip !~ s/::$/:/;
+    $ip =~ s/\A::\z/::0/;
+    return if $ip =~ /\A:/ and $ip !~ s/\A::/:/;
+    return if $ip =~ /:\z/ and $ip !~ s/::\z/:/;
     my @nums = split /:/, $ip, -1;
     return unless @nums <= 8;
     my ($empty, $ipv4, $str) = (0,'','');
     for (@nums) {
         return if $ipv4;
-        $str .= "0" x (4-length) . $_, next if /^[a-fA-F\d]{1,4}$/;
+        $str .= "0" x (4-length) . $_, next if /\A[a-fA-F0-9]{1,4}\z/;
         do { return if $empty++ }, $str .= "X", next if $_ eq '';
         next if $ipv4 = _pack_ipv4($_);
         return;

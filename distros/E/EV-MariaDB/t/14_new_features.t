@@ -4,7 +4,7 @@ use Test::More;
 use lib 't/lib';
 use TestMariaDB;
 plan skip_all => 'No MariaDB/MySQL server' unless TestMariaDB::server_available();
-plan tests => 78;
+plan tests => 93;
 use EV;
 use EV::MariaDB;
 
@@ -518,17 +518,18 @@ with_mariadb(multi_statements => 1, cb => sub {
 
 # select_db persists across reset
 with_mariadb(cb => sub {
-    $m->select_db("test", sub {
+    $m->select_db($TestMariaDB::db, sub {
         my ($ok, $e) = @_;
         ok(!$e, 'select_db persist: select_db ok');
         $m->reset;
     });
     $m->on_connect(sub {
-        # after reset, should reconnect to "test" (cached by select_db)
+        # after reset, should reconnect to the cached db
         $m->q("select database()", sub {
             my ($r, $e) = @_;
             ok(!$e, 'select_db persist: query after reset ok');
-            is($r->[0][0], 'test', 'select_db persist: database preserved across reset');
+            is($r->[0][0], $TestMariaDB::db,
+                'select_db persist: database preserved across reset');
             EV::break;
         });
     });
@@ -563,3 +564,124 @@ with_mariadb(cb => sub {
         });
     });
 });
+
+# bind_params error paths
+with_mariadb(cb => sub {
+    $m->prepare("select ?", sub {
+        my ($stmt, $err) = @_;
+        die $err if $err;
+
+        # non-ARRAY ref croaks
+        eval { $m->bind_params($stmt, "not an arrayref") };
+        like($@, qr/ARRAY reference/, 'bind_params: non-ARRAY ref croaks');
+        eval { $m->bind_params($stmt, undef) };
+        like($@, qr/ARRAY reference/, 'bind_params: undef croaks');
+
+        # state != IDLE during in-flight execute -> croak
+        $m->execute($stmt, [1], sub {
+            $m->close_stmt($stmt, sub { EV::break });
+        });
+        eval { $m->bind_params($stmt, [2]) };
+        like($@, qr/operation is in progress/, 'bind_params: croaks while op in flight');
+    });
+});
+
+# bind_params on disconnected object croaks "not connected"
+{
+    my $obj = EV::MariaDB->new;
+    eval { $obj->bind_params(0, []) };
+    like($@, qr/not connected/, 'bind_params: not connected on fresh object croaks');
+}
+
+# set_charset with bogus name -> error callback
+with_mariadb(cb => sub {
+    $m->set_charset("definitely_not_a_charset_xyz", sub {
+        my ($ok, $err) = @_;
+        ok($err, 'set_charset error: bad charset returns error');
+        EV::break;
+    });
+});
+
+# autocommit toggle: 0 then 1 round-trip
+with_mariadb(cb => sub {
+    $m->autocommit(0, sub {
+        my (undef, $err1) = @_;
+        ok(!$err1, 'autocommit(0): no error');
+        $m->autocommit(1, sub {
+            my (undef, $err2) = @_;
+            ok(!$err2, 'autocommit(1): no error (re-enable)');
+            EV::break;
+        });
+    });
+});
+
+# close_stmt fast-path callback receives (1, undef) after reset invalidation
+with_mariadb(cb => sub {
+    $m->prepare("select 1", sub {
+        my ($stmt, $err) = @_;
+        die $err if $err;
+        $m->on_connect(sub {
+            $m->close_stmt($stmt, sub {
+                my ($ok, $cerr) = @_;
+                ok($ok, 'close_stmt fast-path: ok==1 after reset');
+                ok(!defined $cerr, 'close_stmt fast-path: undef err after reset');
+                EV::break;
+            });
+        });
+        $m->reset;
+    });
+});
+
+# close_stmt with a NULL/zero handle croaks instead of crashing
+with_mariadb(cb => sub {
+    eval { $m->close_stmt(0, sub {}) };
+    like($@, qr/invalid statement handle/, 'close_stmt: NULL handle croaks');
+    EV::break;
+});
+
+# reset_connection invalidates server-side prepared statements: subsequent
+# execute on a stmt prepared before reset_connection must croak (closed=1)
+with_mariadb(cb => sub {
+    $m->prepare("select 1", sub {
+        my ($stmt, $err) = @_;
+        die $err if $err;
+        $m->reset_connection(sub {
+            my (undef, $rerr) = @_;
+            ok(!$rerr, 'reset_connection invalidate: reset ok');
+            eval { $m->execute($stmt, [], sub {}) };
+            like($@, qr/no longer valid/, 'reset_connection invalidate: stmt marked closed');
+            $m->close_stmt($stmt, sub { EV::break });
+        });
+    });
+});
+
+# Failed change_user must NOT corrupt cached credentials — reset() should
+# reconnect with the original user, not the failed one. If the rollback
+# is broken, reset() fires on_error with auth failure; we trap that
+# explicitly so the regression surfaces as a named failing test, not as
+# a TAP plan-count mismatch.
+with_mariadb(
+    cb => sub {
+        my $orig_user = $TestMariaDB::user;
+        $m->change_user("__definitely_not_a_real_user_$$", "wrong", undef, sub {
+            my (undef, $err) = @_;
+            ok($err, 'change_user rollback: bad creds rejected');
+            $m->on_connect(sub {
+                $m->q("select current_user()", sub {
+                    my ($r, $qerr) = @_;
+                    ok(!$qerr, 'change_user rollback: query after reset ok');
+                    like($r->[0][0], qr/^\Q$orig_user\E\@/,
+                        'change_user rollback: reset reconnected as original user');
+                    EV::break;
+                });
+            });
+            $m->reset;
+        });
+    },
+    on_error => sub {
+        fail("change_user rollback: reset reconnect failed ($_[0]) — credential cache likely not rolled back");
+        fail("change_user rollback: query after reset never ran");
+        fail("change_user rollback: user check never ran");
+        EV::break;
+    },
+);

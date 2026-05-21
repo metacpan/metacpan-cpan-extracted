@@ -6,7 +6,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp qw[carp croak confess cluck longmess shortmess];
-our $VERSION = 35;
+our $VERSION = 36;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -98,6 +98,7 @@ sub extraDestroys($self) {
 }
 
 sub fastdisconnect($self) {
+    return if(!defined($self->{clacks}));    # never connected, nothing to do
     eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
         $self->{clacks}->fastdisconnect();
     };
@@ -106,6 +107,7 @@ sub fastdisconnect($self) {
 }
 
 sub disconnect($self) {
+    return if(!defined($self->{clacks}));    # never connected, nothing to do
     eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
         $self->{clacks}->disconnect();
     };
@@ -114,11 +116,31 @@ sub disconnect($self) {
 }
 
 sub DESTROY($self) {
+    # During Perl's global destruction phase, package symbol tables are torn
+    # down in arbitrary order. By the time DESTROY runs here the inner
+    # Net::Clacks::Client (and IO::Socket::SSL, IO::Select, etc.) may already
+    # be unavailable. Skip cleanup entirely in that phase — the kernel closes
+    # any leftover FD on process exit and the server detects EOF.
+    return if(${^GLOBAL_PHASE} eq 'DESTRUCT');
+
+    # Outside global destruction, do a *fast* close (no flush, no QUIT, no
+    # sleeps). DESTROY can run at moments where the graceful path is
+    # inappropriate (worker child unwinding after fork, exception
+    # propagation, local-block exit). Callers who want a graceful protocol-
+    # level close should call $cache->disconnect() explicitly first.
+    if(defined($self->{clacks})) {
+        eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
+            $self->{clacks}->fastdisconnect();
+        };
+    }
+
+    # Wrap extraDestroys too — a subclass override might throw during
+    # teardown, and we don't want that to escape DESTROY (Perl turns
+    # propagated exceptions out of DESTROY into "(in cleanup)" warnings).
     eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
-        $self->{clacks}->disconnect();
+        $self->extraDestroys();
     };
 
-    $self->extraDestroys();
     return;
 }
 

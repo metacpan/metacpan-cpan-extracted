@@ -201,8 +201,8 @@ with_native(
         $ch->drain(sub {
             $done = 1;
             ok($done, 'drain+finish: drain fired');
-            ok($disconnected || 1, 'drain+finish: drain callback reached');
             $ch->finish;
+            ok($disconnected, 'drain+finish: on_disconnect fired after finish');
             EV::break;
         });
     },

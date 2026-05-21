@@ -1,8 +1,8 @@
 package Future::Uring::Handle;
-$Future::Uring::Handle::VERSION = '0.004';
+$Future::Uring::Handle::VERSION = '0.005';
 use 5.020;
 use warnings;
-use experimental 'signatures';
+use experimental qw/signatures lexical_subs/;
 
 require Future::Uring;
 
@@ -448,7 +448,7 @@ Future::Uring::Handle - A Uring filehandle
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

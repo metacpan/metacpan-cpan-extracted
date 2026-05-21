@@ -1,6 +1,11 @@
-/**********************************************************************************************\
-* Async write implementation
-\**********************************************************************************************/
+/*
+ * Async write implementation
+ *
+ * This writes a span of bytes from a SecretBuffer into a file handle, and if it would block,
+ * starts a background thread to continue pumping the bytes into it.  The more sensible way to
+ * go is to just use IPC::Run, but this enables the $sb->as_pipe feature without a dependency
+ * on IPC::Run.
+ */
 
 typedef struct {
    int refcount;

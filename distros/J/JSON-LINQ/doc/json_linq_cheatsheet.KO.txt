@@ -11,6 +11,13 @@
   my $q = JSON::LINQ->FromJSONL('events.jsonl');
   # JSON 문자열에서
   my $q = JSON::LINQ->FromJSONString('[{"id":1}]');
+  # FromLTSV: read an LTSV file (label:value, TAB-separated, streaming)
+  my $q = JSON::LINQ->FromLTSV('data.ltsv');
+  # FromCSV: CSV 파일 읽기 (첫 행 = 헤더, 스트리밍)
+  my $q = JSON::LINQ->FromCSV('data.csv');
+  my $q = JSON::LINQ->FromCSV('data.csv', sep => "\t");         # TSV
+  my $q = JSON::LINQ->FromCSV('f.csv', headers=>[qw(a b c)]);  # 헤더 없음
+  my $q = JSON::LINQ->FromCSV('f.csv', headers=>[qw(a b c)], skip_header=>1);
   # 메모리 배열에서
   my $q = JSON::LINQ->From(\@array);
   # 빈 시퀀스
@@ -61,6 +68,13 @@
 
   ->ToJSON('output.json')    # JSON 배열 파일로 출력
   ->ToJSONL('output.jsonl')  # JSONL 파일로 출력
+  ->ToLTSV('output.ltsv')                        # write as LTSV file (all keys, alphabetical)
+  ->ToLTSV('out.ltsv', label_order=>[qw(a b c)]) # emit specified labels in order
+  ->ToLTSV('out.ltsv', headers    =>[qw(a b c)]) # alias for label_order
+  ->ToCSV('output.csv')              # CSV 파일로 출력 (전체 키, 알파벳순)
+  ->ToCSV('out.csv', headers    =>[qw(a b c)])  # 지정 열 순서대로
+  ->ToCSV('out.csv', label_order=>[qw(a b c)])  # headers 별칭
+  ->ToCSV('out.csv', sep=>"\t", no_header=>1)    # TSV, 헤더 없음
 
 [ 9. 불리언 값 ]
 
@@ -71,5 +85,13 @@
 
   JSON::LINQ: https://metacpan.org/dist/JSON-LINQ
   JSONL 명세: https://jsonlines.org/
+
+
+  # JOIN: CSV 주테이블 x JSON 서브테이블 (가격 마스터)
+  my $prices = JSON::LINQ->FromJSON('prices.json');
+  JSON::LINQ->FromCSV('orders.csv')
+      ->Join($prices, sub { $_[0]{sku} }, sub { $_[0]{sku} },
+          sub { { order_id => $_[0]{id}, amount => $_[0]{qty} * $_[1]{price} } })
+      ->ToArray();
 
 ======================================================================

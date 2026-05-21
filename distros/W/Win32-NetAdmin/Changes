@@ -1,5 +1,13 @@
 Revision history for Perl extension Win32::NetAdmin.
 
+0.14    [2026-05-04]
+        - Fix memory leak in LocalGroupIsMember by ms-rs [PR/8]
+        - Restore early-exit and tab indentation in LocalGroupIsMember loop [PR/13]
+        - Fix Cygwin g++ build of Net*Enum resume-handle arguments [PR/12]
+        - Improve test reliability on Windows Server by Florian Manschwetus [PR/6]
+        - Move repository to perl-libwin32 organization [PR/10]
+        - Add LICENSE and README.md [PR/14]
+
 0.13  Tue Oct 21 2014
         - Change resumeHandle variable type to DWORD_PTR
           (thanks to Mark J Hewitt) [pr#5] [rt#99461]

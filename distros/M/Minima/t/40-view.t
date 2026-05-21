@@ -12,4 +12,10 @@ like(
     'warns on calling base &render'
 );
 
+like(
+    warning { $v->prepare_response(undef) },
+    qr/base.*called/i,
+    'warns on calling base &prepare_response'
+);
+
 done_testing;

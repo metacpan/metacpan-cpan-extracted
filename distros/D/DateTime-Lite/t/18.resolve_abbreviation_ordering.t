@@ -30,17 +30,24 @@
 ##   EEST: v0.6.2 returned Asia/Gaza first. v0.6.3 puts Asia/Beirut first
 ##         (earliest adopter still active on EEST).
 ##----------------------------------------------------------------------------
+BEGIN
+{
+    use strict;
+    use warnings;
+    use lib './lib';
+    use Test::More;
+    local $@;
+    eval{ require DBI; require DBD::SQLite };
+    plan( skip_all => 'DBI and DBD::SQLite are required for this test' ) if( $@ );
+};
+
 use strict;
 use warnings;
-use lib './lib';
-use Test::More;
 
 BEGIN
 {
-    eval{ require DBI; require DBD::SQLite };
-    plan( skip_all => 'DBI and DBD::SQLite are required for this test' ) if( $@ );
     use_ok( 'DateTime::Lite::TimeZone' ) || BAIL_OUT( 'Cannot load DateTime::Lite::TimeZone' );
-}
+};
 
 # NOTE: CEST - Central European Summer Time.
 #       30 zones have historically used CEST. Among those still active,

@@ -11,7 +11,7 @@ BEGIN
     use Test::More;
     # 2024-12-31T11:47:47
     use Test::Time time => 1735645667;
-    use DateTime;
+    use DateTime::Lite;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
     $TEST_ID = $ENV{TEST_ID} if( exists( $ENV{TEST_ID} ) );
 };
@@ -51,9 +51,9 @@ my $tests =
     {
         locale => 'en',
         options => { numeric => 'auto' },
-        # Using 1 DateTime object
+        # Using 1 DateTime::Lite object
         args => [
-            DateTime->new(
+            DateTime::Lite->new(
                 year => 2024,
                 month => 2,
                 day => 1,
@@ -69,14 +69,14 @@ my $tests =
     {
         locale => 'en',
         options => { numeric => 'auto' },
-        # Using 2 DateTime objects
+        # Using 2 DateTime::Lite objects
         args => [
-            DateTime->new(
+            DateTime::Lite->new(
                 year => 2024,
                 month => 12,
                 day => 1,
             ),
-            DateTime->new(
+            DateTime::Lite->new(
                 year => 2024,
                 month => 2,
                 day => 1,
@@ -115,7 +115,7 @@ my $tests =
         locale => 'ja',
         options => { numeric => 'auto' },
         args => [
-            DateTime->new(
+            DateTime::Lite->new(
                 year => 2023,
                 month => 12,
                 day => 31,
@@ -132,7 +132,7 @@ my $tests =
         locale => 'de',
         options => { numeric => 'auto' },
         args => [
-            DateTime->new(
+            DateTime::Lite->new(
                 year => 2024,
                 month => 12,
                 day => 24,
@@ -189,7 +189,7 @@ my $tests =
         locale => 'en',
         options => { numeric => 'auto' },
         args => [
-            DateTime->new(
+            DateTime::Lite->new(
                 year => 2024,
                 month => 12,
                 day => 31,
@@ -230,7 +230,7 @@ my $tests =
             { type => "integer", value => '২', unit => "hour" },
             { type => "decimal", value => ".", unit => "hour" },
             { type => "fraction", value => '৭৫', unit => "hour" },
-            { type => "literal", value => " ঘন্টায়" },
+            { type => "literal", value => " ঘণ্টায়" },
         ],
     },
     # Test with Persian (Iran) - Persian digits, comma for decimal

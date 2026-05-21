@@ -24,7 +24,6 @@
             "Atomic::Pipe" : "0.026",
             "DBD::MariaDB" : "1.00",
             "DBD::Pg" : "v3.5.0",
-            "DBD::mysql" : "4.00",
             "DBI" : "1.644",
             "DBIx::QuickDB" : "0.000040",
             "Digest::SHA" : "0",
@@ -66,7 +65,6 @@
             "Atomic::Pipe" : "0.026",
             "DBD::MariaDB" : "1.00",
             "DBD::Pg" : "v3.5.0",
-            "DBD::mysql" : "4.00",
             "DBI" : "1.644",
             "DBIx::QuickDB" : "0.000040",
             "IO::Select" : "0",
@@ -93,7 +91,7 @@
          "url" : "https://github.com/exodist/IPC-Manager/"
       }
    },
-   "version" : "0.000035",
+   "version" : "0.000037",
    "x_generated_by_perl" : "v5.42.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

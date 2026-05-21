@@ -69,6 +69,10 @@ Graphics::Toolkit::Color::Space->new(
     precision => 0,
    value_form => ['[RYGCBMrygcbm]\d{1,3}','\d{1,3}','\d{1,3}'],
        suffix => ['', '%', '%'],
-      convert => {RGB => [\&to_rgb, \&from_rgb]},
-       values => {read => \&read_values, write => \&write_values, }
+      convert => {RGB  => [\&to_rgb, \&from_rgb]},
+       values => {read => \&read_values, write => \&write_values, },
+   constraint => {cone => {checker => '$_[0][1] + $_[0][2] <= 1',
+                          error    => 'The sum of whiteness and blackness can not exceed 100%.',
+	                      remedy   => 'my $s = $_[0][1] + $_[0][2];[$_[0][0], $_[0][1]/$s, $_[0][2]/$s]', }},
+
 );

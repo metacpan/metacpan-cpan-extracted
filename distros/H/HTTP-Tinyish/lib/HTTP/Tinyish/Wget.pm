@@ -37,6 +37,8 @@ sub configure {
             $supports{http} = 1;
         } elsif ($err && $err =~ /Invalid host/) {
             $supports{http} = $supports{https} = 1;
+        } elsif ($err && $err =~ /wget: unrecognized option '(.*?)'/) {
+            die "This wget ($wget) is too old and doesn't support $1";
         }
 
         (undef, $err) = _run_wget('--method', 'GET', 'http://');
@@ -92,6 +94,8 @@ sub mirror {
     my($self, $url, $file, $opts) = @_;
     $opts ||= {};
 
+    my $tempfile = $file . int(rand(2**31));
+
     # This doesn't send If-Modified-Since because -O and -N are mutually exclusive :(
     my($stdout, $stderr);
     eval {
@@ -99,7 +103,7 @@ sub mirror {
             $wget,
             $self->build_options("GET", $url, $opts),
             $url,
-            '-O', $file,
+            '-O', $tempfile,
         ], \undef, \$stdout, \$stderr,
         {
             binmode_stdout => ":raw",
@@ -107,7 +111,8 @@ sub mirror {
         };
     };
 
-    if ($@ or $?) {
+    if ($@ or $? && ($? >> 8) <= 5) {
+        unlink $tempfile;
         return $self->internal_error($url, $@ || $stderr);
     }
 
@@ -115,6 +120,12 @@ sub mirror {
 
     my $res = { url => $url, content => $stdout };
     $self->parse_http_header($stderr, $res);
+
+    if ($res->{status} eq '200') {
+        rename $tempfile, $file
+            or die "Error replacing $file with $tempfile: $!\n";
+    }
+    unlink $tempfile;
     $res;
 }
 

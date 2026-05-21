@@ -108,7 +108,7 @@ each CI push via C<.github/workflows/dashboard.yml>.
 =head1 OPTIONS
 
   --generate_mutant_tests=DIR
-      Generate a timestamped test stub file in DIR (typically 't/') for
+      Generate a timestamped test stub file in DIR (typically 'xt/') for
       surviving mutants. The file is named mutant_YYYYMMDD_HHMMSS.t and
       contains:
         - TODO test stubs for High/Medium difficulty survivors, with
@@ -145,7 +145,7 @@ each CI push via C<.github/workflows/dashboard.yml>.
       of them with boundary values extracted from surviving NUM_BOUNDARY
       mutants whose enclosing subroutine matches the schema's function
       field. The original schema is never modified. Augmented copies are
-      written to t/conf/mutant_fuzz_YYYYMMDD_HHMMSS_FUNCTION.yml and
+      written to xt/conf/mutant_fuzz_YYYYMMDD_HHMMSS_FUNCTION.yml and
       are picked up automatically by t/fuzz.t on the next test run.
 
       Schemas whose filename already starts with mutant_fuzz_ are skipped
@@ -212,6 +212,7 @@ Readonly my %config => (
 	output => 'cover_html/index.html',	# published to gh-pages
 	max_retry => 5,
 	min_locale_samples => 3,
+	module_file => 'lib/App/Test/Generator.pm',
 	verbose => 1,
 );
 
@@ -541,17 +542,16 @@ for my $file (sort keys %{$cover_db->{summary}}) {
 	# Normalise blib/lib/ paths to lib/ for display.
 	# Devel::Cover instruments blib/ during testing but we
 	# want to show lib/ paths to match the source tree.
+
 	my $display_file = $file;
 	if($file =~ /^blib\/lib\/(.+)$/) {
 		my $lib_path = "lib/$1";
-		# If a native lib/ version exists, skip this blib/ entry
-		# to avoid duplicate rows
 		next if exists $cover_db->{summary}{$lib_path};
 		$display_file = $lib_path;
 	}
 
 	my $info = $cover_db->{summary}{$file};
-	my $html_file = $display_file;
+	my $html_file = $file;          # Use original path (with blib/) for the link
 	$html_file =~ s|/|-|g;
 	$html_file =~ s|\.pm$|-pm|;
 	$html_file =~ s|\.pl$|-pl|;
@@ -578,33 +578,6 @@ for my $file (sort keys %{$cover_db->{summary}}) {
 		'<span class="coverage-badge %s" title="%s">%.1f%%</span>',
 		$badge_class, $tooltip, $total
 	);
-
-	my $delta_html;
-	if(exists $deltas{$file}) {
-		my $delta = $deltas{$file};
-		my $delta_class = $delta > 0 ? 'positive' : $delta < 0 ? 'negative' : 'neutral';
-		my $delta_icon = $delta > 0 ? '&#9650;' : $delta < 0 ? '&#9660;' : '&#9679;';
-		my $prev_pct = $prev_data->{summary}{$file}{total}{percentage} // 0;
-
-		$delta_html = sprintf(
-			'<td class="%s" title="Previous: %.1f%%">%s %.1f%%</td>',
-			$delta_class, $prev_pct, $delta_icon, abs($delta)
-		);
-	} else {
-		$delta_html = '<td class="neutral" title="No previous data">&#9679;</td>';
-	}
-
-	my $source_url = $github_base . $display_file;
-	my $has_coverage = (
-		defined $info->{statement}{percentage} ||
-		defined $info->{branch}{percentage} ||
-		defined $info->{condition}{percentage} ||
-		defined $info->{subroutine}{percentage}
-	);
-
-	my $source_link = $has_coverage
-		? sprintf('<a href="%s" class="icon-link" title="View source on GitHub">&#128269;</a>', $source_url)
-		: '<span class="disabled-icon" title="No coverage data">&#128269;</span>';
 
 	# Create the sparkline - limit to last N points like the main trend chart
 	my @file_history;
@@ -633,6 +606,44 @@ for my $file (sort keys %{$cover_db->{summary}}) {
 	}
 
 	my $points_attr = join(',', @file_history);
+
+	my $delta_html;
+	if(exists $deltas{$file}) {
+		my $delta = $deltas{$file};
+		my $delta_class = $delta > 0 ? 'positive' : $delta < 0 ? 'negative' : 'neutral';
+		my $delta_icon  = $delta > 0 ? '&#9650;'  : $delta < 0 ? '&#9660;' : '&#9679;';
+		my $prev_pct = $prev_data->{summary}{$file}{total}{percentage} // 0;
+
+		$delta_html = sprintf(
+			'<td class="%s" title="Previous: %.1f%%">%s %.1f%%</td>',
+			$delta_class, $prev_pct, $delta_icon, abs($delta)
+		);
+	} elsif(@file_history >= 2) {
+		# No explicit previous-run record for this file, but it has
+		# sparkline history -- derive the delta from the last two points
+		my $delta = sprintf('%.1f', $file_history[-1] - $file_history[-2]);
+		my $delta_class = $delta > 0 ? 'positive' : $delta < 0 ? 'negative' : 'neutral';
+		my $delta_icon  = $delta > 0 ? '&#9650;'  : $delta < 0 ? '&#9660;' : '&#9679;';
+
+		$delta_html = sprintf(
+			'<td class="%s" title="Previous (sparkline): %.1f%%">%s %.1f%%</td>',
+			$delta_class, $file_history[-2], $delta_icon, abs($delta)
+		);
+	} else {
+		$delta_html = '<td class="neutral" title="No previous data">&#9679;</td>';
+	}
+
+	my $source_url = $github_base . $display_file;
+	my $has_coverage = (
+		defined $info->{statement}{percentage} ||
+		defined $info->{branch}{percentage} ||
+		defined $info->{condition}{percentage} ||
+		defined $info->{subroutine}{percentage}
+	);
+
+	my $source_link = $has_coverage
+		? sprintf('<a href="%s" class="icon-link" title="View source on GitHub">&#128269;</a>', $source_url)
+		: '<span class="disabled-icon" title="No coverage data">&#128269;</span>';
 
 	push @html, sprintf(
 		qq{<tr class="%s"><td><a href="%s" title="View coverage line by line" target="_blank">%s</a> %s<canvas class="sparkline" width="80" height="20" data-points="$points_attr"></canvas></td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%.1f</td><td>%s</td>%s</tr>},
@@ -1236,6 +1247,9 @@ if($version) {
 			);
 		}
 
+		# detected Perl version cliff, if any
+		my $perl_cliff = detect_perl_version_cliff(\@fail_reports, \@pass_reports);
+
 		if($ENABLE_DEP_ANALYSIS) {
 			my %dep_stats;
 
@@ -1319,11 +1333,6 @@ if($version) {
 
 				push @html, '</ul>';
 			}
-
-			my $perl_cliff = detect_perl_version_cliff(
-				\@fail_reports,
-				\@pass_reports,
-			);
 
 			if($perl_cliff) {
 				my $perl_cutoff = parse_version($perl_cliff->{fails_up_to});
@@ -1658,11 +1667,29 @@ HTML
 			$prev_fail_set{$key} = 1;
 		}
 
+		my $cliff_skipped = 0;
+
 		for my $r (@deduped) {
-			my $date = $r->{date} // '';
 			my $perl = $r->{perl} // '';
-			my $os = $r->{osname} // '';
 			my $grade = lc($r->{grade} // 'unknown');
+
+			if($perl_cliff && $perl) {
+				if(parse_version($perl) <= parse_version($perl_cliff->{fails_up_to})) {
+					$cliff_skipped++;
+					next;
+				}
+			}
+
+			my $date = $r->{date} // '';
+			my $os   = $r->{osname} // '';
+
+			# Skip reports on Perl versions below the detected cliff —
+			# these are expected failures due to the module's minimum
+			# Perl version requirement, not actionable bugs
+			if($perl_cliff && $perl) {
+				next if parse_version($perl) <= parse_version($perl_cliff->{fails_up_to});
+			}
+
 			my $row_class = "cpan-$grade";	# cpan-fail or cpan-unknown
 			my $reporter = $r->{reporter} // '';
 			$reporter =~ s/"//g;
@@ -1687,13 +1714,22 @@ HTML
 			);
 		}
 
+		if($cliff_skipped) {
+			push @html, sprintf('<p><em>%d report(s) on Perl &leq; %s omitted — expected failures, see version cliff notice above.</em></p>',
+				$cliff_skipped,
+				$perl_cliff->{fails_up_to},
+			);
+		}
+
 		push @html, '</tbody></table>';
 	} else {
 		# @fail_reports is empty
 		push @html, "<p>No <A HREF=\"https://fast2-matrix.cpantesters.org/?dist=$dist_name+$version\">CPAN Testers</A> failures reported for $dist_name $version</p>";
 	}
 } elsif($res->{status} == 404) {	# 404 means no fail reports
-	push @html, "<p>No CPAN Testers failures reported for $dist_name $version.</p>";
+	# $version may be undef if the CPAN API did not return release data
+	my $version_str = $version // 'unknown';
+	push @html, "<p>No CPAN Testers failures reported for $dist_name $version_str.</p>";
 } else {
 	my $reason = $res->{status} == $HTTP_CONNECTION_FAILED
 		? 'CPAN Testers API temporarily unreachable'
@@ -1737,15 +1773,39 @@ if(my $stat = stat($config{cover_db})) {
 	$timestamp = strftime('%Y-%m-%d %H:%M:%S', localtime($stat->mtime));
 }
 
-push @html, <<"HTML";
-<footer>
-	<p>Project: <a href="https://github.com/$config{github_user}/$config{github_repo}">$config{github_repo}</a></p>
-	<p><em>Last updated: $timestamp - <a href="$commit_url">commit <code>$short_sha</code></a></em></p>
-</footer>
+# Get ATG version for dashboard footer — search @INC for the installed module
+my $atg_version = 'unknown';
+my $module_file = $INC{'App/Test/Generator.pm'};
+unless($module_file) {
+	# Module not yet loaded; search @INC directly
+	for my $dir (@INC) {
+		my $candidate = "$dir/App/Test/Generator.pm";
+		if(-f $candidate) {
+			$module_file = $candidate;
+			last;
+		}
+	}
+}
 
-</body>
-</html>
-HTML
+# Fall back to the source tree path for ATG's own development environment
+$module_file //= $config{module_file};
+if($module_file && open(my $fh, '<', $module_file)) {
+	while(<$fh>) {
+		if(/our\s+\$VERSION\s*=\s*['"]([^'"]+)['"]/) {
+			$atg_version = $1;
+			last;
+		}
+	}
+	close $fh;
+}
+
+push @html, '<footer>',
+	"\t<p>Project: <a href=\"https://github.com/$config{github_user}/$config{github_repo}\">$config{github_repo}</a></p>",
+	"\t<p><em>Last updated: $timestamp - <a href=\"$commit_url\">commit <code>$short_sha</code></a></em></p>",
+	"\t<p style=\"float: right; font-size: 0.85em; color: #999;\">Powered by <a href=\"https://metacpan.org/dist/App-Test-Generator\">App::Test::Generator $atg_version</a></p>",
+	'</footer>';
+
+push @html, '</body>', '</html>';
 
 # Write to index.html
 print "Writing output to $config{output}\n" if($config{verbose});
@@ -1760,7 +1820,7 @@ if($mutation_db && $mutant_test_dir) {
 # Generate fuzz schema augmentations from surviving mutants
 # if --generate_fuzz was passed on the command line
 if($mutation_db && $generate_fuzz) {
-	_generate_fuzz_schemas($mutation_db);
+	_generate_fuzz_schemas($mutation_db, 't');
 }
 
 # --------------------------------------------------
@@ -2261,7 +2321,7 @@ sub fetch_open_rt_ticket_count {
 	return undef unless @rc >= 3;
 	return undef unless $rc[0] == 200 && $rc[1] eq 'OK';
 
-	my $tickets = $rc[2] && ref $rc[2] eq 'ARRAY' ? $rc[2] : [];
+	my $tickets = ($rc[2] && (ref($rc[2]) eq 'ARRAY')) ? $rc[2] : [];
 
 	return scalar @$tickets;
 }
@@ -2850,7 +2910,7 @@ sub _extract_schema_for_mutant {
 
 	# If SchemaExtractor fails to instantiate, fall back gracefully
 	if($@ || !$extractor) {
-		warn "SchemaExtractor failed for $file: $@\n" if $@;
+		warn "SchemaExtractor failed for $file: $@" if $@;
 		return;
 	}
 
@@ -2858,7 +2918,7 @@ sub _extract_schema_for_mutant {
 	my $schemas = eval { $extractor->extract_all(no_write => 1) };
 
 	if($@ || !$schemas) {
-		warn "extract_all failed for $file: $@\n" if $@;
+		warn "extract_all failed for $file: $@" if $@;
 		return;
 	}
 
@@ -2955,7 +3015,7 @@ sub _strip_internal_keys {
 #             t/fuzz.t picks it up on the next test run.
 #
 # Entry:      $schema      - cleaned schema hashref
-#             $test_dir    - base test directory (e.g. 't')
+#             $test_dir    - base test directory (e.g. 'xt')
 #             $module      - Perl module name for filename
 #             $function    - function name for filename
 #             $timestamp   - YYYYMMDD_HHMMSS string
@@ -2994,13 +3054,13 @@ sub _write_mutant_schema {
 	# Serialise the schema to a normalised YAML string
 	my $yaml = _dump_schema_yaml($schema);
 	if(!defined $yaml) {
-		warn "YAML serialisation failed for $path\n";
+		warn "YAML serialisation failed for $path";
 		return;
 	}
 
 	# Write the YAML file and report success or failure
 	open(my $fh, '>:encoding(UTF-8)', $path)
-		or do { warn "Cannot write $path: $!\n"; return };
+		or do { warn "Cannot write $path: $!"; return };
 	print $fh $yaml;
 	close $fh;
 
@@ -3126,7 +3186,7 @@ sub _dump_schema_yaml {
 # Arguments:
 #   $mutation_db  - decoded mutation JSON hashref
 #   $cover_db     - decoded Devel::Cover JSON hashref
-#   $test_dir     - directory to write the .t file (default: 't')
+#   $test_dir     - directory to write the .t file (default: 'xt')
 #
 # Returns:
 #   The filename written, or undef if nothing written
@@ -3134,8 +3194,8 @@ sub _dump_schema_yaml {
 sub _generate_mutant_tests {
 	my ($mutation_db, $cover_db, $test_dir, $generate_test) = @_;
 
-	# Default output directory is the project's t/ directory
-	$test_dir //= 't';
+	# Default output directory is the project's xt/ directory
+	$test_dir //= 'xt';
 
 	# --------------------------------------------------
 	# Separate survivors into high/med (need TODO stubs)
@@ -3204,13 +3264,16 @@ sub _generate_mutant_tests {
 	my $filename  = File::Spec->catfile($test_dir, "mutant_${timestamp}.t");
 
 	if(-e $filename) {
-		warn "Mutant test file $filename already exists, skipping generation\n";
+		warn "Mutant test file $filename already exists, skipping generation";
 		return undef;
 	}
 
 	# --------------------------------------------------
 	# Open the output file for writing
 	# --------------------------------------------------
+	mkdir($test_dir) or die "Cannot create mutant test directory $test_dir: $!"
+		unless -d $test_dir;
+
 	open my $fh, '>', $filename
 		or die "Cannot write mutant test file $filename: $!";
 
@@ -3229,8 +3292,8 @@ sub _generate_mutant_tests {
 # HIGH/MEDIUM difficulty survivors have TODO stubs — these need real tests.
 # LOW difficulty survivors appear as comment hints — worth improving.
 #
-# Note: new() is called with no arguments as a starting point.
-# If a module requires constructor arguments, add them before running.
+# Stubs call new() for modules with a constructor, or show a class method
+# placeholder for modules without one. Add arguments as needed.
 
 use strict;
 use warnings;
@@ -3254,9 +3317,9 @@ HEADER
 	# --------------------------------------------------
 	for my $file (@files) {
 		# Section header for this source file
-		print $fh '#' x $STUB_SEPARATOR_WIDTH . "\n";
+		print $fh '#' x $STUB_SEPARATOR_WIDTH, "\n";
 		print $fh "# FILE: $file\n";
-		print $fh '#' x $STUB_SEPARATOR_WIDTH . "\n";
+		print $fh '#' x $STUB_SEPARATOR_WIDTH, "\n";
 
 		# Read source lines for context in comments (1-indexed)
 		my @source_lines;
@@ -3267,6 +3330,7 @@ HEADER
 			close $sfh;
 		}
 
+		my $has_new = grep { /^\s*sub\s+new\b/ } @source_lines;
 		# --------------------------------------------------
 		# High/Med survivors — one TODO stub per line,
 		# listing all mutation variants for that line.
@@ -3376,9 +3440,26 @@ HEADER
 				print $fh "    local \$TODO = 'Complete: $id $location';\n";
 				print $fh $boundary_hint if $boundary_hint;
 				print $fh $env_hint      if $env_hint;
-				print $fh "    # NOTE: new() called with no arguments as a starting point.\n";
-				print $fh "    # If $mod requires constructor arguments, add them here.\n";
-				print $fh "    my \$obj = new_ok('${mod}');\n";
+				# --------------------------------------------------
+				# Determine whether the module has a constructor —
+				# if not, new_ok() is wrong and we emit a class
+				# method placeholder instead
+				# --------------------------------------------------
+				# Determine correct calling convention for the stub
+				my $is_class_method = _is_class_method(\@source_lines, $sub_name);
+
+				if($is_class_method) {
+					print $fh "    # NOTE: $sub_name is a class method — call directly.\n";
+					print $fh "    my \$result = ${mod}->${sub_name}(...);\n";
+					print $fh "    # ok(\$result, '$id: add assertion here');\n";
+				} elsif($has_new) {
+					print $fh "    # NOTE: new() called with no arguments as a starting point.\n";
+					print $fh "    # If $mod requires constructor arguments, add them here.\n";
+					print $fh "    my \$obj = new_ok('${mod}');\n";
+				} else {
+					print $fh "    # NOTE: $mod has no constructor — call class methods directly.\n";
+					print $fh "    # e.g. my \$result = ${mod}->method(...);\n";
+				}
 				print $fh "    # TODO: exercise $location to detect the mutant\n";
 				print $fh "    fail('$id: replace with real assertion');\n";
 				print $fh "}\n\n";
@@ -3489,10 +3570,26 @@ HEADER
 				}
 
 				print $fh $env_hint if $env_hint;
-				print $fh "# NOTE: new() called with no arguments as a starting point.\n";
-				print $fh "# If $mod requires constructor arguments, add them here.\n";
-				print $fh "# my \$obj = new_ok('${mod}');\n";
-				print $fh "# ok(\$obj->..., '$id: add assertion here');\n\n";
+				# --------------------------------------------------
+				# Emit constructor or class method placeholder
+				# depending on whether the module has a new()
+				# --------------------------------------------------
+				my $is_class_method = _is_class_method(\@source_lines, $sub_name);
+
+				if($is_class_method) {
+					print $fh "# NOTE: $sub_name is a class method — call directly.\n";
+					print $fh "# e.g. my \$result = ${mod}->${sub_name}(...);\n";
+					print $fh "# ok(\$result, '$id: add assertion here');\n\n";
+				} elsif($has_new) {
+					print $fh "# NOTE: new() called with no arguments as a starting point.\n";
+					print $fh "# If $mod requires constructor arguments, add them here.\n";
+					print $fh "# my \$obj = new_ok('${mod}');\n";
+					print $fh "# ok(\$obj->..., '$id: add assertion here');\n\n";
+				} else {
+					print $fh "# NOTE: $mod has no constructor — call class methods directly.\n";
+					print $fh "# e.g. my \$result = ${mod}->method(...);\n";
+					print $fh "# ok(\$result, '$id: add assertion here');\n\n";
+				}
 			}
 		}
 	}
@@ -3508,22 +3605,63 @@ HEADER
 }
 
 # --------------------------------------------------
+# _is_class_method
+#
+# Purpose:    Determine whether a named subroutine
+#             in a source file is a class method
+#             (receives $class as first arg) rather
+#             than an instance method ($self).
+#
+# Entry:      $source_lines - arrayref of source lines
+#             $sub_name     - name of the sub to check
+#
+# Exit:       Returns 1 if class method, 0 otherwise.
+# --------------------------------------------------
+sub _is_class_method {
+	my ($source_lines, $sub_name) = @_;
+
+	# Find the start of the named sub
+	my $in_sub = 0;
+	for my $line (@{$source_lines}) {
+		if(!$in_sub && $line =~ /^\s*sub\s+\Q$sub_name\E\b/) {
+			$in_sub = 1;
+			next;
+		}
+		next unless $in_sub;
+
+		# Look for first argument extraction in the sub body
+		# Class method: my $class = shift  /  my ($class, ...
+		return 1 if $line =~ /my\s+\$class\s*=/;
+		return 1 if $line =~ /my\s*\(\s*\$class\b/;
+
+		# Instance method: my $self = shift  /  my ($self, ...
+		return 0 if $line =~ /my\s+\$self\s*=/;
+		return 0 if $line =~ /my\s*\(\s*\$self\b/;
+
+		# Stop scanning at end of sub
+		last if $line =~ /^\s*\}\s*$/;
+	}
+
+	return 0;
+}
+
+# --------------------------------------------------
 # _generate_fuzz_schemas
 #
-# Purpose:    Scan t/conf/ for existing YAML schema
-#             files and augment copies of them with
-#             boundary values extracted from surviving
-#             NUM_BOUNDARY mutants whose enclosing sub
-#             matches the schema's function field.
-#             The original schema is never modified.
-#             Augmented copies are written with a
-#             timestamped mutant_fuzz_ prefix so they
-#             are picked up by t/fuzz.t automatically.
+# Scan t/conf/ for existing YAML schema
+#     files and augment copies of them with
+#     boundary values extracted from surviving
+#     NUM_BOUNDARY mutants whose enclosing sub
+#     matches the schema's function field.
+#     The original schema is never modified.
+#     Augmented copies are written with a
+#     timestamped mutant_fuzz_ prefix so they
+#     are picked up by t/fuzz.t automatically.
 #
 # Entry:      $mutation_db - decoded mutation JSON
 #                            hashref
 #             $test_dir    - base test directory
-#                            (default: 't')
+#                            (default: 'xt')
 #
 # Exit:       Returns the number of augmented schema
 #             files written. Returns 0 if no matching
@@ -3547,15 +3685,15 @@ HEADER
 sub _generate_fuzz_schemas {
 	my ($mutation_db, $test_dir) = @_;
 
-	# Default test directory is the project's t/ directory
-	$test_dir //= 't';
+	# Default test directory is the project's xt/ directory
+	$test_dir //= 'xt';
 
 	my $conf_dir  = "$test_dir/conf";
 	my $written   = 0;
 
 	# Nothing to do if t/conf/ does not exist yet
 	unless(-d $conf_dir) {
-		print "No $conf_dir directory found, skipping fuzz schema generation\n" if $config{verbose};
+		warn "No $conf_dir directory found, skipping fuzz schema generation" if $config{verbose};
 		return 0;
 	}
 
@@ -3684,7 +3822,7 @@ sub _generate_fuzz_schemas {
 	# Scan t/conf/ for existing YAML schema files
 	# --------------------------------------------------
 	opendir(my $dh, $conf_dir)
-		or do { warn "Cannot read $conf_dir: $!\n"; return 0 };
+		or do { warn "Cannot read $conf_dir: $!"; return 0 };
 
 	my @schema_files = grep {
 		# Include only .yml files that are not already
@@ -3695,8 +3833,7 @@ sub _generate_fuzz_schemas {
 	closedir $dh;
 
 	if($config{verbose}) {
-		printf "Found %d candidate schema file(s) in %s\n",
-			scalar(@schema_files), $conf_dir;
+		printf "Found %d candidate schema file(s) in %s\n", scalar(@schema_files), $conf_dir;
 	}
 
 	# --------------------------------------------------
@@ -3981,6 +4118,7 @@ sub _mutation_index {
 	push @html, "<li><b>Total</b>: $data->{total}</li>";
 	push @html, '<li><b>Killed</b>: ', scalar(@{$data->{killed} || []}), '</li>';
 	push @html, '<li><b>Survived</b>: ', scalar(@{$data->{survived} || []}), '</li>';
+
 	push @html, '</ul>';
 
 	push @html, "<h3>Mutation Files</h3>\n";
@@ -3990,9 +4128,9 @@ sub _mutation_index {
 	# TER3 = Third level Test Effectiveness Ratio (LCSAJ path coverage).
 	# Only shown when lcsaj_root is configured.
 	if($config{lcsaj_root}) {
-		push @html, "<tr><th>File</th><th>Total</th><th>Killed</th><th>Survivors</th><th>Score%</th><th>Complexity</th><th title=\"TER1=Statement, TER2=Branch, TER3=LCSAJ Path\">TER1 / TER2 / TER3</th></tr>\n";
+		push @html, "<tr><th>File</th><th>Total</th><th>Killed</th><th>Survivors</th><th>Skipped</th><th>Score%</th><th>Complexity</th><th title=\"TER1=Statement, TER2=Branch, TER3=LCSAJ Path\">TER1 / TER2 / TER3</th></tr>\n";
 	} else {
-		push @html, "<tr><th>File</th><th>Total</th><th>Killed</th><th>Survivors</th><th>Score%</th><th>Complexity</th></tr>\n";
+		push @html, "<tr><th>File</th><th>Total</th><th>Killed</th><th>Survivors</th><th>Skipped</th><th>Score%</th><th>Complexity</th></tr>\n";
 	}
 
 	for my $file (
@@ -4044,17 +4182,6 @@ sub _mutation_index {
 			$complexity_class, $complexity_tooltip, $complexity
 		);
 
-		# Try each candidate directory in turn, most-specific first.
-		# _lcsaj_coverage_for_file returns (undef, undef) when the
-		# .lcsaj.json file cannot be found, so we keep trying until
-		# we get a defined result or exhaust all candidates.
-		my ($lcsaj_cov, $lcsaj_total);
-		for my $dir ($config{lcsaj_root}, $config{mutation_dir} . '/lib', $config{mutation_dir}) {
-			next unless $dir;
-			($lcsaj_cov, $lcsaj_total) = _lcsaj_coverage_for_file($file, $dir, $lcsaj_hits, \@html);
-			last if defined $lcsaj_cov;
-		}
-
 		# --------------------------------------------------
 		# Compute TER1/TER2/TER3 triple for this file.
 		# TER1 = statement coverage  (Devel::Cover)
@@ -4077,7 +4204,12 @@ sub _mutation_index {
 		}
 
 		# TER3 — LCSAJ path coverage (existing logic, unchanged)
-		($lcsaj_cov, $lcsaj_total) = (undef, undef);
+		# Try each candidate directory in turn, most-specific first.
+		# _lcsaj_coverage_for_file returns (undef, undef) when the
+		# .lcsaj.json file cannot be found, so we keep trying until
+		# we get a defined result or exhaust all candidates.
+
+		my ($lcsaj_cov, $lcsaj_total);
 		for my $dir ($config{lcsaj_root}, $config{mutation_dir} . '/lib', $config{mutation_dir}) {
 			next unless $dir;
 			($lcsaj_cov, $lcsaj_total) = _lcsaj_coverage_for_file($file, $dir, $lcsaj_hits, \@html);
@@ -4093,7 +4225,7 @@ sub _mutation_index {
 		# falling back to a grey n/a badge if unavailable.
 		# --------------------------------------------------
 		my $ter_cell;
-		if($lcsaj_dir) {
+		if($config{lcsaj_root}) {
 			my $ter1_badge = _ter_badge($ter1_pct, 'n/a');
 			my $ter2_badge = _ter_badge($ter2_pct, 'n/a');
 			my $ter3_badge = _ter_badge($ter3_pct, 'n/a');
@@ -4106,7 +4238,7 @@ sub _mutation_index {
 		}
 
 		push @html, sprintf(
-			qq{<tr class="%s"><td><a href="%s" title="View mutation line by line" target="_blank">%s</a> %s</td><td>%d</td><td>%d</td><td>%d</td><td>%s</td><td>%s</td><td>%s</td></tr>},
+			qq{<tr class="%s"><td><a href="%s" title="View mutation line by line" target="_blank">%s</a> %s</td><td>%d</td><td>%d</td><td>%d</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>},
 			$row_class,
 			$html_file,
 			$file,
@@ -4114,6 +4246,7 @@ sub _mutation_index {
 			$total,
 			$killed,
 			$survived,
+			$files->{$file}{skipped} // 0,
 			$badge_html,
 			$complexity_html,
 			$ter_cell,
@@ -4146,7 +4279,28 @@ sub _mutation_index {
 		# --------------------------------------------------
 		push @html, '<h2>Executive Summary</h2>';
 		push @html, "<div class='summary'>";
-		push @html, "Tests execute $stmt_pct% of the code, but detect only $data->{score}% of injected faults.";
+
+		my $exec_summary;
+		if(!$data->{total}) {
+			# No mutants yet — mutation workflow not yet run
+			$exec_summary = "Tests execute $stmt_pct% of the code. "
+				. 'No mutation data available yet — trigger the mutation workflow for fault detection analysis.';
+		} elsif($data->{score} >= $config{med_threshold}) {
+			# High score — drop the 'only' and 'but'
+			$exec_summary = "Tests execute $stmt_pct% of the code "
+				. "and detect $data->{score}% of injected faults.";
+		} elsif($data->{score} >= $config{low_threshold}) {
+			# Moderate score — neutral wording
+			$exec_summary = "Tests execute $stmt_pct% of the code "
+				. "but detect only $data->{score}% of injected faults.";
+		} else {
+			# Low score — add actionable note
+			$exec_summary = "Tests execute $stmt_pct% of the code "
+				. "but detect only $data->{score}% of injected faults — "
+				. 'consider adding targeted tests to kill surviving mutants.';
+		}
+
+		push @html, $exec_summary;
 		push @html, '</div>';
 	}
 
@@ -4224,7 +4378,6 @@ sub _ter_badge {
 #             Mutants missing a 'file' field are
 #             silently skipped.
 #
-# Side effects: None.
 # --------------------------------------------------
 sub _group_by_file {
 	my $data = $_[0];
@@ -4234,11 +4387,18 @@ sub _group_by_file {
 	for my $status (qw(survived killed)) {
 		next unless $data->{$status};
 
-		for my $m (@{ $data->{$status} }) {
+		for my $m (@{$data->{$status}}) {
 			next unless ref $m;
 			next unless defined $m->{file};
 
-			push @{ $files{ $m->{file} }{$status} }, $m;
+			push @{$files{$m->{file}}{$status}}, $m;
+		}
+	}
+
+	# Propagate per-file skipped line counts from MUTANT_SKIP annotations
+	if($data->{skipped}) {
+		for my $file (keys %{$data->{skipped}}) {
+			$files{$file}{skipped} = $data->{skipped}{$file};
 		}
 	}
 
@@ -4387,6 +4547,9 @@ sub _mutant_file_report {
 			print $out "TER2 (Branch): $branch_pct%<br>\n";
 			print $out "TER3 (LCSAJ): $ter3_str<br>\n";
 			print $out "Approximate LCSAJ segments: $approx_lcsaj<br>\n";
+			if(my $skipped = $mutants->{skipped}) {
+				print $out "<p><em>$skipped line(s) excluded by MUTANT_SKIP annotations.</em></p>\n";
+			}
 			print $out "</div>\n";
 
 			print $out qq{
@@ -5422,76 +5585,75 @@ sub _lcsaj_coverage_for_file {
 	# ----------------------------------------------------------
 	my $lcsaj_file;
 
-    for my $rel (@rel_candidates) {
-	my $base = basename($rel);
-	my $candidate = File::Spec->catfile(
-		$lcsaj_dir,
-		"$rel.lcsaj",
-		"$base.lcsaj.json"
-	);
-	if(-f $candidate) {
-		$lcsaj_file = $candidate;
-		last;
+	for my $rel (@rel_candidates) {
+		my $base = basename($rel);
+		my $candidate = File::Spec->catfile(
+			$lcsaj_dir,
+			"$rel.lcsaj",
+			"$base.lcsaj.json"
+		);
+		if(-f $candidate) {
+			$lcsaj_file = $candidate;
+			last;
+		}
 	}
-    }
 
-    return (undef, undef) unless defined $lcsaj_file;
+	return (undef, undef) unless defined $lcsaj_file;
 
-    # ----------------------------------------------------------
-    # Load the LCSAJ path definitions.
-    # ----------------------------------------------------------
-    open my $fh, '<', $lcsaj_file
-        or do {
-            return (undef, undef);
-        };
-    my $paths = decode_json(do { local $/; <$fh> });
-    close $fh;
+	# ----------------------------------------------------------
+	# Load the LCSAJ path definitions.
+	# ----------------------------------------------------------
+	open my $fh, '<', $lcsaj_file or do {
+		return (undef, undef);
+	};
+	my $paths = decode_json(do { local $/; <$fh> });
+	close $fh;
 
-    my $total = scalar @{ $paths // [] };
-    return (0, 0) unless $total;
+	my $total = scalar @{ $paths // [] };
+	return (0, 0) unless $total;
 
-    # ----------------------------------------------------------
-    # Resolve which hit-map entry belongs to this file.
-    # Runtime.pm writes keys as _normalize(abs_path(file)), which
-    # produces "lib/Foo/Bar.pm".  Try several key forms so we match
-    # regardless of what the caller passed in.
-    # ----------------------------------------------------------
-    my $norm_abs = $abs;
-    $norm_abs =~ s{^.*/blib/lib/}{lib/};
-    $norm_abs =~ s{^.*/lib/}{lib/};
+	# ----------------------------------------------------------
+	# Resolve which hit-map entry belongs to this file.
+	# Runtime.pm writes keys as _normalize(abs_path(file)), which
+	# produces "lib/Foo/Bar.pm".  Try several key forms so we match
+	# regardless of what the caller passed in.
+	# ----------------------------------------------------------
+	my $norm_abs = $abs;
+	$norm_abs =~ s{^.*/blib/lib/}{lib/};
+	$norm_abs =~ s{^.*/lib/}{lib/};
 
-    my $norm_orig = $original;
-    $norm_orig =~ s{^.*/blib/lib/}{lib/};
-    $norm_orig =~ s{^.*/lib/}{lib/};
+	my $norm_orig = $original;
+	$norm_orig =~ s{^.*/blib/lib/}{lib/};
+	$norm_orig =~ s{^.*/lib/}{lib/};
 
-    my $file_hits =
-           $hits->{$norm_abs}           # "lib/Foo/Bar.pm"  (most likely)
-        // $hits->{$norm_orig}          # same, from original arg
-        // $hits->{$abs}               # absolute path (unusual)
-        // $hits->{$original}          # raw arg as-is
-        // {};
+	my $file_hits =
+		   $hits->{$norm_abs}           # "lib/Foo/Bar.pm"  (most likely)
+		// $hits->{$norm_orig}          # same, from original arg
+		// $hits->{$abs}               # absolute path (unusual)
+		// $hits->{$original}          # raw arg as-is
+		// {};
 
-    # ----------------------------------------------------------
-    # Count how many LCSAJ paths had at least one line executed.
-    # A path is considered covered if any line in [start..end]
-    # appears in the hit map.
-    # ----------------------------------------------------------
-    my $covered = 0;
+	# ----------------------------------------------------------
+	# Count how many LCSAJ paths had at least one line executed.
+	# A path is considered covered if any line in [start..end]
+	# appears in the hit map.
+	# ----------------------------------------------------------
+	my $covered = 0;
 
-    for my $p (@{ $paths }) {
-        next unless ref $p eq 'HASH';
+	for my $p (@{ $paths }) {
+		next unless ref $p eq 'HASH';
 
-        my $start = $p->{start};
-        my $end   = $p->{end};
-        next unless defined $start && defined $end;
+		my $start = $p->{start};
+		my $end   = $p->{end};
+		next unless defined $start && defined $end;
 
-        for my $line ($start .. $end) {
-            if($file_hits->{$line}) {
-                $covered++;
-                last;
-            }
-        }
-    }
+		for my $line ($start .. $end) {
+			if($file_hits->{$line}) {
+				$covered++;
+				last;
+			}
+		}
+	}
 
 	return ($covered, $total);
 }
@@ -5513,7 +5675,7 @@ sub _lcsaj_coverage_for_file {
 #   qualifying files found
 # --------------------------------------------------
 sub _own_file_coverage_pct {
-	my ($summary) = @_;
+	my $summary = $_[0];
 
 	return undef unless $summary;
 

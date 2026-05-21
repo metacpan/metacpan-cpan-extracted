@@ -26,7 +26,7 @@ if (! $dbh_noerr) {
 $dbh_noerr->{RaiseError} = 0;
 $dbh_noerr->{PrintError} = 0;
 
-plan tests => 116;
+plan tests => 128;
 
 isnt ($dbh, undef, 'Connect to database for async testing');
 
@@ -397,6 +397,46 @@ is ($@, q{}, $t);
 $t=q{Database method pg_result returns correct result after execute};
 is ($res, 2, $t);
 
+{
+    my ($sth0, $sth1, $old_switch);
+
+    #
+    # Test that handle_old_async deals correctly with async prepares.
+    # See https://github.com/bucardo/dbdpg/pull/142#issuecomment-4260460925
+    #
+
+    $t=q{Pending async prepare handled correctly by handle_old_async};
+
+    # Start an async prepare.
+    $sth0 = $dbh->prepare('select * from dbd_pg_test5 where id = ?', { pg_async => PG_ASYNC, pg_prepare_now => 1 });
+
+    # Tell execute that it should prepare on first execution.
+    $old_switch = $$dbh{switch_prepared};
+    $dbh->{pg_switch_prepared} = 1;
+
+    # Create async statement w/o prepare.
+    $sth1 = $dbh->prepare('select * from dbd_pg_test5 where t = ?', { pg_async => PG_ASYNC | PG_OLDQUERY_WAIT});
+
+    # Execute. This will call handle_old_async to wait for the result
+    # of the previous async prepare & query and then start a second
+    # async prepare.
+    $sth1->execute(2);
+    eval {
+        # Wait for result.
+        # Without the fix, this will abort with
+        #
+        #  prepared statement "dbdpg_p3993_X" already exists
+        #
+        # as first and second prepare will have used the same
+        # prepare_number because handle_old_async didn't increment
+        # it.
+        $dbh->pg_result();
+    };
+    is ($@, q{}, $t);
+
+    $dbh->{pg_switch_prepared} = $old_switch;
+}
+
 $dbh->do('DROP TABLE dbd_pg_test5');
 
 ## TODO: More pg_sleep tests with execute
@@ -626,6 +666,62 @@ $t=q{sth2 finish succeeds};
 ok ($sth2->finish, $t);
 
 $sth1->finish;
+
+# Test async COPY TO STDOUT: non-blocking do(), polling, result, and data drain
+$t = q{do() with PG_ASYNC on COPY TO STDOUT returns '0E0' immediately (non-blocking)};
+eval {
+    $res = $dbh->do(
+        q{COPY (SELECT * FROM unnest(ARRAY[1,2,3,4,5,6,7,8,9,10]::int[]) as dbd_pg_asynccopytest(a)) TO STDOUT},
+        { pg_async => PG_ASYNC }
+    );
+};
+is ($@, q{}, $t);
+is ($res, '0E0', "$t - result is '0E0' (expected for async COPY TO STDOUT)");
+
+$t = q{Database is in async mode after async COPY do()};
+is ($dbh->{pg_async_status}, 1, $t);
+
+$t = q{pg_ready() becomes true within reasonable time for small async COPY TO STDOUT};
+my $ready = 0;
+for my $i (1..12) {  # up to ~12 seconds max wait
+    if ($dbh->pg_ready) {
+        $ready = 1;
+        last;
+    }
+    sleep 1;
+}
+ok ($ready, $t);
+
+$t = q{pg_result() succeeds after async COPY TO STDOUT completes without error};
+eval {
+    $res = $dbh->pg_result();
+};
+is ($@, q{}, $t);
+
+$t = q{pg_result() after async COPY TO STDOUT returns -1 (rows unknown during COPY)};
+is ($res, -1, $t);
+
+$t = q{We can drain the async COPY TO STDOUT data stream via pg_getcopydata loop};
+my @copied_rows;
+while (1) {
+    my $buf = '';
+    my $status = $dbh->pg_getcopydata($buf);
+    last if !(defined $status && $status >= 0);
+    chomp $buf;
+    push @copied_rows, $buf;
+}
+is (scalar @copied_rows, 10, "$t - received correct number of rows from async COPY TO STDOUT");
+is_deeply (\@copied_rows, [qw(1 2 3 4 5 6 7 8 9 10)], "$t - correct row values from async COPY TO STDOUT");
+
+$t = q{Async status cleared after full COPY drain + pg_result};
+is ($dbh->{pg_async_status}, 0, $t);
+
+# Cleanup / sanity checks
+eval { $dbh->pg_ready(); };
+like ($@, qr{No async|async query}, 'pg_ready fails after COPY TO STDOUT completed and cleared');
+
+eval { $dbh->do('SELECT 1'); };
+is ($@, q{}, 'Normal synchronous query works after async COPY TO STDOUT finished');
 
 cleanup_database($dbh,'test');
 $dbh_noerr->disconnect;

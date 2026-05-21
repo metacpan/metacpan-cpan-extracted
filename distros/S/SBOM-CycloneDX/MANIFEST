@@ -22,6 +22,7 @@ lib/SBOM/CycloneDX/Component/Pedigree.pm
 lib/SBOM/CycloneDX/Component/PerformanceMetric.pm
 lib/SBOM/CycloneDX/Component/QuantitativeAnalysis.pm
 lib/SBOM/CycloneDX/Component/SWID.pm
+lib/SBOM/CycloneDX/Composition.pm
 lib/SBOM/CycloneDX/CryptoProperties.pm
 lib/SBOM/CycloneDX/CryptoProperties/AlgorithmProperties.pm
 lib/SBOM/CycloneDX/CryptoProperties/CertificateExtension.pm
@@ -50,6 +51,7 @@ lib/SBOM/CycloneDX/Declarations/Targets.pm
 lib/SBOM/CycloneDX/Definitions.pm
 lib/SBOM/CycloneDX/Dependency.pm
 lib/SBOM/CycloneDX/Enum.pm
+lib/SBOM/CycloneDX/Enum/AggregateType.pm
 lib/SBOM/CycloneDX/Enum/CommonExtensionName.pm
 lib/SBOM/CycloneDX/Enum/ComponentType.pm
 lib/SBOM/CycloneDX/Enum/CryptoAssetType.pm
@@ -112,6 +114,7 @@ lib/SBOM/CycloneDX/schema/cryptography-defs.schema.json
 lib/SBOM/CycloneDX/schema/jsf-0.82.schema.json
 lib/SBOM/CycloneDX/schema/spdx.schema.json
 lib/SBOM/CycloneDX/Service.pm
+lib/SBOM/CycloneDX/Source.pm
 lib/SBOM/CycloneDX/Standard.pm
 lib/SBOM/CycloneDX/Standard/Level.pm
 lib/SBOM/CycloneDX/Standard/Requirement.pm

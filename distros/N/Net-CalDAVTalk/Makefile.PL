@@ -25,7 +25,7 @@ WriteMakefile(
         'DateTime::Format::ICal' => '0.09',
         'Text::LevenshteinXS' => '0.03',
         'Text::VCardFast' => '0.06',
-        'Text::JSCalendar' => '0.03',
+        'Text::JSCalendar' => '0.05',
         'JSON' => 0,
         'JSON::XS' => 0,
         'MIME::Types' => 0,

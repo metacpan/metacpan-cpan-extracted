@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use utf8;
 
-use Types::Standard qw(Str);
+use Types::Standard qw(Str InstanceOf);
 
 use Moo;
 use namespace::autoclean;
@@ -17,7 +17,7 @@ has name        => (is => 'rw', isa => Str, required => 1);
 has version     => (is => 'rw', isa => Str);
 has tag_version => (is => 'rw', isa => Str);
 has patch       => (is => 'rw', isa => Str);
-has text        => (is => 'rw', isa => Str);
+has text        => (is => 'rw', isa => InstanceOf ['SBOM::CycloneDX::Attachment']);
 has url         => (is => 'rw', isa => Str);
 
 sub TO_JSON {

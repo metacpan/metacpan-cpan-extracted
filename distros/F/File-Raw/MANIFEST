@@ -9,13 +9,14 @@ Changes
 file.c
 ignore.txt
 include/file_compat.h
-include/file_hooks.h
-include/file_hooks_impl.h
+include/file_plugin.h
 include/ppport.h
 include/xop_compat.h
 lib/File/Raw.pm
 Makefile.PL
 MANIFEST			This list of files
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module YAML meta-data (added by MakeMaker)
 README
 t/00-load.t
 t/001-file-basic.t
@@ -28,20 +29,24 @@ t/007-file-platform.t
 t/008-file-mmap-methods.t
 t/009-file-lines-methods.t
 t/010-file-loop-patterns.t
-t/011-file-hooks.t
-t/012-file-xs-api.t
 t/013-file-map-grep-for.t
 t/014-file-map-grep.t
 t/015-file-stat.t
 t/016-import.t
+t/020-plugin-register.t
+t/021-plugin-read-write.t
+t/022-plugin-record.t
+t/023-plugin-stream.t
+t/024-plugin-predicate.t
+t/025-plugin-lines-iter.t
+t/026-range-lines.t
+t/050-chain-noop.t
+t/051-chain-pass-through.t
+t/054-chain-options-routing.t
+t/055-chain-bad-shape.t
+t/056-chain-cancel.t
+t/057-chain-streamrecord-rejected.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-t/xs/file_api_test/file_api_test.c
-t/xs/file_api_test/file_api_test.pm
-t/xs/file_api_test/Makefile.PL
-t/xs/file_api_test/MYMETA.json
-t/xs/file_api_test/MYMETA.yml
 xt/boilerplate.t
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)

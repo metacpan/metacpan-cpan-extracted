@@ -1,12 +1,21 @@
-.gitignore
 bin/omop-csv-validator
 Changes
+CITATION.cff
 cpanfile
+ddl/OMOPCDM_postgresql_5.4_ddl.sql
+ddl/README.md
+example/DRUG_EXPOSURE.csv
+example/README.md
 lib/OMOP/CSV/Validator.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
 t/01-csv.t
+t/02-cli.t
+t/03-real-ddl.t
+t/04-reorder-csv.t
+t/05-turbo-parity.t
+t/lib/TestHelper.pm
 utils/README.md
 utils/reorder-csv.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)

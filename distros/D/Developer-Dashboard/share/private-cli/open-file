@@ -77,7 +77,7 @@ Perl modules, Java classes, and print-vs-editor behavior.
   dashboard open-file . "Ok\.js$"
   dashboard open-file Developer::Dashboard::CLI::Paths
   dashboard open-file javax.jws.WebService
-  dashboard open-file --print bookmarks api-dashboard
+  dashboard open-file --print bookmarks index
 
 =for comment FULL-POD-DOC END
 

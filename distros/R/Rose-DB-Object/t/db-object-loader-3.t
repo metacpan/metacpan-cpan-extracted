@@ -6,7 +6,7 @@ use Test::More tests => 1 + (5 * 12);
 
 BEGIN 
 {
-  require 't/test-lib.pl';
+  require './t/test-lib.pl';
   use_ok('Rose::DB::Object::Loader');
 }
 

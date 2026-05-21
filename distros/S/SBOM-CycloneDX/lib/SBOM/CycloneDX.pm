@@ -30,7 +30,7 @@ use constant JSON_SCHEMA_1_5 => 'http://cyclonedx.org/schema/bom-1.5.schema.json
 use constant JSON_SCHEMA_1_6 => 'http://cyclonedx.org/schema/bom-1.6.schema.json';
 use constant JSON_SCHEMA_1_7 => 'http://cyclonedx.org/schema/bom-1.7.schema.json';
 
-our $VERSION = 1.07;
+our $VERSION = 1.08;
 
 our %JSON_SCHEMA = (
     '1.2' => JSON_SCHEMA_1_2,
@@ -445,6 +445,8 @@ This is the class hierarchy of the L<SBOM::CycloneDX> distribution.
 
 =back
 
+=item * L<SBOM::CycloneDX::Composition>
+
 =item * L<SBOM::CycloneDX::CryptoProperties>
 
 =over
@@ -508,6 +510,8 @@ This is the class hierarchy of the L<SBOM::CycloneDX> distribution.
 =item * L<SBOM::CycloneDX::Enum>
 
 =over
+
+=item * L<SBOM::CycloneDX::Enum::AggregateType>
 
 =item * L<SBOM::CycloneDX::Enum::CommonExtensionName>
 
@@ -614,6 +618,8 @@ This is the class hierarchy of the L<SBOM::CycloneDX> distribution.
 =item * L<SBOM::CycloneDX::Schema>
 
 =item * L<SBOM::CycloneDX::Service>
+
+=item * L<SBOM::CycloneDX::Source>
 
 =item * L<SBOM::CycloneDX::Standard>
 

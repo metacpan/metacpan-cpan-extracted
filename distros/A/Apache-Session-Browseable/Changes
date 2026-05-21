@@ -1,5 +1,15 @@
 Revision history for Perl extension Apache::Session::Browseable.
 
+1.3.19
+    - Fix CVE-2026-8503: Apache::Session::Generate::SHA256 used a
+      low-entropy seed (time, PID, rand, stringified hash ref) to derive
+      session identifiers. Use Crypt::URandom to generate session ids
+      from a cryptographically secure source, falling back to the
+      previous hashing method only if Crypt::URandom is unavailable.
+      Similar in scope to CVE-2025-40931 and CVE-2025-40932.
+    - Fix Redis indexes: never cleaned before
+    - Improve  resilience and reliability Patroni driver
+
 1.3.18
     - Add persistence option for Redis
 

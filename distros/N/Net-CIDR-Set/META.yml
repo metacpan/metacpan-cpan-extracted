@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
 keywords:
   - CIDR
   - INET
@@ -27,13 +27,13 @@ name: Net-CIDR-Set
 provides:
   Net::CIDR::Set:
     file: lib/Net/CIDR/Set.pm
-    version: '0.19'
+    version: '0.20'
   Net::CIDR::Set::IPv4:
     file: lib/Net/CIDR/Set/IPv4.pm
-    version: '0.19'
+    version: '0.20'
   Net::CIDR::Set::IPv6:
     file: lib/Net/CIDR/Set/IPv6.pm
-    version: '0.19'
+    version: '0.20'
 requires:
   Carp: '0'
   namespace::autoclean: '0'
@@ -45,12 +45,12 @@ resources:
   Authority: cpan:RRWO
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-CIDR-Set
   repository: git://github.com/robrwo/perl-Net-CIDR-Set.git
-version: '0.19'
+version: '0.20'
 x_contributors:
   - 'Thomas Eckardt <Thomas.Eckardt@thockar.com>'
   - 'Brian Gottreu <gottreu@cpan.org>'
-  - 'Robert Rothenberg <rrwo@cpan.org>'
+  - 'Robert Rothenberg <perl@rhizomnic.com>'
   - 'Stig Palmquist <stigtsp@cpan.org>'
-x_generated_by_perl: v5.34.3
+x_generated_by_perl: v5.42.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

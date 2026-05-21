@@ -4,7 +4,7 @@ AtteanX::Store::LMDB - LMDB-based RDF store
 
 =head1 VERSION
 
-This document describes AtteanX::Store::LMDB version 0.001
+This document describes AtteanX::Store::LMDB version 0.003
 
 =head1 SYNOPSIS
 
@@ -20,7 +20,7 @@ use v5.14;
 use warnings;
 
 package AtteanX::Store::LMDB {
-our $VERSION	= '0.001';
+our $VERSION	= '0.003';
 use Moo;
 use Type::Tiny::Role;
 use Types::Standard qw(Bool Str InstanceOf HashRef);
@@ -55,6 +55,18 @@ has initialize => (is => 'ro', isa => Bool, default => 0);
 has filename => (is => 'ro', isa => Str, required => 1);
 has env		=> (is => 'rw', isa => InstanceOf['LMDB::Env']);
 has indexes	=> (is => 'rw', isa => HashRef, default => sub { +{} });
+
+sub BUILDARGS {
+	my $class	= shift;
+	my @params 	= @_;
+	my %args;
+	if (scalar(@params) == 1) {
+		%args	= (filename => shift(@params));
+	} else {
+		%args	= @params;
+	}
+	return $class->SUPER::BUILDARGS(%args);
+}
 
 sub BUILD {
 	my $self	= shift;

@@ -1,5 +1,104 @@
+0.85 2026-05-21
+  - Add native C parsers (Ragel) for ASN.1 GeneralizedTime, ISO 8601,
+    ISO 9075 and RFC 9557.
+
+0.80 2026-05-19
+  - Add native C parsers (Ragel) for RFC 4287 and W3CDTF formats.
+
+0.71 2026-05-19
+  - Fix @CARP_NOT support in C/XS backend by routing parse errors
+    through per-package _croak wrappers.
+
+0.70 2026-05-18
+  - Use Carp::croak for parse errors in C/XS backend to support
+    @CARP_NOT in wrapper modules.
+  - Add example scripts for DateTime, Time::Moment, and Time::HiRes
+    integration (eg/datetime.pl, eg/time-moment.pl, eg/time-hires.pl).
+  - Add NON_CONSTRUCTOR_KEYS constant for safe forwarding of
+    str2date results to DateTime or Time::Moment constructors.
+  - Document INTEROPERABILITY with DateTime, Time::HiRes, and
+    Time::Moment including NON_CONSTRUCTOR_KEYS usage.
+  - Optimize str2date in list context by pushing key-value pairs
+    directly onto the Perl stack, avoiding intermediate HV allocation
+  - Add benchmark scripts for str2time and time2str comparing
+    performance across formats and against other modules
+    (bench/, repository only).
+
+0.60 2026-05-14
+  - Fix str2time integer overflow on perls built with 32-bit IV.
+  - Add native C parsers (Ragel) for RFC 3339, RFC 2822, and ECMAScript
+    formats. The XS backend tries native parsers first and falls back to
+    the regexp path for formats without a C parser.
+
+0.50 2026-05-12 Milestone
+  - Implement str2time and str2date in C/XS. All public functions
+    (time2str, str2time, str2date) now have optional XS implementations
+    using C99. The XS backend uses the same precompiled regexps from
+    Time::Str::Regexp as the Pure-Perl implementation. Performance of
+    str2time is approximately 10x faster than Pure-Perl.
+
+0.10 2026-05-12
+  - Fix build failure caused by missing tstr_calendar.c in C source list.
+  - Consolidate Pure-Perl Token and Calendar implementations into
+    Time::Str::PP.
+  - Declare v5.10.1 minimum in all source files.
+
+0.09 2026-05-12
+  - Add Time::Str::Token module for converting captured date/time tokens
+    to semantic values (parse_day, parse_month, parse_day_name,
+    parse_meridiem, parse_tz_offset). Includes XS implementation.
+  - Add Time::Str::Calendar module for Gregorian calendar validation and
+    computation (leap_year, month_days, valid_ymd, ymd_to_rdn, rdn_to_ymd,
+    ymd_to_dow, rdn_to_dow, resolve_century). Includes XS implementation.
+  - Validate ordinal day suffixes against day number (previously matched
+    but not verified). Mismatched suffixes are now rejected.
+  - Capture ordinal suffixes inside the day field in DateTime_Rx.
+  - Add documentation for Time::Str::Regexp: named captures, format
+    groupings, and a worked example combining Regexp, Token, and Calendar.
+
+0.08 2026-05-07
+  - Split RFC2822 into canonical (strict) and RFC2822FWS (permissive) variants.
+    The canonical form uses single-space separators and accepts a single
+    non-nested comment. RFC2822FWS preserves the original behavior with
+    folding white space and nested comments.
+  - Add Time::Str::Regexp module providing individually exportable
+    precompiled regexes for all supported date/time formats.
+  - Validate day name against parsed date (previously accepted without
+    verification). Inadvertently omitted from the 0.07 changelog.
+  - Use config slicing for MakeMaker::Awesome header and WriteMakefile_arg
+    options. Update [@Starter] to v6.0.2 for correct [PrereqsFile] ordering.
+    (PR by @Grinnz)
+  - Use canonical format names in parse error messages.
+
+0.07 2026-05-06
+  - Added optional XS acceleration of time2str (requires C99 compiler).
+    Falls back to pure-Perl when no compiler is available.
+  - Refactored internals: parsing regexps moved to Time::Str::Regexp,
+    pure-Perl implementation moved to Time::Str::PP.
+
+0.06 2026-05-04
+  - Expanded RATIONALE with comparison to Date::Parse,
+    Date::Parse::Modern, and Time::ParseDate covering numeric date
+    ambiguity, two-digit year handling, and timezone abbreviation
+    resolution.
+  - Added RFC 3501 (IMAP) format support.
+  - Added ECMAScript format support.
+  - Added UnixStamp format support.
+
+0.05 2026-05-02
+  - Added RFC 9557 (IXDTF) format support.
+  - Added RATIONALE and LIMITATIONS to POD
+
+0.04 2026-04-29
+  - Added ISO 8601 format support.
+
+0.03 2026-04-28
+  - Clarified and expanded the Generic format documentation.
+  - Added RFC 5280 (PKIX/x509) format support.
+  - Added RFC 5545 (iCalendar) format support.
+
 0.02 2026-04-27
- - Added missing Test::Number::Delta to test prerequisites.
+  - Added missing Test::Number::Delta to test prerequisites.
 
 0.01 2026-04-26
   - Initial CPAN release.

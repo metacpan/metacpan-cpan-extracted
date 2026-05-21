@@ -8,6 +8,11 @@ without relying on guesswork or POSIX-only assumptions.
 The supported baseline on Windows is PowerShell plus Strawberry Perl. Git Bash optional. Scoop optional. They are setup helpers, not runtime
 requirements for the installed `dashboard` command. The verification flow is
 layered so fast tests catch regressions before the slower VM gate runs.
+The checkout bootstrap entrypoint for that baseline is `install.ps1`, and the
+streamed operator flow is `irm .../install.ps1 | iex`. That bootstrap is also
+responsible for setting the CurrentUser execution policy to `RemoteSigned`
+when the host is still at the default `Restricted` policy, otherwise the
+generated PowerShell profile cannot load in new sessions.
 
 ## Verification Layers
 
@@ -16,14 +21,21 @@ layered so fast tests catch regressions before the slower VM gate runs.
 - locally override the platform detector so Linux CI can still exercise Windows dispatch logic
 - assert `dashboard shell ps` and PowerShell prompt bootstrap output
 - assert `ps` resolves to PowerShell rather than the POSIX `PS1` variable
-- assert `.pl`, `.ps1`, `.cmd`, and `.bat` command argv resolution
+- assert `.pl`, `.py`, `.js`, `.ps1`, `.cmd`, and `.bat` command argv resolution
 - assert Windows `PATHEXT` lookup behavior
 
 2. Real Strawberry Perl smoke on Windows
 
 - run `integration/windows/run-strawberry-smoke.ps1`
+- run `install.ps1` from a checkout or streamed through `irm ... | iex` when the change targets the bootstrap path itself
+- when validating that bootstrap path inside the smoke guest, use `-UseInstallBootstrap`; the smoke sets `DD_INSTALL_CPAN_TARGET` to the staged tarball and executes `install.ps1` through `Invoke-Expression`
 - install the built tarball with `cpanm`
 - verify `dashboard shell ps` and `dashboard ps1`
+- verify a fresh PowerShell session can load the generated profile without a
+  `running scripts is disabled` execution-policy failure
+- verify that same fresh PowerShell session can resolve `dashboard` on `PATH`
+  and does not fail by sending a multi-line shell bootstrap array directly
+  into `Invoke-Expression`
 - verify one PowerShell-backed collector command
 - verify one saved Ajax PowerShell handler through `Invoke-WebRequest`
 - verify browser DOM rendering through Edge or Chrome when available
@@ -72,6 +84,12 @@ Run the Strawberry Perl smoke on a Windows host with:
 powershell -ExecutionPolicy Bypass -File integration/windows/run-strawberry-smoke.ps1 -Tarball C:\path\Developer-Dashboard-*.tar.gz
 ```
 
+Run the same smoke against the checkout bootstrap path with:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File integration/windows/run-strawberry-smoke.ps1 -Tarball C:\path\Developer-Dashboard-*.tar.gz -UseInstallBootstrap -BootstrapScript C:\path\install.ps1
+```
+
 Run the full-system Windows VM gate from a Linux host with:
 
 ```bash
@@ -85,10 +103,15 @@ Perl, and then run the smoke. The helper is meant to make that long path
 rerunnable, not instant.
 
 Inside the Windows guest smoke, the tarball install currently uses
-`cpanm --notest` for third-party dependency setup. The release-grade
-verification still comes from the Developer Dashboard smoke that runs after
-that install step: `dashboard shell ps`, `dashboard ps1`, collector, saved
-Ajax, web, and browser checks still execute in the guest.
+`cpanm --notest` for third-party dependency setup. When `-UseInstallBootstrap`
+or `WINDOWS_USE_INSTALL_BOOTSTRAP=1` is enabled, the smoke passes that same
+tarball through the literal `DD_INSTALL_CPAN_TARGET` environment variable and
+executes `install.ps1` through a streamed `Invoke-Expression` wrapper. The
+release-grade verification still comes from the Developer Dashboard smoke that
+runs after that install step: the normal streamed operator path defaults to
+a fresh clone of the GitHub `master` checkout, while the smoke overrides that
+with the exact staged tarball under test; `dashboard shell ps`, `dashboard ps1`,
+collector, saved Ajax, web, and browser checks still execute in the guest.
 
 ## Release Rule
 

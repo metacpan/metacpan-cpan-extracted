@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.016;
 
-our $VERSION = '2.440';
+our $VERSION = '2.441';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -410,9 +410,11 @@ sub run {
                 }
                 $db_string = 'DB ' . basename( $db ) . ( @schemas > 1 ? '.' . ( $schema // $undef_str ) : '' ) . ':';
                 $sf->{d}{schema} = $schema;
+                if ( $sf->{i}{dbms} eq 'SQLite' ) {
+                    $sf->{d}{schema} //= 'main';
+                    # $schema remains as it is
+                }
                 $sf->{d}{is_system_schema} = $is_system_schema;
-                $sf->{d}{user_schemas} = $user_schemas;
-                $sf->{d}{sys_schemas} = $sys_schemas;
                 $sf->{d}{db_string}  = $db_string;
 
                 # TABLES
@@ -550,7 +552,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.440
+Version 2.441
 
 =head1 DESCRIPTION
 

@@ -2,7 +2,7 @@
 
 =head1 DESCRIPTION
 
-Use Resource::Silo DLS with some fake classes,
+Use Resource::Silo DSL with some fake classes,
 make sure the most typical happy paths work.
 
 =cut
@@ -45,7 +45,9 @@ BEGIN {
     };
 
     package My::Res;
-    use Resource::Silo -class;
+    use Resource::Silo -class, -shortcut => 'silo';
+    use Exporter qw(import);
+    our @EXPORT = qw(silo);
 
     resource config      => sub { My::Config->load; };
     resource dbh         => sub {

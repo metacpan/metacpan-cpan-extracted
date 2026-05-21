@@ -17,6 +17,7 @@ my @files = (
     't/lib/TestServer.pm',
     't/lib/TestServer/BasicTests.pm',
     't/lib/TestServer/Reflect.pm',
+    't/send-file-magic-open.t',
     'xt/author/00-compile.t',
     'xt/author/distmeta.t',
     'xt/author/eol.t',

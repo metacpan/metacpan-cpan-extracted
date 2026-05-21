@@ -1,5 +1,5 @@
 package Muster::Hook::Include;
-$Muster::Hook::Include::VERSION = '0.93';
+$Muster::Hook::Include::VERSION = '0.9501';
 use Mojo::Base 'Muster::Hook::Directives';
 use Muster::LeafFile;
 use Muster::Hooks;
@@ -12,7 +12,7 @@ Muster::Hook::Include - Muster include-page directive
 
 =head1 VERSION
 
-version 0.93
+version 0.9501
 
 =head1 DESCRIPTION
 

@@ -1,5 +1,52 @@
 Revision history for Plack-Middleware-Statsd
 
+v0.9.3    2026-05-18 20:09:53+01:00 Europe/London
+  [Enhancements]
+  - Use core Digest::SHA instead of CryptX.  This removes the secure_set_hash option.
+
+v0.9.2    2026-05-18 15:17:52+01:00 Europe/London
+  [Bug Fixes]
+  - Fixed the memory leak with psgix.monitor.statsd_secure_set_add.
+
+  [Enhancements]
+  - If the client has the secure_set_add method (such as Net::Statsd::Lite), then it will be used instead of
+    creating a wrapper.
+
+v0.9.1    2026-05-16 00:58:16+01:00 Europe/London
+  [Enhancements]
+  - Crypt::Mac::HMAC is only loaded if secure_set_key is specified. It is now recommended instead of required.xs
+
+  [Security]
+  - The minimum version of Crypt::Mac::HMAC was bumped.
+
+v0.9.0    2026-05-09 23:57:27+01:00 Europe/London
+  [Security]
+  - The psgi.request.remote_addr metric is no longer logged unless the secure_set_key is specified in the constructor.
+    This is to avoid leaking personally identifiable information if the connection to the statsd client is not secure,
+    CVE-2026-45179.
+
+  [Enhancements]
+  - Added psgix.monitor.statsd_secure_set_add to the environment with a method for securely logging set data.
+
+  [Documentation]
+  - Added a SECURITY CONSIDERATIONS section.
+
+  - Updated copyright year.
+
+  - Updated author email due to issues with cpan.org email forwarding.
+
+  - Removed CONTRIBUTING.md due to re-evaluation about some AI-assisted issue reporting.
+
+  - Fixed spelling errors.
+
+  [Tests]
+  - Added author tests for POD spelling.
+
+  [Toolchain]
+  - Stopped signing distributions, since Module::Signature is deprecated.
+
+  - Added doap.xml to the distribution.
+
 v0.8.2    2025-08-16 12:11:31+01:00 Europe/London
   [Documentation]
   - Removed redundant section.

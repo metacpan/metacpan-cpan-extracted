@@ -90,7 +90,7 @@ subtest 'Scalar-ref on non-PK select column is unaffected by the guard' => sub {
             ->search(
                 { EventId => $uuid },
                 {
-                    '+select'    => [ { '' => \"datetime('now')", -as => 'ts' } ],
+                    '+select'    => [ { '' => \"strftime('%Y-%m-%d %H:%M:%f', 'now')", -as => 'ts' } ],
                     result_class => 'DBIx::Class::ResultClass::HashRefInflator',
                 }
             )->all->get;
@@ -107,7 +107,7 @@ subtest 'Scalar-ref on non-PK select column is unaffected by the guard' => sub {
             ->search(
                 { EventId => $uuid },
                 {
-                    '+select'    => [ { '' => \"datetime('now')", -as => 'ts' } ],
+                    '+select'    => [ { '' => \"strftime('%Y-%m-%d %H:%M:%f', 'now')", -as => 'ts' } ],
                     result_class => 'DBIx::Class::ResultClass::HashRefInflator',
                 }
             )->all->get;

@@ -355,6 +355,7 @@ diag( "Attempting at setting an invalid value for enum type." ) if( $DEBUG );
 }
 
 diag( "Testing for error returning data type instead of undef" ) if( $DEBUG );
+# NOTE: want error
 subtest "want error" => sub
 {
     $o->name( 'id' );
@@ -375,7 +376,7 @@ subtest "want error" => sub
     # Object
     $name = $o->trigger_error->dummy->name;
     # There is a race exception with Test::More whereby even if undef is returned, Test::More will give me an empty string.
-    is( length( $name // '' ), 0, 'error -> object' );
+    is( length( $name . '' ), 0, 'error -> object' );
     # Scalar
     $name = ${$o->trigger_error};
     is( $name => undef, 'error -> scalar' );
@@ -418,7 +419,8 @@ subtest "number" => sub
     $rv = $o->total;
     is( $rv, 30, 'number assigned via lvalue' );
     {
-        no warnings;
+        no warnings 'Module::Generic';
+        local $SIG{__WARN__} = sub{};
         $o->total('not a number');
     }
     $rv = $o->total;

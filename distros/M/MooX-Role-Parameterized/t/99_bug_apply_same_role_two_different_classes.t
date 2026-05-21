@@ -1,5 +1,6 @@
 #!perl
 
+use v5.12;
 use strict;
 use warnings;
 use Carp;
@@ -15,6 +16,8 @@ subtest(
         can_ok( 'TheClass',      'foo' );    # succeeds
         can_ok( 'TheClass',      'bar' );    # should works
         can_ok( 'TheOtherClass', 'bam' );    # fails
+
+        done_testing;
     }
 );
 
@@ -22,6 +25,8 @@ subtest(
     'test normal attr' => sub {
         can_ok( 'TheClass',      'xoxo' );    # should works
         can_ok( 'TheOtherClass', 'xoxo' );    # fails
+
+        done_testing;
     }
 );
 
@@ -30,6 +35,8 @@ subtest(
         can_ok( 'TheClass',      'xxx' );     # succeeds
         can_ok( 'TheClass',      'yyy' );     # should works
         can_ok( 'TheOtherClass', 'zzz' );     # fails
+
+        done_testing;
     }
 );
 
@@ -47,6 +54,8 @@ subtest(
         is $b->bam,  3,       'TheOtherClass attr bam should be 3';
         is $b->xoxo, 6,       'TheOtherClass attr xoxo should be 6';
         is $b->zzz,  'dummy', 'TheOtherClass method zzz should return "dummy"';
+
+        done_testing;
     }
 );
 

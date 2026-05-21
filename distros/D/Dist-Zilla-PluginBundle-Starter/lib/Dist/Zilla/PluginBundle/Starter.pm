@@ -6,7 +6,7 @@ with 'Dist::Zilla::Role::PluginBundle::Easy',
   'Dist::Zilla::Role::PluginBundle::PluginRemover';
 use namespace::clean;
 
-our $VERSION = 'v6.0.1';
+our $VERSION = 'v6.0.2';
 
 # Revisions can include entries with the standard plugin name, array ref of plugin/name/config,
 # or coderefs which are passed the pluginbundle object and return a list of plugins in one of these formats.
@@ -137,6 +137,8 @@ my %revisions = (
     'PodSyntaxTests',
     'Test::ReportPrereqs',
     ['Test::Compile' => { xt_mode => 1 }],
+    'MetaMergeFile',
+    'PrereqsFile',
     sub { $_[0]->pluginset_installer },
     'Manifest',
     'PruneCruft',
@@ -147,8 +149,6 @@ my %revisions = (
     'TestRelease',
     'ConfirmRelease',
     sub { $_[0]->pluginset_releaser },
-    'MetaMergeFile',
-    'PrereqsFile',
     ['MetaNoIndex' => { directory => [qw(t xt inc share eg examples)] }],
     sub { $_[0]->pluginset_metaprovides },
     'ShareDir',
@@ -486,7 +486,7 @@ following plugins if not configured further:
 
 =item L<[License]|Dist::Zilla::Plugin::License>
 
-=item L<[ReadmeAnyFromPod]|Dist::Zilla::Plugin::Pod2Readme>
+=item L<[Pod2Readme]|Dist::Zilla::Plugin::Pod2Readme>
 
 =item L<[PodSyntaxTests]|Dist::Zilla::Plugin::PodSyntaxTests>
 
@@ -495,6 +495,10 @@ following plugins if not configured further:
 =item L<[Test::Compile]|Dist::Zilla::Plugin::Test::Compile>
 
   xt_mode = 1
+
+=item L<[MetaMergeFile]|Dist::Zilla::Plugin::MetaMergeFile>
+
+=item L<[PrereqsFile]|Dist::Zilla::Plugin::PrereqsFile>
 
 =item L<[MakeMaker]|Dist::Zilla::Plugin::MakeMaker>
 
@@ -515,10 +519,6 @@ following plugins if not configured further:
 =item L<[ConfirmRelease]|Dist::Zilla::Plugin::ConfirmRelease>
 
 =item L<[UploadToCPAN]|Dist::Zilla::Plugin::UploadToCPAN>
-
-=item L<[MetaMergeFile]|Dist::Zilla::Plugin::MetaMergeFile>
-
-=item L<[PrereqsFile]|Dist::Zilla::Plugin::PrereqsFile>
 
 =item L<[MetaNoIndex]|Dist::Zilla::Plugin::MetaNoIndex>
 

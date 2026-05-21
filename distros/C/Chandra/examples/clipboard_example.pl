@@ -23,7 +23,7 @@ Chandra::Clipboard->clear;
 print "Clipboard cleared.\n";
 print "Has text after clear: ", Chandra::Clipboard->has_text ? 'yes' : 'no', "\n";
 
-# Integration with Chandra::App (commented — requires running app)
+# Integration with Chandra::App (commented - requires running app)
 # use Chandra::App;
 # my $app = Chandra::App->new(title => 'Clipboard Demo');
 # $app->bind('copy', sub {

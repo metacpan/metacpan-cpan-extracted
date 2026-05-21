@@ -4,7 +4,7 @@ requires 'perl', '5.010';
 
 requires 'Carp';
 requires 'Locale::AU';
-requires 'Locale::CA';
+requires 'Locale::CA', '0.09';
 requires 'Locale::Object::Country';
 requires 'Locale::US';
 requires 'Object::Configure';

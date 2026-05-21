@@ -1,10 +1,11 @@
 package DBIx::Class::Async::Exception;
 
-$DBIx::Class::Async::Exception::VERSION   = '0.65';
-$DBIx::Class::Async::Exception::AUTHORITY = 'cpan:MANWAR';
-
 use strict;
 use warnings;
+use version;
+
+our $VERSION   = qv('v1.0.3');
+our $AUTHORITY = 'cpan:MANWAR';
 
 use overload
     '""'     => \&message,
@@ -17,7 +18,7 @@ DBIx::Class::Async::Exception - Base class for DBIx::Class::Async exceptions
 
 =head1 VERSION
 
-Version 0.65
+Version v1.0.3
 
 =head1 SYNOPSIS
 

@@ -7,7 +7,7 @@ use v5.14;
 use warnings;
 
 package AtteanX::Endpoint {
-	our $VERSION	= "0.002";
+	our $VERSION	= "0.003";
 }
 
 package AtteanX::Error {
@@ -46,7 +46,7 @@ package AtteanX::Endpoint::ServerError {
 	has 'code' => (is => 'ro', isa => Int, default => 500);
 }
 
-package Plack::App::AtteanX::Endpoint 0.002 {
+package Plack::App::AtteanX::Endpoint 0.003 {
 	use parent qw(Plack::Component);
 	use Plack::Request;
 	
@@ -84,12 +84,11 @@ AtteanX::Endpoint - SPARQL 1.1 Protocol Endpoint
 
 =head1 VERSION
 
-This document describes AtteanX::Endpoint version 0.002
+This document describes AtteanX::Endpoint version 0.003
 
 =head1 SYNOPSIS
 
-  use v5.14;
-  use Attean;
+  plackup -p 9091 scripts/endpoint.psgi
 
 =head1 DESCRIPTION
 
@@ -113,11 +112,6 @@ A hash reference containing configuration data for the endpoint. For example:
         named_graphs => 1,
         default => 1,
       },
-      html => {
-        embed_images => 1,
-        image_width => 200,
-        resource_links => 1,
-      },
       load_data => 0,
       update => 0,
     }
@@ -138,6 +132,7 @@ The L<Attean::API::IRI> of the graph in the model that represents the default gr
 package AtteanX::Endpoint {
 	use Moo;
 	use Attean;
+	use Attean::RDF qw(iri);
 	use TryCatch;
 	use JSON;
 	use Encode;
@@ -189,9 +184,10 @@ package AtteanX::Endpoint {
 			# ->new( \%conf )
 			my $conf		= shift @params;
 			my $store_conf	= $conf->{store};
-			my ($name, $file)	= split(';', $store_conf, 2);
-			my $sclass	= Attean->get_store($name)->new();
-			my $store	= $sclass->new();
+			my ($name_, $file)	= split(';', $store_conf, 2);
+			my ($name, @args)	= split('=', $name_);
+			my $sclass	= Attean->get_store($name);
+			my $store	= $sclass->new(@args);
 			my $model	= Attean::MutableQuadModel->new( store => $store );
 			
 			my $graph	= Attean::IRI->new('http://example.org/graph');
@@ -266,7 +262,7 @@ a response object.
 		
 		my $config	= $self->{conf};
 		my $endpoint_path = $config->{endpoint}{endpoint_path} || '/sparql';
-		my $model	= $self->{model};
+		my $gsp_path = $config->{endpoint}{gsp_path} || '/gsp';
 		
 		my $response	= Plack::Response->new;
 
@@ -275,7 +271,9 @@ a response object.
 		$server .= " " . $response->headers->header('Server') if defined($response->headers->header('Server'));
 		$response->headers->header('Server' => $server);
 
-		unless ($req->path eq $endpoint_path) {
+		if ($req->path eq $endpoint_path or $req->path eq $gsp_path) {
+			# no-op
+		} else {
 			my $content;
 			my $path	= $req->path_info;
 			$path		=~ s#^/##;
@@ -298,6 +296,155 @@ END
 			return $response;
 		}
 	
+		if ($req->path eq $endpoint_path) {
+			$self->_run_protocol($req, $response);
+		} else {
+			$self->_run_gsp($req, $response);
+		}
+	}
+
+	sub get_gsp_graph {
+		my $self	= shift;
+		my $req		= shift;
+		my $query     = $req->parameters;
+		if ($req->query_string eq 'default') {
+			my $default	= $self->graph;
+			return $default;
+		} elsif (my $g = $req->param('graph')) {
+			return iri($g);
+		}
+		return;
+	}
+	
+	sub _run_gsp {
+		my $self	= shift;
+		my $req		= shift;
+		my $response	= shift;
+
+		my $config	= $self->{conf};
+		my $model	= $self->{model};
+		my $headers	= $req->headers;
+		my $type	= $headers->header('Accept') || 'application/sparql-results+xml';
+		if (my $t = $req->param('media-type')) {
+			$type	= $t;
+			$headers->header('Accept' => $type);
+		}
+
+		my $ae		= $req->headers->header('Accept-Encoding') || '';
+		my $graph	= $self->get_gsp_graph($req); # TODO
+		unless ($graph) {
+			die AtteanX::Endpoint::ClientError->new(
+				code => 400,
+				message => 'No graph specified', uri => 'http://id.kasei.us/rdf-endpoint/error/gsp_no_graph'
+			);
+		}
+		my $base	= $req->base;
+		my $parser	= Attean->get_parser('SPARQL')->new(base => $base);
+		my $algebra;
+		my $content;
+		if ($req->method eq 'GET' or $req->method eq 'HEAD') {
+			my $sparql		= 'CONSTRUCT WHERE { ?s ?p ?o }';
+			($algebra)	= eval { $parser->parse($sparql, base => $base) };
+			$self->log_gsp_request( $req );
+			if ($@ or not($algebra)) {
+				my $error	= $@ || 'Internal error';
+				$self->log_error( $req, $error );
+				my $eclass	= ($error =~ /Syntax/) ? 'AtteanX::Endpoint::ClientError' : 'AtteanX::Endpoint::ServerError';
+				die $eclass->new(message => 'SPARQL GSP parse error', uri => 'http://id.kasei.us/rdf-endpoint/error/parse_error', details => { error => $error });
+			}
+		} else {
+			unless ($config->{endpoint}{update}) {
+				die AtteanX::Endpoint::ClientError->new(code => 405, message => 'Method not allowed', uri => 'http://id.kasei.us/rdf-endpoint/error/bad_http_method');
+			}
+			if ($req->method eq 'PUT' or $req->method eq 'POST') {
+				my $ct		= $req->headers->header('Content-Type');
+				unless ($ct) {
+					die AtteanX::Endpoint::ClientError->new(
+						code => 400,
+						message => 'No Content-Type specified for PUT request', uri => 'http://id.kasei.us/rdf-endpoint/error/gsp_no_media_type'
+					);
+				}
+				my $pclass	= Attean->get_parser(media_type => $ct);
+				unless ($pclass) {
+					die AtteanX::Endpoint::ClientError->new(
+						code => 400,
+						message => "No parser available for media type $ct", uri => 'http://id.kasei.us/rdf-endpoint/error/gsp_unrecognized_media_type'
+					);
+				}
+				my $parser	= $pclass->new();
+				my $iter = $parser->parse_iter_from_io($req->body);
+				
+				my @ops;
+				if ($req->method eq 'PUT') {
+					my $drop	= Attean::Algebra::Clear->new(drop => 1, silent => 1, target => 'GRAPH', graph => $graph);
+					push(@ops, $drop);
+				}
+				my $insert	= Attean::Algebra::Modify->new(insert => [$iter->as_quads($graph)->elements]);
+				push(@ops, $insert);
+				my $seq		= Attean::Algebra::Sequence->new(children => \@ops);
+	# 			warn $seq->as_string;
+				$algebra	= $seq;
+			} elsif ($req->method eq 'DELETE') {
+				$algebra	= Attean::Algebra::Clear->new(drop => 1, silent => 1, target => 'GRAPH', graph => $graph);
+			} else {
+				die AtteanX::Endpoint::ClientError->new(
+					code => 400,
+					message => "Unsupported HTTP method: " . $req->method, uri => 'http://id.kasei.us/rdf-endpoint/error/gsp_unrecognized_http_method'
+				);
+			}
+		}
+
+		if ($self->log->is_trace) {
+			$self->log->trace("Algebra:\n" . $algebra->as_string);
+		}
+		my $default_graphs	= [$graph];
+		my $planner	= $self->planner;
+		if ($self->log->is_trace) {
+			$self->log->debug('Planning with default graphs:');
+			foreach my $g (@$default_graphs) {
+				$self->log->trace($g->as_string);
+			}
+		}
+
+		my $plan	= $planner->plan_for_algebra($algebra, $model, $default_graphs);
+		if ($self->log->is_debug) {
+			$self->log->debug("Plan:\n" . $plan->as_string);
+		}
+		eval {
+			my $iter	= $plan->evaluate($model);
+			$response->status(200);
+			if ($req->method eq 'GET' or $req->method eq 'HEAD') { # RDF content
+				my $sclass	= Attean->negotiate_serializer(request_headers => $headers, role => 'Attean::API::TripleSerializer') // Attean->get_serializer('ntriples');
+				my @args;
+				$self->log->debug("Serializer class: $sclass");
+				my $s		= $sclass->new(@args);
+				my $stype	= $s->canonical_media_type;
+				if ($req->method eq 'GET') {
+					$content	= $s->serialize_iter_to_bytes($iter);
+				}
+				$response->headers->content_type($stype);
+			} else {
+				$response->headers->content_type('text/plain');
+				$content	= "OK\n";
+			}
+		};
+		if ($@) {
+			my $error	= $@;
+			$self->log->fatal($error);
+			die AtteanX::Endpoint::ServerError->new(code => 500, message => 'SPARQL GSP execution error', uri => 'http://id.kasei.us/rdf-endpoint/error/execution_error', details => { error => $@ });
+		}
+	
+		$self->wrap_response_with_encoding($req, $response, $ae, $content);
+		return $response;
+	}
+	
+	sub _run_protocol {
+		my $self	= shift;
+		my $req		= shift;
+		my $response	= shift;
+
+		my $config	= $self->{conf};
+		my $model	= $self->{model};
 		my $headers	= $req->headers;
 		my $type	= $headers->header('Accept') || 'application/sparql-results+xml';
 		if (my $t = $req->param('media-type')) {
@@ -436,9 +583,26 @@ END
 				eval {
 					my $iter	= $plan->evaluate($model);
 					$response->status(200);
-					my $sclass	= Attean->negotiate_serializer(request_headers => $headers) // Attean->get_serializer('sparqlxml');
+					if ($headers->header('Accept') eq '*/*') {
+						$headers->remove_header('Accept');
+					}
+					
+					my $sclass	= Attean->negotiate_serializer(request_headers => $headers, role => 'Attean::API::ResultSerializer') // Attean->get_serializer('sparqlxml');
+					my @args;
+					if ($sclass eq 'AtteanX::Serializer::SPARQLHTML') {
+						push(@args, head => <<"END");
+							<style>
+								table, th, td {
+									border: 1px solid #000;
+								}
+								table {
+									border-collapse: collapse;
+								}
+							</style>
+END
+					}
 					$self->log->debug("Serializer class: $sclass");
-					my $s		= $sclass->new();
+					my $s		= $sclass->new(@args);
 					$content	= $s->serialize_iter_to_bytes($iter);
 					my $stype	= $s->canonical_media_type;
 					$response->headers->content_type($stype);
@@ -468,7 +632,18 @@ END
 			$response->headers->content_type('text/html');
 		}
 	
-		$content	= $response->body || $content;
+		$self->wrap_response_with_encoding($req, $response, $ae, $content);
+		return $response;
+	}
+	
+	sub wrap_response_with_encoding {
+		my $self	= shift;
+		my $req		= shift;
+		my $response	= shift;
+		my $ae		= shift;
+		my $content	= $response->body || shift;
+		return unless (defined($content));
+		
 		my $length	= 0;
 		my %ae		= map { $_ => 1 } split(/\s*,\s*/, $ae);
 		if ($ae{'gzip'}) {
@@ -494,7 +669,6 @@ END
 			$response->headers->header('Content-Length' => $length);
 			$response->body( $body ) unless ($req->method eq 'HEAD');
 		}
-		return $response;
 	}
 	
 =item C<< log_query ( $request, $sparql ) >>
@@ -510,6 +684,13 @@ C<< $request >> but before evaluation.
 		my $message	= shift;
 		$self->log->info("SPARQL query:\n" . $message);
 		$self->_log( $req, { level => 'info', message => $message } );
+	}
+
+	sub log_gsp_request {
+		my $self	= shift;
+		my $req		= shift;
+		$self->log->info("GSP query:\n" . $req->method);
+		$self->_log( $req, { level => 'info' } );
 	}
 
 =item C<< log_error ( $message ) >>
@@ -582,7 +763,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2016 Gregory Todd Williams.
+Copyright (c) Gregory Todd Williams.
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

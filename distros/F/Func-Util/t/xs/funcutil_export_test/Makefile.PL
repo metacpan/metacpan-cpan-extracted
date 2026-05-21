@@ -28,13 +28,19 @@ my $extra_ldfrom = '';
 my $extra_ldflags = '';
 
 if ($^O eq 'linux' || $^O eq 'freebsd' || $^O eq 'openbsd' || $^O eq 'netbsd' ||
-    $^O eq 'solaris' || $^O eq 'sunos' || $^O eq 'dragonfly') {
+    $^O eq 'dragonfly') {
     # Don't link against Util.so directly - that records a DT_NEEDED with a
     # relative path that the runtime linker can't resolve. Instead, allow
     # unresolved symbols at link time; they'll be satisfied by RTLD_GLOBAL.
     $extra_ldflags = '-Wl,--allow-shlib-undefined';
 }
-# macOS/darwin: no special linking needed (flat namespace + RTLD_GLOBAL)
+# macOS/darwin: no special linking needed (flat namespace + RTLD_GLOBAL).
+# Solaris/illumos (sunos): Sun ld rejects --allow-shlib-undefined as
+# "unrecognized option" AND already allows unresolved symbols at link
+# time by default - leave $extra_ldflags empty. Func-Util 0.03's CPAN
+# tester reports failed on Solaris 11 with:
+#   ld: fatal: unrecognized option '--allow-shlib-undefined'
+# because solaris was previously bundled into the GNU-ld branch above.
 
 my %makefile_args = (
     NAME              => 'funcutil_export_test',

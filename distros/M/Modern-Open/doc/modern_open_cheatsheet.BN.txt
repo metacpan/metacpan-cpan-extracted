@@ -1,0 +1,122 @@
+======================================================================
+ Modern::Open à¦à¦¿à¦ à¦¶à¦¿à¦                   [BN] à¦¬à¦¾à¦à¦²à¦¾
+======================================================================
+
+[ 1. Installation / [BN] à¦¬à¦¾à¦à¦²à¦¾ ]
+
+  à¦à¦¨à¦¸à§à¦à¦² à¦à¦°à§à¦¨:
+    cpan Modern::Open
+
+  à¦¸à§à¦à§à¦°à¦¿à¦ªà§à¦à§ à¦¬à§à¦¯à¦¬à¦¹à¦¾à¦° à¦à¦°à§à¦¨:
+    use Modern::Open;
+
+  à¦ªà§à¦°à¦­à¦¾à¦¬: open(), opendir(), sysopen(), pipe(), socket(),
+          à¦à¦¬à¦ accept() à¦à§ autovivification + autodie à¦¸à¦à¦¸à§à¦à¦°à¦£ à¦¦à¦¿à¦¯à¦¼à§ à¦ªà§à¦°à¦¤à¦¿à¦¸à§à¦¥à¦¾à¦ªà¦¨ à¦à¦°à§à¥¤
+          Perl 5.005_03 à¦à¦¬à¦ à¦ªà¦°à¦¬à¦°à§à¦¤à§ à¦¸à¦¬ à¦¸à¦à¦¸à§à¦à¦°à¦£à§ à¦à¦¾à¦ à¦à¦°à§à¥¤
+          নোট: socket() অটোভিভিফিকেশন সমর্থন করে কিন্তু autodie করে না।
+
+[ 2. open() -- 2-arg ]
+
+  my $fh;
+  open($fh, "< file.txt");   # à¦ªà¦¡à¦¼à§à¦¨
+  open($fh, "> file.txt");   # à¦²à¦¿à¦à§à¦¨ (à¦à¦­à¦¾à¦°à¦°à¦¾à¦à¦)
+  open($fh, ">> file.txt");  # à¦¯à§à¦ à¦à¦°à§à¦¨
+  open($fh, "+< file.txt");  # à¦ªà¦¡à¦¼à§à¦¨/à¦²à¦¿à¦à§à¦¨
+  open($fh, "cmd |");        # à¦à¦®à¦¾à¦¨à§à¦¡ à¦ªà¦¾à¦à¦ª à¦¥à§à¦à§ à¦ªà¦¡à¦¼à§à¦¨
+  open($fh, "| cmd");        # à¦à¦®à¦¾à¦¨à§à¦¡ à¦ªà¦¾à¦à¦ªà§ à¦²à¦¿à¦à§à¦¨
+
+  while (my $line = readline($fh)) { ... }
+  print $fh "text\n";
+  close($fh);
+
+[ 3. open() -- 3-arg ]
+
+  my $fh;
+  open($fh, '<',  "file.txt");   # à¦ªà¦¡à¦¼à§à¦¨
+  open($fh, '>',  "file.txt");   # à¦²à¦¿à¦à§à¦¨ (à¦à¦­à¦¾à¦°à¦°à¦¾à¦à¦)
+  open($fh, '>>', "file.txt");   # à¦¯à§à¦ à¦à¦°à§à¦¨
+  open($fh, '+<', "file.txt");   # à¦ªà¦¡à¦¼à§à¦¨/à¦²à¦¿à¦à§à¦¨
+  open($fh, '+>', "file.txt");   # à¦ªà¦¡à¦¼à§à¦¨/à¦²à¦¿à¦à§à¦¨ (à¦à¦­à¦¾à¦°à¦°à¦¾à¦à¦)
+  open($fh, '-|', "cmd");        # à¦à¦®à¦¾à¦¨à§à¦¡ à¦ªà¦¾à¦à¦ª à¦¥à§à¦à§ à¦ªà¦¡à¦¼à§à¦¨
+  open($fh, '|-', "cmd");        # à¦à¦®à¦¾à¦¨à§à¦¡ à¦ªà¦¾à¦à¦ªà§ à¦²à¦¿à¦à§à¦¨
+
+[ 4. opendir() ]
+
+  my $dh;
+  opendir($dh, "/path/to/dir");
+  while (my $e = readdir($dh)) {
+      next if $e eq '.' or $e eq '..';
+      print "$e\n";
+  }
+  closedir($dh);
+
+[ 5. sysopen() ]
+
+  use Fcntl qw(O_RDONLY O_WRONLY O_CREAT O_TRUNC);
+
+  my $fh;
+  sysopen($fh, "file.txt", O_RDONLY);
+  sysopen($fh, "file.txt", O_WRONLY | O_CREAT | O_TRUNC);
+  sysopen($fh, "file.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+
+[ 6. pipe() ]
+
+  my($reader, $writer);
+  pipe($reader, $writer);
+  if (my $pid = fork()) {
+      close($writer);
+      while (my $line = readline($reader)) { print $line }
+      close($reader);
+  } else {
+      close($reader);
+      print $writer "à¦¶à¦¿à¦¶à§ à¦ªà§à¦°à¦à§à¦°à¦¿à¦¯à¦¼à¦¾ à¦¥à§à¦à§ à¦¹à§à¦¯à¦¾à¦²à§\n";
+      close($writer);
+      exit 0;
+  }
+
+[ 7. socket() / accept() ]
+
+  use Socket qw(AF_INET SOCK_STREAM sockaddr_in inet_aton);
+  my $server;
+  socket($server, AF_INET, SOCK_STREAM, 0);
+  # নোট: socket() autodie করে না; রিটার্ন মান নিজে পরীক্ষা করুন।
+  my $client;
+  accept($client, $server);
+
+[ 8. autodie ]
+
+  # void context: à¦¬à§à¦¯à¦°à§à¦¥à¦¤à¦¾à¦¯à¦¼ die
+  open($fh, "< no_such_file.txt");   # dies: Can't open(...)
+
+  # à¦°à¦¿à¦à¦¾à¦°à§à¦¨ à¦­à§à¦¯à¦¾à¦²à§ à¦¸à¦¹: à¦¬à§à¦¯à¦°à§à¦¥à¦¤à¦¾à¦¯à¦¼ undef/0
+  my $rc = open($fh, "< file.txt");
+  unless ($rc) { warn "open à¦¬à§à¦¯à¦°à§à¦¥: $!" }
+
+  open(FILE, "< file.txt");   # dies: Bare handle no longer supported
+
+[ 9. Handle ]
+
+  readline($fh)        # à¦à¦ à¦²à¦¾à¦à¦¨ à¦ªà¦¡à¦¼à§à¦¨
+  read($fh, $buf, $n)  # N à¦¬à¦¾à¦à¦ à¦ªà¦¡à¦¼à§à¦¨
+  print $fh "..."      # à¦²à¦¿à¦à§à¦¨
+  binmode($fh)         # à¦¬à¦¾à¦à¦¨à¦¾à¦°à¦¿ à¦®à§à¦¡
+  seek($fh, 0, 0)      # à¦¶à§à¦°à§à¦¤à§ à¦¯à¦¾à¦¨
+  tell($fh)            # à¦¬à¦°à§à¦¤à¦®à¦¾à¦¨ à¦à¦¬à¦¸à§à¦¥à¦¾à¦¨
+  close($fh)           # à¦¬à¦¨à§à¦§ à¦à¦°à§à¦¨
+  eof($fh)             # à¦«à¦¾à¦à¦²à§à¦° à¦¶à§à¦· à¦ªà¦°à§à¦à§à¦·à¦¾ à¦à¦°à§à¦¨
+
+[ 10. Compatibility ]
+
+  Perl à¦¸à¦à¦¸à§à¦à¦°à¦£ : 5.005_03 à¦à¦¬à¦ à¦ªà¦°à¦¬à¦°à§à¦¤à§ (5.42 à¦¸à¦¹)
+  à¦ªà§à¦²à§à¦¯à¦¾à¦à¦«à¦°à§à¦®  : Unix, Linux, macOS, Windows (CRLF à¦¸à§à¦¬à¦¯à¦¼à¦à¦à§à¦°à¦¿à¦¯à¦¼)
+  à¦¨à¦¿à¦°à§à¦­à¦°à¦¤à¦¾    : Fcntl (à¦à§à¦° à¦®à¦¡à¦¿à¦à¦²)
+
+[ 11. Official resources ]
+
+  Modern::Open (MetaCPAN):
+    https://metacpan.org/dist/Modern-Open
+
+  INABA Hitoshi (ina) on CPAN:
+    https://metacpan.org/author/INA
+
+======================================================================

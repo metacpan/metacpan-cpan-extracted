@@ -3,8 +3,7 @@
 #
 use strict;
 use warnings;
-use Test::More;
-use MyNote;
+use MyTest;
 use UUID 'generate_v6';
 
 ok 1, 'loaded';

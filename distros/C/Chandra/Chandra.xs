@@ -1,5 +1,5 @@
 /*
- * Chandra.xs — Root XS file
+ * Chandra.xs - Root XS file
  *
  * Thin wrapper: includes shared header (which provides all static
  * C functions when WEBVIEW_IMPLEMENTATION is defined), then pulls

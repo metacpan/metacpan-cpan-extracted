@@ -1,6 +1,30 @@
 BATsh Shpargalka [RU] Russkiy
 ==============================
 
+----------------------------------------------------------------------
+КРАТКОЕ ОПИСАНИЕ
+  BATsh — двуязычный интерпретатор оболочки, выполняющий синтаксис
+  cmd.exe и bash/sh в одном файле сценария, автоматически переключая
+  режим строка за строкой. Внешняя оболочка не нужна — чистый Perl.
+
+СМЕШАННЫЙ ПРИМЕР
+  :: Раздел CMD (первый токен заглавными буквами)
+  @ECHO OFF
+  SET LANG=BATsh
+
+  # Раздел SH (первый токен содержит строчные буквы)
+  greet() { echo "Привет $1 (режим bash)"; }
+  greet $LANG
+  result=$(echo $LANG | perl -e 'while(<STDIN>){chomp;print uc}')
+  echo "Заглавные: $result"
+
+  :: Возврат в CMD (чтение результата SH)
+  ECHO Возврат в CMD: %result%
+
+  # Запуск: perl lib/BATsh.pm script.batsh
+----------------------------------------------------------------------
+
+
 BATsh -- dvuyazychnyy shell, kotoryy vypolnyayet sintaksis cmd.exe i bash/sh
 v odnom skripte. Pervyy token kazhdoy stroki opredelyayet rezhim.
 
@@ -98,3 +122,21 @@ v odnom skripte. Pervyy token kazhdoy stroki opredelyayet rezhim.
   Zavisimosti CPAN ne nuzhny.
 
 Sm. takzhe: https://metacpan.org/dist/BATsh
+
+11. Конвейер CMD и модификаторы параметров
+-------------------------------------------
+  cmd1 | cmd2              # Конвейер через временный файл (Pure Perl)
+  SET /P VAR=Приглашение:  # Читать строку из STDIN в VAR
+  %~dp0                    # Диск+каталог %0 (наиболее частое использование)
+  %~n1, %~x1, %~nx1       # Имя файла, расширение, оба
+
+12. Функции SH и расширение переменных
+----------------------------------------
+  f() { echo $1; }         # Определение функции
+  ${var%.*}  ${var%%.*}    # Удалить суффикс (кратчайший/длиннейший)
+  ${var#*.}  ${var##*.}    # Удалить префикс (кратчайший/длиннейший)
+  ${var/a/b} ${var//a/b}   # Заменить (первый/все)
+  ${var^^} ${var,,}        # Верхний/нижний регистр
+  cmd > f  cmd >> f  2>&1  # Перенаправление
+  cmd1 && cmd2             # И-цепочка
+  cmd1 || cmd2             # ИЛИ-цепочка

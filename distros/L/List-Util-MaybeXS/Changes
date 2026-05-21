@@ -1,5 +1,8 @@
 Revision history for List-Util-MaybeXS
 
+1.500015 - 2026-05-13
+  - fix zip and mesh functions returning empty when given one element inputs
+
 1.500014 - 2025-06-26
   - fix sample and shuffle incompletely shuffling the array
 

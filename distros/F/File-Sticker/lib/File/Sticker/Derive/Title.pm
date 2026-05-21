@@ -1,12 +1,12 @@
 package File::Sticker::Derive::Title;
-$File::Sticker::Derive::Title::VERSION = '4.401';
+$File::Sticker::Derive::Title::VERSION = '4.603';
 =head1 NAME
 
 File::Sticker::Derive::Title - derive values from existing meta-data
 
 =head1 VERSION
 
-version 4.401
+version 4.603
 
 =head1 SYNOPSIS
 
@@ -65,7 +65,7 @@ This is expected to update the given meta-data.
 sub derive {
     my $self = shift;
     my %args = @_;
-    say STDERR whoami(), " filename=$args{filename}" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     my $filename = $args{filename};
     my $meta = $args{meta};

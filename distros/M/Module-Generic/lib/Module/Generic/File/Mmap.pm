@@ -15,6 +15,7 @@ BEGIN
 {
     use strict;
     use warnings;
+    warnings::register_categories( 'Module::Generic' );
     use parent qw( Module::Generic );
     use vars qw( $VERSION $HAS_CACHE_MMAP $HAS_B64 );
     use Data::UUID;
@@ -777,7 +778,7 @@ sub THAW
     {
         my $f = Module::Generic::File->new( $cache_file ) || do
         {
-            warn( "Unable to get a file object for \"$cache_file\": ", Module::Generic::File->error, "\n" ) if( $self->_warnings_is_enabled() );
+            warn( "Unable to get a file object for \"$cache_file\": ", Module::Generic::File->error, "\n" ) if( $self->_warnings_is_enabled( 'Module::Generic' ) );
             return( $new );
         };
         $new->{cache_file} = $f;
@@ -789,7 +790,7 @@ sub THAW
             serializer => '',
         ) || do
         {
-            warn( "Unable to instantiate a Cache::FastMmap object.\n" ) if( $self->_warnings_is_enabled() );
+            warn( "Unable to instantiate a Cache::FastMmap object.\n" ) if( $self->_warnings_is_enabled( 'Module::Generic' ) );
             return( $new );
         };
         $new->{_cache}->set( $new->key => $cache_data );

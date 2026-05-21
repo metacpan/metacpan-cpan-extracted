@@ -1,7 +1,7 @@
 # ABSTRACT: Board configuration management
 
 package App::karr::Config;
-our $VERSION = '0.102';
+our $VERSION = '0.205';
 use Moo;
 use YAML::XS qw( LoadFile DumpFile );
 use Path::Tiny;
@@ -12,7 +12,14 @@ has data => ( is => 'lazy' );
 
 sub _build_data {
   my ($self) = @_;
-  return LoadFile($self->file->stringify);
+  my $file = $self->file;
+  return LoadFile($file->stringify) if defined $file && -f $file;
+  die "No file or data provided to Config\n";
+}
+
+sub from_merged {
+  my ($class, $merged) = @_;
+  return bless { data => $merged, file => undef }, $class;
 }
 
 sub save {
@@ -55,6 +62,41 @@ sub next_id {
 sub claim_timeout {
   my ($self) = @_;
   return $self->data->{claim_timeout} // '1h';
+}
+
+sub priority_order {
+  my ($class) = @_;
+  return (critical => 0, high => 1, medium => 2, low => 3);
+}
+
+
+sub class_order {
+  my ($class) = @_;
+  return (expedite => 0, 'fixed-date' => 1, standard => 2, intangible => 3);
+}
+
+
+sub is_terminal_status {
+  my ($class, $status) = @_;
+  return 1 if $status eq 'done' || $status eq 'archived';
+  return 0;
+}
+
+
+sub terminal_statuses {
+  my ($class) = @_;
+  return ('done', 'archived');
+}
+
+
+sub status_requires_claim {
+  my ($self, $status_name) = @_;
+  my ($sc) = grep {
+    (ref $_ ? $_->{name} : $_) eq $status_name
+  } @{$self->data->{statuses} // []};
+  return 0 unless $sc;
+  return 1 if !ref $sc;
+  return $sc->{require_claim} ? 1 : 0;
 }
 
 sub effective_config {
@@ -122,7 +164,7 @@ App::karr::Config - Board configuration management
 
 =head1 VERSION
 
-version 0.102
+version 0.205
 
 =head1 SYNOPSIS
 
@@ -146,16 +188,44 @@ this class works with the temporary YAML file generated for a command run.
 L<karr>, L<App::karr>, L<App::karr::BoardStore>, L<App::karr::Task>,
 L<App::karr::Git>
 
+=head2 priority_order
+
+Returns a hash for sorting tasks by priority.
+
+    my %order = App::karr::Config->priority_order;
+    # (critical => 0, high => 1, medium => 2, low => 3)
+
+=head2 class_order
+
+Returns a hash for sorting tasks by class of service.
+
+    my %order = App::karr::Config->class_order;
+    # (expedite => 0, 'fixed-date' => 1, standard => 2, intangible => 3)
+
+=head2 is_terminal_status
+
+Returns true if the given status is terminal (done or archived).
+
+    if (App::karr::Config->is_terminal_status($task->status)) {
+        # task is in a terminal state
+    }
+
+=head2 terminal_statuses
+
+Returns a list of terminal status names.
+
+    my @terminal = App::karr::Config->terminal_statuses;
+
 =head1 SUPPORT
 
 =head2 Issues
 
 Please report bugs and feature requests on GitHub at
-L<https://github.com/Getty/p5-app-karr/issues>.
+L<https://github.com/Getty/karr/issues>.
 
 =head2 IRC
 
-Join C<#ai> on C<irc.perl.org> or message Getty directly.
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -163,7 +233,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

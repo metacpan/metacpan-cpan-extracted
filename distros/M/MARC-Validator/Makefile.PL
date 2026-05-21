@@ -20,7 +20,7 @@ readme_from 'Validator.pm';
 recursive_author_tests('xt');
 requires 'Class::Utils' => 0.03;
 requires 'Business::ISBN' => 0;
-requires 'Business::UDC' => 0;
+requires 'Business::UDC' => 0.07;
 requires 'Data::MARC::Validator::Report::Error' => 0.02;
 requires 'Data::MARC::Validator::Report::Plugin' => 0.02;
 requires 'Data::MARC::Validator::Report::Plugin::Errors' => 0.02;
@@ -44,7 +44,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Unicode::UTF8' => 0;
 tests_recursive;
-version '0.17';
+version '0.21';
 
 # Run.
 WriteAll();

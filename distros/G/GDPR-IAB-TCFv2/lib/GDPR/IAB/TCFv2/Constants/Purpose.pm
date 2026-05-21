@@ -1,38 +1,55 @@
-package GDPR::IAB::TCFv2::Constants::Purpose;
-use strict;
+package GDPR::IAB::TCFv2::Constants::Purpose 0.520;
+use v5.12;
 use warnings;
 
 require Exporter;
-use base qw<Exporter>;
+use parent qw<Exporter>;
 
 use constant {
-    InfoStorageAccess        => 1,
-    BasicAdserving           => 2,
-    PersonalizationProfile   => 3,
-    PersonalizationSelection => 4,
-    ContentProfile           => 5,
-    ContentSelection         => 6,
-    AdPerformance            => 7,
-    ContentPerformance       => 8,
-    MarketResearch           => 9,
-    DevelopImprove           => 10,
-    SelectContent            => 11,
+
+  # Short, established names -- supported indefinitely.  Used by examples
+  # and tests across the distribution.
+  InfoStorageAccess        => 1,
+  BasicAdserving           => 2,
+  PersonalizationProfile   => 3,
+  PersonalizationSelection => 4,
+  ContentProfile           => 5,
+  ContentSelection         => 6,
+  AdPerformance            => 7,
+  ContentPerformance       => 8,
+  MarketResearch           => 9,
+  DevelopImprove           => 10,
+  SelectContent            => 11,
+
+  # TCF v2.3 spec-aligned long-form aliases (Phase 3).  Each name tracks
+  # the canonical wording from the IAB Global Vendor List JSON for the
+  # corresponding purpose.id.  Both names resolve to the same integer and
+  # are interchangeable everywhere a Purpose constant is accepted.
+  StoreAndOrAccessInformationOnDevice        => 1,
+  UseLimitedDataToSelectAdvertising          => 2,
+  CreateProfilesForPersonalisedAdvertising   => 3,
+  UseProfilesToSelectPersonalisedAdvertising => 4,
+  CreateProfilesToPersonaliseContent         => 5,
+  UseProfilesToSelectPersonalisedContent     => 6,
+  MeasureAdvertisingPerformance              => 7,
+  MeasureContentPerformance                  => 8,
+  UnderstandAudiences                        => 9,
+  DevelopAndImproveServices                  => 10,
+  UseLimitedDataToSelectContent              => 11,
 };
 
 use constant PurposeDescription => {
-    InfoStorageAccess        => "Store and/or access information on a device",
-    BasicAdserving           => "Use limited data to select advertising",
-    PersonalizationProfile   => "Create profiles for personalised advertising",
-    PersonalizationSelection =>
-      "Use profiles to select personalised advertising",
-    ContentProfile     => "Create profiles to personalise content",
-    ContentSelection   => "Use profiles to select personalised content",
-    AdPerformance      => "Measure advertising performance",
-    ContentPerformance => "Measure content performance",
-    MarketResearch     =>
-      "Understand audiences through statistics or combinations of data from different sources",
-    DevelopImprove => "Develop and improve services",
-    SelectContent  => "Use limited data to select content",
+  InfoStorageAccess        => "Store and/or access information on a device",
+  BasicAdserving           => "Use limited data to select advertising",
+  PersonalizationProfile   => "Create profiles for personalised advertising",
+  PersonalizationSelection => "Use profiles to select personalised advertising",
+  ContentProfile           => "Create profiles to personalise content",
+  ContentSelection         => "Use profiles to select personalised content",
+  AdPerformance            => "Measure advertising performance",
+  ContentPerformance       => "Measure content performance",
+  MarketResearch           => "Understand audiences through statistics or combinations of data from different sources",
+  DevelopImprove           => "Develop and improve services",
+  SelectContent            => "Use limited data to select content",
 };
 
 our @EXPORT_OK = qw<
@@ -47,20 +64,33 @@ our @EXPORT_OK = qw<
   MarketResearch
   DevelopImprove
   SelectContent
+  StoreAndOrAccessInformationOnDevice
+  UseLimitedDataToSelectAdvertising
+  CreateProfilesForPersonalisedAdvertising
+  UseProfilesToSelectPersonalisedAdvertising
+  CreateProfilesToPersonaliseContent
+  UseProfilesToSelectPersonalisedContent
+  MeasureAdvertisingPerformance
+  MeasureContentPerformance
+  UnderstandAudiences
+  DevelopAndImproveServices
+  UseLimitedDataToSelectContent
   PurposeDescription
 >;
-our %EXPORT_TAGS = ( all => \@EXPORT_OK );
+our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 1;
 
 __END__
+
+=encoding utf8
+
 =head1 NAME
 
-GDPR::IAB::TCFv2::Constants::Purpose - TCF v2.2 purposes
+GDPR::IAB::TCFv2::Constants::Purpose - TCF v2.3 purposes
 
 =head1 SYNOPSIS
 
-    use strict;
     use warnings;
     
     use GDPR::IAB::TCFv2::Constants::Purpose qw<:all>;
@@ -160,7 +190,7 @@ A profile created for personalised advertising in relation to a person having se
 =back
 
 =head2  ContentProfile
-	
+
 Purpose id 5: Create profiles to personalise content
 
 Information about your activity on this service (for instance, forms you submit, non-advertising content you look at) can be stored and combined with other information about you (such as your previous activity on this service or other websites or apps) or similar users. This is then used to build or improve a profile about you (which might for example include possible interests and personal aspects). Your profile can be used (also later) to present content that appears more relevant based on your possible interests, such as by adapting the order in which content is shown to you, so that it is even easier for you to find content that matches your interests.
@@ -180,7 +210,7 @@ You have viewed three videos on space exploration across different TV apps. An u
 =back
 
 =head2  ContentSelection
-	
+
 Purpose id 6: Use profiles to select personalised content
 
 Content presented to you on this service can be based on your content personalisation profiles, which can reflect your activity on this or other services (for instance, the forms you submit, content you look at), possible interests and personal aspects, such as by adapting the order in which content is shown to you, so that it is even easier for you to find (non-advertising) content that matches your interests.
@@ -193,7 +223,7 @@ Illustrations:
 
 You read articles on vegetarian food on a social media platform and then use the cooking app of an unrelated company. The profile built about you on the social media platform will be used to present you vegetarian recipes on the welcome screen of the cooking app.
 
-=item* 
+=item *
 
 You have viewed three videos about rowing across different websites. An unrelated video sharing platform will recommend five other videos on rowing that may be of interest to you when you use your TV app, based on a profile built about you when you visited those different websites to watch online videos.
 
@@ -271,7 +301,7 @@ Illustrations:
 
 =item *
 
-A technology platform working withA technology platform working with a social media provider notices a growth in mobile app users, and sees based on their profiles that many of them are connecting through mobile connections. It uses a new technology to deliver ads that are formatted for mobile devices and that are low-bandwidth, to improve their performance. a social media provider notices a growth in mobile app users, and sees based on their profiles that many of them are connecting through mobile connections. It uses a new technology to deliver ads that are formatted for mobile devices and that are low-bandwidth, to improve their performance.
+A technology platform working with a social media provider notices a growth in mobile app users, and sees based on their profiles that many of them are connecting through mobile connections. It uses a new technology to deliver ads that are formatted for mobile devices and that are low-bandwidth, to improve their performance.
 
 =item *
 
@@ -302,3 +332,72 @@ A sports news mobile app has started a new section of articles covering the most
 =head2 PurposeDescription
 
 Returns a hashref with a mapping between all purpose ids and their description.
+
+=head1 NAME ALIASES
+
+In addition to the short names documented above, every purpose is also
+exported under a long-form alias that tracks the canonical wording of the
+IAB Global Vendor List for TCF v2.3. Both names resolve to the same integer
+and may be used interchangeably anywhere a Purpose constant is accepted
+(C<is_purpose_consent_allowed>, C<is_vendor_consent_allowed>, etc.).
+
+    use GDPR::IAB::TCFv2::Constants::Purpose qw<:all>;
+
+    # Equivalent:
+    $consent->is_purpose_consent_allowed( InfoStorageAccess );
+    $consent->is_purpose_consent_allowed( StoreAndOrAccessInformationOnDevice );
+
+The full mapping:
+
+=over 4
+
+=item *
+
+C<InfoStorageAccess> — C<StoreAndOrAccessInformationOnDevice> (id 1)
+
+=item *
+
+C<BasicAdserving> — C<UseLimitedDataToSelectAdvertising> (id 2)
+
+=item *
+
+C<PersonalizationProfile> — C<CreateProfilesForPersonalisedAdvertising> (id 3)
+
+=item *
+
+C<PersonalizationSelection> — C<UseProfilesToSelectPersonalisedAdvertising> (id 4)
+
+=item *
+
+C<ContentProfile> — C<CreateProfilesToPersonaliseContent> (id 5)
+
+=item *
+
+C<ContentSelection> — C<UseProfilesToSelectPersonalisedContent> (id 6)
+
+=item *
+
+C<AdPerformance> — C<MeasureAdvertisingPerformance> (id 7)
+
+=item *
+
+C<ContentPerformance> — C<MeasureContentPerformance> (id 8)
+
+=item *
+
+C<MarketResearch> — C<UnderstandAudiences> (id 9)
+
+=item *
+
+C<DevelopImprove> — C<DevelopAndImproveServices> (id 10)
+
+=item *
+
+C<SelectContent> — C<UseLimitedDataToSelectContent> (id 11)
+
+=back
+
+The short names are the historical established forms and are supported
+indefinitely. The long-form aliases are provided for callers who prefer
+to mirror the IAB spec wording verbatim (e.g. when generating policy
+documents or audit logs).

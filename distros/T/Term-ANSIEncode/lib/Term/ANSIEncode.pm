@@ -1,4 +1,4 @@
-package Term::ANSIEncode 1.99;
+package Term::ANSIEncode 2.02;
 
 #######################################################################
 #            _   _  _____ _____   ______                     _        #
@@ -59,35 +59,35 @@ BEGIN {
     our @EXPORT_OK = qw(ansi_colors);
 } ## end BEGIN
 
-our $VERSION = '1.99';
+our $VERSION = '2.02';
 
 # Package-level caches so large tables are built only once per process.
 our $GLOBAL_ANSI_META = _global_ansi_meta();
 
 # Table of styles. Each entry is [tl,tr,bl,br,top,bot,vl,vr]
 our %STYLES = (
-    DEFAULT          => ['╔', '╗', '╚', '╝', '═', '═', '║', '║'],
-    THIN             => ['┌', '┐', '└', '┘', '─', '─', '│', '│'],
-    ROUND            => ['╭', '╮', '╰', '╯', '─', '─', '│', '│'],
-    THICK            => ['┏', '┓', '┗', '┛', '━', '━', '┃', '┃'],
-    BLOCK            => ['🬚', '🬩', '🬌', '🬍', '🬋', '🬋', '▌', '▐'],
-    WEDGE            => ['🭊', '🬿', '🭥', '🭚', '▅', '🮄', '█', '█'],
+    'DEFAULT'        => ['╔', '╗', '╚', '╝', '═', '═', '║', '║'],
+    'THIN'           => ['┌', '┐', '└', '┘', '─', '─', '│', '│'],
+    'ROUND'          => ['╭', '╮', '╰', '╯', '─', '─', '│', '│'],
+    'THICK'          => ['┏', '┓', '┗', '┛', '━', '━', '┃', '┃'],
+    'BLOCK'          => ['🬚', '🬩', '🬌', '🬍', '🬋', '🬋', '▌', '▐'],
+    'WEDGE'          => ['🭊', '🬿', '🭥', '🭚', '▅', '🮄', '█', '█'],
     'BIG WEDGE'      => ['◢', '◣', '◥', '◤', '█', '█', '█', '█'],
-    DOTS             => ['🞄', '🞄', '🞄', '🞄', '🞄', '🞄', '🞄', '🞄'],
-    DIAMOND          => ['⧫', '⧫', '⧫', '⧫', '⧫', '⧫', '⧫', '⧫'],
-    STAR             => ['⭑', '⭑', '⭑', '⭑', '⭑', '⭑', '⭑', '⭑'],
-    CIRCLE           => ['○', '○', '○', '○', '○', '○', '○', '○'],
-    SQUARE           => ['∎', '∎', '∎', '∎', '∎', '∎', '∎', '∎'],
-    DITHERED         => ['▒', '▒', '▒', '▒', '▒', '▒', '▒', '▒'],
-    HEART            => ['♥', '♥', '♥', '♥', '♥', '♥', '♥', '♥'],
-    CHRISTIAN        => ['🕇', '🕇', '🕇', '🕇', '🕇', '🕇', '🕇', '🕇'],
-    NOTES            => ['♪', '♪', '♪', '♪', '♪', '♪', '♪', '♪'],
-    PARALLELOGRAM    => ['▰', '▰', '▰', '▰', '▰', '▰', '▰', '▰'],
+    'DOTS'           => ['🞄', '🞄', '🞄', '🞄', '🞄', '🞄', '🞄', '🞄'],
+    'DIAMOND'        => ['⧫', '⧫', '⧫', '⧫', '⧫', '⧫', '⧫', '⧫'],
+    'STAR'           => ['⭑', '⭑', '⭑', '⭑', '⭑', '⭑', '⭑', '⭑'],
+    'CIRCLE'         => ['○', '○', '○', '○', '○', '○', '○', '○'],
+    'SQUARE'         => ['∎', '∎', '∎', '∎', '∎', '∎', '∎', '∎'],
+    'DITHERED'       => ['▒', '▒', '▒', '▒', '▒', '▒', '▒', '▒'],
+    'HEART'          => ['♥', '♥', '♥', '♥', '♥', '♥', '♥', '♥'],
+    'CHRISTIAN'      => ['🕇', '🕇', '🕇', '🕇', '🕇', '🕇', '🕇', '🕇'],
+    'NOTES'          => ['♪', '♪', '♪', '♪', '♪', '♪', '♪', '♪'],
+    'PARALLELOGRAM'  => ['▰', '▰', '▰', '▰', '▰', '▰', '▰', '▰'],
     'BIG ARROWS'     => ['▶', '▶', '◀', '◀', '▶', '◀', '▲', '▼'],
-    ARROWS           => ['🡕', '🡖', '🡔', '🡗', '🡒', '🡐', '🡑', '🡓'],
-    ARROWHEADS       => ['🠉', '🠋', '🠉', '🠋', '🠊', '🠈', '🠉', '🠋'],
+    'ARROWS'         => ['🡕', '🡖', '🡔', '🡗', '🡒', '🡐', '🡑', '🡓'],
+    'ARROWHEADS'     => ['🠉', '🠋', '🠉', '🠋', '🠊', '🠈', '🠉', '🠋'],
     'FAT ARROWHEADS' => ['🡅', '🡇', '🡅', '🡇', '🡆', '🡄', '🡅', '🡇'],
-    SOLID            => ['█', '█', '█', '█', '█', '█', '█', '█'],
+    'SOLID'          => ['█', '█', '█', '█', '█', '█', '█', '█'],
 );
 
 sub new {
@@ -124,11 +124,11 @@ sub get_version {
 [% YELLOW %]║[% B_BLACK %]                                                                             [% YELLOW %]║[% B_BLACK %]
 [% YELLOW %]╠═════════════════════════════════════════════════════════════════════════════╣[% RESET %]
 [% YELLOW %]║[% RESET %][% B_COLOR 17 %]                         Written By [% BRIGHT YELLOW %]Richard Kelsch[% RESET %][% B_COLOR 17 %]                           [% RESET %][% YELLOW %]║[% RESET %]
-[% YELLOW %]║[% RESET %][% B_COLOR 17 %]                       Copyright ©[% GREEN %]2025 [% BRIGHT YELLOW %]Richard Kelsch[% RESET %][% B_COLOR 17 %]                        [% RESET %][% YELLOW %]║[% RESET %]
+[% YELLOW %]║[% RESET %][% B_COLOR 17 %]                   Copyright ©[% GREEN %]2023 - 2026 [% BRIGHT YELLOW %]Richard Kelsch[% RESET %][% B_COLOR 17 %]                     [% RESET %][% YELLOW %]║[% RESET %]
 [% YELLOW %]║[% RESET %][% B_COLOR 17 %]                            All Rights Reserved                              [% RESET %][% YELLOW %]║[% RESET %]
 [% YELLOW %]║[% RESET %][% B_COLOR 17 %]                         Perl Artistic License 2.0                           [% RESET %][% YELLOW %]║[% RESET %]
 [% YELLOW %]║[% RESET %][% B_COLOR 17 %]                               Version [% GREEN %]XXXX[% RESET %][% B_COLOR 17 %]                                  [% RESET %][% YELLOW %]║[% RESET %]
-[% YELLOW %]║[% RESET %][% B_COLOR 17 %]              GitHub:  https://github.com/richcsst/ansi-encode               [% RESET %][% YELLOW %]║[% RESET %]
+[% YELLOW %]║[% RESET %][% B_COLOR 17 %]               GitHub:  https://github.com/richcsst/ansiencode               [% RESET %][% YELLOW %]║[% RESET %]
 [% YELLOW %]╚═════════════════════════════════════════════════════════════════════════════╝[% RESET %]
 VERSION
 ###
@@ -383,7 +383,7 @@ sub _ansi_detect_capability {
                 '3 BIT'  => TRUE,
                 '4 BIT'  => TRUE,
                 '8 BIT'  => TRUE,
-                '24 BIT' => ((exists($ENV{'COLORTERM'}) && $ENV{'COLORTERM'} =~ /truecolor|24bit/) || (exists($ENV{'TERM_PROGRAM'}) && $ENV{'TERM_PROGRAM'} =~ /WarpTerminal/)) ? TRUE : FALSE,
+                '24 BIT' => ((exists($ENV{'COLORTERM'}) && $ENV{'COLORTERM'} =~ /truecolor|24bit/) || (exists($ENV{'TERM_PROGRAM'}) && $ENV{'TERM_PROGRAM'} =~ /WarpTerminal/)) ? TRUE : FALSE, # Warp AI terminal supports 24 bit
             };
         } ## end if (exists($ENV{'WT_SESSION'...}))
     } else {
@@ -601,7 +601,7 @@ sub ansi_decode {
     $text =~ s/\[\%\s*SCROLL\s+DOWN\s+(\d+)\s*\%\]/   $csi . $1 . 'T'           /eigs;
     $text =~ s/\[\%\s*SPACES\s+(\d+)\s*\%\]/   ' ' x $1           /eigs;
     $text =~ s/\[\%\s*TABS\s+(\d+)\s*\%\]/   "\t" x $1           /eigs;
-    $text =~ s/\[\%\s*CHAR\s+(\S),(\d+)\s*\%\]/   "$1" x $2           /eigs;
+    $text =~ s/\[\%\s*CHAR\s+(\S+),(\d+)\s*\%\]/   "$1" x $2           /eigs;
 
     # HORIZONTAL RULE expands into a sequence of meta-tokens (resolved later).
     $text =~ s/\[\%\s*HORIZONTAL\s+RULE\s+(.*?)\s*\%\]/
@@ -2016,7 +2016,7 @@ Output "count" number of spaces
 
 =item CHAR character,count
 
-Output "count" number of "character".  Only ONE character is allowed.
+Output "count" number of "character".  Can be one or more non-space characters.
 
 =back
 

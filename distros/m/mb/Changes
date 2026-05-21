@@ -1,5 +1,19 @@
 Revision history for this software.
 
+0.62  2026-05-17 JST (Japan Standard Time)
+  - fix lib/mb.pm: _open_a(), _open_r(), _open_w() rewritten to use a
+    unique numbered package glob (mb::FH::H<n>) instead of \do{local *_}.
+    The old implementation always resolved to *main::_ causing IO-slot
+    collisions on Perl 5.005_03.  New design: each function increments
+    $mb::_fh_seq and returns the glob-name string; callers use
+    no strict 'refs' with readline(*{$fh}) / print {*{$fh}} / close($fh).
+    Function signatures changed from ($$) to ($): the filehandle argument
+    is no longer passed in; callers now assign the return value instead.
+  - fix lib/mb.pm: all six call sites of _open_r() and _open_w() updated
+    to the new calling convention.
+  - fix t/4006_mb_getc.t: replace six open(my $fh,...) with SKIP-guard
+    with bareword filehandle form (FILE41-FILE43, FILE51-FILE53).
+
 0.61  2026-04-03 JST (Japan Standard Time)
   - fix t/9050-pod.t: skip G11 Pod::Checker errors check when
     Pod::Checker < 1.51 to avoid false FAILs caused by mis-reported

@@ -12,7 +12,7 @@ use Plack::Util::Accessor qw( logger status clean );
 
 use experimental qw( signatures );
 
-our $VERSION = 'v1.3.0';
+our $VERSION = 'v1.3.1';
 
 
 sub prepare_app($self) {
@@ -83,7 +83,7 @@ Plack::Middleware::BlockHeaderInjection - block header injections in responses
 
 =head1 VERSION
 
-version v1.3.0
+version v1.3.1
 
 =head1 SYNOPSIS
 
@@ -136,6 +136,8 @@ Future releases may only support Perl versions released in the last ten years.
 =head1 SEE ALSO
 
 L<https://en.wikipedia.org/wiki/HTTP_header_injection>
+
+L<Plack::Middleware::Lint>
 
 =head1 SOURCE
 

@@ -18,12 +18,19 @@ my @files = (
     't/LWP/ConsoleLogger/environment-variable-log-file.t',
     't/LWP/ConsoleLogger/post-with-json.t',
     't/LWP/ConsoleLogger/post.t',
+    't/decode-header-value.t',
+    't/everywhere-logfile-child.pl',
+    't/everywhere-logfile.t',
     't/pretty.t',
     't/test-data/content-regex.html',
     't/test-data/file-upload.html',
     't/test-data/foo.html',
     't/test-data/unicode.html',
-    't/unicode.t'
+    't/test-data/wide-cjk.html',
+    't/unicode.t',
+    't/utf8-cookies.t',
+    't/utf8-headers.t',
+    't/wide-chars.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

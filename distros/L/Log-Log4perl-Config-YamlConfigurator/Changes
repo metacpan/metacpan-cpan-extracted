@@ -1,18 +1,33 @@
 Release history for Log-Log4perl-Config-YamlConfigurator
 
-1.0.3     2026-02-02
+v1.2.0    2026-05-13
+          - Implement external variable substitution
+
+v1.1.1    2026-05-06
+          - Improve documentation
+          - Update project boilerplate
+
+v1.1.0    2026-05-05
+          - Implement environment variable substitution
+          - Add perl critic test script
+
+v1.0.4    2026-05-03
+          - Prefix tags in changes file
+          - Load Log::Log4perl::Config and YAML::PP lazily
+
+v1.0.3    2026-02-02
           - Remove GitHub CI/CD workflow
           - Remove author extensions
           - Migrated to Codeberg
 
-1.0.2     2024-10-11
+v1.0.2    2024-10-11
           - Update author extensions
           - Setup CI workflow that is based on the GitHub project
             PerlToolsTeam/github_workflows
           - Improve dependencies setup in cpanfile
           - Improve INSTALLATION section in README
 
-1.0.1     2024-09-04
+v1.0.1    2024-09-04
           - Improve project setup
           - Remove leading "v" from dotted decimal version
           - Use Beam-Wire $config key to load logging data

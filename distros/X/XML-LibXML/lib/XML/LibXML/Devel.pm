@@ -11,14 +11,11 @@ use warnings;
 
 use XML::LibXML;
 
-use vars qw ($VERSION);
-$VERSION = "2.0210"; # VERSION TEMPLATE: DO NOT CHANGE
+our $VERSION = "2.0213"; # VERSION TEMPLATE: DO NOT CHANGE
 
 use 5.008_000;
 
 use parent qw(Exporter);
-
-use vars qw( @EXPORT @EXPORT_OK %EXPORT_TAGS );
 
 # This allows declaration	use XML::LibXML::Devel ':all';
 # If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
@@ -30,8 +27,12 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
   refcnt_dec
   refcnt
   fix_owner
-  mem_used
 ) ] );
+
+# mem_used is only compiled in when the installed libxml2 supports the
+# legacy memory-tracking API (removed in 2.14, deprecated by Apple SDKs).
+push @{ $EXPORT_TAGS{'all'} }, 'mem_used'
+  if defined &XML::LibXML::Devel::mem_used;
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 

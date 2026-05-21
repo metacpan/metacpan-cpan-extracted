@@ -1,4 +1,25 @@
 Revision history for Log-Dispatch-UDP
 
-0.01 February 25 2012
-     - Initial release.  You can log stuff to a UDP socket.
+0.02      2026-05-21 12:58:22+01:00 Europe/London
+  [Documentation]
+  - New maintainer is Robert Rothenberg <perl@rhizomnic.com>
+  - Updated copyright year
+  - Reformatted Changes to follow the Changes spec
+  - Added a security policy
+  - Added a SECURITY CONSIDERATIONS section
+  - Added doap.xml metadata
+
+  [Bug Fixes]
+  - Remove unused code
+
+  [Security]
+  - Increases the minimum versions of some prerequisites
+
+  [Tests]
+  - Added author tests.
+
+  [Toolchain]
+  - Changes to the Dist::Zilla configuration
+
+0.01 2012-02-25
+  - Initial release.  You can log stuff to a UDP socket.

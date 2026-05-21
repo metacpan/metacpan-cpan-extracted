@@ -84,7 +84,7 @@ Version 0.69
 
 # We'll have 1.x versions only after minfree() has a baseline implementation.
 # Please run perl Makefile.PL after changing the version here.
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
 POSIX::setlocale(&POSIX::LC_ALL, 'C');
 $ENV{PATH} = '/usr/bin:/bin';
@@ -1140,11 +1140,6 @@ sub unpack
 		  # normal case: mime helper placed all 
 		  # in a directory (or file) called $unpacked
 
-
-		  if ($archive =~ m{^\Q$self->{destdir}\E})
-		    {
-		      # to delete it, we should know if it was created during unpack.
-		    }
 		  $self->{done}{$archive} = $unpacked;
 		  $data->{cmd} = $h->{fmt_p};
 		  $data->{unpacked} = $self->loggable_pathname($unpacked);
@@ -1168,6 +1163,14 @@ sub unpack
 		    }
                   $self->{progress_tstamp} = time;
 		  $self->{inside_archives}--;
+
+		  # If the archive was an intermediate file created inside destdir
+		  # (e.g. foo.tar produced by unpacking foo.tar.gz), remove it now
+		  # that its contents have been recursively unpacked.
+		  if ($archive =~ m{^\Q$self->{destdir}\E} and -f $archive and !-l $archive)
+		    {
+		      unlink $archive;
+		    }
 		}
 	    }
 	}

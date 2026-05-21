@@ -49,9 +49,21 @@ static void shm_rdunlock_cleanup(pTHX_ void *ptr) {
     if (_vlen > SHM_MAX_STR_LEN) croak("value too long (max 2GB)"); \
     bool _vutf8 = SvUTF8(sv) ? true : false
 
+#define EXTRACT_STR_EXPECTED(esv) \
+    STRLEN _elen; \
+    const char* _estr = SvPV(esv, _elen); \
+    if (_elen > SHM_MAX_STR_LEN) croak("expected value too long (max 2GB)")
+
+#define EXTRACT_STR_EXPECTED_DESIRED(esv, dsv) \
+    EXTRACT_STR_EXPECTED(esv); \
+    STRLEN _dlen; \
+    const char* _dstr = SvPV(dsv, _dlen); \
+    if (_dlen > SHM_MAX_STR_LEN) croak("desired value too long (max 2GB)"); \
+    bool _dutf8 = SvUTF8(dsv) ? true : false
+
 #define REQUIRE_TTL(h) \
     { ShmHandle *_th = (h)->shard_handles ? (h)->shard_handles[0] : (h); \
-      if (!_th->expires_at) croak("put_ttl requires a TTL-enabled map (pass ttl > 0 to constructor)"); }
+      if (!_th->expires_at) croak("operation requires a TTL-enabled map (pass ttl > 0 to constructor)"); }
 
 #define EXTRACT_CURSOR(classname, sv) \
     if (!sv_isobject(sv) || !sv_derived_from(sv, classname)) \
@@ -194,9 +206,12 @@ DEFINE_KW_HOOK(i16, "I16", stat_recoveries,    1, build_kw_1arg)
 DEFINE_KW_HOOK(i16, "I16", arena_used,       1, build_kw_1arg)
 DEFINE_KW_HOOK(i16, "I16", arena_cap,        1, build_kw_1arg)
 DEFINE_KW_HOOK(i16, "I16", add,              3, build_kw_3arg)
+DEFINE_KW_HOOK(i16, "I16", add_ttl,          4, build_kw_4arg)
+DEFINE_KW_HOOK(i16, "I16", update_ttl,       4, build_kw_4arg)
 DEFINE_KW_HOOK(i16, "I16", update,           3, build_kw_3arg)
 DEFINE_KW_HOOK(i16, "I16", swap,             3, build_kw_3arg)
 DEFINE_KW_HOOK(i16, "I16", cas,             4, build_kw_4arg)
+DEFINE_KW_HOOK(i16, "I16", cas_take,         3, build_kw_3arg)
 DEFINE_KW_HOOK(i16, "I16", persist,         2, build_kw_2arg)
 DEFINE_KW_HOOK(i16, "I16", set_ttl,         3, build_kw_3arg)
 
@@ -243,9 +258,12 @@ DEFINE_KW_HOOK(i32, "I32", stat_recoveries,    1, build_kw_1arg)
 DEFINE_KW_HOOK(i32, "I32", arena_used,       1, build_kw_1arg)
 DEFINE_KW_HOOK(i32, "I32", arena_cap,        1, build_kw_1arg)
 DEFINE_KW_HOOK(i32, "I32", add,              3, build_kw_3arg)
+DEFINE_KW_HOOK(i32, "I32", add_ttl,          4, build_kw_4arg)
+DEFINE_KW_HOOK(i32, "I32", update_ttl,       4, build_kw_4arg)
 DEFINE_KW_HOOK(i32, "I32", update,           3, build_kw_3arg)
 DEFINE_KW_HOOK(i32, "I32", swap,             3, build_kw_3arg)
 DEFINE_KW_HOOK(i32, "I32", cas,             4, build_kw_4arg)
+DEFINE_KW_HOOK(i32, "I32", cas_take,         3, build_kw_3arg)
 DEFINE_KW_HOOK(i32, "I32", persist,         2, build_kw_2arg)
 DEFINE_KW_HOOK(i32, "I32", set_ttl,         3, build_kw_3arg)
 
@@ -292,9 +310,12 @@ DEFINE_KW_HOOK(ii, "II", stat_recoveries,    1, build_kw_1arg)
 DEFINE_KW_HOOK(ii, "II", arena_used,       1, build_kw_1arg)
 DEFINE_KW_HOOK(ii, "II", arena_cap,        1, build_kw_1arg)
 DEFINE_KW_HOOK(ii, "II", add,              3, build_kw_3arg)
+DEFINE_KW_HOOK(ii, "II", add_ttl,          4, build_kw_4arg)
+DEFINE_KW_HOOK(ii, "II", update_ttl,       4, build_kw_4arg)
 DEFINE_KW_HOOK(ii, "II", update,           3, build_kw_3arg)
 DEFINE_KW_HOOK(ii, "II", swap,             3, build_kw_3arg)
 DEFINE_KW_HOOK(ii, "II", cas,             4, build_kw_4arg)
+DEFINE_KW_HOOK(ii, "II", cas_take,         3, build_kw_3arg)
 DEFINE_KW_HOOK(ii, "II", persist,         2, build_kw_2arg)
 DEFINE_KW_HOOK(ii, "II", set_ttl,         3, build_kw_3arg)
 
@@ -338,8 +359,12 @@ DEFINE_KW_HOOK(i16s, "I16S", stat_recoveries,    1, build_kw_1arg)
 DEFINE_KW_HOOK(i16s, "I16S", arena_used,       1, build_kw_1arg)
 DEFINE_KW_HOOK(i16s, "I16S", arena_cap,        1, build_kw_1arg)
 DEFINE_KW_HOOK(i16s, "I16S", add,              3, build_kw_3arg)
+DEFINE_KW_HOOK(i16s, "I16S", add_ttl,          4, build_kw_4arg)
+DEFINE_KW_HOOK(i16s, "I16S", update_ttl,       4, build_kw_4arg)
 DEFINE_KW_HOOK(i16s, "I16S", update,           3, build_kw_3arg)
 DEFINE_KW_HOOK(i16s, "I16S", swap,             3, build_kw_3arg)
+DEFINE_KW_HOOK(i16s, "I16S", cas,              4, build_kw_4arg)
+DEFINE_KW_HOOK(i16s, "I16S", cas_take,         3, build_kw_3arg)
 DEFINE_KW_HOOK(i16s, "I16S", persist,         2, build_kw_2arg)
 DEFINE_KW_HOOK(i16s, "I16S", set_ttl,         3, build_kw_3arg)
 
@@ -383,8 +408,12 @@ DEFINE_KW_HOOK(i32s, "I32S", stat_recoveries,    1, build_kw_1arg)
 DEFINE_KW_HOOK(i32s, "I32S", arena_used,       1, build_kw_1arg)
 DEFINE_KW_HOOK(i32s, "I32S", arena_cap,        1, build_kw_1arg)
 DEFINE_KW_HOOK(i32s, "I32S", add,              3, build_kw_3arg)
+DEFINE_KW_HOOK(i32s, "I32S", add_ttl,          4, build_kw_4arg)
+DEFINE_KW_HOOK(i32s, "I32S", update_ttl,       4, build_kw_4arg)
 DEFINE_KW_HOOK(i32s, "I32S", update,           3, build_kw_3arg)
 DEFINE_KW_HOOK(i32s, "I32S", swap,             3, build_kw_3arg)
+DEFINE_KW_HOOK(i32s, "I32S", cas,              4, build_kw_4arg)
+DEFINE_KW_HOOK(i32s, "I32S", cas_take,         3, build_kw_3arg)
 DEFINE_KW_HOOK(i32s, "I32S", persist,         2, build_kw_2arg)
 DEFINE_KW_HOOK(i32s, "I32S", set_ttl,         3, build_kw_3arg)
 
@@ -428,8 +457,12 @@ DEFINE_KW_HOOK(is, "IS", stat_recoveries,    1, build_kw_1arg)
 DEFINE_KW_HOOK(is, "IS", arena_used,       1, build_kw_1arg)
 DEFINE_KW_HOOK(is, "IS", arena_cap,        1, build_kw_1arg)
 DEFINE_KW_HOOK(is, "IS", add,              3, build_kw_3arg)
+DEFINE_KW_HOOK(is, "IS", add_ttl,          4, build_kw_4arg)
+DEFINE_KW_HOOK(is, "IS", update_ttl,       4, build_kw_4arg)
 DEFINE_KW_HOOK(is, "IS", update,           3, build_kw_3arg)
 DEFINE_KW_HOOK(is, "IS", swap,             3, build_kw_3arg)
+DEFINE_KW_HOOK(is, "IS", cas,              4, build_kw_4arg)
+DEFINE_KW_HOOK(is, "IS", cas_take,         3, build_kw_3arg)
 DEFINE_KW_HOOK(is, "IS", persist,         2, build_kw_2arg)
 DEFINE_KW_HOOK(is, "IS", set_ttl,         3, build_kw_3arg)
 
@@ -476,9 +509,12 @@ DEFINE_KW_HOOK(si16, "SI16", stat_recoveries,    1, build_kw_1arg)
 DEFINE_KW_HOOK(si16, "SI16", arena_used,       1, build_kw_1arg)
 DEFINE_KW_HOOK(si16, "SI16", arena_cap,        1, build_kw_1arg)
 DEFINE_KW_HOOK(si16, "SI16", add,              3, build_kw_3arg)
+DEFINE_KW_HOOK(si16, "SI16", add_ttl,          4, build_kw_4arg)
+DEFINE_KW_HOOK(si16, "SI16", update_ttl,       4, build_kw_4arg)
 DEFINE_KW_HOOK(si16, "SI16", update,           3, build_kw_3arg)
 DEFINE_KW_HOOK(si16, "SI16", swap,             3, build_kw_3arg)
 DEFINE_KW_HOOK(si16, "SI16", cas,             4, build_kw_4arg)
+DEFINE_KW_HOOK(si16, "SI16", cas_take,         3, build_kw_3arg)
 DEFINE_KW_HOOK(si16, "SI16", persist,         2, build_kw_2arg)
 DEFINE_KW_HOOK(si16, "SI16", set_ttl,         3, build_kw_3arg)
 
@@ -525,9 +561,12 @@ DEFINE_KW_HOOK(si32, "SI32", stat_recoveries,    1, build_kw_1arg)
 DEFINE_KW_HOOK(si32, "SI32", arena_used,       1, build_kw_1arg)
 DEFINE_KW_HOOK(si32, "SI32", arena_cap,        1, build_kw_1arg)
 DEFINE_KW_HOOK(si32, "SI32", add,              3, build_kw_3arg)
+DEFINE_KW_HOOK(si32, "SI32", add_ttl,          4, build_kw_4arg)
+DEFINE_KW_HOOK(si32, "SI32", update_ttl,       4, build_kw_4arg)
 DEFINE_KW_HOOK(si32, "SI32", update,           3, build_kw_3arg)
 DEFINE_KW_HOOK(si32, "SI32", swap,             3, build_kw_3arg)
 DEFINE_KW_HOOK(si32, "SI32", cas,             4, build_kw_4arg)
+DEFINE_KW_HOOK(si32, "SI32", cas_take,         3, build_kw_3arg)
 DEFINE_KW_HOOK(si32, "SI32", persist,         2, build_kw_2arg)
 DEFINE_KW_HOOK(si32, "SI32", set_ttl,         3, build_kw_3arg)
 
@@ -574,9 +613,12 @@ DEFINE_KW_HOOK(si, "SI", stat_recoveries,    1, build_kw_1arg)
 DEFINE_KW_HOOK(si, "SI", arena_used,       1, build_kw_1arg)
 DEFINE_KW_HOOK(si, "SI", arena_cap,        1, build_kw_1arg)
 DEFINE_KW_HOOK(si, "SI", add,              3, build_kw_3arg)
+DEFINE_KW_HOOK(si, "SI", add_ttl,          4, build_kw_4arg)
+DEFINE_KW_HOOK(si, "SI", update_ttl,       4, build_kw_4arg)
 DEFINE_KW_HOOK(si, "SI", update,           3, build_kw_3arg)
 DEFINE_KW_HOOK(si, "SI", swap,             3, build_kw_3arg)
 DEFINE_KW_HOOK(si, "SI", cas,             4, build_kw_4arg)
+DEFINE_KW_HOOK(si, "SI", cas_take,         3, build_kw_3arg)
 DEFINE_KW_HOOK(si, "SI", persist,         2, build_kw_2arg)
 DEFINE_KW_HOOK(si, "SI", set_ttl,         3, build_kw_3arg)
 
@@ -620,8 +662,12 @@ DEFINE_KW_HOOK(ss, "SS", stat_recoveries,    1, build_kw_1arg)
 DEFINE_KW_HOOK(ss, "SS", arena_used,       1, build_kw_1arg)
 DEFINE_KW_HOOK(ss, "SS", arena_cap,        1, build_kw_1arg)
 DEFINE_KW_HOOK(ss, "SS", add,              3, build_kw_3arg)
+DEFINE_KW_HOOK(ss, "SS", add_ttl,          4, build_kw_4arg)
+DEFINE_KW_HOOK(ss, "SS", update_ttl,       4, build_kw_4arg)
 DEFINE_KW_HOOK(ss, "SS", update,           3, build_kw_3arg)
 DEFINE_KW_HOOK(ss, "SS", swap,             3, build_kw_3arg)
+DEFINE_KW_HOOK(ss, "SS", cas,              4, build_kw_4arg)
+DEFINE_KW_HOOK(ss, "SS", cas_take,         3, build_kw_3arg)
 DEFINE_KW_HOOK(ss, "SS", persist,         2, build_kw_2arg)
 DEFINE_KW_HOOK(ss, "SS", set_ttl,         3, build_kw_3arg)
 
@@ -685,9 +731,12 @@ BOOT:
     REGISTER_KW(i16, arena_used,       "Data::HashMap::Shared::I16::arena_used");
     REGISTER_KW(i16, arena_cap,        "Data::HashMap::Shared::I16::arena_cap");
     REGISTER_KW(i16, add,              "Data::HashMap::Shared::I16::add");
+    REGISTER_KW(i16, add_ttl,          "Data::HashMap::Shared::I16::add_ttl");
+    REGISTER_KW(i16, update_ttl,       "Data::HashMap::Shared::I16::update_ttl");
     REGISTER_KW(i16, update,           "Data::HashMap::Shared::I16::update");
     REGISTER_KW(i16, swap,             "Data::HashMap::Shared::I16::swap");
     REGISTER_KW(i16, cas,             "Data::HashMap::Shared::I16::cas");
+    REGISTER_KW(i16, cas_take,         "Data::HashMap::Shared::I16::cas_take");
     REGISTER_KW(i16, persist,         "Data::HashMap::Shared::I16::persist");
     REGISTER_KW(i16, set_ttl,         "Data::HashMap::Shared::I16::set_ttl");
     REGISTER_KW(i32, put,         "Data::HashMap::Shared::I32::put");
@@ -732,9 +781,12 @@ BOOT:
     REGISTER_KW(i32, arena_used,       "Data::HashMap::Shared::I32::arena_used");
     REGISTER_KW(i32, arena_cap,        "Data::HashMap::Shared::I32::arena_cap");
     REGISTER_KW(i32, add,              "Data::HashMap::Shared::I32::add");
+    REGISTER_KW(i32, add_ttl,          "Data::HashMap::Shared::I32::add_ttl");
+    REGISTER_KW(i32, update_ttl,       "Data::HashMap::Shared::I32::update_ttl");
     REGISTER_KW(i32, update,           "Data::HashMap::Shared::I32::update");
     REGISTER_KW(i32, swap,             "Data::HashMap::Shared::I32::swap");
     REGISTER_KW(i32, cas,             "Data::HashMap::Shared::I32::cas");
+    REGISTER_KW(i32, cas_take,         "Data::HashMap::Shared::I32::cas_take");
     REGISTER_KW(i32, persist,         "Data::HashMap::Shared::I32::persist");
     REGISTER_KW(i32, set_ttl,         "Data::HashMap::Shared::I32::set_ttl");
     REGISTER_KW(ii, put,         "Data::HashMap::Shared::II::put");
@@ -779,9 +831,12 @@ BOOT:
     REGISTER_KW(ii, arena_used,       "Data::HashMap::Shared::II::arena_used");
     REGISTER_KW(ii, arena_cap,        "Data::HashMap::Shared::II::arena_cap");
     REGISTER_KW(ii, add,              "Data::HashMap::Shared::II::add");
+    REGISTER_KW(ii, add_ttl,          "Data::HashMap::Shared::II::add_ttl");
+    REGISTER_KW(ii, update_ttl,       "Data::HashMap::Shared::II::update_ttl");
     REGISTER_KW(ii, update,           "Data::HashMap::Shared::II::update");
     REGISTER_KW(ii, swap,             "Data::HashMap::Shared::II::swap");
     REGISTER_KW(ii, cas,             "Data::HashMap::Shared::II::cas");
+    REGISTER_KW(ii, cas_take,         "Data::HashMap::Shared::II::cas_take");
     REGISTER_KW(ii, persist,         "Data::HashMap::Shared::II::persist");
     REGISTER_KW(ii, set_ttl,         "Data::HashMap::Shared::II::set_ttl");
     REGISTER_KW(i16s, put,         "Data::HashMap::Shared::I16S::put");
@@ -823,8 +878,12 @@ BOOT:
     REGISTER_KW(i16s, arena_used,       "Data::HashMap::Shared::I16S::arena_used");
     REGISTER_KW(i16s, arena_cap,        "Data::HashMap::Shared::I16S::arena_cap");
     REGISTER_KW(i16s, add,              "Data::HashMap::Shared::I16S::add");
+    REGISTER_KW(i16s, add_ttl,          "Data::HashMap::Shared::I16S::add_ttl");
+    REGISTER_KW(i16s, update_ttl,       "Data::HashMap::Shared::I16S::update_ttl");
     REGISTER_KW(i16s, update,           "Data::HashMap::Shared::I16S::update");
     REGISTER_KW(i16s, swap,             "Data::HashMap::Shared::I16S::swap");
+    REGISTER_KW(i16s, cas,              "Data::HashMap::Shared::I16S::cas");
+    REGISTER_KW(i16s, cas_take,         "Data::HashMap::Shared::I16S::cas_take");
     REGISTER_KW(i16s, persist,         "Data::HashMap::Shared::I16S::persist");
     REGISTER_KW(i16s, set_ttl,         "Data::HashMap::Shared::I16S::set_ttl");
     REGISTER_KW(i32s, put,         "Data::HashMap::Shared::I32S::put");
@@ -866,8 +925,12 @@ BOOT:
     REGISTER_KW(i32s, arena_used,       "Data::HashMap::Shared::I32S::arena_used");
     REGISTER_KW(i32s, arena_cap,        "Data::HashMap::Shared::I32S::arena_cap");
     REGISTER_KW(i32s, add,              "Data::HashMap::Shared::I32S::add");
+    REGISTER_KW(i32s, add_ttl,          "Data::HashMap::Shared::I32S::add_ttl");
+    REGISTER_KW(i32s, update_ttl,       "Data::HashMap::Shared::I32S::update_ttl");
     REGISTER_KW(i32s, update,           "Data::HashMap::Shared::I32S::update");
     REGISTER_KW(i32s, swap,             "Data::HashMap::Shared::I32S::swap");
+    REGISTER_KW(i32s, cas,              "Data::HashMap::Shared::I32S::cas");
+    REGISTER_KW(i32s, cas_take,         "Data::HashMap::Shared::I32S::cas_take");
     REGISTER_KW(i32s, persist,         "Data::HashMap::Shared::I32S::persist");
     REGISTER_KW(i32s, set_ttl,         "Data::HashMap::Shared::I32S::set_ttl");
     REGISTER_KW(is, put,         "Data::HashMap::Shared::IS::put");
@@ -909,8 +972,12 @@ BOOT:
     REGISTER_KW(is, arena_used,       "Data::HashMap::Shared::IS::arena_used");
     REGISTER_KW(is, arena_cap,        "Data::HashMap::Shared::IS::arena_cap");
     REGISTER_KW(is, add,              "Data::HashMap::Shared::IS::add");
+    REGISTER_KW(is, add_ttl,          "Data::HashMap::Shared::IS::add_ttl");
+    REGISTER_KW(is, update_ttl,       "Data::HashMap::Shared::IS::update_ttl");
     REGISTER_KW(is, update,           "Data::HashMap::Shared::IS::update");
     REGISTER_KW(is, swap,             "Data::HashMap::Shared::IS::swap");
+    REGISTER_KW(is, cas,              "Data::HashMap::Shared::IS::cas");
+    REGISTER_KW(is, cas_take,         "Data::HashMap::Shared::IS::cas_take");
     REGISTER_KW(is, persist,         "Data::HashMap::Shared::IS::persist");
     REGISTER_KW(is, set_ttl,         "Data::HashMap::Shared::IS::set_ttl");
     REGISTER_KW(si16, put,         "Data::HashMap::Shared::SI16::put");
@@ -955,9 +1022,12 @@ BOOT:
     REGISTER_KW(si16, arena_used,       "Data::HashMap::Shared::SI16::arena_used");
     REGISTER_KW(si16, arena_cap,        "Data::HashMap::Shared::SI16::arena_cap");
     REGISTER_KW(si16, add,              "Data::HashMap::Shared::SI16::add");
+    REGISTER_KW(si16, add_ttl,          "Data::HashMap::Shared::SI16::add_ttl");
+    REGISTER_KW(si16, update_ttl,       "Data::HashMap::Shared::SI16::update_ttl");
     REGISTER_KW(si16, update,           "Data::HashMap::Shared::SI16::update");
     REGISTER_KW(si16, swap,             "Data::HashMap::Shared::SI16::swap");
     REGISTER_KW(si16, cas,             "Data::HashMap::Shared::SI16::cas");
+    REGISTER_KW(si16, cas_take,         "Data::HashMap::Shared::SI16::cas_take");
     REGISTER_KW(si16, persist,         "Data::HashMap::Shared::SI16::persist");
     REGISTER_KW(si16, set_ttl,         "Data::HashMap::Shared::SI16::set_ttl");
     REGISTER_KW(si32, put,         "Data::HashMap::Shared::SI32::put");
@@ -1002,9 +1072,12 @@ BOOT:
     REGISTER_KW(si32, arena_used,       "Data::HashMap::Shared::SI32::arena_used");
     REGISTER_KW(si32, arena_cap,        "Data::HashMap::Shared::SI32::arena_cap");
     REGISTER_KW(si32, add,              "Data::HashMap::Shared::SI32::add");
+    REGISTER_KW(si32, add_ttl,          "Data::HashMap::Shared::SI32::add_ttl");
+    REGISTER_KW(si32, update_ttl,       "Data::HashMap::Shared::SI32::update_ttl");
     REGISTER_KW(si32, update,           "Data::HashMap::Shared::SI32::update");
     REGISTER_KW(si32, swap,             "Data::HashMap::Shared::SI32::swap");
     REGISTER_KW(si32, cas,             "Data::HashMap::Shared::SI32::cas");
+    REGISTER_KW(si32, cas_take,         "Data::HashMap::Shared::SI32::cas_take");
     REGISTER_KW(si32, persist,         "Data::HashMap::Shared::SI32::persist");
     REGISTER_KW(si32, set_ttl,         "Data::HashMap::Shared::SI32::set_ttl");
     REGISTER_KW(si, put,         "Data::HashMap::Shared::SI::put");
@@ -1049,9 +1122,12 @@ BOOT:
     REGISTER_KW(si, arena_used,       "Data::HashMap::Shared::SI::arena_used");
     REGISTER_KW(si, arena_cap,        "Data::HashMap::Shared::SI::arena_cap");
     REGISTER_KW(si, add,              "Data::HashMap::Shared::SI::add");
+    REGISTER_KW(si, add_ttl,          "Data::HashMap::Shared::SI::add_ttl");
+    REGISTER_KW(si, update_ttl,       "Data::HashMap::Shared::SI::update_ttl");
     REGISTER_KW(si, update,           "Data::HashMap::Shared::SI::update");
     REGISTER_KW(si, swap,             "Data::HashMap::Shared::SI::swap");
     REGISTER_KW(si, cas,             "Data::HashMap::Shared::SI::cas");
+    REGISTER_KW(si, cas_take,         "Data::HashMap::Shared::SI::cas_take");
     REGISTER_KW(si, persist,         "Data::HashMap::Shared::SI::persist");
     REGISTER_KW(si, set_ttl,         "Data::HashMap::Shared::SI::set_ttl");
     REGISTER_KW(ss, put,         "Data::HashMap::Shared::SS::put");
@@ -1093,8 +1169,12 @@ BOOT:
     REGISTER_KW(ss, arena_used,       "Data::HashMap::Shared::SS::arena_used");
     REGISTER_KW(ss, arena_cap,        "Data::HashMap::Shared::SS::arena_cap");
     REGISTER_KW(ss, add,              "Data::HashMap::Shared::SS::add");
+    REGISTER_KW(ss, add_ttl,          "Data::HashMap::Shared::SS::add_ttl");
+    REGISTER_KW(ss, update_ttl,       "Data::HashMap::Shared::SS::update_ttl");
     REGISTER_KW(ss, update,           "Data::HashMap::Shared::SS::update");
     REGISTER_KW(ss, swap,             "Data::HashMap::Shared::SS::swap");
+    REGISTER_KW(ss, cas,              "Data::HashMap::Shared::SS::cas");
+    REGISTER_KW(ss, cas_take,         "Data::HashMap::Shared::SS::cas_take");
     REGISTER_KW(ss, persist,         "Data::HashMap::Shared::SS::persist");
     REGISTER_KW(ss, set_ttl,         "Data::HashMap::Shared::SS::set_ttl");
 

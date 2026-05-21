@@ -17,6 +17,25 @@ typedef struct {
     int *is_freed_ptr;
 } parallel_ctx;
 
+/* Guard registered with SAVEDESTRUCTOR_X so that, on any unwind (including
+   uncaught croak from unsafe-mode tasks), we clear ctx->is_freed_ptr and free
+   the heap-allocated is_freed flag. Prevents writes to a dead stack slot when
+   async tasks complete after the XSUB has unwound. */
+typedef struct {
+    int **target_field; /* &ctx->is_freed_ptr */
+    int *is_freed;
+} ifp_guard;
+
+static void ifp_guard_destroy(pTHX_ void *p) {
+    ifp_guard *g = (ifp_guard *)p;
+    if (!*(g->is_freed)) {
+        /* cleanup didn't run — ctx still alive, safe to clear field */
+        *(g->target_field) = NULL;
+    }
+    Safefree(g->is_freed);
+    Safefree(g);
+}
+
 typedef struct {
     AV *tasks;
     SV *final_cb;
@@ -45,6 +64,16 @@ typedef struct {
     CV *shared_cv;
     int *is_freed_ptr;
 } plimit_ctx;
+
+typedef struct {
+    AV *tasks;
+    SV *final_cb;
+    int settled;
+    CV **cvs;
+    I32 num_cvs;
+    CV *shared_cv;
+    int *is_freed_ptr;
+} race_ctx;
 
 static void parallel_cleanup(pTHX_ parallel_ctx **ctx_ptr) {
     if (!ctx_ptr || !*ctx_ptr) return;
@@ -426,6 +455,74 @@ done:
     }
 }
 
+static void race_cleanup(pTHX_ race_ctx **ctx_ptr) {
+    if (!ctx_ptr || !*ctx_ptr) return;
+    race_ctx *ctx = *ctx_ptr;
+    *ctx_ptr = NULL;
+
+    if (ctx->is_freed_ptr) {
+        *(ctx->is_freed_ptr) = 1;
+    }
+
+    if (ctx->shared_cv) {
+        CvXSUBANY(ctx->shared_cv).any_ptr = NULL;
+        SvREFCNT_dec((SV*)ctx->shared_cv);
+    }
+    if (ctx->cvs) {
+        I32 i;
+        for (i = 0; i < ctx->num_cvs; i++) {
+            if (ctx->cvs[i]) {
+                CvXSUBANY(ctx->cvs[i]).any_ptr = NULL;
+                SvREFCNT_dec((SV*)ctx->cvs[i]);
+            }
+        }
+        Safefree(ctx->cvs);
+    }
+    if (ctx->tasks) SvREFCNT_dec((SV*)ctx->tasks);
+    if (ctx->final_cb) SvREFCNT_dec(ctx->final_cb);
+    Safefree(ctx);
+}
+
+static void race_task_done(pTHX_ CV *cv) {
+    dXSARGS;
+    SvREFCNT_inc_simple_void(cv);
+    sv_2mortal((SV*)cv);
+    race_ctx *ctx = (race_ctx *)CvXSUBANY(cv).any_ptr;
+    if (!ctx || ctx->settled) {
+        XSRETURN_EMPTY;
+    }
+    ctx->settled = 1;
+
+    if (ctx->cvs) {
+        CvXSUBANY(cv).any_ptr = NULL;
+    }
+
+    SV *cb = ctx->final_cb;
+    if (IS_PVCV(cb)) {
+        dSP;
+        ENTER;
+        SAVETMPS;
+        SvREFCNT_inc(cb);
+        sv_2mortal(cb);
+
+        PUSHMARK(SP);
+        for (I32 i = 0; i < items; i++) {
+            XPUSHs(sv_mortalcopy(ST(i)));
+        }
+        PUTBACK;
+
+        race_cleanup(aTHX_ &ctx);
+
+        call_sv(cb, G_DISCARD | G_VOID);
+
+        FREETMPS;
+        LEAVE;
+    } else {
+        race_cleanup(aTHX_ &ctx);
+    }
+    XSRETURN_EMPTY;
+}
+
 MODULE = EV::Future		PACKAGE = EV::Future
 
 PROTOTYPES: DISABLE
@@ -456,16 +553,26 @@ parallel(tasks, final_cb, ...)
             return;
         }
 
-        int is_freed = 0;
+        ENTER;
+
+        int *is_freed;
+        Newxz(is_freed, 1, int);
+
         parallel_ctx *ctx;
         Newx(ctx, 1, parallel_ctx);
-        ctx->is_freed_ptr = &is_freed;
+        ctx->is_freed_ptr = is_freed;
         ctx->tasks = (AV*)SvREFCNT_inc((SV*)tasks);
         ctx->final_cb = SvREFCNT_inc(final_cb);
         ctx->remaining = len;
         ctx->cvs = NULL;
         ctx->num_cvs = 0;
         ctx->shared_cv = NULL;
+
+        ifp_guard *guard;
+        Newx(guard, 1, ifp_guard);
+        guard->target_field = &ctx->is_freed_ptr;
+        guard->is_freed = is_freed;
+        SAVEDESTRUCTOR_X(ifp_guard_destroy, guard);
 
         SV *done_rv = NULL;
         if (unsafe) {
@@ -483,7 +590,7 @@ parallel(tasks, final_cb, ...)
         U32 flags = G_DISCARD | (unsafe ? 0 : G_EVAL);
 
         for (i = 0; i < len; i++) {
-            if (is_freed) break;
+            if (*is_freed) break;
 
             SV **task_ary = (AvREAL(tasks) && !SvMAGICAL(tasks)) ? AvARRAY(tasks) : NULL;
             SV **fetch_ptr = (task_ary && i <= AvFILL(tasks))
@@ -509,17 +616,17 @@ parallel(tasks, final_cb, ...)
                 PUTBACK;
 
                 call_sv(task_sv, flags);
+                SPAGAIN;
                 if (!unsafe) {
-                    SPAGAIN;
                     if (SvTRUE(ERRSV)) {
                         SV *err = sv_mortalcopy(ERRSV);
-                        if (!is_freed) {
+                        if (!*is_freed) {
                             parallel_cleanup(aTHX_ &ctx);
                         }
                         croak_sv(err);
                     }
                 }
-                
+
                 FREETMPS;
                 LEAVE;
             } else {
@@ -543,9 +650,7 @@ parallel(tasks, final_cb, ...)
                 }
             }
         }
-        if (!is_freed && ctx) {
-            ctx->is_freed_ptr = NULL;
-        }
+        LEAVE;
 
 void
 series(tasks, final_cb, ...)
@@ -570,10 +675,14 @@ series(tasks, final_cb, ...)
             return;
         }
 
-        int is_freed = 0;
+        ENTER;
+
+        int *is_freed;
+        Newxz(is_freed, 1, int);
+
         series_ctx *ctx;
         Newx(ctx, 1, series_ctx);
-        ctx->is_freed_ptr = &is_freed;
+        ctx->is_freed_ptr = is_freed;
         ctx->tasks = (AV*)SvREFCNT_inc((SV*)tasks);
         ctx->final_cb = SvREFCNT_inc(final_cb);
         ctx->current_idx = 0;
@@ -583,10 +692,15 @@ series(tasks, final_cb, ...)
         ctx->unsafe = unsafe;
         ctx->current_cv = NULL;
 
+        ifp_guard *guard;
+        Newx(guard, 1, ifp_guard);
+        guard->target_field = &ctx->is_freed_ptr;
+        guard->is_freed = is_freed;
+        SAVEDESTRUCTOR_X(ifp_guard_destroy, guard);
+
         _series_next(aTHX_ &ctx);
-        if (!is_freed && ctx) {
-            ctx->is_freed_ptr = NULL;
-        }
+
+        LEAVE;
 
 void
 parallel_limit(tasks, limit, final_cb, ...)
@@ -615,10 +729,14 @@ parallel_limit(tasks, limit, final_cb, ...)
         if (limit < 1) limit = 1;
         if (limit > len) limit = len;
 
-        int is_freed = 0;
+        ENTER;
+
+        int *is_freed;
+        Newxz(is_freed, 1, int);
+
         plimit_ctx *ctx;
         Newx(ctx, 1, plimit_ctx);
-        ctx->is_freed_ptr = &is_freed;
+        ctx->is_freed_ptr = is_freed;
         ctx->tasks = (AV*)SvREFCNT_inc((SV*)tasks);
         ctx->final_cb = SvREFCNT_inc(final_cb);
         ctx->remaining = len;
@@ -633,6 +751,12 @@ parallel_limit(tasks, limit, final_cb, ...)
         ctx->num_cvs = 0;
         ctx->shared_cv = NULL;
 
+        ifp_guard *guard;
+        Newx(guard, 1, ifp_guard);
+        guard->target_field = &ctx->is_freed_ptr;
+        guard->is_freed = is_freed;
+        SAVEDESTRUCTOR_X(ifp_guard_destroy, guard);
+
         if (unsafe) {
             ctx->shared_cv = newXS(NULL, plimit_task_done, __FILE__);
             CvXSUBANY(ctx->shared_cv).any_ptr = ctx;
@@ -642,6 +766,126 @@ parallel_limit(tasks, limit, final_cb, ...)
         }
 
         _plimit_dispatch(aTHX_ &ctx);
-        if (!is_freed && ctx) {
-            ctx->is_freed_ptr = NULL;
+
+        LEAVE;
+
+void
+race(tasks, final_cb, ...)
+    AV *tasks
+    SV *final_cb
+    CODE:
+        int unsafe = 0;
+        if (items > 2 && SvTRUE(ST(2))) unsafe = 1;
+
+        I32 len = av_len(tasks) + 1;
+        if (len <= 0) {
+            if (IS_PVCV(final_cb)) {
+                dSP;
+                ENTER;
+                SAVETMPS;
+                PUSHMARK(SP);
+                PUTBACK;
+                call_sv(final_cb, G_DISCARD | G_VOID);
+                FREETMPS;
+                LEAVE;
+            }
+            return;
         }
+
+        ENTER;
+
+        int *is_freed;
+        Newxz(is_freed, 1, int);
+
+        race_ctx *ctx;
+        Newx(ctx, 1, race_ctx);
+        ctx->is_freed_ptr = is_freed;
+        ctx->tasks = (AV*)SvREFCNT_inc((SV*)tasks);
+        ctx->final_cb = SvREFCNT_inc(final_cb);
+        ctx->settled = 0;
+        ctx->cvs = NULL;
+        ctx->num_cvs = 0;
+        ctx->shared_cv = NULL;
+
+        ifp_guard *guard;
+        Newx(guard, 1, ifp_guard);
+        guard->target_field = &ctx->is_freed_ptr;
+        guard->is_freed = is_freed;
+        SAVEDESTRUCTOR_X(ifp_guard_destroy, guard);
+
+        SV *done_rv = NULL;
+        if (unsafe) {
+            ctx->shared_cv = newXS(NULL, race_task_done, __FILE__);
+            CvXSUBANY(ctx->shared_cv).any_ptr = ctx;
+            done_rv = sv_2mortal(newRV_inc((SV*)ctx->shared_cv));
+        } else {
+            ctx->num_cvs = len;
+            Newxz(ctx->cvs, len, CV*);
+        }
+
+        dSP;
+
+        I32 i;
+        U32 flags = G_DISCARD | (unsafe ? 0 : G_EVAL);
+
+        for (i = 0; i < len; i++) {
+            if (*is_freed || ctx->settled) break;
+
+            SV **task_ary = (AvREAL(tasks) && !SvMAGICAL(tasks)) ? AvARRAY(tasks) : NULL;
+            SV **fetch_ptr = (task_ary && i <= AvFILL(tasks))
+                ? &task_ary[i]
+                : av_fetch(tasks, i, 0);
+            SV *task_sv = fetch_ptr ? *fetch_ptr : NULL;
+
+            if (IS_PVCV(task_sv)) {
+                CV *cv = NULL;
+                if (!unsafe) {
+                    cv = newXS(NULL, race_task_done, __FILE__);
+                    CvXSUBANY(cv).any_ptr = ctx;
+                    ctx->cvs[i] = (CV*)SvREFCNT_inc((SV*)cv);
+                }
+
+                ENTER;
+                SAVETMPS;
+                if (!unsafe) {
+                    done_rv = sv_2mortal(newRV_noinc((SV*)cv));
+                }
+                PUSHMARK(SP);
+                XPUSHs(done_rv);
+                PUTBACK;
+
+                call_sv(task_sv, flags);
+                SPAGAIN;
+                if (!unsafe) {
+                    if (SvTRUE(ERRSV)) {
+                        SV *err = sv_mortalcopy(ERRSV);
+                        if (!*is_freed) {
+                            race_cleanup(aTHX_ &ctx);
+                        }
+                        croak_sv(err);
+                    }
+                }
+
+                FREETMPS;
+                LEAVE;
+            } else {
+                ctx->settled = 1;
+                SV *cb = ctx->final_cb;
+                if (IS_PVCV(cb)) {
+                    ENTER;
+                    SAVETMPS;
+                    SvREFCNT_inc(cb);
+                    sv_2mortal(cb);
+                    PUSHMARK(SP);
+                    PUTBACK;
+                    race_cleanup(aTHX_ &ctx);
+                    call_sv(cb, G_DISCARD | G_VOID);
+                    FREETMPS;
+                    LEAVE;
+                } else {
+                    race_cleanup(aTHX_ &ctx);
+                }
+                break;
+            }
+        }
+        LEAVE;

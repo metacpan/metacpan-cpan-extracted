@@ -97,6 +97,7 @@ my @files = (
     't/Common/iterator.t',
     't/Common/izip.t',
     't/Factory/construct_from_attrs.t',
+    't/Factory/construct_from_iterable.t',
     't/Permute.t',
     't/Role/Utils.t',
     't/lib/MyTest/Tests/May/Iter.pm',

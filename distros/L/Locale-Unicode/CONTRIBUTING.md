@@ -1,7 +1,7 @@
 ## How to contribute
  
 Thank you for considering contributing to this distribution.
-I welcome any contribution to Locale::Unicode, including, but not limited to bug reports, feature requests, general comments, and patches.
+I welcome any contribution to Locale::Unicode::Boolean, including, but not limited to bug reports, feature requests, general comments, and patches.
 
 Feel free to clone it from its gitlab repository at <https://gitlab.com/jackdeguest/Locale-Unicode> and issue a pull request.
 
@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://gitlab.com/jackde
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/Locale-Unicode-v0.3.11/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/Locale-Unicode-Boolean-v0.1.0/README.md)
 
 ## Author
 

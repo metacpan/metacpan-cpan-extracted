@@ -1,5 +1,8 @@
 Revision history for WWW::YaCyBlacklist
 
+0.9       2026-05-20 02:16:18+02:00 Europe/Berlin
+         parser check for incomplete patterns added
+
 0.8       2025-08-11 01:01:32+02:00 Europe/Berlin
          issue with nultiple calls of read_from_array( ) fixed
 

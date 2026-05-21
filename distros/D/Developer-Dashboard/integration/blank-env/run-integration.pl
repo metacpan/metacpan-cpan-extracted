@@ -9,7 +9,7 @@ use File::Path qw(make_path remove_tree);
 use File::Spec;
 use IO::Select;
 use IPC::Open3 qw(open3);
-use JSON::XS qw(decode_json);
+use JSON::XS qw(decode_json encode_json);
 use Symbol qw(gensym);
 use Time::HiRes qw(sleep time);
 
@@ -171,8 +171,8 @@ BOOKMARK
 
     _run_shell( 'init fake project git repo', 'git init ' . _shell_quote($project) );
 
-    my $install = _run_shell( 'cpanm install host-built tarball', 'cpanm ' . _shell_quote($install_tarball) );
-    _assert( $install->{exit_code} == 0, 'cpanm installed host-built distribution tarball' );
+    my $install = _run_shell( 'cpanm install host-built tarball', 'cpanm --notest ' . _shell_quote($install_tarball) );
+    _assert( $install->{exit_code} == 0, 'cpanm --notest installed host-built distribution tarball after the source-tree test gates passed' );
 
     my $bare = _run_shell( 'dashboard bare usage', 'dashboard', allow_fail => 1 );
     _assert( $bare->{exit_code} != 0, 'bare dashboard returns non-zero usage exit' );
@@ -188,8 +188,40 @@ BOOKMARK
     my $init_data = decode_json( $init->{stdout} );
     _assert_match( $init_data->{runtime_root} || '', qr/\.developer-dashboard/, 'dashboard init returns runtime root' );
     _assert( !grep { $_ eq 'welcome' } @{ $init_data->{pages} || [] }, 'dashboard init no longer seeds welcome page' );
-    _assert( grep { $_ eq 'api-dashboard' } @{ $init_data->{pages} || [] }, 'dashboard init seeds api-dashboard page' );
-    _assert( grep { $_ eq 'sql-dashboard' } @{ $init_data->{pages} || [] }, 'dashboard init seeds sql-dashboard page' );
+    my $reported_pages = encode_json( [ sort @{ $init_data->{pages} || [] } ] );
+    my $expected_pages = encode_json( [ 'legacy-ajax', 'legacy-ajax-stream', 'nav/alpha.tt', 'nav/beta.tt', 'project-home' ] );
+    _assert(
+        $reported_pages eq $expected_pages,
+        'dashboard init reports only the fake-project bookmark files that the integration fixture created instead of seeding extracted core starter dashboards',
+    );
+
+    my $legacy_flat_core  = File::Spec->catfile( $home, '.developer-dashboard', 'cli', '_dashboard-core' );
+    my $legacy_flat_shell = File::Spec->catfile( $home, '.developer-dashboard', 'cli', 'shell' );
+    _write_text(
+        $legacy_flat_core,
+        <<'PERL'
+#!/usr/bin/env perl
+# developer-dashboard-managed-helper: _dashboard-core
+print "legacy-core\n";
+PERL
+    );
+    chmod 0700, $legacy_flat_core or die "Unable to chmod $legacy_flat_core: $!";
+    _write_text(
+        $legacy_flat_shell,
+        <<'PERL'
+#!/usr/bin/env perl
+# developer-dashboard-managed-helper: shell
+print "legacy-shell\n";
+PERL
+    );
+    chmod 0700, $legacy_flat_shell or die "Unable to chmod $legacy_flat_shell: $!";
+
+    my $shell_bootstrap = _run_shell( 'dashboard shell bash', 'dashboard shell bash' );
+    _assert_match( $shell_bootstrap->{stdout}, qr/_dd_tmux_status_active/, 'dashboard shell bash emits the tmux ticket-session detection helper after install' );
+    _assert_match( $shell_bootstrap->{stdout}, qr/status-format\[0\].*tmux-status-top --width #\{client_width\}/s, 'dashboard shell bash emits the tmux status bootstrap after install' );
+    _assert_match( $shell_bootstrap->{stdout}, qr/ps1 --jobs \\j --mode compact --no-indicators/, 'dashboard shell bash suppresses prompt indicators when tmux owns the status line after install' );
+    _assert( !-e $legacy_flat_core, 'dashboard shell bash helper staging removes managed legacy flat _dashboard-core files after install' );
+    _assert( !-e $legacy_flat_shell, 'dashboard shell bash helper staging removes managed legacy flat shell wrappers after install' );
 
     make_path($update_root);
     _write_text(
@@ -492,7 +524,7 @@ JSON
 
     my $helper_page = _run_shell(
         'helper page after login',
-        'curl -fsS -b ' . _shell_quote($cookie) . ' http://' . $container_ip . ':7890/app/api-dashboard'
+        'curl -fsS -b ' . _shell_quote($cookie) . ' http://' . $container_ip . ':7890/'
     );
     _assert_match( $helper_page->{stdout}, qr/id="logout-url"/, 'helper page chrome renders logout link' );
 
@@ -506,7 +538,7 @@ JSON
     my $post_logout_users = _run_shell( 'dashboard auth list-users after logout', $project_cd . 'dashboard auth list-users' );
     _assert( $post_logout_users->{stdout} !~ /helper_login/, 'helper logout removes helper account from auth store' );
 
-    my $restart = _run_shell( 'dashboard restart', $project_cd . 'dashboard restart' );
+    my $restart = _run_shell( 'dashboard restart', $project_cd . 'dashboard restart -o json' );
     _assert_match( $restart->{stdout}, qr/"web_pid"\s*:/, 'dashboard restart returns structured lifecycle data' );
     _wait_for_http( 'http://127.0.0.1:7890/', 200 );
 
@@ -538,7 +570,7 @@ JSON
     _assert_match( $restart_status->{stdout}, qr/"prog"\s*:\s*"broken\.indicator"/, 'system status payload includes the broken config collector indicator' );
     _assert_match( $restart_status->{stdout}, qr/"prog"\s*:\s*"healthy\.indicator"/, 'system status payload includes the healthy config collector indicator' );
 
-    my $stop = _run_shell( 'dashboard stop', $project_cd . 'dashboard stop' );
+    my $stop = _run_shell( 'dashboard stop', $project_cd . 'dashboard stop -o json' );
     _assert_match( $stop->{stdout}, qr/"web_pid"\s*:/, 'dashboard stop returns structured lifecycle data' );
     my $stopped = _run_shell(
         'curl after stop',
@@ -916,9 +948,10 @@ run-integration.pl - blank-environment Docker integration runner for a host-buil
 
 This script expects a host-built C<Developer-Dashboard> tarball to be mounted
 into the container. It extracts that tarball to a temporary source tree,
-stages a versioned local tarball copy for C<cpanm> so the install stays on the
-host-built artifact rather than drifting to a CPAN lookup, and then exercises
-the installed C<dashboard> CLI and web runtime against a fake project.
+stages a versioned local tarball copy for C<cpanm --notest> so the install
+stays on the host-built artifact rather than drifting to a CPAN lookup, and
+then exercises the installed C<dashboard> CLI and web runtime against a fake
+project after the source-tree test and coverage gates have already run.
 
 =head1 FUNCTIONS
 

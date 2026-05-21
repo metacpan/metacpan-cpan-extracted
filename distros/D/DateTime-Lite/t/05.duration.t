@@ -2,13 +2,22 @@
 ##----------------------------------------------------------------------------
 ## Lightweight DateTime Alternative - t/05.duration.t
 ##----------------------------------------------------------------------------
+BEGIN
+{
+    use strict;
+    use warnings;
+    use lib './lib';
+    use Test::More;
+    use Scalar::Util ();
+};
+
 use strict;
 use warnings;
-use lib './lib';
-use Test::More;
-use Scalar::Util ();
 
-use_ok( 'DateTime::Lite::Duration' ) or BAIL_OUT( 'Cannot load DateTime::Lite::Duration' );
+BEGIN
+{
+    use_ok( 'DateTime::Lite::Duration' ) or BAIL_OUT( 'Cannot load DateTime::Lite::Duration' );
+};
 
 # NOTE: Basic constructor and accessors
 subtest 'Basic constructor and accessors' => sub
@@ -178,6 +187,33 @@ subtest 'in_units()' => sub
     # single unit returns scalar, not list
     my $m = $dur->in_units( 'months' );
     is( ref( \$m ), 'SCALAR', 'in_units() single unit returns scalar' );
+};
+
+# NOTE: Error handling: unknown arguments
+subtest 'Error handling: unknown arguments' => sub
+{
+    # Single unknown key - the original bug: 'year' instead of 'years'
+    my $dur;
+    {
+        local $SIG{__WARN__} = sub{};
+        $dur = DateTime::Lite::Duration->new( year => 1 );
+    }
+    ok( !defined( $dur ), "new(): 'year' (typo for 'years') returns undef" );
+    like( DateTime::Lite::Duration->error . '', qr/unknown argument/i, 'new(): error mentions unknown argument' );
+    like( DateTime::Lite::Duration->error . '', qr/'year'/, "new(): error names the offending key" );
+
+    # Multiple unknown keys
+    {
+        local $SIG{__WARN__} = sub{};
+        $dur = DateTime::Lite::Duration->new( year => 1, second => 30 );
+    }
+    ok( !defined( $dur ), 'new(): multiple unknown args return undef' );
+    like( DateTime::Lite::Duration->error . '', qr/unknown arguments/i, 'new(): plural form for multiple unknowns' );
+
+    # Valid args still work
+    $dur = DateTime::Lite::Duration->new( years => 1, months => 6 );
+    ok( defined( $dur ), 'new(): valid args still work' );
+    is( $dur->years, 1, 'valid: years' );
 };
 
 done_testing;

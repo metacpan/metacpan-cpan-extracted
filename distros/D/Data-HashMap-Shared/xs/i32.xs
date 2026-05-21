@@ -95,6 +95,28 @@ set_multi(SV* self_sv, ...)
     OUTPUT:
         RETVAL
 
+UV
+remove_multi(SV* self_sv, ...)
+    CODE:
+        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
+        uint32_t count = 0;
+        if (h->shard_handles) {
+            for (int i = 1; i < items; i++)
+                count += shm_i32_remove(h, (int32_t)SvIV(ST(i)));
+        } else {
+            ShmHeader *hdr = h->hdr;
+            shm_rwlock_wrlock(hdr);
+            shm_seqlock_write_begin(&hdr->seq);
+            for (int i = 1; i < items; i++)
+                count += shm_i32_remove_inner(h, (int32_t)SvIV(ST(i)));
+            if (count) shm_i32_maybe_shrink(h);
+            shm_seqlock_write_end(&hdr->seq);
+            shm_rwlock_wrunlock(hdr);
+        }
+        RETVAL = count;
+    OUTPUT:
+        RETVAL
+
 void
 get_multi(SV* self_sv, ...)
     PPCODE:
@@ -158,6 +180,18 @@ get_multi(SV* self_sv, ...)
             }
         }
 
+void
+get_with_ttl(SV* self_sv, int32_t key)
+    PPCODE:
+        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
+        int32_t out_value;
+        int64_t out_ttl;
+        if (!shm_i32_get_with_ttl(h, key, &out_value, &out_ttl)) XSRETURN_EMPTY;
+        EXTEND(SP, 2);
+        mPUSHi(out_value);
+        if (out_ttl < 0) PUSHs(&PL_sv_undef);
+        else mPUSHi(out_ttl);
+
 SV*
 stats(SV* self_sv)
     CODE:
@@ -184,6 +218,16 @@ cas(SV* self_sv, int32_t key, int32_t expected, int32_t desired)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
         RETVAL = shm_i32_cas(h, key, expected, desired);
+    OUTPUT:
+        RETVAL
+
+SV*
+cas_take(SV* self_sv, int32_t key, int32_t expected)
+    CODE:
+        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
+        int32_t out_value;
+        if (!shm_i32_cas_take(h, key, expected, &out_value)) XSRETURN_UNDEF;
+        RETVAL = newSViv(out_value);
     OUTPUT:
         RETVAL
 
@@ -567,10 +611,28 @@ add(SV* self_sv, int32_t key, int32_t value)
         RETVAL
 
 bool
+add_ttl(SV* self_sv, int32_t key, int32_t value, UV ttl_sec)
+    CODE:
+        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
+        REQUIRE_TTL(h);
+        RETVAL = shm_i32_add_ttl(h, key, value, (uint32_t)ttl_sec);
+    OUTPUT:
+        RETVAL
+
+bool
 update(SV* self_sv, int32_t key, int32_t value)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
         RETVAL = shm_i32_update(h, key, value);
+    OUTPUT:
+        RETVAL
+
+bool
+update_ttl(SV* self_sv, int32_t key, int32_t value, UV ttl_sec)
+    CODE:
+        EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
+        REQUIRE_TTL(h);
+        RETVAL = shm_i32_update_ttl(h, key, value, (uint32_t)ttl_sec);
     OUTPUT:
         RETVAL
 

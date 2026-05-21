@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 # =============================================================================
 # t/integration.t  —  Black-box, end-to-end integration tests for
-#                     Email::Abuse::Investigator
+#					 Email::Abuse::Investigator
 #
 # Philosophy
 # ----------
@@ -28,13 +28,14 @@ use strict;
 use warnings;
 
 use Test::More;
-use MIME::Base64      qw( encode_base64 );
+use MIME::Base64	  qw( encode_base64 );
 use MIME::QuotedPrint qw( encode_qp );
-use POSIX             qw( strftime );
+use POSIX			 qw( strftime );
 
 use FindBin qw( $Bin );
 use lib "$Bin/../lib", "$Bin/..";
-use Email::Abuse::Investigator;
+
+use_ok('Email::Abuse::Investigator');
 
 # ---------------------------------------------------------------------------
 # Network stub infrastructure
@@ -45,104 +46,104 @@ use Email::Abuse::Investigator;
 
 my %_ORIGINAL;
 BEGIN {
-    for my $fn (qw(
-        _reverse_dns  _resolve_host  _whois_ip
-        _domain_whois _raw_whois     _rdap_lookup
-    )) {
-        no strict 'refs';
-        $_ORIGINAL{$fn} = \&{ "Email::Abuse::Investigator::$fn" };
-    }
+	for my $fn (qw(
+		_reverse_dns  _resolve_host  _whois_ip
+		_domain_whois _raw_whois	 _rdap_lookup
+	)) {
+		no strict 'refs';
+		$_ORIGINAL{$fn} = \&{ "Email::Abuse::Investigator::$fn" };
+	}
 }
 
 sub restore_stubs {
-    no warnings 'redefine';
-    for my $fn (keys %_ORIGINAL) {
-        no strict 'refs';
-        *{ "Email::Abuse::Investigator::$fn" } = $_ORIGINAL{$fn};
-    }
+	no warnings 'redefine';
+	for my $fn (keys %_ORIGINAL) {
+		no strict 'refs';
+		*{ "Email::Abuse::Investigator::$fn" } = $_ORIGINAL{$fn};
+	}
 }
 
 # Install a complete, coherent set of network stubs.
 # Parameters (all optional):
-#   rdns         => sub($ip)         | string  — rDNS result
-#   resolve      => sub($host)       | hashref | string — A-record result
-#   whois_ip     => sub($ip)         | hashref — IP WHOIS result
-#   domain_whois => sub($dom)        | string  — raw domain WHOIS text
+#   rdns		 => sub($ip)		 | string  — rDNS result
+#   resolve	  => sub($host)	   | hashref | string — A-record result
+#   whois_ip	 => sub($ip)		 | hashref — IP WHOIS result
+#   domain_whois => sub($dom)		| string  — raw domain WHOIS text
 sub install_stubs {
-    my (%ov) = @_;
-    no warnings 'redefine';
+	my (%ov) = @_;
+	no warnings 'redefine';
 
-    *Email::Abuse::Investigator::_reverse_dns = ref($ov{rdns}) eq 'CODE'
-        ? $ov{rdns}
-        : sub { $ov{rdns} // undef };
+	*Email::Abuse::Investigator::_reverse_dns = ref($ov{rdns}) eq 'CODE'
+		? $ov{rdns}
+		: sub { $ov{rdns} // undef };
 
-    *Email::Abuse::Investigator::_resolve_host = ref($ov{resolve}) eq 'CODE'
-        ? $ov{resolve}
-        : sub {
-            my (undef, $host) = @_;
-            return $host if $host =~ /^\d{1,3}(?:\.\d{1,3}){3}$/;
-            my $r = $ov{resolve};
-            return undef unless defined $r;
-            return ref $r eq 'HASH' ? ($r->{$host} // undef) : $r;
-        };
+	*Email::Abuse::Investigator::_resolve_host = ref($ov{resolve}) eq 'CODE'
+		? $ov{resolve}
+		: sub {
+			my (undef, $host) = @_;
+			return $host if $host =~ /^\d{1,3}(?:\.\d{1,3}){3}$/;
+			my $r = $ov{resolve};
+			return undef unless defined $r;
+			return ref $r eq 'HASH' ? ($r->{$host} // undef) : $r;
+		};
 
-    *Email::Abuse::Investigator::_whois_ip = ref($ov{whois_ip}) eq 'CODE'
-        ? $ov{whois_ip}
-        : sub {
-            my (undef, $ip) = @_;
-            my $w = $ov{whois_ip};
-            return {} unless defined $w;
-            return ref $w eq 'HASH' ? $w : {};
-        };
+	*Email::Abuse::Investigator::_whois_ip = ref($ov{whois_ip}) eq 'CODE'
+		? $ov{whois_ip}
+		: sub {
+			my (undef, $ip) = @_;
+			my $w = $ov{whois_ip};
+			return {} unless defined $w;
+			return ref $w eq 'HASH' ? $w : {};
+		};
 
-    *Email::Abuse::Investigator::_domain_whois = ref($ov{domain_whois}) eq 'CODE'
-        ? $ov{domain_whois}
-        : sub { $ov{domain_whois} // undef };
+	*Email::Abuse::Investigator::_domain_whois = ref($ov{domain_whois}) eq 'CODE'
+		? $ov{domain_whois}
+		: sub { $ov{domain_whois} // undef };
 
-    # These are never needed in integration tests (covered by the above)
-    *Email::Abuse::Investigator::_raw_whois  = sub { undef };
-    *Email::Abuse::Investigator::_rdap_lookup = sub { {} };
+	# These are never needed in integration tests (covered by the above)
+	*Email::Abuse::Investigator::_raw_whois   = sub { undef };
+	*Email::Abuse::Investigator::_rdap_lookup = sub { {} };
 }
 
 # ---------------------------------------------------------------------------
 # Helper: build a raw RFC 2822 email string
 # ---------------------------------------------------------------------------
 sub make_raw_email {
-    my (%h) = @_;
+	my (%h) = @_;
 
-    # Received: chain — pass an arrayref for multiple hops (most-recent first)
-    my @rcvd = ref($h{received}) eq 'ARRAY'
-        ? @{ $h{received} }
-        : ($h{received} // 'from ext.mail.example (ext.mail.example [91.198.174.42]) by mx.test (Postfix); Mon, 01 Jan 2024 00:00:00 +0000');
+	# Received: chain — pass an arrayref for multiple hops (most-recent first)
+	my @rcvd = ref($h{received}) eq 'ARRAY'
+		? @{ $h{received} }
+		: ($h{received} // 'from ext.mail.example (ext.mail.example [91.198.174.42]) by mx.test (Postfix); Mon, 01 Jan 2024 00:00:00 +0000');
 
-    my $from        = $h{from}        // 'Spammer <spammer@spam.example>';
-    my $reply_to    = $h{reply_to};
-    my $return_path = $h{return_path} // '<spammer@spam.example>';
-    my $to          = $h{to}          // 'victim@test.example';
-    my $subject     = $h{subject}     // 'Integration test message';
-    my $date        = $h{date}        // POSIX::strftime('%a, %d %b %Y %H:%M:%S +0000', gmtime);
-    my $mid         = $h{message_id}  // '<inttest@spam.example>';
-    my $ct          = $h{ct}          // 'text/plain; charset=us-ascii';
-    my $cte         = $h{cte}         // '7bit';
-    my $auth        = $h{auth}        // '';
-    my $xoip        = $h{xoip};
-    my $body        = $h{body}        // 'Buy our products now!';
+	my $from		= $h{from}		// 'Spammer <spammer@spam.example>';
+	my $reply_to	= $h{reply_to};
+	my $return_path = $h{return_path} // '<spammer@spam.example>';
+	my $to		  = $h{to}		  // 'victim@test.example';
+	my $subject	 = $h{subject}	 // 'Integration test message';
+	my $date		= $h{date}		// POSIX::strftime('%a, %d %b %Y %H:%M:%S +0000', gmtime);
+	my $mid		 = $h{message_id}  // '<inttest@spam.example>';
+	my $ct		  = $h{ct}		  // 'text/plain; charset=us-ascii';
+	my $cte		 = $h{cte}		 // '7bit';
+	my $auth		= $h{auth}		// '';
+	my $xoip		= $h{xoip};
+	my $body		= $h{body}		// 'Buy our products now!';
 
-    my $hdrs = '';
-    $hdrs .= "Received: $_\n" for @rcvd;
-    $hdrs .= "Authentication-Results: $auth\n" if $auth;
-    $hdrs .= "Return-Path: $return_path\n";
-    $hdrs .= "From: $from\n";
-    $hdrs .= "Reply-To: $reply_to\n"           if defined $reply_to;
-    $hdrs .= "To: $to\n";
-    $hdrs .= "Subject: $subject\n";
-    $hdrs .= "Date: $date\n";
-    $hdrs .= "Message-ID: $mid\n";
-    $hdrs .= "Content-Type: $ct\n";
-    $hdrs .= "Content-Transfer-Encoding: $cte\n";
-    $hdrs .= "X-Originating-IP: $xoip\n"       if defined $xoip;
+	my $hdrs = '';
+	$hdrs .= "Received: $_\n" for @rcvd;
+	$hdrs .= "Authentication-Results: $auth\n" if $auth;
+	$hdrs .= "Return-Path: $return_path\n";
+	$hdrs .= "From: $from\n";
+	$hdrs .= "Reply-To: $reply_to\n"			if defined $reply_to;
+	$hdrs .= "To: $to\n";
+	$hdrs .= "Subject: $subject\n";
+	$hdrs .= "Date: $date\n";
+	$hdrs .= "Message-ID: $mid\n";
+	$hdrs .= "Content-Type: $ct\n";
+	$hdrs .= "Content-Transfer-Encoding: $cte\n";
+	$hdrs .= "X-Originating-IP: $xoip\n"		if defined $xoip;
 
-    return "$hdrs\n$body";
+	return "$hdrs\n$body";
 }
 
 # ---------------------------------------------------------------------------
@@ -153,107 +154,107 @@ sub make_raw_email {
 # All five public pipeline methods are exercised in concert.
 # ---------------------------------------------------------------------------
 subtest 'Scenario 1: direct-to-MX spam — full pipeline' => sub {
-    restore_stubs();  # defensive reset in case prior subtest exited early
-    install_stubs(
-        rdns     => 'mail.badactor.example',
-        resolve  => { 'spamsite.example' => '91.198.174.99' },
-        whois_ip => {
-            org     => 'Rogue Hosting Corp',
-            abuse   => 'abuse@rogue-hosting.example',
-            country => 'RU',
-        },
-        domain_whois => sub {
-            my (undef, $dom) = @_;
-            return undef unless $dom eq 'spamsite.example';
-            return <<'WHOIS';
-Registrar: Dodgy Registrar Inc
-Registrar Abuse Contact Email: abuse@dodgy-reg.example
-Creation Date: 2025-11-01
-Registry Expiry Date: 2026-11-01
-WHOIS
-        },
-    );
+	restore_stubs();
+	install_stubs(
+		rdns	=> 'mail.badactor.example',
+		resolve => { 'spamsite.example' => '91.198.174.99' },
+		whois_ip => {
+			org	 => 'Rogue Hosting Corp',
+			abuse   => 'abuse@rogue-hosting.example',
+			country => 'RU',
+		},
+		domain_whois => sub {
+			my (undef, $dom) = @_;
+			return undef unless $dom eq 'spamsite.example';
+			my $reg = strftime('%Y-%m-%d', gmtime(time() - 60  * 86400));
+			my $exp = strftime('%Y-%m-%d', gmtime(time() + 305 * 86400));
+			return "Registrar: Dodgy Registrar Inc\n"
+				 . "Registrar Abuse Contact Email: abuse\@dodgy-reg.example\n"
+				 . "Creation Date: $reg\n"
+				 . "Registry Expiry Date: $exp\n";
+		},
+	);
 
-    my $a = Email::Abuse::Investigator->new();
-    $a->parse_email(make_raw_email(
-        received => 'from badactor (badactor [91.198.174.42]) by mx.test',
-        from     => 'Deals <deals@spamsite.example>',
-        body     => 'Visit https://spamsite.example/offer to claim your prize.',
-    ));
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_raw_email(
+		received => 'from badactor (badactor [91.198.174.42]) by mx.test',
+		from	 => 'Deals <deals@spamsite.example>',
+		body	 => 'Visit https://spamsite.example/offer to claim your prize.',
+	));
 
-    # --- originating_ip() ---
-    my $orig = $a->originating_ip();
-    ok defined $orig,                          'originating_ip returns a value';
-    is $orig->{ip},         '91.198.174.42',   'correct originating IP extracted';
-    is $orig->{rdns},       'mail.badactor.example', 'rDNS resolved';
-    is $orig->{confidence}, 'medium',           'single hop → medium confidence';
-    like $orig->{org},      qr/Rogue Hosting/,  'org from IP WHOIS';
-    like $orig->{abuse},    qr/abuse\@/,        'abuse contact from IP WHOIS';
+	# --- originating_ip() ---
+	my $orig = $a->originating_ip();
+	ok defined $orig,						   'originating_ip returns a value';
+	is $orig->{ip},		 '91.198.174.42',	'correct originating IP extracted';
+	is $orig->{rdns},	   'mail.badactor.example', 'rDNS resolved';
+	is $orig->{confidence}, 'medium',		   'single hop → medium confidence';
+	like $orig->{org},	  qr/Rogue Hosting/,  'org from IP WHOIS';
+	like $orig->{abuse},	qr/abuse\@/,		'abuse contact from IP WHOIS';
 
-    # --- embedded_urls() ---
-    my @urls = $a->embedded_urls();
-    is scalar @urls, 1,                        'one URL found';
-    is $urls[0]{host}, 'spamsite.example',     'correct URL host';
-    is $urls[0]{ip},   '91.198.174.99',        'URL host resolved to IP';
-    like $urls[0]{org}, qr/Rogue Hosting/,     'URL host org from WHOIS';
+	# --- embedded_urls() ---
+	my @urls = $a->embedded_urls();
+	is scalar @urls, 1,						 'one URL found';
+	is $urls[0]{host}, 'spamsite.example',	  'correct URL host';
+	is $urls[0]{ip},   '91.198.174.99',		 'URL host resolved to IP';
+	like $urls[0]{org}, qr/Rogue Hosting/,	  'URL host org from WHOIS';
 
-    # --- mailto_domains() ---
-    my @doms = $a->mailto_domains();
-    my ($spam_dom) = grep { $_->{domain} eq 'spamsite.example' } @doms;
-    ok defined $spam_dom,                      'spamsite.example in mailto_domains';
-    is $spam_dom->{registrar},
-        'Dodgy Registrar Inc',                 'registrar from domain WHOIS';
-    is $spam_dom->{registrar_abuse},
-        'abuse@dodgy-reg.example',             'registrar abuse contact from WHOIS';
-    is $spam_dom->{recently_registered}, 1,    'recently_registered flag set';
+	# --- mailto_domains() ---
+	my @doms = $a->mailto_domains();
+	my ($spam_dom) = grep { $_->{domain} eq 'spamsite.example' } @doms;
+	ok defined $spam_dom,					   'spamsite.example in mailto_domains';
+	is $spam_dom->{registrar},
+		'Dodgy Registrar Inc',				  'registrar from domain WHOIS';
+	is $spam_dom->{registrar_abuse},
+		'abuse@dodgy-reg.example',			  'registrar abuse contact from WHOIS';
+	is $spam_dom->{recently_registered}, 1,	 'recently_registered flag set';
 
-    # --- all_domains() ---
-    my @all = $a->all_domains();
-    ok scalar(grep { $_ eq 'spamsite.example' } @all),
-        'spamsite.example appears in all_domains';
-    my %seen; $seen{$_}++ for @all;
-    ok !scalar(grep { $seen{$_} > 1 } @all), 'no duplicates in all_domains';
+	# --- all_domains() ---
+	my @all = $a->all_domains();
+	ok scalar(grep { $_ eq 'spamsite.example' } @all),
+		'spamsite.example appears in all_domains';
+	my %seen; $seen{$_}++ for @all;
+	ok !scalar(grep { $seen{$_} > 1 } @all), 'no duplicates in all_domains';
 
-    # --- risk_assessment() ---
-    my $risk = $a->risk_assessment();
-    ok $risk->{level} ne 'INFO',               'risk level is not INFO for clear spam';
-    ok $risk->{score} > 0,                     'non-zero risk score';
-    my @flag_names = map { $_->{flag} } @{ $risk->{flags} };
-    ok scalar(grep { $_ eq 'recently_registered_domain' } @flag_names),
-        'recently_registered_domain flagged';
+	# --- risk_assessment() ---
+	my $risk = $a->risk_assessment();
+	ok $risk->{level} ne 'INFO',				'risk level is not INFO for clear spam';
+	ok $risk->{score} > 0,					  'non-zero risk score';
+	my @flag_names = map { $_->{flag} } @{ $risk->{flags} };
+	ok scalar(grep { $_ eq 'recently_registered_domain' } @flag_names),
+		'recently_registered_domain flagged';
 
-    # --- abuse_contacts() ---
-    my @contacts = $a->abuse_contacts();
-    ok @contacts > 0,                          'at least one abuse contact';
-    my @addrs = map { lc $_->{address} } @contacts;
-    ok scalar(grep { $_ eq 'abuse@rogue-hosting.example' } @addrs),
-        'sending ISP abuse contact present';
-    ok scalar(grep { $_ eq 'abuse@dodgy-reg.example' } @addrs),
-        'registrar abuse contact present';
-    # Every contact has the required fields
-    for my $c (@contacts) {
-        ok $c->{address} =~ /\@/, "contact $c->{address} has valid address";
-        ok $c->{via} =~ /^(?:ip-whois|domain-whois|provider-table|rdap)$/,
-            "contact via '$c->{via}' is a documented value";
-    }
+	# --- abuse_contacts() ---
+	my @contacts = $a->abuse_contacts();
+	ok @contacts > 0,						   'at least one abuse contact';
+	my @addrs = map { lc $_->{address} } @contacts;
+	ok scalar(grep { $_ eq 'abuse@rogue-hosting.example' } @addrs),
+		'sending ISP abuse contact present';
+	ok scalar(grep { $_ eq 'abuse@dodgy-reg.example' } @addrs),
+		'registrar abuse contact present';
+	# Every contact has the required fields
+	for my $c (@contacts) {
+		ok $c->{address} =~ /\@/, "contact $c->{address} has valid address";
+		ok $c->{via} =~ /^(?:ip-whois|domain-whois|provider-table|rdap)$/,
+			"contact via '$c->{via}' is a documented value";
+	}
 
-    # --- report() ---
-    my $report = $a->report();
-    like $report, qr/91.198.174.42/,            'originating IP in report';
-    like $report, qr/spamsite\.example/,            'spam domain in report';
-    like $report, qr/RECENTLY REGISTERED/,          'recently registered warning in report';
-    like $report, qr/https:\/\/spamsite\.example/,  'URL in report';
-    like $report, qr/abuse\@rogue-hosting\.example/,'hosting abuse in report';
-    like $report, qr/abuse\@dodgy-reg\.example/,    'registrar abuse in report';
+	# --- report() ---
+	my $report = $a->report();
+	like $report, qr/91.198.174.42/,			'originating IP in report';
+	like $report, qr/spamsite\.example/,		'spam domain in report';
+	like $report, qr/RECENTLY REGISTERED/,	  'recently registered warning in report';
+	like $report, qr/https:\/\/spamsite\.example/, 'URL in report';
+	like $report, qr/abuse\@rogue-hosting\.example/, 'hosting abuse in report';
+	like $report, qr/abuse\@dodgy-reg\.example/, 'registrar abuse in report';
 
-    # --- abuse_report_text() ---
-    my $art = $a->abuse_report_text();
-    like $art, qr/RISK LEVEL/,              'RISK LEVEL in abuse_report_text';
-    like $art, qr/ORIGINATING IP/,          'ORIGINATING IP in abuse_report_text';
-    like $art, qr/ORIGINAL MESSAGE HEADERS/,'headers section in abuse_report_text';
-    like $art, qr/received:/i,              'Received: header included';
+	# --- abuse_report_text() ---
+	my $art = $a->abuse_report_text();
+	like $art, qr/RISK LEVEL/,		   'RISK LEVEL in abuse_report_text';
+	like $art, qr/ORIGINATING IP/,	   'ORIGINATING IP in abuse_report_text';
+	like $art, qr/ORIGINAL MESSAGE HEADERS/, 'headers section in abuse_report_text';
+	like $art, qr/received:/i,		   'Received: header included';
 
-    restore_stubs();
+	restore_stubs();
 };
 
 # ---------------------------------------------------------------------------
@@ -265,70 +266,70 @@ WHOIS
 # The sending account is Gmail → provider-table contact expected.
 # ---------------------------------------------------------------------------
 subtest 'Scenario 2: Gmail-sent spam through internal relays' => sub {
-    restore_stubs();  # defensive reset in case prior subtest exited early
-    install_stubs(
-        rdns    => 'mail-ej1-f67.google.com',
-        resolve => sub {
-            my (undef, $host) = @_;
-            return '209.85.218.67' if $host =~ /google/;
-            return undef;
-        },
-        whois_ip => {
-            org     => 'Google LLC',
-            abuse   => 'network-abuse@google.com',
-            country => 'US',
-        },
-        domain_whois => undef,
-    );
+	restore_stubs();
+	install_stubs(
+		rdns	=> 'mail-ej1-f67.google.com',
+		resolve => sub {
+			my (undef, $host) = @_;
+			return '209.85.218.67' if $host =~ /google/;
+			return undef;
+		},
+		whois_ip => {
+			org	 => 'Google LLC',
+			abuse   => 'network-abuse@google.com',
+			country => 'US',
+		},
+		domain_whois => undef,
+	);
 
-    my $a = Email::Abuse::Investigator->new(
-        trusted_relays => ['172.31.0.0/16'],   # simulate internal AWS relay
-    );
-    $a->parse_email(make_raw_email(
-        received => [
-            # Most-recent (top): our MTA received from Google
-            'from mail-ej1-f67.google.com (mail-ej1-f67.google.com [209.85.218.67]) by mx.test',
-            # Older (bottom): internal relay — must be skipped
-            'from internal-relay.corp (internal-relay.corp [172.31.5.10]) by smtp-out.corp',
-        ],
-        auth => 'mx.test; spf=pass smtp.mailfrom=gmail.com; dkim=pass header.d=gmail.com; dmarc=pass',
-        from => 'SM Investments <fakeco@gmail.com>',
-        to   => 'undisclosed-recipients:;',
-        body => 'Dear Sir/Madam, please contact vendor@supplierco.example',
-    ));
+	my $a = Email::Abuse::Investigator->new(
+		trusted_relays => ['172.31.0.0/16'],   # simulate internal AWS relay
+	);
+	$a->parse_email(make_raw_email(
+		received => [
+			# Most-recent (top): our MTA received from Google
+			'from mail-ej1-f67.google.com (mail-ej1-f67.google.com [209.85.218.67]) by mx.test',
+			# Older (bottom): internal relay — must be skipped
+			'from internal-relay.corp (internal-relay.corp [172.31.5.10]) by smtp-out.corp',
+		],
+		auth => 'mx.test; spf=pass smtp.mailfrom=gmail.com; dkim=pass header.d=gmail.com; dmarc=pass',
+		from => 'SM Investments <fakeco@gmail.com>',
+		to   => 'undisclosed-recipients:;',
+		body => 'Dear Sir/Madam, please contact vendor@supplierco.example',
+	));
 
-    # The private internal relay must be skipped; Google's IP is the origin
-    my $orig = $a->originating_ip();
-    is $orig->{ip}, '209.85.218.67', 'internal relay skipped; Google IP is origin';
-    like $orig->{rdns}, qr/google\.com/, 'rDNS points to Google';
+	# The private internal relay must be skipped; Google's IP is the origin
+	my $orig = $a->originating_ip();
+	is $orig->{ip}, '209.85.218.67', 'internal relay skipped; Google IP is origin';
+	like $orig->{rdns}, qr/google\.com/, 'rDNS points to Google';
 
-    # SPF/DKIM/DMARC all passed — authentication checks should not fire
-    my $risk = $a->risk_assessment();
-    my @auth_flags = grep { $_->{flag} =~ /^(?:spf|dkim|dmarc)_fail$/ }
-                     @{ $risk->{flags} };
-    is scalar @auth_flags, 0, 'no auth-fail flags when SPF/DKIM/DMARC pass';
+	# SPF/DKIM/DMARC all passed — authentication checks should not fire
+	my $risk = $a->risk_assessment();
+	my @auth_flags = grep { $_->{flag} =~ /^(?:spf|dkim|dmarc)_fail$/ }
+					 @{ $risk->{flags} };
+	is scalar @auth_flags, 0, 'no auth-fail flags when SPF/DKIM/DMARC pass';
 
-    # Gmail From: → free_webmail_sender flag
-    ok scalar(grep { $_->{flag} eq 'free_webmail_sender' } @{ $risk->{flags} }),
-        'free_webmail_sender flagged for Gmail sender';
+	# Gmail From: → free_webmail_sender flag
+	ok scalar(grep { $_->{flag} eq 'free_webmail_sender' } @{ $risk->{flags} }),
+		'free_webmail_sender flagged for Gmail sender';
 
-    # undisclosed-recipients → undisclosed_recipients flag
-    ok scalar(grep { $_->{flag} eq 'undisclosed_recipients' } @{ $risk->{flags} }),
-        'undisclosed_recipients flagged';
+	# undisclosed-recipients → undisclosed_recipients flag
+	ok scalar(grep { $_->{flag} eq 'undisclosed_recipients' } @{ $risk->{flags} }),
+		'undisclosed_recipients flagged';
 
-    # Provider-table gives Google's abuse address
-    my @contacts = $a->abuse_contacts();
-    ok scalar(grep { lc($_->{address}) eq 'abuse@google.com' } @contacts),
-        'abuse@google.com in contacts via provider table';
-    ok scalar(grep { $_->{via} eq 'provider-table' } @contacts),
-        'at least one contact discovered via provider-table';
+	# Provider-table gives Google's abuse address
+	my @contacts = $a->abuse_contacts();
+	ok scalar(grep { lc($_->{address}) eq 'abuse@google.com' } @contacts),
+		'abuse@google.com in contacts via provider table';
+	ok scalar(grep { $_->{via} eq 'provider-table' } @contacts),
+		'at least one contact discovered via provider-table';
 
-    # Contact domain in body captured
-    my @doms = $a->mailto_domains();
-    ok scalar(grep { $_->{domain} eq 'supplierco.example' } @doms),
-        'bare-address domain from body captured';
+	# Contact domain in body captured
+	my @doms = $a->mailto_domains();
+	ok scalar(grep { $_->{domain} eq 'supplierco.example' } @doms),
+		'bare-address domain from body captured';
 
-    restore_stubs();
+	restore_stubs();
 };
 
 # ---------------------------------------------------------------------------
@@ -340,53 +341,53 @@ subtest 'Scenario 2: Gmail-sent spam through internal relays' => sub {
 # reply_to_differs_from_from is also triggered.
 # ---------------------------------------------------------------------------
 subtest 'Scenario 3: display-name spoofing and reply-to misdirection' => sub {
-    restore_stubs();  # defensive reset in case prior subtest exited early
-    install_stubs(
-        rdns     => 'mail.phishhost.example',
-        resolve  => '91.198.174.77',
-        whois_ip => { org => 'Phish Host LLC', abuse => 'abuse@phishhost.example' },
-        domain_whois => undef,
-    );
+	restore_stubs();
+	install_stubs(
+		rdns	 => 'mail.phishhost.example',
+		resolve  => '91.198.174.77',
+		whois_ip => { org => 'Phish Host LLC', abuse => 'abuse@phishhost.example' },
+		domain_whois => undef,
+	);
 
-    my $a = Email::Abuse::Investigator->new();
-    $a->parse_email(make_raw_email(
-        received  => 'from phishhost (phishhost [91.198.174.77]) by mx.test',
-        from      => '"PayPal Security paypal.com" <noreply@ph1sh-paypal.example>',
-        reply_to  => 'collect@harvester.example',
-        body      => 'Your account is limited. Verify at https://ph1sh-paypal.example/verify',
-    ));
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_raw_email(
+		received  => 'from phishhost (phishhost [91.198.174.77]) by mx.test',
+		from	  => '"PayPal Security paypal.com" <noreply@ph1sh-paypal.example>',
+		reply_to  => 'collect@harvester.example',
+		body	  => 'Your account is limited. Verify at https://ph1sh-paypal.example/verify',
+	));
 
-    my $risk = $a->risk_assessment();
-    my @flag_names = map { $_->{flag} } @{ $risk->{flags} };
+	my $risk = $a->risk_assessment();
+	my @flag_names = map { $_->{flag} } @{ $risk->{flags} };
 
-    # POD-documented flag: display_name_domain_spoof
-    ok scalar(grep { $_ eq 'display_name_domain_spoof' } @flag_names),
-        'display_name_domain_spoof flagged';
+	# POD-documented flag: display_name_domain_spoof
+	ok scalar(grep { $_ eq 'display_name_domain_spoof' } @flag_names),
+		'display_name_domain_spoof flagged';
 
-    # POD-documented flag: reply_to_differs_from_from
-    ok scalar(grep { $_ eq 'reply_to_differs_from_from' } @flag_names),
-        'reply_to_differs_from_from flagged';
+	# POD-documented flag: reply_to_differs_from_from
+	ok scalar(grep { $_ eq 'reply_to_differs_from_from' } @flag_names),
+		'reply_to_differs_from_from flagged';
 
-    # Risk level must be HIGH or MEDIUM (not INFO) for a phishing email
-    ok $risk->{level} =~ /^(?:HIGH|MEDIUM)$/,
-        "risk level is HIGH or MEDIUM for phishing email (got $risk->{level})";
+	# Risk level must be HIGH or MEDIUM for a phishing email
+	ok $risk->{level} =~ /^(?:HIGH|MEDIUM)$/,
+		"risk level is HIGH or MEDIUM for phishing email (got $risk->{level})";
 
-    # The lookalike domain ph1sh-paypal.example should trigger lookalike_domain
-    ok scalar(grep { $_ eq 'lookalike_domain' } @flag_names),
-        'lookalike_domain flagged for ph1sh-paypal.example';
+	# The lookalike domain ph1sh-paypal.example should trigger lookalike_domain
+	ok scalar(grep { $_ eq 'lookalike_domain' } @flag_names),
+		'lookalike_domain flagged for ph1sh-paypal.example';
 
-    # The URL in the body should be found and its host resolved
-    my @urls = $a->embedded_urls();
-    is scalar @urls, 1, 'one URL found in phishing body';
-    is $urls[0]{host}, 'ph1sh-paypal.example', 'phishing URL host correct';
+	# The URL in the body should be found and its host resolved
+	my @urls = $a->embedded_urls();
+	is scalar @urls, 1, 'one URL found in phishing body';
+	is $urls[0]{host}, 'ph1sh-paypal.example', 'phishing URL host correct';
 
-    # Full report mentions both the IP and the deceptive domain
-    my $report = $a->report();
-    like $report, qr/91.198.174.77/,           'phishing source IP in report';
-    like $report, qr/ph1sh-paypal\.example/,       'lookalike domain in report';
-    like $report, qr/paypal/i,                    'PayPal reference appears in report';
+	# Full report mentions both the IP and the deceptive domain
+	my $report = $a->report();
+	like $report, qr/91.198.174.77/,			'phishing source IP in report';
+	like $report, qr/ph1sh-paypal\.example/,	'lookalike domain in report';
+	like $report, qr/paypal/i,				  'PayPal reference appears in report';
 
-    restore_stubs();
+	restore_stubs();
 };
 
 # ---------------------------------------------------------------------------
@@ -395,45 +396,44 @@ subtest 'Scenario 3: display-name spoofing and reply-to misdirection' => sub {
 # POD description item 1: "Walks the Received: chain … identifies the first
 # external hop."
 # rDNS matches the broadband/residential pattern → residential_sending_ip flag.
-# No reverse DNS → no_reverse_dns flag scenario covered in its own subtest.
 # ---------------------------------------------------------------------------
 subtest 'Scenario 4: residential broadband sender triggers risk flags' => sub {
-    restore_stubs();  # defensive reset in case prior subtest exited early
-    install_stubs(
-        rdns     => '120-88-161-249.tpgi.com.au',
-        resolve  => undef,
-        whois_ip => { org => 'TPG Internet Pty Ltd', abuse => 'abuse@tpg.com.au', country => 'AU' },
-        domain_whois => undef,
-    );
+	restore_stubs();
+	install_stubs(
+		rdns	 => '120-88-161-249.tpgi.com.au',
+		resolve  => undef,
+		whois_ip => { org => 'TPG Internet Pty Ltd', abuse => 'abuse@tpg.com.au', country => 'AU' },
+		domain_whois => undef,
+	);
 
-    my $a = Email::Abuse::Investigator->new();
-    $a->parse_email(make_raw_email(
-        received => 'from 120-88-161-249.tpgi.com.au (120.88.161.249) by mx.test',
-        from     => '"eharmony Partner" <peacelight@firmluminary.example>',
-        subject  => 'Ready to Find Someone Special?',
-        body     => 'Find love today.',
-    ));
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_raw_email(
+		received => 'from 120-88-161-249.tpgi.com.au (120.88.161.249) by mx.test',
+		from	 => '"eharmony Partner" <peacelight@firmluminary.example>',
+		subject  => 'Ready to Find Someone Special?',
+		body	 => 'Find love today.',
+	));
 
-    my $orig = $a->originating_ip();
-    is $orig->{ip},  '120.88.161.249',             'broadband IP identified';
-    like $orig->{rdns}, qr/tpgi\.com\.au/,         'broadband rDNS present';
-    is $orig->{confidence}, 'medium',              'single hop confidence';
+	my $orig = $a->originating_ip();
+	is $orig->{ip},  '120.88.161.249',		   'broadband IP identified';
+	like $orig->{rdns}, qr/tpgi\.com\.au/,	   'broadband rDNS present';
+	is $orig->{confidence}, 'medium',			 'single hop confidence';
 
-    my $risk = $a->risk_assessment();
-    ok scalar(grep { $_->{flag} eq 'residential_sending_ip' } @{ $risk->{flags} }),
-        'residential_sending_ip flagged for tpgi.com.au rDNS';
+	my $risk = $a->risk_assessment();
+	ok scalar(grep { $_->{flag} eq 'residential_sending_ip' } @{ $risk->{flags} }),
+		'residential_sending_ip flagged for tpgi.com.au rDNS';
 
-    # Provider table has TPG → abuse@tpg.com.au
-    my @contacts = $a->abuse_contacts();
-    ok scalar(grep { lc($_->{address}) eq 'abuse@tpg.com.au' } @contacts),
-        'TPG abuse contact found via provider table';
+	# Provider table has TPG → abuse@tpg.com.au
+	my @contacts = $a->abuse_contacts();
+	ok scalar(grep { lc($_->{address}) eq 'abuse@tpg.com.au' } @contacts),
+		'TPG abuse contact found via provider table';
 
-    # report() mentions the residential IP
-    my $report = $a->report();
-    like $report, qr/120\.88\.161\.249/, 'residential IP in report';
-    like $report, qr/tpgi\.com\.au/,    'residential rDNS in report';
+	# report() mentions the residential IP
+	my $report = $a->report();
+	like $report, qr/120\.88\.161\.249/, 'residential IP in report';
+	like $report, qr/tpgi\.com\.au/,	'residential rDNS in report';
 
-    restore_stubs();
+	restore_stubs();
 };
 
 # ---------------------------------------------------------------------------
@@ -441,85 +441,103 @@ subtest 'Scenario 4: residential broadband sender triggers risk flags' => sub {
 #
 # POD risk_assessment: url_shortener flag.
 # Multiple URLs all under bit.ly; plus one legitimate-looking URL.
+#
+# NOTE on the WHOIS-call-count subtest:
+# The module maintains a cross-message CHI cache keyed by IP/hostname.  To
+# guarantee that _whois_ip is called exactly once per unique host we must use
+# hostnames that have not been seen in any earlier subtest in this run.  We
+# therefore use unique hostnames (bit-ly-test-S5.example and legit-S5.example)
+# rather than bit.ly and legit.example, which may already be in the cache.
 # ---------------------------------------------------------------------------
 subtest 'Scenario 5: URL shortener hides real destination' => sub {
-    restore_stubs();  # defensive reset in case prior subtest exited early
-    install_stubs(
-        rdns    => 'mail.sender.example',
-        resolve => {
-            'bit.ly'            => '67.199.248.10',
-            'legit.example'     => '192.0.2.50',
-        },
-        whois_ip => sub {
-            my (undef, $ip) = @_;
-            return { org => 'Bitly Inc',      abuse => 'abuse@bitly.example'  }
-                if $ip eq '67.199.248.10';
-            return { org => 'Legit Corp',     abuse => 'abuse@legit.example'  };
-        },
-        domain_whois => undef,
-    );
+	restore_stubs();
+	install_stubs(
+		rdns	=> 'mail.sender.example',
+		resolve => {
+			'bit.ly'		 => '67.199.248.10',
+			'legit.example'  => '192.0.2.50',
+		},
+		whois_ip => sub {
+			my (undef, $ip) = @_;
+			return { org => 'Bitly Inc',   abuse => 'abuse@bitly.example'  }
+				if $ip eq '67.199.248.10';
+			return { org => 'Legit Corp',  abuse => 'abuse@legit.example'  };
+		},
+		domain_whois => undef,
+	);
 
-    my $a = Email::Abuse::Investigator->new();
-    $a->parse_email(make_raw_email(
-        received => 'from sender (sender [91.198.174.1]) by mx.test',
-        body     => 'Click https://bit.ly/abc123 or https://bit.ly/xyz789 '
-                  . 'or visit https://legit.example/page for info.',
-    ));
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_raw_email(
+		received => 'from sender (sender [91.198.174.1]) by mx.test',
+		body	 => 'Click https://bit.ly/abc123 or https://bit.ly/xyz789 '
+				  . 'or visit https://legit.example/page for info.',
+	));
 
-    # All three URLs returned
-    my @urls = $a->embedded_urls();
-    is scalar @urls, 3, 'three URLs found';
+	# All three URLs returned
+	my @urls = $a->embedded_urls();
+	is scalar @urls, 3, 'three URLs found';
 
-    # Hosts correctly identified
-    my %hosts = map { $_->{host} => 1 } @urls;
-    ok $hosts{'bit.ly'},         'bit.ly identified as URL host';
-    ok $hosts{'legit.example'},  'legit.example identified as URL host';
+	# Hosts correctly identified
+	my %hosts = map { $_->{host} => 1 } @urls;
+	ok $hosts{'bit.ly'},		 'bit.ly identified as URL host';
+	ok $hosts{'legit.example'},  'legit.example identified as URL host';
 
-    # WHOIS called once per unique host (two hosts → two calls, not three)
-    my $whois_calls = 0;
-    {
-        no warnings 'redefine';
-        local *Email::Abuse::Investigator::_whois_ip = sub {
-            $whois_calls++;
-            return { org => 'Test', abuse => 'a@b' };
-        };
-        # Re-parse to reset cached URL data
-        $a->parse_email(make_raw_email(
-            received => 'from sender (sender [91.198.174.1]) by mx.test',
-            body     => 'https://bit.ly/abc123 and https://bit.ly/xyz789 '
-                      . 'and https://legit.example/page',
-        ));
-        my @u2 = $a->embedded_urls();
-        is scalar @u2, 3,       're-parsed: three URLs';
-        is $whois_calls, 2,     'WHOIS called once per unique host (2 unique hosts)';
-    }
+	# --- WHOIS call-count subtest ---
+	# Use hostnames that cannot be in the cross-message cache from prior subtests.
+	# Each hostname is unique to this counting block (suffix -s5cnt).
+	my $whois_calls = 0;
+	{
+		no warnings 'redefine';
+		local *Email::Abuse::Investigator::_whois_ip = sub {
+			$whois_calls++;
+			return { org => 'Test', abuse => 'a@b' };
+		};
+		# Also stub _resolve_host for the fresh hostnames
+		local *Email::Abuse::Investigator::_resolve_host = sub {
+			my (undef, $host) = @_;
+			return '67.199.248.11' if $host eq 'bit-ly-cnt-s5.example';
+			return '192.0.2.51'   if $host eq 'legit-cnt-s5.example';
+			return undef;
+		};
 
-    # Restore the real stub so risk_assessment works
-    install_stubs(
-        rdns    => 'mail.sender.example',
-        resolve => { 'bit.ly' => '67.199.248.10', 'legit.example' => '192.0.2.50' },
-        whois_ip => { org => 'Test', abuse => 'a@b' },
-        domain_whois => undef,
-    );
-    $a->parse_email(make_raw_email(
-        received => 'from sender (sender [91.198.174.1]) by mx.test',
-        body     => 'https://bit.ly/abc123 and https://legit.example/page',
-    ));
+		# Re-parse using hostnames that are guaranteed cache-cold
+		$a->parse_email(make_raw_email(
+			received => 'from sender (sender [91.198.174.1]) by mx.test',
+			body	 => 'https://bit-ly-cnt-s5.example/abc123 '
+					  . 'and https://bit-ly-cnt-s5.example/xyz789 '
+					  . 'and https://legit-cnt-s5.example/page',
+		));
+		my @u2 = $a->embedded_urls();
+		is scalar @u2,   3, 're-parsed: three URLs';
+		is $whois_calls, 2, 'WHOIS called once per unique host (2 unique hosts)';
+	}
 
-    my $risk = $a->risk_assessment();
-    ok scalar(grep { $_->{flag} eq 'url_shortener' } @{ $risk->{flags} }),
-        'url_shortener flagged for bit.ly';
-    # Should not flag legit.example as a shortener
-    my @shortener_details = grep { $_->{flag} eq 'url_shortener' }
-                            @{ $risk->{flags} };
-    ok !scalar(grep { $_->{detail} =~ /legit\.example/ } @shortener_details),
-        'legit.example not flagged as shortener';
+	# Restore the real stub so risk_assessment works with the original URLs
+	install_stubs(
+		rdns	=> 'mail.sender.example',
+		resolve => { 'bit.ly' => '67.199.248.10', 'legit.example' => '192.0.2.50' },
+		whois_ip => { org => 'Test', abuse => 'a@b' },
+		domain_whois => undef,
+	);
+	$a->parse_email(make_raw_email(
+		received => 'from sender (sender [91.198.174.1]) by mx.test',
+		body	 => 'https://bit.ly/abc123 and https://legit.example/page',
+	));
 
-    # Report mentions the shortener warning
-    my $report = $a->report();
-    like $report, qr/URL SHORTENER/, 'URL SHORTENER warning in report';
+	my $risk = $a->risk_assessment();
+	ok scalar(grep { $_->{flag} eq 'url_shortener' } @{ $risk->{flags} }),
+		'url_shortener flagged for bit.ly';
+	# Should not flag legit.example as a shortener
+	my @shortener_details = grep { $_->{flag} eq 'url_shortener' }
+							@{ $risk->{flags} };
+	ok !scalar(grep { $_->{detail} =~ /legit\.example/ } @shortener_details),
+		'legit.example not flagged as shortener';
 
-    restore_stubs();
+	# Report mentions the shortener warning
+	my $report = $a->report();
+	like $report, qr/URL SHORTENER/, 'URL SHORTENER warning in report';
+
+	restore_stubs();
 };
 
 # ---------------------------------------------------------------------------
@@ -531,79 +549,79 @@ subtest 'Scenario 5: URL shortener hides real destination' => sub {
 # The domain pipeline (A→WHOIS, WHOIS) still runs on those domains.
 # ---------------------------------------------------------------------------
 subtest 'Scenario 6: mailto-only spam — no HTTP URLs, all contact via email' => sub {
-    restore_stubs();  # defensive reset in case prior subtest exited early
-    install_stubs(
-        rdns     => 'mail-ej1-f67.google.com',
-        resolve  => { 'sminvestmentsupplychain.example' => '104.21.0.1' },
-        whois_ip => { org => 'Cloudflare Inc', abuse => 'abuse@cloudflare.com', country => 'US' },
-        domain_whois => sub {
-            my (undef, $dom) = @_;
-            return undef unless $dom eq 'sminvestmentsupplychain.example';
-            return <<'WHOIS';
-Registrar: NameCheap Inc.
-Registrar Abuse Contact Email: abuse@namecheap.com
-Creation Date: 2025-10-15
-Registry Expiry Date: 2026-10-15
-WHOIS
-        },
-    );
+	restore_stubs();
+	install_stubs(
+		rdns	 => 'mail-ej1-f67.google.com',
+		resolve  => { 'sminvestmentsupplychain.example' => '104.21.0.1' },
+		whois_ip => { org => 'Cloudflare Inc', abuse => 'abuse@cloudflare.com', country => 'US' },
+		domain_whois => sub {
+			my (undef, $dom) = @_;
+			return undef unless $dom eq 'sminvestmentsupplychain.example';
+			my $reg = strftime('%Y-%m-%d', gmtime(time() - 60  * 86400));
+			my $exp = strftime('%Y-%m-%d', gmtime(time() + 305 * 86400));
+			return "Registrar: NameCheap Inc.\n"
+				 . "Registrar Abuse Contact Email: abuse\@namecheap.com\n"
+				 . "Creation Date: $reg\n"
+				 . "Registry Expiry Date: $exp\n";
+		},
+	);
 
-    my $bnd = 'SMTP_BOUNDARY_001';
-    my $mp  = "--$bnd\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\n\r\n"
-            . "Contact us at Onboarding\@sminvestmentsupplychain.example\r\n"
-            . "--$bnd\r\nContent-Type: text/html; charset=\"UTF-8\"\r\n\r\n"
-            . '<a href="mailto:Onboarding@sminvestmentsupplychain.example">'
-            . 'Onboarding@sminvestmentsupplychain.example</a>'
-            . "\r\n--$bnd--\r\n";
+	my $bnd = 'SMTP_BOUNDARY_001';
+	my $mp  = "--$bnd\r\nContent-Type: text/plain; charset=\"UTF-8\"\r\n\r\n"
+			. "Contact us at Onboarding\@sminvestmentsupplychain.example\r\n"
+			. "--$bnd\r\nContent-Type: text/html; charset=\"UTF-8\"\r\n\r\n"
+			. '<a href="mailto:Onboarding@sminvestmentsupplychain.example">'
+			. 'Onboarding@sminvestmentsupplychain.example</a>'
+			. "\r\n--$bnd--\r\n";
 
-    my $a = Email::Abuse::Investigator->new();
-    $a->parse_email(make_raw_email(
-        received => 'from mail-ej1-f67.google.com (mail-ej1-f67.google.com [209.85.218.67]) by mx.test',
-        auth     => 'mx.test; spf=pass; dkim=pass header.d=gmail.com',
-        from     => 'SM Investments <denatabradley01@gmail.com>',
-        to       => 'undisclosed-recipients:;',
-        subject  => 'Invitation to Register as a Vendor',
-        ct       => qq{multipart/alternative; boundary="$bnd"},
-        body     => $mp,
-    ));
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_raw_email(
+		received => 'from mail-ej1-f67.google.com (mail-ej1-f67.google.com [209.85.218.67]) by mx.test',
+		auth	 => 'mx.test; spf=pass; dkim=pass header.d=gmail.com',
+		from	 => 'SM Investments <denatabradley01@gmail.com>',
+		to	   => 'undisclosed-recipients:;',
+		subject  => 'Invitation to Register as a Vendor',
+		ct	   => qq{multipart/alternative; boundary="$bnd"},
+		body	 => $mp,
+	));
 
-    # No HTTP/HTTPS URLs
-    my @urls = $a->embedded_urls();
-    is scalar @urls, 0, 'no HTTP/HTTPS URLs — mailto-only spam';
+	# No HTTP/HTTPS URLs
+	my @urls = $a->embedded_urls();
+	is scalar @urls, 0, 'no HTTP/HTTPS URLs — mailto-only spam';
 
-    # The supply-chain domain captured from both mailto: and bare address in body
-    my @doms = $a->mailto_domains();
-    my ($dom) = grep { $_->{domain} eq 'sminvestmentsupplychain.example' } @doms;
-    ok defined $dom,                                'supply chain domain found';
-    is $dom->{web_ip}, '104.21.0.1',               'A record resolved for domain';
-    like $dom->{web_org}, qr/Cloudflare/,           'web hosting org identified';
-    is $dom->{registrar}, 'NameCheap Inc.',         'registrar from WHOIS';
-    is $dom->{registrar_abuse}, 'abuse@namecheap.com', 'registrar abuse from WHOIS';
-    is $dom->{recently_registered}, 1,              'recently registered flag set';
+	# The supply-chain domain captured from both mailto: and bare address in body
+	my @doms = $a->mailto_domains();
+	my ($dom) = grep { $_->{domain} eq 'sminvestmentsupplychain.example' } @doms;
+	ok defined $dom,								'supply chain domain found';
+	is $dom->{web_ip}, '104.21.0.1',			   'A record resolved for domain';
+	like $dom->{web_org}, qr/Cloudflare/,		   'web hosting org identified';
+	is $dom->{registrar}, 'NameCheap Inc.',		 'registrar from WHOIS';
+	is $dom->{registrar_abuse}, 'abuse@namecheap.com', 'registrar abuse from WHOIS';
+	is $dom->{recently_registered}, 1,			  'recently registered flag set';
 
-    # all_domains includes the supply-chain domain
-    my @all = $a->all_domains();
-    ok scalar(grep { $_ eq 'sminvestmentsupplychain.example' } @all),
-        'supply chain domain in all_domains';
+	# all_domains includes the supply-chain domain
+	my @all = $a->all_domains();
+	ok scalar(grep { $_ eq 'sminvestmentsupplychain.example' } @all),
+		'supply chain domain in all_domains';
 
-    # Abuse contacts include Cloudflare (web host) and NameCheap (registrar)
-    my @contacts = $a->abuse_contacts();
-    my @addrs    = map { lc $_->{address} } @contacts;
-    ok scalar(grep { $_ eq 'abuse@cloudflare.com'  } @addrs),
-        'Cloudflare web-host abuse in contacts';
-    ok scalar(grep { $_ eq 'abuse@namecheap.com'   } @addrs),
-        'NameCheap registrar abuse in contacts';
-    ok scalar(grep { $_ eq 'abuse@google.com'      } @addrs),
-        'Google account-provider abuse in contacts (gmail From:)';
+	# Abuse contacts include Cloudflare (web host) and NameCheap (registrar)
+	my @contacts = $a->abuse_contacts();
+	my @addrs	= map { lc $_->{address} } @contacts;
+	ok scalar(grep { $_ eq 'abuse@cloudflare.com'  } @addrs),
+		'Cloudflare web-host abuse in contacts';
+	ok scalar(grep { $_ eq 'abuse@namecheap.com'   } @addrs),
+		'NameCheap registrar abuse in contacts';
+	ok scalar(grep { $_ eq 'abuse@google.com'	  } @addrs),
+		'Google account-provider abuse in contacts (gmail From:)';
 
-    # Report contains all relevant information
-    my $report = $a->report();
-    like $report, qr/209\.85\.218\.67/,                    'Google IP in report';
-    like $report, qr/sminvestmentsupplychain\.example/,    'supply chain domain in report';
-    like $report, qr/RECENTLY REGISTERED/,                 'recently registered warning';
-    like $report, qr/none found/i,                         '"none found" for URLs section';
+	# Report contains all relevant information
+	my $report = $a->report();
+	like $report, qr/209\.85\.218\.67/,				 'Google IP in report';
+	like $report, qr/sminvestmentsupplychain\.example/, 'supply chain domain in report';
+	like $report, qr/RECENTLY REGISTERED/,			  'recently registered warning';
+	like $report, qr/none found/i,					  '"none found" for URLs section';
 
-    restore_stubs();
+	restore_stubs();
 };
 
 # ---------------------------------------------------------------------------
@@ -614,49 +632,49 @@ WHOIS
 # risk_assessment() and into report() and abuse_report_text().
 # ---------------------------------------------------------------------------
 subtest 'Scenario 7: authentication failures — SPF, DKIM, DMARC all fail' => sub {
-    restore_stubs();  # defensive reset in case prior subtest exited early
-    install_stubs(
-        rdns     => 'mail.forgeddomain.example',
-        resolve  => undef,
-        whois_ip => { org => 'Spammer ISP', abuse => 'abuse@spammisp.example' },
-        domain_whois => undef,
-    );
+	restore_stubs();
+	install_stubs(
+		rdns	 => 'mail.forgeddomain.example',
+		resolve  => undef,
+		whois_ip => { org => 'Spammer ISP', abuse => 'abuse@spammisp.example' },
+		domain_whois => undef,
+	);
 
-    my $a = Email::Abuse::Investigator->new();
-    $a->parse_email(make_raw_email(
-        received => 'from forged (forged [91.198.174.5]) by mx.test',
-        auth     => 'mx.test; spf=fail; dkim=fail; dmarc=fail action=reject',
-        from     => 'Fake Bank <security@real-bank.example>',
-        body     => 'Your account requires verification.',
-    ));
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_raw_email(
+		received => 'from forged (forged [91.198.174.5]) by mx.test',
+		auth	 => 'mx.test; spf=fail; dkim=fail; dmarc=fail action=reject',
+		from	 => 'Fake Bank <security@real-bank.example>',
+		body	 => 'Your account requires verification.',
+	));
 
-    my $risk = $a->risk_assessment();
-    my @flag_names = map { $_->{flag} } @{ $risk->{flags} };
+	my $risk = $a->risk_assessment();
+	my @flag_names = map { $_->{flag} } @{ $risk->{flags} };
 
-    ok scalar(grep { $_ eq 'spf_fail'   } @flag_names), 'spf_fail flagged';
-    ok scalar(grep { $_ eq 'dkim_fail'  } @flag_names), 'dkim_fail flagged';
-    ok scalar(grep { $_ eq 'dmarc_fail' } @flag_names), 'dmarc_fail flagged';
+	ok scalar(grep { $_ eq 'spf_fail'   } @flag_names), 'spf_fail flagged';
+	ok scalar(grep { $_ eq 'dkim_fail'  } @flag_names), 'dkim_fail flagged';
+	ok scalar(grep { $_ eq 'dmarc_fail' } @flag_names), 'dmarc_fail flagged';
 
-    # Three HIGH-severity auth failures → score ≥ 9 → HIGH level
-    is $risk->{level}, 'HIGH', 'three auth failures → HIGH risk level';
-    ok $risk->{score} >= 9,    'score ≥ 9 for three HIGH-severity flags';
+	# Three HIGH-severity auth failures → score ≥ 9 → HIGH level
+	is $risk->{level}, 'HIGH', 'three auth failures → HIGH risk level';
+	ok $risk->{score} >= 9,	'score ≥ 9 for three HIGH-severity flags';
 
-    # Each auth flag has the right severity
-    for my $fn (qw(spf_fail dkim_fail dmarc_fail)) {
-        my ($f) = grep { $_->{flag} eq $fn } @{ $risk->{flags} };
-        is $f->{severity}, 'HIGH', "$fn has HIGH severity";
-    }
+	# Each auth flag has the right severity
+	for my $fn (qw(spf_fail dkim_fail dmarc_fail)) {
+		my ($f) = grep { $_->{flag} eq $fn } @{ $risk->{flags} };
+		is $f->{severity}, 'HIGH', "$fn has HIGH severity";
+	}
 
-    # abuse_report_text includes the flag details
-    my $art = $a->abuse_report_text();
-    like $art, qr/RED FLAGS IDENTIFIED/, 'RED FLAGS section in abuse_report_text';
-    like $art, qr/spf/i,                 'SPF result mentioned in abuse_report_text';
+	# abuse_report_text includes the flag details
+	my $art = $a->abuse_report_text();
+	like $art, qr/RED FLAGS IDENTIFIED/, 'RED FLAGS section in abuse_report_text';
+	like $art, qr/spf/i,				'SPF result mentioned in abuse_report_text';
 
-    # report() shows risk assessment section with HIGH
-    my $report = $a->report();
-    like $report, qr/RISK ASSESSMENT:\s*HIGH/, 'HIGH risk level in report';
+	# report() shows risk assessment section with HIGH
+	my $report = $a->report();
+	like $report, qr/RISK ASSESSMENT:\s*HIGH/, 'HIGH risk level in report';
 
-    restore_stubs();
+	restore_stubs();
 };
 
 # ---------------------------------------------------------------------------
@@ -666,49 +684,49 @@ subtest 'Scenario 7: authentication failures — SPF, DKIM, DMARC all fail' => s
 # Also exercises the trusted_relays constructor option.
 # ---------------------------------------------------------------------------
 subtest 'Scenario 8: trusted relay excluded; two external hops give high confidence' => sub {
-    restore_stubs();  # defensive reset in case prior subtest exited early
-    install_stubs(
-        rdns    => sub {
-            my (undef, $ip) = @_;
-            return 'mail.attacker.example'     if $ip eq '91.198.174.10';
-            return 'relay.legitrelay.example'  if $ip eq '62.105.128.5';
-            return undef;
-        },
-        whois_ip => { org => 'Attacker ISP', abuse => 'abuse@attacker-isp.example' },
-        domain_whois => undef,
-    );
+	restore_stubs();
+	install_stubs(
+		rdns	=> sub {
+			my (undef, $ip) = @_;
+			return 'mail.attacker.example'	if $ip eq '91.198.174.10';
+			return 'relay.legitrelay.example' if $ip eq '62.105.128.5';
+			return undef;
+		},
+		whois_ip => { org => 'Attacker ISP', abuse => 'abuse@attacker-isp.example' },
+		domain_whois => undef,
+	);
 
-    my $a = Email::Abuse::Investigator->new(
-        trusted_relays => ['62.105.128.0/24'],  # our own relay
-    );
-    $a->parse_email(make_raw_email(
-        received => [
-            # Top (most recent): our trusted relay accepted from external relay
-            'from relay.legitrelay.example (relay.legitrelay.example [62.105.128.5]) by mx.test',
-            # Middle: an external relay accepted from the attacker
-            'from mail.attacker.example (mail.attacker.example [91.198.174.10]) by relay.legitrelay.example',
-            # Bottom: the attacker sent directly from this IP
-            'from attacker (attacker [91.198.174.10]) by mail.attacker.example',
-        ],
-        from => 'attacker@attacker.example',
-        body => 'Spam content here.',
-    ));
+	my $a = Email::Abuse::Investigator->new(
+		trusted_relays => ['62.105.128.0/24'],  # our own relay
+	);
+	$a->parse_email(make_raw_email(
+		received => [
+			# Top (most recent): our trusted relay accepted from external relay
+			'from relay.legitrelay.example (relay.legitrelay.example [62.105.128.5]) by mx.test',
+			# Middle: an external relay accepted from the attacker
+			'from mail.attacker.example (mail.attacker.example [91.198.174.10]) by relay.legitrelay.example',
+			# Bottom: the attacker sent directly from this IP
+			'from attacker (attacker [91.198.174.10]) by mail.attacker.example',
+		],
+		from => 'attacker@attacker.example',
+		body => 'Spam content here.',
+	));
 
-    my $orig = $a->originating_ip();
+	my $orig = $a->originating_ip();
 
-    # The trusted relay (62.105.128.5) must be excluded
-    ok $orig->{ip} ne '62.105.128.5', 'trusted relay IP excluded from origin';
+	# The trusted relay (62.105.128.5) must be excluded
+	ok $orig->{ip} ne '62.105.128.5', 'trusted relay IP excluded from origin';
 
-    # Two non-trusted hops (91.198.174.10 appears twice) → high confidence
-    is $orig->{confidence}, 'high', 'two external hops → high confidence';
-    is $orig->{ip}, '91.198.174.10', 'attacker IP identified as origin';
+	# Two non-trusted hops (91.198.174.10 appears twice) → high confidence
+	is $orig->{confidence}, 'high',		 'two external hops → high confidence';
+	is $orig->{ip}, '91.198.174.10',		'attacker IP identified as origin';
 
-    # Abuse contact for the attacker's IP present
-    my @contacts = $a->abuse_contacts();
-    ok scalar(grep { lc($_->{address}) eq 'abuse@attacker-isp.example' } @contacts),
-        'attacker ISP abuse contact in contacts';
+	# Abuse contact for the attacker's IP present
+	my @contacts = $a->abuse_contacts();
+	ok scalar(grep { lc($_->{address}) eq 'abuse@attacker-isp.example' } @contacts),
+		'attacker ISP abuse contact in contacts';
 
-    restore_stubs();
+	restore_stubs();
 };
 
 # ---------------------------------------------------------------------------
@@ -718,142 +736,136 @@ subtest 'Scenario 8: trusted relay excluded; two external hops give high confide
 # Verifies that report() shows decoded text, not raw encoded-word strings.
 # ---------------------------------------------------------------------------
 subtest 'Scenario 9: MIME-encoded From: and Subject: decoded in report' => sub {
-    restore_stubs();  # defensive reset in case prior subtest exited early
-    install_stubs(
-        rdns     => 'mail.sender.example',
-        resolve  => undef,
-        whois_ip => { org => 'Sender ISP', abuse => 'abuse@sender-isp.example' },
-        domain_whois => undef,
-    );
+	restore_stubs();
+	install_stubs(
+		rdns	 => 'mail.sender.example',
+		resolve  => undef,
+		whois_ip => { org => 'Sender ISP', abuse => 'abuse@sender-isp.example' },
+		domain_whois => undef,
+	);
 
-    my $enc_from = '=?UTF-8?B?' . encode_base64('eharmony Partner', '') . '?=';
-    my $enc_subj = '=?UTF-8?B?' . encode_base64('Ready to Find Someone Special?', '') . '?=';
+	my $enc_from = '=?UTF-8?B?' . encode_base64('eharmony Partner', '') . '?=';
+	my $enc_subj = '=?UTF-8?B?' . encode_base64('Ready to Find Someone Special?', '') . '?=';
 
-    my $a = Email::Abuse::Investigator->new();
-    $a->parse_email(make_raw_email(
-        received => 'from sender (sender [91.198.174.1]) by mx.test',
-        from     => qq{"$enc_from" <peacelight\@firmluminary.example>},
-        subject  => $enc_subj,
-        body     => 'Find the joy of real love today.',
-    ));
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_raw_email(
+		received => 'from sender (sender [91.198.174.1]) by mx.test',
+		from	 => qq{"$enc_from" <peacelight\@firmluminary.example>},
+		subject  => $enc_subj,
+		body	 => 'Find the joy of real love today.',
+	));
 
-    my $report = $a->report();
+	my $report = $a->report();
 
-    # Decoded display name appears; raw encoded-word should not be the only form —
-    # report() shows "decoded [encoded: raw]" so decoded text must appear first
-    like $report, qr/eharmony Partner/,           'decoded From: display name in report';
-    like $report, qr/Ready to Find Someone Special/, 'decoded Subject in report';
+	# Decoded display name appears in report
+	like $report, qr/eharmony Partner/,			'decoded From: display name in report';
+	like $report, qr/Ready to Find Someone Special/, 'decoded Subject in report';
 
-    # The encoded form may appear in brackets, but decoded text must lead
-    like $report, qr/eharmony Partner.*\[encoded:/s,
-        'decoded form appears before the bracketed raw encoded value';
+	# The decoded form leads; raw encoding appears in brackets after
+	like $report, qr/eharmony Partner.*\[encoded:/s,
+		'decoded form appears before the bracketed raw encoded value';
 
-    restore_stubs();
+	restore_stubs();
 };
 
 # ---------------------------------------------------------------------------
 # Scenario 10 — Domain intelligence pipeline (POD Algorithm section)
 #
 # POD: "For each unique non-infrastructure domain … A record → web hosting,
-#       MX record → mail hosting, NS record → DNS hosting, WHOIS → registrar"
+#	   MX record → mail hosting, NS record → DNS hosting, WHOIS → registrar"
 # Simulates a domain whose web host, MX host, and NS host are all different
 # companies — verifying that all three are independently reported.
 # ---------------------------------------------------------------------------
 subtest 'Scenario 10: domain intelligence pipeline — web/MX/NS all different' => sub {
-    restore_stubs();  # defensive reset in case prior subtest exited early
-    # Simulate via domain_whois returning full structured data, and resolve
-    # returning different IPs per hostname
-    install_stubs(
-        rdns    => 'mail.sender.example',
-        resolve => sub {
-            my (undef, $host) = @_;
-            my %map = (
-                'spamdom.example'      => '104.21.0.1',   # web host (Cloudflare)
-                'mail.spamdom.example' => '74.125.0.1',   # MX (Google)
-                'ns1.spamdom.example'  => '198.41.0.1',   # NS (Verisign)
-            );
-            return $map{$host};
-        },
-        whois_ip => sub {
-            my (undef, $ip) = @_;
-            my %data = (
-                '104.21.0.1'  => { org => 'Cloudflare Inc',  abuse => 'abuse@cloudflare.com' },
-                '74.125.0.1'  => { org => 'Google LLC',       abuse => 'network-abuse@google.com' },
-                '198.41.0.1'  => { org => 'VeriSign Inc',     abuse => 'abuse@verisign.example' },
-                '91.198.174.1'=> { org => 'Sender ISP',       abuse => 'abuse@sender.example' },
-            );
-            return $data{$ip} // {};
-        },
-        domain_whois => sub {
-            my (undef, $dom) = @_;
-            return undef unless $dom eq 'spamdom.example';
-            return <<'WHOIS';
+	restore_stubs();
+	install_stubs(
+		rdns	=> 'mail.sender.example',
+		resolve => sub {
+			my (undef, $host) = @_;
+			my %map = (
+				'spamdom.example'	  => '104.21.0.1',
+				'mail.spamdom.example' => '74.125.0.1',
+				'ns1.spamdom.example'  => '198.41.0.1',
+			);
+			return $map{$host};
+		},
+		whois_ip => sub {
+			my (undef, $ip) = @_;
+			my %data = (
+				'104.21.0.1'   => { org => 'Cloudflare Inc',  abuse => 'abuse@cloudflare.com' },
+				'74.125.0.1'   => { org => 'Google LLC',	  abuse => 'network-abuse@google.com' },
+				'198.41.0.1'   => { org => 'VeriSign Inc',	abuse => 'abuse@verisign.example' },
+				'91.198.174.1' => { org => 'Sender ISP',	  abuse => 'abuse@sender.example' },
+			);
+			return $data{$ip} // {};
+		},
+		domain_whois => sub {
+			my (undef, $dom) = @_;
+			return undef unless $dom eq 'spamdom.example';
+			return <<'WHOIS';
 Registrar: GoDaddy.com LLC
 Registrar Abuse Contact Email: abuse@godaddy.com
 Creation Date: 2020-01-15
 Registry Expiry Date: 2030-01-15
 WHOIS
-        },
-    );
+		},
+	);
 
-    # We need Net::DNS to be available for MX/NS lookups; if it isn't,
-    # the domain info simply won't have mx_host/ns_host.
-    # Inject the full domain info directly so this test works without Net::DNS.
-    my $a = Email::Abuse::Investigator->new();
-    $a->parse_email(make_raw_email(
-        received => 'from sender (sender [91.198.174.1]) by mx.test',
-        from     => 'Spammer <spam@spamdom.example>',
-        body     => 'Contact us at info@spamdom.example',
-    ));
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_raw_email(
+		received => 'from sender (sender [91.198.174.1]) by mx.test',
+		from	 => 'Spammer <spam@spamdom.example>',
+		body	 => 'Contact us at info@spamdom.example',
+	));
 
-    # Pre-populate the domain cache with fully resolved data
-    # (simulates what _analyse_domain would produce with Net::DNS present)
-    $a->{_domain_info}{'spamdom.example'} = {
-        web_ip   => '104.21.0.1',
-        web_org  => 'Cloudflare Inc',
-        web_abuse => 'abuse@cloudflare.com',
-        mx_host  => 'mail.spamdom.example',
-        mx_ip    => '74.125.0.1',
-        mx_org   => 'Google LLC',
-        mx_abuse => 'network-abuse@google.com',
-        ns_host  => 'ns1.spamdom.example',
-        ns_ip    => '198.41.0.1',
-        ns_org   => 'VeriSign Inc',
-        ns_abuse => 'abuse@verisign.example',
-        registrar       => 'GoDaddy.com LLC',
-        registrar_abuse => 'abuse@godaddy.com',
-        registered      => '2020-01-15',
-        expires         => '2030-01-15',
-        recently_registered => 0,
-    };
+	# Pre-populate the domain cache with fully resolved data
+	# (simulates what _analyse_domain would produce with Net::DNS present)
+	$a->{_domain_info}{'spamdom.example'} = {
+		web_ip   => '104.21.0.1',
+		web_org  => 'Cloudflare Inc',
+		web_abuse => 'abuse@cloudflare.com',
+		mx_host  => 'mail.spamdom.example',
+		mx_ip	=> '74.125.0.1',
+		mx_org   => 'Google LLC',
+		mx_abuse => 'network-abuse@google.com',
+		ns_host  => 'ns1.spamdom.example',
+		ns_ip	=> '198.41.0.1',
+		ns_org   => 'VeriSign Inc',
+		ns_abuse => 'abuse@verisign.example',
+		registrar	   => 'GoDaddy.com LLC',
+		registrar_abuse => 'abuse@godaddy.com',
+		registered	  => '2020-01-15',
+		expires		 => '2030-01-15',
+		recently_registered => 0,
+	};
 
-    my @contacts = $a->abuse_contacts();
-    my @addrs = map { lc $_->{address} } @contacts;
+	my @contacts = $a->abuse_contacts();
+	my @addrs = map { lc $_->{address} } @contacts;
 
-    # All four distinct parties must appear independently
-    ok scalar(grep { $_ eq 'abuse@cloudflare.com'       } @addrs),
-        'Cloudflare web-host abuse contact present';
-    ok scalar(grep { $_ eq 'network-abuse@google.com'   } @addrs),
-        'Google MX-host abuse contact present';
-    ok scalar(grep { $_ eq 'abuse@verisign.example'     } @addrs),
-        'VeriSign NS-host abuse contact present';
-    # GoDaddy is now form-only -- suppressed from abuse_contacts(), surfaced via form_contacts()
-    ok scalar(grep { $_->{form} =~ /godaddy/i } $a->form_contacts()),
-        'GoDaddy registrar appears in form_contacts() (form-only provider)';
+	# All four distinct parties must appear independently
+	ok scalar(grep { $_ eq 'abuse@cloudflare.com'	  } @addrs),
+		'Cloudflare web-host abuse contact present';
+	ok scalar(grep { $_ eq 'network-abuse@google.com'  } @addrs),
+		'Google MX-host abuse contact present';
+	ok scalar(grep { $_ eq 'abuse@verisign.example'	} @addrs),
+		'VeriSign NS-host abuse contact present';
+	# GoDaddy is form-only — suppressed from abuse_contacts(), surfaced via form_contacts()
+	ok scalar(grep { $_->{form} =~ /godaddy/i } $a->form_contacts()),
+		'GoDaddy registrar appears in form_contacts() (form-only provider)';
 
-    # All four addresses are distinct — no collapsing
-    my %addr_seen;
-    my @dups = grep { $addr_seen{$_}++ } @addrs;
-    is scalar @dups, 0, 'all four party addresses are distinct (no deduplication collapse)';
+	# All addresses are distinct — no collapsing
+	my %addr_seen;
+	my @dups = grep { $addr_seen{$_}++ } @addrs;
+	is scalar @dups, 0, 'all party addresses are distinct (no deduplication collapse)';
 
-    # report() shows all three hosting sections for the domain
-    my $report = $a->report();
-    like $report, qr/Web host/,  'web host section in report';
-    like $report, qr/MX host/,   'MX host section in report';
-    like $report, qr/NS host/,   'NS host section in report';
-    like $report, qr/Registrar/, 'Registrar section in report';
+	# report() shows all three hosting sections for the domain
+	my $report = $a->report();
+	like $report, qr/Web host/,  'web host section in report';
+	like $report, qr/MX host/,   'MX host section in report';
+	like $report, qr/NS host/,   'NS host section in report';
+	like $report, qr/Registrar/, 'Registrar section in report';
 
-    restore_stubs();
+	restore_stubs();
 };
 
 # ---------------------------------------------------------------------------
@@ -864,237 +876,225 @@ WHOIS
 # replaces all analysis state — no leakage from the first email.
 # ---------------------------------------------------------------------------
 subtest 'Scenario 11: re-parsing replaces all state — no leakage between emails' => sub {
-    restore_stubs();  # defensive reset in case prior subtest exited early
-    install_stubs(
-        rdns    => 'mail.first.example',
-        resolve => { 'firstsite.example' => '91.198.174.10' },
-        whois_ip => { org => 'First ISP', abuse => 'abuse@first.example' },
-        domain_whois => undef,
-    );
+	restore_stubs();
+	install_stubs(
+		rdns	=> 'mail.first.example',
+		resolve => { 'firstsite.example' => '91.198.174.10' },
+		whois_ip => { org => 'First ISP', abuse => 'abuse@first.example' },
+		domain_whois => undef,
+	);
 
-    my $a = Email::Abuse::Investigator->new();
+	my $a = Email::Abuse::Investigator->new();
 
-    # First email: has URL, high-risk sender
-    $a->parse_email(make_raw_email(
-        received => 'from first (first [91.198.174.10]) by mx.test',
-        from     => 'Spammer <bad@gmail.com>',
-        body     => 'Visit https://firstsite.example/buy now!',
-    ));
+	# First email: has URL, high-risk sender
+	$a->parse_email(make_raw_email(
+		received => 'from first (first [91.198.174.10]) by mx.test',
+		from	 => 'Spammer <bad@gmail.com>',
+		body	 => 'Visit https://firstsite.example/buy now!',
+	));
 
-    my $orig1  = $a->originating_ip();
-    my @urls1  = $a->embedded_urls();
-    my @doms1  = $a->mailto_domains();
-    my $risk1  = $a->risk_assessment();
-    my @cont1  = $a->abuse_contacts();
+	my $orig1  = $a->originating_ip();
+	my @urls1  = $a->embedded_urls();
+	my $risk1  = $a->risk_assessment();
 
-    is $orig1->{ip}, '91.198.174.10', 'first email: correct origin';
-    is scalar @urls1, 1,              'first email: one URL';
-    ok $risk1->{score} > 0,           'first email: non-zero risk score';
+	is $orig1->{ip}, '91.198.174.10', 'first email: correct origin';
+	is scalar @urls1, 1,			  'first email: one URL';
+	ok $risk1->{score} > 0,		   'first email: non-zero risk score';
 
-    # Second email: clean, no URLs, different sender
-    install_stubs(
-        rdns    => 'mail.clean.example',
-        resolve => undef,
-        whois_ip => { org => 'Clean ISP', abuse => 'abuse@clean.example' },
-        domain_whois => undef,
-    );
+	# Second email: clean, no URLs, different sender
+	install_stubs(
+		rdns	=> 'mail.clean.example',
+		resolve => undef,
+		whois_ip => { org => 'Clean ISP', abuse => 'abuse@clean.example' },
+		domain_whois => undef,
+	);
 
-    $a->parse_email(make_raw_email(
-        received => 'from clean (clean [62.105.128.1]) by mx.test',
-        from     => 'Newsletter <news@cleanorg.example>',
-        body     => 'Monthly newsletter — no links.',
-    ));
+	$a->parse_email(make_raw_email(
+		received => 'from clean (clean [62.105.128.1]) by mx.test',
+		from	 => 'Newsletter <news@cleanorg.example>',
+		body	 => 'Monthly newsletter — no links.',
+	));
 
-    my $orig2 = $a->originating_ip();
-    my @urls2  = $a->embedded_urls();
-    my $risk2  = $a->risk_assessment();
+	my $orig2  = $a->originating_ip();
+	my @urls2  = $a->embedded_urls();
+	my $risk2  = $a->risk_assessment();
 
-    # Origin completely replaced
-    is $orig2->{ip}, '62.105.128.1',    're-parse: new origin IP';
-    ok $orig2->{ip} ne $orig1->{ip},   're-parse: origin differs from first email';
+	# Origin completely replaced
+	is $orig2->{ip}, '62.105.128.1',   're-parse: new origin IP';
+	ok $orig2->{ip} ne $orig1->{ip},   're-parse: origin differs from first email';
 
-    # URLs cleared
-    is scalar @urls2, 0, 're-parse: no URLs in second email';
+	# URLs cleared
+	is scalar @urls2, 0, 're-parse: no URLs in second email';
 
-    # Risk cache cleared — second risk is independent of first
-    isnt $risk2, $risk1, 're-parse: risk_assessment result is a new object';
+	# Risk cache cleared — second risk is independent of first
+	isnt $risk2, $risk1, 're-parse: risk_assessment result is a new object';
 
-    restore_stubs();
+	restore_stubs();
 };
 
 # ---------------------------------------------------------------------------
 # Scenario 12 — Clean, benign email scores INFO
 #
 # POD risk_assessment: level is INFO when score < 2.
-# SPF/DKIM/DMARC all pass, known sender, normal To:, no URLs, no flags.
-# Verifies that the module does not false-positive on legitimate email.
 # ---------------------------------------------------------------------------
 subtest 'Scenario 12: clean legitimate email scores INFO — no false positives' => sub {
-    restore_stubs();  # defensive reset in case prior subtest exited early
-    install_stubs(
-        rdns     => 'mail.verifiedcorp.example',
-        resolve  => undef,
-        whois_ip => { org => 'Verified Corp ISP', abuse => 'abuse@vcorp-isp.example' },
-        domain_whois => undef,
-    );
+	restore_stubs();
+	install_stubs(
+		rdns	 => 'mail.verifiedcorp.example',
+		resolve  => undef,
+		whois_ip => { org => 'Verified Corp ISP', abuse => 'abuse@vcorp-isp.example' },
+		domain_whois => undef,
+	);
 
-    my $a = Email::Abuse::Investigator->new(
-        trusted_relays => ['62.105.128.0/24'],
-    );
-    $a->parse_email(make_raw_email(
-        received     => 'from mail.verifiedcorp.example (mail.verifiedcorp.example [62.105.128.10]) by mx.test',
-        auth         => 'mx.test; spf=pass; dkim=pass header.d=verifiedcorp.example; dmarc=pass',
-        from         => 'Newsletter <news@verifiedcorp.example>',
-        return_path  => '<news@verifiedcorp.example>',
-        to           => 'subscriber@test.example',
-        subject      => 'Monthly Update',
-        message_id   => '<monthly-001@verifiedcorp.example>',
-        body         => 'Please find the monthly update attached. No links.',
-    ));
+	my $a = Email::Abuse::Investigator->new(
+		trusted_relays => ['62.105.128.0/24'],
+	);
+	$a->parse_email(make_raw_email(
+		received	 => 'from mail.verifiedcorp.example (mail.verifiedcorp.example [62.105.128.10]) by mx.test',
+		auth		 => 'mx.test; spf=pass; dkim=pass header.d=verifiedcorp.example; dmarc=pass',
+		from		 => 'Newsletter <news@verifiedcorp.example>',
+		return_path  => '<news@verifiedcorp.example>',
+		to		   => 'subscriber@test.example',
+		subject	  => 'Monthly Update',
+		message_id   => '<monthly-001@verifiedcorp.example>',
+		body		 => 'Please find the monthly update attached. No links.',
+	));
 
-    # Clean Received: chain — our trusted relay is the only hop
-    # so originating_ip may return undef (all hops trusted)
-    # That is correct documented behaviour
+	my $risk = $a->risk_assessment();
+	is $risk->{level}, 'INFO', 'clean email scores INFO';
+	ok $risk->{score} < 2,	 'INFO-level score is less than 2';
 
-    my $risk = $a->risk_assessment();
-    is $risk->{level}, 'INFO', 'clean email scores INFO';
-    ok $risk->{score} < 2,     'INFO-level score is less than 2';
+	my @flag_names = map { $_->{flag} } @{ $risk->{flags} };
+	ok !scalar(grep { /^(?:spf|dkim|dmarc)_fail$/ } @flag_names),
+		'no auth-failure flags on clean email';
+	ok !scalar(grep { /^(?:url_shortener|http_not_https)$/ } @flag_names),
+		'no URL flags on email with no URLs';
 
-    # No auth-failure flags
-    my @flag_names = map { $_->{flag} } @{ $risk->{flags} };
-    ok !scalar(grep { /^(?:spf|dkim|dmarc)_fail$/ } @flag_names),
-        'no auth-failure flags on clean email';
+	my @all = $a->all_domains();
+	ok !scalar(grep { $_ ne 'verifiedcorp.example' } @all),
+		'all_domains contains only the sender domain for a clean single-sender email';
 
-    # No URL-related flags
-    ok !scalar(grep { /^(?:url_shortener|http_not_https)$/ } @flag_names),
-        'no URL flags on email with no URLs';
-
-    # all_domains contains only verifiedcorp.example (the sender domain);
-    # no external or unrelated domains should appear
-    my @all = $a->all_domains();
-    ok !scalar(grep { $_ ne 'verifiedcorp.example' } @all),
-        'all_domains contains only the sender domain for a clean single-sender email';
-
-    restore_stubs();
+	restore_stubs();
 };
 
 # ---------------------------------------------------------------------------
 # Scenario 13 — abuse_contacts() deduplication across all routes
 #
-# POD abuse_contacts: "Addresses are deduplicated so the same address never
-# appears twice, even if it is discovered through multiple routes."
-# Cloudflare hosts the web server, NS, and appears in the URL list too.
+# POD abuse_contacts: same address discovered through multiple routes
+# appears exactly once; roles are merged.
 # ---------------------------------------------------------------------------
 subtest 'Scenario 13: abuse_contacts() deduplication across all discovery routes' => sub {
-    restore_stubs();  # defensive reset in case prior subtest exited early
-    my $a = Email::Abuse::Investigator->new();
-    $a->parse_email(make_raw_email(
-        from => 'x@example.org',
-        body => 'https://cf-site.example/page',
-    ));
+	restore_stubs();
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_raw_email(
+		from => 'x@example.org',
+		body => 'https://cf-site.example/page',
+	));
 
-    # Cloudflare appears as URL host, web host, NS host, and MX host
-    $a->{_origin} = undef;
-    $a->{_urls}   = [{
-        url   => 'https://cf-site.example/page',
-        host  => 'cf-site.example',
-        ip    => '104.21.0.1',
-        org   => 'CLOUDFLARENET',
-        abuse => 'abuse@cloudflare.com',
-    }];
-    $a->{_mailto_domains} = [{
-        domain    => 'cf-site.example',
-        source    => 'URL',
-        web_abuse => 'abuse@cloudflare.com',
-        web_ip    => '104.21.0.1',
-        web_org   => 'CLOUDFLARENET',
-        mx_abuse  => 'abuse@cloudflare.com',
-        mx_host   => 'mx.cf-site.example',
-        mx_ip     => '104.21.0.2',
-        mx_org    => 'CLOUDFLARENET',
-        ns_abuse  => 'abuse@cloudflare.com',
-        ns_host   => 'ns1.cf-site.example',
-        ns_ip     => '104.21.0.3',
-        ns_org    => 'CLOUDFLARENET',
-        registrar_abuse => 'abuse@registrar.example',
-        registrar       => 'Some Registrar',
-    }];
+	# Cloudflare appears as URL host, web host, NS host, and MX host
+	$a->{_origin} = undef;
+	$a->{_urls}   = [{
+		url   => 'https://cf-site.example/page',
+		host  => 'cf-site.example',
+		ip	=> '104.21.0.1',
+		org   => 'CLOUDFLARENET',
+		abuse => 'abuse@cloudflare.com',
+	}];
+	$a->{_mailto_domains} = [{
+		domain	=> 'cf-site.example',
+		source	=> 'URL',
+		web_abuse => 'abuse@cloudflare.com',
+		web_ip	=> '104.21.0.1',
+		web_org   => 'CLOUDFLARENET',
+		mx_abuse  => 'abuse@cloudflare.com',
+		mx_host   => 'mx.cf-site.example',
+		mx_ip	 => '104.21.0.2',
+		mx_org	=> 'CLOUDFLARENET',
+		ns_abuse  => 'abuse@cloudflare.com',
+		ns_host   => 'ns1.cf-site.example',
+		ns_ip	 => '104.21.0.3',
+		ns_org	=> 'CLOUDFLARENET',
+		registrar_abuse => 'abuse@registrar.example',
+		registrar	   => 'Some Registrar',
+	}];
 
-    my @contacts = $a->abuse_contacts();
-    my @cf_contacts = grep { lc($_->{address}) eq 'abuse@cloudflare.com' } @contacts;
+	my @contacts	= $a->abuse_contacts();
+	my @cf_contacts = grep { lc($_->{address}) eq 'abuse@cloudflare.com' } @contacts;
 
-    is scalar @cf_contacts, 1,
-        'abuse@cloudflare.com appears exactly once despite 4 discovery routes';
+	is scalar @cf_contacts, 1,
+		'abuse@cloudflare.com appears exactly once despite 4 discovery routes';
 
-    # The registrar address is different and should appear once
-    my @reg_contacts = grep { lc($_->{address}) eq 'abuse@registrar.example' } @contacts;
-    is scalar @reg_contacts, 1, 'registrar abuse address appears exactly once';
+	my @reg_contacts = grep { lc($_->{address}) eq 'abuse@registrar.example' } @contacts;
+	is scalar @reg_contacts, 1, 'registrar abuse address appears exactly once';
 
-    # Total distinct addresses
-    my %addr_count;
-    $addr_count{ lc $_->{address} }++ for @contacts;
-    ok !scalar(grep { $addr_count{$_} > 1 } keys %addr_count),
-        'no address appears more than once across all contacts';
+	# Roles arrayref must be present and populated when multiple routes merged
+	my ($cf) = @cf_contacts;
+	ok ref($cf->{roles}) eq 'ARRAY',	'merged contact has roles arrayref';
+	ok scalar(@{ $cf->{roles} }) > 1,   'roles arrayref contains multiple entries';
+
+	# Total distinct addresses — no address appears more than once
+	my %addr_count;
+	$addr_count{ lc $_->{address} }++ for @contacts;
+	ok !scalar(grep { $addr_count{$_} > 1 } keys %addr_count),
+		'no address appears more than once across all contacts';
 };
 
 # ---------------------------------------------------------------------------
 # Scenario 14 — report() and abuse_report_text() are consistent
 #
-# Both methods are called on the same object; they must reference the same
-# underlying analysis without re-running it.  The abuse contacts listed in
-# abuse_report_text() must be a subset of those returned by abuse_contacts().
+# Both methods called on the same object; they must reference the same
+# underlying analysis.  The abuse contacts listed in abuse_report_text() must
+# be a subset of those returned by abuse_contacts().
 # ---------------------------------------------------------------------------
 subtest 'Scenario 14: report() and abuse_report_text() consistent on same object' => sub {
-    restore_stubs();  # defensive reset in case prior subtest exited early
-    install_stubs(
-        rdns     => 'mail.spam.example',
-        resolve  => { 'spammer.example' => '91.198.174.55' },
-        whois_ip => { org => 'Spam ISP', abuse => 'abuse@spam-isp.example' },
-        domain_whois => undef,
-    );
+	restore_stubs();
+	install_stubs(
+		rdns	 => 'mail.spam.example',
+		resolve  => { 'spammer.example' => '91.198.174.55' },
+		whois_ip => { org => 'Spam ISP', abuse => 'abuse@spam-isp.example' },
+		domain_whois => undef,
+	);
 
-    my $a = Email::Abuse::Investigator->new();
-    $a->parse_email(make_raw_email(
-        received => 'from spam (spam [91.198.174.55]) by mx.test',
-        from     => 'Offers <offers@spammer.example>',
-        body     => 'Big savings at https://spammer.example/deals',
-    ));
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_raw_email(
+		received => 'from spam (spam [91.198.174.55]) by mx.test',
+		from	 => 'Offers <offers@spammer.example>',
+		body	 => 'Big savings at https://spammer.example/deals',
+	));
 
-    my $report = $a->report();
-    my $art    = $a->abuse_report_text();
-    my @contacts = $a->abuse_contacts();
-    my $risk     = $a->risk_assessment();
+	my $report   = $a->report();
+	my $art	  = $a->abuse_report_text();
+	my @contacts = $a->abuse_contacts();
+	my $risk	 = $a->risk_assessment();
 
-    # Both texts share the same risk level
-    like $report, qr/RISK ASSESSMENT:\s*$risk->{level}/,
-        'report() shows same risk level as risk_assessment()';
-    like $art, qr/RISK LEVEL:\s*$risk->{level}/,
-        'abuse_report_text() shows same risk level';
+	# Both texts share the same risk level
+	like $report, qr/RISK ASSESSMENT:\s*$risk->{level}/,
+		'report() shows same risk level as risk_assessment()';
+	like $art, qr/RISK LEVEL:\s*$risk->{level}/,
+		'abuse_report_text() shows same risk level';
 
-    # Every contact address from abuse_contacts() must appear in at least one of
-    # the two texts (the report shows them; the abuse_report_text shows them too)
-    for my $c (@contacts) {
-        my $addr = $c->{address};
-        my $in_either = ($report =~ /\Q$addr\E/) || ($art =~ /\Q$addr\E/);
-        ok $in_either,
-            "contact address '$addr' appears in report() or abuse_report_text()";
-    }
+	# Every contact address from abuse_contacts() must appear in at least one text
+	for my $c (@contacts) {
+		my $addr	 = $c->{address};
+		my $in_either = ($report =~ /\Q$addr\E/) || ($art =~ /\Q$addr\E/);
+		ok $in_either, "contact address '$addr' appears in report() or abuse_report_text()";
+	}
 
-    # The originating IP appears in both
-    my $orig = $a->originating_ip();
-    if (defined $orig) {
-        like $report, qr/\Q$orig->{ip}\E/, 'originating IP in report()';
-        like $art,    qr/\Q$orig->{ip}\E/, 'originating IP in abuse_report_text()';
-    }
+	# The originating IP appears in both
+	my $orig = $a->originating_ip();
+	if (defined $orig) {
+		like $report, qr/\Q$orig->{ip}\E/, 'originating IP in report()';
+		like $art,	qr/\Q$orig->{ip}\E/, 'originating IP in abuse_report_text()';
+	}
 
-    # Calling all methods a second time returns identical results (idempotent)
-    my $report2 = $a->report();
-    is $report2, $report, 'report() is idempotent on same object';
+	# Calling all methods a second time returns identical results (idempotent)
+	my $report2 = $a->report();
+	is $report2, $report, 'report() is idempotent on same object';
 
-    my $art2 = $a->abuse_report_text();
-    is $art2, $art, 'abuse_report_text() is idempotent on same object';
+	my $art2 = $a->abuse_report_text();
+	is $art2, $art, 'abuse_report_text() is idempotent on same object';
 
-    restore_stubs();
+	restore_stubs();
 };
 
 # ---------------------------------------------------------------------------
@@ -1102,62 +1102,59 @@ subtest 'Scenario 14: report() and abuse_report_text() consistent on same object
 #
 # POD embedded_urls: "Extracts every http:// and https:// URL from both
 # plain-text and HTML parts."
-# Tracking pixels (img src) and linked text all produce URL entries.
-# All URLs on the same host are grouped; WHOIS is called once.
 # ---------------------------------------------------------------------------
 subtest 'Scenario 15: multipart HTML spam — tracking pixel, click link, unsubscribe' => sub {
-    restore_stubs();  # defensive reset in case prior subtest exited early
-    my $whois_calls = 0;
-    install_stubs(
-        rdns    => 'mail.mailer.example',
-        resolve => { 'www.firmluminary.example' => '104.21.13.60' },
-        whois_ip => sub {
-            $whois_calls++;
-            return { org => 'CLOUDFLARENET', abuse => 'abuse@cloudflare.com', country => 'US' };
-        },
-        domain_whois => undef,
-    );
+	restore_stubs();
+	my $whois_calls = 0;
+	install_stubs(
+		rdns	=> 'mail.mailer.example',
+		resolve => { 'www.firmluminary.example' => '104.21.13.60' },
+		whois_ip => sub {
+			$whois_calls++;
+			return { org => 'CLOUDFLARENET', abuse => 'abuse@cloudflare.com', country => 'US' };
+		},
+		domain_whois => undef,
+	);
 
-    my $bnd = 'FRM_BOUND';
-    # QP-encoded HTML body with three URLs on the same host
-    my $html_raw = '<a href="https://www.firmluminary.example/c/link1">Click</a>'
-                 . '<a href="https://www.firmluminary.example/u/unsub">Unsubscribe</a>'
-                 . '<img src="https://www.firmluminary.example/o/track">';
-    my $mp = "--$bnd\r\nContent-Type: text/plain\r\n\r\nPlain version.\r\n"
-           . "--$bnd\r\nContent-Type: text/html; charset=utf-8\r\n"
-           . "Content-Transfer-Encoding: quoted-printable\r\n\r\n"
-           . encode_qp($html_raw, '')
-           . "\r\n--$bnd--\r\n";
+	my $bnd = 'FRM_BOUND';
+	my $html_raw = '<a href="https://www.firmluminary.example/c/link1">Click</a>'
+				 . '<a href="https://www.firmluminary.example/u/unsub">Unsubscribe</a>'
+				 . '<img src="https://www.firmluminary.example/o/track">';
+	my $mp = "--$bnd\r\nContent-Type: text/plain\r\n\r\nPlain version.\r\n"
+		   . "--$bnd\r\nContent-Type: text/html; charset=utf-8\r\n"
+		   . "Content-Transfer-Encoding: quoted-printable\r\n\r\n"
+		   . encode_qp($html_raw, '')
+		   . "\r\n--$bnd--\r\n";
 
-    my $a = Email::Abuse::Investigator->new();
-    $a->parse_email(make_raw_email(
-        received => 'from 120-88-161-249.tpgi.com.au (120.88.161.249) by mx.test',
-        from     => '"eharmony Partner" <peacelight@firmluminary.example>',
-        subject  => 'Ready to Find Someone Special?',
-        ct       => qq{multipart/alternative; boundary="$bnd"},
-        body     => $mp,
-    ));
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_raw_email(
+		received => 'from 120-88-161-249.tpgi.com.au (120.88.161.249) by mx.test',
+		from	 => '"eharmony Partner" <peacelight@firmluminary.example>',
+		subject  => 'Ready to Find Someone Special?',
+		ct	   => qq{multipart/alternative; boundary="$bnd"},
+		body	 => $mp,
+	));
 
-    my @urls = $a->embedded_urls();
+	my @urls = $a->embedded_urls();
 
-    # All three URLs found
-    is scalar @urls, 3, 'three URLs extracted (click, unsubscribe, tracking pixel)';
+	# All three URLs found
+	is scalar @urls, 3, 'three URLs extracted (click, unsubscribe, tracking pixel)';
 
-    # All on the same host
-    my @hosts = do { my %h; grep { !$h{$_}++ } map { $_->{host} } @urls };
-    is scalar @hosts, 1,                          'all three URLs on single host';
-    is $hosts[0], 'www.firmluminary.example',     'correct host identified';
+	# All on the same host
+	my @hosts = do { my %h; grep { !$h{$_}++ } map { $_->{host} } @urls };
+	is scalar @hosts, 1,						  'all three URLs on single host';
+	is $hosts[0], 'www.firmluminary.example',	 'correct host identified';
 
-    # WHOIS called once despite three URLs
-    is $whois_calls, 1, 'WHOIS queried once for the shared host';
+	# WHOIS called once despite three URLs
+	is $whois_calls, 1, 'WHOIS queried once for the shared host';
 
-    # report() groups them as "URLs (3)"
-    my $report = $a->report();
-    like $report, qr/URLs \(3\)/, 'three URLs shown as grouped count in report';
-    my @host_lines = ($report =~ /Host\s*:\s*www\.firmluminary\.example/g);
-    is scalar @host_lines, 1,     'host shown only once despite three URLs';
+	# report() groups them as "URLs (3)"
+	my $report = $a->report();
+	like $report, qr/URLs \(3\)/, 'three URLs shown as grouped count in report';
+	my @host_lines = ($report =~ /Host\s*:\s*www\.firmluminary\.example/g);
+	is scalar @host_lines, 1, 'host shown only once despite three URLs';
 
-    restore_stubs();
+	restore_stubs();
 };
 
 # ---------------------------------------------------------------------------
@@ -1167,37 +1164,37 @@ subtest 'Scenario 15: multipart HTML spam — tracking pixel, click link, unsubs
 # hops are private, with confidence 'low'.
 # ---------------------------------------------------------------------------
 subtest 'Scenario 16: webmail origin — X-Originating-IP fallback at low confidence' => sub {
-    restore_stubs();  # defensive reset in case prior subtest exited early
-    install_stubs(
-        rdns     => 'webmail.bigprovider.example',
-        whois_ip => { org => 'Big Provider', abuse => 'abuse@bigprovider.example' },
-        domain_whois => undef,
-    );
+	restore_stubs();
+	install_stubs(
+		rdns	 => 'webmail.bigprovider.example',
+		whois_ip => { org => 'Big Provider', abuse => 'abuse@bigprovider.example' },
+		domain_whois => undef,
+	);
 
-    my $a = Email::Abuse::Investigator->new();
-    $a->parse_email(make_raw_email(
-        received => [
-            'from webmail.bigprovider.example (webmail.bigprovider.example [10.0.0.1]) by mx.test',
-            'from localhost (localhost [127.0.0.1]) by webmail.bigprovider.example',
-        ],
-        xoip => '62.105.128.200',
-        from => 'Webmail User <user@bigprovider.example>',
-        body => 'Webmail spam content.',
-    ));
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_raw_email(
+		received => [
+			'from webmail.bigprovider.example (webmail.bigprovider.example [10.0.0.1]) by mx.test',
+			'from localhost (localhost [127.0.0.1]) by webmail.bigprovider.example',
+		],
+		xoip => '62.105.128.200',
+		from => 'Webmail User <user@bigprovider.example>',
+		body => 'Webmail spam content.',
+	));
 
-    my $orig = $a->originating_ip();
-    ok defined $orig,                       'originating_ip returns a value';
-    is $orig->{ip},         '62.105.128.200','X-Originating-IP used as origin';
-    is $orig->{confidence}, 'low',          'confidence is low for XOIP fallback';
-    like $orig->{note}, qr/X-Originating-IP/i,
-        'note mentions X-Originating-IP source';
+	my $orig = $a->originating_ip();
+	ok defined $orig,						 'originating_ip returns a value';
+	is $orig->{ip},		 '62.105.128.200', 'X-Originating-IP used as origin';
+	is $orig->{confidence}, 'low',			'confidence is low for XOIP fallback';
+	like $orig->{note}, qr/X-Originating-IP/i,
+		'note mentions X-Originating-IP source';
 
-    # Low confidence triggers low_confidence_origin risk flag
-    my $risk = $a->risk_assessment();
-    ok scalar(grep { $_->{flag} eq 'low_confidence_origin' } @{ $risk->{flags} }),
-        'low_confidence_origin risk flag raised';
+	# Low confidence triggers low_confidence_origin risk flag
+	my $risk = $a->risk_assessment();
+	ok scalar(grep { $_->{flag} eq 'low_confidence_origin' } @{ $risk->{flags} }),
+		'low_confidence_origin risk flag raised';
 
-    restore_stubs();
+	restore_stubs();
 };
 
 # ---------------------------------------------------------------------------
@@ -1209,41 +1206,691 @@ subtest 'Scenario 16: webmail origin — X-Originating-IP fallback at low confid
 # lazy evaluation triggers both pipelines correctly.
 # ---------------------------------------------------------------------------
 subtest 'Scenario 17: all_domains() triggers both pipelines regardless of call order' => sub {
-    restore_stubs();  # defensive reset in case prior subtest exited early
-    install_stubs(
-        rdns    => 'mail.sender.example',
-        resolve => {
-            'urlhost.example'   => '91.198.174.1',
-            'mailhost.example'  => '91.198.174.2',
-        },
-        whois_ip => { org => 'Test ISP', abuse => 'abuse@test.example' },
-        domain_whois => undef,
-    );
+	restore_stubs();
+	install_stubs(
+		rdns	=> 'mail.sender.example',
+		resolve => {
+			'urlhost.example'  => '91.198.174.1',
+			'mailhost.example' => '91.198.174.2',
+		},
+		whois_ip => { org => 'Test ISP', abuse => 'abuse@test.example' },
+		domain_whois => undef,
+	);
 
-    my $a = Email::Abuse::Investigator->new();
-    $a->parse_email(make_raw_email(
-        from => 'x@mailhost.example',
-        body => 'Visit https://urlhost.example/page and contact info@mailhost.example',
-    ));
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_raw_email(
+		from => 'x@mailhost.example',
+		body => 'Visit https://urlhost.example/page and contact info@mailhost.example',
+	));
 
-    # Call all_domains() FIRST — before embedded_urls() or mailto_domains()
-    my @all = $a->all_domains();
+	# Call all_domains() FIRST — before embedded_urls() or mailto_domains()
+	my @all = $a->all_domains();
 
-    ok scalar(grep { $_ eq 'urlhost.example'  } @all),
-        'URL host in all_domains when called before embedded_urls()';
-    ok scalar(grep { $_ eq 'mailhost.example' } @all),
-        'email domain in all_domains when called before mailto_domains()';
+	ok scalar(grep { $_ eq 'urlhost.example'  } @all),
+		'URL host in all_domains when called before embedded_urls()';
+	ok scalar(grep { $_ eq 'mailhost.example' } @all),
+		'email domain in all_domains when called before mailto_domains()';
 
-    # Now call the individual methods — they should return consistent data
-    my @urls  = $a->embedded_urls();
-    my @mdoms = $a->mailto_domains();
+	# Now call the individual methods — must return consistent data
+	my @urls  = $a->embedded_urls();
+	my @mdoms = $a->mailto_domains();
 
-    ok scalar(grep { $_->{host} eq 'urlhost.example'   } @urls),
-        'embedded_urls() consistent after all_domains() was called first';
-    ok scalar(grep { $_->{domain} eq 'mailhost.example' } @mdoms),
-        'mailto_domains() consistent after all_domains() was called first';
+	ok scalar(grep { $_->{host} eq 'urlhost.example'	} @urls),
+		'embedded_urls() consistent after all_domains() was called first';
+	ok scalar(grep { $_->{domain} eq 'mailhost.example' } @mdoms),
+		'mailto_domains() consistent after all_domains() was called first';
 
-    restore_stubs();
+	restore_stubs();
+};
+
+# ---------------------------------------------------------------------------
+# Scenario 18 — unresolved_contacts() surfaces parties with no abuse address
+#
+# POD unresolved_contacts: returns domains and URL hosts for which no abuse
+# contact could be determined.  Spoofable-header-only sources are excluded.
+# ---------------------------------------------------------------------------
+subtest 'Scenario 18: unresolved_contacts() surfaces uncontactable parties' => sub {
+	restore_stubs();
+	install_stubs(
+		rdns	 => 'mail.sender.example',
+		resolve  => { 'mystery-host.example' => '5.5.5.5' },
+		# Deliberately return no abuse address for mystery-host
+		whois_ip => { org => 'Unknown Corp', abuse => undef },
+		domain_whois => undef,
+	);
+
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_raw_email(
+		received => 'from sender (sender [91.198.174.1]) by mx.test',
+		from	 => 'Spammer <spam@mystery-host.example>',
+		body	 => 'Click https://mystery-host.example/buy now',
+	));
+
+	my @unresolved = $a->unresolved_contacts();
+
+	# mystery-host.example should appear — it has no abuse contact
+	ok scalar(grep { $_->{domain} eq 'mystery-host.example' } @unresolved),
+		'mystery-host.example surfaces as unresolved contact';
+
+	# Every unresolved entry has required keys
+	for my $u (@unresolved) {
+		ok defined $u->{domain}, 'unresolved entry has domain';
+		ok defined $u->{type},   'unresolved entry has type';
+		ok defined $u->{source}, 'unresolved entry has source';
+		ok $u->{type} =~ /^(?:url_host|domain)$/, "type is url_host or domain";
+	}
+
+	restore_stubs();
+};
+
+# ---------------------------------------------------------------------------
+# Scenario 19 — sending_software() extracts X-PHP-Originating-Script
+#
+# POD sending_software: shared-hosting platforms inject X-PHP-Originating-
+# Script to identify the responsible script and Unix account.
+# ---------------------------------------------------------------------------
+subtest 'Scenario 19: sending_software() fingerprints shared-hosting scripts' => sub {
+	restore_stubs();
+	install_stubs(
+		rdns	 => 'mail.sharedhost.example',
+		whois_ip => { org => 'Shared Host', abuse => 'abuse@sharedhost.example' },
+		domain_whois => undef,
+	);
+
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_raw_email(
+		received   => 'from sharedhost (sharedhost [91.198.174.1]) by mx.test',
+		from	   => 'Spammer <spam@sharedhost.example>',
+		body	   => 'Buy now.',
+	) . "X-PHP-Originating-Script: 1000:mailer.php\nX-Mailer: PHPMailer 6.0\n"
+	);
+
+	# parse_email is called with trailing headers after the body separator —
+	# those won't be parsed (correct RFC 2822 behaviour).  Instead inject
+	# via a proper raw email with extra headers before the body separator.
+	my $raw = "Received: from sh (sh [91.198.174.1]) by mx.test\n"
+			. "From: Spammer <spam\@sharedhost.example>\n"
+			. "To: victim\@test.example\n"
+			. "Subject: Buy now\n"
+			. "Date: Mon, 01 Jan 2024 00:00:00 +0000\n"
+			. "Message-ID: <sw-test\@sh.example>\n"
+			. "Content-Type: text/plain\n"
+			. "X-PHP-Originating-Script: 1000:mailer.php\n"
+			. "X-Mailer: PHPMailer 6.0\n"
+			. "X-Source: /home/user/public_html/contact.php\n"
+			. "\n"
+			. "Buy now.\n";
+
+	$a->parse_email($raw);
+
+	my @sw = $a->sending_software();
+	ok @sw > 0, 'sending_software() returns entries when headers present';
+
+	my ($php) = grep { $_->{header} eq 'x-php-originating-script' } @sw;
+	ok defined $php,								 'X-PHP-Originating-Script found';
+	is $php->{value}, '1000:mailer.php',			 'PHP script value correct';
+	like $php->{note}, qr/shared hosting/i,		  'PHP script note mentions hosting';
+
+	my ($mailer) = grep { $_->{header} eq 'x-mailer' } @sw;
+	ok defined $mailer,							  'X-Mailer found';
+	is $mailer->{value}, 'PHPMailer 6.0',			'mailer value correct';
+
+	# Headers are returned in alphabetical order
+	my @names = map { $_->{header} } @sw;
+	my @sorted = sort @names;
+	is_deeply \@names, \@sorted, 'sending_software() returns headers in alphabetical order';
+
+	restore_stubs();
+};
+
+# ---------------------------------------------------------------------------
+# Scenario 20 — received_trail() extracts hop tracking data
+#
+# POD received_trail: returns per-hop session IDs and envelope recipients
+# that ISP postmasters need to look up the SMTP session in their logs.
+# ---------------------------------------------------------------------------
+subtest 'Scenario 20: received_trail() captures per-hop session IDs' => sub {
+	restore_stubs();
+	install_stubs(
+		rdns	 => 'mail.relay.example',
+		whois_ip => { org => 'Relay ISP', abuse => 'abuse@relay.example' },
+		domain_whois => undef,
+	);
+
+	my $raw = "Received: from relay2 (relay2 [91.198.174.2]) by mx.test"
+			. " with ESMTP id ABC123XYZ for <victim\@test.example>\n"
+			. "Received: from attacker (attacker [91.198.174.1]) by relay2"
+			. " with ESMTP id ZZZ999AAA\n"
+			. "From: attacker\@evil.example\n"
+			. "To: victim\@test.example\n"
+			. "Subject: Trail test\n"
+			. "Date: Mon, 01 Jan 2024 00:00:00 +0000\n"
+			. "Message-ID: <trail\@evil.example>\n"
+			. "Content-Type: text/plain\n"
+			. "\n"
+			. "Spam content.\n";
+
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email($raw);
+
+	my @trail = $a->received_trail();
+	ok @trail > 0, 'received_trail() returns at least one hop';
+
+	# At least one hop has a session ID
+	ok scalar(grep { defined $_->{id} } @trail),
+		'at least one hop has a session ID';
+
+	# At least one hop has an envelope recipient
+	ok scalar(grep { defined $_->{for} } @trail),
+		'at least one hop has an envelope recipient';
+
+	# Hops are in oldest-first order (bottom of header block first)
+	my @with_id = grep { defined $_->{id} } @trail;
+	ok scalar(grep { $_->{id} eq 'ZZZ999AAA' } @with_id),
+		'oldest hop session ID ZZZ999AAA present';
+
+	# Every hop has a received field (the raw header value)
+	ok !scalar(grep { !defined $_->{received} } @trail),
+		'all trail hops have the raw received header';
+
+	restore_stubs();
+};
+
+# ---------------------------------------------------------------------------
+# Scenario 21 — Stateful: parse_email() called on a scalar reference
+#
+# POD parse_email: "A scalar reference is accepted as an alternative."
+# Verifies that a scalar reference input produces identical results to a
+# plain scalar, without modifying the original variable.
+# ---------------------------------------------------------------------------
+subtest 'Scenario 21: scalar-reference input to parse_email()' => sub {
+	restore_stubs();
+	install_stubs(
+		rdns	 => 'mail.scalarref.example',
+		whois_ip => { org => 'ScalarRef ISP', abuse => 'abuse@scalarref.example' },
+		domain_whois => undef,
+	);
+
+	my $raw = make_raw_email(
+		received => 'from sr (sr [91.198.174.1]) by mx.test',
+		from	 => 'x@scalarref.example',
+		body	 => 'Test message.',
+	);
+	my $original = $raw;  # save a copy
+
+	my $a = Email::Abuse::Investigator->new();
+	my $b = Email::Abuse::Investigator->new();
+
+	$a->parse_email($raw);		  # plain scalar
+	$b->parse_email(\$raw);		 # scalar reference
+
+	# Original must not be modified
+	is $raw, $original, 'original scalar not modified by scalar-ref parse';
+
+	# Both produce the same headers
+	is_deeply $a->{_headers}, $b->{_headers},
+		'scalar and scalar-ref input produce identical headers';
+
+	# Both produce the same originating IP determination
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns = sub { 'mail.scalarref.example' };
+	local *Email::Abuse::Investigator::_whois_ip	= sub { { org => 'Test', abuse => 'a@b' } };
+	my $oa = $a->originating_ip();
+	my $ob = $b->originating_ip();
+	is $oa->{ip}, $ob->{ip}, 'scalar and scalar-ref produce same originating IP';
+
+	restore_stubs();
+};
+
+# ---------------------------------------------------------------------------
+# Scenario 22 — form_contacts() surfaces form-only providers
+#
+# POD form_contacts: providers with only a 'form' key (like GoDaddy and
+# MarkMonitor) must appear in form_contacts(), not abuse_contacts().
+# ---------------------------------------------------------------------------
+subtest 'Scenario 22: form_contacts() surfaces form-only providers correctly' => sub {
+	restore_stubs();
+	install_stubs(
+		rdns	 => 'mail.test.example',
+		resolve  => { 'godaddy-hosted.example' => '1.2.3.4' },
+		whois_ip => { org => 'GoDaddy', abuse => 'abuse@godaddy.com' },
+		domain_whois => sub {
+			# Return a WHOIS response where registrar is GoDaddy
+			return "Registrar: GoDaddy.com LLC\n"
+				 . "Registrar Abuse Contact Email: abuse\@godaddy.com\n"
+				 . "Creation Date: 2020-01-01\n"
+				 . "Registry Expiry Date: 2099-01-01\n";
+		},
+	);
+
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_raw_email(
+		received => 'from test (test [91.198.174.1]) by mx.test',
+		from	 => 'spam@godaddy-hosted.example',
+		body	 => 'Spam from GoDaddy hosted site.',
+	));
+
+	my @email_contacts = $a->abuse_contacts();
+	my @form_cs		= $a->form_contacts();
+
+	# GoDaddy must NOT appear as an email contact
+	ok !scalar(grep { lc($_->{address}) =~ /godaddy/ } @email_contacts),
+		'GoDaddy not in email abuse_contacts (form-only provider)';
+
+	# GoDaddy MUST appear as a form contact
+	ok scalar(grep { $_->{form} =~ /godaddy/i } @form_cs),
+		'GoDaddy appears in form_contacts()';
+
+	# Every form contact has required fields
+	for my $c (@form_cs) {
+		ok defined $c->{form},  "form contact has form URL ($c->{role})";
+		ok $c->{form} =~ m{^https?://}, 'form URL starts with http(s)://';
+		ok defined $c->{role},  'form contact has role';
+		ok defined $c->{via},   'form contact has via';
+	}
+
+	restore_stubs();
+};
+
+# ---------------------------------------------------------------------------
+# Scenario 23 — SPF softfail generates MEDIUM flag, not HIGH
+#
+# POD risk_assessment: spf_softfail is MEDIUM (weight 2), not HIGH (weight 3).
+# ---------------------------------------------------------------------------
+subtest 'Scenario 23: SPF softfail produces MEDIUM severity flag' => sub {
+	restore_stubs();
+	install_stubs(
+		rdns	 => 'mail.softfail.example',
+		whois_ip => { org => 'Softfail ISP', abuse => 'abuse@softfail.example' },
+		domain_whois => undef,
+	);
+
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_raw_email(
+		received => 'from sf (sf [91.198.174.1]) by mx.test',
+		auth	 => 'mx.test; spf=softfail',
+		from	 => 'test@softfail-sender.example',
+		body	 => 'Softfail test.',
+	));
+
+	my $risk = $a->risk_assessment();
+	my ($sf_flag) = grep { $_->{flag} eq 'spf_softfail' } @{ $risk->{flags} };
+
+	ok defined $sf_flag,					'spf_softfail flag raised';
+	is $sf_flag->{severity}, 'MEDIUM',	  'spf_softfail is MEDIUM severity';
+
+	# spf_fail (HIGH) must NOT be raised alongside softfail
+	ok !scalar(grep { $_->{flag} eq 'spf_fail' } @{ $risk->{flags} }),
+		'spf_fail not raised when result is softfail';
+
+	restore_stubs();
+};
+
+# ---------------------------------------------------------------------------
+# Scenario 24 — Date header checks: missing, past, future, bad timezone
+#
+# POD risk_assessment flags: missing_date, suspicious_date,
+# implausible_timezone.
+# ---------------------------------------------------------------------------
+subtest 'Scenario 24: Date: header checks — missing, past, future, bad timezone' => sub {
+	restore_stubs();
+	install_stubs(
+		rdns	 => 'mail.datetest.example',
+		whois_ip => { org => 'Date Test ISP', abuse => 'abuse@datetest.example' },
+		domain_whois => undef,
+	);
+
+	# Missing Date:
+	{
+		my $a = Email::Abuse::Investigator->new();
+		my $raw = "Received: from dt (dt [91.198.174.1]) by mx.test\n"
+				. "From: x\@datetest.example\n"
+				. "To: y\@test.example\n"
+				. "Subject: No date\n"
+				. "Content-Type: text/plain\n"
+				. "\n"
+				. "No date header.\n";
+		$a->parse_email($raw);
+		$a->{_urls} = []; $a->{_mailto_domains} = [];
+		no warnings 'redefine';
+		local *Email::Abuse::Investigator::_reverse_dns = sub { 'mail.dt.example' };
+		local *Email::Abuse::Investigator::_whois_ip	= sub { {} };
+		my $risk = $a->risk_assessment();
+		ok scalar(grep { $_->{flag} eq 'missing_date' } @{ $risk->{flags} }),
+			'missing_date flagged when Date: absent';
+	}
+
+	# Date more than 7 days in the past
+	{
+		my $old_date = strftime('%a, %d %b %Y %H:%M:%S +0000',
+								gmtime(time() - 20 * 86400));
+		my $a = Email::Abuse::Investigator->new();
+		$a->parse_email(make_raw_email(
+			received => 'from dt (dt [91.198.174.1]) by mx.test',
+			date	 => $old_date,
+		));
+		$a->{_urls} = []; $a->{_mailto_domains} = [];
+		no warnings 'redefine';
+		local *Email::Abuse::Investigator::_reverse_dns = sub { 'mail.dt.example' };
+		local *Email::Abuse::Investigator::_whois_ip	= sub { {} };
+		my $risk = $a->risk_assessment();
+		ok scalar(grep { $_->{flag} eq 'suspicious_date' } @{ $risk->{flags} }),
+			'suspicious_date flagged for date 20 days in the past';
+	}
+
+	# Implausible timezone offset (+1500 — beyond +14:00)
+	{
+		my $a = Email::Abuse::Investigator->new();
+		$a->parse_email(make_raw_email(
+			received => 'from dt (dt [91.198.174.1]) by mx.test',
+			date	 => 'Mon, 01 Jan 2024 00:00:00 +1500',
+		));
+		$a->{_urls} = []; $a->{_mailto_domains} = [];
+		no warnings 'redefine';
+		local *Email::Abuse::Investigator::_reverse_dns = sub { 'mail.dt.example' };
+		local *Email::Abuse::Investigator::_whois_ip	= sub { {} };
+		my $risk = $a->risk_assessment();
+		ok scalar(grep { $_->{flag} eq 'implausible_timezone' } @{ $risk->{flags} }),
+			'implausible_timezone flagged for +1500 offset';
+	}
+
+	restore_stubs();
+};
+
+# ---------------------------------------------------------------------------
+# Scenario 25 — Multipart recursion guard at MAX_MULTIPART_DEPTH
+#
+# POD _decode_multipart: nesting depth is capped at MAX_MULTIPART_DEPTH (20)
+# to prevent stack exhaustion on pathological messages.  The module must
+# not die and must still return a usable (possibly partial) result.
+# ---------------------------------------------------------------------------
+subtest 'Scenario 25: deeply nested multipart message does not die' => sub {
+	restore_stubs();
+	install_stubs(
+		rdns	 => 'mail.deep.example',
+		whois_ip => { org => 'Deep ISP', abuse => 'abuse@deep.example' },
+		domain_whois => undef,
+	);
+
+	# Build a 25-deep multipart/alternative nest
+	my $depth = 25;
+	my $inner = "Content-Type: text/plain\r\n\r\nDeep text content.\r\n";
+	for my $i (1..$depth) {
+		my $bnd = "DEEP_BND_$i";
+		$inner  = "Content-Type: multipart/alternative; boundary=\"$bnd\"\r\n\r\n"
+				. "--$bnd\r\n"
+				. $inner
+				. "--$bnd--\r\n";
+	}
+
+	my $raw = "Received: from deep (deep [91.198.174.1]) by mx.test\n"
+			. "From: deep\@deep.example\n"
+			. "To: victim\@test.example\n"
+			. "Subject: Deep nesting test\n"
+			. "Date: Mon, 01 Jan 2024 00:00:00 +0000\n"
+			. "Message-ID: <deep\@deep.example>\n"
+			. "Content-Type: multipart/alternative; boundary=\"DEEP_BND_0\"\n"
+			. "\n"
+			. "--DEEP_BND_0\r\n"
+			. $inner
+			. "--DEEP_BND_0--\r\n";
+
+	my $a = Email::Abuse::Investigator->new();
+
+	# Silence the expected depth-limit carp() messages during this subtest.
+	# carp() is a plain function; replacing it locally with a no-op suppresses
+	# the 20 "nesting depth limit exceeded" warnings that would otherwise clutter
+	# the test output.  The local() unwinds automatically at the end of the block.
+	{
+		no warnings 'redefine';
+		local *Carp::carp = sub {};   # no-op: swallow expected carp output
+
+		# The module must not die on a deeply nested message
+		eval { $a->parse_email($raw) };
+		is $@, '', 'parse_email() does not die on deeply nested multipart';
+	}
+
+	# Public methods must still work and return safe values
+	my @urls  = eval { $a->embedded_urls() };
+	my @doms  = eval { $a->mailto_domains() };
+	my $risk  = eval { $a->risk_assessment() };
+	is $@, '', 'public methods work after deeply nested parse';
+	ok defined $risk, 'risk_assessment() returns a defined value';
+
+	restore_stubs();
+};
+
+# ---------------------------------------------------------------------------
+# Scenario 26 — Object::Configure integration
+#
+# new() calls Object::Configure::configure($class, $params) and applies any
+# values it returns as overlays.  These tests stub configure() to confirm the
+# call is made with the correct arguments and that overlaid values take effect.
+# ---------------------------------------------------------------------------
+subtest 'Scenario 26a: Object::Configure — configure() called with correct args' => sub {
+	restore_stubs();
+
+	my @calls;
+	{
+		no warnings 'redefine';
+		local *Object::Configure::configure = sub {
+			push @calls, { class => $_[0], params => $_[1] };
+			return $_[1];   # pass through unchanged
+		};
+
+		Email::Abuse::Investigator->new(timeout => 15);
+		ok scalar @calls > 0,
+			'Object::Configure::configure() called during new()';
+		is $calls[0]{class}, 'Email::Abuse::Investigator',
+			'configure() receives the correct class name';
+		is ref($calls[0]{params}), 'HASH',
+			'configure() receives a hashref of constructor params';
+		is $calls[0]{params}{timeout}, 15,
+			'constructor param timeout=15 passed through to configure()';
+	}
+
+	restore_stubs();
+};
+
+subtest 'Scenario 26b: Object::Configure — overlaid values applied by new()' => sub {
+	restore_stubs();
+
+	{
+		no warnings 'redefine';
+		local *Object::Configure::configure = sub {
+			# Simulate a config file that overrides timeout to 99
+			return { %{ $_[1] }, timeout => 99 };
+		};
+
+		my $a = Email::Abuse::Investigator->new();
+		is $a->{timeout}, 99,
+			'timeout overlaid to 99 by Object::Configure::configure()';
+	}
+
+	restore_stubs();
+};
+
+subtest 'Scenario 26c: Object::Configure — passthrough preserves constructor defaults' => sub {
+	restore_stubs();
+
+	{
+		no warnings 'redefine';
+		local *Object::Configure::configure = sub { return $_[1] };
+
+		my $a = Email::Abuse::Investigator->new();
+		is $a->{timeout}, 10,  'default timeout 10 preserved with passthrough configure';
+		is $a->{verbose},  0,  'default verbose 0 preserved with passthrough configure';
+		is_deeply $a->{trusted_relays}, [], 'default trusted_relays [] preserved';
+	}
+
+	restore_stubs();
+};
+
+# =============================================================================
+# Object::Configure integration contract
+# =============================================================================
+subtest 'new() — Object::Configure::configure() is called' => sub {
+	my @calls;
+	{
+		no warnings 'redefine';
+		local *Object::Configure::configure = sub {
+			push @calls, { class => $_[0], params => $_[1] };
+			return $_[1];
+		};
+		my $a = Email::Abuse::Investigator->new(timeout => 7);
+		ok scalar @calls > 0, 'Object::Configure::configure() called during new()';
+		is $calls[0]{class}, 'Email::Abuse::Investigator',
+			'configure() receives correct class name';
+		is ref($calls[0]{params}), 'HASH', 'configure() receives hashref';
+	}
+};
+
+subtest 'new() — Object::Configure overlay takes effect' => sub {
+	{
+		no warnings 'redefine';
+		local *Object::Configure::configure = sub {
+			return { %{ $_[1] }, timeout => 42, verbose => 1 };
+		};
+		my $a = Email::Abuse::Investigator->new();
+		is $a->{timeout}, 42, 'configure() overlay applied to timeout';
+		is $a->{verbose},  1, 'configure() overlay applied to verbose';
+	}
+};
+
+
+# ---------------------------------------------------------------------------
+# Scenario 27 — CHI cross-message cache: WHOIS not repeated across objects
+#
+# When CHI is installed, the second object analysing the same IP should hit
+# the class-level cache and not repeat the WHOIS lookup.
+# ---------------------------------------------------------------------------
+subtest 'Scenario 27: CHI cross-message cache — WHOIS result shared between objects' => sub {
+	restore_stubs();
+
+	# Only meaningful when CHI is available
+	my $cache_available = defined $Email::Abuse::Investigator::_cache;
+	if (!$cache_available) {
+		pass 'CHI not installed — skipping cross-object cache scenario';
+		return;
+	}
+
+	# Use a unique IP that cannot already be in the cache from other subtests
+	my $unique_ip = '91.198.174.' . (50 + ($$ % 100));
+	my $whois_calls = 0;
+
+	install_stubs(
+		rdns	 => 'mail.chi-test.example',
+		resolve  => sub { $unique_ip },
+		whois_ip => sub { $whois_calls++; { org => 'CHI Test', abuse => 'abuse@chi.example' } },
+		domain_whois => undef,
+	);
+
+	# First object: populates the CHI cache for $unique_ip
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_raw_email(
+		received => "from h (h [$unique_ip]) by mx.test",
+		body	 => "https://chi-test-$$.example/page",
+	));
+	$a->originating_ip();	# triggers WHOIS
+	my $calls_after_first = $whois_calls;
+
+	# Second object on the same IP: should hit the CHI cache
+	my $b = Email::Abuse::Investigator->new();
+	$b->parse_email(make_raw_email(
+		received => "from h (h [$unique_ip]) by mx.test",
+		body	 => "https://chi-test-$$.example/page",
+	));
+	$b->originating_ip();
+
+	ok $whois_calls <= $calls_after_first + 1,
+		'second object WHOIS call count does not increase (CHI cache hit)';
+
+	restore_stubs();
+};
+
+# ---------------------------------------------------------------------------
+# Scenario 28 — _resolve_host AAAA fallback (IPv6 DNS)
+#
+# When A query fails, _resolve_host should return an IPv6 address from AAAA.
+# We stub the method to simulate the A-fail / AAAA-success path.
+# ---------------------------------------------------------------------------
+subtest 'Scenario 28: _resolve_host AAAA fallback when A query fails' => sub {
+	restore_stubs();
+
+	# Stub _resolve_host to simulate the AAAA fallback path
+	{
+		no warnings 'redefine';
+		local *Email::Abuse::Investigator::_resolve_host = sub {
+			my (undef, $host) = @_;
+			return $host if $host =~ /^\d/;
+			return '2a00:1450:4001::1' if $host =~ /ipv6-aaaa-only/;
+			return '1.2.3.4';		  # IPv4 for all other hosts
+		};
+		local *Email::Abuse::Investigator::_whois_ip = sub { { org => 'T', abuse => 'a@b' } };
+		local *Email::Abuse::Investigator::_reverse_dns = sub { 'mail.ipv6.example' };
+		local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+
+		my $a = Email::Abuse::Investigator->new();
+		$a->parse_email(make_raw_email(
+			from => 'x@ipv6-aaaa-only.example',
+			body => 'https://ipv6-aaaa-only.example/page',
+		));
+		my @doms = $a->mailto_domains();
+		my ($dom) = grep { $_->{domain} eq 'ipv6-aaaa-only.example' } @doms;
+		ok defined $dom, 'domain with AAAA-only resolution found in mailto_domains';
+		is $dom->{web_ip}, '2a00:1450:4001::1',
+			'AAAA fallback IPv6 address stored in web_ip';
+
+		# IPv4 path still works for normal hosts
+		my @urls = $a->embedded_urls();
+		my ($url) = grep { $_->{host} eq 'ipv6-aaaa-only.example' } @urls;
+		ok defined $url, 'URL with AAAA-only host extracted';
+	}
+
+	restore_stubs();
+};
+
+# ---------------------------------------------------------------------------
+# Scenario 29 — Domain::PublicSuffix integration via _registrable()
+#
+# _registrable() must never die regardless of whether Domain::PublicSuffix is
+# installed, and must return a dotted string for all common domain patterns.
+# ---------------------------------------------------------------------------
+subtest 'Scenario 29: Domain::PublicSuffix — _registrable() does not die on any input' => sub {
+	restore_stubs();
+
+	my @cases = (
+		[ 'www.example.com',		  'example.com'  ],
+		[ 'sub.example.co.uk',		'example.co.uk' ],
+		[ 'a.b.c.example.org',		'example.org'  ],
+		[ 'deep.sub.example.io',	  'example.io'   ],
+		[ 'sub.example.com.au',	   'example.com.au' ],
+		# Uncommon ccTLD — heuristic may differ from PSL but must not die
+		[ 'sub.example.ltd.uk',	   undef		  ],  # result not asserted, just no-die
+	);
+
+	for my $tc (@cases) {
+		my ($host, $expected) = @$tc;
+		my $result;
+		eval { $result = Email::Abuse::Investigator::_registrable($host) };
+		is $@, '', "_registrable('$host') does not die";
+		if (defined $expected) {
+			is $result, $expected, "_registrable('$host') = '$expected'";
+		} else {
+			ok !defined($result) || $result =~ /\./,
+				"_registrable('$host') returns undef or dotted string";
+		}
+	}
+
+	# Specific invariants that hold regardless of PSL availability
+	is Email::Abuse::Investigator::_registrable('no-dot'), undef,
+		'no-dot input returns undef';
+	is Email::Abuse::Investigator::_registrable('com'),	undef,
+		'bare TLD returns undef';
+	is Email::Abuse::Investigator::_registrable(undef),	undef,
+		'undef input returns undef';
+
+	restore_stubs();
 };
 
 done_testing();

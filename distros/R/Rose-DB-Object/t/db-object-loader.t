@@ -6,7 +6,7 @@ use Test::More tests => 1 + (6 * 38) + 9;
 
 BEGIN 
 {
-  require 't/test-lib.pl';
+  require './t/test-lib.pl';
   use_ok('Rose::DB::Object::Loader');
 }
 
@@ -388,9 +388,10 @@ BEGIN
   #
 
   my $dbh;
-
+$DB::single = 1;
   eval 
   {
+  $DB::single = 1;
     $dbh = Rose::DB->new('pg_admin')->retain_dbh()
       or die Rose::DB->error;
   };

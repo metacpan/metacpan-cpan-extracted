@@ -45,6 +45,8 @@ t/20-tls.t
 t/21-adopt-initial-data.t
 t/22-v002-features.t
 t/23-coverage-gaps.t
+t/24-callback-and-accessor-coverage.t
+t/25-fragment-guard.t
 typemap
 Websockets.xs
 META.yml                                 Module YAML meta-data (added by MakeMaker)

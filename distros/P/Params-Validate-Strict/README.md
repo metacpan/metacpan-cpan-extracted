@@ -4,7 +4,7 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 # VERSION
 
-Version 0.30
+Version 0.32
 
 # SYNOPSIS
 
@@ -64,6 +64,22 @@ This function takes two mandatory arguments:
     A reference to a hash that defines the validation rules for each parameter.
     The keys of the hash are the parameter names, and the values are either a string representing the parameter type or a reference to a hash containing more detailed rules.
 
+    As an alternative the schema may be supplied as an **arrayref of parameter
+    hashrefs**, where every element describes one parameter and carries a mandatory
+    `name` key:
+
+        $schema = [
+          { name => 'username', type => 'string', min => 3, max => 50 },
+          { name => 'age',      type => 'integer', min => 0, max => 150 },
+          { name => 'role',     type => 'string', optional => 1, default => 'user' },
+        ];
+
+    The arrayref form is normalised to the standard hashref form before any further
+    processing.  It is particularly useful when declaration order matters (e.g.
+    for positional or mixed calling conventions used by some CPAN modules).  The
+    `name` key is consumed during normalisation and does not appear as a
+    validation rule.
+
     For some sort of compatibility with [Data::Processor](https://metacpan.org/pod/Data%3A%3AProcessor),
     it is possible to wrap the schema within a hash like this:
 
@@ -109,7 +125,7 @@ It takes optional arguments:
     making your validation logic more maintainable and readable.
 
     Each custom type is defined as a hash reference containing the same validation rules available for regular parameters
-    (`type`, `min`, `max`, `matches`, `memberof`, `enum`, `notmemberof`, `callback`, etc.).
+    (`type`, `min`, `max`, `matches`, `memberof`, `values`, `enum`, `notmemberof`, `callback`, etc.).
 
         my $custom_types = {
           email => {
@@ -172,6 +188,22 @@ The schema can define the following rules for each parameter:
           ]
         };
 
+    As a shorthand, `type` itself may be an arrayref of type name strings (a _union type_)
+    when all other constraints are shared between the alternatives:
+
+        $schema = {
+          data => { type => ['string', 'arrayref'] },
+          id   => { type => ['string', 'integer'], optional => 1 },
+        };
+
+    This is equivalent to the full array-of-rules form but more concise.
+    Every other key in the rule hash (`optional`, `min`, `max`, `matches`, etc.)
+    is inherited by each candidate type and validated independently against it.
+    Type names are tried left-to-right; the first match wins and its coercion
+    (e.g. numeric types) is propagated back to the caller.
+    If the value fails all candidate types, validation croaks with a message
+    listing the union members.
+
 - `can`
 
     The parameter must be an object that understands the method `can`.
@@ -231,6 +263,10 @@ The schema can define the following rules for each parameter:
     define ranges.
 
 - `enum`
+
+    Same as `memberof`.
+
+- `values`
 
     Same as `memberof`.
 
@@ -318,7 +354,7 @@ The schema can define the following rules for each parameter:
     This flag has no effect on numeric types (`integer`, `number`, `float`) as numbers
     do not have case.
 
-- `min`
+- `min`/`minimum`
 
     The minimum length (for strings in characters not bytes), value (for numbers) or number of keys (for hashrefs).
 
@@ -342,6 +378,10 @@ The schema can define the following rules for each parameter:
     this integer value defines which position the argument will be in.
     If this is set for all arguments,
     `validate_strict` will return a reference to an array, rather than a reference to a hash.
+
+- `regex`
+
+    Synonym of matches
 
 - `description`
 
@@ -398,6 +438,15 @@ The schema can define the following rules for each parameter:
 
         my $result = validate_strict(schema => $schema, input => { make_optional => 1 });
 
+    If the parameter is not optional, it can be passed an undef value, which will not flag an error.
+    This is by design.
+    So this will not say that the required parameter 's' is missing:
+
+        validate_strict(
+            schema => { s => { type => 'string' } },
+            input  => { s => undef },
+        );
+
 - `default`
 
     Populate missing optional parameters with the specified value.
@@ -452,8 +501,7 @@ The schema can define the following rules for each parameter:
                         min => 1 # At least one hobby
                     }
                 }
-            },
-            metadata => {
+            }, metadata => {
                 type => 'hashref',
                 schema => {
                     created => { type => 'string' },
@@ -557,7 +605,7 @@ The schema can define the following rules for each parameter:
           matches => qr/^\d{10}$/
         }
 
-    The `transform` function is applied to the value before any validation checks (`min`, `max`,
+    The `transform` function is applied to the value before any validation checks (`min`/`minimum`, `max`,
     `matches`, `callback`, etc.), ensuring that validation rules are checked against the cleaned data.
 
     Transformations work with all parameter types including nested structures:
@@ -568,8 +616,7 @@ The schema can define the following rules for each parameter:
             name => {
               type => 'string',
               transform => sub { trim($_[0]) }
-            },
-            email => {
+            }, email => {
               type => 'string',
               transform => sub { lc(trim($_[0])) }
             }
@@ -606,7 +653,7 @@ The schema can define the following rules for each parameter:
 
 - `validator`
 
-    A synonym of Cvalidate>, for compatibility with [Data::Processor](https://metacpan.org/pod/Data%3A%3AProcessor).
+    A synonym of `validate`, for compatibility with [Data::Processor](https://metacpan.org/pod/Data%3A%3AProcessor).
 
 - `cross_validation`
 
@@ -913,18 +960,23 @@ Nigel Horne, `<njh at nigelhorne.com>`
 
     [PARAM_NAME, VALUE, TYPE_NAME, CONSTRAINT_VALUE]
 
-    ValidationRule ::= SimpleType | ComplexRule
+    ValidationRule ::= SimpleType | ComplexRule | UnionType
 
     SimpleType ::= string | integer | number | arrayref | hashref | coderef | object
 
+    UnionType ::= seq SimpleType    -- at least two members; written as type => ['a', 'b']
+
     ComplexRule == [
-        type: TYPE_NAME;
+        type: SimpleType | UnionType;
         min: ℕ₁;
         max: ℕ₁;
         optional: 𝔹;
         matches: REGEX;
+        regex: REGEX;
         nomatch: REGEX;
         memberof: seq VALUE;
+        enum: seq VALUE;
+        values: seq VALUE;
         notmemberof: seq VALUE;
         callback: FUNCTION;
         isa: TYPE_NAME;
@@ -939,8 +991,8 @@ Nigel Horne, `<njh at nigelhorne.com>`
 
     ∀ rule: ComplexRule •
       rule.min ≤ rule.max ∧
-      ¬(rule.memberof ∧ rule.min) ∧
-      ¬(rule.memberof ∧ rule.max) ∧
+      ¬((rule.memberof ∨ rule.enum ∨ rule.values) ∧ rule.min) ∧
+      ¬((rule.memberof ∨ rule.enum ∨ rule.values) ∧ rule.max) ∧
       ¬(rule.notmemberof ∧ rule.min) ∧
       ¬(rule.notmemberof ∧ rule.max)
 
@@ -992,7 +1044,7 @@ Nigel Horne, `<njh at nigelhorne.com>`
 
 # SEE ALSO
 
-- Test coverage report: [https://nigelhorne.github.io/Params-Validate-Strict/coverage/](https://nigelhorne.github.io/Params-Validate-Strict/coverage/)
+- [Test Dashboard](https://nigelhorne.github.io/Params-Validate-Strict/coverage/)
 - [Data::Processor](https://metacpan.org/pod/Data%3A%3AProcessor)
 - [Params::Get](https://metacpan.org/pod/Params%3A%3AGet)
 - [Params::Smart](https://metacpan.org/pod/Params%3A%3ASmart)
@@ -1036,4 +1088,6 @@ You can also look for information at:
 
 Copyright 2025-2026 Nigel Horne.
 
-This program is released under the following licence: GPL2
+This program is released under the following licence: GPL2.
+If you use it,
+please let me know.

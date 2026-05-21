@@ -22,7 +22,7 @@ class Container::Builder::Config {
 			WorkingDir => $working_dir
 		);
 		my %rootfs = ( type => 'layers' );
-		my @diff_ids = map { 'sha256:' . $_->get_digest() } @$layers;
+		my @diff_ids = map { 'sha256:' . $_->get_unc_digest() } @$layers;
 		$rootfs{diff_ids} = \@diff_ids;
 		my %history = ( created => '0001-01-01T00:00:00Z' );
 		my @histories = map { 

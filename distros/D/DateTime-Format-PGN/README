@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.05
+    version 1.01
 
 SYNOPSIS
 
@@ -57,25 +57,35 @@ METHODS
 
 Source
 
-    PGN spec <https://www.chessclub.com/user/help/PGN-spec> by Steven J.
-    Edwards.
+    PGN spec
+    <https://web.archive.org/web/20160830115945/https://www.chessclub.com/user/help/PGN-spec>
+    by Steven J. Edwards.
 
 See also
 
-      * Chess::PGN::Parse
+      * * Chess::PGN::Parse
 
-      * DateTime::Incomplete
+      * * DateTime::Incomplete
 
-      * http://datetime.perl.org/
+      * * https://github.com/houseabsolute/DateTime.pm/wiki
 
 AUTHOR
 
-    Ingram Braun <ibraun@cpan.org>
+    Ingram Braun <carlorff1@gmail.com>
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2016 by Ingram Braun.
+    This software is copyright (c) 2016–2026 by Ingram Braun.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+POD ERRORS
+
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 66:
+
+      '=item' outside of any '=over'
 

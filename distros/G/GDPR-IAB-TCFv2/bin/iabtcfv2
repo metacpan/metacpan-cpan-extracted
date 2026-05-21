@@ -1,0 +1,979 @@
+#!/usr/bin/env perl
+
+use v5.12;
+use warnings;
+
+use Getopt::Long qw(GetOptionsFromArray :config pass_through require_order bundling);
+use Pod::Usage;
+use File::Spec;
+eval { require JSON; 1 } or require JSON::PP;
+use GDPR::IAB::TCFv2;
+
+use constant {EXIT_SUCCESS => 0, EXIT_PARSE_ERROR => 1,};
+
+my $script_path = File::Spec->rel2abs($0);
+
+sub _json_false {
+  return JSON->can('false') ? JSON->false() : JSON::PP::false();
+}
+
+sub _json_true {
+  return JSON->can('true') ? JSON->true() : JSON::PP::true();
+}
+
+sub _clean_error {
+  my $err = shift;
+  return "" unless defined $err;
+
+  # If it's a reference (e.g. an exception object), return it as-is
+  return $err if ref $err;
+
+  # Strip Perl/Carp's automatic " at ... line ..." location suffix
+  $err =~ s/ at \S+ line \d+\.?\n?\z//;
+  chomp $err;
+  return $err;
+}
+
+# Subcommand registry: drives dispatch, the short-help summaries, and
+# the unknown-subcommand error message. New subcommands plug in here
+# with no other code edits.
+#
+# Each `common` row is [short, long, value-placeholder, description].
+# Rows appear in the short help in the order listed. Niche flags (e.g.
+# --cmp-validator-timeout) are intentionally omitted from `common` and
+# documented only in the full POD.
+my %SUBCOMMANDS = (
+  dump => {
+    summary  => 'Parse TC strings and emit JSON.',
+    synopsis => 'iabtcfv2 dump [options] [tc_strings...]',
+    runner   => \&run_dump,
+    common   => [
+      ['-p', '--pretty',             '',     'Indent JSON output'],
+      ['-c', '--compact',            '',     'Compact JSON (lists of IDs instead of boolean maps)'],
+      ['-v', '--vendor-id',          '<ID>', 'Filter output to a single vendor ID'],
+      ['-s', '--strict-legal-basis', '',     'Strict spec validation in the underlying parser'],
+      ['-i', '--ignore-errors',      '',     'Skip parse-error JSON output (still bumps exit code)'],
+      ['-f', '--fail-fast',          '',     'Exit immediately on the first parse error'],
+      ['-e', '--errors-to-stderr',   '',     'Send error JSON objects to STDERR'],
+      ['-w', '--enable-warnings',    '',     'Emit human-readable warnings on STDERR'],
+      ['-q', '--quiet',              '',     'Suppress STDOUT (exit code only)'],
+    ],
+  },
+  validate => {
+    summary  => 'Validate TC strings against a vendor identity and a purpose policy.',
+    synopsis => 'iabtcfv2 validate -v <id> [options] [tc_strings...]',
+    runner   => \&run_validate,
+    common   => [
+      ['-v', '--vendor-id',                    '<ID>',   'REQUIRED: vendor ID to validate'],
+      ['-C', '--consent-purposes',             '<LIST>', 'Purpose IDs that must be allowed on consent (e.g. 1,3)'],
+      ['-L', '--legitimate-interest-purposes', '<LIST>', 'Purpose IDs that must be allowed on legitimate interest'],
+      ['-F', '--flexible-purposes',            '<LIST>', 'Purpose IDs declared flexible by the vendor'],
+      ['-d', '--verify-disclosed-vendors',     '',       'Require vendor in the Disclosed Vendors segment'],
+      ['-s', '--strict-legal-basis',           '',       'Strict spec validation in the underlying parser'],
+      ['-m', '--min-tcf-policy-version',       '<N>',    'Reject TC strings whose policy version is below N'],
+      ['',   '--cmp-validator',                '<PATH-OR-URL>', 'Validate cmp_id against an IAB CMP registry snapshot'],
+      ['-a', '--all',                          '',              'Accumulate every failing rule (reasons array)'],
+      ['-p', '--pretty',                       '',              'Indent JSON output'],
+      ['-t', '--text',                         '',              'Human-readable text output instead of JSON'],
+      ['-i', '--ignore-errors',                '',              'Skip parse-error JSON output'],
+      ['-f', '--fail-fast',                    '',              'Exit on first parse error or invalid TC string'],
+      ['-e', '--errors-to-stderr',             '',              'Send error JSON objects to STDERR'],
+      ['-w', '--enable-warnings',              '',              'Emit human-readable warnings on STDERR'],
+      ['-q', '--quiet',                        '',              'Suppress STDOUT (exit code only)'],
+    ],
+  },
+);
+
+my %global_opts;
+GetOptions(
+  'help'      => \$global_opts{full_help},
+  'h'         => \$global_opts{short_help},
+  'man'       => \$global_opts{man},
+  'version|V' => \$global_opts{version},
+) or pod2usage(-input => $script_path, -exitval => 2, -verbose => 0);
+
+if ($global_opts{version}) {
+  print "iabtcfv2 version $GDPR::IAB::TCFv2::VERSION\n";
+  exit EXIT_SUCCESS;
+}
+
+if ($global_opts{short_help}) {
+  _show_short_help($ARGV[0]);
+}
+if ($global_opts{full_help}) {
+  _show_help($ARGV[0]);
+}
+pod2usage(-input => $script_path, -exitval => 1, -verbose => 2) if $global_opts{man};
+
+my $subcommand = shift @ARGV;
+
+# Bare invocation: brief overview, exit 1 (mirrors `--help` behavior).
+_show_short_help() unless defined $subcommand;
+
+# `iabtcfv2 help [<sub>]` keeps showing the full POD, same as before.
+if ($subcommand eq 'help') {
+  _show_help(shift @ARGV);
+}
+
+my $entry = $SUBCOMMANDS{$subcommand};
+_unknown_subcommand($subcommand) unless $entry;
+$entry->{runner}->(@ARGV);
+
+sub run_dump {
+  my @args = @_;
+  my %opts = (
+    pretty               => 0,
+    compact              => 0,
+    'ignore-errors'      => 0,
+    'fail-fast'          => 0,
+    'errors-to-stderr'   => 0,
+    'quiet'              => 0,
+    'enable-warnings'    => 0,
+    'vendor-id'          => undef,
+    'strict-legal-basis' => 0,
+  );
+
+  require Getopt::Long;
+  my $parser = Getopt::Long::Parser->new(config => [qw(no_pass_through require_order bundling)]);
+
+  my $getopt_ok;
+  {
+    local @ARGV = @args;
+    $getopt_ok = $parser->getoptions(
+      'pretty|p'             => \$opts{pretty},
+      'compact|c'            => \$opts{compact},
+      'ignore-errors|i'      => \$opts{'ignore-errors'},
+      'fail-fast|f'          => \$opts{'fail-fast'},
+      'errors-to-stderr|e'   => \$opts{'errors-to-stderr'},
+      'quiet|q'              => \$opts{'quiet'},
+      'enable-warnings|w'    => \$opts{'enable-warnings'},
+      'vendor-id|v=i'        => \$opts{'vendor-id'},
+      'strict-legal-basis|s' => \$opts{'strict-legal-basis'},
+      'help'                 => sub {
+        pod2usage(-input => $script_path, -exitval => 1, -verbose => 99, -sections => "DUMP|BUGS");
+      },
+      'h' => sub { _show_subcommand_short_help('dump'); exit 1; },
+    );
+    @args = @ARGV;
+  }
+  $getopt_ok or pod2usage(-input => $script_path, -exitval => 2, -verbose => 99, -sections => "DUMP/Usage");
+
+  my $json_pkg = JSON->can('new') ? 'JSON' : 'JSON::PP';
+  my $json     = $json_pkg->new->utf8;
+  if ($opts{pretty}) {
+    $json->pretty(1);
+    $json->indent_length(4) if $json->isa('JSON::PP');
+  }
+
+  my $state = {count => 0, line_num => 0,};
+
+  if (@args) {
+    foreach my $str (@args) {
+      $state->{line_num}++;
+      _process_string($str, $state, \%opts, $json);
+    }
+  }
+  else {
+    binmode(STDIN, ':encoding(UTF-8)') if -t STDIN;    ## no critic (InputOutput::ProhibitInteractiveTest, InputOutput::RequireEncodingWithUTF8Layer)
+    while (my $line = <STDIN>) {                       ## no critic (InputOutput::ProhibitExplicitStdin)
+      $state->{line_num}++;
+      chomp $line;
+      next unless $line =~ /\S/;
+      _process_string($line, $state, \%opts, $json);
+    }
+  }
+
+  exit EXIT_SUCCESS;
+}
+
+sub _process_string {
+  my ($str, $state, $o, $j) = @_;
+  my $output_data;
+
+  eval {
+    my $tcf = GDPR::IAB::TCFv2->Parse(
+      $str,
+      json   => {compact => $o->{compact}, vendor_id => $o->{'vendor-id'},},
+      strict => $o->{'strict-legal-basis'},
+    );
+    $output_data = $tcf->TO_JSON;
+  };
+  if (my $err = $@) {
+    if ($o->{'fail-fast'}) {
+      warn "Fatal: Failed to parse TC string '$str' at line $state->{line_num}: $err\n" if $o->{'enable-warnings'};
+      exit EXIT_PARSE_ERROR;
+    }
+
+    warn "Warning: Failed to parse TC string '$str' at line $state->{line_num}: $err\n" if $o->{'enable-warnings'};
+
+    return if $o->{'ignore-errors'};
+
+    $err         = _clean_error($err);
+    $output_data = {tc_string => $str, error => $err, success => _json_false(),};
+
+    if ($o->{'errors-to-stderr'}) {
+      warn $j->encode($output_data) . "\n";
+      return;
+    }
+  }
+
+  return if $o->{'quiet'};
+
+  print $j->encode($output_data) . "\n";
+
+  $state->{count}++;
+}
+
+sub _show_help {
+  my $topic = shift;
+
+  if ($topic && $topic eq 'dump') {
+    pod2usage(-input => $script_path, -exitval => 1, -verbose => 99, -sections => "DUMP|BUGS");
+  }
+  if ($topic && $topic eq 'validate') {
+    pod2usage(-input => $script_path, -exitval => 1, -verbose => 99, -sections => "VALIDATE|BUGS");
+  }
+  pod2usage(-input => $script_path, -exitval => 1, -verbose => 99, -sections => "SYNOPSIS|OPTIONS|SUBCOMMANDS|BUGS");
+}
+
+# Brief overview shown by `iabtcfv2 -h`, by `iabtcfv2 -h <subcommand>`,
+# by a bare `iabtcfv2`, or as a fallback path. Always exits 1 so the
+# caller's shell sees "no command actually ran".
+sub _show_short_help {
+  my $topic = shift;
+
+  if (defined $topic && $SUBCOMMANDS{$topic}) {
+    _show_subcommand_short_help($topic);
+    exit 1;
+  }
+
+  print {*STDERR} "iabtcfv2 - CLI tool for GDPR IAB TCF v2 strings\n\n";
+  print {*STDERR} "Usage:\n    iabtcfv2 <subcommand> [options] [tc_strings...]\n\n";
+  print {*STDERR} "Subcommands:\n";
+  for my $name (sort keys %SUBCOMMANDS) {
+    printf {*STDERR} "    %-10s %s\n", $name, $SUBCOMMANDS{$name}{summary};
+  }
+  print {*STDERR} "\n";
+  print {*STDERR} "Run 'iabtcfv2 <subcommand> -h' for a short summary of that subcommand.\n";
+  print {*STDERR} "Run 'iabtcfv2 --help'              for the full manual.\n";
+  exit 1;
+}
+
+sub _show_subcommand_short_help {
+  my $name      = shift;
+  my $sub_entry = $SUBCOMMANDS{$name};
+
+  print {*STDERR} "iabtcfv2 $name - $sub_entry->{summary}\n\n";
+  print {*STDERR} "Usage:\n    $sub_entry->{synopsis}\n\n";
+  print {*STDERR} "Options:\n";
+
+  # `-h` / `--help` are appended as if they were registry rows so they
+  # share the two-pass alignment below and do not require hardcoded
+  # column widths.
+  my @rows
+    = (@{$sub_entry->{common}}, ['-h', '', '', 'Show this short help'], ['', '--help', '', 'Show full documentation'],);
+
+  # Two-pass formatting so the description column is left-aligned across
+  # rows regardless of long-option / value-placeholder width.
+  my @lines;
+  my $left_width = 0;
+  for my $row (@rows) {
+    my ($s, $l, $v, $desc) = @{$row};
+    my $left_col;
+    if (length $l) {
+
+      # `-x, --long-name [<VAL>]` — comma only when both forms exist.
+      my $short_col = length($s) ? "$s," : '   ';
+      $left_col = sprintf "    %-3s %s%s", $short_col, $l, length($v) ? " $v" : '';
+    }
+    else {
+      # Short-only row (e.g. the `-h` line in the appended help block).
+      $left_col = sprintf "    %s", $s;
+    }
+    $left_width = length($left_col) if length($left_col) > $left_width;
+    push @lines, [$left_col, $desc];
+  }
+
+  for my $r (@lines) {
+    printf {*STDERR} "%-${left_width}s  %s\n", $r->[0], $r->[1];
+  }
+
+  print {*STDERR} "\nReads TC strings from positional args, or one per line from STDIN.\n";
+  print {*STDERR} "\nRun 'iabtcfv2 $name --help' for the full documentation.\n";
+}
+
+sub _unknown_subcommand {
+  my $name = shift;
+
+  print {*STDERR} "iabtcfv2: unknown subcommand '$name'\n\n";
+  print {*STDERR} "Available subcommands:\n";
+  for my $sc (sort keys %SUBCOMMANDS) {
+    printf {*STDERR} "    %-10s %s\n", $sc, $SUBCOMMANDS{$sc}{summary};
+  }
+  print {*STDERR} "\n";
+  print {*STDERR} "Run 'iabtcfv2 -h' for a short overview, or 'iabtcfv2 --help' for the full manual.\n";
+  exit 2;
+}
+
+sub _parse_id_list {
+  my $s = shift;
+  return [] unless defined $s && length $s;
+  return [map { 0 + $_ } grep { length $_ } split /\s*,\s*/, $s];
+}
+
+sub run_validate {    ## no critic (Subroutines::ProhibitExcessComplexity)
+  my @args = @_;
+  my %opts = (
+    pretty                         => 0,
+    'ignore-errors'                => 0,
+    'fail-fast'                    => 0,
+    'errors-to-stderr'             => 0,
+    quiet                          => 0,
+    'enable-warnings'              => 0,
+    'vendor-id'                    => undef,
+    'consent-purposes'             => undef,
+    'legitimate-interest-purposes' => undef,
+    'flexible-purposes'            => undef,
+    'verify-disclosed-vendors'     => 0,
+    'strict-legal-basis'           => 0,
+    'min-tcf-policy-version'       => undef,
+    'cmp-validator'                => undef,
+    'cmp-validator-network-ok'     => 0,
+    'cmp-validator-verify-ssl'     => 1,
+    'cmp-validator-timeout'        => 30,
+    all                            => 0,
+    text                           => 0,
+  );
+
+  require Getopt::Long;
+  my $parser = Getopt::Long::Parser->new(config => [qw(no_pass_through require_order bundling)]);
+
+  my $getopt_ok;
+  {
+    local @ARGV = @args;
+    $getopt_ok = $parser->getoptions(
+      'pretty|p'                         => \$opts{pretty},
+      'ignore-errors|i'                  => \$opts{'ignore-errors'},
+      'fail-fast|f'                      => \$opts{'fail-fast'},
+      'errors-to-stderr|e'               => \$opts{'errors-to-stderr'},
+      'quiet|q'                          => \$opts{quiet},
+      'enable-warnings|w'                => \$opts{'enable-warnings'},
+      'vendor-id|v=i'                    => \$opts{'vendor-id'},
+      'consent-purposes|C=s'             => \$opts{'consent-purposes'},
+      'legitimate-interest-purposes|L=s' => \$opts{'legitimate-interest-purposes'},
+      'flexible-purposes|F=s'            => \$opts{'flexible-purposes'},
+      'verify-disclosed-vendors|d'       => \$opts{'verify-disclosed-vendors'},
+      'strict-legal-basis|s'             => \$opts{'strict-legal-basis'},
+      'min-tcf-policy-version|m=i'       => \$opts{'min-tcf-policy-version'},
+      'cmp-validator=s'                  => \$opts{'cmp-validator'},
+      'cmp-validator-network-ok'         => \$opts{'cmp-validator-network-ok'},
+      'cmp-validator-verify-ssl!'        => \$opts{'cmp-validator-verify-ssl'},
+      'cmp-validator-timeout=i'          => \$opts{'cmp-validator-timeout'},
+      'all|a'                            => \$opts{all},
+      'text|t'                           => \$opts{text},
+      'help'                             => sub {
+        pod2usage(-input => $script_path, -exitval => 1, -verbose => 99, -sections => "VALIDATE|BUGS");
+      },
+      'h' => sub { _show_subcommand_short_help('validate'); exit 1; },
+    );
+    @args = @ARGV;
+  }
+  $getopt_ok or pod2usage(-input => $script_path, -exitval => 2, -verbose => 99, -sections => "VALIDATE/Usage");
+
+  unless (defined $opts{'vendor-id'}) {
+    pod2usage(
+      -input    => $script_path,
+      -exitval  => 2,
+      -message  => "validate: --vendor-id|-v is required",
+      -verbose  => 99,
+      -sections => "VALIDATE/Usage"
+    );
+  }
+
+  require GDPR::IAB::TCFv2::Validator;
+
+  my %vargs = (
+    vendor_id                => $opts{'vendor-id'},
+    verify_disclosed_vendors => $opts{'verify-disclosed-vendors'},
+    strict_legal_basis       => $opts{'strict-legal-basis'},
+  );
+  $vargs{consent_purpose_ids} = _parse_id_list($opts{'consent-purposes'}) if defined $opts{'consent-purposes'};
+  $vargs{legitimate_interest_purpose_ids} = _parse_id_list($opts{'legitimate-interest-purposes'})
+    if defined $opts{'legitimate-interest-purposes'};
+  $vargs{flexible_purpose_ids}   = _parse_id_list($opts{'flexible-purposes'}) if defined $opts{'flexible-purposes'};
+  $vargs{min_tcf_policy_version} = $opts{'min-tcf-policy-version'} if defined $opts{'min-tcf-policy-version'};
+
+  if (defined $opts{'cmp-validator'}) {
+    require GDPR::IAB::TCFv2::CMPValidator;
+
+    my $src      = $opts{'cmp-validator'};
+    my %cmp_args = (verify_ssl => $opts{'cmp-validator-verify-ssl'}, timeout => $opts{'cmp-validator-timeout'},);
+
+    if ($src =~ m{^https?://}i) {
+      $cmp_args{url}        = $src;
+      $cmp_args{network_ok} = 1 if $opts{'cmp-validator-network-ok'};
+    }
+    else {
+      $cmp_args{file} = $src;
+    }
+
+    # The CMPValidator emits a `carp` when the registry is older
+    # than 28 days. Surface that warning only when the user has
+    # opted into warnings (--enable-warnings); otherwise filter it
+    # out so routine CLI use stays quiet. Other warnings flow
+    # through unchanged.
+    my $cmp_validator;
+    {
+      local $SIG{__WARN__} = sub {
+        my $msg = defined($_[0]) ? $_[0] : '';
+        return if $msg =~ /CMP list is older than 28 days/;
+        warn @_;    ## no critic (ErrorHandling::RequireCarping)
+        }
+        if !$opts{'enable-warnings'};
+
+      $cmp_validator = eval { GDPR::IAB::TCFv2::CMPValidator->new(%cmp_args) };
+    }
+
+    if (my $err = $@) {
+      $err = _clean_error($err);
+      warn "validate: $err\n";
+      exit 2;
+    }
+
+    $vargs{cmp_validator} = $cmp_validator;
+  }
+
+  my $validator = eval { GDPR::IAB::TCFv2::Validator->new(%vargs) };
+  if (my $err = $@) {
+    $err = _clean_error($err);
+    warn "validate: $err\n";
+    exit 2;
+  }
+
+  my $json_pkg = JSON->can('new') ? 'JSON' : 'JSON::PP';
+  my $json     = $json_pkg->new->utf8;
+  if ($opts{pretty}) {
+    $json->pretty(1);
+    $json->indent_length(4) if $json->isa('JSON::PP');
+  }
+
+  my $state = {count => 0, line_num => 0, any_fail => 0,};
+
+  if (@args) {
+    foreach my $str (@args) {
+      $state->{line_num}++;
+      _validate_string($str, $state, \%opts, $json, $validator);
+    }
+  }
+  else {
+    binmode(STDIN, ':encoding(UTF-8)') if -t STDIN;    ## no critic (InputOutput::ProhibitInteractiveTest, InputOutput::RequireEncodingWithUTF8Layer)
+    while (my $line = <STDIN>) {                       ## no critic (InputOutput::ProhibitExplicitStdin)
+      $state->{line_num}++;
+      chomp $line;
+      next unless $line =~ /\S/;
+      _validate_string($line, $state, \%opts, $json, $validator);
+    }
+  }
+
+  exit($state->{any_fail} ? EXIT_PARSE_ERROR : EXIT_SUCCESS);
+}
+
+sub _validate_string {
+  my ($str, $state, $o, $j, $validator) = @_;
+
+  my $result = eval { $o->{all} ? $validator->validate_all($str) : $validator->validate($str); };
+  if (my $err = $@) {
+    $state->{any_fail} = 1;
+
+    if ($o->{'fail-fast'}) {
+      warn "Fatal: Failed to parse TC string '$str' at line $state->{line_num}: $err\n" if $o->{'enable-warnings'};
+      exit EXIT_PARSE_ERROR;
+    }
+
+    warn "Warning: Failed to parse TC string '$str' at line $state->{line_num}: $err\n" if $o->{'enable-warnings'};
+
+    return if $o->{'ignore-errors'};
+
+    $err = _clean_error($err);
+    my $output_data = {tc_string => $str, error => $err, success => _json_false(),};
+
+    if ($o->{'errors-to-stderr'}) {
+      if ($o->{text}) {
+        warn "ERROR  $str: $err\n";
+      }
+      else {
+        warn $j->encode($output_data) . "\n";
+      }
+      return;
+    }
+
+    return if $o->{quiet};
+    _emit_validate($output_data, $state, $o, $j);
+    return;
+  }
+
+  my $output_data;
+  if ($result->is_valid) {
+    $output_data = {tc_string => $str, vendor_id => $o->{'vendor-id'}, valid => _json_true(),};
+  }
+  else {
+    $state->{any_fail} = 1;
+    my @reasons = $result->reasons;
+    $output_data = {
+      tc_string => $str,
+      vendor_id => $o->{'vendor-id'},
+      valid     => _json_false(),
+      $o->{all} ? (reasons => \@reasons) : (reason => $reasons[0]),
+    };
+  }
+
+  return if $o->{quiet};
+
+  _emit_validate($output_data, $state, $o, $j);
+
+  exit EXIT_PARSE_ERROR if !$result->is_valid && $o->{'fail-fast'};
+
+  return;
+}
+
+sub _emit_validate {
+  my ($output_data, $state, $o, $j) = @_;
+
+  if ($o->{text}) {
+    my $tc  = $output_data->{tc_string};
+    my $vid = $output_data->{vendor_id};
+    my $line;
+    if (exists $output_data->{error}) {
+      $line = "ERROR  $tc: $output_data->{error}";
+    }
+    elsif ($output_data->{valid}) {
+      $line = "OK     $tc vendor $vid";
+    }
+    else {
+      my @reasons = $o->{all} ? @{$output_data->{reasons} || []} : ($output_data->{reason});
+      if (@reasons == 1) {
+        $line = "FAIL   $tc vendor $vid: $reasons[0]";
+      }
+      else {
+        $line = join "\n", "FAIL   $tc vendor $vid:", map {"  - $_"} @reasons;
+      }
+    }
+    print "$line\n";
+    $state->{count}++;
+    return;
+  }
+
+  print $j->encode($output_data) . "\n";
+  $state->{count}++;
+
+  return;
+}
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+iabtcfv2 - CLI tool for GDPR IAB TCF v2 strings
+
+=head1 SYNOPSIS
+
+iabtcfv2 [options] <subcommand> [subcommand-options]
+
+Run with B<-h> for a short overview, or B<--help> for the full manual.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-h>
+
+Print a brief summary (synopsis + common options + pointer to B<--help>) and
+exits. Pair with a subcommand for a per-subcommand summary, e.g.
+C<iabtcfv2 dump -h>.
+
+=item B<--help>
+
+Print the full manual (this document) and exits. Same as C<iabtcfv2 help>.
+For per-subcommand manuals, run C<iabtcfv2 <sub> --help> or
+C<iabtcfv2 help <sub>>.
+
+=item B<--version>, B<-V>
+
+Print the version and exits.
+
+=item B<--man>
+
+Prints the manual page and exits.
+
+=back
+
+=head1 SUBCOMMANDS
+
+=over 4
+
+=item B<dump>
+
+Parses TC strings and outputs them as JSON.
+
+=item B<validate>
+
+Validates TC strings against a vendor identity and a set of purpose lists,
+emitting one JSON record per string (or text lines with B<--text>).
+
+=back
+
+=head1 DUMP
+
+=head2 Usage
+
+    iabtcfv2 dump [options] [tc_strings...]
+
+    Run `iabtcfv2 dump -h` for a short summary, or `--help` for this manual.
+
+=head2 Description
+
+Parses TC strings and outputs them as JSON.
+
+=head2 Options
+
+=over 4
+
+=item B<--pretty>, B<-p>
+
+Output human-readable, indented JSON.
+
+=item B<--compact>, B<-c>
+
+Output a compact JSON representation (lists of IDs instead of boolean maps).
+
+=item B<--vendor-id>, B<-v> I<ID>
+
+Filter the output to only show data for a specific vendor ID.
+
+=item B<--strict-legal-basis>, B<-s>
+
+Enable strict specification validation. In this mode, the tool will fail if
+mandatory segments are missing (e.g., Disclosed Vendors in TCF v2.3).
+
+=item B<--ignore-errors>, B<-i>
+
+Do not output any JSON error object for failed strings.
+
+=item B<--fail-fast>, B<-f>
+
+Stop processing and exit the program immediately upon the first parse error.
+
+=item B<--errors-to-stderr>, B<-e>
+
+Output JSON error objects to B<STDERR> instead of B<STDOUT>.
+
+=item B<--enable-warnings>, B<-w>
+
+Emit human-readable warning messages on B<STDERR> when a TC string fails to
+parse. Off by default; enable to get diagnostic context alongside the JSON
+error object.
+
+=item B<--quiet>, B<-q>
+
+Suppress all output on B<STDOUT>. The exit code still reflects whether parsing
+succeeded, which is convenient for shell-style C<if iabtcfv2 dump -q "$tc">
+checks. Combine with C<--enable-warnings> if you want diagnostics on B<STDERR>.
+
+=back
+
+=head2 Examples
+
+    # Dump a string to JSON line
+    iabtcfv2 dump CPi...AAA
+
+    # Dump multiple strings (one JSON object per line)
+    iabtcfv2 dump CPi...AAA CPj...BBB
+
+    # Read from STDIN
+    cat strings.txt | iabtcfv2 dump
+
+    # Pipe through `jq -s` if you need a single JSON array
+    cat strings.txt | iabtcfv2 dump | jq -s .
+
+=head2 Short option bundling
+
+Single-character flags can be bundled together after a single dash. The last
+option in the bundle may take a value as the next argument.
+
+    # Equivalent of `--pretty --ignore-errors`
+    iabtcfv2 dump -pi CPi...AAA
+
+    # Equivalent of `--compact --pretty`
+    iabtcfv2 dump -cp CPi...AAA
+
+    # Last bundled short can take a value: -p (pretty) + -v <id> (vendor-id)
+    iabtcfv2 dump -pv 284 CPi...AAA
+
+    # Long options accept the GNU `=value` form too
+    iabtcfv2 dump --vendor-id=284 CPi...AAA
+
+Bundling does NOT support abbreviating long options (`--ver` is not accepted
+as a shortcut for `--version`); always use the full long-option name or its
+single-character short alias.
+
+=head1 DOCKER USAGE
+
+This tool is also available as a Docker image on Docker Hub.
+
+=head2 Basic Usage
+
+    docker run --rm peczenyj/gdpr-iab-tcfv2 dump "CLcVDxRMWfGmWAVAHCENAXCkAKDAADnAABRgA5mdfCKZuYJez-NQm0TBMYA4oCAAGQYIAAAAAAEAIAEgAA"
+
+=head2 Processing Streams (STDIN)
+
+To process a stream of strings via pipe:
+
+    cat strings.txt | docker run -i --rm peczenyj/gdpr-iab-tcfv2 dump
+
+To type strings manually:
+
+    docker run -it --rm peczenyj/gdpr-iab-tcfv2 dump
+
+=head1 VALIDATE
+
+=head2 Usage
+
+    iabtcfv2 validate --vendor-id <id> [options] [tc_strings...]
+
+    Run `iabtcfv2 validate -h` for a short summary, or `--help` for this manual.
+
+=head2 Description
+
+Validates TC strings against a vendor identity and a set of declared purpose
+lists. The vendor must be allowed for every purpose in C<--consent-purposes>
+on a consent basis, and for every purpose in
+C<--legitimate-interest-purposes> on a legitimate-interest basis. Purposes
+listed in C<--flexible-purposes> are checked using the GVL flexible-purpose
+semantics, with the default basis derived from which list also contains the
+purpose. See L<GDPR::IAB::TCFv2::Validator> for the underlying rule engine.
+
+By default the subcommand emits one JSON object per input TC string on
+B<STDOUT>. With B<--text> it emits one human-readable line per string
+instead.
+
+=head2 Output shape
+
+A successful validation produces:
+
+    {"tc_string":"CO...","vendor_id":32,"valid":true}
+
+A failure in default (fail-fast) mode produces a singular C<reason>:
+
+    {"tc_string":"CO...","vendor_id":32,"valid":false,
+     "reason":"vendor 32 not allowed for purpose 1 (consent)"}
+
+A failure in B<--all> mode produces a plural C<reasons> array:
+
+    {"tc_string":"CO...","vendor_id":32,"valid":false,
+     "reasons":["...","..."]}
+
+A parse error produces the same shape as the C<dump> subcommand:
+
+    {"tc_string":"INVALID","error":"...","success":false}
+
+=head2 Required options
+
+=over 4
+
+=item B<--vendor-id>, B<-v> I<ID>
+
+The numeric vendor ID to validate against. Required.
+
+=back
+
+=head2 Purpose options
+
+=over 4
+
+=item B<--consent-purposes>, B<-C> I<1,2,3>
+
+Comma-separated list of purpose IDs that the vendor must be allowed to
+process on a B<consent> basis.
+
+=item B<--legitimate-interest-purposes>, B<-L> I<1,2,3>
+
+Comma-separated list of purpose IDs that the vendor must be allowed to
+process on a B<legitimate interest> basis.
+
+=item B<--flexible-purposes>, B<-F> I<1,2,3>
+
+Comma-separated list of purpose IDs that the vendor declared as flexible.
+Each ID listed here MUST also appear in either C<--consent-purposes> or
+C<--legitimate-interest-purposes>; the membership determines the default
+legal basis used for the flexible-purpose check.
+
+=back
+
+=head2 Rule options
+
+=over 4
+
+=item B<--verify-disclosed-vendors>, B<-d>
+
+Require the vendor to appear in the Disclosed Vendors segment. When the TC string
+carries the segment, the vendor must be present. If the segment is absent, it
+only fails if B<--min-tcf-policy-version> is set to 5 or higher (TCF v2.3+).
+
+=item B<--strict-legal-basis>, B<-s>
+
+Enable strict spec validation in the underlying parser (see C<dump --strict>).
+
+=item B<--min-tcf-policy-version>, B<-m> I<N>
+
+Reject TC strings whose Global Vendor List policy version is below I<N>.
+Checked first, before any vendor- or purpose-level rules.
+
+=item B<--cmp-validator> I<PATH-OR-URL>
+
+Validate the C<cmp_id> embedded in each TC string against an IAB CMP
+registry snapshot. The argument is detected as a URL when it starts
+with C<http://> or C<https://>, otherwise it is treated as a local
+file path. Failures yield a C<reason> mentioning the unknown or
+deleted CMP id.
+
+When the argument is a URL, the standard HTTP-proxy environment
+variables (C<https_proxy>, C<http_proxy>, C<no_proxy>) are honored
+automatically.
+
+=item B<--cmp-validator-network-ok>
+
+Required when B<--cmp-validator> is a URL. Without this flag, URL fetching
+is refused (mirrors the library's C<network_ok =E<gt> 1> opt-in:
+fetching from an arbitrary URL is intentional, never accidental).
+Has no effect when B<--cmp-validator> is a file path.
+
+=item B<--cmp-validator-verify-ssl>, B<--no-cmp-validator-verify-ssl>
+
+Verify TLS certificates when fetching from an HTTPS URL. On by default;
+disable with B<--no-cmp-validator-verify-ssl> only when targeting a server
+with a self-signed or otherwise non-public-CA certificate. Has no
+effect when B<--cmp-validator> is a file path.
+
+=item B<--cmp-validator-timeout> I<SECONDS>
+
+Per-request timeout for the URL fetch, in seconds. Defaults to 30.
+Has no effect when B<--cmp-validator> is a file path.
+
+=item B<--all>, B<-a>
+
+Accumulate every failing rule into a C<reasons> array instead of
+short-circuiting on the first failure. The output JSON uses plural
+C<reasons> (array) instead of singular C<reason> (string).
+
+=back
+
+=head2 Output options
+
+=over 4
+
+=item B<--pretty>, B<-p>
+
+Output human-readable, indented JSON.
+
+=item B<--text>, B<-t>
+
+Output one human-readable line per TC string instead of JSON. Format:
+
+    OK     <tc>  vendor <id>
+    FAIL   <tc>  vendor <id>: <reason>
+    ERROR  <tc>: <parse error>
+
+In B<--all> mode, multi-reason failures span multiple indented lines.
+
+=item B<--ignore-errors>, B<-i>
+
+Skip parse errors silently (still bumps the exit code). Validation failures
+are still emitted.
+
+=item B<--fail-fast>, B<-f>
+
+Exit immediately on the first parse error or the first invalid TC string.
+Validation failures are emitted before exiting; parse errors are not (matches
+the C<dump> contract).
+
+=item B<--errors-to-stderr>, B<-e>
+
+Route parse-error records to B<STDERR> instead of B<STDOUT>.
+
+=item B<--enable-warnings>, B<-w>
+
+Emit human-readable warning messages on B<STDERR> when a TC string fails to
+parse, and when the B<--cmp-validator> registry snapshot is older than 28 days.
+Off by default.
+
+=item B<--quiet>, B<-q>
+
+Suppress all output on B<STDOUT>. The exit code still reflects validity,
+which is convenient for shell-style C<if iabtcfv2 validate -q -v 32 ... "$tc">
+checks.
+
+=back
+
+=head2 Exit codes
+
+=over 4
+
+=item *
+
+B<0> — every input TC string was parsed and validated cleanly.
+
+=item *
+
+B<1> — at least one TC string failed validation or could not be parsed.
+
+=item *
+
+B<2> — bad CLI usage (missing C<--vendor-id>, incoherent purpose lists,
+unreachable C<--cmp-validator> source).
+
+=back
+
+=head2 Examples
+
+    # Single string, fail-fast
+    iabtcfv2 validate -v 32 -C 1,3 -L 7 CO...AAA
+
+    # All reasons, pretty JSON, text-friendly
+    iabtcfv2 validate -av 32 -C 1,3 -L 7 -t CO...AAA
+
+    # Pipeline-friendly: just the exit code
+    if iabtcfv2 validate -q -v 32 -C 1,3 "$tc"; then ...
+
+    # Many strings as JSON Lines (one record per line); pipe through
+    # `jq -s` if you need a single JSON array.
+    iabtcfv2 validate -v 32 -C 1,3 CO...AAA CO...BBB
+    iabtcfv2 validate -v 32 -C 1,3 CO...AAA CO...BBB | jq -s .
+
+    # Reject TC strings that name an unknown or deleted CMP, using a
+    # local snapshot of the IAB CMP registry.
+    iabtcfv2 validate -v 32 --cmp-validator /etc/iab/cmp-list.json CO...AAA
+
+    # Same, but fetching the registry over HTTPS through whatever
+    # proxy `https_proxy` points at.
+    iabtcfv2 validate -v 32 \
+        --cmp-validator https://cmplist.consensu.org/v2/cmp-list.json \
+        --cmp-validator-network-ok \
+        CO...AAA
+
+=head1 DESCRIPTION
+
+B<iabtcfv2> is a command-line interface for the GDPR::IAB::TCFv2 library.
+
+=head2 B<Warning: Name Change>
+
+Previous versions of this distribution (v0.300) included a standalone utility
+named B<iabtcf-dump>. This has been unified into the B<iabtcfv2> tool using
+the B<dump> subcommand.
+
+=head1 BUGS
+
+Report bugs and feature requests at L<https://github.com/peczenyj/GDPR-IAB-TCFv2/issues>.
+
+=cut

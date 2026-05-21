@@ -638,7 +638,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- bind_js() — returns the JavaScript needed for two-way binding ----
+ # ---- bind_js() - returns the JavaScript needed for two-way binding ----
 
 SV *
 bind_js(self)
@@ -664,7 +664,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- set_values_js(hashref) — returns JS to set field values ----
+ # ---- set_values_js(hashref) - returns JS to set field values ----
 
 SV *
 set_values_js(self, data)
@@ -718,7 +718,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- get_values_js() — returns JS that sends current form values via bridge ----
+ # ---- get_values_js() - returns JS that sends current form values via bridge ----
 
 SV *
 get_values_js(self)
@@ -832,7 +832,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- on_change(field_or_cb, [cb]) — register change handlers ----
+ # ---- on_change(field_or_cb, [cb]) - register change handlers ----
 
 SV *
 on_change(self, field_or_cb, ...)
@@ -890,7 +890,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- fields() — returns arrayref of field names ----
+ # ---- fields() - returns arrayref of field names ----
 
 SV *
 fields(self)
@@ -918,7 +918,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- action(coderef) — get/set action handler ----
+ # ---- action(coderef) - get/set action handler ----
 
 SV *
 action(self, ...)
@@ -940,7 +940,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- dispatch(event_type, json_string) — internal: called from bridge ----
+ # ---- dispatch(event_type, json_string) - internal: called from bridge ----
 
 void
 dispatch(self, event_type, json_str)
@@ -1063,7 +1063,7 @@ CODE:
     SvREFCNT_dec(decoded);
 }
 
- # ---- _route_event(event_type, json_str) — class method: routes to correct form ----
+ # ---- _route_event(event_type, json_str) - class method: routes to correct form ----
 
 void
 _route_event(class, event_type, json_str)
@@ -1131,7 +1131,7 @@ CODE:
     SvREFCNT_dec(decoded);
 }
 
- # ---- attach(app) — register form and bind events on the app ----
+ # ---- attach(app) - register form and bind events on the app ----
 
 SV *
 attach(self, app)
@@ -1222,7 +1222,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- detach() — remove form from the global registry ----
+ # ---- detach() - remove form from the global registry ----
 
 SV *
 detach(self)
@@ -1244,7 +1244,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- validate(\%data) — validate form data, returns hashref or undef ----
+ # ---- validate(\%data) - validate form data, returns hashref or undef ----
 
 SV *
 validate(self, data_rv)
@@ -1357,7 +1357,7 @@ CODE:
             }
         }
 
-        /* Pattern — compile regex and match */
+        /* Pattern - compile regex and match */
         {
             SV **pat = hv_fetchs(opts_hv, "pattern", 0);
             if (pat && SvOK(*pat)) {

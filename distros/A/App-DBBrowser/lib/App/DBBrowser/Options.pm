@@ -29,6 +29,16 @@ sub new {
     }, $class;
 }
 
+sub __plugins {
+    my ( $sf ) = @_;
+    my $op_mn = App::DBBrowser::Options::Menus->new( $sf->{i}, $sf->{o} );
+    my $op_rw = App::DBBrowser::Options::ReadWrite->new( $sf->{i}, $sf->{o} );
+    my $groups = $op_mn->groups( undef, undef, 1 );
+    $sf->config_groups( $groups );
+    #$sf->config_groups( $groups, undef, undef, 1 );
+    $op_rw->read_config_file();
+}
+
 
 sub __config_global {
     my ( $sf ) = @_;
@@ -207,15 +217,16 @@ sub set_options {
     my $op_rw = App::DBBrowser::Options::ReadWrite->new( $sf->{i}, $sf->{o} );
     $sf->{o} = $op_rw->read_config_file();
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
-    my $global_settings = '- Global settings';
+    my $plugins         = '- Plugins';
     my $config_plugins  = '- Options';
+    my $global_settings = '- Other';
     my $app_info        = '- App info';
     my $help            = '- Help';
     my $main_old_idx = 0;
 
     OPTION: while( 1 ) {
         my @pre  = ( undef, $sf->{i}{_continue} );
-        my $menu = [ @pre, $global_settings, $config_plugins, $app_info, $help ];
+        my $menu = [ @pre, $plugins, $config_plugins, $global_settings, $app_info, $help ];
         # Choose
         my $main_idx = $tc->choose(
             $menu,
@@ -233,6 +244,9 @@ sub set_options {
         }
         if ( $menu->[$main_idx] eq $sf->{i}{_continue} ) {
             return;
+        }
+        elsif ( $menu->[$main_idx] eq $plugins ) {
+            $sf->__plugins();
         }
         elsif ( $menu->[$main_idx] eq $global_settings ) {
             $sf->__config_global();
@@ -280,7 +294,7 @@ sub config_groups {
         unshift @pre, $hidden;
     }
     else {
-        $prompt = 'Your choice:';
+        #$prompt = 'Your choice:';
     }
     my $grp_old_idx = $cursor_first_pos;
 
@@ -406,10 +420,10 @@ sub __display_info {
     my $app_dir = $sf->{i}{app_dir};
     eval { $app_dir = decode( 'locale', $app_dir ) };
     my $info = 'db-browser'  . "\n\n";
-    $info .= 'version: ' . $main::VERSION . "\n\n";
-    $info .= 'path: ' . catfile( $RealBin, $RealScript ) . "\n\n";
-    $info .= 'app-dir: ' . $app_dir . "\n";
-    $tc->choose( [ '<<' ], { prompt => $info, color => 1 } );
+    $info .= 'Version: ' . $main::VERSION . "\n\n";
+    $info .= 'Path: ' . catfile( $RealBin, $RealScript ) . "\n\n";
+    $info .= 'App-Dir: ' . $app_dir . "\n";
+    $tc->choose( [ ' << ' ], { prompt => $info, color => 1, margin => [ 1, 1, 1, 1 ] } );
 }
 
 

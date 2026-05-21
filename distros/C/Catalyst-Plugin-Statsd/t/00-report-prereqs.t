@@ -65,6 +65,8 @@ my @include = qw(
   Log::Dispatch::Array
   Term::Size::Perl
   Term::Size::Win32
+  Net::Statsd::Tiny
+  Crypt::Mac::HMAC
 );
 
 my @exclude = qw(

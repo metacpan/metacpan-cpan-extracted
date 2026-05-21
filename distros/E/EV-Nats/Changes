@@ -1,27 +1,10 @@
 Revision history for EV::Nats
 
+0.02  2026-04-29
+    - Hardened TLS (hostname verification) and NKey auth (CRC + prefix
+      fixes; both were latently broken in 0.01).
+    - JetStream / KV / ObjectStore protocol fixes.
+    - Expanded tests; CI now runs JS + TLS + NKey suites.
+
 0.01  2026-04-09
-    - Initial release
-    - Pure XS NATS client protocol (PUB, SUB, UNSUB, MSG, HMSG)
-    - Request/reply with automatic inbox management
-    - Queue group subscriptions with reconnect restore
-    - Auto-reconnect with exponential backoff + jitter
-    - Server pool with cluster URL failover from INFO
-    - Write coalescing via ev_prepare for high throughput
-    - O(1) subscription lookup via hash table
-    - Graceful drain (UNSUB all, PING fence, callback, disconnect)
-    - Optional TLS via OpenSSL (auto-detected at build time)
-    - NKey/JWT authentication with Ed25519 signing
-    - JetStream API (EV::Nats::JetStream)
-    - Key-Value store (EV::Nats::KV)
-    - Object store with chunked upload/download (EV::Nats::ObjectStore)
-    - Publish batching API
-    - Slow consumer detection with configurable threshold
-    - Lame duck mode notification
-    - Per-connection stats counters
-    - Unix domain socket support
-    - TCP and Unix socket support
-    - flush() with PONG callback tracking
-    - Headers support (HPUB/HMSG)
-    - Auto-unsub state restored on reconnect
-    - max_payload enforcement on send and receive
+    - Initial release.

@@ -113,7 +113,6 @@ t/switches-in-import.t
 t/symbol-as-method-call.t
 t/symbol-in-export.t
 t/test-builder.t
-t/test-most.t
 t/tie.t
 t/typeglob.t
 t/unnest-quotes.t
@@ -235,7 +234,6 @@ test-data/symbol-as-method-call.pl
 test-data/symbol-in-signature.pl
 test-data/test-html-lint.t
 test-data/test-more.t
-test-data/test-most.t
 test-data/tie.pl
 test-data/typeglob.pl
 test-data/unnest-quotes.pl

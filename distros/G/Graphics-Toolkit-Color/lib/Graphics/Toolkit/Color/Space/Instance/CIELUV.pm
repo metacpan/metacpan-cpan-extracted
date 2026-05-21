@@ -22,7 +22,7 @@ sub from_xyz {
     my $u_white = 0.197839825; # 4 * $D65[0] / $white_mix; #
     my $v_white = 0.468336303; # 9 * $D65[1] / $white_mix; #
 
-    my $l = ($XYZ[1] > $eta) ? (($XYZ[1] ** (1/3)) * 116 - 16) : ($kappa * $XYZ[1]);
+    my $l = (abs($XYZ[1]) > $eta) ? (($XYZ[1] ** (1/3)) * 116 - 16) : ($kappa * $XYZ[1]);
     my $u = 13 * $l * ($u_color - $u_white);
     my $v = 13 * $l * ($v_color - $v_white);
 
@@ -41,7 +41,7 @@ sub to_xyz {
     my $u_color = $l ? (($u / 13 / $l) + $u_white) : 0;
     my $v_color = $l ? (($v / 13 / $l) + $v_white) : 0;
 
-    my $y = ($l > $kappa * $eta) ? ((($l+16) / 116) ** 3) : ($l / $kappa);
+    my $y = (abs($l) > $kappa * $eta) ? ((($l+16) / 116) ** 3) : ($l / $kappa);
     my $color_mix = $v_color ? (9 * $y / $v_color) : 0;
     my $x = $u_color * $color_mix / 4;
     my $z = ($color_mix - $x - (15 * $y)) / 3;

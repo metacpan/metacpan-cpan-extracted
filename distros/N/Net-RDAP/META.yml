@@ -24,6 +24,7 @@ requires:
   File::Basename: '0'
   File::Slurp: '0'
   File::Spec: '0'
+  File::XDG: '0'
   File::stat: '0'
   HTTP::Date: '0'
   HTTP::Request::Common: '0'
@@ -45,5 +46,5 @@ requires:
 resources:
   bugtracker: https://github.com/gbxyz/perl-Net-RDAP/issues
   repository: https://github.com/gbxyz/perl-Net-RDAP.git
-version: '0.41'
+version: '0.42'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

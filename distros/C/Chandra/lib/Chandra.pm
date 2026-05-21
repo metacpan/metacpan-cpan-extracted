@@ -3,7 +3,7 @@ package Chandra;
 use strict;
 use warnings;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 require XSLoader;
 XSLoader::load('Chandra', $VERSION);
@@ -92,9 +92,9 @@ See:
 
 =over 4
 
-=item * examples/bind_example.pl — JavaScript to Perl function binding
+=item * examples/bind_example.pl - JavaScript to Perl function binding
 
-=item * examples/counter_app.pl — counter app with bidirectional communication
+=item * examples/counter_app.pl - counter app with bidirectional communication
 
 =back
 
@@ -152,7 +152,7 @@ Perl coderef called when JavaScript invokes C<window.external.invoke($arg)>.
 
 =head2 run()
 
-Simple blocking run — shows the window and blocks until it is closed.
+Simple blocking run - shows the window and blocks until it is closed.
 
 =head2 init()
 

@@ -1157,13 +1157,20 @@ sub test_watch_pids {
             },
         );
 
-        my $resp = $handle->sync_request(wp_svc => 'ping');
-        # Signal parent we are ready
-        open my $fh, '>', $ready_file or die "open: $!";
-        print $fh "$resp->{response}\n";
-        close $fh;
+        my $resp_text = 'ERROR: unknown';
+        unless (eval { my $resp = $handle->sync_request(wp_svc => 'ping');
+                       $resp_text = $resp->{response} // 'ERROR: undef response'; 1 }) {
+            my $err = $@ // 'unknown';
+            chomp $err;
+            $resp_text = "ERROR: $err";
+        }
 
-        # Exit — the service watches our pid and should terminate
+        my $pend = "$ready_file.pend";
+        open my $fh, '>', $pend or die "open: $!";
+        print $fh "$resp_text\n";
+        close $fh;
+        rename $pend, $ready_file or die "rename: $!";
+
         exit(0);
     }
 

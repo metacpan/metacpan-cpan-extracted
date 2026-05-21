@@ -1,0 +1,17 @@
+^\.claude/
+^\.playwright-mcp/
+^blib/
+^Makefile$
+^Makefile\.old$
+^pm_to_blib
+^MYMETA\.
+^RTIR-Extension-MISP-
+\.tar\.gz$
+\.bak$
+\.swp$
+^cover_db/
+^t/tmp/
+^xt/tmp/
+\bCVS\b
+\B\.svn\b
+^\.git\b

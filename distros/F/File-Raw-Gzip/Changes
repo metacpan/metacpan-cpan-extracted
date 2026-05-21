@@ -1,0 +1,12 @@
+Revision history for File-Raw-Gzip
+
+0.03    2026-05-17
+        - Fix Strawberry / Win32 "Free to wrong pool" crash
+        - Bumped File::Raw prereq to 0.13 for the streaming O_BINARY
+          fix on Windows 
+
+0.02    2026-05-07
+        - Bumped File::Raw prereq to 0.12
+
+0.01    2026-05-05
+        First version, released on an unsuspecting world.

@@ -294,6 +294,18 @@ extern const struct ltc_hash_descriptor sha3_256_desc;
 int sha3_224_test(void);
 extern const struct ltc_hash_descriptor sha3_224_desc;
 int sha3_done(hash_state *md, unsigned char *out);
+/* SHAKE128 with digest length according to RFC 8702 */
+int sha3_shake128_init(hash_state *md);
+#define sha3_shake128_process(a,b,c) sha3_process(a,b,c)
+int sha3_shake128_done(hash_state *md, unsigned char *out);
+int sha3_shake128_test(void);
+extern const struct ltc_hash_descriptor shake128_desc;
+/* SHAKE256 with digest length according to RFC 8702 */
+int sha3_shake256_init(hash_state *md);
+#define sha3_shake256_process(a,b,c) sha3_process(a,b,c)
+int sha3_shake256_done(hash_state *md, unsigned char *out);
+int sha3_shake256_test(void);
+extern const struct ltc_hash_descriptor shake256_desc;
 /* SHAKE128 + SHAKE256 */
 int sha3_shake_init(hash_state *md, int num);
 #define sha3_shake_process(a,b,c) sha3_process(a,b,c)
@@ -374,6 +386,8 @@ int sha512_224_done(hash_state * md, unsigned char *out);
 int sha512_224_test(void);
 extern const struct ltc_hash_descriptor sha512_224_desc;
 #endif /* LTC_SHA512_224 */
+
+int shani_is_supported(void);
 
 #ifdef LTC_SHA256
 int sha256_init(hash_state * md);

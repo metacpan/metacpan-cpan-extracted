@@ -17,7 +17,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.17'
+generated_by: 'Module::Install version 1.21'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,7 +30,8 @@ no_index:
     - t
     - xt
 requires:
-  Attean: 0.013
+  Attean: 0.038
+  Config::JFDI: 0
   File::ShareDir: 0
   HTML::HTML5::Writer: 0
   HTTP::Negotiate: 0
@@ -48,7 +49,7 @@ requires:
 resources:
   IRC: irc://irc.perl.org/#perlrdf
   bugtracker: https://github.com/kasei/atteanx-endpoint/issues
-  homepage: http://search.cpan.org/dist/AtteanX-Endpoint/
+  homepage: https://metacpan.org/release/AtteanX-Endpoint/
   license: http://dev.perl.org/licenses/
-  repository: http://github.com/kasei/atteanx-endpoint/
-version: '0.002'
+  repository: https://github.com/kasei/atteanx-endpoint/
+version: '0.003'

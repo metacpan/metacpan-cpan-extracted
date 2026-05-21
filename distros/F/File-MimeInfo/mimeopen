@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 $|++;
 
 # ########## #
@@ -10,7 +10,8 @@ $|++;
 # ########## #
 use Encode::Locale;
 use Encode;
-@ARGV = map { decode(locale => $_, 1) } @ARGV;
+use B qw(cstring);
+@ARGV = map { my $d = eval { decode(locale => $_, 1) }; defined $d ? $d : $_ } @ARGV;
 
 
 if (-t) {
@@ -78,6 +79,7 @@ if ($args{help} || $args{usage}) {
 if ($args{version}) {
     print "mimeopen $VERSION\n\n", << 'EOV';
 Copyright (c) 2005, 2012 Jaap G Karssenberg. All rights reserved.
+Copyright (c) 2013-2026 Michiel W. Beijen. All rights reserved.
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl.
 
@@ -152,7 +154,8 @@ $mimetype = $args{'magic-only'}
     : mimetype($f) ;
 
 unless (length $mimetype) {
-    print STDERR "Could not determine mimetype for file: $file\n";
+    my $q = -t STDERR ? cstring($file) : $file;
+    print STDERR "Could not determine mimetype for file: $q\n";
     exit 5;
 }
 
@@ -177,7 +180,8 @@ unless($default) {
     exit 6;
 }
 
-print 'Opening '.join(', ', map qq{"$_"}, @ARGV)
+my $q = -t STDOUT ? \&cstring : sub { qq{"$_[0]"} };
+print 'Opening '.join(', ', map $q->($_), @ARGV)
     . ' with '.$default->get_value('Name')."  ($mimetype)\n";
 #print STDERR "exec string: ".$default->parse_Exec(@ARGV)."\n";
 if (@ARGV == 1 or $default->wants_list) {
@@ -265,11 +269,8 @@ sub complain { # Error messages
 
 sub resolvelink { # --dereference
     my $file = shift;
-    my $link = readlink($file) || return $file;
-    my (undef, $dir, undef) = File::Spec->splitpath($file);
-    $link = File::Spec->rel2abs($link, $dir);
-    $link = resolvelink($link) if -l $link; # recurs
-    return $link;
+    require Cwd;
+    return Cwd::abs_path($file) // $file; # undef on cycles
 }
 
 __END__
@@ -367,6 +368,7 @@ Maintained by Michiel Beijen E<lt>mb@x14.nlE<gt>
 =head1 COPYRIGHT
 
 Copyright (c) 2002, 2012 Jaap G Karssenberg. All rights reserved.
+Copyright (c) 2013-2026 Michiel W. Beijen. All rights reserved.
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl.
 

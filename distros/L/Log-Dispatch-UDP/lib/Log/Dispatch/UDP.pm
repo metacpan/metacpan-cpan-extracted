@@ -1,22 +1,19 @@
-## no critic (RequireUseStrict)
 package Log::Dispatch::UDP;
-{
-  $Log::Dispatch::UDP::VERSION = '0.01';
-}
 
-## use critic (RequireUseStrict)
+use v5.8;
 use strict;
 use warnings;
 use parent 'Log::Dispatch::Output';
 
 use Carp qw(croak);
 use IO::Socket::INET;
-use Socket qw(SOCK_DGRAM);
-use Readonly;
+use Socket 2.026 qw(SOCK_DGRAM);
 
 use namespace::clean;
 
-Readonly::Array my @VALID_PARAMS => qw(host port);
+# ABSTRACT: Log messages to a remote UDP socket
+
+our $VERSION = '0.02';
 
 sub new {
     my ( $class, %params ) = @_;
@@ -55,9 +52,13 @@ sub log_message {
 
 1;
 
-
+__END__
 
 =pod
+
+=encoding UTF-8
+
+=for stopwords netcat
 
 =head1 NAME
 
@@ -65,7 +66,7 @@ Log::Dispatch::UDP - Log messages to a remote UDP socket
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -91,46 +92,62 @@ listening on some remote host.  The datagrams themselves
 contain only the messages (there's no real structure to them),
 so you can easily listen in using netcat.
 
+=head1 SECURITY CONSIDERATIONS
+
+Log messages are not encrypted.  Be wary of logging authentication
+details such as usernames, passwords or session ids, financial
+information such as credit cards, or other personally identifying
+information over unsecured channels.
+
 =head1 SEE ALSO
 
 L<Log::Dispatch>
 
-=begin comment
+=for Pod::Coverage new
 
-=over
+=for Pod::Coverage log_message
 
-=item new
+=head1 SOURCE
 
-=item log_message
+The development version is on github at L<https://github.com/robrwo/perl-Log-Dispatch-UDP>
+and may be cloned from L<https://github.com/robrwo/perl-Log-Dispatch-UDP.git>
 
-=back
+=head1 SUPPORT
 
-=end comment
+Only the latest version of this module will be supported.
 
-=head1 AUTHOR
+This module requires Perl v5.8 or later.
+Future releases may only support Perl versions released in the last ten (10) years.
 
-Rob Hoelz <rob@hoelz.ro>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2012 by Rob Hoelz.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
-=head1 BUGS
+=head2 Reporting Bugs and Submitting Feature Requests
 
 Please report any bugs or feature requests on the bugtracker website
-https://github.com/hoelzro/log-dispatch-udp/issues
+L<https://github.com/robrwo/perl-Log-Dispatch-UDP/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+If the bug you are reporting has security implications which make it inappropriate to send to a public issue tracker,
+then see F<SECURITY.md> for instructions how to report security vulnerabilities.
+
+=head1 AUTHOR
+
+Rob Hoelz <rob@hoelz.ro>
+
+This module is currently maintained by Robert Rothenberg <perl@rhizomnic.com>.
+
+=head1 CONTRIBUTOR
+
+=for stopwords Robert Rothenberg
+
+Robert Rothenberg <perl@rhizomnic.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012, 2026 by Rob Hoelz <rob@hoelz.ro>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =cut
-
-
-__END__
-
-# ABSTRACT: Log messages to a remote UDP socket
-

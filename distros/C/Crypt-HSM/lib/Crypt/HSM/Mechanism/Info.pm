@@ -1,5 +1,5 @@
 package Crypt::HSM::Mechanism::Info;
-$Crypt::HSM::Mechanism::Info::VERSION = '0.030';
+$Crypt::HSM::Mechanism::Info::VERSION = '0.032';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Crypt::HSM::Mechanism::Info - PKCS11 mechanism information
 
 =head1 VERSION
 
-version 0.030
+version 0.032
 
 =head1 METHODS
 
@@ -91,6 +91,14 @@ True if the mechanism can be used with C<unwrap>
 =item * C<derive>
 
 True if the mechanism can be used with C<derive>
+
+=item * C<encapsulate>
+
+True if the mechanism can be used with C<encapsulate> (not yet implemented)
+
+=item * C<decapsulate>
+
+True if the mechanism can be used with C<decapsulate> (not yet implemented)
 
 =item * C<extension>
 

@@ -1,7 +1,7 @@
 {
    "abstract" : "MCP server with a command execution tool",
    "author" : [
-      "Torsten Raudssus <torsten@raudssus.de>"
+      "Torsten Raudssus <getty@cpan.org>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
@@ -53,7 +53,7 @@
          "web" : "https://github.com/Getty/p5-mcp-run"
       }
    },
-   "version" : "0.100",
+   "version" : "0.103",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -392,7 +392,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.100",
+                  "tag" : "0.103",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

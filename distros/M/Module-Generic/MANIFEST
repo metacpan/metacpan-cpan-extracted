@@ -51,7 +51,6 @@ scripts/startup.pl
 SIGNATURE			Public-key signature (added by MakeMaker)
 t/00.load.t
 t/01.core_methods.t
-t/01.pod.t
 t/02.num.t
 t/03.hash.t
 t/04.colour.t
@@ -84,8 +83,9 @@ t/30.modperl.t
 t/31.global.t
 t/32.file_magic.t
 t/33.xs_methods.t
-t/90.coverage.t
-t/91.signature.t
+t/90.pod.t
+t/91.coverage.t
+t/93.signature.t
 t/99.kwalitee.t
 t/conf/extra.conf.in
 t/conf/options.conf.in

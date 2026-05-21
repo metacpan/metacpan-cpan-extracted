@@ -8,16 +8,22 @@ use JSON;
 
 # https://specs.opencontainers.org/image-spec/image-index/?v=v1.1.1
 class Container::Builder::Index {
-	method generate_index($manifest_digest, $manifest_size) {
+	method generate_index($manifest_digest, $manifest_size, $tag_name) {
 		# TODO: you can annotate and pass the container name
-		return encode_json({
+		my $index = {
 			schemaVersion => 2,
 			manifests => [{
 				mediaType => 'application/vnd.oci.image.manifest.v1+json',
 				digest => 'sha256:' . $manifest_digest,
 				size => int($manifest_size)
 			}]
-		});
+		};
+		if($tag_name) {
+			$index->{manifests}->[0]->{annotations} = {
+				"org.opencontainers.image.ref.name" => $tag_name
+			};
+		}
+		return encode_json($index);
 	}
 }
 

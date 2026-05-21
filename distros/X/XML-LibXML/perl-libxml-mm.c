@@ -162,7 +162,7 @@ PmmProxyNodeRegistryPtr(ProxyNodePtr proxy)
 xmlChar *
 PmmRegistryName(void * ptr)
 {
-	unsigned long int v = (unsigned long int) ptr;
+	UV v = PTR2UV(ptr);
 	int HASH_NAME_SIZE = _PMM_HASH_NAME_SIZE(sizeof(void*));
 	xmlChar * name;
 	int i;

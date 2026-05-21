@@ -6,7 +6,7 @@ use 5.010;
 
 use parent 'Hypersonic::Event::Role';
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 sub name { 'select' }
 
@@ -58,10 +58,12 @@ sub gen_create {
 
     # Windows requires WSAStartup
     if ($^O eq 'MSWin32') {
+        # gen_create is inlined into the void XS hypersonic_run_event_loop;
+        # use croak instead of `return -1;` which trips GCC 14+
+        # -Wreturn-mismatch (now an error).
         $builder->line('WSADATA wsa_data;')
           ->if('WSAStartup(MAKEWORD(2,2), &wsa_data) != 0')
-            ->line('fprintf(stderr, "WSAStartup failed\\n");')
-            ->line('return -1;')
+            ->line('croak("WSAStartup failed");')
           ->endif;
     }
 }

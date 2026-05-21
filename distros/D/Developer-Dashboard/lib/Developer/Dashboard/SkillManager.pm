@@ -3,7 +3,7 @@ package Developer::Dashboard::SkillManager;
 use strict;
 use warnings;
 
-our $VERSION = '3.14';
+our $VERSION = '3.90';
 
 use Cwd qw(realpath);
 use File::Copy qw(copy);
@@ -13,7 +13,11 @@ use File::Basename qw(basename);
 use File::Find qw(find);
 use File::Temp qw(tempdir);
 use Capture::Tiny qw(capture);
+use IO::Select;
+use IPC::Open3;
 use JSON::XS qw(decode_json encode_json);
+use Symbol qw(gensym);
+use Developer::Dashboard::Platform qw(command_in_path);
 use Developer::Dashboard::PathRegistry;
 
 # new()
@@ -30,8 +34,9 @@ sub new {
       );
 
     return bless {
-        paths    => $paths,
-        progress => $args{progress},
+        paths      => $paths,
+        progress   => $args{progress},
+        skip_tests => $args{skip_tests} ? 1 : 0,
     }, $class;
 }
 
@@ -46,13 +51,29 @@ sub install_progress_tasks {
         { id => 'install_aptfile',      label => 'Install aptfile dependencies' },
         { id => 'install_apkfile',      label => 'Install apkfile dependencies' },
         { id => 'install_dnfile',       label => 'Install dnfile dependencies' },
+        { id => 'install_wingetfile',   label => 'Install wingetfile dependencies' },
         { id => 'install_brewfile',     label => 'Install brewfile dependencies' },
         { id => 'install_package_json', label => 'Install package.json dependencies' },
+        { id => 'install_requirements_txt', label => 'Install requirements.txt dependencies' },
         { id => 'install_cpanfile',     label => 'Install cpanfile dependencies' },
         { id => 'install_cpanfile_local', label => 'Install cpanfile.local dependencies' },
+        { id => 'install_makefile',     label => 'Install Makefile dependencies' },
+        { id => 'install_dockerfile', label => 'Install dockerfile dependencies' },
         { id => 'install_ddfile',       label => 'Install ddfile dependencies' },
         { id => 'install_ddfile_local', label => 'Install ddfile.local dependencies' },
     ];
+}
+
+# dependency_progress_tasks_for_skill_path($skill_path)
+# Returns the ordered dependency-task list that should be shown for one
+# installed skill after its manifest files are known on disk.
+# Input: absolute skill root directory path.
+# Output: array reference of applicable progress task hashes.
+sub dependency_progress_tasks_for_skill_path {
+    my ( $self, $skill_path ) = @_;
+    my %wanted = map { $_ => 1 } $self->_dependency_progress_task_ids_for_skill_path($skill_path);
+    my @tasks = grep { $wanted{ $_->{id} || '' } } @{ install_progress_tasks() };
+    return \@tasks;
 }
 
 # install_progress_tasks_for_sources(@sources)
@@ -252,10 +273,15 @@ sub uninstall {
         return { error => "Failed to uninstall skill: " . join( ', ', @$error ) };
     }
 
+    my $registration = $self->_unregister_root_ddfile_source($repo_name);
+    return $registration if $registration->{error};
+
     return {
-        success   => 1,
-        repo_name => $repo_name,
-        message   => "Skill '$repo_name' uninstalled successfully",
+        success                     => 1,
+        repo_name                   => $repo_name,
+        message                     => "Skill '$repo_name' uninstalled successfully",
+        unregistered_ddfile         => $registration->{ddfile},
+        unregistered_ddfile_entries => $registration->{removed},
     };
 }
 
@@ -483,6 +509,75 @@ sub _register_root_ddfile_source {
     };
 }
 
+# _unregister_root_ddfile_source($repo_name)
+# Removes root-ddfile skill source entries that resolve to one repo name after
+# an uninstall while preserving comments, unrelated entries, and line order.
+# Input: installed skill repo name string.
+# Output: hash ref with ddfile path and removed-entry count, or an error hash.
+sub _unregister_root_ddfile_source {
+    my ( $self, $repo_name ) = @_;
+    return { error => 'Missing repo name' } if !$repo_name;
+
+    my $home_root = $self->{paths}->home_runtime_root;
+    my $ddfile = File::Spec->catfile( $home_root, 'ddfile' );
+    return {
+        success => 1,
+        ddfile  => $ddfile,
+        removed => 0,
+    } if !-f $ddfile;
+
+    open my $read_fh, '<', $ddfile or return { error => "Unable to read root ddfile $ddfile: $!" };
+    local $/;
+    my $existing = <$read_fh> // '';
+    close $read_fh;
+
+    my @kept;
+    my $removed = 0;
+    for my $line ( split /\n/, $existing, -1 ) {
+        if ( $line =~ /\A\s*#/ || $line =~ /\A\s*\z/ ) {
+            push @kept, $line;
+            next;
+        }
+        if ( $self->_ddfile_source_matches_repo_name( $line, $repo_name ) ) {
+            $removed++;
+            next;
+        }
+        push @kept, $line;
+    }
+
+    if ($removed) {
+        while ( @kept && $kept[-1] eq '' ) {
+            pop @kept;
+        }
+        my $rewritten = @kept ? join( "\n", @kept ) . "\n" : q{};
+        open my $write_fh, '>', $ddfile or return { error => "Unable to update root ddfile $ddfile: $!" };
+        print {$write_fh} $rewritten;
+        close $write_fh;
+        $self->{paths}->secure_file_permissions($ddfile) if $rewritten ne q{};
+    }
+
+    return {
+        success => 1,
+        ddfile  => $ddfile,
+        removed => $removed,
+    };
+}
+
+# _ddfile_source_matches_repo_name($source, $repo_name)
+# Reports whether one explicit root-ddfile source line resolves to one repo
+# name using the same repo-name extraction rules as install.
+# Input: source line string and installed repo name string.
+# Output: boolean true when the source resolves to the same repo name.
+sub _ddfile_source_matches_repo_name {
+    my ( $self, $source, $repo_name ) = @_;
+    return 0 if !defined $source || !defined $repo_name;
+    $source =~ s/^\s+|\s+$//g;
+    return 0 if $source eq q{} || $source =~ /\A#/;
+    my $resolved = _extract_repo_name($source);
+    return 0 if !defined $resolved || $resolved eq q{};
+    return $resolved eq $repo_name ? 1 : 0;
+}
+
 # _register_home_gitignore_skill($repo_name)
 # Adds one installed skill directory to the home runtime .gitignore when that
 # ignore file already exists.
@@ -665,9 +760,31 @@ sub _remove_existing_skill_path {
     my $error;
     remove_tree( $skill_path, { error => \$error } );
     if ( @{$error} ) {
-        return { error => "Failed to replace existing skill at $skill_path: " . join( ', ', @{$error} ) };
+        return { error => "Failed to replace existing skill at $skill_path: " . $self->_remove_tree_error_text($error) };
     }
     return { success => 1 };
+}
+
+# _remove_tree_error_text($errors)
+# Formats File::Path::remove_tree structured error entries into a stable
+# readable message instead of Perl hash stringification.
+# Input: array reference of remove_tree error entries.
+# Output: single-line error summary string.
+sub _remove_tree_error_text {
+    my ( $self, $errors ) = @_;
+    return 'unknown remove_tree failure' if ref($errors) ne 'ARRAY' || !@{$errors};
+    my @parts;
+    for my $entry ( @{$errors} ) {
+        if ( ref($entry) eq 'HASH' ) {
+            for my $path ( sort keys %{$entry} ) {
+                my $message = defined $entry->{$path} && $entry->{$path} ne '' ? $entry->{$path} : 'unknown error';
+                push @parts, "$path: $message";
+            }
+            next;
+        }
+        push @parts, "$entry";
+    }
+    return join( ', ', @parts ) || 'unknown remove_tree failure';
 }
 
 # _install_to_skills_root($source, $skills_root)
@@ -688,6 +805,7 @@ sub _install_to_skills_root {
 
     $self->{paths}->ensure_dir($skills_root);
     my $skill_path = File::Spec->catdir( $skills_root, $repo_name );
+    my $had_existing = -e $skill_path ? 1 : 0;
     my $version_before = $self->_skill_env_version($skill_path);
     my $remove = $self->_remove_existing_skill_path($skill_path);
     return $remove if $remove->{error};
@@ -740,10 +858,15 @@ sub _install_to_skills_root {
     $self->_progress_emit( { task_id => 'prepare_layout', status => 'running' } );
     $self->_prepare_skill_layout($skill_path);
     $self->_progress_emit( { task_id => 'prepare_layout', status => 'done' } );
+    $self->_progress_emit(
+        {
+            add_tasks => $self->dependency_progress_tasks_for_skill_path($skill_path),
+        }
+    );
     my $dependency = $self->_install_skill_dependencies($skill_path);
     return $dependency if $dependency->{error};
     my $version_after = $self->_skill_env_version($skill_path);
-    my $install_status = $self->_install_version_status( $version_before, $version_after );
+    my $install_status = $self->_install_version_status( $version_before, $version_after, $had_existing );
 
     return {
         success        => 1,
@@ -783,13 +906,16 @@ sub _skill_env_version {
     return undef;
 }
 
-# _install_version_status($before, $after)
-# Classifies one install result from the before and after .env VERSION values.
-# Input: optional version strings.
+# _install_version_status($before, $after, $had_existing)
+# Classifies one install result from the before and after .env VERSION values
+# plus whether the skill existed before this run started.
+# Input: optional version strings and a boolean that reports whether an earlier
+# installed skill tree existed before reinstall or update work began.
 # Output: installed, updated, no update, or unknown.
 sub _install_version_status {
-    my ( $self, $before, $after ) = @_;
+    my ( $self, $before, $after, $had_existing ) = @_;
     return 'installed' if !defined $before && defined $after;
+    return 'installed' if !$had_existing;
     return 'updated'   if defined $before && defined $after && $before ne $after;
     return 'no update' if defined $before && defined $after && $before eq $after;
     return 'unknown';
@@ -830,14 +956,19 @@ sub _prepare_skill_layout {
 # Output: result hash reference with success or error state.
 sub _install_skill_dependencies {
     my ( $self, $skill_path ) = @_;
+    my %visible_task = map { $_ => 1 } $self->_dependency_progress_task_ids_for_skill_path($skill_path);
     my @steps = (
         [ install_aptfile      => sub { $self->_install_skill_aptfile($skill_path) } ],
         [ install_apkfile      => sub { $self->_install_skill_apkfile($skill_path) } ],
         [ install_dnfile       => sub { $self->_install_skill_dnfile($skill_path) } ],
+        [ install_wingetfile   => sub { $self->_install_skill_wingetfile($skill_path) } ],
         [ install_brewfile     => sub { $self->_install_skill_brewfile($skill_path) } ],
         [ install_package_json => sub { $self->_install_skill_package_json($skill_path) } ],
+        [ install_requirements_txt => sub { $self->_install_skill_requirements_txt($skill_path) } ],
         [ install_cpanfile     => sub { $self->_install_skill_cpanfile($skill_path) } ],
         [ install_cpanfile_local => sub { $self->_install_skill_cpanfile_local($skill_path) } ],
+        [ install_makefile     => sub { $self->_install_skill_makefile($skill_path) } ],
+        [ install_dockerfile => sub { $self->_install_skill_dockerfile($skill_path) } ],
         [ install_ddfile       => sub { $self->_install_skill_ddfile($skill_path) } ],
         [ install_ddfile_local => sub { $self->_install_skill_ddfile_local($skill_path) } ],
     );
@@ -846,8 +977,10 @@ sub _install_skill_dependencies {
     my $ran = 0;
     for my $step (@steps) {
         my ( $task_id, $runner ) = @{$step};
+        my $show_progress = $visible_task{$task_id} ? 1 : 0;
         my $running_label = $self->_dependency_progress_label( $task_id, $skill_path );
-        $self->_progress_emit( { task_id => $task_id, status => 'running', label => $running_label } );
+        $self->_progress_emit( { task_id => $task_id, status => 'running', label => $running_label } ) if $show_progress;
+        local $self->{_active_dependency_task_id} = $task_id;
         my $result = $runner->();
         if ( $result->{error} ) {
             $self->_progress_emit(
@@ -856,7 +989,7 @@ sub _install_skill_dependencies {
                     status  => 'failed',
                     label   => $self->_dependency_progress_label( $task_id, $skill_path, result => $result ),
                 }
-            );
+            ) if $show_progress;
             return $result;
         }
         $self->_progress_emit(
@@ -865,7 +998,7 @@ sub _install_skill_dependencies {
                 status  => 'done',
                 label   => $self->_dependency_progress_label( $task_id, $skill_path, result => $result ),
             }
-        );
+        ) if $show_progress;
         $ran ||= !$result->{skipped};
         push @stdout, $result->{stdout} if defined $result->{stdout} && $result->{stdout} ne '';
         push @stderr, $result->{stderr} if defined $result->{stderr} && $result->{stderr} ne '';
@@ -877,6 +1010,70 @@ sub _install_skill_dependencies {
         stdout  => join( '', @stdout ),
         stderr  => join( '', @stderr ),
     };
+}
+
+# _dependency_progress_task_ids_for_skill_path($skill_path)
+# Resolves which dependency install tasks should appear in the visible progress
+# board for one concrete skill on the current host.
+# Input: absolute skill root directory path.
+# Output: ordered task id list.
+sub _dependency_progress_task_ids_for_skill_path {
+    my ( $self, $skill_path ) = @_;
+    return () if !defined $skill_path || $skill_path eq '';
+
+    my %cross_platform_file_for = (
+        install_package_json     => 'package.json',
+        install_requirements_txt => 'requirements.txt',
+        install_cpanfile         => 'cpanfile',
+        install_cpanfile_local   => 'cpanfile.local',
+        install_makefile         => 'Makefile',
+        install_dockerfile       => 'dockerfile',
+        install_ddfile           => 'ddfile',
+        install_ddfile_local     => 'ddfile.local',
+    );
+    my %system_file_for = (
+        install_aptfile    => 'aptfile',
+        install_apkfile    => 'apkfile',
+        install_dnfile     => 'dnfile',
+        install_wingetfile => 'wingetfile',
+        install_brewfile   => 'brewfile',
+    );
+    my %allowed_system = map { $_ => 1 } $self->_host_progress_system_task_ids;
+    my @task_ids;
+    for my $task ( @{ install_progress_tasks() } ) {
+        my $task_id = $task->{id} || '';
+        next if $task_id eq 'fetch_source' || $task_id eq 'prepare_layout';
+        if ( my $file = $cross_platform_file_for{$task_id} ) {
+            push @task_ids, $task_id if -f File::Spec->catfile( $skill_path, $file );
+            next;
+        }
+        if ( my $file = $system_file_for{$task_id} ) {
+            push @task_ids, $task_id if $allowed_system{$task_id} && -f File::Spec->catfile( $skill_path, $file );
+            next;
+        }
+    }
+    return @task_ids;
+}
+
+# _host_progress_system_task_ids()
+# Detects which OS-specific dependency manifest types are relevant for the
+# current host when building the visible progress board.
+# Input: none.
+# Output: ordered task id list for host-relevant system package managers.
+sub _host_progress_system_task_ids {
+    my ($self) = @_;
+    my $os = $ENV{DD_TEST_OS} || $^O;
+    my $is_alpine = $ENV{DD_TEST_ALPINE} ? 1 : ( $os eq 'linux' && -f '/etc/alpine-release' ? 1 : 0 );
+    my $is_fedora = $ENV{DD_TEST_FEDORA} ? 1 : ( $os eq 'linux' && -f '/etc/fedora-release' ? 1 : 0 );
+    my $is_debian_like = $ENV{DD_TEST_DEBIAN_LIKE}
+      ? 1
+      : ( $os eq 'linux' && !$is_alpine && !$is_fedora && -f '/etc/debian_version' ? 1 : 0 );
+    return ('install_wingetfile') if $os eq 'MSWin32';
+    return ('install_brewfile')   if $os eq 'darwin';
+    return ('install_apkfile')    if $is_alpine;
+    return ('install_dnfile')     if $is_fedora;
+    return ('install_aptfile')    if $is_debian_like;
+    return ();
 }
 
 # _dependency_progress_label($task_id, $skill_path, %args)
@@ -893,10 +1090,14 @@ sub _dependency_progress_label {
         install_aptfile        => 'aptfile',
         install_apkfile        => 'apkfile',
         install_dnfile         => 'dnfile',
+        install_wingetfile     => 'wingetfile',
         install_brewfile       => 'brewfile',
         install_package_json   => 'package.json',
+        install_requirements_txt => 'requirements.txt',
         install_cpanfile       => 'cpanfile',
         install_cpanfile_local => 'cpanfile.local',
+        install_makefile       => 'Makefile',
+        install_dockerfile     => 'dockerfile',
     );
     my %labels = (
         install_ddfile         => 'Install ddfile dependencies',
@@ -904,10 +1105,14 @@ sub _dependency_progress_label {
         install_aptfile        => 'Install aptfile dependencies',
         install_apkfile        => 'Install apkfile dependencies',
         install_dnfile         => 'Install dnfile dependencies',
+        install_wingetfile     => 'Install wingetfile dependencies',
         install_brewfile       => 'Install brewfile dependencies',
         install_package_json   => 'Install package.json dependencies',
+        install_requirements_txt => 'Install requirements.txt dependencies',
         install_cpanfile       => 'Install cpanfile dependencies',
         install_cpanfile_local => 'Install cpanfile.local dependencies',
+        install_makefile       => 'Install Makefile dependencies',
+        install_dockerfile     => 'Install dockerfile dependencies',
     );
     my $label = $labels{$task_id} || $task_id;
     my $file  = $files{$task_id} || return $label;
@@ -951,6 +1156,106 @@ sub _progress_emit {
     return 1 if !$progress || ref($progress) ne 'CODE';
     $progress->($event);
     return 1;
+}
+
+# _active_dependency_task_id()
+# Returns the dependency-task id currently being executed so lower-level
+# helpers can stream detail lines into the visible progress board.
+# Input: none.
+# Output: task id string or undef.
+sub _active_dependency_task_id {
+    my ($self) = @_;
+    return $self->{_active_dependency_task_id};
+}
+
+# _progress_detail_line($line, %args)
+# Streams one compact detail line into the active dependency task.
+# Input: raw text line plus optional explicit task_id.
+# Output: true value.
+sub _progress_detail_line {
+    my ( $self, $line, %args ) = @_;
+    my $task_id = $args{task_id} || $self->_active_dependency_task_id || return 1;
+    return 1 if !defined $line;
+    $line =~ s/\r//g;
+    $line =~ s/\s+\z//;
+    return 1 if $line eq '';
+    return $self->_progress_emit(
+        {
+            task_id     => $task_id,
+            detail_line => $line,
+        }
+    );
+}
+
+# _run_streaming_command(%args)
+# Runs one external dependency command while streaming a rolling output
+# snapshot into the active progress task and collecting the full transcript.
+# Input: command array reference plus optional cwd and banner line.
+# Output: hash reference with stdout, stderr, and exit fields.
+sub _run_streaming_command {
+    my ( $self, %args ) = @_;
+    my $command = $args{command} || die "Missing command for streaming execution\n";
+    die "Streaming command must be an array reference\n" if ref($command) ne 'ARRAY' || !@{$command};
+    my $cwd = $args{cwd};
+    my $banner = $args{banner};
+    $self->_progress_detail_line($banner) if defined $banner && $banner ne '';
+
+    my $stdout_handle;
+    my $stderr_handle = gensym;
+    my $stdin_handle  = gensym;
+    my $pid;
+    my $stdout = '';
+    my $stderr = '';
+    my %target_for;
+
+    my $launcher = sub {
+        $pid = open3( $stdin_handle, $stdout_handle, $stderr_handle, @{$command} );
+    };
+
+    if ( defined $cwd && $cwd ne '' ) {
+        my $orig = Cwd::getcwd();
+        chdir $cwd or die "Unable to chdir to $cwd for command launch: $!";
+        my $ok = eval { $launcher->(); 1 };
+        my $error = $@;
+        chdir $orig or die "Unable to chdir back to $orig after command launch: $!";
+        die $error if !$ok;
+    }
+    else {
+        $launcher->();
+    }
+
+    close $stdin_handle if $stdin_handle;
+    %target_for = (
+        fileno($stdout_handle) => \$stdout,
+        fileno($stderr_handle) => \$stderr,
+    );
+
+    my $selector = IO::Select->new();
+    $selector->add($stdout_handle) if $stdout_handle;
+    $selector->add($stderr_handle) if $stderr_handle;
+    while ( my @ready = $selector->can_read ) {
+        for my $handle (@ready) {
+            my $chunk = '';
+            my $read = sysread( $handle, $chunk, 8192 );
+            if ( !defined $read || $read == 0 ) {
+                $selector->remove($handle);
+                close $handle;
+                next;
+            }
+            my $slot = $target_for{ fileno($handle) };
+            ${$slot} .= $chunk if $slot;
+            for my $line ( split /\n/, $chunk ) {
+                $self->_progress_detail_line($line);
+            }
+        }
+    }
+
+    waitpid $pid, 0;
+    return {
+        stdout => $stdout,
+        stderr => $stderr,
+        exit   => $? >> 8,
+    };
 }
 
 # _skill_install_root($skill_path)
@@ -1061,6 +1366,15 @@ sub _is_fedora {
     return 1 if $ENV{DD_TEST_FEDORA};
     return 0 if $self->_current_os ne 'linux';
     return -f '/etc/fedora-release' ? 1 : 0;
+}
+
+# _is_windows()
+# Detects whether wingetfile processing should run on the current host.
+# Input: none.
+# Output: boolean true when the host is Windows.
+sub _is_windows {
+    my ($self) = @_;
+    return $self->_current_os eq 'MSWin32' ? 1 : 0;
 }
 
 # _apt_package_is_installed($package)
@@ -1238,20 +1552,12 @@ sub _install_skill_package_json {
     );
     close $workspace_fh;
 
-    my $cwd = Cwd::getcwd();
-    my ( $npm_stdout, $npm_stderr, $npm_exit );
-    eval {
-        chdir $workspace or die "Unable to chdir to $workspace for package.json dependency install: $!";
-        ( $npm_stdout, $npm_stderr, $npm_exit ) = capture {
-            system( 'npx', '--yes', 'npm', 'install', @specs );
-        };
-        chdir $cwd or die "Unable to chdir back to $cwd after package.json dependency install: $!";
-        1;
-    } or do {
-        my $error = $@;
-        chdir $cwd if Cwd::getcwd() ne $cwd;
-        die $error;
-    };
+    my $run = $self->_run_streaming_command(
+        command => [ 'npx', '--yes', 'npm', 'install', @specs ],
+        cwd     => $workspace,
+        banner  => "Installing Node dependencies for " . basename($skill_path) . " from $package_json: " . join( ' ', @specs ),
+    );
+    my ( $npm_stdout, $npm_stderr, $npm_exit ) = @{$run}{qw(stdout stderr exit)};
     return {
         error => "Failed to install skill Node dependencies for $skill_path: $npm_stderr",
     } if $npm_exit != 0;
@@ -1259,12 +1565,14 @@ sub _install_skill_package_json {
     my $workspace_modules = File::Spec->catdir( $workspace, 'node_modules' );
     my ( $copy_stdout, $copy_stderr, $copy_exit ) = ( '', '', 0 );
     if ( -d $workspace_modules ) {
-        ( $copy_stdout, $copy_stderr, $copy_exit ) = capture {
-            system( 'cp', '-R', "$workspace_modules/.", $target_root );
-        };
+        my $copy_error = eval {
+            $self->_copy_tree_contents( $workspace_modules, $target_root );
+            1;
+        } ? '' : "$@";
+        $copy_error =~ s/\s+\z// if defined $copy_error;
         return {
-            error => "Failed to merge skill Node dependencies into $target_root for $skill_path: $copy_stderr",
-        } if $copy_exit != 0;
+            error => "Failed to merge skill Node dependencies into $target_root for $skill_path: $copy_error",
+        } if $copy_error ne '';
     }
 
     return {
@@ -1272,6 +1580,41 @@ sub _install_skill_package_json {
         stdout  => $npm_stdout . $copy_stdout,
         stderr  => $npm_stderr . $copy_stderr,
     };
+}
+
+# _install_skill_requirements_txt($skill_path)
+# Installs Python dependencies declared by requirements.txt into the current
+# user's Python environment through python -m pip --user.
+# Input: absolute skill root directory path.
+# Output: result hash reference with success or error state.
+sub _install_skill_requirements_txt {
+    my ( $self, $skill_path ) = @_;
+    my $requirements = File::Spec->catfile( $skill_path, 'requirements.txt' );
+    return { success => 1, skipped => 1 } if !-f $requirements;
+
+    my $run = $self->_run_streaming_command(
+        command => [ $self->_python_dependency_command, '-m', 'pip', 'install', '--user', '--requirement', $requirements ],
+        cwd     => $skill_path,
+        banner  => "Installing Python dependencies for " . basename($skill_path) . " from $requirements",
+    );
+    my ( $stdout, $stderr, $exit ) = @{$run}{qw(stdout stderr exit)};
+    return {
+        error => "Failed to install skill Python dependencies for $skill_path: $stderr",
+    } if $exit != 0;
+
+    return {
+        success => 1,
+        stdout  => $stdout,
+        stderr  => $stderr,
+    };
+}
+
+# _python_dependency_command()
+# Resolves the preferred Python executable for requirements.txt installs.
+# Input: none.
+# Output: executable path or command name string.
+sub _python_dependency_command {
+    return command_in_path('python') || command_in_path('python3') || 'python';
 }
 
 # _package_json_dependency_specs($package_json)
@@ -1302,6 +1645,47 @@ sub _package_json_dependency_specs {
     }
 
     return @specs;
+}
+
+# _copy_tree_contents($source_root, $target_root)
+# Recursively copies the contents of one directory tree into another without
+# relying on external shell utilities.
+# Input: absolute source directory path and absolute target directory path.
+# Output: true value after the copy succeeds, or dies on the first copy error.
+sub _copy_tree_contents {
+    my ( $self, $source_root, $target_root ) = @_;
+    die "Missing source tree for copy\n" if !defined $source_root || $source_root eq '';
+    die "Missing target tree for copy\n" if !defined $target_root || $target_root eq '';
+    die "Source tree $source_root does not exist\n" if !-d $source_root;
+
+    make_path($target_root) if !-d $target_root;
+
+    find(
+        {
+            no_chdir => 1,
+            wanted   => sub {
+                my $source = $File::Find::name;
+                return if $source eq $source_root;
+
+                my $relative = File::Spec->abs2rel( $source, $source_root );
+                my $target = File::Spec->catfile( $target_root, $relative );
+
+                if ( -d $source ) {
+                    make_path($target) if !-d $target;
+                    return;
+                }
+
+                my ( undef, $target_dir ) = File::Spec->splitpath($target);
+                make_path($target_dir) if defined $target_dir && $target_dir ne '' && !-d $target_dir;
+                copy( $source, $target ) or die "Unable to copy $source to $target: $!";
+                my $mode = ( stat $source )[2];
+                chmod( $mode & 07777, $target ) if defined $mode && -f $target;
+            },
+        },
+        $source_root
+    );
+
+    return 1;
 }
 
 # _install_manifest_file($manifest_path, %args)
@@ -1381,18 +1765,18 @@ sub _install_skill_aptfile {
 
     my $aptfile = File::Spec->catfile( $skill_path, 'aptfile' );
     my @runner_prefix = $self->_skill_package_runner_prefix;
-    my ( $stdout, $stderr, $exit ) = capture {
-        print "Installing apt packages for ", basename($skill_path), " from $aptfile: ", join( ' ', @missing_packages ), "\n";
-        system( @runner_prefix, 'apt-get', 'install', '-y', @missing_packages );
-    };
+    my $run = $self->_run_streaming_command(
+        command => [ @runner_prefix, 'apt-get', 'install', '-y', @missing_packages ],
+        banner  => "Installing apt packages for " . basename($skill_path) . " from $aptfile: " . join( ' ', @missing_packages ),
+    );
     return {
-        error => "Failed to install skill apt dependencies for $skill_path: $stderr",
-    } if $exit != 0;
+        error => "Failed to install skill apt dependencies for $skill_path: $run->{stderr}",
+    } if $run->{exit} != 0;
 
     return {
         success => 1,
-        stdout  => $stdout,
-        stderr  => $stderr,
+        stdout  => $run->{stdout},
+        stderr  => $run->{stderr},
     };
 }
 
@@ -1417,18 +1801,18 @@ sub _install_skill_apkfile {
     } if !@missing_packages;
 
     my @runner_prefix = $self->_skill_package_runner_prefix;
-    my ( $stdout, $stderr, $exit ) = capture {
-        print "Installing apk packages for ", basename($skill_path), " from $apkfile: ", join( ' ', @missing_packages ), "\n";
-        system( @runner_prefix, 'apk', 'add', '--no-cache', @missing_packages );
-    };
+    my $run = $self->_run_streaming_command(
+        command => [ @runner_prefix, 'apk', 'add', '--no-cache', @missing_packages ],
+        banner  => "Installing apk packages for " . basename($skill_path) . " from $apkfile: " . join( ' ', @missing_packages ),
+    );
     return {
-        error => "Failed to install skill apk dependencies for $skill_path: $stderr",
-    } if $exit != 0;
+        error => "Failed to install skill apk dependencies for $skill_path: $run->{stderr}",
+    } if $run->{exit} != 0;
 
     return {
         success => 1,
-        stdout  => $stdout,
-        stderr  => $stderr,
+        stdout  => $run->{stdout},
+        stderr  => $run->{stderr},
     };
 }
 
@@ -1453,18 +1837,57 @@ sub _install_skill_dnfile {
     } if !@missing_packages;
 
     my @runner_prefix = $self->_skill_package_runner_prefix;
-    my ( $stdout, $stderr, $exit ) = capture {
-        print "Installing dnf packages for ", basename($skill_path), " from $dnfile: ", join( ' ', @missing_packages ), "\n";
-        system( @runner_prefix, 'dnf', 'install', '-y', @missing_packages );
-    };
+    my $run = $self->_run_streaming_command(
+        command => [ @runner_prefix, 'dnf', 'install', '-y', @missing_packages ],
+        banner  => "Installing dnf packages for " . basename($skill_path) . " from $dnfile: " . join( ' ', @missing_packages ),
+    );
     return {
-        error => "Failed to install skill dnf dependencies for $skill_path: $stderr",
-    } if $exit != 0;
+        error => "Failed to install skill dnf dependencies for $skill_path: $run->{stderr}",
+    } if $run->{exit} != 0;
 
     return {
         success => 1,
-        stdout  => $stdout,
-        stderr  => $stderr,
+        stdout  => $run->{stdout},
+        stderr  => $run->{stderr},
+    };
+}
+
+# _install_skill_wingetfile($skill_path)
+# Installs wingetfile packages on Windows hosts after printing the requested
+# package list.
+# Input: absolute skill root directory path.
+# Output: result hash reference with success or error state.
+sub _install_skill_wingetfile {
+    my ( $self, $skill_path ) = @_;
+    my $wingetfile = File::Spec->catfile( $skill_path, 'wingetfile' );
+    my @packages = $self->_dependency_file_lines($wingetfile);
+    return { success => 1, skipped => 1 } if !@packages || !$self->_is_windows;
+
+    my @stdout;
+    my @stderr;
+    for my $package (@packages) {
+        my $run = $self->_run_streaming_command(
+            command => [
+                'winget', 'install',
+                '--id', $package,
+                '--exact',
+                '--accept-package-agreements',
+                '--accept-source-agreements',
+                '--disable-interactivity',
+            ],
+            banner => "Installing winget packages for " . basename($skill_path) . " from $wingetfile: $package",
+        );
+        return {
+            error => "Failed to install skill winget dependencies for $skill_path: $run->{stderr}",
+        } if $run->{exit} != 0;
+        push @stdout, $run->{stdout} if defined $run->{stdout} && $run->{stdout} ne '';
+        push @stderr, $run->{stderr} if defined $run->{stderr} && $run->{stderr} ne '';
+    }
+
+    return {
+        success => 1,
+        stdout  => join( '', @stdout ),
+        stderr  => join( '', @stderr ),
     };
 }
 
@@ -1488,18 +1911,18 @@ sub _install_skill_brewfile {
     my @packages = $self->_dependency_file_lines($brewfile);
     return { success => 1, skipped => 1 } if !@packages || $self->_current_os ne 'darwin';
 
-    my ( $stdout, $stderr, $exit ) = capture {
-        print "Installing brew packages for ", basename($skill_path), " from $brewfile: ", join( ' ', @packages ), "\n";
-        system( 'brew', 'install', @packages );
-    };
+    my $run = $self->_run_streaming_command(
+        command => [ 'brew', 'install', @packages ],
+        banner  => "Installing brew packages for " . basename($skill_path) . " from $brewfile: " . join( ' ', @packages ),
+    );
     return {
-        error => "Failed to install skill brew dependencies for $skill_path: $stderr",
-    } if $exit != 0;
+        error => "Failed to install skill brew dependencies for $skill_path: $run->{stderr}",
+    } if $run->{exit} != 0;
 
     return {
         success => 1,
-        stdout  => $stdout,
-        stderr  => $stderr,
+        stdout  => $run->{stdout},
+        stderr  => $run->{stderr},
     };
 }
 
@@ -1512,9 +1935,12 @@ sub _install_skill_cpanfile {
     my $cpanfile = File::Spec->catfile( $skill_path, 'cpanfile' );
     return { success => 1, skipped => 1 } if !-f $cpanfile;
     my $shared_root = $self->_ensure_perl_root( $self->_shared_perl_root );
-    my ( $stdout, $stderr, $exit ) = capture {
-        system( 'cpanm', '--notest', '-L', $shared_root, '--cpanfile', $cpanfile, '--installdeps', $skill_path );
-    };
+    my $run = $self->_run_streaming_command(
+        command => [ 'cpanm', '--notest', '-L', $shared_root, '--cpanfile', $cpanfile, '--installdeps', '.' ],
+        cwd     => $skill_path,
+        banner  => "Installing Perl dependencies for " . basename($skill_path) . " from $cpanfile",
+    );
+    my ( $stdout, $stderr, $exit ) = @{$run}{qw(stdout stderr exit)};
     return {
         error => "Failed to install skill dependencies for $skill_path: $stderr",
     } if $exit != 0;
@@ -1535,9 +1961,12 @@ sub _install_skill_cpanfile_local {
     my $cpanfile_local = File::Spec->catfile( $skill_path, 'cpanfile.local' );
     return { success => 1, skipped => 1 } if !-f $cpanfile_local;
     my $local_root = $self->_ensure_perl_root( $self->_skill_local_perl_root($skill_path) );
-    my ( $stdout, $stderr, $exit ) = capture {
-        system( 'cpanm', '--notest', '-L', $local_root, '--cpanfile', $cpanfile_local, '--installdeps', $skill_path );
-    };
+    my $run = $self->_run_streaming_command(
+        command => [ 'cpanm', '--notest', '-L', $local_root, '--cpanfile', $cpanfile_local, '--installdeps', '.' ],
+        cwd     => $skill_path,
+        banner  => "Installing local Perl dependencies for " . basename($skill_path) . " from $cpanfile_local",
+    );
+    my ( $stdout, $stderr, $exit ) = @{$run}{qw(stdout stderr exit)};
     return {
         error => "Failed to install skill local dependencies for $skill_path: $stderr",
     } if $exit != 0;
@@ -1547,6 +1976,112 @@ sub _install_skill_cpanfile_local {
         stdout  => $stdout,
         stderr  => $stderr,
     };
+}
+
+# _install_skill_makefile($skill_path)
+# Runs the optional skill Makefile command chain before ddfile processing.
+# Input: absolute skill root directory path.
+# Output: result hash reference with success or error state.
+sub _install_skill_makefile {
+    my ( $self, $skill_path ) = @_;
+    my $makefile = File::Spec->catfile( $skill_path, 'Makefile' );
+    return { success => 1, skipped => 1 } if !-f $makefile;
+
+    my %targets = map { $_ => 1 } $self->_makefile_targets($makefile);
+    my @commands = (
+        [],
+        ( $self->{skip_tests}
+            ? ()
+            : $targets{test}
+            ? ( ['test'] )
+            : $targets{tests}
+            ? ( ['tests'] )
+            : () ),
+        ['install'],
+        ( $targets{clean} ? ( ['clean'] ) : () ),
+    );
+
+    my ( @stdout, @stderr );
+    my $result = eval {
+        for my $args (@commands) {
+            my $target_name = @{$args} ? join( ' ', @{$args} ) : 'default';
+            my $run = $self->_run_streaming_command(
+                command => [ 'make', @{$args} ],
+                cwd     => $skill_path,
+                banner  => "Running make $target_name for " . basename($skill_path) . " from $makefile",
+            );
+            my ( $stdout, $stderr, $exit ) = @{$run}{qw(stdout stderr exit)};
+            push @stdout, $stdout if defined $stdout && $stdout ne '';
+            push @stderr, $stderr if defined $stderr && $stderr ne '';
+            if ( $exit != 0 ) {
+                my $target = 'default';
+                if (@{$args}) {
+                    $target = join( ' ', @{$args} );
+                }
+                my $detail = $stderr ne '' ? $stderr : $stdout;
+                die "Failed to run skill Makefile target '$target' for $skill_path: $detail";
+            }
+        }
+        return {
+            success => 1,
+            stdout  => join( '', @stdout ),
+            stderr  => join( '', @stderr ),
+        };
+    };
+    my $error = $@;
+    return { error => $error } if !$result;
+    return $result;
+}
+
+
+# _install_skill_dockerfile($skill_path)
+# Builds Docker images declared by dockerfile in the skill root.
+# Input: absolute skill root directory path.
+# Output: result hash reference with success or error state.
+sub _install_skill_dockerfile {
+    my ( $self, $skill_path ) = @_;
+    my $dockerfile = File::Spec->catfile( $skill_path, 'dockerfile' );
+    return { success => 1, skipped => 1 } if !-f $dockerfile;
+
+    my $run = $self->_run_streaming_command(
+        command => [ 'docker', 'build', '-t', lc(basename($skill_path)), '-f', $dockerfile, $skill_path ],
+        cwd     => $skill_path,
+        banner  => "Building Docker image for " . basename($skill_path) . " from $dockerfile",
+    );
+    return {
+        error => "Failed to build Docker image for $skill_path: $run->{stderr}",
+    } if $run->{exit} != 0;
+
+    return {
+        success => 1,
+        stdout  => $run->{stdout},
+        stderr  => $run->{stderr},
+    };
+}
+
+# _makefile_targets($makefile)
+# Extracts simple top-level target names from one skill Makefile.
+# Input: absolute Makefile path.
+# Output: list of target name strings.
+sub _makefile_targets {
+    my ( $self, $makefile ) = @_;
+    return () if !defined $makefile || !-f $makefile;
+    open my $fh, '<', $makefile or die "Unable to read $makefile: $!";
+    my %seen;
+    my @targets;
+    while ( my $line = <$fh> ) {
+        next if $line =~ /^\s/;
+        next if $line =~ /^\#/;
+        next if $line =~ /^\./;
+        next if $line !~ /^([^:=]+)\s*:(?![=])/;
+        for my $target ( split /\s+/, $1 ) {
+            next if !defined $target || $target eq '';
+            next if $seen{$target}++;
+            push @targets, $target;
+        }
+    }
+    close $fh or die "Unable to close $makefile: $!";
+    return @targets;
 }
 
 # _skill_metadata($repo_name, $skill_path)
@@ -1572,6 +2107,8 @@ sub _skill_metadata {
     my $has_apkfile = -f File::Spec->catfile( $skill_path, 'apkfile' ) ? JSON::XS::true() : JSON::XS::false();
     my $has_dnfile = -f File::Spec->catfile( $skill_path, 'dnfile' ) ? JSON::XS::true() : JSON::XS::false();
     my $has_brewfile = -f File::Spec->catfile( $skill_path, 'brewfile' ) ? JSON::XS::true() : JSON::XS::false();
+    my $has_makefile = -f File::Spec->catfile( $skill_path, 'Makefile' ) ? JSON::XS::true() : JSON::XS::false();
+    my $has_dockerfile = -f File::Spec->catfile( $skill_path, 'dockerfile' ) ? JSON::XS::true() : JSON::XS::false();
     my $has_config = -f File::Spec->catfile( $skill_path, 'config', 'config.json' ) ? JSON::XS::true() : JSON::XS::false();
     my $has_cpanfile = -f File::Spec->catfile( $skill_path, 'cpanfile' ) ? JSON::XS::true() : JSON::XS::false();
     my $has_cpanfile_local = -f File::Spec->catfile( $skill_path, 'cpanfile.local' ) ? JSON::XS::true() : JSON::XS::false();
@@ -1594,6 +2131,8 @@ sub _skill_metadata {
     $metadata->{has_apkfile} = $has_apkfile;
     $metadata->{has_dnfile} = $has_dnfile;
     $metadata->{has_brewfile} = $has_brewfile;
+    $metadata->{has_makefile} = $has_makefile;
+    $metadata->{has_dockerfile} = $has_dockerfile;
     $metadata->{has_config} = $has_config;
     $metadata->{has_cpanfile} = $has_cpanfile;
     $metadata->{has_cpanfile_local} = $has_cpanfile_local;
@@ -1623,6 +2162,8 @@ sub _skill_usage {
     my $has_apkfile = -f File::Spec->catfile( $skill_path, 'apkfile' ) ? JSON::XS::true() : JSON::XS::false();
     my $has_dnfile = -f File::Spec->catfile( $skill_path, 'dnfile' ) ? JSON::XS::true() : JSON::XS::false();
     my $has_brewfile = -f File::Spec->catfile( $skill_path, 'brewfile' ) ? JSON::XS::true() : JSON::XS::false();
+    my $has_makefile = -f File::Spec->catfile( $skill_path, 'Makefile' ) ? JSON::XS::true() : JSON::XS::false();
+    my $has_dockerfile = -f File::Spec->catfile( $skill_path, 'dockerfile' ) ? JSON::XS::true() : JSON::XS::false();
     my $has_cpanfile = -f File::Spec->catfile( $skill_path, 'cpanfile' ) ? JSON::XS::true() : JSON::XS::false();
     my $has_cpanfile_local = -f File::Spec->catfile( $skill_path, 'cpanfile.local' ) ? JSON::XS::true() : JSON::XS::false();
     my $usage = { %{ $self->_skill_metadata( $repo_name, $skill_path ) } };
@@ -1641,6 +2182,8 @@ sub _skill_usage {
     $usage->{config}{has_apkfile} = $has_apkfile;
     $usage->{config}{has_dnfile} = $has_dnfile;
     $usage->{config}{has_brewfile} = $has_brewfile;
+    $usage->{config}{has_makefile} = $has_makefile;
+    $usage->{config}{has_dockerfile} = $has_dockerfile;
     $usage->{config}{has_cpanfile} = $has_cpanfile;
     $usage->{config}{has_cpanfile_local} = $has_cpanfile_local;
     $usage->{collectors} = $collectors;
@@ -1863,7 +2406,10 @@ Manages the lifecycle of installed dashboard skills:
 
 Skills are isolated under the active DD-OOP-LAYERS skills root such as
 ~/.developer-dashboard/skills/<repo-name>/ or
-<project>/.developer-dashboard/skills/<repo-name>/
+<project>/.developer-dashboard/skills/<repo-name>/. Explicit installs also
+register their original source lines in the home root F<ddfile>, and uninstall
+removes matching entries again by repo name while preserving comments and
+unrelated sources.
 
 =for comment FULL-POD-DOC START
 

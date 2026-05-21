@@ -6,7 +6,7 @@ use Test::More tests => 183;
 
 BEGIN 
 {
-  require 't/test-lib.pl';
+  require './t/test-lib.pl';
   use_ok('Rose::DB::Object');
   use_ok('Rose::DB::Object::Manager');
   use_ok('Rose::DB::Object::ConventionManager');

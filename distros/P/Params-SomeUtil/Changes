@@ -1,5 +1,9 @@
 Revision history for Perl extension Params-SomeUtil
 
+1.09 Sun  3 May 2026
+  - Documentation fixes (thanks RJBS)
+
+1.08 Sat  7 Feb 2026
   - Forked from Params-Util version 1.07 as Params-SomeUtil
   - Fix bug where passing regex match variables ($1) returns
     undef regardless of value for some functions (rt#81276)

@@ -16,6 +16,7 @@ void process_lease_leases_response(pTHX_ pending_call_t *pc);
 void process_keepalive_response(pTHX_ keepalive_call_t *kc);
 void keepalive_rearm_recv(pTHX_ keepalive_call_t *kc);
 void cleanup_keepalive(pTHX_ keepalive_call_t *kc);
+void keepalive_call_perl_release(pTHX_ keepalive_call_t *kc);
 int try_reconnect_keepalive(pTHX_ keepalive_call_t *kc);
 
 #endif /* ETCD_LEASE_H */

@@ -1,0 +1,21 @@
+Source: perl-libconfig
+Section: perl
+Priority: optional
+Maintainer: Cnangel <cnangel@gmail.com>
+Build-Depends: debhelper (>= 9),
+               libconfig-dev,
+               perl,
+               libtest-deep-perl,
+               libtest-exception-perl,
+               libtest-warn-perl
+Standards-Version: 4.6.0
+Homepage: https://github.com/cnangel/Conf-Libconfig
+
+Package: perl-libconfig
+Architecture: any
+Depends: ${perl:Depends}, ${misc:Depends}, ${shlibs:Depends}
+Description: Perl bindings to the C library libconfig
+ Conf::Libconfig is a Perl extension for the libconfig C library.
+ It supports Scalar, Array, Hash and List data structures, and
+ provides full bindings to libconfig 1.8.x including options,
+ formatting, safe getters, and error handling.

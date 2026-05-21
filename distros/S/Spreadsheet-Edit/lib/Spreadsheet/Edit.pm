@@ -16,8 +16,8 @@ package Spreadsheet::Edit;
 # Allow "use <thismodule> <someversion>;" in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
 
-our $VERSION = '1001.001'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2025-12-12'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1001.003'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2026-05-05'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # FIXME: cmd_nesting does nothing except prefix >s to log messages.
 #        Shouldn't it skip that many "public" call frames???
@@ -497,7 +497,7 @@ my $r =
   || $title =~ /^[0-9]$/               # $0 and regex $1 $2 .. $9
                                        # (regardless of max cx)
   || ($title =~ /^[1-9]\d+$/a
-       && $title <= $num_cols) # cx values > 9
+       && $title <= $num_cols) # cx values > 9  # n.b. OR maxcx+1
 ;
 #btw ivis 'unindexed: $title' if $r;
 $r
@@ -1491,7 +1491,7 @@ sub _apply_to_rows($$$;$$$) {
 # User-defined column aliases must already be valid in %colx;
 # all other entries are deleted and re-created.
 #
-# Note: the special '^', '$' and numieric cx values (if in 0..num_cols)
+# Note: the special '^', '$' and numieric cx values (only in 0..num_cols)
 # are handled algorithmically in _specs2cxdesclist() before consulting %colx.
 #
 # When building %colx, conflicts are resolved using these priorities:
@@ -1530,9 +1530,10 @@ sub _rebuild_colx {
     my ($key, $cx, $desc, $nomasking) = @_;
     if (defined (my $ocx = $colx->{$key})) {
       if ($cx != $ocx) {
-        oops if $nomasking; # _get_usable_titles should have screen out
         $self->_carponce("Warning: ", visq($key), " ($desc) is MASKED BY (",
                          $colx_desc->{$key}, ")") unless $silent;
+        oops(dvis '$key $ocx $cx $desc $colx_desc->{$key} $silent $nomasking')
+          if $nomasking; # _get_usable_titles should have screen out
       }
     } else {
       oops if exists $colx->{$key};
@@ -1560,7 +1561,9 @@ sub _rebuild_colx {
       my $key = $title;
       $key =~ s/\A\s+//s; $key =~ s/\s+\z//s;
       if ($key ne $title) {
-        __putback($key, $cx, __fmt_cx($cx).": Title sans lead/trailing spaces",1);
+        # "nomasking" arg is false in case the trimmed title clashes with a
+        # full Title in another column
+        __putback($key, $cx, __fmt_cx($cx).": Title sans lead/trailing spaces",0);
       }
     }
     # Automatic aliases
@@ -1807,13 +1810,14 @@ sub unalias(@) {
 #
 #    Auto-detect options:
 #     required => [COLSPEC, ...] # required titles
-#     min_rx, max_rx   => NUM    # range of rows which may contain the row
+#     min_rx, max_rx   => NUM    # range of rows to examine
 #     first_cx => NUM    # first column ix which must contain a valid title
 #     last_cx  => NUM    # last  column ix which must contain a valid title
 #
 # Note: This is called internally by read_spreadsheet(), passing 'auto'
-#   by default.  Therefore users need not call this method explicitly
-#   except to change title row or if read_spreadsheet was not used at all.
+#   by default.  Therefore users only need to call title_rx explicitly
+#   to change title row or if read_spreadsheet() was not used to
+#   construct the sheet.
 #
 sub title_rx(;$@) {
   my ($self, $opthash_arg) = &__selfmust_opthash;
@@ -1830,12 +1834,11 @@ sub title_rx(;$@) {
   if (@_ == 0) {
     # A return value was requested
     croak '{OPTARGS} passed to title_rx with no operator (get request?)'
-      if %$opthash;
+      if keys %$opthash;
     $rx = $$self->{title_rx};
     $self->_logmethretifv([], [$rx]);
   } else {
-    # N.B. undef arg means there are no titles
-    $rx = shift;
+    $rx = shift; # N.B. undef means there are no titles
     my $notie; $notie = shift() if u($_[0]) eq "_notie"; # during auto-detect probes
     croak "Extraneous argument(s) to title_rx: ".avis(@_) if @_;
 
@@ -1862,6 +1865,7 @@ sub _autodetect_title_rx {
 
   my ($title_rx, $rows, $colx, $num_cols, $verbose, $debug) =
      @$$self{qw(title_rx rows colx num_cols verbose debug)};
+
 
   if ($#$rows == -1) {
     return undef; # completely empty
@@ -2675,8 +2679,10 @@ sub read_spreadsheet($;@) {
       #...TODO   $minfo[$cx] |= 0x0001 if $F->[$cx] =~ /^-[\d.]+$/a;
     }
     push(@$meta_info, \@minfo);
-    $lnum = $.+1;
+
     push(@$rows, $F);
+
+    $lnum = $.+1;
   }
   close $fh || croak "Error reading $hash->{csvpath}: $!\n";
 
@@ -2708,9 +2714,12 @@ sub read_spreadsheet($;@) {
 # write_csv {OPTHASH} "/path/to/output.csv"
 # Cells will be quoted if the input was quoted, i.e. if indicated by meta_info.
 sub write_csv(*;@) {
-  my $self = &__selfmust;
-  my $opts = ref($_[0]) eq 'HASH' ? shift() : {};
-  my $dest = shift;
+  my ($self, $opts) = &__selfmust_opthash;
+  my $dest = shift // croak "Missing 'destination' arg";
+
+  # Instantiate and remove verbose/debug/silent from %$opts
+  my $saved_stdopts = $self->_set_stdopts($opts);
+  scope_guard{ $self->_restore_stdopts($saved_stdopts) };
 
   my %csvopts = ( @sane_CSV_write_options,
                   quote_space => 0,  # dont quote embedded spaces
@@ -2747,13 +2756,13 @@ sub write_csv(*;@) {
 
   my $fh;
   if (openhandle($dest)) { # an already-open file handle?
-    log_methcall $self, [$opts, "<file handle specified> $opts->{iolayers} "
-                                .scalar(@$rows)." rows, $num_cols columns)"]
+    log_methcall $self, [$opts, "<file handle specified>"
+                                ." (".scalar(@$rows)." rows, $num_cols columns)"]
       if $$self->{verbose};
     $fh = $dest;
   } else {
-    log_methcall $self, [$opts, $dest." $opts->{iolayers} ("
-                               .scalar(@$rows)." rows, $num_cols columns)"]
+    log_methcall $self, [$opts, $dest
+                                 ." (".scalar(@$rows)." rows, $num_cols columns)"]
       if $$self->{verbose};
     croak "Output path suffix must be *.csv, not\n  ",qsh($dest),"\n"
       if $dest =~ /\.([a-z]*)$/ && lc($1) ne "csv";
@@ -2858,6 +2867,10 @@ sub write_spreadsheet(*;@) {
   if ($outpath =~ /\.csv$/i) {
     return $self->write_csv($opts, $outpath);
   }
+
+  # Instantiate and remove verbose/debug/silent from %$opts
+  my $saved_stdopts = $self->_set_stdopts($opts);
+  scope_guard{ $self->_restore_stdopts($saved_stdopts) };
 
   my $colx = $$self->{colx};
 

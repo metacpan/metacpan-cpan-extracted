@@ -1,0 +1,310 @@
+0.031  Thu Apr 30 23:58:00 2026
+    - Made `git push` part of the formal closure process instead of relying on
+      memory. The gate chain now ends with an explicit `push-gate` that pushes
+      the committed HEAD to `origin` after `git-gate` has already confirmed a
+      clean tree.
+    - Updated the gate rule documentation and main PAX POD so "all gates"
+      now means QA, version-history, CPAN packaging, git cleanliness, and the
+      final push of the committed release checkpoint.
+
+0.030  Thu Apr 30 23:40:00 2026
+    - Replaced the repetitive sum-loop marketing block in the README and main
+      PAX POD with five separately measured workload examples that are framed
+      as different common jobs: invoice rollup, retry budget planning, shard
+      weight planning, backfill window checksum, and cohort retention
+      counting.
+    - Synced the README and main POD again so both documents now carry the
+      same inline code snippets and the same proven measurements from the
+      local Linux/x86_64 host. Across those examples, stock Perl took about
+      `116s` to `120s`, while the packaged standalone binaries finished in
+      about `1.16s` to `1.27s`.
+
+0.029  Thu Apr 30 22:45:00 2026
+    - Synced the README and main PAX POD again and replaced file-name-only
+      performance discussion with five measured code snippets that PAX
+      accelerates strongly on the current toolchain. Each documented example is
+      a proven integer sum-loop kernel with stock Perl around `88s` to `90s`
+      and the packaged standalone binary around `0.91s` to `0.95s`.
+
+0.028  Thu Apr 30 21:35:00 2026
+    - Closed the CPANTS kwalitee gaps from the `0.027` release by adding
+      explicit `Capture::Tiny` prereqs, repository/provides metadata, a Perl
+      version declaration, a real license section in the main POD, and shipped
+      `SECURITY.md` plus `CONTRIBUTING.md` with concrete reporting guidance.
+    - Fixed the `make cpan-release` upload path so it passes the configured
+      PAUSE credentials to `cpan-upload` instead of relying on an implicit
+      shell environment inside the make recipe.
+
+0.027  Thu Apr 30 09:40:00 2026
+    - Expanded the README and main PAX POD to explain the current
+      shape-driven performance model directly, including concrete examples of
+      workloads that do well, workloads that are still weak, and what operators
+      should report when they see a performance regression or an unexpectedly
+      slow packaged binary.
+
+0.026  Tue Apr 29 23:55:00 2026
+    - Stopped standalone builds from executing arbitrary long-running source
+      scripts during source-plan or native-shape discovery. Script entrypoints
+      now use static source analysis in those paths, so a heavy benchmark no
+      longer spends build time running itself under `--pax-standalone-inspect`
+      or live capture.
+    - Added a reusable native loop shape for masked integer mix/accumulate
+      kernels and taught the Tier 1 and Tier 2 backends to emit artifacts for
+      that class instead of treating it as a packaged-Perl fallback.
+    - Wired compiled script units into standalone native dispatch so script
+      subs with recognized native shapes are rewritten through the packaged
+      runtime helper before top-level execution starts. On the
+      `/tmp/long-process-2.pl` benchmark this changed the standalone runtime
+      from roughly parity with stock Perl to about `1.2s` versus `86s`.
+
+0.025  Wed Apr 29 22:10:00 2026
+    - Replaced the fake one-line POD stubs across the maintained PAX Perl
+      surface with DD-style file-level documentation so modules, tools, tests,
+      and fixtures now describe their real role instead of hiding behind
+      placeholder text.
+    - Tightened `POD-DOC-ALL` so placeholder phrases no longer count as
+      documentation and module docs must carry substantive operator-facing
+      sections rather than token `NAME` and `DESCRIPTION` blocks.
+    - Expanded `PAX::AppImage` to DD-style module documentation and added
+      concrete subroutine intent comments around its builder, launcher, and
+      asset-packaging helpers.
+
+0.024  Wed Apr 29 20:40:00 2026
+    - Fixed the shebang/interpreter contract for scripts that use `FindBin` by
+      resetting the cached `FindBin` globals against the target script before
+      PAX evaluates it as `main`.
+    - Kept the quiet CLI acceptance harness from `0.023`, so the shebang
+      regression can now validate script-local `use lib` paths without
+      drowning the gate replay in progress output.
+
+0.023  Wed Apr 29 20:10:00 2026
+    - Kept the new shebang/interpreter workflow and full-surface
+      documentation gate intact while tightening the CLI acceptance harness so
+      progress output is disabled for routine standalone builds and only
+      enabled where the rundown itself is under test.
+    - This removes the avoidable stderr flood from self-hosting acceptance
+      runs and makes the SOW-03 gate replay practical without weakening the
+      actual shebang or standalone coverage.
+
+0.022  Wed Apr 29 19:15:00 2026
+    - Completed the shebang/interpreter workflow so an installed standalone
+      `pax` binary can execute a Perl script directly from a shebang such as
+      `#!/usr/local/bin/pax` while preserving the script-facing `$0` and
+      `@ARGV` contract.
+    - Tightened `POD-DOC-ALL` from a changed-files check into a full
+      maintained-surface check across PAX modules, Perl scripts, tool scripts,
+      tests, and test fixtures, then backfilled the missing file-level POD
+      inventory so the documentation gate now closes at 100 percent coverage.
+
+0.021  Wed Apr 29 18:20:00 2026
+    - Added interpreter-mode execution to the public `pax` entrypoint so a
+      built `pax` binary can be installed and used directly from a shebang line
+      such as `#!/usr/local/bin/pax` for normal Perl scripts.
+    - Preserved the script-facing process contract in that path by running the
+      target file as `main` with the expected `$0` and `@ARGV`, then added
+      regression coverage around self-built shebang execution.
+
+0.020  Wed Apr 29 16:55:00 2026
+    - Fixed the `POD-DOC-ALL` gate so changed-subroutine comments are checked
+      as real preceding comments instead of in-body narration, which closes the
+      false-negative path caught by the committed-tree replay.
+    - Extended the repository-wide POD sweep across Perl tool scripts and
+      silenced the internal git-parent probe so the documentation gate stays
+      deterministic and quiet while checking committed history.
+
+0.019  Wed Apr 29 14:20:00 2026
+    - Added a mandatory post-PAUSE release rule: after a successful PAUSE
+      upload, the release flow must move the `RELEASED_TO_PAUSE` git tag to the
+      released commit and push that tag to `origin`.
+    - Wired the rule into `make cpan-release` so the repository now tags the
+      released commit through a dedicated `pause-release-tag` target instead of
+      relying on operator memory after upload.
+    - Refocused the README on PAX as software instead of release-process
+      choreography, keeping the gate and release policy in the rulebook and
+      main POD instead of the product manual.
+    - Upgraded the documentation gate so `doc-gate` now runs `POD-DOC-ALL`,
+      which enforces current file-level POD plus non-boilerplate changed
+      subroutine comments across Perl scripts, modules, tests, and tool
+      helpers.
+
+0.018  Wed Apr 29 12:55:00 2026
+    - Added Perl-style `-I`, `-M`, and `-e` support to the public `pax build`
+      and `pax run` workflow so operators can compile or execute inline Perl
+      entrypoints without first writing a source file or manifest.
+    - Treated inline CLI entrypoints as isolated builds, carried their
+      synthesized entrypoint through the standalone pipeline, and documented the
+      new public surface in the README and main POD.
+    - Hardened code-unit live-capture timeouts so builds fall back to direct
+      capture when `ALRM` signal setup is unavailable instead of crashing on
+      platforms such as Alpine.
+    - Normalized default standalone output paths to absolute locations before
+      launcher compilation so `pax run -e ...` works with the fallback
+      `.pax/standalone/<name>/<name>` path instead of failing on relative
+      launcher source emission.
+    - Added CLI and compiler regression coverage for the inline public command
+      surface and the no-usable-`ALRM` timeout fallback path.
+
+0.016  Wed Apr 29 10:15:00 2026
+    - Routed built-in standalone helper commands through the direct managed-helper runtime path instead of the switchboard wrapper path, which reduces per-command process overhead for the packaged helper surface.
+    - Applied the same direct helper fast path to dotted skill command dispatch so packaged helper invocations reuse the in-process runtime path instead of spawning wrapper hops.
+    - Added standalone runtime regression coverage for direct helper routing from the compiled CLI router.
+
+0.015  Wed Apr 29 01:30:00 2026
+    - Fixed generic imported-class resolution in compiled code-unit rewrites so
+      generated standalone runtime ops now honor classes brought in through
+      `use` and `require` instead of guessing by sibling package shape.
+    - Closed the stage-3 standalone Dashboard `skills install` crash by making
+      compiled skill CLI progress and dispatcher helpers resolve the imported
+      `SkillManager`, `SkillDispatcher`, `PathRegistry`, and `CLI::Progress`
+      classes structurally from source.
+    - Extended the three-stage dashboard standalone Docker acceptance flow to
+      exercise the broader helper surface and a valid git-backed sample skill
+      install from the final binary-only runtime stage.
+
+0.014  Tue Apr 28 23:55:00 2026
+    - Fixed standalone managed-helper dispatch so packaged helper assets that
+      are real Perl programs execute directly inside the bundled runtime while
+      wrapper helpers still route through the packaged helper core.
+    - Packaged SONAME alias paths alongside concrete shared-library files for
+      bundled XS runtime dependencies, which fixes source-tree-free stage-3
+      standalone runs that previously failed on loader lookups such as
+      `libexpat.so.1`.
+    - Revalidated the external three-stage Dashboard build flow so the final
+      source-free binary now runs `version`, `init`, `ps1`, `jq`, `of`,
+      `restart`, and `shell bash` directly from the packaged runtime.
+
+0.012  Tue Apr 28 11:30:00 2026
+    - Added a committed-history version gate so `all-gates` now fails when a
+      release-facing commit lands without advancing the PAX version number.
+    - Replaced hardcoded current-version release examples in the operator docs
+      with `<next-version>` placeholders so the release instructions do not
+      drift every time a checkpoint is cut.
+    - Fixed standalone runtime executable resolution for binaries invoked
+      through `PATH`, localized `$0` to the embedded executable path during
+      runtime dispatch, and extended installed-layout module version discovery
+      through `@INC` so standalone `pax` rebuilds stay self-hosting.
+    - Normalized the public Docker examples to use plain `pax build ...`
+      commands instead of redundant `--compact --no-paxfile` flags when no
+      local `paxfile.yml` is present.
+
+0.011  Mon Apr 27 13:10:42 2026
+    - Separated release preparation from release verification so the CPAN gate
+      no longer dirties tracked files while also requiring a clean git tree.
+    - Kept version bumping explicit and stopped auto-generating placeholder
+      changelog text, so release notes must describe real project progress.
+    - Kept the current release tarball available after normal cleanup while
+      reserving destructive artifact removal for the explicit reset path.
+    - Switched `make cpan-release` to the DD-style PAUSE flow: verify the repo
+      gates, use the tarball built in the repo root, and upload it through the
+      local CPAN uploader configuration instead of exposing credential plumbing
+      in the project docs.
+    - Fixed the Dist::Zilla release layout so the built tarball now includes
+      installer metadata such as `Makefile.PL`, which `cpanm` requires when
+      configuring a CPAN distribution.
+    - Added a DD-style progress rundown for `pax build`, keeping structured
+      JSON on stdout while phase-by-phase task updates print on stderr during
+      long standalone builds.
+    - Made the build rundown the default even in non-interactive runs, with
+      `PAX_PROGRESS=0` as the explicit opt-out for quiet build automation.
+    - Broke the build rundown into smaller checkpoints after input resolution
+      so operators can see metadata inference, dependency analysis, native
+      artifact analysis, manifest writing, and launcher compilation advance
+      independently during long standalone builds.
+    - Split the code-unit compilation stage itself into source discovery,
+      entrypoint compilation, application unit compilation, and dependency
+      unit compilation so large Perl builds no longer appear stuck on a single
+      compile line.
+    - Added file-level application unit progress so long builds show which
+      source file is currently being compiled instead of stalling on a raw
+      count.
+    - Cut one duplicate application source-tree walk out of standalone builds
+      and deduplicated resolved source roots so large projects stop rescanning
+      the same lib tree unnecessarily.
+    - Isolated explicit entrypoint builds from ambient `paxfile.yml` defaults
+      so self-hosting and one-off builds no longer inherit unrelated assets,
+      library roots, or CPAN policy files from the current repository.
+    - Stopped application source scans from treating nested bundled runtime
+      include trees as project code, which fixes second-generation self-builds
+      that previously broke on modules such as `Digest::SHA` and
+      `IO::Socket::INET`.
+    - Added a standalone-input rebuild path that carries an embedded source
+      snapshot for application entrypoints and modules, so a built `pax`
+      binary can rebuild from another standalone `pax` binary even after the
+      original source tree is gone.
+    - Added explicit TDD, BDD, ATDD, QA, and final all-gates targets so the
+      repository now has one mandatory completion chain instead of relying on
+      partial gate passes and operator memory.
+
+0.010  Mon Apr 27 12:57:43 2026
+    - Excluded `BACKLOG.md` from the Dist::Zilla tarball.
+    - Extended tarball verification so `BACKLOG.md` is rejected if it appears in
+      a release archive.
+
+0.009  Mon Apr 27 12:35:03 2026
+    - Applied the DD-style documentation rule to PAX so the README and main POD
+      now read as an operator manual plus architecture reference instead of a
+      short command summary.
+    - Added `docs/pax-doc-parity.md` to record the documentation baseline and
+      parity rule derived from the DD Source documentation style.
+    - Excluded repository-only Docker and helper material from the Dist::Zilla
+      tarball using DD-style gather and tarball verification rules.
+    - Removed explicit tarball exclusion-list narration from public docs while
+      keeping the exclusions enforced in packaging and release gates.
+
+0.008  Mon Apr 27 12:28:33 2026
+    - Excluded repository-only Docker and packaging helper material from the
+      Dist::Zilla tarball using DD-style gather rules.
+    - Added tarball exclusions for `examples/`, `tools/`, `docs/`,
+      `Dockerfile`, `DOCKER.md`, and `docker-compose.yml`.
+    - Extended the tarball verification gate so those excluded paths are
+      checked explicitly during release validation.
+
+0.007  Mon Apr 27 12:21:21 2026
+    - Closed the SOW-03 release checkpoint with a full passing test run, active
+      release gates, and a clean backup commit for the standalone build/run
+      workflow.
+
+0.006  Mon Apr 27 12:08:37 2026
+    - Fixed the CPAN gate flow to validate the tarball for the current bumped
+      version instead of using stale pre-bump make variables.
+    - Switched version checking to a dedicated support script so release gates
+      run cleanly and deterministically.
+
+0.005  Mon Apr 27 12:07:53 2026
+    - Added enforced release preparation gates for version consistency, Changes,
+      and documentation before Dist::Zilla build.
+    - Added automatic +0.001 version bumping to the CPAN distribution build
+      flow so release tarballs are not rebuilt forever at the same version.
+
+0.004  Mon Apr 27 12:10:00 2026
+    - Completed the SOW-03 public workflow around `pax build` and `pax run`.
+    - Reduced the public CLI surface to only `build` and `run`.
+    - Made `pax build` and `pax run` read `paxfile.yml` by default and honor
+      `-o` and `--output`.
+    - Validated standalone self-build for `bin/pax`, nested self-hosted build,
+      external standalone app Docker proof, and single-binary Dancer2 webapp
+      packaging with embedded assets.
+
+0.003  Sat Apr 25 23:53:33 2026
+    - Neutralized PAX code-unit compiler operation names for entry command, file
+      registry, and completion helpers so core compiler output no longer encodes
+      Developer Dashboard-specific op names.
+    - Added generic standalone runtime app metadata/env handling for compiled
+      entry commands, file aliases, command naming, and result inline limits.
+    - Added SOW-03 and changed the primary `pax build` / `pax run` workflow to
+      build standalone binaries from CLI or paxfile defaults, with `-o`/`--output`
+      supported by both commands.
+
+0.002  Sat Apr 25 23:51:57 2026
+    - Established an early internal release checkpoint while stabilizing the
+      synchronized distribution versioning and packaging baseline.
+
+Revision history for PAX
+
+0.001  2026-04-25
+    - Added initial CPAN release gate documentation and project metadata scaffold.
+    - Added CPAN release rule set to AGENTS.override.md.
+    - Added `cpanfile`, `Changes`, `README.md`, `dist.ini`, and `lib/PAX.pm`.
+    - Added version anchor in `lib/PAX.pm` (`0.001`) to support synchronized module
+      versioning.
+    - Added standalone build output option and `-o` alias support already in progress.

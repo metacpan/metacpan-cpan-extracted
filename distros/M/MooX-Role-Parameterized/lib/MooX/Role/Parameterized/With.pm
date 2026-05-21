@@ -1,11 +1,11 @@
 package MooX::Role::Parameterized::With;
-
+use v5.12;
 use strict;
 use warnings;
 
-our $VERSION = "0.501";
+our $VERSION = '0.701'; # VERSION
 
-# ABSTRACT: MooX::Role::Parameterized:With - dsl to apply roles with composition parameters
+# ABSTRACT: dsl to apply roles with composition parameters
 
 use Carp                      qw(carp);
 use MooX::Role::Parameterized qw();
@@ -32,31 +32,39 @@ __END__
 
 =head1 NAME
 
-MooX::Role::Parameterized:With - dsl to apply roles with composition parameters
+MooX::Role::Parameterized::With - dsl to apply roles with composition parameters
 
 =head1 SYNOPSIS
 
-    package FooWith;
+    package Tag;
+
+    use Moo::Role;
+    use MooX::Role::Parameterized;
+
+    parameter name => ( is => 'ro', required => 1 );
+
+    role {
+        my ( $params, $mop ) = @_;
+
+        $mop->has( $params->name => ( is => 'rw' ) );
+    };
+
+    package Article;
 
     use Moo;
-    use MooX::Role::Parameterized::With; # overrides Moo::with
+    use MooX::Role::Parameterized::With;    # overrides Moo::with
 
-    with "Bar" => {           # apply parameterized role Bar once
-        attr => 'baz',
-        method => 'run'
-    }, "Other::Role" => [     # apply parameterized role "Other::Role" twice
-        { ... },              # with different parameters
-        { ... },
-    ],
-    "Other::Role" => { ...},  # apply it again
-    "Some::Moo::Role",
-    "Some::Role::Tiny";
+    with Tag => [                  # apply the parameterized role twice,
+        { name => 'author' },      # once per parameter set,
+        { name => 'editor' },
+      ],
+      Tag => { name => 'status' }; # then once more on its own
 
-    has foo => ( is => 'ro'); # continue with normal Moo code
+    has title => ( is => 'ro' );   # continue with normal Moo code
 
 =head1 DESCRIPTION
 
-This B<experimental> package try to offer an easy way to add parametrized roles.
+This package tries to offer an easy way to add parameterized roles.
 
 Will load and apply L<MooX::Roles::Parameterized> roles, just need use this package
 with a hash of role => parameters.

@@ -5,16 +5,48 @@
 use strict;
 use warnings;
 
+use 5.010001;
 use ExtUtils::MakeMaker;
+
+my @CSourceFiles = qw(
+  XS.c tstr_time2str.c tstr_token_parse.c tstr_regexp.c tstr_parse.c
+  tstr_cparse_asn1gt.c tstr_cparse_ecmascript.c tstr_cparse_iso8601.c
+  tstr_cparse_iso9075.c tstr_cparse_rfc2822.c tstr_cparse_rfc3339.c
+  tstr_cparse_rfc4287.c tstr_cparse_rfc9557.c tstr_cparse_w3cdtf.c
+);
+use Config;
+my $xs_ok = 0;
+if (eval { require ExtUtils::CBuilder; ExtUtils::CBuilder->new(quiet => 1)->have_compiler }) {
+  my $cb = ExtUtils::CBuilder->new(quiet => 1);
+  my $src = 'conftest.c';
+  open my $fh, '>', $src or die "Cannot write $src: $!";
+  print $fh "#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L\n";
+  print $fh "#error C99 required\n";
+  print $fh "#endif\n";
+  print $fh "int main(void){return 0;}\n";
+  close $fh;
+  eval {
+    $cb->compile(source => $src, extra_compiler_flags => ['-std=c99']);
+    $xs_ok = 1;
+  };
+  unlink $src, glob('conftest.*');
+}
+if ($xs_ok) {
+  print "C99 compiler found, building XS.\n";
+} else {
+  print "No C99 compiler found, Pure-Perl only.\n";
+}
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Parse and format date/time strings in multiple standard formats",
   "AUTHOR" => "Christian Hansen <chansen\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
+    "ExtUtils::CBuilder" => 0,
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Time-Str",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Time::Str",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -27,10 +59,19 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.47",
     "Test::Number::Delta" => "1.06"
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.85",
   "test" => {
     "TESTS" => "t/*.t t/*/*.t"
   }
+);
+
+%WriteMakefileArgs = (
+    %WriteMakefileArgs,
+    XS => ($xs_ok ? { 'XS.xs' => 'XS.c' } : {}),
+    C => ($xs_ok ? [@CSourceFiles] : []),
+    OBJECT => ($xs_ok ? '$(O_FILES)' : ''),
+    INC => ($xs_ok ? '-I.' : ''),
+    CCFLAGS => ($xs_ok ? "$Config{ccflags} -std=c99" : $Config{ccflags}),
 );
 
 my %FallbackPrereqs = (

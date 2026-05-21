@@ -37,6 +37,14 @@
   #include <zlib.h>
 #endif
 
+#ifdef HAVE_ZSTD
+  #include <zstd.h>
+#endif
+
+#ifdef HAVE_SNAPPY
+  #include <snappy-c.h>
+#endif
+
 /* ================================================================
  * Constants
  * ================================================================ */
@@ -45,6 +53,14 @@
 #define KF_MAGIC_FREED 0xDEADCAFE
 
 #define KF_BUF_INIT 16384
+
+/* True during Perl global destruction — calling user callbacks then is unsafe
+ * because closed-over SVs may already have been freed. */
+#ifdef PERL_PHASE_DESTRUCT
+#  define KF_IN_GLOBAL_DESTRUCT() (PL_phase == PERL_PHASE_DESTRUCT)
+#else
+#  define KF_IN_GLOBAL_DESTRUCT() (PL_dirty)
+#endif
 
 /* Connection states */
 #define CONN_DISCONNECTED    0
@@ -67,8 +83,6 @@
 #define API_HEARTBEAT         12
 #define API_LEAVE_GROUP       13
 #define API_SYNC_GROUP        14
-#define API_DESCRIBE_GROUPS   15
-#define API_LIST_GROUPS       16
 #define API_SASL_HANDSHAKE    17
 #define API_API_VERSIONS      18
 #define API_CREATE_TOPICS     19
@@ -81,12 +95,12 @@
 
 #define API_VERSIONS_MAX_KEY  64
 
-/* Compression types */
-#define COMPRESS_NONE  0
-#define COMPRESS_GZIP  1
+/* Compression types — Kafka wire codes. */
+#define COMPRESS_NONE   0
+#define COMPRESS_GZIP   1
 #define COMPRESS_SNAPPY 2
-#define COMPRESS_LZ4   3
-#define COMPRESS_ZSTD  4
+#define COMPRESS_LZ4    3
+#define COMPRESS_ZSTD   4
 
 #define CLEAR_HANDLER(field) \
     do { if (NULL != (field)) { SvREFCNT_dec(field); (field) = NULL; } } while(0)
@@ -98,13 +112,8 @@
 typedef struct kf_buf_s kf_buf_t;
 typedef struct ev_kafka_conn_s ev_kafka_conn_t;
 typedef struct ev_kafka_conn_cb_s ev_kafka_conn_cb_t;
-typedef struct kf_topic_meta_s kf_topic_meta_t;
-typedef struct kf_partition_meta_s kf_partition_meta_t;
-typedef struct kf_consumer_group_s kf_consumer_group_t;
-typedef struct ev_kafka_s ev_kafka_t;
 
 typedef ev_kafka_conn_t* EV__Kafka__Conn;
-typedef ev_kafka_t* EV__Kafka;
 
 /* ================================================================
  * Dynamic buffer
@@ -406,7 +415,6 @@ struct ev_kafka_conn_s {
     /* Connection params */
     char *host;
     int   port;
-    int   node_id;
 
     /* SASL */
     char *sasl_mechanism;
@@ -418,6 +426,11 @@ struct ev_kafka_conn_s {
     char *scram_nonce;
     char *scram_client_first;
     size_t scram_client_first_len;
+    /* For server-final-message signature verification (RFC 5802). */
+    unsigned char scram_server_key[64];
+    int scram_server_key_len;
+    char *scram_auth_message;
+    size_t scram_auth_message_len;
 
     /* Buffers */
     char   *rbuf;
@@ -452,10 +465,6 @@ struct ev_kafka_conn_s {
 
     /* Safety */
     int callback_depth;
-
-    /* Back-pointer to cluster */
-    ev_kafka_t *cluster;
-    ngx_queue_t cluster_queue;
 };
 
 /* ================================================================
@@ -537,6 +546,7 @@ static ssize_t kf_io_read(ev_kafka_conn_t *self, void *buf, size_t len) {
 #ifdef HAVE_OPENSSL
     if (self->ssl) {
         int ssl_len = (len > (size_t)INT_MAX) ? INT_MAX : (int)len;
+        ERR_clear_error();
         int ret = SSL_read(self->ssl, buf, ssl_len);
         if (ret <= 0) {
             int err = SSL_get_error(self->ssl, ret);
@@ -550,6 +560,7 @@ static ssize_t kf_io_read(ev_kafka_conn_t *self, void *buf, size_t len) {
                 return -1;
             }
             if (err == SSL_ERROR_ZERO_RETURN) return 0;
+            ERR_clear_error();
             errno = EIO;
             return -1;
         }
@@ -563,6 +574,7 @@ static ssize_t kf_io_write(ev_kafka_conn_t *self, const void *buf, size_t len) {
 #ifdef HAVE_OPENSSL
     if (self->ssl) {
         int ssl_len = (len > (size_t)INT_MAX) ? INT_MAX : (int)len;
+        ERR_clear_error();
         int ret = SSL_write(self->ssl, buf, ssl_len);
         if (ret <= 0) {
             int err = SSL_get_error(self->ssl, ret);
@@ -575,6 +587,7 @@ static ssize_t kf_io_write(ev_kafka_conn_t *self, const void *buf, size_t len) {
                 errno = EAGAIN;
                 return -1;
             }
+            ERR_clear_error();
             errno = EIO;
             return -1;
         }
@@ -763,7 +776,8 @@ static void conn_cleanup(pTHX_ ev_kafka_conn_t *self) {
 }
 
 static void conn_cancel_pending(pTHX_ ev_kafka_conn_t *self, const char *err) {
-    SV *err_sv = newSVpv(err, 0);
+    int in_destruct = KF_IN_GLOBAL_DESTRUCT();
+    SV *err_sv = in_destruct ? NULL : newSVpv(err, 0);
     ngx_queue_t *q;
 
     while (!ngx_queue_empty(&self->cb_queue)) {
@@ -771,7 +785,7 @@ static void conn_cancel_pending(pTHX_ ev_kafka_conn_t *self, const char *err) {
         ngx_queue_remove(q);
         ev_kafka_conn_cb_t *cbt = ngx_queue_data(q, ev_kafka_conn_cb_t, queue);
         self->pending_count--;
-        if (cbt->cb && !cbt->internal) {
+        if (cbt->cb && !cbt->internal && !in_destruct) {
             conn_invoke_cb(aTHX_ self, cbt->cb, NULL, sv_2mortal(newSVsv(err_sv)));
             if (conn_check_destroyed(self)) {
                 SvREFCNT_dec(cbt->cb);
@@ -783,7 +797,7 @@ static void conn_cancel_pending(pTHX_ ev_kafka_conn_t *self, const char *err) {
         if (cbt->cb) SvREFCNT_dec(cbt->cb);
         Safefree(cbt);
     }
-    SvREFCNT_dec(err_sv);
+    if (err_sv) SvREFCNT_dec(err_sv);
 }
 
 static void conn_handle_disconnect(pTHX_ ev_kafka_conn_t *self, const char *reason) {
@@ -1075,6 +1089,11 @@ static void conn_send_sasl_authenticate(pTHX_ ev_kafka_conn_t *self) {
         self->scram_nonce = savepv(nonce);
         self->scram_step = SCRAM_STEP_CLIENT_FIRST;
 
+        if (!self->sasl_username) {
+            conn_emit_error(aTHX_ self, "SCRAM: username required");
+            kf_buf_free(&body);
+            return;
+        }
         kf_buf_t msg;
         kf_buf_init(&msg);
         kf_buf_append(&msg, "n,,n=", 5);
@@ -1100,7 +1119,12 @@ static void conn_send_sasl_authenticate(pTHX_ ev_kafka_conn_t *self) {
     }
 
     self->state = CONN_SASL_AUTH;
-    conn_send_request(aTHX_ self, API_SASL_AUTHENTICATE, 2, &body, NULL, 1, 0);
+    {
+        int16_t ver = self->api_versions[API_SASL_AUTHENTICATE];
+        if (ver < 0) ver = 1;
+        if (ver > 2) ver = 2;
+        conn_send_request(aTHX_ self, API_SASL_AUTHENTICATE, ver, &body, NULL, 1, 0);
+    }
     kf_buf_free(&body);
 }
 
@@ -1225,6 +1249,14 @@ static void conn_parse_sasl_authenticate_response(pTHX_ ev_kafka_conn_t *self,
         HMAC(md, salted_password, digest_len,
             (unsigned char *)"Client Key", 10, client_key, &ck_len);
 
+        /* ServerKey = HMAC(SaltedPassword, "Server Key") — saved for
+         * server-final-message verification. */
+        unsigned int sk_hmac_len = digest_len;
+        HMAC(md, salted_password, digest_len,
+            (unsigned char *)"Server Key", 10,
+            self->scram_server_key, &sk_hmac_len);
+        self->scram_server_key_len = (int)sk_hmac_len;
+
         /* StoredKey = H(ClientKey) */
         unsigned char stored_key[64];
         {
@@ -1259,6 +1291,11 @@ static void conn_parse_sasl_authenticate_response(pTHX_ ev_kafka_conn_t *self,
         int di;
         for (di = 0; di < digest_len; di++)
             proof[di] = client_key[di] ^ client_sig[di];
+
+        /* Save AuthMessage for server-signature verification at step 2. */
+        if (self->scram_auth_message) Safefree(self->scram_auth_message);
+        self->scram_auth_message = savepvn(auth_msg.data, auth_msg.len);
+        self->scram_auth_message_len = auth_msg.len;
 
         kf_buf_free(&auth_msg);
 
@@ -1296,14 +1333,77 @@ static void conn_parse_sasl_authenticate_response(pTHX_ ev_kafka_conn_t *self,
         kf_buf_append(&body, final_msg.data, final_msg.len);
 
         self->scram_step = SCRAM_STEP_CLIENT_FINAL;
-        conn_send_request(aTHX_ self, API_SASL_AUTHENTICATE, 2, &body, NULL, 1, 0);
+        {
+            int16_t ver = self->api_versions[API_SASL_AUTHENTICATE];
+            if (ver < 0) ver = 1;
+            if (ver > 2) ver = 2;
+            conn_send_request(aTHX_ self, API_SASL_AUTHENTICATE, ver, &body, NULL, 1, 0);
+        }
         kf_buf_free(&body);
         kf_buf_free(&final_msg);
         return;
     }
 
     if (self->sasl_mechanism && self->scram_step == SCRAM_STEP_CLIENT_FINAL) {
-        /* Server-final-message: v=<server_signature> — we just verify no error */
+        /* Server-final-message: v=<base64(ServerSignature)>
+         * ServerSignature = HMAC(ServerKey, AuthMessage) — RFC 5802. */
+        if (!auth_data || auth_data_len < 2 || auth_data[0] != 'v' || auth_data[1] != '=') {
+            conn_emit_error(aTHX_ self, "SCRAM: missing server signature");
+            if (conn_check_destroyed(self)) return;
+            conn_handle_disconnect(aTHX_ self, "SCRAM verify failed");
+            return;
+        }
+        const char *recv_b64 = auth_data + 2;
+        int recv_b64_len = (int)(auth_data_len - 2);
+
+        /* Compute expected server signature. */
+        const EVP_MD *md = NULL;
+        if (strcmp(self->sasl_mechanism, "SCRAM-SHA-256") == 0) md = EVP_sha256();
+        else if (strcmp(self->sasl_mechanism, "SCRAM-SHA-512") == 0) md = EVP_sha512();
+        if (!md || self->scram_server_key_len <= 0 || !self->scram_auth_message) {
+            conn_emit_error(aTHX_ self, "SCRAM: missing state for verification");
+            if (conn_check_destroyed(self)) return;
+            conn_handle_disconnect(aTHX_ self, "SCRAM verify failed");
+            return;
+        }
+        unsigned char expected[64];
+        unsigned int expected_len = (unsigned int)self->scram_server_key_len;
+        HMAC(md, self->scram_server_key, self->scram_server_key_len,
+            (unsigned char *)self->scram_auth_message,
+            self->scram_auth_message_len, expected, &expected_len);
+
+        /* Decode the received base64 signature. */
+        unsigned char recv_sig[64];
+        int recv_sig_len = 0;
+        {
+            BIO *b64 = BIO_new(BIO_f_base64());
+            BIO *bmem = BIO_new_mem_buf(recv_b64, recv_b64_len);
+            BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
+            b64 = BIO_push(b64, bmem);
+            recv_sig_len = BIO_read(b64, recv_sig, (int)sizeof(recv_sig));
+            BIO_free_all(b64);
+        }
+
+        int ok = (recv_sig_len == (int)expected_len)
+            && (CRYPTO_memcmp(recv_sig, expected, expected_len) == 0);
+
+        /* Wipe ServerKey/AuthMessage now that verification is done. */
+        OPENSSL_cleanse(self->scram_server_key, sizeof(self->scram_server_key));
+        self->scram_server_key_len = 0;
+        if (self->scram_auth_message) {
+            OPENSSL_cleanse(self->scram_auth_message,
+                self->scram_auth_message_len);
+            Safefree(self->scram_auth_message);
+            self->scram_auth_message = NULL;
+            self->scram_auth_message_len = 0;
+        }
+
+        if (!ok) {
+            conn_emit_error(aTHX_ self, "SCRAM: server signature mismatch");
+            if (conn_check_destroyed(self)) return;
+            conn_handle_disconnect(aTHX_ self, "SCRAM verify failed");
+            return;
+        }
         self->scram_step = SCRAM_STEP_DONE;
         /* fall through to CONN_READY */
     }
@@ -1506,24 +1606,27 @@ static void kf_encode_record(kf_buf_t *b, int offset_delta, int64_t ts_delta,
     kf_buf_free(&rec);
 }
 
-/* Build a RecordBatch containing a single record.
- * Returns the complete RecordBatch bytes in *out.
- * Caller must kf_buf_free(out) when done.
- */
-/* Multi-record batch encoder with producer ID support */
+/* Build a RecordBatch from one or more records, with optional
+ * compression and producer-ID/transactional state. Caller frees *out. */
 static void kf_encode_record_batch_multi(pTHX_ kf_buf_t *out,
     AV *records_av, int64_t timestamp, int compression,
     int64_t producer_id, int16_t producer_epoch, int32_t base_sequence,
     int is_transactional)
 {
+    SSize_t i, count = av_len(records_av) + 1;
+
+    /* Validate up front so croak() doesn't longjmp over kf_buf_free below. */
+    for (i = 0; i < count; i++) {
+        SV **elem = av_fetch(records_av, i, 0);
+        if (!elem || !SvROK(*elem) || SvTYPE(SvRV(*elem)) != SVt_PVHV)
+            croak("produce_batch: record element must be a hashref");
+    }
+
     kf_buf_t records;
     kf_buf_init(&records);
-    SSize_t i, count = av_len(records_av) + 1;
 
     for (i = 0; i < count; i++) {
         SV **elem = av_fetch(records_av, i, 0);
-        if (!elem || !SvROK(*elem))
-            croak("produce_batch: record element must be a hashref");
         HV *rh = (HV*)SvRV(*elem);
         SV **key_sv = hv_fetch(rh, "key", 3, 0);
         SV **val_sv = hv_fetch(rh, "value", 5, 0);
@@ -1600,6 +1703,44 @@ static void kf_encode_record_batch_multi(pTHX_ kf_buf_t *out,
         Safefree(compressed);
     } else
 #endif
+#ifdef HAVE_ZSTD
+    if (compression == COMPRESS_ZSTD) {
+        size_t dest_cap = ZSTD_compressBound(records.len);
+        char *compressed;
+        Newx(compressed, dest_cap, char);
+        size_t clen = ZSTD_compress(compressed, dest_cap,
+            records.data, records.len, ZSTD_CLEVEL_DEFAULT);
+        if (!ZSTD_isError(clen)) {
+            kf_buf_append_i32(&inner, (int32_t)count);
+            kf_buf_append(&inner, compressed, clen);
+        } else {
+            uint16_t zero = 0;
+            memcpy(inner.data, &zero, 2);
+            kf_buf_append_i32(&inner, (int32_t)count);
+            kf_buf_append(&inner, records.data, records.len);
+        }
+        Safefree(compressed);
+    } else
+#endif
+#ifdef HAVE_SNAPPY
+    if (compression == COMPRESS_SNAPPY) {
+        size_t dest_cap = snappy_max_compressed_length(records.len);
+        char *compressed;
+        Newx(compressed, dest_cap, char);
+        size_t clen = dest_cap;
+        if (snappy_compress(records.data, records.len, compressed, &clen)
+                == SNAPPY_OK) {
+            kf_buf_append_i32(&inner, (int32_t)count);
+            kf_buf_append(&inner, compressed, clen);
+        } else {
+            uint16_t zero = 0;
+            memcpy(inner.data, &zero, 2);
+            kf_buf_append_i32(&inner, (int32_t)count);
+            kf_buf_append(&inner, records.data, records.len);
+        }
+        Safefree(compressed);
+    } else
+#endif
     {
         (void)compression;
         kf_buf_append_i32(&inner, (int32_t)count);
@@ -1615,101 +1756,6 @@ static void kf_encode_record_batch_multi(pTHX_ kf_buf_t *out,
     kf_buf_append_i32(out, 0);
     kf_buf_append_i8(out, 2);
     kf_buf_append_i32(out, (int32_t)crc_val);
-    kf_buf_append(out, inner.data, inner.len);
-
-    kf_buf_free(&inner);
-    kf_buf_free(&records);
-}
-
-/* Single-record convenience wrapper */
-static void kf_encode_record_batch(kf_buf_t *out,
-    const char *key, STRLEN key_len,
-    const char *value, STRLEN value_len,
-    HV *headers, int64_t timestamp, int compression)
-{
-    kf_buf_t records;
-    kf_buf_init(&records);
-    kf_encode_record(&records, 0, 0, key, key_len, value, value_len, headers);
-
-    kf_buf_t inner;
-    kf_buf_init(&inner);
-
-    int16_t attrs = (int16_t)(compression & 0x07);
-    kf_buf_append_i16(&inner, attrs);
-    kf_buf_append_i32(&inner, 0);           /* lastOffsetDelta */
-    kf_buf_append_i64(&inner, timestamp);
-    kf_buf_append_i64(&inner, timestamp);
-    kf_buf_append_i64(&inner, -1);          /* producerId */
-    kf_buf_append_i16(&inner, -1);          /* producerEpoch */
-    kf_buf_append_i32(&inner, -1);          /* baseSequence */
-
-#ifdef HAVE_LZ4
-    if (compression == COMPRESS_LZ4) {
-        int max_compressed = LZ4_compressBound((int)records.len);
-        char *compressed;
-        Newx(compressed, max_compressed, char);
-        int clen = LZ4_compress_default(records.data, compressed,
-            (int)records.len, max_compressed);
-        if (clen > 0) {
-            kf_buf_append_i32(&inner, 1);   /* records count */
-            kf_buf_append(&inner, compressed, clen);
-        } else {
-            /* fallback to uncompressed */
-            /* rewrite attrs to 0 */
-            uint16_t zero = 0;
-            memcpy(inner.data, &zero, 2);
-            kf_buf_append_i32(&inner, 1);
-            kf_buf_append(&inner, records.data, records.len);
-        }
-        Safefree(compressed);
-    } else
-#endif
-#ifdef HAVE_ZLIB
-    if (compression == COMPRESS_GZIP) {
-        size_t dest_cap = compressBound((uLong)records.len) + 32;
-        char *compressed;
-        Newx(compressed, dest_cap, char);
-        z_stream zs;
-        Zero(&zs, 1, z_stream);
-        int zinit = deflateInit2(&zs, Z_DEFAULT_COMPRESSION, Z_DEFLATED,
-                                  MAX_WBITS + 16, 8, Z_DEFAULT_STRATEGY);
-        int zok = 0;
-        if (zinit == Z_OK) {
-            zs.next_in  = (Bytef *)records.data;
-            zs.avail_in = (uInt)records.len;
-            zs.next_out = (Bytef *)compressed;
-            zs.avail_out = (uInt)dest_cap;
-            if (deflate(&zs, Z_FINISH) == Z_STREAM_END) zok = 1;
-            deflateEnd(&zs);
-        }
-        if (zok) {
-            kf_buf_append_i32(&inner, 1);
-            kf_buf_append(&inner, compressed, zs.total_out);
-        } else {
-            uint16_t zero = 0;
-            memcpy(inner.data, &zero, 2);
-            kf_buf_append_i32(&inner, 1);
-            kf_buf_append(&inner, records.data, records.len);
-        }
-        Safefree(compressed);
-    } else
-#endif
-    {
-        (void)compression;
-        kf_buf_append_i32(&inner, 1);       /* records count */
-        kf_buf_append(&inner, records.data, records.len);
-    }
-
-    uint32_t crc_val = crc32c(inner.data, inner.len);
-
-    int32_t batch_length = 4 + 1 + 4 + (int32_t)inner.len;
-
-    kf_buf_init(out);
-    kf_buf_append_i64(out, 0);              /* baseOffset = 0 */
-    kf_buf_append_i32(out, batch_length);
-    kf_buf_append_i32(out, 0);              /* partitionLeaderEpoch */
-    kf_buf_append_i8(out, 2);               /* magic = 2 */
-    kf_buf_append_i32(out, (int32_t)crc_val); /* CRC32C */
     kf_buf_append(out, inner.data, inner.len);
 
     kf_buf_free(&inner);
@@ -1851,16 +1897,18 @@ static SV* conn_parse_metadata_response(pTHX_ ev_kafka_conn_t *self,
                 if (n < 0) goto done;
                 p += n;
                 int32_t rcount = (int32_t)(raw - 1);
-                if (end - p < (ptrdiff_t)(rcount * 4)) goto done;
-                p += rcount * 4;
+                if (rcount < 0 || rcount > 65536) goto done;
+                if (end - p < (ptrdiff_t)((int64_t)rcount * 4)) goto done;
+                p += (int64_t)rcount * 4;
 
                 /* isr: compact array of i32 */
                 n = kf_read_uvarint(p, end, &raw);
                 if (n < 0) goto done;
                 p += n;
                 rcount = (int32_t)(raw - 1);
-                if (end - p < (ptrdiff_t)(rcount * 4)) goto done;
-                p += rcount * 4;
+                if (rcount < 0 || rcount > 65536) goto done;
+                if (end - p < (ptrdiff_t)((int64_t)rcount * 4)) goto done;
+                p += (int64_t)rcount * 4;
 
                 /* offline_replicas: compact array of i32 — v5+ */
                 if (version >= 5) {
@@ -1905,6 +1953,7 @@ static SV* conn_parse_metadata_response(pTHX_ ev_kafka_conn_t *self,
         /* brokers array */
         if (end - p < 4) goto done;
         int32_t broker_count = kf_read_i32(p); p += 4;
+        if (broker_count < 0 || broker_count > 65536) goto done;
         int32_t i;
         for (i = 0; i < broker_count; i++) {
             HV *bh = newHV();
@@ -1951,6 +2000,7 @@ static SV* conn_parse_metadata_response(pTHX_ ev_kafka_conn_t *self,
         /* topics array */
         if (end - p < 4) goto done;
         int32_t topic_count = kf_read_i32(p); p += 4;
+        if (topic_count < 0 || topic_count > 1000000) goto done;
         for (i = 0; i < topic_count; i++) {
             HV *th = newHV();
             if (end - p < 2) goto done;
@@ -1972,6 +2022,7 @@ static SV* conn_parse_metadata_response(pTHX_ ev_kafka_conn_t *self,
             /* partitions */
             if (end - p < 4) goto done;
             int32_t part_count = kf_read_i32(p); p += 4;
+            if (part_count < 0 || part_count > 1000000) goto done;
             AV *parts_av = newAV();
             int32_t j;
             for (j = 0; j < part_count; j++) {
@@ -1997,14 +2048,16 @@ static SV* conn_parse_metadata_response(pTHX_ ev_kafka_conn_t *self,
                 /* replicas */
                 if (end - p < 4) goto done;
                 int32_t rcount = kf_read_i32(p); p += 4;
-                if (end - p < (ptrdiff_t)(rcount * 4)) goto done;
-                p += rcount * 4;
+                if (rcount < 0 || rcount > 65536) goto done;
+                if (end - p < (ptrdiff_t)((int64_t)rcount * 4)) goto done;
+                p += (int64_t)rcount * 4;
 
                 /* isr */
                 if (end - p < 4) goto done;
                 rcount = kf_read_i32(p); p += 4;
-                if (end - p < (ptrdiff_t)(rcount * 4)) goto done;
-                p += rcount * 4;
+                if (rcount < 0 || rcount > 65536) goto done;
+                if (end - p < (ptrdiff_t)((int64_t)rcount * 4)) goto done;
+                p += (int64_t)rcount * 4;
 
                 /* offline_replicas (v5+) */
                 if (version >= 5) {
@@ -2028,7 +2081,6 @@ done:
     return sv_2mortal(newRV_noinc((SV*)result));
 }
 
-/* Stub parsers — return raw bytes wrapped in hash with error_code */
 /* Produce response parser (API 0, v0-v7) */
 static SV* conn_parse_produce_response(pTHX_ ev_kafka_conn_t *self,
     int16_t version, const char *data, size_t len)
@@ -2128,7 +2180,9 @@ static int kf_decode_record_batch(pTHX_ const char *data, size_t len,
     /* int32_t partition_leader_epoch = kf_read_i32(p); */ p += 4;
     int8_t magic = (int8_t)*p; p += 1;
     if (magic != 2) return -1; /* only support magic=2 (current format) */
-    /* int32_t crc = kf_read_i32(p); */ p += 4; /* skip CRC check for speed */
+    uint32_t expected_crc = (uint32_t)kf_read_i32(p); p += 4;
+    /* CRC32C covers the bytes from attributes to end of batch. */
+    if (crc32c(p, (size_t)(batch_end - p)) != expected_crc) return -1;
 
     if (batch_end - p < 36) return -1;
     int16_t attributes = kf_read_i16(p); p += 2;
@@ -2191,15 +2245,64 @@ static int kf_decode_record_batch(pTHX_ const char *data, size_t len,
 #endif
 #ifdef HAVE_LZ4
         if (compression_type == COMPRESS_LZ4) {
-            Newx(decompressed, decomp_cap, char);
-            int dlen = LZ4_decompress_safe(p, decompressed,
-                (int)compressed_len, (int)decomp_cap);
+            int dlen = -1;
+            while (decomp_cap < 64 * 1024 * 1024) {
+                Newx(decompressed, decomp_cap, char);
+                dlen = LZ4_decompress_safe(p, decompressed,
+                    (int)compressed_len, (int)decomp_cap);
+                if (dlen >= 0) break;
+                /* Negative return can mean either malformed input or
+                 * insufficient output buffer — LZ4 doesn't distinguish.
+                 * Grow and retry; if it's malformed we'll bail at the cap. */
+                Safefree(decompressed);
+                decompressed = NULL;
+                decomp_cap *= 2;
+            }
             if (dlen > 0) {
                 rec_data = decompressed;
                 rec_end = decompressed + dlen;
-            } else {
+            } else if (decompressed) {
                 Safefree(decompressed);
                 decompressed = NULL;
+            }
+        }
+#endif
+#ifdef HAVE_ZSTD
+        if (compression_type == COMPRESS_ZSTD) {
+            unsigned long long expected =
+                ZSTD_getFrameContentSize(p, compressed_len);
+            size_t dlen;
+            if (expected != ZSTD_CONTENTSIZE_ERROR
+                    && expected != ZSTD_CONTENTSIZE_UNKNOWN
+                    && expected <= 64ULL * 1024 * 1024) {
+                Newx(decompressed, (size_t)expected, char);
+                dlen = ZSTD_decompress(decompressed, (size_t)expected,
+                    p, compressed_len);
+                if (!ZSTD_isError(dlen)) {
+                    rec_data = decompressed;
+                    rec_end = decompressed + dlen;
+                } else {
+                    Safefree(decompressed);
+                    decompressed = NULL;
+                }
+            }
+        }
+#endif
+#ifdef HAVE_SNAPPY
+        if (compression_type == COMPRESS_SNAPPY) {
+            size_t dlen;
+            if (snappy_uncompressed_length(p, compressed_len, &dlen)
+                    == SNAPPY_OK
+                    && dlen <= 64UL * 1024 * 1024) {
+                Newx(decompressed, dlen, char);
+                if (snappy_uncompress(p, compressed_len,
+                        decompressed, &dlen) == SNAPPY_OK) {
+                    rec_data = decompressed;
+                    rec_end = decompressed + dlen;
+                } else {
+                    Safefree(decompressed);
+                    decompressed = NULL;
+                }
             }
         }
 #endif
@@ -3147,6 +3250,7 @@ static void conn_io_cb(EV_P_ ev_io *w, int revents) {
 #ifdef HAVE_OPENSSL
     /* TLS handshake in progress */
     if (self->state == CONN_TLS_HANDSHAKE) {
+        ERR_clear_error();
         int ret = SSL_connect(self->ssl);
         if (ret == 1) {
             conn_stop_reading(self);
@@ -3165,9 +3269,18 @@ static void conn_io_cb(EV_P_ ev_io *w, int revents) {
             conn_stop_reading(self);
             conn_start_writing(self);
         } else {
-            conn_emit_error(aTHX_ self, "SSL_connect failed");
+            char errbuf[256];
+            unsigned long e = ERR_peek_last_error();
+            if (e) {
+                snprintf(errbuf, sizeof(errbuf), "SSL_connect failed: %s",
+                    ERR_reason_error_string(e));
+            } else {
+                snprintf(errbuf, sizeof(errbuf), "SSL_connect failed (err=%d)", err);
+            }
+            ERR_clear_error();
+            conn_emit_error(aTHX_ self, errbuf);
             if (conn_check_destroyed(self)) return;
-            conn_handle_disconnect(aTHX_ self, "SSL_connect failed");
+            conn_handle_disconnect(aTHX_ self, errbuf);
         }
         return;
     }
@@ -3301,6 +3414,7 @@ static void conn_on_connect_done(pTHX_ ev_kafka_conn_t *self) {
         }
 
         self->state = CONN_TLS_HANDSHAKE;
+        ERR_clear_error();
         int ret = SSL_connect(self->ssl);
         if (ret == 1) {
             /* Immediate success */
@@ -3314,9 +3428,18 @@ static void conn_on_connect_done(pTHX_ ev_kafka_conn_t *self) {
         } else if (err == SSL_ERROR_WANT_WRITE) {
             conn_start_writing(self);
         } else {
-            conn_emit_error(aTHX_ self, "SSL_connect failed");
+            char errbuf[256];
+            unsigned long e = ERR_peek_last_error();
+            if (e) {
+                snprintf(errbuf, sizeof(errbuf), "SSL_connect failed: %s",
+                    ERR_reason_error_string(e));
+            } else {
+                snprintf(errbuf, sizeof(errbuf), "SSL_connect failed (err=%d)", err);
+            }
+            ERR_clear_error();
+            conn_emit_error(aTHX_ self, errbuf);
             if (conn_check_destroyed(self)) return;
-            conn_handle_disconnect(aTHX_ self, "SSL_connect failed");
+            conn_handle_disconnect(aTHX_ self, errbuf);
         }
         return;
     }
@@ -3352,7 +3475,16 @@ static void conn_start_connect(pTHX_ ev_kafka_conn_t *self,
     hints.ai_family = AF_UNSPEC;
     hints.ai_socktype = SOCK_STREAM;
 
+    /* Fast path: if host is a numeric IP literal, AI_NUMERICHOST avoids any
+     * DNS resolver work and returns synchronously without blocking the EV
+     * loop. For non-literal hostnames getaddrinfo still blocks; users that
+     * need fully-async DNS should resolve in Perl-land before connecting. */
+    hints.ai_flags = AI_NUMERICHOST | AI_NUMERICSERV;
     int gai_err = getaddrinfo(host, port_str, &hints, &res);
+    if (gai_err != 0) {
+        hints.ai_flags = 0;
+        gai_err = getaddrinfo(host, port_str, &hints, &res);
+    }
     if (gai_err != 0) {
         char errbuf[256];
         snprintf(errbuf, sizeof(errbuf), "resolve: %s", gai_strerror(gai_err));
@@ -3418,99 +3550,6 @@ static void conn_start_connect(pTHX_ ev_kafka_conn_t *self,
 }
 
 /* ================================================================
- * Cluster client struct (Layer 2) — skeleton
- * ================================================================ */
-
-struct kf_partition_meta_s {
-    int32_t partition_id;
-    int32_t leader_id;
-    int16_t error_code;
-};
-
-struct kf_topic_meta_s {
-    char *name;
-    int name_len;
-    int16_t error_code;
-    int num_partitions;
-    kf_partition_meta_t *partitions;
-    ngx_queue_t queue;
-};
-
-struct kf_consumer_group_s {
-    char *group_id;
-    char *member_id;
-    int32_t generation_id;
-    int state;
-    int32_t coordinator_node_id;
-    ev_kafka_conn_t *coordinator;
-    ev_timer heartbeat_timer;
-    int heartbeat_timing;
-    double heartbeat_interval;
-    double session_timeout;
-    double rebalance_timeout;
-    SV *on_assign;
-    SV *on_revoke;
-    AV *subscriptions;
-};
-
-struct ev_kafka_s {
-    unsigned int magic;
-    struct ev_loop *loop;
-
-    ngx_queue_t brokers;
-    int broker_count;
-
-    char **bootstrap_hosts;
-    int   *bootstrap_ports;
-    int    bootstrap_count;
-
-    ngx_queue_t topics;
-    ev_timer metadata_timer;
-    int metadata_timing;
-    double metadata_refresh_interval;
-    int metadata_pending;
-
-    char *client_id;
-    int   client_id_len;
-
-    int tls_enabled;
-    char *tls_ca_file;
-    int tls_skip_verify;
-    char *sasl_mechanism;
-    char *sasl_username;
-    char *sasl_password;
-
-    /* Producer */
-    ngx_queue_t produce_batches;
-    ev_timer linger_timer;
-    int linger_timing;
-    double linger_ms;
-    int batch_size;
-    int16_t acks;
-    int32_t max_request_size;
-    SV *partitioner;
-    int rr_counter;
-
-    /* Consumer */
-    ngx_queue_t consume_partitions;
-    SV *on_message;
-    int32_t fetch_max_bytes;
-    int32_t fetch_min_bytes;
-    int32_t fetch_max_wait_ms;
-    ev_timer fetch_timer;
-    int fetch_timing;
-
-    /* Consumer group */
-    kf_consumer_group_t *group;
-
-    /* Event handlers */
-    SV *on_error;
-    SV *on_connect;
-
-    int callback_depth;
-};
-
-/* ================================================================
  * XS INTERFACE
  * ================================================================ */
 
@@ -3535,7 +3574,6 @@ _new(char *cls, SV *loop_sv)
         self->loop = loop;
         self->fd = -1;
         self->state = CONN_DISCONNECTED;
-        self->node_id = -1;
         self->next_correlation_id = 1;
 
         Newx(self->rbuf, KF_BUF_INIT, char);
@@ -3594,6 +3632,13 @@ DESTROY(EV::Kafka::Conn self)
         if (self->sasl_password) Safefree(self->sasl_password);
         if (self->scram_nonce) Safefree(self->scram_nonce);
         if (self->scram_client_first) Safefree(self->scram_client_first);
+#ifdef HAVE_OPENSSL
+        OPENSSL_cleanse(self->scram_server_key, sizeof(self->scram_server_key));
+        if (self->scram_auth_message) {
+            OPENSSL_cleanse(self->scram_auth_message, self->scram_auth_message_len);
+            Safefree(self->scram_auth_message);
+        }
+#endif
         if (self->tls_ca_file) Safefree(self->tls_ca_file);
         if (self->rbuf) Safefree(self->rbuf);
         if (self->wbuf) Safefree(self->wbuf);
@@ -3773,11 +3818,35 @@ api_versions(EV::Kafka::Conn self)
     }
 
 void
-fetch(EV::Kafka::Conn self, const char *topic, int partition, SV *offset_sv, SV *cb, int max_bytes = 1048576)
+fetch(EV::Kafka::Conn self, const char *topic, int partition, SV *offset_sv, SV *arg1 = NULL, SV *arg2 = NULL)
     CODE:
     {
         if (self->state != CONN_READY)
             croak("not connected");
+
+        /* Accept either fetch(..., $cb) or fetch(..., \%opts, $cb).
+         * $opts may set max_bytes, max_wait_ms, min_bytes. */
+        SV *cb = NULL;
+        HV *opts = NULL;
+        if (arg1 && SvROK(arg1) && SvTYPE(SvRV(arg1)) == SVt_PVHV) {
+            opts = (HV*)SvRV(arg1);
+            cb = arg2;
+        } else {
+            cb = arg1;
+        }
+
+        int32_t max_bytes = 1048576;
+        int32_t max_wait_ms = 500;
+        int32_t min_bytes = 1;
+        if (opts) {
+            SV **v;
+            if ((v = hv_fetchs(opts, "max_bytes", 0)) && SvOK(*v))
+                max_bytes = (int32_t)SvIV(*v);
+            if ((v = hv_fetchs(opts, "max_wait_ms", 0)) && SvOK(*v))
+                max_wait_ms = (int32_t)SvIV(*v);
+            if ((v = hv_fetchs(opts, "min_bytes", 0)) && SvOK(*v))
+                min_bytes = (int32_t)SvIV(*v);
+        }
 
         int64_t offset = SvIV(offset_sv);
         STRLEN topic_len = strlen(topic);
@@ -3790,8 +3859,8 @@ fetch(EV::Kafka::Conn self, const char *topic, int partition, SV *offset_sv, SV 
         kf_buf_init(&body);
 
         kf_buf_append_i32(&body, -1);          /* replica_id = -1 (consumer) */
-        kf_buf_append_i32(&body, 500);          /* max_wait_ms */
-        kf_buf_append_i32(&body, 1);            /* min_bytes */
+        kf_buf_append_i32(&body, max_wait_ms);
+        kf_buf_append_i32(&body, min_bytes);
 
         /* max_bytes (v3+) */
         if (ver >= 3)
@@ -3834,16 +3903,39 @@ fetch(EV::Kafka::Conn self, const char *topic, int partition, SV *offset_sv, SV 
     }
 
 void
-fetch_multi(EV::Kafka::Conn self, SV *topics_sv, SV *cb, int max_bytes = 1048576)
+fetch_multi(EV::Kafka::Conn self, SV *topics_sv, SV *arg1 = NULL, SV *arg2 = NULL)
     CODE:
     {
         if (self->state != CONN_READY)
             croak("not connected");
 
-        /* topics_sv: { topic => [{partition => N, offset => N}, ...], ... } */
+        /* topics_sv: { topic => [{partition => N, offset => N}, ...], ... }
+         * accept fetch_multi(\%topics, $cb) or fetch_multi(\%topics, \%opts, $cb). */
         if (!SvROK(topics_sv) || SvTYPE(SvRV(topics_sv)) != SVt_PVHV)
             croak("fetch_multi: expected hashref");
         HV *topics_hv = (HV*)SvRV(topics_sv);
+
+        SV *cb = NULL;
+        HV *opts = NULL;
+        if (arg1 && SvROK(arg1) && SvTYPE(SvRV(arg1)) == SVt_PVHV) {
+            opts = (HV*)SvRV(arg1);
+            cb = arg2;
+        } else {
+            cb = arg1;
+        }
+
+        int32_t max_bytes = 1048576;
+        int32_t max_wait_ms = 500;
+        int32_t min_bytes = 1;
+        if (opts) {
+            SV **v;
+            if ((v = hv_fetchs(opts, "max_bytes", 0)) && SvOK(*v))
+                max_bytes = (int32_t)SvIV(*v);
+            if ((v = hv_fetchs(opts, "max_wait_ms", 0)) && SvOK(*v))
+                max_wait_ms = (int32_t)SvIV(*v);
+            if ((v = hv_fetchs(opts, "min_bytes", 0)) && SvOK(*v))
+                min_bytes = (int32_t)SvIV(*v);
+        }
 
         int16_t ver = self->api_versions[API_FETCH];
         if (ver < 0) ver = 4;
@@ -3853,8 +3945,8 @@ fetch_multi(EV::Kafka::Conn self, SV *topics_sv, SV *cb, int max_bytes = 1048576
         kf_buf_init(&body);
 
         kf_buf_append_i32(&body, -1);          /* replica_id */
-        kf_buf_append_i32(&body, 500);          /* max_wait_ms */
-        kf_buf_append_i32(&body, 1);            /* min_bytes */
+        kf_buf_append_i32(&body, max_wait_ms);
+        kf_buf_append_i32(&body, min_bytes);
         if (ver >= 3)
             kf_buf_append_i32(&body, max_bytes);
         if (ver >= 4)
@@ -3944,6 +4036,12 @@ produce_batch(EV::Kafka::Conn self, const char *topic, int partition, SV *record
 #endif
 #ifdef HAVE_ZLIB
                 else if (clen == 4 && memcmp(cstr, "gzip", 4) == 0) compression = COMPRESS_GZIP;
+#endif
+#ifdef HAVE_ZSTD
+                else if (clen == 4 && memcmp(cstr, "zstd", 4) == 0) compression = COMPRESS_ZSTD;
+#endif
+#ifdef HAVE_SNAPPY
+                else if (clen == 6 && memcmp(cstr, "snappy", 6) == 0) compression = COMPRESS_SNAPPY;
 #endif
                 else croak("unsupported compression: %.*s", (int)clen, cstr);
             }
@@ -4069,6 +4167,12 @@ produce(EV::Kafka::Conn self, const char *topic, int partition, SV *key_sv, SV *
 #ifdef HAVE_ZLIB
                 else if (clen == 4 && memcmp(cstr, "gzip", 4) == 0) compression = COMPRESS_GZIP;
 #endif
+#ifdef HAVE_ZSTD
+                else if (clen == 4 && memcmp(cstr, "zstd", 4) == 0) compression = COMPRESS_ZSTD;
+#endif
+#ifdef HAVE_SNAPPY
+                else if (clen == 6 && memcmp(cstr, "snappy", 6) == 0) compression = COMPRESS_SNAPPY;
+#endif
                 else croak("unsupported compression: %.*s", (int)clen, cstr);
             }
         } else if (opts_sv && SvROK(opts_sv) && SvTYPE(SvRV(opts_sv)) == SVt_PVCV) {
@@ -4102,8 +4206,20 @@ produce(EV::Kafka::Conn self, const char *topic, int partition, SV *key_sv, SV *
             }
         }
 
+        /* Build a single-element AV and dispatch to the multi encoder so
+         * the compression / CRC framing logic lives in one place. */
         kf_buf_t batch;
-        kf_encode_record_batch(&batch, key, key_len, value, value_len, headers, timestamp, compression);
+        {
+            HV *rec = newHV();
+            if (key)   hv_stores(rec, "key",     newSVpvn(key, key_len));
+            if (value) hv_stores(rec, "value",   newSVpvn(value, value_len));
+            if (headers) hv_stores(rec, "headers", newRV_inc((SV*)headers));
+            AV *records_av = newAV();
+            av_push(records_av, newRV_noinc((SV*)rec));
+            kf_encode_record_batch_multi(aTHX_ &batch, records_av, timestamp,
+                compression, -1, -1, -1, 0);
+            SvREFCNT_dec((SV*)records_av);
+        }
 
         /* Use Produce version — cap at v7 */
         int16_t ver = self->api_versions[API_PRODUCE];
@@ -4764,125 +4880,6 @@ txn_offset_commit(EV::Kafka::Conn self, const char *transactional_id, const char
 
 MODULE = EV::Kafka  PACKAGE = EV::Kafka
 
-EV::Kafka
-_new(char *cls, SV *loop_sv)
-    CODE:
-    {
-        struct ev_loop *loop;
-        ev_kafka_t *self;
-
-        if (SvOK(loop_sv) && sv_derived_from(loop_sv, "EV::Loop"))
-            loop = (struct ev_loop *)SvIV(SvRV(loop_sv));
-        else
-            loop = EV_DEFAULT;
-
-        Newxz(self, 1, ev_kafka_t);
-        self->magic = KF_MAGIC_ALIVE;
-        self->loop = loop;
-
-        ngx_queue_init(&self->brokers);
-        ngx_queue_init(&self->topics);
-        ngx_queue_init(&self->produce_batches);
-        ngx_queue_init(&self->consume_partitions);
-
-        self->client_id = savepv("ev-kafka");
-        self->client_id_len = 8;
-
-        /* Producer defaults */
-        self->linger_ms = 5.0;
-        self->batch_size = 16384;
-        self->acks = -1;
-        self->max_request_size = 1048576;
-
-        /* Consumer defaults */
-        self->fetch_max_bytes = 1048576;
-        self->fetch_min_bytes = 1;
-        self->fetch_max_wait_ms = 500;
-
-        /* Metadata defaults */
-        self->metadata_refresh_interval = 300.0;
-
-        RETVAL = self;
-    }
-    OUTPUT:
-        RETVAL
-
-void
-DESTROY(EV::Kafka self)
-    CODE:
-    {
-        if (self->magic != KF_MAGIC_ALIVE) return;
-        self->magic = KF_MAGIC_FREED;
-
-        /* Clean up broker connections */
-        while (!ngx_queue_empty(&self->brokers)) {
-            ngx_queue_t *q = ngx_queue_head(&self->brokers);
-            ngx_queue_remove(q);
-            ev_kafka_conn_t *conn = ngx_queue_data(q, ev_kafka_conn_t, cluster_queue);
-            conn->cluster = NULL;
-            conn->intentional_disconnect = 1;
-            conn_cleanup(aTHX_ conn);
-            /* Note: conn is owned by its Perl SV, will be freed by Perl GC */
-        }
-
-        /* Clean up topic metadata */
-        while (!ngx_queue_empty(&self->topics)) {
-            ngx_queue_t *q = ngx_queue_head(&self->topics);
-            ngx_queue_remove(q);
-            kf_topic_meta_t *tm = ngx_queue_data(q, kf_topic_meta_t, queue);
-            if (tm->name) Safefree(tm->name);
-            if (tm->partitions) Safefree(tm->partitions);
-            Safefree(tm);
-        }
-
-        if (self->metadata_timing) {
-            ev_timer_stop(self->loop, &self->metadata_timer);
-            self->metadata_timing = 0;
-        }
-        if (self->linger_timing) {
-            ev_timer_stop(self->loop, &self->linger_timer);
-            self->linger_timing = 0;
-        }
-        if (self->fetch_timing) {
-            ev_timer_stop(self->loop, &self->fetch_timer);
-            self->fetch_timing = 0;
-        }
-
-        /* Free bootstrap */
-        if (self->bootstrap_hosts) {
-            int i;
-            for (i = 0; i < self->bootstrap_count; i++)
-                if (self->bootstrap_hosts[i]) Safefree(self->bootstrap_hosts[i]);
-            Safefree(self->bootstrap_hosts);
-        }
-        if (self->bootstrap_ports) Safefree(self->bootstrap_ports);
-
-        /* Free consumer group */
-        if (self->group) {
-            if (self->group->heartbeat_timing)
-                ev_timer_stop(self->loop, &self->group->heartbeat_timer);
-            if (self->group->group_id) Safefree(self->group->group_id);
-            if (self->group->member_id) Safefree(self->group->member_id);
-            CLEAR_HANDLER(self->group->on_assign);
-            CLEAR_HANDLER(self->group->on_revoke);
-            if (self->group->subscriptions) SvREFCNT_dec((SV*)self->group->subscriptions);
-            Safefree(self->group);
-        }
-
-        CLEAR_HANDLER(self->on_error);
-        CLEAR_HANDLER(self->on_connect);
-        CLEAR_HANDLER(self->on_message);
-        CLEAR_HANDLER(self->partitioner);
-
-        if (self->client_id) Safefree(self->client_id);
-        if (self->sasl_mechanism) Safefree(self->sasl_mechanism);
-        if (self->sasl_username) Safefree(self->sasl_username);
-        if (self->sasl_password) Safefree(self->sasl_password);
-        if (self->tls_ca_file) Safefree(self->tls_ca_file);
-
-        Safefree(self);
-    }
-
 int
 _murmur2(SV *data_sv)
     CODE:
@@ -4949,13 +4946,18 @@ _error_name(int code)
             case 15: name = "COORDINATOR_NOT_AVAILABLE"; break;
             case 16: name = "NOT_COORDINATOR"; break;
             case 17: name = "INVALID_TOPIC_EXCEPTION"; break;
+            case 19: name = "NOT_ENOUGH_REPLICAS"; break;
+            case 20: name = "NOT_ENOUGH_REPLICAS_AFTER_APPEND"; break;
             case 22: name = "ILLEGAL_GENERATION"; break;
             case 25: name = "UNKNOWN_MEMBER_ID"; break;
+            case 26: name = "INVALID_SESSION_TIMEOUT"; break;
             case 27: name = "REBALANCE_IN_PROGRESS"; break;
             case 35: name = "UNSUPPORTED_VERSION"; break;
             case 36: name = "TOPIC_ALREADY_EXISTS"; break;
             case 39: name = "REASSIGNMENT_IN_PROGRESS"; break;
             case 41: name = "NOT_CONTROLLER"; break;
+            case 45: name = "OUT_OF_ORDER_SEQUENCE_NUMBER"; break;
+            case 46: name = "DUPLICATE_SEQUENCE_NUMBER"; break;
             case 47: name = "INVALID_REPLICATION_FACTOR"; break;
             case 58: name = "SASL_AUTHENTICATION_FAILED"; break;
             case 72: name = "LISTENER_NOT_FOUND"; break;
@@ -4966,6 +4968,169 @@ _error_name(int code)
         mPUSHp(name, strlen(name));
         XSRETURN(1);
     }
+
+# ---- internal test helpers (not part of the public API) ----
+
+SV*
+_test_zigzag_i32(int v)
+    CODE:
+    {
+        int32_t v32 = (int32_t)v;
+        uint32_t z = (uint32_t)((v32 << 1) ^ (v32 >> 31));
+        RETVAL = newSVuv(z);
+    }
+    OUTPUT:
+        RETVAL
+
+SV*
+_test_zigzag_i64(SV *v_sv)
+    CODE:
+    {
+        int64_t v = (int64_t)SvIV(v_sv);
+        uint64_t z = (uint64_t)((v << 1) ^ (v >> 63));
+        RETVAL = newSVuv(z);
+    }
+    OUTPUT:
+        RETVAL
+
+# Encode then decode a varint; returns the round-tripped i64 or undef on
+# malformed input.
+SV*
+_test_varint_roundtrip(SV *v_sv)
+    CODE:
+    {
+        int64_t v = (int64_t)SvIV(v_sv);
+        kf_buf_t b;
+        kf_buf_init(&b);
+        kf_buf_append_varint(&b, v);
+        int64_t out;
+        int n = kf_read_varint(b.data, b.data + b.len, &out);
+        if (n < 0) RETVAL = &PL_sv_undef;
+        else RETVAL = newSViv((IV)out);
+        kf_buf_free(&b);
+    }
+    OUTPUT:
+        RETVAL
+
+# Encode a single-record RecordBatch v2 with given options.
+# opts: { compression => 0|1|3, producer_id, producer_epoch,
+#         base_sequence, is_transactional, timestamp }.
+SV*
+_test_encode_batch(SV *records_sv, SV *opts_sv = NULL)
+    CODE:
+    {
+        if (!SvROK(records_sv) || SvTYPE(SvRV(records_sv)) != SVt_PVAV)
+            croak("_test_encode_batch: arrayref required");
+        AV *records = (AV*)SvRV(records_sv);
+
+        int compression = 0;
+        int64_t producer_id = -1;
+        int16_t producer_epoch = -1;
+        int32_t base_sequence = -1;
+        int is_txn = 0;
+        int64_t ts = 0;
+        if (opts_sv && SvROK(opts_sv) && SvTYPE(SvRV(opts_sv)) == SVt_PVHV) {
+            HV *opts = (HV*)SvRV(opts_sv);
+            SV **v;
+            if ((v = hv_fetchs(opts, "compression", 0)) && SvOK(*v))
+                compression = (int)SvIV(*v);
+            if ((v = hv_fetchs(opts, "producer_id", 0)) && SvOK(*v))
+                producer_id = (int64_t)SvIV(*v);
+            if ((v = hv_fetchs(opts, "producer_epoch", 0)) && SvOK(*v))
+                producer_epoch = (int16_t)SvIV(*v);
+            if ((v = hv_fetchs(opts, "base_sequence", 0)) && SvOK(*v))
+                base_sequence = (int32_t)SvIV(*v);
+            if ((v = hv_fetchs(opts, "is_transactional", 0)) && SvOK(*v))
+                is_txn = (int)SvIV(*v);
+            if ((v = hv_fetchs(opts, "timestamp", 0)) && SvOK(*v))
+                ts = (int64_t)SvIV(*v);
+        }
+
+        kf_buf_t out;
+        kf_encode_record_batch_multi(aTHX_ &out, records, ts, compression,
+            producer_id, producer_epoch, base_sequence, is_txn);
+        RETVAL = newSVpvn(out.data, out.len);
+        kf_buf_free(&out);
+    }
+    OUTPUT:
+        RETVAL
+
+# Parse a captured response body of a known API. Returns the parsed hash
+# (same shape user callbacks see) or undef if the parser rejected the bytes.
+# api: 'metadata' | 'produce' | 'fetch' | 'list_offsets' | 'find_coordinator'.
+SV*
+_test_parse_response(const char *api, int version, SV *bytes_sv)
+    CODE:
+    {
+        STRLEN len;
+        const char *data = SvPV(bytes_sv, len);
+        ev_kafka_conn_t stub;
+        memset(&stub, 0, sizeof(stub));
+        stub.magic = KF_MAGIC_ALIVE;
+        stub.fd = -1;
+        SV *result = NULL;
+        if (strcmp(api, "metadata") == 0) {
+            result = conn_parse_metadata_response(aTHX_ &stub, (int16_t)version, data, len);
+        } else if (strcmp(api, "produce") == 0) {
+            result = conn_parse_produce_response(aTHX_ &stub, (int16_t)version, data, len);
+        } else if (strcmp(api, "fetch") == 0) {
+            result = conn_parse_fetch_response(aTHX_ &stub, (int16_t)version, data, len);
+        } else if (strcmp(api, "list_offsets") == 0) {
+            result = conn_parse_list_offsets_response(aTHX_ &stub, (int16_t)version, data, len);
+        } else if (strcmp(api, "find_coordinator") == 0) {
+            result = conn_parse_find_coordinator_response(aTHX_ &stub, (int16_t)version, data, len);
+        } else if (strcmp(api, "join_group") == 0) {
+            result = conn_parse_join_group_response(aTHX_ &stub, (int16_t)version, data, len);
+        } else if (strcmp(api, "sync_group") == 0) {
+            result = conn_parse_sync_group_response(aTHX_ &stub, (int16_t)version, data, len);
+        } else if (strcmp(api, "heartbeat") == 0) {
+            result = conn_parse_heartbeat_response(aTHX_ &stub, (int16_t)version, data, len);
+        } else if (strcmp(api, "offset_commit") == 0) {
+            result = conn_parse_offset_commit_response(aTHX_ &stub, (int16_t)version, data, len);
+        } else if (strcmp(api, "offset_fetch") == 0) {
+            result = conn_parse_offset_fetch_response(aTHX_ &stub, (int16_t)version, data, len);
+        } else if (strcmp(api, "leave_group") == 0) {
+            result = conn_parse_leave_group_response(aTHX_ &stub, (int16_t)version, data, len);
+        } else if (strcmp(api, "create_topics") == 0) {
+            result = conn_parse_create_topics_response(aTHX_ &stub, (int16_t)version, data, len);
+        } else if (strcmp(api, "delete_topics") == 0) {
+            result = conn_parse_delete_topics_response(aTHX_ &stub, (int16_t)version, data, len);
+        } else if (strcmp(api, "init_producer_id") == 0) {
+            result = conn_parse_init_producer_id_response(aTHX_ &stub, (int16_t)version, data, len);
+        } else if (strcmp(api, "add_partitions_to_txn") == 0) {
+            result = conn_parse_add_partitions_to_txn_response(aTHX_ &stub, (int16_t)version, data, len);
+        } else if (strcmp(api, "end_txn") == 0) {
+            result = conn_parse_end_txn_response(aTHX_ &stub, (int16_t)version, data, len);
+        } else if (strcmp(api, "txn_offset_commit") == 0) {
+            result = conn_parse_txn_offset_commit_response(aTHX_ &stub, (int16_t)version, data, len);
+        } else {
+            croak("_test_parse_response: unknown api '%s'", api);
+        }
+        RETVAL = result ? SvREFCNT_inc(result) : &PL_sv_undef;
+    }
+    OUTPUT:
+        RETVAL
+
+# Decode a RecordBatch v2 blob. Returns arrayref of {offset, key, value,
+# headers} on success, or undef on malformed input (CRC mismatch, etc.).
+SV*
+_test_decode_batch(SV *bytes_sv)
+    CODE:
+    {
+        STRLEN len;
+        const char *data = SvPV(bytes_sv, len);
+        AV *records_av = newAV();
+        int64_t base_offset;
+        int n = kf_decode_record_batch(aTHX_ data, len, records_av, &base_offset);
+        if (n < 0) {
+            SvREFCNT_dec((SV*)records_av);
+            RETVAL = &PL_sv_undef;
+        } else {
+            RETVAL = newRV_noinc((SV*)records_av);
+        }
+    }
+    OUTPUT:
+        RETVAL
 
 BOOT:
 {

@@ -4,7 +4,7 @@
 #
 # Run: perl examples/log_example.pl
 #
-# Demonstrates all logging features interactively — type commands
+# Demonstrates all logging features interactively - type commands
 # at the prompt to exercise each capability.
 #
 use strict;

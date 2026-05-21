@@ -5,7 +5,7 @@ use warnings;
 use EV;
 
 BEGIN {
-    our $VERSION = '0.01';
+    our $VERSION = '0.02';
     use XSLoader;
     XSLoader::load __PACKAGE__, $VERSION;
 }
@@ -20,9 +20,11 @@ sub new {
     my ($class, %args) = @_;
 
     # Connection URI: clickhouse://user:pass@host:port/database
+    # host accepts a bracketed IPv6 literal (e.g. clickhouse://[::1]:9000/db)
     if (my $uri = delete $args{uri}) {
-        if ($uri =~ m{^clickhouse(?:\+(\w+))?://(?:([^:@]*?)(?::([^@]*))?\@)?([^/:]+)(?::(\d+))?(?:/([^?]*))?(?:\?(.*))?$}) {
+        if ($uri =~ m{^clickhouse(?:\+(\w+))?://(?:([^:@]*?)(?::([^@]*))?\@)?(\[[^\]]+\]|[^/:?]+)(?::(\d+))?(?:/([^?]*))?(?:\?(.*))?$}) {
             my ($proto, $u, $pw, $h, $p, $db, $qs) = ($1, $2, $3, $4, $5, $6, $7);
+            $h =~ s/^\[(.*)\]$/$1/;
             $args{protocol} //= $proto if $proto;
             $args{user}     //= _uri_unescape($u)  if defined $u && $u ne '';
             $args{password} //= _uri_unescape($pw) if defined $pw;
@@ -126,10 +128,11 @@ EV::ClickHouse - Async ClickHouse client using EV
     use EV;
     use EV::ClickHouse;
 
+    # Discrete parameters
     my $ch = EV::ClickHouse->new(
         host       => '127.0.0.1',
-        port       => 8123,
-        protocol   => 'http',       # or 'native'
+        port       => 9000,
+        protocol   => 'native',     # or 'http'
         user       => 'default',
         password   => '',
         database   => 'default',
@@ -138,44 +141,40 @@ EV::ClickHouse - Async ClickHouse client using EV
         on_error   => sub { warn "error: $_[0]\n" },
     );
 
-    # simple query
-    $ch->query("select * from system.one", sub {
+    # Or via URI: clickhouse[+native]://user:pass@host:port/db?key=val
+    my $ch = EV::ClickHouse->new(
+        uri        => 'clickhouse+native://default:@127.0.0.1:9000/default',
+        on_connect => sub { ... },
+    );
+
+    # SELECT
+    $ch->query("SELECT number FROM system.numbers LIMIT 3", sub {
         my ($rows, $err) = @_;
-        if ($err) { warn $err; return }
-        for my $row (@$rows) {
-            print join(", ", @$row), "\n";
-        }
+        die $err if $err;
+        print "row: @$_\n" for @$rows;     # row: 0 / row: 1 / row: 2
     });
 
-    # query with per-query settings
-    $ch->query("select 1", { max_execution_time => 30 }, sub {
-        my ($rows, $err) = @_;
-    });
+    # Per-query settings + parameterized values (no string interpolation)
+    $ch->query(
+        "SELECT {x:UInt32} + {y:UInt32} AS sum",
+        { params => { x => 40, y => 2 }, max_execution_time => 30 },
+        sub { my ($rows, $err) = @_; print $rows->[0][0], "\n" },  # 42
+    );
 
-    # insert data (TSV string)
-    $ch->insert("my_table", "1\tfoo\n2\tbar\n", sub {
-        my (undef, $err) = @_;
-        warn "insert error: $err" if $err;
-    });
-
-    # insert data (arrayref — no escaping needed)
+    # INSERT - arrayref of rows (no TSV escaping needed)
     $ch->insert("my_table", [
-        [1, "foo"],
-        [2, "bar"],
-    ], sub {
-        my (undef, $err) = @_;
-        warn "insert error: $err" if $err;
-    });
+        [1, "hello\tworld"],   # embedded tab is fine
+        [2, undef],            # NULL
+        [3, [10, 20]],         # Array column
+    ], sub { my (undef, $err) = @_; warn "insert: $err" if $err });
 
-    # insert with async_insert
-    $ch->insert("my_table", [[1, "foo"]], { async_insert => 1 }, sub {
-        my (undef, $err) = @_;
-    });
+    # INSERT - pre-formatted TSV string
+    $ch->insert("my_table", "1\tfoo\n2\tbar\n", sub { ... });
 
-    # raw mode — get response body as-is (HTTP only)
-    $ch->query("SELECT * FROM my_table FORMAT CSV", { raw => 1 }, sub {
+    # Raw HTTP response body (HTTP only)
+    $ch->query("SELECT * FROM t FORMAT CSV", { raw => 1 }, sub {
         my ($body, $err) = @_;
-        print $body;  # raw CSV text
+        print $body;
     });
 
     EV::run;
@@ -183,37 +182,47 @@ EV::ClickHouse - Async ClickHouse client using EV
 =head1 DESCRIPTION
 
 EV::ClickHouse is an asynchronous ClickHouse client that integrates with
-the EV event loop. It supports both the HTTP (port 8123) and native TCP
-(port 9000) protocols, implemented directly in XS without external
-ClickHouse client libraries.
+the L<EV> event loop. It speaks both the ClickHouse HTTP protocol
+(port 8123) and the native TCP protocol (port 9000) directly in XS, with
+no external ClickHouse client library linked. zlib is required; OpenSSL
+(for TLS) and liblz4 (for native compression) are optional and detected
+at build time.
 
-Key features:
+=head2 Features
 
 =over 4
 
-=item * HTTP protocol with queued request delivery
+=item * HTTP and native TCP protocols, with the same Perl API
 
-=item * Native TCP protocol with binary column-oriented data
+=item * gzip compression (HTTP) and LZ4 compression with CityHash
+checksums (native)
 
-=item * Gzip compression (HTTP) and LZ4 compression (native)
+=item * TLS/SSL via OpenSSL, with optional C<tls_skip_verify> for
+self-signed certs and C<tls_ca_file> for additional roots
 
-=item * TLS/SSL support via OpenSSL (with skip-verify option)
+=item * Connection URIs (C<clickhouse[+native]://user:pass@host:port/db>),
+including bracketed IPv6 literals
 
-=item * TabSeparated format parsing
+=item * Per-query and connection-level ClickHouse settings; parameterized
+queries via C<params>
 
-=item * INSERT with data support
+=item * Auto-reconnect with exponential backoff; queued (unsent) queries
+are preserved across reconnects
 
-=item * Session management (HTTP)
+=item * Keepalive pings for idle native connections; graceful drain;
+query cancellation and skip_pending
 
-=item * Query/connect timeouts and auto-reconnect
+=item * Streaming results via C<on_data> per-block callback (native);
+on_progress for native progress packets
 
-=item * Query cancellation
+=item * Raw HTTP response mode for CSV / JSONEachRow / Parquet / etc.
 
-=item * Streaming results via on_data callback
+=item * 30+ ClickHouse types including Decimal128, UUID, IPv4/IPv6,
+Nullable, Array, Tuple, Map, LowCardinality (with cross-block dictionaries),
+SimpleAggregateFunction, Nested
 
-=item * Opt-in decode of Date/DateTime, Decimal, Enum columns
-
-=item * Named rows (hashref) mode
+=item * Opt-in decode of Date/DateTime, Decimal, and Enum columns; named-rows
+(hashref) mode
 
 =back
 
@@ -223,20 +232,35 @@ Key features:
 
     my $ch = EV::ClickHouse->new(%args);
 
+The connection is initiated immediately; C<new> returns before it
+completes. Queries issued before C<on_connect> fires are queued and
+dispatched once the connection is ready.
+
 B<Connection parameters:>
 
 =over 4
+
+=item uri => $uri_string
+
+Single-string connection target:
+C<clickhouse[+native]://user:pass@host:port/database?key=value>.
+
+The C<+native> suffix selects the native protocol; otherwise HTTP is used.
+Hostnames, IPv4 addresses, and bracketed IPv6 literals are all accepted
+(e.g. C<clickhouse://[::1]:9000/db>). Query-string values are merged into
+the constructor arguments. Discrete C<host>, C<port>, etc. arguments
+override the URI.
 
 =item host => $hostname
 
 Server hostname. Default: C<127.0.0.1>.
 
-B<Note:> DNS resolution is currently blocking. For fully asynchronous behavior,
-use an IP address or a local caching resolver.
+B<Note:> DNS resolution is currently blocking. For fully asynchronous
+behaviour, use an IP literal or a local caching resolver.
 
 =item port => $port
 
-Server port. Default: C<8123> for HTTP, C<9000> for native.
+Server port. Default: C<8123> (HTTP), C<9000> (native).
 
 =item protocol => 'http' | 'native'
 
@@ -252,21 +276,27 @@ Password. Default: empty.
 
 =item database => $dbname
 
-Default database. Default: C<default>. Also accepts C<db>.
+Default database. Default: C<default>. The shorter alias C<db> is also
+accepted.
 
 =item tls => 0 | 1
 
-Enable TLS. Default: C<0>.
+Enable TLS. Default: C<0>. Requires the module to be built with OpenSSL
+(otherwise the constructor croaks).
 
 =item tls_ca_file => $path
 
-Path to a CA certificate file for TLS verification. If provided, it will be
-used in addition to system default CA paths.
+Additional CA certificate file for TLS verification, used alongside the
+system trust store.
 
 =item tls_skip_verify => 0 | 1
 
-Skip TLS certificate verification. Default: C<0>.
-Useful for self-signed certificates in development.
+Skip TLS certificate verification. Default: C<0>. Useful in development
+with self-signed certs; do not use in production.
+
+=item loop => $ev_loop
+
+EV event loop object. Default: C<EV::default_loop>.
 
 =back
 
@@ -276,11 +306,20 @@ B<Callbacks:>
 
 =item on_connect => sub { }
 
-Called when the connection is established.
+Called once the connection is fully established (after the native
+ServerHello, or after the TCP/TLS handshake for HTTP).
 
 =item on_error => sub { my ($message) = @_ }
 
-Called on connection-level errors. Default: C<sub { die @_ }>.
+Called on connection-level errors (DNS failure, socket error, TLS failure,
+read/write errors, etc.). Default: C<sub { die @_ }>. Per-query errors
+are delivered to the query's own callback as the second argument; they
+do not invoke C<on_error>.
+
+When a connection drops mid-flight, C<on_error> fires first with the
+underlying cause, and C<on_disconnect> fires immediately after as the
+state machine tears the socket down. If C<auto_reconnect> is set, the
+reconnect attempt happens after C<on_disconnect> returns.
 
 =item on_progress => sub { my ($rows, $bytes, $total_rows, $written_rows, $written_bytes) = @_ }
 
@@ -288,13 +327,14 @@ Called on native protocol progress packets. Not fired for HTTP.
 
 =item on_disconnect => sub { }
 
-Called when the connection is closed (either by C<finish()>, server disconnect,
-or error). Useful for reconnect logic or cleanup.
+Called when the connection is closed (by C<finish>, server disconnect, or
+error). Fires after internal state has been reset, so it is safe to queue
+new queries or call C<reset> from inside the handler.
 
 =item on_trace => sub { my ($message) = @_ }
 
-Debug trace callback. Called with internal state machine messages
-(e.g. query dispatch). Useful for debugging protocol issues.
+Debug trace callback. Called with internal state-machine messages
+(connect, dispatch, disconnect). Useful for diagnosing protocol issues.
 
 =back
 
@@ -304,83 +344,89 @@ B<Options:>
 
 =item compress => 0 | 1
 
-Enable compression. Default: C<0>.
+Enable compression: gzip on HTTP (request and response), LZ4 with CityHash
+checksums on the native protocol. Default: C<0>. Native compression
+requires liblz4 at build time.
 
 =item session_id => $id
 
-HTTP session ID for stateful operations.
+HTTP session id for stateful operations (temporary tables, SET, etc.).
+Native protocol has stateful sessions intrinsically; this option is HTTP-only.
 
 =item connect_timeout => $seconds
 
-Connection timeout in seconds.
+TCP/TLS connection timeout. C<0> (default) means no timeout. Floating
+point allowed.
 
 =item query_timeout => $seconds
 
-Default query timeout applied to all queries. Can be overridden per-query
-via the C<query_timeout> key in the settings hashref.
+Default per-query timeout applied to every query and insert. The query
+callback receives a C<timeout> error if exceeded. Override per-call via
+the C<query_timeout> key in the settings hashref.
 
 =item auto_reconnect => 0 | 1
 
-Automatically reconnect on connection loss. Default: C<0>.
-When enabled, queued (unsent) queries are preserved across reconnects;
-in-flight queries receive an error callback.
+Reconnect automatically on connection loss. Default: C<0>. When enabled,
+queued (unsent) queries are preserved across reconnects; in-flight queries
+receive an error.
 
 =item settings => \%hash
 
-Connection-level ClickHouse settings applied to every query and insert.
-Per-query settings (see L</query>, L</insert>) override these defaults.
+ClickHouse settings applied to every query and insert. Per-call settings
+(see L</query>, L</insert>) override these.
 
     settings => { async_insert => 1, max_threads => 4 }
 
 =item keepalive => $seconds
 
-Send periodic native protocol ping packets to keep the connection alive
-during idle periods. Set to C<0> (default) to disable. Only effective
-with the native protocol.
+Send a native protocol PING every N seconds while the connection is idle.
+Default: C<0> (disabled). Native protocol only.
 
 =item reconnect_delay => $seconds
 
-Initial delay for reconnect backoff when C<auto_reconnect> is enabled.
-The delay doubles after each failed attempt, up to C<reconnect_max_delay>.
-Set to C<0> (default) for immediate reconnect (no backoff).
+Initial delay for the C<auto_reconnect> exponential backoff. Each failed
+attempt doubles the delay, capped at C<reconnect_max_delay>. Default:
+C<0> (immediate retry, no backoff).
 
 =item reconnect_max_delay => $seconds
 
-Maximum reconnect delay. Default: C<0> (no cap).
+Backoff ceiling. Default: C<0>, meaning no explicit cap; the implementation
+still bounds the backoff exponent at 20 doublings, so with
+C<reconnect_delay = 0.5> the worst case is roughly 6 days. Setting an
+explicit ceiling is recommended in production.
 
 =back
 
 B<Decode options (native protocol only):>
 
-These options control how column values are formatted when returned from
-the native protocol. All are opt-in and default to C<0> (returning raw
-numeric values for backward compatibility).
+These shape how column values are returned. All are opt-in and default
+to C<0>, which returns raw numeric forms for stable round-tripping.
 
 =over 4
 
 =item decode_datetime => 0 | 1
 
-Return C<Date>, C<Date32>, C<DateTime>, and C<DateTime64> columns as
-formatted strings (e.g. C<"2024-01-15">, C<"2024-01-15 10:30:00">) instead
-of raw integer values. Uses UTC by default; if the column has an explicit
-timezone (e.g. C<DateTime('America/New_York')>), values are converted to
-that timezone.
+Return C<Date>, C<Date32>, C<DateTime>, and C<DateTime64> as formatted
+strings (e.g. C<"2024-01-15">, C<"2024-01-15 10:30:00">) instead of raw
+integers. Uses UTC; columns with an explicit timezone
+(C<DateTime('America/New_York')>) are converted to that zone.
 
 =item decode_decimal => 0 | 1
 
-Return C<Decimal32>/C<Decimal64>/C<Decimal128> columns as scaled
-floating-point numbers instead of unscaled integers.
+Return C<Decimal32>/C<Decimal64>/C<Decimal128> as scaled floating-point
+numbers instead of unscaled integers. Note: at large precisions, double
+loses bits, so leave disabled if you need exact arithmetic.
 
 =item decode_enum => 0 | 1
 
-Return C<Enum8>/C<Enum16> columns as string labels instead of numeric codes.
+Return C<Enum8>/C<Enum16> as string labels instead of numeric codes.
 
 =item named_rows => 0 | 1
 
-Return each row as a hashref (keyed by column name) instead of an arrayref.
+Return each row as a hashref keyed by column name instead of an arrayref.
 
     my $ch = EV::ClickHouse->new(named_rows => 1, ...);
-    $ch->query("SELECT 1 as n", sub {
+    $ch->query("SELECT 1 AS n", sub {
         my ($rows, $err) = @_;
         print $rows->[0]{n};  # 1
     });
@@ -394,136 +440,178 @@ Return each row as a hashref (keyed by column name) instead of an arrayref.
     $ch->query($sql, sub { my ($rows, $err) = @_ });
     $ch->query($sql, \%settings, sub { my ($rows, $err) = @_ });
 
-Executes a SQL query. For SELECT: callback receives C<($arrayref_of_arrayrefs)>.
-For DDL/DML: callback receives C<(undef)> on success.
-On error: C<(undef, $error_message)>.
-
-The optional C<\%settings> hashref passes per-query ClickHouse settings
-(e.g. C<max_execution_time>, C<max_threads>). These override any
-connection-level defaults. Special keys (not sent to the server):
+Executes a SQL statement. The callback receives:
 
 =over 4
 
-=item C<query_id> — sets the query identifier (protocol-level field)
+=item * C<($arrayref_of_arrayrefs)> for SELECT with at least one row
 
-=item C<raw> — HTTP only. When true, the callback receives the raw response
-body as a scalar string instead of parsed rows. Use this with an explicit
-C<FORMAT> clause (CSV, JSONEachRow, Parquet, etc.):
+=item * C<(undef)> for DDL/DML on success and for SELECT with zero rows
+on the native protocol (HTTP returns an empty arrayref). When in doubt,
+treat C<undef> and C<[]> equivalently with C<my @rows = @{$rows // []};>.
+
+=item * C<(undef, $error_message)> on error (server exception or
+connection error)
+
+=back
+
+The optional C<\%settings> hashref passes per-query ClickHouse settings
+(C<max_execution_time>, C<max_threads>, C<async_insert>, etc.), overriding
+connection-level defaults.
+
+The following keys are intercepted by the client and not sent verbatim
+to the server:
+
+=over 4
+
+=item C<params => \%hash>
+
+Parameterized values for C<{name:Type}> placeholders in the SQL. Encoding
+and quoting is the server's job, so values do not need escaping:
+
+    $ch->query(
+        "SELECT * FROM t WHERE id = {id:UInt64} AND name = {n:String}",
+        { params => { id => 42, n => "O'Brien" } },
+        sub { ... },
+    );
+
+Works on both protocols (HTTP uses URL-encoded C<param_*> query string;
+native uses dedicated wire fields).
+
+=item C<query_id => $string>
+
+Set the protocol-level query identifier. Retrievable later via
+L</last_query_id>.
+
+=item C<raw => 1>
+
+HTTP only. The callback receives the raw response body as a scalar string
+instead of parsed rows. Use with an explicit C<FORMAT> clause:
 
     $ch->query("SELECT * FROM t FORMAT CSV", { raw => 1 }, sub {
         my ($body, $err) = @_;
-        # $body is the raw CSV text
     });
 
-Not supported with the native protocol (croaks).
+Croaks if used with the native protocol.
 
-=item C<query_timeout> — per-query timeout in seconds, overriding the
-connection-level C<query_timeout>.
+=item C<query_timeout => $seconds>
 
-=item C<on_data> — native protocol only. A code ref called for each data
-block as it arrives. Enables streaming: rows are delivered incrementally
-and not accumulated.
+Per-query timeout, overriding the connection-level C<query_timeout>.
+
+=item C<on_data => sub { my ($rows) = @_; ... }>
+
+Native protocol only. A code ref called for each data block as it arrives,
+for streaming large result sets. Rows are delivered incrementally and
+B<not> accumulated, so the final callback receives C<(undef)> rather than
+all rows. The final callback always fires on completion or error, even if
+no data block was emitted (empty result, server-side error before the
+first block).
 
     $ch->query("SELECT * FROM big_table",
         { on_data => sub { my ($rows) = @_; process_batch($rows) } },
-        sub { my (undef, $err) = @_; ... }  # final callback
+        sub { my (undef, $err) = @_; warn $err if $err },
     );
 
 =back
 
-B<Native protocol type notes:> With the native protocol, column values
-are returned as typed Perl scalars by default. C<Date> and C<DateTime>
-columns return integer values (days since epoch and Unix timestamps);
-enable C<decode_datetime> for formatted strings. C<Enum> columns return
-numeric codes; enable C<decode_enum> for string labels. C<Decimal>
-columns return unscaled integers; enable C<decode_decimal> for scaled
-floats. C<SimpleAggregateFunction> columns are transparently decoded as
-their inner type. C<Nested> columns are decoded as arrays of tuples.
-C<LowCardinality> columns work across multi-block results with shared
-dictionaries.
+B<Native protocol type notes:> values come back as typed Perl scalars.
+By default C<Date>/C<DateTime> are integers (days since epoch / Unix
+timestamps); enable C<decode_datetime> for strings. C<Enum> values are
+numeric codes; C<decode_enum> returns labels. C<Decimal> values are
+unscaled integers; C<decode_decimal> scales them to floats.
+C<SimpleAggregateFunction> is transparently decoded as its inner type.
+C<Nested> columns become arrays of tuples. C<LowCardinality> works
+correctly across multi-block results with shared dictionaries.
 
 =head2 insert
 
     $ch->insert($table, $data, sub { my (undef, $err) = @_ });
     $ch->insert($table, $data, \%settings, sub { my (undef, $err) = @_ });
 
-C<$data> can be either:
+C<$data> may be either:
 
 =over 4
 
-=item * A string in TabSeparated format (tab-separated columns, newline-separated rows)
+=item * A pre-formatted TabSeparated string (tabs separate columns,
+newlines separate rows, with the standard ClickHouse escapes).
 
-=item * An arrayref of arrayrefs: C<[ [$col1, $col2, ...], ... ]>
+=item * An arrayref of arrayrefs (rows of column values).
 
 =back
 
-When using arrayrefs, values are encoded directly without TSV escaping:
-C<undef> maps to NULL, strings may contain tabs and newlines freely,
-arrayrefs encode Array/Tuple columns, and hashrefs encode Map columns.
+When using arrayrefs, no TSV escaping is needed: C<undef> maps to NULL
+and strings may contain tabs and newlines freely.
 
-    # TSV string (existing)
-    $ch->insert("my_table", "1\thello\n2\tworld\n", sub { ... });
+Nested arrayrefs (Array/Tuple columns) and hashrefs (Map columns) are
+supported B<only on the native protocol>, where the encoder has the
+column type from the server's sample block. On HTTP the same call
+croaks rather than silently produce malformed TSV; use the native
+protocol or pre-serialise nested types into ClickHouse TSV literal form.
 
-    # Arrayref (new) — no escaping needed
+    # Native: nested types encode directly.
     $ch->insert("my_table", [
-        [1, "hello\tworld"],      # embedded tab
-        [2, undef],               # NULL
-        [3, [10, 20]],            # Array column
+        [1, "hello\tworld"],   # embedded tab
+        [2, undef],            # NULL
+        [3, [10, 20]],         # Array column   (native only)
+        [4, { a => 1, b => 2 }],  # Map column  (native only)
     ], sub { ... });
 
-The optional C<\%settings> hashref works the same as in L</query>.
+The optional C<\%settings> hashref works exactly as in L</query>,
+including C<query_id>, C<query_timeout>, and C<params>.
 
 =head2 ping
 
     $ch->ping(sub { my ($result, $err) = @_ });
 
-Checks if the connection is alive. On success C<$result> is a true value
-and C<$err> is undef.  On error: C<(undef, $error_message)>.
+Send a no-op round trip to verify the connection is alive. On success
+C<$result> is true, C<$err> is C<undef>. On error: C<(undef, $error)>.
 
 =head2 finish
 
     $ch->finish;
 
-Disconnects. Cancels pending operations.
+Close the connection. Pending queries receive an error callback. Aliased
+as C<disconnect>.
 
 =head2 reset
 
     $ch->reset;
 
-Disconnects and reconnects using original parameters.
+Disconnect and immediately reconnect using the original parameters.
+Aliased as C<reconnect>.
 
 =head2 drain
 
     $ch->drain(sub { ... });
 
-Registers a callback to be invoked when all pending queries have completed.
-If no queries are pending, the callback fires immediately (synchronously).
-Useful for graceful shutdown: queue your final queries, then call C<drain>
-with a callback that calls C<finish>.
+Register a callback to fire once all pending queries (queued + in-flight)
+have completed. If nothing is pending, the callback fires synchronously.
+The classic graceful-shutdown pattern:
 
     $ch->query("SELECT 1", sub { ... });
     $ch->query("SELECT 2", sub { ... });
     $ch->drain(sub {
-        print "all done\n";
         $ch->finish;
+        EV::break;
     });
 
 =head2 cancel
 
     $ch->cancel;
 
-Cancels the currently running query. For the native protocol, sends a
-CLIENT_CANCEL packet. For HTTP, closes the connection. Pending callbacks
-receive an error.
+Cancel the currently in-flight query. Native protocol sends CLIENT_CANCEL
+and waits for the server's EndOfStream/Exception; HTTP closes the connection
+(use C<auto_reconnect> or call L</reset> to recover). The query's callback
+receives an error.
 
 =head2 skip_pending
 
     $ch->skip_pending;
 
-Cancels all pending operations. Each pending callback is invoked
-with C<(undef, $error_message)>. If a request is currently in flight,
-the connection is closed (subsequent queries require reconnection
-via C<reset>).
+Drop every pending operation: each queued and in-flight callback is invoked
+with C<(undef, $error_message)>. If a request was on the wire, the connection
+is torn down; call L</reset> (or rely on C<auto_reconnect>) before issuing
+new queries.
 
 =head1 ACCESSORS
 
@@ -531,78 +619,74 @@ via C<reset>).
 
 =item is_connected
 
-Returns true if the connection is established.
+True if the connection is established.
 
 =item pending_count
 
-Number of pending (queued + in-flight) operations.
+Number of pending operations (queued + in-flight).
 
 =item server_info
 
-Full server identification string (e.g. C<"ClickHouse 24.1.0 (revision 54429)">).
-Only available with the native protocol (populated from ServerHello).
-Returns C<undef> for HTTP connections.
+Full server identification string (e.g. C<"ClickHouse 24.1.0 (revision 54459)">),
+populated from the native ServerHello. C<undef> for HTTP connections.
 
 =item server_version
 
-Server version string (e.g. C<"24.1.0">). Only available with the native
-protocol. Returns C<undef> for HTTP connections.
+Server version (e.g. C<"24.1.0">). Native only; C<undef> for HTTP.
 
 =item server_timezone
 
-Server timezone string (e.g. C<"UTC">, C<"Europe/Moscow">). Only available
-with the native protocol. Returns C<undef> for HTTP connections.
+Server timezone (e.g. C<"UTC">, C<"Europe/Moscow">). Native only; C<undef>
+for HTTP.
 
 =item column_names
 
-Returns an arrayref of column names from the last native protocol query
-result, or C<undef> if no query has been executed yet.
+Arrayref of column names from the most recent native query result, or
+C<undef> if no query has run.
 
-    $ch->query("SELECT 1 as foo, 2 as bar", sub {
+    $ch->query("SELECT 1 AS foo, 2 AS bar", sub {
         my $names = $ch->column_names;  # ['foo', 'bar']
     });
 
 =item column_types
 
-Returns an arrayref of ClickHouse type strings from the last native protocol
-query result (e.g. C<['UInt32', 'String', 'Nullable(DateTime)']>), or
-C<undef> if no query has been executed yet.
+Arrayref of ClickHouse type strings from the most recent native query
+(e.g. C<['UInt32', 'String', 'Nullable(DateTime)']>).
 
 =item last_query_id
 
-Returns the query_id of the last dispatched query, or C<undef> if none.
-Set via C<< { query_id => 'my-id' } >> in the settings hash of C<query>
-or C<insert>.
+C<query_id> of the most recently dispatched query, or C<undef>. Set via
+C<< { query_id => 'my-id' } >> in the settings hash of L</query>/L</insert>.
 
 =item last_error_code
 
-Returns the ClickHouse error code (integer) from the last server error,
-or C<0> if no error. Useful for distinguishing retryable errors (e.g.
-C<202> = C<TOO_MANY_SIMULTANEOUS_QUERIES>) from permanent ones (e.g.
-C<60> = C<UNKNOWN_TABLE>).
+ClickHouse error code (integer) of the most recent server-side exception,
+or C<0> if no error. The B<top-level> code is reported even when the
+exception is a chain. Useful for distinguishing retryable errors (e.g.
+C<202> = C<TOO_MANY_SIMULTANEOUS_QUERIES>) from permanent ones (C<60> =
+C<UNKNOWN_TABLE>, C<516> = C<AUTHENTICATION_FAILED>).
 
 =item last_totals
 
-Returns an arrayref of totals rows from the last native protocol query
-that used C<WITH TOTALS>, or C<undef> if none.
+Arrayref of totals rows from the last query that used C<WITH TOTALS>,
+or C<undef>. Native only.
 
 =item last_extremes
 
-Returns an arrayref of extremes rows from the last native protocol query,
-or C<undef> if none.
+Arrayref of extremes rows from the last native query, or C<undef>.
 
 =item profile_rows_before_limit
 
-Number of rows that would have been returned without C<LIMIT>, from the
-last query's profile info. Useful for pagination.
+Rows that would have been returned without C<LIMIT>. Useful for pagination
+UIs. Native only.
 
 =item profile_rows
 
-Total rows processed by the last query.
+Total rows processed by the last query (native ProfileInfo).
 
 =item profile_bytes
 
-Total bytes processed by the last query.
+Total bytes processed by the last query (native ProfileInfo).
 
 =back
 
@@ -612,9 +696,25 @@ Total bytes processed by the last query.
     reconnect  -> reset
     disconnect -> finish
 
+=head1 REQUIREMENTS
+
+=over 4
+
+=item * Perl 5.12 or newer
+
+=item * L<EV> 4.11 or newer (event loop)
+
+=item * zlib (required)
+
+=item * OpenSSL (optional, for TLS; auto-detected at build time)
+
+=item * liblz4 (optional, for native protocol compression; auto-detected)
+
+=back
+
 =head1 SEE ALSO
 
-L<EV>, L<EV::Pg>, L<EV::MariaDB>
+L<EV>, L<https://clickhouse.com/docs>
 
 =head1 AUTHOR
 

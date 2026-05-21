@@ -176,6 +176,7 @@ struct ev_clickhouse_s {
     ev_timer ka_timer;      /* keepalive timer */
     double keepalive;       /* keepalive interval (0 = disabled) */
     int ka_timing;
+    unsigned int ka_in_flight; /* keepalive pings sent but not yet ack'd */
     int callback_depth;
     /* error info from last SERVER_EXCEPTION or HTTP error */
     int32_t last_error_code;
@@ -255,6 +256,9 @@ static ev_ch_cb_t* alloc_cbt(void) {
     } else {
         Newx(cbt, 1, ev_ch_cb_t);
     }
+    /* Fully initialise so callers can never observe a stale field from a
+     * previous user of this freelist node. */
+    cbt->cb = NULL;
     cbt->raw = 0;
     cbt->on_data = NULL;
     cbt->query_timeout = 0;
@@ -278,6 +282,11 @@ static ev_ch_send_t* alloc_send(void) {
     } else {
         Newx(s, 1, ev_ch_send_t);
     }
+    /* Fully initialise so callers can never observe a stale field from a
+     * previous user of this freelist node. */
+    s->data = NULL;
+    s->data_len = 0;
+    s->cb = NULL;
     s->insert_data = NULL;
     s->insert_data_len = 0;
     s->insert_av = NULL;
@@ -335,20 +344,61 @@ static int check_destroyed(ev_clickhouse_t *self) {
 static void emit_error(ev_clickhouse_t *self, const char *msg) {
     if (NULL == self->on_error) return;
 
-    dSP;
-    ENTER;
-    SAVETMPS;
-    PUSHMARK(SP);
-    XPUSHs(sv_2mortal(newSVpv(msg, 0)));
-    PUTBACK;
+    /* Self-guard callback_depth so on_error handlers may drop the last
+     * reference to the connection without freeing self while we're still
+     * running. Caller must still invoke check_destroyed() afterwards to
+     * pick up a deferred Safefree. */
+    self->callback_depth++;
+    {
+        dSP;
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        XPUSHs(sv_2mortal(newSVpv(msg, 0)));
+        PUTBACK;
 
-    call_sv(self->on_error, G_DISCARD | G_EVAL);
-    if (SvTRUE(ERRSV)) {
-        warn("EV::ClickHouse: exception in error handler: %s", SvPV_nolen(ERRSV));
+        call_sv(self->on_error, G_DISCARD | G_EVAL);
+        if (SvTRUE(ERRSV)) {
+            warn("EV::ClickHouse: exception in error handler: %s", SvPV_nolen(ERRSV));
+        }
+
+        FREETMPS;
+        LEAVE;
     }
+    self->callback_depth--;
+}
 
-    FREETMPS;
-    LEAVE;
+/* emit_error + cancel_pending + cleanup_connection. Returns 1 if self was
+ * freed (caller must not access self after). Caller should return regardless
+ * of the result — the connection is gone. */
+static int fail_connection(ev_clickhouse_t *self, const char *msg) {
+    emit_error(self, msg);
+    if (check_destroyed(self)) return 1;
+    if (cancel_pending(self, msg)) return 1;
+    cleanup_connection(self);
+    return 0;
+}
+
+/* Invoke a zero-argument callback (on_connect, on_disconnect, on_drain).
+ * Self-guards callback_depth and consumes ERRSV; caller decides whether to
+ * SvREFCNT_dec the captured cb. Returns 1 if self was freed. */
+static int fire_zero_arg_cb(ev_clickhouse_t *self, SV *cb, const char *what) {
+    self->callback_depth++;
+    {
+        dSP;
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        PUTBACK;
+        call_sv(cb, G_DISCARD | G_EVAL);
+        if (SvTRUE(ERRSV))
+            warn("EV::ClickHouse: exception in %s handler: %s",
+                 what, SvPV_nolen(ERRSV));
+        FREETMPS;
+        LEAVE;
+    }
+    self->callback_depth--;
+    return check_destroyed(self);
 }
 
 static void emit_trace(ev_clickhouse_t *self, const char *fmt, ...) {
@@ -359,6 +409,14 @@ static void emit_trace(ev_clickhouse_t *self, const char *fmt, ...) {
     vsnprintf(buf, sizeof(buf), fmt, ap);
     va_end(ap);
 
+    /* Self-guard callback_depth so on_trace may drop the last reference to
+     * the connection without freeing self mid-call. We deliberately do NOT
+     * call check_destroyed here: most callers (cleanup_connection, start_connect,
+     * pipeline_advance) continue to access self after emit_trace returns, so
+     * an immediate Safefree would UAF. The struct is in EV_CH_FREED state
+     * after such a callback and the next outer check_destroyed picks it up;
+     * worst case is a tiny leak when on_trace destroys the connection. */
+    self->callback_depth++;
     {
         dSP;
         ENTER;
@@ -372,6 +430,7 @@ static void emit_trace(ev_clickhouse_t *self, const char *fmt, ...) {
         FREETMPS;
         LEAVE;
     }
+    self->callback_depth--;
 }
 
 static SV* pop_cb(ev_clickhouse_t *self) {
@@ -527,10 +586,35 @@ static char* safe_strdup(const char *s) {
 }
 
 static int has_http_unsafe_chars(const char *s) {
+    /* The XS layer hands us a NUL-terminated C string, so embedded NULs
+     * have already been truncated; we only need to reject CR/LF here. */
     if (!s) return 0;
     for (; *s; s++)
         if (*s == '\r' || *s == '\n') return 1;
     return 0;
+}
+
+/* Common cleanup idioms for fields owned by the connection. */
+#define CLEAR_STR(p) do { if (p) { Safefree(p); (p) = NULL; } } while (0)
+#define CLEAR_SV(p)  do { if (p) { SvREFCNT_dec((SV*)(p)); (p) = NULL; } } while (0)
+
+/* Drop the first `n` bytes from recv_buf, shifting any remaining bytes left. */
+static inline void recv_consume(struct ev_clickhouse_s *self, size_t n) {
+    if (n < self->recv_len)
+        memmove(self->recv_buf, self->recv_buf + n, self->recv_len - n);
+    self->recv_len -= n;
+}
+
+/* Forward decl: defined further down with the other buffer helpers. */
+static void ensure_send_cap(struct ev_clickhouse_s *self, size_t need);
+
+/* Replace send_buf content with `src` (heap-allocated, freed here). */
+static inline void send_replace(struct ev_clickhouse_s *self, char *src, size_t len) {
+    ensure_send_cap(self, len);
+    Copy(src, self->send_buf, len, char);
+    self->send_len = len;
+    self->send_pos = 0;
+    Safefree(src);
 }
 
 static int is_ip_literal(const char *s) {
@@ -571,64 +655,27 @@ static void cleanup_connection(ev_clickhouse_t *self) {
 
     self->connected = 0;
     self->connecting = 0;
-
-    /* fire on_disconnect if we were connected */
-    if (was_connected && NULL != self->on_disconnect) {
-        self->callback_depth++;
-        {
-            dSP;
-            ENTER;
-            SAVETMPS;
-            PUSHMARK(SP);
-            PUTBACK;
-            call_sv(self->on_disconnect, G_DISCARD | G_EVAL);
-            if (SvTRUE(ERRSV))
-                warn("EV::ClickHouse: exception in disconnect handler: %s",
-                     SvPV_nolen(ERRSV));
-            FREETMPS;
-            LEAVE;
-        }
-        self->callback_depth--;
-    }
     self->send_len = 0;
     self->send_pos = 0;
     self->recv_len = 0;
     self->send_count = 0;
+    self->ka_in_flight = 0;
     self->native_state = NATIVE_IDLE;
-    if (self->native_rows) {
-        SvREFCNT_dec((SV*)self->native_rows);
-        self->native_rows = NULL;
-    }
-    if (self->native_col_names) {
-        SvREFCNT_dec((SV*)self->native_col_names);
-        self->native_col_names = NULL;
-    }
-    if (self->native_col_types) {
-        SvREFCNT_dec((SV*)self->native_col_types);
-        self->native_col_types = NULL;
-    }
-    if (self->native_totals) {
-        SvREFCNT_dec((SV*)self->native_totals);
-        self->native_totals = NULL;
-    }
-    if (self->native_extremes) {
-        SvREFCNT_dec((SV*)self->native_extremes);
-        self->native_extremes = NULL;
-    }
+    CLEAR_SV(self->native_rows);
+    CLEAR_SV(self->native_col_names);
+    CLEAR_SV(self->native_col_types);
+    CLEAR_SV(self->native_totals);
+    CLEAR_SV(self->native_extremes);
     lc_free_dicts(self);
-    if (self->insert_data) {
-        Safefree(self->insert_data);
-        self->insert_data = NULL;
-        self->insert_data_len = 0;
-    }
-    if (self->insert_av) {
-        SvREFCNT_dec(self->insert_av);
-        self->insert_av = NULL;
-    }
-    if (self->insert_err) {
-        Safefree(self->insert_err);
-        self->insert_err = NULL;
-    }
+    CLEAR_STR(self->insert_data);
+    self->insert_data_len = 0;
+    CLEAR_SV(self->insert_av);
+    CLEAR_STR(self->insert_err);
+
+    /* Fire on_disconnect AFTER state is reset, so a handler that queues
+     * new queries or calls reconnect sees clean state. */
+    if (was_connected && NULL != self->on_disconnect)
+        (void)fire_zero_arg_cb(self, self->on_disconnect, "disconnect");
 }
 
 /* Returns 1 if self was freed. */
@@ -1279,6 +1326,47 @@ static char* ch_lz4_compress(const char *data, size_t data_len, size_t *out_len)
     return out;
 }
 
+/* Decompress one or more consecutive LZ4 sub-blocks starting at buf[*pos].
+ * Advances *pos past every consumed sub-block; *out_len is total decompressed
+ * size. Returns malloc'd buffer (caller Safefrees) on success, NULL on
+ * not-enough-data (sets *need_more=1) or on hard error (sets *err). */
+static char* ch_lz4_decompress_chain(const char *buf, size_t len, size_t *pos,
+                                      size_t *out_len, int *need_more,
+                                      const char **err) {
+    size_t comp_consumed;
+    char *out;
+
+    *need_more = 0;
+    *err = NULL;
+
+    out = ch_lz4_decompress(buf + *pos, len - *pos, out_len,
+                            &comp_consumed, need_more, err);
+    if (!out) return NULL;
+    *pos += comp_consumed;
+
+    while (len - *pos >= CH_CHECKSUM_SIZE + CH_COMPRESS_HEADER_SIZE
+           && (uint8_t)buf[*pos + CH_CHECKSUM_SIZE] == CH_LZ4_METHOD) {
+        size_t extra_len, extra_consumed;
+        int extra_need_more = 0;
+        const char *extra_err = NULL;
+        char *extra = ch_lz4_decompress(buf + *pos, len - *pos, &extra_len,
+                                         &extra_consumed,
+                                         &extra_need_more, &extra_err);
+        if (!extra) {
+            Safefree(out);
+            if (extra_need_more) { *need_more = 1; return NULL; }
+            *err = extra_err;
+            return NULL;
+        }
+        Renew(out, *out_len + extra_len, char);
+        Copy(extra, out + *out_len, extra_len, char);
+        *out_len += extra_len;
+        *pos += extra_consumed;
+        Safefree(extra);
+    }
+    return out;
+}
+
 #endif /* HAVE_LZ4 */
 
 /* --- Days-since-epoch calculation for Date encoding --- */
@@ -1856,10 +1944,7 @@ static void process_http_response(ev_clickhouse_t *self) {
                 } else {
                     if (decoded) Safefree(decoded);
                     size_t consumed = cp - self->recv_buf;
-                    if (consumed < self->recv_len)
-                        memmove(self->recv_buf, self->recv_buf + consumed,
-                                self->recv_len - consumed);
-                    self->recv_len -= consumed;
+                    recv_consume(self, consumed);
                     int destroyed = deliver_error(self, "gzip decompression failed");
                     if (destroyed) return;
                     goto done;
@@ -1875,10 +1960,7 @@ static void process_http_response(ev_clickhouse_t *self) {
                 int destroyed = deliver_raw_body(self, final_body, final_len);
                 if (final_body != body) Safefree(final_body);
                 if (decoded) Safefree(decoded);
-                if (consumed < self->recv_len)
-                    memmove(self->recv_buf, self->recv_buf + consumed,
-                            self->recv_len - consumed);
-                self->recv_len -= consumed;
+                recv_consume(self, consumed);
                 if (destroyed) return;
             } else {
                 AV *rows = NULL;
@@ -1886,10 +1968,7 @@ static void process_http_response(ev_clickhouse_t *self) {
                     rows = parse_tab_separated(final_body, final_len);
                 if (final_body != body) Safefree(final_body);
                 if (decoded) Safefree(decoded);
-                if (consumed < self->recv_len)
-                    memmove(self->recv_buf, self->recv_buf + consumed,
-                            self->recv_len - consumed);
-                self->recv_len -= consumed;
+                recv_consume(self, consumed);
                 if (deliver_rows(self, rows)) return;
             }
             }
@@ -1918,11 +1997,7 @@ static void process_http_response(ev_clickhouse_t *self) {
             if (decoded) Safefree(decoded);
 
             size_t consumed = cp - self->recv_buf;
-            if (consumed < self->recv_len) {
-                memmove(self->recv_buf, self->recv_buf + consumed,
-                        self->recv_len - consumed);
-            }
-            self->recv_len -= consumed;
+            recv_consume(self, consumed);
 
             int destroyed = deliver_error(self, errmsg);
             Safefree(errmsg);
@@ -1948,10 +2023,7 @@ static void process_http_response(ev_clickhouse_t *self) {
                     final_len = dec_len;
                 } else {
                     size_t consumed = hdr_end + content_length;
-                    if (consumed < self->recv_len)
-                        memmove(self->recv_buf, self->recv_buf + consumed,
-                                self->recv_len - consumed);
-                    self->recv_len -= consumed;
+                    recv_consume(self, consumed);
                     int destroyed = deliver_error(self, "gzip decompression failed");
                     if (destroyed) return;
                     goto done;
@@ -1965,20 +2037,14 @@ static void process_http_response(ev_clickhouse_t *self) {
             if (is_raw) {
                 int destroyed = deliver_raw_body(self, final_body, final_len);
                 if (final_body != body) Safefree(final_body);
-                if (consumed < self->recv_len)
-                    memmove(self->recv_buf, self->recv_buf + consumed,
-                            self->recv_len - consumed);
-                self->recv_len -= consumed;
+                recv_consume(self, consumed);
                 if (destroyed) return;
             } else {
                 AV *rows = NULL;
                 if (final_len > 0)
                     rows = parse_tab_separated(final_body, final_len);
                 if (final_body != body) Safefree(final_body);
-                if (consumed < self->recv_len)
-                    memmove(self->recv_buf, self->recv_buf + consumed,
-                            self->recv_len - consumed);
-                self->recv_len -= consumed;
+                recv_consume(self, consumed);
                 if (deliver_rows(self, rows)) return;
             }
             }
@@ -2006,11 +2072,7 @@ static void process_http_response(ev_clickhouse_t *self) {
             if (err_body != body) Safefree(err_body);
 
             size_t consumed = hdr_end + content_length;
-            if (consumed < self->recv_len) {
-                memmove(self->recv_buf, self->recv_buf + consumed,
-                        self->recv_len - consumed);
-            }
-            self->recv_len -= consumed;
+            recv_consume(self, consumed);
 
             int destroyed = deliver_error(self, errmsg);
             Safefree(errmsg);
@@ -2536,7 +2598,7 @@ static SV* days_to_date_sv(int32_t days) {
     return newSVpvn(buf, 10);
 }
 
-/* Convert epoch seconds to "YYYY-MM-DD HH:MM:SS", tz-aware */
+/* Convert epoch seconds to "YYYY-MM-DD HH:MM:SS" in UTC. */
 static SV* epoch_to_datetime_sv(uint32_t epoch) {
     time_t t = (time_t)epoch;
     struct tm tm;
@@ -2548,7 +2610,7 @@ static SV* epoch_to_datetime_sv(uint32_t epoch) {
     return newSVpvn(buf, 19);
 }
 
-/* Like epoch_to_datetime_sv but uses localtime_r (TZ must already be set by caller) */
+/* Format epoch in the caller's currently-active TZ (set via set_tz). */
 static SV* epoch_to_datetime_sv_local(uint32_t epoch) {
     time_t t = (time_t)epoch;
     struct tm tm;
@@ -2596,7 +2658,18 @@ static SV* dt64_to_datetime_sv_ex(int64_t val, int precision, int use_local) {
 }
 
 
-/* Set TZ environment variable and call tzset(); returns saved old TZ (caller must free) */
+/* Set TZ environment variable and call tzset(); returns saved old TZ
+ * (caller must free).
+ *
+ * Design note: this mutates process-global state via setenv()+tzset().
+ * That is safe in this module because (1) EV runs single-threaded, (2)
+ * the entire set_tz / loop / restore_tz sequence in decode_column_ex
+ * is pure C with no Perl callback dispatch in between, and (3) Perl
+ * callbacks (on_data, query callbacks) only fire AFTER the block decode
+ * completes and the TZ is already restored. Code reading the TZ from a
+ * C-level signal handler during the window would see the column's TZ;
+ * such handlers are inherently async-signal-unsafe with libc time
+ * functions and out of scope here. */
 static char* set_tz(const char *tz) {
     char *old_tz = getenv("TZ");
     char *saved = NULL;
@@ -3360,6 +3433,15 @@ static char* serialize_av_to_tsv(pTHX_ AV *rows, size_t *out_len) {
 
             if (!val_svp || !SvOK(*val_svp)) {
                 nbuf_append(&b, "\\N", 2);
+            } else if (SvROK(*val_svp)) {
+                /* Nested AV/HV refs (Array/Tuple/Map columns) cannot be
+                 * round-tripped through TSV without column-type info from
+                 * the server, which the HTTP path doesn't have. Fail loudly
+                 * rather than silently sending ARRAY(0x...) garbage. */
+                Safefree(b.data);
+                croak("insert data: row %" IVdf " column %" IVdf " is a "
+                      "reference; nested Array/Tuple/Map columns require "
+                      "the native protocol", (IV)r, (IV)c);
             } else {
                 STRLEN vlen;
                 const char *v = SvPV(*val_svp, vlen);
@@ -4504,6 +4586,129 @@ static int skip_block_info(const char *buf, size_t len, size_t *pos) {
  *   3  = Pong
  *   4  = Hello parsed (self->server_* fields populated)
  */
+
+/* Parse a Data block (table_name + optional-LZ4-chain + block_info + columns)
+ * and decode-and-discard each column. Used by SERVER_LOG and SERVER_PROFILE_EVENTS,
+ * which carry a block in the same wire format as SERVER_DATA but whose contents
+ * the client does not surface to Perl.
+ *
+ * `lz4_optional` (used by PROFILE_EVENTS only): if set, fall back to parsing
+ * the body uncompressed when LZ4 hard-fails — older servers occasionally send
+ * profile_events uncompressed even on a compressed connection.
+ *
+ * Returns 1 on success (advances *outer_pos past the consumed bytes),
+ *         0 on need-more-data,
+ *        -1 on hard error (sets *errmsg). */
+static int parse_and_discard_block(ev_clickhouse_t *self,
+                                    const char *buf, size_t len, size_t *outer_pos,
+                                    const char *kind, int lz4_optional,
+                                    char **errmsg) {
+    size_t pos = *outer_pos;
+    int rc;
+    char *decompressed = NULL;
+    const char *bbuf;
+    size_t blen, bpos;
+    char errbuf[64];
+
+    rc = skip_native_string(buf, len, &pos);
+    if (rc == 0) return 0;
+    if (rc < 0) {
+        snprintf(errbuf, sizeof(errbuf), "malformed %s block", kind);
+        *errmsg = safe_strdup(errbuf);
+        return -1;
+    }
+
+#ifdef HAVE_LZ4
+    if (self->compress) {
+        int need_more = 0;
+        const char *lz4_err = NULL;
+        decompressed = ch_lz4_decompress_chain(buf, len, &pos, &blen,
+                                                &need_more, &lz4_err);
+        if (!decompressed) {
+            if (need_more) return 0;
+            if (!lz4_optional) {
+                snprintf(errbuf, sizeof(errbuf), "%s: LZ4 decompression failed", kind);
+                *errmsg = safe_strdup(lz4_err ? lz4_err : errbuf);
+                return -1;
+            }
+            /* fall through to uncompressed parsing */
+        }
+    }
+    if (decompressed) {
+        bbuf = decompressed;
+        bpos = 0;
+    } else
+#endif
+    {
+        bbuf = buf;
+        blen = len;
+        bpos = pos;
+    }
+
+#define _BAIL(rc_val) do { \
+    if (decompressed) Safefree(decompressed); \
+    if (rc_val < 0) { snprintf(errbuf, sizeof(errbuf), "malformed %s block", kind); *errmsg = safe_strdup(errbuf); } \
+    return rc_val; \
+} while (0)
+
+    if (CH_CLIENT_REVISION >= DBMS_MIN_REVISION_WITH_BLOCK_INFO) {
+        rc = skip_block_info(bbuf, blen, &bpos);
+        if (rc <= 0) _BAIL(rc);
+    }
+    {
+        uint64_t nc, nr, c;
+        rc = read_varuint(bbuf, blen, &bpos, &nc);
+        if (rc <= 0) _BAIL(rc);
+        rc = read_varuint(bbuf, blen, &bpos, &nr);
+        if (rc <= 0) _BAIL(rc);
+
+        for (c = 0; c < nc; c++) {
+            const char *ctype;
+            size_t ctype_len;
+            rc = skip_native_string(bbuf, blen, &bpos);
+            if (rc <= 0) _BAIL(rc);
+            rc = read_native_string_ref(bbuf, blen, &bpos, &ctype, &ctype_len);
+            if (rc <= 0) _BAIL(rc);
+            /* custom serialization flag (revision >= 54446) */
+            if (bpos >= blen) _BAIL(0);
+            if ((uint8_t)bbuf[bpos]) {
+                if (decompressed) Safefree(decompressed);
+                *errmsg = safe_strdup("custom serialization not supported");
+                return -1;
+            }
+            bpos++;
+            if (nr > 0) {
+                col_type_t *ct = parse_col_type(ctype, ctype_len);
+                int col_err = 0;
+                SV **vals = decode_column(bbuf, blen, &bpos, nr, ct, &col_err, 0);
+                if (!vals) {
+                    free_col_type(ct);
+                    if (col_err || decompressed) {
+                        if (decompressed) Safefree(decompressed);
+                        snprintf(errbuf, sizeof(errbuf), "malformed %s block", kind);
+                        *errmsg = safe_strdup(errbuf);
+                        return -1;
+                    }
+                    return 0;
+                }
+                {
+                    uint64_t j;
+                    for (j = 0; j < nr; j++) SvREFCNT_dec(vals[j]);
+                }
+                Safefree(vals);
+                free_col_type(ct);
+            }
+        }
+    }
+
+#undef _BAIL
+
+    if (!decompressed) pos = bpos;
+    if (decompressed) Safefree(decompressed);
+    *outer_pos = pos;
+    return 1;
+}
+
 static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
     const char *buf = self->recv_buf;
     size_t len = self->recv_len;
@@ -4577,11 +4782,7 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
         }
 
         /* consume from recv_buf */
-        if (pos < self->recv_len) {
-            memmove(self->recv_buf, self->recv_buf + pos,
-                    self->recv_len - pos);
-        }
-        self->recv_len -= pos;
+        recv_consume(self, pos);
         return 4;
     }
 
@@ -4600,55 +4801,16 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
 
 #ifdef HAVE_LZ4
         if (self->compress) {
-            /* Decompress the block body — may span multiple LZ4 sub-blocks.
-             * ClickHouse's CompressedWriteBuffer flushes at ~1MB, so a single
-             * Data packet can produce multiple consecutive compressed frames. */
-            size_t comp_consumed;
-            int need_more;
+            /* Decompress the block body — may span multiple LZ4 sub-blocks. */
+            int need_more = 0;
             const char *lz4_err = NULL;
-            decompressed = ch_lz4_decompress(buf + pos, len - pos,
-                                              &dlen, &comp_consumed,
-                                              &need_more, &lz4_err);
+            decompressed = ch_lz4_decompress_chain(buf, len, &pos, &dlen,
+                                                    &need_more, &lz4_err);
             if (!decompressed) {
                 if (need_more) return 0;
                 *errmsg = safe_strdup(lz4_err ? lz4_err : "LZ4 decompression failed");
                 return -1;
             }
-            pos += comp_consumed;
-
-            /* Decompress any additional sub-blocks.  A compressed sub-block
-             * starts with 16 bytes of checksum followed by method byte 0x82.
-             * If the remaining data doesn't match that signature, it belongs
-             * to the next server packet — stop decompressing. */
-            while (len - pos >= CH_CHECKSUM_SIZE + CH_COMPRESS_HEADER_SIZE
-                   && (uint8_t)buf[pos + CH_CHECKSUM_SIZE] == CH_LZ4_METHOD) {
-                size_t extra_len, extra_consumed;
-                int extra_need_more;
-                const char *extra_err = NULL;
-                char *extra = ch_lz4_decompress(buf + pos, len - pos,
-                                                 &extra_len, &extra_consumed,
-                                                 &extra_need_more, &extra_err);
-                if (!extra) {
-                    if (extra_need_more) {
-                        /* Partial sub-block — need more network data.
-                         * Discard what we decompressed so far; we'll retry
-                         * from the beginning when more data arrives. */
-                        Safefree(decompressed);
-                        return 0;
-                    }
-                    /* Decompression error */
-                    Safefree(decompressed);
-                    *errmsg = safe_strdup(extra_err ? extra_err : "LZ4 decompression failed");
-                    return -1;
-                }
-                /* Append to decompressed buffer */
-                Renew(decompressed, dlen + extra_len, char);
-                Copy(extra, decompressed + dlen, extra_len, char);
-                dlen += extra_len;
-                pos += extra_consumed;
-                Safefree(extra);
-            }
-
             dbuf = decompressed;
             dpos = 0;
         } else
@@ -4708,35 +4870,38 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
                     rc = read_native_string_ref(dbuf, dlen, &dpos,
                             &cnames[c], &cname_lens[c]);
                     if (rc <= 0) {
+                        int was_compressed = decompressed != NULL;
                         for (c = 0; c < num_cols; c++) if (ctypes[c]) free_col_type(ctypes[c]);
                         Safefree(cnames); Safefree(cname_lens);
                         Safefree(ctypes_str); Safefree(ctype_lens);
                         Safefree(ctypes);
                         if (decompressed) Safefree(decompressed);
-                        if (rc < 0 || decompressed) { *errmsg = safe_strdup("malformed cname"); return -1; }
+                        if (rc < 0 || was_compressed) { *errmsg = safe_strdup("malformed cname"); return -1; }
                         return 0;
                     }
                     rc = read_native_string_ref(dbuf, dlen, &dpos,
                             &ctypes_str[c], &ctype_lens[c]);
                     if (rc <= 0) {
+                        int was_compressed = decompressed != NULL;
                         for (c = 0; c < num_cols; c++) if (ctypes[c]) free_col_type(ctypes[c]);
                         Safefree(cnames); Safefree(cname_lens);
                         Safefree(ctypes_str); Safefree(ctype_lens);
                         Safefree(ctypes);
                         if (decompressed) Safefree(decompressed);
-                        if (rc < 0 || decompressed) { *errmsg = safe_strdup("malformed ctype"); return -1; }
+                        if (rc < 0 || was_compressed) { *errmsg = safe_strdup("malformed ctype"); return -1; }
                         return 0;
                     }
                     ctypes[c] = parse_col_type(ctypes_str[c], ctype_lens[c]);
 
                     /* custom serialization flag (revision >= 54446) */
                     if (dpos >= dlen) {
+                        int was_compressed = decompressed != NULL;
                         for (c = 0; c < num_cols; c++) if (ctypes[c]) free_col_type(ctypes[c]);
                         Safefree(cnames); Safefree(cname_lens);
                         Safefree(ctypes_str); Safefree(ctype_lens);
                         Safefree(ctypes);
                         if (decompressed) Safefree(decompressed);
-                        if (decompressed) { *errmsg = safe_strdup("truncated custom_ser"); return -1; }
+                        if (was_compressed) { *errmsg = safe_strdup("truncated custom_ser"); return -1; }
                         return 0;
                     }
                     if ((uint8_t)dbuf[dpos]) {
@@ -4787,11 +4952,7 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
 
                 if (decompressed) Safefree(decompressed);
                 else pos = dpos;
-                if (pos < self->recv_len) {
-                    memmove(self->recv_buf, self->recv_buf + pos,
-                            self->recv_len - pos);
-                }
-                self->recv_len -= pos;
+                recv_consume(self, pos);
 
                 if (!data_pkt) {
                     /* Send empty Data block to complete the INSERT protocol */
@@ -4808,11 +4969,7 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
 
                 /* Send the data block — write to send_buf and start writing */
                 self->native_state = NATIVE_WAIT_RESULT;
-                ensure_send_cap(self, data_pkt_len);
-                Copy(data_pkt, self->send_buf, data_pkt_len, char);
-                self->send_len = data_pkt_len;
-                self->send_pos = 0;
-                Safefree(data_pkt);
+                send_replace(self, data_pkt, data_pkt_len);
                 if (try_write(self)) return -2;
                 return 1;
             }
@@ -4835,20 +4992,12 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
 
                 if (decompressed) Safefree(decompressed);
                 else pos = dpos;
-                if (pos < self->recv_len) {
-                    memmove(self->recv_buf, self->recv_buf + pos,
-                            self->recv_len - pos);
-                }
-                self->recv_len -= pos;
+                recv_consume(self, pos);
 
                 nbuf_init(&fallback);
                 nbuf_empty_data_block(&fallback, self->compress);
                 self->native_state = NATIVE_WAIT_RESULT;
-                ensure_send_cap(self, fallback.len);
-                Copy(fallback.data, self->send_buf, fallback.len, char);
-                self->send_len = fallback.len;
-                self->send_pos = 0;
-                Safefree(fallback.data);
+                send_replace(self, fallback.data, fallback.len);
                 self->insert_err = safe_strdup(
                     "INSERT failed: server sent 0-column sample block");
                 if (try_write(self)) return -2;
@@ -4882,11 +5031,7 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
             }
             if (decompressed) Safefree(decompressed);
             else pos = dpos;  /* uncompressed: advance pos to match dpos */
-            if (pos < self->recv_len) {
-                memmove(self->recv_buf, self->recv_buf + pos,
-                        self->recv_len - pos);
-            }
-            self->recv_len -= pos;
+            recv_consume(self, pos);
             return 1;
         }
 
@@ -5069,11 +5214,7 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
             else pos = dpos;  /* uncompressed: advance pos to match dpos */
 
             /* Consume from recv_buf */
-            if (pos < self->recv_len) {
-                memmove(self->recv_buf, self->recv_buf + pos,
-                        self->recv_len - pos);
-            }
-            self->recv_len -= pos;
+            recv_consume(self, pos);
             return 1;
 
         data_error:
@@ -5133,9 +5274,10 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
         if (rc == 0) return 0;
         if (rc < 0) { *errmsg = safe_strdup("malformed exception has_nested"); return -1; }
 
-        /* Skip nested exceptions */
+        /* Skip nested exceptions — keep the top-level code, not the innermost. */
         while (has_nested) {
-            rc = read_i32(buf, len, &pos, &code);
+            int32_t nested_code;
+            rc = read_i32(buf, len, &pos, &nested_code);
             if (rc == 0) return 0;
             if (rc < 0) { *errmsg = safe_strdup("malformed nested exception"); return -1; }
 
@@ -5162,11 +5304,7 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
         snprintf(err, msg_len + name_len + 64, "Code: %d. %.*s: %.*s",
                  (int)code, (int)name_len, name, (int)msg_len, msg);
 
-        if (pos < self->recv_len) {
-            memmove(self->recv_buf, self->recv_buf + pos,
-                    self->recv_len - pos);
-        }
-        self->recv_len -= pos;
+        recv_consume(self, pos);
 
         *errmsg = err;
         return -1;
@@ -5199,11 +5337,7 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
             if (rc < 0) { *errmsg = safe_strdup("malformed progress packet"); return -1; }
         }
 
-        if (pos < self->recv_len) {
-            memmove(self->recv_buf, self->recv_buf + pos,
-                    self->recv_len - pos);
-        }
-        self->recv_len -= pos;
+        recv_consume(self, pos);
 
         if (NULL != self->on_progress) {
             dSP;
@@ -5255,11 +5389,7 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
         self->profile_rows = pi_rows;
         self->profile_bytes = pi_bytes;
         self->profile_rows_before_limit = pi_rows_before_limit;
-        if (pos < self->recv_len) {
-            memmove(self->recv_buf, self->recv_buf + pos,
-                    self->recv_len - pos);
-        }
-        self->recv_len -= pos;
+        recv_consume(self, pos);
         return 1;
     }
 
@@ -5271,260 +5401,31 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
         rc = skip_native_string(buf, len, &pos);
         if (rc == 0) return 0;
         if (rc < 0) { *errmsg = safe_strdup("malformed table_columns packet"); return -1; }
-        if (pos < self->recv_len) {
-            memmove(self->recv_buf, self->recv_buf + pos,
-                    self->recv_len - pos);
-        }
-        self->recv_len -= pos;
+        recv_consume(self, pos);
         return 1;
     }
 
     case SERVER_LOG: {
-        /* Contains a Data block — parse like SERVER_DATA but discard */
-        const char *lbuf;
-        size_t llen, lpos;
-        char *log_decompressed = NULL;
-
-        /* table name — outside compression */
-        rc = skip_native_string(buf, len, &pos);
-        if (rc == 0) return 0;
-        if (rc < 0) { *errmsg = safe_strdup("malformed server log block"); return -1; }
-
-#ifdef HAVE_LZ4
-        if (self->compress) {
-            size_t comp_consumed;
-            int need_more;
-            const char *lz4_err = NULL;
-            log_decompressed = ch_lz4_decompress(buf + pos, len - pos,
-                                                  &llen, &comp_consumed,
-                                                  &need_more, &lz4_err);
-            if (!log_decompressed) {
-                if (need_more) return 0;
-                *errmsg = safe_strdup("server log: LZ4 decompression failed");
-                return -1;
-            }
-            pos += comp_consumed;
-
-            /* Additional sub-blocks (same logic as SERVER_DATA) */
-            while (len - pos >= CH_CHECKSUM_SIZE + CH_COMPRESS_HEADER_SIZE
-                   && (uint8_t)buf[pos + CH_CHECKSUM_SIZE] == CH_LZ4_METHOD) {
-                size_t extra_len, extra_consumed;
-                int extra_need_more;
-                const char *extra_err = NULL;
-                char *extra = ch_lz4_decompress(buf + pos, len - pos,
-                                                 &extra_len, &extra_consumed,
-                                                 &extra_need_more, &extra_err);
-                if (!extra) {
-                    if (extra_need_more) {
-                        Safefree(log_decompressed);
-                        return 0;
-                    }
-                    Safefree(log_decompressed);
-                    *errmsg = safe_strdup(extra_err ? extra_err : "server log: LZ4 decompression failed");
-                    return -1;
-                }
-                Renew(log_decompressed, llen + extra_len, char);
-                Copy(extra, log_decompressed + llen, extra_len, char);
-                llen += extra_len;
-                pos += extra_consumed;
-                Safefree(extra);
-            }
-
-            lbuf = log_decompressed;
-            lpos = 0;
-        } else
-#endif
-        {
-            lbuf = buf;
-            llen = len;
-            lpos = pos;
-        }
-
-        /* block info */
-        if (CH_CLIENT_REVISION >= DBMS_MIN_REVISION_WITH_BLOCK_INFO) {
-            rc = skip_block_info(lbuf, llen, &lpos);
-            if (rc <= 0) { if (log_decompressed) Safefree(log_decompressed); if (rc < 0) *errmsg = safe_strdup("malformed server log block"); return rc; }
-        }
-        uint64_t nc, nr;
-        rc = read_varuint(lbuf, llen, &lpos, &nc);
-        if (rc <= 0) { if (log_decompressed) Safefree(log_decompressed); if (rc < 0) *errmsg = safe_strdup("malformed server log block"); return rc; }
-        rc = read_varuint(lbuf, llen, &lpos, &nr);
-        if (rc <= 0) { if (log_decompressed) Safefree(log_decompressed); if (rc < 0) *errmsg = safe_strdup("malformed server log block"); return rc; }
-
-        if (nc > 0) {
-            uint64_t c;
-            for (c = 0; c < nc; c++) {
-                const char *ctype;
-                size_t ctype_len;
-                rc = skip_native_string(lbuf, llen, &lpos);
-                if (rc <= 0) { if (log_decompressed) Safefree(log_decompressed); if (rc < 0) *errmsg = safe_strdup("malformed server log block"); return rc; }
-                rc = read_native_string_ref(lbuf, llen, &lpos, &ctype, &ctype_len);
-                if (rc <= 0) { if (log_decompressed) Safefree(log_decompressed); if (rc < 0) *errmsg = safe_strdup("malformed server log block"); return rc; }
-                /* custom serialization flag (revision >= 54446) */
-                if (lpos >= llen) { if (log_decompressed) Safefree(log_decompressed); return 0; }
-                if ((uint8_t)lbuf[lpos]) { if (log_decompressed) Safefree(log_decompressed); *errmsg = safe_strdup("custom serialization not supported"); return -1; }
-                lpos++;
-                if (nr > 0) {
-                    col_type_t *ct = parse_col_type(ctype, ctype_len);
-                    int log_col_err = 0;
-                    SV **vals = decode_column(lbuf, llen, &lpos, nr, ct, &log_col_err, 0);
-                    if (!vals) {
-                        free_col_type(ct);
-                        if (log_col_err || log_decompressed) {
-                            if (log_decompressed) Safefree(log_decompressed);
-                            *errmsg = safe_strdup("malformed server log block");
-                            return -1;
-                        }
-                        return 0;
-                    }
-                    uint64_t j;
-                    for (j = 0; j < nr; j++) SvREFCNT_dec(vals[j]);
-                    Safefree(vals);
-                    free_col_type(ct);
-                }
-            }
-        }
-
-        if (!log_decompressed) pos = lpos;
-        if (log_decompressed) Safefree(log_decompressed);
-
-        if (pos < self->recv_len) {
-            memmove(self->recv_buf, self->recv_buf + pos,
-                    self->recv_len - pos);
-        }
-        self->recv_len -= pos;
+        rc = parse_and_discard_block(self, buf, len, &pos, "server log", 0, errmsg);
+        if (rc <= 0) return rc;
+        recv_consume(self, pos);
         return 1;
     }
 
-    case SERVER_PROFILE_EVENTS:
-        /* Same structure as SERVER_LOG — data block to discard.
-         * Fall through to SERVER_LOG handler would work, but SERVER_LOG
-         * is above us.  Just skip: table_name + rest handled like LOG. */
-    {
-        const char *pebuf;
-        size_t pelen, pepos;
-        char *pe_decompressed = NULL;
+    case SERVER_PROFILE_EVENTS: {
+        rc = parse_and_discard_block(self, buf, len, &pos, "profile_events", 1, errmsg);
+        if (rc <= 0) return rc;
 
-        rc = skip_native_string(buf, len, &pos);
-        if (rc == 0) return 0;
-        if (rc < 0) { *errmsg = safe_strdup("malformed profile_events block"); return -1; }
-
-#ifdef HAVE_LZ4
-        if (self->compress) {
-            size_t comp_consumed;
-            int need_more;
-            const char *lz4_err = NULL;
-            pe_decompressed = ch_lz4_decompress(buf + pos, len - pos,
-                                                 &pelen, &comp_consumed,
-                                                 &need_more, &lz4_err);
-            if (!pe_decompressed) {
-                if (need_more) return 0;
-                /* Profile events may be uncompressed — fall back */
-                goto pe_uncompressed;
-            }
-            pos += comp_consumed;
-            while (len - pos >= CH_CHECKSUM_SIZE + CH_COMPRESS_HEADER_SIZE
-                   && (uint8_t)buf[pos + CH_CHECKSUM_SIZE] == CH_LZ4_METHOD) {
-                size_t extra_len, extra_consumed;
-                int extra_need_more;
-                const char *extra_err = NULL;
-                char *extra = ch_lz4_decompress(buf + pos, len - pos,
-                                                 &extra_len, &extra_consumed,
-                                                 &extra_need_more, &extra_err);
-                if (!extra) {
-                    if (extra_need_more) { Safefree(pe_decompressed); return 0; }
-                    Safefree(pe_decompressed);
-                    *errmsg = safe_strdup("profile_events: LZ4 decompression failed");
-                    return -1;
-                }
-                Renew(pe_decompressed, pelen + extra_len, char);
-                Copy(extra, pe_decompressed + pelen, extra_len, char);
-                pelen += extra_len;
-                pos += extra_consumed;
-                Safefree(extra);
-            }
-            pebuf = pe_decompressed;
-            pepos = 0;
-        } else
-#endif
-        {
-#ifdef HAVE_LZ4
-            pe_uncompressed:
-#endif
-            pebuf = buf;
-            pelen = len;
-            pepos = pos;
-        }
-
-        if (CH_CLIENT_REVISION >= DBMS_MIN_REVISION_WITH_BLOCK_INFO) {
-            rc = skip_block_info(pebuf, pelen, &pepos);
-            if (rc <= 0) { if (pe_decompressed) Safefree(pe_decompressed); if (rc < 0) *errmsg = safe_strdup("malformed profile_events block"); return rc; }
-        }
-        uint64_t pe_nc, pe_nr;
-        rc = read_varuint(pebuf, pelen, &pepos, &pe_nc);
-        if (rc <= 0) { if (pe_decompressed) Safefree(pe_decompressed); if (rc < 0) *errmsg = safe_strdup("malformed profile_events block"); return rc; }
-        rc = read_varuint(pebuf, pelen, &pepos, &pe_nr);
-        if (rc <= 0) { if (pe_decompressed) Safefree(pe_decompressed); if (rc < 0) *errmsg = safe_strdup("malformed profile_events block"); return rc; }
-
-        if (pe_nc > 0) {
-            uint64_t c;
-            for (c = 0; c < pe_nc; c++) {
-                const char *ctype;
-                size_t ctype_len;
-                rc = skip_native_string(pebuf, pelen, &pepos);
-                if (rc <= 0) { if (pe_decompressed) Safefree(pe_decompressed); if (rc < 0) *errmsg = safe_strdup("malformed profile_events block"); return rc; }
-                rc = read_native_string_ref(pebuf, pelen, &pepos, &ctype, &ctype_len);
-                if (rc <= 0) { if (pe_decompressed) Safefree(pe_decompressed); if (rc < 0) *errmsg = safe_strdup("malformed profile_events block"); return rc; }
-                /* custom serialization flag */
-                if (pepos >= pelen) { if (pe_decompressed) Safefree(pe_decompressed); return 0; }
-                if ((uint8_t)pebuf[pepos]) { if (pe_decompressed) Safefree(pe_decompressed); *errmsg = safe_strdup("custom serialization not supported"); return -1; }
-                pepos++;
-                if (pe_nr > 0) {
-                    col_type_t *ct = parse_col_type(ctype, ctype_len);
-                    int pe_col_err = 0;
-                    SV **vals = decode_column(pebuf, pelen, &pepos, pe_nr, ct, &pe_col_err, 0);
-                    if (!vals) {
-                        free_col_type(ct);
-                        if (pe_col_err || pe_decompressed) {
-                            if (pe_decompressed) Safefree(pe_decompressed);
-                            *errmsg = safe_strdup("malformed profile_events block");
-                            return -1;
-                        }
-                        return 0;
-                    }
-                    uint64_t j;
-                    for (j = 0; j < pe_nr; j++) SvREFCNT_dec(vals[j]);
-                    Safefree(vals);
-                    free_col_type(ct);
-                }
-            }
-        }
-
-        if (!pe_decompressed) pos = pepos;
-        if (pe_decompressed) Safefree(pe_decompressed);
-
-        if (pos < self->recv_len) {
-            memmove(self->recv_buf, self->recv_buf + pos,
-                    self->recv_len - pos);
-        }
-        self->recv_len -= pos;
+        recv_consume(self, pos);
         return 1;
     }
 
     case SERVER_PONG:
-        if (pos < self->recv_len) {
-            memmove(self->recv_buf, self->recv_buf + pos,
-                    self->recv_len - pos);
-        }
-        self->recv_len -= pos;
+        recv_consume(self, pos);
         return 3;
 
     case SERVER_END_OF_STREAM:
-        if (pos < self->recv_len) {
-            memmove(self->recv_buf, self->recv_buf + pos,
-                    self->recv_len - pos);
-        }
-        self->recv_len -= pos;
+        recv_consume(self, pos);
         return 2;
 
     default: {
@@ -5567,36 +5468,15 @@ static void process_native_response(ev_clickhouse_t *self) {
                     native_buf_t ab;
                     nbuf_init(&ab);
                     nbuf_cstring(&ab, "");  /* quota_key */
-                    ensure_send_cap(self, ab.len);
-                    Copy(ab.data, self->send_buf, ab.len, char);
-                    self->send_len = ab.len;
-                    self->send_pos = 0;
-                    Safefree(ab.data);
+                    send_replace(self, ab.data, ab.len);
                     if (try_write(self)) return;
                 }
                 self->native_state = NATIVE_IDLE;
                 self->connected = 1;
 
                 /* fire on_connect */
-                if (NULL != self->on_connect) {
-                    self->callback_depth++;
-                    {
-                        dSP;
-                        ENTER;
-                        SAVETMPS;
-                        PUSHMARK(SP);
-                        PUTBACK;
-                        call_sv(self->on_connect, G_DISCARD | G_EVAL);
-                        if (SvTRUE(ERRSV)) {
-                            warn("EV::ClickHouse: exception in connect handler: %s",
-                                 SvPV_nolen(ERRSV));
-                        }
-                        FREETMPS;
-                        LEAVE;
-                    }
-                    self->callback_depth--;
-                    if (check_destroyed(self)) return;
-                }
+                if (NULL != self->on_connect &&
+                    fire_zero_arg_cb(self, self->on_connect, "connect")) return;
                 /* start pipeline if queries were queued during connect */
                 if (!ngx_queue_empty(&self->send_queue))
                     pipeline_advance(self);
@@ -5610,9 +5490,7 @@ static void process_native_response(ev_clickhouse_t *self) {
             /* error */
             if (self->native_state == NATIVE_WAIT_HELLO) {
                 /* Hello failed — connection-level error */
-                self->callback_depth++;
                 emit_error(self, errmsg);
-                self->callback_depth--;
                 Safefree(errmsg);
                 if (check_destroyed(self)) return;
                 if (cancel_pending(self, "connection failed")) return;
@@ -5689,12 +5567,17 @@ static void process_native_response(ev_clickhouse_t *self) {
         }
 
         if (rc == 3) {
-            /* Pong — deliver success to callback */
+            /* Pong — ack a keepalive ping, or deliver to user's ping() cb */
+            self->native_state = NATIVE_IDLE;
+            if (self->ka_in_flight > 0) {
+                /* Keepalive ack: not tied to send_count or any user cb */
+                self->ka_in_flight--;
+                continue;
+            }
             if (self->timing) {
                 ev_timer_stop(self->loop, &self->timer);
                 self->timing = 0;
             }
-            self->native_state = NATIVE_IDLE;
             if (self->send_count > 0) self->send_count--;
             AV *rows = newAV();
             if (deliver_rows(self, rows)) return;
@@ -5726,24 +5609,14 @@ static void start_connect(ev_clickhouse_t *self) {
     if (ret != 0) {
         char errbuf[256];
         snprintf(errbuf, sizeof(errbuf), "getaddrinfo: %s", gai_strerror(ret));
-        self->callback_depth++;
-        emit_error(self, errbuf);
-        self->callback_depth--;
-        if (check_destroyed(self)) return;
-        if (cancel_pending(self, errbuf)) return;
-        cleanup_connection(self);
+        fail_connection(self, errbuf);
         return;
     }
 
     fd = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
     if (fd < 0) {
         freeaddrinfo(res);
-        self->callback_depth++;
-        emit_error(self, "socket() failed");
-        self->callback_depth--;
-        if (check_destroyed(self)) return;
-        if (cancel_pending(self, "socket() failed")) return;
-        cleanup_connection(self);
+        fail_connection(self, "socket() failed");
         return;
     }
 
@@ -5753,12 +5626,7 @@ static void start_connect(ev_clickhouse_t *self) {
         if (fl < 0 || fcntl(fd, F_SETFL, fl | O_NONBLOCK) < 0) {
             freeaddrinfo(res);
             close(fd);
-            self->callback_depth++;
-            emit_error(self, "fcntl O_NONBLOCK failed");
-            self->callback_depth--;
-            if (check_destroyed(self)) return;
-            if (cancel_pending(self, "fcntl O_NONBLOCK failed")) return;
-            cleanup_connection(self);
+            fail_connection(self, "fcntl O_NONBLOCK failed");
             return;
         }
     }
@@ -5795,12 +5663,7 @@ static void start_connect(ev_clickhouse_t *self) {
         close(fd);
         self->fd = -1;
         self->connecting = 0;
-        self->callback_depth++;
-        emit_error(self, errbuf);
-        self->callback_depth--;
-        if (check_destroyed(self)) return;
-        if (cancel_pending(self, errbuf)) return;
-        cleanup_connection(self);
+        fail_connection(self, errbuf);
         return;
     }
 
@@ -5834,12 +5697,7 @@ static void on_connect_done(ev_clickhouse_t *self) {
         int ret;
         self->ssl_ctx = SSL_CTX_new(TLS_client_method());
         if (!self->ssl_ctx) {
-            self->callback_depth++;
-            emit_error(self, "SSL_CTX_new failed");
-            self->callback_depth--;
-            if (check_destroyed(self)) return;
-            if (cancel_pending(self, "SSL_CTX_new failed")) return;
-            cleanup_connection(self);
+            fail_connection(self, "SSL_CTX_new failed");
             return;
         }
         SSL_CTX_set_default_verify_paths(self->ssl_ctx);
@@ -5849,36 +5707,28 @@ static void on_connect_done(ev_clickhouse_t *self) {
             SSL_CTX_set_verify(self->ssl_ctx, SSL_VERIFY_PEER, NULL);
         if (self->tls_ca_file) {
             if (SSL_CTX_load_verify_locations(self->ssl_ctx, self->tls_ca_file, NULL) != 1) {
-                self->callback_depth++;
-                emit_error(self, "SSL_CTX_load_verify_locations failed");
-                self->callback_depth--;
-                if (check_destroyed(self)) return;
-                if (cancel_pending(self, "SSL_CTX_load_verify_locations failed")) return;
-                cleanup_connection(self);
+                fail_connection(self, "SSL_CTX_load_verify_locations failed");
                 return;
             }
         }
         self->ssl = SSL_new(self->ssl_ctx);
         if (!self->ssl) {
-            self->callback_depth++;
-            emit_error(self, "SSL_new failed");
-            self->callback_depth--;
-            if (check_destroyed(self)) return;
-            if (cancel_pending(self, "SSL_new failed")) return;
-            cleanup_connection(self);
+            fail_connection(self, "SSL_new failed");
             return;
         }
         SSL_set_fd(self->ssl, self->fd);
 
+        int host_is_ip = is_ip_literal(self->host);
+
         /* SNI must not be sent for IP address literals (RFC 6066 s3) */
-        if (!is_ip_literal(self->host))
+        if (!host_is_ip)
             SSL_set_tlsext_host_name(self->ssl, self->host);
 
         /* Verify server certificate matches hostname or IP */
         if (!self->tls_skip_verify) {
             X509_VERIFY_PARAM *param = SSL_get0_param(self->ssl);
             X509_VERIFY_PARAM_set_hostflags(param, X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS);
-            if (is_ip_literal(self->host))
+            if (host_is_ip)
                 X509_VERIFY_PARAM_set1_ip_asc(param, self->host);
             else
                 X509_VERIFY_PARAM_set1_host(param, self->host, 0);
@@ -5895,12 +5745,7 @@ static void on_connect_done(ev_clickhouse_t *self) {
             } else if (err == SSL_ERROR_WANT_WRITE) {
                 start_writing(self);
             } else {
-                self->callback_depth++;
-                emit_error(self, "SSL_connect failed");
-                self->callback_depth--;
-                if (check_destroyed(self)) return;
-                if (cancel_pending(self, "SSL_connect failed")) return;
-                cleanup_connection(self);
+                fail_connection(self, "SSL_connect failed");
                 return;
             }
             /* continue TLS handshake in io_cb */
@@ -5914,11 +5759,7 @@ handshake_done:
         /* Send ClientHello and wait for ServerHello */
         size_t hello_len;
         char *hello = build_native_hello(self, &hello_len);
-        ensure_send_cap(self, hello_len);
-        Copy(hello, self->send_buf, hello_len, char);
-        self->send_len = hello_len;
-        self->send_pos = 0;
-        Safefree(hello);
+        send_replace(self, hello, hello_len);
 
         self->native_state = NATIVE_WAIT_HELLO;
         start_writing(self);
@@ -5928,24 +5769,8 @@ handshake_done:
     /* HTTP protocol: connection is ready */
     self->connected = 1;
 
-    if (NULL != self->on_connect) {
-        self->callback_depth++;
-        {
-            dSP;
-            ENTER;
-            SAVETMPS;
-            PUSHMARK(SP);
-            PUTBACK;
-            call_sv(self->on_connect, G_DISCARD | G_EVAL);
-            if (SvTRUE(ERRSV)) {
-                warn("EV::ClickHouse: exception in connect handler: %s", SvPV_nolen(ERRSV));
-            }
-            FREETMPS;
-            LEAVE;
-        }
-        self->callback_depth--;
-        if (check_destroyed(self)) return;
-    }
+    if (NULL != self->on_connect &&
+        fire_zero_arg_cb(self, self->on_connect, "connect")) return;
 
     /* start pipeline if queries were queued during connect */
     if (!ngx_queue_empty(&self->send_queue))
@@ -5965,18 +5790,14 @@ static int try_write(ev_clickhouse_t *self) {
                 return 0;
             }
             /* write error */
-            self->callback_depth++;
             emit_error(self, strerror(errno));
-            self->callback_depth--;
             if (check_destroyed(self)) return 1;
             if (cancel_pending(self, "write error")) return 1;
             cleanup_connection(self);
             return 0;
         }
         if (n == 0) {
-            self->callback_depth++;
             emit_error(self, "connection closed during write");
-            self->callback_depth--;
             if (check_destroyed(self)) return 1;
             if (cancel_pending(self, "connection closed")) return 1;
             cleanup_connection(self);
@@ -6008,9 +5829,7 @@ static void on_readable(ev_clickhouse_t *self) {
 
     if (n < 0) {
         if (errno == EAGAIN || errno == EWOULDBLOCK) return;
-        self->callback_depth++;
         emit_error(self, strerror(errno));
-        self->callback_depth--;
         if (check_destroyed(self)) return;
         if (cancel_pending(self, "read error")) return;
         cleanup_connection(self);
@@ -6024,9 +5843,7 @@ static void on_readable(ev_clickhouse_t *self) {
         int has_queued = !ngx_queue_empty(&self->send_queue);
 
         if (had_inflight) {
-            self->callback_depth++;
             emit_error(self, "connection closed by server");
-            self->callback_depth--;
             if (check_destroyed(self)) return;
             /* Only cancel in-flight cb_queue (irrecoverable).
              * Keep send_queue if auto_reconnect — those haven't been sent yet. */
@@ -6094,12 +5911,7 @@ static void io_cb(EV_P_ ev_io *w, int revents) {
         if (err != 0) {
             char errbuf[256];
             snprintf(errbuf, sizeof(errbuf), "connect: %s", strerror(err));
-            self->callback_depth++;
-            emit_error(self, errbuf);
-            self->callback_depth--;
-            if (check_destroyed(self)) return;
-            if (cancel_pending(self, errbuf)) return;
-            cleanup_connection(self);
+            fail_connection(self, errbuf);
             return;
         }
 
@@ -6121,11 +5933,7 @@ static void io_cb(EV_P_ ev_io *w, int revents) {
                 /* Send ClientHello over TLS, then wait for ServerHello */
                 size_t hello_len;
                 char *hello = build_native_hello(self, &hello_len);
-                ensure_send_cap(self, hello_len);
-                Copy(hello, self->send_buf, hello_len, char);
-                self->send_len = hello_len;
-                self->send_pos = 0;
-                Safefree(hello);
+                send_replace(self, hello, hello_len);
                 self->native_state = NATIVE_WAIT_HELLO;
                 start_writing(self);
                 return;
@@ -6133,24 +5941,8 @@ static void io_cb(EV_P_ ev_io *w, int revents) {
 
             /* HTTP protocol: fire on_connect */
             self->connected = 1;
-            if (NULL != self->on_connect) {
-                self->callback_depth++;
-                {
-                    dSP;
-                    ENTER;
-                    SAVETMPS;
-                    PUSHMARK(SP);
-                    PUTBACK;
-                    call_sv(self->on_connect, G_DISCARD | G_EVAL);
-                    if (SvTRUE(ERRSV)) {
-                        warn("EV::ClickHouse: exception in connect handler: %s", SvPV_nolen(ERRSV));
-                    }
-                    FREETMPS;
-                    LEAVE;
-                }
-                self->callback_depth--;
-                if (check_destroyed(self)) return;
-            }
+            if (NULL != self->on_connect &&
+                fire_zero_arg_cb(self, self->on_connect, "connect")) return;
             if (!ngx_queue_empty(&self->send_queue))
                 pipeline_advance(self);
             return;
@@ -6163,12 +5955,7 @@ static void io_cb(EV_P_ ev_io *w, int revents) {
             } else if (err == SSL_ERROR_WANT_WRITE) {
                 start_writing(self);
             } else {
-                self->callback_depth++;
-                emit_error(self, "SSL handshake failed");
-                self->callback_depth--;
-                if (check_destroyed(self)) return;
-                if (cancel_pending(self, "SSL handshake failed")) return;
-                cleanup_connection(self);
+                fail_connection(self, "SSL handshake failed");
             }
             return;
         }
@@ -6196,12 +5983,7 @@ static void timer_cb(EV_P_ ev_timer *w, int revents) {
 
     if (self->connecting) {
         stop_writing(self);
-        self->callback_depth++;
-        emit_error(self, "connect timeout");
-        self->callback_depth--;
-        if (check_destroyed(self)) return;
-        if (cancel_pending(self, "connect timeout")) return;
-        cleanup_connection(self);
+        fail_connection(self, "connect timeout");
     } else {
         /* query timeout */
         if (self->native_rows) {
@@ -6261,6 +6043,7 @@ static void ka_timer_cb(EV_P_ ev_timer *w, int revents) {
         ensure_send_cap(self, self->send_len + pkt.len);
         Copy(pkt.data, self->send_buf + self->send_len, pkt.len, char);
         self->send_len += pkt.len;
+        self->ka_in_flight++;
         Safefree(pkt.data);
         if (!self->writing) start_writing(self);
     }
@@ -6358,23 +6141,11 @@ static int pipeline_advance(ev_clickhouse_t *self) {
         && self->on_drain) {
         SV *drain_cb = self->on_drain;
         self->on_drain = NULL;
-        {
-            dSP;
-            ENTER;
-            SAVETMPS;
-            PUSHMARK(SP);
-            PUTBACK;
-            self->callback_depth++;
-            call_sv(drain_cb, G_DISCARD | G_EVAL);
-            self->callback_depth--;
-            if (SvTRUE(ERRSV))
-                warn("EV::ClickHouse: drain callback died: %s",
-                     SvPV_nolen(ERRSV));
-            FREETMPS;
-            LEAVE;
+        if (fire_zero_arg_cb(self, drain_cb, "drain")) {
+            SvREFCNT_dec(drain_cb);
+            return 1;
         }
         SvREFCNT_dec(drain_cb);
-        if (check_destroyed(self)) return 1;
     }
 
     /* Restart keepalive timer when idle */
@@ -6543,31 +6314,30 @@ CODE:
         if (self->ssl_ctx) { SSL_CTX_free(self->ssl_ctx); self->ssl_ctx = NULL; }
   #endif
         if (self->fd >= 0) close(self->fd);
-        if (self->host) Safefree(self->host);
-        if (self->user) Safefree(self->user);
-        if (self->password) Safefree(self->password);
-        if (self->database) Safefree(self->database);
-        if (self->session_id) Safefree(self->session_id);
-        if (self->tls_ca_file) Safefree(self->tls_ca_file);
-        if (self->server_name) Safefree(self->server_name);
-        if (self->server_display_name) Safefree(self->server_display_name);
-        if (self->server_timezone) Safefree(self->server_timezone);
-        if (self->native_rows) { SvREFCNT_dec((SV*)self->native_rows); self->native_rows = NULL; }
-        if (self->native_col_names) { SvREFCNT_dec((SV*)self->native_col_names); self->native_col_names = NULL; }
-        if (self->native_col_types) { SvREFCNT_dec((SV*)self->native_col_types); self->native_col_types = NULL; }
-        if (self->native_totals) { SvREFCNT_dec((SV*)self->native_totals); self->native_totals = NULL; }
-        if (self->native_extremes) { SvREFCNT_dec((SV*)self->native_extremes); self->native_extremes = NULL; }
-        if (self->default_settings) { SvREFCNT_dec((SV*)self->default_settings); self->default_settings = NULL; }
-        if (self->on_disconnect) { SvREFCNT_dec(self->on_disconnect); self->on_disconnect = NULL; }
-        if (self->on_drain) { SvREFCNT_dec(self->on_drain); self->on_drain = NULL; }
-        if (self->on_trace) { SvREFCNT_dec(self->on_trace); self->on_trace = NULL; }
-        if (self->last_query_id) Safefree(self->last_query_id);
-        if (self->ka_timing) { ev_timer_stop(self->loop, &self->ka_timer); self->ka_timing = 0; }
-        if (self->insert_data) Safefree(self->insert_data);
-        if (self->insert_av) SvREFCNT_dec(self->insert_av);
-        if (self->insert_err) Safefree(self->insert_err);
-        if (self->recv_buf) Safefree(self->recv_buf);
-        if (self->send_buf) Safefree(self->send_buf);
+        CLEAR_STR(self->host);
+        CLEAR_STR(self->user);
+        CLEAR_STR(self->password);
+        CLEAR_STR(self->database);
+        CLEAR_STR(self->session_id);
+        CLEAR_STR(self->tls_ca_file);
+        CLEAR_STR(self->server_name);
+        CLEAR_STR(self->server_display_name);
+        CLEAR_STR(self->server_timezone);
+        CLEAR_STR(self->last_query_id);
+        CLEAR_STR(self->insert_data);
+        CLEAR_STR(self->insert_err);
+        CLEAR_STR(self->recv_buf);
+        CLEAR_STR(self->send_buf);
+        CLEAR_SV(self->native_rows);
+        CLEAR_SV(self->native_col_names);
+        CLEAR_SV(self->native_col_types);
+        CLEAR_SV(self->native_totals);
+        CLEAR_SV(self->native_extremes);
+        CLEAR_SV(self->default_settings);
+        CLEAR_SV(self->on_disconnect);
+        CLEAR_SV(self->on_drain);
+        CLEAR_SV(self->on_trace);
+        CLEAR_SV(self->insert_av);
         Safefree(self);
         return;
     }
@@ -6595,52 +6365,34 @@ CODE:
     self->loop = NULL;
     self->connected = 0;
 
-    if (NULL != self->on_connect) {
-        SvREFCNT_dec(self->on_connect);
-        self->on_connect = NULL;
-    }
-    if (NULL != self->on_error) {
-        SvREFCNT_dec(self->on_error);
-        self->on_error = NULL;
-    }
-    if (NULL != self->on_progress) {
-        SvREFCNT_dec(self->on_progress);
-        self->on_progress = NULL;
-    }
-    if (NULL != self->on_disconnect) {
-        SvREFCNT_dec(self->on_disconnect);
-        self->on_disconnect = NULL;
-    }
-    if (NULL != self->on_drain) {
-        SvREFCNT_dec(self->on_drain);
-        self->on_drain = NULL;
-    }
-    if (NULL != self->on_trace) {
-        SvREFCNT_dec(self->on_trace);
-        self->on_trace = NULL;
-    }
-    if (self->last_query_id) { Safefree(self->last_query_id); self->last_query_id = NULL; }
-    if (self->host) { Safefree(self->host); self->host = NULL; }
-    if (self->user) { Safefree(self->user); self->user = NULL; }
-    if (self->password) { Safefree(self->password); self->password = NULL; }
-    if (self->database) { Safefree(self->database); self->database = NULL; }
-    if (self->session_id) { Safefree(self->session_id); self->session_id = NULL; }
-    if (self->tls_ca_file) { Safefree(self->tls_ca_file); self->tls_ca_file = NULL; }
-    if (self->server_name) { Safefree(self->server_name); self->server_name = NULL; }
-    if (self->server_display_name) { Safefree(self->server_display_name); self->server_display_name = NULL; }
-    if (self->server_timezone) { Safefree(self->server_timezone); self->server_timezone = NULL; }
-    if (self->native_rows) { SvREFCNT_dec((SV*)self->native_rows); self->native_rows = NULL; }
-    if (self->native_col_names) { SvREFCNT_dec((SV*)self->native_col_names); self->native_col_names = NULL; }
-    if (self->native_col_types) { SvREFCNT_dec((SV*)self->native_col_types); self->native_col_types = NULL; }
-    if (self->native_totals) { SvREFCNT_dec((SV*)self->native_totals); self->native_totals = NULL; }
-    if (self->native_extremes) { SvREFCNT_dec((SV*)self->native_extremes); self->native_extremes = NULL; }
+    CLEAR_SV(self->on_connect);
+    CLEAR_SV(self->on_error);
+    CLEAR_SV(self->on_progress);
+    CLEAR_SV(self->on_disconnect);
+    CLEAR_SV(self->on_drain);
+    CLEAR_SV(self->on_trace);
+    CLEAR_STR(self->last_query_id);
+    CLEAR_STR(self->host);
+    CLEAR_STR(self->user);
+    CLEAR_STR(self->password);
+    CLEAR_STR(self->database);
+    CLEAR_STR(self->session_id);
+    CLEAR_STR(self->tls_ca_file);
+    CLEAR_STR(self->server_name);
+    CLEAR_STR(self->server_display_name);
+    CLEAR_STR(self->server_timezone);
+    CLEAR_SV(self->native_rows);
+    CLEAR_SV(self->native_col_names);
+    CLEAR_SV(self->native_col_types);
+    CLEAR_SV(self->native_totals);
+    CLEAR_SV(self->native_extremes);
     lc_free_dicts(self);
-    if (self->default_settings) { SvREFCNT_dec((SV*)self->default_settings); self->default_settings = NULL; }
-    if (self->insert_data) { Safefree(self->insert_data); self->insert_data = NULL; }
-    if (self->insert_av) { SvREFCNT_dec(self->insert_av); self->insert_av = NULL; }
-    if (self->insert_err) { Safefree(self->insert_err); self->insert_err = NULL; }
-    if (self->recv_buf) { Safefree(self->recv_buf); self->recv_buf = NULL; }
-    if (self->send_buf) { Safefree(self->send_buf); self->send_buf = NULL; }
+    CLEAR_SV(self->default_settings);
+    CLEAR_STR(self->insert_data);
+    CLEAR_SV(self->insert_av);
+    CLEAR_STR(self->insert_err);
+    CLEAR_STR(self->recv_buf);
+    CLEAR_STR(self->send_buf);
 
     self->magic = EV_CH_FREED;
     if (self->callback_depth == 0) {
@@ -6653,7 +6405,7 @@ void
 _set_tls_ca_file(EV::ClickHouse self, const char *path)
 CODE:
 {
-    if (self->tls_ca_file) Safefree(self->tls_ca_file);
+    CLEAR_STR(self->tls_ca_file);
     self->tls_ca_file = safe_strdup(path);
 }
 
@@ -6669,10 +6421,10 @@ CODE:
         croak("connection parameters must not contain CR or LF");
     }
 
-    if (self->host) Safefree(self->host);
-    if (self->user) Safefree(self->user);
-    if (self->password) Safefree(self->password);
-    if (self->database) Safefree(self->database);
+    CLEAR_STR(self->host);
+    CLEAR_STR(self->user);
+    CLEAR_STR(self->password);
+    CLEAR_STR(self->database);
 
     self->host = safe_strdup(host);
     self->port = port;
@@ -7043,7 +6795,7 @@ SV *
 server_version(EV::ClickHouse self)
 CODE:
 {
-    if (self->server_name) {
+    if (self->server_revision) {
         char buf[64];
         int n = snprintf(buf, sizeof(buf), "%u.%u.%u",
                          self->server_version_major,
@@ -7062,23 +6814,17 @@ void
 skip_pending(EV::ClickHouse self)
 CODE:
 {
-    if (self->send_count > 0) {
-        cleanup_connection(self);
-    }
-    if (self->insert_data) {
-        Safefree(self->insert_data);
-        self->insert_data = NULL;
-        self->insert_data_len = 0;
-    }
-    if (self->insert_av) {
-        SvREFCNT_dec(self->insert_av);
-        self->insert_av = NULL;
-    }
-    if (self->insert_err) {
-        Safefree(self->insert_err);
-        self->insert_err = NULL;
-    }
+    /* Cancel queued + in-flight callbacks first (delivers errors), then
+     * tear down the socket if a request was on the wire — capture the
+     * had_inflight state up front because cancel_pending zeroes send_count. */
+    int had_inflight = self->send_count > 0;
     if (cancel_pending(self, "skipped")) return;
+    CLEAR_STR(self->insert_data);
+    self->insert_data_len = 0;
+    CLEAR_SV(self->insert_av);
+    CLEAR_STR(self->insert_err);
+    if (had_inflight)
+        cleanup_connection(self);
 }
 
 void
@@ -7099,7 +6845,7 @@ void
 _set_session_id(EV::ClickHouse self, const char *sid)
 CODE:
 {
-    if (self->session_id) Safefree(self->session_id);
+    CLEAR_STR(self->session_id);
     self->session_id = safe_strdup(sid);
 }
 
@@ -7314,26 +7060,10 @@ CODE:
 {
     if (!(SvROK(cb) && SvTYPE(SvRV(cb)) == SVt_PVCV))
         croak("drain callback must be a CODE reference");
-    if (self->on_drain) SvREFCNT_dec(self->on_drain);
+    CLEAR_SV(self->on_drain);
     if (self->pending_count == 0 && ngx_queue_empty(&self->send_queue)) {
         /* Nothing pending — fire immediately */
-        self->on_drain = NULL;
-        {
-            dSP;
-            ENTER;
-            SAVETMPS;
-            PUSHMARK(SP);
-            PUTBACK;
-            self->callback_depth++;
-            call_sv(cb, G_DISCARD | G_EVAL);
-            self->callback_depth--;
-            if (SvTRUE(ERRSV))
-                warn("EV::ClickHouse: drain callback died: %s",
-                     SvPV_nolen(ERRSV));
-            FREETMPS;
-            LEAVE;
-        }
-        check_destroyed(self);
+        (void)fire_zero_arg_cb(self, cb, "drain");
     } else {
         self->on_drain = SvREFCNT_inc(cb);
     }
@@ -7356,10 +7086,7 @@ CODE:
         /* We still need to wait for EndOfStream or Exception from server */
     } else if (self->protocol == PROTO_HTTP && self->send_count > 0) {
         /* HTTP: close connection to cancel */
-        if (self->native_rows) {
-            SvREFCNT_dec((SV*)self->native_rows);
-            self->native_rows = NULL;
-        }
+        CLEAR_SV(self->native_rows);
         if (cancel_pending(self, "query cancelled")) return;
         cleanup_connection(self);
         if (self->auto_reconnect && self->host)

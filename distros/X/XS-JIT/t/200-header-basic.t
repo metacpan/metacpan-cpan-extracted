@@ -4,6 +4,9 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
+# JITted .dll files stay locked on Windows; let the OS reap %TEMP% so
+# File::Temp does not carp on every cleanup attempt.
+$File::Temp::KEEP_ALL = 1 if $^O =~ /^(MSWin32|cygwin|msys)$/;
 
 BEGIN {
     use_ok('XS::JIT::Header');

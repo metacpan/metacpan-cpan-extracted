@@ -1,3 +1,4 @@
+#!perl
 
 BEGIN {
   unless ($ENV{RELEASE_TESTING}) {
@@ -6,9 +7,10 @@ BEGIN {
   }
 }
 
-use strict;
-use warnings;
+
 use Test::More;
 
-use Test::DistManifest;
+eval "use Test::DistManifest";
+plan skip_all => "Test::DistManifest required for testing the manifest"
+  if $@;
 manifest_ok();

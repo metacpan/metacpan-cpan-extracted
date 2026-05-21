@@ -1,5 +1,5 @@
 /*
- * chandra_log.h — Structured logging for Chandra
+ * chandra_log.h - Structured logging for Chandra
  *
  * Levels: debug(0), info(1), warn(2), error(3), fatal(4)
  * Outputs: stderr, file (with rotation + flock), callback

@@ -18,8 +18,8 @@ BEGIN
     use_ok( 'Module::Generic::Array' ) || BAIL_OUT( "Unable to load Module::Generic::Array" );
     use_ok( 'Module::Generic::Scalar' ) || BAIL_OUT( "Unable to load Module::Generic::Scalar" );
 }
-# use warnings 'Module::Generic::Array';
-# no warnings 'Module::Generic::Array';
+# use warnings 'Module::Generic';
+# no warnings 'Module::Generic';
 use strict;
 use warnings;
 
@@ -33,9 +33,9 @@ my $h = \%$a;
 isa_ok( $h, 'Module::Generic::Hash' );
 is( CORE::exists( $a->{disapprove} ), 1, 'array to hash' );
 is( "@$a", 'I disapprove of what you say, but I will defend to the death your right to say it', 'array as string' );
-no warnings 'Module::Generic::Array';
+no warnings 'Module::Generic';
 is( $a->delete( 'not-integer' ), $a, 'delete with non-integer offset' );
-use warnings 'Module::Generic::Array';
+use warnings 'Module::Generic';
 my $a2 = $a->clone;
 is( $a2->delete( 2 )->as_string, 'of', 'delete with offset' );
 is( "@$a2", 'I disapprove what you say, but I will defend to the death your right to say it', 'array after delete' );

@@ -14,6 +14,15 @@ METHODS
 
     Constructor.
 
+    *       "mode_strict"
+
+            Strict mode for parsing.
+
+            In not strict mode, parser could parse MARC leader with dashes
+            instead of spaces,
+
+            Default is 0.
+
     *       "verbose"
 
             Verbose mode flag. It's boolean value.
@@ -47,6 +56,13 @@ ERRORS
      parse():
              Bad length of MARC leader.
                      Length: %s
+             Couldn't parse MARC leader.
+             (Errors in stack trace are:
+                     Bad number in data base address.
+                             String: %s
+                     Bad number in length.
+                             String: %s
+             and from L<Data::MARC::Leader>, see documentation.)
 
      serialize():
              Bad 'Data::MARC::Leader' instance to serialize.
@@ -183,7 +199,8 @@ EXAMPLE3
      # 02200cem a2200541 i 4500
 
 DEPENDENCIES
-    Class::Utils, Data::MARC::Leader, Error::Pure, Mo::utils, Scalar::Util.
+    Class::Utils, Data::MARC::Leader, English, Error::Pure, Mo::utils,
+    Scalar::Util.
 
 SEE ALSO
     Data::MARC::Leader
@@ -210,5 +227,5 @@ ACKNOWLEDGEMENTS
     Linked Open Data.
 
 VERSION
-    0.08
+    0.09
 

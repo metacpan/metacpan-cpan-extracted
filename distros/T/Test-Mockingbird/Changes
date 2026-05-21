@@ -1,5 +1,126 @@
 Revision history for Test::Mockingbird - Advanced mocking library for Perl with support for dependency injection and spies
 
+0.10	Fri May  8 15:11:42 EDT 2026
+
+  Bug fixes
+
+  - _parse_target() used !defined $arg3 to detect the single-argument
+    shorthand form ('Pkg::method').  Because no caller ever passes three
+    arguments to _parse_target(), $arg3 is always undef, making the guard
+    permanently true.  As a result, spy('A::B', 'method') was misread as
+    shorthand and resolved to package 'A', method 'B' -- silently spying
+    on the wrong target.  Fixed by changing the discriminator to
+    !defined $arg2: the shorthand form has exactly one argument (arg2
+    undef), the longhand form has two (arg2 defined).  All other callers
+    pass a single string argument and are unaffected.
+
+  - mock() emitted "Prototype mismatch: sub ... ()" warnings whenever it
+    replaced a function that carried a Perl prototype (such as the ()
+    no-args prototype used by I18N::LangTags::Detect::detect).  The
+    warning fired because the replacement coderef had no prototype, so
+    Perl flagged the redefinition as a signature mismatch.  Fixed by
+    calling Scalar::Util::set_prototype on the replacement immediately
+    before installing it, copying the prototype from the original coderef.
+    The call uses the & sigil (&Scalar::Util::set_prototype) to bypass
+    set_prototype's own (&$) prototype constraint, which would otherwise
+    reject a lexical variable as the first argument.  unmock() required
+    no change: reinstating the original coderef via glob assignment
+    restores its prototype automatically.
+
+  - Scalar::Util is now loaded (use Scalar::Util ()) without importing
+    set_prototype into the Test::Mockingbird namespace, avoiding any
+    risk of the imported alias inheriting the (&$) prototype constraint
+    at the call site.
+
+  Notes
+
+  - spy() installs its wrapper coderef directly without going through
+    mock(), so it does not benefit from the set_prototype fix and still
+    emits a prototype-mismatch warning when wrapping a prototyped
+    function.  This is a known limitation documented in the test suite
+    and will be addressed separately.
+
+  Tests
+
+  - Added prototype-preservation subtests to all four test files:
+
+    unit.t        Six white-box subtests confirming that prototype()
+                  on the installed glob matches the original after
+                  mock() for (), ($$), ($), and no-prototype functions,
+                  including across stacked mocks and after unmock.
+
+    function.t    Three subtests capturing $SIG{__WARN__} and asserting
+                  no prototype-mismatch warning is emitted during the
+                  mock/unmock cycle for (), ($$), and no-prototype
+                  functions.  Return-value assertions on () functions
+                  use ->can() to bypass Perl's compile-time constant
+                  inlining of () prototype functions.
+
+    integration.t Three end-to-end subtests covering plain mock(),
+                  deep_mock(), and mock_scoped() on a () prototype
+                  function.  All use ->can() closures for return-value
+                  assertions; the plain mock() subtest uses the
+                  fully-qualified Test::Mockingbird::restore_all() to
+                  avoid shadowing by the TimeTravel restore_all import.
+
+    edge-cases.t  Five boundary-condition subtests: () warning
+                  suppression; stacked mocks each independently carrying
+                  the prototype; mock_scoped() delegating correctly to
+                  mock(); spy() documented as a known limitation that
+                  still emits the mismatch warning; and ($$) full cycle.
+0.09	Mon May  4 20:22:49 EDT 2026
+
+  Bug fixes
+
+  - mock_scoped was recording two diagnostic meta layers per call: one of
+    type 'mock' (emitted by the internal mock() call) and a second of type
+    'mock_scoped' (pushed explicitly afterwards).  diagnose_mocks() therefore
+    reported depth 2 and a misleading 'mock' entry for every mock_scoped
+    installation.  Fixed by setting local $TYPE = 'mock_scoped' before
+    delegating to mock(), matching the pattern already used by mock_return,
+    mock_exception, mock_sequence, and mock_once.  Each mock_scoped call now
+    records exactly one layer of the correct type.
+
+  New features
+
+  - mock_scoped now accepts multiple method/coderef pairs in a single call,
+    returning one guard that restores all of them on destruction.  Four
+    argument forms are supported:
+
+      Single shorthand (unchanged):
+        my $g = mock_scoped 'Pkg::method' => sub { ... };
+
+      Single longhand (unchanged):
+        my $g = mock_scoped('Pkg', 'method', sub { ... });
+
+      Multi shorthand -- pairs of fully-qualified-name, coderef:
+        my $g = mock_scoped(
+            'Pkg::fetch'  => sub { ... },
+            'Other::save' => sub { ... },
+        );
+
+      Multi longhand -- package followed by method/coderef pairs:
+        my $g = mock_scoped('Pkg',
+            fetch  => sub { ... },
+            save   => sub { ... },
+            remove => sub { ... },
+        );
+
+    All methods covered by a multi-method guard are restored atomically when
+    the guard goes out of scope or is explicitly undefed.
+
+  - Test::Mockingbird::Guard updated to store a list of fully-qualified
+    method names rather than a single name, enabling the multi-method
+    mock_scoped forms above.  Single-method behaviour is unchanged.
+
+  Tests
+
+  - Added t/mock_scoped_multi.t (39 assertions) covering: the meta-layer
+    bug fix; no-regression checks on both single-method forms; all three
+    new multi-method forms (multi shorthand, multi longhand two methods,
+    multi longhand three methods); explicit guard undef; and
+    diagnose_mocks() state before and after guard destruction.
+
 0.08	Tue Apr  7 18:49:17 EDT 2026
 	Test::Mockingbird::DESTROY now calls restore_all
 

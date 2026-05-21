@@ -3,16 +3,18 @@ use warnings;
 use Test::More;
 
 BEGIN {
-    use_ok('GDPR::IAB::TCFv2::Constants::Purpose');
-    use_ok('GDPR::IAB::TCFv2::Constants::SpecialFeature');
-    use_ok('GDPR::IAB::TCFv2::Constants::RestrictionType');
-    use_ok('GDPR::IAB::TCFv2::BitUtils');
-    use_ok('GDPR::IAB::TCFv2::BitField');
-    use_ok('GDPR::IAB::TCFv2::Publisher');
-    use_ok('GDPR::IAB::TCFv2::PublisherRestrictions');
-    use_ok('GDPR::IAB::TCFv2::PublisherTC');
-    use_ok('GDPR::IAB::TCFv2::RangeSection');
-    use_ok('GDPR::IAB::TCFv2');
+  use_ok('GDPR::IAB::TCFv2::Constants::Purpose');
+  use_ok('GDPR::IAB::TCFv2::Constants::SpecialFeature');
+  use_ok('GDPR::IAB::TCFv2::Constants::RestrictionType');
+  use_ok('GDPR::IAB::TCFv2::BitUtils');
+  use_ok('GDPR::IAB::TCFv2::BitField');
+  use_ok('GDPR::IAB::TCFv2::Publisher');
+  use_ok('GDPR::IAB::TCFv2::PublisherRestrictions');
+  use_ok('GDPR::IAB::TCFv2::PublisherTC');
+  use_ok('GDPR::IAB::TCFv2::RangeSection');
+  use_ok('GDPR::IAB::TCFv2');
+  use_ok('GDPR::IAB::TCFv2::Parser');
+  use_ok('iabtcfv2');
 }
 
 require_ok('GDPR::IAB::TCFv2::Constants::Purpose');
@@ -25,34 +27,52 @@ require_ok('GDPR::IAB::TCFv2::PublisherRestrictions');
 require_ok('GDPR::IAB::TCFv2::PublisherTC');
 require_ok 'GDPR::IAB::TCFv2::RangeSection';
 require_ok 'GDPR::IAB::TCFv2';
+require_ok 'GDPR::IAB::TCFv2::Parser';
+require_ok 'iabtcfv2';
 
 subtest "check interfaces" => sub {
-    isa_ok 'GDPR::IAB::TCFv2::BitUtils',                   'Exporter';
-    isa_ok 'GDPR::IAB::TCFv2::Constants::Purpose',         'Exporter';
-    isa_ok 'GDPR::IAB::TCFv2::Constants::SpecialFeature',  'Exporter';
-    isa_ok 'GDPR::IAB::TCFv2::Constants::RestrictionType', 'Exporter';
+  isa_ok 'GDPR::IAB::TCFv2::BitUtils',                   'Exporter';
+  isa_ok 'GDPR::IAB::TCFv2::Constants::Purpose',         'Exporter';
+  isa_ok 'GDPR::IAB::TCFv2::Constants::SpecialFeature',  'Exporter';
+  isa_ok 'GDPR::IAB::TCFv2::Constants::RestrictionType', 'Exporter';
 
-    my @role_base_methods    = qw<Parse TO_JSON>;
-    my @role_decoder_methods = qw<contains>;
+  my @role_base_methods    = qw<Parse TO_JSON>;
+  my @role_decoder_methods = qw<contains>;
 
 
-    can_ok 'GDPR::IAB::TCFv2::BitField', @role_base_methods,
-      @role_decoder_methods;
-    can_ok 'GDPR::IAB::TCFv2::RangeSection', @role_base_methods,
-      @role_decoder_methods, qw<all>;
+  can_ok 'GDPR::IAB::TCFv2::BitField', @role_base_methods, @role_decoder_methods;
+  can_ok 'GDPR::IAB::TCFv2::RangeSection', @role_base_methods, @role_decoder_methods, qw<all>;
 
-    can_ok 'GDPR::IAB::TCFv2::PublisherRestrictions', @role_base_methods,
-      qw<check_restriction restrictions>;
-    can_ok 'GDPR::IAB::TCFv2::Publisher', @role_base_methods,
-      qw<check_restriction restrictions>;
-    can_ok 'GDPR::IAB::TCFv2::PublisherTC', @role_base_methods,
-      qw<num_custom_purposes
-      is_purpose_consent_allowed
-      is_purpose_legitimate_interest_allowed
-      is_custom_purpose_consent_allowed
-      is_custom_purpose_legitimate_interest_allowed>;
+  can_ok 'GDPR::IAB::TCFv2::PublisherRestrictions', @role_base_methods, qw<check_restriction restrictions>;
+  can_ok 'GDPR::IAB::TCFv2::Publisher',             @role_base_methods, qw<check_restriction restrictions>;
+  can_ok 'GDPR::IAB::TCFv2::PublisherTC', @role_base_methods, qw<num_custom_purposes
+    is_purpose_consent_allowed
+    is_purpose_legitimate_interest_allowed
+    is_custom_purpose_consent_allowed
+    is_custom_purpose_legitimate_interest_allowed>;
 
-    done_testing;
+  done_testing;
+};
+
+subtest 'parser-split BC contract' => sub {
+  my $tc_string
+    = 'CLcVDxRMWfGmWAVAHCENAXCkAKDAADnAABRgA5mdfCKZuYJez-NQm0TBMYA4oCAAGQYIAAAAAAEAIAEgAA.argAC0gAAAAAAAAAAAA';
+
+  my $c = GDPR::IAB::TCFv2->Parse($tc_string);
+  is(ref($c), 'GDPR::IAB::TCFv2::Parser', 'hub Parse returns a GDPR::IAB::TCFv2::Parser instance');
+
+  isa_ok(GDPR::IAB::TCFv2::Parser->Parse($tc_string),
+    'GDPR::IAB::TCFv2::Parser', 'direct Parser->Parse returns a ::Parser instance');
+
+  done_testing;
+};
+
+subtest 'looksLikeIsConsentVersion2 placement' => sub {
+  ok(GDPR::IAB::TCFv2->can('looksLikeIsConsentVersion2'), 'hub exposes looksLikeIsConsentVersion2');
+  is(GDPR::IAB::TCFv2::Parser->can('looksLikeIsConsentVersion2'),
+    undef, 'Parser deliberately does not expose looksLikeIsConsentVersion2');
+
+  done_testing;
 };
 
 diag("GDPR::IAB::TCFv2/$GDPR::IAB::TCFv2::VERSION");

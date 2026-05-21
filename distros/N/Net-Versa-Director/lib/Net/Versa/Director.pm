@@ -1,12 +1,12 @@
 package Net::Versa::Director;
-$Net::Versa::Director::VERSION = '0.004000';
+$Net::Versa::Director::VERSION = '0.005000';
 # ABSTRACT: Versa Director REST API client library
 
-use v5.36;
+use v5.38;
 use Moo;
-use feature 'signatures';
+use feature qw( class signatures );
+no warnings 'experimental::class';
 use Types::Standard qw( Str );
-use Carp qw( croak );
 use Net::Versa::Director::Serializer;
 
 
@@ -52,21 +52,86 @@ has '+persistent_headers' => (
     },
 );
 
+# around 'do_request' => sub($orig, $self, $method, $uri, $opts) {
+#     use DDP;
+#     warn 'request: ' . np($method) . np($uri) . np($opts);
+#     my $response = $orig->($self, $method, $uri, $opts);
+#     warn 'response: ' .  np $response;
+#     return $response;
+# };
+
+
+class Net::Versa::Director::Exception {
+    use overload q{""} => 'as_string', fallback => 1;
+}
+class Net::Versa::Director::Exception::OAuth :isa(Net::Versa::Director::Exception) {
+    field $error                :param :reader;
+    field $error_description    :param :reader;
+
+    method as_string {
+        return $error_description;
+    }
+}
+class Net::Versa::Director::Exception::Basic :isa(Net::Versa::Director::Exception) {
+    field $code                 :param :reader;
+    field $description          :param :reader;
+    field $http_status_code     :param :reader;
+    field $message              :param :reader;
+    field $more_info            :param :reader;
+
+    method as_string {
+        return $description;
+    }
+}
+class Net::Versa::Director::Exception::VNMS :isa(Net::Versa::Director::Exception) {
+    field $error                :param :reader;
+    field $exception            :param :reader;
+    field $timestamp            :param :reader;
+    field $http_status_code     :param :reader;
+    field $message              :param :reader;
+    field $path                 :param :reader;
+
+    method as_string {
+        return $message;
+    }
+}
+class Net::Versa::Director::Exception::Other :isa(Net::Versa::Director::Exception) {
+    field $http_status_code     :param :reader;
+    field $message              :param :reader;
+
+    method as_string {
+        return $message;
+    }
+}
+
 sub _error_handler ($self, $res) {
     if (ref $res->data eq 'HASH') {
         if (exists $res->data->{error} && ref $res->data->{error} eq 'HASH') {
-            croak($res->data->{error});
+            if (exists $res->data->{error}->{code}) {
+                die Net::Versa::Director::Exception::Basic->new(
+                    $res->data->{error}->%*,
+                );
+            }
+            die Net::Versa::Director::Exception::VNMS->new(
+                $res->data->{error}->%*,
+            );
         }
-        else {
-            croak($res->data);
+        elsif ($self->_is_oauth && exists $res->data->{error_description}) {
+            die Net::Versa::Director::Exception::OAuth->new(
+                $res->data->%*,
+            );
         }
+
+        die Net::Versa::Director::Exception::VNMS->new(
+            $res->data->%*
+        );
     }
-    # emulate API response
+    # handle undocumented API error responses
     else {
-        croak({
+        die Net::Versa::Director::Exception::Other->new(
             http_status_code    => $res->code,
-            message             => $res->response->decoded_content,
-        });
+            message             => $res->response->status_line,
+        );
     }
 }
 
@@ -179,6 +244,17 @@ sub list_device_networks ($self, $devicename) {
 }
 
 
+sub get_device_configuration ($self, $devicename) {
+    $self->set_header(Accept => 'text/plain');
+    return $self->_get("/vnms/appliance/export",
+        {
+            applianceName           => $devicename,
+        }, {
+            deserializer => undef,
+        });
+}
+
+
 1;
 
 __END__
@@ -193,11 +269,11 @@ Net::Versa::Director - Versa Director REST API client library
 
 =head1 VERSION
 
-version 0.004000
+version 0.005000
 
 =head1 SYNOPSIS
 
-    use v5.36;
+    use v5.38;
     use Net::Versa::Director;
 
     # to use the username/password basic authentication
@@ -233,13 +309,12 @@ version 0.004000
 
 =head1 DESCRIPTION
 
-This module is a client library for the Versa Director REST API using the
-basic authentication API endpoint on port 9182.
+This module is a client library for the Versa Director REST API.
 
-Currently it is developed and tested against version 21.2.
+Currently it is developed and tested against version 22.1.4.
 
 For more information see
-L<https://docs.versa-networks.com/Management_and_Orchestration/Versa_Director/Director_REST_APIs/01_Versa_Director_REST_API_Overview>.
+L<https://docs.versa-networks.com/Management_and_Orchestration/Versa_Director/Director_REST_APIs/Versa_Director_REST_API_Overview>.
 
 =head1 METHODS
 
@@ -315,42 +390,61 @@ Returns an arrayref of network hashrefs.
 
 From /api/config/devices/device/$devicename/config/networks/network?deep=true.
 
+=head2 get_device_configuration
+
+Takes a device name.
+
+Returns the current device configuration as string.
+
+From /vnms/appliance/export?applianceName=$devicename.
+
 =head1 ERROR handling
 
 All methods throw an exception on error returning the unmodified data from the API
-as hashref.
+as a Net::Versa::Director::Exception subclass object which stringifies to an error message.
 
-Currently the Versa Director has to different API error formats depending on
+Currently the Versa Director has multiple different API error formats depending on
 the type of request.
 
-=head2 authentication errors
+See L<https://docs.versa-networks.com/Management_and_Orchestration/Versa_Director/Director_REST_APIs/Versa_Director_REST_API_Overview#Status_and_Error_Responses>
+for a detailed documentation about the possible error responses.
 
-The response of an authentication error looks like this:
+=head2 OAuth errors
 
-    {
-        code               => 4001,
-        description        => "Invalid user name or password.",
-        http_status_code   => 401,
-        message            => "Unauthenticated",
-        more_info          => "http://nms.versa.com/errors/4001",
-    }
+Are thrown as Net::Versa::Director::Exception::OAuth objects and have the following attributes:
+
+    error               => 'invalid_client',
+    error_description   =>'Client authentication failed (e.g., unknown client, no client authentication included, or unsupported authentication method).',
 
 =head2 YANG data model errors
 
-All API endpoints starting with /api/config or /api/operational return this type of error:
+All API endpoints starting with /api/config or /api/operational return this type of error.
+They are thrown as Net::Versa::Director::Exception::Basic objects and have the following attributes:
+
+    code                => 401,
+    description         => "Invalid user name or password.",
+    http_status_code    => 401,
+    message             => "Unauthenticated",
+    more_info           => "http://nms.versa.com/errors/401",
 
 =head2 YANG and relational data model errors
 
-All API endpoints starting with /vnms return this type of error:
+All API endpoints starting with /vnms are thrown as Net::Versa::Director::Exception::VNMS objects:
 
-    {
-        error               => "Not Found",
-        exception           => "com.versa.vnms.common.exception.VOAEException",
-        http_status_code    => 404,
-        message             => " device work flow non-existing does not exist ",
-        path                => "/vnms/sdwan/workflow/devices/device/non-existing",
-        timestamp           => 1696574964569,
-    }
+    error               => "Not Found",
+    exception           => "com.versa.vnms.common.exception.VOAEException",
+    http_status_code    => 404,
+    message             => " device work flow non-existing does not exist ",
+    path                => "/vnms/sdwan/workflow/devices/device/non-existing",
+    timestamp           => 1696574964569,
+
+=head2 other errors
+
+If an error response doesn't conform to any of the above documented types, the exception is thrown
+as Net::Versa::Director::Exception::Other object:
+
+    http_status_code    => 500,
+    message             => "500 Internal Server Error",
 
 =head1 TESTS
 
@@ -382,11 +476,11 @@ Only read calls are tested so far.
 
 =head1 AUTHOR
 
-Alexander Hartmaier <abraxxa@cpan.org>
+Alexander Hartmaier <alex@hartmaier.priv.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Alexander Hartmaier.
+This software is copyright (c) 2023 by Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

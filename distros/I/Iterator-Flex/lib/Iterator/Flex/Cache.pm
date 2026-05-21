@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use experimental qw( signatures postderef );
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use parent 'Iterator::Flex::Base';
 use Iterator::Flex::Utils qw( STATE :IterAttrs :IterStates throw_failure );
@@ -66,6 +66,8 @@ sub new ( $class, $iterable, $pars = {} ) {
     my %pars = $pars->%*;
 
     my $capacity = delete $pars{capacity} // 2;
+    Scalar::Util::looks_like_number( $capacity ) && int( $capacity ) == $capacity && $capacity > 0
+      or throw_failure( parameter => "parameter 'capacity' ($capacity) is not a positive integer" );
 
     $class->SUPER::new( {
             capacity => $capacity,
@@ -185,7 +187,7 @@ Iterator::Flex::Cache - Cache Iterator Class
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 METHODS
 

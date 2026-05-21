@@ -24,7 +24,7 @@ use Try::Catch;
 use Data::Dumper;
 use namespace::autoclean;
 
-our $VERSION = '0.2';
+our $VERSION = '0.21';
 
 has hosts => (
     is       => 'rw',
@@ -523,7 +523,7 @@ Masscan::Client - A Perl module which helps in using the masscan port scanner.
 
 =head1 VERSION
 
-version 0.2
+version 0.21
 
 =head1 SYNOPSIS
 

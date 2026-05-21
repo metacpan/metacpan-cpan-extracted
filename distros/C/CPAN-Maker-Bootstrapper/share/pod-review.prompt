@@ -1,0 +1,79 @@
+# CPAN::Maker::Bootstrapper - pod review prompt
+# Edit this file to customize the pod review behavior.
+# This file was installed from the distribution defaults.
+# Lines beginning with # are ignored.
+#
+- Perform a documentation review of the POD in this Perl source file.
+- If no POD exists, generate complete POD documentation for the module
+  based on the source code, placing it after __END__. Document all
+  public methods (methods that do not start with '_'), the module's
+  purpose, synopsis, configuration, and any important behaviors or
+  caveats visible in the code.
+- If POD exists, focus on: missing or incomplete sections, features that are undocumented,
+  inaccurate examples, broken cross-references, undocumented public methods, and
+  inconsistencies between the code and the documentation.
+- Findings should be presented in a compact JSON object. No text outside the JSON.
+- Set "mode" inside the JSON object to "review" when POD exists, "generate" when generating new POD.
+- Place findings in the "findings" array with id, section, method (or null),
+  severity, description, detail, and suggestion.
+- Populate "suggestion" with text only when a finding identifies wrong, missing
+  or completely misleading text. Leave null otherwise.
+- Place generated POD as a string in "generated_pod", null if reviewing.
+- If POD for a public method (one that does not start with '_') is missing, 
+  write the documentation for that method and place that in the suggestion
+  element of the JSON output.
+- Do not flag minor wording preferences or formatting style.
+- Do not raise a finding and then withdraw it in the same response.
+- Only raise findings where the documentation actively misleads, not
+  where it could theoretically be improved.
+- Severity ratings should reflect how bad, missing or wrong
+  documentation would mislead a developer using the module.
+- Severity ratings should be low, medium, high.
+- Cite the method name or section for each finding.
+- Include a =head1 VERSION section containing only:
+  "This documentation refers to version @PACKAGE_VERSION@."
+- Use =encoding utf8 immediately after the NAME section.
+- Use =head1 METHODS AND SUBROUTINES rather than =head1 METHODS.
+- Include an =head1 AUTHOR section.
+- Include an =head1 LICENSE section with the standard Perl boilerplate:
+  "This library is free software; you can redistribute it and/or modify
+  it under the same terms as Perl itself."
+- Include =head1 SYNOPSIS and =head1 SEE ALSO sections.
+- In the =head1 SEE ALSO section use POD L<> link formatting for all
+  module names and URLs.
+- Generate =head1 sections in the following order:
+  NAME, SYNOPSIS, DESCRIPTION, CONFIGURATION, CONSTANTS,
+  METHODS AND SUBROUTINES, ACCESSORS, ENVIRONMENT, CAVEATS,
+  DEPENDENCIES, SEE ALSO, VERSION, AUTHOR, LICENSE
+- Omit sections that have no content rather than generating empty ones.
+- When generating new POD, begin the generated POD block with =pod
+  on its own line before =head1 NAME, so the generated documentation
+  can be cleanly identified and extracted from the review output.
+- Do not include findings with severity "none". These add no value.
+- When reviewing the SYNOPSIS do not guess method details and
+  return values for methods not part of the code being reviewed.
+- Only raise a finding if a developer following the documentation
+  exactly as written would write code that is incorrect or broken.
+- Do not raise findings for: edge cases not covered by examples,
+  behavior that is consistent with how similar Perl modules work,
+  information available in referenced documentation or linked modules,
+  return value nuances that are standard HTTP or JSON behavior,
+  or any finding where the fix would be "add a caveat" or
+  "mention this could also happen".
+- A finding must identify specific documentation text that is
+  factually wrong or missing in a way that has no workaround
+  from reading the existing documentation.
+- Do not create a finding if after analysis the finding would have been withdrawn.
+- For modules that subclass CLI::Simple do NOT raise a finding about a missing
+   METHODS AND SUBROUTINES section. Do not mention this is the findings.
+- For modules that subclass CLI::Simple it is not necessary to document methods - instead 
+  the commands and options must be documented.
+- For modules that subclass CLI::Simple ensure there are usage, options, and commands sections.
+- For modules that subclass CLI::Simple commands are mapped to methods in a hash that is passed to the
+  CLI::Simple constructor (command => ). Use the keys of that hash to ensure that all commands are documented.
+- CLI::Simple subclassed modules will generally be "modulinos" - meaning the SYNOPSIS will often
+  reference a script that is not the module name but likely a derivation of it. This is not a finding.
+  It is unnecessary to explain modulinos.
+- A SYNOPSIS does not have to cover every use case of the module or modulino.
+- Undocumented package globals or constants should NOT be raised as a finding unless
+  they would be routinely use to alter the behavior of the module by a user.

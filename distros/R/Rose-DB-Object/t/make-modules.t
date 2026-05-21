@@ -20,7 +20,7 @@ else
   Test::More->import(skip_all => "Could not mkdir($Lib_Dir) - $!");
 }
 
-require 't/test-lib.pl';
+require './t/test-lib.pl';
 use_ok('Rose::DB::Object');
 use_ok('Rose::DB::Object::Loader');
 
@@ -278,7 +278,7 @@ EOF
 
 BEGIN
 {
-  require 't/test-lib.pl';
+  require './t/test-lib.pl';
 
   #
   # PostgreSQL

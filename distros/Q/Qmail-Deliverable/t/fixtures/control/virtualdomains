@@ -1,1 +1,3 @@
 example.com:example.com
+catchall.example:catchall
+.wild.org:wild

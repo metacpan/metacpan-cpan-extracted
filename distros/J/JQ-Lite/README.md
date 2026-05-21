@@ -173,7 +173,7 @@ Administrator privileges are not required.
 
 ```dockerfile
 FROM alpine
-RUN apk add --no-cache jq-lite
+RUN apk add --no-cache perl-jq-lite
 ```
 
 jq-lite can be used as a **container-standard JSON processing tool**

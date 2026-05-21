@@ -11,6 +11,13 @@
   my $q = JSON::LINQ->FromJSONL('events.jsonl');
   # 從JSON字串
   my $q = JSON::LINQ->FromJSONString('[{"id":1}]');
+  # FromLTSV: read an LTSV file (label:value, TAB-separated, streaming)
+  my $q = JSON::LINQ->FromLTSV('data.ltsv');
+  # 從 CSV 檔案讀取（首列為標題列，串流）
+  my $q = JSON::LINQ->FromCSV('data.csv');
+  my $q = JSON::LINQ->FromCSV('data.csv', sep => "\t");         # TSV
+  my $q = JSON::LINQ->FromCSV('f.csv', headers=>[qw(a b c)]);  # 無標題列
+  my $q = JSON::LINQ->FromCSV('f.csv', headers=>[qw(a b c)], skip_header=>1);
   # 從記憶體陣列
   my $q = JSON::LINQ->From(\@array);
   # 空序列
@@ -63,6 +70,13 @@
 
   ->ToJSON('output.json')    # 寫出JSON陣列檔
   ->ToJSONL('output.jsonl')  # 寫出JSONL檔
+  ->ToLTSV('output.ltsv')                        # write as LTSV file (all keys, alphabetical)
+  ->ToLTSV('out.ltsv', label_order=>[qw(a b c)]) # emit specified labels in order
+  ->ToLTSV('out.ltsv', headers    =>[qw(a b c)]) # alias for label_order
+  ->ToCSV('output.csv')              # 寫出 CSV 檔（全欄位，字母序）
+  ->ToCSV('out.csv', headers    =>[qw(a b c)])  # 指定欄位順序
+  ->ToCSV('out.csv', label_order=>[qw(a b c)])  # headers 的別名
+  ->ToCSV('out.csv', sep=>"\t", no_header=>1)    # TSV，無標題列
 
 [ 9. 布林值 ]
 
@@ -73,5 +87,13 @@
 
   JSON::LINQ: https://metacpan.org/dist/JSON-LINQ
   JSONL規範:  https://jsonlines.org/
+
+
+  # JOIN: CSV主表 x JSON子表（價格）
+  my $prices = JSON::LINQ->FromJSON('prices.json');
+  JSON::LINQ->FromCSV('orders.csv')
+      ->Join($prices, sub { $_[0]{sku} }, sub { $_[0]{sku} },
+          sub { { order_id => $_[0]{id}, amount => $_[0]{qty} * $_[1]{price} } })
+      ->ToArray();
 
 ======================================================================

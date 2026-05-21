@@ -8,7 +8,7 @@ use TestHelper;
 
 require_pg;
 use File::Temp 'tmpnam';
-plan tests => 123;
+plan tests => 125;
 
 # notice handler
 with_pg(
@@ -129,8 +129,10 @@ with_pg(cb => sub {
 with_pg(cb => sub {
     my ($pg) = @_;
     my @rows;
+    my $cb_calls = 0;
     $pg->query("select generate_series(1,10) as n", sub {
         my ($data, $err) = @_;
+        $cb_calls++;
         if (ref $data eq 'ARRAY' && @$data > 0) {
             push @rows, $data->[0][0];
             $pg->skip_pending;
@@ -141,6 +143,8 @@ with_pg(cb => sub {
                     my ($d, $e) = @_;
                     is(scalar @rows, 1, 'single_row skip: only 1 row before abort');
                     is($rows[0], '1', 'single_row skip: first row value');
+                    is($cb_calls, 1,
+                       'single_row skip: TUPLES_OK terminator suppressed');
                     ok(!$e, 'single_row skip: followup query ok');
                     is($d->[0][0], 'after_skip', 'single_row skip: followup result');
                     EV::break;
@@ -279,7 +283,7 @@ SKIP: {
         });
         $cancel_timer = EV::timer(0.5, 0, sub {
             $pg->cancel_async(sub {
-                my ($err) = @_;
+                my ($r, $err) = @_;
                 ok(!defined $err, 'cancel_async: no error');
                 $got_cancel_ok = 1;
                 undef $cancel_timer;
@@ -312,7 +316,7 @@ SKIP: {
         });
         $cancel_timer = EV::timer(0.5, 0, sub {
             $pg->cancel_async(sub {
-                my ($err) = @_;
+                my ($r, $err) = @_;
                 ok(!defined $err, 'cancel_async double: first cancel ok');
                 $got_cancel_ok = 1;
                 undef $cancel_timer;
@@ -337,7 +341,7 @@ SKIP: {
             my $t; $t = EV::timer(0.3, 0, sub {
                 undef $t;
                 $pg->cancel_async(sub {
-                    my ($err) = @_;
+                    my ($r, $err) = @_;
                     $cancel_err = $err;
                 });
                 $pg->finish;
@@ -418,7 +422,13 @@ with_pg(cb => sub {
         is($m->{fields}[0]{name}, 'col_a', 'result_meta: field 0 name');
         is($m->{fields}[1]{name}, 'col_b', 'result_meta: field 1 name');
         ok(defined $m->{fields}[0]{type}, 'result_meta: field 0 has type OID');
-        EV::break;
+
+        # result_meta cache must drop on reset (fresh conn = no prior result)
+        $pg->reset;
+        $pg->on_connect(sub {
+            ok(!defined $pg->result_meta, 'result_meta: cleared on reset');
+            EV::break;
+        });
     });
 });
 

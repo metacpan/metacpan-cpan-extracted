@@ -1,6 +1,10 @@
 #
 # make sure delayed persist works in forks.
 #
+# NOTE: The below text was the old behaviour. The test was changed once
+# the deferral timestamp was move into shared memory. It now reflects
+# the ideally desired behaviour.
+#
 # Note that this test is really misleading. It seems to indicate a
 # behavior that is correct, which is incorrect. What it really does is
 # document the behavior of defer as it is now, in case it changes
@@ -19,19 +23,14 @@
 #
 use strict;
 use warnings;
-use Test::More;
-use MyNote;
-use Config;
+use MyTest;
 use File::Temp;
 
 use vars qw(@OPTS $tmpdir $fn0 $fn1 $fn2);
 
 BEGIN {
-    plan skip_all => 'pseudofork platform'
-        if $Config{d_pseudofork};
-
-    $tmpdir = File::Temp->newdir(CLEANUP => 0);
-    $fn0 = File::Temp::tempnam($tmpdir, 'UUID.test');
+    $tmpdir = File::Temp->newdir('UUID-test-XXXXXXXX', TMPDIR => 1, CLEANUP => 0);
+    $fn0 = File::Temp::tempnam($tmpdir, 'UUID.test.');
     $fn1 = File::Temp::tempnam($tmpdir, 'UUID.test.');
     $fn2 = File::Temp::tempnam($tmpdir, 'UUID.test.');
     @OPTS = ('uuid1', ':persist='.$fn0, ':defer=999999');
@@ -71,7 +70,7 @@ UUID::_persist($fn1);
 
 uuid1();
 
-ok -e $fn1, 'later persist found';
+ok !-e $fn1, 'later persist still missing';
 
 ok UUID::_defer(0.00000001), 'defer changed';
 UUID::_persist($fn2);

@@ -1,0 +1,47 @@
+---
+abstract: 'Generate Factur-X / ZUGFeRD-compatible PDF/A-3 invoices (EN 16931)'
+author:
+  - huguesmax
+build_requires:
+  Compress::Zlib: '0'
+  ExtUtils::MakeMaker: '0'
+  Test::More: '1.302'
+configure_requires:
+  ExtUtils::MakeMaker: '7.00'
+  File::ShareDir::Install: '0.13'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - factur-x
+  - facturx
+  - zugferd
+  - pdf
+  - invoice
+  - en16931
+  - pdfa3
+  - cii
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PDF-FacturX
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Encode: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  File::ShareDir: '1.116'
+  File::Temp: '0'
+  PDF::Builder: '3.020'
+  POSIX: '0'
+  XML::LibXML: '2.0'
+  perl: '5.020'
+resources:
+  bugtracker: https://github.com/huguesmax/PDF-FacturX/issues
+  homepage: https://github.com/huguesmax/PDF-FacturX
+  repository: https://github.com/huguesmax/PDF-FacturX.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

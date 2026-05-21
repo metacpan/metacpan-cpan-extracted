@@ -57,7 +57,7 @@ additions to C<Params::SomeUtil> may clash)
 
 L<Params::Util> already exists and has for some time.  Unfortunately,
 while the current maintainer has accepted patches to the project's
-git repostiroy, he refuses to make new releases of the module.  I
+git repository, he refuses to make new releases of the module.  I
 offered to help cut a new release but refused citing "quality" as an
 issue without elaborating, thus this fork.  This module includes
 the following changes that were applied after 1.07:
@@ -124,7 +124,7 @@ require DynaLoader;
 
 use vars qw{$VERSION @ISA @EXPORT_OK %EXPORT_TAGS};
 
-$VERSION   = '1.08';
+$VERSION   = '1.09';
 @ISA       = qw{
 	Exporter
 	DynaLoader

@@ -25,9 +25,11 @@ no_index:
     - author
     - builder
 provides:
+  CustomCallbacks:
+    file: lib/example/CustomCallbacks.pm
   OcToolkit:
     file: lib/OcToolkit.pm
-    version: '1.08'
+    version: '1.13'
 requires:
   File::Find::Rule: '0.34'
   File::Path: '2.18'
@@ -36,10 +38,11 @@ requires:
   MIME::Base64: '3.16'
   Template: '3.102'
   Text::Diff: '1.45'
+  Tie::IxHash: '1.23'
   YAML: '1.31'
   YAML::Safe: '0.82'
   perl: v5.16.0
-version: '1.08'
+version: '1.13'
 x_contributors:
   - 'John Summers <devp2000a@gmail.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1
-#                   and LibVirt version v11.10.0
+#                   and LibVirt version v12.3.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -16,12 +16,12 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad;
 
-class Sys::Async::Virt::NetworkPort v0.2.3;
+class Sys::Async::Virt::NetworkPort v0.6.3;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v11.10.1;
+use Protocol::Sys::Virt::Remote::XDR v12.3.0;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -35,37 +35,49 @@ use constant {
 };
 
 
-field $_id :param :reader;
+field $_rpc_id :param :reader;
 field $_client :param :reader;
+
+method network() {
+    return $_client->_domain_network_instance( $_rpc_id->{net} );
+}
+
+method uuid() {
+    return $_rpc_id->{uuid};
+}
+
+method uuid_string() {
+    return join( '-', unpack('H8H4H4H4H12', $_rpc_id->{uuid}) );
+}
 
 
 method delete($flags = 0) {
     return $_client->_call(
         $remote->PROC_NETWORK_PORT_DELETE,
-        { port => $_id, flags => $flags // 0 }, empty => 1 );
+        { port => $_rpc_id, flags => $flags // 0 }, empty => 1 );
 }
 
 async method get_parameters($flags = 0) {
     $flags |= await $_client->_typed_param_string_okay();
     my $nparams = await $_client->_call(
         $remote->PROC_NETWORK_PORT_GET_PARAMETERS,
-        { port => $_id, nparams => 0, flags => $flags // 0 }, unwrap => 'nparams' );
+        { port => $_rpc_id, nparams => 0, flags => $flags // 0 }, unwrap => 'nparams' );
     return await $_client->_call(
         $remote->PROC_NETWORK_PORT_GET_PARAMETERS,
-        { port => $_id, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
+        { port => $_rpc_id, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
 }
 
 async method get_xml_desc($flags = 0) {
     return await $_client->_call(
         $remote->PROC_NETWORK_PORT_GET_XML_DESC,
-        { port => $_id, flags => $flags // 0 }, unwrap => 'xml' );
+        { port => $_rpc_id, flags => $flags // 0 }, unwrap => 'xml' );
 }
 
 async method set_parameters($params, $flags = 0) {
     $params = await $_client->_filter_typed_param_string( $params );
     return await $_client->_call(
         $remote->PROC_NETWORK_PORT_SET_PARAMETERS,
-        { port => $_id, params => $params, flags => $flags // 0 }, empty => 1 );
+        { port => $_rpc_id, params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
 
@@ -81,7 +93,7 @@ Sys::Async::Virt::NetworkPort - Client side proxy to remote LibVirt network port
 
 =head1 VERSION
 
-v0.2.3
+v0.6.3
 
 =head1 SYNOPSIS
 
@@ -94,6 +106,24 @@ v0.2.3
 =head2 new
 
 =head1 METHODS
+
+=head2 network
+
+  $net = $port->network;
+
+Returns the L<Sys::Async::Virt::Network> instance which this port is part of.
+
+=head2 uuid
+
+  $uuid = $port->uuid;
+
+Returns a 16-byte string containing the (binary) UUID.
+
+=head2 uuid_string
+
+  $str = $port->uuid_string;
+
+Returns the string representation of the UUID (C<xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx>).
 
 =head2 delete
 
@@ -132,6 +162,15 @@ See documentation of L<virNetworkPortSetParameters|https://libvirt.org/html/libv
 
 =head1 CONSTANTS
 
+
+   my $value = Sys::Async::Virt::NetworkPort->BANDWIDTH_IN_AVERAGE;
+
+   # - or -
+
+   my $value = $port->BANDWIDTH_IN_AVERAGE;
+
+
+
 =over 8
 
 =item BANDWIDTH_IN_AVERAGE
@@ -157,7 +196,7 @@ L<LibVirt|https://libvirt.org>, L<Sys::Virt>
 =head1 LICENSE AND COPYRIGHT
 
 
-  Copyright (C) 2024-2025 Erik Huelsmann
+  Copyright (C) 2024-2026 Erik Huelsmann
 
 All rights reserved. This program is free software;
 you can redistribute it and/or modify it under the same terms as Perl itself.

@@ -2,7 +2,7 @@ package IPC::Manager::Base::FS;
 use strict;
 use warnings;
 
-our $VERSION = '0.000035';
+our $VERSION = '0.000037';
 
 use File::Spec;
 
@@ -186,6 +186,68 @@ sub peer_pid_file {
     return File::Spec->catfile($self->{+ROUTE}, $self->on_disk_name($peer_id) . ".pid");
 }
 
+sub peer_suspend_file {
+    my $self = shift;
+    my ($peer_id) = @_;
+
+    return File::Spec->catfile($self->{+ROUTE}, $self->on_disk_name($peer_id) . ".suspend");
+}
+
+sub peer_suspend_expires {
+    my $self = shift;
+    my ($peer_id) = @_;
+    return undef unless defined $peer_id && length $peer_id;
+
+    my $file = $self->peer_suspend_file($peer_id);
+    return undef unless -f $file;
+
+    open(my $fh, '<', $file) or return undef;
+    chomp(my $exp = <$fh>);
+    close($fh);
+
+    return undef unless defined $exp && $exp =~ m/^[0-9]+(?:\.[0-9]+)?\z/;
+    return $exp + 0;
+}
+
+sub _read_peer_pidfile {
+    my ($self, $on_disk) = @_;
+    return 0 unless defined $on_disk && length $on_disk;
+
+    my $pidfile = File::Spec->catfile($self->{+ROUTE}, "$on_disk.pid");
+    return 0 unless -f $pidfile;
+
+    open(my $fh, '<', $pidfile) or return 0;
+    chomp(my $pid = <$fh>);
+    close($fh);
+
+    return 0 unless defined $pid && $pid =~ m/^[0-9]+\z/;
+    return $pid + 0;
+}
+
+sub _reap_peer_artifacts {
+    my ($self, $peer_id) = @_;
+    return $self->_reap_peer_artifacts_by_on_disk($self->on_disk_name($peer_id));
+}
+
+sub _reap_peer_artifacts_by_on_disk {
+    my ($self, $on_disk) = @_;
+    return 0 unless defined $on_disk && length $on_disk;
+
+    my $route = $self->{+ROUTE};
+    my $path  = File::Spec->catfile($route, $on_disk);
+
+    remove_tree($path, {keep_root => 0, safe => 1}) if -e $path;
+
+    for my $suffix (qw/pid name resume stats suspend/) {
+        my $sidecar = File::Spec->catfile($route, "$on_disk.$suffix");
+        unlink($sidecar) if -e $sidecar;
+        my $pend = "$sidecar.pend";
+        unlink($pend) if -e $pend;
+    }
+
+    return 1;
+}
+
 sub init {
     my $self = shift;
 
@@ -206,7 +268,15 @@ sub init {
         }
     }
     else {
-        croak "${id} ${pt} already exists" if -e $path;
+        if (-e $path) {
+            my $existing_pid = $self->_read_peer_pidfile($self->on_disk_name($id));
+            if ($existing_pid && !$self->pid_is_running($existing_pid)) {
+                $self->_reap_peer_artifacts($id);
+            }
+            else {
+                croak "${id} ${pt} already exists";
+            }
+        }
         $self->make_path($path);
         $self->_write_name_file;
     }
@@ -216,6 +286,9 @@ sub init {
     $self->handles_for_peer_change if USE_INOTIFY();
 
     $self->write_pid;
+
+    my $suspend_file = $self->peer_suspend_file($id);
+    unlink($suspend_file) if -e $suspend_file;
 }
 
 sub clear_pid {
@@ -290,7 +363,19 @@ sub post_disconnect_hook {
 
 sub pre_suspend_hook {
     my $self = shift;
+    my (%params) = @_;
+
     $self->clear_pid;
+
+    my $expires_at = $params{expires_at};
+    return unless defined $expires_at;
+
+    my $sidecar = $self->peer_suspend_file($self->{+ID});
+    my $pend    = "$sidecar.pend";
+    open(my $fh, '>', $pend) or die "Could not open suspend file '$pend': $!";
+    print $fh ($expires_at + 0);
+    close($fh);
+    rename($pend, $sidecar) or die "Could not rename '$pend' -> '$sidecar': $!";
 }
 
 sub reset_handles_for_peer_change { $_[0]->{+PEER_INOTIFY}->read }
@@ -320,10 +405,13 @@ sub peers {
     for my $file (readdir($dh)) {
         next if $file eq $my_on_disk;
         next if $file =~ m/^(\.|_)/;
-        next if $file =~ m/\.(?:pid|name|resume|stats)$/;
+        next if $file =~ m/\.(?:pid|name|resume|stats|suspend)$/;
 
         my $path = File::Spec->catdir($self->{+ROUTE}, $file);
         next unless $self->check_path($path);
+
+        my $pid = $self->_read_peer_pidfile($file);
+        next if $pid && !$self->pid_is_running($pid);
 
         push @out => $self->_real_name_for_on_disk($file);
     }
@@ -331,6 +419,33 @@ sub peers {
     close($dh);
 
     return sort @out;
+}
+
+sub peer_left {
+    my $self = shift;
+
+    my $route = $self->{+ROUTE};
+    return 0 unless defined $route && -d $route;
+
+    my $my_on_disk = $self->on_disk_name($self->{+ID});
+
+    my $removed = 0;
+    opendir(my $dh, $route) or return 0;
+    for my $file (readdir($dh)) {
+        next if $file eq $my_on_disk;
+        next if $file =~ m/^(\.|_)/;
+        next if $file =~ m/\.(?:pid|name|resume|stats|suspend)$/;
+
+        my $pid = $self->_read_peer_pidfile($file);
+        next unless $pid;
+        next if $self->pid_is_running($pid);
+
+        $self->_reap_peer_artifacts_by_on_disk($file);
+        $removed++;
+    }
+    closedir($dh);
+
+    return $removed;
 }
 
 sub peer_pid {

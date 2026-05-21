@@ -1,0 +1,8 @@
+Version 0.002 - 2026-05-05
+  - Improved concept of config_* attributes
+  - Fancy output
+
+Version 0.001 - 2025..2026
+  Various "version 0.001" have been attached to my other CPAN dists
+  in the inc/ directory, and should not be considered official releases
+  as the version was not updated despite many changes.

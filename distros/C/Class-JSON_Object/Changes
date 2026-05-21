@@ -1,0 +1,10 @@
+Revision history for Class-JSON_Object
+
+0.02	2026-05-06
+
+	Add create, create_sparse and load_sparse.
+	
+0.01    2023-12-14
+
+	First version, released on an unsuspecting world.
+

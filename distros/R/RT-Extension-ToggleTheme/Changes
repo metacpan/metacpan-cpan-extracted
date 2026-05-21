@@ -1,5 +1,28 @@
 Revision history for RT-Extension-ToggleTheme
 
+1.03 2026-05-11
+ - Remove Elevator-only stylesheet restriction; toggle now works with any Bootstrap 5 theme
+ - Show toggle button in self-service portal as well as privileged interface
+
+1.02 2026-05-04
+ -  Version bump for pause
+
+1.01 2026-05-04
+ - Add menu-item class to toggle button to fix keyboard-shortcuts.js error
+
+1.00 2026-05-04
+ - Rewrite for RT 6
+ - Toggle WebDefaultThemeMode (light/dark) instead of WebDefaultStylesheet
+ - Use data-bs-theme on <html> for client-side theme switching (Bootstrap 5)
+ - Replace FontAwesome icons with RT 6 native circle-half SVG icon
+ - Replace Elements/Tabs callbacks with Elements/Header/PrivilegedMainNav
+   and Elements/Header/SelfServiceMainNav (RT 6 menu callback hooks)
+ - Remove MassageCSSFiles callback (dark mode handled natively in RT 6)
+ - Add MANIFEST.SKIP
+
+0.04 12-15-2021
+ - Update for RT 5 -- Remove no longer needed patches
+
 0.03 12-18-2020
  - Bump version for cpan
 

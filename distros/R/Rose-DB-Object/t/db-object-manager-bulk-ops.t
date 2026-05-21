@@ -6,7 +6,7 @@ use Test::More tests => 218;
 
 BEGIN 
 {
-  require 't/test-lib.pl';
+  require './t/test-lib.pl';
   use_ok('DateTime');
   use_ok('Rose::DB::Object');
   use_ok('Rose::DB::Object::Manager');

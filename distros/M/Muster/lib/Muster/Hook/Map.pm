@@ -1,12 +1,12 @@
 package Muster::Hook::Map;
-$Muster::Hook::Map::VERSION = '0.93';
+$Muster::Hook::Map::VERSION = '0.9501';
 =head1 NAME
 
 Muster::Hook::Map - Muster map and pmap directive.
 
 =head1 VERSION
 
-version 0.93
+version 0.9501
 
 =head1 DESCRIPTION
 

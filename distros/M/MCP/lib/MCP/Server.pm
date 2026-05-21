@@ -25,6 +25,9 @@ sub handle ($self, $request, $context) {
   # Requests
   if (defined(my $id = $request->{id})) {
 
+    my $token = ($request->{params} // {})->{_meta}{progressToken};
+    $context->progress_token($token) if defined $token;
+
     if ($method eq 'initialize') {
       my $result = $self->_handle_initialize($request->{params} // {});
       return _jsonrpc_response($result, $id);
@@ -62,6 +65,11 @@ sub handle ($self, $request, $context) {
   return undef;
 }
 
+sub notify_list_changed ($self, $kind) {
+  return undef unless my $transport = $self->transport;
+  return $transport->notify_all("notifications/$kind/list_changed");
+}
+
 sub prompt ($self, %args) {
   my $prompt = MCP::Prompt->new(%args);
   push @{$self->prompts}, $prompt;
@@ -74,8 +82,8 @@ sub resource ($self, %args) {
   return $resource;
 }
 
-sub to_action ($self) {
-  $self->transport(my $http = MCP::Server::Transport::HTTP->new(server => $self));
+sub to_action ($self, $options = {}) {
+  $self->transport(my $http = MCP::Server::Transport::HTTP->new(server => $self, %$options));
   return sub ($c) { $http->handle_request($c) };
 }
 
@@ -91,9 +99,11 @@ sub tool ($self, %args) {
 }
 
 sub _handle_initialize ($self, $params) {
+  my $transport = $self->transport;
+  my $caps      = $transport && $transport->notifications ? {listChanged => true} : {};
   return {
     protocolVersion => PROTOCOL_VERSION,
-    capabilities    => {prompts => {}, resources => {}, tools => {}},
+    capabilities    => {prompts => $caps, resources => $caps, tools => $caps},
     serverInfo      => {name    => $self->name, version => $self->version}
   };
 }
@@ -322,6 +332,13 @@ L<MCP::Tool> inherits all methods from L<Mojo::EventEmitter> and implements the 
 
 Handle a JSON-RPC request and return a response.
 
+=head2 notify_list_changed
+
+  my $bool = $server->notify_list_changed('tools');
+
+Broadcast a C<notifications/$kind/list_changed> JSON-RPC notification to all connected clients. Returns true on
+success, or C<undef> if no notification could be delivered.
+
 =head2 prompt
 
   my $prompt = $server->prompt(
@@ -348,8 +365,11 @@ Register a new resource with the server.
 =head2 to_action
 
   my $action = $server->to_action;
+  my $action = $server->to_action({streaming => 1});
 
-Convert the server to a L<Mojolicious> action.
+Convert the server to a L<Mojolicious> action. Any options are passed through to the constructor of
+L<MCP::Server::Transport::HTTP>; in particular, C<< streaming => 1 >> opts in to the server-to-client SSE stream
+and explicit session termination.
 
 =head2 to_stdio
 

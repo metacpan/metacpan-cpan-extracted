@@ -78,7 +78,11 @@ sub postamble {
     my $builder_def = 'lib/XS/JIT/Builder.def';
     
     # -iwithsysroot is Apple Clang-specific; use -I on other platforms
-    my $inc_flag = ($^O eq 'darwin') ? '-iwithsysroot' : '-I';
+    # Use plain -I; ExtUtils::MakeMaker doesn't switch to -iwithsysroot on
+    # Darwin either (the perl headers it points at are typically outside
+    # the SDK on homebrew/perlbrew), and forcing -iwithsysroot here breaks
+    # builds whenever PERL_INC isn't under the active SDK root.
+    my $inc_flag = '-I';
     
     # On Windows, we need a separate .def file for Builder.dll
     # Generate it now so it's available for the build

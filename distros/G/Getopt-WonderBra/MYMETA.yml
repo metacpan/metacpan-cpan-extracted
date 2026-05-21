@@ -1,0 +1,20 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.30, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Getopt-WonderBra
+requires: {}
+version: '1.04'
+x_installdirs: site
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_version_from: lib/Getopt/WonderBra.pm

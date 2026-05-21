@@ -17,6 +17,7 @@ WINDOWS_DOCKUR_TIMEOUT_SECS="${WINDOWS_DOCKUR_TIMEOUT_SECS:-7200}"
 WINDOWS_DOCKUR_WEB_PORT="${WINDOWS_DOCKUR_WEB_PORT:-8006}"
 WINDOWS_DOCKUR_RDP_PORT="${WINDOWS_DOCKUR_RDP_PORT:-3389}"
 WINDOWS_SKIP_CPANM_TESTS="${WINDOWS_SKIP_CPANM_TESTS:-1}"
+WINDOWS_USE_INSTALL_BOOTSTRAP="${WINDOWS_USE_INSTALL_BOOTSTRAP:-0}"
 WINDOWS_STRAWBERRY_URL="${WINDOWS_STRAWBERRY_URL:-}"
 WINDOWS_DOCKUR_USERNAME="${WINDOWS_DOCKUR_USERNAME:-developer}"
 WINDOWS_DOCKUR_PASSWORD="${WINDOWS_DOCKUR_PASSWORD:-developer-pass-123}"
@@ -155,6 +156,7 @@ prepare_dockur_oem_bundle() {
   mkdir -p "$storage_dir" "$shared_dir" "$oem_dir"
   cp "$TARBALL" "$shared_dir/"
   cp "$ROOT_DIR/integration/windows/run-strawberry-smoke.ps1" "$oem_dir/"
+  cp "$ROOT_DIR/install.ps1" "$oem_dir/"
 
   cat >"$install_bat" <<'EOF'
 @echo off
@@ -183,26 +185,37 @@ try {
         throw "Unable to locate Developer Dashboard tarball in \$shared"
     }
 
-    Write-Status -Name "status.txt" -Value "locate-strawberry-perl"
-    \$perl = Get-Command perl -ErrorAction SilentlyContinue
-    if (-not \$perl) {
-        Write-Status -Name "status.txt" -Value "install-strawberry-perl"
-        \$installer = "C:\\OEM\\strawberry-perl-installer.msi"
-        if (-not (Test-Path \$installer)) {
-            throw "Unable to find staged Strawberry Perl installer at \$installer"
+    if ("$WINDOWS_USE_INSTALL_BOOTSTRAP" -ne "1") {
+        Write-Status -Name "status.txt" -Value "locate-strawberry-perl"
+        \$perl = Get-Command perl -ErrorAction SilentlyContinue
+        if (-not \$perl) {
+            Write-Status -Name "status.txt" -Value "install-strawberry-perl"
+            \$installer = "C:\\OEM\\strawberry-perl-installer.msi"
+            if (-not (Test-Path \$installer)) {
+                throw "Unable to find staged Strawberry Perl installer at \$installer"
+            }
+            Start-Process msiexec.exe -ArgumentList @('/i', \$installer, '/qn', '/norestart') -Wait
         }
-        Start-Process msiexec.exe -ArgumentList @('/i', \$installer, '/qn', '/norestart') -Wait
     }
 
     Write-Status -Name "status.txt" -Value "run-strawberry-smoke"
     \$smokeArgs = @(
+        '-NoLogo',
+        '-NoProfile',
+        '-ExecutionPolicy', 'Bypass',
+        '-File', 'C:\\OEM\\run-strawberry-smoke.ps1',
         '-Tarball', \$tarball.FullName,
         '-StatusRoot', \$shared
     )
+    if ("$WINDOWS_USE_INSTALL_BOOTSTRAP" -eq "1") {
+        \$smokeArgs += '-UseInstallBootstrap'
+        \$smokeArgs += '-BootstrapScript'
+        \$smokeArgs += 'C:\\OEM\\install.ps1'
+    }
     if ("$WINDOWS_SKIP_CPANM_TESTS" -eq "1") {
         \$smokeArgs += '-SkipCpanmTests'
     }
-    & "C:\\OEM\\run-strawberry-smoke.ps1" @smokeArgs
+    & powershell.exe @smokeArgs
     Write-Status -Name "status.txt" -Value "success"
 }
 catch {
@@ -212,6 +225,17 @@ catch {
     throw
 }
 EOF
+}
+
+reset_dockur_workdir() {
+  # Purpose: remove stale Dockur guest state so a fresh smoke rerun always
+  # replays the OEM bootstrap path instead of booting an old installed image.
+  # Input: the configured Dockur workdir path.
+  # Output: deletes the persisted storage, shared, and OEM subdirectories.
+  rm -rf \
+    "$WINDOWS_DOCKUR_WORKDIR/storage" \
+    "$WINDOWS_DOCKUR_WORKDIR/shared" \
+    "$WINDOWS_DOCKUR_WORKDIR/oem"
 }
 
 run_prepared_qemu_smoke() {
@@ -251,15 +275,20 @@ run_prepared_qemu_smoke() {
   echo "==> copy tarball and Windows smoke script into guest"
   scp -i "$WINDOWS_SSH_KEY" -P "$WINDOWS_SSH_PORT" -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
     "$TARBALL" \
+    "$ROOT_DIR/install.ps1" \
     "$ROOT_DIR/integration/windows/run-strawberry-smoke.ps1" \
     "$WINDOWS_SSH_USER"@127.0.0.1:/C:/Temp/
 
   local guest_tarball="C:/Temp/$(basename "$TARBALL")"
 
   echo "==> run Strawberry Perl smoke inside guest"
+  local guest_command="powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -File C:/Temp/run-strawberry-smoke.ps1 -Tarball '$guest_tarball'"
+  if [[ "$WINDOWS_USE_INSTALL_BOOTSTRAP" == "1" ]]; then
+    guest_command="$guest_command -UseInstallBootstrap -BootstrapScript C:/Temp/install.ps1"
+  fi
   ssh -i "$WINDOWS_SSH_KEY" -p "$WINDOWS_SSH_PORT" -o BatchMode=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
     "$WINDOWS_SSH_USER"@127.0.0.1 \
-    "powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -File C:/Temp/run-strawberry-smoke.ps1 -Tarball '$guest_tarball'"
+    "$guest_command"
 }
 
 run_dockur_smoke() {
@@ -271,6 +300,10 @@ run_dockur_smoke() {
   local error_file="$shared_dir/error.txt"
   local host_log_file="$shared_dir/dockur-host.log"
   local container_log_file="$shared_dir/dockur-container.log"
+
+  if ! docker ps -a --format '{{.Names}}' | grep -Fxq "$WINDOWS_DOCKUR_NAME"; then
+    reset_dockur_workdir
+  fi
 
   prepare_dockur_oem_bundle
   rm -f "$status_file" "$error_file"
@@ -426,6 +459,9 @@ C<releases.json> feed before it generates the OEM bootstrap. The Dockur path
 is the repeatable host-side provisioning route; the supported runtime baseline
 inside Windows remains PowerShell plus Strawberry Perl. Git Bash and Scoop are
 optional setup helpers, not runtime requirements for Developer Dashboard.
+Set C<WINDOWS_USE_INSTALL_BOOTSTRAP=1> to make the in-guest smoke run the
+repo-root F<install.ps1> bootstrap against the staged tarball before the normal
+dashboard verification steps.
 
 =cut
 __END__

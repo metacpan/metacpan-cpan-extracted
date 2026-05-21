@@ -6,8 +6,8 @@ use EV;
 use EV::ClickHouse;
 
 my $ch = EV::ClickHouse->new(
-    host     => $ENV{CLICKHOUSE_HOST} // '127.0.0.1',
-    port     => $ENV{CLICKHOUSE_PORT} // 8123,
+    host     => $ENV{CLICKHOUSE_HOST} // $ENV{TEST_CLICKHOUSE_HOST} // '127.0.0.1',
+    port     => $ENV{CLICKHOUSE_PORT} // $ENV{TEST_CLICKHOUSE_PORT} // 8123,
     settings => { max_threads => 2 },   # connection-level defaults
     on_connect => sub {
         print "Connected (connection default: max_threads=2)\n";

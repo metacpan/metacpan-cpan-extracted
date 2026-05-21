@@ -6,7 +6,7 @@ use EV::Kafka;
 
 my $broker = $ENV{TEST_KAFKA_BROKER} || '127.0.0.1:9092';
 plan skip_all => 'set TEST_KAFKA_BROKER to run' unless $ENV{TEST_KAFKA_BROKER};
-plan tests => 6;
+plan tests => 8;
 
 my ($host, $port) = split /:/, $broker;
 my $conn = EV::Kafka::Conn::_new('EV::Kafka::Conn', undef);
@@ -34,22 +34,36 @@ $conn->on_connect(sub {
                     my ($res2, $err2) = @_;
                     ok !$err2, 'lz4 produce ok';
 
-                    # produce uncompressed
-                    $conn->produce('compress-test', 0, 'none-key', 'none-value', sub {
-                        my ($res3, $err3) = @_;
-                        ok !$err3, 'uncompressed produce ok';
+                    # produce with zstd
+                    $conn->produce('compress-test', 0, 'zstd-key', 'zstd-value' x 10,
+                        { compression => 'zstd' }, sub {
+                        my ($rzs, $ezs) = @_;
+                        ok !$ezs, 'zstd produce ok';
 
-                        # fetch all back
-                        $conn->fetch('compress-test', 0, $offset, sub {
-                            my ($fres, $ferr) = @_;
-                            ok !$ferr, 'fetch ok';
-                            my $recs = $fres->{topics}[0]{partitions}[0]{records};
-                            ok scalar @$recs >= 3, "fetched " . scalar(@$recs) . " records";
-                            for my $r (@$recs) {
-                                diag "  key=$r->{key} value_len=" . length($r->{value} // '');
-                            }
-                            $conn->disconnect;
-                            EV::break;
+                        # produce with snappy
+                        $conn->produce('compress-test', 0, 'snappy-key', 'snappy-value' x 10,
+                            { compression => 'snappy' }, sub {
+                            my ($rsn, $esn) = @_;
+                            ok !$esn, 'snappy produce ok';
+
+                            # produce uncompressed
+                            $conn->produce('compress-test', 0, 'none-key', 'none-value', sub {
+                                my ($res3, $err3) = @_;
+                                ok !$err3, 'uncompressed produce ok';
+
+                                # fetch all back
+                                $conn->fetch('compress-test', 0, $offset, sub {
+                                    my ($fres, $ferr) = @_;
+                                    ok !$ferr, 'fetch ok';
+                                    my $recs = $fres->{topics}[0]{partitions}[0]{records};
+                                    ok scalar @$recs >= 5, "fetched " . scalar(@$recs) . " records";
+                                    for my $r (@$recs) {
+                                        diag "  key=$r->{key} value_len=" . length($r->{value} // '');
+                                    }
+                                    $conn->disconnect;
+                                    EV::break;
+                                });
+                            });
                         });
                     });
                 });

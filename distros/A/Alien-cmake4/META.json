@@ -4,7 +4,7 @@
       "Michal Josef Špaček <skim@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -22,28 +22,28 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::Build::MM" : "0.32",
+            "Alien::Build::MM" : "0.25",
             "Archive::Tar" : "0",
             "Config" : "0",
-            "ExtUtils::MakeMaker" : "6.76",
             "File::Spec" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",
             "Mojo::DOM" : "0",
-            "Mojolicious" : "7.00",
+            "Mojolicious" : "7",
             "Mozilla::CA" : "0",
             "Net::SSLeay" : "1.49",
             "Sort::Versions" : "0",
             "URI" : "0",
-            "URI::Escape" : "0"
+            "URI::Escape" : "0",
+            "version" : "0"
          }
       },
       "configure" : {
          "requires" : {
             "Alien::Build" : "1.40",
             "Alien::Build::MM" : "0.32",
-            "Alien::Build::Plugin::Build::Make" : "0",
+            "Alien::Build::Plugin::Build::Autoconf" : "0",
             "Alien::Build::Plugin::Probe::CommandLine" : "0",
             "ExtUtils::MakeMaker" : "6.76"
          }
@@ -54,6 +54,7 @@
             "Alien::Build" : "0.25",
             "Path::Tiny" : "0",
             "parent" : "0",
+            "perl" : "5.008001",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -76,7 +77,7 @@
          "url" : "https://github.com/michal-josef-spacek/Alien-cmake4"
       }
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.84",
       "requires" : {
@@ -96,5 +97,5 @@
          "system" : {}
       }
    },
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

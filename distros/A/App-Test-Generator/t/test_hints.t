@@ -3,7 +3,7 @@ use warnings;
 
 use File::Spec;
 use File::Temp qw(tempdir);
-use Test::DescribeMe qw(extended);
+# use Test::DescribeMe qw(extended);
 use Test::Most;
 use YAML::XS qw(LoadFile);
 

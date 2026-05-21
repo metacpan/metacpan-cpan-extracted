@@ -4,8 +4,9 @@ package PGPLOT::Device;
 
 use strict;
 use warnings;
+use List::Util;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 
 my %Default = ( device => 'xs', );
@@ -13,6 +14,7 @@ my %Default = ( device => 'xs', );
 my $NDevices;
 my %PGDevice;
 my %DevMap;
+
 
 sub _croak {
     require Carp;
@@ -129,6 +131,30 @@ sub new {
     $self;
 }
 
+sub _default {
+    my $key = shift;
+    _class_init();
+    if ( $key eq 'device' ) {
+        return exists $DevMap{xs} ? 'xs' : 'ps';
+    }
+    die( 'internal error' );
+}
+
+
+
+
+
+
+
+
+
+sub devices {
+    my $class = shift;
+    _class_init();
+
+    return ( sort List::Util::uniqstr keys %DevMap );
+}
+
 sub _class_init {
     return if $NDevices;
 
@@ -175,8 +201,8 @@ sub _initialize {
     $self->{$_} = $spec{$_} for keys %spec;
 
     unless ( defined $self->{device} ) {
-        $self->{device}  = $Default{device};
-        $self->{devinfo} = $PGDevice{ $DevMap{ $Default{device} } };
+        $self->{device}  = _default( 'device' );
+        $self->{devinfo} = $PGDevice{ $DevMap{ $self->{device} } };
     }
 
     if ( exists $opts->{vars} ) {
@@ -508,7 +534,7 @@ PGPLOT::Device - autogenerate PGPLOT device names
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -604,7 +630,7 @@ into the class constructor.
 The  internal counter which tracks the number of times the device object has
 been used is available as C<${devn}>.
 
-=head1 METHODS
+=head1 CONSTRUCTORS
 
 =head2 new
 
@@ -692,6 +718,16 @@ If not specified, the user is prompted if
 Set to a true or false value to override the automatic configuration.
 
 =back
+
+=head1 CLASS METHODS
+
+=head2 devices
+
+  @devices = PGPLOT::Device->devices;
+
+Returns a list of the devices available in the local PGPLOT installation.
+
+=head1 METHODS
 
 =head2 override
 
@@ -882,11 +918,11 @@ Please report any bugs or feature requests to bug-pgplot-device@rt.cpan.org  or 
 
 Source is available at
 
-  https://gitlab.com/djerius/pgplot-device
+  https://codeberg.org/djerius/p5-PGPLOT-Device
 
 and may be cloned from
 
-  https://gitlab.com/djerius/pgplot-device.git
+  https://codeberg.org/djerius/p5-PGPLOT-Device.git
 
 =head1 SEE ALSO
 

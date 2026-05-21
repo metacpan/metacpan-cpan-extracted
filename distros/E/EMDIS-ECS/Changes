@@ -578,6 +578,22 @@ Version 0.49 2026-03-20
 - docker/centos:  removed as obsolete due to CentOS 7 end-of-life (was
   June 30, 2024)
 - docker/dist/certfiles.tar.gz: replace expired certificates
+- docker/dist/Dockerfile:  remove gnupg1 package and add note about its
+  removal from EPEL in late 2025
 - docker/dist/generate_ca_and_certfiles.sh:  increase x509 certificate
   expiration -days to 3650
 - docker/qpid-broker-cpp:  removed as obsolete due to CentOS 7 end-of-life
+- docker/rockylinux/Dockerfile:  remove gnupg1 package and add note about
+  its removal from EPEL in late 2025
+
+Version 0.50 2026-05-10
+=======================
+- Config.pm:  add T_INBOUND setting with default value 2400
+- ecs_setup:  add T_INBOUND setting
+- ecs_scan_mail:  update processing loop to fully implement processing
+  cutoff times based on T_SCN and T_INBOUND - this is useful when running
+  "ecs_scan_mail --once" under an environment such as AWS Lambda, to have
+  the program exit cleanly after some amount of time
+- ecs_amqp_recv.py:  add --timelimit command line parameter to set
+  execution time limit;  add code to control receiver link flow credit
+  (to limit and enable message delivery)

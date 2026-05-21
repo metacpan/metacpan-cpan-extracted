@@ -36,6 +36,7 @@ my $small    = FALSE; # Force a small screen for debugging core dumps
 my $help     = FALSE; # Shows a brief help screen
 my $man      = FALSE; # Shows the full POD manual
 my $errors   = FALSE; # Show errors
+my $interval = (1/15);
 my $show_func;
 
 # Forced flushing has been removed and an automatic flush is triggered if VirtualVox is detected in the module itself.
@@ -293,30 +294,32 @@ if (defined($show_func)) { # If the "--func" option is used, the they are run on
 
 if (grep(/Texture|Blit|Rotate|Flipping|Monochrome|Mode Drawing|Animated|Replace/,@order)) {
     foreach my $file (@files) {
-        next if ($file =~ /^\.+/ || $file =~ /Test/i || -d "$images_path/$file"); # Ignore the test pattern and directories
+        next if ($file =~ /^\.+/ || $file =~ /Test|README\.md/i || -d "$images_path/$file"); # Ignore the test pattern and directories
         if ($file =~ /\.gif$/i) {
             my $image;
-            if ($XX > 320) { # Only load native for larger screens
-				print_it($F, "Loading Animation (native size) > $file", '00FFFFFF', undef, 1);
+            if (grep(/Animated/, @order)) {
+                if ($XX > 320) { # Only load native for larger screens
+                    print_it($F, "Loading Animation (native size) > $file", '00FFFFFF', undef, 1);
+                    $image = $F->load_image(
+                        {
+                            'file'   => "$images_path/$file",
+                            'center' => CENTER_XY
+                        }
+                    );
+                    push(@ANIM,$image);
+                }
+                print_it($F, "Loading Animation (full screen) > $file", '00FFFFFF', undef, 1);
                 $image = $F->load_image(
                     {
+                        'width'  => $XX,
+                        'height' => $YY - $F->{'Y_CLIP'},
                         'file'   => "$images_path/$file",
                         'center' => CENTER_XY
                     }
                 );
                 push(@ANIM,$image);
+                push(@ANIM,$image) if ($XX <= 320); # "Native" is really scaled down for tiny screens.
             }
-            print_it($F, "Loading Animation (full screen) > $file", '00FFFFFF', undef, 1);
-            $image = $F->load_image(
-                {
-                    'width'  => $XX,
-                    'height' => $YY - $F->{'Y_CLIP'},
-                    'file'   => "$images_path/$file",
-                    'center' => CENTER_XY
-                }
-            );
-            push(@ANIM,$image);
-            push(@ANIM,$image) if ($XX <= 320); # "Native" is really scaled down for tiny screens.
         } else {
             print_it($F, "Loading Image > $file", '00FFFFFF', undef, 1);
             my $image = $F->load_image(
@@ -351,15 +354,14 @@ foreach my $name (@order) {
                 $F->cls();
                 $F->acceleration(PERL);
                 $func{$name}->($name . ' -> Pure-Perl');
-				$F->acceleration(SOFTWARE);
+                $F->acceleration(SOFTWARE);
             }
         } else {
             $F->cls();
             $F->acceleration(SOFTWARE);
             $func{$name}->($name . ' -> C Accelerated');
         }
-		$F->_flush_screen();
-        sleep $delay unless($name =~ /Plot|Lines|Poly|Boxes|Circles|Ellipses|Arcs|Beziers|Pies/);
+        sleep $delay unless($name =~ /Plot|Lines|Poly|Boxes|Circles|Ellipses|Arcs|Beziers|Pies|Animated/);
     }
 }
 
@@ -372,6 +374,12 @@ $F->cls('ON');         # Clear the screen and turn the cursor on
 undef($F);             # Destroy the framebuffer object
 
 exit(0);
+
+sub vbox_flush {
+    if ($F->{'VBOX'} && ($F->{'LAST_FLUSHED'} + $interval) <= time) {
+        $F->_flush_screen();
+    }
+}
 
 sub color_mapping { # Shows Red-Green-Blue to see if color mapping is correct (in the proper order).
     my $name = shift;
@@ -394,6 +402,7 @@ sub color_mapping { # Shows Red-Green-Blue to see if color mapping is correct (i
         }
     );
 
+    vbox_flush();
     sleep $delay / 2;
 
     $F->rbox(
@@ -414,6 +423,7 @@ sub color_mapping { # Shows Red-Green-Blue to see if color mapping is correct (i
         }
     );
 
+    vbox_flush();
     sleep $delay / 2 unless ($rpi);
 
     my $image = $F->load_image(
@@ -427,6 +437,7 @@ sub color_mapping { # Shows Red-Green-Blue to see if color mapping is correct (i
         }
     );
     $F->blit_write($image);
+    vbox_flush();
 }
 
 sub plotting {
@@ -451,6 +462,7 @@ sub plotting {
                 'y'          => $y,
             }
         );
+        vbox_flush();
     }
 }
 
@@ -478,6 +490,7 @@ sub lines {
                 'antialiased' => $aa,
             }
         );
+        vbox_flush();
     }
 } ## end sub lines
 
@@ -509,6 +522,7 @@ sub angle_lines {
         );
         $angle = ($F->acceleration()) ? $angle + .5 : $angle + 1;
         $angle -= 360 if ($angle >= 360);
+        vbox_flush();
     }
 }
 
@@ -533,6 +547,7 @@ sub boxes {
                 'yy'         => int(rand($YY)),
             }
         );
+        vbox_flush();
     }
 }
 
@@ -558,6 +573,7 @@ sub filled_boxes {
                 'filled' => 1,
             }
         );
+        vbox_flush();
     }
 }
 
@@ -597,6 +613,7 @@ sub gradient_boxes {
                 }
             }
         );
+        vbox_flush();
     }
 }
 
@@ -640,6 +657,7 @@ sub hatch_filled_boxes {
                 'hatch'  => $HATCHES[int(rand(scalar(@HATCHES)))]
             }
         );
+        vbox_flush();
     }
     $F->attribute_reset();
 }
@@ -661,6 +679,7 @@ sub texture_filled_boxes {
                 'texture' => $image
             }
         );
+        vbox_flush();
     }
 }
 
@@ -687,6 +706,7 @@ sub rounded_boxes {
                 'radius'     => 4 + rand($XX / 16),
             }
         );
+        vbox_flush();
     }
 }
 
@@ -714,6 +734,7 @@ sub filled_rounded_boxes {
                 'filled' => 1,
             }
         );
+        vbox_flush();
     }
 }
 
@@ -750,6 +771,7 @@ sub hatch_filled_rounded_boxes {
                 'hatch'  => $HATCHES[int(rand(scalar(@HATCHES)))],
             }
         );
+        vbox_flush();
     }
     $F->attribute_reset();
 }
@@ -790,6 +812,7 @@ sub gradient_rounded_boxes {
                 }
             }
         );
+        vbox_flush();
     }
 }
 
@@ -811,6 +834,7 @@ sub texture_filled_rounded_boxes {
                 'texture' => $image
             }
         );
+        vbox_flush();
     }
 }
 
@@ -835,6 +859,7 @@ sub circles {
                 'radius'     => rand($center_y),
             }
         );
+        vbox_flush();
     }
 }
 
@@ -860,6 +885,7 @@ sub filled_circles {
                 'filled' => 1,
             }
         );
+        vbox_flush();
     }
 }
 
@@ -881,6 +907,7 @@ sub balls {
                 },
             }
         );
+        vbox_flush();
     }
 }
 
@@ -915,6 +942,7 @@ sub hatch_filled_circles {
                 'hatch'  => $HATCHES[int(rand(scalar(@HATCHES)))],
             }
         );
+        vbox_flush();
     }
     $F->attribute_reset();
 }
@@ -949,6 +977,7 @@ sub gradient_circles {
                 }
             }
         );
+        vbox_flush();
     }
 }
 
@@ -968,6 +997,7 @@ sub texture_filled_circles {
                 'texture' => $image
             }
         );
+        vbox_flush();
     }
 }
 
@@ -994,6 +1024,7 @@ sub arcs {
                 'end_degrees'   => rand(360),
             }
         );
+        vbox_flush();
     }
 }
 
@@ -1020,6 +1051,7 @@ sub poly_arcs {
                 'end_degrees'   => rand(360),
             }
         );
+        vbox_flush();
     }
 }
 
@@ -1046,6 +1078,7 @@ sub filled_pies {
                 'end_degrees' => rand(360),
             }
         );
+        vbox_flush();
     }
 }
 
@@ -1081,6 +1114,7 @@ sub hatch_filled_pies {
                 'hatch'         => $HATCHES[int(rand(scalar(@HATCHES)))],
             }
         );
+        vbox_flush();
     }
     $F->attribute_reset();
 }
@@ -1116,6 +1150,7 @@ sub gradient_pies {
                 }
             }
         );
+        vbox_flush();
     }
 }
 
@@ -1140,6 +1175,7 @@ sub texture_filled_pies {
                 'texture'       => $image,
             }
         );
+        vbox_flush();
     }
 }
 
@@ -1165,6 +1201,7 @@ sub ellipses {
                 'yradius'    => rand($center_y),
             }
         );
+        vbox_flush();
     }
 }
 
@@ -1191,6 +1228,7 @@ sub filled_ellipses {
                 'filled'  => 1,
             }
         );
+        vbox_flush();
     }
 }
 
@@ -1226,6 +1264,7 @@ sub hatch_filled_ellipses {
                 'hatch'   => $HATCHES[int(rand(scalar(@HATCHES)))],
             }
         );
+        vbox_flush();
     }
     $F->attribute_reset();
 }
@@ -1260,6 +1299,7 @@ sub gradient_ellipses {
                 }
             }
         );
+        vbox_flush();
     }
 }
 
@@ -1280,6 +1320,7 @@ sub texture_filled_ellipses {
                 'texture' => $image
             }
         );
+        vbox_flush();
     }
 }
 
@@ -1308,6 +1349,7 @@ sub polygons {
                 'antialiased' => $aa,
             }
         );
+        vbox_flush();
     }
 }
 
@@ -1337,6 +1379,7 @@ sub filled_polygons {
                 'filled'      => 1,
             }
         );
+        vbox_flush();
     }
 }
 
@@ -1375,6 +1418,7 @@ sub hatch_filled_polygons {
                 'hatch'       => $HATCHES[int(rand(scalar(@HATCHES)))]
             }
         );
+        vbox_flush();
     }
     $F->attribute_reset();
 }
@@ -1410,6 +1454,7 @@ sub gradient_polygons {
                 }
             }
         );
+        vbox_flush();
     }
 }
 
@@ -1434,6 +1479,7 @@ sub texture_filled_polygons {
                 'texture'     => $image
             }
         );
+        vbox_flush();
     }
 }
 
@@ -1461,6 +1507,7 @@ sub beziers {
                 'points'      => 100,
             }
         );
+        vbox_flush();
     }
 }
 
@@ -1493,6 +1540,7 @@ sub truetype_fonts {
             $b->{'x'} = rand($F->{'XX_CLIP'} - $b->{'pwidth'});
             $F->ttf_print($b);
         }
+        vbox_flush();
     }
 }
 
@@ -1510,6 +1558,7 @@ sub truetype_printing {
             'color'   => sprintf('%02x%02x%02x%02x', int(rand(256)), int(rand(256)), int(rand(256)), 255),
         }
     );
+    vbox_flush();
 
     $F->clip_set(
         {
@@ -1529,6 +1578,7 @@ sub truetype_printing {
             'color'   => sprintf('%02x%02x%02x%02x', int(rand(256)), int(rand(256)), int(rand(256)), 255),
         }
     );
+    vbox_flush();
     $F->clip_reset();
 }
 
@@ -1566,6 +1616,7 @@ sub rotate_truetype_fonts {
         $F->vsync();
         $angle++;
         $angle = 270 if ($angle >= 360);
+        vbox_flush();
     }
 }
 
@@ -1637,6 +1688,7 @@ sub flood_fill {
             }
         );
 
+        vbox_flush();
         $F->set_color(
             {
                 'red'   => int(rand(256)),
@@ -1667,6 +1719,7 @@ sub flood_fill {
                 'y' => 880 * $ym,
             }
         );
+        vbox_flush();
     } else {
         $F->set_color(
             {
@@ -1691,6 +1744,7 @@ sub flood_fill {
             }
         );
 
+        vbox_flush();
         $F->set_color(
             {
                 'red'   => int(rand(256)),
@@ -1705,6 +1759,7 @@ sub flood_fill {
                 'y' => 3,
             }
         );
+        vbox_flush();
     }
 }
 
@@ -1757,6 +1812,7 @@ sub color_replace {
                 }
             }
         );
+        vbox_flush();
     }
     $F->clip_reset();
 }
@@ -1782,6 +1838,7 @@ sub blitting {
         $image->{'x'} = abs(rand($XX - $image->{'width'}));
         $image->{'y'} = $F->{'Y_CLIP'} + abs(rand(($YY - $F->{'Y_CLIP'}) - $image->{'height'}));
         $F->blit_write($image);
+        vbox_flush();
     }
 }
 
@@ -1822,8 +1879,8 @@ sub blit_move {
         );
         $x++;
         $y += .5;
+        vbox_flush();
         sleep .0166666667;
-        $F->vsync();
     }
 }
 
@@ -1871,6 +1928,7 @@ sub rotate {
         $angle++;
         $angle = 0 if ($angle >= 360);
         $count++;
+        vbox_flush();
     }
 
     $angle = 0;
@@ -1899,6 +1957,7 @@ sub rotate {
         $angle--;
         $angle = 0 if ($angle <= -360);
         $count++;
+        vbox_flush();
     }
 }
 
@@ -1931,6 +1990,7 @@ sub flipping {
             sleep .0166666667;
             $F->vsync();
         }
+        vbox_flush();
     }
 }
 
@@ -1958,6 +2018,7 @@ sub monochrome {
         $mono->{'x'} = abs(rand($XX - $mono->{'width'}));
         $mono->{'y'} = $F->{'Y_CLIP'} + abs(rand(($YY - $F->{'Y_CLIP'}) - $mono->{'height'}));
         $F->blit_write($mono);
+        vbox_flush();
     }
 }
 
@@ -2001,6 +2062,7 @@ sub animated {
                         }
                         my $begin = time;
                         $F->blit_write($image->[$frame]);
+                        vbox_flush();
 
                         my $Delay = (($image->[$frame]->{'tags'}->{'gif_delay'} * .01)) - (time - $begin);
                         if ($Delay > 0) {
@@ -2062,6 +2124,7 @@ sub mode_drawing {
                 'filled' => 1,
             }
         );
+        vbox_flush();
 
         $F->set_color(
             {
@@ -2080,6 +2143,8 @@ sub mode_drawing {
             }
         );
 
+        vbox_flush();
+
         $F->set_color(
             {
                 'red'   => 0,
@@ -2096,6 +2161,7 @@ sub mode_drawing {
                 'filled' => 1,
             }
         );
+        vbox_flush();
 
         if ($mode == XOR_MODE) {
             sleep 1;
@@ -2107,6 +2173,7 @@ sub mode_drawing {
                     'filled' => 1,
                 }
             );
+            vbox_flush();
 
             $F->set_color(
                 {
@@ -2124,6 +2191,7 @@ sub mode_drawing {
                     'filled' => 1,
                 }
             );
+            vbox_flush();
 
             $F->set_color(
                 {
@@ -2141,7 +2209,9 @@ sub mode_drawing {
                     'filled' => 1,
                 }
             );
+            vbox_flush();
             $F->blit_write($image2);
+            vbox_flush();
         } ## end if ($mode == XOR_MODE)
     } ## end else [ if ($mode == MASK_MODE)]
 } ## end sub mode_drawing
@@ -2161,9 +2231,11 @@ sub alpha_drawing {
 
     $F->normal_mode();
     $F->blit_write($image);
+    vbox_flush();
 
     $F->alpha_mode();
     $F->blit_write($image2);
+    vbox_flush();
 
     $F->set_color(
         {
@@ -2182,6 +2254,7 @@ sub alpha_drawing {
             'filled' => 1,
         }
     );
+    vbox_flush();
 
     $F->set_color(
         {
@@ -2200,6 +2273,7 @@ sub alpha_drawing {
             'filled' => 1,
         }
     );
+    vbox_flush();
 
     $F->set_color(
         {
@@ -2218,6 +2292,7 @@ sub alpha_drawing {
             'filled' => 1,
         }
     );
+    vbox_flush();
 } ## end sub alpha_drawing
 
 sub mask_drawing {
@@ -2241,9 +2316,11 @@ sub mask_drawing {
     } until ($image2->{'image'} ne $image1->{'image'});
     $F->normal_mode();
     $F->blit_write($image1);
+    vbox_flush();
     $F->mask_mode();
 
     $F->blit_write($image2);
+    vbox_flush();
 } ## end sub mask_drawing
 
 sub unmask_drawing {
@@ -2267,9 +2344,11 @@ sub unmask_drawing {
     } until ($image2->{'image'} ne $image1->{'image'});
     $F->normal_mode();
     $F->blit_write($image1);
+    vbox_flush();
     $F->unmask_mode();
 
     $F->blit_write($image2);
+    vbox_flush();
 } ## end sub unmask_drawing
 
 sub print_it {
@@ -2310,6 +2389,7 @@ sub print_it {
         );
         $fb->cls();
         $fb->ttf_print($b);
+        vbox_flush();
 
         $fb->clip_set(
             {
@@ -2325,7 +2405,8 @@ sub print_it {
     } else {
         print STDERR "$message\n";
     }
-    $fb->_flush_screen();
+    vbox_flush();
+
     $fb->acceleration($acc);
 } ## end sub print_it
 

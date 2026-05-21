@@ -4,7 +4,10 @@ use strict;
 use warnings;
 
 use Test::More 0.90;
-use Crypt::Argon2 qw/argon2i_pass argon2i_raw argon2_verify argon2_pass argon2_needs_rehash/;
+use Crypt::Argon2 qw/
+	argon2i_pass argon2i_raw argon2_verify argon2_pass argon2_needs_rehash
+	argon2_implementation
+	/;
 
 sub hashtest {
 	my ($t_cost, $m_cost, $parallelism, $password, $salt, $hexref, $mcfref) = @_;
@@ -58,5 +61,10 @@ subtest 'needs_rehash', sub {
 	ok(argon2_needs_rehash($encoded, 'argon2id', 2, '64M', 1, 16, 8), 'Rehash with different output length');
 	ok(argon2_needs_rehash($encoded, 'argon2id', 2, '64M', 1, 32, 16), 'Rehash with different salt length');
 };
+
+ok argon2_implementation, 'argon2_implementation returns something';
+
+ok !defined eval { argon2_verify('', 'password') }, 'argon2_verify throws when given an empty string';
+like $@, qr/Could not detect argon2 type: missing '\$' separator/;
 
 done_testing();

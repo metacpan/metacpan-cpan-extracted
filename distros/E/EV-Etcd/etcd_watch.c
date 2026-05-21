@@ -29,21 +29,29 @@ void watch_rearm_recv(pTHX_ watch_call_t *wc) {
     grpc_call_error err = grpc_call_start_batch(wc->call, &op, 1, &wc->base, NULL);
     if (err != GRPC_CALL_OK) {
         wc->active = 0;
-        CALL_SIMPLE_ERROR_CALLBACK(wc->callback, "Watch rearm failed");
+        CALL_STATUS_ERROR_CALLBACK(wc->callback, GRPC_STATUS_INTERNAL, "Watch rearm failed", "watch");
         cleanup_watch(aTHX_ wc);
     }
 }
 
-/* Cleanup watch and remove from client list */
-void cleanup_watch(pTHX_ watch_call_t *wc) {
-    ev_etcd_t *client = wc->client;
+/* Free struct memory and key buffers — final step once both owners released */
+static void watch_call_free(pTHX_ watch_call_t *wc) {
+    if (wc->params.key) Safefree(wc->params.key);
+    if (wc->params.range_end) Safefree(wc->params.range_end);
+    Safefree(wc);
+}
 
+/* Client-side cleanup: free gRPC state, unlink from list, drop client ownership.
+ * If Perl side already released, free the struct. Otherwise leave it alive and
+ * inert for the Perl handle's DESTROY to free later — prevents UAF when the
+ * user holds the handle past cancellation. */
+void cleanup_watch(pTHX_ watch_call_t *wc) {
+    if (!wc->client_owns) return;
+
+    ev_etcd_t *client = wc->client;
     watch_call_t **wp = &client->watches;
     while (*wp) {
-        if (*wp == wc) {
-            *wp = wc->next;
-            break;
-        }
+        if (*wp == wc) { *wp = wc->next; break; }
         wp = &(*wp)->next;
     }
 
@@ -53,35 +61,39 @@ void cleanup_watch(pTHX_ watch_call_t *wc) {
     grpc_metadata_array_destroy(&wc->trailing_metadata);
     if (wc->recv_buffer) {
         grpc_byte_buffer_destroy(wc->recv_buffer);
+        wc->recv_buffer = NULL;
     }
     grpc_slice_unref(wc->status_details);
     if (wc->call) {
         grpc_call_unref(wc->call);
+        wc->call = NULL;
     }
     SvREFCNT_dec(wc->callback);
+    wc->callback = NULL;
+    wc->active = 0;
+    wc->client_owns = 0;
 
-    if (wc->params.key) {
-        Safefree(wc->params.key);
-    }
-    if (wc->params.range_end) {
-        Safefree(wc->params.range_end);
-    }
+    if (!wc->perl_owns) watch_call_free(aTHX_ wc);
+}
 
-    Safefree(wc);
+/* Perl-side cleanup: drop perl ownership; free struct if client side already done */
+void watch_call_perl_release(pTHX_ watch_call_t *wc) {
+    wc->perl_owns = 0;
+    if (!wc->client_owns) watch_call_free(aTHX_ wc);
 }
 
 /* Process WatchResponse and call Perl callback */
 void process_watch_response(pTHX_ watch_call_t *wc) {
     if (!wc->recv_buffer) {
         wc->active = 0;
-        CALL_SIMPLE_ERROR_CALLBACK(wc->callback, "No watch response received");
+        CALL_STATUS_ERROR_CALLBACK(wc->callback, GRPC_STATUS_INTERNAL, "No watch response received", "watch");
         return;
     }
 
     grpc_byte_buffer_reader reader;
     if (!grpc_byte_buffer_reader_init(&reader, wc->recv_buffer)) {
         wc->active = 0;
-        CALL_SIMPLE_ERROR_CALLBACK(wc->callback, "Failed to read watch response buffer");
+        CALL_STATUS_ERROR_CALLBACK(wc->callback, GRPC_STATUS_INTERNAL, "Failed to read watch response buffer", "watch");
         return;
     }
 
@@ -94,7 +106,7 @@ void process_watch_response(pTHX_ watch_call_t *wc) {
 
     if (!resp) {
         wc->active = 0;
-        CALL_SIMPLE_ERROR_CALLBACK(wc->callback, "Failed to parse watch response");
+        CALL_STATUS_ERROR_CALLBACK(wc->callback, GRPC_STATUS_INTERNAL, "Failed to parse watch response", "watch");
         return;
     }
 
@@ -120,10 +132,11 @@ void process_watch_response(pTHX_ watch_call_t *wc) {
     HV *result = newHV();
     add_header_to_hv(aTHX_ result, resp->header);
 
-    hv_store(result, "watch_id", 8, newSViv(resp->watch_id), 0);
-    hv_store(result, "created", 7, newSViv(resp->created), 0);
-    hv_store(result, "canceled", 8, newSViv(resp->canceled), 0);
-    hv_store(result, "compact_revision", 16, newSViv(resp->compact_revision), 0);
+    hv_store(result, "watch_id", 8, newSVi64(resp->watch_id), 0);
+    hv_store(result, "created", 7, newSViv(resp->created ? 1 : 0), 0);
+    /* canceled / compact_revision are server-cancellation signals — handled
+     * via the early-return error path above (resp->canceled) and never
+     * appear in the success hash, so we don't store them here. */
 
     AV *events = newAV();
     if (resp->n_events > 0) {
@@ -199,7 +212,7 @@ static void watch_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revents) {
         grpc_byte_buffer_destroy(send_buffer);
         wc->active = 0;
         client->in_callback = 1;
-        CALL_SIMPLE_ERROR_CALLBACK(wc->callback, "Watch reconnect failed");
+        CALL_STATUS_ERROR_CALLBACK(wc->callback, GRPC_STATUS_INTERNAL, "Watch reconnect failed", "watch");
         client->in_callback = 0;
         if (!client->active) {
             finish_client_destroy(aTHX_ client);
@@ -221,7 +234,7 @@ static void watch_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revents) {
     if (err != GRPC_CALL_OK) {
         STREAMING_CALL_BATCH_ERROR(wc);
         client->in_callback = 1;
-        CALL_SIMPLE_ERROR_CALLBACK(wc->callback, "Watch reconnect batch failed");
+        CALL_STATUS_ERROR_CALLBACK(wc->callback, GRPC_STATUS_INTERNAL, "Watch reconnect batch failed", "watch");
         client->in_callback = 0;
         if (!client->active) {
             finish_client_destroy(aTHX_ client);

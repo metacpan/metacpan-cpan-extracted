@@ -62,7 +62,7 @@ sub __get_win_func_stmt {
     $placeholder //= '';
     my @parts;
     my $win_stmt = $win_data->{'func'};
-    $win_stmt .= '(' . $win_data->{'args_str'} // '';
+    $win_stmt .= '(' . $win_data->{'args_str'} // ''; ##
     if ( $placeholder eq 'args_str' ) {
         push @parts, $win_stmt;
         $win_stmt = '';

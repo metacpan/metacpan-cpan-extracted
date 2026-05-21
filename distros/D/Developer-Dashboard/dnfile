@@ -12,4 +12,5 @@ perl
 perl-App-cpanminus
 perl-devel
 pkgconf-pkg-config
+tmux
 zlib-devel

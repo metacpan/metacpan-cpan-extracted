@@ -10,6 +10,7 @@ BEGIN
     use Config;
     use JSON;
     use Test::More qw( no_plan );
+    use URI;
     use_ok( 'Module::Generic::Scalar' ) || BAIL_OUT( "Unable to load Module::Generic::Scalar" );
     # use Nice::Try;
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
@@ -224,6 +225,7 @@ is( $s8->join( ' ', $s9 ), 'Hello world', 'join (2)' );
 subtest 'scalar io' => sub
 {
     use utf8;
+    no warnings 'Module::Generic';
     my $text = <<EOT;
 Mignonne, allons voir si la rose
 Qui ce matin avoit desclose
@@ -628,6 +630,7 @@ subtest 'regexp capture' => sub
 
 done_testing();
 
+# NOTE: MyObject class
 package
     MyObject;
 BEGIN

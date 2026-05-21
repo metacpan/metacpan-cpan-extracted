@@ -1,0 +1,151 @@
+# To read this file, run:
+#    perldoc ./CONTRIBUTING
+
+=head1 CONTRIBUTING
+
+How to contribute to C<MooX-Role-Parameterized>?
+
+=head1 DESCRIPTION
+
+Patches are welcome!
+
+They must be built against the
+C<L<devel|https://github.com/peczenyj/MooX-Role-Parameterized/tree/devel>> branch,
+then submitted as pull requests at GitHub.
+
+This distribution is authored with L<Dist::Zilla>. C<dist.ini> is the
+single source of truth for the version and the prerequisites; C<Makefile.PL>
+and C<MANIFEST> are generated at build time and are not tracked in git.
+
+The documentation is written using the
+L<POD|http://perldoc.perl.org/perlpod.html> format. Use the C<perldoc> tool
+to render it in a terminal:
+
+    perldoc ./CONTRIBUTING
+
+=head1 PATCHING, STEP BY STEP
+
+=over 4
+
+=item 1. Get the source
+
+    git clone --origin upstream git://github.com/peczenyj/MooX-Role-Parameterized.git
+    cd MooX-Role-Parameterized
+    git checkout devel
+
+=item 2. Install build dependencies
+
+Not required for doc patches.
+
+    curl -L https://cpanmin.us | perl - -nq Dist::Zilla
+    dzil authordeps --missing | cpanm -nq
+    dzil listdeps --develop --missing | cpanm -nq
+
+=item 3. Make your fix/feature
+
+    git checkout -b <my-patch> devel
+
+    # edit files and add modification
+
+    # Run the testsuite
+    dzil test --all
+
+    git commit -s -m '<<some nice message>>'
+
+=item 4. Setup a fork
+
+=item 4.1. L<Fork the project on GitHub|https://github.com/peczenyj/MooX-Role-Parameterized/>
+
+=item 4.2. Link your local repo to your fork (just once)
+
+(You are using C<MooX-Role-Parameterized> isn't it?)
+
+    git remote add github <github-user>.github.com:<github-user>/MooX-Role-Parameterized.git
+
+=item 5. Submit your work
+
+=item 5.1 Push!
+
+    git push github <my-patch>
+
+=item 5.2 Submit a pull request on GitHub
+
+Target the C<devel> branch.
+
+=item 6. Loop
+
+Redo from step 3.
+
+=back
+
+=head1 FOR RELEASE MANAGER
+
+There is no version to bump by hand. The version is derived from git
+tags by the C<Git::NextVersion> plugin and injected into every package
+at build time by C<OurPkgVersion>: a build of the tag C<vX.YYY> is
+version C<X.YYY>, and any other build is the latest tag incremented.
+The C<vX.YYY> tag is therefore the single source of truth.
+
+Releases are tag-triggered: pushing a C<vX.YYY> tag runs the
+C<release.yml> workflow, which runs the tests, builds the distribution
+(pinning the version to the tag), uploads it to CPAN and creates a
+GitHub release.
+
+This repository follows the C<git-flow> branching model: C<master>
+holds released code, C<devel> is the integration branch, and each
+release is prepared on a short-lived C<release/X.YYY> branch.
+
+=head2 With git-flow
+
+=over 4
+
+=item 1. Start the release branch
+
+    git flow release start X.YYY
+
+This branches C<release/X.YYY> off C<devel>.
+
+=item 2. Update the changelog
+
+    # Add the release notes under the {{$NEXT}} line; that placeholder
+    # becomes the "X.YYY <date>" header in the built distribution.
+    $EDITOR Changelog
+    dzil test --all
+    git add Changelog
+    git commit
+
+=item 3. Finish the release
+
+    git flow release finish X.YYY
+
+This merges C<release/X.YYY> into C<master>, tags it C<vX.YYY>, merges
+C<master> back into C<devel>, deletes the release branch and -- because
+C<gitflow.release.finish.push> is enabled for this repo -- pushes
+C<master>, C<devel> and the new tag.
+
+=back
+
+Pushing the C<vX.YYY> tag is what triggers the C<release.yml> workflow
+described above.
+
+=head2 Without git-flow
+
+The equivalent plain-git steps are:
+
+    git checkout -b release/X.YYY devel
+    $EDITOR Changelog
+    dzil test --all
+    git commit -a
+
+    git checkout master
+    git merge --no-ff release/X.YYY
+    git tag v<X.YYY>
+
+    git checkout devel
+    git merge --no-ff release/X.YYY
+    git branch -d release/X.YYY
+
+    git push origin master devel
+    git push origin v<X.YYY>
+
+=cut

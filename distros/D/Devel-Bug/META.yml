@@ -1,0 +1,36 @@
+---
+abstract: 'Transparent inline debugging probe (pure Perl)'
+author:
+  - 'Kevin Shea <KEVJSHEA@cpan.org>'
+build_requires:
+  Data::Dump: '0'
+  ExtUtils::MakeMaker: '0'
+  Term::Size::Perl: '0'
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-Bug
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Devel::Bug:
+    file: lib/Devel/Bug.pm
+    version: '0.08'
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Term::ANSIColor: '0'
+  perl: '5.020'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-Bug
+  repository: https://github.com/ASquareClock/Devel-Bug.git
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

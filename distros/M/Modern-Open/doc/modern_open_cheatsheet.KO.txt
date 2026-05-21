@@ -1,0 +1,130 @@
+======================================================================
+ Modern::Open 치트 시트                               [KO] 한국어
+======================================================================
+
+[ 1. 설치 및 사용법 ]
+
+  설치:
+    cpan Modern::Open
+
+  스크립트에서 사용:
+    use Modern::Open;
+
+  효과: open(), opendir(), sysopen(), pipe(), socket(), accept() 를
+        자동 변수 생성(autovivification) + autodie 버전으로 교체한다.
+        Perl 5.005_03 이상의 모든 버전에서 동작한다.
+        주의: socket() 는 autovivification 만 지원하며 autodie 는 하지 않는다.
+
+[ 2. open() -- 2인수 형식 ]
+
+  my $fh;
+  open($fh, "< file.txt");   # 읽기
+  open($fh, "> file.txt");   # 쓰기 (덮어쓰기)
+  open($fh, ">> file.txt");  # 추가
+  open($fh, "+< file.txt");  # 읽기/쓰기
+  open($fh, "cmd |");        # 명령어로부터 파이프 읽기
+  open($fh, "| cmd");        # 명령어로 파이프 쓰기
+
+  while (my $line = readline($fh)) { ... }
+  print $fh "text\n";
+  close($fh);
+
+[ 3. open() -- 3인수 형식 ]
+
+  my $fh;
+  open($fh, '<',  "file.txt");   # 읽기
+  open($fh, '>',  "file.txt");   # 쓰기 (덮어쓰기)
+  open($fh, '>>', "file.txt");   # 추가
+  open($fh, '+<', "file.txt");   # 읽기/쓰기
+  open($fh, '+>', "file.txt");   # 읽기/쓰기 (덮어쓰기)
+  open($fh, '-|', "cmd");        # 명령어로부터 파이프 읽기
+  open($fh, '|-', "cmd");        # 명령어로 파이프 쓰기
+
+  # 3인수 형식은 내부적으로 CORE::sysopen 을 사용한다.
+  # 파일명에 모드 문자가 포함되어도 오해석되지 않는다.
+
+[ 4. opendir() ]
+
+  my $dh;
+  opendir($dh, "/path/to/dir");
+
+  while (my $entry = readdir($dh)) {
+      next if $entry eq '.' or $entry eq '..';
+      print "$entry\n";
+  }
+  closedir($dh);
+
+[ 5. sysopen() ]
+
+  use Fcntl qw(O_RDONLY O_WRONLY O_CREAT O_TRUNC);
+
+  my $fh;
+  sysopen($fh, "file.txt", O_RDONLY);
+  sysopen($fh, "file.txt", O_WRONLY | O_CREAT | O_TRUNC);
+  sysopen($fh, "file.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+
+[ 6. pipe() ]
+
+  my($reader, $writer);
+  pipe($reader, $writer);
+
+  if (my $pid = fork()) {
+      close($writer);
+      while (my $line = readline($reader)) { print $line }
+      close($reader);
+  } else {
+      close($reader);
+      print $writer "자식 프로세스에서 안녕하세요\n";
+      close($writer);
+      exit 0;
+  }
+
+[ 7. socket() 와 accept() ]
+
+  use Socket qw(AF_INET SOCK_STREAM sockaddr_in inet_aton);
+
+  my $server;
+  socket($server, AF_INET, SOCK_STREAM, 0);
+  # 주의: socket() 는 autodie 하지 않는다. 반환값을 직접 확인할 것.
+
+  my $client;
+  accept($client, $server);
+
+[ 8. autodie 동작 ]
+
+  # void 컨텍스트 (반환값 미수신): 실패 시 die
+  open($fh, "< no_such_file.txt");   # dies: Can't open(...)
+
+  # 반환값 수신: 실패 시 undef/0 반환
+  my $rc = open($fh, "< file.txt");
+  unless ($rc) { warn "open 실패: $!" }
+
+  # 베어워드 핸들은 거부된다:
+  open(FILE, "< file.txt");   # dies: Bare handle no longer supported
+
+[ 9. 반환된 핸들 ]
+
+  readline($fh)        # 한 줄 읽기
+  read($fh, $buf, $n)  # N바이트 읽기
+  print $fh "..."      # 쓰기
+  binmode($fh)         # 바이너리 모드 설정
+  seek($fh, 0, 0)      # 처음으로 이동
+  tell($fh)            # 현재 위치
+  close($fh)           # 닫기
+  eof($fh)             # 파일 끝 확인
+
+[ 10. 호환성 ]
+
+  Perl 버전  : 5.005_03 이상 (5.42 포함)
+  플랫폼     : Unix, Linux, macOS, Windows (CRLF 자동 처리)
+  의존 모듈  : Fcntl (코어 모듈)
+
+[ 11. 공식 자료 ]
+
+  Modern::Open (MetaCPAN):
+    https://metacpan.org/dist/Modern-Open
+
+  INABA Hitoshi (ina) on CPAN:
+    https://metacpan.org/author/INA
+
+======================================================================

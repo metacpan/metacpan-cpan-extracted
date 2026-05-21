@@ -1067,6 +1067,12 @@ my $toml_data = Developer::Dashboard::CLI::Query::_parse_query_input(
 );
 is_deeply( $toml_data, { alpha => { beta => 4 } }, 'TOML query parsing works' );
 
+my $toml_bool_data = Developer::Dashboard::CLI::Query::_parse_query_input(
+    command => 'tomq',
+    text    => "enabled = true\ndisabled = false\n",
+);
+is_deeply( $toml_bool_data, { enabled => 1, disabled => 0 }, 'TOML query parsing inflates booleans into plain Perl scalars' );
+
 my $props_data = Developer::Dashboard::CLI::Query::_parse_query_input(
     command => 'propq',
     text    => "alpha.beta=5\npath = one\\\\two\nwrapped = first\\\n second\n",

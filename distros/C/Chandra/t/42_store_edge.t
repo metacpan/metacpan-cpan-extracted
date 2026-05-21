@@ -89,7 +89,7 @@ sub sp { "$dir/$_[0].json" }
 {
     my $s = Chandra::Store->new(path => sp('clash'), auto_save => 0);
     $s->set('foo', 'scalar');
-    # foo is a string, not a hash — setting foo.bar should die
+    # foo is a string, not a hash - setting foo.bar should die
     eval { $s->set('foo.bar', 'x') };
     like($@, qr/not a hash/i, 'intermediate scalar blocks traversal');
 }

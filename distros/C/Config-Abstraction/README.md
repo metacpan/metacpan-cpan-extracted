@@ -4,7 +4,7 @@ Config::Abstraction - Merge and manage configuration data from different sources
 
 # VERSION
 
-Version 0.37
+Version 0.38
 
 # SYNOPSIS
 
@@ -223,6 +223,19 @@ Options:
             }
         );
 
+- `defaults`
+
+    A hash reference that provides default values for the object's own attributes (such as `config_dirs`, `logger`, `flatten`, etc.).
+    If this option is supplied,
+    the object is initialized using the keys in this hash as the base;
+    any other options passed directly to `new()` (aside from `env_prefix`) are ignored.
+    This allows you to pre-define a standard configuration profile for the object itself.
+    Note that `defaults` is distinct from the `data` option - `data` supplies the initial configuration values that will be merged with files, environment, and command line,
+    while `defaults` sets the object's internal parameters.
+    The `env_prefix` value,
+    if provided as a top-level argument,
+    still takes precedence over any `env_prefix` that might exist inside the `defaults` hash.
+
 - `env_prefix`
 
     A prefix for environment variable keys and comment line options, e.g. `MYAPP_DATABASE__USER`,
@@ -399,7 +412,7 @@ You can find documentation for this module with the perldoc command.
 
 - [Hash::Merge](https://metacpan.org/pod/Hash%3A%3AMerge)
 - [Log::Abstraction](https://metacpan.org/pod/Log%3A%3AAbstraction)
-- Test Dashboard [https://nigelhorne.github.io/Config-Abstraction/coverage/](https://nigelhorne.github.io/Config-Abstraction/coverage/)
+- [Test Dashboard](https://nigelhorne.github.io/Config-Abstraction/coverage/)
 - Development version on GitHub [https://github.com/nigelhorne/Config-Abstraction](https://github.com/nigelhorne/Config-Abstraction)
 
 # AUTHOR

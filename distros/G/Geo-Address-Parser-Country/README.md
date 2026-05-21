@@ -5,7 +5,7 @@ canonical country name
 
 # VERSION
 
-Version 0.02
+Version 0.04
 
 # SYNOPSIS
 
@@ -21,6 +21,12 @@ Version 0.02
         au    => Locale::AU->new(),
     });
 
+    # Simple form: component extracted automatically from place
+    my $result = $resolver->resolve(
+        place => 'Ramsgate, Kent, England',
+    );
+
+    # Explicit form: caller supplies the component directly
     my $result = $resolver->resolve(
         component => 'England',
         place     => 'Ramsgate, Kent, England',
@@ -56,12 +62,12 @@ construction)
 
 # TODO
 
-- Add `normalise_place()` to handle missing commas before
+- Complete `normalise_place()` to handle missing commas before
 country and state names in raw uncleaned input strings. Poor data
 import means strings like `"Houston TX USA"` or
 `"Some Place England"` need comma insertion before component
-extraction can work correctly. This should be implemented before
-relying on `resolve()` for raw uncleaned input.
+extraction can work correctly. This should be called before
+`resolve()` for raw uncleaned input.
 
 # METHODS
 
@@ -78,13 +84,12 @@ object.
 #### Input
 
     {
-        us    => { type => 'object', can => 'new' },  # Locale::US instance
-        ca_en => { type => 'object', can => 'new' },  # Locale::CA English instance
-        ca_fr => { type => 'object', can => 'new' },  # Locale::CA French instance
-        au    => { type => 'object', can => 'new' },  # Locale::AU instance
-        geonames => {                                  # Optional Geo::GeoNames instance
+        us    => { type => 'object' },  # Locale::US instance
+        ca_en => { type => 'object' },  # Locale::CA English instance
+        ca_fr => { type => 'object' },  # Locale::CA French instance
+        au    => { type => 'object' },  # Locale::AU instance
+        geonames => {                   # Optional Geo::GeoNames instance
             type     => 'object',
-            can      => 'search',
             optional => 1,
         },
     }
@@ -116,6 +121,10 @@ The locale objects are stored by reference and shared for all calls to
 `resolve()`. Constructing them once and reusing the resolver object
 is more efficient than constructing a new resolver for each lookup.
 
+`Object::Configure` is used after validation to allow locale objects
+to be supplied via environment variables or a config file rather than
+always being passed explicitly.
+
 ### Example
 
     my $resolver = Geo::Address::Parser::Country->new({
@@ -138,8 +147,8 @@ string alongside any warnings generated during resolution.
 #### Input
 
     {
-        component => { type => 'string', min => 1 },
-        place     => { type => 'string', min => 1 },
+        place     => { type => 'string', min => 1 },           # required
+        component => { type => 'string', min => 1, optional => 1 },
     }
 
 #### Output
@@ -156,11 +165,16 @@ string alongside any warnings generated during resolution.
 
 ### Arguments
 
-- `component` - The last comma-separated component of the place
-string, e.g. `"England"`, `"TX"`, `"NSW"`. Required.
 - `place` - The full place string, e.g.
-`"Ramsgate, Kent, England"`. May be modified by appending a country
-suffix where needed. Required.
+`"Ramsgate, Kent, England"`. Required. May be modified by appending a
+country suffix where needed.
+- `component` - The last comma-separated component of the place
+string, e.g. `"England"`, `"TX"`, `"NSW"`. Optional. When absent,
+`resolve()` extracts it automatically as the last comma-separated
+token of `place`. When `place` contains no comma, the entire
+`place` string is used as the component. Supplying `component`
+explicitly is useful when the caller already has it available from a
+structured data source.
 
 ### Returns
 
@@ -193,6 +207,12 @@ the appropriate country string (`", USA"`, `", Canada"`,
 
 ### Example
 
+    # Simple form - component extracted automatically
+    my $result = $resolver->resolve(
+        place => 'Houston, TX',
+    );
+
+    # Explicit form - component supplied by caller
     my $result = $resolver->resolve(
         component => 'TX',
         place     => 'Houston, TX',
@@ -202,6 +222,72 @@ the appropriate country string (`", USA"`, `", Canada"`,
     # $result->{place}       eq 'Houston, TX, USA'
     # $result->{warnings}[0] eq 'TX: assuming country is United States'
     # $result->{unknown}     is 0
+
+## normalise\_place
+
+### Purpose
+
+Inserts missing commas into a raw, uncleaned place string so that
+`resolve()` can reliably extract the last component. Raw input from
+poor-quality data imports frequently omits the commas that separate
+city, state, and country tokens.
+
+### API Specification
+
+#### Input
+
+    {
+        place => { type => 'string', min => 1 },
+    }
+
+#### Output
+
+    {
+        type   => 'hashref',
+        schema => {
+            place    => { type => 'string', min => 1 },
+            warnings => { type => 'arrayref' },
+        },
+    }
+
+### Arguments
+
+- `place` - The raw place string to normalise, e.g.
+`"Houston TX USA"` or `"Some Place England"`. Required.
+
+### Returns
+
+A hashref containing:
+
+- `place` - The normalised place string with commas inserted
+where they were missing, e.g. `"Houston, TX, USA"`. Always returned
+even if no changes were made.
+- `warnings` - An arrayref of warning strings generated during
+normalisation, e.g. noting where commas were inserted. May be empty.
+
+### Side Effects
+
+None.
+
+### Notes
+
+This method is not yet fully implemented. It currently returns the
+place string unchanged. Implementation requires scanning the token
+sequence against the locale tables (US states, Canadian provinces,
+Australian states, and the %DIRECT country table) to identify where
+comma boundaries belong.
+
+Call this method before `resolve()` when working with raw input that
+may lack commas:
+
+    my $norm   = $resolver->normalise_place(place => 'Houston TX USA');
+    my $result = $resolver->resolve(place => $norm->{place});
+
+### Example
+
+    my $norm = $resolver->normalise_place(place => 'Some Place England');
+    # $norm->{place}    eq 'Some Place, England'   (once implemented)
+    # $norm->{warnings} contains a note about comma insertion
 
 # AUTHOR
 
@@ -223,37 +309,32 @@ automatically be notified of progress on your bug as I make changes.
 
 # BUGS
 
-- The direct lookup table contains `nl` as an abbreviation for the
-Netherlands.  This conflicts with `NL`, the ISO 3166-2 code for the Canadian
-province of Newfoundland and Labrador.  Because the direct table is consulted
-before the `Locale::CA` province-code path, passing `component => 'NL'`
-currently resolves to `Netherlands` rather than `Canada`.  The workaround
-is to pass the full province name (`Newfoundland and Labrador`) or to ensure
-the place string includes an explicit `Canada` suffix before calling
-`resolve()`.
-- `Geo::GeoNames` generates its query methods via `AUTOLOAD`, so
-`can('search')` returns false at the Perl level even though
-`$geonames->search(...)` works correctly at runtime.  The constructor
-schema currently validates the optional `geonames` argument with
-`can => 'search'`, which rejects a real `Geo::GeoNames` object.
-Until this is resolved, pass a wrapper object that defines `search` as a
-named method, or subclass `Geo::GeoNames` and add a stub:
-
-        package My::GeoNames;
-        use parent 'Geo::GeoNames';
-        sub search { my $self = shift; $self->SUPER::search(@_) }
+- `normalise_place()` is not yet implemented. It currently
+returns the place string unchanged. See ["normalise\_place"](#normalise_place) for
+details of the planned behaviour.
+- The step 6 Australian state code lookup uses the raw,
+un-normalised component as the hash key, making it case-sensitive
+unlike steps 2-5. Lowercase codes such as `nsw` will not match.
+A fix to apply `uc($component)` consistently is pending.
+- `Geo::GeoNames` generates its query methods via `AUTOLOAD`,
+so `can('search')` returns false at the Perl level even though
+`$geonames->search(...)` works correctly at runtime. The
+`can => 'search'` schema check has been commented out as a
+temporary workaround pending a fix to `Geo::GeoNames` itself.
 
 Please report additional bugs via the GitHub issue tracker:
 [https://github.com/nigelhorne/Geo-Address-Parser-Country/issues](https://github.com/nigelhorne/Geo-Address-Parser-Country/issues)
 
 # SEE ALSO
 
+- [Test Dashboard](https://nigelhorne.github.io/Geo-Address-Parser-Country/coverage/)
 - [Geo::Address::Parser](https://metacpan.org/pod/Geo%3A%3AAddress%3A%3AParser)
 - [Locale::US](https://metacpan.org/pod/Locale%3A%3AUS)
 - [Locale::CA](https://metacpan.org/pod/Locale%3A%3ACA)
 - [Locale::AU](https://metacpan.org/pod/Locale%3A%3AAU)
 - [Locale::Object::Country](https://metacpan.org/pod/Locale%3A%3AObject%3A%3ACountry)
 - [Geo::GeoNames](https://metacpan.org/pod/Geo%3A%3AGeoNames)
+- [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure)
 - [Params::Get](https://metacpan.org/pod/Params%3A%3AGet)
 - [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict)
 - [Return::Set](https://metacpan.org/pod/Return%3A%3ASet)
@@ -262,11 +343,5 @@ Please report additional bugs via the GitHub issue tracker:
 
 Copyright 2026 Nigel Horne.
 
-Usage is subject to licence terms.
-
-The licence terms of this software are as follows:
-
-- Personal single user, single computer use: GPL2
-- All other users (including Commercial, Charity, Educational, Government)
-  must apply in writing for a licence for use from Nigel Horne at the
-  above e-mail.
+Usage is subject to GPL2 licence terms.
+If you use it, please let me know.

@@ -1,5 +1,20 @@
 Revision history for Config-INI-RefVars
 
+0.24    2026/05/09
+
+    Fixed Makefile.PL.
+
+0.23    2026/05/09
+
+    - Tests: Switched from Test::Fatal to Test::Exception to avoid problems with perl 5.10.
+    - Improved POD section.
+    - Added CONTRIBUTING.md and SECURITY.md.
+    - Completed Makefile.PL to resolve CPANTS experimental issues.
+
+0.22    2026/05/09
+
+    - Skipped version.
+
 0.21    2025/06/02
 
     - Adapted Makefile.PL to generate META.json.

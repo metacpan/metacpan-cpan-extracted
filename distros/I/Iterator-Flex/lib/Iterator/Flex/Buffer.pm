@@ -6,9 +6,10 @@ use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
-use Iterator::Flex::Utils ':IterAttrs', ':IterStates', ':SignalParameters', ':ExhaustionActions';
+use Iterator::Flex::Utils ':IterAttrs', ':IterStates', ':SignalParameters', ':ExhaustionActions',
+  'throw_failure';
 use Iterator::Flex::Factory 'to_iterator';
 use Ref::Util;
 use namespace::clean;
@@ -173,7 +174,7 @@ sub construct ( $class, $state ) {
 
         # this iterator only depends on $src if it hasn't drained it.
         # currently _DEPENDS must be a list of iterators, not a
-        # coderef, so a dynamic dependency is no tpossible
+        # coderef, so a dynamic dependency is not possible
         ( +_DEPENDS ) => $src,
         ( +FREEZE )   => sub {
             return [
@@ -226,13 +227,13 @@ Iterator::Flex::Buffer - Buffer Iterator Class
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 METHODS
 
 =head2 new
 
-  $iterator = Ierator::Flex::Buffer->new( $iterable, $capacity, ?\%pars );
+  $iterator = Iterator::Flex::Buffer->new( $iterable, $capacity, ?\%pars );
 
 Returns an iterator which on the first call to C<next> extracts
 C<$capacity> elements from C<$iterable>, stores them in a buffer,

@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use 5.042;
+use 5.042.2;
 no source::encoding;
 use warnings FATAL => 'all';
 use autodie ':default';
@@ -46,12 +46,12 @@ foreach my $file (list_regex_files('\.svg$', 'output.images')) {
 	my @text = split /\n/, $text;
 	my $starting_size = scalar @text;
 	@text = grep {$_ !~ m/^\h*\<dc:title\>made.+\/Simple\.pm\<\/dc:title\>$/} @text;
-	@text = grep {$_ !~ m/^\h*\<dc:date\>/}        @text;
-	@text = grep {$_ !~ m/^\h*\<path\h+id="/}      @text;
+	@text = grep {$_ !~ m/^\h*\<dc:date\>/}          @text;
+	@text = grep {$_ !~ m/^\h*\<path\h+id="/}        @text;
 	@text = grep {$_ !~ m/^\h*\<use\h*xlink:href="/} @text;
-	@text = grep {$_ !~ m/clipPath/}           @text;
-	@text = grep {$_ !~ m/clip\-path="/}       @text;
-	foreach my $line (grep {/id="image[a-z\d]+"/} @text) {
+	@text = grep {$_ !~ m/clipPath/}                 @text;
+	@text = grep {$_ !~ m/clip\-path="/}             @text;
+	foreach my $line (@text) {
 		$line =~ s/\h+id="image[a-z\d]+"//;
 	}
 	printf("$file: Went from $starting_size lines -> %u lines\n", scalar @text);

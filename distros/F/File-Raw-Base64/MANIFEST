@@ -1,0 +1,23 @@
+b64.c
+b64.h
+Base64.xs
+Changes
+lib/File/Raw/Base64.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-rfc4648-vectors.t
+t/02-roundtrip.t
+t/03-urlsafe.t
+t/04-wrap.t
+t/05-pem.t
+t/06-strict-vs-lenient.t
+t/07-padding.t
+t/08-empty-and-large.t
+t/09-bad-options.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

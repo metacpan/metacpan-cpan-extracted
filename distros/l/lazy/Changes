@@ -1,5 +1,42 @@
 Revision history for lazy
 
+1.000002  2026-05-09 18:42:49Z
+    - Cap App::cpm at 0.997017 on Perl < 5.24 via DynamicPrereqs, since
+      App::cpm v0.999.0+ raised its minimum to 5.24 and otherwise won't
+      install on older Perls. 0.997017 is the last pre-v1.0 release
+      that both installs on older Perls and drives App::cpm's static
+      install path correctly (GH#36)
+    - Extend the GitHub Actions test matrix down to Perl 5.20 to validate
+      the App::cpm cap, and inject the same cap into cpanfile in the
+      workflow ([DynamicPrereqs] only writes Makefile.PL, not cpanfile,
+      so install-with-cpm needs the gate appended at CI time)
+    - Pin install-with-cpm's bootstrap App::cpm to 0.997017 on Perl 5.20
+      and 5.22, since the action's default builds cpm from skaji/cpm
+      main (App::cpm v1.0+) which itself requires Perl 5.24
+    - Skip t/local-install-via-args.t when App::cpm is in the broken
+      0.998000–0.999.x range — those releases' static-install code
+      path dies with "Invalid option linkage for install_base=s" on
+      the test's x_static_install fixture (verified on Perl 5.42; not
+      Perl-version specific). v1.0.0+ fixed the bug, and our cap pins
+      Perl < 5.24 to 0.997017, so this skip is a runtime safety net
+      for smokers with a broken cpm pre-installed
+    - Document t/local-install-via-args.t with detailed comments explaining
+      the test's purpose, fixture, resolver choices and per-arg rationale,
+      and emit Perl + App::cpm versions on failure to make CPAN testers
+      reports easier to triage (GH#36)
+    - Fix stale "Acme::CPANAuthors::Canadian" comment in
+      t/local-install-via-args.t — the test installs Local::StaticInstall
+
+
+1.000001  2026-05-08 20:39:23Z
+    - Fix @INC hook to return empty list (not 1) for skipped modules, so
+      require continues searching @INC (GH#22)
+    - Skip Encode::ConfigLocal in @INC hook
+    - Promote trailing POD =head2 sections to =head1
+    - Test against Perl 5.24 through 5.42
+    - Migrate lint/tidy tooling from Code::TidyAll to precious
+    - Drop unused Capture::Tiny import and feature 'say'
+
 1.000000  2024-08-29 02:16:08Z
     - Try to prevent deep recursion (GH#7) (Olaf Alders)
     - Simplify (change) public API (GH#7) (Olaf Alders)

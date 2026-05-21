@@ -1,5 +1,37 @@
 Revision history for LTSV::LINQ
 
+1.09  2026-05-17 JST (Japan Standard Time)
+
+    Pre-release fix:
+    - lib/LTSV/LINQ.pm: SEE ALSO now includes L<JSON::LINQ> and L<CSV::LINQ>
+
+    Features:
+    - lib/LTSV/LINQ.pm: ToLTSV now accepts label_order => \@labels and
+      headers => \@labels options to control the output order of
+      LTSV fields.  label_order specifies which labels appear first and
+      in what order; labels present in the record but not listed are
+      appended in sorted order.  headers is an alias for label_order,
+      provided for interoperability with CSV-LINQ (which uses headers
+      as the primary option name on ToCSV).
+    - t/0003-ltsv-file.t: 6 new tests (15-20) covering headers order,
+      label_order alias, and absent-label skipping; plan updated
+      from 14 to 20.
+
+    Fix:
+    - lib/LTSV/LINQ.pm: FromLTSV and ToLTSV on Perl 5.005_03 now use a
+      unique numbered package glob per call
+      (LTSV::LINQ::FH::H1, LTSV::LINQ::FH::H2, ...) instead of
+      \do{local *_}, which always resolves to *main::_ and caused IO
+      slot collision when two iterators were open concurrently
+      (e.g. Join or GroupJoin with two FromLTSV sources).
+    - lib/LTSV/LINQ.pm: $_fh_seq added to use vars.
+    - lib/LTSV/LINQ.pm: POD FromLTSV section updated to document
+      concurrent-use safety on all supported Perl versions.
+
+    Tests:
+    - t/0014-concurrent-fh.t: new test (26 tests) covering concurrent
+      FromLTSV in Join, GroupJoin, Concat+Join, and ToLTSV round-trip.
+
 1.08  2026-04-04 JST (Japan Standard Time)
 
     Fixes:

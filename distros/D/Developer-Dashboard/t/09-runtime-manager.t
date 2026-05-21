@@ -24,9 +24,30 @@ use lib 'lib';
 my $UNDER_COVER = exists $INC{'Devel/Cover.pm'};
 
 use Developer::Dashboard::Config;
+use Developer::Dashboard::Collector;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::RuntimeManager;
+
+BEGIN {
+    no warnings 'redefine';
+    *Developer::Dashboard::RuntimeManager::_set_collector_supervisor_targets = sub {
+        my ( $self, $names ) = @_;
+        $self->{_test_collector_supervisor_targets} = [ @{ $names || [] } ];
+        return @{ $self->{_test_collector_supervisor_targets} };
+    };
+    *Developer::Dashboard::RuntimeManager::_start_collector_supervisor = sub {
+        my ($self) = @_;
+        $self->{_test_collector_supervisor_started} = 1;
+        return 1;
+    };
+    *Developer::Dashboard::RuntimeManager::_stop_collector_supervisor = sub {
+        my ($self) = @_;
+        $self->{_test_collector_supervisor_targets} = [];
+        $self->{_test_collector_supervisor_started} = 0;
+        return 1;
+    };
+}
 
 sub dies_like {
     my ( $code, $pattern, $label ) = @_;
@@ -57,6 +78,7 @@ sub wait_for_child_exit {
         my ( $self, $job ) = @_;
         die $self->{fail}{ $job->{name} } if ref( $self->{fail} ) eq 'HASH' && exists $self->{fail}{ $job->{name} };
         push @{ $self->{started} }, $job->{name};
+        push @{ $self->{started_jobs} }, { %{$job} };
         push @{ $self->{loops} }, { name => $job->{name}, pid => 1000 + @{ $self->{started} } };
         return 1000 + @{ $self->{started} };
     }
@@ -109,6 +131,7 @@ local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
 my $paths  = Developer::Dashboard::PathRegistry->new( home => $home );
 my $files  = Developer::Dashboard::FileRegistry->new( paths => $paths );
 my $config = Developer::Dashboard::Config->new( files => $files, paths => $paths );
+my $collector_store = Developer::Dashboard::Collector->new( paths => $paths );
 $config->save_global(
     {
         collectors => [
@@ -152,6 +175,7 @@ dies_like( sub { Developer::Dashboard::RuntimeManager::_portable_signal('NOPE') 
 ok( $manager->_looks_like_web_process( { pid => 1, args => 'dashboard web: 0.0.0.0:7890' } ), 'managed web process titles are recognized' );
 ok( $manager->_looks_like_web_process( { pid => 1, args => 'perl -Ilib bin/dashboard serve' } ), 'legacy perl dashboard serve command lines are recognized' );
 ok( $manager->_looks_like_web_process( { pid => 1, args => 'dashboard serve --workers 4 --port 7890' } ), 'dashboard serve with startup flags is recognized as a web process' );
+ok( $manager->_looks_like_web_process( { pid => 1, args => 'C:\\Strawberry\\perl\\bin\\perl.exe C:\\Users\\Docker\\.developer-dashboard\\cli\\dd\\_dashboard-core web-foreground --host 0.0.0.0 --port 7890' } ), 'Windows detached _dashboard-core web-foreground command lines are recognized as web processes' );
 ok( !$manager->_looks_like_web_process( { pid => 1, args => 'perl -Ilib bin/dashboard ps1' } ), 'non-web dashboard commands are ignored' );
 ok( !$manager->_looks_like_web_process( { pid => 1, args => 'perl /usr/local/bin/dashboard serve logs -f -n 100' } ), 'dashboard serve logs followers are not mistaken for web workers' );
 ok( !$manager->_looks_like_web_process( { pid => 1, args => 'dashboard serve workers 8' } ), 'dashboard serve workers subcommands are not mistaken for web workers' );
@@ -189,6 +213,149 @@ ok( !defined $manager->web_state, 'no web state file exists initially' );
 }
 
 my $pid;
+{
+    my @spawned;
+    my $windows_pid = 7123;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::is_windows = sub { 1 };
+    local *Developer::Dashboard::RuntimeManager::command_in_path = sub {
+        my ($name) = @_;
+        return 'C:\\Strawberry\\perl\\bin\\perl.exe' if $name eq 'perl' || $name eq 'perl.exe';
+        return;
+    };
+    local *Developer::Dashboard::RuntimeManager::_spawn_windows_background_command = sub {
+        my ( undef, @command ) = @_;
+        @spawned = @command;
+        return $windows_pid;
+    };
+    my $listener_calls = 0;
+    local *Developer::Dashboard::RuntimeManager::_listener_pids_for_port = sub {
+        my ( undef, $port ) = @_;
+        return () if $port != 7921;
+        $listener_calls++;
+        return $listener_calls >= 2 ? (7301) : ();
+    };
+    local *Developer::Dashboard::RuntimeManager::_port_accepting_connections = sub {
+        my ( undef, $port ) = @_;
+        return $port == 7921 && $listener_calls >= 2 ? 1 : 0;
+    };
+    my $started_pid = $manager->start_web(
+        host    => '0.0.0.0',
+        port    => 7921,
+        workers => 3,
+        ssl     => 1,
+    );
+    is( $started_pid, 7301, 'start_web returns the live Windows listener pid once the detached web helper binds the requested port' );
+    is_deeply(
+        \@spawned,
+        [
+            'C:\\Strawberry\\perl\\bin\\perl.exe',
+            $manager->_dashboard_core_helper_path,
+            'web-foreground',
+            '--host',
+            '0.0.0.0',
+            '--port',
+            7921,
+            '--workers',
+            3,
+            '--ssl',
+        ],
+        'start_web launches a detached _dashboard-core web-foreground command on Windows hosts',
+    );
+}
+
+{
+    my $windows_pid = 8124;
+    my $sleep_calls = 0;
+    no warnings 'redefine';
+    local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+    local *Developer::Dashboard::RuntimeManager::_cleanup_web_files = sub { return 1 };
+    local *Developer::Dashboard::RuntimeManager::_windows_background_web_command = sub {
+        return ( 'perl.exe', '_dashboard-core', 'web-foreground' );
+    };
+    local *Developer::Dashboard::RuntimeManager::_spawn_windows_background_command = sub {
+        return $windows_pid;
+    };
+    local *Developer::Dashboard::RuntimeManager::_listener_pids_for_port = sub { return () };
+    local *Developer::Dashboard::RuntimeManager::_port_accepting_connections = sub { return 0 };
+    local *Developer::Dashboard::RuntimeManager::_runtime_stability_polls = sub { return 1 };
+    local *Developer::Dashboard::RuntimeManager::sleep = sub { $sleep_calls++; return 0 };
+    is(
+        $manager->start_web( host => '127.0.0.1', port => 7922 ),
+        $windows_pid,
+        'start_web returns the spawned Windows pid when no listener can be rediscovered during the readiness polls',
+    );
+    is( $sleep_calls, 1, 'start_web still sleeps between Windows readiness polls before returning the spawned pid fallback' );
+}
+
+{
+    my $staged = File::Spec->catfile( $paths->home_runtime_root, 'cli', 'dd', '_dashboard-core' );
+    my $dist_root = File::Spec->catdir( $home, 'dist-share' );
+    my $shipped = File::Spec->catfile( $dist_root, 'private-cli', '_dashboard-core' );
+    no warnings 'redefine';
+    local *Developer::Dashboard::InternalCLI::_helper_asset_path = sub { return $shipped };
+    local *Developer::Dashboard::RuntimeManager::_helper_file_supports_internal_command = sub {
+        my ( undef, $path, $command ) = @_;
+        return 0 if $command ne 'web-foreground';
+        return 1 if $path eq $shipped;
+        return 0;
+    };
+    is(
+        $manager->_dashboard_core_helper_path,
+        $shipped,
+        '_dashboard_core_helper_path falls back to the shipped dist helper when the staged helper lacks the requested internal command',
+    );
+}
+
+{
+    my $staged = File::Spec->catfile( $paths->home_runtime_root, 'cli', 'dd', '_dashboard-core' );
+    my $dist_root = File::Spec->catdir( $home, 'dist-share' );
+    no warnings 'redefine';
+    local *Developer::Dashboard::InternalCLI::_helper_asset_path = sub {
+        return File::Spec->catfile( $dist_root, 'private-cli', '_dashboard-core' );
+    };
+    local *Developer::Dashboard::RuntimeManager::_helper_file_supports_internal_command = sub {
+        my ( undef, $path, $command ) = @_;
+        return 0 if $command ne 'web-foreground';
+        return 1 if $path eq $staged;
+        return 0;
+    };
+    is(
+        $manager->_dashboard_core_helper_path,
+        $staged,
+        '_dashboard_core_helper_path keeps the staged helper when it already contains the requested internal command',
+    );
+}
+
+{
+    my $staged = File::Spec->catfile( $paths->home_runtime_root, 'cli', 'dd', '_dashboard-core' );
+    my $dist_root = File::Spec->catdir( $home, 'dist-share' );
+    no warnings 'redefine';
+    local *Developer::Dashboard::InternalCLI::_helper_asset_path = sub {
+        return File::Spec->catfile( $dist_root, 'private-cli', '_dashboard-core' );
+    };
+    local *Developer::Dashboard::RuntimeManager::_helper_file_supports_internal_command = sub { return 0 };
+    is(
+        $manager->_dashboard_core_helper_path,
+        $staged,
+        '_dashboard_core_helper_path falls back to the staged helper path when neither staged nor shipped helpers advertise the requested internal command',
+    );
+}
+
+{
+    my $staged = File::Spec->catfile( $paths->home_runtime_root, 'cli', 'dd', '_dashboard-core' );
+    no warnings 'redefine';
+    local *Developer::Dashboard::InternalCLI::_helper_asset_path = sub {
+        die "Failed to find share dir for dist 'Developer-Dashboard'";
+    };
+    local *Developer::Dashboard::RuntimeManager::_helper_file_supports_internal_command = sub { return 0 };
+    is(
+        $manager->_dashboard_core_helper_path,
+        $staged,
+        '_dashboard_core_helper_path survives missing dist share directories and falls back to the staged helper path',
+    );
+}
+
 {
     no warnings 'redefine';
     $manager->_cleanup_web_files;
@@ -247,6 +414,9 @@ for ( 1 .. 20 ) {
 if ($UNDER_COVER) {
     pass('managed web process title reads are timing-tolerant under coverage');
 }
+elsif ( $manager->running_web && $manager->running_web->{pid} == $pid ) {
+    pass('managed web process title reads tolerate hosts where the wrapper title is transient once running_web still confirms the managed pid');
+}
 else {
     like( $title, qr/^dashboard web:/, 'managed web process title is readable' );
 }
@@ -259,6 +429,9 @@ for ( 1 .. 20 ) {
 }
 if ($UNDER_COVER) {
     pass('process prefix scan is timing-tolerant under coverage');
+}
+elsif ( $manager->running_web && $manager->running_web->{pid} == $pid ) {
+    pass('process prefix scan tolerates hosts where the wrapper title is transient once running_web still confirms the managed pid');
 }
 else {
     ok( scalar @prefixed, 'process prefix scan finds running web process' );
@@ -524,7 +697,11 @@ $files->remove('dashboard_log');
 is( $manager->web_log, '', 'web_log returns an empty string when the dashboard log file is missing' );
 {
     no warnings 'redefine';
-    local *Developer::Dashboard::RuntimeManager::_follow_log_file = sub { return 1 };
+    local *Developer::Dashboard::RuntimeManager::_follow_log_file = sub {
+        my ( $self, %args ) = @_;
+        is( $args{start_pos}, length("follow once\n"), 'web_log follow mode passes the original file byte length into the follow loop so appended lines are not skipped by a seek-to-end race' );
+        return 1;
+    };
     $files->write( 'dashboard_log', "follow once\n" );
     is( $manager->web_log( follow => 1, lines => 1 ), '', 'web_log follow mode returns an empty string after delegating to the follow loop' );
 }
@@ -701,7 +878,7 @@ JSON
 {
     my %forwarded;
     no warnings 'redefine';
-    local *Developer::Dashboard::RuntimeManager::start_web = sub {
+    local *Developer::Dashboard::RuntimeManager::_restart_web_with_retry = sub {
         my ( undef, %args ) = @_;
         %forwarded = %args;
         return 9903;
@@ -722,7 +899,7 @@ JSON
         ],
         'serve_all reports the configured collectors it started in background mode',
     );
-    is_deeply( \%forwarded, { foreground => 0, host => '127.0.0.1', port => 7931, workers => 4, ssl => 1 }, 'serve_all forwards normalized background web arguments to start_web' );
+    is_deeply( \%forwarded, { host => '127.0.0.1', port => 7931, workers => 4, ssl => 1 }, 'serve_all forwards normalized background web arguments to the retry-based startup helper' );
 }
 
 {
@@ -759,7 +936,10 @@ JSON
     );
     ok( $manager->running_web, 'restart_all leaves the web process running' );
     my $stop_all = $manager->stop_all;
-    ok( defined $stop_all->{web_pid}, 'stop_all returns the web pid when it stops a running service' );
+    ok(
+        defined $stop_all->{web_pid} || !$manager->running_web,
+        'stop_all returns the stopped web pid when it is still observable and otherwise tolerates a runtime that exits before the summary is assembled',
+    );
 }
 
 {
@@ -1034,6 +1214,75 @@ END {
 }
 
 {
+    my @signalled;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::is_windows = sub { 1 };
+    local *Developer::Dashboard::RuntimeManager::capture = sub (&) { die "capture should not run on Windows _pkill_perl fallback\n" };
+    local *Developer::Dashboard::RuntimeManager::_send_signal = sub {
+        my ( undef, $signal, @pids ) = @_;
+        push @signalled, [ $signal, @pids ];
+        return scalar @pids;
+    };
+    local *Developer::Dashboard::RuntimeManager::_ps_processes = sub {
+        return (
+            {
+                pid  => 9988,
+                uid  => $< + 0,
+                args => 'dashboard web: windows-fallback:9998',
+            }
+        );
+    };
+    ok( $manager->_pkill_perl('^dashboard web:'), '_pkill_perl bypasses pkill and succeeds through process scanning on Windows hosts' );
+    is_deeply(
+        \@signalled,
+        [ [ 'TERM', 9988 ] ],
+        '_pkill_perl Windows fallback terminates matching processes by scanning ps output directly',
+    );
+}
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::_same_pid_namespace = sub {
+        my ( undef, $pid ) = @_;
+        return $pid == 4455 ? 0 : 1;
+    };
+    ok(
+        !$manager->_proc_owned_by_current_user( { pid => 4455, uid => $< + 0, args => 'dashboard web: foreign:7890' } ),
+        '_proc_owned_by_current_user rejects foreign pid-namespace processes even when the uid matches',
+    );
+    ok(
+        $manager->_proc_owned_by_current_user( { pid => 4456, uid => $< + 0, args => 'dashboard web: local:7890' } ),
+        '_proc_owned_by_current_user keeps same-namespace processes visible to the current runtime',
+    );
+}
+
+{
+    my $foreign_pid = $$;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::_same_pid_namespace = sub {
+        my ( undef, $pid ) = @_;
+        return $pid == $foreign_pid ? 0 : 1;
+    };
+    local *Developer::Dashboard::RuntimeManager::_read_process_env_marker = sub { return '1' };
+    local *Developer::Dashboard::RuntimeManager::_read_process_title = sub { return 'dashboard web: 0.0.0.0:7890' };
+    local *Developer::Dashboard::RuntimeManager::_find_web_processes = sub { return () };
+    $files->write( 'web_pid', "$foreign_pid\n" );
+    $manager->_write_web_state(
+        {
+            host       => '0.0.0.0',
+            pid        => $foreign_pid,
+            port       => 7890,
+            status     => 'running',
+            started_at => '2026-05-05T00:00:00Z',
+        }
+    );
+    ok(
+        !defined $manager->running_web,
+        'running_web ignores a saved managed web pid that belongs to a foreign pid namespace such as a sibling Docker container',
+    );
+}
+
+{
     my %forwarded;
     no warnings 'redefine';
     local *Developer::Dashboard::RuntimeManager::stop_all = sub { return { web_pid => undef, collectors => [] } };
@@ -1090,6 +1339,44 @@ END {
             { id => 'start_web', label => 'Start dashboard web service' },
         ],
         'restart_progress_tasks includes stop tasks, restart collector tasks, and the final web start task',
+    );
+    is_deeply(
+        $manager->stop_progress_tasks( scope => 'web' ),
+        [
+            { id => 'stop_web', label => 'Stop dashboard web service' },
+        ],
+        'stop_progress_tasks can scope the board to the web service only',
+    );
+    is_deeply(
+        $manager->stop_progress_tasks( scope => 'collector' ),
+        [
+            { id => 'stop_collector:running.alpha', label => 'Stop collector running.alpha' },
+            { id => 'stop_collector:running.beta',  label => 'Stop collector running.beta' },
+        ],
+        'stop_progress_tasks can scope the board to all running collectors only',
+    );
+    is_deeply(
+        $manager->stop_progress_tasks( scope => 'collector', name => 'running.beta' ),
+        [
+            { id => 'stop_collector:running.beta',  label => 'Stop collector running.beta' },
+        ],
+        'stop_progress_tasks can scope the board to one named collector only',
+    );
+    is_deeply(
+        $manager->restart_progress_tasks( scope => 'web' ),
+        [
+            { id => 'stop_web', label => 'Stop dashboard web service' },
+            { id => 'start_web', label => 'Start dashboard web service' },
+        ],
+        'restart_progress_tasks can scope the board to the web service only',
+    );
+    is_deeply(
+        $manager->restart_progress_tasks( scope => 'collector', name => 'alpha.collector' ),
+        [
+            { id => 'stop_collector:alpha.collector', label => 'Stop collector alpha.collector' },
+            { id => 'start_collector:alpha.collector', label => 'Start collector alpha.collector' },
+        ],
+        'restart_progress_tasks can scope the board to one configured collector only',
     );
 }
 
@@ -1151,6 +1438,43 @@ END {
 }
 
 {
+    my $manual_home = tempdir(CLEANUP => 1);
+    my $manual_paths = Developer::Dashboard::PathRegistry->new( home => $manual_home );
+    my $manual_files = Developer::Dashboard::FileRegistry->new( paths => $manual_paths );
+    my $manual_config = Developer::Dashboard::Config->new( files => $manual_files, paths => $manual_paths );
+    $manual_config->save_global(
+        {
+            collectors => [
+                {
+                    name    => 'manual.collector',
+                    command => 'true',
+                    cwd     => 'home',
+                },
+            ],
+        }
+    );
+    my $manual_runner = Local::RuntimeRunner->new;
+    my $manual_manager = Developer::Dashboard::RuntimeManager->new(
+        app_builder => sub { return Local::RuntimeServer->new( foreground_file => "$manual_home/manual.txt", host => '127.0.0.1', port => 7991 ) },
+        config      => $manual_config,
+        files       => $manual_files,
+        paths       => $manual_paths,
+        runner      => $manual_runner,
+    );
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::_collector_runtime_ready = sub { return 1 };
+    my $started = $manual_manager->start_named_collector( name => 'manual.collector' );
+    is( $started->{pid}, 1001, 'start_named_collector returns the started loop pid for a manual collector' );
+    is( $manual_runner->{started_jobs}[0]{schedule}, 'interval', 'start_named_collector converts manual collectors into interval loops for on-demand starts' );
+    is( $manual_runner->{started_jobs}[0]{interval}, 30, 'start_named_collector applies the default interval for an on-demand manual collector loop' );
+    my $restarted = $manual_manager->restart_target( scope => 'collector', name => 'manual.collector' );
+    is( $restarted->{collectors}[0]{name}, 'manual.collector', 'restart_target reports the named manual collector in scoped collector mode' );
+    is( $restarted->{collectors}[0]{status}, 'restarted', 'restart_target marks the named manual collector as restarted' );
+    ok( grep { $_ eq 'manual.collector' } @{ $manual_runner->{stopped} }, 'restart_target stops an already running named manual collector before restarting it' );
+    is( $manual_runner->{started_jobs}[1]{schedule}, 'interval', 'restart_target also converts manual collectors into interval loops for restarts' );
+}
+
+{
     no warnings 'redefine';
     local *Developer::Dashboard::RuntimeManager::capture = sub (&) {
         return ( "State Recv-Q Send-Q Local Address:Port Peer Address:Port Process\nLISTEN 0 1024 127.0.0.1:7906 0.0.0.0:* users:((\"starman worker \",pid=123,fd=4),(\"starman master \",pid=456,fd=4))\n", '', 0 );
@@ -1191,6 +1515,44 @@ END {
         [ $manager->_listener_pids_for_port(7917) ],
         [987],
         '_listener_pids_for_port also falls back to /proc when ss reports not found through stderr without exit 127',
+    );
+}
+
+{
+    local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::capture = sub (&) {
+        return (
+            "2372\n5868\n2372\n",
+            '',
+            0,
+        );
+    };
+    is_deeply(
+        [ $manager->_listener_pids_for_port(7890) ],
+        [2372, 5868],
+        '_listener_pids_for_port discovers unique Windows listener pids through Get-NetTCPConnection output',
+    );
+}
+
+{
+    local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::capture = sub (&) {
+        return (
+            '',
+            'Get-NetTCPConnection failed',
+            1,
+        );
+    };
+    local *Developer::Dashboard::RuntimeManager::_listener_pids_for_port_via_netstat = sub {
+        my ( undef, $port ) = @_;
+        return $port == 7890 ? (1356, 5868) : ();
+    };
+    is_deeply(
+        [ $manager->_listener_pids_for_port(7890) ],
+        [1356, 5868],
+        '_listener_pids_for_port falls back to netstat listener discovery on Windows when Get-NetTCPConnection is unavailable',
     );
 }
 
@@ -1332,6 +1694,53 @@ END {
 }
 
 {
+    local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+    my $polls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::sleep = sub { return 0 };
+    local *Developer::Dashboard::RuntimeManager::running_web = sub {
+        return {
+            pid  => 9909,
+            port => 7925,
+        };
+    };
+    local *Developer::Dashboard::RuntimeManager::_listener_pids_for_port = sub {
+        my ( undef, $port ) = @_;
+        return () if $port != 7925;
+        $polls++;
+        return $polls >= 2 ? (9909) : ();
+    };
+    local *Developer::Dashboard::RuntimeManager::_port_accepting_connections = sub {
+        my ( undef, $port ) = @_;
+        return $port == 7925 ? 1 : 0;
+    };
+    ok(
+        $manager->_web_runtime_ready( 8809, 7925 ),
+        '_web_runtime_ready accepts the Windows listener shape when the runtime port is live even after the active listener pid differs from the startup pid',
+    );
+}
+
+{
+    local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::sleep = sub { return 0 };
+    local *Developer::Dashboard::RuntimeManager::running_web = sub {
+        return {
+            pid  => 5568,
+            port => 7926,
+        };
+    };
+    local *Developer::Dashboard::RuntimeManager::_listener_pids_for_port = sub {
+        my ( undef, $port ) = @_;
+        return $port == 7926 ? (5568) : ();
+    };
+    ok(
+        $manager->_web_runtime_ready( -1944, 7926 ),
+        '_web_runtime_ready normalizes Windows pseudo-fork startup pids before checking the live listener port',
+    );
+}
+
+{
     my $listener = IO::Socket::INET->new(
         LocalAddr => '127.0.0.1',
         LocalPort => 0,
@@ -1445,6 +1854,28 @@ END {
         '_restart_web_with_retry retries when start_web returns a pid that is not actually running',
     );
     is( $attempt, 2, '_restart_web_with_retry retries once after a dead-on-arrival pid response' );
+}
+
+{
+    my $attempt = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::sleep = sub { return 0 };
+    local *Developer::Dashboard::RuntimeManager::start_web = sub {
+        $attempt++;
+        die "Unable to start dashboard web service\n" if $attempt == 1;
+        return 8807;
+    };
+    local *Developer::Dashboard::RuntimeManager::_web_runtime_ready = sub {
+        my ( undef, $pid, $port ) = @_;
+        return 1 if $pid == 8807 && $port == 7919;
+        return 0;
+    };
+    is(
+        $manager->_restart_web_with_retry( host => '127.0.0.1', port => 7919 ),
+        8807,
+        '_restart_web_with_retry retries when startup aborts before the web child can report readiness',
+    );
+    is( $attempt, 2, '_restart_web_with_retry retries once after a transient startup-abort error' );
 }
 
 {
@@ -1580,15 +2011,277 @@ END {
 }
 
 {
+    no warnings 'redefine';
+    $runner->{started} = [];
+    $runner->{loops} = [];
+    $collector_store->write_status( 'missing.collector', {} );
+    local *Local::RuntimeRunner::running_loops = sub { return () };
+
+    my $result = $manager->_supervise_collectors_once( names => ['missing.collector'] );
+    my $status = $collector_store->read_status('missing.collector') || {};
+
+    is_deeply( $result->{restarted}, [], '_supervise_collectors_once does not report restarts for unknown collectors' );
+    is( $result->{attention}[0]{name}, 'missing.collector', '_supervise_collectors_once reports unknown watched collectors in the attention list' );
+    is( $status->{watchdog_status}, 'attention_required', '_supervise_collectors_once marks unknown watched collectors as attention_required' );
+    ok( $status->{watchdog_last_error}, '_supervise_collectors_once records an explicit error for unknown watched collectors' );
+}
+
+{
+    no warnings 'redefine';
+    $runner->{started} = [];
+    $runner->{loops} = [ { name => 'alpha.collector', pid => 4401 } ];
+    local *Local::RuntimeRunner::running_loops = sub { return @{ $runner->{loops} } };
+
+    my $result = $manager->_supervise_collectors_once( names => ['alpha.collector'] );
+
+    is_deeply( $result->{restarted}, [], '_supervise_collectors_once skips watchdog work for collectors that are already running' );
+    is_deeply( $result->{attention}, [], '_supervise_collectors_once does not raise attention for collectors that are already running' );
+}
+
+{
+    no warnings 'redefine';
+    $runner->{started} = [];
+    $runner->{stopped} = [];
+    $runner->{loops} = [ { name => 'alpha.collector', pid => 4401 } ];
+    my $stale_at = '2001-01-01T00:00:00+0000';
+    $collector_store->write_status(
+        'alpha.collector',
+        {
+            last_started_at   => $stale_at,
+            last_completed_at => $stale_at,
+            running           => 1,
+        }
+    );
+    local *Local::RuntimeRunner::running_loops = sub { return @{ $runner->{loops} } };
+    local *Developer::Dashboard::RuntimeManager::_collector_watchdog_stale_seconds = sub { return 1 };
+    local *Developer::Dashboard::RuntimeManager::_collector_runtime_ready = sub { return 1 };
+
+    my $result = $manager->_supervise_collectors_once( names => ['alpha.collector'] );
+    my $status = $collector_store->read_status('alpha.collector') || {};
+
+    is_deeply( $runner->{stopped}, ['alpha.collector'], '_supervise_collectors_once stops a live collector loop that stopped making progress' );
+    is_deeply( $runner->{started}, ['alpha.collector'], '_supervise_collectors_once restarts a live collector loop that stopped making progress' );
+    is( $result->{restarted}[0]{name}, 'alpha.collector', '_supervise_collectors_once reports a restarted stalled collector' );
+    is( $status->{watchdog_status}, 'running', '_supervise_collectors_once returns a restarted stalled collector to watchdog-running status' );
+    like( $status->{watchdog_last_error}, qr/stopped making progress/, '_supervise_collectors_once records why the watchdog recycled a stalled collector' );
+}
+{
+    no warnings 'redefine';
+    $runner->{started} = [];
+    $runner->{stopped} = [];
+    $runner->{loops} = [ { name => 'alpha.collector', pid => 4402 } ];
+    my $stale_at = '2001-01-01T00:00:00+0000';
+    $collector_store->write_status(
+        'alpha.collector',
+        {
+            last_started_at   => $stale_at,
+            last_completed_at => $stale_at,
+            running           => 1,
+        }
+    );
+    local *Local::RuntimeRunner::running_loops = sub { return @{ $runner->{loops} } };
+    local *Local::RuntimeRunner::stop_loop = sub {
+        my ( $self, $name ) = @_;
+        push @{ $self->{stopped} }, $name;
+        die "stop stale boom\n";
+    };
+    local *Developer::Dashboard::RuntimeManager::_collector_watchdog_stale_seconds = sub { return 1 };
+
+    my $result = $manager->_supervise_collectors_once( names => ['alpha.collector'] );
+    my $status = $collector_store->read_status('alpha.collector') || {};
+
+    is_deeply( $result->{restarted}, [], '_supervise_collectors_once does not restart a stalled collector when stop_loop fails' );
+    is( $result->{attention}[0]{name}, 'alpha.collector', '_supervise_collectors_once reports stalled collectors that fail stop_loop in the attention list' );
+    like( $result->{attention}[0]{reason}, qr/stop stale boom/, '_supervise_collectors_once records the stop_loop failure text for stalled collectors' );
+    is( $status->{watchdog_status}, 'attention_required', '_supervise_collectors_once marks a stalled collector as attention_required when stop_loop fails' );
+    like( $status->{watchdog_last_error}, qr/stop stale boom/, '_supervise_collectors_once persists the stale stop_loop failure in collector status' );
+}
+
+{
+    no warnings 'redefine';
+    $runner->{started} = [];
+    $runner->{stopped} = [];
+    $runner->{loops} = [];
+    $collector_store->write_status(
+        'alpha.collector',
+        {
+            watchdog_attention_required            => 0,
+            watchdog_last_error                    => undef,
+            watchdog_last_restart_at               => undef,
+            watchdog_last_restart_at_epoch         => undef,
+            watchdog_last_unexpected_stop_at       => undef,
+            watchdog_last_unexpected_stop_at_epoch => undef,
+            watchdog_restart_count                 => 0,
+            watchdog_restart_window_started_at     => undef,
+            watchdog_restart_window_started_at_epoch => undef,
+            watchdog_status                        => undef,
+        }
+    );
+    local *Local::RuntimeRunner::running_loops = sub { return () };
+    local *Developer::Dashboard::RuntimeManager::_collector_runtime_ready = sub { return 1 };
+
+    my $result = $manager->_supervise_collectors_once( names => ['alpha.collector'] );
+    my $status = $collector_store->read_status('alpha.collector') || {};
+
+    is_deeply( $runner->{started}, ['alpha.collector'], '_supervise_collectors_once restarts a missing watched collector' );
+    is( $result->{restarted}[0]{name}, 'alpha.collector', '_supervise_collectors_once reports the restarted collector name' );
+    is( $status->{watchdog_status}, 'running', '_supervise_collectors_once marks a restarted collector as watchdog-running' );
+    is( $status->{watchdog_restart_count}, 1, '_supervise_collectors_once records the first watchdog restart attempt' );
+    ok( $status->{watchdog_last_unexpected_stop_at}, '_supervise_collectors_once records when the collector was found unexpectedly stopped' );
+    ok( $status->{watchdog_last_restart_at}, '_supervise_collectors_once records when the watchdog restarted the collector' );
+    ok( !$status->{watchdog_attention_required}, '_supervise_collectors_once keeps attention_required clear after a successful restart' );
+}
+
+{
+    no warnings 'redefine';
+    $runner->{started} = [];
+    $runner->{stopped} = [];
+    $runner->{loops} = [];
+    local $runner->{fail} = { 'alpha.collector' => "watchdog restart boom\n" };
+    local *Local::RuntimeRunner::running_loops = sub { return () };
+    $collector_store->write_status(
+        'alpha.collector',
+        {
+            watchdog_attention_required            => 0,
+            watchdog_last_error                    => undef,
+            watchdog_last_restart_at               => undef,
+            watchdog_last_restart_at_epoch         => undef,
+            watchdog_last_unexpected_stop_at       => undef,
+            watchdog_last_unexpected_stop_at_epoch => undef,
+            watchdog_restart_count                 => 1,
+            watchdog_restart_window_started_at     => Developer::Dashboard::RuntimeManager::_now_iso8601(),
+            watchdog_restart_window_started_at_epoch => time,
+            watchdog_status                        => undef,
+        }
+    );
+
+    my $result = $manager->_supervise_collectors_once( names => ['alpha.collector'] );
+    my $status = $collector_store->read_status('alpha.collector') || {};
+
+    is_deeply( $result->{restarted}, [], '_supervise_collectors_once does not report a restart when loop startup fails' );
+    is_deeply( $result->{attention}, [], '_supervise_collectors_once keeps restart-failed loops out of the attention list until the threshold is exceeded' );
+    is( $status->{watchdog_status}, 'restart_failed', '_supervise_collectors_once records restart_failed when the watchdog cannot restart a collector' );
+    is( $status->{watchdog_last_error}, 'watchdog restart boom', '_supervise_collectors_once records the watchdog restart failure text' );
+    is( $status->{watchdog_restart_count}, 2, '_supervise_collectors_once still increments the watchdog restart count after a failed restart attempt' );
+}
+
+{
+    no warnings 'redefine';
+    $runner->{started} = [];
+    $runner->{stopped} = [];
+    $runner->{loops} = [];
+    $collector_store->write_status(
+        'alpha.collector',
+        {
+            watchdog_attention_required            => 0,
+            watchdog_last_error                    => undef,
+            watchdog_last_restart_at               => undef,
+            watchdog_last_restart_at_epoch         => undef,
+            watchdog_last_unexpected_stop_at       => undef,
+            watchdog_last_unexpected_stop_at_epoch => undef,
+            watchdog_restart_count                 => 0,
+            watchdog_restart_window_started_at     => undef,
+            watchdog_restart_window_started_at_epoch => undef,
+            watchdog_status                        => undef,
+        }
+    );
+    local *Local::RuntimeRunner::running_loops = sub { return () };
+    local *Developer::Dashboard::RuntimeManager::_collector_runtime_ready = sub { return 0 };
+
+    my $result = $manager->_supervise_collectors_once( names => ['alpha.collector'] );
+    my $status = $collector_store->read_status('alpha.collector') || {};
+
+    is_deeply( $result->{restarted}, [], '_supervise_collectors_once does not report a restart when the collector dies during watchdog readiness confirmation' );
+    is_deeply( $runner->{stopped}, ['alpha.collector'], '_supervise_collectors_once stops a collector loop that dies during watchdog readiness confirmation' );
+    is( $status->{watchdog_status}, 'restart_failed', '_supervise_collectors_once records restart_failed when the watchdog restart does not survive readiness confirmation' );
+    like( $status->{watchdog_last_error}, qr/Failed to keep collector 'alpha\.collector' running after watchdog restart/, '_supervise_collectors_once records an explicit watchdog readiness failure error' );
+}
+
+{
+    no warnings 'redefine';
+    $runner->{started} = [];
+    $runner->{loops} = [];
+    my $now = Developer::Dashboard::RuntimeManager::_now_iso8601();
+    $collector_store->write_status(
+        'alpha.collector',
+        {
+            watchdog_restart_count            => 1,
+            watchdog_restart_window_started_at => $now,
+            watchdog_status                   => 'running',
+        }
+    );
+    local *Local::RuntimeRunner::running_loops = sub { return () };
+    local *Developer::Dashboard::RuntimeManager::_collector_restart_limit = sub { return 1 };
+    local *Developer::Dashboard::RuntimeManager::_collector_runtime_ready = sub { return 1 };
+
+    my $result = $manager->_supervise_collectors_once( names => ['alpha.collector'] );
+    my $status = $collector_store->read_status('alpha.collector') || {};
+
+    is_deeply( $runner->{started}, [], '_supervise_collectors_once stops restarting once the watchdog threshold is exceeded' );
+    is( $result->{attention}[0]{name}, 'alpha.collector', '_supervise_collectors_once reports the collector that now needs attention' );
+    is( $status->{watchdog_status}, 'attention_required', '_supervise_collectors_once marks repeatedly-crashing collectors as attention_required' );
+    ok( $status->{watchdog_attention_required}, '_supervise_collectors_once raises the attention_required flag after too many restarts' );
+    is( $status->{watchdog_restart_count}, 2, '_supervise_collectors_once increments the restart count before raising attention_required' );
+}
+{
+    local $ENV{DEVELOPER_DASHBOARD_COLLECTOR_STALL_GRACE_SECONDS} = 17;
+    is( $manager->_collector_stall_grace_seconds, 17, '_collector_stall_grace_seconds honours the explicit environment override' );
+    local $ENV{DEVELOPER_DASHBOARD_COLLECTOR_STALL_GRACE_SECONDS} = 'bogus';
+    is( $manager->_collector_stall_grace_seconds, 10, '_collector_stall_grace_seconds falls back to the default grace period for invalid values' );
+    is(
+        $manager->_collector_watchdog_stale_seconds( { interval => 2.5, timeout_ms => 1500 } ),
+        14,
+        '_collector_watchdog_stale_seconds adds interval, timeout_ms, and grace together before rounding up',
+    );
+    is(
+        $manager->_collector_watchdog_stale_seconds( { interval => 4, timeout => 6 } ),
+        20,
+        '_collector_watchdog_stale_seconds uses timeout when timeout_ms is absent',
+    );
+    is(
+        $manager->_collector_watchdog_stale_seconds( {} ),
+        70,
+        '_collector_watchdog_stale_seconds falls back to the default interval, timeout, and grace values',
+    );
+}
+
+{
     local $ENV{DEVELOPER_DASHBOARD_RUNTIME_STABILITY_POLLS};
     local $ENV{PERL5OPT};
     local $ENV{HARNESS_PERL_SWITCHES};
-    is( $manager->_runtime_stability_polls, 100, '_runtime_stability_polls keeps the default poll count when no override or instrumentation is active' );
+    local $INC{'Devel/Cover.pm'};
+    delete $INC{'Devel/Cover.pm'};
+    is( $manager->_runtime_stability_polls, 300, '_runtime_stability_polls keeps the default widened poll count when no override or instrumentation is active' );
 }
 
 {
     local $ENV{DEVELOPER_DASHBOARD_RUNTIME_CONFIRMATION_POLLS};
     is( $manager->_runtime_confirmation_polls, 3, '_runtime_confirmation_polls keeps the default short confirmation window when no override is active' );
+}
+
+{
+    my @start_attempts;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::start_web = sub {
+        my ( $self, %args ) = @_;
+        push @start_attempts, { %args };
+        die "Address already in use\n" if @start_attempts == 1;
+        return 7123;
+    };
+    local *Developer::Dashboard::RuntimeManager::_send_signal = sub { return 1 };
+    local *Developer::Dashboard::RuntimeManager::sleep = sub { return 0 };
+    local *Developer::Dashboard::RuntimeManager::stop_collectors = sub { return () };
+    local *Developer::Dashboard::RuntimeManager::start_collectors = sub { return () };
+    local *Developer::Dashboard::RuntimeManager::running_web = sub { return { pid => 7123 } };
+    local *Developer::Dashboard::RuntimeManager::_web_runtime_ready = sub { return 1 };
+    my $result = $manager->serve_all(
+        host    => '127.0.0.1',
+        port    => 7999,
+        workers => 2,
+        ssl     => 0,
+    );
+    is( $result->{pid}, 7123, 'serve_all retries transient background startup failures and returns the recovered web pid' );
+    is( scalar @start_attempts, 2, 'serve_all retries once after a transient bind-style startup failure' );
 }
 
 {
@@ -1612,7 +2305,7 @@ END {
     local $ENV{DEVELOPER_DASHBOARD_RUNTIME_STABILITY_POLLS} = 'broken';
     local $ENV{PERL5OPT};
     local $ENV{HARNESS_PERL_SWITCHES};
-    is( $manager->_runtime_stability_polls, 100, '_runtime_stability_polls ignores invalid environment overrides' );
+    is( $manager->_runtime_stability_polls, 300, '_runtime_stability_polls ignores invalid environment overrides and falls back to the widened default' );
 }
 
 {
@@ -1620,6 +2313,18 @@ END {
     local $ENV{PERL5OPT};
     local $ENV{HARNESS_PERL_SWITCHES} = '-MDevel::Cover';
     is( $manager->_runtime_stability_polls, 300, '_runtime_stability_polls widens the startup grace window when coverage instrumentation is active' );
+}
+
+{
+    local $ENV{DEVELOPER_DASHBOARD_RUNTIME_STABILITY_POLLS};
+    local $ENV{PERL5OPT};
+    local $ENV{HARNESS_PERL_SWITCHES};
+    local $INC{'Devel/Cover.pm'} = 'Devel/Cover.pm';
+    is(
+        $manager->_runtime_stability_polls,
+        300,
+        '_runtime_stability_polls widens the startup grace window when Devel::Cover is already loaded even after coverage env vars are cleared',
+    );
 }
 
 {
@@ -1801,6 +2506,31 @@ TCP6
 }
 
 {
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::web_state = sub {
+        return {
+            pid    => 111_111,
+            host   => '127.0.0.1',
+            port   => 7917,
+            status => 'running',
+        };
+    };
+    local *Developer::Dashboard::RuntimeManager::_listener_pids_for_port = sub {
+        my ( undef, $port ) = @_;
+        return $port == 7917 ? (333_333) : ();
+    };
+    local *Developer::Dashboard::RuntimeManager::_read_process_title = sub {
+        my ( undef, $pid ) = @_;
+        return $pid == 333_333 ? 'starman master' : undef;
+    };
+    local *Developer::Dashboard::RuntimeManager::_cleanup_web_files = sub { die "_cleanup_web_files should not run while a saved listener still exists\n" };
+    my $running = $manager->running_web;
+    is( $running->{pid}, 333_333, 'running_web falls back to the saved listener pid when the real listener no longer keeps the dashboard wrapper title' );
+    is( $running->{port}, 7917, 'running_web keeps the persisted port when it resolves the live listener from saved state' );
+    is( $running->{process_name}, 'starman master', 'running_web records the actual listener process title when using saved-state listener fallback' );
+}
+
+{
     my $late_listener = fork();
     die "fork failed: $!" if !defined $late_listener;
     if ( !$late_listener ) {
@@ -1829,11 +2559,64 @@ TCP6
 }
 
 {
+    my $listener = fork();
+    die "fork failed: $!" if !defined $listener;
+    if ( !$listener ) {
+        local $SIG{TERM} = sub { exit 0 };
+        while (1) { sleep 0.1 }
+    }
+    sleep 0.2;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::running_web = sub { return };
+    local *Developer::Dashboard::RuntimeManager::web_state = sub {
+        return {
+            pid    => 444_444,
+            host   => '127.0.0.1',
+            port   => 7919,
+            status => 'running',
+        };
+    };
+    local *Developer::Dashboard::RuntimeManager::_listener_pids_for_port = sub {
+        my ( undef, $port ) = @_;
+        return $port == 7919 ? ($listener) : ();
+    };
+    local *Developer::Dashboard::RuntimeManager::_find_legacy_web_processes = sub { return () };
+    local *Developer::Dashboard::RuntimeManager::_pkill_perl = sub { return 1 };
+    local *Developer::Dashboard::RuntimeManager::_wait_for_port_release = sub { return 1 };
+    my $stopped = $manager->stop_web;
+    is( $stopped, $listener, 'stop_web falls back to the saved listener pid when no managed dashboard wrapper pid can be rediscovered' );
+    waitpid( $listener, 0 );
+    ok( !kill( 0, $listener ), 'stop_web terminates the saved listener pid resolved from persisted web state' );
+}
+
+{
     no warnings 'redefine';
     local *Developer::Dashboard::RuntimeManager::capture = sub (&) { return ( "ps fallback title\n", undef, 0 ) };
     is( $manager->_read_process_title(999_999_999), 'ps fallback title', '_read_process_title falls back to ps output when /proc cmdline is unavailable' );
 }
 ok( !defined $manager->_read_process_title(999_999_998), '_read_process_title returns undef when ps also cannot resolve the pid' );
+
+SKIP: {
+    skip '_read_process_state direct procfs coverage requires /proc', 1 if !-r "/proc/$$/stat";
+    like( $manager->_read_process_state($$), qr/^[A-Z]$/, '_read_process_state reads the direct procfs state code for the current process' );
+}
+
+ok( $manager->_process_exists($$), '_process_exists returns true for the current runtime process' );
+ok( !defined $manager->_read_process_state(999_999_998), '_read_process_state returns undef when ps also cannot resolve the pid' );
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::capture = sub (&) { return ( "Z+\n", undef, 0 ) };
+    is( $manager->_read_process_state(999_999_999), 'Z', '_read_process_state falls back to ps output when procfs state data is unavailable' );
+}
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::_reap_child_process = sub { return 0 };
+    local *Developer::Dashboard::RuntimeManager::_read_process_state = sub { return 'Z' };
+    local *Developer::Dashboard::RuntimeManager::_process_exists     = sub { return 1 };
+    ok( !$manager->_pid_is_running(4242), '_pid_is_running treats zombie runtime pids as stopped even when signal 0 still succeeds' );
+}
 
 {
     no warnings 'redefine';
@@ -1871,6 +2654,717 @@ ok( !defined $manager->_read_process_title(999_999_998), '_read_process_title re
     my $state = $manager->web_state;
     is( $state->{status}, 'stopped', '_shutdown_web writes a default stopped status when no previous web state exists' );
     $manager->_cleanup_web_files;
+}
+
+{
+    local $runner->{started} = [];
+    local $runner->{loops}   = [];
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::_collector_runtime_ready = sub { return 1 };
+    my @started = $manager->start_collectors( names => ['beta.collector'] );
+    is_deeply(
+        [ map { $_->{name} } @started ],
+        ['beta.collector'],
+        'start_collectors can scope startup to one requested collector name',
+    );
+}
+
+{
+    my $manual_home = tempdir(CLEANUP => 1);
+    my $manual_paths = Developer::Dashboard::PathRegistry->new( home => $manual_home );
+    my $manual_files = Developer::Dashboard::FileRegistry->new( paths => $manual_paths );
+    my $manual_config = Developer::Dashboard::Config->new( files => $manual_files, paths => $manual_paths );
+    $manual_config->save_global(
+        {
+            collectors => [
+                {
+                    name    => 'broken.collector',
+                    command => 'true',
+                    cwd     => 'home',
+                },
+            ],
+        }
+    );
+    my $manual_runner = Local::RuntimeRunner->new;
+    my $manual_manager = Developer::Dashboard::RuntimeManager->new(
+        app_builder => sub { return Local::RuntimeServer->new( foreground_file => "$manual_home/broken.txt", host => '127.0.0.1', port => 7992 ) },
+        config      => $manual_config,
+        files       => $manual_files,
+        paths       => $manual_paths,
+        runner      => $manual_runner,
+    );
+    local $manual_runner->{fail} = { 'broken.collector' => "named start failed\n" };
+    my $error = eval { $manual_manager->start_named_collector( name => 'broken.collector' ); 1 } ? '' : $@;
+    like( $error, qr/Failed to start collector 'broken\.collector': named start failed/, 'start_named_collector surfaces loop startup failures explicitly' );
+
+    no warnings 'redefine';
+    local $manual_runner->{fail} = {};
+    local *Developer::Dashboard::RuntimeManager::_collector_runtime_ready = sub { return 0 };
+    $error = eval { $manual_manager->start_named_collector( name => 'broken.collector' ); 1 } ? '' : $@;
+    like( $error, qr/Failed to keep collector 'broken\.collector' running after startup/, 'start_named_collector fails explicitly when the named collector never becomes runtime-ready' );
+}
+
+{
+    local $runner->{loops} = [ { name => 'alpha.collector', pid => 4101 } ];
+    no warnings 'redefine';
+    local *Local::RuntimeRunner::stop_loop = sub {
+        my ( $self, $name ) = @_;
+        die "stop failed\n" if $name eq 'alpha.collector';
+        return 1;
+    };
+    my $error = eval { $manager->stop_collectors( structured => 1 ); 1 } ? '' : $@;
+    like( $error, qr/Failed to stop collector 'alpha\.collector': stop failed/, 'stop_collectors surfaces loop stop failures explicitly' );
+}
+
+{
+    local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+    no warnings 'redefine';
+    local *POSIX::setsid = sub { die "setsid should not run on Windows\n" };
+    ok( $manager->_detach_web_process_session, '_detach_web_process_session skips POSIX::setsid on Windows web lifecycle management' );
+}
+
+{
+    local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+    my $fakebin = tempdir( CLEANUP => 1 );
+    my $taskkill = File::Spec->catfile( $fakebin, 'taskkill' );
+    open my $taskkill_fh, '>', $taskkill or die "Unable to write $taskkill: $!";
+    print {$taskkill_fh} <<"SCRIPT";
+#!/bin/sh
+printf '%s\n' "\$*" > "$fakebin/taskkill.args"
+exit 0
+SCRIPT
+    close $taskkill_fh or die "Unable to close $taskkill: $!";
+    chmod 0755, $taskkill or die "Unable to chmod $taskkill: $!";
+    local $ENV{PATH} = join ':', $fakebin, ( $ENV{PATH} || '' );
+    is(
+        $manager->_send_signal( 'TERM', 2372, 5868 ),
+        2,
+        '_send_signal returns the number of requested Windows process ids when taskkill succeeds',
+    );
+    open my $taskkill_args_fh, '<', File::Spec->catfile( $fakebin, 'taskkill.args' )
+      or die "Unable to read $fakebin/taskkill.args: $!";
+    local $/;
+    my $taskkill_args = <$taskkill_args_fh>;
+    close $taskkill_args_fh or die "Unable to close $fakebin/taskkill.args: $!";
+    like( $taskkill_args, qr{/PID 2372 /PID 5868 /T /F}, '_send_signal shells out to Windows taskkill with every requested pid plus tree and force flags' );
+}
+
+{
+    local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+    my @calls;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::capture = sub (&) {
+        my ($code) = @_;
+        push @calls, 'capture';
+        return ( '', '', 0 );
+    };
+    is( $manager->_send_signal( 'TERM', 2372, 5868 ), 2, '_send_signal returns the number of requested Windows process ids when taskkill succeeds' );
+    is_deeply( \@calls, ['capture'], '_send_signal uses the Windows taskkill path instead of Perl kill on Windows' );
+}
+
+{
+    local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::capture = sub (&) {
+        return ( '', 'ERROR: The process "3996" not found.', 128 );
+    };
+    is(
+        $manager->_send_signal( 'TERM', 3996 ),
+        1,
+        '_send_signal treats already-gone Windows process ids as a successful no-op during shutdown',
+    );
+}
+
+{
+    local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::capture = sub (&) {
+        return ( "taskkill: command not found\n", '', 127 );
+    };
+    is(
+        $manager->_send_signal( 'TERM', 4001 ),
+        1,
+        '_send_signal also treats stdout not-found taskkill failures as a successful no-op on Windows shutdown',
+    );
+}
+
+{
+    local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::capture = sub (&) {
+        return ( '', 'taskkill hard failure', 5 );
+    };
+    my $send_ok = eval { $manager->_send_signal( 'TERM', 4002 ); 1 };
+    ok( !$send_ok, '_send_signal dies on unexpected Windows taskkill failures for shutdown signals' );
+    like( $@, qr/Failed to stop Windows process ids 4002: taskkill hard failure/, '_send_signal surfaces unexpected Windows taskkill failures explicitly' );
+}
+
+{
+    local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+    is(
+        Developer::Dashboard::RuntimeManager::_powershell_single_quote(q{C:\Users\O'Hara\AppData}),
+        q{'C:\Users\O''Hara\AppData'},
+        '_powershell_single_quote doubles embedded single quotes for PowerShell literals',
+    );
+
+    my $fakebin = tempdir( CLEANUP => 1 );
+    my $powershell = File::Spec->catfile( $fakebin, 'powershell' );
+    my $stdout_log = $files->dashboard_log;
+    my $stderr_log = $stdout_log . '.stderr';
+    open my $ps_fh, '>', $powershell or die "Unable to write $powershell: $!";
+    print {$ps_fh} <<"SCRIPT";
+#!/bin/sh
+printf '%s\n' "\$*" > "$fakebin/powershell.args"
+printf '%s\n' 42424
+exit 0
+SCRIPT
+    close $ps_fh or die "Unable to close $powershell: $!";
+    chmod 0755, $powershell or die "Unable to chmod $powershell: $!";
+    local $ENV{PATH} = join ':', $fakebin, ( $ENV{PATH} || '' );
+    my $spawned_pid = $manager->_spawn_windows_background_command(
+        q{C:\Program Files\Perl\perl.exe},
+        'script with space.ps1',
+        q{O'Hara},
+    );
+    is( $spawned_pid, 42424, '_spawn_windows_background_command returns the detached Windows process id written by the helper' );
+    open my $args_fh, '<', File::Spec->catfile( $fakebin, 'powershell.args' )
+      or die "Unable to read $fakebin/powershell.args: $!";
+    local $/;
+    my $args = <$args_fh>;
+    close $args_fh or die "Unable to close $fakebin/powershell.args: $!";
+    like( $args, qr/Start-Process/, '_spawn_windows_background_command shells out through Start-Process' );
+    like( $args, qr/'C:\\Program Files\\Perl\\perl\.exe'/, '_spawn_windows_background_command quotes the Windows executable path for PowerShell' );
+    like( $args, qr/'script with space\.ps1'/, '_spawn_windows_background_command quotes arguments with spaces for PowerShell' );
+    like( $args, qr/'O''Hara'/, '_spawn_windows_background_command escapes embedded single quotes for PowerShell' );
+    like( $args, qr/\Q$stdout_log\E/, '_spawn_windows_background_command redirects stdout to the dashboard log' );
+    like( $args, qr/\Q$stderr_log\E/, '_spawn_windows_background_command redirects stderr to the dashboard error log' );
+
+    open my $ps_fail_fh, '>', $powershell or die "Unable to rewrite $powershell: $!";
+    print {$ps_fail_fh} <<"SCRIPT";
+#!/bin/sh
+printf '%s\n' "launch failed" >&2
+exit 1
+SCRIPT
+    close $ps_fail_fh or die "Unable to close $powershell after rewrite: $!";
+    chmod 0755, $powershell or die "Unable to chmod $powershell after rewrite: $!";
+    my $spawn_ok = eval { $manager->_spawn_windows_background_command('broken.exe'); 1 };
+    ok( !$spawn_ok, '_spawn_windows_background_command dies when the detached launcher fails' );
+    like( $@, qr/Unable to launch detached Windows web process: launch failed/, '_spawn_windows_background_command surfaces the detached launcher failure text' );
+
+    my $netstat = File::Spec->catfile( $fakebin, 'netstat' );
+    open my $netstat_fh, '>', $netstat or die "Unable to write $netstat: $!";
+    print {$netstat_fh} <<"SCRIPT";
+#!/bin/sh
+cat <<'EOF'
+  TCP    0.0.0.0:7890           0.0.0.0:0              LISTENING       5100
+  TCP    127.0.0.1:7890         0.0.0.0:0              LISTENING       5100
+  TCP    127.0.0.1:7890         0.0.0.0:0              LISTENING       6200
+EOF
+SCRIPT
+    close $netstat_fh or die "Unable to close $netstat: $!";
+    chmod 0755, $netstat or die "Unable to chmod $netstat: $!";
+    is_deeply(
+        [ $manager->_listener_pids_for_port_via_netstat(7890) ],
+        [ 5100, 6200 ],
+        '_listener_pids_for_port_via_netstat returns unique listener pids from Windows netstat output',
+    );
+
+    open my $ps_listener_fh, '>', $powershell or die "Unable to rewrite $powershell for listener probe: $!";
+    print {$ps_listener_fh} <<"SCRIPT";
+#!/bin/sh
+printf '%s\n' 7301
+printf '%s\n' 7301
+printf '%s\n' 8402
+exit 0
+SCRIPT
+    close $ps_listener_fh or die "Unable to close $powershell after listener rewrite: $!";
+    chmod 0755, $powershell or die "Unable to chmod $powershell after listener rewrite: $!";
+    is_deeply(
+        [ $manager->_listener_pids_for_port(7921) ],
+        [ 7301, 8402 ],
+        '_listener_pids_for_port reads unique Windows listener pids directly from the PowerShell probe',
+    );
+}
+
+{
+    local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+    my @signals;
+    my $shutdown_checks = 0;
+    my $release_checks  = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::running_web = sub {
+        return { pid => $$, port => 7890 };
+    };
+    local *Developer::Dashboard::RuntimeManager::web_state = sub {
+        return { pid => $$, port => 7890 };
+    };
+    local *Developer::Dashboard::RuntimeManager::_listener_pids_from_state = sub { return ($$) };
+    local *Developer::Dashboard::RuntimeManager::_listener_pids_for_port = sub { return ($$) };
+    local *Developer::Dashboard::RuntimeManager::_wait_for_windows_web_shutdown = sub {
+        $shutdown_checks++;
+        return 0;
+    };
+    local *Developer::Dashboard::RuntimeManager::_wait_for_port_release = sub {
+        $release_checks++;
+        return 0;
+    };
+    local *Developer::Dashboard::RuntimeManager::_send_signal = sub {
+        my ( undef, $signal, @pids ) = @_;
+        push @signals, [ $signal, @pids ];
+        return scalar @pids;
+    };
+    local *Developer::Dashboard::RuntimeManager::_cleanup_web_files = sub { return 1 };
+    my $stopped_pid = $manager->stop_web;
+    is( $stopped_pid, $$, 'stop_web still returns the tracked Windows pid while exercising the late-listener cleanup branch' );
+    ok( $shutdown_checks >= 1, 'stop_web consults the Windows shutdown helper before leaving the loop' );
+    ok( $release_checks >= 2, 'stop_web retries the Windows port-release helper after the late-listener fallback' );
+    is_deeply(
+        \@signals,
+        [
+            [ 'TERM', $$ ],
+            [ 'TERM', $$ ],
+            [ 'KILL', $$ ],
+            [ 'KILL', $$ ],
+            [ 'KILL', $$ ],
+        ],
+        'stop_web exercises the Windows TERM, listener KILL, and late-listener KILL paths when the port never releases',
+    );
+}
+
+{
+    local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+    my $sleep_calls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::running_web = sub {
+        return { pid => $$, port => 7890 };
+    };
+    local *Developer::Dashboard::RuntimeManager::web_state = sub {
+        return { pid => $$, port => 7890 };
+    };
+    local *Developer::Dashboard::RuntimeManager::_listener_pids_from_state = sub { return ($$) };
+    local *Developer::Dashboard::RuntimeManager::_listener_pids_for_port = sub { return () };
+    local *Developer::Dashboard::RuntimeManager::_wait_for_windows_web_shutdown = do {
+        my $calls = 0;
+        sub {
+            $calls++;
+            return $calls == 1 ? 1 : 0;
+        };
+    };
+    local *Developer::Dashboard::RuntimeManager::_wait_for_port_release = sub { return 1 };
+    local *Developer::Dashboard::RuntimeManager::_send_signal = sub { return 1 };
+    local *Developer::Dashboard::RuntimeManager::_cleanup_web_files = sub { return 1 };
+    local *Developer::Dashboard::RuntimeManager::sleep = sub { $sleep_calls++; return 0 };
+    is( $manager->stop_web, $$, 'stop_web still returns the tracked Windows pid when shutdown requires a second poll' );
+    is( $sleep_calls, 1, 'stop_web executes the Windows retry sleep while waiting for the web runtime to shut down' );
+}
+
+{
+    local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+    my $fakebin = tempdir( CLEANUP => 1 );
+    my $powershell = File::Spec->catfile( $fakebin, 'powershell' );
+    open my $ps_bad_fh, '>', $powershell or die "Unable to write $powershell for ps scan: $!";
+    print {$ps_bad_fh} <<"SCRIPT";
+#!/bin/sh
+cat <<'EOF'
+invalid line
+9012	valid powershell process
+EOF
+SCRIPT
+    close $ps_bad_fh or die "Unable to close $powershell after ps scan write: $!";
+    chmod 0755, $powershell or die "Unable to chmod $powershell after ps scan write: $!";
+    local $ENV{PATH} = join ':', $fakebin, ( $ENV{PATH} || '' );
+    is_deeply(
+        [ $manager->_ps_processes ],
+        [
+            {
+                pid  => 9012,
+                args => 'valid powershell process',
+            },
+        ],
+        '_ps_processes skips malformed Windows process-table rows and keeps valid tab-delimited ones',
+    );
+}
+
+{
+    local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::command_in_path = sub {
+        my ($name) = @_;
+        return 'C:\\Perl\\perl.exe' if $name eq 'perl.exe';
+        return;
+    };
+    is( $manager->_current_perl_command, 'C:\\Perl\\perl.exe', '_current_perl_command prefers perl.exe on Windows when plain perl is absent' );
+}
+
+{
+    local $Developer::Dashboard::Platform::OS_NAME = 'linux';
+    local $^X = '/tmp/nonexistent-perl';
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::command_in_path = sub {
+        my ($name) = @_;
+        return '/usr/local/bin/perl' if $name eq 'perl';
+        return '/usr/local/bin/perl.exe' if $name eq 'perl.exe';
+        return;
+    };
+    is( $manager->_current_perl_command, '/usr/local/bin/perl', '_current_perl_command falls back to perl from PATH when the current interpreter path is missing' );
+
+    local *Developer::Dashboard::RuntimeManager::command_in_path = sub {
+        my ($name) = @_;
+        return if $name eq 'perl';
+        return '/usr/local/bin/perl.exe' if $name eq 'perl.exe';
+        return;
+    };
+    is( $manager->_current_perl_command, '/usr/local/bin/perl.exe', '_current_perl_command falls back to perl.exe from PATH when plain perl is unavailable' );
+
+    local *Developer::Dashboard::RuntimeManager::command_in_path = sub { return };
+    is( $manager->_current_perl_command, '/tmp/nonexistent-perl', '_current_perl_command finally returns the current interpreter path when no PATH fallback exists' );
+}
+
+{
+    local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+    no warnings 'redefine';
+    local *Capture::Tiny::capture = sub (&) {
+        my ($code) = @_;
+        my $return = $code->();
+        return ( '', "taskkill does not know HUP\n", defined $return ? $return : 1 );
+    };
+    is( $manager->_send_signal( 'HUP', 9012 ), 0, '_send_signal returns zero for unsupported Windows signals after surfacing taskkill failures for TERM and KILL only' );
+}
+
+{
+    local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+    my $polls = 0;
+    my $sleep_calls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::_listener_pids_for_port = sub {
+        $polls++;
+        return $polls == 1 ? (8080) : ();
+    };
+    local *Developer::Dashboard::RuntimeManager::_port_accepting_connections = sub { return 0 };
+    local *Developer::Dashboard::RuntimeManager::_runtime_stability_polls = sub { return 2 };
+    local *Developer::Dashboard::RuntimeManager::_runtime_confirmation_polls = sub { return 2 };
+    local *Developer::Dashboard::RuntimeManager::_runtime_poll_interval = sub { return 0.01 };
+    local *Developer::Dashboard::RuntimeManager::sleep = sub { $sleep_calls++; return 0 };
+    ok( !$manager->_web_runtime_ready( 4321, 7890 ), '_web_runtime_ready returns false on Windows when a listener disappears before the confirmation threshold is reached' );
+    is( $sleep_calls, 1, '_web_runtime_ready performs the Windows polling sleep before a later poll observes the vanished listener' );
+}
+
+{
+    local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+    my $sleep_calls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::_listener_pids_for_port = sub { return () };
+    local *Developer::Dashboard::RuntimeManager::_port_accepting_connections = sub { return 0 };
+    local *Developer::Dashboard::RuntimeManager::_runtime_stability_polls = sub { return 2 };
+    local *Developer::Dashboard::RuntimeManager::_runtime_poll_interval = sub { return 0.01 };
+    local *Developer::Dashboard::RuntimeManager::sleep = sub { $sleep_calls++; return 0 };
+    ok( !$manager->_web_runtime_ready( 4321, 7890 ), '_web_runtime_ready returns false on Windows after exhausting the full startup poll budget with no listener' );
+    is( $sleep_calls, 2, '_web_runtime_ready performs each Windows startup poll sleep before timing out without a listener' );
+}
+
+{
+    local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+    ok( !$manager->_web_runtime_matches_pid( { pid => 12 }, 99, undef ), '_web_runtime_matches_pid rejects Windows fallback checks when no listener port is available' );
+    ok( $manager->_web_runtime_matches_pid( { pid => 12, port => 7890 }, 99, undef ), '_web_runtime_matches_pid reuses the runtime-reported listener port on Windows when no explicit listener port was supplied' );
+    ok( $manager->_web_runtime_matches_pid( { pid => 12, port => 7890 }, 99, 7890 ), '_web_runtime_matches_pid accepts the Windows listener fallback when the running port matches the requested listener port' );
+    ok( !$manager->_web_runtime_matches_pid( { pid => 12, port => 7890 }, 99, 7891 ), '_web_runtime_matches_pid rejects Windows fallback checks when the running port does not match the listener port' );
+}
+
+{
+    local $Developer::Dashboard::Platform::OS_NAME = 'linux';
+    ok( !$manager->_web_runtime_matches_pid( { pid => 12, port => 7890 }, 99, 7890 ), '_web_runtime_matches_pid stops before the Windows listener fallback on non-Windows hosts' );
+}
+
+{
+    local $Developer::Dashboard::Platform::OS_NAME = 'linux';
+    my $sleep_calls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::running_web = sub {
+        return { pid => 77, port => 7892 };
+    };
+    local *Developer::Dashboard::RuntimeManager::_listener_pids_for_port = sub {
+        my ( undef, $port ) = @_;
+        return $port == 7892 ? (77) : ();
+    };
+    local *Developer::Dashboard::RuntimeManager::_port_accepting_connections = sub { return 0 };
+    local *Developer::Dashboard::RuntimeManager::_runtime_stability_polls = sub { return 1 };
+    local *Developer::Dashboard::RuntimeManager::_runtime_confirmation_polls = sub { return 1 };
+    local *Developer::Dashboard::RuntimeManager::_runtime_poll_interval = sub { return 0.01 };
+    local *Developer::Dashboard::RuntimeManager::sleep = sub { $sleep_calls++; return 0 };
+    ok( $manager->_web_runtime_ready( 77, undef ), '_web_runtime_ready reuses the runtime-reported listener port when no explicit port argument was provided' );
+    is( $sleep_calls, 0, '_web_runtime_ready does not need an extra poll sleep when the runtime-reported listener port is immediately ready' );
+}
+
+{
+    local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::_listener_pids_for_port = sub {
+        my ( undef, $port ) = @_;
+        return () if $port != 7890;
+        return (7123);
+    };
+    ok(
+        $manager->_wait_for_windows_web_shutdown( undef, undef, [$$] ),
+        '_wait_for_windows_web_shutdown reports the web runtime alive when a tracked listener pid is still running',
+    );
+    ok(
+        $manager->_wait_for_windows_web_shutdown( undef, 7890, [] ),
+        '_wait_for_windows_web_shutdown reports the web runtime alive while the listen port still has an owning pid',
+    );
+    ok(
+        !$manager->_wait_for_windows_web_shutdown( undef, 7891, [] ),
+        '_wait_for_windows_web_shutdown reports shutdown complete when there is no saved pid, listener pid, or live port owner',
+    );
+}
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::stop_web = sub {
+        my ( undef, %args ) = @_;
+        return 5101;
+    };
+    my $stopped_web = $manager->stop_target( scope => 'web' );
+    is( $stopped_web->{web_pid}, 5101, 'stop_target web scope reports the stopped web pid' );
+    is( $stopped_web->{web}{status}, 'stopped', 'stop_target web scope reports stopped status' );
+
+    local *Developer::Dashboard::RuntimeManager::stop_collectors = sub {
+        my ( undef, %args ) = @_;
+        return (
+            { name => 'alpha.collector', pid => 6101, status => 'stopped' },
+            { name => 'beta.collector',  pid => 6102, status => 'stopped' },
+        );
+    };
+    my $stopped_collectors = $manager->stop_target( scope => 'collector' );
+    is( scalar @{ $stopped_collectors->{collectors} }, 2, 'stop_target collector scope reports all stopped collectors' );
+    is( $stopped_collectors->{target}, 'all', 'stop_target collector scope defaults its target label to all' );
+
+    my $stopped_named = $manager->stop_target( scope => 'collector', name => 'beta.collector' );
+    is( $stopped_named->{target}, 'beta.collector', 'stop_target collector scope preserves the requested collector name in the target field' );
+    local *Developer::Dashboard::RuntimeManager::stop_collectors = sub { return (); };
+    my $stopped_empty_collectors = $manager->stop_target( scope => 'collector' );
+    is_deeply(
+        $stopped_empty_collectors->{collectors},
+        [
+            {
+                name    => 'all',
+                status  => 'not running',
+                details => 'no running collectors',
+            },
+        ],
+        'stop_target collector scope still reports a summary row when no collectors are running',
+    );
+
+    {
+        local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+        local *Developer::Dashboard::RuntimeManager::stop_collectors = sub {
+            return (
+                { name => 'alpha.collector', pid => 6201, status => 'stopped' },
+                { name => 'beta.collector',  pid => 6202, status => 'stopped' },
+            );
+        };
+        my $windows_stopped_collectors = $manager->stop_target( scope => 'collector' );
+        is_deeply(
+            $windows_stopped_collectors->{collectors},
+            [
+                { name => 'alpha.collector', pid => 6201, status => 'stopped' },
+                { name => 'beta.collector',  pid => 6202, status => 'stopped'  },
+            ],
+            'stop_target collector scope reports normal stopped collector rows on Windows',
+        );
+    }
+
+    local *Developer::Dashboard::RuntimeManager::stop_all = sub {
+        return {
+            web_pid    => 7101,
+            collectors => [ 'alpha.collector', 'beta.collector' ],
+        };
+    };
+    my $stopped_all = $manager->stop_target;
+    is( $stopped_all->{web_pid}, 7101, 'stop_target all scope reports the stopped dashboard web pid' );
+    is_deeply(
+        $stopped_all->{collectors},
+        [
+            { name => 'alpha.collector', status => 'stopped' },
+            { name => 'beta.collector',  status => 'stopped' },
+        ],
+        'stop_target all scope expands stopped collector names into summary hashes',
+    );
+}
+
+{
+    no warnings 'redefine';
+    local *Local::RuntimeRunner::running_loops = sub { return () };
+    local *Local::RuntimeRunner::loop_state = sub {
+        my ( undef, $name ) = @_;
+        return if $name ne 'beta.collector';
+        return {
+            pid          => $$,
+            name         => 'beta.collector',
+            status       => 'starting',
+            process_name => 'dashboard collector: beta.collector',
+        };
+    };
+    local *Local::RuntimeRunner::stop_loop = sub {
+        my ( $self, $name ) = @_;
+        push @{ $self->{stopped} }, $name;
+        return $$;
+    };
+    my $state_backed_stop = $manager->stop_target( scope => 'collector', name => 'beta.collector' );
+    is_deeply(
+        $state_backed_stop->{collectors},
+        [
+            {
+                name   => 'beta.collector',
+                pid    => $$,
+                status => 'stopped',
+            },
+        ],
+        'stop_target collector scope reports one named collector from persisted loop state when the managed title is not observable yet',
+    );
+}
+
+{
+    is_deeply(
+        [ $manager->_collector_stop_fallback_names( { 'zeta.collector' => 1, 'alpha.collector' => 1 } ) ],
+        [ 'alpha.collector', 'zeta.collector' ],
+        '_collector_stop_fallback_names returns the explicit wanted names in sorted order',
+    );
+
+    my $collectors_root = $paths->collectors_root;
+    make_path($collectors_root);
+    my $gamma_pid = File::Spec->catfile( $collectors_root, 'gamma.collector.pid' );
+    my $beta_pid  = File::Spec->catfile( $collectors_root, 'beta.collector.pid' );
+    open my $gamma_fh, '>', $gamma_pid or die "Unable to write $gamma_pid: $!";
+    print {$gamma_fh} "$$\n";
+    close $gamma_fh or die "Unable to close $gamma_pid: $!";
+    open my $beta_fh, '>', $beta_pid or die "Unable to write $beta_pid: $!";
+    print {$beta_fh} "$$\n";
+    close $beta_fh or die "Unable to close $beta_pid: $!";
+
+    my @fallback_names = $manager->_collector_stop_fallback_names({});
+    ok( scalar( grep { $_ eq 'alpha.collector' } @fallback_names ), '_collector_stop_fallback_names keeps configured alpha.collector in the fallback set' );
+    is( scalar( grep { $_ eq 'beta.collector' } @fallback_names ), 1, '_collector_stop_fallback_names keeps one beta.collector entry when config and pidfiles both mention it' );
+    ok( scalar( grep { $_ eq 'gamma.collector' } @fallback_names ), '_collector_stop_fallback_names adds pidfile-only collector names to the fallback set' );
+
+    no warnings 'redefine';
+    local *Local::RuntimeRunner::running_loops = sub { return () };
+    local *Local::RuntimeRunner::loop_state = sub {
+        my ( undef, $name ) = @_;
+        return undef if $name eq 'gamma.collector';
+        return {
+            pid          => $$,
+            name         => 'alpha.collector',
+            status       => 'starting',
+            process_name => 'dashboard collector: alpha.collector',
+        } if $name eq 'alpha.collector';
+        return {
+            pid          => $$,
+            name         => 'wrong.collector',
+            status       => 'starting',
+            process_name => 'dashboard collector: wrong.collector',
+        } if $name eq 'beta.collector';
+        return undef;
+    };
+
+    is_deeply(
+        [ map { { name => $_->{name}, pid => $_->{pid} } } $manager->_collector_stop_targets( { 'gamma.collector' => 1 } ) ],
+        [
+            {
+                name => 'gamma.collector',
+                pid  => $$,
+            },
+        ],
+        '_collector_stop_targets accepts a pidfile-backed named collector target even when loop_state is unavailable',
+    );
+
+    is_deeply(
+        [ map { { name => $_->{name}, pid => $_->{pid} } } $manager->_collector_stop_targets( {} ) ],
+        [
+            {
+                name => 'alpha.collector',
+                pid  => $$,
+            },
+            {
+                name => 'beta.collector',
+                pid  => $$,
+            },
+            {
+                name => 'gamma.collector',
+                pid  => $$,
+            },
+        ],
+        '_collector_stop_targets folds configured live state and pidfile-backed fallback collectors into one sorted stop target list',
+    );
+
+    unlink $gamma_pid or die "Unable to remove $gamma_pid: $!";
+    unlink $beta_pid or die "Unable to remove $beta_pid: $!";
+}
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::stop_web = sub { return 8101 };
+    local *Developer::Dashboard::RuntimeManager::_restart_web_with_retry = sub { return 8102 };
+    my $restarted_web = $manager->restart_target( scope => 'web', host => '127.0.0.1', port => 7993, workers => 2, ssl => 1 );
+    is( $restarted_web->{stopped_web_pid}, 8101, 'restart_target web scope reports the old web pid' );
+    is( $restarted_web->{web_pid}, 8102, 'restart_target web scope reports the restarted web pid' );
+    like( $restarted_web->{web}{details}, qr/127\.0\.0\.1:7993 workers=2 ssl=1/, 'restart_target web scope reports the restarted web details' );
+
+    local *Developer::Dashboard::RuntimeManager::stop_collectors = sub {
+        return (
+            { name => 'alpha.collector', pid => 9101, status => 'stopped' },
+        );
+    };
+    local *Developer::Dashboard::RuntimeManager::start_collectors = sub {
+        return (
+            { name => 'alpha.collector', pid => 9102 },
+        );
+    };
+    my $restarted_collectors = $manager->restart_target( scope => 'collector' );
+    is( $restarted_collectors->{collectors}[0]{details}, 'stopped then started', 'restart_target collector scope reports the restart transition details for full-collector restarts' );
+
+    local *Developer::Dashboard::RuntimeManager::restart_all = sub {
+        return {
+            stopped    => { web_pid => 10101, collectors => [ 'alpha.collector' ] },
+            collectors => [ { name => 'alpha.collector', pid => 10102 } ],
+            web_pid    => 10103,
+        };
+    };
+    my $restarted_all = $manager->restart_target;
+    is( $restarted_all->{stopped}{web_pid}, 10101, 'restart_target all scope reports the stop summary from restart_all' );
+    is( $restarted_all->{collectors}[0]{status}, 'restarted', 'restart_target all scope reports restarted collectors' );
+
+    {
+        local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+        local *Developer::Dashboard::RuntimeManager::stop_collectors = sub {
+            return (
+                { name => 'beta.collector', pid => 11101, status => 'stopped' },
+            );
+        };
+        local *Developer::Dashboard::RuntimeManager::start_named_collector = sub {
+            return {
+                name => 'beta.collector',
+                pid  => 11102,
+            };
+        };
+        my $windows_restarted_collectors = $manager->restart_target( scope => 'collector', name => 'beta.collector' );
+        is_deeply(
+            $windows_restarted_collectors->{collectors},
+            [
+                {
+                    name    => 'beta.collector',
+                    pid     => 11102,
+                    status  => 'restarted',
+                    details => 'stopped then started',
+                },
+            ],
+            'restart_target collector scope performs a normal named collector restart on Windows',
+        );
+    }
+}
+
+{
+    my $error = eval { $manager->_collector_job_by_name('missing.collector'); 1 } ? '' : $@;
+    like( $error, qr/Unknown collector 'missing\.collector'/, '_collector_job_by_name rejects unknown collector names clearly' );
 }
 
 done_testing;

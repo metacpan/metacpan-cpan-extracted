@@ -12,7 +12,7 @@ subtest 'basic' => sub {
 
         isa_ok( $iter, ['Iterator::Flex::Base'], 'correct parent class' );
         can_ok( $iter, [ 'reset', ], 'has reset' );
-        is( $iter->can( 'freeze' ), undef, 'can not freeze' );
+        is( $iter->can( 'freeze' ), undef, 'cannot freeze' );
     };
 
     subtest 'values' => sub {
@@ -22,6 +22,24 @@ subtest 'basic' => sub {
         is( \@values,    [ 10, 20 ], 'values are correct' );
         is( $iter->next, undef,      'iterator exhausted' );
     };
+};
+
+subtest 'matched false values' => sub {
+
+    my @array = ( 0, q{}, 1 );
+    my $iter  = igrep { defined } iarray( \@array );
+
+    my @values;
+
+    ok(
+        lives {
+            push @values, $iter->next for 0 .. $#array;
+        },
+        'iterate'
+    ) or note $@;
+
+    is( \@values,    \@array, 'false values are returned' );
+    is( $iter->next, undef,   'iterator exhausted' );
 };
 
 subtest 'reset' => sub {

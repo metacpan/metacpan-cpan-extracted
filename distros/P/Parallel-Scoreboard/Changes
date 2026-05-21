@@ -1,5 +1,8 @@
 Revision history for Perl module Parallel::Scoreboard
 
+0.09 2026-05-06
+ - avoid failure due to race condition #13 (Yuji Hatakeyama)
+
 0.08 2016-12-12
  - do not report failure if temporary directory is created by another process #11
  - do not call `use_test_base` #10

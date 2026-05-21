@@ -5,7 +5,7 @@ use warnings;
 
 use App::MARC::List;
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Run.
 exit App::MARC::List->new->run;
@@ -28,7 +28,7 @@ marc-list - Tool to get MARC leader or field/subfield unique list.
 
 =head1 SYNOPSIS
 
- marc-list [-f] [-h] [--version] marc_xml_file field [subfield]
+ marc-list [-f] [-h] [-s] [--version] marc_xml_file field [subfield]
 
 =head1 DESCRIPTION
 
@@ -50,6 +50,10 @@ Print frequency.
 
 Print help.
 
+=item * C<-s>
+
+Skip controls of field/subfield.
+
 =item * C<--version>
 
 Print version of script.
@@ -57,6 +61,10 @@ Print version of script.
 =item * C<marc_xml_file>
 
 MARC XML file name.
+
+Input file could be compressed by L<IO::Uncompress::AnyUncompress> module.
+Possibility is to uncompress gzip, zip, bzip2, zstd, xz, lzma, lzip, lzf or
+lzop.
 
 =item * C<field>
 
@@ -77,7 +85,7 @@ Required for data fields.
 
 =head1 EXAMPLE1
 
- marc-lisr __MARC.xml__ leader
+ marc-list __MARC.xml__ leader
 
 =head1 EXAMPLE2
 
@@ -105,6 +113,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

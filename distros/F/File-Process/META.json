@@ -1,10 +1,10 @@
 {
-   "abstract" : "File processing utility",
+   "abstract" : "File::Process",
    "author" : [
-      "Rob Lauer <rlauer6@comcast.net>"
+      "Rob Lauer <rclauer@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -34,33 +34,40 @@
       },
       "runtime" : {
          "requires" : {
-            "IO::Scalar" : "2.111",
-            "JSON::PP" : "0",
-            "List::Util" : "1.33",
-            "ReadonlyX" : "1.04",
-            "Text::CSV_XS" : "0",
+            "IO::Scalar" : "2.113",
+            "JSON" : "4.10",
+            "Readonly" : "2.05",
             "perl" : "5.010"
          }
       },
       "test" : {
          "requires" : {
-            "JSON::PP" : "4.10",
-            "List::Util" : "1.33",
-            "Text::CSV_XS" : "1.48"
+            "Text::CSV_XS" : "0"
          }
       }
    },
    "provides" : {
       "File::Process" : {
          "file" : "lib/File/Process.pm",
-         "version" : "0.12"
+         "version" : "v1.0.0"
       },
       "File::Process::Utils" : {
          "file" : "lib/File/Process/Utils.pm",
-         "version" : "0.11"
+         "version" : "v1.0.0"
       }
    },
    "release_status" : "stable",
-   "version" : "0.12",
-   "x_serialization_backend" : "JSON::PP version 4.10"
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "rclauer@gmail.com",
+         "web" : "https://github.com/rlauer6/File-Process/issues"
+      },
+      "homepage" : "https://github.com/rlauer6/File-Process",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/rlauer6/File-Process"
+      }
+   },
+   "version" : "v1.0.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

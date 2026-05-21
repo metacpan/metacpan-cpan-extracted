@@ -6,7 +6,7 @@ use strict;
 use base 'Exporter';
 our @EXPORT_OK = ('throw_failure');
 
-our $VERSION = '0.38';
+our $VERSION = '0.42';
 $VERSION = eval $VERSION;
 
 use Exception::Class 'Test::Most::Exception' => {
@@ -24,7 +24,7 @@ Test::Most::Exception - Internal exception class
 
 =head1 VERSION
 
-Version 0.38
+Version 0.41
 
 =head1 SYNOPSIS
 

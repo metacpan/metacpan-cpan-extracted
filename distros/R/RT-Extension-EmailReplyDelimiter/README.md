@@ -114,7 +114,9 @@ is at [https://codeberg.org/ivarch/rt-extension-emailreplydelimiter/issues](http
 The following people have contributed to this project, and their assistance
 is acknowledged and greatly appreciated:
 
-- [grantemsley](https://codeberg.org/grantemsley) - fixed issues with quoted-printable messages, added support for regular expression delimiters, and provided examples for removing quoted text from messages sent from Outlook ([#1](https://codeberg.org/ivarch/rt-extension-emailreplydelimiter/pulls/1)).
+- [grantemsley](https://codeberg.org/grantemsley) - fixed issues with quoted-printable messages, added support for regular expression delimiters, and provided examples for removing quoted text from messages sent from Outlook
+  ([#1](https://codeberg.org/ivarch/rt-extension-emailreplydelimiter/pulls/1));
+  and added base64 encoding support ([#2](https://codeberg.org/ivarch/rt-extension-emailreplydelimiter/pulls/2)).
 
 # LICENSE AND COPYRIGHT
 

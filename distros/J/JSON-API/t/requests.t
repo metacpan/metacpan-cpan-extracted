@@ -18,6 +18,12 @@ sub call_api
 		my ($code, $response) = $api->put($path, $data);
 		is($code, $expected_code, "List context HTTP Code for $message should return $expected_code");
 		is_deeply($response, $expected, "List context response for $message");
+	} elsif ($METHOD eq "PATCH") {
+		my $scalar = $api->patch($path, $data);
+		is_deeply($scalar, $expected, "Scalar context for $message");
+		my ($code, $response) = $api->patch($path, $data);
+		is($code, $expected_code, "List context HTTP Code for $message should return $expected_code");
+		is_deeply($response, $expected, "List context response for $message");
 	} elsif ($METHOD eq "POST") {
 		my $scalar = $api->post($path, $data);
 		is_deeply($scalar, $expected, "Scalar context for $message");
@@ -31,7 +37,7 @@ sub call_api
 		is($code, $expected_code, "List context HTTP Code: $message should return $expected_code");
 		is_deeply($response, $expected, "List context response for $message");
 	} else {
-		fail("Invalid METHOD provided. Must be one of GET PUT POST DELETE");
+		fail("Invalid METHOD provided. Must be one of GET PUT PATCH POST DELETE");
 	}
 }
 
@@ -63,7 +69,7 @@ my $httpd = run_http_server {
 				[ 'asdf' ],
 			]
 		} # }}}
-		elsif ($path =~ m/^\/(put|post)_(in)?valid_json$/) { # {{{
+		elsif ($path =~ m/^\/(put|post|patch)_(in)?valid_json$/) { # {{{
 			[
 				200,
 				[ 'Content-Type' => 'application/json' ],
@@ -128,6 +134,10 @@ call_api($api, "POST", '/get_invalid_json', undef,
 	{}, 200,
 	"post('/get_invalid_json') returns {}");
 
+call_api($api, "PATCH", '/get_invalid_json', undef,
+	{}, 200,
+	"patch('/get_invalid_json') returns {}");
+
 call_api($api, "PUT",'/put_valid_json', {name => 'foo', value => 'bar'},
 	{ code => 'success' }, 200,
 	"put('/put_valid_json') returns with decoded content");
@@ -135,6 +145,10 @@ call_api($api, "PUT",'/put_valid_json', {name => 'foo', value => 'bar'},
 call_api($api, "POST",  '/post_valid_json', {name => 'foo', value => 'bar'},
 	{ code => 'success' }, 200,
 	"post('/post_valid_json') returns with decoded content");
+
+call_api($api, "PATCH",  '/patch_valid_json', {name => 'foo', value => 'bar'},
+	{ code => 'success' }, 200,
+	"patch('/patch_valid_json') returns with decoded content");
 
 call_api($api, "DELETE", '/del_valid_json', undef,
 	{}, 200,

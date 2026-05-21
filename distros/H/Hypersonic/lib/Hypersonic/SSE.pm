@@ -9,7 +9,7 @@ use 5.010;
 # Automatically handles headers, event formatting, and keepalives.
 # Uses JIT-compiled XS for performance.
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use constant {
     STATE_INIT     => 0,
@@ -375,7 +375,9 @@ sub gen_xs_event {
         ->line('SPAGAIN;')
         ->line('int is_finished = 0;')
         ->if('count > 0')
-          ->line('is_finished = SvTRUE(POPs);')
+          ->comment('SvTRUE is a multi-evaluation macro on older perls; pop into a temp first')
+          ->line('SV* _ret_sv = POPs;')
+          ->line('is_finished = SvTRUE(_ret_sv);')
         ->endif
         ->line('PUTBACK;')
         ->line('FREETMPS;')
@@ -484,7 +486,9 @@ sub gen_xs_data {
         ->line('SPAGAIN;')
         ->line('int is_finished = 0;')
         ->if('count > 0')
-          ->line('is_finished = SvTRUE(POPs);')
+          ->comment('SvTRUE is a multi-evaluation macro on older perls; pop into a temp first')
+          ->line('SV* _ret_sv = POPs;')
+          ->line('is_finished = SvTRUE(_ret_sv);')
         ->endif
         ->line('PUTBACK;')
         ->line('FREETMPS;')
@@ -572,7 +576,9 @@ sub gen_xs_retry {
         ->line('SPAGAIN;')
         ->line('int is_finished = 0;')
         ->if('count > 0')
-          ->line('is_finished = SvTRUE(POPs);')
+          ->comment('SvTRUE is a multi-evaluation macro on older perls; pop into a temp first')
+          ->line('SV* _ret_sv = POPs;')
+          ->line('is_finished = SvTRUE(_ret_sv);')
         ->endif
         ->line('PUTBACK;')
         ->line('FREETMPS;')
@@ -655,7 +661,9 @@ sub gen_xs_keepalive {
         ->line('SPAGAIN;')
         ->line('int is_finished = 0;')
         ->if('count > 0')
-          ->line('is_finished = SvTRUE(POPs);')
+          ->comment('SvTRUE is a multi-evaluation macro on older perls; pop into a temp first')
+          ->line('SV* _ret_sv = POPs;')
+          ->line('is_finished = SvTRUE(_ret_sv);')
         ->endif
         ->line('PUTBACK;')
         ->line('FREETMPS;')
@@ -741,7 +749,9 @@ sub gen_xs_comment {
         ->line('SPAGAIN;')
         ->line('int is_finished = 0;')
         ->if('count > 0')
-          ->line('is_finished = SvTRUE(POPs);')
+          ->comment('SvTRUE is a multi-evaluation macro on older perls; pop into a temp first')
+          ->line('SV* _ret_sv = POPs;')
+          ->line('is_finished = SvTRUE(_ret_sv);')
         ->endif
         ->line('PUTBACK;')
         ->line('FREETMPS;')
@@ -824,7 +834,9 @@ sub gen_xs_close {
         ->line('SPAGAIN;')
         ->line('int is_finished = 0;')
         ->if('count > 0')
-          ->line('is_finished = SvTRUE(POPs);')
+          ->comment('SvTRUE is a multi-evaluation macro on older perls; pop into a temp first')
+          ->line('SV* _ret_sv = POPs;')
+          ->line('is_finished = SvTRUE(_ret_sv);')
         ->endif
         ->line('PUTBACK;')
         ->line('FREETMPS;')

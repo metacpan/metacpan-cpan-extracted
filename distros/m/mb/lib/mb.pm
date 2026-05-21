@@ -13,11 +13,14 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.61';
+$VERSION = '0.62';
 $VERSION = $VERSION;
 
 # internal use
 $mb::last_s_passed = 0; # last s/// status (1 if s/// passed)
+
+# filehandle sequence counter for _open_a/_open_r/_open_w
+$mb::_fh_seq = 0;
 
 BEGIN { pop @INC if $INC[-1] eq '.' } # CVE-2016-1238: Important unsafe module load path flaw
 use strict;
@@ -185,19 +188,19 @@ END
     ) {
 
         # read application script
-        mb::_open_r(my $fh, $ARGV[0]) or die "$0(@{[__LINE__]}): can't open file: $ARGV[0]\n";
+        my $fh = mb::_open_r($ARGV[0]) or die "$0(@{[__LINE__]}): can't open file: $ARGV[0]\n";
 
         # sysread(...) has hidden binmode($fh) that's not portable
         # local $_; sysread($fh, $_, -s $ARGV[0]);
-        local $_ = CORE::do { local $/; <$fh> }; # good!
-        close $fh;
+        local $_ = CORE::do { local $/; no strict 'refs'; readline(*{$fh}) };
+        { no strict 'refs'; close($fh) }
 
         # poor file locking
         local $SIG{__DIE__} = sub { rmdir "$ARGV[0].lock"; };
         if (mkdir "$ARGV[0].lock", 0755) {
-            mb::_open_w(my $fh, $script_oo) or die "$0(@{[__LINE__]}): can't open file: $script_oo\n";
-            print {$fh} mb::_insert_source_encoding_unimport(mb::parse());
-            close $fh;
+            my $fh = mb::_open_w($script_oo) or die "$0(@{[__LINE__]}): can't open file: $script_oo\n";
+            { no strict 'refs'; print {*{$fh}} mb::_insert_source_encoding_unimport(mb::parse()) }
+            { no strict 'refs'; close($fh) }
             rmdir "$ARGV[0].lock";
         }
         else {
@@ -353,16 +356,16 @@ sub mb::do ($) {
                 (mtime($prefix_file_oo) <= mtime($prefix_file)) or
                 (mtime($prefix_file_oo) <= mtime(__FILE__))
             ) {
-                mb::_open_r(my $fh, $prefix_file) or confess "$0(@{[__LINE__]}): can't open file: $prefix_file\n";
-                local $_ = CORE::do { local $/; <$fh> };
-                close $fh;
+                my $fh = mb::_open_r($prefix_file) or confess "$0(@{[__LINE__]}): can't open file: $prefix_file\n";
+                local $_ = CORE::do { local $/; no strict 'refs'; readline(*{$fh}) };
+                { no strict 'refs'; close($fh) }
 
                 # poor file locking
                 local $SIG{__DIE__} = sub { rmdir "$prefix_file.lock"; };
                 if (mkdir "$prefix_file.lock", 0755) {
-                    mb::_open_w(my $fh, $prefix_file_oo) or confess "$0(@{[__LINE__]}): can't open file: $prefix_file_oo\n";
-                    print {$fh} mb::_insert_source_encoding_unimport(mb::parse());
-                    close $fh;
+                    my $fh = mb::_open_w($prefix_file_oo) or confess "$0(@{[__LINE__]}): can't open file: $prefix_file_oo\n";
+                    { no strict 'refs'; print {*{$fh}} mb::_insert_source_encoding_unimport(mb::parse()) }
+                    { no strict 'refs'; close($fh) }
                     rmdir "$prefix_file.lock";
                 }
                 else {
@@ -609,16 +612,16 @@ sub mb::require (;$) {
                     (mtime($prefix_file_oo) <= mtime($prefix_file)) or
                     (mtime($prefix_file_oo) <= mtime(__FILE__))
                 ) {
-                    mb::_open_r(my $fh, $prefix_file) or confess "$0(@{[__LINE__]}): can't open file: $prefix_file\n";
-                    local $_ = CORE::do { local $/; <$fh> };
-                    close $fh;
+                    my $fh = mb::_open_r($prefix_file) or confess "$0(@{[__LINE__]}): can't open file: $prefix_file\n";
+                    local $_ = CORE::do { local $/; no strict 'refs'; readline(*{$fh}) };
+                    { no strict 'refs'; close($fh) }
 
                     # poor file locking
                     local $SIG{__DIE__} = sub { rmdir "$prefix_file.lock"; };
                     if (mkdir "$prefix_file.lock", 0755) {
-                        mb::_open_w(my $fh, $prefix_file_oo) or confess "$0(@{[__LINE__]}): can't open file: $prefix_file_oo\n";
-                        print {$fh} mb::_insert_source_encoding_unimport(mb::parse());
-                        close $fh;
+                        my $fh = mb::_open_w($prefix_file_oo) or confess "$0(@{[__LINE__]}): can't open file: $prefix_file_oo\n";
+                        { no strict 'refs'; print {*{$fh}} mb::_insert_source_encoding_unimport(mb::parse()) }
+                        { no strict 'refs'; close($fh) }
                         rmdir "$prefix_file.lock";
                     }
                     else {
@@ -1434,24 +1437,33 @@ sub mb::_clustered_codepoint ($) {
 }
 
 #---------------------------------------------------------------------
-# open for append by undefined filehandle
-sub mb::_open_a ($$) {
-    $_[0] = \do { local *_ } if $] < 5.006;
-    return open($_[0], ">> $_[1]");
+# open for append -- returns glob-name string on success, "" on failure.
+# Works on Perl 5.005_03 and all later versions.
+# Always uses a unique numbered package glob (mb::FH::H<n>) so that
+# concurrent callers each get their own IO slot.
+sub mb::_open_a ($) {
+    $mb::_fh_seq++;
+    my $fhn = "mb::FH::H$mb::_fh_seq";
+    { no strict 'refs'; open($fhn, ">> $_[0]") or return "" }
+    return $fhn;
 }
 
 #---------------------------------------------------------------------
-# open for read by undefined filehandle
-sub mb::_open_r ($$) {
-    $_[0] = \do { local *_ } if $] < 5.006;
-    return open($_[0], $_[1]);
+# open for read -- returns glob-name string on success, "" on failure.
+sub mb::_open_r ($) {
+    $mb::_fh_seq++;
+    my $fhn = "mb::FH::H$mb::_fh_seq";
+    { no strict 'refs'; open($fhn, $_[0]) or return "" }
+    return $fhn;
 }
 
 #---------------------------------------------------------------------
-# open for write by undefined filehandle
-sub mb::_open_w ($$) {
-    $_[0] = \do { local *_ } if $] < 5.006;
-    return open($_[0], "> $_[1]");
+# open for write -- returns glob-name string on success, "" on failure.
+sub mb::_open_w ($) {
+    $mb::_fh_seq++;
+    my $fhn = "mb::FH::H$mb::_fh_seq";
+    { no strict 'refs'; open($fhn, "> $_[0]") or return "" }
+    return $fhn;
 }
 
 #---------------------------------------------------------------------

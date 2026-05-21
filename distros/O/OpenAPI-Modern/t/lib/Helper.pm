@@ -55,6 +55,7 @@ YAML
 # 'lwp': classes of type URI, HTTP::Headers, HTTP::Request, HTTP::Response
 # 'plack': classes of type Plack::Request, Plack::Response
 # 'catalyst': classes of type Catalyst::Request, Catalyst::Response
+# 'dancer2': classes of type Dancer2::Core::Request, Dancer2::Core::Response
 our @TYPES = $ENV{TYPE} ? split(/,/, $ENV{TYPE}) : qw(mojo lwp plack catalyst dancer2);
 our $TYPE = $ENV{TYPE} ? (split(/,/, $ENV{TYPE}))[0] : 'mojo'; # safe default
 
@@ -305,6 +306,11 @@ our $dumper = JSON::Schema::Modern::_JSON_BACKEND()->new
 *HTTP::Request::TO_JSON = sub ($obj) { $obj->as_string };
 *HTTP::Response::TO_JSON = sub ($obj) { $obj->as_string };
 # Plack and Catalyst don't have serializers
+
+my $yaml = YAML::PP->new(boolean => 'JSON::PP');
+sub decode_yaml ($string) {
+  $yaml->load_string($string);
+}
 
 # deep comparison, with strict typing
 sub is_equal ($got, $expected, $test_name = undef) {

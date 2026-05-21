@@ -96,7 +96,7 @@ $t->get_ok('/traveller/random')
 
 $t->get_ok('/gridmapper/random')
     ->status_is(200)
-    ->element_exists('defs g#bed rect[stroke=black]')
+    ->element_exists('defs g#bed-n rect[stroke=black]')
     ->element_exists('g#regions rect#square0101');
 
 # warn $t->tx->res->body;

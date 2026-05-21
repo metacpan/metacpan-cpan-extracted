@@ -1,10 +1,10 @@
 {
-   "abstract" : "Transparency & Consent String version 2 parser ",
+   "abstract" : "TCF v2.3 distribution: parser, validator, CMP-validator, and CLI",
    "author" : [
-      "Tiago Peczenyj <tiago.peczenyj+gdpr-iab-tcfv2@gmail.com>"
+      "Tiago Peczenyj <tiago.peczenyj+cpan@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -16,7 +16,10 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "xt",
+         "bench",
+         "docs"
       ]
    },
    "prereqs" : {
@@ -31,31 +34,119 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "DateTimeX::TO_JSON" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON" : "0",
+            "JSON::PP" : "0",
+            "JSON::XS" : "0",
+            "Time::Piece" : "0"
+         },
          "requires" : {
-            "perl" : "5.008"
+            "perl" : "5.012000"
          }
       },
       "test" : {
          "requires" : {
+            "IO::Compress::Gzip" : "0",
+            "IO::Uncompress::Gunzip" : "0",
+            "JSON::PP" : "0",
             "Test::Exception" : "0.43",
             "Test::More" : "0.94",
-            "Test::Pod" : "0"
+            "Test::Pod" : "0",
+            "Test::Synopsis" : "0",
+            "Test::Warn" : "0.3",
+            "Time::Piece" : "0"
          }
+      }
+   },
+   "provides" : {
+      "GDPR::IAB::TCFv2" : {
+         "file" : "lib/GDPR/IAB/TCFv2.pm",
+         "version" : "0.520"
+      },
+      "GDPR::IAB::TCFv2::BitField" : {
+         "file" : "lib/GDPR/IAB/TCFv2/BitField.pm",
+         "version" : "0.520"
+      },
+      "GDPR::IAB::TCFv2::BitUtils" : {
+         "file" : "lib/GDPR/IAB/TCFv2/BitUtils.pm",
+         "version" : "0.520"
+      },
+      "GDPR::IAB::TCFv2::CMPValidator" : {
+         "file" : "lib/GDPR/IAB/TCFv2/CMPValidator.pm",
+         "version" : "0.520"
+      },
+      "GDPR::IAB::TCFv2::Constants::Purpose" : {
+         "file" : "lib/GDPR/IAB/TCFv2/Constants/Purpose.pm",
+         "version" : "0.520"
+      },
+      "GDPR::IAB::TCFv2::Constants::RestrictionType" : {
+         "file" : "lib/GDPR/IAB/TCFv2/Constants/RestrictionType.pm",
+         "version" : "0.520"
+      },
+      "GDPR::IAB::TCFv2::Constants::SpecialFeature" : {
+         "file" : "lib/GDPR/IAB/TCFv2/Constants/SpecialFeature.pm",
+         "version" : "0.520"
+      },
+      "GDPR::IAB::TCFv2::Parser" : {
+         "file" : "lib/GDPR/IAB/TCFv2/Parser.pm",
+         "version" : "0.520"
+      },
+      "GDPR::IAB::TCFv2::Publisher" : {
+         "file" : "lib/GDPR/IAB/TCFv2/Publisher.pm",
+         "version" : "0.520"
+      },
+      "GDPR::IAB::TCFv2::PublisherRestrictions" : {
+         "file" : "lib/GDPR/IAB/TCFv2/PublisherRestrictions.pm",
+         "version" : "0.520"
+      },
+      "GDPR::IAB::TCFv2::PublisherTC" : {
+         "file" : "lib/GDPR/IAB/TCFv2/PublisherTC.pm",
+         "version" : "0.520"
+      },
+      "GDPR::IAB::TCFv2::RangeSection" : {
+         "file" : "lib/GDPR/IAB/TCFv2/RangeSection.pm",
+         "version" : "0.520"
+      },
+      "GDPR::IAB::TCFv2::Validator" : {
+         "file" : "lib/GDPR/IAB/TCFv2/Validator.pm",
+         "version" : "0.520"
+      },
+      "GDPR::IAB::TCFv2::Validator::Failure" : {
+         "file" : "lib/GDPR/IAB/TCFv2/Validator/Failure.pm",
+         "version" : "0.520"
+      },
+      "GDPR::IAB::TCFv2::Validator::Reason" : {
+         "file" : "lib/GDPR/IAB/TCFv2/Validator/Reason.pm",
+         "version" : "0.520"
+      },
+      "GDPR::IAB::TCFv2::Validator::Result" : {
+         "file" : "lib/GDPR/IAB/TCFv2/Validator/Result.pm",
+         "version" : "0.520"
+      },
+      "iabtcfv2" : {
+         "file" : "lib/iabtcfv2.pm",
+         "version" : "0.520"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "X_security_policy" : "https://github.com/peczenyj/GDPR-IAB-TCFv2/blob/devel/SECURITY.md",
       "bugtracker" : {
          "web" : "https://github.com/peczenyj/GDPR-IAB-TCFv2/issues"
       },
       "homepage" : "https://github.com/peczenyj/GDPR-IAB-TCFv2",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/peczenyj/GDPR-IAB-TCFv2.git",
          "web" : "https://github.com/peczenyj/GDPR-IAB-TCFv2"
       }
    },
-   "version" : "0.203",
+   "version" : "0.520",
    "x_authority" : "cpan:PACMAN",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

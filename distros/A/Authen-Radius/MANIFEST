@@ -17,6 +17,8 @@ t/local_dictionary.t
 t/check_pwd.t
 t/no_dictionary.t
 t/acct_reply.t
+t/eintr.t
+t/message_auth.t
 raddb/dictionary
 raddb/dictionary.ascend
 raddb/dictionary.cisco

@@ -1,0 +1,110 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Capture::Tiny qw(capture);
+use File::Basename qw(dirname);
+use File::Spec;
+use FindBin qw($RealBin);
+
+my $repo_root = File::Spec->catdir( $RealBin, File::Spec->updir );
+my $source    = File::Spec->catfile( $repo_root, 'lib', 'Developer', 'Dashboard.pm' );
+my $target    = File::Spec->catfile( $repo_root, 'README.md' );
+my $to_stdout = ( scalar grep { defined $_ && $_ eq '--stdout' } @ARGV ) ? 1 : 0;
+
+die "Missing POD source: $source\n" if !-f $source;
+die "pod2markdown is required on PATH to sync the checkout manual\n" if !_command_on_path('pod2markdown');
+
+my ( $stdout, $stderr, $exit ) = capture {
+    system( 'pod2markdown', $source );
+    return $? >> 8;
+};
+
+die "pod2markdown failed while generating the checkout manual: $stderr\n" if $exit != 0;
+
+my $generated = join "\n",
+  '<!-- Generated from lib/Developer/Dashboard.pm POD by script/sync-readme-from-pod. Do not edit manually. -->',
+  '',
+  $stdout;
+
+if ($to_stdout) {
+    print $generated;
+    exit 0;
+}
+
+open my $fh, '>', $target or die "Unable to write $target: $!\n";
+print {$fh} $generated;
+close $fh or die "Unable to close $target: $!\n";
+
+exit 0;
+
+sub _command_on_path {
+    my ($name) = @_;
+    return 0 if !defined $name || $name eq '';
+
+    for my $dir ( split /:/, $ENV{PATH} || q{} ) {
+        next if !defined $dir || $dir eq '';
+        my $candidate = File::Spec->catfile( $dir, $name );
+        return 1 if -x $candidate;
+    }
+
+    return 0;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+sync-readme-from-pod - regenerate the checkout manual from the main Developer::Dashboard POD
+
+=head1 SYNOPSIS
+
+  script/sync-readme-from-pod
+  script/sync-readme-from-pod --stdout
+
+=head1 DESCRIPTION
+
+This checkout-only helper regenerates the project manual used by Markdown
+consumers from the canonical POD in C<Developer::Dashboard>. It exists to keep
+the top-level manual and the main module documentation in exact sync and to
+avoid hand-edited drift between the two copies.
+
+=head1 PURPOSE
+
+Use this helper whenever the main module POD changes and the checkout manual
+must be refreshed before tests, build, or release gates.
+
+=head1 INPUTS
+
+=over 4
+
+=item * no arguments
+
+Rewrite the checkout manual in place.
+
+=item * C<--stdout>
+
+Print the generated manual to standard output instead of rewriting the file.
+
+=back
+
+=head1 OUTPUT
+
+Either the rewritten checkout manual on disk or the generated Markdown text on
+standard output.
+
+=head1 EXAMPLES
+
+  script/sync-readme-from-pod
+  script/sync-readme-from-pod --stdout > /tmp/manual-preview
+
+=head1 WHAT USES IT
+
+Developers use this helper during documentation updates, and the release
+metadata tests use its C<--stdout> mode to verify that the checked-in checkout
+manual still matches the generated output.
+
+=cut

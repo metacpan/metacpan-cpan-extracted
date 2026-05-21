@@ -1,5 +1,5 @@
 /*
- * chandra_notify.h — Native OS notifications
+ * chandra_notify.h - Native OS notifications
  *
  * Platform support:
  *   - macOS: UNUserNotificationCenter (10.14+) / NSUserNotification (legacy)
@@ -32,13 +32,13 @@ static int chandra_notify_is_supported(void);
 static int chandra_notify_send(pTHX_ ChandraNotification *notif);
 
 /* ================================================================
- * Implementation-only section — compiled only in Chandra.xs
+ * Implementation-only section - compiled only in Chandra.xs
  * (CHANDRA_XS_IMPLEMENTATION is defined there before including us)
  * ================================================================ */
 #ifdef CHANDRA_XS_IMPLEMENTATION
 
 /* ============================================================================
- * macOS Implementation — UNUserNotificationCenter / NSUserNotification
+ * macOS Implementation - UNUserNotificationCenter / NSUserNotification
  * ============================================================================ */
 #if defined(WEBVIEW_COCOA)
 
@@ -172,7 +172,7 @@ static int chandra_notify_send(pTHX_ ChandraNotification *notif) {
 }
 
 /* ============================================================================
- * Linux Implementation — libnotify or notify-send fallback
+ * Linux Implementation - libnotify or notify-send fallback
  * ============================================================================ */
 #elif defined(WEBVIEW_GTK)
 
@@ -284,7 +284,7 @@ static int chandra_notify_send(pTHX_ ChandraNotification *notif) {
             len += snprintf(cmd + len, sizeof(cmd) - len, " -t %d", notif->timeout_ms);
         }
         
-        /* Title and body — shell-escape single quotes */
+        /* Title and body - shell-escape single quotes */
         {
             const char *title = notif->title ? notif->title : "";
             const char *body = notif->body;
@@ -307,7 +307,7 @@ static int chandra_notify_send(pTHX_ ChandraNotification *notif) {
 }
 
 /* ============================================================================
- * Windows Implementation — Toast / Balloon notifications (stub)
+ * Windows Implementation - Toast / Balloon notifications (stub)
  * ============================================================================ */
 #elif defined(WEBVIEW_WINAPI)
 

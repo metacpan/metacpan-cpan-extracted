@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use PPI;
-use Test::DescribeMe qw(extended);
+# use Test::DescribeMe qw(extended);
 use Test::Most;
 
 BEGIN { use_ok('App::Test::Generator::SchemaExtractor') }

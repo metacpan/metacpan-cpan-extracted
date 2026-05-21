@@ -1,5 +1,5 @@
 /*
- * chandra_bridge_ext.h — Bridge extension registry
+ * chandra_bridge_ext.h - Bridge extension registry
  *
  * Manages named JavaScript extensions that are injected into the
  * bridge code under window.chandra.<name>.  Extensions may declare
@@ -101,7 +101,7 @@ chandra_ext_register(pTHX_ const char *name, const char *source,
             croak("Chandra::Bridge::Extension: name must not be empty");
     }
 
-    /* check deps exist (or will be registered later — we check at generation time) */
+    /* check deps exist (or will be registered later - we check at generation time) */
 
     idx = chandra_ext_find(name);
     if (idx >= 0) {
@@ -180,7 +180,7 @@ chandra_ext_source(const char *name)
 /*
  * Returns a Newx'd array of indices into _ext_list in dependency order.
  * Caller must Safefree.  Sets *out_count.  Returns NULL on error
- * (circular or missing dep), with *err_msg set (caller does NOT free err_msg —
+ * (circular or missing dep), with *err_msg set (caller does NOT free err_msg -
  * it points to a static or already-allocated buffer).
  */
 static int *

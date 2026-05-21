@@ -35,9 +35,10 @@
       "runtime" : {
          "requires" : {
             "DBD::Pg" : "3.007004",
+            "Mojo::SQL" : "0.01",
             "Mojolicious" : "8.50",
             "SQL::Abstract::Pg" : "1.0",
-            "perl" : "5.016"
+            "perl" : "5.020"
          }
       }
    },
@@ -60,6 +61,6 @@
          "web" : "https://web.libera.chat/#mojo"
       }
    },
-   "version" : "4.29",
+   "version" : "5.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

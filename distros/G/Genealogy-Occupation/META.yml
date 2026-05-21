@@ -1,0 +1,39 @@
+---
+abstract: 'Normalise and translate genealogical occupation strings'
+author:
+  - 'Nigel Horne <njh@nigelhorne.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::DescribeMe: '0'
+  Test::Mockingbird: '0.1'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Genealogy-Occupation
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  I18N::LangTags::Detect: '0'
+  Lingua::EN::ABC: '0'
+  Params::Get: '0'
+  Params::Validate::Strict: '0'
+  Readonly: '0'
+  Return::Set: '0'
+  perl: '5.014'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Genealogy-Occupation
+  homepage: https://metacpan.org/pod/Genealogy::Occupation
+  repository: git://github.com/nigelhorne/Genealogy-Occupation.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

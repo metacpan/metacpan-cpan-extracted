@@ -5,10 +5,16 @@ dtl_posix.h
 leap_seconds.h
 lib/DateTime/Lite.pm
 lib/DateTime/Lite/Duration.pm
+lib/DateTime/Lite/Duration/JA.pod
 lib/DateTime/Lite/Exception.pm
+lib/DateTime/Lite/Exception/JA.pod
 lib/DateTime/Lite/Infinite.pm
+lib/DateTime/Lite/Infinite/JA.pod
+lib/DateTime/Lite/JA.pod
 lib/DateTime/Lite/PP.pm
+lib/DateTime/Lite/PP/JA.pod
 lib/DateTime/Lite/TimeZone.pm
+lib/DateTime/Lite/TimeZone/JA.pod
 lib/DateTime/Lite/tz.sqlite3
 LICENSE
 Makefile.PL
@@ -17,6 +23,7 @@ META.json
 META.yml
 ppport.h
 README
+README-ja-JP.md
 README.md
 scripts/benchmark.pl
 scripts/build_tz_database.pl

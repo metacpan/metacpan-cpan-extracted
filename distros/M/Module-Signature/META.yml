@@ -18,14 +18,14 @@ name: Module-Signature
 provides:
   Module::Signature:
     file: lib/Module/Signature.pm
-    version: '0.95'
+    version: '0.96'
 requires:
   File::Temp: '0'
   perl: '5.010'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Module-Signature
   repository: git://github.com/audreyt/module-signature.git
-version: '0.95'
+version: '0.96'
 x_contributors:
   - 'Audrey Tang <audreyt@audreyt.org>'
   - 'Baldur Kristinsson <baldur.kristinsson@gmail.com>'

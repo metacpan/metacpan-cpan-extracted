@@ -1,0 +1,138 @@
+======================================================================
+ CSV::LINQ — Helaian Rujukan Pantas                        [BM] Bahasa Melayu
+======================================================================
+
+[ 1. Mencipta Kueri ]
+
+  use CSV::LINQ;
+  my $q = CSV::LINQ->FromCSV('data.csv');             # baca fail CSV (lazy)
+  my $q = CSV::LINQ->FromCSV('data.tsv', sep=>"\t");  # sokongan TSV
+  my $q = CSV::LINQ->From(\@array);                   # daripada array dalam ingatan
+  my $q = CSV::LINQ->Range(1, 10);                    # urutan integer
+  my $q = CSV::LINQ->Empty();                         # urutan kosong
+  my $q = CSV::LINQ->Repeat($elem, 5);                # ulang elemen
+
+  Nota: setiap kaedah terminal menghabiskan iterator.
+    Panggil semula From()/FromCSV() untuk menggunakan semula data.
+
+[ 2. Penapisan ]
+
+  ->Where(sub { $_[0]{age} > 30 })
+  ->Where(city => 'Tokyo')                            # DSL ringkas
+
+  Tapis elemen mengikut syarat.
+
+[ 3. Unjuran ]
+
+  ->Select(sub { { name => $_[0]{name} } })
+  ->SelectMany(sub { $_[0]{tags} })                   # ratakan (mesti pulangkan ARRAY ref)
+
+  Select mengubah setiap elemen; SelectMany meratakan array bersarang.
+
+[ 4. Pengisihan ]
+
+  ->OrderBy(sub { $_[0]{name} })                      # perbandingan cmp
+  ->OrderByDescending(sub { $_[0]{score} })
+  ->OrderByStr(sub { $_[0]{code} })                   # perbandingan rentetan
+  ->OrderByStrDescending(sub { $_[0]{name} })
+  ->OrderByNum(sub { $_[0]{price} })                  # perbandingan berangka
+  ->OrderByNumDescending(sub { $_[0]{amount} })
+  ->ThenBy(sub { $_[0]{name} })
+  ->ThenByNum(sub { $_[0]{age} })
+  ->Reverse()
+
+  OrderBy*/OrderByNum*/OrderByStr*: kunci isih utama.
+    ThenBy*/ThenByNum*/ThenByStr*: kunci sekunder (selepas OrderBy*).
+    Reverse: menterbalikkan susunan semasa.
+
+[ 5. Penomboran Halaman ]
+
+  ->Skip(10)->Take(5)
+  ->SkipWhile(sub { $_[0]{v} < 5 })
+  ->TakeWhile(sub { $_[0]{v} < 5 })
+
+  Skip/Take: langkau atau ambil N elemen.
+    SkipWhile/TakeWhile: berdasarkan syarat.
+
+[ 6. Pengelompokan ]
+
+  ->GroupBy(sub { $_[0]{dept} })
+  ->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} })
+
+  GroupBy mengembalikan array { Key=>'...', Elements=>[...] }.
+    ToLookup mengembalikan hashref { key => [elements] }.
+
+[ 7. Operasi Set ]
+
+  ->Distinct()
+  ->Distinct(sub { $_[0]{id} })                       # mengikut kunci
+  ->Union($q2)
+  ->Intersect($q2)
+  ->Except($q2)
+  ->SequenceEqual($q2)
+
+  Distinct/Union/Intersect/Except menyokong pemilih kunci pilihan.
+    SequenceEqual: benar jika kedua-dua urutan adalah sama.
+
+[ 8. Cantuman ]
+
+  ->Join($q2, sub{$_[0]{id}}, sub{$_[0]{id}},
+         sub{ {%{$_[0]}, %{$_[1]}} })
+  ->GroupJoin($q2, sub{$_[0]{id}}, sub{$_[0]{id}},
+              sub{ {row=>$_[0], inner=>$_[1]} })
+
+  Join: cantuman dalaman. GroupJoin: cantuman luar kiri
+    (kumpulan dalaman dihantar sebagai objek CSV::LINQ).
+
+[ 9. Pengagregatan (kaedah terminal) ]
+
+  ->Count()
+  ->Sum(sub { $_[0]{amount} })
+  ->Average(sub { $_[0]{score} })
+  ->AverageOrDefault(sub { $_[0]{score} })
+  ->Min(sub { $_[0]{price} })
+  ->Max(sub { $_[0]{price} })
+  ->First()  ->FirstOrDefault()
+  ->Last()   ->LastOrDefault()
+  ->Single() ->SingleOrDefault()
+  ->ElementAt(2)  ->ElementAtOrDefault(2)
+  ->Any(sub { $_[0]{active} })
+  ->All(sub { $_[0]{score} > 0 })
+  ->Contains($value)
+  ->Aggregate($seed, sub { $_[0] + $_[1]{v} })
+
+  Varian OrDefault mengembalikan undef berbanding die untuk urutan kosong.
+    ElementAt: indeks 0-asas (die jika di luar julat). ElementAtOrDefault: undef.
+
+[ 10. Kaedah urutan lain ]
+
+  ->Concat($q2)
+  ->Zip($q2, sub { [$_[0], $_[1]] })
+  ->DefaultIfEmpty($default)
+  ->ForEach(sub { print $_[0]{name}, "\n" })
+
+  Concat: gabungkan dua urutan. DefaultIfEmpty: lalai jika kosong.
+    Zip: gabungkan dua urutan elemen-demi-elemen.
+
+[ 11. Kaedah penukaran ]
+
+  ->ToArray()
+  ->ToList()
+  ->ToDictionary(sub{$_[0]{id}}, sub{$_[0]{name}})
+  ->ToLookup(sub{$_[0]{dept}})
+  ->ToCSV('out.csv')
+  ->ToCSV('out.csv', headers      => [qw(name age city)])
+  ->ToCSV('out.csv', label_order  => [qw(city name age)])  # alias
+  ->ToCSV('out.tsv', sep          => "\t")
+
+  ToDictionary mengembalikan hashref key=>element.
+    ToCSV menulis urutan ke fail CSV.
+    label_order: alias untuk pilihan headers dalam ToCSV.
+
+[ 12. Pautan Rujukan ]
+
+  CSV::LINQ: https://metacpan.org/dist/CSV-LINQ
+  Spesifikasi CSV (RFC 4180): https://www.rfc-editor.org/rfc/rfc4180
+  LINQ: https://docs.microsoft.com/dotnet/api/system.linq
+
+======================================================================

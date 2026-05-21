@@ -1,0 +1,12 @@
+Changes
+lib/DMS/Parser.pm
+lib/DMS/Parser/Emitter.pm
+lib/DMS/Parser/Tier1.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/comments.t
+t/front_matter.t
+t/roundtrip.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

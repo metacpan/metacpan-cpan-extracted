@@ -3,9 +3,11 @@ package Developer::Dashboard::Web::App;
 use strict;
 use warnings;
 
-our $VERSION = '3.14';
+our $VERSION = '3.90';
 
 use Capture::Tiny qw(capture);
+use File::Basename qw(dirname);
+use File::ShareDir qw(dist_dir);
 use POSIX qw(strftime);
 use File::Spec;
 use Scalar::Util qw(blessed);
@@ -20,6 +22,8 @@ use Developer::Dashboard::PageRuntime;
 use Developer::Dashboard::Codec qw(decode_payload);
 use Developer::Dashboard::Zipper ();
 
+our $MODULE_SOURCE_PATH = File::Spec->rel2abs(__FILE__);
+
 # new(%args)
 # Constructs the browser-facing dashboard web application.
 # Input: auth, pages, sessions, config, and optional actions/resolver objects.
@@ -29,13 +33,19 @@ sub new {
     my $auth     = $args{auth}     || die 'Missing auth store';
     my $pages    = $args{pages}    || die 'Missing page store';
     my $sessions = $args{sessions} || die 'Missing session store';
+    my $runtime = $args{runtime};
+    if ( !$runtime ) {
+        $runtime = Developer::Dashboard::PageRuntime->new(
+            paths => ref($pages) eq 'Developer::Dashboard::PageStore' ? $pages->{paths} : undef,
+        );
+    }
     return bless {
         actions  => $args{actions},
         auth     => $auth,
         config   => $args{config},
         pages    => $pages,
         prompt   => $args{prompt},
-        runtime  => $args{runtime} || Developer::Dashboard::PageRuntime->new,
+        runtime  => $runtime,
         resolver => $args{resolver},
         sessions => $sessions,
     }, $class;
@@ -176,7 +186,7 @@ sub dispatch_request {
     return $self->legacy_ajax_response(%args) if $path eq '/ajax';
     return $self->ajax_singleton_stop_response(%args) if $path eq '/ajax/singleton/stop';
     if ( $path =~ m{^/ajax/(.+)$} ) {
-        return $self->legacy_ajax_file_response( ajax_file => uri_unescape($1), %args );
+        return $self->prefixed_ajax_file_response( ajax_path => uri_unescape($1), %args );
     }
     return $self->status_response(%args) if $path eq '/system/status';
     return $self->jquery_js_response(%args) if $path eq '/js/jquery.js' || $path eq '/js/jquery-4.0.0.min.js';
@@ -184,7 +194,7 @@ sub dispatch_request {
     return $self->tiff_js_response(%args) if $path eq '/tiff.min.js';
     return $self->loading_image_response(%args) if $path eq '/loading.webp';
     if ( $path =~ m{^/(js|css|others)/(.+)$} ) {
-        return $self->static_file_response( type => $1, file => uri_unescape($2), %args );
+        return $self->prefixed_static_file_response( type => $1, file => uri_unescape($2), %args );
     }
     if ( $path =~ m{^/app/(.+)/source$} ) {
         return $self->page_source_response( id => $1, %args );
@@ -205,6 +215,9 @@ sub dispatch_request {
         return $self->skill_route_response( skill_name => $1, route => $2, %args );
     }
     return $self->transient_action_response(%args) if $path eq '/action' && $method eq 'POST';
+    if ( my $custom_route = $self->_custom_skill_route_response( %args, route_path => $path ) ) {
+        return $custom_route;
+    }
 
     return [ 404, 'text/plain; charset=utf-8', "Not found\n" ];
 }
@@ -426,6 +439,59 @@ sub legacy_ajax_file_response {
     );
 }
 
+# skill_ajax_file_response(%args)
+# Executes one `/ajax/<skill>/<file>` route against a layered skill-local ajax file.
+# Input: skill name, ajax file name, and normalized request metadata.
+# Output: response array reference.
+sub skill_ajax_file_response {
+    my ( $self, %args ) = @_;
+    my $skill_name = $args{skill_name} || '';
+    my $ajax_file  = $args{ajax_file}  || '';
+    return [ 400, 'text/plain; charset=utf-8', "Invalid skill name\n" ] if $skill_name eq '';
+    my %params = _parse_query( $args{query} || '' );
+    my %body_params = _parse_query( $args{body} || '' );
+    my $saved_ajax_path = $self->_skill_ajax_file_path( $skill_name, $ajax_file );
+    my %request_params = (
+        %params,
+        %body_params,
+        file => $saved_ajax_path ne '' ? $ajax_file : join( '/', $skill_name, $ajax_file ),
+    );
+    if ( !exists $request_params{type} && ( $args{default_type} || '' ) ne '' ) {
+        $request_params{type} = $args{default_type};
+    }
+    return _transient_url_forbidden_response() if !$self->_legacy_ajax_allowed( \%request_params );
+    return $self->_legacy_ajax_response(
+        params          => \%request_params,
+        saved_ajax_path => $saved_ajax_path,
+    );
+}
+
+# prefixed_ajax_file_response(%args)
+# Resolves one `/ajax/...` request by preferring the longest matching skill prefix
+# and falling back to the normal nested saved-ajax file path when no skill-local
+# handler exists.
+# Input: ajax_path plus normalized request metadata.
+# Output: response array reference.
+sub prefixed_ajax_file_response {
+    my ( $self, %args ) = @_;
+    my $ajax_path = $args{ajax_path} || '';
+    my @segments = grep { defined && $_ ne '' } split m{/+}, $ajax_path;
+    if ( my $spec = $self->_resolve_skill_route_spec(@segments) ) {
+        my $ajax_file = join '/', @{ $spec->{route_segments} || [] };
+        if ( $ajax_file ne '' ) {
+            my $saved_ajax_path = $self->_skill_ajax_file_path( $spec->{skill_name}, $ajax_file );
+            my $route_spec = $self->_skill_ajax_route_spec( $spec->{skill_name}, $ajax_file );
+            return $self->skill_ajax_file_response(
+                %args,
+                default_type => $route_spec ? ( $route_spec->{type} || '' ) : '',
+                skill_name   => $spec->{skill_name},
+                ajax_file    => $ajax_file,
+            ) if $saved_ajax_path ne '';
+        }
+    }
+    return $self->legacy_ajax_file_response( %args, ajax_file => $ajax_path );
+}
+
 # status_response(%args)
 # Executes the `/system/status` route.
 # Input: normalized request arguments.
@@ -437,187 +503,73 @@ sub status_response {
 }
 
 # marked_js_response(%args)
-# Serves the built-in marked shim asset.
+# Serves the bundled jQuery asset used by saved bookmark pages.
 # Input: normalized request arguments.
 # Output: response array reference.
 sub jquery_js_response {
     my ( $self, %args ) = @_;
-    return [ 200, 'application/javascript; charset=utf-8', <<'JS' ];
-(function () {
-  function asArray(list) {
-    return Array.prototype.slice.call(list || []);
-  }
+    my $path = _bundled_public_asset_path( 'js', 'jquery-4.0.0.min.js' );
+    open my $fh, '<:raw', $path or die "Unable to read $path: $!";
+    local $/;
+    my $content = <$fh>;
+    close $fh or die "Unable to close $path: $!";
+    return [ 200, 'application/javascript; charset=utf-8', $content ];
+}
 
-  function onReady(fn) {
-    if (typeof fn !== 'function') return;
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', function () { fn(window.jQuery); }, { once: true });
-      return;
-    }
-    fn(window.jQuery);
-  }
+# _bundled_public_asset_path($type, $file)
+# Resolves one bundled public asset from the repo share tree during
+# development or from the installed distribution share dir after install.
+# Input: asset type directory plus file name.
+# Output: absolute asset path string.
+sub _bundled_public_asset_path {
+    my ( $type, $file ) = @_;
+    die 'asset type is required' if !defined $type || $type eq '';
+    die 'asset file is required' if !defined $file || $file eq '';
 
-  function wrap(nodes) {
-    var api = {
-      nodes: nodes || [],
-      length: (nodes || []).length,
-      ready: function (fn) {
-        if (this.nodes[0] === document) onReady(fn);
-        return this;
-      },
-      text: function (value) {
-        if (arguments.length === 0) {
-          return this.nodes[0] ? this.nodes[0].textContent : '';
-        }
-        this.nodes.forEach(function (node) {
-          node.textContent = value == null ? '' : String(value);
-        });
-        return this;
-      }
-    };
-    return api;
-  }
+    my $module_source = $MODULE_SOURCE_PATH || File::Spec->rel2abs(__FILE__);
+    my $module_dir    = dirname($module_source);
+    my @candidates;
 
-  function $(arg) {
-    if (typeof arg === 'function') {
-      onReady(arg);
-      return wrap([document]);
-    }
-    if (arg === document) {
-      return wrap([document]);
-    }
-    if (typeof arg === 'string') {
-      return wrap(asArray(document.querySelectorAll(arg)));
-    }
-    if (arg && arg.nodeType) {
-      return wrap([arg]);
-    }
-    return wrap([]);
-  }
-
-  $.ajax = function (options) {
-    var opts = options || {};
-    var xhr = new XMLHttpRequest();
-    var method = opts.method || opts.type || 'GET';
-    var successArgs = null;
-    var failureArgs = null;
-    var alwaysArgs = null;
-    var finished = false;
-
-    function remember(callback, args, store) {
-      if (typeof callback !== 'function') return xhr;
-      if (args) {
-        callback.apply(xhr, args);
-        return xhr;
-      }
-      store.push(callback);
-      return xhr;
+    for my $levels_up ( 4 .. 7 ) {
+        push @candidates, File::Spec->catfile(
+            File::Spec->rel2abs(
+                File::Spec->catdir(
+                    $module_dir,
+                    ( File::Spec->updir ) x $levels_up,
+                    'share',
+                    'public',
+                    $type,
+                )
+            ),
+            $file,
+        );
     }
 
-    function runCallbacks(callbacks, args) {
-      callbacks.forEach(function (callback) {
-        callback.apply(xhr, args);
-      });
+    my $dist_root = eval { dist_dir('Developer-Dashboard') };
+    if ( defined $dist_root && $dist_root ne '' ) {
+        push @candidates, File::Spec->catfile( $dist_root, 'public', $type, $file );
     }
 
-    function finishSuccess(payload) {
-      if (finished) return;
-      finished = true;
-      successArgs = [payload, 'success', xhr];
-      alwaysArgs = [xhr, 'success'];
-      if (typeof opts.success === 'function') {
-        opts.success(payload, 'success', xhr);
-      }
-      if (typeof opts.complete === 'function') {
-        opts.complete(xhr, 'success');
-      }
-      runCallbacks(xhr._done_callbacks, successArgs);
-      runCallbacks(xhr._always_callbacks, alwaysArgs);
+    my $module_path = $INC{'Developer/Dashboard/Web/App.pm'} || __FILE__;
+    my $module_root = File::Spec->rel2abs(
+        File::Spec->catdir(
+            dirname($module_path),
+            File::Spec->updir,
+            File::Spec->updir,
+            File::Spec->updir,
+            File::Spec->updir,
+        )
+    );
+    push @candidates, File::Spec->catfile( $module_root, 'auto', 'share', 'dist', 'Developer-Dashboard', 'public', $type, $file );
+    push @candidates, File::Spec->catfile( $module_root, 'auto', 'Developer', 'Dashboard', 'public', $type, $file );
+
+    my %seen;
+    for my $candidate (@candidates) {
+        next if !defined $candidate || $candidate eq '' || $seen{$candidate}++;
+        return $candidate if -f $candidate;
     }
 
-    function finishFailure(status, error) {
-      if (finished) return;
-      finished = true;
-      failureArgs = [xhr, status, error];
-      alwaysArgs = [xhr, status];
-      if (typeof opts.error === 'function') {
-        opts.error(xhr, status, error);
-      }
-      if (typeof opts.complete === 'function') {
-        opts.complete(xhr, status);
-      }
-      runCallbacks(xhr._fail_callbacks, failureArgs);
-      runCallbacks(xhr._always_callbacks, alwaysArgs);
-    }
-
-    xhr._done_callbacks = [];
-    xhr._fail_callbacks = [];
-    xhr._always_callbacks = [];
-    xhr.done = function (callback) {
-      return remember(callback, successArgs, xhr._done_callbacks);
-    };
-    xhr.fail = function (callback) {
-      return remember(callback, failureArgs, xhr._fail_callbacks);
-    };
-    xhr.always = function (callback) {
-      return remember(callback, alwaysArgs, xhr._always_callbacks);
-    };
-    xhr.then = function (onDone, onFail) {
-      xhr.done(onDone);
-      xhr.fail(onFail);
-      return xhr;
-    };
-    xhr.open(method, opts.url || '', true);
-
-    if (opts.headers && typeof opts.headers === 'object') {
-      Object.keys(opts.headers).forEach(function (key) {
-        xhr.setRequestHeader(key, opts.headers[key]);
-      });
-    }
-
-    xhr.onreadystatechange = function () {
-      var payload;
-      if (xhr.readyState !== 4) return;
-      if (xhr.status >= 200 && xhr.status < 300) {
-        payload = xhr.responseText;
-        if (opts.dataType === 'json') {
-          try {
-            payload = payload === '' ? null : JSON.parse(payload);
-          } catch (error) {
-            finishFailure('parsererror', error);
-            return;
-          }
-        }
-        finishSuccess(payload);
-        return;
-      }
-      finishFailure('error', xhr.statusText || 'error');
-    };
-
-    xhr.onerror = function () {
-      finishFailure('error', xhr.statusText || 'error');
-    };
-
-    xhr.onabort = function () {
-      finishFailure('abort', xhr.statusText || 'abort');
-    };
-
-    if (opts.data && typeof opts.data === 'object' && !(opts.data instanceof FormData)) {
-      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
-      xhr.send(new URLSearchParams(opts.data).toString());
-      return xhr;
-    }
-
-    xhr.send(opts.data == null ? null : opts.data);
-    return xhr;
-  };
-
-  $.ready = onReady;
-  $.fn = {};
-  window.jQuery = $;
-  window.$ = $;
-})();
-JS
+    die "Unable to find bundled public asset $type/$file";
 }
 
 # marked_js_response(%args)
@@ -660,6 +612,33 @@ sub static_file_response {
     return $self->_serve_static_file( $args{type}, $args{file} );
 }
 
+# prefixed_static_file_response(%args)
+# Resolves one `/js/...`, `/css/...`, or `/others/...` request by preferring the
+# longest matching skill prefix and falling back to the normal nested public
+# asset path when no skill-local asset exists.
+# Input: asset type, requested file path, and normalized request metadata.
+# Output: response array reference.
+sub prefixed_static_file_response {
+    my ( $self, %args ) = @_;
+    my $type = $args{type} || '';
+    my $file = $args{file} || '';
+    my @segments = grep { defined && $_ ne '' } split m{/+}, $file;
+    if ( my $spec = $self->_resolve_skill_route_spec(@segments) ) {
+        my $skill_file = join '/', @{ $spec->{route_segments} || [] };
+        if ( $skill_file ne '' ) {
+            my $resolved = $self->_skill_static_file_path( $spec->{skill_name}, $type, $skill_file );
+            my $route_spec = $self->_skill_route_spec( $type, $spec->{skill_name}, $skill_file );
+            return $self->skill_static_file_response(
+                %args,
+                default_type => $route_spec ? ( $route_spec->{type} || '' ) : '',
+                skill_name => $spec->{skill_name},
+                file       => $skill_file,
+            ) if $resolved ne '';
+        }
+    }
+    return $self->static_file_response( %args, type => $type, file => $file );
+}
+
 # legacy_app_response(%args)
 # Executes the saved `/app/<id>` render route and follows saved URL forwards.
 # Input: saved app id plus normalized request query, body, headers, and remote address.
@@ -690,12 +669,33 @@ sub skill_route_response {
     return [ 400, 'text/plain; charset=utf-8', "Invalid skill route\n" ] if !$route;
     
     require Developer::Dashboard::SkillDispatcher;
-    my $dispatcher = Developer::Dashboard::SkillDispatcher->new();
+    my $dispatcher = Developer::Dashboard::SkillDispatcher->new( paths => $self->{pages} ? $self->{pages}{paths} : undef );
+    my ( $query_params, $body_params ) = $self->_request_params(%args);
     return $dispatcher->route_response(
-        app        => $self,
-        skill_name => $skill_name,
-        route      => $route,
+        app          => $self,
+        body_params  => $body_params,
+        headers      => $args{headers} || {},
+        path         => $args{path} || '',
+        query_params => $query_params,
+        remote_addr  => $args{remote_addr},
+        route        => $route,
+        skill_name   => $skill_name,
     );
+}
+
+# skill_static_file_response(%args)
+# Serves one `/js/<skill>/...`, `/css/<skill>/...`, or `/others/<skill>/...` request from layered skill dashboards/public assets.
+# Input: skill name, asset type, file path, and normalized request metadata.
+# Output: response array reference.
+sub skill_static_file_response {
+    my ( $self, %args ) = @_;
+    my $skill_name = $args{skill_name} || '';
+    my $type       = $args{type}       || '';
+    my $file       = $args{file}       || '';
+    return [ 400, 'text/plain; charset=utf-8', "Invalid skill name\n" ] if $skill_name eq '';
+    my $skill_file = $self->_skill_static_file_path( $skill_name, $type, $file );
+    return $self->_serve_static_file_at_path( $type, $file, $skill_file, $args{default_type} || '' ) if $skill_file ne '';
+    return $self->_serve_static_file( $type, join( '/', $skill_name, $file ) );
 }
 
 # transient_action_response(%args)
@@ -862,6 +862,15 @@ sub _blank_editor_response {
         description => '',
         meta        => { source_kind => 'transient', source_format => 'legacy' },
     );
+    my $request_ctx = $self->{_current_request_context} || {};
+    $page->{meta}{request_context} = {
+        host        => $request_ctx->{host} || '',
+        path        => '/',
+        remote_addr => $request_ctx->{remote_addr} || '',
+        tier        => $request_ctx->{tier} || 'helper',
+        username    => $request_ctx->{username} || '',
+        role        => $request_ctx->{role} || '',
+    };
     return [ 200, 'text/html; charset=utf-8', $self->_edit_html($page) ];
 }
 
@@ -1197,6 +1206,65 @@ function ddOverlayHtml(text) {
   if (source.endsWith('\n')) html += ' ';
   return html;
 }
+function ddDirectiveName(line) {
+  const match = String(line).match(/^([A-Za-z][A-Za-z0-9.]*)\s*:/);
+  return match ? match[1].toUpperCase() : '';
+}
+function ddHighestCodeDirective(text) {
+  let highest = 0;
+  String(text).split('\n').forEach(function(line) {
+    const match = String(line).match(/^(CODE)(\d+)\s*:/i);
+    if (!match) return;
+    const number = parseInt(match[2], 10);
+    if (number > highest) highest = number;
+  });
+  return highest;
+}
+function ddNextDirectiveForContext(textBefore, fullText) {
+  const directives = {};
+  String(fullText).split('\n').forEach(function(line) {
+    const name = ddDirectiveName(line);
+    if (name) directives[name] = 1;
+  });
+  const priorLines = String(textBefore).split('\n');
+  let priorDirective = '';
+  for (let index = priorLines.length - 1; index >= 0; index -= 1) {
+    const name = ddDirectiveName(priorLines[index]);
+    if (!name) continue;
+    priorDirective = name;
+    break;
+  }
+  if (priorDirective === 'TITLE') {
+    return directives.HTML ? '' : 'HTML: ';
+  }
+  if (priorDirective === 'HTML' || /^CODE\d+$/.test(priorDirective)) {
+    return 'CODE' + (ddHighestCodeDirective(fullText) + 1) + ': ';
+  }
+  return '';
+}
+function ddApplyDirectiveAssist() {
+  if (ddEditor.selectionStart !== ddEditor.selectionEnd) return false;
+  const caret = ddEditor.selectionStart;
+  const value = ddEditor.value;
+  const lineStart = value.lastIndexOf('\n', Math.max(caret - 1, 0) - 1) + 1;
+  const lineEndAt = value.indexOf('\n', caret);
+  const lineEnd = lineEndAt >= 0 ? lineEndAt : value.length;
+  const line = value.slice(lineStart, lineEnd);
+  if (line !== ':---' || caret !== lineEnd) return false;
+
+  const textBefore = value.slice(0, lineStart);
+  const textAfter = value.slice(lineEnd);
+  const nextDirective = ddNextDirectiveForContext(textBefore, value);
+  let replacement = ':--------------------------------------------------------------------------------:';
+  let nextCaret = lineStart + replacement.length;
+  if (nextDirective) {
+    replacement += '\n' + nextDirective;
+    nextCaret += 1 + nextDirective.length;
+  }
+  ddEditor.value = textBefore + replacement + textAfter;
+  ddEditor.setSelectionRange(nextCaret, nextCaret);
+  return true;
+}
 function ddSyncEditorOverlay() {
   ddHighlight.style.minWidth = Math.max(ddEditor.scrollWidth, ddEditor.clientWidth) + 'px';
   ddHighlight.style.minHeight = Math.max(ddEditor.scrollHeight, ddEditor.clientHeight) + 'px';
@@ -1207,6 +1275,7 @@ function ddRenderEditor(text) {
   ddSyncEditorOverlay();
 }
 ddEditor.addEventListener('input', function() {
+  ddApplyDirectiveAssist();
   ddRenderEditor(ddEditor.value);
 });
 ddEditor.addEventListener('scroll', function() {
@@ -1769,31 +1838,127 @@ sub _legacy_app_response {
 sub _skill_app_fallback_response {
     my ( $self, %args ) = @_;
     my $id = $args{id} || return;
-    my ( $skill_name, @rest ) = split m{/+}, $id;
-    return if !$skill_name;
+    my @segments = grep { defined && $_ ne '' } split m{/+}, $id;
+    return if !@segments;
 
     require Developer::Dashboard::SkillDispatcher;
     require Developer::Dashboard::SkillManager;
-    my $dispatcher = Developer::Dashboard::SkillDispatcher->new();
-    my $manager = Developer::Dashboard::SkillManager->new();
-    my $installed_skill = $manager->get_skill_path( $skill_name, include_disabled => 1 );
-    if ( !$installed_skill ) {
-        return @rest ? [ 404, 'text/plain; charset=utf-8', "Not found\n" ] : undef;
-    }
-    if ( !$dispatcher->get_skill_path($skill_name) ) {
+    my $dispatcher = Developer::Dashboard::SkillDispatcher->new( paths => $self->{pages} ? $self->{pages}{paths} : undef );
+    my $manager = Developer::Dashboard::SkillManager->new( paths => $self->{pages} ? $self->{pages}{paths} : undef );
+    my $installed_skill = $manager->get_skill_path( $segments[0], include_disabled => 1 );
+    return $segments[1] ? [ 404, 'text/plain; charset=utf-8', "Not found\n" ] : undef if !$installed_skill;
+    my $spec = $dispatcher->resolve_route_segments( \@segments, include_disabled => 1 );
+    return $segments[1] ? [ 404, 'text/plain; charset=utf-8', "Not found\n" ] : undef if !$spec;
+    if ( !@{ $spec->{skill_layers} || [] } ) {
         return [ 404, 'text/plain; charset=utf-8', "Not found\n" ];
     }
 
     return $dispatcher->route_response(
         app          => $self,
-        skill_name   => $skill_name,
-        route        => join( '/', @rest ),
+        skill_name   => $spec->{skill_name},
+        route        => join( '/', @{ $spec->{route_segments} || [] } ),
         query_params => $args{query_params} || {},
         body_params  => $args{body_params}  || {},
         remote_addr  => $args{remote_addr},
         headers      => $args{headers} || {},
         path         => '/app/' . $id,
     );
+}
+
+# _resolve_skill_route_spec(@segments)
+# Resolves the longest installed skill-prefix for a slash-delimited route tail.
+# Input: one list of path segments.
+# Output: hash reference with skill_name, route_segments, and skill_layers, or undef.
+sub _resolve_skill_route_spec {
+    my ( $self, @segments ) = @_;
+    return $self->_skill_dispatcher->resolve_route_segments( \@segments );
+}
+
+# _custom_skill_route_response(%args)
+# Resolves one non-smart custom skill route path after all primary routes have
+# already declined to handle the request.
+# Input: normalized request metadata plus route_path.
+# Output: response array reference or undef when no custom skill route matches.
+sub _custom_skill_route_response {
+    my ( $self, %args ) = @_;
+    my $route_path = $args{route_path} || '';
+    return if $route_path eq '' || $route_path eq '/';
+    my $spec = $self->_skill_dispatcher->resolve_custom_route_path($route_path);
+    return if !$spec;
+    if ( !( $spec->{skill_name} || '' ) ) {
+        my $kind = $spec->{kind} || '';
+        my $dispatch_path = '';
+        if ( $kind eq 'app' ) {
+            $dispatch_path = '/app/' . ( $spec->{route_id} || '' );
+        }
+        elsif ( $kind eq 'ajax' ) {
+            $dispatch_path = '/ajax/' . ( $spec->{ajax_file} || '' );
+        }
+        elsif ( grep { $_ eq $kind } qw(js css others) ) {
+            $dispatch_path = '/' . $kind . '/' . ( $spec->{file} || '' );
+        }
+        return if $dispatch_path eq '';
+        return $self->dispatch_request(
+            %args,
+            path => $dispatch_path,
+        );
+    }
+    if ( ( $spec->{kind} || '' ) eq 'app' ) {
+        return $self->skill_route_response(
+            %args,
+            path       => $route_path,
+            route      => $spec->{route_id},
+            skill_name => $spec->{skill_name},
+        );
+    }
+    if ( ( $spec->{kind} || '' ) eq 'ajax' ) {
+        return $self->skill_ajax_file_response(
+            %args,
+            ajax_file    => $spec->{ajax_file},
+            default_type => $spec->{type} || '',
+            skill_name   => $spec->{skill_name},
+        );
+    }
+    if ( grep { $_ eq ( $spec->{kind} || '' ) } qw(js css others) ) {
+        return $self->skill_static_file_response(
+            %args,
+            default_type => $spec->{type} || '',
+            file         => $spec->{file},
+            skill_name   => $spec->{skill_name},
+            type         => $spec->{kind},
+        );
+    }
+    return;
+}
+
+# _skill_dispatcher()
+# Builds the skill dispatcher used by web route helpers that resolve layered
+# skill routes, ajax handlers, and static assets.
+# Input: none.
+# Output: Developer::Dashboard::SkillDispatcher object.
+sub _skill_dispatcher {
+    my ($self) = @_;
+    require Developer::Dashboard::SkillDispatcher;
+    return Developer::Dashboard::SkillDispatcher->new( paths => $self->{pages} ? $self->{pages}{paths} : undef );
+}
+
+# _skill_route_spec($kind, $skill_name, $target)
+# Resolves one custom skill route specification for default mime handling.
+# Input: route kind string, skill name string, and relative route target.
+# Output: route spec hash reference or undef.
+sub _skill_route_spec {
+    my ( $self, $kind, $skill_name, $target ) = @_;
+    return if !$kind || !$skill_name || !$target;
+    return $self->_skill_dispatcher->skill_route_spec( $kind, $skill_name, $target );
+}
+
+# _skill_ajax_route_spec($skill_name, $ajax_file)
+# Resolves one custom skill ajax route specification for default mime handling.
+# Input: skill name string and relative ajax file name.
+# Output: route spec hash reference or undef.
+sub _skill_ajax_route_spec {
+    my ( $self, $skill_name, $ajax_file ) = @_;
+    return $self->_skill_route_spec( 'ajax', $skill_name, $ajax_file );
 }
 
 # _missing_named_page_response($id)
@@ -1840,21 +2005,15 @@ sub _legacy_ajax_response {
     my ( $self, %args ) = @_;
     my $params = $args{params} || {};
     my $type  = $params->{type} || 'text';
-    my %types = (
-        html => 'text/html; charset=utf-8',
-        text => 'text/plain; charset=utf-8',
-        json => 'application/json; charset=utf-8',
-        js   => 'application/javascript; charset=utf-8',
-        xml  => 'application/xml; charset=utf-8',
-        yml  => 'text/plain; charset=utf-8',
-        yaml => 'text/plain; charset=utf-8',
-        xslt => 'application/xml; charset=utf-8',
-    );
     my $code;
     my $saved_path = '';
     if ( my $token = $params->{token} ) {
         $code = eval { decode_payload($token) };
         return [ 400, 'text/plain; charset=utf-8', "$@" ] if $@;
+    }
+    elsif ( ( $args{saved_ajax_path} || '' ) ne '' ) {
+        $saved_path = $args{saved_ajax_path};
+        return [ 404, 'text/plain; charset=utf-8', "Ajax handler not found\n" ] if !-f $saved_path;
     }
     elsif ( ( $params->{file} || '' ) ne '' ) {
         my $runtime_root = $self->{pages}{paths} ? $self->{pages}{paths}->runtime_root : '';
@@ -1876,7 +2035,7 @@ sub _legacy_ajax_response {
     );
     return [
         200,
-        $types{$type} || 'text/plain; charset=utf-8',
+        _ajax_content_type($type),
         {
             stream => sub {
                 my ($writer) = @_;
@@ -1905,6 +2064,29 @@ sub _legacy_ajax_response {
             },
         },
     ];
+}
+
+# _ajax_content_type($type)
+# Maps symbolic Ajax response types to concrete content types while accepting
+# raw mime strings from skill route metadata.
+# Input: symbolic type string or raw mime type string.
+# Output: HTTP content type string.
+sub _ajax_content_type {
+    my ($type) = @_;
+    my %types = (
+        html => 'text/html; charset=utf-8',
+        text => 'text/plain; charset=utf-8',
+        json => 'application/json; charset=utf-8',
+        js   => 'application/javascript; charset=utf-8',
+        xml  => 'application/xml; charset=utf-8',
+        yml  => 'text/plain; charset=utf-8',
+        yaml => 'text/plain; charset=utf-8',
+        xslt => 'application/xml; charset=utf-8',
+    );
+    my $value = defined $type && $type ne '' ? $type : 'text';
+    return $types{$value} if exists $types{$value};
+    return $value if $value =~ m{/};
+    return 'text/plain; charset=utf-8';
 }
 
 # _legacy_ajax_allowed($params)
@@ -2329,12 +2511,20 @@ sub _expired_session_cookie {
 # Output: array reference of status code, content type, body.
 sub _serve_static_file {
     my ( $self, $type, $filename ) = @_;
+    return $self->_serve_static_file_from_roots( $type, $filename, $self->_static_file_roots($type) );
+}
+
+# _serve_static_file_from_roots($type, $filename, @roots)
+# Serves one static file from an explicit ordered list of public roots.
+# Input: asset type string, relative filename, and candidate directory roots.
+# Output: array reference of status code, content type, and body.
+sub _serve_static_file_from_roots {
+    my ( $self, $type, $filename, @public_roots ) = @_;
 
     # Prevent directory traversal attacks
     return [ 400, 'text/plain; charset=utf-8', "Bad Request\n" ]
         if $filename =~ /\.\./;
 
-    my @public_roots = $self->_static_file_roots($type);
     my $file_path = '';
     for my $public_dir (@public_roots) {
         my $candidate = File::Spec->catfile( $public_dir, $filename );
@@ -2347,15 +2537,27 @@ sub _serve_static_file {
     }
     return [ 404, 'text/plain; charset=utf-8', "Not Found\n" ] if $file_path eq '';
 
-    # Determine content type
-    my $content_type = $self->_get_content_type( $type, $filename );
+    return $self->_serve_static_file_at_path( $type, $filename, $file_path );
+}
 
-    # Read and return file
-    open my $fh, '<', $file_path or return [ 500, 'text/plain; charset=utf-8', "Internal Server Error\n" ];
-    my $content = do { local $/; <$fh> };
-    close $fh;
+# _skill_ajax_file_path($skill_name, $ajax_file)
+# Resolves one layered skill-local dashboards/ajax file path through the skill dispatcher.
+# Input: skill name string and relative ajax file name.
+# Output: absolute file path string or empty string.
+sub _skill_ajax_file_path {
+    my ( $self, $skill_name, $ajax_file ) = @_;
+    return '' if !$skill_name || !$ajax_file;
+    return $self->_skill_dispatcher->skill_ajax_file_path( $skill_name, $ajax_file ) || '';
+}
 
-    return [ 200, $content_type, $content ];
+# _skill_static_file_path($skill_name, $type, $file)
+# Resolves one layered skill-local dashboards/public asset path through the skill dispatcher.
+# Input: skill name string, asset type string, and relative file path.
+# Output: absolute file path string or empty string.
+sub _skill_static_file_path {
+    my ( $self, $skill_name, $type, $file ) = @_;
+    return '' if !$skill_name || !$type || !$file;
+    return $self->_skill_dispatcher->skill_static_file_path( $skill_name, $type, $file ) || '';
 }
 
 # _static_file_roots($type)
@@ -2390,6 +2592,23 @@ sub _static_file_roots {
     );
     push @roots, $home_root if !$seen{$home_root}++;
     return @roots;
+}
+
+# _serve_static_file_at_path($type, $filename, $file_path, $default_type)
+# Serves one already-resolved static file path after the caller has chosen the lookup source.
+# Input: asset type string, request filename string, resolved file path string, and optional explicit mime type override.
+# Output: array reference of status code, content type, and body.
+sub _serve_static_file_at_path {
+    my ( $self, $type, $filename, $file_path, $default_type ) = @_;
+    return [ 404, 'text/plain; charset=utf-8', "Not Found\n" ]
+      if !defined $file_path || $file_path eq '' || !-f $file_path || !-r $file_path;
+    my $content_type = defined $default_type && $default_type ne ''
+      ? _ajax_content_type($default_type)
+      : $self->_get_content_type( $type, $filename );
+    open my $fh, '<', $file_path or return [ 500, 'text/plain; charset=utf-8', "Internal Server Error\n" ];
+    my $content = do { local $/; <$fh> };
+    close $fh;
+    return [ 200, $content_type, $content ];
 }
 
 # _get_content_type($type, $filename)
@@ -2492,7 +2711,7 @@ Supports: JS, CSS, JSON, XML, HTML, SVG, PNG, JPEG, GIF, WebP, ICO, and others.
 
 =head1 PURPOSE
 
-This module is the main route backend for the browser application. It handles login and logout, saved and transient page render/source/edit routes, status endpoints, saved Ajax endpoints, API dashboard and SQL dashboard routes, and the auth checks that decide whether a request is local admin, helper user, or unauthorized outsider.
+This module is the main route backend for the browser application. It handles login and logout, saved and transient page render/source/edit routes, status endpoints, saved Ajax endpoints, and the auth checks that decide whether a request is local admin, helper user, or unauthorized outsider.
 
 =head1 WHY IT EXISTS
 

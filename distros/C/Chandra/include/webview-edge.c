@@ -1,5 +1,5 @@
 /*
- * webview-edge.c — Edge/WebView2 backend for Windows
+ * webview-edge.c - Edge/WebView2 backend for Windows
  *
  * This file implements the WebView2 (Chromium-based) backend for Windows.
  * It is included by webview-win32.c and provides runtime detection of

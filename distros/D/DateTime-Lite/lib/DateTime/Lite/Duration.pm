@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Lightweight DateTime Alternative - ~/lib/DateTime/Lite/Duration.pm
-## Version v0.1.0
+## Version v0.1.2
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/04/03
-## Modified 2026/04/10
+## Modified 2026/05/20
 ## All rights reserved
 ## 
 ## 
@@ -66,11 +66,12 @@ BEGIN
     sub MAX_NANOSECONDS () { 1_000_000_000 }
     use Scalar::Util ();
     use Wanted;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.2';
 };
 
 # Keep in unit order from largest to smallest
 my @UNITS = qw( months days minutes seconds nanoseconds );
+my @valid_keys = ( @UNITS, qw( years weeks hours end_of_month ) );
 
 # NOTE: Constructor
 sub new
@@ -114,6 +115,18 @@ sub new
             return( $self->error( "Invalid end_of_month mode '$p{end_of_month}'. Must be 'wrap', 'limit', or 'preserve'." ) );
         }
         $self->{end_of_month} = $p{end_of_month};
+    }
+
+    delete( @p{ @valid_keys } );
+    if( scalar( keys( %p ) ) )
+    {
+        my @unknown = sort( keys( %p ) );
+        return( $self->error( sprintf(
+            "Unknown argument%s passed to %s->new: %s",
+            scalar( @unknown ) > 1 ? 's' : '',
+            $class,
+            join( ', ', map{ "'$_'" } @unknown ),
+        ) ) );
     }
 
     $self->_normalise_nanoseconds;
@@ -227,7 +240,7 @@ sub error
         }
         else
         {
-            warn( $msg ) if( warnings::enabled() );
+            warn( $msg ) if( warnings::enabled( 'DateTime::Lite' ) );
             rreturn( DateTime::Lite::NullObject->new ) if( want( 'OBJECT' ) );
             return;
         }
@@ -369,7 +382,7 @@ sub pass_error
         $self->{error} = ${ $pack . '::ERROR' } = ( defined( $class ) ? bless( $err => $class ) : $err );
         $self->{error}->code( $code ) if( defined( $code ) && $self->{error}->can( 'code' ) );
 
-        if( $self->{fatal} || ( defined( ${"${class}\::FATAL_EXCEPTIONS"} ) && ${"${class}\::FATAL_EXCEPTIONS"} ) )
+        if( $self->{fatal} || ( defined( ${"${pack}\::FATAL_EXCEPTIONS"} ) && ${"${pack}\::FATAL_EXCEPTIONS"} ) )
         {
             die( $self->{error} );
         }
@@ -618,7 +631,7 @@ DateTime::Lite::Duration - Duration objects for use with DateTime::Lite
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.2
 
 =head1 DESCRIPTION
 
@@ -798,89 +811,6 @@ Propagates the error from a lower-level call into this object's error slot witho
 
 =head1 ERROR HANDLING
 
-On error, methods return C<undef>
-
-=head2 add
-
-    $dur->add( months => 1, days => 15 );
-
-Adds a duration specified as key-value pairs (same keys as L</new>) to this duration in-place. Returns C<$self>.
-
-=head2 add_duration
-
-    $dur->add_duration( $other_dur );
-
-Adds another L<DateTime::Lite::Duration> object to this duration in-place. Returns C<$self>.
-
-=head2 subtract
-
-    $dur->subtract( days => 1 );
-
-Subtracts a duration specified as key-value pairs from this duration in-place. Equivalent to adding the inverse. Returns C<$self>.
-
-=head2 subtract_duration
-
-    $dur->subtract_duration( $other_dur );
-
-Subtracts another L<DateTime::Lite::Duration> object from this duration in-place. Returns C<$self>.
-
-=head2 delta_months
-
-    my $m = $dur->delta_months;  # may be negative
-
-Returns the raw signed months component.
-
-=head2 delta_days
-
-    my $d = $dur->delta_days;
-
-Returns the raw signed days component.
-
-=head2 delta_minutes
-
-    my $min = $dur->delta_minutes;
-
-Returns the raw signed minutes component.
-
-=head2 delta_seconds
-
-    my $s = $dur->delta_seconds;
-
-Returns the raw signed seconds component.
-
-=head2 delta_nanoseconds
-
-    my $ns = $dur->delta_nanoseconds;
-
-Returns the raw signed nanoseconds component.
-
-=head2 error
-
-    my $dur = DateTime::Lite::Duration->new( %bad_args ) ||
-        die( DateTime::Lite::Duration->error );
-
-Instance and class method. When called with a message, creates a L<DateTime::Lite::Exception>, stores it, warns or C<die>s (depending on L</fatal>), and returns C<undef>. When called without arguments, returns the last error object.
-
-=head2 fatal
-
-    $dur->fatal(1);  # enable fatal mode
-
-Gets or sets the C<fatal> flag. When true, any call to L</error> will C<die> instead of warn-and-return-undef.
-
-=head2 pass_error
-
-    sub my_op
-    {
-        my $self = shift( @_ );
-        my $res = $self->_inner_op ||
-            return( $self->pass_error );
-        return( $res );
-    }
-
-Propagates the error from a lower-level call into this object's error slot without constructing a new exception. Used internally and in subclasses.
-
-=head1 ERROR HANDLING
-
 On error, methods return C<undef> in scalar context, or an empty list in list context. The exception is accessible via C<< $obj->error >> or C<< DateTime::Lite::Duration->error >>.
 
 The exception object stringifies to a human-readable message including file and line number.
@@ -901,7 +831,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 Copyright(c) 2026 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

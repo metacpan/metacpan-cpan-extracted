@@ -1,5 +1,5 @@
 /*
- * chandra_internal.h — C helper functions for internal Chandra operations
+ * chandra_internal.h - C helper functions for internal Chandra operations
  *
  * This header eliminates Perl method dispatch overhead for internal operations.
  * We only use Perl's call_* API for:
@@ -15,7 +15,7 @@
 #define CHANDRA_INTERNAL_H
 
 /* ============================================================================
- * Bridge JS Code — static constant (replaces Chandra::Bridge->js_code)
+ * Bridge JS Code - static constant (replaces Chandra::Bridge->js_code)
  * ============================================================================ */
 
 static const char CHANDRA_BRIDGE_JS[] =
@@ -87,7 +87,7 @@ static const char CHANDRA_BRIDGE_JS[] =
 #define CHANDRA_BRIDGE_JS_LEN (sizeof(CHANDRA_BRIDGE_JS) - 1)
 
 /* ============================================================================
- * Router JS Code — static constant (replaces Chandra::App->_router_js)
+ * Router JS Code - static constant (replaces Chandra::App->_router_js)
  * ============================================================================ */
 
 static const char CHANDRA_ROUTER_JS[] =
@@ -136,7 +136,7 @@ chandra_init_bind(pTHX_ SV *self_sv)
         SV **app_svp = hv_fetchs(bind_hv, "app", 0);
         if (app_svp && SvOK(*app_svp)
             && SvRV(*app_svp) == SvRV(self_sv)) {
-            /* Same app object — reuse existing bind */
+            /* Same app object - reuse existing bind */
             (void)hv_stores(bind_hv, "app", newSVsv(self_sv));
             need_new = 0;
         }

@@ -1,10 +1,11 @@
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
+BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
+BEGIN { pop @INC if $INC[-1] eq '.' }
 use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{LTSV::LINQ},
-    'VERSION'   => q{1.08},
+    'VERSION'   => q{1.09},
     'ABSTRACT'  => q{LINQ-style query interface for LTSV files},
     'PREREQ_PM' => {
         'perl' => '5.00503',
@@ -43,11 +44,11 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'provides' => {
             'LTSV::LINQ' => {
                 'file'    => 'lib/LTSV/LINQ.pm',
-                'version' => '1.08',
+                'version' => '1.09',
             },
             'LTSV::LINQ::Ordered' => {
                 'file'    => 'lib/LTSV/LINQ.pm',
-                'version' => '1.08',
+                'version' => '1.09',
             }
         },
     };

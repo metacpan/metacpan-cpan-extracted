@@ -379,20 +379,17 @@ char* xs_jit_generate_code(pTHX_ const char *user_code,
     strbuf_append(&buf, "#  ifndef XopENTRY_set\n");
     strbuf_append(&buf, "#    define XopENTRY_set(xop, field, value) do { (xop)->field = (value); } while(0)\n");
     strbuf_append(&buf, "#  endif\n");
-    strbuf_append(&buf, "PERL_STATIC_INLINE void S_xop_compat_register(pTHX_ Perl_ppaddr_t ppfunc, const char *name, const char *desc) {\n");
+    /* Real function (not a macro): the preprocessor identifies macro
+       arguments by commas at the call site BEFORE expanding aTHX_, so
+       a 3-arg macro can't be called with `Perl_custom_op_register(aTHX_ p, x)`
+       — that's two preprocessor args. Function form lets the C compiler
+       handle aTHX_ at the call site and matches the native 5.14+ ABI. */
+    strbuf_append(&buf, "PERL_STATIC_INLINE void Perl_custom_op_register(pTHX_ Perl_ppaddr_t ppfunc, const XOP *xop) {\n");
     strbuf_append(&buf, "    if (!PL_custom_op_names) PL_custom_op_names = newHV();\n");
     strbuf_append(&buf, "    if (!PL_custom_op_descs) PL_custom_op_descs = newHV();\n");
-    strbuf_append(&buf, "    hv_store(PL_custom_op_names, (char*)&ppfunc, sizeof(ppfunc), newSVpv(name, 0), 0);\n");
-    strbuf_append(&buf, "    hv_store(PL_custom_op_descs, (char*)&ppfunc, sizeof(ppfunc), newSVpv(desc, 0), 0);\n");
+    strbuf_append(&buf, "    hv_store(PL_custom_op_names, (char*)&ppfunc, sizeof(ppfunc), newSVpv(xop->xop_name, 0), 0);\n");
+    strbuf_append(&buf, "    hv_store(PL_custom_op_descs, (char*)&ppfunc, sizeof(ppfunc), newSVpv(xop->xop_desc, 0), 0);\n");
     strbuf_append(&buf, "}\n");
-    strbuf_append(&buf, "#  undef Perl_custom_op_register\n");
-    strbuf_append(&buf, "#  ifdef PERL_IMPLICIT_CONTEXT\n");
-    strbuf_append(&buf, "#    define Perl_custom_op_register(ctx, ppfunc, xop) \\\n");
-    strbuf_append(&buf, "        S_xop_compat_register((ctx), (Perl_ppaddr_t)(ppfunc), (xop)->xop_name, (xop)->xop_desc)\n");
-    strbuf_append(&buf, "#  else\n");
-    strbuf_append(&buf, "#    define Perl_custom_op_register(ppfunc, xop) \\\n");
-    strbuf_append(&buf, "        S_xop_compat_register(aTHX_ (Perl_ppaddr_t)(ppfunc), (xop)->xop_name, (xop)->xop_desc)\n");
-    strbuf_append(&buf, "#  endif\n");
     strbuf_append(&buf, "#endif /* !PERL_VERSION_GE(5,14,0) */\n");
     strbuf_append(&buf, "\n");
 
@@ -552,6 +549,34 @@ static int mkdir_p(const char *path) {
     return mkdir(tmp, 0755) == 0 || errno == EEXIST;
 }
 
+/* Run a shell command and capture its merged stdout+stderr (the caller
+   already appends "2>&1" so anything gcc/ld writes lands in the pipe).
+   Returns the command's exit status (0 on success); *out_sv receives a
+   mortal SV with the captured text, or NULL if popen itself failed. */
+static int xs_jit_run_capture(pTHX_ const char *cmd, SV **out_sv) {
+#if defined(WIN32)
+    FILE *fp = _popen(cmd, "r");
+#else
+    FILE *fp = popen(cmd, "r");
+#endif
+    if (!fp) {
+        *out_sv = NULL;
+        return -1;
+    }
+    SV *sv = newSVpvs("");
+    char buf[4096];
+    size_t n;
+    while ((n = fread(buf, 1, sizeof(buf), fp)) > 0)
+        sv_catpvn(sv, buf, n);
+#if defined(WIN32)
+    int rc = _pclose(fp);
+#else
+    int rc = pclose(fp);
+#endif
+    *out_sv = sv_2mortal(sv);
+    return rc;
+}
+
 /* Compile C file to shared object */
 int xs_jit_compile_file(pTHX_ const char *c_file, const char *so_file,
                         const char *extra_cflags, const char *extra_ldflags) {
@@ -567,7 +592,7 @@ int xs_jit_compile_file(pTHX_ const char *c_file, const char *so_file,
     SV **cccdlflags_sv = hv_fetch(config, "cccdlflags", 10, 0);
     SV **lddlflags_sv = hv_fetch(config, "lddlflags", 9, 0);
     SV **archlib_sv = hv_fetch(config, "archlib", 7, 0);
-#ifdef WIN32
+#if defined(WIN32) || defined(__CYGWIN__) || defined(__MSYS__)
     SV **libperl_sv = hv_fetch(config, "libperl", 7, 0);
 #endif
 
@@ -588,13 +613,11 @@ int xs_jit_compile_file(pTHX_ const char *c_file, const char *so_file,
     char cmd[MAX_PATH_LEN * 4];  /* Larger buffer for extra flags */
     int ret;
 
-    /* On macOS, Perl headers live inside the SDK, so use -iwithsysroot
-       (matching what ExtUtils::MakeMaker generates) instead of plain -I */
-#ifdef __APPLE__
-    const char *inc_flag = "-iwithsysroot";
-#else
+    /* Use plain -I; -iwithsysroot only works when PERL_INC sits under the
+       active SDK root (system perl). homebrew/perlbrew installs do not,
+       so -iwithsysroot makes the compiler not find EXTERN.h.  EUMM itself
+       uses plain -I in the same situation. */
     const char *inc_flag = "-I";
-#endif
 
     /* Ensure C99 mode for for-loop variable declarations; skip if ccflags already sets -std= */
     const char *std_flag = (strstr(ccflags, "-std=") == NULL) ? "-std=gnu99" : "";
@@ -603,39 +626,62 @@ int xs_jit_compile_file(pTHX_ const char *c_file, const char *so_file,
     snprintf(cmd, sizeof(cmd), "%s %s %s %s %s %s -c -o \"%s\" %s \"%s/CORE\" \"%s\" 2>&1",
              cc, ccflags, std_flag, optimize, cccdlflags, extra_cflags, o_file, inc_flag, archlib, c_file);
 
-    ret = system(cmd);
+    SV *captured = NULL;
+    ret = xs_jit_run_capture(aTHX_ cmd, &captured);
     if (ret != 0) {
-        warn("XS::JIT: Compilation failed: %s", cmd);
+        warn("XS::JIT: Compilation failed: %s\n--- compiler output ---\n%s",
+             cmd, captured ? SvPV_nolen(captured) : "(no output captured)");
         return 0;
     }
 
-    /* Link to shared object with extra ldflags */
-#ifdef WIN32
-    /* On Win32, DLLs must resolve all symbols at link time.
-       Derive -lperl5XX from $Config{libperl} (e.g. "libperl542.a" -> "-lperl542") */
+    /* Link to shared object with extra ldflags.
+       Cygwin/MSYS need the same lib-resolve as native Win32: --shared
+       requires resolving all symbols at link time, so we link against
+       -lperl5XX derived from $Config{libperl} and ask the linker to
+       export everything so other XS modules can reference symbols. */
+#if defined(WIN32) || defined(__CYGWIN__) || defined(__MSYS__)
     char perl_lib_flag[64] = "";
     if (libperl_sv && *libperl_sv) {
         const char *libperl = SvPV_nolen(*libperl_sv);
-        /* Strip leading "lib" and trailing ".a" to get e.g. "perl542" */
-        if (strncmp(libperl, "lib", 3) == 0) {
-            const char *start = libperl + 3;
-            const char *dot = strrchr(start, '.');
+        const char *start = NULL;
+
+        /* $Config{libperl} naming varies by build:
+         *   Strawberry/MinGW : libperl540.a       -> -lperl540
+         *   Cygwin           : libperl5_40_3.dll.a -> -lperl5_40_3
+         *   Cygwin (alt)     : cygperl5_40_3.dll  -> -lperl5_40_3
+         * Strip whichever known prefix is present, then strip the first
+         * dotted suffix to get the bare lib stem. */
+        if (strncmp(libperl, "lib", 3) == 0)        start = libperl + 3;
+        else if (strncmp(libperl, "cyg", 3) == 0)   start = libperl + 3;
+
+        if (start) {
+            const char *dot = strchr(start, '.');
             size_t len = dot ? (size_t)(dot - start) : strlen(start);
             if (len < sizeof(perl_lib_flag) - 3) {
-                snprintf(perl_lib_flag, sizeof(perl_lib_flag), "-l%.*s", (int)len, start);
+                snprintf(perl_lib_flag, sizeof(perl_lib_flag),
+                         "-l%.*s", (int)len, start);
             }
         }
     }
-    snprintf(cmd, sizeof(cmd), "%s %s %s -o \"%s\" \"%s\" %s 2>&1",
-             cc, lddlflags, extra_ldflags, so_file, o_file, perl_lib_flag);
+    /* Last-resort fallback: plain -lperl. Cygwin perl normally installs
+     * libperl.dll.a as a versioned-import-library alias, so this resolves
+     * even when the parsed name above produced nothing. */
+    if (!perl_lib_flag[0]) {
+        snprintf(perl_lib_flag, sizeof(perl_lib_flag), "-lperl");
+    }
+    snprintf(cmd, sizeof(cmd),
+             "%s %s %s -Wl,--export-all-symbols -o \"%s\" \"%s\" -L\"%s/CORE\" %s 2>&1",
+             cc, lddlflags, extra_ldflags, so_file, o_file, archlib, perl_lib_flag);
 #else
     snprintf(cmd, sizeof(cmd), "%s %s %s -o \"%s\" \"%s\" 2>&1",
              cc, lddlflags, extra_ldflags, so_file, o_file);
 #endif
 
-    ret = system(cmd);
+    captured = NULL;
+    ret = xs_jit_run_capture(aTHX_ cmd, &captured);
     if (ret != 0) {
-        warn("XS::JIT: Linking failed: %s", cmd);
+        warn("XS::JIT: Linking failed: %s\n--- linker output ---\n%s",
+             cmd, captured ? SvPV_nolen(captured) : "(no output captured)");
         return 0;
     }
 

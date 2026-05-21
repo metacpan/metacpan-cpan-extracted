@@ -17,7 +17,7 @@ BEGIN {
 our @ISA = qw(Exporter File::MimeInfo);
 our @EXPORT = qw(mimetype);
 our @EXPORT_OK = qw(extensions describe globs inodetype magic);
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 our $DEBUG;
 
 our $_hashed = 0;
@@ -145,7 +145,7 @@ sub _hash_magic {
     my $file = shift;
 
     open MAGIC, '<', $file
-        || croak "Could not open file '$file' for reading";
+        or croak "Could not open file '$file' for reading";
     binmode MAGIC;
     <MAGIC> eq "MIME-Magic\x00\n"
         or carp "Magic file '$file' doesn't seem to be a magic file";
@@ -348,5 +348,6 @@ Maintained by Michiel Beijen E<lt>mb@x14.nlE<gt>
 =head1 COPYRIGHT
 
 Copyright (c) 2003, 2012 Jaap G Karssenberg. All rights reserved.
+Copyright (c) 2013-2026 Michiel W. Beijen. All rights reserved.
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.

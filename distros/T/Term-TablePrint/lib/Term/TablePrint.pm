@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.16.0;
 
-our $VERSION = '0.180';
+our $VERSION = '0.181';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -700,9 +700,16 @@ sub __cols_to_string {
     my $ds = $self->{decimal_separator};
     my $regex_fract = "(\Q${ds}\E[0-9]+)\\z";
     my $lrb = ' ' x $width->{edge};
+    my $header = $lrb;
+
+    HEADER: for my $col ( 0 .. $#{$width->{cols_calc}} ) {
+        $header .= adjust_to_printwidth( $tbl_copy->[0][$col], $width->{cols_calc}[$col] );
+        $header .= $col == $#{$width->{cols_calc}} ? $lrb : $tab;
+    }
+    $tbl_copy->[0] = $header; # overwrite $tbl_copy to save memory
     my $str;
 
-    ROW: for my $row ( 0 .. $#{$tbl_copy} ) {
+    ROW: for my $row ( 1 .. $#{$tbl_copy} ) {
         $str = $lrb;
 
         COL: for my $col ( 0 .. $#{$width->{cols_calc}} ) {
@@ -989,7 +996,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.180
+Version 0.181
 
 =cut
 

@@ -1,34 +1,66 @@
 {
-   "abstract" : "Perl interface to functions that assist in working\r\nwith salted hashes.\r",
+   "abstract" : "Perl interface to functions that assist in working with salted hashes.",
    "author" : [
-      "Sascha Kiefer, L<esskar@cpan.org>"
+      "Robert Rothenberg <perl@rhizomnic.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Crypt-SaltedHash",
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.30"
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla::Plugin::UsefulReadme" : "v0.4.3",
+            "Pod::Simple::Text" : "3.23",
+            "Test::CleanNamespaces" : "0.15",
+            "Test::DistManifest" : "0",
+            "Test::EOF" : "0",
+            "Test::Fixme" : "0",
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "warnings" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "Digest" : "0"
+            "Crypt::SysRandom" : "0",
+            "Digest" : "0",
+            "MIME::Base64" : "0",
+            "POSIX" : "0",
+            "perl" : "v5.6.0",
+            "strict" : "0"
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
+            "File::Spec" : "0",
+            "Module::Metadata" : "0",
             "Test::Fatal" : "0",
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "warnings" : "0"
          }
+      }
+   },
+   "provides" : {
+      "Crypt::SaltedHash" : {
+         "file" : "lib/Crypt/SaltedHash.pm",
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -38,10 +70,22 @@
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/campus-explorer/crypt-saltedhash.git",
-         "web" : "http://github.com/campus-explorer/crypt-saltedhash"
-      }
+         "url" : "git://github.com/robrwo/perl-Crypt-SaltedHash.git",
+         "web" : "https://github.com/robrwo/perl-Crypt-SaltedHash"
+      },
+      "x_authority" : "cpan:RRWO"
    },
-   "version" : "0.09"
+   "version" : "0.11",
+   "x_contributors" : [
+      "Chris Weyl <cweyl@alumni.drew.edu>",
+      "David Steinbrunner <dsteinbrunner@pobox.com>",
+      "Gerda Shank <gerda.shank@gmail.com>",
+      "Sascha Kiefer <perl@intertivityNOSP4M.com>",
+      "Sergey Romanov <complefor@rambler.ru>"
+   ],
+   "x_deprecated" : 1,
+   "x_generated_by_perl" : "v5.42.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

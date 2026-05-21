@@ -16,13 +16,13 @@ my $app = Chandra::App->new(
     height => 1,
 );
 
-# Init the underlying webview — this bootstraps NSApplication
+# Init the underlying webview - this bootstraps NSApplication
 # (setActivationPolicy, finishLaunching, etc.) which is required
 # before any child windows will display.
 my $wv = $app->webview;
 $wv->init;
 
-# Non-blocking event loop pump — call repeatedly to keep GUI alive
+# Non-blocking event loop pump - call repeatedly to keep GUI alive
 sub pump { $wv->loop(0) for 1..5 }
 
 # Pump + sleep helper
@@ -37,16 +37,16 @@ sub pump_sleep {
 
 print <<'BANNER';
 ===========================================
-  Chandra::Splash — Interactive Demo
+  Chandra::Splash - Interactive Demo
 ===========================================
 
 Commands:
-  progress     — Progress bar + status updates
-  custom       — Custom HTML content
-  frameless    — Frameless splash window
-  timeout      — Auto-close after 2 seconds
-  app          — $app->splash() convenience wrapper
-  quit         — Exit
+  progress     - Progress bar + status updates
+  custom       - Custom HTML content
+  frameless    - Frameless splash window
+  timeout      - Auto-close after 2 seconds
+  app          - $app->splash() convenience wrapper
+  quit         - Exit
 
 BANNER
 

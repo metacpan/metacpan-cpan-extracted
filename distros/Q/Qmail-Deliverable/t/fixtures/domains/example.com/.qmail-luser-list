@@ -1,0 +1,2 @@
+|/var/qmail/bin/preline /usr/local/bin/ezmlm-reject ./mailing-list/
+|/var/qmail/bin/preline /usr/local/bin/ezmlm-send ./mailing-list/

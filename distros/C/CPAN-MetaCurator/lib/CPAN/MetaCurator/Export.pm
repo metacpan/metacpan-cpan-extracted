@@ -9,15 +9,16 @@ use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 use Data::Dumper::Concise; # For Dumper().
 use DateTime::Tiny;
 
+use File::Slurper 'read_lines';
 use File::Spec;
 
 use Moo;
 
-use File::Slurper 'read_lines';
+use Syntax::Keyword::Match;
 
 our %seen;
 
-our $VERSION = '1.15';
+our $VERSION = '1.17';
 
 # -----------------------------------------------
 
@@ -37,7 +38,7 @@ sub export_tree
 	my($root)	= shift @{$$pad{topics} }; # I.e.: {parent_id => 1, text => 'Root', title => 'MetaCurator'}.
 	my($id)		= $$pad{topic_html_ids}{$$root{title} };
 
-	$self -> logger -> info("Entry: id: $id. title: $$root{title}");
+	$self -> logger -> info("Topic: id: $id. title: $$root{title}");
 
 	push @list, qq|<li data-jstree='{"opened": true}' id = '$id'><a href = '#'>$$root{title}</a>|;
 	push @list, '<ul>';
@@ -48,10 +49,10 @@ sub export_tree
 
 	for my $topic (@{$$pad{topics} })
 	{
-		$self -> logger -> info("Entry: id: $$topic{id}. html_id: $$pad{topic_html_ids}{$$topic{title}}. title: $$topic{title}");
+		$self -> logger -> info("Topic: id: $$topic{id}. html_id: $$pad{topic_html_ids}{$$topic{title}}. title: $$topic{title}");
 
 		$leaf_id	= $$pad{topic_html_ids}{$$topic{title} };
-		$lines_ref	= $self -> format_text($leaf_id, $pad, $topic);
+		$lines_ref	= $self -> parse_topic($leaf_id, $pad, $topic);
 
 		push @list, qq|\t<li data-jstree='{"opened": false}' id = '$leaf_id'>$$topic{title}|;
 		push @list, '<ul>';
@@ -65,6 +66,8 @@ sub export_tree
 
 		push @list, '</ul>';
 		push @list, '</li>';
+
+		$self -> logger -> info($self -> visual_break);
 	}
 
 	push @list, '</ul>', '</li>', '</ul>';
@@ -110,108 +113,245 @@ sub export_modules_table
 } # End of export_modules_table.
 
 # --------------------------------------------------
+# Note: Data is returned in:
+# 1: $button
+# 2: $index
+# 3: @$inside_pre
 
-sub format_text
+sub handle_inside_pre
+{
+	my($self, $index, $line, $lines, $inside_pre, $special_case, $topic) = @_;
+
+	$$special_case{inside_pre}	= true;
+	@$inside_pre				= $line;
+
+	do
+	{
+		$index++;
+
+		if ($index <= $#$lines)
+		{
+			$line = $$lines[$index];
+
+			if ($line =~ /^o /)
+			{
+				$$special_case{inside_pre} = false;
+			}
+			else
+			{
+				push @$inside_pre, $line;
+			}
+		}
+		else
+		{
+			$$special_case{inside_pre} = false;
+		}
+	} until (! $$special_case{inside_pre});
+
+	my($button) = "<span>&nbsp;&nbsp;</span><button id='toggle-btn'>[pre.../pre]</button>";
+
+	$self -> logger -> debug("\t$_") for (@$inside_pre);
+
+	return ($button, $index);
+
+} # End of handle_inside_pre.
+
+# --------------------------------------------------
+# Note: Data is returned in:
+# 1: $button
+# 2: $index
+# 3: @$see_also
+
+sub handle_see_also
+{
+	my($self, $index, $line, $lines, $see_also, $special_case, $topic) = @_;
+
+	$$special_case{see_also}	= true;
+	@$see_also					= $line;
+
+	do
+	{
+		$index++;
+
+		if ($index <= $#$lines)
+		{
+			$line = $$lines[$index];
+
+			if ($line =~ /^o /)
+			{
+				$$special_case{see_also} = false;
+			}
+			else
+			{
+				push @$see_also, $line;
+			}
+
+		}
+		else
+		{
+			$$special_case{see_also} = false;
+		}
+	} until (! $$special_case{see_also});
+
+	$self -> logger -> debug("\t$_") for (@$see_also);
+
+	return $index;
+
+} # End of handle_see_also.
+
+# --------------------------------------------------
+# Some names might be acronyms & module names & topic names.
+# Example: RSS.
+
+sub gather_statistics
+{
+	my($self, $node_type, $pad, $token, $topic) = @_;
+
+	$$node_type{acronym}	= $$topic{title} eq 'Acronyms'	? true : false;
+	$$node_type{topic}		= $$pad{topic_names}{$token}	? true : false;
+	$$node_type{known}		= $$pad{packages}{$token}		? true : false;
+	$$node_type{unknown}	= ! ($$node_type{acronym} || $$node_type{known} || $$node_type{topic});
+
+	$$pad{count}{acronym}++	if ($$node_type{acronym});
+	$$pad{count}{known}++	if ($$node_type{known});
+
+	if ($$node_type{unknown} && ($token ne 'See also') )
+	{
+		$self -> logger -> debug("Unknown: $token");
+	}
+
+} # End of gather_statistics;
+
+# --------------------------------------------------
+
+sub parse_topic
 {
 	my($self, $leaf_id, $pad, $topic)	= @_;
-	my(@lines)							= grep{length} split(/\n/, $$topic{text});
-	@lines								= map{s/\s+$//; s/^-\s//; s/:$//; $_} @lines;
+	my(@lines)							= split(/\n/, $$topic{text});
+	@lines								= grep{length} map{s/^\s+//; s/:\s*$//; $_} @lines;
 	my($line_id)						= $leaf_id;
 	my($index)							= 0;
-	my($token_re)						= qr/^o/o;
 
-	my($finished);
+	my($button, %button);
+	my($description);
+	my(@extras);
 	my($href, @hover);
-	my($item, @items);
+	my(@inside_pre, $item, @items);
 	my($line);
 	my(%node_type);
-	my(@pre_pre);
 	my(%special_case, @see_also);
 	my($token);
 
-	$special_case{pre_pre}	= false;
-	$special_case{see_also}	= false;
+	$button{extras}				= '';
+	$button{inside_pre}			= '';
+	$button{see_also}			= '';
+	$special_case{inside_pre}	= false;
+	$special_case{see_also}		= false;
 
 	while ($index <= $#lines)
 	{
 		$line = $lines[$index];
 
+		# 1 of 2: Process non-modules.
+
+		if ($line =~ /<pre>/)
+		{
+			($button{inside_pre}, $index) = $self -> handle_inside_pre($index, $line, \@lines, \@inside_pre, \%special_case, $topic);
+		}
+		elsif ($line =~ /^o See also/)
+		{
+			$index				= $self -> handle_see_also($index, $line, \@lines, \@see_also, \%special_case, $topic);
+			$button{see_also}	= "<button id='toggle-btn'>[See also]</button>";
+		}
+
 		$index++;
 
-		next if (! $line);
-		next if ($line =~ /o See also/); # For the moment.
-		next if ($line !~ /^o (.+)/);
+		last if ($index > $#lines);
+
+		# 2 of 2: Skip everything except modules (hopefully).
+
+		next if ($line !~ /^o (.+):?/);
 
 		$token	= $1 || '';
 		$item	= {href => '', id => ++$line_id, text => ''};
 
-=pod
-		if ($line =~ /<pre>/)
+		$self -> gather_statistics(\%node_type, $pad, $token, $topic);
+
+		# Special cases, due to their formatting:
+		# 1: See also.
+		# 2: FAQ.
+
+		if ($token eq 'See also')
 		{
-			$special_case{pre_pre} = true;
+			$$item{html}	= $button{see_also};
+			$$item{text}	= "";
 
-			next;
+			push @items, $item;
+
 		}
-		elsif ($special_case{pre_pre})
-		{
-			if ($line =~ /<\/pre>/)
-			{
-				$special_case{pre_pre} = false;
-
-				$$item{html}	= '<button id="trigger">Hover over me</button>';
-				$$item{text}	= $token;
-			}
-			else
-			{
-				push @pre_pre, $line;
-			}
-		}
-=cut
-
-		$node_type{acronym}	= $$topic{title} eq 'Acronyms'	? true : false;
-		$node_type{topic}	= $$pad{topic_names}{$token}	? true : false;
-		$node_type{known}	= $$pad{packages}{$token}		? true : false;
-		$node_type{unknown}	= ! ($node_type{acronym} || $node_type{known} || $node_type{topic});
-
-		# Some names might be acronyms & module names & topic names.
-		# Example: RSS.
-
-		if ($node_type{acronym})
-		{
-			$$pad{count}{acronym}++;
-		}
-		elsif ($node_type{topic})
-		{
-			# These are counted in Database.build_pad().
-		}
-		elsif ($node_type{known})
-		{
-			$$pad{count}{known}++;
-		}
-		elsif ($node_type{unknown})
-		{
-			$$pad{count}{unknown}++;
-
-			$self -> logger -> debug("Unknown: $token");
-		}
-
-		if ($$topic{title} eq 'FAQ')
+		elsif ($$topic{title} eq 'FAQ')
 		{
 			$$item{html}	= '';
 			$$item{text}	= $line;
 
 			push @items, $item;
 		}
-		elsif (defined $lines[$index + 1])
+		else
 		{
-			$$item{html}	= "<a href = '@{[$lines[$index + 1]]}' target = '_blank'>$token - $lines[$index]</a>";
+			# Do we have a standard 3 line entry or 3+ lines? Examples are from Acronyms.
+			#
+			# 3 line entry:
+			# o DKIM:
+			# - DomainKeys Identified Mail <- $index
+			# - https://en.wikipedia.org/wiki/DomainKeys_Identified_Mail
+			#
+			# 3+ line entry:
+			# o DMARC:
+			# - Domain-based Message Authentication, Reporting, and Conformance <- $index
+			# - https://en.wikipedia.org/wiki/DMARC
+			# - An email authentication protocol that helps protect domain owners and recipients from email spoofing, phishing, and other email-based attacks
+			# - https://datatracker.ietf.org/doc/html/draft-crocker-dmarc-bcp-03
+			#
+			# If the latter then stockpile lines beyond 3 & stash them in a hidden field to be popped-up on a button click.
+
+			@extras = ();
+
+			while ( ($index <= $#lines) && ($lines[$index] !~ /^o/) )
+			{
+				push @extras, $lines[$index++];
+			}
+
+			if ($#extras < 2)
+			{
+				#$self -> logger -> debug("Token: $token. Expected: $_ >$extras[$_]<") for (0 .. $#extras);
+			}
+
+			$self -> logger -> error("Token: $token. Missing lines"), next if ($#extras < 1);
+			$self -> logger -> error("Token: $token. Missing -text"), next if ($extras[0] !~ /^-/);
+			$self -> logger -> error("Token: $token. Missing -link"), next if ( ($#extras < 1) || ($extras[1] !~ /^-/) );
+
+			$description	= shift @extras;
+			$href			= shift @extras;
+
+			$self -> logger -> error("Token: $token. Missing description"),	next if (! defined($description) );
+			$self -> logger -> error("Token: $token. Missing href"), 		next if (! defined($href) );
+
+			if ($#extras >= 0)
+			{
+				$button{extras} = "<span>&nbsp;&nbsp;</span><button id='toggle-btn'>[TBA]</button>";
+
+				$self -> logger -> debug("Token: $token. Extras:");
+				$self -> logger -> debug("\t$_") for (@extras);
+			}
+			else
+			{
+				$button{extras} = '';
+			}
+
+			$$item{html}	= "<span><a href = '$href' target = '_blank'>$token - $description</a></span><span>.</span>$button{extras}";
 			$$item{text}	= "";
 
 			push @items, $item;
-		}
-		else
-		{
-			$self -> logger -> warn("Undefined token @ $line");
 		}
 
 		if (! $seen{$token})
@@ -220,59 +360,11 @@ sub format_text
 
 			$seen{$token} = true;
 		}
-
-=pod
-
-	my($count) = 0;
-
-	my($entry);
-	my(@pieces);
-	my($text_is_topic, $topic_id);
-
-	for $item (@see_also)
-	{
-		$count++;
-
-		if ($count == 1)
-		{
-			$$topic{id}++;
-
-			push @lines, {href => '', id => $$topic{id}, text => 'See also:'};
-		}
-
-		@pieces			= split(/ - /, $$item{text});
-		$pieces[0]		= $1 if ($pieces[0] =~ $topic_name_re); # Eg: [[XS]].
-		$pieces[1]		= defined($pieces[1]) && (length($pieces[1]) ) ? "$pieces[0] - $pieces[1]" : $pieces[0];
-		$topic_id		= $$pad{topic_names}{$pieces[0]} || 0;
-		$text_is_topic	= ($topic_id > 0) ? true : false;
-
-		if ($$item{text} =~ /^http/) # Eg: https://perldoc.perl.org/ - PerlDoc
-		{
-			$$item{text} = "<a href = '$pieces[0]'>$$item{text}</a>";
-		}
-		elsif ($text_is_topic) # Eg: GeographicStuff or [[HTTPHandling]] or CryptoStuff - re Data::Entropy
-		{
-			$self -> logger -> error("Missing id for topic") if ($topic_id == 0);
-
-			$$item{text}	= "$pieces[0] (topic)";
-			#$$item{text}	= "<a href = '#$topic_id'>pieces[1]</a>";
-			#$$item{text}	= qq|<button onclick="\$('#jstree_div').jstree(true).select_node('$topic_id');">$$item{text}</button>|;
-			#$$item{text}	= qq|<button onclick="\$('#jstree_div').jstree(true).select_node('#$topic_id');">$$item{text}</button>|;
-			#$$item{text}	= qq|<button onclick="\$('#jstree_div').jstree(true).select_node('\#$topic_id');">$$item{text}</button>|;
-		}
-		else # Eg: It's a module.
-		{
-			$$item{text} = "<a href = 'https://metacpan.org/pod/$pieces[0]'>$$item{text}</a>";
-		}
-
-		push @lines, $item;
-=cut
-
 	}
 
 	return [@items];
 
-} # End of format_text.
+} # End of parse_topic.
 
 # --------------------------------------------------
 

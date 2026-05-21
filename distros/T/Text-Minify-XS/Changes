@@ -1,5 +1,15 @@
 Revision history for Text-Minify-XS:
 
+v0.7.9    2026-04-27 14:42:11+01:00 Europe/London
+  [Enhancements]
+  - Improved XS.xs by using appropriate isSPACE variants.
+
+  [Documentation]
+  - Updated contact email address.
+
+  [Tests]
+  - Moved more author tests into xt.
+
 v0.7.8    2026-04-25 17:06:23+01:00 Europe/London
   [Bug Fixes]
   - Fix CVE-2026-7040 handling of malformed UTF-8. (Thanks to Karl Williamson <kwh@cpan.org> for assistance.)

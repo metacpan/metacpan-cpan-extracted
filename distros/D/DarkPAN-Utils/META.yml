@@ -5,7 +5,6 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '6.64'
   File::ShareDir::Install: '0'
-  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::ShareDir::Install: '0'
@@ -23,10 +22,10 @@ no_index:
 provides:
   DarkPAN::Utils:
     file: lib/DarkPAN/Utils.pm
-    version: v1.0.0
+    version: v1.1.0
   DarkPAN::Utils::Docs:
     file: lib/DarkPAN/Utils/Docs.pm
-    version: v1.0.0
+    version: v1.1.0
 requires:
   Archive::Tar: '3.02'
   Class::Accessor::Validated: '0.04'
@@ -43,8 +42,8 @@ requires:
   Text::Markdown::Discount: '0.18'
   perl: '5.010'
 resources:
-  bugtracker: http://github.com/rlauer6/DarkPAN-Utils
-  homepage: http://github.com/rlauer6/DarkPAN-Utils
-  repository: git://github.com/rlauer6/DarkPAN-Utils.git
-version: v1.0.0
+  bugtracker: https://github.com/rlauer6/DarkPAN-Utils/issues
+  homepage: https://github.com/rlauer6/DarkPAN-Utils
+  repository: https://github.com/rlauer6/DarkPAN-Utils
+version: v1.1.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2002-2025 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2002-2026 National Marrow Donor Program. All rights reserved.
 #
 # For a description of this program, please refer to the POD documentation
 # embedded at the bottom of the file (e.g. perldoc ecs_scan_mail).
@@ -97,6 +97,9 @@ eval
 
         last if $interrupted;  # quit now if interrupted
         my $processing_start_time = time();
+        my $processing_cutoff_time = $processing_start_time + $ECS_CFG->T_SCN;
+        my $processing_inbound_cutoff_time = $processing_start_time +
+            ($ECS_CFG->T_INBOUND < $ECS_CFG->T_SCN ? $ECS_CFG->T_INBOUND : $ECS_CFG->T_SCN);
 
         if($reload_config) {
             print "$DEBUG_LABEL reload_config($opt_config)\n"
@@ -107,17 +110,17 @@ eval
         }
 
         # scan mail
-        scan_mail();
+        scan_mail($processing_start_time, $processing_inbound_cutoff_time);
 
         last if $interrupted;  # quit now if interrupted
 
         # scan AMQP "inbox" queue(s)
-        scan_amqp();
+        scan_amqp($processing_start_time, $processing_inbound_cutoff_time);
 
         last if $interrupted;  # quit now if interrupted
 
         # process incoming messages in 'store' folder
-        process_store($processing_start_time);
+        process_store($processing_start_time, $processing_inbound_cutoff_time);
 
         if($ECS_NODE_TBL->lock())
         {
@@ -140,10 +143,10 @@ eval
         # process outbound message files in "maildrop" folder
         my $to_dir = $ECS_CFG->ECS_TO_DIR;
         if ((not defined $to_dir) or ($to_dir eq '' )) {
-           process_maildrop();
+           process_maildrop($processing_start_time, $processing_cutoff_time);
         }
         else {
-           process_to_XX( $processing_start_time );
+           process_to_XX($processing_start_time, $processing_cutoff_time);
         }
 
         last if $interrupted;  # quit now if interrupted
@@ -207,6 +210,15 @@ sub indexAdj {
 # scan email inbox and process messages
 sub scan_mail
 {
+    my $processing_start_time = shift;
+    my $processing_cutoff_time = shift;
+
+    # check whether processing time limit has been exceeded
+    if(time() >= $processing_cutoff_time) {
+        log_info("scan_mail(): skipped due to processing time limit");
+        return;
+    }
+
     my $mbox_err;
     my $loopnum = 0;
     my $msgcount = -1;
@@ -230,6 +242,13 @@ sub scan_mail
                 time, '%04d%02d%02d_%02d%02d%02d');
             for my $msgnum (1..$msgcount) {
                 last if $interrupted;      # exit msgnum loop if int'd
+
+                # check whether processing time limit has been exceeded
+                if(time() >= $processing_cutoff_time) {
+                    log_info("scan_mail(): exiting early due to processing " .
+                        "time limit (mbox msgnum: $msgnum)");
+                    last;
+                }
 
                 # read email message
                 my ($err, $raw_msg) = mbox_get_message(indexAdj($msgnum,$numDelMsg));
@@ -381,13 +400,22 @@ sub scan_mail
 # scan AMQP "inbox" queue(s) and process messages
 sub scan_amqp
 {
+    my $processing_start_time = shift;
+    my $processing_cutoff_time = shift;
+
     if(not is_yes($ECS_CFG->ENABLE_AMQP)) {
         print "$DEBUG_LABEL skipping AMQP scan (ENABLE_AMQP = " . $ECS_CFG->ENABLE_AMQP . ")\n"
             if $ECS_CFG->{ECS_DEBUG} > 0;
         return;
     }
 
-    # construct AMQP download command (minus queue name)
+    # check whether processing time limit has been exceeded
+    if(time() >= $processing_cutoff_time) {
+        log_info("scan_amqp(): skipped due to processing time limit");
+        return;
+    }
+
+    # construct AMQP download command (minus queue name, timelimit, suffix)
     # to mboxes/in_amqp_tmp, mboxes/in_amqp, and optionally in_bck
     my $cmd = sprintf('%s --debug %s --timeout %s --broker %s --outputdir %s --outputdir %s',
                       $ECS_CFG->AMQP_CMD_RECV,
@@ -416,8 +444,17 @@ sub scan_amqp
     $ENV{ECS_AMQP_SSLPASS} = $ECS_CFG->AMQP_SSLPASS
         if $ECS_CFG->AMQP_SSLPASS;
 
+    # check whether processing time limit has been exceeded
+    my $timelimit = $processing_cutoff_time - time();
+    if($timelimit < 0) {
+        log_info("scan_amqp(): exiting early due to processing time limit " .
+            "(before AMQP META download)");
+        return;
+    }
+
     # download from meta message queue
-    my $cmd_meta = $cmd . sprintf(' --address %s', $ECS_CFG->AMQP_ADDR_META);
+    my $cmd_meta = $cmd . sprintf(' --address %s --timelimit %d',
+        $ECS_CFG->AMQP_ADDR_META, $timelimit);
     print "$DEBUG_LABEL AMQP META download command: $cmd_meta\n"
         if $ECS_CFG->ECS_DEBUG > 0;
     $err = timelimit_cmd($ECS_CFG->AMQP_RECV_TIMELIMIT, $cmd_meta);
@@ -426,8 +463,17 @@ sub scan_amqp
             "meta message queue " . $ECS_CFG->AMQP_ADDR_META . ": $err");
     }
 
+    # check whether processing time limit has been exceeded
+    $timelimit = $processing_cutoff_time - time();
+    if($timelimit < 0) {
+        log_info("scan_amqp(): exiting early due to processing time limit " .
+            "(before AMQP MSG download)");
+        return;
+    }
+
     # download from regular message queue
-    my $cmd_msg = $cmd . sprintf(' --address %s', $ECS_CFG->AMQP_ADDR_MSG);
+    my $cmd_msg = $cmd . sprintf(' --address %s --timelimit %d',
+        $ECS_CFG->AMQP_ADDR_MSG, $timelimit);
     print "$DEBUG_LABEL AMQP MSG download command: $cmd_msg\n"
         if $ECS_CFG->ECS_DEBUG > 0;
     $err = timelimit_cmd($ECS_CFG->AMQP_RECV_TIMELIMIT, $cmd_msg);
@@ -436,10 +482,18 @@ sub scan_amqp
             "regular message queue " . $ECS_CFG->AMQP_ADDR_MSG . ": $err");
     }
 
+    # check whether processing time limit has been exceeded
+    $timelimit = $processing_cutoff_time - time();
+    if($timelimit < 0) {
+        log_info("scan_amqp(): exiting early due to processing time limit " .
+            "(before AMQP DOC download)");
+        return;
+    }
+
     # download from document queue
     # use .amqp.doc suffix for messages downloaded from document queue
-    my $cmd_doc = $cmd . sprintf(' --address %s --suffix .amqp.doc',
-        $ECS_CFG->AMQP_ADDR_DOC);
+    my $cmd_doc = $cmd . sprintf(' --address %s --suffix .amqp.doc --timelimit %d',
+        $ECS_CFG->AMQP_ADDR_DOC, $timelimit);
     print "$DEBUG_LABEL AMQP DOC download command: $cmd_doc\n"
         if $ECS_CFG->ECS_DEBUG > 0;
     $err = timelimit_cmd($ECS_CFG->AMQP_RECV_TIMELIMIT, $cmd_doc);
@@ -449,13 +503,22 @@ sub scan_amqp
     }
 
     # process downloaded files
-    process_amqp_staging()
+    process_amqp_staging($processing_start_time, $processing_cutoff_time)
 }
 
 # ----------------------------------------------------------------------
 # Process inbound message files in AMQP staging folder
 sub process_amqp_staging
 {
+    my $processing_start_time = shift;
+    my $processing_cutoff_time = shift;
+
+    # check whether processing time limit has been exceeded
+    if(time() >= $processing_cutoff_time) {
+        log_info("process_amqp_staging(): skipped due to processing time limit");
+        return;
+    }
+
     print "$DEBUG_LABEL process_amqp_staging()\n"
         if $ECS_CFG->{ECS_DEBUG} > 0;
 
@@ -477,6 +540,14 @@ sub process_amqp_staging
     for $file (@filelist)
     {
         last if $interrupted;
+
+        # check whether processing time limit has been exceeded
+        if(time() >= $processing_cutoff_time) {
+            log_info("process_amqp_staging(): exiting early due to " .
+                "processing time limit (file: $file)");
+            last;
+        }
+
         next if($file eq '.') or ($file eq '..');
         my $filename = catfile($ECS_CFG->ECS_MBX_AMQP_STAGING_DIR, $file);
         next unless -f $filename;
@@ -568,6 +639,15 @@ sub process_amqp_staging
 # Process outgoing messages in "maildrop" folder
 sub process_maildrop
 {
+    my $processing_start_time = shift;
+    my $processing_cutoff_time = shift;
+
+    # check whether processing time limit has been exceeded
+    if(time() >= $processing_cutoff_time) {
+        log_info("process_maildrop(): skipped due to processing time limit");
+        return;
+    }
+
     print "$DEBUG_LABEL process_maildrop()\n"
         if $ECS_CFG->{ECS_DEBUG} > 0;
 
@@ -594,6 +674,14 @@ sub process_maildrop
     for $file (@filelist)
     {
         last if $interrupted;
+
+        # check whether processing time limit has been exceeded
+        if(time() >= $processing_cutoff_time) {
+            log_info("process_amqp_staging(): exiting early due to " .
+                "processing time limit (file: $file)");
+            last;
+        }
+
         next if($file eq '.') or ($file eq '..');
         my $filename = catfile($ECS_CFG->ECS_DRP_DIR, $file);
         next unless -f $filename;
@@ -664,7 +752,14 @@ sub process_maildrop
 sub process_to_XX
 {
     my $processing_start_time = shift;
-    my $processing_end_time = $processing_start_time + $ECS_CFG->T_SCN;
+    my $processing_cutoff_time = shift;
+
+    # check whether processing time limit has been exceeded
+    if(time() >= $processing_cutoff_time) {
+        log_info("process_to_XX(): skipped due to processing time limit");
+        return;
+    }
+
     my $to_dir = $ECS_CFG->ECS_TO_DIR;
     print "$DEBUG_LABEL process_to_XX() --> to_XX directories\n"
         if $ECS_CFG->{ECS_DEBUG} > 0;
@@ -727,6 +822,13 @@ sub process_to_XX
           {
              last if $interrupted;
 
+             # check whether processing time limit has been exceeded
+             if(time() >= $processing_cutoff_time) {
+                log_info("process_to_XX(): exiting early due to processing " .
+                    "time limit (\"to_$node_id\" file: $filename)");
+                last;
+             }
+
              print "$DEBUG_LABEL processing \"to_$node_id\" file: $filename\n"
                 if $ECS_CFG->{ECS_DEBUG} > 0;
 
@@ -772,7 +874,13 @@ sub compare_seq_part
 sub process_store
 {
     my $processing_start_time = shift;
-    my $processing_end_time = $processing_start_time + $ECS_CFG->T_SCN;
+    my $processing_cutoff_time = shift;
+
+    # check whether processing time limit has been exceeded
+    if(time() >= $processing_cutoff_time) {
+        log_info("process_store(): skipped due to processing time limit");
+        return;
+    }
 
     my @nodelist = ();
     my $nodes = {};
@@ -806,6 +914,13 @@ sub process_store
     NODE:
     for my $node_id (@nodelist)
     {
+        # check whether processing time limit has been exceeded
+        if(time() >= $processing_cutoff_time) {
+            log_info("process_store(): exiting early due to processing " .
+                "time limit (node: $node_id)");
+            last NODE;
+        }
+
         # retrieve node status from node_tbl
         my $was_locked = $ECS_NODE_TBL->LOCK;
         if(not $was_locked)
@@ -952,10 +1067,16 @@ sub process_store
             }
             unlink $filename;
 
-            last NODE_DOC_MSG_PART if $processing_end_time < time();
+            last NODE_DOC_MSG_PART if $processing_cutoff_time <= time();
             last NODE if $interrupted;
         }
-        last NODE if $processing_end_time < time();
+
+        # check whether processing time limit has been exceeded
+        if(time() >= $processing_cutoff_time) {
+            log_info("process_store(): exiting early due to processing " .
+                "time limit (after $node_id doc)");
+            last NODE;
+        }
 
         # process message files in sequential order by seq_num
         my $msgpart = $nodes->{$node_id}->{msgpart};
@@ -1148,10 +1269,16 @@ sub process_store
                 unlink $mpfn;
             }
 
-            last NODE_MSG_PART if $processing_end_time < time();
+            last NODE_MSG_PART if $processing_cutoff_time <= time();
             last NODE if $interrupted;
         }
-        last NODE if $processing_end_time < time();
+
+        # check whether processing time limit has been exceeded
+        if(time() >= $processing_cutoff_time) {
+            log_info("process_store(): exiting early due to processing " .
+                "time limit (after $node_id msg)");
+            last NODE;
+        }
     }
 
     @nodelist = ();
@@ -1208,8 +1335,10 @@ sub update_statistics
                 }
                 else
                 {
-                    $nodes->{$node_id}->{in_seq} = $node->{in_seq};
-                    $nodes->{$node_id}->{doc_in_seq} = $node->{doc_in_seq};
+                    $nodes->{$node_id}->{in_seq} = (exists $node->{in_seq} ?
+                        $node->{in_seq} : 0);
+                    $nodes->{$node_id}->{doc_in_seq} = (exists $node->{doc_in_seq} ?
+                        $node->{doc_in_seq} : 0);
                 }
             }
         }

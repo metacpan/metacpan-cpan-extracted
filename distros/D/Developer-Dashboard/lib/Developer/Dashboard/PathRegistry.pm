@@ -3,7 +3,7 @@ package Developer::Dashboard::PathRegistry;
 use strict;
 use warnings;
 
-our $VERSION = '3.14';
+our $VERSION = '3.90';
 
 use Digest::MD5 qw(md5_hex);
 use Cwd qw(abs_path cwd);
@@ -24,6 +24,8 @@ sub new {
     my $self = bless {
         home            => $home,
         app_name        => $args{app_name} || 'developer-dashboard',
+        cwd             => $args{cwd},
+        memo            => {},
         workspace_roots => $args{workspace_roots} || [],
         project_roots   => $args{project_roots} || [],
         named_paths     => $args{named_paths} || {},
@@ -151,15 +153,22 @@ sub runtime_roots {
 # Output: ordered list of runtime root directory path strings from home to deepest layer.
 sub runtime_layers {
     my ($self) = @_;
-    my @roots;
-    my %seen;
-    for my $root ( $self->_runtime_layers_from_env, $self->home_runtime_root, $self->_ancestor_runtime_layers ) {
-        next if !defined $root || $root eq '';
-        my $identity = $self->_path_identity($root);
-        next if $seen{$identity}++;
-        push @roots, $root;
-    }
-    return @roots;
+    my $cwd = $self->current_working_directory;
+    my $cache_key = 'runtime_layers:' . $self->_path_identity( defined $cwd ? $cwd : '' );
+    return @{ $self->_memoize(
+            $cache_key => sub {
+                my @roots;
+                my %seen;
+                for my $root ( $self->_runtime_layers_from_env, $self->home_runtime_root, $self->_ancestor_runtime_layers ) {
+                    next if !defined $root || $root eq '';
+                    my $identity = $self->_path_identity($root);
+                    next if $seen{$identity}++;
+                    push @roots, $root;
+                }
+                return \@roots;
+            }
+        )
+    };
 }
 
 # state_root()
@@ -678,7 +687,20 @@ sub runtime_local_lib_roots {
 # Output: directory path string or undef.
 sub current_project_root {
     my ($self) = @_;
-    return $self->project_root_for( cwd() );
+    my $cwd = $self->current_working_directory;
+    my $cache_key = 'current_project_root:' . $self->_path_identity( defined $cwd ? $cwd : '' );
+    return $self->_memoize( $cache_key => sub { $self->project_root_for($cwd) } );
+}
+
+# current_working_directory()
+# Returns the invocation-scoped current working directory used for path and
+# runtime-layer derivation.
+# Input: none.
+# Output: directory path string or undef when cwd is unavailable.
+sub current_working_directory {
+    my ($self) = @_;
+    return $self->{cwd} if defined $self->{cwd} && $self->{cwd} ne '';
+    return eval { cwd() };
 }
 
 # project_root_for($start_dir)
@@ -688,7 +710,8 @@ sub current_project_root {
 sub project_root_for {
     my ( $self, $start_dir ) = @_;
 
-    my $dir = $start_dir || cwd();
+    my $dir = defined $start_dir && $start_dir ne '' ? $start_dir : $self->current_working_directory;
+    return if !defined $dir || $dir eq '';
 
     while ($dir) {
         return $dir if -d File::Spec->catdir( $dir, '.git' );
@@ -1034,7 +1057,7 @@ sub _expand_home {
 # child layer to the deepest current layer.
 sub _ancestor_runtime_layers {
     my ($self) = @_;
-    my $cwd = eval { cwd() };
+    my $cwd = $self->current_working_directory;
     return () if !defined $cwd || $cwd eq '';
     my $home = $self->home;
     my $home_runtime = $self->home_runtime_path;
@@ -1149,6 +1172,20 @@ sub _runtime_layers_from_env {
     my $raw = $ENV{DEVELOPER_DASHBOARD_RUNTIME_LAYERS} || '';
     return () if $raw eq '';
     return grep { defined $_ && $_ ne '' } split /\n/, $raw;
+}
+
+# _memoize($key, $builder)
+# Caches one derived path or layer value for the lifetime of the current
+# registry object so repeated helper calls do not recompute cwd-driven state.
+# Input: cache key string and builder code reference.
+# Output: cached scalar or reference value.
+sub _memoize {
+    my ( $self, $key, $builder ) = @_;
+    die "Missing memoization key\n" if !defined $key || $key eq '';
+    die "Missing memoization builder\n" if ref($builder) ne 'CODE';
+    return $self->{memo}{$key} if exists $self->{memo}{$key};
+    $self->{memo}{$key} = $builder->();
+    return $self->{memo}{$key};
 }
 
 1;

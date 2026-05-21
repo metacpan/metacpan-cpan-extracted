@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name                        : DBD-Pg
-version                     : 3.20.0
+version                     : 3.20.2
 abstract                    : DBI PostgreSQL interface
 author:              
   - Greg Sabino Mullane <greg@turnstep.com>
@@ -21,7 +21,7 @@ build_requires:
   version                   : 0
 configure_requires:
   DBI                       : 1.614
-  ExtUtils::MakeMaker       : 7.64
+  ExtUtils::MakeMaker       : 6.58
   version                   : 0
 recommends:
   Cwd                       : 0
@@ -31,10 +31,10 @@ recommends:
 provides:
   DBD::Pg:
     file                    : Pg.pm
-    version                 : 3.20.0
+    version                 : 3.20.2
   Bundle::DBD::Pg:
     file                    : lib/Bundle/DBD/Pg.pm
-    version                 : 3.20.0
+    version                 : 3.20.2
 
 keywords:
   - Postgres

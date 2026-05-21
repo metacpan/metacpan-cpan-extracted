@@ -1,0 +1,333 @@
+=pod
+
+=head1 PORTING NOTES
+
+This document describes the porting of Borland Turbo Vision to Perl.
+It focuses on implementation status, class mapping and technical
+considerations arising from differences between C++ and Perl.
+
+This document is primarily intended for maintainers and contributors.
+
+The TUI framework is based on the original Turbo Vision 2.0 C++ sources.
+The goal of the port is conceptual compatibility rather than a
+mechanical translation of code.
+
+Turbo Vision classes are mapped to Perl modules in a mostly one-to-one
+fashion.
+
+This port is based on the original codebase of Borland C++ 4.02
+(Turbo Vision 2.0 sources including bug fixes by Eric Woodruff: 
+L<tv2fixed.zip|http://www.sigala.it/sergio/tvision/source/tv2fixed.zip>).
+In addition, assembler routines that have been ported to C++ come from 
+I<magiblot>'s implementation I<"A modern port of Turbo Vision 2.0.">.
+
+=head2 Class Implementation Status
+
+The following table provides an overview of the implementation status
+of major Turbo Vision classes in the Perl port. The status reflects
+practical usability rather than theoretical completeness.
+
+ Status legend:
+  [x] Implemented
+  [o] Partially implemented
+  [ ] Not implemented
+
+The status table is intended as a practical guide rather than a strict
+feature checklist.
+
+The meanings of the status indicators are as follows:
+
+=over 4
+
+=item [x] Implemented
+
+The class is usable for typical applications. Core functionality is
+present and stable. Some optional or rarely used features may still be
+missing, but the class can be relied upon in normal use.
+
+=item [o] Partially implemented
+
+The class exists and provides limited functionality. Common use cases
+may work, but parts of the API, platform-specific behavior or advanced
+features are missing or incomplete. Use with care.
+
+=item [ ] Not implemented
+
+The class does not exist in the Perl port. References to this class are
+documented for transparency and orientation only. No compatibility is
+provided.
+
+=back
+
+The table focuses on practical relevance. A class marked as implemented
+does not imply full parity with the original C++ version in every
+detail.
+
+=head3 Core Primitives
+
+ Class              Perl Module                  Status
+ ------------------ ---------------------------- ------
+ TObject            TUI::Objects::Object         [x]
+ TPoint             TUI::Objects::Point          [x]
+ TRect              TUI::Objects::Rect           [x]
+ TDrawBuffer        TUI::Views::DrawBuffer       [x]
+ TPalette           TUI::Views::Palette          [x]
+ TCommandSet        TUI::Views::CommandSet       [x]
+
+=head3 Event System
+
+ Class              Perl Module                  Status
+ ------------------ ---------------------------- ------
+ TEvent             TUI::Drivers::Event          [x]
+ KeyDownEvent       TUI::Drivers::Event          [x]
+ MouseEvent         TUI::Drivers::Event          [x]
+ MessageEvent       TUI::Drivers::Event          [x]
+ TEventQueue        TUI::Drivers::EventQueue     [x]
+
+=head3 Driver Layer
+
+ Class              Perl Module                  Status
+ ------------------ ---------------------------- ------
+ THWMouse           TUI::Drivers::HWMouse        [o]
+ TMouse             TUI::Drivers::Mouse          [x]
+ TSystemError       TUI::Drivers::SystemError    [o]
+ TScreen            TUI::Drivers::Screen         [o]
+ TDisplay           TUI::Drivers::Display        [o]
+ THardwareInfo      TUI::Drivers::HardwareInfo   [o]
+
+Win32 Console Driver, implemented in C<TUI::Drivers::HardwareInfo::Win32>.
+
+=head3 View Hierarchy
+
+ Class              Perl Module                  Status
+ ------------------ ---------------------------- ------
+ TView              TUI::Views::View             [x]
+ TGroup             TUI::Views::Group            [x]
+ TFrame             TUI::Views::Frame            [x]
+ TScrollBar         TUI::Views::ScrollBar        [x]
+ TScroller          TUI::Views::Scroller         [x]
+ TListViewer        TUI::Views::ListViewer       [x]
+
+=head3 Application Framework
+
+ Class              Perl Module                  Status
+ ------------------ ---------------------------- ------
+ TBackground        TUI::App::Background         [x]
+ TDeskInit          TUI::App::DeskInit           [x]
+ TDeskTop           TUI::App::DeskTop            [x]
+ TProgInit          TUI::App::ProgInit           [x]
+ TProgram           TUI::App::Program            [x]
+ TApplication       TUI::App::Application        [x]
+ TWindowInit        TUI::Views::WindowInit       [x]
+ TWindow            TUI::Views::Window           [x]
+ TDialog            TUI::Dialogs::Dialog         [x]
+
+
+=head3 Dialog Controls
+
+Buttons and Clusters
+
+ Class              Perl Module                   Status
+ ------------------ ----------------------------- ------
+ TButton            TUI::Dialogs::Button          [x]
+ TSItem             TUI::Dialogs::StrItem         [x]
+ TCluster           TUI::Dialogs::Cluster         [x]
+ TRadioButtons      TUI::Dialogs::RadioButtons    [x]
+ TCheckBoxes        TUI::Dialogs::CheckBoxes      [x]
+ TMultiCheckBoxes   TUI::Dialogs::MultiCheckBoxes [x]
+
+Input and Text
+
+ Class              Perl Module                  Status
+ ------------------ ---------------------------- ------
+ TInputLine         TUI::Dialogs::InputLine      [x]
+ TStaticText        TUI::Dialogs::StaticText     [x]
+ TParamText         TUI::Dialogs::ParamText      [x]
+ TLabel             TUI::Dialogs::Label          [x]
+
+Lists and History
+
+ Class              Perl Module                           Status
+ ------------------ ------------------------------------- ------
+ TListBox           TUI::Dialogs::ListBox                 [x]
+ TListBoxRec        TUI::Dialogs::ListBox                 [x]
+ TSortedListBox     TUI::StdDlg::SortedListBox            [x]
+ HistRec            TUI::Dialogs::HistoryViewer::HistList [x]
+ THistoryViewer     TUI::Dialogs::HistoryViewer           [x]
+ THistInit          TUI::Dialogs::HistInit                [x]
+ THistoryWindow     TUI::Dialogs::HistoryWindow           [x]
+ THistory           TUI::Dialogs::History                 [x]
+
+=head3 Standard Dialogs
+
+ Class              Perl Module                  Status
+ ------------------ ---------------------------- ------
+ ffblk/find_t       TUI::StdDlg::Dos             [x]
+ FindFirstRec       TUI::StdDlg::FindFirstRec    [o]
+ TSearchRec         TUI::StdDlg::FileCollection  [x]
+ TFileCollection    TUI::StdDlg::FileCollection  [x]
+ TFileInputLine     TUI::StdDlg::FileInputLine   [x]
+ TFileList          TUI::StdDlg::FileList        [x]
+ TFileInfoPane      TUI::StdDlg::FileInfoPane    [x]
+ TFileDialog        TUI::StdDlg::FileDialog      [x]
+ TDirEntry          TUI::StdDlg::DirEntry        [x]
+ TDirCollection     TUI::StdDlg::DirCollection   [x]
+ TDirListBox        TUI::StdDlg::DirListBox      [x]
+ TChDirDialog       TUI::StdDlg::ChDirDialog     [x]
+
+Win32 FindFirstRec class, implemented in C<TUI::Drivers::FindFirstRec::Win32>.
+
+=head3 Menu System
+
+ Class              Perl Module                  Status
+ ------------------ ---------------------------- ------
+ TMenuItem          TUI::Menus::MenuItem         [x]
+ TMenu              TUI::Menus::Menu             [x]
+ TMenuView          TUI::Menus::MenuView         [x]
+ TMenuBar           TUI::Menus::MenuBar          [x]
+ TMenuBox           TUI::Menus::MenuBox          [x]
+ TMenuPopup         (missing)                    [ ]
+ TSubMenu           TUI::Menus::SubMenu          [x]
+ TStatusLine        TUI::Menus::StatusLine       [x]
+ TStatusItem        TUI::Menus::StatusItem       [x]
+ TStatusDef         TUI::Menus::StatusDef        [x]
+
+=head3 Message Box System
+
+ Class              Perl Module                  Status
+ ------------------ ---------------------------- ------
+ messageBox()       TUI::MsgBox::MsgBoxText      [x]
+ messageBoxRect()   TUI::MsgBox::MsgBoxText      [x]
+ inputBox()         TUI::MsgBox::MsgBoxText      [x]
+ inputBoxRect()     TUI::MsgBox::MsgBoxText      [x]
+
+=head3 Validator System
+
+ Class                   Perl Module                  Status
+ ----------------------- ---------------------------- ------
+ TValidator              (missing)                    [ ]
+ TFilterValidator        (missing)                    [ ]
+ TRangeValidator         (missing)                    [ ]
+ TLookupValidator        (missing)                    [ ]
+ TStringLookupValidator  (missing)                    [ ]
+ TPXPictureValidator     (missing)                    [ ]
+
+=head3 Collections Framework
+
+ Class                Perl Module                       Status
+ -------------------- --------------------------------- ------
+ TNSCollection        TUI::Objects::NSCollection        [x]
+ TNSSortedCollection  TUI::Objects::NSSortedCollection  [x]
+ TCollection          TUI::Objects::Collection          [x]
+ TSortedCollection    TUI::Objects::SortedCollection    [x]
+ TStringCollection    TUI::Objects::StringCollection    [x]
+ TStringList          (missing)                         [ ]
+ TStrListMaker        (missing)                         [ ]
+ TResourceCollection  (missing)                         [ ]
+ TResourceFile        (missing)                         [ ]
+
+=head3 Editors and Text Devices
+
+ Class              Perl Module                  Status
+ ------------------ ---------------------------- ------
+ TEditor            (missing)                    [ ]
+ TMemo              (missing)                    [ ]
+ TFileEditor        (missing)                    [ ]
+ TEditWindow        (missing)                    [ ]
+ TIndicator         (missing)                    [ ]
+ TTextDevice        TUI::TextView::TextDevice    [x]
+ TTerminal          TUI::TextView::Terminal      [x]
+
+=head3 Gadgets
+
+ Class              Perl Module                  Status
+ ------------------ ---------------------------- ------
+ TCalcDisplay       (missing)                    [ ]
+ TCalendarView      (missing)                    [ ]
+ TClickTester       (missing)                    [ ]
+ TClockView         TUI::Gadgets::ClockView      [x]
+ TEventViewer       TUI::Gadgets::EventViewer    [x]
+ THeapView          TUI::Gadgets::HeapView       [o]
+ TLineCollection    (missing)                    [ ]
+ TPuzzleView        (missing)                    [ ]
+
+Win32 THeapView, implemented in C<TUI::Gadgets::HeapView::Win32>.
+
+=head2 Memory Management and Resource Handling
+
+Languages with automatic garbage collection (like Perl) have complementary 
+problems compared to languages without garbage collection (like C/C++). For 
+every issue, there is a bug characteristic of non-GC languages and a bug 
+characteristic of GC languages, along with programmer responsibilities in both 
+types.
+
+Perl programmers might think they are relieved from freeing objects, but objects
+hold other resources besides memory that often need to be released 
+appropriately. Where a C++ programmer might have a dangling reference (often 
+not a bug due to some flag or state marking it as not to be used), a Perl 
+programmer has a memory leak. Thus, the C++ programmer is responsible for 
+ensuring C<free/delete> is called appropriately, while the Perl programmer must 
+ensure unwanted references are nulled or otherwise disposed of properly.
+
+Perl 5 supports weak references so that programmers can deliberately avoid 
+creating reference cycles. If data structures contain reference cycles, these 
+are only reclaimed by the Perl runtime when the parent thread is switched off. 
+This is seen as a welcome compromise, as opposed to implementing overhead cycle 
+detection, which would slow down execution time.
+
+It is claimed that a few calls to C<weaken> or using 
+L<Proxy Objects|https://www.perl.com/pub/2002/08/07/proxyobject.html/> can 
+handle this. This might be true, but Turbo Vision sources use many dangling 
+references in various tree structures or collections. To break all these cycles 
+and ensure timely disposal of garbage memory, the Perl implementation must have 
+an intelligent scheme.
+
+Turbo Vision C++ code relies heavily on the convention of resource allocation 
+and ensures reliable and timely destructor calls. This is not possible in Perl, 
+which works with cycles. This poses some challenges during implementation. If 
+you interrupt a garbage cycle, you can't know which destructor to call first 
+without causing dependency problems - it might even be impossible, since there 
+are more cyclic dependencies than just memory references. All other resources 
+have to be cleaned up manually, like in Pascal or C++, without the advantages 
+of Perl.
+
+When porting C++ code to Perl, one common pitfall is accidentally replacing an 
+object reference instead of copying data into the existing object. In C++, 
+passing by reference ensures that assignments modify the caller's object, while 
+in Perl the same assignment simply rebinds a local scalar and discards the 
+caller's reference. This difference can silently break control flow, especially 
+in event-driven systems where modified objects must propagate back to the 
+caller.
+
+=head2 Debug Helpers
+
+C<NoteSV> and C<CheckSV> are two functions from the L<Devel::Leak> module that 
+can be used to track memory leaks in Perl applications. They work together to 
+identify and report on memory that has been allocated but not properly released.
+
+    my $count = Devel::Leak::NoteSV($handle);
+    my $count = Devel::Leak::CheckSV($handle);
+
+C<NoteSV> searches the Perl-internal table of assigned scalar values (which 
+also contains arrays and hashes), and records their addresses in a table. It 
+returns a count of these I<things> and stores a reference to the table in its 
+argument.
+
+C<CheckSV> is passed an argument containing a reference to a table created by 
+C<NoteSV>. It runs through the Perl internals again and calls C<sv_dump()> for 
+all I<things> that were not yet present when C<NoteSV> was called. It returns 
+the  number of I<things> now assigned. 
+
+This is particularly useful if you want to check your application for memory 
+leaks, as shown in this example code from L<Devel::Leak>:
+
+  use Devel::Leak;
+  ... setup code
+  my $count = Devel::Leak::NoteSV($handle);
+  ... code that may leak
+  Devel::Leak::CheckSV($handle);
+
+B<Note>: This small Perl utility module is to be used as a replacement for the 
+Turbo Vision Pascal implementation of I<SetMemTop>.
+
+=cut

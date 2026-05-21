@@ -19,12 +19,17 @@ jobs:
       - uses: shogo82148/actions-setup-perl@v1
         with:
           perl-version: ${{ matrix.perl }}
+      - name: Install system deps
+        run: sudo apt-get update && sudo apt-get install -y socat
       - name: Install nats-server
         run: |
           curl -fsSL https://github.com/nats-io/nats-server/releases/download/v2.10.24/nats-server-v2.10.24-linux-amd64.tar.gz | tar xz
           sudo mv nats-server-v2.10.24-linux-amd64/nats-server /usr/local/bin/
       - name: Start nats-server
-        run: nats-server -p 14222 -a 127.0.0.1 --pid /tmp/nats.pid &
+        run: |
+          nats-server -p 14222 -a 127.0.0.1 --pid /tmp/nats.pid &
+          for i in 1 2 3 4 5; do nc -z 127.0.0.1 14222 && exit 0; sleep 1; done
+          echo "nats-server did not start" && exit 1
       - name: Install deps
         run: cpanm -n EV
       - name: Build
@@ -44,10 +49,13 @@ jobs:
       - uses: shogo82148/actions-setup-perl@v1
         with:
           perl-version: ${{ matrix.perl }}
-      - name: Install nats-server
-        run: brew install nats-server
+      - name: Install system deps
+        run: brew install nats-server socat
       - name: Start nats-server
-        run: nats-server -p 14222 -a 127.0.0.1 --pid /tmp/nats.pid &
+        run: |
+          nats-server -p 14222 -a 127.0.0.1 --pid /tmp/nats.pid &
+          for i in 1 2 3 4 5; do nc -z 127.0.0.1 14222 && exit 0; sleep 1; done
+          echo "nats-server did not start" && exit 1
       - name: Install deps
         run: cpanm -n EV
       - name: Build
@@ -64,9 +72,114 @@ jobs:
         with:
           usesh: true
           prepare: |
-            pkg install -y perl5 p5-EV nats-server gmake
+            pkg install -y perl5 p5-EV nats-server gmake socat
           run: |
             nats-server -p 14222 -a 127.0.0.1 --pid /tmp/nats.pid &
             sleep 1
             perl Makefile.PL && gmake
             TEST_NATS_HOST=127.0.0.1 TEST_NATS_PORT=14222 gmake test
+
+  tls:
+    runs-on: ubuntu-latest
+    name: Linux / TLS + NKey
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.40'
+      - name: Install nats-server
+        run: |
+          curl -fsSL https://github.com/nats-io/nats-server/releases/download/v2.10.24/nats-server-v2.10.24-linux-amd64.tar.gz | tar xz
+          sudo mv nats-server-v2.10.24-linux-amd64/nats-server /usr/local/bin/
+      - name: Generate self-signed cert
+        run: |
+          openssl req -x509 -newkey rsa:2048 -nodes -days 1 \
+            -subj "/CN=localhost" \
+            -addext "subjectAltName=DNS:localhost,IP:127.0.0.1" \
+            -keyout /tmp/server.key -out /tmp/server.pem
+          cat > /tmp/nats-tls.conf <<EOF
+          port: 14222
+          host: 127.0.0.1
+          tls {
+            cert_file: "/tmp/server.pem"
+            key_file:  "/tmp/server.key"
+          }
+          EOF
+      - name: Start nats-server (TLS)
+        run: |
+          nats-server -c /tmp/nats-tls.conf --pid /tmp/nats.pid &
+          for i in 1 2 3 4 5; do nc -z 127.0.0.1 14222 && exit 0; sleep 1; done
+          echo "nats-server did not start" && exit 1
+      - name: Install deps
+        run: cpanm -n EV
+      - name: Build
+        run: perl Makefile.PL && make
+      - name: Test (TLS-only suite)
+        run: |
+          NATS_TLS=1 NATS_CA_FILE=/tmp/server.pem \
+          TEST_NATS_HOST=127.0.0.1 TEST_NATS_PORT=14222 \
+          prove -bv xt/10_tls.t
+
+  jetstream:
+    runs-on: ubuntu-latest
+    name: Linux / JetStream + KV + ObjectStore
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.40'
+      - name: Install nats-server
+        run: |
+          curl -fsSL https://github.com/nats-io/nats-server/releases/download/v2.10.24/nats-server-v2.10.24-linux-amd64.tar.gz | tar xz
+          sudo mv nats-server-v2.10.24-linux-amd64/nats-server /usr/local/bin/
+      - name: Start nats-server (JetStream)
+        run: |
+          nats-server -p 14222 -a 127.0.0.1 --jetstream --store_dir /tmp/nats-js --pid /tmp/nats.pid &
+          for i in 1 2 3 4 5; do nc -z 127.0.0.1 14222 && exit 0; sleep 1; done
+          echo "nats-server did not start" && exit 1
+      - name: Install deps
+        run: cpanm -n EV
+      - name: Build
+        run: perl Makefile.PL && make
+      - name: Test (JetStream + KV + watch + ack-flow suite)
+        run: |
+          TEST_NATS_HOST=127.0.0.1 TEST_NATS_PORT=14222 \
+          prove -bv xt/11_jetstream.t xt/12_kv.t xt/13_object_store.t \
+                    xt/16_kv_watch.t xt/18_js_ack_flow.t
+
+  integration:
+    runs-on: ubuntu-latest
+    name: Linux / lame-duck + NKey + flush-disconnect
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.40'
+      - name: Install nats-server
+        run: |
+          curl -fsSL https://github.com/nats-io/nats-server/releases/download/v2.10.24/nats-server-v2.10.24-linux-amd64.tar.gz | tar xz
+          sudo mv nats-server-v2.10.24-linux-amd64/nats-server /usr/local/bin/
+      - name: Install deps
+        run: cpanm -n EV
+      - name: Build
+        run: perl Makefile.PL && make
+      - name: Test (per-test nats-server lifecycle)
+        run: |
+          # These tests fork their own nats-server with custom configs;
+          # they do NOT use TEST_NATS_HOST/TEST_NATS_PORT.
+          prove -bv xt/14_lame_duck.t xt/15_nkey_auth.t xt/17_flush_disconnect.t
+
+  release_pod:
+    runs-on: ubuntu-latest
+    name: Linux / release POD
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.40'
+      - name: Install deps
+        run: cpanm -n EV Test::Pod Test::Pod::Coverage
+      - name: Build
+        run: perl Makefile.PL && make
+      - name: Test (release POD)
+        run: RELEASE_TESTING=1 prove -bv xt/release_pod.t

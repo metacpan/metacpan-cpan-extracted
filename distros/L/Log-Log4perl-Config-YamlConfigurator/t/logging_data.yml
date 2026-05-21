@@ -13,7 +13,7 @@ appender:
     layout: Log::Log4perl::Layout::SimpleLayout
   FILE: 
     name: Log::Log4perl::Appender::File
-    filename: file.log
+    filename: ${filename}
     mode: append
     create_at_logtime: 1
     layout:

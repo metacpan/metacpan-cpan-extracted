@@ -15,7 +15,7 @@ HV *member_to_hv(pTHX_ Etcdserverpb__Member *member) {
     if (!member) return NULL;
 
     HV *hv = newHV();
-    hv_store(hv, "id", 2, newSVuv(member->id), 0);
+    hv_store(hv, "id", 2, newSVu64(member->id), 0);
     if (member->name) {
         hv_store(hv, "name", 4, newSVpv(member->name, 0), 0);
     }

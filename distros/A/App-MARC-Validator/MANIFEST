@@ -1,6 +1,7 @@
 bin/marc-validator
 Changes
 CONCEPT
+examples/obj_to_json.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm
@@ -25,6 +26,7 @@ t/App-MARC-Validator/01-use.t
 t/App-MARC-Validator/02-version.t
 t/App-MARC-Validator/03-new.t
 t/App-MARC-Validator/04-run.t
+t/data/cnb003755915.xml
 Validator.pm
 Validator/Utils.pm
 xt/App-MARC-Validator-Utils/01-pod_coverage.t

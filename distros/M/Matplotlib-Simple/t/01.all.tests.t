@@ -213,7 +213,7 @@ dies_ok {
 		'output.file' => '/tmp/dies_ok.svg',
 	});
 } '"plt" dies when given a non-File::Temp object';
-foreach my $numeric_arg ('cbpad', 'ncols', 'nrows', 'scale', 'scalex', 'scaley') {
+foreach my $numeric_arg ('cbpad', 'ncols', 'nrows', 'scale', 'scalex', 'scaley', 'ncol', 'nrow') {
 	dies_ok {
 		plt({
 			$numeric_arg  => 'A',
@@ -1352,7 +1352,7 @@ plt({
 		    orientation  => 'horizontal',    # assign x and y labels smartly
 		    title        => 'Horizontal orientation',
 		    ylabel       => 'Value',
-		    xlabel       => 'Frequency',                #				'log'					=> 1,
+		    xlabel       => 'Frequency',
 		},
 	],
 	ncols => 3,
@@ -1928,6 +1928,12 @@ scatter({
 	},
 	logscale => ['x', 'y']
 });
+hist({
+	execute       => 0,
+	fh            => $fh,
+	data          => [0..9],
+	'output.file' => '/tmp/hist.arr.svg',
+});
 plt({
 	fh                => $fh,
 	execute           => 1,
@@ -2026,7 +2032,7 @@ plt({
 	'output.file' => '/tmp/hist2d.svg',
 });
 # σὺ δὲ τῇ πίστει ἕστηκας. μὴ ὑψηλὰ φρόνει, ἀλλὰ φοβοῦ
-my @output_files = ('/tmp/add.single.svg', '/tmp/single.wide.svg', '/tmp/single.array.svg', '/tmp/wide.subplots.svg', '/tmp/single.pie.svg', '/tmp/pie.svg', '/tmp/single.boxplot.svg', '/tmp/boxplot.svg', '/tmp/single.violinplot.svg', '/tmp/violin.svg', '/tmp/single.barplot.svg', '/tmp/single.hexbin.svg', '/tmp/single.hist2d.svg', '/tmp/hexbin.svg', '/tmp/plots.svg', '/tmp/plot.single.svg', '/tmp/plot.single.arr.svg', '/tmp/barplots.svg', '/tmp/single.hist.svg', '/tmp/histogram.svg', '/tmp/single.scatter.svg', '/tmp/scatterplots.svg', '/tmp/imshow.single.svg', '/tmp/imshow.multiple.svg', '/tmp/single.tab.svg', '/tmp/single.bonds.svg', '/tmp/hlines.svg', '/tmp/dssp.single.svg', '/tmp/dssp.multiple.svg', '/tmp/hist2d.pads.svg', '/tmp/twinx.arr.svg', '/tmp/twinx.hash.svg', '/tmp/key.colors.bar.svg', '/tmp/bar.sub.svg', '/tmp/bar.sub.self.svg', '/tmp/barh.sub.svg', '/tmp/boxplot.sub.svg', '/tmp/hexbin.sub.svg', '/tmp/hist.sub.svg', '/tmp/hist2d.sub.svg', '/tmp/plot.sub.svg', '/tmp/newline_fail.svg', '/tmp/hist2d.logscale.svg', '/tmp/scatter.logscale.svg', '/tmp/hist2d.svg');
+my @output_files = ('/tmp/add.single.svg', '/tmp/single.wide.svg', '/tmp/single.array.svg', '/tmp/wide.subplots.svg', '/tmp/single.pie.svg', '/tmp/pie.svg', '/tmp/single.boxplot.svg', '/tmp/boxplot.svg', '/tmp/single.violinplot.svg', '/tmp/violin.svg', '/tmp/single.barplot.svg', '/tmp/single.hexbin.svg', '/tmp/single.hist2d.svg', '/tmp/hexbin.svg', '/tmp/plots.svg', '/tmp/plot.single.svg', '/tmp/plot.single.arr.svg', '/tmp/barplots.svg', '/tmp/single.hist.svg', '/tmp/histogram.svg', '/tmp/single.scatter.svg', '/tmp/scatterplots.svg', '/tmp/imshow.single.svg', '/tmp/imshow.multiple.svg', '/tmp/single.tab.svg', '/tmp/single.bonds.svg', '/tmp/hlines.svg', '/tmp/dssp.single.svg', '/tmp/dssp.multiple.svg', '/tmp/hist2d.pads.svg', '/tmp/twinx.arr.svg', '/tmp/twinx.hash.svg', '/tmp/key.colors.bar.svg', '/tmp/bar.sub.svg', '/tmp/bar.sub.self.svg', '/tmp/barh.sub.svg', '/tmp/boxplot.sub.svg', '/tmp/hexbin.sub.svg', '/tmp/hist.sub.svg', '/tmp/hist2d.sub.svg', '/tmp/plot.sub.svg', '/tmp/newline_fail.svg', '/tmp/hist2d.logscale.svg', '/tmp/scatter.logscale.svg', '/tmp/hist.arr.svg', '/tmp/hist2d.svg');
 my %file2SHA;
 open my $tsv, '<', $sha_sum_filename;
 while (<$tsv>) {
@@ -2056,14 +2062,14 @@ sub check_SHA_sum {
 	if ($sum eq $test_sum) {
 		return 1;
 	} else {
-		die "$file: $test_sum doesn't equal $sum";
+		die "$file:\ntest:\t$test_sum\n!=\n$sum";
 	}
 }
 my %check_files = map {'/tmp/' . "$_.svg" => 1} ('add.single', 'barplots',
 'imshow.multiple','imshow.single', 'plot.single', 'plots',
 'single.bonds', 'single.tab', 'barplots', 'single.barplot', 'hlines',
-'dssp.single', 'dssp.multiple', 'plot.single.arr', 'hist2d.pads', 'twinx.arr', 'twinx.hash', 'key.colors.bar', 'newline_fail', 'barh.sub', 'bar.sub', 'bar.sub.self', 'boxplot.sub', 'hexbin.sub', 'hist2d.sub', 'hist.sub', 'plot.sub', 'hist2d.logscale', 'scatter.logscale');
-p %check_files;
+'dssp.single', 'dssp.multiple', 'plot.single.arr', 'hist2d.pads', 'twinx.arr', 'twinx.hash', 'key.colors.bar', 'newline_fail', 'barh.sub', 'bar.sub', 'bar.sub.self', 'boxplot.sub', 'hexbin.sub', 'hist2d.sub', 'plot.sub', 'hist2d.logscale', 'scatter.logscale');
+
 foreach my $file (@output_files) {
 	if (defined $check_files{$file}) {
 		ok(check_SHA_sum($file2SHA{$file}, $file), "$file matches verified file SHA sum");

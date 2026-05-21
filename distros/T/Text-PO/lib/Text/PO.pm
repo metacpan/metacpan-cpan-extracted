@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO.pm
-## Version v1.0.0
+## Version v1.0.1
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2018/06/21
-## Modified 2026/01/29
+## Modified 2026/04/28
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -20,15 +20,16 @@ BEGIN
     use vars qw( $VERSION @META $DEF_META );
     use open ':std' => ':utf8';
     use Class::Struct;
-    use DateTime;
-    use DateTime::TimeZone;
+    use DateTime::Format::Lite;
+    use DateTime::Lite;
+    use DateTime::Lite::TimeZone;
     use Encode ();
     use Fcntl qw( :DEFAULT );
     use JSON ();
     use Scalar::Util;
     use Text::PO::Element;
-    use constant HAS_LOCAL_TZ => ( eval( qq{DateTime::TimeZone->new( name => 'local' );} ) ? 1 : 0 );
-    our $VERSION = 'v1.0.0';
+    use constant HAS_LOCAL_TZ => ( DateTime::Lite::TimeZone->new( name => 'local' ) ? 1 : 0 );
+    our $VERSION = 'v1.0.1';
 };
 
 use strict;
@@ -56,8 +57,8 @@ our $DEF_META =
     'Project-Id-Version'    => 'Project 0.1',
     'Report-Msgid-Bugs-To'  => 'bugs@example.com',
     # 2011-07-02 20:53+0900
-    'POT-Creation-Date'     => DateTime->from_epoch( 'epoch' => time(), 'time_zone' => ( HAS_LOCAL_TZ ? 'local' : 'UTC' ) )->strftime( '%Y-%m-%d %H:%M%z' ),
-    'PO-Revision-Date'      => DateTime->from_epoch( 'epoch' => time(), 'time_zone' => ( HAS_LOCAL_TZ ? 'local' : 'UTC' ) )->strftime( '%Y-%m-%d %H:%M%z' ),
+    'POT-Creation-Date'     => DateTime::Lite->from_epoch( 'epoch' => time(), 'time_zone' => ( HAS_LOCAL_TZ ? 'local' : 'UTC' ) )->strftime( '%Y-%m-%d %H:%M%z' ),
+    'PO-Revision-Date'      => DateTime::Lite->from_epoch( 'epoch' => time(), 'time_zone' => ( HAS_LOCAL_TZ ? 'local' : 'UTC' ) )->strftime( '%Y-%m-%d %H:%M%z' ),
     'Last-Translator'       => 'Unknown <hello@example.com>',
     'Language-Team'         => 'Unknown <hello@example.com>',
     'Language'              => '',
@@ -1068,7 +1069,7 @@ sub parse_date_to_object
     my $strp = $d->formatter;
     unless( $strp )
     {
-        $strp = DateTime::Format::Strptime->new(
+        $strp = DateTime::Format::Lite->new(
             pattern   => '%Y-%m-%d %H:%M%z',
             locale    => 'en_GB',
             time_zone => $d->time_zone,
@@ -1504,15 +1505,15 @@ sub _can_write_fh
 sub _set_get_meta_date
 {
     my $self = shift( @_ );
-    my $field = shift( @_ ) || return( $self->error( "No field was provided to get its DateTime object equivalent." ) );
+    my $field = shift( @_ ) || return( $self->error( "No field was provided to get its DateTime::Lite object equivalent." ) );
     if( @_ )
     {
         my $v = shift( @_ );
-        if( ref( $v ) && $self->_is_a( $v => 'DateTime' ) )
+        if( ref( $v ) && $self->_is_a( $v => 'DateTime::Lite' ) )
         {
-            my $strp = DateTime::Format::Strptime->new(
-                pattern => '%F %H:%M%z',
-                locale  => 'en_GB',
+            my $strp = DateTime::Format::Lite->new(
+                pattern   => '%F %H:%M%z',
+                locale    => 'en_GB',
                 time_zone => ( HAS_LOCAL_TZ ? 'local' : 'UTC' ),
             );
             $v->set_formatter( $strp );
@@ -1534,7 +1535,7 @@ sub _set_get_meta_date
 sub _set_get_meta_value
 {
     my $self = shift( @_ );
-    my $field = shift( @_ ) || return( $self->error( "No field was provided to get its DateTime object equivalent." ) );
+    my $field = shift( @_ ) || return( $self->error( "No field was provided to get its DateTime::Lite object equivalent." ) );
     if( @_ )
     {
         my $v = shift( @_ );
@@ -1736,7 +1737,7 @@ Or, maybe using the object overloading directly:
 
 =head1 VERSION
 
-    v1.0.0
+    v1.0.1
 
 =head1 DESCRIPTION
 
@@ -2143,7 +2144,7 @@ Override the maximum include depth for this parse call.
 
 =head2 parse_date_to_object
 
-Provided with a date string and this returns a L<DateTime> object
+Provided with a date string and this returns a L<DateTime::Lite> object
 
 =head2 parse_header_value
 
@@ -2300,9 +2301,9 @@ Given a filehandle, returns true if it can be written to it or false otherwise.
 
 =head2 _set_get_meta_date
 
-Takes a meta field name for a date-type field and sets its value, if one is provided, or returns a L<DateTime> object.
+Takes a meta field name for a date-type field and sets its value, if one is provided, or returns a L<DateTime::Lite> object.
 
-If a value is provided, even a string, it will be converted to a L<DateTime> object and a L<DateTime::Format::Strptime> will be attached to it as a formatter so the stringification of the object produces a date compliant with PO format.
+If a value is provided, even a string, it will be converted to a L<DateTime::Lite> object and a L<DateTime::Format::Lite> will be attached to it as a formatter so the stringification of the object produces a date compliant with PO format.
 
 =head2 _set_get_meta_value
 

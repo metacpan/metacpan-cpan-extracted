@@ -11,15 +11,13 @@ build_requires:
   Exporter: '0'
   ExtUtils::MakeMaker: '7.06'
   ExtUtils::Manifest: '0'
+  Fcntl: '0'
   File::Spec: '0'
   File::Temp: '0.10'
-  List::Util: '1.29'
-  Test::More: '0.88'
   Thread::Semaphore: '0'
   Time::HiRes: '0'
   Try::Tiny: '0'
   blib: '0'
-  lib: '0'
   strict: '0'
   threads: '0'
   threads::shared: '0'
@@ -30,10 +28,12 @@ configure_requires:
   Config: '0'
   Devel::CheckLib: '1.14'
   ExtUtils::MakeMaker: '7.06'
+  File::Spec: '0'
+  File::Temp: '0.10'
   strict: '0'
   warnings: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -45,17 +45,17 @@ no_index:
     - inc
 provides:
   UUID:
-    file: UUID.pm
-    version: '0.37'
+    file: lib/UUID.pm
+    version: '0.38'
 requires:
   Carp: '0'
   DynaLoader: '0'
   Exporter: '0'
   Time::HiRes: '0'
   blib: '0'
-  perl: '5.005063'
+  perl: '5.008001'
   strict: '0'
   vars: '0'
   warnings: '0'
-version: '0.37'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.38'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

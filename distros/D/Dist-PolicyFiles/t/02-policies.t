@@ -24,6 +24,11 @@ subtest 'John Doe' => sub {
                                       full_name => 'John Doe',
                                       dir       => $out_dir
                                      );
+    is($dp_obj->cpan_rt_url, 'https://rt.cpan.org/NoAuth/ReportBug.html?Queue=My-Great-Module',
+      'cpan_rt_url()');
+    is($dp_obj->repo_name, 'My-Great-Module', 'repo_name()');
+    is($dp_obj->github_url, 'https://github.com/jd/My-Great-Module',
+       'github_url()');
 
   $dp_obj->create_security_md(maintainer => 'Other Person <other@person.blah>',
                               url        => q{},
@@ -45,6 +50,11 @@ subtest 'Klaus Rindfrey' => sub {
                                         prefix       => 'perl-',
                                         uncapitalize => 1
                                        );
+    is($dp_obj->cpan_rt_url, 'https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dist-PolicyFiles',
+      'cpan_rt_url()');
+    is($dp_obj->repo_name, 'perl-dist-policyfiles', 'repo_name()');
+    is($dp_obj->github_url, 'https://github.com/klaus-rindfrey/perl-dist-policyfiles',
+       'github_url()');
 
     $dp_obj->create_security_md(minimum_perl_version => '5.14',
                                 timeframe            => '10 days');

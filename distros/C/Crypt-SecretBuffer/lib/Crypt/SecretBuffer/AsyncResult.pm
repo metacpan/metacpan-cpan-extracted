@@ -1,7 +1,7 @@
 package Crypt::SecretBuffer::AsyncResult;
 # VERSION
 # ABSTRACT: Observe results of a write_async operation
-$Crypt::SecretBuffer::AsyncResult::VERSION = '0.023';
+$Crypt::SecretBuffer::AsyncResult::VERSION = '0.024';
 1;
 
 __END__
@@ -33,7 +33,7 @@ as a list.  On a timeout, it returns an empty list.
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 AUTHOR
 

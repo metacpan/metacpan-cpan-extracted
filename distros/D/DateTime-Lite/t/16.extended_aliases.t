@@ -3,15 +3,22 @@
 ## DateTime::Lite::TimeZone - t/16.extended_aliases.t
 ## Test suite for resolve_abbreviation() with extended => 1
 ##----------------------------------------------------------------------------
+BEGIN
+{
+    use strict;
+    use warnings;
+    use lib './lib';
+    use Test::More;
+    use Scalar::Util qw( looks_like_number );
+};
+
 use strict;
 use warnings;
-use Test::More;
-use Scalar::Util qw( looks_like_number );
 
 BEGIN
 {
     use_ok( 'DateTime::Lite::TimeZone' ) || BAIL_OUT( 'Cannot load DateTime::Lite::TimeZone' );
-}
+};
 
 # NOTE: Helpers
 sub result_zones

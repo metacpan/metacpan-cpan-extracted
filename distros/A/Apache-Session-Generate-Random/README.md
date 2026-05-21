@@ -21,10 +21,15 @@ This module extends [Apache::Session](https://metacpan.org/pod/Apache%3A%3ASessi
 
 # RECENT CHANGES
 
-Changes for version 0.002001 (2026-02-25)
+Changes for version 0.002002 (2026-05-02)
 
-- Bug Fixes
-    - Specify minimum versions of prerequisites.
+- Documentation
+    - Updated author email address.
+- Other
+    - Added DOAP metadata to the distribution.
+    - Updated distribution metadata.
+- Toolchain
+    - Stopped signing distributions, because Module::Signature is deprecated.
 
 See the `Changes` file for more details.
 
@@ -94,11 +99,11 @@ then see `SECURITY.md` for instructions how to report security vulnerabilities.
 # SOURCE
 
 The development version is on github at [https://github.com/robrwo/perl-Apache-Session-Generate-Random](https://github.com/robrwo/perl-Apache-Session-Generate-Random)
-and may be cloned from [git://github.com/robrwo/perl-Apache-Session-Generate-Random.git](git://github.com/robrwo/perl-Apache-Session-Generate-Random.git)
+and may be cloned from [https://github.com/robrwo/perl-Apache-Session-Generate-Random.git](https://github.com/robrwo/perl-Apache-Session-Generate-Random.git)
 
 # AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 # COPYRIGHT AND LICENSE
 

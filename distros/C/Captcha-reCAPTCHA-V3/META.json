@@ -42,13 +42,12 @@
       },
       "runtime" : {
          "recommends" : {
-            "JSON::XS" : "0"
+            "JSON::PP" : "0"
          },
          "requires" : {
             "JSON" : "2.0",
-            "LWP::Protocol::https" : "0",
-            "LWP::UserAgent" : "0",
-            "perl" : "5.008001"
+            "Module::Build::Tiny" : "0.039",
+            "perl" : "v5.10.1"
          }
       },
       "test" : {
@@ -60,7 +59,7 @@
    "provides" : {
       "Captcha::reCAPTCHA::V3" : {
          "file" : "lib/Captcha/reCAPTCHA/V3.pm",
-         "version" : "0.06"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -75,12 +74,12 @@
          "web" : "https://github.com/worthmine/Captcha-reCAPTCHA-V3"
       }
    },
-   "version" : "0.06",
+   "version" : "0.12",
    "x_authority" : "cpan:WORTHMINE",
    "x_contributors" : [
       "Yuki Yoshida(worthmine) <2944869+worthmine@users.noreply.github.com>",
       "worthmine <worthmine@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_serialization_backend" : "JSON::PP version 4.18",
    "x_static_install" : 1
 }

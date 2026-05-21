@@ -23,9 +23,14 @@ sub new {
 
 
 sub groups {
-    my ( $sf, $plugin, $db ) = @_;
+    my ( $sf, $plugin, $db, $select_plugins ) = @_;
     my $groups;
-    if ( $db ) {
+    if ( $select_plugins ) {
+        $groups = [
+            { name => 'group_select_plugins', text => "- Plugins" },
+        ];
+    }
+    elsif ( $db ) {
         $groups = [
             { name => 'group_connect', text => "- Connect data" }, ##
         ];
@@ -44,8 +49,7 @@ sub groups {
     }
     else {
         $groups = [
-            { name => 'group_select_plugins', text => "- Select plugins" },
-            { name => 'group_global',         text => "- Global settings" },
+            { name => 'group_global', text => "- Global settings" },
         ];
     }
     return $groups;
@@ -80,13 +84,13 @@ sub sub_groups {
             { name => '_e_write_access', text => "- Write access",       section => 'enable' },
         ],
         group_sql_settings => [
-            { name => '_meta',               text => "- System data",          section => 'G'      },
-            { name => 'operators',           text => "- Operators",            section => 'G'      },
-            { name => '_add_aliases',        text => "- Add aliases",          section => 'alias'  },
-            { name => '_aliases_in_clauses', text => "- Alias use in clauses", section => 'alias'  },
-            { name => '_sql_identifiers',    text => "- Identifiers",          section => 'G'      },
-            { name => '_view_name_prefix',   text => "- View prefix",          section => 'create' }, ##
-            { name => '_other_sql_settings', text => "- Other",                section => 'G'      },
+            { name => '_meta',               text => "- System data",      section => 'G'      },
+            { name => 'operators',           text => "- Operators",        section => 'G'      },
+            { name => '_add_aliases',        text => "- Add aliases",      section => 'alias'  },
+            { name => '_aliases_in_clauses', text => "- Alias in clauses", section => 'alias'  },
+            { name => '_sql_identifiers',    text => "- Identifiers",      section => 'G'      },
+            { name => '_view_name_prefix',   text => "- View prefix",      section => 'create' }, ##
+            { name => '_other_sql_settings', text => "- Other",            section => 'G'      },
         ],
         group_create_table => [
             { name => '_enable_ct_opt',          text => "- Enable options",                     section => 'create' },
@@ -385,6 +389,9 @@ sub group_sql_settings {
             [ 'quote_tables',         "- Quote table names",     [ $no, $yes ] ],
             [ 'quote_columns',        "- Quote column names",    [ $no, $yes ] ],
         ];
+        if ( $driver eq 'Firebird' ) {
+            shift @$sub_menu;
+        }
         $sf->__settings_menu_wrap( $info, $lo, $section, $sub_menu, $prompt );
     }
     elsif ( $sub_group eq '_view_name_prefix' ) {

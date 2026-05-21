@@ -6,7 +6,7 @@ use warnings;
 our $VERSION;
 
 BEGIN {
-    $VERSION = '0.20';
+    $VERSION = '0.21';
 }
 
 =encoding utf-8
@@ -225,7 +225,7 @@ mid-flight controls like cancellation.
 
 =over
 
-=item * C<all()> and C<race()> should ideally be implemented in XS.
+=item * C<race()> should ideally be implemented in XS.
 
 =back
 

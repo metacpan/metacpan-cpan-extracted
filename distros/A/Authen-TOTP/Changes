@@ -1,5 +1,17 @@
 Revision history for Perl extension Authen-TOTP
 
+0.1.1 2026-05-18T09:44:39Z
+    - Replace plain old rand with Crypt::PRNG::random_string_from()
+
+0.1.0 2023-10-02
+    - Tidy up the documentation a bit
+
+0.0.9 2023-10-02
+    - Merge OTP method PR from mdeweerd 
+
+0.0.8 2023-09-29
+    - Remove usage of MIME::Base32::XS, in favor of the faster Encode::Base2N
+
 0.0.7 2020-07-02T11:07:50Z
     - Moved git repo to github
     - Added CONTRIBUTING.md file

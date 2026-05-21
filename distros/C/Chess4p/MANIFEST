@@ -2,17 +2,24 @@ Changes
 lib/Chess4p/Common.pm
 lib/Chess4p/Move.pm
 lib/Chess4p/Board.pm
+lib/Chess4p/Perft.pm
 lib/Chess4p.pm
+lib/Chess4p/Pgn/Reader.pm
 Makefile.PL
 MANIFEST			This list of files
 README
-t/manifest.t
-t/pod-coverage.t
-t/pod.t
-t/basics.t
-t/move.t
-t/board.t
-t/random.t
+develop.org
+t/000-manifest.t
+t/001-pod-coverage.t
+t/002-pod.t
+t/300-bb-iter.t
+t/400-basics.t
+t/410-move.t
+t/420-board.t
+t/430-san.t
+t/440-pgn-reader.t
+t/700-random.t
+t/800-perft.t
 xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

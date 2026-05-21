@@ -3,7 +3,7 @@ package Crypt::ScryptKDF;
 use strict;
 use warnings ;
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use MIME::Base64 qw(decode_base64 encode_base64);
 use Exporter 'import';
@@ -41,8 +41,7 @@ sub random_bytes {
   }
 
   if (!defined $rv)  {
-    warn "WARNING: Generating random bytes via insecure rand()\n";
-    $rv = pack('C*', map(int(rand(256)), 1..$length));
+    die "FATAL: Cannot generate random bytes. Install one of: Crypt::PRNG, Crypt::OpenSSL::Random, Net::SSLeay, Crypt::Random, or Bytes::Random::Secure\n";
   }
 
   return $rv
@@ -201,7 +200,7 @@ number generator. It tries to use one of the following:
 
 =item * L<Bytes::Random::Secure> - random_bytes()
 
-=item * As an B<unsecure> fallback it uses built-in rand()
+=item * If none of the modules above is installed, this module fails (since v0.011).
 
 =back
 
@@ -293,4 +292,4 @@ This program is free software; you can redistribute it and/or modify it under th
 
 =head1 COPYRIGHT
 
-Copyright (c) 2013-2015 DCIT, a.s. L<http://www.dcit.cz> / Karel Miko
+Copyright (c) 2013-2026 DCIT, a.s. L<https://www.dcit.cz> / Karel Miko

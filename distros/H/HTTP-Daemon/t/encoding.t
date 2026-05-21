@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 
 use HTTP::Daemon ();
-use Socket qw( AF_INET6 );
+use Socket       qw( AF_INET6 );
 
 {
     no warnings 'redefine';
@@ -13,7 +13,7 @@ use Socket qw( AF_INET6 );
         = sub { return q{fe80::250:54ff:fe00:f01%ens3} };
 
     my $d = HTTP::Daemon->new;
-    is($d->sockhost, q{fe80::250:54ff:fe00:f01%ens3}, 'we overrode sockhost');
+    is($d->sockhost,   q{fe80::250:54ff:fe00:f01%ens3}, 'we overrode sockhost');
     is($d->sockdomain, Socket::AF_INET6, 'we overrode sockdomain');
 
     like(

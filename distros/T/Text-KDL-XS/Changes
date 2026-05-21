@@ -1,0 +1,11 @@
+Revision history for Text-KDL-XS
+
+0.001  2026-04-30
+        - Initial CPAN release.
+        - XS bindings to the ckdl C library via Alien::ckdl.
+        - High-level tree API: parse_kdl / emit_kdl with full round-trip.
+        - Streaming event API (Text::KDL::XS::Parser) for memory-bounded
+          ingestion of large documents.
+        - Plain-Perl-data emission mode for the common "config out" case.
+        - Supports KDL v1 and v2 with automatic version detection.
+        - Sources: strings, filehandles, blessed IO objects, code references.

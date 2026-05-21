@@ -841,6 +841,15 @@ Plot a hash of arrays as a series of histograms
 
 ### single, simple plot
 
+as of version 0.26, single arrays can be given to `hist` instead of a hash, simplifying the call:
+
+    hist({
+     	data          => [0..9],
+    	'output.file' => '/tmp/hist.arr.svg',
+    });
+
+for slightly more complex data sets, hashes are taken:
+
     use Matplotlib::Simple 'hist';
 	
     my @e = generate_normal_dist( 100, 15, 3 * 200 );
@@ -972,9 +981,9 @@ which makes the following simple plot:
 
 <img width="1511" height="491" alt="histogram" src="https://github.com/user-attachments/assets/b13b4cc8-6e64-40b0-913d-6a5886cee0db" />
 
-Make a 2-D histogram from a hash of arrays
-
 ## hist2d
+
+Make a 2-D histogram from a hash of arrays
 
 ### single, simple plot
     plt({

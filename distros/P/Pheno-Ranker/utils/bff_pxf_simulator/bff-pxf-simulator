@@ -17,6 +17,7 @@
 
 use strict;
 use warnings;
+use File::Basename qw(dirname);
 use Getopt::Long qw(:config no_ignore_case);
 use Pod::Usage;
 
@@ -68,6 +69,25 @@ sub randomize_ga4gh {
     ) or pod2usage(2);
     pod2usage(1)                              if $help;
     pod2usage( -verbose => 2, -exitval => 0 ) if $man;
+    validate_args(
+        {
+            format                       => $format,
+            number                       => $number,
+            output                       => $output,
+            diseases                     => $diseases,
+            exposures                    => $exposures,
+            phenotypicFeatures           => $phenotypicFeatures,
+            procedures                   => $procedures,
+            treatments                   => $treatments,
+            max_diseases_pool            => $max_diseases_pool,
+            max_ethnicity_pool           => $max_ethnicity_pool,
+            max_exposures_pool           => $max_exposures_pool,
+            max_phenotypicFeatures_pool  => $max_phenotypicFeatures_pool,
+            max_procedures_pool          => $max_procedures_pool,
+            max_treatments_pool          => $max_treatments_pool,
+            ext_ontologies               => $ext_ontologies,
+        }
+    );
 
     # Create object
     my $randomize = Randomizer->new(
@@ -96,6 +116,58 @@ sub randomize_ga4gh {
 
     # Run method
     $randomize->run;
+}
+
+sub validate_args {
+    my $arg = shift;
+
+    usage_error("--format must be one of: bff, pxf")
+      unless $arg->{format} =~ /\A(?:bff|pxf)\z/;
+
+    validate_positive_int( '--number', $arg->{number} );
+
+    for my $name (qw(diseases exposures phenotypicFeatures procedures treatments)) {
+        validate_non_negative_int( "--$name", $arg->{$name} );
+    }
+
+    for my $name (
+        qw(max_diseases_pool max_ethnicity_pool max_exposures_pool max_phenotypicFeatures_pool max_procedures_pool max_treatments_pool)
+      )
+    {
+        next unless defined $arg->{$name};
+        ( my $option = $name ) =~ s/_/-/g;
+        validate_positive_int( "--$option", $arg->{$name} );
+    }
+
+    if ( defined $arg->{ext_ontologies} ) {
+        usage_error("--external-ontologies must be a readable file")
+          unless -f $arg->{ext_ontologies} && -r _;
+    }
+
+    my $out_dir = dirname( $arg->{output} );
+    usage_error("--output directory <$out_dir> is not writable")
+      unless -d $out_dir && -w _;
+
+    return 1;
+}
+
+sub validate_positive_int {
+    my ( $name, $value ) = @_;
+    usage_error("$name must be a positive integer")
+      unless defined $value && $value =~ /\A[0-9]+\z/ && $value > 0;
+    return 1;
+}
+
+sub validate_non_negative_int {
+    my ( $name, $value ) = @_;
+    usage_error("$name must be a non-negative integer")
+      unless defined $value && $value =~ /\A[0-9]+\z/;
+    return 1;
+}
+
+sub usage_error {
+    my $message = shift;
+    pod2usage( -message => "$message\n", -exitval => 1 );
 }
 
 package Randomizer;
@@ -174,11 +246,12 @@ sub write_json {
 sub pxf_generator {
     my ( $id, $self ) = @_;
     my $result_hash = run_functions($self);
+    my $subject_id  = "IndividualId_$id";
     my $pxf         = fake_hash(
         {
             id      => "Phenopacket_" . $id,
             subject => {
-                id  => "IndividualId_" . $id,
+                id  => $subject_id,
                 age => {
                     iso8601duration =>
                       fake_template( "P%dY", fake_int_mod( 1, 99 ) )
@@ -187,10 +260,43 @@ sub pxf_generator {
             },
             diseases           => $result_hash->{diseases},
             phenotypicFeatures => $result_hash->{phenotypicFeatures},
+            interpretations    =>
+              pxf_interpretations( $result_hash->{diseases}, $subject_id ),
             medicalActions     => merge_medical_actions($result_hash)
         }
     );
     return $pxf->();
+}
+
+sub pxf_interpretations {
+    my ( $diseases, $subject_id ) = @_;
+    $diseases ||= [];
+    my @status   = qw(SOLVED UNSOLVED);
+    my @interpretations;
+
+    for my $i ( 0 .. $#{$diseases} ) {
+        my $disease = $diseases->[$i]{term};
+        push @interpretations,
+          {
+            id             => 'Interpretation_' . ( $i + 1 ),
+            progressStatus => $status[ $i % @status ],
+            diagnosis      => {
+                disease                => $disease,
+                genomicInterpretations => [
+                    {
+                        subjectOrBiosampleId  => $subject_id,
+                        interpretationStatus => 'CAUSATIVE',
+                        geneDescriptor       => {
+                            valueId => 'HGNC:' . ( 1000 + $i + 1 ),
+                            symbol  => 'GENE' . ( $i + 1 )
+                        }
+                    }
+                ]
+            }
+          };
+    }
+
+    return \@interpretations;
 }
 
 sub merge_medical_actions {
@@ -249,7 +355,12 @@ sub bff_generator {
 
 sub create_entries {
     my ( $params, $ontologies_array, $n, $max ) = @_;
+    return [] if $n == 0;
     my $shuffled_slice = shuffle_slice( $max, $ontologies_array );
+    die "Requested $n terms, but only "
+      . scalar( @{$shuffled_slice} )
+      . " ontology terms are available\n"
+      if $n > @{$shuffled_slice};
     my $array;
     for ( my $i = 0 ; $i < $n ; $i++ ) {
         push @$array,
@@ -528,7 +639,7 @@ B<BFF:> C<diseases, exposures, interventionsOrProcedures, phenotypicFeatures, tr
 
 procedures = interventionsOrProcedures
 
-B<PXF:> C<interventionsOrProcedures, medicalActions.procedure, medicalActions.treatment, phenotypicFeatures>.
+B<PXF:> C<diseases, interpretations, interventionsOrProcedures, medicalActions.procedure, medicalActions.treatment, phenotypicFeatures>.
 
 procedures = medicalActions.procedure
 

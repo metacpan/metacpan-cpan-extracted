@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2025 Philipp Schafft
+# Copyright (c) 2023-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -16,7 +16,7 @@ use parent 'Data::Identifier::Interface::Userdata';
 use Carp;
 use Scalar::Util qw(weaken);
 
-our $VERSION = v0.28;
+our $VERSION = v0.29;
 
 my %_types = (
     db          => 'Data::TagDB',
@@ -97,7 +97,7 @@ Data::Identifier::Interface::Subobjects - format independent identifier object
 
 =head1 VERSION
 
-version v0.28
+version v0.29
 
 =head1 SYNOPSIS
 
@@ -184,7 +184,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023-2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2023-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

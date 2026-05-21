@@ -25,7 +25,6 @@
             "Test::CPAN::Changes" : "0.19",
             "Test::CPAN::Meta" : "0",
             "Test::CPAN::Meta::JSON" : "0.16",
-            "Test::DistManifest" : "0",
             "Test::EOL" : "0",
             "Test::Kwalitee" : "1.21",
             "Test::MinimumVersion" : "0",
@@ -38,7 +37,6 @@
             "Test::Pod::LinkCheck" : "0",
             "Test::Portability::Files" : "0",
             "Test::Synopsis" : "0",
-            "Test::Vars" : "0",
             "Test::Version" : "1"
          }
       },
@@ -89,25 +87,31 @@
    "provides" : {
       "Net::OpenSSH::More" : {
          "file" : "lib/Net/OpenSSH/More.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       },
       "Net::OpenSSH::More::Linux" : {
          "file" : "lib/Net/OpenSSH/More/Linux.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "bugtracker" : {},
-      "repository" : {}
+      "bugtracker" : {
+         "web" : "https://github.com/troglodyne-internet-widgets/perl-Net-Openssh-More/issues"
+      },
+      "homepage" : "https://github.com/troglodyne-internet-widgets/perl-Net-Openssh-More",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/troglodyne-internet-widgets/perl-Net-Openssh-More.git",
+         "web" : "https://github.com/troglodyne-internet-widgets/perl-Net-Openssh-More"
+      }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_contributors" : [
-      "Andy Baugh <andy@troglodyne.net>",
-      "teo <Andy Baugh>"
+      "Andy Baugh <andy@troglodyne.net>"
    ],
-   "x_generated_by_perl" : "v5.40.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "MIT"
 }
 

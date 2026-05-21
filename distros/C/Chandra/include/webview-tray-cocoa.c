@@ -1,5 +1,5 @@
 /*
- * webview-tray-cocoa.c — macOS system tray (NSStatusBar) backend
+ * webview-tray-cocoa.c - macOS system tray (NSStatusBar) backend
  *
  * Uses the Objective-C runtime via objc_msgSend, matching the pattern
  * established in webview-cocoa.c.
@@ -174,7 +174,7 @@ WEBVIEW_API int webview_tray_create(struct webview_tray *t) {
       }
     }
   } else {
-    /* No icon — use tooltip text as title */
+    /* No icon - use tooltip text as title */
     id button = ((id(*)(id, SEL))objc_msgSend)(priv->status_item,
         sel_registerName("button"));
     if (button) {

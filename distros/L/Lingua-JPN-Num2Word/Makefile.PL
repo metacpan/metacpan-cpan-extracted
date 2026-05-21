@@ -7,7 +7,7 @@ use 5.016000;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Translate Numbers into Japanese",
+  "ABSTRACT" => "Number to word conversion in Japanese",
   "AUTHOR" => "PetaMem s.r.o. <info\@petamem.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -17,11 +17,16 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.016000",
   "NAME" => "Lingua::JPN::Num2Word",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "Export::Attrs" => 0,
     "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.2603300",
+  "TEST_REQUIRES" => {
+    "Test::More" => 0,
+    "strict" => 0
+  },
+  "VERSION" => "0.2604300",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -29,7 +34,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "Export::Attrs" => 0,
+  "Test::More" => 0,
+  "strict" => 0,
   "utf8" => 0,
   "warnings" => 0
 );

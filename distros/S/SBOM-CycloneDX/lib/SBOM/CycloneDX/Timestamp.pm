@@ -21,7 +21,7 @@ around BUILDARGS => sub {
 
 };
 
-has value => (is => 'rw', default => sub { Time::Piece->new }, coerce => sub { _parse($_[0]) });
+has value => (is => 'rw', default => sub { Time::Piece->gmtime }, coerce => sub { _parse($_[0]) });
 
 my @PATTERNS = (
     ['%Y-%m-%dT%H:%M:%S', qr/(\d{4}-\d{2}-\d{2}[T]\d{2}:\d{2}:\d{2})\.\d+Z/],
@@ -38,10 +38,10 @@ sub _parse {
 
     return $datetime->value if ($datetime->isa('SBOM::CycloneDX::Timestamp'));
 
-    return Time::Piece->new unless $datetime;
+    return Time::Piece->gmtime unless $datetime;
 
-    return Time::Piece->new($datetime) if ($datetime =~ /^([0-9]+)$/);
-    return Time::Piece->new            if ($datetime eq 'now');
+    return Time::Piece->gmtime($datetime) if ($datetime =~ /^([0-9]+)$/);
+    return Time::Piece->gmtime            if ($datetime eq 'now');
 
     foreach my $pattern (@PATTERNS) {
         my ($format, $regexp) = @{$pattern};
@@ -50,13 +50,13 @@ sub _parse {
 
     Carp::carp 'Malformed timestamp';
 
-    return Time::Piece->new;
+    return Time::Piece->gmtime;
 
 }
 
 sub to_string { shift->TO_JSON }
 
-sub TO_JSON { shift->value->datetime . '.000Z' }
+sub TO_JSON { shift->value->datetime . 'Z' }
 
 1;
 
@@ -74,7 +74,7 @@ SBOM::CycloneDX::Timestamp - Timestamp representation for CycloneDX
 
     SBOM::CycloneDX::Timestamp->new('2025-01-01T00:00:00');
 
-    SBOM::CycloneDX::Timestamp->new(Time::Piece->new);
+    SBOM::CycloneDX::Timestamp->new(Time::Piece->gmtime);
 
 
 =head1 DESCRIPTION

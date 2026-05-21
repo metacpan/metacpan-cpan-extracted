@@ -16,20 +16,18 @@ Params::Get - Get the parameters to a subroutine in any way you want
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 =head1 DESCRIPTION
 
 Exports a single function, C<get_params>, which returns a given value.
-If a validation schema is provided, the value is validated using
-L<Params::Validate::Strict>.
-If validation fails, it croaks.
 
-When used hand-in-hand with L<Return::Set> you should be able to formally specify the input and output sets for a method.
+When used hand-in-hand with L<Params::Validate::Strict> and L<Return::Set>,
+you should be able to formally specify the input and output sets for a method.
 
 =head1 SYNOPSIS
 
@@ -43,8 +41,8 @@ When used hand-in-hand with L<Return::Set> you should be able to formally specif
             schema => {
                 'latitude' => {
                     type => 'number',
-                    min => -180,
-                    max => 180
+                    min => -90,
+                    max => 90
                 }, 'longitude' => {
                     type => 'number',
                     min => -180,
@@ -93,6 +91,69 @@ Some people like this sort of model, which is also supported.
         return bless $rc, $class;
     }
 
+=head2 The C<$default> Parameter
+
+The first argument is the C<$default> parameter controls how single-argument calls are interpreted and provides
+a default key name for parameter extraction in those cases.
+
+When no arguments are provided with a defined C<$default>:
+
+    get_params('required'); # Throws usage error
+
+The function requires either arguments or an undefined C<$default>.
+
+=head3 Usage Examples
+
+=over 2
+
+=item * Simple scalar parameter:
+
+    sub set_country {
+        my $params = get_params('country', @_);
+        # Accepts: set_country('US')
+        # Returns: { country => 'US' }
+    }
+
+=item * Object constructor with options:
+
+    sub new {
+        my $class = shift;
+        my $params = get_params('value', @_);
+        # Accepts: MyClass->new($object)
+        # Accepts: MyClass->new($object, { option => 'value' })
+        # Returns: { value => $object } or { value => $object, option => 'value' }
+    }
+
+=item * Hash parameter:
+
+    sub configure {
+        my $params = get_params('config', @_);
+        # Accepts: configure({ db => 'mysql', host => 'localhost' })
+        # Returns: { config => { db => 'mysql', host => 'localhost' } }
+    }
+
+=item * Without default (named parameters only):
+
+    sub process {
+        my $params = get_params(undef, @_);
+        # Accepts: process(name => 'John', age => 30)
+        # Returns: { name => 'John', age => 30 }
+    }
+
+=back
+
+=head3 Caveats
+
+=over 2
+
+=item * When C<$default> is defined and no arguments are provided, an error is thrown
+
+=item * There's no way to specify that a default parameter is optional
+
+=item * Single hash references always bypass the default parameter naming
+
+=back
+
 =cut
 
 sub get_params
@@ -101,6 +162,10 @@ sub get_params
 	return $_[0] if((scalar(@_) == 1) && (ref($_[0]) eq 'HASH'));	# Note - doesn't check if "default" was given
 
 	my $default = shift;
+
+	if(ref($default)) {
+		Carp::croak(__PACKAGE__, '::get_params: $default must be a scalar');
+	}
 
 	my $args;
 	my $array_ref;
@@ -169,13 +234,16 @@ sub get_params
 			# }
 			# FIXME: No means to say that the default is optional
 			# Carp::croak('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)");
-			Carp::croak(Devel::Confess::longmess('Usage: ', __PACKAGE__, '->', (caller(1))[3], "($default => \$val)"));
+			Carp::croak(Devel::Confess::longmess("Usage: ", __PACKAGE__, '->', (caller(1))[3], "($default => \$val)"));
 		}
 		return;
 	}
 	if(($num_args == 2) && (ref($args->[1]) eq 'HASH')) {
 		if(defined($default)) {
 			if(scalar keys %{$args->[1]}) {
+				if($args->[0] eq $default) {
+					return { $default => $args->[1] };
+				}
 				# Obj->new('foo', { 'key1' => 'val1' } - set foo to the mandatory first argument, and the rest are options
 				return {
 					$default => $args->[0],
@@ -210,9 +278,13 @@ Sometimes giving an array ref rather than array fails.
 
 =over 4
 
+=item * L<Params::Smart>
+
 =item * L<Params::Validate::Strict>
 
 =item * L<Return::Set>
+
+=item * L<Test Dashboard|https://nigelhorne.github.io/Params-Get/coverage/>
 
 =back
 
@@ -252,14 +324,14 @@ L<http://deps.cpantesters.org/?module=Params::Get>
 
 =back
 
-=head1 LICENSE AND COPYRIGHT
+=head1 LICENCE AND COPYRIGHT
 
-Copyright 2025 Nigel Horne.
+Copyright 2025-2026 Nigel Horne.
 
-This program is released under the following licence: GPL2
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
 
 =cut
 
 1;
-
-__END__

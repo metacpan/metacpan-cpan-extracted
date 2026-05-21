@@ -2,7 +2,7 @@
 
 =head1 DESCRIPTION
 
-Make sure that overriding a resource resets correcponding cache entry.
+Make sure that overriding a resource resets corresponding cache entry.
 
 =cut
 

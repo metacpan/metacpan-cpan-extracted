@@ -2,6 +2,8 @@ use 5.008004;
 use ExtUtils::MakeMaker;
 use File::ShareDir::Install;
 
+os_unsupported if $^O eq 'MSWin32';
+
 install_share 'share';
 
 WriteMakefile(
@@ -59,6 +61,10 @@ check:
 # 3020, start Hex Describe on port 3000.
 run:
 	morbo --mode development --listen http://*:3000 script/hex-describe
+
+upload:
+	ssh sibirocobombus make hex-describe
+	ssh sibirocobombus.root systemctl restart hex-describe
 EOT
   return join "\n", @ret;
 }

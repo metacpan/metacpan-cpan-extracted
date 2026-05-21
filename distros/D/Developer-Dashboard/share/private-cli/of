@@ -77,7 +77,7 @@ resolution, Java source lookup, and print-vs-editor behavior.
   dashboard of . "Ok\.js$"
   dashboard of Developer::Dashboard::CLI::Paths
   dashboard of javax.jws.WebService
-  dashboard of --print bookmarks api-dashboard
+  dashboard of --print bookmarks index
 
 =for comment FULL-POD-DOC END
 

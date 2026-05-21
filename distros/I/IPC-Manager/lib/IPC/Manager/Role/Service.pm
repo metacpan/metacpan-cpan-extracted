@@ -2,7 +2,7 @@ package IPC::Manager::Role::Service;
 use strict;
 use warnings;
 
-our $VERSION = '0.000035';
+our $VERSION = '0.000037';
 
 # Not included in role:
 use Carp qw/croak/;
@@ -34,11 +34,12 @@ requires qw{
     handle_request
 };
 
-sub cycle                { 0.2 }
-sub interval             { 0.2 }
-sub use_posix_exit       { 0 }
-sub intercept_errors     { 0 }
-sub expose_error_details { 0 }
+sub cycle                  { 0.2 }
+sub interval               { 0.2 }
+sub use_posix_exit         { 0 }
+sub intercept_errors       { 0 }
+sub expose_error_details   { 0 }
+sub run_returns_to_caller  { 0 }
 
 sub terminated    { $_[0]->{_TERMINATED} }
 sub is_terminated { defined $_[0]->{_TERMINATED} ? 1 : 0 }
@@ -679,6 +680,19 @@ Returns the interval for C<run_on_interval> callbacks (default: 0.2 seconds).
 =item $self->use_posix_exit()
 
 Returns whether to use POSIX exit codes (default: 0).
+
+=item $self->run_returns_to_caller()
+
+When true, C<_ipcm_service> returns to its caller after C<run()> returns rather
+than calling C<POSIX::_exit> / C<exit>.  This is meaningful only when the
+service was launched via C<exec.stay_in_begin = 1>: in that mode C<_ipcm_service>
+is invoked synchronously from inside the boot C<-M> BEGIN hook of the exec'd
+perl process, so returning from C<_ipcm_service> lets control propagate back
+through C<IPC::Manager::Service::State::import> and out of BEGIN.  Services
+that want to drive a BEGIN-time C<goto::file> handoff (e.g. a preload service
+that forks a grandchild and then hands the test file off via C<goto::file>)
+must override this to return true.  Default is C<0>, which preserves the
+existing "always exit after run() returns" behaviour for every other service.
 
 =item $self->intercept_errors()
 

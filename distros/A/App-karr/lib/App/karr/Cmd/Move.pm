@@ -1,7 +1,7 @@
 # ABSTRACT: Change a task's status
 
 package App::karr::Cmd::Move;
-our $VERSION = '0.102';
+our $VERSION = '0.205';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -11,6 +11,7 @@ use App::karr::Role::BoardAccess;
 use App::karr::Role::Output;
 use App::karr::Task;
 use App::karr::Config;
+use Time::Piece;
 
 with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output';
 
@@ -40,10 +41,8 @@ sub execute {
   my @ids = $self->parse_ids($id_str);
   my $new_status = $args_ref->[1];
 
-  my $config = App::karr::Config->new(
-    file => $self->board_dir->child('config.yml'),
-  );
-  my @statuses = $config->statuses;
+  my $ec = $self->store->effective_config;
+  my @statuses = $self->store->all_status_names;
 
   my @results;
   for my $id (@ids) {
@@ -65,15 +64,13 @@ sub execute {
     die "New status required\n" unless $task_new_status;
 
     # Check require_claim
-    my $sc = $config->status_config($task_new_status);
-    if ($sc && $sc->{require_claim} && !$self->claim && !$task->has_claimed_by) {
+    if ($self->store->status_requires_claim($task_new_status) && !$self->claim && !$task->has_claimed_by) {
       die "Status '$task_new_status' requires --claim\n";
     }
 
     if ($self->claim) {
       $task->claimed_by($self->claim);
-      require Time::Piece;
-      $task->claimed_at(Time::Piece::gmtime()->datetime . 'Z');
+      $task->claimed_at(gmtime->datetime . 'Z');
     }
 
     my $old_status = $task->status;
@@ -81,15 +78,13 @@ sub execute {
 
     # Set started/completed timestamps
     if ($task_new_status eq 'in-progress' && !$task->has_started) {
-      require Time::Piece;
-      $task->started(Time::Piece::gmtime()->strftime('%Y-%m-%d'));
+      $task->started(gmtime->strftime('%Y-%m-%d'));
     }
     if ($task_new_status eq 'done' && !$task->has_completed) {
-      require Time::Piece;
-      $task->completed(Time::Piece::gmtime()->strftime('%Y-%m-%d'));
+      $task->completed(gmtime->strftime('%Y-%m-%d'));
     }
 
-    $task->save;
+    $self->save_task($task);
 
     push @results, { id => $task->id, title => $task->title, old_status => $old_status, new_status => $task_new_status };
     printf "Moved task %d: %s -> %s\n", $task->id, $old_status, $task_new_status unless $self->json;
@@ -124,7 +119,7 @@ App::karr::Cmd::Move - Change a task's status
 
 =head1 VERSION
 
-version 0.102
+version 0.205
 
 =head1 SYNOPSIS
 
@@ -163,11 +158,11 @@ L<App::karr::Cmd::Pick>, L<App::karr::Cmd::Handoff>
 =head2 Issues
 
 Please report bugs and feature requests on GitHub at
-L<https://github.com/Getty/p5-app-karr/issues>.
+L<https://github.com/Getty/karr/issues>.
 
 =head2 IRC
 
-Join C<#ai> on C<irc.perl.org> or message Getty directly.
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -175,7 +170,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

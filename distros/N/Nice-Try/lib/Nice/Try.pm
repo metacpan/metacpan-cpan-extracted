@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## A real Try Catch Block Implementation Using Perl Filter - ~/lib/Nice/Try.pm
-## Version v1.3.17
+## Version v1.4.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/05/17
-## Modified 2025/07/20
+## Modified 2026/04/29
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -25,8 +25,8 @@ BEGIN
     use Filter::Util::Call;
     use Scalar::Util ();
     use List::Util ();
-    use Want ();
-    our $VERSION = 'v1.3.17';
+    use Wanted ();
+    our $VERSION = 'v1.4.0';
     our $ERROR;
     our( $CATCH, $DIED, $EXCEPTION, $FINALLY, $HAS_CATCH, @RETVAL, $SENTINEL, $TRY, $WANTARRAY );
 }
@@ -49,7 +49,7 @@ sub import
     $hash->{dont_want} = 0 if( !CORE::exists( $hash->{dont_want} ) );
     # We use the $class to process the __DATA__ or __END__ token section
     $hash->{class} = $class;
-    # We check if we are running under tie and if so we cannot use Want features, 
+    # We check if we are running under tie and if so we cannot use Wanted features, 
     # because they would trigger a segmentation fault.
     $hash->{is_tied} = 0;
     if( $class->can( 'TIESCALAR' ) || $class->can( 'TIEHASH' ) || $class->can( 'TIEARRAY' ) )
@@ -798,25 +798,25 @@ CORE::local \$Nice::Try::NOOP = sub
 };
 if( CORE::defined( \$Nice::Try::WANTARRAY ) && !\$Nice::Try::THREADED && !( !CORE::length( [CORE::caller]->[1] ) && [CORE::caller(1)]->[3] eq '(eval)' ) )
 {
-    CORE::eval "\\\$Nice::Try::WANT = Want::want( 'LIST' )
+    CORE::eval "\\\$Nice::Try::WANT = Wanted::want( 'LIST' )
             ? 'LIST'
-            : Want::want( 'HASH' )
+            : Wanted::want( 'HASH' )
                 ? 'HASH'
-                : Want::want( 'ARRAY' )
+                : Wanted::want( 'ARRAY' )
                     ? 'ARRAY'
-                    : Want::want( 'OBJECT' )
+                    : Wanted::want( 'OBJECT' )
                         ? 'OBJECT'
-                        : Want::want( 'CODE' )
+                        : Wanted::want( 'CODE' )
                             ? 'CODE'
-                            : Want::want( 'REFSCALAR' )
+                            : Wanted::want( 'REFSCALAR' )
                                 ? 'REFSCALAR'
-                                : Want::want( 'BOOL' )
+                                : Wanted::want( 'BOOL' )
                                     ? 'BOOLEAN'
-                                    : Want::want( 'GLOB' )
+                                    : Wanted::want( 'GLOB' )
                                         ? 'GLOB'
-                                        : Want::want( 'SCALAR' )
+                                        : Wanted::want( 'SCALAR' )
                                             ? 'SCALAR'
-                                            : Want::want( 'VOID' )
+                                            : Wanted::want( 'VOID' )
                                                 ? 'VOID'
                                                 : '';";
     undef( \$Nice::Try::WANT ) if( \$\@ );
@@ -2193,7 +2193,7 @@ When run, this would produce, as one would expect:
 
 Also since version 1.0.0, L<Nice::Try> is B<extended> context aware:
 
-    use Want; # an awesome module which extends wantarray
+    use Wanted; # an awesome module which extends wantarray
     sub info
     {
         my $self = shift( @_ );
@@ -2287,7 +2287,7 @@ And you also have granular power in the catch block to filter which exception to
 
 =head1 VERSION
 
-    v1.3.17
+    v1.4.0
 
 =head1 DESCRIPTION
 
@@ -2481,7 +2481,7 @@ The above would yield something like:
     Oops again at ./test.pl line 14.
     Got here in finally with $@ -> Oops again at ./test.pl line 14.
 
-=item * L<Nice::Try> is rich context aware, which means it can provide you with a super granular context on how to return data back to the caller based on the caller's expectation, by using a module like L<Want>.
+=item * L<Nice::Try> is rich context aware, which means it can provide you with a super granular context on how to return data back to the caller based on the caller's expectation, by using a module like L<Wanted>.
 
 =item * Call to L<perlfunc/caller> will return the correct entry in call stack
 
@@ -2961,7 +2961,7 @@ For example:
 
 Now, you can do the following:
 
-    use Want; # an awesome module which extends wantarray
+    use Wanted; # an awesome module which extends wantarray
     sub info
     {
         my $self = shift( @_ );
@@ -3011,7 +3011,7 @@ Now, you can do the following:
 
 Thus this is particularly useful if, for example, you want to differentiate if the caller just wants a return string, or an object for chaining.
 
-L<perlfunc/wantarray> would not know the difference, and other try-catch implementation would not let you benefit from using L<Want>.
+L<perlfunc/wantarray> would not know the difference, and other try-catch implementation would not let you benefit from using L<Wanted>.
 
 For example:
 
@@ -3035,19 +3035,19 @@ Other cases are:
     # object context
     my $name = $o->info->another_method;
 
-See L<Want> for more information on how you can benefit from it.
+See L<Wanted> for more information on how you can benefit from it.
 
-Currently lvalues are not implemented and will be in future releases. Also note that L<Want> does not work within tie-handlers. It would trigger a segmentation fault. L<Nice::Try> detects this and disable automatically support for L<Want> if used inside a tie-handler, reverting to regular L<perlfunc/wantarray> context.
+Currently lvalues are not implemented and will be in future releases. Also note that L<Wanted> does not work within tie-handlers. C<Nice::Try> ow uses L<Wanted> over L<Want>, which would trigger a segmentation fault inside tie-handlers, so this is fixed now. L<Nice::Try> detects this and disable automatically support for L<Wanted> if used inside a tie-handler, reverting to regular L<perlfunc/wantarray> context.
 
 Also, for this rich context awareness to be used, obviously try-catch would need to be inside a subroutine, otherwise there is no rich context other than the one the regular L<perlfunc/wantarray> provides.
 
-This is particularly true when running within an Apache modperl handler which has no caller. If you use L<Nice::Try> in such handler, it will kill Apache process, so you need to disable the use of L<Want>, by calling:
+This is particularly true when running within an Apache modperl handler which has no caller. If you use L<Nice::Try> in such handler, it will kill Apache process, so you need to disable the use of L<Wanted>, by calling:
 
     use Nice::Try dont_want => 1;
 
-When there is an update to correct this bug from L<Want>, I will issue a new version.
+When there is an update to correct this bug from L<Wanted>, I will issue a new version.
 
-The use of L<Want> is also automatically disabled when running under a package that use overloading.
+The use of L<Wanted> is also automatically disabled when running under a package that use overloading.
 
 =head1 __DATA__ and __END__ sections
 
@@ -3245,7 +3245,7 @@ You can also pass an optional hash or hash reference of options to L</implement>
 
 L<Nice::Try> is thread-safe for both compile-time and runtime operations. During compilation, source filtering is isolated per thread/process. At runtime, transformed code uses C<local> variables (e.g., C<$Nice::Try::EXCEPTION>, C<$Nice::Try::DIED>) to ensure thread isolation. The C<finally> block, implemented via C<Nice::Try::ScopeGuard>, is thread-safe due to per-object state.
 
-Context awareness with L<Want> is disabled in threaded environments to avoid known issues, reverting to L<perlfunc/wantarray> for safety:
+Context awareness with L<Wanted> is disabled in threaded environments to avoid known issues, reverting to L<perlfunc/wantarray> for safety:
 
     use threads;
     use Nice::Try;

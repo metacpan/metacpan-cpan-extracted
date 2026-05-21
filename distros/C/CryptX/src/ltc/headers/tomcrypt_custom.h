@@ -126,6 +126,7 @@
    #define LTC_RIJNDAEL
    #define LTC_SHA256
    #define LTC_YARROW
+   #define LTC_ECB_MODE
    #define LTC_CTR_MODE
 
    #define LTC_RNG_MAKE_PRNG
@@ -218,6 +219,7 @@
 
 /* stream ciphers */
 #define LTC_CHACHA
+#define LTC_XCHACHA20
 #define LTC_SALSA20
 #define LTC_XSALSA20
 #define LTC_SOSEMANUK
@@ -303,7 +305,6 @@
 
 #define LTC_EAX_MODE
 
-#define LTC_OCB_MODE
 #define LTC_OCB3_MODE
 #define LTC_CCM_MODE
 #define LTC_GCM_MODE
@@ -453,6 +454,9 @@
 /* Ed25519 & X25519 */
 #define LTC_CURVE25519
 
+/* Ed448 & X448 */
+#define LTC_CURVE448
+
 /* ECC */
 #define LTC_MECC
 
@@ -578,6 +582,7 @@
    #define LTC_ECC_SECP256R1
    #define LTC_ECC_SECP384R1
    #define LTC_ECC_SECP521R1
+   #define LTC_ECC_FRP256V1
 #endif
 #endif /* LTC_MECC */
 
@@ -705,6 +710,10 @@
    #error LTC_CHACHA20_PRNG requires LTC_CHACHA
 #endif
 
+#if defined(LTC_XCHACHA20) && !defined(LTC_CHACHA)
+   #error LTC_XCHACHA20 requires LTC_CHACHA
+#endif
+
 #if defined(LTC_XSALSA20) && !defined(LTC_SALSA20)
    #error LTC_XSALSA20 requires LTC_SALSA20
 #endif
@@ -747,7 +756,7 @@
    #error LTC_ECB_MODE not defined, but all other modes depend on it
 #endif
 #if defined(LTC_OMAC) || defined(LTC_PMAC) || defined(LTC_XCBC) || defined(LTC_F9_MODE) || defined(LTC_EAX_MODE) || \
-    defined(LTC_OCB_MODE) || defined(LTC_OCB3_MODE) || defined(LTC_CCM_MODE) || defined(LTC_GCM_MODE) )
+    defined(LTC_OCB3_MODE) || defined(LTC_CCM_MODE) || defined(LTC_GCM_MODE) )
    #error LTC_ECB_MODE not defined, but most MAC and AEAD modes depend on it
 #endif
 #endif

@@ -2,7 +2,7 @@ NAME
     marc-list - Tool to get MARC leader or field/subfield unique list.
 
 SYNOPSIS
-     marc-list [-f] [-h] [--version] marc_xml_file field [subfield]
+     marc-list [-f] [-h] [-s] [--version] marc_xml_file field [subfield]
 
 DESCRIPTION
     Tool to fetch unique list of some field in MARC collection file. It
@@ -20,6 +20,10 @@ ARGUMENTS
 
             Print help.
 
+    *       "-s"
+
+            Skip controls of field/subfield.
+
     *       "--version"
 
             Print version of script.
@@ -27,6 +31,10 @@ ARGUMENTS
     *       "marc_xml_file"
 
             MARC XML file name.
+
+            Input file could be compressed by IO::Uncompress::AnyUncompress
+            module. Possibility is to uncompress gzip, zip, bzip2, zstd, xz,
+            lzma, lzip, lzf or lzop.
 
     *       "field"
 
@@ -44,7 +52,7 @@ ARGUMENTS
     *       "module_version"
 
 EXAMPLE1
-     marc-lisr __MARC.xml__ leader
+     marc-list __MARC.xml__ leader
 
 EXAMPLE2
      marc-list __MARC.xml__ 008
@@ -66,5 +74,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.08
+    0.09
 

@@ -112,9 +112,11 @@ sub TO_JSON {
     my $json = {};
 
     if ($self->expression) {
-        $json->{expression}      = $self->expression;
-        $json->{acknowledgement} = $self->acknowledgement if $self->acknowledgement;
-        $json->{'bom-ref'}       = $self->bom_ref         if $self->bom_ref;
+        $json->{expression}        = $self->expression;
+        $json->{expressionDetails} = $self->expression_details if @{$self->expression_details};
+        $json->{acknowledgement}   = $self->acknowledgement    if $self->acknowledgement;
+        $json->{'bom-ref'}         = $self->bom_ref            if $self->bom_ref;
+        $json->{licensing}         = $self->licensing          if %{$self->licensing->TO_JSON};
     }
     else {
 
@@ -130,13 +132,12 @@ sub TO_JSON {
         $json->{license}->{id}   = $spdx_license if $spdx_license;
         $json->{license}->{name} = $license_name if $license_name;
 
-        $json->{license}->{'bom-ref'}         = $self->bom_ref            if $self->bom_ref;
-        $json->{license}->{acknowledgement}   = $self->acknowledgement    if $self->acknowledgement;
-        $json->{license}->{text}              = $self->text               if $self->text;
-        $json->{license}->{url}               = $self->url                if $self->url;
-        $json->{license}->{properties}        = $self->properties         if @{$self->properties};
-        $json->{license}->{licensing}         = $self->licensing          if %{$self->licensing->TO_JSON};
-        $json->{license}->{expressionDetails} = $self->expression_details if @{$self->expression_details};
+        $json->{license}->{'bom-ref'}       = $self->bom_ref         if $self->bom_ref;
+        $json->{license}->{acknowledgement} = $self->acknowledgement if $self->acknowledgement;
+        $json->{license}->{text}            = $self->text            if $self->text;
+        $json->{license}->{url}             = $self->url             if $self->url;
+        $json->{license}->{properties}      = $self->properties      if @{$self->properties};
+        $json->{license}->{licensing}       = $self->licensing       if %{$self->licensing->TO_JSON};
 
     }
 

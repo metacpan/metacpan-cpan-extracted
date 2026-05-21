@@ -28,6 +28,7 @@
       "configure" : {
          "requires" : {
             "Alien::MariaDB" : "0",
+            "EV" : "4.11",
             "EV::MakeMaker" : "0",
             "ExtUtils::MakeMaker" : "6.64"
          }
@@ -56,6 +57,6 @@
          "web" : "https://github.com/vividsnow/perl5-ev-mariadb"
       }
    },
-   "version" : "0.04",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

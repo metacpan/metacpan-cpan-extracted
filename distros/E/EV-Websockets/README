@@ -80,15 +80,19 @@ CLASSES
             max_message_size => 1048576,             # optional, 0 = unlimited
             connect_timeout  => 5.0,                 # optional, seconds
             on_connect  => sub { my ($conn, $headers) = @_; ... },
-            on_message  => sub { my ($conn, $data, $is_binary, $is_final) = @_; ... },
+            on_message  => sub { my ($conn, $data, $is_binary) = @_; ... },
             on_close    => sub { my ($conn, $code, $reason) = @_; ... },
             on_error    => sub { my ($conn, $err) = @_; ... },
             on_pong     => sub { my ($conn, $payload) = @_; ... },
             on_drain    => sub { my ($conn) = @_; ... },
         );
 
-    Returns an EV::Websockets::Connection object. $is_final is always 1
-    (messages are fully reassembled before delivery).
+    Returns an EV::Websockets::Connection object.
+
+    "on_message" receives complete reassembled messages; fragmented frames
+    are buffered internally up to "max_message_size". For backwards
+    compatibility a fourth argument $is_final is also passed but is always
+    1.
 
     "connect_timeout" sets a deadline (in seconds) for the WebSocket
     handshake. If the connection is not established within this time,
@@ -98,7 +102,11 @@ CLASSES
     server (Set-Cookie, Content-Type, Server, Sec-WebSocket-Protocol, and
     when available Location, WWW-Authenticate).
 
-    "on_drain" fires when the send queue becomes empty after a write.
+    "on_drain" fires from the writeable callback when the send queue
+    empties. It will not fire if close() has already been queued - once
+    closing is in progress the connection short-circuits to teardown without
+    emitting drain. If you need to act after the queue empties, do so before
+    calling close(), or rely on "on_close" instead.
 
    listen(%options)
     Create a WebSocket listener. Returns the port number being listened on
@@ -115,7 +123,7 @@ CLASSES
             headers          => { 'Set-Cookie' => 'session=abc123' }, # response headers
             on_handshake => sub { my ($headers) = @_; return { 'X-Custom' => 'val' } },
             on_connect  => sub { my ($conn, $headers) = @_; ... },
-            on_message  => sub { my ($conn, $data, $is_binary, $is_final) = @_; ... },
+            on_message  => sub { my ($conn, $data, $is_binary) = @_; ... },
             on_close    => sub { my ($conn, $code, $reason) = @_; ... },
             on_error    => sub { my ($conn, $err) = @_; ... },
             on_pong     => sub { my ($conn, $payload) = @_; ... },
@@ -140,7 +148,10 @@ CLASSES
     receives a 403).
 
    connections
-    Returns a list of all currently connected Connection objects.
+    Returns a list of Connection objects whose state is "connected" or
+    "closing" (i.e. the WebSocket handshake completed and the underlying wsi
+    still exists). Conns still in "connecting" and conns already
+    "closed"/"destroyed" are omitted.
 
         my @conns = $ctx->connections;
         $_->send("broadcast!") for @conns;
@@ -153,7 +164,7 @@ CLASSES
             initial_data     => $already_read_bytes, # optional pre-read data
             max_message_size => 1048576,
             on_connect => sub { my ($conn, $headers) = @_; ... },
-            on_message => sub { my ($conn, $data, $is_binary, $is_final) = @_; ... },
+            on_message => sub { my ($conn, $data, $is_binary) = @_; ... },
             on_close   => sub { my ($conn, $code, $reason) = @_; ... },
             on_error   => sub { my ($conn, $err) = @_; ... },
             on_pong    => sub { my ($conn, $payload) = @_; ... },
@@ -172,66 +183,93 @@ CLASSES
     Represents a WebSocket connection.
 
    send($data)
-    Send text data over the connection.
+    Queue a text frame. Croaks if the connection is not open.
 
    send_binary($data)
-    Send binary data over the connection.
+    Queue a binary frame. Croaks if the connection is not open.
 
-   send_ping($data)
-    Send a Ping frame. Payload is silently truncated to 125 bytes per RFC
-    6455.
+   send_ping([$payload])
+    Queue a Ping frame. $payload is optional; if supplied it is silently
+    truncated to 125 bytes per RFC 6455 §5.5. Croaks if the connection is
+    not open.
 
-   send_pong($data)
-    Send a Pong frame. Payload is silently truncated to 125 bytes per RFC
-    6455.
+   send_pong([$payload])
+    Queue a Pong frame. Same payload rules as "send_ping". Most peers send
+    Pong automatically in response to Ping; you only need this to send an
+    unsolicited Pong (e.g. as a one-way keepalive).
 
-   send_fragment($data, $is_binary, $is_final)
-    Send a WebSocket message fragment for streaming large messages. The
-    first call starts a new fragmented message (text or binary based on
-    $is_binary). Subsequent calls send continuation frames. Set $is_final to
-    true on the last fragment.
+   send_fragment($data, $is_binary = 0, $is_final = 1)
+    Send one fragment of a streaming message. The first call starts a new
+    fragmented message (text or binary per $is_binary); subsequent calls
+    send continuation frames. Set $is_final true on the last fragment.
 
         $conn->send_fragment("part1", 0, 0);   # text, not final
         $conn->send_fragment("part2", 0, 0);   # continuation, not final
         $conn->send_fragment("part3", 0, 1);   # continuation, final
 
-    $is_binary defaults to 0, $is_final defaults to 1.
+    Use this only if you need to interleave outbound writes with other I/O
+    while streaming a single message. For ordinary sends, prefer
+    "send"/"send_binary".
+
+   send_queue_size
+    Returns the number of payload bytes currently queued for sending
+    (excludes WebSocket framing overhead). Useful for backpressure
+    monitoring; pair with "on_drain" to gate further sends.
 
    stash
     Returns a hashref for storing arbitrary per-connection metadata. The
-    hashref is lazily created on first access and persists for the lifetime
-    of the connection.
+    hashref is lazily created on first access and lives until the connection
+    is freed.
 
         $conn->stash->{user_id} = 42;
         my $uid = $conn->stash->{user_id};
 
-   send_queue_size
-    Returns the number of payload bytes currently queued for sending.
-
    get_protocol
-    Returns the negotiated "Sec-WebSocket-Protocol" value, or "undef".
+    Returns the negotiated "Sec-WebSocket-Protocol" value, or "undef" if no
+    subprotocol was negotiated or the connection is closed.
 
    peer_address
-    Returns the peer IP address as a string, or "undef".
+    Returns the peer's IP address as a printable string (IPv4 dotted-quad or
+    IPv6 colon notation, no brackets, no port), or "undef" if unavailable.
 
-   close($code, $reason)
-    Close the connection with the given status code and reason.
+   close([$code = 1000], [$reason])
+    Initiate a clean WebSocket close. Sends a Close frame with $code
+    (default 1000, normal closure) and an optional UTF-8 $reason (truncated
+    by lws to fit the frame). Pending sends are drained first, then the
+    connection is torn down and "on_close" fires.
+
+    This is a no-op (does not croak) if the connection is already closed,
+    closing, or destroyed. It is also a no-op while the connection is still
+    in the "connecting" state - calling close() before the handshake
+    completes does not cancel the in-flight connect; use "connect_timeout"
+    to bound the handshake instead.
 
    pause_recv
-    Stop receiving data from this connection (flow control).
+    Stop reading frames from this connection (TCP flow control). New
+    incoming frames will back up in the kernel's socket buffer until
+    "resume_recv" is called. Silently does nothing on a closed or destroyed
+    connection.
 
    resume_recv
-    Resume receiving data after "pause_recv".
+    Resume receiving after "pause_recv". Silently does nothing on a closed
+    or destroyed connection.
 
    is_connected
-    Returns true if the connection is established and open.
+    Returns true while "state" is "connected".
 
    is_connecting
-    Returns true if the connection is in progress.
+    Returns true while "state" is "connecting". Returns false once the
+    connection is established, closing, closed, or destroyed.
 
    state
-    Returns the current state as a string: "connecting", "connected",
-    "closing", "closed", or "destroyed".
+    Returns the current state as one of:
+
+    "connecting" - TCP/TLS handshake or HTTP upgrade in progress
+    "connected" - open and ready to send/receive
+    "closing" - close() has been called; pending sends still draining
+    "closed" - the underlying wsi is gone but the Perl object is still alive
+    "destroyed" - the C struct has been freed (further method calls will
+    croak)
 
 DEBUGGING
         EV::Websockets::_set_debug(1);
@@ -296,7 +334,36 @@ BENCHMARKS
         Net::Async::WebSocket  ~141us avg,   ~7k msg/s  (Pure Perl)
 
 URL FORMATS
-    The module supports both "ws://" and "wss://" (TLS) URLs.
+    "connect" accepts "ws://" (plaintext) and "wss://" (TLS) URLs:
+
+        ws://host[:port]/path
+        wss://host[:port]/path
+        ws://[2001:db8::1]:9001/         # IPv6 (brackets required)
+
+    The default port is 80 for "ws://" and 443 for "wss://". Userinfo
+    ("user:pass@") in the URL is not parsed; pass HTTP auth via the
+    "headers" option instead.
+
+ERRORS AND EXCEPTIONS
+    Methods on "EV::Websockets::Connection" fall into two groups:
+
+    Send / accessors that croak when the connection is gone
+        "send", "send_binary", "send_ping", "send_pong", "send_fragment",
+        and "stash" croak with "Connection has been destroyed" or
+        "Connection is not open" if invoked after the connection has closed
+        or been DESTROYed. Wrap in "eval { ... }" if you may race connection
+        teardown.
+
+    Lifecycle / control that silently no-op
+        "close", "pause_recv", and "resume_recv" return silently when the
+        connection is already closed or destroyed. This makes them safe to
+        call from cleanup paths without guarding.
+
+    User-supplied callbacks ("on_connect", "on_message", "on_close",
+    "on_error", "on_pong", "on_drain", "on_handshake") are invoked under
+    "G_EVAL": a die inside a callback is caught, warned, and the connection
+    continues. "on_error" is itself wrapped, so a die inside "on_error" will
+    not recurse.
 
 SEE ALSO
     EV, Alien::libwebsockets, libwebsockets <https://libwebsockets.org/>,

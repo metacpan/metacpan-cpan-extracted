@@ -12,8 +12,31 @@ Static files are served from the effective lookup roots in this order:
 2. `~/.developer-dashboard/dashboard/public/...`
 3. the saved bookmark root `dashboards/public/...` for assets that ship beside saved bookmark files
 
+Skill-local assets use a parallel route namespace:
+
+1. `~/.developer-dashboard/skills/<repo-name>/dashboards/public/js/...` through `/js/<repo-name>/...`
+2. `~/.developer-dashboard/skills/<repo-name>/dashboards/public/css/...` through `/css/<repo-name>/...`
+3. `~/.developer-dashboard/skills/<repo-name>/dashboards/public/others/...` through `/others/<repo-name>/...`
+4. nested child skills under `~/.developer-dashboard/skills/<repo-name>/skills/<sub-skill>/...`
+   extend those same prefixes, for example
+   `~/.developer-dashboard/skills/<repo-name>/skills/<sub-skill>/dashboards/public/js/foo/bar.js`
+   maps to `/js/<repo-name>/<sub-skill>/foo/bar.js`
+
+Skill-local Ajax handlers use:
+
+1. `~/.developer-dashboard/skills/<repo-name>/dashboards/ajax/...` through `/ajax/<repo-name>/...`
+2. nested child skills under
+   `~/.developer-dashboard/skills/<repo-name>/skills/<sub-skill>/dashboards/ajax/...`
+   map to `/ajax/<repo-name>/<sub-skill>/...`
+
 The URL paths stay the same regardless of which on-disk root satisfies the
 request.
+
+When a request such as `/js/example-skill/foo/bar.js`,
+`/js/example-skill/sub-skill/foo/bar.js`, or `/ajax/example-skill/sub-skill/foo`
+does not exist in the skill-local tree, Developer Dashboard falls back to the
+normal nested saved-bookmark path `dashboards/public/...` or `dashboards/ajax/...`
+instead of assuming the leading path segments must always belong to a skill.
 
 Example layout:
 ```
@@ -31,12 +54,16 @@ Reference static files in bookmark HTML or page instructions using these URL pat
 ```html
 <script src="/js/jquery.js"></script>
 <script src="/js/my-custom-script.js"></script>
+<script src="/js/example-skill/skill.js"></script>
+<script src="/js/example-skill/sub-skill/path/file.js"></script>
 ```
 
 ### CSS Stylesheets
 ```html
 <link rel="stylesheet" href="/css/bootstrap.min.css">
 <link rel="stylesheet" href="/css/custom-styles.css">
+<link rel="stylesheet" href="/css/example-skill/skill.css">
+<link rel="stylesheet" href="/css/example-skill/sub-skill/path/file.css">
 ```
 
 ### Other Assets (Images, Fonts, JSON, etc.)
@@ -44,6 +71,36 @@ Reference static files in bookmark HTML or page instructions using these URL pat
 <img src="/others/logo.png">
 <link rel="icon" href="/others/favicon.ico">
 <script src="/others/config.json" type="application/json"></script>
+<img src="/others/example-skill/icon.svg">
+<img src="/others/example-skill/sub-skill/path/file.txt">
+```
+
+### Skill-local Ajax Endpoints
+```html
+<script>
+var endpoints = {};
+</script>
+```
+
+Skill bookmark CODE blocks can publish stable endpoints such as:
+
+```perl
+CODE1: Ajax jvar => 'endpoints.status', file => 'status', code => q{
+print "ok\n";
+};
+```
+
+When that page lives inside `~/.developer-dashboard/skills/example-skill/dashboards/...`,
+the browser-facing endpoint becomes:
+
+```text
+/ajax/example-skill/status?type=text
+```
+
+Nested child skills extend that pattern:
+
+```text
+/ajax/example-skill/sub-skill/status?type=text
 ```
 
 ## Adding New Files
@@ -128,6 +185,14 @@ The static file server implements the following security measures:
 GET /js/<filename>      - Serve JavaScript files
 GET /css/<filename>     - Serve CSS files
 GET /others/<filename>  - Serve other static assets
+GET /js/<repo-name>/<filename>     - Serve skill-local JavaScript files
+GET /css/<repo-name>/<filename>    - Serve skill-local CSS files
+GET /others/<repo-name>/<filename> - Serve skill-local assets
+GET /ajax/<repo-name>/<filename>   - Serve skill-local saved Ajax handlers
+GET /js/<repo-name>/<sub-skill>/<filename>     - Serve nested skill-local JavaScript files
+GET /css/<repo-name>/<sub-skill>/<filename>    - Serve nested skill-local CSS files
+GET /others/<repo-name>/<sub-skill>/<filename> - Serve nested skill-local assets
+GET /ajax/<repo-name>/<sub-skill>/<filename>   - Serve nested skill-local saved Ajax handlers
 ```
 
 ### Response Codes
@@ -189,7 +254,8 @@ CODE1: Initialize application
 ## File Size Limitations
 
 Built-in compatibility asset:
-- `/js/jquery.js` provides a local jQuery-style helper with `$(document).ready`, `$.ajax`, jqXHR-style `.done(...)` / `.fail(...)` / `.always(...)` chaining, the `method` alias used by modern callers, and selector `.text(...)` support for saved bookmark pages
+- `/js/jquery.js` serves the bundled local copy of jQuery 4.0.0
+- `/js/jquery-4.0.0.min.js` is kept as a compatibility alias for the same bundled payload
 
 Additional files can be added as needed. There are no built-in size restrictions, but large files should be minified to optimize page load times.
 

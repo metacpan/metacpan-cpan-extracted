@@ -39,7 +39,6 @@ class ChunkLoader extends ScriptLoader {
 	}	
 
   updateStatus(message,mode){
-    //console.log("UPDATE STATUS CALLED");
       let e=new CustomEvent("JPACK_STATUS",{detail: {progress: parseInt(100*this.chunksLoaded/this.chunksExpected), message:message, mode:mode}});
       window.dispatchEvent(e);
 
@@ -51,6 +50,7 @@ class ChunkLoader extends ScriptLoader {
 	 */
 	bootstrap(){
 
+    this.updateStatus("Loading Applcation Boostrap");
     // Path is relative to this.buildRoot
     let name="app/jpack/boot/00000000000000000000000000000000/00000000000000000000000000000000.jpack";
     return this.queueChunkScript(name)
@@ -63,7 +63,8 @@ class ChunkLoader extends ScriptLoader {
           this.unloadScript(this.buildRoot+name);
 
           this.chunksLoaded++;
-          this.updateStatus("Boot Complete");
+          this.updateStatus();
+          //this.updateStatus("Boot Complete");
 
           return Promise.resolve();
         });
@@ -167,12 +168,13 @@ class ChunkLoader extends ScriptLoader {
 		return new Promise((resolve,reject)=>{
 			setTimeout(()=>{
 				this.loadScript(path).then((e)=>{
-					this.updateStatus("Loading data "+ entry.path);
+          this.updateStatus();
+					//this.updateStatus("Loading data "+ entry.path);
 					//e.parentElement.removeChild(e);
 					resolve();
 				})
 				.catch((e)=>{
-					this.updateStatus("Error data "+ entry.path);
+					//this.updateStatus("Error data "+ entry.path);
 					console.log("Caught error", entry);
 					entry.rejecter("Could not load script");
 				});
@@ -227,14 +229,14 @@ class ChunkLoader extends ScriptLoader {
 					return chunkLoader.queueChunkScript(segPath);
 				})
 					.then((data)=>{
-						scope.updateStatus("Building channels from "+segPath);
+            //scope.updateStatus("Building channels from "+segPath);
 
             // Delete the script element  as we no longer need it
 						return callback(data);//channelManager.buildChannels(data);
 					})
 					.then(()=>{
             scope.chunksLoaded++;
-						scope.updateStatus("Building channels complete "+segPath);
+						//scope.updateStatus("Building channels complete "+segPath);
 
             scope.unloadScript(scope.buildRoot+segPath);
 
@@ -334,11 +336,13 @@ class ChunkLoader extends ScriptLoader {
 
   //Load the normal data stored in jpack database
   data(cb){
+    this.updateStatus("Loading Data");
     return this.load("data/jpack",  cb, 0);
   }
 
   //Load the application scripts stored in jpack database
   app(){
+    this.updateStatus("Loading Applcation Core");
     return this.load("app/jpack/main",  (data)=>{
       // Expected the content is javascript. Create a script element, with the content and append to head?
       let decoder=new TextDecoder("utf-8");
@@ -350,6 +354,7 @@ class ChunkLoader extends ScriptLoader {
     });
   }
   css(){
+    this.updateStatus("Loading Applcation Styles");
     return this.load("app/jpack/css",  (data)=>{
       // Expected the content is javascript. Create a script element, with the content and append to head?
       let decoder=new TextDecoder("utf-8");

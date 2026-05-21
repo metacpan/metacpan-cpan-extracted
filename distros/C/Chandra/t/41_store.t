@@ -154,7 +154,7 @@ sub store_path { "$dir/$_[0].json" }
         $s->set('num', 99);
     }
 
-    # Reopen — data should persist
+    # Reopen - data should persist
     my $s2 = Chandra::Store->new(path => $path);
     is($s2->get('saved'), 'yes', 'data persists across instances');
     is($s2->get('num'),   99,    'numeric persists');
@@ -222,7 +222,7 @@ sub store_path { "$dir/$_[0].json" }
 
     require Chandra::App;
 
-    # store() is a Perl method on Chandra::App — test it via direct bless trick
+    # store() is a Perl method on Chandra::App - test it via direct bless trick
     my $app = bless { title => 'My App' }, 'Chandra::App';
     can_ok('Chandra::App', 'store');
 }

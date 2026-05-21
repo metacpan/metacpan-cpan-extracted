@@ -3,7 +3,7 @@ package Developer::Dashboard::Platform;
 use strict;
 use warnings;
 
-our $VERSION = '3.14';
+our $VERSION = '3.90';
 
 use Exporter 'import';
 use File::Basename qw(basename dirname);
@@ -146,6 +146,8 @@ sub command_argv_for_path {
     my $lower = lc $resolved;
 
     return ( $^X, '-I', _module_lib_root(), $resolved ) if $lower =~ /\.pl\z/;
+    return ( _python_binary(), $resolved ) if $lower =~ /\.py\z/;
+    return ( _node_binary(), $resolved ) if $lower =~ /\.js\z/;
     return ( $^X, '-I', _module_lib_root(), '-MDeveloper::Dashboard::Platform', '-e', 'Developer::Dashboard::Platform::_exec_go_source(@ARGV)', $resolved )
       if $lower =~ /\.go\z/;
     return ( $^X, '-I', _module_lib_root(), '-MDeveloper::Dashboard::Platform', '-e', 'Developer::Dashboard::Platform::_exec_java_source(@ARGV)', $resolved )
@@ -221,7 +223,7 @@ sub _runnable_path_candidates {
     my @candidates = _path_candidates($path);
     return @candidates if $path =~ /\.[^\\\/.]+\z/;
 
-    for my $suffix (qw(.pl .go .java .ps1 .cmd .bat .sh .bash)) {
+    for my $suffix (qw(.pl .py .js .go .java .ps1 .cmd .bat .sh .bash)) {
         push @candidates, _path_candidates( $path . $suffix );
     }
 
@@ -236,6 +238,8 @@ sub _runnable_path_candidates {
 sub _is_windows_runnable_candidate {
     my ($path) = @_;
     return 1 if $path =~ /\.(?:pl|ps1)\z/i;
+    return 1 if $path =~ /\.py\z/i && ( command_in_path('python') || command_in_path('python3') );
+    return 1 if $path =~ /\.js\z/i && command_in_path('node');
     return 1 if $path =~ /\.(?:com|exe|bat|cmd)\z/i;
     return 1 if $path =~ /\.(?:sh|bash)\z/i && ( command_in_path('bash') || command_in_path('sh') );
     return 1 if _has_shebang($path);
@@ -262,13 +266,32 @@ sub _powershell_binary {
     return command_in_path('pwsh') || command_in_path('powershell') || 'powershell';
 }
 
+# _python_binary()
+# Resolves the preferred Python executable name for Python-backed hooks and commands.
+# Input: none.
+# Output: executable path or command name string.
+sub _python_binary {
+    return command_in_path('python') || command_in_path('python3') || 'python';
+}
+
+# _node_binary()
+# Resolves the preferred Node.js executable name for JavaScript-backed hooks and commands.
+# Input: none.
+# Output: executable path or command name string.
+sub _node_binary {
+    return command_in_path('node') || 'node';
+}
+
 # _cmd_binary()
 # Resolves the Windows command processor used for .cmd and .bat scripts.
 # Input: none.
-# Output: executable path or command name string.
+# Output: executable path or command name string, normalized back to cmd.exe
+# when PATH or ComSpec resolves through a generic cmd shim instead of the
+# canonical Windows command processor name.
 sub _cmd_binary {
     my $candidate = $ENV{ComSpec} || command_in_path('cmd') || 'cmd.exe';
-    return 'cmd.exe' if lc( basename($candidate) ) eq 'cmd.exe';
+    my $base = lc( basename($candidate) );
+    return 'cmd.exe' if $base eq 'cmd.exe' || $base eq 'cmd';
     return $candidate;
 }
 

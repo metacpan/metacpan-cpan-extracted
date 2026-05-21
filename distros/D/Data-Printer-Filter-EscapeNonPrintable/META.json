@@ -16,7 +16,11 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "eg",
+         "examples",
+         "share",
+         "xt"
       ]
    },
    "prereqs" : {
@@ -35,10 +39,9 @@
             "App::CPANTS::Lint" : "0",
             "Data::Printer" : "0",
             "Devel::Cover" : "0",
+            "Devel::NYTProf" : "0",
             "Perl::Critic" : "0",
-            "Perl::Tidy" : "0",
-            "Pod::Markdown" : "0",
-            "Pod::Markdown::Githubert" : "0"
+            "Perl::Tidy" : "0"
          },
          "requires" : {
             "Test::CPAN::Changes" : "0",
@@ -75,9 +78,10 @@
          "web" : "https://github.com/ryoskzypu/Data-Printer-Filter-EscapeNonPrintable"
       }
    },
-   "version" : "v1.0.0",
+   "version" : "v1.0.1",
    "x_contributors" : [
       "ryoskzypu <ryoskzypu@proton.me>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_spdx_expression" : "MIT-0"
 }

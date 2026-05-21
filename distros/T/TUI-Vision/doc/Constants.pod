@@ -1,0 +1,675 @@
+=pod
+
+=head1 CONSTANTS
+
+The Turbo Vision framework defines a large set of constants used to
+describe behavior rather than encode logic.
+
+Constants are used for palettes, flags, command identifiers and event
+classification. They are central to the framework because many design
+decisions are expressed declaratively through constant values.
+
+Understanding the naming scheme is usually more important than
+memorizing individual values.
+
+=head2 Naming Conventions
+
+Turbo Vision follows strict naming conventions to make source code
+readable and predictable.
+
+The most relevant conventions are:
+
+=over 4
+
+=item 1.
+
+Type names begin with an uppercase C<T>.
+
+=item 2.
+
+Registration records for stream I/O begin with an uppercase C<R>.
+
+=item 3.
+
+Identifiers starting with lowercase letters denote constants. The
+prefix identifies the functional area of the constant.
+
+=back
+
+The following table lists the standard constant prefixes used
+throughout the framework:
+
+  Prefix  Definition              Example
+  ------  ----------------------- --------------------------------------
+  ap      Application palette     apColor
+  bf      Button flag             bfDefault
+  cp      Color palettes          cpListViewer
+  cm      Command constant        cmOk
+  co      Collection codes        coOverflow
+  dm      Drag mode               dmDragGrow
+  ev      Event constant          evCommand
+  gf      Grow mode flag          gfGrowAll
+  hc      Help context            hcNoContext
+  kb      Keyboard code constant  kbAltA
+  mb      Mouse button constant   mbRightButton
+  of      Option flag             ofTopSelect
+  R       Registration record     RCollection
+  sb      Scroll bar              sbRightArrow
+  sf      State flag              sfActive
+  sm      Screen mode constant    smFont8x8
+  st      Stream code             stOk
+  T       Object type             TCollection
+  wf      Window flags            wfMove
+  wp      Window color palettes   wpBlueWindow
+
+=head2 bfXXXX
+
+Button Flags constants
+
+The C<bfXXXX> values are passed as a bit mask to C<< TButton->new >> and specify 
+button attributes, as shown in the table:
+
+  Constant        Value   Usage
+  --------------- ------- --------------------------------------------------
+  bfNormal        0x00    non-default button
+  bfDefault       0x01    This will be the default button
+  bfLeftAdjust    0x02    If OR'd with either bfNormal or bfDefault, 
+                          the button label will be left justified instead of 
+                          centered.
+  bfBroadcast     0x04    If this bit is set, when a button is pressed, 
+                          TButton sends an evBroadcast message. If not set, 
+                          TButton inserts a new event with putEvent.
+
+B<Note>: It's up to the programmer to ensure that each C<TGroup> entity 
+(C<TDialog> is descended from C<TGroup>) has only one default button.
+
+=head2 cmXXXX
+
+Command constants
+
+The C<cmXXXX> constants are the predefined commands within Turbo Vision and are
+passed to C<handleEvent> methods in the C<< $event->{command} >> field. 
+
+Constant values of C<0..99>, and C<256..999> are reserved for use by 
+Turbo Vision. Your applications can define command constants in the range 
+C<100..255>, and C<1000..65535>.
+
+  Constant        Value   Usage
+  --------------- ------- ---------------------------------------------------
+  cmValid             0   Message passed to TView->valid
+  cmQuit              1   Upon receipt of cmQuit, TProgram->handleEvent
+                          terminates the application. The Alt-X keystroke is
+                          normally mapped to the cmQuit command.
+  cmError             2   No object should handle this command. Instead, use
+                          cmError as a way of trapping any unimplemented
+                          commands (i.e. while the program is still in
+                          development).
+  cmMenu              3   This internal command is used to initiate menu
+                          selection. The status line, as shown in Chapter
+                          14, typically maps the F10 key to cmMenu. See
+                          TStatusLine.
+  cmClose             4   For mode less windows, clicking in a window's close
+                          box causes the cmClose command to be sent to the
+                          window and the window's Close method is called. To
+                          prevent closing a window, you can intercept the
+                          cmClose command in your derived window's
+                          handleEvent method (also see the wfClose
+                          constants). Typically a status line item such as
+                          Alt-F3 is mapped to the cmClose command. The
+                          TVSHELL1 program in Chapter 14 uses the F3 key 
+                          to generate cmClose for opening and closing
+                          subdirectories.
+  cmZoom              5   The cmZoom flag is generated when the window is
+                          zoomed. You can prevent zooming by intercepting
+                          the cmZoom command (also see the wfZoom constant).
+                          By convention, Turbo Vision applications often use
+                          the F5 key to denote a zoom.
+  cmResize            6   cmResize is sent when a window is resized. Also
+                          see wfMove and wfGrow. By convention, Ctrl-F5 is
+                          often used to zoom a window.
+  cmNext              7   Causes the last window on the desktop to be moved
+                          to in front of all the others. F6 is often used as
+                          a short cut key for this command.
+  cmPrev              8   Moves the first window on the desktop to behind all
+                          the other windows. Shift-F6 is often used as a
+                          short cut key for this command.
+  cmOk                9   In a dialog, this value is returned if the Okay
+                          button was pressed.
+  cmCancel            10  In a dialog, this value is returned if the Cancel
+                          button was pressed, or if the keyboard Escape key
+                          was pressed, or a dialog's close icon was clicked.
+  cmYes               11  In a dialog, this is a standard value to be
+                          returned by a Yes button.
+  cmNo                12  In a dialog, this is the standard value to be
+                          returned by a No button.
+  cmDefault           13  Is used to indicate a "default" button selection.
+  cmReceivedFocus     50  Together with cmReleasedFocus, this command is sent
+                          by TView->setState to inform peer views of a change
+                          in focus. Views may use these messages to change
+                          their appearance (for example, when a button loses
+                          focus, it is no longer highlighted).
+  cmReleasedFocus     51  See above.
+  cmCommandSetChanged 52  Whenever enableCommands, disableCommands or
+                          setCommands changes the command set, this message
+                          is broadcast to every view's handleEvent method,
+                          giving them a chance to redraw themselves if the
+                          command set change affects how they should appear.
+  cmScrollbarChanged  53  When a scroll bar's position indicator moves, the
+                          scrollbar sends this broadcast message to its
+                          owner.
+  cmScrollbarClicked  54  When the mouse is clicked on a Scroll bar, the
+                          scroll bar broadcasts this message to its owner.
+  cmSelectWindowNum   55  This broadcast message is sent when the keyboard
+                          keys Alt-1 through Alt-9 are pressed to select a
+                          specific window. The window whose TWindow.Number
+                          field matches the selection number (passed in
+                          $event->{infoInt}), responds by selecting itself 
+                          with TView->select.
+  cmListItemSelected  56  Whenever an item in a list viewer is selected, the
+                          TListViewer sends this as an evBroadcast message.
+  cmRecordHistory     60  When received by a THistory object, this message
+                          causes it to record the contents of the TInputLine
+                          object that it owns.
+
+=head2 coXXXX
+
+Collection Error constants
+
+When a C<TCollection> error occurs, the method C<< TCollection->error >> is 
+called, with the Code parameter having one of the values shown in the table.
+
+  Constant     Value  Usage
+  ------------ ------ ---------------------------------------------------
+  coIndexError    -1  Means that the index is out of range. In this
+                      case, the Info parameter of Error contains the
+                      invalid index.
+  coOverflow      -2  The collection could not be expanded any further.
+
+=head2 dmXXXX
+
+Drag Mode constants
+
+The C<< TView->dragMode >> field controls whether or not a view can be dragged 
+or have its size changed. The C<dragMode> field is stored in a scalar, with the 
+bits set by the constants shown in the following table, and C<$limits> is a 
+C<TRect> parameter to C<< TView->dragView >>.
+
+  Constant        Value    Usage
+  --------------- -------- --------------------------------------------------
+  dmDragMove      0x01     Allow the view to move.
+  dmDragGrow      0x02     Allow the view to change size.
+  dmLimitLoX      0x10     The left hand side cannot move outside $limits.
+  dmLimitLoY      0x20     The top side cannot move outside $limits.
+  dmLimitHiX      0x40     The right hand side cannot move outside $limits.
+  dmLimitHiY      0x80     The bottom side cannot move outside $limits.
+  dmLimitAll      0xF0     None of the view can move outside $limits.
+
+=head2 evXXXX
+
+=head3 Event constants
+
+The C<evXXXX> constants are used to designate event types and event masks,
+particularly as used in the What field of an event record but also in other
+places within Turbo Vision.
+
+  Constant        Value   Usage
+  --------------- ------- ---------------------------------------------------
+  evMouseDown     0x0001  Mouse button pressed
+  evMouseUp       0x0002  Mouse button released
+  evMouseMove     0x0004  Mouse has changed location
+  evMouseAuto     0x0008  This event occurs periodically while the mouse
+                          button is held down
+  evKeyDown       0x0010  A key has been pressed.
+  evCommand       0x0100  The event type is a command event.
+  evBroadcast     0x0200  The event type is a broadcast event.
+  evNothing       0x0000  This event was already handled.
+  evMouse         0x000F  The event type is a mouse event.
+  evKeyboard      0x0010  The event type is a keyboard event.
+  evMessage       0xFF00  The event is a message event, which can be either
+                          user defined, an evCommand or evBroadcast event.
+
+B<See>: C<positionalEvents> and C<focusedEvents>.
+
+=head2 focusedEvents
+
+    use constant focusedEvents => evKeyboard | evCommand;
+
+C<focusedEvents> contains a bit mask for identifying events that are focused. 
+Any event that is neither a focused event nor a positional event, is classed as 
+a broadcast event. 
+
+=head2 gfXXXX
+
+C<< TView->growMode >> field constants
+
+The C<gfXXXX> constants set the C<< TView->growMode >> field, which controls 
+how a view grows in relation to the view that owns it.
+
+  Constant      Value     Usage
+  -------------- -------- ---------------------------------------------------
+  gfGrowLoX      0x01     The left side of the view will stay a constant
+                          distance from its owner's left side.
+  gfGrowLoY      0x02     The top of the view will stay a constant distance
+                          from its owner's top.
+  gfGrowHiX      0x04     The right side of the view will stay a constant
+                          distance from its owner's right side.
+  gfGrowHiY      0x08     The bottom of the view will stay a constant distance
+                          from its owner's bottom side.
+  gfGrowRel      0x10     The view will maintain its size relative to the
+                          owner. This flag should only be used on TWindow
+                          derived objects and is intended for keeping windows
+                          adjusted relative to their owner when switching
+                          between 25 line mode and 43/50 line screen modes.
+  gfGrowAll      0x0F     The view should maintain the same size and move with
+                          respect to the lower right corner of the owner.
+
+=head2 kbXXXX
+
+Keyboard constants
+
+The C<kbXXXX> constants are divided into two groups: a small group for 
+detecting keyboard shift states, and a large group as equates for the 
+non-standard keystrokes such as function and Alt keys.
+
+=head3 Keyboard Shift State constants
+
+  Constant        Value   Usage
+  --------------- ------- ---------------------------------------------------
+  kbRightShift    0x0001  Bit set if the right shift key down
+  kbLeftShift     0x0002  Bit set if the left shift key down
+  kbCtrlShift     0x0004  Bit set if the Ctrl key is down
+  kbAltShift      0x0008  Bit set if the Alt key is down
+  kbScrollState   0x0010  Bit set if the Scroll Lock is down
+  kbNumState      0x0020  Bit set if the Num Lock is down
+  kbCapsState     0x0040  Bit set if the Caps Lock down
+  kbInsState      0x0080  Bit set if keyboard is in Ins Lock state
+
+The keyboard shift state constants are used as a bit mask to test a location in
+low memory at C<0x40:0x17> for the status of various keyboard keys, such as the 
+Ctrl or Shift key. For example, to see if the keyboard is producing shifted
+characters, declare an absolute variable at C<0x40:0x17> and test the bits like
+this:
+
+  my $keyboardShifts = THardwareInfo->getShiftState();
+  ...
+  if ( $keyboardShifts & ( kbRightShift | kbLeftShift | kbCapsState ) )
+
+=head3 Keyboard ScanCode constants
+
+Use these constants to check for specific keystroke values in the 
+C<< TEvent->{keyCode} >> field. For example,
+
+  if ( $event->{keyCode} == kbPgDn ) {
+    # handle page down function
+    ...;
+  }
+
+=head3 Alt-Ch key code constants
+
+  Constant    Value       Constant    Value
+  ----------- ----------- ----------- -------
+  kbAltA      0x1E00      kbAltN      0x3100
+  kbAltB      0x3000      kbAltO      0x1800
+  kbAltC      0x2E00      kbAltP      0x1900
+  kbAltD      0x2000      kbAltQ      0x1000
+  kbAltE      0x1200      kbAltR      0x1300
+  kbAltF      0x2100      kbAltS      0x1F00
+  kbAltG      0x2200      kbAltT      0x1400
+  kbAltH      0x2300      kbAltU      0x1600
+  kbAltI      0x1700      kbAltV      0x2F00
+  kbAltJ      0x2400      kbAltW      0x1100
+  kbAltK      0x2500      kbAltX      0x2D00
+  kbAltL      0x2600      kbAltY      0x1500
+  kbAltM      0x3200      kbAltZ      0x2C00
+
+=head3 Ctrl and special key code constants
+
+  Constant    Value       Constant    Value
+  ----------- ----------- ----------- -------
+  kbAltEqual  0x8300      kbEnd       0x4F00
+  kbAltMinus  0x8200      bEnter      0x1C0D
+  kbAltSpace  0x0200      kbEsc       0x011B
+  kbBack      0x0E08      kbGrayMinus 0x4A2D *
+  kbCtrlBack  0x0E7F      kbHome      0x4700
+  kbCtrlDel   0x0600      kbIns       0x5200
+  kbCtrlEnd   0x7500      kbLeft      0x4B00 *
+  kbCtrlEnter 0x1C0A      kbNoKey     0x0000
+  kbCtrlHome  0x7700      kbPgDn      0x5100
+  kbCtrlIns   0x0400      kbPgUp      0x4900
+  kbCtrlLeft  0x7300      kbGrayPlus  0x4E2B
+  kbCtrlPgDn  0x7600      kbRight     0x4D00 *
+  kbCtrlPgUp  0x8400      kbShiftDel  0x0700
+  kbCtrlPrtSc 0x7200      kbShiftIns  0x0500
+  kbCtrlRight 0x7400      kbShiftTab  0x0F00
+  kbDel       0x5300      kbTab       0x0F09
+  kbDown      0x5000      kbUp        0x4800
+
+[*] C<kbGrayMinus> and C<kbGrayPlus> are the - and + keys on the numeric keypad.
+C<kbLeft> and C<kbRight> are the arrow keys.
+
+=head3 Alt-number key code constants
+
+  Constant    Value       Constant    Value
+  ----------- ----------- ----------- -------
+  kbAlt1      0x7800      kbAlt6      0x7D00
+  kbAlt2      0x7900      kbAlt7      0x7E00
+  kbAlt3      0x7A00      kbAlt8      0x7F00
+  kbAlt4      0x7B00      kbAlt9      0x8000
+  kbAlt5      0x7C00      kbAlt0      0x8100
+
+=head3 Function key code constants
+
+  Constant    Value       Constant    Value
+  ----------- ----------- ----------- -------
+  kbF1        0x3B00      kbF6        0x4000
+  kbF2        0x3C00      kbF7        0x4100
+  kbF3        0x3D00      kbF8        0x4200
+  kbF4        0x3E00      kbF9        0x4300
+  kbF5        0x3F00      kbF10       0x4400
+
+=head3 Shift-function key code constants
+
+  Constant    Value       Constant    Value
+  ----------- ----------- ----------- -------
+  kbShiftF1   0x5400      kbShiftF6   0x5900
+  kbShiftF2   0x5500      kbShiftF7   0x5A00
+  kbShiftF3   0x5600      kbShiftF8   0x5B00
+  kbShiftF4   0x5700      kbShiftF9   0x5C00
+  kbShiftF5   0x5800      kbShiftF10  0x5D00
+
+=head3 Ctrl-function key code constants
+
+  Constant    Value       Constant    Value
+  ----------- ----------- ----------- -------
+  kbCtrlF1    0x5E00      kbCtrlF6    0x6300
+  kbCtrlF2    0x5F00      kbCtrlF7    0x6400
+  kbCtrlF3    0x6000      kbCtrlF8    0x6500
+  kbCtrlF4    0x6100      kbCtrlF9    0x6600
+  kbCtrlF5    0x6200      kbCtrlF10   0x6700
+
+=head3 Alt-function key codes
+
+  Constant    Value       Constant    Value
+  ----------- ----------- ----------- -------
+  kbAltF1     0x6800      kbAltF6     0x6D00
+  kbAltF2     0x6900      kbAltF7     0x6E00
+  kbAltF3     0x6A00      kbAltF8     0x6F00
+  kbAltF4     0x6B00      kbAltF9     0x7000
+  kbAltF5     0x6C00      kbAltF10    0x7100
+
+=head2 maxCollectionSize 
+
+  use constant maxCollectionSize => int( (UINT_MAX - 16) / $Config{ptrsize} );
+
+C<maxCollectionSize> sets the maximum number of elements that can be put into a
+collection.
+
+=head2 maxViewWidth
+
+  use constant maxViewWidth => 132;
+
+Determines the maximum width of a view.
+
+=head2 mbXXXX
+
+Mouse Button constants
+
+The C<mbXXXX> constants are used to test the C<< TEvent->{buttons} >> field of 
+a C<TEvent> hash to determine if the left or right button was pressed.
+
+  Constant        Value   Usage
+  --------------- ------- ---------------------------------------------------
+  mbLeftButton    0x01    Value if left button was pressed.
+  mbRightButton   0x02    Value if right button was pressed.
+
+B<See>: C<TEvent>
+
+=head2 mfXXXX
+
+=head3 Table of Message Box Types
+
+  Constant        Value   Usage
+  --------------- ------- ---------------------------------------------------
+  mfWarning       0x0000  Display a warning type message box
+  mfError         0x0001  Display an error type message box
+  mfInformation   0x0002  Display an Information box
+  mfConfirmation  0x0003  Display a confirmation box
+
+=head3 Table of Button flags
+
+  Constant        Value   Usage
+  --------------- ------- ---------------------------------------------------
+  mfYesButton     0x0100  Show a Yes button
+  mfNoButton      0x0200  Show a No button
+  mfOkButton      0x0400  Show an Okay button
+  mfCancelButton  0x0800  Show a Cancel button
+  mfYesNoCancel           Show a Yes, No and a Cancel button
+  mfOkCancel              Show an Okay and a Cancel button
+
+B<Note>: C<messageBox> only works within Turbo Vision applications. Do not 
+attempt to use it in non-Turbo Vision applications.
+
+B<See>: C<sprintf>, C<messageBoxRect>, C<TStaticText>
+
+=head2 ofXXXX 
+
+TView->options field bit positions constants
+
+The C<ofXXXX> constants select options available in all TView-derived objects. 
+Setting the bit position to a 1 sets the indicated attribute; clearing the bit 
+position to 0 disables the indicated attributes.
+
+  Constant        Value   Usage
+  --------------- ------- -----------------------------------------------------
+  ofSelectable    0x0001  If this bit is set, then the view can be selected 
+                          with a mouse. While most views are normally 
+                          selectable, this bit gives the option to make the 
+                          item non-selectable. An example of an non-selectable 
+                          view is TStaticText items.
+  ofTopSelect     0x0002  When set, this view will move to the topmost view 
+                          whenever it is selected. This option should normally
+                          be set only for window objects.
+  ofFirstClick    0x0004  When a mouse click is used to select a view, the 
+                          click can be optionally passed to the view after it 
+                          is selected. For example, within a dialog box, if 
+                          you click on a button, you not only wish to set the 
+                          focus to that button, but you probably also want to 
+                          activate the button at the same time.
+  ofFramed        0x0008  When set, the view has visible frame drawn around 
+                          it.
+  ofPreProcess    0x0010  This option enables views other than the focused 
+                          view to have a chance at processing an $event. 
+                          Normally, events are passed down the focus-chain, 
+                          however, events are also sent to any sub-views 
+                          (in Z-order) that have this bit set, giving them a 
+                          chance to process the $event. 
+  ofPostProcess   0x0020  When this bit is set, sub-views are given a chance 
+                          after the focused view, to process events that have 
+                          not yet cleared.
+  ofBuffered      0x0040  Views can optionally store an image of themselves in
+                          a memory buffer. When the view needs to be redrawn 
+                          on the screen, it can rapidly copy itself from the 
+                          buffer, rather than recreate the drawing on the 
+                          screen. To enable cache buffering of the view's 
+                          displayable image, set the ofBuffered bit to on. 
+                          The buffers are stored in special, disposable memory
+                          caches. When the memory manager runs out of memory, 
+                          these cache buffers are automatically deleted to 
+                          free up more memory space, and the view's recreate 
+                          their displayable images as they would without the 
+                          ofBuffered option. If you set the ofBuffered option,
+                          be sure to call the TGroup method's lock and unlock 
+                          to prevent copying of the screen image to the 
+                          display until all of the sub-view's have drawn 
+                          themselves.
+  ofTileable      0x0080  Generally, you will want window objects to be either
+                          tileable or cascadable so that the desktop can 
+                          automatically rearrange the windows, if desired. 
+                          If you wish to disable this function for a 
+                          particular view, clear this bit position in the 
+                          TView->options field. When disabled, the view will 
+                          not move on the screen, even if other views become 
+                          tiled or cascaded. See also: TDeskTop->cascade, 
+                          TDeskTop->tile.
+  ofCenterX       0x0100  When this bit is set, the insertion of the view 
+                          causes the view to be horizontally centered.
+  ofCenterY       0x0200  When this bit is set, a view is centered in the 
+                          vertical direction (especially useful when switching
+                          between 25 and 43/50 line modes).
+  ofCentered      0x0300  Same as setting both C<ofCenterX> and C<ofCenterY>: 
+                          centers the view in both vertical and horizontal 
+                          directions.
+
+=head2 positionalEvents
+
+  use constant positionalEvents => evMouse;
+
+You can force events and messages to route as if they are positional events by 
+setting positionalEvents to the event's C<evXXXX> constant. By adding your own 
+event classes (by setting the bit patterns) you can create broadcast messages 
+that route the same as a positional C<$event>.
+
+B<See>: C<focusedEvents>
+
+=head2 sbXXXX
+
+=head3 Scrollbar constants
+
+  Constant          Value   Usage
+  ----------------- ------- ---------------------------------------------------
+  sbLeftArrow       0       The horizontal scroll bar's left arrow.
+  sbRightArrow      1       Horizontal scroll bar's right arrow.
+  sbPageLeft        2       The page area to the left of the position indicator.
+  sbPageRight       3       The page indicator to the right of the indicator.
+  sbUpArrow         4       Vertical scroll bar's up arrow.
+  sbDownArrow       5       Vertical scroll bar's down arrow.
+  sbPageUp          6       Paging area above the position indicator.
+  sbPageDown        7       Paging area below the position indicator.
+  sbIndicator       8       Position indicator on the scroll bar.
+  sbHorizontal      0x0000  The scroll bar is horizontal.
+  sbVertical        0x0001  The scroll bar is vertical.
+  sbHandleKeyboard  0x0002  Scroll bar accepts keyboard commands.
+
+Use one of the first 9 C<sbXXXX> constants as a parameter to 
+C<< TScrollBar->scrollStep >>. The last 3 C<sbXXXX> constants, C<sbHorizontal>, 
+C<sbVertical>, C<sbHandleKeyboard> are used to specify a horizontal, vertical, 
+or keyboard accessible scrollbar when a scroll bar is created using the 
+C<< TWindow->standardScrollBar >> method.
+
+=head2 selectMode
+
+Constants for selectMode
+
+  use constant {
+    normalSelect    => 0,
+    enterSelect     => 1,
+    leaveSelect     => 2,
+  };
+
+An internal value used by Turbo Vision.
+
+=head2 sfXXXX
+
+State Flag constants
+
+Use TView->setState to set the state bits, from the table below, into a
+TView's state field. Example usage:
+
+    $view->setState( sfCursorIns, true );
+
+where the first parameter is the state value to change, and the second
+parameter is C<true> to enable the selected condition, or C<false> to disable 
+the selected condition. Some of the bits are not normally set by the programmer
+but rather by methods in Turbo Vision. You can, however, read and test the
+values in TView->state directly.
+
+  Constant    Value   Usage
+  ----------- ------- ---------------------------------------------------------
+  sfVisible   0x0001  Set when the view is visible in front of its owner (for
+                      example, a button on a dialog) but note that a visible
+                      view's owner may itself be hidden from view. Call
+                      TView->exposed to determine if a view is actually 
+                      visible  on the screen, and use TView->hide to clear 
+                      this bit and  hide the view, and TView->show to set this 
+                      bit and make the view visible.
+  sfCursorVis 0x0002  Set when the view's cursor is visible. Use
+                      TView->showCursor to make the cursor visible and set 
+                      this bit, or TView->hideCursor to hide the cursor and 
+                      clear this bit.
+  sfCursorIns 0x0004  Set when the cursor is a solid block (the "insert" 
+                      cursor), clear when the cursor is an underscore (the 
+                      "overstrike" cursor). Call TView->blockCursor to set 
+                      this bit, and TView->normalCursor to clear the bit.
+  sfShadow    0x0008  Set when the view has a shadow.
+  sfActive    0x0010  Set whenever the view is an active window or a subview
+                      within an active window. For example, when using the app
+                      to edit multiple files, only the editor that you are
+                      currently using is the active window.
+  sfSelected  0x0020  Set when this view is selected. (See TView->selected).
+  sfFocused   0x0040  If the view is part of the focus chain (see Chapter 13,
+                      "More Turbo Vision Features" in the Borland Pascal
+                      Developer's Guide), then this bit is set.
+  sfDragging  0x0080  Set whenever the view is being dragged.
+  sfDisabled  0x0100  Set if the view has been disabled and is no longer
+                      processing events.
+  sfModal     0x0200  Whenever a view is displayed using the execView call, 
+                      that view becomes a modal view (as compared to a view 
+                      that has been inserted into the desktop). This bit is 
+                      set when the view is the modal view and controls how 
+                      events are sent through the view hierarchy.
+  sfExposed   0x0800  Set when a view is possibly visible on the screen. Don't
+                      check this flag directly because a visible view can 
+                      still be hidden due to clipping. Instead, call 
+                      TView->exposed to determine if the view is actually 
+                      visible.
+
+B<See>: C<blockCursor>, C<exposed>, C<hide>, C<hideCursor>,
+C<normalCursor>, C<setState>, C<show>, C<showCursor> from C<TView>.
+
+=head2 smXXXX
+
+Screen Mode constants
+
+Use the constants from the table below when selecting Black & White, Color or
+Monochrome color palettes, or switching between 25 and 43- or 50 line display
+modes. 
+
+
+  Constant  Value   Usage
+  --------- ------- --------------------------------------------------
+  smBW80    0x0002  Black and white/gray scale
+  smCO80    0x0003  Color mode
+  smMono    0x0004  Monochrome mode
+  smFont8x8 0x0100  43 or 50 line modes
+
+B<See>: C<< TScreen->setVideoMode >>, C<< TScreen->screenMode >>, 
+C<< TProgram->setScreenMode >>
+
+=head2 wfXXXX
+
+TWindow flags
+
+  Constant  Value   Usage
+  --------- ------- --------------------------------------------------
+  wfMove    0x01    When bit is set, the window can be moved.
+  wfGrow    0x02    When the bit is set, the window can be resized and has a
+                    "grow" icon in the lower right corner.  If you clear this
+                    bit you can prevent a window from being resized.
+  wfClose   0x04    Set this bit to add a close icon in the upper left corner
+                    of a window.  Clear the bit to eliminate the icon.
+  wfZoom    0x08    When this bit is set, the window contains a zoom icon for
+                    zooming a window to full size.
+
+B<See>: TWindow
+
+=head2 wnNoNumber
+
+    use constant wnNoNumber => 0;
+
+When ever a C<< TWindow->number >> field contains this value, it means that the
+window has no number.  Windows that have no number do not display any
+number in the upper right corner, nor can they be selected with the
+Alt-number quick key selection for switching between windows numbered C<1>
+through C<9>.
+
+=cut

@@ -29,6 +29,7 @@ use Data::Dumper;
 use Data::HexDump;
 use English qw($OS_ERROR);
 use Net::IP qw(ip_bintoip ip_compress_address ip_expand_address ip_iptobin);
+use POSIX qw(EINTR);
 use Time::HiRes qw(time);
 
 use vars qw($VERSION @ISA @EXPORT);
@@ -42,7 +43,7 @@ require Exporter;
             STATUS_SERVER
             COA_REQUEST COA_ACCEPT COA_REJECT COA_ACK COA_NAK);
 
-$VERSION = '0.35';
+$VERSION = '0.37';
 
 my (%dict_id, %dict_name, %dict_val, %dict_vendor_id, %dict_vendor_name );
 my ($request_id) = $$ & 0xff;   # probably better than starting from 0
@@ -123,7 +124,7 @@ sub new {
     $self->{'timeout'} = $h{'TimeOut'} ? $h{'TimeOut'} : 5;
     $self->{'localaddr'} = $h{'LocalAddr'};
     $self->{'secret'} = $h{'Secret'};
-    $self->{'message_auth'}  = $h{'Rfc3579MessageAuth'};
+    $self->{'message_auth'} = exists $h{'Rfc3579MessageAuth'} ? $h{'Rfc3579MessageAuth'} : 1;
 
     if ($h{'NodeList'}) {
         # contains resolved node list in text representation
@@ -212,18 +213,23 @@ sub send_packet {
 
     if (($self->{message_auth} && ($type == ACCESS_REQUEST)) || ($type == STATUS_SERVER)) {
         $length += $RFC3579_MSG_AUTH_ATTR_LEN;
+        # RFC 9716 section 4.2: Message-Authenticator SHOULD be the first
+        # attribute in Access-Request, immediately after the 20-octet
+        # header, so a Blast-RADIUS-aware server can authenticate the
+        # packet before parsing the rest of the attributes.
+        my $msg_auth_header = pack('C C', $RFC3579_MSG_AUTH_ATTR_ID, $RFC3579_MSG_AUTH_ATTR_LEN);
         $data = pack('C C n', $type, $request_id, $length)
                 . $self->{authenticator}
-                . $self->{attributes}
-                . pack('C C', $RFC3579_MSG_AUTH_ATTR_ID, $RFC3579_MSG_AUTH_ATTR_LEN)
-                . "\0" x ($RFC3579_MSG_AUTH_ATTR_LEN - 2);
+                . $msg_auth_header
+                . "\0" x ($RFC3579_MSG_AUTH_ATTR_LEN - 2)
+                . $self->{attributes};
 
         my $msg_authenticator = $self->hmac_md5($data, $self->{secret});
         $data = pack('C C n', $type, $request_id, $length)
                 . $self->{authenticator}
-                . $self->{attributes}
-                . pack('C C', $RFC3579_MSG_AUTH_ATTR_ID, $RFC3579_MSG_AUTH_ATTR_LEN)
-                . $msg_authenticator;
+                . $msg_auth_header
+                . $msg_authenticator
+                . $self->{attributes};
         if ($debug) {
             print STDERR "RFC3579 Message-Authenticator: "._ascii_to_hex($msg_authenticator)." was added to request.\n";
         }
@@ -303,24 +309,33 @@ sub recv_packet {
     } else {
         return $self->set_error('ESELECTFAIL');
     }
+
     my $timeout = $self->{'timeout'};
-    my @ready;
-    my $from_addr_n;
-    my ($start_time, $end_time);
+
+    my ( @ready, $from_addr_n, $start_time );
     while ($timeout > 0){
         $start_time = time();
-        @ready = $sh->can_read($timeout) or return $self->set_error('ETIMEOUT', $!);
-        $end_time = time();
-        $timeout -= $end_time - $start_time;
+
+        @ready = $sh->can_read($timeout);
+        my $errno = $OS_ERROR;  # capture before any later op can clobber $!
+
+        $timeout -= time() - $start_time;
+
+        if (!@ready) {
+            if (($errno == EINTR) && ($timeout > 0)) {
+                next;
+            }
+            return $self->set_error('ETIMEOUT', $errno);
+        }
+
         $from_addr_n = $ready[0]->recv($data, 65536);
-        if (defined($from_addr_n)) {
-            last;
+        last if (defined($from_addr_n));
+
+        if (!defined($self->{sock_list})) {
+            return $self->set_error('ERECVFAIL', $OS_ERROR);
         }
-        if (!defined($from_addr_n) && !defined($self->{'sock_list'})) {
-            return $self->set_error('ERECVFAIL', $!);
-        }elsif ($debug) {
-            print STDERR "Received error/event from one peer:".$!."\n";
-        }
+
+        $debug and STDERR->say('Received error/event from one peer: '.$OS_ERROR);
     }
 
     if ($debug) {
@@ -1332,8 +1347,11 @@ Optional parameter C<Debug> with a Perl "true" value turns on debugging
 Optional parameter C<LocalAddr> may contain local IP/host bind address from
 which RADIUS packets are sent.
 
-Optional parameter C<Rfc3579MessageAuth> with a Perl "true" value turns on generating
-of Message-Authenticator for Access-Request (RFC3579, section 3.2).
+Optional parameter C<Rfc3579MessageAuth> controls whether a Message-Authenticator
+attribute is generated for Access-Request packets (RFC3579, section 3.2).
+It is enabled by default to mitigate the Blast-RADIUS protocol vulnerability
+(L<https://www.blastradius.fail/>); pass C<< Rfc3579MessageAuth => 0 >> to
+disable it when talking to a server that cannot handle the attribute.
 The Message-Authenticator is always generated for Status-Server packets.
 
 Optional parameter C<NodeList> may contain a Perl reference to an array, containing a list of

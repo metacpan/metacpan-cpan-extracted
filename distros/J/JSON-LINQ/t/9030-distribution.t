@@ -19,7 +19,8 @@ my $ROOT = File::Spec->rel2abs(
 plan_skip('MANIFEST not found') unless -f "$ROOT/MANIFEST";
 
 plan_tests(count_A($ROOT) + count_B($ROOT) + count_F()
-         + count_H()      + count_I()      + count_J($ROOT));
+         + count_H()      + count_I()      + count_J($ROOT)
+         + count_L());
 
 check_A($ROOT);
 check_B($ROOT);
@@ -27,5 +28,6 @@ check_F($ROOT);
 check_H($ROOT);
 check_I($ROOT);
 check_J($ROOT);   # no J2 stale entries for LTSV-LINQ
+check_L($ROOT);
 
 END { end_testing() }

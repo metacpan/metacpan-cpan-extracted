@@ -164,7 +164,7 @@ static int try_windows_node(pUCXT, U8 *node_id) {
   return rv;
 }
 
-int uu_get_node_id(pUCXT, U8 *node_id) {
+int uu_node_getid(pUCXT, U8 *node_id) {
   /* returns:
    *  -1 if cant find due to error.
    *   0 if cant find.

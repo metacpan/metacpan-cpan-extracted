@@ -97,7 +97,7 @@ SYNOPSIS
         $obj->customer->id( '44d9a3ab-32e2-4c46-b6c9-8b307f273d47' );
 
 VERSION
-        v1.3.1
+        v1.5.0
 
 DESCRIPTION
     Module::Generic as its name says it all, is a generic module to inherit
@@ -1739,9 +1739,9 @@ SUPPORT METHODS
 
     Provided with an object property name, and a class/package name, this
     will attempt to load the module if it is not already loaded. It does so
-    using "load_class" in Class::Load. Once loaded, it will init an object
-    passing it the other arguments received. It returns the object
-    instantiated upon success or undef and sets an "error"
+    using "_load_class". Once loaded, it will init an object passing it the
+    other arguments received. It returns the object instantiated upon
+    success or undef and sets an "error"
 
     This is a support method used by "_instantiate_object"
 
@@ -2096,8 +2096,6 @@ SUPPORT METHODS
   _is_ip
     Returns true if the given IP has a syntax compliant with IPv4 or IPv6
     including CIDR notation or not, false otherwise.
-
-    For this method to work, you need to have installed Regexp::Common::net
 
   _is_number
     Returns true if the provided value looks like a number, false otherwise.
@@ -5223,7 +5221,7 @@ SEE ALSO
     and Module::Generic::Tie, Module::Generic::File, Module::Generic::Finfo,
     Module::Generic::SharedMem, Module::Generic::Scalar::IO
 
-    Number::Format, Class::Load, Scalar::Util
+    Scalar::Util
 
 AUTHOR
     Jacques Deguest <jack@deguest.jp>

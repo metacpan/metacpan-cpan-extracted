@@ -1,11 +1,12 @@
 package Crypt::DSA::Key::PEM;
 
 use strict;
+use warnings;
 use Carp qw( croak );
 use Convert::PEM;
 use Crypt::DSA::Key;
 
-our $VERSION = '1.19'; #VERSION
+our $VERSION = '1.20'; #VERSION
 
 use vars qw{$VERSION @ISA};
 BEGIN {

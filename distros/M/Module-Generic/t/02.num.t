@@ -197,7 +197,15 @@ is( $n ^ 11, 3, 'Bitwise XOR' );
 is( $n << 2, 32, 'Bitwise shift left' );
 is( $n >> 2, 2, 'Bitwise shift right' );
 is( $n <<= 2, 32, 'Bitwise shift left assignment' );
-is( $n >>= -2, 128, 'Bitwise shift right assignment' );
+SKIP:
+{
+    if( $] < 5.034000 )
+    {
+        $n <<= 2;   # 32 << 2 == 128, equivalent to $n >>= -2 and keep the object
+        skip( "Bitwise shift right assignment; >>= -2 does not work in perl < 5.34.", 1 );
+    }
+    is( $n >>= -2, 128, 'Bitwise shift right assignment' );
+};
 is( $n x 2, 128128, 'String multiplication' );
 is( $n x= 2, 128128, 'String multiplication assignment' );
 is( $n .= 4, 1281284, 'String concatenation with numbers' );
@@ -284,7 +292,9 @@ is( $n4->atan, POSIX::atan( $n4 ), 'atan' );
 is( $n4->atan2(12), CORE::atan2( $n4, 12 ), 'atan2' );
 my $n5 = $n4->cbrt;
 # 108.612997866582
-is( $n5, POSIX::cbrt( $n4 ), 'cbrt' );
+# Use math fallback for perl < 5.022 where POSIX::cbrt does not exist.
+my $cbrt_expected = $] >= 5.022 ? POSIX::cbrt( $n4 ) : ( $n4 ** ( 1/3 ) );
+is( $n5, $cbrt_expected, 'cbrt' );
 # 109
 is( $n5->ceil, POSIX::ceil( $n5 ), 'ceil' );
 # 108
@@ -302,7 +312,9 @@ ok( !$n3->is_positive, 'Is not positive' );
 # 14.0633732581021
 is( $n4->log, CORE::log( $n4 ), 'log' );
 # 20.2891588576344
-is( $n4->log2, POSIX::log2( $n4 ), 'log2' );
+# Ligne 313 du test
+my $log2_expected = $] >= 5.022 ? POSIX::log2( $n4 ) : ( CORE::log( $n4 ) / CORE::log(2) );
+is( $n4->log2, $log2_expected, 'log2' );
 # 6.10764540293951
 is( $n4->log10, POSIX::log10( $n4 ), 'log10' );
 is( $n4->max(1281285), 1281285, 'max' );
@@ -327,7 +339,7 @@ ok( $n4->is_normal, 'Is normal number' );
 
 my $inf = Module::Generic::Number->new( 9**9**9, debug => 3 );
 isa_ok( $inf, 'Module::Generic::Infinity', 'Infinity Class' );
-# diag( "Infinity: $inf" );
+# diag( "Infinity: $inf -> ", overload::StrVal( $inf ) );
 # diag( "Is finite? " . $inf->is_finite );
 is( "$inf", "Inf", 'Infinity stringified' );
 ok( $inf->is_infinite, 'Is infinite' );
@@ -387,6 +399,7 @@ my $a = $n6->as_array;
 isa_ok( $a, 'Module::Generic::Array', 'as_array => Module::Generic::Array' );
 is( $a->[0], 10, 'as_array' );
 
+# NOTE: Additional functionality and edge cases
 subtest 'Additional functionality and edge cases' => sub
 {
     my $num = Module::Generic::Number->new( 3.14159, debug => $DEBUG );

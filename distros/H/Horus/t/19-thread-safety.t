@@ -4,6 +4,16 @@ use warnings;
 use Test::More;
 
 BEGIN {
+    # perl 5.10.0 shipped with a broken ithreads implementation - bare
+    # `threads->create(sub { 1 })->join` SEGVs inside threads->create
+    # itself, no XS code involved. Confirmed locally in a clean
+    # perlbrew build of 5.10.0 x86_64-linux-thread-multi. Fixed in
+    # 5.10.1. Skip the whole file on any 5.10.x to stay safe; modern
+    # Perls cover this just fine.
+    plan skip_all => 'perl 5.10 ithreads unsafe (broken in 5.10.0; '
+                   . 'see comment in t/19-thread-safety.t)'
+        if $] < 5.012;
+
     eval { require threads; threads->import(); 1 }
         or plan skip_all => 'threads not available';
 }

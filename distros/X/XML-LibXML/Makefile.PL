@@ -64,7 +64,6 @@ my %prereqs = (
   "overload" => 0,
   "parent" => 0,
   "strict" => 0,
-  "vars" => 0,
   "warnings" => 0,
 );
 
@@ -76,6 +75,15 @@ my %xsbuild = Alien::Base::Wrapper->mm_args;  # Might contain a definition of DE
 while (my ($k, $v) = each %xsbuild_concat) {
   my $base_val = $xsbuild{$k};
   $xsbuild{$k} = (defined($base_val) ? ($base_val . ' ' . $v) : $v);
+}
+
+# Strip bogus -L/lib entries that Alien::Base::Wrapper sometimes injects
+# (the directory does not exist on macOS and the linker warns about it).
+for my $key (qw(LDFLAGS LDDLFLAGS)) {
+  next if !defined $xsbuild{$key};
+  $xsbuild{$key} =~ s{(?:^|\s)\K-L/lib(?=\s|$)}{}g;
+  $xsbuild{$key} =~ s{\s+}{ }g;
+  $xsbuild{$key} =~ s{^\s+|\s+$}{}g;
 }
 
 my %WriteMakefileArgs = (
@@ -93,8 +101,11 @@ my %WriteMakefileArgs = (
     'resources' => {
       repository => {
         type => 'git',
-        url  => 'https://github.com/shlomif/perl-XML-LibXML.git',
-        web  => 'https://github.com/shlomif/perl-XML-LibXML',
+        url  => 'https://github.com/cpan-authors/XML-LibXML.git',
+        web  => 'https://github.com/cpan-authors/XML-LibXML',
+      },
+      bugtracker => {
+        web => 'https://github.com/cpan-authors/XML-LibXML/issues',
       },
     },
     'keywords' => [
@@ -176,13 +187,28 @@ sub MY::manifypods {
   $str .= <<"EOF";
 docs-fast :
 \t\@$^X -pi~ -e 's{<edition>[0-9.]*</edition>}{<edition>'"\$(VERSION)"'</edition>}' docs/libxml.dbk
-\t\@$^X -Iblib/arch -Iblib/lib example/xmllibxmldocs.pl docs/libxml.dbk lib/XML/LibXML/
+\t\@$^X -Iblib/arch -Iblib/lib scripts/xmllibxmldocs.pl docs/libxml.dbk lib/XML/LibXML/
 docs : pure_all
 \t\@$^X -pi~ -e 's{<edition>[0-9.]*</edition>}{<edition>'"\$(VERSION)"'</edition>}' docs/libxml.dbk
-\t\@$^X -Iblib/arch -Iblib/lib example/xmllibxmldocs.pl docs/libxml.dbk lib/XML/LibXML/
+\t\@$^X -Iblib/arch -Iblib/lib scripts/xmllibxmldocs.pl docs/libxml.dbk lib/XML/LibXML/
 \t\@$^X -pi.old -e 's/a/a/' Makefile.PL
 \t\@echo "==> YOU MUST NOW RE-RUN $^X Makefile.PL <=="
 \t\@false
 EOF
   return $str;
+}
+
+# Regenerate the per-class POD files from docs/libxml.dbk. Mirrors the
+# existing `docs` target but skips the manpage re-bootstrap dance, so it can
+# be used in CI as a drift check.  The .pod files are tracked in git
+# (bison-style generated source); run this after editing docs/libxml.dbk and
+# commit both the .dbk and the resulting .pod changes.
+sub MY::postamble {
+  return <<'POSTAMBLE';
+
+pod_docs : pure_all
+	$(NOECHO) $(PERL) -pi~ -e 's{<edition>[0-9.]*</edition>}{<edition>'"$(VERSION)"'</edition>}' docs/libxml.dbk
+	$(NOECHO) $(PERL) -Iblib/arch -Iblib/lib scripts/xmllibxmldocs.pl docs/libxml.dbk lib/XML/LibXML/
+
+POSTAMBLE
 }

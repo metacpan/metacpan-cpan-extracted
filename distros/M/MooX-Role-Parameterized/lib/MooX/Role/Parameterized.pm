@@ -1,9 +1,11 @@
 package MooX::Role::Parameterized;
-
+use v5.12;
 use strict;
 use warnings;
 
-# ABSTRACT: MooX::Role::Parameterized - roles with composition parameters
+our $VERSION = '0.701'; # VERSION
+
+# ABSTRACT: roles with composition parameters
 
 use Module::Runtime qw(use_module);
 use Carp            qw(carp croak);
@@ -11,8 +13,6 @@ use Exporter        qw(import);
 use Moo::Role       qw();
 use MooX::BuildClass;
 use MooX::Role::Parameterized::Mop;
-
-our $VERSION = "0.501";
 
 our @EXPORT = qw(parameter role apply apply_roles_to_target);
 
@@ -184,6 +184,18 @@ __END__
 
 MooX::Role::Parameterized - roles with composition parameters
 
+=begin markdown
+
+[![Kwalitee](https://cpants.cpanauthors.org/dist/MooX-Role-Parameterized.svg)](https://cpants.cpanauthors.org/dist/MooX-Role-Parameterized)
+[![tests](https://github.com/peczenyj/MooX-Role-Parameterized/actions/workflows/linux.yml/badge.svg)](https://github.com/peczenyj/MooX-Role-Parameterized/actions/workflows/linux.yml)
+[![tests](https://github.com/peczenyj/MooX-Role-Parameterized/actions/workflows/windows.yml/badge.svg)](https://github.com/peczenyj/MooX-Role-Parameterized/actions/workflows/windows.yml)
+[![tests](https://github.com/peczenyj/MooX-Role-Parameterized/actions/workflows/macos.yml/badge.svg)](https://github.com/peczenyj/MooX-Role-Parameterized/actions/workflows/macos.yml)
+[![Coverage Status](https://coveralls.io/repos/github/peczenyj/MooX-Role-Parameterized/badge.svg?branch=master)](https://coveralls.io/github/peczenyj/MooX-Role-Parameterized?branch=master)
+[![license](https://img.shields.io/cpan/l/MooX-Role-Parameterized.svg)](https://github.com/peczenyj/MooX-Role-Parameterized/blob/master/LICENSE)
+[![cpan](https://img.shields.io/cpan/v/MooX-Role-Parameterized.svg)](https://metacpan.org/dist/MooX-Role-Parameterized)
+
+=end markdown
+
 =head1 SYNOPSIS
 
     package Counter;
@@ -234,9 +246,22 @@ MooX::Role::Parameterized - roles with composition parameters
         name => 'zapped',     # methods increment_zapped ( +1 )
     };                        # reset_zapped (set to zero)
 
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Alternatively, to install with cpanm:
+
+    cpanm .
+
 =head1 DESCRIPTION
 
-It is an B<experimental> port of L<MooseX::Role::Parameterized> to L<Moo>.
+It is a port of L<MooseX::Role::Parameterized> to L<Moo>.
 
 =head1 FUNCTIONS
 
@@ -299,7 +324,7 @@ Important, if you want to apply the role multiple times, like to create multiple
 
     has foo => ( is => 'ro'); # continue with normal Moo code
 
-=head1 STATIC METHOS
+=head1 STATIC METHODS
 
 =head2 is_role
 
@@ -352,6 +377,8 @@ Allow to do this:
 =head1 SEE ALSO
 
 L<MooseX::Role::Parameterized> - Moose version
+
+L<MooX::Role::Parameterized::Cookbook> - recipes and worked examples
 
 =head1 THANKS
 

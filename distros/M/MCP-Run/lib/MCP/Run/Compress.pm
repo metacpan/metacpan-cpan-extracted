@@ -1,5 +1,5 @@
 package MCP::Run::Compress;
-our $VERSION = '0.100';
+our $VERSION = '0.103';
 use Mojo::Base -base;
 
 # ABSTRACT: Output compression for LLMs
@@ -801,12 +801,11 @@ sub _build_default_filters {
     max_lines => 30,
   );
 
-  # git commit: transform Co-Authored-By
+  # git commit: transform Co-Authored-By. Match the raw string so we
+  # also catch compound commands like `cd foo && git add bar && git
+  # commit -m "..."`, where the parsed top-level program isn't `git`.
   $self->register_filter(
-    parsed_command => {
-      program    => 'git',
-      subcommand => 'commit',
-    },
+    command => '\bgit\b[^&|;]*?(?<![=])\bcommit\b',
     command_transform => sub {
       my ($cmd) = @_;
       my $model = $ENV{CO_AUTHORED_BY} || $ENV{ANTHROPIC_MODEL};
@@ -814,7 +813,10 @@ sub _build_default_filters {
       if ($cmd =~ /Co-Authored-By:/i) {
         $cmd =~ s/Co-Authored-By: [^\n]+/Co-Authored-By: $model/g;
       } else {
-        $cmd =~ s/(")\s*$/$1\n\nCo-Authored-By: $model/m;
+        # Inject inside the closing quote, otherwise the Co-Authored-By
+        # line ends up as a separate shell command and `<model@host>`
+        # parses as a redirection, breaking the whole call.
+        $cmd =~ s/(")\s*$/\n\nCo-Authored-By: $model$1/m;
       }
       return $cmd;
     },
@@ -1144,7 +1146,7 @@ MCP::Run::Compress - Output compression for LLMs
 
 =head1 VERSION
 
-version 0.100
+version 0.103
 
 =head1 SYNOPSIS
 
@@ -1204,7 +1206,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

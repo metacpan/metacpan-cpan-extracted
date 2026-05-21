@@ -1,0 +1,7 @@
+Revision history for Alien-ckdl
+
+0.001  2026-04-30
+        - Initial CPAN release.
+        - Builds ckdl from upstream main as a static library via alienfile.
+        - Bypasses upstream CMake; only the C sources making up libkdl
+          are compiled (no Python, Cython, C++ bindings, or test suite).

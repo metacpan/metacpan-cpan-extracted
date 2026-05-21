@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 # JIT-compiled gzip compression for Hypersonic
 # All compression happens in C via zlib for maximum performance
@@ -24,11 +24,20 @@ sub check_zlib {
     return $ZLIB_DETECTION->{available};
 }
 
-# Get zlib compiler flags (uses centralized detection)
+# Get zlib compiler flags (uses centralized detection).
+#
+# detect_zlib returns ldflags='' (defined empty string) when neither
+# Alien, pkg-config, nor the manual paths probe found zlib *but* the
+# caller still wants to attempt a link. Use `||` (string-falsy) rather
+# than `//` (defined-or) so an empty detection still falls back to
+# `-lz`. Without this, when pkg-config returned an unparseable result
+# on some Debian configs, the link line ended up missing -lz entirely
+# and the JIT-compiled .so failed at dlopen with `undefined symbol:
+# deflate`.
 sub get_zlib_flags {
     require Hypersonic::JIT::Util;
     $ZLIB_DETECTION //= Hypersonic::JIT::Util->detect_zlib();
-    return ($ZLIB_DETECTION->{cflags} // '', $ZLIB_DETECTION->{ldflags} // '-lz');
+    return ($ZLIB_DETECTION->{cflags} || '', $ZLIB_DETECTION->{ldflags} || '-lz');
 }
 
 # Configure compression

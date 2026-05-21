@@ -136,6 +136,14 @@ subtest 'memory stability check' => sub {
     plan skip_all => 'ps -o rss= not portable'
         unless $^O =~ /^(?:linux|darwin)$/;
 
+    # Sanitizers (ASan/MSan) maintain shadow memory that grows independently
+    # of allocations; a strict RSS budget produces false positives there.
+    my $under_sanitizer = ($ENV{LD_PRELOAD} && $ENV{LD_PRELOAD} =~ /(?:asan|msan|tsan|ubsan)/i)
+        || $ENV{ASAN_OPTIONS}
+        || $ENV{UBSAN_OPTIONS}
+        || $ENV{MSAN_OPTIONS};
+    my $budget_kb = $under_sanitizer ? 8192 : 1024;
+
     my $data = {};
 
     # Warm up
@@ -155,9 +163,9 @@ subtest 'memory stability check' => sub {
     my $after = `ps -o rss= -p $$` + 0;
     my $growth = $after - $before;
 
-    # Allow some growth but not excessive (< 1MB)
-    ok($growth < 1024, "memory growth reasonable: ${growth}KB");
-    diag("Memory: before=${before}KB after=${after}KB growth=${growth}KB");
+    ok($growth < $budget_kb, "memory growth reasonable: ${growth}KB (budget ${budget_kb}KB)");
+    diag("Memory: before=${before}KB after=${after}KB growth=${growth}KB"
+         . ($under_sanitizer ? " [sanitizer]" : ""));
 };
 
 done_testing;

@@ -22,10 +22,36 @@ BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = '
 use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
 
-use vars qw($VERSION);
-$VERSION = '1.08';
+use vars qw($VERSION $_fh_seq);
+$VERSION = '1.09';
 $VERSION = $VERSION;
 # $VERSION self-assignment suppresses "used only once" warning under strict.
+$_fh_seq = 0;
+$_fh_seq = $_fh_seq;
+# $_fh_seq self-assignment suppresses "used only once" warning under strict.
+
+###############################################################################
+# Internal file-handle helper
+###############################################################################
+
+# _open_fh - open a file for reading ('<') or writing ('>') and return
+# the glob name string.  Works on Perl 5.005_03 and all later versions.
+#
+# Always uses a unique numbered package glob (LTSV::LINQ::FH::H<n>) so
+# that concurrent iterators each get their own IO slot.
+#
+# $raw: if true, binmode is called (raw bytes; for LTSV).
+#       Pass 0 for CSV interop where OS-level \r\n->\n conversion is desired.
+sub _open_fh {
+    my($mode, $file, $raw) = @_;
+    $_fh_seq++;
+    my $seq = $_fh_seq;
+    my $fhn = "LTSV::LINQ::FH::H${seq}";
+    my $arg = ($mode eq '>') ? ">$file" : "< $file";
+    { no strict 'refs'; open($fhn, $arg) or die "Cannot open '$file': $!" }
+    if ($raw) { no strict 'refs'; binmode(*{$fhn}) }
+    return $fhn;
+}
 
 ###############################################################################
 # Constructor and Iterator Infrastructure
@@ -69,20 +95,16 @@ sub From {
 sub FromLTSV {
     my($class, $file) = @_;
 
-    my $fh;
-    if ($] >= 5.006) {
-        # Avoid "Too many arguments for open at" error when running with Perl 5.005_03
-        eval q{ open($fh, '<', $file) } or die "Cannot open '$file': $!";
-    }
-    else {
-        $fh = \do { local *_ };
-        open($fh, "< $file") or die "Cannot open '$file': $!";
-    }
-    binmode $fh;    # Treat as raw bytes; handles all multibyte encodings
-                    # and prevents \r\n -> \n translation on Windows
+    my $fhn = _open_fh('<', $file, 1);
 
     return $class->new(sub {
-        while (my $line = <$fh>) {
+        while (1) {
+            no strict 'refs';
+            my $line = readline(*{$fhn});
+            unless (defined $line) {
+                no strict 'refs'; close($fhn);
+                return undef;
+            }
             chomp $line;
             $line =~ s/\r\z//;  # Remove CR for CRLF files on any platform
             next unless length $line;
@@ -93,8 +115,6 @@ sub FromLTSV {
 
             return { %record } if %record;
         }
-        close $fh;
-        return undef;
     });
 }
 
@@ -1144,33 +1164,40 @@ sub DefaultIfEmpty {
 
 # ToLTSV - write to LTSV file
 sub ToLTSV {
-    my($self, $filename) = @_;
+    my($self, $file, %opts) = @_;
 
-    my $fh;
-    if ($] >= 5.006) {
-        # Avoid "Too many arguments for open at" error when running with Perl 5.005_03
-        eval q{ open($fh, '>', $filename) } or die "Cannot open '$filename': $!";
-    }
-    else {
-        $fh = \do { local *_ };
-        open($fh, "> $filename") or die "Cannot open '$filename': $!";
-    }
-    binmode $fh;    # Write raw bytes; prevents \r\n translation on Windows
-                    # and is consistent with FromLTSV
+    # label_order => [...] specifies output label order.
+    # headers => [...] is an alias for label_order (CSV-LINQ interop).
+    my $label_order = defined $opts{label_order} ? $opts{label_order}
+                    : defined $opts{headers}     ? $opts{headers}
+                    : undef;
+
+    my $fhn = _open_fh('>', $file, 1);
 
     $self->ForEach(sub {
         my $record = shift;
         # LTSV spec: tab is the field separator; newline terminates the record.
         # Sanitize values to prevent structural corruption of the output file.
+        my @keys;
+        if (defined $label_order) {
+            # Output specified labels first (in given order), skipping those
+            # absent from the record; then append remaining keys (sorted).
+            my %in_order = map { $_ => 1 } @{$label_order};
+            my @extra = sort grep { !$in_order{$_} } keys %$record;
+            @keys = ((grep { exists $record->{$_} } @{$label_order}), @extra);
+        }
+        else {
+            @keys = sort keys %$record;
+        }
         my $line = join("\t", map {
             my $v = defined($record->{$_}) ? $record->{$_} : '';
             $v =~ s/[\t\n\r]/ /g;
             "$_:$v"
-        } sort keys %$record);
-        print $fh $line, "\n";
+        } @keys);
+        no strict 'refs'; print {*{$fhn}} $line, "\n";
     });
 
-    close $fh;
+    { no strict 'refs'; close($fhn) }
     return 1;
 }
 
@@ -1369,7 +1396,7 @@ LTSV::LINQ - LINQ-style query interface for LTSV files
 
 =head1 VERSION
 
-Version 1.07
+Version 1.09
 
 =head1 SYNOPSIS
 
@@ -1879,7 +1906,7 @@ Create a query from an array.
 
   my $query = LTSV::LINQ->From([{name => 'Alice'}, {name => 'Bob'}]);
 
-=item B<FromLTSV($filename)>
+=item B<FromLTSV($file)>
 
 Create a query from an LTSV file.
 
@@ -1899,6 +1926,14 @@ immediately:
 
   # File closed as soon as all records are loaded
   my @records = LTSV::LINQ->FromLTSV("access.log")->ToArray();
+
+B<Concurrent use (e.g. Join/GroupJoin):> On Perl 5.006 and later,
+each call to C<FromLTSV> uses a distinct lexical file handle, so
+multiple iterators may be open simultaneously without interference.
+On Perl 5.005_03, a unique numbered package glob is used per call
+(C<LTSV::LINQ::FH::H1>, C<LTSV::LINQ::FH::H2>, ...) to achieve
+the same safety. Using C<Join> or C<GroupJoin> with two C<FromLTSV>
+sources is therefore safe on all supported Perl versions.
 
 =item B<Range($start, $count)>
 
@@ -3420,11 +3455,37 @@ B<Examples:>
 B<Note:> This is useful for ensuring a sequence always has at least
 one element.
 
-=item B<ToLTSV($filename)>
+=item B<ToLTSV($file [, label_order =E<gt> \@labels] [, headers =E<gt> \@labels])>
 
 Write to LTSV file.
 
+B<Parameters:>
+
+=over 4
+
+=item * C<$file> - Output file path
+
+=item * C<label_order =E<gt> [\@labels]> - (Optional) Specify output label order.
+Labels listed here appear first in the order given; labels present in the
+record but not listed are appended in sorted order.
+
+=item * C<headers =E<gt> [\@labels]> - Alias for C<label_order> (CSV-LINQ interop).
+
+=back
+
+B<Examples:>
+
+  # Default: labels in sorted order
   $query->ToLTSV("output.ltsv");
+
+  # Specify label order
+  $query->ToLTSV("output.ltsv", label_order => [qw(host status bytes url)]);
+
+  # Alias form (CSV-LINQ interoperability)
+  $query->ToLTSV("output.ltsv", headers => [qw(host status bytes url)]);
+
+B<Note:> Labels specified in C<label_order>/C<headers> that do not exist in a
+given record are silently skipped for that record.
 
 =back
 
@@ -4245,7 +4306,7 @@ Example:
 
 Dies if argument is not an array reference.
 
-=item B<FromLTSV($filename)>
+=item B<FromLTSV($file)>
 
 Dies if file cannot be opened.
 
@@ -4961,6 +5022,10 @@ Full documentation is available via:
 =item * LTSV specification
 
 http://ltsv.org/
+
+=item * L<JSON::LINQ> - LINQ-style query interface for JSON/JSONL files
+
+=item * L<CSV::LINQ> - LINQ-style query interface for CSV files
 
 =item * Microsoft LINQ documentation
 

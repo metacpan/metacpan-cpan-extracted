@@ -5,15 +5,14 @@ use EV;
 
 BEGIN {
     use XSLoader;
-    our $VERSION = '0.01';
+    our $VERSION = '0.02';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
 sub new {
     my ($class, %opts) = @_;
 
-    my $loop = delete $opts{loop};
-    my $self = $class->_new($loop);
+    my $loop = delete $opts{loop};  # passed through to per-conn _new on demand
 
     # Parse brokers
     my $brokers = delete $opts{brokers} // '127.0.0.1:9092';
@@ -70,7 +69,18 @@ sub new {
     $cfg->{fetch_active} = 0;
     $cfg->{group} = undef;
 
-    bless { xs => $self, cfg => $cfg }, "${class}::Client";
+    my $self = bless { cfg => $cfg, loop => $loop }, "${class}::Client";
+
+    # Warn on credentials over plaintext.
+    if ($cfg->{sasl} && !$cfg->{tls}) {
+        my $mech = $cfg->{sasl}{mechanism} // '';
+        if ($mech eq 'PLAIN' || $mech =~ /^SCRAM-/) {
+            warn "EV::Kafka: SASL $mech configured without TLS — "
+                . "credentials will be sent over plaintext\n";
+        }
+    }
+
+    return $self;
 }
 
 package EV::Kafka::Client;
@@ -95,7 +105,7 @@ sub _get_or_create_conn {
     my $info = $cfg->{broker_map}{$node_id};
     return undef unless $info;
 
-    my $conn = EV::Kafka::Conn::_new('EV::Kafka::Conn', undef);
+    my $conn = EV::Kafka::Conn::_new('EV::Kafka::Conn', $self->{loop});
     $self->_configure_conn($conn);
 
     $cfg->{conns}{$node_id} = $conn;
@@ -137,14 +147,18 @@ sub _bootstrap_connect {
             return;
         }
         my ($host, $port) = @{$bs[$idx++]};
-        my $conn = EV::Kafka::Conn::_new('EV::Kafka::Conn', undef);
+        my $conn = EV::Kafka::Conn::_new('EV::Kafka::Conn', $self->{loop});
         $self->_configure_conn($conn);
 
         $conn->on_error(sub {
             # try next broker
-            $try->();
+            $try->() if $try;
         });
 
+        # $conn must be captured strongly here so the conn struct stays
+        # alive between $try returning and on_connect firing. The cost is
+        # a benign cycle (conn -> on_connect CV -> $conn) cleared at
+        # client DESTROY when $cfg is torn down.
         $conn->on_connect(sub {
             undef $try; # break self-reference cycle
             $conn->on_error(sub {
@@ -219,13 +233,55 @@ sub _refresh_metadata {
             $cfg->{on_connect}->() if $cfg->{on_connect};
             $cfg->{on_connect} = undef;
         }
+
+        # Arm periodic metadata refresh (after first successful fetch).
+        $self->_arm_metadata_timer;
     });
+}
+
+sub _arm_metadata_timer {
+    my ($self) = @_;
+    my $cfg = $self->{cfg};
+    return if $cfg->{_meta_timer};
+    my $interval = $cfg->{metadata_refresh} || 0;
+    return if $interval <= 0;
+    weaken(my $weak = $self);
+    $cfg->{_meta_timer} = EV::timer $interval, $interval, sub {
+        return unless $weak;
+        $weak->_refresh_metadata unless $weak->{cfg}{meta_pending};
+    };
+}
+
+sub _disarm_metadata_timer {
+    my ($self) = @_;
+    undef $self->{cfg}{_meta_timer};
 }
 
 sub _refresh_metadata_for_topic {
     my ($self, $topic) = @_;
     my $cfg = $self->{cfg};
     return if $cfg->{meta_pending};
+
+    # Bound retries so a permanently-unavailable topic can't accumulate
+    # produce ops in pending_ops indefinitely.
+    my $tries = ++$cfg->{_topic_meta_tries}{$topic};
+    if ($tries > 10) {
+        delete $cfg->{_topic_meta_tries}{$topic};
+        my $msg = "metadata: topic '$topic' unavailable after $tries tries";
+        # Drop any pending ops queued for this topic and report.
+        my @keep;
+        for my $op (@{$cfg->{pending_ops}}) {
+            if ($op->{topic} && $op->{topic} eq $topic) {
+                $op->{cb}->(undef, $msg) if $op->{cb};
+            } else {
+                push @keep, $op;
+            }
+        }
+        $cfg->{pending_ops} = \@keep;
+        $cfg->{on_error}->($msg) if $cfg->{on_error};
+        return;
+    }
+
     $cfg->{meta_pending} = 1;
 
     my $conn = $self->_any_conn;
@@ -241,6 +297,18 @@ sub _refresh_metadata_for_topic {
 
         _merge_metadata($cfg, $meta);
 
+        # Fold the per-topic response into $cfg->{meta} so _num_partitions
+        # (which reads from {meta}{topics}) sees auto-created topics.
+        if ($cfg->{meta} && ref $cfg->{meta}{topics} eq 'ARRAY') {
+            my %by_name = map { $_->{name} => $_ } @{$cfg->{meta}{topics}};
+            for my $t (@{$meta->{topics} // []}) {
+                $by_name{$t->{name}} = $t;
+            }
+            $cfg->{meta}{topics} = [values %by_name];
+        } else {
+            $cfg->{meta} = $meta;
+        }
+
         # if topic still has error, retry after delay
         my $topic_ok = 0;
         for my $t (@{$meta->{topics} // []}) {
@@ -251,9 +319,10 @@ sub _refresh_metadata_for_topic {
         }
 
         if ($topic_ok) {
+            delete $cfg->{_topic_meta_tries}{$topic};
             $self->_drain_all_pending;
         } else {
-            # retry after short delay (topic being created)
+            # retry after short delay (topic being created); bounded above.
             my $t; $t = EV::timer 0.5, 0, sub {
                 undef $t;
                 $self->_refresh_metadata_for_topic($topic);
@@ -456,6 +525,13 @@ sub _flush_batch {
     my ($self, $topic, $partition, $conn) = @_;
     my $cfg = $self->{cfg};
     my $bkey = "$topic:$partition";
+    my $idempotent = defined $cfg->{producer_id} && $cfg->{producer_id} >= 0;
+
+    # When idempotent, allow only one in-flight batch per partition.
+    # Two in-flight batches racing a retry can alias sequence numbers and
+    # trigger OutOfOrderSequenceNumber (error 45), which is non-retriable.
+    return if $idempotent && $cfg->{_inflight}{$bkey};
+
     my $batch = delete $cfg->{batches}{$bkey};
     return unless $batch && @$batch;
 
@@ -466,12 +542,13 @@ sub _flush_batch {
     $popts{compression} = $cfg->{compression} if $cfg->{compression};
     $popts{transactional_id} = $cfg->{transactional_id} if $cfg->{_txn_active};
     my $saved_seq;
-    if (defined $cfg->{producer_id} && $cfg->{producer_id} >= 0) {
+    if ($idempotent) {
         $popts{producer_id}    = $cfg->{producer_id};
         $popts{producer_epoch} = $cfg->{producer_epoch};
         $saved_seq = $cfg->{next_sequence}{$bkey} // 0;
         $popts{base_sequence}  = $saved_seq;
         $cfg->{next_sequence}{$bkey} = $saved_seq + scalar @records;
+        $cfg->{_inflight}{$bkey} = 1;
     }
 
     $self->_add_txn_partition($topic, $partition) if $cfg->{_txn_active};
@@ -479,17 +556,47 @@ sub _flush_batch {
     # retry count persists on the batch across re-queues
     $cfg->{_batch_retries}{$bkey} //= 3;
 
+    weaken(my $weak_self = $self);
     $conn->produce_batch($topic, $partition, \@records, \%popts, sub {
         my ($result, $err) = @_;
+        delete $cfg->{_inflight}{$bkey} if $idempotent;
 
         my $retriable = 0;
+        my $fatal_seq = 0;
         if (!$err && $result && ref $result->{topics} eq 'ARRAY') {
             for my $t (@{$result->{topics}}) {
                 for my $p (@{$t->{partitions} // []}) {
                     my $ec = $p->{error_code} // 0;
                     $retriable = $ec if $ec == 6 || $ec == 15 || $ec == 16;
+                    # 45 = OUT_OF_ORDER_SEQUENCE_NUMBER, 46 = DUPLICATE,
+                    # 47 = INVALID_PRODUCER_EPOCH (not the validation one).
+                    $fatal_seq = $ec if $ec == 45 || $ec == 46;
                 }
             }
+        }
+
+        # Idempotent fatal sequence error: bump producer epoch and retry
+        # the batch. This is the producer's only recovery path from these
+        # codes — they're non-retriable in the usual sense but require a
+        # fresh InitProducerId.
+        if ($idempotent && $fatal_seq && !$cfg->{_txn_active}
+                && ($cfg->{_epoch_retries}{$bkey} //= 1) > 0) {
+            $cfg->{_epoch_retries}{$bkey}--;
+            # rewind sequence and re-queue the batch
+            $cfg->{next_sequence} = {};
+            $cfg->{_acked_sequence} = {};
+            if (exists $cfg->{batches}{$bkey}) {
+                unshift @{$cfg->{batches}{$bkey}}, @$batch;
+            } else {
+                $cfg->{batches}{$bkey} = $batch;
+            }
+            # force re-init of producer_id/epoch then re-flush
+            $cfg->{producer_id} = -1;
+            $cfg->{producer_epoch} = -1;
+            $weak_self->_init_idempotent(sub {
+                $weak_self->_flush_all_batches if $weak_self;
+            }) if $weak_self;
+            return;
         }
 
         if ($retriable && ($cfg->{_batch_retries}{$bkey} // 0) > 0) {
@@ -500,17 +607,34 @@ sub _flush_batch {
             } else {
                 $cfg->{batches}{$bkey} = $batch;
             }
-            $self->_refresh_metadata unless $cfg->{meta_pending};
+            $weak_self->_refresh_metadata if $weak_self && !$cfg->{meta_pending};
             my $rt; $rt = EV::timer 0.5, 0, sub {
                 undef $rt;
-                $self->_flush_all_batches;
+                $weak_self->_flush_all_batches if $weak_self;
             };
             return;
         }
         delete $cfg->{_batch_retries}{$bkey};
 
+        # Track broker-acked sequence high-water mark for the partition so
+        # abort_transaction can roll back next_sequence and not leave gaps.
+        # Also restore the epoch-retry budget so a much-later 45/46 still
+        # gets a recovery attempt.
+        if ($idempotent && !$err && defined $saved_seq) {
+            my $next = $saved_seq + scalar @records;
+            my $cur  = $cfg->{_acked_sequence}{$bkey} // 0;
+            $cfg->{_acked_sequence}{$bkey} = $next if $next > $cur;
+            delete $cfg->{_epoch_retries}{$bkey};
+        }
+
         for my $cb (@cbs) {
             $cb->($result, $err) if $cb;
+        }
+
+        # Idempotent: kick any batch that accumulated while we were in-flight.
+        if ($idempotent && $weak_self
+            && $cfg->{batches}{$bkey} && @{$cfg->{batches}{$bkey}}) {
+            $weak_self->_flush_all_batches;
         }
     });
 }
@@ -545,10 +669,17 @@ sub produce_many {
     my @errors;
     my $acks0 = ($self->{cfg}{acks} == 0);
     for my $msg (@$messages) {
-        my ($topic, $key, $value, @rest) = ref $msg eq 'ARRAY' ? @$msg : @{$msg}{qw(topic key value)};
+        my ($topic, $key, $value, @rest);
+        if (ref $msg eq 'ARRAY') {
+            ($topic, $key, $value, @rest) = @$msg;
+        } else {
+            ($topic, $key, $value) = @{$msg}{qw(topic key value)};
+            my %opts = %$msg;
+            delete @opts{qw(topic key value)};
+            push @rest, \%opts if %opts;
+        }
         if ($acks0) {
             $self->produce($topic, $key, $value, @rest);
-            --$remaining;
         } else {
             $self->produce($topic, $key, $value, @rest, sub {
                 my ($result, $err) = @_;
@@ -571,38 +702,32 @@ sub flush {
     undef $cfg->{_linger_timer};
     $cfg->{_linger_active} = 0;
 
-    # wait for all in-flight produce callbacks across all connections
-    my $pending = 0;
-    my %seen;
-    for my $conn (values %{$cfg->{conns} // {}}) {
-        next unless $conn && $conn->connected;
-        $pending += $conn->pending;
-        $seen{$$conn} = 1;
-    }
-    if ($cfg->{bootstrap_conn} && $cfg->{bootstrap_conn}->connected
-        && !$seen{${$cfg->{bootstrap_conn}}}) {
-        $pending += $cfg->{bootstrap_conn}->pending;
-    }
-    if ($pending == 0) {
-        $cb->() if $cb;
-        return;
-    }
-    # poll until pending drains
-    my $check; $check = EV::timer 0, 0.01, sub {
+    # Drained when all of these reach zero: in-flight requests on every
+    # connection, pre-metadata pending_ops, gated/queued idempotent batches.
+    my $outstanding = sub {
         my $p = 0;
-        my %s;
+        my %seen;
         for my $c (values %{$cfg->{conns} // {}}) {
             next unless $c && $c->connected;
             $p += $c->pending;
-            $s{$$c} = 1;
+            $seen{$$c} = 1;
         }
         $p += $cfg->{bootstrap_conn}->pending
             if $cfg->{bootstrap_conn} && $cfg->{bootstrap_conn}->connected
-            && !$s{${$cfg->{bootstrap_conn}}};
-        if ($p == 0) {
-            undef $check;
-            $cb->() if $cb;
-        }
+            && !$seen{${$cfg->{bootstrap_conn}}};
+        $p += scalar @{$cfg->{pending_ops} // []};
+        $p += scalar grep { $_ && @$_ } values %{$cfg->{batches} // {}};
+        return $p;
+    };
+
+    if ($outstanding->() == 0) {
+        $cb->() if $cb;
+        return;
+    }
+    my $check; $check = EV::timer 0, 0.01, sub {
+        return if $outstanding->() > 0;
+        undef $check;
+        $cb->() if $cb;
     };
     $cfg->{_flush_timer} = $check;
 }
@@ -690,7 +815,11 @@ sub poll {
             }
         }
 
-        $conn->fetch_multi(\%fetch_arg, sub {
+        $conn->fetch_multi(\%fetch_arg, {
+            max_bytes   => $cfg->{fetch_max_bytes},
+            max_wait_ms => $cfg->{fetch_max_wait_ms},
+            min_bytes   => $cfg->{fetch_min_bytes},
+        }, sub {
             my ($result, $err) = @_;
             $dispatched--;
 
@@ -916,14 +1045,26 @@ sub _group_join {
                 $self->_group_join;
                 return;
             }
+            if ($res->{error_code} == 22 || $res->{error_code} == 25) {
+                # ILLEGAL_GENERATION / UNKNOWN_MEMBER_ID — broker-side
+                # session expired or generation rolled. Reset state and
+                # rejoin from scratch.
+                $g->{member_id} = '';
+                $g->{generation} = -1;
+                my $t; $t = EV::timer 1, 0, sub { undef $t; $self->_group_start };
+                return;
+            }
             if ($res->{error_code}) {
-                $cfg->{on_error}->("JoinGroup error: $res->{error_code}") if $cfg->{on_error};
+                $cfg->{on_error}->(sprintf "JoinGroup: %s (code %d)",
+                    $self->error_name($res->{error_code}),
+                    $res->{error_code}) if $cfg->{on_error};
                 return;
             }
 
             $g->{member_id}  = $res->{member_id};
             $g->{generation} = $res->{generation_id};
-            my $is_leader = ($res->{leader} eq $res->{member_id});
+            my $is_leader = defined($res->{leader}) && defined($res->{member_id})
+                && $res->{leader} eq $res->{member_id};
 
             # Build assignments (if leader)
             my $assignments = [];
@@ -1041,8 +1182,17 @@ sub _group_sync {
                 my $t; $t = EV::timer 1, 0, sub { undef $t; $self->_group_join };
                 return;
             }
+            if ($res->{error_code} == 22 || $res->{error_code} == 25) {
+                # ILLEGAL_GENERATION / UNKNOWN_MEMBER_ID — start over.
+                $g->{member_id} = '';
+                $g->{generation} = -1;
+                my $t; $t = EV::timer 1, 0, sub { undef $t; $self->_group_start };
+                return;
+            }
             if ($res->{error_code}) {
-                $cfg->{on_error}->("SyncGroup error: $res->{error_code}") if $cfg->{on_error};
+                $cfg->{on_error}->(sprintf "SyncGroup: %s (code %d)",
+                    $self->error_name($res->{error_code}),
+                    $res->{error_code}) if $cfg->{on_error};
                 return;
             }
 
@@ -1171,13 +1321,31 @@ sub _start_heartbeat {
         $coord->heartbeat($g->{group_id}, $g->{generation}, $g->{member_id}, sub {
             my ($res, $err) = @_;
             if ($err) { return }
-            if ($res && $res->{error_code} == 27) {
+            return unless $res;
+            my $ec = $res->{error_code} // 0;
+            if ($ec == 27) {
                 # REBALANCE_IN_PROGRESS
                 $g->{state} = 'rebalancing';
                 $g->{on_revoke}->($cfg->{assignments}) if $g->{on_revoke};
                 $self->_stop_heartbeat;
                 $self->_stop_fetch_loop;
                 $self->_group_join;
+            } elsif ($ec == 22 || $ec == 25) {
+                # ILLEGAL_GENERATION / UNKNOWN_MEMBER_ID — start over.
+                $g->{state} = 'rebalancing';
+                $g->{member_id} = '';
+                $g->{generation} = -1;
+                $self->_stop_heartbeat;
+                $self->_stop_fetch_loop;
+                $self->_group_start;
+            } elsif ($ec == 15 || $ec == 16) {
+                # Coordinator moved — re-discover. Stop the fetch loop
+                # too: assignments are stale until the new coordinator
+                # confirms generation.
+                $g->{state} = 'rebalancing';
+                $self->_stop_heartbeat;
+                $self->_stop_fetch_loop;
+                $self->_group_start;
             }
         }, $g->{group_instance_id});
     };
@@ -1194,10 +1362,16 @@ sub _start_fetch_loop {
     my $cfg = $self->{cfg};
     return if $cfg->{fetch_active};
     $cfg->{fetch_active} = 1;
+    $cfg->{_fetch_in_flight} = 0;
 
+    weaken(my $weak = $self);
     $cfg->{fetch_timer} = EV::timer 0, 0.1, sub {
-        return unless $cfg->{fetch_active};
-        $self->poll;
+        return unless $weak && $cfg->{fetch_active};
+        # Skip ticks while a prior poll round is still in flight to avoid
+        # duplicate per-(topic,partition) requests landing on the broker.
+        return if $cfg->{_fetch_in_flight};
+        $cfg->{_fetch_in_flight} = 1;
+        $weak->poll(sub { $cfg->{_fetch_in_flight} = 0 });
     };
 }
 
@@ -1205,6 +1379,7 @@ sub _stop_fetch_loop {
     my ($self) = @_;
     my $cfg = $self->{cfg};
     $cfg->{fetch_active} = 0;
+    $cfg->{_fetch_in_flight} = 0;
     undef $cfg->{fetch_timer};
 }
 
@@ -1377,6 +1552,17 @@ sub abort_transaction {
     $cfg->{batches} = {};
     undef $cfg->{_linger_timer};
     $cfg->{_linger_active} = 0;
+    # Clear per-partition idempotent state. In-flight responses for the
+    # aborted transaction may still arrive; their callbacks will run as
+    # usual but must not block subsequent produce after begin_transaction.
+    $cfg->{_inflight} = {};
+    $cfg->{_batch_retries} = {};
+    # Roll next_sequence back to the broker-acked high-water mark so
+    # discarded reservations don't leave gaps that would trigger
+    # OutOfOrderSequenceNumber on the next transaction.
+    for my $bkey (keys %{$cfg->{next_sequence}}) {
+        $cfg->{next_sequence}{$bkey} = $cfg->{_acked_sequence}{$bkey} // 0;
+    }
 
     my $conn = $self->_txn_conn;
     unless ($conn) { $cb->(undef) if $cb; return }
@@ -1396,6 +1582,7 @@ sub close {
 
     $self->_stop_heartbeat;
     $self->_stop_fetch_loop;
+    $self->_disarm_metadata_timer;
 
     for my $conn (values %{$cfg->{conns} // {}}) {
         eval { $conn->disconnect if $conn && $conn->connected };
@@ -1441,7 +1628,8 @@ EV::Kafka - High-performance asynchronous Kafka/Redpanda client using EV
     $kafka->connect(sub {
         $kafka->produce('my-topic', 'key', 'value', sub {
             my ($result, $err) = @_;
-            say "produced at offset " . $result->{topics}[0]{partitions}[0]{base_offset};
+            my $off = $result->{topics}[0]{partitions}[0]{base_offset};
+            print "produced at offset $off\n";
         });
     });
 
@@ -1470,7 +1658,7 @@ Two-layer architecture:
 
 =item * B<EV::Kafka::Conn> (XS) -- single broker TCP connection with
 protocol encoding/decoding, correlation ID matching, pipelining,
-optional TLS and SASL/PLAIN authentication.
+optional TLS and SASL (PLAIN, SCRAM-SHA-256/512) authentication.
 
 =item * B<EV::Kafka::Client> (Perl) -- cluster management with metadata
 discovery, broker connection pooling, partition leader routing, producer
@@ -1490,19 +1678,22 @@ Features:
 =item * Metadata-driven partition leader routing
 
 =item * Producer: acks modes (-1/0/1), key-based partitioning (murmur2),
-headers, fire-and-forget (acks=0)
+headers, fire-and-forget (acks=0), idempotent producer with epoch-bump
+recovery, transactional / exactly-once stream processing
 
 =item * Consumer: manual partition assignment, offset tracking, poll-based
-message delivery
+message delivery; consumer groups with JoinGroup/SyncGroup/Heartbeat,
+sticky partition assignment, offset commit/fetch, automatic rebalancing,
+session-expiry recovery
 
-=item * Consumer groups: JoinGroup/SyncGroup/Heartbeat, sticky
-partition assignment, offset commit/fetch, automatic rebalancing
+=item * Compression: lz4, gzip, zstd, snappy (each gated by build-time
+library detection)
 
-=item * TLS (OpenSSL) and SASL/PLAIN authentication
+=item * TLS (OpenSSL) and SASL/PLAIN, SCRAM-SHA-256/512 (with full
+RFC 5802 server-signature verification)
 
-=item * Automatic reconnection at the connection layer
-
-=item * Bootstrap broker failover (tries all listed brokers)
+=item * Automatic reconnection at the connection layer; bootstrap-broker
+failover; periodic metadata refresh
 
 =back
 
@@ -1560,7 +1751,8 @@ Skip TLS certificate verification.
 
 =item sasl => \%opts
 
-Enable SASL authentication. Supports PLAIN mechanism:
+Enable SASL authentication. Supported mechanisms: C<PLAIN>,
+C<SCRAM-SHA-256>, C<SCRAM-SHA-512>.
 
     sasl => { mechanism => 'PLAIN', username => 'user', password => 'pass' }
 
@@ -1581,13 +1773,16 @@ Maximum batch size in bytes before a batch is flushed immediately.
 =item compression => 'Str'
 
 Compression type for produce batches: C<'lz4'> (requires liblz4),
-C<'gzip'> (requires zlib), or C<undef> for none.
+C<'gzip'> (requires zlib), C<'zstd'> (requires libzstd),
+C<'snappy'> (requires libsnappy), or C<undef> for none.
 
 =item idempotent => Bool (default 0)
 
 Enable idempotent producer. Calls C<InitProducerId> on connect and
 sets producer_id/epoch/sequence in each RecordBatch for exactly-once
-delivery (broker-side deduplication).
+delivery (broker-side deduplication). Only one batch per
+(topic, partition) is in-flight at a time when this is enabled, to
+prevent sequence-number aliasing on retry.
 
 =item transactional_id => 'Str'
 
@@ -1614,7 +1809,8 @@ Message delivery callback for consumer operations.
 
 =item fetch_max_wait_ms => Int (default 500)
 
-Maximum time the broker waits for C<fetch_min_bytes> of data.
+Maximum time the broker waits to accumulate C<fetch_min_bytes> of data
+before returning a fetch response.
 
 =item fetch_max_bytes => Int (default 1048576)
 
@@ -1626,18 +1822,22 @@ Minimum bytes before the broker responds to a fetch.
 
 =item metadata_refresh => Int (default 300)
 
-Metadata refresh interval in seconds (reserved, not yet wired).
+Periodic metadata refresh interval in seconds. Set to C<0> to disable.
+Refreshes happen in the background, so consumers and producers pick up
+leader changes without waiting for a request to fail first.
 
-=item loop => EV::Loop
+=item loop => $ev_loop
 
-EV loop to use. Default: C<EV::default_loop>.
+EV loop object to use. Default: C<EV::default_loop>.
 
 =back
 
-=head2 connect($cb)
+=head2 connect([$cb])
 
 Connect to the cluster. Connects to the first available bootstrap
-broker, fetches cluster metadata, then fires C<$cb->($metadata)>.
+broker, fetches cluster metadata, then fires C<$cb-E<gt>($metadata)>.
+On bootstrap-broker failure the next address is tried; if all fail,
+the C<on_error> handler fires.
 
     $kafka->connect(sub {
         my $meta = shift;
@@ -1720,9 +1920,11 @@ Get consumer lag for all assigned partitions.
 
 =head2 error_name($code)
 
-Convert a Kafka numeric error code to its name.
+Convert a Kafka numeric error code to its name. Callable as a method
+or class function.
 
-    EV::Kafka::Client::error_name(3)  # "UNKNOWN_TOPIC_OR_PARTITION"
+    $kafka->error_name(3);                  # "UNKNOWN_TOPIC_OR_PARTITION"
+    EV::Kafka::Client::error_name(3);       # same
 
 =head2 poll([$cb])
 
@@ -1731,10 +1933,11 @@ received record. C<$cb> fires when all fetch responses have arrived.
 
     my $timer = EV::timer 0, 0.1, sub { $kafka->poll };
 
-=head2 subscribe($topic, ..., %opts)
+=head2 subscribe(@topics, %opts)
 
-Join a consumer group and subscribe to topics. The group protocol
-handles partition assignment automatically.
+Join a consumer group and subscribe to one or more topics. The list
+of topic names comes first, followed by option key/value pairs. The
+group protocol handles partition assignment automatically.
 
     $kafka->subscribe('topic-a', 'topic-b',
         group_id           => 'my-group',
@@ -1839,8 +2042,9 @@ Produce a message to a specific partition.
     });
 
 Options: C<acks> (default 1), C<headers> (hashref), C<timestamp>
-(epoch ms, default now), C<compression> (C<'none'>, C<'lz4'>; requires
-LZ4 at build time).
+(epoch ms, default now), C<compression> (C<'none'>, C<'lz4'>,
+C<'gzip'>, C<'zstd'>, C<'snappy'>; each requires its respective
+library at build time).
 
 =head2 produce_batch($topic, $partition, \@records, [\%opts,] [$cb])
 
@@ -1853,9 +2057,11 @@ C<producer_id>, C<producer_epoch>, C<base_sequence>.
         { key => 'k2', value => 'v2' },
     ], sub { my ($result, $err) = @_ });
 
-=head2 fetch($topic, $partition, $offset, $cb, [$max_bytes])
+=head2 fetch($topic, $partition, $offset, [\%opts,] $cb)
 
-Fetch messages from a partition starting at C<$offset>.
+Fetch messages from a partition starting at C<$offset>. C<%opts> may
+set C<max_bytes> (per-partition cap, default 1 MiB), C<max_wait_ms>
+(broker block-time, default 500), C<min_bytes> (default 1).
 
     $conn->fetch('topic', 0, 0, sub {
         my ($result, $err) = @_;
@@ -1865,10 +2071,11 @@ Fetch messages from a partition starting at C<$offset>.
         }
     });
 
-=head2 fetch_multi(\%topics, $cb, [$max_bytes])
+=head2 fetch_multi(\%topics, [\%opts,] $cb)
 
 Multi-partition fetch in a single request. Groups multiple
-topic-partitions into one Fetch call to the broker.
+topic-partitions into one Fetch call to the broker. C<%opts> accepts
+the same keys as C<fetch>.
 
     $conn->fetch_multi({
         'topic-a' => [{ partition => 0, offset => 10 },
@@ -1876,7 +2083,9 @@ topic-partitions into one Fetch call to the broker.
         'topic-b' => [{ partition => 0, offset => 0 }],
     }, sub { my ($result, $err) = @_ });
 
-Used internally by C<poll()> to batch fetches by broker leader.
+Used internally by C<poll()> to batch fetches by broker leader, with
+C<max_bytes>/C<max_wait_ms>/C<min_bytes> taken from the cluster client
+config.
 
 =head2 list_offsets($topic, $partition, $timestamp, $cb)
 
@@ -1916,13 +2125,10 @@ if not yet negotiated.
     my $vers = $conn->api_versions;
     # { 0 => 7, 1 => 11, 3 => 8, ... }
 
-=head2 on_error([$cb])
+=head2 on_error([$cb]), on_connect([$cb]), on_disconnect([$cb])
 
-=head2 on_connect([$cb])
-
-=head2 on_disconnect([$cb])
-
-Set handler callbacks. Pass C<undef> to clear.
+Set connection-level handler callbacks. Call with no argument or
+C<undef> to clear.
 
 =head2 client_id($id)
 
@@ -2069,13 +2275,18 @@ numeric codes:
     0   No error
     1   OFFSET_OUT_OF_RANGE
     3   UNKNOWN_TOPIC_OR_PARTITION
-    6   NOT_LEADER_OR_FOLLOWER
-    15  COORDINATOR_NOT_AVAILABLE
-    16  NOT_COORDINATOR
-    25  UNKNOWN_MEMBER_ID
-    27  REBALANCE_IN_PROGRESS
+    6   NOT_LEADER_OR_FOLLOWER       (retried by the producer)
+    15  COORDINATOR_NOT_AVAILABLE    (retried)
+    16  NOT_COORDINATOR              (retried)
+    22  ILLEGAL_GENERATION           (group rejoin)
+    25  UNKNOWN_MEMBER_ID            (group rejoin)
+    27  REBALANCE_IN_PROGRESS        (group rejoin)
     36  TOPIC_ALREADY_EXISTS
-    79  MEMBER_ID_REQUIRED
+    45  OUT_OF_ORDER_SEQUENCE_NUMBER (idempotent: epoch bump)
+    46  DUPLICATE_SEQUENCE_NUMBER    (idempotent: epoch bump)
+    79  MEMBER_ID_REQUIRED           (group rejoin with assigned id)
+
+Use C<EV::Kafka::Client::error_name($code)> for the full list.
 
 When a broker disconnects mid-flight, all pending callbacks receive
 C<(undef, "connection closed by broker")> or C<(undef, "disconnected")>.
@@ -2221,25 +2432,28 @@ Minimal producer + consumer lifecycle:
 =head1 BENCHMARKS
 
 Measured on Linux with TCP loopback to Redpanda, 100-byte values,
-Perl 5.40.2, 50K messages (C<bench/benchmark.pl>):
+Perl 5.40.2, 20K messages (C<bench/benchmark.pl>):
 
-    Pipeline produce (acks=1)    68K msg/sec     7.4 MB/s
-    Fire-and-forget (acks=0)    100K msg/sec    11.0 MB/s
-    Fetch throughput             31K msg/sec     3.4 MB/s
-    Sequential round-trip        19K msg/sec    54 us avg latency
-    Metadata request             25K req/sec    41 us avg latency
+    Pipeline produce (acks=1)   100K msg/sec    11.0 MB/s
+    Fire-and-forget (acks=0)    120K msg/sec    13.2 MB/s
+    Sequential round-trip        24K msg/sec    42 us avg latency
+    Metadata request             21K req/sec    47 us avg latency
 
 Throughput by value size (pipelined, acks=1):
 
-       10 bytes    61K msg/sec      0.9 MB/s
-      100 bytes    68K msg/sec      7.4 MB/s
-     1000 bytes    50K msg/sec     50.2 MB/s
-    10000 bytes    18K msg/sec    178.5 MB/s
+       10 bytes   105K msg/sec      1.5 MB/s
+      100 bytes   100K msg/sec     10.5 MB/s
+     1000 bytes    70K msg/sec     70.7 MB/s
+    10000 bytes    20K msg/sec    202.0 MB/s
+
+Latency histogram (20K round-trips, acks=1, C<bench/latency.pl>):
+
+    median: 39 us    p90: 59 us    p95: 75 us    p99: 122 us
 
 Pipeline produce throughput is limited by Perl callback overhead per
 message. Fire-and-forget mode (C<acks=0>) skips the response cycle
-entirely, reaching ~100K msg/sec. Sequential round-trip (one produce,
-wait for ack, repeat) measures raw broker latency at ~54 microseconds.
+entirely, reaching ~120K msg/sec. Sequential round-trip (one produce,
+wait for ack, repeat) measures raw broker latency around 39us median.
 
 The fetch path is sequential (fetch, process, fetch again) which
 introduces one round-trip per batch. With larger C<max_bytes> and
@@ -2282,35 +2496,26 @@ encoding complexity.
 
 =over
 
-=item * B<LZ4 and gzip compression> -- supported when built with
-liblz4 and zlib. snappy and zstd are not implemented.
+=item * B<Blocking DNS for hostnames> -- numeric IPv4/IPv6 literals
+take a fast path (C<AI_NUMERICHOST>) and never block. Non-literal
+hostnames call C<getaddrinfo> synchronously, blocking the EV loop
+until the resolver responds. For fully non-blocking operation against
+named brokers, pre-resolve in Perl-land.
 
-=item * B<Transactions / EOS> -- C<begin_transaction>,
-C<send_offsets_to_transaction>, C<commit_transaction>,
-C<abort_transaction> provide full exactly-once stream processing.
-C<InitProducerId>, C<AddPartitionsToTxn>, C<TxnOffsetCommit>, C<EndTxn>
-are all wired. Requires C<transactional_id> in constructor.
-
-=item * B<No GSSAPI/OAUTHBEARER> -- SASL/PLAIN and SCRAM-SHA-256/512
-are supported. GSSAPI (Kerberos) and OAUTHBEARER are not implemented.
-
-=item * B<Sticky partition assignment> -- assignments are preserved
-across rebalances where possible. New partitions are distributed to
-the least-loaded member. Overloaded members shed excess partitions.
-
-=item * B<Blocking DNS resolution> -- C<getaddrinfo> is called
-synchronously in C<conn_start_connect>. For fully non-blocking
-operation, use IP addresses instead of hostnames.
+=item * B<No GSSAPI/OAUTHBEARER> -- only SASL/PLAIN and
+SCRAM-SHA-256/512 are implemented.
 
 =item * B<No flexible API versions> -- all API versions are capped
 below the flexible-version threshold to avoid compact string/array
-encoding. This limits interoperability with very new protocol features
-but works with all Kafka 0.11+ and Redpanda brokers.
+encoding. Works with Kafka 0.11+ and Redpanda; loses access to a few
+newer protocol features.
 
-=item * B<Limited produce retry> -- transient errors (NOT_LEADER,
+=item * B<Producer retry policy> -- transient errors (NOT_LEADER,
 COORDINATOR_NOT_AVAILABLE) trigger metadata refresh and up to 3
-retries with backoff. Non-retriable errors are surfaced to the
-callback immediately.
+retries with backoff. Hard idempotent errors (OUT_OF_ORDER_SEQUENCE,
+DUPLICATE_SEQUENCE) trigger one InitProducerId-with-fresh-epoch
+recovery attempt. Other broker errors are surfaced to the callback
+immediately.
 
 =back
 

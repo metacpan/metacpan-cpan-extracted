@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.1502';
+our $VERSION = '0.1703';
 
 use Carp;
 use Scalar::Util qw( set_prototype );
@@ -28,7 +28,7 @@ sub import {
     my ($self, @param) = @_;
     my $caller = caller;
     my $target;
-    my $shortcut = "silo";
+    my $shortcut;
 
     while (@param) {
         my $flag = shift @param;
@@ -44,27 +44,40 @@ sub import {
         };
     };
 
-    $target //= __PACKAGE__."::container::".$caller;
+    if (!defined $target) {
+        # we're not in class mode, create a one-off package
+        $target = __PACKAGE__ . "::container::" . $caller;
+        $shortcut //= 'silo';
+    }
 
     my $spec = Resource::Silo::Metadata->new($target);
     $metadata{$target} = $spec;
 
     my $instance;
-    my $silo = set_prototype {
-        # cannot instantiate target until the package is fully defined,
-        # thus go lazy
-        $instance //= $target->new;
-    } '';
+    my $shortcut_sub = set_prototype {
+            # cannot instantiate target until the package is fully defined,
+            # thus go lazy
+            $instance //= $target->new;
+        } '';
+
+    if (!defined $shortcut) {
+        # TODO remove deprecation after 2027-01-01 and just let it die
+        my $orig = $shortcut_sub;
+        $shortcut_sub = sub {
+            carp "'silo' is deprecated when -class is in action, use explicit -shortcut instead";
+            goto &$orig;
+        }
+    }
+
+    $shortcut //= 'silo'; # only for deprecation
 
     no strict 'refs'; ## no critic
     no warnings 'redefine', 'once'; ## no critic
 
     push @{"${target}::ISA"}, 'Resource::Silo::Container';
 
-    push @{"${caller}::ISA"}, 'Exporter';
-    push @{"${caller}::EXPORT"}, $shortcut;
-    *{"${caller}::resource"} = $spec->_make_dsl;
-    *{"${caller}::$shortcut"}     = $silo;
+    *{"${caller}::resource"}  = $spec->_make_dsl;
+    *{"${caller}::$shortcut"} = $shortcut_sub;
 };
 
 sub get_meta {
@@ -107,8 +120,11 @@ Declaring the resources:
     package My::App;
 
     # This creates 'resource' and 'silo' functions
-    # and *also* makes 'silo' re-exportable via Exporter
     use Resource::Silo;
+
+    # reexport shortcut function
+    use Exporter qw(import);
+    our @EXPORT_OK = qw(silo);
 
     # A literal resource, that is, initialized with a constant value
     resource config_file =>
@@ -203,16 +219,6 @@ returning the one and true container instance.
 
 =back
 
-Additionally, L<Exporter> is added to the calling package's C<@ISA>
-and C<silo> is appended to C<our @EXPORT>.
-
-B<NOTE> If the module has other exported functions, they should be added
-via
-
-    push our @EXPORT, qw( foo bar quux );
-
-or else the C<silo> function in that array will be overwritten.
-
 =head2 USE OPTIONS
 
 =head3 -class
@@ -223,10 +229,20 @@ the calling package will itself become the container class.
 Such a class may have normal fields and methods in addition to resources
 and will also be L<Moose>- and L<Moo>-compatible.
 
+In this case, C<silo> will not be exported by default, unless C<-shortcut> is explicitly specified.
+
+Consider C<-class> for larger projects and especially libraries, as a library
+may benefit from component wiring and fork-awareness, but gains nothing by being a singleton.
+
 =head3 -shortcut <function name>
 
 If specified, use that name for main instance, instead of C<silo>.
 Name must be a valid identifier, i.e. C</[a-z_][a-z_0-9]*/i>.
+
+E.g.
+
+    use Resource::Silo -shortcut => 'instance';
+    # pretend we're MooX::Singleton
 
 =head2 resource
 
@@ -234,7 +250,8 @@ Name must be a valid identifier, i.e. C</[a-z_][a-z_0-9]*/i>.
     resource 'name' => %options;
 
 If the number of arguments is odd,
-the last one is popped and considered to be the initializer.
+the last one is popped and considered to be the initializer
+(C<init>, see below).
 
 %options may include:
 
@@ -342,7 +359,7 @@ If unspecified, any dependencies are allowed, but circular instantiation
 will still be prohibited.
 
 B<NOTE> This behavior was different prior to v.0.09
-and may be change again in the near future.
+and may change again in the near future.
 
 This parameter has a different structure
 if C<class> parameter is in action (see below).
@@ -384,10 +401,29 @@ E.g. when using L<Redis::Namespace>:
 Check the resource after initialization.
 The function must throw an exception if the resource is invalid.
 
-It is applied after the resource is initialized and before it is put into the cache,
+It is applied after the resource is initialized (and coerced, if C<coerce> is set)
+and before it is put into the cache,
 both for normally initialized and overridden resources.
 
 B<NOTE> Experimental, name and semantics may change in the future.
+
+=head3 coerce => sub { $container, $resource }: $resource
+
+Transform the resource value after initialization and before L</check>.
+The return value replaces the resource.
+An C<undef> or empty-string return is treated as an error.
+
+This is analogous to Moo's C<coerce> option on attributes
+(see L<Moo/coerce>), but operates at the container level
+and receives the container as its first argument.
+
+A typical use case is accepting a plain string from the initializer
+and converting it to a richer object:
+
+    resource config_dir =>
+        init    => sub { '/etc/myapp' },
+        coerce  => sub { my ($silo, $path) = @_; Path::Tiny::path($path) },
+        check   => sub { my ($silo, $dir)  = @_; die "not a dir" unless $dir->is_dir };
 
 =head3 cleanup => sub { $resource_instance }
 
@@ -425,7 +461,7 @@ This is mutually exclusive with C<fork_cleanup>.
 The higher the number, the later the resource will get destroyed.
 
 The default is 0, negative numbers are also valid, if that makes sense for
-you application
+your application
 (e.g. destroy C<$my_service_main_object> before the resources it consumes).
 
     resource logger =>
@@ -454,11 +490,16 @@ either initialized, or overridden.
 
 See L<Resource::Silo::Container/lock>.
 
-=head3 preload => 0 | 1
+=head3 preload => 0 | 1 | [ argument1, argument2, ... ]
 
 If set, try loading the resource when C<silo-E<gt>ctl-E<gt>preload> is called.
-Useful if you want to throw errors when a service is starting,
-not during request processing.
+Useful if you want to throw errors when a service is starting, as in "fail early".
+
+Note that this flag does not affect the container initialization itself,
+it has to be requested explicitly.
+
+If C<argument> is in action, C<preload>, if present, B<must> be a list of arguments,
+and the initializer will be called with each of them, in the specified order.
 
 See L<Resource::Silo::Container/preload>.
 
@@ -482,19 +523,23 @@ Currently does nothing except emitting a warning.
 
 =head2 silo
 
-A re-exportable function returning one and true container instance
+A function returning one and true container instance
+(i.e. a singleton)
 associated with the class where the resources were declared.
 
-B<NOTE> Calling C<use Resource::Silo> from a different module will
-create a I<separate> container instance. You'll have to re-export
-(or otherwise provide access to) this function.
+C<silo-E<gt>new> will create a fresh instance of the I<same> container class,
+subject to the same initialization rules (e.g. for testing purposes).
 
-I<This is done on purpose so that multiple projects or modules can coexist
-within the same interpreter without interference.>
+B<NOTE> As of 0.17, C<silo> will not be available by default if C<-class> is used.
+Specify a C<-shortcut> explicitly to get it back.
 
-C<silo-E<gt>new> will create a new instance of the I<same> container class.
-The resource container class may therefore be viewed as an
-I<optional singleton>.
+B<NOTE> Prior to v.0.16, the shortcut function was also added to C<@EXPORT>
+in the calling package, re-exporting itself.
+This was a bad design decision and happens no more.
+If you still need this behavior, reimplementing it is as simple as
+
+    use Exporter qw(import);
+    our @EXPORT = qw(silo);
 
 =head1 UTILITY FUNCTIONS
 
@@ -586,7 +631,7 @@ If a resource depends on other resources,
 those will be simply created upon request.
 
 It is possible to make several resources depend on each other.
-Trying to initialize such resource will cause an expection, however.
+Trying to initialize such resource will cause an exception, however.
 
 =head2 COMPATIBILITY
 
@@ -679,8 +724,13 @@ This software is still in beta stage. Its interface is still evolving.
 as it doesn't seem to have compelling use cases
 while complicating the implementation.
 
-=item * Forced re-exporting of C<silo> was probably a bad idea
-and should have been left as an exercise to the user.
+=item * Version 0.15 removes C<loose_deps> flag and instead allows listing
+any dependencies, provided they are all declared by the time of
+container instantiation.
+
+=item * Prior to version 0.16, C<silo> would add itself to C<@EXPORT>
+in the calling package.
+This was a bad design decision, and is now left as an exercise to the user.
 
 =back
 
@@ -693,7 +743,7 @@ L<https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Resource-Silo>.
 
 =over
 
-=item * This module was names after a building in the game
+=item * This module was named after a building in the game
 B<I<Heroes of Might and Magic III.>>
 
 =item * This module was inspired in part by my work for
@@ -730,7 +780,7 @@ L<https://metacpan.org/release/Resource-Silo>;
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2023-2024, Konstantin Uvarin, C<< <khedin@gmail.com> >>
+Copyright (c) 2023-2026, Konstantin Uvarin, C<< <khedin@gmail.com> >>
 
 This program is free software.
 You can redistribute it and/or modify it under the terms of either:

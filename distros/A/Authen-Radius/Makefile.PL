@@ -20,5 +20,6 @@ WriteMakefile(
     TEST_REQUIRES => {
         'Test::More' => 0,
         'Test::NoWarnings' => 0,
+        'Test::MockModule' => 0,
     },
 );

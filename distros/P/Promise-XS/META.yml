@@ -3,6 +3,7 @@ abstract: 'Fast promises in Perl'
 author:
   - 'Felipe Gasper (FELIPE)'
   - 'Tom van der Woerdt <tomvanderwoerdt@sd.apple.com>'
+  - 'Takahiro Shimizu (ANATOFUZ)'
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Temp: '0'
@@ -12,7 +13,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker::CPANfile: '0.09'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,6 +25,6 @@ no_index:
     - inc
 resources:
   bugtracker: https://github.com/FGasper/p5-Promise-XS/issues
-  repository: git://github.com/FGasper/p5-Promise-XS.git
-version: '0.20'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  repository: git://github.com/AnaTofuZ/p5-Promise-XS.git
+version: '0.21'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

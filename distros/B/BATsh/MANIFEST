@@ -17,6 +17,8 @@ t/0001-classify.t
 t/0002-sh-interpreter.t
 t/0003-cmd-interpreter.t
 t/0004-bridge.t
+t/0005-verify_compat.t
+t/0006-new-features.t
 t/9001-load.t
 t/9010-encoding.t
 t/9020-perl5compat.t

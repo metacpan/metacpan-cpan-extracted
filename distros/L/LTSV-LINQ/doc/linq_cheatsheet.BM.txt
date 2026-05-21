@@ -140,10 +140,15 @@
   ->ToLookup(sub { $_[0]{dept} })
   ->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} })
   ->ToLTSV('output.ltsv')
+  ->ToLTSV('output.ltsv',              # label_order: specify output label order
+      label_order => [qw(host status bytes url)])
+  ->ToLTSV('output.ltsv',              # headers: alias for label_order (CSV-LINQ interop)
+      headers => [qw(host status bytes url)])
 
   ToDictionary bɛ hashref key=>element sɛbɛn.
     ToLookup bɛ hashref key=>[elements] sɛbɛn.
     ToLTSV bɛ sequence sɛbɛn LTSV file kɔnɔ.
+    label_order bɛ label yɔrɔ latigɛ; headers ye a tɔgɔ wɛrɛ ye (CSV-LINQ kɛlɛn).
 
 [ 12. Sariyaw (Official resources) ]
 

@@ -1,8 +1,11 @@
 package Net::RDAP;
+use Carp;
 use Digest::SHA qw(sha256_hex);
+use File::Path qw(make_path);
 use File::Slurp;
-use File::stat;
 use File::Spec;
+use File::stat;
+use File::XDG;
 use HTTP::Request::Common;
 use JSON;
 use MIME::Base64;
@@ -29,7 +32,7 @@ use constant {
 use strict;
 use warnings;
 
-$VERSION = '0.41';
+$VERSION = '0.42';
 
 =pod
 
@@ -117,6 +120,10 @@ and L<Net::RDAP::Values>.
 =item * C<cache_ttl> - if set, specifies how long after a record has
 been cached before L<Net::RDAP> asks the server for any update. By
 default this is one hour (3600 seconds).
+
+=item * C<cache_dir> - if set, specifies where L<Net::RDAP> stores its cache. If
+not provided, then the directory to use is determined using L<File::XDG>. Prior
+to v0.42, the value of C<L<File::Spec>-E<gt>tmpdir()> was used.
 
 =item * C<accept_language> - a string that will be passed to RDAP servers in
 the C<Accept-Language> header. If not provided, the default is "C<en>".
@@ -415,19 +422,19 @@ sub _get {
     #
     # path to local copy of the remote resource
     #
-    my $file = File::Spec->catfile(
-        File::Spec->tmpdir,
-        sprintf(
-            '%s-%s.json',
-            ref($self),
-            sha256_hex(join(chr(0), (
-                $VERSION,
-                $url->as_string,
-                $lang,
-                getpwuid($<),
-            )))
-        )
-    );
+
+    my $dir = $self->{cache_dir} || File::XDG->new(path_class => 'File::Spec', name => ref($self))->cache_home;
+
+    #
+    # untaint $dir
+    #
+    if ($dir =~ /(.+)/) {
+        $dir = $1;
+    }
+
+    croak(sprintf("Unable to create '%s'", $dir)) if (!-d $dir && !make_path($dir, { mode => 0700 }));
+
+    my $file = File::Spec->catfile($dir, sprintf('%s.json', sha256_hex(join(chr(0), ($VERSION, $url->canonical->as_string, $lang)))));
 
     #
     # untaint file

@@ -94,7 +94,7 @@ CODE:
     HV *hv = (HV *)SvRV(self);
     SV **data_svp = hv_fetchs(hv, "data", 0);
     if (items > 1) {
-        /* data($key) — lookup within the data hash */
+        /* data($key) - lookup within the data hash */
         if (data_svp && *data_svp && SvROK(*data_svp) && SvTYPE(SvRV(*data_svp)) == SVt_PVHV) {
             HV *data_hv = (HV *)SvRV(*data_svp);
             STRLEN klen;
@@ -105,7 +105,7 @@ CODE:
             RETVAL = newSV(0);
         }
     } else {
-        /* data() — return raw data field */
+        /* data() - return raw data field */
         RETVAL = (data_svp && *data_svp) ? SvREFCNT_inc(*data_svp) : newSV(0);
     }
 OUTPUT:

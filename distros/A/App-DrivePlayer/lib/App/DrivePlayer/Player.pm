@@ -235,20 +235,19 @@ sub _send_command_sync {
     }
 
     my $deadline = time() + $IPC_TIMEOUT;
-    my $buf      = '';
     while (time() < $deadline) {
-        my $chunk = '';
-        $self->_socket->recv($chunk, 4096);
-        $buf .= $chunk if defined $chunk && length $chunk;
+        # First, see if a matching response is already buffered (e.g. read
+        # in by an earlier _drain_events / _send_command_sync call).
+        my $resp = $self->_consume_buffered_response($id);
+        return $resp if $resp;
 
-        while ($buf =~ s/^([^\n]+)\n//) {
-            my $obj = eval { decode_json($1) } or next;
-            $self->_handle_end_file($obj)
-                if $obj->{event} && $obj->{event} eq 'end-file';
-            return $obj
-                if defined $obj->{request_id} && $obj->{request_id} == $id;
+        my $chunk = '';
+        $self->_socket->recv($chunk, 65536);
+        if (defined $chunk && length $chunk) {
+            $self->_pending_buf($self->_pending_buf . $chunk);
+        } else {
+            sleep 0.02;
         }
-        sleep 0.02 unless length $chunk;
     }
     return;
 }
@@ -257,16 +256,38 @@ sub _drain_events {
     my ($self) = @_;
     return unless $self->_socket;
 
-    my $buf   = $self->_pending_buf;
     my $chunk = '';
     $self->_socket->recv($chunk, 65536);
-    $buf .= $chunk if defined $chunk && length $chunk;
+    $self->_pending_buf($self->_pending_buf . $chunk)
+        if defined $chunk && length $chunk;
+
+    $self->_consume_buffered_response(undef);   # process events, discard any
+                                                # stray request responses
+}
+
+# Walk through complete lines in _pending_buf, dispatching events and
+# returning the first response whose request_id matches $want_id (undef =
+# don't match any; just process events).
+sub _consume_buffered_response {
+    my ($self, $want_id) = @_;
+    my $buf = $self->_pending_buf;
+    my $matched;
 
     while ($buf =~ s/^([^\n]+)\n//) {
-        my $obj = eval { decode_json($1) } or next;
-        $self->_handle_event($obj) if $obj->{event};
+        my $obj = eval { decode_json($1) };
+        next if !$obj || $@;
+        if ($obj->{event}) {
+            $self->_handle_event($obj);
+            next;
+        }
+        if (defined $want_id && defined $obj->{request_id}
+                && $obj->{request_id} == $want_id) {
+            $matched = $obj;
+            last;
+        }
     }
     $self->_pending_buf($buf);
+    return $matched;
 }
 
 sub _handle_event {

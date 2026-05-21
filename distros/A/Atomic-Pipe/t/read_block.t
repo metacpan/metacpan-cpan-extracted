@@ -8,29 +8,53 @@ BEGIN {
     require "./$path";
 }
 
-my ($r, $w) = Atomic::Pipe->pair;
+BEGIN {
+    my $path = __FILE__;
+    $path =~ s{[^/]+\.t$}{select_mode.pm};
+    require "./$path";
+}
 
-my $start = time;
-worker { note_sleep 10; $w->write_message("aaa\n") };
+for my $use_select (io_select_modes()) {
+    subtest "use_io_select=$use_select" => sub {
+        my ($r, $w) = Atomic::Pipe->pair(use_io_select => $use_select);
 
-sleep 2 if $^O eq 'MSWin32';
+        # Test 1: blocking read waits until writer writes.
+        # Sync replaces wall-clock timing: worker signals ready, parent verifies
+        # the read end is not currently readable (proving a read would block),
+        # then releases the worker to perform the write.
+        my $sync = make_sync();
+        worker {
+            sync_signal($sync->{from_worker_w});
+            sync_wait($sync->{to_worker_r});
+            $w->write_message("aaa\n");
+        };
 
-my $msg = $r->read_message;
-ok(time - $start > 6, "Blocked");
-is($msg, "aaa\n", "got the message");
+        sync_wait($sync->{from_worker_r});
+        ok(!can_read_now($r->rh), "Read would block (no data yet)");
 
-cleanup();
+        sync_signal($sync->{to_worker_w});
+        my $msg = $r->read_message;
+        is($msg, "aaa\n", "got the message");
 
-$start = time;
-worker { note_sleep 10; $w->write_message("bbb\n") };
+        cleanup();
 
-sleep 2 if $^O eq 'MSWin32';
+        # Test 2: non-blocking read returns immediately when no data is available.
+        $sync = make_sync();
+        worker {
+            sync_signal($sync->{from_worker_w});
+            sync_wait($sync->{to_worker_r});
+            $w->write_message("bbb\n");
+        };
 
-$r->blocking(0);
+        sync_wait($sync->{from_worker_r});
 
-$msg = $r->read_message;
-ok(time - $start < 8, "Did not spend too much time waiting");
-ok(!$msg, "No message (did not block)");
+        $r->blocking(0);
+        $msg = $r->read_message;
+        ok(!$msg, "No message (did not block)");
 
-cleanup();
+        sync_signal($sync->{to_worker_w});
+        cleanup();
+    };
+}
+
 done_testing;

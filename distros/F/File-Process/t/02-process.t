@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Data::Dumper;
-use JSON::PP;
+use JSON qw(decode_json);
 use Test::More tests => 3;
 
 use lib qw(.);

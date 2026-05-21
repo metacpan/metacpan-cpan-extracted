@@ -119,7 +119,6 @@ sub fetch {
         }
     };
     if ($error = $@) {
-    # chomp $error;
     return $self->{ TOLERANT }
            ? (undef,  Template::Constants::STATUS_DECLINED)
            : ($error, Template::Constants::STATUS_ERROR);
@@ -183,10 +182,9 @@ sub _load {
         # plugin module name is explicitly stated in PLUGIN_NAME
         $pkg = $module;
         ($file = $module) =~ s|::|/|g;
-        $file =~ s|::|/|g;
         $self->debug("loading $module.pm (PLUGIN_NAME)")
             if $self->{ DEBUG };
-        $ok = eval { require "$file.pm" };
+        $ok = eval { $module->isa($PLUGIN_BASE) or require "$file.pm" };
         $error = $@;
     }
     else {
@@ -200,11 +198,11 @@ sub _load {
             $self->debug("loading $file.pm (PLUGIN_BASE)")
                 if $self->{ DEBUG };
 
-            $ok = eval { require "$file.pm" };
+            $ok = eval { $pkg->isa($PLUGIN_BASE) or require "$file.pm" };
             last unless $@;
 
             $error .= "$@\n"
-                unless ($@ =~ /^Can\'t locate $file\.pm/);
+                unless ($@ =~ /^Can't locate \Q$file\E\.pm/);
         }
     }
 

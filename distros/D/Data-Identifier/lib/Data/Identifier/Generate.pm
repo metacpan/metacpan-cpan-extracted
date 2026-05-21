@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2025 Philipp Schafft
+# Copyright (c) 2023-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -31,7 +31,7 @@ use constant {
 };
 
 
-our $VERSION = v0.28;
+our $VERSION = v0.29;
 
 my %_multiplicity_prefix = (
     total   => '4.1',
@@ -100,18 +100,29 @@ sub unicode_character {
     my $unicode_cp;
     my $unicode_cp_str;
 
+    croak 'No type given' unless defined $type;
+    croak 'No/Bad request given' unless defined($request) && length($request);
+
     if ($type eq 'unicode') {
         if ($request =~ /^[Uu]\+([0-9a-fA-F]+)$/) {
             $unicode_cp = hex($1);
-        } else {
+        } elsif ($request =~ /^[0-9]+\z/) {
             $unicode_cp = int($request);
+        } else {
+            croak 'Bad request given: '.$request;
         }
     } elsif ($type eq 'ascii') {
-        $unicode_cp = int($request);
+        if ($request =~ /^[0-9]+\z/) {
+            $unicode_cp = int($request);
+        } else {
+            croak 'Bad request given: '.$request;
+        }
         croak 'US-ASCII character out of range: '.$unicode_cp if $unicode_cp < 0 || $unicode_cp > 0x7F;
     } elsif ($type eq 'raw') {
         croak 'Raw value is not exactly one character long' unless length($request) == 1;
         $unicode_cp = ord($request);
+    } else {
+        croak 'Bad type given: '.$type;
     }
 
     croak 'Unicode character out of range: '.$unicode_cp if $unicode_cp < 0 || $unicode_cp > 0x10FFFF;
@@ -311,6 +322,15 @@ sub gte_simple {
 }
 
 
+sub unit {
+    my ($pkg, $request, %opts) = @_;
+
+    require Data::Identifier::Util;
+
+    return Data::Identifier::Util->render_unit_request('Data::Identifier' => $request, %opts);
+}
+
+
 #@returns Data::Identifier
 sub generic {
     my ($pkg, %opts) = @_;
@@ -496,7 +516,7 @@ Data::Identifier::Generate - format independent identifier object
 
 =head1 VERSION
 
-version v0.28
+version v0.29
 
 =head1 SYNOPSIS
 
@@ -798,6 +818,40 @@ It holds a hashref that is used to pass information on the generated identifier 
 
 =back
 
+=head2 unit
+
+    my Data::Identifier $identifier = Data::Identifier::Generate->unit($request, %opts);
+
+(experimental since v0.29)
+
+Generates a (derived) unit from the given request.
+The request is a hashref with entries of the base units as keys and their exponent as value.
+(e.g. C<{m =E<gt> 1, s =E<gt> -1}> for meters per second).
+The keys must be one of the SI symbols (C<s>, C<m>, C<kg>, C<A>, C<K>, C<mol>, or C<cd>), or C<prefix>.
+If C<prefix> is given it will accept any SI prefix by name or symbol (such as C<milli> or C<G>).
+Future version might also allow other keys.
+
+Future version might accept other requests than hashrefs.
+
+This method tries to be smart detecting well known and common units.
+In those case those units might be returned directly.
+
+The following options (all optional) are supported:
+
+=over
+
+=item C<displayname>
+
+The displayname as to be used for the identifier.
+This is the same as defined by L<Data::Identifier/new>.
+
+Defaults to the data from the request.
+
+=back
+
+B<Note:>
+This function might load L<Data::Identifier::Util> dynamically.
+
 =head2 generic
 
     my Data::Identifier $identifier = Data::Identifier::Generate->generate(%opts);
@@ -872,7 +926,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023-2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2023-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

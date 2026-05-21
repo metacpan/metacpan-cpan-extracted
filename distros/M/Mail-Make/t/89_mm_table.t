@@ -18,7 +18,7 @@ BEGIN
     use_ok( 'MM::Const', qw( :table ) ) || BAIL_OUT( "Unable to load Module::Generic::File" );
 };
 
-# NOTE: Tests
+# NOTE: make/copy/clear basics
 subtest 'make/copy/clear basics' => sub
 {
     my $t = MM::Table->make( undef, 0 );
@@ -42,6 +42,7 @@ subtest 'make/copy/clear basics' => sub
     is_deeply( \@none, [], 'clear: list context empty' );
 };
 
+# NOTE: set/add/unset/get ordering + case-insensitive keys
 subtest 'set/add/unset/get ordering + case-insensitive keys' => sub
 {
     my $t = MM::Table->make( undef, 10 );
@@ -59,6 +60,7 @@ subtest 'set/add/unset/get ordering + case-insensitive keys' => sub
     is( $t->get( 'foo' ), undef, 'unset removes all values for key (case-insensitive)' );
 };
 
+# NOTE: merge semantics (first value only) + missing key
 subtest 'merge semantics (first value only) + missing key' => sub
 {
     my $t = MM::Table->make( undef, 10 );
@@ -80,6 +82,7 @@ subtest 'merge semantics (first value only) + missing key' => sub
     is( $t->get( 'miss' ), 'a', 'merge on missing key behaves like add()' );
 };
 
+# NOTE: overlay semantics (new table = overlay first, then base)
 subtest 'overlay semantics (new table = overlay first, then base)' => sub
 {
     my $base = MM::Table->make( undef, 10 );
@@ -124,6 +127,7 @@ subtest 'overlay semantics (new table = overlay first, then base)' => sub
     );
 };
 
+# NOTE: compress SET (keep last) and MERGE (comma list) with stable order by first occurrence
 subtest 'compress SET (keep last) and MERGE (comma list) with stable order by first occurrence' => sub
 {
     my $t = MM::Table->make( undef, 10 );
@@ -158,6 +162,7 @@ subtest 'compress SET (keep last) and MERGE (comma list) with stable order by fi
     );
 };
 
+# NOTE: overlap SET overwrites key entirely; overlap MERGE merges into first value
 subtest 'overlap SET overwrites key entirely; overlap MERGE merges into first value' => sub
 {
     my $base = MM::Table->make( undef, 10 );
@@ -212,6 +217,7 @@ subtest 'overlap SET overwrites key entirely; overlap MERGE merges into first va
     );
 };
 
+# NOTE: do() filter + early abort
 subtest 'do() filter + early abort' => sub
 {
     my $t = MM::Table->make( undef, 10 );
@@ -252,6 +258,7 @@ subtest 'do() filter + early abort' => sub
     is( $count, 2, 'do early abort stops iteration' );
 };
 
+# NOTE: tied interface: FETCH/STORE/EXISTS/DELETE/CLEAR and each() multivalue FETCH quirk
 subtest 'tied interface: FETCH/STORE/EXISTS/DELETE/CLEAR and each() multivalue FETCH quirk' => sub
 {
     my $t = MM::Table->make( undef, 10 );

@@ -38,7 +38,7 @@ See L<Mojolicious::Guides> for more information.
 
 package Game::HexDescribe;
 
-our $VERSION = 1.03;
+our $VERSION = 1.04;
 
 use Modern::Perl;
 use Mojolicious::Lite;
@@ -84,7 +84,7 @@ plugin Config => {
   default => {
     loglevel => 'warn',
     logfile => undef,
-    contrib => dist_dir('Game-HexDescribe'),
+    contrib => undef,
   },
   file => getcwd() . '/hex-describe.conf',
 };
@@ -111,18 +111,40 @@ Mapper.
 =cut
 
 my $text_mapper_url = app->config('text_mapper_url') || 'https://campaignwiki.org/text-mapper';
+$Game::HexDescribe::Util::text_mapper_url = $text_mapper_url;
 $log->debug("Text Mapper URL: $text_mapper_url");
 
 $Game::HexDescribe::Util::face_generator_url = app->config('face_generator_url') || 'https://campaignwiki.org/face';
 $log->debug("Face Generator URL: $Game::HexDescribe::Util::face_generator_url");
 
-$Game::HexDescribe::Util::text_mapper_url = app->config('text_mapper_url') || 'https://campaignwiki.org/text-mapper';
-$log->debug("Text Mapper URL: $Game::HexDescribe::Util::text_mapper_url");
-
 =head2 Entry Points
 
 As this is a web app, the URLs you can call are basically the API it exposes.
 Each URL can accept either I<get> or I<post> requests, or I<any>.
+
+The config file key C<under> can be used to host the entire application on a
+specific path. Example C<hex-describe.conf> file:
+
+    {
+      loglevel => 'debug',
+      logfile => undef,
+      contrib => 'share',
+      text_mapper_url => 'http://localhost:3010',
+      face_generator_url => 'http://localhost:3020',
+      under => 'hex-describe',
+    };
+
+Command line to start it:
+
+    morbo --mode development --listen http://*:3000 script/hex-describe
+
+The result is that Hex Describe is now available via
+C<http://localhost:3000/hex-describe>.
+
+=cut
+
+my $under = app->config('under');
+under $under if $under;
 
 =over 4
 
@@ -137,7 +159,7 @@ result instead of allow the user to edit the form.
 
 get '/' => sub {
   my $c = shift;
-  my $map = $c->param('map') || load_map('default', app->config('contrib'));
+  my $map = $c->param('map') || load_map('default', app->config('contrib') || dist_dir('Game-HexDescribe'));
   my $url = $c->param('url');
   my $table = $c->param('table');
   $c->render(template => 'edit', map => $map, url => $url, table => $table);
@@ -217,7 +239,7 @@ get '/stats/random/alpine' => sub {
       $reverse_map{$type}++;
     }
   }
-  my $table = load_table('schroeder', app->config('contrib'));
+  my $table = load_table('schroeder', app->config('contrib') || dist_dir('Game-HexDescribe'));
   my $descriptions = describe_map($map_data, parse_table($table), 0);
   my %reverse_creatures;
   for my $coords (keys %$descriptions) {
@@ -301,7 +323,7 @@ get '/describe/random/smale' => sub {
   my $labels = $c->param('labels');
   my $url = $c->param('url') || "$text_mapper_url/smale/random/text";
   my $map = get_data($url);
-  my $table = load_table('seckler', app->config('contrib'));
+  my $table = load_table('seckler', app->config('contrib') || dist_dir('Game-HexDescribe'));
   init();
   my $descriptions = describe_map(parse_map($map), parse_table($table), 1); # with faces
   $map = add_labels($map) if $labels;
@@ -329,7 +351,7 @@ get '/describe/random/alpine' => sub {
   }
   srand($seed) if $seed;
   my $map = get_data($url);
-  my $table = load_table('schroeder', app->config('contrib'));
+  my $table = load_table('schroeder', app->config('contrib') || dist_dir('Game-HexDescribe'));
   init();
   my $descriptions = describe_map(parse_map($map), parse_table($table), 1); # with faces
   $map = add_labels($map) if $labels;
@@ -351,7 +373,7 @@ get '/describe/random/strom' => sub {
   my $labels = $c->param('labels');
   my $url = $c->param('url') || "$text_mapper_url/smale/random/text";
   my $map = get_data($url);
-  my $table = load_table('strom', app->config('contrib'));
+  my $table = load_table('strom', app->config('contrib') || dist_dir('Game-HexDescribe'));
   init();
   my $descriptions = describe_map(parse_map($map), parse_table($table), 1); # with faces
   $map = add_labels($map) if $labels;
@@ -373,7 +395,7 @@ get '/describe/random/johnston' => sub {
   my $labels = $c->param('labels');
   my $url = $c->param('url') || "$text_mapper_url/apocalypse/random/text";
   my $map = get_data($url);
-  my $table = load_table('johnston', app->config('contrib'));
+  my $table = load_table('johnston', app->config('contrib') || dist_dir('Game-HexDescribe'));
   init();
   my $descriptions = describe_map(parse_map($map), parse_table($table), 1); # with faces
   $map = add_labels($map) if $labels;
@@ -395,7 +417,7 @@ get '/describe/random/traveller' => sub {
   my $labels = $c->param('labels');
   my $url = $c->param('url') || "$text_mapper_url/traveller/random/text";
   my $map = get_data($url);
-  my $table = load_table('traveller', app->config('contrib'));
+  my $table = load_table('traveller', app->config('contrib') || dist_dir('Game-HexDescribe'));
   init();
   my $descriptions = describe_map(parse_map($map), parse_table($table), 1); # with faces
   $map = add_labels($map) if $labels;
@@ -581,7 +603,7 @@ This shows you the default map.
 
 get '/default/map' => sub {
   my $c = shift;
-  $c->render(text => load_map('default', app->config('contrib')), format => 'txt');
+  $c->render(text => load_map('default', app->config('contrib') || dist_dir('Game-HexDescribe')), format => 'txt');
 };
 
 =item get /schroeder/table
@@ -592,7 +614,7 @@ This shows you the table by Alex Schroeder.
 
 get '/schroeder/table' => sub {
   my $c = shift;
-  $c->render(text => load_table('schroeder', app->config('contrib')), format => 'txt');
+  $c->render(text => load_table('schroeder', app->config('contrib') || dist_dir('Game-HexDescribe')), format => 'txt');
 };
 
 =item get /seckler/table
@@ -603,7 +625,7 @@ This shows you the table by Peter Seckler.
 
 get '/seckler/table' => sub {
   my $c = shift;
-  $c->render(text => load_table('seckler', app->config('contrib')), format => 'txt');
+  $c->render(text => load_table('seckler', app->config('contrib') || dist_dir('Game-HexDescribe')), format => 'txt');
 };
 
 =item get /strom/table
@@ -614,7 +636,7 @@ This shows you the table by Matt Strom.
 
 get '/strom/table' => sub {
   my $c = shift;
-  $c->render(text => load_table('strom', app->config('contrib')), format => 'txt');
+  $c->render(text => load_table('strom', app->config('contrib') || dist_dir('Game-HexDescribe')), format => 'txt');
 };
 
 =item get /johnston/table
@@ -625,7 +647,7 @@ This shows you the table by Josh Johnston.
 
 get '/johnston/table' => sub {
   my $c = shift;
-  $c->render(text => load_table('johnston', app->config('contrib')), format => 'txt');
+  $c->render(text => load_table('johnston', app->config('contrib') || dist_dir('Game-HexDescribe')), format => 'txt');
 };
 
 =item get /traveller/table
@@ -636,7 +658,7 @@ This shows you the Traveller table by Vicky Radcliffe and Alex Schroeder.
 
 get '/traveller/table' => sub {
   my $c = shift;
-  $c->render(text => load_table('traveller', app->config('contrib')), format => 'txt');
+  $c->render(text => load_table('traveller', app->config('contrib') || dist_dir('Game-HexDescribe')), format => 'txt');
 };
 
 =item get /rorschachhamster/table
@@ -647,21 +669,7 @@ Für die deutschen Tabellen von Rorschachhamster Alex Schroeder.
 
 get '/rorschachhamster/table' => sub {
   my $c = shift;
-  $c->render(text => load_table('rorschachhamster', app->config('contrib')), format => 'txt');
-};
-
-=item get /source
-
-This gets you the source code of Hex Describe in case the source repository is
-no longer available.
-
-=cut
-
-get '/source' => sub {
-  my $c = shift;
-  seek(DATA,0,0);
-  local $/ = undef;
-  $c->render(text => <DATA>, format => 'txt');
+  $c->render(text => load_table('rorschachhamster', app->config('contrib') || dist_dir('Game-HexDescribe')), format => 'txt');
 };
 
 =item get /authors
@@ -756,7 +764,7 @@ sub get_table {
   my $url = $c->param('url');
   my $table = '';
   $table .= get_data($url) if $url;
-  $table .= load_table($load, app->config('contrib')) if $load;
+  $table .= load_table($load, app->config('contrib') || dist_dir('Game-HexDescribe')) if $load;
   # the table in the text area comes at the end and overrides the defaults
   $table .= $c->param('table') || '';
   return $url, $table if wantarray;
@@ -1268,6 +1276,7 @@ page is my attempt at writing a tutorial.
 <li><a href="#quests">Simple Quests: here, nearby, other</a></li>
 <li><a href="#combining">Combining it: here, save, store</a></li>
 <li><a href="#here">Reuse: here, same, and nearby</a></li>
+<li><a href="#neighbouring">When the neighbourhood has an influence</a></li>
 <li><a href="#global">Global values</a></li>
 <li><a href="#append">Rearranging the output: append</a></li>
 <li><a href="#unique">Unique results</a></li>
@@ -1703,7 +1712,7 @@ many later nested descriptions.
 0201 hill
 0301 hill
 0401 hill
-include https://campaignwiki.org/contrib/gnomeyland.txt
+include gnomeyland.txt
 
 ;hill
 1,The rolling hills stretch on forever. [fire?||[burning hills]]
@@ -1721,7 +1730,7 @@ href="#same">reuse</a>, below.
 0101 town law-3
 0201 town law-0
 0301 town law-1
-include https://campaignwiki.org/contrib/gnomeyland.txt
+include gnomeyland.txt
 
 ;town
 1,This is a small town. [constable-[same law]]
@@ -1748,7 +1757,7 @@ If you want an introduction for your map key, use the <code>TOP</code> rule:
 0101 hill
 0201 hill
 0301 hill
-include https://campaignwiki.org/contrib/gnomeyland.txt
+include gnomeyland.txt
 
 ;TOP
 1,This is the introduction.
@@ -1766,7 +1775,7 @@ introduction:
 0101 hill
 0201 hill
 0301 hill
-include https://campaignwiki.org/contrib/gnomeyland.txt
+include gnomeyland.txt
 
 ;TOP
 1,This is the introduction.&lt;/p&gt;&lt;p class="sidebar"&gt;And this is the sidebar!
@@ -1811,7 +1820,7 @@ an appropriate second sentence.
 1101 white mountain
 1201 light-grey mountain
 1301 light-green village
-include https://campaignwiki.org/contrib/gnomeyland.txt
+include gnomeyland.txt
 
 ;mountains
 1,[mountain]
@@ -1826,6 +1835,11 @@ include https://campaignwiki.org/contrib/gnomeyland.txt
 1,gorgon
 1,cryo-hydra
 % end
+
+<p>
+In addition to that, the "hex" key with the current coordinates is always
+available as a local. <code>[same hex]</code> returns something like "0101".
+</p>
 
 <h2 id="alias">Alias: as</h2>
 
@@ -1849,7 +1863,7 @@ it. The pattern “<em>something</em> as <em>something else</em>” is key, here
 1101 white mountain
 1201 light-grey mountain
 1301 light-green village
-include https://campaignwiki.org/contrib/gnomeyland.txt
+include gnomeyland.txt
 
 ;mountains
 1,[mountain]
@@ -1970,7 +1984,7 @@ lair]</code>.
 1101 white mountain
 1201 light-grey mountain
 1301 light-green village
-include https://campaignwiki.org/contrib/gnomeyland.txt
+include gnomeyland.txt
 
 ;mountains
 1,[mountain]
@@ -2080,7 +2094,7 @@ hexes having the "white" feature.
 1101 white mountain
 1201 light-grey mountain
 1301 light-green fir-forest
-include https://campaignwiki.org/contrib/gnomeyland.txt
+include gnomeyland.txt
 
 ;mountains
 1,This is the [name for white big mountains].
@@ -2144,7 +2158,7 @@ rivers.
 1301 light-green fir-forest
 0401-0701-0702 river
 1101-1401 river
-include https://campaignwiki.org/contrib/gnomeyland.txt
+include gnomeyland.txt
 
 ;river
 1,[name for river] flows through here.
@@ -2200,7 +2214,7 @@ the appropriate table.
 1101 white mountain
 1201 light-grey mountain
 1301 light-green fir-forest
-include https://campaignwiki.org/contrib/gnomeyland.txt
+include gnomeyland.txt
 
 ;mountains
 1,[mountain]
@@ -2243,7 +2257,7 @@ Here's another idea: there is currently an experimental feature whereby
 1101 white mountain
 1201 light-grey mountain
 1301 light-green fir-forest
-include https://campaignwiki.org/contrib/gnomeyland.txt
+include gnomeyland.txt
 
 ;mountains
 1,Here lives a dragon that loves to hunt in [adjacent hex].
@@ -2268,7 +2282,7 @@ What if you want to link to this adjacent hex?
 1101 white mountain
 1201 light-grey mountain
 1301 light-green fir-forest
-include https://campaignwiki.org/contrib/gnomeyland.txt
+include gnomeyland.txt
 
 ;mountains
 1,Here lives a dragon that loves to hunt in &lt;a href="#desc[name for neighbour]"&gt;[name for neighbour]&lt;/a&gt;.
@@ -2320,15 +2334,21 @@ three different results. Clearly, this can't work.
 1,magic missile
 % end
 
-<h2 id="quests">Simple Quests: here, nearby, other</h2>
+<h2 id="quests">Simple Quests: here, nearby, closest, other</h2>
 
 <p>
 Here's another idea which you might use to build simple fetch quests and the
 like. If a references starts with the word "here" then the result of the table
-will get saved. At the very end, when everything is else is done and there is a
-reference starts with the word "nearby" then the closest of these saved items
-will get used; and if there is a reference starts with the word "other" then
-some other of these saved items will get used.
+will get saved. At the very end, the following references are processed:
+
+<dl>
+<dt>"closest"<dd>the nearest of these saved items will get used, even if this
+item is found in the same hex (no minimum distance)
+<dt>"nearby"<dd>the nearest of these saved items will get used, but not if this
+item is found in the same hex (minimum distance is one hex)
+<dt>"other"<dd>a random saved item is used, but not if this item is found in the
+same hex (minimum distance is one hex)
+</dl>
 
 %= example begin
 0101 light-grey mountain
@@ -2344,7 +2364,7 @@ some other of these saved items will get used.
 1101 white mountain
 1201 light-grey mountain
 1301 light-green village
-include https://campaignwiki.org/contrib/gnomeyland.txt
+include gnomeyland.txt
 
 ;mountain
 1,The [here ingredient] grows up here, if you know where to look.
@@ -2369,7 +2389,8 @@ include https://campaignwiki.org/contrib/gnomeyland.txt
 % end
 
 <p>
-Or more complicated, with types of ingredients.
+Or more complicated, with types of ingredients. The alchemist has a preferences
+noted and picks a nearby matching ingredient.
 
 %= example begin
 0101 light-grey mountain
@@ -2385,7 +2406,7 @@ Or more complicated, with types of ingredients.
 1101 white mountain
 1201 light-grey mountain
 1301 light-green village
-include https://campaignwiki.org/contrib/gnomeyland.txt
+include gnomeyland.txt
 
 ;mountain
 2,It's cold up here.
@@ -2398,7 +2419,7 @@ include https://campaignwiki.org/contrib/gnomeyland.txt
 1,The [here forest ingredient] grows up here, if you know where to look.
 
 ;village
-1,The village alchemist is looking for [ingredient].
+1,The village alchemist specializes in [quote [mountain|forest] as preference] alchemy and is looking for [nearby [same preference] ingredient].
 
 ;mountain ingredient
 1,Edelweiss
@@ -2409,18 +2430,46 @@ include https://campaignwiki.org/contrib/gnomeyland.txt
 1,Blue Worm
 1,Fey Moss
 1,Magic Mushroom
+% end
 
-;ingredient
-1,[nearby mountain ingredient]
-1,[nearby forest ingredient]
+<p>
+Both "nearby" and "other" exclude saved items from the same hex. If you don't
+want to exclude saved items from the same, use "closest":
+
+%= example begin
+0101 light-grey bushes
+0201 light-grey bushes town
+0301 light-grey bushes
+0401 light-grey bushes town
+0501 light-grey bushes
+include gnomeyland.txt
+
+;bushes
+1,Nestled in the countryside is a small village. It belongs to the town of [closest town name].
+
+;town
+1,This is the town of [here town name].
+
+;town name
+1,[town name1] [town name2]
+
+;town name1
+1,Sweet
+1,Clear
+1,Fair
+
+;town name2
+1,Abbey
+1,Oaks
+1,Elms
+1,Grove
 % end
 
 <p>
 Beware: If you start a reference with the word "nearby" then what follows has to
 be the thing that was saved using references starting with the word "here". In
 the example above, <code>[here forest ingredient]</code> matches <code>[nearby
-forest ingredient]</code>. The following wouldn't work and it would be hard to
-spot:
+forest ingredient]</code>. The following wouldn't work:
 
 <pre>
 ;village
@@ -2433,11 +2482,7 @@ spot:
 
 <p>
 The problem is that it never says <code>[here ingredient]</code> anywhere, so
-nothing is ever found, which means that a random ingredient will get picked.
-Thus, it <em>looks</em> as if it worked because a random ingredient is picked,
-but it doesn't prefer ingredients that were actually used on the map. You might
-just as well have written <code>The village alchemist is looking for
-[ingredient].</code>
+nothing is ever found. In this case, <code>[here independet]</code> returns "…".
 
 <p>
 Remember: "nearby X" and "here X" must match up.
@@ -2464,7 +2509,7 @@ map, and thus half the time pilgrims will be looking for a Heracles temple.
 1101 white mountain
 1201 light-grey mountain
 1301 light-green village
-include https://campaignwiki.org/contrib/gnomeyland.txt
+include gnomeyland.txt
 
 ;mountain
 1,Here stands a temple of *[here power as temple]*.
@@ -2483,10 +2528,10 @@ include https://campaignwiki.org/contrib/gnomeyland.txt
 1,The inn houses a pilgrim looking for the temple of *[other temple]*.
 % end
 
-<h2 id="here">Reuse: here, same, and nearby</h2>
+<h2 id="here">Reuse: here, same, closest and nearby</h2>
 
 <p>
-We said that if a references starts with the word "here" then the result of the
+We said that if a reference starts with the word "here" then the result of the
 table will get saved. What follows is an example where we use "here" and "same"
 and "nearby" and nested references to pull it all together.
 
@@ -2504,7 +2549,7 @@ and "nearby" and nested references to pull it all together.
 1101 white mountain
 1201 light-grey mountain
 1301 light-green village
-include https://campaignwiki.org/contrib/gnomeyland.txt
+include gnomeyland.txt
 
 ;mountains
 1,[white mountain]
@@ -2527,6 +2572,82 @@ include https://campaignwiki.org/contrib/gnomeyland.txt
 
 ;village
 1,The village alchemist is looking for the horn of a [nearby ice monster].
+% end
+
+The difference between "closest" and "nearby" is that "nearby" excludes the
+current hex whereas "closest" does not.
+
+<h2 id="neighbouring">When the neighbourhood has an influence</h2>
+
+<p>
+If you store something in a hex, you can check for the presence of
+that something in neighbouring hexes using "neighbouring x ? a : b".
+Note that the spaces around the question mark and the colon are
+mandatory in order to avoid mismatches.
+
+<p>
+More specifically, "neighbouring x ? a : b" works as follows:
+
+<dl>
+<dt>x</dt>
+<dd>
+<p>
+This is the <em>if</em> clause. It's a reference to a saved value. The
+neighbouring hex must have used something like "here store something
+as something else" which allows you to use "something else" as
+<em>x</em>. If neither <em>? a</em> nor <em>: b</em> are given, the
+value itself is returned. In this example, that would be "something".
+<p>
+As mentioned <a href="#quests">above</a>, using just "here" without
+"store" would do a table lookup. If you write "here something as
+something else", then a value from the "something" table is stored as
+"something else". If either <em>? a</em> or <em>: b</em> or both are
+given, the value isn't used. In these situations, use "here store" and
+avoid the table lookup.
+</dd>
+<dt>? a</dt>
+<dd>
+<p>
+This is the <em>then</em> clause. If <em>x</em> returned a value, then
+<em>a</em> is returned. If this clause is not provided and <em>x</em>
+returned a value, then that value is returned.
+</dd>
+<dt>: b</dt>
+<dd>
+<p>
+This is the <em>else</em> clause. If <em>x</em> returned no value, then
+<em>b</em> is returned. If this clause is not provided and <em>x</em>
+returned no value, then a horizontal ellipsis (…) is returned.
+</dd>
+</dl>
+
+<p>
+Note that both <em>a</em> and <em>b</em> are expanded before
+"neighbouring" is evaluated. Furthermore, "neighbouring" is evaluated
+in a second phase.
+
+<p>
+In this example, each water hex is a potential coastal hex and
+villages neighbouring a coastal hex get a slightly different
+description:
+
+%= example begin
+0101 water
+0102 water
+0103 water
+0201 light-green trees
+0202 light-grey village
+0203 water
+0301 light-green village
+0302 light-grey bushes
+0303 light-grey bushes
+include gnomeyland.txt
+
+;water
+1,[here store yes as is coast]
+
+;village
+1,[neighbouring is coast ? This is a costal village. : This is an inland village]
 % end
 
 <h2 id="global">Global values</h2>
@@ -2558,7 +2679,7 @@ with each ruler is stored globally using "global store <em>something</em> as
 1101 green grass village
 1201 green grass
 1301 green grass village
-include https://campaignwiki.org/contrib/gnomeyland.txt
+include gnomeyland.txt
 
 ;TOP
 1,In this land, [ruler 1] is fighting [ruler 2].
@@ -2649,7 +2770,7 @@ little dungeon to appear in the middle of the village description, however.
 1101 green grass
 1201 green grass
 1301 green grass
-include https://campaignwiki.org/contrib/gnomeyland.txt
+include gnomeyland.txt
 
 ;TOP
 1,This is the example land.
@@ -2699,7 +2820,7 @@ appearance. It will simply appear no more than once – not exactly once!
 1101 green grass village
 1201 green grass
 1301 green grass village
-include https://campaignwiki.org/contrib/gnomeyland.txt
+include gnomeyland.txt
 
 ;grass
 1,The grass is green.
@@ -2730,7 +2851,7 @@ of our relic, if we want the relic to match the temple!
 0901 empty
 1001 empty
 1101 empty
-include https://campaignwiki.org/contrib/gnomeyland.txt
+include gnomeyland.txt
 
 ;law
 1,Here stands a temple of [here power].
@@ -2897,16 +3018,16 @@ The tables contain material by the following people:
 <li><a href="https://blog.d4caltrops.com/">Ktrey Parker</a>
 <li><a href="http://www.whidou.fr/">Whidou</a>
 <li>Robin Green
-<li>J. Alan Henning (<a href="https://twitter.com/jalanhenning">@jalanhenning</a> on Twitter)
+<li>J. Alan Henning (<a href="https://dice.camp/@jalanhenning">@jalanhenning@dice.camp</a>)
 <li>Josh Johnston
 <li>Vicky Radcliffe
 <li><a href="https://nilisnotnull.blogspot.com/">Peter Fröhlich </a>
+<li><a href="https://grenzland.club/~agroschim/">agroschim</a>
 </ul>
 
 <p>
-The icons are based on the
-<a href="https://alexschroeder.ch/cgit/hex-mapping/tree/gnomeyland">Gnomeyland</a>
-icons by Gregory B. MacKenzie.
+The icons are based on the Gnomeyland icons by Gregory B. MacKenzie.
+You can find a copy in <a href="https://src.alexschroeder.ch/hex-mapping.git/">Hex Mapping</a>.
 
 @@ hex-describe.css
 body {
@@ -3032,8 +3153,7 @@ hr {
 <a href="https://campaignwiki.org/hex-describe">Hex Describe</a>&#x2003;
 <%= link_to 'Authors' => 'authors' %>&#x2003;
 <%= link_to 'Help' => 'help' %>&#x2003;
-<%= link_to 'Source' => 'source' %>&#x2003;
-<a href="https://alexschroeder.ch/cgit/hex-describe/about/">Git</a>&#x2003;
-<a href="https://alexschroeder.ch/wiki/Contact">Alex Schroeder</a>
+<a href="https://src.alexschroeder.ch/hex-describe.git/">Source</a>&#x2003;
+<a href="https://alexschroeder.ch/view/Contact">Alex Schroeder</a>
 </body>
 </html>

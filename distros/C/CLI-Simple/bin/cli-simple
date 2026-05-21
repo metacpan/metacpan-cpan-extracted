@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+#-*- mode: sh; -*-
+# modulino invocation
+
+MODULINO_WRAPPER=cli-simple
+MODULE_NAME=CLI::Simple
+MODULE_PATH=$(MODULE_PATH="${MODULE_NAME//:://}.pm" perl -M$MODULE_NAME -e 'print $INC{$ENV{MODULE_PATH}};')
+
+MODULINO_WRAPPER=$MODULINO_WRAPPER perl $MODULE_PATH "$@"

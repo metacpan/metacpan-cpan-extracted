@@ -1,10 +1,9 @@
 Revision history for EV::Kafka
 
+0.02  2026-05-02
+    - zstd / snappy compression
+    - Producer and consumer-group correctness fixes
+    - Verify RecordBatch CRC32C and SCRAM server signature (RFC 5802)
+
 0.01  2026-04-09
     - Initial release
-    - Pure XS binary protocol, no librdkafka dependency
-    - Producer: linger batching, idempotent, transactions/EOS, LZ4/gzip
-    - Consumer: manual assignment, consumer groups, sticky assignment
-    - Admin: CreateTopics, DeleteTopics
-    - TLS, SASL/PLAIN, SCRAM-SHA-256/512
-    - Multi-partition fetch, auto-retry, bootstrap failover

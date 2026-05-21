@@ -1,55 +1,238 @@
 ======================================================================
- JSON::LINQ فوری گائیڈ                                        [UR] اردو
+ JSON::LINQ فوری گائیڈ                                       [UR] اردو
 ======================================================================
 
-JSON اور JSONL فائلوں کے لیے LINQ طرز کا سوال انٹرفیس
+[ 1. سوال بنانا ]
 
-[ 1. 1. سوال بنانا ]
+  use JSON::LINQ;
 
-  FromJSON, FromJSONL, FromJSONString, From, Empty, Range, Repeat
+  # JSON فائل سے (ٹاپ لیول ارے)
+  my $q = JSON::LINQ->FromJSON('data.json');
 
-[ 2. 2. فلٹرنگ ]
+  # JSONL فائل سے (سٹریمنگ)
+  my $q = JSON::LINQ->FromJSONL('events.jsonl');
 
-  Where
+  # JSON سٹرنگ سے
+  my $q = JSON::LINQ->FromJSONString('[{"id":1},{"id":2}]');
 
-[ 3. 3. پروجیکشن ]
+  # LTSV فائل سے (label:value, TAB-الگ، سٹریمنگ)
+  my $q = JSON::LINQ->FromLTSV('data.ltsv');
+  # CSV فائل سے (پہلی قطار ہیڈر, سٹریمنگ)
+  my $q = JSON::LINQ->FromCSV('data.csv');
+  my $q = JSON::LINQ->FromCSV('data.csv', sep => "\t");         # TSV
+  my $q = JSON::LINQ->FromCSV('f.csv', headers=>[qw(a b c)], skip_header=>1);
 
-  Select, SelectMany
+  # میموری میں ارے سے
+  my $q = JSON::LINQ->From(\@array);
 
-[ 4. 4. ترتیب ]
+  # خالی سیکوینس
+  my $q = JSON::LINQ->Empty();
 
-  OrderBy, OrderByDescending, OrderByNum, OrderByStr, ThenBy, Reverse
+  # انٹیجر سیکوینس: 1, 2, 3, 4, 5
+  my $q = JSON::LINQ->Range(1, 5);
 
-[ 5. 5. صفحہ بندی ]
+  # عنصر کو N بار دہرائیں
+  my $q = JSON::LINQ->Repeat("x", 3);
 
-  Skip, Take, SkipWhile, TakeWhile
+  # نوٹ: ٹرمینل میتھڈ کال کرنے کے بعد iterator ختم ہو جاتا ہے۔
+  # دوبارہ سوال کے لیے From*/From کو دوبارہ کال کریں۔
 
-[ 6. 6. گروپ بندی ]
+[ 2. فلٹرنگ ]
 
-  GroupBy, ToLookup
+  ->Where(sub { $_[0]{status} eq '200' })
+  ->Where(sub { $_[0]{score} >= 80 })
+  ->Where(sub { defined $_[0]{email} && $_[0]{email} ne '' })
 
-[ 7. 7. اجتماع ]
+[ 3. پروجیکشن ]
 
-  Count, Sum, Average, Min, Max, First, Last, Any, All, ForEach, Aggregate
+  # Select: ہر عنصر کو تبدیل کریں
+  ->Select(sub { { path => $_[0]{url}, code => $_[0]{status} } })
+  ->Select(sub { $_[0]{name} })
 
-[ 8. 8. سیٹ آپریشنز ]
+  # SelectMany: نیسٹڈ ارے کو ہموار کریں (selector کو ARRAY ref واپس کرنا چاہیے)
+  ->SelectMany(sub { [ @{ $_[0]{tags} } ] })
 
-  Distinct, Union, Intersect, Except
+[ 4. ترتیب ]
 
-[ 9. 9. تبدیلی ]
+  # پرائمری کی -- سمارٹ (دونوں عدد ہوں تو عددی)
+  ->OrderBy(sub { $_[0]{name} })
+  ->OrderByDescending(sub { $_[0]{score} })
 
-  ToJSON, ToJSONL, ToArray, ToDictionary, ToLookup
+  # پرائمری کی -- عددی موازنہ مجبور کریں
+  ->OrderByNum(sub { $_[0]{price} })
+  ->OrderByNumDescending(sub { $_[0]{amount} })
 
-[ 10. 10. جوڑ ]
+  # پرائمری کی -- سٹرنگ موازنہ مجبور کریں (cmp)
+  ->OrderByStr(sub { $_[0]{code} })
+  ->OrderByStrDescending(sub { $_[0]{name} })
 
-  Join, GroupJoin, Concat, Zip
+  # سیکنڈری کی (OrderBy* کے بعد چین کریں)
+  ->ThenBy(sub { $_[0]{name} })              # سمارٹ چڑھتا
+  ->ThenByDescending(sub { $_[0]{score} })   # سمارٹ اترتا
+  ->ThenByNum(sub { $_[0]{age} })            # عددی چڑھتا
+  ->ThenByNumDescending(sub { $_[0]{age} })  # عددی اترتا
+  ->ThenByStr(sub { $_[0]{name} })           # سٹرنگ چڑھتا
+  ->ThenByStrDescending(sub { $_[0]{name} }) # سٹرنگ اترتا
 
-[ 11. 11. بولین اقدار ]
+  ->Reverse()  # موجودہ ترتیب الٹ دیں
 
-  JSON::LINQ::true / JSON::LINQ::false
+[ 5. صفحہ بندی ]
 
-[ 12. 12. حوالہ لنکس ]
+  ->Skip(10)  # پہلے 10 چھوڑیں
+  ->Take(5)   # اگلے 5 لیں
+  ->SkipWhile(sub { $_[0]{score} < 80 })
+  ->TakeWhile(sub { $_[0]{score} >= 80 })
 
-  https://metacpan.org/dist/JSON-LINQ
+[ 6. گروپ بندی ]
+
+  # GroupBy: { Key => '...', Elements => [...] } واپس کرتا ہے
+  my @groups = $q->GroupBy(sub { $_[0]{category} })->ToArray();
+  for my $g (@groups) {
+      printf "%s: %d\n", $g->{Key}, scalar @{$g->{Elements}};
+  }
+
+  # ToLookup: hashref of arrayrefs واپس کرتا ہے
+  my %lookup = %{ $q->ToLookup(sub { $_[0]{dept} }) };
+  my @eng = @{ $lookup{Engineering} };
+
+  # value selector کے ساتھ ToLookup
+  my %names = %{ $q->ToLookup(sub { $_[0]{dept} },
+                               sub { $_[0]{name} }) };
+
+[ 7. سیٹ آپریشنز ]
+
+  ->Distinct()                          # deduplicate (by value)
+  ->Distinct(sub { $_[0]{id} })         # deduplicate by key
+  ->Union($other_q)                     # set union (no duplicates)
+  ->Union($other_q, sub { $_[0]{id} })  # union by key
+  ->Intersect($other_q)                 # set intersection
+  ->Intersect($other_q, sub { ... })    # intersection by key
+  ->Except($other_q)                    # set difference
+  ->Except($other_q, sub { ... })       # difference by key
+  ->SequenceEqual($other_q)             # true if equal sequence
+
+[ 8. جوڑ (Join) ]
+
+  # Join (اندرونی جوڑ)
+  $outer->Join($inner_q,
+      sub { $_[0]{dept_id} },              # بیرونی کی سیلیکٹر
+      sub { $_[0]{id} },                   # اندرونی کی سیلیکٹر
+      sub { { name => $_[0]{name},
+              dept => $_[1]{name} } }      # نتیجہ سیلیکٹر
+  )
+
+  # GroupJoin (بائیں بیرونی جوڑ)
+  $outer->GroupJoin($inner_q,
+      sub { $_[0]{id} },                   # بیرونی کی سیلیکٹر
+      sub { $_[0]{user_id} },              # اندرونی کی سیلیکٹر
+      sub { my($o, $i_group) = @_;
+            { name   => $o->{name},
+              orders => [ $i_group->ToArray() ] } }
+  )
+
+  # JOIN: مرکزی JSON × ذیلی LTSV (محکمہ تلاش)
+  my $depts = JSON::LINQ->FromLTSV('departments.ltsv');
+  JSON::LINQ->FromJSON('employees.json')
+      ->Join($depts,
+          sub { $_[0]{dept_id} },
+          sub { $_[0]{id}      },
+          sub { { name => $_[0]{name}, dept => $_[1]{name} } })
+      ->ToArray();
+
+  # JOIN: مرکزی LTSV × ذیلی JSON (قیمت ماسٹر)
+  my $prices = JSON::LINQ->FromJSON('prices.json');
+  JSON::LINQ->FromLTSV('orders.ltsv')
+      ->Join($prices,
+          sub { $_[0]{sku} },
+          sub { $_[0]{sku} },
+          sub { { order_id => $_[0]{id},
+                  amount   => $_[0]{qty} * $_[1]{price} } })
+      ->ToArray();
+
+  # JOIN: مرکزی CSV × معاون JSON (قیمت ماسٹر)
+  my $prices = JSON::LINQ->FromJSON('prices.json');
+  JSON::LINQ->FromCSV('orders.csv')
+      ->Join($prices, sub { $_[0]{sku} }, sub { $_[0]{sku} },
+          sub { { order_id => $_[0]{id}, amount => $_[0]{qty} * $_[1]{price} } })
+      ->ToArray();
+
+[ 9. اجتماع (Terminal) ]
+
+  ->ToArray()                            # collect all elements
+  ->ToList()                             # same as ToArray()
+  ->Count()                              # element count
+  ->Count(sub { $_[0] > 5 })            # conditional count
+  ->Sum(sub { $_[0]{amount} })          # sum of selector values
+  ->Average(sub { $_[0]{score} })       # mean (die if empty)
+  ->AverageOrDefault(sub { ... })       # mean or undef if empty
+  ->Min(sub { $_[0]{price} })           # minimum
+  ->Max(sub { $_[0]{price} })           # maximum
+  ->First()                             # first element (die if empty)
+  ->First(sub { $_[0] > 5 })            # first match (die if none)
+  ->FirstOrDefault()                    # first or undef
+  ->FirstOrDefault(sub { $_[0] > 5 })   # first match or undef
+  ->Last()                              # last element (die if empty)
+  ->Last(sub { $_[0] > 5 })             # last match (die if none)
+  ->LastOrDefault()                     # last or undef
+  ->LastOrDefault(sub { $_[0] > 5 })    # last match or undef
+  ->Single()                            # exactly one (else die)
+  ->SingleOrDefault()                   # one or undef
+  ->ElementAt($n)                       # element at index $n (0-based)
+  ->ElementAtOrDefault($n)              # element at $n or undef
+  ->Any()                               # true if non-empty
+  ->Any(sub { $_[0] > 5 })              # true if any match
+  ->All(sub { $_[0] > 0 })              # true if all match
+  ->Contains($value)                    # true if value present
+  ->ForEach(sub { print $_[0] })        # side-effect per element
+  ->Aggregate($seed, sub { $_[0] + $_[1] })  # fold/reduce
+
+[ 10. دیگر طریقے ]
+
+  ->Concat($other_q)                    # concatenate two sequences
+  ->DefaultIfEmpty($default)            # return $default if empty
+  ->Zip($other_q, sub { "$_[0]-$_[1]" }) # combine element-wise
+
+[ 11. تبدیلی کے طریقے ]
+
+  ->ToArray()                           # returns Perl array
+  ->ToList()                            # alias for ToArray()
+  ->ToDictionary(sub { $_[0]{id} })     # hashref: key => element
+  ->ToDictionary(sub { $_[0]{id} },     # hashref: key => value
+                 sub { $_[0]{name} })
+  ->ToLookup(sub { $_[0]{dept} })       # hashref: key => [elements]
+  ->ToLookup(sub { $_[0]{dept} },       # hashref: key => [values]
+             sub { $_[0]{name} })
+  ->ToJSON('output.json')               # JSON array فائل کے طور پر لکھیں
+  ->ToJSONL('output.jsonl')             # JSONL فائل کے طور پر لکھیں
+  ->ToLTSV('output.ltsv')                        # LTSV فائل کے طور پر لکھیں (تمام key، حروف تہجی کے مطابق)
+  ->ToLTSV('out.ltsv', label_order=>[qw(a b c)]) # مخصوص label مخصوص ترتیب میں آؤٹ پٹ کریں
+  ->ToLTSV('out.ltsv', headers    =>[qw(a b c)]) # label_order کا عرفی نام
+  ->ToCSV('output.csv')                                   # CSV فائل میں لڪہنا
+  ->ToCSV('out.csv', headers=>[qw(a b c)])                # مخصوص کالم ترتیب میں
+  ->ToCSV('out.csv', label_order=>[qw(a b c)])            # headers کا عرف
+  ->ToCSV('out.csv', sep=>"\t")                           # TSV آوٹ پٹ
+  ->ToCSV('out.csv', no_header=>1)                        # ہیڈر صف چھوڑیں
+
+[ 12. بولین اقدار ]
+
+  JSON::LINQ::true    # سٹرنگ "true"، عدد 1
+  JSON::LINQ::false   # سٹرنگ "false"، عدد 0
+
+  my $rec = { active => JSON::LINQ::true };
+  # ToJSON کوڈ کرتا ہے: {"active":true}
+
+[ 13. حوالہ لنکس ]
+
+  JSON::LINQ (MetaCPAN):
+    https://metacpan.org/dist/JSON-LINQ
+
+  JSONL specification:
+    https://jsonlines.org/
+
+  LINQ (.NET) reference (semantic inspiration):
+    https://docs.microsoft.com/en-us/dotnet/api/system.linq
+
+  LTSV::LINQ (sister module for LTSV files):
+    https://metacpan.org/dist/LTSV-LINQ
 
 ======================================================================

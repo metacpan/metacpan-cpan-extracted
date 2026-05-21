@@ -1,0 +1,35 @@
+{
+  "id": "resp_def456",
+  "object": "response",
+  "status": "completed",
+  "created_at": 1760000001,
+  "model": "gpt-5.5-pro",
+  "output": [
+    {
+      "id": "msg_def",
+      "type": "message",
+      "status": "completed",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "function_call",
+          "id": "fc_abc",
+          "call_id": "call_abc123",
+          "name": "get_weather",
+          "arguments": "{\"location\":\"Paris, France\",\"units\":\"celsius\"}"
+        }
+      ]
+    }
+  ],
+  "usage": {
+    "input_tokens": 120,
+    "input_tokens_details": {
+      "cached_tokens": 0
+    },
+    "output_tokens": 32,
+    "output_tokens_details": {
+      "reasoning_tokens": 10
+    },
+    "total_tokens": 152
+  }
+}

@@ -6,7 +6,7 @@ use 5.010;
 
 use parent 'Hypersonic::Event::Role';
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 sub name { 'io_uring' }
 
@@ -24,13 +24,36 @@ sub available {
         || -f '/usr/include/x86_64-linux-gnu/liburing.h';
     return 0 unless $has_header;
 
-    # Verify liburing is actually linkable (not just headers/files exist)
-    # This is the definitive test - prevents "undefined symbol" at runtime
-    return __PACKAGE__->_can_link('-luring', 'io_uring_queue_init', '#include <liburing.h>');
+    # io_uring may be disabled at the kernel level. RHEL9 ships with
+    # kernel.io_uring_disabled=2 by default; a value of 1 or 2 means
+    # the syscall returns EINVAL/EPERM regardless of liburing being
+    # linkable. Bail before we sink time into a compile+link probe.
+    if (open my $fh, '<', '/proc/sys/kernel/io_uring_disabled') {
+        my $disabled = <$fh>;
+        close $fh;
+        chomp $disabled if defined $disabled;
+        return 0 if defined $disabled && $disabled ne '0';
+    }
+
+    # Compile-link-and-RUN probe. A pure link check passes on systems
+    # that have liburing installed but where io_uring_setup() will
+    # nevertheless fail at runtime (kernel disabled, sandboxing, missing
+    # liburing.so at exec time). Actually open and close a ring.
+    require Hypersonic::JIT::Util;
+    return Hypersonic::JIT::Util->can_run(
+        '',
+        '-luring',
+        'struct io_uring ring; int rc = io_uring_queue_init(8, &ring, 0); '
+            . 'if (rc < 0) return 1; io_uring_queue_exit(&ring); return 0;',
+        '#include <liburing.h>',
+    );
 }
 
 sub includes {
-    return '#include <liburing.h>';
+    # liburing.h for the server loop. <sys/epoll.h> is needed for the
+    # UA::Async slot-tracking helpers (gen_create_loop / _add_with_slot /
+    # _get_slot) - io_uring is Linux 5.1+ which always has epoll.
+    return "#include <liburing.h>\n#include <sys/epoll.h>";
 }
 
 sub defines {
@@ -66,8 +89,11 @@ sub gen_create {
       ->blank
       ->if('!ring_initialized')
         ->if('io_uring_queue_init(URING_ENTRIES, &ring, 0) < 0')
-          ->line('perror("io_uring_queue_init");')
-          ->line('return -1;')
+          # gen_create is inlined into hypersonic_run_event_loop, which
+          # is a void XS function. `return <value>;` triggers GCC 14+
+          # -Wreturn-mismatch (now an error). croak from XS instead -
+          # it longjmps out cleanly and surfaces a Perl-level error.
+          ->line('croak("io_uring_queue_init() failed: %s", strerror(errno));')
         ->endif
         ->line('ring_initialized = 1;')
       ->endif
@@ -176,6 +202,58 @@ sub gen_cleanup {
       ->line('ring_initialized = 0;')
     ->endif;
 }
+
+# ============================================================
+# Async Slot Integration Methods (UA Async)
+#
+# UA::Async tracks per-slot fd readiness independently of the server
+# loop's io_uring ring. We use epoll under the hood since io_uring
+# requires Linux 5.1+ which always has epoll, and a separate epoll
+# instance is much simpler than weaving slot tracking through the
+# server's submission ring.
+# ============================================================
+
+sub gen_wait_once {
+    my ($class, $builder, $loop_var, $events_var, $count_var, $timeout_ms) = @_;
+
+    $builder->line("$count_var = epoll_wait($loop_var, $events_var, MAX_EVENTS, $timeout_ms);")
+      ->line("if ($count_var < 0 && errno == EINTR) $count_var = 0;");
+}
+
+sub gen_create_loop {
+    my ($class, $builder, $loop_var) = @_;
+
+    $builder->line("$loop_var = epoll_create1(0);")
+      ->if("$loop_var < 0")
+        ->line('croak("epoll_create1() failed");')
+      ->endif;
+}
+
+sub gen_add_with_slot {
+    my ($class, $builder, $loop_var, $fd_var, $slot_var, $events) = @_;
+
+    my $ev_flags = $events eq 'read' ? 'EPOLLIN | EPOLLET | EPOLLONESHOT'
+                 : $events eq 'write' ? 'EPOLLOUT | EPOLLET | EPOLLONESHOT'
+                 : 'EPOLLIN | EPOLLET | EPOLLONESHOT';
+
+    $builder->line('{')
+      ->line('    struct epoll_event _ev;')
+      ->line("    _ev.events = $ev_flags;")
+      ->line("    _ev.data.u32 = (uint32_t)$slot_var;")
+      ->line("    epoll_ctl($loop_var, EPOLL_CTL_ADD, $fd_var, &_ev);")
+      ->line('}');
+}
+
+sub gen_get_slot {
+    my ($class, $builder, $events_var, $index_var, $slot_var) = @_;
+
+    $builder->line("int $slot_var;")
+      ->line("$slot_var = (int)${events_var}[$index_var].data.u32;");
+}
+
+# When async-slot helpers above are emitted, the io_uring includes
+# already pull in <sys/epoll.h> via the generated Hypersonic includes.
+# We don't need to add it here.
 
 # Future/Pool integration - add pool notify fd via poll on the fd
 sub gen_add_pool_notify {

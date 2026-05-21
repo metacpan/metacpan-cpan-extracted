@@ -12,7 +12,6 @@ BEGIN
 BEGIN
 {
     use_ok( 'Locale::Unicode' ) || BAIL_OUT( 'Unable to load Locale::Unicode' );
-    use_ok( 'DateTime::Locale' ) || BAIL_OUT( "Cannot load DateTime::Locale" );
 };
 
 use strict;

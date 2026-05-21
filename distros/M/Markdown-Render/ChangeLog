@@ -1,3 +1,26 @@
+Sat Apr 11 08:12:02 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.4]:
+	* cpan/Makefile
+	- do not clean requires, provides
+	- -D requires
+	* cpan/requires
+	- added to repo
+	- +Net::SSLeasy, IO::Socket::SSL
+	* cpan/provides: added to repo
+	* cpan/extra: added to repo
+	* t/00-markdown.t: added to repo
+	* t/files/README.md.in: added to repo
+	* release-notes-2.0.4.md: new
+	* VERSION: bump
+	* release-notes.mk: new
+	* Makefile: add
+	* .gitignore: *.html, *.diffs, *.lst
+	* README.md: generated
+	* lib/Markdown/Render.pm.in
+	(_render_with_github):
+	- replaced LWP::UserAgent with HTTP::Tiny
+
 Mon Feb 16 07:35:28 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.0.3]:

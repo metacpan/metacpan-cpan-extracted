@@ -1,13 +1,19 @@
 
-/* These local parse functions are independenct of the SecretBuffer instance,
- * needing only the 'data' pointer to whch the parse_state refers.
+/* These local parse functions are independent of the SecretBuffer instance,
+ * needing only the 'data' pointer to which the parse_state refers.
  * The pos/lim of the parse state must already be checked against the length
  * of the data before calling these.
  */
+
+/* compute number of bytes needed for one character */
 static int sizeof_codepoint_encoding(int codepoint, int encoding);
+/* parse codepoint from end of parse and decrement ->lim */
 static int sb_parse_prev_codepoint(secret_buffer_parse *parse);
+/* parse codepoint from start of parse and increment ->pos */
 static int sb_parse_next_codepoint(secret_buffer_parse *parse);
-static bool sb_parse_encode_codepoint(secret_buffer_parse *parse, int codepoint);
+/* encode codepoint into buffer range described by 'parse' */
+static bool sb_parse_encode_codepoint(secret_buffer_parse_rw *parse, int codepoint);
+
 static bool sb_parse_match_charset_bytes(secret_buffer_parse *parse, const secret_buffer_charset *cset, int flags);
 static bool sb_parse_match_charset_codepoints(secret_buffer_parse *parse, const secret_buffer_charset *cset, int flags);
 static bool sb_parse_match_str_U8(secret_buffer_parse *parse, const U8 *pattern, size_t pattern_len, int flags);
@@ -159,7 +165,7 @@ bool secret_buffer_match(secret_buffer_parse *parse, SV *pattern, int flags) {
          if (!secret_buffer_parse_init(&pat_parse, tmp, 0, dst_len, dst_enc))
             croak("transcode of pattern failed: %s", pat_parse.error);
          /* Transcode the pattern */
-         if (!secret_buffer_transcode(&pat_orig, &pat_parse))
+         if (!secret_buffer_transcode(&pat_orig, (secret_buffer_parse_rw*) &pat_parse))
             croak("transcode of pattern failed: %s", pat_orig.error? pat_orig.error : pat_parse.error);
       }
    }
@@ -268,7 +274,7 @@ static const int8_t base64_decode_table[256]= {
  * adjusting the size of dst as needed.  Both src->pos and dst->pos
  * are updated.
  */
-bool secret_buffer_transcode(secret_buffer_parse *src, secret_buffer_parse *dst) {
+bool secret_buffer_transcode(secret_buffer_parse *src, secret_buffer_parse_rw *dst) {
    src->error= NULL;
    dst->error= NULL;
    // If the source and destination encodings are both bytes, use memcpy
@@ -335,10 +341,10 @@ bool secret_buffer_transcode(secret_buffer_parse *src, secret_buffer_parse *dst)
    }
    else {
       while (src->pos < src->lim) {
-         int cp= sb_parse_next_codepoint(src);
+         int len, cp= sb_parse_next_codepoint(src);
          if (cp < 0)
             return false; // error is already set
-         int len= sb_parse_encode_codepoint(dst, cp);
+         len= sb_parse_encode_codepoint(dst, cp);
          if (len < 0)
             return false; // error is already set
       }
@@ -353,12 +359,12 @@ bool secret_buffer_transcode(secret_buffer_parse *src, secret_buffer_parse *dst)
 bool
 secret_buffer_copy_to(secret_buffer_parse *src, SV *dst_sv, int encoding, bool append) {
    dTHX;
-   secret_buffer_parse dst;
+   secret_buffer_parse_rw dst;
    secret_buffer *dst_sbuf= NULL;
    SSize_t need_bytes;
    bool dst_wide= false;
 
-   Zero(&dst, 1, secret_buffer_parse);
+   Zero(&dst, 1, secret_buffer_parse_rw);
    // Encoding may be -1 to indicate the user didn't specify, in which case we use the
    // same encoding as the source, unless the destination is a perl scalar (handled below)
    dst.encoding= encoding >= 0? encoding : src->encoding;
@@ -863,8 +869,8 @@ static int sb_parse_next_codepoint(secret_buffer_parse *parse) {
             cp= (cp << 6) | (*pos++ & 0x3F);
             break;
          default:
-            invalid:    SB_RETURN_ERROR("invalid UTF8 character")
-            incomplete: SB_RETURN_ERROR("incomplete UTF8 character")
+            invalid:    SB_RETURN_ERROR("invalid UTF8 encoding")
+            incomplete: SB_RETURN_ERROR("incomplete UTF8 encoding")
          }
          if (cp < min_cp)
             SB_RETURN_ERROR("overlong encoding of UTF8 character")
@@ -1110,10 +1116,10 @@ static int sizeof_codepoint_encoding(int codepoint, int encoding) {
       return -1;
 }
 
-static bool sb_parse_encode_codepoint(secret_buffer_parse *dst, int codepoint) {
+static bool sb_parse_encode_codepoint(secret_buffer_parse_rw *dst, int codepoint) {
    #define SB_RETURN_ERROR(msg) { dst->error= msg; return false; }
    int encoding= dst->encoding, n;
-   U8 *dst_pos= (U8*) dst->pos;
+   U8 *dst_pos= dst->pos;
    // codepoints above 0x10FFFF are illegal
    if (codepoint >= 0x110000)
       SB_RETURN_ERROR("invalid codepoint");

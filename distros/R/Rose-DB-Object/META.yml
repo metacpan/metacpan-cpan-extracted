@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ requires:
   File::Path: '0'
   File::Spec: '0'
   Math::BigInt: '1.77'
-  Rose::DB: '0.782'
+  Rose::DB: '0.787'
   Rose::DateTime::Util: '0.532'
   Rose::Object: '0.854'
   Scalar::Util: '0'
@@ -40,5 +40,5 @@ resources:
   homepage: http://rosecode.org
   license: http://dev.perl.org/licenses/
   repository: https://github.com/siracusa/rose/tree/master/modules/Rose-DB-Object
-version: '0.822'
+version: '0.823'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

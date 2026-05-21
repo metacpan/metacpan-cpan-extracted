@@ -24,9 +24,9 @@ use FindBin;
 # Si substrate uses a fixed two-oscillator model (Aspnes & Studna).
 # ============================================================
 
-my $vase = Physics::Ellipsometry::VASE->new(layers => 1);
+my $vase = Physics::Ellipsometry::VASE->new(layers => 1, maxiter => 1000);
 
-my $data_file = "$FindBin::Bin/../data/Metal_Oxides/tantalum oxide/Cap_11012006/w1_11012006.dat";
+my $data_file = "$FindBin::Bin/w1_11012006.dat";
 $vase->load_data($data_file);
 
 # ----------------------------------------------------------
@@ -216,9 +216,10 @@ sub tauc_lorentz_model {
 $vase->set_model(\&tauc_lorentz_model);
 
 # Initial parameters (scaled):
-#   eps_inf=1.5, A=50(eV)/100=0.5, E0=4.6eV, C=1.0eV, Eg=3.8eV,
-#   d=100nm/100=1.0
-my $initial_params = pdl [1.5, 0.5, 4.6, 1.0, 3.8, 1.0];
+#   eps_inf=2.0, A=120(eV)/100=1.2, E0=4.2eV, C=1.5eV, Eg=3.6eV,
+#   d=95nm/100=0.95
+# These are typical literature values for Ta2O5 thin films
+my $initial_params = pdl [2.0, 1.2, 4.2, 1.5, 3.6, 0.95];
 
 print "Fitting Tauc-Lorentz model to Ta2O5 data...\n";
 my $fit_params = $vase->fit($initial_params);
@@ -236,6 +237,7 @@ printf "  E0 (center):    %.4f eV\n", $E0;
 printf "  C (broadening): %.4f eV\n", $C_osc;
 printf "  Eg (band gap):  %.4f eV\n", $Eg;
 printf "  Thickness:      %.2f nm\n", $d;
+printf "  MSE:            %.4f\n", $vase->mse($fit_params, nparams => 6);
 printf "  Iterations:     %d\n", $vase->{iters};
 print "=" x 40, "\n";
 

@@ -4,7 +4,7 @@
       "Jan Baier <jan.baier@amagical.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -48,11 +48,11 @@
    "provides" : {
       "Pass::OTP" : {
          "file" : "lib/Pass/OTP.pm",
-         "version" : "1.801"
+         "version" : "1.901"
       },
       "Pass::OTP::URI" : {
          "file" : "lib/Pass/OTP/URI.pm",
-         "version" : "1.801"
+         "version" : "1.901"
       }
    },
    "release_status" : "stable",
@@ -63,6 +63,6 @@
          "web" : "https://github.com/baierjan/Pass-OTP-perl"
       }
    },
-   "version" : "1.801",
+   "version" : "1.901",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

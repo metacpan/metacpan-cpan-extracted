@@ -1,5 +1,8 @@
 Revision history for Perl module Text::PO
 
+v1.0.1 2026-04-28T11:01:58+0900
+    - Updated dependencies
+
 v1.0.0 2026-03-30T09:52:15+0900
     - Improved plural handling in Text::PO::Element
     - Got rid of global variable in Text::PO::Gettext that would not be thread-safe

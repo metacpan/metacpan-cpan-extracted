@@ -59,6 +59,8 @@ enum ltc_oid_id {
    LTC_OID_EC_PRIMEF,
    LTC_OID_X25519,
    LTC_OID_ED25519,
+   LTC_OID_X448,
+   LTC_OID_ED448,
    LTC_OID_DH,
    LTC_OID_RSA_OAEP,
    LTC_OID_RSA_MGF1,
@@ -181,6 +183,9 @@ int func_name (hash_state * md, const unsigned char *in, unsigned long inlen)   
     }                                                                                       \
     return CRYPT_OK;                                                                        \
 }
+
+
+#define LTC_SHA_TARGET LTC_ATTRIBUTE((__target__("sse2,ssse3,sse4.1,sha")))
 
 #ifdef LTC_SHA1
 int sha1_test_desc(const struct ltc_hash_descriptor *desc, const char *name);
@@ -620,16 +625,16 @@ int ltc_ecc_projective_add_point(const ecc_point *P, const ecc_point *Q, ecc_poi
 
 #if defined(LTC_MECC_FP)
 /* optimized point multiplication using fixed point cache (HAC algorithm 14.117) */
-int ltc_ecc_fp_mulmod(void *k, ecc_point *G, ecc_point *R, void *a, void *modulus, int map);
+int ltc_ecc_fp_mulmod(const void *k, const ecc_point *G, ecc_point *R, const void *ma, const void *modulus, int map);
 
 /* functions for saving/loading/freeing/adding to fixed point cache */
 int ltc_ecc_fp_save_state(unsigned char **out, unsigned long *outlen);
 int ltc_ecc_fp_restore_state(unsigned char *in, unsigned long inlen);
-void ltc_ecc_fp_free(void);
-int ltc_ecc_fp_add_point(ecc_point *g, void *modulus, int lock);
+int ltc_ecc_fp_free(void);
+int ltc_ecc_fp_add_point(const ecc_point *g, const void *ma, const void *modulus, int lock);
 
 /* lock/unlock all points currently in fixed point cache */
-void ltc_ecc_fp_tablelock(int lock);
+int ltc_ecc_fp_tablelock(int lock);
 #endif
 
 /* R = kG */
@@ -710,6 +715,33 @@ int ec25519_crypto_ctx(      unsigned char *out, unsigned long *outlen,
                        const unsigned char *ctx, unsigned long  ctxlen);
 #endif /* LTC_CURVE25519 */
 
+#ifdef LTC_CURVE448
+int ec448_export(unsigned char *out, unsigned long *outlen, int which, const curve448_key *key);
+int ec448_import_pkcs8(const unsigned char *in, unsigned long inlen,
+                       const password_ctx *pw_ctx, enum ltc_oid_id id, curve448_key *key);
+int ec448_import_pkcs8_asn1(ltc_asn1_list *alg_id, ltc_asn1_list *priv_key,
+                            enum ltc_oid_id id, curve448_key *key);
+int x448_import_pkcs8_asn1(ltc_asn1_list *alg_id, ltc_asn1_list *priv_key,
+                           curve448_key *key);
+int ec448_keypair_internal(prng_state *prng, int wprng, unsigned char *pk, unsigned char *sk);
+int ec448_sk_to_pk_internal(unsigned char *pk, const unsigned char *sk);
+int ec448_sign_internal(unsigned char *sm, unsigned long long *smlen,
+                        const unsigned char *m, unsigned long long mlen,
+                        const unsigned char *sk, const unsigned char *pk,
+                        const unsigned char *ctx, unsigned long long cs);
+int ec448_verify_internal(int *stat, unsigned char *m, unsigned long long *mlen,
+                          const unsigned char *sm, unsigned long long smlen,
+                          const unsigned char *ctx, unsigned long long cs,
+                          const unsigned char *pk);
+int ec448_prehash_internal(unsigned char *out, const unsigned char *msg, unsigned long long msglen);
+int ec448_crypto_ctx(unsigned char *out, unsigned long *outlen, unsigned char flag,
+                   const unsigned char *ctx, unsigned long ctxlen);
+int ec448_scalarmult_internal(unsigned char *out, const unsigned char *scalar, const unsigned char *point);
+int ec448_scalarmult_base_internal(unsigned char *out, const unsigned char *scalar);
+int ed448_import_pkcs8_asn1(ltc_asn1_list *alg_id, ltc_asn1_list *priv_key,
+                            curve448_key *key);
+#endif /* LTC_CURVE448 */
+
 #ifdef LTC_DER
 
 #define LTC_ASN1_IS_TYPE(e, t) (((e) != NULL) && ((e)->type == (t)))
@@ -724,7 +756,8 @@ int der_decode_asn1_identifier(const unsigned char *in, unsigned long *inlen, lt
 int der_length_asn1_identifier(const ltc_asn1_list *id, unsigned long *idlen);
 
 int der_encode_asn1_length(unsigned long len, unsigned char* out, unsigned long* outlen);
-int der_decode_asn1_length(const unsigned char *in, unsigned long *inlen, unsigned long *outlen);
+int der_decode_asn1_length_ex(const unsigned char *in, unsigned long *inlen, unsigned long *outlen, unsigned int flags);
+#define der_decode_asn1_length(i, il, ol) der_decode_asn1_length_ex(i, il, ol, 0)
 int der_length_asn1_length(unsigned long len, unsigned long *outlen);
 
 int der_length_sequence_ex(const ltc_asn1_list *list, unsigned long inlen,

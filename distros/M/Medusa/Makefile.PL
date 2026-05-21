@@ -10,6 +10,7 @@ my %WriteMakefileArgs = (
     ABSTRACT_FROM    => 'lib/Medusa.pm',
     LICENSE          => 'artistic_2',
     MIN_PERL_VERSION => '5.008003',
+    macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },
@@ -21,6 +22,9 @@ my %WriteMakefileArgs = (
     PREREQ_PM => {
 	'Data::Dumper' => 0,
         'B' => 0,
+	'POSIX' => 0,
+	'Data::GUID' => 0,
+	'Time::HiRes' => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Medusa-*' },

@@ -1,32 +1,18 @@
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Test::More;
 use IO::Socket::INET;
 use File::Temp qw(tempdir);
 use File::Path qw(make_path);
+use HypersonicTest qw(spawn_server wait_for_port);
 
 
 use Hypersonic;
 
 # Skip if we can't fork
 plan skip_all => 'fork not available' unless $^O ne 'MSWin32';
-
-# Wait for server with port probing (works across all platforms)
-sub wait_for_port {
-    my ($port, $max_tries) = @_;
-    $max_tries //= 50;
-    for (1..$max_tries) {
-        my $sock = IO::Socket::INET->new(
-            PeerAddr => '127.0.0.1',
-            PeerPort => $port,
-            Proto    => 'tcp',
-            Timeout  => 0.1,
-        );
-        if ($sock) { close($sock); return 1; }
-        select(undef, undef, undef, 0.1);
-    }
-    return 0;
-}
 
 # Create temp directory with test files
 my $static_dir = tempdir(CLEANUP => 1);
@@ -64,11 +50,9 @@ close $fh;
 my $port = 23000 + ($$ % 1000);
 my $cache_dir = "_test_static_$$";
 
-my $pid = fork();
-die "Fork failed: $!" unless defined $pid;
-
-if ($pid == 0) {
-    # Child - run server
+# spawn_server captures child STDERR so we can diag the real failure
+# when the server child dies before binding (OpenBSD failure mode).
+my ($pid, $log) = spawn_server(sub {
     my $server = Hypersonic->new(cache_dir => $cache_dir);
 
     # Serve static files from temp directory
@@ -82,11 +66,11 @@ if ($pid == 0) {
 
     $server->compile();
     $server->run(port => $port);
-    exit(0);
-}
+});
 
 # Parent - run tests
-wait_for_port($port) or die "Server failed to start on port $port";
+wait_for_port($port, { pid => $pid, log => $log, tries => 50 })
+    or BAIL_OUT("server child failed to bind port $port (see diag above)");
 
 sub make_request {
     my ($path) = @_;

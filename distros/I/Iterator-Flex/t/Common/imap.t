@@ -13,7 +13,7 @@ subtest 'basic' => sub {
 
         isa_ok( $iter, ['Iterator::Flex::Base'], 'correct parent class' );
         can_ok( $iter, [ 'reset', ], 'has reset' );
-        is( $iter->can( 'freeze' ), undef, 'can not freeze' );
+        is( $iter->can( 'freeze' ), undef, 'cannot freeze' );
     };
 
     subtest 'scalar' => sub {
@@ -36,6 +36,16 @@ subtest 'list' => sub {
         is( $iter->next, undef,        'iterator exhausted' );
     };
 
+};
+
+subtest 'empty list result' => sub {
+
+    my $iter = imap { $_ ? ( $_ ) : () } iarray( [ 0, 1, 2 ] );
+
+    is( $iter->next, 1,     'empty result is skipped' );
+    is( $iter->next, 2,     'next mapped value' );
+    is( $iter->next, undef, 'iterator exhausted' );
+    ok( $iter->is_exhausted, 'exhausted flag' );
 };
 
 subtest 'reset' => sub {

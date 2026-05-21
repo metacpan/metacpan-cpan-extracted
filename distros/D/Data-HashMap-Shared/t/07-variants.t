@@ -11,6 +11,8 @@ use Data::HashMap::Shared::I32S;
 use Data::HashMap::Shared::IS;
 use Data::HashMap::Shared::SI16;
 use Data::HashMap::Shared::SI32;
+use Data::HashMap::Shared::SI;
+use Data::HashMap::Shared::SS;
 
 sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
 
@@ -291,6 +293,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $old = $map->swap(1, 400);
     is($old, 300, 'I32 swap: returns old value');
     do { my $_r = shm_i32_cas $map, 1, 400, 999; ok($_r, 'I32 cas: succeeds') };
+    do { my $_r = shm_i32_cas $map, 1, 400, 0; ok(!$_r, 'I32 cas: fails on mismatch') };
     do { my $_r = shm_i32_get $map, 1; is($_r, 999, 'I32 cas: value correct') };
     unlink $path;
 }
@@ -306,6 +309,7 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $old = $map->swap("a", 40);
     is($old, 30, 'SI16 swap: returns old value');
     do { my $_r = shm_si16_cas $map, "a", 40, 99; ok($_r, 'SI16 cas: succeeds') };
+    do { my $_r = shm_si16_cas $map, "a", 40, 0; ok(!$_r, 'SI16 cas: fails on mismatch') };
     do { my $_r = shm_si16_get $map, "a"; is($_r, 99, 'SI16 cas: value correct') };
     unlink $path;
 }
@@ -320,13 +324,30 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     my $old = $map->swap("key", 400);
     is($old, 300, 'SI32 swap: returns old value');
     do { my $_r = shm_si32_cas $map, "key", 400, 999; ok($_r, 'SI32 cas: succeeds') };
+    do { my $_r = shm_si32_cas $map, "key", 400, 0; ok(!$_r, 'SI32 cas: fails on mismatch') };
     do { my $_r = shm_si32_get $map, "key"; is($_r, 999, 'SI32 cas: correct') };
     unlink $path;
 }
 
-# ====== add/update/swap on string-value variants (no cas) ======
+# SI: add/update/swap/cas (string → int64)
+{
+    my $path = tmpfile();
+    my $map = Data::HashMap::Shared::SI->new($path, 1000);
+    do { my $_r = shm_si_add $map, "k", 10; ok($_r, 'SI add: succeeds') };
+    do { my $_r = shm_si_add $map, "k", 20; ok(!$_r, 'SI add: fails on existing') };
+    do { my $_r = shm_si_update $map, "k", 30; ok($_r, 'SI update: succeeds') };
+    do { my $_r = shm_si_get $map, "k"; is($_r, 30, 'SI update: value changed') };
+    my $old = $map->swap("k", 40);
+    is($old, 30, 'SI swap: returns old value');
+    do { my $_r = shm_si_cas $map, "k", 40, 99; ok($_r, 'SI cas: succeeds') };
+    do { my $_r = shm_si_cas $map, "k", 40, 100; ok(!$_r, 'SI cas: fails on mismatch') };
+    do { my $_r = shm_si_get $map, "k"; is($_r, 99, 'SI cas: value correct') };
+    unlink $path;
+}
 
-# IS: add/update/swap (int64 → string)
+# ====== add/update/swap/cas on string-value variants ======
+
+# IS: add/update/swap/cas (int64 → string)
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::IS->new($path, 1000);
@@ -339,10 +360,25 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     is($old, "updated", 'IS swap: returns old value');
     my $new_s = $map->swap(99, "new");
     ok(!defined $new_s, 'IS swap: undef for new key');
+    do { my $_r = shm_is_cas $map, 1, "swapped", "casval"; ok($_r, 'IS cas: succeeds on match') };
+    do { my $_r = shm_is_get $map, 1; is($_r, "casval", 'IS cas: value updated') };
+    do { my $_r = shm_is_cas $map, 1, "wrong", "X"; ok(!$_r, 'IS cas: fails on mismatch') };
+    do { my $_r = shm_is_get $map, 1; is($_r, "casval", 'IS cas mismatch: value unchanged') };
+    do { my $_r = shm_is_cas $map, 1234567, "x", "y"; ok(!$_r, 'IS cas: fails on missing key') };
+    # Method form
+    ok($map->cas(1, "casval", "method"), 'IS cas: method form succeeds');
+    is($map->get(1), "method", 'IS cas method: value updated');
+    # Inline/arena boundary (7 = inline max, 8 = arena) via method form
+    $map->put(7, "1234567");          # exactly inline max
+    ok($map->cas(7, "1234567", "abcdefg"), 'IS cas: 7-byte inline');
+    is($map->get(7), "abcdefg", 'IS cas: 7-byte updated');
+    $map->put(8, "12345678");         # arena
+    ok($map->cas(8, "12345678", "abcdefgh"), 'IS cas: 8-byte arena');
+    is($map->get(8), "abcdefgh", 'IS cas: 8-byte updated');
     unlink $path;
 }
 
-# I16S: add/update/swap
+# I16S: add/update/swap/cas
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::I16S->new($path, 1000);
@@ -351,10 +387,22 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     do { my $_r = shm_i16s_update $map, 1, "new"; ok($_r, 'I16S update: succeeds') };
     my $old = $map->swap(1, "swap");
     is($old, "new", 'I16S swap: returns old');
+    do { my $_r = shm_i16s_cas $map, 1, "swap", "cas"; ok($_r, 'I16S cas: succeeds') };
+    do { my $_r = shm_i16s_get $map, 1; is($_r, "cas", 'I16S cas: value updated') };
+    do { my $_r = shm_i16s_cas $map, 1, "swap", "fail"; ok(!$_r, 'I16S cas: fails on mismatch') };
+    do { my $_r = shm_i16s_cas $map, 9999, "x", "y"; ok(!$_r, 'I16S cas: fails on missing key') };
+    ok($map->cas(1, "cas", "method"), 'I16S cas: method form');
+    is($map->get(1), "method", 'I16S cas method: value updated');
+    $map->put(7, "1234567");
+    ok($map->cas(7, "1234567", "abcdefg"), 'I16S cas: 7-byte inline');
+    is($map->get(7), "abcdefg", 'I16S cas: 7-byte updated');
+    $map->put(8, "12345678");
+    ok($map->cas(8, "12345678", "abcdefgh"), 'I16S cas: 8-byte arena');
+    is($map->get(8), "abcdefgh", 'I16S cas: 8-byte updated');
     unlink $path;
 }
 
-# I32S: add/update/swap
+# I32S: add/update/swap/cas
 {
     my $path = tmpfile();
     my $map = Data::HashMap::Shared::I32S->new($path, 1000);
@@ -363,6 +411,93 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     do { my $_r = shm_i32s_update $map, 1, "new"; ok($_r, 'I32S update: succeeds') };
     my $old = $map->swap(1, "swap");
     is($old, "new", 'I32S swap: returns old');
+    do { my $_r = shm_i32s_cas $map, 1, "swap", "cas"; ok($_r, 'I32S cas: succeeds') };
+    do { my $_r = shm_i32s_get $map, 1; is($_r, "cas", 'I32S cas: value updated') };
+    do { my $_r = shm_i32s_cas $map, 1, "swap", "fail"; ok(!$_r, 'I32S cas: fails on mismatch') };
+    do { my $_r = shm_i32s_cas $map, 9999, "x", "y"; ok(!$_r, 'I32S cas: fails on missing key') };
+    ok($map->cas(1, "cas", "method"), 'I32S cas: method form');
+    is($map->get(1), "method", 'I32S cas method: value updated');
+    $map->put(7, "1234567");
+    ok($map->cas(7, "1234567", "abcdefg"), 'I32S cas: 7-byte inline');
+    is($map->get(7), "abcdefg", 'I32S cas: 7-byte updated');
+    $map->put(8, "12345678");
+    ok($map->cas(8, "12345678", "abcdefgh"), 'I32S cas: 8-byte arena');
+    is($map->get(8), "abcdefgh", 'I32S cas: 8-byte updated');
+    unlink $path;
+}
+
+# SS: add/update/swap/cas (string → string)
+{
+    my $path = tmpfile();
+    my $map = Data::HashMap::Shared::SS->new($path, 1000);
+    do { my $_r = shm_ss_add $map, "k", "v1"; ok($_r, 'SS add: succeeds on new key') };
+    do { my $_r = shm_ss_add $map, "k", "v2"; ok(!$_r, 'SS add: fails on existing') };
+    do { my $_r = shm_ss_get $map, "k"; is($_r, "v1", 'SS add: value unchanged') };
+    do { my $_r = shm_ss_update $map, "k", "v2"; ok($_r, 'SS update: succeeds on existing') };
+    do { my $_r = shm_ss_update $map, "absent", "x"; ok(!$_r, 'SS update: fails on missing') };
+    do { my $_r = shm_ss_get $map, "k"; is($_r, "v2", 'SS update: value changed') };
+    my $sold = $map->swap("k", "v1");
+    is($sold, "v2", 'SS swap: returns old value');
+    do { my $_r = shm_ss_cas $map, "k", "v1", "v2"; ok($_r, 'SS cas: succeeds on match') };
+    do { my $_r = shm_ss_get $map, "k"; is($_r, "v2", 'SS cas: value updated') };
+    do { my $_r = shm_ss_cas $map, "k", "v1", "v3"; ok(!$_r, 'SS cas: fails on mismatch') };
+    do { my $_r = shm_ss_get $map, "k"; is($_r, "v2", 'SS cas mismatch: value unchanged') };
+    do { my $_r = shm_ss_cas $map, "absent", "x", "y"; ok(!$_r, 'SS cas: fails on missing key') };
+
+    # Long values (force arena allocation, > 7 bytes inline limit)
+    my $long_a = "a" x 100;
+    my $long_b = "b" x 100;
+    $map->put("L", $long_a);
+    do { my $_r = shm_ss_cas $map, "L", $long_a, $long_b; ok($_r, 'SS cas: long arena value match') };
+    do { my $_r = shm_ss_get $map, "L"; is($_r, $long_b, 'SS cas: long value updated') };
+
+    # Empty-string value
+    $map->put("E", "");
+    do { my $_r = shm_ss_cas $map, "E", "", "non-empty"; ok($_r, 'SS cas: empty→non-empty') };
+    do { my $_r = shm_ss_cas $map, "E", "", "x"; ok(!$_r, 'SS cas: fails after value changed') };
+
+    # Byte-equality regardless of UTF-8 flag on expected (ASCII bytes only)
+    $map->put("U", "abc");
+    my $up_expected = "abc"; utf8::upgrade($up_expected);
+    do { my $_r = shm_ss_cas $map, "U", $up_expected, "ok"; ok($_r, 'SS cas: utf8-upgraded expected matches downgraded stored') };
+    do { my $_r = shm_ss_get $map, "U"; is($_r, "ok", 'SS cas: value updated via toggled expected') };
+
+    # Method form
+    ok($map->cas("U", "ok", "method"), 'SS cas: method form');
+    is($map->get("U"), "method", 'SS cas method: value updated');
+
+    unlink $path;
+}
+
+# CAS refreshes TTL on match (string-value variant with default TTL)
+{
+    my $path = tmpfile();
+    my $map = Data::HashMap::Shared::SS->new($path, 1000, 0, 60);
+    $map->put("k", "v1");
+    sleep 2;
+    my $before = shm_ss_ttl_remaining $map, "k";
+    ok($before <= 58, "SS cas TTL: TTL decayed (before=$before)");
+    ok($map->cas("k", "v1", "v2"), 'SS cas: succeeds with TTL');
+    my $after = shm_ss_ttl_remaining $map, "k";
+    # After refresh, ttl should be back near the 60s default — assert >= 59
+    # to tolerate coarse-clock granularity without depending on $before.
+    ok($after >= 59, "SS cas TTL: refreshed to default on match (after=$after)");
+    unlink $path;
+}
+
+# CAS promotes in LRU on match
+{
+    my $path = tmpfile();
+    my $map = Data::HashMap::Shared::SS->new($path, 1000, 3);  # max_size=3 LRU
+    $map->put("a", "1");
+    $map->put("b", "2");
+    $map->put("c", "3");
+    ok($map->cas("a", "1", "1prime"), 'SS cas LRU: succeeds');
+    # CAS-touched "a" promoted; adding "d" should evict the tail ("b")
+    $map->put("d", "4");
+    is($map->size, 3, 'SS cas LRU: size still 3');
+    ok($map->exists("a"), 'SS cas LRU: promoted key survives eviction');
+    ok(!$map->exists("b"), 'SS cas LRU: oldest non-touched key evicted');
     unlink $path;
 }
 

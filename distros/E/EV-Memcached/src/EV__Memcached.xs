@@ -137,6 +137,7 @@ struct ev_mc_wait_s {
     HV *stats_hv;
     HV *mget_results;     /* borrowed for MGET_ENTRY, owned for MGET_FENCE */
     int counted;
+    int no_response;      /* 1: fire-and-forget, drain to wbuf only, no cb_queue entry */
     ngx_queue_t queue;
     ev_tstamp queued_at;
 };
@@ -244,6 +245,13 @@ static void cleanup_connection(pTHX_ ev_mc_t *self);
 static void emit_error(pTHX_ ev_mc_t *self, const char *msg);
 static void handle_disconnect(pTHX_ ev_mc_t *self, const char *reason);
 static void schedule_reconnect(pTHX_ ev_mc_t *self);
+static void apply_keepalive(ev_mc_t *self);
+static void report_connect_error(pTHX_ ev_mc_t *self, const char *errbuf);
+static void finish_connect_success(pTHX_ ev_mc_t *self);
+static void mc_send_sasl_auth(pTHX_ ev_mc_t *self, SV *cb);
+static void stop_connect_timer(ev_mc_t *self);
+static void stop_reconnect_timer(ev_mc_t *self);
+static void stop_waiting_timer(ev_mc_t *self);
 static void send_next_waiting(pTHX_ ev_mc_t *self);
 static int check_destroyed(ev_mc_t *self);
 static void cancel_pending(pTHX_ ev_mc_t *self, SV *err_sv);
@@ -329,15 +337,10 @@ static const char* mc_status_str(uint16_t status) {
  * ================================================================ */
 
 static void buf_ensure_write(ev_mc_t *self, size_t needed) {
-    /* Compact: reclaim already-sent prefix before growing */
+    /* Compact first: reclaim any already-sent prefix. The capacity check
+       below short-circuits the "compaction alone sufficed" case. */
     if (self->wbuf_off > 0) {
         size_t live = self->wbuf_len - self->wbuf_off;
-        if (live + needed <= self->wbuf_cap) {
-            memmove(self->wbuf, self->wbuf + self->wbuf_off, live);
-            self->wbuf_len = live;
-            self->wbuf_off = 0;
-            return;
-        }
         memmove(self->wbuf, self->wbuf + self->wbuf_off, live);
         self->wbuf_len = live;
         self->wbuf_off = 0;
@@ -442,8 +445,10 @@ static void invoke_cb(pTHX_ ev_mc_t *self, SV *cb, SV *result, SV *error) {
     self->callback_depth--;
 }
 
-static void emit_error(pTHX_ ev_mc_t *self, const char *msg) {
-    if (NULL == self->on_error) return;
+/* Invoke a user handler with at most one mortal arg; catch exceptions
+   so a die in user code can't unwind through libev. */
+static void invoke_handler(pTHX_ ev_mc_t *self, SV *cb, SV *arg, const char *label) {
+    if (NULL == cb) { if (arg) SvREFCNT_dec(arg); return; }
 
     self->callback_depth++;
 
@@ -451,59 +456,72 @@ static void emit_error(pTHX_ ev_mc_t *self, const char *msg) {
     ENTER;
     SAVETMPS;
     PUSHMARK(SP);
-    XPUSHs(sv_2mortal(newSVpv(msg, 0)));
+    if (arg) XPUSHs(sv_2mortal(arg));
     PUTBACK;
-    call_sv(self->on_error, G_DISCARD | G_EVAL);
+    call_sv(cb, G_DISCARD | G_EVAL);
     if (SvTRUE(ERRSV)) {
-        warn("EV::Memcached: on_error callback error: %s", SvPV_nolen(ERRSV));
+        warn("EV::Memcached: %s callback error: %s", label, SvPV_nolen(ERRSV));
         sv_setsv(ERRSV, &PL_sv_undef);
     }
     FREETMPS;
     LEAVE;
 
     self->callback_depth--;
+}
+
+static void emit_error(pTHX_ ev_mc_t *self, const char *msg) {
+    invoke_handler(aTHX_ self, self->on_error, newSVpv(msg, 0), "on_error");
 }
 
 static void emit_connect(pTHX_ ev_mc_t *self) {
-    if (NULL == self->on_connect) return;
-
-    self->callback_depth++;
-
-    dSP;
-    ENTER;
-    SAVETMPS;
-    PUSHMARK(SP);
-    PUTBACK;
-    call_sv(self->on_connect, G_DISCARD | G_EVAL);
-    if (SvTRUE(ERRSV)) {
-        warn("EV::Memcached: on_connect callback error: %s", SvPV_nolen(ERRSV));
-        sv_setsv(ERRSV, &PL_sv_undef);
-    }
-    FREETMPS;
-    LEAVE;
-
-    self->callback_depth--;
+    invoke_handler(aTHX_ self, self->on_connect, NULL, "on_connect");
 }
 
 static void emit_disconnect(pTHX_ ev_mc_t *self) {
-    if (NULL == self->on_disconnect) return;
+    invoke_handler(aTHX_ self, self->on_disconnect, NULL, "on_disconnect");
+}
 
+static void apply_keepalive(ev_mc_t *self) {
+    if (self->keepalive <= 0 || self->path) return;
+    int one = 1;
+    setsockopt(self->fd, SOL_SOCKET, SO_KEEPALIVE, &one, sizeof(one));
+#ifdef TCP_KEEPIDLE
+    setsockopt(self->fd, IPPROTO_TCP, TCP_KEEPIDLE,
+               &self->keepalive, sizeof(self->keepalive));
+#endif
+}
+
+/* Common tail for synchronous connect-failure paths in start_connect:
+   emit error, run pending callbacks, and arm reconnect if configured.
+   Caller returns immediately after invoking. */
+static void report_connect_error(pTHX_ ev_mc_t *self, const char *errbuf) {
     self->callback_depth++;
-
-    dSP;
-    ENTER;
-    SAVETMPS;
-    PUSHMARK(SP);
-    PUTBACK;
-    call_sv(self->on_disconnect, G_DISCARD | G_EVAL);
-    if (SvTRUE(ERRSV)) {
-        warn("EV::Memcached: on_disconnect callback error: %s", SvPV_nolen(ERRSV));
-        sv_setsv(ERRSV, &PL_sv_undef);
-    }
-    FREETMPS;
-    LEAVE;
-
+    emit_error(aTHX_ self, errbuf);
     self->callback_depth--;
+    if (check_destroyed(self)) return;
+    if (!self->intentional_disconnect && self->reconnect)
+        schedule_reconnect(aTHX_ self);
+}
+
+/* Shared post-connect-success path used by both on_connect_complete (after
+   async EINPROGRESS resolves) and start_connect (when connect(2) returns
+   immediately). Caller must already have set self->connected = 1 and
+   stopped/initialized the io watchers as required by its path. */
+static void finish_connect_success(pTHX_ ev_mc_t *self) {
+    self->reconnect_attempts = 0;
+
+    start_reading(self);
+    apply_keepalive(self);
+
+    mc_send_sasl_auth(aTHX_ self, NULL);
+
+    emit_connect(aTHX_ self);
+    if (check_destroyed(self)) return;
+
+    /* Drain wait_queue immediately unless we are waiting for SASL_AUTH
+       to complete; the SASL response handler calls send_next_waiting. */
+    if (!self->username || !self->password)
+        send_next_waiting(aTHX_ self);
 }
 
 /* ================================================================
@@ -549,7 +567,12 @@ static void cleanup_wait(pTHX_ ev_mc_wait_t *wt) {
  * ================================================================ */
 
 /* mark_skipped: if true, set cbt->skipped=1 and invoke ALL callbacks (skip_pending behavior).
- * if false, only invoke non-skipped callbacks (cancel_pending behavior). */
+ * if false, only invoke non-skipped callbacks (cancel_pending behavior).
+ *
+ * Callers MUST bump callback_depth before calling this (and call
+ * check_destroyed after) — DESTROY sets magic=FREED before running
+ * us, so an unconditional check_destroyed here would Safefree(self)
+ * mid-loop. The depth bump pins self until the caller is done. */
 static void cancel_pending_impl(pTHX_ ev_mc_t *self, SV *err_sv, int mark_skipped) {
     if (self->in_cb_cleanup) return;
     self->in_cb_cleanup = 1;
@@ -567,7 +590,6 @@ static void cancel_pending_impl(pTHX_ ev_mc_t *self, SV *err_sv, int mark_skippe
             if (self->magic == MC_MAGIC_FREED) {
                 cleanup_cbt(aTHX_ cbt);
                 self->in_cb_cleanup = 0;
-                if (mark_skipped) check_destroyed(self);
                 return;
             }
         }
@@ -596,6 +618,10 @@ static void cancel_waiting(pTHX_ ev_mc_t *self, SV *err_sv) {
             if (self->magic == MC_MAGIC_FREED) {
                 cleanup_wait(aTHX_ wt);
                 self->in_wait_cleanup = 0;
+                /* Caller bumps depth before calling us (disconnect XS,
+                   skip_waiting XS, or io_cb path), so check_destroyed
+                   here would prematurely free during DESTROY where
+                   magic is already FREED before we run. */
                 return;
             }
         }
@@ -613,15 +639,9 @@ static void cleanup_connection(pTHX_ ev_mc_t *self) {
     stop_reading(self);
     stop_writing(self);
 
-    if (self->connect_timer_active) {
-        ev_timer_stop(self->loop, &self->connect_timer);
-        self->connect_timer_active = 0;
-    }
+    stop_connect_timer(self);
     disarm_cmd_timer(self);
-    if (self->waiting_timer_active) {
-        ev_timer_stop(self->loop, &self->waiting_timer);
-        self->waiting_timer_active = 0;
-    }
+    stop_waiting_timer(self);
 
     if (self->fd >= 0) {
         close(self->fd);
@@ -678,12 +698,12 @@ static void schedule_reconnect(pTHX_ ev_mc_t *self) {
 
     self->reconnect_attempts++;
 
-    if (self->reconnect_delay_ms <= 0) {
-        start_connect(aTHX_ self);
-        return;
-    }
-
+    /* Always defer through a timer (even with delay==0) so that an
+       immediate connect failure cannot recurse:
+       schedule_reconnect -> start_connect -> report_connect_error ->
+       schedule_reconnect -> ... blowing the C stack. */
     ev_tstamp delay = (ev_tstamp)self->reconnect_delay_ms / 1000.0;
+    if (delay < 0) delay = 0;
     ev_timer_init(&self->reconnect_timer, reconnect_timer_cb, delay, 0.0);
     self->reconnect_timer.data = (void *)self;
     ev_timer_start(self->loop, &self->reconnect_timer);
@@ -695,7 +715,9 @@ static void arm_cmd_timer(ev_mc_t *self) {
     if (!self->connected) return;
     ev_tstamp timeout = (ev_tstamp)self->command_timeout_ms / 1000.0;
     if (self->cmd_timer_active) {
-        ev_timer_set(&self->cmd_timer, timeout, timeout);
+        /* Adjust repeat in-place; ev_timer_again restarts using the new value.
+           ev_timer_set is forbidden on an active watcher per libev docs. */
+        self->cmd_timer.repeat = timeout;
         ev_timer_again(self->loop, &self->cmd_timer);
     } else {
         ev_timer_init(&self->cmd_timer, cmd_timeout_cb, timeout, timeout);
@@ -712,11 +734,32 @@ static void disarm_cmd_timer(ev_mc_t *self) {
     }
 }
 
+static void stop_connect_timer(ev_mc_t *self) {
+    if (self->connect_timer_active) {
+        ev_timer_stop(self->loop, &self->connect_timer);
+        self->connect_timer_active = 0;
+    }
+}
+
+static void stop_reconnect_timer(ev_mc_t *self) {
+    if (self->reconnect_timer_active) {
+        ev_timer_stop(self->loop, &self->reconnect_timer);
+        self->reconnect_timer_active = 0;
+    }
+}
+
+static void stop_waiting_timer(ev_mc_t *self) {
+    if (self->waiting_timer_active) {
+        ev_timer_stop(self->loop, &self->waiting_timer);
+        self->waiting_timer_active = 0;
+    }
+}
+
 static void cmd_timeout_cb(EV_P_ ev_timer *w, int revents) {
     ev_mc_t *self = (ev_mc_t *)w->data;
     (void)loop; (void)revents;
 
-    if (NULL == self || self->magic != MC_MAGIC_ALIVE) return;
+    if (self->magic != MC_MAGIC_ALIVE) return;
 
     if (ngx_queue_empty(&self->cb_queue)) {
         disarm_cmd_timer(self);
@@ -755,7 +798,7 @@ static void connect_timeout_cb(EV_P_ ev_timer *w, int revents) {
     ev_mc_t *self = (ev_mc_t *)w->data;
     (void)loop; (void)revents;
 
-    if (NULL == self || self->magic != MC_MAGIC_ALIVE) return;
+    if (self->magic != MC_MAGIC_ALIVE) return;
 
     self->connect_timer_active = 0;
     self->callback_depth++;
@@ -768,7 +811,7 @@ static void reconnect_timer_cb(EV_P_ ev_timer *w, int revents) {
     ev_mc_t *self = (ev_mc_t *)w->data;
     (void)loop; (void)revents;
 
-    if (NULL == self || self->magic != MC_MAGIC_ALIVE) return;
+    if (self->magic != MC_MAGIC_ALIVE) return;
 
     self->reconnect_timer_active = 0;
     self->callback_depth++;
@@ -811,7 +854,7 @@ static void waiting_timer_cb(EV_P_ ev_timer *w, int revents) {
     ev_mc_t *self = (ev_mc_t *)w->data;
     (void)loop; (void)revents;
 
-    if (NULL == self || self->magic != MC_MAGIC_ALIVE) return;
+    if (self->magic != MC_MAGIC_ALIVE) return;
 
     self->waiting_timer_active = 0;
     self->callback_depth++;
@@ -846,33 +889,39 @@ static void schedule_waiting_timer(ev_mc_t *self) {
 
 static void send_next_waiting(pTHX_ ev_mc_t *self) {
     while (!ngx_queue_empty(&self->wait_queue) && self->connected) {
-        if (self->max_pending > 0 && self->pending_count >= self->max_pending)
-            break;
-
         ngx_queue_t *q = ngx_queue_head(&self->wait_queue);
         ev_mc_wait_t *wt = ngx_queue_data(q, ev_mc_wait_t, queue);
+
+        /* max_pending gates only counted entries; mc_enqueue_cmd uses the
+           same exception (|| !counted). Fire-and-forget (no_response) and
+           mget GETKQ entries are uncounted and must not be blocked. */
+        if (self->max_pending > 0 && self->pending_count >= self->max_pending
+            && !wt->no_response && wt->counted)
+            break;
+
         ngx_queue_remove(q);
         self->waiting_count--;
 
         /* Append packet to write buffer */
         buf_append_write(self, wt->packet, wt->packet_len);
 
-        /* Create cb entry */
-        ev_mc_cb_t *cbt = alloc_cbt();
-        cbt->cb = wt->cb; wt->cb = NULL; /* transfer ownership */
-        cbt->opaque = wt->opaque;
-        cbt->cmd = wt->cmd;
-        cbt->quiet = wt->quiet;
-        cbt->counted = wt->counted;
-        cbt->stats_hv = wt->stats_hv; wt->stats_hv = NULL;
-        cbt->mget_results = wt->mget_results; wt->mget_results = NULL;
-        ngx_queue_insert_tail(&self->cb_queue, &cbt->queue);
-        if (cbt->counted) self->pending_count++;
+        if (!wt->no_response) {
+            ev_mc_cb_t *cbt = alloc_cbt();
+            cbt->cb = wt->cb; wt->cb = NULL;
+            cbt->opaque = wt->opaque;
+            cbt->cmd = wt->cmd;
+            cbt->quiet = wt->quiet;
+            cbt->counted = wt->counted;
+            cbt->stats_hv = wt->stats_hv; wt->stats_hv = NULL;
+            cbt->mget_results = wt->mget_results; wt->mget_results = NULL;
+            ngx_queue_insert_tail(&self->cb_queue, &cbt->queue);
+            if (cbt->counted) self->pending_count++;
+            arm_cmd_timer(self);
+        }
 
-        Safefree(wt->packet); wt->packet = NULL;
+        Safefree(wt->packet);
         Safefree(wt);
 
-        arm_cmd_timer(self);
         start_writing(self);
     }
 }
@@ -881,10 +930,35 @@ static void send_next_waiting(pTHX_ ev_mc_t *self) {
  * Build and enqueue a command
  * ================================================================ */
 
-/* Fire-and-forget: send packet with quiet opcode, no cb_queue entry.
- * Server suppresses response on success. */
-/* Fire-and-forget using quiet opcode. No cb_queue entry, no response expected.
- * Uses opaque=0 since no matching is needed. Does NOT advance next_opaque. */
+/* Allocate the next opaque, skipping 0 across wraparound (0 is reserved
+ * for fire-and-forget commands so error responses don't get matched to
+ * the wrong cb_queue head). */
+static uint32_t mc_next_opaque(ev_mc_t *self) {
+    uint32_t op = self->next_opaque++;
+    if (self->next_opaque == 0) self->next_opaque = 1;
+    return op;
+}
+
+/* Encode a complete request packet (header + extras + key + value) into
+ * the caller-supplied buffer p, which must be at least
+ * MC_HEADER_SIZE + extras_len + key_len + value_len bytes. */
+static void mc_pack(char *p, uint8_t opcode,
+    const char *key, uint16_t key_len,
+    const char *value, uint32_t value_len,
+    const char *extras, uint8_t extras_len,
+    uint32_t opaque, uint64_t cas)
+{
+    uint32_t body_len = (uint32_t)extras_len + (uint32_t)key_len + value_len;
+    mc_encode_header(p, opcode, key_len, extras_len, body_len, opaque, cas);
+    p += MC_HEADER_SIZE;
+    if (extras_len > 0) { memcpy(p, extras, extras_len); p += extras_len; }
+    if (key_len > 0)    { memcpy(p, key, key_len); p += key_len; }
+    if (value_len > 0)  { memcpy(p, value, value_len); }
+}
+
+/* Fire-and-forget using a quiet opcode (SETQ/FLUSHQ/...). No cb_queue
+ * entry; opaque is always 0 (server only responds on error and that
+ * response is silently discarded by handle_response_packet). */
 static void mc_fire_and_forget(pTHX_ ev_mc_t *self,
     uint8_t opcode, const char *key, STRLEN key_len,
     const char *value, STRLEN value_len,
@@ -899,14 +973,26 @@ static void mc_fire_and_forget(pTHX_ ev_mc_t *self,
 
     if (self->connected) {
         buf_ensure_write(self, packet_len);
-        char *p = self->wbuf + self->wbuf_len;
-        mc_encode_header(p, opcode, (uint16_t)key_len, extras_len, body_len, 0, cas);
-        p += MC_HEADER_SIZE;
-        if (extras_len > 0) { memcpy(p, extras, extras_len); p += extras_len; }
-        if (key_len > 0)    { memcpy(p, key, key_len); p += key_len; }
-        if (value_len > 0)  { memcpy(p, value, value_len); }
+        mc_pack(self->wbuf + self->wbuf_len, opcode,
+                key, (uint16_t)key_len, value, (uint32_t)value_len,
+                extras, extras_len, 0, cas);
         self->wbuf_len += packet_len;
         start_writing(self);
+    } else {
+        /* Not yet connected (or reconnecting): queue and drain after connect. */
+        ev_mc_wait_t *wt;
+        Newxz(wt, 1, ev_mc_wait_t);
+        Newx(wt->packet, packet_len, char);
+        wt->packet_len = packet_len;
+        mc_pack(wt->packet, opcode,
+                key, (uint16_t)key_len, value, (uint32_t)value_len,
+                extras, extras_len, 0, cas);
+        wt->no_response = 1;
+        wt->queued_at = ev_now(self->loop);
+        ngx_queue_insert_tail(&self->wait_queue, &wt->queue);
+        self->waiting_count++;
+        if (self->waiting_timeout_ms > 0)
+            schedule_waiting_timer(self);
     }
 }
 
@@ -921,7 +1007,7 @@ static uint32_t mc_enqueue_cmd(pTHX_ ev_mc_t *self,
     if (key_len > MC_MAX_KEY_LEN)
         croak("key too long (%d bytes, max %d)", (int)key_len, MC_MAX_KEY_LEN);
 
-    uint32_t opaque = self->next_opaque++;
+    uint32_t opaque = mc_next_opaque(self);
     uint32_t body_len = extras_len + (uint32_t)key_len + (uint32_t)value_len;
     size_t packet_len = MC_HEADER_SIZE + body_len;
 
@@ -932,17 +1018,12 @@ static uint32_t mc_enqueue_cmd(pTHX_ ev_mc_t *self,
         (self->max_pending <= 0 || self->pending_count < self->max_pending || !counted);
 
     if (can_send) {
-        /* Build packet directly into write buffer */
         buf_ensure_write(self, packet_len);
-        char *p = self->wbuf + self->wbuf_len;
-        mc_encode_header(p, opcode, (uint16_t)key_len, extras_len, body_len, opaque, cas);
-        p += MC_HEADER_SIZE;
-        if (extras_len > 0) { memcpy(p, extras, extras_len); p += extras_len; }
-        if (key_len > 0)    { memcpy(p, key, key_len); p += key_len; }
-        if (value_len > 0)  { memcpy(p, value, value_len); }
+        mc_pack(self->wbuf + self->wbuf_len, opcode,
+                key, (uint16_t)key_len, value, (uint32_t)value_len,
+                extras, extras_len, opaque, cas);
         self->wbuf_len += packet_len;
 
-        /* Create cb entry */
         ev_mc_cb_t *cbt = alloc_cbt();
         if (cb) { cbt->cb = newSVsv(cb); }
         cbt->opaque = opaque;
@@ -963,12 +1044,9 @@ static uint32_t mc_enqueue_cmd(pTHX_ ev_mc_t *self,
         Newxz(wt, 1, ev_mc_wait_t);
         Newx(wt->packet, packet_len, char);
         wt->packet_len = packet_len;
-        char *p = wt->packet;
-        mc_encode_header(p, opcode, (uint16_t)key_len, extras_len, body_len, opaque, cas);
-        p += MC_HEADER_SIZE;
-        if (extras_len > 0) { memcpy(p, extras, extras_len); p += extras_len; }
-        if (key_len > 0)    { memcpy(p, key, key_len); p += key_len; }
-        if (value_len > 0)  { memcpy(p, value, value_len); }
+        mc_pack(wt->packet, opcode,
+                key, (uint16_t)key_len, value, (uint32_t)value_len,
+                extras, extras_len, opaque, cas);
 
         if (cb) { wt->cb = newSVsv(cb); }
         wt->opaque = opaque;
@@ -1011,9 +1089,22 @@ static void mc_enqueue_mget(pTHX_ ev_mc_t *self, AV *keys_av, SV *cb, int full_i
     int entry_cmd = full_info ? CB_CMD_MGETS_ENTRY : CB_CMD_MGET_ENTRY;
     int fence_cmd = full_info ? CB_CMD_MGETS_FENCE : CB_CMD_MGET_FENCE;
 
+    SSize_t i;
+
+    /* Pre-validate all key lengths before mutating wbuf / queues / refcounts.
+       Croaking mid-loop would leave half-built GETKQ packets queued without
+       a NOOP fence, corrupting opaque ordering on the wire. */
+    for (i = 0; i < count; i++) {
+        SV **sv = av_fetch(keys_av, i, 0);
+        if (!sv || !SvOK(*sv)) continue;
+        STRLEN key_len;
+        (void)SvPV(*sv, key_len);
+        if (key_len > MC_MAX_KEY_LEN)
+            croak("mget key too long (%d bytes, max %d)", (int)key_len, MC_MAX_KEY_LEN);
+    }
+
     HV *results = newHV();
 
-    SSize_t i;
     for (i = 0; i < count; i++) {
         SV **sv = av_fetch(keys_av, i, 0);
         if (!sv || !SvOK(*sv)) continue;
@@ -1021,10 +1112,7 @@ static void mc_enqueue_mget(pTHX_ ev_mc_t *self, AV *keys_av, SV *cb, int full_i
         STRLEN key_len;
         const char *key = SvPV(*sv, key_len);
 
-        if (key_len > MC_MAX_KEY_LEN)
-            croak("mget key too long (%d bytes, max %d)", (int)key_len, MC_MAX_KEY_LEN);
-
-        uint32_t opaque = self->next_opaque++;
+        uint32_t opaque = mc_next_opaque(self);
         uint32_t body_len = (uint32_t)key_len;
         size_t packet_len = MC_HEADER_SIZE + body_len;
 
@@ -1064,7 +1152,7 @@ static void mc_enqueue_mget(pTHX_ ev_mc_t *self, AV *keys_av, SV *cb, int full_i
 
     /* NOOP fence */
     {
-        uint32_t opaque = self->next_opaque++;
+        uint32_t opaque = mc_next_opaque(self);
         size_t packet_len = MC_HEADER_SIZE;
         int can_send = self->connected;
 
@@ -1312,8 +1400,8 @@ static void handle_response_packet(pTHX_ ev_mc_t *self) {
     case CB_CMD_SASL_AUTH:
         if (cbt->cb)
             invoke_cb(aTHX_ self, cbt->cb, newSViv(1), NULL);
-        /* Auto-auth (cb==NULL): send_next_waiting runs after this switch
-         * via the common path at line ~1359 */
+        /* Auto-auth (cb==NULL): wait queue is drained by the common
+           send_next_waiting call at the end of this switch. */
         break;
 
     case CB_CMD_STATS:
@@ -1372,7 +1460,15 @@ static void process_responses(pTHX_ ev_mc_t *self) {
         }
 
         uint32_t body_len = mc_read_u32(self->rbuf + 8);
-        uint32_t total_len = MC_HEADER_SIZE + body_len;
+        /* Sanity bound: memcached's hard limit is 128 MB; cap at 256 MB to
+           catch garbage/MITM responses without rejecting any real reply.
+           Also avoids size_t overflow on 32-bit perls when MC_HEADER_SIZE
+           is added below. */
+        if (body_len > 0x10000000u) {
+            handle_disconnect(aTHX_ self, "response body too large");
+            return;
+        }
+        size_t total_len = (size_t)MC_HEADER_SIZE + body_len;
 
         if (self->rbuf_len < total_len) break; /* incomplete packet */
 
@@ -1448,52 +1544,19 @@ static void on_connect_complete(pTHX_ ev_mc_t *self) {
         self->fd = -1;
         self->connecting = 0;
         stop_writing(self);
-        if (self->connect_timer_active) {
-            ev_timer_stop(self->loop, &self->connect_timer);
-            self->connect_timer_active = 0;
-        }
+        stop_connect_timer(self);
 
-        self->callback_depth++;
-        emit_error(aTHX_ self, errbuf);
-        self->callback_depth--;
-        if (check_destroyed(self)) return;
-
-        if (!self->intentional_disconnect && self->reconnect)
-            schedule_reconnect(aTHX_ self);
+        report_connect_error(aTHX_ self, errbuf);
         return;
     }
 
     self->connecting = 0;
     self->connected = 1;
-    self->reconnect_attempts = 0;
 
     stop_writing(self);
-    if (self->connect_timer_active) {
-        ev_timer_stop(self->loop, &self->connect_timer);
-        self->connect_timer_active = 0;
-    }
+    stop_connect_timer(self);
 
-    /* Setup read watcher */
-    start_reading(self);
-
-    /* TCP keepalive */
-    if (self->keepalive > 0) {
-        int one = 1;
-        setsockopt(self->fd, SOL_SOCKET, SO_KEEPALIVE, &one, sizeof(one));
-#ifdef TCP_KEEPIDLE
-        setsockopt(self->fd, IPPROTO_TCP, TCP_KEEPIDLE,
-                   &self->keepalive, sizeof(self->keepalive));
-#endif
-    }
-
-    mc_send_sasl_auth(aTHX_ self, NULL);
-
-    emit_connect(aTHX_ self);
-    if (check_destroyed(self)) return;
-
-    /* Defer waiting queue drain until SASL auth completes (if active) */
-    if (!self->username)
-        send_next_waiting(aTHX_ self);
+    finish_connect_success(aTHX_ self);
 }
 
 static void io_cb(EV_P_ ev_io *w, int revents) {
@@ -1587,12 +1650,7 @@ static void start_connect(pTHX_ ev_mc_t *self) {
         if (ret != 0) {
             char errbuf[256];
             snprintf(errbuf, sizeof(errbuf), "getaddrinfo: %s", gai_strerror(ret));
-            self->callback_depth++;
-            emit_error(aTHX_ self, errbuf);
-            self->callback_depth--;
-            if (check_destroyed(self)) return;
-            if (!self->intentional_disconnect && self->reconnect)
-                schedule_reconnect(aTHX_ self);
+            report_connect_error(aTHX_ self, errbuf);
             return;
         }
 
@@ -1601,12 +1659,7 @@ static void start_connect(pTHX_ ev_mc_t *self) {
             freeaddrinfo(res);
             char errbuf[128];
             snprintf(errbuf, sizeof(errbuf), "socket: %s", strerror(errno));
-            self->callback_depth++;
-            emit_error(aTHX_ self, errbuf);
-            self->callback_depth--;
-            if (check_destroyed(self)) return;
-            if (!self->intentional_disconnect && self->reconnect)
-                schedule_reconnect(aTHX_ self);
+            report_connect_error(aTHX_ self, errbuf);
             return;
         }
 
@@ -1642,26 +1695,7 @@ static void start_connect(pTHX_ ev_mc_t *self) {
         ev_set_priority(&self->rio, self->priority);
         ev_set_priority(&self->wio, self->priority);
 
-        start_reading(self);
-
-        /* TCP keepalive */
-        if (self->keepalive > 0 && !self->path) {
-            int one = 1;
-            setsockopt(self->fd, SOL_SOCKET, SO_KEEPALIVE, &one, sizeof(one));
-#ifdef TCP_KEEPIDLE
-            setsockopt(self->fd, IPPROTO_TCP, TCP_KEEPIDLE,
-                       &self->keepalive, sizeof(self->keepalive));
-#endif
-        }
-
-        self->reconnect_attempts = 0;
-
-        mc_send_sasl_auth(aTHX_ self, NULL);
-
-        emit_connect(aTHX_ self);
-        if (check_destroyed(self)) return;
-        if (!self->username)
-            send_next_waiting(aTHX_ self);
+        finish_connect_success(aTHX_ self);
         return;
     }
 
@@ -1670,12 +1704,7 @@ static void start_connect(pTHX_ ev_mc_t *self) {
         snprintf(errbuf, sizeof(errbuf), "connect: %s", strerror(errno));
         close(self->fd);
         self->fd = -1;
-        self->callback_depth++;
-        emit_error(aTHX_ self, errbuf);
-        self->callback_depth--;
-        if (check_destroyed(self)) return;
-        if (!self->intentional_disconnect && self->reconnect)
-            schedule_reconnect(aTHX_ self);
+        report_connect_error(aTHX_ self, errbuf);
         return;
     }
 
@@ -1734,8 +1763,10 @@ CODE:
     Newx(RETVAL->wbuf, BUF_INIT_SIZE, char);
     RETVAL->wbuf_cap = BUF_INIT_SIZE;
 
-    /* Default error handler: die */
-    RETVAL->on_error = eval_pv("sub { die @_ }", TRUE);
+    /* Default error handler: warn. Callback exceptions are caught by
+       G_EVAL in emit_error, so a `die` would be demoted to a warning
+       anyway — emit it directly and avoid the double prefix. */
+    RETVAL->on_error = eval_pv("sub { warn \"EV::Memcached error: @_\\n\" }", TRUE);
     SvREFCNT_inc_simple_void_NN(RETVAL->on_error);
 
     /* Parse options */
@@ -1828,19 +1859,10 @@ CODE:
         /* Stop watchers */
         stop_reading(self);
         stop_writing(self);
-        if (self->connect_timer_active) {
-            ev_timer_stop(self->loop, &self->connect_timer);
-            self->connect_timer_active = 0;
-        }
+        stop_connect_timer(self);
         disarm_cmd_timer(self);
-        if (self->reconnect_timer_active) {
-            ev_timer_stop(self->loop, &self->reconnect_timer);
-            self->reconnect_timer_active = 0;
-        }
-        if (self->waiting_timer_active) {
-            ev_timer_stop(self->loop, &self->waiting_timer);
-            self->waiting_timer_active = 0;
-        }
+        stop_reconnect_timer(self);
+        stop_waiting_timer(self);
         if (self->fd >= 0) { close(self->fd); self->fd = -1; }
 
         /* Clean up queues without invoking Perl callbacks */
@@ -1862,50 +1884,41 @@ CODE:
         CLEAR_HANDLER(self->on_error);
         CLEAR_HANDLER(self->on_connect);
         CLEAR_HANDLER(self->on_disconnect);
-        if (self->host) { Safefree(self->host); self->host = NULL; }
-        if (self->path) { Safefree(self->path); self->path = NULL; }
-        if (self->username) { Safefree(self->username); self->username = NULL; }
-        if (self->password) { Safefree(self->password); self->password = NULL; }
-        if (self->rbuf) { Safefree(self->rbuf); self->rbuf = NULL; }
-        if (self->wbuf) { Safefree(self->wbuf); self->wbuf = NULL; }
+        Safefree(self->host);     self->host = NULL;
+        Safefree(self->path);     self->path = NULL;
+        Safefree(self->username); self->username = NULL;
+        Safefree(self->password); self->password = NULL;
+        Safefree(self->rbuf);     self->rbuf = NULL;
+        Safefree(self->wbuf);     self->wbuf = NULL;
         return;
     }
 
-    self->magic = MC_MAGIC_FREED;
-
     /* Stop timers */
-    if (self->connect_timer_active) {
-        ev_timer_stop(self->loop, &self->connect_timer);
-        self->connect_timer_active = 0;
-    }
+    stop_connect_timer(self);
     disarm_cmd_timer(self);
-    if (self->reconnect_timer_active) {
-        ev_timer_stop(self->loop, &self->reconnect_timer);
-        self->reconnect_timer_active = 0;
-    }
-    if (self->waiting_timer_active) {
-        ev_timer_stop(self->loop, &self->waiting_timer);
-        self->waiting_timer_active = 0;
-    }
+    stop_reconnect_timer(self);
+    stop_waiting_timer(self);
 
     cleanup_connection(aTHX_ self);
 
-    /* Cancel pending/waiting with disconnected error */
+    /* Cancel pending/waiting with disconnected error.
+       Don't pre-set magic=FREED here: cancel_pending_impl bails its
+       loop on FREED, which would leak every entry past the first if
+       any callback was set. Bump callback_depth so any nested DESTROY
+       (e.g. a callback drops a separate strong ref) takes the deferred
+       path at the top of this function. */
     if (!PL_dirty) {
+        self->callback_depth++;
         cancel_pending(aTHX_ self, err_disconnected);
         cancel_waiting(aTHX_ self, err_disconnected);
+        self->callback_depth--;
     } else {
         /* Global destruction: free entries without calling Perl */
         while (!ngx_queue_empty(&self->cb_queue)) {
             ngx_queue_t *q = ngx_queue_head(&self->cb_queue);
             ev_mc_cb_t *cbt = ngx_queue_data(q, ev_mc_cb_t, queue);
             ngx_queue_remove(q);
-            CLEAR_HANDLER(cbt->cb);
-            if (cbt->stats_hv) { SvREFCNT_dec((SV*)cbt->stats_hv); cbt->stats_hv = NULL; }
-            if ((cbt->cmd == CB_CMD_MGET_FENCE || cbt->cmd == CB_CMD_MGETS_FENCE) && cbt->mget_results) {
-                SvREFCNT_dec((SV*)cbt->mget_results); cbt->mget_results = NULL;
-            }
-            Safefree(cbt);
+            cleanup_cbt(aTHX_ cbt);
         }
         while (!ngx_queue_empty(&self->wait_queue)) {
             ngx_queue_t *q = ngx_queue_head(&self->wait_queue);
@@ -1915,16 +1928,18 @@ CODE:
         }
     }
 
+    self->magic = MC_MAGIC_FREED;
+
     CLEAR_HANDLER(self->on_error);
     CLEAR_HANDLER(self->on_connect);
     CLEAR_HANDLER(self->on_disconnect);
 
-    if (self->host) { Safefree(self->host); self->host = NULL; }
-    if (self->path) { Safefree(self->path); self->path = NULL; }
-    if (self->username) { Safefree(self->username); self->username = NULL; }
-    if (self->password) { Safefree(self->password); self->password = NULL; }
-    if (self->rbuf) { Safefree(self->rbuf); self->rbuf = NULL; }
-    if (self->wbuf) { Safefree(self->wbuf); self->wbuf = NULL; }
+    Safefree(self->host);
+    Safefree(self->path);
+    Safefree(self->username);
+    Safefree(self->password);
+    Safefree(self->rbuf);
+    Safefree(self->wbuf);
 
     Safefree(self);
 }
@@ -1936,10 +1951,14 @@ CODE:
     if (self->connected || self->connecting)
         croak("already connected");
 
-    if (self->host) Safefree(self->host);
+    /* An auto-reconnect timer may be pending; cancel it to avoid a
+       second start_connect when the timer fires. */
+    stop_reconnect_timer(self);
+
+    Safefree(self->host);
     self->host = savepv(host);
     self->port = port;
-    if (self->path) { Safefree(self->path); self->path = NULL; }
+    Safefree(self->path); self->path = NULL;
     self->intentional_disconnect = 0;
 
     start_connect(aTHX_ self);
@@ -1952,9 +1971,11 @@ CODE:
     if (self->connected || self->connecting)
         croak("already connected");
 
-    if (self->path) Safefree(self->path);
+    stop_reconnect_timer(self);
+
+    Safefree(self->path);
     self->path = savepv(path);
-    if (self->host) { Safefree(self->host); self->host = NULL; }
+    Safefree(self->host); self->host = NULL;
     self->intentional_disconnect = 0;
 
     start_connect(aTHX_ self);
@@ -1966,17 +1987,19 @@ CODE:
 {
     self->intentional_disconnect = 1;
 
-    if (self->reconnect_timer_active) {
-        ev_timer_stop(self->loop, &self->reconnect_timer);
-        self->reconnect_timer_active = 0;
-    }
+    stop_reconnect_timer(self);
 
+    /* Pin the object across pending-callback dispatch so that an
+       `undef $mc` from a callback defers DESTROY rather than freeing
+       us mid-call; check_destroyed below handles the deferred free. */
+    self->callback_depth++;
     if (self->connected || self->connecting) {
         handle_disconnect(aTHX_ self, NULL);
     } else {
-        /* Not connected: cancel waiting */
         cancel_waiting(aTHX_ self, err_disconnected);
     }
+    self->callback_depth--;
+    check_destroyed(self);
 }
 
 int
@@ -2211,27 +2234,21 @@ CODE:
     }
     UV expiry = extra > 0 ? SvUV(ST(1)) : 0;
 
-    if (cb) {
-        if (expiry > 0) {
-            char extras[4];
-            mc_write_u32(extras, (uint32_t)expiry);
-            mc_enqueue_cmd(aTHX_ self, MC_OP_FLUSH, NULL, 0, NULL, 0,
-                           extras, 4, 0, CB_CMD_FLUSH, 0, cb);
-        } else {
-            mc_enqueue_cmd(aTHX_ self, MC_OP_FLUSH, NULL, 0, NULL, 0,
-                           NULL, 0, 0, CB_CMD_FLUSH, 0, cb);
-        }
-    } else {
-        if (expiry > 0) {
-            char extras[4];
-            mc_write_u32(extras, (uint32_t)expiry);
-            mc_fire_and_forget(aTHX_ self, MC_OP_FLUSHQ, NULL, 0, NULL, 0,
-                               extras, 4, 0);
-        } else {
-            mc_fire_and_forget(aTHX_ self, MC_OP_FLUSHQ, NULL, 0, NULL, 0,
-                               NULL, 0, 0);
-        }
+    char extras[4];
+    const char *xp = NULL;
+    uint8_t xl = 0;
+    if (expiry > 0) {
+        mc_write_u32(extras, (uint32_t)expiry);
+        xp = extras;
+        xl = 4;
     }
+
+    if (cb)
+        mc_enqueue_cmd(aTHX_ self, MC_OP_FLUSH, NULL, 0, NULL, 0,
+                       xp, xl, 0, CB_CMD_FLUSH, 0, cb);
+    else
+        mc_fire_and_forget(aTHX_ self, MC_OP_FLUSHQ, NULL, 0, NULL, 0,
+                           xp, xl, 0);
 }
 
 void
@@ -2423,10 +2440,7 @@ CODE:
     self->max_reconnect_attempts = max_attempts >= 0 ? max_attempts : 0;
     if (!enable) {
         self->reconnect_attempts = 0;
-        if (self->reconnect_timer_active) {
-            ev_timer_stop(self->loop, &self->reconnect_timer);
-            self->reconnect_timer_active = 0;
-        }
+        stop_reconnect_timer(self);
     }
 }
 
@@ -2473,15 +2487,8 @@ CODE:
     if (items > 1) {
         self->keepalive = SvIV(ST(1));
         if (self->keepalive < 0) self->keepalive = 0;
-        /* Apply to current connection if active */
-        if (self->connected && self->fd >= 0 && self->keepalive > 0) {
-            int one = 1;
-            setsockopt(self->fd, SOL_SOCKET, SO_KEEPALIVE, &one, sizeof(one));
-#ifdef TCP_KEEPIDLE
-            setsockopt(self->fd, IPPROTO_TCP, TCP_KEEPIDLE,
-                       &self->keepalive, sizeof(self->keepalive));
-#endif
-        }
+        if (self->connected && self->fd >= 0)
+            apply_keepalive(self);
     }
     RETVAL = self->keepalive;
 }
@@ -2492,12 +2499,18 @@ void
 skip_pending(EV::Memcached self)
 CODE:
 {
+    self->callback_depth++;
     cancel_pending_impl(aTHX_ self, err_skipped, 1);
+    self->callback_depth--;
+    check_destroyed(self);
 }
 
 void
 skip_waiting(EV::Memcached self)
 CODE:
 {
+    self->callback_depth++;
     cancel_waiting(aTHX_ self, err_skipped);
+    self->callback_depth--;
+    check_destroyed(self);
 }

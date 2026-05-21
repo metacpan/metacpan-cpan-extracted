@@ -1,55 +1,239 @@
 ======================================================================
- JSON::LINQ चीट शीट                                          [HI] हिन्दी
+ JSON::LINQ चीट शीट                                        [HI] हिन्दी
 ======================================================================
 
-JSON और JSONL फ़ाइलों के लिए LINQ-शैली क्वेरी इंटरफ़ेस
+[ 1. क्वेरी बनाना ]
 
-[ 1. 1. क्वेरी बनाना ]
+  use JSON::LINQ;
 
-  FromJSON, FromJSONL, FromJSONString, From, Empty, Range, Repeat
+  # JSON फ़ाइल से (शीर्ष-स्तरीय ऐरे)
+  my $q = JSON::LINQ->FromJSON('data.json');
 
-[ 2. 2. फ़िल्टरिंग ]
+  # JSONL फ़ाइल से (स्ट्रीमिंग)
+  my $q = JSON::LINQ->FromJSONL('events.jsonl');
 
-  Where
+  # JSON स्ट्रिंग से
+  my $q = JSON::LINQ->FromJSONString('[{"id":1},{"id":2}]');
 
-[ 3. 3. प्रोजेक्शन ]
+  # LTSV फ़ाइल से (label:value, TAB-विभाजित, स्ट्रीमिंग)
+  my $q = JSON::LINQ->FromLTSV('data.ltsv');
+  # CSV फ़ाइल से (पहली पंक्ति हेडर, स्ट्रीमिंग)
+  my $q = JSON::LINQ->FromCSV('data.csv');
+  my $q = JSON::LINQ->FromCSV('data.csv', sep => "\t");         # TSV
+  my $q = JSON::LINQ->FromCSV('f.csv', headers=>[qw(a b c)]);  # बिना हेडर
+  my $q = JSON::LINQ->FromCSV('f.csv', headers=>[qw(a b c)], skip_header=>1);
 
-  Select, SelectMany
+  # इन-मेमरी ऐरे से
+  my $q = JSON::LINQ->From(\@array);
 
-[ 4. 4. क्रमबद्धता ]
+  # खाली सीक्वेंस
+  my $q = JSON::LINQ->Empty();
 
-  OrderBy, OrderByDescending, OrderByNum, OrderByStr, ThenBy, Reverse
+  # पूर्णांक सीक्वेंस: 1, 2, 3, 4, 5
+  my $q = JSON::LINQ->Range(1, 5);
 
-[ 5. 5. पेजिनेशन ]
+  # तत्व N बार दोहराएं
+  my $q = JSON::LINQ->Repeat("x", 3);
 
-  Skip, Take, SkipWhile, TakeWhile
+  # नोट: टर्मिनल मेथड कॉल करने पर इटेरेटर समाप्त हो जाता है।
+  # पुनः क्वेरी के लिए From*/From दोबारा कॉल करें।
 
-[ 6. 6. समूहीकरण ]
+[ 2. फ़िल्टरिंग ]
 
-  GroupBy, ToLookup
+  ->Where(sub { $_[0]{status} eq '200' })
+  ->Where(sub { $_[0]{score} >= 80 })
+  ->Where(sub { defined $_[0]{email} && $_[0]{email} ne '' })
 
-[ 7. 7. समग्रण ]
+[ 3. प्रोजेक्शन ]
 
-  Count, Sum, Average, Min, Max, First, Last, Any, All, ForEach, Aggregate
+  # Select: प्रत्येक तत्व को रूपांतरित करें
+  ->Select(sub { { path => $_[0]{url}, code => $_[0]{status} } })
+  ->Select(sub { $_[0]{name} })
 
-[ 8. 8. सेट संचालन ]
+  # SelectMany: नेस्टेड ऐरे समतल करें (सिलेक्टर ARRAY रेफ लौटाए)
+  ->SelectMany(sub { [ @{ $_[0]{tags} } ] })
 
-  Distinct, Union, Intersect, Except
+[ 4. क्रमबद्धता ]
 
-[ 9. 9. रूपांतरण ]
+  # प्राथमिक कुंजी -- स्मार्ट (दोनों संख्या हों तो संख्यात्मक)
+  ->OrderBy(sub { $_[0]{name} })
+  ->OrderByDescending(sub { $_[0]{score} })
 
-  ToJSON, ToJSONL, ToArray, ToDictionary, ToLookup
+  # प्राथमिक कुंजी -- संख्यात्मक तुलना बाध्य करें
+  ->OrderByNum(sub { $_[0]{price} })
+  ->OrderByNumDescending(sub { $_[0]{amount} })
 
-[ 10. 10. जॉइन ]
+  # प्राथमिक कुंजी -- स्ट्रिंग तुलना बाध्य करें (cmp)
+  ->OrderByStr(sub { $_[0]{code} })
+  ->OrderByStrDescending(sub { $_[0]{name} })
 
-  Join, GroupJoin, Concat, Zip
+  # द्वितीयक कुंजी (OrderBy* के बाद चेन करें)
+  ->ThenBy(sub { $_[0]{name} })              # स्मार्ट आरोही
+  ->ThenByDescending(sub { $_[0]{score} })   # स्मार्ट अवरोही
+  ->ThenByNum(sub { $_[0]{age} })            # संख्यात्मक आरोही
+  ->ThenByNumDescending(sub { $_[0]{age} })  # संख्यात्मक अवरोही
+  ->ThenByStr(sub { $_[0]{name} })           # स्ट्रिंग आरोही
+  ->ThenByStrDescending(sub { $_[0]{name} }) # स्ट्रिंग अवरोही
 
-[ 11. 11. बूलियन मान ]
+  ->Reverse()  # वर्तमान क्रम उलटें
 
-  JSON::LINQ::true / JSON::LINQ::false
+[ 5. पेजिनेशन ]
 
-[ 12. 12. संदर्भ लिंक ]
+  ->Skip(10)  # पहले 10 छोड़ें
+  ->Take(5)   # अगले 5 लें
+  ->SkipWhile(sub { $_[0]{score} < 80 })
+  ->TakeWhile(sub { $_[0]{score} >= 80 })
 
-  https://metacpan.org/dist/JSON-LINQ
+[ 6. समूहीकरण ]
+
+  # GroupBy: { Key => '...', Elements => [...] } लौटाता है
+  my @groups = $q->GroupBy(sub { $_[0]{category} })->ToArray();
+  for my $g (@groups) {
+      printf "%s: %d\n", $g->{Key}, scalar @{$g->{Elements}};
+  }
+
+  # ToLookup: hashref of arrayrefs लौटाता है
+  my %lookup = %{ $q->ToLookup(sub { $_[0]{dept} }) };
+  my @eng = @{ $lookup{Engineering} };
+
+  # मान सिलेक्टर के साथ ToLookup
+  my %names = %{ $q->ToLookup(sub { $_[0]{dept} },
+                               sub { $_[0]{name} }) };
+
+[ 7. सेट संचालन ]
+
+  ->Distinct()                          # deduplicate (by value)
+  ->Distinct(sub { $_[0]{id} })         # deduplicate by key
+  ->Union($other_q)                     # set union (no duplicates)
+  ->Union($other_q, sub { $_[0]{id} })  # union by key
+  ->Intersect($other_q)                 # set intersection
+  ->Intersect($other_q, sub { ... })    # intersection by key
+  ->Except($other_q)                    # set difference
+  ->Except($other_q, sub { ... })       # difference by key
+  ->SequenceEqual($other_q)             # true if equal sequence
+
+[ 8. जॉइन ]
+
+  # Join (आंतरिक जॉइन)
+  $outer->Join($inner_q,
+      sub { $_[0]{dept_id} },              # बाहरी कुंजी सिलेक्टर
+      sub { $_[0]{id} },                   # आंतरिक कुंजी सिलेक्टर
+      sub { { name => $_[0]{name},
+              dept => $_[1]{name} } }      # परिणाम सिलेक्टर
+  )
+
+  # GroupJoin (बाएं बाहरी जॉइन)
+  $outer->GroupJoin($inner_q,
+      sub { $_[0]{id} },                   # बाहरी कुंजी सिलेक्टर
+      sub { $_[0]{user_id} },              # आंतरिक कुंजी सिलेक्टर
+      sub { my($o, $i_group) = @_;
+            { name   => $o->{name},
+              orders => [ $i_group->ToArray() ] } }
+  )
+
+  # JOIN: मुख्य JSON × सब-टेबल LTSV (विभाग लुकअप)
+  my $depts = JSON::LINQ->FromLTSV('departments.ltsv');
+  JSON::LINQ->FromJSON('employees.json')
+      ->Join($depts,
+          sub { $_[0]{dept_id} },
+          sub { $_[0]{id}      },
+          sub { { name => $_[0]{name}, dept => $_[1]{name} } })
+      ->ToArray();
+
+  # JOIN: मुख्य LTSV × सब-टेबल JSON (मूल्य मास्टर)
+  my $prices = JSON::LINQ->FromJSON('prices.json');
+  JSON::LINQ->FromLTSV('orders.ltsv')
+      ->Join($prices,
+          sub { $_[0]{sku} },
+          sub { $_[0]{sku} },
+          sub { { order_id => $_[0]{id},
+                  amount   => $_[0]{qty} * $_[1]{price} } })
+      ->ToArray();
+
+  # JOIN: मुख्य CSV × सहायक JSON (मूल्य मास्टर)
+  my $prices = JSON::LINQ->FromJSON('prices.json');
+  JSON::LINQ->FromCSV('orders.csv')
+      ->Join($prices, sub { $_[0]{sku} }, sub { $_[0]{sku} },
+          sub { { order_id => $_[0]{id}, amount => $_[0]{qty} * $_[1]{price} } })
+      ->ToArray();
+
+[ 9. समग्रण (टर्मिनल) ]
+
+  ->ToArray()                            # collect all elements
+  ->ToList()                             # same as ToArray()
+  ->Count()                              # element count
+  ->Count(sub { $_[0] > 5 })            # conditional count
+  ->Sum(sub { $_[0]{amount} })          # sum of selector values
+  ->Average(sub { $_[0]{score} })       # mean (die if empty)
+  ->AverageOrDefault(sub { ... })       # mean or undef if empty
+  ->Min(sub { $_[0]{price} })           # minimum
+  ->Max(sub { $_[0]{price} })           # maximum
+  ->First()                             # first element (die if empty)
+  ->First(sub { $_[0] > 5 })            # first match (die if none)
+  ->FirstOrDefault()                    # first or undef
+  ->FirstOrDefault(sub { $_[0] > 5 })   # first match or undef
+  ->Last()                              # last element (die if empty)
+  ->Last(sub { $_[0] > 5 })             # last match (die if none)
+  ->LastOrDefault()                     # last or undef
+  ->LastOrDefault(sub { $_[0] > 5 })    # last match or undef
+  ->Single()                            # exactly one (else die)
+  ->SingleOrDefault()                   # one or undef
+  ->ElementAt($n)                       # element at index $n (0-based)
+  ->ElementAtOrDefault($n)              # element at $n or undef
+  ->Any()                               # true if non-empty
+  ->Any(sub { $_[0] > 5 })              # true if any match
+  ->All(sub { $_[0] > 0 })              # true if all match
+  ->Contains($value)                    # true if value present
+  ->ForEach(sub { print $_[0] })        # side-effect per element
+  ->Aggregate($seed, sub { $_[0] + $_[1] })  # fold/reduce
+
+[ 10. अन्य मेथड ]
+
+  ->Concat($other_q)                    # concatenate two sequences
+  ->DefaultIfEmpty($default)            # return $default if empty
+  ->Zip($other_q, sub { "$_[0]-$_[1]" }) # combine element-wise
+
+[ 11. रूपांतरण मेथड ]
+
+  ->ToArray()                           # returns Perl array
+  ->ToList()                            # alias for ToArray()
+  ->ToDictionary(sub { $_[0]{id} })     # hashref: key => element
+  ->ToDictionary(sub { $_[0]{id} },     # hashref: key => value
+                 sub { $_[0]{name} })
+  ->ToLookup(sub { $_[0]{dept} })       # hashref: key => [elements]
+  ->ToLookup(sub { $_[0]{dept} },       # hashref: key => [values]
+             sub { $_[0]{name} })
+  ->ToJSON('output.json')               # JSON ऐरे फ़ाइल के रूप में लिखें
+  ->ToJSONL('output.jsonl')             # JSONL फ़ाइल के रूप में लिखें
+  ->ToLTSV('output.ltsv')                        # LTSV फ़ाइल के रूप में लिखें (सभी कुंजी, वर्णक्रमानुसार)
+  ->ToLTSV('out.ltsv', label_order=>[qw(a b c)]) # निर्दिष्ट लेबल निर्दिष्ट क्रम में आउटपुट करें
+  ->ToLTSV('out.ltsv', headers    =>[qw(a b c)]) # label_order का उपनाम
+  ->ToCSV('output.csv')                                   # CSV फ़ाइल में लिखें (सभी कुंजी, वर्णमाला)
+  ->ToCSV('out.csv', headers=>[qw(a b c)])                # निर्दिष्ट कॉलम क्रमानुसार
+  ->ToCSV('out.csv', label_order=>[qw(a b c)])            # headers का उपनाम
+  ->ToCSV('out.csv', sep=>"\t")                           # TSV आउटपुट
+  ->ToCSV('out.csv', no_header=>1)                        # शीर्षक पंक्ति छोड़ें
+
+[ 12. बूलियन मान ]
+
+  JSON::LINQ::true    # स्ट्रिंग "true", संख्या 1
+  JSON::LINQ::false   # स्ट्रिंग "false", संख्या 0
+
+  my $rec = { active => JSON::LINQ::true };
+  # ToJSON एनकोड करता है: {"active":true}
+
+[ 13. संदर्भ लिंक ]
+
+  JSON::LINQ (MetaCPAN):
+    https://metacpan.org/dist/JSON-LINQ
+
+  JSONL specification:
+    https://jsonlines.org/
+
+  LINQ (.NET) reference (semantic inspiration):
+    https://docs.microsoft.com/en-us/dotnet/api/system.linq
+
+  LTSV::LINQ (sister module for LTSV files):
+    https://metacpan.org/dist/LTSV-LINQ
 
 ======================================================================

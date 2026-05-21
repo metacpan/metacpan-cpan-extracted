@@ -1,10 +1,31 @@
 package TUI::Memory;
+
 use strict;
 use warnings;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.000001';
+$VERSION =~ tr/_//d;
+our $AUTHORITY = 'cpan:BRICKPOOL';
 
-=encoding utf8
+use Import::Into;
+
+use TUI::Memory::Util;
+
+sub import {
+  my $target = caller;
+  TUI::Memory::Util->import::into( $target, qw( lowMemory ) );
+}
+
+sub unimport {
+  my $caller = caller;
+  TUI::Memory::Util->unimport::out_of( $caller );
+}
+
+1
+
+__END__
+
+=pod
 
 =head1 NAME
 
@@ -12,10 +33,7 @@ TUI::Memory - Memory utilities for the TUI::Vision framework
 
 =head1 SYNOPSIS
 
-    use TUI::Memory;
-
-    # Placeholder module.
-    # The full memory utility system will be migrated from TV::Memory.
+  use TUI::Memory;
 
 =head1 DESCRIPTION
 
@@ -28,33 +46,32 @@ This module re-exported:
 
 =over 4
 
-=item * Util  
+=item * L<Util|TUI::Memory::Util> -
 Utility functions such as C<lowMemory> for memory monitoring.
 
 =back
 
-This stub does not implement any of these features yet.  
-It exists solely to reserve the namespace for the upcoming migration.
+=head1 AUTHORS
 
-=head1 ROADMAP
+=over
 
-=over 4
+=item * Borland International (original Turbo Vision design)
 
-=item * Phase 2  
-Migration of TV::Memory::Util into TUI::Memory::Util.
-
-=item * Phase 3  
-Integration with TUI::Drivers for system-level memory checks.
-
-=item * Phase 4  
-Optional diagnostic hooks for TUI::Gadgets (HeapView).
+=item * J. Schneider <brickpool@cpan.org> (Perl implementation and maintenance)
 
 =back
 
-=head1 AUTHOR
+=head1 CONTRIBUTORS
 
-J. Schneider
+Contributors are documented in the POD of the respective framework modules.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 1990-1994, 1997 by Borland International
+
+Copyright (c) 2025-2026 the L</AUTHORS> as listed above.
+
+This software is licensed under the MIT license (see the LICENSE file, which is
+part of the distribution).
 
 =cut
-
-1;

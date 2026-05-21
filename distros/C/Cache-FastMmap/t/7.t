@@ -1,14 +1,14 @@
 
 #########################
 
-use Test::More tests => 13;
+use Test::More tests => 14;
 BEGIN { use_ok('Cache::FastMmap') };
 use strict;
 
 #########################
 
-# Insert your test code below, the Test::More module is use()ed here so read
-# its man page ( perldoc Test::More ) for help writing this test script.
+# write_back + empty_on_exit: dirty cache entries flush to the backing
+# store when the cache object is destroyed, not eagerly.
 
 # Test a backing store just made of a local hash
 my %BackingStore = (
@@ -110,7 +110,14 @@ $FC = undef;
 
 ok( eq_hash(\%WrittenItems, \%BackingStore), "items match 4");
 
+{
+  my $FC1 = Cache::FastMmap->new(init_file => 1, serializer => '', empty_on_exit => 1);
+  my $FC2 = Cache::FastMmap->new(init_file => 1, serializer => '', empty_on_exit => 1);
+
+  my $live = grep { defined } values %Cache::FastMmap::LiveCaches;
+  is( $live, 2, "empty_on_exit tracks multiple live caches" );
+}
+
 sub RandStr {
   return join '', map { chr(ord('a') + rand(26)) } (1 .. $_[0]);
 }
-

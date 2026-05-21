@@ -1,5 +1,5 @@
 package MCP::Run;
-our $VERSION = '0.100';
+our $VERSION = '0.103';
 use Mojo::Base 'MCP::Server', -signatures;
 
 # ABSTRACT: MCP server with a command execution tool
@@ -81,7 +81,7 @@ sub _handle_run ($self, $tool, $args) {
   my $compress = $args->{compress}         // $self->compress;
 
   my $result = $self->execute($command, $wd, $timeout);
-  return $self->format_result($tool, $result, $compress);
+  return $self->format_result($tool, $result, $compress, $command);
 }
 
 sub run_stdio ($class_or_self, %args) {
@@ -96,7 +96,7 @@ sub execute ($self, $command, $working_directory, $timeout) {
 }
 
 
-sub format_result ($self, $tool, $result, $compress = undef) {
+sub format_result ($self, $tool, $result, $compress = undef, $command = '') {
   my $exit_code = $result->{exit_code} // -1;
   my $stdout    = $result->{stdout}    // '';
   my $stderr    = $result->{stderr}    // '';
@@ -106,7 +106,7 @@ sub format_result ($self, $tool, $result, $compress = undef) {
 
   if ($compress) {
     (my $compressor) = $self->_get_compressor;
-    ($stdout, $stderr) = $compressor->compress('', $stdout, $stderr);
+    ($stdout, $stderr) = $compressor->compress($command, $stdout, $stderr);
   }
 
   my $text = "Exit code: $exit_code\n";
@@ -141,7 +141,7 @@ MCP::Run - MCP server with a command execution tool
 
 =head1 VERSION
 
-version 0.100
+version 0.103
 
 =head1 SYNOPSIS
 
@@ -293,7 +293,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

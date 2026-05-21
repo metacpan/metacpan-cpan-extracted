@@ -1,5 +1,53 @@
 Revision history for Perl distribution DateTime-Lite
 
+v0.7.1 2026-05-20T08:36:01+0900
+    [Improvement]
+    - Minor corrections in method pass_error in DateTime::Lite, DateTime::Lite::TimeZone, and DateTime::Lite::Duration
+
+v0.7.0 2026-05-17T21:29:35+0900
+    [New Feature]
+    - Added the method extended_aliases in DateTime::Lite::TimeZone to retrieve all extended timezone aliases.
+    - Added Japanese localisation for the POD documentation for all modules.
+
+v0.6.7 2026-05-05T21:08:09+0900
+    [Bug Fixes]
+    - Added checking for unknown arguments passed to constructors that were silently
+      ignored, and causing typos such as C<year> instead of C<years> in
+      C<DateTime::Lite::Duration->new> to produce incorrect results without
+      any indication of error. All constructors now return an error when an
+      unrecognised argument is supplied.
+      This includes new(), from_epoch(), from_object(), from_day_of_year(),
+      last_day_of_month(), and any future constructors that would rely on _new(), and
+      also DateTime::Lite::Duration->new and DateTime::Lite::TimeZone->new
+
+v0.6.6 2026-05-03T21:09:36+0900
+    [Bug Fixes]
+    - Corrected fallback handler. XSLoader fallback to pure-Perl was not triggered on
+      platforms with old compilers (such as FreeBSD 9.2 with GCC 4.2) that emit an
+      "Undefined symbol" error for __builtin_unreachable. The error filter regex has
+      been tuned to cover this case.
+    - Added, or corrected the following missing or broken methods to the pure-Perl
+      fallback (PERL_DATETIME_LITE_PP=1):
+        - clone(): fallback was added in DateTime::Lite.
+        - _compare(): in DateTime::Lite, moved is_infinite() check before the
+          floating-zone clone block to prevent incorrect behaviour when comparing
+          Infinite objects in pure-Perl.
+        - _posix_tz_lookup(): in DateTime::Lite::TimeZone, corrected to add pure-Perl
+          fallback.
+        - DateTime::Lite::PP: removed dependency on DateTime::LeapSecond (part of the
+          DateTime distribution). The leap second table is now inlined directly from
+          leap_seconds.h, making the pure-Perl fallback fully self-contained.
+        - DateTime::Lite::PP: _normalize_tai_seconds() and _normalize_leap_seconds()
+          did not short-circuit on non-finite values (Inf/-Inf), causing
+          DateTime::Lite::Infinite::Future and DateTime::Lite::Infinite::Past objects
+          to be constructed with corrupted utc_rd_days (-2 instead of Inf).
+          Both functions now return immediately when the seconds argument is not a
+          finite number, mirroring the dtl_isfinite() guard in the XS implementation.
+
+    [CI]
+    - Added a new job in the CI pipeline: perl-5.38-pure-perl to verify the full test
+      suite passes on every release with PERL_DATETIME_LITE_PP=1.
+
 v0.6.5 2026-04-24T15:17:55+0900
     [Bug Fixes]
     - Added %O in the supported patterns tokens for strftime(). It returns now the

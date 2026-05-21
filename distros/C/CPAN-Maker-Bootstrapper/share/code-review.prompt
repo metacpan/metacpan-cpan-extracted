@@ -1,0 +1,92 @@
+# CPAN::Maker::Bootstrapper - code review prompt
+# Edit this file to customize the code review behavior.
+# This file was installed from the distribution defaults.
+# Lines beginning with # are ignored.
+#
+- Perform a review of the code in this Perl source file.
+- The document titled with the prefix "primary:" is the file under review.
+  All findings must relate to this file only.
+- Documents titled with the prefix "context:" are reference material only.
+  Do not raise findings against context files.
+- Focus on substantive issues only: logic errors, real security
+  vulnerabilities, error handling gaps, and architectural concerns.
+- Focus on algorithmic correctness: does the logic do what the
+  documentation claims, are edge cases handled, does error handling
+  leave the system in a consistent state.
+- Do not flag style preferences, cosmetic issues, or patterns that are
+  intentional (such as the modulino pattern or postfix conditionals).
+- Severity ratings should reflect actual exploitability and impact.
+- Do not include findings the review itself concludes are not defects.
+- Confirmations that specific logic is correct are welcome but should
+  be included in the confirmations array and kept brief.
+- If a file whose title is prefixed with 'annotations:' is provided
+  observe the following rules for each annotated finding:
+  WRONG     - this finding is based on faulty logic by the LLM. The code
+              is correct. A REASON explaining the correct logic will follow
+              indented two spaces on the next line(s). Use the REASON to
+              correct your understanding; do not re-raise this finding or
+              any variation of it.
+  REJECT    - this finding has been reviewed and dismissed; do not raise it
+              or any substantially similar finding in this review
+  ACCEPT    - this finding was valid and has been fixed; confirm the fix if
+              the relevant code is present, otherwise re-raise it
+  DEFER     - this finding is known and acknowledged but not yet fixed.
+              Do not raise it as a new finding. Carry it forward unchanged
+              in the deferred array of your output.
+  CONFIRMED - finding confirmed by LLM and developer; do not re-raise
+- If a file whose title is prefixed with 'suppressions:' is provided
+  it contains permanently dismissed findings from prior review rounds.
+  Each entry includes a function name, code excerpt, and reason.
+  Do not raise any finding that matches by function, excerpt, or
+  semantic similarity to any entry in the suppressions file.
+- Output the review as a JSON object only. Do not include any text
+  outside the JSON object. Do not use markdown code fences.
+  The JSON must conform to this structure:
+  {
+    "findings": [
+      {
+        "id": 1,
+        "function": "function_name",
+        "severity": "high|medium|low|informational",
+        "disposition": null,
+        "description": "brief description",
+        "excerpt": "short code excerpt",
+        "detail": "full explanation of the finding"
+      }
+    ],
+    "confirmations": [
+      {
+        "id": 1,
+        "function": "function_name",
+        "description": "brief description of what was confirmed correct"
+      }
+    ],
+    "deferred": [
+      {
+        "id": 1,
+        "function": "function_name",
+        "description": "brief description of deferred finding"
+      }
+    ]
+  }
+- Your response must be a valid JSON object. Any fields present in the
+  annotations document that are not part of your review output
+  (findings, confirmations, deferred) must be copied verbatim into
+  your response without modification.
+- Findings from the annotations document with disposition WRONG or REJECT
+  must be included in your findings array with their disposition and
+  description preserved unchanged. Do not re-evaluate them. Do not omit them.
+- Findings with disposition WRONG-RECONSIDER were flagged as incorrect
+  in a prior review. Re-examine the specific function and code excerpt
+  carefully before deciding whether to raise them again.
+  - If after careful analysis the code is correct and the prior finding
+    was indeed wrong, carry it forward with disposition WRONG.
+  - If you can identify specifically why the prior analysis was incorrect
+    (e.g. misread control flow, wrong threat model, incorrect assumption
+    about a called function), carry it forward with disposition CONFIRMED
+    and briefly explain the correct understanding in the detail field.
+  - If the code has changed and the finding is now valid, include it
+    as a new finding with disposition null.
+  - Do not simply re-raise the finding unchanged with the same reasoning
+    that was previously rejected.
+- Output compact JSON with no whitespace outside string values.

@@ -1,12 +1,12 @@
 package File::Sticker::Scribe::Mp3;
-$File::Sticker::Scribe::Mp3::VERSION = '4.401';
+$File::Sticker::Scribe::Mp3::VERSION = '4.603';
 =head1 NAME
 
 File::Sticker::Scribe::Mp3 - read, write and standardize meta-data from MP3 file
 
 =head1 VERSION
 
-version 4.401
+version 4.603
 
 =head1 SYNOPSIS
 
@@ -62,7 +62,7 @@ File must be an MP3 file.
 sub allowed_file {
     my $self = shift;
     my $file = shift;
-    say STDERR whoami(), " file=$file" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     my $ft = $self->{file_magic}->info_from_filename($file);
     if ($ft->{mime_type} eq 'audio/mpeg')
@@ -131,7 +131,7 @@ Read the meta-data from the given file.
 sub read_meta {
     my $self = shift;
     my $filename = shift;
-    say STDERR whoami(), " filename=$filename" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     my $mp3 = MP3::Tag->new($filename);
     my %meta = ();
@@ -229,7 +229,7 @@ Overwrite the given field. This does no checking.
 sub replace_one_field {
     my $self = shift;
     my %args = @_;
-    say STDERR whoami(), " filename=$args{filename}" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     my $filename = $args{filename};
     my $field = $args{field};
@@ -313,7 +313,7 @@ For some fields, they cannot be removed, merely set to the empty string.
 sub delete_field_from_file {
     my $self = shift;
     my %args = @_;
-    say STDERR whoami(), " filename=$args{filename}" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     my $filename = $args{filename};
     my $field = $args{field};

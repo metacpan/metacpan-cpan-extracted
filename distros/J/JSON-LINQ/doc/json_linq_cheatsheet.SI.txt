@@ -1,55 +1,237 @@
 ======================================================================
- JSON::LINQ ත්වරිත යොමු කාඩ්                                  [SI] සිංහල
+ JSON::LINQ ත්වරිත යොමු කාඩ්                                [SI] සිංහල
 ======================================================================
 
-JSON සහ JSONL ගොනු සඳහා LINQ-ශෛලී විමසුම් අතුරු මුහුණත
+[ 1. විමසුම් නිර්මාණය ]
 
-[ 1. 1. විමසුම් නිර්මාණය ]
+  use JSON::LINQ;
 
-  FromJSON, FromJSONL, FromJSONString, From, Empty, Range, Repeat
+  # JSON ගොනුවකින් (ශීර්ෂ-මට්ටම් අරාව)
+  my $q = JSON::LINQ->FromJSON('data.json');
 
-[ 2. 2. පෙරීම ]
+  # JSONL ගොනුවකින් (ස්ට්‍රීමිං)
+  my $q = JSON::LINQ->FromJSONL('events.jsonl');
 
-  Where
+  # JSON නූලකින්
+  my $q = JSON::LINQ->FromJSONString('[{"id":1},{"id":2}]');
 
-[ 3. 3. ප්‍රක්ෂේපණය ]
+  # LTSV ගොනුවකින් (label:value, TAB-වෙන්, ස්ට්‍රීමිං)
+  my $q = JSON::LINQ->FromLTSV('data.ltsv');
+  # CSV ඛිලේන් (ප්‍රථම ප්රතිරෝප්ඤ්ටුව, ස්ක්‍රීමිංග්)
+  my $q = JSON::LINQ->FromCSV('data.csv');
+  my $q = JSON::LINQ->FromCSV('data.csv', sep => "\t");         # TSV
+  my $q = JSON::LINQ->FromCSV('f.csv', headers=>[qw(a b c)], skip_header=>1);
 
-  Select, SelectMany
+  # මතකයේ ඇති අරාවකින්
+  my $q = JSON::LINQ->From(\@array);
 
-[ 4. 4. අනුපිළිවෙල ]
+  # හිස් අනුක්‍රමය
+  my $q = JSON::LINQ->Empty();
 
-  OrderBy, OrderByDescending, OrderByNum, OrderByStr, ThenBy, Reverse
+  # පූර්ණ සංඛ්‍යා අනුක්‍රමය: 1, 2, 3, 4, 5
+  my $q = JSON::LINQ->Range(1, 5);
 
-[ 5. 5. පිටු ගැනීම ]
+  # අංගය N වාරයක් නැවත නැවත
+  my $q = JSON::LINQ->Repeat("x", 3);
 
-  Skip, Take, SkipWhile, TakeWhile
+  # සටහන: terminal method ඇමතූ පසු iterator ක්ෂය වේ.
+  # නැවත විමසීමට From*/From නැවත ඇමතන්න.
 
-[ 6. 6. කාණ්ඩ ගැනීම ]
+[ 2. පෙරීම ]
 
-  GroupBy, ToLookup
+  ->Where(sub { $_[0]{status} eq '200' })
+  ->Where(sub { $_[0]{score} >= 80 })
+  ->Where(sub { defined $_[0]{email} && $_[0]{email} ne '' })
 
-[ 7. 7. සමස්තතාව ]
+[ 3. ප්‍රක්ෂේපණය ]
 
-  Count, Sum, Average, Min, Max, First, Last, Any, All, ForEach, Aggregate
+  # Select: සෑම අංගයක්ම පරිවර්තනය කරන්න
+  ->Select(sub { { path => $_[0]{url}, code => $_[0]{status} } })
+  ->Select(sub { $_[0]{name} })
 
-[ 8. 8. කට්ටල මෙහෙයුම් ]
+  # SelectMany: කූඩු ගත් අරා සමතලා කරන්න (selector ARRAY ref ආපසු දිය යුතුය)
+  ->SelectMany(sub { [ @{ $_[0]{tags} } ] })
 
-  Distinct, Union, Intersect, Except
+[ 4. අනුපිළිවෙල ]
 
-[ 9. 9. පරිවර්තනය ]
+  # ප්‍රාථමික යතුර -- ස්මාර්ට් (දෙකම සංඛ්‍යා නම් සංඛ්‍යාත්මක)
+  ->OrderBy(sub { $_[0]{name} })
+  ->OrderByDescending(sub { $_[0]{score} })
 
-  ToJSON, ToJSONL, ToArray, ToDictionary, ToLookup
+  # ප්‍රාථමික යතුර -- සංඛ්‍යාත්මක සැසඳීම බලකරන්න
+  ->OrderByNum(sub { $_[0]{price} })
+  ->OrderByNumDescending(sub { $_[0]{amount} })
 
-[ 10. 10. එකතු කිරීම ]
+  # ප්‍රාථමික යතුර -- නූල් සැසඳීම බලකරන්න (cmp)
+  ->OrderByStr(sub { $_[0]{code} })
+  ->OrderByStrDescending(sub { $_[0]{name} })
 
-  Join, GroupJoin, Concat, Zip
+  # ද්විතීයික යතුර (OrderBy* ට පසු දාමයේ)
+  ->ThenBy(sub { $_[0]{name} })              # ස්මාර්ට් ආරෝහණ
+  ->ThenByDescending(sub { $_[0]{score} })   # ස්මාර්ට් අවරෝහණ
+  ->ThenByNum(sub { $_[0]{age} })            # සංඛ්‍යාත්මක ආරෝහණ
+  ->ThenByNumDescending(sub { $_[0]{age} })  # සංඛ්‍යාත්මක අවරෝහණ
+  ->ThenByStr(sub { $_[0]{name} })           # නූල් ආරෝහණ
+  ->ThenByStrDescending(sub { $_[0]{name} }) # නූල් අවරෝහණ
 
-[ 11. 11. බූලියන් අගයන් ]
+  ->Reverse()  # වත්මන් පිළිවෙල ආපසු හරවන්න
 
-  JSON::LINQ::true / JSON::LINQ::false
+[ 5. පිටු ගැනීම ]
 
-[ 12. 12. යොමු සබැඳි ]
+  ->Skip(10)  # පළමු 10 මඟ හරින්න
+  ->Take(5)   # ඊළඟ 5 ගන්න
+  ->SkipWhile(sub { $_[0]{score} < 80 })
+  ->TakeWhile(sub { $_[0]{score} >= 80 })
 
-  https://metacpan.org/dist/JSON-LINQ
+[ 6. කාණ්ඩ ගැනීම ]
+
+  # GroupBy: { Key => '...', Elements => [...] } ලබා දේ
+  my @groups = $q->GroupBy(sub { $_[0]{category} })->ToArray();
+  for my $g (@groups) {
+      printf "%s: %d\n", $g->{Key}, scalar @{$g->{Elements}};
+  }
+
+  # ToLookup: hashref of arrayrefs ලබා දේ
+  my %lookup = %{ $q->ToLookup(sub { $_[0]{dept} }) };
+  my @eng = @{ $lookup{Engineering} };
+
+  # අගය තේරීම් සහිත ToLookup
+  my %names = %{ $q->ToLookup(sub { $_[0]{dept} },
+                               sub { $_[0]{name} }) };
+
+[ 7. කට්ටල මෙහෙයුම් ]
+
+  ->Distinct()                          # deduplicate (by value)
+  ->Distinct(sub { $_[0]{id} })         # deduplicate by key
+  ->Union($other_q)                     # set union (no duplicates)
+  ->Union($other_q, sub { $_[0]{id} })  # union by key
+  ->Intersect($other_q)                 # set intersection
+  ->Intersect($other_q, sub { ... })    # intersection by key
+  ->Except($other_q)                    # set difference
+  ->Except($other_q, sub { ... })       # difference by key
+  ->SequenceEqual($other_q)             # true if equal sequence
+
+[ 8. සම්බන්ධ කිරීම (Join) ]
+
+  # Join (අභ්‍යන්තර සම්බන්ධය)
+  $outer->Join($inner_q,
+      sub { $_[0]{dept_id} },              # පිටත යතුරු තේරීම
+      sub { $_[0]{id} },                   # ඇතුළු යතුරු තේරීම
+      sub { { name => $_[0]{name},
+              dept => $_[1]{name} } }      # ප්‍රතිඵල තේරීම
+  )
+
+  # GroupJoin (වම් පිටත සම්බන්ධය)
+  $outer->GroupJoin($inner_q,
+      sub { $_[0]{id} },                   # පිටත යතුරු තේරීම
+      sub { $_[0]{user_id} },              # ඇතුළු යතුරු තේරීම
+      sub { my($o, $i_group) = @_;
+            { name   => $o->{name},
+              orders => [ $i_group->ToArray() ] } }
+  )
+
+  # JOIN: ප්‍රධාන JSON × ද්විතීය LTSV (දෙපාර්තමේන්තු සෙවීම)
+  my $depts = JSON::LINQ->FromLTSV('departments.ltsv');
+  JSON::LINQ->FromJSON('employees.json')
+      ->Join($depts,
+          sub { $_[0]{dept_id} },
+          sub { $_[0]{id}      },
+          sub { { name => $_[0]{name}, dept => $_[1]{name} } })
+      ->ToArray();
+
+  # JOIN: ප්‍රධාන LTSV × ද්විතීය JSON (මිල ප්‍රධාන)
+  my $prices = JSON::LINQ->FromJSON('prices.json');
+  JSON::LINQ->FromLTSV('orders.ltsv')
+      ->Join($prices,
+          sub { $_[0]{sku} },
+          sub { $_[0]{sku} },
+          sub { { order_id => $_[0]{id},
+                  amount   => $_[0]{qty} * $_[1]{price} } })
+      ->ToArray();
+
+  # JOIN: කෙසේ CSV × හී JSON (ප්‍රික්ොලන)
+  my $prices = JSON::LINQ->FromJSON('prices.json');
+  JSON::LINQ->FromCSV('orders.csv')
+      ->Join($prices, sub { $_[0]{sku} }, sub { $_[0]{sku} },
+          sub { { order_id => $_[0]{id}, amount => $_[0]{qty} * $_[1]{price} } })
+      ->ToArray();
+
+[ 9. සමස්තතාව (Terminal) ]
+
+  ->ToArray()                            # collect all elements
+  ->ToList()                             # same as ToArray()
+  ->Count()                              # element count
+  ->Count(sub { $_[0] > 5 })            # conditional count
+  ->Sum(sub { $_[0]{amount} })          # sum of selector values
+  ->Average(sub { $_[0]{score} })       # mean (die if empty)
+  ->AverageOrDefault(sub { ... })       # mean or undef if empty
+  ->Min(sub { $_[0]{price} })           # minimum
+  ->Max(sub { $_[0]{price} })           # maximum
+  ->First()                             # first element (die if empty)
+  ->First(sub { $_[0] > 5 })            # first match (die if none)
+  ->FirstOrDefault()                    # first or undef
+  ->FirstOrDefault(sub { $_[0] > 5 })   # first match or undef
+  ->Last()                              # last element (die if empty)
+  ->Last(sub { $_[0] > 5 })             # last match (die if none)
+  ->LastOrDefault()                     # last or undef
+  ->LastOrDefault(sub { $_[0] > 5 })    # last match or undef
+  ->Single()                            # exactly one (else die)
+  ->SingleOrDefault()                   # one or undef
+  ->ElementAt($n)                       # element at index $n (0-based)
+  ->ElementAtOrDefault($n)              # element at $n or undef
+  ->Any()                               # true if non-empty
+  ->Any(sub { $_[0] > 5 })              # true if any match
+  ->All(sub { $_[0] > 0 })              # true if all match
+  ->Contains($value)                    # true if value present
+  ->ForEach(sub { print $_[0] })        # side-effect per element
+  ->Aggregate($seed, sub { $_[0] + $_[1] })  # fold/reduce
+
+[ 10. අනෙකුත් ක්‍රම ]
+
+  ->Concat($other_q)                    # concatenate two sequences
+  ->DefaultIfEmpty($default)            # return $default if empty
+  ->Zip($other_q, sub { "$_[0]-$_[1]" }) # combine element-wise
+
+[ 11. පරිවර්තන ක්‍රම ]
+
+  ->ToArray()                           # returns Perl array
+  ->ToList()                            # alias for ToArray()
+  ->ToDictionary(sub { $_[0]{id} })     # hashref: key => element
+  ->ToDictionary(sub { $_[0]{id} },     # hashref: key => value
+                 sub { $_[0]{name} })
+  ->ToLookup(sub { $_[0]{dept} })       # hashref: key => [elements]
+  ->ToLookup(sub { $_[0]{dept} },       # hashref: key => [values]
+             sub { $_[0]{name} })
+  ->ToJSON('output.json')               # JSON array ගොනුවක් ලෙස ලිවීම
+  ->ToJSONL('output.jsonl')             # JSONL ගොනුවක් ලෙස ලිවීම
+  ->ToLTSV('output.ltsv')                        # LTSV ගොනුවක් ලෙස ලිවීම (සියලු key, හෝඩිය අනුව)
+  ->ToLTSV('out.ltsv', label_order=>[qw(a b c)]) # නිශ්චිත label නිශ්චිත අනුපිළිවෙලින් ප්‍රතිදානය කරන්න
+  ->ToLTSV('out.ltsv', headers    =>[qw(a b c)]) # label_order හි අන්වර්ථ නාමය
+  ->ToCSV('output.csv')                        # CSV ඛිලේ ලිවීම
+  ->ToCSV('out.csv', headers=>[qw(a b c)])     # පේදේල් තීරු පීල්වේල්
+  ->ToCSV('out.csv', label_order=>[qw(a b c)]) # headers ට විඛල්ඤ න්යාමය
+  ->ToCSV('out.csv', sep=>"\t", no_header=>1)   # TSV
+
+[ 12. බූලියන් අගයන් ]
+
+  JSON::LINQ::true    # නූල "true", සංඛ්‍යාව 1
+  JSON::LINQ::false   # නූල "false", සංඛ්‍යාව 0
+
+  my $rec = { active => JSON::LINQ::true };
+  # ToJSON කේතනය කරයි: {"active":true}
+
+[ 13. යොමු සබැඳි ]
+
+  JSON::LINQ (MetaCPAN):
+    https://metacpan.org/dist/JSON-LINQ
+
+  JSONL specification:
+    https://jsonlines.org/
+
+  LINQ (.NET) reference (semantic inspiration):
+    https://docs.microsoft.com/en-us/dotnet/api/system.linq
+
+  LTSV::LINQ (sister module for LTSV files):
+    https://metacpan.org/dist/LTSV-LINQ
 
 ======================================================================

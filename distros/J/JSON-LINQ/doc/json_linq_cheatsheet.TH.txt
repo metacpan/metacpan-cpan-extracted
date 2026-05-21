@@ -1,55 +1,239 @@
 ======================================================================
- JSON::LINQ ชีทโกง                                            [TH] ภาษาไทย
+ JSON::LINQ ชีทโกง                                        [TH] ภาษาไทย
 ======================================================================
 
-ใช้ JSON::LINQ เพื่อค้นหาข้อมูล JSON และ JSONL
+[ 1. การสร้างคิวรี ]
 
-[ 1. 1. การสร้างคิวรี ]
+  use JSON::LINQ;
 
-  FromJSON, FromJSONL, FromJSONString, From, Empty, Range, Repeat
+  # จากไฟล์ JSON (อาร์เรย์ระดับบนสุด)
+  my $q = JSON::LINQ->FromJSON('data.json');
 
-[ 2. 2. การกรอง ]
+  # จากไฟล์ JSONL (สตรีมมิ่ง)
+  my $q = JSON::LINQ->FromJSONL('events.jsonl');
 
-  Where
+  # จากสตริง JSON
+  my $q = JSON::LINQ->FromJSONString('[{"id":1},{"id":2}]');
 
-[ 3. 3. การฉาย ]
+  # จากไฟล์ LTSV (label:value, TAB-คั่น, สตรีมมิ่ง)
+  my $q = JSON::LINQ->FromLTSV('data.ltsv');
+  # จากไฟล์ CSV (แถวแรกเป็นส่วนหัว, สตรีมมิ่ง)
+  my $q = JSON::LINQ->FromCSV('data.csv');
+  my $q = JSON::LINQ->FromCSV('data.csv', sep => "\t");         # TSV
+  my $q = JSON::LINQ->FromCSV('f.csv', headers=>[qw(a b c)]);  # ไม่มีส่วนหัว
+  my $q = JSON::LINQ->FromCSV('f.csv', headers=>[qw(a b c)], skip_header=>1);
 
-  Select, SelectMany
+  # จากอาร์เรย์ในหน่วยความจำ
+  my $q = JSON::LINQ->From(\@array);
 
-[ 4. 4. การเรียงลำดับ ]
+  # ลำดับว่าง
+  my $q = JSON::LINQ->Empty();
 
-  OrderBy, OrderByDescending, OrderByNum, OrderByStr, ThenBy, Reverse
+  # ลำดับจำนวนเต็ม: 1, 2, 3, 4, 5
+  my $q = JSON::LINQ->Range(1, 5);
 
-[ 5. 5. การแบ่งหน้า ]
+  # ทำซ้ำองค์ประกอบ N ครั้ง
+  my $q = JSON::LINQ->Repeat("x", 3);
 
-  Skip, Take, SkipWhile, TakeWhile
+  # หมายเหตุ: หลังเรียก terminal method iterator จะหมด
+  # หากต้องการสอบถามอีก ให้เรียก From*/From ใหม่
 
-[ 6. 6. การจัดกลุ่ม ]
+[ 2. การกรอง ]
 
-  GroupBy, ToLookup
+  ->Where(sub { $_[0]{status} eq '200' })
+  ->Where(sub { $_[0]{score} >= 80 })
+  ->Where(sub { defined $_[0]{email} && $_[0]{email} ne '' })
 
-[ 7. 7. การรวม ]
+[ 3. การฉาย ]
 
-  Count, Sum, Average, Min, Max, First, Last, Any, All, ForEach, Aggregate
+  # Select: แปลงองค์ประกอบแต่ละตัว
+  ->Select(sub { { path => $_[0]{url}, code => $_[0]{status} } })
+  ->Select(sub { $_[0]{name} })
 
-[ 8. 8. การดำเนินการชุด ]
+  # SelectMany: ทำให้อาร์เรย์ซ้อนกันแบนราบ (selector ต้องคืน ARRAY ref)
+  ->SelectMany(sub { [ @{ $_[0]{tags} } ] })
 
-  Distinct, Union, Intersect, Except
+[ 4. การเรียงลำดับ ]
 
-[ 9. 9. การแปลง ]
+  # คีย์หลัก -- อัจฉริยะ (ตัวเลขหากดูเหมือนตัวเลขทั้งคู่)
+  ->OrderBy(sub { $_[0]{name} })
+  ->OrderByDescending(sub { $_[0]{score} })
 
-  ToJSON, ToJSONL, ToArray, ToDictionary, ToLookup
+  # คีย์หลัก -- บังคับเปรียบเทียบตัวเลข
+  ->OrderByNum(sub { $_[0]{price} })
+  ->OrderByNumDescending(sub { $_[0]{amount} })
 
-[ 10. 10. การเชื่อมต่อ ]
+  # คีย์หลัก -- บังคับเปรียบเทียบสตริง (cmp)
+  ->OrderByStr(sub { $_[0]{code} })
+  ->OrderByStrDescending(sub { $_[0]{name} })
 
-  Join, GroupJoin, Concat, Zip
+  # คีย์รอง (เชื่อมต่อหลัง OrderBy*)
+  ->ThenBy(sub { $_[0]{name} })              # อัจฉริยะ จากน้อยไปมาก
+  ->ThenByDescending(sub { $_[0]{score} })   # อัจฉริยะ จากมากไปน้อย
+  ->ThenByNum(sub { $_[0]{age} })            # ตัวเลข จากน้อยไปมาก
+  ->ThenByNumDescending(sub { $_[0]{age} })  # ตัวเลข จากมากไปน้อย
+  ->ThenByStr(sub { $_[0]{name} })           # สตริง จากน้อยไปมาก
+  ->ThenByStrDescending(sub { $_[0]{name} }) # สตริง จากมากไปน้อย
 
-[ 11. 11. ค่าบูลีน ]
+  ->Reverse()  # ย้อนลำดับปัจจุบัน
 
-  JSON::LINQ::true / JSON::LINQ::false
+[ 5. การแบ่งหน้า ]
 
-[ 12. 12. ลิงก์อ้างอิง ]
+  ->Skip(10)  # ข้ามรายการแรก 10 รายการ
+  ->Take(5)   # เอา 5 รายการถัดไป
+  ->SkipWhile(sub { $_[0]{score} < 80 })
+  ->TakeWhile(sub { $_[0]{score} >= 80 })
 
-  https://metacpan.org/dist/JSON-LINQ
+[ 6. การจัดกลุ่ม ]
+
+  # GroupBy: คืนค่า { Key => '...', Elements => [...] }
+  my @groups = $q->GroupBy(sub { $_[0]{category} })->ToArray();
+  for my $g (@groups) {
+      printf "%s: %d\n", $g->{Key}, scalar @{$g->{Elements}};
+  }
+
+  # ToLookup: คืนค่า hashref of arrayrefs
+  my %lookup = %{ $q->ToLookup(sub { $_[0]{dept} }) };
+  my @eng = @{ $lookup{Engineering} };
+
+  # ToLookup พร้อม value selector
+  my %names = %{ $q->ToLookup(sub { $_[0]{dept} },
+                               sub { $_[0]{name} }) };
+
+[ 7. การดำเนินการชุด ]
+
+  ->Distinct()                          # deduplicate (by value)
+  ->Distinct(sub { $_[0]{id} })         # deduplicate by key
+  ->Union($other_q)                     # set union (no duplicates)
+  ->Union($other_q, sub { $_[0]{id} })  # union by key
+  ->Intersect($other_q)                 # set intersection
+  ->Intersect($other_q, sub { ... })    # intersection by key
+  ->Except($other_q)                    # set difference
+  ->Except($other_q, sub { ... })       # difference by key
+  ->SequenceEqual($other_q)             # true if equal sequence
+
+[ 8. การเชื่อมต่อ (Join) ]
+
+  # Join (inner join)
+  $outer->Join($inner_q,
+      sub { $_[0]{dept_id} },              # outer key selector
+      sub { $_[0]{id} },                   # inner key selector
+      sub { { name => $_[0]{name},
+              dept => $_[1]{name} } }      # result selector
+  )
+
+  # GroupJoin (left outer join)
+  $outer->GroupJoin($inner_q,
+      sub { $_[0]{id} },                   # outer key selector
+      sub { $_[0]{user_id} },              # inner key selector
+      sub { my($o, $i_group) = @_;
+            { name   => $o->{name},
+              orders => [ $i_group->ToArray() ] } }
+  )
+
+  # JOIN: JSON หลัก × LTSV ย่อย (ค้นหาแผนก)
+  my $depts = JSON::LINQ->FromLTSV('departments.ltsv');
+  JSON::LINQ->FromJSON('employees.json')
+      ->Join($depts,
+          sub { $_[0]{dept_id} },
+          sub { $_[0]{id}      },
+          sub { { name => $_[0]{name}, dept => $_[1]{name} } })
+      ->ToArray();
+
+  # JOIN: LTSV หลัก × JSON ย่อย (ราคา master)
+  my $prices = JSON::LINQ->FromJSON('prices.json');
+  JSON::LINQ->FromLTSV('orders.ltsv')
+      ->Join($prices,
+          sub { $_[0]{sku} },
+          sub { $_[0]{sku} },
+          sub { { order_id => $_[0]{id},
+                  amount   => $_[0]{qty} * $_[1]{price} } })
+      ->ToArray();
+
+  # JOIN: CSV หลัก × JSON รอง (ตารางราคา)
+  my $prices = JSON::LINQ->FromJSON('prices.json');
+  JSON::LINQ->FromCSV('orders.csv')
+      ->Join($prices, sub { $_[0]{sku} }, sub { $_[0]{sku} },
+          sub { { order_id => $_[0]{id}, amount => $_[0]{qty} * $_[1]{price} } })
+      ->ToArray();
+
+[ 9. การรวม (Terminal) ]
+
+  ->ToArray()                            # collect all elements
+  ->ToList()                             # same as ToArray()
+  ->Count()                              # element count
+  ->Count(sub { $_[0] > 5 })            # conditional count
+  ->Sum(sub { $_[0]{amount} })          # sum of selector values
+  ->Average(sub { $_[0]{score} })       # mean (die if empty)
+  ->AverageOrDefault(sub { ... })       # mean or undef if empty
+  ->Min(sub { $_[0]{price} })           # minimum
+  ->Max(sub { $_[0]{price} })           # maximum
+  ->First()                             # first element (die if empty)
+  ->First(sub { $_[0] > 5 })            # first match (die if none)
+  ->FirstOrDefault()                    # first or undef
+  ->FirstOrDefault(sub { $_[0] > 5 })   # first match or undef
+  ->Last()                              # last element (die if empty)
+  ->Last(sub { $_[0] > 5 })             # last match (die if none)
+  ->LastOrDefault()                     # last or undef
+  ->LastOrDefault(sub { $_[0] > 5 })    # last match or undef
+  ->Single()                            # exactly one (else die)
+  ->SingleOrDefault()                   # one or undef
+  ->ElementAt($n)                       # element at index $n (0-based)
+  ->ElementAtOrDefault($n)              # element at $n or undef
+  ->Any()                               # true if non-empty
+  ->Any(sub { $_[0] > 5 })              # true if any match
+  ->All(sub { $_[0] > 0 })              # true if all match
+  ->Contains($value)                    # true if value present
+  ->ForEach(sub { print $_[0] })        # side-effect per element
+  ->Aggregate($seed, sub { $_[0] + $_[1] })  # fold/reduce
+
+[ 10. เมธอดอื่น ๆ ]
+
+  ->Concat($other_q)                    # concatenate two sequences
+  ->DefaultIfEmpty($default)            # return $default if empty
+  ->Zip($other_q, sub { "$_[0]-$_[1]" }) # combine element-wise
+
+[ 11. เมธอดแปลง ]
+
+  ->ToArray()                           # returns Perl array
+  ->ToList()                            # alias for ToArray()
+  ->ToDictionary(sub { $_[0]{id} })     # hashref: key => element
+  ->ToDictionary(sub { $_[0]{id} },     # hashref: key => value
+                 sub { $_[0]{name} })
+  ->ToLookup(sub { $_[0]{dept} })       # hashref: key => [elements]
+  ->ToLookup(sub { $_[0]{dept} },       # hashref: key => [values]
+             sub { $_[0]{name} })
+  ->ToJSON('output.json')               # เขียนเป็นไฟล์ JSON array
+  ->ToJSONL('output.jsonl')             # เขียนเป็นไฟล์ JSONL
+  ->ToLTSV('output.ltsv')                        # เขียนเป็นไฟล์ LTSV (ทุก key, เรียงตามตัวอักษร)
+  ->ToLTSV('out.ltsv', label_order=>[qw(a b c)]) # ส่งออก label ที่ระบุตามลำดับที่ระบุ
+  ->ToLTSV('out.ltsv', headers    =>[qw(a b c)]) # นามแฝงของ label_order
+  ->ToCSV('output.csv')                                   # เขียนเป็นไฟล์ CSV (ทุกคีย์, ตัวอักษร)
+  ->ToCSV('out.csv', headers=>[qw(a b c)])                # คอลัมน์ที่ระบุตามลำดับ
+  ->ToCSV('out.csv', label_order=>[qw(a b c)])            # ชื่อแทนของ headers
+  ->ToCSV('out.csv', sep=>"\t")                           # ผลลัพธ์ TSV
+  ->ToCSV('out.csv', no_header=>1)                        # ไม่แสดงแถวส่วนหัว
+
+[ 12. ค่าบูลีน ]
+
+  JSON::LINQ::true    # สตริง "true", ตัวเลข 1
+  JSON::LINQ::false   # สตริง "false", ตัวเลข 0
+
+  my $rec = { active => JSON::LINQ::true };
+  # ToJSON เข้ารหัสเป็น: {"active":true}
+
+[ 13. ลิงก์อ้างอิง ]
+
+  JSON::LINQ (MetaCPAN):
+    https://metacpan.org/dist/JSON-LINQ
+
+  JSONL specification:
+    https://jsonlines.org/
+
+  LINQ (.NET) reference (semantic inspiration):
+    https://docs.microsoft.com/en-us/dotnet/api/system.linq
+
+  LTSV::LINQ (sister module for LTSV files):
+    https://metacpan.org/dist/LTSV-LINQ
 
 ======================================================================

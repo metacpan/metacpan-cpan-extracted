@@ -2,7 +2,7 @@ package App::perlimports::Include;
 
 use Moo;
 
-our $VERSION = '0.000059';
+our $VERSION = '0.000060';
 
 ## no critic (Bangs::ProhibitDebuggingModules)
 
@@ -788,7 +788,7 @@ App::perlimports::Include - Encapsulate one use statement in a document
 
 =head1 VERSION
 
-version 0.000059
+version 0.000060
 
 =head1 METHODS
 

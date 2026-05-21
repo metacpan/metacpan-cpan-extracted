@@ -1,8 +1,14 @@
 Revision history for MIDI-Util
 
+0.1305 2026-04-27 07:32:03
+    - Fix typo in docs.
+    - Only substitute MIDI s/f for #/b if a flag is given as the first argument to the midi_format() function.
+    - Fix dist.ini bits.
+
 0.1304 2025-02-02 18:44:37
     - Fix copyright and email.
     - Improve documentation.
+    - Fix the play_fluidsynth() logic.
 
 0.1303 2025-02-02 18:28:17
     - Fix the play_timidity() function.

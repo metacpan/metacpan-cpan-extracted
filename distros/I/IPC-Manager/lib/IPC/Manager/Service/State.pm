@@ -133,8 +133,15 @@ sub ipcm_service {
 
     $new_inst->pre_fork_hook();
 
-    $exec->{json} = IPC::Manager::Serializer::JSON->serialize(\%params)
-        if $exec;
+    # Forward the stay_in_begin flag (only) into the child's params.
+    # The 'exec' key is otherwise stripped on the parent side and the
+    # child needs to know whether import() should call _ipcm_service
+    # synchronously at BEGIN time (stay_in_begin = 1) or stash the
+    # closure for the -e snippet to fire at runtime.
+    $exec->{json} = IPC::Manager::Serializer::JSON->serialize({
+        %params,
+        exec => { stay_in_begin => $exec->{stay_in_begin} ? 1 : 0 },
+    }) if $exec;
 
     my $pid = fork // die "Could not fork: $!";
 
@@ -212,33 +219,61 @@ sub _ipcm_service {
     # ipcm_service() calls from inside the running service both unwind
     # back here via `longjump IPCM_SERVICE`, after which the loop re-runs
     # setjump() with $service_inst pointing at the replacement.
+    #
+    # If the running service consumes Role::Service with
+    # run_returns_to_caller() true, run() returning normally stores the
+    # exit code in $returning_exit and lets _ipcm_service return it to
+    # its caller (used by the exec.stay_in_begin = 1 BEGIN-return path).
+    my $returning_exit;
     while (1) {
         my $jumped = setjump IPCM_SERVICE => sub {
             # Snapshot: $service_inst can be replaced before this block exits.
             my $using_service = $service_inst;
 
-            my $do_posix_exit = ref($using_service) ne 'CODE' && $using_service->use_posix_exit;
+            my $is_code       = ref($using_service) eq 'CODE';
+            my $do_posix_exit = !$is_code && $using_service->use_posix_exit;
 
-            eval {
-                if (ref($using_service) eq 'CODE') {
-                    my $exit = $using_service->();
-                    exit($exit);
+            my $exit;
+            my $ok = eval {
+                if ($is_code) {
+                    $exit = $using_service->();
                 }
                 else {
-                    my $exit = $using_service->run() // 0;
-                    $do_posix_exit ? POSIX::_exit($exit) : exit($exit);
+                    $exit = $using_service->run() // 0;
                 }
                 1;
-            } or warn $@;
+            };
+            warn $@ unless $ok;
 
-            $do_posix_exit ? POSIX::_exit(255) : exit(255);
+            if (   $ok
+                && !$is_code
+                && $using_service->can('run_returns_to_caller')
+                && $using_service->run_returns_to_caller)
+            {
+                $returning_exit = \$exit;
+                return;
+            }
+
+            my $code = $ok ? $exit : 255;
+            if ($is_code) {
+                exit($code);
+            }
+            else {
+                $do_posix_exit ? POSIX::_exit($code) : exit($code);
+            }
         };
 
-        # setjump returns undef if the sub returned normally (never, in
-        # practice -- we always exit()).  Any other value means longjump
-        # was called and we loop with the updated $service_inst.
+        # setjump returns undef if the sub returned normally.  Two
+        # cases reach here: (a) the run-returns-to-caller opt-in
+        # stored an exit in $returning_exit -- break and let
+        # _ipcm_service return it; (b) the (unexpected) scope-leak
+        # path -- fall through to the warn + _exit(255) below.  Any
+        # other value means longjump was called and we re-run setjump
+        # with the updated $service_inst.
         last unless $jumped;
     }
+
+    return $$returning_exit if $returning_exit;
 
     # This should not be reachable....
     eval { warn "Scope leak in service '$name' process $$" };
@@ -321,6 +356,43 @@ Returns the PID of the newly forked worker to the parent; in the worker
 process the callback is invoked and the function never returns.
 
 =back
+
+=head1 EXEC AND STAY-IN-BEGIN MODE
+
+When C<ipcm_service> is invoked with an C<exec> parameter, the freshly-forked
+child does not re-enter the in-process service loop directly; instead it
+C<exec>s a new perl with C<-MIPC::Manager::Service::State> and a serialised
+parameter blob on C<@ARGV>.  Perl loads this module at boot, which means
+C<import> runs at C<BEGIN> time of the C<-e> snippet that follows on the
+command line.
+
+By default C<import> stashes a closure on the module so that the service
+starts only once the Perl runtime exits C<BEGIN> and runs the C<-e> snippet,
+which calls C<_post_exec_run>.  This is the right shape for normal services:
+the interpreter is fully past BEGIN by the time the service event loop spins
+up, so anything the loop does happens in a "running program" context.
+
+The C<exec =E<gt> { stay_in_begin =E<gt> 1 }> variant flips that: C<import>
+calls C<_ipcm_service> synchronously, while the C<-M> hook is still on the
+stack and Perl has not yet finished parsing the C<-e> entry script.  This
+mode exists for services that need to keep the interpreter in
+"parsing the entry script" state while the service loop runs -- typically so
+they can, on some incoming request, hand the entry script's source off to a
+source filter like L<goto::file> and let the test (or other target) compile
+in C<main> with a shallow stack.
+
+For that hand-off to be usable, C<_ipcm_service> must eventually return all
+the way back through C<import> and out of BEGIN, instead of calling C<exit>
+once C<run()> finishes.  Services that want this behaviour B<must> consume
+L<IPC::Manager::Role::Service> and override C<run_returns_to_caller> to
+return true.  The combination -- C<exec.stay_in_begin = 1> on the launching
+side, C<run_returns_to_caller> true on the consuming class -- is the
+supported pattern for "preload services that hand off to a forked,
+freshly-C<goto::file>'d test grandchild".  The Test2-Harness preload service
+is the canonical example consumer.
+
+For every other service the default (C<run_returns_to_caller> returning C<0>)
+keeps the existing "always exit after C<run()> returns" behaviour.
 
 =head1 SOURCE
 

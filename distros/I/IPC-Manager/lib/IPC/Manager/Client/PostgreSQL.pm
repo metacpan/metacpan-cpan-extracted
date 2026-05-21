@@ -2,7 +2,7 @@ package IPC::Manager::Client::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000035';
+our $VERSION = '0.000037';
 
 use Carp qw/croak/;
 use File::Temp qw/tempdir/;
@@ -37,10 +37,11 @@ sub table_sql {
     return (
         <<"        EOT",
             CREATE TABLE IF NOT EXISTS ipcm_peers(
-                "id"        VARCHAR(512)    NOT NULL PRIMARY KEY,
-                "pid"       INTEGER         DEFAULT NULL,
-                "active"    NUMERIC         DEFAULT EXTRACT(epoch FROM NOW()),
-                "stats"     BYTEA           DEFAULT NULL
+                "id"                VARCHAR(512)    NOT NULL PRIMARY KEY,
+                "pid"               INTEGER         DEFAULT NULL,
+                "active"            NUMERIC         DEFAULT EXTRACT(epoch FROM NOW()),
+                "stats"             BYTEA           DEFAULT NULL,
+                "suspend_expires"   NUMERIC         DEFAULT NULL
             );
         EOT
         <<"        EOT",
@@ -64,7 +65,10 @@ sub spawn {
 
     my $dsn = $params{route};
 
-    unless ($dsn) {
+    if (!$dsn && $params{dbh}) {
+        $dsn = $params{+ROUTE} = $class->route_from_dbh($params{dbh});
+    }
+    elsif (!$dsn) {
         require DBIx::QuickDB;
         my $qdb = DBIx::QuickDB->build_db(pg_db => {driver => 'PostgreSQL'});
         $params{+QDB}  = $qdb;

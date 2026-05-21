@@ -1,6 +1,10 @@
+on 'configure' => sub {
+    requires 'File::ShareDir::Install';
+};
+
 requires 'JSON::XS';
 requires 'YAML::XS';
-requires 'TOML::Tiny';
+requires 'TOML::Parser';
 requires 'Capture::Tiny';
 requires 'Getopt::Long';
 requires 'Digest::MD5';
@@ -27,8 +31,4 @@ on 'develop' => sub {
     recommends 'DBD::Pg';
     recommends 'DBD::ODBC';
     recommends 'DBD::Oracle';
-};
-
-on 'test' => sub {
-    requires 'Test::Pod';
 };

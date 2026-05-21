@@ -1,5 +1,5 @@
 package Langertha::Metrics;
-our $VERSION = '0.500';
+our $VERSION = '0.502';
 # ABSTRACT: Backwards-compat facade over Langertha::Usage / Pricing / Cost / UsageRecord
 use strict;
 use warnings;
@@ -100,7 +100,7 @@ Langertha::Metrics - Backwards-compat facade over Langertha::Usage / Pricing / C
 
 =head1 VERSION
 
-version 0.500
+version 0.502
 
 =head1 SUPPORT
 

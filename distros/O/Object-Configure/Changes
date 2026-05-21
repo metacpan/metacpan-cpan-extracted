@@ -1,7 +1,77 @@
 Revision history for Object::Configure - Runtime Configuration for an Object
 
+0.21	Thu May 21 07:55:13 EDT 2026
+
+	[Bug Fixes]
+	- Bump minimum version of Params::Get and Config::Abstraction
+
+0.20	Tue May 19 08:51:20 EDT 2026
+
+	[Enhancement]
+	- Improve the method documentation
+
+	[Bug Fixes]
+	- Fixed disable_hot_reload() hanging indefinitely when child process does not exit on SIGTERM
+		During mutation testing the forked watcher process can be left in a state where it never receives or acts on SIGTERM, causing waitpid to block forever.
+		The fix replaces the unconditional waitpid with a non-blocking poll loop with a 5-second deadline, then escalates to SIGKILL if the child is still alive, followed by a final waitpid that is safe because SIGKILL cannot be caught or deferred.
+	- Fixed configure() logger dispatch ignoring NULL and re-wrapping existing Log::Abstraction instances
+	- Fixed looking in the correct directory for a object class to reload
+	- Fixed _reload_object_config() to use full config file paths during hot reload.
+		Previously attempted to reload from basename only (e.g., 'app.yml') instead
+		of full path stored in _config_files array. This caused -f test to fail and
+		reload to silently return without updating object properties or calling
+		_on_config_reload hooks. Now uses the last (most specific) path from
+		_config_files array when available, falling back to _config_file for
+		backward compatibility. Added explicit return statement for consistency.
+	- Sanity check that class is given to configure()
+	- Fixed register_object() to return void consistently.
+		Previously returned a coderef on first call (from $SIG{USR1} assignment),
+		undef on Windows, and false on subsequent calls. Now explicitly returns
+		nothing via 'return;' at end of function to match API specification.
+	- Fixed restore_signal_handlers() to return void consistently.
+		Previously returned undef when handler was defined and empty list when
+		not defined. Now explicitly returns nothing via 'return;' at end of
+		function to match API specification.
+	- Automatically preserve coderefs and blessed objects passed to configure().
+		Config::Abstraction treats unknown scalar values as config file paths,
+		which corrupts coderef and object references. The configure() function
+		now automatically stashes these values before processing and restores
+		them afterward, eliminating the need for users to implement manual
+		stash-delete-restore patterns in their constructors. The logger
+		parameter continues to receive special handling for wrapping in
+		Log::Abstraction. Added comprehensive test suite (t/coderef.t) to
+		verify preservation of coderefs and blessed objects.
+	- Fixed _deep_merge() to correctly return overlay value when overlay is not a hash.
+		Previously returned base value instead of overlay, violating the principle
+		that overlay should always take precedence. Changed line to
+		'return $overlay unless ref($overlay) eq "HASH"'.
+	- Fixed logger='NULL' handling to prevent unwanted logger creation.
+		When logger parameter was set to 'NULL', code would skip wrapping but fall
+		through to else clause which created a default Log::Abstraction anyway.
+		Restructured logic to explicitly check for 'NULL' first and preserve it
+		without creating any logger. Also optimized to avoid dereferencing
+		$params->{'logger'} twice by using the already-assigned $logger variable.
+	- Comprehensive POD documentation updates for all public methods.
+		Added detailed documentation for configure(), instantiate(),
+		enable_hot_reload(), disable_hot_reload(), reload_config(),
+		register_object(), restore_signal_handlers(), and get_signal_handler_info().
+		Each method now includes Purpose, Arguments, Returns, Side Effects, Notes,
+		Usage Example, API Specification (Params::Validate::Strict compatible
+		input schema and Return::Set compatible output schema), and Formal
+		Specification (Z notation). Added comprehensive white-box test suite
+		(t/function.t) covering all public and private functions.
+
 0.19	Fri Dec 12 08:07:32 EST 2025
-	Enable reading from universal.yaml etc.
+
+	[Enhancement]
+	- Added UNIVERSAL configuration inheritance support.
+	All classes now automatically inherit from a universal.yml (or .conf,
+	.json, etc.) configuration file if present. This allows application-wide
+	defaults to be set once and inherited by all classes unless explicitly
+	overridden. Modified _walk_isa() to explicitly include UNIVERSAL in the
+	inheritance chain for classes with no explicit parents. Added test suite
+	(t/universal.t) to verify UNIVERSAL inheritance across multiple classes
+	and inheritance levels. Updated POD with UNIVERSAL CONFIGURATION section.
 
 0.18	Thu Dec 11 11:58:01 EST 2025
 	If a parent class hierachy can't be found, ensure we still load the given path/file

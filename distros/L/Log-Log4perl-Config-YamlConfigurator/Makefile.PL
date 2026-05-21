@@ -65,8 +65,8 @@ my %att = (
 
 if ( caller() ) {
   *WriteMakefile = sub {
-    my $att = { @_ };
-    @ARGV ? $att->{ $ARGV[ 0 ] } : $att
+    my %args = @_;
+    @ARGV ? [ @args{ @ARGV } ] : \%args
   }
 } else {
   require ExtUtils::MakeMaker::CPANfile;

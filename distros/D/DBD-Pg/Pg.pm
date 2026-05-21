@@ -16,7 +16,7 @@ use 5.008001;
 {
     package DBD::Pg;
 
-    use version; our $VERSION = qv('3.20.0');
+    use version; our $VERSION = qv('3.20.2');
 
     use DBI 1.614 ();
     use Exporter ();
@@ -137,7 +137,7 @@ use 5.008001;
         $class .= '::dr';
 
         ## Work around for issue found in https://rt.cpan.org/Ticket/Display.html?id=83057
-        my $realversion = qv('3.20.0');
+        my $realversion = qv('3.20.2');
 
         $drh = DBI::_new_drh($class, {
             'Name'        => 'Pg',
@@ -1707,7 +1707,7 @@ DBD::Pg - PostgreSQL database driver for the DBI module
 
 =head1 VERSION
 
-This documents version 3.20.0 of the DBD::Pg module
+This documents version 3.20.2 of the DBD::Pg module
 
 =head1 DESCRIPTION
 
@@ -1815,7 +1815,36 @@ whether to use SSL to connect to the database:
 
 =item * require: connect only with SSL
 
+=item * verify-ca: connect only with SSL and verify that the server 
+certificate is issued by a trusted certificate authority (CA)
+
+=item * verify-full: connect only with SSL, verify that the server 
+certificate is issued by a trusted CA, and verify that the server host
+name matches that in the certificate
+
 =back
+
+The latter two options are only supported on Postgres version 8.4
+or higher.
+
+The I<sslrootcert> parameter can be used to specify the complete path
+to a file containing the root certificate for the server
+(C<sslrootcert=/path/to/root.crt>) or to use the certificates trusted by
+your OS (C<sslrootcert=system>). Other SSL-related connection parameters
+also can be specified and may need to be. Refer to the
+L<PostgreSQL libpq SSL documentation|https://www.postgresql.org/docs/current/libpq-ssl.html>
+for the complete list and the latest details on how to configure SSL
+connections.
+
+For example, to specify that SSL is required for connecting to a host
+over the network and and to do full verification of the server's
+certificate, you might specify this:
+
+  $dbh = DBI->connect('dbi:Pg:dbname=foo;host=example.com;' .
+    'sslmode=verify-full;sslrootcert=system',
+    $username,
+    $password,
+    {AutoCommit => 0, RaiseError => 1});
 
 You can also connect using sockets in a specific directory. This 
 may be needed if the server you are connecting to has a different 
@@ -2818,7 +2847,7 @@ server version 9.0 or higher.
 
 The C<ping> method determines if there is a working connection to an active 
 database server. It does this by sending a small query to the server, currently 
-B<'DBD::Pg ping test v3.20.0'>. It returns 0 (false) if the connection is not valid,
+B<'DBD::Pg ping test v3.20.2'>. It returns 0 (false) if the connection is not valid,
 otherwise it returns a positive number (true). It should never throw an exception. 
 The value returned indicates the current state:
 

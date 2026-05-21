@@ -102,14 +102,14 @@ subtest 'getline' => sub
     like( $line, qr/^\#\!perl/, 'Read first line again' );
 
     {
-        no warnings 'Module::Generic::File::IO';
+        no warnings 'Module::Generic';
         is( ( $line = $io->getline( 'Boom' ) ), undef, 'caught an exception' );
     }
     like( $io->error->message, qr/usage.*getline\(\) at .* line /, 'getline usage' );
     is( $line, undef, 'return value is undef upon exception' );
     
     {
-        no warnings 'Module::Generic::File::IO';
+        no warnings 'Module::Generic';
         ( $list, $context ) = $io->getlines( 'Boom' );
     }
     is( $list, undef, 'caught another exception' );
@@ -117,14 +117,14 @@ subtest 'getline' => sub
     is( $list, undef, 'empty return list in list context upon exception' );
     
     {
-        no warnings 'Module::Generic::File::IO';
+        no warnings 'Module::Generic';
         is( ( $line = $io->getlines ), undef, 'caught another exception' );
     }
     like( $io->error->message, qr/Can't call .*getlines in a scalar context.* at .* line /, 'getlines in scalar context returns an exception' );
     is( $line, undef, 'return value is undef upon exception' );
 
     {
-        no warnings 'Module::Generic::File::IO';
+        no warnings 'Module::Generic';
         is( $io->getlines, undef, 'caught another exception' );
     }
     like( $io->error->message, qr/Can't call .*getlines in a scalar context.* at .* line /, 'getlines in void context returns an exception' );

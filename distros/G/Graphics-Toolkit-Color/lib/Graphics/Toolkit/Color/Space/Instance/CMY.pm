@@ -10,6 +10,7 @@ sub invert { [ map {1 - $_} @{$_[0]} ] }
 
 Graphics::Toolkit::Color::Space->new (
        axis => [qw/cyan magenta yellow/],
+  precision => 6,
     convert => {RGB => [\&invert, \&invert]},
 );
 

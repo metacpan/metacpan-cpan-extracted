@@ -1,5 +1,14 @@
 Revision history for Perl module DateTime::Locale::FromCLDR
 
+v0.8.5 2026-05-20T06:21:05+0900
+    - Correcting circular dependency on DateTime::Lite
+
+v0.8.4 2026-05-19T07:26:03+0900
+    - Updating dependencies
+
+v0.8.3 2026-05-19T06:40:59+0900
+    - Updating dependencies
+
 v0.8.2 2026-04-16T15:19:57+0900
     - Corrected overloaked debugging
 

@@ -36,15 +36,17 @@ use Test2::Plugin::MemUsage;
 subtest real_module_matches_mock_shape => sub {
     skip_all "Win32::Process::Memory not installed" unless $HAS_REAL_WPM;
     skip_all "not on MSWin32 (\$^O = $^O)"          unless $^O eq 'MSWin32';
+    skip_all "Win32::Process::Memory loaded but GetProcessMemoryInfo not defined"
+        unless defined &Win32::Process::Memory::GetProcessMemoryInfo;
 
     my $info;
     ok(lives { $info = Win32::Process::Memory::GetProcessMemoryInfo($$) },
         "GetProcessMemoryInfo did not throw")
-        or diag $@;
+        or do { diag $@; return };
 
-    is(ref($info), 'HASH', "returns a hashref");
+    is(ref($info), 'HASH', "returns a hashref") or return;
     for my $k (qw/WorkingSetSize PeakWorkingSetSize PagefileUsage/) {
-        ok(exists $info->{$k}, "$k key present");
+        ok(exists $info->{$k}, "$k key present") or next;
         like($info->{$k}, qr/^\d+$/, "$k value is numeric");
     }
 };
@@ -53,9 +55,11 @@ subtest real_module_matches_mock_shape => sub {
 subtest real_collect_win32_meaningful => sub {
     skip_all "Win32::Process::Memory not installed" unless $HAS_REAL_WPM;
     skip_all "not on MSWin32 (\$^O = $^O)"          unless $^O eq 'MSWin32';
+    skip_all "Win32::Process::Memory loaded but GetProcessMemoryInfo not defined"
+        unless defined &Win32::Process::Memory::GetProcessMemoryInfo;
 
     my %mem = Test2::Plugin::MemUsage::_collect_win32();
-    ok(%mem, "got mem hash");
+    ok(%mem, "got mem hash") or return;
     for my $k (qw/rss peak size/) {
         my ($v, $u) = @{$mem{$k}};
         like($v, qr/^\d+$/,         "$k numeric");

@@ -1,0 +1,71 @@
+{
+   "abstract" : "Normalise and translate genealogical occupation strings",
+   "author" : [
+      "Nigel Horne <njh@nigelhorne.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Genealogy-Occupation",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "I18N::LangTags::Detect" : "0",
+            "Lingua::EN::ABC" : "0",
+            "Params::Get" : "0",
+            "Params::Validate::Strict" : "0",
+            "Readonly" : "0",
+            "Return::Set" : "0",
+            "perl" : "5.014",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::DescribeMe" : "0",
+            "Test::Mockingbird" : "0.1",
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Genealogy-Occupation@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Genealogy-Occupation",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Genealogy-Occupation"
+      },
+      "homepage" : "https://metacpan.org/pod/Genealogy::Occupation",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Genealogy-Occupation.git",
+         "web" : "https://github.com/nigelhorne/Genealogy-Occupation"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

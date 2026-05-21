@@ -1,0 +1,122 @@
+======================================================================
+ ááááá¹áááááá Modern::Open     [KM] áá¶áá¶ááááá
+======================================================================
+
+[ 1. Installation / [KM] áá¶áá¶ááááá ]
+
+  ááá¡á¾á:
+    cpan Modern::Open
+
+  áááá¾áááá»ááááááá¸á:
+    use Modern::Open;
+
+  ááááá·ááááá¶á: áááá½á open(), opendir(), sysopen(), pipe(), socket(),
+               áá·á accept() ááááááá autovivification + autodie á
+               áááá¾ááá¶ááá¾ Perl 5.005_03 áá·áááááááááááá¶ááá¢ááá
+               សំគាល់: socket() គាំទ្រ autovivification ប៉ុន្តែមិន autodie ទេ។
+
+[ 2. open() -- 2-arg ]
+
+  my $fh;
+  open($fh, "< file.txt");   # á¢á¶á
+  open($fh, "> file.txt");   # ááááá (ááááááá¶áá)
+  open($fh, ">> file.txt");  # áááááá
+  open($fh, "+< file.txt");  # á¢á¶á/ááááá
+  open($fh, "cmd |");        # á¢á¶ááá¸ pipe áá¶áááááááá¶
+  open($fh, "| cmd");        # ááááááá pipe áá¶áááááááá¶
+
+  while (my $line = readline($fh)) { ... }
+  print $fh "text\n";
+  close($fh);
+
+[ 3. open() -- 3-arg ]
+
+  my $fh;
+  open($fh, '<',  "file.txt");   # á¢á¶á
+  open($fh, '>',  "file.txt");   # ááááá (ááááááá¶áá)
+  open($fh, '>>', "file.txt");   # áááááá
+  open($fh, '+<', "file.txt");   # á¢á¶á/ááááá
+  open($fh, '+>', "file.txt");   # á¢á¶á/ááááá (ááááááá¶áá)
+  open($fh, '-|', "cmd");        # á¢á¶ááá¸ pipe áá¶áááááááá¶
+  open($fh, '|-', "cmd");        # ááááááá pipe áá¶áááááááá¶
+
+[ 4. opendir() ]
+
+  my $dh;
+  opendir($dh, "/path/to/dir");
+  while (my $e = readdir($dh)) {
+      next if $e eq '.' or $e eq '..';
+      print "$e\n";
+  }
+  closedir($dh);
+
+[ 5. sysopen() ]
+
+  use Fcntl qw(O_RDONLY O_WRONLY O_CREAT O_TRUNC);
+
+  my $fh;
+  sysopen($fh, "file.txt", O_RDONLY);
+  sysopen($fh, "file.txt", O_WRONLY | O_CREAT | O_TRUNC);
+  sysopen($fh, "file.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+
+[ 6. pipe() ]
+
+  my($reader, $writer);
+  pipe($reader, $writer);
+  if (my $pid = fork()) {
+      close($writer);
+      while (my $line = readline($reader)) { print $line }
+      close($reader);
+  } else {
+      close($reader);
+      print $writer "áá½áááá¸áá¸áááá¾ááá¶ááá¼á\n";
+      close($writer);
+      exit 0;
+  }
+
+[ 7. socket() / accept() ]
+
+  use Socket qw(AF_INET SOCK_STREAM sockaddr_in inet_aton);
+  my $server;
+  socket($server, AF_INET, SOCK_STREAM, 0);
+  # សំគាល់: socket() មិន autodie; ពិនិត្យតម្លៃត្រឡប់ដោយខ្លួនឯង។
+  my $client;
+  accept($client, $server);
+
+[ 8. autodie ]
+
+  # void context: die áááááááá¶ááá
+  open($fh, "< no_such_file.txt");   # dies: Can't open(...)
+
+  # áá¶áá½áááááááááá¡áá: undef/0 áááááááá¶ááá
+  my $rc = open($fh, "< file.txt");
+  unless ($rc) { warn "open ááá¶ááá: $!" }
+
+  open(FILE, "< file.txt");   # dies: Bare handle no longer supported
+
+[ 9. Handle ]
+
+  readline($fh)        # á¢á¶ááá½ááá½á
+  read($fh, $buf, $n)  # á¢á¶á N bytes
+  print $fh "..."      # ááááá
+  binmode($fh)         # áááááá binary
+  seek($fh, 0, 0)      # áááááá»ááá¶áááááá¾á
+  tell($fh)            # áá¸áá¶ááááááá»áááááá
+  close($fh)           # áá·á
+  eof($fh)             # áá·áá·ááááá»áááááááá¯ááá¶á
+
+[ 10. Compatibility ]
+
+  áááá Perl  : 5.005_03 á¡á¾ááá¾ (áá½ááá¶á 5.42)
+  áááá·áá¶     : Unix, Linux, macOS, Windows (CRLF áááááááááááááááá·)
+  á¢á¶ááááá    : Fcntl (áá¼áá»ááááá¼á)
+
+[ 11. Official resources ]
+
+  Modern::Open (MetaCPAN):
+    https://metacpan.org/dist/Modern-Open
+
+  INABA Hitoshi (ina) on CPAN:
+    https://metacpan.org/author/INA
+
+======================================================================

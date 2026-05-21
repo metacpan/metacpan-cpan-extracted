@@ -3,8 +3,8 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: BATsh
-version: 0.01
-abstract: Bilingual Shell: cmd.exe and bash in one script
+version: 0.02
+abstract: Bilingual Shell for cmd.exe and bash in one script
 author:
   - ina <ina@cpan.org>
 license: perl
@@ -24,16 +24,16 @@ minimum_perl_version: 5.00503
 provides:
   BATsh:
     file: lib/BATsh.pm
-    version: 0.01
+    version: 0.02
   BATsh::CMD:
     file: lib/BATsh/CMD.pm
-    version: 0.01
+    version: 0.02
   BATsh::Env:
     file: lib/BATsh/Env.pm
-    version: 0.01
+    version: 0.02
   BATsh::SH:
     file: lib/BATsh/SH.pm
-    version: 0.01
+    version: 0.02
 resources:
   license: http://dev.perl.org/licenses/
   bugtracker: https://github.com/ina-cpan/BATsh/issues

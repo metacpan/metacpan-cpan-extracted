@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Exporter (); BEGIN { *import = \&Exporter::import }
 
-our $VERSION = '1.500014';
+our $VERSION = '1.500015';
 $VERSION =~ tr/_//d;
 
 our @EXPORT_OK;
@@ -189,7 +189,7 @@ Graham Barr <gbarr@pobox.com>
 
 =head1 CONTRIBUTORS
 
-None so far.
+Chris Novakovic <chris@chrisn.me.uk>
 
 =head1 COPYRIGHT
 

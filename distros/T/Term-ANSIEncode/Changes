@@ -423,3 +423,17 @@
 1.99    Mar 25, 2026
 
         Yeah, MetaCPAN is really cheesing me off.  This should fix it.
+
+2.00    May 17, 2026
+
+        Changes to documentation and some code clean up.
+
+2.01    May 17, 2026
+
+        Ugh, I accidentally included some test code.
+		Since CPAN has no inline editing ability, I had to increment the
+		version.
+
+2.02    May 18, 2026
+
+        Improved the capability of the CHAR token.

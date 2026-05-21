@@ -8,6 +8,13 @@ use feature 'signatures';
 use Iterator::Flex::Common qw[ itake iseq thaw ];
 use Data::Dump 'pp';
 
+subtest 'invalid count' => sub {
+
+    for my $n ( 0, -1, 1.5, 'not-a-number' ) {
+        like( dies { itake( iseq( 10 ), $n ) }, qr/"n"/, "reject n $n" );
+    }
+};
+
 
 subtest 'partial take' => sub {
 

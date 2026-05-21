@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Paths;
 use strict;
 use warnings;
 
-our $VERSION = '3.14';
+our $VERSION = '3.90';
 
 use Cwd qw(cwd);
 use File::Basename qw(basename);
@@ -194,7 +194,7 @@ sub _cdr_payload {
         };
     }
 
-    my @matches = $paths->locate_dirs_under( cwd(), @terms );
+    my @matches = $paths->locate_dirs_under( $paths->current_working_directory, @terms );
     return {
         target  => @matches == 1 ? $matches[0] : '',
         matches => @matches == 1 ? [] : \@matches,
@@ -224,13 +224,13 @@ sub _cdr_completion {
         return _cdr_initial_candidates(
             paths   => $paths,
             prefix  => $current,
-            include => [ cwd() ],
+            include => [ $paths->current_working_directory ],
         );
     }
 
     my $first = $args[0] // '';
     my $alias_target = eval { $paths->resolve_dir($first) };
-    my $base_root = defined $alias_target && $alias_target ne '' ? $alias_target : cwd();
+    my $base_root = defined $alias_target && $alias_target ne '' ? $alias_target : $paths->current_working_directory;
     my $filter_start = defined $alias_target && $alias_target ne '' ? 1 : 0;
     my @filters = @args >= $arg_index ? @args[ $filter_start .. ( $arg_index - 1 ) ] : ();
 

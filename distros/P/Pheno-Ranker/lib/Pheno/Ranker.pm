@@ -4,42 +4,33 @@ use strict;
 use warnings;
 use autodie;
 use feature qw(say);
-use Data::Dumper;
 use File::Basename        qw(dirname);
-use Cwd                   qw(abs_path);
-use File::Spec::Functions qw(catdir catfile);
+use File::Spec::Functions qw(catfile);
 use Term::ANSIColor       qw(:constants);
 use Moo;
-use Types::Standard qw(Str Int Num Enum ArrayRef HashRef Undef Bool);
+use Types::Standard qw(Int Enum Bool);
 use File::ShareDir::ProjectDistDir qw(dist_dir);
-use List::Util                     qw(all);
-use Hash::Util                     qw(lock_hash);
 use Pheno::Ranker::IO;
 use Pheno::Ranker::Compare;
 use Pheno::Ranker::Metrics;
 use Pheno::Ranker::Graph;
+use Pheno::Ranker::Config;
+use Pheno::Ranker::Context;
+use Pheno::Ranker::Options;
 
 use Exporter 'import';
 our @EXPORT_OK = qw($VERSION write_json);
 
 # Personalize warn and die functions
-$SIG{__WARN__} = sub { warn BOLD YELLOW "Warn: ", @_ };
-$SIG{__DIE__}  = sub { die BOLD RED "Error: ", @_ };
+$SIG{__WARN__} = sub { warn BOLD YELLOW "Warn: ", @_, RESET };
+$SIG{__DIE__}  = sub { die BOLD RED "Error: ", @_, RESET };
 
-# Global variables:
-$Data::Dumper::Sortkeys = 1;
-our $VERSION   = '1.07';
+our $VERSION   = '1.08';
 our $share_dir = dist_dir('Pheno-Ranker');
 
 # Set development mode
 use constant DEVEL_MODE => 0;
 
-# Misc variables
-my (
-    $config_sort_by,                   $config_similarity_metric_cohort,
-    $config_max_out,                   $config_max_number_vars,
-    $config_max_matrix_records_in_ram, @config_allowed_terms
-);
 my $default_config_file = catfile( $share_dir, 'conf', 'config.yaml' );
 
 ############################################
@@ -51,165 +42,85 @@ has 'config_file' => (
     isa =>
       sub { die "Config file '$_[0]' is not a valid file" unless -e $_[0] },
     default => $default_config_file,
-    coerce  => sub { $_[0] // $default_config_file },
-    trigger => sub {
-        my ( $self, $config_file ) = @_;
-        my $config = read_yaml($config_file);
-
-        # Set basic configuration parameters
-        $self->_set_basic_config($config);
-
-        # Validate and set exclusive configuration parameters
-        $self->_validate_and_set_exclusive_config( $config, $config_file );
-
-        # Set additional configuration parameters on $self
-        $self->_set_additional_config( $config, $config_file );
-
-        # Lock config data (keys+values)
-        lock_hash(%$config);
-    }
 );
 
-# Private Method: _set_basic_config
-sub _set_basic_config {
-    my ( $self, $config ) = @_;
-    $config_sort_by                  = $config->{sort_by} // 'hamming';
-    $config_similarity_metric_cohort = $config->{similarity_metric_cohort}
-      // 'hamming';
-    $config_max_out                   = $config->{max_out}         // 50;
-    $config_max_number_vars           = $config->{max_number_vars} // 10_000;
-    $config_max_matrix_records_in_ram = $config->{max_matrix_records_in_ram}
-      // 5_000;
-}
+has config => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub { Pheno::Ranker::Config->new( file => shift->config_file ) },
+);
 
-# Private Method: _validate_and_set_exclusive_config
-sub _validate_and_set_exclusive_config {
-    my ( $self, $config, $config_file ) = @_;
-    unless ( exists $config->{allowed_terms}
-        && ArrayRef->check( $config->{allowed_terms} )
-        && @{ $config->{allowed_terms} } )
-    {
-        die "No <allowed terms> provided or not an array ref at $config_file\n";
-    }
-    @config_allowed_terms = @{ $config->{allowed_terms} };
-}
-
-# Private Method: _set_additional_config
-sub _set_additional_config {
-    my ( $self, $config, $config_file ) = @_;
-
-    # Setters
-    $self->{primary_key}             = $config->{primary_key} // 'id';
-    $self->{exclude_variables_regex} = $config->{exclude_variables_regex}
-      // undef;
-    $self->{exclude_variables_regex_qr} =
-      defined $self->{exclude_variables_regex}
-      ? qr/$self->{exclude_variables_regex}/
-      : undef;
-    $self->{array_terms}    = $config->{array_terms} // ['foo'];
-    $self->{array_regex}    = $config->{array_regex} // '^([^:]+):(\d+)';
-    $self->{array_regex_qr} = qr/$self->{array_regex}/;
-    $self->{array_terms_regex_str} =
-      '^(' . join( '|', map { "\Q$_\E" } @{ $self->{array_terms} } ) . '):';
-    $self->{array_terms_regex_qr} = qr/$self->{array_terms_regex_str}/;
-    $self->{format}               = $config->{format};
-    $self->{seed} =
-      ( defined $config->{seed} && Int->check( $config->{seed} ) )
-      ? $config->{seed}
-      : 123456789;
-
-    if ( $self->{array_terms}[0] ne 'foo' ) {
-        unless ( exists $config->{id_correspondence}
-            && HashRef->check( $config->{id_correspondence} ) )
-        {
-            die
-"No <id_correspondence> provided or not a hash ref at $config_file\n";
-        }
-        $self->{id_correspondence} = $config->{id_correspondence};
-        if ( exists $config->{format} && Str->check( $config->{format} ) ) {
-            die
-"<$config->{format}> does not match any key from <id_correspondence>\n"
-              unless exists $config->{id_correspondence}{ $config->{format} };
-        }
-    }
-}
+has options => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        my $self = shift;
+        return Pheno::Ranker::Options->new(
+            config    => $self->config,
+            share_dir => $share_dir,
+        );
+    },
+);
 
 has sort_by => (
-    default => $config_sort_by,
-    is      => 'ro',
-    coerce  => sub { $_[0] // $config_sort_by },
-    lazy    => 1,
-    isa     => Enum [qw(hamming jaccard)]
+    is  => 'ro',
+    isa => Enum [qw(hamming jaccard)]
 );
 
 has similarity_metric_cohort => (
-    default => $config_similarity_metric_cohort,
-    is      => 'ro',
-    coerce  => sub { $_[0] // $config_similarity_metric_cohort },
-    lazy    => 1,
-    isa     => Enum [qw(hamming jaccard)]
+    is  => 'ro',
+    isa => Enum [qw(hamming jaccard)]
+);
+
+has matrix_format => (
+    is  => 'ro',
+    isa => Enum [qw(dense mtx)]
 );
 
 has max_out => (
-    default => $config_max_out,
-    is      => 'ro',
-    coerce  => sub { $_[0] // $config_max_out },
-    lazy    => 1,
-    isa     => Int
+    is  => 'ro',
+    isa => Int
 );
 
 has max_number_vars => (
-    default => $config_max_number_vars,
-    is      => 'ro',
-    coerce  => sub { $_[0] // $config_max_number_vars },
-    lazy    => 1,
-    isa     => Int
+    is  => 'ro',
+    isa => Int
 );
 
 has max_matrix_records_in_ram => (
-    default => $config_max_matrix_records_in_ram,
-    is      => 'ro',
-    coerce  => sub { $_[0] // $config_max_matrix_records_in_ram },
-    lazy    => 1,
-    isa     => Int
+    is  => 'ro',
+    isa => Int
+);
+
+has graph_min_weight => (
+    is => 'ro',
+);
+
+has graph_max_weight => (
+    is => 'ro',
 );
 
 has hpo_file => (
-    default => catfile( $share_dir, 'db', 'hp.json' ),
-    coerce  => sub { $_[0] // catfile( $share_dir, 'db', 'hp.json' ) },
     is      => 'ro',
     isa     => sub { die "Error <$_[0]> is not a valid file" unless -e $_[0] },
 );
 
 has poi_out_dir => (
-    default => catdir('./'),
-    coerce  => sub { $_[0] // catdir('./') },
     is      => 'ro',
     isa     => sub { die "<$_[0]> dir does not exist" unless -d $_[0] },
 );
 
 has [qw/include_terms exclude_terms/] => (
-    is   => 'ro',
-    lazy => 1,
-    isa  => sub {
-        my $value = shift;
+    is  => 'ro',
+    isa => sub {
         die "<--include_terms> and <--exclude_terms> must be an array ref\n"
-          unless ref $value eq 'ARRAY';
-        foreach my $term (@$value) {
-            die
-"Invalid term '$term' in <--include_terms> or <--exclude_terms>. Allowed values are: "
-              . join( ', ', @config_allowed_terms ) . "\n"
-              unless grep { $_ eq $term } @config_allowed_terms;
-        }
+          unless ref shift eq 'ARRAY';
     },
-    default => sub { [] },
 );
 
 has cli => (
     is      => 'ro',
     isa     => Bool,
-    default => 0,
-    coerce  => sub { $_[0] // 0 },
 );
 
 # Miscellaneous attributes
@@ -219,8 +130,7 @@ has [
       log verbose age cytoscape_json graph_stats/
 ] => ( is => 'ro' );
 
-has [qw/append_prefixes reference_files patients_of_interest/] =>
-  ( default => sub { [] }, is => 'ro' );
+has [qw/append_prefixes reference_files patients_of_interest/] => ( is => 'ro' );
 
 has [qw/glob_hash_file ref_hash_file ref_binary_hash_file coverage_stats_file/]
   => ( is => 'ro' );
@@ -229,12 +139,20 @@ has [qw/glob_hash_file ref_hash_file ref_binary_hash_file coverage_stats_file/]
 # End declaring attributes for the class #
 ##########################################
 
+around BUILDARGS => sub {
+    my ( $orig, $class, @args ) = @_;
+    my $args = $class->$orig(@args);
+    return Pheno::Ranker::Options->defined_constructor_args($args);
+};
+
 sub BUILD {
 
     # BUILD: is an instance method that is called after the object has been constructed but before it is returned to the caller.
     # BUILDARGS is a class method that is responsible for processing the arguments passed to the constructor (new) and returning a hash reference of attributes that will be used to initialize the object.
 
     my $self = shift;
+    $self->config->apply_to($self) unless exists $self->{primary_key};
+    $self->options->apply_to($self);
 
     # Miscellaneous checks
     if ( @{ $self->{append_prefixes} } ) {
@@ -247,6 +165,10 @@ sub BUILD {
         die "<--patients-of-interest> must be used with <--r>\n"
           unless @{ $self->{reference_files} };
     }
+    if ( $self->{matrix_format} eq 'mtx' ) {
+        die "<--matrix-format mtx> only works in cohort mode\n"
+          if $self->{target_file};
+    }
 }
 
 # ============================================================
@@ -255,123 +177,36 @@ sub BUILD {
 sub run {
     my $self = shift;
 
-    # -----------------------------------------------------
-    # Retrieve configuration parameters from the object
-    # -----------------------------------------------------
-    my $reference_files          = $self->{reference_files};
-    my $target_file              = $self->{target_file};
-    my $weights_file             = $self->{weights_file};
-    my $export                   = $self->{export};
-    my $export_basename          = $self->{export_basename};
-    my $include_hpo_ascendants   = $self->{include_hpo_ascendants};
-    my $hpo_file                 = $self->{hpo_file};
-    my $align                    = $self->{align};
-    my $align_basename           = $self->{align_basename};
-    my $out_file                 = $self->{out_file};
-    my $cytoscape_json           = $self->{cytoscape_json};
-    my $graph_stats              = $self->{graph_stats};
-    my $append_prefixes          = $self->{append_prefixes};
-    my $primary_key              = $self->{primary_key};
-    my $poi                      = $self->{patients_of_interest};
-    my $poi_out_dir              = $self->{poi_out_dir};
-    my $cli                      = $self->{cli};
-    my $similarity_metric_cohort = $self->{similarity_metric_cohort};
-    my $weight                   = undef;
-
-    # -----------------------------------------------------
-    # Check directories for --align and --export options
-    # -----------------------------------------------------
-    my $align_dir = defined $align ? dirname($align) : '.';
-    die "Directory <$align_dir> does not exist (used with --align)\n"
-      unless -d $align_dir;
-    my $export_dir = defined $export ? dirname($export) : '.';
-    die "Directory <$export_dir> does not exist (used with --export)\n"
-      unless -d $export_dir;
-
-    # -----------------------------------------------------
-    # Check for precomputed data (glob_hash, ref_hash, ref_binary_hash, coverage_stats)
-    # -----------------------------------------------------
-    my $has_precomputed =
-         defined $self->{glob_hash_file}
-      && defined $self->{ref_hash_file}
-      && defined $self->{ref_binary_hash_file}
-      && defined $self->{coverage_stats_file};
+    $self->_validate_output_directories;
 
     my (
-        $glob_hash,      $ref_hash, $ref_binary_hash,
-        $coverage_stats, $hash2serialize
+        $glob_hash, $ref_hash, $ref_binary_hash, $hash2serialize, $weight
     );
 
-    if ($has_precomputed) {
-
-        say "Using precomputed data" if $self->{verbose};
-
-        # Use precomputed data provided via Moo attributes
-        $glob_hash       = read_json( $self->{glob_hash_file} );
-        $ref_hash        = read_json( $self->{ref_hash_file} );
-        $ref_binary_hash = read_json( $self->{ref_binary_hash_file} );
-        $coverage_stats  = read_json( $self->{coverage_stats_file} );
-
-        # Set format from *.coverage_stats.json
-        $self->_add_attribute( 'format', $coverage_stats->{format} );
-
-        $hash2serialize = {
-            glob_hash       => $glob_hash,
-            ref_hash        => $ref_hash,
-            ref_binary_hash => $ref_binary_hash,
-        };
+    if ( $self->_has_precomputed_data ) {
+        ( $glob_hash, $ref_hash, $ref_binary_hash, $hash2serialize ) =
+          $self->_load_precomputed_data;
     }
     else {
-        # -----------------------------------------------------
-        # Part A: Load reference cohort data
-        # -----------------------------------------------------
-        my $ref_data =
-          $self->_load_reference_cohort_data( $reference_files, $primary_key,
-            $append_prefixes );
+        my $ref_data = $self->_load_reference_cohort_data(
+            $self->{reference_files},
+            $self->{primary_key},
+            $self->{append_prefixes}
+        );
 
-        #-------------------------------
-        # Write json for $poi if --poi |
-        #-------------------------------
-        # *** IMPORTANT ***
-        # It will exit when done (dry-run)
-        if (@$poi) {
-            write_poi(
-                {
-                    ref_data    => $ref_data,
-                    poi         => $poi,
-                    poi_out_dir => $poi_out_dir,
-                    primary_key => $primary_key,
-                    verbose     => $self->{verbose}
-                }
-            );
+        return 1 if $self->_maybe_write_poi($ref_data);
 
-            # premature return
-            return 1;
-        }
+        $weight = validate_json( $self->{weights_file} );
+        $self->_maybe_load_hpo;
 
-        # -----------------------------------------------------
-        # Load weights file and HPO data if needed
-        # -----------------------------------------------------
-        # We assing weights if <--w>
-        # NB: The user can exclude variables by using variable: 0
-        $weight = validate_json($weights_file);
-
-        # Now we load $hpo_nodes, $hpo_edges if --include_hpo_ascendants
-        # NB: we load them within $self to minimize the #args
-
-        if ($include_hpo_ascendants) {
-            my ( $nodes, $edges ) = parse_hpo_json( read_json($hpo_file) );
-            $self->{nodes} = $nodes;
-            $self->{edges} = $edges;
-        }
-
-        # -----------------------------------------------------
-        # Part B: Compute cohort metrics
-        # -----------------------------------------------------
         my ( $coverage_stats, $glob_hash_computed, $ref_hash_computed,
             $ref_binary_hash_computed, $hash2serialize_computed )
-          = $self->_compute_cohort_metrics( $ref_data, $weight, $primary_key,
-            $target_file );
+          = $self->_compute_cohort_metrics(
+            $ref_data,
+            $weight,
+            $self->{primary_key},
+            $self->{target_file}
+          );
 
         $glob_hash       = $glob_hash_computed;
         $ref_hash        = $ref_hash_computed;
@@ -379,48 +214,151 @@ sub run {
         $hash2serialize  = $hash2serialize_computed;
     }
 
-    # -----------------------------------------------------
-    # If no target file is provided, perform cohort comparison
-    # -----------------------------------------------------
-    cohort_comparison( $ref_binary_hash, $self ) unless $target_file;
+    $self->_maybe_run_cohort_comparison($ref_binary_hash);
+    $self->_maybe_write_graph($ref_binary_hash);
+    $self->_maybe_process_patient(
+        {
+            weight          => $weight,
+            glob_hash       => $glob_hash,
+            ref_hash        => $ref_hash,
+            ref_binary_hash => $ref_binary_hash,
+        },
+        \$hash2serialize
+    );
+    $self->_maybe_export_hashes($hash2serialize);
 
-    # Create and write Cytoscape JSON if requested
-    my $graph = $self->_perform_graph_calculations( $out_file, $cytoscape_json,
-        $graph_stats, $similarity_metric_cohort );
+    return 1;
+}
 
-    # -----------------------------------------------------
-    # Part C: Process patient data (if target_file is provided)
-    # -----------------------------------------------------
-    if ($target_file) {
-        $self->_process_patient_data(
-            {
-                target_file     => $target_file,
-                primary_key     => $primary_key,
-                weight          => $weight,
-                glob_hash       => $glob_hash,
-                ref_hash        => $ref_hash,
-                ref_binary_hash => $ref_binary_hash,
-                align           => $align,
-                align_basename  => $align_basename,
-                out_file        => $out_file,
-                cli             => $cli,
-                verbose         => $self->{verbose},
-            },
-            \$hash2serialize
-        );
-    }
+sub _validate_output_directories {
+    my $self = shift;
 
-    # -----------------------------------------------------
-    # Export JSON if requested
-    # -----------------------------------------------------
-    if ( defined $export ) {
-        serialize_hashes(
-            {
-                data            => $hash2serialize,
-                export_basename => $export ? $export : $export_basename
-            }
-        );
-    }
+    my $align_dir = defined $self->{align} ? dirname( $self->{align} ) : '.';
+    die "Directory <$align_dir> does not exist (used with --align)\n"
+      unless -d $align_dir;
+
+    my $export_dir = defined $self->{export} ? dirname( $self->{export} ) : '.';
+    die "Directory <$export_dir> does not exist (used with --export)\n"
+      unless -d $export_dir;
+
+    return 1;
+}
+
+sub _has_precomputed_data {
+    my $self = shift;
+    return defined $self->{glob_hash_file}
+      && defined $self->{ref_hash_file}
+      && defined $self->{ref_binary_hash_file}
+      && defined $self->{coverage_stats_file};
+}
+
+sub _load_precomputed_data {
+    my $self = shift;
+
+    say "Using precomputed data" if $self->{verbose};
+
+    my $glob_hash       = read_json( $self->{glob_hash_file} );
+    my $ref_hash        = read_json( $self->{ref_hash_file} );
+    my $ref_binary_hash = read_json( $self->{ref_binary_hash_file} );
+    my $coverage_stats  = read_json( $self->{coverage_stats_file} );
+
+    $self->_add_attribute( 'format', $coverage_stats->{format} );
+
+    my $hash2serialize = {
+        glob_hash       => $glob_hash,
+        ref_hash        => $ref_hash,
+        ref_binary_hash => $ref_binary_hash,
+    };
+
+    return ( $glob_hash, $ref_hash, $ref_binary_hash, $hash2serialize );
+}
+
+sub _maybe_write_poi {
+    my ( $self, $ref_data ) = @_;
+    return 0 unless @{ $self->{patients_of_interest} };
+
+    write_poi(
+        {
+            ref_data    => $ref_data,
+            poi         => $self->{patients_of_interest},
+            poi_out_dir => $self->{poi_out_dir},
+            primary_key => $self->{primary_key},
+            verbose     => $self->{verbose}
+        }
+    );
+
+    return 1;
+}
+
+sub _maybe_load_hpo {
+    my $self = shift;
+    return 1 unless $self->{include_hpo_ascendants};
+
+    my ( $nodes, $edges ) = parse_hpo_json( read_json( $self->{hpo_file} ) );
+    $self->{nodes} = $nodes;
+    $self->{edges} = $edges;
+
+    return 1;
+}
+
+sub _maybe_run_cohort_comparison {
+    my ( $self, $ref_binary_hash ) = @_;
+    return 1 if $self->{target_file};
+
+    cohort_comparison( $ref_binary_hash, $self->_context );
+    return 1;
+}
+
+sub _maybe_write_graph {
+    my ( $self, $ref_binary_hash ) = @_;
+
+    $self->_perform_graph_calculations(
+        $ref_binary_hash,
+        $self->{cytoscape_json},
+        $self->{graph_stats},
+        $self->{similarity_metric_cohort},
+        $self->{graph_min_weight},
+        $self->{graph_max_weight}
+    );
+
+    return 1;
+}
+
+sub _maybe_process_patient {
+    my ( $self, $computed, $hash2serialize_ref ) = @_;
+    return 1 unless $self->{target_file};
+
+    $self->_process_patient_data(
+        {
+            target_file     => $self->{target_file},
+            primary_key     => $self->{primary_key},
+            weight          => $computed->{weight},
+            glob_hash       => $computed->{glob_hash},
+            ref_hash        => $computed->{ref_hash},
+            ref_binary_hash => $computed->{ref_binary_hash},
+            align           => $self->{align},
+            align_basename  => $self->{align_basename},
+            out_file        => $self->{out_file},
+            cli             => $self->{cli},
+            verbose         => $self->{verbose},
+        },
+        $hash2serialize_ref
+    );
+
+    return 1;
+}
+
+sub _maybe_export_hashes {
+    my ( $self, $hash2serialize ) = @_;
+    return 1 unless defined $self->{export};
+
+    serialize_hashes(
+        {
+            data            => $hash2serialize,
+            export_basename =>
+              $self->{export} ? $self->{export} : $self->{export_basename}
+        }
+    );
 
     return 1;
 }
@@ -492,27 +430,35 @@ sub _compute_cohort_metrics {
     $self->_add_attribute( 'format', check_format($ref_data) )
       unless defined $self->{format};
 
-    my $coverage_stats = coverage_stats( $ref_data, $self->{format} );
+    my $context        = $self->_context;
+    my $coverage_stats = coverage_stats(
+        $ref_data,
+        $context->{format},
+        {
+            retain_excluded_phenotypicFeatures =>
+              $context->{retain_excluded_phenotypicFeatures}
+        }
+    );
     die
 "--include-terms <@{$self->{include_terms}}> does not exist in the cohort(s)\n"
       unless check_existence_of_include_terms( $coverage_stats,
-        $self->{include_terms} );
+        $context->{include_terms} );
 
     # Restructure PXF
-    restructure_pxf_interpretations( $ref_data, $self );
+    restructure_pxf_interpretations( $ref_data, $context );
 
     # First we create:
     # - $glob_hash => hash with all the COHORT keys possible
     # - $ref_hash  => BIG hash with all individiduals' keys "flattened"
 
     my ( $glob_hash, $ref_hash ) =
-      create_glob_and_ref_hashes( $ref_data, $weight, $self );
+      create_glob_and_ref_hashes( $ref_data, $weight, $context );
 
     # Limit the number of variables if > $self-{max_number_vars}
     # *** IMPORTANT ***
     # Change only performed in $glob_hash
-    if ( keys %$glob_hash > $self->{max_number_vars} ) {
-        $glob_hash = randomize_variables( $glob_hash, $self );
+    if ( keys %$glob_hash > $context->{max_number_vars} ) {
+        $glob_hash = randomize_variables( $glob_hash, $context );
     }
 
     # Second we peform one-hot encoding for each individual
@@ -553,6 +499,7 @@ sub _process_patient_data {
     my $cli             = $params->{cli};
     my $verbose         = $params->{verbose};
     my $export          = $self->{export};
+    my $context         = $self->_context;
 
     my $tar_data = array2object(
         io_yaml_or_json( { filepath => $target_file, mode => 'read' } ) );
@@ -562,7 +509,7 @@ sub _process_patient_data {
     die
 "Sorry, <$target_file> does not contain primary_key <$primary_key>. Are you using the right config file?\n"
       unless exists $tar_data->{$primary_key};
-    restructure_pxf_interpretations( $tar_data, $self );
+    restructure_pxf_interpretations( $tar_data, $context );
 
     # We store {primary_key} as a variable as it might be deleted from $tar_data (--exclude-terms id)
 
@@ -572,7 +519,7 @@ sub _process_patient_data {
             {
                 hash   => $tar_data,
                 weight => $weight,
-                self   => $self
+                self   => $context
             }
         )
     };
@@ -595,7 +542,7 @@ sub _process_patient_data {
             ref_binary_hash => $ref_binary_hash,
             tar_binary_hash => $tar_binary_hash,
             weight          => $weight,
-            self            => $self
+            self            => $context
         }
       );
     say join "\n", @$results_rank if $cli;
@@ -618,18 +565,21 @@ sub _process_patient_data {
 }
 
 sub _perform_graph_calculations {
-    my ( $self, $out_file, $cytoscape_json, $graph_stats,
-        $similarity_metric_cohort )
+    my ( $self, $ref_binary_hash, $cytoscape_json, $graph_stats,
+        $similarity_metric_cohort, $graph_min_weight, $graph_max_weight )
       = @_;
 
     my $graph;
     if ($cytoscape_json) {
-        $graph = matrix2graph(
+        $graph = binary_hash2graph(
             {
-                matrix      => $out_file,
-                json        => $cytoscape_json,
-                graph_stats => 1,
-                verbose     => $self->{verbose},
+                ref_binary_hash  => $ref_binary_hash,
+                json             => $cytoscape_json,
+                metric           => $similarity_metric_cohort,
+                graph_stats      => 1,
+                graph_min_weight => $graph_min_weight,
+                graph_max_weight => $graph_max_weight,
+                verbose          => $self->{verbose},
             }
         );
     }
@@ -654,13 +604,18 @@ sub _add_attribute {
     return 1;
 }
 
+sub _context {
+    my $self = shift;
+    return Pheno::Ranker::Context->from_ranker($self);
+}
+
 1;
 
 =pod
 
 =head1 NAME
 
-Convert::Pheno - A module that performs semantic similarity in PXF/BFF data structures and beyond (JSON|YAML)
+Pheno::Ranker - A module that performs semantic similarity in PXF/BFF data structures and beyond (JSON|YAML)
   
 =head1 SYNOPSIS
 

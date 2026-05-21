@@ -57,6 +57,7 @@ my $log = Game::TextMapper::Log->get;
 has 'steepness';
 has 'peaks';
 has 'peak';
+has 'peak_min';
 has 'bumps';
 has 'bump';
 has 'bottom';
@@ -68,7 +69,24 @@ sub place_peak {
   my $self = shift;
   my $altitude = shift;
   my $count = shift;
-  my $current_altitude = shift;
+  my $min = shift;
+  my $max = shift;
+  # max altitude exactly once
+  my $x = int(rand($self->width)) + 1;
+  my $y = int(rand($self->height)) + 1;
+  my $coordinates = coordinates($x, $y);
+  $altitude->{$coordinates} = $max;
+  $log->debug("placed max $max at $coordinates");
+  # prepare distribution
+  my @distribution;
+  my $n = 1;
+  for my $i (0 .. $max - $min) {
+    push(@distribution, $n);
+    $n *= 2;
+  }
+  # this is the "die size"
+  $n = $distribution[$#distribution];
+  $log->debug("@distribution");
   my @queue;
   # place some peaks and put them in a queue
   for (1 .. $count) {
@@ -78,9 +96,17 @@ sub place_peak {
       my $y = int(rand($self->height)) + 1;
       my $coordinates = coordinates($x, $y);
       next if $altitude->{$coordinates};
-      $altitude->{$coordinates} = $current_altitude;
-      $log->debug("placed $current_altitude at $coordinates");
-      push(@queue, $coordinates);
+      my $r = rand($n);
+      $log->debug("  rolled $r");
+      for my $i (0 .. $#distribution) {
+        $log->debug("  $r < $distribution[$i]");
+        if ($r < $distribution[$i]) {
+          $altitude->{$coordinates} = $max - $i;
+          $log->debug("placed $altitude->{$coordinates} at $coordinates");
+          push(@queue, $coordinates);
+          last;
+        }
+      }
       last;
     }
   }
@@ -159,7 +185,7 @@ sub fix_altitude {
 sub altitude {
   my $self = shift;
   my ($world, $altitude) = @_;
-  my @queue = $self->place_peak($altitude, $self->peaks, $self->peak);
+  my @queue = $self->place_peak($altitude, $self->peaks, $self->peak_min, $self->peak);
   $self->grow_mountains($altitude, @queue);
   $self->fix_altitude($altitude);
   # note height for debugging purposes
@@ -926,6 +952,7 @@ sub generate_map {
   $self->steepness(shift // 3);
   $self->peaks(shift // int($self->width * $self->height / 40));
   $self->peak(shift // 10);
+  $self->peak_min(shift // $self->peak);
   $self->bumps(shift // int($self->width * $self->height / 40));
   $self->bump(shift // 2);
   $self->bottom(shift // 0);

@@ -70,6 +70,15 @@ typedef struct {
    secret_buffer *sbuf; /* may be NULL when referencing a span from a plain PV */
 } secret_buffer_parse;
 
+/* secret_buffer_parse with writable characters */
+typedef struct {
+   U8 *pos, *lim;
+   const char *error;
+   int encoding;
+   U8 pos_bit, lim_bit;
+   secret_buffer *sbuf; /* may be NULL when referencing a span from a plain PV */
+} secret_buffer_parse_rw;
+
 /* Initialize a parse struct, and also verify that the described span is within the
  * defined length of the buffer.  If not, it returns false and sets ->error.
  */
@@ -128,12 +137,8 @@ extern bool secret_buffer_match_bytestr(secret_buffer_parse *p, char *data, size
 extern SSize_t secret_buffer_sizeof_transcode(secret_buffer_parse *src, int dst_encoding);
 
 /* Transcode from source to destination, respecting the ->encoding of each.
- * MAKE SURE THAT 'dst' POINTERS DESCRIBE WRITEABLE DATA.
- * The secret_buffer_parse struct declares its data pointers as 'const', and I should have
- * created a matching struct with writable pointers, but created this API prior to that and now
- * don't want to change the declaration because its public.
  */
-extern bool secret_buffer_transcode(secret_buffer_parse *src, secret_buffer_parse *dst);
+extern bool secret_buffer_transcode(secret_buffer_parse *src, secret_buffer_parse_rw *dst);
 
 /* Copy characters from a parse struct to a Perl SV, optionally appending.
  * This respects the src->encoding, as opposed to secret_buffer_splice which always copies

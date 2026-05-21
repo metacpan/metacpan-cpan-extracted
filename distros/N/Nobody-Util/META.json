@@ -1,0 +1,58 @@
+{
+   "abstract" : "Utility modules used by Nobody (but useful to everybody)",
+   "author" : [
+      "Rich Paul <rpaul@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Nobody-Util",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "JSON::XS" : "0",
+            "List::Util" : "1.45",
+            "POSIX" : "0",
+            "Path::Tiny" : "0",
+            "Scalar::Util" : "0",
+            "Sub::Util" : "0",
+            "URI" : "0",
+            "common::sense" : "0",
+            "perl" : "5.020"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://gitlab.com/nobody-does-ai/nobody.git",
+         "web" : "https://gitlab.com/nobody-does-ai/nobody"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

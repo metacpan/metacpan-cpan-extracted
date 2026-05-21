@@ -2,6 +2,7 @@ package Resource::Silo::Metadata::DAG;
 
 use strict;
 use warnings;
+our $VERSION = '0.1703';
 
 =head1 NAME
 

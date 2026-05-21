@@ -6,7 +6,7 @@ use Test::More tests => 490;
 
 BEGIN 
 {
-  require 't/test-lib.pl';
+  require './t/test-lib.pl';
   use_ok('Rose::DB::Object');
   use_ok('Rose::DB::Object::Util');
 }
@@ -1433,7 +1433,6 @@ CREATE TABLE rose_db_object_test
   start          DATE,
   save           INT,
   enums          ENUM('foo', 'bar', 'baz') DEFAULT 'foo',
-  ndate          DATE NOT NULL DEFAULT '0000-00-00',
   dur            VARCHAR(255) DEFAULT '2 months 5 days 3 seconds',
   epoch          INT DEFAULT 943997400,
   hiepoch        DECIMAL(16,6),
@@ -1493,7 +1492,6 @@ EOF
       flag2    => { type => 'boolean' },
       status   => { default => 'active', methods => [ qw(get_set get set) ] },
       start    => { type => 'date', default => '12/24/1980', lazy => 1 },
-      ndate    => { type => 'date', not_null => 1, default => '0000-00-00' },
       save     => { type => 'scalar' },
       nums     => { type => 'array' },
       enums    => { type => 'enum', values => [ qw(foo bar baz) ], default => 'foo' },

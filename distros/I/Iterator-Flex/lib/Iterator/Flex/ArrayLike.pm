@@ -7,10 +7,10 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use Ref::Util;
-use Iterator::Flex::Utils ':IterAttrs', 'resolve_meth';
+use Iterator::Flex::Utils ':IterAttrs', 'resolve_meth', 'throw_failure';
 use namespace::clean;
 
 use parent 'Iterator::Flex::Base';
@@ -75,7 +75,7 @@ use parent 'Iterator::Flex::Base';
 
 sub new ( $class, $obj, $pars = {} ) {
 
-    $class->_croak( parameter => q{argument must be a blessed reference} )
+    throw_failure( parameter => q{argument must be a blessed reference} )
       unless Ref::Util::is_blessed_ref( $obj );
 
     $class->SUPER::new( { object => $obj }, $pars );
@@ -181,7 +181,7 @@ Iterator::Flex::ArrayLike - ArrayLike Iterator Class
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 METHODS
 

@@ -14,7 +14,7 @@
 #include "perl.h"
 #include "XSUB.h"
 #include "include/file_compat.h"
-#include "include/file_hooks.h"
+#include "include/file_plugin.h"
 
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -109,13 +109,574 @@
 #endif
 
 /* ============================================
-   File hooks - lazy approach with simple pointer checks
-   Implementation in header so external XS modules (e.g. the test
-   extension under t/xs/) can include it directly on platforms where
-   linking against Raw.so is impractical (Windows/Cygwin without an
-   import library).
+   Plugin registry + dispatch helpers.
+   Storage and definitions live here in the Raw.so TU; downstream XS
+   modules see only file_plugin.h and resolve the function symbols at
+   load time via RTLD_GLOBAL.
    ============================================ */
-#include "include/file_hooks_impl.h"
+
+/* Registry: name (PV) -> FilePlugin* (stored via PTR2IV in the SV). */
+static HV *g_file_plugin_registry = NULL;
+
+/* One-pointer cache: short-circuits HV lookup when the same plugin is
+ * used in tight loops (e.g. each_line). */
+static const FilePlugin *g_file_last_plugin = NULL;
+
+static void file_plugin_registry_init(pTHX) {
+    if (!g_file_plugin_registry)
+        g_file_plugin_registry = newHV();
+}
+
+int file_register_plugin(pTHX_ const FilePlugin *plugin) {
+    SV *entry;
+    STRLEN name_len;
+
+    if (!plugin || !plugin->name || !*plugin->name) return -1;
+
+    file_plugin_registry_init(aTHX);
+    name_len = strlen(plugin->name);
+    if (hv_exists(g_file_plugin_registry, plugin->name, name_len))
+        return 0;
+
+    entry = newSViv(PTR2IV(plugin));
+    if (!hv_store(g_file_plugin_registry, plugin->name, name_len, entry, 0)) {
+        SvREFCNT_dec(entry);
+        return -1;
+    }
+    return 1;
+}
+
+int file_unregister_plugin(pTHX_ const char *name) {
+    if (!g_file_plugin_registry || !name) return 0;
+    if (g_file_last_plugin && strcmp(g_file_last_plugin->name, name) == 0)
+        g_file_last_plugin = NULL;
+    return hv_delete(g_file_plugin_registry, name, strlen(name), G_DISCARD)
+           ? 1 : 0;
+}
+
+const FilePlugin *file_lookup_plugin(pTHX_ const char *name) {
+    SV **svp;
+    const FilePlugin *p;
+
+    if (!name) return NULL;
+    if (g_file_last_plugin && strcmp(g_file_last_plugin->name, name) == 0)
+        return g_file_last_plugin;
+    if (!g_file_plugin_registry) return NULL;
+
+    svp = hv_fetch(g_file_plugin_registry, name, strlen(name), 0);
+    if (!svp || !*svp) return NULL;
+    p = INT2PTR(const FilePlugin*, SvIV(*svp));
+    g_file_last_plugin = p;
+    return p;
+}
+
+/* ---- option-HV builder ---- */
+
+HV* file_plugin_build_opts(pTHX_ SV **stack, int start, int items,
+                           const char *fn_name) {
+    HV *opts;
+    int i;
+    int has_plugin = 0;
+
+    if (start >= items) return NULL;
+    if ((items - start) % 2 != 0)
+        croak("File::Raw::%s: odd number of options (expected key => value pairs)",
+              fn_name);
+
+    opts = newHV();
+    for (i = start; i < items; i += 2) {
+        SV *key_sv = stack[i];
+        SV *val_sv = stack[i + 1];
+        STRLEN key_len;
+        const char *key;
+
+        if (!SvOK(key_sv))
+            croak("File::Raw::%s: option key at position %d is undef",
+                  fn_name, i);
+        key = SvPV(key_sv, key_len);
+        if (!hv_store(opts, key, (I32)key_len, SvREFCNT_inc(val_sv), 0)) {
+            SvREFCNT_dec(val_sv);
+            SvREFCNT_dec((SV*)opts);
+            croak("File::Raw::%s: failed to store option '%s'", fn_name, key);
+        }
+        if (key_len == 6 && memcmp(key, "plugin", 6) == 0)
+            has_plugin = 1;
+    }
+
+    if (!has_plugin) {
+        SvREFCNT_dec((SV*)opts);
+        croak("File::Raw::%s: options passed without 'plugin' key", fn_name);
+    }
+    return opts;
+}
+
+/* ---- dispatch helpers ---- */
+
+/* FilePluginChain — internal-only resolution result for a single dispatch
+ * call.
+ *
+ * Two shapes:
+ *
+ *   Single-plugin (fast path, count == 1, shared == NULL):
+ *     plugins[0] is the resolved plugin; opts is passed to it directly
+ *     (no per-plugin slicing). This is the only path used when the
+ *     caller passed `plugin => 'name'` as a scalar string — preserves
+ *     today's behaviour byte-for-byte.
+ *
+ *   Chain (count >= 1, shared != NULL):
+ *     `plugin => [a, b, c]` (arrayref). `shared` holds top-level keys
+ *     that did not match any plugin name's per-plugin sub-hash;
+ *     `per_plugin[i]` (may be NULL) holds the sub-hashref the user
+ *     gave for plugins[i]. `file_plugin_chain_iter_opts` builds a
+ *     fresh per-iteration HV from these. */
+typedef struct {
+    const FilePlugin **plugins;     /* count slots */
+    int                count;
+    HV                *shared;      /* NULL on single-plugin fast path */
+    HV               **per_plugin;  /* count slots, each may be NULL */
+} FilePluginChain;
+
+static void
+file_plugin_chain_init(FilePluginChain *chain) {
+    memset(chain, 0, sizeof *chain);
+}
+
+static void
+file_plugin_chain_free(pTHX_ FilePluginChain *chain) {
+    int i;
+    if (chain->per_plugin) {
+        for (i = 0; i < chain->count; i++) {
+            if (chain->per_plugin[i])
+                SvREFCNT_dec((SV *)chain->per_plugin[i]);
+        }
+        Safefree(chain->per_plugin);
+        chain->per_plugin = NULL;
+    }
+    if (chain->shared) {
+        SvREFCNT_dec((SV *)chain->shared);
+        chain->shared = NULL;
+    }
+    if (chain->plugins) {
+        Safefree(chain->plugins);
+        chain->plugins = NULL;
+    }
+    chain->count = 0;
+}
+
+/* Resolve plugin chain. Accepts scalar (single-plugin fast path) or
+ * arrayref (chain). Croaks on undef, empty arrayref, unknown plugin
+ * name, or wrong-shape value. Caller must call file_plugin_chain_free
+ * on `out` before returning. */
+static void
+file_plugin_resolve_chain(pTHX_ HV *opts, const char *fn_name,
+                          FilePluginChain *out)
+{
+    SV **slot;
+    SV  *plugin_sv;
+    AV  *plugins_av;
+    SSize_t n;
+    SSize_t i;
+
+    file_plugin_chain_init(out);
+
+    slot = hv_fetchs(opts, "plugin", 0);
+    if (!slot || !*slot || !SvOK(*slot))
+        croak("File::Raw::%s: missing 'plugin' option", fn_name);
+    plugin_sv = *slot;
+
+    /* Scalar fast path — single-plugin call, opts passed straight through. */
+    if (!SvROK(plugin_sv)) {
+        const char *name = SvPV_nolen(plugin_sv);
+        const FilePlugin *p = file_lookup_plugin(aTHX_ name);
+        if (!p) croak("File::Raw::%s: unknown plugin '%s'", fn_name, name);
+        Newx(out->plugins, 1, const FilePlugin *);
+        out->plugins[0] = p;
+        out->count = 1;
+        return;
+    }
+
+    if (SvTYPE(SvRV(plugin_sv)) != SVt_PVAV)
+        croak("File::Raw::%s: 'plugin' must be a string or arrayref of "
+              "plugin names", fn_name);
+
+    plugins_av = (AV *)SvRV(plugin_sv);
+    n = av_len(plugins_av) + 1;
+    if (n <= 0)
+        croak("File::Raw::%s: empty plugin chain", fn_name);
+
+    Newx(out->plugins, n, const FilePlugin *);
+    out->count = (int)n;
+
+    for (i = 0; i < n; i++) {
+        SV **np = av_fetch(plugins_av, i, 0);
+        const char *name;
+        const FilePlugin *p;
+        if (!np || !*np || !SvOK(*np))
+            croak("File::Raw::%s: undef plugin name at chain index %ld",
+                  fn_name, (long)i);
+        if (SvROK(*np))
+            croak("File::Raw::%s: plugin name at chain index %ld must "
+                  "be a string", fn_name, (long)i);
+        name = SvPV_nolen(*np);
+        p = file_lookup_plugin(aTHX_ name);
+        if (!p)
+            croak("File::Raw::%s: unknown plugin '%s' (chain index %ld)",
+                  fn_name, name, (long)i);
+        out->plugins[i] = p;
+    }
+
+    /* Build shared HV + per-plugin slots. Walk every key in opts:
+     *   - 'plugin'   → skip (already consumed)
+     *   - matches a plugin name AND is a hashref → per-plugin sub-hash
+     *   - otherwise → shared bag, visible to every iteration */
+    out->shared = newHV();
+    Newxz(out->per_plugin, n, HV *);
+
+    {
+        HE *he;
+        hv_iterinit(opts);
+        while ((he = hv_iternext(opts))) {
+            I32 klen_i;
+            const char *key = hv_iterkey(he, &klen_i);
+            STRLEN klen = (STRLEN)klen_i;
+            SV *val = hv_iterval(opts, he);
+            int matched = -1;
+
+            if (klen == 6 && memcmp(key, "plugin", 6) == 0) continue;
+
+            if (SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVHV) {
+                int j;
+                for (j = 0; j < (int)n; j++) {
+                    const char *pn = out->plugins[j]->name;
+                    STRLEN plen = strlen(pn);
+                    if (plen == klen && memcmp(key, pn, klen) == 0) {
+                        matched = j;
+                        break;
+                    }
+                }
+            }
+
+            if (matched >= 0) {
+                out->per_plugin[matched] = (HV *)SvRV(val);
+                SvREFCNT_inc((SV *)out->per_plugin[matched]);
+            } else {
+                (void)hv_store(out->shared, key, klen,
+                               SvREFCNT_inc(val), 0);
+            }
+        }
+    }
+}
+
+/* Resolve for phases that don't support chaining (RECORD, STREAM).
+ * Croaks if the user passed an arrayref. */
+static const FilePlugin *
+file_plugin_resolve_single(pTHX_ HV *opts, const char *fn_name)
+{
+    SV **slot = hv_fetchs(opts, "plugin", 0);
+    const char *name;
+    const FilePlugin *p;
+    if (!slot || !*slot || !SvOK(*slot))
+        croak("File::Raw::%s: missing 'plugin' option", fn_name);
+    if (SvROK(*slot))
+        croak("File::Raw::%s: plugin chains are not supported for the "
+              "'%s' phase (record/stream); pass a single plugin name "
+              "instead", fn_name, fn_name);
+    name = SvPV_nolen(*slot);
+    p = file_lookup_plugin(aTHX_ name);
+    if (!p) croak("File::Raw::%s: unknown plugin '%s'", fn_name, name);
+    return p;
+}
+
+/* Build the per-iteration ctx->options HV for chain mode: shared bag
+ * with the indexed plugin's sub-hash overlaid on top (sub-hash wins on
+ * conflict). The 'plugin' key is set to the iterating plugin's own
+ * name, so plugins that read it (e.g. Separated's known_opt list)
+ * don't see something stale or array-shaped. Returns a fresh HV the
+ * dispatcher must SvREFCNT_dec after the iteration. */
+static HV *
+file_plugin_chain_iter_opts(pTHX_ FilePluginChain *chain, int idx)
+{
+    HV *iter = newHV();
+    HE *he;
+
+    if (chain->shared) {
+        hv_iterinit(chain->shared);
+        while ((he = hv_iternext(chain->shared))) {
+            I32 klen_i;
+            const char *key = hv_iterkey(he, &klen_i);
+            SV *val = hv_iterval(chain->shared, he);
+            (void)hv_store(iter, key, klen_i, SvREFCNT_inc(val), 0);
+        }
+    }
+    if (chain->per_plugin && chain->per_plugin[idx]) {
+        HV *pp = chain->per_plugin[idx];
+        hv_iterinit(pp);
+        while ((he = hv_iternext(pp))) {
+            I32 klen_i;
+            const char *key = hv_iterkey(he, &klen_i);
+            SV *val = hv_iterval(pp, he);
+            (void)hv_store(iter, key, klen_i, SvREFCNT_inc(val), 0);
+        }
+    }
+    (void)hv_store(iter, "plugin", 6,
+                   newSVpv(chain->plugins[idx]->name, 0), 0);
+    return iter;
+}
+
+/* READ dispatcher.
+ *
+ * Single-plugin scalar path: identical to today — opts goes straight
+ * through, plugin's return SV is returned bare, caller manages
+ * `if (out != bytes)` decref.
+ *
+ * Chain path: walks the resolved plugin list left-to-right, threading
+ * each plugin's return SV into the next call's ctx->data. Refcount
+ * discipline tracks "do we own the current SV?" so that whether the
+ * chain returns the input bytes unchanged or a fresh SV, the contract
+ * the caller sees is identical to the single-plugin path. */
+SV* file_plugin_dispatch_read(pTHX_ HV *opts, const char *path, SV *bytes) {
+    FilePluginChain chain;
+    SV *current;
+    int we_own;
+    int i;
+
+    file_plugin_resolve_chain(aTHX_ opts, "slurp", &chain);
+
+    /* Scalar fast path: zero allocation overhead vs. today. */
+    if (chain.shared == NULL) {
+        const FilePlugin *p = chain.plugins[0];
+        FilePluginContext ctx;
+        SV *out;
+        if (!p->read_fn) {
+            file_plugin_chain_free(aTHX_ &chain);
+            croak("File::Raw: plugin '%s' has no read phase", p->name);
+        }
+        ctx.path         = path;
+        ctx.data         = bytes;
+        ctx.callback     = NULL;
+        ctx.options      = opts;
+        ctx.phase        = FILE_PLUGIN_PHASE_READ;
+        ctx.cancel       = 0;
+        ctx.plugin_state = p->state;
+        ctx.call_state   = NULL;
+        out = p->read_fn(aTHX_ &ctx);
+        file_plugin_chain_free(aTHX_ &chain);
+        if (ctx.cancel) return NULL;
+        return out;
+    }
+
+    /* Chain path. */
+    current = bytes;
+    we_own  = 0;
+
+    for (i = 0; i < chain.count; i++) {
+        const FilePlugin *p = chain.plugins[i];
+        FilePluginContext ctx;
+        HV *iter_opts;
+        SV *next;
+
+        if (!p->read_fn) {
+            if (we_own) SvREFCNT_dec(current);
+            file_plugin_chain_free(aTHX_ &chain);
+            croak("File::Raw: plugin '%s' has no read phase "
+                  "(chain index %d)", p->name, i);
+        }
+
+        iter_opts        = file_plugin_chain_iter_opts(aTHX_ &chain, i);
+        ctx.path         = path;
+        ctx.data         = current;
+        ctx.callback     = NULL;
+        ctx.options      = iter_opts;
+        ctx.phase        = FILE_PLUGIN_PHASE_READ;
+        ctx.cancel       = 0;
+        ctx.plugin_state = p->state;
+        ctx.call_state   = NULL;
+
+        next = p->read_fn(aTHX_ &ctx);
+        SvREFCNT_dec((SV *)iter_opts);
+
+        if (ctx.cancel || !next) {
+            if (we_own) SvREFCNT_dec(current);
+            file_plugin_chain_free(aTHX_ &chain);
+            return NULL;
+        }
+
+        if (next != current) {
+            if (we_own) SvREFCNT_dec(current);
+            current = next;
+            we_own  = 1;   /* per existing convention, plugin gives us +1 */
+        }
+        /* else: plugin returned the same SV; ownership unchanged. */
+    }
+
+    file_plugin_chain_free(aTHX_ &chain);
+    /* Contract matches today's: if we never replaced bytes, we return
+     * bytes (caller still owns the +1 we never touched). If we replaced
+     * it, we return the fresh SV with +1 from the last plugin, exactly
+     * as today's single-plugin path would. */
+    return current;
+}
+
+/* WRITE dispatcher. Mirror image of READ — same chain mechanics, but
+ * iterates RIGHT TO LEFT. The user's payload (which can be structured —
+ * AoA, AoH, etc.) flows into the *last* plugin first; that plugin emits
+ * bytes; subsequent (earlier-listed) plugins wrap those bytes. The byte
+ * stream produced by the FIRST plugin is what gets written to disk.
+ *
+ * Mnemonic: same array spelling for read and write — the array describes
+ * the encoding stack from outermost wrapper to innermost format. */
+SV* file_plugin_dispatch_write(pTHX_ HV *opts, const char *path, SV *payload) {
+    FilePluginChain chain;
+    SV *current;
+    int we_own;
+    int i;
+
+    file_plugin_resolve_chain(aTHX_ opts, "spew", &chain);
+
+    if (chain.shared == NULL) {
+        const FilePlugin *p = chain.plugins[0];
+        FilePluginContext ctx;
+        SV *out;
+        if (!p->write_fn) {
+            file_plugin_chain_free(aTHX_ &chain);
+            croak("File::Raw: plugin '%s' has no write phase", p->name);
+        }
+        ctx.path         = path;
+        ctx.data         = payload;
+        ctx.callback     = NULL;
+        ctx.options      = opts;
+        ctx.phase        = FILE_PLUGIN_PHASE_WRITE;
+        ctx.cancel       = 0;
+        ctx.plugin_state = p->state;
+        ctx.call_state   = NULL;
+        out = p->write_fn(aTHX_ &ctx);
+        file_plugin_chain_free(aTHX_ &chain);
+        if (ctx.cancel) return NULL;
+        return out;
+    }
+
+    current = payload;
+    we_own  = 0;
+
+    for (i = chain.count - 1; i >= 0; i--) {
+        const FilePlugin *p = chain.plugins[i];
+        FilePluginContext ctx;
+        HV *iter_opts;
+        SV *next;
+
+        if (!p->write_fn) {
+            if (we_own) SvREFCNT_dec(current);
+            file_plugin_chain_free(aTHX_ &chain);
+            croak("File::Raw: plugin '%s' has no write phase "
+                  "(chain index %d)", p->name, i);
+        }
+
+        iter_opts        = file_plugin_chain_iter_opts(aTHX_ &chain, i);
+        ctx.path         = path;
+        ctx.data         = current;
+        ctx.callback     = NULL;
+        ctx.options      = iter_opts;
+        ctx.phase        = FILE_PLUGIN_PHASE_WRITE;
+        ctx.cancel       = 0;
+        ctx.plugin_state = p->state;
+        ctx.call_state   = NULL;
+
+        next = p->write_fn(aTHX_ &ctx);
+        SvREFCNT_dec((SV *)iter_opts);
+
+        if (ctx.cancel || !next) {
+            if (we_own) SvREFCNT_dec(current);
+            file_plugin_chain_free(aTHX_ &chain);
+            return NULL;
+        }
+
+        if (next != current) {
+            if (we_own) SvREFCNT_dec(current);
+            current = next;
+            we_own  = 1;
+        }
+    }
+
+    file_plugin_chain_free(aTHX_ &chain);
+    return current;
+}
+
+/* RECORD dispatcher — single-plugin only. Chains are rejected because
+ * a "record" is one already-parsed unit; threading it through multiple
+ * record fns would require the records to remain the same shape across
+ * links, which collapses the abstraction. */
+SV* file_plugin_dispatch_record(pTHX_ HV *opts, const char *path, SV *record) {
+    const FilePlugin *p = file_plugin_resolve_single(aTHX_ opts, "record");
+    FilePluginContext ctx;
+    SV *out;
+
+    if (!p->record_fn)
+        croak("File::Raw: plugin '%s' has no record phase", p->name);
+
+    ctx.path         = path;
+    ctx.data         = NULL;
+    ctx.callback     = NULL;
+    ctx.options      = opts;
+    ctx.phase        = FILE_PLUGIN_PHASE_RECORD;
+    ctx.cancel       = 0;
+    ctx.plugin_state = p->state;
+    ctx.call_state   = NULL;
+
+    out = p->record_fn(aTHX_ &ctx, record);
+    if (ctx.cancel) return NULL;
+    return out;
+}
+
+/* file_plugin_dispatch_stream is defined below - it relies on
+ * FILE_BUFFER_SIZE and the platform open()/read() wrappers. */
+SV* file_plugin_dispatch_stream(pTHX_ HV *opts, const char *path, SV *cb) {
+    const FilePlugin *p = file_plugin_resolve_single(aTHX_ opts, "each_line");
+    FilePluginContext ctx;
+    char buf[FILE_BUFFER_SIZE];
+    int fd;
+    ssize_t n;
+    int cancelled = 0;
+
+    if (!p->stream_fn)
+        croak("File::Raw: plugin '%s' has no stream phase", p->name);
+
+    /* O_BINARY on Windows: without it the CRT puts the descriptor in
+     * text mode and strips \r from any \r\n in the read buffer before
+     * the plugin's stream hook sees it. Hash-style plugins (and any
+     * other binary consumer) then see a different byte stream than
+     * the one-shot read path, which already sets O_BINARY. No-op on
+     * Unix where O_BINARY is defined to 0. */
+    {
+        int open_flags = O_RDONLY;
+#ifdef _WIN32
+        open_flags |= O_BINARY;
+#endif
+        fd = file_open3(path, open_flags, 0);
+    }
+    if (fd < 0) return NULL;
+
+    ctx.path         = path;
+    ctx.data         = NULL;
+    ctx.callback     = cb;
+    ctx.options      = opts;
+    ctx.phase        = FILE_PLUGIN_PHASE_STREAM;
+    ctx.cancel       = 0;
+    ctx.plugin_state = p->state;
+    ctx.call_state   = NULL;
+
+    while ((n = read(fd, buf, sizeof(buf))) > 0) {
+        if (p->stream_fn(aTHX_ &ctx, buf, (size_t)n, 0) || ctx.cancel) {
+            cancelled = 1;
+            break;
+        }
+    }
+    if (!cancelled) {
+        /* EOF flush so the plugin can emit any buffered final record. */
+        p->stream_fn(aTHX_ &ctx, NULL, 0, 1);
+    }
+    close(fd);
+    return (cancelled || ctx.cancel) ? NULL : &PL_sv_yes;
+}
 
 /* ============================================
    Stat cache - like Perl's _ special filehandle
@@ -336,15 +897,9 @@ static OP* pp_file_slurp(pTHX) {
     char *buf;
     ssize_t n, total;
 
-    /* If hooks registered, use full path with hook support */
-    if (g_file_read_hook || g_file_hooks[FILE_HOOK_PHASE_READ]) {
-        result = file_slurp_internal(aTHX_ path);
-        PUSHs(sv_2mortal(result));  
-        PUTBACK;
-        return NORMAL;
-    }
-
-    /* Fast path: direct syscalls, no hooks */
+    /* Fast path: direct syscalls. The custom op only fires when the
+     * call-checker accepted exactly one arg, so there is no plugin tail
+     * to dispatch here - the variadic XSUB owns that path. */
 #ifdef _WIN32
     fd = open(path, O_RDONLY | O_BINARY);
 #else
@@ -774,7 +1329,23 @@ static OP* pp_file_atomic_spew(pTHX) {
    Call checkers for compile-time optimization
    ============================================ */
 
-/* 1-arg call checker (slurp, exists, size, is_file, is_dir, lines) */
+/* Count args between pushop's first sibling and the trailing cv op.
+ * The last sibling in the chain is the cv (we don't replace it), so the
+ * arg count is (total siblings) - 1. Returns -1 if the chain is shorter
+ * than expected (no args at all). */
+static int file_count_call_args(OP *pushop) {
+    OP *o = OpSIBLING(pushop);
+    int n = 0;
+    while (o) {
+        n++;
+        o = OpSIBLING(o);
+    }
+    return n > 0 ? n - 1 : -1;
+}
+
+/* 1-arg call checker (slurp, exists, size, is_file, is_dir, lines).
+ * Bails when items != 1 so the regular XSUB sees the full arg list -
+ * critical for the plugin tail (slurp($p, plugin => ..., key => val)). */
 static OP* file_call_checker_1arg(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) {
     file_ppfunc ppfunc = (file_ppfunc)SvIVX(ckobj);
     OP *pushop, *cvop, *argop;
@@ -788,15 +1359,14 @@ static OP* file_call_checker_1arg(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) {
         pushop = cUNOPx(pushop)->op_first;
     }
 
+    if (file_count_call_args(pushop) != 1) return entersubop;
+
     /* Get the args: pushmark -> arg -> cv */
     argop = OpSIBLING(pushop);
     if (!argop) return entersubop;
 
     cvop = OpSIBLING(argop);
     if (!cvop) return entersubop;
-
-    /* Verify exactly 1 arg */
-    if (OpSIBLING(argop) != cvop) return entersubop;
 
     /* Detach arg from tree */
     OpMORESIB_set(pushop, cvop);
@@ -815,7 +1385,9 @@ static OP* file_call_checker_1arg(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) {
     return newop;
 }
 
-/* 2-arg call checker (spew, append) */
+/* 2-arg call checker (spew, append).
+ * Bails when items != 2 so the regular XSUB sees the full arg list -
+ * critical for the plugin tail (spew($p, $data, plugin => ..., ...)). */
 static OP* file_call_checker_2arg(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) {
     file_ppfunc ppfunc = (file_ppfunc)SvIVX(ckobj);
     OP *pushop, *cvop, *pathop, *dataop;
@@ -829,6 +1401,8 @@ static OP* file_call_checker_2arg(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) {
         pushop = cUNOPx(pushop)->op_first;
     }
 
+    if (file_count_call_args(pushop) != 2) return entersubop;
+
     /* Get the args: pushmark -> path -> data -> cv */
     pathop = OpSIBLING(pushop);
     if (!pathop) return entersubop;
@@ -838,9 +1412,6 @@ static OP* file_call_checker_2arg(pTHX_ OP *entersubop, GV *namegv, SV *ckobj) {
 
     cvop = OpSIBLING(dataop);
     if (!cvop) return entersubop;
-
-    /* Verify exactly 2 args */
-    if (OpSIBLING(dataop) != cvop) return entersubop;
 
     /* Detach args from tree */
     OpMORESIB_set(pushop, cvop);
@@ -920,14 +1491,19 @@ static IV g_free_mmaps_count = 0;
    ============================================ */
 
 typedef struct {
-    int fd;             /* File descriptor */
-    char *buffer;       /* Read buffer */
+    int fd;             /* File descriptor (-1 in record-iter mode) */
+    char *buffer;       /* Read buffer (NULL in record-iter mode)   */
     size_t buf_size;    /* Buffer size */
     size_t buf_pos;     /* Current position in buffer */
     size_t buf_len;     /* Valid data length in buffer */
     int eof;            /* End of file reached */
     int refcount;       /* Reference count */
     char *path;         /* File path (for reopening) */
+    /* Record-iterator mode (set when lines_iter was called with a
+     * plugin tail). When records is non-NULL, next/eof/close walk the
+     * AoA instead of reading bytes from fd. */
+    AV *records;
+    SSize_t records_idx;
 } LineIterEntry;
 
 static LineIterEntry *g_iters = NULL;
@@ -1027,7 +1603,7 @@ static SV* file_slurp_internal(pTHX_ const char *path) {
                 
                 munmap(map, st.st_size);
                 close(fd);
-                goto apply_hooks;
+                goto done;
             }
             /* mmap failed, fall through to read() */
         }
@@ -1082,20 +1658,7 @@ static SV* file_slurp_internal(pTHX_ const char *path) {
 
     close(fd);
 
-apply_hooks:
-    /* Run read hooks if registered (lazy - just pointer check) */
-    if (g_file_read_hook || g_file_hooks[FILE_HOOK_PHASE_READ]) {
-        SV *hooked = file_run_hooks(aTHX_ FILE_HOOK_PHASE_READ, path, result);
-        if (!hooked) {
-            SvREFCNT_dec(result);
-            return &PL_sv_undef;
-        }
-        if (hooked != result) {
-            SvREFCNT_dec(result);
-            result = hooked;
-        }
-    }
-
+done:
     return result;
 }
 
@@ -1231,18 +1794,6 @@ static int file_spew_internal(pTHX_ const char *path, SV *data) {
 #else
     int open_flags = O_WRONLY | O_CREAT | O_TRUNC;
 #endif
-
-    /* Run write hooks if registered (lazy - just pointer check) */
-    if (UNLIKELY(g_file_write_hook || g_file_hooks[FILE_HOOK_PHASE_WRITE])) {
-        SV *hooked = file_run_hooks(aTHX_ FILE_HOOK_PHASE_WRITE, path, data);
-        if (!hooked) {
-            return 0;  /* Hook cancelled the write */
-        }
-        if (hooked != data) {
-            write_data = hooked;
-            free_write_data = 1;
-        }
-    }
 
     buf = SvPV(write_data, len);
 
@@ -1649,6 +2200,9 @@ static void free_iter_slot(IV idx) {
     if (entry->path) {
         Safefree(entry->path);
     }
+    if (entry->records) {
+        SvREFCNT_dec((SV *)entry->records);
+    }
 
     entry->fd = -1;
     entry->buffer = NULL;
@@ -1658,6 +2212,8 @@ static void free_iter_slot(IV idx) {
     entry->eof = 0;
     entry->refcount = 0;
     entry->path = NULL;
+    entry->records = NULL;
+    entry->records_idx = 0;
 
     if (g_free_iters_count >= g_free_iters_size) {
         g_free_iters_size *= 2;
@@ -1696,6 +2252,13 @@ static IV file_lines_open(pTHX_ const char *path) {
     path_len = strlen(path);
     Newx(entry->path, path_len + 1, char);
     memcpy(entry->path, path, path_len + 1);
+
+    /* Byte-line mode: ensure record-mode fields stay NULL even if
+     * alloc_iter_slot reused a slot whose previous owner was a
+     * record-iter (free_iter_slot already clears them, but be explicit
+     * - this was overlooked before the field was added). */
+    entry->records      = NULL;
+    entry->records_idx  = 0;
 
     return idx;
 }
@@ -2475,6 +3038,49 @@ static AV* file_tail_internal(pTHX_ const char *path, IV n) {
     return result;
 }
 
+/* range_lines: 1-based, half-open in count style.
+ * range_lines($p, 1, 10)  -> first 10 lines (same as head($p, 10))
+ * range_lines($p, 5, 3)   -> lines 5, 6, 7
+ * If `from` is past EOF or `count <= 0`, returns an empty AV (no error).
+ * `from < 1` is also treated as empty (caller error - documented).
+ *
+ * Implementation: skip-then-take using the existing line iterator. SVs
+ * for the skipped lines are allocated and immediately freed; that's
+ * O(skip) cheap work but bounded by line size, not file size. For very
+ * large skips (millions of lines) a buffer-scan-without-allocation
+ * variant would help; deferred until benchmarks demand it. */
+static AV* file_range_internal(pTHX_ const char *path, IV from, IV count) {
+    AV *result = newAV();
+    IV idx, i;
+    SV *line;
+
+    if (count <= 0 || from < 1) return result;
+
+    idx = file_lines_open(aTHX_ path);
+    if (idx < 0) return result;
+
+    /* Skip lines 1 .. from-1 */
+    for (i = 0; i < from - 1; i++) {
+        line = file_lines_next(aTHX_ idx);
+        if (line == &PL_sv_undef) {
+            file_lines_close(idx);
+            return result;
+        }
+        SvREFCNT_dec(line);
+    }
+
+    /* Take `count` lines starting at line `from` */
+    av_extend(result, count - 1);
+    for (i = 0; i < count; i++) {
+        line = file_lines_next(aTHX_ idx);
+        if (line == &PL_sv_undef) break;
+        av_push(result, line);
+    }
+
+    file_lines_close(idx);
+    return result;
+}
+
 /* ============================================
    Atomic spew - write to temp file then rename
    ============================================ */
@@ -2574,11 +3180,30 @@ static AV* file_split_lines(pTHX_ SV *content) {
 XS_INTERNAL(xs_slurp) {
     dXSARGS;
     const char *path;
+    SV *bytes;
 
-    if (items != 1) croak("Usage: file::slurp(path)");
+    if (items < 1)
+        croak("Usage: file::slurp(path [, plugin => ..., key => value ...])");
 
-    path = SvPV_nolen(ST(0));
-    ST(0) = sv_2mortal(file_slurp_internal(aTHX_ path));
+    path  = SvPV_nolen(ST(0));
+    bytes = file_slurp_internal(aTHX_ path);
+
+    if (items > 1) {
+        HV *opts = file_plugin_build_opts(aTHX_ &ST(0), 1, items, "slurp");
+        SV *out  = file_plugin_dispatch_read(aTHX_ opts, path, bytes);
+        SvREFCNT_dec((SV *)opts);
+        if (!out) {
+            SvREFCNT_dec(bytes);
+            ST(0) = &PL_sv_undef;
+            XSRETURN(1);
+        }
+        if (out != bytes) {
+            SvREFCNT_dec(bytes);
+            bytes = out;
+        }
+    }
+
+    ST(0) = sv_2mortal(bytes);
     XSRETURN(1);
 }
 
@@ -2596,30 +3221,54 @@ XS_INTERNAL(xs_slurp_raw) {
 XS_INTERNAL(xs_spew) {
     dXSARGS;
     const char *path;
+    SV *payload;
+    SV *bytes_to_write = NULL;
 
-    if (items != 2) croak("Usage: file::spew(path, data)");
+    if (items < 2)
+        croak("Usage: file::spew(path, data [, plugin => ..., key => value ...])");
 
-    path = SvPV_nolen(ST(0));
-    if (file_spew_internal(aTHX_ path, ST(1))) {
-        ST(0) = &PL_sv_yes;
-    } else {
-        ST(0) = &PL_sv_no;
+    path    = SvPV_nolen(ST(0));
+    payload = ST(1);
+
+    if (items > 2) {
+        HV *opts = file_plugin_build_opts(aTHX_ &ST(0), 2, items, "spew");
+        bytes_to_write = file_plugin_dispatch_write(aTHX_ opts, path, payload);
+        SvREFCNT_dec((SV *)opts);
+        if (!bytes_to_write) {
+            ST(0) = &PL_sv_no;
+            XSRETURN(1);
+        }
+        payload = sv_2mortal(bytes_to_write);
     }
+
+    ST(0) = file_spew_internal(aTHX_ path, payload) ? &PL_sv_yes : &PL_sv_no;
     XSRETURN(1);
 }
 
 XS_INTERNAL(xs_append) {
     dXSARGS;
     const char *path;
+    SV *payload;
+    SV *bytes_to_write = NULL;
 
-    if (items != 2) croak("Usage: file::append(path, data)");
+    if (items < 2)
+        croak("Usage: file::append(path, data [, plugin => ..., key => value ...])");
 
-    path = SvPV_nolen(ST(0));
-    if (file_append_internal(aTHX_ path, ST(1))) {
-        ST(0) = &PL_sv_yes;
-    } else {
-        ST(0) = &PL_sv_no;
+    path    = SvPV_nolen(ST(0));
+    payload = ST(1);
+
+    if (items > 2) {
+        HV *opts = file_plugin_build_opts(aTHX_ &ST(0), 2, items, "append");
+        bytes_to_write = file_plugin_dispatch_write(aTHX_ opts, path, payload);
+        SvREFCNT_dec((SV *)opts);
+        if (!bytes_to_write) {
+            ST(0) = &PL_sv_no;
+            XSRETURN(1);
+        }
+        payload = sv_2mortal(bytes_to_write);
     }
+
+    ST(0) = file_append_internal(aTHX_ path, payload) ? &PL_sv_yes : &PL_sv_no;
     XSRETURN(1);
 }
 
@@ -2720,9 +3369,55 @@ XS_INTERNAL(xs_lines) {
     int open_flags = O_RDONLY;
 #endif
 
-    if (items != 1) croak("Usage: file::lines(path)");
+    if (items < 1)
+        croak("Usage: file::lines(path [, plugin => ..., key => value ...])");
 
     path = SvPV_nolen(ST(0));
+
+    /* Plugin path: route the slurp through plugin READ. If the plugin
+     * returns an arrayref we hand that back unchanged (each element is
+     * a record). If it returns bytes we fall through to the byte-split
+     * helper below by stashing them in `buffer`. */
+    if (items > 1) {
+        HV *opts = file_plugin_build_opts(aTHX_ &ST(0), 1, items, "lines");
+        SV *bytes = file_slurp_internal(aTHX_ path);
+        SV *out   = file_plugin_dispatch_read(aTHX_ opts, path, bytes);
+        SvREFCNT_dec((SV *)opts);
+        if (!out) {
+            SvREFCNT_dec(bytes);
+            ST(0) = sv_2mortal(newRV_noinc((SV *)newAV()));
+            XSRETURN(1);
+        }
+        if (out != bytes) SvREFCNT_dec(bytes);
+        if (SvROK(out) && SvTYPE(SvRV(out)) == SVt_PVAV) {
+            ST(0) = sv_2mortal(out);
+            XSRETURN(1);
+        }
+        /* Plugin returned bytes - reuse the byte-split path below. */
+        {
+            STRLEN len;
+            const char *pv = SvPV(out, len);
+            AV *result = newAV();
+            const char *cursor = pv;
+            const char *bend = pv + len;
+            const char *nl;
+            av_extend(result, len / 40);
+            while (cursor < bend) {
+                nl = (const char *)memchr(cursor, '\n', bend - cursor);
+                if (nl) {
+                    av_push(result, newSVpvn(cursor, nl - cursor));
+                    cursor = nl + 1;
+                } else {
+                    if (cursor < bend)
+                        av_push(result, newSVpvn(cursor, bend - cursor));
+                    break;
+                }
+            }
+            SvREFCNT_dec(out);
+            ST(0) = sv_2mortal(newRV_noinc((SV *)result));
+            XSRETURN(1);
+        }
+    }
 
     fd = open(path, open_flags);
     if (UNLIKELY(fd < 0)) {
@@ -2906,9 +3601,60 @@ XS_INTERNAL(xs_lines_iter) {
     IV idx;
     SV *idx_sv;
 
-    if (items != 1) croak("Usage: file::lines_iter(path)");
+    if (items < 1)
+        croak("Usage: file::lines_iter(path [, plugin => ..., key => value ...])");
 
     path = SvPV_nolen(ST(0));
+
+    /* Plugin path: slurp + dispatch READ, wrap the resulting AoA in an
+     * iterator that walks records in order. This is eager (whole AoA
+     * held in memory) - for true streaming use each_line($p, $cb,
+     * plugin => ...). The iterator interface itself is preserved so
+     * code that stores the iterator handle still composes. */
+    if (items > 1) {
+        HV *opts;
+        SV *bytes;
+        SV *out;
+        AV *records;
+        LineIterEntry *entry;
+
+        opts = file_plugin_build_opts(aTHX_ &ST(0), 1, items, "lines_iter");
+        bytes = file_slurp_internal(aTHX_ path);
+        out = file_plugin_dispatch_read(aTHX_ opts, path, bytes);
+        SvREFCNT_dec((SV *)opts);
+        if (!out) {
+            SvREFCNT_dec(bytes);
+            ST(0) = &PL_sv_undef;
+            XSRETURN(1);
+        }
+        if (out != bytes) SvREFCNT_dec(bytes);
+        if (!SvROK(out) || SvTYPE(SvRV(out)) != SVt_PVAV) {
+            SvREFCNT_dec(out);
+            croak("File::Raw::lines_iter: plugin must return an arrayref of records");
+        }
+        records = (AV *)SvRV(out);
+        SvREFCNT_inc(records);   /* keep the AV alive on its own */
+        SvREFCNT_dec(out);       /* drop the RV wrapper */
+
+        idx = alloc_iter_slot();
+        entry = &g_iters[idx];
+        entry->fd           = -1;        /* sentinel: no file behind us */
+        entry->buffer       = NULL;
+        entry->buf_size     = 0;
+        entry->buf_pos      = 0;
+        entry->buf_len      = 0;
+        entry->eof          = 0;
+        entry->refcount     = 1;
+        entry->path         = NULL;
+        entry->records      = records;
+        entry->records_idx  = 0;
+
+        idx_sv = newSViv(idx);
+        ST(0) = sv_2mortal(sv_bless(newRV_noinc(idx_sv),
+                                    gv_stashpv("File::Raw::lines", GV_ADD)));
+        XSRETURN(1);
+    }
+
     idx = file_lines_open(aTHX_ path);
 
     if (idx < 0) {
@@ -2949,6 +3695,19 @@ XS_INTERNAL(xs_lines_iter_next) {
     }
 
     entry = &g_iters[idx];
+
+    /* Record-iter mode: walk the AoA we collected at lines_iter() time. */
+    if (entry->records) {
+        SSize_t total = av_len(entry->records) + 1;
+        if (entry->records_idx >= total) {
+            ST(0) = &PL_sv_undef;
+            XSRETURN(1);
+        }
+        SV **rp = av_fetch(entry->records, entry->records_idx++, 0);
+        ST(0) = (rp && *rp) ? sv_2mortal(newSVsv(*rp)) : &PL_sv_undef;
+        XSRETURN(1);
+    }
+
     if (UNLIKELY(entry->fd < 0)) {
         ST(0) = &PL_sv_undef;
         XSRETURN(1);
@@ -3038,6 +3797,11 @@ XS_INTERNAL(xs_lines_iter_eof) {
     }
 
     entry = &g_iters[idx];
+    if (entry->records) {
+        ST(0) = (entry->records_idx >= (av_len(entry->records) + 1))
+                  ? &PL_sv_yes : &PL_sv_no;
+        XSRETURN(1);
+    }
     ST(0) = (entry->eof && entry->buf_pos >= entry->buf_len) ? &PL_sv_yes : &PL_sv_no;
     XSRETURN(1);
 }
@@ -3245,13 +4009,24 @@ XS_INTERNAL(xs_each_line) {
     U8 gimme = G_VOID;
 #endif
 
-    if (items != 2) croak("Usage: file::each_line(path, callback)");
+    if (items < 2)
+        croak("Usage: file::each_line(path, callback [, plugin => ..., key => value ...])");
 
     path = SvPV_nolen(ST(0));
     callback = ST(1);
 
     if (!SvROK(callback) || SvTYPE(SvRV(callback)) != SVt_PVCV) {
         croak("Second argument must be a code reference");
+    }
+
+    /* Plugin path: route through streaming dispatch. The plugin's
+     * stream fn owns the record emission and calls back to `callback`
+     * per record (typically once for each parsed CSV row, etc.). */
+    if (items > 2) {
+        HV *opts = file_plugin_build_opts(aTHX_ &ST(0), 2, items, "each_line");
+        (void)file_plugin_dispatch_stream(aTHX_ opts, path, callback);
+        SvREFCNT_dec((SV *)opts);
+        XSRETURN_EMPTY;
     }
 
     block_cv = (CV*)SvRV(callback);
@@ -3344,6 +4119,49 @@ XS_INTERNAL(xs_each_line) {
     XSRETURN_EMPTY;
 }
 
+/* Run plugin READ, expect arrayref result. Returns the underlying AV*
+ * (whose RV is stored in *out_holder for the caller to refcount-dec).
+ * Returns NULL if the plugin cancelled. Croaks if the plugin returned
+ * a non-arrayref (predicate-style XSUBs need an iterable). */
+static AV *file_records_via_plugin(pTHX_ HV *opts, const char *path,
+                                   SV **out_holder)
+{
+    SV *bytes = file_slurp_internal(aTHX_ path);
+    SV *out   = file_plugin_dispatch_read(aTHX_ opts, path, bytes);
+    if (!out) {
+        SvREFCNT_dec(bytes);
+        return NULL;
+    }
+    if (out != bytes) SvREFCNT_dec(bytes);
+    if (!SvROK(out) || SvTYPE(SvRV(out)) != SVt_PVAV) {
+        SvREFCNT_dec(out);
+        croak("File::Raw: plugin must return an arrayref of records "
+              "for predicate-style operations");
+    }
+    *out_holder = out;
+    return (AV *)SvRV(out);
+}
+
+/* Apply a coderef predicate to one record. Returns 1 if matched, 0 otherwise.
+ * Used by the plugin path of grep/count/find. */
+static int file_call_predicate_cv(pTHX_ CV *cv, SV *record) {
+    int matches = 0;
+    int n;
+    SV *r;
+    dSP;
+    PUSHMARK(SP);
+    XPUSHs(record);
+    PUTBACK;
+    n = call_sv((SV *)cv, G_SCALAR);
+    SPAGAIN;
+    if (n > 0) {
+        r = POPs;
+        matches = SvTRUE(r) ? 1 : 0;
+    }
+    PUTBACK;
+    return matches;
+}
+
 /* Grep lines with callback or registered predicate name */
 XS_INTERNAL(xs_grep_lines) {
     dXSARGS;
@@ -3355,10 +4173,44 @@ XS_INTERNAL(xs_grep_lines) {
     CV *block_cv = NULL;
     FileLineCallback *fcb = NULL;
 
-    if (items != 2) croak("Usage: file::grep_lines(path, &predicate or $name)");
+    if (items < 2)
+        croak("Usage: file::grep_lines(path, &predicate or $name [, plugin => ..., key => value ...])");
 
     path = SvPV_nolen(ST(0));
     predicate = ST(1);
+
+    /* Plugin path: records come from plugin READ; predicate must be a coderef. */
+    if (items > 2) {
+        HV *opts;
+        SV *holder = NULL;
+        AV *records;
+        SSize_t i, n;
+        AV *matched;
+
+        if (!SvROK(predicate) || SvTYPE(SvRV(predicate)) != SVt_PVCV)
+            croak("File::Raw::grep_lines: predicate must be a coderef when "
+                  "a plugin is in use (predicate-name sugar is legacy 2-arg only)");
+
+        opts = file_plugin_build_opts(aTHX_ &ST(0), 2, items, "grep_lines");
+        records = file_records_via_plugin(aTHX_ opts, path, &holder);
+        SvREFCNT_dec((SV *)opts);
+        if (!records) {
+            ST(0) = sv_2mortal(newRV_noinc((SV *)newAV()));
+            XSRETURN(1);
+        }
+
+        matched = newAV();
+        n = av_len(records) + 1;
+        for (i = 0; i < n; i++) {
+            SV **rp = av_fetch(records, i, 0);
+            SV *rec = (rp && *rp) ? *rp : &PL_sv_undef;
+            if (file_call_predicate_cv(aTHX_ (CV *)SvRV(predicate), rec))
+                av_push(matched, SvREFCNT_inc(rec));
+        }
+        SvREFCNT_dec(holder);
+        ST(0) = sv_2mortal(newRV_noinc((SV *)matched));
+        XSRETURN(1);
+    }
     result = newAV();
 
     /* Check if predicate is a name or coderef */
@@ -3434,9 +4286,51 @@ XS_INTERNAL(xs_count_lines) {
     CV *block_cv = NULL;
     FileLineCallback *fcb = NULL;
 
-    if (items < 1 || items > 2) croak("Usage: file::count_lines(path, [&predicate or $name])");
+    if (items < 1)
+        croak("Usage: file::count_lines(path [, &predicate or $name] [, plugin => ..., key => value ...])");
 
     path = SvPV_nolen(ST(0));
+
+    /* Plugin path: if items > 2 we definitely have a plugin tail. Otherwise
+     * if items == 2 and ST(1) looks like the start of options (a string key
+     * with a value missing - i.e. items == 2 but ST(1) is a known options
+     * key like "plugin"), users use the explicit form by passing a coderef
+     * or undef as the predicate slot first. Keep it strict: plugin tail
+     * begins at position 2, so items must be >= 3 (predicate may be undef). */
+    if (items > 2) {
+        HV *opts;
+        SV *holder = NULL;
+        AV *records;
+        SSize_t i, n;
+        IV matched = 0;
+        int has_pred = SvOK(ST(1));
+
+        if (has_pred && (!SvROK(ST(1)) || SvTYPE(SvRV(ST(1))) != SVt_PVCV))
+            croak("File::Raw::count_lines: predicate must be a coderef or undef "
+                  "when a plugin is in use");
+
+        opts = file_plugin_build_opts(aTHX_ &ST(0), 2, items, "count_lines");
+        records = file_records_via_plugin(aTHX_ opts, path, &holder);
+        SvREFCNT_dec((SV *)opts);
+        if (!records) {
+            ST(0) = sv_2mortal(newSViv(0));
+            XSRETURN(1);
+        }
+        n = av_len(records) + 1;
+        if (!has_pred) {
+            matched = n;
+        } else {
+            for (i = 0; i < n; i++) {
+                SV **rp = av_fetch(records, i, 0);
+                SV *rec = (rp && *rp) ? *rp : &PL_sv_undef;
+                if (file_call_predicate_cv(aTHX_ (CV *)SvRV(ST(1)), rec))
+                    matched++;
+            }
+        }
+        SvREFCNT_dec(holder);
+        ST(0) = sv_2mortal(newSViv(matched));
+        XSRETURN(1);
+    }
 
     /* If no predicate, just count newlines - no SV creation needed */
     if (items == 1) {
@@ -3553,10 +4447,41 @@ XS_INTERNAL(xs_find_line) {
     CV *block_cv = NULL;
     FileLineCallback *fcb = NULL;
 
-    if (items != 2) croak("Usage: file::find_line(path, &predicate or $name)");
+    if (items < 2)
+        croak("Usage: file::find_line(path, &predicate or $name [, plugin => ..., key => value ...])");
 
     path = SvPV_nolen(ST(0));
     predicate = ST(1);
+
+    if (items > 2) {
+        HV *opts;
+        SV *holder = NULL;
+        AV *records;
+        SSize_t i, n;
+
+        if (!SvROK(predicate) || SvTYPE(SvRV(predicate)) != SVt_PVCV)
+            croak("File::Raw::find_line: predicate must be a coderef when "
+                  "a plugin is in use");
+
+        opts = file_plugin_build_opts(aTHX_ &ST(0), 2, items, "find_line");
+        records = file_records_via_plugin(aTHX_ opts, path, &holder);
+        SvREFCNT_dec((SV *)opts);
+        if (!records) XSRETURN_UNDEF;
+
+        n = av_len(records) + 1;
+        for (i = 0; i < n; i++) {
+            SV **rp = av_fetch(records, i, 0);
+            SV *rec = (rp && *rp) ? *rp : &PL_sv_undef;
+            if (file_call_predicate_cv(aTHX_ (CV *)SvRV(predicate), rec)) {
+                SV *winner = newSVsv(rec);
+                SvREFCNT_dec(holder);
+                ST(0) = sv_2mortal(winner);
+                XSRETURN(1);
+            }
+        }
+        SvREFCNT_dec(holder);
+        XSRETURN_UNDEF;
+    }
 
     /* Check if predicate is a name or coderef */
     if (SvROK(predicate) && SvTYPE(SvRV(predicate)) == SVt_PVCV) {
@@ -3627,7 +4552,8 @@ XS_INTERNAL(xs_map_lines) {
     IV idx;
     SV *line;
     AV *result;
-    if (items != 2) croak("Usage: file::map_lines(path, &callback)");
+    if (items < 2)
+        croak("Usage: file::map_lines(path, &callback [, plugin => ..., key => value ...])");
 
     path = SvPV_nolen(ST(0));
     callback = ST(1);
@@ -3635,6 +4561,46 @@ XS_INTERNAL(xs_map_lines) {
 
     if (!SvROK(callback) || SvTYPE(SvRV(callback)) != SVt_PVCV) {
         croak("Second argument must be a code reference");
+    }
+
+    if (items > 2) {
+        HV *opts;
+        SV *holder = NULL;
+        AV *records;
+        SSize_t i, n;
+        AV *out;
+
+        SvREFCNT_dec((SV *)result);
+        opts = file_plugin_build_opts(aTHX_ &ST(0), 2, items, "map_lines");
+        records = file_records_via_plugin(aTHX_ opts, path, &holder);
+        SvREFCNT_dec((SV *)opts);
+        if (!records) {
+            ST(0) = sv_2mortal(newRV_noinc((SV *)newAV()));
+            XSRETURN(1);
+        }
+        out = newAV();
+        n = av_len(records) + 1;
+        av_extend(out, n);
+        for (i = 0; i < n; i++) {
+            SV **rp = av_fetch(records, i, 0);
+            SV *rec = (rp && *rp) ? *rp : &PL_sv_undef;
+            int rn;
+            SV *rv;
+            dSP;
+            PUSHMARK(SP);
+            XPUSHs(rec);
+            PUTBACK;
+            rn = call_sv(callback, G_SCALAR);
+            SPAGAIN;
+            if (rn > 0) {
+                rv = POPs;
+                av_push(out, SvREFCNT_inc(rv));
+            }
+            PUTBACK;
+        }
+        SvREFCNT_dec(holder);
+        ST(0) = sv_2mortal(newRV_noinc((SV *)out));
+        XSRETURN(1);
     }
 
     idx = file_lines_open(aTHX_ path);
@@ -3667,196 +4633,423 @@ XS_INTERNAL(xs_map_lines) {
     XSRETURN(1);
 }
 
-/* Register a Perl callback */
-XS_INTERNAL(xs_register_line_callback) {
+/* ============================================
+   Perl bridge for the plugin API.
+
+   Perl plugins are registered as a hashref of phase coderefs:
+
+       File::Raw::register_plugin('csv', {
+           read   => sub { my ($path, $bytes,  $opts) = @_; ... },
+           write  => sub { my ($path, $rows,   $opts) = @_; ... },
+           record => sub { my ($path, $record, $opts) = @_; ... },
+       });
+
+   The bridge allocates a PerlPluginBridge holding the coderef SVs plus
+   a FilePlugin block whose function pointers are static C thunks. The
+   thunks recover the bridge from FilePluginContext::plugin_state and
+   call the appropriate coderef. The bridge is pinned in
+   g_perl_plugins so we can free it on unregister.
+
+   The 'stream' phase is intentionally not supported from Perl: a Perl
+   stream plugin would be invoked once per chunk by file.c's read loop,
+   and the per-call call_sv overhead defeats the point of streaming.
+   Perl plugins that need record-by-record callbacks should implement
+   the 'record' phase instead - File::Raw drives the iteration.
+   ============================================ */
+
+typedef struct PerlPluginBridge {
+    char        *name;     /* strdup'd; pointer is stored in plugin.name */
+    SV          *read_cv;
+    SV          *write_cv;
+    SV          *record_cv;
+    FilePlugin   plugin;
+} PerlPluginBridge;
+
+static HV *g_perl_plugins = NULL;
+
+static void perl_plugin_bridge_free(pTHX_ PerlPluginBridge *b) {
+    if (!b) return;
+    if (b->read_cv)   SvREFCNT_dec(b->read_cv);
+    if (b->write_cv)  SvREFCNT_dec(b->write_cv);
+    if (b->record_cv) SvREFCNT_dec(b->record_cv);
+    if (b->name)      Safefree(b->name);
+    Safefree(b);
+}
+
+static SV *perl_plugin_thunk_read(pTHX_ FilePluginContext *ctx) {
+    PerlPluginBridge *b = (PerlPluginBridge *)ctx->plugin_state;
+    SV *result;
+    int count;
+    dSP;
+
+    ENTER;
+    SAVETMPS;
+    PUSHMARK(SP);
+    XPUSHs(sv_2mortal(newSVpv(ctx->path ? ctx->path : "", 0)));
+    XPUSHs(sv_2mortal(newSVsv(ctx->data)));
+    XPUSHs(sv_2mortal(newRV_inc((SV *)ctx->options)));
+    PUTBACK;
+
+    count = call_sv(b->read_cv, G_SCALAR | G_EVAL);
+
+    SPAGAIN;
+    if (SvTRUE(ERRSV)) {
+        SV *err = newSVsv(ERRSV);
+        FREETMPS;
+        LEAVE;
+        croak_sv(err);
+    }
+    if (count > 0) {
+        SV *ret = POPs;
+        if (SvOK(ret)) {
+            result = newSVsv(ret);
+        } else {
+            ctx->cancel = 1;
+            result = NULL;
+        }
+    } else {
+        ctx->cancel = 1;
+        result = NULL;
+    }
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+    return result;
+}
+
+static SV *perl_plugin_thunk_write(pTHX_ FilePluginContext *ctx) {
+    PerlPluginBridge *b = (PerlPluginBridge *)ctx->plugin_state;
+    SV *result;
+    int count;
+    dSP;
+
+    ENTER;
+    SAVETMPS;
+    PUSHMARK(SP);
+    XPUSHs(sv_2mortal(newSVpv(ctx->path ? ctx->path : "", 0)));
+    XPUSHs(sv_2mortal(newSVsv(ctx->data)));
+    XPUSHs(sv_2mortal(newRV_inc((SV *)ctx->options)));
+    PUTBACK;
+
+    count = call_sv(b->write_cv, G_SCALAR | G_EVAL);
+
+    SPAGAIN;
+    if (SvTRUE(ERRSV)) {
+        SV *err = newSVsv(ERRSV);
+        FREETMPS;
+        LEAVE;
+        croak_sv(err);
+    }
+    if (count > 0) {
+        SV *ret = POPs;
+        if (SvOK(ret)) {
+            result = newSVsv(ret);
+        } else {
+            ctx->cancel = 1;
+            result = NULL;
+        }
+    } else {
+        ctx->cancel = 1;
+        result = NULL;
+    }
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+    return result;
+}
+
+static SV *perl_plugin_thunk_record(pTHX_ FilePluginContext *ctx, SV *record) {
+    PerlPluginBridge *b = (PerlPluginBridge *)ctx->plugin_state;
+    SV *result;
+    int count;
+    dSP;
+
+    ENTER;
+    SAVETMPS;
+    PUSHMARK(SP);
+    XPUSHs(sv_2mortal(newSVpv(ctx->path ? ctx->path : "", 0)));
+    XPUSHs(sv_2mortal(newSVsv(record)));
+    XPUSHs(sv_2mortal(newRV_inc((SV *)ctx->options)));
+    PUTBACK;
+
+    count = call_sv(b->record_cv, G_SCALAR | G_EVAL);
+
+    SPAGAIN;
+    if (SvTRUE(ERRSV)) {
+        SV *err = newSVsv(ERRSV);
+        FREETMPS;
+        LEAVE;
+        croak_sv(err);
+    }
+    if (count > 0) {
+        SV *ret = POPs;
+        if (SvOK(ret)) {
+            result = newSVsv(ret);
+        } else {
+            result = &PL_sv_undef;  /* exclude */
+        }
+    } else {
+        result = &PL_sv_undef;
+    }
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+    return result;
+}
+
+/* ============================================
+   Built-in 'predicate' plugin.
+
+   Records flow through plugin->record_fn(), which looks up a predicate by
+   name in g_file_callback_registry. The record fn returns the record SV
+   when the predicate matches, or &PL_sv_undef when it does not -
+   callers (grep/count/find) interpret this via truthiness.
+
+   The 'name' option is required:
+
+       File::Raw::grep_lines($p, plugin => 'predicate', name => 'is_blank');
+
+   Predicates registered as Perl coderefs are invoked with the record in
+   $_; the same convention as grep_lines's per-record callbacks.
+   ============================================ */
+
+static SV *predicate_plugin_record(pTHX_ FilePluginContext *ctx, SV *record) {
+    SV **svp;
+    const char *pred_name;
+    STRLEN pred_name_len;
+    FileLineCallback *cb;
+
+    svp = hv_fetchs(ctx->options, "name", 0);
+    if (!svp || !*svp || !SvOK(*svp))
+        croak("File::Raw plugin 'predicate': missing 'name' option");
+    pred_name = SvPV(*svp, pred_name_len);
+
+    if (!g_file_callback_registry)
+        file_init_callback_registry(aTHX);
+
+    svp = hv_fetch(g_file_callback_registry, pred_name, pred_name_len, 0);
+    if (!svp || !*svp)
+        croak("File::Raw plugin 'predicate': unknown predicate '%s'", pred_name);
+    cb = INT2PTR(FileLineCallback *, SvIV(*svp));
+
+    if (cb->predicate) {
+        return cb->predicate(aTHX_ record) ? record : &PL_sv_undef;
+    } else if (cb->perl_callback) {
+        SV *old_defsv = DEFSV;
+        SV *result_sv;
+        int count;
+        bool matched = FALSE;
+        dSP;
+
+        DEFSV = record;
+        ENTER;
+        SAVETMPS;
+        PUSHMARK(SP);
+        PUTBACK;
+        count = call_sv(cb->perl_callback, G_SCALAR);
+        SPAGAIN;
+        if (count > 0) {
+            result_sv = POPs;
+            matched = SvTRUE(result_sv);
+        }
+        PUTBACK;
+        FREETMPS;
+        LEAVE;
+        DEFSV = old_defsv;
+        return matched ? record : &PL_sv_undef;
+    }
+    return &PL_sv_undef;
+}
+
+static FilePlugin g_predicate_plugin = {
+    "predicate",
+    NULL,                       /* read   */
+    NULL,                       /* write  */
+    predicate_plugin_record,    /* record */
+    NULL,                       /* stream */
+    NULL                        /* state - the global registry is consulted directly */
+};
+
+/* Public XSUBs for the predicate registry that backs the 'predicate'
+ * plugin. Adding here also makes the entry visible to the legacy 2-arg
+ * grep_lines($p, $name) sugar, which looks names up in the same HV. */
+
+XS_INTERNAL(xs_register_predicate) {
     dXSARGS;
     const char *name;
     STRLEN name_len;
     SV *coderef;
     FileLineCallback *cb;
+    FileLineCallback *existing;
     SV *sv;
 
-    if (items != 2) croak("Usage: file::register_line_callback($name, \\&coderef)");
+    if (items != 2)
+        croak("Usage: File::Raw::register_predicate($name, \\&coderef)");
 
     name = SvPV(ST(0), name_len);
     coderef = ST(1);
 
-    if (!SvROK(coderef) || SvTYPE(SvRV(coderef)) != SVt_PVCV) {
-        croak("File::Raw::register_line_callback: second argument must be a coderef");
-    }
+    if (!SvROK(coderef) || SvTYPE(SvRV(coderef)) != SVt_PVCV)
+        croak("File::Raw::register_predicate: second arg must be a coderef");
 
     file_init_callback_registry(aTHX);
 
-    /* If already registered, just update the perl_callback in place */
-    {
-        FileLineCallback *existing = file_get_callback(aTHX_ name);
-        if (existing) {
-            /* Update existing - free old perl_callback and set new one */
-            if (existing->perl_callback) {
-                SvREFCNT_dec(existing->perl_callback);
-            }
-            existing->perl_callback = newSVsv(coderef);
-            existing->predicate = NULL;  /* Clear any C predicate */
-            XSRETURN_YES;
-        }
+    existing = file_get_callback(aTHX_ name);
+    if (existing) {
+        if (existing->perl_callback) SvREFCNT_dec(existing->perl_callback);
+        existing->perl_callback = newSVsv(coderef);
+        existing->predicate = NULL;
+        XSRETURN_YES;
     }
 
     Newxz(cb, 1, FileLineCallback);
-    cb->predicate = NULL;  /* No C function */
+    cb->predicate = NULL;
     cb->perl_callback = newSVsv(coderef);
-
     sv = newSViv(PTR2IV(cb));
     hv_store(g_file_callback_registry, name, name_len, sv, 0);
 
     XSRETURN_YES;
 }
 
-/* List registered callbacks */
-XS_INTERNAL(xs_list_line_callbacks) {
+XS_INTERNAL(xs_list_predicates) {
     dXSARGS;
-    AV *result;
-    HE *entry;
+    AV *result = newAV();
+    HE *he;
 
     PERL_UNUSED_VAR(items);
 
-    result = newAV();
     if (g_file_callback_registry) {
         hv_iterinit(g_file_callback_registry);
-        while ((entry = hv_iternext(g_file_callback_registry))) {
-            av_push(result, newSVsv(hv_iterkeysv(entry)));
+        while ((he = hv_iternext(g_file_callback_registry))) {
+            I32 klen;
+            const char *kname = hv_iterkey(he, &klen);
+            av_push(result, newSVpvn(kname, klen));
         }
     }
 
-    ST(0) = sv_2mortal(newRV_noinc((SV*)result));
+    ST(0) = sv_2mortal(newRV_noinc((SV *)result));
     XSRETURN(1);
 }
 
-/* ============================================
-   Hook registration XS functions
-   ============================================ */
-
-/* Register a Perl read hook */
-XS_INTERNAL(xs_register_read_hook) {
+XS_INTERNAL(xs_register_plugin) {
     dXSARGS;
-    SV *coderef;
-    FileHookEntry *entry;
+    const char *name;
+    STRLEN name_len;
+    SV *spec;
+    HV *spec_hv;
+    SV **svp;
+    PerlPluginBridge *b;
+    int rc;
+    int override = 0;
 
-    if (items != 1) croak("Usage: file::register_read_hook(\\&coderef)");
+    if (items < 2 || items > 3)
+        croak("Usage: File::Raw::register_plugin($name, \\%%phases [, $override])");
 
-    coderef = ST(0);
-    if (!SvROK(coderef) || SvTYPE(SvRV(coderef)) != SVt_PVCV) {
-        croak("File::Raw::register_read_hook: argument must be a coderef");
+    name = SvPV(ST(0), name_len);
+    if (name_len == 0)
+        croak("File::Raw::register_plugin: name must be non-empty");
+
+    spec = ST(1);
+    if (!SvROK(spec) || SvTYPE(SvRV(spec)) != SVt_PVHV)
+        croak("File::Raw::register_plugin: second arg must be a hashref");
+    spec_hv = (HV *)SvRV(spec);
+
+    if (items == 3) override = SvTRUE(ST(2));
+
+    if (override) (void)file_unregister_plugin(aTHX_ name);
+
+    Newxz(b, 1, PerlPluginBridge);
+    b->name = savepv(name);
+
+    svp = hv_fetchs(spec_hv, "read", 0);
+    if (svp && *svp && SvROK(*svp) && SvTYPE(SvRV(*svp)) == SVt_PVCV) {
+        b->read_cv = newSVsv(*svp);
+        b->plugin.read_fn = perl_plugin_thunk_read;
+    }
+    svp = hv_fetchs(spec_hv, "write", 0);
+    if (svp && *svp && SvROK(*svp) && SvTYPE(SvRV(*svp)) == SVt_PVCV) {
+        b->write_cv = newSVsv(*svp);
+        b->plugin.write_fn = perl_plugin_thunk_write;
+    }
+    svp = hv_fetchs(spec_hv, "record", 0);
+    if (svp && *svp && SvROK(*svp) && SvTYPE(SvRV(*svp)) == SVt_PVCV) {
+        b->record_cv = newSVsv(*svp);
+        b->plugin.record_fn = perl_plugin_thunk_record;
+    }
+    /* hv_existss is 5.36+. Use hv_exists for portability. */
+    if (hv_exists(spec_hv, "stream", 6))
+        croak("File::Raw::register_plugin: 'stream' phase not supported "
+              "from Perl - implement 'record' instead, or write a C plugin");
+
+    if (!b->plugin.read_fn && !b->plugin.write_fn && !b->plugin.record_fn) {
+        perl_plugin_bridge_free(aTHX_ b);
+        croak("File::Raw::register_plugin: at least one of read/write/record "
+              "must be a coderef");
     }
 
-    /* Use the hook list for Perl callbacks */
-    Newxz(entry, 1, FileHookEntry);
-    entry->name = "perl_read_hook";
-    entry->c_func = NULL;
-    entry->perl_callback = newSVsv(coderef);
-    entry->priority = FILE_HOOK_PRIORITY_NORMAL;
-    entry->user_data = NULL;
-    entry->next = g_file_hooks[FILE_HOOK_PHASE_READ];
-    g_file_hooks[FILE_HOOK_PHASE_READ] = entry;
+    b->plugin.name  = b->name;
+    b->plugin.state = b;
+
+    rc = file_register_plugin(aTHX_ &b->plugin);
+    if (rc != 1) {
+        perl_plugin_bridge_free(aTHX_ b);
+        if (rc == 0)
+            croak("File::Raw::register_plugin: plugin '%s' is already registered",
+                  name);
+        croak("File::Raw::register_plugin: invalid plugin spec for '%s'", name);
+    }
+
+    if (!g_perl_plugins) g_perl_plugins = newHV();
+    hv_store(g_perl_plugins, name, name_len, newSViv(PTR2IV(b)), 0);
 
     XSRETURN_YES;
 }
 
-/* Register a Perl write hook */
-XS_INTERNAL(xs_register_write_hook) {
+XS_INTERNAL(xs_unregister_plugin) {
     dXSARGS;
-    SV *coderef;
-    FileHookEntry *entry;
+    const char *name;
+    STRLEN name_len;
+    SV **svp;
+    int removed_perl = 0;
 
-    if (items != 1) croak("Usage: file::register_write_hook(\\&coderef)");
+    if (items != 1)
+        croak("Usage: File::Raw::unregister_plugin($name)");
 
-    coderef = ST(0);
-    if (!SvROK(coderef) || SvTYPE(SvRV(coderef)) != SVt_PVCV) {
-        croak("File::Raw::register_write_hook: argument must be a coderef");
-    }
+    name = SvPV(ST(0), name_len);
 
-    /* Use the hook list for Perl callbacks */
-    Newxz(entry, 1, FileHookEntry);
-    entry->name = "perl_write_hook";
-    entry->c_func = NULL;
-    entry->perl_callback = newSVsv(coderef);
-    entry->priority = FILE_HOOK_PRIORITY_NORMAL;
-    entry->user_data = NULL;
-    entry->next = g_file_hooks[FILE_HOOK_PHASE_WRITE];
-    g_file_hooks[FILE_HOOK_PHASE_WRITE] = entry;
-
-    XSRETURN_YES;
-}
-
-/* Clear all hooks for a phase */
-XS_INTERNAL(xs_clear_hooks) {
-    dXSARGS;
-    const char *phase_name;
-    FileHookPhase phase;
-    FileHookEntry *entry, *next;
-
-    if (items != 1) croak("Usage: file::clear_hooks($phase)");
-
-    phase_name = SvPV_nolen(ST(0));
-
-    if (strcmp(phase_name, "read") == 0) {
-        phase = FILE_HOOK_PHASE_READ;
-        g_file_read_hook = NULL;
-        g_file_read_hook_data = NULL;
-    } else if (strcmp(phase_name, "write") == 0) {
-        phase = FILE_HOOK_PHASE_WRITE;
-        g_file_write_hook = NULL;
-        g_file_write_hook_data = NULL;
-    } else if (strcmp(phase_name, "open") == 0) {
-        phase = FILE_HOOK_PHASE_OPEN;
-    } else if (strcmp(phase_name, "close") == 0) {
-        phase = FILE_HOOK_PHASE_CLOSE;
-    } else {
-        croak("File::Raw::clear_hooks: unknown phase '%s' (use read, write, open, close)", phase_name);
-    }
-
-    /* Free hook list */
-    entry = g_file_hooks[phase];
-    while (entry) {
-        next = entry->next;
-        if (entry->perl_callback) {
-            SvREFCNT_dec(entry->perl_callback);
+    if (g_perl_plugins) {
+        svp = hv_fetch(g_perl_plugins, name, name_len, 0);
+        if (svp && *svp) {
+            PerlPluginBridge *b = INT2PTR(PerlPluginBridge *, SvIV(*svp));
+            (void)hv_delete(g_perl_plugins, name, name_len, G_DISCARD);
+            (void)file_unregister_plugin(aTHX_ name);
+            perl_plugin_bridge_free(aTHX_ b);
+            removed_perl = 1;
         }
-        Safefree(entry);
-        entry = next;
     }
-    g_file_hooks[phase] = NULL;
+    if (!removed_perl)
+        (void)file_unregister_plugin(aTHX_ name);
 
     XSRETURN_YES;
 }
 
-/* Check if hooks are registered for a phase */
-XS_INTERNAL(xs_has_hooks) {
+XS_INTERNAL(xs_list_plugins) {
     dXSARGS;
-    const char *phase_name;
-    FileHookPhase phase;
-    int has;
+    AV *result = newAV();
+    HE *he;
 
-    if (items != 1) croak("Usage: file::has_hooks($phase)");
+    PERL_UNUSED_VAR(items);
 
-    phase_name = SvPV_nolen(ST(0));
-
-    if (strcmp(phase_name, "read") == 0) {
-        phase = FILE_HOOK_PHASE_READ;
-        has = (g_file_read_hook != NULL) || (g_file_hooks[phase] != NULL);
-    } else if (strcmp(phase_name, "write") == 0) {
-        phase = FILE_HOOK_PHASE_WRITE;
-        has = (g_file_write_hook != NULL) || (g_file_hooks[phase] != NULL);
-    } else if (strcmp(phase_name, "open") == 0) {
-        phase = FILE_HOOK_PHASE_OPEN;
-        has = (g_file_hooks[phase] != NULL);
-    } else if (strcmp(phase_name, "close") == 0) {
-        phase = FILE_HOOK_PHASE_CLOSE;
-        has = (g_file_hooks[phase] != NULL);
-    } else {
-        croak("File::Raw::has_hooks: unknown phase '%s' (use read, write, open, close)", phase_name);
+    if (g_file_plugin_registry) {
+        hv_iterinit(g_file_plugin_registry);
+        while ((he = hv_iternext(g_file_plugin_registry))) {
+            I32 klen;
+            const char *kname = hv_iterkey(he, &klen);
+            av_push(result, newSVpvn(kname, klen));
+        }
     }
 
-    ST(0) = has ? &PL_sv_yes : &PL_sv_no;
+    ST(0) = sv_2mortal(newRV_noinc((SV *)result));
     XSRETURN(1);
 }
 
@@ -4153,14 +5346,52 @@ XS_INTERNAL(xs_rm_rf) {
 }
 
 /* Head and tail */
+/* head/tail share an arg-parsing convention: even items means $n is at
+ * ST(1) and the plugin tail (if any) begins at ST(2); odd items means
+ * $n is omitted and the plugin tail begins at ST(1). This avoids the
+ * ambiguity of "is ST(1) a count or the first option key?". */
 XS_INTERNAL(xs_head) {
     dXSARGS;
     const char *path;
     AV *result;
-    IV n = 10;  /* Default to 10 lines */
-    if (items < 1 || items > 2) croak("Usage: file::head(path, [n])");
+    IV n = 10;
+    int n_positional;
+
+    if (items < 1)
+        croak("Usage: file::head(path [, n] [, plugin => ..., key => value ...])");
+
     path = SvPV_nolen(ST(0));
-    if (items > 1) n = SvIV(ST(1));
+    n_positional = (items % 2 == 0) ? 2 : 1;
+    if (n_positional == 2) n = SvIV(ST(1));
+
+    if (items > n_positional) {
+        HV *opts;
+        SV *holder = NULL;
+        AV *records;
+        AV *out;
+        SSize_t i, total, take;
+
+        opts = file_plugin_build_opts(aTHX_ &ST(0), n_positional, items, "head");
+        records = file_records_via_plugin(aTHX_ opts, path, &holder);
+        SvREFCNT_dec((SV *)opts);
+        if (!records) {
+            ST(0) = sv_2mortal(newRV_noinc((SV *)newAV()));
+            XSRETURN(1);
+        }
+        out = newAV();
+        total = av_len(records) + 1;
+        take = (n < (IV)total) ? n : total;
+        if (take < 0) take = 0;
+        av_extend(out, take);
+        for (i = 0; i < take; i++) {
+            SV **rp = av_fetch(records, i, 0);
+            av_push(out, SvREFCNT_inc(rp && *rp ? *rp : &PL_sv_undef));
+        }
+        SvREFCNT_dec(holder);
+        ST(0) = sv_2mortal(newRV_noinc((SV *)out));
+        XSRETURN(1);
+    }
+
     result = file_head_internal(aTHX_ path, n);
     ST(0) = sv_2mortal(newRV_noinc((SV*)result));
     XSRETURN(1);
@@ -4170,11 +5401,111 @@ XS_INTERNAL(xs_tail) {
     dXSARGS;
     const char *path;
     AV *result;
-    IV n = 10;  /* Default to 10 lines */
-    if (items < 1 || items > 2) croak("Usage: file::tail(path, [n])");
+    IV n = 10;
+    int n_positional;
+
+    if (items < 1)
+        croak("Usage: file::tail(path [, n] [, plugin => ..., key => value ...])");
+
     path = SvPV_nolen(ST(0));
-    if (items > 1) n = SvIV(ST(1));
+    n_positional = (items % 2 == 0) ? 2 : 1;
+    if (n_positional == 2) n = SvIV(ST(1));
+
+    if (items > n_positional) {
+        HV *opts;
+        SV *holder = NULL;
+        AV *records;
+        AV *out;
+        SSize_t i, total, start, take;
+
+        opts = file_plugin_build_opts(aTHX_ &ST(0), n_positional, items, "tail");
+        records = file_records_via_plugin(aTHX_ opts, path, &holder);
+        SvREFCNT_dec((SV *)opts);
+        if (!records) {
+            ST(0) = sv_2mortal(newRV_noinc((SV *)newAV()));
+            XSRETURN(1);
+        }
+        out = newAV();
+        total = av_len(records) + 1;
+        take  = (n < (IV)total) ? n : total;
+        if (take < 0) take = 0;
+        start = total - take;
+        av_extend(out, take);
+        for (i = start; i < total; i++) {
+            SV **rp = av_fetch(records, i, 0);
+            av_push(out, SvREFCNT_inc(rp && *rp ? *rp : &PL_sv_undef));
+        }
+        SvREFCNT_dec(holder);
+        ST(0) = sv_2mortal(newRV_noinc((SV *)out));
+        XSRETURN(1);
+    }
+
     result = file_tail_internal(aTHX_ path, n);
+    ST(0) = sv_2mortal(newRV_noinc((SV*)result));
+    XSRETURN(1);
+}
+
+/* range_lines(path, from, count [, plugin => ..., key => value ...])
+ *
+ * 1-based, half-open in count style: range_lines($p, 5, 3) returns
+ * lines 5, 6, 7 (or fewer if EOF arrives first). Symmetric with
+ * head/tail in shape and plugin behaviour. */
+XS_INTERNAL(xs_range_lines) {
+    dXSARGS;
+    const char *path;
+    IV from, count;
+    AV *result;
+
+    if (items < 3)
+        croak("Usage: file::range_lines(path, from, count "
+              "[, plugin => ..., key => value ...])");
+
+    path  = SvPV_nolen(ST(0));
+    from  = SvIV(ST(1));
+    count = SvIV(ST(2));
+
+    /* Plugin path: slice the plugin's record AoA. Same eager trade-off
+     * as head/tail/lines under a plugin tail. */
+    if (items > 3) {
+        HV *opts;
+        SV *holder = NULL;
+        AV *records;
+        AV *out;
+        SSize_t i, total, start, end;
+
+        opts = file_plugin_build_opts(aTHX_ &ST(0), 3, items, "range_lines");
+        records = file_records_via_plugin(aTHX_ opts, path, &holder);
+        SvREFCNT_dec((SV *)opts);
+        if (!records) {
+            ST(0) = sv_2mortal(newRV_noinc((SV *)newAV()));
+            XSRETURN(1);
+        }
+        out = newAV();
+        if (from < 1 || count <= 0) {
+            SvREFCNT_dec(holder);
+            ST(0) = sv_2mortal(newRV_noinc((SV *)out));
+            XSRETURN(1);
+        }
+        total = av_len(records) + 1;
+        start = from - 1;            /* 1-based -> 0-based */
+        if (start >= total) {
+            SvREFCNT_dec(holder);
+            ST(0) = sv_2mortal(newRV_noinc((SV *)out));
+            XSRETURN(1);
+        }
+        end = start + count;
+        if (end > total) end = total;
+        av_extend(out, end - start - 1);
+        for (i = start; i < end; i++) {
+            SV **rp = av_fetch(records, i, 0);
+            av_push(out, SvREFCNT_inc(rp && *rp ? *rp : &PL_sv_undef));
+        }
+        SvREFCNT_dec(holder);
+        ST(0) = sv_2mortal(newRV_noinc((SV *)out));
+        XSRETURN(1);
+    }
+
+    result = file_range_internal(aTHX_ path, from, count);
     ST(0) = sv_2mortal(newRV_noinc((SV*)result));
     XSRETURN(1);
 }
@@ -4183,9 +5514,27 @@ XS_INTERNAL(xs_tail) {
 XS_INTERNAL(xs_atomic_spew) {
     dXSARGS;
     const char *path;
-    if (items != 2) croak("Usage: file::atomic_spew(path, data)");
-    path = SvPV_nolen(ST(0));
-    ST(0) = file_atomic_spew_internal(aTHX_ path, ST(1)) ? &PL_sv_yes : &PL_sv_no;
+    SV *payload;
+    SV *bytes_to_write = NULL;
+
+    if (items < 2)
+        croak("Usage: file::atomic_spew(path, data [, plugin => ..., key => value ...])");
+
+    path    = SvPV_nolen(ST(0));
+    payload = ST(1);
+
+    if (items > 2) {
+        HV *opts = file_plugin_build_opts(aTHX_ &ST(0), 2, items, "atomic_spew");
+        bytes_to_write = file_plugin_dispatch_write(aTHX_ opts, path, payload);
+        SvREFCNT_dec((SV *)opts);
+        if (!bytes_to_write) {
+            ST(0) = &PL_sv_no;
+            XSRETURN(1);
+        }
+        payload = sv_2mortal(bytes_to_write);
+    }
+
+    ST(0) = file_atomic_spew_internal(aTHX_ path, payload) ? &PL_sv_yes : &PL_sv_no;
     XSRETURN(1);
 }
 
@@ -4196,22 +5545,51 @@ XS_INTERNAL(xs_atomic_spew) {
 XS_EXTERNAL(XS_file_func_slurp) {
     dXSARGS;
     const char *path;
-    if (items != 1) croak("Usage: file_slurp($path)");
-    path = SvPV_nolen(ST(0));
-    ST(0) = sv_2mortal(file_slurp_internal(aTHX_ path));
+    SV *bytes;
+
+    if (items < 1)
+        croak("Usage: file_slurp($path [, plugin => ..., key => value ...])");
+
+    path  = SvPV_nolen(ST(0));
+    bytes = file_slurp_internal(aTHX_ path);
+
+    if (items > 1) {
+        HV *opts = file_plugin_build_opts(aTHX_ &ST(0), 1, items, "slurp");
+        SV *out  = file_plugin_dispatch_read(aTHX_ opts, path, bytes);
+        SvREFCNT_dec((SV *)opts);
+        if (!out) {
+            SvREFCNT_dec(bytes);
+            ST(0) = &PL_sv_undef;
+            XSRETURN(1);
+        }
+        if (out != bytes) {
+            SvREFCNT_dec(bytes);
+            bytes = out;
+        }
+    }
+    ST(0) = sv_2mortal(bytes);
     XSRETURN(1);
 }
 
 XS_EXTERNAL(XS_file_func_spew) {
     dXSARGS;
     const char *path;
-    if (items != 2) croak("Usage: file_spew($path, $data)");
-    path = SvPV_nolen(ST(0));
-    if (file_spew_internal(aTHX_ path, ST(1))) {
-        ST(0) = &PL_sv_yes;
-    } else {
-        ST(0) = &PL_sv_no;
+    SV *payload;
+
+    if (items < 2)
+        croak("Usage: file_spew($path, $data [, plugin => ..., key => value ...])");
+
+    path    = SvPV_nolen(ST(0));
+    payload = ST(1);
+
+    if (items > 2) {
+        HV *opts = file_plugin_build_opts(aTHX_ &ST(0), 2, items, "spew");
+        SV *out  = file_plugin_dispatch_write(aTHX_ opts, path, payload);
+        SvREFCNT_dec((SV *)opts);
+        if (!out) { ST(0) = &PL_sv_no; XSRETURN(1); }
+        payload = sv_2mortal(out);
     }
+    ST(0) = file_spew_internal(aTHX_ path, payload) ? &PL_sv_yes : &PL_sv_no;
     XSRETURN(1);
 }
 
@@ -4256,17 +5634,40 @@ XS_EXTERNAL(XS_file_func_lines) {
     const char *path;
     SV *content;
     AV *lines;
-    if (items != 1) croak("Usage: file_lines($path)");
-    path = SvPV_nolen(ST(0));
-    content = file_slurp_internal(aTHX_ path);
 
+    if (items < 1)
+        croak("Usage: file_lines($path [, plugin => ..., key => value ...])");
+
+    path = SvPV_nolen(ST(0));
+
+    if (items > 1) {
+        HV *opts = file_plugin_build_opts(aTHX_ &ST(0), 1, items, "lines");
+        SV *bytes = file_slurp_internal(aTHX_ path);
+        SV *out   = file_plugin_dispatch_read(aTHX_ opts, path, bytes);
+        SvREFCNT_dec((SV *)opts);
+        if (!out) {
+            SvREFCNT_dec(bytes);
+            ST(0) = sv_2mortal(newRV_noinc((SV *)newAV()));
+            XSRETURN(1);
+        }
+        if (out != bytes) SvREFCNT_dec(bytes);
+        if (SvROK(out) && SvTYPE(SvRV(out)) == SVt_PVAV) {
+            ST(0) = sv_2mortal(out);
+            XSRETURN(1);
+        }
+        lines = file_split_lines(aTHX_ out);
+        SvREFCNT_dec(out);
+        ST(0) = sv_2mortal(newRV_noinc((SV *)lines));
+        XSRETURN(1);
+    }
+
+    content = file_slurp_internal(aTHX_ path);
     if (content == &PL_sv_undef) {
         lines = newAV();
     } else {
         lines = file_split_lines(aTHX_ content);
         SvREFCNT_dec(content);
     }
-
     ST(0) = sv_2mortal(newRV_noinc((SV*)lines));
     XSRETURN(1);
 }
@@ -4477,18 +5878,44 @@ XS_EXTERNAL(XS_file_func_chmod) {
 XS_EXTERNAL(XS_file_func_append) {
     dXSARGS;
     const char *path;
-    if (items != 2) croak("Usage: file_append($path, $data)");
-    path = SvPV_nolen(ST(0));
-    ST(0) = file_append_internal(aTHX_ path, ST(1)) ? &PL_sv_yes : &PL_sv_no;
+    SV *payload;
+
+    if (items < 2)
+        croak("Usage: file_append($path, $data [, plugin => ..., key => value ...])");
+
+    path    = SvPV_nolen(ST(0));
+    payload = ST(1);
+
+    if (items > 2) {
+        HV *opts = file_plugin_build_opts(aTHX_ &ST(0), 2, items, "append");
+        SV *out  = file_plugin_dispatch_write(aTHX_ opts, path, payload);
+        SvREFCNT_dec((SV *)opts);
+        if (!out) { ST(0) = &PL_sv_no; XSRETURN(1); }
+        payload = sv_2mortal(out);
+    }
+    ST(0) = file_append_internal(aTHX_ path, payload) ? &PL_sv_yes : &PL_sv_no;
     XSRETURN(1);
 }
 
 XS_EXTERNAL(XS_file_func_atomic_spew) {
     dXSARGS;
     const char *path;
-    if (items != 2) croak("Usage: file_atomic_spew($path, $data)");
-    path = SvPV_nolen(ST(0));
-    ST(0) = file_atomic_spew_internal(aTHX_ path, ST(1)) ? &PL_sv_yes : &PL_sv_no;
+    SV *payload;
+
+    if (items < 2)
+        croak("Usage: file_atomic_spew($path, $data [, plugin => ..., key => value ...])");
+
+    path    = SvPV_nolen(ST(0));
+    payload = ST(1);
+
+    if (items > 2) {
+        HV *opts = file_plugin_build_opts(aTHX_ &ST(0), 2, items, "atomic_spew");
+        SV *out  = file_plugin_dispatch_write(aTHX_ opts, path, payload);
+        SvREFCNT_dec((SV *)opts);
+        if (!out) { ST(0) = &PL_sv_no; XSRETURN(1); }
+        payload = sv_2mortal(out);
+    }
+    ST(0) = file_atomic_spew_internal(aTHX_ path, payload) ? &PL_sv_yes : &PL_sv_no;
     XSRETURN(1);
 }
 
@@ -4537,6 +5964,7 @@ static const ImportEntry import_funcs[] = {
     {"join", 0, xs_join, NULL},
     {"mkpath", 0, xs_mkpath, NULL},
     {"rm_rf", 0, xs_rm_rf, NULL},
+    {"range_lines", 0, xs_range_lines, NULL},
     {NULL, 0, NULL, NULL}
 };
 
@@ -4906,14 +6334,22 @@ XS_EXTERNAL(boot_File__Raw) {
     newXS("File::Raw::count_lines", xs_count_lines, __FILE__);
     newXS("File::Raw::find_line", xs_find_line, __FILE__);
     newXS("File::Raw::map_lines", xs_map_lines, __FILE__);
-    newXS("File::Raw::register_line_callback", xs_register_line_callback, __FILE__);
-    newXS("File::Raw::list_line_callbacks", xs_list_line_callbacks, __FILE__);
 
-    /* File hooks */
-    newXS("File::Raw::register_read_hook", xs_register_read_hook, __FILE__);
-    newXS("File::Raw::register_write_hook", xs_register_write_hook, __FILE__);
-    newXS("File::Raw::clear_hooks", xs_clear_hooks, __FILE__);
-    newXS("File::Raw::has_hooks", xs_has_hooks, __FILE__);
+    /* Plugin API */
+    newXS("File::Raw::register_plugin", xs_register_plugin, __FILE__);
+    newXS("File::Raw::unregister_plugin", xs_unregister_plugin, __FILE__);
+    newXS("File::Raw::list_plugins", xs_list_plugins, __FILE__);
+    newXS("File::Raw::register_predicate", xs_register_predicate, __FILE__);
+    newXS("File::Raw::list_predicates", xs_list_predicates, __FILE__);
+
+    /* Built-in 'predicate' plugin: routes the eight built-in line
+     * predicates and any user-registered ones through plugin dispatch.
+     * Initialise the predicate storage first so the plugin's record fn
+     * always sees a populated registry. */
+    file_init_callback_registry(aTHX);
+    if (file_register_plugin(aTHX_ &g_predicate_plugin) != 1) {
+        croak("File::Raw boot: failed to register built-in 'predicate' plugin");
+    }
 
     /* Combined stat - all attributes in one syscall */
     newXS("File::Raw::stat", xs_stat_all, __FILE__);
@@ -4921,6 +6357,7 @@ XS_EXTERNAL(boot_File__Raw) {
     /* Head and tail */
     newXS("File::Raw::head", xs_head, __FILE__);
     newXS("File::Raw::tail", xs_tail, __FILE__);
+    newXS("File::Raw::range_lines", xs_range_lines, __FILE__);
 
     /* Import function */
     newXS("File::Raw::import", XS_file_import, __FILE__);

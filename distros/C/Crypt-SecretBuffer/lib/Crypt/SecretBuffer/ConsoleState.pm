@@ -1,7 +1,7 @@
 package Crypt::SecretBuffer::ConsoleState;
 # VERSION
 # ABSTRACT: Disable TTY echo within a scope
-$Crypt::SecretBuffer::ConsoleState::VERSION = '0.023';
+$Crypt::SecretBuffer::ConsoleState::VERSION = '0.024';
 1;
 
 __END__
@@ -86,9 +86,25 @@ Boolean, read/write.
 
 Set the console/tty state to the original value seen when the object was created.
 
+=head2 wait_char_readable
+
+  $bool= $console_state->wait_char_readable;
+  $bool= $console_state->wait_char_readable($timeout_seconds);
+
+Wait until a character is available to be read from the console/tty represented by this object.
+
+If C<$timeout_seconds> is omitted or undef, waits indefinitely.
+Returns true if a character is ready, or false if the timeout expires first.
+
+On Windows, this filters out console events that do not produce a character, such as
+modifier-only key presses, mouse events, and window resize events.  When using this as a test
+before C<< $secret_buffer->append_sysread($fh, 1) >> beware that in the Windows codepage
+65001 (UTF-8) one readable char can be returned as multiple bytes, so either request a larger
+read, or check the code page and UTF-8 nature of the bytes received.
+
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 AUTHOR
 

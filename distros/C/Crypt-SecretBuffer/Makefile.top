@@ -24,36 +24,39 @@ require ExtUtils::Depends;
 require ExtUtils::CFeatureTest;
 
 my $dep= ExtUtils::Depends->new('Crypt::SecretBuffer');
-my $test= ExtUtils::CFeatureTest->new;
+my $ctest= ExtUtils::CFeatureTest->new;
 
 if ($^O eq 'MSWin32') {
-   $test->require_header('windows.h');
-   $test->header('wincrypt.h');
+   $ctest->require_header('windows.h');
+   $ctest->header('wincrypt.h');
 } else {
-   $test->require_header('unistd.h');
-   $test->require_header('fcntl.h');
-   $test->require_header('termios.h');
-   $test->require_feature(HAVE_PTHREAD => 'pthread_detach', { h => 'pthread.h', -l => 'pthread' });
-   $test->require_feature(HAVE_CLOCK_GETTIME => 'clock_gettime', { h => 'time.h', -l => 'rt' });
+   $ctest->require_header('unistd.h');
+   $ctest->require_header('fcntl.h');
+   $ctest->require_header('termios.h');
+   $ctest->require_feature(HAVE_PTHREAD => 'pthread_detach', { h => 'pthread.h', -l => 'pthread' });
+   $ctest->require_feature(HAVE_CLOCK_GETTIME => 'clock_gettime', { h => 'time.h', -l => 'rt' });
 
-   $test->feature(HAVE_MINCORE   => 'mincore',   { h => 'sys/mman.h' });
-   $test->feature(HAVE_GETRANDOM => 'getrandom', { h => 'sys/random.h' });
+   $ctest->feature(HAVE_MINCORE   => 'mincore',   { h => 'sys/mman.h' });
+   $ctest->feature(HAVE_GETRANDOM => 'getrandom', { h => 'sys/random.h' });
 }
 
-$test->header('stdint.h');
+$ctest->header('stdint.h');
 
-$test->header('stdbool.h');
-$test->feature(HAVE_BOOL      => 'bool x= true; return x == false;');
+$ctest->header('stdbool.h');
+unless ($ctest->feature(HAVE_BOOL => 'bool x= true; return x == false;')) {
+   $ctest->append_config_local(
+      '#define bool int',
+      '#define true 1',
+      '#define false 0',
+   );
+}
 
-$test->feature(HAVE_LIBSSL    => 'unsigned char buf[1]; return RAND_bytes(buf, 1) == 1? 0 : 1;',
-               { h => 'openssl/rand.h', -l => 'ssl' });
+$ctest->header('string.h');
+$ctest->feature(HAVE_EXPLICIT_BZERO => 'char buf[1]= { 1 }; explicit_bzero(buf, 1); return buf[0];');
+$ctest->feature(HAVE_MEMMEM         => 'return memmem("foo", 3, "bar", 3)? 1 : 0;');
 
-$test->header('string.h');
-$test->feature(HAVE_EXPLICIT_BZERO => 'char buf[1]= { 1 }; explicit_bzero(buf, 1); return buf[0];');
-$test->feature(HAVE_MEMMEM         => 'return memmem("foo", 3, "bar", 3)? 1 : 0;');
-
-$test->write_config_header('SecretBuffer_config.h');
-$test->export_deps($dep);
+$ctest->write_config_header('SecretBuffer_config.h');
+$ctest->export_deps($dep);
 
 my @exports= `$^X build-manual-linkage-header.pl --list-prototypes < SecretBuffer.h`;
 chomp(@exports);

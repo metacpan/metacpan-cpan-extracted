@@ -6,7 +6,7 @@ use Test::More tests => 321;
 
 BEGIN 
 {
-  require 't/test-lib.pl';
+  require './t/test-lib.pl';
   use_ok('Rose::DB::Object');
 }
 

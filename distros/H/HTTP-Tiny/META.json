@@ -5,7 +5,7 @@
       "David Golden <dagolden@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.036, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -107,7 +107,7 @@
    "provides" : {
       "HTTP::Tiny" : {
          "file" : "lib/HTTP/Tiny.pm",
-         "version" : "0.092"
+         "version" : "0.094"
       }
    },
    "release_status" : "stable",
@@ -122,7 +122,7 @@
          "web" : "https://github.com/Perl-Toolchain-Gang/HTTP-Tiny"
       }
    },
-   "version" : "0.092",
+   "version" : "0.094",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
       "Alan Gardner <gardner@pythian.com>",

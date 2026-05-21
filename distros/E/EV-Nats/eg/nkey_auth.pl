@@ -5,12 +5,12 @@ use warnings;
 use EV;
 use EV::Nats;
 
-# Method 1: credentials file (contains JWT + NKey seed)
+# Method 1: credentials file (contains JWT + NKey seed).
+# Apply creds_file BEFORE connect, so JWT/NKey are available during the
+# initial CONNECT handshake.
 if (my $creds = $ENV{NATS_CREDS}) {
     my $nats;
     $nats = EV::Nats->new(
-        host     => $ENV{NATS_HOST} // 'connect.ngs.global',
-        port     => $ENV{NATS_PORT} // 4222,
         tls      => 1,
         on_error => sub { warn "error: @_\n" },
         on_connect => sub {
@@ -20,7 +20,10 @@ if (my $creds = $ENV{NATS_CREDS}) {
         },
     );
     $nats->creds_file($creds);
-    $nats->connect($ENV{NATS_HOST} // 'connect.ngs.global');
+    $nats->connect(
+        $ENV{NATS_HOST} // 'connect.ngs.global',
+        $ENV{NATS_PORT} // 4222,
+    );
     EV::run;
     exit;
 }

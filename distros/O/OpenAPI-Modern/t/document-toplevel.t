@@ -15,14 +15,12 @@ use lib 't/lib';
 use Helper;
 use Test2::Warnings 0.038 qw(:no_end_test warnings had_no_warnings);
 
-my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
-
 subtest 'basic construction' => sub {
   cmp_result(
     [ warnings {
       JSON::Schema::Modern::Document::OpenAPI->new(
         canonical_uri => 'http://localhost:1234/api',
-        schema => $yamlpp->load_string(OPENAPI_PREAMBLE."\npaths: {}\n"),
+        schema => decode_yaml(OPENAPI_PREAMBLE."\npaths: {}\n"),
         json_schema_dialect => 'https://example.com/metaschema',
       )
     } ],
@@ -32,7 +30,7 @@ subtest 'basic construction' => sub {
 
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE."\npaths: {}\n"));
+    schema => decode_yaml(OPENAPI_PREAMBLE."\npaths: {}\n"));
 
   cmp_result([ $doc->errors ], [], 'no errors when loading empty document');
   cmp_result(
@@ -67,7 +65,7 @@ subtest 'top level document checks' => sub {
     [ warnings {
       $doc = JSON::Schema::Modern::Document::OpenAPI->new(
         specification_version => 'draft7',
-        schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+        schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   schemas:
     test_schema:
@@ -219,7 +217,7 @@ ERRORS
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 $self: '#frag\\ment'
 YAML
   cmp_result(
@@ -235,7 +233,7 @@ YAML
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 $self: '#fragment'
 YAML
   cmp_result(
@@ -252,7 +250,7 @@ YAML
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 jsonSchemaDialect: '#frag\\ment'
 YAML
 
@@ -281,7 +279,7 @@ YAML
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     evaluator => $js,
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 jsonSchemaDialect: https://metaschema/with/wrong/spec
 YAML
 
@@ -327,7 +325,7 @@ subtest 'openapi version checks' => sub {
     cmp_result(
       [ warnings {
         JSON::Schema::Modern::Document::OpenAPI->new(
-          schema => $yamlpp->load_string(<<"YAML"))
+          schema => decode_yaml(<<"YAML"))
 ---
 openapi: $version
 info:
@@ -350,7 +348,7 @@ YAML
     cmp_result(
       [ warnings {
         JSON::Schema::Modern::Document::OpenAPI->new(
-          schema => $yamlpp->load_string(<<"YAML"))
+          schema => decode_yaml(<<"YAML"))
 ---
 openapi: $version
 info:
@@ -365,7 +363,7 @@ YAML
   }
 
   foreach my $version (qw(3.3.5 4.0.0 4.1.0 4.1.1)) {
-    my $doc = JSON::Schema::Modern::Document::OpenAPI->new(schema => $yamlpp->load_string(<<"YAML"));
+    my $doc = JSON::Schema::Modern::Document::OpenAPI->new(schema => decode_yaml(<<"YAML"));
 ---
 openapi: $version
 info:
@@ -390,7 +388,7 @@ subtest 'parsing of jsonSchemaDialect to calculate dialect, metaschema_uri' => s
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     evaluator => my $js = JSON::Schema::Modern->new,
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 # no jsonSchemaDialect
 components:
   schemas:
@@ -461,7 +459,7 @@ YAML
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     evaluator => $js = JSON::Schema::Modern->new,
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 # no jsonSchemaDialect
 components:
   schemas:
@@ -480,7 +478,7 @@ YAML
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     evaluator => $js = JSON::Schema::Modern->new,
-    schema => my $schema = $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    schema => my $schema = decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 # no jsonSchemaDialect
 components:
   schemas:
@@ -516,7 +514,7 @@ YAML
     canonical_uri => 'http://localhost:1234/api',
     evaluator => $js,
     metaschema_uri => DEFAULT_METASCHEMA->{+OAS_VERSION}, # '#meta' is now just {"type": ["object","boolean"]}
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 jsonSchemaDialect: https://my_custom_dialect
 components:
   schemas:
@@ -566,7 +564,7 @@ YAML
     evaluator => $js,
     # metaschema_uri cannot be autogenerated, as jsonSchemaDialect uri-reference will not match
     metaschema_uri => DEFAULT_METASCHEMA->{+OAS_VERSION},
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 $self: api
 jsonSchemaDialect: my_custom_dialect   # this is a relative uri
 components:
@@ -604,7 +602,7 @@ YAML
 subtest 'custom dialects, via metaschema_uri' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     metaschema_uri => STRICT_METASCHEMA->{+OAS_VERSION},
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   schemas:
     Foo:
@@ -628,7 +626,7 @@ YAML
 subtest 'custom dialects, via metaschema_uri and jsonSchemaDialect' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     metaschema_uri => STRICT_METASCHEMA->{+OAS_VERSION},
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<YAML));
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<YAML));
 jsonSchemaDialect: ${\ STRICT_DIALECT->{+OAS_VERSION} }
 components:
   schemas:
@@ -655,7 +653,7 @@ subtest 'custom $self value' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/foo/api.json',
     evaluator => my $js = JSON::Schema::Modern->new,
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 $self: user/api.json  # the 'user' family of APIs
 paths: {}
 YAML
@@ -681,7 +679,7 @@ YAML
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/foo/api.json',
     evaluator => $js,
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 $self: http://localhost:5555/user/api.json  # the 'user' family of APIs
 paths: {}
 YAML
@@ -706,7 +704,7 @@ YAML
   # relative $self, relative original_uri - $self is resolved with original_uri
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'foo/api.json',
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 $self: user/api.json  # the 'user' family of APIs
 paths: {}
 YAML
@@ -731,7 +729,7 @@ YAML
   # absolute $self, relative original_uri - $self is used as is
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'foo/api.json',
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 $self: http://localhost:5555/user/api.json  # the 'user' family of APIs
 paths: {}
 YAML

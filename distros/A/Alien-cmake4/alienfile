@@ -2,6 +2,7 @@ use alienfile;
 
 use Config;
 use File::Spec;
+use version;
 
 # NOTE: you can set ALIEN_CMAKE_FROM_SOURCE to force a build from source
 # even on platforms which have binary versions of cmake available.  Normally
@@ -18,12 +19,18 @@ plugin 'Probe::CommandLine' => (
 share {
 	my $binary_release_name;
 	my $binary_format;
-	if ($^O eq 'linux' && $Config{'archname'} =~ /^x86_64/) {
-		$binary_release_name = 'linux-x86_64';
-		$binary_format = 'tar.gz';
-	} elsif ($^O eq 'linux' && $Config{'archname'} =~ /^aarch64/) {
-		$binary_release_name = 'linux-aarch64';
-		$binary_format = 'tar.gz';
+
+	if ($^O eq 'linux') {
+		my $linux_binary_ok = _glibc_at_least('2.17');
+		if ($linux_binary_ok) {
+			if ($Config{'archname'} =~ /^x86_64/) {
+				$binary_release_name = 'linux-x86_64';
+				$binary_format = 'tar.gz';
+			} elsif ($Config{'archname'} =~ /^aarch64/) {
+				$binary_release_name = 'linux-aarch64';
+				$binary_format = 'tar.gz';
+			}
+		}
 	} elsif ($^O eq 'MSWin32' && $Config{'ptrsize'} == 4) {
 		$binary_release_name = 'windows-i386';
 		$binary_format = 'zip';
@@ -98,3 +105,16 @@ share {
 		$build->runtime_prop->{'command'} = 'cmake';
         };
 };
+
+sub _glibc_at_least {
+	my $need = shift;
+
+	my $out = `getconf GNU_LIBC_VERSION 2>/dev/null`;
+	if (! defined $out || $out !~ /glibc\s+([0-9.]+)/) {
+		return 0;
+	}
+	my $glibc_version = $1;
+
+	return version->parse("v$glibc_version") >= version->parse("v$need");
+}
+

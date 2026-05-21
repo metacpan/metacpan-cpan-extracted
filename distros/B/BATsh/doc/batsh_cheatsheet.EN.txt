@@ -1,6 +1,33 @@
 BATsh Cheat Sheet [EN] English
 ==============================
 
+----------------------------------------------------------------------
+EXECUTIVE SUMMARY
+  BATsh is a bilingual shell that runs cmd.exe batch and bash/sh syntax
+  in the same script file. It switches modes automatically per line/section.
+  No external shell needed -- pure Perl implementation.
+
+MIXED-MODE SAMPLE
+  :: CMD section (uppercase first token)
+  @ECHO OFF
+  SET LANG=BATsh
+  SET COUNT=3
+
+  # SH section (lowercase first token)
+  greet() { echo "Hello from $1 (bash mode)"; }
+  greet $LANG
+  for i in 1 2 3; do echo "  item $i of $COUNT"; done
+  result=$(echo $LANG | perl -e 'while(<STDIN>){chomp;print uc}')
+  echo "Uppercase: $result"
+
+  :: CMD section again (reads SH result via bridge)
+  ECHO Back in CMD: %result%
+
+  # Run with: perl lib/BATsh.pm script.batsh
+  # Or:       use BATsh; BATsh->run('script.batsh');
+----------------------------------------------------------------------
+
+
 BATsh is a bilingual shell that runs cmd.exe and bash/sh syntax in the
 same script.  The script is divided into sections; each section is
 executed verbatim by the appropriate shell.
@@ -140,3 +167,59 @@ executed verbatim by the appropriate shell.
   No CPAN dependencies.
 
 See also: https://metacpan.org/dist/BATsh
+
+11. CMD Pipeline and Parameter Modifiers
+-----------------------------------------
+  cmd1 | cmd2              # pipeline via temporary file (Pure Perl)
+  ECHO hello | perl -e "while(<STDIN>){print uc}"
+
+  SET /P VAR=Prompt:       # read a line from STDIN into VAR
+
+  Batch-parameter tilde modifiers (e.g. when %0=C:\scripts\deploy.bat):
+    %~0   -> C:\scripts\deploy.bat  (dequote only)
+    %~f0  -> C:/scripts/deploy.bat  (full absolute path)
+    %~d0  -> C:                     (drive letter)
+    %~p0  -> /scripts/              (directory path)
+    %~n0  -> deploy                 (filename without extension)
+    %~x0  -> .bat                   (extension)
+    %~dp0 -> C:/scripts/            (drive + directory, most common)
+    %~nx1 -> deploy.bat             (name + extension)
+
+12. SH Functions and Expansion
+--------------------------------
+  greet() {              # function definition
+      echo "Hi $1"
+  }
+  function add {         # alternative syntax
+      echo $(( $1 + $2 ))
+  }
+  greet world            # call function
+  add 3 4                # -> 7
+
+  ${var%.*}    remove shortest suffix matching .*
+  ${var%%.*}   remove longest  suffix matching .*
+  ${var#*.}    remove shortest prefix matching *.
+  ${var##*.}   remove longest  prefix matching *.
+  ${var/a/b}   replace first  occurrence of a with b
+  ${var//a/b}  replace all    occurrences of a with b
+  ${var^^}     uppercase all
+  ${var,,}     lowercase all
+  ${var:2:4}   substring from offset 2, length 4
+  ${#var}      string length
+  ${var:-def}  value if set, else def
+
+13. SH I/O Redirection
+------------------------
+  cmd > file      stdout overwrite
+  cmd >> file     stdout append
+  cmd < file      stdin from file
+  cmd 2> file     stderr to file
+  cmd 2>&1        merge stderr into stdout
+  cmd > f 2>&1    both stdout and stderr to file
+
+14. SH Compound Commands
+-------------------------
+  cmd1 && cmd2    run cmd2 only if cmd1 succeeds
+  cmd1 || cmd2    run cmd2 only if cmd1 fails
+  cmd1 ; cmd2     run cmd2 unconditionally
+

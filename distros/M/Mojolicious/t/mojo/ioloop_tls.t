@@ -335,7 +335,7 @@ is $server, 'accepted',  'right result';
 is $client, 'connected', 'right result';
 ok !$client_err, 'no error';
 my $expect = $version eq 'TLSv1_3' ? 'TLS_AES_256_GCM_SHA384' : 'AES256-SHA';
-is $cipher, $expect, "$expect has been negotiatied";
+is $cipher, $expect, "$expect has been negotiated";
 
 # Ignore missing client certificate
 ($server, $client, $client_err) = ();

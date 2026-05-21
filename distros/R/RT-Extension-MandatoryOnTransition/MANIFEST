@@ -53,8 +53,12 @@ po/fr.po
 po/mandatoryontransition.pot
 README
 xt/basic.t
+xt/cfcg_update_layout.t
+xt/clear_required_cf.t
+xt/date_cf_update.t
 xt/immutable_core_for_update.t
 xt/mandatory_on_create.t
+xt/must_be_update.t
 xt/queue_change.t
 xt/required_fields.t
 xt/roles.t

@@ -1,0 +1,30 @@
+0.000002  2026-05-12 14:55:52-07:00 America/Los_Angeles
+
+    - API rework: clean_eval and clean_string_eval now always return a
+      blessed Clean::Eval result object. New 'ok' field drives the bool
+      overload; new 'out' field holds the block's scalar-context return
+      value on success (block form only - string form never captures a
+      result, since the body may be defining subs, BEGIN/END blocks, or
+      otherwise producing nothing meaningful in scalar context).
+
+    - 'error' key is now only present on failure; 'out' key is only
+      present on block-form success. Stringification yields the empty
+      string on success and the trapped error on failure.
+
+    - last_error() is now only updated on failure (successes no longer
+      reset it). Documented that it remains fragile under DESTROY-time
+      reentry; capturing the result object at the call site is the
+      robust path.
+
+    - New convenience accessors: ok, out, error.
+
+    - Expanded POD: synopsis updated for the new pattern
+      (if (my $ev = clean_eval {...}) { ... = $ev->out }), new RESULT
+      OBJECT section, PITFALLS section covering the
+      my-in-conditional/or-die parsing gotcha, forced scalar context on
+      block return, string-form lexical visibility, return-from-block
+      semantics, and the (&) prototype not accepting a coderef variable.
+
+0.000001  2026-05-12 14:07:06-07:00 America/Los_Angeles
+
+    - Initial Version

@@ -1,5 +1,5 @@
 package Crypt::Passphrase::SHA1::Hex;
-$Crypt::Passphrase::SHA1::Hex::VERSION = '0.022';
+$Crypt::Passphrase::SHA1::Hex::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -19,7 +19,7 @@ sub accepts_hash {
 
 sub verify_password {
 	my ($self, $password, $hash) = @_;
-	return sha1($password) eq pack 'H40', $hash;
+	return $self->secure_compare(sha1($password), pack 'H40', $hash);
 }
 
 1;
@@ -38,7 +38,7 @@ Crypt::Passphrase::SHA1::Hex - Validate against hexed SHA1 hashes with Crypt::Pa
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 

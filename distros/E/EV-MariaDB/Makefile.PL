@@ -23,6 +23,7 @@ WriteMakefile(
     OBJECT        => 'MariaDB$(OBJ_EXT)',
     CONFIGURE_REQUIRES => {
         'Alien::MariaDB'      => 0,
+        'EV'                  => '4.11',
         'EV::MakeMaker'       => 0,
         'ExtUtils::MakeMaker' => '6.64',
     },

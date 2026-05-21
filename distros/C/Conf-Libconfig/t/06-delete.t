@@ -2,8 +2,9 @@
 use strict;
 use warnings;
 use Data::Dumper;
-use Test::More tests => 10;
+use Test::More tests => 11;
 use Test::Deep;
+use Test::Exception;
 
 use Conf::Libconfig;
 
@@ -20,6 +21,10 @@ ok($foo->delete_node("me.mar.check1.m"), "delete node - status ok");
 ok($foo->delete_node_key("me.mar.check1", "ggg"), "delete node key - status ok");
 ok($foo->delete_node_key("me.mar.family1.[4]", "y"), "delete node key - status ok");
 ok($foo->delete_node_elem("me.mar.family1", 2), "delete node element - status ok");
+
+# delete_node with root-level key (no dots) — verifies strrchr NULL guard
+throws_ok { $foo->delete_node("rootkey") }
+    qr/no dot separator/, "delete_node root-level key croaks";
 
 ok($foo->write_file($newcfgfile), "write file - status ok");
 unlink($newcfgfile);

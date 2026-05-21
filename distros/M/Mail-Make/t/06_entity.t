@@ -19,10 +19,10 @@ use warnings;
 
 BEGIN
 {
-    use ok( 'Mail::Make::Entity' );
+    use_ok( 'Mail::Make::Entity' ) or BAIL_OUT( 'Unable to load Mail::Make::Entity' );
 };
 
-# NOTE: build(): basic single-part entities
+# NOTE: build: text/plain with data
 subtest 'build: text/plain with data' => sub
 {
     my $e = Mail::Make::Entity->build(
@@ -40,6 +40,7 @@ subtest 'build: text/plain with data' => sub
           'QP encoding auto-selected for text/*' );
 };
 
+# NOTE: build: image/png with path
 subtest 'build: image/png with path' => sub
 {
     # Create a temp file to use as path
@@ -65,7 +66,7 @@ subtest 'build: image/png with path' => sub
     like( $h->get( 'Content-Disposition' ), qr/inline/, 'disposition is inline' );
 };
 
-# NOTE: build(): filename handling - the core fix
+# NOTE: build: plain ASCII filename
 subtest 'build: plain ASCII filename' => sub
 {
     my $path = tempfile( cleanup => 1, open => 1 );
@@ -82,6 +83,7 @@ subtest 'build: plain ASCII filename' => sub
     like( $cd, qr/filename="logo\.png"/, 'plain filename quoted correctly' );
 };
 
+# NOTE: build: filename with comma uses RFC 2231
 subtest 'build: filename with comma uses RFC 2231' => sub
 {
     my $path = tempfile( cleanup => 1, open => 1 );
@@ -100,6 +102,7 @@ subtest 'build: filename with comma uses RFC 2231' => sub
     like(   $cd, qr/%2C/i,                 'comma percent-encoded' );
 };
 
+# NOTE: build: filename derived from path
 subtest 'build: filename derived from path' => sub
 {
     my $path = tempfile( cleanup => 1, open => 1 );
@@ -115,7 +118,7 @@ subtest 'build: filename derived from path' => sub
     like( $cd, qr/filename/, 'filename parameter present' );
 };
 
-# NOTE: build(): validation errors
+# NOTE: build: data + path mutually exclusive
 subtest 'build: data + path mutually exclusive' => sub
 {
     my $path = tempfile( cleanup => 1 );
@@ -128,6 +131,7 @@ subtest 'build: data + path mutually exclusive' => sub
     like( Mail::Make::Entity->error, qr/mutually exclusive/i, 'error mentions mutually exclusive' );
 };
 
+# NOTE: build: encoding not allowed for multipart
 subtest 'build: encoding not allowed for multipart' => sub
 {
     my $e = Mail::Make::Entity->build(
@@ -140,6 +144,7 @@ subtest 'build: encoding not allowed for multipart' => sub
     like( Mail::Make::Entity->error, qr/not permitted/i, 'error mentions not permitted' );
 };
 
+# NOTE: build: unknown encoding rejected
 subtest 'build: unknown encoding rejected' => sub
 {
     my $e = Mail::Make::Entity->build(
@@ -151,6 +156,7 @@ subtest 'build: unknown encoding rejected' => sub
     like( Mail::Make::Entity->error, qr/unknown/i, 'error mentions unknown' );
 };
 
+# NOTE: build: invalid disposition rejected
 subtest 'build: invalid disposition rejected' => sub
 {
     my $e = Mail::Make::Entity->build(
@@ -162,6 +168,7 @@ subtest 'build: invalid disposition rejected' => sub
     like( Mail::Make::Entity->error, qr/invalid disposition/i, 'error mentions invalid disposition' );
 };
 
+# NOTE: build: invalid boundary rejected
 subtest 'build: invalid boundary rejected' => sub
 {
     my $e = Mail::Make::Entity->build(
@@ -171,7 +178,7 @@ subtest 'build: invalid boundary rejected' => sub
     ok( !defined( $e ), 'build() rejects boundary with NUL' );
 };
 
-# NOTE: multipart entity
+# NOTE: multipart: add_part and serialisation
 subtest 'multipart: add_part and serialisation' => sub
 {
     my $top = Mail::Make::Entity->build( type => 'multipart/mixed' );
@@ -184,7 +191,7 @@ subtest 'multipart: add_part and serialisation' => sub
     );
     ok( defined( $child ), 'child part created' );
     $top->add_part( $child );
-    is( scalar( @{ $top->parts } ), 1, 'one part added' );
+    is( scalar( @{$top->parts} ), 1, 'one part added' );
 
     my $s = $top->as_string;
     if( !ok( defined( $s ), 'as_string' ) )
@@ -213,6 +220,7 @@ subtest 'multipart: add_part and serialisation' => sub
     };
 };
 
+# NOTE: multipart: add_part rejects non-entity
 subtest 'multipart: add_part rejects non-entity' => sub
 {
     my $top = Mail::Make::Entity->build( type => 'multipart/mixed' );
@@ -221,7 +229,7 @@ subtest 'multipart: add_part rejects non-entity' => sub
     like( $top->error, qr/argument must be a Mail::Make::Entity/i, 'error message correct' );
 };
 
-# NOTE: as_string: single-part encoding applied
+# NOTE: as_string: base64 encoding applied for image
 subtest 'as_string: base64 encoding applied for image' => sub
 {
     my $path = tempfile( cleanup => 1, open => 1 );
@@ -241,6 +249,7 @@ subtest 'as_string: base64 encoding applied for image' => sub
     like( $body, qr{^[A-Za-z0-9+/=]+$}, 'body is valid base64' );
 };
 
+# NOTE: as_string: quoted-printable for text/html
 subtest 'as_string: quoted-printable for text/html' => sub
 {
     my $e = Mail::Make::Entity->build(
@@ -254,7 +263,7 @@ subtest 'as_string: quoted-printable for text/html' => sub
 };
 
 # NOTE: make_multipart
-# NOTE: build(): 'attach' shorthand key
+# NOTE: build: attach shorthand promotes path
 subtest 'build: attach shorthand promotes path' => sub
 {
     my $path = tempfile( cleanup => 1, open => 1 );
@@ -268,6 +277,7 @@ subtest 'build: attach shorthand promotes path' => sub
     like( $h->get( 'Content-Disposition' ), qr/filename=/, 'filename set from basename' );
 };
 
+# NOTE: build: attach shorthand with extra options
 subtest 'build: attach shorthand with extra options' => sub
 {
     my $path = tempfile( cleanup => 1, open => 1 );
@@ -283,6 +293,7 @@ subtest 'build: attach shorthand with extra options' => sub
     like( $h->get( 'Content-Disposition' ), qr/custom-name\.bin/, 'explicit filename takes precedence' );
 };
 
+# NOTE: build: attach ignored when path already provided
 subtest 'build: attach ignored when path already provided' => sub
 {
     my $path = tempfile( cleanup => 1, open => 1 );
@@ -298,6 +309,7 @@ subtest 'build: attach ignored when path already provided' => sub
     ok( defined( $e ), 'build() with explicit path succeeds' );
 };
 
+# NOTE: build: attach with non-existent file falls through to error
 subtest 'build: attach with non-existent file falls through to error' => sub
 {
     local $SIG{__WARN__} = sub{};
@@ -305,7 +317,7 @@ subtest 'build: attach with non-existent file falls through to error' => sub
     ok( !defined( $e ), 'build() with non-existent attach path returns error' );
 };
 
-# NOTE: build(): auto-detect MIME type from path
+# NOTE: build: type auto-detected from path when not provided
 subtest 'build: type auto-detected from path when not provided' => sub
 {
     my $path = tempfile( cleanup => 1, open => 1, suffix => '.pdf' );
@@ -319,6 +331,7 @@ subtest 'build: type auto-detected from path when not provided' => sub
     ok( defined( $h->get( 'Content-Type' ) ), 'Content-Type is set' );
 };
 
+# NOTE: make_multipart promotes single-part
 subtest 'make_multipart promotes single-part' => sub
 {
     my $e = Mail::Make::Entity->build(
@@ -329,9 +342,10 @@ subtest 'make_multipart promotes single-part' => sub
     $e->make_multipart( 'mixed' );
     ok(  $e->is_multipart, 'becomes multipart after make_multipart()' );
     like( $e->effective_type, qr{multipart/mixed}, 'effective_type updated' );
-    is( scalar( @{ $e->parts } ), 1, 'original body wrapped as child part' );
+    is( scalar( @{$e->parts} ), 1, 'original body wrapped as child part' );
 };
 
+# NOTE: make_multipart is idempotent
 subtest 'make_multipart is idempotent' => sub
 {
     my $e = Mail::Make::Entity->build( type => 'multipart/mixed' );
@@ -339,7 +353,7 @@ subtest 'make_multipart is idempotent' => sub
     ok( $e->is_multipart, 'still multipart after second make_multipart() call' );
 };
 
-# NOTE: purge
+# NOTE: purge clears body
 subtest 'purge clears body' => sub
 {
     my $e = Mail::Make::Entity->build(

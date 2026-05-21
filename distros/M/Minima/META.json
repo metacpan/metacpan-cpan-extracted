@@ -1,10 +1,10 @@
 {
    "abstract" : "Efficient web framework built with modern core classes",
    "author" : [
-      "Cesar Tessarin, <cesar@tessarin.com.br>."
+      "Cesar Tessarin, <cesar@tessarin.com.br>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4234",
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -13,17 +13,28 @@
       "version" : 2
    },
    "name" : "Minima",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "ExtUtils::MakeMaker" : "7",
+            "File::ShareDir::Install" : "0.14"
          }
       },
       "runtime" : {
          "requires" : {
             "Data::Dumper" : "2.1",
             "File::Share" : "0.27",
-            "File::ShareDir" : "1.00",
             "Hash::MultiValue" : "0.16",
             "JSON" : "4.10",
             "Path::Tiny" : "0.142",
@@ -31,7 +42,7 @@
             "Router::Simple" : "0.17",
             "Template" : "3.100",
             "YAML::XS" : "v0.904.0",
-            "perl" : "v5.40.0"
+            "perl" : "5.040000"
          }
       },
       "test" : {
@@ -40,42 +51,15 @@
          }
       }
    },
-   "provides" : {
-      "Minima" : {
-         "file" : "lib/Minima.pm",
-         "version" : "v0.7.4"
-      },
-      "Minima::App" : {
-         "file" : "lib/Minima/App.pm"
-      },
-      "Minima::Controller" : {
-         "file" : "lib/Minima/Controller.pm"
-      },
-      "Minima::Project" : {
-         "file" : "lib/Minima/Project.pm"
-      },
-      "Minima::Router" : {
-         "file" : "lib/Minima/Router.pm"
-      },
-      "Minima::Setup" : {
-         "file" : "lib/Minima/Setup.pm"
-      },
-      "Minima::View" : {
-         "file" : "lib/Minima/View.pm"
-      }
-   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "web" : "https://github.com/tessarin/Minima/issues"
       },
-      "license" : [
-         "http://opensource.org/licenses/mit-license.php"
-      ],
       "repository" : {
          "url" : "https://github.com/tessarin/Minima"
       }
    },
-   "version" : "v0.7.4",
+   "version" : "v0.8.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

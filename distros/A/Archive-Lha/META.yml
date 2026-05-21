@@ -1,0 +1,80 @@
+---
+abstract: 'read and extract .LZH/.LHA archives'
+author:
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+  - 'Nicolas Mendoza <mendoza@pvv.ntnu.no>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Slurp: '0'
+  Test::More: '0.47'
+  Test::UseAllModules: '0.09'
+  Time::Moment: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Archive-Lha
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Archive::Lha:
+    file: lib/Archive/Lha.pm
+    version: '0.22'
+  Archive::Lha::CRC:
+    file: lib/Archive/Lha/CRC.pm
+  Archive::Lha::Constants:
+    file: lib/Archive/Lha/Constants.pm
+  Archive::Lha::Decode:
+    file: lib/Archive/Lha/Decode.pm
+  Archive::Lha::Decode::Base:
+    file: lib/Archive/Lha/Decode/Base.pm
+  Archive::Lha::Decode::LH0:
+    file: lib/Archive/Lha/Decode/LH0.pm
+  Archive::Lha::Decode::LH5:
+    file: lib/Archive/Lha/Decode/LH5.pm
+  Archive::Lha::Decode::LH6:
+    file: lib/Archive/Lha/Decode/LH6.pm
+  Archive::Lha::Decode::LH7:
+    file: lib/Archive/Lha/Decode/LH7.pm
+  Archive::Lha::Header:
+    file: lib/Archive/Lha/Header.pm
+  Archive::Lha::Header::Base:
+    file: lib/Archive/Lha/Header/Base.pm
+  Archive::Lha::Header::Level0:
+    file: lib/Archive/Lha/Header/Level0.pm
+  Archive::Lha::Header::Level1:
+    file: lib/Archive/Lha/Header/Level1.pm
+  Archive::Lha::Header::Level2:
+    file: lib/Archive/Lha/Header/Level2.pm
+  Archive::Lha::Header::Utils:
+    file: lib/Archive/Lha/Header/Utils.pm
+  Archive::Lha::Stream:
+    file: lib/Archive/Lha/Stream.pm
+  Archive::Lha::Stream::Base:
+    file: lib/Archive/Lha/Stream/Base.pm
+  Archive::Lha::Stream::File:
+    file: lib/Archive/Lha/Stream/File.pm
+  Archive::Lha::Stream::Hex:
+    file: lib/Archive/Lha/Stream/Hex.pm
+  Archive::Lha::Stream::String:
+    file: lib/Archive/Lha/Stream/String.pm
+requires:
+  Encode: '0'
+  Exporter::Lite: '0'
+  File::Basename: '0'
+  File::Path: '0'
+  Getopt::Long: '0'
+  POSIX: '0'
+  Time::Moment: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/nicomen/archive-lha/issues
+  repository: https://github.com/nicomen/archive-lha.git
+version: '0.22'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

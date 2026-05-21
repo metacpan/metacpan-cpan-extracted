@@ -1,7 +1,11 @@
 package DBIx::Class::Async;
 
-$DBIx::Class::Async::VERSION   = '0.65';
-$DBIx::Class::Async::AUTHORITY = 'cpan:MANWAR';
+use strict;
+use warnings;
+use version;
+
+our $VERSION   = qv('v1.0.3');
+our $AUTHORITY = 'cpan:MANWAR';
 
 =encoding utf8
 
@@ -11,13 +15,117 @@ DBIx::Class::Async - Non-blocking, multi-worker asynchronous wrapper for DBIx::C
 
 =head1 VERSION
 
-Version 0.65
+Version v1.0.3
 
 =head1 DISCLAIMER
 
 B<This is pure experimental currently.>
 
 You are encouraged to try and share your suggestions.
+
+=head1 DATABASE SUPPORT
+
+=head2 Oracle
+
+DBIx::Class::Async has been tested against Oracle AI Database 23ai Free
+(running via Docker) using L<DBD::Oracle> and the C<FREEPDB1> pluggable
+database. The following features were verified to work correctly:
+
+=over 4
+
+=item * CRUD operations (create, read, update, delete)
+
+=item * search(), count(), and all()
+
+=item * belongs_to and has_many relationships
+
+=item * Transactions via txn_do()
+
+=item * Concurrent async queries across multiple workers
+
+=back
+
+To run the Oracle integration tests yourself, set the following environment
+variables and run the test in C<xt/>:
+
+    DBIC_ASYNC_ORACLE_DSN='dbi:Oracle:host=localhost;port=1521;service_name=FREEPDB1' \
+    DBIC_ASYNC_ORACLE_USER='your_user' \
+    DBIC_ASYNC_ORACLE_PASS='your_password' \
+    prove -lv xt/001-oracle.t
+
+B<Note:> L<Math::Base36> E<gt>= 0.07 is required for Oracle support.
+
+=head2 MySQL
+
+DBIx::Class::Async has been tested against MySQL 8.0.45 (Ubuntu 24.04) using
+L<DBD::mysql>. The following features were verified to work correctly:
+
+=over 4
+
+=item * CRUD operations (create, read, update, delete)
+
+=item * search(), count(), and all()
+
+=item * belongs_to and has_many relationships
+
+=item * Transactions via txn_do()
+
+=item * Concurrent async queries across multiple workers
+
+=back
+
+To run the MySQL integration tests against your instance, set the following
+environment variables and run the test in C<xt/>:
+
+    DBIC_ASYNC_MYSQL_DSN='dbi:mysql:database=your_db;host=localhost;port=3306' \
+    DBIC_ASYNC_MYSQL_USER='your_user' \
+    DBIC_ASYNC_MYSQL_PASS='your_password' \
+    prove -lv xt/002-mysql.t
+
+=head2 PostgreSQL
+
+DBIx::Class::Async has been tested against PostgreSQL using
+L<Test::PostgreSQL::v2> which spins up a temporary PostgreSQL instance
+automatically — no manual database setup required.
+
+The following features were verified to work correctly:
+
+=over 4
+
+=item * CRUD operations (create, find, update, delete)
+
+=item * InflateColumn::DateTime inflation through the async worker path
+
+=item * DateTime stringification with correct PostgreSQL-aware formatting
+via L<DateTime::Format::Pg> (space separator with timezone offset)
+
+=back
+
+The PostgreSQL test also covers two known bugs that were fixed on the
+async path (equivalent of DBIx-Class PR#138):
+
+=over 4
+
+=item * B<BUG 1> - InflateColumn::DateTime not firing through the async
+worker, returning a plain string instead of a DateTime object.
+
+=item * B<BUG 2> - No formatter set on the inflated DateTime object,
+causing stringification to fall back to bare ISO8601 output instead of
+PostgreSQL-native format.
+
+=back
+
+To run the PostgreSQL integration tests:
+
+    prove -lv t/156-resultset-inflate-datetime.t
+
+The test requires L<DBD::Pg>, L<DateTime::Format::Pg>, and
+L<Test::PostgreSQL::v2> E<gt>= 2.02. If any of these are missing the
+test skips gracefully.
+
+=head2 SQLite
+
+Fully supported and used as the primary database for the standard test suite.
 
 =head1 QUICK START
 

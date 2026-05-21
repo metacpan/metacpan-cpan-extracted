@@ -1,0 +1,277 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/rlauer6/CPAN-Maker/buildspec-schema.json",
+  "title": "CPAN::Maker buildspec",
+  "description": "Schema for CPAN::Maker buildspec.yml",
+  "type": "object",
+  "required": ["pm-module"],
+  "additionalProperties": false,
+  "properties": {
+
+    "pm-module": {
+      "description": "Name of the Perl module to package",
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9]*(::[A-Za-z][A-Za-z0-9]*)*$"
+    },
+
+    "version": {
+      "description": "Version of the buildspec format",
+      "type": "string"
+    },
+
+    "min-perl-version": {
+      "description": "Minimum Perl version to consider core (e.g. 5.010)",
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+"
+    },
+
+    "include-version": {
+      "description": "Whether to include version numbers in dependencies",
+      "type": "string",
+      "enum": ["yes", "no", "0", "1", "off", "on"]
+    },
+
+    "version-from": {
+      "description": "Module name or path that provides the package version",
+      "type": "string"
+    },
+
+    "postamble": {
+      "description": "Path to a file containing Makefile.PL postamble",
+      "type": "string"
+    },
+
+    "provides": {
+      "description": "List of modules provided by this distribution",
+      "type": "array",
+      "items": { "type": "string" }
+    },
+
+    "extra": {
+      "description": "Path to a manifest file listing extra files to include",
+      "type": "string"
+    },
+
+    "extra-files": {
+      "description": "List of extra files or directories to include in the distribution",
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "string",
+            "description": "A single file path relative to the project root"
+          },
+          {
+            "type": "object",
+            "description": "A destination directory mapped to a list of source files",
+            "minProperties": 1,
+            "maxProperties": 1,
+            "additionalProperties": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        ]
+      }
+    },
+
+    "project": {
+      "description": "Project metadata",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "description": "Short description of the module",
+          "type": "string"
+        },
+        "git": {
+          "description": "URL of a git repository to clone and build",
+          "type": "string"
+        },
+        "author": {
+          "description": "Author information",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["name"],
+          "properties": {
+            "name": {
+              "description": "Author name",
+              "type": "string"
+            },
+            "mailto": {
+              "description": "Author email address",
+              "type": "string",
+              "format": "email"
+            }
+          }
+        }
+      }
+    },
+
+    "dependencies": {
+      "description": "Dependency file locations and resolver configuration",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "requires": {
+          "description": "Path to runtime dependency file",
+          "type": "string"
+        },
+        "test-requires": {
+          "description": "Path to test dependency file",
+          "type": "string"
+        },
+        "build-requires": {
+          "description": "Path to build dependency file",
+          "type": "string"
+        },
+        "recommends": {
+          "description": "Path to recommended dependency file",
+          "type": "string"
+        },
+        "resolver": {
+          "description": "Dependency resolver — 'scandeps' or path to resolver script",
+          "type": "string"
+        },
+        "core-modules": {
+          "description": "Whether to include core modules in dependency list",
+          "type": "string",
+          "enum": ["yes", "no"]
+        },
+        "required-modules": {
+          "description": "Whether to include required modules in dependency list",
+          "type": "string",
+          "enum": ["yes", "no"]
+        },
+        "path": {
+          "description": "Deprecated: use requires instead",
+          "type": "string"
+        }
+      }
+    },
+
+    "path": {
+      "description": "File and directory locations for build inputs",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pm-module": {
+          "description": "Path to the directory containing the main module",
+          "type": "string"
+        },
+        "recurse": {
+          "description": "Whether to recurse subdirectories when finding modules",
+          "type": "string",
+          "enum": ["yes", "no"]
+        },
+        "tests": {
+          "description": "Path to the test directory",
+          "type": "string"
+        },
+        "exe-files": {
+          "description": "Path to the directory containing executable Perl scripts",
+          "type": "string"
+        },
+        "scripts": {
+          "description": "Path to the directory containing executable shell scripts",
+          "type": "string"
+        },
+        "exclude-files": {
+          "description": "Path to a file listing files to exclude from the distribution",
+          "type": "string"
+        }
+      }
+    },
+
+    "scripts": {
+      "description": "List of shell script paths to include",
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      ]
+    },
+
+    "exe-files": {
+      "description": "List of executable Perl script paths to include",
+      "oneOf": [
+        { "type": "string" },
+        {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      ]
+    },
+
+    "pl-files": {
+      "description": "PL_FILES entries for ExtUtils::MakeMaker",
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+
+    "man-links": {
+      "description": "Symbolic links from script names to module man pages",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "minProperties": 1,
+        "maxProperties": 1,
+        "additionalProperties": { "type": "string" }
+      }
+    },
+
+    "resources": {
+      "description": "Distribution resource URLs for META_MERGE",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "homepage": {
+          "description": "Project homepage URL",
+          "type": "string",
+          "format": "uri"
+        },
+        "bugtracker": {
+          "description": "Bug tracker information",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "web": {
+              "description": "Bug tracker web URL",
+              "type": "string",
+              "format": "uri"
+            },
+            "mailto": {
+              "description": "Bug tracker email address",
+              "type": "string",
+              "format": "email"
+            }
+          }
+        },
+        "repository": {
+          "description": "Source repository information",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["url", "type"],
+          "properties": {
+            "url": {
+              "description": "Repository URL",
+              "type": "string"
+            },
+            "web": {
+              "description": "Repository web browsing URL",
+              "type": "string",
+              "format": "uri"
+            },
+            "type": {
+              "description": "Repository type",
+              "type": "string",
+              "enum": ["git", "svn", "hg", "cvs"]
+            }
+          }
+        }
+      }
+    }
+  }
+}

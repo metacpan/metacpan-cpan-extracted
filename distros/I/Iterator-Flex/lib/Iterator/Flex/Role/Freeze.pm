@@ -6,7 +6,7 @@ use v5.28;
 use strict;
 use warnings;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use List::Util;
 
@@ -38,7 +38,7 @@ sub freeze ( $obj ) {
         # first check if dependencies can freeze.
         my $cant = List::Util::first { !$_->can( 'freeze' ) }
         @{ $ipar->[REG_ITER__DEPENDS] };
-        throw_failure( parameter => "dependency: @{[ $cant->_name ]} is not serializeable" )
+        throw_failure( parameter => "dependency: @{[ $cant->_name ]} is not serializable" )
           if $cant;
 
         # now freeze them
@@ -76,7 +76,7 @@ Iterator::Flex::Role::Freeze - Role to add serialization capability to an Iterat
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 METHODS
 

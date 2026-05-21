@@ -43,7 +43,7 @@ Output format: C<dumper>, C<json>, or C<yaml>. Default: C<dumper>.
 
 Show this help message.
 
-=item V<--version>
+=item B<--version>
 
 Prints the version of L<Config::Abstraction>
 

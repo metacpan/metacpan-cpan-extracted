@@ -1,7 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
-use MyNote;
+use MyTest;
 
 use vars '@OPTS';
 
@@ -31,5 +30,9 @@ my $foo;
 unparse($bin, $foo);
 is $foo, $str, 'unparse';
 note $foo;
+
+# check for null node. makes sure randoms are
+# initialized since :mac=random here.
+unlike $foo, qr/-010000000000/, 'not null node';
 
 done_testing;

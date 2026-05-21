@@ -1,3 +1,13 @@
+0.016     2026-05-11 23:14:43-07:00 America/Los_Angeles
+
+    - Add [PruneCruft] to dist.ini so build artifacts (blib/,
+      pm_to_blib, MYMETA.*) no longer leak into release tarballs.
+    - Add '@Class::Name' parent prefix to import (shortcut for `use parent`)
+    - Add '&Role::Name' role prefix to import (compose Role::Tiny role)
+    - Skip `new` injection when Object::HashBase is imported into a Role::Tiny role
+    - Role::Tiny is a soft requirement, loaded only when '&' prefix used
+    - '&' prefix requires Perl 5.10+
+
 0.015     2024-08-29 17:55:35-07:00 America/Los_Angeles
 
     - Fix double-import bug

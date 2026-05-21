@@ -6,6 +6,49 @@ Home page:    <https://metacpan.org/release/Attean/>
 Bug tracker:  <https://github.com/kasei/attean/issues>
 Maintainer:   Gregory Todd Williams <mailto:gwilliams@cpan.org>
 
+0.038  2026-05-19
+
+ - (Update) Update negotiate_serializer to accept a 'role' argument.
+
+0.037  2026-05-04
+
+ - (Update) Fix Turtle and N-Tuples parsers to throw an error on the use of
+   escaped surrogates.
+ - (Update) Fix bug in Turtle serialization of strings with newlines and a
+   trailing quote.
+ - (Update) Fix bug in parser code that was failing to accurately track the
+   input line number.
+ - (Update) Update Makefile.PL to use GNU tar on MacOS when creating new
+   releases.
+
+0.036  2026-04-06
+
+ - (Update) Fix bug in Attean::API::Literal->sparql_tokens handling of
+   newlines.
+ - (Update) Minor fixes and updates to developer tests.
+
+0.035  2025-01-23
+
+ - (Addition) Add CDT rewriting in RDFXML parser and serializer.
+ - (Addition) Add POD for blank_nodes attributes in RDFXML parser and
+   serializer.
+ - (Addition) Add support for testing SERVICE evaluation in both Simple and
+   Plan evaluation.
+ - (Addition) Add test classes for mocking federation tests.
+ - (Update) Extend W3C manifest support for new qt:constructDataFile.
+   property.
+ - (Update) Fix CDT rewriting in Attean::API::CanonicalizingBindingSet.
+ - (Update) Fix SPARQL serialization of algebras with top-level Extend
+   (BIND or select expressions).
+ - (Update) Fix SPARQL serialization of casting function expressions.
+ - (Update) Fix bug that was causing warnings during test suite runs
+   (#172).
+ - (Update) Fix error handling in Attean::SPARQLClient.
+ - (Update) Update Attean::API::CanonicalizingBindingSet to rewrite CDT
+   blank nodes as part of canonicalization.
+ - (Update) Use List::Util instead of List::MoreUtils (#171 from
+   @plicease).
+
 0.034  2024-06-25
 
  - (Addition) Add registry to allow extension literal datatypes to map to

@@ -4,24 +4,21 @@ use Test::More;
 use IO::Socket::INET;
 use File::Temp qw(tempdir);
 use POSIX qw(_exit);
+use lib 'xt/lib';
+use EVNatsHelpers qw(nats_bin_or_skip free_port);
 use EV;
 use EV::Nats;
 
 # This test starts 3 nats-server instances in a cluster,
 # connects to one, kills it, and verifies failover via reconnect.
 
-my $nats_bin = '/usr/sbin/nats-server';
-$nats_bin = `which nats-server 2>/dev/null` unless -x $nats_bin;
-chomp $nats_bin;
-unless (-x $nats_bin) {
-    plan skip_all => "nats-server not found";
-}
+my $nats_bin = nats_bin_or_skip();
 
 plan tests => 5;
 
 my $tmp = tempdir(CLEANUP => 1);
-my @ports   = (24221, 24222, 24223);
-my @cluster = (24331, 24332, 24333);
+my @ports   = (free_port(), free_port(), free_port());
+my @cluster = (free_port(), free_port(), free_port());
 my @pids;
 
 # Write configs and start servers

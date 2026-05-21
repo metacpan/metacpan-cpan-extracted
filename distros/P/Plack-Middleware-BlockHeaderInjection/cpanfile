@@ -40,6 +40,7 @@ on 'develop' => sub {
   requires "Pod::Markdown::Github" => "0";
   requires "Software::Security::Policy::Individual" => "0.10";
   requires "Test::CVE" => "0.08";
+  requires "Test::DistManifest" => "0";
   requires "Test::EOF" => "0";
   requires "Test::EOL" => "0";
   requires "Test::Fixme" => "0";

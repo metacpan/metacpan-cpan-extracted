@@ -1,0 +1,770 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!-- This template is for creating an Internet Draft using xml2rfc,
+    which is available here: http://xml.resource.org. -->
+<!DOCTYPE rfc SYSTEM "rfc2629-xhtml.ent">
+<?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+<!-- used by XSLT processors -->
+<!-- For a complete list and description of processing instructions (PIs), 
+    please see http://xml.resource.org/authoring/README.html. -->
+<rfc
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      category="info"
+      ipr="none"
+      submissionType="independent"
+      obsoletes=""
+      updates=""
+      xml:lang="en"
+      tocInclude="true"
+      tocDepth="4"
+      symRefs="true"
+      sortRefs="true"
+      version="3">
+  <!-- xml2rfc v2v3 conversion 2.38.1 -->
+  <!-- category values: std, bcp, info, exp, and historic
+    ipr values: trust200902, noModificationTrust200902, noDerivativesTrust200902,
+       or pre5378Trust200902
+    you can add the attributes updates="NNNN" and obsoletes="NNNN" 
+    they will automatically be output with "(if approved)" -->
+
+ <!-- ***** FRONT MATTER ***** -->
+
+ <front>
+    <!-- The abbreviated title is used in the page header - it is only necessary if the 
+        full title is longer than 39 characters -->
+
+   <title abbrev="CLACKS protocol">CLACKS interprocess messaging protocol</title>
+
+   <author fullname="Rene Schickbauer" surname="Schickbauer">
+      <organization>cavac.at</organization>
+      <address>
+        <uri>https://cavac.at</uri>
+     </address>
+    </author>
+    <date year="2026"/>
+
+   <keyword>clacks</keyword>
+    <!-- Keywords will be incorporated into HTML output
+        files in a meta tag but they have no effect on text or nroff
+        output. If you submit your draft to the RFC Editor, the
+        keywords will be used for the search engine. -->
+
+   <abstract>
+      <t>CLACKS interprocess messaging is an asyncronous protocol used in various web- and homeautomation applications.</t>
+      <t>
+          The protocol implements real-time signalling and data caching. It also implements a master/slave mode for distributed servers
+          for load balancing and reducing network load between internet hosts.
+      </t>
+    </abstract>
+  </front>
+  <middle>
+    <section numbered="true" toc="default">
+      <name>Introduction</name>
+      <t>
+              For many distributed applications there exists a requirement for fire-and-forget messaging between processes and/or devices in order to communicate state changes,
+              events and changed settings. CLACKS is designed to provide a number of different signals to fill those needs as well as provide hub-and-spoke routing through 
+              its interclacks mode.
+      </t>
+      <section numbered="true" toc="default">
+        <name>Requirements Language</name>
+        <t>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+       "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+       document are to be interpreted as described in <xref target="RFC2119" format="default">RFC 2119</xref>.</t>
+      </section>
+    </section>
+    <section numbered="true" toc="default">
+        <name>Technical terms</name>
+        <t>This section gives a short explanation of the technical terms used in the CLACKS protocol.</t>
+        <section numbered="true" toc="default">
+            <name>Signal</name>
+            <t>A signal is an information that is sent asyncronous to all clients listening for it, of either an event, a value change or an
+                information about a previously stored value. Examples of these would be "Event 7 has happened" or "Sensor 12 value is 127"
+        </t>
+        </section>
+        <section numbered="true" toc="default">
+            <name>Overhead</name>
+            <t>
+                Overhead are signals exchanged between servers or a server and a client library that, in most cases, has no direct implication for a
+                client application. These include keep alive packets, interclacks syncronizations, authentication, test messages and error messages,
+                among others.
+            </t>
+        </section>
+        <section numbered="true" toc="default">
+            <name>Cache</name>
+            <t>
+                The Clacks cache is a storage for values in clacks servers. This cache is syncronized via interclacks links between clacks servers. The cache
+                also implements vary basic mathematical functions (increment, decrement), so cached variables can act as asyncronous counters.
+            </t>
+        </section>
+        <section numbered="true" toc="default">
+            <name>Interclacks</name>
+            <t>
+                This is a special mode of clacks links that enables multiple servers in a master/slave configuration to participate in the same clacks network.
+                This is useful for load sharing. It is also very useful for running different servers with a limited bandwidth between them, as all
+                clients only connect to their local node and there is only a single link sharing data between those servers.
+            </t>
+            <artwork>
+
+       +----------+           +----------+
+       |          |Interclacks|          |
+       | Server A +-----------+ Server B |
+       |          |           |          |
+       +-+------+-+           +-+------+-+
+         |      |               |      |
+         |      |               |      |
+   +-----+--+ +-+------+  +-----+--+ +-+------+
+   |Client 1| |Client 2|  |Client 3| |Client 4|
+   +--------+ +--------+  +--------+ +--------+
+            </artwork>
+        </section>
+        <section numbered="true" toc="default">
+            <name>Variables</name>
+            <t>
+                Variables are the names (keys) for notifications, value-transmitting signals and data stored in the clacks cache. Variables may only contain letters, numbers and colons. It is RECOMMENDED that logical
+                parts of the variable names (e.g. variables for sub-systems) be separated by double-colons. Variable names <bcp14>MUST NOT</bcp14> contain spaces or euqal signs ("="). Examples would be "Sensor17" and "Kitchen::Sensorbox2::Temperature".
+            </t>
+        </section>
+    </section>
+    <section numbered="true" toc="default">
+        <name>Protocol overview</name>
+        <t>
+            CLACKS is designed to be asyncronous for the client in order to limit delays introduced by the network and server side processing. Some operations like fetching stored values MAY be processed by 
+            the client as syncronous operations. Servers process any messages in the order of arrival except when an interclacks lock is active during syncronization of clacks servers.
+        </t>
+        <t>
+            By default, TLS encryption and authentication is rquired, but TLS can be seen as OPTIONAL under specific circumstances if other methods of protecting communication are provided,
+            for example running a unix-domain-sockets network only or for point-to-point links that are physically secured. These circumstances must be evaluated before deploying a less secure CLACKS network.
+        </t>
+
+        <t>
+            The protocol is a server/client protocol. The interclacks OVERHEAD commands allow a master/slave architecture of servers. This interclacks mode allows for handling local connections 
+            (Unix Domain Sockets, Point-to-Point links) over multiple devices as well as limiting the number of connections a single server has to handle.
+        </t>
+        <t>
+            For ease of implementation, the protocol is designed entirely in plaintext, Unicode in UTF-8 encoding <bcp14>SHOULD</bcp14> be supported by all systems. Binary data <bcp14>MUST</bcp14> be encoded in Base64.
+        </t>
+        <section numbered="true" toc="default">
+            <name>Transport layers</name>
+            <t>CLACKS is designed to allow different transport layers, depending on the application requirements. These can be combined as needed.</t>
+            <section numbered="true" toc="default">
+                <name>TCP</name>
+                <t>TCP on port of 49888 is the default. This allows multiple hosts to communicate. TCP transport <bcp14>MUST</bcp14> use TLS encryption and <bcp14>MUST</bcp14> use Authentication.</t>
+            </section>
+            <section numbered="true" toc="default">
+                <name>Unix Domain Sockets</name>
+                <t>Transport over Unix Domain Sockets MAY disable encryption for faster communication and lower processor usage. It is RECOMMENDED that other access control methods (e.g. file permissions/access control lists) are used to limit access to the socket. Authentication <bcp14>MUST</bcp14> be used to further limit unauthorized access.</t>
+            </section>
+            <section numbered="true" toc="default">
+                <name>Point-to-Point links</name>
+                <t>
+                    Point-to-point links MAY be supported by CLACKS server to connect local devices through serial connections, point-to-point radio links and similar setups. This is to support embedded systems with very low processing power.
+                    For point-to-point links, TLS encryption is OPTIONAL, although authentication <bcp14>MUST</bcp14> still be implemented.
+                </t>
+            </section>
+        </section>
+        <section numbered="true" toc="default">
+            <name>Line breaks</name>
+            <t>Each command and response line <bcp14>MUST</bcp14> be ended by a linebreak consisting of the characters "carriage return" (ASCII 13) and "line feed" (ASCII 10).</t>
+        </section>
+        <section numbered="true" toc="default">
+            <name>Asyncronous behaviour</name>
+            <t>In this sample client/server session, the client (C) connects to the server (S), authenticates and retrieves the value for the variable X from clacks cache.</t>
+            <sourcecode>
+C: CLACKS testclient
+S: CLACKS Server version 22
+S: OVERHEAD M Authentication required
+C: OVERHEAD A ZXhhbXBsZXVzZXI=:dW5zYWZlcGFzc3dvcmQ=
+S: OVERHEAD O Welcome!
+C: RETRIEVE X
+S: RETRIEVED X=12
+C: QUIT
+            </sourcecode>
+            <t>
+                It is important to note that, as an async protocol, both server and client can send at the same time, or even before an expected request has been recieved. For example, the client can send an authentication response before it has
+                recieved the authentication request by the server. It can even send the request to retrieve the data, but it still has to check the server responses in the correct order to know if the request worked as expected.
+            </t>
+            <sourcecode>
+C: CLACKS testclient
+C: OVERHEAD A ZXhhbXBsZXVzZXI=:dW5zYWZlcGFzc3dvcmQ=
+C: RETRIEVE X
+S: CLACKS Server version 22
+S: OVERHEAD M Authentication required
+S: OVERHEAD O Welcome!
+S: RETRIEVED X=12
+C: QUIT
+            </sourcecode>
+            <t>
+                In the same way, the client can request multiple retrievals at once, even sending requests to change the cached data inbetween.
+            </t>
+            <sourcecode>
+C: SET X=10
+C: RETRIEVE X
+C: INCREMENT X=2
+C: RETRIEVE X
+S: RETRIEVED X=10
+S: RETRIEVED X=12
+            </sourcecode>
+            <t>
+                This allows the protocol handlers to pack multiple requests/responses into a single network packet, reducing the roundtrip delay. For the last sample above, all four client commands can be packed
+                into a single packet, and the same is true for the server responses. Thus (in theory) reducing the network delay to a single roundtrip. The server still has to respond to each RETRIEVE request to
+                enable the client tracking the correct order of responses.
+            </t>
+            <t>
+                As the server potentially handles other clients that change the same stored value, a client <bcp14>MUST</bcp14> expect a value to change without actively changing it. This MAY happen even within the same response
+                network packet for multiple requests of the same variable.
+            </t>
+            <sourcecode>
+C: RETRIEVE X
+C: RETRIEVE X
+S: RETRIEVED X=10
+S: RETRIEVED X=12
+            </sourcecode>
+        </section>
+        <section numbered="true" toc="default">
+            <name>Units and measurements</name>
+            <t>
+                To reduce problems with different measurement systems, all values send through clacks <bcp14>MUST</bcp14> conform to the metric system.
+            </t>
+            <t>
+                All timestamps be in UTC, either as unix epoch (seconds since "1970-01-01 00:00:00") or in the format "YYYY-MM-DD hh:mi:ss". When more precision is required,
+                the timestamp <bcp14>MUST</bcp14> be send as unix epoch with a decimal point.
+            </t>
+        </section>
+        <section numbered="true" toc="default">
+            <name>Value encoding</name>
+            <t>
+                Since the CLACKS protocol uses line-based communication, values that contain line breaks (carriage return or line feed characters)
+                <bcp14>MUST</bcp14> be encoded before transmission. The reference implementation uses the following encoding scheme:
+            </t>
+            <section numbered="true" toc="default">
+                <name>Multi-line string values</name>
+                <t>
+                    Values containing newline characters are encoded using Base64 with a special prefix. The format is:
+                </t>
+                <sourcecode>
+PAGECAMELCLACKSB64:&lt;base64-encoded-data&gt;
+                </sourcecode>
+                <t>
+                    For example, a value containing "line1\nline2" would be encoded as:
+                </t>
+                <sourcecode>
+PAGECAMELCLACKSB64:bGluZTEKbGluZTI=
+                </sourcecode>
+                <t>
+                    The receiving client library <bcp14>SHOULD</bcp14> automatically detect this prefix and decode the value
+                    transparently, so the application receives the original multi-line string.
+                </t>
+            </section>
+            <section numbered="true" toc="default">
+                <name>Complex data structures</name>
+                <t>
+                    Complex data structures (hashes, arrays, nested structures) are serialized to YAML format first,
+                    then Base64-encoded with a different prefix:
+                </t>
+                <sourcecode>
+PAGECAMELCLACKSYAMLB64:&lt;base64-encoded-yaml&gt;
+                </sourcecode>
+                <t>
+                    The receiving client library <bcp14>SHOULD</bcp14> detect this prefix, decode the Base64, parse the YAML,
+                    and return the reconstructed data structure to the application.
+                </t>
+                <t>
+                    Note: Storing values that begin with the literal string "PAGECAMELCLACKSB64" is not permitted,
+                    as this would be ambiguous with encoded values.
+                </t>
+            </section>
+        </section>
+    </section>
+    <section numbered="true" toc="default">
+        <name>Commands</name>
+        <section numbered="true" toc="default">
+            <name>Session initiation</name>
+            <t>To initiate a connection, the first thing both sides send is a CLACKS command.</t>
+            <section numbered="true" toc="default">
+                <name>CLACKS software-identification</name>
+                <t>
+                    The CLACKS command <bcp14>MUST</bcp14> be the first command sent when a connection is established. Failure to recieve a CLACKS command from the communication partner means that
+                        the other side is not running the clacks protocol and the connection <bcp14>MUST</bcp14> be closed.
+                </t>
+                <t>
+                    The "software-identification" is an arbitrary string that gives information what software (and which version) is running. For clacks clients, this often includes an
+                    identification of the program program using a generic client library. This information is part of the CLIENTLIST server response and can be useful in monitoring
+                    specific programs.
+                </t>
+                <t>
+                    The "software-identification" string <bcp14>MUST NOT</bcp14> contain semicolons.
+                </t>
+                <t>
+                    Examples:
+                </t>
+                <sourcecode>
+CLACKS Net::Clacks Server Version 23
+                </sourcecode>
+
+                <sourcecode>
+CLACKS Homeautomation ZigBee Bridge
+                </sourcecode>
+            </section>
+        </section>
+        <section numbered="true" toc="default">
+            <name>System commands</name>
+            <t>This section lists commands required for authentification, monitoring, debugging and server managment.</t>
+            <section numbered="true" toc="default">
+                <name>OVERHEAD flags data-string</name>
+                <t>
+                    The OVERHEAD command is used for system-level communication between clients and servers. It carries one or more single-letter flags
+                    followed by an optional data string. Multiple flags can be combined in a single command.
+                </t>
+                <t>Available flags:</t>
+                <ul>
+                    <li><strong>A</strong> - Authentication token. The data-string contains base64-encoded credentials in the format "username:password".</li>
+                    <li><strong>O</strong> - Authentication OK. Sent by server to confirm successful authentication.</li>
+                    <li><strong>F</strong> - Authentication failed. Sent by server when authentication fails.</li>
+                    <li><strong>E</strong> - Error message. Server to client error notification.</li>
+                    <li><strong>M</strong> - Informal message. No operation required, used for human-readable status messages.</li>
+                    <li><strong>C</strong> - Close all connections. Instructs the server to disconnect all clients.</li>
+                    <li><strong>D</strong> - Discard message. The message should not be logged or forwarded.</li>
+                    <li><strong>G</strong> - Forward message. The message should be forwarded to interclacks peers.</li>
+                    <li><strong>I</strong> - Set interclacks mode. Value: 1 (enable) or 0 (disable). Enables server-to-server communication mode.</li>
+                    <li><strong>L</strong> - Lock for sync. Value: 1 (lock) or 0 (unlock). Used during KEYSYNC to prevent data races.</li>
+                    <li><strong>N</strong> - No logging. The message should not be logged (useful for sensitive data like credentials).</li>
+                    <li><strong>S</strong> - Shutdown service. Value: number of seconds before shutdown. Requires manage permission.</li>
+                    <li><strong>T</strong> - Timestamp. Used before KEYSYNC to calculate time offset between servers.</li>
+                    <li><strong>U</strong> - Return to sender. The message should also be sent back to the originating client.</li>
+                    <li><strong>Z</strong> - No flags. Placeholder when no other flags are set.</li>
+                </ul>
+                <t>Examples:</t>
+                <sourcecode>
+OVERHEAD A dXNlcm5hbWU6cGFzc3dvcmQ=
+OVERHEAD O Welcome!
+OVERHEAD F Login failed!
+OVERHEAD M Authentication required
+OVERHEAD E unknown_command BADCMD
+OVERHEAD I 1
+OVERHEAD L 1
+                </sourcecode>
+            </section>
+            <section numbered="true" toc="default">
+                <name>PING</name>
+                <t>
+                    Clients <bcp14>MUST</bcp14> send a PING command at least every 60 seconds. This shows the server that the client is still alive.
+                    The server <bcp14>MAY</bcp14> disconnect any client that has not sent any PING command within that timeout interval.
+                </t>
+                <t>
+                    From experience, it is <bcp14>RECOMMENDED</bcp14> that the PING command is send from the main loop of the client, to check that the client
+                    is not stuck in a sub-program/function.
+                </t>
+            </section>
+            <section numbered="true" toc="default">
+                <name>NOPING</name>
+                <t>
+                    Clients can send a NOPING command in cases when they may not be able to fullfill the 60 second timeout requirement. Examples of this
+                    would be waiting for user input or processing a large dataset.
+                </t>
+                <t>
+                    When the server recieves a NOPING command, it <bcp14>SHOULD</bcp14> suspend timeout handling for that client until the next PING is recieved.
+                </t>
+            </section>
+            <section numbered="true" toc="default">
+                <name>TIMEOUT</name>
+                <t>
+                    If the server detects a timeout condition, it sends a TIMEOUT command to the client and closes the connection.
+                </t>
+            </section>
+            <section numbered="true" toc="default">
+                <name>QUIT</name>
+                <t>A client or server whishing to close a connection <bcp14>MUST</bcp14> try to send a QUIT command before disconnecting.</t>
+            </section>
+            <section numbered="true" toc="default">
+                <name>NOP</name>
+                <t>
+                    NOP is a No OPeration command. It <bcp14>MUST</bcp14> be ignored by the communication partner. This command <bcp14>MAY</bcp14> be used to
+                    fault conditions that require a network packet to be send. Examples of this include a network route becoming unavailble or a client loosing power.
+                </t>
+            </section>
+            <section numbered="true" toc="default">
+                <name>MONITOR</name>
+                <t>
+                    The MONITOR command turns on server monitoring. The server <bcp14>SHOULD</bcp14> start sending implementation-specific DEBUG commands to the client,
+                    showing server activity, state changes and other information useful for debugging and monitoring the clacks server.
+                </t>
+            </section>
+            <section numbered="true" toc="default">
+                <name>UNMONITOR</name>
+                <t>
+                    The UNMONITOR turns off server monitoring. The server <bcp14>MUST</bcp14> stop sending DEBUG commands to the client.
+                </t>
+            </section>
+            <section numbered="true" toc="default">
+                <name>DEBUG value</name>
+                <t>
+                    The DEBUG command is used to sending implementation-specific server activity, state changes and other useful information to the client. Example:
+                </t>
+                <sourcecode>
+                    DEBUG CLIENT TestClient22 connected
+                    DEBUG Testclient22=SET X=22
+                    DEBUG TestClient22=RETRIEVE Y
+                    DEBUG TestClient22=PING
+                    DEBUG client TestClient22 disconnected
+                    DEBUG saving persistance file
+                </sourcecode>
+            </section>
+            <section numbered="true" toc="default">
+                <name>KEYSYNC cachetime accesstime mode variable=value</name>
+                <t>
+                    The KEYSYNC command is used exclusively on interclacks links to synchronize cached data between servers.
+                    It is only valid after interclacks mode has been enabled via OVERHEAD I.
+                </t>
+                <t>
+                    When an interclacks connection is established, the master server locks the slave (OVERHEAD L 1), sends its
+                    timestamp (OVERHEAD T), transmits all cached values via KEYSYNC commands, then unlocks the slave (OVERHEAD L 0).
+                    The slave then sends its cached values to the master in the same manner.
+                </t>
+                <t>Parameters:</t>
+                <ul>
+                    <li><strong>cachetime</strong> - Unix timestamp when the value was last modified.</li>
+                    <li><strong>accesstime</strong> - Unix timestamp when the value was last accessed.</li>
+                    <li><strong>mode</strong> - Either "S" (store/active) or "D" (deleted).</li>
+                    <li><strong>variable</strong> - The cache key name.</li>
+                    <li><strong>value</strong> - The cached data value.</li>
+                </ul>
+                <t>
+                    The receiving server compares the cachetime with its local copy. If the incoming cachetime is newer,
+                    the value is updated. This ensures that the most recent value wins in case of conflicts.
+                </t>
+                <t>Example:</t>
+                <sourcecode>
+KEYSYNC 1704067200 1704067100 S sensor::temperature=21.5
+KEYSYNC 1704067000 1704066900 D old::deleted::key=
+                </sourcecode>
+            </section>
+            <section numbered="true" toc="default">
+                <name>FLUSH value</name>
+                <t>
+                    The FLUSH command is used by a client or server to check when a communication partner has caught up with any previously sent commands,
+                    since many of them may not generate an answer. The communication partner <bcp14>MUST</bcp14> return a FLUSHED command with the same value.
+                    The value can be any arbitrary string.
+                </t>
+                <section numbered="true" toc="default">
+                    <name>FLUSHED value</name>
+                    <t>
+                        Upon reciept of a FLUSH command, a server or client <bcp14>MUST</bcp14> generate a FLUSHED command with the same value.
+                    </t>
+                </section>
+            </section>
+            <section numbered="true" toc="default">
+                <name>CLIENTLIST</name>
+                <t>
+                    The CLIENTLIST command requests a list of all connected clients from the server. This command requires
+                    manage permission. The server responds with CLIENTLISTSTART, followed by zero or more CLIENT entries,
+                    followed by CLIENTLISTEND.
+                </t>
+                <section numbered="true" toc="default">
+                    <name>CLIENTLISTSTART</name>
+                    <t>Marks the beginning of the client list response.</t>
+                </section>
+                <section numbered="true" toc="default">
+                    <name>CLIENT key=value;key=value;...</name>
+                    <t>
+                        Each CLIENT line contains semicolon-separated key=value pairs describing one connected client.
+                        Available fields include:
+                    </t>
+                    <ul>
+                        <li><strong>CID</strong> - Unique client identifier assigned by the server.</li>
+                        <li><strong>HOST</strong> - Client's hostname or IP address.</li>
+                        <li><strong>PORT</strong> - Client's source port number.</li>
+                        <li><strong>CLIENTINFO</strong> - Software identification string from the client's CLACKS command.</li>
+                        <li><strong>OUTBUFFER_LENGTH</strong> - Bytes pending in the output buffer for this client.</li>
+                        <li><strong>INBUFFER_LENGTH</strong> - Bytes pending in the input buffer from this client.</li>
+                        <li><strong>INTERCLACKS</strong> - 1 if this is an interclacks connection, 0 otherwise.</li>
+                        <li><strong>MONITOR</strong> - 1 if monitor mode is enabled for this client, 0 otherwise.</li>
+                        <li><strong>LASTPING</strong> - Unix timestamp of the last PING received from this client.</li>
+                        <li><strong>LASTINTERCLACKSPING</strong> - Unix timestamp of the last interclacks ping.</li>
+                    </ul>
+                </section>
+                <section numbered="true" toc="default">
+                    <name>CLIENTLISTEND</name>
+                    <t>Marks the end of the client list response.</t>
+                </section>
+            </section>
+            <section numbered="true" toc="default">
+                <name>CLIENTDISCONNECT client-id</name>
+                <t>
+                    The CLIENTDISCONNECT command forces the server to disconnect a specific client identified by its CID.
+                    This command requires manage permission. The server will attempt to send a QUIT message to the target
+                    client before closing the connection.
+                </t>
+                <t>Example:</t>
+                <sourcecode>
+CLIENTDISCONNECT unixdomainsocket:1704067200.12345:67890
+                </sourcecode>
+            </section>
+        </section>
+        <section numbered="true" toc="default">
+            <name>Instant communication</name>
+            <t>
+                This section lists commands for instant data communication. By default, the client is in "send-only" mode after establishing a connection and does not
+                recieve any NOTIFY and SET commands from the server. In CLACKS parlance, messages send via NOTIFY and SET are called "signals".
+            </t>
+            <t>
+                If a link is in interclacks mode (a link between two servers), all NOTIFY and SET commands <bcp14>MUST</bcp14> be forwarded by default and all LISTEN
+                and UNLISTEN commands <bcp14>MUST</bcp14> be ignored.
+            </t>
+            <t>
+                SET and NOTIFY are transmitted "in the blind" from client to server, meaning a client does not know if another client is LISTENing to that signal. The signal
+                if then processed by the server (or servers) and sent to any client listening to it. The signal <bcp14>MUST NOT</bcp14> be transmitted back to the original
+                sending client, even if it is listening for that signal name.
+            </t>
+            <section numbered="true" toc="default">
+                <name>LISTEN variable</name>
+                <t>
+                    The LISTEN command is used by a client to tell the server it wants to recieve any NOTIFY or SET commands send to the server that have the same variable name.
+                    The server <bcp14>MUST</bcp14> start forwarding any such messages to that client until it either recieves a matching UNLISTEN command or the client disconnects.
+                </t>
+            </section>
+            <section numbered="true" toc="default">
+                <name>UNLISTEN variable</name>
+                <t>
+                    The UNLISTEN command is used a client to tell the server it wants to stop recieving NOTIFY and SET commands with the same variable name. The server <bcp14>MUST</bcp14> stop
+                    forwarding any such messages to that client.
+                </t>
+            </section>
+            <section numbered="true" toc="default">
+                <name>NOTIFY variable</name>
+                <t>
+                    The NOTIFY command notifies a server or client that an event has happened. The NOTIFY command does not convey a value. For example, a time service might notify clients listening
+                    to a specific variable that the date has changed, so that they can run some daily tasks.
+                </t>
+                <sourcecode>
+NOTIFY Clock::DayChange
+                </sourcecode>
+            </section>
+            <section numbered="true" toc="default">
+                <name>SET variable=value</name>
+                <t>
+                    The SET command notifies a server or client about a new value or reading. For example, a temperature sensor could broadcast a new reading:
+                </t>
+                <sourcecode>
+SET Kitchen::Temperature=21.8
+                </sourcecode>
+            </section>
+        </section>
+        <section numbered="true" toc="default">
+            <name>Caching</name>
+            <t>This section lists commands for caching.</t>
+            <section numbered="true" toc="default">
+                <name>STORE variable=value</name>
+                <t>The STORE command stores a variable to the cache.</t>
+            </section>
+            <section numbered="true" toc="default">
+                <name>REMOVE variable</name>
+                <t>The REMOVE command deletes a variable from the cache.</t>
+            </section>
+            <section numbered="true" toc="default">
+                <name>RETRIEVE variable</name>
+                <t>The RETRIEVE command requests retrieval of a variable from the cache. The server <bcp14>MUST</bcp14> either reply with a RETRIEVED or a NOTRETRIEVED command.</t>
+                <section numbered="true" toc="default">
+                    <name>RETRIEVED variable=value</name>
+                    <t>The server has found the variable in the cache with a value.</t>
+                </section>
+                <section numbered="true" toc="default">
+                    <name>NOTRETRIEVED variable</name>
+                    <t>The server has not found the variable.</t>
+                </section>
+            </section>
+            <section numbered="true" toc="default">
+                <name>INCREMENT variable=value</name>
+                <t>
+                    This command is used to increment a variable with a given value. If the variable is not known to the server, it <bcp14>MUST</bcp14> be created with the value of
+                    zero before incrementing. If the variable is non-numeric, a conversion to a number <bcp14>MUST</bcp14> be attempted, defaulting to zero if conversion fails. The same
+                    conversion process is applied to the value in the increment command. The value in the increment command <bcp14>MUST NOT</bcp14> be empty.
+                </t>
+            </section>
+            <section numbered="true" toc="default">
+                <name>DECREMENT variable=value</name>
+                <t>
+                    This command is used to decrement a variable with a given value. If the variable is not known to the server, it <bcp14>MUST</bcp14> be created with the value of
+                    zero before decrementing. If the variable is non-numeric, a conversion to a number <bcp14>MUST</bcp14> be attempted, defaulting to zero if conversion fails. The same
+                    conversion process is applied to the value in the decrement command. The value in the decrement command <bcp14>MUST NOT</bcp14> be empty.
+                </t>
+                <t></t>
+            </section>
+            <section numbered="true" toc="default">
+                <name>SETANDSTORE variable=value</name>
+                <t>
+                    The SETANDSTORE command is a compound of the SET and STORE command. It stores the given value in the given variable, but also forwards it as SET command to all clients.
+                </t>
+                <t>
+                    On interclacks links, the SETANDSTORE command is forwarded as such and <bcp14>MUST NOT</bcp14> be transmitted as separate SET and STORE commands.
+                    On client links, the SETANDSTORE command <bcp14>MUST</bcp14> only be transmitted SET command from servers to clients.
+                </t>
+                <t>
+                    The purpose of the compound SETANDSTORE command is to save bandwidth. It allows clients to SET and STORE a variable without transmitting it twice. The same applies to
+                    interclacks links.
+                </t>
+            </section>
+            <section numbered="true" toc="default">
+                <name>KEYLIST</name>
+                <t>
+                    The KEYLIST command requests a list of all keys currently stored in the cache. This command requires
+                    read permission. The server responds with KEYLISTSTART, followed by zero or more KEY entries,
+                    followed by KEYLISTEND. Example response:
+                </t>
+                <sourcecode>
+KEYLISTSTART
+KEY sensor::temperature
+KEY sensor::humidity
+KEY config::update_interval
+KEYLISTEND
+                </sourcecode>
+                <section numbered="true" toc="default">
+                    <name>KEYLISTSTART</name>
+                    <t>Marks the beginning of the key list response.</t>
+                </section>
+                <section numbered="true" toc="default">
+                    <name>KEY variable</name>
+                    <t>Each KEY line contains a single variable name that exists in the cache.</t>
+                </section>
+                <section numbered="true" toc="default">
+                    <name>KEYLISTEND</name>
+                    <t>Marks the end of the key list response.</t>
+                </section>
+            </section>
+            <section numbered="true" toc="default">
+                <name>CLEARCACHE</name>
+                <t>
+                    The CLEARCACHE command removes all entries from the server's cache. This command requires manage permission.
+                    Use with caution as this operation cannot be undone. On interclacks networks, the CLEARCACHE command
+                    is forwarded to peer servers, clearing the cache across the entire network.
+                </t>
+            </section>
+        </section>
+    </section>
+    <section numbered="true" toc="default">
+        <name>Reference implementation</name>
+        <t>An open source reference implementation in Perl called <xref target="NetClacks" format="default">Net::Clacks</xref> is available on MetaCPAN.</t>
+    </section>
+    <section numbered="true" toc="default">
+        <name>Dedication</name>
+        <t>
+            The name of the protocol is a direct reference to the Discworld novel <xref target="GoingPostal" format="default">"Going Postal"</xref> by Terry Pratchett.
+            In this book, the author describes an interconnected optical telegraph system for passing messages at high speed. The command OVERHEAD is named after a short
+            mentioning of "passing names in the overhead" in the story. This is done to keep the memory of those people alive.
+        </t>
+        <blockquote>
+            <t>“Do you not know that a man is not dead while his name is still spoken?”</t>
+        </blockquote>
+        <t>
+            The book mentions that the names are passed with the flags "GNU" (send message to next tower, don't log, turn around at the end). The clacks protocol defined in
+            this document offers compatibility with the description in the book, and it is possible to send the following command:
+        </t>
+        <sourcecode>
+OVERHEAD GNU Terry Pratchett
+        </sourcecode>
+            
+    </section>
+  </middle>
+  <!--  *****BACK MATTER ***** -->
+
+ <back>
+    <!-- References split into informative and normative -->
+
+   <!-- There are 2 ways to insert reference entries from the citation libraries:
+    1. define an ENTITY at the top, and use "ampersand character"RFC2629; here (as shown)
+    2. simply use a PI "less than character"?rfc include="reference.RFC.2119.xml"?> here
+       (for I-Ds: include="reference.I-D.narten-iana-considerations-rfc2434bis.xml")
+
+    Both are cited textually in the same manner: by using xref elements.
+    If you use the PI option, xml2rfc will, by default, try to find included files in the same
+    directory as the including file. You can also define the XML_LIBRARY environment variable
+    with a value containing a set of directories to search.  These can be either in the local
+    filing system or remote ones accessed by http (http://domain/dir/... ).-->
+
+   <references>
+      <name>References</name>
+      <references>
+        <name>Normative References</name>
+        <!--?rfc include="http://xml.resource.org/public/rfc/bibxml/reference.RFC.2119.xml"?-->
+     <reference anchor="RFC2119" target="https://www.rfc-editor.org/info/rfc2119" xml:base="https://xml2rfc.tools.ietf.org/public/rfc/bibxml/reference.RFC.2119.xml">
+          <front>
+            <title>Key words for use in RFCs to Indicate Requirement Levels</title>
+            <seriesInfo name="DOI" value="10.17487/RFC2119"/>
+            <seriesInfo name="RFC" value="2119"/>
+            <seriesInfo name="BCP" value="14"/>
+            <author initials="S." surname="Bradner" fullname="S. Bradner">
+              <organization/>
+            </author>
+            <date year="1997" month="March"/>
+            <abstract>
+              <t>In many standards track documents several words are used to signify the requirements in the specification.  These words are often capitalized. This document defines these words as they should be interpreted in IETF documents.  This document specifies an Internet Best Current Practices for the Internet Community, and requests discussion and suggestions for improvements.</t>
+            </abstract>
+          </front>
+        </reference>
+          <!-- the following is the minimum to make xml2rfc happy -->
+        <!--
+        <reference anchor="min_ref">
+
+           <front>
+            <title>Minimal Reference</title>
+            <author initials="authInitials" surname="authSurName">
+              <organization/>
+            </author>
+            <date year="2006"/>
+          </front>
+        </reference>
+        -->
+      </references>
+      <references>
+        <name>Informative References</name>
+        <!-- Here we use entities that we defined at the beginning. -->
+
+         <reference anchor="NetClacks" target="https://metacpan.org/pod/Net::Clacks">
+              <front>
+                <title>Reference implementation of the Clacks protocol</title>
+                <author surname="Schickbauer" initials="R." fullname="Rene Schickbauer">
+                  <organization/>
+                </author>
+                <date year="2026"/>
+              </front>
+            </reference>
+         <reference anchor="GoingPostal">
+              <front>
+                <title>Going Postal</title>
+                <seriesInfo name="ISBN" value="0-385-60342-8"/>
+                <author surname="Pratchett" initials="T." fullname="Terry Pratchett">
+                  <organization/>
+                </author>
+                <date year="2004"/>
+              </front>
+            </reference>
+          </references>
+        </references>
+        <!--
+    <section anchor="app-additional" numbered="true" toc="default">
+      <name>Additional Stuff</name>
+      <t>This becomes an Appendix.</t>
+    </section>
+        -->
+    <!-- Change Log
+
+v00 2006-03-15  EBD   Initial version
+
+v01 2006-04-03  EBD   Moved PI location back to position 1 -
+                     v3.1 of XMLmind is better with them at this location.
+v02 2007-03-07  AH    removed extraneous nested_list attribute,
+                     other minor corrections
+v03 2007-03-09  EBD   Added comments on null IANA sections and fixed heading capitalization.
+                     Modified comments around figure to reflect non-implementation of
+                     figure indent control.  Put in reference using anchor="DOMINATION".
+                     Fixed up the date specification comments to reflect current truth.
+v04 2007-03-09 AH     Major changes: shortened discussion of PIs,
+                     added discussion of rfc include.
+v05 2007-03-10 EBD    Added preamble to C program example to tell about ABNF and alternative 
+                     images. Removed meta-characters from comments (causes problems).
+
+v06 2010-04-01 TT     Changed ipr attribute values to latest ones. Changed date to
+                     year only, to be consistent with the comments. Updated the 
+                     IANA guidelines reference from the I-D to the finished RFC.
+v07 2020-01-21 HL    Converted the template to use XML schema version 3.
+    -->
+ </back>
+</rfc>

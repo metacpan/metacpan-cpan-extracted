@@ -50,6 +50,7 @@ $Class => undef
 $Collection
 $Format
 $PreserveNewLines => 0
+$RowsPerPage => 100
 </%ARGS>
 <%ONCE>
 my $no_html = HTML::Scrubber->new( deny => '*' );
@@ -113,14 +114,17 @@ my $worksheet = $workbook->add_worksheet();
 
 foreach my $column (@columns){
     for (my $i = 0; $i < @$column; $i++) {
-        $worksheet->write(0, $i, $column->[$i]->{header});
+        RT::Extension::ExcelFeed->WriteExcel( $worksheet, 0, $i, $column->[$i]->{header} );
     }
 }
+
+$RowsPerPage = 100 if !$RowsPerPage || $RowsPerPage > 1000;
+$Collection->RowsPerPage($RowsPerPage);
 
 my $i = 0;
 # Start at 1, header row is in 0
 my $current_row = 1;
-while (my $row = $Collection->Next) {
+while ( my $row = ( $Collection->Next || ( $Collection->NextPage && $Collection->Next ) ) ) {
     for my $col (@columns) {
         my @row_values = map {
             my $val = ProcessColumnMapValue($_->{map}, Arguments => [$row, $i++], Escape => 0);
@@ -131,8 +135,7 @@ while (my $row = $Collection->Next) {
             $val;
         } @$col;
         for (my $j = 0; $j < @row_values; $j++) {
-            my $write_method = $row_values[$j] =~ /^(-|\+|=|\@|")/ ? 'write_string' : 'write';
-            $worksheet->$write_method($current_row, $j, $row_values[$j]);
+            RT::Extension::ExcelFeed->WriteExcel( $worksheet, $current_row, $j, $row_values[$j] );
         }
         $current_row++;
     }

@@ -1,0 +1,36 @@
+---
+abstract: Amazon::Signature4::Lite
+author:
+  - 'Rob Lauer <rclauer@gmail.com>'
+build_requires:
+  Amazon::Signature4::Lite: '0'
+  ExtUtils::MakeMaker: '6.64'
+  File::ShareDir::Install: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::ShareDir::Install: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Amazon-Signature4-Lite
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Amazon::Signature4::Lite:
+    file: lib/Amazon/Signature4/Lite.pm
+    version: v1.0.0
+requires:
+  Digest::SHA: '6.04'
+  URI::Escape: '5.34'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/rlauer6/Amazon-Signature4-Lite/issues
+  homepage: https://github.com/rlauer6/Amazon-Signature4-Lite
+  repository: https://github.com/rlauer6/Amazon-Signature4-Lite
+version: v1.0.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

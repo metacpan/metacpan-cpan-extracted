@@ -1,6 +1,30 @@
 BATsh Kurzreferenz [DE] Deutsch
 =================================
 
+----------------------------------------------------------------------
+ZUSAMMENFASSUNG
+  BATsh ist ein zweisprachiger Shell-Interpreter, der cmd.exe-Batch und
+  bash/sh-Syntax in derselben Skriptdatei ausfuehrt. Modus wird zeilenweise
+  automatisch erkannt. Kein externer Shell noetig -- reines Perl.
+
+GEMISCHTES BEISPIEL
+  :: CMD-Abschnitt (erster Token Grossbuchstaben)
+  @ECHO OFF
+  SET LANG=BATsh
+
+  # SH-Abschnitt (erster Token enthaelt Kleinbuchstaben)
+  greet() { echo "Hallo $1 (bash-Modus)"; }
+  greet $LANG
+  result=$(echo $LANG | perl -e 'while(<STDIN>){chomp;print uc}')
+  echo "Grossbuchstaben: $result"
+
+  :: Zurueck in CMD (SH-Ergebnis lesen)
+  ECHO Zurueck in CMD: %result%
+
+  # Ausfuehren: perl lib/BATsh.pm script.batsh
+----------------------------------------------------------------------
+
+
 BATsh ist eine zweisprachige Shell, die cmd.exe- und bash/sh-Syntax
 im selben Skript ausfuehrt. Das erste Token jeder Zeile bestimmt den Modus.
 
@@ -99,3 +123,22 @@ im selben Skript ausfuehrt. Das erste Token jeder Zeile bestimmt den Modus.
   Keine CPAN-Abhaengigkeiten.
 
 Siehe auch: https://metacpan.org/dist/BATsh
+
+11. CMD-Pipeline und Parameter-Modifikatoren
+--------------------------------------------
+  cmd1 | cmd2              # Pipeline ueber temporaere Datei (Pure Perl)
+  SET /P VAR=Eingabe:      # Eine Zeile von STDIN in VAR lesen
+  %~dp0                    # Laufwerk+Verzeichnis von %0 (haeufigste Verwendung)
+  %~n1, %~x1, %~nx1       # Dateiname, Erweiterung, beides
+
+12. SH-Funktionen und Variablenexpansion
+-----------------------------------------
+  f() { echo $1; }         # Funktionsdefinition
+  ${var%.*}  ${var%%.*}    # Suffix entfernen (kuerzest/laengst)
+  ${var#*.}  ${var##*.}    # Praefix entfernen (kuerzest/laengst)
+  ${var/a/b} ${var//a/b}   # Ersetzen (erste/alle)
+  ${var^^} ${var,,}        # Gross-/Kleinschreibung
+  ${var:2:4} ${#var}       # Teilstring, Laenge
+  cmd > f  cmd >> f  2>&1  # Umleitungen
+  cmd1 && cmd2             # UND-Verkettung
+  cmd1 || cmd2             # ODER-Verkettung

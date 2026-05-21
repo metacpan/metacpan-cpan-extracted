@@ -9,8 +9,8 @@ $ENV{PATH} = "/bin:/usr/bin";
 delete $ENV{ENV};
 
 my $testdir = File::Temp::tempdir("FU_06_XXXXX", TMPDIR => 1, CLEANUP => 1);
-my $cmd1 = "$^X ./file_unpack2 -q -L $testdir.log  -D $testdir t/data";
-my $cmd2 = "$^X ./file_unpack2 -q -L $testdir.log2 -D $testdir $testdir";
+my $cmd1 = "$^X ./file_unpack2 --deep -q -L $testdir.log  -D $testdir t/data";
+my $cmd2 = "$^X ./file_unpack2 --deep -q -L $testdir.log2 -D $testdir $testdir";
 my $r1 = system($cmd1);
 my $r2 = system($cmd2);
 ok($r1 == 0, "normal: $cmd1");

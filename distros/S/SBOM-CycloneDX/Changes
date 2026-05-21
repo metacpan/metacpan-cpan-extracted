@@ -1,5 +1,11 @@
 Change history for SBOM::CycloneDX
 
+1.08 2026-05-12
+    - Added "SBOM::CycloneDX::Composition" and "SBOM::CycloneDX::Source"
+    - Added "SBOM::CycloneDX::Enum::AggregateType"
+    - Use "gmtime" instead of "localtime" in "SBOM::CycloneDX::Timestamp" (giterlizzi/perl-SBOM-CycloneDX#6)
+    - Updated documentations
+
 1.07 2026-01-21
     - Improved support for CycloneDX 1.7 (https://cyclonedx.org/docs/1.7/json/)
     - Improved documentations

@@ -1,5 +1,8 @@
 Revision history for JSON-Schema-Modern
 
+0.639     2026-05-09 22:47:09Z
+          - config option "max_traversal_depth" has been renamed to "max_depth"
+
 0.638     2026-04-18 19:12:38Z
           - completely refactored media-type handler: now a singleton (shared
             throughout the process), also supports charset encoding and enhanced

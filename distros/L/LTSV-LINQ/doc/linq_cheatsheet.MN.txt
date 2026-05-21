@@ -140,10 +140,15 @@
   ->ToLookup(sub { $_[0]{dept} })
   ->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} })
   ->ToLTSV('output.ltsv')
+  ->ToLTSV('output.ltsv',              # label_order: specify output label order
+      label_order => [qw(host status bytes url)])
+  ->ToLTSV('output.ltsv',              # headers: alias for label_order (CSV-LINQ interop)
+      headers => [qw(host status bytes url)])
 
   ToDictionary нь hashref key=>element буцаана.
     ToLookup нь hashref key=>[elements] буцаана.
     ToLTSV нь дарааллыг LTSV файлд бичнэ.
+    label_order шошгоны дарааллыг тодорхойлно; headers нь түүний өөр нэр (CSV-LINQ нийцтэй).
 
 [ 12. Албан ёсны нөөц (Official resources) ]
 

@@ -1,7 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
-use MyNote;
+use MyTest;
 use UUID 'uuid7';
 
 ok 1, 'loaded';

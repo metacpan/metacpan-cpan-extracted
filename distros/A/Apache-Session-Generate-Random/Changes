@@ -1,5 +1,17 @@
 Revision history for Apache-Session-Generate-Random:
 
+0.002002  2026-05-02 18:16:20+01:00 Europe/London
+  [Documentation]
+  - Updated author email address.
+
+  [Other]
+  - Added DOAP metadata to the distribution.
+
+  - Updated distribution metadata.
+
+  [Toolchain]
+  - Stopped signing distributions, because Module::Signature is deprecated.
+
 0.002001  2026-02-25 17:16:47+00:00 Europe/London
   [Bug Fixes]
   - Specify minimum versions of prerequisites.

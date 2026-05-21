@@ -113,6 +113,20 @@ PAGE
 
     my $mode_error = eval { $runner->_run_job( mode => 'bogus', source => '1', cwd => $timeout_dir ); 1 } ? '' : $@;
     like( $mode_error, qr/Unknown collector mode 'bogus'/, 'collector runner rejects unknown execution modes' );
+
+    no warnings 'redefine';
+    local *Developer::Dashboard::CollectorRunner::_run_job = sub { die "outer run wrapper failure\n" };
+    my $wrapped = $runner->run_once(
+        {
+            name    => 'wrapped.failure',
+            command => q{printf wrapped},
+            cwd     => $timeout_dir,
+        }
+    );
+    is( $wrapped->{exit_code}, 255, 'run_once maps outer execution wrapper failures to exit 255' );
+    like( $wrapped->{stderr}, qr/outer run wrapper failure/, 'run_once appends outer execution wrapper failures to stderr' );
+    is( $collector_store->read_status('wrapped.failure')->{active_runs}, 0, 'run_once clears active_runs after an outer execution wrapper failure' );
+    ok( !$collector_store->read_status('wrapped.failure')->{running}, 'run_once clears running after an outer execution wrapper failure' );
 }
 
 {
@@ -146,6 +160,18 @@ PAGE
     waitpid( $managed_child, 0 );
     ok( !-e $pidfile, 'stop_loop removes loop pid files after forced kill' );
     ok( !-e $statefile, 'stop_loop removes loop state files after forced kill' );
+}
+
+{
+    my $cron_name = 'coverage.cron';
+    ok( !$runner->_job_is_due( { schedule => 'manual' }, $cron_name ), '_job_is_due rejects manual collectors' );
+    ok( $runner->_job_is_due( { interval => 10 }, $cron_name ), '_job_is_due accepts interval collectors' );
+    ok( $runner->_cron_due( undef, $cron_name ), '_cron_due treats an empty cron expression as always due' );
+    ok( !$runner->_cron_due( '* * * *', $cron_name ), '_cron_due rejects malformed cron expressions' );
+    my @now = localtime();
+    my $expr = sprintf '%d-%d %d %d %d %d', $now[1], $now[1], $now[2], $now[3], $now[4] + 1, $now[6];
+    ok( $runner->_job_is_due( { schedule => 'cron', cron => $expr }, $cron_name ), '_job_is_due delegates matching cron collectors to cron scheduling' );
+    ok( !$runner->_job_is_due( { schedule => 'cron', cron => $expr }, $cron_name ), '_job_is_due suppresses duplicate cron slots after the first matching tick' );
 }
 
 {
@@ -429,6 +455,177 @@ PAGE
     my $state = $runner->loop_state($loop_name);
     is( $state->{status}, 'error', '_run_loop_child writes error state when a collector tick dies' );
     like( $state->{error}, qr/forced child failure/, '_run_loop_child persists the collector error message' );
+}
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::CollectorRunner::_fork_process = sub { return undef };
+    my $error = eval { $runner->_start_loop_worker( { command => 'true' }, 'fork.fail', 'title' ); 1 } ? '' : $@;
+    like( $error, qr/Unable to fork collector worker 'fork\.fail'/, '_start_loop_worker reports fork failures explicitly' );
+}
+
+{
+    my %active = ( 999999 => 1 );
+    is( $runner->_reap_finished_loop_workers( \%active ), 0, '_reap_finished_loop_workers ignores non-child pids' );
+    is_deeply( \%active, { 999999 => 1 }, '_reap_finished_loop_workers leaves unreaped pids in place' );
+    is( $runner->_reap_finished_loop_workers(), 0, '_reap_finished_loop_workers tolerates a missing active-worker hash' );
+}
+
+{
+    is( $runner->_settle_single_tick_workers(), 1, '_settle_single_tick_workers returns true for an empty worker set' );
+    my %active = ( 41 => 1 );
+    my $reap_calls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::CollectorRunner::_reap_finished_loop_workers = sub {
+        my ( undef, $active_workers ) = @_;
+        $reap_calls++;
+        %{$active_workers} = ();
+        return 1;
+    };
+    local *Developer::Dashboard::CollectorRunner::sleep = sub { return 0 };
+    is( $runner->_settle_single_tick_workers( \%active ), 1, '_settle_single_tick_workers waits for worker-settling helpers' );
+    is( $reap_calls, 1, '_settle_single_tick_workers stops once the active set clears' );
+}
+
+{
+    my $child_a = fork();
+    die "fork failed: $!" if !defined $child_a;
+    if ( !$child_a ) {
+        sleep 30;
+        exit 0;
+    }
+    my $child_b = fork();
+    die "fork failed: $!" if !defined $child_b;
+    if ( !$child_b ) {
+        sleep 30;
+        exit 0;
+    }
+    my %active = ( $child_a => 1, $child_b => 1 );
+    ok( $runner->_terminate_loop_workers( \%active ), '_terminate_loop_workers returns true after terminating active workers' );
+    is_deeply( \%active, {}, '_terminate_loop_workers clears the active worker set' );
+    is( waitpid( $child_a, WNOHANG ), -1, '_terminate_loop_workers reaps the first worker child it manages' );
+    is( waitpid( $child_b, WNOHANG ), -1, '_terminate_loop_workers reaps the second worker child it manages' );
+}
+
+{
+    my %active = ( 424242 => 1 );
+    no warnings 'redefine';
+    local *Developer::Dashboard::CollectorRunner::_waitpid_nonblocking = sub {
+        my ( undef, $pid ) = @_;
+        return $pid == 424242 ? 424242 : -1;
+    };
+    is( $runner->_reap_finished_loop_workers( \%active ), 1, '_reap_finished_loop_workers reaps exited worker children' );
+    is_deeply( \%active, {}, '_reap_finished_loop_workers removes reaped worker children from the active set' );
+}
+
+{
+    my $shutdown_name = 'coverage.shutdown.with-workers';
+    my $shutdown_pid = fork();
+    die "fork failed: $!" if !defined $shutdown_pid;
+    if ( !$shutdown_pid ) {
+        my $worker = fork();
+        die "fork failed: $!" if !defined $worker;
+        if ( !$worker ) {
+            sleep 30;
+            exit 0;
+        }
+        my %active = ( $worker => 1 );
+        my $child_runner = Developer::Dashboard::CollectorRunner->new(
+            collectors => $collector_store,
+            files      => $files,
+            indicators => $indicator_store,
+            paths      => $paths,
+        );
+        $child_runner->_shutdown_loop( $shutdown_name, 'stopped', \%active );
+    }
+    waitpid( $shutdown_pid, 0 );
+    is( $? >> 8, 0, '_shutdown_loop terminates tracked workers before exiting a managed child' );
+    pass('_shutdown_loop reaps tracked worker children during shutdown');
+}
+
+{
+    my %state_capture;
+    my @log_entries;
+    my $child_pid = fork();
+    die "fork failed: $!" if !defined $child_pid;
+    if ( !$child_pid ) {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CollectorRunner::run_once = sub { die "worker fallback failure\n" };
+        local *Developer::Dashboard::CollectorRunner::_write_loop_state = sub {
+            my ( undef, $name, $data ) = @_;
+            my $file = File::Spec->catfile( $home, 'worker-fallback-state.json' );
+            open my $fh, '>', $file or die $!;
+            print {$fh} json_encode( { name => $name, %{$data} } );
+            close $fh;
+            return $data;
+        };
+        $runner->_run_loop_worker(
+            { command => 'printf fallback', cwd => $home, interval => 2 },
+            'worker.fallback',
+            undef,
+            undef,
+        );
+    }
+    waitpid( $child_pid, 0 );
+    is( $? >> 8, 255, '_run_loop_worker exits non-zero when the worker body dies' );
+    my $state_file = File::Spec->catfile( $home, 'worker-fallback-state.json' );
+    open my $state_fh, '<', $state_file or die $!;
+    my $state = json_decode( do { local $/; <$state_fh> } );
+    close $state_fh;
+    is( $state->{process_name}, $runner->_process_title('worker.fallback'), '_run_loop_worker falls back to the managed loop title when no title is supplied' );
+    is( $state->{schedule}, 'interval', '_run_loop_worker falls back to interval schedule metadata from the job' );
+    ok( $state->{pid} > 0, '_run_loop_worker falls back to the current pid when no loop pid is supplied' );
+}
+
+{
+    my $loop_name = 'coverage.loop.start-failure';
+    my $child_pid = fork();
+    die "fork failed: $!" if !defined $child_pid;
+    if ( !$child_pid ) {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CollectorRunner::_job_is_due = sub { return 1 };
+        local *Developer::Dashboard::CollectorRunner::_start_loop_worker = sub { die "forced worker start failure\n" };
+        local *Developer::Dashboard::CollectorRunner::sleep = sub { return 0 };
+        my $ok = $runner->_run_loop_child(
+            daemonize     => 1,
+            interval      => 0,
+            job           => { command => 'printf child', cwd => $home },
+            name          => $loop_name,
+            schedule_mode => 'interval',
+            single_tick   => 1,
+            title         => $runner->_process_title($loop_name),
+        );
+        exit( $ok ? 0 : 1 );
+    }
+    waitpid( $child_pid, 0 );
+    is( $? >> 8, 0, '_run_loop_child returns cleanly after a worker-start failure tick' );
+    my $state = $runner->loop_state($loop_name);
+    is( $state->{status}, 'error', '_run_loop_child records error state when worker startup fails' );
+    like( $state->{error}, qr/forced worker start failure/, '_run_loop_child persists worker-start failure details' );
+}
+
+{
+    my $missing_root = File::Spec->catdir( $home, 'missing-collectors-root' );
+    my $alt_paths = Developer::Dashboard::PathRegistry->new( home => $home );
+    my $alt_runner = Developer::Dashboard::CollectorRunner->new(
+        collectors => $collector_store,
+        files      => $files,
+        paths      => $alt_paths,
+    );
+    no warnings 'redefine';
+    local *Developer::Dashboard::PathRegistry::collectors_root = sub { return $missing_root };
+    is_deeply( [ $alt_runner->running_loops ], [], 'running_loops returns an empty list when the collectors root cannot be opened' );
+}
+
+{
+    my $pidfile = $runner->_pidfile('foreign-namespace');
+    open my $fh, '>', $pidfile or die $!;
+    print {$fh} "12345\n";
+    close $fh;
+    no warnings 'redefine';
+    local *Developer::Dashboard::CollectorRunner::_same_pid_namespace = sub { return 0 };
+    is( $runner->stop_loop('foreign-namespace'), 12345, 'stop_loop returns the pid when it belongs to a foreign namespace' );
+    ok( !-f $pidfile, 'stop_loop still removes foreign-namespace pidfiles during cleanup' );
 }
 
 {

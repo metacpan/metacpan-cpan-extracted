@@ -1,5 +1,5 @@
-#ifndef UU_GEN_H
-#define UU_GEN_H
+#ifndef ULIB__GEN_H
+#define ULIB__GEN_H
 
 #include "ulib/UUID.h"
 
@@ -7,15 +7,15 @@ void uu_gen_init(pUCXT);
 void uu_gen_setrand(pUCXT);
 void uu_gen_setuniq(pUCXT);
 
-int uu_realnode(pUCXT, struct_uu_t *out);
+int uu_gen_realnode(pUCXT, struct_uu_t *out);
 
-void uu_v0gen(pUCXT, struct_uu_t *out, char *dptr);
-void uu_v1gen(pUCXT, struct_uu_t *out, char *dptr);
-void uu_v3gen(pUCXT, struct_uu_t *out, char *dptr);
-void uu_v4gen(pUCXT, struct_uu_t *out, char *dptr);
-void uu_v5gen(pUCXT, struct_uu_t *out, char *dptr);
-void uu_v6gen(pUCXT, struct_uu_t *out, char *dptr);
-void uu_v7gen(pUCXT, struct_uu_t *out, char *dptr);
+void uu_gen_v0(pUCXT, struct_uu_t *out, char *dptr);
+void uu_gen_v1(pUCXT, struct_uu_t *out, char *dptr);
+void uu_gen_v3(pUCXT, struct_uu_t *out, char *dptr);
+void uu_gen_v4(pUCXT, struct_uu_t *out, char *dptr);
+void uu_gen_v5(pUCXT, struct_uu_t *out, char *dptr);
+void uu_gen_v6(pUCXT, struct_uu_t *out, char *dptr);
+void uu_gen_v7(pUCXT, struct_uu_t *out, char *dptr);
 
 #endif
 /* ex:set ts=2 sw=2 itab=spaces: */

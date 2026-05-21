@@ -20,9 +20,9 @@ use warnings;
 
 BEGIN
 {
-    use ok( 'Mail::Make::Body' );
-    use ok( 'Mail::Make::Body::File' );
-    use ok( 'Mail::Make::Body::InCore' );
+    use_ok( 'Mail::Make::Body' ) or BAIL_OUT( 'Unable to load Mail::Make::Body' );
+    use_ok( 'Mail::Make::Body::File' ) or BAIL_OUT( 'Unable to load Mail::Make::Body::File' );
+    use_ok( 'Mail::Make::Body::InCore' ) or BAIL_OUT( 'Unable to load Mail::Make::Body::InCore' );
 };
 
 # NOTE: Mail::Make::Body::InCore

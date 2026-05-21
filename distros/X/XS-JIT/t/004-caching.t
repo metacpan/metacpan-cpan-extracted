@@ -7,7 +7,7 @@ use File::Spec;
 use Time::HiRes qw(time);
 
 my $cache_dir = '_CACHED_XS_test_cache';
-remove_tree($cache_dir) if -d $cache_dir;
+remove_tree($cache_dir, { safe => 1, error => \my $err7 }) if -d $cache_dir;
 
 use_ok('XS::JIT');
 
@@ -161,7 +161,7 @@ C_CODE
 # Different cache directories
 {
     my $cache_dir2 = '_CACHED_XS_test_cache2';
-    remove_tree($cache_dir2) if -d $cache_dir2;
+    remove_tree($cache_dir2, { safe => 1, error => \my $err8 }) if -d $cache_dir2;
 
     my $code = <<'C_CODE';
 SV* diff_cache_func(SV* self) {
@@ -184,7 +184,7 @@ C_CODE
 
     is(DiffCache->get, 'diff_cache', 'Function works from second cache');
 
-    remove_tree($cache_dir2);
+    remove_tree($cache_dir2, { safe => 1, error => \my $err9 });
 }
 
 # Test cache with force option
@@ -208,7 +208,11 @@ C_CODE
 
     # Force recompile (should still work)
     # Suppress expected "Subroutine redefined" warning
-    {
+    SKIP: {
+        skip "Windows holds a lock on loaded DLLs; in-process force recompile "
+           . "cannot overwrite the on-disk file", 2
+            if $^O eq 'MSWin32';
+
         no warnings 'redefine';
         ok(XS::JIT->compile(
             code => $code, name => 'ForceOption::JIT_0',
@@ -216,9 +220,9 @@ C_CODE
             cache_dir => $cache_dir,
             force => 1,
         ), 'Force recompile succeeds');
-    }
 
-    is(ForceOption->get, 'force_compiled', 'Function works after force recompile');
+        is(ForceOption->get, 'force_compiled', 'Function works after force recompile');
+    }
 }
 
 # Test cache directory structure
@@ -278,6 +282,6 @@ C_CODE
 }
 
 # Clean up
-remove_tree($cache_dir) if -d $cache_dir;
+remove_tree($cache_dir, { safe => 1, error => \my $err10 }) if -d $cache_dir;
 
 done_testing();

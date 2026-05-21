@@ -68,7 +68,7 @@
          "web" : "https://github.com/markov2/perl5-Business-CAMT"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_oodist" : {
       "email" : "markov@cpan.org",
       "first_year" : 2024,

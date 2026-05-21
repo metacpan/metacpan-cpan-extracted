@@ -2,13 +2,22 @@
 ##----------------------------------------------------------------------------
 ## Lightweight DateTime Alternative - t/08.infinite.t
 ##----------------------------------------------------------------------------
+BEGIN
+{
+    use strict;
+    use warnings;
+    use lib './lib';
+    use Test::More;
+};
+
 use strict;
 use warnings;
-use lib './lib';
-use Test::More;
 
-use_ok( 'DateTime::Lite' ) or BAIL_OUT( 'Cannot load DateTime::Lite' );
-use_ok( 'DateTime::Lite::Infinite' ) or BAIL_OUT( 'Cannot load DateTime::Lite::Infinite' );
+BEGIN
+{
+    use_ok( 'DateTime::Lite' ) or BAIL_OUT( 'Cannot load DateTime::Lite' );
+    use_ok( 'DateTime::Lite::Infinite' ) or BAIL_OUT( 'Cannot load DateTime::Lite::Infinite' );
+};
 
 # NOTE: Basic construction
 subtest 'Basic construction' => sub
@@ -68,7 +77,7 @@ subtest 'Comparison: Infinite > any normal datetime' => sub
 
     ok( $fut > $now, 'Infinite::Future > now' );
     ok( $pas < $now, 'Infinite::Past < now' );
-    ok( $fut > $pas, 'Future > Past' );
+    ok( $fut > $pas, 'Infinite::Future > Past' );
 };
 
 # NOTE: Adding an infinite duration to a normal datetime -> Infinite
@@ -81,6 +90,42 @@ subtest 'Adding an infinite duration to a normal datetime -> Infinite' => sub
     $dt->add_duration( $dur );
     isa_ok( $dt, 'DateTime::Lite::Infinite::Future',
         'Adding infinite duration yields Infinite::Future' );
+};
+
+# NOTE: utc_rd_values are truly infinite (PP/XS parity)
+# This subtest serves to address a bug where _normalize_tai_seconds and
+# _normalize_leap_seconds did not short-circuit on non-finite values in pure-Perl mode,
+# causing utc_rd_days to be corrupted (-2 instead of Inf).
+subtest 'utc_rd_values are truly infinite' => sub
+{
+    my $fut = DateTime::Lite::Infinite::Future->new;
+    my $pas = DateTime::Lite::Infinite::Past->new;
+
+    my( $fd, $fs, $fn ) = $fut->utc_rd_values;
+    my( $pd, $ps, $pn ) = $pas->utc_rd_values;
+
+    ok( $fd > 1_000_000,  'Future: utc_rd_days is very large (Inf)' );
+    ok( $pd < -1_000_000, 'Past: utc_rd_days is very negative (-Inf)' );
+    ok( !defined( $fn ) || $fn >= 0, 'Future: rd_nanosecs is non-negative' );
+};
+
+# NOTE: Comparison symmetry (PP regression: $fut > $now was false due to corrupted
+# utc_rd_values in pure-Perl mode)
+subtest 'Comparison symmetry' => sub
+{
+    my $now = DateTime::Lite->now( time_zone => 'UTC' );
+    my $fut = DateTime::Lite::Infinite::Future->new;
+    my $pas = DateTime::Lite::Infinite::Past->new;
+
+    # Both directions must be consistent
+    ok(  ( $fut > $now ), 'fut > now' );
+    ok( !( $fut < $now ), 'not fut < now' );
+    ok(  ( $now < $fut ), 'now < fut' );
+    ok( !( $now > $fut ), 'not now > fut' );
+    ok(  ( $pas < $now ), 'pas < now' );
+    ok( !( $pas > $now ), 'not pas > now' );
+    ok(  ( $now > $pas ), 'now > pas' );
+    ok( !( $now < $pas ), 'not now < pas' );
 };
 
 done_testing;

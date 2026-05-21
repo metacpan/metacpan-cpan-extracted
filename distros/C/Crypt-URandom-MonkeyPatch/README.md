@@ -32,10 +32,17 @@ Crypt::URandom::MonkeyPatch::urandom used from Some::Package line 123
 
 # RECENT CHANGES
 
-Changes for version v0.1.3 (2025-09-14)
+Changes for version v0.1.4 (2026-05-06)
 
-- Bug Fixes
-    - Use print instead of say when CRYPT\_URANDOM\_MONKEYPATCH\_DEBUG is enabled.
+- Security
+    - Set minimum version of Crypt::URandom.
+- Documentation
+    - Update copyright year.
+    - Update author email address.
+    - Fix SOURCE link in the documentation.
+- Toolchain
+    - Stop signing distributions due to Module::Signature deprecation.
+    - Add doap.xml to the distribution.
 
 See the `Changes` file for more details.
 
@@ -43,7 +50,7 @@ See the `Changes` file for more details.
 
 This module lists the following modules as runtime dependencies:
 
-- [Crypt::URandom](https://metacpan.org/pod/Crypt%3A%3AURandom)
+- [Crypt::URandom](https://metacpan.org/pod/Crypt%3A%3AURandom) version 0.55 or later
 - [constant](https://metacpan.org/pod/constant)
 - [perl](https://metacpan.org/pod/perl) version v5.8.0 or later
 - [strict](https://metacpan.org/pod/strict)
@@ -105,16 +112,16 @@ report security vulnerabilities.
 
 # SOURCE
 
-The development version is on github at ["robrwo/perl-Crypt-URandom-MonkeyPatch" in github.com](https://metacpan.org/pod/github.com#robrwo-perl-Crypt-URandom-MonkeyPatch)
-and may be cloned from ["robrwo/perl-Crypt-URandom-MonkeyPatch.git" in github.com](https://metacpan.org/pod/github.com#robrwo-perl-Crypt-URandom-MonkeyPatch.git)
+The development version is on github at [https://github.com/robrwo/perl-Crypt-URandom-MonkeyPatch](https://github.com/robrwo/perl-Crypt-URandom-MonkeyPatch)
+and may be cloned from [https://github.com/robrwo/perl-Crypt-URandom-MonkeyPatch.git](https://github.com/robrwo/perl-Crypt-URandom-MonkeyPatch.git)
 
 # AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Robert Rothenberg <rrwo@cpan.org>.
+This software is Copyright (c) 2025-2026 by Robert Rothenberg <perl@rhizomnic.com>.
 
 This is free software, licensed under:
 

@@ -1,5 +1,20 @@
 Revision history for Perl module Module::Generic
 
+v1.5.0 2026-05-19T22:06:32+0900
+    - Updated to be compliant with perl v5.16.0. Before it required v5.28.0
+      Older perls (5.14 and below) suffer from a core bug in the interaction between
+      tied scalars and :lvalue subroutine returns.
+    - Added _in_global_destruction() class-wide utility for safe DESTROY methods,
+      using ${^GLOBAL_PHASE} on perl 5.14+ with a B::main_cv fallback retained for future
+      portability work.
+    - Multiple corrections in Module::Generic::Number for portability across perl versions,
+      including POSIX function fallbacks for perl < 5.22 (isinf, isnan, isnormal, cbrt,
+      log2, max/fmax, min/fmin, round_zero/round) and canonical Inf/NaN string
+      normalisation in Module::Generic::NumberSpecial.
+
+v1.4.0 2026-05-11T13:24:15+0900
+    - Added the methods children() and save() in Module::Generic::File
+
 v1.3.1 2026-03-31T12:23:04+0900
     - Minor improvement of getline() in Module::Generic::File
     - Corrected the method filetype() to check the symbolic links first.

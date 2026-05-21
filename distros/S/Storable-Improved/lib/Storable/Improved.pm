@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Storable Improved with Bug Fixes - ~/lib/Storable/Improved.pm
-## Version v0.1.3
+## Version v0.1.4
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/07/23
-## Modified 2022/07/25
+## Modified 2026/05/16
 ## All rights reserved
 ## 
 ## 
@@ -17,7 +17,7 @@ BEGIN
     use strict;
     use warnings;
     use warnings::register;
-    use Storable ();
+    use Storable 3.25 ();
     use parent -norequire, qw( Storable );
     use vars qw(
         $VERSION @EXPORT_OK @EXPORT @CARP_NOT
@@ -37,7 +37,7 @@ BEGIN
     *Deparse = \$Storable::Deparse;
     *Eval = \$Storable::Eval;
     *DEBUGME = \$Storable::DEBUGME;
-    $VERSION = 'v0.1.3';
+    $VERSION = 'v0.1.4';
 };
 
 use strict;
@@ -153,7 +153,7 @@ Storable::Improved - Storable improved with core flaws mitigated
 
 =head1 VERSION
 
-    v0.1.3
+    v0.1.4
 
 =head1 DESCRIPTION
 
@@ -246,7 +246,7 @@ For example:
             my( $f, $val ) = @_;
             if( exists( $h->{ $f } ) )
             {
-                $headers->{ $f } = [ $h->{ $f } ] unless( ref( $h->{ $f } ) eq 'ARRAY' );
+                $h->{ $f } = [ $h->{ $f } ] unless( ref( $h->{ $f } ) eq 'ARRAY' );
                 push( @{$h->{ $f }}, $val );
             }
             else

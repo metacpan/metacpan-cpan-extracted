@@ -3,8 +3,7 @@
 #
 use strict;
 use warnings;
-use Test::More;
-use MyNote;
+use MyTest;
 use UUID ':all';
 
 ok 1, 'loaded';

@@ -1,6 +1,89 @@
-# NOTE: Starting on Aug 29, 2024, this file will no longer be updated. Please see
-  the release notes for versions of this module published on GitHub: 
-  https://github.com/geofffranks/test-mockmodule/releases
+## 0.185.0 — 2026-05-07
+
+## What's Changed
+* Fix GH #83: Reverts to pre v0.181.0 behavior. new() returns singleton-per-package by default again. pass distinct => 1 for v0.181's fresh-object-per-call behavior.
+* New: Test::MockModule->original_for($pkg, $sub) — call the original sub from inside a mock closure without capturing $mock.
+
+**Full Changelog**: https://github.com/geofffranks/test-mockmodule/compare/0.184.0...0.185.0
+
+## 0.184.0 — 2026-05-04
+
+## What's Changed
+* fix: restore noop() to return 1 for backward compatibility by @Koan-Bot in https://github.com/geofffranks/test-mockmodule/pull/80
+
+
+**Full Changelog**: https://github.com/geofffranks/test-mockmodule/compare/0.183.0...0.184.0
+
+## 0.183.0 — 2026-05-01
+
+## What's Changed
+* Followup to PR #77 by @geofffranks in https://github.com/geofffranks/test-mockmodule/pull/79
+* Thanks @Koan-Bot @atoomic for providing a fix for #48 !
+
+**Full Changelog**: https://github.com/geofffranks/test-mockmodule/compare/0.181.0...0.183.0
+
+## 0.182.0 — 2026-05-01
+
+## What's Changed
+* Provide a global way to assure nostrict ever happens by @toddr in https://github.com/geofffranks/test-mockmodule/pull/66
+* Fix define() + unmock() bug, CI modernization, prototype tests by @Koan-Bot in https://github.com/geofffranks/test-mockmodule/pull/69
+* feat: mocked_subs() introspection + original() fix (GH #52, #42) by @Koan-Bot in https://github.com/geofffranks/test-mockmodule/pull/70
+* fix: align noop() return value with mock_all(noop=>1) by @Koan-Bot in https://github.com/geofffranks/test-mockmodule/pull/71
+* fix: add strict mode guard to mock_all() by @Koan-Bot in https://github.com/geofffranks/test-mockmodule/pull/72
+* ci: add Perl 5.40 and 5.42 to test matrix by @Koan-Bot in https://github.com/geofffranks/test-mockmodule/pull/75
+* docs: fix POD typos and syntax errors by @Koan-Bot in https://github.com/geofffranks/test-mockmodule/pull/76
+* perf: optimize _strict_mode() with exists check by @Koan-Bot in https://github.com/geofffranks/test-mockmodule/pull/73
+* fix: skip special Perl subs in mock_all() by @Koan-Bot in https://github.com/geofffranks/test-mockmodule/pull/74
+
+## New Contributors
+* @Koan-Bot made their first contribution in https://github.com/geofffranks/test-mockmodule/pull/69
+
+**Full Changelog**: https://github.com/geofffranks/test-mockmodule/compare/0.180.0...0.182.0
+
+## 0.181.0 — 2026-04-30
+
+## What's Changed
+* Provide a global way to assure nostrict ever happens by @toddr in https://github.com/geofffranks/test-mockmodule/pull/66
+* Fix define() + unmock() bug, CI modernization, prototype tests by @Koan-Bot in https://github.com/geofffranks/test-mockmodule/pull/69
+* feat: mocked_subs() introspection + original() fix (GH #52, #42) by @Koan-Bot in https://github.com/geofffranks/test-mockmodule/pull/70
+* fix: align noop() return value with mock_all(noop=>1) by @Koan-Bot in https://github.com/geofffranks/test-mockmodule/pull/71
+* fix: add strict mode guard to mock_all() by @Koan-Bot in https://github.com/geofffranks/test-mockmodule/pull/72
+* ci: add Perl 5.40 and 5.42 to test matrix by @Koan-Bot in https://github.com/geofffranks/test-mockmodule/pull/75
+* docs: fix POD typos and syntax errors by @Koan-Bot in https://github.com/geofffranks/test-mockmodule/pull/76
+* perf: optimize _strict_mode() with exists check by @Koan-Bot in https://github.com/geofffranks/test-mockmodule/pull/73
+* fix: skip special Perl subs in mock_all() by @Koan-Bot in https://github.com/geofffranks/test-mockmodule/pull/74
+
+## Moose & Mouse meta-class aware mocking (#55)
+
+`Test::MockModule` now registers mocks on the target's Moose/Mouse meta-class via `add_method` (in addition to the symbol table) when the target uses `Class::MOP::Class` or `Mouse::Meta::Class`. This fixes:
+
+- Role `requires` checks failing after mocking (incl. dynamic `apply_all_roles`).
+- `The method 'foo' was not found in the inheritance hierarchy` errors when loading a subclass with `around foo` after mocking the parent's `foo`.
+
+`unmock` restores via `add_method`, or `remove_method` (Moose) / internal cache purge (Mouse) for inherited originals.
+
+Immutable classes fall back to symbol-table-only with a one-time warning. Moo is not supported (no MOP).
+
+No public API change. Moose/Mouse/Class::MOP are not auto-loaded for non-Moose users.
+
+**Full Changelog**: https://github.com/geofffranks/test-mockmodule/compare/0.181.0...0.182.0
+
+## New Contributors
+* @Koan-Bot made their first contribution in https://github.com/geofffranks/test-mockmodule/pull/69
+
+**Full Changelog**: https://github.com/geofffranks/test-mockmodule/compare/0.180.0...0.181.0
+
+## 0.180.0 — 2025-07-03
+
+## What's Changed
+* Remove Software::License from runtime dependencies by @bbrtj in https://github.com/geofffranks/test-mockmodule/pull/68
+
+## New Contributors
+* @bbrtj made their first contribution in https://github.com/geofffranks/test-mockmodule/pull/68
+
+**Full Changelog**: https://github.com/geofffranks/test-mockmodule/compare/0.179.0...0.180.0
+
+# NOTE: Automated tracking resumed 2026-05-04. See https://github.com/geofffranks/test-mockmodule/releases for any older entries pre-0.180.0.
 
 # Revision history for Test::MockModule pre Aug 29, 2024
 

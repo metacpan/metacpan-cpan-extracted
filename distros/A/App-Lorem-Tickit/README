@@ -1,0 +1,55 @@
+NAME
+    lorem-tickit - Tickit application with lorem ipsum generator.
+
+SYNOPSIS
+     lorem-tickit [-h] [--version]
+
+DESCRIPTION
+    This application is an interactive Tickit lorem ipsum generator.
+
+ARGUMENTS
+    *       "-h"
+
+            Print help.
+
+    *       "--version"
+
+            Print version of script.
+
+CONTROLS
+    *       "Tab", arrows
+
+            Select setting.
+
+    *       "+", "-"
+
+            Increase or decrease selected count.
+
+    *       "Enter", "Space"
+
+            Use selected generator.
+
+    *       "q"
+
+            Quit.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/App-Lorem-Tickit>
+
+SEE ALSO
+    Lorem <https://flathub.org/en/apps/org.gnome.design.Lorem>
+        Simple app to generate the well-known Lorem Ipsum placeholder text.
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2026 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

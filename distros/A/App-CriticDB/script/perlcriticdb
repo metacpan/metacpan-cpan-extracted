@@ -1,0 +1,76 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+
+use App::CriticDB;
+
+my %opt=(
+	help =>undef,
+	man  =>undef,
+	#
+	file =>undef,
+	type =>undef,
+	paths=>[],
+	debug=>'',
+	#
+	profile=>undef,
+	# force  =>undef, # force all timestamps to 'newer', force delete, etc.?
+);
+GetOptions(
+	'help'     =>\$opt{help},
+	'man'      =>\$opt{man},
+	#
+	'file=s'   =>\$opt{file},
+	'type=s'   =>\$opt{type},
+	'debug=s'  =>\$opt{debug},
+	#
+	'profile=s'=>\$opt{profile},
+	#
+	'<>'       =>sub { my ($x)=@_; push @{$opt{paths}},$x },
+);
+
+if($opt{man})  { pod2usage(-verbose=>2,-exitval=>2) }
+if($opt{help}) { pod2usage(-verbose=>1,-exitval=>2) }
+
+my $criticdb;
+if($opt{file})     { $criticdb=App::CriticDB->new(file=>$opt{file},type=>$opt{type}//'storable',profile=>$opt{profile},debug=>{map {$_=>1} split(/,/,$opt{debug})}) }
+if(!$criticdb)     { die 'No database specified' }
+if(@{$opt{paths}}) { $criticdb->collect(@{$opt{paths}}) }
+
+$criticdb->report();
+
+__END__
+
+=pod
+
+=head1 NAME
+
+perlcriticdb - Commandline interface to Critic violations database
+
+=head1 SYNOPSIS
+
+  perlcriticdb
+    [ --file=violations.ext [ --type=storable ] ]
+    [ --profile=file ]
+    [ --man | --help ]
+    [ FILE | DIRECTORY ]
+
+=head1 DESCRIPTION
+
+C<perlcriticdb> is a tool to invoke C<perlcritic>, store violations in a local datastore, and build reports from of collected L<Perl::Critic> violation data.
+
+=head1 AUTHORS
+
+Brian Blackmore (brian@mediaalpha.com).
+
+=head1 COPYRIGHT
+
+  Copyright (c) 2025--2035, MediaAlpha.com.
+
+This library is free software; you can redistribute it and/or modify it under the terms of the GNU Library General Public License Version 3 as published by the Free Software Foundation.
+
+=cut

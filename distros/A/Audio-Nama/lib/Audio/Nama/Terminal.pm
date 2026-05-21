@@ -8,7 +8,8 @@ use Audio::Nama::Globals qw(:singletons $this_bus $this_track $text);
 use Audio::Nama::Log qw(logpkg logsub);
 use Data::Dumper::Concise;
 use List::MoreUtils qw(first_index);
-
+use File::Basename qw(fileparse);
+#use DDP;
 
 =comment - widgets
 
@@ -16,89 +17,58 @@ Tree:
 
 tickit
 	term
-vbox (root)
-	scrollbox 
-		vbox 
-		   static
-		   static
-		   ...
-    entry
+	console
+		entry
+		tabbed widget
+		    tab widget for commands
+			tab widget for track list
 
 Names:
 
-$text->{tickit} 
-$text->{root} 
-$text->{vbox} 
-$text->{scrollbox} 
-$text->{term} 
-$text->{entry} 
+$text->{tickit}
 =cut
 
 {
-my ($root, $vbox, $tickit, $term, $scrollbox, $entry);
+my ($root, $tickit, $term, $entry, @scrollers, $do_command);
 $text->{loop} = IO::Async::Loop->new;
 sub initialize_terminal {
-$root = 		Tickit::Widget::VBox->new; 
-$vbox = 		Tickit::Widget::VBox->new; # contains multiple items to scroll through
-$scrollbox = Tickit::Widget::ScrollBox->new->set_child( $vbox );
-$tickit = Tickit::Async->new( root => $root);
-$text->{tickit} = $tickit;
-$text->{term} = $term = $tickit->term;
-my $lines = $term->lines;
- 
-$root->add($scrollbox, valign => 'top', force_size => $lines - 2); 
-
-}
-
-sub create_entry_widget {
-
-	my $do_command = sub { my ( $self, $line ) = @_; 
+$do_command = sub { my ( $self, $line ) = @_; 
 							print_to_terminal($line); 
 							$line =~ s/^.+?>\s*//;
 							process_line($line); 
-							$self->set_text(prompt());
-							$self->set_position(99); 
+							show_prompt();
 						}; 
-	$entry = Tickit::Widget::Entry->new( 
-		text 	 => prompt(),
-		on_enter => $do_command,
-	);
-	Tickit::Widget::Entry::Plugin::Completion->apply($entry, gen_words => \&gen_words, use_popup => $config->{use_autocomplete_popup}); 
-
-	my $backspace  = sub { 
-		my $stop_pos = length prompt();
-		$entry->text_delete( $entry->position - 1, 1 ) 
-			unless $entry->position <= $stop_pos 
-	};
-	my $spacebar = sub {
-		if ( $entry->position == length prompt() ) { toggle_transport() }
-		else { $entry->on_text(' ') }
-	};
-
-	$entry->bind_keys( 
-	'Up' 		=> sub { previous_command() }, 
-	'Down'		=> sub { next_command()     }, 
-	'C-a'	  	=> sub { $entry->set_position( length prompt() ) },
-	'Home'  	=> sub { $entry->set_position( length prompt() ) },
-	'C-k'		=> sub { $entry->text_delete(  $entry->position, 999) },
-	'C-u'   	=> sub { $entry->text_delete(  
-							length prompt(), 
-							$entry->position - length prompt() ) },
-	'C-h'   	=> $backspace,
-	'Backspace' => $backspace,
-    ' '			=> $spacebar,
-	); 
-
-	#$entry->set_text(prompt()); 
-	$entry->set_position(99);
-	$root->add($entry, valign => 'bottom');
-
-	$entry
-}
+$root =	Tickit::Console->new( on_line => $do_command );
+my $tab  = $text->{command_tab}    = $root->add_tab(name => 'Nama/Ecasound', make_widget => \&save_scroller);
+my $tab2 = $text->{track_list_tab} = $root->add_tab(name => 'Track Listing', make_widget => \&save_scroller);
+sub save_scroller  { my $scroller = shift; push @scrollers, $scroller; return $scroller }
+$entry = find_first($root, 'Tickit::Widget::Entry');
+$text->{tickit} = $tickit = Tickit::Async->new( root => $root);
+$term = $tickit->term;
+setup_key_bindings();
  
-sub print_to_terminal ($txt) {
-	$vbox->add( Tickit::Widget::Static->new( text => $txt ));
-	$scrollbox->scroll_to(1e5);
+}
+sub find_first {
+	my ($obj, $wanted_class) = @_;
+	my @children = $obj->children;
+	my ($first) = grep{ $_ isa  $wanted_class } @children;
+	$first;
+}
+
+sub show_prompt {
+	$entry->set_text(prompt());
+	$entry->set_position(99); 
+}
+sub suspend
+{
+	$term->pause;
+	kill STOP => $$;
+	$term->resume;
+}
+sub print_to_terminal (@text) {
+	s/\n$// for @text;
+	return if not $scrollers[0] isa 'Tickit::Widget::Scroller';
+	$scrollers[0]->push(Tickit::Widget::Scroller::Item::Text->new($_)) for @text; 
 }
 
 sub prompt { 
@@ -116,6 +86,54 @@ sub previous_command {
 sub print_command {
 	$entry->set_text(join " ",prompt(),$text->{command_history}->[$text->{command_index}])
 }
+sub setup_key_bindings {
+
+	Tickit::Widget::Entry::Plugin::Completion->apply($entry, 
+		gen_words => \&gen_words, 
+		use_popup => 0, 
+		ignore_case => 1); 
+
+	my $backspace  = sub { 
+		my $stop_pos = length prompt();
+		$entry->text_delete( $entry->position - 1, 1 ) 
+			unless $entry->position <= $stop_pos 
+	};
+	my $left = sub { 
+		my $stop_pos = length prompt();
+		$entry->set_position( $entry->position - 1 ) 
+			unless $entry->position <= $stop_pos 
+	};
+
+	my $spacebar = sub {
+		if ( $config->{press_space_to_start}
+				and $entry->position == length prompt()
+				and ! ($mode->song or $mode->live) )
+		{ toggle_transport() }
+		else { $entry->on_text(' ') }
+	};
+
+	$entry->bind_keys( 
+	'Up' 		=> sub { previous_command() }, 
+	'Down'		=> sub { next_command()     }, 
+	'Left'		=> $left,
+	'C-a'	  	=> sub { $entry->set_position( length prompt() ) },
+	'Home'  	=> sub { $entry->set_position( length prompt() ) },
+	'C-k'		=> sub { $entry->text_delete(  $entry->position, 999) },
+	'C-u'   	=> sub { $entry->text_delete(  
+							length prompt(), 
+							$entry->position - length prompt() ) },
+	'C-h'   	=> $backspace,
+	'Backspace' => $backspace,
+    ' '			=> $spacebar,
+	'C-z'		=> \&suspend,
+	); 
+
+}
+ 
+sub command {
+	substr( $entry->text, length prompt() )
+}
+
 }
 our ($old_output_fh);
 sub redirect_stdout {
@@ -189,15 +207,6 @@ sub revise_prompt {
 =cut
 }
 
-sub detect_spacebar {
-=comment
-		if ( $config->{press_space_to_start} 
-				and ($buffer eq $trigger)
-				and ! ($mode->song or $mode->live) )
-			toggle_transport();	
-=cut
-warn ("not implemented");
-}
 sub throw {
 	logsub((caller(0))[3]);
 	pager_newline(@_)
@@ -270,30 +279,134 @@ sub load_keywords {
  	my %hyphenated = map{my $h = $_; $h =~ s/_/-/g; $h => $_ }grep{ /_/ } @keywords;
 	$text->{hyphenated_commands} = \%hyphenated;
 	push @keywords, keys %hyphenated;
-	#push @keywords, grep{$_} map{split " ", $text->{commands}->{$_}->{short}} @keywords;
 	push @keywords, keys %{$text->{iam}};
-	push @keywords, keys %{$fx_cache->{partial_label_to_full}};
 	push @keywords, keys %{$text->{midi_cmd}} if $config->{use_midi};
-	push @keywords, "Audio::Nama::";
-	push @keywords, pwd_files();
-	@{$text->{keywords}} = sort {lc $a cmp lc $b} @keywords
-	
-}
-sub gen_words {
-	my %args = @_;
-	my $word = $args{word};
-	my $keywords = $text->{keywords};
-	my $first = 0;
-	my $last = scalar @$keywords - 1;
-	for (my $i = 0;      $i <= $last; $i++)  { $first = $i,     last if @$keywords[$i] =~ /^$word/i }
-	return unless $first;
-	for (my $i = $first; $i <= $last; $i++)  { $last  = $i - 1, last if @$keywords[$i] !~ /^$word/i }
-	@$keywords[$first .. $last]
-}
-sub pwd_files {
-	my $dir = '.';
-	my $pwd = path($dir);
-	grep {-f} $pwd->children;
+	$text->{keywords}    = [sort {$a cmp $b} @keywords ];
+	$text->{autocomplete_keywords}->@* = grep { not /_/ } $text->{keywords}->@*;
+	$text->{executables} = [sort {$a cmp $b} executables()];
+	$text->{project_list} = project_list();
+	$text->{effects}     =  [sort {$a cmp $b} keys $fx_cache->{partial_label_to_full}->%*];
 }
 
+sub project_list { 
+	my $root = path(project_root());
+	[ sort { $a cmp $b }
+	 	map { $_-> basename } 
+		grep { -d } 
+		$root->children ]; 
+}
+
+sub gen_words {
+	state $pwd = path(getcwd);
+	my %args = @_;
+	my $word = $args{word};
+	my $entry = $args{entry};
+	my $wordpos = $args{wordpos};
+	my $plen = length $word;
+	my $keywords = [];
+	my $is_command;
+
+	if (command() =~ /load(.project)? / )
+	{
+		$keywords = $text->{project_list};
+	}
+
+	### handle file paths - import command only
+
+	elsif (command() =~ /imp(ort)?(-audio|-midi)? / ) # followed by a space
+	{
+	#print_to_terminal("word: $word");
+
+		## substitute environment variable 
+
+		my ($var);
+		if ( ($var) = $word =~ m[  \$ (\w+) $ ]x  and $ENV{$var}){
+			#print_to_terminal("var: $var");
+			$pwd = path($ENV{$var});
+			my $item = $pwd->stringify;
+			if ($pwd->is_dir){
+				$item =~ s(/*$)(/);
+			}
+			$entry->text_splice($wordpos, $plen, $item) ;
+			return;
+		}
+		if ( $word eq '~' or $word =~ m(^~/) )
+		{
+			#say "got tilde";
+			$word =~ s{~/?}{$ENV{HOME}/};
+			$pwd = path($ENV{HOME});
+			$entry->text_splice($wordpos, $plen, $word) ;
+			return
+		}
+		my ($stub, $dir) =  fileparse($word);
+		#print_to_terminal("word: $word, dir: $dir, stub: $stub");
+
+		$pwd = path($dir);
+
+		if ( $word =~ m(/) )
+		{
+			@$keywords = sort { $a cmp $b } map { $_->stringify} $pwd->children;
+			if ($stub =~ /\S/)
+			{
+				@$keywords = grep { m(  / $stub [^/]* $ )x } @$keywords;
+			}
+		}
+		else {
+			@$keywords = sort { $a cmp $b } map { $_->basename} $pwd->children;
+			if ($stub =~ /\S/)
+			{
+				@$keywords = grep { /^$stub/ } @$keywords;
+			}
+		}
+		map { path($_)->is_dir and s{$}{/} } @$keywords;
+		#print_to_terminal("found",scalar @$keywords , "files in this directory");
+		#print_to_terminal($_) for @$keywords; 
+		
+	}
+	elsif ( command() =~ /^ \s* ! /x )
+	{ 
+	   	$keywords = $text->{executables};
+	}
+	elsif ( command() =~ / (afx) | (add.effect) /x )
+	{ 
+	   	$keywords = $text->{effects};
+	}
+	else { 
+		$keywords = $text->{autocomplete_keywords} ;
+		$is_command++;
+	}
+
+	#print_to_terminal("found ".scalar @$keywords. " keywords");
+	#print_to_terminal($_) for @$keywords[0..10];
+	my $first = undef;
+	my $last = scalar @$keywords - 1;
+	for (my $i = 0;      $i <= $last; $i++)  { $first = $i,     last if @$keywords[$i] =~ /^$word/i }
+	return unless defined $first;
+	for (my $i = $first; $i <= $last; $i++)  { $last  = $i - 1, last if @$keywords[$i] !~ /^$word/i }
+	my @result = @$keywords[$first .. $last];
+
+	# don't print if full paths;
+	#unless (grep { m(/) } @result)
+	#{
+	 print_to_terminal("found", scalar @result, "matches") if @result > 10;
+	 print_to_terminal($_) for @result;
+	 print_to_terminal(' ');
+	#}
+
+	@result;
+}
+	
+sub executables {
+	# if starts with letter, return executables for that letter
+	# if starts with ./ ../ ~/ / return the appropriate set of executables
+	my @path = "$ENV{HOME}/bin";
+	# split ':', $ENV{PATH};
+	my @executables = ();
+	for my $dir	(@path)
+	{
+		my $p = path($dir);
+		push @executables, grep { -x $_ } map { $_->stringify} $p->children;
+	}
+	@executables
+}
 1;

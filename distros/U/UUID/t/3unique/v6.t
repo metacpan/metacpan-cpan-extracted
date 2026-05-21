@@ -1,21 +1,42 @@
 use strict;
 use warnings;
-use Test::More;
-use MyNote;
-BEGIN { use_ok 'UUID' }
+use MyTest;
+use MyTmpTimer;
+use UUID;
 
-my $n = 100;
+my $N = 4_000;
 my %seen = ();
+my $count = 0;
 
-for (1 .. $n) {
+my $fh = tmptimer( $N, sub {
+    my ($N, $fh) = @_;
     my ($bin, $str);
-    UUID::generate_v6($bin);
-    UUID::unparse($bin, $str);
-    note $str;
-    ok !exists($seen{$str});
-    $seen{$str} = 1;
+    for (1 .. $N) {
+        UUID::generate_v6($bin);
+        UUID::unparse($bin, $str);
+        print $fh $str. "\n";
+    }
+});
+
+while (my $str = <$fh>) {
+    chomp $str;
+    note $str if $count++ < 3;
+    ++$seen{$str};
 }
 
-is scalar(keys %seen), $n, 'no dupes';
+# avoid cleanup race
+$fh->close;
+
+{
+    my $expected = $N;
+    my $got = scalar keys %seen;
+    is $count, $expected, 'count ok';
+    is $got,   $expected, 'unique ok';
+
+    # show the repeats, if any
+    my $reps = scalar grep { $seen{$_} > 1 } keys %seen;
+    next unless $reps;
+    diag q(     repeats: '). $reps. q(');
+}
 
 done_testing;

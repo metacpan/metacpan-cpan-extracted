@@ -45,6 +45,9 @@ for my $case (
     [ skill     => [ qw(install enable disable uninstall list usage) ] ],
     [ docker    => [ qw(compose list enable disable) ] ],
     [ path      => [ qw(list resolve add del locate project-root) ] ],
+    [ restart   => [ qw(web collector) ] ],
+    [ stop      => [ qw(web collector) ] ],
+    [ log       => [ qw(web collector) ] ],
     [ indicator => [ qw(set list refresh-core) ] ],
     [ collector => [ qw(write-result status list job output inspect log run start stop restart) ] ],
     [ config    => [ qw(init show) ] ],
@@ -67,6 +70,42 @@ is_deeply(
     [ Developer::Dashboard::CLI::Complete::_subcommand_candidates('unknown') ],
     [],
     '_subcommand_candidates returns an empty list for unsupported built-ins',
+);
+
+is_deeply(
+    [
+        Developer::Dashboard::CLI::Complete::complete(
+            words           => [ 'dashboard', 'workspace', 'DD-' ],
+            index           => 2,
+            ticket_sessions => sub { return qw(DD-123 DD-456 OTHER-1) },
+        )
+    ],
+    [ qw(DD-123 DD-456) ],
+    'complete suggests tmux workspace session names for dashboard workspace',
+);
+
+is_deeply(
+    [
+        Developer::Dashboard::CLI::Complete::complete(
+            words           => [ 'dashboard', 'restart', 'collector', 'al' ],
+            index           => 3,
+            collector_names => sub { return qw(alpha.collector beta.collector) },
+        )
+    ],
+    [qw(alpha.collector)],
+    'complete suggests configured collector names for dashboard restart collector',
+);
+
+is_deeply(
+    [
+        Developer::Dashboard::CLI::Complete::complete(
+            words           => [ 'dashboard', 'log', 'collector', 'be' ],
+            index           => 3,
+            collector_names => sub { return qw(alpha.collector beta.collector) },
+        )
+    ],
+    [qw(beta.collector)],
+    'complete suggests configured collector names for dashboard log collector',
 );
 
 {

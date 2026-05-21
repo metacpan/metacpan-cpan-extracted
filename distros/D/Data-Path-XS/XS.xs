@@ -46,15 +46,20 @@ typedef struct {
 /* Compiled path object - flexible array member for cache locality */
 typedef struct {
     U32 magic;       /* COMPILED_PATH_MAGIC for fast type check */
+    I32 utf8_flag;   /* +1 for byte path, -1 for UTF-8 path (signed klen factor) */
     SSize_t count;
     SV *path_sv;     /* Owned copy of path string buffer */
     PathComponent components[1];  /* Flexible array member (C89 style) */
 } CompiledPath;
 
-/* Fast compiled path validation - check ref, NULL, and magic */
+/* Fast compiled path validation - check ref, payload type, and magic.
+ * sv_setref_pv produces an RV whose target is an IV-bearing SV; if not IOK,
+ * input is not a compiled path. Checking SvIOK avoids "isn't numeric" warnings
+ * from SvIV on bless'd hashes/arrays/garbage. */
 #define VALIDATE_COMPILED_PATH(sv, cp) do { \
-    if (UNLIKELY(!SvROK(sv))) croak("Not a compiled path"); \
-    cp = INT2PTR(CompiledPath*, SvIV(SvRV(sv))); \
+    SV *_inner; \
+    if (UNLIKELY(!SvROK(sv) || !SvIOK(_inner = SvRV(sv)))) croak("Not a compiled path"); \
+    cp = INT2PTR(CompiledPath*, SvIVX(_inner)); \
     if (UNLIKELY(!cp || cp->magic != COMPILED_PATH_MAGIC)) croak("Not a compiled path"); \
 } while(0)
 
@@ -69,18 +74,18 @@ PERL_STATIC_INLINE int is_array_index(const char *s, STRLEN len, IV *idx) {
     const char *end = s + len;
     int negative = 0;
 
-    if (UNLIKELY(len == 0 || len > (MAX_INDEX_DIGITS + 1))) return 0;  /* Empty or too long */
+    /* Length cap includes the optional leading minus sign. */
+    if (UNLIKELY(len == 0 || len > (MAX_INDEX_DIGITS + 1))) return 0;
 
-    /* Handle negative sign */
     if (*s == '-') {
         negative = 1;
         s++;
         len--;
-        if (UNLIKELY(len == 0)) return 0;  /* Just "-" */
+        if (UNLIKELY(len == 0)) return 0;
     }
 
-    if (UNLIKELY(len > MAX_INDEX_DIGITS)) return 0;  /* Too many digits */
-    if (len > 1 && *s == '0') return 0;  /* No leading zeros */
+    if (UNLIKELY(len > MAX_INDEX_DIGITS)) return 0;
+    if (len > 1 && *s == '0') return 0;  /* leading zeros => hash key */
 
     while (s < end) {
         if (UNLIKELY(*s < '0' || *s > '9')) return 0;
@@ -90,6 +95,19 @@ PERL_STATIC_INLINE int is_array_index(const char *s, STRLEN len, IV *idx) {
 
     *idx = negative ? -val : val;
     return 1;
+}
+
+/* SvPV + SvUTF8 → signed klen (negative encodes UTF-8 to hv_*). */
+PERL_STATIC_INLINE I32 sv_to_klen(pTHX_ SV *sv, const char **kstr_out) {
+    STRLEN klen;
+    *kstr_out = SvPV(sv, klen);
+    return SvUTF8(sv) ? -(I32)klen : (I32)klen;
+}
+
+/* True iff p..end (after slash-skipping) has no further non-empty components. */
+PERL_STATIC_INLINE int kw_at_last_component(const char *p, const char *end) {
+    while (p < end && *p == '/') p++;
+    return p >= end;
 }
 
 /* Fast SV to index - check IOK first, accept negative for Perl-style access */
@@ -103,9 +121,11 @@ PERL_STATIC_INLINE int sv_to_index(pTHX_ SV *sv, IV *idx) {
     return is_array_index(s, len, idx);
 }
 
-/* Navigate using raw char* path components */
+/* Navigate using raw char* path components.
+ * utf8_flag is +1 for byte keys, -1 for UTF-8 keys (signed klen convention). */
 PERL_STATIC_INLINE SV* navigate_to_parent(pTHX_ SV *data, const char *path, STRLEN path_len,
-                              const char **final_key_ptr, STRLEN *final_key_len, int create) {
+                              const char **final_key_ptr, STRLEN *final_key_len,
+                              int create, I32 utf8_flag) {
     const char *p = path;
     const char *end = path + path_len;
     SV *current = data;
@@ -152,9 +172,15 @@ PERL_STATIC_INLINE SV* navigate_to_parent(pTHX_ SV *data, const char *path, STRL
 
         if (LIKELY(t == SVt_PVHV)) {
             HV *hv = (HV*)inner;
-            SV **val = hv_fetch(hv, tok_start, tok_len, 0);
+            SV **val = hv_fetch(hv, tok_start, (I32)tok_len * utf8_flag, 0);
             if (UNLIKELY(!val || !*val || !SvROK(*val))) {
                 if (create) {
+                    /* Tied/magical containers can't autovivify — hv_store
+                     * returns NULL without invoking STORE. Croak with a
+                     * useful message rather than the generic one above. */
+                    if (UNLIKELY(SvRMAGICAL((SV*)hv))) {
+                        croak("Cannot path_set on tied/magical hash");
+                    }
                     /* check already points at next real component start */
                     const char *next_end = check;
                     while (next_end < end && *next_end != '/') next_end++;
@@ -162,7 +188,7 @@ PERL_STATIC_INLINE SV* navigate_to_parent(pTHX_ SV *data, const char *path, STRL
                     SV *new_ref = is_array_index(check, next_end - check, &dummy)
                         ? newRV_noinc((SV*)newAV())
                         : newRV_noinc((SV*)newHV());
-                    if (UNLIKELY(!hv_store(hv, tok_start, tok_len, new_ref, 0))) {
+                    if (UNLIKELY(!hv_store(hv, tok_start, (I32)tok_len * utf8_flag, new_ref, 0))) {
                         SvREFCNT_dec(new_ref);
                         *final_key_ptr = NULL;
                         return NULL;
@@ -184,7 +210,9 @@ PERL_STATIC_INLINE SV* navigate_to_parent(pTHX_ SV *data, const char *path, STRL
             SV **val = av_fetch((AV*)inner, idx, 0);
             if (UNLIKELY(!val || !*val || !SvROK(*val))) {
                 if (create) {
-                    /* check already points at next real component start */
+                    if (UNLIKELY(SvRMAGICAL((SV*)inner))) {
+                        croak("Cannot path_set on tied/magical array");
+                    }
                     const char *next_end = check;
                     while (next_end < end && *next_end != '/') next_end++;
                     IV dummy;
@@ -242,26 +270,22 @@ static CompiledPath* compile_path(pTHX_ SV *path_sv) {
     if (count == 0) {
         Newxz(cp, 1, CompiledPath);
         cp->magic = COMPILED_PATH_MAGIC;
+        cp->utf8_flag = SvUTF8(path_sv) ? -1 : 1;
         cp->count = 0;
-        cp->path_sv = newSVpvn(path, path_len);
+        cp->path_sv = newSVpvn_flags(path, path_len, SvUTF8(path_sv) ? SVf_UTF8 : 0);
         return cp;
     }
 
-    /* Allocate struct with inline component array in single allocation
-     * Size = base struct + (count-1) extra PathComponents
-     * (struct already includes space for 1 component)
-     */
-    Size_t alloc_size = sizeof(CompiledPath);
-    if (count > 1) {
-        alloc_size += (count - 1) * sizeof(PathComponent);
-    }
+    /* Single alloc: base struct already has 1 inline component slot. */
+    Size_t alloc_size = sizeof(CompiledPath) + (count - 1) * sizeof(PathComponent);
     Newxc(cp, alloc_size, char, CompiledPath);
 
     cp->magic = COMPILED_PATH_MAGIC;
+    cp->utf8_flag = SvUTF8(path_sv) ? -1 : 1;
     cp->count = count;
     /* Create independent copy of path string so PathComponent pointers
      * remain valid even if the original SV's buffer is modified/freed */
-    cp->path_sv = newSVpvn(path, path_len);
+    cp->path_sv = newSVpvn_flags(path, path_len, SvUTF8(path_sv) ? SVf_UTF8 : 0);
 
     /* Re-derive pointers into our own copy's buffer */
     const char *copy_buf = SvPVX(cp->path_sv);
@@ -319,6 +343,7 @@ static OP* pp_pathget_dynamic(pTHX)
     const char *path = SvPV(path_sv, path_len);
     const char *p = path;
     const char *end = path + path_len;
+    const I32 utf8_flag = SvUTF8(path_sv) ? -1 : 1;
 
     SV *current = data_sv;
 
@@ -326,7 +351,6 @@ static OP* pp_pathget_dynamic(pTHX)
     while (p < end && *p == '/') p++;
 
     while (p < end && SvOK(current)) {
-        /* Find component end */
         const char *start = p;
         while (p < end && *p != '/') p++;
         STRLEN comp_len = p - start;
@@ -342,22 +366,24 @@ static OP* pp_pathget_dynamic(pTHX)
         }
 
         SV *inner = SvRV(current);
-        IV idx;
+        svtype t = SvTYPE(inner);
 
-        if (is_array_index(start, comp_len, &idx)) {
-            if (UNLIKELY(SvTYPE(inner) != SVt_PVAV)) {
+        /* Dispatch by parent container type, like path_get/patha_get/pathc_get.
+         * Hash keys that look numeric are still hash keys. */
+        if (LIKELY(t == SVt_PVHV)) {
+            SV **svp = hv_fetch((HV*)inner, start, (I32)comp_len * utf8_flag, 0);
+            current = svp ? *svp : &PL_sv_undef;
+        } else if (t == SVt_PVAV) {
+            IV idx;
+            if (UNLIKELY(!is_array_index(start, comp_len, &idx))) {
                 current = &PL_sv_undef;
                 break;
             }
             SV **elem = av_fetch((AV*)inner, idx, 0);
             current = elem ? *elem : &PL_sv_undef;
         } else {
-            if (UNLIKELY(SvTYPE(inner) != SVt_PVHV)) {
-                current = &PL_sv_undef;
-                break;
-            }
-            SV **svp = hv_fetch((HV*)inner, start, comp_len, 0);
-            current = svp ? *svp : &PL_sv_undef;
+            current = &PL_sv_undef;
+            break;
         }
 
         if (p < end && *p == '/') p++;
@@ -367,33 +393,21 @@ static OP* pp_pathget_dynamic(pTHX)
     RETURN;
 }
 
-/* Helper to check if next path component is numeric (including negative) */
+/* Check if the next non-empty component (after p) parses as an array index. */
 PERL_STATIC_INLINE int kw_next_component_is_numeric(const char *p, const char *end)
 {
-    if (p >= end || *p != '/') return 0;
-    /* Skip consecutive slashes to find next real component */
     while (p < end && *p == '/') p++;
     if (p >= end) return 0;
-
-    /* Handle optional negative sign */
-    if (*p == '-') {
-        p++;
-        if (p >= end || *p == '/') return 0;  /* Just "-" */
-    }
-
-    const char *digits_start = p;
-    while (p < end && *p != '/') {
-        if (*p < '0' || *p > '9') return 0;
-        p++;
-    }
-    /* Use same rules as is_array_index: no leading zeros, max digits */
-    STRLEN len = p - digits_start;
-    if (UNLIKELY(len == 0 || len > MAX_INDEX_DIGITS)) return 0;
-    if (len > 1 && *digits_start == '0') return 0;
-    return 1;
+    const char *q = p;
+    while (q < end && *q != '/') q++;
+    IV dummy;
+    return is_array_index(p, q - p, &dummy);
 }
 
-/* Custom op for dynamic path set with autovivification */
+/* Custom op for dynamic path set with autovivification.
+ * Dispatches by parent container type (consistent with path_set/patha_set/pathc_set):
+ * hash parent -> use component as hash key (even if numeric-looking);
+ * array parent -> require numeric component. */
 static OP* pp_pathset_dynamic(pTHX)
 {
     dSP; dMARK; dORIGMARK;
@@ -406,6 +420,7 @@ static OP* pp_pathset_dynamic(pTHX)
     const char *path = SvPV(path_sv, path_len);
     const char *p = path;
     const char *end = path + path_len;
+    const I32 utf8_flag = SvUTF8(path_sv) ? -1 : 1;
 
     /* Skip leading slashes */
     while (p < end && *p == '/') p++;
@@ -418,7 +433,6 @@ static OP* pp_pathset_dynamic(pTHX)
     SV *current = data_sv;
 
     while (p < end) {
-        /* Find component end */
         const char *start = p;
         while (p < end && *p != '/') p++;
         STRLEN comp_len = p - start;
@@ -428,84 +442,84 @@ static OP* pp_pathset_dynamic(pTHX)
             continue;
         }
 
-        /* Skip all trailing slashes/empty components for "is last" check */
-        const char *next_p = p;
-        while (next_p < end && *next_p == '/') next_p++;
-        int is_last = (next_p >= end);
+        int is_last = kw_at_last_component(p, end);
 
         if (UNLIKELY(!SvROK(current))) {
             croak("Cannot navigate to path");
         }
 
         SV *inner = SvRV(current);
-        IV idx;
+        svtype t = SvTYPE(inner);
 
-        if (is_array_index(start, comp_len, &idx)) {
-            /* Array access */
-            if (UNLIKELY(SvTYPE(inner) != SVt_PVAV)) {
+        if (LIKELY(t == SVt_PVHV)) {
+            HV *hv = (HV*)inner;
+            I32 klen = (I32)comp_len * utf8_flag;
+
+            if (is_last) {
+                SV *copy = SvROK(value_sv) ? SvREFCNT_inc(value_sv) : newSVsv(value_sv);
+                if (UNLIKELY(!hv_store(hv, start, klen, copy, 0))) {
+                    SvREFCNT_dec(copy);
+                    croak(SvRMAGICAL((SV*)hv)
+                          ? "Cannot pathset on tied/magical hash"
+                          : "Failed to store value");
+                }
+            } else {
+                SV **elem = hv_fetch(hv, start, klen, 1);  /* lvalue/create */
+                if (UNLIKELY(!elem)) {
+                    croak(SvRMAGICAL((SV*)hv)
+                          ? "Cannot pathset on tied/magical hash"
+                          : "Cannot navigate to path");
+                }
+                if (!SvROK(*elem)) {
+                    /* sv_setsv on a magical slot won't propagate STORE;
+                     * fail loudly instead of silently dropping the write. */
+                    if (UNLIKELY(SvRMAGICAL((SV*)hv))) {
+                        croak("Cannot pathset on tied/magical hash");
+                    }
+                    SV *new_ref = kw_next_component_is_numeric(p, end)
+                        ? newRV_noinc((SV*)newAV())
+                        : newRV_noinc((SV*)newHV());
+                    sv_setsv(*elem, new_ref);
+                    SvREFCNT_dec(new_ref);
+                }
+                current = *elem;
+            }
+        } else if (t == SVt_PVAV) {
+            IV idx;
+            if (UNLIKELY(!is_array_index(start, comp_len, &idx))) {
                 croak("Cannot navigate to path");
             }
             AV *av = (AV*)inner;
 
             if (is_last) {
-                /* Final component - store value */
                 SV *copy = SvROK(value_sv) ? SvREFCNT_inc(value_sv) : newSVsv(value_sv);
                 if (UNLIKELY(!av_store(av, idx, copy))) {
                     SvREFCNT_dec(copy);
-                    croak("Failed to store value");
+                    croak(SvRMAGICAL((SV*)av)
+                          ? "Cannot pathset on tied/magical array"
+                          : "Failed to store value");
                 }
             } else {
-                /* Intermediate - autovivify if needed */
-                SV **elem = av_fetch(av, idx, 1);  /* 1 = lvalue/create */
+                SV **elem = av_fetch(av, idx, 1);  /* lvalue/create */
                 if (UNLIKELY(!elem)) {
-                    croak("Cannot navigate to path");
+                    croak(SvRMAGICAL((SV*)av)
+                          ? "Cannot pathset on tied/magical array"
+                          : "Cannot navigate to path");
                 }
-                if (!SvOK(*elem) || !SvROK(*elem)) {
-                    /* Autovivify based on next component */
-                    SV *new_ref;
-                    if (kw_next_component_is_numeric(p, end)) {
-                        new_ref = newRV_noinc((SV*)newAV());
-                    } else {
-                        new_ref = newRV_noinc((SV*)newHV());
+                if (!SvROK(*elem)) {
+                    if (UNLIKELY(SvRMAGICAL((SV*)av))) {
+                        croak("Cannot pathset on tied/magical array");
                     }
+                    SV *new_ref = kw_next_component_is_numeric(p, end)
+                        ? newRV_noinc((SV*)newAV())
+                        : newRV_noinc((SV*)newHV());
                     sv_setsv(*elem, new_ref);
                     SvREFCNT_dec(new_ref);
                 }
                 current = *elem;
             }
         } else {
-            /* Hash access */
-            if (UNLIKELY(SvTYPE(inner) != SVt_PVHV)) {
-                croak("Cannot navigate to path");
-            }
-            HV *hv = (HV*)inner;
-
-            if (is_last) {
-                /* Final component - store value */
-                SV *copy = SvROK(value_sv) ? SvREFCNT_inc(value_sv) : newSVsv(value_sv);
-                if (UNLIKELY(!hv_store(hv, start, comp_len, copy, 0))) {
-                    SvREFCNT_dec(copy);
-                    croak("Failed to store value");
-                }
-            } else {
-                /* Intermediate - autovivify if needed */
-                SV **elem = hv_fetch(hv, start, comp_len, 1);  /* 1 = lvalue/create */
-                if (UNLIKELY(!elem)) {
-                    croak("Cannot navigate to path");
-                }
-                if (!SvOK(*elem) || !SvROK(*elem)) {
-                    /* Autovivify based on next component */
-                    SV *new_ref;
-                    if (kw_next_component_is_numeric(p, end)) {
-                        new_ref = newRV_noinc((SV*)newAV());
-                    } else {
-                        new_ref = newRV_noinc((SV*)newHV());
-                    }
-                    sv_setsv(*elem, new_ref);
-                    SvREFCNT_dec(new_ref);
-                }
-                current = *elem;
-            }
+            croak("Cannot navigate to path");
         }
 
         if (p < end && *p == '/') p++;
@@ -516,7 +530,8 @@ static OP* pp_pathset_dynamic(pTHX)
     RETURN;
 }
 
-/* Custom op for dynamic path delete */
+/* Custom op for dynamic path delete.
+ * Dispatches the final delete by parent container type. */
 static OP* pp_pathdelete_dynamic(pTHX)
 {
     dSP;
@@ -527,6 +542,7 @@ static OP* pp_pathdelete_dynamic(pTHX)
     const char *path = SvPV(path_sv, path_len);
     const char *p = path;
     const char *end = path + path_len;
+    const I32 utf8_flag = SvUTF8(path_sv) ? -1 : 1;
 
     /* Skip leading slashes */
     while (p < end && *p == '/') p++;
@@ -540,11 +556,8 @@ static OP* pp_pathdelete_dynamic(pTHX)
     SV *parent = NULL;
     const char *last_key_start = NULL;
     STRLEN last_key_len = 0;
-    int last_is_numeric = 0;
-    IV last_idx = 0;
 
     while (p < end) {
-        /* Find component end */
         const char *start = p;
         while (p < end && *p != '/') p++;
         STRLEN comp_len = p - start;
@@ -554,22 +567,12 @@ static OP* pp_pathdelete_dynamic(pTHX)
             continue;
         }
 
-        /* Check if numeric using shared helper */
-        IV idx;
-        int is_numeric = is_array_index(start, comp_len, &idx);
-
-        /* Skip all trailing slashes/empty components for "is last" check */
-        const char *next_p = p;
-        while (next_p < end && *next_p == '/') next_p++;
-        int is_last = (next_p >= end);
+        int is_last = kw_at_last_component(p, end);
 
         if (is_last) {
-            /* Remember this for deletion */
             parent = current;
             last_key_start = start;
             last_key_len = comp_len;
-            last_is_numeric = is_numeric;
-            last_idx = idx;
             break;
         }
 
@@ -579,49 +582,49 @@ static OP* pp_pathdelete_dynamic(pTHX)
         }
 
         SV *inner = SvRV(current);
+        svtype t = SvTYPE(inner);
 
-        if (is_numeric) {
-            if (UNLIKELY(SvTYPE(inner) != SVt_PVAV)) {
+        if (LIKELY(t == SVt_PVHV)) {
+            SV **svp = hv_fetch((HV*)inner, start, (I32)comp_len * utf8_flag, 0);
+            current = svp ? *svp : &PL_sv_undef;
+        } else if (t == SVt_PVAV) {
+            IV idx;
+            if (UNLIKELY(!is_array_index(start, comp_len, &idx))) {
                 PUSHs(&PL_sv_undef);
                 RETURN;
             }
             SV **elem = av_fetch((AV*)inner, idx, 0);
             current = elem ? *elem : &PL_sv_undef;
         } else {
-            if (UNLIKELY(SvTYPE(inner) != SVt_PVHV)) {
-                PUSHs(&PL_sv_undef);
-                RETURN;
-            }
-            SV **svp = hv_fetch((HV*)inner, start, comp_len, 0);
-            current = svp ? *svp : &PL_sv_undef;
+            PUSHs(&PL_sv_undef);
+            RETURN;
         }
 
         if (p < end && *p == '/') p++;
     }
 
-    /* Perform the delete */
+    /* Perform the delete by parent container type */
     SV *deleted = NULL;
     if (parent && SvROK(parent)) {
         SV *inner = SvRV(parent);
-        if (last_is_numeric) {
-            if (SvTYPE(inner) == SVt_PVAV)
-                deleted = av_delete((AV*)inner, last_idx, 0);
-        } else {
-            if (SvTYPE(inner) == SVt_PVHV)
-                deleted = hv_delete((HV*)inner, last_key_start, last_key_len, 0);
+        svtype t = SvTYPE(inner);
+        if (LIKELY(t == SVt_PVHV)) {
+            deleted = hv_delete((HV*)inner, last_key_start,
+                                (I32)last_key_len * utf8_flag, 0);
+        } else if (t == SVt_PVAV) {
+            IV idx;
+            if (is_array_index(last_key_start, last_key_len, &idx))
+                deleted = av_delete((AV*)inner, idx, 0);
         }
     }
 
-    if (deleted) {
-        SvREFCNT_inc_simple_void_NN(deleted);
-        PUSHs(sv_2mortal(deleted));
-    } else {
-        PUSHs(&PL_sv_undef);
-    }
+    /* hv_delete/av_delete with flags=0 already mortalize the returned SV. */
+    PUSHs(deleted ? deleted : &PL_sv_undef);
     RETURN;
 }
 
-/* Custom op for dynamic path exists check */
+/* Custom op for dynamic path exists check.
+ * Dispatches by parent container type. */
 static OP* pp_pathexists_dynamic(pTHX)
 {
     dSP;
@@ -632,6 +635,7 @@ static OP* pp_pathexists_dynamic(pTHX)
     const char *path = SvPV(path_sv, path_len);
     const char *p = path;
     const char *end = path + path_len;
+    const I32 utf8_flag = SvUTF8(path_sv) ? -1 : 1;
 
     /* Skip leading slashes */
     while (p < end && *p == '/') p++;
@@ -645,7 +649,6 @@ static OP* pp_pathexists_dynamic(pTHX)
     SV *current = data_sv;
 
     while (p < end) {
-        /* Find component end */
         const char *start = p;
         while (p < end && *p != '/') p++;
         STRLEN comp_len = p - start;
@@ -655,14 +658,7 @@ static OP* pp_pathexists_dynamic(pTHX)
             continue;
         }
 
-        /* Check if numeric using shared helper */
-        IV idx;
-        int is_numeric = is_array_index(start, comp_len, &idx);
-
-        /* Skip all trailing slashes/empty components for "is last" check */
-        const char *next_p = p;
-        while (next_p < end && *next_p == '/') next_p++;
-        int is_last = (next_p >= end);
+        int is_last = kw_at_last_component(p, end);
 
         if (UNLIKELY(!SvROK(current))) {
             PUSHs(&PL_sv_no);
@@ -670,47 +666,41 @@ static OP* pp_pathexists_dynamic(pTHX)
         }
 
         SV *inner = SvRV(current);
+        svtype t = SvTYPE(inner);
 
-        if (is_numeric) {
-            if (UNLIKELY(SvTYPE(inner) != SVt_PVAV)) {
+        if (LIKELY(t == SVt_PVHV)) {
+            HV *hv = (HV*)inner;
+            I32 klen = (I32)comp_len * utf8_flag;
+            if (is_last) {
+                PUSHs(hv_exists(hv, start, klen) ? &PL_sv_yes : &PL_sv_no);
+                RETURN;
+            }
+            SV **svp = hv_fetch(hv, start, klen, 0);
+            if (!svp || !SvOK(*svp)) {
+                PUSHs(&PL_sv_no);
+                RETURN;
+            }
+            current = *svp;
+        } else if (t == SVt_PVAV) {
+            IV idx;
+            if (UNLIKELY(!is_array_index(start, comp_len, &idx))) {
                 PUSHs(&PL_sv_no);
                 RETURN;
             }
             AV *av = (AV*)inner;
-
             if (is_last) {
-                /* Final component - check if exists */
-                bool exists = av_exists(av, idx);
-                PUSHs(exists ? &PL_sv_yes : &PL_sv_no);
+                PUSHs(av_exists(av, idx) ? &PL_sv_yes : &PL_sv_no);
                 RETURN;
-            } else {
-                SV **elem = av_fetch(av, idx, 0);
-                if (!elem || !SvOK(*elem)) {
-                    PUSHs(&PL_sv_no);
-                    RETURN;
-                }
-                current = *elem;
             }
-        } else {
-            if (UNLIKELY(SvTYPE(inner) != SVt_PVHV)) {
+            SV **elem = av_fetch(av, idx, 0);
+            if (!elem || !SvOK(*elem)) {
                 PUSHs(&PL_sv_no);
                 RETURN;
             }
-            HV *hv = (HV*)inner;
-
-            if (is_last) {
-                /* Final component - check if exists */
-                bool exists = hv_exists(hv, start, comp_len);
-                PUSHs(exists ? &PL_sv_yes : &PL_sv_no);
-                RETURN;
-            } else {
-                SV **svp = hv_fetch(hv, start, comp_len, 0);
-                if (!svp || !SvOK(*svp)) {
-                    PUSHs(&PL_sv_no);
-                    RETURN;
-                }
-                current = *svp;
-            }
+            current = *elem;
+        } else {
+            PUSHs(&PL_sv_no);
+            RETURN;
         }
 
         if (p < end && *p == '/') p++;
@@ -721,29 +711,28 @@ static OP* pp_pathexists_dynamic(pTHX)
     RETURN;
 }
 
-/* Build a custom op for dynamic path access */
-static OP* kw_build_dynamic_pathget(pTHX_ OP *data_op, OP *path_op)
+/* Wrap a (data, path) pair as a custom binop dispatched to ppaddr. */
+PERL_STATIC_INLINE OP* kw_make_binop(pTHX_ OP *data_op, OP *path_op,
+                                     OP *(*ppaddr)(pTHX))
 {
-    /* Create BINOP with data and path as children */
     OP *binop = newBINOP(OP_NULL, 0, data_op, path_op);
     binop->op_type = OP_CUSTOM;
-    binop->op_ppaddr = pp_pathget_dynamic;
-
+    binop->op_ppaddr = ppaddr;
     return binop;
 }
 
-/* Build a chain of hash/array element accesses for assignment (lvalue) */
+/* Build a chain of HELEM accesses for constant-path assignment (lvalue).
+ * Only entered when build_kw_pathset has verified all components are
+ * non-numeric strings, so no AELEM branch is needed. */
 static OP* kw_build_deref_chain_lvalue(pTHX_ OP *data_op, const char *path, STRLEN path_len)
 {
     OP *current = data_op;
     const char *p = path;
     const char *end = path + path_len;
 
-    /* Skip leading slash */
     if (p < end && *p == '/') p++;
 
     while (p < end) {
-        /* Find component end */
         const char *start = p;
         while (p < end && *p != '/') p++;
         STRLEN comp_len = p - start;
@@ -753,21 +742,9 @@ static OP* kw_build_deref_chain_lvalue(pTHX_ OP *data_op, const char *path, STRL
             continue;
         }
 
-        /* Check if this component is numeric */
-        IV idx;
-        int is_numeric = is_array_index(start, comp_len, &idx);
-
-        if (is_numeric) {
-            /* Array element: $current->[$idx] */
-            current = newBINOP(OP_AELEM, OPf_MOD,
-                newUNOP(OP_RV2AV, OPf_REF | OPf_MOD, current),
-                newSVOP(OP_CONST, 0, newSViv(idx)));
-        } else {
-            /* Hash element: $current->{key} */
-            current = newBINOP(OP_HELEM, OPf_MOD,
-                newUNOP(OP_RV2HV, OPf_REF | OPf_MOD, current),
-                newSVOP(OP_CONST, 0, newSVpvn(start, comp_len)));
-        }
+        current = newBINOP(OP_HELEM, OPf_MOD,
+            newUNOP(OP_RV2HV, OPf_REF | OPf_MOD, current),
+            newSVOP(OP_CONST, 0, newSVpvn(start, comp_len)));
 
         if (p < end && *p == '/') p++;
     }
@@ -775,43 +752,17 @@ static OP* kw_build_deref_chain_lvalue(pTHX_ OP *data_op, const char *path, STRL
     return current;
 }
 
-/* Build a custom op for dynamic path set */
+/* Build a LISTOP-style custom op carrying (pushmark, data, path, value). */
 static OP* kw_build_dynamic_pathset(pTHX_ OP *data_op, OP *path_op, OP *value_op)
 {
-    /* Build list: pushmark, data, path, value */
-    OP *pushmark = newOP(OP_PUSHMARK, 0);
-    OP *list = op_append_elem(OP_LIST, pushmark, data_op);
+    OP *list = op_append_elem(OP_LIST, newOP(OP_PUSHMARK, 0), data_op);
     list = op_append_elem(OP_LIST, list, path_op);
     list = op_append_elem(OP_LIST, list, value_op);
 
-    /* Convert to custom op */
     OP *custom = op_convert_list(OP_NULL, 0, list);
     custom->op_type = OP_CUSTOM;
     custom->op_ppaddr = pp_pathset_dynamic;
-
     return custom;
-}
-
-/* Build a custom op for dynamic path delete */
-static OP* kw_build_dynamic_pathdelete(pTHX_ OP *data_op, OP *path_op)
-{
-    /* Create BINOP with data and path as children */
-    OP *binop = newBINOP(OP_NULL, 0, data_op, path_op);
-    binop->op_type = OP_CUSTOM;
-    binop->op_ppaddr = pp_pathdelete_dynamic;
-
-    return binop;
-}
-
-/* Build a custom op for dynamic path exists */
-static OP* kw_build_dynamic_pathexists(pTHX_ OP *data_op, OP *path_op)
-{
-    /* Create BINOP with data and path as children */
-    OP *binop = newBINOP(OP_NULL, 0, data_op, path_op);
-    binop->op_type = OP_CUSTOM;
-    binop->op_ppaddr = pp_pathexists_dynamic;
-
-    return binop;
 }
 
 /* The build callback for 'pathget' keyword */
@@ -825,7 +776,7 @@ static int build_kw_pathget(pTHX_ OP **out, XSParseKeywordPiece *args[],
     OP *path_op = args[1]->op;
 
     /* Always use custom op to avoid autovivification of intermediate levels */
-    *out = kw_build_dynamic_pathget(aTHX_ data_op, path_op);
+    *out = kw_make_binop(aTHX_ data_op, path_op, pp_pathget_dynamic);
     return KEYWORD_PLUGIN_EXPR;
 }
 
@@ -857,29 +808,53 @@ static int build_kw_pathset(pTHX_ OP **out, XSParseKeywordPiece *args[],
         (path_op->op_private & OPpCONST_BARE) == 0)
     {
         SV *path_sv = cSVOPx(path_op)->op_sv;
-        if (SvPOK(path_sv)) {
+        if (SvPOK(path_sv) && !SvUTF8(path_sv)) {
             STRLEN path_len;
             const char *path = SvPV(path_sv, path_len);
+            const char *path_end = path + path_len;
 
             /* Validate: non-empty path with at least one component */
             const char *p = path;
-            while (p < path + path_len && *p == '/') p++;
-            if (p >= path + path_len) {
+            while (p < path_end && *p == '/') p++;
+            if (p >= path_end) {
                 croak("Cannot set root");
             }
 
-            /* Build: $data->{a}{b}{c} = $value */
-            OP *lvalue = kw_build_deref_chain_lvalue(aTHX_ data_op, path, path_len);
+            /* Scan for numeric components. The const-path optimization compiles
+             * to native HELEM/AELEM ops, which forces a fixed hash-vs-array
+             * choice per component. Numeric-looking components would force AELEM,
+             * but the actual parent at runtime might be a hash with stringy
+             * numeric keys (path_set treats those as hash keys). Fall through
+             * to the dynamic op for consistent semantics in that case. */
+            int has_numeric = 0;
+            const char *q = p;
+            while (q < path_end) {
+                const char *tok = q;
+                while (q < path_end && *q != '/') q++;
+                STRLEN tok_len = q - tok;
+                IV dummy;
+                if (tok_len > 0 && is_array_index(tok, tok_len, &dummy)) {
+                    has_numeric = 1;
+                    break;
+                }
+                if (q < path_end) q++;
+            }
 
-            /* Mark as lvalue for proper autovivification */
-            lvalue = op_lvalue(lvalue, OP_SASSIGN);
+            if (!has_numeric) {
+                /* All components are string keys: build $data->{a}{b}{c} = $value */
+                OP *lvalue = kw_build_deref_chain_lvalue(aTHX_ data_op, path, path_len);
 
-            *out = newBINOP(OP_SASSIGN, 0, value_op, lvalue);
+                /* Mark as lvalue for proper autovivification */
+                lvalue = op_lvalue(lvalue, OP_SASSIGN);
 
-            /* Free the constant path op */
-            op_free(path_op);
+                *out = newBINOP(OP_SASSIGN, 0, value_op, lvalue);
 
-            return KEYWORD_PLUGIN_EXPR;
+                /* Free the constant path op */
+                op_free(path_op);
+
+                return KEYWORD_PLUGIN_EXPR;
+            }
+            /* fallthrough to dynamic op for paths with numeric components */
         }
     }
 
@@ -913,7 +888,7 @@ static int build_kw_pathdelete(pTHX_ OP **out, XSParseKeywordPiece *args[],
     OP *path_op = args[1]->op;
 
     /* Always use custom op to avoid autovivification of intermediate levels */
-    *out = kw_build_dynamic_pathdelete(aTHX_ data_op, path_op);
+    *out = kw_make_binop(aTHX_ data_op, path_op, pp_pathdelete_dynamic);
     return KEYWORD_PLUGIN_EXPR;
 }
 
@@ -940,7 +915,7 @@ static int build_kw_pathexists(pTHX_ OP **out, XSParseKeywordPiece *args[],
     OP *path_op = args[1]->op;
 
     /* Always use custom op to avoid autovivification of intermediate levels */
-    *out = kw_build_dynamic_pathexists(aTHX_ data_op, path_op);
+    *out = kw_make_binop(aTHX_ data_op, path_op, pp_pathexists_dynamic);
     return KEYWORD_PLUGIN_EXPR;
 }
 
@@ -971,11 +946,12 @@ path_get(data, path)
     const char *path_str = SvPV(path, path_len);
     const char *final_key;
     STRLEN final_key_len;
+    const I32 utf8_flag = SvUTF8(path) ? -1 : 1;
 
     if (path_len == 0) {
         RETVAL = SvREFCNT_inc(data);
     } else {
-        SV *parent = navigate_to_parent(aTHX_ data, path_str, path_len, &final_key, &final_key_len, 0);
+        SV *parent = navigate_to_parent(aTHX_ data, path_str, path_len, &final_key, &final_key_len, 0, utf8_flag);
 
         /* final_key == NULL means path refers to root (e.g., "/" or "///") */
         if (!final_key) {
@@ -987,7 +963,7 @@ path_get(data, path)
             svtype t = SvTYPE(inner);
 
             if (t == SVt_PVHV) {
-                SV **val = hv_fetch((HV*)inner, final_key, final_key_len, 0);
+                SV **val = hv_fetch((HV*)inner, final_key, (I32)final_key_len * utf8_flag, 0);
                 RETVAL = (val && *val) ? SvREFCNT_inc(*val) : &PL_sv_undef;
             } else if (t == SVt_PVAV) {
                 IV idx;
@@ -1015,12 +991,13 @@ path_set(data, path, value)
     const char *path_str = SvPV(path, path_len);
     const char *final_key;
     STRLEN final_key_len;
+    const I32 utf8_flag = SvUTF8(path) ? -1 : 1;
 
     if (path_len == 0) {
         croak("Cannot set root");
     }
 
-    SV *parent = navigate_to_parent(aTHX_ data, path_str, path_len, &final_key, &final_key_len, 1);
+    SV *parent = navigate_to_parent(aTHX_ data, path_str, path_len, &final_key, &final_key_len, 1, utf8_flag);
 
     /* final_key == NULL with parent means path refers to root - can't set
      * final_key == NULL without parent means navigation failed */
@@ -1036,9 +1013,11 @@ path_set(data, path, value)
     SV *copy = SvROK(value) ? SvREFCNT_inc(value) : newSVsv(value);  /* Refs shared, scalars copied */
 
     if (t == SVt_PVHV) {
-        if (UNLIKELY(!hv_store((HV*)inner, final_key, final_key_len, copy, 0))) {
+        if (UNLIKELY(!hv_store((HV*)inner, final_key, (I32)final_key_len * utf8_flag, copy, 0))) {
             SvREFCNT_dec(copy);
-            croak("Failed to store value");
+            croak(SvRMAGICAL(inner)
+                  ? "Cannot path_set on tied/magical hash"
+                  : "Failed to store value");
         }
     } else if (t == SVt_PVAV) {
         IV idx;
@@ -1048,7 +1027,9 @@ path_set(data, path, value)
         }
         if (UNLIKELY(!av_store((AV*)inner, idx, copy))) {
             SvREFCNT_dec(copy);
-            croak("Failed to store value");
+            croak(SvRMAGICAL(inner)
+                  ? "Cannot path_set on tied/magical array"
+                  : "Failed to store value");
         }
     } else {
         SvREFCNT_dec(copy);
@@ -1071,12 +1052,13 @@ path_delete(data, path)
     const char *path_str = SvPV(path, path_len);
     const char *final_key;
     STRLEN final_key_len;
+    const I32 utf8_flag = SvUTF8(path) ? -1 : 1;
 
     if (path_len == 0) {
         croak("Cannot delete root");
     }
 
-    SV *parent = navigate_to_parent(aTHX_ data, path_str, path_len, &final_key, &final_key_len, 0);
+    SV *parent = navigate_to_parent(aTHX_ data, path_str, path_len, &final_key, &final_key_len, 0, utf8_flag);
 
     /* final_key == NULL with parent means path refers to root - can't delete
      * final_key == NULL without parent means navigation failed - return undef */
@@ -1092,7 +1074,7 @@ path_delete(data, path)
         svtype t = SvTYPE(inner);
 
         if (t == SVt_PVHV) {
-            RETVAL = hv_delete((HV*)inner, final_key, final_key_len, 0);
+            RETVAL = hv_delete((HV*)inner, final_key, (I32)final_key_len * utf8_flag, 0);
             if (RETVAL) SvREFCNT_inc(RETVAL);
             else RETVAL = &PL_sv_undef;
         } else if (t == SVt_PVAV) {
@@ -1119,11 +1101,12 @@ path_exists(data, path)
     const char *path_str = SvPV(path, path_len);
     const char *final_key;
     STRLEN final_key_len;
+    const I32 utf8_flag = SvUTF8(path) ? -1 : 1;
 
     if (path_len == 0) {
         RETVAL = 1;
     } else {
-        SV *parent = navigate_to_parent(aTHX_ data, path_str, path_len, &final_key, &final_key_len, 0);
+        SV *parent = navigate_to_parent(aTHX_ data, path_str, path_len, &final_key, &final_key_len, 0, utf8_flag);
 
         /* final_key == NULL with parent means path refers to root (e.g., "/" or "///") - always exists
          * final_key == NULL without parent means navigation failed (e.g., traverse non-ref) */
@@ -1136,7 +1119,7 @@ path_exists(data, path)
             svtype t = SvTYPE(inner);
 
             if (t == SVt_PVHV) {
-                RETVAL = hv_exists((HV*)inner, final_key, final_key_len);
+                RETVAL = hv_exists((HV*)inner, final_key, (I32)final_key_len * utf8_flag);
             } else if (t == SVt_PVAV) {
                 IV idx;
                 RETVAL = is_array_index(final_key, final_key_len, &idx)
@@ -1168,9 +1151,9 @@ patha_get(data, path_av)
         svtype t = SvTYPE(inner);
 
         if (LIKELY(t == SVt_PVHV)) {
-            STRLEN klen;
-            const char *kstr = SvPV(*key_ptr, klen);
-            SV **val = hv_fetch((HV*)inner, kstr, klen, 0);
+            const char *kstr;
+            I32 sklen = sv_to_klen(aTHX_ *key_ptr, &kstr);
+            SV **val = hv_fetch((HV*)inner, kstr, sklen, 0);
             if (UNLIKELY(!val || !*val)) { RETVAL = &PL_sv_undef; goto done; }
             current = *val;
         } else if (t == SVt_PVAV) {
@@ -1209,18 +1192,20 @@ patha_set(data, path_av, value)
         svtype t = SvTYPE(inner);
 
         if (LIKELY(t == SVt_PVHV)) {
-            STRLEN klen;
-            const char *kstr = SvPV(*key_ptr, klen);
-            SV **val = hv_fetch((HV*)inner, kstr, klen, 0);
+            const char *kstr;
+            I32 sklen = sv_to_klen(aTHX_ *key_ptr, &kstr);
+            SV **val = hv_fetch((HV*)inner, kstr, sklen, 0);
             if (UNLIKELY(!val || !*val || !SvROK(*val))) {
                 SV **next_key = av_fetch(path_av, i + 1, 0);
                 IV dummy;
                 SV *new_ref = (next_key && *next_key && sv_to_index(aTHX_ *next_key, &dummy))
                     ? newRV_noinc((SV*)newAV())
                     : newRV_noinc((SV*)newHV());
-                if (UNLIKELY(!hv_store((HV*)inner, kstr, klen, new_ref, 0))) {
+                if (UNLIKELY(!hv_store((HV*)inner, kstr, sklen, new_ref, 0))) {
                     SvREFCNT_dec(new_ref);
-                    croak("Failed to store intermediate value");
+                    croak(SvRMAGICAL(inner)
+                          ? "Cannot patha_set on tied/magical hash"
+                          : "Failed to store intermediate value");
                 }
                 current = new_ref;
             } else {
@@ -1238,7 +1223,9 @@ patha_set(data, path_av, value)
                     : newRV_noinc((SV*)newHV());
                 if (UNLIKELY(!av_store((AV*)inner, idx, new_ref))) {
                     SvREFCNT_dec(new_ref);
-                    croak("Failed to store intermediate value");
+                    croak(SvRMAGICAL(inner)
+                          ? "Cannot patha_set on tied/magical array"
+                          : "Failed to store intermediate value");
                 }
                 current = new_ref;
             } else {
@@ -1257,11 +1244,13 @@ patha_set(data, path_av, value)
     SV *copy = SvROK(value) ? SvREFCNT_inc(value) : newSVsv(value);  /* Refs shared, scalars copied */
 
     if (LIKELY(t == SVt_PVHV)) {
-        STRLEN klen;
-        const char *kstr = SvPV(*final_key_ptr, klen);
-        if (UNLIKELY(!hv_store((HV*)inner, kstr, klen, copy, 0))) {
+        const char *kstr;
+        I32 sklen = sv_to_klen(aTHX_ *final_key_ptr, &kstr);
+        if (UNLIKELY(!hv_store((HV*)inner, kstr, sklen, copy, 0))) {
             SvREFCNT_dec(copy);
-            croak("Failed to store value");
+            croak(SvRMAGICAL(inner)
+                  ? "Cannot patha_set on tied/magical hash"
+                  : "Failed to store value");
         }
     } else if (t == SVt_PVAV) {
         IV idx;
@@ -1271,7 +1260,9 @@ patha_set(data, path_av, value)
         }
         if (UNLIKELY(!av_store((AV*)inner, idx, copy))) {
             SvREFCNT_dec(copy);
-            croak("Failed to store value");
+            croak(SvRMAGICAL(inner)
+                  ? "Cannot patha_set on tied/magical array"
+                  : "Failed to store value");
         }
     } else {
         SvREFCNT_dec(copy);
@@ -1303,9 +1294,9 @@ patha_exists(data, path_av)
         svtype t = SvTYPE(inner);
 
         if (LIKELY(t == SVt_PVHV)) {
-            STRLEN klen;
-            const char *kstr = SvPV(*key_ptr, klen);
-            SV **val = hv_fetch((HV*)inner, kstr, klen, 0);
+            const char *kstr;
+            I32 sklen = sv_to_klen(aTHX_ *key_ptr, &kstr);
+            SV **val = hv_fetch((HV*)inner, kstr, sklen, 0);
             if (UNLIKELY(!val || !*val)) { RETVAL = 0; goto done; }
             current = *val;
         } else if (t == SVt_PVAV) {
@@ -1326,9 +1317,9 @@ patha_exists(data, path_av)
     if (UNLIKELY(!final_key_ptr || !*final_key_ptr)) { RETVAL = 0; goto done; }
 
     if (LIKELY(t == SVt_PVHV)) {
-        STRLEN klen;
-        const char *kstr = SvPV(*final_key_ptr, klen);
-        RETVAL = hv_exists((HV*)inner, kstr, klen);
+        const char *kstr;
+        I32 sklen = sv_to_klen(aTHX_ *final_key_ptr, &kstr);
+        RETVAL = hv_exists((HV*)inner, kstr, sklen);
     } else if (t == SVt_PVAV) {
         IV idx;
         RETVAL = sv_to_index(aTHX_ *final_key_ptr, &idx) ? av_exists((AV*)inner, idx) : 0;
@@ -1357,9 +1348,9 @@ patha_delete(data, path_av)
         svtype t = SvTYPE(inner);
 
         if (LIKELY(t == SVt_PVHV)) {
-            STRLEN klen;
-            const char *kstr = SvPV(*key_ptr, klen);
-            SV **val = hv_fetch((HV*)inner, kstr, klen, 0);
+            const char *kstr;
+            I32 sklen = sv_to_klen(aTHX_ *key_ptr, &kstr);
+            SV **val = hv_fetch((HV*)inner, kstr, sklen, 0);
             if (UNLIKELY(!val || !*val)) { RETVAL = &PL_sv_undef; goto done; }
             current = *val;
         } else if (t == SVt_PVAV) {
@@ -1380,9 +1371,9 @@ patha_delete(data, path_av)
     if (UNLIKELY(!final_key_ptr || !*final_key_ptr)) { RETVAL = &PL_sv_undef; goto done; }
 
     if (LIKELY(t == SVt_PVHV)) {
-        STRLEN klen;
-        const char *kstr = SvPV(*final_key_ptr, klen);
-        RETVAL = hv_delete((HV*)inner, kstr, klen, 0);
+        const char *kstr;
+        I32 sklen = sv_to_klen(aTHX_ *final_key_ptr, &kstr);
+        RETVAL = hv_delete((HV*)inner, kstr, sklen, 0);
         if (RETVAL) SvREFCNT_inc(RETVAL);
         else RETVAL = &PL_sv_undef;
     } else if (t == SVt_PVAV) {
@@ -1428,6 +1419,7 @@ pathc_get(data, compiled)
         SV *current = data;
         PathComponent *c = cp->components;
         PathComponent *end = c + cp->count;
+        const I32 utf8_flag = cp->utf8_flag;
 
         while (c < end) {
             if (UNLIKELY(!SvROK(current))) {
@@ -1439,7 +1431,7 @@ pathc_get(data, compiled)
             svtype t = SvTYPE(inner);
 
             if (LIKELY(t == SVt_PVHV)) {
-                SV **val = hv_fetch((HV*)inner, c->str, c->len, 0);
+                SV **val = hv_fetch((HV*)inner, c->str, (I32)c->len * utf8_flag, 0);
                 if (UNLIKELY(!val || !*val)) {
                     RETVAL = &PL_sv_undef;
                     goto done;
@@ -1483,6 +1475,7 @@ pathc_set(data, compiled, value)
     SV *current = data;
     PathComponent *c = cp->components;
     PathComponent *last = c + cp->count - 1;
+    const I32 utf8_flag = cp->utf8_flag;
 
     /* Navigate to parent, creating intermediate structures as needed */
     while (c < last) {
@@ -1492,15 +1485,18 @@ pathc_set(data, compiled, value)
         svtype t = SvTYPE(inner);
 
         if (LIKELY(t == SVt_PVHV)) {
-            SV **val = hv_fetch((HV*)inner, c->str, c->len, 0);
+            I32 klen = (I32)c->len * utf8_flag;
+            SV **val = hv_fetch((HV*)inner, c->str, klen, 0);
             if (UNLIKELY(!val || !*val || !SvROK(*val))) {
                 /* Create intermediate structure using pre-computed type */
                 SV *new_ref = c->next_is_array
                     ? newRV_noinc((SV*)newAV())
                     : newRV_noinc((SV*)newHV());
-                if (UNLIKELY(!hv_store((HV*)inner, c->str, c->len, new_ref, 0))) {
+                if (UNLIKELY(!hv_store((HV*)inner, c->str, klen, new_ref, 0))) {
                     SvREFCNT_dec(new_ref);
-                    croak("Failed to store intermediate value");
+                    croak(SvRMAGICAL(inner)
+                          ? "Cannot pathc_set on tied/magical hash"
+                          : "Failed to store intermediate value");
                 }
                 current = new_ref;
             } else {
@@ -1515,7 +1511,9 @@ pathc_set(data, compiled, value)
                     : newRV_noinc((SV*)newHV());
                 if (UNLIKELY(!av_store((AV*)inner, c->idx, new_ref))) {
                     SvREFCNT_dec(new_ref);
-                    croak("Failed to store intermediate value");
+                    croak(SvRMAGICAL(inner)
+                          ? "Cannot pathc_set on tied/magical array"
+                          : "Failed to store intermediate value");
                 }
                 current = new_ref;
             } else {
@@ -1534,15 +1532,19 @@ pathc_set(data, compiled, value)
     SV *copy = SvROK(value) ? SvREFCNT_inc(value) : newSVsv(value);  /* Refs shared, scalars copied */
 
     if (LIKELY(t == SVt_PVHV)) {
-        if (UNLIKELY(!hv_store((HV*)inner, last->str, last->len, copy, 0))) {
+        if (UNLIKELY(!hv_store((HV*)inner, last->str, (I32)last->len * utf8_flag, copy, 0))) {
             SvREFCNT_dec(copy);
-            croak("Failed to store value");
+            croak(SvRMAGICAL(inner)
+                  ? "Cannot pathc_set on tied/magical hash"
+                  : "Failed to store value");
         }
     } else if (t == SVt_PVAV) {
         if (UNLIKELY(!last->is_numeric)) { SvREFCNT_dec(copy); croak("Invalid array index"); }
         if (UNLIKELY(!av_store((AV*)inner, last->idx, copy))) {
             SvREFCNT_dec(copy);
-            croak("Failed to store value");
+            croak(SvRMAGICAL(inner)
+                  ? "Cannot pathc_set on tied/magical array"
+                  : "Failed to store value");
         }
     } else {
         SvREFCNT_dec(copy);
@@ -1572,6 +1574,7 @@ pathc_exists(data, compiled)
         SV *current = data;
         PathComponent *c = cp->components;
         PathComponent *last = c + cp->count - 1;
+        const I32 utf8_flag = cp->utf8_flag;
 
         while (c < last) {
             if (UNLIKELY(!SvROK(current))) {
@@ -1582,7 +1585,7 @@ pathc_exists(data, compiled)
             svtype t = SvTYPE(inner);
 
             if (LIKELY(t == SVt_PVHV)) {
-                SV **val = hv_fetch((HV*)inner, c->str, c->len, 0);
+                SV **val = hv_fetch((HV*)inner, c->str, (I32)c->len * utf8_flag, 0);
                 if (UNLIKELY(!val || !*val)) { RETVAL = 0; goto done; }
                 current = *val;
             } else if (t == SVt_PVAV) {
@@ -1604,7 +1607,7 @@ pathc_exists(data, compiled)
             SV *inner = SvRV(current);
             svtype t = SvTYPE(inner);
             if (LIKELY(t == SVt_PVHV)) {
-                RETVAL = hv_exists((HV*)inner, last->str, last->len);
+                RETVAL = hv_exists((HV*)inner, last->str, (I32)last->len * utf8_flag);
             } else if (t == SVt_PVAV) {
                 RETVAL = last->is_numeric ? av_exists((AV*)inner, last->idx) : 0;
             } else {
@@ -1630,6 +1633,7 @@ pathc_delete(data, compiled)
     SV *current = data;
     PathComponent *c = cp->components;
     PathComponent *last = c + cp->count - 1;
+    const I32 utf8_flag = cp->utf8_flag;
 
     while (c < last) {
         if (UNLIKELY(!SvROK(current))) {
@@ -1640,7 +1644,7 @@ pathc_delete(data, compiled)
         svtype t = SvTYPE(inner);
 
         if (LIKELY(t == SVt_PVHV)) {
-            SV **val = hv_fetch((HV*)inner, c->str, c->len, 0);
+            SV **val = hv_fetch((HV*)inner, c->str, (I32)c->len * utf8_flag, 0);
             if (UNLIKELY(!val || !*val)) { RETVAL = &PL_sv_undef; goto done; }
             current = *val;
         } else if (t == SVt_PVAV) {
@@ -1663,7 +1667,7 @@ pathc_delete(data, compiled)
         svtype t = SvTYPE(inner);
 
         if (LIKELY(t == SVt_PVHV)) {
-            RETVAL = hv_delete((HV*)inner, last->str, last->len, 0);
+            RETVAL = hv_delete((HV*)inner, last->str, (I32)last->len * utf8_flag, 0);
             if (RETVAL) SvREFCNT_inc(RETVAL);
             else RETVAL = &PL_sv_undef;
         } else if (t == SVt_PVAV) {
@@ -1688,10 +1692,14 @@ DESTROY(self)
     SV *self
   CODE:
     if (SvROK(self)) {
-        CompiledPath *cp = INT2PTR(CompiledPath*, SvIV(SvRV(self)));
-        /* Validate magic before freeing to prevent crashes from invalid objects */
-        if (cp && cp->magic == COMPILED_PATH_MAGIC) {
-            free_compiled_path(aTHX_ cp);
+        SV *inner = SvRV(self);
+        /* SvIOK guard avoids "Argument isn't numeric" warnings when this
+         * package name was abused to bless arbitrary refs. */
+        if (SvIOK(inner)) {
+            CompiledPath *cp = INT2PTR(CompiledPath*, SvIVX(inner));
+            if (cp && cp->magic == COMPILED_PATH_MAGIC) {
+                free_compiled_path(aTHX_ cp);
+            }
         }
     }
 
@@ -1699,26 +1707,21 @@ MODULE = Data::Path::XS    PACKAGE = Data::Path::XS
 
 BOOT:
     {
-        /* Register custom ops for dynamic paths */
-        XopENTRY_set(&xop_pathget, xop_name, "pathget_dynamic");
-        XopENTRY_set(&xop_pathget, xop_desc, "dynamic path get");
-        Perl_custom_op_register(aTHX_ pp_pathget_dynamic, &xop_pathget);
+#define REGISTER_XOP(xop, nm, dsc, pp) STMT_START { \
+            XopENTRY_set(&(xop), xop_name, (nm));   \
+            XopENTRY_set(&(xop), xop_desc, (dsc));  \
+            Perl_custom_op_register(aTHX_ (pp), &(xop)); \
+        } STMT_END
 
-        XopENTRY_set(&xop_pathset, xop_name, "pathset_dynamic");
-        XopENTRY_set(&xop_pathset, xop_desc, "dynamic path set");
-        Perl_custom_op_register(aTHX_ pp_pathset_dynamic, &xop_pathset);
-
-        XopENTRY_set(&xop_pathdelete, xop_name, "pathdelete_dynamic");
-        XopENTRY_set(&xop_pathdelete, xop_desc, "dynamic path delete");
-        Perl_custom_op_register(aTHX_ pp_pathdelete_dynamic, &xop_pathdelete);
-
-        XopENTRY_set(&xop_pathexists, xop_name, "pathexists_dynamic");
-        XopENTRY_set(&xop_pathexists, xop_desc, "dynamic path exists");
-        Perl_custom_op_register(aTHX_ pp_pathexists_dynamic, &xop_pathexists);
+        REGISTER_XOP(xop_pathget,    "pathget_dynamic",    "dynamic path get",    pp_pathget_dynamic);
+        REGISTER_XOP(xop_pathset,    "pathset_dynamic",    "dynamic path set",    pp_pathset_dynamic);
+        REGISTER_XOP(xop_pathdelete, "pathdelete_dynamic", "dynamic path delete", pp_pathdelete_dynamic);
+        REGISTER_XOP(xop_pathexists, "pathexists_dynamic", "dynamic path exists", pp_pathexists_dynamic);
+#undef REGISTER_XOP
 
         boot_xs_parse_keyword(0.40);
-        register_xs_parse_keyword("pathget", &hooks_pathget, NULL);
-        register_xs_parse_keyword("pathset", &hooks_pathset, NULL);
+        register_xs_parse_keyword("pathget",    &hooks_pathget,    NULL);
+        register_xs_parse_keyword("pathset",    &hooks_pathset,    NULL);
         register_xs_parse_keyword("pathdelete", &hooks_pathdelete, NULL);
         register_xs_parse_keyword("pathexists", &hooks_pathexists, NULL);
     }

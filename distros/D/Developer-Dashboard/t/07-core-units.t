@@ -25,6 +25,7 @@ use Developer::Dashboard::File;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::Housekeeper;
 use Developer::Dashboard::IndicatorStore;
+use Developer::Dashboard::InternalCLI;
 use Developer::Dashboard::PageDocument;
 use Developer::Dashboard::PageStore;
 use Developer::Dashboard::PathRegistry;
@@ -39,6 +40,7 @@ use Developer::Dashboard::Platform qw(
   shell_command_argv
 );
 use Developer::Dashboard::Prompt;
+use Developer::Dashboard::Web::App;
 use POSIX qw(:sys_wait_h);
 use Developer::Dashboard::UpdateManager;
 
@@ -81,6 +83,12 @@ sub is_same_paths {
 sub _child_perl5opt {
     return join ' ', grep { defined $_ && $_ ne '' } ( $ENV{PERL5OPT}, $ENV{HARNESS_PERL_SWITCHES} );
 }
+
+is(
+    Developer::Dashboard::Web::App::_ajax_content_type('custom-token'),
+    'text/plain; charset=utf-8',
+    '_ajax_content_type falls back to plain text for unknown symbolic ajax types',
+);
 
 my $home = tempdir(CLEANUP => 1);
 local $ENV{HOME} = $home;
@@ -343,6 +351,358 @@ is( _mode_octal( File::Spec->catdir( $home, '.developer-dashboard', 'config', 'a
     is( _mode_octal($legacy_file), '0600', 'doctor --fix tightens legacy bookmark file permissions' );
     my $post_fix_report = $doctor->run;
     ok( $post_fix_report->{ok}, 'doctor reports success after fixes are applied' );
+
+    Developer::Dashboard::InternalCLI::ensure_helpers( paths => $secure_paths );
+    my $managed_core = File::Spec->catfile( $secure_paths->cli_root, 'dd', '_dashboard-core' );
+    my $expected_core = Developer::Dashboard::InternalCLI::_managed_helper_content('_dashboard-core');
+    like(
+        $expected_core,
+        qr/^# developer-dashboard-managed-helper-version: \Q$Developer::Dashboard::InternalCLI::VERSION\E$/m,
+        'doctor helper drift checks compare against helper bodies stamped with the current managed-helper version marker',
+    );
+    my $stale_core = $expected_core;
+    $stale_core .= "\n# stale helper drift\n";
+    open my $managed_core_fh, '>:raw', $managed_core or die "Unable to write $managed_core: $!";
+    print {$managed_core_fh} $stale_core;
+    close $managed_core_fh or die "Unable to close $managed_core: $!";
+
+    my $helper_report = $doctor->run;
+    ok( !$helper_report->{ok}, 'doctor flags stale managed helper content' );
+    ok(
+        grep(
+            {
+                $_->{path} eq $managed_core
+                  && $_->{kind} eq 'helper'
+                  && $_->{problem} eq 'stale managed helper content'
+            } @{ $helper_report->{issues} || [] }
+        ),
+        'doctor reports stale _dashboard-core helper drift explicitly',
+    );
+
+    my $helper_fixed = $doctor->run( fix => 1 );
+    ok( !$helper_fixed->{ok}, 'doctor --fix still reports helper drift repaired in the current run' );
+    ok(
+        grep(
+            {
+                $_->{path} eq $managed_core
+                  && $_->{kind} eq 'helper'
+                  && $_->{fixed}
+            } @{ $helper_fixed->{issues} || [] }
+        ),
+        'doctor marks stale managed helper drift as fixed after restaging',
+    );
+    open my $managed_core_verify_fh, '<:raw', $managed_core or die "Unable to read $managed_core: $!";
+    local $/;
+    my $managed_core_verify = <$managed_core_verify_fh>;
+    close $managed_core_verify_fh or die "Unable to close $managed_core: $!";
+    is( $managed_core_verify, $expected_core, 'doctor --fix restages the current _dashboard-core helper body' );
+    ok( $doctor->run->{ok}, 'doctor reports success after repairing stale helper drift' );
+
+    my $bashrc = File::Spec->catfile( $secure_home, '.bashrc' );
+    my $local_lib_line = qq{eval "\$("/usr/bin/perl" -I "$secure_home/perl5/lib/perl5" -Mlocal::lib)"};
+    my $dashboard_line = qq{eval "\$("$secure_home/perl5/bin/dashboard" shell bash)"};
+    open my $bashrc_fh, '>', $bashrc or die "Unable to write $bashrc: $!";
+    print {$bashrc_fh} <<"BASHRC";
+case \$- in
+    *i*) ;;
+      *) return;;
+esac
+$local_lib_line
+$dashboard_line
+BASHRC
+    close $bashrc_fh or die "Unable to close $bashrc: $!";
+
+    my $bashrc_report = $doctor->run;
+    ok( !$bashrc_report->{ok}, 'doctor flags dashboard-managed bash bootstrap hidden behind the non-interactive return guard' );
+    ok(
+        grep(
+            {
+                $_->{path} eq $bashrc
+                  && $_->{kind} eq 'shell-bootstrap'
+                  && $_->{problem} eq 'dashboard-managed bash bootstrap is hidden behind the non-interactive return guard'
+            } @{ $bashrc_report->{issues} || [] }
+        ),
+        'doctor reports misplaced bash bootstrap lines explicitly',
+    );
+
+    my $bashrc_fixed = $doctor->run( fix => 1 );
+    ok( !$bashrc_fixed->{ok}, 'doctor --fix reports the bash bootstrap issue it repaired in the current run' );
+    ok(
+        grep(
+            {
+                $_->{path} eq $bashrc
+                  && $_->{kind} eq 'shell-bootstrap'
+                  && $_->{fixed}
+            } @{ $bashrc_fixed->{issues} || [] }
+        ),
+        'doctor marks the misplaced bash bootstrap issue as fixed after repair',
+    );
+    open my $bashrc_read_fh, '<', $bashrc or die "Unable to read $bashrc: $!";
+    local $/;
+    my $bashrc_text = <$bashrc_read_fh>;
+    close $bashrc_read_fh or die "Unable to close $bashrc: $!";
+    like(
+        $bashrc_text,
+        qr/\Q$local_lib_line\E\n\Q$dashboard_line\E\ncase \$- in/s,
+        'doctor --fix moves dashboard-managed bash bootstrap lines ahead of the non-interactive return guard',
+    );
+    ok( $doctor->run->{ok}, 'doctor reports success after repairing the misplaced bash bootstrap lines' );
+
+    open my $bashrc_ps1_guard_fh, '>', $bashrc or die "Unable to rewrite $bashrc: $!";
+    print {$bashrc_ps1_guard_fh} <<"BASHRC";
+[ -z "\$PS1" ] && return
+$local_lib_line
+$dashboard_line
+BASHRC
+    close $bashrc_ps1_guard_fh or die "Unable to close $bashrc after rewriting: $!";
+
+    my $bashrc_ps1_report = $doctor->run;
+    ok( !$bashrc_ps1_report->{ok}, 'doctor also flags dashboard-managed bash bootstrap hidden behind the single-line PS1 return guard' );
+
+    my $bashrc_ps1_fixed = $doctor->run( fix => 1 );
+    ok( !$bashrc_ps1_fixed->{ok}, 'doctor --fix reports the single-line PS1 guard issue it repaired in the current run' );
+    open my $bashrc_ps1_read_fh, '<', $bashrc or die "Unable to read $bashrc after PS1-guard repair: $!";
+    local $/;
+    my $bashrc_ps1_text = <$bashrc_ps1_read_fh>;
+    close $bashrc_ps1_read_fh or die "Unable to close $bashrc after PS1-guard repair: $!";
+    like(
+        $bashrc_ps1_text,
+        qr/\Q$local_lib_line\E\n\Q$dashboard_line\E\n\[ -z "\$PS1" \] && return/s,
+        'doctor --fix moves dashboard-managed bash bootstrap lines ahead of the single-line PS1 return guard',
+    );
+    ok( $doctor->run->{ok}, 'doctor reports success after repairing the single-line PS1 guard form too' );
+
+    my $fake_module_root = tempdir( CLEANUP => 1 );
+    my $fake_private_cli = File::Spec->catdir( $fake_module_root, 'auto', 'Developer', 'Dashboard', 'private-cli' );
+    make_path($fake_private_cli);
+    my $fake_core = File::Spec->catfile( $fake_private_cli, '_dashboard-core' );
+    open my $fake_core_fh, '>:raw', $fake_core or die "Unable to write $fake_core: $!";
+    print {$fake_core_fh} "#!/usr/bin/env perl\n# fake packaged helper\n";
+    close $fake_core_fh or die "Unable to close $fake_core: $!";
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::InternalCLI::_repo_private_cli_root = sub { File::Spec->catdir( $fake_module_root, 'missing-repo' ) };
+        local *Developer::Dashboard::InternalCLI::_repo_private_cli_root_candidates = sub { () };
+        local *Developer::Dashboard::InternalCLI::dist_dir = sub { die "no dist root" };
+        local *Developer::Dashboard::InternalCLI::_module_install_lib_root = sub { $fake_module_root };
+        is(
+            Developer::Dashboard::InternalCLI::_helper_asset_path('_dashboard-core'),
+            $fake_core,
+            '_helper_asset_path finds packaged helper assets under the build-tree auto/Developer/Dashboard/private-cli root',
+        );
+    }
+
+    my $fake_build_root = tempdir( CLEANUP => 1 );
+    my $fake_blib_module_dir = File::Spec->catdir( $fake_build_root, 'blib', 'lib', 'Developer', 'Dashboard' );
+    my $fake_share_private_cli = File::Spec->catdir( $fake_build_root, 'share', 'private-cli' );
+    make_path($fake_blib_module_dir);
+    make_path($fake_share_private_cli);
+    my $fake_build_core = File::Spec->catfile( $fake_share_private_cli, '_dashboard-core' );
+    open my $fake_build_core_fh, '>:raw', $fake_build_core or die "Unable to write $fake_build_core: $!";
+    print {$fake_build_core_fh} "#!/usr/bin/env perl\n# fake blib helper\n";
+    close $fake_build_core_fh or die "Unable to close $fake_build_core: $!";
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::InternalCLI::dirname = sub { $fake_blib_module_dir };
+        is(
+            Developer::Dashboard::InternalCLI::_repo_private_cli_root(),
+            $fake_share_private_cli,
+            '_repo_private_cli_root walks above blib/lib to the checkout share/private-cli tree during packaged build tests',
+        );
+    }
+
+    my $fake_cpanm_build_root = tempdir( CLEANUP => 1 );
+    my $fake_cpanm_module_path = File::Spec->catfile(
+        $fake_cpanm_build_root, 'blib', 'lib', 'Developer', 'Dashboard', 'InternalCLI.pm'
+    );
+    my $fake_cpanm_share_private_cli = File::Spec->catdir( $fake_cpanm_build_root, 'share', 'private-cli' );
+    make_path( File::Basename::dirname($fake_cpanm_module_path) );
+    make_path($fake_cpanm_share_private_cli);
+    my $fake_cpanm_core = File::Spec->catfile( $fake_cpanm_share_private_cli, '_dashboard-core' );
+    open my $fake_cpanm_core_fh, '>:raw', $fake_cpanm_core
+      or die "Unable to write $fake_cpanm_core: $!";
+    print {$fake_cpanm_core_fh} "#!/usr/bin/env perl\n# fake cpanm blib helper\n";
+    close $fake_cpanm_core_fh or die "Unable to close $fake_cpanm_core: $!";
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::InternalCLI::_module_source_path = sub { $fake_cpanm_module_path };
+        is(
+            Developer::Dashboard::InternalCLI::_repo_private_cli_root(),
+            $fake_cpanm_share_private_cli,
+            '_repo_private_cli_root finds checkout share/private-cli from a cpanm-style blib/lib module path',
+        );
+    }
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::InternalCLI::_module_source_path = sub { $fake_cpanm_module_path };
+        local *Developer::Dashboard::InternalCLI::_repo_private_cli_root = sub {
+            return File::Spec->catdir( $fake_cpanm_build_root, 'missing-repo-private-cli' );
+        };
+        local *Developer::Dashboard::InternalCLI::dist_dir = sub {
+            return File::Spec->catdir( $fake_cpanm_build_root, 'blib', 'lib', 'auto', 'Developer', 'Dashboard' );
+        };
+        local *Developer::Dashboard::InternalCLI::_module_install_lib_root = sub {
+            return File::Spec->catdir( $fake_cpanm_build_root, 'blib', 'lib' );
+        };
+        is(
+            Developer::Dashboard::InternalCLI::_helper_asset_path('_dashboard-core'),
+            $fake_cpanm_core,
+            '_helper_asset_path rescans module-source share/private-cli candidates before falling back to broken blib auto helper roots in cpanm build trees',
+        );
+    }
+
+    my $captured_module_source = Developer::Dashboard::InternalCLI::_module_source_path();
+    ok(
+        File::Spec->file_name_is_absolute($captured_module_source),
+        '_module_source_path is captured as an absolute path at module load time',
+    );
+    my $cwd_before_module_source_check = getcwd();
+    my $module_source_cwd = tempdir( CLEANUP => 1 );
+    chdir $module_source_cwd or die "Unable to chdir to $module_source_cwd: $!";
+    is(
+        Developer::Dashboard::InternalCLI::_module_source_path(),
+        $captured_module_source,
+        '_module_source_path stays anchored after later cwd changes inside long-running test processes',
+    );
+    chdir $cwd_before_module_source_check
+      or die "Unable to chdir back to $cwd_before_module_source_check: $!";
+
+    {
+        local $INC{'Developer/Dashboard/InternalCLI.pm'};
+        is(
+            Cwd::abs_path( Developer::Dashboard::InternalCLI::_module_install_lib_root() ),
+            Cwd::abs_path(
+                File::Spec->catdir(
+                    File::Basename::dirname(__FILE__),
+                    File::Spec->updir,
+                    'lib',
+                )
+            ),
+            '_module_install_lib_root falls back to the loaded source file path when %INC has no InternalCLI entry',
+        );
+    }
+
+    is_deeply(
+        Developer::Dashboard::InternalCLI::helper_aliases(),
+        {
+            pjq    => 'jq',
+            pyq    => 'yq',
+            ptomq  => 'tomq',
+            pjp    => 'propq',
+            ticket => 'workspace',
+            skill  => 'skills',
+            logs   => 'log',
+        },
+        'helper_aliases returns the shipped compatibility alias map',
+    );
+
+    my $plain_helper_body = "#!/usr/bin/env perl\nprint qq|ok\\n|;\n";
+    my $legacy_core_helper_body = join "\n",
+      '#!/usr/bin/env perl',
+      'die "Missing built-in dashboard command";',
+      'use Developer::Dashboard::CLI::SeededPages;',
+      q{};
+    my $legacy_lazy_helper_body = join "\n",
+      '#!/usr/bin/env perl',
+      '# LAZY-THIN-CMD',
+      '# Developer Dashboard',
+      q{};
+    ok(
+        Developer::Dashboard::InternalCLI::_is_dashboard_managed_helper(
+            $legacy_core_helper_body,
+            '_dashboard-core',
+        ),
+        '_is_dashboard_managed_helper recognizes the legacy _dashboard-core helper shape',
+    );
+    ok(
+        Developer::Dashboard::InternalCLI::_is_dashboard_managed_helper(
+            $legacy_lazy_helper_body,
+            'shell',
+        ),
+        '_is_dashboard_managed_helper recognizes older lazy-thin helper bodies without the newer managed marker',
+    );
+    ok(
+        !Developer::Dashboard::InternalCLI::_is_dashboard_managed_helper(
+            $plain_helper_body,
+            'shell',
+        ),
+        '_is_dashboard_managed_helper rejects unrelated helper bodies',
+    );
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::InternalCLI::helper_content = sub { "print qq|ok\\n|;\n" };
+        my $managed_plain_helper = Developer::Dashboard::InternalCLI::_managed_helper_content('jq');
+        like(
+            $managed_plain_helper,
+            qr/\A\Q# developer-dashboard-managed-helper: jq\E\n\Q# developer-dashboard-managed-helper-version: $Developer::Dashboard::InternalCLI::VERSION\E\nprint qq\|ok\\n\|;/,
+            '_managed_helper_content prefixes the managed and helper-version markers when the helper body has no shebang line',
+        );
+    }
+
+    ok(
+        Developer::Dashboard::InternalCLI::_looks_like_private_cli_root($fake_private_cli),
+        '_looks_like_private_cli_root accepts a private-cli directory that contains _dashboard-core',
+    );
+
+    my $managed_root_target = File::Spec->catfile( $paths->home_runtime_root, 'cli', 'dd' );
+    my $managed_child_target = File::Spec->catfile( $managed_root_target, 'shell' );
+    ok(
+        Developer::Dashboard::InternalCLI::_is_managed_helper_target( $paths, $managed_root_target ),
+        '_is_managed_helper_target accepts the managed helper namespace root itself',
+    );
+    ok(
+        Developer::Dashboard::InternalCLI::_is_managed_helper_target( $paths, $managed_child_target ),
+        '_is_managed_helper_target accepts helper files beneath the managed helper namespace root',
+    );
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::InternalCLI::_repo_private_cli_root = sub { File::Spec->catdir( $fake_module_root, 'missing-repo' ) };
+        local *Developer::Dashboard::InternalCLI::_repo_private_cli_root_candidates = sub { () };
+        local *Developer::Dashboard::InternalCLI::_shared_private_cli_root = sub { $fake_private_cli };
+        local *Developer::Dashboard::InternalCLI::_shared_private_cli_root_candidates = sub { () };
+        is(
+            Developer::Dashboard::InternalCLI::_helper_asset_path('_dashboard-core'),
+            $fake_core,
+            '_helper_asset_path falls back to the shared private-cli root when repo and candidate scans miss the helper asset',
+        );
+    }
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::InternalCLI::_shared_private_cli_root_candidates = sub {
+            return (
+                File::Spec->catdir( $fake_module_root, 'missing-private-cli' ),
+                $fake_private_cli,
+            );
+        };
+        is(
+            Developer::Dashboard::InternalCLI::_shared_private_cli_root(),
+            $fake_private_cli,
+            '_shared_private_cli_root returns the first candidate that actually contains _dashboard-core',
+        );
+    }
+
+    {
+        my $fake_empty_private_cli = File::Spec->catdir( $fake_module_root, 'empty-private-cli' );
+        make_path($fake_empty_private_cli);
+        no warnings 'redefine';
+        local *Developer::Dashboard::InternalCLI::_shared_private_cli_root_candidates = sub {
+            return (
+                $fake_empty_private_cli,
+                File::Spec->catdir( $fake_module_root, 'still-missing-private-cli' ),
+            );
+        };
+        is(
+            Developer::Dashboard::InternalCLI::_shared_private_cli_root(),
+            $fake_empty_private_cli,
+            '_shared_private_cli_root falls back to the first candidate when none of them contain _dashboard-core yet',
+        );
+    }
 }
 
 is( $paths->home, $home, 'home accessor works' );
@@ -507,6 +867,27 @@ ok( !defined $paths->resolve_any('missing-name'), 'resolve_any returns undef whe
     is_deeply( \@warnings, [], 'runtime_layers does not warn when cwd is unavailable' );
 }
 {
+    no warnings 'redefine';
+    local *Developer::Dashboard::PathRegistry::cwd = sub { die "cwd should not be called when the registry was constructed with one\n"; };
+    my $precomputed_cwd_paths = Developer::Dashboard::PathRegistry->new(
+        home => $home,
+        cwd  => $local_repo,
+    );
+    is_same_path(
+        $precomputed_cwd_paths->current_project_root,
+        $local_repo,
+        'current_project_root uses the precomputed cwd supplied to the registry constructor',
+    );
+    is_same_paths(
+        [ $precomputed_cwd_paths->runtime_layers ],
+        [
+            File::Spec->catdir( $home, '.developer-dashboard' ),
+            File::Spec->catdir( $local_repo, '.developer-dashboard' ),
+        ],
+        'runtime_layers uses the precomputed cwd supplied to the registry constructor',
+    );
+}
+{
     my $outside_no_repo = tempdir( CLEANUP => 1 );
     no warnings 'redefine';
     local *Developer::Dashboard::PathRegistry::cwd = sub { return $outside_no_repo; };
@@ -669,6 +1050,56 @@ is_deeply(
             'command_argv_for_path resolves shebang-only Perl scripts through the current perl interpreter on Unix',
         );
         unlink 'unix-runner' or die $!;
+    }
+    {
+        open my $fh, '>', 'unix-hook.js' or die $!;
+        print {$fh} "console.log('ok');\n";
+        close $fh;
+        chmod 0755, 'unix-hook.js' or die $!;
+        {
+            no warnings 'redefine';
+            local *Developer::Dashboard::Platform::command_in_path = sub {
+                my ($name) = @_;
+                return '/usr/local/bin/node' if $name eq 'node';
+                return undef;
+            };
+            is_deeply(
+                [ command_argv_for_path('unix-hook.js') ],
+                [ '/usr/local/bin/node', 'unix-hook.js' ],
+                'command_argv_for_path resolves executable JavaScript source files through node',
+            );
+        }
+        is(
+            resolve_runnable_file('unix-hook'),
+            'unix-hook.js',
+            'resolve_runnable_file finds executable JavaScript sources when the logical command name omits the .js suffix',
+        );
+        unlink 'unix-hook.js' or die $!;
+    }
+    {
+        open my $fh, '>', 'unix-hook.py' or die $!;
+        print {$fh} "print('ok')\n";
+        close $fh;
+        chmod 0755, 'unix-hook.py' or die $!;
+        {
+            no warnings 'redefine';
+            local *Developer::Dashboard::Platform::command_in_path = sub {
+                my ($name) = @_;
+                return '/usr/local/bin/python' if $name eq 'python';
+                return undef;
+            };
+            is_deeply(
+                [ command_argv_for_path('unix-hook.py') ],
+                [ '/usr/local/bin/python', 'unix-hook.py' ],
+                'command_argv_for_path resolves executable Python source files through python',
+            );
+        }
+        is(
+            resolve_runnable_file('unix-hook'),
+            'unix-hook.py',
+            'resolve_runnable_file finds executable Python sources when the logical command name omits the .py suffix',
+        );
+        unlink 'unix-hook.py' or die $!;
     }
     {
         open my $fh, '>', 'unix-hook.go' or die $!;
@@ -903,6 +1334,20 @@ SH
         print {$fh} "\@echo off\r\necho cmd-ok\r\n";
         close $fh;
     }
+    {
+        no warnings 'redefine';
+        local $ENV{ComSpec} = '';
+        local *Developer::Dashboard::Platform::command_in_path = sub {
+            my ($name) = @_;
+            return '/home/mv/bin/cmd' if $name eq 'cmd';
+            return undef;
+        };
+        is_deeply(
+            [ command_argv_for_path('tool.cmd') ],
+            [ 'cmd.exe', '/d', '/c', 'tool.cmd' ],
+            'command_argv_for_path normalizes extensionless cmd shims in PATH back to cmd.exe on Windows',
+        );
+    }
     is_deeply(
         [ command_argv_for_path('tool.cmd') ],
         [ 'cmd.exe', '/d', '/c', 'tool.cmd' ],
@@ -973,6 +1418,44 @@ SH
     is( $runner_sh[1], 'runner.sh', 'command_argv_for_path keeps the shell-script path when dispatching through an available POSIX shell on Windows' );
     like( $runner_sh[0], qr{(?:^|/)sh$}, 'command_argv_for_path resolves .sh scripts through an available POSIX shell on Windows' );
     {
+        open my $fh, '>', 'runner.js' or die $!;
+        print {$fh} "console.log('win-ok');\n";
+        close $fh;
+    }
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Platform::command_in_path = sub {
+            my ($name) = @_;
+            return 'C:/Program Files/nodejs/node.exe' if $name eq 'node';
+            return undef;
+        };
+        ok( is_runnable_file('runner.js'), 'is_runnable_file treats .js files as runnable on Windows when node is available' );
+        is_deeply(
+            [ command_argv_for_path('runner.js') ],
+            [ 'C:/Program Files/nodejs/node.exe', 'runner.js' ],
+            'command_argv_for_path resolves .js scripts on Windows through node',
+        );
+    }
+    {
+        open my $fh, '>', 'runner.py' or die $!;
+        print {$fh} "print('win-ok')\n";
+        close $fh;
+    }
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::Platform::command_in_path = sub {
+            my ($name) = @_;
+            return 'C:/Python312/python.exe' if $name eq 'python';
+            return undef;
+        };
+        ok( is_runnable_file('runner.py'), 'is_runnable_file treats .py files as runnable on Windows when python is available' );
+        is_deeply(
+            [ command_argv_for_path('runner.py') ],
+            [ 'C:/Python312/python.exe', 'runner.py' ],
+            'command_argv_for_path resolves .py scripts on Windows through python',
+        );
+    }
+    {
         open my $fh, '>', 'script.foo' or die $!;
         print {$fh} "#!/usr/bin/env perl\nprint qq{shebang-ok\\n};\n";
         close $fh;
@@ -1008,6 +1491,8 @@ SH
     }
     unlink 'runner.bat' or die $!;
     unlink 'runner.sh' or die $!;
+    unlink 'runner.js' or die $!;
+    unlink 'runner.py' or die $!;
     unlink 'script.foo' or die $!;
     unlink 'notes.txt' or die $!;
     unlink File::Spec->catfile( $home, 'sh' ) or die $!;
@@ -1035,6 +1520,11 @@ SH
         $paths->_prefer_reference_style( $private_tmp, '/tmp' ),
         File::Spec->catdir( '/tmp', 'demo' ),
         '_prefer_reference_style keeps equivalent tmp aliases in the reference style',
+    );
+    is(
+        $paths->_prefer_reference_style( '/tmp/demo', '/tmp/demo' ),
+        '/tmp/demo',
+        '_prefer_reference_style keeps the reference path unchanged when no suffix remains',
     );
     is(
         $paths->_display_path($private_var),
@@ -1508,6 +1998,7 @@ dies_like( sub { $page_store->load_saved_page('missing-page') }, qr/not found/, 
 my $transient = $page_store->load_transient_page( $page_store->encode_page($page) );
 is( $transient->as_hash->{layout}{body}, "Hello <world>", 'load_transient_page decodes tokenized pages into canonical instruction form' );
 ok( $page_store->encode_page($page), 'encode_page accepts page documents directly' );
+like( $page_store->source_url($page), qr{^\Q/?mode=source&token=\E}, 'source_url builds the transient source route for saved pages' );
 dies_like(
     sub {
         $page_store->save_page(
@@ -1760,6 +2251,17 @@ is(
 );
 is( scalar @{ $indicators->sync_collectors([]) }, 0, 'sync_collectors ignores empty collector lists' );
 $indicators->set_indicator(
+    'stale',
+    label          => 'Stale',
+    icon           => 'S',
+    status         => 'ok',
+    priority       => 5,
+    prompt_visible => 1,
+);
+my $stale_indicator = $indicators->mark_stale( 'stale', status => 'error' );
+ok( $stale_indicator->{stale}, 'mark_stale marks stored indicators as stale' );
+is( $stale_indicator->{status}, 'error', 'mark_stale can replace indicator status while preserving the record' );
+$indicators->set_indicator(
     'stale.collector',
     icon                 => 'OLD',
     label                => 'stale.collector',
@@ -1786,6 +2288,61 @@ is( $indicators->get_indicator('fresh.collector')->{collector_name}, 'fresh.coll
 my @page_header_items = $indicators->page_header_items;
 my ($fresh_page_item) = grep { $_->{prog} eq 'fresh.collector' } @page_header_items;
 is( $fresh_page_item->{alias}, 'NEW', 'page header status prefers the configured indicator icon over the collector name' );
+{
+    local $ENV{TMUX} = '';
+    local $ENV{TICKET_REF} = '';
+    local $ENV{WORKSPACE_REF} = '';
+    local $ENV{DEVELOPER_DASHBOARD_TMUX_STATUS} = 0;
+    my $ordered_home = tempdir(CLEANUP => 1);
+    my $ordered_paths = Developer::Dashboard::PathRegistry->new( home => $ordered_home );
+    my $ordered_store = Developer::Dashboard::IndicatorStore->new( paths => $ordered_paths );
+    $ordered_store->sync_collectors(
+        [
+            { name => 'zeta.collector',  indicator => { icon => 'Z' } },
+            { name => 'alpha.collector', indicator => { icon => 'A' } },
+            { name => 'mu.collector',    indicator => { icon => 'M' } },
+        ]
+    );
+    is_deeply(
+        [ map { $_->{name} } $ordered_store->list_indicators ],
+        [ 'zeta.collector', 'alpha.collector', 'mu.collector' ],
+        'list_indicators keeps managed collector indicators in the configured collector array order',
+    );
+    is_deeply(
+        [ map { $_->{prog} } $ordered_store->page_header_items ],
+        [ 'zeta.collector', 'alpha.collector', 'mu.collector' ],
+        'page_header_items keeps managed collector indicators in the configured collector array order',
+    );
+    my $ordered_prompt = Developer::Dashboard::Prompt->new(
+        paths      => $ordered_paths,
+        indicators => $ordered_store,
+    )->render( jobs => 0, cwd => $ordered_home );
+    like(
+        $ordered_prompt,
+        qr/🚨Z 🚨A 🚨M/,
+        'prompt output keeps managed collector indicators in the configured collector array order',
+    );
+    my $ordered_collectors = Developer::Dashboard::Collector->new( paths => $ordered_paths );
+    my $ordered_runner = Developer::Dashboard::CollectorRunner->new(
+        collectors => $ordered_collectors,
+        files      => Developer::Dashboard::FileRegistry->new( paths => $ordered_paths ),
+        indicators => $ordered_store,
+        paths      => $ordered_paths,
+    );
+    $ordered_runner->run_once(
+        {
+            name      => 'alpha.collector',
+            code      => 'print "ok\n"; return 0;',
+            cwd       => $ordered_home,
+            indicator => { icon => 'A' },
+        }
+    );
+    is_deeply(
+        [ map { $_->{name} } $ordered_store->list_indicators ],
+        [ 'zeta.collector', 'alpha.collector', 'mu.collector' ],
+        'collector status writes preserve the configured collector array order after live runs',
+    );
+}
 {
     my $race_home = tempdir(CLEANUP => 1);
     my $race_paths = Developer::Dashboard::PathRegistry->new( home => $race_home );
@@ -1840,6 +2397,31 @@ is( $fresh_page_item->{alias}, 'NEW', 'page header status prefers the configured
         'sync_collectors preserves a concurrent collector status update instead of writing stale missing state',
     );
 }
+{
+    my $core_home = tempdir(CLEANUP => 1);
+    my $core_paths = Developer::Dashboard::PathRegistry->new( home => $core_home );
+    my $core_indicators = Developer::Dashboard::IndicatorStore->new( paths => $core_paths );
+    my $core_repo = File::Spec->catdir( $core_home, 'core-repo' );
+    make_path($core_repo);
+    system( 'git', 'init', '-q', $core_repo ) == 0 or die 'git init failed';
+    system( 'git', '-C', $core_repo, 'config', 'user.email', 'core@example.test' ) == 0 or die 'git config user.email failed';
+    system( 'git', '-C', $core_repo, 'config', 'user.name', 'Core Coverage' ) == 0 or die 'git config user.name failed';
+    open my $core_fh, '>', File::Spec->catfile( $core_repo, 'README' ) or die $!;
+    print {$core_fh} "core coverage\n";
+    close $core_fh;
+    system( 'git', '-C', $core_repo, 'add', 'README' ) == 0 or die 'git add failed';
+    system( 'git', '-C', $core_repo, 'commit', '-q', '-m', 'init' ) == 0 or die 'git commit failed';
+
+    no warnings 'redefine';
+    local *Developer::Dashboard::IndicatorStore::command_in_path = sub { return 1 };
+    my $core_items = $core_indicators->refresh_core_indicators( cwd => $core_repo );
+    my ($docker_indicator)  = grep { $_->{name} eq 'docker' } @{$core_items};
+    my ($project_indicator) = grep { $_->{name} eq 'project' } @{$core_items};
+    my ($git_indicator)     = grep { $_->{name} eq 'git' } @{$core_items};
+    is( $docker_indicator->{status}, 'ok', 'refresh_core_indicators marks docker available when docker is on PATH' );
+    is( $project_indicator->{status}, 'ok', 'refresh_core_indicators marks the project indicator active inside a repository' );
+    is( $git_indicator->{status}, 'clean', 'refresh_core_indicators marks a clean git work tree as clean' );
+}
 
 my $prompt = Developer::Dashboard::Prompt->new( paths => $paths, indicators => $indicators );
 dies_like( sub { Developer::Dashboard::Prompt->new( paths => $paths ) }, qr/Missing indicator store/, 'prompt requires indicators' );
@@ -1847,24 +2429,69 @@ dies_like( sub { Developer::Dashboard::Prompt->new( indicators => $indicators ) 
 
 my $plain_home = tempdir(CLEANUP => 1);
 my $plain_paths = Developer::Dashboard::PathRegistry->new( home => $plain_home );
-my $plain_prompt = Developer::Dashboard::Prompt->new(
-    paths      => $plain_paths,
-    indicators => Developer::Dashboard::IndicatorStore->new( paths => $plain_paths ),
-)->render( cwd => File::Spec->catdir( $plain_home, 'here' ) );
-like( $plain_prompt, qr/\[~\/here\]/, 'prompt still renders the cwd when no indicators exist' );
-unlike( $plain_prompt, qr/\bDD\b/, 'prompt omits the DD fallback when no indicators exist' );
+{
+    local $ENV{TMUX} = '';
+    local $ENV{TICKET_REF} = '';
+    local $ENV{WORKSPACE_REF} = '';
+    local $ENV{DEVELOPER_DASHBOARD_TMUX_STATUS} = 0;
+    my $plain_prompt = Developer::Dashboard::Prompt->new(
+        paths      => $plain_paths,
+        indicators => Developer::Dashboard::IndicatorStore->new( paths => $plain_paths ),
+    )->render( cwd => File::Spec->catdir( $plain_home, 'here' ) );
+    like( $plain_prompt, qr/\[~\/here\]/, 'prompt still renders the cwd when no indicators exist' );
+    unlike( $plain_prompt, qr/\bDD\b/, 'prompt omits the DD fallback when no indicators exist' );
+    like( $plain_prompt, qr/\n> \z/, 'prompt still places the command marker on a fresh line when no indicators exist' );
 
-my $prompt_output = $prompt->render( jobs => 3, cwd => File::Spec->catdir( $home, 'named-path' ) );
-like( $prompt_output, qr/🚨NEW/, 'compact prompt includes the renamed missing collector indicator glyph' );
-like( $prompt_output, qr/✅Z ✅b/, 'compact prompt includes success status glyphs in priority order' );
-unlike( $prompt_output, qr/alpha/, 'prompt skips hidden indicators' );
-like( $prompt_output, qr/~\/named-path/, 'prompt shortens home directory to tilde' );
-like( $prompt_output, qr/\(3 jobs\)/, 'prompt appends job suffix' );
-like(
-    Developer::Dashboard::Prompt->new( paths => $paths, indicators => $indicators )->render( jobs => 0, mode => 'extended' ),
-    qr/✅beta/,
-    'extended prompt prefixes indicator labels with success status glyphs when labels are missing',
-);
+    my $prompt_output = $prompt->render( jobs => 3, cwd => File::Spec->catdir( $home, 'named-path' ) );
+    like( $prompt_output, qr/🚨NEW/, 'compact prompt includes the renamed missing collector indicator glyph' );
+    like( $prompt_output, qr/✅Z ✅b/, 'compact prompt includes success status glyphs in priority order' );
+    unlike( $prompt_output, qr/alpha/, 'prompt skips hidden indicators' );
+    like( $prompt_output, qr/~\/named-path/, 'prompt shortens home directory to tilde' );
+    like( $prompt_output, qr/\(3 jobs\)/, 'prompt appends job suffix' );
+    like( $prompt->render( jobs => 0, cwd => File::Spec->catdir( $home, 'named-path' ), color => 1 ), qr/\e\[[0-9;]*m/, 'prompt can colorize compact indicator parts when requested' );
+    my $prompt_without_indicators = $prompt->render(
+        jobs          => 3,
+        cwd           => File::Spec->catdir( $home, 'named-path' ),
+        no_indicators => 1,
+    );
+    unlike( $prompt_without_indicators, qr/🚨NEW|✅Z|✅b/, 'prompt suppresses indicators when tmux owns the status line' );
+    like( $prompt_without_indicators, qr/~\/named-path/, 'prompt still renders cwd when tmux suppresses indicators' );
+    like( $prompt_without_indicators, qr/\(3 jobs\)/, 'prompt still renders job counts when tmux suppresses indicators' );
+}
+{
+    local $ENV{TICKET_REF} = 'DD-4242';
+    my $tmux_status = $prompt->render_tmux_status( width => 200 );
+    like( $tmux_status, qr/🚨NEW/, 'tmux status formatter includes missing indicator glyphs' );
+    like( $tmux_status, qr/✅Z ✅b/, 'tmux status formatter keeps indicator priority order' );
+    unlike( $tmux_status, qr/\n/, 'tmux status formatter stays on one line when the ticket-session indicator strip fits the available width' );
+    like( $prompt->render_tmux_status( width => 4 ), qr/\n/, 'tmux status formatter still emits multiple lines when the available width is too small for the full indicator strip' );
+    unlike( $tmux_status, qr/🎫:DD-4242/, 'tmux status formatter leaves ticket context to the prompt or tmux session line' );
+    unlike( $tmux_status, qr/\[~\/named-path\]|\n> /, 'tmux status formatter omits prompt-only cwd and cursor fragments' );
+}
+{
+    local $ENV{TMUX} = '';
+    local $ENV{TICKET_REF} = '';
+    local $ENV{DEVELOPER_DASHBOARD_TMUX_STATUS} = 0;
+    like(
+        Developer::Dashboard::Prompt->new( paths => $paths, indicators => $indicators )->render( jobs => 0, mode => 'extended' ),
+        qr/✅beta/,
+        'extended prompt prefixes indicator labels with success status glyphs when labels are missing',
+    );
+}
+{
+    local $ENV{TMUX} = 'tmux-session';
+    local $ENV{DEVELOPER_DASHBOARD_TMUX_STATUS} = '';
+    local $ENV{TICKET_REF} = 'DD-4242';
+    local $ENV{WORKSPACE_REF} = '';
+    ok( $prompt->_tmux_status_active, '_tmux_status_active recognizes ticket-owned tmux sessions when only TICKET_REF is set' );
+}
+{
+    local $ENV{TMUX} = 'tmux-session';
+    local $ENV{DEVELOPER_DASHBOARD_TMUX_STATUS} = '';
+    local $ENV{TICKET_REF} = '';
+    local $ENV{WORKSPACE_REF} = '';
+    ok( !$prompt->_tmux_status_active, '_tmux_status_active leaves ordinary tmux sessions alone when no dashboard ticket marker is present' );
+}
 {
     no warnings 'redefine';
     local *Developer::Dashboard::Prompt::_git_branch = sub { 'master' };
@@ -1901,6 +2528,15 @@ like(
         indicators => Developer::Dashboard::IndicatorStore->new( paths => $plain_paths ),
     )->_git_branch($git_repo);
     ok( defined $detected_branch && $detected_branch ne '', 'prompt detects a git branch from a real repository' );
+}
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::Prompt::_git_branch = sub { "master\x{1F525}" };
+    my $unicode_branch_prompt = Developer::Dashboard::Prompt->new( paths => $paths, indicators => $indicators )->render(
+        jobs => 0,
+        cwd  => File::Spec->catdir( $workspace, 'Alpha-App' ),
+    );
+    like( $unicode_branch_prompt, qr/\Q🌿master🔥\E/, 'prompt keeps UTF-8 branch suffix glyphs intact when rendering the trailing git branch fragment' );
 }
 
 my $repo = File::Spec->catdir( $home, 'repo-for-config' );
@@ -2216,7 +2852,7 @@ chdir $original_cwd or die $!;
     open my $home_user, '>', File::Spec->catfile( $home_user_root, 'fallback.json' ) or die $!;
     print {$home_user} qq|{"username":"fallback","role":"helper","salt":"one","password_hash":"two","updated_at":"2026-01-01T00:00:00Z"}|;
     close $home_user;
-    my $home_state_root  = $paths->state_root;
+    my $home_state_root  = $paths->_state_root_for_layer( $paths->home_runtime_root );
     my $home_session_root = File::Spec->catdir( $home_state_root, 'sessions' );
     make_path($home_session_root);
     open my $home_session, '>', File::Spec->catfile( $home_session_root, 'fallback-session.json' ) or die $!;
@@ -2514,9 +3150,14 @@ is( $isolated_healthy->{exit_code}, 0, 'healthy collector still succeeds after a
 is( $collector_indicators->get_indicator('isolated.indicator.broken')->{status}, 'error', 'broken collector isolation scenario leaves its indicator red' );
 is( $collector_indicators->get_indicator('isolated.indicator.healthy')->{status}, 'ok', 'healthy collector isolation scenario leaves its indicator green' );
 my $collector_prompt = Developer::Dashboard::Prompt->new( paths => $paths, indicators => $collector_indicators );
-my $collector_prompt_output = $collector_prompt->render( jobs => 0, cwd => $home );
-like( $collector_prompt_output, qr/🚨B/, 'prompt keeps the broken collector status visible in the isolation scenario' );
-like( $collector_prompt_output, qr/✅H/, 'prompt keeps the healthy collector status visible in the isolation scenario' );
+{
+    local $ENV{TMUX} = '';
+    local $ENV{TICKET_REF} = '';
+    local $ENV{DEVELOPER_DASHBOARD_TMUX_STATUS} = 0;
+    my $collector_prompt_output = $collector_prompt->render( jobs => 0, cwd => $home );
+    like( $collector_prompt_output, qr/🚨B/, 'prompt keeps the broken collector status visible in the isolation scenario' );
+    like( $collector_prompt_output, qr/✅H/, 'prompt keeps the healthy collector status visible in the isolation scenario' );
+}
 {
     my $tt_home = tempdir(CLEANUP => 1);
     my $tt_paths = Developer::Dashboard::PathRegistry->new( home => $tt_home );
@@ -2585,6 +3226,129 @@ like( $collector_prompt_output, qr/✅H/, 'prompt keeps the healthy collector st
     is( $tt_indicators->get_indicator('templated.indicator')->{label}, 'Templated Updated', 'sync_collectors still refreshes other TT-backed collector indicator metadata' );
     is( $tt_indicators->get_indicator('templated.indicator')->{icon}, '123', 'sync_collectors preserves the rendered TT collector icon while refreshing other metadata' );
     is( $tt_indicators->get_indicator('templated.indicator')->{icon_template}, '[% a %]', 'sync_collectors preserves the configured TT collector icon template while refreshing other metadata' );
+    my $live_tt_paths = Developer::Dashboard::PathRegistry->new(
+        home => tempdir( CLEANUP => 1 ),
+        cwd  => tempdir( CLEANUP => 1 ),
+    );
+    my $live_tt_indicators = Developer::Dashboard::IndicatorStore->new( paths => $live_tt_paths );
+
+    $live_tt_indicators->set_indicator(
+        'live.templated.indicator',
+        name                 => 'live.templated.indicator',
+        label                => '59.46%',
+        icon                 => '59.46%',
+        icon_template        => '[% data.rate %]%',
+        configured_label     => 'Heartbeat',
+        configured_alias     => '',
+        configured_icon      => '[% data.rate %]%',
+        configured_page_status_icon => '',
+        status               => 'ok',
+        collector_name       => 'live.templated.collector',
+        managed_by_collector => 1,
+        page_status_icon     => '&#x1F7E2;',
+        prompt_visible       => 1,
+    );
+    is(
+        scalar @{
+            $live_tt_indicators->sync_collectors(
+                [
+                    {
+                        name      => 'live.templated.collector',
+                        indicator => {
+                            name  => 'live.templated.indicator',
+                            label => 'Heartbeat',
+                            icon  => '[% data.rate %]%',
+                        },
+                    },
+                ]
+            )
+        },
+        0,
+        'sync_collectors leaves live TT-backed collector presentation fields untouched when config is unchanged',
+    );
+    is( $live_tt_indicators->get_indicator('live.templated.indicator')->{label}, '59.46%', 'sync_collectors preserves live collector labels instead of reverting to config placeholders' );
+    is( $live_tt_indicators->get_indicator('live.templated.indicator')->{icon}, '59.46%', 'sync_collectors preserves live TT-backed collector icons instead of reverting to config placeholders' );
+    is( $live_tt_indicators->get_indicator('live.templated.indicator')->{page_status_icon}, '&#x1F7E2;', 'sync_collectors preserves live collector page status icons instead of clobbering them from config sync' );
+
+    my $live_literal_paths = Developer::Dashboard::PathRegistry->new(
+        home => tempdir( CLEANUP => 1 ),
+        cwd  => tempdir( CLEANUP => 1 ),
+    );
+    my $live_literal_indicators = Developer::Dashboard::IndicatorStore->new( paths => $live_literal_paths );
+
+    $live_literal_indicators->set_indicator(
+        'live.literal.indicator',
+        name                 => 'live.literal.indicator',
+        label                => 'CPU',
+        icon                 => '96%',
+        configured_label     => 'CPU',
+        configured_alias     => '',
+        configured_icon      => 'C',
+        configured_page_status_icon => '',
+        status               => 'ok',
+        collector_name       => 'live.literal.collector',
+        managed_by_collector => 1,
+        page_status_icon     => '&#x1F7E2;',
+        prompt_visible       => 1,
+    );
+    is(
+        scalar @{
+            $live_literal_indicators->sync_collectors(
+                [
+                    {
+                        name      => 'live.literal.collector',
+                        indicator => {
+                            name  => 'live.literal.indicator',
+                            label => 'CPU',
+                            icon  => 'C',
+                        },
+                    },
+                ]
+            )
+        },
+        0,
+        'sync_collectors leaves live literal collector presentation fields untouched when config is unchanged',
+    );
+    is( $live_literal_indicators->get_indicator('live.literal.indicator')->{icon}, '96%', 'sync_collectors preserves live literal collector icons instead of reverting them to config seed values' );
+
+    my $live_alias_paths = Developer::Dashboard::PathRegistry->new(
+        home => tempdir( CLEANUP => 1 ),
+        cwd  => tempdir( CLEANUP => 1 ),
+    );
+    my $live_alias_indicators = Developer::Dashboard::IndicatorStore->new( paths => $live_alias_paths );
+
+    $live_alias_indicators->set_indicator(
+        'live.alias.indicator',
+        name                        => 'live.alias.indicator',
+        label                       => 'Alias',
+        alias                       => 'HOT',
+        configured_label            => 'Alias',
+        configured_alias            => '',
+        configured_icon             => '',
+        configured_page_status_icon => '',
+        status                      => 'ok',
+        collector_name             => 'live.alias.collector',
+        managed_by_collector       => 1,
+        prompt_visible             => 1,
+    );
+    is(
+        scalar @{
+            $live_alias_indicators->sync_collectors(
+                [
+                    {
+                        name      => 'live.alias.collector',
+                        indicator => {
+                            name  => 'live.alias.indicator',
+                            label => 'Alias',
+                        },
+                    },
+                ]
+            )
+        },
+        0,
+        'sync_collectors leaves live collector aliases untouched when config alias is unchanged',
+    );
+    is( $live_alias_indicators->get_indicator('live.alias.indicator')->{alias}, 'HOT', 'sync_collectors preserves live collector aliases instead of reverting them to config placeholders' );
 
     my $iconless_candidate = $tt_indicators->collector_indicator_candidate(
         {
@@ -2653,21 +3417,24 @@ close $stale_pid;
         pass('start_loop writes loop metadata for new loops');
     }
     else {
-        no warnings 'redefine';
-        local *Developer::Dashboard::CollectorRunner::sleep = sub { die "stop loop\n" };
-        my $pid = $runner->start_loop(
-            {
-                name     => 'stale',
-                command  => q{printf 'stale'},
-                cwd      => 'home',
-                interval => 0.01,
-            }
-        );
+        my $pid;
+        {
+            no warnings 'redefine';
+            local *Developer::Dashboard::CollectorRunner::sleep = sub { die "stop loop\n" };
+            $pid = $runner->start_loop(
+                {
+                    name     => 'stale',
+                    command  => q{printf 'stale'},
+                    cwd      => 'home',
+                    interval => 0.01,
+                }
+            );
+        }
         ok( $pid, 'start_loop replaces stale pidfiles and starts a new loop' );
         sleep 1;
         ok( $runner->loop_state('stale')->{pid}, 'start_loop writes loop metadata for new loops' );
         my $stopped_pid = $runner->stop_loop('stale');
-        waitpid( $stopped_pid, 0 ) if $stopped_pid;
+        is( waitpid( $stopped_pid, 1 ), -1, 'stop_loop reaps stale-loop children instead of leaving zombies behind' ) if $stopped_pid;
     }
 }
 
@@ -2679,22 +3446,25 @@ close $stale_pid;
         pass('stop_loop removes loop metadata after shutdown');
     }
     else {
-        no warnings 'redefine';
-        local *Developer::Dashboard::CollectorRunner::sleep = sub { die "stop loop\n" };
-        my $pid = $runner->start_loop(
-            {
-                name     => 'loop',
-                command  => q{printf 'loop'},
-                cwd      => 'home',
-                interval => 0.01,
-            }
-        );
+        my $pid;
+        {
+            no warnings 'redefine';
+            local *Developer::Dashboard::CollectorRunner::sleep = sub { die "stop loop\n" };
+            $pid = $runner->start_loop(
+                {
+                    name     => 'loop',
+                    command  => q{printf 'loop'},
+                    cwd      => 'home',
+                    interval => 0.01,
+                }
+            );
+        }
         ok( $pid, 'start_loop forks a collector loop when no live pid exists' );
         sleep 1;
         like( $runner->loop_state('loop')->{status}, qr/^(?:starting|running)$/, 'running loops publish managed lifecycle state metadata' );
         my $stopped_pid = $runner->stop_loop('loop');
         ok( $stopped_pid, 'stop_loop returns the forked pid' );
-        waitpid( $stopped_pid, 0 ) if $stopped_pid;
+        is( waitpid( $stopped_pid, 1 ), -1, 'stop_loop reaps managed loop children instead of leaving zombies behind' ) if $stopped_pid;
         ok( !defined $runner->loop_state('loop'), 'stop_loop removes loop metadata after shutdown' );
     }
 }
@@ -2706,21 +3476,24 @@ close $stale_pid;
         pass('start_loop logs collector failures from the child loop');
     }
     else {
-        no warnings 'redefine';
-        local *Developer::Dashboard::CollectorRunner::sleep = sub { die "stop loop\n" };
-        my $pid = $runner->start_loop(
-            {
-                name     => 'broken-loop',
-                command  => q{printf broken},
-                cwd      => File::Spec->catdir( $home, 'missing-broken-loop' ),
-                interval => 0.01,
-            }
-        );
+        my $pid;
+        {
+            no warnings 'redefine';
+            local *Developer::Dashboard::CollectorRunner::sleep = sub { die "stop loop\n" };
+            $pid = $runner->start_loop(
+                {
+                    name     => 'broken-loop',
+                    command  => q{printf broken},
+                    cwd      => File::Spec->catdir( $home, 'missing-broken-loop' ),
+                    interval => 0.01,
+                }
+            );
+        }
         ok( $pid, 'start_loop also returns a pid for failing jobs' );
         sleep 1;
         like( $runner->loop_state('broken-loop')->{status}, qr/error|running/, 'failing loops keep state metadata for management' );
         my $stopped_pid = $runner->stop_loop('broken-loop');
-        waitpid( $stopped_pid, 0 ) if $stopped_pid;
+        is( waitpid( $stopped_pid, 1 ), -1, 'stop_loop reaps failing managed loop children instead of leaving zombies behind' ) if $stopped_pid;
         like( $files->read('collector_log'), qr/broken-loop/, 'start_loop logs collector failures from the child loop' );
     }
 }
@@ -2745,6 +3518,8 @@ my $env_job = {
 };
 my $env_result = $runner->run_once($env_job);
 like( $env_result->{stdout}, qr/collector-ok/, 'collector runner injects explicit env values' );
+is( $collector->read_status('env.collector')->{active_runs}, 0, 'collector runner clears active_runs after a synchronous run finishes' );
+ok( !$collector->read_status('env.collector')->{running}, 'collector runner clears running after a synchronous run finishes' );
 dies_like(
     sub {
         $runner->start_loop(
@@ -2759,8 +3534,103 @@ dies_like(
     qr/manual schedule/,
     'manual collector schedules are rejected for background loops',
 );
+is_deeply(
+    [ $runner->_collector_execution_policy( { name => 'single.policy' } ) ],
+    [ 'singleton', 1 ],
+    'collector execution policy defaults to singleton mode',
+);
+is_deeply(
+    [ $runner->_collector_execution_policy( { name => 'multi.policy', mode => 'multiple' } ) ],
+    [ 'multiple', 2 ],
+    'collector execution policy defaults multiple mode to two parallel runs',
+);
+is_deeply(
+    [ $runner->_collector_execution_policy( { name => 'wide.policy', mode => 'multiple', multiple => 5 } ) ],
+    [ 'multiple', 5 ],
+    'collector execution policy keeps explicit multiple limits',
+);
+dies_like(
+    sub { $runner->_collector_execution_policy( { name => 'bad.policy', mode => 'burst' } ) },
+    qr/unsupported mode/,
+    'collector execution policy rejects unsupported modes',
+);
+dies_like(
+    sub { $runner->_collector_execution_policy( { name => 'bad.parallel', mode => 'multiple', multiple => 0 } ) },
+    qr/positive integer/,
+    'collector execution policy rejects invalid multiple limits',
+);
 ok( Developer::Dashboard::CollectorRunner::_cron_match('*/2', 4), 'cron matcher supports step expressions' );
 ok( !Developer::Dashboard::CollectorRunner::_cron_match('*/2', 5), 'cron matcher rejects non-matching step expressions' );
+
+{
+    my @spawned;
+    my $sleep_calls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::CollectorRunner::_job_is_due = sub { return 1 };
+    local *Developer::Dashboard::CollectorRunner::_start_loop_worker = sub {
+        my ( undef, $job, $name ) = @_;
+        push @spawned, $name;
+        return 4000 + scalar @spawned;
+    };
+    local *Developer::Dashboard::CollectorRunner::_reap_finished_loop_workers = sub { return 0 };
+    local *Developer::Dashboard::CollectorRunner::sleep = sub {
+        $sleep_calls++;
+        die "stop loop\n" if $sleep_calls >= 2;
+        return 0;
+    };
+    eval {
+        $runner->_run_loop_child(
+            job => {
+                name     => 'singleton.loop',
+                command  => q{printf single},
+                cwd      => 'home',
+                interval => 1,
+            },
+            name      => 'singleton.loop',
+            interval  => 1,
+            daemonize => 0,
+        );
+        1;
+    };
+    like( $@, qr/stop loop/, 'singleton overlap scheduler test stops after two ticks' );
+    is_deeply( \@spawned, ['singleton.loop'], 'singleton loops suppress overlap while a prior worker is still active' );
+}
+
+{
+    my @spawned;
+    my $sleep_calls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::CollectorRunner::_job_is_due = sub { return 1 };
+    local *Developer::Dashboard::CollectorRunner::_start_loop_worker = sub {
+        my ( undef, $job, $name ) = @_;
+        push @spawned, $name;
+        return 5000 + scalar @spawned;
+    };
+    local *Developer::Dashboard::CollectorRunner::_reap_finished_loop_workers = sub { return 0 };
+    local *Developer::Dashboard::CollectorRunner::sleep = sub {
+        $sleep_calls++;
+        die "stop loop\n" if $sleep_calls >= 2;
+        return 0;
+    };
+    eval {
+        $runner->_run_loop_child(
+            job => {
+                name     => 'multiple.loop',
+                command  => q{printf multi},
+                cwd      => 'home',
+                interval => 1,
+                mode     => 'multiple',
+                multiple => 2,
+            },
+            name      => 'multiple.loop',
+            interval  => 1,
+            daemonize => 0,
+        );
+        1;
+    };
+    like( $@, qr/stop loop/, 'multiple overlap scheduler test stops after two ticks' );
+    is_deeply( \@spawned, [ 'multiple.loop', 'multiple.loop' ], 'multiple loops can overlap up to their configured parallel limit' );
+}
 
 {
     my $child = fork();
@@ -2776,7 +3646,7 @@ ok( !Developer::Dashboard::CollectorRunner::_cron_match('*/2', 5), 'cron matcher
     print {$manual_pid} "$child\n";
     close $manual_pid;
     is( $runner->stop_loop('manual'), $child, 'stop_loop terminates manual pidfile processes' );
-    waitpid( $child, 0 );
+    is( waitpid( $child, 1 ), -1, 'stop_loop reaps manual collector children after shutdown' );
 }
 
 {
@@ -2817,6 +3687,288 @@ ok( !Developer::Dashboard::CollectorRunner::_cron_match('*/2', 5), 'cron matcher
     is_deeply( [ map { $_->{name} } @running ], ['observed'], 'running_loops returns only validated managed collectors' );
     is( $running[0]{pid}, $$, 'running_loops includes matching pid values' );
     $runner->_cleanup_loop_files('observed');
+}
+
+{
+    my $child = fork();
+    die 'Unable to fork state-backed stop child' if !defined $child;
+    if ( !$child ) {
+        sleep 30;
+        exit 0;
+    }
+    my $pidfile = File::Spec->catfile( $paths->collectors_root, 'state-backed.pid' );
+    open my $state_pid, '>', $pidfile or die $!;
+    print {$state_pid} "$child\n";
+    close $state_pid;
+    $runner->_write_loop_state(
+        'state-backed',
+        {
+            pid          => $child,
+            name         => 'state-backed',
+            process_name => 'dashboard collector: state-backed',
+            status       => 'starting',
+        }
+    );
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CollectorRunner::_read_process_env_marker = sub { return };
+        local *Developer::Dashboard::CollectorRunner::_read_process_title = sub { return '' };
+        ok(
+            $runner->_state_confirms_managed_loop( 'state-backed', $child ),
+            '_state_confirms_managed_loop trusts persisted loop state for a live collector when process markers are not observable yet',
+        );
+        is(
+            $runner->stop_loop('state-backed'),
+            $child,
+            'stop_loop terminates a managed collector from persisted loop state when process markers are not observable yet',
+        );
+    }
+    is( waitpid( $child, 1 ), -1, 'stop_loop reaps state-backed managed children after shutdown' );
+    $runner->_cleanup_loop_files('state-backed');
+}
+
+{
+    ok(
+        !$runner->_state_confirms_managed_loop( 'missing-state', $$ ),
+        '_state_confirms_managed_loop returns false when no persisted loop state exists for a live pid',
+    );
+
+    for my $case (
+        [
+            'wrong-pid',
+            {
+                pid          => $$ + 1,
+                name         => 'wrong-pid',
+                process_name => 'dashboard collector: wrong-pid',
+                status       => 'running',
+            },
+            qr/pid mismatch/,
+        ],
+        [
+            'wrong-name',
+            {
+                pid          => $$,
+                name         => 'other-name',
+                process_name => 'dashboard collector: wrong-name',
+                status       => 'running',
+            },
+            qr/name mismatch/,
+        ],
+        [
+            'wrong-title',
+            {
+                pid          => $$,
+                name         => 'wrong-title',
+                process_name => 'foreign collector title',
+                status       => 'running',
+            },
+            qr/title mismatch/,
+        ],
+        [
+            'wrong-status',
+            {
+                pid          => $$,
+                name         => 'wrong-status',
+                process_name => 'dashboard collector: wrong-status',
+                status       => 'stopped',
+            },
+            qr/status mismatch/,
+        ],
+    ) {
+        my ( $name, $state, $label ) = @$case;
+        if ( $label =~ /name mismatch/ ) {
+            my $statefile = File::Spec->catfile( $paths->collector_dir($name), 'loop.json' );
+            open my $fh, '>', $statefile or die $!;
+            print {$fh} json_encode($state);
+            close $fh;
+        }
+        else {
+            $runner->_write_loop_state( $name, $state );
+        }
+        ok(
+            !$runner->_state_confirms_managed_loop( $name, $$ ),
+            "_state_confirms_managed_loop rejects persisted loop state with $label",
+        );
+        $runner->_cleanup_loop_files($name);
+    }
+}
+
+{
+    my $pidfile = File::Spec->catfile( $paths->collectors_root, 'stubborn-state.pid' );
+    open my $stubborn_pid, '>', $pidfile or die $!;
+    print {$stubborn_pid} "424242\n";
+    close $stubborn_pid;
+    $runner->_write_loop_state(
+        'stubborn-state',
+        {
+            pid          => 424242,
+            name         => 'stubborn-state',
+            process_name => 'dashboard collector: stubborn-state',
+            status       => 'running',
+        }
+    );
+    my $error = '';
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CollectorRunner::_reap_child_process = sub { return 0 };
+        local *Developer::Dashboard::CollectorRunner::_same_pid_namespace = sub { return 1 };
+        local *Developer::Dashboard::CollectorRunner::_is_managed_loop = sub { return 1 };
+        local *Developer::Dashboard::CollectorRunner::_pid_is_running = sub { return 1 };
+        local *Developer::Dashboard::CollectorRunner::sleep = sub { return 0 };
+        eval { $runner->stop_loop('stubborn-state'); 1 } or $error = $@;
+    }
+    like( $error, qr/Collector 'stubborn-state' did not stop after TERM and KILL/, 'stop_loop fails explicitly when a managed collector still appears alive after TERM and KILL' );
+    ok( -f $pidfile, 'stop_loop keeps the pidfile when a managed collector refuses to stop' );
+    ok( defined $runner->loop_state('stubborn-state'), 'stop_loop keeps loop state metadata when a managed collector refuses to stop' );
+    $runner->_cleanup_loop_files('stubborn-state');
+}
+
+{
+    my $proc_root = tempdir( CLEANUP => 1 );
+    my $proc_dir  = File::Spec->catdir( $proc_root, '4242' );
+    mkdir $proc_dir or die $!;
+    my $environ = File::Spec->catfile( $proc_dir, 'environ' );
+    open my $env_fh, '>', $environ or die $!;
+    print {$env_fh} "BROKEN\0TARGET_KEY=collector-value\0";
+    close $env_fh;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CollectorRunner::_read_process_env_marker = sub {
+            my ( $self, $pid, $key ) = @_;
+            my $proc = File::Spec->catfile( $proc_root, $pid, 'environ' );
+            open my $fh, '<', $proc or return;
+            local $/;
+            my $env = scalar <$fh>;
+            return if !defined $env || $env eq '';
+            for my $pair ( split /\0/, $env ) {
+                next if $pair !~ /^([^=]+)=(.*)$/s;
+                return $2 if $1 eq $key;
+            }
+            return;
+        };
+        is(
+            $runner->_read_process_env_marker( 4242, 'TARGET_KEY' ),
+            'collector-value',
+            '_read_process_env_marker skips malformed environ entries and returns the requested value',
+        );
+    }
+}
+
+{
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CollectorRunner::_read_proc_file = sub { return '' };
+        local *Developer::Dashboard::CollectorRunner::capture = sub (&) {
+            return ( "dashboard collector: ps-fallback   \n", '', 0 );
+        };
+        is(
+            $runner->_read_process_title(4242),
+            'dashboard collector: ps-fallback',
+            '_read_process_title falls back to ps output when procfs command line data is unavailable',
+        );
+    }
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CollectorRunner::_read_proc_file = sub { return '' };
+        local *Developer::Dashboard::CollectorRunner::capture = sub (&) {
+            return ( "dashboard collector: ps-failure\n", '', 1 );
+        };
+        ok(
+            !defined $runner->_read_process_title(4242),
+            '_read_process_title returns undef when ps fallback itself fails',
+        );
+    }
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CollectorRunner::_read_proc_file = sub { return "4242 (dashboard) Z 1 2 3 4\n" };
+        is(
+            $runner->_read_process_state(4242),
+            'Z',
+            '_read_process_state reads the one-letter procfs process state',
+        );
+    }
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CollectorRunner::_read_proc_file = sub { return '' };
+        local *Developer::Dashboard::CollectorRunner::capture = sub (&) {
+            return ( "Z+\n", '', 0 );
+        };
+        is(
+            $runner->_read_process_state(4242),
+            'Z',
+            '_read_process_state falls back to ps output when procfs state is unavailable',
+        );
+    }
+}
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::CollectorRunner::_reap_child_process = sub { return 0 };
+    local *Developer::Dashboard::CollectorRunner::_read_process_state = sub { return 'Z' };
+    local *Developer::Dashboard::CollectorRunner::_process_exists = sub { return 1 };
+    ok(
+        !$runner->_pid_is_running(4242),
+        '_pid_is_running treats zombie collectors as stopped even when signal 0 still succeeds',
+    );
+}
+
+{
+    local $ENV{PERL5OPT}            = '-MDevel::Cover';
+    local $ENV{HARNESS_PERL_SWITCHES} = '';
+    ok( $runner->_coverage_instrumentation_active, '_coverage_instrumentation_active detects Devel::Cover in PERL5OPT' );
+    $runner->_scrub_coverage_environment;
+    ok( !defined $ENV{PERL5OPT}, '_scrub_coverage_environment removes PERL5OPT from managed loop children' );
+
+    local $ENV{PERL5OPT}            = '';
+    local $ENV{HARNESS_PERL_SWITCHES} = '';
+    ok( !$runner->_coverage_instrumentation_active, '_coverage_instrumentation_active returns false when coverage is not requested' );
+}
+
+{
+    {
+        no warnings 'redefine';
+        my $setsid_called = 0;
+        local *Developer::Dashboard::CollectorRunner::is_windows = sub { return 1 };
+        local *Developer::Dashboard::CollectorRunner::setsid     = sub { $setsid_called++; return 1 };
+        ok( $runner->_detach_process_session, '_detach_process_session is a no-op on Windows' );
+        is( $setsid_called, 0, '_detach_process_session skips setsid on Windows' );
+    }
+
+    {
+        no warnings 'redefine';
+        my $setsid_called = 0;
+        local *Developer::Dashboard::CollectorRunner::is_windows = sub { return 0 };
+        local *Developer::Dashboard::CollectorRunner::setsid     = sub { $setsid_called++; return 1 };
+        ok( $runner->_detach_process_session, '_detach_process_session detaches the session on POSIX platforms' );
+        is( $setsid_called, 1, '_detach_process_session calls setsid exactly once on POSIX platforms' );
+    }
+}
+
+{
+    my ( $stdout, $stderr, $exit_code, $timed_out ) = $runner->_run_command(
+        source     => q{printf collector-command},
+        cwd        => $paths->home,
+        timeout_ms => 1_000,
+    );
+    is( $stdout, 'collector-command', '_run_command captures stdout from a successful shell command' );
+    is( $stderr, '', '_run_command leaves stderr empty for a successful shell command' );
+    is( $exit_code, 0, '_run_command returns zero for a successful shell command' );
+    is( $timed_out, 0, '_run_command does not mark successful commands as timed out' );
+}
+
+{
+    my ( $stdout, $stderr, $exit_code, $timed_out ) = $runner->_run_code(
+        source     => q{ die "collector code boom\n"; },
+        cwd        => $paths->home,
+        timeout_ms => 1_000,
+    );
+    is( $stdout, '', '_run_code does not emit stdout for a dying code collector' );
+    like( $stderr, qr/collector code boom/, '_run_code writes code evaluation errors to stderr explicitly' );
+    is( $exit_code, 255, '_run_code returns 255 when collector code dies' );
+    is( $timed_out, 0, '_run_code distinguishes code errors from collector timeouts' );
 }
 
 {
@@ -3474,6 +4626,64 @@ EOF
     is( $audit_keys->{CHILD_DD}{envfile}, File::Spec->catfile( $child_root, '.developer-dashboard', '.env' ), 'EnvAudit->keys exposes the source file for each recorded key' );
     chdir $previous_cwd or die "Unable to chdir back to $previous_cwd: $!";
 }
+{
+    my $env_home = tempdir( CLEANUP => 1 );
+    my $project_root = File::Spec->catdir( $env_home, 'projects', 'cached-cwd-env-project' );
+    my $child_root = File::Spec->catdir( $project_root, 'child' );
+    make_path(
+        File::Spec->catdir( $env_home, '.developer-dashboard' ),
+        File::Spec->catdir( $project_root, '.git' ),
+        $child_root,
+    );
+    open my $home_fh, '>:raw', File::Spec->catfile( $env_home, '.env' ) or die "Unable to write cached cwd home .env: $!";
+    print {$home_fh} "ROOT_CACHE=home\n";
+    close $home_fh or die "Unable to close cached cwd home .env: $!";
+    open my $project_fh, '>:raw', File::Spec->catfile( $project_root, '.env' ) or die "Unable to write cached cwd project .env: $!";
+    print {$project_fh} "PROJECT_CACHE=project\n";
+    close $project_fh or die "Unable to close cached cwd project .env: $!";
+    open my $child_fh, '>:raw', File::Spec->catfile( $child_root, '.env' ) or die "Unable to write cached cwd child .env: $!";
+    print {$child_fh} "CHILD_CACHE=child\n";
+    close $child_fh or die "Unable to close cached cwd child .env: $!";
+
+    local $ENV{HOME} = $env_home;
+    local $ENV{ROOT_CACHE};
+    local $ENV{PROJECT_CACHE};
+    local $ENV{CHILD_CACHE};
+    Developer::Dashboard::EnvAudit->clear();
+    my $paths = Developer::Dashboard::PathRegistry->new(
+        home => $env_home,
+        cwd  => $child_root,
+    );
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::EnvLoader::cwd = sub { die "EnvLoader plain-directory scanning should reuse the registry cwd\n"; };
+        Developer::Dashboard::EnvLoader->load_runtime_layers( paths => $paths );
+    }
+    is( $ENV{ROOT_CACHE}, 'home', 'EnvLoader still loads the root plain-directory env file when using the registry cwd cache' );
+    is( $ENV{PROJECT_CACHE}, 'project', 'EnvLoader still loads the project plain-directory env file when using the registry cwd cache' );
+    is( $ENV{CHILD_CACHE}, 'child', 'EnvLoader still loads the leaf plain-directory env file when using the registry cwd cache' );
+}
+
+{
+    my $docker_runtime_root = File::Spec->catdir( $home, '.developer-dashboard' );
+    my $nested_leaf = File::Spec->catdir( $docker_runtime_root, 'skills', 'alpha', 'skills', 'beta' );
+    make_path(
+        File::Spec->catdir( $docker_runtime_root, 'skills', 'alpha', 'config', 'docker', 'alpha' ),
+        File::Spec->catdir( $nested_leaf, 'config', 'docker', 'beta' ),
+    );
+    is_deeply(
+        [ sort $paths->installed_skill_docker_roots_for_runtime($docker_runtime_root) ],
+        [
+            File::Spec->catdir( $docker_runtime_root, 'skills', 'alpha', 'config', 'docker' ),
+        ],
+        'installed_skill_docker_roots_for_runtime returns docker roots for the matching runtime layer',
+    );
+    is_deeply(
+        [ $paths->installed_skill_docker_roots_for_runtime(undef) ],
+        [],
+        'installed_skill_docker_roots_for_runtime returns an empty list when runtime root is missing',
+    );
+}
 
 {
     my $bad_home = tempdir( CLEANUP => 1 );
@@ -3553,6 +4763,67 @@ EOF
         'EnvLoader propagates .env.pl execution failures instead of hiding them',
     );
     chdir $previous_cwd or die "Unable to chdir back to $previous_cwd: $!";
+}
+
+{
+    my $overlay_dir = tempdir( CLEANUP => 1 );
+    my $env_file = File::Spec->catfile( $overlay_dir, '.env' );
+    my $env_pl_file = File::Spec->catfile( $overlay_dir, '.env.pl' );
+    open my $env_fh, '>:raw', $env_file or die "Unable to write overlay env file: $!";
+    print {$env_fh} "VERSION=leaf\nNEW_ONLY=from-file\n";
+    close $env_fh or die "Unable to close overlay env file: $!";
+    open my $env_pl_fh, '>:raw', $env_pl_file or die "Unable to write overlay env.pl file: $!";
+    print {$env_pl_fh} "\$ENV{PL_ONLY} = \"\$ENV{VERSION}-pl\";\n1;\n";
+    close $env_pl_fh or die "Unable to close overlay env.pl file: $!";
+
+    my $overlay = Developer::Dashboard::EnvLoader->load_files_into_hash(
+        files    => [ undef, $env_file, $env_pl_file, $env_file ],
+        base_env => {
+            KEEP    => 'keep',
+            VERSION => 'base',
+        },
+    );
+    is_deeply(
+        $overlay->{files},
+        [ $env_file, $env_pl_file ],
+        'load_files_into_hash reports only unique existing files in load order',
+    );
+    is_deeply(
+        $overlay->{env},
+        {
+            DEVELOPER_DASHBOARD_ENV_AUDIT => json_encode(
+                {
+                    NEW_ONLY => {
+                        envfile => $env_file,
+                        value   => 'from-file',
+                    },
+                    PL_ONLY => {
+                        envfile => $env_pl_file,
+                        value   => 'leaf-pl',
+                    },
+                    VERSION => {
+                        envfile => $env_file,
+                        value   => 'leaf',
+                    },
+                }
+            ),
+            NEW_ONLY => 'from-file',
+            PL_ONLY  => 'leaf-pl',
+            VERSION  => 'leaf',
+        },
+        'load_files_into_hash returns only added and changed environment values',
+    );
+
+    local $ENV{HOME};
+    is(
+        Developer::Dashboard::EnvLoader->_expand_env_value(
+            value   => '~/fallback-home',
+            file    => $env_file,
+            line_no => 1,
+        ),
+        '~/fallback-home',
+        '_expand_env_value preserves leading tilde text when HOME is unavailable',
+    );
 }
 
 {

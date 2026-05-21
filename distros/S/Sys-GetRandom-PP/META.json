@@ -4,7 +4,7 @@
       "Lukas Mai <l.mai@web.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.66, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -22,10 +22,7 @@
    },
    "prereqs" : {
       "build" : {
-         "requires" : {
-            "Config" : "0",
-            "File::Temp" : "0"
-         }
+         "requires" : {}
       },
       "configure" : {
          "requires" : {
@@ -47,6 +44,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Config" : "0",
             "Exporter" : "5.57",
             "constant" : "1.03",
             "strict" : "0",
@@ -61,12 +59,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://codeberg.org/mauke/Sys-GetRandom-PP/issues"
+      },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/mauke/Sys-GetRandom-PP",
-         "web" : "https://github.com/mauke/Sys-GetRandom-PP"
+         "url" : "https://codeberg.org/mauke/Sys-GetRandom-PP.git",
+         "web" : "https://codeberg.org/mauke/Sys-GetRandom-PP"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

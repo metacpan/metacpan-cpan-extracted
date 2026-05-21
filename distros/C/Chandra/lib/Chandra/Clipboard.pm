@@ -5,7 +5,7 @@ use warnings;
 
 use Chandra ();
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 1;
 
@@ -42,17 +42,17 @@ Chandra::Clipboard - System clipboard access for Chandra applications
 =head1 DESCRIPTION
 
 Chandra::Clipboard provides cross-platform system clipboard access.
-All methods are class methods — no object instantiation needed.
+All methods are class methods - no object instantiation needed.
 
 =head2 Platform Support
 
 =over 4
 
-=item macOS — NSPasteboard (Cocoa)
+=item macOS - NSPasteboard (Cocoa)
 
-=item Linux — GTK clipboard (gtk_clipboard_*)
+=item Linux - GTK clipboard (gtk_clipboard_*)
 
-=item Windows — stub (not yet implemented)
+=item Windows - stub (not yet implemented)
 
 =back
 

@@ -11,7 +11,7 @@ use Data::GUID;
 
 our %LOG;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 BEGIN {
 	%LOG = (

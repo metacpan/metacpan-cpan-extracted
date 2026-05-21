@@ -1,10 +1,8 @@
 <%init>
 my $args = $DECODED_ARGS;
-my $request_path = $HTML::Mason::Commands::r->path_info;
-$request_path =~ s!/{2,}!/!g;
-return unless $request_path =~ m{^/RTIR/};
+return unless $Path =~ m{^/RTIR/};
 
-if ( $request_path =~ m{RTIR/Incident/Display\.html$} ) {
+if ( $Path =~ m{RTIR/Incident/Display\.html$} ) {
     my $id = $args->{'id'};
 
     # we'll never get here unless ticket is there and it's rtir's type
@@ -28,3 +26,9 @@ if ( $request_path =~ m{RTIR/Incident/Display\.html$} ) {
     }
 }
 </%init>
+
+<%args>
+$Path        => ''
+$Search_Args => ''
+$Has_Query   => 0
+</%args>

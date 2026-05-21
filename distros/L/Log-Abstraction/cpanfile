@@ -31,6 +31,7 @@ on 'test' => sub {
 	requires 'Test::Returns';
 	requires 'YAML::XS';
 };
+
 on 'develop' => sub {
 	requires 'Devel::Cover';
 	requires 'Perl::Critic';

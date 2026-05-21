@@ -456,7 +456,7 @@ sub _dotop {
         }
         # ugly hack: only allow import vmeth to be called on root stash
         elsif (($value = $HASH_OPS->{ $item })
-            && ! $atroot || $item eq 'import') {
+            && (! $atroot || $item eq 'import')) {
             @result = &$value($root, @$args);               ## @result
         }
         elsif ( ref $item eq 'ARRAY' ) {
@@ -611,7 +611,7 @@ sub _assign {
     elsif ($rootref eq 'ARRAY' && $item =~ /^-?\d+$/) {
         # or set a list item by index number
         return ($root->[$item] = $value)            ## RETURN
-            unless $default && $root->{ $item };
+            unless $default && $root->[$item];
     }
     elsif (blessed($root)) {
         # try to call the item as a method of an object

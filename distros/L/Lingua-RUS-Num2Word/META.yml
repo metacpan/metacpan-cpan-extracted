@@ -4,7 +4,6 @@ author:
   - 'PetaMem s.r.o. <info@petamem.com>'
 build_requires:
   Test::More: '0'
-  Test::More::UTF8: '0'
   strict: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -18,7 +17,7 @@ name: Lingua-RUS-Num2Word
 provides:
   Lingua::RUS::Num2Word:
     file: lib/Lingua/RUS/Num2Word.pm
-    version: '0.2603300'
+    version: '0.2604300'
 requires:
   Carp: '0'
   Export::Attrs: '0'
@@ -28,7 +27,7 @@ requires:
   warnings: '0'
 resources:
   repository: https://metacpan.org/author/PETAMEM
-version: '0.2603300'
-x_generated_by_perl: v5.42.0
+version: '0.2604300'
+x_generated_by_perl: v5.42.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-2.0 OR BSD-2-Clause'

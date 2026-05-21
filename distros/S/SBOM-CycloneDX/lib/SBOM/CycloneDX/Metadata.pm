@@ -34,7 +34,7 @@ has timestamp => (
 
 has lifecycles => (
     is      => 'rw',
-    isa     => ArrayLike [InstanceOf ['SBOM::CycloneDX::Metadata::Lifecyle']],
+    isa     => ArrayLike [InstanceOf ['SBOM::CycloneDX::Metadata::LifeCycle']],
     default => sub { SBOM::CycloneDX::List->new }
 );
 
@@ -70,11 +70,7 @@ has properties => (
     default => sub { SBOM::CycloneDX::List->new }
 );
 
-has distribution_constraints => (
-    is      => 'rw',
-    isa     => ArrayLike [InstanceOf ['SBOM::CycloneDX::Metadata::DistributionConstraint']],
-    default => sub { SBOM::CycloneDX::List->new }
-);
+has distribution_constraints => (is => 'rw', isa => InstanceOf ['SBOM::CycloneDX::Metadata::DistributionConstraint']);
 
 sub TO_JSON {
 
@@ -86,14 +82,15 @@ sub TO_JSON {
         $json->{tools} = $self->tools;
     }
 
-    $json->{timestamp}   = $self->timestamp   if $self->timestamp;
-    $json->{lifecycles}  = $self->lifecycles  if @{$self->lifecycles};
-    $json->{authors}     = $self->authors     if @{$self->authors};
-    $json->{component}   = $self->component   if $self->component;
-    $json->{manufacture} = $self->manufacture if $self->manufacture;
-    $json->{supplier}    = $self->supplier    if $self->supplier;
-    $json->{licenses}    = $self->licenses    if @{$self->licenses};
-    $json->{properties}  = $self->properties  if @{$self->properties};
+    $json->{timestamp}               = $self->timestamp                if $self->timestamp;
+    $json->{lifecycles}              = $self->lifecycles               if @{$self->lifecycles};
+    $json->{authors}                 = $self->authors                  if @{$self->authors};
+    $json->{component}               = $self->component                if $self->component;
+    $json->{manufacture}             = $self->manufacture              if $self->manufacture;
+    $json->{supplier}                = $self->supplier                 if $self->supplier;
+    $json->{licenses}                = $self->licenses                 if @{$self->licenses};
+    $json->{properties}              = $self->properties               if @{$self->properties};
+    $json->{distributionConstraints} = $self->distribution_constraints if $self->distribution_constraints;
 
     return $json;
 
@@ -128,8 +125,6 @@ and implements the following new ones.
 Properties:
 
 =over
-
-=item * C<BUILD>, 
 
 =item * C<authors>, The person(s) who created the BOM.
 Authors are common in BOMs created through manual processes. BOMs created
@@ -174,8 +169,6 @@ a distributor or repackager.
 validation of the BOM.
 
 =back
-
-=item $metadata->BUILD
 
 =item $metadata->authors
 

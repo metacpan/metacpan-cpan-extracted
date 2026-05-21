@@ -127,20 +127,22 @@ sub svg_label {
     }
   }
   $url =~ s/\%s/url_escape(encode_utf8($self->label))/e or $url .= url_escape(encode_utf8($self->label)) if $url;
-  my $data = sprintf(qq{    <g><text text-anchor="middle" x="%.1f" y="%.1f" %s %s>}
-                     . $self->label
-                     . qq{</text>},
-                     $self->pixels($offset, 0, $dy * 0.4),
-                     $attributes ||'',
-		     $self->map->glow_attributes ||'');
+  my $data = "    <g>";
+  $data .= sprintf('<text text-anchor="middle" x="%.1f" y="%.1f" %s %s>'
+                   . $self->label
+                   . '</text>',
+                   $self->pixels($offset, 0, $dy * 0.4),
+                   $attributes ||'',
+                   $self->map->glow_attributes)
+      if $self->map->glow_attributes;
   $data .= qq{<a xlink:href="$url">} if $url;
-  $data .= sprintf(qq{<text text-anchor="middle" x="%.1f" y="%.1f" %s>}
+  $data .= sprintf('<text text-anchor="middle" x="%.1f" y="%.1f" %s>'
 		   . $self->label
-		   . qq{</text>},
+		   . '</text>',
 		   $self->pixels($offset, 0, $dy * 0.4),
 		   $attributes ||'');
-  $data .= qq{</a>} if $url;
-  $data .= qq{</g>\n};
+  $data .= "</a>" if $url;
+  $data .= "</g>\n";
   return $data;
 }
 

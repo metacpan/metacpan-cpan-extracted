@@ -168,6 +168,10 @@
   ->ToLookup(sub { $_[0]{dept} },       # hashref: key => [values]
              sub { $_[0]{name} })
   ->ToLTSV('output.ltsv')              # write sequence to an LTSV file
+  ->ToLTSV('output.ltsv',              # write with label order specified
+      label_order => [qw(host status bytes url)])
+  ->ToLTSV('output.ltsv',              # headers is an alias for label_order
+      headers => [qw(host status bytes url)])
 
 [ 12. Official resources ]
 

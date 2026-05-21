@@ -28,6 +28,9 @@ BT-30-1;;0;Kennung des Schemas
 BT-30;0;;Kennung der rechtlichen Registrierung des Verkäufers
 BT-31-0;2;;Art der Steuernummer
 BT-31;2;;Umsatzsteuer-Identifikationsnummer des Verkäufers
+BT-32-0;0;Art der Steuernummer
+BT-32;0;Steuernummer des Verkäufers
+BT-33;0;Sonstige rechtliche Informationen des Verkäufers
 BT-34;0;;Elektronische Adresse des Verkäufers
 BT-34-1;0;;Kennung des Schemas
 BT-35;0;;Zeile 1 der Verkäuferanschrift

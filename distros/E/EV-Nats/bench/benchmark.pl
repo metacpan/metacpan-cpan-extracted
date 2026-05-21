@@ -43,7 +43,9 @@ sub run_bench {
     }
 }
 
-# 1. Fire-and-forget publish (no subscriber)
+# 1. Fire-and-forget publish (no subscriber).
+# Uses flush() so timing reflects when the server has confirmed receipt
+# of every PUB, not just when the local write buffer was scheduled.
 run_bench("PUB fire-and-forget", sub {
     my ($done, $t0, $elapsed) = @_;
 
@@ -51,21 +53,11 @@ run_bench("PUB fire-and-forget", sub {
     for my $i (1 .. $n_msgs) {
         $nats->publish('bench.pub', $payload);
     }
-    # flush to measure actual write
-    $nats->ping;
-
-    # wait for PONG
-    my $orig_sub;
-    $orig_sub = $nats->subscribe('_flush_done', sub {});
-    $nats->unsubscribe($orig_sub); # just need ping/pong cycle
-
-    my $t; $t = EV::timer 0.01, 0.01, sub {
-        # check if wbuf is flushed (waiting_count == 0 and connected)
+    $nats->flush(sub {
         $$elapsed = time - $$t0;
-        undef $t;
         $nats->disconnect;
         EV::break;
-    };
+    });
 });
 
 # 2. PUB with subscriber receiving

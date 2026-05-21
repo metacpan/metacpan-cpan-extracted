@@ -44,6 +44,7 @@ requires:
   Moo: '2.005005'
   Path::Tiny: '0.146'
   Pod::Usage: '2.03'
+  Syntax::Keyword::Match: '0.15'
   Text::Balanced: '2.07'
   Text::CSV::Encoded: '0.25'
   Types::Standard: '2.006'
@@ -51,12 +52,12 @@ requires:
   lib: '0.65'
   open: '1.13'
   parent: '0.242'
-  perl: '5.36'
+  perl: v5.40.0
   strict: '1.12'
   warnings: '1.58'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-MetaCurator
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ronsavage/CPAN-MetaCurator.git
-version: '1.15'
+version: '1.17'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

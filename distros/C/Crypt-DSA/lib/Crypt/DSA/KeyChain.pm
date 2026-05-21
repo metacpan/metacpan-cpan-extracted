@@ -1,6 +1,7 @@
 package Crypt::DSA::KeyChain;
 
 use strict;
+use warnings;
 use Math::BigInt 1.78 try => 'GMP, Pari';
 use Digest::SHA qw( sha1 );
 use Carp qw( croak );
@@ -8,8 +9,9 @@ use IPC::Open3;
 use File::Spec;
 use File::Which ();
 use Symbol qw( gensym );
+use Crypt::SysRandom qw( random_bytes );
 
-our $VERSION = '1.19'; #VERSION
+our $VERSION = '1.20'; #VERSION
 
 use vars qw{$VERSION};
 
@@ -31,22 +33,22 @@ sub generate_params {
 
     # try to use fast implementations found on the system, if available.
     unless ($param{Seed} || wantarray || $param{PurePerl}) {
-
         # OpenSSL support
         my $bin     = $^O eq 'MSWin32' ? 'openssl.exe' : 'openssl';
         my $openssl = File::Which::which($bin);
         if ( $openssl ) {
             print STDERR "Using openssl\n" if $v;
             my $bits_n = int($bits);
-            open( NULL, ">", File::Spec->devnull );
-            my $pid = open3( gensym, \*OPENSSL, ">&NULL", "$openssl dsaparam -text -noout $bits_n" );
+            open( NULL, ">", File::Spec->devnull ) or die "Unable to open devnull: $!";
+            my $pid = open3(gensym, \*OPENSSL, ">&NULL", $openssl, 'dsaparam', '-text', '-noout', $bits_n);
             my @res;
             while( <OPENSSL> ) {
                 push @res, $_;
             }
-            waitpid( $pid, 0 );
             close OPENSSL;
             close NULL;
+            waitpid( $pid, 0 );
+            die "openssl dsaparam failed: " . ($? >> 8) if $?;
 
             my %parts;
             my $cur_part;
@@ -81,7 +83,7 @@ sub generate_params {
     SCOPE: {
         print STDERR "." if $v;
         $seed = $param{Seed} ? delete $param{Seed} :
-            join '', map chr rand 256, 1..20;
+            Crypt::SysRandom::random_bytes(20);
         $seedp1 = _seed_plus_one($seed);
         my $md = sha1($seed) ^ sha1($seedp1);
         vec($md, 0, 8) |= 0x80;
@@ -232,6 +234,15 @@ found.
 
 This is entirely optional, and if not provided a random seed will
 be generated automatically.
+
+B<Note>: This module now uses Crypt::SysRandom to generate a seed.
+If you are not using one of the sources of randomness recommended at
+L<https://security.metacpan.org/docs/guides/random-data-for-security.html>
+you B<should not (must not)> provide your own Seed value.
+
+In particular, Perl's B<rand> function must not be used for any
+session, token, hash, authentication, cryptographic value.  Basically do
+not use rand unless you absolutely know how it will be used.
 
 =item * Verbosity
 

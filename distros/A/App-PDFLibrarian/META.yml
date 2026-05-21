@@ -1,0 +1,45 @@
+---
+abstract: 'Manage a library of academic papers in PDF format with embedded BibTeX metadata'
+author:
+  - 'Karl Wette <karl.wette@cpan.org>'
+build_requires: {}
+configure_requires:
+  Devel::CheckBin: '0'
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-PDFLibrarian
+requires:
+  Capture::Tiny: '0.48'
+  Carp::Assert: '0.22'
+  Clipboard: '0.28'
+  Config::IniFiles: '3.000003'
+  File::BaseDir: '0.09'
+  File::MimeInfo: '0.34'
+  File::ShareDir: '1.00'
+  JSON: '4.10'
+  LWP: '6.76'
+  PDF::API2: '2.045'
+  Parallel::Iterator: '1.002'
+  Pod::Usage: '2.03'
+  System::Info: '0.067'
+  Text::BibTeX: '0.89'
+  Text::CSV::Encoded: '0.25'
+  Text::Unidecode: '1.30'
+  URI: '5.27'
+  URI::Encode: v1.1.1
+  XML::LibXML: '2.0134'
+  XML::LibXSLT: '2.002001'
+  perl: '5.018'
+resources:
+  bugtracker: https://github.com/kwwette/pdflibrarian/issues
+  repository: git://github.com/kwwette/pdflibrarian.git
+version: 6.0.1
+x_generated_by_perl: v5.38.2
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: GPL-3.0-only

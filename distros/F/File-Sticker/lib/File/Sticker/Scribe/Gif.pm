@@ -1,12 +1,12 @@
 package File::Sticker::Scribe::Gif;
-$File::Sticker::Scribe::Gif::VERSION = '4.401';
+$File::Sticker::Scribe::Gif::VERSION = '4.603';
 =head1 NAME
 
 File::Sticker::Scribe::Gif - read, write and standardize meta-data from GIF file
 
 =head1 VERSION
 
-version 4.401
+version 4.603
 
 =head1 SYNOPSIS
 
@@ -68,12 +68,13 @@ File must be a GIF image.
 sub allowed_file {
     my $self = shift;
     my $file = shift;
-    say STDERR whoami(), " file=$file" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     $file = $self->_get_the_real_file(filename=>$file);
     my $ft = $self->{file_magic}->info_from_filename($file);
     if ($ft->{mime_type} eq 'image/gif')
     {
+        say STDERR 'Scribe ' . $self->name() . ' allows filetype ' . $ft->{mime_type} . ' of ' . $file if $self->{verbose} > 1;
         return 1;
     }
     return 0;
@@ -130,7 +131,7 @@ Read the meta-data from the given file.
 sub read_meta {
     my $self = shift;
     my $filename = shift;
-    say STDERR whoami(), " filename=$filename" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     my $filename = $self->_get_the_real_file($filename);
     my $info = ImageInfo($filename);
@@ -231,7 +232,7 @@ THIS DOES NOT CHECK that readonly fields are not being overwritten.
 sub replace_all_meta {
     my $self = shift;
     my %args = @_;
-    say STDERR whoami(), " filename=$args{filename}" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     $self->_write_meta(%args);
     
@@ -274,7 +275,7 @@ Quick non-checking loading of the meta-data. Does not standardize any fields.
 sub _load_meta {
     my $self = shift;
     my $filename = shift;
-    say STDERR whoami(), " filename=$filename" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     $filename = $self->_get_the_real_file(filename=>$filename);
     my $et = new Image::ExifTool;
@@ -349,7 +350,7 @@ If the file is a soft link, look for the file it is pointing to
 sub _get_the_real_file {
     my $self = shift;
     my %args = @_;
-    say STDERR whoami(), " filename=$args{filename}" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     my $filename = $args{filename};
     # ExifTool has a wicked habit of replacing soft-linked files with the

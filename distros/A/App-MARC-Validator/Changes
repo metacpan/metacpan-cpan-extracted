@@ -1,3 +1,9 @@
+0.09 2026-05-21T13:25:13+02:00
+ - Add doc.
+ - Remove printing of warnings from MARC processing modules.
+ - Remove strict mode to prevent skip of records with bad leader.
+ - Remove XXX from tests.
+
 0.08 2026-04-08T17:58:32+02:00
  - Add support for compressed input.
 

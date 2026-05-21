@@ -1,5 +1,9 @@
 Revision history for Perl extension Promise::XS:
 
+0.21 Fri 8 May 2026
+- all() is now implemented in XS.
+- add @AnaTofuZ as a maintainer.
+
 0.20 Mon 10 Apr 2023
 - Version bump to “fix” CPAN Testers.
 

@@ -2,7 +2,7 @@ static uint32_t _rand32();
 static uint64_t _rand64();
 
 // Borrowed from https://www.pcg-random.org/posts/bounded-rands.html
-static uint32_t _bounded_rand(uint32_t range) {
+static uint32_t _bounded_rand32_lemire(uint32_t range) {
 	uint32_t x = _rand32();
 	uint64_t m = (uint64_t)x * (uint64_t)range;
 	uint32_t l = (uint32_t)m;
@@ -22,6 +22,22 @@ static uint32_t _bounded_rand(uint32_t range) {
 	}
 
 	return m >> 32;
+}
+
+// Simple rejection sampling (potentially slow for ranges near 2^64)
+static uint64_t _bounded_rand64_rejection(uint64_t range) {
+    uint64_t limit = UINT64_MAX - (UINT64_MAX % range);
+    uint64_t x;
+
+	// Generate a random number, and then check if it's outside the
+	// limit. If it's outside the limit keep generating new numbers
+	// until the number lands INSIDE the limit
+    do {
+        x = _rand64();
+    } while (x >= limit);
+
+	// Clean 1:1 mapping, so we can return an unbiased number
+    return x % range;
 }
 
 // https://prng.di.unimi.it/#remarks

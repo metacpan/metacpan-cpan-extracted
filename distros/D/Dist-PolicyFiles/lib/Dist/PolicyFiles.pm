@@ -6,7 +6,7 @@ use warnings;
 
 use feature ':5.10';
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 
 use Carp;
@@ -91,6 +91,8 @@ sub new {
     $self->{full_name} //= $udata->{full_name}
       // die("Could not determine user's full name");   # Should never happen.
   }
+  $self->{_module_0} = (split(/,/, $self->{module}))[0];
+  $self->{_module_0_dashed} = $self->{_module_0} =~ s/::/-/gr;
   return $self;
 }
 
@@ -103,6 +105,21 @@ sub module       {$_[0]->{module}}
 sub prefix       {$_[0]->{prefix}}
 sub uncapitalize {$_[0]->{uncapitalize}}
 
+sub cpan_rt_url {
+  return "https://rt.cpan.org/NoAuth/ReportBug.html?Queue=" . $_[0]->{_module_0_dashed};
+}
+
+sub repo_name {
+  my $self = shift;
+  my $mod_dashed = $self->{_module_0_dashed};
+  return $self->{prefix} . ($self->{uncapitalize} ? lc($mod_dashed) : $mod_dashed);
+}
+
+sub github_url {
+  my $self = shift;
+  return "https://github.com/$self->{login}/" . $self->repo_name;
+}
+
 
 
 sub create_contrib_md {
@@ -112,14 +129,11 @@ sub create_contrib_md {
   croak('Missing --module: no module specified') unless exists($self->{module});
   my $contrib_md_tmpl_str = defined($contrib_md_tmpl) ?
     do { local ( *ARGV, $/ ); @ARGV = ($contrib_md_tmpl); <> } : INTERNAL_CONTRIB_MD;
-  (my $mod_name = (split(/,/, $self->{module}))[0]) =~ s/::/-/g;
-  my $cpan_rt  = "https://rt.cpan.org/NoAuth/ReportBug.html?Queue=$mod_name";
-  my $repo = $self->{prefix} . ($self->{uncapitalize} ? lc($mod_name) : $mod_name);
-  my $github_i = "https://github.com/$self->{login}/$repo/issues";
   my $tmpl_obj = Text::Template->new(SOURCE => $contrib_md_tmpl_str, TYPE => 'STRING')
     or croak("Couldn't construct template: $Text::Template::ERROR");
-
-  my $tmpl_vars = {cpan_rt  => $cpan_rt, github_i => $github_i};
+  my $tmpl_vars = {cpan_rt  => $self->cpan_rt_url,
+                   github_i => $self->github_url . "/issues",
+                  };
   @{$tmpl_vars}{qw(email full_name module)} = @{$self}{qw(email full_name module)};
   my $contrib = $tmpl_obj->fill_in(HASH => $tmpl_vars)
     // croak("Couldn't fill in template: $Text::Template::ERROR");
@@ -160,7 +174,7 @@ Dist::PolicyFiles - Generate CONTRIBUTING.md and SECURITY.md
 
 =head1 VERSION
 
-Version 0.08
+Version 0.09
 
 =head1 SYNOPSIS
 
@@ -175,9 +189,13 @@ Version 0.08
 This module is used to generate the policy files F<CONTRIBUTING.md> and
 F<SECURITY.md>. It comes with the L<dist-policyfiles> command line tool.
 
-=head2 METHODS
+=head2 Methods
 
-=head3 C<new(I<NAMED_ARGUMENTS>>
+=head3 Constructor
+
+=over
+
+=item C<new(I<NAMED_ARGUMENTS>)>
 
 The constructor C<new()> accepts the following named arguments, where C<login>
 and C<module> are mandatory:
@@ -231,8 +249,9 @@ See also the accessor method of the same name.
 
 =back
 
+=back
 
-=head3 Generation of policy files
+=head2 Generation of policy files
 
 =over
 
@@ -338,9 +357,15 @@ To completely disable one of these arguments, set it to C<undef> or an empty str
 =back
 
 
-=head3 Accessors
+=head3 Other Methods
 
 =over
+
+=item C<cpan_rt_url()>
+
+Returns the CPAN's request tracker URL, e.g.:
+
+   "https://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dist-PolicyFiles"
 
 =item C<dir()>
 
@@ -355,6 +380,12 @@ Returns the user's email address.
 
 Returns the user's full name.
 
+=item C<github_url()>
+
+Returns the github repo URL, e.g.:
+
+   "https://github.com/klaus-rindfrey/perl-dist-policyfiles"
+
 =item C<login()>
 
 Returns the value passed via the constructor argument C<login>.
@@ -367,6 +398,12 @@ Returns the value passed via the constructor argument C<module>.
 
 Returns the value passed via the constructor argument C<prefix> or the default
 value (empty string).
+
+=item C<repo_name()>
+
+Returns the github repo name, e.g.:
+
+   "perl-dist-policyfiles"
 
 =item C<uncapitalize()>
 

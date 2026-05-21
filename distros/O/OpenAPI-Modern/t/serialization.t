@@ -15,10 +15,9 @@ use Test::Needs qw(Sereal::Encoder Sereal::Decoder);
 use lib 't/lib';
 use Helper;
 
-my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
 my $openapi = OpenAPI::Modern->new(
   openapi_uri => '/api',
-  openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+  openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     get: {}

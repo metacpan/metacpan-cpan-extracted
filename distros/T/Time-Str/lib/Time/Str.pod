@@ -1,6 +1,6 @@
 =pod
 
-=encoding =UTF-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -30,11 +30,10 @@ Time::Str - Parse and format date/time strings in multiple standard formats
 =head1 DESCRIPTION
 
 Time::Str parses date/time strings from various standard formats into Unix
-timestamps or component key-value pairs, and formats Unix timestamps back 
-into strings.
+timestamps or components, and formats Unix timestamps back into strings.
 
 Supported standards include ISO 8601, RFC 3339, RFC 2822, RFC 2616 (HTTP),
-ISO 9075 (SQL), ASN.1, and others. A permissive L<generic|/GENERIC FORMAT PARSING> 
+ISO 9075 (SQL), ASN.1, and others. A permissive L<DateTime|/DATETIME FORMAT PARSING> 
 parser handles most real-world date/time representations that can be parsed without 
 ambiguity.
 
@@ -66,18 +65,19 @@ The date/time string to parse.
 
 The format specification. See L</SUPPORTED FORMATS>.
 
-=item * C<precision> (optional, default: 6 or 9 depending on float size)
+=item * C<precision> (optional, default: 6 or 9 depending on Perl's 
+floating-point type)
 
 Number of decimal places to preserve for fractional seconds (0-9).
-Fractional digits beyond the specified precision are B<truncated>, not
-rounded. See L</PRECISION HANDLING>.
+Fractional digits beyond the specified precision are B<truncated>. 
+See L</PRECISION HANDLING>.
 
 =item * C<pivot_year> (optional, default: 1950)
 
-For formats with two-digit years (C<ASN1UT>, RFC 850 within C<RFC2616>),
-sets the pivot year for century expansion. Two-digit years less than
-C<(pivot_year % 100)> map to the next century; others map to the
-current century.
+For formats with two-digit years (C<ASN1UT>, RFC 850 within C<RFC2616>,
+C<RFC5280>), sets the pivot year for century expansion. Two-digit years
+less than C<(pivot_year % 100)> map to the next century; others map to
+the current century.
 
 With the default pivot of 1950: C<49> becomes 2049, C<50> becomes 1950,
 C<99> becomes 1999.
@@ -95,13 +95,13 @@ Croaks if:
 
 =over 4
 
-=item * A named parameter is unknown or out of range
-
 =item * The string cannot be parsed in the specified format
 
 =item * Date or time components are out of valid ranges
 
 =item * No timezone offset or UTC designator is present
+
+=item * A named parameter is unrecognised or out of range
 
 =back
 
@@ -121,12 +121,12 @@ Croaks if:
     my $t = str2time('Mon, 24 Dec 2012 15:30:45 GMT',
                      format => 'RFC2616');
 
-    # Precision (truncation, not rounding)
+    # Precision (truncation)
     my $t = str2time('2024-12-24T15:30:45.123456789Z', precision => 3);
     # 1735052445.123
 
     my $t = str2time('2024-12-24T15:30:45.999999Z', precision => 3);
-    # 1735052445.999 (NOT 1735052446.000)
+    # 1735052445.999
 
 =head2 str2date
 
@@ -166,7 +166,7 @@ C<tz_annotation>. The following components may be present:
 
 =over 4
 
-=item * C<year> - Year (1-9999)
+=item * C<year> - Four-digit year (1-9999)
 
 =item * C<month> - Month (1-12)
 
@@ -178,13 +178,13 @@ C<tz_annotation>. The following components may be present:
 
 =item * C<second> - Second (0-60; 60 allows for leap seconds)
 
-=item * C<nanosecond> - Fractional seconds as nanoseconds (0-999999999)
+=item * C<nanosecond> - Fractional seconds as nanoseconds (0-999,999,999)
 
 =item * C<tz_offset> - Timezone offset in minutes from UTC (e.g., 60
 for +01:00). Present when a numeric offset or UTC designator was parsed.
 
-=item * C<tz_utc> - The matched UTC designator (C<Z>, C<UTC>, C<GMT>)
-if one was present. When followed by a numeric offset (e.g., C<UTC+05:30>),
+=item * C<tz_utc> - The UTC designator (C<Z>, C<UTC>, C<GMT>) if one was 
+present. When followed by a numeric offset (e.g., C<UTC+05:30>),
 C<tz_offset> reflects that offset rather than zero.
 
 =item * C<tz_abbrev> - The timezone abbreviation as it appeared in the
@@ -203,11 +203,11 @@ Croaks if:
 
 =over 4
 
-=item * A named parameter is unknown or out of range
-
 =item * The string cannot be parsed in the specified format
 
 =item * Date or time components are out of valid ranges
+
+=item * A named parameter is unrecognised or out of range
 
 =back
 
@@ -227,12 +227,23 @@ Croaks if:
     # Partial dates
     my %d = str2date('2024-12-24', format => 'W3CDTF');
     # (year => 2024, month => 12, day => 24)
+
     my %d = str2date('2024', format => 'W3CDTF');
     # (year => 2024)
 
     # 12-hour clock
-    my %d = str2date('December 24, 2024, 3:30 PM', format => 'generic');
+    my %d = str2date('December 24, 2024, 3:30 PM', format => 'DateTime');
     # (..., hour => 15)
+
+    # Two-digit year
+    my %d = str2date('Monday, 24-Dec-50 15:30:45 GMT',
+                     format => 'RFC2616');
+    # (year => 1950, ...)
+
+    # Two-digit year with custom pivot
+    my %d = str2date('Monday, 24-Dec-50 15:30:45 GMT',
+                     format => 'RFC2616', pivot_year => 1970);
+    # (year => 2050, ...)
 
     # UTC designator
     my %d = str2date('24 Dec 2012 15:30:45 GMT', format => 'RFC2822');
@@ -240,16 +251,16 @@ Croaks if:
 
     # UTC designator with offset
     my %d = str2date('December 24, 2024 at 3:30 pm UTC+05:30',
-                     format => 'generic');
+                     format => 'DateTime');
     # (..., tz_utc => 'UTC', tz_offset => 330)
 
     # Timezone abbreviation (unresolved)
     my %d = str2date('24 Dec 2012 15:30:45 IST', format => 'RFC2822');
-    # (..., tz_abbrev => 'IST') # no tz_offset
+    # (..., tz_abbrev => 'IST')
 
     # RFC 9557 annotation
     my %d = str2date('2024-12-24T15:30:45.500+01:00[Europe/Stockholm]',
-                     format => 'generic');
+                     format => 'DateTime');
     # (..., tz_offset => 60, tz_annotation => '[Europe/Stockholm]')
 
 =head2 time2str
@@ -296,7 +307,7 @@ See L</PRECISION HANDLING>.
 
 =item * C<nanosecond> (optional)
 
-Explicit nanosecond value (0-999999999) for fractional seconds. Overrides
+Explicit nanosecond value (0-999,999,999) for fractional seconds. Overrides
 any fractional part of C<$time> and bypasses rounding. Use this for exact
 control over fractional output or to preserve nanosecond precision that
 floating-point cannot represent. Can be combined with C<precision> to
@@ -316,7 +327,7 @@ Croaks if:
 
 =item * C<$time> is outside the supported range
 
-=item * A named parameter is unknown or out of range
+=item * A named parameter is unrecognised or out of range
 
 =back
 
@@ -342,9 +353,13 @@ Croaks if:
     my $str = time2str(1735052445.999999, precision => 3);
     # '2024-12-24T15:30:46.000Z'
 
-    # Nanosecond override (no rounding)
-    my $str = time2str(1735052445, nanosecond => 500_000_000, precision => 9);
-    # '2024-12-24T15:30:45.500000000Z'
+    # Zero-padding
+    my $str = time2str(1735052445, precision => 3);
+    # '2024-12-24T15:30:45.000Z'
+
+    # Nanosecond override (no rounding, auto-detected precision)
+    my $str = time2str(1735052445, nanosecond => 500_000_000);
+    # '2024-12-24T15:30:45.500Z'
 
     # Zero-padding with nanosecond
     my $str = time2str(1735052445, nanosecond => 0, precision => 3);
@@ -366,97 +381,50 @@ Croaks if:
     my $str = time2str(1735052445, format => 'CLF', offset => 60);
     # '24/Dec/2024:16:30:45 +0100'
 
-=head1 PRECISION HANDLING
+=head1 FORMAT OVERVIEW
 
-The module handles fractional seconds differently when parsing versus
-formatting.
+=head2 Profiles of ISO 8601
 
-=head2 Parsing (str2time)
+  ISO8601      20241224T153045.500+0100
+  RFC4287      2024-12-24T15:30:45Z
+  W3CDTF       2024-12-24T15:30:45+01:00
+  RFC5545      20241224T153045Z
 
-Fractional seconds beyond the specified precision are B<truncated>, not
-rounded. This preserves the exact digits provided in the input up to the
-requested precision:
+=head2 Based on ISO 8601
 
-    str2time('2024-12-24T15:30:45.123456Z', precision => 3)
-    # Returns: 1735052445.123 (digits beyond 3rd truncated)
+  RFC3339      2024-12-24 15:30:45+01:00
+  RFC9557      2024-12-24 15:30:45+01:00[Europe/Paris]
+  ISO9075      2024-12-24 15:30:45 +01:00
+  ASN1GT       20241224153045Z
+  ASN1UT       241224153045Z
+  RFC5280      241224153045Z
 
-    str2time('2024-12-24T15:30:45.999999Z', precision => 3)
-    # Returns: 1735052445.999 (NOT .000 of next second)
+=head2 RFC / IMF / HTTP / IMAP
 
-B<Note>: C<str2date> does not accept a precision parameter. It always
-preserves fractional seconds at full nanosecond resolution in the
-C<nanosecond> component.
+  RFC2822      Tue, 24 Dec 2024 15:30:45 +0100
+  RFC2616      Tue, 24 Dec 2024 15:30:45 GMT
+  RFC3501      24-Dec-2024 15:30:45 +0100
 
-=head2 Formatting (time2str)
+=head2 Unix / C Library
 
-Fractional seconds are B<rounded> to the specified precision. Rounding
-prevents floating-point artifacts from appearing in formatted output:
+  ANSIC        Tue Dec 24 15:30:45 2024
+  UnixDate     Tue Dec 24 15:30:45 UTC 2024
+  UnixStamp    Tue Dec 24 15:30:45.500 2024 UTC
+  GitDate      Tue Dec 24 15:30:45 2024 +0100
+  RubyDate     Tue Dec 24 15:30:45 +0100 2024
 
-    time2str(1735052445.123456, precision => 3)
-    # '2024-12-24T15:30:45.123Z'
+C<UnixStamp> is a superset of C<ANSIC>, C<GitDate>, C<RubyDate>,
+and C<UnixDate>.
 
-    time2str(1735052445.999999, precision => 3)
-    # '2024-12-24T15:30:46.000Z' (rounds up to next second)
+=head2 Other
 
-    time2str(1735052445.999999, precision => 0)
-    # '2024-12-24T15:30:46Z' (rounds up, fraction omitted)
+  ECMAScript   Tue Dec 24 2024 15:30:45 GMT+0100
+  CLF          24/Dec/2024:15:30:45 +0100
+  DateTime     (permissive, multi-format parser)
 
-=head2 Bypassing Rounding
-
-The C<nanosecond> parameter overrides the fractional part of C<$time> and
-is not subject to rounding, giving exact control over the output:
-
-    time2str(1735052445, nanosecond => 999_999_000, precision => 6)
-    # '2024-12-24T15:30:45.999999Z' (exact, no rounding)
-
-    time2str(1735052445, nanosecond => 0)
-    # '2024-12-24T15:30:45Z' (no fractional part)
-
-=head1 FLOATING-POINT PRECISION
-
-Perl typically uses IEEE 754 double-precision (64-bit) floating-point,
-providing approximately 15-17 significant decimal digits shared between
-the integer and fractional parts of a number.
-
-=head2 Implications for Timestamps
-
-Whole seconds are always represented exactly within the supported date
-range (0001-01-01 to 9999-12-31).
-Fractional precision depends on the magnitude of the timestamp:
-
-=over 4
-
-=item * B<Millisecond precision> (C<precision =E<gt> 3>) is exact and stable
-across the entire supported date range.
-
-=item * B<Microsecond precision> (C<precision =E<gt> 6>) is reliable for
-timestamps within roughly ±140 years of the Unix epoch (1830-2110). Beyond
-this range, values may shift by ±1 microsecond due to floating-point spacing.
-
-=item * B<Nanosecond precision> cannot be represented faithfully in a
-floating-point timestamp. Use the C<nanosecond> parameter for exact
-sub-microsecond values.
-
-=back
-
-=head2 Default Precision
-
-When C<time2str> formats a timestamp with fractional seconds and neither
-C<precision> nor C<nanosecond> is specified, it uses a system-dependent
-default determined at compile time:
-
-=over 4
-
-=item * B<6 decimal places> on standard 64-bit double-precision systems
-
-=item * B<9 decimal places> on platforms with extended floating-point
-(e.g., long double)
-
-=back
-
-This default prevents spurious trailing digits caused by floating-point
-representation. For explicit control, always specify C<precision> or
-C<nanosecond>.
+C<DateTime> can parse C<ISO8601> (extended format), C<RFC3339>,
+C<RFC9557>, C<RFC4287>, C<W3CDTF>, C<ISO9075>, C<RFC2822>,
+C<RFC2616>, C<RFC3501>, and C<ECMAScript> formats.
 
 =head1 SUPPORTED FORMATS
 
@@ -494,13 +462,15 @@ B<Parsing>:
 
 Hours are required; minutes and seconds are optional. The fractional part
 may use a period or comma and applies to the least significant time
-component present:
+component present. The timezone designator is optional.
 
-  2024122415Z                  # hour only
+  2024122415                   # hour only, no timezone
+  2024122415Z                  # hour only, UTC
   2024122415,5Z                # decimal hour (30 minutes)
   201212241530Z                # hour and minute
   201212241530,5Z              # decimal minute (30 seconds)
-  20121224153045Z              # full time
+  20121224153045               # full time, no timezone
+  20121224153045Z              # full time, UTC
   20121224153045.500Z          # with fractional seconds
   20121224153045,123456789Z    # nanoseconds, comma separator
   20121224153045+0100          # with numeric offset
@@ -549,7 +519,7 @@ B<Limitations>: Fractional seconds are not supported.
 
 =head2 CLF
 
-Common Log Format.
+Common Log Format. Used by web servers like Apache and Nginx.
 
   DD/MMM/YYYY:HH:MM:SS[.fraction] ±HHMM
 
@@ -572,15 +542,49 @@ B<Formatting>:
   time2str(1735052445.5, format => 'CLF', precision => 3, offset => 60)
   # '24/Dec/2024:16:30:45.500 +0100'
 
-=head2 Generic
+=head2 DateTime
 
 A permissive parser that accepts a wide variety of real-world date/time
 representations, restricted to those that can be parsed deterministically.
 B<Parsing only>; cannot be used with C<time2str>.
 
-See L</GENERIC FORMAT PARSING> for the full grammar, rules, and examples.
+See L</DATETIME FORMAT PARSING> for the full grammar, rules, and examples.
 
-=head2 Git
+=head2 ECMAScript (alias: JavaScript)
+
+ECMAScript C<Date.prototype.toString> format.
+
+  DDD MMM DD YYYY HH:MM:SS [GMT|UTC]±HHMM [(comment)]
+
+B<Parsing>:
+
+Day name is required. An optional parenthesized comment (e.g., timezone name) 
+may follow the offset and is discarded. C<GMT> or C<UTC> before the offset
+is captured in C<tz_utc>.
+
+  Tue Dec 24 2024 15:30:45 GMT+0100 (Central European Standard Time)
+  Tue Dec 24 2024 15:30:45 +0000
+  Tue Dec 24 2024 15:30:45 UTC+0530 (India Standard Time)
+  Mon Jan 01 2024 00:00:00 GMT+0000 (Coordinated Universal Time)
+
+Timezone offset format: C<±HHMM> (required)
+
+B<Formatting>:
+
+  time2str(1735052445, format => 'ECMAScript')
+  # 'Tue Dec 24 2024 15:30:45 GMT+0000'
+
+  time2str(1735052445, format => 'ECMAScript', offset => 60)
+  # 'Tue Dec 24 2024 16:30:45 GMT+0100'
+
+B<Limitations>: Fractional seconds are not supported. Parenthesized
+comment is not preserved in formatting.
+
+=head2 Generic
+
+Deprecated. Use C<DateTime> instead.
+
+=head2 GitDate (alias: Git)
 
 Default date format used by Git.
 
@@ -595,13 +599,64 @@ Timezone offset format: C<±HHMM>
 
 B<Formatting>:
 
-  time2str(1735052445, format => 'Git')
+  time2str(1735052445, format => 'GitDate')
   # 'Tue Dec 24 15:30:45 2024 +0000'
 
-  time2str(1735052445, format => 'Git', offset => 60)
+  time2str(1735052445, format => 'GitDate', offset => 60)
   # 'Tue Dec 24 16:30:45 2024 +0100'
 
 B<Limitations>: Fractional seconds are not supported.
+
+=head2 ISO8601
+
+Calendar date and time as defined in ISO 8601. Accepts both extended
+(with separators) and basic (compact) forms. Minutes, seconds,
+fractional seconds, and timezone are all optional when a time is present.
+The fractional part applies to the least significant time component
+present, allowing decimal hours and decimal minutes.
+
+Extended format:
+
+  YYYY-MM-DD
+  YYYY-MM-DDThh[:mm[:ss]][(.|,)fraction][Z|±hh[:mm]]
+
+Basic format:
+
+  YYYYMMDD
+  YYYYMMDDThh[mm[ss]][(.|,)fraction][Z|±hh[mm]]
+
+B<Parsing>:
+
+  2024-12-24                   # date only (extended)
+  20241224                     # date only (basic)
+  2024-12-24T15Z               # hour only
+  2024-12-24T15,5Z             # decimal hour (15:30)
+  2024-12-24T15:30Z            # hour and minute
+  2024-12-24T15:30.5Z          # decimal minute (15:30:30)
+  2024-12-24T15:30:45Z         # full time
+  2024-12-24T15:30:45.500Z     # fractional seconds
+  2024-12-24T15:30:45,500Z     # comma separator
+  20241224T153045Z             # basic
+  20241224T1530,5Z             # basic, decimal minute
+  20241224T153045+0100         # basic with offset
+  2024-12-24T15:30:45+01:00    # extended with offset
+
+B<Formatting>:
+
+Produces extended format, identical to RFC3339.
+
+  time2str(1735052445, format => 'ISO8601')
+  # '2024-12-24T15:30:45Z'
+
+  time2str(1735052445, format => 'ISO8601', offset => 60)
+  # '2024-12-24T16:30:45+01:00'
+
+  time2str(1735052445.5, format => 'ISO8601', precision => 3)
+  # '2024-12-24T15:30:45.500Z'
+
+B<Limitations>: Formatting always produces extended format with full
+time (hours, minutes, seconds). Date-only, basic format, decimal hours,
+and decimal minutes are not produced.
 
 =head2 ISO9075 (alias: SQL)
 
@@ -665,19 +720,21 @@ Fractional seconds are not supported.
 
 Internet Message Format date as defined in RFC 2822 / RFC 5322.
 
-  [DDD,] D MMM YYYY HH:MM[:SS] (±HHMM|UT|UTC|GMT|abbrev)
+  [DDD,] D MMM YYYY HH:MM[:SS] (±HHMM|UT|UTC|GMT|abbrev) [(comment)]
 
 B<Parsing>:
 
 Day name and seconds are optional. Accepts numeric offsets, UTC
 designators (C<UT>, C<UTC>, C<GMT>), and timezone abbreviations.
 Abbreviations are returned in C<tz_abbrev> without resolution.
+An optional trailing comment in parentheses is accepted but discarded.
 
-  Mon, 24 Dec 2012 15:30:45 +0100     # tz_offset => 60
+  Mon, 24 Dec 2012 15:30:45 +0100
   Mon, 24 Dec 2012 15:30 +0100
   24 Dec 2012 15:30:45 +0100
-  24 Dec 2012 15:30:45 GMT            # tz_utc => 'GMT', tz_offset => 0
-  24 Dec 2012 15:30:45 CET            # tz_abbrev => 'CET'
+  24 Dec 2012 15:30:45 GMT
+  24 Dec 2012 15:30:45 CET
+  24 Dec 2012 15:30:45 +0100 (CET)
 
 Timezone offset format: C<±HHMM>
 
@@ -695,9 +752,31 @@ Always produces a numeric offset:
 
 B<Limitations>: Fractional seconds are not supported.
 
+=head2 RFC2822FWS
+
+Permissive variant of C<RFC2822> that accepts folding white space (FWS)
+between fields and nested comments, as allowed by the raw RFC 2822
+grammar before header unfolding.
+
+  [DDD,] D MMM YYYY HH:MM[:SS] (±HHMM|UT|UTC|GMT|abbrev) [(comment)]
+
+B<Parsing>:
+
+Whitespace between fields may be any combination of spaces, tabs, and
+folding (multiple whitespace characters). Comments may be nested.
+
+  Mon, 24 Dec 2012 15:30:45 +0100
+  Mon,  24  Dec  2012  15:30:45  +0100
+  24 Dec 2012 15:30:45 +0100 (Central (European) Time)
+
+B<Formatting>: Identical to C<RFC2822>.
+
+Use this format when parsing raw, unfolded email headers. For most
+applications, C<RFC2822> is preferred.
+
 =head2 RFC3339
 
-Internet timestamp as defined in RFC 3339, a profile of ISO 8601.
+Internet timestamp as defined in RFC 3339. Based on ISO 8601.
 
   YYYY-MM-DD(T|t| )HH:MM:SS[.fraction](Z|z|±HH:MM)
 
@@ -729,11 +808,37 @@ Always produces uppercase C<T> and C<Z> (or C<±HH:MM>):
   time2str(1735052445.5, format => 'RFC3339', precision => 3)
   # '2024-12-24T15:30:45.500Z'
 
+=head2 RFC3501 (aliases: RFC9051, IMAP)
+
+IMAP internal date format as defined in RFC 3501 and RFC 9051.
+
+  DD-MMM-YYYY HH:MM:SS ±HHMM
+
+B<Parsing>:
+
+Day is always two digits (zero-padded). Month name is case-insensitive.
+
+  24-Dec-2024 15:30:45 +0100
+  01-Jan-2024 00:00:00 +0000
+  24-dec-2024 15:30:45 -0500
+
+Timezone offset format: C<±HHMM> (required)
+
+B<Formatting>:
+
+  time2str(1735052445, format => 'RFC3501')
+  # '24-Dec-2024 15:30:45 +0000'
+
+  time2str(1735052445, format => 'RFC3501', offset => 60)
+  # '24-Dec-2024 16:30:45 +0100'
+
+B<Limitations>: Fractional seconds are not supported.
+
 =head2 RFC4287 (alias: ATOM)
 
-Atom feed timestamp as defined in RFC 4287. Stricter than RFC 3339:
-requires uppercase C<T> and C<Z>, no space separator, no lowercase
-designators.
+Atom feed timestamp as defined in RFC 4287. Profile of ISO 8601.
+Stricter than RFC 3339: requires uppercase C<T> and C<Z>, no space
+separator, no lowercase designators.
 
   YYYY-MM-DDTHH:MM:SS[.fraction](Z|±HH:MM)
 
@@ -748,7 +853,93 @@ Timezone offset format: C<±HH:MM>
 
 B<Formatting>: Identical to RFC3339.
 
-=head2 Ruby
+=head2 RFC5280 (alias: x509)
+
+X.509 certificate validity times as defined in RFC 5280. Certificates 
+encode validity as ASN.1 UTCTime (two-digit year) for dates before 2050 
+and GeneralizedTime (four-digit year) for dates from 2050 onward. Both 
+forms require UTC and do not permit fractional seconds or timezone offsets.
+
+  YYMMDDhhmmssZ           # UTCTime
+  YYYYMMDDhhmmssZ         # GeneralizedTime
+
+B<Parsing>:
+
+Accepts both forms. Two-digit years are expanded using C<pivot_year>
+(default 1950), which matches the RFC 5280 convention: years 00-49 map
+to 2000-2049, years 50-99 map to 1950-1999.
+
+  121224153045Z            # UTCTime, year 12 -> 2012
+  491231235959Z            # UTCTime, year 49 -> 2049
+  500101000000Z            # UTCTime, year 50 -> 1950
+  20500101000000Z          # GeneralizedTime
+  99991231235959Z          # GeneralizedTime
+
+B<Formatting>:
+
+Automatically selects the form based on the timestamp: UTCTime for dates
+before 2050-01-01T00:00:00Z, GeneralizedTime for dates from 2050 onward.
+
+  time2str(1356359445, format => 'RFC5280')
+  # '121224143045Z'        - before 2050, UTCTime
+
+  time2str(2524608000, format => 'RFC5280')
+  # '20500101000000Z'      - from 2050, GeneralizedTime
+
+B<Limitations>: Always UTC. The C<offset> parameter is ignored.
+Fractional seconds are not supported.
+
+=head2 RFC5545 (alias: iCal)
+
+iCalendar date and date-time as defined in RFC 5545. Profile of ISO 8601.
+
+  YYYYMMDD
+  YYYYMMDDThhmmss[Z]
+
+B<Parsing>:
+
+Date-only and date-time forms are accepted. Without C<Z>, parses as
+local time with no C<tz_offset>.
+
+  20241224                     # date only
+  20241224T153045              # local time
+  20241224T153045Z             # UTC
+
+B<Formatting>:
+
+  time2str(1735052445, format => 'RFC5545')
+  # '20241224T153045Z'
+
+B<Limitations>: Always UTC. The C<offset> parameter is ignored.
+Fractional seconds are not supported.
+
+=head2 RFC9557 (alias: IXDTF)
+
+Internet Extended Date/Time Format as defined in RFC 9557. Extends
+RFC 3339 with optional bracketed suffix tags for timezone annotations
+and calendar systems.
+
+  YYYY-MM-DD(T|t| )HH:MM:SS[.fraction](Z|z|±HH:MM)[tags]
+
+B<Parsing>:
+
+The base timestamp follows RFC 3339 syntax. One or more bracketed suffix
+tags may follow the timezone. Tag content matches C<[0-9A-Za-z!+-._/]+>.
+Tags are captured verbatim in C<tz_annotation> without validation or
+interpretation; no constraints are enforced on tag content beyond the
+character class. Intended for use with C<str2date>.
+
+  2024-12-24T15:30:45Z
+  2024-12-24T15:30:45+01:00[Europe/Stockholm]
+  2024-12-24T15:30:45Z[Europe/Stockholm]
+  2024-12-24T15:30:45.500+05:30[Asia/Kolkata]
+  2024-12-24T15:30:45Z[Europe/Stockholm][u-ca=gregory]
+
+Timezone offset format: C<±HH:MM>
+
+B<Formatting>: Identical to RFC3339 (tags are not preserved).
+
+=head2 RubyDate (alias: Ruby)
 
 Date format popularized by Ruby on Rails and Twitter.
 
@@ -763,15 +954,15 @@ Timezone offset format: C<±HHMM>
 
 B<Formatting>:
 
-  time2str(1735052445, format => 'Ruby')
+  time2str(1735052445, format => 'RubyDate')
   # 'Tue Dec 24 15:30:45 +0000 2024'
 
-  time2str(1735052445, format => 'Ruby', offset => 60)
+  time2str(1735052445, format => 'RubyDate', offset => 60)
   # 'Tue Dec 24 16:30:45 +0100 2024'
 
 B<Limitations>: Fractional seconds are not supported.
 
-=head2 Unix
+=head2 UnixDate (alias: Unix)
 
 The C<date(1)> command output format as defined by POSIX.
 
@@ -800,13 +991,57 @@ B<Formatting>:
 Always produces the zone-before-year. Uses C<UTC> for zero offset
 and a numeric offset otherwise.
 
-  time2str(1735052445, format => 'Unix')
+  time2str(1735052445, format => 'UnixDate')
   # 'Tue Dec 24 15:30:45 UTC 2024'
 
-  time2str(1735052445, format => 'Unix', offset => 60)
+  time2str(1735052445, format => 'UnixDate', offset => 60)
   # 'Tue Dec 24 16:30:45 +0100 2024'
 
 B<Limitations>: Fractional seconds are not supported.
+
+=head2 UnixStamp
+
+Unix C<date(1)> based format with optional fractional seconds and
+timezone. A superset of C<ANSIC>, C<GitDate>, C<RubyDate>, and 
+C<UnixDate> formats.
+
+  [DDD] MMM (_D|D|DD) hh:mm[:ss[.fraction]] [±HHMM|UTC|GMT|abbrev] YYYY
+  [DDD] MMM (_D|D|DD) hh:mm[:ss[.fraction]] YYYY [±HHMM|UTC|GMT|abbrev]
+
+B<Parsing>:
+
+Day name is optional. Day may be space-padded or zero-padded.
+Seconds and fractional seconds are optional. Timezone may appear
+before or after the year.
+
+  Sun Jul 17 06:53:23 2022
+  Sun Jul  3 06:53:23 2022
+  Jul 17 06:53:23 2022
+  Sun Jul 17 20:35:45.089105460 2022
+  Sun Jul 17 06:53:23 +0100 2022
+  Sun Jul 17 06:53:23 EDT 2022
+  Sun Jul 17 06:53:23 2022 +0100
+  Sun Jul 17 06:53:23 2022 EDT
+  Sun Jul 17 06:53:23 GMT+0100 2022
+  Jul 17 06:53 2022
+
+Timezone offset format: C<±HHMM>
+
+See L</TIMEZONE ABBREVIATIONS>.
+
+B<Formatting>:
+
+Always produces the zone-before-year. Uses C<UTC> for zero offset
+and a numeric offset otherwise.
+
+  time2str(1658044403, format => 'UnixStamp')
+  # 'Sun Jul 17 06:53:23 UTC 2022'
+
+  time2str(1658044403, format => 'UnixStamp', offset => 60)
+  # 'Sun Jul 17 07:53:23 +0100 2022'
+
+  time2str(1658044403.5, format => 'UnixStamp', precision => 3)
+  # 'Sun Jul 17 06:53:23.500 UTC 2022'
 
 =head2 W3CDTF (alias: W3C)
 
@@ -834,24 +1069,23 @@ Timezone offset format: C<±HH:MM>
 
 B<Formatting>: Identical to RFC3339.
 
-=head1 GENERIC FORMAT PARSING
+=head1 DATETIME FORMAT PARSING
 
-The C<generic> format parser accepts a wide variety of real-world date/time
+The C<DateTime> format parser accepts a wide variety of real-world date/time
 representations, restricted to those that can be parsed deterministically.
-B<Parsing only>; cannot be used with C<time2str>.
 A date is always required. Time and timezone are optional, but a timezone
 may only appear when a time is present.
 
 =head2 Date
 
-Three categories of date format are accepted.
+A date is always required. Three categories are accepted.
 
 =head3 Numeric Dates (Y-M-D only)
 
 When all three components are numeric, they B<must> appear in
 year-month-day order to avoid the ambiguity between American (M/D/Y) and
 European (D/M/Y) conventions. The separator must be a hyphen, slash, or
-period, and must be consistent within the date.
+period, consistent within the date.
 
   2024-12-24
   2024/12/24
@@ -865,47 +1099,59 @@ These are rejected:
 
 =head3 Dates with Textual Months
 
-When the month is a name or Roman numeral it is unambiguous, so the day
-and year may appear in any order relative to the month. Month names may
-be abbreviated (C<Jan>, C<Feb>, ...) or written in full (C<January>,
-C<February>, ...). Roman numerals C<I> through C<XII> are accepted.
-Separators follow the same rules as numeric dates, or spaces may be used.
+When the month is given as a name or Roman numeral it is unambiguous, so
+the day and year may appear in any order relative to the month. Month
+names may be abbreviated (C<Jan>, C<Feb>, ...) or written in full
+(C<January>, C<February>, ...).
 
-Separator-based:
+Roman numerals (C<I> through C<XII>) are accepted only in day-month-year 
+order.
 
-  2024-Dec-24
-  24-Dec-2024
-  Dec-24-2024
+Month names and Roman numerals are all case-insensitive.
+
+Separator-based (hyphen, slash, or period, consistent within the date):
+
+  2024-Dec-24       # Y-M-D
+  24-Dec-2024       # D-M-Y
+  Dec-24-2024       # M-D-Y
   2024/December/24
-  24.XII.2024
+  24.XII.2024       # Roman numeral, D-M-Y only
 
 Space-separated:
 
   24 December 2024
-  24th December 2024
   December 24, 2024
+  24. XII. 2024
+
+In space-separated dates, an ordinal suffix (C<st>, C<nd>, C<rd>, C<th>)
+or a trailing period may follow the day. A trailing period or comma may 
+follow the month:
+
+  24th December 2024
+  24. December 2024
   December 24th, 2024
   24. XII. 2024
+  24 XII. 2024
+  24. XII 2024
 
 =head3 Compact Dates (No Separators)
 
-Accepted only when the month is textual:
+Accepted only when the month is textual. Roman numerals are accepted in
+day-month-year order:
 
   24DEC2024
   24Dec2024
   2024DEC24
   2024Dec24
+  24XII2024
 
-=head3 Day Names and Ordinal Suffixes
+=head3 Day Names
 
 An optional day name prefix (e.g., C<Monday,> or C<Mon,>) is accepted
-before the date but not validated against the actual date. Ordinal
-suffixes (C<st>, C<nd>, C<rd>, C<th>) are accepted after a numeric day
-but not validated.
+before the date. Day names are case-insensitive.
 
   Monday, 24 December 2024
   Mon, 24 Dec 2024
-  December 24th, 2024
 
 =head3 Year
 
@@ -921,45 +1167,40 @@ comma and space, the word C<at> surrounded by spaces, or a plain space.
   December 24, 2024, 15:30
   Monday, 24th December 2024 at 3:30 pm
 
-=head3 Hours and Minutes
+Either C<HH:MM> or C<HH> with an AM/PM indicator is required as a
+minimum.
 
-Separated by a colon. Hours may be one or two digits; minutes are always
-two digits.
+=head3 24-Hour Time
 
-  9:05
+Hours and minutes separated by a colon. Hours may be one or two digits;
+minutes are always two digits. Seconds are optional (two digits,
+colon-separated). An optional fractional part may follow the seconds,
+separated by a period or comma, up to nine digits.
+
   15:30
-
-=head3 Seconds
-
-Optional, separated from minutes by a colon, always two digits.
-
+  9:05
   15:30:45
-
-=head3 Fractional Seconds
-
-An optional fractional part may follow the seconds, separated by a period
-or comma. Up to nine digits (nanosecond precision) are accepted.
-
-  15:30:45.5
   15:30:45.500
-  15:30:45.123456789
   15:30:45,500
+  15:30:45.123456789
 
-=head3 12-Hour Clock
+=head3 12-Hour Time
 
-An AM/PM indicator may follow the time with or without a space:
+An AM/PM indicator is required. Hours must be 1-12. Minutes, seconds, and
+fractional seconds follow the same rules as 24-hour time but are optional.
+The indicator may appear with or without a separating space.
+
+Accepted forms: C<AM>, C<am>, C<PM>, C<pm>, C<A.M.>, C<a.m.>, C<P.M.>,
+C<p.m.>
 
   3 PM
   3PM
   3:30 PM
-  3:30:45 PM
-  3:30:45.500 PM
-  3:30 pm
-  3:30 P.M.
-  3:30 p.m.
+  3:30:45 pm
+  3:30:45.500 P.M.
+  12 p.m.
 
-When present, the hour must be 1-12. Midnight is C<12:00 AM>, noon is
-C<12:00 PM>.
+Midnight is C<12:00 AM>, noon is C<12:00 PM>.
 
 =head2 Timezone
 
@@ -973,22 +1214,29 @@ C<UTC+05:30>), in which case C<tz_offset> reflects that offset.
 
 =head3 Numeric Offsets
 
-  ±1
-  ±01
-  ±0100
-  ±01:00
-  ±05:30
+Two-digit hours only:
+
+  ±HH
+  ±HHMM
+  ±HH:MM
+
+  +01
+  +0100
+  +01:00
+  +05:30
 
 =head3 Combined UTC and Offset
 
-C<UTC> or C<GMT> followed immediately by a numeric offset. C<tz_utc> is
-set to the designator; C<tz_offset> reflects the numeric part:
+C<UTC> or C<GMT> followed immediately by a numeric offset. Single-digit
+hours are only accepted in this combined form. C<tz_utc> is set to the
+designator; C<tz_offset> reflects the numeric part:
 
   UTC+1
+  UTC+5:30
   UTC+01:00
   GMT+5:30
 
-=head3 Timezone Abbreviations
+=head3 Abbreviations
 
 Abbreviations matching C<[A-Z][A-Za-z][A-Z]{1,4}> are accepted. UTC
 designators are handled as above; all others (e.g., C<EST>, C<CET>,
@@ -996,7 +1244,7 @@ C<IST>) are returned in C<tz_abbrev> without resolution.
 
 See L</TIMEZONE ABBREVIATIONS>.
 
-=head3 Timezone Annotations
+=head3 Annotations
 
 RFC 9557 (IXDTF) bracketed tags and Java C<ZoneId> annotations are
 captured in C<tz_annotation>. Parenthesized comments are accepted but
@@ -1011,6 +1259,10 @@ discarded.
 =head2 Validation
 
 =over 4
+
+=item * Ordinal suffixes, when present, must match the day number
+
+=item * Day names, when present, must match the date
 
 =item * Dates must be valid for the Gregorian calendar, including leap years
 
@@ -1044,7 +1296,7 @@ discarded.
   # RFC 2616 (HTTP)
   Mon, 24 Dec 2024 15:30:45 GMT
 
-  # RFC 9051 (IMAP)
+  # RFC 3501 (IMAP)
   24-Dec-2024 15:30:45 +0100
 
   # ISO 9075 (SQL)
@@ -1065,9 +1317,102 @@ discarded.
   24DEC2024 12:30:45.500
   24.Dec.2024 15:30:45
 
+=head1 PRECISION HANDLING
+
+The module handles fractional seconds differently when parsing versus
+formatting.
+
+=head2 Parsing (str2time)
+
+Fractional seconds beyond the specified precision are B<truncated>. This 
+preserves the exact digits provided in the input up to the requested 
+precision:
+
+    str2time('2024-12-24T15:30:45.123456Z', precision => 3)
+    # Returns: 1735052445.123 (digits beyond 3rd truncated)
+
+    str2time('2024-12-24T15:30:45.999999Z', precision => 3)
+    # Returns: 1735052445.999 (NOT .000 of next second)
+
+B<Note>: C<str2date> does not accept a precision parameter. It always
+preserves fractional seconds at full nanosecond resolution in the
+C<nanosecond> component.
+
+=head2 Formatting (time2str)
+
+Fractional seconds are B<rounded> to the specified precision. Rounding
+prevents floating-point artifacts from appearing in formatted output:
+
+    time2str(1735052445.123456, precision => 3)
+    # '2024-12-24T15:30:45.123Z'
+
+    time2str(1735052445.999999, precision => 3)
+    # '2024-12-24T15:30:46.000Z' (rounds up to next second)
+
+    time2str(1735052445.999999, precision => 0)
+    # '2024-12-24T15:30:46Z' (rounds up, fraction omitted)
+
+=head2 Bypassing Rounding
+
+The C<nanosecond> parameter overrides the fractional part of C<$time> and
+is not subject to rounding, giving exact control over the output:
+
+    time2str(1735052445, nanosecond => 999_999_000, precision => 6)
+    # '2024-12-24T15:30:45.999999Z' (exact, no rounding)
+
+    time2str(1735052445, nanosecond => 0)
+    # '2024-12-24T15:30:45Z' (no fractional part)
+
+=head1 FLOATING-POINT PRECISION
+
+Perl's floating-point type (NV) is typically IEEE 754 double-precision
+(64-bit), providing approximately 15-17 significant decimal digits
+shared between the integer and fractional parts of a number.
+
+=head2 Implications for Timestamps
+
+Whole seconds are always represented exactly within the supported date
+range (0001-01-01 to 9999-12-31).
+
+Fractional precision depends on the magnitude of the timestamp:
+
+=over 4
+
+=item * B<Millisecond precision> (C<precision =E<gt> 3>) is exact and stable
+across the entire supported date range.
+
+=item * B<Microsecond precision> (C<precision =E<gt> 6>) is reliable for
+timestamps within roughly ±140 years of the Unix epoch (1830-2110). Beyond
+this range, values may shift by ±1 microsecond due to floating-point spacing.
+
+=item * B<Nanosecond precision> cannot be represented faithfully in a
+floating-point timestamp. Use the C<nanosecond> parameter for exact
+sub-microsecond values.
+
+=back
+
+=head2 Default Precision
+
+When C<time2str> formats a timestamp with fractional seconds and neither
+C<precision> nor C<nanosecond> is specified, it uses a default based on
+Perl's NV (floating-point) type:
+
+=over 4
+
+=item * B<6 decimal places> when NV is double-precision (64-bit)
+
+=item * B<9 decimal places> when NV has extended precision
+(e.g., long double)
+
+=back
+
+This default prevents spurious trailing digits caused by floating-point
+representation. For explicit control, always specify C<precision> or
+C<nanosecond>.
+
 =head1 TIMEZONE ABBREVIATIONS
 
-The C<Generic>, C<RFC2822>, and C<Unix> parsers accept timezone
+The C<DateTime>, C<RFC2822>, and C<Unix> parsers accept timezone
 abbreviations.
 
 =over 4
@@ -1085,7 +1430,6 @@ C<CET>, or C<IST> to numeric offsets, as many are ambiguous (e.g.,
 C<IST> could mean India Standard Time UTC+5:30, Israel Standard Time
 UTC+2, or Irish Standard Time UTC+1).
 
-
 =back
 
 C<str2time> requires a resolved offset and will croak if only an
@@ -1093,45 +1437,493 @@ unresolved abbreviation is present. Use C<str2date> to retrieve the
 components including C<tz_abbrev>, then resolve externally:
 
     my %d = str2date('24 Dec 2012 15:30:45 IST', format => 'RFC2822');
-    # (..., tz_abbrev => 'IST') # no tz_offset
+    # (..., tz_abbrev => 'IST')
 
-    my %d = str2date('24 Dec 2012 15:30:45 GMT', format => 'RFC2822');
-    # (..., tz_utc => 'GMT', tz_offset => 0)
+=head1 CONSTANTS
 
+=head2 IMPLEMENTATION
 
-=head1 SEE ALSO
+    say Time::Str::IMPLEMENTATION;  # "XS" or "PP"
 
-L<Time::Moment>, L<DateTime>, L<Time::Piece>
+Returns the active backend: C<XS> when the C/XS implementation is
+loaded, C<PP> when using Pure Perl. Set the C<TIME_STR_PP> environment
+variable before loading the module to force the Pure-Perl backend.
+
+=head2 MIN_TIME
+
+    Time::Str::MIN_TIME  # -62135596800 (0001-01-01T00:00:00Z)
+
+The smallest Unix timestamp accepted by C<time2str>.
+
+=head2 MAX_TIME
+
+    Time::Str::MAX_TIME  # 253402300799 (9999-12-31T23:59:59Z)
+
+The largest Unix timestamp accepted by C<time2str>.
+
+=head2 NON_CONSTRUCTOR_KEYS
+
+    my %date = str2date($string);
+
+    my $tm = do {
+      delete local @date{Time::Str::NON_CONSTRUCTOR_KEYS};
+      Time::Moment->new(%date, offset => $offset);
+    };
+
+Returns a list of keys that C<str2date> may return which are not
+direct constructor parameters for L<DateTime> or L<Time::Moment>:
+C<tz_abbrev>, C<tz_annotation>, C<tz_offset>, and C<tz_utc>.
+This list is maintained across releases - if future versions of
+C<str2date> add new non-component keys, they will be included here.
+Using this constant instead of a hard-coded list ensures your code
+remains forward-compatible.
+
+Use C<local>/C<delete> to temporarily/permanently remove these keys 
+before forwarding the remaining components to a constructor.
+
+=head1 INTEROPERABILITY
+
+C<str2date> returns date/time components that can be forwarded to 
+constructors of other date/time modules. C<str2time> returns a Unix
+epoch suitable for C<from_epoch> style constructors.
+
+=head2 DateTime
+
+    use Time::Str qw(str2time str2date);
+    
+    # From epoch
+    my $dt = DateTime->from_epoch(epoch => str2time('2024-12-24T15:30:45Z'));
+    
+    # From components (preserves nanoseconds and offset)
+    my %date = str2date('20241224T153045,500+0100', format => 'ISO8601');
+    my $dt = DateTime->new(
+      year       => $date{year},
+      month      => $date{month},
+      day        => $date{day},
+      hour       => $date{hour},
+      minute     => $date{minute},
+      second     => $date{second},
+      nanosecond => $date{nanosecond},
+      time_zone  => DateTime::TimeZone->offset_as_string(
+                      $date{tz_offset} * 60),
+    );
+
+When no timezone offset is present, the datetime is floating:
+
+    my %date = str2date('2024-12-24 15:30:45', format => 'DateTime');
+    my $dt = DateTime->new(
+      year      => $date{year}, 
+      month     => $date{month},
+      # ...,
+      time_zone => 'floating',
+    );
+
+Timezone abbreviations are not resolved by C<str2date>. Map them to
+IANA names in your application:
+
+    my %date = str2date('24 Dec 2024 15:30:45 CET', format => 'RFC2822');
+    # $date{tz_abbrev} is 'CET'
+    my $dt = DateTime->new(
+      year      => $date{year},
+      month     => $date{month},
+      # ...,
+      time_zone => 'Europe/Stockholm',
+    );
+
+See F<eg/datetime.pl> for a complete example with timezone resolution.
+
+=head2 Time::HiRes
+
+C<time2str> accepts the floating-point timestamps returned by
+C<Time::HiRes::time>. Fractional seconds are preserved up to
+the requested precision.
+
+    use Time::HiRes qw(time);
+    use Time::Str   qw(time2str str2time);
+    
+    say time2str(time);
+    # '2024-12-24T15:30:45.123456Z'
+    
+    say time2str(time, precision => 3);
+    # '2024-12-24T15:30:45.123Z'
+    
+    say time2str(time, format => 'RFC2822', offset => 60);
+    # 'Tue, 24 Dec 2024 16:30:45 +0100'
+    
+    # Round-trip
+    my $str  = time2str(time);
+    my $back = str2time($str);
+
+See F<eg/time-hires.pl> for a complete example with format and precision options.
+
+=head2 Time::Moment
+
+    use Time::Str qw(str2time str2date);
+    
+    # From epoch
+    my $tm = Time::Moment->from_epoch(str2time('2024-12-24T15:30:45Z'));
+    
+    # From components (preserves nanoseconds and offset)
+    my %date = str2date('20241224T153045,500+0100', format => 'ISO8601');
+    my $tm = Time::Moment->new(
+      year       => $date{year},
+      month      => $date{month},
+      day        => $date{day},
+      hour       => $date{hour},
+      minute     => $date{minute},
+      second     => $date{second},
+      nanosecond => $date{nanosecond},
+      offset     => $date{tz_offset},
+    );
+
+When no timezone is present, resolve to a local IANA timezone using
+C<DateTime::TimeZone>:
+
+    use DateTime::TimeZone;
+    my %date = str2date('2024-12-24 15:30:45', format => 'DateTime');
+    my $tm = Time::Moment->new(
+      year  => $date{year}, 
+      month => $date{month},
+      # ...,
+    );
+    my $tz = DateTime::TimeZone->new(name => 'local');
+    $tm = $tm->with_offset_same_local(
+      $tz->offset_for_local_datetime($tm) / 60);
+
+Timezone abbreviations require explicit mapping:
+
+    my %date = str2date('24 Dec 2024 15:30:45 CET', format => 'RFC2822');
+    # $date{tz_abbrev} is 'CET'
+    my $tm = Time::Moment->new(
+      year  => $date{year}, 
+      month => $date{month},
+      # ...,
+    );
+    my $tz = DateTime::TimeZone->new(name => 'Europe/Stockholm');
+    $tm = $tm->with_offset_same_local(
+      $tz->offset_for_local_datetime($tm) / 60);
+
+See F<eg/time-moment.pl> for a complete example with timezone resolution.
+
+=head1 ERROR HANDLING
+
+Both the Pure-Perl and C/XS backends raise parse errors via
+C<Carp::croak>. This means C<@CARP_NOT> works as expected,
+allowing wrapper modules to control error attribution in the
+call stack.
+
+    package My::Wrapper;
+    our @CARP_NOT = ('Time::Str');
+
+    sub parse {
+      return Time::Str::str2time($_[0]);
+      # errors report from My::Wrapper's caller
+    }
+
+Usage errors (wrong number of arguments, invalid parameter values)
+in the C/XS backend are not routed through C<Carp::croak> and are
+not subject to C<@CARP_NOT>.
+
+=head1 DIAGNOSTICS
+
+=over 4
+
+=item Usage: %s
+
+(F) A function was called with an incorrect number of arguments.
+
+=item Parameter 'format' is unknown: '%s'
+
+(F) The format specifier is not recognised.
+
+=item Parameter '%s' is out of range
+
+(F) A parameter value is outside its valid range.
+
+=item Unrecognised named parameter: '%s'
+
+(F) An unrecognised named parameter was given.
+
+=item Unable to parse: %s
+
+(F) C<str2date> or C<str2time> could not parse the input string.
+
+=item Unable to convert: timestamp string without a UTC designator or numeric offset
+
+(F) C<str2time> successfully parsed the input string but cannot convert
+it to a Unix timestamp without a UTC designator or numeric offset.
+
+=back
+
+=head1 LIMITATIONS
+
+=over 4
+
+=item *
+
+No support for locale-specific formatting or parsing. Month and day
+names are English only.
+
+=item *
+
+No support for ISO 8601 week-dates (e.g., C<2024-W52-2>) or ordinal
+dates (e.g., C<2024-359>).
+
+=item *
+
+Timestamps are limited to the year range 0001-9999. Most string
+representation formats cannot represent years outside this range.
+
+=item *
+
+Timezone abbreviations (e.g., C<EST>, C<IST>) are captured in
+C<tz_abbrev> but are not resolved to UTC offsets. C<str2time> requires
+a UTC designator or numeric offset and will croak if only an
+abbreviation is present.
+
+=back
+
+=head1 EXPORTS
+
+Nothing is exported by default. Functions can be imported individually or by category:
+
+  use Time::Str qw(time2str str2time str2date);  # individual functions
+  use Time::Str qw(:all);                        # all functions
+
+=head1 IMPLEMENTATION
+
+Time::Str ships with two backends: an optional C/XS implementation
+(compiled with C99) and a Pure-Perl fallback. The XS backend is
+selected automatically when a C99 compiler is available at install
+time.
+
+The XS backend includes native C parsers (generated by Ragel) for
+ASN.1 GeneralizedTime, ECMAScript, ISO 8601, ISO 9075, RFC 2822, 
+RFC 3339, RFC 4287, RFC 9557 and W3CDTF formats. When  available, 
+these are tried first; if no native parser exists for the requested 
+format, parsing falls back to the precompiled regular  expressions 
+from L<Time::Str::Regexp>. Both paths produce identical results.
+
+To force the Pure-Perl backend, set the environment variable
+C<TIME_STR_PP> before loading the module:
+
+    BEGIN { $ENV{TIME_STR_PP} = 1 }
+    use Time::Str;
+
+The active backend can be queried at runtime:
+
+    say Time::Str::IMPLEMENTATION;  # "XS" or "PP"
+
+=head1 PREREQUISITES
+
+Requires Perl v5.10.1 or later. A C99 compiler is recommended but not
+required; if unavailable, the module falls back to a Pure-Perl
+implementation.
+
+=head1 RATIONALE
+
+=head2 strftime and strptime
+
+L<strftime|https://pubs.opengroup.org/onlinepubs/9799919799/functions/strftime.html>
+and
+L<strptime|https://pubs.opengroup.org/onlinepubs/9799919799/functions/strptime.html>
+are the traditional C library interfaces for formatting and parsing
+date/time strings. While widely available, they have limitations that
+make them unsuitable for reliable timestamp handling across formats:
+
+=over 4
+
+=item *
+
+Both C<strftime> and C<strptime> are subject to the current locale.
+Month and day names vary by locale, making them unreliable for formats
+that require English names (e.g., RFC 2822, RFC 2616). Even English
+locales are not consistent - abbreviated month names may differ (e.g.,
+C<Sep> vs C<Sept>). Using these functions for standard formats requires
+the C locale; altering the locale in a running process has issues with
+thread safety, side effects, and slow performance.
+
+=item *
+
+C<strptime> requires a fixed format string and cannot express optional
+components (e.g., optional day name in RFC 2822, optional seconds in
+ISO 8601). Handling variations requires multiple C<strptime> calls or
+manual pre-processing.
+
+=item *
+
+C<strptime> cannot parse ISO 8601 basic format date-times (e.g.,
+C<20241224T153045Z>) where date and time components lack separators.
+
+=item *
+
+C<strftime> cannot produce ISO 8601 extended timezone offsets (C<±HH:MM>)
+portably. The C<%z> conversion produces basic format (C<±HHMM>) and there
+is no standard conversion for the extended form.
+
+=item *
+
+Neither interface handles fractional seconds or nanosecond precision.
+
+=item *
+
+There is no built-in validation of parsed components - out-of-range
+values such as month 13, day 32, or hour 25 are silently accepted.
+
+=back
+
+Time::Str provides named format specifiers that encapsulate the parsing
+and formatting rules for each standard, with strict validation of all
+components.
+
+=head2 Numeric Date Ambiguity
+
+Numeric dates in year-month-day order (C<YYYY-MM-DD>) are unambiguous.
+However, when the year is not the leading component, the interpretation
+depends on convention: C<01/02/2024> is January 2nd in American format
+(MM/DD/YYYY) but February 1st in European format (DD/MM/YYYY).
+
+When both the first and second components are in the range 1-12, either
+interpretation produces a valid date - 144 such combinations exist (12
+months x 12 days), making it impossible to determine the intended format
+from the string alone.
+
+Existing modules handle this differently:
+
+=over 4
+
+=item L<Date::Parse|https://metacpan.org/pod/Date::Parse>
+
+Assumes American (MM/DD). Swaps to year-month-day only if the first
+value exceeds 12. Documents this as a known bug with no workaround.
+
+=item L<Date::Parse::Modern|https://metacpan.org/pod/Date::Parse::Modern>
+
+Assumes European (DD/MM/YYYY) for non-year-leading formats. Swaps
+day and month if the month value exceeds 12.
+
+=item L<Time::ParseDate|https://metacpan.org/pod/Time::ParseDate>
+
+Assumes American (MM/DD) by default. A C<UK> option switches to
+European (DD/MM). Applies heuristics when values exceed 12.
+
+=back
+
+Time::Str avoids this problem entirely: numeric dates must be in
+year-month-day order. Ambiguous formats are rejected. When the month
+is given as a name or Roman numeral, day and year may appear in any
+order since the month is unambiguous.
+
+=head2 Two-Digit Year Ambiguity
+
+A two-digit year introduces century ambiguity: C<01/02/03> could be
+2003-01-02, 2003-02-01, or 2001-02-03 depending on which component
+is assumed to be the year and which convention is used for month and
+day. Existing modules apply different heuristics:
+
+=over 4
+
+=item L<Date::Parse|https://metacpan.org/pod/Date::Parse>
+
+Assumes the year is the last component (MM/DD/YY). Expands
+two-digit years using a fixed split: 69-99 to 1969-1999,
+0-68 to 2000-2068.
+
+=item L<Date::Parse::Modern|https://metacpan.org/pod/Date::Parse::Modern>
+
+Requires a four-digit year in numeric dates. Two-digit year dates
+such as C<01/02/03> are not recognised. When a two-digit year
+appears with a textual month (e.g., C<17 March 94>), it is
+unconditionally mapped to the 1900s.
+
+=item L<Time::ParseDate|https://metacpan.org/pod/Time::ParseDate>
+
+Infers the year position from value ranges. When all three values are
+12 or below, defaults to MM/DD/YY. Expands two-digit years relative
+to the current year with C<PREFER_PAST> and C<PREFER_FUTURE> options.
+
+=back
+
+The same input produces different results depending on the module
+and, in some cases, the current date.
+
+The C<datetime> format in Time::Str requires a four-digit year,
+avoiding century ambiguity entirely. Formats that inherently use
+two-digit years (C<ASN1UT>, RFC 850 within C<RFC2616>, C<RFC5280>) 
+provide a configurable C<pivot_year> parameter with a documented default.
+
+=head2 Ambiguous Timezone Abbreviations
+
+Timezone abbreviations such as C<EST>, C<IST>, and C<CST> are
+inherently ambiguous. C<IST> may refer to India Standard Time
+(+05:30), Israel Standard Time (+02:00), or Irish Standard Time
+(+01:00). C<CST> may refer to US Central Standard Time (-06:00),
+China Standard Time (+08:00), or Cuba Standard Time (-05:00).
+
+There is no authoritative registry of abbreviations, and existing
+modules resolve them differently:
+L<Date::Parse|https://metacpan.org/pod/Date::Parse>, 
+L<Date::Parse::Modern|https://metacpan.org/pod/Date::Parse::Modern>, and
+L<Time::ParseDate|https://metacpan.org/pod/Time::ParseDate>
+each ship their own lookup tables with conflicting mappings.
+
+Even when a mapping is correct for the present, it may not be
+historically accurate. Timezone rules change: regions adopt new
+offsets, daylight saving rules are revised or abolished, and
+political decisions alter zone boundaries. A static lookup table
+cannot account for these changes across time.
+
+Time::Str captures abbreviations in C<tz_abbrev> without attempting
+to resolve them, leaving interpretation to the caller.
 
 =head1 STANDARDS
 
 =over 4
 
-=item * ISO 8601:2004 - Data elements and interchange formats
+=item * L<ISO 8601:2019 - Data elements and interchange formats|https://www.iso.org/obp/ui/#iso:std:iso:8601>
 
-=item * RFC 3339 - Date and Time on the Internet: Timestamps
+=item * L<RFC 3339 - Date and Time on the Internet: Timestamps|https://datatracker.ietf.org/doc/html/rfc3339#section-5.6>
 
-=item * RFC 2822 / RFC 5322 - Internet Message Format
+=item * L<RFC 2822|https://datatracker.ietf.org/doc/html/rfc2822#section-3.3> / L<RFC 5322|https://datatracker.ietf.org/doc/html/rfc5322#section-3.3> - Internet Message Format
 
-=item * RFC 2616 / RFC 7231 - HTTP/1.1
+=item * L<RFC 2616|https://datatracker.ietf.org/doc/html/rfc2616#section-3.3> / L<RFC 7231|https://datatracker.ietf.org/doc/html/rfc7231#section-7.1.1.1> - HTTP/1.1
 
-=item * RFC 4287 - The Atom Syndication Format
+=item * L<RFC 3501|https://datatracker.ietf.org/doc/html/rfc3501#section-2.3.3> / L<RFC 9051|https://datatracker.ietf.org/doc/html/rfc9051#section-2.3.3> - Internet Message Access Protocol (IMAP)
 
-=item * RFC 9051 - Internet Message Access Protocol (IMAP)
+=item * L<RFC 4287 - The Atom Syndication Format|https://datatracker.ietf.org/doc/html/rfc4287#section-3.3>
 
-=item * RFC 9557 - Date and Time on the Internet: Timestamps with Additional Information
+=item * L<RFC 5280 - Internet X.509 Public Key Infrastructure (PKIX)|https://datatracker.ietf.org/doc/html/rfc5280#section-4.1.2.5>
 
-=item * ISO 9075 - SQL Database Language
+=item * L<RFC 5545 - Internet Calendaring and Scheduling (iCalendar)|https://datatracker.ietf.org/doc/html/rfc5545#section-3.3.4>
 
-=item * ITU-T X.680 (ISO/IEC 8824-1) - ASN.1
+=item * L<RFC 9557 - Date and Time on the Internet: Timestamps with Additional Information|https://datatracker.ietf.org/doc/html/rfc9557>
 
-=item * W3C Date and Time Formats
+=item * L<ISO 9075 - SQL Database Language|https://www.iso.org/standard/76583.html>
+
+=item * L<ITU-T X.680 (ISO/IEC 8824-1) - ASN.1|https://www.itu.int/rec/T-REC-X.680-202102-I>
+
+=item * L<W3C Date and Time Formats|https://www.w3.org/TR/NOTE-datetime>
+
+=item * L<ECMAScript Date.prototype.toString|https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-date.prototype.tostring>
 
 =back
+
+=head1 SEE ALSO
+
+L<Time::Str::Regexp>, L<Time::Str::Token>, L<Time::Str::Calendar>,
+L<Time::Moment>, L<DateTime>, L<Time::Piece>
 
 =head1 AUTHOR
 
 Christian Hansen
+
+=head1 CONTRIBUTORS
+
+=over
+
+=item Dan Book (L<cpan:DBOOK|https://metacpan.org/author/DBOOK> L<GitHub:Grinnz|https://github.com/Grinnz>)
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

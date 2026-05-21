@@ -1,4 +1,27 @@
 Revision history for Perl extension Parallel::DataPipe.
+0.14  Mon Apr 27 2026
+    - Optimized _get_data and _put_data using 4-argument sysread() and
+      syswrite() with offsets. This avoids unnecessary string copying and
+      repeated concatenations.
+    - Added buffer pre-allocation in _get_data to improve memory efficiency
+      and performance for large payloads.
+
+0.13  Tue Apr 26 2026
+    - Fixed silent data corruption in _get_data when sysread() transfers fewer
+      bytes than requested (permitted by POSIX). The payload loop now accumulates
+      bytes via concatenation and advances $offset by the actual byte count.
+      Both _get_data and _put_data add `use bytes` so that length() counts raw
+      bytes when handling Sereal/Storable payloads.
+    - Fixed _get_data and _put_data to die immediately when sysread() or
+      syswrite() returns 0 or a short count on the 4-byte frame header or EOF
+      marker, preventing silent framing corruption and infinite loops.
+    - Fixed DESTROY to guard against undef mypid (partially-constructed objects
+      no longer produce an "uninitialized value" warning).
+    - Fixed t/large-payload-integrity.t to replace the // operator with a
+      defined() ternary for compatibility with the declared Perl 5.8 floor.
+    - Added regression tests: t/large-payload-integrity.t (partial sysread via
+      IO::Handle override) and t/framing-edge-cases.t (partial header syswrite,
+      zero-byte payload sysread, DESTROY warning on bare object).
 0.11  Fri Jun 21
     - Fixed bug when destructor was invoked from children (shoud be only from main thread)
       With this fix it works ok on perl 5.8.9, put 5.8.0 as a requirement

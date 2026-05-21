@@ -33,4 +33,10 @@ for my $test (@tests) {
 	ok($passphrase->needs_rehash($hash), "$hash needs rehash");
 }
 
+ok(Crypt::Passphrase::Validator->secure_compare('a', 'a'));
+ok(!Crypt::Passphrase::Validator->secure_compare('a', 'b'));
+ok(!Crypt::Passphrase::Validator->secure_compare('a', 'ab'));
+ok(!Crypt::Passphrase::Validator->secure_compare('ab', 'ba'));
+ok(!Crypt::Passphrase::Validator->secure_compare('a', ''));
+
 done_testing;

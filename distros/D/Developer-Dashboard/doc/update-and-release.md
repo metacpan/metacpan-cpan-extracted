@@ -37,6 +37,15 @@ Hard implementation rules under this gate:
 - keep `Signed-Releases` backed by a real GitHub release that contains the release tarball and its detached signature asset
 - keep workflow coverage gates matching the `Devel::Cover` `Total` summary line by regex instead of fixed-width spacing, because host upgrades can change padding without changing the real `100.0 / 100.0 / 100.0` outcome
 
+For this repository, the signed GitHub release path is tag-driven. Push a
+version tag in the form `vX.XX` after the local gates are green when the
+repository needs a real GitHub release object for Scorecard. The workflow at
+`.github/workflows/release-github.yml` then builds the tarball, writes a
+checksum, generates a detached signature, and creates or updates the GitHub
+release for that tag. That workflow must also install `Devel::Cover` before
+it runs the numeric `cover` gate, or the release path will die before the
+tarball, checksum, and signature assets are published.
+
 ## Local Update
 
 Run:
@@ -72,6 +81,16 @@ command wants a compact summary after the hook chain finishes, it can call
 
 Use `dashboard version` to print the installed Developer Dashboard version.
 
+Before a release or push, regenerate the checkout manual with:
+
+```bash
+script/sync-readme-from-pod
+```
+
+The canonical manual source is the POD inside `lib/Developer/Dashboard.pm`.
+`README.md` is a generated checkout artifact and must not be hand-edited as a
+second independent manual.
+
 The blank-container integration harness now installs the tarball first and then
 builds a fake-project `./.developer-dashboard` tree so the shipped test suite
 still starts from a clean runtime before exercising project-local overrides.
@@ -96,6 +115,18 @@ sequence, the repository root must contain exactly one unpacked
 `Developer-Dashboard-X.XX/` build directory and exactly one matching
 `Developer-Dashboard-X.XX.tar.gz` tarball. If stale build directories remain,
 the tarball kwalitee gate must fail.
+After the source-tree `prove -lr t` and explicit `Devel::Cover` gates pass,
+verify the built tarball still installs in a blank Perl container with:
+
+```bash
+docker run --rm -v "$PWD:/work" -w /work perl:5.38-bookworm \
+  sh -lc 'cpanm --notest /work/Developer-Dashboard-X.XX.tar.gz -v'
+```
+
+That blank-container step is now an installation-verification gate. It keeps
+the packaged dependency-resolution and installed-runtime check, but it does
+not rerun the full distribution test suite a second time because the normal
+source-tree test and coverage gates already covered that work.
 
 ## Local Usage
 
@@ -257,8 +288,8 @@ Use `Developer::Dashboard::Folder` for runtime path helpers. It resolves the
 same root-style names exposed by `dashboard paths`, including runtime,
 bookmark, config, and configured alias names such as `docker`, without relying
 on unscoped CPAN-global module names.
-`dashboard init` now seeds `api-dashboard` and `sql-dashboard` as editable saved bookmarks when those ids are missing. Re-running init keeps existing user config intact, creates `config.json` as `{}` only when it is missing, keeps dashboard-managed helpers under `~/.developer-dashboard/cli/dd/`, preserves user-owned files under `~/.developer-dashboard/cli/`, and skips rewriting dashboard-managed helper or starter files when the shipped content MD5 already matches.
-`dashboard cpan <Module...>` now manages optional runtime Perl modules under `./.developer-dashboard/local` and appends matching requirements to `./.developer-dashboard/cpanfile`, with automatic `DBI` handling for `DBD::*` requests, while keeping the implementation in `bin/dashboard` and letting saved Ajax workers derive `local/lib/perl5` directly from the runtime root. The shipped SQL dashboard stays generic and does not bundle `DBD::SQLite`, `DBD::mysql`, `DBD::Pg`, `DBD::ODBC`, or `DBD::Oracle` in the base release runtime. Install only the driver you need in the user or project runtime, and keep the browser verification split between `t/31-sql-dashboard-sqlite-playwright.t` for SQLite and `t/32-sql-dashboard-rdbms-playwright.t` for the docker-backed MySQL/PostgreSQL/MSSQL/Oracle paths.
+`dashboard init` now seeds the current dashboard-managed starter pages as editable saved bookmarks when those ids are missing. Re-running init keeps existing user config intact, creates `config.json` as `{}` only when it is missing, keeps dashboard-managed helpers under `~/.developer-dashboard/cli/dd/`, preserves user-owned files under `~/.developer-dashboard/cli/`, and skips rewriting dashboard-managed helper or starter files when the shipped content MD5 already matches.
+`dashboard cpan <Module...>` now manages optional runtime Perl modules under `./.developer-dashboard/local` and appends matching requirements to `./.developer-dashboard/cpanfile`, while keeping the implementation in `bin/dashboard` and letting saved Ajax workers derive `local/lib/perl5` directly from the runtime root.
 
 ## Release To PAUSE
 
@@ -385,11 +416,9 @@ helpers such as `fetch_value()`, `stream_value()`, and `stream_data()` can
 populate the DOM from saved `/ajax/...` endpoints without manual bootstrap
 ordering fixes or whole-response buffering.
 
-For seeded UI workspaces such as `api-dashboard`, run a browser smoke from a
-fresh project-local runtime and verify the real rendered DOM includes the
-expected controls, tabs, and collection sidebar rather than only checking the
-saved bookmark source text.
-For the seeded `sql-dashboard`, also run `prove -lv t/27-sql-dashboard-playwright.t` so driver-dropdown DSN rewriting, multi-SQL collection persistence, the merged workspace navigation layout, active saved-SQL labeling, the large auto-resizing editor, inline saved-SQL deletion, SQL execution, schema tabs, and shareable `connection` URL restoration stay browser-verified.
+For seeded UI workspaces, run a browser smoke from a fresh project-local
+runtime and verify the real rendered DOM includes the expected controls and
+navigation rather than only checking the saved bookmark source text.
 
 Command-output capture is implemented with `Capture::Tiny` `capture`, with exit codes returned from the capture block. The core runtime does not currently make outbound HTTP client requests.
 

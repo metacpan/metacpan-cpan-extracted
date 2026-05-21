@@ -12,6 +12,8 @@ my @files = (
     't/00-report-prereqs.t',
     't/load.t',
     't/local-install-via-args.t',
+    't/pass-through-args.t',
+    't/skip-branches.t',
     't/test-data/darkpan/authors/01mailrc.txt',
     't/test-data/darkpan/modules/02STAMP',
     't/test-data/darkpan/modules/02packages.details.txt',

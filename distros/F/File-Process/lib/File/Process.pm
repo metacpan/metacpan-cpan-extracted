@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Carp;
-use English              qw(-no_match_vars);
+use English qw(-no_match_vars);
 use File::Process::Utils qw(:booleans :chars);
 use IO::Scalar;
 use Scalar::Util qw( openhandle );
@@ -12,7 +12,7 @@ use Data::Dumper;
 
 use parent qw( Exporter );
 
-our $VERSION = '0.12';
+our $VERSION = '1.0.0';
 
 our %DEFAULT_PROCESSORS = (
   pre       => \&_pre,
@@ -73,8 +73,7 @@ sub process_file {
   my ( $fh, $all_lines ) = $processors{'pre'}->( $file, \%args );
 
   if ( !$fh || !ref $all_lines ) {
-    croak
-      "invalid pre processor return values: wanted file handle, array ref\n";
+    croak "invalid pre processor return values: wanted file handle, array ref\n";
   }
 
   LINE: while (1) {
@@ -85,8 +84,7 @@ sub process_file {
 
     foreach my $p ( @processors{qw( filter process )} ) {
 
-      $current_line
-        = eval { return $p->( $fh, $all_lines, \%args, $current_line ); };
+      $current_line = eval { return $p->( $fh, $all_lines, \%args, $current_line ); };
 
       last LINE if $EVAL_ERROR;
 
@@ -118,10 +116,10 @@ sub _pre {
   if ( openhandle $file ) {
     $fh = $file;
 
-    $args->{file} = ref $fh; # GLOB
+    $args->{file} = ref $fh;  # GLOB
   }
   else {
-    open $fh, '<', $file     ## no critic (RequireBriefOpen)
+    open $fh, '<', $file ## no critic (RequireBriefOpen)
       or croak 'could not open ' . $file . $NL;
 
     $args->{'file'} = $file;
@@ -261,10 +259,10 @@ sub main {
 ########################################################################
   require IO::Scalar;
   require Data::Dumper;
-  require JSON::PP;
+  require JSON;
   require Text::CSV_XS;
 
-  JSON::PP->import('decode_json');
+  JSON->import('decode_json');
 
   Data::Dumper->import('Dumper');
 
@@ -331,8 +329,7 @@ END_OF_TEXT
 
   $fh = IO::Scalar->new( \$json_text );
 
-  print Dumper(
-    decode_json( process_file( $fh, merge_lines => 1, chomp => 1 ) ) );
+  print Dumper( decode_json( process_file( $fh, merge_lines => 1, chomp => 1 ) ) );
 
   # +-----------------+
   # | READ A CSV FILE |
@@ -382,7 +379,7 @@ __END__
 
 =head1 NAME
 
-File::Process - process text files with customer handlers
+File::Process - process text files with custom handlers
 
 =head1 SYNOPSIS
 
@@ -710,11 +707,11 @@ method for processing CSV files.
  use File::Process qw(pre process_file);
  use Text::CSV_XS;
  use Data::Dumper;
- 
+
  my $csv = Text::CSV_XS->new;
-  
+
  my $file = shift;
- 
+
  my ($csv_lines) = process_file(
    $file,
    csv   => $csv,
@@ -722,14 +719,14 @@ method for processing CSV files.
    has_headers => 1,
    pre   => sub {
      my ( $fh, $args ) = @_;
-  
+
      my ($fh, $all_lines) = pre($file, $args);
- 
+
      if ( $args->{'has_headers'} ) {
        my @column_names = $args->{csv}->getline($fh);
        $args->{csv}->column_names(@column_names);
      }
-  
+
      return ($fh, $all_lines);
    },
    next_line => sub {
@@ -807,7 +804,7 @@ modified under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<File::Process:Utils>
+L<File::Process::Utils>
 
 =head1 AUTHOR
 

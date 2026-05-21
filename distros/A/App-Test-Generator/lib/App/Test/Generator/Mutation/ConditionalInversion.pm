@@ -7,11 +7,32 @@ use parent 'App::Test::Generator::Mutation::Base';
 use App::Test::Generator::Mutant;
 use PPI;
 
-our $VERSION = '0.33';
+our $VERSION = '0.38';
 
 =head1 VERSION
 
-Version 0.33
+Version 0.38
+
+=head1 METHODS
+
+=head2 applies_to
+
+Returns true if the document contains any C<if> or C<unless> compound
+statements that this mutator can target.
+
+=cut
+
+sub applies_to {
+	my ($self, $doc) = @_;
+	my $compounds = $doc->find('PPI::Statement::Compound') || [];
+	for my $stmt (@{$compounds}) {
+		my $first = $stmt->schild(0);
+		next unless $first && $first->isa('PPI::Token::Word');
+		my $type = $first->content();
+		return 1 if $type eq 'if' || $type eq 'unless';
+	}
+	return 0;
+}
 
 =head2 mutate
 
@@ -95,7 +116,11 @@ sub mutate {
 
 	for my $stmt (@{$compounds}) {
 		# Only process if and unless statements
-		my $type = $stmt->type || '';
+		# Use the actual first token content rather than ->type() since
+		# PPI >= 1.270 returns 'if' for both if and unless via ->type()
+		my $first_word = $stmt->schild(0);
+		next unless $first_word && $first_word->isa('PPI::Token::Word');
+		my $type = $first_word->content();
 		next unless $type eq 'if' || $type eq 'unless';
 
 		# Verify the statement has a condition block to invert
@@ -142,7 +167,7 @@ sub mutate {
 
 		# Report construction failures clearly rather than silently dropping
 		if($@ || !$mutant) {
-			warn "Failed to construct mutant COND_INV_${line}_${col}: $@\n" if $@;
+			warn "Failed to construct mutant COND_INV_${line}_${col}: $@" if $@;
 			next;
 		}
 

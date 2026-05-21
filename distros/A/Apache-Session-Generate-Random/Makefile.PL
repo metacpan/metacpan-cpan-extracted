@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "use system randomness for generating session ids",
-  "AUTHOR" => "Robert Rothenberg <rrwo\@cpan.org>",
+  "AUTHOR" => "Robert Rothenberg <perl\@rhizomnic.com>",
   "BUILD_REQUIRES" => {
     "ExtUtils::MakeMaker" => "7.22",
     "Module::Metadata" => "1.000015"
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "Module::Metadata" => "1.000015",
     "Test::More" => 0
   },
-  "VERSION" => "0.002001",
+  "VERSION" => "0.002002",
   "test" => {
     "TESTS" => "t/*.t"
   }

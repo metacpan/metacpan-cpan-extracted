@@ -16,11 +16,17 @@ use Readonly;
 # --------------------------------------------------
 Readonly my $OUT_DIR => 'cover_html/lcsaj_hits';
 
-our $VERSION = '0.33';
-
 =head1 NAME
 
 Devel::App::Test::Generator::LCSAJ::Runtime - Debugger backend for LCSAJ coverage
+
+=head1 VERSION
+
+Version 0.38
+
+=cut
+
+our $VERSION = '0.38';
 
 =head1 SYNOPSIS
 
@@ -31,9 +37,8 @@ Devel::App::Test::Generator::LCSAJ::Runtime - Debugger backend for LCSAJ coverag
 This module is loaded as a Perl debugger backend using the C<-d:Module> flag.
 
 When Perl sees C<-d:App::Test::Generator::LCSAJ::Runtime> it prepends C<Devel::>
-and loads C<Devel/App/Test/Generator/LCSAJ/Runtime.pm> from C<@INC>. The file
-must therefore live at that path — typically
-C<lib/Devel/App/Test/Generator/LCSAJ/Runtime.pm>.
+and loads C<Devel/App/Test/Generator/LCSAJ/Runtime.pm> from C<@INC>.
+The file must therefore live at that path - typically C<lib/Devel/App/Test/Generator/LCSAJ/Runtime.pm>.
 
 Perl automatically calls C<DB::DB> before executing each statement while the
 debugger is active. We record (file, line) pairs to build runtime hit data for
@@ -161,7 +166,7 @@ sub DB::DB {
 	# so it works regardless of CWD or install prefix
 	return if $norm =~ m{(?:^|/)Devel/App/Test/Generator/LCSAJ/Runtime\.pm$};
 
-	# If a target list was provided skip files not in it
+	# If a target list was provided, skip files not in it
 	if(%TARGET) {
 		return unless $TARGET{$norm};
 	}
@@ -197,8 +202,7 @@ sub _write_results {
 
 	make_path($OUT_DIR) unless -d $OUT_DIR;
 
-	open my $fh, '>', $out_file
-		or croak "Cannot write $out_file: $!";
+	open my $fh, '>', $out_file or croak "Cannot write $out_file: $!";
 
 	print $fh encode_json(\%HITS);
 	close $fh;
@@ -236,6 +240,17 @@ L<Devel::Cover>, L<App::Test::Generator>
 
 =head1 AUTHOR
 
-Nigel Horne
+Nigel Horne, C<< <njh at nigelhorne.com> >>
+
+Portions of this module's initial design and documentation were created
+with the assistance of AI.
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright 2025-2026 Nigel Horne.
+
+Usage is subject to the terms of GPL2.
+If you use it,
+please let me know.
 
 =cut

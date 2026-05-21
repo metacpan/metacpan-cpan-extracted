@@ -19,13 +19,16 @@ subtest 'examine the root logger' => sub {
 };
 
 subtest 'check appender definitions' => sub {
-  plan tests => 2;
+  plan tests => 3;
 
   my $appender = Log::Log4perl->appender_by_name( 'SCREEN' );
   isa_ok $appender, 'Log::Log4perl::Appender::Screen';
 
   $appender = Log::Log4perl->appender_by_name( 'FILE' );
   isa_ok $appender, 'Log::Log4perl::Appender::File';
+
+  is $appender->filename, 'file.log',
+    'check filename attribute of File appender after variable substitution';
 };
 
 my $logger = Log::Log4perl->get_logger( 'Foo::Bar' );

@@ -6,7 +6,7 @@ use parent 'App::Test::Generator::Mutation::Base';
 use App::Test::Generator::Mutant;
 use PPI;
 
-our $VERSION = '0.33';
+our $VERSION = '0.38';
 
 =head1 NAME
 
@@ -15,7 +15,9 @@ with undef to expose missing undef-return checks in the test suite
 
 =head1 VERSION
 
-Version 0.33
+Version 0.38
+
+=head1 METHODS
 
 =head2 applies_to
 
@@ -57,9 +59,14 @@ True if the node is a C<PPI::Statement::Return>, false otherwise.
 sub applies_to {
 	my ($self, $node) = @_;
 
-	# This strategy only targets return statements — other node
-	# types cannot produce return-undef mutants
-	return $node->isa('PPI::Statement::Return');
+	# PPI >= 1.270 classifies return as PPI::Statement::Break
+	# rather than the dedicated PPI::Statement::Return class
+	return 0 unless $node->isa('PPI::Statement::Break');
+
+	# Confirm it is specifically a return statement and not
+	# last, next, or redo which are also PPI::Statement::Break
+	my $first = $node->schild(0) or return 0;
+	return $first->content eq 'return';
 }
 
 =head2 mutate
@@ -143,8 +150,16 @@ C<return;> statements are skipped as they already return undef.
 sub mutate {
 	my ($self, $doc) = @_;
 
-	# Find all return statements in the document
-	my $returns = $doc->find('PPI::Statement::Return') || [];
+	# PPI >= 1.270 classifies return statements as PPI::Statement::Break
+	# rather than PPI::Statement::Return -- use a custom predicate
+	my $returns = $doc->find(sub {
+		my $node = $_[1];
+		# Match Break nodes that are specifically return statements
+		return 0 unless $node->isa('PPI::Statement::Break');
+		my $first = $node->schild(0) or return 0;
+		return $first->content eq 'return';
+	}) || [];
+
 	my @mutants;
 
 	for my $ret (@{$returns}) {
@@ -152,6 +167,16 @@ sub mutate {
 		# so mutating them would produce a redundant mutant that
 		# can never be killed by any meaningful test
 		my $expr = $ret->schild(1) or next;
+
+		# Skip bare semicolon — PPI may include the statement
+		# terminator as a significant child on bare returns
+		next if $expr->isa('PPI::Token::Structure') && $expr->content eq ';';
+		# Skip structure nodes (e.g. return ($x, $y) gives a
+		# PPI::Structure::List) — we can only mutate token expressions
+		next unless $expr->isa('PPI::Token');
+
+		# Skip postfix conditionals — replacing 'unless ...' with undef is invalid syntax
+		next if $expr->isa('PPI::Token::Word') && $expr->content =~ /^(?:if|unless|while|until|for|foreach)$/;
 
 		# Capture location so the transform closure targets the
 		# exact statement rather than the first match on that line
@@ -176,24 +201,28 @@ sub mutate {
 				# document copy it receives at test time
 				transform => sub {
 					my $doc  = $_[0];
-
-					# Find all return statements in the fresh document copy
-					my $rets = $doc->find('PPI::Statement::Return') || [];
-
+					# PPI >= 1.270 uses PPI::Statement::Break for return
+					my $rets = $doc->find(sub {
+						my $node = $_[1];
+						return 0 unless $node->isa('PPI::Statement::Break');
+						my $first = $node->schild(0) or return 0;
+						return $first->content eq 'return';
+						}) || [];
 					for my $ret (@{$rets}) {
-						# Match by line and column to avoid mutating
-						# the wrong return statement
 						next unless $ret->line_number   == $line;
 						next unless $ret->column_number == $col;
-
-						# Skip bare returns — already return undef,
-						# redundant to mutate
 						my $expr = $ret->schild(1) or last;
 
-						# Replace the expression with the literal undef.
-						# Operate on the token content directly to avoid
-						# PPI document ownership issues that arise when
-						# replacing entire statement nodes
+						# Skip bare semicolon — already returns undef
+						next if $expr->isa('PPI::Token::Structure') && $expr->content eq ';';
+
+						# Skip structure nodes (e.g. PPI::Structure::List from
+						# return ($x, $y)) — set_content only exists on tokens
+						next unless $expr->isa('PPI::Token');
+
+						# Skip postfix conditionals — replacing 'unless ...' with undef is invalid syntax
+						next if $expr->isa('PPI::Token::Word') && $expr->content =~ /^(?:if|unless|while|until|for|foreach)$/;
+
 						$expr->set_content('undef');
 						last;
 					}
@@ -201,10 +230,10 @@ sub mutate {
 			);
 		};
 
-		# If Mutant construction fails, report clearly rather than
+		# If the Mutant construction fails, report clearly rather than
 		# silently dropping the mutant from the results
 		if($@ || !$mutant) {
-			warn "Failed to construct mutant $id: $@\n" if $@;
+			warn "Failed to construct mutant $id: $@" if $@;
 			next;
 		}
 
@@ -222,19 +251,9 @@ Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 Copyright 2026 Nigel Horne.
 
-Usage is subject to licence terms.
-
-The licence terms of this software are as follows:
-
-=over 4
-
-=item * Personal single user, single computer use: GPL2
-
-=item * All other users (including Commercial, Charity, Educational,
-Government) must apply in writing for a licence for use from Nigel Horne
-at the above e-mail.
-
-=back
+Usage is subject to the terms of GPL2.
+If you use it,
+please let me know.
 
 =cut
 

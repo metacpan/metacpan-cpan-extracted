@@ -69,4 +69,26 @@ my $changes = $build_dir->child('Changes')->slurp;
 unlike $changes, qr/\{\{\$NEXT\}\}/, 'no marker in Changes';
 like $changes, qr/0\.001/, 'version in Changes';
 
+my $config_script = $build_dir->child('Makefile.PL')->slurp;
+like $config_script, qr/\buse\s+5.006;/, 'perl version requirement in Makefile.PL';
+
+$tzil = Builder->from_config(
+  { dist_root => 'does-not-exist' },
+  {
+    add_files => {
+      path('source', 'dist.ini') => simple_ini({},
+        ['@Starter' => { installer => 'MakeMaker::Awesome', revision => 6 }],
+      ),
+      path('source', 'lib', 'DZT', 'Sample.pm') => "package DZT::Sample;\nour \$VERSION = '0.001';\n1",
+      path('source', 'prereqs.yml') => "runtime:\n  requires:\n    perl: '5.006'\n",
+    },
+  },
+);
+
+$tzil->build;
+$build_dir = path($tzil->tempdir)->child('build');
+
+$config_script = $build_dir->child('Makefile.PL')->slurp;
+like $config_script, qr/\buse\s+5.006;/, 'perl version requirement in Makefile.PL (MM::A)';
+
 done_testing;

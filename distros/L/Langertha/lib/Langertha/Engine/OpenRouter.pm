@@ -1,6 +1,6 @@
 package Langertha::Engine::OpenRouter;
 # ABSTRACT: OpenRouter API
-our $VERSION = '0.500';
+our $VERSION = '0.502';
 use Moose;
 use Carp qw( croak );
 
@@ -43,7 +43,7 @@ Langertha::Engine::OpenRouter - OpenRouter API
 
 =head1 VERSION
 
-version 0.500
+version 0.502
 
 =head1 SYNOPSIS
 

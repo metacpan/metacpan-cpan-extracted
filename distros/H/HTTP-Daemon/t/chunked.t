@@ -94,19 +94,17 @@ use IO::Socket::IP;
 plan tests => scalar @TESTS;
 
 my $daemon = TestServer::Reflect->new;
-my $url = $daemon->start;
+my $url    = $daemon->start;
 
 my $addr = $url->host;
 my $port = $url->port;
 
 for my $test (@TESTS) {
-    my $raw  = $test->{raw};
+    my $raw = $test->{raw};
     $raw =~ s/\r?\n/$CRLF/mg;
 
-    my $sock = IO::Socket::IP->new(
-        PeerAddr => $addr,
-        PeerPort => $port,
-    ) or die;
+    my $sock = IO::Socket::IP->new(PeerAddr => $addr, PeerPort => $port,)
+        or die;
 
     print $sock $raw;
 

@@ -5,10 +5,13 @@ use App::MARC::Validator;
 use English;
 use File::Object;
 use File::Spec::Functions qw(abs2rel);
-use Test::More 'tests' => 6;
+use Test::More 'tests' => 7;
 use Test::NoWarnings;
 use Test::Output;
 use Test::Warn 0.31;
+
+# Data directory.
+my $data_dir = File::Object->new->up->dir('data');
 
 # Test.
 @ARGV = (
@@ -22,6 +25,39 @@ stdout_like(
 	},
 	qr{^$right_ret},
 	'List plugins (-l).',
+);
+
+# Test.
+@ARGV = (
+	'-p',
+	'-u',
+	'plugin:MARC::Validator::Plugin::Field008',
+	$data_dir->file('cnb003755915.xml')->s,
+);
+$right_ret = <<'END';
+{
+   "field_008" : {
+      "checks" : {
+         "not_valid" : {
+            "1426868" : [
+               {
+                  "error" : "Bad length of MARC leader.",
+                  "params" : {
+                     "Length" : 23
+                  }
+               }
+            ]
+         }
+      },
+END
+chomp $right_ret;
+stdout_like(
+	sub {
+		App::MARC::Validator->new->run;
+		return;
+	},
+	qr{^\Q$right_ret\E},
+	'Process MARC record with shorter leader that 24 characters.',
 );
 
 # Test.
@@ -66,8 +102,7 @@ stderr_is(
 );
 
 sub help {
-	my $script = abs2rel(File::Object->new->file('04-run.t')->s);
-	# XXX Hack for missing abs2rel on Windows.
+	my $script = abs2rel(__FILE__);
 	if ($OSNAME eq 'MSWin32') {
 		$script =~ s/\\/\//msg;
 	}

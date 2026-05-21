@@ -25,6 +25,7 @@ Readonly::Hash our %DESC => (
 	PARTIAL_FORM => 'partial form for range shorthand',
 	PARTIAL_NUMBER => 'partial number for range shorthand',
 	RBRACK => 'right subgroup bracket',
+	WHITESPACE => 'whitespace',
 );
 Readonly::Hash our %TOKEN_RULES => (
 	ALPHA_SPEC => {
@@ -104,7 +105,7 @@ Readonly::Hash our %OPERATORS => (
 	},
 );
 
-our $VERSION = 0.03;
+our $VERSION = 0.08;
 
 sub can_be_standalone {
 	my $type = shift;
@@ -141,7 +142,7 @@ sub can_follow_primary {
 
 	if ($type eq 'FORM') {
 		if (defined $primary_type
-			&& any { $primary_type eq $_ } qw(APOS_AUX AUX_DOT AUX_GROUP AUX_LANG AUX_TIME FORM NUMBER SUBGROUP)) {
+			&& any { $primary_type eq $_ } qw(ALPHA_SPEC APOS_AUX AUX_DOT AUX_GROUP AUX_LANG AUX_TIME FORM NUMBER SUBGROUP)) {
 
 			return 1;
 		}

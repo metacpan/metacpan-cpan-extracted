@@ -8,6 +8,9 @@ use Cwd qw(abs_path getcwd);
 use Developer::Dashboard::Collector;
 use Developer::Dashboard::CLI::SeededPages ();
 use Developer::Dashboard::EnvAudit;
+use Developer::Dashboard::FileRegistry;
+use Developer::Dashboard::IndicatorStore;
+use Developer::Dashboard::InternalCLI;
 use Developer::Dashboard::JSON qw(json_decode json_encode);
 use Developer::Dashboard::PathRegistry;
 use Encode qw(decode encode);
@@ -21,6 +24,7 @@ use Test::More;
 use Time::HiRes qw(sleep);
 
 my $UNDER_COVER = exists $INC{'Devel/Cover.pm'};
+my $repo = getcwd();
 
 sub _portable_path {
     my ($path) = @_;
@@ -52,7 +56,6 @@ local $ENV{DEVELOPER_DASHBOARD_CONFIGS};
 local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
 
 my $perl = $^X;
-my $repo = getcwd();
 chdir $ENV{HOME} or die "Unable to chdir to $ENV{HOME}: $!";
 my $lib = File::Spec->catdir( $repo, 'lib' );
 my $dashboard = File::Spec->catfile( $repo, 'bin', 'dashboard' );
@@ -68,18 +71,16 @@ my $runtime_csvq = File::Spec->catfile( $runtime_dd_cli_root, 'csvq' );
 my $runtime_xmlq = File::Spec->catfile( $runtime_dd_cli_root, 'xmlq' );
 my $runtime_of = File::Spec->catfile( $runtime_dd_cli_root, 'of' );
 my $runtime_open_file = File::Spec->catfile( $runtime_dd_cli_root, 'open-file' );
-my $runtime_ticket = File::Spec->catfile( $runtime_dd_cli_root, 'ticket' );
+my $runtime_workspace = File::Spec->catfile( $runtime_dd_cli_root, 'workspace' );
 my $runtime_path = File::Spec->catfile( $runtime_dd_cli_root, 'path' );
 my $runtime_paths = File::Spec->catfile( $runtime_dd_cli_root, 'paths' );
 my $runtime_ps1 = File::Spec->catfile( $runtime_dd_cli_root, 'ps1' );
+my $runtime_doctor = File::Spec->catfile( $runtime_dd_cli_root, 'doctor' );
 my $runtime_dashboard_core = File::Spec->catfile( $runtime_dd_cli_root, '_dashboard-core' );
-my $runtime_api_dashboard = File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'dashboards', 'api-dashboard' );
-my $runtime_sql_dashboard = File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'dashboards', 'sql-dashboard' );
-my $seed_manifest_file = File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'config', 'seeded-pages.json' );
 
 my $init = _run("$perl -I'$lib' '$dashboard' init");
 like($init, qr/runtime_root/, 'dashboard init works');
-for my $helper ( $runtime_jq, $runtime_yq, $runtime_tomq, $runtime_propq, $runtime_iniq, $runtime_csvq, $runtime_xmlq, $runtime_of, $runtime_open_file, $runtime_ticket, $runtime_path, $runtime_paths, $runtime_ps1 ) {
+for my $helper ( $runtime_jq, $runtime_yq, $runtime_tomq, $runtime_propq, $runtime_iniq, $runtime_csvq, $runtime_xmlq, $runtime_of, $runtime_open_file, $runtime_workspace, $runtime_path, $runtime_paths, $runtime_ps1 ) {
     ok( -f $helper, "dashboard init seeds private helper $helper" );
     ok( -x $helper, "dashboard init marks private helper $helper executable" );
 }
@@ -92,8 +93,6 @@ my $bootstrapped_config_json = do { local $/; <$bootstrapped_config_fh> };
 close $bootstrapped_config_fh;
 is_deeply( json_decode($bootstrapped_config_json), {}, 'dashboard init creates a missing config.json as an empty object' );
 my $managed_jq_mtime_before = ( stat $runtime_jq )[9];
-my $managed_api_dashboard_mtime_before = ( stat $runtime_api_dashboard )[9];
-my $managed_sql_dashboard_mtime_before = ( stat $runtime_sql_dashboard )[9];
 my $home_only_init_project = File::Spec->catdir( $ENV{HOME}, 'projects', 'home-only-init-project' );
 my $home_only_local_cli = File::Spec->catdir( $home_only_init_project, '.developer-dashboard', 'cli' );
 make_path( File::Spec->catdir( $home_only_init_project, '.git' ), $home_only_local_cli );
@@ -134,49 +133,6 @@ sleep 1.1;
 my $reinit = _run("$perl -I'$lib' '$dashboard' init");
 like($reinit, qr/config_file/, 'dashboard init can be re-run after a config already exists');
 is( ( stat $runtime_jq )[9], $managed_jq_mtime_before, 'dashboard init skips rewriting a dashboard-managed helper when its md5 already matches the shipped helper content' );
-is( ( stat $runtime_api_dashboard )[9], $managed_api_dashboard_mtime_before, 'dashboard init skips rewriting the api-dashboard seeded page when its md5 already matches the shipped seed content' );
-is( ( stat $runtime_sql_dashboard )[9], $managed_sql_dashboard_mtime_before, 'dashboard init skips rewriting the sql-dashboard seeded page when its md5 already matches the shipped seed content' );
-{
-    my $stale_sql_dashboard = <<'BOOKMARK';
-TITLE: SQL Dashboard
-:--------------------------------------------------------------------------------:
-BOOKMARK: sql-dashboard
-:--------------------------------------------------------------------------------:
-HTML: <div id="stale-sql-dashboard">stale managed sql dashboard</div>
-BOOKMARK
-    open my $stale_sql_fh, '>:raw', $runtime_sql_dashboard or die "Unable to write $runtime_sql_dashboard: $!";
-    print {$stale_sql_fh} $stale_sql_dashboard;
-    close $stale_sql_fh or die "Unable to close $runtime_sql_dashboard: $!";
-    open my $seed_manifest_fh, '>:raw', $seed_manifest_file or die "Unable to write $seed_manifest_file: $!";
-    print {$seed_manifest_fh} json_encode(
-        {
-            'sql-dashboard' => {
-                asset => 'sql-dashboard.page',
-                md5   => Developer::Dashboard::SeedSync::content_md5($stale_sql_dashboard),
-            },
-        }
-    );
-    print {$seed_manifest_fh} "\n";
-    close $seed_manifest_fh or die "Unable to close $seed_manifest_file: $!";
-
-    my $refresh_seed_init = _run("$perl -I'$lib' '$dashboard' init");
-    like( $refresh_seed_init, qr/runtime_root/, 'dashboard init refreshes a stale dashboard-managed seeded sql-dashboard copy' );
-    my $refreshed_sql_dashboard = _run("$perl -I'$lib' '$dashboard' page source sql-dashboard");
-    unlike( $refreshed_sql_dashboard, qr/stale-managed-sql-dashboard|stale managed sql dashboard/, 'dashboard init removes the stale managed sql-dashboard body when refreshing the shipped seed' );
-    like( $refreshed_sql_dashboard, qr/data-sql-workspace-tab="run"/, 'dashboard init refreshes sql-dashboard to the shipped Run SQL workspace layout when the saved page is a stale managed copy' );
-    like( $refreshed_sql_dashboard, qr/id="sql-table-filter"/, 'dashboard init refreshes sql-dashboard to the shipped schema filter layout when the saved page is a stale managed copy' );
-
-    my $user_sql_dashboard = $refreshed_sql_dashboard;
-    $user_sql_dashboard =~ s/SQL Workspace/User SQL Workspace/;
-    open my $user_sql_fh, '>:raw', $runtime_sql_dashboard or die "Unable to write $runtime_sql_dashboard: $!";
-    print {$user_sql_fh} $user_sql_dashboard;
-    close $user_sql_fh or die "Unable to close $runtime_sql_dashboard: $!";
-
-    my $preserve_seed_init = _run("$perl -I'$lib' '$dashboard' init");
-    like( $preserve_seed_init, qr/runtime_root/, 'dashboard init can be re-run after a user-edited sql-dashboard saved page diverges from the managed digest' );
-    my $preserved_user_sql_dashboard = _run("$perl -I'$lib' '$dashboard' page source sql-dashboard");
-    like( $preserved_user_sql_dashboard, qr/User SQL Workspace/, 'dashboard init preserves a user-edited sql-dashboard saved page instead of overwriting it' );
-}
 open my $preserved_config_fh, '<:raw', $global_config_file or die "Unable to read $global_config_file: $!";
 my $preserved_config_json = do { local $/; <$preserved_config_fh> };
 close $preserved_config_fh;
@@ -238,83 +194,11 @@ is_deeply(
 }
 
 my $pages = _run("$perl -I'$lib' '$dashboard' page list");
-unlike($pages, qr/\bwelcome\b/, 'dashboard init no longer seeds a welcome page');
-like($pages, qr/api-dashboard/, 'dashboard init seeds the API dashboard bookmark');
-like($pages, qr/sql-dashboard/, 'dashboard init seeds the SQL dashboard bookmark');
-my $api_page_source = _run("$perl -I'$lib' '$dashboard' page source api-dashboard");
-like($api_page_source, qr/^TITLE:\s+API Dashboard/m, 'api-dashboard source is available as a saved bookmark');
-unlike(
-    $api_page_source,
-    _literal_pattern(
-        'companies' . ' house',
-        'user' . 'name=',
-        'pass' . 'word=',
-        'ds' . 'n=',
-    ),
-    'api-dashboard bookmark source stays free of legacy sensitive details'
+is_deeply(
+    json_decode($pages),
+    [ 'project-context', 'system-status' ],
+    'dashboard init seeds only the remaining core starter pages',
 );
-like($api_page_source, qr/Import Postman Collection/, 'api-dashboard source exposes Postman collection import controls');
-like($api_page_source, qr/Export Postman Collection/, 'api-dashboard source exposes Postman collection export controls');
-like($api_page_source, qr/New Tab/, 'api-dashboard source exposes multiple request tabs');
-like($api_page_source, qr/history\.pushState/, 'api-dashboard source keeps workspace location in browser history');
-like($api_page_source, qr/window\.addEventListener\('popstate'/, 'api-dashboard source restores state on browser back and forward navigation');
-like($api_page_source, qr/URLSearchParams/, 'api-dashboard source parses direct-link workspace state from the URL');
-like($api_page_source, qr/api-response-preview/, 'api-dashboard source exposes an in-browser preview area for media responses');
-like($api_page_source, qr/configs\.collections\.bootstrap/, 'api-dashboard source binds a bootstrap collection ajax endpoint');
-like($api_page_source, qr/configs\.collections\.save/, 'api-dashboard source binds a collection save ajax endpoint');
-like($api_page_source, qr/configs\.collections\.delete/, 'api-dashboard source binds a collection delete ajax endpoint');
-like($api_page_source, qr/configs\.send\.request/, 'api-dashboard source binds the saved request sender ajax endpoint');
-like($api_page_source, qr/schema\.getpostman\.com\/json\/collection\/v2\.1\.0\/collection\.json/, 'api-dashboard source exports Postman v2.1 collection schema');
-like($api_page_source, qr/config\/api-dashboard/, 'api-dashboard source targets the runtime config/api-dashboard storage path');
-like($api_page_source, qr/preview_media_type/, 'api-dashboard source carries preview metadata for browser-rendered media responses');
-like($api_page_source, qr/Request Token Values/, 'api-dashboard source exposes the request-specific token form');
-like($api_page_source, qr/data-api-token-input/, 'api-dashboard source tags per-token input fields for shared collection placeholder values');
-like($api_page_source, qr/api-collection-tab/, 'api-dashboard source exposes collection tabs instead of only stacked collection cards');
-unlike($api_page_source, qr/opendir my \$dh, \$dir or do|open my \$fh, '<', \$path or do|\}\s+or do\s+\{/, 'api-dashboard saved ajax code avoids Perl control-flow precedence warnings in generated handlers');
-unlike($api_page_source, qr/!\s*\(\s*\$uri->scheme\s*\|\|\s*''\s*\)\s*=~/, 'api-dashboard saved ajax code avoids precedence-ambiguous URL scheme guards');
-my $sql_page_source = _run("$perl -I'$lib' '$dashboard' page source sql-dashboard");
-like($sql_page_source, qr/^TITLE:\s+SQL Dashboard/m, 'sql-dashboard source is available as a saved bookmark');
-unlike(
-    $sql_page_source,
-    _literal_pattern(
-        'companies' . ' house',
-        'e' . 'wf',
-        'xml' . 'gw',
-        'chi' . 'ps',
-        'tuxe' . 'do',
-        'c' . 'hs',
-        'gro' . 'ver',
-        'ci' . 'dev',
-        'p' . 'bs',
-        'user' . 'name=',
-        'pass' . 'word=',
-    ),
-    'sql-dashboard bookmark source stays free of sensitive or internal legacy details'
-);
-like($sql_page_source, qr/Connection Profiles/, 'sql-dashboard source exposes connection profile management');
-like($sql_page_source, qr/SQL Workspace/, 'sql-dashboard source exposes the merged SQL workspace');
-unlike($sql_page_source, qr/data-sql-main-tab="collections"/, 'sql-dashboard source no longer exposes a separate collections main tab');
-like($sql_page_source, qr/sql-workspace-nav/, 'sql-dashboard source exposes the workspace navigation rail');
-like($sql_page_source, qr/sql-active-sql-name/, 'sql-dashboard source exposes the active saved SQL label');
-like($sql_page_source, qr/sql-editor-actions/, 'sql-dashboard source exposes the understated editor action row');
-like($sql_page_source, qr/sql-editor-note/, 'sql-dashboard source exposes the editor guidance note');
-like($sql_page_source, qr/sql-inline-delete/, 'sql-dashboard source exposes inline delete controls for saved SQL entries');
-unlike($sql_page_source, qr/sql-open-schema/, 'sql-dashboard source removes the redundant in-workspace schema button');
-like($sql_page_source, qr/autoResizeSqlEditor/, 'sql-dashboard source exposes content-based editor auto-resize');
-like($sql_page_source, qr/Schema Explorer/, 'sql-dashboard source exposes a schema explorer area');
-like($sql_page_source, qr/URLSearchParams/, 'sql-dashboard source parses shareable workspace state from the URL');
-like($sql_page_source, qr/history\.pushState/, 'sql-dashboard source keeps workspace state in browser history');
-like($sql_page_source, qr/configs\.profiles\.bootstrap/, 'sql-dashboard source binds a profile bootstrap ajax endpoint');
-like($sql_page_source, qr/configs\.profiles\.save/, 'sql-dashboard source binds a profile save ajax endpoint');
-like($sql_page_source, qr/configs\.profiles\.delete/, 'sql-dashboard source binds a profile delete ajax endpoint');
-like($sql_page_source, qr/configs\.sql\.execute/, 'sql-dashboard source binds a saved sql execution ajax endpoint');
-like($sql_page_source, qr/configs\.schema\.browse/, 'sql-dashboard source binds a schema browse ajax endpoint');
-like($sql_page_source, qr/config\/sql-dashboard/, 'sql-dashboard source targets the runtime config/sql-dashboard storage path');
-like($sql_page_source, qr/SQLS_SEP/, 'sql-dashboard source carries programmable multi-statement separators');
-like($sql_page_source, qr/INSTRUCTION_SEP/, 'sql-dashboard source carries programmable instruction separators');
-
-my $page_source = _run("$perl -I'$lib' '$dashboard' page source api-dashboard");
-like($page_source, qr/^BOOKMARK:\s+api-dashboard/m, 'page source prefers saved page ids over token decoding');
 
 my $tt_page_instruction = <<'BOOKMARK';
 TITLE: TT CLI Demo
@@ -404,6 +288,81 @@ is( sprintf( '%04o', ( stat($legacy_bookmark_file) )[2] & 07777 ), '0600', 'dash
 my $doctor_clean = json_decode( _run("$perl -I'$lib' '$dashboard' doctor") );
 ok( $doctor_clean->{ok}, 'dashboard doctor reports success after repair' );
 
+my $managed_core_expected = Developer::Dashboard::InternalCLI::_managed_helper_content('_dashboard-core');
+my $managed_core_stale = $managed_core_expected;
+$managed_core_stale .= "\n# stale helper drift\n";
+open my $managed_core_stale_fh, '>:raw', $runtime_dashboard_core or die "Unable to write $runtime_dashboard_core: $!";
+print {$managed_core_stale_fh} $managed_core_stale;
+close $managed_core_stale_fh or die "Unable to close $runtime_dashboard_core: $!";
+
+my $doctor_helper_report = json_decode( _run("$perl -I'$lib' '$runtime_doctor'") );
+ok( !$doctor_helper_report->{ok}, 'dashboard doctor reports stale managed helper drift' );
+ok(
+    grep(
+        {
+            $_->{path} eq $runtime_dashboard_core
+              && $_->{kind} eq 'helper'
+              && $_->{problem} eq 'stale managed helper content'
+        } @{ $doctor_helper_report->{issues} || [] }
+    ),
+    'dashboard doctor reports stale _dashboard-core helper drift through the staged helper runtime',
+);
+
+my $doctor_helper_fixed = json_decode( _run("$perl -I'$lib' '$runtime_doctor' --fix") );
+ok( !$doctor_helper_fixed->{ok}, 'dashboard doctor --fix reports the helper drift it repaired in that run' );
+ok(
+    grep(
+        {
+            $_->{path} eq $runtime_dashboard_core
+              && $_->{kind} eq 'helper'
+              && $_->{fixed}
+        } @{ $doctor_helper_fixed->{issues} || [] }
+    ),
+    'dashboard doctor --fix marks stale helper drift as repaired through the staged helper runtime',
+);
+my $doctor_helper_clean = json_decode( _run("$perl -I'$lib' '$runtime_doctor'") );
+ok( $doctor_helper_clean->{ok}, 'dashboard doctor reports success after helper restaging repair' );
+
+my $bashrc = File::Spec->catfile( $ENV{HOME}, '.bashrc' );
+my $local_lib_line = qq{eval "\$("/usr/bin/perl" -I "$ENV{HOME}/perl5/lib/perl5" -Mlocal::lib)"};
+my $dashboard_line = qq{eval "\$("$ENV{HOME}/perl5/bin/dashboard" shell bash)"};
+open my $bashrc_fh, '>', $bashrc or die "Unable to write $bashrc: $!";
+print {$bashrc_fh} <<"BASHRC";
+[ -z "\$PS1" ] && return
+$local_lib_line
+$dashboard_line
+BASHRC
+close $bashrc_fh or die "Unable to close $bashrc: $!";
+
+my $doctor_shell_report = json_decode( _run("$perl -I'$lib' '$runtime_doctor'") );
+ok( !$doctor_shell_report->{ok}, 'dashboard doctor reports misplaced bash bootstrap lines through the staged helper runtime' );
+ok(
+    grep(
+        {
+            $_->{path} eq $bashrc
+              && $_->{kind} eq 'shell-bootstrap'
+              && $_->{problem} eq 'dashboard-managed bash bootstrap is hidden behind the non-interactive return guard'
+        } @{ $doctor_shell_report->{issues} || [] }
+    ),
+    'dashboard doctor reports the misplaced bash bootstrap issue through the staged helper runtime',
+);
+
+my $doctor_shell_fixed = json_decode( _run("$perl -I'$lib' '$runtime_doctor' --fix") );
+ok( !$doctor_shell_fixed->{ok}, 'dashboard doctor --fix reports the bash bootstrap issue it repaired through the staged helper runtime' );
+ok(
+    grep(
+        {
+            $_->{path} eq $bashrc
+              && $_->{kind} eq 'shell-bootstrap'
+              && $_->{fixed}
+        } @{ $doctor_shell_fixed->{issues} || [] }
+    ),
+    'dashboard doctor --fix marks the misplaced bash bootstrap issue as fixed through the staged helper runtime',
+);
+my $doctor_shell_clean = json_decode( _run("$perl -I'$lib' '$runtime_doctor'") );
+ok( $doctor_shell_clean->{ok}, 'dashboard doctor reports success after repairing misplaced bash bootstrap lines' );
+unlink $bashrc or die "Unable to remove $bashrc after doctor shell-bootstrap smoke coverage: $!";
+
 my $indicator_refresh = _run("$perl -I'$lib' '$dashboard' indicator refresh-core");
 like($indicator_refresh, qr/docker|project|git/, 'indicator refresh-core works');
 
@@ -423,6 +382,8 @@ close $fake_tmux_fh;
 chmod 0755, $fake_tmux or die "Unable to chmod $fake_tmux: $!";
 local $ENV{PATH} = join ':', $fake_tmux_dir, ( $ENV{PATH} || () );
 local $ENV{TICKET_REF};
+local $ENV{WORKSPACE_REF};
+local $ENV{TMUX} = '';
 
 my $ps1 = _run("$perl -I'$lib' '$dashboard' ps1 --jobs 1");
 like($ps1, qr/\(1 jobs\)|developer-dashboard:master| D /, 'ps1 command works');
@@ -446,7 +407,7 @@ my $help = _run("$perl -I'$lib' '$dashboard' help");
 like($help, qr/Description:/, 'dashboard help renders the fuller POD help');
 like($help, qr/dashboard serve \[logs \[-f\] \[-n N\]\|workers <N>\]/, 'dashboard help documents serve logs tail/follow flags and serve workers commands');
 like($help, qr/dashboard serve .*--no-editor.*--no-endit.*--no-indicators.*--no-indicator/s, 'dashboard help documents serve no-editor and no-indicators aliases');
-like($help, qr/dashboard ticket \[ticket-ref\]/, 'dashboard help documents the built-in ticket subcommand');
+like($help, qr/dashboard workspace \[workspace-ref\]/, 'dashboard help documents the built-in workspace subcommand');
 like($help, qr/dashboard docker enable <service>/, 'dashboard help documents docker enable for isolated compose services');
 like($help, qr/dashboard docker disable <service>/, 'dashboard help documents docker disable for isolated compose services');
 like($help, qr/dashboard docker list \[--enabled\|--disabled\]/, 'dashboard help documents docker list filters for isolated compose services');
@@ -497,8 +458,12 @@ my $workers_config = do { local $/; <$workers_config_fh> };
 close $workers_config_fh;
 like( $workers_config, qr/"web"\s*:\s*\{\s*"workers"\s*:\s*3/s, 'dashboard serve workers stores the default worker count in config' );
 if ( defined $serve_workers_pid ) {
-    my $serve_workers_stop = _run("$perl -I'$lib' '$dashboard' stop");
-    like( $serve_workers_stop, qr/"web_pid"\s*:\s*\d+/, 'dashboard stop stops the service started by serve workers' );
+    my $serve_workers_stop = _run("$perl -I'$lib' '$dashboard' stop -o json");
+    like(
+        $serve_workers_stop,
+        qr/"web"\s*:\s*\{\s*"details"\s*:\s*"dashboard web service"\s*,\s*"pid"\s*:\s*(?:null|\d+)\s*,\s*"status"\s*:\s*"stopped"/s,
+        'dashboard stop reports the service started by serve workers as stopped even when the managed pid has already disappeared from the final summary',
+    );
 }
 else {
     pass('dashboard serve workers reused an already-running managed web service instead of starting a new pid');
@@ -587,7 +552,7 @@ if ( !$UNDER_COVER ) {
         sleep 0.25;
     }
     like( $first_stdout, qr/^\d+\.\d+\n$/, 'dashboard serve starts configured interval collectors so collector output begins changing without a separate restart' );
-    my $restart_json = json_decode( _run("$perl -I'$lib' '$dashboard' restart --host 127.0.0.1 --port $serve_port") );
+    my $restart_json = json_decode( _run("$perl -I'$lib' '$dashboard' restart -o json --host 127.0.0.1 --port $serve_port") );
     ok( $restart_json->{web_pid}, 'dashboard restart still returns a managed web pid in the collector lifecycle smoke test' );
     ok( kill( 0, $restart_json->{web_pid} ), 'dashboard restart reports a live managed web pid in the collector lifecycle smoke test' );
     my $serve_ua = LWP::UserAgent->new( timeout => 5 );
@@ -606,8 +571,10 @@ if ( !$UNDER_COVER ) {
         sleep 0.25;
     }
     unlike( $second_stdout, qr/^\Q$first_stdout\E$/, 'dashboard restart restarts collector loops and refreshes collector output after the serve-started run' );
-    my $serve_stop = json_decode( _run("$perl -I'$lib' '$dashboard' stop") );
+    my $serve_stop = json_decode( _run("$perl -I'$lib' '$dashboard' stop -o json") );
     ok( ref( $serve_stop->{collectors} ) eq 'ARRAY', 'dashboard stop still returns the collector stop list after serve/restart lifecycle control' );
+    my $serve_stop_response = $serve_ua->get("http://127.0.0.1:$serve_port/");
+    ok( !$serve_stop_response->is_success, 'dashboard stop actually tears down the restarted collector lifecycle web listener' );
 }
 if ( !$UNDER_COVER ) {
     my $readonly_home = tempdir( CLEANUP => 1 );
@@ -667,7 +634,7 @@ if ( !$UNDER_COVER ) {
     my $readonly_config = do { local $/; <$readonly_config_fh> };
     close $readonly_config_fh;
     like( $readonly_config, qr/"web"\s*:\s*\{[\s\S]*"no_editor"\s*:\s*1/s, 'dashboard serve --no-endit persists no_editor in config' );
-    my $readonly_restart = json_decode( _run("$perl -I'$lib' '$dashboard' restart --host 127.0.0.1 --port $readonly_port") );
+    my $readonly_restart = json_decode( _run("$perl -I'$lib' '$dashboard' restart -o json --host 127.0.0.1 --port $readonly_port") );
     ok( $readonly_restart->{web_pid}, 'dashboard restart keeps managing the no-editor web service' );
     for ( 1 .. _startup_probe_attempts() ) {
         my $ready_response = $readonly_ua->get("http://127.0.0.1:$readonly_port/app/readonly");
@@ -676,7 +643,7 @@ if ( !$UNDER_COVER ) {
     }
     my $source_response = $readonly_ua->get("http://127.0.0.1:$readonly_port/app/readonly/source");
     is( $source_response->code, 403, 'dashboard restart preserves the saved no-editor source block' );
-    my $readonly_stop = json_decode( _run("$perl -I'$lib' '$dashboard' stop") );
+    my $readonly_stop = json_decode( _run("$perl -I'$lib' '$dashboard' stop -o json") );
     ok( ref( $readonly_stop->{collectors} ) eq 'ARRAY', 'dashboard stop still works after a no-editor lifecycle run' );
 }
 if ( !$UNDER_COVER ) {
@@ -731,7 +698,7 @@ if ( !$UNDER_COVER ) {
     my $noind_config = do { local $/; <$noind_config_fh> };
     close $noind_config_fh;
     like( $noind_config, qr/"web"\s*:\s*\{[\s\S]*"no_indicators"\s*:\s*1/s, 'dashboard serve --no-indicator persists no_indicators in config' );
-    my $noind_restart = json_decode( _run("$perl -I'$lib' '$dashboard' restart --host 127.0.0.1 --port $noind_port") );
+    my $noind_restart = json_decode( _run("$perl -I'$lib' '$dashboard' restart -o json --host 127.0.0.1 --port $noind_port") );
     ok( $noind_restart->{web_pid}, 'dashboard restart keeps managing the no-indicators web service' );
     my $post_restart_render;
     for ( 1 .. 240 ) {
@@ -742,7 +709,7 @@ if ( !$UNDER_COVER ) {
     ok( $post_restart_render && $post_restart_render->is_success, 'no-indicators live server remains reachable after restart' );
     my $post_restart_body = decode( 'UTF-8', $post_restart_render->decoded_content );
     unlike( $post_restart_body, qr/id="status-on-top"/, 'dashboard restart preserves the no-indicators top-right strip removal' );
-    my $noind_stop = json_decode( _run("$perl -I'$lib' '$dashboard' stop") );
+    my $noind_stop = json_decode( _run("$perl -I'$lib' '$dashboard' stop -o json") );
     ok( ref( $noind_stop->{collectors} ) eq 'ARRAY', 'dashboard stop still works after a no-indicators lifecycle run' );
 }
 {
@@ -815,6 +782,25 @@ if ( !$UNDER_COVER ) {
     my $pending_log = _run("$perl -I'$lib' '$dashboard' collector log pending.collector");
     like( $pending_log, qr/No log entries are available yet for collector 'pending\.collector'/, 'dashboard collector log <name> is explicit when a configured collector has not run yet' );
 
+    my $collector_log_files = Developer::Dashboard::FileRegistry->new(
+        paths => Developer::Dashboard::PathRegistry->new( home => $collector_log_home )
+    );
+    $collector_log_files->write( 'dashboard_log', "web one\nweb two\n" );
+    my $top_level_web_log = _run("$perl -I'$lib' '$dashboard' log web");
+    is( $top_level_web_log, "web one\nweb two\n", 'dashboard log web prints only the dashboard web log' );
+
+    my $top_level_collector_logs = _run("$perl -I'$lib' '$dashboard' log collector");
+    like( $top_level_collector_logs, qr/cli\.collector/, 'dashboard log collector prints collector logs without needing the nested collector command' );
+    like( $top_level_collector_logs, qr/cli stdout/, 'dashboard log collector includes collector stdout content' );
+
+    my $named_top_level_collector_log = _run("$perl -I'$lib' '$dashboard' log collector cli.collector");
+    like( $named_top_level_collector_log, qr/cli\.collector/, 'dashboard log collector <name> resolves one named collector log stream' );
+    unlike( $named_top_level_collector_log, qr/pending\.collector/, 'dashboard log collector <name> limits output to the requested collector' );
+
+    my $everything_log = _run("$perl -I'$lib' '$dashboard' logs");
+    like( $everything_log, qr/web one/, 'dashboard logs includes the dashboard web log in the all-logs view' );
+    like( $everything_log, qr/cli\.collector/, 'dashboard logs includes collector logs in the all-logs view' );
+
     my $templated_run = json_decode( _run("$perl -I'$lib' '$dashboard' collector run templated.collector") );
     is( $templated_run->{exit_code}, 0, 'dashboard collector run keeps TT-icon collectors successful when stdout contains valid JSON' );
     my $templated_indicators = json_decode( _run("$perl -I'$lib' '$dashboard' indicator list") );
@@ -852,6 +838,31 @@ if ( !$UNDER_COVER ) {
         qr/Unknown collector 'missing\.collector'/,
         'dashboard collector log reports unknown collector names explicitly',
     );
+
+    my $collector_start_pid = _run("$perl -I'$lib' '$dashboard' collector start cli.collector");
+    like( $collector_start_pid, qr/\A\d+\n\z/, 'dashboard collector start still starts one named collector loop directly' );
+
+    my $top_level_stop_named_collector = _run("$perl -I'$lib' '$dashboard' stop collector cli.collector");
+    like( $top_level_stop_named_collector, qr/Component\s+Target\s+Status/, 'dashboard stop collector <name> prints a table summary by default' );
+    like( $top_level_stop_named_collector, qr/collector\s+cli\.collector\s+stopped/, 'dashboard stop collector <name> reports the named collector row' );
+
+    my $top_level_restart_named_collector = json_decode( _run("$perl -I'$lib' '$dashboard' restart collector cli.collector -o json") );
+    is( $top_level_restart_named_collector->{scope}, 'collector', 'dashboard restart collector <name> reports the collector scope in JSON mode' );
+    is( $top_level_restart_named_collector->{target}, 'cli.collector', 'dashboard restart collector <name> reports the requested collector target in JSON mode' );
+
+    my $top_level_stop_all_collectors = _run("$perl -I'$lib' '$dashboard' stop collector");
+    like( $top_level_stop_all_collectors, qr/Component\s+Target\s+Status/, 'dashboard stop collector without a name prints a table summary by default' );
+    like( $top_level_stop_all_collectors, qr/collector/, 'dashboard stop collector without a name reports collector rows' );
+
+    my $restart_web_port = _find_free_port();
+    my $top_level_restart_web = json_decode(
+        _run("$perl -I'$lib' '$dashboard' restart web -o json --host 127.0.0.1 --port $restart_web_port")
+    );
+    is( $top_level_restart_web->{scope}, 'web', 'dashboard restart web reports the web scope in JSON mode' );
+    ok( $top_level_restart_web->{web_pid}, 'dashboard restart web returns the managed web pid in JSON mode' );
+    my $top_level_stop_web = _run("$perl -I'$lib' '$dashboard' stop web");
+    like( $top_level_stop_web, qr/Component\s+Target\s+Status/, 'dashboard stop web prints a table summary by default' );
+    like( $top_level_stop_web, qr/web\s+dashboard\s+stopped/, 'dashboard stop web reports the web row in the summary table' );
 }
 
 my $bookmarks_root = _run("$perl -I'$lib' '$dashboard' path resolve bookmarks_root");
@@ -1120,6 +1131,20 @@ unlike( $shell_bootstrap, qr/d2\(\)\s*\{\s*'\Q$perl\E'\s+/s, 'dashboard shell ba
 unlike( $shell_bootstrap, qr/done\s+<\s+</, 'dashboard shell bash bootstrap avoids process substitution in completion helpers for macOS compatibility' );
 like( $shell_bootstrap, qr/completion_output="\$\('\Q$dashboard\E' complete /, 'dashboard shell bash bootstrap captures dashboard completions through command substitution' );
 like( $shell_bootstrap, qr/completion_output="\$\('\Q$dashboard\E' path complete-cdr /, 'dashboard shell bash bootstrap captures cdr completions through command substitution' );
+{
+    local $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} = '/tmp/stale-dashboard-entrypoint';
+    my $stale_entrypoint_bootstrap = _run("$perl -I'$lib' '$dashboard' shell bash");
+    like(
+        $stale_entrypoint_bootstrap,
+        qr/d2\(\)\s*\{\s*'\Q$dashboard\E'\s+"\$@"/s,
+        'dashboard shell bash bootstrap ignores a stale inherited dashboard entrypoint path',
+    );
+    unlike(
+        $stale_entrypoint_bootstrap,
+        qr/\Q$ENV{DEVELOPER_DASHBOARD_ENTRYPOINT}\E/,
+        'dashboard shell bash bootstrap does not leak an inherited stale dashboard entrypoint path',
+    );
+}
 my $shell_bootstrap_file = File::Spec->catfile( $ENV{HOME}, 'dashboard-shell.sh' );
 open my $shell_bootstrap_fh, '>', $shell_bootstrap_file or die "Unable to write $shell_bootstrap_file: $!";
 print {$shell_bootstrap_fh} $shell_bootstrap;
@@ -1160,10 +1185,30 @@ like( $portable_cdr_keywords_multi, qr/\Q@{[ _portable_path($cwd_search_root) ]}
 my $cdr_keywords_regex = _run("bash -lc '. \"$shell_bootstrap_file\"; cd \"$cwd_search_root\"; cdr team-alpha\$; pwd'");
 is_same_path_output( $cdr_keywords_regex, $cwd_search_multi_one . "\n", 'cdr treats non-alias search terms as regexes beneath the current directory' );
 like( $shell_bootstrap, qr/ps1 --jobs \\j --mode compact/, 'dashboard shell bash bootstrap keeps bash job-count prompt rendering' );
+like( $shell_bootstrap, qr/_dd_tmux_status_active/, 'dashboard shell bash bootstrap centralizes the dashboard ticket tmux-session detection helper' );
+like( $shell_bootstrap, qr/TICKET_REF/, 'dashboard shell bash bootstrap also recognizes ticket-managed tmux sessions through the ticket reference environment' );
+like( $shell_bootstrap, qr/tmux set-option -q status-position bottom/, 'dashboard shell bash bootstrap keeps the normal tmux status bar at the bottom in ticket sessions' );
+like( $shell_bootstrap, qr/tmux set-option -q status 2/, 'dashboard shell bash bootstrap enables a two-line tmux status block for ticket sessions' );
+like( $shell_bootstrap, qr/tmux set-option -q status-interval 2/, 'dashboard shell bash bootstrap refreshes the tmux status block automatically for ticket sessions' );
+like( $shell_bootstrap, qr/tmux set-option -q status-format\[0\].*tmux-status-top --width #\{client_width\}/s, 'dashboard shell bash bootstrap renders the indicator strip into the first tmux status row' );
+like( $shell_bootstrap, qr/status-format\[0\] "#\('\Q$dashboard\E' ps1 --mode tmux-status-top --width #\{client_width\}\)"/, 'dashboard shell bash bootstrap renders the tmux ticket indicator row through the explicit dashboard entrypoint path' );
+unlike( $shell_bootstrap, qr/status-format\[0\] "#\(dashboard ps1 --mode tmux-status-top --width #\{client_width\}\)"/, 'dashboard shell bash bootstrap does not depend on a bare dashboard PATH lookup for tmux ticket status rendering' );
+like( $shell_bootstrap, qr/tmux set-option -q status-format\[1\] "\$_dd_default_status"/, 'dashboard shell bash bootstrap restores the normal tmux status row beneath the indicators' );
+like( $shell_bootstrap, qr/_dd_update_prompt\(\)/, 'dashboard shell bash bootstrap centralizes prompt refresh through one helper so later distro PS1 assignments cannot permanently override it' );
+like( $shell_bootstrap, qr/PROMPT_COMMAND=.*_dd_update_prompt/s, 'dashboard shell bash bootstrap installs a PROMPT_COMMAND refresh hook so the dashboard prompt survives later bashrc prompt assignments' );
+like( $shell_bootstrap, qr/ps1 --jobs \\j --mode compact --no-indicators/, 'dashboard shell bash bootstrap suppresses prompt indicators when tmux owns the status line' );
 
 my $zsh_bootstrap = _run("$perl -I'$lib' '$dashboard' shell zsh");
 like( $zsh_bootstrap, qr/add-zsh-hook precmd _dd_update_prompt/, 'dashboard shell zsh bootstrap refreshes the prompt through a precmd hook' );
 like( $zsh_bootstrap, qr/ps1 --jobs \$\{#jobstates\} --mode compact/, 'dashboard shell zsh bootstrap uses zsh job counts for prompt rendering' );
+like( $zsh_bootstrap, qr/_dd_tmux_status_active/, 'dashboard shell zsh bootstrap centralizes the dashboard ticket tmux-session detection helper' );
+like( $zsh_bootstrap, qr/TICKET_REF/, 'dashboard shell zsh bootstrap also recognizes ticket-managed tmux sessions through the ticket reference environment' );
+like( $zsh_bootstrap, qr/tmux set-option -q status-position bottom/, 'dashboard shell zsh bootstrap keeps the normal tmux status bar at the bottom in ticket sessions' );
+like( $zsh_bootstrap, qr/tmux set-option -q status 2/, 'dashboard shell zsh bootstrap enables a two-line tmux status block for ticket sessions' );
+like( $zsh_bootstrap, qr/tmux set-option -q status-interval 2/, 'dashboard shell zsh bootstrap refreshes the tmux status block automatically for ticket sessions' );
+like( $zsh_bootstrap, qr/tmux set-option -q status-format\[0\].*tmux-status-top --width #\{client_width\}/s, 'dashboard shell zsh bootstrap renders the indicator strip into the first tmux status row' );
+like( $zsh_bootstrap, qr/tmux set-option -q status-format\[1\] "\$default_status"/, 'dashboard shell zsh bootstrap restores the normal tmux status row beneath the indicators' );
+like( $zsh_bootstrap, qr/ps1 --jobs \$\{#jobstates\} --mode compact --no-indicators/, 'dashboard shell zsh bootstrap suppresses prompt indicators when tmux owns the status line' );
 like( $zsh_bootstrap, qr/path cdr/, 'dashboard shell zsh bootstrap keeps the cdr path helper functions' );
 like( $zsh_bootstrap, qr/\bd2\(\)\s*\{/, 'dashboard shell zsh bootstrap exposes the d2 shortcut helper' );
 like( $zsh_bootstrap, qr/autoload -Uz compinit/, 'dashboard shell zsh bootstrap loads compinit for fresh shells before completion setup' );
@@ -1177,6 +1222,14 @@ unlike( $zsh_bootstrap, qr/d2\(\)\s*\{\s*'\Q$perl\E'\s+/s, 'dashboard shell zsh 
 my $sh_bootstrap = _run("$perl -I'$lib' '$dashboard' shell sh");
 like( $sh_bootstrap, qr/path cdr/, 'dashboard shell sh bootstrap keeps the cdr path helper functions' );
 like( $sh_bootstrap, qr/ps1 --mode compact/, 'dashboard shell sh bootstrap renders the prompt through dashboard ps1' );
+like( $sh_bootstrap, qr/_dd_tmux_status_active/, 'dashboard shell sh bootstrap centralizes the dashboard ticket tmux-session detection helper' );
+like( $sh_bootstrap, qr/TICKET_REF/, 'dashboard shell sh bootstrap also recognizes ticket-managed tmux sessions through the ticket reference environment' );
+like( $sh_bootstrap, qr/tmux set-option -q status-position bottom/, 'dashboard shell sh bootstrap keeps the normal tmux status bar at the bottom in ticket sessions' );
+like( $sh_bootstrap, qr/tmux set-option -q status 2/, 'dashboard shell sh bootstrap enables a two-line tmux status block for ticket sessions' );
+like( $sh_bootstrap, qr/tmux set-option -q status-interval 2/, 'dashboard shell sh bootstrap refreshes the tmux status block automatically for ticket sessions' );
+like( $sh_bootstrap, qr/tmux set-option -q status-format\[0\].*tmux-status-top --width #\{client_width\}/s, 'dashboard shell sh bootstrap renders the indicator strip into the first tmux status row' );
+like( $sh_bootstrap, qr/tmux set-option -q status-format\[1\] "\$_dd_default_status"/, 'dashboard shell sh bootstrap restores the normal tmux status row beneath the indicators' );
+like( $sh_bootstrap, qr/ps1 --mode compact --no-indicators/, 'dashboard shell sh bootstrap suppresses prompt indicators when tmux owns the status line' );
 unlike( $sh_bootstrap, qr/\\j/, 'dashboard shell sh bootstrap does not rely on bash-specific job expansion' );
 unlike( $sh_bootstrap, qr/\bperl\s+-MJSON::XS\b/, 'dashboard shell sh bootstrap does not decode helper JSON through a bare perl command either' );
 like( $sh_bootstrap, qr/\Q$perl\E.*-MJSON::XS/s, 'dashboard shell sh bootstrap decodes helper JSON through the same perl interpreter that generated the bootstrap' );
@@ -1200,12 +1253,110 @@ my $ps_bootstrap = _run("$perl -I'$lib' '$dashboard' shell ps");
 like( $ps_bootstrap, qr/function prompt \{/, 'dashboard shell ps bootstrap uses the PowerShell prompt function instead of a PS1 variable' );
 like( $ps_bootstrap, qr/function cdr \{/, 'dashboard shell ps bootstrap exposes the cdr helper' );
 like( $ps_bootstrap, qr/\bps1 --mode compact/, 'dashboard shell ps bootstrap still renders prompt text through dashboard ps1' );
+like( $ps_bootstrap, qr/DEVELOPER_DASHBOARD_TMUX_STATUS -eq '1'/, 'dashboard shell ps bootstrap gates tmux status-right behind the dashboard ticket session flag' );
+like( $ps_bootstrap, qr/TICKET_REF/, 'dashboard shell ps bootstrap also recognizes ticket-managed tmux sessions through the ticket reference environment' );
+like( $ps_bootstrap, qr/tmux set-option -q status-position bottom/, 'dashboard shell ps bootstrap keeps the normal tmux status bar at the bottom in ticket sessions' );
+like( $ps_bootstrap, qr/tmux set-option -q status 2/, 'dashboard shell ps bootstrap enables a two-line tmux status block for ticket sessions' );
+like( $ps_bootstrap, qr/tmux set-option -q status-interval 2/, 'dashboard shell ps bootstrap refreshes the tmux status block automatically for ticket sessions' );
+like( $ps_bootstrap, qr/tmux set-option -q status-format\[0\].*tmux-status-top --width #\{client_width\}/s, 'dashboard shell ps bootstrap renders the indicator strip into the first tmux status row' );
+like( $ps_bootstrap, qr/tmux set-option -q status-format\[1\] \$ddDefaultStatus/, 'dashboard shell ps bootstrap restores the normal tmux status row beneath the indicators' );
+like( $ps_bootstrap, qr/\bps1 --mode compact --no-indicators/, 'dashboard shell ps bootstrap suppresses prompt indicators when tmux owns the status line' );
+like( $ps_bootstrap, qr/\[Console\]::InputEncoding\s*=\s*\[System\.Text\.UTF8Encoding\]::new\(\$false\)/, 'dashboard shell ps bootstrap forces UTF-8 console input encoding so prompt glyphs survive on Windows' );
+like( $ps_bootstrap, qr/\[Console\]::OutputEncoding\s*=\s*\[System\.Text\.UTF8Encoding\]::new\(\$false\)/, 'dashboard shell ps bootstrap forces UTF-8 console output encoding so prompt glyphs survive on Windows' );
+like( $ps_bootstrap, qr/\$ddPrompt\s*=\s*& .*?\bps1 --mode compact/s, 'dashboard shell ps bootstrap captures the dashboard prompt text before splitting header and cursor lines' );
+like( $ps_bootstrap, qr/Write-Host \$header/s, 'dashboard shell ps bootstrap writes the status header line separately before returning the cursor prompt' );
+like( $ps_bootstrap, qr/return '> '/s, 'dashboard shell ps bootstrap falls back to a bare next-line cursor prompt when the helper returns no content' );
 unlike( $ps_bootstrap, qr/\bPS1\b/, 'dashboard shell ps bootstrap does not mention the POSIX PS1 environment variable' );
 like( $ps_bootstrap, qr/function Invoke-DashboardShortcut \{/, 'dashboard shell ps bootstrap exposes the d2 shortcut runner' );
 like( $ps_bootstrap, qr/Set-Alias d2 Invoke-DashboardShortcut/, 'dashboard shell ps bootstrap exposes the d2 shortcut alias' );
 like( $ps_bootstrap, qr/Register-ArgumentCompleter/, 'dashboard shell ps bootstrap wires argument completion for dashboard and d2' );
 like( $ps_bootstrap, qr/CommandName 'dashboard', 'd2'/, 'dashboard shell ps bootstrap registers completion for both dashboard and d2' );
 like( $ps_bootstrap, qr/CommandName 'cdr', 'dd_cdr', 'which_dir'/, 'dashboard shell ps bootstrap also registers cdr-family completion' );
+my $tmux_status_render_top = _run("$perl -I'$lib' '$dashboard' ps1 --mode tmux-status-top --width 200 --cwd '$ENV{HOME}'");
+like( $tmux_status_render_top, qr/[✅🚨]🐳.*🕒\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/, 'dashboard ps1 tmux-status-top keeps the full indicator strip plus trailing date-time on one line when the tmux width is wide enough' );
+my $tmux_status_render_bottom = _run("$perl -I'$lib' '$dashboard' ps1 --mode tmux-status-bottom --width 200 --cwd '$ENV{HOME}'");
+is( $tmux_status_render_bottom, '', 'dashboard ps1 tmux-status-bottom stays empty when the tmux width is wide enough for one indicator line' );
+{
+    my $tmux_indicator_home = tempdir( CLEANUP => 1 );
+    local $ENV{HOME} = $tmux_indicator_home;
+    local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS};
+    local $ENV{DEVELOPER_DASHBOARD_CONFIGS};
+    local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
+    my $tmux_indicator_paths = Developer::Dashboard::PathRegistry->new(
+        home            => $tmux_indicator_home,
+        cwd             => $tmux_indicator_home,
+        workspace_roots => [],
+        project_roots   => [],
+    );
+    my $tmux_indicator_store = Developer::Dashboard::IndicatorStore->new( paths => $tmux_indicator_paths );
+    make_path(
+        File::Spec->catdir( $tmux_indicator_home, '.developer-dashboard', 'config' ),
+    );
+    open my $tmux_config_fh, '>:raw', File::Spec->catfile( $tmux_indicator_home, '.developer-dashboard', 'config', 'config.json' )
+      or die "Unable to write tmux indicator config: $!";
+    print {$tmux_config_fh} encode(
+        'UTF-8',
+        json_encode(
+            {
+                collectors => [
+                    {
+                        name      => 'heartbeat',
+                        indicator => {
+                            name  => 'heartbeat',
+                            label => 'Heartbeat',
+                            icon  => 'H',
+                        },
+                    },
+                    {
+                        name      => 'templated.rate',
+                        indicator => {
+                            name  => 'templated.rate',
+                            label => 'Rate',
+                            icon  => '[% data.rate %]%',
+                        },
+                    },
+                ],
+            }
+        )
+    );
+    close $tmux_config_fh;
+    $tmux_indicator_store->set_indicator(
+        'heartbeat',
+        name                 => 'heartbeat',
+        label                => 'Heartbeat',
+        icon                 => '96%',
+        configured_label     => 'Heartbeat',
+        configured_alias     => '',
+        configured_icon      => 'H',
+        configured_page_status_icon => '',
+        status               => 'ok',
+        collector_name       => 'heartbeat',
+        managed_by_collector => 1,
+        updated_at           => time,
+    );
+    $tmux_indicator_store->set_indicator(
+        'templated.rate',
+        name                 => 'templated.rate',
+        label                => '59.46%',
+        icon                 => '59.46%',
+        icon_template        => '[% data.rate %]%',
+        configured_label     => 'Rate',
+        configured_alias     => '',
+        configured_icon      => '[% data.rate %]%',
+        configured_page_status_icon => '',
+        status               => 'ok',
+        collector_name       => 'templated.rate',
+        managed_by_collector => 1,
+        updated_at           => time,
+    );
+
+    my $live_tmux_status_top = _run("$perl -I'$lib' '$dashboard' ps1 --mode tmux-status-top --width 18 --cwd '$tmux_indicator_home'");
+    my $live_tmux_status_bottom = _run("$perl -I'$lib' '$dashboard' ps1 --mode tmux-status-bottom --width 18 --cwd '$tmux_indicator_home'");
+    my $live_tmux_status = $live_tmux_status_top . $live_tmux_status_bottom;
+    like( $live_tmux_status, qr/✅96%/, 'dashboard tmux-status lines preserve live literal collector icons instead of resetting them to the config placeholder' );
+    like( $live_tmux_status, qr/✅59\.46%/, 'dashboard tmux-status lines preserve TT-backed live collector icons containing percent signs instead of resetting them to the raw TT config' );
+    unlike( $live_tmux_status, qr/\[%\s*data\.rate\s*%\]/, 'dashboard tmux-status lines do not leak raw TT-backed collector icon templates' );
+}
 my $path_del = _run("$perl -I'$lib' '$dashboard' path del foobar");
 like( $path_del, qr/"name"\s*:\s*"foobar"/, 'dashboard path del reports the removed alias' );
 like( $path_del, qr/"removed"\s*:\s*1/, 'dashboard path del removes existing aliases' );
@@ -1320,6 +1471,24 @@ exit 0
 SH
 close $fake_npx_fh;
 chmod 0755, $fake_npx or die "Unable to chmod $fake_npx: $!";
+my $fake_make_log = File::Spec->catfile( $fake_bin, 'make.log' );
+my $fake_make = File::Spec->catfile( $fake_bin, 'make' );
+open my $fake_make_fh, '>', $fake_make or die "Unable to write $fake_make: $!";
+print {$fake_make_fh} <<"SH";
+#!/bin/sh
+printf '%s|cwd=%s\\n' "\$*" "\$PWD" >> '$fake_make_log'
+exit 0
+SH
+close $fake_make_fh;
+chmod 0755, $fake_make or die "Unable to chmod $fake_make: $!";
+my $fake_sudo = File::Spec->catfile( $fake_bin, 'sudo' );
+open my $fake_sudo_fh, '>', $fake_sudo or die "Unable to write $fake_sudo: $!";
+print {$fake_sudo_fh} <<"SH";
+#!/bin/sh
+exec "\$@"
+SH
+close $fake_sudo_fh;
+chmod 0755, $fake_sudo or die "Unable to chmod $fake_sudo: $!";
 my $skill_repo_root = File::Spec->catdir( $ENV{HOME}, 'skill-fixtures' );
 my $skill_repo = File::Spec->catdir( $skill_repo_root, 'demo-skill' );
 make_path( File::Spec->catdir( $skill_repo, 'cli', 'foo.d' ) );
@@ -1342,6 +1511,9 @@ close $skill_cpanfile_fh;
 open my $skill_package_json_fh, '>', File::Spec->catfile( $skill_repo, 'package.json' ) or die "Unable to write skill package.json: $!";
 print {$skill_package_json_fh} qq|{"name":"demo-skill-node","version":"1.0.0","dependencies":{"left-pad":"1.3.0"}}\n|;
 close $skill_package_json_fh;
+open my $skill_makefile_fh, '>', File::Spec->catfile( $skill_repo, 'Makefile' ) or die "Unable to write skill Makefile: $!";
+print {$skill_makefile_fh} ".PHONY: all test install clean\nall:\n\t\@:\ntest:\n\t\@:\ninstall:\n\t\@:\nclean:\n\t\@:\n";
+close $skill_makefile_fh;
 open my $skill_index_fh, '>', File::Spec->catfile( $skill_repo, 'dashboards', 'index' ) or die "Unable to write skill index: $!";
 print {$skill_index_fh} "TITLE: Demo Skill Index\n:--------------------------------------------------------------------------------:\nBOOKMARK: index\n:--------------------------------------------------------------------------------:\nHTML:\nDemo Skill Index\n";
 close $skill_index_fh;
@@ -1380,6 +1552,7 @@ like( $skill_progress_stdout, qr/"repo_name"\s*:\s*"demo-skill"/, 'dashboard ski
 like( $skill_progress_stderr, qr/dashboard skills install progress/, 'dashboard skills install progress output prints the task-board title when enabled' );
 like( $skill_progress_stderr, qr/\[ \] Fetch skill source/, 'dashboard skills install progress output prints the full task list before work begins' );
 like( $skill_progress_stderr, qr/\[OK\] Install package\.json dependencies from .*demo-skill.*package\.json/, 'dashboard skills install progress output shows that package.json was detected and handed to npx-wrapped npm' );
+like( $skill_progress_stderr, qr/\[OK\] Install Makefile dependencies from .*demo-skill.*Makefile/, 'dashboard skills install progress output shows that Makefile dependencies were processed before ddfile work' );
 like( $skill_progress_stderr, qr/\[OK\] Install cpanfile dependencies/, 'dashboard skills install progress output marks dependency steps complete after work finishes' );
 open my $fake_npx_log_fh, '<', $fake_npx_log or die "Unable to read $fake_npx_log: $!";
 my @fake_npx_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$fake_npx_log_fh>;
@@ -1396,6 +1569,34 @@ like(
 ok(
     -d File::Spec->catdir( $ENV{HOME}, 'node_modules', 'left-pad' ),
     'dashboard skills install merges staged Node dependencies into HOME/node_modules',
+);
+open my $fake_make_log_fh, '<', $fake_make_log or die "Unable to read $fake_make_log: $!";
+my @fake_make_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$fake_make_log_fh>;
+close $fake_make_log_fh;
+is_deeply(
+    [ @fake_make_steps[ -4 .. -1 ] ],
+    [
+        "|cwd=$ENV{HOME}/.developer-dashboard/skills/demo-skill",
+        "test|cwd=$ENV{HOME}/.developer-dashboard/skills/demo-skill",
+        "install|cwd=$ENV{HOME}/.developer-dashboard/skills/demo-skill",
+        "clean|cwd=$ENV{HOME}/.developer-dashboard/skills/demo-skill",
+    ],
+    'dashboard skills install runs the default Makefile command chain for skills that ship a Makefile',
+);
+unlink $fake_make_log;
+my $skill_install_notest = _run("PATH='$fake_bin':\"\$PATH\" $perl -I'$lib' '$dashboard' skills install --notest -o json 'file://$skill_repo'");
+like( $skill_install_notest, qr/"repo_name"\s*:\s*"demo-skill"/, 'dashboard skills install --notest still installs the requested skill successfully' );
+open my $fake_make_notest_fh, '<', $fake_make_log or die "Unable to read $fake_make_log after --notest install: $!";
+my @fake_make_notest_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$fake_make_notest_fh>;
+close $fake_make_notest_fh;
+is_deeply(
+    [ @fake_make_notest_steps[ -3 .. -1 ] ],
+    [
+        "|cwd=$ENV{HOME}/.developer-dashboard/skills/demo-skill",
+        "install|cwd=$ENV{HOME}/.developer-dashboard/skills/demo-skill",
+        "clean|cwd=$ENV{HOME}/.developer-dashboard/skills/demo-skill",
+    ],
+    'dashboard skills install --notest skips the Makefile test target while still running make, make install, and make clean',
 );
 my $home_root_ddfile = File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'ddfile' );
 open my $home_root_ddfile_fh, '<', $home_root_ddfile or die "Unable to read $home_root_ddfile: $!";
@@ -1843,29 +2044,44 @@ if [ "\$1" = "has-session" ]; then
   fi
   exit 0
 fi
+if [ "\$1" = "show-options" ] && [ "\$3" = "status-format[0]" ]; then
+  printf '%s\n' '#[default]DEFAULT-ROW'
+  exit 0
+fi
 exit 0
 SH
 close $fake_ticket_tmux_fh;
 chmod 0755, $fake_ticket_tmux or die "Unable to chmod $fake_ticket_tmux: $!";
-my $ticket_output = _run("PATH='$fake_ticket_bin':\"\$PATH\" $perl -I'$lib' '$dashboard' ticket DD-NEW");
-is( $ticket_output, '', 'dashboard ticket stays quiet on success while tmux handles the terminal attach' );
+my $ticket_output = _run("PATH='$fake_ticket_bin':\"\$PATH\" $perl -I'$lib' '$dashboard' workspace DD-NEW");
+is( $ticket_output, '', 'dashboard workspace stays quiet on success while tmux handles the terminal attach' );
 open my $fake_ticket_log_fh, '<', $fake_ticket_log or die "Unable to read $fake_ticket_log: $!";
 my $fake_ticket_log_text = do { local $/; <$fake_ticket_log_fh> };
 close $fake_ticket_log_fh;
-like( $fake_ticket_log_text, qr/^has-session -t DD-NEW$/m, 'dashboard ticket checks whether the requested tmux session already exists' );
-like( $fake_ticket_log_text, qr/^new-session -d .* -s DD-NEW -n Code1$/m, 'dashboard ticket creates a new tmux session when the ticket session is missing' );
-like( $fake_ticket_log_text, qr/^attach-session -t DD-NEW$/m, 'dashboard ticket attaches to the requested tmux session' );
-like( $fake_ticket_log_text, qr/TICKET_REF=DD-NEW/, 'dashboard ticket seeds TICKET_REF into new tmux sessions' );
+like( $fake_ticket_log_text, qr/^has-session -t DD-NEW$/m, 'dashboard workspace checks whether the requested tmux session already exists' );
+like( $fake_ticket_log_text, qr/^new-session -d .* -s DD-NEW -n Code1$/m, 'dashboard workspace creates a new tmux session when the workspace session is missing' );
+like( $fake_ticket_log_text, qr/^show-options -gqv \@dd_ticket_status_default$/m, 'dashboard workspace checks whether tmux already recorded the default bottom-row status' );
+like( $fake_ticket_log_text, qr/^show-options -gqv status-format\[0\]$/m, 'dashboard workspace snapshots the current global tmux bottom-row status before replacing it with the indicator row' );
+like( $fake_ticket_log_text, qr/^set-option -gq status-position bottom$/m, 'dashboard workspace keeps the tmux status block anchored at the bottom' );
+like( $fake_ticket_log_text, qr/^set-option -gq status 2$/m, 'dashboard workspace enables a two-line tmux status block for dashboard-managed workspace sessions' );
+like( $fake_ticket_log_text, qr/^set-option -gq status-interval 2$/m, 'dashboard workspace refreshes the tmux status block automatically for dashboard-managed workspace sessions' );
+like( $fake_ticket_log_text, qr/^set-option -gq status-format\[0\] #\('.*dashboard' ps1 --mode tmux-status-top --width #\{client_width\}\)$/m, 'dashboard workspace configures the first tmux status row to render dashboard indicators through the explicit dashboard entrypoint path' );
+like( $fake_ticket_log_text, qr/^set-option -gq status-format\[1\] /m, 'dashboard workspace restores the normal tmux bottom-row status beneath the indicator strip' );
+like( $fake_ticket_log_text, qr/^set-option -guq status-format\[2\]$/m, 'dashboard workspace clears any stale third tmux status row after configuring the workspace status block' );
+like( $fake_ticket_log_text, qr/^attach-session -t DD-NEW$/m, 'dashboard workspace attaches to the requested tmux session' );
+like( $fake_ticket_log_text, qr/WORKSPACE_REF=DD-NEW/, 'dashboard workspace seeds WORKSPACE_REF into new tmux sessions' );
+like( $fake_ticket_log_text, qr/TICKET_REF=DD-NEW/, 'dashboard workspace keeps TICKET_REF seeded for compatibility with older tmux sessions' );
+like( $fake_ticket_log_text, qr/DEVELOPER_DASHBOARD_TMUX_STATUS=1/, 'dashboard workspace seeds the tmux-status session flag into new tmux sessions so only dashboard-managed workspace sessions move indicators into the tmux status line' );
 
 unlink $fake_ticket_log or die "Unable to unlink $fake_ticket_log: $!";
-my $runtime_ticket_output = _run("PATH='$fake_ticket_bin':\"\$PATH\" $perl -I'$lib' '$runtime_ticket' DD-EXISTING");
-is( $runtime_ticket_output, '', 'private runtime ticket helper stays quiet on success' );
+my $runtime_ticket_output = _run("PATH='$fake_ticket_bin':\"\$PATH\" $perl -I'$lib' '$runtime_workspace' DD-EXISTING");
+is( $runtime_ticket_output, '', 'private runtime workspace helper stays quiet on success' );
 open my $runtime_ticket_log_fh, '<', $fake_ticket_log or die "Unable to read $fake_ticket_log: $!";
 my $runtime_ticket_log_text = do { local $/; <$runtime_ticket_log_fh> };
 close $runtime_ticket_log_fh;
-like( $runtime_ticket_log_text, qr/^has-session -t DD-EXISTING$/m, 'private runtime ticket helper checks the requested session' );
-unlike( $runtime_ticket_log_text, qr/^new-session /m, 'private runtime ticket helper skips session creation when tmux reports it already exists' );
-like( $runtime_ticket_log_text, qr/^attach-session -t DD-EXISTING$/m, 'private runtime ticket helper attaches to existing sessions' );
+like( $runtime_ticket_log_text, qr/^has-session -t DD-EXISTING$/m, 'private runtime workspace helper checks the requested session' );
+unlike( $runtime_ticket_log_text, qr/^new-session /m, 'private runtime workspace helper skips session creation when tmux reports it already exists' );
+like( $runtime_ticket_log_text, qr/^set-option -gq status-format\[0\] #\('.*dashboard' ps1 --mode tmux-status-top --width #\{client_width\}\)$/m, 'private runtime workspace helper also reapplies the indicator tmux status row for existing workspace sessions' );
+like( $runtime_ticket_log_text, qr/^attach-session -t DD-EXISTING$/m, 'private runtime workspace helper attaches to existing sessions' );
 
 my $json_value = _run(qq{printf '{"alpha":{"beta":2}}' | $perl -I'$lib' '$dashboard' jq alpha.beta});
 is( $json_value, "2\n", 'jq extracts scalar JSON values' );
@@ -2351,6 +2567,8 @@ my $toml_root_stdin = _run("cat '$toml_file' | $perl -I'$lib' '$dashboard' tomq 
 is( $toml_root_stdin, $toml_root, 'tomq returns the same whole-document result from stdin and file input' );
 my $toml_keys = _run(qq{printf '[foo]\\na = 1\\n[bar]\\nb = 2\\n' | $perl -I'$lib' '$dashboard' tomq 'sort keys %\$d'});
 is_deeply( json_decode($toml_keys), [ 'bar', 'foo' ], 'tomq evaluates Perl expressions against decoded TOML data through $d' );
+my $toml_bool = _run(qq{printf 'enabled = true\\ndisabled = false\\n' | $perl -I'$lib' '$dashboard' tomq '\$d'});
+is_deeply( json_decode($toml_bool), { disabled => 0, enabled => 1 }, 'tomq returns plain Perl scalar booleans instead of TOML backend objects' );
 my $toml_direct = _run(qq{printf '[alpha]\\nbeta = 4\\n' | $perl -I'$lib' '$runtime_tomq' alpha.beta});
 is( $toml_direct, $toml_value, 'private runtime tomq matches dashboard tomq output' );
 
@@ -2518,8 +2736,10 @@ my ( $plain_restart_stdout, $plain_restart_stderr, $plain_restart_exit ) = captu
 };
 is( $plain_restart_exit, 0, 'dashboard restart succeeds from a repo without a project-local dashboard root' );
 unlike( $plain_restart_stderr, qr/\S/, 'dashboard restart keeps stderr clean in a repo without a project-local dashboard root' );
+like( $plain_restart_stdout, qr/Component\s+Target\s+Status/, 'dashboard restart prints a table summary by default' );
+like( $plain_restart_stdout, qr/\bweb\b/, 'dashboard restart table summary includes the web row' );
 ok( !-d File::Spec->catdir( $plain_repo, '.developer-dashboard' ), 'dashboard restart does not create a project-local .developer-dashboard tree in repos that have not opted in' );
-my ( undef, $plain_stop_stderr, $plain_stop_exit ) = capture {
+my ( $plain_stop_stdout, $plain_stop_stderr, $plain_stop_exit ) = capture {
     local $ENV{PERL5OPT} if _coverage_requested();
     local $ENV{HARNESS_PERL_SWITCHES} if _coverage_requested();
     system $perl, '-I' . $lib, $dashboard, 'stop';
@@ -2527,6 +2747,28 @@ my ( undef, $plain_stop_stderr, $plain_stop_exit ) = capture {
 };
 is( $plain_stop_exit, 0, 'dashboard stop succeeds after the plain-repo restart check' );
 unlike( $plain_stop_stderr, qr/\S/, 'dashboard stop keeps stderr clean after the plain-repo restart check' );
+like( $plain_stop_stdout, qr/Component\s+Target\s+Status/, 'dashboard stop prints a table summary by default' );
+like( $plain_stop_stdout, qr/\bweb\b/, 'dashboard stop table summary includes the web row' );
+
+my $json_restart_port = _find_free_port();
+my ( $json_restart_stdout, $json_restart_stderr, $json_restart_exit ) = capture {
+    local $ENV{PERL5OPT} if _coverage_requested();
+    local $ENV{HARNESS_PERL_SWITCHES} if _coverage_requested();
+    system 'sh', '-c', "cd '$plain_repo' && $perl -I'$repo/lib' '$repo/bin/dashboard' restart -o json --host 127.0.0.1 --port $json_restart_port";
+    return $? >> 8;
+};
+is( $json_restart_exit, 0, 'dashboard restart -o json succeeds from a repo without a project-local dashboard root' );
+unlike( $json_restart_stderr, qr/\S/, 'dashboard restart -o json keeps stderr clean in a repo without a project-local dashboard root' );
+like( $json_restart_stdout, qr/"web_pid"\s*:/, 'dashboard restart -o json prints the legacy machine-readable payload' );
+my ( $json_stop_stdout, $json_stop_stderr, $json_stop_exit ) = capture {
+    local $ENV{PERL5OPT} if _coverage_requested();
+    local $ENV{HARNESS_PERL_SWITCHES} if _coverage_requested();
+    system $perl, '-I' . $lib, $dashboard, 'stop', '-o', 'json';
+    return $? >> 8;
+};
+is( $json_stop_exit, 0, 'dashboard stop -o json succeeds after the json restart check' );
+unlike( $json_stop_stderr, qr/\S/, 'dashboard stop -o json keeps stderr clean after the json restart check' );
+like( $json_stop_stdout, qr/"collectors"\s*:/, 'dashboard stop -o json prints the legacy machine-readable payload' );
 
 my $progress_restart_port = _find_free_port();
 my ( $progress_restart_stdout, $progress_restart_stderr, $progress_restart_exit ) = capture {
@@ -2766,8 +3008,13 @@ sub _write_zip_entries {
 sub _run {
     my ($cmd) = @_;
     my $child_perl5opt = join ' ', grep { defined $_ && $_ ne '' } ( $ENV{PERL5OPT}, $ENV{HARNESS_PERL_SWITCHES} );
-    my $runtime_command = defined $dashboard
-      && $cmd =~ /\Q'$dashboard'\E\s+(?:serve|restart|stop)\b/;
+    my $runtime_command = (
+        defined $dashboard
+          && $cmd =~ /\Q'$dashboard'\E\s+(?:serve|restart|stop)\b/
+    ) || (
+        defined $runtime_dd_cli_root
+          && $cmd =~ /\Q'$runtime_dd_cli_root\E\/(?:_dashboard-core|doctor|serve|restart|stop)\b/
+    );
     my ( $stdout, $stderr, $exit_code ) = capture {
         if ($runtime_command) {
             local $ENV{PERL5OPT};

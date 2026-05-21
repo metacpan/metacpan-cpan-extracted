@@ -7,7 +7,7 @@ use lib 't';
 use TestHelper;
 
 require_pg;
-plan tests => 25;
+plan tests => 27;
 
 # Test simple query
 with_pg(cb => sub {
@@ -44,6 +44,19 @@ with_pg(cb => sub {
         is($rows->[0][0], 't', 'null param: IS NULL is true');
         EV::break;
     });
+});
+
+# Test that NULs in params raise a clear error rather than silently
+# truncating (libpq strlens text-format params, so we must detect NULs
+# in the XS layer).
+with_pg(cb => sub {
+    my ($pg) = @_;
+    eval {
+        $pg->query_params("select \$1::text", ["ab\0cd"], sub { });
+    };
+    like($@, qr/NUL byte/, 'NUL in text param: croak rather than truncate');
+    like($@, qr/parameter 0/, 'NUL in text param: error names the parameter');
+    EV::break;
 });
 
 # Test multi-row result

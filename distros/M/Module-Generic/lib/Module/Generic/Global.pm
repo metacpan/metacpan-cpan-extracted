@@ -15,7 +15,7 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'Module::Generic' );
     use parent qw( Exporter );
     use vars qw(
         $MOD_PERL $REPO $MUTEX $ERRORS $LOCKS $STATS $ORDER $SIZES $CLEANUP $NS_LOCKS
@@ -300,7 +300,7 @@ sub new
         $ref->{max_total_bytes} > 0 &&
         $ref->{max_store_bytes} > $ref->{max_total_bytes} )
     {
-        warn( "You have set the maximum byte size of an element ($ref->{max_store_bytes}) to be greater than the total byte size alllwed for all elements ($ref->{max_total_bytes}" ) if( warnings::enabled() );
+        warn( "You have set the maximum byte size of an element ($ref->{max_store_bytes}) to be greater than the total byte size alllwed for all elements ($ref->{max_total_bytes}" ) if( warnings::enabled( 'Module::Generic' ) );
     }
 
     # The 'key', if any, must NOT be any reference. It must be a plain scalar.
@@ -437,7 +437,7 @@ sub cleanup_register
 
     if( !ref( $self ) )
     {
-        warn( "${self}::cleanup_register() cannot be called as a class function anymore. Use an instance instead." ) if( warnings::enabled() );
+        warn( "${self}::cleanup_register() cannot be called as a class function anymore. Use an instance instead." ) if( warnings::enabled( 'Module::Generic' ) );
         return;
     }
 
@@ -541,7 +541,7 @@ sub error
     {
         my $msg = join( '', @_ );
         my $ex = Module::Generic::Global::Exception->new({ message => $msg, code => 500, skip_frames => 1 });
-        warn( $ex ) if( warnings::enabled() );
+        warn( $ex ) if( warnings::enabled( 'Module::Generic' ) );
         # $self->__message( 4, "Is \$ERRORS shared ? ", ( HAS_THREADS && threads::shared::is_shared( $ERRORS ) ? 'yes' : 'no' ) );
         $self->_lock_write( $ERRORS, delay => ERROR_DELAY ) || die( "Unable to get a lock on \$ERRORS" );
         $self->{_error} = $ex if( ref( $self ) );
@@ -552,7 +552,7 @@ sub error
         $self->_unlock;
         if( $@ )
         {
-            warn( "Error serialising exception object: $@" ) if( warnings::enabled() );
+            warn( "Error serialising exception object: $@" ) if( warnings::enabled( 'Module::Generic' ) );
         }
         return;
     }
@@ -571,7 +571,7 @@ sub error
             };
             if( $@ )
             {
-                warn( "Error deserialising stored exception object: $@" ) if( warnings::enabled() );
+                warn( "Error deserialising stored exception object: $@" ) if( warnings::enabled( 'Module::Generic' ) );
             }
         }
     }
@@ -853,7 +853,7 @@ sub set
         $self->{max_total_bytes} > 0 &&
         $max > $self->{max_total_bytes} )
     {
-        warn( "You have set the maximum byte size of an element ($max) to be greater than the total byte size alllwed for all elements ($self->{max_total_bytes}" ) if( warnings::enabled() );
+        warn( "You have set the maximum byte size of an element ($max) to be greater than the total byte size alllwed for all elements ($self->{max_total_bytes}" ) if( warnings::enabled( 'Module::Generic' ) );
     }
 
     $self->__message( 4, "Checking if byte length of value provided ($raw_len) is bigger than maximum allowed ($max)" );
@@ -1664,6 +1664,20 @@ END
         Module::Generic::Global::Guard;
     use strict;
     use warnings;
+    local $@;
+    if( defined( ${^GLOBAL_PHASE} ) )
+    {
+        # perl 5.14+: use the built-in
+        eval q{ sub _in_global_destruction () { ${^GLOBAL_PHASE} eq 'DESTRUCT' } };
+    }
+    else
+    {
+        # perl < 5.14: detect via B::main_cv. During global destruction, PL_main_cv is
+        # set to Nullcv, which B exposes as a B::SPECIAL whose dereferenced value is 0.
+        require B;
+        eval q{ sub _in_global_destruction () { ${B::main_cv()} == 0 } };
+    }
+    die( $@ ) if( $@ );
     our $VERSION = 'v0.1.0';
 
     sub new
@@ -1677,7 +1691,7 @@ END
     {
         # <https://perldoc.perl.org/perlobj#Destructors>
         CORE::local( $., $@, $!, $^E, $? );
-        CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+        CORE::return if( &_in_global_destruction() );
         my $self = CORE::shift( @_ );
         CORE::return if( !CORE::defined( $self ) );
         return(1) unless( $self->{mutex} && ref( $self->{mutex} ) );

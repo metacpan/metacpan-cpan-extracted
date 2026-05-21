@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 
+use Test::DescribeMe qw(extended);
 use IPC::Run3;
 use IPC::System::Simple qw(system);
 use Test::Most;
@@ -40,7 +41,7 @@ if($@) {
 	ok($? == 0, 'Generated test script exits successfully');
 
 	if($? != 0) {
-		diag("STDOUT:\n$stdout");
+		diag("STDOUT:\n$stdout") if(!defined($ENV{AUTOMATED_TESTING}));
 	}
 	unlink $outfile;
 	diag($stderr) if(length($stderr));

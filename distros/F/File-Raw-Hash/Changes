@@ -1,0 +1,37 @@
+Revision history for File-Raw-Hash
+
+0.03    2026-05-17
+        - Bumped File::Raw prereq to 0.13 to pick up the streaming
+          O_BINARY fix on Windows.
+
+0.02    2026-05-07
+        - Bumped File::Raw prereq to 0.12
+
+0.01    2026-05-07
+        Initial release.
+        - Single 'hash' plugin registered with File::Raw.
+        - READ, WRITE, STREAM, RECORD phases (passthrough on the data
+          path; the digest is delivered via a caller-supplied scalar /
+          hash / array ref passed in the 'into' option).
+        - Algorithms: sha256, sha512, sha1, md5, crc32, xxh64, blake3.
+          All vendored public-domain reference implementations; no
+          OpenSSL or libsodium dependency.
+        - HMAC mode (RFC 2104) via the 'hmac_key' option for sha256,
+          sha512, sha1, and md5. Verified against RFC 4231 / RFC 2202
+          test vectors. Rejected for crc32 / xxh64 / blake3 with a
+          named error.
+        - xxh64 accepts an optional 'xxh64_seed' integer (default 0).
+        - BLAKE3 verified against the official test_vectors.json for
+          empty input, length 1/2/3, exact-chunk (1024) and
+          tree-forming (1025) inputs.
+        - Output formats: hex, HEX, base64, base64url, raw.
+        - Multi-algo runs in one pass: algos => [...].
+        - Algo name normalisation: SHA-256 / sha_256 / SHA256 / sha256
+          all resolve identically.
+        - Composes cleanly inside File::Raw plugin chains; placement
+          decides whether the digest reflects on-disk bytes or any
+          decoded representation downstream.
+        - record_fn is wired forward-compat for File::Raw's RECORD
+          dispatcher; v0.01 ships a private _test_record_one XSUB that
+          exercises it through file_plugin_dispatch_record while
+          File::Raw works on a public per-record iterator.

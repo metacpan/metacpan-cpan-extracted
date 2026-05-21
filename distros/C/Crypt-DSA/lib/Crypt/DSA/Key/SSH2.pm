@@ -1,10 +1,11 @@
 package Crypt::DSA::Key::SSH2;
 
 use strict;
+use warnings;
 use MIME::Base64 qw( decode_base64 );
 use Crypt::DSA::Key;
 
-our $VERSION = '1.19'; #VERSION
+our $VERSION = '1.20'; #VERSION
 
 use vars qw{$VERSION @ISA};
 BEGIN {

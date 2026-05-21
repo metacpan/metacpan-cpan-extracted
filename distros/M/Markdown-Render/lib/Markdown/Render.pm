@@ -6,13 +6,12 @@ use warnings;
 use Carp;
 use Data::Dumper;
 use English qw(-no_match_vars);
-use HTTP::Request;
+use HTTP::Tiny;
 use IO::Scalar;
 use JSON;
-use LWP::UserAgent;
 use List::Util qw(none);
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.4';
 
 use parent qw(Class::Accessor::Fast);
 
@@ -276,38 +275,34 @@ sub _render_with_github {
 
   my $markdown = $self->get_markdown;
 
-  my $ua  = LWP::UserAgent->new;
-  my $req = HTTP::Request->new( 'POST', $GITHUB_API );
-
   my $mode = $self->get_mode;
 
   if ( none { $mode eq $_ } qw(gfm markdown) ) {
     $mode = 'markdown';
   }
 
-  my $api_request = {
-    text => $markdown,
-    mode => $mode,
-  };
+  my $ua = HTTP::Tiny->new;
 
-  $req->content( to_json($api_request) );
+  my $rsp = $ua->post(
+    $GITHUB_API,
+    { content => to_json( { text => $markdown, mode => $mode } ),
+      headers => { 'Content-Type' => 'application/json' },
+    }
+  );
 
-  my $rsp = $ua->request($req);
-
-  croak 'could not render using GitHub API: ' . $rsp->status_line
-    if !$rsp->is_success;
+  croak 'could not render using GitHub API: ' . $rsp->{status} . ' ' . $rsp->{reason}
+    if !$rsp->{success};
 
   if ( $self->get_raw ) {
-    $self->set_html( $rsp->content );
-
+    $self->set_html( $rsp->{content} );
     return $self;
   }
 
   if ( $self->get_mode eq 'gfm' ) {
-    return $self->fix_anchors( $rsp->content );
+    return $self->fix_anchors( $rsp->{content} );
   }
   else {
-    $self->fix_anchors( $rsp->content );
+    $self->fix_anchors( $rsp->{content} );
     return $self->fix_github_html( $self->get_html );
   }
 }

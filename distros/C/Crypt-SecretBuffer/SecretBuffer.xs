@@ -15,13 +15,6 @@
 #endif
 
 #include "SecretBuffer_config.h"
-
-#ifndef HAVE_BOOL
-   #define bool int
-   #define true 1
-   #define false 0
-#endif
-
 #include "SecretBuffer.h"
 #include "SecretBufferManualLinkage.h"
 
@@ -40,6 +33,7 @@ typedef struct secret_buffer_byte_range {
 
 // For typemap
 typedef secret_buffer_span *auto_secret_buffer_span;
+
 int sb_parse_codepointcmp(secret_buffer_parse *lhs, secret_buffer_parse *rhs);
 
 /**********************************************************************************************\
@@ -106,6 +100,8 @@ static void croak_with_syserror(const char *prefix, DWORD error_code) {
       croak("%s: %lu", prefix, error_code);
 }
 
+#include "perl_win32_excerpt.c"
+
 #else /* not WIN32 */
 
 static size_t get_page_size() {
@@ -148,6 +144,9 @@ static void* memmem(
    return NULL;
 }
 #endif /* HAVE_MEMMEM */
+
+/* static functions sb_wait_fh_readable and sb_wait_fd_readable */
+#include "secret_buffer_wait_readable.c"
 
 /**********************************************************************************************\
 * MAGIC vtables
@@ -249,11 +248,11 @@ void* secret_buffer_X_from_magic(pTHX_ SV *obj, int flags,
 static secret_buffer_span* secret_buffer_span_from_magic(SV *objref, int flags);
 
 #include "secret_buffer_base.c"
-#include "secret_buffer_console.c"
-#include "secret_buffer_async_write.c"
 #include "secret_buffer_charset.c"
 #include "secret_buffer_parse.c"
 #include "secret_buffer_span.c"
+#include "secret_buffer_console.c"
+#include "secret_buffer_async_write.c"
 
 /**********************************************************************************************\
 * SecretBuffer magic
@@ -543,6 +542,8 @@ void
 length(buf, val=NULL)
    auto_secret_buffer buf
    SV *val
+   ALIAS:
+      len = 1
    PPCODE:
       if (val) { /* writing */
          IV ival= SvIV(val);
@@ -801,8 +802,10 @@ append_sysread(buf, handle, count)
       IV got;
    PPCODE:
       got= secret_buffer_append_sysread(buf, handle, count);
-      ST(0)= (got < 0)? &PL_sv_undef : sv_2mortal(newSViv(got));
-      XSRETURN(1);
+      if (got < 0)
+         XSRETURN_UNDEF;
+      else
+         PUSHs(sv_2mortal(newSViv(got)));
 
 void
 append_read(buf, handle, count)
@@ -813,8 +816,10 @@ append_read(buf, handle, count)
       int got;
    PPCODE:
       got= secret_buffer_append_read(buf, handle, count);
-      ST(0)= (got < 0)? &PL_sv_undef : sv_2mortal(newSViv(got));
-      XSRETURN(1);
+      if (got < 0)
+         XSRETURN_UNDEF;
+      else
+         PUSHs(sv_2mortal(newSViv(got)));
 
 void
 _append_console_line(buf, handle)
@@ -931,6 +936,15 @@ unmask_secrets_to(coderef, ...)
       SPAGAIN;
       XSRETURN(count);
 
+bool
+_wait_fh_readable(handle, timeout_sv)
+   PerlIO *handle
+   SV *timeout_sv
+   CODE:
+      RETVAL= sb_wait_fh_readable(aTHX_ handle, timeout_sv);
+   OUTPUT:
+      RETVAL
+
 void
 _debug_charset(cset)
    secret_buffer_charset *cset
@@ -984,18 +998,19 @@ new(pkg, ...)
          for (; i < items; i+= 2) {
             STRLEN len;
             const char *name= SvPV(ST(i), len);
+            SV *val= ST(i+1);
             if (len == 4 && memcmp(name, "echo", 4) == 0) {
-               set_echo= ST(i+1);
+               if (SvOK(val)) set_echo= val;
             }
             else if (len == 6 && memcmp(name, "handle", 6) == 0) {
-               IO *io = sv_2io(ST(i+1));
+               IO *io = sv_2io(val);
                handle= io? IoIFP(io) : NULL;
             }
             else if (len == 10 && memcmp(name, "line_input", 10) == 0) {
-               set_line_input= ST(i+1);
+               if (SvOK(val)) set_line_input= val;
             }
             else if (len == 12 && memcmp(name, "auto_restore", 12) == 0) {
-               auto_restore= ST(i+1);
+               if (SvOK(val)) auto_restore= val;
             }
             else {
                croak("Unknown option '%s'", name);
@@ -1014,7 +1029,7 @@ new(pkg, ...)
       }
       if (auto_restore)
          cstate.auto_restore= SvTRUE(auto_restore);
-      if (set_echo && SvOK(set_echo)) {
+      if (set_echo) {
          bool enable= SvTRUE(set_echo);
          if (sb_console_state_get_echo(&cstate) != enable) {
             already_set= false;
@@ -1022,7 +1037,7 @@ new(pkg, ...)
                croak("set echo = %d failed", (int)enable);
          }
       }
-      if (set_line_input && SvOK(set_line_input)) {
+      if (set_line_input) {
          bool enable= SvTRUE(set_line_input);
          if (sb_console_state_get_line_input(&cstate) != enable) {
             already_set= false;
@@ -1032,7 +1047,7 @@ new(pkg, ...)
       }
       /* if user called 'maybe_new' and echo state aready matches requested
          state, return undef. */
-      if (ix == 1 && already_set)
+      if (ix == 1 && (set_echo || set_line_input) && already_set)
          XSRETURN(1);
       /* new blessed ConsoleState object */
       ST(0)= objref= sv_2mortal(newRV_noinc(&PL_sv_yes));
@@ -1083,6 +1098,28 @@ restore(cstate)
    CODE:
       RETVAL= sb_console_state_restore(cstate);
       cstate->auto_restore= false; /* no longer run restore on destructor */
+   OUTPUT:
+      RETVAL
+
+bool
+wait_char_readable(cstate, timeout_sv=&PL_sv_undef)
+   sb_console_state *cstate
+   SV *timeout_sv
+   CODE:
+      RETVAL= sb_console_state_wait_char_readable(aTHX_ cstate, timeout_sv);
+   OUTPUT:
+      RETVAL
+
+bool
+_append_console_char(cstate, buf)
+   sb_console_state *cstate
+   secret_buffer *buf;
+   CODE:
+#ifdef WIN32
+      RETVAL= sb_append_console_char(aTHX_ cstate, buf);
+#else
+      RETVAL= false;
+#endif
    OUTPUT:
       RETVAL
 

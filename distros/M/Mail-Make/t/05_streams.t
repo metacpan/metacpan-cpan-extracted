@@ -19,10 +19,10 @@ use warnings;
 
 BEGIN
 {
-    use ok( 'Mail::Make::Body' );
-    use ok( 'Mail::Make::Body::InCore' );
-    use ok( 'Mail::Make::Stream::Base64' );
-    use ok( 'Mail::Make::Stream::QuotedPrint' );
+    use_ok( 'Mail::Make::Body' ) or BAIL_OUT( 'Unable to load Mail::Make::Body' );
+    use_ok( 'Mail::Make::Body::InCore' ) or BAIL_OUT( 'Unable to load Mail::Make::Body::InCore' );
+    use_ok( 'Mail::Make::Stream::Base64' ) or BAIL_OUT( 'Unable to load Mail::Make::Stream::Base64' );
+    use_ok( 'Mail::Make::Stream::QuotedPrint' ) or BAIL_OUT( 'Unable to load Mail::Make::Stream::QuotedPrint' );
 };
 
 # NOTE: Helpers
@@ -66,7 +66,7 @@ sub qp_decode
     return( \$out );
 }
 
-# NOTE: Mail::Make::Stream::Base64
+# NOTE: Base64: encode/decode round-trip ASCII
 subtest 'Base64: encode/decode round-trip ASCII' => sub
 {
     my $b64  = Mail::Make::Stream::Base64->new;
@@ -80,6 +80,7 @@ subtest 'Base64: encode/decode round-trip ASCII' => sub
     is( $$dec, "Hello, world!", 'round-trip content matches' );
 };
 
+# NOTE: Base64: encode/decode round-trip binary
 subtest 'Base64: encode/decode round-trip binary' => sub
 {
     my $b64    = Mail::Make::Stream::Base64->new;
@@ -92,6 +93,7 @@ subtest 'Base64: encode/decode round-trip binary' => sub
     is( $$dec, $binary, 'binary round-trip correct (all 256 byte values)' );
 };
 
+# NOTE: Base64: lines not longer than 76 chars
 subtest 'Base64: lines not longer than 76 chars' => sub
 {
     my $b64  = Mail::Make::Stream::Base64->new;
@@ -106,6 +108,7 @@ subtest 'Base64: lines not longer than 76 chars' => sub
     }
 };
 
+# NOTE: Base64: encoded output uses CRLF line endings
 subtest 'Base64: encoded output uses CRLF line endings' => sub
 {
     my $b64  = Mail::Make::Stream::Base64->new;
@@ -115,6 +118,7 @@ subtest 'Base64: encoded output uses CRLF line endings' => sub
     like( $$enc, qr/\015\012/, 'encoded output contains CRLF' );
 };
 
+# NOTE: Base64: encode a plain scalar ref directly
 subtest 'Base64: encode a plain scalar ref directly' => sub
 {
     my $b64 = Mail::Make::Stream::Base64->new;
@@ -126,6 +130,7 @@ subtest 'Base64: encode a plain scalar ref directly' => sub
     is( $$dec, $raw, 'plain scalar ref input round-trips' );
 };
 
+# NOTE: Base64: exportable encode_b64 / decode_b64 functions
 subtest 'Base64: exportable encode_b64 / decode_b64 functions' => sub
 {
     use Mail::Make::Stream::Base64 qw( encode_b64 decode_b64 );
@@ -138,7 +143,7 @@ subtest 'Base64: exportable encode_b64 / decode_b64 functions' => sub
     is( $dec, $raw, 'exported decode_b64() round-trips' );
 };
 
-# NOTE: Mail::Make::Stream::QuotedPrint
+# NOTE: QuotedPrint: encode/decode round-trip ASCII
 subtest 'QuotedPrint: encode/decode round-trip ASCII' => sub
 {
     my $qp   = Mail::Make::Stream::QuotedPrint->new;
@@ -152,6 +157,7 @@ subtest 'QuotedPrint: encode/decode round-trip ASCII' => sub
     is( $$dec, "Hello, world!\n", 'round-trip content matches' );
 };
 
+# NOTE: QuotedPrint: non-ASCII characters encoded
 subtest 'QuotedPrint: non-ASCII characters encoded' => sub
 {
     use Encode;
@@ -166,6 +172,7 @@ subtest 'QuotedPrint: non-ASCII characters encoded' => sub
     is( $$dec, $text, 'round-trip restores original UTF-8 bytes' );
 };
 
+# NOTE: QuotedPrint: pure ASCII is unchanged
 subtest 'QuotedPrint: pure ASCII is unchanged' => sub
 {
     my $qp   = Mail::Make::Stream::QuotedPrint->new;
@@ -178,6 +185,7 @@ subtest 'QuotedPrint: pure ASCII is unchanged' => sub
     is( $$dec, $text, 'pure ASCII round-trips correctly' );
 };
 
+# NOTE: QuotedPrint: encode accepts scalar ref directly
 subtest 'QuotedPrint: encode accepts scalar ref directly' => sub
 {
     my $qp  = Mail::Make::Stream::QuotedPrint->new;
@@ -189,6 +197,7 @@ subtest 'QuotedPrint: encode accepts scalar ref directly' => sub
     is( $$dec, $raw, 'scalar ref input round-trips' );
 };
 
+# NOTE: QuotedPrint: exportable encode_qp / decode_qp functions
 subtest 'QuotedPrint: exportable encode_qp / decode_qp functions' => sub
 {
     use Mail::Make::Stream::QuotedPrint qw( encode_qp decode_qp );
@@ -201,6 +210,7 @@ subtest 'QuotedPrint: exportable encode_qp / decode_qp functions' => sub
     is( $dec, $raw, 'exported decode_qp() round-trips' );
 };
 
+# NOTE: QuotedPrint: custom eol option
 subtest 'QuotedPrint: custom eol option' => sub
 {
     my $qp   = Mail::Make::Stream::QuotedPrint->new;

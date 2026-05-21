@@ -1,7 +1,7 @@
 # ABSTRACT: Install, check, and update bundled agent skills
 
 package App::karr::Cmd::Skill;
-our $VERSION = '0.102';
+our $VERSION = '0.205';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -208,7 +208,7 @@ App::karr::Cmd::Skill - Install, check, and update bundled agent skills
 
 =head1 VERSION
 
-version 0.102
+version 0.205
 
 =head1 SYNOPSIS
 
@@ -264,11 +264,11 @@ L<App::karr::Cmd::Context>, L<App::karr::Cmd::Config>
 =head2 Issues
 
 Please report bugs and feature requests on GitHub at
-L<https://github.com/Getty/p5-app-karr/issues>.
+L<https://github.com/Getty/karr/issues>.
 
 =head2 IRC
 
-Join C<#ai> on C<irc.perl.org> or message Getty directly.
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -276,7 +276,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

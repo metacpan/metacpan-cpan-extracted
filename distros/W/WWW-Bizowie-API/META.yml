@@ -1,26 +1,41 @@
---- #YAML:1.0
-name:               WWW-Bizowie-API
-version:            0.01
-abstract:           Perl interface to the Bizowie.com API
+---
+abstract: "Perl API interface to Bizowie's L<erp software|http://bizowie.com/>."
 author:
-    - Michael Aquilina <aquilina@cpan.org>
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Bizowie <info@bizowie.com>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    LWP::UserAgent:        0
-    HTTP::Request::Common: 0
-    Try::Tiny:             0
-    JSON:                  0
-    Mo:                    0
-no_index:
-    directory:
-        - t
-generated_by:       ExtUtils::MakeMaker version 6.52
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - erp
+  - cloud-erp
+  - distribution
+  - wholesale
+  - manufacturing
+  - bizowie
+  - api
+  - sdk
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
-
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WWW-Bizowie-API
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTTP::Request::Common: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Mo: '0'
+  Try::Tiny: '0'
+  perl: '5.008006'
+resources:
+  bugtracker: https://github.com/bizowie/WWW-Bizowie-API/issues
+  homepage: https://bizowie.com
+  repository: https://github.com/bizowie/WWW-Bizowie-API.git
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

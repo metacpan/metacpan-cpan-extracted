@@ -1,0 +1,27 @@
+{
+  "Volumes": [
+    {
+      "Name": "my-data",
+      "Driver": "local",
+      "Mountpoint": "/var/lib/docker/volumes/my-data/_data",
+      "CreatedAt": "2025-01-10T08:00:00Z",
+      "Status": {},
+      "Labels": {
+        "project": "test"
+      },
+      "Scope": "local",
+      "Options": {}
+    },
+    {
+      "Name": "postgres-data",
+      "Driver": "local",
+      "Mountpoint": "/var/lib/docker/volumes/postgres-data/_data",
+      "CreatedAt": "2025-01-11T09:00:00Z",
+      "Status": {},
+      "Labels": {},
+      "Scope": "local",
+      "Options": {}
+    }
+  ],
+  "Warnings": []
+}

@@ -6,8 +6,6 @@ use v5.12;
 use warnings;
 use Graphics::Toolkit::Color::Space qw/min max/;
 
- # add constraint W + B <= 100
-
 sub from_rgb {
     my ($r, $g, $b) = @{$_[0]};
     my $vmax = max($r, $g, $b);
@@ -53,9 +51,8 @@ Graphics::Toolkit::Color::Space->new(
        precision => 0,
             type => [qw/angular linear linear/],
           suffix => ['', '%', '%'],
+         convert => {RGB => [\&to_rgb, \&from_rgb]},
       constraint => {cone => {checker => '$_[0][1] + $_[0][2] <= 1',
 		                     error    => 'The sum of whiteness and blackness can not exceed 100%.',
 		                     remedy   => 'my $s = $_[0][1] + $_[0][2];[$_[0][0], $_[0][1]/$s, $_[0][2]/$s]', }},
-
-         convert => {RGB => [\&to_rgb, \&from_rgb]},
 );

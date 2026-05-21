@@ -1,0 +1,5 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+# Note: This is a test case for the SPDX-License-Identifier records and this particular file is licensed under MIT
+# SPDX-License-Identifier: Artistic-1.0-Perl OR GPL-1.0-or-later

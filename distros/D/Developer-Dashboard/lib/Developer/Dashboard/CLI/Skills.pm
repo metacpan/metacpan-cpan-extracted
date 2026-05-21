@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Skills;
 use strict;
 use warnings;
 
-our $VERSION = '3.14';
+our $VERSION = '3.90';
 
 use Getopt::Long qw(GetOptionsFromArray);
 use Cwd qw(getcwd);
@@ -30,13 +30,14 @@ sub run_skills_command {
     if ( $action eq 'install' ) {
         my $use_ddfile = 0;
         my $output = 'table';
-        GetOptionsFromArray( \@argv, 'ddfile' => \$use_ddfile, 'o|output=s' => \$output );
-        return _usage_error("Usage: dashboard skills install [-o json|table] [<git-url-or-local-dir> ...]\n")
+        my $notest = 0;
+        GetOptionsFromArray( \@argv, 'ddfile' => \$use_ddfile, 'o|output=s' => \$output, 'notest' => \$notest );
+        return _usage_error("Usage: dashboard skills install [--notest] [-o json|table] [<git-url-or-local-dir> ...]\n")
           if $output ne 'json' && $output ne 'table';
         return _usage_error(
-            "Usage: dashboard skills install [-o json|table] [<git-url-or-local-dir> ...]\n"
-              . "Usage: dashboard skill install [-o json|table] [<git-url-or-local-dir> ...]\n"
-              . "Usage: dashboard skills install --ddfile [-o json|table]\n"
+            "Usage: dashboard skills install [--notest] [-o json|table] [<git-url-or-local-dir> ...]\n"
+              . "Usage: dashboard skill install [--notest] [-o json|table] [<git-url-or-local-dir> ...]\n"
+              . "Usage: dashboard skills install --ddfile [--notest] [-o json|table]\n"
         ) if $use_ddfile && @argv;
         my $paths = _build_paths();
         my @progress_sources = @argv;
@@ -50,8 +51,9 @@ sub run_skills_command {
               : _skills_install_progress_for_sources(@progress_sources)
           : undef;
         my $manager = Developer::Dashboard::SkillManager->new(
-            paths    => $paths,
-            progress => $progress ? $progress->callback : undef,
+            paths      => $paths,
+            progress   => $progress ? $progress->callback : undef,
+            skip_tests => $notest,
         );
         my $result;
         my $error;
@@ -182,7 +184,8 @@ sub _skills_install_progress {
     return if !$enabled && !-t STDERR;
     return Developer::Dashboard::CLI::Progress->new(
         title   => 'dashboard skills install progress',
-        tasks   => Developer::Dashboard::SkillManager->install_progress_tasks,
+        max_detail_lines => 10,
+        tasks   => _skills_install_progress_tasks(),
         stream  => \*STDERR,
         dynamic => ( -t STDERR ? 1 : 0 ),
         color   => ( -t STDERR ? 1 : 0 ),
@@ -201,11 +204,24 @@ sub _skills_install_progress_for_sources {
     return if !@sources;
     return Developer::Dashboard::CLI::Progress->new(
         title   => 'dashboard skills install progress',
+        max_detail_lines => 10,
         tasks   => Developer::Dashboard::SkillManager->install_progress_tasks_for_sources(@sources),
         stream  => \*STDERR,
         dynamic => ( -t STDERR ? 1 : 0 ),
         color   => ( -t STDERR ? 1 : 0 ),
     );
+}
+
+# _skills_install_progress_tasks()
+# Builds the visible dependency-task board for skill installs, keeping only the
+# system package manager steps that apply to the current host.
+# Input: none.
+# Output: array reference of progress task hashes.
+sub _skills_install_progress_tasks {
+    return [
+        { id => 'fetch_source',   label => 'Fetch skill source' },
+        { id => 'prepare_layout', label => 'Prepare skill layout' },
+    ];
 }
 
 # _skills_install_summary_table($result)

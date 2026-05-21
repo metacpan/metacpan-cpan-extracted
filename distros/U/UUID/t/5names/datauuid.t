@@ -1,15 +1,16 @@
 use strict;
 use warnings;
-use Test::More;
-use MyNote;
 
 BEGIN {
     my $has_du = eval 'require Data::UUID';
     unless ($has_du) {
-        plan skip_all => 'no Data::UUID';
+        print "1..0 # SKIP no Data::UUID\n";
+        exit 0;
     }
     Data::UUID->import(qw(NameSpace_DNS));
 }
+
+use MyTest;
 
 use UUID qw(parse uuid3);
 

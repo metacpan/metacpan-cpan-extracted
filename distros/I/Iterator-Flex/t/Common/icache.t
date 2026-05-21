@@ -31,6 +31,14 @@ sub _test_values {
     is( \@values, \@expected, 'values are correct' ) or diag pp( \@values );
 }
 
+subtest 'invalid capacity' => sub {
+
+    for my $capacity ( 0, -1, 1.5, 'not-a-number' ) {
+        like( dies { icache( iarray( [ 0, 10, 20 ] ), { capacity => $capacity } ) },
+            qr/capacity/, "reject capacity $capacity" );
+    }
+};
+
 subtest 'basic' => sub {
 
     my $iter = icache( iarray( [ 0, 10, 20 ] ) );

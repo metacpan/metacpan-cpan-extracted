@@ -50,7 +50,7 @@ subtest_streamed "Common tests using mocks" => sub {
         no warnings qw{redefine};
         *Net::OpenSSH::DESTROY = sub { undef };
     }
-    my $obj = Net::OpenSSH::More->new( 'host' => '127.0.0.1', retry_max => 1, 'output_prefix' => '# ' );
+    my $obj = Net::OpenSSH::More->new( 'host' => '127.0.0.1', retry_max => 1, 'output_prefix' => '# ', 'password' => 'mock' );
     is( ref $obj,           'Net::OpenSSH::More', "Got right ref type for object upon instantiation" );
     is( $obj->diag("Whee"), undef,                "You should see whee before this subtest" );
 };

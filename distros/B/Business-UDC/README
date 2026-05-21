@@ -7,6 +7,7 @@ SYNOPSIS
      my $obj = Business::UDC->new($udc_string);
      my $ast_hr = $obj->ast;
      my $error = $obj->error;
+     my ($error, %params) = $obj->error;
      my $is_valid = $obj->is_valid;
      my $source = $obj->source;
      my $tokens_ar = $obj->tokens;
@@ -28,12 +29,15 @@ METHODS
 
   "error"
      my $error = $obj->error;
+     my ($error, %params) = $obj->error;
 
-    Get error.
+    Get error in scalar mode.
+
+    Get error and error parameters in array mode.
 
     TODO Errors.
 
-    Returns string or undef.
+    Returns string or undef and optional list of strings.
 
   "is_valid"
      my $is_valid = $obj->is_valid;
@@ -104,5 +108,5 @@ ACKNOWLEDGEMENTS
     Linked Open Data.
 
 VERSION
-    0.03
+    0.08
 

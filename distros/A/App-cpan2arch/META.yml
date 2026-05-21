@@ -1,0 +1,67 @@
+---
+abstract: 'generate PKGBUILD from CPAN metadata'
+author:
+  - 'ryoskzypu <ryoskzypu@proton.me>'
+build_requires:
+  Capture::Tiny: '0.50'
+  Devel::CheckBin: '0.04'
+  ExtUtils::MakeMaker: '0'
+  Path::Tiny: '0.150'
+  Test2::V1: '0'
+  Text::Diff: '1.45'
+  builtin: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: App-cpan2arch
+no_index:
+  directory:
+    - t
+    - inc
+    - eg
+    - examples
+    - share
+    - xt
+recommends:
+  CHI: '0.61'
+  Cpanel::JSON::XS: '4.40'
+  Data::Printer: '1.002001'
+  Getopt::Long::More: '0.007'
+  Mojo::UserAgent::Cached: '1.25'
+  Term::ReadKey: '2.38'
+requires:
+  Archive::Tar: '0'
+  Capture::Tiny: '0.50'
+  Devel::CheckBin: '0.04'
+  File::Basename: '0'
+  File::Spec::Functions: '0'
+  IO::Socket::SSL: '2.098'
+  List::Compare: '0.55'
+  List::Util: '0'
+  Module::CoreList: '0'
+  Mojo::Log: '0'
+  Mojo::Promise: '0'
+  Mojo::UserAgent: '0'
+  Mojolicious: '9.45'
+  Object::Pad: '0.825'
+  Path::Tiny: '0.150'
+  Pod::Usage: '0'
+  Scalar::Util: '0'
+  Software::LicenseUtils: '0.104007'
+  Term::Table: '0'
+  Time::Piece: '0'
+  perl: '5.042000'
+  version: '0'
+resources:
+  bugtracker: https://github.com/ryoskzypu/App-cpan2arch/issues
+  repository: https://github.com/ryoskzypu/App-cpan2arch.git
+version: v1.1.0
+x_contributors:
+  - 'ryoskzypu <ryoskzypu@proton.me>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_spdx_expression: MIT-0

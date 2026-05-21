@@ -6,7 +6,11 @@ otptool - one-time password tool
 
 =head1 SYNOPSIS
 
-otptool otpauth://...
+otptool URI | -
+
+    URI: otpauth://
+
+    If invoked with '-', the URI is read from standard input.
 
 =cut
 
@@ -21,6 +25,7 @@ use Pass::OTP qw(otp);
 use Pass::OTP::URI qw(parse);
 
 our $VERSION = $Pass::OTP::VERSION;
+my $uri = '';
 
 Getopt::Long::Configure(qw(auto_version));
 GetOptions(
@@ -28,8 +33,16 @@ GetOptions(
 ) || pod2usage(2);
 
 pod2usage(2) if @ARGV == 0;
-pod2usage(2) if $ARGV[0] !~ m#^otpauth://#;
-printf("%s\n", otp(parse($ARGV[0])));
+
+if ($ARGV[0] eq '-') {
+    $uri = <>;
+} elsif ($ARGV[0] =~ m#^otpauth://#) {
+    $uri = $ARGV[0];
+} else {
+    pod2usage(2);
+}
+
+printf("%s\n", otp(parse($uri)));
 exit 0;
 
 __END__

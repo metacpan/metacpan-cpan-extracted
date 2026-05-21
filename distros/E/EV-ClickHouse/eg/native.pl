@@ -6,8 +6,8 @@ use EV;
 use EV::ClickHouse;
 
 my $ch = EV::ClickHouse->new(
-    host     => $ENV{CLICKHOUSE_HOST} // '127.0.0.1',
-    port     => $ENV{CLICKHOUSE_NATIVE_PORT} // 9000,
+    host     => $ENV{CLICKHOUSE_HOST} // $ENV{TEST_CLICKHOUSE_HOST} // '127.0.0.1',
+    port     => $ENV{CLICKHOUSE_NATIVE_PORT} // $ENV{TEST_CLICKHOUSE_NATIVE_PORT} // 9000,
     protocol => 'native',
     on_connect => sub {
         print "Connected via native protocol\n";

@@ -1,0 +1,72 @@
+{
+   "abstract" : "Transparent inline debugging probe (pure Perl)",
+   "author" : [
+      "Kevin Shea <KEVJSHEA@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Devel-Bug",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Term::ANSIColor" : "0",
+            "perl" : "5.020"
+         },
+         "suggests" : {
+            "Data::Dump" : "0",
+            "Term::Size::Perl" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dump" : "0",
+            "Term::Size::Perl" : "0",
+            "Test2::V0" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Devel::Bug" : {
+         "file" : "lib/Devel/Bug.pm",
+         "version" : "0.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-Bug"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ASquareClock/Devel-Bug.git",
+         "web" : "https://github.com/ASquareClock/Devel-Bug"
+      }
+   },
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

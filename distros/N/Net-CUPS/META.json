@@ -4,13 +4,13 @@
       "D. Hageman <dhageman@dracken.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-CUPS",
    "no_index" : {
@@ -44,6 +44,6 @@
          "x_git" : "https://github.com/niner/perl-Net-CUPS.git"
       }
    },
-   "version" : "0.64",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.65",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

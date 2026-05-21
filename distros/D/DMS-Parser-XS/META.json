@@ -1,0 +1,48 @@
+{
+   "abstract" : "XS wrapper around the C DMS parser",
+   "author" : [
+      "DMS"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DMS-Parser-XS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DMS::Parser" : "v0.5.1",
+            "DMS::Parser::Emitter" : "v0.5.1",
+            "Tie::IxHash" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.5.3",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

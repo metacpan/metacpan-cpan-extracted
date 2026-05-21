@@ -7,12 +7,12 @@ OcToolkit - Open Cloud Toolkit -  A Helm-like Perl module for managing Openshift
 
     use OcToolkit;
     
-    my $ocObj = OcToolkit->new( 
-                            advanceFeatures       => $advanceFeatures,
+    my $ocObj = OcToolkit->new( advanceFeatures       => $advanceFeatures,
                             clusterBaseAddress    => $clusterBaseAddress,
                             cluster               => $cluster,
                             ocConfigFile          => $ocConfigFile,
                             host                  => $host,
+                            secretsJson           => $secretsJson,
                             ocResourceKinds       => $ocResourceKinds,
                             componentDirs         => $componentDirs,
                             namespace             => $namespace,
@@ -31,11 +31,6 @@ OcToolkit - Open Cloud Toolkit -  A Helm-like Perl module for managing Openshift
                             generateUrl           => \&generateUrl,
                             removeClutter         => \&removeClutter,
                             removeClutterBackup   => \&removeClutterBackup);
-    $ocObj->install('test');
-    $ocObj->validate('test');
-    $ocObj->update('test');
-    $ocObj->backup('prod');
-    $ocObj->delete('dev');
 
 # DESCRIPTION
 

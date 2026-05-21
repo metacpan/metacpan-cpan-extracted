@@ -2,11 +2,8 @@ package Func::Util;
 
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
-# DynaLoader with RTLD_GLOBAL so our C API symbols (funcutil_register_export_xs,
-# funcutil_register_predicate_xs, etc.) are visible to other XS modules that
-# link against us at runtime. XSLoader on older Perls doesn't honour dl_load_flags.
 use DynaLoader;
 our @ISA = ('DynaLoader');
 sub dl_load_flags { 0x01 }

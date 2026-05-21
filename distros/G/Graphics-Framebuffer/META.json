@@ -23,7 +23,7 @@
       "build" : {
          "requires" : {
             "List::Util" : "1.20",
-            "Term::ANSIColor" : "0",
+            "Term::ANSIColor" : "4.00",
             "Test::More" : "1.00"
          }
       },
@@ -31,26 +31,26 @@
          "requires" : {
             "ExtUtils::MakeMaker" : "6.52",
             "Inline::MakeMaker" : "0.45",
-            "Term::ANSIColor" : "0",
-            "Term::ReadKey" : "0"
+            "Term::ANSIColor" : "4.00",
+            "Term::ReadKey" : "2.04"
          }
       },
       "runtime" : {
          "requires" : {
             "File::Map" : "0.64",
-            "IO::Handle" : "0",
+            "IO::Handle" : "1.07",
             "Imager" : "0.80",
             "Inline" : "0.53",
             "Inline::C" : "0.53",
             "List::Util" : "1.20",
             "Math::Bezier" : "0.01",
             "Math::Gradient" : "0.03",
-            "Term::ReadKey" : "0",
-            "perl" : "5.020"
+            "Term::ReadKey" : "2.04",
+            "perl" : "5.020000"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "6.99",
+   "version" : "7.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

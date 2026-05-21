@@ -3,6 +3,9 @@ use warnings;
 
 use lib '.';
 use inc::Module::Install;
+use Module::Install::DOAPChangeSets;
+use Module::Install::AuthorTests;
+use Module::Install::Scripts;
 
 name			'AtteanX-Store-LMDB';
 all_from		'lib/AtteanX/Store/LMDB.pm';
@@ -34,8 +37,20 @@ resources(
 );
 
 author_tests('xt');
+install_script 'bin/attean_lmdb_create';
 
 write_doap_changes "meta/changes.ttl", "Changes", "turtle";
 
-sign;
+# On MacOS, prefer homebrew-installed GNU tar so that we don't include Mac-specific
+# extended header data (which results in "Ignoring unknown extended header keyword"
+# messages on non-Mac systems when extracting data.
+if (-x '/opt/homebrew/bin/gtar') {
+	makemaker_args(
+		dist => {
+			TAR => '/opt/homebrew/bin/gtar'
+		}
+	);
+}
+
+sign if ! exists $ENV{CI};
 WriteAll;

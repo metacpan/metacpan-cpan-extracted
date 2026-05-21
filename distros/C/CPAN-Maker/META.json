@@ -1,7 +1,7 @@
 {
-   "abstract" : "CPAN distribution maker",
+   "abstract" : "CPAN::Maker",
    "author" : [
-      "Rob Lauer <rlauer6@comcast.net>"
+      "Rob Lauer <rclauer@gmail.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
@@ -33,60 +33,65 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "JSON::Validator" : "0"
+         },
          "requires" : {
-            "IO::Scalar" : "2.111",
-            "JSON" : "0",
-            "List::Util" : "1.33",
-            "Log::Log4perl" : "0",
-            "Module::ScanDeps::Static" : "0",
-            "Pod::Find" : "0",
-            "Readonly" : "0",
-            "Text::CSV_XS" : "0",
+            "CLI::Simple" : "v2.0.0",
+            "CLI::Simple::Constants" : "v2.0.0",
+            "CLI::Simple::Utils" : "v2.0.0",
+            "File::Process" : "v1.0.0",
+            "File::ShareDir" : "1.118",
+            "JSON" : "4.10",
+            "Log::Log4perl::Level" : "0",
+            "Module::CPANfile" : "0",
+            "Readonly" : "2.05",
+            "Role::Tiny" : "2.002004",
+            "Role::Tiny::With" : "2.002004",
             "YAML::Tiny" : "0",
             "perl" : "5.010"
          }
       },
       "test" : {
          "requires" : {
-            "JSON" : "0",
-            "Text::CSV_XS" : "0"
+            "JSON" : "4.10"
          }
       }
    },
    "provides" : {
       "CPAN::Maker" : {
          "file" : "lib/CPAN/Maker.pm",
-         "version" : "v1.8.0"
+         "version" : "v1.9.1"
       },
       "CPAN::Maker::Constants" : {
          "file" : "lib/CPAN/Maker/Constants.pm",
-         "version" : "v1.8.0"
+         "version" : "v1.9.1"
+      },
+      "CPAN::Maker::Role::FileUtils" : {
+         "file" : "lib/CPAN/Maker/Role/FileUtils.pm",
+         "version" : "v1.9.1"
+      },
+      "CPAN::Maker::Role::ModuleUtils" : {
+         "file" : "lib/CPAN/Maker/Role/ModuleUtils.pm",
+         "version" : "v1.9.1"
       },
       "CPAN::Maker::Utils" : {
          "file" : "lib/CPAN/Maker/Utils.pm",
-         "version" : "v1.8.0"
-      },
-      "File::Process" : {
-         "file" : "lib/File/Process.pm",
-         "version" : "0.15"
-      },
-      "File::Process::Utils" : {
-         "file" : "lib/File/Process/Utils.pm",
-         "version" : "0.12"
+         "version" : "v1.9.1"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/rlauer6/CPAN-Maker/issues"
+         "mailto" : "rclauer@gmail.com",
+         "web" : "https://github.com/rlauer6/CPAN-Maker/issues"
       },
-      "homepage" : "http://github.com/rlauer6/CPAN-Maker",
+      "homepage" : "https://github.com/rlauer6/CPAN-Maker",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/rlauer6/CPAN-Maker.git",
-         "web" : "http://github.com/rlauer6/CPAN-Maker"
+         "web" : "https://github.com/rlauer6/CPAN-Maker"
       }
    },
-   "version" : "v1.8.0",
+   "version" : "v1.9.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

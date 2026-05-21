@@ -1,5 +1,42 @@
 Revision history for File-Raw
 
+0.13    2026-05-17
+        - Windows: file_plugin_dispatch_stream (the each_line entry)
+          now opens with O_BINARY. 
+
+0.12    2026-05-07
+        - Windows: emit a MinGW import library (libRaw.dll.a) alongside
+          Raw.dll at build time and publish its location through
+          ExtUtils::Depends's set_libs. Downstream plugin XS dists
+          (Base64, Gzip, Hash, Separated, ...) can now drop their
+          hand-rolled MSWin32 Makefile.PL branches that hunted for
+          Raw.dll on disk. ExtUtils::Depends should now provide the right
+          -L/-lRaw automatically.
+
+0.11    2026-05-05
+        - Win32 portability fix: the FilePlugin struct fields read/write/
+          record/stream have been renamed to read_fn/write_fn/record_fn/stream_fn.
+
+0.10    2026-05-03
+        - BREAKING: the global read/write hook system is gone. Removed
+          register_read_hook, register_write_hook, clear_hooks,
+          has_hooks, register_line_callback, list_line_callbacks and the
+          whole include/file_hooks*.h C API (file_register_hook_c,
+          file_run_hooks, FileHookContext, etc.). Downstream modules that
+          registered hooks must port to the new plugin API.
+        - Replacement: a named-plugin system. Callers opt in per call via
+          a trailing key/value tail:  File::Raw::slurp($p, plugin => 'csv', sep => ';');
+        - register_plugin / unregister_plugin / list_plugins (Perl) and
+          file_register_plugin / file_unregister_plugin / file_lookup_plugin
+          plus dispatch helpers in include/file_plugin.h (C). Plugins
+          implement any subset of read / write / record / stream phases.
+        - Predicate registry survives, repackaged as a built-in 'predicate'
+          plugin. New names: register_predicate / list_predicates. The
+          legacy 2-arg sugar grep_lines($p, 'is_blank') keeps working.
+        - `plugin =>` accepts an arrayref of plugin names in addition to a scalar string. 
+	  READ unwraps left to right; WRITE applies right to left:
+        - Change to use ExtUtils::Depends to help linking header.
+
 0.09    2026-04-25
         - Fix build on Solaris/SunOS: drop GNU-only -Wl,--export-dynamic
           and -Wl,-soname flags, native ld already exports by default

@@ -10,7 +10,7 @@ build_requires:
 configure_requires:
   Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,7 +19,7 @@ name: Crypt-ScryptKDF
 provides:
   Crypt::ScryptKDF:
     file: lib/Crypt/ScryptKDF.pm
-    version: '0.010'
+    version: '0.011'
 requires:
   Exporter: '5.59'
   MIME::Base64: '0'
@@ -27,5 +27,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/DCIT/perl-Crypt-ScryptKDF
-version: '0.010'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.016'
+version: '0.011'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -3,11 +3,12 @@ package OSLV::Monitor::Backends::FreeBSD;
 use 5.006;
 use strict;
 use warnings;
-use JSON;
-use Clone 'clone';
-use File::Slurp;
+use JSON         qw(decode_json encode_json);
+use Clone        qw(clone);
+use File::Slurp  qw(read_file write_file);
 use List::Util   qw( uniq );
 use Scalar::Util qw(looks_like_number);
+use Time::HiRes  qw(gettimeofday);
 
 =head1 NAME
 
@@ -15,11 +16,11 @@ OSLV::Monitor::Backends::FreeBSD - backend for FreeBSD jails
 
 =head1 VERSION
 
-Version 0.0.4
+Version 0.0.5
 
 =cut
 
-our $VERSION = '0.0.4';
+our $VERSION = '0.0.5';
 
 =head1 SYNOPSIS
 
@@ -129,11 +130,26 @@ sub run {
 	my $new_proc_cache = {};
 	my $cache_is_new   = 0;
 	if ( -f $self->{proc_cache} ) {
+		if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+			warn(     'DEBUG, '
+					. join( '.', gettimeofday )
+					. ': backend run loading proc cache "'
+					. $self->{proc_cache}
+					. '"' );
+		}
 		eval {
 			my $raw_cache = read_file( $self->{proc_cache} );
 			$proc_cache = decode_json($raw_cache);
 		};
 		if ($@) {
+			if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+				warn(     'DEBUG, '
+						. join( '.', gettimeofday )
+						. ': backend run proc cache "'
+						. $self->{proc_cache}
+						. '" could not be loaded... '
+						. $@ );
+			}
 			push(
 				@{ $data->{errors} },
 				'reading proc cache "' . $self->{proc_cache} . '" failed... using a empty one...' . $@
@@ -141,8 +157,11 @@ sub run {
 			$data->{cache_failure} = 1;
 			$proc_cache = {};
 			return $data;
-		}
+		} ## end if ($@)
 	} else {
+		if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+			warn( 'DEBUG, ' . join( '.', gettimeofday ) . ': backend run proc cache is new' );
+		}
 		$cache_is_new = 1;
 	}
 
@@ -175,9 +194,18 @@ sub run {
 	};
 
 	# get a list of jails for jid to name mapping
+	if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+		warn(     'DEBUG, '
+				. join( '.', gettimeofday )
+				. ': backend run calling "/usr/sbin/jls -h --libxo json 2> /dev/null"' );
+	}
 	my $output = `/usr/sbin/jls -h --libxo json 2> /dev/null`;
+	if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+		warn(     'DEBUG, '
+				. join( '.', gettimeofday )
+				. ': backend run "/usr/sbin/jls -h --libxo json 2> /dev/null" finished' );
+	}
 	my $jls;
-	my %jid_to_name;
 	my @IP_keys = ( 'ip4.addr', 'ip6.addr' );
 	eval { $jls = decode_json($output) };
 	if ($@) {
@@ -193,111 +221,155 @@ sub run {
 	{
 		foreach my $jls_jail ( @{ $jls->{'jail-information'}{jail} } ) {
 			if ( defined( $jls_jail->{name} ) && defined( $jls_jail->{jid} ) ) {
-				my $jname = $jls_jail->{name};
+				if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+					warn(     'DEBUG, '
+							. join( '.', gettimeofday )
+							. ': backend run processing jname="'
+							. $jls_jail->{name}
+							. '" jid="'
+							. $jls_jail->{jid}
+							. '"' );
+				}
 
-				$jid_to_name{ $jls_jail->{jid} } = $jname;
+				my $jname        = $jls_jail->{name};
+				my $include_jail = $self->{'obj'}->include($jname);
 
-				$data->{oslvms}{$jname} = clone($base_stats);
-
-				# finds each ip ifconfig shows in a jail
-				my $output = `ifconfig -j $jname 2> /dev/null`;
-				my %found_IPv4;
-				my %found_IPv6;
-				if ( $? eq 0 ) {
-					my @output_split = split( /\n/, $output );
-					my $interface;
-					foreach my $line (@output_split) {
-						if ( $line =~ /^[a-zA-Z].*\:[\ \t]+flags\=/ ) {
-							$interface = $line;
-							$interface =~ s/\:[\ \t]+flags.*//;
-						} elsif ( $line =~ /^[\ \t]+inet6 /
-							&& defined($interface) )
-						{
-							$line =~ s/^[\ \t]+inet6 //;
-							$line =~ s/\ .*$//;
-							$line =~ s/\%.*$//;
-							$found_IPv6{$line} = $interface;
-						} elsif ( $line =~ /^[\ \t]+inet /
-							&& defined($interface) )
-						{
-							$line =~ s/^[\ \t]+inet //;
-							$line =~ s/ .*$//;
-							$found_IPv4{$line} = $interface;
-						}
-					} ## end foreach my $line (@output_split)
-				} ## end if ( $? eq 0 )
-
-				foreach my $ip_key (@IP_keys) {
-					my @current_IPs;
-
-					if ( $ip_key eq 'ip4.addr' ) {
-						@current_IPs = keys(%found_IPv4);
-					} else {
-						@current_IPs = keys(%found_IPv6);
+				if ($include_jail) {
+					if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+						warn( 'DEBUG, ' . join( '.', gettimeofday ) . ': backend run calling clone($base_stats)' );
 					}
 
-					if (   defined( $jls_jail->{$ip_key} )
-						&& ref( $jls_jail->{$ip_key} ) eq 'ARRAY'
-						&& defined( $jls_jail->{$ip_key}[0] ) )
-					{
-						foreach my $ip ( @{ $jls_jail->{$ip_key} } ) {
-							if ( ref($ip) eq '' && !defined( $found_IPv4{$ip} ) && !defined( $found_IPv6{$ip} ) ) {
-								if (   $ip =~ /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/
-									|| $ip =~ /^[\:0-9a-fA-F]+$/ )
-								{
-									push( @current_IPs, $ip );
-								}
-							}
-						}
-					} ## end if ( defined( $jls_jail->{$ip_key} ) && ref...)
-					foreach my $ip (@current_IPs) {
-						my $ip_if;
-						my $ip_gw;
-						my $ip_gw_if;
+					$data->{oslvms}{$jname} = clone($base_stats);
 
-						if ( $ip_key eq 'ip4.addr'
-							&& defined( $found_IPv4{$ip} ) )
-						{
-							$ip_if = $found_IPv4{$ip};
-						} elsif ( $ip_key eq 'ip6.addr'
-							&& defined( $found_IPv6{$ip} ) )
-						{
-							$ip_if = $found_IPv6{$ip};
-						}
-						# set the ip type flag for netstat
-						my $ip_flag = '-6';
-						if ( $ip_key eq 'ip4.addr' ) {
-							$ip_flag = '-4';
-						}
+					if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+						warn( 'DEBUG, ' . join( '.', gettimeofday ) . ': backend run done clone($base_stats) done' );
+					}
 
-						# fetch netstat route info for the jail
-						my $output = `route -n -j $jname $ip_flag show default 2> /dev/null`;
-						if ( $? eq 0 ) {
-							my @output_split = split( /\n/, $output );
-							foreach my $line (@output_split) {
-								if ( $line =~ /gateway\:[\ \t]/ ) {
-									$line =~ s/.*gateway\:[\ \t]+//;
-									$line =~ s/[\ \t]*$//;
-									$ip_gw = $line;
-								} elsif ( $line =~ /interface:[\ \t]/ ) {
-									$line =~ s/.*interface\:[\ \t]+//;
-									$line =~ s/[\ \t]*$//;
-									$ip_gw_if = $line;
-								}
-							} ## end foreach my $line (@output_split)
-						} ## end if ( $? eq 0 )
-
-						push(
-							@{ $data->{oslvms}{$jname}{ip} },
+					# finds each ip ifconfig shows in a jail
+					if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+						warn(     'DEBUG, '
+								. join( '.', gettimeofday )
+								. ': backend run calling "ifconfig -j '
+								. $jname
+								. ' 2> /dev/null"' );
+					}
+					my $output = `ifconfig -j $jname 2> /dev/null`;
+					my %found_IPv4;
+					my %found_IPv6;
+					if ( $? eq 0 ) {
+						if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+							warn(     'DEBUG, '
+									. join( '.', gettimeofday )
+									. ': backend run processing ifconfig info for jail' );
+						}
+						my @output_split = split( /\n/, $output );
+						my $interface;
+						foreach my $line (@output_split) {
+							if ( $line =~ /^[a-zA-Z].*\:[\ \t]+flags\=/ ) {
+								$interface = $line;
+								$interface =~ s/\:[\ \t]+flags.*//;
+							} elsif ( $line =~ /^[\ \t]+inet6 /
+								&& defined($interface) )
 							{
-								ip    => $ip,
-								if    => $ip_if,
-								gw    => $ip_gw,
-								gw_if => $ip_gw_if,
+								$line =~ s/^[\ \t]+inet6 //;
+								$line =~ s/\ .*$//;
+								$line =~ s/\%.*$//;
+								$found_IPv6{$line} = $interface;
+							} elsif ( $line =~ /^[\ \t]+inet /
+								&& defined($interface) )
+							{
+								$line =~ s/^[\ \t]+inet //;
+								$line =~ s/ .*$//;
+								$found_IPv4{$line} = $interface;
 							}
-						);
-					} ## end foreach my $ip (@current_IPs)
-				} ## end foreach my $ip_key (@IP_keys)
+						} ## end foreach my $line (@output_split)
+					} elsif ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+						warn( 'DEBUG, ' . join( '.', gettimeofday ) . ': backend run ifconfig exited non-zero' );
+					}
+					## end if ( $? eq 0 )
+
+					foreach my $ip_key (@IP_keys) {
+						my @current_IPs;
+
+						if ( $ip_key eq 'ip4.addr' ) {
+							@current_IPs = keys(%found_IPv4);
+						} else {
+							@current_IPs = keys(%found_IPv6);
+						}
+
+						if (   defined( $jls_jail->{$ip_key} )
+							&& ref( $jls_jail->{$ip_key} ) eq 'ARRAY'
+							&& defined( $jls_jail->{$ip_key}[0] ) )
+						{
+							foreach my $ip ( @{ $jls_jail->{$ip_key} } ) {
+								if ( ref($ip) eq '' && !defined( $found_IPv4{$ip} ) && !defined( $found_IPv6{$ip} ) ) {
+									if (   $ip =~ /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/
+										|| $ip =~ /^[\:0-9a-fA-F]+$/ )
+									{
+										push( @current_IPs, $ip );
+									}
+								}
+							}
+						} ## end if ( defined( $jls_jail->{$ip_key} ) && ref...)
+						foreach my $ip (@current_IPs) {
+							my $ip_if;
+							my $ip_gw;
+							my $ip_gw_if;
+
+							if ( $ip_key eq 'ip4.addr'
+								&& defined( $found_IPv4{$ip} ) )
+							{
+								$ip_if = $found_IPv4{$ip};
+							} elsif ( $ip_key eq 'ip6.addr'
+								&& defined( $found_IPv6{$ip} ) )
+							{
+								$ip_if = $found_IPv6{$ip};
+							}
+							# set the ip type flag for netstat
+							my $ip_flag = '-6';
+							if ( $ip_key eq 'ip4.addr' ) {
+								$ip_flag = '-4';
+							}
+
+							# fetch route info for the jail
+							if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+								warn(     'DEBUG, '
+										. join( '.', gettimeofday )
+										. ': backend run calling "route -n -j '
+										. $jname . ' '
+										. $ip_flag
+										. ' show default 2> /dev/null"' );
+							}
+							my $output = `route -n -j $jname $ip_flag show default 2> /dev/null`;
+							if ( $? eq 0 ) {
+								my @output_split = split( /\n/, $output );
+								foreach my $line (@output_split) {
+									if ( $line =~ /gateway\:[\ \t]/ ) {
+										$line =~ s/.*gateway\:[\ \t]+//;
+										$line =~ s/[\ \t]*$//;
+										$ip_gw = $line;
+									} elsif ( $line =~ /interface:[\ \t]/ ) {
+										$line =~ s/.*interface\:[\ \t]+//;
+										$line =~ s/[\ \t]*$//;
+										$ip_gw_if = $line;
+									}
+								} ## end foreach my $line (@output_split)
+							} elsif ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+								warn( 'DEBUG, ' . join( '.', gettimeofday ) . ': backend run route exited non-zero' );
+							}
+
+							push(
+								@{ $data->{oslvms}{$jname}{ip} },
+								{
+									ip    => $ip,
+									if    => $ip_if,
+									gw    => $ip_gw,
+									gw_if => $ip_gw_if,
+								}
+							);
+						} ## end foreach my $ip (@current_IPs)
+					} ## end foreach my $ip_key (@IP_keys)
+				} ## end if ($include_jail)
 			} ## end if ( defined( $jls_jail->{name} ) && defined...)
 		} ## end foreach my $jls_jail ( @{ $jls->{'jail-information'...}})
 	} ## end if ( defined($jls) && ref($jls) eq 'HASH' ...)
@@ -344,11 +416,25 @@ sub run {
 	};
 
 	foreach my $jail (@found_jails) {
+		if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+			warn(     'DEBUG, '
+					. join( '.', gettimeofday )
+					. ': backend run calling "/bin/ps ax --libxo json -o %cpu,%mem,pid,acflag,cow,dsiz,etimes,inblk,jail,majflt,minflt,msgrcv,msgsnd,nivcsw,nswap,nvcsw,oublk,rss,ssiz,systime,time,tsiz,usertime,vsz,pid,gid,uid,command,nsigs -J '
+					. $jail
+					. ' 2> /dev/null"' );
+		}
 		$output
 			= `/bin/ps ax --libxo json -o %cpu,%mem,pid,acflag,cow,dsiz,etimes,inblk,jail,majflt,minflt,msgrcv,msgsnd,nivcsw,nswap,nvcsw,oublk,rss,ssiz,systime,time,tsiz,usertime,vsz,pid,gid,uid,command,nsigs -J $jail 2> /dev/null`;
 		my $ps;
 		eval { $ps = decode_json($output); };
 		if ( !$@ ) {
+			if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+				warn(     'DEBUG, '
+						. join( '.', gettimeofday )
+						. ': backend run processing proc info for jail '
+						. $jail
+						. '' );
+			}
 			foreach my $proc ( @{ $ps->{'process-information'}{process} } ) {
 				if ( $proc->{'elapsed-times'} ne '-' ) {
 					my $cache_name
@@ -411,12 +497,31 @@ sub run {
 	} ## end foreach my $jail (@found_jails)
 
 	# save the proc cache for next run
+	if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+		warn(     'DEBUG, '
+				. join( '.', gettimeofday )
+				. ': backend run writing proc cache to "'
+				. $self->{proc_cache}
+				. '"' );
+	}
 	eval { write_file( $self->{proc_cache}, encode_json($new_proc_cache) ); };
 	if ($@) {
+		if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+			warn(     'DEBUG, '
+					. join( '.', gettimeofday )
+					. ': backend run errored writing proc cache to "'
+					. $self->{proc_cache} . '"... '
+					. $@ );
+		}
 		push( @{ $data->{errors} }, 'saving proc cache failed, "' . $self->{proc_cache} . '"... ' . $@ );
-	}
+	} ## end if ($@)
 
 	if ($cache_is_new) {
+		if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+			warn(     'DEBUG, '
+					. join( '.', gettimeofday )
+					. ': backend run cache is new so not returning any oslvm info and zeroing totals' );
+		}
 		delete( $data->{oslvms} );
 		$data->{oslvms} = {};
 		my @total_keys = keys( %{ $data->{totals} } );
@@ -426,6 +531,10 @@ sub run {
 			}
 		}
 	} ## end if ($cache_is_new)
+
+	if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+		warn( 'DEBUG, ' . join( '.', gettimeofday ) . ': backend run done' );
+	}
 
 	return $data;
 } ## end sub run

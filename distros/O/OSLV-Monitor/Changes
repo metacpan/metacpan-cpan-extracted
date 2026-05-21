@@ -1,5 +1,13 @@
 Revision history for OSLV-Monitor
 
+1.0.4   2026-05-09/14:30
+        - fix handling of include/exclude stuff for FreeBSD
+        - add OSLV_MONITOR_DEBUG env
+        - note JSON::XS
+
+1.0.3   2026-04-28/14:00
+        - fix handling of Docker, translatting annoying random string names to something meaningful
+
 1.0.2   2024-10-15/17:30
         - add zero stats if the cache is new to prevent spikes at start
 

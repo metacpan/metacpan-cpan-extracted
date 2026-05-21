@@ -16,6 +16,7 @@ WriteMakefile(
         'ExtUtils::MakeMaker' => 0,
     },
     PREREQ_PM => {
+        'version'             => '0.77',
         'CHI'                 => 0,
         'JSON'                => 0,
         'JSON::MaybeXS'       => 0,
@@ -45,6 +46,7 @@ WriteMakefile(
         'DBIx::Class'         => 0,
         'Future::AsyncAwait'  => 0,
         'SQL::Translator'     => 0.11018,
+        'Math::Base36'        => 0.07
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'DBIx-Class-Async-*' },

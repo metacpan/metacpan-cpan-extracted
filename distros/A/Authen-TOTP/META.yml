@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,15 +26,20 @@ no_index:
 provides:
   Authen::TOTP:
     file: lib/Authen/TOTP.pm
-    version: v0.0.7
+    version: v0.1.1
 requires:
+  Crypt::PRNG: '0'
   Digest::SHA: '0'
   MIME::Base32: '0'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/tchatzi/Authen-TOTP/issues
   homepage: https://github.com/tchatzi/Authen-TOTP
-  repository: git://github.com/tchatzi/Authen-TOTP.git
-version: 0.0.7
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  repository: https://github.com/tchatzi/Authen-TOTP.git
+version: 0.1.1
+x_contributors:
+  - 'George Baugh <george@troglodyne.net>'
+  - 'MDW <--unset>'
+  - 'tchatzi <tchatzi2000@yahoo.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

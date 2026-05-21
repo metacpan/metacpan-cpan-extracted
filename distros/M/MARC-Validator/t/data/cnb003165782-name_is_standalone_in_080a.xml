@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>01180nas a2200361 i 4500</leader>
+  <controlfield tag="001">cps20193165782</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20230809090643.0</controlfield>
+  <controlfield tag="007">ta</controlfield>
+  <controlfield tag="008">191219c20169999xr fr p       0   b0cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb003165782</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)1135578632</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="d">BOA001</subfield>
+    <subfield code="e">rda</subfield>
+  </datafield>
+  <datafield tag="043" ind1=" " ind2=" ">
+    <subfield code="a">e-xr---</subfield>
+    <subfield code="b">e-xr-mo</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">352/354</subfield>
+    <subfield code="x">Stupně místní, oblastní a ústřední správy</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">15</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">Kružberk (Česko)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(051)-027.541</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="245" ind1="0" ind2="0">
+    <subfield code="a">Kružberský občasník</subfield>
+  </datafield>
+  <datafield tag="264" ind1=" " ind2="1">
+    <subfield code="a">Kružberk :</subfield>
+    <subfield code="b">Obec Kružberk,</subfield>
+    <subfield code="c">[2016?]-</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="c">30 cm</subfield>
+  </datafield>
+  <datafield tag="310" ind1=" " ind2=" ">
+    <subfield code="a">2x ročně</subfield>
+  </datafield>
+  <datafield tag="336" ind1=" " ind2=" ">
+    <subfield code="a">text</subfield>
+    <subfield code="b">txt</subfield>
+    <subfield code="2">rdacontent</subfield>
+  </datafield>
+  <datafield tag="337" ind1=" " ind2=" ">
+    <subfield code="a">bez média</subfield>
+    <subfield code="b">n</subfield>
+    <subfield code="2">rdamedia</subfield>
+  </datafield>
+  <datafield tag="338" ind1=" " ind2=" ">
+    <subfield code="a">svazek</subfield>
+    <subfield code="b">nc</subfield>
+    <subfield code="2">rdacarrier</subfield>
+  </datafield>
+  <datafield tag="588" ind1=" " ind2=" ">
+    <subfield code="a">Popsáno podle: 26. listopadu 2019</subfield>
+    <subfield code="5">CZ-PrNK</subfield>
+  </datafield>
+  <datafield tag="651" ind1=" " ind2="7">
+    <subfield code="a">Kružberk (Česko)</subfield>
+    <subfield code="7">ge257910</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">místní časopisy</subfield>
+    <subfield code="7">fd132900</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2="1">
+    <subfield code="3">Online verze</subfield>
+    <subfield code="u">http://www.kruzberk.cz/kruzbersky-obcasnik/</subfield>
+    <subfield code="4">N</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="r">2019-</subfield>
+  </datafield>
+  <datafield tag="968" ind1=" " ind2=" ">
+    <subfield code="a">5d</subfield>
+  </datafield>
+  <datafield tag="969" ind1=" " ind2=" ">
+    <subfield code="a">i</subfield>
+  </datafield>
+  <datafield tag="970" ind1=" " ind2=" ">
+    <subfield code="n">Obecní úřad Kružberk</subfield>
+    <subfield code="a">Kružberk 84, 747 86 Kružberk</subfield>
+    <subfield code="e">556 311 029</subfield>
+    <subfield code="x">obec@kruzberk.cz</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">003165782</subfield>
+  </datafield>
+</record>
+
+</collection>

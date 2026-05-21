@@ -1,0 +1,45 @@
+bin/bootstrapper
+bin/cpan-maker-bootstrapper
+ChangeLog
+lib/CPAN/Maker/Bootstrapper.pm
+lib/CPAN/Maker/Bootstrapper/ConfigReader.pm
+lib/CPAN/Maker/Bootstrapper/Constants.pm
+lib/CPAN/Maker/Bootstrapper/Role/CreateConfig.pm
+lib/CPAN/Maker/Bootstrapper/Role/Init.pm
+lib/CPAN/Maker/Bootstrapper/Role/Installer.pm
+lib/CPAN/Maker/Bootstrapper/Role/LLM/Annotator.pm
+lib/CPAN/Maker/Bootstrapper/Role/LLM/Models.pm
+lib/CPAN/Maker/Bootstrapper/Role/LLM/ReleaseNotes.pm
+lib/CPAN/Maker/Bootstrapper/Role/LLM/Reviewer.pm
+lib/CPAN/Maker/Bootstrapper/Role/LLM/Utils.pm
+lib/CPAN/Maker/Bootstrapper/Role/ScaffoldImporter.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+postamble
+release-notes.md
+share/build.yml
+share/builder
+share/buildspec.yml.tmpl
+share/class-module.pm.tmpl
+share/cli-module.pm.tmpl
+share/code-review.prompt
+share/cpan-maker-bootstrapper.yml
+share/git.mk
+share/gitignore
+share/help.mk
+share/Makefile.txt
+share/MANIFEST
+share/modulino.tmpl
+share/perl.mk
+share/pod-review.prompt
+share/README.md
+share/release-notes.mk
+share/test.t.tmpl
+share/update.mk
+share/upgrade.mk
+share/version.mk
+t/00-cpan-maker-bootstrapper.t
+t/find-primary-package.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

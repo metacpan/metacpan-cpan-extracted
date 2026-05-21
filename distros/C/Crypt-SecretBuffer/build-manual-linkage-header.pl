@@ -34,6 +34,10 @@ print <<END;
      sv_setpvs(sv, "$_->{proto}"); \\
      hv_stores(c_api, "$_->{name}", SvREFCNT_inc(make_enum_dualvar(aTHX_ (IV)($_->{name}), sv))); \\
 END_API_FN
+     /* back-compat alias.  It is ABI-compatible, but type of argument changed */ \\
+     sv= get_sv("Crypt::SecretBuffer::C_API::bool secret_buffer_transcode(secret_buffer_parse *, secret_buffer_parse *)", GV_ADD); \\
+     sv_setpvs(sv, "bool secret_buffer_transcode(secret_buffer_parse *src, secret_buffer_parse *dst)"); \\
+     make_enum_dualvar(aTHX_ (IV)(secret_buffer_transcode), sv); \\
    }
 
 #endif

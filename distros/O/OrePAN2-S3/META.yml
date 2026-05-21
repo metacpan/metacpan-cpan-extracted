@@ -1,11 +1,10 @@
 ---
 abstract: OrePAN2::S3
 author:
-  - 'Rob Lauer <rlauer6@comcast.net>'
+  - 'Rob Lauer <rlauer@treasurersbriefcase.com>'
 build_requires:
   ExtUtils::MakeMaker: '6.64'
   File::ShareDir::Install: '0'
-  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::ShareDir::Install: '0'
@@ -23,22 +22,37 @@ no_index:
 provides:
   OrePAN2::S3:
     file: lib/OrePAN2/S3.pm
-    version: v1.0.4
+    version: v1.2.1
+  OrePAN2::S3::Role::Delete:
+    file: lib/OrePAN2/S3/Role/Delete.pm
+    version: '0'
+  OrePAN2::S3::Role::Inject:
+    file: lib/OrePAN2/S3/Role/Inject.pm
+    version: '0'
+  OrePAN2::S3::Role::UploadArtifacts:
+    file: lib/OrePAN2/S3/Role/UploadArtifacts.pm
+    version: '0'
 requires:
-  Amazon::Credentials: '0'
-  Amazon::S3: '0'
-  Archive::Tar: '0'
-  CLI::Simple: '0'
-  DarkPAN::Utils: '0'
-  JSON: '0'
+  Amazon::Credentials: v1.3.0
+  Amazon::S3::Lite: v1.0.0
+  CLI::Simple: v2.0.1
+  CLI::Simple::Constants: v2.0.1
+  CLI::Simple::Utils: v2.0.1
+  CPAN::Meta: '2.150010'
+  DarkPAN::Utils: v1.0.0
+  DarkPAN::Utils::Docs: v1.0.0
+  JSON: '4.10'
+  LWP::MediaTypes: '6.04'
   OrePAN2::Index: '0'
-  Readonly: '0'
-  Template: '0'
-  YAML: '0'
+  Readonly: '2.05'
+  Role::Tiny: '2.002004'
+  Role::Tiny::With: '2.002004'
+  Template: '3.102'
+  Text::Markdown::Discount: '0.18'
   perl: '5.010'
 resources:
-  bugtracker: http://github.com/rlauer6/orepan2-s3/issues
-  homepage: http://github.com/rlauer6/orepan2-s3.git
-  repository: git://github.com/rlauer6/orepan2-s3.git
-version: v1.0.4
+  bugtracker: http://github.com/rlauer6/OrePAN2-S3/issues
+  homepage: http://github.com/rlauer6/OrePAN2-S3.git
+  repository: git://github.com/rlauer6/OrePAN2-S3.git
+version: v1.2.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -3,6 +3,8 @@ abstract: 'Library to work with Universal Decimal Classification.'
 author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
+  English: 0
+  Error::Pure::Utils: 0
   ExtUtils::MakeMaker: 6.59
   Readonly: 0
   Test::More: 0
@@ -37,4 +39,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Business-UDC
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Business-UDC
-version: '0.03'
+version: '0.08'

@@ -1,4 +1,33 @@
+Revision history for TUI::Vision
+
+2.0.1  2026-05-12
+    - Rebranding and consolidation under the TUI::Vision naming.
+    - Major dialog work, including StdDlg updates.
+    - Documentation updates and release preparation.
+
 2.0.0  2026-04-16
     - Initial namespace reservation for TUI::Vision
     - Added stub modules for all TUI::* components
     - Added toolkit placeholder
+
+0.2.6  2026-04-15
+    - Extended views/widgets (including text, scroll, terminal and utility
+      views) with broader test coverage.
+
+0.2.5  2025-12-31
+    - Strong focus on window/menu/statusline UI components.
+    - Continued API cleanup and internal refactoring across core modules.
+    - More tests and assertions added for stability.
+    - Documentation and structure maintenance throughout the year.
+
+0.2.4  2024-12-31
+    - Namespace/module structure migration and cleanup.
+    - Core desktop/app/view building blocks expanded.
+    - Geometry/toolkit foundations (point/rect/toolkit paths) matured.
+    - Test and project layout improvements (including xt coverage).
+
+0.2.3  2023-04-30
+    - Repository on Github
+
+0.2.1  2021-06-02
+    - Initial release

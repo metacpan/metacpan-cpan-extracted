@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Lightweight DateTime Alternative - ~/lib/DateTime/Lite/PP.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/04/03
-## Modified 2026/04/10
+## Modified 2026/05/03
 ## All rights reserved
 ## 
 ## 
@@ -59,10 +59,13 @@ BEGIN
         }
     }
     warnings::register_categories( 'DateTime::Lite' );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
-$DateTime::Lite::IsPurePerl = 1;
+{
+    no warnings 'once';
+    $DateTime::Lite::IsPurePerl = 1;
+}
 
 my @MonthLengths = ( 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 );
 
@@ -81,12 +84,23 @@ my( @EndOfLastMonthDOY, @EndOfLastMonthDOLY );
     }
 }
 
+# NOTE: Leap second data - mirrors leap_seconds.h (same source as the XS path).
+# This makes PP.pm fully self-contained without requiring DateTime::LeapSecond.
+my %_EXTRA_SECONDS = (
+    720075 => +1,  720259 => +1,  720624 => +1,  720989 => +1,
+    721354 => +1,  721720 => +1,  722085 => +1,  722450 => +1,
+    722815 => +1,  723362 => +1,  723727 => +1,  724092 => +1,
+    724823 => +1,  725737 => +1,  726468 => +1,  726833 => +1,
+    727380 => +1,  727745 => +1,  728110 => +1,  728659 => +1,
+    729206 => +1,  729755 => +1,  732312 => +1,  733408 => +1,
+    734685 => +1,  735780 => +1,  736330 => +1,
+);
+
 # NOTE: _accumulated_leap_seconds
 sub _accumulated_leap_seconds
 {
     shift( @_ );    # class/self
-    require DateTime::LeapSecond;
-    return( DateTime::LeapSecond::leap_seconds( $_[0] ) );
+    return( _leap_seconds_for( $_[0] ) );
 }
 
 # NOTE: _compare_rd( self, d1, s1, ns1, d2, s2, ns2 )
@@ -103,16 +117,20 @@ sub _compare_rd
 sub _day_length
 {
     shift( @_ );
-    require DateTime::LeapSecond;
-    return( DateTime::LeapSecond::day_length( $_[0] ) );
+    return( _day_length_for( $_[0] ) );
+}
+
+sub _day_length_for
+{
+    my $utc_rd = $_[0];
+    return( 86400 + ( $_EXTRA_SECONDS{ $utc_rd } // 0 ) );
 }
 
 # NOTE: _day_has_leap_second
 sub _day_has_leap_second
 {
     my( undef, $utc_rd ) = @_;
-    require DateTime::LeapSecond;
-    return( DateTime::LeapSecond::day_length( $utc_rd ) > 86400 ? 1 : 0 );
+    return( exists( $_EXTRA_SECONDS{ $utc_rd } ) ? 1 : 0 );
 }
 
 # NOTE: _epoch_to_rd( self, epoch )
@@ -142,6 +160,41 @@ sub _is_leap_year
     return(1) if( $y % 100 );
     return(0) if( $y % 400 );
     return(1);
+}
+
+sub _leap_seconds_for
+{
+    my $utc_rd = $_[0];
+    return(
+        $utc_rd >= 736330 ? 27 :
+        $utc_rd >= 735780 ? 26 :
+        $utc_rd >= 734685 ? 25 :
+        $utc_rd >= 733408 ? 24 :
+        $utc_rd >= 732312 ? 23 :
+        $utc_rd >= 729755 ? 22 :
+        $utc_rd >= 729206 ? 21 :
+        $utc_rd >= 728659 ? 20 :
+        $utc_rd >= 728110 ? 19 :
+        $utc_rd >= 727745 ? 18 :
+        $utc_rd >= 727380 ? 17 :
+        $utc_rd >= 726833 ? 16 :
+        $utc_rd >= 726468 ? 15 :
+        $utc_rd >= 725737 ? 14 :
+        $utc_rd >= 724823 ? 13 :
+        $utc_rd >= 724092 ? 12 :
+        $utc_rd >= 723727 ? 11 :
+        $utc_rd >= 723362 ? 10 :
+        $utc_rd >= 722815 ?  9 :
+        $utc_rd >= 722450 ?  8 :
+        $utc_rd >= 722085 ?  7 :
+        $utc_rd >= 721720 ?  6 :
+        $utc_rd >= 721354 ?  5 :
+        $utc_rd >= 720989 ?  4 :
+        $utc_rd >= 720624 ?  3 :
+        $utc_rd >= 720259 ?  2 :
+        $utc_rd >= 720075 ?  1 :
+        0
+    );
 }
 
 # _normalize_nanoseconds( self, \$secs, \$nanosecs )
@@ -174,20 +227,21 @@ sub _normalize_nanoseconds
 sub _normalize_leap_seconds
 {
     # $_[1] = days (aliased), $_[2] = secs (aliased)
-    require DateTime::LeapSecond;
+    # Short-circuit for non-finite values (Inf/-Inf from Infinite objects)
+    return unless( defined( $_[2] ) && ( $_[2] - $_[2] ) == 0 );
     while( $_[2] < 0 )
     {
-        my $dl = DateTime::LeapSecond::day_length( $_[1] - 1 );
+        my $dl = _day_length_for( $_[1] - 1 );
         $_[2] += $dl;
         $_[1]--;
     }
 
-    my $dl = DateTime::LeapSecond::day_length( $_[1] );
+    my $dl = _day_length_for( $_[1] );
     while( $_[2] > $dl - 1 )
     {
         $_[2] -= $dl;
         $_[1]++;
-        $dl = DateTime::LeapSecond::day_length( $_[1] );
+        $dl = _day_length_for( $_[1] );
     }
 }
 
@@ -195,6 +249,8 @@ sub _normalize_leap_seconds
 sub _normalize_tai_seconds
 {
     # $_[1] = days (aliased), $_[2] = secs (aliased)
+    # Short-circuit for non-finite values (Inf/-Inf from Infinite objects)
+    return unless( defined( $_[2] ) && ( $_[2] - $_[2] ) == 0 );
     return if( $_[2] >= 0 && $_[2] < 86400 );
 
     use integer;
@@ -401,7 +457,7 @@ You should not normally load or call this module directly.
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 SEE ALSO
 
@@ -415,7 +471,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 Copyright(c) 2026 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

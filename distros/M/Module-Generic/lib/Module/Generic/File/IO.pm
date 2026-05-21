@@ -15,7 +15,7 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'Module::Generic' );
     use Config;
     use Fcntl qw( :DEFAULT :flock :seek ); 
     use IO::File ();
@@ -218,7 +218,7 @@ sub flock
             defined( $current_state ) &&
             CORE::ref( $current_state // '' ) eq 'HASH' )
         {
-            warn( "The process with thread ID $current_state->{tid} and pid $current_state->{pid} already holds a lock on the file handle with flags $current_state->{flags}, and registered from class ", $current_state->{caller}->[0], " at line ", $current_state->{caller}->[2], "." ) if( $self->_is_warnings_enabled );
+            warn( "The process with thread ID $current_state->{tid} and pid $current_state->{pid} already holds a lock on the file handle with flags $current_state->{flags}, and registered from class ", $current_state->{caller}->[0], " at line ", $current_state->{caller}->[2], "." ) if( $self->_is_warnings_enabled( 'Module::Generic' ) );
         }
     }
     # try-catch
@@ -516,7 +516,7 @@ sub DESTROY
 {
     # <https://perldoc.perl.org/perlobj#Destructors>
     CORE::local( $., $@, $!, $^E, $? );
-    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    CORE::return if( Module::Generic::_in_global_destruction() );
     my $self = CORE::shift( @_ );
     CORE::return if( !CORE::defined( $self ) );
 

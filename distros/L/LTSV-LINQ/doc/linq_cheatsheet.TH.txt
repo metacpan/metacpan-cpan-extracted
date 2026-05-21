@@ -140,10 +140,15 @@
   ->ToLookup(sub { $_[0]{dept} })
   ->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} })
   ->ToLTSV('output.ltsv')
+  ->ToLTSV('output.ltsv',              # label_order: specify output label order
+      label_order => [qw(host status bytes url)])
+  ->ToLTSV('output.ltsv',              # headers: alias for label_order (CSV-LINQ interop)
+      headers => [qw(host status bytes url)])
 
   ToDictionary คืนค่า hashref key=>element
     ToLookup คืนค่า hashref key=>[elements]
     ToLTSV เขียนลำดับลงไฟล์ LTSV
+    label_order ระบุลำดับ label; headers เป็นชื่อแทน (ใช้ร่วมกับ CSV-LINQ)
 
 [ 12. แหล่งข้อมูลอย่างเป็นทางการ (Official resources) ]
 

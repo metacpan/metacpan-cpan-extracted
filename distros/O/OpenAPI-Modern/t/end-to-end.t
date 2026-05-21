@@ -19,14 +19,13 @@ use JSON::Schema::Modern::Utilities 'jsonp';
 use Mojolicious;
 use Test::Mojo;
 
-my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
 my $doc_uri_rel = Mojo::URL->new('/api');
 my $doc_uri = $doc_uri_rel->to_abs(Mojo::URL->new('http://example.com'));
 
 subtest 'full end-to-end test of transmitted request and response' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri_rel,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
     parameters:

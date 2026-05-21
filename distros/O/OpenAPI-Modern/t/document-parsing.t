@@ -18,8 +18,6 @@ use Helper;
 use JSON::Schema::Modern::Utilities 'jsonp';
 use Test::Needs;
 
-my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
-
 subtest 'basic document validation' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
@@ -263,7 +261,7 @@ YAML
 
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    schema => $yamlpp->load_string($yaml),
+    schema => decode_yaml($yaml),
   );
 
   is_equal([ $doc->errors ], [], 'no errors when parsing this document');
@@ -284,7 +282,7 @@ YAML
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    schema => $yamlpp->load_string($yaml =~ s/operation_id_[a-z]/operation_id_dupe/gr),
+    schema => decode_yaml($yaml =~ s/operation_id_[a-z]/operation_id_dupe/gr),
   );
 
   cmp_result(
@@ -321,7 +319,7 @@ ERRORS
 subtest 'bad subschemas' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   schemas:
     alpha_schema:
@@ -353,7 +351,7 @@ ERRORS
 subtest 'find identifiers, subschemas and other entities' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   schemas:
     alpha:
@@ -431,7 +429,7 @@ YAML
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     metaschema_uri => DEFAULT_METASCHEMA->{+OAS_VERSION},  # needed to override $schema
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   schemas:                  # entity 0
     beta_schema:
@@ -674,7 +672,7 @@ YAML
 };
 
 subtest 'invalid servers entries' => sub {
-  my $schema = $yamlpp->load_string(<<'YAML');
+  my $schema = decode_yaml(<<'YAML');
 components:
   links:
     my_link:
@@ -736,7 +734,7 @@ YAML
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
     schema => {
-      $yamlpp->load_string(OPENAPI_PREAMBLE)->%*,
+      decode_yaml(OPENAPI_PREAMBLE)->%*,
       $schema->%{servers},
       components => {
         $schema->{components}->%*,
@@ -854,7 +852,7 @@ ERRORS
 subtest 'disallowed fields adjacent to $refs in path-items' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/alpha: {}
   /foo/beta: {}
@@ -865,7 +863,7 @@ YAML
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   callbacks:
     my_callback0:
@@ -916,7 +914,7 @@ ERRORS
 subtest 'query and querystring' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     get:
@@ -951,7 +949,7 @@ YAML
 subtest 'extract tags and identify duplicates' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 components: {}
 tags:
   - name: foo
@@ -1014,7 +1012,7 @@ YAML
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 tags:
   - name: foo
   - name: bar
@@ -1079,7 +1077,7 @@ subtest 'bad references' => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'foo/api.json',
     evaluator => my $js = JSON::Schema::Modern->new(strict => 1),
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   schemas:
     schema0:
@@ -1174,7 +1172,7 @@ subtest '3.0 document' => sub {
 
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    schema => $yamlpp->load_string(<<'YAML'));
+    schema => decode_yaml(<<'YAML'));
 openapi: 3.0.4
 info:
   title: Test API
@@ -1227,7 +1225,7 @@ YAML
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'foo/api.json',
     evaluator => my $js = JSON::Schema::Modern->new(strict => 1),
-    schema => $yamlpp->load_string(<<'YAML'));
+    schema => decode_yaml(<<'YAML'));
 openapi: 3.0.4
 info:
   title: Test API
@@ -1267,7 +1265,7 @@ YAML
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'foo/api.json',
     evaluator => $js = JSON::Schema::Modern->new(strict => 1),
-    schema => $yamlpp->load_string(<<'YAML'));
+    schema => decode_yaml(<<'YAML'));
 openapi: 3.0.4
 info:
   title: Test API
@@ -1329,7 +1327,7 @@ YAML
   $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'foo/api.json',
     evaluator => $js = JSON::Schema::Modern->new(strict => 1),
-    schema => $yamlpp->load_string(<<'YAML'));
+    schema => decode_yaml(<<'YAML'));
 openapi: 3.0.4
 info:
   title: Test API
@@ -1508,7 +1506,7 @@ subtest defaults => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     evaluator => JSON::Schema::Modern->new(with_defaults => 1),
     canonical_uri => 'http://localhost:1234/api',
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   parameters:
     MyParameter:

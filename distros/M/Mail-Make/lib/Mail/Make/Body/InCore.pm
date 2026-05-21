@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## MIME Email Builder - ~/lib/Mail/Make/Body/InCore.pm
-## Version v0.1.1
+## Version v0.1.2
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/03/02
-## Modified 2026/03/07
+## Modified 2026/05/11
 ## All rights reserved
 ## 
 ## 
@@ -22,7 +22,7 @@ BEGIN
     use parent qw( Mail::Make::Body );
     use vars qw( $VERSION $EXCEPTION_CLASS );
     our $EXCEPTION_CLASS = 'Mail::Make::Exception';
-    our $VERSION         = 'v0.1.1';
+    our $VERSION         = 'v0.1.2';
 }
 
 use strict;
@@ -130,7 +130,7 @@ Mail::Make::Body::InCore - In-Memory Body for Mail::Make
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.2
 
 =head1 DESCRIPTION
 

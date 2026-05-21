@@ -1,0 +1,42 @@
+Revision history for Dist-AutomationPolicy:
+
+v0.2.2    2026-05-21 14:23:16+01:00 Europe/London
+  [Bug Fixes]
+  - Fix bug when JSON::XS is used as the backend.
+
+v0.2.1    2026-05-17 23:49:02+01:00 Europe/London
+  [Enhancements]
+  - Removed Type::Common from prerequsities to use the JSON schema to validate.
+
+  - Removed or changed other prerequisites to reduce dependencies.
+
+v0.2.0    2026-05-15 17:36:17+01:00 Europe/London
+  [Enhancements]
+  - Added the models attribute for documenting the models used.
+
+  [Documentation]
+  - Updated documentation.
+
+v0.1.2    2026-05-12 17:11:12+01:00 Europe/London
+  [Bug Fixes]
+  - Specified the minimum version for JSON::Schema::Validate.
+
+  [Documentation]
+  - Fixed typo in Changes.
+
+v0.1.1    2026-05-12 12:34:16+01:00 Europe/London
+  [Enhancements]
+  - Switched to use JSON::Schema::Validate, which only requires core prereqs.
+
+  - Removed Ref::Util and Syntax::Keyword::SmartMatch prerequisites.
+
+  [Bug Fixes]
+  - Fixed subtle reference handling issue in the constructors.
+
+  [Tests]
+  - Remove unnecessary test prerequisites (due to copy/paste).
+
+  - Specified the minimum Path::Tiny version for the SYNOPSIS tests.
+
+v0.1.0    2026-05-11 22:09:42+01:00 Europe/London
+  - Initial prototype released to CPAN.  - Initial prototype released to CPAN.

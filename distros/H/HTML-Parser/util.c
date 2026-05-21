@@ -72,6 +72,7 @@ decode_entities(pTHX_ SV* sv, HV* entity2char, bool expand_prefix)
 
     char *repl;
     STRLEN repl_len;
+    char *repl_allocated = 0;
     char buf[UTF8_MAXLEN];
     int repl_utf8;
     int high_surrogate = 0;
@@ -89,6 +90,7 @@ decode_entities(pTHX_ SV* sv, HV* entity2char, bool expand_prefix)
 
 	ent_start = s;
 	repl = 0;
+	repl_allocated = 0;
 
 	if (s < end && *s == '#') {
 	    UV num = 0;
@@ -159,7 +161,7 @@ decode_entities(pTHX_ SV* sv, HV* entity2char, bool expand_prefix)
 			}
 		    }
 
-		    tmp = (char*)uvuni_to_utf8((U8*)buf, num);
+		    tmp = (char*)uvchr_to_utf8((U8*)buf, num);
 		    repl = buf;
 		    repl_len = tmp - buf;
 		    repl_utf8 = 1;
@@ -176,16 +178,34 @@ decode_entities(pTHX_ SV* sv, HV* entity2char, bool expand_prefix)
 		    (*s == ';' && (svp = hv_fetch(entity2char, ent_name, s - ent_name + 1, 0)))
 		   )
 		{
-		    repl = SvPV(*svp, repl_len);
+		    char *src = SvPV(*svp, repl_len);
 		    repl_utf8 = SvUTF8(*svp);
+		    if ((SV*)*svp == sv) {
+			/* Self-aliased: hash entry SV == input SV.
+			 * grow_gap() may realloc sv's PV later; copy
+			 * the entity value into an owned buffer first.
+			 * Freed by the repl_allocated cleanup below. */
+			Newx(repl_allocated, repl_len ? repl_len : 1, char);
+			Copy(src, repl_allocated, repl_len, char);
+			repl = repl_allocated;
+		    } else {
+			repl = src;
+		    }
 		}
 		else if (expand_prefix) {
 		    char *ss = s - 1;
 		    while (ss > ent_name) {
 			svp = hv_fetch(entity2char, ent_name, ss - ent_name, 0);
 			if (svp) {
-			    repl = SvPV(*svp, repl_len);
+			    char *src = SvPV(*svp, repl_len);
 			    repl_utf8 = SvUTF8(*svp);
+			    if ((SV*)*svp == sv) {
+				Newx(repl_allocated, repl_len ? repl_len : 1, char);
+				Copy(src, repl_allocated, repl_len, char);
+				repl = repl_allocated;
+			    } else {
+				repl = src;
+			    }
 			    s = ss;
 			    break;
 			}
@@ -197,7 +217,9 @@ decode_entities(pTHX_ SV* sv, HV* entity2char, bool expand_prefix)
 	}
 
 	if (repl) {
-	    char *repl_allocated = 0;
+	    /* repl_allocated is now function-scoped; set by the
+	     * named-entity self-alias path above or by the UTF8 mismatch
+	     * branch below. Same cleanup in either case. */
 	    if (s < end && *s == ';')
 		s++;
 	    t--;  /* '&' already copied, undo it */

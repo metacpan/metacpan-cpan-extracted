@@ -67,6 +67,14 @@ subtest 'basic' => sub {
 
 };
 
+subtest 'non-iterable reference values' => sub {
+
+    my $ref  = \2;
+    my $iter = iflatten( [ 1, $ref, 3 ] );
+
+    is( $iter->drain, [ 1, $ref, 3 ], 'non-iterable references pass through' );
+};
+
 subtest 'rewind' => sub {
 
     my $iter = iflatten(    #

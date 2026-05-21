@@ -1,0 +1,552 @@
+=encoding utf8
+
+=head1 NAME
+
+Net::Clacks::Protocol - CLACKS interprocess messaging protocol
+
+=head1 DESCRIPTION
+
+CLACKS interprocess messaging is an asyncronous protocol used in various web- and homeautomation applications.
+
+The protocol implements real-time signalling and data caching. It also implements a master/slave mode for distributed servers for load balancing and reducing network load between internet hosts.
+
+=head1 INTRODUCTION
+
+For many distributed applications there exists a requirement for fire-and-forget messaging between processes and/or devices in order to communicate state changes, events and changed settings. CLACKS is designed to provide a number of different signals to fill those needs as well as provide hub-and-spoke routing through its interclacks mode.
+
+=head2 Requirements Language
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in L<RFC 2119|https://www.rfc-editor.org/info/rfc2119>.
+
+=head1 TECHNICAL TERMS
+
+This section gives a short explanation of the technical terms used in the CLACKS protocol.
+
+=head2 Signal
+
+A signal is an information that is sent asyncronous to all clients listening for it, of either an event, a value change or an information about a previously stored value. Examples of these would be "Event 7 has happened" or "Sensor 12 value is 127"
+
+=head2 Overhead
+
+Overhead are signals exchanged between servers or a server and a client library that, in most cases, has no direct implication for a client application. These include keep alive packets, interclacks syncronizations, authentication, test messages and error messages, among others.
+
+=head2 Cache
+
+The Clacks cache is a storage for values in clacks servers. This cache is syncronized via interclacks links between clacks servers. The cache also implements vary basic mathematical functions (increment, decrement), so cached variables can act as asyncronous counters.
+
+=head2 Interclacks
+
+This is a special mode of clacks links that enables multiple servers in a master/slave configuration to participate in the same clacks network. This is useful for load sharing. It is also very useful for running different servers with a limited bandwidth between them, as all clients only connect to their local node and there is only a single link sharing data between those servers.
+
+           +----------+           +----------+
+           |          |Interclacks|          |
+           | Server A +-----------+ Server B |
+           |          |           |          |
+           +-+------+-+           +-+------+-+
+             |      |               |      |
+             |      |               |      |
+       +-----+--+ +-+------+  +-----+--+ +-+------+
+       |Client 1| |Client 2|  |Client 3| |Client 4|
+       +--------+ +--------+  +--------+ +--------+
+
+=head2 Variables
+
+Variables are the names (keys) for notifications, value-transmitting signals and data stored in the clacks cache. Variables may only contain letters, numbers and colons. It is RECOMMENDED that logical parts of the variable names (e.g. variables for sub-systems) be separated by double-colons. Variable names B<MUST NOT> contain spaces or euqal signs ("="). Examples would be "Sensor17" and "Kitchen::Sensorbox2::Temperature".
+
+=head1 PROTOCOL OVERVIEW
+
+CLACKS is designed to be asyncronous for the client in order to limit delays introduced by the network and server side processing. Some operations like fetching stored values MAY be processed by the client as syncronous operations. Servers process any messages in the order of arrival except when an interclacks lock is active during syncronization of clacks servers.
+
+By default, TLS encryption and authentication is rquired, but TLS can be seen as OPTIONAL under specific circumstances if other methods of protecting communication are provided, for example running a unix-domain-sockets network only or for point-to-point links that are physically secured. These circumstances must be evaluated before deploying a less secure CLACKS network.
+
+The protocol is a server/client protocol. The interclacks OVERHEAD commands allow a master/slave architecture of servers. This interclacks mode allows for handling local connections (Unix Domain Sockets, Point-to-Point links) over multiple devices as well as limiting the number of connections a single server has to handle.
+
+For ease of implementation, the protocol is designed entirely in plaintext, Unicode in UTF-8 encoding B<SHOULD> be supported by all systems. Binary data B<MUST> be encoded in Base64.
+
+=head2 Transport layers
+
+CLACKS is designed to allow different transport layers, depending on the application requirements. These can be combined as needed.
+
+=head3 TCP
+
+TCP on port of 49888 is the default. This allows multiple hosts to communicate. TCP transport B<MUST> use TLS encryption and B<MUST> use Authentication.
+
+=head3 Unix Domain Sockets
+
+Transport over Unix Domain Sockets MAY disable encryption for faster communication and lower processor usage. It is RECOMMENDED that other access control methods (e.g. file permissions/access control lists) are used to limit access to the socket. Authentication B<MUST> be used to further limit unauthorized access.
+
+=head3 Point-to-Point links
+
+Point-to-point links MAY be supported by CLACKS server to connect local devices through serial connections, point-to-point radio links and similar setups. This is to support embedded systems with very low processing power. For point-to-point links, TLS encryption is OPTIONAL, although authentication B<MUST> still be implemented.
+
+=head2 Line breaks
+
+Each command and response line B<MUST> be ended by a linebreak consisting of the characters "carriage return" (ASCII 13) and "line feed" (ASCII 10).
+
+=head2 Asyncronous behaviour
+
+In this sample client/server session, the client (C) connects to the server (S), authenticates and retrieves the value for the variable X from clacks cache.
+
+It is important to note that, as an async protocol, both server and client can send at the same time, or even before an expected request has been recieved. For example, the client can send an authentication response before it has recieved the authentication request by the server. It can even send the request to retrieve the data, but it still has to check the server responses in the correct order to know if the request worked as expected.
+
+In the same way, the client can request multiple retrievals at once, even sending requests to change the cached data inbetween.
+
+This allows the protocol handlers to pack multiple requests/responses into a single network packet, reducing the roundtrip delay. For the last sample above, all four client commands can be packed into a single packet, and the same is true for the server responses. Thus (in theory) reducing the network delay to a single roundtrip. The server still has to respond to each RETRIEVE request to enable the client tracking the correct order of responses.
+
+As the server potentially handles other clients that change the same stored value, a client B<MUST> expect a value to change without actively changing it. This MAY happen even within the same response network packet for multiple requests of the same variable.
+
+    C: CLACKS testclient
+    S: CLACKS Server version 22
+    S: OVERHEAD M Authentication required
+    C: OVERHEAD A ZXhhbXBsZXVzZXI=:dW5zYWZlcGFzc3dvcmQ=
+    S: OVERHEAD O Welcome!
+    C: RETRIEVE X
+    S: RETRIEVED X=12
+    C: QUIT
+
+    C: CLACKS testclient
+    C: OVERHEAD A ZXhhbXBsZXVzZXI=:dW5zYWZlcGFzc3dvcmQ=
+    C: RETRIEVE X
+    S: CLACKS Server version 22
+    S: OVERHEAD M Authentication required
+    S: OVERHEAD O Welcome!
+    S: RETRIEVED X=12
+    C: QUIT
+
+    C: SET X=10
+    C: RETRIEVE X
+    C: INCREMENT X=2
+    C: RETRIEVE X
+    S: RETRIEVED X=10
+    S: RETRIEVED X=12
+
+    C: RETRIEVE X
+    C: RETRIEVE X
+    S: RETRIEVED X=10
+    S: RETRIEVED X=12
+
+=head2 Units and measurements
+
+To reduce problems with different measurement systems, all values send through clacks B<MUST> conform to the metric system.
+
+All timestamps be in UTC, either as unix epoch (seconds since "1970-01-01 00:00:00") or in the format "YYYY-MM-DD hh:mi:ss". When more precision is required, the timestamp B<MUST> be send as unix epoch with a decimal point.
+
+=head2 Value encoding
+
+Since the CLACKS protocol uses line-based communication, values that contain line breaks (carriage return or line feed characters) B<MUST> be encoded before transmission. The reference implementation uses the following encoding scheme:
+
+=head3 Multi-line string values
+
+Values containing newline characters are encoded using Base64 with a special prefix. The format is:
+
+For example, a value containing "line1\nline2" would be encoded as:
+
+The receiving client library B<SHOULD> automatically detect this prefix and decode the value transparently, so the application receives the original multi-line string.
+
+    PAGECAMELCLACKSB64:<base64-encoded-data>
+
+    PAGECAMELCLACKSB64:bGluZTEKbGluZTI=
+
+=head3 Complex data structures
+
+Complex data structures (hashes, arrays, nested structures) are serialized to YAML format first, then Base64-encoded with a different prefix:
+
+The receiving client library B<SHOULD> detect this prefix, decode the Base64, parse the YAML, and return the reconstructed data structure to the application.
+
+Note: Storing values that begin with the literal string "PAGECAMELCLACKSB64" is not permitted, as this would be ambiguous with encoded values.
+
+    PAGECAMELCLACKSYAMLB64:<base64-encoded-yaml>
+
+=head1 COMMANDS
+
+=head2 Session initiation
+
+To initiate a connection, the first thing both sides send is a CLACKS command.
+
+=head3 CLACKS software-identification
+
+The CLACKS command B<MUST> be the first command sent when a connection is established. Failure to recieve a CLACKS command from the communication partner means that the other side is not running the clacks protocol and the connection B<MUST> be closed.
+
+The "software-identification" is an arbitrary string that gives information what software (and which version) is running. For clacks clients, this often includes an identification of the program program using a generic client library. This information is part of the CLIENTLIST server response and can be useful in monitoring specific programs.
+
+The "software-identification" string B<MUST NOT> contain semicolons.
+
+Examples:
+
+    CLACKS Net::Clacks Server Version 23
+
+    CLACKS Homeautomation ZigBee Bridge
+
+=head2 System commands
+
+This section lists commands required for authentification, monitoring, debugging and server managment.
+
+=head3 OVERHEAD flags data-string
+
+The OVERHEAD command is used for system-level communication between clients and servers. It carries one or more single-letter flags followed by an optional data string. Multiple flags can be combined in a single command.
+
+Available flags:
+
+Examples:
+
+=over 4
+
+=item *
+
+B<A> - Authentication token. The data-string contains base64-encoded credentials in the format "username:password".
+
+=item *
+
+B<O> - Authentication OK. Sent by server to confirm successful authentication.
+
+=item *
+
+B<F> - Authentication failed. Sent by server when authentication fails.
+
+=item *
+
+B<E> - Error message. Server to client error notification.
+
+=item *
+
+B<M> - Informal message. No operation required, used for human-readable status messages.
+
+=item *
+
+B<C> - Close all connections. Instructs the server to disconnect all clients.
+
+=item *
+
+B<D> - Discard message. The message should not be logged or forwarded.
+
+=item *
+
+B<G> - Forward message. The message should be forwarded to interclacks peers.
+
+=item *
+
+B<I> - Set interclacks mode. Value: 1 (enable) or 0 (disable). Enables server-to-server communication mode.
+
+=item *
+
+B<L> - Lock for sync. Value: 1 (lock) or 0 (unlock). Used during KEYSYNC to prevent data races.
+
+=item *
+
+B<N> - No logging. The message should not be logged (useful for sensitive data like credentials).
+
+=item *
+
+B<S> - Shutdown service. Value: number of seconds before shutdown. Requires manage permission.
+
+=item *
+
+B<T> - Timestamp. Used before KEYSYNC to calculate time offset between servers.
+
+=item *
+
+B<U> - Return to sender. The message should also be sent back to the originating client.
+
+=item *
+
+B<Z> - No flags. Placeholder when no other flags are set.
+
+=back
+
+    OVERHEAD A dXNlcm5hbWU6cGFzc3dvcmQ=
+    OVERHEAD O Welcome!
+    OVERHEAD F Login failed!
+    OVERHEAD M Authentication required
+    OVERHEAD E unknown_command BADCMD
+    OVERHEAD I 1
+    OVERHEAD L 1
+
+=head3 PING
+
+Clients B<MUST> send a PING command at least every 60 seconds. This shows the server that the client is still alive. The server B<MAY> disconnect any client that has not sent any PING command within that timeout interval.
+
+From experience, it is B<RECOMMENDED> that the PING command is send from the main loop of the client, to check that the client is not stuck in a sub-program/function.
+
+=head3 NOPING
+
+Clients can send a NOPING command in cases when they may not be able to fullfill the 60 second timeout requirement. Examples of this would be waiting for user input or processing a large dataset.
+
+When the server recieves a NOPING command, it B<SHOULD> suspend timeout handling for that client until the next PING is recieved.
+
+=head3 TIMEOUT
+
+If the server detects a timeout condition, it sends a TIMEOUT command to the client and closes the connection.
+
+=head3 QUIT
+
+A client or server whishing to close a connection B<MUST> try to send a QUIT command before disconnecting.
+
+=head3 NOP
+
+NOP is a No OPeration command. It B<MUST> be ignored by the communication partner. This command B<MAY> be used to fault conditions that require a network packet to be send. Examples of this include a network route becoming unavailble or a client loosing power.
+
+=head3 MONITOR
+
+The MONITOR command turns on server monitoring. The server B<SHOULD> start sending implementation-specific DEBUG commands to the client, showing server activity, state changes and other information useful for debugging and monitoring the clacks server.
+
+=head3 UNMONITOR
+
+The UNMONITOR turns off server monitoring. The server B<MUST> stop sending DEBUG commands to the client.
+
+=head3 DEBUG value
+
+The DEBUG command is used to sending implementation-specific server activity, state changes and other useful information to the client. Example:
+
+                        DEBUG CLIENT TestClient22 connected
+                        DEBUG Testclient22=SET X=22
+                        DEBUG TestClient22=RETRIEVE Y
+                        DEBUG TestClient22=PING
+                        DEBUG client TestClient22 disconnected
+                        DEBUG saving persistance file
+
+=head3 KEYSYNC cachetime accesstime mode variable=value
+
+The KEYSYNC command is used exclusively on interclacks links to synchronize cached data between servers. It is only valid after interclacks mode has been enabled via OVERHEAD I.
+
+When an interclacks connection is established, the master server locks the slave (OVERHEAD L 1), sends its timestamp (OVERHEAD T), transmits all cached values via KEYSYNC commands, then unlocks the slave (OVERHEAD L 0). The slave then sends its cached values to the master in the same manner.
+
+Parameters:
+
+The receiving server compares the cachetime with its local copy. If the incoming cachetime is newer, the value is updated. This ensures that the most recent value wins in case of conflicts.
+
+Example:
+
+=over 4
+
+=item *
+
+B<cachetime> - Unix timestamp when the value was last modified.
+
+=item *
+
+B<accesstime> - Unix timestamp when the value was last accessed.
+
+=item *
+
+B<mode> - Either "S" (store/active) or "D" (deleted).
+
+=item *
+
+B<variable> - The cache key name.
+
+=item *
+
+B<value> - The cached data value.
+
+=back
+
+    KEYSYNC 1704067200 1704067100 S sensor::temperature=21.5
+    KEYSYNC 1704067000 1704066900 D old::deleted::key=
+
+=head3 FLUSH value
+
+The FLUSH command is used by a client or server to check when a communication partner has caught up with any previously sent commands, since many of them may not generate an answer. The communication partner B<MUST> return a FLUSHED command with the same value. The value can be any arbitrary string.
+
+=head3 FLUSHED value
+
+Upon reciept of a FLUSH command, a server or client B<MUST> generate a FLUSHED command with the same value.
+
+=head3 CLIENTLIST
+
+The CLIENTLIST command requests a list of all connected clients from the server. This command requires manage permission. The server responds with CLIENTLISTSTART, followed by zero or more CLIENT entries, followed by CLIENTLISTEND.
+
+=head3 CLIENTLISTSTART
+
+Marks the beginning of the client list response.
+
+=head3 CLIENT key=value;key=value;...
+
+Each CLIENT line contains semicolon-separated key=value pairs describing one connected client. Available fields include:
+
+=over 4
+
+=item *
+
+B<CID> - Unique client identifier assigned by the server.
+
+=item *
+
+B<HOST> - Client's hostname or IP address.
+
+=item *
+
+B<PORT> - Client's source port number.
+
+=item *
+
+B<CLIENTINFO> - Software identification string from the client's CLACKS command.
+
+=item *
+
+B<OUTBUFFER_LENGTH> - Bytes pending in the output buffer for this client.
+
+=item *
+
+B<INBUFFER_LENGTH> - Bytes pending in the input buffer from this client.
+
+=item *
+
+B<INTERCLACKS> - 1 if this is an interclacks connection, 0 otherwise.
+
+=item *
+
+B<MONITOR> - 1 if monitor mode is enabled for this client, 0 otherwise.
+
+=item *
+
+B<LASTPING> - Unix timestamp of the last PING received from this client.
+
+=item *
+
+B<LASTINTERCLACKSPING> - Unix timestamp of the last interclacks ping.
+
+=back
+
+=head3 CLIENTLISTEND
+
+Marks the end of the client list response.
+
+=head3 CLIENTDISCONNECT client-id
+
+The CLIENTDISCONNECT command forces the server to disconnect a specific client identified by its CID. This command requires manage permission. The server will attempt to send a QUIT message to the target client before closing the connection.
+
+Example:
+
+    CLIENTDISCONNECT unixdomainsocket:1704067200.12345:67890
+
+=head2 Instant communication
+
+This section lists commands for instant data communication. By default, the client is in "send-only" mode after establishing a connection and does not recieve any NOTIFY and SET commands from the server. In CLACKS parlance, messages send via NOTIFY and SET are called "signals".
+
+If a link is in interclacks mode (a link between two servers), all NOTIFY and SET commands B<MUST> be forwarded by default and all LISTEN and UNLISTEN commands B<MUST> be ignored.
+
+SET and NOTIFY are transmitted "in the blind" from client to server, meaning a client does not know if another client is LISTENing to that signal. The signal if then processed by the server (or servers) and sent to any client listening to it. The signal B<MUST NOT> be transmitted back to the original sending client, even if it is listening for that signal name.
+
+=head3 LISTEN variable
+
+The LISTEN command is used by a client to tell the server it wants to recieve any NOTIFY or SET commands send to the server that have the same variable name. The server B<MUST> start forwarding any such messages to that client until it either recieves a matching UNLISTEN command or the client disconnects.
+
+=head3 UNLISTEN variable
+
+The UNLISTEN command is used a client to tell the server it wants to stop recieving NOTIFY and SET commands with the same variable name. The server B<MUST> stop forwarding any such messages to that client.
+
+=head3 NOTIFY variable
+
+The NOTIFY command notifies a server or client that an event has happened. The NOTIFY command does not convey a value. For example, a time service might notify clients listening to a specific variable that the date has changed, so that they can run some daily tasks.
+
+    NOTIFY Clock::DayChange
+
+=head3 SET variable=value
+
+The SET command notifies a server or client about a new value or reading. For example, a temperature sensor could broadcast a new reading:
+
+    SET Kitchen::Temperature=21.8
+
+=head2 Caching
+
+This section lists commands for caching.
+
+=head3 STORE variable=value
+
+The STORE command stores a variable to the cache.
+
+=head3 REMOVE variable
+
+The REMOVE command deletes a variable from the cache.
+
+=head3 RETRIEVE variable
+
+The RETRIEVE command requests retrieval of a variable from the cache. The server B<MUST> either reply with a RETRIEVED or a NOTRETRIEVED command.
+
+=head3 RETRIEVED variable=value
+
+The server has found the variable in the cache with a value.
+
+=head3 NOTRETRIEVED variable
+
+The server has not found the variable.
+
+=head3 INCREMENT variable=value
+
+This command is used to increment a variable with a given value. If the variable is not known to the server, it B<MUST> be created with the value of zero before incrementing. If the variable is non-numeric, a conversion to a number B<MUST> be attempted, defaulting to zero if conversion fails. The same conversion process is applied to the value in the increment command. The value in the increment command B<MUST NOT> be empty.
+
+=head3 DECREMENT variable=value
+
+This command is used to decrement a variable with a given value. If the variable is not known to the server, it B<MUST> be created with the value of zero before decrementing. If the variable is non-numeric, a conversion to a number B<MUST> be attempted, defaulting to zero if conversion fails. The same conversion process is applied to the value in the decrement command. The value in the decrement command B<MUST NOT> be empty.
+
+=head3 SETANDSTORE variable=value
+
+The SETANDSTORE command is a compound of the SET and STORE command. It stores the given value in the given variable, but also forwards it as SET command to all clients.
+
+On interclacks links, the SETANDSTORE command is forwarded as such and B<MUST NOT> be transmitted as separate SET and STORE commands. On client links, the SETANDSTORE command B<MUST> only be transmitted SET command from servers to clients.
+
+The purpose of the compound SETANDSTORE command is to save bandwidth. It allows clients to SET and STORE a variable without transmitting it twice. The same applies to interclacks links.
+
+=head3 KEYLIST
+
+The KEYLIST command requests a list of all keys currently stored in the cache. This command requires read permission. The server responds with KEYLISTSTART, followed by zero or more KEY entries, followed by KEYLISTEND. Example response:
+
+    KEYLISTSTART
+    KEY sensor::temperature
+    KEY sensor::humidity
+    KEY config::update_interval
+    KEYLISTEND
+
+=head3 KEYLISTSTART
+
+Marks the beginning of the key list response.
+
+=head3 KEY variable
+
+Each KEY line contains a single variable name that exists in the cache.
+
+=head3 KEYLISTEND
+
+Marks the end of the key list response.
+
+=head3 CLEARCACHE
+
+The CLEARCACHE command removes all entries from the server's cache. This command requires manage permission. Use with caution as this operation cannot be undone. On interclacks networks, the CLEARCACHE command is forwarded to peer servers, clearing the cache across the entire network.
+
+=head1 REFERENCE IMPLEMENTATION
+
+An open source reference implementation in Perl called L<Net::Clacks|Net::Clacks> is available on MetaCPAN.
+
+=head1 DEDICATION
+
+The name of the protocol is a direct reference to the Discworld novel "Going Postal" by Terry Pratchett. In this book, the author describes an interconnected optical telegraph system for passing messages at high speed. The command OVERHEAD is named after a short mentioning of "passing names in the overhead" in the story. This is done to keep the memory of those people alive.
+
+The book mentions that the names are passed with the flags "GNU" (send message to next tower, don't log, turn around at the end). The clacks protocol defined in this document offers compatibility with the description in the book, and it is possible to send the following command:
+
+    OVERHEAD GNU Terry Pratchett
+
+=head1 REFERENCE IMPLEMENTATION
+
+An open source reference implementation in Perl called L<Net::Clacks> is available on MetaCPAN.
+
+=head1 DEDICATION
+
+The name of the protocol is a direct reference to the Discworld novel "Going Postal" by Terry Pratchett. In this book, the author describes an interconnected optical telegraph system for passing messages at high speed. The command OVERHEAD is named after "passing names in the overhead" in the story.
+
+I<"Do you not know that a man is not dead while his name is still spoken?">
+
+The book mentions that the names are passed with the flags "GNU" (send message to next tower, don't log, turn around at the end). The clacks protocol offers compatibility with the description in the book:
+
+    OVERHEAD GNU Terry Pratchett
+
+=head1 AUTHOR
+
+Rene Schickbauer
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2026 Rene Schickbauer
+
+This documentation is part of the Net::Clacks distribution and is subject to the same license terms.
+
+=cut

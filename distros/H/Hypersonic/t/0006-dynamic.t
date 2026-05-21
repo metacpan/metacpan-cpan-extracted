@@ -1,7 +1,10 @@
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Test::More;
 use IO::Socket::INET;
+use HypersonicTest qw(spawn_server wait_for_port);
 
 
 use Hypersonic;
@@ -12,12 +15,9 @@ plan skip_all => 'fork not available' unless $^O ne 'MSWin32';
 my $port = 19900 + ($$ % 1000);
 my $cache_dir = "_test_cache_dyn_$$";  # Capture before fork!
 
-# Fork a server process with both static and dynamic routes
-my $pid = fork();
-die "Fork failed: $!" unless defined $pid;
-
-if ($pid == 0) {
-    # Child - run server
+# spawn_server captures the child's STDERR/STDOUT so we can diag the
+# actual error when the server fails to bind on platforms like OpenBSD.
+my ($pid, $log) = spawn_server(sub {
     my $server = Hypersonic->new(cache_dir => $cache_dir);
 
     # Static route - runs once at compile time
@@ -47,11 +47,13 @@ if ($pid == 0) {
 
     $server->compile();
     $server->run(port => $port, workers => 1);
-    exit(0);
-}
+});
 
-# Parent - wait for server to start
-sleep(2);
+wait_for_port($port, { pid => $pid, log => $log, tries => 50 })
+    or do {
+        kill 'TERM', $pid;
+        BAIL_OUT("server child failed to bind port $port (see diag above)");
+    };
 
 # Test helper
 sub http_request {

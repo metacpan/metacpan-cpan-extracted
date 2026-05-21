@@ -1,4 +1,5 @@
 Build.PL
+CHANGELOG.md
 example.pl
 lib/Term/ReadLine/Repl.pm
 MANIFEST			This list of files
@@ -6,3 +7,4 @@ META.json
 META.yml
 Readme.md
 t/01_basic.t
+zork.pl

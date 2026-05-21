@@ -38,7 +38,7 @@ use Game::HexDescribe::Log;
 use Modern::Perl;
 use Mojo::URL;
 use Mojo::File;
-use List::Util qw(shuffle);
+use List::Util qw(shuffle sum);
 use Array::Utils qw(intersect);
 use Encode qw(decode_utf8);
 use utf8;
@@ -167,7 +167,7 @@ sub parse_table {
 	next if $subtable =~ /^(?:capitalize|titlecase|highlightcase|normalize-elvish) (.*)/ and $data->{$1};
 	next if $subtable =~ /^adjacent hex$/; # experimental
 	next if $subtable =~ /^same (.*)/ and ($data->{$1} or $aliases{$1} or $1 eq 'adjacent hex');
-	next if $subtable =~ /^(?:here|nearby|other|append|later|with|and|save|store) (.+?)( as (.+))?$/ and $data->{$1};
+	next if $subtable =~ /^(?:here|nearby|closest|other|neighbouring|append|later|with|and|save|store) (.+?)( as (.+))?$/ and $data->{$1};
 	$subtable = $1 if $subtable =~ /^(.+) as (.+)/;
 	$log->error("Error in table $table: subtable $subtable is missing")
 	    unless $data->{$subtable};
@@ -203,7 +203,7 @@ name.
 Note that for C</describe/text>, C<init> is called for every paragraph.
 
 B<%locals> is a hash of all the "normal" table lookups encountered so far. It is
-is reset for every paragraph. To refer to a previous result, start a reference
+reset for every paragraph. To refer to a previous result, start a reference
 with the word "same". This doesn't work for references to adjacent hexes, dice
 rolls, or names. Here's an example:
 
@@ -734,7 +734,7 @@ sub describe {
       my $location = $coordinates eq 'no map' ? 'somewhere' : one(neighbours($map_data, $coordinates));
       $locals{$word} = $location;
       return $location;
-    } elsif ($word =~ /^(?:nearby|other|later) ./) {
+    } elsif ($word =~ /^(?:nearby|closest|other|later|neighbouring) ./) {
       # skip on the first pass
       return "｢$word｣";
     } elsif ($word =~ /^append (.*)/) {
@@ -748,15 +748,8 @@ sub describe {
       return $locals{$key}->[0] if exists $locals{$key} and ref($locals{$key}) eq 'ARRAY';
       return $locals{$key} if exists $locals{$key};
       return $globals->{$key}->{global} if $globals->{$key} and $globals->{$key}->{global};
-      $log->warn("[same $key] is undefined for $coordinates, attempt picking a new one");
-      my $text = pick($map_data, $table_data, $level, $coordinates, $words, $key, $redirects);
-      if ($text) {
-	$locals{$key} = $text;
-	push(@descriptions, $text . "*");
-      } else {
-	$log->error("[$key] is undefined for $coordinates");
-	push(@descriptions, "…");
-      }
+      $log->warn("[same $key] is undefined for $coordinates");
+      push(@descriptions, "…");
     } elsif ($word =~ /^(?:(here|global) )?with (.+?)(?: as (.+))?$/) {
       my ($where, $key, $alias) = ($1, $2, $3);
       my $text = pick($map_data, $table_data, $level, $coordinates, $words, $key, $redirects);
@@ -963,9 +956,9 @@ sub resolve_appends {
 
 =item resolve_nearby
 
-We have nearly everything resolved except for references starting with the word
-"nearby" because these require all of the other data to be present. This
-modifies the third parameter, C<$descriptions>.
+We have nearly everything resolved except for references starting with the words
+"closest" and "nearby" because these require all of the other data to be
+present. This modifies the third parameter, C<$descriptions>.
 
 =cut
 
@@ -976,7 +969,7 @@ sub resolve_nearby {
   my $redirects = shift;
   for my $coord (keys %$descriptions) {
     $descriptions->{$coord} =~
-	s/｢nearby ([^][｣]*)｣/closest($map_data,$table_data,$coord,$1, $redirects) or '…'/ge
+	s/｢(nearby|closest) ([^][｣]*)｣/closest($map_data,$table_data,$coord,$2,$1,$redirects) or '…'/ge
 	for 1 .. 2; # two levels deep of ｢nearby ...｣
     $descriptions->{$coord} =~ s!( \(<a href="#desc\d+">\d+</a>\))</em>!</em>$1!g; # fixup
   }
@@ -984,8 +977,8 @@ sub resolve_nearby {
 
 =item closest
 
-This picks the closest instance of whatever we're looking for, but not from the
-same coordinates, obviously.
+This picks the closest instance of whatever we're looking for. If the type
+argument is "nearby", the same coordinates are excluded.
 
 =cut
 
@@ -994,8 +987,10 @@ sub closest {
   my $table_data = shift;
   my $coordinates = shift;
   my $key = shift;
+  my $type = shift;
   my $redirects = shift;
-  my @coordinates = grep { $_ ne $coordinates and $_ ne 'global' } keys %{$globals->{$key}};
+  my @coordinates = grep { $_ ne 'global' } keys %{$globals->{$key}};
+  @coordinates = grep { $_ ne $coordinates } @coordinates if $type eq "nearby";
   if (not @coordinates) {
     $log->info("Did not find any hex with $key ($coordinates)");
     return "…";
@@ -1090,6 +1085,57 @@ sub some_other {
   . qq{ (<a href="#desc$other">$other</a>)}; # see resolve_later!
 }
 
+=item resolve_neighbouring
+
+This implements "neighbouring [foo] ? [bar] : [baz]". Both the then and the else
+clause are optional.
+
+=cut
+
+sub resolve_neighbouring {
+  my $map_data = shift;
+  my $table_data = shift;
+  my $descriptions = shift;
+  my $redirects = shift;
+  for my $coord (keys %$descriptions) {
+    $descriptions->{$coord} =~
+	s/｢neighbouring ([^][｣]*?)(?: \? ([^][｣]*?))?(?: : ([^][｣]*?))?｣/neighbouring($map_data,$table_data,$coord,$1,$2,$3) or '…'/ge
+	for 1 .. 2; # two levels deep of ｢neighbouring ...｣
+  }
+}
+
+=item some_other
+
+This implements if-then-else logic where "if" must be a global entry in the
+neighbouring hexes. If no "then" clause is supplied, the neighbouring entry is
+returned if any.
+
+=cut
+
+sub neighbouring {
+  my $map_data = shift;
+  my $table_data = shift;
+  my $coordinates = shift;
+  my $if = shift;
+  my $then = shift;
+  my $else = shift;
+  my @neighbours = neighbours($map_data, $coordinates);
+  # $log->info("neighbours of $coordinates: @neighbours");
+  my @coordinates = keys %{$globals->{$if}};
+  # $log->info("coordinates with '$if': @coordinates");
+  @coordinates = intersect(@coordinates, @neighbours);
+  # $log->info("intersection: @coordinates");
+  # $log->info("if '@coordinates' then '$then' else '$else'");
+  if (@coordinates) {
+    return $then if $then;
+    # just pick a random one
+    my $other = one(@coordinates);
+    return $globals->{$if}->{$other}
+    . qq{ (<a href="#desc$other">$other</a>)}; # see resolve_later!
+  } else {
+    return $else if $else;
+  }
+}
 
 =item resolve_later
 
@@ -1162,6 +1208,7 @@ sub describe_map {
   }
   resolve_nearby($map_data, $table_data, \%descriptions, $redirects);
   resolve_other($map_data, $table_data, \%descriptions, $redirects);
+  resolve_neighbouring($map_data, $table_data, \%descriptions, $redirects);
   resolve_later($map_data, $table_data, \%descriptions, $redirects);
   # as append might include the items above, it must come last
   resolve_appends($map_data, $table_data, \%descriptions, $redirects);
@@ -1444,7 +1491,12 @@ sub markdown_lists {
   for (split(/(<.*?>)/)) {
     if (/^<ol.*>$/) { unshift(@list, '1.'); $str .= "\n" }
     elsif (/^<ul.*>$/) { unshift(@list, '*'); $str .= "\n" }
-    elsif (/^<li>$/) { $str .= " " x (4 * @list) . $list[0] . " " }
+    elsif (/^<li>$/) {
+      $str .= (@list > 1
+               # all the list markers except for the current one
+               ? (" " x (sum map { length($_) + 1 } @list[1..$#list]))
+               : "")
+          . $list[0] . " " }
     elsif (/^<\/(ol|ul)>$/) { shift(@list) }
     elsif (/^<\/li>$/) { $str .= "\n" unless $str =~ /\n$/ }
     else { $str .= $_ }

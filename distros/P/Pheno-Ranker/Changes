@@ -1,5 +1,18 @@
 Revision history for Perl distribution Pheno-Ranker
 
+1.08 2025-05-01:00:00Z (Manuel Rueda <mrueda@cpan.org>)
+
+ - Refactored internals to split configuration, context, compare, ranking, and graph helpers
+ - Added Matrix Market output (--matrix-format mtx) and graph edge filtering options
+ - Use Perl-versioned Inline cache directories to avoid stale compiled objects on CPAN testers
+ - Canonicalize nested arrays by meaningful content to avoid order-only differences in complex JSON
+ - Renamed configuration keys to indexed_terms, index_regex, and identity_paths; legacy names remain supported
+ - Added default first-level array identities for generic JSON (format: JSON) when identity_paths is absent
+ - bff-pxf-plot:
+    - Improved plot aesthetics and readability while preserving the dependencies
+ - QR-code utils:
+    - Updated PDF template
+
 1.07 2025-06-05:00:00Z (Manuel Rueda <mrueda@cpan.org>)
 
  - Revived --patient-of-interest (--poi) option

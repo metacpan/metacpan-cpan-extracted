@@ -1,0 +1,18 @@
+#!/usr/bin/env perl
+# plhasa - lhasa-compatible interface to plha
+use strict;
+use warnings;
+use FindBin ();
+use File::Spec ();
+
+$ENV{PLHASA} = 1;
+
+my $plha = File::Spec->catfile($FindBin::Bin, 'plha');
+if (-f $plha) {
+    # Run via perl directly (works during testing and on all platforms)
+    exec $^X, $plha, @ARGV or die "Cannot exec $plha: $!\n";
+}
+
+# Installed: try plha (Unix) or plha.bat (Windows)
+my $ext = $^O eq 'MSWin32' ? '.bat' : '';
+exec "plha$ext", @ARGV or die "Cannot exec plha: $!\n";

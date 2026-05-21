@@ -118,6 +118,7 @@ static bool parse_simple_charclass(pTHX_ secret_buffer_charset *cset, SV *qr_ref
 #ifdef RX_EXTFLAGS
    U32 rx_flags = RX_EXTFLAGS(cset->rx);
    bool flag_i= !!(rx_flags & RXf_PMf_FOLD);
+   bool flag_s= !!(rx_flags & RXf_PMf_SINGLELINE);
 /* the /xx flag was added in 5.26 */
 #ifdef RXf_PMf_EXTENDED_MORE
    bool flag_xx= !!(rx_flags & RXf_PMf_EXTENDED_MORE);
@@ -126,7 +127,7 @@ static bool parse_simple_charclass(pTHX_ secret_buffer_charset *cset, SV *qr_ref
    const char *lim = pos + RX_PRELEN(cset->rx);
 #else
    /* collect the flags by parsing the stringified representation. */
-   bool flag_i= false;
+   bool flag_i= false, flag_s= false;
    STRLEN len;
    const char *pos= SvPV(qr_ref, len);
    const char *lim= pos + len;
@@ -134,10 +135,12 @@ static bool parse_simple_charclass(pTHX_ secret_buffer_charset *cset, SV *qr_ref
       return false;
    bool ignore= false;
    for (pos += 2, lim--; *pos != ':'; ++pos) {
-      if (pos >= lim) // we can read *lim because we bcked it up one char
+      if (pos >= lim) // we can read *lim because we backed it up one char
          return false;
       if (*pos == 'i' && !ignore)
          flag_i= true;
+      else if (*pos == 's' && !ignore)
+         flag_s= true;
       else if (*pos == '-')
          ignore= true;
    }
@@ -149,8 +152,17 @@ static bool parse_simple_charclass(pTHX_ secret_buffer_charset *cset, SV *qr_ref
       cset->match_multi= true;
       lim--;
    }
-   if (pos >= lim || *pos != '[' || lim[-1] != ']')
+   if (pos >= lim || *pos != '[' || lim[-1] != ']') {
+      /* special case qr/./ which is easy to process */
+      if (pos + 1 == lim && *pos == '.') {
+         cset->unicode_above_7F= SECRET_BUFFER_CHARSET_ALLUNI;
+         memset(cset->bitmap, 0xFF, sizeof(cset->bitmap));
+         if (!flag_s) /* all but newline */
+            cset->bitmap[0] &= ~(1ULL << 0x0A);
+         return true;
+      }
       return false;
+   }
    pos++; /* Skip [ */
 
    /* Check for negation */
@@ -282,23 +294,27 @@ static void build_charset_via_regex_engine(pTHX_ secret_buffer_charset *cset) {
    }
 }
 
+/* Return true if the regex appears to meet our limitation of
+ * "only a single character class with optional '+' "
+ * This will return true for some things that parse_simple_charclass cannot parse
+ * since it can fall back to build_charset_via_regex_engine.
+ */
 static bool regex_is_single_charclass(REGEXP *rx) {
    /* Get the pattern string */
    STRLEN pat_len = RX_PRELEN(rx);
    const char *pattern = RX_PRECOMP(rx);
-//   struct regexp *re=
-//#ifndef SVt_REGEXP
-//      (struct regexp*) rx;          // before 5.12 REGEXP was struct regexp
-//#else
-//      (struct regexp*) SvANY(rx);   // after 5.12 REGEXP is a type of SV
-//#endif
-   /* Try to validate that this regex is a single char class, with optional '+' */
-   //warn("pattern = '%.*s' re->nparens = %d re->minlen = %d", pat_len, pattern, re->nparens, re->minlen);
-   return pat_len >= 3 && pattern[0] == '[' && (
-            pattern[pat_len-1] == ']'
-         || (pattern[pat_len-1] == '+' && pattern[pat_len-2] == ']')
-         );
-//       && re->nparens == 0 && re->minlen == 1; <-- this doesn't seem to be reliable
+   return pat_len >= 3 && pattern[0] == '['
+            && (pattern[pat_len-1] == ']' || (pattern[pat_len-1] == '+' && pattern[pat_len-2] == ']'))
+       /* character class '.' */
+       || (pat_len == 1 || (pat_len == 2 && pattern[1] == '+'))
+          && pattern[0] == '.'
+       /* the character classes \w \W \s \S \d \D */
+       || (pat_len == 2 || (pat_len == 3 && pattern[2] == '+'))
+          && pattern[0] == '\\' && (
+               pattern[1] == 'w' || pattern[1] == 'W'
+            || pattern[1] == 's' || pattern[1] == 'S'
+            || pattern[1] == 'd' || pattern[1] == 'D'
+          );
 }
 
 /* Main function: Get or create cached charset from regexp */

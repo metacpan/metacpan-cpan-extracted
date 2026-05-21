@@ -1,0 +1,38 @@
+perl-libconfig (1.1.2-1) unstable; urgency=low
+
+  * Fix set_hook/get_hook to use config-level API instead of setting-level on root
+  * Fix get_item zero-value bug by restructuring with config_setting_get_elem + type check
+  * Fix auto_check_and_create strrchr -> strchr for correct nested path resolution
+  * Add bindings: set_destructor, set_include_func, set_fatal_error_func, setting get_elem/set_hook/get_hook
+  * Add Devel::CheckLib configure-time check for libconfig
+  * Clean up dead commented-out code blocks
+  * Add tests for get_elem, setting set_hook/get_hook, invalid boolean input
+
+ -- Cnangel <cnangel@gmail.com>  Tue, 20 May 2026 10:00:00 +0800
+
+perl-libconfig (1.1.1-1) unstable; urgency=low
+
+  * Fix version guards for multi-version libconfig compatibility (1.1.x ~ 1.8.x)
+  * Fix config_setting_lookup_int type for pre-1.4 (long* vs int*)
+  * Fix config_setting_source_file, config_set_default_format, config_setting_lookup guards
+  * Fix config_set_hook to use config_setting_set_hook
+  * Add version guards for error_type/error_file (1.4+)
+
+ -- Cnangel <cnangel@gmail.com>  Sat, 17 May 2026 10:00:00 +0800
+
+perl-libconfig (1.1.0-1) unstable; urgency=low
+
+  * Upgrade to support libconfig 1.8.x API
+  * Add options, format, precision, tab_width, hook, clear, error handling
+  * Add setting-level lookup, safe getters, type checks, source info
+  * Fix stray semicolon bugs
+  * Optimize fragile type detection logic
+  * Switch build system to ExtUtils::MakeMaker
+
+ -- Cnangel <cnangel@gmail.com>  Fri, 15 May 2026 10:00:00 +0800
+
+perl-libconfig (0.021-1) unstable; urgency=low
+
+  * Debian package creation
+
+ -- Artiom M <a.mv@gmx.fr>  Wed, 12 Aug 2015 10:39:25 +0200

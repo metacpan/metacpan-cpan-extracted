@@ -1,0 +1,9 @@
+severity = 1
+
+[-CodeLayout::RequireTidyCode]
+[-TestingAndDebugging::RequireUseStrict]
+[-TestingAndDebugging::RequireUseWarnings]
+
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print say system

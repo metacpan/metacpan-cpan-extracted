@@ -17,13 +17,13 @@ more or less the same fixed positions.
 
 Do you work with pen and paper, or do you work electronically?
 
-I work with **pen and paper**. That's why I print out the
-[empty PDF](empty.pdf) and start drawing my face elements using a blue
-fountain pen. The empty.pdf file has basic face shapes that help me
-draw the eyes always in the right spot, the mouth always in the right
-spot, the beard always in the right spot, and so on.
-
-![Example of a face on the template](example.png)
+I work with **pen and paper**. That's why I print out the [empty
+PDF](https://campaignwiki.org/contrib/empty.pdf) and start drawing my
+face elements using a blue fountain pen. The empty.pdf file has basic
+face shapes that help me draw the eyes always in the right spot, the
+mouth always in the right spot, the beard always in the right spot,
+and so on. See this
+[example of a face on the template](https://campaignwiki.org/contrib/example.png).
 
 If this work for you, print a bunch of empty.pdf sheets and start
 drawing a row of noses, a row of mouths, a row of hair (or bald
@@ -31,25 +31,27 @@ heads), a row of ears, a row of chins (maybe with beard), and so on.
 Scan what you draw and send me a mail (to
 [Alex Schroeder](mailto:alex@alexschroeder.ch)) as soon as possible.
 I'll set up a test account and we'll see how it goes, refining the
-process as we go.
-
-![Example of the manual process](manual-process.png)
+process as we go. See this
+[example of the manual process](https://campaignwiki.org/contrib/manual-process.png).
 
 If you're like me, you'll agree that elves should have thinner faces
 and dwarves should have rounder faces. That's what the
-[elf PDF](elf.pdf) and the [dwarf PDF](dwarf.pdf) are for.
+[elf PDF](https://campaignwiki.org/contrib/elf.pdf) and the
+[dwarf PDF](https://campaignwiki.org/contrib/dwarf.pdf) are for.
 
 If you work **electronically** using a tablet or so, I would suggest
 something else. Here's how I worked using my iPad and Procreate: I
-created a new image by importing the [empty PNG](empty.png) and adding
+created a new image by importing the
+[empty PNG](https://campaignwiki.org/contrib/empty.png) and adding
 a new layer for all the different elements: eyes, mouth, chin, ears,
 nose, extra, and hair. I exported the whole image in PSD format,
 keeping all the layers intact. If you got this far,
 just [send it](mailto:alex@alexschroeder.ch) to me.
+See this
+[example of the electronic process](https://campaignwiki.org/contrib/electronic-process.png).
 
-![Example of the electronic process](electronic-process.png)
-
-[Download PSD file](electronic-process.psd)
+If you also prefer to work with the PSD format:
+[download PSD file](https://campaignwiki.org/contrib/electronic-process.psd).
 
 To get started, send me at bunch of noses, mouths, hair, ears, and
 chins. The minimum is one each, but more is better, of course. 😄
@@ -63,9 +65,9 @@ Later, we can use some other method to exchange files.
 
 It's important to get the file names right.
 
-This application goes through the files in the [elements](elements)
-folder for a given artist and picks out one of each for every
-*element* of a face. These are the elements considered, in order:
+This application goes through the files in the `elements` folder for a
+given artist and picks out one of each for every *element* of a face.
+These are the elements considered, in order:
 
 * face
 * eyes
@@ -118,7 +120,6 @@ not for dwarves or elves.
 All the files for each artist go into a directory with a short
 nickname, e.g. "alex". The artist's name and the link to their
 homepage is extracted from the `README.md` file in their directory.
-Take a look at [mine](share/alex/README.md), for example.
 
 Currently, the code assumes that all artists have dedicated their
 files to the
@@ -137,19 +138,19 @@ processing you need to do with scanned images:
 2. Clean up the image using [ImageMagick](http://www.imagemagick.org/)
    and the following command line: `convert -blur 0x1 +dither -remap
    blau.png scan1.jpg source1.png` – this forces the image to use the
-   [blue](blau.png) Palette (and loses the grid). We're also moving
-   from JPG (which is what your scanner probably produced) to PNG. As
-   for transparency: If your PNG files use "indexed mode" or a
-   *palette* then it will work if you have a transparent color. If you
-   don't (because you're converting a JPG to a PNG as you did just
-   now) then *white* is considered to be *transparent* when merging
-   the various elements. If your PNG files use "RGB mode" or *true
-   color*, then it will also work if you use an alpha channel.
-   Unfortunately, this means that it will *not* work if you use RGB
-   mode and no alpha channel—such elements will cover all previous
-   elements.
+   [blue](https://campaignwiki.org/contrib/blau.png) Palette (and
+   loses the grid). We're also moving from JPG (which is what your
+   scanner probably produced) to PNG. As for transparency: If your PNG
+   files use "indexed mode" or a *palette* then it will work if you
+   have a transparent color. If you don't (because you're converting a
+   JPG to a PNG as you did just now) then *white* is considered to be
+   *transparent* when merging the various elements. If your PNG files
+   use "RGB mode" or *true color*, then it will also work if you use
+   an alpha channel. Unfortunately, this means that it will *not* work
+   if you use RGB mode and no alpha channel—such elements will cover
+   all previous elements.
 
-3. Cut the image into elements using [cutter.pl](helpers/cutter.pl).
+3. Cut the image into elements using `cutter.pl`.
    It cuts the scan into 5 × 5 images of 450 × 600 pixels each and
    labels them by row. You'd invoke it as follows: `perl
    helpers/cutter.pl source1.png alex eyes_all nose_all mouth_all
@@ -237,16 +238,14 @@ deploy it. There is a
 [Cookbook](http://mojolicio.us/perldoc/Mojolicious/Guides/Cookbook#DEPLOYMENT)
 with a section on deployment. The following is a quick summary.
 
-This runs the script as a server on
-[localhost:3000](http://localhost:3000/):
+This runs the script as a server on `localhost:3000`:
 
 ```sh
 face-generator daemon
 ```
 
-This runs the script as a server on
-[localhost:3000](http://localhost:3000/) and reloads it every time you
-change one of the files:
+This runs the script as a server on `localhost:3000` and reloads it
+every time you change one of the files:
 
 ```sh
 morbo script/face-generator
@@ -289,7 +288,8 @@ In this case, you should note the type in the config file.
 ## Appropriate background image when editing images
 
 When using the `/debug` URLs to edit images, you might not always want
-to use the default background image, [empty.png](share/empty.png).
+to use the default background image,
+[empty.png](https://campaignwiki.org/contrib/empty.png).
 
 You can specify the background image to use via the URL parameter
 `empty`. It must name an image in the `share` directory. Example:
@@ -380,9 +380,8 @@ This will create copies in your current directory. If you're happy,
 move them back into the elements folder.
 
 If you need help figuring out by how much you might want to shift
-images, you can use [top.pl](helpers/top.pl) and
-[bottom.pl](helpers/bottom.pl). They cound how many white lines there
-are at the top and at the bottom, respectively.
+images, you can use `top.pl` and `bottom.pl`. They cound how many
+white lines there are at the top and at the bottom, respectively.
 
 Example usage:
 
@@ -392,10 +391,10 @@ perl helpers/top.pl share/alex/eyes_all_*
 
 ## Alternative look
 
-For [my images](share/alex) I enforced a blue color map because I
-was doing my drawings using a blue fountain pen. This is the command
-line I used in my example above: `convert -blur 0x1 +dither -remap
-blau.png scan1.jpg source1.png`
+For [my images](https://campaignwiki.org/face/view/alex/random) I
+enforced a blue color map because I was doing my drawings using a blue
+fountain pen. This is the command line I used in my example above:
+`convert -blur 0x1 +dither -remap blau.png scan1.jpg source1.png`
 
 If you do your drawings using a pencil, you might want to keep the
 pencil look. I'll suggest the following command line: `convert -blur

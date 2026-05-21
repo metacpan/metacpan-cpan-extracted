@@ -1,159 +1,55 @@
-# ABSTRACT: Role providing board directory discovery and config access
+# ABSTRACT: Role providing board discovery, sync lifecycle, and task access
 
 package App::karr::Role::BoardAccess;
-our $VERSION = '0.102';
+our $VERSION = '0.205';
 use Moo::Role;
-use Path::Tiny;
-use YAML::XS qw( LoadFile DumpFile );
-use Carp qw( croak );
-use File::Temp qw( tempdir );
+
+with 'App::karr::Role::BoardDiscovery';
+with 'App::karr::Role::SyncLifecycle';
 
 
-has board_dir => (
-  is => 'lazy',
-  clearer => '_clear_board_dir',
-);
-
-has config => (
-  is => 'lazy',
-  clearer => '_clear_config',
-);
-
-has git_root => (
-  is => 'lazy',
-);
-
-has store => (
-  is => 'lazy',
-);
-
-sub _build_board_dir {
-  my ($self) = @_;
-  my $store = $self->store;
-  $store->git->pull;
-  croak "No karr board found. Run 'karr init' to create one.\n"
-    unless $store->board_exists;
-
-  my $dir = path( tempdir( CLEANUP => 1 ) );
-  $store->materialize_to($dir);
-  return $dir;
-}
-
-sub _build_git_root {
-  my ($self) = @_;
-  require App::karr::Git;
-
-  my $start = $self->can('has_dir') && $self->has_dir
-    ? path($self->dir)->absolute
-    : path('.')->absolute;
-
-  while (1) {
-    my $git = App::karr::Git->new( dir => $start->stringify );
-    my $root = $git->repo_root;
-    return $root if $root;
-    last if $start->is_rootdir;
-    $start = $start->parent;
-  }
-  croak "Not a git repository. karr requires Git.\n";
-}
-
-sub _build_store {
-  my ($self) = @_;
-  require App::karr::Git;
-  require App::karr::BoardStore;
-  my $git = App::karr::Git->new( dir => $self->git_root->stringify );
-  return App::karr::BoardStore->new( git => $git );
-}
-
-sub _build_config {
-  my ($self) = @_;
-  my $config_file = $self->board_dir->child('config.yml');
-  croak "No config.yml found in " . $self->board_dir unless $config_file->exists;
-  return LoadFile($config_file->stringify);
-}
-
-sub save_config {
-  my ($self) = @_;
-  DumpFile($self->board_dir->child('config.yml')->stringify, $self->config);
-}
-
-sub tasks_dir {
-  my ($self) = @_;
-  my $name = $self->config->{tasks_dir} // 'tasks';
-  return $self->board_dir->child($name);
+sub load_tasks {
+    my ($self) = @_;
+    return $self->store->load_tasks;
 }
 
 sub find_task {
-  my ($self, $id) = @_;
-  my $dir = $self->tasks_dir;
-  return undef unless $dir->exists;
-  require App::karr::Task;
-  for my $file ($dir->children(qr/\.md$/)) {
-    if ($file->basename =~ /^0*${id}-/) {
-      return App::karr::Task->from_file($file);
-    }
-  }
-  return undef;
+    my ($self, $id) = @_;
+    return $self->store->find_task($id);
 }
 
-sub load_tasks {
-  my ($self) = @_;
-  my $dir = $self->tasks_dir;
-  return () unless $dir->exists;
-  require App::karr::Task;
-  my @files = sort $dir->children(qr/\.md$/);
-  return map { App::karr::Task->from_file($_) } @files;
+sub save_task {
+    my ($self, $task) = @_;
+    return $self->store->save_task($task);
 }
 
-sub parse_ids {
-  my ($self, $id_str) = @_;
-  return split /,/, $id_str;
-}
-
-sub sync_before {
-  my ($self) = @_;
-  my $git = $self->store->git;
-  $git->pull;
-  $self->_clear_config;
-  $self->_clear_board_dir;
-  $self->board_dir;
-}
-
-sub sync_after {
-  my ($self) = @_;
-  my $git = $self->store->git;
-  $self->_serialize_to_refs($git);
-  $git->push;
-  $self->_clear_config;
-}
-
-sub _materialize_from_refs {
-  my ($self, $git) = @_;
-  return $self->store->materialize_to( $self->board_dir );
-}
-
-sub _serialize_to_refs {
-  my ($self, $git) = @_;
-  return $self->store->serialize_from( $self->board_dir );
+sub delete_task {
+    my ($self, $id) = @_;
+    return $self->store->delete_task($id);
 }
 
 sub allocate_next_id {
-  my ($self) = @_;
-  return $self->store->allocate_next_id;
+    my ($self) = @_;
+    return $self->store->allocate_next_id;
+}
+
+sub parse_ids {
+    my ($self, $id_str) = @_;
+    return split /,/, $id_str;
 }
 
 sub append_log {
-  my ($self, $git, %entry) = @_;
-  require JSON::MaybeXS;
-  require POSIX;
-  $entry{ts} //= POSIX::strftime('%Y-%m-%dT%H:%M:%SZ', gmtime());
-  my $identity = $git->git_user_email || 'unknown';
-  $identity =~ s/[^a-zA-Z0-9._-]/_/g;
-  my $ref = "refs/karr/log/$identity";
-  my $existing = $git->read_ref($ref);
-  my $line = JSON::MaybeXS::encode_json(\%entry);
-  my $new = $existing ? "$existing\n$line" : $line;
-  $git->write_ref($ref, $new);
+    my ($self, $git, %entry) = @_;
+    $git //= $self->git;
+    require App::karr::ActivityLog;
+    my $logger = App::karr::ActivityLog->new(git => $git);
+    return $logger->log_entry(%entry);
+}
+
+sub save_config {
+    my ($self, $effective) = @_;
+    $effective //= $self->config;
+    return $self->store->save_config($effective);
 }
 
 1;
@@ -166,28 +62,31 @@ __END__
 
 =head1 NAME
 
-App::karr::Role::BoardAccess - Role providing board directory discovery and config access
+App::karr::Role::BoardAccess - Role providing board discovery, sync lifecycle, and task access
 
 =head1 VERSION
 
-version 0.102
+version 0.205
 
 =head1 DESCRIPTION
 
-This role gives command objects a consistent way to find the current board,
-load tasks, read and write configuration, and synchronise temporary board files
-with the Git ref backend. Most command modules in C<karr> compose this role.
+This role composes L<Role::BoardDiscovery> and L<Role::SyncLifecycle> and
+adds task-access methods that delegate to the store. Commands compose this role
+for full board functionality.
+
+All task operations work directly against refs via C<< $self->store->load_tasks() >>
+and similar. No temporary directory is created.
 
 =head1 SUPPORT
 
 =head2 Issues
 
 Please report bugs and feature requests on GitHub at
-L<https://github.com/Getty/p5-app-karr/issues>.
+L<https://github.com/Getty/karr/issues>.
 
 =head2 IRC
 
-Join C<#ai> on C<irc.perl.org> or message Getty directly.
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -195,7 +94,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,7 +1,7 @@
 ## How to contribute
  
 Thank you for considering contributing to this distribution.
-I welcome any contribution to DateTime::Format::RelativeTime, including, but not limited to bug reports, feature requests, general comments, and patches.
+I welcome any contribution to DateTime::Format::RelativeTime::Exception, including, but not limited to bug reports, feature requests, general comments, and patches.
 
 Feel free to clone it from its gitlab repository at <https://gitlab.com/jackdeguest/DateTime-Format-RelativeTime> and issue a pull request.
 
@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://gitlab.com/jackde
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/DateTime-Format-RelativeTime-v0.2.0/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/DateTime-Format-RelativeTime-Exception-v0.2.2/README.md)
 
 ## Author
 

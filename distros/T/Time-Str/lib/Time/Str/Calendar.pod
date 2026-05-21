@@ -1,0 +1,133 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Time::Str::Calendar - Gregorian calendar validation and computation
+
+=head1 SYNOPSIS
+
+    use Time::Str::Calendar qw( valid_ymd ymd_to_rdn ymd_to_dow
+                                rdn_to_ymd resolve_century );
+
+    # Validate a date
+    valid_ymd(2024, 2, 29);  # true (leap year)
+    valid_ymd(2023, 2, 29);  # false
+
+    # Rata Die Number
+    my $rdn = ymd_to_rdn(2024, 12, 24);  # 739244
+
+    # Day of week (1=Mon .. 7=Sun)
+    my $dow = ymd_to_dow(2024, 12, 24);  # 2 (Tuesday)
+
+    # Rata Die to date
+    my ($y, $m, $d) = rdn_to_ymd(739244);  # (2024, 12, 24)
+
+    # Resolve two-digit year
+    my $year = resolve_century(24, 1950);  # 2024
+
+=head1 DESCRIPTION
+
+This module provides Gregorian calendar functions for date validation,
+day numbering, and century resolution. All functions operate on integer
+values and are exportable on request. Use C<:all> to import everything.
+
+=head1 FUNCTIONS
+
+=head2 leap_year
+
+    my $bool = leap_year($year);
+
+Returns true if the given year is a leap year in the Gregorian calendar.
+
+=head2 month_days
+
+    my $days = month_days($year, $month);
+
+Returns the number of days in the given month (28-31), accounting
+for leap years.
+
+Croaks if C<month> is out of range [1, 12].
+
+=head2 valid_ymd
+
+    my $bool = valid_ymd($year, $month, $day);
+
+Returns true if the given date is valid in the Gregorian calendar.
+Checks year (1-9999), month (1-12), and day range for the given
+month, accounting for leap years.
+
+=head2 ymd_to_rdn
+
+    my $rdn = ymd_to_rdn($year, $month, $day);
+
+Returns the Rata Die Number for the given date (day 1 = 0001-01-01).
+
+Croaks if C<year> is out of range [1, 9999], C<month> is out of
+range [1, 12], or C<day> is out of range [1, 31].
+
+The date is not validated; use C<valid_ymd> first if the input is
+untrusted.
+
+=head2 rdn_to_ymd
+
+    my ($year, $month, $day) = rdn_to_ymd($rdn);
+
+Converts a Rata Die Number back to a Gregorian date.
+
+Croaks if C<rdn> is out of range [1, 3652059].
+
+=head2 rdn_to_dow
+
+    my $dow = rdn_to_dow($rdn);
+
+Returns the day of week for the given Rata Die Number as an integer
+(1=Monday .. 7=Sunday).
+
+Croaks if C<rdn> is out of range [1, 3652059].
+
+=head2 ymd_to_dow
+
+    my $dow = ymd_to_dow($year, $month, $day);
+
+Returns the day of week as an integer (1=Monday .. 7=Sunday).
+
+Croaks if C<year> is out of range [1, 9999], C<month> is out of
+range [1, 12], or C<day> is out of range [1, 31].
+
+The date is not validated; use C<valid_ymd> first if the input is
+untrusted.
+
+=head2 resolve_century
+
+    my $resolved = resolve_century($year, $pivot_year);
+
+Resolves a two-digit year (0-99) to a four-digit year using the
+given pivot year. Years below the pivot offset map to the next
+century; others map to the pivot's century.
+
+    resolve_century(24, 1950)  # 2024
+    resolve_century(49, 1950)  # 2049
+    resolve_century(50, 1950)  # 1950
+    resolve_century(99, 1950)  # 1999
+
+Croaks if C<year> is out of range [0, 99] or C<pivot_year> is out
+of range [0, 9899].
+
+=head1 SEE ALSO
+
+L<Time::Str>, L<Time::Str::Token>, L<Time::Str::Regexp>
+
+=head1 AUTHOR
+
+Christian Hansen
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 by Christian Hansen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

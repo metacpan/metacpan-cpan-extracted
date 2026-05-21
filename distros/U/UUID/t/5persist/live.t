@@ -3,16 +3,14 @@
 #
 use strict;
 use warnings;
-use Test::More;
-use MyNote;
+use MyTest;
 use File::Spec ();
 use File::Temp ();
-use Config;
 
 use vars qw(@OPTS $TMPDIR $STATEFILE);
 
 BEGIN {
-    my $tdo = File::Temp->newdir(CLEANUP => 0);
+    my $tdo = File::Temp->newdir('UUID-test-XXXXXXXX', TMPDIR => 1, CLEANUP => 0);
     $TMPDIR = $tdo->dirname;
 
     my $tfo = File::Temp->new(

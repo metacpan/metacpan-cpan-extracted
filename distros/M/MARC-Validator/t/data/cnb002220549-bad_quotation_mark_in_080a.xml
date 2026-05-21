@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>02738nam a2200661 a 4500</leader>
+  <controlfield tag="001">nkc20112220549</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">20260220114705.0</controlfield>
+  <controlfield tag="007">ta</controlfield>
+  <controlfield tag="008">110812s2010    xr abcfe      001 0acze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb002220549</subfield>
+  </datafield>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="a">978-80-242-2922-5</subfield>
+    <subfield code="q">(váz.)</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">OLA001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="d">ABA001</subfield>
+  </datafield>
+  <datafield tag="041" ind1="1" ind2=" ">
+    <subfield code="a">cze</subfield>
+    <subfield code="h">eng</subfield>
+  </datafield>
+  <datafield tag="043" ind1=" " ind2=" ">
+    <subfield code="a">n-us---</subfield>
+    <subfield code="a">p------</subfield>
+  </datafield>
+  <datafield tag="045" ind1=" " ind2=" ">
+    <subfield code="a">x3x4</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">355/359</subfield>
+    <subfield code="x">Vojenství. Obrana země. Ozbrojené síly</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">15</subfield>
+  </datafield>
+  <datafield tag="072" ind1=" " ind2="7">
+    <subfield code="a">929</subfield>
+    <subfield code="x">Biografie</subfield>
+    <subfield code="2">Konspekt</subfield>
+    <subfield code="9">8</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">929</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">355-051</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">355.353.4</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">355.483(966.2)“1944”</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">355.483(528.3)"1945"</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">355.48(100)"1939/1945"</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(73)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(9)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">(0:82-94)</subfield>
+    <subfield code="2">MRF</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Sledge, E. B.</subfield>
+    <subfield code="q">(Eugene Bondurant),</subfield>
+    <subfield code="d">1923-2001</subfield>
+    <subfield code="7">xx0138978</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Se starou gardou :</subfield>
+    <subfield code="b">na Peleliu a Okinawě /</subfield>
+    <subfield code="c">Eugene B. Sledge ; [z anglického originálu ... přeložil Michal Ulvr]</subfield>
+  </datafield>
+  <datafield tag="250" ind1=" " ind2=" ">
+    <subfield code="a">Vyd. 1.</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Praha :</subfield>
+    <subfield code="b">Knižní klub,</subfield>
+    <subfield code="c">2010</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">365 s., [16] s. obr. příl. :</subfield>
+    <subfield code="b">il., mapy, portréty ;</subfield>
+    <subfield code="c">21 cm</subfield>
+  </datafield>
+  <datafield tag="490" ind1="1" ind2=" ">
+    <subfield code="a">Universum</subfield>
+  </datafield>
+  <datafield tag="504" ind1=" " ind2=" ">
+    <subfield code="a">Obsahuje bibliografii a rejstřík</subfield>
+  </datafield>
+  <datafield tag="600" ind1="1" ind2="7">
+    <subfield code="a">Sledge, E. B.</subfield>
+    <subfield code="q">(Eugene Bondurant),</subfield>
+    <subfield code="d">1923-2001</subfield>
+    <subfield code="7">xx0138978</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="610" ind1="1" ind2="7">
+    <subfield code="a">Spojené státy americké.</subfield>
+    <subfield code="b">Marine Corps.</subfield>
+    <subfield code="b">Marines, 5th.</subfield>
+    <subfield code="b">Battalion, 3rd.</subfield>
+    <subfield code="b">Company K.</subfield>
+    <subfield code="7">kn20110823005</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="648" ind1=" " ind2="7">
+    <subfield code="a">1939-1945</subfield>
+    <subfield code="7">ch460653</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="648" ind1=" " ind2="7">
+    <subfield code="a">1944</subfield>
+    <subfield code="7">ch967320</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="648" ind1=" " ind2="7">
+    <subfield code="a">1945</subfield>
+    <subfield code="7">ch460654</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">vojáci</subfield>
+    <subfield code="7">ph127219</subfield>
+    <subfield code="z">Spojené státy americké</subfield>
+    <subfield code="y">1939-1945</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">námořní pěchota</subfield>
+    <subfield code="7">ph286376</subfield>
+    <subfield code="z">Spojené státy americké</subfield>
+    <subfield code="y">1939-1945</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">bitva o Peleliu (1944 : Peleliu, Palau)</subfield>
+    <subfield code="7">ph311299</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">bitva o Okinawu (1945 : Okinawa, Japonsko)</subfield>
+    <subfield code="7">ph659011</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="7">
+    <subfield code="a">druhá světová válka (1939-1945)</subfield>
+    <subfield code="7">ph117270</subfield>
+    <subfield code="z">Tichý oceán (oblast)</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">soldiers</subfield>
+    <subfield code="z">United States</subfield>
+    <subfield code="y">1939-1945</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">Marine Corps</subfield>
+    <subfield code="z">United States</subfield>
+    <subfield code="y">1939-1945</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">battle of Peleliu (1944 : Peleliu, Palau)</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">battle of Okinawa (1945 : Okinawa, Japan )</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="650" ind1="0" ind2="9">
+    <subfield code="a">World War (1939-1945)</subfield>
+    <subfield code="z">Pacific Ocean</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="7">
+    <subfield code="a">autobiografické vzpomínky</subfield>
+    <subfield code="7">fd131854</subfield>
+    <subfield code="2">czenas</subfield>
+  </datafield>
+  <datafield tag="655" ind1=" " ind2="9">
+    <subfield code="a">autobiographical reminiscences</subfield>
+    <subfield code="2">eczenas</subfield>
+  </datafield>
+  <datafield tag="765" ind1="0" ind2=" ">
+    <subfield code="t">With the old breed</subfield>
+    <subfield code="9">Česky</subfield>
+  </datafield>
+  <datafield tag="830" ind1=" " ind2="0">
+    <subfield code="a">Universum (Knižní klub)</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2="1">
+    <subfield code="u">https://ndk.cz/uuid/uuid:fe4e00b0-a1ef-11e7-ae0a-005056827e52</subfield>
+    <subfield code="y">Digitalizovaný dokument</subfield>
+  </datafield>
+  <datafield tag="901" ind1=" " ind2=" ">
+    <subfield code="b">9788024229225</subfield>
+    <subfield code="f">1. vyd.</subfield>
+    <subfield code="o">20110830</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="928" ind1="9" ind2=" ">
+    <subfield code="a">Euromedia Group - Knižní klub</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">002220549</subfield>
+  </datafield>
+</record>
+
+</collection>

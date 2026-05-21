@@ -1,276 +1,351 @@
 # Term::ANSIEncode
 
-![Term::ANSIEncode Logo](images/ANSI-Encode.png?raw=true "Term::ANSIEncode Logo Title Text")
+[![Term::ANSIEncode Logo](pics/ANSI-Encode.png?raw=true "Term::ANSIEncode Logo Title Text")](https://youtu.be/dINayZsQdTM)
+
+<sub>Click the image for something fun</sub>
+
+![Divider](pics/pink.jpg?raw=true "Divider")
 
 ## Description
 
-Markup text to ANSI encoder.  Very handy for making server identification screens.
+   Markup text to ANSI encoder.  Very handy for making server identification screens.
 
-GitHub will ALWAYS have the latest version and CPAN is not guaranteed to have the latest.
+   GitHub will *ALWAYS* have the latest version and CPAN is not guaranteed to have the latest.
 
-You will get best results if you use a font with all of the UTF-8 characters.  See the **Fonts** section below.
+   You will get best results if you use a font with all of the UTF-8 characters.  See the **Fonts** section below.
+
+![Divider](pics/pink.jpg?raw=true "Divider")
 
 ## Usage
 
-### To use the Perl module:
-```
- # Read the module's POD manual for more information, via "man" or "perldoc"
+   ### To use the Perl module:
 
- my $ansi = Term::ANSIEncode->new;
+   ```perl
+   # Read the module's POD manual for more information, via "man" or "perldoc"
 
- my $string = '[% CLS %]Some markup encoded string';
- $string .= "\n" . '[% RED     %]Red foreground[% RESET %]' . "\n";
- $string .= "\n" . '[% YELLOW  %]Yellow foreground[% RESET %]' . "\n";
- $string .= "\n" . '[% GREEN   %]Green foreground[% RESET %]' . "\n";
- $string .= "\n" . '[% CYAN    %]Cyan foreground[% RESET %]' . "\n";
- $string .= "\n" . '[% BLUE    %]Blue foreground[% RESET %]' . "\n";
- $string .= "\n" . '[% MAGENTA %]Magenta foreground[% RESET %]' . "\n";
+   use Term::ANSIEncode;
 
- $ansi->ansi_output($string);
-```
-### To use the executable, run:
-```
-ansiencode [options] [File or Search]
-```
-It is **HIGHLY** encouraged for your terminal be set as **UTF-8** for the advanced features in this module/utility.  It is also encouraged that you use a font having the graphics characters for frames and other features.
+   my $ansi = Term::ANSIEncode->new;
 
-Excellent True-Type fonts for use:  http://github.com/gabrielelana/awesome-terminal-fonts (Listed as "Source Code" fonts)
+   my $string = '[% CLS %]Some markup encoded string' . "\n";
+   $string .= '[% CHAR =,80 %]' . "\n"; # A line of ==== 80 columns long
 
-For Windows, this setting is in your "Region" setting.  Also note, Windows Terminal/Command/PowerShell lacks some capabilities.  The third party AI **Warp Terminal** supports all features.
+   $string .= '[% RED     %]Red foreground[% RESET %]' . "\n";
+   $string .= '[% YELLOW  %]Yellow foreground[% RESET %]' . "\n";
+   $string .= '[% GREEN   %]Green foreground[% RESET %]' . "\n";
+   $string .= '[% CYAN    %]Cyan foreground[% RESET %]' . "\n";
+   $string .= '[% BLUE    %]Blue foreground[% RESET %]' . "\n";
+   $string .= '[% MAGENTA %]Magenta foreground[% RESET %]' . "\n";
+
+   $string .= '[% BLACK %][% B_RED     %]Red background black foreground[% RESET %]' . "\n";
+   $string .= '[% BLACK %][% B_YELLOW  %]Yellow background black foreground[% RESET %]' . "\n";
+   $string .= '[% BLACK %][% B_GREEN   %]Green background black foreground[% RESET %]' . "\n";
+   $string .= '[% BLACK %][% B_CYAN    %]Cyan background black foreground[% RESET %]' . "\n";
+   $string .= '[% BLACK %][% B_BLUE    %]Blue background black foreground[% RESET %]' . "\n";
+   $string .= '[% BLACK %][% B_MAGENTA %]Magenta background black foreground[% RESET %]' . "\n";
+
+   $string .= '[% RGB 255,105,180 %]Hot Pink foreground[% RESET %]' . "\n";
+   $string .= '[% BLACK %][% B_RGB 255,105,180 %]Hot Pink background black foreground[% RESET %]' . "\n";
+
+   $string .= '[% CHAR =,80 %]' . "\n\n"; # A line of ==== 80 columns long
+
+   $ansi->ansi_output($string);
+   ```
+
+![Code Sample](pics/Sample.png)
+
+   ### To use the executable, run:
+
+   ```bash
+   ansiencode [options] [File or Search]
+   ```
+
+   It is **HIGHLY** encouraged for your terminal be set as **UTF-8** for the advanced features in this module/utility.  It is also encouraged that you use a font having the graphics characters for frames and other features.
+
+   Excellent True-Type fonts for use:  http://github.com/gabrielelana/awesome-terminal-fonts (Listed as "Source Code" fonts)
+
+   For Windows, this setting is in your "Region" setting.  Also note, Windows Terminal/Command/PowerShell lacks some capabilities.  The third party AI **Warp Terminal** supports all features.
+
+![Divider](pics/pink.jpg?raw=true "Divider")
 
 ## Options
 
-![Help Screen](images/help.png?raw=true "Term::ANSIEncode Help Screen")
+![Help Screen](pics/help.png?raw=true "Term::ANSIEncode Help Screen")
 
-### -**a** or --**ansi-modes**
+----
 
-Show aupported ANSI color modes.  Note, this is only for detection.  The other options may depend on the supported color support.  However, the tokens will always send output assuming the mode is supported.
+   ### -**a** or --**ansi-modes**
 
-![Support Color Modes](images/supported.png?raw=true "Term::ANSIEncode Supported Color Modes")
+   Show aupported ANSI color modes.  Note, this is only for detection.  The other options may depend on the supported color support.  However, the tokens will always send output assuming the mode is supported.
 
-### --**baud**=speed
+![Support Color Modes](pics/supported.png?raw=true "Term::ANSIEncode Supported Color Modes")
 
-Slow down output to the specific baud rate.  It can be any baud rate.  Full speed otherwise.
+----
 
-### -**c** or --**colors**
+   ### --**baud**=speed
 
-Show color grid for use with "COLOR" and "GRAY" tokens.
+   Slow down output to the specific baud rate.  It can be any baud rate.  Full speed otherwise.
 
-![Colors](images/colors.png?raw=true "Term::ANSIEncode Color Examples")
+----
 
-### -**d** or --**dump** [search]
+   ### -**c** or --**colors**
 
-Shows the symbols only.
+   Show color grid for use with "COLOR", "GRAY" and "RGB" tokens.
 
-### -**f** or --**frame**
+![Colors](pics/colors.png?raw=true "Term::ANSIEncode Color Examples")
 
-Show sample frame types.
+----
 
-![Frames](images/frames.png?raw=true "Term::ANSIEncode Frames Example")
+   ### -**d** or --**dump** [search]
 
-### -**h** or --**horizontal-rules**
+   Shows the symbols only.
 
-Show sample horizontal rules.
+----
 
-![Horizontal Rules](images/rules.png?raw=true "Term::ANSIEncode Horizontal Rules Example")
+   ### -**f** or --**frame**
 
-### -**r** or --**rawtokens**
+   Show sample frame types.
 
-Raw dump of available tokens.
+![Frames](pics/frames.png?raw=true "Term::ANSIEncode Frames Example")
 
-### -**s** or --**symbols** [search]
+----
 
-Show all of the symbol character tokens by name.  Use search to shorten the huge list.
+   ### -**h** or --**horizontal-rules**
 
-### -**t** or --**tokens**
+   Show sample horizontal rules.
 
-Show most used tokens.
+![Horizontal Rules](pics/rules.png?raw=true "Term::ANSIEncode Horizontal Rules Example")
 
-### -**u** or --**unicode** [search]
+----
 
-Show all of the symbol character tokens by unicode.  Use search to shorten the huge list.
+   ### -**r** or --**rawtokens**
 
-### -**v** or --**version**
+   Raw dump of available tokens.
 
-Show version and licensing info.
+----
 
-![Version](images/version.png?raw=true "Term::ANSIEncode Version")
+   ### -**s** or --**symbols** [search]
+
+   Show all of the symbol character tokens by name.  Use search to shorten the huge list.
+
+----
+
+   ### -**t** or --**tokens**
+
+   Show most used tokens.
+
+----
+
+   ### -**u** or --**unicode** [search]
+
+   Show all of the symbol character tokens by unicode.  Use search to shorten the huge list.
+
+----
+
+   ### -**v** or --**version**
+
+   Show version and licensing info.
+
+![Version](pics/version.png?raw=true "Term::ANSIEncode Version")
+
+![Divider](pics/pink.jpg?raw=true "Divider")
 
 ## Author
 
-Richard Kelsch
+   Richard Kelsch
 
-* **GitHub** - https://github.com/richcsst
+   * **GitHub** - [https://github.com/richcsst](https://github.com/richcsst)
+
+![Divider](pics/pink.jpg?raw=true "Divider")
 
 ## Fonts
 
-Some fonts do not support all of the Unicode characters.  The "examples" directory has an install script to install the "Awesome" fonts that look great and have all Unicode symbols.  They look great, are easy to read and have a plethora of support for the graphics and unicode characters.  They are TrueType fonts and can be installed on most systems and terminals.
+   Some fonts do not support all of the Unicode characters.  The "examples" directory has an install script to install the "Awesome" fonts that look great and have all Unicode symbols.  They look great, are easy to read and have a plethora of support for the graphics and unicode characters.  They are TrueType fonts and can be installed on most systems and terminals.
 
-* http://github.com/gabrielelana/awesome-terminal-fonts
+   * [http://github.com/gabrielelana/awesome-terminal-fonts](http://github.com/gabrielelana/awesome-terminal-fonts)
 
-Use the ```font-installer/install-awesome-fonts.sh``` script to install the fonts without having to clone the above repository.
+   Use the ```font-installer/install-awesome-fonts.sh``` script to install the fonts without having to clone the above repository.
 
-I suggest "**SourceCodePro-Powerline-Awesome**" when selecting a font
+   I suggest "**SourceCodePro-Powerline-Awesome**" when selecting a font
+
+![Divider](pics/pink.jpg?raw=true "Divider")
 
 ## Tokens
 
-Tokens have to be encapsulated inside [% token %] (the token must be surrounded by at least one space on each side.  Colors beyond the standard 8 will require a terminal that supports 16, 256 and/or 16.7 million colors.  This list is only a partial list of tokens.
+   Tokens have to be encapsulated inside **[% TOKEN %]** (the token name must be surrounded by at least one space on each side.  Colors beyond the standard 8 will require a terminal that supports 16, 256 and/or 16.7 million colors.  This list is only a partial list of tokens.
 
-NOTE:  Use "less -r" to view ANSI in "less".
+   NOTE:  Use "less -r" to view ANSI in "less".
 
-### CLEAR
+   * *Please use the "-t" option to see all of the tokens.  This is only a partial list.*
 
-Please use the "-t" option to see all of the tokens.  This is only a partial list.
+   ### CLEAR
 
-| **Token** | **Description** |
-| --- | --- |
-| CLEAR | Places cursor at top left, screen cleared |
-| CLS | Same as CLEAR |
-| CLEAR LINE | Clear to the end of line |
-| CLEAR DOWN | Clear down from current cursor position |
-| CLEAR UP | Clear up from current cursor position |
+   | **Token** | **Description** |
+   | --- | --- |
+   | CLEAR | Places cursor at top left, screen cleared |
+   | CLS | Same as CLEAR |
+   | CLEAR LINE | Clear to the end of line |
+   | CLEAR DOWN | Clear down from current cursor position |
+   | CLEAR UP | Clear up from current cursor position |
 
-### CURSOR
+   ### CURSOR
 
-| **Token** | **Description** |
-| --- | --- |
-| CURSOR OFF | Turn off the text cursor |
-| CURSOR ON | Turn on the text cursor |
-| DOWN | Moves cursor down one step |
-| HOME | Place the cursor at the top-left of the screen |
-| LEFT | Moves cursor left one step |
-| LINEFEED | One line down, keeping horizontal position the same.  Will scroll if the bottom of the screen |
-| NEWLINE | Start a new (blank) line on column 1 of the next line.  Will scroll if the bottom of the screen.
-| NEXT LINE | Move to column 1 of the next line down.
-| PREVIOUS LINE | Move to column 1 of the previous line.
-| RESTORE | Place cursor at saved position |
-| RETURN | Sends a carriage return (ASCII 13) |
-| RIGHT | Moves cursor right one step |
-| SAVE | Save cursor position |
-| SCREEN 1 | Sets display to screen 1 (default) |
-| SCREEN 2 | Sets display to screen 2 |
-| UP | Moves cursor up one step |
-| SPACES count | "count" number of spaces |
-| TABS count | "count" number of horizontal tabs |
-| CHAR character,count | Repeat "character" "count" number of times |
-| LOCATE column,row | Sets the cursor location |
-| SCROLL UP count | Scroll the screen up "count" number of times |
-| SCROLL DOWN count | Scroll the screen down "count" number of times |
+   | **Token** | **Description** |
+   | --- | --- |
+   | CURSOR OFF | Turn off the text cursor |
+   | CURSOR ON | Turn on the text cursor |
+   | DOWN | Moves cursor down one step |
+   | HOME | Place the cursor at the top-left of the screen |
+   | LEFT | Moves cursor left one step |
+   | LINEFEED | One line down, keeping horizontal position the same.  Will scroll if the bottom of the screen |
+   | NEWLINE | Start a new (blank) line on column 1 of the next line.  Will scroll if the bottom of the screen.
+   | NEXT LINE | Move to column 1 of the next line down.
+   | PREVIOUS LINE | Move to column 1 of the previous line.
+   | RESTORE | Place cursor at saved position |
+   | RETURN | Sends a carriage return (ASCII 13) |
+   | RIGHT | Moves cursor right one step |
+   | SAVE | Save cursor position |
+   | SCREEN 1 | Sets display to screen 1 (default) |
+   | SCREEN 2 | Sets display to screen 2 |
+   | UP | Moves cursor up one step |
+   | SPACES count | "count" number of spaces |
+   | TABS count | "count" number of horizontal tabs |
+   | CHAR character,count | Repeat "character(s)" "count" number of times |
+   | LOCATE column,row | Sets the cursor location |
+   | SCROLL UP count | Scroll the screen up "count" number of times |
+   | SCROLL DOWN count | Scroll the screen down "count" number of times |
 
-### ATTRIBUTES
+   ### ATTRIBUTES
 
-| **Token** | **Description** |
-| --- | --- |
-| BOLD | Bold text |
-| CROSSED OUT | Crossed out (not all terminals support this) |
-| DEFAULT FONT | Set to the default font |
-| DEFAULT UNDERLINE COLOR | Set to the default color for the underline attribute |
-| ENCIRCLED | Turn on encircled letters |
-| ENCIRCLED OFF | Turn off encircled letters |
-| FAINT | Use faint (light) text |
-| FONT DEFAULT | Use default font size |
-| FONT DOUBLE-HEIGHT BOTTOM | Use double-height font bottom half |
-| FONT DOUBLE-HEIGHT TOP | Use double-height font top half |
-| FONT DOUBLE-WIDTH | Use double-width font |
-| FRAMED | Turn on framed text |
-| FRAMED OFF | Turn off framed text |
-| HIDE | Hide text (later exposed with REVEAL) |
-| INVERT | Invert text (swap foreground and background colors) |
-| ITALIC | Show italic text |
-| NORMAL | Set text attributes back to defaults |
-| OVERLINED | Turn on overlined text |
-| OVERLINED OFF | Turn off overlined text |
-| PROPORTIONAL OFF | Turn off proportional spaced text |
-| PROPORTIONAL ON | Turn on proportional spaced text |
-| RAPID BLINK | Blink text rapidly |
-| RESET | Reset all colors and attributes to their defaults |
-| REVEAL | Show all text hidden with HIDE |
-| REVERSE | Invert text (just like INVERT) |
-| RING BELL | Rings the console bell |
-| SLOW BLINK | Blink text slowly |
-| SUBSCRIPT | Turn on subscript text |
-| SUBSCRIPT OFF | Turn off subscript text |
-| SUPERSCRIPT | Turn on superscript text |
-| SUPERSCRIPT OFF | Turn off superscript text |
-| UNDERLINE | Underline text |
-| UNDERLINE COLOR color | Set the color of underlines to the color token |
-| WRAP | Begin text region to be word-wrapped |
-| ENDWRAP | Ends text region to be word-wrapped |
-| JUSTFIFIED | Begin text region to be word-wrapped and justified |
-| ENDJUSTIFIED | End text region to be word-wraopped and justified |
+   | **Token** | **Description** |
+   | --- | --- |
+   | BOLD | Bold text |
+   | CROSSED OUT | Crossed out (not all terminals support this) |
+   | DEFAULT FONT | Set to the default font |
+   | DEFAULT UNDERLINE COLOR | Set to the default color for the underline attribute |
+   | ENCIRCLED | Turn on encircled letters |
+   | ENCIRCLED OFF | Turn off encircled letters |
+   | FAINT | Use faint (light) text |
+   | FONT DEFAULT | Use default font size |
+   | FONT DOUBLE-HEIGHT BOTTOM | Use double-height font bottom half |
+   | FONT DOUBLE-HEIGHT TOP | Use double-height font top half |
+   | FONT DOUBLE-WIDTH | Use double-width font |
+   | FRAMED | Turn on framed text |
+   | FRAMED OFF | Turn off framed text |
+   | HIDE | Hide text (later exposed with REVEAL) |
+   | INVERT | Invert text (swap foreground and background colors) |
+   | ITALIC | Show italic text |
+   | NORMAL | Set text attributes back to defaults |
+   | OVERLINED | Turn on overlined text |
+   | OVERLINED OFF | Turn off overlined text |
+   | PROPORTIONAL OFF | Turn off proportional spaced text |
+   | PROPORTIONAL ON | Turn on proportional spaced text |
+   | RAPID BLINK | Blink text rapidly |
+   | RESET | Reset all colors and attributes to their defaults |
+   | REVEAL | Show all text hidden with HIDE |
+   | REVERSE | Invert text (just like INVERT) |
+   | RING BELL | Rings the console bell |
+   | SLOW BLINK | Blink text slowly |
+   | SUBSCRIPT | Turn on subscript text |
+   | SUBSCRIPT OFF | Turn off subscript text |
+   | SUPERSCRIPT | Turn on superscript text |
+   | SUPERSCRIPT OFF | Turn off superscript text |
+   | UNDERLINE | Underline text |
+   | UNDERLINE COLOR color | Set the color of underlines to the color token |
+   | WRAP | Begin text region to be word-wrapped |
+   | ENDWRAP | Ends text region to be word-wrapped |
+   | JUSTFIFIED | Begin text region to be word-wrapped and justified |
+   | ENDJUSTIFIED | End text region to be word-wraopped and justified |
 
-### COLORS
+   ### COLORS
 
-| **Token** | **Description** |
-| --- | --- |
-| NORMAL | Sets colors to default |
+   | **Token** | **Description** |
+   | --- | --- |
+   | NORMAL | Sets colors to default |
 
-#### FOREGROUND
+   #### FOREGROUND
 
-| **Token** | **Description** |
-| --- | --- |
-| DEFAULT | Default foreground color |
-| BLACK | Black |
-| RED | Red |
-| PINK | Hot pink (requires 256 color terminal) |
-| ORANGE | Orange (requires 256 color terminal) |
-| NAVY | Deep blue (requires 256 color terminal) |
-| GREEN | Green |
-| YELLOW | Yellow |
-| BLUE | Blue |
-| MAGENTA | Magenta |
-| CYAN | Cyan |
-| WHITE | White |
-| BRIGHT BLACK | Bright black (dim grey) |
-| BRIGHT RED | Bright red |
-| BRIGHT GREEN | Lime |
-| BRIGHT YELLOW | Bright Yellow |
-| BRIGHT BLUE | Bright blue |
-| BRIGHT MAGENTA | Bright magenta |
-| BRIGHT CYAN | Bright cyan |
-| BRIGHT WHITE | Bright white |
-| COLOR 16 - COLOR 231 | Term256 colors (use -c to see these) |
-| GREY 0 - GREY 23  | Levels of grey |
-| RGB red,green,blue | 24 bit colors |
+   | **Token** | **Description** |
+   | --- | --- |
+   | DEFAULT | Default foreground color |
+   | BLACK | Black |
+   | RED | Red |
+   | PINK | Hot pink (requires 256 color terminal) |
+   | ORANGE | Orange (requires 256 color terminal) |
+   | NAVY | Deep blue (requires 256 color terminal) |
+   | GREEN | Green |
+   | YELLOW | Yellow |
+   | BLUE | Blue |
+   | MAGENTA | Magenta |
+   | CYAN | Cyan |
+   | WHITE | White |
+   | BRIGHT BLACK | Bright black (dim grey) |
+   | BRIGHT RED | Bright red |
+   | BRIGHT GREEN | Lime |
+   | BRIGHT YELLOW | Bright Yellow |
+   | BRIGHT BLUE | Bright blue |
+   | BRIGHT MAGENTA | Bright magenta |
+   | BRIGHT CYAN | Bright cyan |
+   | BRIGHT WHITE | Bright white |
+   | COLOR 16 - COLOR 231 | Term256 colors (use -c to see these) |
+   | GREY 0 - GREY 23  | Levels of grey |
+   | RGB red,green,blue | 24 bit colors |
 
-#### BACKGROUND
+   #### BACKGROUND
 
-| **Token** | **Description** |
-| --- | --- |
-| B_DEFAULT | Default background color |
-| B_BLACK | Black |
-| B_RED | Red |
-| B_GREEN | Green |
-| B_YELLOW | Yellow |
-| B_BLUE | Blue |
-| B_MAGENTA | Magenta |
-| B_CYAN | Cyan |
-| B_WHITE | White |
-| B_PINK | Hot pink (requires 256 color terminal) |
-| B_ORANGE | Orange (requires 256 color terminal) |
-| B_NAVY | Deep blue (requires 256 color terminal) |
-| B_BRIGHT BLACK | Bright black (grey) |
-| B_BRIGHT RED | Bright red |
-| B_BRIGHT GREEN | Lime |
-| B_BRIGHT YELLOW | Bright yellow |
-| B_BRIGHT BLUE | Bright blue |
-| B_BRIGHT MAGENTA | Bright magenta |
-| B_BRIGHT CYAN | Bright cyan |
-| B_BRIGHT WHITE | Bright white |
-| B_COLOR 16 - B_COLOR 231 | Term256 background colors (use -c to see these) |
-| B_GREY 0 - B_GREY 23 | Levels of grey |
-} B_RGB red,green,blue | 24 bit background colors |
+   | **Token** | **Description** |
+   | --- | --- |
+   | B_DEFAULT | Default background color |
+   | B_BLACK | Black |
+   | B_RED | Red |
+   | B_GREEN | Green |
+   | B_YELLOW | Yellow |
+   | B_BLUE | Blue |
+   | B_MAGENTA | Magenta |
+   | B_CYAN | Cyan |
+   | B_WHITE | White |
+   | B_PINK | Hot pink (requires 256 color terminal) |
+   | B_ORANGE | Orange (requires 256 color terminal) |
+   | B_NAVY | Deep blue (requires 256 color terminal) |
+   | B_BRIGHT BLACK | Bright black (grey) |
+   | B_BRIGHT RED | Bright red |
+   | B_BRIGHT GREEN | Lime |
+   | B_BRIGHT YELLOW | Bright yellow |
+   | B_BRIGHT BLUE | Bright blue |
+   | B_BRIGHT MAGENTA | Bright magenta |
+   | B_BRIGHT CYAN | Bright cyan |
+   | B_BRIGHT WHITE | Bright white |
+   | B_COLOR 16 - B_COLOR 231 | Term256 background colors (use -c to see these) |
+   | B_GREY 0 - B_GREY 23 | Levels of grey |
+   | B_RGB red,green,blue | 24 bit background colors |
 
-### HORIZONTAL RULES
+   ### HORIZONTAL RULES
 
-| **Token** | **Description** |
-| --- | --- |
-| HORIZONTAL RULE token | A solid line of background in the color defined by "token" |
+   | **Token** | **Description** |
+   | --- | --- |
+   | HORIZONTAL RULE token | A solid line of background in the color defined by "token" |
+
+![Divider](pics/pink.jpg?raw=true "Divider")
 
 ## SUGGESTIONS
 
-* When making a tokenized file for output, first prepare what you want to show in just black and white text.
-* Make two copies of the output in the file and only work on the last copy for adding color and attributes, referring to the original above for reference.
-* Have a second terminal window open to run ```ansiencode [filename]``` to quickly see what the output looks like, without having to exit your editor.
-* Remove the original copy, once everything looks great, then you are finished.
+   * When making a tokenized file for output, first prepare what you want to show in just black and white text.
+   * Make two copies of the output in the file and only work on the last copy for adding color and attributes, referring to the original above for reference.
+   * Have a second terminal window open to run ```ansiencode [filename]``` to quickly see what the output looks like, without having to exit your editor.
+   * Remove the original copy, once everything looks great, then you are finished.
 
+![Divider](pics/pink.jpg?raw=true "Divider")
+
+## COPYRIGHT
+
+   Copyright © 2023-2026 Richard Kelsch
+
+![Divider](pics/pink.jpg?raw=true "Divider")
+
+## LICENSE
+
+   This program is free software; you can redistribute it and/or modify it under the terms of either: the GNU General Public License as published by the Free Software Foundation; or the Artistic License.
+
+   This program is free software; you can redistribute it and/or modify it under the terms of either: the GNU General Public License as published by the Free Software Foundation; or the Artistic License.
+
+   See [http://dev.perl.org/licenses/](http://dev.perl.org/licenses/) for more information.

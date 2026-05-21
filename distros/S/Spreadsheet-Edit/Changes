@@ -1,5 +1,13 @@
 Changes to Spreadsheet::Edit, Spreadsheet::Edit::IO, and/or Spreadsheet::Edit::Log
 
+1001.003 : Fix test to not fail on platforms without working 'tput'
+1001.002 : Fix title_rx auto-detect oops when cleaned title matches a raw
+           title in another column.
+           Allow per-call override of verbose/debug/silent more often.
+           btwbt: More compact mini-backtrace; simplified colorize impl.
+           Add (undocumented) &btwN_str which returns the string.
+           log_call: Show empty list result as () instead of nothing.
+           Update shared test library.
 1001.001 : btwbt mini-tracebacks now show outer-most frame first.
            *Removed* support for user-specified btw prefix strings
            (lots of complexity for mostly-imaginary real benefits).

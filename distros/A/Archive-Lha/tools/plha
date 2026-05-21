@@ -1,0 +1,715 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Data::Dumper;
+use Encode;
+use FindBin;
+use File::Spec;
+use File::Basename;
+use File::Path;
+use Getopt::Long qw( GetOptionsFromArray );
+use lib File::Spec->catfile($FindBin::Bin, '..', 'lib');
+
+use Archive::Lha::Decode;
+use Archive::Lha::Header;
+use Archive::Lha::Header::Utils ();
+use Archive::Lha::Stream::File;
+use Carp;
+use POSIX qw( strftime setlocale LC_TIME );
+use Time::Moment;
+
+# Charset options: -fc (from charset) and -tc (to charset)
+my $opt_from_charset;
+my $opt_to_charset;
+my $opt_use_locale;
+
+# Parse --use-locale before anything else so setlocale runs at startup
+Getopt::Long::GetOptionsFromArray(\@ARGV,
+    'use-locale'              => \$opt_use_locale,
+    'from-charset|fc=s'      => \$opt_from_charset,
+    'to-charset|tc=s'        => \$opt_to_charset,
+);
+setlocale(LC_TIME, 'C') unless $opt_use_locale;
+
+# Return display name for a header, respecting -fc/-tc options.
+# Without options, pathname() auto-detects from the OS field.
+sub _display_name {
+  my ($header) = @_;
+  return $header->pathname( $opt_from_charset, $opt_to_charset // 'UTF-8' );
+}
+
+my $controller = +{
+    d => sub {
+        my $fname = shift or usage();
+        my $stream = open_archive($fname);
+        while ( defined( my $level = $stream->search_header ) ) {
+            my $header = Archive::Lha::Header->new(
+                level  => $level,
+                stream => $stream
+            );
+            $stream->seek( $header->{next_header} );
+            print Dumper($header);
+        }
+
+    },
+    l => sub {
+        my $fname = shift or usage();
+        my $stream = open_archive($fname);
+        while ( defined( my $level = $stream->search_header ) ) {
+            my $header = Archive::Lha::Header->new(
+                level  => $level,
+                stream => $stream
+            );
+            $stream->seek( $header->{next_header} );
+            my $fullname = _display_name($header);
+            $fullname = '' if $fullname eq '.';
+            my $has_path = ($fullname =~ m{/} && !_is_directory($header));
+            # l shows filename only (no path), + prefix if file has a path component
+            my $name = $has_path ? (split m{/}, $fullname)[-1] : $fullname;
+            $name .= '/' if _is_directory($header) && $name ne '' && $name !~ m{/$};
+            my $prefix = $has_path ? '+' : ' ';
+            printf "%s%s\n", $prefix, $name;
+        }
+    },
+    v => sub {
+        my $contents = '';
+        my $fname = shift or usage();
+        my $stream = open_archive($fname);
+        my $totals = { original_size => 0, encoded_size => 0, count => 0 };
+        print "Original  Packed Ratio    Date     Time    Name\n";
+        print "-------- ------- ----- --------- --------  -------------\n";
+        while ( defined( my $level = $stream->search_header ) ) {
+            my $header = Archive::Lha::Header->new(
+                level  => $level,
+                stream => $stream
+            );
+            $stream->seek( $header->{next_header} );
+
+            $totals->{original_size} += $header->{original_size};
+            $totals->{encoded_size}  += $header->{encoded_size};
+            $totals->{count}         += 1;
+            printf "%8d %7d%5.1f%% %s %s  %s\n",
+              $header->{original_size},
+              $header->{encoded_size},
+              (($header->{encoded_size} && $header->{original_size}) ? 100 * ($header->{original_size} - $header->{encoded_size}) / $header->{original_size} : 0),
+              _header_date($header),
+              _header_time($header),
+              _display_name($header);
+            printf ": %s\n", $header->{comment} if $header->{comment};
+        }
+        print "-------- ------- ----- --------- --------\n";
+        printf "%8d %7d%5.1f%% %s %s  %s\n",
+             $totals->{original_size},
+             $totals->{encoded_size},
+             (($totals->{encoded_size} && $totals->{original_size}) ? 100 * ($totals->{original_size} - $totals->{encoded_size}) / $totals->{original_size} : 0),
+             strftime("%d-%b-%y", localtime((stat($fname))[9])),
+             strftime("%T",       localtime((stat($fname))[9])),
+             (sprintf(" %d files", $totals->{count}));
+    },
+    vv => sub {
+        my $fname = shift or usage();
+        my $stream = open_archive($fname);
+        my $totals = { original_size => 0, encoded_size => 0, count => 0 };
+        print "Original  Packed Ratio    Date     Time     Atts   Method CRC  L OS\n";
+        print "-------- ------- ----- --------- -------- -------- ------ ---- -----\n";
+        while ( defined( my $level = $stream->search_header ) ) {
+            my $header = Archive::Lha::Header->new(
+                level  => $level,
+                stream => $stream
+            );
+            $stream->seek( $header->{next_header} );
+
+            $totals->{original_size} += $header->{original_size};
+            $totals->{encoded_size}  += $header->{encoded_size};
+            $totals->{count}         += 1;
+
+            my $name = _display_name($header);
+            my $os_char = uc($header->{os}[0] // '?');
+            my $hdr_level = ref($header) =~ /Level(\d)/ ? $1 : '?';
+
+            printf "%s\n", $name;
+            printf "%8d %7d%5.1f%% %s %s ----rwed  -%s- %04X %s %s\n",
+              $header->{original_size},
+              $header->{encoded_size},
+              (($header->{encoded_size} && $header->{original_size}) ? 100 * ($header->{original_size} - $header->{encoded_size}) / $header->{original_size} : 0),
+              _header_date($header),
+              _header_time($header),
+              $header->{method},
+              $header->{crc16},
+              $hdr_level,
+              $os_char;
+            printf ": %s\n", $header->{comment} if $header->{comment};
+        }
+        print "-------- ------- ----- --------- --------\n";
+        printf "%8d %7d%5.1f%% %s %s  %s\n",
+             $totals->{original_size},
+             $totals->{encoded_size},
+             (($totals->{encoded_size} && $totals->{original_size}) ? 100 * ($totals->{original_size} - $totals->{encoded_size}) / $totals->{original_size} : 0),
+             strftime("%d-%b-%y", localtime((stat($fname))[9])),
+             strftime("%T",       localtime((stat($fname))[9])),
+             (sprintf(" %d files", $totals->{count}));
+    },
+    t => sub {
+        my $fname = shift or usage();
+        printf "Testing integrity of archive '%s':\n", $fname;
+        my $stream = open_archive($fname);
+        my $totals = { original_size => 0, encoded_size => 0, count => 0 };
+        while ( defined( my $level = $stream->search_header ) ) {
+            my $header = Archive::Lha::Header->new(
+                level  => $level,
+                stream => $stream
+            );
+            $stream->seek( $header->data_top );
+            _decode_entry($header, $stream);
+            $stream->seek( $header->{next_header} );
+
+            $totals->{original_size} += $header->{original_size};
+            $totals->{encoded_size}  += $header->{encoded_size};
+            $totals->{count}         += 1;
+            printf "    Testing: (%8d/%8d)  %s\n", $header->{original_size}, $header->{original_size}, _display_name($header);
+        }
+        my $error = undef;
+        if ($totals->{count}) {
+            if (!$error) {
+              printf "%d files tested, all files OK\n", $totals->{count};
+            }
+        } else {
+            $error = 1;
+            printf "No files tested.\n";
+        }
+        if ($error) {
+            printf "\nOperation not entirely successful\n\n";
+        } else {
+            printf "\nOperation succesful\n\n";
+        }
+    },
+    x => sub {
+        my $fname = shift or usage();
+        my %target;
+        if (@_) {
+            %target = map { $_ => 1 } @_;
+        }
+        my $stream = open_archive($fname);
+        while ( defined( my $level = $stream->search_header ) ) {
+            my $header = Archive::Lha::Header->new(
+                level  => $level,
+                stream => $stream
+            );
+            if ( %target and !$target{$header->pathname} ) {
+                $stream->seek( $header->next_header );
+                next;
+            }
+            $stream->seek( $header->data_top );
+
+            if (_is_directory($header)) {
+                mkpath $header->pathname unless -d $header->pathname;
+                $stream->seek( $header->{next_header} );
+                next;
+            }
+
+            my ($decoded, $crc) = _decode_entry($header, $stream);
+            $stream->seek( $header->{next_header} );
+            die "crc mismatch" if $crc != $header->crc16;
+
+            write_all($header->pathname, $decoded);
+        }
+    },
+};
+
+my $PROGNAME = $ENV{PLHASA} ? 'plhasa' : basename($0);
+
+&main;exit;
+
+sub main {
+    if ($PROGNAME eq 'plhasa') {
+        _main_lhasa();
+    } else {
+        _main_plha();
+    }
+}
+
+sub _main_plha {
+    GetOptionsFromArray(\@ARGV,
+        'from-charset|fc=s' => \$opt_from_charset,
+        'to-charset|tc=s'   => \$opt_to_charset,
+        'use-locale'        => \$opt_use_locale,
+    );
+    my $cmd = shift @ARGV or usage();
+    my $file = shift @ARGV or usage();
+    check_magic($file);
+    if ( !exists $controller->{$cmd} ) {
+        usage("Unknown command: $cmd");
+    }
+    $controller->{$cmd}->($file, @ARGV);
+}
+
+# lhasa-compatible argument parsing:
+# [-]{lvtxep[q{num}][finv]}[w=<dir>] archive_file [file...]
+sub _main_lhasa {
+    my $arg = shift @ARGV or usage_lhasa();
+    $arg =~ s/^-//;  # strip optional leading dash
+
+    # extract command letter (first char)
+    my ($cmd_char) = $arg =~ /^([lvtxep])/i or usage_lhasa();
+    my $flags = substr($arg, 1);  # everything after command char
+
+    # parse options from flags string
+    my %opts = (quiet => 0, verbose => 0, force => 0, ignore_path => 0, dry_run => 0, extract_dir => undef);
+    while (length $flags) {
+        if ($flags =~ s/^q(\d*)//) {
+            $opts{quiet} = length($1) ? int($1) : 1;
+        } elsif ($flags =~ s/^w=([^\s]+)//) {
+            $opts{extract_dir} = $1;
+        } elsif ($flags =~ s/^f//) {
+            $opts{force} = 1;
+        } elsif ($flags =~ s/^i//) {
+            $opts{ignore_path} = 1;
+        } elsif ($flags =~ s/^n//) {
+            $opts{dry_run} = 1;
+        } elsif ($flags =~ s/^v//) {
+            $opts{verbose} = 1;
+        } else {
+            $flags = substr($flags, 1);  # skip unknown flag
+        }
+    }
+
+    # also allow w=<dir> as a separate argument
+    if (@ARGV && $ARGV[0] =~ /^w=(.+)/) {
+        $opts{extract_dir} = $1;
+        shift @ARGV;
+    }
+
+    my $file = shift @ARGV or usage_lhasa();
+    check_magic($file);
+
+    my $cmd = lc $cmd_char;
+    $cmd = 'x' if $cmd eq 'e';
+
+    if ($cmd eq 'p') {
+        _print_to_stdout($file, \%opts, @ARGV);
+    } elsif ($cmd eq 'x') {
+        _extract_lhasa($file, \%opts, @ARGV);
+    } elsif ($cmd eq 'l') {
+        _list_lhasa($file, 'l');
+    } elsif ($cmd eq 'v') {
+        _list_lhasa($file, 'lv');
+    } elsif ($cmd eq 't') {
+        $controller->{t}->($file);
+    } else {
+        usage_lhasa();
+    }
+}
+
+sub _print_to_stdout {
+    my ($fname, $opts, @targets) = @_;
+    my %target = map { $_ => 1 } @targets;
+    my $stream = open_archive($fname);
+    while ( defined( my $level = $stream->search_header ) ) {
+        my $header = Archive::Lha::Header->new( level => $level, stream => $stream );
+        if (%target && !$target{$header->pathname}) {
+            $stream->seek( $header->{next_header} );
+            next;
+        }
+        next if _is_directory($header);
+        $stream->seek( $header->data_top );
+        my ($decoded) = _decode_entry($header, $stream);
+        $stream->seek( $header->{next_header} );
+        print $decoded;
+    }
+}
+
+sub _extract_lhasa {
+    my ($fname, $opts, @targets) = @_;
+    my %target = map { $_ => 1 } @targets;
+    my $stream = open_archive($fname);
+    while ( defined( my $level = $stream->search_header ) ) {
+        my $header = Archive::Lha::Header->new( level => $level, stream => $stream );
+        my $pathname = $header->pathname;
+        $pathname =~ s{.*/}{} if $opts->{ignore_path};
+        if (%target && !$target{$pathname}) {
+            $stream->seek( $header->{next_header} );
+            next;
+        }
+        $pathname = File::Spec->catfile($opts->{extract_dir}, $pathname)
+            if $opts->{extract_dir};
+
+        if (_is_directory($header)) {
+            mkpath $pathname unless -d $pathname || $opts->{dry_run};
+            $stream->seek( $header->{next_header} );
+            next;
+        }
+
+        $stream->seek( $header->data_top );
+        my ($decoded, $crc) = _decode_entry($header, $stream);
+        $stream->seek( $header->{next_header} );
+        die "crc mismatch for " . $header->pathname if $crc != $header->crc16;
+
+        unless ($opts->{dry_run}) {
+            if (-e $pathname && !$opts->{force}) {
+                print STDERR "$pathname already exists, skipping (use -f to force)\n";
+                next;
+            }
+            write_all($pathname, $decoded);
+        }
+        printf "  %s\n", $pathname if $opts->{verbose};
+    }
+}
+
+sub usage_lhasa {
+    die "plhasa -- Perl LHA tool (lhasa-compatible)\n" .
+        "usage: plhasa [-]{lvtxep[q{num}][finv]}[w=<dir>] archive_file [file...]\n" .
+        "commands:                          options:\n" .
+        " l   List (terse)                   f  Force overwrite (no prompt)\n" .
+        " v   Verbose list                   i  Ignore directory path\n" .
+        " t   Test file CRC in archive       n  Perform dry run\n" .
+        " x,e Extract from archive           q{num}  Quiet mode\n" .
+        " p   Print to stdout from archive   v  Verbose\n" .
+        "                                    w=<dir> Specify extract directory\n";
+}
+
+sub usage {
+    my ($msg) = @_;
+    my $text = "Usage: $0 [options] (l|v|vv|x|t|d) archive (files)\n" .
+        " l  - list contents (LhA terse format, filename only)\n" .
+        " v  - list archive verbose (LhA v format)\n" .
+        " vv - list archive full (LhA vv format)\n" .
+        " x  - extract archive\n" .
+        " t  - test file\n" .
+        " d  - dump each header\n" .
+        " -fc, --from-charset <charset>  source encoding for filenames (default: auto-detect)\n" .
+        " -tc, --to-charset <charset>    output encoding for filenames (default: UTF-8)\n" .
+        " --use-locale                   use system locale for month names (default: English)\n";
+    if ($msg) {
+        die "$msg\n$text";
+    }
+    die $text;
+}
+
+sub _header_date {
+    my ($h) = @_;
+    return $h->{timestamp_is_unix}
+        ? strftime("%d-%b-%y", localtime($h->{timestamp}))
+        : strftime("%d-%b-%y", Archive::Lha::Header::Utils::dostime_fields($h->{timestamp}));
+}
+
+sub _header_time {
+    my ($h) = @_;
+    return $h->{timestamp_is_unix}
+        ? strftime("%T", localtime($h->{timestamp}))
+        : strftime("%T", Archive::Lha::Header::Utils::dostime_fields($h->{timestamp}));
+}
+
+# ls-style date from Unix epoch (stat mtime etc)
+# Note: avoid %e (space-padded day) — not supported on Windows MSVC runtime.
+# Use %d and strip the leading zero manually instead.
+sub _ls_stamp {
+    my ($epoch) = @_;
+    my $six_months = 6 * 30 * 86400;
+    my @t = localtime($epoch);
+    my $day = sprintf "%2d", $t[3];  # space-pad day
+    if (abs(time - $epoch) < $six_months) {
+        return strftime("%b", @t) . " $day " . strftime("%H:%M", @t);
+    }
+    return strftime("%b", @t) . " $day  " . strftime("%Y", @t);
+}
+
+# ls-style date from a header (handles both DOS and Unix timestamps)
+sub _ls_stamp_header {
+    my ($header) = @_;
+    my $epoch = $header->{timestamp_is_unix}
+        ? $header->{timestamp}
+        : Archive::Lha::Header::Utils::_dostime2utime($header->{timestamp});
+    return _ls_stamp($epoch);
+}
+
+# Lhasa-compatible listing (l = terse, lv = verbose with method+crc)
+sub _list_lhasa {
+    my ($fname, $mode) = @_;
+    my $stream = open_archive($fname);
+    my $totals = { original_size => 0, encoded_size => 0, count => 0 };
+
+    if ($mode eq 'lv') {
+        printf " PERMSSN    UID  GID    PACKED    SIZE  RATIO METHOD CRC     STAMP          NAME\n";
+        printf "---------- ----------- ------- ------- ------ ---------- ------------ -------------\n";
+    } else {
+        printf " PERMSSN    UID  GID      SIZE  RATIO     STAMP           NAME\n";
+        printf "---------- ----------- ------- ------ ------------ --------------------\n";
+    }
+
+    while ( defined( my $level = $stream->search_header ) ) {
+        my $header = Archive::Lha::Header->new(
+            level  => $level,
+            stream => $stream
+        );
+        # Skip to next header - no need to decode for listing
+        $stream->seek( $header->{next_header} );
+
+        $totals->{original_size} += $header->{original_size};
+        $totals->{encoded_size}  += $header->{encoded_size};
+        $totals->{count}         += 1;
+
+        my $stamp = _ls_stamp_header($header);
+        my $name  = _display_name($header);
+        $name = '' if $name eq '.';  # empty root directory
+        $name .= '/' if _is_directory($header) && $name ne '' && $name !~ m{/$};
+        $name = _fix_msdos_allcaps($name) if ($header->{os}[0] // '') eq 'M';
+        my $prefix = _lhasa_prefix($header);
+        my $ratio_str = _is_directory($header) ? '******'
+            : sprintf("%5.1f%%", $header->{original_size}
+                ? unpack('f', pack('f', 100 * $header->{encoded_size} / $header->{original_size})) : 100);
+
+        if ($mode eq 'lv') {
+            printf "%s%7d %7d %s -%s- %04x %s %s\n",
+                $prefix,
+                $header->{encoded_size},
+                $header->{original_size},
+                $ratio_str,
+                $header->{method},
+                $header->{crc16},
+                $stamp,
+                $name;
+        } else {
+            printf "%s%7d %s %s %s\n",
+                $prefix,
+                $header->{original_size},
+                $ratio_str,
+                $stamp,
+                $name;
+        }
+    }
+
+    if ($mode eq 'lv') {
+        printf "---------- ----------- ------- ------- ------ ---------- ------------ -------------\n";
+    } else {
+        printf "---------- ----------- ------- ------ ------------ --------------------\n";
+    }
+
+    my $ratio = $totals->{original_size}
+        ? unpack('f', pack('f', 100 * $totals->{encoded_size} / $totals->{original_size})) : 100;
+    my $stamp = _ls_stamp((stat($fname))[9]);
+
+    # PERMSSN (10) + sep (1) + UID/GID (11) + sep (1) = 23 chars for prefix
+    # " Total    " (PERMSSN 10) + " " (sep) + "%5d files" (UID/GID 11) + " " (sep) = 23
+    my $file_str = $totals->{count} == 1 ? 'file ' : 'files';
+    my $prefix = " Total    " . sprintf(" %5d %s ", $totals->{count}, $file_str);
+
+    if ($mode eq 'lv') {
+        printf "%s%7d %7d %5.1f%%            %s\n",
+            $prefix,
+            $totals->{encoded_size},
+            $totals->{original_size},
+            $ratio,
+            $stamp;
+    } else {
+        printf "%s%7d %5.1f%% %s\n",
+            $prefix,
+            $totals->{original_size},
+            $ratio,
+            $stamp;
+    }
+}
+
+sub _is_directory { $_[0]->{method} eq 'lhd' }
+
+# MS-DOS archives store filenames in all-caps. Lhasa detects per-file
+# all-caps paths and converts to lowercase. Match that behavior.
+sub _fix_msdos_allcaps {
+    my ($name) = @_;
+    return $name if $name =~ /[a-z]/;  # has lowercase = not all-caps
+    return lc $name;
+}
+
+# Format permission/owner prefix like lhasa does
+sub _lhasa_prefix {
+    my ($header) = @_;
+    if (defined $header->{unix_perm}) {
+        my $perm = $header->{unix_perm};
+        my $type = _is_directory($header) ? 'd' : '-';
+        my $str = $type;
+        for my $shift (6, 3, 0) {
+            my $bits = ($perm >> $shift) & 7;
+            $str .= ($bits & 4) ? 'r' : '-';
+            $str .= ($bits & 2) ? 'w' : '-';
+            $str .= ($bits & 1) ? 'x' : '-';
+        }
+        my $uid = $header->{unix_uid} // 0;
+        my $gid = $header->{unix_gid} // 0;
+        # PERMSSN(10) + sep(1) + UID/GID(%5d/%-5d = 11) + sep(1) = 23
+        return sprintf "%s %5d/%-5d ", $str, $uid, $gid;
+    }
+    return sprintf "%-23s", '[' . ($header->{os}[1] // 'generic') . ']';
+}
+
+sub _decode_entry {
+    my ($header, $stream) = @_;
+    return ('', 0) if _is_directory($header);
+    my $decoded = '';
+    my $decoder = Archive::Lha::Decode->new(
+        header => $header,
+        read   => sub { $stream->read(@_) },
+        write  => sub { $decoded .= join '', @_ },
+    );
+    my $crc = $decoder->decode;
+    return ($decoded, $crc);
+}
+
+sub open_archive {
+    my $fname = shift;
+    die "fname missing" unless $fname;
+    Archive::Lha::Stream::File->new(file => $fname);
+}
+
+sub write_all {
+    my ($fname, $data) = @_;
+    my $dir = dirname($fname);
+    mkpath $dir unless -d $dir;
+    open my $fh, '>:raw', $fname or die $!;
+    binmode $fh;
+    print $fh $data;
+    close $fh;
+}
+
+sub check_magic {
+    my $fname = shift;
+    open my $fh, '<:raw', $fname or die "Cannot open $fname: $!";
+    binmode $fh;
+    my $magic;
+    my $chars = read($fh, $magic, 5);
+    my ($signature) = unpack("x2a3", $magic);
+    die 'Does not look like an LHa file' unless $signature eq "-lh";
+
+    # Check for truncation: last byte of a well-formed LHA archive is 0x00
+    seek $fh, -1, 2;
+    my $last_byte;
+    read $fh, $last_byte, 1;
+    if ( ord($last_byte) != 0x00 ) {
+        warn "WARNING: Archive may be truncated or corrupt (last byte is not 0x00)\n";
+    }
+    close $fh;
+}
+
+__END__
+
+=encoding UTF-8
+
+=head1 NAME
+
+plha / plhasa - command line tool for .lzh/.lha archives
+
+=head1 SYNOPSIS
+
+  plha [options] <command> archive.lzh [files...]
+
+  plha l archive.lzh          # terse list (LhA l format)
+  plha v archive.lzh          # verbose list (LhA v format)
+  plha vv archive.lzh         # full verbose list (LhA vv format)
+  plha x archive.lzh          # extract all files
+  plha x archive.lzh foo.txt  # extract a specific file
+  plha t archive.lzh          # test archive integrity
+  plha d archive.lzh          # dump raw header data
+
+  # lhasa-compatible interface (via plhasa wrapper)
+  plhasa l archive.lzh        # terse list (lhasa l format, with PERMSSN column)
+  plhasa v archive.lzh        # verbose list (lhasa v format, with METHOD and CRC)
+  plhasa x archive.lzh        # extract
+
+  # Override filename charset
+  plha --from-charset cp932 --to-charset UTF-8 v archive.lzh
+  plha -fc iso-8859-15 v archive.lzh
+
+=head1 DESCRIPTION
+
+B<plha> reads and extracts LZH/LHA archives using Amiga LhA-compatible output
+formats. It supports header levels 0, 1 and 2, and decompression methods
+lh0 (stored), lh5, lh6 and lh7.
+
+B<plhasa> is a wrapper script that invokes B<plha> with C<$ENV{PLHASA}> set.
+When the script detects it is invoked as C<plhasa>, it switches to a
+lhasa-compatible interface with different listing
+formats (C<l> = terse with PERMSSN column, C<v> = verbose with METHOD and CRC)
+and lhasa-style argument parsing (C<[-]{lvtxep...}> prefix).
+
+=head1 COMMANDS
+
+=over 4
+
+=item l
+
+List archive contents in LhA terse format: one filename per line, with a
+C<+> prefix for files that contain a directory path component.
+
+=item v
+
+List archive contents in LhA verbose format: size, packed size, ratio,
+date, time and name.
+
+=item vv
+
+List archive contents in LhA full verbose format: size, packed size, ratio,
+date, time, attributes, compression method, CRC, header level, OS and name.
+
+=item x
+
+Extract files from the archive. If file names are given, only those are
+extracted; otherwise all files are extracted.
+
+=item t
+
+Test the integrity of all files in the archive by decoding and checking CRC.
+
+=item d
+
+Dump the raw parsed header data for each entry (for debugging).
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item -fc I<charset>, --from-charset I<charset>
+
+Specify the character encoding of filenames stored in the archive.
+Defaults to auto-detection based on the OS field in the archive header:
+
+  Amiga (a)        -> iso-8859-15
+  MS-DOS/Win (M/w) -> cp1252
+  Unix (U)         -> guess (Encode::Guess)
+  Human68K (H/J)   -> cp932
+
+If the OS field is absent or unrecognised, L<Encode::Guess> is used to
+probe for latin1, latin2, cp932 and euc-jp.
+
+Supported charset names are those accepted by L<Encode>. Run
+C<perl -MEncode -e 'print join "\n", Encode->encodings(":all")'>
+for a full list.
+
+=item -tc I<charset>, --to-charset I<charset>
+
+Specify the output character encoding for displayed filenames.
+Defaults to UTF-8.
+
+=item --use-locale
+
+Use the system locale for month name abbreviations in date output.
+By default, month names are always displayed in English (equivalent to
+LC_TIME=C), matching the behaviour of lhasa and LhA for UNIX, which both
+hardcode English month abbreviations.
+
+=back
+
+=head1 SEE ALSO
+
+L<Archive::Lha>, L<Encode>
+
+=head1 AUTHOR
+
+Nicolas Mendoza E<lt>mendoza@pvv.ntnu.noE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2025-2026 Nicolas Mendoza E<lt>mendoza@pvv.ntnu.noE<gt>.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. See L<perlartistic>.

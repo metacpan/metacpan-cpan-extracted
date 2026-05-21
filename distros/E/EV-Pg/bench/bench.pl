@@ -25,10 +25,12 @@ sub bench {
                 EV::break;
             });
         },
-        on_error => sub { die "error: $_[0]\n" },
+        on_error => sub { warn "error: $_[0]\n"; EV::break },
     );
-    my $timeout = EV::timer($timeout_sec, 0, sub { die "timeout\n" });
+    my $timed_out;
+    my $timeout = EV::timer($timeout_sec, 0, sub { $timed_out = 1; EV::break });
     EV::run;
+    warn "bench timed out after ${timeout_sec}s\n" if $timed_out;
     $pg->finish;
 }
 

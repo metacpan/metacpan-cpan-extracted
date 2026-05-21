@@ -27,21 +27,21 @@ The Go implementation at `../kanban-md/` is the feature reference. Key docs:
 - `lib/App/karr.pm` — Main app, MooX::Cmd root
 - `lib/App/karr/Cmd/*.pm` — Subcommands (MooX::Cmd default namespace)
 - `lib/App/karr/Role/Output.pm` — Role for --json and --compact output options
+- `lib/App/karr/Role/BoardDiscovery.pm` — Role providing git/store/config discovery
+- `lib/App/karr/Role/SyncLifecycle.pm` — Role providing sync_before/sync_after with retry
+- `lib/App/karr/Role/BoardAccess.pm` — Composes BoardDiscovery + SyncLifecycle + task access
 - `lib/App/karr/Task.pm` — Task object: parse/write Markdown+YAML frontmatter
-- `lib/App/karr/Config.pm` — Board config management
-- `lib/App/karr/Role/BoardAccess.pm` — Role for board directory discovery
+- `lib/App/karr/Config.pm` — Board config management (defaults + helpers)
+- `lib/App/karr/SyncGuard.pm` — Push insurance on die/croak
+- `lib/App/karr/Git.pm` — Low-level Git operations via CLI
+- `lib/App/karr/BoardStore.pm` — Ref-backed board storage (load_tasks, save_task, effective_config)
+- `lib/App/karr/Lock.pm` — Advisory task locking via refs
 
-### Board layout on disk
+### Board state (refs-first)
 
-```
-karr/
-  config.yml
-  tasks/
-    001-set-up-ci-pipeline.md
-    002-fix-login-bug.md
-```
-
-Task files use YAML frontmatter + Markdown body, identical format to kanban-md.
+Canonical state lives in `refs/karr/*`. The `tasks/` directory is a materialized
+view generated on demand (C<karr materialize>), not the source of truth, and is
+always in F<.gitignore> — never committed.
 
 ## Commands (current / planned)
 
@@ -86,11 +86,10 @@ dzil build                     # Build distribution
 ## What still needs building (v1 roadmap)
 
 1. **metrics command** — throughput, lead/cycle time, flow efficiency
-2. **log command** — activity log of board mutations
-3. **dependency checking** — block tasks with unsatisfied deps from being picked
-4. **Self-healing IDs** — detect and repair duplicate IDs, filename/ID mismatches
-5. **WIP limit enforcement** — reject moves that would exceed WIP limits
-6. **TUI** — interactive terminal board (stretch goal, possibly with Tickit)
+2. **dependency checking** — block tasks with unsatisfied deps from being picked
+3. **Self-healing IDs** — detect and repair duplicate IDs, filename/ID mismatches
+4. **WIP limit enforcement** — reject moves that would exceed WIP limits
+5. **TUI** — interactive terminal board (stretch goal, possibly with Tickit)
 
 ## Documentation and release notes
 

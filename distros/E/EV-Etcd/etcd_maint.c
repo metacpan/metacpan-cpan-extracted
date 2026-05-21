@@ -23,12 +23,12 @@ void process_status_response(pTHX_ pending_call_t *pc) {
     if (resp->version) {
         hv_store(result, "version", 7, newSVpv(resp->version, 0), 0);
     }
-    hv_store(result, "db_size", 7, newSViv(resp->dbsize), 0);
-    hv_store(result, "leader", 6, newSVuv(resp->leader), 0);
-    hv_store(result, "raft_index", 10, newSVuv(resp->raftindex), 0);
-    hv_store(result, "raft_term", 9, newSVuv(resp->raftterm), 0);
-    hv_store(result, "raft_applied_index", 18, newSVuv(resp->raftappliedindex), 0);
-    hv_store(result, "db_size_in_use", 14, newSViv(resp->dbsizeinuse), 0);
+    hv_store(result, "db_size", 7, newSVi64(resp->dbsize), 0);
+    hv_store(result, "leader", 6, newSVu64(resp->leader), 0);
+    hv_store(result, "raft_index", 10, newSVu64(resp->raftindex), 0);
+    hv_store(result, "raft_term", 9, newSVu64(resp->raftterm), 0);
+    hv_store(result, "raft_applied_index", 18, newSVu64(resp->raftappliedindex), 0);
+    hv_store(result, "db_size_in_use", 14, newSVi64(resp->dbsizeinuse), 0);
     hv_store(result, "is_learner", 10, newSViv(resp->islearner ? 1 : 0), 0);
 
     if (resp->n_errors > 0) {
@@ -68,7 +68,7 @@ void process_alarm_response(pTHX_ pending_call_t *pc) {
     AV *alarms_av = newAV();
     for (size_t i = 0; i < resp->n_alarms; i++) {
         HV *alarm_hv = newHV();
-        hv_store(alarm_hv, "member_id", 9, newSVuv(resp->alarms[i]->memberid), 0);
+        hv_store(alarm_hv, "member_id", 9, newSVu64(resp->alarms[i]->memberid), 0);
         hv_store(alarm_hv, "alarm", 5, newSViv(resp->alarms[i]->alarm), 0);
         hv_store(alarm_hv, "alarm_type", 10,
                  newSVpv(alarm_type_name(resp->alarms[i]->alarm), 0), 0);
@@ -106,7 +106,7 @@ void process_hash_kv_response(pTHX_ pending_call_t *pc) {
     HV *result = newHV();
     add_header_to_hv(aTHX_ result, resp->header);
     hv_store(result, "hash", 4, newSVuv(resp->hash), 0);
-    hv_store(result, "compact_revision", 16, newSViv(resp->compact_revision), 0);
+    hv_store(result, "compact_revision", 16, newSVi64(resp->compact_revision), 0);
 
     etcdserverpb__hash_kv_response__free_unpacked(resp, NULL);
 
@@ -138,7 +138,7 @@ void process_auth_status_response(pTHX_ pending_call_t *pc) {
     HV *result = newHV();
     add_header_to_hv(aTHX_ result, resp->header);
     hv_store(result, "enabled", 7, newSViv(resp->enabled ? 1 : 0), 0);
-    hv_store(result, "auth_revision", 13, newSVuv(resp->authrevision), 0);
+    hv_store(result, "auth_revision", 13, newSVu64(resp->authrevision), 0);
 
     etcdserverpb__auth_status_response__free_unpacked(resp, NULL);
 

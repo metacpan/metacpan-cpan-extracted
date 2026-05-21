@@ -1,5 +1,5 @@
 /*
- * chandra_splash.h — Splash screen support for Chandra
+ * chandra_splash.h - Splash screen support for Chandra
  *
  * Builds on the child-window infrastructure (chandra_window.h) to provide
  * a lightweight splash/loading-screen window with optional progress bar and
@@ -40,7 +40,7 @@
     "<div class='splash-bar' id='chandra-splash-bar'></div>" \
     "</div></div></body></html>"
 
-/* Image-only template — base64 src filled in at runtime */
+/* Image-only template - base64 src filled in at runtime */
 #define CHANDRA_SPLASH_IMAGE_TMPL \
     "<!DOCTYPE html><html><head><meta charset='utf-8'>" \
     "<style>" \
@@ -50,7 +50,7 @@
     "img { max-width: 100%%; max-height: 100%%; object-fit: contain; }" \
     "</style></head><body><img src='data:%s;base64,%s'></body></html>"
 
-/* JS snippets for live updates — use textContent (safe) not innerHTML */
+/* JS snippets for live updates - use textContent (safe) not innerHTML */
 #define CHANDRA_SPLASH_JS_STATUS \
     "var el=document.getElementById('chandra-splash-status');" \
     "if(el)el.textContent=%s;"
@@ -62,7 +62,7 @@
 /* ---- Internal helpers ---------------------------------------------------- */
 
 /*
- * csplash_js_escape — produce a JS string literal (with quotes) safe for
+ * csplash_js_escape - produce a JS string literal (with quotes) safe for
  * embedding in eval'd code. Escapes backslash, single/double quotes, newline,
  * carriage return, and control chars. Caller must free() the result.
  */
@@ -106,7 +106,7 @@ csplash_js_escape(const char *input)
 /* ---- Public C API -------------------------------------------------------- */
 
 /*
- * csplash_build_html — generate default splash HTML.
+ * csplash_build_html - generate default splash HTML.
  * title may be NULL (renders as empty string).
  * Caller must free() the returned string.
  */
@@ -122,7 +122,7 @@ csplash_build_html(const char *title)
 }
 
 /*
- * csplash_create — create the splash window (does NOT display content yet).
+ * csplash_create - create the splash window (does NOT display content yet).
  * Returns native wid (>= 1) on success, -1 on failure / unsupported platform.
  */
 static int
@@ -133,7 +133,7 @@ csplash_create(const char *title, int width, int height, int frameless)
 }
 
 /*
- * csplash_show_html — set HTML content and make the window visible.
+ * csplash_show_html - set HTML content and make the window visible.
  */
 static void
 csplash_show_html(int wid, const char *html)
@@ -143,7 +143,7 @@ csplash_show_html(int wid, const char *html)
 }
 
 /*
- * csplash_update_status — update the status text line via JS eval.
+ * csplash_update_status - update the status text line via JS eval.
  * text is escaped to prevent JS injection.
  */
 static void
@@ -163,7 +163,7 @@ csplash_update_status(int wid, const char *text)
 }
 
 /*
- * csplash_update_progress — update progress bar width (0–100).
+ * csplash_update_progress - update progress bar width (0–100).
  */
 static void
 csplash_update_progress(int wid, int percent)
@@ -176,7 +176,7 @@ csplash_update_progress(int wid, int percent)
 }
 
 /*
- * csplash_close — destroy the splash window.
+ * csplash_close - destroy the splash window.
  */
 static void
 csplash_close(int wid)
@@ -185,7 +185,7 @@ csplash_close(int wid)
 }
 
 /*
- * csplash_is_open — 1 if the window is still alive, 0 otherwise.
+ * csplash_is_open - 1 if the window is still alive, 0 otherwise.
  */
 static int
 csplash_is_open(int wid)

@@ -1,6 +1,7 @@
 package MCP::Server::Transport::Stdio;
 use Mojo::Base 'MCP::Server::Transport', -signatures;
 
+use MCP::Server::Context;
 use Mojo::JSON qw(decode_json encode_json);
 use Mojo::Log;
 use Scalar::Util qw(blessed);
@@ -12,7 +13,7 @@ sub handle_requests ($self) {
   while (my $input = <>) {
     chomp $input;
     my $request = eval { decode_json($input) };
-    next unless my $response = $server->handle($request, {});
+    next unless my $response = $server->handle($request, MCP::Server::Context->new(transport => $self));
 
     if (blessed($response) && $response->isa('Mojo::Promise')) {
       $response->then(sub { _print_response($_[0]) })->wait;
@@ -20,6 +21,13 @@ sub handle_requests ($self) {
     else { _print_response($response) }
   }
 }
+
+sub notify ($self, $session_id, $method, $params = {}) {
+  _print_response({jsonrpc => '2.0', method => $method, params => $params});
+  return 1;
+}
+
+sub notify_all ($self, $method, $params = {}) { $self->notify(undef, $method, $params) }
 
 sub _print_response ($response) { print encode_json($response) . "\n" }
 
@@ -57,6 +65,20 @@ ones.
   $stdio->handle_requests;
 
 Reads requests from standard input and prints responses to standard output.
+
+=head2 notify
+
+  my $bool = $stdio->notify($session_id, $method);
+  my $bool = $stdio->notify($session_id, $method, {foo => 'bar'});
+
+Send a JSON-RPC notification to standard output. The C<$session_id> is ignored.
+
+=head2 notify_all
+
+  my $bool = $stdio->notify_all($method);
+  my $bool = $stdio->notify_all($method, {foo => 'bar'});
+
+Send a JSON-RPC notification to standard output.
 
 =head1 SEE ALSO
 

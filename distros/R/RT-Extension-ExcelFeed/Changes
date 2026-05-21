@@ -1,3 +1,8 @@
+1.02 2026-05-20
+ - Suppress user avatars when generating Excel files
+ - Use paging to reduce memory usage
+ - Abstract excel write method
+
 1.01 2025-10-22
  - Format formula-like strings as plain text(CVE-2025-61874)
 

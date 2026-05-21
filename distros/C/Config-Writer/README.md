@@ -161,30 +161,49 @@ don't think it will be a problem.
 
     If any errors occurs, \`error\` flag is set.
 
+- **fh()**
+
+    Returns a reference to a File::Temp file handle blessed object to be used
+    like that:
+
+        use Config::Writer;
+        use Template;
+        
+        my $t = Template->new( ... );
+        my $fh = Config::Writer->new( ... );
+
+        $t->process('template.tmpl', { ... }, $fh->fh);
+        
+        # OR
+        
+        print { $fh->fh } "Some text\n";
+
+        $fh->close;
+
+### GETTER METHODS
+
+The next methods returns appropriate properties of **Config::Writer**
+class object.
+
+- filename()
+- fullname()
+- tmpfile()
+- workdir()
+
 # **AUTHORS**
 
-- Volodymyr Pidgornyi, vp&lt;at>dtel-ix.net;
+- Volodymyr Pidgornyi, vp&lt;at>dtel-ix.net
 
 # **CHANGELOG**
 
+- **v0.0.5** - 2026-05-20
+    - added getter methods to retrieve Config::Writer object properties in a convenient way
 - **v0.0.4**
-
-    \- Minor CPAN compatibility fixes;
-
-    \- README.md is generated from Netbox/Config.pm now.
-
+    - minor CPAN compatibility fixes
+    - README.md is generated from Config/Writer.pm now
 - **v0.0.3**
-
-    PAUSE compatibility issues fixed.
-
+    - PAUSE compatibility issues fixed
 - **v0.0.2**
-
-    **sayf()** metrod added.
-
+    - **sayf()** method added
 - **v0.0.1**
-
-    Initial release, since basic features seems to work as intended.
-
-# **TODO**
-
-- Implement helpers for a different configuration files formats.
+    - initial release, since basic features seems to work as intended

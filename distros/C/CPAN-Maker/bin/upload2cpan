@@ -1,0 +1,60 @@
+#@bashrun@
+# -*- mode: sh; -*-
+
+function usage {
+    cat <<EOF
+usage: upload2cpan tarball [pause-user email]
+
+Notes
+-----
+
+* If the arguments are not provided the script will look for
+  PAUSE_USER and EMAIL in the environment. they will be used if
+  arguments are not provided
+
+* If 'tarball' is not provided, the most recent tarball in the current
+  working directory will assumed to be the target.
+
+EOF
+
+    exit 1
+}
+
+TARBALL="$1"
+test -n "$2" && PAUSE_USER="$2";
+test -n "$3" && EMAIL="$3";
+
+if test -z "$PAUSE_USER"; then
+    >&2 echo "ERROR: no PAUSE_USER set"
+    usage
+fi
+
+if test -z "$EMAIL"; then
+    >&2 echo "ERROR: no EMAIL set"
+    usage
+fi
+   
+CPAN_UPLOAD=$(which cpan-upload-http)
+
+echo -n "Password: "
+read -s PASSWORD
+
+if test -z "$TARBALL"; then
+    TARBALL=$(ls -1t *.tar.gz 2>/dev/null | head -1)
+fi
+
+if [ -e "$TARBALL" ]; then
+    echo -n -e "\nupload "$TARBALL" to CPAN? (y/n)"
+    read -n 1 -s ans
+    echo ""
+    if ! [ "$ans" = "y" ]; then
+        exit
+    fi
+else
+    >&2 echo "ERROR: no distributions found to upload"
+fi
+
+# cpan-upload-http
+# https://metacpan.org/release/BRADFITZ/cpan-upload-http-2.4/view/cpan-upload-http
+$CPAN_UPLOAD -user $PAUSE_USER -password $PASSWORD -mailto $EMAIL $TARBALL
+

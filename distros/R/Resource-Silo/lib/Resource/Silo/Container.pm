@@ -2,7 +2,7 @@ package Resource::Silo::Container;
 
 use strict;
 use warnings;
-our $VERSION = '0.1502';
+our $VERSION = '0.1703';
 
 =head1 NAME
 
@@ -74,9 +74,12 @@ sub DEMOLISH {
 # As container instances inside the silo() function will be available forever,
 # we MUST enforce freeing the resources before program ends
 END {
-    foreach my $container (values %active_instances) {
-        next unless $container;
-        $container->ctl->cleanup;
+    # don't iterate over a hash while simultaneously deleting from it.
+    # sorting is useless because keys are mem addresses.
+    my @list = keys %active_instances;
+    foreach my $id (@list) {
+        next unless $active_instances{$id};
+        $active_instances{$id}->ctl->cleanup;
     };
 };
 
@@ -158,6 +161,11 @@ sub _silo_instantiate_res {
     if (!defined $entity) {
         return $entity if ($spec->{nullable});
         croak "Instantiating resource '$key' $spec->{origin} returned undef for no apparent reason";
+    }
+    if ($spec->{coerce}) {
+        $entity = $spec->{coerce}->($self, $entity);
+        croak "Coercing resource '$key' $spec->{origin} returned an empty value"
+            if !defined $entity || (ref $entity eq '' && $entity eq '');
     }
     $spec->{check}->($self, $entity, $name, $arg)
         if $spec->{check};
@@ -270,7 +278,7 @@ sub _silo_unexpected_dep {
     my $spec = $self->{-spec}{resource}{$name};
 
     my $explain = $spec->{autodeps}
-        ? ". Use explicit 'dependencies' or the 'loose_deps' flag"
+        ? ". Use explicit 'dependencies'"
         : " but is not listed in its dependencies";
     croak "Resource '$name' was unexpectedly required by"
         ." '$self->{-onbehalf}'$explain";
@@ -384,7 +392,6 @@ modules will be loaded, even if they are not required by preloaded resources.
 sub preload {
     my $self = shift;
     # TODO allow specifying resources to load
-    #      but first come up with a way to specify arguments, too.
 
     my $meta = $$self->{-spec};
 
@@ -392,7 +399,9 @@ sub preload {
 
     my $list = $meta->{preload};
     for my $name (@$list) {
-        my $unused = $$self->$name;
+        for my $arg (@{ $meta->{resource}{$name}{preload} }) {
+            my $unused = $$self->$name($arg);
+        }
     };
     return $self;
 };
@@ -487,7 +496,7 @@ sub meta {
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2023, Konstantin Uvarin, C<< <khedin@gmail.com> >>
+Copyright (c) 2023-2026, Konstantin Uvarin, C<< <khedin@gmail.com> >>
 
 This program is free software.
 You can redistribute it and/or modify it under the terms of either:

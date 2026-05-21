@@ -2,10 +2,6 @@
 
 Plack::Middleware::Text::Minify - remove HTML indentation on the fly
 
-# VERSION
-
-version v0.4.1
-
 # SYNOPSIS
 
 ```perl
@@ -30,72 +26,74 @@ trailing whitespace from text content.
 It will be disabled if the `psgix.no-minify` environment key is set
 to a true value. (Added in v0.2.0.)
 
-# ATTRIBUTES
+# RECENT CHANGES
 
-## path
+Changes for version v0.4.2 (2026-05-02)
 
-This is a regex or callback that matches against `PATH_INFO`.  If it
-does not match, then the response won't be minified.
+- Security
+    - Bumped the minimum version of Text::Minify::XS for a security fix.
+- Documentation
+    - Added security policy.
+    - Updated copyright year.
+    - Updated maintainer email address due to closure of cpan.org email.
+    - Updated support policy.
+    - Fixed typos.
+    - README is build by the UsefulReadme plugin.
+- Tests
+    - Moved author tests into xt.
+    - Added and improved author tests.
+- Toolchain
+    - Removed the use of Dist::Zilla::Plugin::ManifestSkip.
+- Other
+    - Added doap.xml to the repo.
 
-The callback takes the `PATH_INFO` and Plack environment as arguments.
+See the `Changes` file for more details.
 
-By default, it will match against any path except for HTTP status
-codes with no bodies, or request methods other than `GET` or `POST`.
+# REQUIREMENTS
 
-## type
+This module lists the following modules as runtime dependencies:
 
-This is a regex or callback that matches against the content-type. If it
-does not match, then the response won't be minified.
+- [Plack::Middleware](https://metacpan.org/pod/Plack%3A%3AMiddleware)
+- [Ref::Util](https://metacpan.org/pod/Ref%3A%3AUtil)
+- [Text::Minify::XS](https://metacpan.org/pod/Text%3A%3AMinify%3A%3AXS) version v0.7.8 or later
+- [parent](https://metacpan.org/pod/parent)
+- [perl](https://metacpan.org/pod/perl) version v5.14.0 or later
+- [warnings](https://metacpan.org/pod/warnings)
 
-The callback takes the content-type header and the Plack reponse as
-arguments.
+See the `cpanfile` file for the full list of prerequisites.
 
-By default, it will match against any "text/" MIME type.
+# INSTALLATION
 
-# SUPPORT FOR OLDER PERL VERSIONS
-
-This module requires Perl v5.14 or newer.
-
-Future releases may only support Perl versions released in the last ten years.
-
-If you need this module on Perl v5.9.3, please use one of the v0.3.x
-versions of this module.  Significant bug or security fixes may be
-backported to those versions.
-
-# KNOWN ISSUES
-
-## Use with templating directive that collapse whitespace
-
-If you are using a templating system with directives that collapse
-whitespace in HTML documents, e.g. in [Template-Toolkit](https://metacpan.org/pod/Template)
+The latest version of this module (along with any dependencies) can be installed from [CPAN](https://www.cpan.org) with the `cpan` tool that is included with Perl:
 
 ```
-[%- IF something -%]
-  <div class="foo">
-    ...
-  </div>
-[%- END -%]
+cpan Plack::Middleware::Text::Minify
 ```
 
-then you may find it worth removing these and letting the middleware
-clean up extra whitespace.
+You can also extract the distribution archive and install this module (along with any dependencies):
 
-## Collapsed Newlines
+```
+cpan .
+```
 
-The underlying minifier does not understand markup, so newlines will
-still be collapsed in HTML elements where whitespace is meaningful,
-e.g. `pre` or `textarea`.
+You can also install this module manually using the following commands:
 
-# SEE ALSO
+```
+perl Makefile.PL
+make
+make test
+make install
+```
 
-[Text::Minify::XS](https://metacpan.org/pod/Text%3A%3AMinify%3A%3AXS)
+If you are working with the source repository, then it may not have a `Makefile.PL` file.  But you can use the [Dist::Zilla](https://dzil.org/) tool in anger to build and install this module:
 
-[PSGI](https://metacpan.org/pod/PSGI)
+```
+dzil build
+dzil test
+dzil install --install-command="cpan ."
+```
 
-# SOURCE
-
-The development version is on github at [https://github.com/robrwo/Plack-Middleware-Text-Minify](https://github.com/robrwo/Plack-Middleware-Text-Minify)
-and may be cloned from [git://github.com/robrwo/Plack-Middleware-Text-Minify.git](git://github.com/robrwo/Plack-Middleware-Text-Minify.git)
+For more information, see the `INSTALL` file included with this distribution.
 
 # BUGS
 
@@ -106,16 +104,32 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+## Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website.  Please see `SECURITY.md` for instructions how to
+report security vulnerabilities
+
+# SOURCE
+
+The development version is on github at [https://github.com/robrwo/Plack-Middleware-Text-Minify](https://github.com/robrwo/Plack-Middleware-Text-Minify)
+and may be cloned from [https://github.com/robrwo/Plack-Middleware-Text-Minify.git](https://github.com/robrwo/Plack-Middleware-Text-Minify.git)
+
 # AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020-2023 by Robert Rothenberg.
+This software is Copyright (c) 2020-2026 by Robert Rothenberg.
 
 This is free software, licensed under:
 
 ```
 The Artistic License 2.0 (GPL Compatible)
 ```
+
+# SEE ALSO
+
+[Text::Minify::XS](https://metacpan.org/pod/Text%3A%3AMinify%3A%3AXS)
+
+[PSGI](https://metacpan.org/pod/PSGI)

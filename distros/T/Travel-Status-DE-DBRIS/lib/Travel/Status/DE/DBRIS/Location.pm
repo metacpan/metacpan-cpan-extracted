@@ -6,7 +6,7 @@ use 5.020;
 
 use parent 'Class::Accessor';
 
-our $VERSION = '0.27';
+our $VERSION = '0.28';
 
 Travel::Status::DE::DBRIS::Location->mk_ro_accessors(
 	qw(eva id lat lon name admin_id operator products type is_cancelled is_additional is_separation display_priority
@@ -46,21 +46,21 @@ sub new {
 
 	bless( $ref, $obj );
 
-	if ( $json->{abfahrtsZeitpunkt} ) {
+	if ( $json->{abfahrt}{sollzeit} ) {
 		$ref->{sched_dep} = $ref->parse_datetime( $opt{strptime_obj},
-			$json->{abfahrtsZeitpunkt} );
+			$json->{abfahrt}{sollzeit} );
 	}
-	if ( $json->{ezAbfahrtsZeitpunkt} ) {
+	if ( $json->{abfahrt}{echtzeit} ) {
 		$ref->{rt_dep} = $ref->parse_datetime( $opt{strptime_obj},
-			$json->{ezAbfahrtsZeitpunkt} );
+			$json->{abfahrt}{echtzeit} );
 	}
-	if ( $json->{ankunftsZeitpunkt} ) {
+	if ( $json->{ankunft}{sollzeit} ) {
 		$ref->{sched_arr} = $ref->parse_datetime( $opt{strptime_obj},
-			$json->{ankunftsZeitpunkt} );
+			$json->{ankunft}{sollzeit} );
 	}
-	if ( $json->{ezAnkunftsZeitpunkt} ) {
+	if ( $json->{ankunft}{echtzeit} ) {
 		$ref->{rt_arr} = $ref->parse_datetime( $opt{strptime_obj},
-			$json->{ezAnkunftsZeitpunkt} );
+			$json->{ankunft}{echtzeit} );
 	}
 
 	if ( $ref->{sched_dep} and $ref->{rt_dep} ) {

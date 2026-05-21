@@ -1,0 +1,63 @@
+From 804cf94a94dd9091525be7b36b57ef4006c5b282 Mon Sep 17 00:00:00 2001
+From: CPANSec Security Scanner Bot <cpan-security@security.metacpan.org>
+Date: Wed, 13 May 2026 21:03:27 -0300
+Subject: [PATCH] Crypt::OpenSSL::PKCS12: bound ASN1_STRING.length before *4
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fixes CVE-2026-8507
+
+OpenSSL's `ASN1_STRING.length` is declared `int`. In `print_attribute`
+the expression `length * 4` is evaluated at `int` precision before
+Perl's `Renew` macro casts to size_t — so at `length == 0x40000000`
+(1 GiB) the multiplication overflows int to 0, the resulting
+`Renew(0)` makes a near-empty allocation, and the immediately
+following `get_hex` writes ~3 * length bytes (≈ 3 GiB of `"%02X "`
+formatted ASN.1 attribute bytes) past the buffer.
+
+The fix: reject lengths > INT_MAX/4 explicitly (and < 0 defensively
+against any future signed-arithmetic regression), then promote to
+size_t before the multiplication so the safe range computes in
+64-bit arithmetic on 64-bit systems.
+
+The bug is reachable via documented public API: any
+`Crypt::OpenSSL::PKCS12->info($p12, $pwd)` or `info_as_hash` call
+on an attacker-supplied PKCS12 with a ≥ 1 GiB OCTET STRING or BIT
+STRING attribute on a SAFEBAG triggers the heap-OOB-WRITE.
+
+CWE-787 (out-of-bounds write); CWE-190 (integer overflow).
+---
+ PKCS12.xs | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/PKCS12.xs b/PKCS12.xs
+index 2f0aa30..86a2d56 100644
+--- a/PKCS12.xs
++++ b/PKCS12.xs
+@@ -679,7 +679,11 @@ void print_attribute(pTHX_ BIO *out, CONST_ASN1_TYPE *av, char **attribute)
+ 
+   case V_ASN1_OCTET_STRING:
+     if(*attribute != NULL) {
+-      Renew(*attribute, av->value.octet_string->length * 4, char);
++      if (av->value.octet_string->length < 0 ||
++          av->value.octet_string->length > INT_MAX / 4)
++        croak("OCTET STRING attribute length out of range (got %d)",
++              av->value.octet_string->length);
++      Renew(*attribute, (size_t)av->value.octet_string->length * 4, char);
+       get_hex(*attribute, av->value.octet_string->data, av->value.octet_string->length);
+     } else {
+       hex_prin(out, av->value.octet_string->data,
+@@ -690,7 +694,11 @@ void print_attribute(pTHX_ BIO *out, CONST_ASN1_TYPE *av, char **attribute)
+ 
+   case V_ASN1_BIT_STRING:
+     if(*attribute != NULL) {
+-      Renew(*attribute, av->value.bit_string->length *4, char);
++      if (av->value.bit_string->length < 0 ||
++          av->value.bit_string->length > INT_MAX / 4)
++        croak("BIT STRING attribute length out of range (got %d)",
++              av->value.bit_string->length);
++      Renew(*attribute, (size_t)av->value.bit_string->length * 4, char);
+       get_hex(*attribute, av->value.bit_string->data, av->value.bit_string->length);
+     } else {
+       hex_prin(out, av->value.bit_string->data,

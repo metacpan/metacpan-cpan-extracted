@@ -52,7 +52,7 @@
       },
       "homepage" : "https://mojolicious.org",
       "license" : [
-         "http://www.opensource.org/licenses/artistic-license-2.0"
+         "https://opensource.org/license/artistic-2-0"
       ],
       "repository" : {
          "type" : "git",
@@ -64,6 +64,6 @@
          "web" : "https://web.libera.chat/#mojo"
       }
    },
-   "version" : "9.42",
+   "version" : "9.45",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -2,7 +2,7 @@ package XML::PugiXML;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 require XSLoader;
 XSLoader::load('XML::PugiXML', $VERSION);
@@ -50,8 +50,12 @@ XML::PugiXML - Perl binding for pugixml C++ XML parser
 =head1 DESCRIPTION
 
 XML::PugiXML provides a Perl interface to the pugixml C++ XML parsing library.
-It offers fast parsing, XPath support, and a clean API. All string inputs
-are automatically upgraded to UTF-8, and all outputs are UTF-8 flagged.
+It offers fast parsing, XPath support, and a clean API.
+
+String inputs must be UTF-8: either Perl Unicode strings (the internal
+representation is passed through), or raw UTF-8 bytes. Latin-1 byte
+strings are not auto-converted; call C<utf8::upgrade> on them first if
+needed. All string outputs are UTF-8 flagged.
 
 =head1 METHODS
 

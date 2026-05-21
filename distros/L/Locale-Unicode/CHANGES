@@ -1,5 +1,14 @@
 Revision history for Perl module Locale::Unicode
 
+v0.4.3 2026-05-19T06:07:32+0900
+    - Updating dependencies
+
+v0.4.2 2026-05-19T06:03:15+0900
+    - Updating dependencies
+
+v0.4.1 2025-10-24T15:10:17+0900
+    - Corrected warning "Attempt to use reference as lvalue in substr" in parse()
+
 v0.4.0 2025-10-16T08:59:17+0900
     - Update dependency from Want to Wanted
 

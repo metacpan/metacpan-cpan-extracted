@@ -12,6 +12,8 @@ examples/01-perl-hello-world.pl
 examples/02-dancer2-base.pl
 examples/03-dancer2.pl
 examples/04-perl-trixie-hello-world.pl
+examples/05-plackup-trixie.pl
+examples/fatpacked.plackup
 lib/Container/Builder.pm
 lib/Container/Builder/Config.pm
 lib/Container/Builder/Index.pm
@@ -28,8 +30,12 @@ t/02_manifest.t
 t/03_index.t
 t/04_copy.t
 t/05_builder.t
+t/06_pr2_regression.t
+t/07_singlefile.t
+t/08_debianpackagefile.t
 t/author-pod-syntax.t
 t/haha/hehe/hihi/ghehe.txt
 t/haha/hehe/hihi/lib/lob.txt
 t/haha/hehe/hoho.txt
 t/haha/hihi.txt
+t/netbase.deb

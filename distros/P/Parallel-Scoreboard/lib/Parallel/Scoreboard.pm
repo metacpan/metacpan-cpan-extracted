@@ -9,7 +9,7 @@ use IO::Handle;
 use POSIX qw(:fcntl_h);
 use File::Path;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Class::Accessor::Lite (
     ro => [ qw(base_dir worker_id) ],
@@ -117,8 +117,9 @@ sub _for_all {
     my ($self, $cb) = @_;
     my @files = glob "$self->{base_dir}/status_*";
     for my $fn (@files) {
-        # obtain id from filename (or else ignore)
-        $fn =~ m|/status_(.*)$|
+        # obtain id from filename (or else ignore);
+        # skip .tmp to avoid racing with update()
+        $fn =~ m|/status_(.*)(?<!\.tmp)$|
             or next;
         my $id = $1;
         # ignore files removed after glob but before open

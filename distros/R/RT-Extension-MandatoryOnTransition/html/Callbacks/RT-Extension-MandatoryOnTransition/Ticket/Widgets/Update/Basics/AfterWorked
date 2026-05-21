@@ -11,6 +11,71 @@ my ($core, $cfs, $roles) = RT::Extension::MandatoryOnTransition->RequiredFields(
 my %exclude_cfs = map { $_ => 1 } @ExcludeCustomFields;
 @$cfs = grep { !$exclude_cfs{$_} } @$cfs;
 
+# If CustomFieldCustomGroupings is present in the Update page layout, it
+# renders ungrouped CFs under the same input name that AfterWorked would
+# use. Adding them here too produces duplicate <input> elements with
+# identical names, causing the submitted value to be an array ref.
+# Ungrouped required CFs are already visible in the widget, so skip them.
+# CFs assigned to a named grouping use a different input name and are
+# unaffected, so they are still rendered here.
+if ( @$cfs && defined &GetPageLayout ) {
+    my $layout = GetPageLayout( Object => $Ticket, Page => 'Update' );
+    if ( $layout ) {
+        # Check for a CustomFieldCustomGroupings widget that will render
+        # ungrouped CFs. The widget name may have an argument suffix
+        # (e.g. "CustomFieldCustomGroupings:Specs") that limits it to
+        # specific groupings. Ungrouped CFs are only shown when there is
+        # no argument (all groupings shown) or when the argument explicitly
+        # includes "Default" (which maps to the ungrouped CFs).
+        my $cfcg_shows_ungrouped;
+        OUTER: for my $section ( @$layout ) {
+            my $elements = $section->{Elements} or next;
+            for my $col ( @$elements ) {
+                for my $widget ( ref $col ? @$col : $col ) {
+                    my $groupings;
+                    if ( ref $widget eq 'HASH' ) {
+                        next unless ( $widget->{Name} // '' ) eq 'CustomFieldCustomGroupings';
+                        $groupings = $widget->{Groupings};
+                    }
+                    else {
+                        next unless $widget =~ /^CustomFieldCustomGroupings(?::(.+))?$/;
+                        $groupings = $1;
+                    }
+                    if ( !$groupings || grep { $_ eq 'Default' } split /\s*,\s*/, $groupings ) {
+                        $cfcg_shows_ungrouped = 1;
+                        last OUTER;
+                    }
+                }
+            }
+        }
+
+        if ( $cfcg_shows_ungrouped ) {
+            # Build the set of CF names assigned to any custom grouping.
+            # CustomFieldGroupings config may have queue-specific overrides
+            # (keyed by queue name) that take precedence over 'Default', just
+            # as RT::CustomField::Groupings does internally.
+            my $groupings_config = RT->Config->Get('CustomFieldGroupings') // {};
+            my $ticket_config    = ref($groupings_config) eq 'HASH' ? ( $groupings_config->{'RT::Ticket'} // {} ) : {};
+            my $queue_name       = $Ticket->QueueObj->Name;
+            my @grouping_order;
+            for my $category ( $queue_name, 'Default' ) {
+                if ( $category && $ticket_config->{$category} ) {
+                    @grouping_order = @{ $ticket_config->{$category} };
+                    last;
+                }
+            }
+            my %cfs_by_grouping  = @grouping_order;
+            my %grouped_cf_names = map { $_ => 1 }
+                map  { ref $_ eq 'ARRAY' ? @$_ : () }
+                values %cfs_by_grouping;
+
+            # Ungrouped required CFs are already rendered by
+            # CustomFieldCustomGroupings - exclude them here.
+            @$cfs = grep { $grouped_cf_names{$_} } @$cfs;
+        }
+    }
+}
+
 return unless @$cfs or @$roles;
 
 my $comp = '/Elements/EditCustomFields';

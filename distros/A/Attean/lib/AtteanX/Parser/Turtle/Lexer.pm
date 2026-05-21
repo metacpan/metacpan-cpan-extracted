@@ -7,7 +7,7 @@ AtteanX::Parser::Turtle::Lexer - Tokenizer for parsing Turtle, TriG, and N-Tripl
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::Turtle::Lexer version 0.035
+This document describes AtteanX::Parser::Turtle::Lexer version 0.038
 
 =head1 SYNOPSIS
 
@@ -23,7 +23,7 @@ This document describes AtteanX::Parser::Turtle::Lexer version 0.035
 
 =cut
 
-package AtteanX::Parser::Turtle::Lexer 0.035 {
+package AtteanX::Parser::Turtle::Lexer 0.038 {
 	use AtteanX::Parser::Turtle::Constants;
 	use v5.14;
 	use strict;
@@ -243,11 +243,11 @@ Returns the next token present in the input.
 				} elsif ($esc eq 'U') {
 					my $codepoint	= $self->read_length(8);
 					$self->_throw_error("Bad unicode escape codepoint '$codepoint'") unless ($codepoint =~ /^[0-9A-Fa-f]+$/o);
-					$iri .= chr(hex($codepoint));
+					$iri .= $self->unescape_hex($codepoint);
 				} elsif ($esc eq 'u') {
 					my $codepoint	= $self->read_length(4);
 					$self->_throw_error("Bad unicode escape codepoint '$codepoint'") unless ($codepoint =~ /^[0-9A-Fa-f]+$/o);
-					my $char	= chr(hex($codepoint));
+					my $char	= $self->unescape_hex($codepoint);
 					if ($char =~ /[<>" {}|\\^`]/o) {
 						$self->_throw_error(sprintf("Bad IRI character: '%s' (0x%x)", $char, ord($char)));
 					}
@@ -268,6 +268,16 @@ Returns the next token present in the input.
 		return $self->new_token(IRI, $self->start_line, $self->start_column, $iri);
 	}
 
+	sub unescape_hex {
+		my $self		= shift;
+		my $codepoint	= shift;
+		my $cp			= hex($codepoint);
+		if ($cp >= 0xd800 && $cp <= 0xdfff) {
+			$self->_throw_error("Invalid use of surrogate codepoint in escape sequence: '$codepoint'", $codepoint);
+		}
+		return chr($cp);
+	}
+	
 	sub _get_bnode {
 		my $self	= shift;
 		$self->read_word('_:');
@@ -427,11 +437,11 @@ Returns the next token present in the input.
 		elsif ($esc eq 'U') {
 			my $codepoint	= $self->read_length(8);
 			$self->_throw_error("Bad unicode escape codepoint '$codepoint'") unless ($codepoint =~ /^[0-9A-Fa-f]+$/o);
-			return chr(hex($codepoint));
+			return $self->unescape_hex($codepoint);
 		} elsif ($esc eq 'u'){
 			my $codepoint	= $self->read_length(4);
 			$self->_throw_error("Bad unicode escape codepoint '$codepoint'") unless ($codepoint =~ /^[0-9A-Fa-f]+$/o);
-			return chr(hex($codepoint));
+			return $self->unescape_hex($codepoint);
 		}
 		$self->_throw_error("Unrecognized string escape '$esc'");
 	}
@@ -457,9 +467,20 @@ Returns the next token present in the input.
 	sub _throw_error {
 		my $self	= shift;
 		my $error	= shift;
+		my $text	= shift // '';
+		my $len		= length($text);
 		my $line	= $self->line;
 		my $col		= $self->column;
-		Carp::confess "$error at $line:$col with buffer: " . Dumper($self->buffer);
+		my $loc		= "at $line:$col";
+		if ($len > 0) {
+			if ($col >= $len) {
+				$col	-= $len;
+				$loc	= "at $line:$col";
+			} else {
+				$loc	= "near $line:$col"
+			}
+		}
+		Carp::confess "$error $loc with buffer: " . Dumper($self->buffer);
 	}
 }
 

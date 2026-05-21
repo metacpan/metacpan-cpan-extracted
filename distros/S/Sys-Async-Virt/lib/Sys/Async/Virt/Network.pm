@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1
-#                   and LibVirt version v11.10.0
+#                   and LibVirt version v12.3.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -16,12 +16,12 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad;
 
-class Sys::Async::Virt::Network v0.2.3;
+class Sys::Async::Virt::Network v0.6.3;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v11.10.1;
+use Protocol::Sys::Virt::Remote::XDR v12.3.0;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -59,104 +59,116 @@ use constant {
 };
 
 
-field $_id :param :reader;
+field $_rpc_id :param :reader;
 field $_client :param :reader;
+
+method name() {
+    return $_rpc_id->{name};
+}
+
+method uuid() {
+    return $_rpc_id->{uuid};
+}
+
+method uuid_string() {
+    return join( '-', unpack('H8H4H4H4H12', $_rpc_id->{uuid}) );
+}
 
 
 method create() {
     return $_client->_call(
         $remote->PROC_NETWORK_CREATE,
-        { net => $_id }, empty => 1 );
+        { net => $_rpc_id }, empty => 1 );
 }
 
 method destroy() {
     return $_client->_call(
         $remote->PROC_NETWORK_DESTROY,
-        { net => $_id }, empty => 1 );
+        { net => $_rpc_id }, empty => 1 );
 }
 
 async method get_autostart() {
     return await $_client->_call(
         $remote->PROC_NETWORK_GET_AUTOSTART,
-        { net => $_id }, unwrap => 'autostart' );
+        { net => $_rpc_id }, unwrap => 'autostart' );
 }
 
 async method get_bridge_name() {
     return await $_client->_call(
         $remote->PROC_NETWORK_GET_BRIDGE_NAME,
-        { net => $_id }, unwrap => 'name' );
+        { net => $_rpc_id }, unwrap => 'name' );
 }
 
 async method get_dhcp_leases($mac, $flags = 0) {
     return await $_client->_call(
         $remote->PROC_NETWORK_GET_DHCP_LEASES,
-        { net => $_id, mac => $mac, need_results => $remote->NETWORK_DHCP_LEASES_MAX, flags => $flags // 0 }, unwrap => 'leases' );
+        { net => $_rpc_id, mac => $mac, need_results => $remote->NETWORK_DHCP_LEASES_MAX, flags => $flags // 0 }, unwrap => 'leases' );
 }
 
 async method get_metadata($type, $uri, $flags = 0) {
     return await $_client->_call(
         $remote->PROC_NETWORK_GET_METADATA,
-        { network => $_id, type => $type, uri => $uri, flags => $flags // 0 }, unwrap => 'metadata' );
+        { network => $_rpc_id, type => $type, uri => $uri, flags => $flags // 0 }, unwrap => 'metadata' );
 }
 
 async method get_xml_desc($flags = 0) {
     return await $_client->_call(
         $remote->PROC_NETWORK_GET_XML_DESC,
-        { net => $_id, flags => $flags // 0 }, unwrap => 'xml' );
+        { net => $_rpc_id, flags => $flags // 0 }, unwrap => 'xml' );
 }
 
 async method is_active() {
     return await $_client->_call(
         $remote->PROC_NETWORK_IS_ACTIVE,
-        { net => $_id }, unwrap => 'active' );
+        { net => $_rpc_id }, unwrap => 'active' );
 }
 
 async method is_persistent() {
     return await $_client->_call(
         $remote->PROC_NETWORK_IS_PERSISTENT,
-        { net => $_id }, unwrap => 'persistent' );
+        { net => $_rpc_id }, unwrap => 'persistent' );
 }
 
 async method list_all_ports($flags = 0) {
     return await $_client->_call(
         $remote->PROC_NETWORK_LIST_ALL_PORTS,
-        { network => $_id, need_results => $remote->NETWORK_PORT_LIST_MAX, flags => $flags // 0 }, unwrap => 'ports' );
+        { network => $_rpc_id, need_results => $remote->NETWORK_PORT_LIST_MAX, flags => $flags // 0 }, unwrap => 'ports' );
 }
 
 async method port_create_xml($xml, $flags = 0) {
     return await $_client->_call(
         $remote->PROC_NETWORK_PORT_CREATE_XML,
-        { network => $_id, xml => $xml, flags => $flags // 0 }, unwrap => 'port' );
+        { network => $_rpc_id, xml => $xml, flags => $flags // 0 }, unwrap => 'port' );
 }
 
 async method port_lookup_by_uuid($uuid) {
     return await $_client->_call(
         $remote->PROC_NETWORK_PORT_LOOKUP_BY_UUID,
-        { network => $_id, uuid => $uuid }, unwrap => 'port' );
+        { network => $_rpc_id, uuid => $uuid }, unwrap => 'port' );
 }
 
 method set_autostart($autostart) {
     return $_client->_call(
         $remote->PROC_NETWORK_SET_AUTOSTART,
-        { net => $_id, autostart => $autostart }, empty => 1 );
+        { net => $_rpc_id, autostart => $autostart }, empty => 1 );
 }
 
 method set_metadata($type, $metadata, $key, $uri, $flags = 0) {
     return $_client->_call(
         $remote->PROC_NETWORK_SET_METADATA,
-        { network => $_id, type => $type, metadata => $metadata, key => $key, uri => $uri, flags => $flags // 0 }, empty => 1 );
+        { network => $_rpc_id, type => $type, metadata => $metadata, key => $key, uri => $uri, flags => $flags // 0 }, empty => 1 );
 }
 
 method undefine() {
     return $_client->_call(
         $remote->PROC_NETWORK_UNDEFINE,
-        { net => $_id }, empty => 1 );
+        { net => $_rpc_id }, empty => 1 );
 }
 
 method update($command, $section, $parentIndex, $xml, $flags = 0) {
     return $_client->_call(
         $remote->PROC_NETWORK_UPDATE,
-        { net => $_id, command => $command, section => $section, parentIndex => $parentIndex, xml => $xml, flags => $flags // 0 }, empty => 1 );
+        { net => $_rpc_id, command => $command, section => $section, parentIndex => $parentIndex, xml => $xml, flags => $flags // 0 }, empty => 1 );
 }
 
 
@@ -173,7 +185,7 @@ Sys::Async::Virt::Network - Client side proxy to remote LibVirt network
 
 =head1 VERSION
 
-v0.2.3
+v0.6.3
 
 =head1 SYNOPSIS
 
@@ -186,6 +198,24 @@ v0.2.3
 =head2 new
 
 =head1 METHODS
+
+=head2 name
+
+  $name = $net->name;
+
+Returns the name of the network.
+
+=head2 uuid
+
+  $uuid = $net->uuid;
+
+Returns a 16-byte string containing the (binary) UUID.
+
+=head2 uuid_string
+
+  $str = $net->uuid_string;
+
+Returns the string representation of the UUID (C<xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx>).
 
 =head2 create
 
@@ -312,6 +342,15 @@ See documentation of L<virNetworkUpdate|https://libvirt.org/html/libvirt-libvirt
 
 =head1 CONSTANTS
 
+
+   my $value = Sys::Async::Virt::Network->XML_INACTIVE;
+
+   # - or -
+
+   my $value = $net->XML_INACTIVE;
+
+
+
 =over 8
 
 =item XML_INACTIVE
@@ -385,7 +424,7 @@ L<LibVirt|https://libvirt.org>, L<Sys::Virt>
 =head1 LICENSE AND COPYRIGHT
 
 
-  Copyright (C) 2024-2025 Erik Huelsmann
+  Copyright (C) 2024-2026 Erik Huelsmann
 
 All rights reserved. This program is free software;
 you can redistribute it and/or modify it under the same terms as Perl itself.

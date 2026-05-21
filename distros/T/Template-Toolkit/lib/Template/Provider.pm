@@ -584,15 +584,14 @@ sub _load_compiled {
 
     ($fpath) = $fpath =~ /^(.*)$/s;
 
-    my $compiled;
-
     # load compiled template via require();  we zap any
     # %INC entry to ensure it is reloaded (we don't
     # want 1 returned by require() to say it's in memory)
     delete $INC{ $fpath };
+    my $compiled;
     eval { $compiled = require $fpath; };
     return $@
-        ? $self->error("compiled template $compiled: $@")
+        ? $self->error("compiled template $fpath: $@")
         : $compiled;
 }
 
@@ -711,7 +710,7 @@ sub _refresh {
                 if $self->{ DEBUG };
 
             ($data, $error) = $self->_load($slot->[ NAME ], $slot->[ DATA ]->{ name });
-            ($data, $error) = $self->_compile($data)
+            ($data, $error) = $self->_compile($data, $self->_compiled_filename($slot->[ NAME ]))
                 unless $error;
 
             if ($error) {

@@ -1,0 +1,13 @@
+<%init>
+return unless $session{'CurrentUser'}->HasRight( Object => $RT::System, Right => 'ModifySelf' );
+
+my $icon = GetSVGImage( Name => 'circle-half', Title => loc('Toggle theme') );
+
+Menu->child(
+    toggle     => raw_html   => qq{<a href="javascript:" id="theme_toggle" class="nav-link menu-item">$icon</a>},
+    sort_order => 100,
+);
+</%init>
+<%args>
+$ARGSRef => {}
+</%args>

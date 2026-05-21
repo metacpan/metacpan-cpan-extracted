@@ -1,5 +1,5 @@
 package Future::Uring::Exception;
-$Future::Uring::Exception::VERSION = '0.004';
+$Future::Uring::Exception::VERSION = '0.005';
 use 5.020;
 use warnings;
 use experimental 'signatures';
@@ -70,7 +70,7 @@ Future::Uring::Exception - an exception from Future::Uring
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 

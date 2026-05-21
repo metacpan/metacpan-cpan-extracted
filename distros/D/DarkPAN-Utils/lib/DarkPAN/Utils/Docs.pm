@@ -31,7 +31,7 @@ __PACKAGE__->setup_accessors( keys %ATTRIBUTES );
 
 use parent qw(Class::Accessor::Validated);
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.1.0';
 
 ########################################################################
 sub new {

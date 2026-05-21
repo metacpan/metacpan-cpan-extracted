@@ -2,7 +2,7 @@ package Crypt::PK::Ed25519;
 
 use strict;
 use warnings;
-our $VERSION = '0.088';
+our $VERSION = '0.089';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 our %EXPORT_TAGS = ( all => [qw( )] );
@@ -104,8 +104,8 @@ sub export_key_pem {
   local $SIG{__DIE__} = \&CryptX::_croak;
   my $key = $self->export_key_der($type||'');
   return unless $key;
-  return der_to_pem($key, "PRIVATE KEY", $password, $cipher) if substr($type, 0, 7) eq 'private';
-  return der_to_pem($key, "PUBLIC KEY") if substr($type,0, 6) eq 'public';
+  return der_to_pem($key, "PRIVATE KEY", $password, $cipher) if $type eq 'private';
+  return der_to_pem($key, "PUBLIC KEY") if $type eq 'public';
 }
 
 sub export_key_jwk {
@@ -133,13 +133,13 @@ Crypt::PK::Ed25519 - Digital signature based on Ed25519
 
  use Crypt::PK::Ed25519;
 
- #Signature: Alice
- my $priv = Crypt::PK::Ed25519->new('Alice_priv_ed25519.der');
- my $sig = $priv->sign_message($message);
+ my $message = 'hello world';
+ my $signer = Crypt::PK::Ed25519->new->generate_key;
+ my $signature = $signer->sign_message($message);
 
- #Signature: Bob (received $message + $sig)
- my $pub = Crypt::PK::Ed25519->new('Alice_pub_ed25519.der');
- $pub->verify_message($sig, $message) or die "ERROR";
+ my $public_der = $signer->export_key_der('public');
+ my $verifier = Crypt::PK::Ed25519->new(\$public_der);
+ $verifier->verify_message($signature, $message) or die "ERROR";
 
  #Load key
  my $pk = Crypt::PK::Ed25519->new;
@@ -168,22 +168,23 @@ I<Since: CryptX-0.067>
 
 =head2 new
 
- my $pk = Crypt::PK::Ed25519->new();
- #or
- my $pk = Crypt::PK::Ed25519->new($priv_or_pub_key_filename);
- #or
- my $pk = Crypt::PK::Ed25519->new(\$buffer_containing_priv_or_pub_key);
+ my $source = Crypt::PK::Ed25519->new();
+ $source->generate_key;
 
-Support for password protected PEM keys
+ my $public_der = $source->export_key_der('public');
+ my $pub = Crypt::PK::Ed25519->new(\$public_der);
 
- my $pk = Crypt::PK::Ed25519->new($priv_pem_key_filename, $password);
- #or
- my $pk = Crypt::PK::Ed25519->new(\$buffer_containing_priv_pem_key, $password);
+ my $private_pem = $source->export_key_pem('private', 'secret', 'AES-256-CBC');
+ my $priv = Crypt::PK::Ed25519->new(\$private_pem, 'secret');
+
+Passing C<$filename> or C<\$buffer> to C<new> is equivalent: both forms
+immediately import the key material into the new object.
 
 =head2 generate_key
 
-Uses Yarrow-based cryptographically strong random number generator seeded with
-random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
+Uses the bundled C<chacha20> PRNG via C<rng_make_prng()>. The exact OS entropy
+source is handled by the underlying LibTomCrypt RNG setup.
+Returns the object itself (for chaining).
 
  $pk->generate_key;
 
@@ -191,17 +192,20 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
 Loads private or public key in DER or PEM format.
 
- $pk->import_key($filename);
- #or
- $pk->import_key(\$buffer_containing_key);
+ my $source = Crypt::PK::Ed25519->new();
+ $source->generate_key;
 
-Support for password protected PEM keys:
+ my $public_der = $source->export_key_der('public');
+ my $pub = Crypt::PK::Ed25519->new();
+ $pub->import_key(\$public_der);
 
- $pk->import_key($filename, $password);
- #or
- $pk->import_key(\$buffer_containing_key, $password);
+ my $private_pem = $source->export_key_pem('private', 'secret', 'AES-256-CBC');
+ my $priv = Crypt::PK::Ed25519->new();
+ $priv->import_key(\$private_pem, 'secret');
 
-Loading private or public keys form perl hash:
+The same method also accepts filenames instead of buffers.
+
+Loading private or public keys from a Perl HASH:
 
  $pk->import_key($hashref);
 
@@ -291,7 +295,7 @@ Supported key formats:
 
 =item * Ed25519 private keys in JSON Web Key (JWK) format
 
-See L<https://tools.ietf.org/html/rfc8037>
+See L<https://www.rfc-editor.org/rfc/rfc8037>
 
  {
   "kty":"OKP",
@@ -323,11 +327,15 @@ Import raw public/private key - can load raw key data exported by L</export_key_
 
 =head2 export_key_der
 
+Returns the key as a binary DER-encoded string.
+
  my $private_der = $pk->export_key_der('private');
  #or
  my $public_der = $pk->export_key_der('public');
 
 =head2 export_key_pem
+
+Returns the key as a PEM-encoded string (ASCII).
 
  my $private_pem = $pk->export_key_pem('private');
  #or
@@ -351,13 +359,15 @@ Support for password protected PEM keys
 
 =head2 export_key_jwk
 
+Returns a JSON string, or a hashref if the optional second argument is true.
+
 Exports public/private keys as a JSON Web Key (JWK).
 
  my $private_json_text = $pk->export_key_jwk('private');
  #or
  my $public_json_text = $pk->export_key_jwk('public');
 
-Also exports public/private keys as a perl HASH with JWK structure.
+Also exports public/private keys as a Perl HASH with JWK structure.
 
  my $jwk_hash = $pk->export_key_jwk('private', 1);
  #or
@@ -367,6 +377,8 @@ B<BEWARE:> For JWK support you need to have L<JSON> module installed.
 
 =head2 export_key_raw
 
+Returns the raw key as a binary string.
+
 Export raw public/private key
 
  my $private_bytes = $pk->export_key_raw('private');
@@ -375,11 +387,57 @@ Export raw public/private key
 
 =head2 sign_message
 
+Returns the signature as a binary string. Ed25519 uses a fixed hash internally
+(SHA-512); unlike RSA or ECDSA there is no C<$hash_name> parameter.
+
  my $signature = $priv->sign_message($message);
 
 =head2 verify_message
 
- my $valid = $pub->verify_message($signature, $message)
+Returns C<1> if the signature is valid, C<0> otherwise.
+
+ my $valid = $pub->verify_message($signature, $message);
+
+=head2 sign_message_ctx
+
+I<Since: CryptX-0.089>
+
+Signs a message using Ed25519ctx (RFC 8032 Section 5.1), which includes a
+mandatory context string (at most 255 bytes). The context string makes the
+signature domain-separated: the same key signing the same message with a
+different context produces a different (and incompatible) signature.
+
+ my $signature = $priv->sign_message_ctx($message, $context);
+
+=head2 verify_message_ctx
+
+I<Since: CryptX-0.089>
+
+Verifies a signature produced by L</sign_message_ctx>.
+
+ my $valid = $pub->verify_message_ctx($signature, $message, $context);
+
+=head2 sign_message_ph
+
+I<Since: CryptX-0.089>
+
+Signs a message using Ed25519ph (RFC 8032 Section 5.1), the "pre-hashed"
+variant. The message is first hashed with SHA-512 internally before signing.
+This is useful when signing very large messages or when only a hash of the
+message is available. An optional context string (at most 255 bytes) can be
+provided; it defaults to the empty string if omitted.
+
+ my $signature = $priv->sign_message_ph($message);
+ my $signature = $priv->sign_message_ph($message, $context);
+
+=head2 verify_message_ph
+
+I<Since: CryptX-0.089>
+
+Verifies a signature produced by L</sign_message_ph>.
+
+ my $valid = $pub->verify_message_ph($signature, $message);
+ my $valid = $pub->verify_message_ph($signature, $message, $context);
 
 =head2 is_private
 
@@ -389,6 +447,8 @@ Export raw public/private key
  # undef .. no key loaded
 
 =head2 key2hash
+
+Returns a hashref with the key components, or C<undef> if no key is loaded.
 
  my $hash = $pk->key2hash;
 
@@ -401,6 +461,25 @@ Export raw public/private key
    priv  => "45C109BA6FD24E8B67D23EFB6B92D99CD457E2137172C0D749FE2B5A0C142DAD",
  }
 
+=head1 OpenSSL interoperability
+
+ # Generate a key with OpenSSL
+ # openssl genpkey -algorithm ed25519 -out ed25519_priv.pem
+ # openssl pkey -in ed25519_priv.pem -pubout -out ed25519_pub.pem
+
+ # Load the OpenSSL-generated key in CryptX
+ use Crypt::PK::Ed25519;
+ my $priv = Crypt::PK::Ed25519->new("ed25519_priv.pem");
+ my $pub  = Crypt::PK::Ed25519->new("ed25519_pub.pem");
+
+ # Sign in CryptX, verify with OpenSSL
+ my $message = "hello";
+ my $signature = $priv->sign_message($message);
+
+ # Export CryptX key for OpenSSL
+ my $pem = $priv->export_key_pem('private');
+ # then: openssl pkey -in priv.pem -text -noout
+
 =head1 SEE ALSO
 
 =over
@@ -409,7 +488,7 @@ Export raw public/private key
 
 =item * L<https://en.wikipedia.org/wiki/Curve25519>
 
-=item * L<https://tools.ietf.org/html/rfc8032>
+=item * L<https://www.rfc-editor.org/rfc/rfc8032>
 
 =back
 

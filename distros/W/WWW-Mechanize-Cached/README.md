@@ -4,7 +4,7 @@ WWW::Mechanize::Cached - Cache response to be polite
 
 # VERSION
 
-version 1.55
+version 2.00
 
 # SYNOPSIS
 
@@ -48,17 +48,22 @@ _$cache\_object_ must have `get()` and `set()` methods like the
 
 The default Cache object is set up with the following params:
 
+    use File::XDG;
     my $cache_params = {
-        default_expires_in => "1d", namespace => 'www-mechanize-cached',
+        default_expires_in => '1d',
+        namespace          => 'www-mechanize-cached',
+        cache_root         => File::XDG->new(
+            name => 'WWW-Mechanize-Cached',
+            api  => 1,
+        )->cache_home->stringify,
+        directory_umask    => 077,
     };
 
     $cache = Cache::FileCache->new( $cache_params );
 
-This should be fine if you only want to use a disk-based cache, you only want
-to cache results for 1 day and you're not in a shared hosting environment.
-If any of this presents a problem for you, you should pass in your own Cache
-object.  These defaults will remain unchanged in order to maintain backwards
-compatibility.
+This should be fine if you only want to use a disk-based cache and you
+only want to cache results for 1 day. If this presents a problem for
+you, you should pass in your own Cache object.
 
 For example, you may want to try something like this:
 

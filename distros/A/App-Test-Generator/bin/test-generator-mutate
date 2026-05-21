@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 
+use Config;
 use Cwd qw(abs_path);
 use File::Find qw(find);
 use File::Spec;
@@ -32,6 +33,31 @@ test-generator-mutate - Run mutation testing against a Perl test suite
 =head1 QUICK START
 
     test-generator-mutate --lib lib --min-score 85 --json mutation.json
+
+=head2 Skipping Lines from Mutation
+
+Some routines involve process-management side-effects (forking,
+signalling, C<waitpid>) that are inherently difficult to assert against
+in a unit test.  A mutant that corrupts a PID or signal value may cause
+the test suite to hang or emit warnings from an C<END> block rather than
+producing a clean pass/fail result.
+
+To exclude a block of lines from mutation testing entirely, wrap it with
+C<## MUTANT_SKIP_BEGIN> and C<## MUTANT_SKIP_END> annotations:
+
+    sub disable_hot_reload {
+        ## MUTANT_SKIP_BEGIN
+        kill 'HUP', $pid if $pid;
+        waitpid $pid, 0;
+        ## MUTANT_SKIP_END
+    }
+
+Skipped lines are silently excluded from the mutation candidate list and
+do not appear in the killed or survived counts.  The number of skipped
+lines is shown in the per-file mutation report.
+
+Mismatched markers (a C<## MUTANT_SKIP_BEGIN> with no matching
+C<## MUTANT_SKIP_END>, or vice versa) are fatal errors.
 
 =head2 Numeric Boundary Mutants
 
@@ -143,6 +169,32 @@ Mutate a single file instead of scanning the entire C<--lib> directory.
 Directory containing test files.
 
 Defaults to C<t>.
+
+=head2 --changed_only
+
+Only mutate files that were changed in the most recent commit, as
+determined by C<git diff --name-only HEAD~1 HEAD>. Files not changed
+in the current commit retain their mutation results from the previous
+dashboard run. This significantly reduces CI runtime while preserving
+accuracy for the files that actually changed.
+
+=head2 --exclude <path>
+
+Exclude files matching the given path fragment from mutation testing.
+May be specified multiple times. For example:
+
+    --exclude lib/Devel --exclude lib/App/Test/Generator/Sample
+
+=head2 --base_sha <sha>
+
+The git commit SHA to use as the base when computing which files have
+changed under C<--changed_only>. Defaults to C<HEAD~1>.
+
+Use this when automated commits (such as coverage snapshots or generated
+test stubs) have landed on top of your last code commit, causing
+C<HEAD~1> to point to an automated commit rather than a real change.
+Typically set by the CI workflow using the output of C<git log> filtered
+to exclude automated commits.
 
 =head2 --min-score <int>
 
@@ -368,7 +420,10 @@ Readonly my $STATUS_KILLED   => 'Killed';
 Readonly my $MUTATION_LEVEL_FULL => 'full';
 Readonly my $MUTATION_LEVEL_FAST => 'fast';
 
+my @excludes;
+
 my %opt = (
+	changed_only   => 0,
 	lib            => 'lib',
 	tests          => 't',
 	min_score      => 0,
@@ -384,11 +439,14 @@ my %opt = (
 
 # Exit code 3 is "invalid command-line options" per the EXIT CODES POD section
 GetOptions(
+	'base_sha=s' => \$opt{base_sha},
+	'changed_only'     => \$opt{changed_only},
 	'lib=s'            => \$opt{lib},
 	'file=s'           => \$opt{file},
 	'tests=s'          => \$opt{tests},
 	'min-score=i'      => \$opt{min_score},
 	'cover_json=s'     => \$opt{cover_json},
+	'exclude=s' => \@excludes,
 	'json=s'           => \$opt{json},
 	'fail-fast'        => \$opt{fail_fast},
 	'timeout=i'        => \$opt{timeout},
@@ -404,24 +462,43 @@ GetOptions(
 pod2usage(-exitval => 0, -verbose => 1) if $opt{help};
 pod2usage(-exitval => 0, -verbose => 2) if $opt{man};
 
+# warn "DEBUG options: changed_only=$opt{changed_only} base_sha=", $opt{base_sha} // 'undef';
+
 # Warn when reserved-for-future-use options are supplied so the
 # caller knows they have no effect yet rather than silently ignoring
-warn "--fail-fast is reserved for future use and has no effect\n"
-	if $opt{fail_fast};
-warn "--timeout is reserved for future use and has no effect\n"
-	if $opt{timeout};
+warn "--fail-fast is reserved for future use and has no effect" if $opt{fail_fast};
+warn "--timeout is reserved for future use and has no effect" if $opt{timeout};
 
 # -------------------------
 # Collect Files
 # -------------------------
-
 my @files;
 
 if($opt{file}) {
 	push @files, $opt{file};
+} elsif($opt{changed_only}) {
+	# Only mutate files changed since the base commit
+	my $base = $opt{base_sha} ? "$opt{base_sha}^" : 'HEAD~1';
+	my $diff = `git diff --name-only $base HEAD 2>/dev/null`;
+	my @changed = grep {
+		# Must be a lib .pm file, must exist, and must not match any exclusion
+		my $f = $_;
+		/^lib\/.*\.pm$/ && -f $f && !grep { $f =~ m{\Q$_\E} } @excludes
+	} split /\n/, $diff;
+
+	if(@changed) {
+		print 'Changed-only mode: mutating ', scalar(@changed), " file(s)\n" if $opt{verbose};
+		@files = @changed;
+	} else {
+		# No lib/*.pm files changed -- fall through to merge and write
+		# existing results back to JSON without running new mutations
+		print "No lib/*.pm files changed -- retaining previous mutation results\n";
+	}
 } else {
 	find(
 		sub {
+			# Skip files matching any exclusion pattern
+			return if grep { $File::Find::name =~ m{\Q$_\E} } @excludes;
 			push @files, $File::Find::name if /\.pm$/;
 		},
 		$opt{lib}
@@ -430,7 +507,12 @@ if($opt{file}) {
 
 # Pass absolute target file paths to the LCSAJ runtime debugger
 # via environment variable so it knows which files to instrument
-$ENV{LCSAJ_TARGETS} = join(':', map { abs_path($_) } @files);
+if(@files) {
+	$ENV{LCSAJ_TARGETS} = join(':', map { abs_path($_) } @files);
+} else {
+	# No files to mutate -- preserve existing LCSAJ hit data
+	delete $ENV{LCSAJ_TARGETS};
+}
 
 # -------------------------
 # Verify baseline tests
@@ -453,6 +535,7 @@ my $total   = 0;
 my $killed  = 0;
 my @survivors;
 my @killed_mutants;
+my %skipped_by_file;	# lines excluded by MUTANT_SKIP annotations, keyed by filename
 
 for my $file (@files) {
 	my $mutator = App::Test::Generator::Mutator->new(
@@ -462,6 +545,12 @@ for my $file (@files) {
 	);
 
 	my @mutants = $mutator->generate_mutants();
+
+	# Collect skip count from mutator
+	my $skipped = scalar keys %{$mutator->{skip_lines} // {}};
+
+	# Add to per-file tracking (needs a new %skipped_by_file hash)
+	$skipped_by_file{$file} = $skipped if $skipped;
 
 	my $groups;
 
@@ -473,6 +562,8 @@ for my $file (@files) {
 		# Full mode: run every mutant independently
 		$groups = { map { $_->id => [$_] } @mutants };
 	}
+
+	# warn "DEBUG file=$file groups=", scalar(keys %{$groups});
 
 	for my $group (values %{$groups}) {
 		my $mutant = representative_mutant($group);
@@ -491,7 +582,8 @@ for my $file (@files) {
 
 		# Point PERL5LIB at the workspace so prove picks up the
 		# mutated module rather than the original in blib/ or lib/
-		local $ENV{PERL5LIB} = File::Spec->catfile($workspace, $opt{lib});
+		local $ENV{PERL5LIB} = File::Spec->catfile($workspace, $opt{lib})
+			. ($ENV{PERL5LIB} ? $Config{path_sep} . $ENV{PERL5LIB} : '');
 
 		my $compile = system($^X, '-c', File::Spec->catfile($workspace, $file));
 		next if $compile != 0;
@@ -556,13 +648,51 @@ unless($opt{quiet}) {
 		'Survived: ', scalar(@survivors), "\n";
 }
 
+# printf "DEBUG argv: json=%s changed_only=%s\n",
+	# $opt{json} // 'undef',
+	# $opt{changed_only} // 'undef';
+
 if($opt{json}) {
+	if($opt{changed_only} && -f $opt{json}) {
+		# printf "DEBUG merge: file=%s size=%d\n", $opt{json}, -s $opt{json};
+		my $raw = do {
+			local $/;
+			open(my $fh, '<', $opt{json}) or die "Cannot open $opt{json}: $!";
+			<$fh>
+		};
+		# printf "DEBUG merge: raw_length=%d first_char=%s\n", length($raw // ''), substr($raw // '', 0, 1);
+		my $prev = eval { decode_json($raw) };
+		if($@) {
+			# printf "DEBUG merge: PARSE ERROR: %s\n", substr($@, 0, 200);
+			$prev = {};
+		} else {
+			$prev //= {};
+		}
+
+		# printf "DEBUG merge: keys=%s survived=%d killed=%d\n",
+			# join(',', sort keys %{$prev // {}}),
+			# scalar(@{ $prev->{survived} || [] }),
+			# scalar(@{ $prev->{killed} || [] });
+
+		# Keep survived/killed entries for files NOT in this run
+		my %mutated_files = map { $_ => 1 } @files;
+		my @prev_survived = grep { !$mutated_files{ $_->{file} // '' } } @{ $prev->{survived} || [] };
+		my @prev_killed = grep { !$mutated_files{ $_->{file} // '' } } @{ $prev->{killed} || [] };
+
+		# Merge previous data with current run
+		unshift @survivors, @prev_survived;
+		unshift @killed_mutants, @prev_killed;
+
+		# Recalculate totals to include previous data
+		$total  += scalar(@prev_survived) + scalar(@prev_killed);
+		$killed += scalar(@prev_killed);
+		$score   = $total ? sprintf('%.2f', ($killed / $total) * 100) : 100;
+	}
+
 	# Sort survivors worst-first so the most impactful gaps
 	# appear at the top of the generated test stub file
 	@survivors = sort { $b->{priority} <=> $a->{priority} } @survivors;
-
 	open(my $fh, '>', $opt{json}) or die "Cannot write $opt{json}: $!";
-
 	print $fh encode_json({
 		score          => $score,
 		total          => $total,
@@ -570,8 +700,8 @@ if($opt{json}) {
 		survived_count => scalar(@survivors),
 		killed         => \@killed_mutants,
 		survived       => \@survivors,
+		skipped        => \%skipped_by_file,
 	});
-
 	close $fh;
 }
 
@@ -744,7 +874,7 @@ sub mutation_difficulty {
 	return {
 		score => $DIFFICULTY_LOW_SCORE,
 		label => $DIFFICULTY_LOW_LABEL,
-		hint  => 'Mutation survived but impact may be minor',
+		hint  => 'Mutation survived, but impact may be minor',
 	};
 }
 

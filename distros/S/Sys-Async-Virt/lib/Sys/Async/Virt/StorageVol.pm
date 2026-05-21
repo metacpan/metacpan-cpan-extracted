@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1
-#                   and LibVirt version v11.10.0
+#                   and LibVirt version v12.3.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -16,12 +16,12 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad;
 
-class Sys::Async::Virt::StorageVol v0.2.3;
+class Sys::Async::Virt::StorageVol v0.6.3;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v11.10.1;
+use Protocol::Sys::Virt::Remote::XDR v12.3.0;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -54,73 +54,85 @@ use constant {
 };
 
 
-field $_id :param :reader;
+field $_rpc_id :param :reader;
 field $_client :param :reader;
+
+method key() {
+    return $_rpc_id->{key};
+}
+
+method name() {
+    return $_rpc_id->{name};
+}
+
+method pool() {
+    return $_client->_storage_pool_instance( $_rpc_id->{pool} );
+}
 
 method delete($flags = 0) {
     return $_client->_call(
         $remote->PROC_STORAGE_VOL_DELETE,
-        { vol => $_id, flags => $flags // 0 }, empty => 1 );
+        { vol => $_rpc_id, flags => $flags // 0 }, empty => 1 );
 }
 
 method download($offset, $length, $flags = 0) {
     return $_client->_call(
         $remote->PROC_STORAGE_VOL_DOWNLOAD,
-        { vol => $_id, offset => $offset, length => $length, flags => $flags // 0 }, stream => 'read', empty => 1 );
+        { vol => $_rpc_id, offset => $offset, length => $length, flags => $flags // 0 }, stream => 'read', empty => 1 );
 }
 
 method get_info() {
     return $_client->_call(
         $remote->PROC_STORAGE_VOL_GET_INFO,
-        { vol => $_id } );
+        { vol => $_rpc_id } );
 }
 
 method get_info_flags($flags = 0) {
     return $_client->_call(
         $remote->PROC_STORAGE_VOL_GET_INFO_FLAGS,
-        { vol => $_id, flags => $flags // 0 } );
+        { vol => $_rpc_id, flags => $flags // 0 } );
 }
 
 async method get_path() {
     return await $_client->_call(
         $remote->PROC_STORAGE_VOL_GET_PATH,
-        { vol => $_id }, unwrap => 'name' );
+        { vol => $_rpc_id }, unwrap => 'name' );
 }
 
 async method get_xml_desc($flags = 0) {
     return await $_client->_call(
         $remote->PROC_STORAGE_VOL_GET_XML_DESC,
-        { vol => $_id, flags => $flags // 0 }, unwrap => 'xml' );
+        { vol => $_rpc_id, flags => $flags // 0 }, unwrap => 'xml' );
 }
 
 async method pool_lookup_by_volume() {
     return await $_client->_call(
         $remote->PROC_STORAGE_POOL_LOOKUP_BY_VOLUME,
-        { vol => $_id }, unwrap => 'pool' );
+        { vol => $_rpc_id }, unwrap => 'pool' );
 }
 
 method resize($capacity, $flags = 0) {
     return $_client->_call(
         $remote->PROC_STORAGE_VOL_RESIZE,
-        { vol => $_id, capacity => $capacity, flags => $flags // 0 }, empty => 1 );
+        { vol => $_rpc_id, capacity => $capacity, flags => $flags // 0 }, empty => 1 );
 }
 
 method upload($offset, $length, $flags = 0) {
     return $_client->_call(
         $remote->PROC_STORAGE_VOL_UPLOAD,
-        { vol => $_id, offset => $offset, length => $length, flags => $flags // 0 }, stream => 'write', empty => 1 );
+        { vol => $_rpc_id, offset => $offset, length => $length, flags => $flags // 0 }, stream => 'write', empty => 1 );
 }
 
 method wipe($flags = 0) {
     return $_client->_call(
         $remote->PROC_STORAGE_VOL_WIPE,
-        { vol => $_id, flags => $flags // 0 }, empty => 1 );
+        { vol => $_rpc_id, flags => $flags // 0 }, empty => 1 );
 }
 
 method wipe_pattern($algorithm, $flags = 0) {
     return $_client->_call(
         $remote->PROC_STORAGE_VOL_WIPE_PATTERN,
-        { vol => $_id, algorithm => $algorithm, flags => $flags // 0 }, empty => 1 );
+        { vol => $_rpc_id, algorithm => $algorithm, flags => $flags // 0 }, empty => 1 );
 }
 
 
@@ -136,7 +148,7 @@ Sys::Async::Virt::StorageVol - Client side proxy to remote LibVirt storage volum
 
 =head1 VERSION
 
-v0.2.3
+v0.6.3
 
 =head1 SYNOPSIS
 
@@ -149,6 +161,24 @@ v0.2.3
 =head2 new
 
 =head1 METHODS
+
+=head2 key
+
+  $key = $vol->key;
+
+Returns a globally unique string identifying the storage volume.
+
+=head2 name
+
+  $name = $vol->name;
+
+Returns the name of the storage volume.
+
+=head2 pool
+
+  $pool = $vol->pool;
+
+Returns the L<Sys::Async::Virt::StoragePool> instance this volume belongs to.
 
 =head2 delete
 
@@ -244,6 +274,15 @@ See documentation of L<virStorageVolWipePattern|https://libvirt.org/html/libvirt
 
 =head1 CONSTANTS
 
+
+   my $value = Sys::Async::Virt::StorageVol->FILE;
+
+   # - or -
+
+   my $value = $vol->FILE;
+
+
+
 =over 8
 
 =item FILE
@@ -307,7 +346,7 @@ L<LibVirt|https://libvirt.org>, L<Sys::Virt>
 =head1 LICENSE AND COPYRIGHT
 
 
-  Copyright (C) 2024-2025 Erik Huelsmann
+  Copyright (C) 2024-2026 Erik Huelsmann
 
 All rights reserved. This program is free software;
 you can redistribute it and/or modify it under the same terms as Perl itself.

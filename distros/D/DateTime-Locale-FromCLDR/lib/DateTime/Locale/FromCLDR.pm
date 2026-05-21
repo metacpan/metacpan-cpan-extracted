@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
-## Unicode Locale Identifier - ~/lib/m
-## Version v0.8.2
+## Unicode Locale Identifier - ~/lib/DateTime/Locale/FromCLDR.pm
+## Version v0.8.5
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/07/07
-## Modified 2026/04/16
+## Modified 2026/05/20
 ## All rights reserved
 ## 
 ## 
@@ -34,7 +34,7 @@ BEGIN
     # "If a given short metazone form is known NOT to be understood in a given locale and the parent locale has this value such that it would normally be inherited, the inheritance of this value can be explicitly disabled by use of the 'no inheritance marker' as the value, which is 3 simultaneous empty set characters (U+2205)."
     # <https://unicode.org/reports/tr35/tr35-dates.html#Metazone_Names>
     our $EMPTY_SET = "∅∅∅";
-    our $VERSION = 'v0.8.2';
+    our $VERSION = 'v0.8.5';
 };
 
 use strict;
@@ -1073,33 +1073,41 @@ sub has_dst
     return( $self->pass_error ) if( !defined( $timezone ) );
     return( "Unknown time zone '${timezone}'" ) if( !$timezone );
     return( $TZ_DST_CACHE->{ lc( $timezone ) } ) if( exists( $TZ_DST_CACHE->{ lc( $timezone ) } ) );
+
+    my $dt_class;
     local $@;
-    # try-catch
-    eval
+    foreach my $this_class ( qw( DateTime::Lite DateTime ) )
     {
-        require DateTime;
-    };
-    if( $@ )
-    {
-        return( $self->error( "Unable to load the DateTime object: $@" ) );
+        # try-catch
+        eval( "require $this_class;" );
+        unless( $@ )
+        {
+            $dt_class = $this_class;
+            last;
+        }
     }
+    if( !defined( $dt_class ) )
+    {
+        return( $self->error( "Unable to load the DateTime::Lite or DateTime class: $@" ) );
+    }
+
     my $dt = eval
     {
-        DateTime->now( time_zone => $timezone );
+        $dt_class->now( time_zone => $timezone );
     };
     if( $@ )
     {
-        return( $self->error( "Unable to instantiate a DateTime object with time zone '${timezone}': $@" ) );
+        return( $self->error( "Unable to instantiate a $dt_class object with time zone '${timezone}': $@" ) );
     }
     my $year = $dt->year;
     my $jan = eval
     {
-        DateTime->new( year => $year, month => 1, day => 1, time_zone => $dt->time_zone )->offset;
+        $dt_class->new( year => $year, month => 1, day => 1, time_zone => $dt->time_zone )->offset;
     };
     return( $self->error( "Unable to get the time zone offset for '${timezone}' at ${year}/1/1: $@" ) ) if( $@ );
     my $jul = eval
     {
-        DateTime->new( year => $year, month => 7, day => 1, time_zone => $dt->time_zone )->offset;
+        $dt_class->new( year => $year, month => 7, day => 1, time_zone => $dt->time_zone )->offset;
     };
     return( $self->error( "Unable to get the time zone offset for '${timezone}' at ${year}/7/1: $@" ) ) if( $@ );
     my $bool = ( $jan != $jul ? 1 : 0 );
@@ -1213,17 +1221,17 @@ sub interval_greatest_diff
 {
     my $self = shift( @_ );
     my $dt1 = shift( @_ ) ||
-        return( $self->error( "No DateTime object was provided. \$locale->interval_greatest_diff( \$dt1, \$dt2 )" ) );
+        return( $self->error( "No DateTime or DateTime::Lite object was provided. \$locale->interval_greatest_diff( \$dt1, \$dt2 )" ) );
     my $dt2 = shift( @_ ) ||
-        return( $self->error( "Missing DateTime object. I was expecting 2 DateTime object, but only 1 was provided. \$locale->interval_greatest_diff( \$dt1, \$dt2 )" ) );
+        return( $self->error( "Missing DateTime or DateTime::Lite object. I was expecting 2 DateTime or DateTime::Lite object, but only 1 was provided. \$locale->interval_greatest_diff( \$dt1, \$dt2 )" ) );
     my $opts = $self->_get_args_as_hash( @_ );
     foreach my $dt ( $dt1, $dt2 )
     {
         if( !defined( $dt ) ||
             !Scalar::Util::blessed( $dt ) ||
-            !$dt->isa( 'DateTime' ) )
+            !( $dt->isa( 'DateTime' ) || $dt->isa( 'DateTime::Lite' ) ) )
         {
-            return( $self->error( "Invalid DateTime object provided (", overload::StrVal( $dt // 'undef' ), ")." ) );
+            return( $self->error( "Invalid DateTime or DateTime::Lite object provided (", overload::StrVal( $dt // 'undef' ), ")." ) );
         }
     }
     my $locale = $self->{locale} ||
@@ -1233,14 +1241,23 @@ sub interval_greatest_diff
         return( $self->error( "Day period first option provided (", overload::StrVal( $opts->{day_period_first} ), ") is a reference that does not stringify!" ) );
     }
 
+    my $dt_class;
     local $@;
-    # try-catch
-    eval { require DateTime; };
-    if( $@ )
+    foreach my $this_class ( qw( DateTime::Lite DateTime ) )
     {
-        return( $self->error( "Unable to load the DateTime object: $@" ) );
+        # try-catch
+        eval( "require $this_class;" );
+        unless( $@ )
+        {
+            $dt_class = $this_class;
+            last;
+        }
     }
-    my $cmp = DateTime->compare_ignore_floating( $dt1, $dt2 );
+    if( !defined( $dt_class ) )
+    {
+        return( $self->error( "Unable to load the DateTime::Lite or DateTime class: $@" ) );
+    }
+    my $cmp = $dt_class->compare_ignore_floating( $dt1, $dt2 );
     my $is_reverse = 0;
     # dt1 > dt2
     if( $cmp > 0 )
@@ -1344,11 +1361,11 @@ sub is_dst
 {
     my $self = shift( @_ );
     my $dt = shift( @_ ) ||
-        return( $self->error( "No DateTime object was provided." ) );
+        return( $self->error( "No DateTime or DateTime::Lite object was provided." ) );
     if( !Scalar::Util::blessed( $dt // '' ) ||
-        !$dt->isa( 'DateTime' ) )
+        !( $dt->isa( 'DateTime' ) || $dt->isa( 'DateTime::Lite' ) ) )
     {
-        return( $self->error( "Object provided (", overload::StrVal( $dt ), " is not a DateTime object." ) )
+        return( $self->error( "Object provided (", overload::StrVal( $dt ), " is not a DateTime or DateTime::Lite object." ) )
     }
     my $timezone = eval
     {
@@ -1357,25 +1374,32 @@ sub is_dst
     $timezone = $self->timezone_canonical( $timezone );
     return( $self->pass_error ) if( !defined( $timezone ) );
     return( "Unknown time zone '${timezone}'" ) if( !$timezone );
+
+    my $dt_class;
     local $@;
-    # try-catch
-    eval
+    foreach my $this_class ( qw( DateTime::Lite DateTime ) )
     {
-        require DateTime;
-    };
-    if( $@ )
+        # try-catch
+        eval( "require $this_class;" );
+        unless( $@ )
+        {
+            $dt_class = $this_class;
+            last;
+        }
+    }
+    if( !defined( $dt_class ) )
     {
-        return( $self->error( "Unable to load the DateTime object: $@" ) );
+        return( $self->error( "Unable to load the DateTime::Lite or DateTime class: $@" ) );
     }
     my $year = $dt->year;
     my $jan = eval
     {
-        DateTime->new( year => $year, month => 1, day => 1, time_zone => $dt->time_zone )->offset;
+        $dt_class->new( year => $year, month => 1, day => 1, time_zone => $dt->time_zone )->offset;
     };
     return( $self->error( "Unable to get the time zone offset for '${timezone}' at ${year}/1/1: $@" ) ) if( $@ );
     my $jul = eval
     {
-        DateTime->new( year => $year, month => 7, day => 1, time_zone => $dt->time_zone )->offset;
+        $dt_class->new( year => $year, month => 7, day => 1, time_zone => $dt->time_zone )->offset;
     };
     return( $self->error( "Unable to get the time zone offset for '${timezone}' at ${year}/7/1: $@" ) ) if( $@ );
     my $offset = eval
@@ -3028,11 +3052,11 @@ sub _find_day_period
 {
     my $self = shift( @_ );
     my $dt = shift( @_ ) ||
-        return( $self->error( "No DateTime object was provided." ) );
+        return( $self->error( "No DateTime or DateTime::Lite object was provided." ) );
     unless( Scalar::Util::blessed( $dt ) &&
-            $dt->isa( 'DateTime' ) )
+            ( $dt->isa( 'DateTime' ) || $dt->isa( 'DateTime::Lite' ) ) )
     {
-        return( $self->error( "The DateTime object provided (", overload::StrVal( $dt ), ") is actually not a DateTime object." ) );
+        return( $self->error( "The DateTime or DateTime::Lite object provided (", overload::StrVal( $dt ), ") is actually not a DateTime or DateTime::Lite object." ) );
     }
     my $opts = $self->_get_args_as_hash( @_ );
 
@@ -3049,35 +3073,35 @@ sub _find_day_period
     }
     my $period2val =
     {
-    # 06:00  12:00
-    # or
-    # 05:00  10:00
-    morning1 => 1,
-    # 10:00  12:00
-    morning2 => 2,
-    # 12:00  18:00
-    # or
-    # 12:00  13:00
-    afternoon1 => 3,
-    # 13:00  18:00
-    afternoon2 => 4,
-    # 18:00  21:00
-    # or
-    # 16:00  18:00
-    evening1 => 5,
-    # 18:00  21:00
-    evening2 => 6,
-    # 21:00  06:00
-    # or
-    # 19:00  23:00
-    night1 => 7,
-    # 23:00  04:00
-    night2 => 8,
-    # midnight and noon have higher score, because they are an exact match
-    # 00:00  00:00
-    midnight => 9,
-    # 12:00  12:00
-    noon => 10,
+        # 06:00  12:00
+        # or
+        # 05:00  10:00
+        morning1 => 1,
+        # 10:00  12:00
+        morning2 => 2,
+        # 12:00  18:00
+        # or
+        # 12:00  13:00
+        afternoon1 => 3,
+        # 13:00  18:00
+        afternoon2 => 4,
+        # 18:00  21:00
+        # or
+        # 16:00  18:00
+        evening1 => 5,
+        # 18:00  21:00
+        evening2 => 6,
+        # 21:00  06:00
+        # or
+        # 19:00  23:00
+        night1 => 7,
+        # 23:00  04:00
+        night2 => 8,
+        # midnight and noon have higher score, because they are an exact match
+        # 00:00  00:00
+        midnight => 9,
+        # 12:00  12:00
+        noon => 10,
     };
     my $greatest_diff;
     # Check the period of the day
@@ -3132,7 +3156,7 @@ sub _find_day_period
         };
         if( $@ )
         {
-            return( $self->error( "Error preparing a clone of the DateTime object for a start or end time for day period token '${token}' value '", join( ', ', @{$ref->{ $token }} ), "': $@" ) );
+            return( $self->error( "Error preparing a clone of the ", ref( $dt ), " object for a start or end time for day period token '${token}' value '", join( ', ', @{$ref->{ $token }} ), "': $@" ) );
         }
         # We die, because this is an internal error, not a user error
         my $token_val = $period2val->{ $token } ||
@@ -4065,7 +4089,7 @@ __END__
 
 =head1 NAME
 
-DateTime::Locale::FromCLDR - DateTime Localised Data from Unicode CLDR
+DateTime::Locale::FromCLDR - DateTime/DateTime::Lite Localised Data from Unicode CLDR
 
 =head1 SYNOPSIS
 
@@ -4213,8 +4237,11 @@ DateTime::Locale::FromCLDR - DateTime Localised Data from Unicode CLDR
     # The CLDR data version. For example: 45.0
     my $str = $locale->version;
 
-    # To get DateTime to use DateTime::Locale::FromCLDR for the locale data
+    # To get DateTime or DateTime::Lite to use DateTime::Locale::FromCLDR for the locale data
     my $dt = DateTime->now(
+        locale => DateTime::Locale::FromCLDR->new( 'en' ),
+    );
+    my $dt = DateTime::Lite->now(
         locale => DateTime::Locale::FromCLDR->new( 'en' ),
     );
 
@@ -4255,7 +4282,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v0.8.2
+    v0.8.5
 
 =head1 DESCRIPTION
 
@@ -4507,6 +4534,7 @@ Same as L<date_format_full|/date_format_full>, but returns the short format patt
 =head2 date_formats
 
     my $now = DateTime->now( locale => 'en' );
+    my $now = DateTime::Lite->now( locale => 'en' );
     my $ref = $locale->date_formats;
     foreach my $type ( sort( keys( %$ref ) ) )
     {
@@ -4622,27 +4650,31 @@ Same as L<day_format_abbreviated|/day_format_abbreviated>, but returns the wide 
 =head2 day_period_format_abbreviated
 
     my $dt = DateTime->new( year => 2024, hour => 7 );
+    my $dt = DateTime::Lite->new( year => 2024, hour => 7 );
     my $locale = DateTime::Locale::FromCLDR->new( 'en' );
     say $locale->day_period_format_abbreviated( $dt );
     # in the morning
 
     my $dt = DateTime->new( year => 2024, hour => 13 );
+    my $dt = DateTime::Lite->new( year => 2024, hour => 13 );
     my $locale = DateTime::Locale::FromCLDR->new( 'en' );
     say $locale->day_period_format_abbreviated( $dt );
     # in the afternoon
 
     my $dt = DateTime->new( year => 2024, hour => 7 );
+    my $dt = DateTime::Lite->new( year => 2024, hour => 7 );
     my $locale = DateTime::Locale::FromCLDR->new( 'ja-Kana-JP' );
     say $locale->day_period_format_abbreviated( $dt );
     # 朝
     # which means "morning" in Japanese
 
     my $dt = DateTime->new( year => 2024, hour => 13 );
+    my $dt = DateTime::Lite->new( year => 2024, hour => 13 );
     my $locale = DateTime::Locale::FromCLDR->new( 'fr' );
     say $locale->day_period_format_abbreviated( $dt );
     # après-midi
 
-Returns a string representing the localised expression of the period of day the L<DateTime> object provided is.
+Returns a string representing the localised expression of the period of day the L<DateTime> or L<DateTime::Lite> object provided is.
 
 If nothing relevant could be found somehow, this will return an empty string. C<undef> is returned only if an error occurred.
 
@@ -4655,6 +4687,7 @@ See also L<Locale::Unicode::Data/calendar_term>, L<Locale::Unicode::Data/day_per
 Same as L<day_period_format_abbreviated|/day_period_format_abbreviated>, but returns the narrow format of day period.
 
     my $dt = DateTime->new( year => 2024, hour => 7 );
+    my $dt = DateTime::Lite->new( year => 2024, hour => 7 );
     my $locale = DateTime::Locale::FromCLDR->new( 'en' );
     say $locale->day_period_format_narrow( $dt );
     # in the morning
@@ -4664,6 +4697,7 @@ Same as L<day_period_format_abbreviated|/day_period_format_abbreviated>, but ret
 Same as L<day_period_format_abbreviated|/day_period_format_abbreviated>, but returns the wide format of day period.
 
     my $dt = DateTime->new( year => 2024, hour => 7 );
+    my $dt = DateTime::Lite->new( year => 2024, hour => 7 );
     my $locale = DateTime::Locale::FromCLDR->new( 'en' );
     say $locale->day_period_format_wide( $dt );
     # in the morning
@@ -4671,16 +4705,19 @@ Same as L<day_period_format_abbreviated|/day_period_format_abbreviated>, but ret
 =head2 day_period_stand_alone_abbreviated
 
     my $dt = DateTime->new( year => 2024, hour => 7 );
+    my $dt = DateTime::Lite->new( year => 2024, hour => 7 );
     my $locale = DateTime::Locale::FromCLDR->new( 'en' );
     say $locale->day_period_stand_alone_abbreviated( $dt );
     # morning
 
     my $dt = DateTime->new( year => 2024, hour => 13 );
+    my $dt = DateTime::Lite->new( year => 2024, hour => 13 );
     my $locale = DateTime::Locale::FromCLDR->new( 'en' );
     say $locale->day_period_stand_alone_abbreviated( $dt );
     # afternoon
 
     my $dt = DateTime->new( year => 2024, hour => 7 );
+    my $dt = DateTime::Lite->new( year => 2024, hour => 7 );
     my $locale = DateTime::Locale::FromCLDR->new( 'ja-Kana-JP' );
     say $locale->day_period_stand_alone_abbreviated( $dt );
     # ""
@@ -4688,11 +4725,12 @@ Same as L<day_period_format_abbreviated|/day_period_format_abbreviated>, but ret
 The previous example would yield nothing, and as per L<the LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#dfst-period>, you would need to use the localised AM/PM instead.
 
     my $dt = DateTime->new( year => 2024, hour => 13 );
+    my $dt = DateTime::Lite->new( year => 2024, hour => 13 );
     my $locale = DateTime::Locale::FromCLDR->new( 'fr' );
     say $locale->day_period_stand_alone_abbreviated( $dt );
     # ap.m.
 
-Returns a string representing the localised expression of the period of day the L<DateTime> object provided is.
+Returns a string representing the localised expression of the period of day the L<DateTime> or L<DateTime::Lite> object provided is.
 
 If nothing relevant could be found somehow, this will return an empty string. C<undef> is returned only if an error occurred.
 
@@ -4705,6 +4743,7 @@ See also L<Locale::Unicode::Data/calendar_term>, L<Locale::Unicode::Data/day_per
 Same as L<day_period_stand_alone_abbreviated|/day_period_stand_alone_abbreviated>, but returns the narrow stand-alone version of the day period.
 
     my $dt = DateTime->new( year => 2024, hour => 13 );
+    my $dt = DateTime::Lite->new( year => 2024, hour => 13 );
     my $locale = DateTime::Locale::FromCLDR->new( 'fr' );
     say $locale->day_period_stand_alone_narrow( $dt );
     # ap.m.
@@ -4714,6 +4753,7 @@ Same as L<day_period_stand_alone_abbreviated|/day_period_stand_alone_abbreviated
 Same as L<day_period_stand_alone_abbreviated|/day_period_stand_alone_abbreviated>, but returns the wide stand-alone version of the day period.
 
     my $dt = DateTime->new( year => 2024, hour => 13 );
+    my $dt = DateTime::Lite->new( year => 2024, hour => 13 );
     my $locale = DateTime::Locale::FromCLDR->new( 'fr' );
     say $locale->day_period_stand_alone_wide( $dt );
     # après-midi
@@ -5114,7 +5154,7 @@ The result is cached to ensure repeating calls for the same C<timezone> are retu
 
 If an error occurred, this will set an L<exception object|DateTime::Locale::FromCLDR::Exception>, and returns C<undef> in scalar context, or an empty list in list context.
 
-How does it work? Very simply, this generates a L<DateTime> object based on the current year and given C<timezone> both for January 1st and July 1st, and get the C<timezone> offset for each. If they do not match, the C<timezone> has daylight saving time.
+How does it work? Very simply, this generates a L<DateTime> or L<DateTime::Lite> (whichever is available) object based on the current year and given C<timezone> both for January 1st and July 1st, and get the C<timezone> offset for each. If they do not match, the C<timezone> has daylight saving time.
 
 =head2 id
 
@@ -5245,13 +5285,13 @@ See L<Locale::Unicode::Data/interval_formats>
     # or, using an hash reference instead:
     # my $diff = $locale->interval_greatest_diff( $dt1, $dt2, { day_period_first => 1 } );
 
-Provided with 2 L<DateTime objects|DateTime>, and this will compute the L<greatest difference|https://unicode.org/reports/tr35/tr35-dates.html#intervalFormats>.
+Provided with 2 L<DateTime objects|DateTime> or L<DateTime::Lite objects|DateTime::Lite>, and this will compute the L<greatest difference|https://unicode.org/reports/tr35/tr35-dates.html#intervalFormats>.
 
 Quoting from the L<LDML specifications|https://unicode.org/reports/tr35/tr35-dates.html#intervalFormats>:
 
 "The data supplied in CLDR requires the software to determine the calendar field with the greatest difference before using the format pattern. For example, the greatest difference in "Jan 10-12, 2008" is the day field, while the greatest difference in "Jan 10 - Feb 12, 2008" is the month field. This is used to pick the exact pattern."
 
-If both C<DateTime> objects are identical, this will return an empty string.
+If both C<DateTime> or C<DateTime::Lite> objects are identical, this will return an empty string.
 
 You can alter the inner working of the algorithm by providing the option C<day_period_first> with a true value. This will prioritise the day period over the AM/PM (morning vs afternoon). What this means, is that if you have two datetimes, one with an hour at C<10:00> and another one at C<13:00>, by default, the algorithm used in web browser, will return C<a> (component for AM/PM) highlighting the difference between morning and afternoon. However, if you pass the option C<day_period_first>, then, this method will prioritise the day periods difference and return C<B> (component for day periods).
 
@@ -5297,9 +5337,11 @@ If an error occurred, an L<exception object|DateTime::Locale::FromCLDR> is set a
 
     my $locale = DateTime::Locale::FromCLDR->new( 'en' );
     my $dt = DateTime->new( year => 2024, month => 7, day => 1, time_zone => 'Asia/Tokyo' );
+    my $dt = DateTime::Lite->new( year => 2024, month => 7, day => 1, time_zone => 'Asia/Tokyo' );
     my $bool = $locale->is_dst( $dt );
     # 0
     my $dt = DateTime->new( year => 2024, month => 7, day => 1, time_zone => 'America/Los_Angeles' );
+    my $dt = DateTime::Lite->new( year => 2024, month => 7, day => 1, time_zone => 'America/Los_Angeles' );
     my $bool = $locale->is_dst( $dt );
     # 1
 
@@ -5309,7 +5351,7 @@ The result is cached to ensure repeating calls for the same C<timezone> are retu
 
 If an error occurred, this will set an L<exception object|DateTime::Locale::FromCLDR::Exception>, and returns C<undef> in scalar context, or an empty list in list context.
 
-How does it work? Very simply, this generates a L<DateTime> object based on the current year and given C<timezone> both for January 1st and July 1st, and get the C<timezone> offset for each. If they do not match, the C<timezone> has daylight saving time.
+How does it work? Very simply, this generates a L<DateTime> or L<DateTime::Lite> (whichever is available) object based on the current year and given C<timezone> both for January 1st and July 1st, and get the C<timezone> offset for each. If they do not match, the C<timezone> has daylight saving time.
 
 =head2 is_ltr
 
@@ -6093,6 +6135,7 @@ Same as L<time_format_full|/time_format_full>, but returns the short format patt
 =head2 time_formats
 
     my $now = DateTime->now( locale => 'en' );
+    my $now = DateTime::Lite->now( locale => 'en' );
     my $ref = $locale->time_formats;
     foreach my $type ( sort( keys( %$ref ) ) )
     {

@@ -1,0 +1,18 @@
+#
+## CopyRight (C) - Carlos Celso
+#
+## see: https://metacpan.org/pod/DBD::SQLite
+
+*) step1
+
+   The script will create the database in memory
+
+*) step2, test perl
+
+   # perl dbi_sqlite_memory.pl
+   
+*) step3, cleanup
+   
+   No cleanup required.
+   
+ENDED

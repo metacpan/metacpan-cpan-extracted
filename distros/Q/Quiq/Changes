@@ -1,3 +1,28 @@
+1.238 2026-05-20
+================
+
+[Quiq::Debug]
+* showRdiff(): UTF-8 Dekodierung hinzugefügt
+
+[Quiq::Mustang]
+* visualize(): Ausgabedatei wird forciert neu erzeugt
+
+[Quiq::StreamServe::Stream]
+* set(): Methode hinzugefügt
+
+[Quiq::Zugferd]
+* Business Terms ergänzt
+* Template EN16931 ergänzt
+
+[Quiq::Zugferd::Entity::Kaeufer]
+* Attribut umsatzsteuerId in umsatzsteuernummer umbenannt
+
+[Quiq::Zugferd::Entity::Verkaeufer]
+* Attribut kennung hinzugefügt
+* Attribut id hinzugefügt
+* Attribut information hinzugefügt
+* Attribut steuerId in steuernummmer und umsatzsteuernummer ausdifferenziert
+
 1.237 2026-04-19
 ================
 

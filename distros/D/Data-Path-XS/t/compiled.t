@@ -154,6 +154,33 @@ subtest 'error handling' => sub {
     # Type mismatch: string key on array (intermediate)
     eval { pathc_set({ arr => [1,2,3] }, path_compile('/arr/key/x'), 'val') };
     like($@, qr/Invalid array index/, 'pathc_set string key on array croaks');
+
+    # Type mismatch: string key on array (final)
+    eval { pathc_set({ arr => [1,2,3] }, path_compile('/arr/key'), 'val') };
+    like($@, qr/Invalid array index/, 'pathc_set string final key on array croaks');
+
+    # And the read-side counterparts return undef without croaking
+    is(pathc_get({ arr => [1,2,3] }, path_compile('/arr/key')), undef,
+       'pathc_get string final key on array returns undef');
+    ok(!pathc_exists({ arr => [1,2,3] }, path_compile('/arr/key')),
+       'pathc_exists string final key on array returns false');
+    is(pathc_delete({ arr => [1,2,3] }, path_compile('/arr/key')), undef,
+       'pathc_delete string final key on array returns undef');
+
+    # pathc_set replaces existing non-ref intermediate scalar with a new
+    # container (matches path_set / patha_set / pp_pathset_dynamic).
+    {
+        my $h = { a => "scalar_in_the_way" };
+        pathc_set($h, path_compile('/a/b'), 'replaced');
+        is(ref $h->{a}, 'HASH', 'pathc_set replaced non-ref intermediate with hash');
+        is($h->{a}{b}, 'replaced', 'pathc_set stored value at new intermediate');
+    }
+    {
+        my $h = { a => "scalar_in_the_way" };
+        pathc_set($h, path_compile('/a/0'), 'arr_replaced');
+        is(ref $h->{a}, 'ARRAY', 'pathc_set autovivified array based on numeric next');
+        is($h->{a}[0], 'arr_replaced', 'pathc_set stored at array index');
+    }
 };
 
 # Test that compiled path owns its own buffer and continues working

@@ -58,22 +58,21 @@ sub _do_subscribe {
                 diag "  $p->{topic}:$p->{partition} from offset $p->{offset}";
             }
 
-            # wait a bit for messages to be fetched
-            my $t; $t = EV::timer 3, 0, sub {
+            # poll up to 20s for the first batch to arrive — broker
+            # may be slow to materialize the assignment, especially in CI
+            my $deadline = time + 20;
+            my $t; $t = EV::timer 0.5, 0.5, sub {
+                return if !@received && time < $deadline;
                 undef $t;
                 ok scalar @received > 0, 'received messages via consumer group';
                 diag "received " . scalar @received . " messages";
 
-                # commit offsets then unsubscribe
                 $kafka->commit(sub {
                     my ($res_or_err) = @_;
                     diag "commit result: " . (ref $res_or_err ? "hash" : ($res_or_err // "undef"));
                     pass 'commit completed';
-
-                    # unsubscribe after commit completes
                     $kafka->unsubscribe;
                     pass 'unsubscribed';
-
                     EV::break;
                 });
             };
@@ -84,7 +83,7 @@ sub _do_subscribe {
     );
 }
 
-my $timeout = EV::timer 30, 0, sub {
+my $timeout = EV::timer 45, 0, sub {
     diag "timeout";
     diag "received so far: " . scalar @received;
     EV::break;

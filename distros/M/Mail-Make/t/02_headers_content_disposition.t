@@ -18,7 +18,7 @@ use warnings;
 
 BEGIN
 {
-    use ok( 'Mail::Make::Headers::ContentDisposition' );
+    use_ok( 'Mail::Make::Headers::ContentDisposition' ) or BAIL_OUT( 'Unable to load Mail::Make::Headers::ContentDisposition' );
 };
 
 # NOTE: Construction

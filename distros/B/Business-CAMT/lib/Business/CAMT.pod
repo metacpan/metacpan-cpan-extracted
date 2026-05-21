@@ -399,8 +399,8 @@ Cast by C<read()>
 
 =head1 SEE ALSO
 
-This module is part of Business-CAMT version 0.15,
-built on April 16, 2026. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Business-CAMT version 0.16,
+built on April 27, 2026. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

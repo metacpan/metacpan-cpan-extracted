@@ -1,5 +1,5 @@
 package Muster::MetaDb;
-$Muster::MetaDb::VERSION = '0.93';
+$Muster::MetaDb::VERSION = '0.9501';
 #ABSTRACT: Muster::MetaDb - keeping meta-data about pages
 =head1 NAME
 
@@ -7,7 +7,7 @@ Muster::MetaDb - keeping meta-data about pages
 
 =head1 VERSION
 
-version 0.93
+version 0.9501
 
 =head1 SYNOPSIS
 
@@ -765,6 +765,10 @@ sub _generate_new_derived_tables {
     }
     my @fieldnames = $self->_get_all_nonhidden_fieldnames();
     say STDERR "FIELDS: ", join(', ', @fieldnames);
+    if (!@fieldnames)
+    {
+        croak __PACKAGE__ . " empty fieldnames";
+    }
 
     # need to define some fields as numeric
     my @field_defs = ();
@@ -778,6 +782,10 @@ sub _generate_new_derived_tables {
         {
             push @field_defs, $field;
         }
+    }
+    if (!@field_defs)
+    {
+        croak __PACKAGE__ . " empty field_defs";
     }
     $q = "CREATE TABLE IF NOT EXISTS flatfields (page PRIMARY KEY, "
     . join(", ", @field_defs) .");";

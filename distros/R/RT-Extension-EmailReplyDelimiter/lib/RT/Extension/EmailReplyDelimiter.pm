@@ -3,7 +3,7 @@ use warnings;
 
 package RT::Extension::EmailReplyDelimiter;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -128,7 +128,9 @@ is acknowledged and greatly appreciated:
 L<grantemsley|https://codeberg.org/grantemsley> - fixed issues with
 quoted-printable messages, added support for regular expression delimiters,
 and provided examples for removing quoted text from messages sent from
-Outlook (L<#1|https://codeberg.org/ivarch/rt-extension-emailreplydelimiter/pulls/1>).
+Outlook (L<#1|https://codeberg.org/ivarch/rt-extension-emailreplydelimiter/pulls/1>);
+and added base64 encoding support
+(L<#2|https://codeberg.org/ivarch/rt-extension-emailreplydelimiter/pulls/2>).
 
 =back
 
@@ -163,28 +165,27 @@ sub ModifyMIMEEntity {
     # If the parsing failed or there was no subject line detected, make no
     # changes.
     return
-      if ( ( not defined $TopEntity )
-        || ( not ref $TopEntity )
-        || ( not defined $TopEntity->head )
-        || ( not $TopEntity->head->count('subject') ) );
+      if ( (not defined $TopEntity)
+        || (not ref $TopEntity)
+        || (not defined $TopEntity->head)
+        || (not $TopEntity->head->count('subject')));
 
     # If no EmailReplyDelimiters are defined, do nothing.
     #
     my $Delimiters = RT->Config->Get('EmailReplyDelimiters');
-    $Delimiters = []            if ( not defined $Delimiters );
-    $Delimiters = [$Delimiters] if ( not ref $Delimiters );
+    $Delimiters = []            if (not defined $Delimiters);
+    $Delimiters = [$Delimiters] if (not ref $Delimiters);
 
-    return if ( 0 == scalar @{$Delimiters} );
+    return if (0 == scalar @{$Delimiters});
 
-    if ( $TopEntity->bodyhandle ) {
+    if ($TopEntity->bodyhandle) {
 
         # If there's a top-level body, this is a simple message with no
         # attachments, so just process the body directly.
 
-        _ProcessEntity( $Delimiters, $TopEntity, {}, {} );
+        _ProcessEntity($Delimiters, $TopEntity, {}, {});
 
-    }
-    else {
+    } else {
 
         # If there isn't a top-level body, this is a multipart message, so
         # process each of the parts which has a body, and then remove any of
@@ -199,22 +200,22 @@ sub ModifyMIMEEntity {
         my %ContentIdInRemovedSection = ();
 
         foreach (@MessageParts) {
-            _ProcessEntity( $Delimiters, $_, \%ContentIdInKeptSection,
-                \%ContentIdInRemovedSection );
+            _ProcessEntity($Delimiters, $_, \%ContentIdInKeptSection,
+                \%ContentIdInRemovedSection);
         }
 
         # Content IDs seen ONLY in removed sections of entity bodies.
         my %ContentIdToRemove = ();
-        foreach ( keys %ContentIdInRemovedSection ) {
+        foreach (keys %ContentIdInRemovedSection) {
             $ContentIdToRemove{$_} = 1
-              if ( not exists $ContentIdInKeptSection{$_} );
+              if (not exists $ContentIdInKeptSection{$_});
         }
 
         # Remove parts the need to be removed.
-        if ( scalar keys %ContentIdToRemove > 0 ) {
+        if (scalar keys %ContentIdToRemove > 0) {
             my @RemainingParts =
-              grep { _ShouldKeepPart( $_, \%ContentIdToRemove ) } @MessageParts;
-            $TopEntity->parts( \@RemainingParts );
+              grep { _ShouldKeepPart($_, \%ContentIdToRemove) } @MessageParts;
+            $TopEntity->parts(\@RemainingParts);
         }
 
     }
@@ -226,41 +227,41 @@ sub ModifyMIMEEntity {
 # section that was removed (if any), respectively.
 #
 sub _ProcessEntity {
-    my ( $Delimiters, $Entity, $ContentIdInKeptSection,
-        $ContentIdInRemovedSection, $Depth )
+    my ($Delimiters, $Entity, $ContentIdInKeptSection,
+        $ContentIdInRemovedSection, $Depth)
       = @_;
-    my (
-        $EffectiveType,  $TextType, $BodyContent,
-        $RemovedContent, $FailedUpdate
-    );
+    my ($EffectiveType, $TextType, $BodyContent,
+        $RemovedContent, $FailedUpdate);
 
     $EffectiveType = $Entity->effective_type;
 
     # Guard against deep recursion.
-    $Depth = 0 if ( not defined $Depth );
+    $Depth = 0 if (not defined $Depth);
     $Depth++;
-    return if ( $Depth > 3 );
+    return if ($Depth > 3);
 
     # Recurse into multipart entities.
-    if ( $EffectiveType =~ /^multipart/ ) {
-        _ProcessEntity( $Delimiters, $_, $ContentIdInKeptSection,
-            $ContentIdInRemovedSection, $Depth )
-          foreach ( $Entity->parts );
+    if ($EffectiveType =~ /^multipart/) {
+        _ProcessEntity($Delimiters, $_, $ContentIdInKeptSection,
+            $ContentIdInRemovedSection, $Depth)
+          foreach ($Entity->parts);
         return;
     }
 
-    return if ( $EffectiveType !~ /^text\/(plain|html)/ );
+    return if ($EffectiveType !~ /^text\/(plain|html)/);
     $TextType = $1;
 
     $BodyContent = $Entity->bodyhandle->as_string;
-    return if ( not defined $BodyContent );
+    return if (not defined $BodyContent);
 
-    # Decode quoted-printable if needed
-    my $WasQuotedPrintable = 0;
-    if ( $Entity->head->mime_encoding =~ /quoted-printable/i ) {
+    # Decode quoted-printable and base64 encoding if needed
+    my $OriginalEncoding = lc($Entity->head->mime_encoding || '');
+    if ($OriginalEncoding eq 'quoted-printable') {
         require MIME::QuotedPrint;
         $BodyContent = MIME::QuotedPrint::decode($BodyContent);
-        $WasQuotedPrintable = 1;
+    } elsif ($OriginalEncoding eq 'base64') {
+        require MIME::Base64;
+        $BodyContent = MIME::Base64::decode($BodyContent);
     }
 
     $RemovedContent = undef;
@@ -270,57 +271,59 @@ sub _ProcessEntity {
     $FailedUpdate = 0;
 
     # If a delimiter is found, remove it and anything following it.
-    foreach my $Delimiter ( @{ $Delimiters || [] } ) {
+    foreach my $Delimiter (@{$Delimiters || []}) {
         my $IsRegex = ref($Delimiter) eq 'Regexp';
-        
-        $RT::Logger->debug("EmailReplyDelimiter testing: " . 
-            ($IsRegex ? "regex pattern" : $Delimiter));
-        
-        if ( $TextType eq 'plain' ) {
-            if ( $IsRegex ) {
+
+        $RT::Logger->debug("EmailReplyDelimiter testing: "
+              . ($IsRegex ? "regex pattern" : $Delimiter));
+
+        if ($TextType eq 'plain') {
+            if ($IsRegex) {
                 $RemovedContent = $1
-                  if ( $BodyContent =~ s/(\s+$Delimiter.+)$//s );
+                  if ($BodyContent =~ s/(\s+$Delimiter.+)$//s);
             } else {
                 $RemovedContent = $1
-                  if ( $BodyContent =~ s/(\s+\Q$Delimiter\E.+)$//s );
+                  if ($BodyContent =~ s/(\s+\Q$Delimiter\E.+)$//s);
             }
-        }
-        else {
-            if ( $IsRegex ) {
+        } else {
+            if ($IsRegex) {
                 $RemovedContent = $2
-                  if ( $BodyContent =~ s/(\s+|>\s*)($Delimiter.+)$/$1/s );
+                  if ($BodyContent =~ s/(\s+|>\s*)($Delimiter.+)$/$1/s);
             } else {
                 $RemovedContent = $2
-                  if ( $BodyContent =~ s/(\s+|>\s*)(\Q$Delimiter\E.+)$/$1/s );
+                  if ($BodyContent =~ s/(\s+|>\s*)(\Q$Delimiter\E.+)$/$1/s);
             }
 
-            if ( defined $RemovedContent ) {
+            if (defined $RemovedContent) {
                 $BodyContent .= '</body></html>'
-                  if ( $RemovedContent =~ /<\/body/i );
+                  if ($RemovedContent =~ /<\/body/i);
             }
         }
 
-        if ( defined $RemovedContent ) {
+        if (defined $RemovedContent) {
+
             # Re-encode if we decoded earlier
-            if ( $WasQuotedPrintable ) {
+            if ($OriginalEncoding eq 'quoted-printable') {
                 $BodyContent = MIME::QuotedPrint::encode($BodyContent);
+            } elsif ($OriginalEncoding eq 'base64') {
+                $BodyContent = MIME::Base64::encode($BodyContent);
             }
-            
-            $RT::Logger->info("EmailReplyDelimiter Removed " . 
-                length($RemovedContent) . " characters after delimiter");
-            
+
+            $RT::Logger->info("EmailReplyDelimiter Removed "
+                  . length($RemovedContent)
+                  . " characters after delimiter");
+
             my $IO;
             $IO = $Entity->bodyhandle->open('w');
             if ($IO) {
                 $IO->print($BodyContent);
-                if ( not $IO->close ) {
+                if (not $IO->close) {
                     $FailedUpdate = 1;
                     RT->Logger->error(
 "EmailReplyDelimiter failed to close bodyhandle after rewrite"
                     );
                 }
-            }
-            else {
+            } else {
                 RT->Logger->error(
                     "EmailReplyDelimiter failed to open bodyhandle for rewrite"
                 );
@@ -342,14 +345,14 @@ sub _ProcessEntity {
 
     # If this is an HTML part, look for content IDs referenced in tags, and
     # update the hash references as described above.
-    if ( $TextType eq 'html' ) {
-        foreach ( split /</, $BodyContent ) {
-            next if ( !/\s(?:src|href)=(?:['"])?cid:([^'">\s]+)/i );
+    if ($TextType eq 'html') {
+        foreach (split /</, $BodyContent) {
+            next if (!/\s(?:src|href)=(?:['"])?cid:([^'">\s]+)/i);
             $ContentIdInKeptSection->{$1} = 1;
         }
-        if ( defined $RemovedContent ) {
-            foreach ( split /</, $RemovedContent ) {
-                next if ( !/\s(?:src|href)=(?:['"])?cid:([^'">\s]+)/i );
+        if (defined $RemovedContent) {
+            foreach (split /</, $RemovedContent) {
+                next if (!/\s(?:src|href)=(?:['"])?cid:([^'">\s]+)/i);
                 $ContentIdInRemovedSection->{$1} = 1;
             }
         }
@@ -361,16 +364,16 @@ sub _ProcessEntity {
 # value does NOT appear as a key in the hashref %$ContentIdToRemove.
 #
 sub _ShouldKeepPart {
-    my ( $Entity, $ContentIdToRemove ) = @_;
-    my ( $ContentIdHeader, $ContentId );
+    my ($Entity, $ContentIdToRemove) = @_;
+    my ($ContentIdHeader, $ContentId);
 
-    $ContentIdHeader = $Entity->head->get( 'content-id', 0 );
-    return 1 if ( not defined $ContentIdHeader );
-    return 1 if ( $ContentIdHeader !~ /^(<)?(.+?)(?(1)>)\s*$/ );
+    $ContentIdHeader = $Entity->head->get('content-id', 0);
+    return 1 if (not defined $ContentIdHeader);
+    return 1 if ($ContentIdHeader !~ /^(<)?(.+?)(?(1)>)\s*$/);
 
     $ContentId = $2;
 
-    return 1 if ( not exists $ContentIdToRemove->{$ContentId} );
+    return 1 if (not exists $ContentIdToRemove->{$ContentId});
 
     return 0;
 }

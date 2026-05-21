@@ -1,0 +1,52 @@
+exclude = [
+    ".build/**",
+    "blib/**",
+    "WWW-Mechanize-Cached-*/**",
+]
+
+[commands.perltidy]
+type = "both"
+include = ["**/*.{pl,pm,t,psgi}"]
+exclude = [
+    "t/00-*",
+    "t/author-*",
+    "t/release-*",
+    "t/zzz-*",
+    "xt/**",
+]
+cmd = ["perltidy", "--profile=$PRECIOUS_ROOT/.perltidyrc"]
+lint-flags = ["--assert-tidy", "--no-standard-output", "--outfile=/dev/null"]
+tidy-flags = ["--backup-and-modify-in-place", "--backup-file-extension=/"]
+ok-exit-codes = 0
+lint-failure-exit-codes = 2
+ignore-stderr = "Begin Error Output Stream"
+
+[commands.perlvars]
+type = "lint"
+include = ["**/*.pm"]
+exclude = [
+    "t/00-*",
+    "t/author-*",
+    "t/release-*",
+    "t/zzz-*",
+    "xt/**",
+]
+cmd = ["perlvars"]
+ok-exit-codes = 0
+lint-failure-exit-codes = 1
+
+[commands.omegasort-gitignore]
+type = "both"
+include = [".gitignore"]
+cmd = ["omegasort", "--sort", "path", "--unique"]
+lint-flags = ["--check"]
+ok-exit-codes = 0
+lint-failure-exit-codes = [1, 2]
+
+[commands.omegasort-stopwords]
+type = "both"
+include = [".stopwords"]
+cmd = ["omegasort", "--sort", "text", "--unique"]
+lint-flags = ["--check"]
+ok-exit-codes = 0
+lint-failure-exit-codes = [1, 2]

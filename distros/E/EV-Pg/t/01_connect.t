@@ -7,7 +7,7 @@ use lib 't';
 use TestHelper;
 
 require_pg;
-plan tests => 9;
+plan tests => 11;
 
 # Test 1: basic object creation
 {
@@ -43,6 +43,22 @@ plan tests => 9;
     ok(defined $pg->db, 'db returns a value');
 
     $pg->finish;
+}
+
+# Test 3: connect to nonexistent database -- exercises PGRES_POLLING_FAILED
+# after TCP succeeds (distinct from unreachable-host failure)
+{
+    my $err_msg;
+    my $pg = EV::Pg->new(
+        conninfo   => "$conninfo dbname=this_db_does_not_exist_xyz",
+        on_connect => sub { EV::break },
+        on_error   => sub { $err_msg = $_[0]; EV::break },
+    );
+    my $t = EV::timer(5, 0, sub { EV::break });
+    EV::run;
+    ok(defined $err_msg, 'bad dbname: on_error fired');
+    like($err_msg, qr/database|does not exist/i,
+         'bad dbname: error mentions database');
 }
 
 # Test 3: reset while connecting (connecting == 1)

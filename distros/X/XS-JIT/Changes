@@ -1,5 +1,40 @@
 Revision history for XS-JIT
 
+0.22	2026-05-09
+	- Builder->memoize: change the TTL comparison from `<` to `<=`.
+	  With time()'s 1-second granularity, 
+	- t/203-header-libc.t: move the C-compiler probe BEFORE use_ok
+	  so plan skip_all can trigger cleanly when no compiler is
+	  available. 
+
+0.21	2026-05-03
+	- Skip File::Temp cleanup on Windows/Cygwin/MSYS
+
+0.20	2026-05-01
+	- t/123-builder-jit-inheritance.t: replace alloca() with portable
+	  Newx/Safefree. 
+	- xs_jit_compile_file: handle Cygwin's $Config{libperl} naming
+	  ("cygperl5_40_3.dll" rather than "libperl..."), and fall back to
+	  -lperl when no parsable name is derivable.
+
+0.19	2026-04-28
+	- Capture compiler/linker stderr in xs_jit_compile_file: use
+	  popen()/pclose() (with _popen on Windows) so the contents of
+	  gcc's "2>&1" redirect actually reach the warn() output. Without
+	  this, every CPAN tester failure report just shows the cmd line
+	  with no clue why it failed.
+	- Fix Cygwin/MSYS linking: extend the Win32 link branch to handle
+	  __CYGWIN__ and __MSYS__, link against -lperl5XX, and add
+	  -Wl,--export-all-symbols. Cygwin previously fell through to the
+	  unix branch which doesn't link against perl, so every JIT
+	  module failed to link.
+	- Fix Perl_custom_op_register fallback for pre-5.14 Perls in both
+	  the static lib/XS/JIT/xs_jit_builder.h header and the JIT-emitted
+	  prologue from xs_jit.c.
+	- Skip "Force recompile succeeds" subtest in t/004-caching.t on
+	  MSWin32: Windows holds an exclusive lock on loaded DLLs, so
+	  in-process force recompile cannot overwrite the on-disk file.
+
 0.18	2026-04-07
 	- Fix Win32 linking: append -lperl5XX derived from $Config{libperl}
 	  (Windows DLLs must resolve all symbols at link time)

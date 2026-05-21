@@ -4,9 +4,11 @@ use strict;
 use warnings;
 
 use Test::Needs {
-	'App::Test::Generator' => '0.19',
+	'App::Test::Generator' => '0.33',
 	'perl' => 5.036,	# Later A::T::G need this version
 };
+
+# use Test::DescribeMe qw(extended);
 use FindBin qw($Bin);
 use IPC::Run3;
 use IPC::System::Simple qw(system);
@@ -36,7 +38,7 @@ if((-d $dirname) && opendir(my $dh, $dirname)) {
 					diag("$filepath: $1 tests run");
 				}
 			} else {
-				diag("$filepath: STDOUT:\n$stdout");
+				diag("$filepath: STDOUT:\n$stdout") if(!$ENV{AUTOMATED_TESTING});
 				diag($stderr) if(length($stderr));
 				diag("$filepath Failed");
 				last;

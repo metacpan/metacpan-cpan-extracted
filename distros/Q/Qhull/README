@@ -1,45 +1,58 @@
-Qhull
+NAME
+    Qhull - Interface to the Qhull convex hull, Delauny triangulation,
+    Voronoi diagram software suite
 
-This is an alpha quality interface to the qhull <https://qhull.org>
-library and executables.
+VERSION
+    version 0.08
 
-At present this module punts to Qhull::PP, which is a wrapper around
-qhull executable, not the library.
+SYNOPSIS
+       use Qhull 'qhull';
 
-At present see Qhull::PP for a discussion of the arguments to qhull.
+       # generate a convex hull and return the ordered
+       # indices of the points in the convex hull
+       my \@indices = qhull( $x, $y );
+
+DESCRIPTION
+    This is an alpha quality interface to the qhull <https://qhull.org>
+    library and executables.
+
+    At present this module punts to Qhull::PP, which is a wrapper around
+    qhull executable, not the library.
+
+    At present see Qhull::PP for a discussion of the arguments to qhull.
 
   Future API
+    qhull has an interesting manner of setting up options, used by both the
+    executable and the library entry point. It may be impossible to get this
+    to look Perlish, especially as the qhull manual page is required to
+    properly use its facilities.
 
-qhull has an interesting manner of setting up options, used by both the
-executable and the library entry point. It may be impossible to get this
-to look Perlish, especially as the qhull manual page is required to
-properly use its facilities.
+    The final interface, which will be the same for the library and the
+    executable wrapper is still in flux.
 
-The final interface, which will be the same for the library and the
-executable wrapper is still in flux.
+SUPPORT
+  Bugs
+    Please report any bugs or feature requests to bug-qhull@rt.cpan.org or
+    through the web interface at:
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Qhull>
 
-INSTALLATION
+  Source
+    Source is available at
 
-This is a Perl module distribution. It should be installed with whichever
-tool you use to manage your installation of Perl, e.g. any of
+      https://gitlab.com/djerius/p5-qhull
 
-  cpanm .
-  cpan  .
-  cpanp -i .
+    and may be cloned from
 
-Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
-Should you wish to install this module manually, the procedure is
+      https://gitlab.com/djerius/p5-qhull.git
 
-  perl Build.PL
-  ./Build
-  ./Build test
-  ./Build install
+AUTHOR
+    Diab Jerius <djerius@cpan.org>
 
 COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2024 by Smithsonian Astrophysical
+    Observatory.
 
-This software is Copyright (c) 2024 by Smithsonian Astrophysical
-Observatory.
+    This is free software, licensed under:
 
-This is free software, licensed under:
+      The GNU General Public License, Version 3, June 2007
 
-  The GNU General Public License, Version 3, June 2007

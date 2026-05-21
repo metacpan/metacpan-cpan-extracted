@@ -1,0 +1,154 @@
+Thu May 21 08:43:43 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.1.3]:
+	* VERSION: bump
+	* release-notes/release-notes-1.1.2.md
+	* VERSION: bump
+	* lib/Amazon/S3/Lite.pm.in
+	- remove unused modules
+	(_parse_notification_configuration)
+	- use generic handler for both QueueConfiguration and LambdaFunctionConfiguration
+	(_create_notification_configuration)
+	- fetch templates from hash, not array
+	- add queue_arn to vars to resolve
+	(_fetch_templates)
+	- populate a hash of templates, not array
+	(_resolve): use g to resolve all instances of var
+	(__DATA__): setup template data structure to support hash
+
+Tue May 19 16:01:24 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.1.2]:
+	* release-notes/release-notes-1.1.2.md
+	* VERSION: bump
+	* lib/Amazon/S3/Lite.pm.in
+	(_request)
+	- remove use of postfix if
+	(put_bucket_notification_configuration)
+	- set query string variable with '=' for signing
+	(get_bucket_notification_configuration)
+	- likewise
+	- log parsed reponse at debug level
+	(_parse_notification_configuration)
+	- elements to capture are CloudFunctionConfiguration, CloudFunction, not Lambda*
+
+Thu May 14 10:00:33 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.1.1]:
+	* release-notes/release-notes-1.1.1.md: new
+	* releaes-notes-*.md => release-notes/
+	* VERSION: bump
+	* cpanfile: likewise
+	* buildspec.yml: remove bin
+	* REQADME.md: generated
+	* lib/Amazon/S3/Lite.pm.in
+	(create_bucket): new
+	(put_bucket_notification_configuration): new
+	(get_bucket_notification_configuration): new
+	(list_buckets): need trailing slash for signing
+	(_croak_on_error): slight refactoring
+	(_resolve): new
+	(_create_notification_configuration): new
+	(_parse_notification_configuration): new
+	(_fetch_templates): new
+	(DATA): added XML templates
+	* t/01-s3-lite.t: updated to test for trailing slash
+	* requires: +List::Util
+
+Thu Apr 30 16:12:47 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.1.0]:
+	* release-notes-1.1.0.md: new
+	* VERSION: bump
+	* README.md: generated
+	* lib/Amazon/S3/Lite.pm.in
+	- pod updates
+	- replace AWS::Signature4 w/Amazon::Signature4::Lite
+	(_signer): refactored to use Amazon::Signature4::Lite
+	(_request): likewise
+	* requires: -HTTP::Request
+	* cpanfile: likewise
+
+Thu Apr 30 10:40:23 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.2]:
+	* release-notes-1.0.2.md: new
+	* README.md: generated
+	* build-github
+	- refactored to use cpanfile
+	* .github/workflows/build.yml: remove repo arg
+	* build-requires
+	- need Markdown::Render@1.0.4 to remove use of LWP
+	- need CPAN::Maker@1.8.5 (bugs in 1.8.3/4)
+	* cpanfile
+	- replace XML::LibXML with XML::Twig
+	* requires: likewise
+	* lib/Amazon/S3/Lite.pm.in
+	- pod updates
+	(_signer): use get_aws... or aws... accessors
+	(_parse_list_buckets): replace XML::LibXML with XML::Twig
+	(_parse_copy_response): ditto
+	(_parse_list_objects_v2): ditto
+	(_croak_on_error)
+	- removed XML::LibXML, replaced with regexp
+	(_xpc): removed
+	(put_object): avoid warning from stat on unopened file handle
+	* t/01-s3-lite.t
+	- new unit/integration tests
+
+Wed Apr 29 15:20:06 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.1]:
+	* release-notes-1.0.1.md: new
+	* README.md: generated
+	* VERSION: bump
+	* .gitignore: CPAN::Maker::Bootstrapper build refactor
+	* Makefile: likewise
+	* docker-compose.yml: +logs
+	* lib/Amazon/S3/Lite.pm.in
+	- pod updates
+	(_init_logger)
+	- don't rain on someone's logger
+	(_init_credentials)
+	- awkward attempt reconcile Amazon::Credentials methods
+	(_signer): ditto
+	(_request): add x-amz-content-sha256 header
+	* lib/Amazon/S3/Lite/Credentials.pm.in
+	(session_token): alias for token()
+	* requires
+	- +IO::Socket::SSL, Net::SSLeay
+	* test-requires
+	+ JSON:PP, -Test::More
+	* test-requires.skip: new
+
+	[1.0.1]: CPAN::Maker::Bootstrapper build refactor
+	* .includes/git.mk: new
+	* .includes/help.mk: new
+	* .includes/perl.mk: new
+	* .includes/release-notes.mk: new
+	* .includes/update.mk: new
+	* .includes/upgrade.mk: new
+	* .includes/version.mk: new
+	* cpanfile: new
+	* t/00-amazon-s3-lite.t: new
+
+
+Fri Mar 27 14:37:28 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.0]:
+	* .gitignore: new
+	* ChangeLog: new
+	* Makefile: new
+	* README.md: new
+	* VERSION: new
+	* buildspec.yml: new
+	* docker-compose.yml: new
+	* lib/Amazon/S3/Lite.pm.in: new
+	* lib/Amazon/S3/Lite/Credentials.pm.in: new
+	* lib/Amazon/S3/Lite/Logger.pm.in: new
+	* release-notes.mk: new
+	* requires: new
+	* t/01-s3-lite.t: new
+	* test-requires: new
+	* version.mk: new
+

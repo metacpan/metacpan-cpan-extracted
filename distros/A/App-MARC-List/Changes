@@ -1,3 +1,11 @@
+0.09 2026-05-02T15:26:32+02:00
+ - Add -s option to skip check of field/subfield.
+ - Add support for compressed input file.
+ - Fix DEPENDENCIES section in doc.
+ - Fix typo in doc.
+ - Remove XXX from tests.
+ - Simplify variables.
+
 0.08 2026-04-09T22:17:28+02:00
  - Add check for input file.
  - Fix minimal version of Test::Warn to 0.31.

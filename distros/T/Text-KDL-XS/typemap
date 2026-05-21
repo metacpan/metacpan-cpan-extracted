@@ -1,0 +1,29 @@
+TYPEMAP
+kdl_parser *       T_PTROBJ_KDL_PARSER
+kdl_emitter *      T_PTROBJ_KDL_EMITTER
+
+INPUT
+T_PTROBJ_KDL_PARSER
+    if (sv_derived_from($arg, \"Text::KDL::XS::Parser\")) {
+        IV tmp = SvIV((SV*)SvRV($arg));
+        $var = INT2PTR($type, tmp);
+    }
+    else {
+        croak(\"$var is not of type Text::KDL::XS::Parser\");
+    }
+
+T_PTROBJ_KDL_EMITTER
+    if (sv_derived_from($arg, \"Text::KDL::XS::Emitter\")) {
+        IV tmp = SvIV((SV*)SvRV($arg));
+        $var = INT2PTR($type, tmp);
+    }
+    else {
+        croak(\"$var is not of type Text::KDL::XS::Emitter\");
+    }
+
+OUTPUT
+T_PTROBJ_KDL_PARSER
+    sv_setref_pv($arg, \"Text::KDL::XS::Parser\", (void*)$var);
+
+T_PTROBJ_KDL_EMITTER
+    sv_setref_pv($arg, \"Text::KDL::XS::Emitter\", (void*)$var);

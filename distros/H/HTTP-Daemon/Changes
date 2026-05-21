@@ -1,5 +1,19 @@
 Revision history for HTTP-Daemon
 
+6.17      2026-05-19 23:11:06Z
+  - Fix CVE-2026-8450 (affects 6.15 and earlier): 2-arg open() in
+    send_file() enabled RCE / arbitrary file write / response-body
+    exfiltration when a string argument was derived from attacker-
+    influenced input. send_file() now uses 3-arg open() with an
+    explicit '<' read mode, so the path is always treated as a literal
+    filename and 2-arg open() shell-magic shapes ('| cmd', 'cmd |',
+    '> path', etc.) are no longer interpreted. send_file() now also
+    returns '0E0' (true zero) on a successful zero-byte transfer so
+    callers can distinguish empty file from open failure (undef). See
+    https://www.cve.org/CVERecord?id=CVE-2026-8450 for the advisory.
+    Reported and patched by Stig Palmquist (stigtsp). (Stig Palmquist,
+    Olaf Alders)
+
 6.16      2023-02-24 03:07:14Z
   - Bump LWP::UserAgent to 6.37 in TestSuggests (GH#65) (Olaf Alders)
 

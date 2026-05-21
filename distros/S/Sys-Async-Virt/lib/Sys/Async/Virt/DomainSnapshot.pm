@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1
-#                   and LibVirt version v11.10.0
+#                   and LibVirt version v12.3.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -16,12 +16,12 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad;
 
-class Sys::Async::Virt::DomainSnapshot v0.2.3;
+class Sys::Async::Virt::DomainSnapshot v0.6.3;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v11.10.1;
+use Protocol::Sys::Virt::Remote::XDR v12.3.0;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -48,62 +48,70 @@ use constant {
 };
 
 
-field $_id :param :reader;
+field $_rpc_id :param :reader;
 field $_client :param :reader;
+
+method domain() {
+    return $_client->_domain_instance( $_rpc_id->{dom} );
+}
+
+method name() {
+    return $_rpc_id->{name};
+}
 
 
 method delete($flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_DELETE,
-        { snap => $_id, flags => $flags // 0 }, empty => 1 );
+        { snap => $_rpc_id, flags => $flags // 0 }, empty => 1 );
 }
 
 async method get_parent($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_GET_PARENT,
-        { snap => $_id, flags => $flags // 0 }, unwrap => 'snap' );
+        { snap => $_rpc_id, flags => $flags // 0 }, unwrap => 'snap' );
 }
 
 async method get_xml_desc($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_GET_XML_DESC,
-        { snap => $_id, flags => $flags // 0 }, unwrap => 'xml' );
+        { snap => $_rpc_id, flags => $flags // 0 }, unwrap => 'xml' );
 }
 
 async method has_metadata($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_HAS_METADATA,
-        { snap => $_id, flags => $flags // 0 }, unwrap => 'metadata' );
+        { snap => $_rpc_id, flags => $flags // 0 }, unwrap => 'metadata' );
 }
 
 async method is_current($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_IS_CURRENT,
-        { snap => $_id, flags => $flags // 0 }, unwrap => 'current' );
+        { snap => $_rpc_id, flags => $flags // 0 }, unwrap => 'current' );
 }
 
 async method list_all_children($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_LIST_ALL_CHILDREN,
-        { snapshot => $_id, need_results => $remote->DOMAIN_SNAPSHOT_LIST_MAX, flags => $flags // 0 }, unwrap => 'snapshots' );
+        { snapshot => $_rpc_id, need_results => $remote->DOMAIN_SNAPSHOT_LIST_MAX, flags => $flags // 0 }, unwrap => 'snapshots' );
 }
 
 async method list_children_names($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_LIST_CHILDREN_NAMES,
-        { snap => $_id, maxnames => $remote->DOMAIN_SNAPSHOT_LIST_MAX, flags => $flags // 0 }, unwrap => 'names' );
+        { snap => $_rpc_id, maxnames => $remote->DOMAIN_SNAPSHOT_LIST_MAX, flags => $flags // 0 }, unwrap => 'names' );
 }
 
 async method num_children($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_NUM_CHILDREN,
-        { snap => $_id, flags => $flags // 0 }, unwrap => 'num' );
+        { snap => $_rpc_id, flags => $flags // 0 }, unwrap => 'num' );
 }
 
 method revert_to_snapshot($flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_REVERT_TO_SNAPSHOT,
-        { snap => $_id, flags => $flags // 0 }, empty => 1 );
+        { snap => $_rpc_id, flags => $flags // 0 }, empty => 1 );
 }
 
 
@@ -119,7 +127,7 @@ Sys::Async::Virt::DomainSnapshot - Client side proxy to remote LibVirt domain sn
 
 =head1 VERSION
 
-v0.2.3
+v0.6.3
 
 =head1 SYNOPSIS
 
@@ -142,6 +150,18 @@ There are no (LibVirt) events available for snapshots.
 Not to be called directly. Various API calls return instances of this type.
 
 =head1 METHODS
+
+=head2 domain
+
+  my $dom = $checkpoint->domain;
+
+Returns the L<Sys::Async::Virt::Domain> instance this is a checkpoint of.
+
+=head2 name
+
+  $name = $snapshot->name;
+
+Returns the name of the domain snapshot.
 
 =head2 delete
 
@@ -215,6 +235,15 @@ See documentation of L<virDomainRevertToSnapshot|https://libvirt.org/html/libvir
 
 =head1 CONSTANTS
 
+
+   my $value = Sys::Async::Virt::DomainSnapshot->XML_SECURE;
+
+   # - or -
+
+   my $value = $snapshot->XML_SECURE;
+
+
+
 =over 8
 
 =item XML_SECURE
@@ -266,7 +295,7 @@ L<LibVirt|https://libvirt.org>, L<Sys::Virt>
 =head1 LICENSE AND COPYRIGHT
 
 
-  Copyright (C) 2024-2025 Erik Huelsmann
+  Copyright (C) 2024-2026 Erik Huelsmann
 
 All rights reserved. This program is free software;
 you can redistribute it and/or modify it under the same terms as Perl itself.

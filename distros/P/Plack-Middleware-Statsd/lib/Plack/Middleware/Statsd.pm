@@ -12,17 +12,19 @@ use warnings;
 
 use parent qw/ Plack::Middleware /;
 
+use Digest::SHA 5.96 qw/ hmac_sha256_base64 /;
 use List::Util qw/ first /;
 use Plack::Util;
 use Plack::Util::Accessor
-    qw/ client sample_rate histogram increment set_add catch_errors /;
+    qw/ client sample_rate histogram increment set_add secure_set_add secure_set_key catch_errors /;
 use Ref::Util qw/ is_coderef /;
+use Scalar::Util qw/ weaken /;
 use Time::HiRes;
 use Try::Tiny;
 
 use experimental qw/ postderef signatures /;
 
-our $VERSION = 'v0.8.2';
+our $VERSION = 'v0.9.3';
 
 # Note: You may be able to omit the client if there is a client
 # defined in the environment hash at C<psgix.monitor.statsd>, and the
@@ -36,13 +38,14 @@ sub prepare_app($self) {
             [qw/ histogram timing_ms timing /],
             [qw/ increment increment /],
             [qw/ set_add   set_add   /],
+            [qw/ secure_set_add secure_set_add /],
           )
         {
             my ( $attr, @methods ) = $init->@*;
             next if defined $self->$attr;
             my $method = first { $client->can($_) } @methods;
             warn "No $attr method found for client " . ref($client)
-                unless defined $method;
+                unless defined $method || $attr eq "secure_set_add";
             $self->$attr(
                 sub($env, @args) {
                     return unless defined $method;
@@ -62,6 +65,18 @@ sub prepare_app($self) {
                 }
             );
         }
+
+        unless ( $client->can("secure_set_add") ) {
+            if ( my $key = $self->secure_set_key ) {
+                $self->secure_set_add(
+                    sub( $env, $metric, $string ) {
+                        my $obscure = hmac_sha256_base64( $string, $key );
+                        $self->set_add->( $env, $metric, $obscure );
+                    }
+                );
+            }
+        }
+
     }
 
     if (my $attr = first { !is_coderef($self->$_) } qw/ histogram increment set_add /) {
@@ -93,6 +108,13 @@ sub prepare_app($self) {
 sub call ( $self, $env ) {
 
     my $client = ( $env->{'psgix.monitor.statsd'} //= $self->client );
+    my $secure = $self->secure_set_add;
+
+    if ( defined $secure ) {
+        weaken( my $ref = $env );
+        $env->{'psgix.monitor.statsd_secure_set_add'} = sub { $secure->( $ref, @_ ) };
+    }
+
 
     my $start = [Time::HiRes::gettimeofday];
     my $res;
@@ -142,8 +164,8 @@ sub call ( $self, $env ) {
                 $increment->( $env, 'psgi.request.content-type.' . $type, $rate );
             }
 
-            $set_add->( $env, 'psgi.request.remote_addr', $env->{REMOTE_ADDR} )
-                if $env->{REMOTE_ADDR};
+            $secure->( $env, 'psgi.request.remote_addr', $env->{REMOTE_ADDR} )
+                if defined($secure) && $env->{REMOTE_ADDR};
 
             $set_add->( $env, 'psgi.worker.pid', $$ );
 
@@ -201,13 +223,15 @@ __END__
 
 =encoding UTF-8
 
+=for stopwords harakiri psgix statsd
+
 =head1 NAME
 
 Plack::Middleware::Statsd - send statistics to statsd
 
 =head1 VERSION
 
-version v0.8.2
+version v0.9.3
 
 =head1 SYNOPSIS
 
@@ -233,6 +257,15 @@ version v0.8.2
 
       }
 
+      # Securely count the number of unique session ids
+
+      if (my $secure_set_add = $env->{'psgix.monitor.statsd_secure_set_add'}) {
+
+        my $options = $c->req->env->{'psgix.session.options'};
+        $secure_set_add->( 'myapp.sessions', $options->{id} );
+
+      }
+
     };
 
   };
@@ -250,8 +283,7 @@ This is a statsd client, such as an instance of L<Net::Statsd::Tiny>.
 
 It is required.
 
-C<psgix.monitor.statsd> will be set to the current client if it is not
-set.
+The C<psgix.monitor.statsd> key in the environment will be set to the current client if it is not set.
 
 The only restriction on the client is that it has the same API as
 L<Net::Statsd::Tiny> or similar modules, by supporting the following
@@ -352,6 +384,30 @@ if there is a fatal error.
 
 Added in v0.5.0.
 
+=head2 secure_set_key
+
+    enable "Statsd",
+      client      => Net::Statsd::Tiny->new( ... ),
+      sample_rate => 1.0,
+      secure_set_key => $key;
+
+This is a secret key used for hashing the secrets before adding them to sets.
+
+When this is set, the C<psgix.monitor.statsd_secure_set_add> key is added to the environment,
+allowing other middleware to securely add items to sets.
+
+Note that it is more secure if a random key is chosen each time that
+the application is started.  However, there may be side effects: if
+the server forks before this middleware is initialised, then each
+worker will log secure set data uniquely, and statistics such as the
+number of unique IP addresses may be multiplied by the number of
+workers.  Even when the key is set before forking, there may be a
+brief spike in the statistics whenever the server is restarted.
+
+Added in v0.9.0.
+
+This feature requires L<Crypt::Mac::HMAC>.
+
 =head1 METRICS
 
 The following metrics are logged:
@@ -366,7 +422,12 @@ If the request method is anything other than an ASCII word, then it will be coun
 
 =item C<psgi.request.remote_addr>
 
-The remote address is added to the set.
+An encrypted remote address is added to the set, if L</secure_set_key> is defined.
+Otherwise it is not logged.
+
+Note: this was changed since version v0.9.0 in order to avoid leaking
+personally identifiable information when the L</client> does not have
+a secured connection to the statsd server.
 
 =item C<psgi.request.content-length>
 
@@ -492,13 +553,24 @@ allow you to monitor process size information.  In your F<app.psgi>:
 =head2 Non-standard HTTP status codes
 
 If your application is returning a status code that is not handled by
-L<HTTP::Status>, then the metrics may not be logged for that reponse.
+L<HTTP::Status>, then the metrics may not be logged for that response.
 
-=head2 psgix.informational
+=head2 C<psgix.informational>
 
 This does not add a wrapper around the C<psgix.informational>
 callback.  If you are making use of it in your code, then you will
 need to add metrics logging yourself.
+
+=head1 SECURITY CONSIDERATIONS
+
+If the L</client> does not have a secure communications channel to the
+statsd server, then there is the risk that information such as IP
+addresses or session ids will be leaked.
+
+Other middleware or frameworks that make use of the C<psgix.monitor.statsd> client
+should use the C<psgix.monitor.statsd_secure_set_add> method when adding set data
+that contains personally identifiable information, authentication tokens or other
+sensitive data.
 
 =head1 SEE ALSO
 
@@ -511,9 +583,7 @@ L<PSGI>
 =head1 SOURCE
 
 The development version is on github at L<https://github.com/robrwo/Plack-Middleware-Statsd>
-and may be cloned from L<git://github.com/robrwo/Plack-Middleware-Statsd.git>
-
-Please see F<CONTRIBUTING.md> for more information on how to contribute to this project.
+and may be cloned from L<https://github.com/robrwo/Plack-Middleware-Statsd.git>
 
 =head1 SUPPORT
 
@@ -536,14 +606,14 @@ then see F<SECURITY.md> for instructions how to report security vulnerabilities.
 
 =head1 AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 The initial development of this module was sponsored by Science Photo
 Library L<https://www.sciencephoto.com>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2025 by Robert Rothenberg.
+This software is Copyright (c) 2018-2026 by Robert Rothenberg.
 
 This is free software, licensed under:
 

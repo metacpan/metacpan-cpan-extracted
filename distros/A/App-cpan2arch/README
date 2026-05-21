@@ -1,0 +1,67 @@
+App::cpan2arch
+
+cpan2arch is a command-line utility that generates an Arch Linux "PKGBUILD"
+based on module/distribution metadata. It relies on the MetaCPAN API to fetch
+metadata and the Official repositories web interface + Aurweb RPC interface for
+Arch Linux packages information.
+
+Warnings about flagged out-of-date packages, missing packages, license problems,
+and other issues are added as comments in the "PKGBUILD" to inform the packager.
+
+The generated "PKGBUILD" follows Perl package guidelines and is printed to
+"STDOUT" by default, unless --update or --write is passed.
+
+See "PKGBUILD EXAMPLE" in App::cpan2arch::WritePkgbuild.
+
+NOTE
+
+This tool is intended to ease the maintenance of Perl packages through
+automation, but blindly relying on it is not recommended since distributions
+might depend on external libraries or even have wrong metadata, thus manual
+inspection is always advised.
+
+OPTIONAL DEPENDENCIES
+
+The following modules are highly recommended for performance but not required:
+
+    Mojo::UserAgent::Cached + CHI
+        Enables caching of HTTP requests to MetaCPAN and Arch Linux APIs.
+        This speeds up repeated queries and reduces server load.
+
+
+INSTALLATION
+
+To download and install this module, use your favorite CPAN client:
+
+    cpanm App::cpan2arch
+
+To do it manually, run the following commands (after downloading and unpacking
+the tarball):
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc
+command:
+
+    perldoc cpan2arch
+    perldoc App::cpan2arch
+
+You can also look for information at:
+
+    GitHub issue tracker (report bugs here)
+        https://github.com/ryoskzypu/App-cpan2arch/issues
+
+    Search CPAN
+        https://metacpan.org/dist/App-cpan2arch
+
+
+COPYRIGHT
+
+Copyright © 2026 ryoskzypu
+MIT-0 License. See LICENSE for details.

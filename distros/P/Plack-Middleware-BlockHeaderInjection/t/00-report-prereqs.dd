@@ -17,6 +17,7 @@ do { my $x = {
                                       'Pod::Markdown::Github' => '0',
                                       'Software::Security::Policy::Individual' => '0.10',
                                       'Test::CVE' => '0.08',
+                                      'Test::DistManifest' => '0',
                                       'Test::EOF' => '0',
                                       'Test::EOL' => '0',
                                       'Test::Fixme' => '0',

@@ -6,7 +6,6 @@ build_requires:
   JSON::PP: '0'
   Test::Exception: '0.29'
   Test::More: '1.302015'
-  lib::relative: '0'
 configure_requires:
   ExtUtils::MakeMaker: '7'
 dynamic_config: 1
@@ -30,4 +29,4 @@ requires:
 resources:
   bugtracker: https://github.com/dallaylaen/resource-silo-p5/issues
   repository: https://github.com/dallaylaen/resource-silo-p5.git
-version: '0.1502'
+version: '0.1703'

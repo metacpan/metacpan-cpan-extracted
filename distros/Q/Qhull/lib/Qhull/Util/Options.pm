@@ -8,7 +8,7 @@ use warnings;
 use experimental 'signatures', 'lexical_subs', 'declared_refs';
 use Log::Any '$log';
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use parent 'Exporter::Tiny';
 
@@ -1129,7 +1129,7 @@ Qhull::Util::Options - Options for Qhull and gang
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 

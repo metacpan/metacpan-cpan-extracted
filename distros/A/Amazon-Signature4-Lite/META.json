@@ -1,0 +1,68 @@
+{
+   "abstract" : "Amazon::Signature4::Lite",
+   "author" : [
+      "Rob Lauer <rclauer@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Amazon-Signature4-Lite",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::SHA" : "6.04",
+            "URI::Escape" : "5.34",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Amazon::Signature4::Lite" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Amazon::Signature4::Lite" : {
+         "file" : "lib/Amazon/Signature4/Lite.pm",
+         "version" : "v1.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "rclauer@gmail.com",
+         "web" : "https://github.com/rlauer6/Amazon-Signature4-Lite/issues"
+      },
+      "homepage" : "https://github.com/rlauer6/Amazon-Signature4-Lite",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/rlauer6/Amazon-Signature4-Lite"
+      }
+   },
+   "version" : "v1.0.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

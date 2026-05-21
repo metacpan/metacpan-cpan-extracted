@@ -1,5 +1,21 @@
 Revision history for Physics-Ellipsometry-VASE
 
+1.00    2025-07-21
+	- Major release: built-in optical modelling toolkit
+	- VASE::TMM — Transfer Matrix Method with physics sign convention
+	- VASE::Dispersion — Cauchy, Sellmeier, Tauc-Lorentz, Drude, GenOsc
+	- VASE::EMA — Linear, Bruggeman, Maxwell-Garnett mixing rules
+	- VASE::Materials — .mat file loader with eV/nm unit handling
+	- VASE::Parameter — bounded parameters with logit transform, vary/fix
+	- VASE::Optimizer — Differential Evolution and grid search
+	- Circular Delta residuals in fit() for proper 0°/360° wrap handling
+	- Configurable LM: deriv_step, min_deriv_step, maxiter, eps
+	- Added mse() method for Mean Squared Error calculation
+	- Updated README with full submodule documentation
+
+0.03    2026-04-13
+	- Moved gnuplot legend to outside right of plot area.
+
 0.02    2026-04-03
         - Auto-detect and parse J.A. Woollam VASE instrument files
         - Weighted fitting using measured sigma columns from Woollam data

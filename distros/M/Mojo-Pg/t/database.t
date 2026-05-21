@@ -10,6 +10,7 @@ use Mojo::IOLoop;
 use Mojo::JSON qw(true);
 use Mojo::Pg;
 use Mojo::Promise;
+use Mojo::SQL qw(sql);
 use Scalar::Util qw(refaddr);
 
 my $pg = Mojo::Pg->new($ENV{TEST_ONLINE});
@@ -27,6 +28,11 @@ subtest 'Custom search_path' => sub {
 subtest 'Blocking select' => sub {
   is_deeply $pg->db->query('SELECT 1 AS one, 2 AS two, 3 AS three')->hash, {one => 1, two => 2, three => 3},
     'right structure';
+};
+
+subtest 'Mojo::SQL statement' => sub {
+  my $sql = sql('SELECT ?::INT AS one, ?::INT AS two', 1, 2);
+  is_deeply $pg->db->query($sql)->hash, {one => 1, two => 2}, 'right structure';
 };
 
 subtest 'Non-blocking select' => sub {
@@ -336,6 +342,27 @@ subtest 'CLean up non-blocking query' => sub {
   $db->disconnect;
   undef $db;
   is $fail, 'Premature connection close', 'right error';
+};
+
+subtest 'Non-blocking query with connection terminated mid-query' => sub {
+  my ($fail, $count);
+  my $db  = $pg->db;
+  my $pid = $db->query('SELECT pg_backend_pid() AS pid')->hash->{pid};
+  $count = 0;
+  $db->query(
+    'SELECT pg_sleep(10)' => sub {
+      my ($db, $err, $results) = @_;
+      $count++;
+      $fail = $err;
+      Mojo::IOLoop->stop;
+    }
+  );
+  Mojo::IOLoop->timer(0.1 => sub { $pg->db->query("SELECT pg_terminate_backend($pid)") });
+  my $timeout = Mojo::IOLoop->timer(5 => sub { Mojo::IOLoop->stop });
+  Mojo::IOLoop->start;
+  Mojo::IOLoop->remove($timeout);
+  is $count, 1, 'callback called exactly once';
+  ok $fail, 'error propagated';
 };
 
 done_testing();

@@ -1,10 +1,10 @@
 {
    "abstract" : "send statistics to statsd",
    "author" : [
-      "Robert Rothenberg <rrwo@cpan.org>"
+      "Robert Rothenberg <perl@rhizomnic.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "PSGI",
       "Plack",
@@ -40,6 +40,7 @@
             "IPC::Open3" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Markdown::Github" : "0",
+            "Pod::Wordlist" : "0",
             "Software::Security::Policy::Individual" : "0.10",
             "Test2::Require::AuthorTesting" : "0",
             "Test2::Tools::Basic" : "1.302200",
@@ -62,6 +63,7 @@
             "Test::Pod::Coverage" : "1.08",
             "Test::Pod::LinkCheck" : "0",
             "Test::Portability::Files" : "0",
+            "Test::Spelling" : "0.17",
             "Test::TrailingSpace" : "0.0203",
             "Test::Vars" : "0",
             "Test::Version" : "1",
@@ -76,9 +78,11 @@
             "Ref::Util::XS" : "0"
          },
          "requires" : {
+            "Digest::SHA" : "5.96",
             "List::Util" : "0",
             "Plack::Middleware" : "0",
             "Ref::Util" : "0",
+            "Scalar::Util" : "0",
             "Time::HiRes" : "0",
             "Try::Tiny" : "0",
             "experimental" : "0",
@@ -118,7 +122,7 @@
    "provides" : {
       "Plack::Middleware::Statsd" : {
          "file" : "lib/Plack/Middleware/Statsd.pm",
-         "version" : "v0.8.2"
+         "version" : "v0.9.3"
       }
    },
    "release_status" : "stable",
@@ -133,10 +137,10 @@
          "web" : "https://github.com/robrwo/Plack-Middleware-Statsd"
       }
    },
-   "version" : "v0.8.2",
+   "version" : "v0.9.3",
    "x_authority" : "cpan:RRWO",
-   "x_generated_by_perl" : "v5.34.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_generated_by_perl" : "v5.42.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

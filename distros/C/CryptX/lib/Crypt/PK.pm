@@ -2,7 +2,7 @@ package Crypt::PK;
 
 use strict;
 use warnings;
-our $VERSION = '0.088';
+our $VERSION = '0.089';
 
 use Carp;
 
@@ -29,5 +29,23 @@ sub _ssh_parse {
 =head1 NAME
 
 Crypt::PK - [internal only]
+
+=head1 SYNOPSIS
+
+Do not use this module directly.
+
+Use a concrete public-key module instead.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<CryptX>
+
+=item * L<Crypt::PK::RSA>, L<Crypt::PK::ECC>, L<Crypt::PK::DSA>, L<Crypt::PK::DH>
+
+=item * L<Crypt::PK::Ed25519>, L<Crypt::PK::Ed448>, L<Crypt::PK::X25519>, L<Crypt::PK::X448>
+
+=back
 
 =cut

@@ -1,0 +1,6 @@
+<%INIT>
+$Catalog->{Attachment} = loc("Attachment");
+</%INIT>
+<%ARGS>
+$Catalog
+</%ARGS>

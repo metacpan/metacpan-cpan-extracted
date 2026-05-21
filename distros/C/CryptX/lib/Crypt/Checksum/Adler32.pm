@@ -2,7 +2,7 @@ package Crypt::Checksum::Adler32;
 
 use strict;
 use warnings;
-our $VERSION = '0.088';
+our $VERSION = '0.089';
 
 use base qw(Crypt::Checksum Exporter);
 our %EXPORT_TAGS = ( all => [qw( adler32_data adler32_data_hex adler32_data_int adler32_file adler32_file_hex adler32_file_int )] );
@@ -31,33 +31,36 @@ Crypt::Checksum::Adler32 - Compute Adler32 checksum
    use Crypt::Checksum::Adler32 ':all';
 
    # calculate Adler32 checksum from string/buffer
-   $checksum_raw  = adler32_data($data);
-   $checksum_hex  = adler32_data_hex($data);
-   $checksum_int  = adler32_data_int($data);
-   # calculate Adler32 checksum from file
-   $checksum_raw  = adler32_file('filename.dat');
-   $checksum_hex  = adler32_file_hex('filename.dat');
-   $checksum_int  = adler32_file_int('filename.dat');
-   # calculate Adler32 checksum from filehandle
-   $checksum_raw  = adler32_file(*FILEHANDLE);
-   $checksum_hex  = adler32_file_hex(*FILEHANDLE);
-   $checksum_int  = adler32_file_int(*FILEHANDLE);
+   my $data = 'data string';
+   my $checksum_raw  = adler32_data($data);
+   my $checksum_hex  = adler32_data_hex($data);
+   my $checksum_int  = adler32_data_int($data);
+   # or from file
+   my $checksum_file_raw  = adler32_file('filename.dat');
+   my $checksum_file_hex  = adler32_file_hex('filename.dat');
+   my $checksum_file_int  = adler32_file_int('filename.dat');
+   # or from filehandle
+   my $filehandle = ...; # existing binary-mode filehandle
+   my $checksum_fh_raw  = adler32_file($filehandle);
+   my $checksum_fh_hex  = adler32_file_hex($filehandle);
+   my $checksum_fh_int  = adler32_file_int($filehandle);
 
    ### OO interface:
    use Crypt::Checksum::Adler32;
 
-   $d = Crypt::Checksum::Adler32->new;
+   my $d = Crypt::Checksum::Adler32->new;
    $d->add('any data');
    $d->add('another data');
-   $d->addfile('filename.dat');
-   $d->addfile(*FILEHANDLE);
-   $checksum_raw  = $d->digest;     # raw 4 bytes
-   $checksum_hex  = $d->hexdigest;  # hexadecimal form
-   $checksum_int  = $d->intdigest;  # 32bit unsigned integer
+   my $checksum_raw  = $d->digest;     # raw 4 bytes
+   my $checksum_hex  = $d->hexdigest;  # hexadecimal form
+   my $checksum_int  = $d->intdigest;  # 32-bit unsigned integer
+
+   # or checksum a file instead
+   my $checksum_file_raw = Crypt::Checksum::Adler32->new->addfile('filename.dat')->digest;
 
 =head1 DESCRIPTION
 
-Calculating Adler32 checksums.
+Computes Adler-32 checksums.
 
 I<Updated: v0.057>
 
@@ -77,51 +80,59 @@ Or all of them at once:
 
 =head2 adler32_data
 
-Returns checksum as raw octects.
+Returns the checksum as raw octets.
 
- $checksum_raw = adler32_data('data string');
+ my $checksum_raw = adler32_data('data string');
  #or
- $checksum_raw = adler32_data('any data', 'more data', 'even more data');
+ my $checksum_raw = adler32_data('any data', 'more data', 'even more data');
 
 =head2 adler32_data_hex
 
 Returns checksum as a hexadecimal string.
 
- $checksum_hex = adler32_data_hex('data string');
+ my $checksum_hex = adler32_data_hex('data string');
  #or
- $checksum_hex = adler32_data_hex('any data', 'more data', 'even more data');
+ my $checksum_hex = adler32_data_hex('any data', 'more data', 'even more data');
 
 =head2 adler32_data_int
 
-Returns checksum as unsigned 32bit integer.
+Returns checksum as unsigned 32-bit integer.
 
- $checksum_int = adler32_data_int('data string');
+ my $checksum_int = adler32_data_int('data string');
  #or
- $checksum_int = adler32_data_int('any data', 'more data', 'even more data');
+ my $checksum_int = adler32_data_int('any data', 'more data', 'even more data');
+
+Each C<adler32_data*> function converts its data arguments to bytes using
+Perl's usual scalar stringification. Defined scalars, including numbers and
+string-overloaded objects, are accepted. C<undef> is treated as an empty
+string and may emit Perl's usual "uninitialized value" warning.
 
 =head2 adler32_file
 
-Returns checksum as raw octects.
+Returns the checksum as raw octets.
 
- $checksum_raw = adler32_file('filename.dat');
+ my $checksum_raw = adler32_file('filename.dat');
  #or
- $checksum_raw = adler32_file(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $checksum_raw = adler32_file($filehandle);
 
 =head2 adler32_file_hex
 
 Returns checksum as a hexadecimal string.
 
- $checksum_hex = adler32_file_hex('filename.dat');
+ my $checksum_hex = adler32_file_hex('filename.dat');
  #or
- $checksum_hex = adler32_file_hex(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $checksum_hex = adler32_file_hex($filehandle);
 
 =head2 adler32_file_int
 
-Returns checksum as unsigned 32bit integer.
+Returns checksum as unsigned 32-bit integer.
 
- $checksum_int = adler32_file_int('filename.dat');
+ my $checksum_int = adler32_file_int('filename.dat');
  #or
- $checksum_int = adler32_file_int(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $checksum_int = adler32_file_int($filehandle);
 
 =head1 METHODS
 
@@ -129,7 +140,7 @@ Returns checksum as unsigned 32bit integer.
 
 Constructor, returns a reference to the checksum object.
 
- $d = Crypt::Checksum::Adler32->new;
+ my $d = Crypt::Checksum::Adler32->new;
 
 =head2 clone
 
@@ -148,6 +159,11 @@ Reinitialize the checksum object state and returns a reference to the checksum o
 All arguments are appended to the message we calculate checksum for.
 The return value is the checksum object itself.
 
+Each argument is converted to bytes using Perl's usual scalar stringification.
+Defined scalars, including numbers and string-overloaded objects, are accepted.
+C<undef> is treated as an empty string and may emit Perl's usual
+"uninitialized value" warning.
+
  $d->add('any data');
  #or
  $d->add('any data', 'more data', 'even more data');
@@ -159,33 +175,38 @@ The return value is the checksum object itself.
 
  $d->addfile('filename.dat');
  #or
- $d->addfile(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ $d->addfile($filehandle);
 
-B<BEWARE:> You have to make sure that the filehandle is in binary mode before you pass it as argument to the addfile() method.
+B<Note:> The filehandle must be in binary mode before you pass it to C<addfile()>.
 
 =head2 digest
 
 Returns the binary checksum (raw bytes).
+This method does not alter the object state, so you can call it
+repeatedly and continue with C<add()> or C<addfile()> afterwards.
 
- $result_raw = $d->digest();
+ my $result_raw = $d->digest();
 
 =head2 hexdigest
 
 Returns the checksum encoded as a hexadecimal string.
+Like C<digest()>, this method does not alter the object state.
 
- $result_hex = $d->hexdigest();
+ my $result_hex = $d->hexdigest();
 
 =head2 intdigest
 
-Returns the checksum encoded as unsigned 32bit integer.
+Returns the checksum encoded as unsigned 32-bit integer.
+Like C<digest()>, this method does not alter the object state.
 
- $result_int = $d->intdigest();
+ my $result_int = $d->intdigest();
 
 =head1 SEE ALSO
 
 =over
 
-=item * L<CryptX|CryptX>
+=item * L<CryptX>
 
 =item * L<https://en.wikipedia.org/wiki/Adler-32>
 

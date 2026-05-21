@@ -2,32 +2,21 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
-use POSIX qw(_exit);
+use lib 'xt/lib';
+use EVNatsHelpers qw(nats_bin_or_skip free_port spawn_nats);
 use EV;
 use EV::Nats;
 
-my $nats_bin = '/usr/sbin/nats-server';
-$nats_bin = `which nats-server 2>/dev/null` unless -x $nats_bin;
-chomp $nats_bin;
-unless (-x $nats_bin) {
-    plan skip_all => "nats-server not found";
-}
+my $nats_bin = nats_bin_or_skip();
 
 plan tests => 4;
 
-my $tmp = tempdir(CLEANUP => 1);
-my $port = 24421;
+my $tmp  = tempdir(CLEANUP => 1);
+my $port = free_port();
 
 sub start_server {
-    my $pid = fork;
-    die "fork: $!" unless defined $pid;
-    if ($pid == 0) {
-        exec $nats_bin, '-p', $port, '-a', '127.0.0.1',
-             '--pid', "$tmp/nats.pid";
-        _exit(1);
-    }
-    sleep 1;
-    return $pid;
+    return spawn_nats($nats_bin, '-p', $port, '-a', '127.0.0.1',
+                                   '--pid', "$tmp/nats.pid");
 }
 
 my $srv_pid = start_server();

@@ -51,34 +51,31 @@
          }
       },
       "test" : {
-         "requires" : {
-            "Test::More" : "0"
-         }
+         "requires" : {}
       }
    },
    "provides" : {
       "DarkPAN::Utils" : {
          "file" : "lib/DarkPAN/Utils.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.1.0"
       },
       "DarkPAN::Utils::Docs" : {
          "file" : "lib/DarkPAN/Utils/Docs.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.1.0"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
          "mailto" : "rclauer@gmail.com",
-         "web" : "http://github.com/rlauer6/DarkPAN-Utils"
+         "web" : "https://github.com/rlauer6/DarkPAN-Utils/issues"
       },
-      "homepage" : "http://github.com/rlauer6/DarkPAN-Utils",
+      "homepage" : "https://github.com/rlauer6/DarkPAN-Utils",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/rlauer6/DarkPAN-Utils.git",
-         "web" : "http://github.com/rlauer6/DarkPAN-Utils"
+         "web" : "https://github.com/rlauer6/DarkPAN-Utils"
       }
    },
-   "version" : "v1.0.0",
+   "version" : "v1.1.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

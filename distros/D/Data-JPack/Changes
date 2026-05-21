@@ -1,4 +1,18 @@
 Revision history for Perl extension Data::JPack.
+v0.3.0 2026-04-21
+  [features]
+    - add css and javascript minification support
+    - add CSS::Minifier::XS and JavaScript::Minifier::XS as deps
+    - Add (poor) documentation
+  
+  [fixes]
+    - Return list of paths when bootstrapped file exists
+
+v0.2.3 2026-02-27
+  [fixes]
+    - JS More readable loading display in client
+    - PERL Add base template class for re-usability
+    - localize_table now works as expected
 
 v0.2.2 2025-10-01
   [fixes]

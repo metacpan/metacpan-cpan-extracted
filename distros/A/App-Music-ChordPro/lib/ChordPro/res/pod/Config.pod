@@ -476,25 +476,6 @@
             preprocess.ly : []
         }
     
-        // Embedding Strums. EXPERIMENTAL
-        strum {
-    
-            // The result produced by the delegate handler.
-            type : none
-    
-            // The module's method to call.
-            handler : none
-    
-            // Specific settings for the PDF backend.
-            pdf {
-                handler : strum2xo
-                type    : image
-            }
-    
-            // The name of the (perl) module that implements the delegate.
-            module : Strum
-        }
-    
         // Embedding SVG.
         svg {
     

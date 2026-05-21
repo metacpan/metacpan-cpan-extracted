@@ -45,7 +45,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.237';
+our $VERSION = '1.238';
 
 use Quiq::Path;
 use Quiq::PerlModule;
@@ -490,7 +490,11 @@ sub visualize {
 
     (my $logFile = $outFile) =~ s/\..*/.log/;
 
+    my $p = Quiq::Path->new;
     my $sh = Quiq::Shell->new(log=>$verbose);
+
+    # Wir erzeugen die Ausgabedatei auf jeden Fall neu
+    $p->delete($outFile);
 
     my $cmd;
     my $javaExe = $self->javaExe;
@@ -510,7 +514,6 @@ sub visualize {
     # wir die Outdatei, da diese dann ggf. fehlerhaft ist (die PDF-Datei
     # is dann korrupt) und kehren zurück.
 
-    my $p = Quiq::Path->new;
     my $logData = $p->read($logFile);
     if ($logData =~ /Exception/i) {
         $p->delete($outFile);
@@ -673,7 +676,7 @@ sub mustangDir {
 
 =head1 VERSION
 
-1.237
+1.238
 
 =head1 AUTHOR
 

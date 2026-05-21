@@ -1,16 +1,19 @@
-bin/cli-simple-example
-bin/create-modulino
-bin/modulino
+bin/cli-simple
+bin/create-modulino.pl
 ChangeLog
 lib/CLI/Simple.pm
 lib/CLI/Simple/Constants.pm
+lib/CLI/Simple/DumpSpec.pm
+lib/CLI/Simple/Helpers.pm
+lib/CLI/Simple/Migrate.pm
+lib/CLI/Simple/Scaffold.pm
+lib/CLI/Simple/Shell.pm
 lib/CLI/Simple/Utils.pm
-LICENSE
 Makefile.PL
 MANIFEST			This list of files
-README
+MANIFEST.SKIP
+postamble
 README.md
-share/MyScript.pm
 t/00-cli-simple-constants.t
 t/00-cli-simple-utils.t
 t/00-cli-simple.t
@@ -20,5 +23,6 @@ t/03-cli-simple-types.t
 t/04-cli-simple-help.t
 t/05-cli-simple-args.t
 t/06-cli-simple-default.t
+t/cli-simple-manifest.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

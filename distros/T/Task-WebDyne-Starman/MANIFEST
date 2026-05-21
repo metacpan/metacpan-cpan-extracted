@@ -6,6 +6,7 @@ Makefile.PL
 README
 README.md
 lib/Task/WebDyne/Starman.pm
+lib/Task/WebDyne/Starman.pm.sha
 cpanfile                                 
 lib/Task/WebDyne/Starman.pm.md           
 META.yml                                 Module YAML meta-data (added by MakeMaker)

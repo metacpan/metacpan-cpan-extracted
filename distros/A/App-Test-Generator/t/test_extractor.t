@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::DescribeMe qw(extended);	# New features
+# use Test::DescribeMe qw(extended);	# New features
 use Test::Most;
 use File::Temp qw(tempdir);
 use File::Spec;

@@ -1,3 +1,9 @@
+1.901   2025/05/21
+- fix packaging
+
+1.900   2025/05/19
+- added support for reading secrets from stdin
+
 1.801   2025/01/23
 - fix rt#158598
 

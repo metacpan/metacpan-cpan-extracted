@@ -11,7 +11,6 @@ inc/Module/Install/ReadmeFromPod.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 inc/Test/More.pm
-inc/Test/Warn.pm
 lib/Parallel/Scoreboard.pm
 lib/Parallel/Scoreboard/PSGI/App.pm
 lib/Parallel/Scoreboard/PSGI/App/JSON.pm
@@ -21,3 +20,4 @@ META.yml
 README
 t/00base.t
 t/01destroy.t
+t/02read_all_ignores_tmp.t

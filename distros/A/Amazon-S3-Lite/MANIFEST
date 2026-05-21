@@ -1,0 +1,12 @@
+ChangeLog
+lib/Amazon/S3/Lite.pm
+lib/Amazon/S3/Lite/Credentials.pm
+lib/Amazon/S3/Lite/Logger.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+share/README.md
+t/00-amazon-s3-lite.t
+t/01-s3-lite.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

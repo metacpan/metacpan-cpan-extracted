@@ -2,7 +2,7 @@
 #define CHANDRA_SOCKET_CLIENT_H
 
 /*
- * chandra_socket_client.h — C helpers for Chandra::Socket::Client
+ * chandra_socket_client.h - C helpers for Chandra::Socket::Client
  *
  * Static functions for connect, poll, and reconnect.
  * Depends on chandra_socket_common.h for shared utilities.

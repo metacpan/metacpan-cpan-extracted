@@ -55,13 +55,13 @@ sub _load_rc
 {
     my %cfg;
     my $rc = $ENV{MM_RC} || do{ ( $ENV{HOME} // '' ) . '/.mailmakerc' };
-    return( %cfg ) unless( -f $rc );
+    return( %cfg ) unless( -f( $rc ) );
     open( my $fh, '<', $rc ) or return( %cfg );
     my $section = '';
     while( my $line = <$fh> )
     {
         chomp( $line );
-        $line =~ s/\s*#.*$//;        # strip comments
+        $line =~ s/\s*#.*$//;  # strip comments
         next unless( length( $line ) );
         if( $line =~ /^\[(\w+)\]$/ )
         {
@@ -97,10 +97,10 @@ my %smtp_common = (
     Hello => $hello,
     Debug => $debug,
 );
-$smtp_common{StartTLS} = 1             if( $starttls );
-$smtp_common{SSL}      = 1             if( $use_ssl );
-$smtp_common{Username} = $username     if( defined( $username ) && length( $username ) );
-$smtp_common{Password} = $password     if( defined( $password ) && length( $password ) );
+$smtp_common{StartTLS} = 1         if( $starttls );
+$smtp_common{SSL}      = 1         if( $use_ssl );
+$smtp_common{Username} = $username if( defined( $username ) && length( $username ) );
+$smtp_common{Password} = $password if( defined( $password ) && length( $password ) );
 
 # NOTE: Skip gracefully if not configured
 unless( defined( $from ) && length( $from ) &&
@@ -127,7 +127,7 @@ subtest 'live: plain-text message delivered' => sub
 
     diag( $mail->error ) if( !defined( $rv ) && $mail->error );
     ok( defined( $rv ), 'plain-text message accepted by server' );
-    ok( ref( $rv ) eq 'ARRAY' && scalar( @{ $rv } ) > 0,
+    ok( ref( $rv ) eq 'ARRAY' && scalar( @$rv ) > 0,
         'smtpsend() returns non-empty arrayref of delivered addresses' );
 };
 
@@ -188,8 +188,7 @@ subtest 'live: Bcc recipient included in envelope, stripped from headers' => sub
     {
         $check_entity->headers->remove( 'Bcc' );
         my $str = $check_entity->as_string;
-        ok( defined( $str ) && $str !~ /^Bcc:/mi,
-            'Bcc header absent from transmitted message' );
+        ok( defined( $str ) && $str !~ /^Bcc:/mi, 'Bcc header absent from transmitted message' );
     }
     else
     {

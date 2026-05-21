@@ -97,7 +97,7 @@ my $signature = $session->sign('sha256-rsa-pkcs-pss', $private_key, $plain_text)
 ok $session->verify('sha256-rsa-pkcs-pss', $public_key, $plain_text, $signature), 'rsa-pss verified';
 }
 
-my $attributes = $public_key->get_attributes([ 'modulus', 'public_exponent' ]);
+my $attributes = $public_key->get_attributes('modulus', 'public_exponent');
 
 is length($attributes->{modulus}->to_bytes), 256, 'modulus is 2024 bits';
 is $attributes->{public_exponent}, 65537, 'public exponent is 65537';

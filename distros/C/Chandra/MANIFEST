@@ -9,6 +9,7 @@ examples/chat_hub.pl
 examples/chat_window.pl
 examples/clipboard_example.pl
 examples/contextmenu_example.pl
+examples/counter.pl
 examples/counter_app.pl
 examples/devtools_example.pl
 examples/dialog_example.pl
@@ -18,7 +19,9 @@ examples/form_example.pl
 examples/hot_reload_content.html
 examples/hot_reload_example.pl
 examples/log_example.pl
+examples/modal.pl
 examples/multiwindow_example.pl
+examples/nav.pl
 examples/pack_example/app.pl
 examples/pack_example/assets/README
 examples/pack_example/lib/PackedCounter.pm
@@ -29,6 +32,7 @@ examples/socket_ipc_example.pl
 examples/splash_example.pl
 examples/splash_simple.pl
 examples/store_example.pl
+examples/table.pl
 examples/tray_example.pl
 include/chandra/chandra.h
 include/chandra/chandra_assets.h
@@ -63,10 +67,12 @@ lib/Chandra.pm
 lib/Chandra/App.pm
 lib/Chandra/Assets.pm
 lib/Chandra/Bind.pm
+lib/Chandra/Breadcrumb.pm
 lib/Chandra/Bridge.pm
 lib/Chandra/Bridge/Extension.pm
 lib/Chandra/Canvas.pm
 lib/Chandra/Clipboard.pm
+lib/Chandra/Component.pm
 lib/Chandra/ContextMenu.pm
 lib/Chandra/DevTools.pm
 lib/Chandra/Dialog.pm
@@ -75,8 +81,11 @@ lib/Chandra/Element.pm
 lib/Chandra/Error.pm
 lib/Chandra/Event.pm
 lib/Chandra/Form.pm
+lib/Chandra/Form/Validator.pm
 lib/Chandra/HotReload.pm
 lib/Chandra/Log.pm
+lib/Chandra/Modal.pm
+lib/Chandra/Nav.pm
 lib/Chandra/Notify.pm
 lib/Chandra/Pack.pm
 lib/Chandra/Protocol.pm
@@ -87,6 +96,10 @@ lib/Chandra/Socket/Hub.pm
 lib/Chandra/Socket/Token.pm
 lib/Chandra/Splash.pm
 lib/Chandra/Store.pm
+lib/Chandra/Table.pm
+lib/Chandra/Tabs.pm
+lib/Chandra/Theme.pm
+lib/Chandra/Toast.pm
 lib/Chandra/Tray.pm
 lib/Chandra/Window.pm
 Makefile.PL
@@ -161,6 +174,13 @@ t/65_token.t
 t/66_token_edge.t
 t/67_bridge_ext.t
 t/68_bridge_ext_edge.t
+t/70_component.t
+t/74_table.t
+t/76_theme.t
+t/77_toast.t
+t/78_modal.t
+t/79_validation.t
+t/80_nav.t
 t/lib/Chandra/Test/Display.pm
 typemap
 xs/app.xs
@@ -181,6 +201,7 @@ xs/event.xs
 xs/form.xs
 xs/hotreload.xs
 xs/log.xs
+xs/modal.xs
 xs/notify.xs
 xs/protocol.xs
 xs/shortcut.xs
@@ -190,5 +211,6 @@ xs/socket_hub.xs
 xs/socket_token.xs
 xs/splash.xs
 xs/store.xs
+xs/toast.xs
 xs/tray.xs
 xs/window.xs

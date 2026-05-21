@@ -12,83 +12,83 @@ use TestServer::Reflect ();
 
 my @TESTS = (
     {
-        title   => "Positive Content Length",
-        raw => <<'END_RAW',
+        title => "Positive Content Length",
+        raw   => <<'END_RAW',
 POST /echo HTTP/1.1
 Content-Length: +1
 
 END_RAW
 
-        status  => 400,
-        like    => qr/value must be an unsigned integer/,
+        status => 400,
+        like   => qr/value must be an unsigned integer/,
     },
     {
-        title   => "Negative Content Length",
-        raw     => <<'END_RAW',
+        title => "Negative Content Length",
+        raw   => <<'END_RAW',
 POST /echo HTTP/1.1
 Content-Length: -1
 
 END_RAW
-        status  => 400,
-        like    => qr/value must be an unsigned integer/,
+        status => 400,
+        like   => qr/value must be an unsigned integer/,
     },
     {
-        title   => "Non Integer Content Length",
-        raw     => <<'END_RAW',
+        title => "Non Integer Content Length",
+        raw   => <<'END_RAW',
 POST /echo HTTP/1.1
 Content-Length: 3.14
 
 END_RAW
-        status  => 400,
-        like    => qr/value must be an unsigned integer/,
+        status => 400,
+        like   => qr/value must be an unsigned integer/,
     },
     {
-        title   => "Explicit Content Length ... with exact length",
-        raw     => <<'END_RAW',
+        title => "Explicit Content Length ... with exact length",
+        raw   => <<'END_RAW',
 POST /echo HTTP/1.1
 Content-Length: 8
 
 ABCDEFGH
 END_RAW
-        status  => 200,
-        like    => qr/^ABCDEFGH$/,
+        status => 200,
+        like   => qr/^ABCDEFGH$/,
     },
     {
-        title   => "No Content Length with body ... will be ignored",
-        raw     => <<'END_RAW',
+        title => "No Content Length with body ... will be ignored",
+        raw   => <<'END_RAW',
 POST /echo HTTP/1.1
 
 ABCDEFGH
 END_RAW
-        status  => 200,
-        like    => qr/^$/,
+        status => 200,
+        like   => qr/^$/,
     },
     {
-        title   => "Shorter Content Length ... gets truncated",
-        raw     => <<'END_RAW',
+        title => "Shorter Content Length ... gets truncated",
+        raw   => <<'END_RAW',
 POST /echo HTTP/1.1
 Content-Length: 4
 
 ABCDEFGH
 END_RAW
-        status  => 200,
-        like    => qr/^ABCD$/,
+        status => 200,
+        like   => qr/^ABCD$/,
     },
     {
-        title   => "Different Content Length ... must fail",
-        raw     => <<'END_RAW',
+        title => "Different Content Length ... must fail",
+        raw   => <<'END_RAW',
 POST /echo HTTP/1.1
 Content-Length: 8
 Content-Length: 4
 
 ABCDEFGH
 END_RAW
-        status  => 400,
-        like    => qr/values are not the same/,
+        status => 400,
+        like   => qr/values are not the same/,
     },
     {
-        title   => "Longer Content Length ... gets timeout",
-        raw     => <<'END_RAW',
+        title => "Longer Content Length ... gets timeout",
+        raw   => <<'END_RAW',
 POST /echo HTTP/1.1
 Content-Length: 9
 
@@ -99,7 +99,7 @@ END_RAW
 );
 
 my $daemon = TestServer::Reflect->new;
-my $url = $daemon->start;
+my $url    = $daemon->start;
 
 my $addr = $url->host;
 my $port = $url->port;
@@ -132,11 +132,9 @@ for my $test (@TESTS) {
 
     ok $raw_res, $test->{title};
 
-    is $res->code, $test->{status},
-        "... and has expected status";
+    is $res->code, $test->{status}, "... and has expected status";
 
-    like $res->content, $test->{like},
-        "... and body does match"
+    like $res->content, $test->{like}, "... and body does match"
         if $test->{like};
 }
 

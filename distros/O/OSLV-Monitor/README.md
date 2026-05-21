@@ -4,10 +4,12 @@ OS level virtualization monitoring extend for LibreNMS
 
 ## Install
 
+`JSON::XS` is not a hard requirement, but it does drastically speed it up, especially on FreeBSD.
+
 #### FreeBSD
 
 ```shell
-pkg install p5-JSON p5-Mime-Base64 p5-Clone p5-File-Slurp p5-IO-Interface
+pkg install p5-JSON p5-JSON-XS p5-Mime-Base64 p5-Clone p5-File-Slurp p5-IO-Interface
 perl Makefile.pl
 make
 make test
@@ -17,14 +19,20 @@ make install
 or...
 
 ```shell
-pkg install p5-JSON p5-Mime-Base64 p5-Clone p5-File-Slurp p5-IO-Interface p5-App-cpanminus
+pkg install p5-JSON  p5-JSON-XS p5-Mime-Base64 p5-Clone p5-File-Slurp p5-IO-Interface p5-App-cpanminus
 cpanm OSLV::Monitor
+```
+
+or...
+
+```shell
+pkg install p5-OSLV-Monitor
 ```
 
 #### Debian
 
 ```shell
-apt-get install libjson-perl libclone-perl libmime-base64-perl libfile-slurp-perl libio-interface-perl
+apt-get install libjson-perl libjson-xs-perl libclone-perl libmime-base64-perl libfile-slurp-perl libio-interface-perl
 perl Makefile.pl
 make
 make test
@@ -34,7 +42,7 @@ make install
 or...
 
 ```shell
-apt-get install libjson-perl libclone-perl libmime-base64-perl libfile-slurp-perl libio-interface-perl cpanminus
+apt-get install libjson-perl libjson-xs-perl libclone-perl libmime-base64-perl libfile-slurp-perl libio-interface-perl cpanminus
 cpanm OSLV::Monitor
 ```
 
@@ -64,7 +72,7 @@ The following keys are used in the JSON config file.
     - include :: A array of regular expressions to include.
         Default :: ["^.*$"]
 
-    - exlcude :: A array of regular expressions to exlclude.
+    - exclude :: A array of regular expressions to exlclude.
         Default :: undef
 
     - backend :: Override the the backend and automatically choose it.

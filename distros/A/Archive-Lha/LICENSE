@@ -1,0 +1,28 @@
+This software is based on multiple works with the following copyrights:
+
+  Copyright (C) 2007-2009 by Kenichi Ishigaki (Perl XS module)
+  Copyright (C) 2025-2026 by Nicolas Mendoza (maintenance and extensions)
+
+The XS/C decompression code is derived from LHa for UNIX and related works:
+
+  Copyright (C) 1993-1995 by Nobutaka Watazaki
+  Copyright (C) 1996-2000 by Tsugio Okamoto
+  Copyright (C) 2002-     by Koji Arai
+
+With contributions from the broader LHa family:
+  Masaru Oki, Yoichi Tagawa, Haruhiko Okumura, Haruyasu Yoshizaki,
+  Kazuhiko Miki, and others.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+For the Perl license, see https://dev.perl.org/licenses/ which states:
+
+  This program is free software; you can redistribute it and/or modify
+  it under the terms of either:
+
+    a) the GNU General Public License as published by the Free Software
+       Foundation; either version 1, or (at your option) any later
+       version, or
+
+    b) the "Artistic License" which comes with Perl.

@@ -69,3 +69,4 @@
 Object-.*
 .test-script-*
 typescript
+mutation.json

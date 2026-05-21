@@ -1,11 +1,10 @@
 #!/usr/bin/env perl
 #
 # Example: Mirror an etcd prefix into a local nested hash using Data::Path::XS
+# (optional CPAN module — install separately to run this example).
 #
 # etcd keys like /myapp/db/host -> "localhost" become:
 #   $config = { db => { host => "localhost" } }
-#
-# Data::Path::XS builds the tree incrementally from watch events.
 #
 use strict;
 use warnings;

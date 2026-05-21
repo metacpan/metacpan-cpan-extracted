@@ -11,6 +11,9 @@ build_requires:
   Scalar::Util: '0'
   Test::DescribeMe: '0'
   Test::Most: '0'
+  Test::Needs: '0'
+  Test::Returns: '0'
+  Test::Which: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
@@ -26,6 +29,7 @@ no_index:
     - inc
 requires:
   IO::Socket::INET: '0'
+  IPC::System::Simple: '0'
   MIME::Base64: '0'
   MIME::QuotedPrint: '0'
   Object::Configure: '0'
@@ -33,10 +37,12 @@ requires:
   Params::Validate::Strict: '0'
   Readonly::Values::Months: '0'
   Socket: '0'
+  Time::Piece: '0'
+  autodie: '0'
   perl: '5.010'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Email-Abuse-Investigator
   homepage: https://metacpan.org/pod/Email::Abuse::Investigator
   repository: git://github.com/nigelhorne/Email-Abuse-Investigator.git
-version: '0.07'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

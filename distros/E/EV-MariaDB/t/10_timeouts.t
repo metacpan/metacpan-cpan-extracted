@@ -85,7 +85,12 @@ with_mariadb(cb => sub {
 with_mariadb(cb => sub {
     $m->q("set wait_timeout=1", sub {
         my (undef, $err) = @_;
-        die "set: $err" if $err;
+        if ($err) {
+            fail("wait_timeout: set wait_timeout=1 failed: $err");
+            fail("wait_timeout: set wait_timeout=1 failed: $err");
+            EV::break;
+            return;
+        }
         my $t; $t = EV::timer(3, 0, sub {
             undef $t;
             $m->ping(sub {

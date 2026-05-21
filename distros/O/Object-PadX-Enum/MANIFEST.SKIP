@@ -1,0 +1,126 @@
+# Default EUMM skip patterns
+
+#!start included /usr/share/perl/5.38/ExtUtils/MANIFEST.SKIP
+# Avoid version control files.
+\bRCS\b
+\bCVS\b
+\bSCCS\b
+,v$
+\B\.svn\b
+\B\.git\b
+^\.github\b
+\B\.gitignore\b
+\b_darcs\b
+\B\.cvsignore$
+
+# Avoid VMS specific MakeMaker generated files
+\bDescrip.MMS$
+\bDESCRIP.MMS$
+\bdescrip.mms$
+
+# Avoid Makemaker generated and utility files.
+\bMANIFEST\.bak
+\bMakefile$
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib\.ts$
+\bpm_to_blib$
+\bblibdirs\.ts$
+\b_eumm/
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\b_build/
+\bBuild.bat$
+\bBuild.COM$
+\bBUILD.COM$
+\bbuild.com$
+
+# and Module::Build::Tiny generated files
+\b_build_params$
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+\.tmp$
+\.#
+\.rej$
+\..*\.sw.?$
+
+# Avoid OS-specific files/dirs
+\B\.DS_Store
+\B\._
+\.i[cC]loud$
+
+# Avoid Devel::Cover and Devel::CoverX::Covered files.
+\bcover_db\b
+\bcovered\b
+
+# Avoid prove files
+\B\.prove$
+
+# Avoid MYMETA files
+^MYMETA\.
+
+# Temp files for new META
+^META_new\.(?:json|yml)
+
+# Avoid travis-ci.org file
+^\.travis\.yml
+
+# Avoid AppVeyor file
+^\.?appveyor.yml
+#!end included /usr/share/perl/5.38/ExtUtils/MANIFEST.SKIP
+
+
+# Version control
+^\.git/
+^\.gitignore$
+^\.github/
+
+# Build artefacts
+^Object-PadX-Enum-\d
+^Object-PadX-Enum-.*\.tar\.gz$
+^_build/
+^blib/
+^\.build/
+^Build$
+^Build\.bat$
+^Build\.PL$
+^Makefile$
+^Makefile\.old$
+^pm_to_blib$
+^MYMETA\.
+
+# XS-generated files (regenerated from Enum.xs at build time)
+^lib/Object/PadX/Enum\.c$
+^lib/Object/PadX/Enum\.o$
+^lib/Object/PadX/Enum\.bs$
+
+# Maintainer-only docs (not shipped)
+^RELEASING\.md$
+
+# Editor / OS junk
+\.bak$
+\.swp$
+\.tmp$
+~$
+^\.DS_Store$
+
+# Compiled object code that may appear during local testing
+\.o$
+\.obj$
+\.so$
+\.dylib$
+\.a$
+\.lib$
+\.bs$
+
+^references
+^examples
+^AGENTS.md
+^README.md
+

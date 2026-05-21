@@ -67,7 +67,7 @@ subtest 'misdependent resource' => sub {
     throws_ok {
         $c->bad
     } qr('base'.*unexpected.*'bad'), "resource with bad dependencies won't initialize";
-    is_deeply \%connect, {}, "base resource want's initialized";
+    is_deeply \%connect, {}, "base resource wasn't initialized";
 };
 
 subtest 'misdependent resource (cache)' => sub {

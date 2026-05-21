@@ -212,17 +212,17 @@ is($EVAL_ERROR, "Subfield is required.\n", "Subfield is required.");
 clean();
 
 sub help {
-	my $script = abs2rel(File::Object->new->file('04-run.t')->s);
-	# XXX Hack for missing abs2rel on Windows.
+	my $script = abs2rel(__FILE__);
 	if ($OSNAME eq 'MSWin32') {
 		$script =~ s/\\/\//msg;
 	}
 	my $help = <<"END";
-Usage: $script [-f] [-h] [--version] marc_xml_file field [subfield]
+Usage: $script [-f] [-h] [-s] [--version] marc_xml_file field [subfield]
 	-f		Print frequency.
 	-h		Print help.
+	-s		Skip controls of field/subfield.
 	--version	Print version.
-	marc_xml_file	MARC XML file.
+	marc_xml_file	MARC XML file, could be compressed.
 	field		MARC field (field number or 'leader' string).
 	subfield	MARC subfield (for datafields).
 END

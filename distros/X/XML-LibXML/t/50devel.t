@@ -1,5 +1,4 @@
 use Test::More;
-BEGIN { plan tests => 18 };
 
 use warnings;
 use strict;
@@ -10,12 +9,22 @@ use XML::LibXML::Devel qw(:all);
 
 $|=1;
 
+if (!XML::LibXML::Devel->can('mem_used')) {
+  plan skip_all => "libxml2 memory-tracking API unavailable (removed in 2.14, deprecated on Apple SDKs); XML::LibXML::Devel::mem_used() is not compiled in";
+}
+
 # Base line
 {
   my $doc = XML::LibXML::Document->new();
 
   my $raw;
   my $mem_before = mem_used();
+
+  if($mem_before == 0) {
+    plan skip_all => "mem_used() returned 0 bytes, implying that memory debugging has been patched out of libxml2";
+  }
+  plan tests => 18;
+
   {
     my $node = $doc->createTextNode("Hello");
 

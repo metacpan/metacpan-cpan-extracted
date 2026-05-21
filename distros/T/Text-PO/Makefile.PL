@@ -26,34 +26,41 @@ my %WriteMakefileArgs = (
         'parent'                => 0,
         'strict'                => '0.238',
         'vars'                  => 0,
-        'warnings'              => '1.44',
+        'warnings'              => 0,
         'Class::Struct'         => '0.65',
-        'DateTime'              => '1.58',
-        'DateTime::TimeZone'    => '2.52',
-        'Encode'                => '3.08',
-        'Fcntl'                 => '1.13',
-        'I18N::Langinfo'        => '0.19',
-        'IO::File'              => '1.41',
-        'JSON'                  => '4.07',
+        'DateTime::Format::Lite' => 'v0.1.3',
+        'DateTime::Lite'        => 'v0.6.5',
+        # Based on 2011-05-15 (perl v5.14.0) availability
+        # https://metacpan.org/release/DANKOGAI/Encode-2.42/source/Encode.pm
+        'Encode'                => '2.42',
+        # Based on perl v5.14.0
+        # https://metacpan.org/release/JESSE/perl-5.14.0/view/ext/Fcntl/Fcntl.pm
+        'Fcntl'                 => '1.11',
+        # Based on the perl v5.14.0
+        # https://metacpan.org/release/JESSE/perl-5.14.0/source/ext/I18N-Langinfo/Langinfo.pm
+        'I18N::Langinfo'        => '0.08',
+        'IO::File'              => 0,
+        'JSON'                  => '2.97001',
         'JSON::XS'              => '4.03',
         'Module::Generic'       => 'v1.3.0',
         'POSIX'                 => '1.53_01',
         'Scalar::Util'          => '1.50',
-        'Text::Wrap'            => '2021.0814',
+        'Text::Wrap'            => '2013.0523',
     },
     TEST_REQUIRES =>
     {
         'utf8'          => 0,
-        'File::Spec'    => '3.78',
+        'File::Spec'    => 0,
         'POSIX'         => '1.53_01',
-        'Test::More'    => '1.302182',
-        'Test::Pod'     => '1.52',
+        'Test::More'    => '1.302133',
+        'Test::Pod'     => '1.50',
     },
     EXE_FILES           => [qw(
         scripts/po.pl
     )],
     LICENSE             => 'perl_5',
-    MIN_PERL_VERSION    => 'v5.14.0',
+    # 2011-05-14
+    MIN_PERL_VERSION    => 'v5.28.0',
     (MM->can('signature_target') ? (SIGN => 1) : ()),
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', DIST_CP => 'cp' },
     clean               => { FILES => 'Text-PO-*' },

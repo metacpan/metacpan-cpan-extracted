@@ -4,6 +4,8 @@ use warnings;
 use Crypt::ScryptKDF;
 use Test::More;
 
+plan skip_all => "Net::SSLeay module not installed" unless eval { require Net::SSLeay };
+
 my @opts = (8, 1, 1, 5);
 is( Crypt::ScryptKDF::scrypt_b64("", "", @opts), "H/7KqYA=" );
 

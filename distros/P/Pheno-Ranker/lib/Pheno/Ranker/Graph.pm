@@ -5,9 +5,11 @@ use warnings;
 use autodie;
 use feature qw(say);
 use JSON::XS;
+use Sort::Naturally qw(nsort);
 use Pheno::Ranker::IO;
+use Pheno::Ranker::Metrics;
 use Exporter 'import';
-our @EXPORT = qw(matrix2graph cytoscape2graph);
+our @EXPORT = qw(binary_hash2graph cytoscape2graph);
 use constant DEVEL_MODE => 0;
 
 ############################
@@ -16,75 +18,45 @@ use constant DEVEL_MODE => 0;
 ############################
 ############################
 
-sub matrix2graph {
+sub binary_hash2graph {
+    my $arg                 = shift;
+    my $ref_binary_hash     = $arg->{ref_binary_hash};
+    my $output              = $arg->{json};
+    my $metric_name         = $arg->{metric};
+    my $verbose             = $arg->{verbose};
+    my $graph_stats         = $arg->{graph_stats};
+    my $graph_min_weight    = $arg->{graph_min_weight};
+    my $graph_max_weight    = $arg->{graph_max_weight};
+    my @ids                 = nsort( keys %$ref_binary_hash );
+    my @strings             = map { $ref_binary_hash->{$_}{binary_digit_string_weighted} } @ids;
+    my %similarity_function = (
+        hamming => \&hd_fast,
+        jaccard => \&jaccard_similarity_formatted,
+    );
+    my $metric = $similarity_function{$metric_name};
 
-    # *** IMPORTANT***
-    # Hard-coded in purpose to avoid using Graph unless necessary
+    my @nodes = map { { data => { id => $_ } } } @ids;
+    my @edges;
 
-    my $arg         = shift;
-    my $input       = $arg->{matrix};
-    my $output      = $arg->{json};
-    my $verbose     = $arg->{verbose};
-    my $graph_stats = $arg->{graph_stats};
+    for my $i ( 0 .. $#ids ) {
+        say "Creating graph edges for <" . $ids[$i] . ">..." if $verbose;
+        my $str1 = $strings[$i];
 
-    # Open the matrix file to read
-    open( my $matrix_fh, '<:encoding(UTF-8)', $input );
+        for my $j ( $i + 1 .. $#ids ) {
+            my $weight = $metric->( $str1, $strings[$j] );
+            next unless _keep_edge( $weight, $graph_min_weight, $graph_max_weight );
 
-    # Read the first line to get node IDs (headers)
-    my $header_line = <$matrix_fh>;
-    chomp $header_line;
-    my @headers = split /\t/, $header_line;
-    shift @headers;    # Remove the initial empty element from the headers list
-
-    # Initialize the nodes and edges arrays
-    my ( @nodes, @edges );
-    my $threshold = 0.0;
-
-    # Initialize an index to keep track of the current row
-    my $current_index = 0;
-
-    # Read each subsequent line
-    while ( my $line = <$matrix_fh> ) {
-        chomp $line;
-        my @values  = split /\t/, $line;
-        my $node_id = shift @values;    # The first column is the node ID
-
-        # Ensure each node is represented in the node array
-        push @nodes, { data => { id => $node_id } };
-
-# Process each value in the row corresponding to an edge, but only in the upper triangle
-# and explicitly skipping diagonal elements
-# Undirected graph - Cytoscape.js settings:
-# "style": [
-#  {
-#  "selector": "edge",
-#  "style": {
-#    "target-arrow-shape": "none"
-#    }
-#  }
-# ]
-
-        for ( my $i = $current_index + 1 ; $i < scalar @headers ; $i++ ) {
-            if ( $values[$i] >= $threshold ) {
-                push @edges,
-                  {
-                    data => {
-                        source => $node_id,
-                        target => $headers[$i],
-                        weight => $values[$i]
-                    }
-                  };
-            }
+            push @edges,
+              {
+                data => {
+                    source => $ids[$i],
+                    target => $ids[$j],
+                    weight => $weight,
+                }
+              };
         }
-
-        # Increment the current row index
-        $current_index++;
     }
 
-    # Close the matrix file handle
-    close $matrix_fh;
-
-    # Assemble the complete graph structure
     my %graph = (
         elements => {
             nodes => \@nodes,
@@ -92,11 +64,18 @@ sub matrix2graph {
         }
     );
 
-    # Open a file to write JSON output
     say "Writting <$output> file " if $verbose;
     write_json( { filepath => $output, data => \%graph } );
 
     return defined $graph_stats ? \%graph : undef;
+}
+
+sub _keep_edge {
+    my ( $weight, $min_weight, $max_weight ) = @_;
+
+    return 0 if defined $min_weight && $weight < $min_weight;
+    return 0 if defined $max_weight && $weight > $max_weight;
+    return 1;
 }
 
 sub cytoscape2graph {

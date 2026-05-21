@@ -20,13 +20,13 @@ exit
 #
 # pmake - make of Perl Poor Tools
 #
-# Copyright (c) 2008, 2009, 2010, 2018, 2019, 2020, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2008, 2009, 2010, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSIONE = '0.27';
+$VERSIONE = '0.31';
 $VERSIONE = $VERSIONE;
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
+BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
 use FindBin;
 use File::Path;
 use File::Copy;
@@ -243,7 +243,7 @@ for my $target (@ARGV) {
                 Ebig5hkscs
                 Ebig5plus
                 Egb18030
-                Egbk 
+                Egbk
                 Ehp15
                 Einformixv6als
                 Ekps9566
@@ -269,7 +269,8 @@ for my $target (@ARGV) {
         binmode FH_MAKEFILEPL;
         printf FH_MAKEFILEPL (<<'END', $package, $version, $abstract, $requires_as_makefile_pl, $author, $name_as_dist_on_url, $name_as_dist_on_url, $name_as_dist_on_url, $provides_as_makefile_pl);
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
+BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
+BEGIN { pop @INC if $INC[-1] eq '.' }
 use ExtUtils::MakeMaker;
 
 my %%args = (
@@ -330,7 +331,7 @@ END
         # How to fix
         # Take a look at the META.yml Spec at https://metacpan.org/pod/CPAN::Meta::History::Meta_1_4
         # (for version 1.4) or https://metacpan.org/pod/CPAN::Meta::Spec (for version 2),
-        # and change your META.yml accordingly. 
+        # and change your META.yml accordingly.
         #
         # How to escape from trap
         #
@@ -382,7 +383,7 @@ END
         # How to fix
         # Take a look at the META.json Spec at https://metacpan.org/pod/CPAN::Meta::History::Meta_1_4
         # (for version 1.4) or https://metacpan.org/pod/CPAN::Meta::Spec (for version 2),
-        # and change your META.json accordingly. 
+        # and change your META.json accordingly.
         #
         # How to escape from trap
         #
@@ -770,21 +771,21 @@ Definitions:
 
 -    "Package" refers to the collection of files distributed by the Copyright
      Holder, and derivatives of that collection of files created through textual
-     modification. 
+     modification.
 -    "Standard Version" refers to such a Package if it has not been modified,
      or has been modified in accordance with the wishes of the Copyright
-     Holder. 
+     Holder.
 -    "Copyright Holder" is whoever is named in the copyright or copyrights for
-     the package. 
+     the package.
 -    "You" is you, if you're thinking about copying or distributing this Package.
 -    "Reasonable copying fee" is whatever you can justify on the basis of
      media cost, duplication charges, time of people involved, and so on. (You
      will not be required to justify it to the Copyright Holder, but only to the
-     computing community at large as a market that must bear the fee.) 
+     computing community at large as a market that must bear the fee.)
 -    "Freely Available" means that no fee is charged for the item itself, though
      there may be fees involved in handling the item. It also means that
      recipients of the item may redistribute it under the same conditions they
-     received it. 
+     received it.
 
 1. You may make and give away verbatim copies of the source form of the
 Standard Version of this Package without restriction, provided that you duplicate
@@ -970,7 +971,7 @@ TO_SECURITY
                     copy($file, "$tardir/$file");
 
 #-----------------------------------------------------------------------------
-# Sunday December 21, 2008 07:38 PM 
+# Sunday December 21, 2008 07:38 PM
 # Fixing world writable files in tarball before upload to CPAN [ #38127 ]
 # http://use.perl.org/~bart/journal/38127 (dead link)
 # Fix CPAN uploads for world writable files
@@ -1058,11 +1059,11 @@ TO_SECURITY
 #
 # ptar - tar of Perl Poor Tools
 #
-# Copyright (c) 2008, 2009, 2010, 2011, 2018, 2019, 2020, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2008, 2009, 2010, 2011, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
+BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
 
 if (scalar(@ARGV) == 0) {
     die <<END;
@@ -1202,7 +1203,7 @@ END
 #
 # pwget - wget of Perl Poor Tools
 #
-# Copyright (c) 2011, 2018, 2019, 2020, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2011, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use Socket;
@@ -1325,6 +1326,7 @@ sub _runtests {
     my $not_ok_script = 0;
     my $total_ok = 0;
     my $total_not_ok = 0;
+    my $total_skip = 0;
 
     # cygwin warning:
     #   MS-DOS style path detected: C:/cpan/Char-X.XX
@@ -1339,53 +1341,67 @@ sub _runtests {
         }
     }
 
+    my $start_time = time();
     my $scriptno = 0;
     for my $script (@script) {
         next if not -e $script;
 
-        my $testno = 1;
         my $ok = 0;
         my $not_ok = 0;
+        my $skip = 0;
         if (my @result = qx{$^X $script}) {
             if (my($tests) = shift(@result) =~ /^1..([0-9]+)/) {
                 for my $result (@result) {
-                    if ($result =~ /^ok /) {
-                        $ok++;
+                    # Read TAP test number directly to avoid offset from comment lines
+                    if ($result =~ /^ok (\d+)/) {
+                        my $tapno = $1;
+                        if ($result =~ /\bSKIP\b/i) {
+                            $skip++;
+                        }
+                        else {
+                            $ok++;
+                        }
                     }
-                    elsif ($result =~ /^not ok /) {
-                        push @{$fail_testno[$scriptno]}, $testno;
+                    elsif ($result =~ /^not ok (\d+)/) {
+                        my $tapno = $1;
+                        push @{$fail_testno[$scriptno]}, $tapno;
                         $not_ok++;
                     }
-                    $testno++;
+                    # TAP comment lines (^#) and other lines are silently ignored
                 }
-                if ($ok == $tests) {
-                    printf("$script ok\n");
+                if ($not_ok == 0) {
+                    if ($skip > 0) {
+                        printf("$script ok (skipped: %d)\n", $skip);
+                    }
+                    else {
+                        printf("$script ok\n");
+                    }
                     $ok_script++;
                 }
                 else {
-                    printf("$script Failed %d/%d subtests\n", $not_ok, $ok+$not_ok);
+                    printf("$script Failed %d/%d subtests\n", $not_ok, $ok+$not_ok+$skip);
                     $not_ok_script++;
                 }
             }
         }
-        $total_ok += $ok;
+        $total_ok   += $ok;
         $total_not_ok += $not_ok;
+        $total_skip += $skip;
         $scriptno++;
     }
 
+    my $elapsed = time() - $start_time;
+
     if (scalar(@script) == $ok_script) {
-        printf <<'END', scalar(@script), $total_ok + $total_not_ok;
-All tests successful.
-Files=%d, Tests=%d
-Result: PASS
-END
+        my $skip_msg = $total_skip > 0 ? " (skipped: $total_skip)" : '';
+        printf("All tests successful.\n");
+        printf("Files=%d, Tests=%d%s, %d wallclock secs\n",
+            scalar(@script), $total_ok + $total_not_ok + $total_skip,
+            $skip_msg, $elapsed);
+        printf("Result: PASS\n");
     }
     else {
-        print <<'END';
-
-Test Summary Report
--------------------
-END
+        print "\nTest Summary Report\n-------------------\n";
         my $scriptno = 0;
         for my $fail_testno (@fail_testno) {
             if (defined $fail_testno) {
@@ -1394,9 +1410,12 @@ END
             }
             $scriptno++;
         }
-        printf("Files=%d, Tests=%d\n", scalar(@script), $total_ok + $total_not_ok);
+        printf("Files=%d, Tests=%d, %d wallclock secs\n",
+            scalar(@script), $total_ok + $total_not_ok + $total_skip, $elapsed);
         printf("Result: FAIL\n");
-        printf("Failed %d/%d test programs. %d/%d subtests failed.\n", $not_ok_script, scalar(@script), $total_not_ok, $total_ok + $total_not_ok);
+        printf("Failed %d/%d test programs. %d/%d subtests failed.\n",
+            $not_ok_script, scalar(@script),
+            $total_not_ok, $total_ok + $total_not_ok + $total_skip);
     }
 }
 

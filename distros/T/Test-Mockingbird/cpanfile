@@ -6,6 +6,7 @@ requires 'ExtUtils::MakeMaker', '6.64';
 
 on 'test' => sub {
 	requires 'Class::Simple';
+	requires 'Readonly';
 	requires 'Test::DescribeMe';
 	requires 'Test::Most';
 	requires 'Test::Needs';

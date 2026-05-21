@@ -39,7 +39,7 @@
             "PPI::XS" : "0.910",
             "Scalar::Util" : "1.50",
             "Symbol" : "1.07",
-            "Want" : "0.29",
+            "Wanted" : "v0.1.0",
             "perl" : "5.016000",
             "strict" : "0",
             "warnings" : "0"
@@ -63,6 +63,6 @@
          "web" : "https://gitlab.com/jackdeguest/Nice-Try"
       }
    },
-   "version" : "v1.3.17",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "v1.4.0",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

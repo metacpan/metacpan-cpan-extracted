@@ -1,0 +1,23 @@
+Revision history for Finance-Tiller2QIF
+
+1.06      2026-05-11
+  - add support for qifdate (gnucash bug: it sometimes doesn't like iso dates)
+  - support boolean command line options in config file.
+1.05      2026-05-07
+  - add preview
+1.04      2026-05-03
+  - refactoring.
+1.03      2026-05-01
+  - Add test to confirm iso8601 dates work
+1.02      2026-04-29
+  - Add configcheck and more messages when verbose is enabled.
+  - Detect and fatalize bad/corrupt csv files.
+1.01      2026-04-28
+  - Fix failed installs on cpantests
+  - Suppress warnings from exception tests
+1.00      2026-04-26
+  - Initial release (trial)
+  - Convert Tiller CSV exports to QIF format
+  - Support for mapping rules with pattern matching
+  - Account-based filtering
+  - Proper UTF-8 encoding throughout

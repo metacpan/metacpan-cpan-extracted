@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Dashboard Improvement Plan</title>
+  <style>
+    body {
+      font-family: "Liberation Serif", Georgia, serif;
+      font-size: 11pt;
+      line-height: 1.45;
+      color: #111;
+      margin: 2.2cm;
+    }
+    h1, h2, h3 {
+      font-family: "Liberation Sans", Arial, sans-serif;
+      margin: 0 0 0.35em 0;
+      color: #0f172a;
+    }
+    h1 {
+      font-size: 22pt;
+      border-bottom: 2px solid #cbd5e1;
+      padding-bottom: 0.2em;
+      margin-bottom: 0.6em;
+    }
+    h2 {
+      font-size: 15pt;
+      margin-top: 1.2em;
+    }
+    h3 {
+      font-size: 12pt;
+      margin-top: 1em;
+    }
+    p {
+      margin: 0 0 0.7em 0;
+    }
+    ul, ol {
+      margin: 0.2em 0 0.8em 1.2em;
+    }
+    li {
+      margin: 0.2em 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.5em 0 1em 0;
+      font-size: 10pt;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 0.45em 0.55em;
+      vertical-align: top;
+      text-align: left;
+    }
+    th {
+      background: #f8fafc;
+    }
+    code {
+      font-family: "Liberation Mono", monospace;
+      font-size: 9.5pt;
+      background: #f8fafc;
+      padding: 0.08em 0.25em;
+    }
+    .muted {
+      color: #475569;
+    }
+  </style>
+</head>
+<body>
+  <h1>Dashboard Improvement Plan</h1>
+  <p class="muted">Repository: <code>/home/mv/projects/developer-dashboard</code><br>Focus: startup performance of the public <code>dashboard</code> command</p>
+
+  <h2>Executive Summary</h2>
+  <p>The public <code>dashboard</code> command is thin by design, but it still matters because it is the most frequently used entrypoint. Profiling shows that the switchboard itself is not the majority of end-to-end time for a normal built-in command. The bigger cost is split between Perl module loading and repeated current-directory resolution, with additional command-specific cost inside the helper process after handoff.</p>
+
+  <table>
+    <tr>
+      <th>Probe</th>
+      <th>Observed Time</th>
+      <th>Meaning</th>
+    </tr>
+    <tr>
+      <td><code>dashboard version</code></td>
+      <td>about 110 ms average</td>
+      <td>Special-case fast path. Useful baseline, but not representative of normal helper dispatch.</td>
+    </tr>
+    <tr>
+      <td><code>dashboard paths</code></td>
+      <td>about 493 ms average</td>
+      <td>Representative built-in command path through the switchboard and staged helper.</td>
+    </tr>
+    <tr>
+      <td>Direct helper: <code>.../cli/dd/paths</code></td>
+      <td>about 362 ms average</td>
+      <td>Shows most of the cost is after the public switchboard hands off.</td>
+    </tr>
+    <tr>
+      <td><code>perl -Ilib -c bin/dashboard</code></td>
+      <td>about 120 ms</td>
+      <td>Compile/load overhead is a major part of the switchboard cost.</td>
+    </tr>
+    <tr>
+      <td>Switchboard module load</td>
+      <td>about 77 ms</td>
+      <td>Static startup cost from Perl module loading before command work begins.</td>
+    </tr>
+    <tr>
+      <td>Isolated env/path/helper setup</td>
+      <td>about 23 ms total</td>
+      <td><code>PathRegistry</code>, <code>EnvLoader</code>, and <code>ensure_helpers</code> are not the main cost in isolation.</td>
+    </tr>
+  </table>
+
+  <h2>Problem</h2>
+  <p>The command is thin in architecture, but the real startup path still pays a measurable tax before useful work happens. This matters because users hit <code>dashboard</code> for nearly everything, so even modest startup delays become visible and repetitive friction.</p>
+
+  <h3>Primary Problem</h3>
+  <p>Normal built-in command dispatch is slower than expected because the runtime repeatedly resolves the current working directory and project context, and that cost compounds across both the public switchboard and the helper process.</p>
+
+  <h3>Secondary Problem</h3>
+  <p>The command-specific helper runtime is doing enough repeated path recomputation that even a lightweight command such as <code>dashboard paths</code> still feels expensive.</p>
+
+  <h2>Evidence</h2>
+  <ol>
+    <li>A strace of <code>dashboard paths</code> showed <code>/bin/pwd</code> executing 72 times during one command invocation.</li>
+    <li>Split of those <code>pwd</code> executions:
+      <ul>
+        <li>6 before helper handoff</li>
+        <li>66 after helper handoff</li>
+      </ul>
+    </li>
+    <li>A direct probe confirmed that <code>Cwd::cwd()</code> on this machine forks <code>/bin/pwd</code>.</li>
+    <li>A direct microbenchmark showed <code>cwd()</code> averaging about 2.0 ms per call on this machine.</li>
+    <li>The <code>paths</code> helper alone took about 212 ms when invoked directly through its Perl module path.</li>
+  </ol>
+
+  <h2>Root Cause</h2>
+  <h3>1. Repeated <code>cwd()</code> calls</h3>
+  <p>The largest concrete hotspot is repeated <code>Cwd::cwd()</code> use. On this environment, that is not a cheap in-process call. It forks <code>/bin/pwd</code>. That makes otherwise innocent path lookups surprisingly expensive.</p>
+
+  <h3>2. Repeated project/runtime path derivation</h3>
+  <p><code>PathRegistry</code> methods derive current project roots, runtime layers, state roots, and related values repeatedly. Commands such as <code>dashboard paths</code> ask for many of these values in one call, and that compounds the <code>cwd()</code> overhead.</p>
+
+  <h3>3. Startup compile/load cost</h3>
+  <p>The switchboard still pays a meaningful Perl compile/load cost before it can decide where to hand off. That cost is not the majority of total runtime for a normal helper path, but it is a large chunk of the public entrypoint overhead.</p>
+
+  <h3>4. Missed caching opportunity</h3>
+  <p><code>Developer::Dashboard::CLI::Paths::_build_paths()</code> passes <code>cwd =&gt; cwd()</code> into <code>PathRegistry-&gt;new()</code>, but <code>PathRegistry</code> does not appear to store or reuse that value. So the helper pays for <code>cwd()</code> but does not gain any caching from it.</p>
+
+  <h2>What Is Not The Main Problem</h2>
+  <ul>
+    <li><code>EnvLoader</code> by itself is not the primary cost center.</li>
+    <li><code>InternalCLI::ensure_helpers()</code> is not the primary cost center in isolation.</li>
+    <li>The thin switchboard architecture itself is not the problem. The issue is the repeated runtime work done around path discovery and module startup.</li>
+  </ul>
+
+  <h2>Recommendation</h2>
+  <p>Keep the public <code>dashboard</code> command thin. Do not replace the switchboard design. Instead, reduce repeated startup work, especially current-directory and project-root recomputation.</p>
+
+  <h3>Recommended Priority Order</h3>
+  <ol>
+    <li>Eliminate repeated <code>cwd()</code> calls from the startup and helper path.</li>
+    <li>Add request-local caching inside <code>PathRegistry</code> for cwd, project root, runtime layers, and derived roots.</li>
+    <li>Audit helper commands like <code>paths</code> for repeated calls into path-derivation methods that can be computed once.</li>
+    <li>Only after that, consider deeper module-load reduction in <code>bin/dashboard</code>.</li>
+  </ol>
+
+  <h2>Solution Plan</h2>
+  <h3>Phase 1: Remove High-Volume <code>cwd()</code> Cost</h3>
+  <ul>
+    <li>Store a single cwd value per invocation and reuse it throughout the command lifetime.</li>
+    <li>Teach <code>PathRegistry</code> to accept and actually use a precomputed cwd.</li>
+    <li>Replace repeated internal <code>cwd()</code> lookups with the cached value wherever the command is operating in one fixed current directory.</li>
+  </ul>
+
+  <h3>Phase 2: Add Request-Local PathRegistry Memoization</h3>
+  <ul>
+    <li>Memoize:
+      <ul>
+        <li>current project root</li>
+        <li>runtime layers</li>
+        <li>runtime root</li>
+        <li>state root and derived roots</li>
+        <li>CLI root and similar derived directories</li>
+      </ul>
+    </li>
+    <li>Keep memoization strictly per-process and per-invocation so it does not create stale cross-command state.</li>
+  </ul>
+
+  <h3>Phase 3: Reduce Repeated Helper-Side Computation</h3>
+  <ul>
+    <li>For helper commands like <code>paths</code>, compute the path inventory once and reuse that data structure rather than calling multiple lazy getters that each recompute upstream state.</li>
+    <li>Review <code>all_paths()</code> and related accessors for repeated tree walks and repeated state-root creation.</li>
+  </ul>
+
+  <h3>Phase 4: Module Load Cleanup</h3>
+  <ul>
+    <li>Move non-essential <code>use</code> statements behind <code>require</code> when the command path does not always need them.</li>
+    <li>Keep the switchboard’s eager module set as small as possible.</li>
+    <li>Preserve readability and safety; do not trade away clear error behavior for micro-optimizations.</li>
+  </ul>
+
+  <h2>Expected Outcome</h2>
+  <p>The biggest likely gain is from removing repeated <code>/bin/pwd</code> subprocess calls. Since the trace showed 72 <code>pwd</code> executions for one <code>dashboard paths</code> command, reducing that to one or a small handful should materially reduce wall time. After that, request-local caching should cut the remaining repeated path derivation overhead.</p>
+
+  <h2>Implementation Notes</h2>
+  <ul>
+    <li>Any optimization work should preserve the DD-OOP-LAYERS behavior and lookup order.</li>
+    <li>Do not hide errors or weaken explicit runtime checks.</li>
+    <li>Re-profile after each phase instead of batching all changes blindly.</li>
+  </ul>
+
+  <h2>Suggested Verification After Changes</h2>
+  <ol>
+    <li>Re-run timing probes for <code>dashboard version</code> and <code>dashboard paths</code>.</li>
+    <li>Re-run syscall trace and count <code>/bin/pwd</code> executions.</li>
+    <li>Verify helper behavior and path outputs remain identical.</li>
+    <li>Run the relevant CLI and path regression tests.</li>
+  </ol>
+
+  <h2>Conclusion</h2>
+  <p>The public <code>dashboard</code> command is not slow because the switchboard pattern is wrong. It is slow because repeated path discovery work, especially <code>cwd()</code> on this environment, is expensive and occurs many times per invocation. The strongest plan is to keep the architecture, remove repeated cwd/process calls, add request-local path caching, and then trim module startup cost where justified.</p>
+</body>
+</html>

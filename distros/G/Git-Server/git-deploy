@@ -228,7 +228,7 @@ use FindBin qw($Script $Bin);
 use Getopt::Long qw(GetOptions);
 use Fcntl qw(LOCK_EX LOCK_NB);
 
-our $VERSION = "0.042";
+our $VERSION = "0.045";
 
 my @invoked = ($0, @ARGV);
 my %initial_ENV = %ENV;
@@ -247,6 +247,8 @@ my $notify = undef;
 my $ver = undef;
 my $deploying_version = 0;
 my $maxdelayrecommended = 0;
+# If $GIT_SSH is used, then $GIT_SSH_COMMAND was ignored (git < 2.3.x) so emulate it for backward compatibility.
+exec sh => -c => $ENV{GIT_SSH_COMMAND}.' "$@"' => ssh => @ARGV or die "exec: $!\n" if $0 eq($ENV{GIT_SSH}||"") and $ENV{GIT_SSH_COMMAND}||="ssh";
 Getopt::Long::Configure("no_ignore_case");
 GetOptions
     "O|o=s@" => $opts,
@@ -262,9 +264,82 @@ GetOptions
     "identity|i=s@" => $identities,
     or exec perldoc => $0;
 
+$ENV{HOME} ||= [getpwnuid $<]->[7];
+if (my $sep = eval { require Config; $Config::Config{path_sep} }) {
+    my @paths = split $sep, ($ENV{PATH}||="/usr/bin");
+    my @gits = grep { -x "$_/git" } @paths;
+    my @shims = grep { -T "$_/git" } @gits;
+    if (!@gits or !@shims or $gits[0] ne $shims[0]) { # Uh oh, first git is not a nice shim. Changes to $PATH may help.
+        @gits or warn "WARNING: No git found in PATH [$ENV{PATH}]";
+        # If @shims, then Great! Local shim found later in $PATH (i.e., maybe on RHEL7 and older)
+        if (!@shims) {
+            # No shim in entire $PATH (i.e., maybe from cron) so try other directories
+            unshift @paths, "$ENV{HOME}/.local/bin","$ENV{HOME}/bin",qw[/usr/local/bin /usr/bin /bin];
+            @gits = grep { -x "$_/git" } @paths;
+            @shims = grep { -T "$_/git" } @gits;
+            if (!@gits or !@shims or $gits[0] ne $shims[0]) { # Shim is still not first git
+                if (@shims) { # Great! Move it to the front.
+                }
+                # Otherwise, if no shim in $PATH, look for original git-client shim:
+                elsif (@shims = grep { -x "$_/git-client" } @paths, ($0=~m{^(.*)/+[^/]+$}?($1):())) {
+                    my $target = undef; # Try to create symlink shim in first $target with permission:
+                    foreach (@paths) {
+                        last if -d && -w _ and !-x "$_/git" and $target = $_;
+                    }
+                    if (!$target) { # No already-existing writable dir in $PATH yet, so last-ditch effort to try creating one.
+                        foreach (@paths) {
+                            if (!-d) {
+                                my @mk = ($_);
+                                push @mk, $1 while $mk[-1]=~m{^(.+)/} && !-e $1;
+                                while (my $d = pop @mk) { mkdir $d, 0755; }
+                            }
+                            last if -d && -w _ and !-x "$_/git" and $target = $_;
+                        }
+                    }
+                    if ($target) { # Found a good place to try jamming in the shim
+                        $target = abs_path $target;
+                        unlink "$target/git" if lstat "$target/git";
+                        symlink "$shims[0]/git-client","$target/git";
+                        if (!-x "$target/git") {
+                            warn "ERROR: Failed to create shim $target/git: $!";
+                            $target = undef;
+                        }
+                    }
+                    if ($target) {
+                        @shims = ($target);
+                    }
+                    else {
+                        @shims = ();
+                    }
+                }
+            }
+        }
+        if (@shims) {
+            unshift @paths, $shims[0]; # Make sure shim dir comes first
+            chomp(my $gitprefix = run_output_ignore_err("git","--exec-path"));
+            my %seen = ($gitprefix => 1); # Remove --exec-path (i.e., invoked from "git deploy") and remove any duplicates so $PATH can't keep bloat growing.
+            $ENV{PATH} = join $sep, grep { !$seen{$_}++ } map { abs_path $_ or $_ } @paths;
+        }
+    }
+}
+
+if (my $full = abs_path $0) {
+    if ($full !~ m{^(?:|/usr)/bin/+[^/]+$}) {
+        chomp(my $alias = run_output_ignore_err(qw[git config --global alias.deploy]));
+        if ($alias ne "!$full") {
+            if (-t STDIN or -t STDOUT) {
+                warn localtime().": [$$] $Script: Warning: Dangerous invocation [$full] may not work from cron. Hint: To fix this warning, run this: git config --global alias.deploy '!$full'\n";
+            }
+            else {
+                warn localtime().qq{: [$$] $Script: Warning: Dangerous invocation [$full] without a TTY may not work from cron. Running "git config --global alias.deploy '!$full'" ...\n}.run_output_include_err(qw[git config --global alias.deploy],"!$full");
+            }
+        }
+    }
+}
+
 if ($ver) {
-    print "[git-deploy v$VERSION] ".`git --version`;
-    exit;
+    print "[git-deploy v$VERSION] ";
+    exec "git --version" or die "Unable to view git --version";
 }
 
 my $runner = $$;
@@ -402,6 +477,7 @@ sub pull_push_notification {
         $ENV{GIT_SSH_COMMAND} .= " -o IdentitiesOnly=yes";
         $ENV{GIT_SSH_COMMAND} .= " -i $_" foreach @$identities;
     }
+    local $ENV{GIT_SSH} = $invoked[0]; # Use $GIT_SSH in case $GIT_SSH_COMMAND is ignored.
     $0 = "$Script - $cwd: Waiting for push notification [$deploy_branch]";
     # Run "fetch" to call "git-upload-pack" causing the git-server to wait for the "push_notification" to release the update:
     return run_output_include_err(qw[git fetch]);
@@ -640,19 +716,7 @@ while (1) {
         }
         last;
     }
-    if ($update =~ /Your branch.*diverged/) {
-        # Rebase can't work if there are local divergents.
-        warn $update;
-        warn localtime().": [$$] $Script: Detected local divergence off [$branch] so doing HARD RESET ...\n";
-        my $hard = "";
-        $hard .= run_output_include_err "git", "checkout", $branch;
-        $hard .= run_output_include_err "git", "reset", "--hard", "$origin/$branch";
-        my $running = getps;
-        last if $running =~ /\Q$Script - $cwd\E: Waiting/;
-        $0 = "$Script - $cwd: Waiting because of local divergence";
-        print run_output_include_err qw(sleep 60);
-    }
-    elsif ($update =~ /You have unstaged changes/) {
+    if ($update =~ /You have unstaged changes/) {
         # Rebase can't work if there are local changes.
         # Make sure there aren't multiple pullers choking on the repo
         warn $update;
@@ -663,6 +727,18 @@ while (1) {
         $0 = "$Script - $cwd: Waiting because of local modifications$monkey";
         print run_output_ignore_err qw(sleep 10);
         $0 = "$Script - $cwd: Checking if changes still exist$monkey";
+    }
+    elsif ($update =~ /Your branch.*diverged/) {
+        # Rebase can't work if there are local divergents.
+        warn $update;
+        warn localtime().": [$$] $Script: Detected local divergence off [$branch] so doing HARD RESET ...\n";
+        my $hard = "";
+        $hard .= run_output_include_err "git", "checkout", $branch;
+        $hard .= run_output_include_err "git", "reset", "--hard", "$origin/$branch";
+        my $running = getps;
+        last if $running =~ /\Q$Script - $cwd\E: Waiting/;
+        $0 = "$Script - $cwd: Waiting because of local divergence";
+        print run_output_include_err qw(sleep 60);
     }
     elsif ($update =~ /untracked.*files would be overwritten/) {
         # Can't create a file if it's already there.

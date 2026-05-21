@@ -18,6 +18,16 @@ my $build = Module::Build->new(
         'Module::Build'   => 0,
         'Test::Exception' => 0,
     },
+    resources => {
+        repository => {
+            type => 'git',
+            url  => 'https://github.com/BlueSquare23/Term-ReadLine-Repl',
+            web  => 'https://github.com/BlueSquare23/Term-ReadLine-Repl',
+        },
+        bugtracker => {
+            web => 'https://github.com/BlueSquare23/Term-ReadLine-Repl/issues',
+        },
+    },
 );
 
 $build->create_build_script();

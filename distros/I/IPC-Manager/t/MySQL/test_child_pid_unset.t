@@ -1,8 +1,15 @@
 use Test2::V1 -ipP;
 use Test2::IPC;
-skip_all "MySQL driver not available" unless eval { require IPC::Manager::Client::MySQL; IPC::Manager::Client::MySQL->viable };
 use lib 't/lib';
-use IPC::Manager::Test;
-IPC::Manager::Test->run_one(protocol => 'MySQL', test => 'test_child_pid_unset');
+use IPC::Manager::Test::DBVersions qw/for_each_db_version/;
+
+for_each_db_version([qw/mysql percona/], sub {
+    unless (eval { require IPC::Manager::Client::MySQL; IPC::Manager::Client::MySQL->viable }) {
+        plan skip_all => "MySQL driver not available";
+        return;
+    }
+    require IPC::Manager::Test;
+    IPC::Manager::Test->run_one(protocol => 'MySQL', test => 'test_child_pid_unset');
+});
 
 done_testing;

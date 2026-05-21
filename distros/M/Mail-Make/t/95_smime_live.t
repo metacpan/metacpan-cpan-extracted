@@ -41,6 +41,12 @@ BEGIN
 use strict;
 use warnings;
 
+BEGIN
+{
+    local $@;
+    eval{ require Crypt::SMIME; 1 } or plan( skip_all => 'Crypt::SMIME is not available' );
+};
+
 # NOTE: Load configuration
 sub _load_rc
 {
@@ -92,15 +98,22 @@ plan( tests => 7 );
 use_ok( 'Mail::Make' );
 use_ok( 'Mail::Make::SMIME' );
 
-my $can_sign = ( defined( $smime_cert ) && length( $smime_cert )
-              && defined( $smime_key  ) && length( $smime_key  )
-              && -r $smime_cert && -r $smime_key );
+my $can_sign = ( defined( $smime_cert ) && 
+                 length( $smime_cert ) &&
+                 defined( $smime_key  ) &&
+                 length( $smime_key  ) &&
+                 -r( $smime_cert ) &&
+                 -r( $smime_key )
+               );
 
-my $can_encrypt = ( defined( $smime_rec_cert ) && length( $smime_rec_cert )
-                 && -r $smime_rec_cert );
+my $can_encrypt = ( defined( $smime_rec_cert ) &&
+                    length( $smime_rec_cert ) &&
+                    -r( $smime_rec_cert ) );
 
-my $can_send = ( defined( $smtp_from ) && length( $smtp_from )
-              && defined( $smtp_to   ) && length( $smtp_to   ) );
+my $can_send = ( defined( $smtp_from ) &&
+                 length( $smtp_from ) &&
+                 defined( $smtp_to ) &&
+                 length( $smtp_to ) );
 
 # NOTE: Helper: build a base Mail::Make object
 sub _make_base_mail
@@ -128,8 +141,8 @@ sub _send_and_check
     $send_opts{StartTLS} = 1          if( $smtp_tls );
 
     my $result = $mail_obj->smtpsend( %send_opts );
-    ok( $result, "$label accepted by server" )
-        or diag( "smtpsend error: " . ( $mail_obj->error // 'unknown' ) );
+    ok( $result, "$label accepted by server" ) or
+        diag( "smtpsend error: " . ( $mail_obj->error // 'unknown' ) );
 }
 
 # NOTE: Subtest 1: sign only
@@ -139,8 +152,7 @@ subtest 'live: smime_sign - multipart/signed delivered' => sub
 
     SKIP:
     {
-        skip( 'S/MIME signing credentials not configured', 2 )
-            unless( $can_sign && $can_send );
+        skip( 'S/MIME signing credentials not configured', 2 ) unless( $can_sign && $can_send );
 
         my $mail = _make_base_mail(
             'sign only',
@@ -148,6 +160,7 @@ subtest 'live: smime_sign - multipart/signed delivered' => sub
             . "Your mail client should show a valid signature indicator.\n"
         );
 
+        local $@;
         my $signed;
         eval
         {
@@ -157,8 +170,8 @@ subtest 'live: smime_sign - multipart/signed delivered' => sub
                 ( defined( $smime_ca ) ? ( CACert => $smime_ca ) : () ),
             );
         };
-        ok( !$@ && defined( $signed ), 'smime_sign() succeeded' )
-            or diag( "smime_sign error: " . ( $@ || $mail->error // '' ) );
+        ok( !$@ && defined( $signed ), 'smime_sign() succeeded' ) or
+            diag( "smime_sign error: " . ( $@ || $mail->error // '' ) );
 
         _send_and_check( $signed, 'signed message' ) if( defined( $signed ) );
     }
@@ -171,8 +184,7 @@ subtest 'live: smime_encrypt - enveloped message delivered' => sub
 
     SKIP:
     {
-        skip( 'S/MIME encryption credentials not configured', 2 )
-            unless( $can_encrypt && $can_send );
+        skip( 'S/MIME encryption credentials not configured', 2 ) unless( $can_encrypt && $can_send );
 
         my $mail = _make_base_mail(
             'encrypt only',
@@ -180,6 +192,7 @@ subtest 'live: smime_encrypt - enveloped message delivered' => sub
             . "Your mail client should decrypt it automatically.\n"
         );
 
+        local $@;
         my $encrypted;
         eval
         {
@@ -187,8 +200,8 @@ subtest 'live: smime_encrypt - enveloped message delivered' => sub
                 RecipientCert => $smime_rec_cert,
             );
         };
-        ok( !$@ && defined( $encrypted ), 'smime_encrypt() succeeded' )
-            or diag( "smime_encrypt error: " . ( $@ || $mail->error // '' ) );
+        ok( !$@ && defined( $encrypted ), 'smime_encrypt() succeeded' ) or
+            diag( "smime_encrypt error: " . ( $@ || $mail->error // '' ) );
 
         _send_and_check( $encrypted, 'encrypted message' ) if( defined( $encrypted ) );
     }
@@ -201,8 +214,7 @@ subtest 'live: smime_sign_encrypt - sign+encrypt delivered' => sub
 
     SKIP:
     {
-        skip( 'S/MIME sign+encrypt credentials not configured', 2 )
-            unless( $can_sign && $can_encrypt && $can_send );
+        skip( 'S/MIME sign+encrypt credentials not configured', 2 ) unless( $can_sign && $can_encrypt && $can_send );
 
         my $mail = _make_base_mail(
             'sign + encrypt',
@@ -210,6 +222,7 @@ subtest 'live: smime_sign_encrypt - sign+encrypt delivered' => sub
             . "Your mail client should show: decrypted + valid signature.\n"
         );
 
+        local $@;
         my $result;
         eval
         {
@@ -220,8 +233,8 @@ subtest 'live: smime_sign_encrypt - sign+encrypt delivered' => sub
                 ( defined( $smime_ca ) ? ( CACert => $smime_ca ) : () ),
             );
         };
-        ok( !$@ && defined( $result ), 'smime_sign_encrypt() succeeded' )
-            or diag( "smime_sign_encrypt error: " . ( $@ || $mail->error // '' ) );
+        ok( !$@ && defined( $result ), 'smime_sign_encrypt() succeeded' ) or
+            diag( "smime_sign_encrypt error: " . ( $@ || $mail->error // '' ) );
 
         _send_and_check( $result, 'sign+encrypt message' ) if( defined( $result ) );
     }
@@ -234,11 +247,11 @@ subtest 'structure: smime_sign produces multipart/signed entity' => sub
 
     SKIP:
     {
-        skip( 'S/MIME signing credentials not configured', 3 )
-            unless( $can_sign );
+        skip( 'S/MIME signing credentials not configured', 3 ) unless( $can_sign );
 
         my $mail = _make_base_mail( 'structure check', "Structure test.\n" );
 
+        local $@;
         my $signed;
         eval
         {
@@ -248,8 +261,8 @@ subtest 'structure: smime_sign produces multipart/signed entity' => sub
                 ( defined( $smime_ca ) ? ( CACert => $smime_ca ) : () ),
             );
         };
-        ok( !$@ && defined( $signed ), 'smime_sign() succeeded' )
-            or diag( "smime_sign error: " . ( $@ || $mail->error // '' ) );
+        ok( !$@ && defined( $signed ), 'smime_sign() succeeded' ) or
+            diag( "smime_sign error: " . ( $@ || $mail->error // '' ) );
 
         my $entity = defined( $signed ) ? $signed->as_entity : undef;
         ok( defined( $entity ), 'as_entity() returns defined value' );
@@ -273,11 +286,11 @@ subtest 'structure: smime_encrypt produces application/pkcs7-mime' => sub
 
     SKIP:
     {
-        skip( 'S/MIME encryption credentials not configured', 3 )
-            unless( $can_encrypt );
+        skip( 'S/MIME encryption credentials not configured', 3 ) unless( $can_encrypt );
 
         my $mail = _make_base_mail( 'encrypt structure', "Encrypt structure test.\n" );
 
+        local $@;
         my $encrypted;
         eval
         {
@@ -285,8 +298,8 @@ subtest 'structure: smime_encrypt produces application/pkcs7-mime' => sub
                 RecipientCert => $smime_rec_cert,
             );
         };
-        ok( !$@ && defined( $encrypted ), 'smime_encrypt() succeeded' )
-            or diag( "smime_encrypt error: " . ( $@ || $mail->error // '' ) );
+        ok( !$@ && defined( $encrypted ), 'smime_encrypt() succeeded' ) or
+            diag( "smime_encrypt error: " . ( $@ || $mail->error // '' ) );
 
         my $entity = defined( $encrypted ) ? $encrypted->as_entity : undef;
         ok( defined( $entity ), 'as_entity() returns defined value' );

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Request;
 # ABSTRACT: Object used for making requests to MetaCPAN
-$MetaCPAN::Client::Request::VERSION = '2.042000';
+$MetaCPAN::Client::Request::VERSION = '2.043000';
 use Moo;
 use Carp;
 use JSON::MaybeXS qw<decode_json encode_json is_bool>;
@@ -92,7 +92,7 @@ sub fetch {
 
 sub ssearch {
     my $self   = shift;
-    my $type   = shift;
+    my $index  = shift;
     my $args   = shift;
     my $params = shift;
 
@@ -104,7 +104,7 @@ sub ssearch {
         size     => $size,
         time     => $time,
         base_url => $self->base_url,
-        type     => $type,
+        index    => $index,
         body     => $self->_build_body($args, $params),
         debug    => $self->debug,
     );
@@ -286,7 +286,7 @@ MetaCPAN::Client::Request - Object used for making requests to MetaCPAN
 
 =head1 VERSION
 
-version 2.042000
+version 2.043000
 
 =head1 ATTRIBUTES
 

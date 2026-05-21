@@ -1,3 +1,9 @@
+0.06  2026-04-27
+    - fix UAF in cleanup_connection when cancel callback drops last $pg ref
+
+0.05  2026-04-27
+    - hardening, expanded leak coverage, valgrind harness, doc polish
+
 0.04  2026-03-23
     - replace ngx_queue.h with inline singly-linked FIFO
     - fix benchmark DBD::Pg async comparison

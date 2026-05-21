@@ -1,10 +1,12 @@
 package DBIx::Class::Async::Storage::DBI::Cursor;
 
-$DBIx::Class::Async::Storage::DBI::Cursor::VERSION   = '0.65';
-$DBIx::Class::Async::Storage::DBI::Cursor::AUTHORITY = 'cpan:MANWAR';
-
 use strict;
 use warnings;
+use version;
+
+our $VERSION   = qv('v1.0.3');
+our $AUTHORITY = 'cpan:MANWAR';
+
 use Future;
 
 =head1 NAME
@@ -13,7 +15,7 @@ DBIx::Class::Async::Storage::DBI::Cursor - Asynchronous cursor for DBIx::Class R
 
 =head1 VERSION
 
-Version 0.65
+Version v1.0.3
 
 =cut
 

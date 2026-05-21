@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## MIME Email Builder - ~/lib/Mail/Make.pm
-## Version v0.22.0
+## Version v0.23.0
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/03/02
-## Modified 2026/03/18
+## Modified 2026/05/10
 ## All rights reserved
 ## 
 ## 
@@ -27,7 +27,7 @@ BEGIN
     our $CRLF                    = "\015\012";
     our $MAX_BODY_IN_MEMORY_SIZE = 1_048_576;  # 1 MiB default
     our $EXCEPTION_CLASS         = 'Mail::Make::Exception';
-    our $VERSION                 = 'v0.22.0';
+    our $VERSION                 = 'v0.23.0';
 }
 
 use strict;
@@ -78,7 +78,7 @@ sub as_entity
 
     # Partition accumulated parts by role
     my( @plain, @html, @inline, @attachment );
-    for my $part ( @{$self->{_parts}} )
+    foreach my $part ( @{$self->{_parts}} )
     {
         my $type = lc( $part->effective_type // '' );
         # Use get() for the raw string value; content_disposition() returns a typed
@@ -92,8 +92,13 @@ sub as_entity
         {
             push( @html, $part );
         }
-        elsif( $cd =~ /inline/ && $part->headers->get( 'Content-ID' ) )
+        elsif( $cd =~ /inline/ || $part->headers->get( 'Content-ID' ) )
         {
+            # A part is classified as inline when it carries Content-Disposition:
+            # inline OR a Content-ID (or both). Either signal is sufficient: a
+            # Content-ID alone means the HTML references it via cid:, and
+            # Content-Disposition: inline without a Content-ID is caught by the
+            # guard below, which returns an error.
             push( @inline, $part );
         }
         else
@@ -102,18 +107,56 @@ sub as_entity
         }
     }
 
-    # NOTE: Step 1: build the text body (plain, html, or alternative)
-    my $body_entity;
-    if( @plain && @html )
+    # NOTE: Step 1 & 2: assemble body, wrapping html+inline in multipart/related
+    # when applicable. The resulting structure depends on what parts are present:
+    #
+    #  plain only             -> text/plain
+    #  html only              -> text/html
+    #  html + inline          -> multipart/related( text/html, image... )
+    #  plain + html           -> multipart/alternative( text/plain, text/html )
+    #  plain + html + inline  -> multipart/alternative(
+    #                                text/plain,
+    #                                multipart/related( text/html, image... )
+    #                            )
+    #
+    # Inline parts without a Content-ID are rejected: the HTML cannot reference
+    # them via cid: and the message would be broken.
+    if( @inline )
     {
+        my @missing_cid = grep { !$_->headers->get( 'Content-ID' ) } @inline;
+        if( @missing_cid )
+        {
+            return( $self->error( scalar( @missing_cid ), " inline part(s) are missing a Content-ID. Each inline part must have a 'cid' or 'id' so the HTML can reference it via cid:UUID. Use attach_inline( ..., id => 'your-uuid.ext' )." ) );
+        }
+    }
+
+    # Build the html entity, then optionally wrap it with its inline parts
+    my $html_entity = @html ? $html[0] : undef;
+    my $related_entity;
+    if( $html_entity && @inline )
+    {
+        $related_entity = Mail::Make::Entity->build( type => 'multipart/related' ) ||
+            return( $self->pass_error( Mail::Make::Entity->error ) );
+        $related_entity->add_part( $html_entity );
+        $related_entity->add_part( $_ ) for( @inline );
+    }
+    else
+    {
+        $related_entity = $html_entity;
+    }
+
+    my $body_entity;
+    if( @plain && $related_entity )
+    {
+        # plain + html (with or without inline): multipart/alternative
         $body_entity = Mail::Make::Entity->build( type => 'multipart/alternative' ) ||
             return( $self->pass_error( Mail::Make::Entity->error ) );
         $body_entity->add_part( $_ ) for( @plain );
-        $body_entity->add_part( $_ ) for( @html );
+        $body_entity->add_part( $related_entity );
     }
-    elsif( @html )
+    elsif( $related_entity )
     {
-        $body_entity = $html[0];
+        $body_entity = $related_entity;
     }
     elsif( @plain )
     {
@@ -124,23 +167,13 @@ sub as_entity
         return( $self->error( "No body parts have been added." ) );
     }
 
-    # NOTE: Step 2: wrap in multipart/related if there are inline parts
-    my $related_entity = $body_entity;
-    if( @inline )
-    {
-        $related_entity = Mail::Make::Entity->build( type => 'multipart/related' ) ||
-            return( $self->pass_error( Mail::Make::Entity->error ) );
-        $related_entity->add_part( $body_entity );
-        $related_entity->add_part( $_ ) for( @inline );
-    }
-
     # NOTE: Step 3: wrap in multipart/mixed if there are attachments
-    my $top_entity = $related_entity;
+    my $top_entity = $body_entity;
     if( @attachment )
     {
         $top_entity = Mail::Make::Entity->build( type => 'multipart/mixed' ) ||
             return( $self->pass_error( Mail::Make::Entity->error ) );
-        $top_entity->add_part( $related_entity );
+        $top_entity->add_part( $body_entity );
         $top_entity->add_part( $_ ) for( @attachment );
     }
 
@@ -243,7 +276,7 @@ sub attach
     my $opts = $self->_get_args_as_hash( @_ );
     unless( defined( $opts->{data} ) || defined( $opts->{path} ) )
     {
-        return( $self->error( "attach(): 'data' or 'path' is required." ) );
+        return( $self->error( "The option 'data' or 'path' is required." ) );
     }
     $opts->{disposition} //= 'attachment';
     my $entity = Mail::Make::Entity->build( %$opts ) ||
@@ -261,11 +294,11 @@ sub attach_inline
     my $opts = $self->_get_args_as_hash( @_ );
     unless( defined( $opts->{data} ) || defined( $opts->{path} ) )
     {
-        return( $self->error( "attach_inline(): 'data' or 'path' is required." ) );
+        return( $self->error( "The option 'data' or 'path' is required." ) );
     }
     unless( defined( $opts->{id} ) || defined( $opts->{cid} ) )
     {
-        return( $self->error( "attach_inline(): 'id' or 'cid' is required for inline parts." ) );
+        return( $self->error( "The option 'id' or 'cid' is required for inline parts." ) );
     }
     # Normalise: Entity->build() expects 'cid'
     $opts->{cid} //= delete( $opts->{id} );
@@ -291,7 +324,7 @@ sub bcc
     return( $self->{_headers}->header( 'Bcc' ) );
 }
 
-# build( %params ) - alternate hash-based constructor/factory
+# build( %params ) is an alternate hash-based constructor/factory
 # Returns a Mail::Make object with all parameters applied.
 sub build
 {
@@ -351,14 +384,42 @@ sub build
             }
             else
             {
-                # Plain scalar or stringifiable object - delegate to attach() which
-                # already handles the positional shorthand
+                # Plain scalar or stringifiable object that delegates to attach() which
+                # already handles the positional shorthand.
                 # So, this can be an attachment data, or a file path, or a file object
                 # like Module::Generic::File (as long as it stringifies) and does not
                 # contain a "\n"
                 $self->attach( $item ) || return( $self->pass_error );
             }
         }
+    }
+    # url_to_inline: fetch an HTML page and embed its assets as inline parts
+    if( exists( $params->{url_to_inline} ) && defined( $params->{url_to_inline} ) )
+    {
+        unless( ref( $params->{url_to_inline} ) eq 'HASH' )
+        {
+            return( $self->error( "The parameter 'url_to_inline' must be a hash reference with at least a 'url' key." ) );
+        }
+        $self->url_to_inline( %{$params->{url_to_inline}} ) || return( $self->pass_error );
+    }
+    # html_to_inline: fetch external assets and embed them as inline parts
+    if( exists( $params->{html_to_inline} ) && defined( $params->{html_to_inline} ) )
+    {
+        unless( ref( $params->{html_to_inline} ) eq 'HASH' )
+        {
+            return( $self->error( "The parameter 'html_to_inline' must be a hash reference with at least 'html' and 'base_url'." ) );
+        }
+        $self->html_to_inline( %{$params->{html_to_inline}} ) || return( $self->pass_error );
+    }
+    # related: html + inline parts in one block
+    # Accepts a hash reference: { html => $html, inline => [ ... ], html_opts => { ... } }
+    if( exists( $params->{related} ) && defined( $params->{related} ) )
+    {
+        unless( ref( $params->{related} ) eq 'HASH' )
+        {
+            return( $self->error( "The parameter 'related' must be a hash reference with at least a 'html' key." ) );
+        }
+        $self->related( %{$params->{related}} ) || return( $self->pass_error );
     }
     # Extra arbitrary headers
     if( exists( $params->{headers} ) && ref( $params->{headers} ) eq 'HASH' )
@@ -429,7 +490,7 @@ sub header
     my( $name, $value ) = @_;
     unless( defined( $name ) && length( $name ) && defined( $value ) )
     {
-        return( $self->error( "header(): name and value are required." ) );
+        return( $self->error( "Name and value are required." ) );
     }
     $self->{_headers}->push_header( $name => $value ) ||
         return( $self->pass_error( $self->{_headers}->error ) );
@@ -451,7 +512,7 @@ sub html
     my $opts = $self->_get_args_as_hash( @_ );
     unless( defined( $text ) )
     {
-        return( $self->error( "html(): text content is required." ) );
+        return( $self->error( "Text content is required." ) );
     }
     my $part = Mail::Make::Entity->build(
         type     => 'text/html',
@@ -461,6 +522,37 @@ sub html
     ) || return( $self->pass_error( Mail::Make::Entity->error ) );
     push( @{$self->{_parts}}, $part );
     return( $self );
+}
+
+# html_to_inline( %opts )
+# Parses an HTML document, fetches all external assets (images, optionally CSS),
+# replaces their URLs with cid: references, sets the HTML body part, and attaches
+# each asset as an inline part. Returns $self for chaining.
+#
+# Required options:
+#   html        Scalar string containing the raw HTML
+#   base_url    Base URL used to resolve relative and absolute-path URLs.
+#               Required unless every src/href in the HTML is already absolute.
+#               A file:///path URI is also accepted.
+#
+# Optional options:
+#   embed_css   Boolean. When true, <link rel="stylesheet"> assets are also fetched and
+#               embedded. Default: 0.
+#   cache_dir   Path to a directory for persistent caching. Each resource is stored as
+#               MD5(url).ext with a sidecar MD5(url).ext.json holding the ETag and
+#               Last-Modified values for conditional requests.
+#   charset     Charset for the HTML part. Default: utf-8.
+#   encoding    CTE for the HTML part. Default: quoted-printable.
+sub html_to_inline
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    my $raw_html = $opts->{html};
+    unless( defined( $raw_html ) && length( $raw_html ) )
+    {
+        return( $self->error( "The option 'html' is required." ) );
+    }
+    return( $self->_hti_process_assets( $raw_html, $opts ) );
 }
 
 # in_reply_to( [$mid] )
@@ -506,7 +598,7 @@ sub plain
     my $opts = $self->_get_args_as_hash( @_ );
     unless( defined( $text ) )
     {
-        return( $self->error( "plain(): text content is required." ) );
+        return( $self->error( "The option text content is required." ) );
     }
     my $part = Mail::Make::Entity->build(
         type     => 'text/plain',
@@ -531,6 +623,42 @@ sub print
     }
     my $entity = $self->as_entity || return( $self->pass_error );
     $entity->print( $fh ) || return( $self->pass_error( $entity->error ) );
+    return( $self );
+}
+
+# related( html => $html, inline => [ { path|data, id, type, ... }, ... ] )
+# Convenience method: sets the HTML body part and attaches all inline parts in one call.
+# The HTML must already contain cid:ID references matching the 'id' values supplied in
+# the inline list. Each inline item is passed to attach_inline() and must supply at
+# least 'id' (or 'cid') and one of 'path' or 'data'. Returns $self for chaining.
+sub related
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+
+    unless( defined( $opts->{html} ) )
+    {
+        return( $self->error( "The option 'html' is required." ) );
+    }
+
+    # Apply html_opts if provided
+    my %html_opts = %{ $opts->{html_opts} // {} };
+    $self->html( $opts->{html}, %html_opts ) || return( $self->pass_error );
+
+    # Process inline parts
+    if( exists( $opts->{inline} ) && defined( $opts->{inline} ) )
+    {
+        my @items = $self->_is_array( $opts->{inline} ) ? @{$opts->{inline}} : ( $opts->{inline} );
+        foreach my $item ( @items )
+        {
+            next unless( defined( $item ) );
+            unless( ref( $item ) eq 'HASH' )
+            {
+                return( $self->error( "Each 'inline' item must be a hash reference with at least 'id' (or 'cid') and 'path' or 'data'." ) );
+            }
+            $self->attach_inline( %$item ) || return( $self->pass_error );
+        }
+    }
     return( $self );
 }
 
@@ -640,7 +768,7 @@ sub smtpsend
 
     unless( defined( $mail_from ) && length( $mail_from ) )
     {
-        return( $self->error( "smtpsend(): cannot determine envelope sender (MAIL FROM). Set MailFrom or From header." ) );
+        return( $self->error( "Cannot determine envelope sender (MAIL FROM). Set MailFrom or From header." ) );
     }
 
     # Validate auth credentials before touching the network
@@ -652,7 +780,7 @@ sub smtpsend
     {
         unless( defined( $password ) )
         {
-            return( $self->error( "smtpsend(): Username supplied but Password is missing." ) );
+            return( $self->error( "Username supplied but Password is missing." ) );
         }
 
         # Authen::SASL and MIME::Base64 are required for SMTP AUTH.
@@ -660,7 +788,7 @@ sub smtpsend
         foreach my $mod ( qw( MIME::Base64 Authen::SASL ) )
         {
             $self->_load_class( $mod ) ||
-                return( $self->error( "smtpsend(): SMTP authentication requires $mod, which is not installed. Install it with: cpan $mod" ) );
+                return( $self->error( "SMTP authentication requires $mod, which is not installed. Install it with: cpan $mod" ) );
         }
     }
 
@@ -706,7 +834,7 @@ sub smtpsend
 
     unless( @addr )
     {
-        return( $self->error( "smtpsend(): no recipients found." ) );
+        return( $self->error( "No recipients found." ) );
     }
 
     # Build Net::SMTP connection options
@@ -759,7 +887,7 @@ sub smtpsend
 
     unless( defined( $smtp ) )
     {
-        return( $self->error( "smtpsend(): could not connect to any SMTP server." ) );
+        return( $self->error( "Could not connect to any SMTP server." ) );
     }
 
     # STARTTLS upgrade (ignored when caller supplied a pre-built object or SSL)
@@ -774,7 +902,7 @@ sub smtpsend
         {
             my $smtp_msg = join( ' ', $smtp->message );
             $smtp->quit;
-            return( $self->error( "smtpsend(): STARTTLS negotiation failed" . ( length( $smtp_msg ) ? ": $smtp_msg" : '.' ) ) );
+            return( $self->error( "STARTTLS negotiation failed" . ( length( $smtp_msg ) ? ": $smtp_msg" : '.' ) ) );
         }
     }
 
@@ -803,7 +931,7 @@ sub smtpsend
             if( $@ || !defined( $password ) )
             {
                 $smtp->quit if( $quit );
-                return( $self->error( "smtpsend(): password callback failed: " . ( $@ // 'returned undef' ) ) );
+                return( $self->error( "Password callback failed: " . ( $@ // 'returned undef' ) ) );
             }
         }
 
@@ -839,7 +967,7 @@ sub smtpsend
             # Capture the server's error message for a more useful diagnostic
             my $smtp_msg = join( ' ', $smtp->message );
             $smtp->quit if( $quit );
-            return( $self->error( "smtpsend(): SMTP authentication failed for user '$username'" . ( length( $smtp_msg ) ? ": $smtp_msg" : '.' ) ) );
+            return( $self->error( "SMTP authentication failed for user '$username'" . ( length( $smtp_msg ) ? ": $smtp_msg" : '.' ) ) );
         }
     }
 
@@ -865,7 +993,7 @@ sub smtpsend
 
     unless( $ok )
     {
-        return( $self->error( "smtpsend(): SMTP transaction failed." ) );
+        return( $self->error( "SMTP transaction failed." ) );
     }
 
     return( wantarray() ? @addr : \@addr );
@@ -904,6 +1032,68 @@ sub to
     return( $self->{_headers}->header( 'To' ) );
 }
 
+# url_to_inline( %opts )
+# Fetches an HTML page from a URL, then processes it exactly like html_to_inline():
+# external assets are fetched, their URLs rewritten to cid: references, and each
+# asset is attached as an inline part. The base_url defaults to the directory
+# portion of the page URL, but can be overridden via the base_url option.
+#
+# Required options:
+#   url       The URL of the HTML page to fetch and process.
+#
+# Optional options: same as html_to_inline() except 'html' (embed_css, cache_dir,
+#   charset, encoding, base_url).
+sub url_to_inline
+{
+    my $self = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+
+    my $url = $opts->{url};
+    unless( defined( $url ) && length( $url ) )
+    {
+        return( $self->error( "The option 'url' is required." ) );
+    }
+
+    # Initialise the per-instance URL cache
+    $self->{_hti_cache} //= {};
+
+    # Fetch the HTML page itself
+    my $result = $self->_hti_fetch( $url, cache_dir => $opts->{cache_dir} );
+    unless( defined( $result ) )
+    {
+        return( $self->error( "Could not fetch '$url': " . ( $self->error // 'unknown error' ) ) );
+    }
+
+    my $raw_html = ref( $result->{data} ) ? "${\$result->{data}}" : $result->{data};
+    unless( defined( $raw_html ) && length( $raw_html ) )
+    {
+        return( $self->error( "Fetched page at '$url' is empty." ) );
+    }
+
+    # Derive base_url from the page URL if not provided explicitly.
+    # Strip the filename part so relative asset URLs resolve correctly:
+    #   https://www.example.com/newsletter/confirm.html
+    #   -> https://www.example.com/newsletter/
+    unless( defined( $opts->{base_url} ) &&
+            length( $opts->{base_url} ) )
+    {
+        $self->_load_class( 'URI' ) || return( $self->pass_error );
+        local $@;
+        my $base = eval
+        {
+            my $u    = URI->new( $url );
+            my $path = $u->path;
+            $path =~ s{[^/]+$}{};
+            $u->path( $path );
+            $u->as_string;
+        };
+        return( $self->error( "An error occurred while trying to instanciate a URI object with the base URL provided '$url': $@" ) ) if( $@ );
+        $opts->{base_url} = defined( $base ) ? $base : $url;
+    }
+
+    return( $self->_hti_process_assets( $raw_html, $opts ) );
+}
+
 # use_temp_file( [$bool] )
 # When true, as_string_ref() always spools to a temporary file regardless of message size.
 # This is used when we know the message will be large, or when we want to bound peak 
@@ -936,7 +1126,7 @@ sub gpg_encrypt
     ) || return( $self->pass_error( Mail::Make::GPG->error ) );
 
     my $recipients = $opts->{Recipients} ||
-        return( $self->error( 'gpg_encrypt(): Recipients option is required.' ) );
+        return( $self->error( 'Recipients option is required.' ) );
     $recipients = [ $recipients ] unless( ref( $recipients ) eq 'ARRAY' );
 
     return( $gpg->encrypt(
@@ -1001,7 +1191,7 @@ sub gpg_sign_encrypt
     ) || return( $self->pass_error( Mail::Make::GPG->error ) );
 
     my $recipients = $opts->{Recipients} ||
-        return( $self->error( 'gpg_sign_encrypt(): Recipients option is required.' ) );
+        return( $self->error( 'Recipients option is required.' ) );
     $recipients = [ $recipients ] unless( ref( $recipients ) eq 'ARRAY' );
 
     return( $gpg->sign_encrypt(
@@ -1034,7 +1224,8 @@ sub smime_encrypt
 
     return( $smime->encrypt(
         entity        => $self,
-        RecipientCert => ( $opts->{RecipientCert} || return( $self->error( 'smime_encrypt(): RecipientCert option is required.' ) ) ),
+        RecipientCert => ( $opts->{RecipientCert} ||
+            return( $self->error( 'RecipientCert option is required.' ) ) ),
     ) || $self->pass_error( $smime->error ) );
 }
 
@@ -1093,7 +1284,7 @@ sub smime_sign_encrypt
     return( $smime->sign_encrypt(
         entity        => $self,
         RecipientCert => ( $opts->{RecipientCert} ||
-            return( $self->error( 'smime_sign_encrypt(): RecipientCert option is required.' ) ) ),
+            return( $self->error( 'RecipientCert option is required.' ) ) ),
     ) || $self->pass_error( $smime->error ) );
 }
 
@@ -1142,7 +1333,7 @@ sub _encode_address
             ? "${enc} <${spec}>"
             : qq{"${name}" <${spec}>} );
     }
-    # Bare addr-spec - nothing to encode
+    # Bare addr-spec; nothing to encode
     return( $addr );
 }
 
@@ -1182,6 +1373,469 @@ sub _format_date
         $t[2], $t[1], $t[0], $tz ) );
 }
 
+# _hti_attr( $node, $attr )
+# Gets an attribute value from a DOM node, compatible with both parsers.
+sub _hti_attr
+{
+    my( $self, $node, $attr ) = @_;
+    # HTML::Object::DOM
+    if( $node->can( 'getAttribute' ) )
+    {
+        return( $node->getAttribute( $attr ) );
+    }
+    # HTML::Object::DOM and HTML::TreeBuilder both support attr()
+    elsif( $node->can( 'attr' ) )
+    {
+        return( $node->attr( $attr ) );
+    }
+    return;
+}
+
+# _hti_ext_for( $url, $mime_type )
+# Derives a lowercase file extension from the URL path or, failing that, from the MIME
+# type string.
+sub _hti_ext_for
+{
+    my( $self, $url, $mime_type ) = @_;
+    # Try the URL path first
+    if( $url =~ /\.([a-zA-Z0-9]+)(?:[?#]|$)/ )
+    {
+        return( lc( $1 ) );
+    }
+    # Fall back to the subtype portion of the MIME type (e.g. 'png' from 'image/png')
+    if( defined( $mime_type ) && $mime_type =~ m{/([a-zA-Z0-9]+)$} )
+    {
+        return( lc( $1 ) );
+    }
+    return( '' );
+}
+
+# _hti_fetch( $url, %opts )
+# Fetches a URL and returns a hashref { data => $bytes, mime_type => $str }, or sets an
+# error and returns undef on failure.
+#
+# Supports:
+#   file:///path/to/file   read directly from disk
+#   http:// / https://     HTTP::Promise preferred, LWP::UserAgent as fallback
+#
+# When cache_dir is provided, caches the response body on disk using MD5(url).ext as the
+# filename, with a sidecar .json for ETag / Last-Modified used in conditional requests.
+sub _hti_fetch
+{
+    my $self      = shift( @_ );
+    my $url       = shift( @_ );
+    my $opts      = $self->_get_args_as_hash( @_ );
+    my $cache_dir = $opts->{cache_dir};
+
+    # Per-instance cache lookup
+    return( $self->{_hti_cache}->{ $url } ) if( exists( $self->{_hti_cache}->{ $url } ) );
+
+    my( $data, $mime_type );
+
+    # file:// URI -> read directly from disk
+    if( lc( substr( $url, 0, 7 ) ) eq 'file://' )
+    {
+        my $f = $self->new_file( $url );
+        unless( $f->exists )
+        {
+            return( $self->error( "File '$url' does not exist." ) );
+        }
+        # Use binmode => 'raw' to read binary assets (PNG, GIF, JPEG...) without
+        # any newline translation or encoding layer.
+        my $raw = $f->load( binmode => 'raw' );
+        if( !defined( $raw ) && $f->error )
+        {
+            return( $self->error( "Could not read file '$url': " . $f->error ) );
+        }
+        $data      = ref( $raw ) ? "$raw" : $raw;
+        $mime_type = eval{ $f->finfo->mime_type } // 'application/octet-stream';
+        $mime_type = "$mime_type" if( ref( $mime_type ) );
+    }
+    else
+    {
+        # Persistent cache support
+        my( $cache_file, $sidecar, $cache_meta );
+        if( defined( $cache_dir ) && length( $cache_dir ) )
+        {
+            # Core module
+            require Digest::MD5;
+            my $ext  = $self->_hti_ext_for( $url, undef );
+            my $hash = Digest::MD5::md5_hex( $url );
+            my $base = defined( $ext ) && length( $ext )
+                ? "${hash}.${ext}"
+                : $hash;
+            my $dir  = $self->new_file( $cache_dir );
+            $cache_file = $dir->child( $base );
+            $sidecar    = $dir->child( "${base}.json" );
+            if( $sidecar->exists )
+            {
+                $cache_meta = $sidecar->load_json // {};
+            }
+            $cache_meta //= {};
+        }
+
+        # Try HTTP::Promise first, then LWP::UserAgent
+        # $resp is declared here so it is in scope for the cache-update block below.
+        my $resp;
+        if( $self->_load_class( 'HTTP::Promise' ) )
+        {
+            my $ua = HTTP::Promise->new(
+                use_promise => 0,
+                ext_vary    => 1,
+            );
+            my %cond_headers;
+            if( defined( $cache_file ) && $cache_file->exists )
+            {
+                if( defined( $cache_meta->{etag} ) &&
+                    length( $cache_meta->{etag} ) )
+                {
+                    $cond_headers{'If-None-Match'} = $cache_meta->{etag};
+                }
+                elsif( !exists( $cond_headers{'If-None-Match'} ) &&
+                       defined( $cache_meta->{last_modified} ) &&
+                       length( $cache_meta->{last_modified} ) )
+                {
+                    $cond_headers{'If-Modified-Since'} = $cache_meta->{last_modified};
+                }
+            }
+            $resp = $ua->get( $url, %cond_headers );
+            unless( defined( $resp ) && $resp->is_success )
+            {
+                # 304 Not Modified; use the cached copy
+                if( defined( $resp ) && $resp->status_code == 304 &&
+                    defined( $cache_file ) && $cache_file->exists )
+                {
+                    $data      = $cache_file->load;
+                    $mime_type = $cache_meta->{mime_type} // 'application/octet-stream';
+                }
+                else
+                {
+                    return( $self->error( "GET $url failed: " . ( defined( $resp ) ? $resp->status_line : $ua->error ) ) );
+                }
+            }
+            else
+            {
+                $data      = $resp->decoded_content( charset => 'none' );
+                $mime_type = do
+                {
+                    my $ct = $resp->content_type;
+                    $ct =~ s/;.*//;
+                    $ct;
+                };
+            }
+        }
+        elsif( $self->_load_class( 'LWP::UserAgent' ) )
+        {
+            my $ua = LWP::UserAgent->new( timeout => 30 );
+            my $req = HTTP::Request->new( GET => $url );
+            if( defined( $cache_file ) && $cache_file->exists )
+            {
+                if( defined( $cache_meta->{etag} ) &&
+                    length( $cache_meta->{etag} ) )
+                {
+                    $req->header( 'If-None-Match' => $cache_meta->{etag} );
+                }
+                elsif( !$req->header( 'If-None-Match' ) &&
+                       defined( $cache_meta->{last_modified} ) &&
+                       length( $cache_meta->{last_modified} ) )
+                {
+                    $req->header( 'If-Modified-Since' => $cache_meta->{last_modified} );
+                }
+            }
+            $resp = $ua->request( $req );
+            unless( $resp->is_success )
+            {
+                if( $resp->code == 304 &&
+                    defined( $cache_file ) && $cache_file->exists )
+                {
+                    $data      = $cache_file->load;
+                    $mime_type = $cache_meta->{mime_type} // 'application/octet-stream';
+                }
+                else
+                {
+                    return( $self->error( "GET $url failed: " . $resp->status_line ) );
+                }
+            }
+            else
+            {
+                $data      = $resp->content;
+                $mime_type = do
+                {
+                    my $ct = $resp->content_type;
+                    $ct =~ s/;.*//;
+                    $ct;
+                };
+            }
+        }
+        else
+        {
+            return( $self->error( "Neither HTTP::Promise nor LWP::UserAgent is available." ) );
+        }
+
+        # Update the persistent cache if cache_dir was provided.
+        # $resp is the last HTTP response object; it is defined when we got a 200
+        # (data freshly downloaded) but not when we served from cache (304).
+        if( defined( $cache_file ) && defined( $data ) )
+        {
+            $cache_file->save( $data );
+            $cache_meta->{mime_type} = $mime_type;
+            if( defined( $resp ) && $resp->can( 'header' ) )
+            {
+                my $etag = $resp->header( 'ETag' );
+                my $lm   = $resp->header( 'Last-Modified' );
+                $cache_meta->{etag}          = $etag if( defined( $etag ) && length( $etag ) );
+                $cache_meta->{last_modified} = $lm   if( defined( $lm )   && length( $lm ) );
+            }
+            $sidecar->save_json( $cache_meta );
+        }
+    }
+
+    my $result = { data => $data, mime_type => $mime_type };
+    # Store in the per-instance cache to avoid re-fetching within this message
+    $self->{_hti_cache}->{ $url } = $result;
+    return( $result );
+}
+
+# _hti_find_nodes( $dom, $tag )
+# Returns an arrayref of nodes matching the given tag name.
+# Works with both HTML::Object::DOM and HTML::TreeBuilder.
+sub _hti_find_nodes
+{
+    my( $self, $dom, $tag ) = @_;
+    # HTML::Object::DOM for now, but could be other classes in the future.
+    if( ref( $dom ) && $dom->can( 'getElementsByTagName' ) )
+    {
+        my $list = $dom->getElementsByTagName( $tag );
+        # If we had an error, we pass it along.
+        return( $dom->pass_error ) if( !defined( $list ) && $dom->can( 'error' ) && $dom->can( 'pass_error' ) && $dom->error );
+        return( defined( $list ) ? [ $list->list ] : [] );
+    }
+    # HTML::Object::Element and HTML::TreeBuilder both expose find_by_tag_name(), which
+    # returns a Module::Generic::Array-like object with a list() method.
+    elsif( ref( $dom ) && $dom->can( 'find_by_tag_name' ) )
+    {
+        # Because HTML::TreeBuilder returns an array while HTML::Object::Element returns
+        # an array object.
+        my @list = $dom->find_by_tag_name( $tag );
+        return( $dom->pass_error ) if( !scalar( @list ) && $dom->can( 'error' ) && $dom->can( 'pass_error' ) && $dom->error );
+        my $list = scalar( @list )
+            ? ( scalar( @list ) == 1 && defined( $list[0] ) && Scalar::Util::reftype( $list[0] ) eq 'ARRAY' )
+                ? ( Scalar::Util::blessed( $list[0] ) && $list[0]->can( 'list' ) )
+                    ? [ $list[0]->list ]
+                    : [ @{$list[0]} ]
+                : \@list
+            : [];
+        return( $list );
+    }
+    return( [] );
+}
+
+# _hti_parse_html( $html )
+# Parses an HTML string and returns a DOM object.
+# Tries HTML::Object::DOM first, then HTML::TreeBuilder.
+sub _hti_parse_html
+{
+    my( $self, $html ) = @_;
+    if( $self->_load_class( 'HTML::Object::DOM', { no_warning => 1 } ) )
+    {
+        my $parser = HTML::Object::DOM->new( debug => $self->debug );
+        my $dom = $parser->parse( $html ) ||
+            return( $self->error( "HTML::Object::DOM parse failed: " . $parser->error ) );
+        return( $dom );
+    }
+    elsif( $self->_load_class( 'HTML::TreeBuilder' ) )
+    {
+        my $tree = HTML::TreeBuilder->new_from_content( $html );
+        return( $tree );
+    }
+    return( $self->error( "Neither HTML::Object::DOM nor HTML::TreeBuilder is available." ) );
+}
+
+# _hti_attr( $node, $attr )
+# Gets an attribute value from a DOM node, compatible with both parsers.
+# _hti_process_assets( $raw_html, $opts )
+# Core of html_to_inline() and url_to_inline(): parses $raw_html, fetches all external
+# assets, rewrites their URLs to cid: references, calls html() with the modified HTML,
+# and attaches each asset via attach_inline(). Returns $self.
+sub _hti_process_assets
+{
+    my( $self, $raw_html, $opts ) = @_;
+
+    my $base_url  = $opts->{base_url};
+    # By default, this is off, because mail readers ignore CSS anyway.
+    my $embed_css = $opts->{embed_css} // 0;
+    my $cache_dir = $opts->{cache_dir};
+
+    # Initialise the per-instance URL cache (avoids fetching the same URL twice within
+    # one message assembly pass).
+    $self->{_hti_cache} //= {};
+
+    # NOTE: Parse the HTML
+    my $dom = $self->_hti_parse_html( $raw_html ) ||
+        return( $self->pass_error );
+
+    # NOTE: Collect assets to embed
+    # Each entry: { node => $node, attr => 'src'|'href', url => $abs_url }
+    my @assets;
+    my %seen_url;
+
+    # <img src="...">
+    my $imgs = $self->_hti_find_nodes( $dom, 'img' );
+    foreach my $node ( @$imgs )
+    {
+        my $src = $self->_hti_attr( $node, 'src' ) // '';
+        next unless( length( $src ) );
+        my $abs = $self->_hti_resolve_url( $src, $base_url ) || next;
+        push( @assets, { node => $node, attr => 'src', url => "$abs" } );
+    }
+
+    # <body background="...">
+    my $bodies = $self->_hti_find_nodes( $dom, 'body' );
+    foreach my $node ( @$bodies )
+    {
+        my $bg = $self->_hti_attr( $node, 'background' ) // '';
+        next unless( length( $bg ) );
+        my $abs = $self->_hti_resolve_url( $bg, $base_url ) || next;
+        push( @assets, { node => $node, attr => 'background', url => "$abs" } );
+    }
+
+    # <link rel="stylesheet" href="..."> : only when embed_css is true
+    if( $embed_css )
+    {
+        my $links = $self->_hti_find_nodes( $dom, 'link' );
+        foreach my $node ( @$links )
+        {
+            my $rel  = lc( $self->_hti_attr( $node, 'rel' ) // '' );
+            my $href = $self->_hti_attr( $node, 'href' ) // '';
+            next unless( $rel eq 'stylesheet' && length( $href ) );
+            my $abs = $self->_hti_resolve_url( $href, $base_url ) || next;
+            push( @assets, { node => $node, attr => 'href', url => "$abs" } );
+        }
+    }
+
+    # NOTE: Fetch each asset, assign a Content-ID, rewrite the HTML attribute
+    require Data::UUID;
+    my $ug       = Data::UUID->new;
+    my $hostname = $self->_default_domain;
+
+    foreach my $asset ( @assets )
+    {
+        my $url = $asset->{url};
+
+        # Reuse Content-ID if the same URL appears more than once
+        my $cid;
+        if( exists( $seen_url{ $url } ) )
+        {
+            $cid = $seen_url{ $url };
+            $self->_hti_set_attr( $asset->{node}, $asset->{attr}, "cid:${cid}" );
+            next;
+        }
+
+        my $result = $self->_hti_fetch( $url, cache_dir => $cache_dir );
+        unless( defined( $result ) )
+        {
+            # Non-fatal: leave the URL unchanged and log a warning
+            warn( "Could not fetch '$url': " . ( $self->error // 'unknown error' ) ) if( $self->_is_warnings_enabled( 'Mail::Make' ) );
+            next;
+        }
+
+        my $data      = ref( $result->{data} ) ? "${\$result->{data}}" : $result->{data};
+        my $mime_type = $result->{mime_type} // 'application/octet-stream';
+
+        # Derive extension from mime type or URL
+        my $ext = $self->_hti_ext_for( $url, $mime_type );
+
+        $cid = lc( $ug->create_str ) . ( length( $ext ) ? ".${ext}" : '' ) . '@' . $hostname;
+        $seen_url{ $url } = $cid;
+
+        # Rewrite the src/href attribute to cid:...
+        $self->_hti_set_attr( $asset->{node}, $asset->{attr}, "cid:${cid}" );
+
+        # Attach the asset as an inline part
+        $self->attach_inline(
+            data => $data,
+            type => $mime_type,
+            cid  => $cid,
+        ) || return( $self->pass_error );
+    }
+
+    # Serialise the modified DOM back to HTML
+    my $modified_html = $self->_hti_serialise( $dom );
+
+    # Set the HTML body part
+    my %html_opts;
+    $html_opts{charset}  = $opts->{charset}  if( exists( $opts->{charset} ) );
+    $html_opts{encoding} = $opts->{encoding} if( exists( $opts->{encoding} ) );
+    $self->html( $modified_html, %html_opts ) || return( $self->pass_error );
+
+    return( $self );
+}
+
+# _hti_resolve_url( $url, $base_url )
+# Resolves a potentially relative URL against base_url.
+# Accepts file:// URIs. Returns the absolute URL string, or undef on error.
+sub _hti_resolve_url
+{
+    my( $self, $url, $base_url ) = @_;
+    return unless( defined( $url ) && length( $url ) );
+    # Already absolute (http://, https://, file://)
+    if( $url =~ m{^(?:https?|file)://}i )
+    {
+        return( $url );
+    }
+    unless( defined( $base_url ) && length( $base_url ) )
+    {
+        return( $self->error( "'base_url' is required to resolve relative URL '$url'." ) );
+    }
+    local $@;
+    my $abs = eval
+    {
+        require URI;
+        URI->new_abs( $url, $base_url )->as_string;
+    };
+    if( $@ || !defined( $abs ) )
+    {
+        return( $self->error( "Could not resolve '$url' against '$base_url': $@" ) );
+    }
+    return( $abs );
+}
+
+# _hti_serialise( $dom )
+# Serialises a DOM object back to an HTML string.
+sub _hti_serialise
+{
+    my( $self, $dom ) = @_;
+    # HTML::Object::DOM
+    if( $dom->can( 'as_string' ) )
+    {
+        return( $dom->as_string );
+    }
+    # HTML::TreeBuilder
+    if( $dom->can( 'as_HTML' ) )
+    {
+        return( $dom->as_HTML( '', "	" ) );
+    }
+    return( '' );
+}
+
+# _hti_set_attr( $node, $attr, $value )
+# Sets an attribute value on a DOM node, compatible with both parsers.
+sub _hti_set_attr
+{
+    my( $self, $node, $attr, $value ) = @_;
+    # Fallback to W3C setAttribute() with HTML::Object::DOM
+    if( $node->can( 'setAttribute' ) )
+    {
+        return( $node->setAttribute( $attr, $value ) );
+    }
+    # HTML::Object::DOM and HTML::TreeBuilder both support attr( $name, $value )
+    elsif( $node->can( 'attr' ) )
+    {
+        return( $node->attr( $attr, $value ) );
+    }
+    return;
+}
+
 # NOTE: STORABLE support
 sub STORABLE_freeze { CORE::return( CORE::shift->FREEZE( @_ ) ); }
 
@@ -1213,34 +1867,113 @@ Mail::Make - Strict, Fluent MIME Email Builder
             type => 'image/png',
             cid  => 'logo@yamato-inc',
         )
-        # Positional shorthand - path, type, and filename are auto-detected
+        # Positional shorthand; path, type, and filename are auto-detected
         ->attach( '/path/to/report.pdf' )
     
-        # Explicit form - override type and filename
+        # Explicit form, which overrides type and filename
         ->attach(
             path     => '/tmp/Q4-Report.pdf',
             type     => 'application/pdf',
             filename => 'Q4 Report 2025.pdf',
         );
 
-    my $raw = $mail->as_string || die( $mail->error );
-    print $raw;
+    # Plain text only
+    my $mail = Mail::Make->new
+        ->from(    'hello@example.com' )
+        ->to(      'jack@example.jp' )
+        ->subject( 'Hello' )
+        ->plain(   "Hello there.\n" )
+        ->smtpsend( Host => 'smtp.example.com' );
 
-    # Scalar-ref form - no string copy, useful for large messages
+    # HTML only
+    Mail::Make->new
+        ->from(    'hello@example.com' )
+        ->to(      'jack@example.jp' )
+        ->subject( 'Hello' )
+        ->html(    '<p>Hello there.</p>' )
+        ->smtpsend( Host => 'smtp.example.com' );
+
+    # Plain text + HTML alternative
+    Mail::Make->new
+        ->from(    'hello@example.com' )
+        ->to(      'jack@example.jp' )
+        ->subject( 'Hello' )
+        ->plain(   "Hello there.\n" )
+        ->html(    '<p>Hello there.</p>' )
+        ->smtpsend( Host => 'smtp.example.com' );
+
+    # HTML with manually managed inline images (cid: already in your HTML)
+    Mail::Make->new
+        ->from(    'hello@example.com' )
+        ->to(      'jack@example.jp' )
+        ->subject( 'Hello' )
+        ->plain(   "Hello there.\n" )
+        ->related(
+            html   => '<p><img src="cid:logo.png@example.com"> Hello.</p>',
+            inline => [
+                { path => '/var/www/images/logo.png', type => 'image/png', id => 'logo.png@example.com' },
+            ],
+        )
+        ->smtpsend( Host => 'smtp.example.com' );
+
+    # HTML with automatic asset embedding (URLs rewritten to cid: automatically) using
+    # either HTML::Object::DOM or HTML::TreeBuilder, whichever is available.
+    Mail::Make->new
+        ->from(    'hello@example.com' )
+        ->to(      'jack@example.jp' )
+        ->subject( 'Hello' )
+        ->plain(   "Hello there.\n" )
+        ->html_to_inline(
+            html     => '<p><img src="/images/logo.png"> Hello.</p>',
+            base_url => 'https://www.example.com',
+        )
+        ->smtpsend( Host => 'smtp.example.com' );
+
+    # Attachments with positional shorthand (path, type, filename auto-detected)
+    Mail::Make->new
+        ->from(    'hello@example.com' )
+        ->to(      'jack@example.jp' )
+        ->subject( 'Q4 Report' )
+        ->plain(   "Please find the report attached.\n" )
+        ->attach( '/path/to/report.pdf' )
+        ->smtpsend( Host => 'smtp.example.com' );
+
+    # Attachments with explicit form
+    Mail::Make->new
+        ->from(    'hello@example.com' )
+        ->to(      'jack@example.jp' )
+        ->subject( 'Q4 Report' )
+        ->plain(   "Please find the report attached.\n" )
+        ->attach(
+            path     => '/tmp/Q4-Report.pdf',
+            type     => 'application/pdf',
+            filename => 'Q4 Report 2025.pdf',
+        )
+        ->smtpsend( Host => 'smtp.example.com' );
+
+    # Full message: plain + HTML with inline images + attachment
+    my $mail = Mail::Make->new
+        ->from(    'hello@example.com' )
+        ->to(      'jack@example.jp' )
+        ->subject( "Q4 Report - Yamato, Inc." )
+        ->plain(   "Please find the report attached.\n" )
+        ->related(
+            html   => '<p><img src="cid:logo@yamato-inc"> Please find the report <b>attached</b>.</p>',
+            inline => [
+                { path => '/var/www/images/logo.png', type => 'image/png', id => 'logo@yamato-inc' },
+            ],
+        )
+        ->attach( '/tmp/Q4-Report.pdf' );
+
+    my $raw = $mail->as_string || die( $mail->error );
+
+    # Scalar-ref form with no string copy, useful for large messages
     my $raw_ref = $mail->as_string_ref || die( $mail->error );
     print $$raw_ref;
 
-    # Write directly to a filehandle - no in-memory buffering
-    open( my $fh, '>', '/tmp/message.eml' ) or die $!;
+    # Write directly to a filehandle, so no in-memory buffering
+    open( my $fh, '>', '/tmp/message.eml' ) or die( $! );
     $mail->print( $fh ) || die( $mail->error );
-
-    # Send directly
-    $mail->smtpsend( Host => 'smtp.example.com' )
-        || die( $mail->error );
-
-    # Direct access to the envelope headers object
-    my $h = $mail->headers;
-    $h->set( 'X-Priority' => '1' );
 
     # Hash-based alternative constructor
     my $mail2 = Mail::Make->build(
@@ -1248,12 +1981,34 @@ Mail::Make - Strict, Fluent MIME Email Builder
         to      => [ 'jack@example.jp' ],
         subject => 'Hello',
         plain   => "Hi there.\n",
-        html    => '<p>Hi there.</p>',
+        related => {
+            html   => '<p><img src="cid:logo@example.com"> Hi there.</p>',
+            inline => [
+                { path => '/var/www/images/logo.png', type => 'image/png', id => 'logo@example.com' },
+            ],
+        },
+        attach  => '/tmp/report.pdf',
     ) || die( Mail::Make->error );
+
+    # Hash-based with automatic asset embedding
+    my $mail3 = Mail::Make->build(
+        from           => 'hello@example.com',
+        to             => [ 'jack@example.jp' ],
+        subject        => 'Hello',
+        plain          => "Hi there.\n",
+        html_to_inline => {
+            html     => '<p><img src="/images/logo.png"> Hi there.</p>',
+            base_url => 'https://www.example.com',
+        },
+    ) || die( Mail::Make->error );
+
+    # Direct access to the envelope headers object
+    my $h = $mail->headers;
+    $h->set( 'X-Priority' => '1' );
 
 =head1 VERSION
 
-    v0.22.0
+    v0.23.0
 
 =head1 DESCRIPTION
 
@@ -1309,7 +2064,7 @@ An alternate hash-based constructor.
 
 Takes an hash or hash reference of options.
 
-Recognised parameters are: L<from|/from>, L<to|/to>, L<cc|/cc>, L<bcc|/bcc>, L<date|/date>, L<reply_to|/reply_to>, L<sender|/sender>, L<subject|/subject>, L<in_reply_to|/in_reply_to>, L<message_id|/message_id>, L<references|/references>, L<plain|/plain>, L<html|/html>, C<plain_opts>, C<html_opts>, C<attach>, C<headers>.
+Recognised parameters are: L<from|/from>, L<to|/to>, L<cc|/cc>, L<bcc|/bcc>, L<date|/date>, L<reply_to|/reply_to>, L<sender|/sender>, L<subject|/subject>, L<in_reply_to|/in_reply_to>, L<message_id|/message_id>, L<references|/references>, L<plain|/plain>, L<html|/html>, C<plain_opts>, C<html_opts>, C<attach>, C<related>, C<html_to_inline>, C<url_to_inline>, C<headers>.
 
 When using the standard mail envelop headers, C<build> will call each respective method, such as L<from|/from>, L<to|/to>, etc.
 
@@ -1345,6 +2100,28 @@ The C<attach> parameter accepts one of the following forms:
 If C<type> is not provided in any of the above forms, it is auto-detected from the file content using L<Module::Generic::File::Magic>.
 
 Each element is forwarded to L</attach>, so all options supported by L</attach> are available in the hash reference form.
+
+The C<related> parameter accepts a hash reference with at least a C<html> key, forwarded to L</related>:
+
+    related => {
+        html   => '<p><img src="cid:logo@example.com"> Hello.</p>',
+        inline => [
+            { path => '/var/www/images/logo.png', type => 'image/png', id => 'logo@example.com' },
+        ],
+    }
+
+The C<html_to_inline> parameter accepts a hash reference with at least C<html> and C<base_url> keys, forwarded to L</html_to_inline>:
+
+    html_to_inline => {
+        html     => '<p><img src="/images/logo.png"> Hello.</p>',
+        base_url => 'https://www.example.com',
+    }
+
+The C<url_to_inline> parameter accepts a hash reference with at least a C<url> key, forwarded to L</url_to_inline>:
+
+    url_to_inline => {
+        url => 'https://www.example.com/newsletter/confirm.html',
+    }
 
 You can also provide additional mail envelop headers by providing the parameter C<headers> as an hash reference.
 
@@ -1572,6 +2349,57 @@ Defaults to C<quoted-printable>
 
 =back
 
+=head2 html_to_inline( %opts )
+
+    # Fluent form
+    $mail->plain( "Hello.\n" )
+         ->html_to_inline(
+             html     => '<p><img src="/images/logo.png"> Hello.</p>',
+             base_url => 'https://www.example.com',
+         );
+
+    # HTML only, no plain text alternative
+    $mail->html_to_inline(
+        html     => '<p><img src="/images/logo.png"> Hello.</p>',
+        base_url => 'https://www.example.com',
+    );
+
+Parses the HTML, fetches all external assets (images, body background images, and optionally CSS), rewrites their URLs to C<cid:UUID.ext@hostname>, sets the HTML body via L</html>, and attaches each asset as an inline part via L</attach_inline>. Returns C<$self> for chaining.
+
+Assets that cannot be fetched are left unchanged and a warning is emitted (suppressible with C<no warnings 'Mail::Make'>).
+
+Supported options are:
+
+=over 4
+
+=item * C<base_url>
+
+The base URL used to resolve relative and absolute-path URLs, such as C</images/logo.png>. Required unless every C<src> and C<href> in the HTML is already an absolute URL. A C<file:///path> URI is also accepted as a base.
+
+=item * C<cache_dir>
+
+Path to a directory for persistent caching. Each fetched resource is stored on disk as C<MD5(url).ext>, with a sidecar C<MD5(url).ext.json> file holding the C<ETag> and C<Last-Modified> values used for subsequent conditional requests (C<If-None-Match> or C<If-Modified-Since>). The per-instance in-memory cache is always active regardless of this option.
+
+=item * C<charset>
+
+Charset for the HTML part. Forwarded to L</html>. Default: C<utf-8>.
+
+=item * C<embed_css>
+
+Boolean. When true, C<< <link rel="stylesheet" href="..."> >> assets are also fetched and embedded as inline parts. Default: C<0>.
+
+=item * C<encoding>
+
+Content-Transfer-Encoding for the HTML part. Forwarded to L</html>. Default: C<quoted-printable>.
+
+=item * C<html>
+
+Required. The raw HTML string to process.
+
+=back
+
+If an error occurs, it sets an L<exception object|Mail::Make::Exception>, and returns C<undef> in scalar context or an empty list in list context.
+
 =head2 in_reply_to( [$mid] )
 
     $mail->in_reply_to( 'dave.null@example.com' ); # Returns $mail
@@ -1689,6 +2517,49 @@ In accessor mode, this returns a list of message IDs, and in scalar mode, this r
 
 If an error occurs, it sets an L<exception object|Mail::Make::Exception>, and returns C<undef> in scalar context, or an empty list in list context.
 
+=head2 related( %opts )
+
+    # Fluent form with plain text alternative
+    $mail->plain( "Hello.\n" )
+         ->related(
+             html   => '<p><img src="cid:logo@example.com"> Hello.</p>',
+             inline => [
+                 { path => '/var/www/images/logo.png', type => 'image/png', id => 'logo@example.com' },
+             ],
+         );
+
+    # HTML only, no plain text alternative
+    $mail->related(
+        html   => '<p><img src="cid:logo@example.com"> Hello.</p>',
+        inline => [
+            { path => '/var/www/images/logo.png', type => 'image/png', id => 'logo@example.com' },
+        ],
+    );
+
+Convenience method that sets the HTML body part and attaches all inline parts in one call. The HTML must already contain C<cid:ID> references matching the C<id> values in the C<inline> list. Returns C<$self> for chaining.
+
+This method is suited to the case where you have already processed the HTML yourself and know the Content-IDs. For automatic URL-to-cid rewriting, use L</html_to_inline> instead.
+
+Supported options are:
+
+=over 4
+
+=item * C<html>
+
+Required. The HTML string, which must already contain C<cid:ID> references for each inline part.
+
+=item * C<html_opts>
+
+Optional hash reference of options forwarded to L</html> (such as C<charset> or C<encoding>).
+
+=item * C<inline>
+
+An array reference of hash references, each forwarded to L</attach_inline>. Each hash reference must supply at least C<id> (or C<cid>) and one of C<path> or C<data>.
+
+=back
+
+If an error occurs, it sets an L<exception object|Mail::Make::Exception>, and returns C<undef> in scalar context or an empty list in list context.
+
 =head2 reply_to( [$address] )
 
     $mail->reply_to( 'hello@example.com' );
@@ -1749,6 +2620,51 @@ Note that it is up to you to ensure there are no duplicates.
 When called as a mutator, it returns the current instance of L<Mail::Make>, otherwise, as an accessor, it returns the current value of the mail envelop header.
 
 If an error occurs, it sets an L<exception object|Mail::Make::Exception>, and returns C<undef> in scalar context, or an empty list in list context.
+
+=head2 url_to_inline( %opts )
+
+    # Fluent form
+    $mail->plain( "Hello.\n" )
+         ->url_to_inline( url => 'https://www.example.com/newsletter/confirm.html' );
+
+    # HTML only, no plain text alternative
+    $mail->url_to_inline( url => 'https://www.example.com/newsletter/confirm.html' );
+
+Fetches the HTML page at C<url>, then processes it exactly like L</html_to_inline>: external assets are fetched, their URLs rewritten to C<cid:> references, and each asset is attached as an inline part via L</attach_inline>. Returns C<$self> for chaining.
+
+The C<base_url> for resolving relative asset URLs defaults to the directory portion of C<url> (e.g. C<https://www.example.com/newsletter/> for a page at C<.../newsletter/confirm.html>), but can be overridden explicitly.
+
+Supported options are:
+
+=over 4
+
+=item * C<url>
+
+Required. The URL of the HTML page to fetch and process. C<file:///path> URIs are also accepted.
+
+=item * C<base_url>
+
+Overrides the base URL used to resolve relative asset URLs. When omitted, it is deduced from the directory portion of C<url>.
+
+=item * C<cache_dir>
+
+Same as L</html_to_inline>. Path to a directory for persistent HTTP caching of fetched assets.
+
+=item * C<charset>
+
+Charset for the HTML part. Forwarded to L</html>. Default: C<utf-8>.
+
+=item * C<embed_css>
+
+Boolean. When true, C<< <link rel="stylesheet" href="..."> >> assets are also fetched and embedded. Default: C<0>.
+
+=item * C<encoding>
+
+Content-Transfer-Encoding for the HTML part. Forwarded to L</html>. Default: C<quoted-printable>.
+
+=back
+
+If an error occurs, it sets an L<exception object|Mail::Make::Exception>, and returns C<undef> in scalar context or an empty list in list context.
 
 =head1 OUTPUT METHODS
 
@@ -2045,20 +2961,20 @@ B<Typical usage:>
     my $signed = $mail->gpg_sign(
         KeyId      => '35ADBC3AF8355E845139D8965F3C0261CDB2E752',
         Passphrase => 'my-passphrase',   # or: sub { MyKeyring::get('gpg') }
-    ) || die $mail->error;
+    ) || die( $mail->error );
     $signed->smtpsend( Host => 'smtp.example.com' );
 
     # Encrypt only
     my $encrypted = $mail->gpg_encrypt(
         Recipients => [ 'alice@example.com' ],
-    ) || die $mail->error;
+    ) || die( $mail->error );
 
     # Sign then encrypt
     my $protected = $mail->gpg_sign_encrypt(
         KeyId      => '35ADBC3AF8355E845139D8965F3C0261CDB2E752',
         Passphrase => sub { MyKeyring::get_passphrase() },
         Recipients => [ 'alice@example.com', 'bob@example.com' ],
-    ) || die $mail->error;
+    ) || die( $mail->error );
 
 =head1 S/MIME METHODS
 
@@ -2164,20 +3080,20 @@ B<Typical usage:>
         Cert   => '/path/to/my.cert.pem',
         Key    => '/path/to/my.key.pem',
         CACert => '/path/to/ca.crt',
-    ) || die $mail->error;
+    ) || die( $mail->error );
     $signed->smtpsend( Host => 'smtp.example.com' );
 
     # Encrypt only
     my $encrypted = $mail->smime_encrypt(
         RecipientCert => '/path/to/recipient.cert.pem',
-    ) || die $mail->error;
+    ) || die( $mail->error );
 
     # Sign then encrypt
     my $protected = $mail->smime_sign_encrypt(
         Cert          => '/path/to/my.cert.pem',
         Key           => '/path/to/my.key.pem',
         RecipientCert => '/path/to/recipient.cert.pem',
-    ) || die $mail->error;
+    ) || die( $mail->error );
 
 =head1 PRIVATE METHODS
 

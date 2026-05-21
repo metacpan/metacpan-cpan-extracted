@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1
-#                   and LibVirt version v11.10.0
+#                   and LibVirt version v12.3.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -13,15 +13,19 @@
 use v5.26;
 use warnings;
 use experimental 'signatures';
+use Feature::Compat::Try;
 use Future::AsyncAwait;
-use Object::Pad;
+use Object::Pad 0.821;
+use Sublike::Extended 0.29 'method', 'sub'; # From XS-Parse-Sublike, used by Future::AsyncAwait
 
-class Sys::Async::Virt::Domain v0.2.3;
+class Sys::Async::Virt::Domain v0.6.3;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v11.10.1;
+use Protocol::Sys::Virt::TypedParams v12.3.0;
+use Protocol::Sys::Virt::URI v12.3.0;
+use Protocol::Sys::Virt::Remote::XDR v12.3.0;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -184,6 +188,7 @@ use constant {
     MIGRATE_PARAM_LISTEN_ADDRESS                                      => "listen_address",
     MIGRATE_PARAM_MIGRATE_DISKS                                       => "migrate_disks",
     MIGRATE_PARAM_MIGRATE_DISKS_DETECT_ZEROES                         => "migrate_disks_detect_zeroes",
+    MIGRATE_PARAM_MIGRATE_DISKS_TARGET_ZERO                           => "migrate_disks_target_zero",
     MIGRATE_PARAM_DISKS_PORT                                          => "disks_port",
     MIGRATE_PARAM_DISKS_URI                                           => "disks_uri",
     MIGRATE_PARAM_COMPRESSION                                         => "compression",
@@ -220,6 +225,13 @@ use constant {
     SAVE_PARAM_FILE                                                   => "file",
     SAVE_PARAM_DXML                                                   => "dxml",
     SAVE_PARAM_IMAGE_FORMAT                                           => "image_format",
+    SAVE_PARAM_IMAGE_FORMAT_RAW                                       => "raw",
+    SAVE_PARAM_IMAGE_FORMAT_GZIP                                      => "gzip",
+    SAVE_PARAM_IMAGE_FORMAT_BZIP2                                     => "bzip2",
+    SAVE_PARAM_IMAGE_FORMAT_XZ                                        => "xz",
+    SAVE_PARAM_IMAGE_FORMAT_LZOP                                      => "lzop",
+    SAVE_PARAM_IMAGE_FORMAT_ZSTD                                      => "zstd",
+    SAVE_PARAM_IMAGE_FORMAT_SPARSE                                    => "sparse",
     SAVE_PARAM_PARALLEL_CHANNELS                                      => "parallel.channels",
     CPU_STATS_CPUTIME                                                 => "cpu_time",
     CPU_STATS_USERTIME                                                => "user_time",
@@ -265,6 +277,7 @@ use constant {
     BANDWIDTH_OUT_BURST                                               => "outbound.burst",
     BLOCK_RESIZE_BYTES                                                => 1 << 0,
     BLOCK_RESIZE_CAPACITY                                             => 1 << 1,
+    BLOCK_RESIZE_EXTEND                                               => 1 << 2,
     MEMORY_VIRTUAL                                                    => 1 << 0,
     MEMORY_PHYSICAL                                                   => 1 << 1,
     UNDEFINE_MANAGED_SAVE                                             => (1 << 0),
@@ -393,6 +406,14 @@ use constant {
     STATS_BLOCK_SUFFIX_TIMED_GROUP_SUFFIX_RD_QUEUE_DEPTH_AVG          => ".rd_queue_depth_avg",
     STATS_BLOCK_SUFFIX_TIMED_GROUP_SUFFIX_WR_QUEUE_DEPTH_AVG          => ".wr_queue_depth_avg",
     STATS_BLOCK_SUFFIX_TIMED_GROUP_SUFFIX_ZONE_APPEND_QUEUE_DEPTH_AVG => ".zone_append_queue_depth_avg",
+    STATS_BLOCK_SUFFIX_LATENCY_HISTOGRAM_READ_PREFIX                  => ".latency_histogram.read.",
+    STATS_BLOCK_SUFFIX_LATENCY_HISTOGRAM_WRITE_PREFIX                 => ".latency_histogram.write.",
+    STATS_BLOCK_SUFFIX_LATENCY_HISTOGRAM_ZONE_APPEND_PREFIX           => ".latency_histogram.zone_append.",
+    STATS_BLOCK_SUFFIX_LATENCY_HISTOGRAM_FLUSH_PREFIX                 => ".latency_histogram.flush.",
+    STATS_BLOCK_SUFFIX_LATENCY_HISTOGRAM_SUFFIX_BIN_COUNT             => "bin.count",
+    STATS_BLOCK_SUFFIX_LATENCY_HISTOGRAM_SUFFIX_BIN_PREFIX            => "bin.",
+    STATS_BLOCK_SUFFIX_LATENCY_HISTOGRAM_SUFFIX_BIN_SUFFIX_START      => ".start",
+    STATS_BLOCK_SUFFIX_LATENCY_HISTOGRAM_SUFFIX_BIN_SUFFIX_VALUE      => ".value",
     STATS_PERF_CMT                                                    => "perf.cmt",
     STATS_PERF_MBMT                                                   => "perf.mbmt",
     STATS_PERF_MBML                                                   => "perf.mbml",
@@ -492,6 +513,7 @@ use constant {
     BLOCK_COPY_REUSE_EXT                                              => 1 << 1,
     BLOCK_COPY_TRANSIENT_JOB                                          => 1 << 2,
     BLOCK_COPY_SYNCHRONOUS_WRITES                                     => 1 << 3,
+    BLOCK_COPY_TARGET_ZEROED                                          => 1 << 4,
     BLOCK_COPY_BANDWIDTH                                              => "bandwidth",
     BLOCK_COPY_GRANULARITY                                            => "granularity",
     BLOCK_COPY_BUF_SIZE                                               => "buf-size",
@@ -890,15 +912,30 @@ use constant {
 };
 
 
-field $_id :param :reader;
+field $_rpc_id :param :reader;
 field $_client :param :reader;
 
+method id() {
+    return $_rpc_id->{id};
+}
+
+method name() {
+    return $_rpc_id->{name};
+}
+
+method uuid() {
+    return $_rpc_id->{uuid};
+}
+
+method uuid_string() {
+    return join( '-', unpack('H8H4H4H4H12', $_rpc_id->{uuid}) );
+}
 
 # ENTRYPOINT: REMOTE_PROC_DOMAIN_GET_BLOCK_JOB_INFO
 async method get_block_job_info($disk, $flags = 0) {
     my $rv = await $_client->_call(
         $remote->PROC_DOMAIN_GET_BLOCK_JOB_INFO,
-        { dom => $_id, path => $disk, flags => $flags // 0 } );
+        { dom => $_rpc_id, path => $disk, flags => $flags // 0 } );
 
     if ($rv->{found}) {
         return $rv;
@@ -913,7 +950,7 @@ async method get_emulator_pin_info($flags = 0) {
     my $maplen = await $_client->_maplen;
     my $rv = await $_client->_call(
         $remote->PROC_DOMAIN_GET_EMULATOR_PIN_INFO,
-        { dom => $_id, maplen => $maplen,
+        { dom => $_rpc_id, maplen => $maplen,
           flags => $flags // 0 } );
 
     if ($rv->{ret} == 0) {
@@ -928,7 +965,7 @@ async method get_emulator_pin_info($flags = 0) {
 async method get_iothread_info($flags = 0) {
     my $rv = await $_client->_call(
         $remote->PROC_DOMAIN_GET_IOTHREAD_INFO,
-        { dom => $_id, flags => $flags // 0 } );
+        { dom => $_rpc_id, flags => $flags // 0 } );
 
     my @rv;
     for my $thread ($rv->{info}->@*) {
@@ -952,7 +989,7 @@ sub _patch_security_label($sec) {
 async method get_security_label() {
     my $rv = await $_client->_call(
         $remote->PROC_DOMAIN_GET_SECURITY_LABEL,
-        { dom => $_id } );
+        { dom => $_rpc_id } );
 
     _patch_security_label( $rv );
     return $rv;
@@ -962,7 +999,7 @@ async method get_security_label() {
 async method get_security_label_list() {
     my $rv = await $_client->_call(
         $remote->PROC_DOMAIN_GET_SECURITY_LABEL_LIST,
-        { dom => $_id } );
+        { dom => $_rpc_id } );
 
     for my $label ($rv->{labels}->@*) {
         _patch_security_label( $label );
@@ -975,7 +1012,7 @@ async method get_security_label_list() {
 async method get_time($flags = 0) {
     my $rv = await $_client->_call(
         $remote->PROC_DOMAIN_GET_TIME,
-        { dom => $_id, flags => $flags // 0 } );
+        { dom => $_rpc_id, flags => $flags // 0 } );
 
     return ( $rv->{seconds}, $rv->{nseconds} );
 }
@@ -987,7 +1024,7 @@ async method get_vcpu_pin_info($flags = 0) {
     my $maplen = await $_client->_maplen;
     my $rv = await $_client->_call(
         $remote->PROC_DOMAIN_GET_VCPU_PIN_INFO,
-        { dom => $_id, ncpumaps => $vcpus,
+        { dom => $_rpc_id, ncpumaps => $vcpus,
           maplen => $maplen, flags => $flags });
 
     my $maps = $rv->{cpumaps};
@@ -1005,7 +1042,7 @@ async method get_vcpus() {
     my $maplen = await $_client->_maplen;
     my $rv = await $_client->_call(
         $remote->PROC_DOMAIN_GET_VCPUS,
-        { dom => $_id, maxinfo => $vcpus, maplen => $maplen } );
+        { dom => $_rpc_id, maxinfo => $vcpus, maplen => $maplen } );
 
     my @rv;
     foreach my $vcpu_idx (0 .. ($vcpus - 1)) {
@@ -1018,934 +1055,1297 @@ async method get_vcpus() {
     return \@rv;
 }
 
+
+###############################################################################
+#
+#                                MIGRATION CODE
+#
+###############################################################################
+#
+# The migration protocol is documented in libvirt's repository:
+#   https://gitlab.com/libvirt/libvirt/-/blob/master/docs/kbase/internals/migration.rst
+#
+
+
+
+# ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_BEGIN3_PARAMS
+# ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_PREPARE3_PARAMS
+# ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_PERFORM3_PARAMS
+# ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_CONFIRM3_PARAMS
+# ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_FINISH3_PARAMS
+async method migrate($dest_client, $params, $flags) {
+    #
+    # This function is a port of virDomainMigrate3
+    #
+    my $cancelled     = 1;
+    my $cookie;
+    my $notify_source = 1;
+    my $saved_error;
+
+    die $log->error(q{migrate() client connected over read-only connection; can't migrate})
+        if $_client->readonly;
+
+    die $log->error(q{migrate() destination client connected over read-only connection; can't migrate})
+        if $dest_client->readonly;
+
+    die $log->error(q{migrate() use migrate_to_uri() for peer-to-peer and tunneled migration})
+        if $flags & (MIGRATE_PEER2PEER | MIGRATE_TUNNELLED);
+
+    my $params_feature = $_client->remote->DRV_FEATURE_MIGRATION_PARAMS;
+    die $log->error(qq{Source host missing feature MIGRATION_PARAMS($params_feature); }
+                    . q{older migration protocols not supported})
+        if (not await $_client->_supports_feature( $params_feature ));
+    die $log->error(q{Destination host missing feature MIGRATION_PARAMS; }
+                    . q{older migration protocols not supported})
+        if (not await $dest_client->_supports_feature( $params_feature ));
+
+    die $log->error(q{migrate() flags MIGRATE_NON_SHARED_DISK and }
+                    . q{MIGRATE_NON_SHARED_INC are mutually exclusive.})
+        if ($flags & MIGRATE_NON_SHARED_DISK
+            and $flags & MIGRATE_NON_SHARED_INC);
+
+    die $log->error(q{migrate() flag MIGRATE_NON_SHARED_SYNCHRONOUS_WRITES }
+                    . q{requires either MIGRATE_NON_SHARED_DISK or }
+                    . q{MIGRATE_NON_SHARED_INC.})
+        if ($flags & MIGRATE_NON_SHARED_SYNCHRONOUS_WRITES
+            and not ($flags & (MIGRATE_NON_SHARED_DISK | MIGRATE_NON_SHARED_INC)));
+
+    die $log->error(q{migrate() with 'dest_client' does not support PEER2PEER and/or TUNNELLED flags})
+        if ($flags & MIGRATE_PEER2PEER or $flags & MIGRATE_TUNNELLED);
+
+    unless (typed_params_field( $params, MIGRATE_PARAM_DEST_NAME )) {
+        $log->info( q{migrate() No destination VM name provided; using source name} );
+        typed_params_field( $params, MIGRATE_PARAM_DEST_NAME,
+                            typed_value_new( TYPED_PARAM_STRING, $self->name ) );
+    }
+
+    if ($flags & MIGRATE_OFFLINE) {
+        my $offline_feature = $_client->remote->DRV_FEATURE_MIGRATION_OFFLINE;
+        die $log->error(q{Source host does not support offline migration})
+            if (await $_client->_supports_feature( $offline_feature ));
+        die $log->error(q{Destination host does not support offline migration})
+            if (await $dest_client->_supports_feature( $offline_feature ));
+    }
+
+
+    my $protection = 0;
+    my $protection_feature = $_client->remote->DRV_FEATURE_MIGRATE_CHANGE_PROTECTION;
+    if (await $_client->_supports_feature( $protection_feature )) {
+        $protection = MIGRATE_CHANGE_PROTECTION;
+    }
+    if ($flags & MIGRATE_CHANGE_PROTECTION and not $protection) {
+        die $log->error(q{Cannot enforce change protection});
+    }
+    $flags &= ~MIGRATE_CHANGE_PROTECTION;
+
+
+    # Require VIR_DRV_FEATURE_MIGRATION_PARAMS to be available,
+    # since it was available since 2013
+    die $log->error(q{Source host does not support VIR_DRV_FEATURE_MIGRATION_PARAMS})
+        unless await $_client->_supports_feature( $_client->remote->DRV_FEATURE_MIGRATION_PARAMS );
+    die $log->error(q{Destination host does not support VIR_DRV_FEATURE_MIGRATION_PARAMS})
+        unless await $dest_client->_supports_feature( $_client->remote->DRV_FEATURE_MIGRATION_PARAMS );
+
+
+    my $rv;
+    $rv = await $_client->_call(
+        $remote->PROC_DOMAIN_MIGRATE_BEGIN3_PARAMS,
+        { dom => $_rpc_id, params => $params,
+          flags => ($flags | $protection) });
+
+    my $dom_xml;
+    ($dom_xml, $cookie) = $rv->@{ qw( xml cookie_out ) };
+    return undef unless $dom_xml;
+
+    try {
+        $rv = await $self->get_state;
+        if ($rv->{'state'} == PAUSED
+            and not ($flags & MIGRATE_POSTCOPY_RESUME)) {
+            $flags |= MIGRATE_PAUSED;
+        }
+    }
+    catch ($e) {
+        $log->debug( "Error: $e" );
+        # ignore errors
+    }
+
+    my $dest_uri;
+    my $dest_flags = $flags & ~(MIGRATE_ABORT_ON_ERROR | MIGRATE_AUTO_CONVERGE);
+
+
+    # # replace the MIGRATE_PARAM_DEST_XML parameter with $dom_xml
+    $params = typed_params_new( $params );
+    typed_params_field( $params, MIGRATE_PARAM_DEST_XML,
+                        typed_value_new( TYPED_PARAM_STRING, $dom_xml ) );
+    try {
+        $rv = await $dest_client->_call(
+            $remote->PROC_DOMAIN_MIGRATE_PREPARE3_PARAMS,
+            { cookie_in => $cookie, params => $params, flags => $dest_flags });
+        ($cookie, $dest_uri) = $rv->@{ qw( cookie_out uri_out ) };
+    }
+    catch ($e) {
+        $log->debug( "Error: $e" );
+        if ($protection) {
+            $saved_error = $e;
+            goto confirm;
+        }
+        else {
+            goto done;
+        }
+    }
+    if ($dest_uri) {
+        typed_params_field( $params, MIGRATE_PARAM_URI,
+                            typed_value_new( TYPED_PARAM_STRING, $dest_uri ) );
+    }
+    elsif (not typed_params_field_string_value( $params, MIGRATE_PARAM_URI )) {
+        try {
+            die $log->error("Internal error: MIGRATE_PREPARE3 didn't set 'uri'");
+        }
+        catch ($e) {
+            $log->debug( "Error: $e" );
+            $saved_error = $e;
+            goto finish;
+        }
+    }
+
+    if ($flags & MIGRATE_OFFLINE) {
+        $log->debug("Offline migration, skipping Perform phase");
+
+        $cookie = undef;
+        $cancelled = 0;
+        goto finish;
+    }
+
+    $log->debug("Perform3");
+    try {
+        $rv = await $_client->_call(
+            $remote->PROC_DOMAIN_MIGRATE_PERFORM3_PARAMS,
+            { dom => $_rpc_id,
+              dconnuri => undef,
+              params => $params,
+              cookie_in => $cookie,
+              flags => ($flags | $protection),
+            } );
+        $cookie = $rv->{cookie_out};
+        $cancelled = 0;
+    }
+    catch ($e) {
+        $log->debug( "Error: $e" );
+        $saved_error   = $e;
+        $notify_source = 0;
+    }
+
+  finish:
+    my $ddomain;
+    try {
+        $rv = await $dest_client->_call(
+            $remote->PROC_DOMAIN_MIGRATE_FINISH3_PARAMS,
+            { params => $params, cookie_in => $cookie,
+              flags => $dest_flags, cancelled => $cancelled });
+        ( $ddomain, $cookie ) = $rv->@{ qw( dom cookie_out ) };
+    }
+    catch ($e) {
+        $log->debug( "Error: $e" );
+        # ignore errors
+    }
+
+    if ($cancelled and $ddomain) {
+        $log->error("finish step ignored migration cancellation and started domain");
+    }
+    $cancelled = not defined $ddomain;
+
+  confirm:
+
+    if ($notify_source) {
+        try {
+            await $_client->_call(
+                $remote->PROC_DOMAIN_MIGRATE_CONFIRM3_PARAMS,
+                { dom => $_rpc_id, params => $params, cookie_in => $cookie,
+                  flags => ($flags | $protection), cancelled => $cancelled});
+        }
+        catch ($e) {
+            $log->debug( "Error: $e" );
+
+            my $name = $self->name;
+            $log->warn("Guest '$name' probably left in 'paused' state on source");
+        }
+    }
+
+  done:
+    if ($saved_error) {
+        die $saved_error;
+    }
+    else {
+        return $ddomain;
+    }
+}
+
+sub _is_local_uri($uri) {
+    my %components = parse_url( $uri );
+
+    return 1 if $components{host} and $components{host} =~  m/^localhost/;
+    return 0 if $components{host};
+
+    return 0 if ($components{transport}
+                 and $components{transport} eq 'unix'
+                 and $components{query}->{socket});
+    return 1 if ($components{transport}
+                 and $components{transport} eq 'unix');
+    return 1 if not $components{transport};
+    return 0;
+}
+
+# ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_PERFORM3
+async method migrate_to_uri($dest_uri, $params, $flags) {
+    die $log->error(q{migrate_to_uri() without PEER2PEER flag should not pass 'dest_uri'})
+        if ($dest_uri and not ($flags & MIGRATE_PEER2PEER));
+
+    die $log->error(q{migrate_to_uri() client connected over read-only connection; can't migrate})
+        if $_client->readonly;
+
+    die $log->error(q{migrate_to_uri() TUNNELLED flag requires PEER2PEER flag to be set})
+        if ($flags & MIGRATE_TUNNELLED
+            and not ($flags & MIGRATE_PEER2PEER));
+
+    if ($flags & MIGRATE_TUNNELLED
+        and $flags & MIGRATE_PARALLEL) {
+        die $log->error(q{migrate_to_uri() TUNNELLED and PARALLEL flags are mutually exclusive});
+    }
+
+    if ($flags & MIGRATE_NON_SHARED_DISK
+        and $flags & MIGRATE_NON_SHARED_INC) {
+        die $log->error(q{migrate_to_uri() NON_SHARED_DISK and NON_SHARED_INC flags are mutually exclusive});
+    }
+
+    if ($flags & MIGRATE_NON_SHARED_SYNCHRONOUS_WRITES) {
+        unless ($flags & (MIGRATE_NON_SHARED_DISK | MIGRATE_NON_SHARED_INC)) {
+            die $log->error(q{migrate_to_uri() flag NON_SHARED_SYNCHRONOUS_WRITES requires either NON_SHARED_DISK or NON_SHARED_INC flag});
+        }
+    }
+
+    if ($flags & MIGRATE_OFFLINE) {
+        unless (await $_client->_supports_feature( $_client->remote->DRV_FEATURE_MIGRATION_OFFLINE )) {
+            die $log->error(q{migrate_to_uri() offline migration not supported by the source host});
+        }
+    }
+
+    if ($flags & MIGRATE_PEER2PEER) {
+        unless (await $_client->_supports_feature( $_client->remote->DRV_FEATURE_MIGRATION_P2P )) {
+            die $log->error(q{migrate_to_uri() p2p migration not supported by the source host});
+        }
+    }
+    else {
+        unless (await $_client->_supports_feature( $_client->remote->DRV_FEATURE_MIGRATION_DIRECT )) {
+            die $log->error(q{migrate_to_uri() direct migration not supported by the source host});
+        }
+    }
+
+    if ($flags & MIGRATE_PEER2PEER) {
+        die $log->error(q{migrate_to_uri() peer-to-peer migration requires $dest_uri to be defined})
+            if (not defined $dest_uri);
+    }
+    else {
+        $dest_uri = undef;
+    }
+
+    if ($flags & MIGRATE_PEER2PEER) {
+        if ( _is_local_uri( $dest_uri ) ) {
+            die $log->error( q{Attempt to migrate guest to same host} );
+        }
+
+        die $log->error(q{Source host does not support VIR_DRV_FEATURE_MIGRATION_PARAMS})
+            unless await $_client->_supports_feature( $_client->remote->DRV_FEATURE_MIGRATION_PARAMS );
+
+        return await $_client->_call( $remote->PROC_DOMAIN_MIGRATE_PERFORM3_PARAMS,
+                                      # domain, dconnuri, params, nparams, flags
+                                      {
+                                          dom => $_rpc_id,
+                                          dconnuri => $dest_uri,
+                                          flags => $flags,
+                                          params => $params,
+                                          cookie_in => '',
+                                      } );
+    }
+
+    # when not migrating PEER2PEER
+    unless (await $_client->_supports_feature( $_client->remote->DRV_FEATURE_MIGRATION_V3 ) ) {
+        die $log->error(q{migrate_to_uri() v3 migration not supported by the source host});
+    }
+
+    die $log->error(q{migrate() requires MIGRATE_PARAM_URI when called without both 'dest_client' and 'dest_client_uri'})
+        if (not typed_params_field_string_value( $params, MIGRATE_PARAM_URI ));
+
+    typed_param_field_check_fields_only( $params,
+                                         MIGRATE_PARAM_URI, MIGRATE_PARAM_DEST_NAME,
+                                         MIGRATE_PARAM_DEST_XML, MIGRATE_PARAM_BANDWIDTH );
+
+    my $miguri    = typed_param_field_string_value( $params, MIGRATE_PARAM_URI );
+    my $dest_name = typed_param_field_string_value( $params, MIGRATE_PARAM_DEST_NAME );
+    my $dest_xml  = typed_param_field_string_value( $params, MIGRATE_PARAM_DEST_XML );
+    my $bandwidth = typed_param_field_ullong_value( $params, MIGRATE_PARAM_BANDWIDTH );
+
+    unless ($dest_name) {
+        die $log->error( q{migrate() empty string for required parameter MIGRATE_PARAM_DEST_NAME} );
+    }
+
+    return await $_client->_call( $remote->PROC_DOMAIN_MIGRATE_PERFORM3,
+                                  {
+                                      dom => $_rpc_id,
+                                      xmlin => $dest_xml,
+                                      uri => $miguri,
+                                      flags => $flags,
+                                      dname => $dest_name,
+                                      bandwidth => $bandwidth,
+                                      cookie_in  => undef,
+                                      dconnuri  => undef,
+                                  } );
+}
+
+
+async method migrate_peer2peer( $dconnuri, $params, $flags ) {
+    return await $self->migrate_to_uri( $dconnuri, $params, $flags | MIGRATE_PEER2PEER );
+}
+
+async method migrate_unmanaged_direct( $miguri, $params, $flags ) {
+    typed_params_field_string_value( $params, MIGRATE_PARAM_URI, $miguri );
+    return await $self->migrate_to_uri( undef, $params, $flags & ~MIGRATE_PEER2PEER );
+}
+
+###############################################################################
+#
+#                             END OF MIGRATION CODE
+#
+###############################################################################
+
+
 # ENTRYPOINT: REMOTE_PROC_DOMAIN_PIN_EMULATOR
 async method pin_emulator($cpumap, $flags = 0) {
     await $self->_call(
         $remote->PROC_DOMAIN_PIN_EMULATOR,
-        { dom => $_id, cpumap => $cpumap,
+        { dom => $_rpc_id, cpumap => $cpumap,
           flags => $flags // 0 } );
 }
 
 method _migrate_perform($cookie, $uri, $flags, $dname, $bandwidth) {
     return $_client->_call(
         $remote->PROC_DOMAIN_MIGRATE_PERFORM,
-        { dom => $_id, cookie => $cookie, uri => $uri, flags => $flags // 0, dname => $dname, bandwidth => $bandwidth }, empty => 1 );
+        { dom => $_rpc_id, cookie => $cookie, uri => $uri, flags => $flags // 0, dname => $dname, bandwidth => $bandwidth }, empty => 1 );
 }
 
 method abort_job() {
     return $_client->_call(
         $remote->PROC_DOMAIN_ABORT_JOB,
-        { dom => $_id }, empty => 1 );
+        { dom => $_rpc_id }, empty => 1 );
 }
 
 method abort_job_flags($flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_ABORT_JOB_FLAGS,
-        { dom => $_id, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, flags => $flags // 0 }, empty => 1 );
 }
 
 method add_iothread($iothread_id, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_ADD_IOTHREAD,
-        { dom => $_id, iothread_id => $iothread_id, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, iothread_id => $iothread_id, flags => $flags // 0 }, empty => 1 );
 }
 
 async method agent_set_response_timeout($timeout, $flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_AGENT_SET_RESPONSE_TIMEOUT,
-        { dom => $_id, timeout => $timeout, flags => $flags // 0 }, unwrap => 'result' );
+        { dom => $_rpc_id, timeout => $timeout, flags => $flags // 0 }, unwrap => 'result' );
 }
 
 method attach_device($xml) {
     return $_client->_call(
         $remote->PROC_DOMAIN_ATTACH_DEVICE,
-        { dom => $_id, xml => $xml }, empty => 1 );
+        { dom => $_rpc_id, xml => $xml }, empty => 1 );
 }
 
 method attach_device_flags($xml, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_ATTACH_DEVICE_FLAGS,
-        { dom => $_id, xml => $xml, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, xml => $xml, flags => $flags // 0 }, empty => 1 );
 }
 
 async method authorized_ssh_keys_get($user, $flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_AUTHORIZED_SSH_KEYS_GET,
-        { dom => $_id, user => $user, flags => $flags // 0 }, unwrap => 'keys' );
+        { dom => $_rpc_id, user => $user, flags => $flags // 0 }, unwrap => 'keys' );
 }
 
 method authorized_ssh_keys_set($user, $keys, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_AUTHORIZED_SSH_KEYS_SET,
-        { dom => $_id, user => $user, keys => $keys, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, user => $user, keys => $keys, flags => $flags // 0 }, empty => 1 );
 }
 
 method backup_begin($backup_xml, $checkpoint_xml, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_BACKUP_BEGIN,
-        { dom => $_id, backup_xml => $backup_xml, checkpoint_xml => $checkpoint_xml, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, backup_xml => $backup_xml, checkpoint_xml => $checkpoint_xml, flags => $flags // 0 }, empty => 1 );
 }
 
 async method backup_get_xml_desc($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_BACKUP_GET_XML_DESC,
-        { dom => $_id, flags => $flags // 0 }, unwrap => 'xml' );
+        { dom => $_rpc_id, flags => $flags // 0 }, unwrap => 'xml' );
 }
 
 method block_commit($disk, $base, $top, $bandwidth, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_BLOCK_COMMIT,
-        { dom => $_id, disk => $disk, base => $base, top => $top, bandwidth => $bandwidth, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, disk => $disk, base => $base, top => $top, bandwidth => $bandwidth, flags => $flags // 0 }, empty => 1 );
 }
 
 async method block_copy($path, $destxml, $params, $flags = 0) {
     $params = await $_client->_filter_typed_param_string( $params );
     return await $_client->_call(
         $remote->PROC_DOMAIN_BLOCK_COPY,
-        { dom => $_id, path => $path, destxml => $destxml, params => $params, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, path => $path, destxml => $destxml, params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
 method block_job_abort($path, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_BLOCK_JOB_ABORT,
-        { dom => $_id, path => $path, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, path => $path, flags => $flags // 0 }, empty => 1 );
 }
 
 method block_job_set_speed($path, $bandwidth, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_BLOCK_JOB_SET_SPEED,
-        { dom => $_id, path => $path, bandwidth => $bandwidth, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, path => $path, bandwidth => $bandwidth, flags => $flags // 0 }, empty => 1 );
 }
 
 async method block_peek($path, $offset, $size, $flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_BLOCK_PEEK,
-        { dom => $_id, path => $path, offset => $offset, size => $size, flags => $flags // 0 }, unwrap => 'buffer' );
+        { dom => $_rpc_id, path => $path, offset => $offset, size => $size, flags => $flags // 0 }, unwrap => 'buffer' );
 }
 
 method block_pull($path, $bandwidth, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_BLOCK_PULL,
-        { dom => $_id, path => $path, bandwidth => $bandwidth, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, path => $path, bandwidth => $bandwidth, flags => $flags // 0 }, empty => 1 );
 }
 
 method block_rebase($path, $base, $bandwidth, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_BLOCK_REBASE,
-        { dom => $_id, path => $path, base => $base, bandwidth => $bandwidth, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, path => $path, base => $base, bandwidth => $bandwidth, flags => $flags // 0 }, empty => 1 );
 }
 
 method block_resize($disk, $size, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_BLOCK_RESIZE,
-        { dom => $_id, disk => $disk, size => $size, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, disk => $disk, size => $size, flags => $flags // 0 }, empty => 1 );
 }
 
 method block_stats($path) {
     return $_client->_call(
         $remote->PROC_DOMAIN_BLOCK_STATS,
-        { dom => $_id, path => $path } );
+        { dom => $_rpc_id, path => $path } );
 }
 
 async method block_stats_flags($path, $flags = 0) {
     $flags |= await $_client->_typed_param_string_okay();
     my $nparams = await $_client->_call(
         $remote->PROC_DOMAIN_BLOCK_STATS_FLAGS,
-        { dom => $_id, path => $path, nparams => 0, flags => $flags // 0 }, unwrap => 'nparams' );
+        { dom => $_rpc_id, path => $path, nparams => 0, flags => $flags // 0 }, unwrap => 'nparams' );
     return await $_client->_call(
         $remote->PROC_DOMAIN_BLOCK_STATS_FLAGS,
-        { dom => $_id, path => $path, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
+        { dom => $_rpc_id, path => $path, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
 }
 
 async method checkpoint_create_xml($xml_desc, $flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_CHECKPOINT_CREATE_XML,
-        { dom => $_id, xml_desc => $xml_desc, flags => $flags // 0 }, unwrap => 'checkpoint' );
+        { dom => $_rpc_id, xml_desc => $xml_desc, flags => $flags // 0 }, unwrap => 'checkpoint' );
 }
 
 async method checkpoint_lookup_by_name($name, $flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_CHECKPOINT_LOOKUP_BY_NAME,
-        { dom => $_id, name => $name, flags => $flags // 0 }, unwrap => 'checkpoint' );
+        { dom => $_rpc_id, name => $name, flags => $flags // 0 }, unwrap => 'checkpoint' );
 }
 
 method core_dump($to, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_CORE_DUMP,
-        { dom => $_id, to => $to, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, to => $to, flags => $flags // 0 }, empty => 1 );
 }
 
 method core_dump_with_format($to, $dumpformat, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_CORE_DUMP_WITH_FORMAT,
-        { dom => $_id, to => $to, dumpformat => $dumpformat, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, to => $to, dumpformat => $dumpformat, flags => $flags // 0 }, empty => 1 );
 }
 
 async method create_with_flags($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_CREATE_WITH_FLAGS,
-        { dom => $_id, flags => $flags // 0 }, unwrap => 'dom' );
+        { dom => $_rpc_id, flags => $flags // 0 }, unwrap => 'dom' );
 }
 
 method del_iothread($iothread_id, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_DEL_IOTHREAD,
-        { dom => $_id, iothread_id => $iothread_id, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, iothread_id => $iothread_id, flags => $flags // 0 }, empty => 1 );
 }
 
 method del_throttle_group($group, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_DEL_THROTTLE_GROUP,
-        { dom => $_id, group => $group, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, group => $group, flags => $flags // 0 }, empty => 1 );
 }
 
 method destroy() {
     return $_client->_call(
         $remote->PROC_DOMAIN_DESTROY,
-        { dom => $_id }, empty => 1 );
+        { dom => $_rpc_id }, empty => 1 );
 }
 
 method destroy_flags($flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_DESTROY_FLAGS,
-        { dom => $_id, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, flags => $flags // 0 }, empty => 1 );
 }
 
 method detach_device($xml) {
     return $_client->_call(
         $remote->PROC_DOMAIN_DETACH_DEVICE,
-        { dom => $_id, xml => $xml }, empty => 1 );
+        { dom => $_rpc_id, xml => $xml }, empty => 1 );
 }
 
 method detach_device_alias($alias, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_DETACH_DEVICE_ALIAS,
-        { dom => $_id, alias => $alias, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, alias => $alias, flags => $flags // 0 }, empty => 1 );
 }
 
 method detach_device_flags($xml, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_DETACH_DEVICE_FLAGS,
-        { dom => $_id, xml => $xml, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, xml => $xml, flags => $flags // 0 }, empty => 1 );
 }
 
 async method fsfreeze($mountpoints, $flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_FSFREEZE,
-        { dom => $_id, mountpoints => $mountpoints, flags => $flags // 0 }, unwrap => 'filesystems' );
+        { dom => $_rpc_id, mountpoints => $mountpoints, flags => $flags // 0 }, unwrap => 'filesystems' );
 }
 
 async method fsthaw($mountpoints, $flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_FSTHAW,
-        { dom => $_id, mountpoints => $mountpoints, flags => $flags // 0 }, unwrap => 'filesystems' );
+        { dom => $_rpc_id, mountpoints => $mountpoints, flags => $flags // 0 }, unwrap => 'filesystems' );
 }
 
 method fstrim($mountPoint, $minimum, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_FSTRIM,
-        { dom => $_id, mountPoint => $mountPoint, minimum => $minimum, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, mountPoint => $mountPoint, minimum => $minimum, flags => $flags // 0 }, empty => 1 );
 }
 
 async method get_autostart() {
     return await $_client->_call(
         $remote->PROC_DOMAIN_GET_AUTOSTART,
-        { dom => $_id }, unwrap => 'autostart' );
+        { dom => $_rpc_id }, unwrap => 'autostart' );
 }
 
 async method get_autostart_once() {
     return await $_client->_call(
         $remote->PROC_DOMAIN_GET_AUTOSTART_ONCE,
-        { dom => $_id }, unwrap => 'autostart' );
+        { dom => $_rpc_id }, unwrap => 'autostart' );
 }
 
 async method get_blkio_parameters($flags = 0) {
     $flags |= await $_client->_typed_param_string_okay();
     my $nparams = await $_client->_call(
         $remote->PROC_DOMAIN_GET_BLKIO_PARAMETERS,
-        { dom => $_id, nparams => 0, flags => $flags // 0 }, unwrap => 'nparams' );
+        { dom => $_rpc_id, nparams => 0, flags => $flags // 0 }, unwrap => 'nparams' );
     return await $_client->_call(
         $remote->PROC_DOMAIN_GET_BLKIO_PARAMETERS,
-        { dom => $_id, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
+        { dom => $_rpc_id, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
 }
 
 method get_block_info($path, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_GET_BLOCK_INFO,
-        { dom => $_id, path => $path, flags => $flags // 0 } );
+        { dom => $_rpc_id, path => $path, flags => $flags // 0 } );
 }
 
 async method get_block_io_tune($disk, $flags = 0) {
     $flags |= await $_client->_typed_param_string_okay();
     my $nparams = await $_client->_call(
         $remote->PROC_DOMAIN_GET_BLOCK_IO_TUNE,
-        { dom => $_id, disk => $disk, nparams => 0, flags => $flags // 0 }, unwrap => 'nparams' );
+        { dom => $_rpc_id, disk => $disk, nparams => 0, flags => $flags // 0 }, unwrap => 'nparams' );
     return await $_client->_call(
         $remote->PROC_DOMAIN_GET_BLOCK_IO_TUNE,
-        { dom => $_id, disk => $disk, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
+        { dom => $_rpc_id, disk => $disk, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
 }
 
 method get_control_info($flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_GET_CONTROL_INFO,
-        { dom => $_id, flags => $flags // 0 } );
+        { dom => $_rpc_id, flags => $flags // 0 } );
 }
 
 async method get_cpu_stats($start_cpu, $ncpus, $flags = 0) {
     $flags |= await $_client->_typed_param_string_okay();
     my $nparams = await $_client->_call(
         $remote->PROC_DOMAIN_GET_CPU_STATS,
-        { dom => $_id, nparams => 0, start_cpu => $start_cpu, ncpus => $ncpus, flags => $flags // 0 }, unwrap => 'nparams' );
+        { dom => $_rpc_id, nparams => 0, start_cpu => $start_cpu, ncpus => $ncpus, flags => $flags // 0 }, unwrap => 'nparams' );
     return await $_client->_call(
         $remote->PROC_DOMAIN_GET_CPU_STATS,
-        { dom => $_id, nparams => $nparams, start_cpu => $start_cpu, ncpus => $ncpus, flags => $flags // 0 }, unwrap => 'params' );
+        { dom => $_rpc_id, nparams => $nparams, start_cpu => $start_cpu, ncpus => $ncpus, flags => $flags // 0 }, unwrap => 'params' );
 }
 
 async method get_disk_errors($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_GET_DISK_ERRORS,
-        { dom => $_id, maxerrors => $remote->DOMAIN_DISK_ERRORS_MAX, flags => $flags // 0 }, unwrap => 'errors' );
+        { dom => $_rpc_id, maxerrors => $remote->DOMAIN_DISK_ERRORS_MAX, flags => $flags // 0 }, unwrap => 'errors' );
 }
 
 async method get_fsinfo($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_GET_FSINFO,
-        { dom => $_id, flags => $flags // 0 }, unwrap => 'info' );
+        { dom => $_rpc_id, flags => $flags // 0 }, unwrap => 'info' );
 }
 
 async method get_guest_info($types, $flags = 0) {
     $flags |= await $_client->_typed_param_string_okay();
     return await $_client->_call(
         $remote->PROC_DOMAIN_GET_GUEST_INFO,
-        { dom => $_id, types => $types, flags => $flags // 0 }, unwrap => 'params' );
+        { dom => $_rpc_id, types => $types, flags => $flags // 0 }, unwrap => 'params' );
 }
 
 async method get_guest_vcpus($flags = 0) {
     $flags |= await $_client->_typed_param_string_okay();
     return await $_client->_call(
         $remote->PROC_DOMAIN_GET_GUEST_VCPUS,
-        { dom => $_id, flags => $flags // 0 }, unwrap => 'params' );
+        { dom => $_rpc_id, flags => $flags // 0 }, unwrap => 'params' );
 }
 
 async method get_hostname($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_GET_HOSTNAME,
-        { dom => $_id, flags => $flags // 0 }, unwrap => 'hostname' );
+        { dom => $_rpc_id, flags => $flags // 0 }, unwrap => 'hostname' );
 }
 
 method get_info() {
     return $_client->_call(
         $remote->PROC_DOMAIN_GET_INFO,
-        { dom => $_id } );
+        { dom => $_rpc_id } );
 }
 
 async method get_interface_parameters($device, $flags = 0) {
     $flags |= await $_client->_typed_param_string_okay();
     my $nparams = await $_client->_call(
         $remote->PROC_DOMAIN_GET_INTERFACE_PARAMETERS,
-        { dom => $_id, device => $device, nparams => 0, flags => $flags // 0 }, unwrap => 'nparams' );
+        { dom => $_rpc_id, device => $device, nparams => 0, flags => $flags // 0 }, unwrap => 'nparams' );
     return await $_client->_call(
         $remote->PROC_DOMAIN_GET_INTERFACE_PARAMETERS,
-        { dom => $_id, device => $device, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
+        { dom => $_rpc_id, device => $device, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
 }
 
 method get_job_info() {
     return $_client->_call(
         $remote->PROC_DOMAIN_GET_JOB_INFO,
-        { dom => $_id } );
+        { dom => $_rpc_id } );
 }
 
 method get_job_stats($flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_GET_JOB_STATS,
-        { dom => $_id, flags => $flags // 0 } );
+        { dom => $_rpc_id, flags => $flags // 0 } );
 }
 
 async method get_launch_security_info($flags = 0) {
     $flags |= await $_client->_typed_param_string_okay();
     return await $_client->_call(
         $remote->PROC_DOMAIN_GET_LAUNCH_SECURITY_INFO,
-        { dom => $_id, flags => $flags // 0 }, unwrap => 'params' );
+        { dom => $_rpc_id, flags => $flags // 0 }, unwrap => 'params' );
 }
 
 async method get_max_memory() {
     return await $_client->_call(
         $remote->PROC_DOMAIN_GET_MAX_MEMORY,
-        { dom => $_id }, unwrap => 'memory' );
+        { dom => $_rpc_id }, unwrap => 'memory' );
 }
 
 async method get_max_vcpus() {
     return await $_client->_call(
         $remote->PROC_DOMAIN_GET_MAX_VCPUS,
-        { dom => $_id }, unwrap => 'num' );
+        { dom => $_rpc_id }, unwrap => 'num' );
 }
 
 async method get_memory_parameters($flags = 0) {
     $flags |= await $_client->_typed_param_string_okay();
     my $nparams = await $_client->_call(
         $remote->PROC_DOMAIN_GET_MEMORY_PARAMETERS,
-        { dom => $_id, nparams => 0, flags => $flags // 0 }, unwrap => 'nparams' );
+        { dom => $_rpc_id, nparams => 0, flags => $flags // 0 }, unwrap => 'nparams' );
     return await $_client->_call(
         $remote->PROC_DOMAIN_GET_MEMORY_PARAMETERS,
-        { dom => $_id, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
+        { dom => $_rpc_id, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
 }
 
 async method get_messages($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_GET_MESSAGES,
-        { dom => $_id, flags => $flags // 0 }, unwrap => 'msgs' );
+        { dom => $_rpc_id, flags => $flags // 0 }, unwrap => 'msgs' );
 }
 
 async method get_metadata($type, $uri, $flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_GET_METADATA,
-        { dom => $_id, type => $type, uri => $uri, flags => $flags // 0 }, unwrap => 'metadata' );
+        { dom => $_rpc_id, type => $type, uri => $uri, flags => $flags // 0 }, unwrap => 'metadata' );
 }
 
 async method get_numa_parameters($flags = 0) {
     $flags |= await $_client->_typed_param_string_okay();
     my $nparams = await $_client->_call(
         $remote->PROC_DOMAIN_GET_NUMA_PARAMETERS,
-        { dom => $_id, nparams => 0, flags => $flags // 0 }, unwrap => 'nparams' );
+        { dom => $_rpc_id, nparams => 0, flags => $flags // 0 }, unwrap => 'nparams' );
     return await $_client->_call(
         $remote->PROC_DOMAIN_GET_NUMA_PARAMETERS,
-        { dom => $_id, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
+        { dom => $_rpc_id, nparams => $nparams, flags => $flags // 0 }, unwrap => 'params' );
 }
 
 async method get_os_type() {
     return await $_client->_call(
         $remote->PROC_DOMAIN_GET_OS_TYPE,
-        { dom => $_id }, unwrap => 'type' );
+        { dom => $_rpc_id }, unwrap => 'type' );
 }
 
 async method get_perf_events($flags = 0) {
     $flags |= await $_client->_typed_param_string_okay();
     return await $_client->_call(
         $remote->PROC_DOMAIN_GET_PERF_EVENTS,
-        { dom => $_id, flags => $flags // 0 }, unwrap => 'params' );
+        { dom => $_rpc_id, flags => $flags // 0 }, unwrap => 'params' );
 }
 
 async method get_scheduler_parameters() {
     return await $_client->_call(
         $remote->PROC_DOMAIN_GET_SCHEDULER_PARAMETERS,
-        { dom => $_id, nparams => $remote->DOMAIN_SCHEDULER_PARAMETERS_MAX }, unwrap => 'params' );
+        { dom => $_rpc_id, nparams => $remote->DOMAIN_SCHEDULER_PARAMETERS_MAX }, unwrap => 'params' );
 }
 
 async method get_scheduler_parameters_flags($flags = 0) {
     $flags |= await $_client->_typed_param_string_okay();
     return await $_client->_call(
         $remote->PROC_DOMAIN_GET_SCHEDULER_PARAMETERS_FLAGS,
-        { dom => $_id, nparams => $remote->DOMAIN_SCHEDULER_PARAMETERS_MAX, flags => $flags // 0 }, unwrap => 'params' );
+        { dom => $_rpc_id, nparams => $remote->DOMAIN_SCHEDULER_PARAMETERS_MAX, flags => $flags // 0 }, unwrap => 'params' );
 }
 
 async method get_scheduler_type() {
     return await $_client->_call(
         $remote->PROC_DOMAIN_GET_SCHEDULER_TYPE,
-        { dom => $_id }, unwrap => 'type' );
+        { dom => $_rpc_id }, unwrap => 'type' );
 }
 
 method get_state($flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_GET_STATE,
-        { dom => $_id, flags => $flags // 0 } );
+        { dom => $_rpc_id, flags => $flags // 0 } );
 }
 
 async method get_vcpus_flags($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_GET_VCPUS_FLAGS,
-        { dom => $_id, flags => $flags // 0 }, unwrap => 'num' );
+        { dom => $_rpc_id, flags => $flags // 0 }, unwrap => 'num' );
 }
 
 async method get_xml_desc($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_GET_XML_DESC,
-        { dom => $_id, flags => $flags // 0 }, unwrap => 'xml' );
+        { dom => $_rpc_id, flags => $flags // 0 }, unwrap => 'xml' );
 }
 
 method graphics_reload($type, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_GRAPHICS_RELOAD,
-        { dom => $_id, type => $type, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, type => $type, flags => $flags // 0 }, empty => 1 );
 }
 
 async method has_current_snapshot($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_HAS_CURRENT_SNAPSHOT,
-        { dom => $_id, flags => $flags // 0 }, unwrap => 'result' );
+        { dom => $_rpc_id, flags => $flags // 0 }, unwrap => 'result' );
 }
 
 async method has_managed_save_image($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_HAS_MANAGED_SAVE_IMAGE,
-        { dom => $_id, flags => $flags // 0 }, unwrap => 'result' );
+        { dom => $_rpc_id, flags => $flags // 0 }, unwrap => 'result' );
 }
 
 method inject_nmi($flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_INJECT_NMI,
-        { dom => $_id, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, flags => $flags // 0 }, empty => 1 );
 }
 
 async method interface_addresses($source, $flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_INTERFACE_ADDRESSES,
-        { dom => $_id, source => $source, flags => $flags // 0 }, unwrap => 'ifaces' );
+        { dom => $_rpc_id, source => $source, flags => $flags // 0 }, unwrap => 'ifaces' );
 }
 
 method interface_stats($device) {
     return $_client->_call(
         $remote->PROC_DOMAIN_INTERFACE_STATS,
-        { dom => $_id, device => $device } );
+        { dom => $_rpc_id, device => $device } );
 }
 
 async method is_active() {
     return await $_client->_call(
         $remote->PROC_DOMAIN_IS_ACTIVE,
-        { dom => $_id }, unwrap => 'active' );
+        { dom => $_rpc_id }, unwrap => 'active' );
 }
 
 async method is_persistent() {
     return await $_client->_call(
         $remote->PROC_DOMAIN_IS_PERSISTENT,
-        { dom => $_id }, unwrap => 'persistent' );
+        { dom => $_rpc_id }, unwrap => 'persistent' );
 }
 
 async method is_updated() {
     return await $_client->_call(
         $remote->PROC_DOMAIN_IS_UPDATED,
-        { dom => $_id }, unwrap => 'updated' );
+        { dom => $_rpc_id }, unwrap => 'updated' );
 }
 
 async method list_all_checkpoints($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_LIST_ALL_CHECKPOINTS,
-        { dom => $_id, need_results => $remote->DOMAIN_CHECKPOINT_LIST_MAX, flags => $flags // 0 }, unwrap => 'checkpoints' );
+        { dom => $_rpc_id, need_results => $remote->DOMAIN_CHECKPOINT_LIST_MAX, flags => $flags // 0 }, unwrap => 'checkpoints' );
 }
 
 async method list_all_snapshots($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_LIST_ALL_SNAPSHOTS,
-        { dom => $_id, need_results => $remote->DOMAIN_SNAPSHOT_LIST_MAX, flags => $flags // 0 }, unwrap => 'snapshots' );
+        { dom => $_rpc_id, need_results => $remote->DOMAIN_SNAPSHOT_LIST_MAX, flags => $flags // 0 }, unwrap => 'snapshots' );
 }
 
 method managed_save($flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_MANAGED_SAVE,
-        { dom => $_id, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, flags => $flags // 0 }, empty => 1 );
 }
 
 method managed_save_define_xml($dxml, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_MANAGED_SAVE_DEFINE_XML,
-        { dom => $_id, dxml => $dxml, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, dxml => $dxml, flags => $flags // 0 }, empty => 1 );
 }
 
 async method managed_save_get_xml_desc($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_MANAGED_SAVE_GET_XML_DESC,
-        { dom => $_id, flags => $flags // 0 }, unwrap => 'xml' );
+        { dom => $_rpc_id, flags => $flags // 0 }, unwrap => 'xml' );
 }
 
 method managed_save_remove($flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_MANAGED_SAVE_REMOVE,
-        { dom => $_id, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, flags => $flags // 0 }, empty => 1 );
 }
 
 async method memory_peek($offset, $size, $flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_MEMORY_PEEK,
-        { dom => $_id, offset => $offset, size => $size, flags => $flags // 0 }, unwrap => 'buffer' );
+        { dom => $_rpc_id, offset => $offset, size => $size, flags => $flags // 0 }, unwrap => 'buffer' );
 }
 
 async method memory_stats($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_MEMORY_STATS,
-        { dom => $_id, maxStats => $remote->DOMAIN_MEMORY_STATS_MAX, flags => $flags // 0 }, unwrap => 'stats' );
+        { dom => $_rpc_id, maxStats => $remote->DOMAIN_MEMORY_STATS_MAX, flags => $flags // 0 }, unwrap => 'stats' );
 }
 
 async method migrate_get_compression_cache($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_MIGRATE_GET_COMPRESSION_CACHE,
-        { dom => $_id, flags => $flags // 0 }, unwrap => 'cacheSize' );
+        { dom => $_rpc_id, flags => $flags // 0 }, unwrap => 'cacheSize' );
 }
 
 async method migrate_get_max_downtime($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_MIGRATE_GET_MAX_DOWNTIME,
-        { dom => $_id, flags => $flags // 0 }, unwrap => 'downtime' );
+        { dom => $_rpc_id, flags => $flags // 0 }, unwrap => 'downtime' );
 }
 
 async method migrate_get_max_speed($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_MIGRATE_GET_MAX_SPEED,
-        { dom => $_id, flags => $flags // 0 }, unwrap => 'bandwidth' );
+        { dom => $_rpc_id, flags => $flags // 0 }, unwrap => 'bandwidth' );
 }
 
 method migrate_set_compression_cache($cacheSize, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_MIGRATE_SET_COMPRESSION_CACHE,
-        { dom => $_id, cacheSize => $cacheSize, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, cacheSize => $cacheSize, flags => $flags // 0 }, empty => 1 );
 }
 
 method migrate_set_max_downtime($downtime, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_MIGRATE_SET_MAX_DOWNTIME,
-        { dom => $_id, downtime => $downtime, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, downtime => $downtime, flags => $flags // 0 }, empty => 1 );
 }
 
 method migrate_set_max_speed($bandwidth, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_MIGRATE_SET_MAX_SPEED,
-        { dom => $_id, bandwidth => $bandwidth, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, bandwidth => $bandwidth, flags => $flags // 0 }, empty => 1 );
 }
 
 method migrate_start_post_copy($flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_MIGRATE_START_POST_COPY,
-        { dom => $_id, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, flags => $flags // 0 }, empty => 1 );
 }
 
 method open_channel($name, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_OPEN_CHANNEL,
-        { dom => $_id, name => $name, flags => $flags // 0 }, stream => 'read', empty => 1 );
+        { dom => $_rpc_id, name => $name, flags => $flags // 0 }, stream => 'read', empty => 1 );
 }
 
 method open_console($dev_name, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_OPEN_CONSOLE,
-        { dom => $_id, dev_name => $dev_name, flags => $flags // 0 }, stream => 'read', empty => 1 );
+        { dom => $_rpc_id, dev_name => $dev_name, flags => $flags // 0 }, stream => 'read', empty => 1 );
 }
 
 method pin_iothread($iothreads_id, $cpumap, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_PIN_IOTHREAD,
-        { dom => $_id, iothreads_id => $iothreads_id, cpumap => $cpumap, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, iothreads_id => $iothreads_id, cpumap => $cpumap, flags => $flags // 0 }, empty => 1 );
 }
 
 method pin_vcpu($vcpu, $cpumap) {
     return $_client->_call(
         $remote->PROC_DOMAIN_PIN_VCPU,
-        { dom => $_id, vcpu => $vcpu, cpumap => $cpumap }, empty => 1 );
+        { dom => $_rpc_id, vcpu => $vcpu, cpumap => $cpumap }, empty => 1 );
 }
 
 method pin_vcpu_flags($vcpu, $cpumap, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_PIN_VCPU_FLAGS,
-        { dom => $_id, vcpu => $vcpu, cpumap => $cpumap, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, vcpu => $vcpu, cpumap => $cpumap, flags => $flags // 0 }, empty => 1 );
 }
 
 method pm_suspend_for_duration($target, $duration, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_PM_SUSPEND_FOR_DURATION,
-        { dom => $_id, target => $target, duration => $duration, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, target => $target, duration => $duration, flags => $flags // 0 }, empty => 1 );
 }
 
 method pm_wakeup($flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_PM_WAKEUP,
-        { dom => $_id, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, flags => $flags // 0 }, empty => 1 );
 }
 
 method reboot($flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_REBOOT,
-        { dom => $_id, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, flags => $flags // 0 }, empty => 1 );
 }
 
 async method rename($new_name, $flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_RENAME,
-        { dom => $_id, new_name => $new_name, flags => $flags // 0 }, unwrap => 'retcode' );
+        { dom => $_rpc_id, new_name => $new_name, flags => $flags // 0 }, unwrap => 'retcode' );
 }
 
 method reset($flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_RESET,
-        { dom => $_id, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, flags => $flags // 0 }, empty => 1 );
 }
 
 method resume() {
     return $_client->_call(
         $remote->PROC_DOMAIN_RESUME,
-        { dom => $_id }, empty => 1 );
+        { dom => $_rpc_id }, empty => 1 );
 }
 
 method save($to) {
     return $_client->_call(
         $remote->PROC_DOMAIN_SAVE,
-        { dom => $_id, to => $to }, empty => 1 );
+        { dom => $_rpc_id, to => $to }, empty => 1 );
 }
 
 method save_flags($to, $dxml, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_SAVE_FLAGS,
-        { dom => $_id, to => $to, dxml => $dxml, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, to => $to, dxml => $dxml, flags => $flags // 0 }, empty => 1 );
 }
 
 async method save_params($params, $flags = 0) {
     $params = await $_client->_filter_typed_param_string( $params );
     return await $_client->_call(
         $remote->PROC_DOMAIN_SAVE_PARAMS,
-        { dom => $_id, params => $params, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
 async method screenshot($screen, $flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_SCREENSHOT,
-        { dom => $_id, screen => $screen, flags => $flags // 0 }, unwrap => 'mime', stream => 'read' );
+        { dom => $_rpc_id, screen => $screen, flags => $flags // 0 }, unwrap => 'mime', stream => 'read' );
 }
 
 method send_key($codeset, $holdtime, $keycodes, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_SEND_KEY,
-        { dom => $_id, codeset => $codeset, holdtime => $holdtime, keycodes => $keycodes, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, codeset => $codeset, holdtime => $holdtime, keycodes => $keycodes, flags => $flags // 0 }, empty => 1 );
 }
 
 method send_process_signal($pid_value, $signum, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_SEND_PROCESS_SIGNAL,
-        { dom => $_id, pid_value => $pid_value, signum => $signum, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, pid_value => $pid_value, signum => $signum, flags => $flags // 0 }, empty => 1 );
 }
 
 method set_autostart($autostart) {
     return $_client->_call(
         $remote->PROC_DOMAIN_SET_AUTOSTART,
-        { dom => $_id, autostart => $autostart }, empty => 1 );
+        { dom => $_rpc_id, autostart => $autostart }, empty => 1 );
 }
 
 method set_autostart_once($autostart) {
     return $_client->_call(
         $remote->PROC_DOMAIN_SET_AUTOSTART_ONCE,
-        { dom => $_id, autostart => $autostart }, empty => 1 );
+        { dom => $_rpc_id, autostart => $autostart }, empty => 1 );
 }
 
 async method set_blkio_parameters($params, $flags = 0) {
     $params = await $_client->_filter_typed_param_string( $params );
     return await $_client->_call(
         $remote->PROC_DOMAIN_SET_BLKIO_PARAMETERS,
-        { dom => $_id, params => $params, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
 async method set_block_io_tune($disk, $params, $flags = 0) {
     $params = await $_client->_filter_typed_param_string( $params );
     return await $_client->_call(
         $remote->PROC_DOMAIN_SET_BLOCK_IO_TUNE,
-        { dom => $_id, disk => $disk, params => $params, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, disk => $disk, params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
 method set_block_threshold($dev, $threshold, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_SET_BLOCK_THRESHOLD,
-        { dom => $_id, dev => $dev, threshold => $threshold, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, dev => $dev, threshold => $threshold, flags => $flags // 0 }, empty => 1 );
 }
 
 method set_guest_vcpus($cpumap, $state, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_SET_GUEST_VCPUS,
-        { dom => $_id, cpumap => $cpumap, state => $state, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, cpumap => $cpumap, state => $state, flags => $flags // 0 }, empty => 1 );
 }
 
 async method set_interface_parameters($device, $params, $flags = 0) {
     $params = await $_client->_filter_typed_param_string( $params );
     return await $_client->_call(
         $remote->PROC_DOMAIN_SET_INTERFACE_PARAMETERS,
-        { dom => $_id, device => $device, params => $params, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, device => $device, params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
 async method set_iothread_params($iothread_id, $params, $flags = 0) {
     $params = await $_client->_filter_typed_param_string( $params );
     return await $_client->_call(
         $remote->PROC_DOMAIN_SET_IOTHREAD_PARAMS,
-        { dom => $_id, iothread_id => $iothread_id, params => $params, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, iothread_id => $iothread_id, params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
 async method set_launch_security_state($params, $flags = 0) {
     $params = await $_client->_filter_typed_param_string( $params );
     return await $_client->_call(
         $remote->PROC_DOMAIN_SET_LAUNCH_SECURITY_STATE,
-        { dom => $_id, params => $params, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
 method set_lifecycle_action($type, $action, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_SET_LIFECYCLE_ACTION,
-        { dom => $_id, type => $type, action => $action, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, type => $type, action => $action, flags => $flags // 0 }, empty => 1 );
 }
 
 method set_max_memory($memory) {
     return $_client->_call(
         $remote->PROC_DOMAIN_SET_MAX_MEMORY,
-        { dom => $_id, memory => $memory }, empty => 1 );
+        { dom => $_rpc_id, memory => $memory }, empty => 1 );
 }
 
 method set_memory($memory) {
     return $_client->_call(
         $remote->PROC_DOMAIN_SET_MEMORY,
-        { dom => $_id, memory => $memory }, empty => 1 );
+        { dom => $_rpc_id, memory => $memory }, empty => 1 );
 }
 
 method set_memory_flags($memory, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_SET_MEMORY_FLAGS,
-        { dom => $_id, memory => $memory, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, memory => $memory, flags => $flags // 0 }, empty => 1 );
 }
 
 async method set_memory_parameters($params, $flags = 0) {
     $params = await $_client->_filter_typed_param_string( $params );
     return await $_client->_call(
         $remote->PROC_DOMAIN_SET_MEMORY_PARAMETERS,
-        { dom => $_id, params => $params, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
 method set_memory_stats_period($period, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_SET_MEMORY_STATS_PERIOD,
-        { dom => $_id, period => $period, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, period => $period, flags => $flags // 0 }, empty => 1 );
 }
 
 method set_metadata($type, $metadata, $key, $uri, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_SET_METADATA,
-        { dom => $_id, type => $type, metadata => $metadata, key => $key, uri => $uri, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, type => $type, metadata => $metadata, key => $key, uri => $uri, flags => $flags // 0 }, empty => 1 );
 }
 
 async method set_numa_parameters($params, $flags = 0) {
     $params = await $_client->_filter_typed_param_string( $params );
     return await $_client->_call(
         $remote->PROC_DOMAIN_SET_NUMA_PARAMETERS,
-        { dom => $_id, params => $params, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
 async method set_perf_events($params, $flags = 0) {
     $params = await $_client->_filter_typed_param_string( $params );
     return await $_client->_call(
         $remote->PROC_DOMAIN_SET_PERF_EVENTS,
-        { dom => $_id, params => $params, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
 async method set_scheduler_parameters($params) {
     $params = await $_client->_filter_typed_param_string( $params );
     return await $_client->_call(
         $remote->PROC_DOMAIN_SET_SCHEDULER_PARAMETERS,
-        { dom => $_id, params => $params }, empty => 1 );
+        { dom => $_rpc_id, params => $params }, empty => 1 );
 }
 
 async method set_scheduler_parameters_flags($params, $flags = 0) {
     $params = await $_client->_filter_typed_param_string( $params );
     return await $_client->_call(
         $remote->PROC_DOMAIN_SET_SCHEDULER_PARAMETERS_FLAGS,
-        { dom => $_id, params => $params, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
 async method set_throttle_group($group, $params, $flags = 0) {
     $params = await $_client->_filter_typed_param_string( $params );
     return await $_client->_call(
         $remote->PROC_DOMAIN_SET_THROTTLE_GROUP,
-        { dom => $_id, group => $group, params => $params, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, group => $group, params => $params, flags => $flags // 0 }, empty => 1 );
 }
 
 method set_time($seconds, $nseconds, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_SET_TIME,
-        { dom => $_id, seconds => $seconds, nseconds => $nseconds, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, seconds => $seconds, nseconds => $nseconds, flags => $flags // 0 }, empty => 1 );
 }
 
 method set_user_password($user, $password, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_SET_USER_PASSWORD,
-        { dom => $_id, user => $user, password => $password, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, user => $user, password => $password, flags => $flags // 0 }, empty => 1 );
 }
 
 method set_vcpu($cpumap, $state, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_SET_VCPU,
-        { dom => $_id, cpumap => $cpumap, state => $state, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, cpumap => $cpumap, state => $state, flags => $flags // 0 }, empty => 1 );
 }
 
 method set_vcpus($nvcpus) {
     return $_client->_call(
         $remote->PROC_DOMAIN_SET_VCPUS,
-        { dom => $_id, nvcpus => $nvcpus }, empty => 1 );
+        { dom => $_rpc_id, nvcpus => $nvcpus }, empty => 1 );
 }
 
 method set_vcpus_flags($nvcpus, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_SET_VCPUS_FLAGS,
-        { dom => $_id, nvcpus => $nvcpus, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, nvcpus => $nvcpus, flags => $flags // 0 }, empty => 1 );
 }
 
 method shutdown() {
     return $_client->_call(
         $remote->PROC_DOMAIN_SHUTDOWN,
-        { dom => $_id }, empty => 1 );
+        { dom => $_rpc_id }, empty => 1 );
 }
 
 method shutdown_flags($flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_SHUTDOWN_FLAGS,
-        { dom => $_id, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, flags => $flags // 0 }, empty => 1 );
 }
 
 async method snapshot_create_xml($xml_desc, $flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_CREATE_XML,
-        { dom => $_id, xml_desc => $xml_desc, flags => $flags // 0 }, unwrap => 'snap' );
+        { dom => $_rpc_id, xml_desc => $xml_desc, flags => $flags // 0 }, unwrap => 'snap' );
 }
 
 async method snapshot_current($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_CURRENT,
-        { dom => $_id, flags => $flags // 0 }, unwrap => 'snap' );
+        { dom => $_rpc_id, flags => $flags // 0 }, unwrap => 'snap' );
 }
 
 async method snapshot_list_names($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_LIST_NAMES,
-        { dom => $_id, maxnames => $remote->DOMAIN_SNAPSHOT_LIST_MAX, flags => $flags // 0 }, unwrap => 'names' );
+        { dom => $_rpc_id, maxnames => $remote->DOMAIN_SNAPSHOT_LIST_MAX, flags => $flags // 0 }, unwrap => 'names' );
 }
 
 async method snapshot_lookup_by_name($name, $flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_LOOKUP_BY_NAME,
-        { dom => $_id, name => $name, flags => $flags // 0 }, unwrap => 'snap' );
+        { dom => $_rpc_id, name => $name, flags => $flags // 0 }, unwrap => 'snap' );
 }
 
 async method snapshot_num($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_SNAPSHOT_NUM,
-        { dom => $_id, flags => $flags // 0 }, unwrap => 'num' );
+        { dom => $_rpc_id, flags => $flags // 0 }, unwrap => 'num' );
 }
 
 method start_dirty_rate_calc($seconds, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_START_DIRTY_RATE_CALC,
-        { dom => $_id, seconds => $seconds, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, seconds => $seconds, flags => $flags // 0 }, empty => 1 );
 }
 
 method suspend() {
     return $_client->_call(
         $remote->PROC_DOMAIN_SUSPEND,
-        { dom => $_id }, empty => 1 );
+        { dom => $_rpc_id }, empty => 1 );
 }
 
 method undefine() {
     return $_client->_call(
         $remote->PROC_DOMAIN_UNDEFINE,
-        { dom => $_id }, empty => 1 );
+        { dom => $_rpc_id }, empty => 1 );
 }
 
 method undefine_flags($flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_UNDEFINE_FLAGS,
-        { dom => $_id, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, flags => $flags // 0 }, empty => 1 );
 }
 
 method update_device_flags($xml, $flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_UPDATE_DEVICE_FLAGS,
-        { dom => $_id, xml => $xml, flags => $flags // 0 }, empty => 1 );
+        { dom => $_rpc_id, xml => $xml, flags => $flags // 0 }, empty => 1 );
 }
 
 
@@ -1961,7 +2361,7 @@ Sys::Async::Virt::Domain - Client side proxy to remote LibVirt domain
 
 =head1 VERSION
 
-v0.2.3
+v0.6.3
 
 =head1 SYNOPSIS
 
@@ -1991,6 +2391,30 @@ Not to be called directly. Instances are returned from calls
 in L<Sys::Async::Virt>.
 
 =head1 METHODS
+
+=head2 id
+
+  $id = $dom->id;
+
+Returns the id of the domain when running or C<undef> otherwise.
+
+=head2 name
+
+  $name = $dom->name;
+
+Returns the name of the domain.
+
+=head2 uuid
+
+  $uuid = $dom->uuid;
+
+Returns a 16-byte string containing the (binary) UUID.
+
+=head2 uuid_string
+
+  $str = $dom->uuid_string;
+
+Returns the string representation of the UUID (C<xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx>).
 
 =head2 get_block_job_info
 
@@ -2059,6 +2483,51 @@ with one extra key C<affinity>, an array of booleans where each element
 indicates whether the vCPU is allowed to run on that physical CPU (affinity).
 
 See also the documentation of L<virDomainGetVcpus|https://libvirt.org/html/libvirt-libvirt-domain.html#virDomainGetVcpus>.
+
+=head2 migrate
+
+  my $ddom = await $dom->migrate( $dest_client, $params, $flags );
+
+This function implements the I<managed direct migration> pattern: the client
+manages the migration through connnections to both the source and destination
+LibVirt daemons.
+
+Returns a L<Sys::Async::Virt::Domain> instance associated with C<$dest_client>
+in case of success. Throws an error otherwise.
+
+See L<virDomainMigrate3|https://libvirt.org/html/libvirt-libvirt-domain.html#virDomainMigrate3>.
+
+For more information on migrations, see L<https://libvirt.org/migration.html>.
+
+=head2 migrate_to_uri
+
+  my $bool = await $dom->migrate_to_uri( $dconnuri, $params, $flags );
+
+This function provides the I<peer-to-peer> and I<unmanaged direct> migration
+patterns, where the client instructs the source host to connect to the
+destination to perform the migration. If the C<MIGRATE_PEER2PEER> flag is set,
+the source LibVirt daemon connects to the destination LibVirt daemon (managed
+peer to peer). Without this flag, the source LibVirt daemon instructs the
+hypervisor to connect to the target hypervisor and orchestrate the migration
+between the two (unmanaged direct migration).
+
+See L<virDomainMigrateToURI3|https://libvirt.org/html/libvirt-libvirt-domain.html#virDomainMigrateToURI3>.
+
+For more information on migrations, see L<https://libvirt.org/migration.html>.
+
+=head2 migrate_peer2peer
+
+  my $bool = await $dom->migrate_peer2peer( $uri, $params, $flags );
+
+Convenience wrapper around C<migrate_to_uri>, setting the C<MIGRATE_PEER2PEER>
+flag.
+
+=head2 migrate_unmanaged_direct
+
+  my $bool = await $dom->migrate_unmanaged_direct( $uri, $params, $flags );
+
+Convenience wrapper around C<migrate_to_uri>, setting unsetting the
+C<MIGRATE_PEER2PEER> flag and adding C<MIGRATE_PARAM_URI> to C<$params>.
 
 =head2 pin_emulator
 
@@ -3212,6 +3681,15 @@ See documentation of L<virDomainUpdateDeviceFlags|https://libvirt.org/html/libvi
 
 =head1 CONSTANTS
 
+
+   my $value = Sys::Async::Virt::Domain->CHECKPOINT_CREATE_REDEFINE;
+
+   # - or -
+
+   my $value = $dom->CHECKPOINT_CREATE_REDEFINE;
+
+
+
 =over 8
 
 =item CHECKPOINT_CREATE_REDEFINE
@@ -3532,6 +4010,8 @@ See documentation of L<virDomainUpdateDeviceFlags|https://libvirt.org/html/libvi
 
 =item MIGRATE_PARAM_MIGRATE_DISKS_DETECT_ZEROES
 
+=item MIGRATE_PARAM_MIGRATE_DISKS_TARGET_ZERO
+
 =item MIGRATE_PARAM_DISKS_PORT
 
 =item MIGRATE_PARAM_DISKS_URI
@@ -3603,6 +4083,20 @@ See documentation of L<virDomainUpdateDeviceFlags|https://libvirt.org/html/libvi
 =item SAVE_PARAM_DXML
 
 =item SAVE_PARAM_IMAGE_FORMAT
+
+=item SAVE_PARAM_IMAGE_FORMAT_RAW
+
+=item SAVE_PARAM_IMAGE_FORMAT_GZIP
+
+=item SAVE_PARAM_IMAGE_FORMAT_BZIP2
+
+=item SAVE_PARAM_IMAGE_FORMAT_XZ
+
+=item SAVE_PARAM_IMAGE_FORMAT_LZOP
+
+=item SAVE_PARAM_IMAGE_FORMAT_ZSTD
+
+=item SAVE_PARAM_IMAGE_FORMAT_SPARSE
 
 =item SAVE_PARAM_PARALLEL_CHANNELS
 
@@ -3693,6 +4187,8 @@ See documentation of L<virDomainUpdateDeviceFlags|https://libvirt.org/html/libvi
 =item BLOCK_RESIZE_BYTES
 
 =item BLOCK_RESIZE_CAPACITY
+
+=item BLOCK_RESIZE_EXTEND
 
 =item MEMORY_VIRTUAL
 
@@ -3950,6 +4446,22 @@ See documentation of L<virDomainUpdateDeviceFlags|https://libvirt.org/html/libvi
 
 =item STATS_BLOCK_SUFFIX_TIMED_GROUP_SUFFIX_ZONE_APPEND_QUEUE_DEPTH_AVG
 
+=item STATS_BLOCK_SUFFIX_LATENCY_HISTOGRAM_READ_PREFIX
+
+=item STATS_BLOCK_SUFFIX_LATENCY_HISTOGRAM_WRITE_PREFIX
+
+=item STATS_BLOCK_SUFFIX_LATENCY_HISTOGRAM_ZONE_APPEND_PREFIX
+
+=item STATS_BLOCK_SUFFIX_LATENCY_HISTOGRAM_FLUSH_PREFIX
+
+=item STATS_BLOCK_SUFFIX_LATENCY_HISTOGRAM_SUFFIX_BIN_COUNT
+
+=item STATS_BLOCK_SUFFIX_LATENCY_HISTOGRAM_SUFFIX_BIN_PREFIX
+
+=item STATS_BLOCK_SUFFIX_LATENCY_HISTOGRAM_SUFFIX_BIN_SUFFIX_START
+
+=item STATS_BLOCK_SUFFIX_LATENCY_HISTOGRAM_SUFFIX_BIN_SUFFIX_VALUE
+
 =item STATS_PERF_CMT
 
 =item STATS_PERF_MBMT
@@ -4147,6 +4659,8 @@ See documentation of L<virDomainUpdateDeviceFlags|https://libvirt.org/html/libvi
 =item BLOCK_COPY_TRANSIENT_JOB
 
 =item BLOCK_COPY_SYNCHRONOUS_WRITES
+
+=item BLOCK_COPY_TARGET_ZEROED
 
 =item BLOCK_COPY_BANDWIDTH
 
@@ -4970,7 +5484,7 @@ L<LibVirt|https://libvirt.org>, L<Sys::Virt>
 =head1 LICENSE AND COPYRIGHT
 
 
-  Copyright (C) 2024-2025 Erik Huelsmann
+  Copyright (C) 2024-2026 Erik Huelsmann
 
 All rights reserved. This program is free software;
 you can redistribute it and/or modify it under the same terms as Perl itself.

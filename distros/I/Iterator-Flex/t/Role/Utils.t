@@ -112,7 +112,7 @@ subtest 'throw_failure' => sub {
 
         like(
             dies { throw_failure( internal => 'foo' ) },
-            qr|Failure caught at t/Role/Utils.t line \d+\.$|m,
+            qr|Failure caught at (?:[.]/)?t/Role/Utils[.]t line \d+\.$|m,
         );
 
     };

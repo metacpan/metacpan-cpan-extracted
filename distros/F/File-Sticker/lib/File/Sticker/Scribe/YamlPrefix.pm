@@ -1,12 +1,12 @@
 package File::Sticker::Scribe::YamlPrefix;
-$File::Sticker::Scribe::YamlPrefix::VERSION = '4.401';
+$File::Sticker::Scribe::YamlPrefix::VERSION = '4.603';
 =head1 NAME
 
 File::Sticker::Scribe::YamlPrefix - write and standardize meta-data from YAML file
 
 =head1 VERSION
 
-version 4.401
+version 4.603
 
 =head1 SYNOPSIS
 
@@ -73,7 +73,7 @@ If it does exist, the YAML-prefix area must exist also.
 sub allowed_file {
     my $self = shift;
     my $file = shift;
-    say STDERR whoami(), " file=$file" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     my $ft = $self->{file_magic}->info_from_filename($file);
     # This needs to be a plain text file
@@ -82,6 +82,7 @@ sub allowed_file {
             and $ft->{mime_type} =~ m{^text/plain}
             and $file !~ /\.yml$/)
     {
+        say STDERR 'Scribe ' . $self->name() . ' allows filetype ' . $ft->{mime_type} . ' of ' . $file if $self->{verbose} > 1;
         return 1;
     }
     return 0;
@@ -135,7 +136,7 @@ Read the meta-data from the given file.
 sub read_meta {
     my $self = shift;
     my $filename = shift;
-    say STDERR whoami(), " filename=$filename" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     my ($yaml_str,$more) = $self->_yaml_and_more($filename);
     my %meta = ();
@@ -228,7 +229,7 @@ This does no checking for multi-valued fields, it just deletes the whole thing.
 sub delete_field_from_file {
     my $self = shift;
     my %args = @_;
-    say STDERR whoami(), " filename=$args{filename}" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     my $filename = $args{filename};
     my $field = $args{field};
@@ -252,7 +253,7 @@ Overwrite the existing meta-data with that given.
 sub replace_all_meta {
     my $self = shift;
     my %args = @_;
-    say STDERR whoami(), " filename=$args{filename}" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     my $filename = $args{filename};
     my $meta = $args{meta};
@@ -272,7 +273,7 @@ Overwrite the given field. This does no checking.
 sub replace_one_field {
     my $self = shift;
     my %args = @_;
-    say STDERR whoami(), " filename=$args{filename}" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     my $filename = $args{filename};
     my $field = $args{field};
@@ -320,7 +321,7 @@ and also the rest of the file as a separate part.
 sub _yaml_and_more {
     my $self = shift;
     my $filename = shift;
-    say STDERR whoami(), " filename=$filename" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     my $fh;
     if (!open($fh, '<', $filename))
@@ -368,7 +369,7 @@ Quick non-checking loading of the meta-data. Does not standardize any fields.
 sub _load_meta {
     my $self = shift;
     my $filename = shift;
-    say STDERR whoami(), " filename=$filename" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     my ($yaml_str,$more) = $self->_yaml_and_more($filename);
     my $meta;

@@ -9,3 +9,9 @@ log4perl-configurator:
   args:
     data: 
       $config: logging_data.yml
+    subst:
+      filename:
+        $ref: filename-provider
+
+filename-provider:
+  value: file.log

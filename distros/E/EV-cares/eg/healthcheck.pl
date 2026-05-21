@@ -46,16 +46,16 @@ printf "%-30s %-8s %-10s %s\n", 'HOST', 'STATUS', 'TIME', 'RESULT';
 printf "%s\n", '-' x 75;
 
 my ($ok, $fail) = (0, 0);
-for my $r (sort { $a->{host} cmp $b->{host} } @results) {
-    if ($r->{status} == ARES_SUCCESS) {
+for my $row (sort { $a->{host} cmp $b->{host} } @results) {
+    if ($row->{status} == ARES_SUCCESS) {
         printf "%-30s %-8s %6.1fms   %s\n",
-            $r->{host}, 'OK', $r->{time_ms},
-            join(', ', @{$r->{addrs}});
+            $row->{host}, 'OK', $row->{time_ms},
+            join(', ', @{$row->{addrs}});
         $ok++;
     } else {
         printf "%-30s %-8s %6.1fms   %s\n",
-            $r->{host}, 'FAIL', $r->{time_ms},
-            EV::cares::strerror($r->{status});
+            $row->{host}, 'FAIL', $row->{time_ms},
+            EV::cares::strerror($row->{status});
         $fail++;
     }
 }

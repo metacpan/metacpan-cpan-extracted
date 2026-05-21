@@ -1,5 +1,8 @@
 Revision history for Chandra
 
+0.25 2026-05-17
+  - Fix MANIFEST
+
 0.24 2026-04-19
   - Add Chandra::Component - Object::Proto reactive component system
   - Components support state, lifecycle hooks (on_mount, on_unmount, on_update)
@@ -124,7 +127,7 @@ Revision history for Chandra
     - Add Chandra::Store - Persistent key-value storage for Chandra apps
 
 0.10  2026-04-02
-    - Add Chandra::Shortcut — keyboard shortcuts and global hotkeys
+    - Add Chandra::Shortcut - keyboard shortcuts and global hotkeys
 
 0.09  2026-04-01
     - Fix Makefile to identify BSD's that should use GTK/WebKit2

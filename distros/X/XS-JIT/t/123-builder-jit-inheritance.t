@@ -3,6 +3,9 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
+# JITted .dll files stay locked on Windows; let the OS reap %TEMP% so
+# File::Temp does not carp on every cleanup attempt.
+$File::Temp::KEEP_ALL = 1 if $^O =~ /^(MSWin32|cygwin|msys)$/;
 
 use_ok('XS::JIT');
 use_ok('XS::JIT::Builder');
@@ -470,12 +473,17 @@ subtest 'Multiple unrelated packages' => sub {
       ->endif
       ->raw('STRLEN len;')
       ->raw('const char* str = SvPV(ST(0), len);')
-      ->raw('char* buffer = (char*)alloca(len + 1);')
+      # alloca() needs <alloca.h> on Solaris and isn't reliably visible
+      # without it on every platform. Use Newx/Safefree (Perl's portable
+      # allocators) so this fixture compiles everywhere.
+      ->raw('char* buffer;')
+      ->raw('Newx(buffer, len + 1, char);')
       ->for('STRLEN i = 0', 'i < len', 'i++')
         ->raw('buffer[i] = str[len - 1 - i];')
       ->endfor
       ->raw('buffer[len] = \'\\0\';')
       ->raw('ST(0) = sv_2mortal(newSVpvn(buffer, len));')
+      ->raw('Safefree(buffer);')
       ->xs_return('1')
       ->xs_end
       ->blank;

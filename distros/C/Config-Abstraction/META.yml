@@ -10,6 +10,7 @@ build_requires:
   POSIX: '0'
   Readonly: '0'
   Test::DescribeMe: '0'
+  Test::Mockingbird: '0'
   Test::Most: '0'
   Test::Needs: '0'
   Test::TempDir::Tiny: '0'
@@ -17,7 +18,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -39,7 +40,7 @@ requires:
   Hash::Merge: '0'
   JSON::MaybeXS: '0'
   JSON::Parse: '0'
-  Params::Get: '0.13'
+  Params::Get: '0.14'
   Params::Validate::Strict: '0.11'
   Pod::Usage: '0'
   Scalar::Util: '0'
@@ -50,5 +51,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Config-Abstraction
   homepage: https://metacpan.org/pod/Config::Abstraction
   repository: git://github.com/nigelhorne/Config-Abstraction.git
-version: '0.37'
+version: '0.38'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

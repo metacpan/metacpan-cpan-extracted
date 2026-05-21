@@ -22,7 +22,7 @@ has data    => ();
 
 =head1 AUTHORS
 
-Bizowie <http://bizowie.com>
+L<Bizowie|http://bizowie.com/>
 
 =head1 COPYRIGHT AND LICENSE
 

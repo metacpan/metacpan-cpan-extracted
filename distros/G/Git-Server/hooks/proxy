@@ -12,7 +12,23 @@ my $working = "$base.workingdir";
 $ENV{GIT_SSH_COMMAND} = (`git config core.sshCommand 2>/dev/null` =~ /^(.+)/ ? $1 : "ssh")." -A -o SendEnv=XMODIFIERS";
 $ENV{XMODIFIERS} ||= "";
 ($ENV{DEBUG} and !warn localtime().": [$who] git-server: DEBUG: [$base] Skipping proxy checks during $how\n") or exit 0 if $ENV{XMODIFIERS} =~ /^skip_proxy=(.*)/m and $1;
-$ENV{XMODIFIERS} = join "\n", "skip_proxy=1", split /\n/, $ENV{XMODIFIERS};
+$ENV{XMODIFIERS} =~ s/^skip_proxy=.*//gm; # Clear any (false) setting
+$ENV{XMODIFIERS} = "skip_proxy=1\n$ENV{XMODIFIERS}";
+while ($ENV{XMODIFIERS} =~ s/\n\n/\n/g) {}
+$ENV{XMODIFIERS} =~ s/\n+$//;
+$ENV{USER} ||= [getpwuid $<]->[0];
+$ENV{HOME} ||= [getpwuid $<]->[7];
+while (my ($remote,$proxy) = each %proxy) {
+    # Ensure no cheater local repo urls.
+    # XXX: Should HTTP URLs be converted to SSH URLs on the fly to be "helpful" for known URLs, such as github.com?
+    next if $proxy =~ m{^(\w+://|[-.@\w]+:)}; # If it has a colon, it's probably a safe enough "remote" git URL
+    my $server = $ENV{SERVER_ADDR} or die "Auth required for proxy.url $proxy\n";
+    $proxy =~ s{^~(/?)}{$ENV{HOME}$1};
+    $proxy =~ s{^\Q$ENV{HOME}\E(/?)}{};
+    $proxy ||= "/";
+    $proxy = "$ENV{USER}\@$server:$proxy";
+    $proxy{$remote} = $proxy;
+}
 my $WHY_FAILED = {};
 sub remote_refs {
     my $remote = shift;
@@ -32,7 +48,7 @@ sub remote_refs {
         $WHY_FAILED->{$remote} = "";
     }
     # Clean up refs list ignoring "HEAD" and ignore everything that isn't a regular branch or tag, such as /pull/ requests.
-    @list = sort { $a cmp $b } grep { m{\srefs/(?:heads|tags)/(?!HEAD)} } @list;
+    @list = sort { my ($a_ref,$b_ref) = "$a$b" =~ /\s(refs.*)\n.*?\s(refs.*)/; $a_ref cmp $b_ref or $a cmp $b } grep { m{\srefs/(?:heads|tags)/(?!HEAD)} } @list;
     return join "", @list;
 }
 
@@ -163,14 +179,13 @@ if (my $changes = {}) {
         }
     }
     if (my @sync = sort keys %$changes) {
-        $pick = shift @sync;
+        $pick = shift @sync and $diff = $changes->{$pick} or die localtime().": [$who] git-server: Unable to calculate proxy sync requirements. Implementation error!\n";
+        warn localtime().": [$who] git-server: DEBUG: Need Sync (".join(" ",sort keys %$diff).") with [$pick] $proxy{$pick}\n" if $ENV{DEBUG};
         foreach my $ignore (@sync) {
             # If there are multiple remote proxy mismatches, then just focus on syncing the first one for now.
-            warn localtime().": [$who] git-server: DEBUG: Need Sync (".join(" ",sort keys %{ $changes->{$ignore} }).") with [$ignore] $proxy{$ignore} but ignoring for now. Please try again.\n" if $ENV{DEBUG};
+            warn localtime().": [$who] git-server: DEBUG: Need Sync (".join(" ",sort keys %{ $changes->{$ignore} }).") with [$ignore] $proxy{$ignore} (ignoring this try)\n" if $ENV{DEBUG};
         }
     }
-    $pick and $diff = $changes->{$pick} or die localtime().": [$who] git-server: Unable to calculate proxy sync requirements. Implementation error!\n";
-    warn localtime().": [$who] git-server: DEBUG: Need Sync (".join(" ",sort keys %$diff).") with $proxy{$pick}\n" if $ENV{DEBUG};
 }
 foreach my $n (sort keys %$diff) {
     my $t = $diff->{$n};
@@ -185,13 +200,13 @@ foreach my $n (sort keys %$diff) {
         my ($older, $newer, $target);
         if ($l and $r) {
             # Both exist but are different
-            if (`git log $l | grep $r`) {
+            if (`git log --format='%H' $l | grep $r`) {
                 # Remote found in local log, so remote is older. Must update remote to catch up to local:
                 $older = $pick;
                 $newer = "here";
                 $target = $l;
             }
-            if (`git log $r | grep $l`) {
+            if (`git log --format='%H' $r | grep $l`) {
                 # Local found in remote log, so local is older. Must update local to catch up to remote:
                 $older = "here";
                 $newer = $pick;
@@ -260,7 +275,7 @@ foreach my $n (sort keys %$diff) {
         elsif ($t eq "branch") {
             # Push local changes on branch $n to remote proxy
             0 == system "(git checkout $n || git checkout --track here/$n) 1>&2" or next;
-            system "(git pull --rebase here $n && git push there) 1>&2";
+            system "(git pull --rebase here $n && git push $pick $n --force) 1>&2";
         }
     }
     else {
@@ -282,18 +297,19 @@ if (1) {
         print $fh $refs->{here};
         close $fh;
     }
+    elsif ($refs->{here} eq $refs->{$pick}) {
+        # One remote was synced successfully, but not all, so it's safe to try again. Do not remove "SYNCED" file in case everything was synced during pre-write phase.
+        warn localtime().": [$who] git-server: DEBUG: Three-Way Proxy partially synced but not all proxies. Trying again ...\n" if $ENV{DEBUG};
+        $ENV{XMODIFIERS} =~ s/^skip_proxy=.*\n?//gm; # Recursively sync, so do NOT skip_proxy this time.
+        1 while $ENV{XMODIFIERS} =~ s/\n\n/\n/g;
+        chdir($ENV{GIT_DIR}=$base) and sleep 1 and exec $0, $how;
+    }
     else {
+        # We must remove "SYNCED" status at this point since there was a problem during this attempt. Don't keep trying.
         unlink ".git/SYNCED";
-        if ($refs->{here} eq $refs->{$pick}) {
-            # XXX: Will we be able sync accurately enough now that the "SYNCED" file is wiped? Maybe not, but it should be safe enough to try running again. So let's give it a try:
-            warn localtime().": [$who] git-server: DEBUG: Three-Way Proxy partially synced but not all proxies. Trying again ...\n" if $ENV{DEBUG};
-            chdir($ENV{GIT_DIR}=$base) and sleep 1 and exec $0, $how;
-        }
-        else {
-            (my $here  = "[here]: $base\n$refs->{here}")           =~ s/\s*$/\n/; $here  =~ s/^/< /gm;
-            (my $there = "[$pick]: $proxy{$pick}\n$refs->{$pick}") =~ s/\s*$/\n/; $there =~ s/^/> /gm;
-            warn localtime().": [$who] git-server: Proxy sync failed. Manual intervention may be required. Try again later.\n\n$here\n$there\n" if $ENV{DEBUG};
-        }
+        (my $here  = "[here]: $base\n$refs->{here}")           =~ s/\s*$/\n/; $here  =~ s/^/< /gm;
+        (my $there = "[$pick]: $proxy{$pick}\n$refs->{$pick}") =~ s/\s*$/\n/; $there =~ s/^/> /gm;
+        warn localtime().": [$who] git-server: DEBUG: Proxy sync failed. Manual intervention may be required.\n\n$here\n$there\n" if $ENV{DEBUG};
     }
 }
 exit 0;

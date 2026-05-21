@@ -1,13 +1,14 @@
 ---
 abstract: 'Simple command line script accelerator'
 author:
-  - 'Rob Lauer <rlauer6@comcast.net>'
+  - 'Rob Lauer <rclauer@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '6.64'
   File::ShareDir::Install: '0'
-  Test::Exit: '0'
-  Test::More: '0'
-  Test::Output: '0'
+  Role::Tiny: '2.002004'
+  Test::Exit: '0.11'
+  Test::Output: '1.036'
+  YAML::Tiny: '1.76'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::ShareDir::Install: '0'
@@ -25,25 +26,43 @@ no_index:
 provides:
   CLI::Simple:
     file: lib/CLI/Simple.pm
-    version: v1.0.12
+    version: v2.0.2
   CLI::Simple::Constants:
     file: lib/CLI/Simple/Constants.pm
-    version: v1.0.12
+    version: v2.0.2
+  CLI::Simple::DumpSpec:
+    file: lib/CLI/Simple/DumpSpec.pm
+    version: '0'
+  CLI::Simple::Helpers:
+    file: lib/CLI/Simple/Helpers.pm
+    version: '0'
+  CLI::Simple::Migrate:
+    file: lib/CLI/Simple/Migrate.pm
+    version: '0'
+  CLI::Simple::Scaffold:
+    file: lib/CLI/Simple/Scaffold.pm
+    version: '0'
+  CLI::Simple::Shell:
+    file: lib/CLI/Simple/Shell.pm
+    version: '0'
   CLI::Simple::Utils:
     file: lib/CLI/Simple/Utils.pm
-    version: v1.0.12
+    version: v2.0.2
 requires:
   Class::Accessor::Fast: '0.51'
+  File::ShareDir: '1.118'
   File::Which: '1.23'
   JSON: '4.07'
   List::Util: '1.56'
   Log::Log4perl: '1.57'
   Log::Log4perl::Level: '0'
   Readonly: '2.05'
+  Role::Tiny: '0'
+  YAML::Tiny: '1.76'
   perl: '5.010'
 resources:
-  bugtracker: http://github.com/rlauer6/perl-CLI-Simple/issues
-  homepage: http://github.com/rlauer6/perl-CLI-Simple
-  repository: git://github.com/rlauer6/perl-CLI-Simple.git
-version: v1.0.12
+  bugtracker: http://github.com/rlauer6/CLI-Simple/issues
+  homepage: http://github.com/rlauer6/CLI-Simple
+  repository: git://github.com/rlauer6/CLI-Simple.git
+version: v2.0.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,6 +4,7 @@ use utf8;
 
 use Minima::App;
 use Minima::View::JSON;
+use Plack::Response;
 
 $ENV{PLACK_ENV} = 'deployment';
 
@@ -21,5 +22,10 @@ is( $view->render({áèîõü => 1}), $s, 'encodes UTF-8' );
 # Pretty print in development
 delete $ENV{PLACK_ENV};
 is( $view->render([]), "[]\n", 'pretty prints in development mode' );
+
+# Sets Content-Type
+my $r = Plack::Response->new;
+$view->prepare_response($r);
+is( $r->content_type, 'application/json', 'sets proper content-type' );
 
 done_testing;

@@ -30,6 +30,11 @@
 static void *cq_thread_func(void *arg);
 static void cq_async_callback(EV_P_ ev_async *w, int revents);
 static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success);
+
+/* Sentinel tag for fire-and-forget batches (e.g. watch cancel SEND_MESSAGE).
+ * gRPC's GRPC_CQ_NEXT contract requires a non-NULL tag; we use this dummy
+ * call_base_t so the completion can be identified and skipped. */
+static call_base_t cancel_sentinel = { CALL_TYPE_NONE };
 static void process_txn_response(pTHX_ pending_call_t *pc);
 static void process_auth_response(pTHX_ pending_call_t *pc);
 static void process_user_add_response(pTHX_ pending_call_t *pc);
@@ -275,7 +280,7 @@ static void cq_async_callback(struct ev_loop *loop, ev_async *w, int revents) {
         queued_event_t *qe = queue;
         queue = qe->next;
 
-        /* Skip NULL tags (e.g., from watch cancel messages) */
+        /* Defensive NULL guard — every code path uses a real tag (see cancel_sentinel) */
         if (qe->tag) {
             process_grpc_event(aTHX_ client, qe->tag, qe->success);
         }
@@ -307,6 +312,9 @@ static void cq_async_callback(struct ev_loop *loop, ev_async *w, int revents) {
  */
 static void process_grpc_event(pTHX_ ev_etcd_t *client, void *tag, int success) {
     call_base_t *base = (call_base_t *)tag;
+
+    /* Fire-and-forget cancel batch — nothing to do */
+    if (base->type == CALL_TYPE_NONE) return;
 
     if (base->type == CALL_TYPE_WATCH_RECV) {
             /* Watch receive completion */
@@ -650,7 +658,7 @@ static SV* response_op_to_hashref(pTHX_ Etcdserverpb__ResponseOp *op) {
         }
         hv_store(range, "kvs", 3, newRV_noinc((SV *)kvs), 0);
         hv_store(range, "more", 4, newSViv(rr->more), 0);
-        hv_store(range, "count", 5, newSViv(rr->count), 0);
+        hv_store(range, "count", 5, newSVi64(rr->count), 0);
 
         hv_store(hv, "response_range", 14, newRV_noinc((SV *)range), 0);
     }
@@ -670,7 +678,7 @@ static SV* response_op_to_hashref(pTHX_ Etcdserverpb__ResponseOp *op) {
         HV *del = newHV();
         add_header_to_hv(aTHX_ del, dr->header);
 
-        hv_store(del, "deleted", 7, newSViv(dr->deleted), 0);
+        hv_store(del, "deleted", 7, newSVi64(dr->deleted), 0);
 
         if (dr->n_prev_kvs > 0) {
             AV *prev_kvs = newAV();
@@ -700,22 +708,57 @@ static void parse_request_ops(pTHX_ SV *src_av, Etcdserverpb__RequestOp ***dst_o
     size_t n = av_len(av) + 1;
     if (n == 0) return;
 
+    /* Pre-validate sizes up front — must croak before any allocation, otherwise
+     * a longjmp from VALIDATE_*_SIZE leaks the partially-built ops array.
+     * Use SvPV() (not SvCUR) so non-POK SVs get stringified to a real length. */
+    #define VALIDATE_HV_KEY(hv_in, name, len_check) do { \
+        SV **_f = hv_fetch((hv_in), name, sizeof(name) - 1, 0); \
+        if (_f && SvOK(*_f)) { STRLEN _l; (void)SvPV(*_f, _l); len_check(_l); } \
+    } while (0)
+    for (size_t i = 0; i < n; i++) {
+        SV **elem = av_fetch(av, i, 0);
+        if (!elem || !SvROK(*elem) || SvTYPE(SvRV(*elem)) != SVt_PVHV) continue;
+        HV *hv = (HV *)SvRV(*elem);
+        SV **inner;
+
+        if ((inner = hv_fetch(hv, "request_range", 13, 0)) ||
+            (inner = hv_fetch(hv, "range", 5, 0))) {
+            if (SvROK(*inner) && SvTYPE(SvRV(*inner)) == SVt_PVHV) {
+                HV *ih = (HV *)SvRV(*inner);
+                VALIDATE_HV_KEY(ih, "key", VALIDATE_KEY_SIZE);
+                VALIDATE_HV_KEY(ih, "range_end", VALIDATE_KEY_SIZE);
+            }
+        }
+        if ((inner = hv_fetch(hv, "request_put", 11, 0)) ||
+            (inner = hv_fetch(hv, "put", 3, 0))) {
+            if (SvROK(*inner) && SvTYPE(SvRV(*inner)) == SVt_PVHV) {
+                HV *ih = (HV *)SvRV(*inner);
+                VALIDATE_HV_KEY(ih, "key", VALIDATE_KEY_SIZE);
+                VALIDATE_HV_KEY(ih, "value", VALIDATE_VALUE_SIZE);
+            }
+        }
+        if ((inner = hv_fetch(hv, "request_delete_range", 20, 0)) ||
+            (inner = hv_fetch(hv, "delete", 6, 0))) {
+            if (SvROK(*inner) && SvTYPE(SvRV(*inner)) == SVt_PVHV) {
+                HV *ih = (HV *)SvRV(*inner);
+                VALIDATE_HV_KEY(ih, "key", VALIDATE_KEY_SIZE);
+                VALIDATE_HV_KEY(ih, "range_end", VALIDATE_KEY_SIZE);
+            }
+        }
+    }
+    #undef VALIDATE_HV_KEY
+
     Newxz(*dst_ops, n, Etcdserverpb__RequestOp *);
     *dst_n = n;
 
     for (size_t i = 0; i < n; i++) {
         SV **elem = av_fetch(av, i, 0);
-        if (!elem || !SvROK(*elem) || SvTYPE(SvRV(*elem)) != SVt_PVHV) {
-            Newxz((*dst_ops)[i], 1, Etcdserverpb__RequestOp);
-            etcdserverpb__request_op__init((*dst_ops)[i]);
-            continue;
-        }
-
-        HV *hv = (HV *)SvRV(*elem);
         Newxz((*dst_ops)[i], 1, Etcdserverpb__RequestOp);
         etcdserverpb__request_op__init((*dst_ops)[i]);
+        if (!elem || !SvROK(*elem) || SvTYPE(SvRV(*elem)) != SVt_PVHV) continue;
 
-        /* Check for request_range / range */
+        HV *hv = (HV *)SvRV(*elem);
+
         SV **range_sv = hv_fetch(hv, "request_range", 13, 0);
         if (!range_sv) range_sv = hv_fetch(hv, "range", 5, 0);
         if (range_sv && SvROK(*range_sv) && SvTYPE(SvRV(*range_sv)) == SVt_PVHV) {
@@ -728,7 +771,6 @@ static void parse_request_ops(pTHX_ SV *src_av, Etcdserverpb__RequestOp ***dst_o
             if (k && SvOK(*k)) {
                 STRLEN len;
                 char *str = SvPV(*k, len);
-                VALIDATE_KEY_SIZE(len);
                 rr->key.data = (uint8_t *)str;
                 rr->key.len = len;
             }
@@ -736,7 +778,6 @@ static void parse_request_ops(pTHX_ SV *src_av, Etcdserverpb__RequestOp ***dst_o
             if (re && SvOK(*re)) {
                 STRLEN len;
                 char *str = SvPV(*re, len);
-                VALIDATE_KEY_SIZE(len);
                 rr->range_end.data = (uint8_t *)str;
                 rr->range_end.len = len;
             }
@@ -745,7 +786,6 @@ static void parse_request_ops(pTHX_ SV *src_av, Etcdserverpb__RequestOp ***dst_o
             continue;
         }
 
-        /* Check for request_put / put */
         SV **put_sv = hv_fetch(hv, "request_put", 11, 0);
         if (!put_sv) put_sv = hv_fetch(hv, "put", 3, 0);
         if (put_sv && SvROK(*put_sv) && SvTYPE(SvRV(*put_sv)) == SVt_PVHV) {
@@ -758,7 +798,6 @@ static void parse_request_ops(pTHX_ SV *src_av, Etcdserverpb__RequestOp ***dst_o
             if (k && SvOK(*k)) {
                 STRLEN len;
                 char *str = SvPV(*k, len);
-                VALIDATE_KEY_SIZE(len);
                 pr->key.data = (uint8_t *)str;
                 pr->key.len = len;
             }
@@ -766,19 +805,17 @@ static void parse_request_ops(pTHX_ SV *src_av, Etcdserverpb__RequestOp ***dst_o
             if (v && SvOK(*v)) {
                 STRLEN len;
                 char *str = SvPV(*v, len);
-                VALIDATE_VALUE_SIZE(len);
                 pr->value.data = (uint8_t *)str;
                 pr->value.len = len;
             }
             SV **l = hv_fetch(ph, "lease", 5, 0);
-            if (l && SvOK(*l)) pr->lease = SvIV(*l);
+            if (l && SvOK(*l)) pr->lease = SvI64(*l);
 
             (*dst_ops)[i]->request_case = ETCDSERVERPB__REQUEST_OP__REQUEST_REQUEST_PUT;
             (*dst_ops)[i]->request_put = pr;
             continue;
         }
 
-        /* Check for request_delete_range / delete */
         SV **del_sv = hv_fetch(hv, "request_delete_range", 20, 0);
         if (!del_sv) del_sv = hv_fetch(hv, "delete", 6, 0);
         if (del_sv && SvROK(*del_sv) && SvTYPE(SvRV(*del_sv)) == SVt_PVHV) {
@@ -791,7 +828,6 @@ static void parse_request_ops(pTHX_ SV *src_av, Etcdserverpb__RequestOp ***dst_o
             if (k && SvOK(*k)) {
                 STRLEN len;
                 char *str = SvPV(*k, len);
-                VALIDATE_KEY_SIZE(len);
                 dr->key.data = (uint8_t *)str;
                 dr->key.len = len;
             }
@@ -799,7 +835,6 @@ static void parse_request_ops(pTHX_ SV *src_av, Etcdserverpb__RequestOp ***dst_o
             if (re && SvOK(*re)) {
                 STRLEN len;
                 char *str = SvPV(*re, len);
-                VALIDATE_KEY_SIZE(len);
                 dr->range_end.data = (uint8_t *)str;
                 dr->range_end.len = len;
             }
@@ -846,7 +881,7 @@ static void process_auth_response(pTHX_ pending_call_t *pc) {
         if (token_len > 0) {
             /* Validate token size to prevent memory exhaustion */
             if (token_len > ETCD_MAX_VALUE_SIZE) {
-                CALL_SIMPLE_ERROR_CALLBACK(pc->callback, "auth token too large");
+                CALL_STATUS_ERROR_CALLBACK(pc->callback, GRPC_STATUS_INTERNAL, "auth token too large", "authenticate");
                 etcdserverpb__authenticate_response__free_unpacked(resp, NULL);
                 return;
             }
@@ -1176,8 +1211,6 @@ CODE:
 
     /* Initialize threading for hybrid gRPC/EV approach */
     pthread_mutex_init(&client->queue_mutex, NULL);
-    client->event_queue = NULL;
-    client->event_queue_tail = NULL;
     client->thread_running = 1;
 
     /* Initialize ev_async watcher for main thread notification */
@@ -1203,35 +1236,19 @@ CODE:
         croak("Failed to create gRPC completion queue thread");
     }
 
-    client->pending_calls = NULL;
-    client->watches = NULL;
-    client->keepalives = NULL;
-    client->observes = NULL;
-    /* Store auth token if provided */
     if (init_auth_token && init_auth_token_len > 0) {
         Newx(client->auth_token, init_auth_token_len + 1, char);
         Copy(init_auth_token, client->auth_token, init_auth_token_len, char);
         client->auth_token[init_auth_token_len] = '\0';
         client->auth_token_len = init_auth_token_len;
-    } else {
-        client->auth_token = NULL;
-        client->auth_token_len = 0;
     }
     client->timeout_seconds = timeout_seconds;
     client->active = 1;
-    client->in_callback = 0;
     client->owner_pid = getpid();
-
-    /* Retry configuration */
     client->max_retries = max_retries;
-
-    /* Health monitoring */
     client->is_healthy = 1;  /* Assume healthy initially */
-    if (health_callback) {
+    if (health_callback)
         client->health_callback = SvREFCNT_inc(health_callback);
-    } else {
-        client->health_callback = NULL;
-    }
 
     /* Initialize health timer (stopped initially) */
     ev_timer_init(&client->health_timer, health_timer_callback, 0.0, 0.0);
@@ -1277,8 +1294,11 @@ CODE:
     /* Pre-validate option sizes before allocating pending call */
     if (opts && SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV) {
         SV **svp;
-        if ((svp = hv_fetchs((HV *)SvRV(opts), "range_end", 0)) && SvOK(*svp))
-            VALIDATE_KEY_SIZE(SvCUR(*svp));
+        if ((svp = hv_fetchs((HV *)SvRV(opts), "range_end", 0)) && SvOK(*svp)) {
+            STRLEN _l;
+            (void)SvPV(*svp, _l);
+            VALIDATE_KEY_SIZE(_l);
+        }
     }
 
     /* Create pending call structure */
@@ -1324,12 +1344,12 @@ CODE:
 
         /* limit */
         if ((svp = hv_fetchs(hv, "limit", 0)) && SvOK(*svp)) {
-            req.limit = SvIV(*svp);
+            req.limit = SvI64(*svp);
         }
 
         /* revision */
         if ((svp = hv_fetchs(hv, "revision", 0)) && SvOK(*svp)) {
-            req.revision = SvIV(*svp);
+            req.revision = SvI64(*svp);
         }
 
         /* keys_only */
@@ -1373,22 +1393,22 @@ CODE:
 
         /* min_mod_revision */
         if ((svp = hv_fetchs(hv, "min_mod_revision", 0)) && SvOK(*svp)) {
-            req.min_mod_revision = SvIV(*svp);
+            req.min_mod_revision = SvI64(*svp);
         }
 
         /* max_mod_revision */
         if ((svp = hv_fetchs(hv, "max_mod_revision", 0)) && SvOK(*svp)) {
-            req.max_mod_revision = SvIV(*svp);
+            req.max_mod_revision = SvI64(*svp);
         }
 
         /* min_create_revision */
         if ((svp = hv_fetchs(hv, "min_create_revision", 0)) && SvOK(*svp)) {
-            req.min_create_revision = SvIV(*svp);
+            req.min_create_revision = SvI64(*svp);
         }
 
         /* max_create_revision */
         if ((svp = hv_fetchs(hv, "max_create_revision", 0)) && SvOK(*svp)) {
-            req.max_create_revision = SvIV(*svp);
+            req.max_create_revision = SvI64(*svp);
         }
     }
 
@@ -1520,7 +1540,7 @@ CODE:
 
         /* lease - lease ID to associate with key */
         if ((svp = hv_fetchs(hv, "lease", 0)) && SvOK(*svp)) {
-            req.lease = SvIV(*svp);
+            req.lease = SvI64(*svp);
         }
 
         /* prev_kv - return previous key-value pair */
@@ -1646,8 +1666,11 @@ CODE:
     /* Pre-validate option sizes before allocating pending call */
     if (opts && SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV) {
         SV **svp;
-        if ((svp = hv_fetchs((HV *)SvRV(opts), "range_end", 0)) && SvOK(*svp))
-            VALIDATE_KEY_SIZE(SvCUR(*svp));
+        if ((svp = hv_fetchs((HV *)SvRV(opts), "range_end", 0)) && SvOK(*svp)) {
+            STRLEN _l;
+            (void)SvPV(*svp, _l);
+            VALIDATE_KEY_SIZE(_l);
+        }
     }
 
     /* Create pending call structure */
@@ -1814,7 +1837,7 @@ CODE:
         }
     }
 
-    /* Create watch structure */
+    /* Create watch structure (Newxz zeroes everything; only set non-zero fields) */
     watch_call_t *wc;
     Newxz(wc, 1, watch_call_t);
     init_call_base(&wc->base, CALL_TYPE_WATCH);
@@ -1822,26 +1845,18 @@ CODE:
     wc->client = client;
     wc->active = 1;
     wc->watch_id = -1;
+    wc->auto_reconnect = 1;  /* Enable by default */
+    wc->client_owns = 1;
+    wc->perl_owns = 1;
     grpc_metadata_array_init(&wc->initial_metadata);
     grpc_metadata_array_init(&wc->trailing_metadata);
-    wc->recv_buffer = NULL;
     wc->status_details = grpc_empty_slice();
-
-    /* Recovery fields */
-    wc->auto_reconnect = 1;  /* Enable by default */
-    wc->last_revision = 0;
-    wc->reconnect_attempt = 0;
 
     /* Store key for recovery */
     Newx(wc->params.key, key_len + 1, char);
     Copy(key_str, wc->params.key, key_len, char);
     wc->params.key[key_len] = '\0';
     wc->params.key_len = key_len;
-    wc->params.range_end = NULL;
-    wc->params.range_end_len = 0;
-    wc->params.start_revision = 0;
-    wc->params.prev_kv = 0;
-    wc->params.progress_notify = 0;
 
     /* Build WatchCreateRequest wrapped in WatchRequest */
     Etcdserverpb__WatchCreateRequest create_req = ETCDSERVERPB__WATCH_CREATE_REQUEST__INIT;
@@ -1896,7 +1911,7 @@ CODE:
 
         /* start_revision - watch from specific revision */
         if ((svp = hv_fetchs(hv, "start_revision", 0)) && SvOK(*svp)) {
-            create_req.start_revision = SvIV(*svp);
+            create_req.start_revision = SvI64(*svp);
             wc->params.start_revision = create_req.start_revision;
         }
 
@@ -1914,7 +1929,7 @@ CODE:
 
         /* watch_id - optional explicit watch ID */
         if ((svp = hv_fetchs(hv, "watch_id", 0)) && SvOK(*svp)) {
-            create_req.watch_id = SvIV(*svp);
+            create_req.watch_id = SvI64(*svp);
             wc->params.watch_id = create_req.watch_id;
             wc->params.has_watch_id = 1;
         }
@@ -2015,7 +2030,7 @@ OUTPUT:
 void
 ev_etcd_lease_grant(client, ttl, callback)
     EV::Etcd client
-    IV ttl
+    int64_t ttl
     SV *callback
 CODE:
 {
@@ -2100,7 +2115,7 @@ CODE:
 void
 ev_etcd_lease_revoke(client, lease_id, callback)
     EV::Etcd client
-    IV lease_id
+    int64_t lease_id
     SV *callback
 CODE:
 {
@@ -2185,7 +2200,7 @@ CODE:
 void
 ev_etcd_lease_time_to_live(client, lease_id, ...)
     EV::Etcd client
-    IV lease_id
+    int64_t lease_id
 CODE:
 {
     /* Parse arguments: lease_time_to_live(lease_id, [opts,] callback) */
@@ -2378,7 +2393,7 @@ CODE:
 void
 ev_etcd_compact(client, revision, ...)
     EV::Etcd client
-    IV revision
+    int64_t revision
 CODE:
 {
     /* Parse arguments: compact(revision, [opts,] callback) */
@@ -2571,7 +2586,7 @@ CODE:
 EV::Etcd::Keepalive
 ev_etcd_lease_keepalive(client, lease_id, ...)
     EV::Etcd client
-    IV lease_id
+    int64_t lease_id
 CODE:
 {
     /* Parse arguments: lease_keepalive(lease_id, [opts,] callback) */
@@ -2589,7 +2604,7 @@ CODE:
 
     VALIDATE_CALLBACK(callback);
 
-    /* Create keepalive structure */
+    /* Create keepalive structure (Newxz zeroes everything; only set non-zero fields) */
     keepalive_call_t *kc;
     Newxz(kc, 1, keepalive_call_t);
     init_call_base(&kc->base, CALL_TYPE_LEASE_KEEPALIVE);
@@ -2598,8 +2613,9 @@ CODE:
     kc->active = 1;
     kc->auto_reconnect = 1;  /* Enable by default */
     kc->lease_id = lease_id;
+    kc->client_owns = 1;
+    kc->perl_owns = 1;
 
-    /* Process options */
     if (opts && SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV) {
         HV *hv = (HV *)SvRV(opts);
         SV **svp;
@@ -2610,7 +2626,6 @@ CODE:
     }
     grpc_metadata_array_init(&kc->initial_metadata);
     grpc_metadata_array_init(&kc->trailing_metadata);
-    kc->recv_buffer = NULL;
     kc->status_details = grpc_empty_slice();
 
     /* Build LeaseKeepAliveRequest */
@@ -2708,13 +2723,16 @@ CODE:
             SV **elem = av_fetch(av, i, 0);
             if (elem && SvROK(*elem) && SvTYPE(SvRV(*elem)) == SVt_PVHV) {
                 HV *hv = (HV *)SvRV(*elem);
+                STRLEN _l;
                 SV **key_sv = hv_fetch(hv, "key", 3, 0);
                 if (key_sv && SvOK(*key_sv)) {
-                    VALIDATE_KEY_SIZE(SvCUR(*key_sv));
+                    (void)SvPV(*key_sv, _l);
+                    VALIDATE_KEY_SIZE(_l);
                 }
                 SV **value_sv = hv_fetch(hv, "value", 5, 0);
                 if (value_sv && SvOK(*value_sv)) {
-                    VALIDATE_VALUE_SIZE(SvCUR(*value_sv));
+                    (void)SvPV(*value_sv, _l);
+                    VALIDATE_VALUE_SIZE(_l);
                 }
             }
         }
@@ -2786,7 +2804,7 @@ CODE:
                     SV **version_sv = hv_fetch(hv, "version", 7, 0);
                     if (version_sv && SvOK(*version_sv)) {
                         compares[i]->target_union_case = ETCDSERVERPB__COMPARE__TARGET_UNION_VERSION;
-                        compares[i]->version = SvIV(*version_sv);
+                        compares[i]->version = SvI64(*version_sv);
                         if (!target_sv)
                             compares[i]->target = ETCDSERVERPB__COMPARE__COMPARE_TARGET__VERSION;
                     }
@@ -2794,7 +2812,7 @@ CODE:
                     SV **create_rev_sv = hv_fetch(hv, "create_revision", 15, 0);
                     if (create_rev_sv && SvOK(*create_rev_sv)) {
                         compares[i]->target_union_case = ETCDSERVERPB__COMPARE__TARGET_UNION_CREATE_REVISION;
-                        compares[i]->create_revision = SvIV(*create_rev_sv);
+                        compares[i]->create_revision = SvI64(*create_rev_sv);
                         if (!target_sv)
                             compares[i]->target = ETCDSERVERPB__COMPARE__COMPARE_TARGET__CREATE;
                     }
@@ -2802,7 +2820,7 @@ CODE:
                     SV **mod_rev_sv = hv_fetch(hv, "mod_revision", 12, 0);
                     if (mod_rev_sv && SvOK(*mod_rev_sv)) {
                         compares[i]->target_union_case = ETCDSERVERPB__COMPARE__TARGET_UNION_MOD_REVISION;
-                        compares[i]->mod_revision = SvIV(*mod_rev_sv);
+                        compares[i]->mod_revision = SvI64(*mod_rev_sv);
                         if (!target_sv)
                             compares[i]->target = ETCDSERVERPB__COMPARE__COMPARE_TARGET__MOD;
                     }
@@ -2822,7 +2840,7 @@ CODE:
                     SV **lease_sv = hv_fetch(hv, "lease", 5, 0);
                     if (lease_sv && SvOK(*lease_sv)) {
                         compares[i]->target_union_case = ETCDSERVERPB__COMPARE__TARGET_UNION_LEASE;
-                        compares[i]->lease = SvIV(*lease_sv);
+                        compares[i]->lease = SvI64(*lease_sv);
                         /* Auto-set target to LEASE if not explicitly specified */
                         if (!target_sv)
                             compares[i]->target = ETCDSERVERPB__COMPARE__COMPARE_TARGET__LEASE;
@@ -4514,8 +4532,8 @@ CODE:
     lk.name.len = name_len;
     lk.key.data = (uint8_t *)key_str;
     lk.key.len = key_len;
-    lk.rev = sv_rev && *sv_rev ? SvIV(*sv_rev) : 0;
-    lk.lease = sv_lease && *sv_lease ? SvIV(*sv_lease) : 0;
+    lk.rev = sv_rev && *sv_rev ? SvI64(*sv_rev) : 0;
+    lk.lease = sv_lease && *sv_lease ? SvI64(*sv_lease) : 0;
 
     V3electionpb__ProclaimRequest req = V3ELECTIONPB__PROCLAIM_REQUEST__INIT;
     req.leader = &lk;
@@ -4682,8 +4700,8 @@ CODE:
     lk.name.len = name_len;
     lk.key.data = (uint8_t *)key_str;
     lk.key.len = key_len;
-    lk.rev = sv_rev && *sv_rev ? SvIV(*sv_rev) : 0;
-    lk.lease = sv_lease && *sv_lease ? SvIV(*sv_lease) : 0;
+    lk.rev = sv_rev && *sv_rev ? SvI64(*sv_rev) : 0;
+    lk.lease = sv_lease && *sv_lease ? SvI64(*sv_lease) : 0;
 
     V3electionpb__ResignRequest req = V3ELECTIONPB__RESIGN_REQUEST__INIT;
     req.leader = &lk;
@@ -4775,6 +4793,7 @@ CODE:
         }
     }
 
+    /* Newxz zeroes everything; only set non-zero fields */
     observe_call_t *oc;
     Newxz(oc, 1, observe_call_t);
     init_call_base(&oc->base, CALL_TYPE_ELECTION_OBSERVE);
@@ -4782,10 +4801,10 @@ CODE:
     oc->client = client;
     oc->active = 1;
     oc->auto_reconnect = auto_reconnect;
-    oc->reconnect_attempt = 0;
+    oc->client_owns = 1;
+    oc->perl_owns = 1;
     grpc_metadata_array_init(&oc->initial_metadata);
     grpc_metadata_array_init(&oc->trailing_metadata);
-    oc->recv_buffer = NULL;
     oc->status_details = grpc_empty_slice();
 
     /* Save params for reconnection */
@@ -5077,7 +5096,7 @@ CODE:
 void
 ev_etcd_member_remove(client, id, callback)
     EV::Etcd client
-    UV id
+    uint64_t id
     SV *callback
 CODE:
 {
@@ -5145,7 +5164,7 @@ CODE:
 void
 ev_etcd_member_update(client, id, peer_urls, callback)
     EV::Etcd client
-    UV id
+    uint64_t id
     SV *peer_urls
     SV *callback
 CODE:
@@ -5249,7 +5268,7 @@ CODE:
 void
 ev_etcd_member_promote(client, id, callback)
     EV::Etcd client
-    UV id
+    uint64_t id
     SV *callback
 CODE:
 {
@@ -5364,7 +5383,7 @@ CODE:
 
         /* member_id - optional member ID (0 means all members) */
         if ((svp = hv_fetchs(hv, "member_id", 0))) {
-            req.memberid = SvUV(*svp);
+            req.memberid = SvU64(*svp);
         }
 
         /* alarm - alarm type (NOSPACE, CORRUPT) */
@@ -5545,7 +5564,7 @@ CODE:
         callback = ST(1);
     } else if (items == 3) {
         /* hash_kv(revision, callback) */
-        revision = SvIV(ST(1));
+        revision = SvI64(ST(1));
         callback = ST(2);
     } else {
         croak("Usage: $client->hash_kv([$revision,] $callback)");
@@ -5632,7 +5651,7 @@ CODE:
 void
 ev_etcd_move_leader(client, target_id, callback)
     EV::Etcd client
-    UV target_id
+    uint64_t target_id
     SV *callback
 CODE:
 {
@@ -5808,7 +5827,9 @@ CODE:
         warn("EV::Etcd: client destroyed in forked child (pid %d, created in %d)"
              " -- skipping gRPC cleanup", (int)getpid(), (int)client->owner_pid);
 
-        /* Free SV callbacks and Safefree'd params only; don't touch gRPC objects */
+        /* Free SV callbacks and Safefree'd params only; don't touch gRPC objects.
+         * Honor dual-ownership: if Perl handle is still alive we leave the struct
+         * for *_DESTROY to free. */
         pending_call_t *pc = client->pending_calls;
         while (pc) {
             pending_call_t *next = pc->next;
@@ -5822,9 +5843,13 @@ CODE:
             if (ev_is_active(&wc->reconnect_timer))
                 ev_timer_stop(EV_DEFAULT, &wc->reconnect_timer);
             SvREFCNT_dec(wc->callback);
-            if (wc->params.key) Safefree(wc->params.key);
-            if (wc->params.range_end) Safefree(wc->params.range_end);
-            Safefree(wc);
+            wc->callback = NULL;
+            wc->client_owns = 0;
+            if (!wc->perl_owns) {
+                if (wc->params.key) Safefree(wc->params.key);
+                if (wc->params.range_end) Safefree(wc->params.range_end);
+                Safefree(wc);
+            }
             wc = next;
         }
         keepalive_call_t *kc = client->keepalives;
@@ -5833,7 +5858,9 @@ CODE:
             if (ev_is_active(&kc->reconnect_timer))
                 ev_timer_stop(EV_DEFAULT, &kc->reconnect_timer);
             SvREFCNT_dec(kc->callback);
-            Safefree(kc);
+            kc->callback = NULL;
+            kc->client_owns = 0;
+            if (!kc->perl_owns) Safefree(kc);
             kc = next;
         }
         observe_call_t *oc = client->observes;
@@ -5842,8 +5869,12 @@ CODE:
             if (ev_is_active(&oc->reconnect_timer))
                 ev_timer_stop(EV_DEFAULT, &oc->reconnect_timer);
             SvREFCNT_dec(oc->callback);
-            if (oc->params.name) Safefree(oc->params.name);
-            Safefree(oc);
+            oc->callback = NULL;
+            oc->client_owns = 0;
+            if (!oc->perl_owns) {
+                if (oc->params.name) Safefree(oc->params.name);
+                Safefree(oc);
+            }
             oc = next;
         }
         if (ev_is_active(&client->health_timer))
@@ -5864,8 +5895,8 @@ CODE:
     /* Signal the gRPC thread to stop and wait for it */
     client->thread_running = 0;
 
-    /* Mark all watches and keepalives as inactive and cancel their gRPC calls.
-     * This will cause pending operations to complete with success=0. */
+    /* Mark every streaming call inactive and cancel its gRPC call so pending
+     * batches complete promptly with success=0. */
     watch_call_t *wc = client->watches;
     while (wc) {
         wc->active = 0;
@@ -5957,65 +5988,12 @@ CODE:
             pc = next;
         }
 
-        wc = client->watches;
-        while (wc) {
-            watch_call_t *next = wc->next;
-            grpc_metadata_array_destroy(&wc->initial_metadata);
-            grpc_metadata_array_destroy(&wc->trailing_metadata);
-            if (wc->recv_buffer) {
-                grpc_byte_buffer_destroy(wc->recv_buffer);
-            }
-            grpc_slice_unref(wc->status_details);
-            if (wc->call) {
-                grpc_call_unref(wc->call);
-            }
-            SvREFCNT_dec(wc->callback);
-            if (wc->params.key) {
-                Safefree(wc->params.key);
-            }
-            if (wc->params.range_end) {
-                Safefree(wc->params.range_end);
-            }
-            Safefree(wc);
-            wc = next;
-        }
-
-        kc = client->keepalives;
-        while (kc) {
-            keepalive_call_t *next = kc->next;
-            grpc_metadata_array_destroy(&kc->initial_metadata);
-            grpc_metadata_array_destroy(&kc->trailing_metadata);
-            if (kc->recv_buffer) {
-                grpc_byte_buffer_destroy(kc->recv_buffer);
-            }
-            grpc_slice_unref(kc->status_details);
-            if (kc->call) {
-                grpc_call_unref(kc->call);
-            }
-            SvREFCNT_dec(kc->callback);
-            Safefree(kc);
-            kc = next;
-        }
-
-        oc = client->observes;
-        while (oc) {
-            observe_call_t *next = oc->next;
-            grpc_metadata_array_destroy(&oc->initial_metadata);
-            grpc_metadata_array_destroy(&oc->trailing_metadata);
-            if (oc->recv_buffer) {
-                grpc_byte_buffer_destroy(oc->recv_buffer);
-            }
-            grpc_slice_unref(oc->status_details);
-            if (oc->call) {
-                grpc_call_unref(oc->call);
-            }
-            SvREFCNT_dec(oc->callback);
-            if (oc->params.name) {
-                Safefree(oc->params.name);
-            }
-            Safefree(oc);
-            oc = next;
-        }
+        /* Streaming-call cleanup honors dual-ownership: cleanup_* unlinks and
+         * frees gRPC state, then frees the struct only if the Perl handle has
+         * already been released. Otherwise the struct lives until *_DESTROY. */
+        while (client->watches) cleanup_watch(aTHX_ client->watches);
+        while (client->keepalives) cleanup_keepalive(aTHX_ client->keepalives);
+        while (client->observes) cleanup_observe(aTHX_ client->observes);
     }
 
     /* Stop health timer */
@@ -6069,7 +6047,11 @@ CODE:
 
     watch_call_t *wc = watch;
 
-    /* Stop reconnect timer unconditionally — may be pending even when active=0 */
+    if (!wc->client_owns) {
+        CALL_SUCCESS_CALLBACK(callback, newHV());
+        return;
+    }
+
     if (ev_is_active(&wc->reconnect_timer))
         ev_timer_stop(EV_DEFAULT, &wc->reconnect_timer);
 
@@ -6101,11 +6083,10 @@ CODE:
         op.op = GRPC_OP_SEND_MESSAGE;
         op.data.send_message.send_message = send_buffer;
 
-        (void)grpc_call_start_batch(wc->call, &op, 1, NULL, NULL);
+        (void)grpc_call_start_batch(wc->call, &op, 1, &cancel_sentinel, NULL);
         grpc_byte_buffer_destroy(send_buffer);
     }
 
-    /* Force pending RECV to complete immediately */
     if (wc->call)
         grpc_call_cancel(wc->call, NULL);
 
@@ -6117,13 +6098,7 @@ ev_etcd_watch_DESTROY(watch)
     EV::Etcd::Watch watch
 CODE:
 {
-    /* The watch_call_t is managed by the client's watches list.
-     * DESTROY being called just means Perl lost its reference to the watch object,
-     * but the watch is still active on the client side.
-     * We intentionally do NOT deactivate the watch here.
-     * If the user wants to stop the watch, they should call cancel().
-     * The watch will be cleaned up when the client is destroyed. */
-    (void)watch;  /* Silence unused parameter warning */
+    watch_call_perl_release(aTHX_ watch);
 }
 
 MODULE = EV::Etcd  PACKAGE = EV::Etcd::Keepalive  PREFIX = ev_etcd_keepalive_
@@ -6138,7 +6113,11 @@ CODE:
 
     keepalive_call_t *kc = keepalive;
 
-    /* Stop reconnect timer unconditionally — may be pending even when active=0 */
+    if (!kc->client_owns) {
+        CALL_SUCCESS_CALLBACK(callback, newHV());
+        return;
+    }
+
     if (ev_is_active(&kc->reconnect_timer))
         ev_timer_stop(EV_DEFAULT, &kc->reconnect_timer);
 
@@ -6149,7 +6128,6 @@ CODE:
 
     kc->active = 0;
 
-    /* Force pending RECV to complete immediately */
     if (kc->call)
         grpc_call_cancel(kc->call, NULL);
 
@@ -6161,7 +6139,7 @@ ev_etcd_keepalive_DESTROY(keepalive)
     EV::Etcd::Keepalive keepalive
 CODE:
 {
-    (void)keepalive;
+    keepalive_call_perl_release(aTHX_ keepalive);
 }
 
 MODULE = EV::Etcd  PACKAGE = EV::Etcd::Observe  PREFIX = ev_etcd_observe_
@@ -6176,7 +6154,11 @@ CODE:
 
     observe_call_t *oc = observe;
 
-    /* Stop reconnect timer unconditionally — may be pending even when active=0 */
+    if (!oc->client_owns) {
+        CALL_SUCCESS_CALLBACK(callback, newHV());
+        return;
+    }
+
     if (ev_is_active(&oc->reconnect_timer))
         ev_timer_stop(EV_DEFAULT, &oc->reconnect_timer);
 
@@ -6187,7 +6169,6 @@ CODE:
 
     oc->active = 0;
 
-    /* Force pending RECV to complete immediately */
     if (oc->call)
         grpc_call_cancel(oc->call, NULL);
 
@@ -6199,7 +6180,7 @@ ev_etcd_observe_DESTROY(observe)
     EV::Etcd::Observe observe
 CODE:
 {
-    (void)observe;
+    observe_call_perl_release(aTHX_ observe);
 }
 
 MODULE = EV::Etcd  PACKAGE = EV::Etcd  PREFIX = ev_etcd_

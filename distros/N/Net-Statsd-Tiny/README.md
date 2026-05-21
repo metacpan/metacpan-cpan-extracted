@@ -2,10 +2,6 @@
 
 Net::Statsd::Tiny - A tiny StatsD client that supports multimetric packets
 
-# VERSION
-
-version v0.3.7
-
 # SYNOPSIS
 
 ```perl
@@ -50,172 +46,92 @@ For simplicity, it will allow you to specify a sampling rate for any
 metric, not just the ones where it is documented below. But again,
 some daemons may ignore or reject this.
 
-# ATTRIBUTES
+# RECENT CHANGES
 
-## `host`
+Changes for version v0.3.9 (2026-05-18)
 
-The host of the statsd daemon. It defaults to `127.0.0.1`.
+- Incompatabilities
+    - Bumped the minimum Perl version to 5.12.
+- Security
+    - Upgraded minimum versions of some prerequisites to exclude known vulnerabilities.
+- Documentation
+    - Added SPDX Licence Snippet to borrowed test code.
+    - Fixed typos.
+- Tests
+    - Add more author tests.
 
-## `port`
+See the `Changes` file for more details.
 
-The port that the statsd daemon is listening on. It defaults to
-`8125`.
+# REQUIREMENTS
 
-## `proto`
+This module lists the following modules as runtime dependencies:
 
-The network protocol that the statsd daemon is using. It defaults to
-`udp`.
+- [Carp](https://metacpan.org/pod/Carp)
+- [Class::Accessor::Fast](https://metacpan.org/pod/Class%3A%3AAccessor%3A%3AFast)
+- [IO::Socket](https://metacpan.org/pod/IO%3A%3ASocket) version 1.18 or later
+- [Socket](https://metacpan.org/pod/Socket) version 2.026 or later
+- [parent](https://metacpan.org/pod/parent)
+- [perl](https://metacpan.org/pod/perl) version v5.12.0 or later
+- [strict](https://metacpan.org/pod/strict)
+- [warnings](https://metacpan.org/pod/warnings)
 
-## `prefix`
+See the `cpanfile` file for the full list of prerequisites.
 
-The prefix to prepend to metric names. It defaults to a blank string.
+# INSTALLATION
 
-## `autoflush`
-
-A flag indicating whether metrics will be send immediately. It
-defaults to true.
-
-When it is false, metrics will be saved in a buffer and only sent when
-the buffer is full, or when the ["flush"](#flush) method is called.
-
-Note that when this is disabled, you will want to flush the buffer
-regularly at the end of each task (e.g. a website request or job).
-
-Not all StatsD daemons support receiving multiple metrics in a single
-packet.
-
-## `max_buffer_size`
-
-Specifies the maximum buffer size. It defaults to `512`.
-
-# METHODS
-
-## `counter`
+The latest version of this module (along with any dependencies) can be installed from [CPAN](https://www.cpan.org) with the `cpan` tool that is included with Perl:
 
 ```
-$stats->counter( $metric, $value, $rate );
+cpan Net::Statsd::Tiny
 ```
 
-This adds the `$value` to the counter specified by the `$metric`
-name.
-
-If a `$rate` is specified and less than 1, then a sampling rate will
-be added. `$rate` must be between 0 and 1.
-
-## `update`
-
-This is an alias for ["counter"](#counter), for compatability with
-[Etsy::StatsD](https://metacpan.org/pod/Etsy%3A%3AStatsD) or [Net::Statsd::Client](https://metacpan.org/pod/Net%3A%3AStatsd%3A%3AClient).
-
-## `increment`
+You can also extract the distribution archive and install this module (along with any dependencies):
 
 ```
-$stats->increment( $metric, $rate );
+cpan .
 ```
 
-This is an alias for
+You can also install this module manually using the following commands:
 
 ```
-$stats->counter( $metric, 1, $rate );
+perl Makefile.PL
+make
+make test
+make install
 ```
 
-## `decrement`
+If you are working with the source repository, then it may not have a `Makefile.PL` file.  But you can use the [Dist::Zilla](https://dzil.org/) tool in anger to build and install this module:
 
 ```
-$stats->decrement( $metric, $rate );
+dzil build
+dzil test
+dzil install --install-command="cpan ."
 ```
 
-This is an alias for
+For more information, see the `INSTALL` file included with this distribution.
 
-```
-$stats->counter( $metric, -1, $rate );
-```
+# SECURITY CONSIDERATIONS
 
-## `metric`
+When using the ["set\_add"](#set_add) method, be wary of exposing sensitive information like IP addresses, usernames, email addresses or even session ids over insecure channels.  One workaround is to log a message digest of the value instead, for example
 
-```
-$stats->metric( $metric, $value );
-```
+```perl
+use Digest::SHA qw/ hmac_sha1 /;
 
-This is a counter that only accepts positive (increasing) values. It
-is appropriate for counters that will never decrease (e.g. the number
-of requests processed.)  However, this metric type is not supported by
-many StatsD daemons.
+...
 
-## `gauge`
-
-```
-$stats->gauge( $metric, $value );
+$tats->set_key( "myapp.sessions", hmac_sha1( $session->id, $my_secret_key );
 ```
 
-A gauge can be thought of as a counter that is maintained by the
-client instead of the daemon, where `$value` is a positive integer.
+Note that the keys should be consistent across worker processes and hosts.
 
-However, this also supports gauge increment extensions. If the number
-is prefixed by a "+", then the gauge is incremented by that amount,
-and if the number is prefixed by a "-", then the gauge is decremented
-by that amount.
+When generating metric names based on untrusted sources (such as HTTP requests), ensure that the metrics contain only printable characters and do not contain colons (":") or pipes ("|"), since these are used by the statsd protocol.
 
-## `timing`
+# SUPPORT
 
-```
-$stats->timing( $metric, $value, $rate );
-```
+Only the latest version of this module will be supported.
 
-This logs a "timing" in milliseconds, so that statistics about the
-metric can be gathered. The `$value` must be positive number,
-although the specification recommends that integers be used.
-
-In actually, any values can be logged, and this is often used as a
-generic histogram for non-timing values (especially since many StatsD
-daemons do not support the ["histogram"](#histogram) metric type).
-
-If a `$rate` is specified and less than 1, then a sampling rate will
-be added. `$rate` must be between 0 and 1.  Note that sampling
-rates for timings may not be supported by all statsd servers.
-
-## `timing_ms`
-
-This is an alias for ["timing"](#timing), for compatability with
-[Net::Statsd::Client](https://metacpan.org/pod/Net%3A%3AStatsd%3A%3AClient).
-
-## `histogram`
-
-```
-$stats->histogram( $metric, $value );
-```
-
-This logs a value so that statistics about the metric can be
-gathered. The `$value` must be a positive number, although the
-specification recommends that integers be used.
-
-## `set_add`
-
-```
-$stats->set_add( $metric, $string );
-```
-
-This adds the the `$string` to a set, for logging the number of
-unique things, e.g. IP addresses or usernames.
-
-## `flush`
-
-This sends the buffer to the ["host"](#host) and empties the buffer, if there
-is any data in the buffer.
-
-# SEE ALSO
-
-[Net::Statsd::Lite](https://metacpan.org/pod/Net%3A%3AStatsd%3A%3ALite) which has a similar API but uses [Moo](https://metacpan.org/pod/Moo) and
-[Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny) for data validation. It's also faster.
-
-[https://github.com/b/statsd\_spec](https://github.com/b/statsd_spec)
-
-# SOURCE
-
-The development version is on github at [https://github.com/robrwo/Net-Statsd-Tiny](https://github.com/robrwo/Net-Statsd-Tiny)
-and may be cloned from [git://github.com/robrwo/Net-Statsd-Tiny.git](git://github.com/robrwo/Net-Statsd-Tiny.git)
-
-# BUGS
+This module requires Perl v5.12 or later.
+Future releases may only support Perl versions released in the last ten (10) years.
 
 Please report any bugs or feature requests on the bugtracker website
 [https://github.com/robrwo/Net-Statsd-Tiny/issues](https://github.com/robrwo/Net-Statsd-Tiny/issues)
@@ -224,9 +140,19 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+## Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website. Please see `SECURITY.md` for instructions how to
+report security vulnerabilities
+
+# SOURCE
+
+The development version is on github at [https://github.com/robrwo/Net-Statsd-Tiny](https://github.com/robrwo/Net-Statsd-Tiny)
+and may be cloned from [https://github.com/robrwo/Net-Statsd-Tiny.git](https://github.com/robrwo/Net-Statsd-Tiny.git)
+
 # AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 The initial development of this module was sponsored by Science Photo
 Library [https://www.sciencephoto.com](https://www.sciencephoto.com).
@@ -237,10 +163,17 @@ Michael R. Davis <mrdvt@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2023 by Robert Rothenberg.
+This software is Copyright (c) 2018-2026 by Robert Rothenberg.
 
 This is free software, licensed under:
 
 ```
 The Artistic License 2.0 (GPL Compatible)
 ```
+
+# SEE ALSO
+
+[Net::Statsd::Lite](https://metacpan.org/pod/Net%3A%3AStatsd%3A%3ALite) which has a similar API but uses [Moo](https://metacpan.org/pod/Moo) and
+[Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny) for data validation. It's also faster.
+
+[https://github.com/b/statsd\_spec](https://github.com/b/statsd_spec)

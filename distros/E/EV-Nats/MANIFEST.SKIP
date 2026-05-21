@@ -34,7 +34,6 @@
 ^Nats\.o$
 \.o$
 \.bs$
-^src/ppport\.h$
 
 # Avoid archive
 \.tar\.gz$

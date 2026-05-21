@@ -1,0 +1,501 @@
+#define PERL_NO_GET_CONTEXT
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
+#include "tstr_param.h"
+#include "tstr_format.h"
+#include "tstr_datetime.h"
+#include "tstr_time2str.h"
+#include "tstr_parsed.h"
+#include "tstr_token_parse.h"
+#include "tstr_calendar.h"
+#include "tstr_regexp.h"
+#include "tstr_parse.h"
+#include "tstr_sv.h"
+#include "tstr_carp.h"
+
+#if NVSIZE > 8
+# define DEFAULT_PRECISION 9
+#else
+# define DEFAULT_PRECISION 6
+#endif
+
+#define DEFAULT_PIVOT_YEAR 1950
+#define NANOS_PER_SECOND   TSTR_NANOS_PER_SECOND
+#define MIN_EPOCH          INT64_C(-62135596800)
+#define MAX_EPOCH          INT64_C(253402300799)
+#define EPOCH_20500101     INT64_C(2524608000)
+
+#define MY_CXT_KEY "Time::Str::_cxt" XS_VERSION
+
+typedef struct {
+  REGEXP *regexps[TSTR_FORMAT_TYPE_COUNT];
+  tstr_sv_keys_t keys;
+} my_cxt_t;
+
+START_MY_CXT
+
+#define SHARE_KEY(s) newSVpvn_share("" s "", sizeof(s) - 1, 0)
+
+static void init_keys(pTHX_ tstr_sv_keys_t *k) {
+  k->k_year          = SHARE_KEY("year");
+  k->k_month         = SHARE_KEY("month");
+  k->k_day           = SHARE_KEY("day");
+  k->k_hour          = SHARE_KEY("hour");
+  k->k_minute        = SHARE_KEY("minute");
+  k->k_second        = SHARE_KEY("second");
+  k->k_nanosecond    = SHARE_KEY("nanosecond");
+  k->k_tz_offset     = SHARE_KEY("tz_offset");
+  k->k_tz_utc        = SHARE_KEY("tz_utc");
+  k->k_tz_abbrev     = SHARE_KEY("tz_abbrev");
+  k->k_tz_annotation = SHARE_KEY("tz_annotation");
+  k->k_fraction      = SHARE_KEY("fraction");
+  k->k_day_name      = SHARE_KEY("day_name");
+  k->k_meridiem      = SHARE_KEY("meridiem");
+}
+
+static void load_regexps(pTHX_ my_cxt_t *cxt) {
+  HV *mapping;
+  HE *entry;
+  int i;
+
+  dSP;
+
+  ENTER;
+  SAVETMPS;
+
+  load_module(PERL_LOADMOD_NOIMPORT, newSVpvs("Time::Str::Regexp"), NULL);
+
+  PUSHMARK(SP);
+  call_pv("Time::Str::Regexp::mapping", G_SCALAR);
+  SPAGAIN;
+  mapping = (HV *)SvRV(POPs);
+  PUTBACK;
+
+  for (i = 0; i < TSTR_FORMAT_TYPE_COUNT; i++)
+    cxt->regexps[i] = NULL;
+
+  hv_iterinit(mapping);
+  while ((entry = hv_iternext(mapping))) {
+    STRLEN klen;
+    const char *key = HePV(entry, klen);
+    tstr_format_t fmt = tstr_format_from_string(key, klen);
+    SV *val = HeVAL(entry);
+    REGEXP *rx;
+
+    if (fmt == TSTR_FORMAT_UNKNOWN)
+      croak("panic: Time::Str::Regexp::mapping() returned unknown format key '%.*s'",
+            (int)klen, key);
+
+    rx = SvRX(val);
+    if (!rx)
+      croak("panic: Time::Str::Regexp::mapping() value for '%.*s' is not a regexp",
+            (int)klen, key);
+
+    cxt->regexps[fmt] = ReREFCNT_inc(rx);
+  }
+
+  FREETMPS;
+  LEAVE;
+}
+
+
+MODULE = Time::Str  PACKAGE = Time::Str
+
+PROTOTYPES: DISABLE
+
+BOOT:
+{
+  MY_CXT_INIT;
+  init_keys(aTHX_ &MY_CXT.keys);
+  load_regexps(aTHX_ &MY_CXT);
+}
+
+#ifdef USE_ITHREADS
+
+void
+CLONE(...)
+  CODE:
+{
+  MY_CXT_CLONE;
+  init_keys(aTHX_ &MY_CXT.keys);
+  load_regexps(aTHX_ &MY_CXT);
+  PERL_UNUSED_VAR(items);
+}
+
+#endif
+
+void
+time2str(...)
+  PREINIT:
+    dXSTARG;
+    int64_t epoch;
+    int offset = 0;
+    int nanosecond = -1;
+    int precision = -1;
+    tstr_format_t fmt = TSTR_FORMAT_RFC3339;
+    tstr_datetime_t dt;
+    int i;
+  PPCODE:
+    if (items < 1 || !(items & 1))
+      croak("Usage: time2str(time [, format => 'RFC3339' ])");
+
+    epoch = (int64_t)SvNV(ST(0));
+
+    for (i = 1; i < items; i += 2) {
+      const char *key;
+      STRLEN klen;
+      SV *val;
+
+      key = SvPV_const(ST(i), klen);
+      val = ST(i + 1);
+
+      switch (tstr_param_from_string(key, klen)) {
+        case TSTR_PARAM_FORMAT:
+          fmt = tstr_sv_format(aTHX_ val);
+          break;
+        case TSTR_PARAM_OFFSET:
+          offset = tstr_sv_offset(aTHX_ val);
+          break;
+        case TSTR_PARAM_PRECISION:
+          precision = tstr_sv_precision(aTHX_ val);
+          break;
+        case TSTR_PARAM_NANOSECOND:
+          nanosecond = tstr_sv_nanosecond(aTHX_ val);
+          break;
+        default:
+          croak("Unrecognised named parameter: '%"SVf"'", ST(i));
+      }
+    }
+
+    if (epoch < MIN_EPOCH || epoch > MAX_EPOCH)
+      croak("Parameter 'time' is out of range");
+
+    if (nanosecond < 0 && SvNOK(ST(0))) {
+      NV t = SvNV(ST(0));
+      NV sec = Perl_floor(t);
+      NV fr = t - sec;
+      int scale_exp = (precision >= 0) ? precision : DEFAULT_PRECISION;
+      NV scale = Perl_pow(10.0, (NV)scale_exp);
+
+      fr = Perl_floor(fr * scale + 0.5) / scale;
+      nanosecond = (int)Perl_floor(fr * NANOS_PER_SECOND + 0.5);
+      epoch = (int64_t)sec;
+
+      if (nanosecond >= NANOS_PER_SECOND) {
+        nanosecond -= NANOS_PER_SECOND;
+        epoch++;
+      }
+    }
+
+    if (nanosecond < 0)
+      nanosecond = 0;
+
+    if (offset) {
+      int64_t local = epoch + (int64_t)offset * 60;
+      if (local < MIN_EPOCH || local > MAX_EPOCH)
+        croak("Parameter 'time' is out of range for the given offset");
+    }
+
+    if (fmt == TSTR_FORMAT_RFC5280) {
+      fmt = (epoch < EPOCH_20500101) ? TSTR_FORMAT_ASN1UT : TSTR_FORMAT_ASN1GT;
+      nanosecond = 0;
+      offset = 0;
+      precision = -1;
+    }
+
+    tstr_datetime_from_epoch(&dt, epoch, offset, nanosecond);
+
+    (void)SvUPGRADE(TARG, SVt_PV);
+    (void)SvGROW(TARG, 30);
+    SvCUR_set(TARG, 0);
+    SvPOK_only(TARG);
+
+    if (!tstr_time2str(aTHX_ TARG, &dt, precision, fmt))
+      croak("Parameter 'format' does not support time2str");
+    PUSHTARG;
+
+void
+str2time(...)
+  PREINIT:
+    dMY_CXT;
+    tstr_format_t fmt = TSTR_FORMAT_RFC3339;
+    int pivot_year = -1;
+    int precision = -1;
+    tstr_parsed_t parsed;
+    int i;
+  PPCODE:
+    if (items < 1 || !(items & 1))
+      croak("Usage: str2time(string [, format => 'RFC3339' ])");
+
+    for (i = 1; i < items; i += 2) {
+      const char *key;
+      STRLEN klen;
+      SV *val;
+
+      key = SvPV_const(ST(i), klen);
+      val = ST(i + 1);
+
+      switch (tstr_param_from_string(key, klen)) {
+        case TSTR_PARAM_FORMAT:
+          fmt = tstr_sv_format(aTHX_ val);
+          break;
+        case TSTR_PARAM_PIVOT_YEAR:
+          pivot_year = tstr_sv_pivot_year(aTHX_ val);
+          break;
+        case TSTR_PARAM_PRECISION:
+          precision = tstr_sv_precision(aTHX_ val);
+          break;
+        default:
+          croak("Unrecognised named parameter: '%"SVf"'", ST(i));
+      }
+    }
+
+    tstr_parse(aTHX_ ST(0), fmt, pivot_year,
+               MY_CXT.regexps, &MY_CXT.keys, &parsed);
+
+    if (!(parsed.flags & TSTR_PARSED_HAS_OFFSET))
+      tstr_croak("Unable to convert: timestamp string without a UTC designator or numeric offset");
+
+    {
+      int hour = parsed.hour;
+
+      if (parsed.flags & TSTR_PARSED_HAS_MERIDIEM)
+        hour = hour % 12 + parsed.meridiem;
+
+      uint32_t rdn = tstr_calendar_ymd_to_rdn(parsed.year, parsed.month, parsed.day);
+      int64_t sod  = ((int64_t)hour * 60 + parsed.minute) * 60 + parsed.second;
+      int64_t epoch = ((int64_t)rdn - TSTR_CALENDAR_RDN_UNIX_EPOCH) * 86400
+                    + sod - (int64_t)parsed.offset * 60;
+
+      if (parsed.flags & TSTR_PARSED_HAS_NANOSECOND) {
+        int scale_exp = (precision >= 0) ? precision : DEFAULT_PRECISION;
+        NV scale = Perl_pow(10.0, (NV)scale_exp);
+        NV fraction = Perl_floor((NV)parsed.nanosecond * scale / NANOS_PER_SECOND) / scale;
+        mPUSHn((NV)epoch + fraction);
+      } else {
+#if IVSIZE == 4
+        mPUSHn((NV)epoch);
+#else
+        mPUSHi(epoch);
+#endif
+      }
+    }
+
+void
+str2date(...)
+  PREINIT:
+    dMY_CXT;
+    tstr_format_t fmt = TSTR_FORMAT_RFC3339;
+    int pivot_year = -1;
+    tstr_parsed_t parsed;
+    HV *result;
+    int i;
+  PPCODE:
+    if (items < 1 || !(items & 1))
+      croak("Usage: str2date(string [, format => 'RFC3339' ])");
+
+    for (i = 1; i < items; i += 2) {
+      const char *key;
+      STRLEN klen;
+      SV *val;
+
+      key = SvPV_const(ST(i), klen);
+      val = ST(i + 1);
+
+      switch (tstr_param_from_string(key, klen)) {
+        case TSTR_PARAM_FORMAT:
+          fmt = tstr_sv_format(aTHX_ val);
+          break;
+        case TSTR_PARAM_PIVOT_YEAR:
+          pivot_year = tstr_sv_pivot_year(aTHX_ val);
+          break;
+        default:
+          croak("Unrecognised named parameter: '%"SVf"'", ST(i));
+      }
+    }
+
+    tstr_parse(aTHX_ ST(0), fmt, pivot_year,
+               MY_CXT.regexps, &MY_CXT.keys, &parsed);
+
+    if (GIMME_V == G_ARRAY) {
+      int n;
+      EXTEND(SP, tstr_parsed_field_count(&parsed) * 2);
+      n = tstr_sv_parsed_to_stack(aTHX_ &parsed, &MY_CXT.keys, SP);
+      SP += n;
+    } else {
+      HV *result = tstr_sv_parsed_to_hv(aTHX_ &parsed, &MY_CXT.keys);
+      mPUSHs(newRV_noinc((SV *)result));
+    }
+
+MODULE = Time::Str  PACKAGE = Time::Str::Token
+
+PROTOTYPES: DISABLE
+
+void
+parse_day(...)
+  PREINIT:
+    const char *src;
+    STRLEN len;
+    int value;
+  PPCODE:
+    if (items != 1)
+      croak("Usage: parse_day(string)");
+    src = SvPV_const(ST(0), len);
+    if (!tstr_token_parse_day(src, len, &value))
+      tstr_token_croakf("Unable to parse: day is invalid");
+    mPUSHi(value);
+
+void
+parse_day_name(...)
+  PREINIT:
+    const char *src;
+    STRLEN len;
+    int value;
+  PPCODE:
+    if (items != 1)
+      croak("Usage: parse_day_name(string)");
+    src = SvPV_const(ST(0), len);
+    if (!tstr_token_parse_day_name(src, len, &value))
+      tstr_token_croakf("Unable to parse: day name is invalid");
+    mPUSHi(value);
+
+void
+parse_month(...)
+  PREINIT:
+    const char *src;
+    STRLEN len;
+    int value;
+  PPCODE:
+    if (items != 1)
+      croak("Usage: parse_month(string)");
+    src = SvPV_const(ST(0), len);
+    if (!tstr_token_parse_month(src, len, &value))
+      tstr_token_croakf("Unable to parse: month is invalid");
+    mPUSHi(value);
+
+void
+parse_meridiem(...)
+  PREINIT:
+    const char *src;
+    STRLEN len;
+    int value;
+  PPCODE:
+    if (items != 1)
+      croak("Usage: parse_meridiem(string)");
+    src = SvPV_const(ST(0), len);
+    if (!tstr_token_parse_meridiem(src, len, &value))
+      tstr_token_croakf("Unable to parse: meridiem is invalid");
+    mPUSHi(value);
+
+void
+parse_tz_offset(...)
+  PREINIT:
+    const char *src;
+    STRLEN len;
+    int value;
+  PPCODE:
+    if (items != 1)
+      croak("Usage: parse_tz_offset(string)");
+    src = SvPV_const(ST(0), len);
+    if (!tstr_token_parse_tz_offset(src, len, &value))
+      tstr_token_croakf("Unable to parse: timezone offset is invalid");
+    mPUSHi(value);
+
+
+MODULE = Time::Str  PACKAGE = Time::Str::Calendar
+
+PROTOTYPES: DISABLE
+
+void
+leap_year(...)
+  PPCODE:
+    if (items != 1)
+      croak("Usage: leap_year(year)");
+    if (tstr_calendar_leap_year((int)SvIV(ST(0))))
+      XSRETURN_YES;
+    XSRETURN_NO;
+
+void
+month_days(...)
+  PREINIT:
+    int y, m;
+  PPCODE:
+    if (items != 2)
+      croak("Usage: month_days(year, month)");
+    y = (int)SvIV(ST(0));
+    m = tstr_sv_month(aTHX_ ST(1));
+    mPUSHi(tstr_calendar_month_days(y, m));
+
+void
+valid_ymd(...)
+  PPCODE:
+    if (items != 3)
+      croak("Usage: valid_ymd(year, month, day)");
+    if (tstr_calendar_valid_ymd((int)SvIV(ST(0)), (int)SvIV(ST(1)), (int)SvIV(ST(2))))
+      XSRETURN_YES;
+    XSRETURN_NO;
+
+void
+ymd_to_rdn(...)
+  PREINIT:
+    int y, m, d;
+  PPCODE:
+    if (items != 3)
+      croak("Usage: ymd_to_rdn(year, month, day)");
+    tstr_sv_ymd(aTHX_ ST(0), ST(1), ST(2), &y, &m, &d);
+    mPUSHi((IV)tstr_calendar_ymd_to_rdn(y, m, d));
+
+void
+rdn_to_ymd(...)
+  PREINIT:
+    IV rdn;
+    int y, m, d;
+  PPCODE:
+    if (items != 1)
+      croak("Usage: rdn_to_ymd(rdn)");
+    rdn = SvIV(ST(0));
+    if (rdn < TSTR_CALENDAR_RDN_MIN || rdn > TSTR_CALENDAR_RDN_MAX)
+      croak("Parameter 'rdn' is out of range");
+    tstr_calendar_rdn_to_ymd((uint32_t)rdn, &y, &m, &d);
+    EXTEND(SP, 3);
+    mPUSHi(y);
+    mPUSHi(m);
+    mPUSHi(d);
+
+void
+rdn_to_dow(...)
+  PREINIT:
+    IV rdn;
+  PPCODE:
+    if (items != 1)
+      croak("Usage: rdn_to_dow(rdn)");
+    rdn = SvIV(ST(0));
+    if (rdn < TSTR_CALENDAR_RDN_MIN || rdn > TSTR_CALENDAR_RDN_MAX)
+      croak("Parameter 'rdn' is out of range");
+    mPUSHi(tstr_calendar_rdn_to_dow((uint32_t)rdn));
+
+void
+ymd_to_dow(...)
+  PREINIT:
+    int y, m, d;
+  PPCODE:
+    if (items != 3)
+      croak("Usage: ymd_to_dow(year, month, day)");
+    tstr_sv_ymd(aTHX_ ST(0), ST(1), ST(2), &y, &m, &d);
+    mPUSHi(tstr_calendar_ymd_to_dow(y, m, d));
+
+void
+resolve_century(...)
+  PREINIT:
+    int year, pivot_year;
+  PPCODE:
+    if (items != 2)
+      croak("Usage: resolve_century(year, pivot_year)");
+    year = (int)SvIV(ST(0));
+    if (year < 0 || year > 99)
+      croak("Parameter 'year' is out of range [0, 99]");
+    pivot_year = tstr_sv_pivot_year(aTHX_ ST(1));
+    mPUSHi(tstr_calendar_resolve_century(year, pivot_year));
+

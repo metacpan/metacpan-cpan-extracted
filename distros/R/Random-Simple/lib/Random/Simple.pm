@@ -8,8 +8,9 @@ use Config;
 use v5.10; # For state
 
 # https://pause.perl.org/pause/query?ACTION=pause_operating_model#3_5_factors_considering_in_the_indexing_phase
-our $VERSION = '0.26';
-our $debug   = 0;
+our $VERSION   = '0.28';
+our $debug     = 0;
+my $URANDOM_FH = undef;
 
 # Check if the UV (unsigned value) Perl type is 64bit
 my $has_64bit = ($Config{uvsize} == 8);
@@ -41,8 +42,15 @@ sub warmup {
 sub seed {
 	my ($seed1, $seed2) = @_;
 
+	$seed1 = int($seed1);
+	$seed2 = int($seed2);
+
 	if ($debug) {
 		print "SEEDING MANUALLY ($seed1, $seed2)\n";
+	}
+
+	if ($seed1 == 0 && $seed2 == 0) {
+		croak("Both seeds cannot be zero");
 	}
 
 	Random::Simple::_seed($seed1, $seed2); # C API
@@ -55,6 +63,10 @@ sub os_random_bytes {
 	my $count  = shift();
 	my $ret    = "";
 
+	if ($count <= 0) {
+		croak("$count is not a valid amount of bytes");
+	}
+
 	if ($^O eq 'MSWin32') {
 		require Win32::API;
 
@@ -66,9 +78,11 @@ sub os_random_bytes {
 		$ret = chr(0) x $count;
 		$rand->Call($ret, $count) or croak("Could not read from csprng: $^E");
 	} elsif (-r "/dev/urandom") {
-		open my $urandom, '<:raw', '/dev/urandom' or croak("Couldn't open /dev/urandom: $!");
+		if (!$URANDOM_FH) {
+			open($URANDOM_FH, '<:raw', '/dev/urandom') or croak("Couldn't open /dev/urandom: $!");
+		}
 
-		sysread($urandom, $ret, $count) or croak("Couldn't read from csprng: $!");
+		sysread($URANDOM_FH, $ret, $count) or croak("Couldn't read from csprng: $!");
 	} else {
 		croak("Unknown operating system $^O");
 	};
@@ -151,6 +165,10 @@ sub seed_with_os_random {
 sub random_bytes {
 	my ($num) = @_;
 
+	if ($num < 0) {
+		croak("$num is not a valid amount of bytes");
+	}
+
 	my $octets_needed = $num / 4;
 
 	my $ret = "";
@@ -167,15 +185,24 @@ sub random_bytes {
 }
 
 # Get a random non-biased integer in a given range (inclusive)
-# Note: Range must be no larger than 2^32 - 2
+# Note: "Lemire"    range must be no larger than 2^32 - 2 (best)
+# Note: "Rejection" range must be no larger than 2^64 - 2
 sub random_int {
 	my ($min, $max) = @_;
 
 	if ($max < $min) { die("Max can't be less than min"); }
 
 	my $range = $max - $min + 1; # +1 makes it inclusive
-	my $ret   = _bounded_rand($range);
-	$ret      += $min;
+	my $ret;
+
+	# Anything bigger than 2^32 - 2
+	if ($range > 4294967294) {
+		$ret = _bounded_rand64_rejection($range);
+	} else {
+		$ret = _bounded_rand32_lemire($range);
+	}
+
+	$ret += $min;
 
 	return $ret;
 }
@@ -199,6 +226,8 @@ sub random_float {
 sub random_elem {
 	my @arr = @_;
 
+	if (!@arr) { return (); }
+
 	my $elem_count = scalar(@arr) - 1;
 	my $idx        = Random::Simple::random_int(0, $elem_count);
 	my $ret        = $arr[$idx];
@@ -209,6 +238,8 @@ sub random_elem {
 # Use the Fisher-Yates algo to shuffle an array in a non-biased way
 sub shuffle_array {
 	my @array = @_;
+
+	if (!@array) { return (); }
 
     my $i = @array;
     while ($i--) {
@@ -232,14 +263,21 @@ sub perl_rand64 {
 sub srand {
 	my $seed = $_[0];
 
+	# No seed passed in so we generate a good random one
 	if (!$seed) {
-		$seed = int(rand() * 4294967295); # Random 32bit int
+		my $bytes = os_random_bytes(8);
+		my @parts = str_split($bytes, 4);
+
+		my $high = unpack("L", $parts[0]);
+		my $low  = unpack("L", $parts[1]);
+
+		$seed = ($high << 32) | $low;
 	}
 
 	# Seed has to be an integer
 	$seed = int($seed);
 
-	# Convert one 32bit seed into 2x 64bit seeds
+	# Convert one seed into 2x 64bit seeds
 	my $seed1 = _hash_mur3($seed);  # C API
 	my $seed2 = _hash_mur3($seed1); # C API
 
@@ -284,8 +322,6 @@ Random::Simple - Generate good random numbers in a user consumable way.
 
     use Random::Simple;
 
-    my $prng           = new Random::Simple();
-
     my $coin_flip      = random_int(1, 2);
     my $die_roll       = random_int(1, 6);
     my $random_percent = random_float() * 100;
@@ -317,7 +353,7 @@ get a handful of other useful random related methods.
 
 =item B<random_int($min, $max)>
 
-returns a non-biased integer between C<$min> and C<$max> (inclusive). Range must be no larger than 2**32 - 2.
+returns a non-biased integer between C<$min> and C<$max> (inclusive). Range must be no larger than 2**64 - 2.
 
 =item B<random_float()>
 

@@ -20,6 +20,10 @@ no_index:
   directory:
     - t
     - inc
+    - eg
+    - examples
+    - share
+    - xt
 requires:
   Data::Printer: '1.000000'
   Data::Printer::Filter: '0'
@@ -27,7 +31,8 @@ requires:
 resources:
   bugtracker: https://github.com/ryoskzypu/Data-Printer-Filter-EscapeNonPrintable/issues
   repository: https://github.com/ryoskzypu/Data-Printer-Filter-EscapeNonPrintable.git
-version: v1.0.0
+version: v1.0.1
 x_contributors:
   - 'ryoskzypu <ryoskzypu@proton.me>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_spdx_expression: MIT-0

@@ -13,7 +13,7 @@
 package Module::Generic::Boolean;
 BEGIN
 {
-    use v5.26.1;
+    use v5.16.0;
     use common::sense;
     use vars qw( $true $false );
     use overload
@@ -26,7 +26,6 @@ BEGIN
     our( $VERSION ) = 'v1.2.2';
 };
 
-use v5.26.1;
 use strict;
 
 sub new { return( $_[1] ? $true : $false ); }

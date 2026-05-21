@@ -2,7 +2,7 @@
 
 Authen::TOTP - Interface to RFC6238 two factor authentication (2FA)
 
-Version 0.0.7
+Version 0.1.1
 
 # SYNOPSIS
 
@@ -49,6 +49,12 @@ It currently passes RFC6238 Test Vectors for SHA1, SHA256, SHA512
     else {
            #no match
     }
+
+    # Get generated OTP and validate it
+    my $otp=$gen->otp();
+    print "Generated OTP is $otp\n";
+    my $matches=$gen->validate_otp(otp => $otp);
+    print "Self generated OTP is ".($matches?"OK":"NOK")."\n";
 
 # new Authen::TOTP
 
@@ -129,10 +135,21 @@ It currently passes RFC6238 Test Vectors for SHA1, SHA256, SHA512
                 tolerance      =>      <try this many iterations before/after when>
                 otp            =>      <OTP to compare to>
         );
+
+        $gen->otp( <when> ); # Get the TOTP token at <epoch_to_use>
         
 
 # Revision History
 
+    0.1.1
+       Replace rand() with Crypt::PRNG::random_string_from() following
+       advisory from rrwo@cpansec.org and CVE-2026-46473
+    0.1.0
+           Fix documentation inaccuracies (still referenced MIME::Base32::XS)
+    0.0.9
+           Added otp method to get user code, and updated tests for this.
+    0.0.8
+           Remove usage of MIME::Base32::XS, in favor of the faster Encode::Base2N
     0.0.7
            Moved git repo to github
            Added CONTRIBUTING.md file
@@ -158,7 +175,10 @@ one of
 [Digest::SHA](https://metacpan.org/pod/Digest%3A%3ASHA) or [Digest::SHA::PurePerl](https://metacpan.org/pod/Digest%3A%3ASHA%3A%3APurePerl)
 
 and
-[MIME::Base32::XS](https://metacpan.org/pod/MIME%3A%3ABase32%3A%3AXS) or [MIME::Base32](https://metacpan.org/pod/MIME%3A%3ABase32)
+[Encode::Base2N](https://metacpan.org/pod/Encode%3A%3ABase2N) or [MIME::Base32](https://metacpan.org/pod/MIME%3A%3ABase32)
+
+and
+[Crypt::PRNG](https://metacpan.org/pod/Crypt%3A%3APRNG) since version 0.1.1 for safer random secrets
 
 [Imager::QRCode](https://metacpan.org/pod/Imager%3A%3AQRCode) if you want to generate QRCodes as well
 
@@ -181,6 +201,8 @@ Let me know if you find anything that's not working
 # ACKNOWLEDGEMENTS
 
 Github user j256 for his example implementation
+
+Github users teodesian and mdeweerd for their PRs
 
 Gryphon Shafer <gryphon@cpan.org> for his [Auth::GoogleAuth](https://metacpan.org/pod/Auth%3A%3AGoogleAuth) module
 that does mostly the same job, but I discovered after I had written 

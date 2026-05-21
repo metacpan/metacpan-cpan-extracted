@@ -1,7 +1,7 @@
 ---
 abstract: 'Kanban Assignment & Responsibility Registry'
 author:
-  - 'Torsten Raudssus <torsten@raudssus.de>'
+  - 'Torsten Raudssus <getty@cpan.org>'
 build_requires:
   File::Temp: '0'
   Test::Exception: '0'
@@ -28,12 +28,12 @@ requires:
   Time::Piece: '0'
   YAML::XS: '0'
 resources:
-  IRC: irc://irc.perl.org/#ai
+  IRC: irc://irc.perl.org/#langertha
   IRC_user: Getty
-  bugtracker: https://github.com/Getty/p5-app-karr/issues
-  homepage: https://github.com/Getty/p5-app-karr
-  repository: https://github.com/Getty/p5-app-karr.git
-version: '0.102'
+  bugtracker: https://github.com/Getty/karr/issues
+  homepage: https://github.com/Getty/karr
+  repository: https://github.com/Getty/karr.git
+version: '0.205'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -42,7 +42,8 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
         Dist::Zilla::Plugin::GatherDir:
-          exclude_filename: []
+          exclude_filename:
+            - README.md
           exclude_match: []
           include_dotfiles: 1
           prefix: ''
@@ -104,35 +105,6 @@ x_Dist_Zilla:
       name: '@Author::GETTY/@Filter/UploadToCPAN'
       version: '6.037'
     -
-      class: Dist::Zilla::Plugin::Run::AfterBuild
-      config:
-        Dist::Zilla::Plugin::Run::Role::Runner:
-          fatal_errors: 1
-          quiet: 0
-          run:
-            - 'docker build ${KARR_DOCKER_BUILD_ARGS:-} -f %d/Dockerfile --target runtime-root -t raudssus/karr:latest %d'
-            - 'docker build ${KARR_DOCKER_BUILD_ARGS:-} -f %d/Dockerfile --target runtime-user -t raudssus/karr:user %d'
-          version: '0.049'
-      name: '@Author::GETTY/Run::AfterBuild'
-      version: '0.049'
-    -
-      class: Dist::Zilla::Plugin::Run::AfterRelease
-      config:
-        Dist::Zilla::Plugin::Run::Role::Runner:
-          fatal_errors: 1
-          quiet: 0
-          run:
-            - "${GH_BIN:-gh} release view %v -R Getty/p5-app-karr >/dev/null 2>&1 || ${GH_BIN:-gh} release create %v -R Getty/p5-app-karr --title %v --notes 'Dist::Zilla release'"
-            - '${GH_BIN:-gh} release upload %v -R Getty/p5-app-karr %a --clobber'
-            - 'docker build ${KARR_DOCKER_BUILD_ARGS:-} -f %d/Dockerfile --target runtime-root -t raudssus/karr:%v -t raudssus/karr:$(echo %v | cut -d. -f1) %d'
-            - 'docker build ${KARR_DOCKER_BUILD_ARGS:-} -f %d/Dockerfile --target runtime-user -t raudssus/karr:user %d'
-            - 'docker push raudssus/karr:%v'
-            - 'docker push raudssus/karr:$(echo %v | cut -d. -f1)'
-            - 'docker push raudssus/karr:user'
-          version: '0.049'
-      name: '@Author::GETTY/Run::AfterRelease'
-      version: '0.049'
-    -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Author::GETTY/MetaConfig'
       version: '6.037'
@@ -144,6 +116,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::GETTY/PodSyntaxTests'
       version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::Test::ChangesHasContent
+      name: '@Author::GETTY/Test::ChangesHasContent'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@Author::GETTY/GithubMeta'
@@ -316,7 +292,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.102'
+          tag: '0.205'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -376,6 +352,18 @@ x_Dist_Zilla:
           repo_root: .
       name: '@Author::GETTY/Git::Push'
       version: '2.052'
+    -
+      class: Dist::Zilla::Plugin::GitHub::CreateRelease
+      name: '@Author::GETTY/GitHub::CreateRelease'
+      version: '0.0008'
+    -
+      class: Dist::Zilla::Plugin::Docker::API
+      name: runtime-root/Docker::API
+      version: '0.103'
+    -
+      class: Dist::Zilla::Plugin::Docker::API
+      name: runtime-user/Docker::API
+      version: '0.103'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

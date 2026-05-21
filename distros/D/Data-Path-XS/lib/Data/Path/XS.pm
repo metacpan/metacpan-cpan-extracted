@@ -2,7 +2,7 @@ package Data::Path::XS;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use parent 'Exporter';
 our @EXPORT_OK = qw(path_get path_set path_delete path_exists
@@ -54,6 +54,8 @@ sub unimport {
 
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 Data::Path::XS - Fast path-based access to nested data structures
@@ -64,147 +66,173 @@ Data::Path::XS - Fast path-based access to nested data structures
 
     my $data = { foo => { bar => [1, 2, 3] } };
 
-    # String path API
-    path_get($data, '/foo/bar/1');        # 2
-    path_set($data, '/foo/bar/1', 42);    # sets to 42
-    path_exists($data, '/foo/baz');       # 0
-    path_delete($data, '/foo/bar/0');     # removes first element
+    path_get   ($data, '/foo/bar/1');         # 2
+    path_set   ($data, '/foo/bar/1', 42);     # 42 (returns the value set)
+    path_exists($data, '/foo/baz');           # 0
+    path_delete($data, '/foo/bar/0');         # 1 (returns the deleted value)
 
-    # Array path API - when path is already parsed
+    # Pre-parsed path components (binary-safe; allows "/" in keys)
     use Data::Path::XS qw(patha_get patha_set);
-    patha_get($data, ['foo', 'bar', 1]);  # 42
+    patha_get($data, ['foo', 'bar', 1]);
     patha_set($data, ['foo', 'new'], 'value');
 
-    # Compiled path API - for repeated access patterns
-    use Data::Path::XS qw(path_compile pathc_get pathc_set);
-    my $cp = path_compile('/foo/bar/1');
-    pathc_get($data, $cp);                # 42
-    pathc_get($other_data, $cp);          # reuse on different data
+    # Pre-compiled paths for hot loops
+    use Data::Path::XS qw(path_compile pathc_get);
+    my $cp    = path_compile('/foo/bar/1');
+    my $other = { foo => { bar => [4, 5, 6] } };
+    pathc_get($data,  $cp);                   # 42
+    pathc_get($other, $cp);                   # 5 — reuse across data
 
-    # KEYWORDS - Zero-overhead syntax (requires ':keywords')
+    # Keyword syntax (compile-time optimized)
     use Data::Path::XS ':keywords';
 
-    my $val = pathget $data, "/foo/bar/1";     # fast custom op, no autovivification
-    pathset $data, "/foo/bar/1", 99;           # with autovivification
-    pathdelete $data, "/foo/bar/1";            # delete element
-    if (pathexists $data, "/foo/bar") { ... }  # check existence
+    my $v = pathget    $data, "/foo/bar/1";
+    pathset            $data, "/foo/bar/1", 99;
+    pathdelete         $data, "/foo/bar/1";
+    print "ok\n" if pathexists $data, "/foo/bar";
 
 =head1 DESCRIPTION
 
-Minimal XS module for fast access to deeply nested Perl data structures
-using slash-separated paths. Provides four APIs optimized for different
-use cases:
+Fast XS access to deeply nested Perl data structures via slash-separated
+paths (similar shape to JSON Pointer, but without RFC 6901's C<~0>/C<~1>
+escaping). Four parallel APIs let you trade ergonomics against speed:
 
 =over 4
 
-=item * B<Keywords API> - Near-native performance via compile-time optimization
+=item * L</STRING PATH API> - C<path_*>, the general-purpose entry point.
 
-=item * B<String API> (path_*) - Best general-purpose performance
+=item * L</ARRAY PATH API> - C<patha_*>, when path components are already
+parsed or may contain C</> or other special characters.
 
-=item * B<Array API> (patha_*) - When path components are already parsed
+=item * L</COMPILED PATH API> - C<path_compile> + C<pathc_*>, when the
+same path is reused many times on different data.
 
-=item * B<Compiled API> (pathc_*) - Maximum speed for repeated access patterns
+=item * L</KEYWORDS API> - C<pathget>/C<pathset>/etc. as syntax via
+L<XS::Parse::Keyword>, compiled to inline custom ops or (where possible)
+native Perl assignment ops.
 
 =back
 
-=head1 KEYWORDS API
+All four APIs share the same path syntax (L</PATH FORMAT>) and the same
+container-dispatch semantics (L</Numeric vs String Keys>).
 
-The keywords API provides near-native performance through compile-time
-optimized custom ops (or native Perl ops for C<pathset> with constant paths).
+=head1 IMPORTING
 
-    use Data::Path::XS ':keywords';
+    use Data::Path::XS qw(path_get path_set ...);   # function exports
+    use Data::Path::XS ':keywords';                  # enable keyword syntax
+    use Data::Path::XS ':keywords', qw(path_get);    # both
 
-=head2 pathget DATA, PATH
+The C<:keywords> tag installs lexically-scoped keyword hints; the keywords
+are visible only inside the importing scope. C<no Data::Path::XS;> removes
+them. Function exports follow standard L<Exporter> rules.
 
-Get a value from a nested data structure. Returns undef for missing paths
-without autovivifying intermediate levels.
+=head1 PATH FORMAT
 
-    my $val = pathget $data, "/users/0/name";
+=over 4
 
-=head2 pathset DATA, PATH, VALUE
+=item *
 
-Set a value with autovivification support. Returns the value set.
+Components are separated by C</>. A leading C</> is optional:
+C<"/foo/bar"> and C<"foo/bar"> are equivalent.
 
-    pathset $data, "/users/0/name", "Alice";
+=item *
 
-Intermediate structures are created automatically (hashes for string keys,
-arrays for numeric indices). If an existing intermediate value is not a
-reference, it is silently replaced with the appropriate container type.
+An empty string or C<"/"> refers to the root. Repeated and trailing
+slashes (C<"//foo//">) are tolerated and yield the same components.
 
-=head2 pathdelete DATA, PATH
+=item *
 
-Delete a value and return the deleted value.
+Numeric components I<may> address array elements when the parent
+container is an array; on a hash parent the same string is treated as a
+hash key. See L</Numeric vs String Keys>.
 
-    my $old = pathdelete $data, "/users/0/name";
+=item *
 
-=head2 pathexists DATA, PATH
+Negative indices work like Perl's native array access (C<-1> is the last
+element). See L</Negative Array Indices>.
 
-Check if a path exists (returns true/false).
+=item *
 
-    if (pathexists $data, "/users/0/name") {
-        print "User has a name\n";
-    }
+No escaping is provided in the string API: keys containing C</> or the
+empty string cannot be expressed in a string path. Use the array API
+(e.g. C<< patha_get($data, ['', 'a/b']) >>) for those.
 
-=head2 Constant vs Dynamic Paths
+=item *
 
-For C<pathset> with constant string paths, the keyword compiles directly to
-native Perl assignment ops with autovivification - zero overhead. Because
-this uses Perl's native ops, error messages differ from the dynamic-path
-form (e.g. "Not a HASH reference" vs "Cannot navigate to path"), and
-attempting to traverse a non-reference intermediate will croak rather than
-silently replacing it.
+UTF-8 keys are propagated correctly. The path SV's C<SvUTF8> flag (or,
+in the array API, each key SV's flag) is forwarded to C<hv_fetch>/
+C<hv_store> so C<"/café"> matches hash keys stored under C<use utf8>.
 
-All other keywords and dynamic paths use optimized custom ops. C<pathget>,
-C<pathexists>, and C<pathdelete> never autovivify intermediate structures.
-Dynamic C<pathset> autovivifies intermediates, including replacing
-non-reference scalars.
+=back
 
-All keyword forms achieve near-native performance.
+=head2 Numeric vs String Keys
+
+All four APIs dispatch by B<parent container type>, not by key shape:
+
+    my $h = { '0' => 'zero' };
+    path_get($h, '/0');               # 'zero' - hash key
+    pathget $h, "/0";                 # 'zero' - same
+
+    my $a = ['x', 'y', 'z'];
+    path_get($a, '/0');               # 'x' - array index
+    pathget $a, "/0";                 # 'x' - same
+
+When autovivifying a missing intermediate, the type to create is chosen
+by the B<next> component's shape: a numeric next component creates an
+array, otherwise a hash.
 
 =head1 STRING PATH API
 
 =head2 path_get($data, $path)
 
-Returns value at path, or undef if not found. Empty path returns root.
+Returns the value at C<$path>, or C<undef> if any component is missing.
+An empty path returns C<$data> itself. Never autovivifies.
 
-    path_get($data, '/foo/bar');  # deep access
-    path_get($data, '');          # returns $data
+    path_get($data, '/foo/bar');
+    path_get($data, '');               # returns $data
 
 =head2 path_set($data, $path, $value)
 
-Sets value at path. Creates intermediate hashes/arrays as needed
-(replacing non-reference scalars at intermediate positions).
-Numeric keys create arrays, string keys create hashes.
-Returns the value set.
+Stores C<$value> at C<$path>, creating intermediate hashes/arrays as
+needed (see L</Numeric vs String Keys> for the type-decision rule).
+Existing non-reference scalars at intermediate positions are silently
+replaced. Returns C<$value>. Croaks on an empty path or on a path that
+cannot be navigated (e.g. through a tied container, see L</Tied
+containers>).
 
     path_set($data, '/foo/bar', 42);
-    path_set($data, '/items/0/name', 'first');  # creates array
+    path_set($data, '/items/0/name', 'first');   # autovivifies array
 
 =head2 path_delete($data, $path)
 
-Deletes value at path. Returns deleted value or undef if not found.
+Deletes the value at C<$path> and returns it, or C<undef> if not found.
+Croaks on an empty path.
 
     my $old = path_delete($data, '/foo/bar');
 
 =head2 path_exists($data, $path)
 
-Returns 1 if path exists, 0 otherwise. Empty path always exists.
+Returns C<1> if C<$path> resolves to an existing element (using
+C<exists> semantics: explicit C<undef> values count as existing), C<0>
+otherwise. The empty path always exists.
 
-    if (path_exists($data, '/foo/bar')) { ... }
+    do_thing() if path_exists($data, '/foo/bar');
 
 =head1 ARRAY PATH API
 
-Functions that accept path as an arrayref of components. Useful when
-path components are already parsed or contain special characters.
+The C<patha_*> functions take an arrayref of components instead of a
+slash-separated string. Use this when path pieces are already parsed,
+when keys may contain C</>, or when you want to address an empty-string
+key (C<< [''] >>).
+
+Each key SV's C<SvUTF8> flag is honoured per component.
 
 =head2 patha_get($data, \@path)
 
     patha_get($data, ['foo', 'bar', 0]);
-    patha_get($data, []);  # returns root
+    patha_get($data, []);             # returns $data
 
 =head2 patha_set($data, \@path, $value)
-
-Creates intermediates as needed (replacing non-reference scalars).
 
     patha_set($data, ['foo', 'bar'], 42);
 
@@ -218,26 +246,25 @@ Creates intermediates as needed (replacing non-reference scalars).
 
 =head1 COMPILED PATH API
 
-Pre-compile paths for maximum performance when accessing the same path
-repeatedly on different data structures. Compiled paths eliminate
-parsing overhead and pre-compute array indices.
+Pre-compile a path once, then reuse it for many lookups. The compiled
+object holds parsed components, pre-computed array indices, and the
+UTF-8 flag, so per-call overhead drops to the navigation itself.
 
 =head2 path_compile($path)
 
-Compiles a path string into a reusable compiled path object.
+Returns a compiled path object (a blessed reference). The object owns
+its own copy of the path string, so the caller may freely mutate or
+discard the source SV.
 
     my $cp = path_compile('/users/0/name');
 
 =head2 pathc_get($data, $compiled)
 
-    my $cp = path_compile('/deep/path/here');
     for my $record (@records) {
-        my $val = pathc_get($record, $cp);  # no parsing each time
+        my $val = pathc_get($record, $cp);
     }
 
 =head2 pathc_set($data, $compiled, $value)
-
-Creates intermediates as needed (replacing non-reference scalars).
 
     pathc_set($data, $cp, 'new value');
 
@@ -249,86 +276,190 @@ Creates intermediates as needed (replacing non-reference scalars).
 
     pathc_exists($data, $cp);
 
-=head1 PATH FORMAT
+=head1 KEYWORDS API
+
+    use Data::Path::XS ':keywords';
+
+The keywords compile to either an inline custom op or, where the path
+allows, native Perl assignment ops. They never call into XSUB
+dispatch and so reach near-native speed.
+
+=head2 pathget DATA, PATH
+
+Get a value. Returns C<undef> for missing paths and never autovivifies.
+
+    my $val = pathget $data, "/users/0/name";
+
+=head2 pathset DATA, PATH, VALUE
+
+Set a value, autovivifying intermediates as needed. Returns C<VALUE>.
+
+    pathset $data, "/users/0/name", "Alice";
+
+=head2 pathdelete DATA, PATH
+
+Delete a value and return it.
+
+    my $old = pathdelete $data, "/users/0/name";
+
+=head2 pathexists DATA, PATH
+
+True if C<PATH> exists.
+
+    print "found\n" if pathexists $data, "/users/0/name";
+
+=head2 Constant vs Dynamic Paths
+
+When C<pathset> is called with a compile-time constant path that
 
 =over 4
 
-=item * Leading "/" is optional (e.g., "/foo/bar" and "foo/bar" are equivalent)
+=item *
 
-=item * Empty string or "/" refers to root
+contains only string components (no numeric pieces), and
 
-=item * Components are separated by "/"
+=item *
 
-=item * Numeric components access array elements (including negative indices)
-
-=item * No escaping - keys containing "/" cannot be used with string API;
-use array API instead
-
-=item * Empty string keys ("") cannot be accessed via string API; use array API:
-C<patha_get($data, [''])>
+does not carry the C<SvUTF8> flag (i.e. is not authored under
+C<use utf8>),
 
 =back
+
+the keyword compiles directly to a native HELEM-chain assignment with
+autovivification - zero per-call overhead. Because this uses Perl's
+native ops:
+
+=over 4
+
+=item *
+
+error messages match Perl's (e.g. C<"Not a HASH reference">) rather
+than this module's (C<"Cannot navigate to path">), and
+
+=item *
+
+a non-reference intermediate causes a croak rather than being silently
+replaced.
+
+=back
+
+In every other case (numeric component, UTF-8 path, non-constant path),
+the keyword falls through to a custom op with the same semantics as
+C<path_set>.
+
+The other three keywords (C<pathget>, C<pathexists>, C<pathdelete>)
+always use custom ops.
 
 =head1 EDGE CASES
 
 =head2 Empty Paths
 
-An empty path ("" or "/") refers to the root data structure:
+The empty path (C<"">, C<"/">, C<"///">) addresses the root:
 
-    path_get($data, "");   # returns $data
-    path_get($data, "/");  # returns $data
-    path_get($data, "foo/bar");  # same as "/foo/bar"
-    path_exists($data, ""); # returns 1 (root always exists)
-    path_set($data, "", $v); # croaks - cannot set root
-    path_delete($data, ""); # croaks - cannot delete root
+    path_get   ($data, "");           # $data
+    path_exists($data, "/");          # 1
+    path_set   ($data, "", $v);       # croaks "Cannot set root"
+    path_delete($data, "");           # croaks "Cannot delete root"
 
 =head2 Negative Array Indices
 
-Negative indices work like Perl's native array access:
+Negative indices behave like Perl's:
 
     my $data = { arr => ['a', 'b', 'c'] };
-    path_get($data, '/arr/-1');  # 'c' (last element)
-    path_get($data, '/arr/-2');  # 'b' (second to last)
-    path_set($data, '/arr/-1', 'z');  # sets last element
+    path_get($data, '/arr/-1');       # 'c'
+    path_set($data, '/arr/-1', 'z');  # arr now ['a','b','z']
 
-Out-of-bounds negative indices return undef (or false for exists).
+Out-of-range negative indices return C<undef> (or false for C<exists>).
 
 =head2 Leading Zeros
 
-Numeric strings with leading zeros are treated as hash keys, not array indices:
+Strings with leading zeros are treated as hash keys, not array indices:
 
-    path_get($data, '/arr/007');  # looks up $data->{arr}{007}, not $data->{arr}[7]
-    path_get($data, '/arr/0');    # accesses $data->{arr}[0] (single zero is valid)
+    path_get($data, '/arr/007');      # $data->{arr}{007}
+    path_get($data, '/arr/0');        # $data->{arr}[0] (single zero ok)
 
 =head2 Integer Overflow
 
-Indices longer than 18 digits (9 on 32-bit perls) are treated as hash keys
-to prevent overflow:
+Indices with more than 18 digits (9 on 32-bit perls) are treated as
+hash keys to prevent overflow:
 
-    path_get($data, '/arr/12345678901234567890');  # hash key, not array index
+    path_get($data, '/arr/12345678901234567890');  # hash key
+
+=head1 LIMITATIONS
+
+=head2 Tied containers
+
+Read operations (C<path_get>, C<path_exists>, C<path_delete>, and their
+array/compiled/keyword counterparts) work on tied hashes and arrays via
+the standard fetch/exists/delete magic.
+
+Write operations (C<path_set>, C<patha_set>, C<pathc_set>, and the
+C<pathset> keyword) currently croak with a message of the form
+C<"Cannot ... on tied/magical hash"> or C<"... on tied/magical array">,
+rather than invoking the tied STORE method. For tied write targets,
+assign through native Perl syntax. This limitation may be relaxed in a
+future release.
 
 =head1 THREAD SAFETY
 
-This module is designed for single-threaded use. It does not use any global
-state and should work correctly in a threaded environment where each thread
-has its own data structures, but no thread-safety guarantees are made for
-shared data structures.
+The module uses no global state and is safe in threaded programs as
+long as each thread operates on its own data. No locking is performed
+on shared structures.
 
-B<Compiled paths> hold an internal copy of the path string and should not
-be shared across threads. Create separate compiled path objects in each thread
-if needed.
+Compiled-path objects own internal buffers and should not be shared
+across threads; create one per thread.
 
 =head1 PERFORMANCE
 
-Benchmarks show XS implementation is 10-25x faster than pure Perl for
-deep paths, and competitive with native Perl hash/array access.
+Indicative numbers from F<bench/benchmark.pl> on a single sample run
+(rate per second, higher is better):
 
-For hot paths accessed repeatedly, the compiled API provides additional
-20-35% speedup over the string API by eliminating parsing overhead.
+    Operation                Pure Perl    Native Perl    Data::Path::XS
+    ----------------------- ----------- -------------- -----------------
+    path_get shallow            2.1 M/s        35.4 M/s          22.6 M/s
+    path_get deep (5 levels)    0.8 M/s         7.0 M/s           8.6 M/s
+    path_get missing key        1.3 M/s         4.4 M/s          14.7 M/s
+    path_set deep existing      0.8 M/s         8.1 M/s           7.3 M/s
+    pathget kw const shallow    -              37.5 M/s          42.2 M/s
+    pathget kw const deep       -               7.3 M/s           8.5 M/s
+    pathexists kw const deep    -               6.3 M/s          10.2 M/s
+
+The keyword API matches or exceeds native Perl on most workloads. The
+compiled API adds another ~20-35% on hot paths by skipping parsing.
+Run F<bench/benchmark.pl> for a fuller comparison on your hardware.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Data::Diver> - pure-Perl deep accessor with similar reach.
+
+=item *
+
+L<JSON::Pointer> - RFC 6901 path syntax (with C<~0>/C<~1> escaping)
+over the same kinds of structures.
+
+=item *
+
+L<Data::DPath> - XPath-like queries over data.
+
+=item *
+
+L<XS::Parse::Keyword> - the keyword-plugin framework used to install
+the C<pathget>/C<pathset>/C<pathdelete>/C<pathexists> syntax.
+
+=back
 
 =head1 AUTHOR
 
 vividsnow
+
+=head1 BUGS
+
+Please report issues at
+L<https://github.com/vividsnow/perl5-data-path-xs/issues>.
 
 =head1 LICENSE
 

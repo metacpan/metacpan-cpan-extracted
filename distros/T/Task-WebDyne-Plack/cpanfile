@@ -8,5 +8,4 @@ on configure => sub {
 
 on test => sub {
     requires 'Test::More';
-    suggests 'Test::Pod', '1.14';
 };

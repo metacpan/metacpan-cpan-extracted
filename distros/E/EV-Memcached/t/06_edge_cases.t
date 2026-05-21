@@ -162,6 +162,99 @@ my $prefix = "ev_mc_edge_$$\_";
     run_ev();
 }
 
+# --- fire-and-forget set queued before connect is delivered, not dropped ---
+# Regression: mc_fire_and_forget used to silently drop packets when called
+# during the connecting/reconnect-pending phase even though the public API
+# accepts the call.
+{
+    my $mc = EV::Memcached->new(
+        host => $host, port => $port,
+        on_error => sub { diag "ff error: @_" },
+    );
+    my $key = "${prefix}ff_pre_connect";
+    # All issued BEFORE connect completes; both go to wait_queue and drain
+    # in FIFO order after connect: SETQ first, then SET-with-cb. The cb
+    # fires once the SET response arrives, by which time SETQ has been
+    # processed by the server.
+    $mc->set($key, "ff_value");                 # fire-and-forget
+    $mc->set("${key}_marker", "m", sub {        # ordering fence
+        my ($res, $err) = @_;
+        ok(!$err, "ff fence set ok");
+        $mc->get($key, sub {
+            my ($val) = @_;
+            is($val, "ff_value", "fire-and-forget queued during connect was delivered");
+            $mc->disconnect;
+            EV::break;
+        });
+    });
+    my $t = EV::timer 5, 0, sub { fail("ff queued connect timeout"); EV::break };
+    EV::run;
+}
+
+# --- connect() while reconnect timer is pending does not double-connect ---
+# Regression: connect()/connect_unix() did not stop the reconnect_timer,
+# so the pending timer would later fire start_connect a second time,
+# leaking the first fd and corrupting libev watchers.
+{
+    # Point at wrong port so initial connect fails and reconnect timer arms.
+    my $errors = 0;
+    my $mc = EV::Memcached->new(
+        host                   => $host,
+        port                   => $port + 1000,
+        reconnect              => 1,
+        reconnect_delay        => 500,    # 500ms before retry fires
+        max_reconnect_attempts => 5,
+        on_error               => sub { $errors++ },
+    );
+
+    # Wait for the first failure so a reconnect timer is armed.
+    my $w; $w = EV::timer 0.3, 0, sub {
+        undef $w;
+        # Now redirect to the real port and call connect() while a
+        # reconnect timer is pending. If the timer is not stopped,
+        # it will fire start_connect a second time after we already
+        # established the connection.
+        $mc->connect($host, $port);
+    };
+
+    my $connect_count = 0;
+    $mc->on_connect(sub { $connect_count++ });
+
+    # Give it time for both: the redirected connect, and any rogue
+    # timer firing (reconnect_delay = 500ms).
+    my $t = EV::timer 2, 0, sub { EV::break };
+    EV::run;
+    $mc->on_connect(undef);
+
+    is($connect_count, 1, "connect() during pending reconnect: one connect, no double-fire");
+    ok($mc->is_connected, "connect() during pending reconnect: connected to new host");
+    $mc->disconnect;
+}
+
+# --- username without password does not stall waiting queue ---
+# Regression: when only `username` was passed to the constructor (no
+# `password`), SASL auth was correctly skipped but the post-connect
+# drain gate also fired, leaving any pre-connect-queued commands in
+# wait_queue forever.
+{
+    my $mc = EV::Memcached->new(
+        host     => $host,
+        port     => $port,
+        username => 'someone',  # no password
+        on_error => sub {},
+    );
+    my $got_cb;
+    # Queued before connect completes -> goes to wait_queue.
+    $mc->set("${prefix}usernameonly", "v", sub {
+        $got_cb = 1;
+        EV::break;
+    });
+    my $t = EV::timer 3, 0, sub { EV::break };
+    EV::run;
+    ok($got_cb, "username-only: pre-connect command does not stall");
+    $mc->disconnect;
+}
+
 # --- large value error ---
 {
     my $mc = make_mc();

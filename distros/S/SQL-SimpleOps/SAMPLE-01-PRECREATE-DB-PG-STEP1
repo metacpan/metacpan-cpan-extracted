@@ -1,0 +1,18 @@
+ 
+-- Postgres Step 1 - precretaion
+ 
+DROP TABLE IF EXISTS test_db.standard_notnull ;
+DROP TABLE IF EXISTS test_db.standard_null ;
+DROP TABLE IF EXISTS test_db.standard_single ;
+DROP TABLE IF EXISTS test_db.autoincrement_1 ;
+DROP TABLE IF EXISTS test_db.standard_indexed ;
+DROP TABLE IF EXISTS test_db.master ;
+DROP TABLE IF EXISTS test_db.slave ;
+DROP SCHEMA IF EXISTS test_db CASCADE ;
+DROP DATABASE IF EXISTS test_db ;
+DROP ROLE IF EXISTS user_read;
+DROP ROLE IF EXISTS user_update;
+
+CREATE DATABASE test_db ENCODING 'UTF8';
+
+-- Done

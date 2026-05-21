@@ -7,12 +7,14 @@ use Class::Utils qw(set_params);
 use English;
 use Error::Pure qw(err);
 use Getopt::Std;
+use IO::Uncompress::AnyUncompress qw($AnyUncompressError);
 use List::MoreUtils qw(uniq);
 use List::Util qw(max);
+use MARC::Batch;
 use MARC::File::XML (BinaryEncoding => 'utf8', RecordFormat => 'MARC21');
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Constructor.
 sub new {
@@ -36,47 +38,66 @@ sub run {
 	$self->{'_opts'} = {
 		'f' => 0,
 		'h' => 0,
+		's' => 0,
 	};
-	if (! getopts('fh', $self->{'_opts'})
+	if (! getopts('fhs', $self->{'_opts'})
 		|| $self->{'_opts'}->{'h'}
 		|| @ARGV < 2) {
 
-		print STDERR "Usage: $0 [-f] [-h] [--version] marc_xml_file field [subfield]\n";
+		print STDERR "Usage: $0 [-f] [-h] [-s] [--version] marc_xml_file field [subfield]\n";
 		print STDERR "\t-f\t\tPrint frequency.\n";
 		print STDERR "\t-h\t\tPrint help.\n";
+		print STDERR "\t-s\t\tSkip controls of field/subfield.\n";
 		print STDERR "\t--version\tPrint version.\n";
-		print STDERR "\tmarc_xml_file\tMARC XML file.\n";
+		print STDERR "\tmarc_xml_file\tMARC XML file, could be compressed.\n";
 		print STDERR "\tfield\t\tMARC field (field number or 'leader' string).\n";
 		print STDERR "\tsubfield\tMARC subfield (for datafields).\n";
 		return 1;
 	}
-	$self->{'_marc_xml_file'} = shift @ARGV;
-	$self->{'_marc_field'} = shift @ARGV;
-	$self->{'_marc_subfield'} = shift @ARGV;
+	my $marc_xml_file = shift @ARGV;
+	my $marc_field = shift @ARGV;
+	my $marc_subfield = shift @ARGV;
 
-	if ($self->{'_marc_field'} ne 'leader'
-		&& $self->{'_marc_field'} !~ m/^\d+$/ms) {
+	if (! $self->{'_opts'}->{'s'}) {
+		if ($marc_field ne 'leader'
+			&& $marc_field !~ m/^\d+$/ms) {
 
-		err "Bad field definition. Must be a 'leader' or numeric value of the field.";
+			err "Bad field definition. Must be a 'leader' or numeric value of the field.";
+		}
+
+		if ($marc_field ne 'leader'
+			&& int($marc_field) > 9
+			&& ! defined $marc_subfield) {
+
+			err 'Subfield is required.';
+		}
 	}
 
-	if ($self->{'_marc_field'} ne 'leader'
-		&& int($self->{'_marc_field'}) > 9
-		&& ! defined $self->{'_marc_subfield'}) {
-
-		err 'Subfield is required.';
+	if (! -r $marc_xml_file) {
+		err "File '$marc_xml_file' doesn't exist.";
 	}
-
-	if (! -r $self->{'_marc_xml_file'}) {
-		err "File '$self->{'_marc_xml_file'}' doesn't exist.";
+	my ($fh, $errno);
+	if ($self->_open_marc_input($marc_xml_file, \$fh, \$errno)) {
+		print STDERR "Cannot open file '$marc_xml_file'.";
+		if (defined $errno) {
+			print STDERR "\tErrno: $errno\n";
+		}
+		return 1;
 	}
-	my $marc_file = MARC::File::XML->in($self->{'_marc_xml_file'});
+	my $marc_batch = eval {
+		MARC::Batch->new('XML', $fh);
+	};
+	if ($EVAL_ERROR) {
+		print STDERR "Cannot open MARC XML stream.\n";
+		print STDERR "\tError: $EVAL_ERROR\n";
+		return 1;
+	}
 	my $ret_hr = {};
 	my $num = 1;
 	my $previous_record;
 	while (1) {
 		my $record = eval {
-			$marc_file->next;
+			$marc_batch->next;
 		};
 		if ($EVAL_ERROR) {
 			print STDERR "Cannot process '$num' record. ".
@@ -93,14 +114,14 @@ sub run {
 		}
 		$previous_record = $record;
 
-		if ($self->{'_marc_field'} eq 'leader') {
+		if ($marc_field eq 'leader') {
 			my $leader = $record->leader;
 			$ret_hr->{"'".$leader."'"}++;
 		} else {
-			my @fields = $record->field($self->{'_marc_field'});
+			my @fields = $record->field($marc_field);
 			foreach my $field (@fields) {
-				if (defined $self->{'_marc_subfield'}) {
-					my @subfield_values = $field->subfield($self->{'_marc_subfield'});
+				if (defined $marc_subfield) {
+					my @subfield_values = $field->subfield($marc_subfield);
 					foreach my $subfield_value (@subfield_values) {
 						$ret_hr->{$subfield_value}++;
 					}
@@ -133,6 +154,19 @@ sub run {
 	}
 	
 	return 0;
+}
+
+sub _open_marc_input {
+	my ($self, $path, $fh_sr, $errno_sr) = @_;
+
+	# Compression autodetection.
+	${$fh_sr} = IO::Uncompress::AnyUncompress->new($path);
+	if (defined ${$fh_sr}) {
+		return 0;
+	}
+	${$errno_sr} = $AnyUncompressError;
+
+	return 1;
 }
 
 1;
@@ -349,8 +383,11 @@ L<Class::Utils>,
 L<English>,
 L<Error::Pure>,
 L<Getopt::Std>,
-L<List::MoreUtils>
-L<MARC::File::XML>
+L<IO::Uncompress::AnyUncompress>,
+L<List::MoreUtils>,
+L<List::Util>,
+L<MARC::Batch>,
+L<MARC::File::XML>,
 L<Unicode::UTF8>.
 
 =head1 REPOSITORY
@@ -371,6 +408,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

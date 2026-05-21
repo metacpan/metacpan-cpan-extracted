@@ -19,7 +19,12 @@ BEGIN {
     ($pgversion,$pglibversion,$pgvstring,$pgdefport) = ('?','?','?','?');
 }
 
-($helpconnect,$connerror,$dbh) = connect_database();
+eval {
+    ($helpconnect,$connerror,$dbh) = connect_database();
+};
+if ($@ =~ /Invalid initdb/) {
+    BAIL_OUT 'Could not connect: no initdb found';
+}
 
 if (! defined $dbh or $connerror) {
     plan skip_all => "Connection to database failed, cannot continue testing ($connerror) (dbh=" . (defined($dbh) ? $dbh : '<undefined>') . ')';
@@ -160,7 +165,7 @@ END {
     my $dsn = exists $ENV{DBI_DSN} ? $ENV{DBI_DSN} : '?';
 
     ## Don't show current dir to the world via CPAN::Reporter results
-    $dsn =~ s{host=/.*(dbdpg_test_database/data/socket)}{host=<pwd>/$1};
+    $dsn =~ s{host=/.*(testdb)}{host=<pwd>/$1};
 
     my $ver = defined $DBD::Pg::VERSION ? $DBD::Pg::VERSION : '?';
     my $user = exists $ENV{DBI_USER} ? $ENV{DBI_USER} : '<not set>';

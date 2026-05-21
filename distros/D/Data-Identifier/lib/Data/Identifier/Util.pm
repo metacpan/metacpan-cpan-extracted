@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2025 Philipp Schafft
+# Copyright (c) 2023-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -16,8 +16,9 @@ use parent qw(Data::Identifier::Interface::Userdata Data::Identifier::Interface:
 use Carp;
 
 use Data::Identifier;
+use Data::Identifier::Generate;
 
-our $VERSION = v0.28;
+our $VERSION = v0.29;
 
 my $_DEFAULT_INSTANCE = __PACKAGE__->new;
 
@@ -90,6 +91,105 @@ my %_logicals_to_sid = (
     west        => 211,
 );
 
+my %_wk = (
+    bunit_ns    => {uuid => 'e8e9846a-37ec-42fd-8e89-d15f5467aa9c', displayname => 'unit-namespace'},
+    bunit_gen   => {uuid => 'b1620795-b29a-4aea-ba46-371b187d0a4b', displayname => 'unit-generator'},
+    dunit_ns    => {uuid => 'da8a7fe4-935c-4bf7-9bd1-aaf8fc39305b', displayname => 'derived-unit-namespace'},
+    dunit_gen   => {uuid => 'c3446cff-672b-4247-b62c-755a295ee15f', displayname => 'derived-unit-generator'},
+    #x => {uuid => '', displayname => ''},
+);
+
+foreach my $value (values %_wk) {
+    my $uuid = delete $value->{uuid};
+    $value = Data::Identifier->new(uuid => $uuid, %{$value})->register;
+}
+
+my %_base_units = (
+    map {
+        $_->{id} = Data::Identifier::Generate->generic(
+            namespace => $_wk{bunit_ns},
+            generator => $_wk{bunit_gen},
+            style => 'name-based',
+            request => $_->{symbol},
+            displayname => $_->{name},
+        )->register;
+        $_->{symbol} => $_
+    } (
+        {name => 'second',      symbol => 's',      dimension => 'T',           quantity => 'time',                         variable => [qw(t)]},
+        {name => 'metre',       symbol => 'm',      dimension => 'L',           quantity => 'length',                       variable => [qw(l x r)]},
+        {name => 'kilogram',    symbol => 'kg',     dimension => 'M',           quantity => 'mass',                         variable => [qw(m)]},
+        {name => 'ampere',      symbol => 'A',      dimension => 'I',           quantity => 'electric current',             variable => [qw(I i)]},
+        {name => 'kelvin',      symbol => 'K',      dimension => "\N{U+0398}",  quantity => 'thermodynamic temperature',    variable => [qw(T)]},
+        {name => 'mole',        symbol => 'mol',    dimension => 'N',           quantity => 'amount of substance',          variable => [qw(n)]},
+        {name => 'candela',     symbol => 'cd',     dimension => 'J',           quantity => 'luminous intensity',           variable => [qw(Iv)]},
+    )
+);
+
+my %_number_units = map { $_ => Data::Identifier::Generate->integer($_)->register } (2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73); # primes
+
+my %_composite_unit_elements = (
+    Hz      => {s => -1},
+    N       => {s => -2, m =>  1, kg =>  1},
+    Pa      => {s => -2, m => -1, kg =>  1},
+    J       => {s => -2, m =>  2, kg =>  1},
+    W       => {s => -3, m =>  2, kg =>  1},
+    C       => {s =>  1,                    A =>  1},
+    V       => {s => -3, m =>  2, kg =>  1, A => -1},
+    F       => {s =>  4, m => -2, kg => -1, A =>  2},
+    "\N{U+03A9}"    => {s => -3, m =>  2, kg =>  1, A => -2},
+    "\N{U+2126}"    => {s => -3, m =>  2, kg =>  1, A => -2}, # alias
+    ohm             => {s => -3, m =>  2, kg =>  1, A => -2}, # alias
+    S       => {s =>  3, m => -2, kg => -1, A =>  2},
+    Wb      => {s => -2, m =>  2, kg =>  1, A => -1},
+    T       => {s => -2,          kg =>  1, A => -1},
+    H       => {s => -2, m =>  2, kg =>  1, A => -2},
+    kat     => {s => -1,                             mol => 1},
+    10      => {2 => 1,         5 => 1},
+    12      => {2 => 2, 3 => 1},
+    24      => {2 => 3, 3 => 1},
+    28      => {2 => 2,                  7 => 1},
+    30      => {2 => 1, 3 => 1, 5 => 1},
+    60      => {2 => 2, 3 => 1, 5 => 1},
+    365     => {                5 => 1, 73 => 1},
+    366     => {2 => 1, 3 => 1,         61 => 1},
+    3600    => {2 => 4, 3 => 2, 5 => 2},
+    86400   => {2 => 7, 3 => 3, 5 => 2},
+);
+
+my %_component_to_name = (
+    # Units:
+    (map {$_base_units{$_}{id}->uuid => $_} keys %_base_units),
+    # Numbers:
+    (map {$_number_units{$_}->uuid => $_} keys %_number_units),
+);
+
+my %_si_prefix = (
+    quetta  =>  30, Q   => 30,
+    ronna   =>  27, R   => 27,
+    yotta   =>  24, Y   => 24,
+    zetta   =>  21, Z   => 21,
+    exa     =>  18, E   => 18,
+    peta    =>  15, P   => 15,
+    tera    =>  12, T   => 12,
+    giga    =>   9, G   => 9,
+    mega    =>   6, M   => 6,
+    kilo    =>   3, k   => 3,
+    hecto   =>   2, h   => 2,
+    deca    =>   1, da  => 1,
+    deci    =>  -1, d   => -1,
+    centi   =>  -2, c   => -2,
+    milli   =>  -3, m   => -3,
+    micro   =>  -6, "\N{GREEK SMALL LETTER MU}" => -6,
+    nano    =>  -9, n   => -9,
+    pico    => -12, p   => -12,
+    femto   => -15, f   => -15,
+    atto    => -18, a   => -18,
+    zepto   => -21, z   => -21,
+    yocto   => -24, y   => -24,
+    ronto   => -27, r   => -27,
+    quecto  => -30, q   => -30,
+);
+
 
 sub new {
     my ($pkg, @opts) = @_;
@@ -144,6 +244,8 @@ sub pack {
         return $identifier->uuid(no_defaults => 1);
     } elsif ($template eq 'uuidHEXDASH') {
         return $identifier->uuid(no_defaults => 1) =~ tr/a-f/A-F/r;
+    } elsif ($template eq 'Data::Identifier') {
+        return $identifier;
     }
 
     if (defined($v) && defined($pack_template)) {
@@ -212,6 +314,10 @@ sub unpack {
         return Data::Identifier->new(uuid => $data);
     } elsif ($template eq 'uuidHEXDASH') {
         return Data::Identifier->new(uuid => $data);
+    } elsif ($template eq 'Data::Identifier') {
+        # We don't care too much here if it is actually a Data::Identifier or just any other supported type.
+        # Data::Identifier will do the right thing anyway.
+        return Data::Identifier->new(from => $data);
     }
 
     if (defined($type) && defined($pack_template)) {
@@ -331,6 +437,127 @@ sub render_sirtx {
     return sprintf('[uuid:%s]', $identifier->uuid);
 }
 
+# Too experimental for listing in public API.
+# TODO: Get this on track for the public API!
+sub parse_unit_request {
+    my ($self, $template, $request, %opts) = _normalise_args(@_);
+    my $exponentas = delete($opts{exponentas}) // 'int';
+    my @res;
+
+    croak 'Stray options passed' if scalar keys %opts;
+
+    if ($template eq 'request') {
+        foreach my $subreq (split(/--/, $request)) {
+            my ($uuid, $neg, $exp_mul) = $subreq =~ /^([0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12})~(-?)([0-9])\z/;
+            my $exp;
+
+            #printf("%-42s -> <%s> <%1s> <%s>\n", $subreq, $uuid, $neg, $exp_mul);
+
+            if ($exponentas eq 'int') {
+                $exp = int($exp_mul);
+                $exp = -$exp if $neg eq '-';
+            } else {
+                croak 'Invalid exponentas: '.$exponentas;
+            }
+
+            push(@res, {
+                    component => Data::Identifier->new(uuid => $uuid),
+                    exponent  => $exp,
+                });
+        }
+    } else {
+        croak 'Unknown template: '.$template;
+    }
+
+    return \@res;
+}
+
+# Too experimental for listing in public API.
+# TODO: Get this on track for the public API!
+sub render_unit_request {
+    my ($pkg, $template, $request, %opts) = _normalise_args(@_);
+    my $displayname = delete $opts{displayname};
+    my $input;
+    my %took;
+
+    croak 'Stray options passed' if scalar keys %opts;
+
+    if (ref($request) eq 'ARRAY') {
+        $request = {map {($_component_to_name{$_->{component}->uuid} // croak 'Unknown base unit: '.$_->{component}->uuid) => $_->{exponent}} @{$request}};
+    }
+
+    if (defined(my $prefix = delete($request->{prefix}))) {
+        $prefix = $_si_prefix{$prefix} // croak 'Bad prefix: '.$prefix;
+        $request->{10} //= 0;
+        $request->{10}  += $prefix;
+    }
+
+    foreach my $key (keys(%_composite_unit_elements)) {
+        my $n = $_composite_unit_elements{$key};
+        my $mul = delete($request->{$key}) // 0;
+        croak 'Bad exponent: '.$mul if $mul != int($mul);
+        $mul = int($mul);
+        next if $mul == 0;
+        foreach my $prime_element (keys %{$n}) {
+            $request->{$prime_element} //= 0;
+            $request->{$prime_element} += $n->{$prime_element} * $mul;
+        }
+    }
+
+    foreach my $key (keys(%_base_units), keys(%_number_units)) {
+        my $mul = delete($request->{$key}) // 0;
+        croak 'Bad exponent: '.$mul if $mul != int($mul);
+        $mul = int($mul);
+        $took{$key} = $mul if $mul != 0;
+    }
+
+    {
+        my @keys = keys %{$request};
+        croak 'Bad extra units: '.join(', ', @keys) if scalar @keys;
+    }
+
+    unless (scalar(grep {!defined $_number_units{$_}} keys %took)) {
+        my $i = 1;
+
+        foreach my $key (keys %took) {
+            $i *= $key ** $took{$key};
+        }
+
+        if ($i == int($i)) {
+            return $pkg->pack($template => Data::Identifier::Generate->integer($i));
+        }
+        croak 'Invalid numeric only request';
+    }
+
+    # Rename from units to UUIDs as keys.
+    foreach my $key (keys %took) {
+        my $uuid = ($_number_units{$key} // $_base_units{$key}{id})->uuid;
+        $took{$uuid} = delete $took{$key};
+    }
+
+    if (scalar(keys %took) == 1) {
+        my ($mul) = values %took;
+        if ($mul == 1) {
+            my ($uuid) = keys %took;
+            return $pkg->pack($template => Data::Identifier->new(uuid => $uuid));
+        }
+    }
+
+    $input = join('--', map{$_.'~'.$took{$_}} sort keys %took);
+
+    if ($template eq 'request') {
+        return $input;
+    }
+
+    $opts{namespace} //= $_wk{dunit_ns},
+    $opts{generator} //= $_wk{dunit_gen},
+    $opts{input}       = $input;
+    $opts{request}     = $input;
+    $opts{displayname} = $displayname;
+
+    return $pkg->pack($template => Data::Identifier::Generate->generic(%opts));
+}
+
 # ---- Private helpers ----
 
 sub _normalise_args {
@@ -389,7 +616,7 @@ Data::Identifier::Util - format independent identifier object
 
 =head1 VERSION
 
-version v0.28
+version v0.29
 
 =head1 SYNOPSIS
 
@@ -399,10 +626,14 @@ version v0.28
 
 (since v0.23)
 
-This package contains some utilty methods that are left out of L<Data::Identifier> to keep that module slim.
+This package contains some utility methods that are left out of L<Data::Identifier> to keep that module slim.
 
 This package inherits from L<Data::Identifier::Interface::Userdata> (since v0.23),
 and L<Data::Identifier::Interface::Subobjects> (since v0.23).
+
+B<Note:>
+This package may register (see L<Data::Identifier/register>) some identifiers required for the provided operations.
+This may or may not overlap with what L<Data::Identifier::Wellknown> registers.
 
 =head1 METHODS
 
@@ -460,6 +691,13 @@ An UUID as 128 bit (16 byte).
 
 An UUID in hex-and-hash format.
 Use C<uuidhexdash> for lower case and C<uuidHEXDASH> for upper case.
+
+=item C<Data::Identifier>
+
+(experimental since v0.29)
+
+A full L<Data::Identifier> object.
+This is mostly for compatibility with other APIs.
 
 =back
 
@@ -519,7 +757,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023-2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2023-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

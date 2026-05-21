@@ -13,9 +13,10 @@
 package Module::Generic::JSON;
 BEGIN
 {
-    use v5.12.0;
+    use v5.16.0;
     use strict;
     use warnings;
+    warnings::register_categories( 'Module::Generic' );
     use parent qw( Module::Generic );
     use vars qw( @EXPORT @EXPORT_OK $AUTOLOAD $DEBUG $VERSION );
     use JSON ();
@@ -27,7 +28,6 @@ BEGIN
     our $VERSION = 'v0.2.2';
 };
 
-use v5.12.0;
 use strict;
 use warnings;
 

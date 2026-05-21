@@ -1,0 +1,136 @@
+=encoding utf-8
+
+=head1 NAME
+
+DateTime::Lite::Exception - DateTime::Lite用の例外オブジェクト
+
+=head1 SYNOPSIS
+
+    use DateTime::Lite;
+
+    # 例外は各種モジュールのerror()メソッドによって自動的に作成されます
+    my $dt = DateTime::Lite->new( year => 2025, month => 13 );
+    if( !defined( $dt ) )
+    {
+        my $err = DateTime::Lite->error;  # DateTime::Lite::Exceptionオブジェクト
+
+        # 文字列化（オーバーロード）："Invalid month value (13) at Foo.pm line 5."
+        warn "$err";
+
+        printf( "Error: %s\n", $err->message );
+        printf( "  at %s line %d\n", $err->file, $err->line );
+
+        # 個別フィールド：
+        printf "Message : %s", $err->message;  # "Invalid month value (13)"
+        printf "File    : %s", $err->file;     # "Foo.pm"
+        printf "Line    : %d", $err->line;     # 5
+        printf "Code    : %s", $err->code // 'n/a';  # 任意のエラーコード
+    }
+
+    # 例外オブジェクトはメソッドチェーンを通じて伝播します
+    # メソッドが失敗すると、チェーン呼び出し（オブジェクト）コンテキストではNullObjectを返すため、
+    # チェーンは"Can't call method on undef"でdieしません：
+    my $result = DateTime::Lite->new( %bad_args )->clone->add( days => 1 ) ||
+        die( DateTime::Lite->error );
+
+    # pass_error：既存の例外を転送する
+    sub my_helper
+    {
+        my $self = shift( @_ );
+        my $tz = DateTime::Lite::TimeZone->new( name => 'Invalid/Zone' ) ||
+            return( $self->pass_error );  # TimeZoneのエラーを再送出します
+        return( $tz );
+    }
+
+    my $obj = My::Class->new->my_helper ||
+        die( My::Class->error );
+
+    # fatalモード：警告を例外に変換します
+    my $dt2 = DateTime::Lite->new( year => 2026 );
+    $dt2->fatal(1);  # 以後のエラーはwarn()ではなくdie()します
+
+=head1 VERSION
+
+    v0.1.0
+
+=head1 DESCRIPTION
+
+C<DateTime::Lite::Exception>は、L<DateTime::Lite>が内部で使用する軽量な例外クラスです。C<error()>メソッドによって自動的に作成され、オブジェクト上とパッケージレベルのC<$ERROR>変数の両方に保存されます。
+
+L<DateTime>と異なり、C<DateTime::Lite>は直接C<die>を呼び出しません（C<throw()>経由の場合を除きます）。代わりに、エラー条件では例外を設定し、スカラーコンテキストではC<undef>、リストコンテキストでは空リストを返します。
+
+=head1 CONSTRUCTOR
+
+=head2 new( %args | $message )
+
+コンストラクタです。単純な文字列メッセージ、または次のキーを持つハッシュのいずれかを受け付けます。
+
+=over 4
+
+=item C<message>
+
+人間が読めるエラーメッセージです。
+
+=item C<file>
+
+エラーが発生したソースファイルです（省略時は自動設定されます）。
+
+=item C<line>
+
+行番号です（省略時は自動設定されます）。
+
+=item C<package>
+
+パッケージ名です（省略時は自動設定されます）。
+
+=item C<skip_frames>
+
+場所を自動検出する際に、追加でスキップするコールスタックフレーム数です。
+
+デフォルト：C<0>。
+
+=back
+
+=head1 METHODS
+
+=head2 as_string
+
+例外の文字列表現を返します。ファイル名と行番号の情報を含みます。このメソッドはC<"">オーバーロードからも呼び出されます。
+
+=head2 file
+
+例外に関連付けられたソースファイルを返します。
+
+=head2 line
+
+例外に関連付けられた行番号を返します。
+
+=head2 message
+
+エラーメッセージ文字列を返します。
+
+=head2 package
+
+例外に関連付けられたパッケージ名を返します。
+
+=head2 throw( %args | $message )
+
+新しい例外オブジェクトを作成し、直ちにそれを使ってC<die()>を呼び出します。
+
+=head1 SEE ALSO
+
+L<DateTime::Lite>, L<DateTime::Lite::Duration>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright(c) 2026 DEGUEST Pte. Ltd.
+
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

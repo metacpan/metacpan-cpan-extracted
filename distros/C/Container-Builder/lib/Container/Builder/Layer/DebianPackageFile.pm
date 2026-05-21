@@ -14,9 +14,6 @@ use Container::Builder::Layer;
 class Container::Builder::Layer::DebianPackageFile :isa(Container::Builder::Layer) { 
 	field $file :param = "";
 	field $data :param = "";
-	field $compress :param = 1;
-	field $size = 0;
-	field $digest = 0;
 
 	method generate_artifact() {
 		my $ar;
@@ -35,31 +32,10 @@ class Container::Builder::Layer::DebianPackageFile :isa(Container::Builder::Laye
 		my $xz_data = $ar->get_data('data.tar.xz');
 		my $unxz_data;
 		IO::Uncompress::UnXz::unxz(\$xz_data => \$unxz_data) or die "Unable to extract data using unxz\n";
-		if($compress) {
-			my $gunzip_compressed_data;
-			IO::Compress::Gzip::gzip(\$unxz_data => \$gunzip_compressed_data) or die "Unable to gunzip the unxz data\n";
-			$self->_scrub_gzip_timestamp(\$gunzip_compressed_data);
-			$size = length($gunzip_compressed_data);
-			$digest = Crypt::Digest::SHA256::sha256_hex($gunzip_compressed_data);
-			return $gunzip_compressed_data;
-		} else {
-			$size = length($unxz_data);
-			$digest = Crypt::Digest::SHA256::sha256_hex($unxz_data);
-			return $unxz_data;
-		}
+		my $data_ref = $self->_parent_does_stuff(\$unxz_data);
+		# TODO: We should actually return references! Less copying == faster!
+		return $$data_ref;
 	}
-
-	method _scrub_gzip_timestamp($s) {
-		$$s =~ s/^\x1f\x8b\x08(.).{4}/\x1f\x8b\x08$1\x00\x00\x00\x00/;
-	}
-
-	method get_media_type() { 
-		my $s = "application/vnd.oci.image.layer.v1.tar";
-		$s .= '+gzip' if $compress;
-		return $s;
-	}
-	method get_digest() { return lc($digest) }
-	method get_size() { return $size }
 }
 
 1;

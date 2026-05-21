@@ -1,3 +1,8 @@
+3.06  10/05/2026
+- Hardlinks not extracted by default, added EXTRACT_HARDLINK flag
+- If hardlinks are extracted, they are now subject to the same rules
+  as symlinks with regards to chown and chmod
+
 3.04  25/02/2025 (Dan Church, Arne Johannessen && SISYPHUS)
 - Fix handling filenames with trailing whitespace
 - Allow --format=ustar option for ptar

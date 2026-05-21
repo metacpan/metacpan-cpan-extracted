@@ -1,12 +1,13 @@
 ##----------------------------------------------------------------------------
 ## MIME Email Builder - ~/lib/Mail/Make/Headers/ContentDisposition.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/03/02
-## Modified 2026/03/02
-## All rights reserved.
-##
+## Modified 2026/05/11
+## All rights reserved
+## 
+## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -21,7 +22,7 @@ BEGIN
     use Mail::Make::Exception;
     our $EXCEPTION_CLASS      = 'Mail::Make::Exception';
     our $VALID_DISPOSITIONS   = qr/^(?:inline|attachment|form-data)$/i;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 use strict;
@@ -34,8 +35,11 @@ sub init
     $self->{filename_lang}    = undef;
     $self->{_exception_class} = $EXCEPTION_CLASS;
     my $disposition = shift( @_ );
-    return( $self->error( "No value was provided for Content-Disposition field." ) )
-        if( !defined( $disposition ) || !length( "$disposition" ) );
+    if( !defined( $disposition ) ||
+        !length( "$disposition" ) )
+    {
+        return( $self->error( "No value was provided for Content-Disposition field." ) );
+    }
     my $params = $self->_get_args_as_hash( @_ );
     my $debug = delete( $params->{debug} );
     $self->debug( $debug );
@@ -173,7 +177,7 @@ Mail::Make::Headers::ContentDisposition - Content-Disposition Header Field Objec
     print "$cd";
     # inline; filename*=UTF-8''Yamato%2CInc-Logo.png
 
-    # Pure ASCII filename - plain quoting used instead
+    # Pure ASCII filename; plain quoting used instead
     $cd->filename( 'logo.png' );
     print "$cd";
     # inline; filename="logo.png"
@@ -185,7 +189,7 @@ Mail::Make::Headers::ContentDisposition - Content-Disposition Header Field Objec
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 

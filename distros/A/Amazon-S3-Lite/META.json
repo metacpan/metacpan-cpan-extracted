@@ -1,0 +1,84 @@
+{
+   "abstract" : "Amazon::S3::Lite",
+   "author" : [
+      "Rob Lauer <rlauer@treasurersbriefcase.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Amazon-S3-Lite",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Amazon::Signature4::Lite" : "v1.0.0",
+            "HTTP::Tiny" : "0.088",
+            "IO::Socket::SSL" : "0",
+            "List::Util" : "0",
+            "Net::SSLeay" : "0",
+            "URI::Escape" : "5.34",
+            "XML::Twig" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Tiny" : "0",
+            "IO::Scalar" : "0",
+            "JSON::PP" : "4.16"
+         }
+      }
+   },
+   "provides" : {
+      "Amazon::S3::Lite" : {
+         "file" : "lib/Amazon/S3/Lite.pm",
+         "version" : "v1.1.4"
+      },
+      "Amazon::S3::Lite::Credentials" : {
+         "file" : "lib/Amazon/S3/Lite/Credentials.pm",
+         "version" : "v1.1.4"
+      },
+      "Amazon::S3::Lite::Logger" : {
+         "file" : "lib/Amazon/S3/Lite/Logger.pm",
+         "version" : "v1.1.4"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "rlauer@treasurersbriefcase.com",
+         "web" : "http://github.com/rlauer6/Amazon-S3-Lite/issues"
+      },
+      "homepage" : "http://github.com/rlauer6/Amazon-S3-Lite.git",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rlauer6/Amazon-S3-Lite.git",
+         "web" : "http://github.com/rlauer6/Amazon-S3-Lite.git"
+      }
+   },
+   "version" : "v1.1.4",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

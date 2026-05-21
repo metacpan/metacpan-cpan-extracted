@@ -1,6 +1,6 @@
 =head1 NAME
 
-Data::JPack - Offline/Online Web application and data system
+Data::JPack - Offline/Online Web Application Packer
 
 
 =head1 SYNOPISIS
@@ -13,23 +13,155 @@ Data::JPack - Offline/Online Web application and data system
 
 =head1 DESCRIPTION
 
-Provides a mechanism to store any data type (text, binary etc) so a web browser
-can load the data without the requirement of a server (ie local files) or
-samesite/ origin security issues.  Data is normally compressed before encoded
 
-It also implements a worker pool system to allow backgroun processing of data
-and user exentable functions
+Provides a platform to package application content suitable for web clients,
+templating, via L<Template::Plexsite> and a foundation for a client side worker
+pool for CPU intensive javavscript tasks.
+
+Application code (javascript), textual and binary data can be packaged and
+loaded without the requirement of a server (ie local files) and avoiding
+samesite / origin security issues.
+
+The client side javascript is installed and accessable via L<Data::JPack::App>.
+
+=head1 API (Server side)
 
 
-It provides the bootstrapping to load application code, and arbitary data, by
-making a file system database loadable from a webpage.
+=head2 Construction 
+
+=head3 new
+
+  Data::JPack->new(OPTIONS)
+
+Create a new packer object, configured with OPTIONS, which are key value pairs.
+The options supported are:
+
+=over
+
+=item html_container
+
+  html_container=> Path_to_html_file
+
+This is a path to a html which will be considered the root or container for the
+data. If a path to a html is given, the dirname is extracted and is used as the
+the actual container path.  If a directory path is provided, this is used
+directly.
+
+=item jpack_type
+
+  html_container=> "data"; 
+
+Currently the only supported value for this option is C<"data">;
 
 
-=head1 HOW IT WORKS
 
-The basics is data is encoded into base64 text, which is then the return value
-from function. This function is the wrapper which is stored in the loadable
-datafile.  This function is passed to the JPack decodeer, which calls the
-function when the file is ready.
+
+=item jpack_compression
+
+  jpack_compression=>COMPRESSION
+
+
+Configures if compression of packed files should be enabled. The only
+compression option supported is C<'deflate'>. Any other value will disable
+compression.
+
+
+=item embedded 
+
+  embedded => FLAG
+
+If FLAG is true, the data encoded will be configured for inline/embedded usage
+in a html file. Otherwise the encoded data will be configured for loading from
+a external file.
+
+The default is C<false>.
+
+=back
+
+=head2 Single Shot Encoding
+
+With an existing C<Data::JPack> object, these methods these methods will
+process a single data chunk, with required header and footer.
+
+=head3 encode
+
+  $packer->encode($data);
+
+Single call that wraps and encodes data suitable for storing in a standalone
+file, or embeded if the C<$packer> object is conifigured.
+
+Returns the encoded data.
+
+=head3 decode
+  
+  $packer->decode($data);
+
+Decodes C<$data> expected in L<Data::JPack> format.  Returns the decoded data.
+
+=head3 encode_file
+
+  $packer->encode_file($path);
+
+Single call the encodes the data from a file located and C<$path>. Calls
+C<encode> internally. 
+
+Returns the encoded data.
+
+
+
+=head2 Streaming Encoding
+
+To encoding a data a chunk at a time, first encode the header, then 0 or more data, then the footer:
+
+  $packer->encode_header;       # Must be first
+  $packer->encode_data($data);  # 0 or more times
+  $packer->encode_footer;       # Must be last
+
+
+=head3 encode_header
+
+  $packer->encode_header;
+
+Serializes the header information required. The actual header created depends
+on the C<embedded> flag of the C<$packer> object. The Output of this sub must
+before any data chunk encoded.
+
+
+=head3 encode_data
+
+  $packer->encode_data;
+
+Encodes the provided data and returns it. Note no filtering of the C<$data> is
+performed.  It must be done manaully before hand.
+
+Returns the encoded data.
+
+
+=head3 encode_footer
+
+  $packer->encode_footer;
+
+Serializes the end of the encoded file. The output of this sub must be after
+all data chunks to be encoded.
+
+
+=head2 Container Management and Inspection
+
+The container contains multiple files.
+
+=head3 next_set_name
+
+
+=head3 next_file_name
+
+=head3 html_root
+
+=head3 current_set
+
+=head3 current_file
+
+=head3 set_prefix
+
+=head3 flush
 
 

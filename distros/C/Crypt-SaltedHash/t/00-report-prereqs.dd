@@ -1,0 +1,46 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Dist::Zilla::Plugin::UsefulReadme' => 'v0.4.3',
+                                      'Pod::Simple::Text' => '3.23',
+                                      'Test::CleanNamespaces' => '0.15',
+                                      'Test::DistManifest' => '0',
+                                      'Test::EOF' => '0',
+                                      'Test::Fixme' => '0',
+                                      'Test::MinimumVersion' => '0',
+                                      'Test::More' => '0.94',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Crypt::SysRandom' => '0',
+                                      'Digest' => '0',
+                                      'MIME::Base64' => '0',
+                                      'POSIX' => '0',
+                                      'perl' => 'v5.6.0',
+                                      'strict' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'File::Spec' => '0',
+                                   'Module::Metadata' => '0',
+                                   'Test::Fatal' => '0',
+                                   'Test::More' => '0',
+                                   'warnings' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

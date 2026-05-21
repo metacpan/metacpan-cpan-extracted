@@ -424,7 +424,8 @@ sub refine_dbi_column_info
     {
       # MySQL uses strange "all zeros" default values for timestamp fields.
       # We'll just ignore them, since MySQL will use them internally no
-      # matter what we do.
+      # matter what we do. (But see the explicit_defaults_for_timestamp
+      # setting discussed below for some caveats.)
       $col_info->{'COLUMN_DEF'} = undef;
     }
     elsif($col_info->{'COLUMN_DEF'} eq 'CURRENT_TIMESTAMP')
@@ -434,7 +435,16 @@ sub refine_dbi_column_info
       #$col_info->{'COLUMN_DEF'} = 'now';
 
       # Actually, let the database handle this.
-      $col_info->{'COLUMN_DEF'} = undef;
+      #
+      # Note: The new(ish) explicit_defaults_for_timestamp setting means we
+      # can't just set the default to undef and allow a NULL to be passed to
+      # MySQL which it will convert to a "current timestamp" value. We have to
+      # set a default explicitly to a value that will be passed as a literal to
+      # the server. See the relevant docs:
+      #
+      # https://dev.mysql.com/doc/refman/8.4/en/server-system-variables.html#sysvar_explicit_defaults_for_timestamp
+
+      $col_info->{'COLUMN_DEF'} = 'NOW()';
     }
   }
 

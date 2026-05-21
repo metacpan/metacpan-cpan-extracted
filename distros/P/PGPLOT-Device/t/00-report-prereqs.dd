@@ -61,7 +61,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'List::Util' => '1.33',
+                                      'List::Util' => '1.45',
                                       'PDL::Graphics::PGPLOT::Window' => '0',
                                       'PGPLOT' => '0',
                                       'Text::Abbrev' => '0',

@@ -2,7 +2,7 @@
 #define CHANDRA_SOCKET_TOKEN_H
 
 /*
- * chandra_socket_token.h — Token generation and rotation helpers
+ * chandra_socket_token.h - Token generation and rotation helpers
  *
  * Provides C-level token generation (same as Hub's inline code)
  * and helpers for rotation timing checks.

@@ -50,6 +50,12 @@ WriteMakefile(Alien::Base::Wrapper->new('Alien::libwebsockets')->mm_args2(ev_arg
 
     META_MERGE => {
         'meta-spec' => { version => 2 },
+        provides => {
+            'EV::Websockets' => {
+                file    => 'lib/EV/Websockets.pm',
+                version => MM->parse_version('lib/EV/Websockets.pm'),
+            },
+        },
         resources => {
             repository => {
                 type => 'git',

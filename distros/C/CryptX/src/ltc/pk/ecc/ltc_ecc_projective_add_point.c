@@ -36,6 +36,24 @@ int ltc_ecc_projective_add_point(const ecc_point *P, const ecc_point *Q, ecc_poi
       return err;
    }
 
+   /* treat internal Z == 0 states as infinity (for elliptic-curve addition: infinity = identity element) */
+   if (P->z != NULL && ltc_mp_iszero(P->z)) {
+      if (Q->z != NULL && ltc_mp_iszero(Q->z)) {
+         /* inf + inf = inf */
+         err = ltc_ecc_set_point_xyz(1, 1, 0, R);
+      }
+      else {
+         /* inf + Q = Q */
+         err = ltc_ecc_copy_point(Q, R);
+      }
+      goto done;
+   }
+   if (Q->z != NULL && ltc_mp_iszero(Q->z)) {
+      /* P + inf = P */
+      err = ltc_ecc_copy_point(P, R);
+      goto done;
+   }
+
    if ((err = ltc_ecc_is_point_at_infinity(P, modulus, &inf)) != CRYPT_OK) return err;
    if (inf) {
       /* P is point at infinity >> Result = Q */
@@ -52,6 +70,7 @@ int ltc_ecc_projective_add_point(const ecc_point *P, const ecc_point *Q, ecc_poi
 
    if ((ltc_mp_cmp(P->x, Q->x) == LTC_MP_EQ) && (ltc_mp_cmp(P->z, Q->z) == LTC_MP_EQ)) {
       if (ltc_mp_cmp(P->y, Q->y) == LTC_MP_EQ) {
+dbl_point:
          /* here P = Q >> Result = 2 * P (use doubling) */
          ltc_mp_deinit_multi(t1, t2, x, y, z, LTC_NULL);
          return ltc_ecc_projective_dbl_point(P, R, ma, modulus, mp);
@@ -96,6 +115,13 @@ int ltc_ecc_projective_add_point(const ecc_point *P, const ecc_point *Q, ecc_poi
    /* T1 = Y' * T1 */
    if ((err = ltc_mp_mul(Q->y, t1, t1)) != CRYPT_OK)                               { goto done; }
    if ((err = ltc_mp_montgomery_reduce(t1, modulus, mp)) != CRYPT_OK)              { goto done; }
+
+   /* Same-affine dispatch: A==B means P,Q share affine x; dispatch to dbl or O before the formulas */
+   if (ltc_mp_cmp(x, t2) == LTC_MP_EQ) {
+      if (ltc_mp_cmp(y, t1) == LTC_MP_EQ) goto dbl_point;
+      err = ltc_ecc_set_point_xyz(1, 1, 0, R);
+      goto done;
+   }
 
    /* Y = Y - T1 */
    if ((err = ltc_mp_sub(y, t1, y)) != CRYPT_OK)                                   { goto done; }
@@ -196,4 +222,3 @@ done:
 }
 
 #endif
-

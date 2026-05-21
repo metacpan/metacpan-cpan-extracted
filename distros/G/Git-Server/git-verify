@@ -71,7 +71,7 @@ use warnings;
 use Cwd qw(abs_path);
 use FindBin qw($RealBin);
 
-our $VERSION = "0.042";
+our $VERSION = "0.045";
 
 if (@ARGV and local $_ = $ARGV[0] || die "Bad arg\n" and !/^--/) {
     s{^ssh://(|[^/:]+\@)\[([a-z0-9\-\.\:]+)\]:(\d+)(?:$|/)}{}i ||
@@ -392,13 +392,14 @@ else {
 if (!@repo_dirs and opendir my $fh, $ENV{HOME}) {
     my @nodes = readdir $fh;
     closedir $fh;
-    foreach my $node (@nodes) {
+    foreach my $node (sort @nodes) {
         push @repo_dirs, "$ENV{HOME}/$node" if -f "$ENV{HOME}/$node/config" && -d "$ENV{HOME}/$node/refs" && -d "$ENV{HOME}/$node/objects" or -f "$ENV{HOME}/$node/.git/config";
     }
 }
 my @repo_info;
 if (@repo_dirs) {
     my %seen;
+    (my $cfg = $0) =~ s{[^/]+$}{hooks/configs};
     foreach my $repo (@repo_dirs) {
         $repo =~ s{/+$}{}; # Remove trailing slashes.
         next if $repo =~ /\.workingdir$/;
@@ -421,7 +422,7 @@ if (@repo_dirs) {
         (my $nice = $gitdir) =~ s{(?:/|\.git)+$}{};
         $nice =~ s{^\Q$ENV{HOME}\E/}{} if $ENV{REMOTE_USER}; # Hide $HOME if REMOTE
         next if $seen{$nice}++;
-        my $conf = run_output_include_err "git","-C",$gitdir,"config","--list","--local";
+        my $conf = run_output_include_err $cfg,"-C",$gitdir,"--local";
         my $info = { nice => $nice, dir => $gitdir, config => $conf };
         my $include = $ENV{REMOTE_USER} ? 0 : 1;
         foreach my $setting (qw[acl.writers acl.readers acl.deploy core.bare proxy.url]) {

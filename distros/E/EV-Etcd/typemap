@@ -1,5 +1,6 @@
 TYPEMAP
-int64_t	T_IV
+int64_t		T_I64
+uint64_t	T_U64
 EV::Etcd	T_PTROBJ
 EV::Etcd::Watch	T_PTROBJ
 EV::Etcd::Keepalive	T_PTROBJ
@@ -13,6 +14,10 @@ T_PTROBJ
     } else {
         croak(\"$var is not of type ${ntype}\");
     }
+T_I64
+    $var = SvI64($arg);
+T_U64
+    $var = SvU64($arg);
 
 OUTPUT
 T_PTROBJ

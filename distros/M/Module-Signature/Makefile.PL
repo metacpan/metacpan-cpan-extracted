@@ -243,7 +243,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "File::Temp" => 0
   },
-  "VERSION" => "0.95",
+  "VERSION" => "0.96",
   "test" => {
     "TESTS" => "t/*.t"
   }

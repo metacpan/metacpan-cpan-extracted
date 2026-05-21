@@ -13,10 +13,10 @@
 package Module::Generic::Iterator;
 BEGIN
 {
-    use v5.12.0;
+    use v5.16.0;
     use common::sense;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'Module::Generic' );
     use parent qw( Module::Generic );
     use Config;
     use Scalar::Util ();
@@ -24,7 +24,6 @@ BEGIN
     our( $VERSION ) = 'v1.2.4';
 };
 
-use v5.12.0;
 use strict;
 require Module::Generic::Array;
 

@@ -5,12 +5,13 @@
 #include <XSUB.h>
 
 #include <argon2.h>
+const char* argon2_implementation();
 
 static size_t S_parse_size(pTHX_ SV* value, int type) {
 	STRLEN len;
 	const char* string = SvPVbyte(value, len);
 	char* end = NULL;
-	int base = strtoul(string, &end, 0);
+	unsigned long base = strtoul(string, &end, 0);
 	if (end == string)
 		Perl_croak(aTHX_ "Couldn't compute %s tag: memory cost doesn't contain anything numeric", argon2_type2string(type, 0));
 	switch(*end) {
@@ -18,7 +19,7 @@ static size_t S_parse_size(pTHX_ SV* value, int type) {
 			if (base > 1024)
 				return base / 1024;
 			else
-				Perl_croak(aTHX_ "Couldn't compute %s tag: Memory size much be at least a kilobyte", argon2_type2string(type, 0));
+				Perl_croak(aTHX_ "Couldn't compute %s tag: Memory size must be at least a kilobyte", argon2_type2string(type, 0));
 		case 'k':
 			return base;
 		case 'M':
@@ -132,7 +133,9 @@ bool argon2d_verify(SV* encoded, SV* password)
 	CODE:
 	encoded_raw = SvPVbyte(encoded, encoded_len);
 	if (ix == 4) {
-		const char* second_dollar = memchr(encoded_raw + 1, '$', encoded_len - 1);
+		const char* second_dollar = encoded_len ? memchr(encoded_raw + 1, '$', encoded_len - 1) : NULL;
+		if (!second_dollar)
+			Perl_croak(aTHX_ "Could not detect argon2 type: missing '$' separator");
 		ix = find_argon2_type(encoded_raw + 1, second_dollar - encoded_raw - 1);
 	}
 	password_raw = SvPVbyte(password, password_len);
@@ -149,3 +152,5 @@ bool argon2d_verify(SV* encoded, SV* password)
 	}
 	OUTPUT:
 	RETVAL
+
+const char* argon2_implementation()

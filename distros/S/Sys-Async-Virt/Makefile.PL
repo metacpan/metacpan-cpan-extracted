@@ -1,3 +1,4 @@
+use ExtUtils::MakeMaker 7.78;
 use ExtUtils::MakeMaker::CPANfile;
 
 
@@ -19,7 +20,6 @@ WriteMakefile(
         },
     },
     NAME              => 'Sys::Async::Virt',
-    VERSION           => 'v0.2.3',
-    # VERSION_FROM      => 'lib/Sys/Async/Virt.pm', EU::MM doesn't support 'class' statements with version numbers
+    VERSION_FROM      => 'lib/Sys/Async/Virt.pm', # EU::MM support 'class' statements with version numbers as of 7.78
 );
 

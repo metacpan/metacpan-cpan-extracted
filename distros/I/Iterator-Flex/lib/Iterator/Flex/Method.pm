@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 # Package::Variant based modules generate constructor functions
 # dynamically when those modules are imported.  However, loading the
@@ -75,7 +75,7 @@ Iterator::Flex::Method - Compartmentalize Iterator::Flex::Method::Maker
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =for Pod::Coverage make_variant_package_name
   make_variant

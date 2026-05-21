@@ -2,7 +2,7 @@ NAME
     HTTP::Tiny - A small, simple, correct HTTP/1.1 client
 
 VERSION
-    version 0.092
+    version 0.094
 
 SYNOPSIS
         use HTTP::Tiny;
@@ -619,7 +619,7 @@ CONTRIBUTORS
     *   Xavier Guimard <yadd@debian.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2025 by Christian Hansen.
+    This software is copyright (c) 2026 by Christian Hansen.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

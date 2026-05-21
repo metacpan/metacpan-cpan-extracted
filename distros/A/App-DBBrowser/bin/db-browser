@@ -2,7 +2,7 @@
 use warnings;
 use strict;
 use 5.016;
-our $VERSION = '2.440';
+our $VERSION = '2.441';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -46,7 +46,7 @@ C<db-browser> - Browse SQL databases and their tables interactively.
 
 =head1 VERSION
 
-Version 2.440
+Version 2.441
 
 =head1 BACKWARD INCOMPATIBLE CHANGES
 
@@ -74,8 +74,8 @@ How plugin and database configuration data is saved has changed.
 
     db-browser database, ...
 
-When the C<db-browser> is called with the argument C<-h|--help>, it displays a menu. The menu entry I<Help> shows this
-documentation - see L</OPTIONS>.
+When the C<db-browser> is called with C<-h> or C<--help>, it displays a L<menu|/db-browser -h> that allows users to
+configure options and obtain information.
 
 If C<db-browser> is called without arguments, the user can choose from the databases offered by the database plugin.
 
@@ -693,27 +693,35 @@ Change the parse settings and reparse the data with the new settings.
 
 =back
 
-=head1 GLOABL SETTINGS
+=head1 db-browser -h
 
-=head2 Select plugins
+Configure options and obtain information:
+
+=head3 Plugins
 
 Choose the required database plugins.
 
-=head2 Gloabl settings
+=head3 Options
 
-=head3 Menu Memory
+L<See below|/Options>.
 
-If enabled, saves the menu position while entering a submenu.
+=head3 Other
 
-=head3 Mouse Mode
+- Menu Memory: If enabled, saves the menu position while entering a submenu.
 
-Set the I<Mouse mode> (see L<Term::Choose/mouse>).
+- Mouse Mode: Set the I<Mouse mode> (see L<Term::Choose/mouse>).
 
-=head1 OPTIONS
+=head3 App info
 
-The options menu is accessed with C<db-browser -h>.
+Displays the version and path of the running C<db-browser>, along with the application directory path.
 
-Select the database plugin and then configure the following options.
+=head3 Help
+
+Display this documentation.
+
+=head1 Options
+
+The I<Options> menu is accessed with C<db-browser -h>.
 
 =head2 Connect data
 
@@ -1528,14 +1536,6 @@ case-insensitive search
 case-sensitive search
 
 =back
-
-=head2 Help
-
-Display this documentation.
-
-=head2 Path
-
-Displays the version and path of the running C<db-browser>, along with the application directory path.
 
 =head1 CONFIGURATION FILES
 

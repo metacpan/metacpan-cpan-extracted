@@ -1,6 +1,30 @@
 BATsh Bang Cheat Sheet [VI] Tieng Viet
 =======================================
 
+----------------------------------------------------------------------
+TOM TAT
+  BATsh la mot trinh thong dich shell song ngu chay cu phap cmd.exe
+  va bash/sh trong cung mot tep lenh, tu dong chuyen che do tung dong.
+  Khong can shell ngoai -- thuan Perl.
+
+VI DU HON HOP
+  :: Phan CMD (token dau la chu hoa)
+  @ECHO OFF
+  SET LANG=BATsh
+
+  # Phan SH (token dau chua chu thuong)
+  greet() { echo "Xin chao $1 (che do bash)"; }
+  greet $LANG
+  result=$(echo $LANG | perl -e 'while(<STDIN>){chomp;print uc}')
+  echo "Chu hoa: $result"
+
+  :: Tro lai CMD (doc ket qua SH)
+  ECHO Tro lai CMD: %result%
+
+  # Chay: perl lib/BATsh.pm script.batsh
+----------------------------------------------------------------------
+
+
 BATsh la mot shell song ngu chay ca cu phap cmd.exe va bash/sh
 trong cung mot script. Token dau tien cua moi dong xac dinh che do.
 
@@ -94,3 +118,21 @@ trong cung mot script. Token dau tien cua moi dong xac dinh che do.
   Khong phu thuoc CPAN.
 
 Xem them: https://metacpan.org/dist/BATsh
+
+11. Duong ong CMD va cac bien the tham so
+-------------------------------------------
+  cmd1 | cmd2              # Duong ong qua file tam thoi (Pure Perl)
+  SET /P VAR=Nhac:         # Doc mot dong tu STDIN vao VAR
+  %~dp0                    # O dia+thu muc cua %0 (dung nhieu nhat)
+  %~n1, %~x1, %~nx1       # Ten file, phan mo rong, ca hai
+
+12. Ham SH va mo rong bien
+----------------------------
+  f() { echo $1; }         # Dinh nghia ham
+  ${var%.*}  ${var%%.*}    # Xoa hau to (ngan nhat/dai nhat)
+  ${var#*.}  ${var##*.}    # Xoa tien to (ngan nhat/dai nhat)
+  ${var/a/b} ${var//a/b}   # Thay the (dau tien/tat ca)
+  ${var^^} ${var,,}        # Chu hoa/chu thuong
+  cmd > f  cmd >> f  2>&1  # Chuyen huong
+  cmd1 && cmd2             # Noi AND
+  cmd1 || cmd2             # Noi OR

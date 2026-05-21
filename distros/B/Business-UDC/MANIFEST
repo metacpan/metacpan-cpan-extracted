@@ -28,9 +28,10 @@ t/Business-UDC-Tokenizer/03-tokenize.t
 t/Business-UDC/01-use.t
 t/Business-UDC/02-version.t
 t/Business-UDC/03-new.t
-t/Business-UDC/04-error.t
-t/Business-UDC/05-is_valid.t
-t/Business-UDC/06-source.t
+t/Business-UDC/04-ast.t
+t/Business-UDC/05-error.t
+t/Business-UDC/06-is_valid.t
+t/Business-UDC/07-source.t
 UDC.pm
 UDC/Grammar.pm
 UDC/Parser.pm

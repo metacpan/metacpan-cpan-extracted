@@ -1,5 +1,5 @@
 # This file is for use with text-mapper.
-# https://alexschroeder.ch/cgit/text-mapper/about/
+# https://campaignwiki.org/text-mapper
 
 # To the extent possible under law, the authors have waived all
 # copyright and related or neighboring rights to this work.
@@ -29,7 +29,7 @@ size-9 xml <circle r="20"/>
 size-A xml <circle r="21"/>
 
 # bases
-consulate xml <text font-size="20pt" dy="50px" dx="-45px" font-family="Calibri, Arial, Optima, Helvetica, sans-serif" text-anchor="middle">■</text>
+consulate xml <text font-size="20pt" dy="7px" dx="-35px" font-family="Calibri, Arial, Optima, Helvetica, sans-serif" text-anchor="middle">■</text>
 tas xml <text font-size="20pt" dy="20px" dx="-70px" font-family="Calibri, Arial, Optima, Helvetica, sans-serif" text-anchor="middle">☼</text>
 pirate xml <text font-size="20pt" dy="20px" dx="70px" font-family="Calibri, Arial, Optima, Helvetica, sans-serif" text-anchor="middle">☠</text>
 research xml <text font-size="20pt" dy="-10px" dx="70px" font-family="Calibri, Arial, Optima, Helvetica, sans-serif" text-anchor="middle">π</text>

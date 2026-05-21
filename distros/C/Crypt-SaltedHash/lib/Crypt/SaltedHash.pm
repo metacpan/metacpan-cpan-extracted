@@ -1,12 +1,14 @@
 package Crypt::SaltedHash;
 
+use v5.6.0;
 use strict;
-use MIME::Base64 ();
+
+use Crypt::SysRandom ();
 use Digest       ();
+use MIME::Base64 ();
+use POSIX ();
 
-use vars qw($VERSION);
-
-$VERSION = '0.09';
+our $VERSION = '0.11';
 
 =encoding latin1
 
@@ -26,12 +28,20 @@ with salted hashes.
 	my $valid = Crypt::SaltedHash->validate($salted, 'secret');
 
 
+=head1 STATUS
+
+This module is deprecated.
+
+This module has not had significant updates since 2006.
+There are newer modules that support more secure algorithms and hashing options,
+and are extensible, such as L<Crypt::Passphrase>.
+
 =head1 DESCRIPTION
 
 The C<Crypt::SaltedHash> module provides an object oriented interface to
 create salted (or seeded) hashes of clear text data. The original
 formalization of this concept comes from RFC-3112 and is extended by the use
-of different digital agorithms.
+of different digital algorithms.
 
 =head1 ABSTRACT
 
@@ -111,7 +121,7 @@ In pseudocode we would perform the extraction and verification operations as suc
 
     Strip the hash identifier from the Digest
     Base64Decode(Digest, 20)
-    Split Digest into 2 byte arrays, one for bytes 0 – 20(pwhash), one for bytes 21 – 32 (salt)
+    Split Digest into 2 byte arrays, one for bytes 0 ï¿½ 20(pwhash), one for bytes 21 ï¿½ 32 (salt)
     Get the target string and salt as separate binary object
     Concatenate the 2 binary values
     SHA hash the concatenation into targetPasswordHash
@@ -119,9 +129,9 @@ In pseudocode we would perform the extraction and verification operations as suc
     Return corresponding Boolean value
 
 Our job is to split the original digest up into 2 distinct byte arrays, one of the left 20 (0 - 20 including the null terminator) bytes and
-the other for the rest of the data. The left 0 – 20 bytes will represent the salted  binary value we will use for a byte-by-byte data
+the other for the rest of the data. The left 0 ï¿½ 20 bytes will represent the salted  binary value we will use for a byte-by-byte data
 match against the new clear text presented for verification. The string presented for verification will have to be salted as well. The rest
-of the bytes (21 – 32) represent the random salt which when decoded will show the exact hex characters that make up the once randomly
+of the bytes (21 ï¿½ 32) represent the random salt which when decoded will show the exact hex characters that make up the once randomly
 generated seed.
 
 We are now ready to verify some data. Let's start with the 4 hashes presented earlier. We will run them through our code to extract the
@@ -169,7 +179,7 @@ be used by default.
 =item *
 
 I<salt>: You can specify your on salt. You can either specify it as a sequence
-of charactres or as a hex encoded string of the form "HEX{...}". If the argument is missing,
+of characters or as a hex encoded string of the form "HEX{...}". If the argument is missing,
 a random seed is provided for you (recommended).
 
 =item *
@@ -306,7 +316,7 @@ sub validate {
     my $gen_hasheddata = $obj->generate;
     my $gen_hash       = &__get_pass_hash($gen_hasheddata);
 
-    return $gen_hash eq $hash;
+    return _secure_compare( $gen_hash, $hash );
 }
 
 =item B<obj()>
@@ -382,18 +392,9 @@ sub __get_pass_hash {
 
 sub __generate_hex_salt {
 
-    my @keychars = (
-        "0", "1", "2", "3", "4", "5", "6", "7",
-        "8", "9", "a", "b", "c", "d", "e", "f"
-    );
     my $length = shift || 8;
 
-    my $salt = '';
-    my $max  = scalar @keychars;
-    for my $i ( 0 .. $length - 1 ) {
-        my $skip = $i == 0 ? 1 : 0;    # don't let the first be 0
-        $salt .= $keychars[ $skip + int( rand( $max - $skip ) ) ];
-    }
+    my $salt = substr( unpack( "h*", Crypt::SysRandom::random_bytes( POSIX::ceil( $length / 2 ) ) ), 0, $length );
 
     return "HEX{$salt}";
 }
@@ -408,13 +409,23 @@ sub __extract_salt {
     return $binsalt;
 }
 
+sub _secure_compare {
+    my ($left, $right) = @_;
+    my $res = length $left != length $right;
+    $right = $left if $res;
+    $res |= ord(substr $left, $_, 1) ^ ord(substr $right, $_, 1) for 0 .. length($left) - 1;
+    return $res == 0;
+}
+
 =head1 SEE ALSO
 
 L<Digest>, L<MIME::Base64>
 
 =head1 AUTHOR
 
-Sascha Kiefer, L<esskar@cpan.org>
+Sascha Kiefer, <esskar@cpan.org>
+
+The current maintainer is Robert Rothenberg <perl@rhizomnic.com>
 
 =head1 ACKNOWLEDGMENTS
 
@@ -423,7 +434,7 @@ hashes demystified - A Primer (L<http://www.securitydocs.com/library/3439>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010 Sascha Kiefer
+Copyright (C) 2005-2006, 2010, 2013, 2026 Sascha Kiefer
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

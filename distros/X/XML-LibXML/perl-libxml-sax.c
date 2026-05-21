@@ -20,6 +20,7 @@ extern "C" {
 #include "ppport.h"
 
 #include <stdlib.h>
+#include <stdint.h>
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 #include <libxml/parserInternals.h>
@@ -65,7 +66,7 @@ typedef PmmSAXVector* PmmSAXVectorPtr;
 struct CBufferChunk {
 	struct CBufferChunk *next;
 	xmlChar *data;
-	int len;
+	size_t len;
 };
 
 struct CBuffer {
@@ -153,14 +154,26 @@ int PSaxCharactersFlush(void *, struct CBuffer *);
 
 struct CBufferChunk * CBufferChunkNew(void) {
 	struct CBufferChunk *newchunk = xmlMalloc(sizeof(struct CBufferChunk));
+	dTHX;
+
+	if (newchunk == NULL) {
+		croak("Out of memory in SAX character buffering");
+	}
+
 	memset(newchunk, 0, sizeof(struct CBufferChunk));
 	return newchunk;
 }
 
 struct CBuffer * CBufferNew(void) {
 	struct CBuffer *new = xmlMalloc(sizeof(struct CBuffer));
-	struct CBufferChunk *newchunk = CBufferChunkNew();
+	struct CBufferChunk *newchunk;
+	dTHX;
 
+	if (new == NULL) {
+		croak("Out of memory in SAX character buffering");
+	}
+
+	newchunk = CBufferChunkNew();
 	memset(new, 0, sizeof(struct CBuffer));
 
 	new->head = newchunk;
@@ -224,19 +237,27 @@ void CBufferFree(struct CBuffer *buffer) {
 	return;
 }
 
-int CBufferLength(struct CBuffer *buffer) {
-	int length = 0;
+size_t CBufferLength(struct CBuffer *buffer) {
+	size_t length = 0;
 	struct CBufferChunk *cur;
 
 	for(cur = buffer->head; cur; cur = cur->next) {
+		if (length > SIZE_MAX - cur->len) {
+			croak("XML::LibXML: SAX character buffer overflow");
+		}
 		length += cur->len;
 	}
 
 	return length;
 }
 
-void CBufferAppend(struct CBuffer *buffer, const xmlChar *newstring, int len) {
+void CBufferAppend(struct CBuffer *buffer, const xmlChar *newstring, size_t len) {
 	xmlChar *copy = xmlMalloc(len);
+	dTHX;
+
+	if (copy == NULL) {
+		croak("Out of memory in SAX character buffering");
+	}
 
 	memcpy(copy, newstring, len);
 
@@ -247,10 +268,10 @@ void CBufferAppend(struct CBuffer *buffer, const xmlChar *newstring, int len) {
 }
 
 xmlChar * CBufferCharacters(struct CBuffer *buffer) {
-	int length = CBufferLength(buffer);
+	size_t length = CBufferLength(buffer);
 	xmlChar *new = xmlMalloc(length + 1);
 	xmlChar *p = new;
-	int copied = 0;
+	size_t copied = 0;
 	struct CBufferChunk *cur;
 
     /* We need this because stderr on some perls requires
@@ -260,6 +281,10 @@ xmlChar * CBufferCharacters(struct CBuffer *buffer) {
      *
      * */
 	dTHX;
+
+	if (new == NULL) {
+		croak("Out of memory in SAX character buffering");
+	}
 
 	if (buffer->head->data == NULL) {
 		return NULL;
@@ -1175,18 +1200,28 @@ int PSaxCharactersFlush (void *ctx, struct CBuffer *buffer) {
     xmlParserCtxtPtr ctxt = (xmlParserCtxtPtr)ctx;
     PmmSAXVectorPtr sax = (PmmSAXVectorPtr)ctxt->_private;
     xmlChar *ch;
+    size_t buflen;
     int len;
+    int ret;
 
     if (buffer->head->data == NULL) {
         return 1;
     }
 
     ch = CBufferCharacters(sax->charbuf);
-    len = CBufferLength(sax->charbuf);
+    buflen = CBufferLength(sax->charbuf);
+    if (buflen > (size_t)INT_MAX) {
+        xmlFree(ch);
+        CBufferPurge(buffer);
+        croak("XML::LibXML: SAX character data exceeds maximum length");
+    }
+    len = (int)buflen;
 
     CBufferPurge(buffer);
 
-    return PSaxCharactersDispatch(ctx, ch, len);
+    ret = PSaxCharactersDispatch(ctx, ch, len);
+    xmlFree(ch);
+    return ret;
 }
 
 int PSaxCharacters (void *ctx, const xmlChar * ch, int len) {
@@ -1536,7 +1571,7 @@ PmmSaxError(void * ctx, const char * msg, ...)
     SV * svMessage;
 
 #if LIBXML_VERSION > 20600
-    xmlErrorPtr last_err = xmlCtxtGetLastError( ctxt );
+    const xmlError *last_err = xmlCtxtGetLastError( ctxt );
 #endif
     dTHX;
     dSP;

@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README.md
+lib/Class/JSON_Object.pm
+script/boilerplate.pl
+t/00_load.t
+t/10_syn1.t
+t/11_syn2.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

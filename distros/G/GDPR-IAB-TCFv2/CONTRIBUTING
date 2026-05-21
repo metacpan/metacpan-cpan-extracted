@@ -1,0 +1,466 @@
+# To read this file, run:
+#    perldoc ./CONTRIBUTING
+
+=encoding utf8
+
+=head1 CONTRIBUTING
+
+How to contribute to C<GDPR-IAB-TCFv2>?
+
+=head1 DESCRIPTION
+
+Patches are welcome!
+
+They must be built against the
+C<L<devel|https://github.com/peczenyj/GDPR-IAB-TCFv2/tree/devel>> branch,
+then submitted as pull requests at GitHub.
+
+The documentation is written using the
+L<POD|http://perldoc.perl.org/perlpod.html> format. Use the C<perldoc> tool
+to render it in a terminal:
+
+    perldoc ./CONTRIBUTING
+
+=head1 PROJECT STATUS
+
+As of 2026-05-09 (the v0.400 release), C<GDPR-IAB-TCFv2> is in
+B<maintenance mode>. Bug fixes, security fixes, CPAN-tester
+regressions, and IAB-spec updates remain in scope. Larger feature work
+-- roadmap Phases 7-9, the distribution items (DockerHub automation,
+Debian package), and the sister-distribution ideas -- is now tracked
+as B<help-wanted> issues on GitHub.
+
+If you are looking for a place to contribute, the
+L<help-wanted issues|https://github.com/peczenyj/GDPR-IAB-TCFv2/issues?q=is%3Aopen+label%3Ahelp-wanted>
+are the curated entry point. F<TODO> at the repository root has
+the full ecosystem and roadmap context, including suggested API
+sketches and test scopes for each item.
+
+=head1 PATCHING, STEP BY STEP
+
+=over 4
+
+=item 1. Get the source
+
+    git clone --origin upstream git://github.com/peczenyj/GDPR-IAB-TCFv2.git
+    cd GDPR-IAB-TCFv2
+    git checkout devel
+
+=item 2. Install build dependencies
+
+Not required for doc patches.
+
+    curl -L https://cpanmin.us | perl - --installdeps --with-develop .
+
+=item 3. Make your fix/feature
+
+    git checkout -b <my-patch> devel
+
+    # edit files and add modification
+
+    # Run the testsuite
+    prove -v
+
+    git commit -s -m '<<some nice message>>'
+
+=item 4. Setup a fork
+
+=item 4.1. L<Fork the project on GitHub|https://github.com/peczenyj/GDPR-IAB-TCFv2/>
+
+=item 4.2. Link your local repo to your fork (just once)
+
+(You are using C<GDPR-IAB-TCFv2> isn't it?)
+
+    git remote add github <github-user>.github.com:<github-user>/GDPR-IAB-TCFv2.git
+
+=item 5. Submit your work
+
+=item 5.1 Push!
+
+    git push github <my-patch>
+
+=item 5.2 Submit a pull request on GitHub
+
+=item 6. Loop
+
+Redo from step 3.
+
+=back
+
+=head1 RELEASING A NEW VERSION
+
+This project follows the L<Git Flow|https://nvie.com/posts/a-successful-git-branching-model/>
+branching model: B<feat/*> and B<fix/*> branches merge into B<devel>;
+B<release/*> branches cut from B<devel> and merge into both B<main> and B<devel>;
+B<hotfix/*> branches cut from B<main> and merge into both. Tags live on B<main>.
+
+The recommended path uses the C<git-flow> CLI (C<git-flow-avh>) to drive the
+ceremony. Plain C<git> works too — both variants are shown side-by-side at
+each step so you can pick one.
+
+The release pipeline itself is fully automated by
+F<.github/workflows/release.yml>: pushing any C<v*> tag triggers a build, a
+PAUSE upload, and a GitHub Release with the tarball attached. You only need
+to drive the local prep and the merge/tag.
+
+=head2 Prerequisites (one-time)
+
+=over 4
+
+=item 1. Install release tooling
+
+    # POD → Markdown converter (regenerates README.md)
+    cpanm Pod::Markdown
+    # or: apt install libpod-markdown-perl
+
+    # Conventional-Commits changelog generator
+    cargo install git-cliff
+    # or: brew install git-cliff
+
+    # git-flow CLI (optional but recommended)
+    apt install git-flow
+    # or: brew install git-flow-avh
+
+=item 2. Initialize git-flow once (skip if you prefer plain git)
+
+    git flow init -d
+
+When prompted, accept the project's existing layout:
+
+=over 4
+
+=item *
+
+production branch = C<main>
+
+=item *
+
+next-release branch = C<devel>
+
+=item *
+
+feature prefix = C<feat/>
+
+=item *
+
+release prefix = C<release/>
+
+=item *
+
+hotfix prefix = C<hotfix/>
+
+=back
+
+The C<-d> flag uses defaults where they match; you'll only be prompted for
+the values that differ.
+
+=item 3. Configure CPAN credentials (repo admin, one-time)
+
+In GitHub, go to B<Settings → Secrets and variables → Actions> and add:
+
+=over 4
+
+=item *
+
+C<PAUSE_USER> — your PAUSE username
+
+=item *
+
+C<PAUSE_PASSWORD> — your PAUSE password
+
+=back
+
+If these secrets are missing, the GitHub Release step still runs but the
+PAUSE upload step is skipped.
+
+=back
+
+=head2 Versioning convention
+
+C<$VERSION> uses the 3-digit C<0.XYZ> form. Bump the last two digits
+in steps of 10 for normal releases (e.g. C<0.350 → 0.360>) and by 1 for
+pure bug-fix follow-ups (e.g. C<0.350 → 0.351>). The git tag prepends
+C<v> (e.g. C<v0.360>); the C<$VERSION> string in the F<.pm> does not.
+
+=head2 Bumping the version
+
+Use the F<tools/bump-version> helper rather than hand-editing the
+fifteen C<our $VERSION = "..."> declarations under F<lib/>. Pass the
+new version as the only argument:
+
+    tools/bump-version 0.402
+
+The script:
+
+=over 4
+
+=item *
+
+Reads the current dist version from F<lib/GDPR/IAB/TCFv2.pm> and
+refuses to run if the new version is not strictly greater (the same
+sanity check PAUSE itself enforces against version regressions).
+
+=item *
+
+Rewrites C<our $VERSION = "..."> in every F<lib/**/*.pm> file in
+place.
+
+=item *
+
+Refuses to run if any F<.pm> under F<lib/> is missing the
+C<$VERSION> declaration entirely. That signals either a new module
+that was added without seeding C<$VERSION>, or a drift caused by
+hand-editing. Investigate and reconcile before bumping.
+
+=back
+
+The script does B<not> touch F<CHANGELOG.md>, run C<git cliff>,
+amend git, or push. Those remain manual steps in the
+L</Step-by-step release> flow below.
+
+After running the bumper, run C<prove -lr xt> to confirm
+F<xt/version.t> stays green.
+
+=head2 Step-by-step release
+
+=over 4
+
+=item 1. Sync C<devel> and confirm what's queued
+
+    git checkout devel
+    git pull --ff-only
+    git log --oneline $(git describe --tags --abbrev=0)..HEAD
+
+The log shows everything that will land in the new release. If something
+that should be in this release is missing, merge its PR before continuing.
+
+=item 2. Open a release branch
+
+B<git-flow:>
+
+    git flow release start 0.360
+
+B<vanilla git:>
+
+    git checkout -b release/0.360 devel
+
+=item 3. Bump the version in both files
+
+    tools/bump-version 0.360         # rewrites $VERSION across lib/**.pm
+
+    $EDITOR CITATION.cff
+    # Edit:
+    #   version: "0.360"
+    #   date-released: "YYYY-MM-DD"     # the actual tag/release date
+
+See L</Bumping the version> above for what the helper does and the
+sanity checks it enforces. F<Makefile.PL> reads C<$VERSION> from the
+C<.pm> via C<VERSION_FROM>; F<CITATION.cff> is the only other file
+that has to be hand-bumped, and both its C<version> and
+C<date-released> fields must be updated together.
+
+=item 4. Regenerate the changelog
+
+    git cliff --tag v0.360 -o CHANGELOG.md
+
+C<cliff.toml> is preconfigured for Conventional Commits and groups by
+C<feat:> / C<fix:> / C<docs:> / C<perf:> / C<refactor:> / C<Other>;
+C<style:> / C<test:> / C<chore:> are skipped.
+
+B<Sanity-check the output> — git-cliff slurps full commit message bodies,
+so stray lines like C<# Conflicts:> from merge commits can leak into the
+changelog. Strip them by hand if present.
+
+=item 5. Regenerate the README
+
+    pod2markdown lib/GDPR/IAB/TCFv2.pm > README.md
+
+Only the main module's POD ships in C<README.md>; submodule POD is
+served via MetaCPAN.
+
+=item 6. Build and verify locally
+
+    perl Makefile.PL
+    make
+    make test           # runs t/
+    prove -lr xt        # runs perlcritic + perltidy
+    make manifest       # updates MANIFEST if test files were added
+    make dist           # produces GDPR-IAB-TCFv2-0.360.tar.gz
+
+Open the tarball and confirm only intended files ship (no F<.bak>,
+no F<docs/>, no F<AGENTS.md>, no F<MYMETA.*>). C<MANIFEST.SKIP> already
+excludes those, but a quick eyeball is cheap insurance.
+
+=item 7. Commit the release prep
+
+    git add lib/GDPR/IAB/TCFv2.pm CITATION.cff CHANGELOG.md README.md
+    # Also `git add MANIFEST` if `make manifest` changed it
+    git commit -m "chore: prepare for v0.360 release"
+
+One commit. B<Do not tag yet> — the tag is created in step 8.
+
+=item 8. Finish the release
+
+B<git-flow> (recommended — automates the merges and tag):
+
+    git flow release finish 0.360
+    # Prompts for the tag message; use something like:
+    # "Release v0.360 — <one-line theme>"
+
+    git push origin main
+    git push origin devel
+    git push origin v0.360       # ← triggers release.yml
+
+C<git flow release finish> merges C<release/0.360> into B<main>, tags it
+as C<v0.360>, merges back into B<devel> (so the version bump and changelog
+land there too), and deletes the local C<release/0.360> branch.
+
+I<You must push all three refs.> The release workflow only fires on the
+tag push, but the tag must be reachable from C<main> for the workflow to
+check out the right tree.
+
+B<vanilla git> (more steps, gives reviewable PRs):
+
+    # 1. PR release/0.360 → devel
+    git push -u origin release/0.360
+    gh pr create --base devel \
+        --title "chore: prepare for v0.360 release" \
+        --body "Version bump, README regen, changelog refresh."
+    # Review and merge on GitHub.
+
+    # 2. PR devel → main
+    gh pr create --base main --head devel \
+        --title "Release v0.360"
+    # Review and merge on GitHub.
+
+    # 3. Tag main and push
+    git checkout main
+    git pull --ff-only
+    git tag -a v0.360 -m "Release v0.360 — <one-line summary>"
+    git push origin v0.360       # ← triggers release.yml
+
+=item 9. Watch the release workflow
+
+    gh run watch -R peczenyj/GDPR-IAB-TCFv2
+    # or
+    gh run list -R peczenyj/GDPR-IAB-TCFv2 --workflow release.yml --limit 1
+
+The workflow does:
+
+=over 4
+
+=item 1.
+
+C<perl Makefile.PL && make manifest && make dist> — produces the tarball
+
+=item 2.
+
+C<cpan-upload -u $PAUSE_USER -p $PAUSE_PASSWORD ...> — uploads to PAUSE
+(skipped silently if C<PAUSE_USER> is empty)
+
+=item 3.
+
+C<softprops/action-gh-release@v2> — creates the GitHub Release with the
+tarball attached and auto-generated notes
+
+=back
+
+If the PAUSE step fails, the GitHub Release still gets created. You can
+then re-upload manually via L<https://pause.perl.org/> without re-running
+the workflow.
+
+=item 10. Post-release sanity
+
+    # Confirm the GitHub Release
+    gh release view v0.360 -R peczenyj/GDPR-IAB-TCFv2
+
+    # Wait ~30 min for PAUSE → MetaCPAN propagation, then:
+    curl -s https://fastapi.metacpan.org/v1/release/GDPR-IAB-TCFv2 \
+        | jq .version
+    # Should report "0.360"
+
+The docker image (C<peczenyj/gdpr-iab-tcfv2:0.360> and C<:latest>) is published
+by F<.github/workflows/docker.yml> on the same C<v*> tag push.
+
+=back
+
+=head2 Pre-release review (and why we don't use draft GitHub Releases)
+
+GitHub supports B<draft> releases that you can review before publishing.
+For most projects this is a useful pre-publish review gate. For B<this>
+project it is not, and the doc deliberately omits the pattern. Two reasons:
+
+=over 4
+
+=item 1.
+
+B<PAUSE upload is irreversible.> Once F<release.yml> uploads
+F<GDPR-IAB-TCFv2-0.360.tar.gz> to PAUSE, the version number is burned
+forever — you can delete the file but can't re-upload a new tarball
+under the same version. So a "review the GitHub Release before it goes
+out" gate doesn't actually protect the thing that matters
+(the CPAN-distributed artifact); it only protects the rendered
+release-notes page.
+
+=item 2.
+
+B<The current F<release.yml> hard-codes C<draft: false>.> If you created
+a draft release with C<gh release create --draft> and then pushed the
+tag, the workflow's C<softprops/action-gh-release@v2> step would update
+the release and flip C<draft> to false — closing the review window the
+moment the workflow finishes (~3 minutes). Conversely, if you let
+C<gh release create --target main --draft> create the tag via the REST
+API instead of pushing it via C<git>, F<release.yml> would B<not> fire
+at all (push events from API-created tags don't trigger workflows), and
+your tarball would never reach PAUSE.
+
+=back
+
+The review gate that actually buys you something is the B<release-prep
+PR> in the vanilla-git path of step 8: opening C<release/0.360 → devel>
+and C<devel → main> as PRs lets a reviewer (or future-you) catch a typo
+in the changelog, an off-by-one in C<$VERSION>, or a stale README
+B<before> the merge that triggers the unstoppable downstream automation.
+Use that path when you want pre-release review.
+
+If you ever do want the draft-release pattern to work properly, it
+needs a workflow tweak: add C<release: { types: [published] }> to
+F<release.yml>'s C<on:> triggers, and remove C<draft: false> from the
+softprops step. The doc does not include that variant today.
+
+=head2 Hotfix releases
+
+For an urgent fix that has to skip C<devel> and ship straight from C<main>:
+
+B<git-flow:>
+
+    git flow hotfix start 0.351
+    # Make the fix, bump $VERSION, regenerate CHANGELOG and README, commit
+    git flow hotfix finish 0.351
+    git push origin main devel v0.351
+
+B<vanilla git:>
+
+    git checkout -b hotfix/0.351 main
+    # Make the fix, bump $VERSION (both lib/GDPR/IAB/TCFv2.pm AND CITATION.cff),
+    # regenerate CHANGELOG and README
+    git add lib/GDPR/IAB/TCFv2.pm CITATION.cff CHANGELOG.md README.md
+    git commit -m "fix: <description> (v0.351)"
+    git push -u origin hotfix/0.351
+
+    # PR hotfix/0.351 → main
+    gh pr create --base main --title "Hotfix v0.351 — <description>"
+    # Merge.
+
+    # Merge main back into devel so the fix doesn't get lost
+    git checkout devel
+    git pull --ff-only
+    git merge --no-ff main -m "Merge hotfix v0.351 back into devel"
+    git push
+
+    # Tag main and push
+    git checkout main && git pull --ff-only
+    git tag -a v0.351 -m "Hotfix v0.351 — <description>"
+    git push origin v0.351
+
+=cut

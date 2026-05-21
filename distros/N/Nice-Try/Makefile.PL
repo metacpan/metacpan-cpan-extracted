@@ -31,7 +31,7 @@ my %WriteMakefileArgs = (
         'PPI::XS'       => '0.910',
     	'Scalar::Util'	=> '1.50',
     	'Symbol'	    => '1.07',
-    	'Want'          => '0.29',
+    	'Wanted'        => 'v0.1.0',
     },
     TEST_REQUIRES =>
     {

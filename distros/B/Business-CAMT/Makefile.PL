@@ -9,7 +9,7 @@ use 5.020;
 use ExtUtils::MakeMaker;
 
 # Use command 'oodist' to produce your whole software release.
-my $version  = '0.15';
+my $version  = '0.16';
 my $git      = "https://github.com/markov2/perl5-Business-CAMT";
 my $publish  = "../public_html/business-camt";
 my $homepage = "http://perl.overmeer.net/CPAN/";

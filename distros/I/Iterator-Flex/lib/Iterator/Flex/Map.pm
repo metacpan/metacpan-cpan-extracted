@@ -7,9 +7,9 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
-use Iterator::Flex::Utils qw( STATE THROW EXHAUSTION :IterAttrs :IterStates );
+use Iterator::Flex::Utils qw( STATE THROW EXHAUSTION :IterAttrs :IterStates throw_failure );
 use Iterator::Flex::Factory 'to_iterator';
 use Ref::Util;
 use parent 'Iterator::Flex::Base';
@@ -76,7 +76,7 @@ sub construct ( $class, $state ) {
         ( +NEXT ) => sub {
             return $self->signal_exhaustion if $iterator_state == IterState_EXHAUSTED;
 
-            unless ( @values ) {
+            while ( !@values ) {
                 eval {
                     my $value = $src->();
                     local $_ = $value;
@@ -130,13 +130,13 @@ Iterator::Flex::Map - Map Iterator Class
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 METHODS
 
 =head2 new
 
-  $iterator = Ierator::Flex::Map->new( $coderef, $iterable, ?\%pars );
+  $iterator = Iterator::Flex::Map->new( $coderef, $iterable, ?\%pars );
 
 Returns an iterator equivalent to running C<map> on C<$iterable> with
 the specified code.  If C<$coderef> returns a list, the elements will

@@ -397,6 +397,12 @@ It now also provides more automated tests and a documentation of the protocol.
 
 This version is fully backwards compatible to Version 34, minus the bugs i hopefully managed to squash.
 
+=head2 VERSION 36
+
+This version squashes some long standing bugs regarding connection management. Very busy servers should now run more stable.
+
+This version is fully backwards compatible to Version 34, minus the bugs i hopefully managed to squash.
+
 =head1 AUTHOR
 
 Rene Schickbauer, E<lt>cavac@cpan.orgE<gt>

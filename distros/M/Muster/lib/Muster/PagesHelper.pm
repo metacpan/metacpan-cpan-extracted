@@ -1,5 +1,5 @@
 package Muster::PagesHelper;
-$Muster::PagesHelper::VERSION = '0.93';
+$Muster::PagesHelper::VERSION = '0.9501';
 #ABSTRACT: Muster::PagesHelper - helping with pages
 =head1 NAME
 
@@ -7,7 +7,7 @@ Muster::PagesHelper - helping with pages
 
 =head1 VERSION
 
-version 0.93
+version 0.9501
 
 =head1 SYNOPSIS
 

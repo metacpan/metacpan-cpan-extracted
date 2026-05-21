@@ -7,3 +7,4 @@ node
 openssl@3
 perl
 pkgconf
+tmux

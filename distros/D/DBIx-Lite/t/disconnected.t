@@ -3,7 +3,7 @@
  use strict;
  use warnings;
 
- use Test::More tests => 6;
+ use Test::More tests => 7;
  use DBIx::Lite;
 
  my $dbix = DBIx::Lite->new(driver_name => 'Pg');
@@ -15,6 +15,11 @@
         diag $@;
     }
     is $sql, 'SELECT me.id FROM authors AS me', 'simple select';
+}
+
+{
+    my ($sql) = $dbix->table('authors')->select_sql;
+    is $sql, 'SELECT me.* FROM authors AS me', 'basic';
 }
 
 {

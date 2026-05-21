@@ -16,7 +16,7 @@ use Readonly;
 
 use Markdown::Render;
 
-our $VERSION = '2.0.3';
+our $VERSION = '2.0.4';
 
 use parent qw(CLI::Simple);
 

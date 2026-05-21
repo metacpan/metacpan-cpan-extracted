@@ -1,5 +1,5 @@
 package Muster::LeafFile::pdf;
-$Muster::LeafFile::pdf::VERSION = '0.93';
+$Muster::LeafFile::pdf::VERSION = '0.9501';
 #ABSTRACT: Muster::LeafFile::pdf - a PDF file in a Muster content tree
 =head1 NAME
 
@@ -7,7 +7,7 @@ Muster::LeafFile::pdf - a PDF file in a Muster content tree
 
 =head1 VERSION
 
-version 0.93
+version 0.9501
 
 =head1 DESCRIPTION
 

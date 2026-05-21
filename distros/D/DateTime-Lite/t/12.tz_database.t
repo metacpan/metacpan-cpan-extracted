@@ -9,19 +9,25 @@
 ## aliases, and historical offsets. They are designed to catch regressions
 ## introduced by a bad rebuild of the database.
 ##----------------------------------------------------------------------------
+BEGIN
+{
+    use strict;
+    use warnings;
+    use lib './lib';
+    use Test::More;
+    use Time::Local qw( timegm );
+    local $@;
+    eval{ require DBI; require DBD::SQLite };
+    plan( skip_all => 'DBI and DBD::SQLite are required for this test' ) if( $@ );
+};
+
 use strict;
 use warnings;
-use lib './lib';
-use Test::More;
-use Time::Local qw( timegm );
 
 BEGIN
 {
-    eval { require DBI; require DBD::SQLite };
-    plan( skip_all => 'DBI and DBD::SQLite are required for this test' ) if( $@ );
-}
-
-use_ok( 'DateTime::Lite::TimeZone' ) or BAIL_OUT( 'Cannot load DateTime::Lite::TimeZone' );
+    use_ok( 'DateTime::Lite::TimeZone' ) or BAIL_OUT( 'Cannot load DateTime::Lite::TimeZone' );
+};
 
 # NOTE: Locate and open the database
 my $db_file = DateTime::Lite::TimeZone->datafile;

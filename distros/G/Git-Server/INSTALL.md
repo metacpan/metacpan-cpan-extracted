@@ -29,13 +29,25 @@ you can install it on the system:
 ```
 [admin@gitsrvhost ~]$ git clone https://github.com/hookbot/git-server
 [admin@gitsrvhost ~]$ cd git-server
+[admin@gitsrvhost git-server]$ rm Git-Server*.tar.gz
 [admin@gitsrvhost git-server]$ perl Makefile.PL
 [admin@gitsrvhost git-server]$ make dist
-[admin@gitsrvhost git-server]$ rpm -ta Git-Server*.tar.gz
+[admin@gitsrvhost git-server]$ rpmbuild -ta Git-Server*.tar.gz
 [admin@gitsrvhost git-server]$ ls -1tr ~/rpmbuild/RPMS/noarch/perl-Git-Server-*rpm | tail -1 | xargs sudo yum install
 [admin@gitsrvhost git-server]$ cd
 [admin@gitsrvhost ~]$ git-verify
 [admin@gitsrvhost ~]$
+```
+
+Or if you don't have a RHEL-compatible server for RPM,
+use the normal legacy installation method:
+
+```
+[admin@gitsrvhost git-server]$ sudo perl -MCPAN -e 'install Git::Server'
+[admin@gitsrvhost git-server]$ # -- OR -- #
+[admin@gitsrvhost git-server]$ perl Makefile.PL
+[admin@gitsrvhost git-server]$ make && sudo make install
+[admin@gitsrvhost git-server]$
 ```
 
 3. Using one of the following methods, setup a repository

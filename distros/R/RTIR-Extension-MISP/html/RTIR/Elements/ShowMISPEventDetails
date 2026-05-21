@@ -1,0 +1,45 @@
+<&| /Widgets/TitleBox,
+    title      => loc("MISP Event Details"),
+    title_href => $event_link,
+    class      => 'ticket-info-misp',
+&>
+
+% if ( $error ) {
+<p class="text-danger"><% loc("Unable to load MISP event details.") %></p>
+% } else {
+% for my $field ( sort keys %info ) {
+  <& /Elements/LabeledValue, Label => loc($field), Value => $info{$field} // '' &>
+% }
+% }
+</&>
+
+<%INIT>
+my $event_id = $Ticket->FirstCustomFieldValue('MISP Event ID');
+return unless $event_id;
+
+my $event_link = RTIR::Extension::MISP::GetMISPBaseURL() . "/events/view/$event_id";
+my $misp_json  = RTIR::Extension::MISP::FetchEventDetails($event_id);
+
+my ( %info, $error );
+unless ( $misp_json && ref $misp_json eq 'HASH' ) {
+    $error = 1;
+}
+else {
+    my %threat_map   = ( 1 => 'High', 2 => 'Medium', 3 => 'Low', 4 => 'Undefined' );
+    my %analysis_map = ( 0 => 'Initial', 1 => 'Ongoing', 2 => 'Completed' );
+
+    $info{'Threat Level'} = $threat_map{ $misp_json->{Event}{threat_level_id} };
+    $info{'Analysis'}     = $analysis_map{ $misp_json->{Event}{analysis} };
+    $info{'Creator org'}  = $misp_json->{Event}{Orgc}{name};
+    $info{'Owner org'}    = $misp_json->{Event}{Org}{name};
+    $info{'Date'}         = $misp_json->{Event}{date};
+    $info{'Published'}    = $misp_json->{Event}{published} ? 'Yes' : 'No';
+
+    my $object_count = scalar @{ $misp_json->{Event}{Object} || [] };
+    $info{'Number of Attributes'} = "$misp_json->{Event}{attribute_count} ($object_count Objects)";
+}
+</%INIT>
+
+<%ARGS>
+$Ticket
+</%ARGS>

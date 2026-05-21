@@ -4,6 +4,10 @@ author:
   - 'Current Maintainer: Geoff Franks <gfranks@cpan.org>'
   - 'Original Author: Simon Flack <simonflk _AT_ cpan.org>'
 build_requires:
+  Class::Load: '0'
+  Moose: '0'
+  Mouse: '0'
+  Test::Exception: '0'
   Test::More: '0.88'
   Test::Warnings: '0'
 configure_requires:
@@ -18,7 +22,7 @@ name: Test-MockModule
 provides:
   Test::MockModule:
     file: lib/Test/MockModule.pm
-    version: v0.180.0
+    version: v0.185.0
 requires:
   Carp: '0'
   SUPER: '1.20'
@@ -29,5 +33,5 @@ resources:
   homepage: https://github.com/geofffranks/test-mockmodule
   license: http://dev.perl.org/licenses/
   repository: git://github.com/geofffranks/test-mockmodule.git
-version: v0.180.0
+version: v0.185.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

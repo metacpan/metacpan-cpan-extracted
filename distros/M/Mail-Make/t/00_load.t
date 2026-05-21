@@ -7,29 +7,29 @@ BEGIN
 };
 
 # To build the list of modules:
-# find ./lib -type f -name "*.pm" -print | xargs perl -lE 'my @f=sort(@ARGV); for(@f) { s,./lib/,,; s,\.pm$,,; s,/,::,g; substr( $_, 0, 0, q{use ok( ''} ); $_ .= q{'' );}; say $_; }'
+# find ./lib -type f -name "*.pm" -print | xargs perl -lE 'my @f=sort(@ARGV); for(@f) { s,./lib/,,; s,\.pm$,,; s,/,::,g; substr( $_, 0, 0, q{use_ok( ''} ); $_ .= q{'' );}; say $_; }'
 BEGIN
 {
-    use ok( 'MM::Const' );
-    use ok( 'MM::Table' );
-    use ok( 'Mail::Make' );
-    use ok( 'Mail::Make::Body' );
-    use ok( 'Mail::Make::Body::File' );
-    use ok( 'Mail::Make::Body::InCore' );
-    use ok( 'Mail::Make::Entity' );
-    use ok( 'Mail::Make::Exception' );
-    use ok( 'Mail::Make::GPG' );
-    use ok( 'Mail::Make::Headers' );
-    use ok( 'Mail::Make::Headers::ContentDisposition' );
-    use ok( 'Mail::Make::Headers::ContentTransferEncoding' );
-    use ok( 'Mail::Make::Headers::ContentType' );
-    use ok( 'Mail::Make::Headers::Generic' );
-    use ok( 'Mail::Make::Headers::MessageID' );
-    use ok( 'Mail::Make::Headers::Subject' );
-    use ok( 'Mail::Make::SMIME' );
-    use ok( 'Mail::Make::Stream' );
-    use ok( 'Mail::Make::Stream::Base64' );
-    use ok( 'Mail::Make::Stream::QuotedPrint' );
+    use_ok( 'MM::Const' );
+    use_ok( 'MM::Table' );
+    use_ok( 'Mail::Make' );
+    use_ok( 'Mail::Make::Body' );
+    use_ok( 'Mail::Make::Body::File' );
+    use_ok( 'Mail::Make::Body::InCore' );
+    use_ok( 'Mail::Make::Entity' );
+    use_ok( 'Mail::Make::Exception' );
+    use_ok( 'Mail::Make::GPG' );
+    use_ok( 'Mail::Make::Headers' );
+    use_ok( 'Mail::Make::Headers::ContentDisposition' );
+    use_ok( 'Mail::Make::Headers::ContentTransferEncoding' );
+    use_ok( 'Mail::Make::Headers::ContentType' );
+    use_ok( 'Mail::Make::Headers::Generic' );
+    use_ok( 'Mail::Make::Headers::MessageID' );
+    use_ok( 'Mail::Make::Headers::Subject' );
+    use_ok( 'Mail::Make::SMIME' );
+    use_ok( 'Mail::Make::Stream' );
+    use_ok( 'Mail::Make::Stream::Base64' );
+    use_ok( 'Mail::Make::Stream::QuotedPrint' );
 };
 
 done_testing();

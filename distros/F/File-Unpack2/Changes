@@ -1,4 +1,7 @@
 
+1.1	kraih Tue Apr 28 17:00:00 CEST 2026
+  - Fixed a problem where temporary archives created during unpacking were not cleaned up.
+
 1.0	kraih Mon Dec 01 15:00:00 CEST 2023
   - Forked File::Unpack to start File::Unpack2.
 	- Applied all openSUSE patches.

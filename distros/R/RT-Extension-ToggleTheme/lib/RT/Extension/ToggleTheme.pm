@@ -3,22 +3,23 @@ use warnings;
 package RT::Extension::ToggleTheme;
 
 RT->AddJavaScript('themes.js');
-RT->AddJavaScript('fontawesome-icons.js');
 
-our $VERSION = '0.03';
+our $VERSION = '1.03';
 
 =head1 NAME
 
-RT-Extension-ToggleTheme - Toggle elevator light and dark theme.
+RT-Extension-ToggleTheme - Toggle light and dark theme.
 
 =head1 DESCRIPTION
 
-To save your eyes in the dark. The theme toggle button only displays for
-users who have the ModifySelf right.
+Adds a light/dark mode toggle button to the RT 6 navigation bar. Works with
+any Bootstrap 5 theme. The toggle button displays for users who have the
+ModifySelf right and appears in both the privileged and self-service
+interfaces.
 
 =head1 RT VERSION
 
-Works with RT 5
+Works with RT 6
 
 =head1 INSTALLATION
 
@@ -32,19 +33,15 @@ Works with RT 5
 
 May need root permissions
 
-=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt6/etc/RT_SiteConfig.pm>
 
 Add this line:
 
     Plugin('RT::Extension::ToggleTheme');
 
-=item Apply patch to RT5
-
-    patch -d /opt/r5 -p1 < patches/header-callback.patch
-
 =item Clear your mason cache
 
-    rm -rf /opt/rt5/var/mason_data/obj
+    rm -rf /opt/rt6/var/mason_data/obj
 
 =item Restart your webserver
 

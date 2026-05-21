@@ -2,20 +2,19 @@ package Geo::Leaflet;
 use strict;
 use warnings;
 use base qw{Package::New};
-use Geo::Leaflet::tileLayer;
-use Geo::Leaflet::marker;
-use Geo::Leaflet::circle;
-use Geo::Leaflet::polygon;
-use Geo::Leaflet::polyline;
-use Geo::Leaflet::rectangle;
-use Geo::Leaflet::icon;
+use Geo::Leaflet::TileLayer;
+use Geo::Leaflet::Marker;
+use Geo::Leaflet::Circle;
+use Geo::Leaflet::Polygon;
+use Geo::Leaflet::Polyline;
+use Geo::Leaflet::Rectangle;
+use Geo::Leaflet::Icon;
+use Geo::Leaflet::DivIcon;
 use JSON::XS qw{};
 use HTML::Tiny qw{};;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our $PACKAGE = __PACKAGE__;
-our @OBJECTS = ();
-our @ICONS   = ();
 
 =head1 NAME
 
@@ -175,7 +174,7 @@ sub title {
 
 =head2 tileLayer
 
-Creates and returns a tileLayer object which is added to the map.
+Creates and returns a TileLayer object which is added to the map.
 
   $map->tileLayer(
                   url     => 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -193,14 +192,16 @@ See: L<https://leafletjs.com/reference.html#tilelayer>
 
 sub tileLayer {
   my $self             = shift;
-  $self->{'tileLayer'} = Geo::Leaflet::tileLayer->new(@_, JSON=>$self->JSON) if @_;
-  $self->{'tileLayer'} = Geo::Leaflet::tileLayer->osm((), JSON=>$self->JSON) unless defined $self->{'tileLayer'};
+  $self->{'tileLayer'} = Geo::Leaflet::TileLayer->new(@_, JSON=>$self->JSON) if @_;
+  $self->{'tileLayer'} = Geo::Leaflet::TileLayer->osm((), JSON=>$self->JSON) unless defined $self->{'tileLayer'};
   return $self->{'tileLayer'};
 }
 
-=head1 ICON CONSTRUCTOR
+=head1 ICON CONSTRUCTORS
 
 =head2 icon
+
+Represents an icon to provide when creating a marker.
 
   my $icon = $map->icon(
                         name    => "my_icon", #must be a valid JavaScript variable name
@@ -221,8 +222,50 @@ See: L<https://leafletjs.com/reference.html#icon>
 
 sub icon {
   my $self = shift;
-  my $icon = Geo::Leaflet::icon->new(@_, JSON=>$self->JSON);
-  push @ICONS, $icon;
+  my $icon = Geo::Leaflet::Icon->new(@_, JSON=>$self->JSON);
+  $self->icon_objects($icon);
+  return $icon;
+}
+
+=head2 divIcon
+
+Represents a lightweight icon for markers that uses a simple `div` element instead of an image. 
+
+Font Awesome with defaults
+
+  my $icon = $map->divIcon(icon_name => "bicycle");
+
+Font Awesome with tweaks
+
+  my $icon = $map->divIcon(
+                           icon_name      => "bicycle",
+                           icon_font_size => 22,
+                           options => {
+                                       iconAnchor => [11,11],
+                                      },
+                          );
+
+Other CSS options
+
+  my $icon = $map->divIcon(
+                        options => {
+                                    html  => '<i class="fa fa-map-marker", style="font-size:48px"></i>',
+                                    iconAnchor => [13, 44],
+                                   }
+                       );
+
+
+See: https://leafletjs.com/reference.html#divicon
+
+=cut
+
+sub divIcon {
+  my $self     = shift;
+  my %param    = @_;
+  my $icon_set = $param{'icon_set'} || 'fa'; #fa is default
+  my $icon     = Geo::Leaflet::DivIcon->new(%param, JSON=>$self->JSON);
+  $self->icon_sets($icon_set);
+  $self->icon_objects($icon);
   return $icon;
 }
 
@@ -240,8 +283,8 @@ See: L<https://leafletjs.com/reference.html#marker>
 
 sub marker {
   my $self   = shift;
-  my $marker = Geo::Leaflet::marker->new(@_, JSON=>$self->JSON);
-  push @OBJECTS, $marker;
+  my $marker = Geo::Leaflet::Marker->new(@_, JSON=>$self->JSON);
+  $self->map_objects($marker);
   return $marker;
 }
 
@@ -258,8 +301,8 @@ See: L<https://leafletjs.com/reference.html#polyline>
 
 sub polyline {
   my $self     = shift;
-  my $polyline = Geo::Leaflet::polyline->new(@_, JSON=>$self->JSON);
-  push @OBJECTS, $polyline;
+  my $polyline = Geo::Leaflet::Polyline->new(@_, JSON=>$self->JSON);
+  $self->map_objects($polyline);
   return $polyline;
 }
 
@@ -276,8 +319,8 @@ See: L<https://leafletjs.com/reference.html#polygon>
 
 sub polygon {
   my $self    = shift;
-  my $polygon = Geo::Leaflet::polygon->new(@_, JSON=>$self->JSON);
-  push @OBJECTS, $polygon;
+  my $polygon = Geo::Leaflet::Polygon->new(@_, JSON=>$self->JSON);
+  $self->map_objects($polygon);
   return $polygon;
 }
 
@@ -297,8 +340,8 @@ See: L<https://leafletjs.com/reference.html#rectangle>
 
 sub rectangle {
   my $self      = shift;
-  my $rectangle = Geo::Leaflet::rectangle->new(@_, JSON=>$self->JSON);
-  push @OBJECTS, $rectangle;
+  my $rectangle = Geo::Leaflet::Rectangle->new(@_, JSON=>$self->JSON);
+  $self->map_objects($rectangle);
   return $rectangle;
 }
 
@@ -314,8 +357,8 @@ See: L<https://leafletjs.com/reference.html#circle>
 
 sub circle {
   my $self    = shift;
-  my $circle  = Geo::Leaflet::circle->new(@_, JSON=>$self->JSON);
-  push @OBJECTS, $circle;
+  my $circle  = Geo::Leaflet::Circle->new(@_, JSON=>$self->JSON);
+  $self->map_objects($circle);
   return $circle;
 }
 
@@ -328,10 +371,12 @@ sub circle {
 sub html {
   my $self = shift;
   my $html = $self->HTML;
-  return $html->html([
+  return join "",
+         '<!DOCTYPE html>',
+         $html->html([
            $html->head([
              $html->title($self->title),
-             $self->html_head_link,
+             $self->html_head_links,
              $self->html_head_script,
              $self->html_head_style,
            ]),
@@ -342,19 +387,32 @@ sub html {
          ]);
 }
 
-=head2 html_head_link
+=head2 html_head_links
 
 =cut
 
-sub html_head_link {
-  my $self = shift;
-  my $html = $self->HTML;
-  return $html->link({
+our %FONTS = (
+              fa => {href => 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'},
+             );
+
+sub html_head_links {
+  my $self  = shift;
+  my $html  = $self->HTML;
+  my @links = (
+               $html->link({
                       rel         => 'stylesheet',
                       href        => 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
                       integrity   => 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=',
                       crossorigin => '',
-                     });
+                     }),
+              );
+  foreach my $set (@{$self->icon_sets}) {
+    my $hash = $FONTS{$set} or die(sprintf('Error: font set "%s" is not registered in %%%s::FONTS', $set, $PACKAGE));
+    die(qq{Error: font set "$set" is not a hash reference}) unless ref($hash) eq 'HASH';
+    $hash->{'rel'} ||= 'stylesheet'; #sane default
+    push @links, $html->link($hash);
+  }
+  return @links;
 }
 
 =head2 html_head_script
@@ -432,18 +490,64 @@ sub html_body_script_contents {
                   $self->tileLayer->stringify,
                   $empty,
                  );
-  foreach my $icon (@ICONS) {
+  foreach my $icon (@{$self->icon_objects}) {
     my $name = $icon->name;
     push @commands, "const $name = " . $icon->stringify;
   }
   my $loop     = 0;
-  foreach my $object (@OBJECTS) {
+  foreach my $object (@{$self->map_objects}) {
     $loop++;
     push @commands, "const object$loop = " . $object->stringify;
   }
   push @commands, $empty;
 
   return join $empty, map {"    $_\n"} @commands;
+}
+
+=head1 DATA ACCESSORS
+
+=head2 map_objects
+
+Returns the array reference of map objects to be added to the map
+
+  $map->map_objects($icon);
+
+=cut
+
+sub map_objects {
+  my $self               = shift;
+  $self->{'map_objects'} = [] unless ref($self->{'map_objects'}) eq 'ARRAY';
+  push @{$self->{'map_objects'}}, @_ if @_;
+  return $self->{'map_objects'};
+
+}
+
+=head2 icon_objects
+
+Returns the array reference of icon objects to be added to the map
+
+  $map->icon_objects($icon);
+
+=cut
+
+sub icon_objects {
+  my $self                = shift;
+  $self->{'icon_objects'} = [] unless ref($self->{'icon_objects'}) eq 'ARRAY';
+  push @{$self->{'icon_objects'}}, @_ if @_;
+  return $self->{'icon_objects'};
+}
+
+=head2 icon_sets
+
+Returns the array reference of icon sets to be added to the map
+
+=cut
+
+sub icon_sets {
+  my $self             = shift;
+  $self->{'icon_sets'} = [] unless ref($self->{'icon_sets'}) eq 'ARRAY';
+  push @{$self->{'icon_sets'}}, @_ if @_;
+  return $self->{'icon_sets'};
 }
 
 =head1 OBJECT ACCESSORS
@@ -457,7 +561,7 @@ Returns an L<HTML:Tiny> object to generate HTML.
 sub HTML {
   my $self       = shift;
   $self->{'HTML'} = shift if @_;
-  $self->{'HTML'} = HTML::Tiny->new unless defined $self->{'HTML'};
+  $self->{'HTML'} = HTML::Tiny->new() unless defined $self->{'HTML'};
   return $self->{'HTML'};
 }
 

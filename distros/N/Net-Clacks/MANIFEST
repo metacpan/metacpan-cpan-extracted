@@ -1,8 +1,13 @@
+.claude/settings.local.json
 Changes
 devscripts/fixpragmas.pl
 devscripts/resetpod.pl
 devscripts/setcopyright.pl
 devscripts/setversion.pl
+documentation/clacks.html
+documentation/clacks.txt
+documentation/clacks.xml
+documentation/xml2pod.pl
 example/chat.pl
 example/chat_unixdomainsocket.pl
 example/chatbot.pl
@@ -21,6 +26,7 @@ lib/Net/Clacks.pm
 lib/Net/Clacks/ClacksCache.pm
 lib/Net/Clacks/Client.pm
 lib/Net/Clacks/PostgreSQL2Clacks.pm
+lib/Net/Clacks/Protocol.pod
 lib/Net/Clacks/Server.pm
 lib/Net/Clacks/UpgradeGuide.pod
 Makefile.PL
@@ -32,6 +38,8 @@ t/02-pod.t
 t/03-podcoverage.t
 t/04-perlcritic.t
 t/05-disconnect.t
+t/06-protocol.t
+t/07-interclacks.t
 t/perlcriticrc
 t/test_server.xml
 META.yml                                 Module YAML meta-data (added by MakeMaker)

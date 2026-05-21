@@ -1,5 +1,23 @@
 Revision history for Net-CIDR-Set
 
+0.20      2026-04-27 19:02:28+01:00 Europe/London
+  [Documentation]
+  - Mentioned CONTRIBUTING.md in SOURCE.
+
+  - Updated copyright year.
+
+  - Updated the current maintainer email.
+
+  [Tests]
+  - Added and improved author tests.
+
+  - Moved author tests into xt.
+
+  [Toolchain]
+  - Set up GitHub workflow for testing.
+
+  - Stopped using Module::Signature for signing modules.
+
 0.19      2025-08-05 13:11:19+01:00 Europe/London
   [Documentation]
   - Fixed typos in documentation RT#168697 (thanks Thomas Eckardt).
@@ -62,7 +80,7 @@ Revision history for Net-CIDR-Set
   - CVE-2025-40911: Disallow IPv4 addresses with a leading 0 in the quads, e.g. "010.0.0.1".
 
   [Documentation]
-  - Updated the current maintainer to Robert Rothenberg <rrwo@cpan.org>.
+  - Updated the current maintainer to Robert Rothenberg.
 
   - Reversed the order of the Changes file to most-recent first.
 

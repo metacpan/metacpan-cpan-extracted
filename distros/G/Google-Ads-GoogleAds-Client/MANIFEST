@@ -6138,6 +6138,7 @@ lib/Google/Ads/GoogleAds/V24/Common/NegativeKeywordListInfo.pm
 lib/Google/Ads/GoogleAds/V24/Common/OfflineUserAddressInfo.pm
 lib/Google/Ads/GoogleAds/V24/Common/Operand.pm
 lib/Google/Ads/GoogleAds/V24/Common/OperatingSystemVersionInfo.pm
+lib/Google/Ads/GoogleAds/V24/Common/OptimizeAssetsExperimentInfo.pm
 lib/Google/Ads/GoogleAds/V24/Common/PageFeedAsset.pm
 lib/Google/Ads/GoogleAds/V24/Common/ParentalStatusDimension.pm
 lib/Google/Ads/GoogleAds/V24/Common/ParentalStatusInfo.pm
@@ -6256,6 +6257,7 @@ lib/Google/Ads/GoogleAds/V24/Common/VerticalAdsItemGroupRuleInfo.pm
 lib/Google/Ads/GoogleAds/V24/Common/VerticalAdsItemGroupRuleListInfo.pm
 lib/Google/Ads/GoogleAds/V24/Common/VideoAdInfo.pm
 lib/Google/Ads/GoogleAds/V24/Common/VideoBumperInStreamAdInfo.pm
+lib/Google/Ads/GoogleAds/V24/Common/VideoExperimentInfo.pm
 lib/Google/Ads/GoogleAds/V24/Common/VideoLineupInfo.pm
 lib/Google/Ads/GoogleAds/V24/Common/VideoNonSkippableInStreamAdInfo.pm
 lib/Google/Ads/GoogleAds/V24/Common/VideoOutstreamAdInfo.pm
@@ -6444,6 +6446,7 @@ lib/Google/Ads/GoogleAds/V24/Enums/DistanceBucketEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/DsaPageFeedCriterionFieldEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/EducationPlaceholderFieldEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/EuPoliticalAdvertisingStatusEnum.pm
+lib/Google/Ads/GoogleAds/V24/Enums/ExperimentAssetDetailOperationEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/ExperimentMetricDirectionEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/ExperimentMetricEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/ExperimentStatusEnum.pm
@@ -6561,6 +6564,7 @@ lib/Google/Ads/GoogleAds/V24/Enums/MessagingRestrictionTypeEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/MimeTypeEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/MinuteOfHourEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/MobileAppVendorEnum.pm
+lib/Google/Ads/GoogleAds/V24/Enums/MobileDevicePlatformEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/MobileDeviceTypeEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/MonthOfYearEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/NegativeGeoTargetTypeEnum.pm
@@ -6574,6 +6578,7 @@ lib/Google/Ads/GoogleAds/V24/Enums/OfflineUserDataJobStatusEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/OfflineUserDataJobTypeEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/OperatingSystemVersionOperatorTypeEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/OptimizationGoalTypeEnum.pm
+lib/Google/Ads/GoogleAds/V24/Enums/OptimizeAssetsExperimentSubtypeEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/PageOnePromotedStrategyGoalEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/ParentalStatusTypeEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/PartnershipOpportunityEnum.pm
@@ -6694,6 +6699,7 @@ lib/Google/Ads/GoogleAds/V24/Enums/VideoAdFormatRestrictionEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/VideoAdSequenceInteractionTypeEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/VideoAdSequenceMinimumDurationEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/VideoEnhancementSourceEnum.pm
+lib/Google/Ads/GoogleAds/V24/Enums/VideoExperimentSubtypeEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/VideoThumbnailEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/WebpageConditionOperandEnum.pm
 lib/Google/Ads/GoogleAds/V24/Enums/WebpageConditionOperatorEnum.pm
@@ -6763,11 +6769,14 @@ lib/Google/Ads/GoogleAds/V24/Resources/AppTopCombinationView.pm
 lib/Google/Ads/GoogleAds/V24/Resources/Asset.pm
 lib/Google/Ads/GoogleAds/V24/Resources/AssetAutomationSetting.pm
 lib/Google/Ads/GoogleAds/V24/Resources/AssetCoverage.pm
+lib/Google/Ads/GoogleAds/V24/Resources/AssetDetail.pm
 lib/Google/Ads/GoogleAds/V24/Resources/AssetFieldTypePolicySummary.pm
 lib/Google/Ads/GoogleAds/V24/Resources/AssetFieldTypeView.pm
 lib/Google/Ads/GoogleAds/V24/Resources/AssetGroup.pm
 lib/Google/Ads/GoogleAds/V24/Resources/AssetGroupAsset.pm
 lib/Google/Ads/GoogleAds/V24/Resources/AssetGroupAssetCombinationData.pm
+lib/Google/Ads/GoogleAds/V24/Resources/AssetGroupAssetInfo.pm
+lib/Google/Ads/GoogleAds/V24/Resources/AssetGroupInfo.pm
 lib/Google/Ads/GoogleAds/V24/Resources/AssetGroupListingGroupFilter.pm
 lib/Google/Ads/GoogleAds/V24/Resources/AssetGroupProductGroupView.pm
 lib/Google/Ads/GoogleAds/V24/Resources/AssetGroupSignal.pm
@@ -6776,6 +6785,8 @@ lib/Google/Ads/GoogleAds/V24/Resources/AssetPolicySummary.pm
 lib/Google/Ads/GoogleAds/V24/Resources/AssetSet.pm
 lib/Google/Ads/GoogleAds/V24/Resources/AssetSetAsset.pm
 lib/Google/Ads/GoogleAds/V24/Resources/AssetSetTypeView.pm
+lib/Google/Ads/GoogleAds/V24/Resources/AssetTestingInfo.pm
+lib/Google/Ads/GoogleAds/V24/Resources/AssetVariationInfo.pm
 lib/Google/Ads/GoogleAds/V24/Resources/AttributionModelSettings.pm
 lib/Google/Ads/GoogleAds/V24/Resources/Audience.pm
 lib/Google/Ads/GoogleAds/V24/Resources/AudienceSetting.pm
@@ -6888,6 +6899,7 @@ lib/Google/Ads/GoogleAds/V24/Resources/Event.pm
 lib/Google/Ads/GoogleAds/V24/Resources/EventOccurrenceRange.pm
 lib/Google/Ads/GoogleAds/V24/Resources/ExpandedLandingPageView.pm
 lib/Google/Ads/GoogleAds/V24/Resources/Experiment.pm
+lib/Google/Ads/GoogleAds/V24/Resources/ExperimentalPerformanceMaxCampaignSettings.pm
 lib/Google/Ads/GoogleAds/V24/Resources/ExperimentArm.pm
 lib/Google/Ads/GoogleAds/V24/Resources/Fellowship.pm
 lib/Google/Ads/GoogleAds/V24/Resources/FinalUrlExpansionAssetView.pm
@@ -6997,6 +7009,7 @@ lib/Google/Ads/GoogleAds/V24/Resources/ParentalStatusView.pm
 lib/Google/Ads/GoogleAds/V24/Resources/PaymentsAccount.pm
 lib/Google/Ads/GoogleAds/V24/Resources/PaymentsAccountInfo.pm
 lib/Google/Ads/GoogleAds/V24/Resources/PendingAccountBudgetProposal.pm
+lib/Google/Ads/GoogleAds/V24/Resources/PerformanceMaxExperimentArmInfo.pm
 lib/Google/Ads/GoogleAds/V24/Resources/PerformanceMaxFinalUrlOptInRecommendation.pm
 lib/Google/Ads/GoogleAds/V24/Resources/PerformanceMaxOptInRecommendation.pm
 lib/Google/Ads/GoogleAds/V24/Resources/PerformanceMaxPlacementView.pm

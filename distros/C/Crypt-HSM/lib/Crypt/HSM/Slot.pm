@@ -1,5 +1,5 @@
 package Crypt::HSM::Slot;
-$Crypt::HSM::Slot::VERSION = '0.030';
+$Crypt::HSM::Slot::VERSION = '0.032';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Crypt::HSM::Slot - A PKCS11 slot
 
 =head1 VERSION
 
-version 0.030
+version 0.032
 
 =head1 SYNOPSIS
 
@@ -211,6 +211,14 @@ True if the SO PIN value is the default value set by token initialization or man
 =item * C<error-state>
 
 True if the token failed a FIPS 140-2 self-test and entered an error state.
+
+=item * C<seed-random-required>
+
+True if the token’s random number generator must be seeded or re-seeded using C<seed_random>.
+
+=item * C<async-session-supported>
+
+True if the token supports asynchronous sessions.
 
 =back
 

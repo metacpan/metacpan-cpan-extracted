@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Exporter ();
 
-our $VERSION = '1.500014';
+our $VERSION = '1.500015';
 $VERSION =~ tr/_//d;
 
 our @EXPORT_OK;
@@ -456,33 +456,37 @@ sub tail ($@) {
 }
 
 sub zip_longest {
+  return unless @_;
   map {
     my $idx = $_;
     [ map $_->[$idx], @_ ];
-  } ( 0 .. max(map $#$_, @_) || -1 )
+  } ( 0 .. max(map $#$_, @_) );
 }
 
 sub zip_shortest {
+  return unless @_;
   map {
     my $idx = $_;
     [ map $_->[$idx], @_ ];
-  } ( 0 .. min(map $#$_, @_) || -1 )
+  } ( 0 .. min(map $#$_, @_) );
 }
 
 *zip = \&zip_longest;
 
 sub mesh_longest {
+  return unless @_;
   map {
     my $idx = $_;
     map $_->[$idx], @_;
-  } ( 0 .. max(map $#$_, @_) || -1 )
+  } ( 0 .. max(map $#$_, @_) );
 }
 
 sub mesh_shortest {
+  return unless @_;
   map {
     my $idx = $_;
     map $_->[$idx], @_;
-  } ( 0 .. min(map $#$_, @_) || -1 )
+  } ( 0 .. min(map $#$_, @_) );
 }
 
 *mesh = \&mesh_longest;

@@ -23,10 +23,10 @@ no_index:
 provides:
   XML::Parser:
     file: Parser.pm
-    version: '2.58'
+    version: '2.59'
   XML::Parser::Expat:
     file: Expat/Expat.pm
-    version: '2.58'
+    version: '2.59'
   XML::Parser::Style::Debug:
     file: Parser/Style/Debug.pm
   XML::Parser::Style::Objects:
@@ -45,5 +45,5 @@ requires:
 resources:
   bugtracker: https://github.com/cpan-authors/XML-Parser/issues
   repository: https://github.com/cpan-authors/XML-Parser.git
-version: '2.58'
+version: '2.59'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

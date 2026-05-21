@@ -7,7 +7,7 @@ use 5.010;
 
 # ABSTRACT: Author tests to verify woven project files are up to date
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Moose;
 use Dist::Zilla::File::InMemory;
@@ -54,7 +54,7 @@ has _test_files => (
             );
 
             my $expected  = $engine->render_file( $plugin->file );
-            my $safe_name = lc $plugin->file;
+            my $safe_name = $plugin->file;
             $safe_name =~ s/[^[:upper:][:lower:][:digit:]_]/_/gmsx;
             $zilla->log_debug( [ 'safe_name: %s', $safe_name ] );
 
@@ -129,7 +129,7 @@ Dist::Zilla::Plugin::Test::WeaveFile - Author tests to verify woven project file
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

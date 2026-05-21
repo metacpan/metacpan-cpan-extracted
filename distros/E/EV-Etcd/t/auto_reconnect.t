@@ -36,6 +36,7 @@ my $test_key = "/test_auto_reconnect_$$";
 my $watch;
 my $events_received = 0;
 my $test_done = 0;
+my $watch_created = 0;
 
 # Test 1: Create watch with auto_reconnect (default)
 $watch = $client->watch($test_key, {
@@ -43,36 +44,47 @@ $watch = $client->watch($test_key, {
 }, sub {
     my ($resp, $err) = @_;
     return if $test_done;
-    
+
     if ($err) {
-        # Error structure should be a hashref
         ok(ref($err) eq 'HASH', 'error is a hashref');
         ok(exists $err->{code}, 'error has code');
         ok(exists $err->{status}, 'error has status');
         ok(exists $err->{message}, 'error has message');
         ok(exists $err->{retryable}, 'error has retryable flag');
-    } elsif ($resp->{events} && @{$resp->{events}}) {
-        $events_received++;
+    } else {
+        $watch_created ||= $resp->{created};
+        $events_received++ if $resp->{events} && @{$resp->{events}};
     }
 });
 
 ok($watch, 'watch created with auto_reconnect');
 
+# Wait for the watch's first server response (created=1) before firing the put,
+# otherwise on a slow/loaded runner the put can land before the watch is
+# registered and the event is never delivered.
+my $created_timeout = EV::timer(5, 0, sub { EV::break });
+my $created_check = EV::timer(0.05, 0.05, sub { EV::break if $watch_created });
+EV::run;
+undef $created_check;
+undef $created_timeout;
+
 # Test 2: Verify watch receives events
-my $put_done = 0;
 $client->put($test_key, "test_value_$$", sub {
     my ($resp, $err) = @_;
-    $put_done = 1;
     ok(!$err, 'put succeeded');
 });
 
-# Run event loop briefly
+# Wait for the put's event to fan out through the watch
 my $timer = EV::timer(2, 0, sub {
     $test_done = 1;
     EV::break;
 });
+my $event_check = EV::timer(0.05, 0.05, sub {
+    EV::break if $events_received >= 1;
+});
 
 EV::run;
+undef $event_check;
 
 ok($events_received >= 1, "watch received $events_received event(s)");
 

@@ -1,3 +1,27 @@
+commit 7506b2ea2d74eb0ea4af0579dcf2c6179a80c077
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun May 10 00:50:05 2026 +0930
+
+    VERSION increment: 0.004
+
+commit b1f2f3698bb088fda6fb562ccbc52b1e3b07c42a
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun May 10 00:49:56 2026 +0930
+
+    Unify module syntax and .sha generation with other Task::WebDyne module suites
+
+commit b080069786d4a4b52bfb2c98780cd2f0749b5e56
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun May 10 00:49:25 2026 +0930
+
+    Unify module syntax and .sha generation with other Task::WebDyne module suites
+
+commit 8c422777f0770be685066b80ddd469d5ec31b97a
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat May 9 23:35:04 2026 +0930
+
+    Fixed docs, simplified Makefile.PL
+
 commit e37bd4de74cfd5e37cbd23763cf51071d9f8c81a
 Author: Andrew Speer <andrew.speer@isolutions.com.au>
 Date:   Tue Jan 6 00:33:16 2026 +1030

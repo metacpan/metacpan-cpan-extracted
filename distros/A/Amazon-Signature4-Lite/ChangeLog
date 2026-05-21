@@ -1,0 +1,30 @@
+Thu Apr 30 16:44:05  Rob Lauer  rclauer@gmail.com
+
+	[1.0.0]:
+
+	* .gitignore: new
+	* .includes/git.mk: new
+	* .includes/help.mk: new
+	* .includes/perl.mk: new
+	* .includes/release-notes.mk: new
+	* .includes/update.mk: new
+	* .includes/upgrade.mk: new
+	* .includes/version.mk: new
+	* ChangeLog: new
+	* Makefile: new
+	* README.md: new
+	* VERSION: new
+	* buildspec.yml.tmpl: new
+	* buildspec.yml: new
+	* cpanfile: new
+	* lib/Amazon/Signature4/Lite.pm.in: new
+	* make-5MGG.log: new
+	* make-y6BD.err: new
+	* make.err: new
+	* make.log: new
+	* requires: new
+	* resources: new
+	* t/00-amazon-signature4-lite.t: new
+	* t/01-signature4-lite.t: new
+	* test-requires: new
+	* test.t.tmpl: new

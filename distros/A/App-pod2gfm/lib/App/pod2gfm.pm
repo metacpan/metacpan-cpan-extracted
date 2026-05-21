@@ -3,18 +3,17 @@ use v5.40.0;
 use strict;
 use warnings;
 
-use Object::Pad 0.800;
+use Object::Pad 0.825;
 
 package App::pod2gfm;  # For toolchain compatibility.
 class App::pod2gfm;
 
-use File::Basename     qw< basename >;
-use File::Spec         ();
-use Getopt::Long::More qw< GetOptionsFromArray optspec >;
+use File::Basename qw< basename >;
+use File::Spec     ();
 use Pod::Usage;
 use Pod::Markdown::Githubert 0.05;
 
-our $VERSION = 'v1.0.1';
+our $VERSION = 'v1.1.0';
 
 my $PROG = basename($0);
 
@@ -23,7 +22,7 @@ field %_opts    :reader;
 field %_gh_opts :reader = ( output_encoding => 'UTF-8' );  # Pod::Markdown::Githubert options
 field $_infile  :reader;
 field $_outfile :reader;
-field $_stdin_cnt = 0;
+field $_has_stdin = false;
 
 method init (@argv)
 {
@@ -34,10 +33,10 @@ method init (@argv)
 
 method run ()
 {
-    my $start = 1;  # Process STDIN.
+    my $start = true;  # Process STDIN.
 
     while ( $start || @_argv ) {
-        $start = 0 if $start;
+        $start = false     if $start;
         $self->_convert_md if $self->_set_handles == 0;
     }
 
@@ -58,28 +57,58 @@ method _process_opts ( $argv = undef )
         warn "$PROG: $msg\n";
     };
 
-    Getopt::Long::More::Configure(
-        qw<
-            default
-            gnu_getopt
-            no_ignore_case
-        >
-    );
+    # Bash completion
+    try {
+        require Getopt::Long::More;
+
+        Getopt::Long::More->VERSION('0.007');
+        Getopt::Long::More->import( qw< GetOptionsFromArray optspec > );
+
+        Getopt::Long::More::Configure(
+            qw<
+                default
+                gnu_getopt
+                no_ignore_case
+            >
+        );
+    }
+    catch ($e) {
+        # Use Getopt::Long as fallback.
+        require Getopt::Long;
+
+        Getopt::Long->import(
+            qw<
+                GetOptionsFromArray
+                :config
+                default
+                gnu_getopt
+                no_ignore_case
+            >
+        );
+    }
 
     GetOptionsFromArray(
         $argv,
-        'a|auto'             => \$_opts{auto},
-        'e|file-extension=s' => optspec(
+        'a|auto' => \$_opts{auto},
+
+        'e|file-extension=s' => defined &Getopt::Long::More::optspec
+        ? optspec(
             destination => \$_opts{file_ext},
             completion  => [ qw< markdown > ],
-        ),
+          )
+        : \$_opts{file_ext},
+
         'no-strip-ext'         => \$_opts{no_strip_ext},
         't|target-directory=s' => \$_opts{target_dir},
         'force'                => \$_opts{force},
-        'hl-language=s'        => optspec(
+
+        'hl-language=s' => defined &Getopt::Long::More::optspec
+        ? optspec(
             destination => \$_gh_opts{hl_language},
             completion  => [ qw< perl > ],
-        ),
+          )
+        : \$_gh_opts{hl_language},
+
         'man-url-prefix=s'     => \$_gh_opts{man_url_prefix},
         'perldoc-url-prefix=s' => \$_gh_opts{perldoc_url_prefix},
         'h|help'               => sub { pod2usage( -exitval => 0, -verbose => 0 ) },
@@ -118,9 +147,9 @@ method _get_infile ()
     my $in_fh;
     my $infile = shift @_argv;
 
-    if ( $_stdin_cnt == 0 && ( !defined $infile || $infile eq '-' ) ) {
+    if ( $_has_stdin eq false && ( !defined $infile || $infile eq '-' ) ) {
         $in_fh      = *STDIN;  # Read STDIN.
-        $_stdin_cnt = 1;       # Only one STDIN is allowed per process.
+        $_has_stdin = true;    # Only one STDIN is allowed per process.
     }
     else {
         open my $fh, '<', $infile

@@ -3,8 +3,7 @@
 #
 use strict;
 use warnings;
-use Test::More;
-use MyNote;
+use MyTest;
 use Config;
 use File::Temp;
 use Time::HiRes ();
@@ -12,7 +11,7 @@ use Time::HiRes ();
 use vars qw(@OPTS $tmpdir $fn0 $fn1);
 
 BEGIN {
-    $tmpdir = File::Temp->newdir(CLEANUP => 0);
+    $tmpdir = File::Temp->newdir('UUID-test-XXXXXXXX', TMPDIR => 1, CLEANUP => 0);
     $fn0 = File::Temp::tempnam($tmpdir, 'UUID.test.');
     $fn1 = File::Temp::tempnam($tmpdir, 'UUID.test.');
     @OPTS = ('uuid1', ':mac=random', ':persist='.$fn0);

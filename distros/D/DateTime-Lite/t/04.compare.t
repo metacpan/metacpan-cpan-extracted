@@ -2,12 +2,21 @@
 ##----------------------------------------------------------------------------
 ## Lightweight DateTime Alternative - t/04.compare.t
 ##----------------------------------------------------------------------------
+BEGIN
+{
+    use strict;
+    use warnings;
+    use lib './lib';
+    use Test::More;
+};
+
 use strict;
 use warnings;
-use lib './lib';
-use Test::More;
 
-use_ok( 'DateTime::Lite' ) or BAIL_OUT( 'Cannot load DateTime::Lite' );
+BEGIN
+{
+    use_ok( 'DateTime::Lite' ) or BAIL_OUT( 'Cannot load DateTime::Lite' );
+};
 
 my $dt1 = DateTime::Lite->new( year => 2025, month => 1, day => 1,  time_zone => 'UTC' );
 my $dt2 = DateTime::Lite->new( year => 2025, month => 6, day => 15, time_zone => 'UTC' );

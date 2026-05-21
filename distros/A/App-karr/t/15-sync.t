@@ -1,4 +1,4 @@
-# t/15-sync.t - Test sync helpers in Role::BoardAccess
+# t/15-sync.t - Test sync lifecycle in Role::SyncLifecycle
 use strict;
 use warnings;
 use Test::More;
@@ -6,20 +6,18 @@ use lib 't/lib';
 use TestGit qw( require_git_c );
 require_git_c();
 use Path::Tiny qw( path tempdir );
-use YAML::XS qw( DumpFile LoadFile Load );
+use YAML::XS qw( Dump Load );
 
-use_ok('App::karr::Git');
-use_ok('App::karr::Task');
-use_ok('App::karr::Role::BoardAccess');
+use App::karr::Git;
+use App::karr::Role::BoardAccess;
 
-# Build a tiny class that consumes BoardAccess with a fixed board_dir
+# Build a tiny class that consumes BoardAccess (which includes SyncLifecycle)
 {
-    package TestBoard;
+    package TestSyncBoard;
     use Moo;
     with 'App::karr::Role::BoardAccess';
     has dir => (is => 'ro', required => 1);
     has has_dir => (is => 'ro', default => sub { 1 });
-    sub _build_board_dir { path($_[0]->dir) }
 }
 
 sub _init_repo {
@@ -43,100 +41,42 @@ sub _init_remote_pair {
     return ($local, $remote);
 }
 
-sub _setup_board {
-    my ($tmpdir) = @_;
-    my $board_dir = $tmpdir->child('karr');
-    $board_dir->mkpath;
-    my $tasks_dir = $board_dir->child('tasks');
-    $tasks_dir->mkpath;
+plan tests => 4;
 
-    DumpFile($board_dir->child('config.yml')->stringify, {
-        name    => 'Test Board',
-        next_id => 3,
-        columns => [qw(backlog todo in-progress done)],
-    });
+subtest 'sync_before returns SyncGuard' => sub {
+    my $repo = _init_repo();
 
-    my $t1 = App::karr::Task->new(
-        id => 1, title => 'First task', status => 'todo',
-        priority => 'high', class => 'standard', body => 'Body one',
-    );
-    my $t2 = App::karr::Task->new(
-        id => 2, title => 'Second task', status => 'backlog',
-        priority => 'medium', class => 'standard', body => 'Body two',
-    );
-    $t1->save($tasks_dir);
-    $t2->save($tasks_dir);
+    my $board = TestSyncBoard->new(dir => $repo->stringify);
+    ok($board->can('sync_before'), 'sync_before method exists');
+    ok($board->can('sync_after'), 'sync_after method exists');
+    ok($board->can('append_log'), 'append_log method exists');
 
-    return ($board_dir, $tasks_dir);
-}
+    my $guard = $board->sync_before;
+    ok($guard->isa('App::karr::SyncGuard'), 'sync_before returns SyncGuard');
+    ok($guard->can('done'), 'guard has done method');
+    ok($guard->can('errs'), 'guard has errs method');
 
-subtest 'serialize and materialize roundtrip' => sub {
-    my $tmpdir = _init_repo();
-    my ($board_dir, $tasks_dir) = _setup_board($tmpdir);
-
-    my $board = TestBoard->new(dir => $board_dir->stringify);
-    my $git = App::karr::Git->new(dir => $tmpdir->stringify);
-
-    # Serialize local files to refs
-    $board->_serialize_to_refs($git);
-
-    # Verify refs exist
-    my @ids = $git->list_task_refs;
-    is_deeply(\@ids, [1, 2], 'list_task_refs returns both task IDs after serialize');
-
-    my $config_ref = Load($git->read_ref('refs/karr/config'));
-    ok($config_ref, 'config ref exists after serialize');
-    ok(!exists $config_ref->{next_id}, 'config ref does not persist next_id');
-
-    # Delete local files
-    for my $file ($tasks_dir->children(qr/\.md$/)) {
-        $file->remove;
-    }
-    my @remaining = $tasks_dir->children(qr/\.md$/);
-    is(scalar @remaining, 0, 'all task files deleted');
-
-    # Materialize from refs
-    $board->_materialize_from_refs($git);
-
-    # Verify files recreated
-    my @recreated = sort $tasks_dir->children(qr/\.md$/);
-    is(scalar @recreated, 2, 'two task files recreated');
-
-    # Verify content
-    my $loaded1 = App::karr::Task->from_file($recreated[0]);
-    is($loaded1->id, 1, 'first task id correct');
-    is($loaded1->title, 'First task', 'first task title correct');
-    is($loaded1->body, 'Body one', 'first task body correct');
-
-    my $loaded2 = App::karr::Task->from_file($recreated[1]);
-    is($loaded2->id, 2, 'second task id correct');
-    is($loaded2->title, 'Second task', 'second task title correct');
-    is($git->read_next_id_ref, 1, 'next-id metadata defaults to 1 when not yet allocated');
+    # Mark guard done so DESTROY doesn't try to push
+    $guard->done;
 };
 
-subtest 'serialize removes deleted task refs' => sub {
-    my $tmpdir = _init_repo();
-    my ($board_dir, $tasks_dir) = _setup_board($tmpdir);
+subtest 'sync_after pushes to remote' => sub {
+    my ($local, $remote) = _init_remote_pair();
+    my $board = TestSyncBoard->new(dir => $local->stringify);
 
-    my $board = TestBoard->new(dir => $board_dir->stringify);
-    my $git = App::karr::Git->new(dir => $tmpdir->stringify);
+    my $local_git = $board->git;
+    $local_git->write_ref('refs/karr/config', Dump({version => 1}));
 
-    $board->_serialize_to_refs($git);
-    is_deeply([$git->list_task_refs], [1, 2], 'both refs exist before deletion');
+    $board->sync_after;
 
-    my ($task2) = $tasks_dir->children(qr/^002-/);
-    $task2->remove;
-
-    $board->_serialize_to_refs($git);
-    is_deeply([$git->list_task_refs], [1], 'deleted local task is removed from refs on serialize');
+    my $remote_git = App::karr::Git->new(dir => $remote->stringify);
+    ok($remote_git->ref_exists('refs/karr/config'), 'config ref was pushed to remote');
 };
 
-subtest 'append_log writes NDJSON' => sub {
-    my $tmpdir = _init_repo();
-    my ($board_dir) = _setup_board($tmpdir);
-
-    my $board = TestBoard->new(dir => $board_dir->stringify);
-    my $git = App::karr::Git->new(dir => $tmpdir->stringify);
+subtest 'append_log writes NDJSON to ref' => sub {
+    my $repo = _init_repo();
+    my $board = TestSyncBoard->new(dir => $repo->stringify);
+    my $git = $board->git;
 
     $board->append_log($git, action => 'create', task_id => 1, ts => '2026-01-01T00:00:00Z');
     $board->append_log($git, action => 'move', task_id => 1, ts => '2026-01-02T00:00:00Z');
@@ -158,25 +98,28 @@ subtest 'append_log writes NDJSON' => sub {
 
 subtest 'push prunes deleted refs on the remote' => sub {
     my ($local, $remote) = _init_remote_pair();
-    my ($board_dir, $tasks_dir) = _setup_board($local);
+    my $board = TestSyncBoard->new(dir => $local->stringify);
+    my $git = $board->git;
 
-    my $board = TestBoard->new(dir => $board_dir->stringify);
-    my $git = App::karr::Git->new(dir => $local->stringify);
+    # Write two task refs
+    $git->write_ref('refs/karr/config', Dump({version => 1}));
+    $git->write_ref('refs/karr/meta/next-id', "3\n");
+    require App::karr::Task;
+    my $t1 = App::karr::Task->new(id => 1, title => 'Task 1', status => 'backlog', priority => 'medium', class => 'standard');
+    my $t2 = App::karr::Task->new(id => 2, title => 'Task 2', status => 'backlog', priority => 'medium', class => 'standard');
+    $git->save_task_ref($t1);
+    $git->save_task_ref($t2);
 
-    $board->_serialize_to_refs($git);
-    ok( $git->push, 'initial push succeeds' );
-
-    my ($task2) = $tasks_dir->children(qr/^002-/);
-    $task2->remove;
-    $board->_serialize_to_refs($git);
-    ok( $git->push, 'pruning push succeeds after deleting a task ref' );
+    $board->sync_after;
 
     my $remote_git = App::karr::Git->new(dir => $remote->stringify);
-    is_deeply(
-        [ $remote_git->list_task_refs ],
-        [1],
-        'remote task refs are pruned to match the local namespace'
-    );
+    is_deeply([sort {$a <=> $b} $remote_git->list_task_refs], [1, 2], 'both task refs pushed to remote');
+
+    # Delete task 2 locally and sync
+    $git->delete_ref('refs/karr/tasks/2/data');
+    $board->sync_after;
+
+    is_deeply([sort {$a <=> $b} $remote_git->list_task_refs], [1], 'task 2 ref was pruned from remote');
 };
 
 done_testing;

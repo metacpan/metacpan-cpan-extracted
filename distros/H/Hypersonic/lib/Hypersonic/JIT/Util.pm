@@ -5,7 +5,7 @@ use warnings;
 use Config;
 use Carp qw(croak);
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 # =============================================================================
 # Cache Directory Management
@@ -159,21 +159,44 @@ sub add_standard_includes {
         $builder->line('#include <stdio.h>');
     }
     
-    if ($features{unistd}) {
-        $builder->line('#include <unistd.h>');
-    }
-    
-    if ($features{fcntl}) {
-        $builder->line('#include <fcntl.h>');
-    }
-    
-    if ($features{socket}) {
-        $builder->line('#include <sys/socket.h>')
-                ->line('#include <sys/types.h>')
-                ->line('#include <netinet/in.h>')
-                ->line('#include <netinet/tcp.h>')
-                ->line('#include <arpa/inet.h>')
-                ->line('#include <sys/uio.h>');
+    # On Windows, unistd / fcntl / netinet don't exist. Winsock provides
+    # the socket API but with different headers + a stub `close()`. We
+    # also define `hs_set_nonblocking(fd)` here so callers don't need
+    # platform-specific fcntl vs ioctlsocket dances.
+    if ($features{unistd} || $features{fcntl} || $features{socket}) {
+        $builder->raw(<<'C');
+#ifdef _WIN32
+#  define WIN32_LEAN_AND_MEAN
+#  include <winsock2.h>
+#  include <ws2tcpip.h>
+#  include <io.h>
+#  ifndef close
+#    define close(fd) closesocket(fd)
+#  endif
+#  ifndef MSG_NOSIGNAL
+#    define MSG_NOSIGNAL 0
+#  endif
+#  ifndef hs_set_nonblocking
+#    define hs_set_nonblocking(fd) do { u_long _m = 1; ioctlsocket((fd), FIONBIO, &_m); } while(0)
+#  endif
+#else
+C
+        $builder->line('#include <unistd.h>') if $features{unistd};
+        $builder->line('#include <fcntl.h>')  if $features{fcntl};
+        if ($features{socket}) {
+            $builder->line('#include <sys/socket.h>')
+                    ->line('#include <sys/types.h>')
+                    ->line('#include <netinet/in.h>')
+                    ->line('#include <netinet/tcp.h>')
+                    ->line('#include <arpa/inet.h>')
+                    ->line('#include <sys/uio.h>');
+        }
+        $builder->raw(<<'C');
+#  ifndef hs_set_nonblocking
+#    define hs_set_nonblocking(fd) do { int _f = fcntl((fd), F_GETFL, 0); fcntl((fd), F_SETFL, _f | O_NONBLOCK); } while(0)
+#  endif
+#endif
+C
     }
     
     if ($features{threading}) {
@@ -324,6 +347,47 @@ C
     unlink $out_path if -f $out_path;
 
     return $result == 0;
+}
+
+## Compile a tiny C program and run it. Returns 1 if the program
+## compiles, links, AND exits 0; 0 otherwise. Use this when "linkable"
+## isn't enough — e.g. probing whether a syscall actually works on the
+## current kernel (io_uring on RHEL9 with kernel.io_uring_disabled=2
+## links fine but io_uring_setup() returns EINVAL at runtime).
+sub can_run {
+    my ($class, $cflags, $ldflags, $body, $extra_includes) = @_;
+    $cflags          //= '';
+    $ldflags         //= '';
+    $extra_includes  //= '';
+
+    require File::Temp;
+
+    my $src_code = <<"C";
+$extra_includes
+int main(void) {
+$body
+}
+C
+
+    my $src = File::Temp->new(SUFFIX => '.c', UNLINK => 1);
+    print $src $src_code;
+    close $src;
+
+    my $out = File::Temp->new(SUFFIX => '', UNLINK => 1);
+    my $out_path = $out->filename;
+    close $out;
+
+    my $cc = $ENV{CC} || $Config{cc} || 'cc';
+    my $compile_rc = system("$cc $cflags -o $out_path " . $src->filename
+                          . " $ldflags >/dev/null 2>&1");
+    if ($compile_rc != 0 || !-x $out_path) {
+        unlink $out_path if -f $out_path;
+        return 0;
+    }
+
+    my $run_rc = system("$out_path >/dev/null 2>&1");
+    unlink $out_path if -f $out_path;
+    return $run_rc == 0;
 }
 
 sub detect_library {
@@ -560,7 +624,7 @@ This module provides common utilities for JIT compilation across Hypersonic modu
 
 =item * Standard include patterns
 
-=item * Library detection (Alien → pkg-config → path search)
+=item * Library detection (Alien -> pkg-config -> path search)
 
 =back
 

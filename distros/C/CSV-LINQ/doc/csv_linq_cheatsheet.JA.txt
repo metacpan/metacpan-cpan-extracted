@@ -1,0 +1,130 @@
+CSV::LINQ Cheat Sheet [JA] CSV::LINQ チートシート
+======================================================================
+
+CONTENTS
+  [ 1] クエリの作成
+  [ 2] フィルタリング
+  [ 3] 射影
+  [ 4] ソート
+  [ 5] ページング
+  [ 6] グループ化
+  [ 7] 集合演算
+  [ 8] 結合
+  [ 9] 集約（終端メソッド）
+  [10] その他のシーケンスメソッド
+  [11] 変換メソッド
+  [12] 公式リソース
+
+NOTE: 注意: 各終端メソッドはイテレータを消費します。
+  データを再利用するにはFrom()/FromCSV()を再呼び出ししてください。
+
+[ 1. クエリの作成 ]
+  use CSV::LINQ;
+  my $q = CSV::LINQ->FromCSV("data.csv");              # CSVファイル読込（遅延評価）
+  my $q = CSV::LINQ->FromCSV("data.tsv", sep=>"\t");  # TSVサポート
+  my $q = CSV::LINQ->From(\@array);                   # インメモリ配列から
+  my $q = CSV::LINQ->Range(1, 10);                     # 整数シーケンス
+  my $q = CSV::LINQ->Empty();                          # 空シーケンス
+  my $q = CSV::LINQ->Repeat($elem, 5);                 # 要素を繰り返す
+
+[ 2. フィルタリング ]
+  ->Where(sub { $_[0]{age} > 30 })
+  ->Where(city => 'Tokyo')                             # DSL省略記法
+NOTE: 条件によって要素をフィルタリングします。
+
+[ 3. 射影 ]
+  ->Select(sub { { name => $_[0]{name} } })
+  ->SelectMany(sub { $_[0]{tags} })                    # 平坦化（ARRAYリファレンスを返す）
+NOTE: Selectは各要素を変換し、SelectManyはネストした配列を平坦化します
+  （セレクタはARRAYリファレンスを返す必要があります）。
+
+[ 4. ソート ]
+  ->OrderBy(sub { $_[0]{name} })                       # スマート（数値または文字列）
+  ->OrderByDescending(sub { $_[0]{score} })
+  ->OrderByStr(sub { $_[0]{code} })                    # 常に文字列比較
+  ->OrderByStrDescending(sub { $_[0]{name} })
+  ->OrderByNum(sub { $_[0]{price} })                   # 常に数値比較
+  ->OrderByNumDescending(sub { $_[0]{amount} })
+  ->ThenBy(sub { $_[0]{name} })
+  ->ThenByNum(sub { $_[0]{age} })
+  ->Reverse()
+NOTE: OrderBy*/OrderByNum*/OrderByStr*: 主ソートキー。
+  ThenBy*/ThenByNum*/ThenByStr*: 副ソートキー（OrderBy*の後に）。
+  Reverse: 現在の順序を逆にします。
+
+[ 5. ページング ]
+  ->Skip(10)->Take(5)
+  ->SkipWhile(sub { $_[0]{v} < 5 })
+  ->TakeWhile(sub { $_[0]{v} < 5 })
+NOTE: Skip/Take: N個の要素をスキップまたは取得。
+  SkipWhile/TakeWhile: 条件ベース。
+
+[ 6. グループ化 ]
+  ->GroupBy(sub { $_[0]{dept} })
+  ->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} })
+NOTE: GroupByは{ Key=>'...', Elements=>[...] }の配列を返します。
+  ToLookupはhashref { key => [elements] }を返します。
+
+[ 7. 集合演算 ]
+  ->Distinct()
+  ->Distinct(sub { $_[0]{id} })                        # キー指定
+  ->Union($q2)
+  ->Intersect($q2)
+  ->Except($q2)
+  ->SequenceEqual($q2)
+NOTE: Distinct/Union/Intersect/Exceptはオプションのキーセレクタをサポート。
+  SequenceEqual: 両方のシーケンスが等しい場合にtrue。
+
+[ 8. 結合 ]
+  ->Join($q2, sub{$_[0]{id}}, sub{$_[0]{id}},
+         sub{ {%{$_[0]}, %{$_[1]}} })
+  ->GroupJoin($q2, sub{$_[0]{id}}, sub{$_[0]{id}},
+              sub{ {row=>$_[0], inner=>$_[1]} })
+NOTE: Join: 内部結合。GroupJoin: 左外部結合
+  （内部グループはCSV::LINQオブジェクトとして渡されます）。
+
+[ 9. 集約（終端メソッド） ]
+  ->Count()
+  ->Sum(sub { $_[0]{amount} })
+  ->Average(sub { $_[0]{score} })
+  ->AverageOrDefault(sub { $_[0]{score} })
+  ->Min(sub { $_[0]{price} })
+  ->Max(sub { $_[0]{price} })
+  ->First()  ->FirstOrDefault()
+  ->Last()   ->LastOrDefault()
+  ->Single() ->SingleOrDefault()
+  ->ElementAt(2)  ->ElementAtOrDefault(2)
+  ->Any(sub { $_[0]{active} })
+  ->All(sub { $_[0]{score} > 0 })
+  ->Contains($value)
+  ->Aggregate($seed, sub { $_[0] + $_[1]{v} })
+NOTE: OrDefaultバリアントは空シーケンスに対してdieの代わりにundefを返します。
+  ElementAt: 0ベースインデックス（範囲外はdie）。ElementAtOrDefault: undef。
+
+[ 10. その他のシーケンスメソッド ]
+  ->Concat($q2)
+  ->Zip($q2, sub { [$_[0], $_[1]] })
+  ->DefaultIfEmpty($default)
+  ->ForEach(sub { print $_[0]{name}, "\n" })
+NOTE: Concat: 2つのシーケンスを結合。DefaultIfEmpty: 空の場合のデフォルト値。
+  Zip: 2つのシーケンスを要素ごとにマージ。
+
+[ 11. 変換メソッド ]
+  ->ToArray()
+  ->ToList()
+  ->ToDictionary(sub{$_[0]{id}}, sub{$_[0]{name}})
+  ->ToLookup(sub{$_[0]{dept}})
+  ->ToCSV("out.csv")
+  ->ToCSV("out.csv", headers => [qw(name age city)])
+  ->ToCSV("out.csv", label_order => [qw(city name age)])  # エイリアス
+  ->ToCSV("out.tsv", sep => "\t")
+NOTE: ToDictionaryはhashref key=>elementを返します。
+  ToCSVはシーケンスをCSVファイルに書き込みます。
+  label_order: ToCSVのheadersオプションのエイリアス。
+
+[ 12. 公式リソース ]
+  CSV::LINQ: https://metacpan.org/dist/CSV-LINQ
+  CSV仕様 (RFC 4180): https://www.rfc-editor.org/rfc/rfc4180
+NOTE:   CSV::LINQ: https://metacpan.org/dist/CSV-LINQ
+  CSV仕様 (RFC 4180): https://www.rfc-editor.org/rfc/rfc4180
+

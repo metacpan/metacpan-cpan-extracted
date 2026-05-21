@@ -1,0 +1,89 @@
+{
+   "abstract" : "Build and install ckdl, a C library for KDL documents",
+   "author" : [
+      "Davenonymous <perl@davenonymous.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-ckdl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Build::MM" : "0.32",
+            "Archive::Tar" : "0",
+            "HTML::LinkExtor" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Mozilla::CA" : "0",
+            "Net::SSLeay" : "1.49",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build" : "1.19",
+            "Alien::Build::MM" : "0.32",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0",
+            "Alien::Build" : "0.25",
+            "perl" : "5.012"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Alien" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Davenonymous/perl-alien-ckdl/issues"
+      },
+      "homepage" : "https://github.com/tjol/ckdl",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Davenonymous/perl-alien-ckdl.git",
+         "web" : "https://github.com/Davenonymous/perl-alien-ckdl"
+      }
+   },
+   "version" : "0.001",
+   "x_alienfile" : {
+      "generated_by" : "Alien::Build::MM version 2.84",
+      "requires" : {
+         "share" : {
+            "Archive::Tar" : "0",
+            "HTML::LinkExtor" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Mozilla::CA" : "0",
+            "Net::SSLeay" : "1.49",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         },
+         "system" : {}
+      }
+   },
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

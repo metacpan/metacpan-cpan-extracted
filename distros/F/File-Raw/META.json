@@ -1,5 +1,5 @@
 {
-   "abstract" : "Fast IO operations using direct system calls",
+   "abstract" : "File operations using direct system calls",
    "author" : [
       "LNATION <email@lnation.org>"
    ],
@@ -27,6 +27,7 @@
       },
       "configure" : {
          "requires" : {
+            "ExtUtils::Depends" : "0.404",
             "ExtUtils::MakeMaker" : "0"
          }
       },
@@ -42,6 +43,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.09",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

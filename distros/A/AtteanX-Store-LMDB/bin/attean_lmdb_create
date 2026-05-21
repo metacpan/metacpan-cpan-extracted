@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+
+use v5.14;
+use Attean;
+use Attean::RDF;
+use lib qw(lib);
+
+my $file	= shift // die;
+my $store = Attean->get_store('LMDB')->new(filename => $file, initialize => 1);
+my $model = Attean::MutableQuadModel->new( store => $store );
+my $class	= Attean->get_parser( filename => $file ) // 'AtteanX::Parser::Turtle';
+my $parser		= $class->new();
+my $graph	= iri('tag:kasei.us,2018:default-graph');
+
+while (my $filename = shift) {
+	open(my $fh, '<:utf8', $filename);
+	$parser->handler(sub {
+		my $t	= shift;
+		my $q	= Attean::Quad->new($t->values, $graph);
+		$model->add_quad($q);
+	});
+	$parser->parse_cb_from_io($fh);
+}

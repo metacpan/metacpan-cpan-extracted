@@ -1,0 +1,130 @@
+CSV::LINQ Cheat Sheet [BN] CSV::LINQ চিট শিট
+======================================================================
+
+CONTENTS
+  [ 1] Creating a query
+  [ 2] Filtering
+  [ 3] Projection
+  [ 4] Sorting
+  [ 5] Paging
+  [ 6] Grouping
+  [ 7] Set operations
+  [ 8] Joins
+  [ 9] Aggregation (terminal methods)
+  [10] Other sequence methods
+  [11] Conversion methods
+  [12] Official resources
+
+NOTE: Note: each terminal method exhausts the iterator.
+  Re-call From()/FromCSV() to reuse data.
+
+[ 1. Creating a query ]
+  use CSV::LINQ;
+  my $q = CSV::LINQ->FromCSV("data.csv");         # read CSV file (lazy)
+  my $q = CSV::LINQ->FromCSV("data.tsv", sep=>"\t"); # TSV support
+  my $q = CSV::LINQ->From(\@array);               # from in-memory array
+  my $q = CSV::LINQ->Range(1, 10);                # integer sequence
+  my $q = CSV::LINQ->Empty();                     # empty sequence
+  my $q = CSV::LINQ->Repeat($elem, 5);            # repeat element
+
+[ 2. Filtering ]
+  ->Where(sub { $_[0]{age} > 30 })
+  ->Where(city => 'Tokyo')                        # DSL shorthand
+NOTE: Filter elements by condition.
+
+[ 3. Projection ]
+  ->Select(sub { { name => $_[0]{name} } })
+  ->SelectMany(sub { $_[0]{tags} })               # flatten (must return ARRAY ref)
+NOTE: Select transforms each element; SelectMany flattens nested arrays
+  (selector must return ARRAY ref).
+
+[ 4. Sorting ]
+  ->OrderBy(sub { $_[0]{name} })                  # string cmp
+  ->OrderByDescending(sub { $_[0]{score} })
+  ->OrderByStr(sub { $_[0]{code} })               # always string cmp
+  ->OrderByStrDescending(sub { $_[0]{name} })
+  ->OrderByNum(sub { $_[0]{price} })              # always numeric cmp
+  ->OrderByNumDescending(sub { $_[0]{amount} })
+  ->ThenBy(sub { $_[0]{name} })
+  ->ThenByNum(sub { $_[0]{age} })
+  ->Reverse()
+NOTE: OrderBy*/OrderByNum*/OrderByStr*: primary sort key.
+  ThenBy*/ThenByNum*/ThenByStr*: secondary key (after OrderBy*).
+  Reverse: reverses current order.
+
+[ 5. Paging ]
+  ->Skip(10)->Take(5)
+  ->SkipWhile(sub { $_[0]{v} < 5 })
+  ->TakeWhile(sub { $_[0]{v} < 5 })
+NOTE: Skip/Take: skip or take N elements.
+  SkipWhile/TakeWhile: condition-based.
+
+[ 6. Grouping ]
+  ->GroupBy(sub { $_[0]{dept} })
+  ->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} })
+NOTE: GroupBy returns array of { Key=>'...', Elements=>[...] }.
+  ToLookup returns hashref { key => [elements] }.
+
+[ 7. Set operations ]
+  ->Distinct()
+  ->Distinct(sub { $_[0]{id} })                   # by key
+  ->Union($q2)
+  ->Intersect($q2)
+  ->Except($q2)
+  ->SequenceEqual($q2)
+NOTE: Distinct/Union/Intersect/Except support optional key selector.
+  SequenceEqual: true if both sequences are equal.
+
+[ 8. Joins ]
+  ->Join($q2, sub{$_[0]{id}}, sub{$_[0]{id}},
+         sub{ {%{$_[0]}, %{$_[1]}} })
+  ->GroupJoin($q2, sub{$_[0]{id}}, sub{$_[0]{id}},
+              sub{ {row=>$_[0], inner=>$_[1]} })
+NOTE: Join: inner join. GroupJoin: left outer join
+  (inner group passed as CSV::LINQ object).
+
+[ 9. Aggregation (terminal methods) ]
+  ->Count()
+  ->Sum(sub { $_[0]{amount} })
+  ->Average(sub { $_[0]{score} })
+  ->AverageOrDefault(sub { $_[0]{score} })
+  ->Min(sub { $_[0]{price} })
+  ->Max(sub { $_[0]{price} })
+  ->First()  ->FirstOrDefault()
+  ->Last()   ->LastOrDefault()
+  ->Single() ->SingleOrDefault()
+  ->ElementAt(2)  ->ElementAtOrDefault(2)
+  ->Any(sub { $_[0]{active} })
+  ->All(sub { $_[0]{score} > 0 })
+  ->Contains($value)
+  ->Aggregate($seed, sub { $_[0] + $_[1]{v} })
+NOTE: OrDefault variants return undef instead of die for empty sequences.
+  ElementAt: 0-based index (die if out of range). ElementAtOrDefault: undef.
+
+[ 10. Other sequence methods ]
+  ->Concat($q2)
+  ->Zip($q2, sub { [$_[0], $_[1]] })
+  ->DefaultIfEmpty($default)
+  ->ForEach(sub { print $_[0]{name}, "\n" })
+NOTE: Concat: joins two sequences. DefaultIfEmpty: default if empty.
+  Zip: merges two sequences element-by-element.
+
+[ 11. Conversion methods ]
+  ->ToArray()
+  ->ToList()
+  ->ToDictionary(sub{$_[0]{id}}, sub{$_[0]{name}})
+  ->ToLookup(sub{$_[0]{dept}})
+  ->ToCSV("out.csv")
+  ->ToCSV("out.csv", headers => [qw(name age city)])
+  ->ToCSV("out.csv", label_order => [qw(city name age)])  # alias
+  ->ToCSV("out.tsv", sep => "\t")
+NOTE: ToDictionary returns hashref key=>element.
+  ToCSV writes sequence to a CSV file.
+  label_order: alias for headers option in ToCSV.
+
+[ 12. Official resources ]
+  CSV::LINQ: https://metacpan.org/dist/CSV-LINQ
+  CSV spec (RFC 4180): https://www.rfc-editor.org/rfc/rfc4180
+NOTE:   CSV::LINQ: https://metacpan.org/dist/CSV-LINQ
+  CSV spec (RFC 4180): https://www.rfc-editor.org/rfc/rfc4180
+

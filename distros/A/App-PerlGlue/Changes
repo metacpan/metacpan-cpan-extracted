@@ -1,0 +1,25 @@
+Revision history for App-PerlGlue
+
+0.04  2026-04-29
+    - Made CLI tests shell-portable on Windows by replacing shell-dependent
+      `echo`/`printf` pipelines with Perl one-liners.
+    - Bumped version to 0.04.
+
+0.03  2026-04-29
+    - Added subcommand help flags so `perlglue <command> --help` and `-h`
+      print command-specific usage.
+    - Clarified top-level usage text to include `perlglue --help` and
+      subcommand help form.
+    - Bumped version to 0.03 and updated CLI test expectation.
+
+0.02  2026-04-29
+    - Added richer CLI command set to match README examples:
+      lines/where filters, replace, pick --csv, convert --to jsonl,
+      jsonl filtering, template rendering, and safe rename.
+    - Improved command help output and added comprehensive POD for all
+      implemented commands and aliases.
+    - Expanded CLI test coverage for version, case conversion, CSV pick,
+      CSV->JSONL conversion, and where-filtered line processing.
+
+0.01  2026-04-29
+    - Initial release with minimal upper/lower, help, and version commands.

@@ -140,5 +140,10 @@ t/lib/TestSchema/Result/Thing.pm
 t/lib/TestSchema/Result/Sprocket.pm
 t/lib/TestSchema/Result/Interface.pm
 t/lib/TestSchema/Result/Maintenance.pm
+xt/001-oracle.t
+xt/002-mysql.t
+xt/lib/TestSchema.pm
+xt/lib/TestSchema/Result/User.pm
+xt/lib/TestSchema/Result/Order.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

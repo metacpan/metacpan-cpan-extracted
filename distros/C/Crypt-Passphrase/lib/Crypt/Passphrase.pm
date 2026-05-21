@@ -1,5 +1,5 @@
 package Crypt::Passphrase;
-$Crypt::Passphrase::VERSION = '0.022';
+$Crypt::Passphrase::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -150,7 +150,7 @@ Crypt::Passphrase - A module for managing passwords in a cryptographically agile
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 

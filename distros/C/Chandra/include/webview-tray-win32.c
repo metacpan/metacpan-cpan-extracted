@@ -1,5 +1,5 @@
 /*
- * webview-tray-win32.c — Windows system tray (Shell_NotifyIcon) backend
+ * webview-tray-win32.c - Windows system tray (Shell_NotifyIcon) backend
  *
  * Uses the Win32 Shell notification API with popup menus.
  */

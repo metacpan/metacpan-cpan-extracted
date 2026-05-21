@@ -1,0 +1,1 @@
+[a-z\d\.-]+/.*(\.(js(on)?|xml|atom|rss|css|ico|zip|tar|t?[gx]z|t?bz(ip)?2?|rar|7z|iso|exe|dll|bin|apk|so|o|class|jar|woff2?|ttf|eot|otf)|DS_Store|Thumbs.db)($|\?)

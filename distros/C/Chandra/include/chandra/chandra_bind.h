@@ -1,5 +1,5 @@
 /*
- * chandra_bind.h — Bind module static helpers
+ * chandra_bind.h - Bind module static helpers
  * Included from Chandra.xs before the INCLUDE: xs/bind.xs
  */
 

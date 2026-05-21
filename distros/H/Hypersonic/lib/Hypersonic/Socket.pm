@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 use XS::JIT;
 use XS::JIT::Builder;
@@ -12,11 +12,13 @@ use Hypersonic::JIT::Util;
 
 # Platform detection
 sub platform {
-    return 'darwin'  if $^O eq 'darwin';
-    return 'linux'   if $^O eq 'linux';
-    return 'freebsd' if $^O eq 'freebsd';
-    return 'openbsd' if $^O eq 'openbsd';
-    return 'netbsd'  if $^O eq 'netbsd';
+    return 'darwin'   if $^O eq 'darwin';
+    return 'linux'    if $^O eq 'linux';
+    return 'freebsd'  if $^O eq 'freebsd';
+    return 'openbsd'  if $^O eq 'openbsd';
+    return 'netbsd'   if $^O eq 'netbsd';
+    return 'mswin32'  if $^O eq 'MSWin32';
+    return 'cygwin'   if $^O eq 'cygwin';
     die "Unsupported platform: $^O";
 }
 
@@ -55,32 +57,55 @@ sub compile_socket_ops {
       ->line('static char recv_buf[RECV_BUF_SIZE];')
       ->blank;
 
+    # Windows: WSAStartup must run before any socket call. We don't
+    # have a BOOT hook in the JIT module, so guard with a static flag
+    # and call it from create_listen_socket (the first entrypoint
+    # users hit). socket() requires Winsock to be initialized; otherwise
+    # it returns INVALID_SOCKET with WSANOTINITIALISED.
+    $builder->raw(<<'C');
+#ifdef _WIN32
+static int hs_wsa_initialized = 0;
+static void hs_wsa_init(void) {
+    if (!hs_wsa_initialized) {
+        WSADATA wsa;
+        if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0) {
+            return;  /* leave flag unset; create_listen_socket will croak */
+        }
+        hs_wsa_initialized = 1;
+    }
+}
+#else
+static inline void hs_wsa_init(void) {}
+#endif
+C
+
     # Generate create_listen_socket
     $builder->xs_function('jit_create_listen_socket')
       ->xs_preamble
       ->line('IV port;')
       ->line('int fd;')
       ->line('int opt;')
-      ->line('int flags;')
       ->line('struct sockaddr_in addr;')
       ->blank
       ->line('if (items != 1) croak("Usage: create_listen_socket(port)");')
       ->line('port = SvIV(ST(0));')
       ->blank
+      ->line('hs_wsa_init();  /* no-op on POSIX */')
       ->line('fd = socket(AF_INET, SOCK_STREAM, 0);')
       ->if('fd < 0')
-        ->line('ST(0) = sv_2mortal(newSViv(-1));')
-        ->line('XSRETURN(1);')
+        # Surface the actual errno - returning silent -1 hides why the
+        # child server died on platforms where bind/listen/socket fail
+        # for non-obvious reasons (see OpenBSD smoke reports).
+        ->line('croak("socket() failed: %s", strerror(errno));')
       ->endif
       ->blank
       ->line('opt = 1;')
-      ->line('setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));')
+      ->line('setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, (const char*)&opt, sizeof(opt));')
       ->line('#ifdef SO_REUSEPORT')
-      ->line('setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt));')
+      ->line('setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, (const char*)&opt, sizeof(opt));')
       ->line('#endif')
       ->blank
-      ->line('flags = fcntl(fd, F_GETFL, 0);')
-      ->line('fcntl(fd, F_SETFL, flags | O_NONBLOCK);')
+      ->line('hs_set_nonblocking(fd);')
       ->blank
       ->line('memset(&addr, 0, sizeof(addr));')
       ->line('addr.sin_family = AF_INET;')
@@ -88,15 +113,15 @@ sub compile_socket_ops {
       ->line('addr.sin_addr.s_addr = INADDR_ANY;')
       ->blank
       ->if('bind(fd, (struct sockaddr*)&addr, sizeof(addr)) < 0')
+        ->line('int saved_errno = errno;')
         ->line('close(fd);')
-        ->line('ST(0) = sv_2mortal(newSViv(-1));')
-        ->line('XSRETURN(1);')
+        ->line('croak("bind(port=%d) failed: %s", (int)port, strerror(saved_errno));')
       ->endif
       ->blank
       ->if('listen(fd, SOMAXCONN) < 0')
+        ->line('int saved_errno = errno;')
         ->line('close(fd);')
-        ->line('ST(0) = sv_2mortal(newSViv(-1));')
-        ->line('XSRETURN(1);')
+        ->line('croak("listen() failed: %s", strerror(saved_errno));')
       ->endif
       ->blank
       ->line('ST(0) = sv_2mortal(newSViv(fd));')
@@ -273,6 +298,9 @@ sub compile_socket_ops {
         code      => $builder->code,
         name      => $module_name,
         cache_dir => $cache_dir,
+        # Windows needs to link against Winsock for the JIT-compiled .so
+        # to resolve socket()/recv()/send()/etc.
+        ($^O eq 'MSWin32' ? (extra_ldflags => '-lws2_32') : ()),
         functions => {
             'Hypersonic::Socket::create_listen_socket' => { source => 'jit_create_listen_socket', is_xs_native => 1 },
             'Hypersonic::Socket::http_accept'          => { source => 'jit_http_accept', is_xs_native => 1 },

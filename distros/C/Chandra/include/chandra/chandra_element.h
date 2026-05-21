@@ -1,5 +1,5 @@
 /*
- * chandra_element.h — Element module static helpers
+ * chandra_element.h - Element module static helpers
  * Included from Chandra.xs before the INCLUDE: xs/element.xs
  */
 
@@ -372,7 +372,7 @@ _elem_sorted_hv_keys(pTHX_ HV *hv)
     return keys;
 }
 
-/* Render element to HTML string — recursive */
+/* Render element to HTML string - recursive */
 static SV *
 _elem_render(pTHX_ SV *self_sv)
 {

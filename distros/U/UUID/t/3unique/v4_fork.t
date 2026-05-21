@@ -1,72 +1,93 @@
-my $I = 4;   # number for forks
-my $N = 100; # number of uuids / fork
-
 use strict;
 use warnings;
-use Test::More;
-use MyNote;
+use MyTest;
 use File::Temp;
 
-use vars qw($tmpdir $dat $sem);
+use vars qw($tmpdir @dat @sem $I $N);
 
 BEGIN {
-    $tmpdir = File::Temp->newdir(CLEANUP => 0);
-    $dat = File::Temp::tempnam($tmpdir, 'UUID.test.');
-    $sem = File::Temp::tempnam($tmpdir, 'UUID.test.');
+    $I = 4;    # number for forks
+    $N = 1000; # number of uuids / fork
+    $tmpdir  = File::Temp->newdir('UUID-test-XXXXXXXX', TMPDIR => 1, CLEANUP => 0);
+    $dat[$_] = File::Temp::tempnam($tmpdir, 'UUID.dat.') for 0 .. $I-1;
+    $sem[$_] = File::Temp::tempnam($tmpdir, 'UUID.sem.') for 0 .. $I-1;
     pass 'began';
 }
 
 use UUID 'uuid4';
 
-my $seen = {};
+my @kids = ();
+my %seen = ();
+my $count = 0;
 
 # Comment this to simulate a prefork process that
 # doesnt actually use UUID in the parent.
-++$seen->{uuid4()} for 1 .. $N;
+++$seen{uuid4()} for 1 .. $N;
+$count += $N;
 
-for my $i ( 1 .. $I ) {
-    my $kid = fork;
+$SIG{CHLD} = 'IGNORE';
 
-    if (!defined($kid)) {
+for my $i ( 0 .. $I-1 ) {
+    my $kid;
+    if (!defined($kid = fork)) {
         fail "fork$i";
     }
-    else {
-        if (!$kid) {
-            open my $fh, '>', $dat or err("open: $dat: $!");
-            print $fh uuid4()."\n"
-                for 1 .. $N;
-            open $fh, '>', $sem or err("open: $sem: $!");
-            exit 0;
-        }
-
+    elsif ($kid) {
         pass "fork$i";
+        push @kids, $kid;
+    }
+    else {
+        my $fh;
+        open $fh, '>', $dat[$i] or err("open: $dat[$i]: $!");
+        print $fh uuid4()."\n" for 1 .. $N;
+        close $fh;
+        open $fh, '>', $sem[$i] or err("open: $sem[$i]: $!");
+        print $fh "\n";
+        close $fh;
+        exit 0;
+    }
+}
 
-        my $timer = 200;
-        while (!-e $sem) {
-            select undef, undef, undef, 0.01;
-            last unless --$timer > 0;
-        }
-        cmp_ok $timer, '>', 0, "timer$i";
+# wait for kids
+my $timeout = 100;
+{
+    my $found = 0;
+    select undef, undef, undef, 0.1;
+    for (0 .. $I-1) { $found++ if -e $sem[$_] }
+    last if $found == $I;
+    redo if --$timeout;
+    # will always fail, or is skipped
+    is $found, $I, 'semfiles found';
+}
+ok $timeout > 0, 'no timeout';
 
-        if ($timer > 0) {
-            open my $fh, '<', $dat or err("open: $dat: $!");
-            ++$seen->{$_} for map{chomp;$_} <$fh>;
+++$seen{uuid4()} for 1 .. $N;
+$count += $N;
 
-            #ok !exists($seen->{uuid4()}), "unique$i $_"
-            #    for 1 .. $N;
-        }
-
-        waitpid $kid, 0;
-        unlink $sem;
+for my $i (0 .. $I-1) {
+    open my $fh, '<', $dat[$i] or err("open: $dat[$i]: $!");
+    for (<$fh>) {
+        chomp;
+        ++$seen{$_};
+        ++$count;
     }
 }
 
 #use Data::Dumper;
-#note "$_\n" for split /\n/, Dumper($seen);
-is scalar(keys %$seen), ($I+1)*$N, 'seen';
+#note "$_\n" for split /\n/, Dumper(\%seen);
+{
+    my $expected = ($I + 2) * $N;
+    my $got = scalar keys %seen;
+    is $count, $expected, 'count ok';
+    is $got,   $expected, 'unique ok';
+
+    # show the repeats, if any
+    my $reps = scalar grep { $seen{$_} > 1 } keys %seen;
+    next unless $reps;
+    diag q(     repeats: '). $reps. q(');
+}
 
 cleanup();
-
 done_testing;
 
 sub err {
@@ -77,7 +98,9 @@ sub err {
 }
 
 sub cleanup {
-    unlink $dat    if defined $dat;
-    unlink $sem    if defined $sem;
-    rmdir  $tmpdir if defined $tmpdir;
+    for my $i (0 .. $I-1) {
+        unlink $dat[$i] if -e $dat[$i];
+        unlink $sem[$i] if -e $sem[$i];
+    }
+    rmdir $tmpdir if defined $tmpdir;
 }

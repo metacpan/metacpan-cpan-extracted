@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use Data::Dumper;
-use Test::More tests => 10;
+use Test::More tests => 13;
 
 use Test::Warn;
 use Test::Exception;
@@ -27,6 +27,13 @@ warning_is { $foo->add_list("no.nodes", "key", ["value1", "value2"]) }
     "[WARN] Settings is null in set_arrayvalue!", "check path is null - status ok";
 warning_is { $foo->add_hash("no.nodes", "key", {"value1", "value2"}) }
     "[WARN] Settings is null in set_hashvalue!", "check path is null - status ok";
+
+warning_is { $foo->add_boolscalar("no.nodes", "key", "value") }
+    "[WARN] Settings is null in set_scalarvalue!", "check boolscalar path is null - status ok";
+warning_is { $foo->modify_boolscalar("no.nodes", "value") }
+    "[WARN] Path is null!", "check modify boolscalar path is null - status ok";
+warning_is { $foo->add_boolhash("no.nodes", "key", {"key", "value"}) }
+    "[WARN] Settings is null in set_hashvalue!", "check boolhash path is null - status ok";
 
 #throws_ok { $foo->add_scalar("me.mar", "key", { "value1", "value2" }) }
 	#qr/have not this type/, "check value is not right - status ok";

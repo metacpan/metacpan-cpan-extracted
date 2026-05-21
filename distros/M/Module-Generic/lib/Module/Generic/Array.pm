@@ -13,10 +13,10 @@
 package Module::Generic::Array;
 BEGIN
 {
-    use v5.26.1;
+    use v5.16.0;
     use common::sense;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'Module::Generic' );
     use vars qw( $DEBUG $ERROR $TRUE $FALSE );
     use List::Util ();
     use Scalar::Util ();
@@ -40,7 +40,6 @@ BEGIN
     our $VERSION = 'v2.3.1';
 };
 
-use v5.26.1;
 use strict;
 no warnings 'redefine';
 require Module::Generic::Boolean;
@@ -123,22 +122,22 @@ sub callback
     my( $what, $code ) = @_;
     if( !defined( $what ) )
     {
-        warnings::warn( "No callback type was provided.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) );
+        warnings::warn( "No callback type was provided.\n" ) if( warnings::enabled( 'Module::Generic' ) );
         CORE::return;
     }
     elsif( $what ne 'add' && $what ne 'remove' )
     {
-        warnings::warn( "Callback type provided ($what) is unsupported. Use 'add' or 'remove'.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) );
+        warnings::warn( "Callback type provided ($what) is unsupported. Use 'add' or 'remove'.\n" ) if( warnings::enabled( 'Module::Generic' ) );
         CORE::return;
     }
     elsif( CORE::scalar( @_ ) == 1 )
     {
-        warnings::warn( "No callback code was provided. Provide an anonymous subroutine, or reference to existing subroutine.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) );
+        warnings::warn( "No callback code was provided. Provide an anonymous subroutine, or reference to existing subroutine.\n" ) if( warnings::enabled( 'Module::Generic' ) );
         CORE::return;
     }
     elsif( defined( $code ) && ref( $code ) ne 'CODE' )
     {
-        warnings::warn( "Callback provided is not a code reference. Provide an anonymous subroutine, or reference to existing subroutine." ) if( warnings::enabled( 'Module::Generic::Array' ) );
+        warnings::warn( "Callback provided is not a code reference. Provide an anonymous subroutine, or reference to existing subroutine." ) if( warnings::enabled( 'Module::Generic' ) );
         CORE::return;
     }
 
@@ -218,12 +217,12 @@ sub delete
     {
         if( $offset !~ /^\-?\d+$/ )
         {
-            warn( "Non integer offset \"$offset\" provided to delete array element\n" ) if( $self->_warnings_is_enabled );
+            warn( "Non integer offset \"$offset\" provided to delete array element\n" ) if( $self->_warnings_is_enabled( 'Module::Generic' ) );
             CORE::return( $self );
         }
         if( CORE::defined( $length ) && $length !~ /^\-?\d+$/ )
         {
-            warn( $self, "Non integer length \"$length\" provided to delete array element\n" ) if( $self->_warnings_is_enabled );
+            warn( $self, "Non integer length \"$length\" provided to delete array element\n" ) if( $self->_warnings_is_enabled( 'Module::Generic' ) );
             CORE::return( $self );
         }
         my @removed = CORE::splice( @$self, $offset, CORE::defined( $length ) ? CORE::int( $length ) : 1 );
@@ -246,17 +245,20 @@ sub each
     my $self = CORE::shift( @_ );
     my $code = CORE::shift( @_ ) || do
     {
-        warn( "No subroutine callback as provided for each\n" ) if( $self->_warnings_is_enabled );
+        warn( "No subroutine callback as provided for each\n" ) if( $self->_warnings_is_enabled( 'Module::Generic' ) );
         CORE::return;
     };
     if( ref( $code ) ne 'CODE' )
     {
-        warn( "I was expecting a reference to a subroutine for the callback to each, but got '$code' instead.\n" ) if( $self->_warnings_is_enabled );
+        warn( "I was expecting a reference to a subroutine for the callback to each, but got '$code' instead.\n" ) if( $self->_warnings_is_enabled( 'Module::Generic' ) );
         CORE::return;
     }
     # Index starts from 0
-    while( my( $i, $v ) = CORE::each( @$self ) )
+    # This does not work in perl < 5.12.0
+    # while( my( $i, $v ) = CORE::each( @$self ) )
+    for( my $i = 0; $i < scalar( @$self ); $i++ )
     {
+        my $v = $self->[$i];
         local $_ = $v;
         # CORE::defined( $code->( $i, $v ) ) || CORE::last;
         my $rv = $code->( $i, $v );
@@ -321,7 +323,7 @@ sub error
         local $@;
         if( !$self->_is_class_loaded( 'Encode' ) && !eval( 'require Encode' ) )
         {
-            warn( $o ) if( $self->_warnings_is_enabled );
+            warn( $o ) if( $self->_warnings_is_enabled( 'Module::Generic' ) );
         }
         else
         {
@@ -331,7 +333,7 @@ sub error
                 Encode::encode( 'UTF-8', "$o", Encode::FB_CROAK );
             };
             # Display warnings if warnings for this class is registered and enabled or if not registered
-            warn( $@ ? $o : $enc_str ) if( $self->_warnings_is_enabled );
+            warn( $@ ? $o : $enc_str ) if( $self->_warnings_is_enabled( 'Module::Generic' ) );
         }
 
         if( !$args->{no_return_null_object} && want( 'OBJECT' ) )
@@ -654,7 +656,9 @@ sub join
 sub keys
 {
     my $self = CORE::shift( @_ );
-    CORE::return( $self->new( CORE::scalar( @$self ) ? [ CORE::keys( @$self ) ] : [] ) );
+    CORE::return( [] ) if( !scalar( @$self ) );
+    my @indices = ( 0 .. $#$self );
+    CORE::return( $self->new( \@indices ) );
 }
 
 sub last { CORE::return( CORE::shift->get_null(-1) ); }
@@ -1074,14 +1078,14 @@ sub splice
     my( $offset, $length, @list ) = @_;
     if( defined( $offset ) && int( $offset ) !~ /^\-?\d+$/ )
     {
-        warn( "Offset provided for splice \"$offset\" is not an integer.\n" ) if( $self->_warnings_is_enabled );
+        warn( "Offset provided for splice \"$offset\" is not an integer.\n" ) if( $self->_warnings_is_enabled( 'Module::Generic' ) );
         ## If a list was provided, the user is not looking to get an element removed, but add it, so we return out object
         CORE::return( $self ) if( CORE::scalar( @list ) );
         CORE::return;
     }
     if( defined( $length ) && int( $length ) !~ /^\-?\d+$/ )
     {
-        warn( "Length provided for splice \"$length\" is not an integer.\n" ) if( $self->_warnings_is_enabled );
+        warn( "Length provided for splice \"$length\" is not an integer.\n" ) if( $self->_warnings_is_enabled( 'Module::Generic' ) );
         CORE::return( $self ) if( CORE::scalar( @list ) );
         CORE::return;
     }
@@ -1167,7 +1171,7 @@ sub unshift
 sub values
 {
     my $self = CORE::shift( @_ );
-    my $ref = [ CORE::values( @$self ) ];
+    my $ref = [ @$self ];
     if( Wanted::want( 'LIST' ) )
     {
         CORE::return( @$ref );
@@ -1273,13 +1277,13 @@ sub _scalar
     CORE::return( Module::Generic::Scalar->new( $str ) );
 }
 
-sub _warnings_is_enabled { CORE::return( warnings::enabled( ref( $_[0] ) || $_[0] ) ); }
+sub _warnings_is_enabled { CORE::return( warnings::enabled( $_[1] || 'Module::Generic' ) ); }
 
 sub DESTROY
 {
     # <https://perldoc.perl.org/perlobj#Destructors>
     CORE::local( $., $@, $!, $^E, $? );
-    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    CORE::return if( Module::Generic::_in_global_destruction() );
     my $self = CORE::shift( @_ );
     CORE::return if( !CORE::defined( $self ) );
 
@@ -1367,12 +1371,12 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         $opts->{debug} //= 0;
         if( CORE::length( $opts->{add} ) && ref( $opts->{add} ) ne 'CODE' )
         {
-            warnings::warn( "Code provided for the array add callback is not a code reference.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) || $opts->{debug} );
+            warnings::warn( "Code provided for the array add callback is not a code reference.\n" ) if( warnings::enabled( 'Module::Generic' ) || $opts->{debug} );
             CORE::return;
         }
         if( CORE::length( $opts->{remove} ) && ref( $opts->{remove} ) ne 'CODE' )
         {
-            warnings::warn( "Code provided for the array remove callback is not a code reference.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) || $opts->{debug} );
+            warnings::warn( "Code provided for the array remove callback is not a code reference.\n" ) if( warnings::enabled( 'Module::Generic' ) || $opts->{debug} );
             CORE::return;
         }
 
@@ -1396,7 +1400,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         my $rv;
         if( !$cb )
         {
-            warnings::warn( "No callback remove found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) || $self->{debug} );
+            warnings::warn( "No callback remove found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
             $rv = 1;
         }
         else
@@ -1421,7 +1425,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         my $rv;
         if( !$cb )
         {
-            warnings::warn( "No callback remove found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) || $self->{debug} );
+            warnings::warn( "No callback remove found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
             $rv = 1;
         }
         else
@@ -1472,7 +1476,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         my $rv;
         if( !$cb )
         {
-            warnings::warn( "No callback remove found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) || $self->{debug} );
+            warnings::warn( "No callback remove found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
             $rv = 1;
         }
         else
@@ -1496,7 +1500,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         my $rv;
         if( !$cb )
         {
-            warnings::warn( "No callback add found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) || $self->{debug} );
+            warnings::warn( "No callback add found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
             $rv = 1;
         }
         else
@@ -1520,7 +1524,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         my $rv;
         if( !$cb )
         {
-            warnings::warn( "No callback remove found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) || $self->{debug} );
+            warnings::warn( "No callback remove found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
             $rv = 1;
         }
         else
@@ -1550,7 +1554,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
             my $cb = $self->{callback_add} || $dummy_callback;
             if( !$cb )
             {
-                warnings::warn( "No callback add found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) || $self->{debug} );
+                warnings::warn( "No callback add found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
                 $rv = 1;
             }
             else
@@ -1568,7 +1572,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
             my $cb = $self->{callback_remove} || $dummy_callback;
             if( !$cb )
             {
-                warnings::warn( "No callback remove found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) || $self->{debug} );
+                warnings::warn( "No callback remove found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
                 $rv = 1;
             }
             else
@@ -1592,7 +1596,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         my $rv;
         if( !$cb )
         {
-            warnings::warn( "No callback add found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) || $self->{debug} );
+            warnings::warn( "No callback add found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
             $rv = 1;
         }
         else
@@ -1631,7 +1635,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         my $rv;
         if( !$cb )
         {
-            warnings::warn( "No callback add found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic::Array' ) || $self->{debug} );
+            warnings::warn( "No callback add found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
             $rv = 1;
         }
         else

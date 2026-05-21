@@ -4,13 +4,12 @@ AtteanX::Endpoint
 Created:      2016-03-25
 Home page:    <http://search.cpan.org/dist/AtteanX::Endpoint/>
 Bug tracker:  <https://github.com/kasei/atteanx-endpoint/issues>
+Maintainer:   Gregory Todd Williams <mailto:gwilliams@cpan.org>
 
-0.002  2017-10-26
+0.003  2026-05-21
 
- - (Update) Change hashbang to use env (#2 from KjetilK).
- - (Update) Replace use of HTML::HTML5::Parser with XML::LibXML::Parser (#4
-   from @kjetilk).
- - (Update) Updated copyright year and added text about CodeMirror license.
+ - (Update) Add implementation of SPARQL Graph Store Protocol.
+ - (Update) Miscellaneous bug-fixes.
 
 0.001  2016-03-25
 

@@ -1,4 +1,5 @@
 package Counter;
+use v5.12;
 use Moo::Role;
 use MooX::Role::Parameterized;
 use Types::Standard qw( Str );

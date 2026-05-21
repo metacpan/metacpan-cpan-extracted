@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the following metadata."
+title: "OMOP-CSV-Validator"
+version: 0.04
+date-released: 2026-05-08
+authors:
+  - family-names: Rueda
+    given-names: Manuel
+    affiliation: CNAG
+    orcid: https://orcid.org/0000-0001-9280-058X
+repository-code: https://github.com/CNAG-Biomedical-Informatics/omop-csv-validator

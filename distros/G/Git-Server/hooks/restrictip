@@ -45,7 +45,7 @@ sub addr_bits {
     my $base = $1;
     my $prefix = $2 || "";
     my $binaryify = Socket->can("inet_pton") || eval { require Socket6; Socket6->can("inet_pton") };
-    my $pton = $binaryify ? $binaryify->($family, $base) : Socket::inet_aton($base) or die localtime().": [$who] git-server: No IPv6 support for restrictip! $@";
+    my $pton = eval { $binaryify ? $binaryify->($family, $base) : Socket::inet_aton($base) } or die localtime().": [$who] git-server: Unable to decode CIDR [$base] for acl.restrictip! $@\n";
     my $len = AF_INET == $family ? 32 : 128;
     $prefix ||= $len;
     die localtime().": [$who] git-server: CIDR [$base/$prefix] Prefix Stank!\n" if $prefix < 8 or $prefix > $len;

@@ -25,7 +25,8 @@ WriteMakefile(
 		'bin/extract-schemas',
 		'bin/extract-schemas2',
 		'bin/test-generator-index',
-		'bin/generate-test-dashboard'
+		'bin/generate-test-dashboard',
+		'bin/instrument-modules',
 	], MIN_PERL_VERSION => '5.036',
 	PREREQ_PM => {
 		'autodie' => 0,
@@ -67,10 +68,10 @@ WriteMakefile(
 		'FindBin' => 0,
 		'IPC::Run3' => 0,
 		'IPC::System::Simple' => 0,
-		'JSON::MaybeXS' => 0,
 		'JSON::PP' => 0,
 		'Test::DescribeMe' => 0,
 		'Test::LectroTest' => 0,
+		'Test::Mockingbird' => 0.10,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
 		'Test::Returns' => 0.02,

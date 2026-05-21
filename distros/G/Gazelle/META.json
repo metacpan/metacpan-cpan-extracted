@@ -4,7 +4,7 @@
       "Masahiro Nagano <kazeburo@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.7",
+   "generated_by" : "Minilla/v3.1.23",
    "license" : [
       "perl_5"
    ],
@@ -65,11 +65,11 @@
    "provides" : {
       "Gazelle" : {
          "file" : "lib/Gazelle.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       },
       "Plack::Handler::Gazelle" : {
          "file" : "lib/Plack/Handler/Gazelle.pm",
-         "version" : "0.49"
+         "version" : "0.50"
       }
    },
    "release_status" : "stable",
@@ -79,11 +79,12 @@
       },
       "homepage" : "https://github.com/kazeburo/Gazelle",
       "repository" : {
-         "url" : "git://github.com/kazeburo/Gazelle.git",
+         "type" : "git",
+         "url" : "https://github.com/kazeburo/Gazelle.git",
          "web" : "https://github.com/kazeburo/Gazelle"
       }
    },
-   "version" : "0.49",
+   "version" : "0.50",
    "x_authority" : "cpan:KAZEBURO",
    "x_contributors" : [
       "Alex Hunsaker <badalex@gmail.com>",
@@ -100,6 +101,6 @@
       "mattn <mattn.jp@gmail.com>",
       "meru_akimbo <merukatoruayu0@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 0
 }

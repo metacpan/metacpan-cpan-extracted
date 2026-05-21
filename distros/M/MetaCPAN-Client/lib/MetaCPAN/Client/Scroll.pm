@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Scroll;
 # ABSTRACT: A MetaCPAN::Client scroller
-$MetaCPAN::Client::Scroll::VERSION = '2.042000';
+$MetaCPAN::Client::Scroll::VERSION = '2.043000';
 use Moo;
 use Carp;
 use Ref::Util qw< is_hashref >;
@@ -31,7 +31,7 @@ has base_url => (
     required => 1,
 );
 
-has type => (
+has index => (
     is       => 'ro',
     isa      => Str,
     required => 1,
@@ -76,13 +76,13 @@ sub BUILDARGS {
     $args{time} //= '5m';
     $args{size} //= '100';
 
-    my ( $ua, $base_url, $type, $body, $time, $size ) =
-        @args{qw< ua base_url type body time size >};
+    my ( $ua, $base_url, $index, $body, $time, $size ) =
+        @args{qw< ua base_url index body time size >};
 
     # fetch scroller from server
 
     my $res = $ua->post(
-        sprintf( '%s/%s/_search?scroll=%s&size=%s', $base_url, $type, $time, $size ),
+        sprintf( '%s/%s/_search?scroll=%s&size=%s', $base_url, $index, $time, $size ),
         { content => encode_json $body }
     );
 
@@ -187,7 +187,7 @@ MetaCPAN::Client::Scroll - A MetaCPAN::Client scroller
 
 =head1 VERSION
 
-version 2.042000
+version 2.043000
 
 =head1 METHODS
 
@@ -226,9 +226,9 @@ The lifetime of the scroller on the server.
 
 The total number of matches.
 
-=head2 type
+=head2 index
 
-The Elasticsearch type to query.
+The Elasticsearch index to query.
 
 =head2 ua
 

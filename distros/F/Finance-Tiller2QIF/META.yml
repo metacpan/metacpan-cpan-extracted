@@ -1,0 +1,31 @@
+---
+abstract: 'Convert Tiller CSV exports to QIF'
+author:
+  - brainbuz@cpan.org
+build_requires:
+  Capture::Tiny: '0'
+  Test2::Bundle::More: '0'
+  Test2::Tools::Exception: '0'
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Finance-Tiller2QIF
+requires:
+  Cpanel::JSON::XS: '0'
+  DBI: '0'
+  DateTime::Format::Flexible: '0'
+  Getopt::Long::Descriptive: '0'
+  Mojo::SQLite: '0'
+  Path::Tiny: '0'
+  Text::CSV: '0'
+  perl: '5.034'
+version: '1.06'
+x_generated_by_perl: v5.40.0
+x_serialization_backend: 'YAML::Tiny version 1.74'
+x_spdx_expression: GPL-3.0-only

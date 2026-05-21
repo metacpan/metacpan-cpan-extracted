@@ -49,6 +49,7 @@
             "MIME::Base64" : "3.16",
             "Template" : "3.102",
             "Text::Diff" : "1.45",
+            "Tie::IxHash" : "1.23",
             "YAML" : "1.31",
             "YAML::Safe" : "0.82",
             "perl" : "v5.16.0"
@@ -62,13 +63,16 @@
       }
    },
    "provides" : {
+      "CustomCallbacks" : {
+         "file" : "lib/example/CustomCallbacks.pm"
+      },
       "OcToolkit" : {
          "file" : "lib/OcToolkit.pm",
-         "version" : "1.08"
+         "version" : "1.13"
       }
    },
    "release_status" : "stable",
-   "version" : "1.08",
+   "version" : "1.13",
    "x_contributors" : [
       "John Summers <devp2000a@gmail.com>"
    ],

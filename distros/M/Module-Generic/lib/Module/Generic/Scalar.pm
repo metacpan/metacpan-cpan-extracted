@@ -13,10 +13,10 @@
 package Module::Generic::Scalar;
 BEGIN
 {
-    use v5.26.1;
+    use v5.16.0;
     use common::sense;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'Module::Generic' );
     use vars qw( $DEBUG $ERROR );
     use Config;
     use Encode ();
@@ -80,11 +80,24 @@ BEGIN
         },
         fallback => 1,
     );
+    local $@;
+    if( defined( ${^GLOBAL_PHASE} ) )
+    {
+        # perl 5.14+: use the built-in
+        eval q{ sub _in_global_destruction () { ${^GLOBAL_PHASE} eq 'DESTRUCT' } };
+    }
+    else
+    {
+        # perl < 5.14: detect via B::main_cv. During global destruction, PL_main_cv is
+        # set to Nullcv, which B exposes as a B::SPECIAL whose dereferenced value is 0.
+        require B;
+        eval q{ sub _in_global_destruction () { ${B::main_cv()} == 0 } };
+    }
+    die( $@ ) if( $@ );
     $DEBUG = 0;
     our $VERSION = 'v1.4.4';
 };
 
-use v5.26.1;
 use strict;
 no warnings 'redefine';
 require Module::Generic::Array;
@@ -348,7 +361,7 @@ sub error
             Encode::encode( 'UTF-8', "$o", Encode::FB_CROAK );
         };
         # Display warnings if warnings for this class is registered and enabled or if not registered
-        warn( $@ ? $o : $enc_str ) if( $self->_warnings_is_enabled );
+        warn( $@ ? $o : $enc_str ) if( $self->_warnings_is_enabled( 'Module::Generic' ) );
 
         if( !$args->{no_return_null_object} && want( 'OBJECT' ) )
         {
@@ -381,7 +394,49 @@ sub error
     return( $o );
 }
 
-sub fc { return( CORE::fc( ${$_[0]} ) eq CORE::fc( $_[1] ) ); }
+sub fc
+{
+    my( $self, $str ) = @_;
+    # CORE::fc was not available before perl v5.16
+    if( $] >= 5.016 )
+    {
+        # We have to hide CORE::fc, otherwise perl v5.10.1 would throw an error: "CORE::fc is not a keyword"
+        my $ref = CORE->can( 'fc' );
+        return( $ref->( $$self ) eq $ref->( $str ) );
+    }
+    elsif( $str !~ /[^\x00-\x7f]/ )
+    {
+        # Fast path: ASCII-only string
+        return( uc( $$self ) eq uc( $str ) );
+    }
+    else
+    {
+        my $encode = sub
+        {
+            my $string = shift( @_ );
+            # Core module
+            require Unicode::UCD;
+            # Borrowed from Unicode::CaseFold
+            my $out = '';
+            foreach my $codepoint ( unpack( "U*", $string ) )
+            {
+                my $mapping = Unicode::UCD::casefold( $codepoint );
+                my @cp;
+                if( !defined( $mapping ) )
+                {
+                    @cp = ( $codepoint );
+                }
+                else
+                {
+                    @cp = map( hex( $_ ), split( / /, $mapping->{full} ) );
+                }
+                $out .= pack( "U*", @cp );
+            }
+            return( $out );
+        };
+        return( $encode->( $$self ) eq $encode->( $str ) );
+    }
+}
 
 sub hex { return( $_[0]->_number( CORE::hex( ${$_[0]} ) ) ); }
 
@@ -413,7 +468,8 @@ sub lcfirst { no warnings 'uninitialized'; return( __PACKAGE__->_new( CORE::lcfi
 
 sub left { no warnings 'uninitialized'; return( $_[0]->_new( CORE::substr( ${$_[0]}, 0, CORE::int( $_[1] ) ) ) ); }
 
-sub length { no warnings 'uninitialized'; return( $_[0]->_number( CORE::length( ${$_[0]} ) ) ); }
+# in perl v5.10.1 or earlier, length(undef) returns 0 instead of undef, which is not what we want.
+sub length { no warnings 'uninitialized'; return( $_[0]->_number( defined( ${$_[0]} ) ? CORE::length( ${$_[0]} ) : undef ) ); }
 
 sub like
 {
@@ -471,16 +527,28 @@ sub match
             ? $re
             : qr/(?:\Q$re\E)+/
         : $re;
-    @rv = $$self =~ /$re/;
-    if( scalar( @{^CAPTURE} ) )
-    {
-        for( my $i = 0; $i < scalar( @{^CAPTURE} ); $i++ )
-        {
-            push( @matches, ${^CAPTURE}[$i] );
-        }
-    }
+    @rv = $$self =~ $re;
     # For named captures
     my $names = { %+ };
+    # @{^CAPTURE} is only available with perl >= v5.26.0
+    if( $] >= 5.026 )
+    {
+        if( scalar( @{^CAPTURE} ) )
+        {
+            for( my $i = 0; $i < scalar( @{^CAPTURE} ); $i++ )
+            {
+                push( @matches, ${^CAPTURE}[$i] );
+            }
+        }
+    }
+    else
+    {
+        for my $i ( 1 .. $#- )
+        {
+            push( @matches, substr( $$self, $-[$i], $+[$i] - $-[$i] ) );
+        }
+    }
+
     unless( want( 'OBJECT' ) || want( 'SCALAR' ) || want( 'LIST' ) || scalar( @matches ) )
     {
         return(0);
@@ -510,11 +578,11 @@ sub pad
     $str //= ' ';
     if( !CORE::length( $n ) )
     {
-        warn( "No number provided to pad the string object.\n" ) if( $self->_warnings_is_enabled );
+        warn( "No number provided to pad the string object.\n" ) if( $self->_warnings_is_enabled( 'Module::Generic' ) );
     }
     elsif( $n !~ /^\-?\d+$/ )
     {
-        warn( "Number provided \"$n\" to pad string is not an integer.\n" ) if( $self->_warnings_is_enabled );
+        warn( "Number provided \"$n\" to pad string is not an integer.\n" ) if( $self->_warnings_is_enabled( 'Module::Generic' ) );
     }
 
     if( $n < 0 )
@@ -626,16 +694,33 @@ sub replace
             : qr/(?:\Q$re\E)+/
         : $re;
     # return( $$self =~ s/$re/$replacement/gs );
-    @rv = $$self =~ s/$re/$replacement/gs;
-    if( scalar( @{^CAPTURE} ) )
-    {
-        for( my $i = 0; $i < scalar( @{^CAPTURE} ); $i++ )
-        {
-            push( @matches, ${^CAPTURE}[$i] );
-        }
-    }
     # For named captures
     my $names = { %+ };
+    # @{^CAPTURE} is only available with perl >= v5.26.0
+    if( $] >= 5.026 )
+    {
+        @rv = $$self =~ s/$re/$replacement/gs;
+        # Only available in perl >= v5.26.0
+        if( scalar( @{^CAPTURE} ) )
+        {
+            for( my $i = 0; $i < scalar( @{^CAPTURE} ); $i++ )
+            {
+                push( @matches, ${^CAPTURE}[$i] );
+            }
+        }
+    }
+    else
+    {
+        @rv = $$self =~ s{$re}
+        {
+            for my $i ( 1 .. $#- )
+            {
+                push( @matches, substr( $$self, $-[$i], $+[$i] - $-[$i] ) );
+            }
+            $replacement;
+        }ges;
+    }
+
     unless( want( 'OBJECT' ) || want( 'SCALAR' ) || want( 'LIST' ) || scalar( @matches ) )
     {
         return(0);
@@ -687,7 +772,7 @@ sub set
         }
         elsif( ref( $_[0] ) )
         {
-            warn( "I do not know what to do with \"", $_[0], "\" (", overload::StrVal( $_[0] ), ")\n" ) if( $self->_warnings_is_enabled );
+            warn( "I do not know what to do with \"", $_[0], "\" (", overload::StrVal( $_[0] ), ")\n" ) if( $self->_warnings_is_enabled( 'Module::Generic' ) );
             return;
         }
         else
@@ -705,7 +790,7 @@ sub split
     my( $expr, $limit ) = @_;
     if( !scalar( @_ ) )
     {
-        CORE::warn( "No argument was provided to split string in Module::Generic::Scalar::split\n" ) if( $self->_warnings_is_enabled );
+        CORE::warn( "No argument was provided to split string in Module::Generic::Scalar::split\n" ) if( $self->_warnings_is_enabled( 'Module::Generic' ) );
         # NOTE: As per perlfunc: "If omitted, PATTERN defaults to a single space, " ", triggering the previously described *awk* emulation."
         $expr = ' ';
     }
@@ -918,7 +1003,7 @@ sub DESTROY
 {
     # <https://perldoc.perl.org/perlobj#Destructors>
     CORE::local( $., $@, $!, $^E, $? );
-    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    CORE::return if( &_in_global_destruction() );
     my $self = CORE::shift( @_ );
     CORE::return if( !CORE::defined( $self ) );
     if( my $obj = Module::Generic::Global->new( 'errors' => $self ) )

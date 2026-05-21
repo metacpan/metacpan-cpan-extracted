@@ -36,3 +36,16 @@ Thumbs\.db$
 
 # examine_datafile helper
 ^examples/examine_datafile\.pl$
+
+# Build helper scripts
+^build_dist\.sh$
+
+# Detailed changes log (not part of dist — see Changes instead)
+^changes\.md$
+
+# PDF/TeX build artifacts
+\.pdf$
+\.aux$
+\.log$
+\.out$
+\.toc$

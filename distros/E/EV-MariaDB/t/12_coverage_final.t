@@ -123,6 +123,9 @@ with_mariadb(cb => sub {
             if (++$done == 3) {
                 is(scalar @errors, 3, 'send failure: all error callbacks fired');
                 ok($on_err || $errors[0], 'send failure: error message received');
+                # Close explicitly so the wrapper's is_connected check skips
+                # a redundant mysql_close against the dup2'd socket fd.
+                $m->finish;
                 EV::break;
             }
         });

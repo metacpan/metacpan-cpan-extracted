@@ -1,5 +1,40 @@
 Revision History for Git::Server
 
+0.045  2026-05-12 03:00:00
+ - Update webhookcallback.cgi to handle formats
+   like default GitLab or GitHub or Git-Server.
+ - Compatibility fix for legacy strace <= 4.5.18.
+ - Strip XMODIFIERS nothing lines for proxy.url.
+ - Fix acl.restrictip malformed CIDR message.
+ - Fix git-client DEBUG deadlock on git < 2.3.x.
+ - git-deploy enhancements:
+   * Shim scan fix.
+   * Allow bootstrapped or relative invocation.
+   * Avoid blowing away local modifications.
+
+0.044  2026-05-02 23:59:00
+ - INSTALL.md doc corrections.
+ - git-deploy enhancements:
+   * Message recommending alias if not in $PATH.
+   * Fix $PATH to let shim work even from cron.
+   * Backward compatibility patch for git < 2.3.x
+ - git-client enhancements:
+   * Backward compatibility patch for git < 2.3.x
+
+0.043  2026-04-27 11:00:00
+ - Warn clean distribution for RPM 4.14 thru 4.19.
+ - Fix log.logfile refs spacing logging.
+ - proxy.url enhancements:
+   * Security: Honor hooks for local proxy.
+   * Fix sync with multiple remotes on first push.
+   * Maintain sync for "git push --force" too.
+   * Fix ref descent check by ignoring comments.
+   * Show failed sync refs sorted by ref.
+ - git-verify enhancements:
+   * Show all repos user has access to.
+   * Sort scanned repos.
+   * Fix git-packer wrapper installation.
+
 0.042  2026-04-20 01:00:00
  - proxy.url enhancements:
    * OPTIMIZATION: Cache ls-remote failures.

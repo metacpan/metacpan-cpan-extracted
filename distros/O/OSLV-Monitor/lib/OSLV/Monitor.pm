@@ -4,6 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use Scalar::Util qw(looks_like_number);
+use Time::HiRes  qw(gettimeofday);
 
 =head1 NAME
 
@@ -11,11 +12,11 @@ OSLV::Monitor - OS level virtualization monitoring extend for LibreNMS.
 
 =head1 VERSION
 
-Version 1.0.2
+Version 1.0.4
 
 =cut
 
-our $VERSION = '1.0.2';
+our $VERSION = '1.0.4';
 
 =head1 SYNOPSIS
 
@@ -75,7 +76,7 @@ sub new {
 	if ( !defined( $opts{time_divider} ) ) {
 		$opts{time_divider} = 1000000;
 	} else {
-		if ( ! looks_like_number( $opts{time_divider} ) ) {
+		if ( !looks_like_number( $opts{time_divider} ) ) {
 			die('time_divider is not a number');
 		}
 	}
@@ -161,10 +162,12 @@ sub load {
 	my $test_string = '
 use OSLV::Monitor::Backends::' . $self->{backend} . ';
 $backend_test=OSLV::Monitor::Backends::'
-		. $self->{backend}
-		. '->new(base_dir=>$self->{base_dir}, obj=>$self, time_divider=>$self->{time_divider});
+		. $self->{backend} . '->new(base_dir=>$self->{base_dir}, obj=>$self, time_divider=>$self->{time_divider});
 $usable=$backend_test->usable;
 ';
+	if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+		warn( 'DEBUG, ' . join( '.', gettimeofday ) . ': test string "' . $test_string . '"' );
+	}
 	eval($test_string);
 
 	if ($usable) {
@@ -199,6 +202,10 @@ sub run {
 		};
 	}
 
+	if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+		warn( 'DEBUG, ' . join( '.', gettimeofday ) . ': calling backend run' );
+	}
+
 	my $to_return_data;
 	#	eval { $to_return_data = $self->{backend_mod}->run };
 	$to_return_data = $self->{backend_mod}->run;
@@ -225,29 +232,71 @@ sub include {
 	my $self = $_[0];
 	my $name = $_[1];
 
-	# return undef if any of these are true
+	# any of these means it is not meaningfully usable or an error
 	if ( !defined($name) ) {
+		if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+			warn( 'DEBUG, ' . join( '.', gettimeofday ) . ': include name is undef returning 0' );
+		}
 		return 0;
 	} elsif ( ref($name) ne '' ) {
+		if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+			warn(     'DEBUG, '
+					. join( '.', gettimeofday )
+					. ': include name ref is not "" but "'
+					. ref($name)
+					. '" returning 0' );
+		}
 		return 0;
 	} elsif ( $name eq '' ) {
+		if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+			warn( 'DEBUG, ' . join( '.', gettimeofday ) . ': include name is "" returning 0' );
+		}
 		return 0;
+	}
+
+	if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+		warn( 'DEBUG, ' . join( '.', gettimeofday ) . ': include name being tested is "' . $name . '"' );
 	}
 
 	# look for mathcing includes
 	foreach my $item ( @{ $self->{include} } ) {
 		# check if it matches
 		if ( $name =~ /$item/ ) {
+			if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+				warn(     'DEBUG, '
+						. join( '.', gettimeofday )
+						. ': include name matched include /'
+						. $item
+						. '/ testing for exlcudes now' );
+			}
 			# if we got a match check for excludes
 			foreach my $item ( @{ $self->{exclude} } ) {
 				if ( $name =~ /$item/ ) {
 					return 0;
+				} elsif ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+					warn(     'DEBUG, '
+							. join( '.', gettimeofday )
+							. ': include name did not match exclude /'
+							. $item
+							. '/' );
 				}
-			}
+			} ## end foreach my $item ( @{ $self->{exclude} } )
 			# if we get here it should means a include matched and no excludes matched
+			if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+				warn(     'DEBUG, '
+						. join( '.', gettimeofday )
+						. ': include name matched a include and no exlcudes returning 1' );
+			}
 			return 1;
-		} ## end if ( $name =~ /$item/ )
+		} elsif ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+			warn( 'DEBUG, ' . join( '.', gettimeofday ) . ': include name did not match include /' . $item . '/' );
+		}
+
 	} ## end foreach my $item ( @{ $self->{include} } )
+
+	if ( $ENV{'OSLV_MONITOR_DEBUG'} ) {
+		warn( 'DEBUG, ' . join( '.', gettimeofday ) . ': include name did not match any includes' );
+	}
 
 	# if we get here it should mean no includes matched
 	return 0;

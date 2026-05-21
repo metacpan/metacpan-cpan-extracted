@@ -1,0 +1,121 @@
+Revision history for Archive-Lha
+
+0.22  2026-05-14 (Nicolas Mendoza)
+    - Remove Archive::Lha::Debug and heavyweight deps (Log::Dispatch, Data::Dump)
+    - Add Test::UseAllModules to TEST_REQUIRES
+    - Fix provides version in META_MERGE to match distribution version
+
+0.21  2026-05-13 (Nicolas Mendoza)
+    - Exclude .github/ from CPAN distribution via MANIFEST.SKIP
+    - Add CONTRIBUTING.md, SECURITY.md, and LICENSE file
+    - Add provides map to META_MERGE in Makefile.PL
+    - Update GitHub Actions to Node.js 24 compatible versions
+      (checkout@v5, cache@v5, actions-setup-perl@v1.41.0)
+
+0.20  2026-05-13 (Nicolas Mendoza)
+    - Fix Windows path separators in pathname(): use File::Spec::Unix
+      throughout so LHA archive paths always use forward slashes
+    - Replace plhasa symlink with a real wrapper script (pl2bat cannot
+      convert symlinks on Windows); detect plhasa mode via $ENV{PLHASA}
+    - Fix timestamp display on Windows: avoid strftime %e (unsupported on
+      older MSVC CRT); use sprintf "%2d" for space-padded day instead
+    - Fix _ls_stamp_header to use _dostime2utime instead of POSIX::mktime
+    - Add Windows CI jobs (Strawberry Perl 5.38 and 5.40)
+    - Remove Data::Dump noise from t/20_decode.t test names
+
+0.19  2026-05-11 (Nicolas Mendoza)
+    - Fix ratio precision in plhasa output: use pack/unpack 'f' to match
+      lhasa's C float rounding (e.g. 25340/40000 gives 63.3% not 63.4%)
+    - Update MANIFEST: add t/charset.t, tools/plhasa, MANIFEST.SKIP,
+      .github/workflows/ci.yml, synthetic test archives; remove bin/act
+      and lib/Archive/Lha.c (generated, now git-ignored)
+
+0.18  2026-05-11 (Nicolas Mendoza)
+    - Fix DOS timestamp test to not assume positive epoch on 32-bit Perl:
+      0xFB9FF926 decodes to year 2105 which overflows 32-bit time_t on
+      ivsize=4 builds (e.g. armv6l without -Duse64bitint); only assert
+      no crash — proper fix is a Perl built with -Duse64bitint or -Duse64bitall
+
+0.17  2026-05-11 (Nicolas Mendoza)
+    - Fix pathname() dropping trailing slash on directory entries
+      (File::Spec->canonpath strips it); switch to File::Spec::Unix->canonpath
+      for portable forward-slash paths on all platforms
+    - Add synthetic test archive dir_trailing_slash.lha with -lhd- and -lh0-
+      directory entries to regression-test trailing slash preservation
+
+0.16  2026-05-10 (Nicolas Mendoza)
+    - Fix decode corruption on Perl built with -Duselongdouble -DDEBUGGING:
+      replace POPp with POPs + SvPVbyte() in input() so the read callback's
+      return value is safely stringified before copying (#1)
+    - Fix UB in Lha.h and Lha.xs: use 1u instead of 1 in bit-shift
+      expressions to avoid signed overflow (introduced in fe85a9c)
+    - Add smoke CI job for Perl 5.36.3 long-double DEBUGGING (perlbrew)
+    - Remove generated lib/Archive/Lha.c from version control
+
+0.15  2026-05-09 (Nicolas Mendoza)
+    - Remove _BSD_SOURCE/_DEFAULT_SOURCE defines from Lha.xs; these caused
+      "Table is broken: total mismatch" decode failures on older glibc
+      platforms (CPAN Testers regression on Perl 5.28/5.32 with 0.13)
+
+0.14  2026-05-09 (Nicolas Mendoza)
+    - Fix plhasa incorrectly lowercasing all-caps filenames in Amiga
+      archives; _fix_msdos_allcaps now only applies when OS byte is 'M'
+      (GitHub issue #2)
+    - Replace real-world test archives with minimal synthetic fixtures
+      (amiga_prefix.lha, amiga_allcaps_preserve.lha)
+
+0.13  2026-05-09 (Nicolas Mendoza)
+    - XS implementations of checksum and dostime2utime in
+      Archive::Lha::Header::Utils; pure-Perl fallbacks retained
+    - Store raw DOS integer in header{timestamp} for Level0/1; new
+      timestamp_is_unix flag distinguishes DOS from Unix epoch at display time
+    - Preload Level0/1/2 header parsers; dispatch via array instead of eval
+    - Fix filename charset for UNIX-tagged archives: use Encode::Guess
+      instead of assuming UTF-8 (fixes latin-1 filenames e.g. "Français")
+    - plha l: show filename node only (no path), matching Amiga LhA guide
+    - plha v/vv: fix timestamps for Level0/1 archives; display CRC uppercase
+    - plha/plhasa: English month names by default (LC_TIME=C), matching
+      lhasa and LhA for UNIX which both hardcode a static months[] array
+    - Add --use-locale flag to opt in to system locale month names
+    - Add --from-charset/--to-charset as long forms of -fc/-tc
+    - CI: run on all branches, use cpanm --installdeps, cache deps,
+      use prove -wlvmb t; hardcode expected plhasa output in tests
+
+0.12  2026-05-08 (Nicolas Mendoza)
+    - Install plhasa via EXE_FILES instead of postamble symlink so it
+      is correctly installed by cpanm (postamble install targets are
+      skipped by cpanm)
+    - Add GitHub repository URL to CPAN metadata
+
+0.11  2026-05-07 (Nicolas Mendoza)
+    - OS-based filename charset auto-detection in pathname()
+      (Amiga->iso-8859-15, MS-DOS/Win->cp1252, Unix->UTF-8, X68K->cp932)
+    - plha l command: LhA terse listing format (filename only, + prefix for paths)
+    - plha -fc/-tc options: explicit from/to charset for filenames
+    - plhasa symlink: activates lhasa-compatible interface (l/v listing formats)
+    - Truncation detection in check_magic(): warn if last byte is not 0x00
+    - Fix Perl 5.38+ incompatibility in Decode::Base (constant subs closing over
+      lexicals): replaced with %_params hash keyed by subclass name
+    - Fix Decode::Base accessor redefinition warnings (_accessors_installed guard)
+    - Full POD rewrite for Archive::Lha and plha: encoding, charset table,
+      limitations, Amiga LhA command docs, Wayback Machine links for dead URLs
+    - Makefile.PL: added missing PREREQ_PM deps (Encode, File::Basename,
+      File::Path, Getopt::Long, Log::Dispatch, Data::Dump, Time::Moment)
+    - Test suite: Amiga and latin-1 test archives, truncation test,
+      unknown command error test, charset option tests
+
+0.10  2026-05-06 (Nicolas Mendoza)
+    - Handle Level 0 file comments (null-byte separator in pathname)
+    - Truncate pathnames and filenames at embedded null bytes
+    - Parse Unix permissions (0x50), UID/GID (0x51), group name (0x52)
+      from extended headers
+    - Handle all LHA methods (lhd, lzs, lz4, lz5, pm0, pm1, pm2)
+    - Fix Windows directory path handling (Amiga compatibility)
+    - Use POSIX::mktime for DOS timestamps (normalizes out-of-range values)
+    - Lower minimum Level 0/1 header size to match lhasa behavior
+    - Add plha command-line tool with lhasa-compatible listing formats
+      (l, lv, v, vv modes)
+    - Add MS-DOS all-caps to lowercase filename conversion
+
+0.06  2007 (Kenichi Ishigaki)
+    - Original CPAN release

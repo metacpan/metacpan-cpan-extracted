@@ -1,5 +1,5 @@
 /*
- * chandra_devtools.h — DevTools JS constant and helpers
+ * chandra_devtools.h - DevTools JS constant and helpers
  * Included from Chandra.xs
  */
 

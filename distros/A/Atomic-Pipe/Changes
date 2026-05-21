@@ -1,3 +1,65 @@
+0.029     2026-04-30 09:15:03-07:00 America/Los_Angeles
+
+    - Add [PruneCruft] to dist.ini so build artifacts (blib/,
+      pm_to_blib, MYMETA.*) no longer leak into release tarballs.
+
+0.028     2026-04-26 20:20:00-07:00 America/Los_Angeles
+
+    - Broaden environmental skip in t/resize.t for the raw
+      fcntl(F_SETPIPE_SZ) sentinel: any non-EINVAL errno is treated as
+      environmental (smoker pipe-page budget, EBUSY, etc.) and
+      skipped. EINVAL stays a hard failure since that is the
+      chomp-string regression the sentinel exists to catch. Adds the
+      failing errno to diag output for future debugging.
+
+    - Load IO::Handle explicitly in Atomic::Pipe and t/compression.t
+      so $w->wh->autoflush(1) works on perls (e.g. 5.12) that do not
+      autoload IO::Handle methods on pipe filehandles. Fixes the
+      mixed_mode_compression FAIL in t/compression.t under perl 5.12.5.
+
+0.027     2026-04-26 05:22:21-07:00 America/Los_Angeles
+
+    - Skip dictionary subtests in t/compression.t when the
+      Compress::Zstd::{Compression,Decompression}{Context,Dictionary}
+      submodules are unavailable. Older Compress::Zstd releases ship
+      without them, which caused four CPAN-Testers FAIL reports under
+      perl 5.20/5.22/5.24.
+
+    - Free the first pipe in t/resize.t before opening the second fifo
+      for the raw fcntl(F_SETPIPE_SZ) sentinel, so the per-user
+      pipe-pages budget is released. Fixes intermittent test 7 FAILs
+      on smokers running multiple pipes in parallel.
+
+0.026     2026-04-26 01:25:04-07:00 America/Los_Angeles
+
+    - Add optional Zstd compression (with optional shared dictionary, supplied
+      as raw bytes or a file path) for bursts and messages, plus a
+      `keep_compressed` flag that exposes the on-wire compressed bytes
+      alongside the decompressed payload. Compress::Zstd is a soft dependency
+      loaded only when compression is enabled.
+
+    - Fix write_blocking() so it actually toggles O_NONBLOCK
+      correctly. Previously fcntl(F_GETFL) was treated as filling an
+      lvalue, so the existing flags were never read, and the
+      "blocking" branch used XOR instead of AND-NOT, which caused
+      write_blocking(1) to silently put the pipe into non-blocking
+      mode.
+
+0.025     2026-04-25 10:08:57-07:00 America/Los_Angeles
+
+    - Fix max_size returning a chomped string from
+      /proc/sys/fs/pipe-max-size, which silently broke
+      resize/resize_or_max on Linux. resize() now numifies $size
+      defensively, and max_size() returns an integer.
+
+0.024     2026-04-12 18:28:48-07:00 America/Los_Angeles
+
+    - Use IO::Select in fill_buffer() for efficient readability polling
+    - IO::Select is now an optional (recommended) dependency
+    - Added use_io_select attribute to toggle IO::Select on/off per instance
+    - Added HAVE_IO_SELECT constant
+    - Falls back to blocking sysread with EINTR retry when IO::Select is unavailable or disabled
+
 0.023     2026-03-31 18:57:05-07:00 America/Los_Angeles
 
     - Fix test lockup on omnios and other 16k pipe buffer systems

@@ -1,0 +1,4 @@
+Thanks to Rocco Caputo's IO::Pipely::pipely where I got the idea how to communicate using mutliplatform pipes.
+Thanks to Shlomi Fish who increased my level of awareness on how good CPAN modules should look like.
+Thanks to booking.com, the dream company for all Perl programmers which productive environment and real life jobs inspired me to create this module.
+

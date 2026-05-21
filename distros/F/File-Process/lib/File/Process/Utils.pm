@@ -4,21 +4,21 @@ use strict;
 use warnings;
 
 use Carp;
-use Text::CSV_XS;
 use Data::Dumper;
-use ReadonlyX;
 use Scalar::Util qw(reftype);
 
-Readonly our $SUCCESS => 1;
-Readonly our $FAILURE => 0;
-Readonly our $TRUE    => 1;
-Readonly our $FALSE   => 0;
+use Readonly;
 
-Readonly our $EMPTY => q{};
-Readonly our $NL    => "\n";
-Readonly our $TAB   => "\t";
-Readonly our $PIPE  => q{|};
-Readonly our $COMMA => q{,};
+Readonly::Scalar our $SUCCESS => 1;
+Readonly::Scalar our $FAILURE => 0;
+Readonly::Scalar our $TRUE    => 1;
+Readonly::Scalar our $FALSE   => 0;
+
+Readonly::Scalar our $EMPTY => q{};
+Readonly::Scalar our $NL    => "\n";
+Readonly::Scalar our $TAB   => "\t";
+Readonly::Scalar our $PIPE  => q{|};
+Readonly::Scalar our $COMMA => q{,};
 
 use parent qw(Exporter);
 
@@ -43,7 +43,7 @@ our %EXPORT_TAGS = (
   'all'      => \@EXPORT_OK,
 );
 
-our $VERSION = '0.11';
+our $VERSION = '1.0.0';
 
 ########################################################################
 sub _is_array { push @_, 'ARRAY'; goto &_is_type; }
@@ -52,7 +52,7 @@ sub is_code   { push @_, 'CODE';  goto &_is_type; }
 ########################################################################
 
 ########################################################################
-sub is_hash {  ## no critic (RequireArgUnpacking)
+sub is_hash { ## no critic (RequireArgUnpacking)
 ########################################################################
   my $result = _is_hash( $_[0] );
 
@@ -63,7 +63,7 @@ sub is_hash {  ## no critic (RequireArgUnpacking)
 }
 
 ########################################################################
-sub is_array {  ## no critic (RequireArgUnpacking)
+sub is_array { ## no critic (RequireArgUnpacking)
 ########################################################################
   my $result = _is_array( $_[0] );
 
@@ -85,6 +85,8 @@ sub process_csv {
   require File::Process;
 
   my $csv_options = $options{csv_options} // {};
+
+  require Text::CSV_XS;
 
   my $csv = Text::CSV_XS->new($csv_options);
 
@@ -294,7 +296,7 @@ index of the array tha that corresponds to the index in the input you
 wish to process.
 
   my %hooks = ( col1 => sub { uc shift } );
-              
+
   my $obj = process_csv(
     'foo.csv',
     column_names => [],

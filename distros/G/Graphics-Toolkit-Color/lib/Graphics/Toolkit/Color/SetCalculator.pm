@@ -11,16 +11,16 @@ my $half_hue_max = $HSL->shape->axis_value_max(0) / 2;
 ########################################################################
 sub complement { # :base_color +steps +tilt %target_delta --> @:values
     my ($start_color, $steps, $tilt, $target_delta) = @_;
-    my $start_values = $start_color->shaped( $HSL->name );
-    my $target_values = [@$start_values];
+    my $start_tuple = $start_color->shaped( $HSL->name );
+    my $target_values = [@$start_tuple];
     $target_values->[0] += $half_hue_max;
     for my $axis_index (0 .. 2) {
         $target_delta->[$axis_index] = 0 unless defined $target_delta->[$axis_index];
         $target_values->[$axis_index] += $target_delta->[$axis_index];
     }
     $target_values = $HSL->clamp( $target_values );  # bring back out of bound linear axis values
-    $target_delta->[1] = $target_values->[1] - $start_values->[1];
-    $target_delta->[2] = $target_values->[2] - $start_values->[2];
+    $target_delta->[1] = $target_values->[1] - $start_tuple->[1];
+    $target_delta->[2] = $target_values->[2] - $start_tuple->[2];
     my $result_count = int abs $steps;
     my $scaling_exponent = abs($tilt) + 1;
     my @hue_percent = map {($_ * 2 / $result_count) ** $scaling_exponent} 1 .. ($result_count - 1) / 2;
@@ -28,9 +28,9 @@ sub complement { # :base_color +steps +tilt %target_delta --> @:values
     my $hue_delta = $half_hue_max + $target_delta->[0]; # real value size of half complement circle
     my @result = ();
     push( @result, Graphics::Toolkit::Color::Values->new_from_tuple(
-                    [$start_values->[0] + ($hue_delta         * $_),
-                     $start_values->[1] + ($target_delta->[1] * $_),
-                     $start_values->[2] + ($target_delta->[2] * $_)], $HSL->name)) for @hue_percent;
+                    [$start_tuple->[0] + ($hue_delta         * $_),
+                     $start_tuple->[1] + ($target_delta->[1] * $_),
+                     $start_tuple->[2] + ($target_delta->[2] * $_)], $HSL->name)) for @hue_percent;
     push @result, Graphics::Toolkit::Color::Values->new_from_tuple( $target_values, $HSL->name)
         if $result_count == 1 or not $result_count % 2;
     $hue_delta = $half_hue_max - $target_delta->[0];
@@ -67,21 +67,21 @@ sub gradient { # @:colors, +steps, +tilt, :space --> @:values
 ########################################################################
 my $adj_len_at_45_deg = sqrt(2) / 2;
 
-sub cluster { # :values, +radius @+|+distance, :space --> @:values
+sub cluster { # .center, +radius @+|+distance, .space --> @:values
     my ($center_color, $cluster_radius, $color_distance, $color_space) = @_;
     my $color_space_name = $color_space->name;
-    my $center_values = $center_color->shaped( $color_space_name );
-    my $center_x = $center_values->[0];
-    my $center_y = $center_values->[1];
-    my $center_z = $center_values->[2];
+    my $center_tuple = $center_color->shaped( $color_space_name );
+    my $center_x = $center_tuple->[0];
+    my $center_y = $center_tuple->[1];
+    my $center_z = $center_tuple->[2];
     my @result_values;
     if (ref $cluster_radius) { # cuboid shaped cluster
         my $colors_in_direction = int $cluster_radius->[0] / $color_distance;
-        my $corner_value = $center_values->[0] - ($colors_in_direction * $color_distance);
+        my $corner_value = $center_tuple->[0] - ($colors_in_direction * $color_distance);
         @result_values = map {[$corner_value + ($_ * $color_distance)]} 0 .. 2 * $colors_in_direction;
         for my $axis_index (1 .. $color_space->axis_count - 1){
             my $colors_in_direction = int $cluster_radius->[$axis_index] / $color_distance;
-            my $corner_value = $center_values->[$axis_index] - ($colors_in_direction * $color_distance);
+            my $corner_value = $center_tuple->[$axis_index] - ($colors_in_direction * $color_distance);
             @result_values = map {
                 my @good_values = @$_[0 .. $axis_index-1];
                 map {[@good_values, ($corner_value + ($_ * $color_distance))]} 0 .. 2 * $colors_in_direction;

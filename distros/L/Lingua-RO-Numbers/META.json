@@ -1,10 +1,10 @@
 {
    "abstract" : "Convert numeric values into their Romanian string equivalents and viceversa",
    "author" : [
-      "Daniel \"Trizen\" Șuteu <trizenx@gmail.com>"
+      "Daniel Șuteu <trizen@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "artistic_2"
    ],
@@ -27,7 +27,7 @@
       "runtime" : {
          "requires" : {
             "Encode" : "0",
-            "perl" : "5.006",
+            "perl" : "5.0080001",
             "strict" : "0",
             "utf8" : "0",
             "warnings" : "0"
@@ -37,18 +37,18 @@
    "provides" : {
       "Lingua::RO::Numbers" : {
          "file" : "lib/Lingua/RO/Numbers.pm",
-         "version" : "0.22"
+         "version" : "0.23"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "license" : [
-         "http://www.perlfoundation.org/artistic_license_2_0"
+         "http://opensource.org/licenses/artistic-license-2.0.php"
       ],
       "repository" : {
          "url" : "https://github.com/trizen/Lingua-RO-Numbers"
       }
    },
-   "version" : "0.22",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.23",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

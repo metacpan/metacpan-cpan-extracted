@@ -1,0 +1,8 @@
+% my $event_id = $TicketObj->FirstCustomFieldValue('MISP Event ID');
+% return unless $event_id;
+
+<& /RTIR/Elements/ShowMISPEventDetails, Ticket => $TicketObj &>
+
+<%ARGS>
+$TicketObj
+</%ARGS>

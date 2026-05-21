@@ -1,0 +1,80 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+use Developer::Dashboard::CLI::Ticket qw(run_workspace_command);
+
+# main(@ARGV)
+# Runs the workspace helper for Developer Dashboard.
+# Input: command-line arguments from @ARGV.
+# Output: creates or attaches to the requested tmux workspace session, then exits.
+run_workspace_command( args => \@ARGV );
+
+__END__
+
+=pod
+
+=head1 NAME
+
+workspace - private tmux workspace helper for Developer Dashboard
+
+=head1 SYNOPSIS
+
+  dashboard workspace <workspace-ref>
+
+=head1 DESCRIPTION
+
+This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the main
+C<dashboard> command can keep workspace-session behaviour available without
+installing a generic executable into the user's global PATH.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+This staged helper exposes C<dashboard workspace>, the command that creates or
+reuses a tmux session for one workspace and then attaches the terminal to it.
+It is the shell-facing entrypoint for the workspace-session workflow.
+
+=head1 WHY IT EXISTS
+
+It exists because workspace-session behavior is a built-in convenience feature,
+but the public switchboard should stay thin while the workspace module owns tmux
+session naming, layered env seeding, and create-vs-attach logic.
+
+=head1 WHEN TO USE
+
+Use this file when changing the C<dashboard workspace> CLI contract, the staged
+helper handoff, or the examples contributors use to understand explicit workspace
+selection and session environment refresh behavior.
+
+=head1 HOW TO USE
+
+Users run C<dashboard workspace E<lt>workspace-refE<gt>> or set C<WORKSPACE_REF>
+and run C<dashboard workspace>. The staged helper forwards the request into the
+private runtime, which loads C<Developer::Dashboard::CLI::Ticket>, resolves the
+workspace name, seeds C<WORKSPACE_REF>, C<TICKET_REF>, C<B>, and C<OB> in the
+tmux session environment, refreshes layered plain-directory C<.env> values from
+the highest ancestor down to the current directory, creates a detached C<Code1>
+window when the session does not exist yet, and then attaches to that session.
+
+=head1 WHAT USES IT
+
+It is used by workspace-session workflows in the shell, by prompt integrations
+that rely on consistent workspace environment variables, and by regression tests
+that verify explicit workspace selection, env refresh, and environment fallback.
+
+=head1 EXAMPLES
+
+  dashboard workspace
+  dashboard workspace DD-123
+  WORKSPACE_REF=DD-123 dashboard workspace
+  dashboard workspace feature-branch-42
+
+=for comment FULL-POD-DOC END
+
+=cut

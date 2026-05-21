@@ -22,6 +22,7 @@ examples/complex-either-not.pl
 examples/complex-nested-either-and.pl
 examples/complex.pl
 examples/contributors.pl
+examples/count.pl
 examples/cover.pl
 examples/cve.pl
 examples/cve_list.pl
@@ -68,6 +69,7 @@ t/api/_get.t
 t/api/_get_or_search.t
 t/api/_search.t
 t/api/author.t
+t/api/count.t
 t/api/cover.t
 t/api/cve.t
 t/api/distribution.t

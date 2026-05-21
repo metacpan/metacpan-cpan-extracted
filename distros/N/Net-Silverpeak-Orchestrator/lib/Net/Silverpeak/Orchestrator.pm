@@ -1,5 +1,5 @@
 package Net::Silverpeak::Orchestrator;
-$Net::Silverpeak::Orchestrator::VERSION = '0.016000';
+$Net::Silverpeak::Orchestrator::VERSION = '0.017000';
 # ABSTRACT: Silverpeak Orchestrator REST API client library
 
 use 5.024;
@@ -281,6 +281,26 @@ sub get_appliance_extrainfo ($self, $id) {
     my $res = $self->_is_version_93
         ? $self->get('/gms/rest/appliance/extraInfo', { nePk => $id })
         : $self->get('/gms/rest/appliance/extraInfo/'. uri_escape($id));
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return $res->data;
+}
+
+
+sub get_appliance_rest ($self, $id, $url) {
+    my $res = $self->_is_version_93
+        ? $self->get('/gms/rest/appliance/rest', { nePk => $id, url => $url })
+        : $self->get('/gms/rest/appliance/rest/' . uri_escape($id) . '/' . uri_escape($url));
+    $self->_error_handler($res)
+        unless $res->code == 200;
+    return $res->data;
+}
+
+
+sub create_or_update_appliance_rest ($self, $id, $url, $data) {
+    my $res = $self->_is_version_93
+        ? $self->_post_with_params('/gms/rest/appliance/rest', { nePk => $id, url => $url }, $data)
+        : $self->post('/gms/rest/appliance/rest/' . uri_escape($id) . '/' . uri_escape($url), $data);
     $self->_error_handler($res)
         unless $res->code == 200;
     return $res->data;
@@ -616,7 +636,7 @@ Net::Silverpeak::Orchestrator - Silverpeak Orchestrator REST API client library
 
 =head1 VERSION
 
-version 0.016000
+version 0.017000
 
 =head1 SYNOPSIS
 
@@ -750,6 +770,14 @@ Returns an appliance by id.
 Takes an appliance id.
 
 Returns a hashref with additional infos about the appliance like its location.
+
+=head2 get_appliance_rest
+
+To communicate with appliance GET APIs directly.
+
+=head2 create_or_update_appliance_rest
+
+To communicate with appliance POST APIs directly.
 
 =head2 get_ha_groups_by_id
 

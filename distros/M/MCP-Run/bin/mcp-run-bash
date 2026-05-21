@@ -43,7 +43,7 @@ mcp-run-bash - MCP server that executes shell commands via bash over stdio
 
 =head1 VERSION
 
-version 0.100
+version 0.103
 
 =head1 SYNOPSIS
 
@@ -156,7 +156,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

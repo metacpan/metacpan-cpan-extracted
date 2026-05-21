@@ -46,8 +46,8 @@ sub TO_JSON {
 
 =head1 NAME
 
-SBOM::CycloneDX::Tools - [Deprecated] The tool(s) used in the creation, enrichment,
-and validation of the BOM
+SBOM::CycloneDX::Tools - The tool(s) used in the creation, enrichment, and
+validation of the BOM.
 
 =head1 SYNOPSIS
 
@@ -57,8 +57,7 @@ and validation of the BOM
 
 =head1 DESCRIPTION
 
-L<SBOM::CycloneDX::Tools> is a "deprecated" module for generate the tool(s) used
-in the creation, enrichment, and validation of the BOM.
+L<SBOM::CycloneDX::Tools> used in the creation, enrichment, and validation of the BOM.
 
 =head2 METHODS
 

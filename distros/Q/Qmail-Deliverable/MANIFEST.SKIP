@@ -1,0 +1,5 @@
+^\.claude
+^\.git
+^\.release
+^Qmail-Deliverable-\d+\.\d+\.tar(?:\.gz)?$
+^cover_db

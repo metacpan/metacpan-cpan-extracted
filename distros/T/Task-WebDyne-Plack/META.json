@@ -33,9 +33,13 @@
       "runtime" : {
          "requires" : {
             "Plack" : "0",
-            "Test::Simple" : "0.44",
             "WebDyne" : "0",
             "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
          }
       }
    },
@@ -51,6 +55,6 @@
          "web" : "https://github.com/aspeer/pm-Task-WebDyne-Plack"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

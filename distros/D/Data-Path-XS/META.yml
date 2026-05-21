@@ -23,12 +23,12 @@ no_index:
 provides:
   Data::Path::XS:
     file: lib/Data/Path/XS.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   XS::Parse::Keyword: '0.40'
   perl: '5.026'
 resources:
   bugtracker: https://github.com/vividsnow/perl5-data-path-xs/issues
   repository: https://github.com/vividsnow/perl5-data-path-xs.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

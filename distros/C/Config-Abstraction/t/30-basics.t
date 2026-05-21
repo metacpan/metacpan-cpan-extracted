@@ -88,6 +88,7 @@ is $config->get('database.pass'), 'local_pass', 'local.json overrides base.yaml'
 ok $config->get('feature.enabled'), 'feature.enabled from JSON';
 is $config->get('extra.debug'), '1', 'extra.debug from ENV';
 is($config->all()->{'database'}{'user'}, 'env_user', 'all() works, when not flattened');
+is($config->database()->{user}, 'env_user', 'AUTOLOAD works, when flattened');
 ok(exists($config->all()->{'database'}{'empty'}), 'empty exists');
 ok(!defined($config->all()->{'database'}{'empty'}), 'empty is not defined');
 

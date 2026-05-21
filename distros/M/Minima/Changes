@@ -1,3 +1,36 @@
+v0.8.0  2026-05-04
+
+        [Changes]
+        - Add route commands to Minima::Router and Minima::App. Routes
+          can now use @redirect/@r and @redirect_permanent/@rp in the
+          controller column to return temporary or permanent redirects
+          directly from the route map.
+        - Add session-backed flash messages to Minima::Controller via
+          flash(). Messages are grouped by type, stored in the PSGI
+          session, and consumed on read.
+        - Add Minima::Router::not_found_route() to expose the registered
+          not_found route independently from route matching.
+        - Switch the distribution build from Module::Build to
+          ExtUtils::MakeMaker, using File::ShareDir::Install for shared
+          files. Update cpanfile, generated-file ignores, and packaging
+          skip rules accordingly.
+
+        [Fixes]
+        - Minima::Router: trim route lines before parsing fields so
+          leading whitespace does not create empty columns.
+        - Minima::App: move controller setup into the dispatch
+          error-handling path so route validation, controller loading,
+          and missing-action failures can use the production
+          server_error route when configured, while development now
+          reports a clearer framework-level diagnostic.
+
+        [Documentation]
+        - Clarify controller_prefix handling. Prefixes should be passed
+          without trailing : or :: separators; the router adds :: when
+          expanding route shortcuts.
+        - Improve Minima::Controller documentation.
+        - Add POD syntax validation to the test suite.
+
 v0.7.4  2025-10-06
 
         [Fixes]

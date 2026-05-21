@@ -8,6 +8,7 @@ requires 'Exporter';
 requires 'ExtUtils::MakeMaker', '6.64';
 requires 'List::Util', '1.33';
 requires 'Params::Get', '0.13';
+requires 'Readonly::Values::Boolean';
 requires 'Scalar::Util';
 requires 'Unicode::GCString';
 requires 'strict';
@@ -16,6 +17,7 @@ requires 'warnings';
 on 'configure' => sub {
 	requires 'ExtUtils::MakeMaker', '6.64';
 };
+
 on 'test' => sub {
 	requires 'File::Glob';
 	requires 'File::Slurp';
@@ -27,10 +29,12 @@ on 'test' => sub {
 	requires 'Readonly';
 	requires 'Test::Compile';
 	requires 'Test::DescribeMe';
+	requires 'Test::Mockingbird', '0.10';
 	requires 'Test::Most';
 	requires 'Test::Needs';
 	requires 'Test::Warnings';
 };
+
 on 'develop' => sub {
 	requires 'Devel::Cover';
 	requires 'Perl::Critic';

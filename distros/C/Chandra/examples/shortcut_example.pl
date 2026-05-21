@@ -11,7 +11,7 @@ my $app = Chandra::App->new(
 
 # Single key shortcut
 $app->shortcut('f5', sub {
-    print "F5 pressed — refreshing\n";
+    print "F5 pressed - refreshing\n";
     $app->refresh;
 });
 
@@ -55,15 +55,15 @@ $app->set_content(q{
         <h1>Keyboard Shortcut Demo</h1>
         <p>Try these shortcuts:</p>
         <ul>
-            <li><kbd>F5</kbd> — Refresh</li>
-            <li><kbd>Cmd/Ctrl+S</kbd> — Save</li>
-            <li><kbd>Cmd/Ctrl+Shift+S</kbd> — Save As</li>
-            <li><kbd>Cmd/Ctrl+P</kbd> — Command Palette (prevents print)</li>
-            <li><kbd>Cmd/Ctrl+K, Cmd/Ctrl+C</kbd> — Comment (chord)</li>
-            <li><kbd>Cmd/Ctrl+Z</kbd> — Undo</li>
-            <li><kbd>Cmd/Ctrl+Shift+Z</kbd> — Redo</li>
-            <li><kbd>Escape</kbd> — Escape</li>
-            <li><kbd>F10</kbd> — Fullscreen</li>
+            <li><kbd>F5</kbd> - Refresh</li>
+            <li><kbd>Cmd/Ctrl+S</kbd> - Save</li>
+            <li><kbd>Cmd/Ctrl+Shift+S</kbd> - Save As</li>
+            <li><kbd>Cmd/Ctrl+P</kbd> - Command Palette (prevents print)</li>
+            <li><kbd>Cmd/Ctrl+K, Cmd/Ctrl+C</kbd> - Comment (chord)</li>
+            <li><kbd>Cmd/Ctrl+Z</kbd> - Undo</li>
+            <li><kbd>Cmd/Ctrl+Shift+Z</kbd> - Redo</li>
+            <li><kbd>Escape</kbd> - Escape</li>
+            <li><kbd>F10</kbd> - Fullscreen</li>
         </ul>
         <p>Check the terminal for output.</p>
     </div>

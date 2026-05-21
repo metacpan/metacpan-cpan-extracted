@@ -5,7 +5,7 @@ use warnings;
 use utf8;
 
 use Config ();
-use Cwd qw(abs_path);
+use Cwd qw(abs_path cwd);
 use FindBin qw($Bin);
 use lib "$Bin/../lib";
 use File::Spec;
@@ -20,6 +20,7 @@ binmode STDERR, ':encoding(UTF-8)';
 
 use Developer::Dashboard::Platform qw(
   command_argv_for_path
+  is_windows
   is_runnable_file
   resolve_runnable_file
 );
@@ -30,6 +31,7 @@ use Developer::Dashboard::InternalCLI ();
 use Developer::Dashboard::Runtime::Result ();
 
 my $dashboard_lib = File::Spec->catdir( $Bin, '..', 'lib' );
+my $switchboard_cwd = eval { cwd() };
 if ( -d $dashboard_lib ) {
     my $path_sep = $Config::Config{path_sep} || ':';
     my @existing = grep { defined && $_ ne '' } split /\Q$path_sep\E/, ( $ENV{PERL5LIB} || '' );
@@ -151,6 +153,7 @@ sub _load_runtime_env {
     require Developer::Dashboard::PathRegistry;
     Developer::Dashboard::EnvAudit->clear();
     my $paths = Developer::Dashboard::PathRegistry->new(
+        cwd             => $switchboard_cwd,
         home            => $ENV{HOME},
         workspace_roots => [],
         project_roots   => [],
@@ -265,6 +268,7 @@ sub _builtin_helper_path {
     return '' if $helper eq '';
     require Developer::Dashboard::PathRegistry;
     my $paths = Developer::Dashboard::PathRegistry->new(
+        cwd             => $switchboard_cwd,
         home            => $ENV{HOME},
         workspace_roots => [],
         project_roots   => [],
@@ -286,6 +290,7 @@ sub _skill_dotted_command_parts {
     require Developer::Dashboard::PathRegistry;
     require Developer::Dashboard::SkillManager;
     my $paths = Developer::Dashboard::PathRegistry->new(
+        cwd             => $switchboard_cwd,
         home            => $ENV{HOME},
         workspace_roots => [],
         project_roots   => [],
@@ -303,19 +308,34 @@ sub _skill_dotted_command_parts {
 sub _exec_switchboard_command {
     my ( $path, @argv ) = @_;
     return 0 if !defined $path || $path eq '';
-    $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} ||= abs_path($0) || $0;
-    $ENV{DEVELOPER_DASHBOARD_REPO_LIB} ||= $dashboard_lib if defined $dashboard_lib && -d $dashboard_lib;
+    # The public entrypoint for this invocation must win over any inherited
+    # source-tree path so packaged helpers and shell bootstraps re-enter the
+    # current dashboard tree instead of a stale parent environment.
+    $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} = abs_path($0) || $0;
+    $ENV{DEVELOPER_DASHBOARD_REPO_LIB} = $dashboard_lib if defined $dashboard_lib && -d $dashboard_lib;
 
     if ( -d $path ) {
         my $run = _resolve_directory_runner($path);
         if ($run) {
             my @command = command_argv_for_path($run);
+            if (is_windows()) {
+                system @command, @argv;
+                my $status = $?;
+                my $exit_code = $status > 255 ? $status >> 8 : $status;
+                exit $exit_code;
+            }
             exec { $command[0] } @command, @argv;
             die "Unable to exec $run: $!";
         }
     }
     if ( my $command_path = resolve_runnable_file($path) ) {
         my @command = command_argv_for_path($command_path);
+        if (is_windows()) {
+            system @command, @argv;
+            my $status = $?;
+            my $exit_code = $status > 255 ? $status >> 8 : $status;
+            exit $exit_code;
+        }
         exec { $command[0] } @command, @argv;
         die "Unable to exec $command_path: $!";
     }
@@ -341,6 +361,7 @@ sub _command_hook_result_key {
 sub _cli_runtime_layers {
     require Developer::Dashboard::PathRegistry;
     my $paths = Developer::Dashboard::PathRegistry->new(
+        cwd             => $switchboard_cwd,
         home            => $ENV{HOME},
         workspace_roots => [],
         project_roots   => [],
@@ -401,7 +422,7 @@ dashboard - thin command switchboard for Developer Dashboard
   dashboard file locate <term...>
   dashboard of [--print] [--line N] [--editor CMD] <file|scope> [pattern...]
   dashboard open-file [--print] [--line N] [--editor CMD] <file|scope> [pattern...]
-  dashboard ticket [ticket-ref]
+  dashboard workspace [workspace-ref]
   dashboard jq [path] [file]
   dashboard yq [path] [file]
   dashboard tomq [path] [file]
@@ -535,7 +556,7 @@ Exercise thin command dispatch through one lightweight built-in helper.
 
 Example 2:
 
-  dashboard page source api-dashboard
+  dashboard page source index
 
 Use the public entrypoint to reach a heavier staged helper without embedding that implementation here.
 

@@ -1,12 +1,12 @@
 package File::Sticker;
-$File::Sticker::VERSION = '4.401';
+$File::Sticker::VERSION = '4.603';
 =head1 NAME
 
 File::Sticker - Read, Write file meta-data
 
 =head1 VERSION
 
-version 4.401
+version 4.603
 
 =head1 SYNOPSIS
 
@@ -175,7 +175,7 @@ sub read_meta ($%) {
     my $self = shift;
     my %args = @_;
     my $filename = $args{filename};
-    say STDERR whoami(), " filename=$filename" if $self->{verbose} > 2;
+    say STDERR whoami(), if $self->{verbose} > 2;
 
     if (!-r $filename)
     {
@@ -263,7 +263,7 @@ Add the contents of the given field to the file, taking into account multi-value
 sub add_field_to_file {
     my $self = shift;
     my %args = @_;
-    say STDERR whoami(), " filename=$args{filename}" if $self->{verbose} > 2;
+    say STDERR whoami(), if $self->{verbose} > 2;
 
     my $filename = $args{filename};
     my $field = $args{field};
@@ -284,11 +284,21 @@ sub add_field_to_file {
             return undef;
         }
 
-        my $old_meta = $self->read_meta(filename=>$filename,read_all=>0);
+        my $old_meta = $self->read_meta(filename=>$filename,read_all=>0,derive=>0);
         my $derived = $self->derive_values(filename=>$filename,meta=>$old_meta);
-        if ($self->{derive} and defined $derived->{$field})
+        # Remember, the "derived" hash still includes the old meta
+        # so it's only a "new" value if there isn't already an old value.
+        if ($self->{derive}
+                and defined $derived->{$field}
+                and !defined $old_meta->{$field})
         {
             $value = $derived->{$field};
+            # If this is a reference, we need to convert it back to a string
+            # because the methods are not expecting an array reference!
+            if (ref $value eq "ARRAY")
+            {
+                $value = join(',', @{$derived->{$field}});
+            }
         }
 
         $scribe->add_field_to_file(
@@ -311,7 +321,7 @@ For multi-value fields, it removes ALL the values.
 sub delete_field_from_file {
     my $self = shift;
     my %args = @_;
-    say STDERR whoami(), " filename=$args{filename}" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     my $filename = $args{filename};
     my $field = $args{field};
@@ -348,7 +358,7 @@ Overwrite the existing meta-data with that given.
 sub replace_all_meta {
     my $self = shift;
     my %args = @_;
-    say STDERR whoami(), " filename=$args{filename}" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     my $filename = $args{filename};
     my $meta = $args{meta};
@@ -581,7 +591,7 @@ Calls plugins to do so.
 sub derive_values {
     my $self = shift;
     my %args = @_;
-    say STDERR whoami(), " filename=$args{filename}" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     my $meta = $args{meta};
     foreach my $dd (@{$self->{_derivers}})

@@ -8,6 +8,14 @@
   my $q = JSON::LINQ->FromJSON('data.json');
   my $q = JSON::LINQ->FromJSONL('events.jsonl');
   my $q = JSON::LINQ->FromJSONString('[{"id":1}]');
+
+  # From an LTSV file (label:value, TAB-separated, streaming)
+  my $q = JSON::LINQ->FromLTSV('data.ltsv');
+  # CSV fayldan (birinchi qator = sarlavha, oqim)
+  my $q = JSON::LINQ->FromCSV('data.csv');
+  my $q = JSON::LINQ->FromCSV('data.csv', sep => "\t");         # TSV
+  my $q = JSON::LINQ->FromCSV('f.csv', headers=>[qw(a b c)]);  # sarlavasiz
+  my $q = JSON::LINQ->FromCSV('f.csv', headers=>[qw(a b c)], skip_header=>1);
   my $q = JSON::LINQ->From(\@array);
   my $q = JSON::LINQ->Empty();
   my $q = JSON::LINQ->Range(1, 5);
@@ -59,6 +67,13 @@
 [ 9. 9. Konversiya ]
 
   ->ToJSON('out.json')   ->ToJSONL('out.jsonl')
+  ->ToLTSV('output.ltsv')                        # write as LTSV file (all keys, alphabetical)
+  ->ToLTSV('out.ltsv', label_order=>[qw(a b c)]) # emit specified labels in order
+  ->ToLTSV('out.ltsv', headers    =>[qw(a b c)]) # alias for label_order
+  ->ToCSV('output.csv')                        # CSV fayli yozish (barcha kalitlar, alifbo)
+  ->ToCSV('out.csv', headers    =>[qw(a b c)]) # belgilangan ustunlar tartibda
+  ->ToCSV('out.csv', label_order=>[qw(a b c)]) # headers uchun taxallus
+  ->ToCSV('out.csv', sep=>"\t", no_header=>1)   # TSV, sarlavsiz
   ->ToArray()  ->ToDictionary(sub { ... })  ->ToLookup(sub { ... })
 
 [ 10. 10. Mantiqiy qiymatlar ]
@@ -70,6 +85,34 @@
 
   $outer->Join($inner, sub{$_[0]{k}}, sub{$_[0]{k}}, sub{...})
   $outer->GroupJoin($inner, sub{...}, sub{...}, sub{...})
+
+  # JOIN: main JSON x sub-table LTSV (department lookup)
+  my $depts = JSON::LINQ->FromLTSV('departments.ltsv');
+  JSON::LINQ->FromJSON('employees.json')
+      ->Join($depts,
+          sub { $_[0]{dept_id} },
+          sub { $_[0]{id}      },
+          sub { { name => $_[0]{name}, dept => $_[1]{name} } })
+      ->ToArray();
+
+  # JOIN: main LTSV x sub-table JSON (price master)
+  my $prices = JSON::LINQ->FromJSON('prices.json');
+  JSON::LINQ->FromLTSV('orders.ltsv')
+      ->Join($prices,
+          sub { $_[0]{sku} },
+          sub { $_[0]{sku} },
+          sub { { order_id => $_[0]{id},
+                  amount   => $_[0]{qty} * $_[1]{price} } })
+      ->ToArray();
+
+  # JOIN: asosiy CSV x yordamchi JSON (narx jadvali)
+  my $prices = JSON::LINQ->FromJSON('prices.json');
+  JSON::LINQ->FromCSV('orders.csv')
+      ->Join($prices,
+          sub { $_[0]{sku} }, sub { $_[0]{sku} },
+          sub { { order_id => $_[0]{id},
+                  amount   => $_[0]{qty} * $_[1]{price} } })
+      ->ToArray();
 
 [ 12. 12. Boshqa metodlar ]
 

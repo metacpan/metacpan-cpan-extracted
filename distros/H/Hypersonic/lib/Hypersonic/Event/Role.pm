@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 # Hypersonic::Event::Role - Base class for event backends
 #

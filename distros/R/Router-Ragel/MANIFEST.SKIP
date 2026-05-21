@@ -1,0 +1,42 @@
+# Default ExtUtils::MakeMaker skip-list (#!include_default would expand this)
+# Keep this hand-written for clarity.
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^blib/
+^pm_to_blib$
+
+# VCS / editor / OS
+^\.git/
+^\.gitignore$
+^\.svn/
+~$
+\.swp$
+\.bak$
+\.tmp$
+^\.DS_Store$
+
+# CI config (not shipped in the CPAN dist)
+^\.github/
+
+# Tooling / IDE
+^\.claude/
+^\.vscode/
+^\.idea/
+
+# Author-only test directory (not shipped in the dist)
+^xt/
+
+# Regression baseline (host-specific, written by xt/regression.t)
+^xt/regression-baseline\.json$
+
+# Inline::C build cache
+^_Inline/
+
+# Stale dist artifacts
+^Router-Ragel-.+/
+\.tar\.gz$
+
+# CPAN / dzil leftovers
+^cover_db/
+^nytprof

@@ -1,9 +1,9 @@
 ## How to contribute
  
 Thank you for considering contributing to this distribution.
-I welcome any contribution to Mail::Make, including, but not limited to bug reports, feature requests, general comments, and patches.
+I welcome any contribution to Mail::Make::Headers::ContentDisposition, including, but not limited to bug reports, feature requests, general comments, and patches.
 
-Feel free to clone it from its gitlab repository at <https://gitlab.com/jackdeguest/Mail-Make> and issue a pull request.
+Feel free to clone it from its gitlab repository at <https://gitlab.com/deguest/Mail-Make> and issue a pull request.
 
 I am very flexible to collaboration and always eager to learn from others.
 
@@ -11,7 +11,7 @@ All contributions are assumed to be provided under the terms of [perl5 license](
 
 ### Issues
 
-File [an issue on bug tracker](https://gitlab.com/jackdeguest/Mail-Make/issues) if you think you've found a bug. Please describe
+File [an issue on bug tracker](https://gitlab.com/deguest/Mail-Make/issues) if you think you've found a bug. Please describe
 
 1. How can it be reproduced
 
@@ -39,11 +39,11 @@ You can reach me via e-mail <jdeguest@cpan.org>, or via [Telegram](https://t.me/
 
 ## Issue Tracking
 
-Issues are currently reported using CPAN [bug tracker](https://gitlab.com/jackdeguest/Mail-Make/issues)
+Issues are currently reported using CPAN [bug tracker](https://gitlab.com/deguest/Mail-Make/issues)
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/Mail-Make-v0.1.0/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/Mail-Make-Headers-ContentDisposition-v0.1.0/README.md)
 
 ## Author
 

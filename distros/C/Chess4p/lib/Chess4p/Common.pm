@@ -1,4 +1,3 @@
-# -*- mode: cperl -*-
 package Chess4p::Common;
 
 use v5.36;
@@ -26,7 +25,16 @@ our @EXPORT_OK = qw(
 
     %square_names
     %square_numbers
+    
+    %file_names
+    %file_numbers
+    
+    %rank_names
+    %rank_numbers
 );
+
+our %EXPORT_TAGS = (all => [@EXPORT_OK]);
+
 
 use constant {
     EMPTY => 0,
@@ -62,5 +70,71 @@ our %square_numbers = (
 
 our %square_names = reverse %square_numbers;
 
+our %file_numbers = (
+    'a' => FILE_A, 'b' => FILE_B, 'c' => FILE_C, 'd' => FILE_D,
+    'e' => FILE_E, 'f' => FILE_F, 'g' => FILE_G, 'h' => FILE_H,
+);
+
+our %file_names = reverse %file_numbers;
+
+our %rank_numbers = (
+    '1' => RANK_1, '2' => RANK_2, '3' => RANK_3, '4' => RANK_4,
+    '5' => RANK_5, '6' => RANK_6, '7' => RANK_7, '8' => RANK_8,
+);
+
+our %rank_names = reverse %rank_numbers;
+
+
 
 1;
+
+
+
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+Common - common constants for Chess4p
+
+=head1 SYNOPSIS
+
+    Import all constants:
+
+    use Chess4p::Common qw(:all);
+
+    Or import constants selectively:
+
+    use Chess4p::Common qw(FILE_A FILE_B FILE_C FILE_D
+                           FILE_E FILE_F FILE_G FILE_H
+                           RANK_1 RANK_2 RANK_3 RANK_4
+                           RANK_5 RANK_6 RANK_7 RANK_8
+                           A1 B1 C1 D1 E1 F1 G1 H1
+                           ...
+                           A8 B8 C8 D8 E8 F8 G8 H8
+                           EMPTY WP WN WB WR WQ WK
+                           BP BN BB BR BQ BK
+                           %square_names
+                           %square_numbers
+                           %file_names
+                           %file_numbers
+                           %rank_names
+                           %rank_numbers
+                          );
+
+=head1 DESCRIPTION
+
+Common constants for Chess4p.
+
+
+=head1 AUTHOR
+
+Ejner Borgbjerg
+
+=head1 LICENSE
+
+Perl Artistic License, GPL
+
+=cut

@@ -1,5 +1,5 @@
 package Crypt::HSM::Session;
-$Crypt::HSM::Session::VERSION = '0.030';
+$Crypt::HSM::Session::VERSION = '0.032';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Crypt::HSM::Session - A PKCS11 session
 
 =head1 VERSION
 
-version 0.030
+version 0.032
 
 =head1 SYNOPSIS
 
@@ -193,6 +193,10 @@ True if the session is read/write; false if the session is read-only
 =item * serial-session
 
 This flag is provided for backward compatibility, and should always be set to true
+
+=item * async-session
+
+True if the session is asynchronous; false if the session is synchronous
 
 =back
 

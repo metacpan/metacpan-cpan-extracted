@@ -1,5 +1,14 @@
 Revision history for Perl extension EV::Redis
 
+0.11 2026-04-27
+     - Fix wait queue clearing on manual reconnect inside on_disconnect
+     - Cap reply decode recursion at 512 levels (hostile-server defence)
+     - Refresh ev_now in command() to avoid spurious waiting_timeout
+
+0.10 2026-04-27
+     - Internal cleanups: const-correctness on disconnect callback,
+       cached OpenSSL detection, doc fixes
+
 0.09 2026-04-08
      - Add benchmarks section to POD
      - Add 19 practical examples in eg/

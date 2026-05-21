@@ -3,7 +3,7 @@
 # Copyright (C) 2013-2026 Richard Kelsch
 # All Rights Reserved
 
-use 5.020;
+use 5.20.0;
 use strict;
 use warnings FATAL => 'all';
 use POSIX qw(getuid);
@@ -20,7 +20,7 @@ use Term::ANSIColor;
 
 # use Data::Dumper::Simple;$Data::Dumper::Terse=TRUE;$Data::Dumper::Indent=TRUE;$Data::Dumper::Useqq=TRUE;$Data::Dumper::Deparse=TRUE;$Data::Dumper::Quotekeys=TRUE;$Data::Dumper::Trailingcomma=TRUE;$Data::Dumper::Sortkeys=TRUE;$Data::Dumper::Purity=TRUE;$Data::Dumper::Deparse=TRUE;
 
-my $VERSION = '2.01';
+my $VERSION = '2.02';
 my ($COLS,$ROWS,$w,$h) = GetTerminalSize(*STDOUT);
 $COLS = 80 if ($COLS < 80);
 $ROWS = 25 if ($ROWS < 25);
@@ -29,11 +29,11 @@ my $pad = int(($COLS - 23)/2);
 my $line = '-' x $pad . ' Graphics::Framebuffer ' . '-' x $pad;
 
 if (-e 'Makefile') { # We need a clean slate;
-	my $cmd = (scalar(@ARGV)) ? "make veryclean; reset; perl Makefile.PL $ARGV[0]" : 'make veryclean; reset; perl Makefile.PL';
-	exec($cmd);
+    my $cmd = (scalar(@ARGV)) ? "make veryclean; reset; perl Makefile.PL $ARGV[0]" : 'make veryclean; reset; perl Makefile.PL';
+    exec($cmd);
 }
 
-my $FORCE_VIDEO_FAIL = FALSE;
+my $FORCE_VIDEO_FAIL = FALSE; # Makes permissions testing easier
 
 $FORCE_VIDEO_FAIL = TRUE if (scalar(@ARGV) && $ARGV[0] eq 'force');
 
@@ -42,13 +42,13 @@ my $blink = "\e[5m";
 # Graphics::Framebuffer banner
 my $banner = '';
 while (my $l = <DATA>) {
-	$banner .= $l;
+    $banner .= $l;
 }
 print $banner;
 
 if ($^O ne 'linux') { # Some people will still try
     print colored(['white on_red']," This module only works on Linux.\n\n");
-	print "Install not possible\n\n";
+    print "Install not possible\n\n";
     $pmt = 'N';
 } elsif (defined($ENV{'DISPLAY'})) {
     print
@@ -74,18 +74,18 @@ my $user = _username_for_tests();
 print colored(['bright_yellow'], ' Is '), colored(['cyan'], $user), colored(['bright_yellow'],' a member of '), colored(['green'], 'video'), '? ... ';
 
 if (! $FORCE_VIDEO_FAIL && _user_in_group($user, 'video')) {
-	print colored(['bright_green'], 'Yes'), "\n";
+    print colored(['bright_green'], 'Yes'), "\n";
 } else {
-	print colored(['bright_red'], 'No'), "\n";
-	my $add_cmd = "sudo usermod -aG video $user";
-	print "\n", colored(['yellow'], 'This module requires access to the Linux Framebuffer and the user needs to be'), "\n";
-	print colored(['yellow'], 'a member of the '), colored(['green'],'video'), colored(['yellow'], ' group.'), "\n\n";
-	print 'User '. colored(['cyan'], $user), ' does not appear to be in the group ', colored(['green'], 'video'), ".  To add your user account\n";
-	print 'to the ', colored(['green'], 'video'), " group, run the following command, then logout of your account\n";
-	print 'completely and then login, and then ', colored(['cyan'], $user), ' will be a member of the ', colored(['green'], 'video'), " group\n\n";
-	print '    ', colored(['on_black', 'bright_white'], $add_cmd), "\n\n";
-	print "Once you have done that, try running the install process again.\n\n";
-	$pmt = 'N';
+    print colored(['bright_red'], 'No'), "\n";
+    my $add_cmd = "sudo usermod -aG video $user";
+    print "\n", colored(['yellow'], 'This module requires access to the Linux Framebuffer and the user needs to be'), "\n";
+    print colored(['yellow'], 'a member of the '), colored(['green'],'video'), colored(['yellow'], ' group.'), "\n\n";
+    print 'User '. colored(['cyan'], $user), ' does not appear to be in the group ', colored(['green'], 'video'), ".  To add your user account\n";
+    print 'to the ', colored(['green'], 'video'), " group, run the following command, then logout of your account\n";
+    print 'completely and then login, and then ', colored(['cyan'], $user), ' will be a member of the ', colored(['green'], 'video'), " group\n\n";
+    print '    ', colored(['on_black', 'bright_white'], $add_cmd), "\n\n";
+    print "Once you have done that, try running the install process again.\n\n";
+    $pmt = 'N';
 }
 unless($pmt =~ /^Y/i) {
     print "\n\nInstall Aborted.\n\n";
@@ -106,6 +106,14 @@ print colored(['bright_yellow'],'             Loading C code'), ' ... ';
 my $ccode    = slurp_file('src/Framebuffer.c');
 print colored(['bright_green'],"Loaded\n");
 
+print colored(['bright_yellow'],'             Loading Manual'), ' ... ';
+my $manual   = slurp_file('MANUAL.md');
+print colored(['bright_green'],"Loaded\n");
+
+print colored(['bright_yellow'],'             Loading Readme'), ' ... ';
+my $readme   = slurp_file('README.md');
+print colored(['bright_green'],"Loaded\n");
+
 print colored(['bright_yellow'],'           Loading MetaDate'), ' ... ';
 my $meta     = slurp_file('src/metadata.txt');
 print colored(['bright_green'],"Loaded\n");
@@ -120,42 +128,58 @@ $template =~ s/\#\# C CODE \#\#/$ccode/s;
 print colored(['bright_green'],"Added\n");
 
 if ($meta =~ /^(.*?)\n/s) {
-	print colored(['bright_yellow'],'   Is this a threaded Perl?'), ' ... ';
-	if ($Config{'useithreads'}) {
-		print colored(['bright_green'],'YES')," Leaving thread support\n";
-	} else {
-		$template =~ s/\#\# THREADS \#.*?\#\#THREADS\#\#//sg;
-		print colored(['red'],'NO')," Removing thread support\n";
-	}
+    print colored(['bright_yellow'],'   Is this a threaded Perl?'), ' ... ';
+    if ($Config{'useithreads'}) {
+        print colored(['bright_green'],'YES')," Leaving thread support\n";
+    } else {
+		$template =~ s/use threads/# use threads/gs;
+        print colored(['red'],'NO')," Removing thread support\n";
+    }
     print colored(['bright_yellow'],'         Inserting versions'), ' ... ';
     my ($version, $date, $email) = split(/\:/, $1 );
     my ($month, $day, $year) = split(/ |, /,$date);
+	my $manver = qq{# VERSION\n\n   Version $version ($date)\n\n   \!\[Divider\]\(pics/pink.jpg?raw=true "Divider"\)\n\n# THANKS};
 
+	$manual   =~ s/\# VERSION.*?\# THANKS/$manver/gs;
     $template =~ s/\#\# VERSION \#\#/$version/sg;
     $template =~ s/\#\# VERSION DATE \#\#/$date/sg;
     $template =~ s/\#\# YEAR \#\#/$year/sg;
     $email    =~ s/-at-/\@/gi;
     print colored(['bright_green'],"Version: $version, $date"),"\n";
     print colored(['bright_yellow'],'  Finalizing Copyright Year'), ' ... ';
-    $template =~ s/\#\# TEMP COPYRIGHT \#\#.*?\#\# TEMPCOPYRIGHT \#\#//sg;
-    print colored(['bright_green'],"Copyright 2017-$year Richard Kelsch"),"\n";
+    $template =~ s/Copyright \© 2003 \- \d\d\d\d Richard Kelsch/Copyright © 2003 - $year Richard Kelsch/g;
+    $readme   =~ s/Copyright \© 2003 \- \d\d\d\d Richard Kelsch/Copyright © 2003 - $year Richard Kelsch/g;
+    print colored(['bright_green'],"Copyright © 2003 - $year Richard Kelsch"),"\n";
     $template =~ s/\#\# EMAIL \#\#/$email/sg;
     $Eml = $email;
     print colored(['bright_yellow'],'                     Author') . ' ... ', colored(['bright_green'],"$email") . "\n";
 } else {
-	die "\nMalformed src/metadata.txt file.  Aborting\n";
+    die "\nMalformed src/metadata.txt file.  Aborting\n";
 }
 
 print colored(['bright_yellow'],'Framebuffer.pm Modification'), ' ... ';
 open(my $FILE,'>','lib/Graphics/Framebuffer.pm') || die "Cannot open 'lib/Graphics/Framebuffer.pm' for writing" ;
 print $FILE $template;
 close($FILE);
+print colored(['bright_green'],'Complete'),"\n";
+
+print colored(['bright_yellow'],'     MANUAL.md Modification'), ' ... ';
+open(my $MAN,'>','MANUAL.md') || die "Cannot open 'MANUAL.md' for writing" ;
+print $MAN $manual;
+close($MAN);
+print colored(['bright_green'],'Complete'),"\n";
+
+print colored(['bright_yellow'],'     README.md Modification'), ' ... ';
+open(my $RM,'>','README.md') || die "Cannot open 'README.md' for writing" ;
+print $RM $readme;
+close($RM);
 print colored(['bright_green'],'Complete'),"\n\n";
+
 print colored(['black on_cyan'],$line),"\n";
 
 my $message;
 if ($COLS <= 185) {
-	print "The ",'"', colored(['bold green'],'examples'), qq{" directory has some handy scripts to help get you started, and\nshow you how to use the module.  Just "} . colored(['bold green'],'perldoc') . qq{" on each to see how to use\nthem:};
+    print "The ",'"', colored(['bold green'],'examples'), qq{" directory has some handy scripts to help get you started, and\nshow you how to use the module.  Just "} . colored(['bold green'],'perldoc') . qq{" on each to see how to use\nthem:};
     $message = qq{
 ------------------------------------------------------------------------------
 primitives.pl          - This script will pretty much demonstrate all of
@@ -184,9 +208,9 @@ get-mce-demos          - Go and grab MCE multiprocessing demos (an alternate
                          threading method using only one instance of GFB)
 };
 } else {
-	$pad = int(($COLS - 21)/2);
-	my $mult = '-' x $pad . '-- MULTIPROCESSING --' . '-' x $pad;
-	print "The ",'"', colored(['bold green'],'examples'), qq{" directory has some handy scripts to help get you started, and show you how to use the module.  Just "} . colored(['bold green'],'perldoc') . qq{" on each to see how to use them:\n};
+    $pad = int(($COLS - 21)/2);
+    my $mult = '-' x $pad . '-- MULTIPROCESSING --' . '-' x $pad;
+    print "The ",'"', colored(['bold green'],'examples'), qq{" directory has some handy scripts to help get you started, and show you how to use the module.  Just "} . colored(['bold green'],'perldoc') . qq{" on each to see how to use them:\n};
     $message = '-' x $COLS . qq{
 primitives.pl          - This script will pretty much demonstrate all of the capabilities of this module.
 slideshow.pl           - This script shows all of the images in a specific path (full screen, if asked).
@@ -204,27 +228,27 @@ get-mce-demos          - Go and grab MCE multiprocessing demos (an alternate thr
 }
 
 foreach my $l (split(/\n/,$message)) {
-	if ($l =~ /^(\S+pl|get-mce-demos)/) {
-		my $old = $1;
-		my $new = ($old =~ /template\.pl/) ? colored(['bright_cyan'],$old) : colored(['bold green'],$old);
-		$l =~ s/$old/$new/;
-	} elsif ($l =~ /^-------/) {
-		$l = colored(['bold cyan'],$l);
-	}
-	print "$l\n";
+    if ($l =~ /^(\S+pl|get-mce-demos)/) {
+        my $old = $1;
+        my $new = ($old =~ /template\.pl/) ? colored(['bright_cyan'],$old) : colored(['bold green'],$old);
+        $l =~ s/$old/$new/;
+    } elsif ($l =~ /^-------/) {
+        $l = colored(['bold cyan'],$l);
+    }
+    print "$l\n";
 }
 print colored(['black on_blue'],'-' x $COLS),"\n";
 
 unless (defined($ENV{'DISPLAY'})) {
-	print colored(['bright_white on_magenta'],' Building    -> '),colored(['bright_green'],'      make'),"\n";
-	print colored(['bright_white on_magenta'],' Testing     -> '),colored(['bright_green'],'      make')," test\n";
-	print colored(['bright_white on_magenta'],' Installing  -> '),colored(['red'],' sudo '),colored(['bright_green'],'make')," install\n";
-	print colored(['bright_white on_magenta'],' Cleaning Up -> '),colored(['bright_green'],'      make')," veryclean\n";
+    print colored(['bright_white on_magenta'],' Building    -> '),colored(['bright_green'],'      make'),"\n";
+    print colored(['bright_white on_magenta'],' Testing     -> '),colored(['bright_green'],'      make')," test\n";
+    print colored(['bright_white on_magenta'],' Installing  -> '),colored(['red'],' sudo '),colored(['bright_green'],'make')," install\n";
+    print colored(['bright_white on_magenta'],' Cleaning Up -> '),colored(['bright_green'],'      make')," veryclean\n";
 } else {
-	print colored(['bright_white on_magenta'],' Building    -> '),colored(['bright_green'],'               make'),"\n";
-	print colored(['bright_white on_magenta'],' Testing     -> '),colored(['red'],'GFB_IGNORE_X=1 '),colored(['bright_green'],'make')," test\n";
-	print colored(['bright_white on_magenta'],' Installing  -> '),colored(['red'],'          sudo '),colored(['bright_green'],'make')," install\n";
-	print colored(['bright_white on_magenta'],' Cleaning Up -> '),colored(['bright_green'],'               make')," veryclean\n";
+    print colored(['bright_white on_magenta'],' Building    -> '),colored(['bright_green'],'               make'),"\n";
+    print colored(['bright_white on_magenta'],' Testing     -> '),colored(['red'],'GFB_IGNORE_X=1 '),colored(['bright_green'],'make')," test\n";
+    print colored(['bright_white on_magenta'],' Installing  -> '),colored(['red'],'          sudo '),colored(['bright_green'],'make')," install\n";
+    print colored(['bright_white on_magenta'],' Cleaning Up -> '),colored(['bright_green'],'               make')," veryclean\n";
 }
 print colored(['black on_blue'],'-' x $COLS),"\n";
 print $blink, colored(['yellow on_blue'],sprintf('%-67s',' PLEASE PAY ATTENTION TO THE MESSAGE BELOW FOR ANY MISSING MODULES BEFORE CONTINUING ')), "\n";
@@ -235,27 +259,27 @@ my $mm = WriteMakefile(
     VERSION_FROM       => 'lib/Graphics/Framebuffer.pm',
     ABSTRACT_FROM      => 'lib/Graphics/Framebuffer.pm',
     PL_FILES           => {},
-    MIN_PERL_VERSION   => 5.020, # 5.6 (5.006) is considered slow and unstable.  Upgrade
+    MIN_PERL_VERSION   => '5.20.0', # 5.6 (5.006) is considered slow and unstable.  Upgrade
     CONFIGURE_REQUIRES => {
         'Inline::MakeMaker'   => '0.45',
         'ExtUtils::MakeMaker' => '6.52',
-        'Term::ANSIColor'     => '0',
-        'Term::ReadKey'       => '0',
+        'Term::ANSIColor'     => '4.00',
+        'Term::ReadKey'       => '2.04',
     },
     BUILD_REQUIRES => {
         'Test::More'      => '1.00',
         'List::Util'      => '1.20',
-		'Term::ANSIColor' => '0',
+        'Term::ANSIColor' => '4.00',
     },
     PREREQ_PRINT   => TRUE,
     PREREQ_FATAL   => FALSE,
     PREREQ_PM      => {
-		'IO::Handle'     => '0',
+        'IO::Handle'     => '1.07',
         'Math::Bezier'   => '0.01',
         'Math::Gradient' => '0.03',
         'List::Util'     => '1.20',
         'File::Map'      => '0.64',
-        'Term::ReadKey'  => '0',
+        'Term::ReadKey'  => '2.04',
         'Imager'         => '0.80',
         'Inline'         => '0.53',
         'Inline::C'      => '0.53',
@@ -274,18 +298,18 @@ sub slurp_file {
 
 sub no_framebuffer {
     my $fb_absent = TRUE;
-	my $os = `uname`;
-	chomp($os);
-	if ($os eq 'Linux') {
-		foreach my $device (0 .. 31) {
-			foreach my $prefix (qw( /dev/fb /dev/fb/ /dev/graphics/fb/ )) {
-				if (-e "$prefix$device") {
-					$fb_absent = FALSE;
-					print colored(['bright_yellow'],'                FRAMEBUFFER'), ' ... ', colored(['bright_green'],'FOUND'), ' - ', colored(['cyan'],"$prefix$device"),"\n";
-				}
-			}
-		}
-	}
+    my $os = `uname`;
+    chomp($os);
+    if ($os eq 'Linux') {
+    foreach my $device (0 .. 31) {
+        foreach my $prefix (qw( /dev/fb /dev/fb/ /dev/graphics/fb/ )) {
+            if (-e "$prefix$device") {
+                $fb_absent = FALSE;
+                print colored(['bright_yellow'],'                FRAMEBUFFER'), ' ... ', colored(['bright_green'],'FOUND'), ' - ', colored(['cyan'],"$prefix$device"),"\n";
+            }
+        }
+    }
+    }
     if ($fb_absent) {
         print colored(['bright_yellow'],'                FRAMEBUFFER'), ' ... ', colored(['bright_red'],'NOT FOUND'),"\n";
     }
@@ -293,23 +317,23 @@ sub no_framebuffer {
 }
 
 sub _username_for_tests {
-	# Prefer SUDO_USER when running under sudo so we check the human account
-	# that will be logging in/out and being added to groups.
-	return $ENV{SUDO_USER} if defined $ENV{SUDO_USER} && length $ENV{SUDO_USER};
-	return $ENV{USER}      if defined $ENV{USER}      && length $ENV{USER};
-	chomp(my $u = `id -un 2>/dev/null`);
-	return $u || 'YOUR_USERNAME';
+    # Prefer SUDO_USER when running under sudo so we check the human account
+    # that will be logging in/out and being added to groups.
+    return $ENV{SUDO_USER} if defined $ENV{SUDO_USER} && length $ENV{SUDO_USER};
+    return $ENV{USER}      if defined $ENV{USER}      && length $ENV{USER};
+    chomp(my $u = `id -un 2>/dev/null`);
+    return $u || 'YOUR_USERNAME';
 }
 
 sub _user_in_group {
-	my ($user, $group) = @_;
-	my $cmd = qq{/usr/bin/id -nG "$user" 2>/dev/null};
-	my $groups = `$cmd` || '';
-	if ($groups =~ /video/) {
-		return(1);
-	} else {
-		return(0);
-	}
+    my ($user, $group) = @_;
+    my $cmd = qq{/usr/bin/id -nG "$user" 2>/dev/null};
+    my $groups = `$cmd` || '';
+    if ($groups =~ /video/) {
+        return(1);
+    } else {
+        return(0);
+    }
 }
 
 __DATA__

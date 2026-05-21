@@ -52,6 +52,33 @@ my $prefix = "ev_mc_feat_$$\_";
     $mc->disconnect;
 }
 
+# --- mget rejects too-long key without corrupting connection ---
+# Regression: a too-long key in the middle of an mget array used to croak
+# after partial GETKQ packets had been queued, leaving the connection in
+# a broken state (opaque mismatch on next response).
+{
+    my $mc = make_mc();
+    my $k1 = "${prefix}mget_pre";
+    my $k2 = "${prefix}mget_post";
+    $mc->set($k1, "v1", sub {
+        $mc->set($k2, "v2", sub {
+            eval { $mc->mget([$k1, 'x' x 251, $k2], sub {}) };
+            like($@, qr/key too long/, "mget: too-long key rejected");
+
+            # Connection must still be usable after the rejection.
+            $mc->mget([$k1, $k2], sub {
+                my ($results, $err) = @_;
+                ok(!$err, "mget: connection survives rejected call");
+                is($results->{$k1}, "v1", "mget: $k1 still readable");
+                is($results->{$k2}, "v2", "mget: $k2 still readable");
+                $mc->disconnect;
+                EV::break;
+            });
+        });
+    });
+    run_ev();
+}
+
 # --- connect_timeout ---
 # Tested via connect_timeout getter/setter below.
 # Non-routable IP test skipped: behavior varies across platforms

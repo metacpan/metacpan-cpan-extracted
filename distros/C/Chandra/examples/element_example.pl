@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 #
-# Example: Element API — build a UI tree in Perl, render to HTML
+# Example: Element API - build a UI tree in Perl, render to HTML
 #
 # Demonstrates Chandra::Element with event handlers that call back to Perl.
 #

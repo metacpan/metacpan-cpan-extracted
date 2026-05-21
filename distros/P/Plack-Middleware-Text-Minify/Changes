@@ -1,5 +1,33 @@
 Revision history for Plack-Middleware-Text-Minify:
 
+v0.4.2    2026-05-02 18:39:58+01:00 Europe/London
+  [Security]
+  - Bumped the minimum version of Text::Minify::XS for a security fix.
+
+  [Documentation]
+  - Added security policy.
+
+  - Updated copyright year.
+
+  - Updated maintainer email address due to closure of cpan.org email.
+
+  - Updated support policy.
+
+  - Fixed typos.
+
+  - README is build by the UsefulReadme plugin.
+
+  [Tests]
+  - Moved author tests into xt.
+
+  - Added and improved author tests.
+
+  [Toolchain]
+  - Removed the use of Dist::Zilla::Plugin::ManifestSkip.
+
+  [Other]
+  - Added doap.xml to the repo.
+
 v0.4.1    2023-10-28 09:34:02+01:00 Europe/London
   [Tests]
   - Migrated tests to use Test2.

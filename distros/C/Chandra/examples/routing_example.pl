@@ -12,7 +12,7 @@ my $app = Chandra::App->new(
     debug  => 1,
 );
 
-# Shared layout — navigation bar + content container
+# Shared layout - navigation bar + content container
 $app->layout(sub {
     my ($body) = @_;
     return qq{
@@ -44,7 +44,7 @@ $app->route('/' => sub {
             <p>Welcome to the Chandra routing example. Click the links
             in the navigation bar to switch between pages.</p>
             <p>All navigation happens client-side within a single webview
-            window — no page reloads.</p>
+            window - no page reloads.</p>
         </div>
     };
 });
@@ -92,7 +92,7 @@ $app->route('/user/:id' => sub {
 # Custom 404
 $app->not_found(sub {
     return qq{
-        <h1>404 — Page Not Found</h1>
+        <h1>404 - Page Not Found</h1>
         <div class="card">
             <p>The page you requested does not exist.
             <a href="/">Go home</a>.</p>

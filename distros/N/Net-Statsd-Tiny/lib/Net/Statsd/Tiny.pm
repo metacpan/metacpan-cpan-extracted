@@ -2,16 +2,17 @@ package Net::Statsd::Tiny;
 
 # ABSTRACT: A tiny StatsD client that supports multimetric packets
 
-use v5.10.1;
+use v5.12;
 
-use strict;
 use warnings;
 
-use base qw/ Class::Accessor::Fast /;
+use parent qw/ Class::Accessor::Fast /;
 
+use Carp ();
 use IO::Socket 1.18 ();
+use Socket 2.026 ();
 
-our $VERSION = 'v0.3.7';
+our $VERSION = 'v0.3.9';
 
 
 __PACKAGE__->mk_ro_accessors(
@@ -114,6 +115,9 @@ sub decrement {
 sub _record {
     my ( $self, $suffix, $metric, $value ) = @_;
 
+    Carp::croak "malformed metric" if $metric =~ /[\N{U+00}-\N{U+1f}:|]/;
+    Carp::croak "malformed value"  if $value  =~ /[\N{U+00}-\N{U+1f}:|]/;
+
     my $data = $self->prefix . $metric . ':' . $value . $suffix . "\n";
 
     if ( $self->autoflush ) {
@@ -155,13 +159,15 @@ __END__
 
 =encoding UTF-8
 
+=for stopwords UDP multimetric compatability StatsD statsd
+
 =head1 NAME
 
 Net::Statsd::Tiny - A tiny StatsD client that supports multimetric packets
 
 =head1 VERSION
 
-version v0.3.7
+version v0.3.9
 
 =head1 SYNOPSIS
 
@@ -343,6 +349,20 @@ unique things, e.g. IP addresses or usernames.
 This sends the buffer to the L</host> and empties the buffer, if there
 is any data in the buffer.
 
+=head1 SECURITY CONSIDERATIONS
+
+When using the L</set_add> method, be wary of exposing sensitive information like IP addresses, usernames, email addresses or even session ids over insecure channels.  One workaround is to log a message digest of the value instead, for example
+
+    use Digest::SHA qw/ hmac_sha1 /;
+
+    ...
+
+    $tats->set_key( "myapp.sessions", hmac_sha1( $session->id, $my_secret_key );
+
+Note that the keys should be consistent across worker processes and hosts.
+
+When generating metric names based on untrusted sources (such as HTTP requests), ensure that the metrics contain only printable characters and do not contain colons (":") or pipes ("|"), since these are used by the statsd protocol.
+
 =head1 SEE ALSO
 
 L<Net::Statsd::Lite> which has a similar API but uses L<Moo> and
@@ -353,9 +373,14 @@ L<https://github.com/b/statsd_spec>
 =head1 SOURCE
 
 The development version is on github at L<https://github.com/robrwo/Net-Statsd-Tiny>
-and may be cloned from L<git://github.com/robrwo/Net-Statsd-Tiny.git>
+and may be cloned from L<https://github.com/robrwo/Net-Statsd-Tiny.git>
 
-=head1 BUGS
+=head1 SUPPORT
+
+Only the latest version of this module will be supported.
+
+This module requires Perl v5.12 or later.
+Future releases may only support Perl versions released in the last ten (10) years.
 
 Please report any bugs or feature requests on the bugtracker website
 L<https://github.com/robrwo/Net-Statsd-Tiny/issues>
@@ -364,9 +389,14 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head2 Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website. Please see F<SECURITY.md> for instructions how to
+report security vulnerabilities
+
 =head1 AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 The initial development of this module was sponsored by Science Photo
 Library L<https://www.sciencephoto.com>.
@@ -379,7 +409,7 @@ Michael R. Davis <mrdvt@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2023 by Robert Rothenberg.
+This software is Copyright (c) 2018-2026 by Robert Rothenberg.
 
 This is free software, licensed under:
 

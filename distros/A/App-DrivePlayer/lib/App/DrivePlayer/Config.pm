@@ -55,7 +55,8 @@ sub _merge {
 sub _defaults {
     return {
         google_restapi => {
-            auth => {
+            class => 'OAuth2Client',
+            auth  => {
                 class         => 'OAuth2Client',
                 client_id     => '',
                 client_secret => '',

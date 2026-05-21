@@ -13,10 +13,10 @@
 package Module::Generic::SharedMem;
 BEGIN
 {
-    use v5.26.1;
+    use v5.16.0;
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'Module::Generic' );
     use parent qw( Module::Generic );
     use vars qw(
         $SUPPORTED_RE $SYSV_SUPPORTED $SEMOP_ARGS $N $HAS_B64
@@ -124,7 +124,6 @@ EOT
     our $VERSION = 'v0.5.5';
 };
 
-use v5.26.1;
 # use strict;
 no warnings 'redefine';
 
@@ -269,7 +268,7 @@ sub exists
     };
     if( $@ )
     {
-        # warn( "Trying to access shared memory triggered error: $e" ) if( $self->_warnings_is_enabled );
+        # warn( "Trying to access shared memory triggered error: $e" ) if( $self->_warnings_is_enabled( 'Module::Generic' ) );
         my $arg = 0;
         if( $semid )
         {
@@ -280,7 +279,7 @@ sub exists
                 semctl( $semid, 0, &IPC::SysV::IPC_RMID, $arg );
             })
             {
-                warn( "Error trying to remove semaphore id ${semid} after checking if shared memory existed: $@" ) if( $self->_warnings_is_enabled );
+                warn( "Error trying to remove semaphore id ${semid} after checking if shared memory existed: $@" ) if( $self->_warnings_is_enabled( 'Module::Generic' ) );
             }
         }
         return(0);
@@ -768,7 +767,7 @@ sub remove
         }
         else
         {
-            warn( "Warning only: could not remove the semaphore id \"$semid\": $!" ) if( $self->_warnings_is_enabled );
+            warn( "Warning only: could not remove the semaphore id \"$semid\": $!" ) if( $self->_warnings_is_enabled( 'Module::Generic' ) );
         }
     }
     $self->removed( $rv ? 1 : 0 );
@@ -851,7 +850,7 @@ sub remove_semaphore
         }
         else
         {
-            warn( "Warning only: could not remove the semaphore id \"$semid\" with IPC::SysV::IPC_RMID value '", &IPC::SysV::IPC_RMID, "' for shared memory id $id: $!" ) if( $self->_warnings_is_enabled );
+            warn( "Warning only: could not remove the semaphore id \"$semid\" with IPC::SysV::IPC_RMID value '", &IPC::SysV::IPC_RMID, "' for shared memory id $id: $!" ) if( $self->_warnings_is_enabled( 'Module::Generic' ) );
         }
     }
     else
@@ -1321,7 +1320,7 @@ sub DESTROY
 {
     # <https://perldoc.perl.org/perlobj#Destructors>
     CORE::local( $., $@, $!, $^E, $? );
-    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    CORE::return if( Module::Generic::_in_global_destruction() );
     my $self = CORE::shift( @_ );
     CORE::return if( !CORE::defined( $self ) );
     CORE::return unless( $self->{id} );

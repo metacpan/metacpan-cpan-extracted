@@ -1,9 +1,9 @@
 package BATsh;
 ######################################################################
 #
-# BATsh - Bilingual Shell: cmd.exe and bash in one script
+# BATsh - Bilingual Shell for cmd.exe and bash in one script
 #
-# Version 0.01 -- Self-contained interpreter
+# Version 0.02 -- Self-contained interpreter
 #
 # https://metacpan.org/dist/BATsh
 #
@@ -21,9 +21,10 @@ use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
 
 use File::Spec ();
+BEGIN { eval { require Cwd } }
 use Carp qw(croak);
 use vars qw($VERSION);
-$VERSION = '0.01';
+$VERSION = '0.02';
 $VERSION = $VERSION;
 
 require BATsh::Env;
@@ -85,6 +86,9 @@ sub run {
     my @lines = <SRCFH>;
     close(SRCFH);
     _ensure_env_init();
+    # Set batch positional parameters: %0 = script path, %1..%9 = args, %* = all args
+    my @script_args = defined($args{args}) ? @{$args{args}} : ();
+    _set_batch_args($file, @script_args);
     _process_lines(@lines);
     return 1;
 }
@@ -108,6 +112,27 @@ sub run_lines {
 sub _ensure_env_init {
     # Init only once per process
     BATsh::Env::init() unless %BATsh::Env::STORE;
+}
+
+###############################################################################
+# _set_batch_args -- populate %0..%9 and %* in the Env store
+#   %0  = script path (as passed to run())
+#   %1  = first argument, ..., %9 = ninth argument
+#   %*  = all arguments joined by single space (does not include %0)
+###############################################################################
+sub _set_batch_args {
+    my ($script, @args) = @_;
+    # Normalise $0: resolve to absolute path using File::Spec
+    my $abs_script = defined $script ? $script : '';
+    if ($abs_script ne '' && !File::Spec->file_name_is_absolute($abs_script)) {
+        my $cwd = defined(&Cwd::cwd) ? Cwd::cwd() : '.';
+        $abs_script = File::Spec->catfile($cwd, $abs_script);
+    }
+    BATsh::Env->set('%0', $abs_script);
+    for my $n (1 .. 9) {
+        BATsh::Env->set("%$n", defined($args[$n - 1]) ? $args[$n - 1] : '');
+    }
+    BATsh::Env->set('%*', join(' ', @args));
 }
 
 ###############################################################################
@@ -270,14 +295,16 @@ sub _exec_cmd_section {
     for my $line (@lines) {
         (my $s = $line) =~ s/\r?\n\z//;
         $s =~ s/\A\s+//;
-        if ($s =~ /\ASETLOCAL\s*\z/i) {
-            _flush_cmd(\@batch) if @batch; @batch = ();
-            BATsh::Env::setlocal();
+        if ($s =~ /\ASETLOCAL(?:\s+(.*))?\z/i) {
+            my $opts = defined $1 ? $1 : '';
+            # Pass the whole line through to CMD interpreter so it sees
+            # ENABLEDELAYEDEXPANSION etc; also update Env flags here.
+            push @batch, $line;
             next;
         }
         if ($s =~ /\AENDLOCAL\s*\z/i) {
-            _flush_cmd(\@batch) if @batch; @batch = ();
-            BATsh::Env::endlocal();
+            # Handled inside CMD.pm / _dispatch
+            push @batch, $line;
             next;
         }
         if ($s =~ /\ACALL\s+:([A-Za-z_][A-Za-z0-9_]*)(.*)/i) {
@@ -441,21 +468,81 @@ __END__
 
 =head1 NAME
 
-BATsh - Bilingual Shell: cmd.exe and bash in one script (self-contained)
+BATsh - Bilingual Shell for cmd.exe and bash in one script (self-contained)
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =head1 SYNOPSIS
 
   use BATsh;
 
+  # Run a bilingual .batsh script
   BATsh->run('myscript.batsh');
+  BATsh->run('myscript.batsh', args => ['arg1', 'arg2']);
+
+  # Run source inline
   BATsh->run_string('echo hello from sh');
+  BATsh->run_string("SET MSG=hello\nECHO %MSG%");
+
+  # Interactive REPL
   BATsh->repl();
 
+  # CMD features: pipe, tilde modifiers, SET /P
+  BATsh->run_string('ECHO hello | perl -e "while(<STDIN>){chomp;print uc(\$_).chr(10)}"');
+  BATsh->run_string("SET /P NAME=Enter name: ");
+
+  # SH features: functions, expansions, pipelines, redirection
+  BATsh->run_string(<<'BATSH');
+  greet() {
+      echo "Hello, \$1"
+  }
+  greet world
+  x=\$(echo hello | perl -e 'while(<STDIN>){chomp;print uc}')
+  echo \$x
+  echo out > /tmp/out.txt
+  BATSH
+
+  # Perl 5.005_03 and later; pure-Perl, no external shell required.
+
 =head1 DESCRIPTION
+
+=head2 Executive Summary
+
+BATsh is a self-contained bilingual shell interpreter written in pure Perl.
+It runs cmd.exe batch syntax and bash/sh syntax in the B<same script file>,
+switching automatically between CMD mode and SH mode on a line-by-line basis.
+No external cmd.exe, bash, or sh is required -- everything runs inside Perl.
+
+=head2 Mixed-Mode Sample
+
+The following script demonstrates cmd.exe and bash sections coexisting and
+sharing variables through the common BATsh::Env variable store.
+
+  :: -- CMD section: sets a variable and calls a SH function via bridge --
+  @ECHO OFF
+  SET LANG=BATsh
+  SET COUNT=3
+
+  # -- SH section: reads CMD variables, uses functions and pipeline --
+  greet() {
+      echo "Hello from $1 (bash/sh mode)"
+  }
+  greet $LANG
+  for i in 1 2 3; do echo "  item $i of $COUNT"; done
+  result=$(echo "$LANG" | perl -e 'while(<STDIN>){chomp;print uc}')
+  echo "Uppercase: $result"
+  echo "log line" >> /tmp/batsh_demo.txt
+
+  :: -- CMD section again: reads variable set by SH side --
+  ECHO Back in CMD mode
+  ECHO Uppercase result: %result%
+
+BATsh features (both modes): pipelines (|), I/O redirection (> >> < 2>&1),
+variable expansion (${var%pat} ${var^^} ${#var}), functions, shift, local.
+
+=head1 FULL DESCRIPTION
 
 BATsh is a self-contained bilingual shell interpreter written in pure Perl.
 It implements both the cmd.exe command set and the sh/bash command set
@@ -472,14 +559,70 @@ Any line whose first token is all uppercase (A-Z, 0-9, path chars) is a CMD
 line. CMD sections are executed by BATsh::CMD, which implements:
 
   ECHO, @ECHO OFF/ON
-  SET VAR=value, SET /A expr
-  IF "A"=="B" ... ELSE ..., IF EXIST, IF DEFINED, IF ERRORLEVEL
+  SET VAR=value, SET /A expr (arithmetic)
+  SET /P VAR=Prompt  (interactive prompt input from STDIN)
+  IF "A"=="B" ... ELSE ..., IF /I (case-insensitive), IF NOT
+  IF EXIST "path with spaces", IF DEFINED var, IF ERRORLEVEL n
   FOR %%V IN (list) DO ..., FOR /L %%V IN (s,step,e) DO ...
-  GOTO :label, :label
+  FOR /F "tokens= delims= skip= eol= usebackq" %%V IN (src) DO ...
+  GOTO :label, :label, GOTO :EOF
   CALL :label [args], CALL file.batsh
-  SETLOCAL, ENDLOCAL
+  SHIFT, SHIFT /N
+  SETLOCAL [ENABLEDELAYEDEXPANSION|DISABLEDELAYEDEXPANSION], ENDLOCAL
   CD, DIR, COPY, DEL, MOVE, MKDIR, RMDIR, REN, TYPE
-  PAUSE, EXIT, CLS, TITLE, VER, PUSHD, POPD
+  PAUSE, EXIT [/B] [code], CLS, TITLE, VER, PUSHD, POPD
+  cmd1 | cmd2  (pipeline via temporary file)
+  &, &&, ||  (sequential, conditional-and, conditional-or)
+
+=head2 Variable Expansion
+
+C<%VAR%> references are expanded before each line is dispatched.
+Variable names are B<case-insensitive> (C<SET foo=x> is visible as C<%FOO%>).
+
+Inside parenthesised IF and FOR blocks, C<%VAR%> is expanded B<at parse time>
+(before any commands in the block run), matching cmd.exe behaviour.  To see
+a value updated inside a block, use delayed expansion:
+
+  SETLOCAL ENABLEDELAYEDEXPANSION
+  SET X=old
+  IF 1==1 (
+      SET X=new
+      ECHO !X!       &:: prints "new" (delayed)
+      ECHO %X%       &:: prints "old" (parse-time)
+  )
+  ENDLOCAL
+
+=head2 Batch Parameters
+
+C<%0> is the script path (absolute); C<%1>..C<%9> are positional arguments;
+C<%*> is all arguments joined by space.  C<SHIFT> / C<SHIFT /N> shifts the
+positional parameters.  C<CALL :label> saves and restores caller's arguments.
+
+Batch-parameter tilde modifiers expand C<%0>..C<%9> components:
+
+  %~0    dequote (strip surrounding "...")
+  %~f1   full absolute path of %1
+  %~d1   drive letter only   (e.g. C:)
+  %~p1   directory path only (with trailing /)
+  %~n1   filename without extension
+  %~x1   extension only       (e.g. .bat)
+  %~dp0  drive + directory    (most common usage)
+  %~nx1  filename + extension
+
+=head2 Redirection and Compound Commands
+
+  ECHO text > file      stdout overwrite
+  ECHO text >> file     stdout append
+  prog 2> err.txt       stderr redirect
+  & cmd                 sequential execution
+  cmd1 && cmd2          run cmd2 only if cmd1 succeeded (ERRORLEVEL 0)
+  cmd1 || cmd2          run cmd2 only if cmd1 failed   (ERRORLEVEL != 0)
+
+The C<^> character escapes the next character:
+
+  ECHO a^&b    prints  a&b   (& not treated as compound separator)
+  ECHO a^^b    prints  a^b
+  ECHO text^   next line is joined (line continuation)
 
 =head1 SH MODE
 
@@ -493,10 +636,22 @@ SH sections are executed by BATsh::SH, which implements:
   while condition; do ... done
   until condition; do ... done
   case $var in pattern) ... ;; esac
-  test / [ ... ]  (file tests, string, integer comparisons)
-  cd, pwd, exit, true, false, :, read, shift
-  $(( arithmetic )), $( command substitution )
-  ${VAR}, ${VAR:-default}, ${VAR:=default}
+  test / [ ... ]  (file, string, and integer comparisons)
+  cd, pwd, exit, true, false, :, read, shift [N], local VAR=value
+  $(( arithmetic )) -- +, -, *, /, %, and $1..$9 inside
+  $( command ) and `command`  (command substitution, nested)
+  cmd1 | cmd2 [| cmd3 ...]  (pipeline via temporary file)
+  cmd1 && cmd2, cmd1 || cmd2, cmd1 ; cmd2  (compound commands)
+  > >> < 2> 2>> 2>&1 1>&2  (I/O redirection)
+  name() { ... }, function name { ... }  (function definitions)
+  $VAR, ${VAR}, $1..$9, $@, $*, $#, $?, $$, $0
+  ${VAR:-default}, ${VAR:=default}, ${VAR:+alt}
+  ${VAR%pat}, ${VAR%%pat}   -- shortest/longest suffix removal
+  ${VAR#pat}, ${VAR##pat}   -- shortest/longest prefix removal
+  ${VAR/pat/rep}, ${VAR//pat/rep}  -- first/all substitution
+  ${VAR^^}, ${VAR^}, ${VAR,,}, ${VAR,}  -- case conversion
+  ${VAR:N:L}, ${VAR:N}  -- substring
+  ${#VAR}  -- string length
   source / . file
 
 =head1 REQUIREMENTS
@@ -505,11 +660,33 @@ Perl 5.005_03 or later. Core modules only. No external shell required.
 
 =head1 BUGS AND LIMITATIONS
 
-The built-in CMD interpreter does not support all cmd.exe extensions
-(e.g. FOR /F with complex token options, delayed expansion with !VAR!).
+The built-in CMD interpreter does not support:
 
-The built-in SH interpreter does not support pipelines (|), redirection
-(> >> <), background execution (&), or here-documents (<<).
+=over
+
+=item * C<FOR /F> with C<usebackq> backtick-quoted commands on Windows
+(the C<cmd /c> subprocess path is untested on Windows)
+
+=item * C<CHOICE>, C<TIMEOUT>, C<XCOPY>, C<ROBOCOPY>, C<FINDSTR>, C<SORT>,
+C<MORE> and other external utilities (delegated to the OS)
+
+=back
+
+The built-in SH interpreter does not support:
+
+=over
+
+=item * Background execution (C<&> at end of command)
+
+=item * Here-documents (C<E<lt>E<lt>>)
+
+=item * Process substitution (C<E<lt>(cmd)>)
+
+=back
+
+Pipeline (C<|>), I/O redirection (C<E<gt>> C<E<gt>E<gt>> C<E<lt>>
+C<2E<gt>> C<2E<gt>E<gt>> C<2E<gt>&1>), compound commands
+(C<&&> C<||> C<;>), and function definitions are all supported.
 
 Section boundary detection is token-based (uppercase vs. lowercase first
 token). Mixed-case first tokens are treated as SH.

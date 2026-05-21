@@ -21,7 +21,7 @@ unless (-f $content_file) {
     print $fh <<'HTML';
 <div style="padding:20px;font-family:sans-serif;">
     <h1>Hot Reload Demo</h1>
-    <p>Edit hot_reload_content.html and save — this page updates automatically!</p>
+    <p>Edit hot_reload_content.html and save - this page updates automatically!</p>
 </div>
 HTML
     close $fh;

@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::CUPS.
 
+0.65 Sun May 17 11:52:00 2026
+	- Fix compatibility with libcupsfilters >= 2 thanks to Philip Gwyn
+
 0.64 Thu Jun 08 20:10:00 2017
 	- Report the printer-state attribute and support non-string device
 	  attributes in general by Edgar Fuß

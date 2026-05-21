@@ -11,7 +11,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(mimetype);
 our @EXPORT_OK = qw(extensions describe globs inodetype mimetype_canon mimetype_isa);
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 our $DEBUG;
 
 our ($_hashed, $_hashed_aliases, $_hashed_subclasses, $_has_mimeinfo_database);
@@ -115,7 +115,7 @@ sub default {
         print STDERR "> File is Path::Tiny object and exists, "
             . "trying default method\n" if $DEBUG;
         open my $fh, '<', $file or return undef;
-        binmode FILE, ':utf8' unless $] < 5.008;
+        binmode $fh, ':utf8' unless $] < 5.008;
         read $fh, $line, 32;
         close $fh;
     }
@@ -165,21 +165,31 @@ sub rehash {
 
 sub _hash_globs {
     my $file = shift;
-    open GLOB, '<', $file || croak "Could not open file '$file' for reading" ;
+    open GLOB, '<', $file or croak "Could not open file '$file' for reading" ;
     binmode GLOB, ':utf8' unless $] < 5.008;
     my ($string, $glob);
+    my %seen_extension;
     while (<GLOB>) {
         next if /^\s*#/ or ! /\S/; # skip comments and empty lines
         chomp;
         ($string, $glob) = split /:/, $_, 2;
         unless ($glob =~ /[\?\*\[]/) { $literal{$glob} = $string }
         elsif ($glob =~ /^\*\.(\w+(\.\w+)*)$/) {
-            $extension{$1} = $string unless exists $extension{$1};
+            next if $seen_extension{$1}++;
+            if (exists $extension{$1} && $extension{$1} ne $string) {
+                my $old = $extension{$1};
+                if (defined $mime2ext{$old}) {
+                    @{$mime2ext{$old}} = grep { $_ ne $1 } @{$mime2ext{$old}};
+                    delete $mime2ext{$old} unless @{$mime2ext{$old}};
+                }
+            }
+            $extension{$1} = $string;
             $mime2ext{$string} = [] if !defined($mime2ext{$string});
-            push @{$mime2ext{$string}}, $1;
+            push @{$mime2ext{$string}}, $1
+                unless grep { $_ eq $1 } @{$mime2ext{$string}};
         } else { unshift @globs, [$glob, _glob_to_regexp($glob), $string] }
     }
-    close GLOB || croak "Could not open file '$file' for reading" ;
+    close GLOB or croak "Could not open file '$file' for reading" ;
 }
 
 sub _glob_to_regexp {
@@ -216,14 +226,14 @@ sub describe {
         : ( reverse data_files('mime', split '/', "$mt.xml") ) ;
     for my $file (@descfiles) {
         $desc = ''; # if a file was found, return at least empty string
-        open XML, '<', $file || croak "Could not open file '$file' for reading";
+        open XML, '<', $file or croak "Could not open file '$file' for reading";
         binmode XML, ':utf8' unless $] < 5.008;
         while (<XML>) {
             next unless m!<comment\s*$att>(.*?)</comment>!;
             $desc = $1;
             last;
         }
-        close XML || croak "Could not open file '$file' for reading";
+        close XML or croak "Could not open file '$file' for reading";
         last if $desc;
     }
     return $desc;
@@ -249,7 +259,7 @@ sub _read_map_files {
     my (@done, %map);
     for my $file (@files) {
         next if grep {$_ eq $file} @done;
-        open MAP, '<', $file || croak "Could not open file '$file' for reading";
+        open MAP, '<', $file or croak "Could not open file '$file' for reading";
         binmode MAP, ':utf8' unless $] < 5.008;
         while (my $line = <MAP>) {
             next unless $line =~ m/\S/; # skip empty lines
@@ -487,6 +497,7 @@ Maintained by Michiel Beijen E<lt>mb@x14.nlE<gt>
 =head1 COPYRIGHT
 
 Copyright (c) 2003, 2012 Jaap G Karssenberg. All rights reserved.
+Copyright (c) 2013-2026 Michiel W. Beijen. All rights reserved.
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 

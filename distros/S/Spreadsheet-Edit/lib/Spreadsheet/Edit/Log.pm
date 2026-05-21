@@ -11,8 +11,8 @@ package Spreadsheet::Edit::Log;
 
 # Allow "use <thismodule> VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1001.001'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2025-12-12'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1001.003'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2026-05-05'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 use Scalar::Util qw/reftype refaddr blessed weaken openhandle/;
@@ -24,8 +24,9 @@ use Exporter 5.57 ();
 our @EXPORT = qw/fmt_call log_call fmt_methcall log_methcall
                  nearest_call abbrev_call_fn_ln_subname/;
 
-our @EXPORT_OK = qw/btw btwN btwbt oops set_logdest
-                    colorize ERROR_COLOR WARN_COLOR BOLD_COLOR SUCCESS_COLOR/;
+our @EXPORT_OK = qw/btw btwN btwbt btwN_str oops set_logdest
+                    colorize ERROR_COLOR WARN_COLOR BOLD_COLOR SUCCESS_COLOR
+                    _can_colorize/;
 
 my %backup_defaults = (
   logdest         => \*STDERR,
@@ -47,45 +48,51 @@ use constant SUCCESS_COLOR  => "succ";
 
 # Insert escapes to colorize text, provided the terminal supports ansi escapes
 our $colorcodes;
+sub _getcode($) {
+  my ($tput_args) = @_;
+  unless (exists $colorcodes->{$tput_args}) {
+    $colorcodes->{$tput_args} = `tput $tput_args 2>/dev/null`;
+    $colorcodes->{$tput_args} = undef if $? != 0;
+  }
+  return $colorcodes->{$tput_args} // die "FAILED: tput $tput_args (export NO_COLOR=1 to bypass)";
+}
 sub colorize($$) {
   my ($str, $colortype) = @_;
   return $str
     if $ENV{NO_COLOR};  # check every time
-  my sub _getcode($$) {
-    my ($name, $tput_args) = @_;
-    unless (exists $colorcodes->{$name}) {
-      $colorcodes->{$name} = `tput $tput_args 2>/dev/null`;
-      $colorcodes->{$name} = undef if $? != 0;
-    }
-    return $colorcodes->{$name} // die("no color ($name)");
-  }
   my ($color_start, $color_end);
   eval {
     # The basic colors 0-7 => black,red,green,yellow,blue,magenta,cyan,white
     # ("white" is often really light grey)
     $color_start =
-      $colortype eq BOLD_COLOR    ? _getcode("bold", "bold") :
-      $colortype eq WARN_COLOR    ? _getcode("boldyellow", "setaf 3 bold") :
-      $colortype eq ERROR_COLOR   ? _getcode("boldred", "setaf 1 bold") :
-      $colortype eq SUCCESS_COLOR ? _getcode("boldgreen", "setaf 2 bold") :
+      $colortype eq BOLD_COLOR    ? _getcode("bold") :
+      $colortype eq WARN_COLOR    ? _getcode("setaf 3 bold") :   # bold yellow
+      $colortype eq ERROR_COLOR   ? _getcode("setaf 1 bold") :   # bold red
+      $colortype eq SUCCESS_COLOR ? _getcode("setaf 2 bold") :   # bold green
       croak "unknown message type '$colortype'"
       ;
-    $color_end = _getcode("sgr0", "sgr0");
+    $color_end = _getcode("sgr0");
   };
   if ($@) {
-    return $str if $@ =~ /no color/; # disabled or TERM does not support it.
+    return $str if $@ =~ /FAILED: tput/; # disabled or TERM does not support it.
     die $@;
   }
   my @chunks = map{ $_ eq "" ? "" : $color_start.$_.$color_end }
-               split /\R/, $str, -1;
+               split /\R/s, $str, -1;
   return join "\n", @chunks;
+}
+sub _can_colorize() {  # used by test scripts
+  state $yes_we_can = do{
+    local $ENV{NO_COLOR} = 0;
+    colorize("foo bar\nbaz", ERROR_COLOR) =~ /\033/;
+  };
 }
 
 sub oops(@) {
   my @args = @_;
   foreach (@args) { $_ = colorize($_, ERROR_COLOR); }
   my $pkg = caller;
-  my $pfx = "\nOOPS";
+  my $pfx = "\n".colorize("OOPS", ERROR_COLOR);
   #$pfx .= " in pkg '$pkg'" unless $pkg eq 'main';
   $pfx .= ": ";
   if (defined(&Spreadsheet::Edit::logmsg)) {
@@ -114,7 +121,7 @@ sub import {
         if keys(%btw_importing_pkgs) && !$btw_importing_pkgs{$pkg};
       $btw_importing_pkgs{$pkg}++;
       if (/^:btw$/) {
-        push @remaining_args, qw/btw btwN btwbt/;
+        push @remaining_args, qw/btw btwN btwbt btwN_str/;
         next;
       }
     }
@@ -125,9 +132,8 @@ sub import {
   goto &Exporter::import
 }#import
 
-sub btwN($@) {
+sub _btwN_str_back1($@) { # does not show top call frame
   my ($N, @strings) = @_;
-#warn dvis '##btwN $N @strings\n';
   local $@;
   local $_ = join("", @strings);
   s/\n\z//s;
@@ -136,7 +142,8 @@ sub btwN($@) {
   #my $sep = " → ";
   #my $sep = " ⇢ ";
   #my $sep = " » "; # « exists in both Unicode and latin1
-  my $sep = " ⇒ ";
+  #my $sep = " ⇒ ";
+  my $sep = "»";
   my @levels;
   if (ref($N) eq "") {
     @levels = ($N);
@@ -159,7 +166,8 @@ sub btwN($@) {
 
   { my (%pkgtail2full, %fname2full, $prev_package);
     my ($uniq_pkgtails, $uniq_fnames, $all_same_package) = (1, 1, 1);
-    foreach my $n (@levels) {
+    foreach (@levels) {
+      my $n = $_ + 1; # hide call to this helper func
       my @c = caller($n);
       my ($package, $path) = @c[0,1];
       last if !defined $package;
@@ -183,6 +191,8 @@ sub btwN($@) {
   }
 
   ##FIXME: Use only ASCII characters if terminal is not UTF enabled? Cf DDI
+  ## --or-- provide an environment variable?
+  ## (for when output must go through tools which barf on "wide" chars)
 
   my $pfx = "";
   my ($prev_pkg, $prev_n);
@@ -191,6 +201,10 @@ sub btwN($@) {
     my $lno = $caller->[2];
     my $path = $caller->[1];
     my $s;
+    # Show the filename if it does not correspond to the package e.g. "eval..."
+    if ($fname ne "${pkg}.pm" && $path ne $0) {
+      $pkg = $path;
+    }
     if ($pkg_obvious || (defined($prev_pkg) && $pkg eq $prev_pkg)) {
       $s = $lno;
     } else {
@@ -199,11 +213,7 @@ sub btwN($@) {
       if (my $h = \%{"${package}::SpreadsheetEdit_Log_Options"}) {
         $pkg = $h->{subst_pkg} if $h->{subst_pkg};
       }
-      $s = "${pkg}:$lno";
-    }
-    if ($fname ne "${pkg}.pm" && $path ne $0) {
-#warn dvis '###FNCRAM $pkg $fname\n';
-      $s = "[${path}]".$s;
+      $s = $s ? " ${pkg}:$lno" : "${pkg}:$lno"
     }
     $pfx .= $sep if $pfx;
     if (defined($prev_n)) {
@@ -216,10 +226,19 @@ sub btwN($@) {
   $pfx .= "> ";
 
   $_ = colorize($_, WARN_COLOR);
-  my $msg = "${pfx}${_}\n";
+  "${pfx}${_}";
+}#_btwN_str_back1
+
+sub btwN_str($@) { # Just the message string, sans final newline
+  my ($N, @strings) = @_;
+  _btwN_str_back1($N, @strings);
+}
+sub btwN($@) {
+  my ($N, @strings) = @_;
+  my $msg = _btwN_str_back1($N, @strings);
   my $fh = _getoptions()->{logdest};
-  print $fh $msg;
-}#btwN
+  print $fh $msg, "\n";
+}
 
 sub btw(@) { @_ = (0, @_); goto &btwN; }
 sub btwbt(@) { @_ = (\99, @_); goto &btwN; }
@@ -254,6 +273,7 @@ sub get_effective_logdest() { _getoptions->{logdest} }
 sub _fmt_list($) {
   my @items = ref($_[0]) eq 'ARRAY' ? @{$_[0]} : ($_[0]);
   oops if wantarray;
+  return "()" if @items==0;
   if (my $is_sequential = (@items >= 4)) {
     my $seq;
     foreach(@items) {
@@ -490,8 +510,7 @@ C<[INPUTS]> and C<[RESULTS]> are each a ref to an array of items (or
 a single non-aref item), used to form comma-separated lists.
 
 Each item is formatted similar to I<Data::Dumper>, i.e. strings are "quoted"
-and complex structures serialized; printable Unicode characters are shown as
-themselves (rather than hex escapes)
+and complex structures are serialized
 
 ... with two exceptions:
 
@@ -715,7 +734,7 @@ Jim Avera (jim.avera gmail)
 
 Public Domain or CC0
 
-=for Pod::Coverage oops
+=for Pod::Coverage oops btwN_str
 
 =cut
 

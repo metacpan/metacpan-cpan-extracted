@@ -1,4 +1,4 @@
-/* Copyright 2018-## YEAR ## Richard Kelsch, All Rights Reserved
+/* Copyright 2018 - ## YEAR ## Richard Kelsch, All Rights Reserved
    See the Perl documentation for Graphics::Framebuffer for licensing information.
 
    Version:  ## VERSION ##

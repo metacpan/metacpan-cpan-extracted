@@ -3,25 +3,29 @@ package Modern::Open;
 #
 # Modern::Open - Autovivification, Autodie, and 3-args open support
 #
-# https://metacpan.org/release/Modern-Open
+# https://metacpan.org/dist/Modern-Open
 #
-# Copyright (c) 2014, 2015, 2018, 2019, 2020, 2021, 2023 INABA Hitoshi <ina@cpan.org>
+# Copyright (c) 2014, 2015, 2018, 2019, 2020, 2021, 2023, 2026 INABA Hitoshi <ina@cpan.org>
 ######################################################################
 
-$VERSION = '0.14';
-$VERSION = $VERSION;
-
 use 5.00503;
+use vars qw($VERSION $_fh_seq);
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
+BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub';
+        eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
 
+$VERSION = '0.15';
+$VERSION = $VERSION;
+$_fh_seq = 0;
+
+BEGIN { pop @INC if $INC[-1] eq '.' } # CVE-2016-1238: Important unsafe module load path flaw
 use Fcntl;
 
 #---------------------------------------------------------------------
 sub Modern::Open::confess (@) {
     my $i = 0;
     my @confess = ();
-    while (my($package,$filename,$line,$subroutine) = caller($i)) {
+    while (my($package, $filename, $line, $subroutine) = caller($i)) {
         push @confess, "[$i] $filename($line) $subroutine\n";
         $i++;
     }
@@ -38,17 +42,22 @@ sub Modern::Open::open (*$;$) {
         Modern::Open::confess "Bare handle no longer supported";
     }
     else {
-        $handle = $_[0] = \do { local *_ };
+        $_fh_seq++;
+        my $fhn = "Modern::Open::FH::H${_fh_seq}";
+        no strict 'refs';
+        $handle = $fhn;
+        $_[0] = \*{$fhn};
     }
 
     if (@_ >= 4) {
         Modern::Open::confess "Too many arguments for open";
     }
     elsif (@_ == 3) {
-        my($mode,$filename) = @_[1,2];
+        my($mode, $filename) = @_[1, 2];
 
         if ($mode eq '-|') {
-            my $return = CORE::open($handle,qq{$filename |});
+            no strict 'refs';
+            my $return = CORE::open($handle, qq{$filename |});
             if ($return or defined wantarray) {
                 return $return;
             }
@@ -57,7 +66,8 @@ sub Modern::Open::open (*$;$) {
             }
         }
         elsif ($mode eq '|-') {
-            my $return = CORE::open($handle,qq{| $filename});
+            no strict 'refs';
+            my $return = CORE::open($handle, qq{| $filename});
             if ($return or defined wantarray) {
                 return $return;
             }
@@ -77,7 +87,8 @@ sub Modern::Open::open (*$;$) {
             if (not exists $flags{$mode}) {
                 Modern::Open::confess "Unknown open() mode '$mode'";
             }
-            my $return = CORE::sysopen($handle,$filename,$flags{$mode});
+            no strict 'refs';
+            my $return = CORE::sysopen(*{$handle}, $filename, $flags{$mode});
             if ($return or defined wantarray) {
                 return $return;
             }
@@ -87,7 +98,8 @@ sub Modern::Open::open (*$;$) {
         }
     }
     elsif (@_ == 2) {
-        my $return = CORE::open($handle,$_[1]);
+        no strict 'refs';
+        my $return = CORE::open($handle, $_[1]);
         if ($return or defined wantarray) {
             return $return;
         }
@@ -108,14 +120,20 @@ sub Modern::Open::opendir (*$) {
         Modern::Open::confess "Bare handle no longer supported";
     }
     else {
-        $handle = $_[0] = \do { local *_ };
+        $_fh_seq++;
+        my $fhn = "Modern::Open::FH::H${_fh_seq}";
+        no strict 'refs';
+        $handle = $fhn;
+        $_[0] = \*{$fhn};
     }
 
     my $return;
-    if ($return = CORE::opendir($handle,$_[1])) {
-    }
-    elsif (($^O =~ /MSWin32/) and (-d qq{$_[1].})) {
-        $return = CORE::opendir($handle,qq{$_[1].});
+    { no strict 'refs';
+        if ($return = CORE::opendir(*{$handle}, $_[1])) {
+        }
+        elsif (($^O =~ /MSWin32/) and (-d qq{$_[1].})) {
+            $return = CORE::opendir(*{$handle}, qq{$_[1].});
+        }
     }
 
     if ($return or defined wantarray) {
@@ -134,14 +152,19 @@ sub Modern::Open::sysopen (*$$;$) {
         Modern::Open::confess "Bare handle no longer supported";
     }
     else {
-        $handle = $_[0] = \do { local *_ };
+        $_fh_seq++;
+        my $fhn = "Modern::Open::FH::H${_fh_seq}";
+        no strict 'refs';
+        $handle = $fhn;
+        $_[0] = \*{$fhn};
     }
 
     if (@_ >= 5) {
         Modern::Open::confess "Too many arguments for sysopen";
     }
     elsif (@_ == 4) {
-        my $return = CORE::sysopen($handle,$_[1],$_[2],$_[3]);
+        no strict 'refs';
+        my $return = CORE::sysopen(*{$handle}, $_[1], $_[2], $_[3]);
         if ($return or defined wantarray) {
             return $return;
         }
@@ -150,7 +173,8 @@ sub Modern::Open::sysopen (*$$;$) {
         }
     }
     elsif (@_ == 3) {
-        my $return = CORE::sysopen($handle,$_[1],$_[2]);
+        no strict 'refs';
+        my $return = CORE::sysopen(*{$handle}, $_[1], $_[2]);
         if ($return or defined wantarray) {
             return $return;
         }
@@ -165,23 +189,31 @@ sub Modern::Open::sysopen (*$$;$) {
 
 #---------------------------------------------------------------------
 sub Modern::Open::pipe (**) {
-    my($handle0,$handle1);
+    my($handle0, $handle1);
 
     if (defined $_[0]) {
         Modern::Open::confess "Bare handle no longer supported";
     }
     else {
-        $handle0 = $_[0] = \do { local *_ };
+        $_fh_seq++;
+        my $fhn0 = "Modern::Open::FH::P${_fh_seq}r";
+        no strict 'refs';
+        $handle0 = $fhn0;
+        $_[0] = \*{$fhn0};
     }
 
     if (defined $_[1]) {
         Modern::Open::confess "Bare handle no longer supported";
     }
     else {
-        $handle1 = $_[1] = \do { local *_ };
+        my $fhn1 = "Modern::Open::FH::P${_fh_seq}w";
+        no strict 'refs';
+        $handle1 = $fhn1;
+        $_[1] = \*{$fhn1};
     }
 
-    my $return = CORE::pipe($handle0,$handle1);
+    no strict 'refs';
+    my $return = CORE::pipe(*{$handle0}, *{$handle1});
     if ($return or defined wantarray) {
         return $return;
     }
@@ -198,29 +230,35 @@ sub Modern::Open::socket (*$$$) {
         Modern::Open::confess "Bare handle no longer supported";
     }
     else {
-        $handle = $_[0] = \do { local *_ };
+        $_fh_seq++;
+        my $fhn = "Modern::Open::FH::H${_fh_seq}";
+        no strict 'refs';
+        $handle = $fhn;
+        $_[0] = \*{$fhn};
     }
 
     # socket doesn't autodie
-    return CORE::socket($handle,$_[1],$_[2],$_[3]);
+    no strict 'refs';
+    return CORE::socket(*{$handle}, $_[1], $_[2], $_[3]);
 }
 
 #---------------------------------------------------------------------
 sub Modern::Open::accept (**) {
-    my($handle0,$handle1);
+    my($handle0, $handle1);
 
     if (defined $_[0]) {
         Modern::Open::confess "Bare handle no longer supported";
     }
     else {
-        $handle0 = $_[0] = \do { local *_ };
+        $_fh_seq++;
+        my $fhn = "Modern::Open::FH::H${_fh_seq}";
+        no strict 'refs';
+        $handle0 = $fhn;
+        $_[0] = \*{$fhn};
     }
 
-    if (defined $_[1]) {
-        Modern::Open::confess "Bare handle no longer supported";
-    }
-
-    my $return = CORE::accept($handle0,$handle1);
+    no strict 'refs';
+    my $return = CORE::accept(*{$handle0}, *{$_[1]});
     if ($return or defined wantarray) {
         return $return;
     }
@@ -256,14 +294,107 @@ __END__
 
 Modern::Open - Autovivification, Autodie, and 3-args open support
 
+=head1 VERSION
+
+Version 0.15
+
 =head1 SYNOPSIS
 
   use Modern::Open;
 
+=head1 TABLE OF CONTENTS
+
+=over 2
+
+=item L</DESCRIPTION>
+
+=item L</INSTALLATION>
+
+=item L</COMPATIBILITY>
+
+=item L</DIAGNOSTICS>
+
+=item L</SEE ALSO>
+
+=back
+
 =head1 DESCRIPTION
 
-Modern::Open provides autovivification and autodie support of open(), opendir(), sysopen(), pipe(), socket(), and accept() on perl 5.00503 or later.
+Modern::Open provides autovivification and autodie support of open(), opendir(), sysopen(), pipe(), and accept() on perl 5.00503 or later.
 And supports three-argument open(), too.
+socket() supports autovivification of the filehandle but does not autodie; it returns the result of CORE::socket() directly.
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+=head1 COMPATIBILITY
+
+This module requires Perl 5.00503 or later and runs on all versions through
+the current release.
+
+=head1 DIAGNOSTICS
+
+=over 2
+
+=item C<Bare handle no longer supported>
+
+A bareword filehandle was passed to open(), opendir(), sysopen(), pipe(), socket(), or accept(). Use an undefined scalar variable instead.
+
+=item C<Too many arguments for open>
+
+More than three arguments were passed to open().
+
+=item C<Too many arguments for sysopen>
+
+More than four arguments were passed to sysopen().
+
+=item C<Not enough arguments for open>
+
+Fewer than two arguments were passed to open().
+
+=item C<Not enough arguments for sysopen>
+
+Fewer than three arguments were passed to sysopen().
+
+=item C<Unknown open() mode '$mode'>
+
+An unrecognized mode string was passed as the second argument to the three-argument form of open().
+
+=item C<Can't open(<VAR>,<VAR>): <VAR>>
+
+Died because 2-argument open() failed and the call was in void context.
+
+=item C<Can't open(<VAR>,<VAR>,<VAR>): <VAR>>
+
+Died because 3-argument open() failed and the call was in void context.
+
+=item C<Can't opendir(<VAR>,<VAR>): <VAR>>
+
+Died because opendir() failed and the call was in void context.
+
+=item C<Can't sysopen(<VAR>,<VAR>,<VAR>): <VAR>>
+
+Died because 3-argument sysopen() failed and the call was in void context.
+
+=item C<Can't sysopen(<VAR>,<VAR>,<VAR>,<VAR>): <VAR>>
+
+Died because 4-argument sysopen() failed and the call was in void context.
+
+=item C<Can't pipe(<VAR>,<VAR>): <VAR>>
+
+Died because pipe() failed and the call was in void context.
+
+=item C<Can't accept(<VAR>,<VAR>): <VAR>>
+
+Died because accept() failed and the call was in void context.
+
+=back
 
 =head1 AUTHOR
 
@@ -271,7 +402,7 @@ INABA Hitoshi E<lt>ina@cpan.orgE<gt>
 
 This project was originated by INABA Hitoshi.
 
-=head1 LICENSE AND COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
 This software is free software; you can redistribute it and/or modify it under the same terms as Perl itself. See L<perlartistic>.
 
@@ -328,4 +459,3 @@ L<The BackPAN|http://backpan.perl.org/authors/id/I/IN/INA/> - A Complete History
 =back
 
 =cut
-

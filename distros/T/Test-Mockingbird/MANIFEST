@@ -19,6 +19,7 @@ t/deepmock.t
 t/edge-cases.t
 t/eof.t
 t/eol.t
+t/extended_tests.t
 t/fixme.t
 t/function.t
 t/gv.t
@@ -28,6 +29,7 @@ t/kwalitee.t
 t/manifest.t
 t/mock.t
 t/mock_scoped.t
+t/mock_scoped_multi.t
 t/object.t
 t/pod-cm.t
 t/pod-coverage.t

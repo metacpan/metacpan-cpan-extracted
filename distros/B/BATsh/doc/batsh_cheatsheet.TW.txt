@@ -1,6 +1,30 @@
 BATsh 速查表 [TW] 繁體中文
 ==============================
 
+----------------------------------------------------------------------
+執行摘要
+  BATsh 是一個雙語 Shell，在同一腳本檔案中執行 cmd.exe 批次處理和
+  bash/sh 語法，逐行自動切換模式，無需外部 Shell，純 Perl 實作。
+  支援管道、重導向、函數、變數展開擴充。
+
+混合模式範例
+  :: CMD 區段（首標記為大寫）
+  @ECHO OFF
+  SET LANG=BATsh
+
+  # SH 區段（首標記含小寫字母）
+  greet() { echo "你好 $1 (bash 模式)"; }
+  greet $LANG
+  result=$(echo $LANG | perl -e 'while(<STDIN>){chomp;print uc}')
+  echo "大寫: $result"
+
+  :: 再次進入 CMD 區段（讀取 SH 結果）
+  ECHO 返回CMD: %result%
+
+  # 執行: perl lib/BATsh.pm script.batsh
+----------------------------------------------------------------------
+
+
 BATsh 是一個雙語 Shell，可在同一腳本中同時執行 cmd.exe 和 bash/sh 語法。
 每行的第一個語彙基元決定執行模式。
 
@@ -97,3 +121,21 @@ BATsh 是一個雙語 Shell，可在同一腳本中同時執行 cmd.exe 和 bash
   無需 CPAN 相依套件。
 
 參見: https://metacpan.org/dist/BATsh
+
+11. CMD 管道和參數修飾符
+--------------------------
+  cmd1 | cmd2              # 透過暫存檔案的管道（純 Perl）
+  SET /P VAR=提示:         # 從 STDIN 讀取一行到 VAR
+  %~dp0                    # %0 的磁碟機+目錄（最常用）
+  %~n1, %~x1, %~nx1       # 檔名、副檔名、兩者
+
+12. SH 函數和變數展開
+---------------------
+  f() { echo $1; }         # 函數定義
+  ${var%.*}  ${var%%.*}    # 刪除後綴（最短/最長）
+  ${var#*.}  ${var##*.}    # 刪除前綴（最短/最長）
+  ${var/a/b} ${var//a/b}   # 替換（第一個/全部）
+  ${var^^} ${var,,}        # 大寫/小寫
+  cmd > f  cmd >> f  2>&1  # 重新導向
+  cmd1 && cmd2             # AND 鏈接
+  cmd1 || cmd2             # OR 鏈接

@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1
-#                   and LibVirt version v11.10.0
+#                   and LibVirt version v12.3.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -16,12 +16,12 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad;
 
-class Sys::Async::Virt::Interface v0.2.3;
+class Sys::Async::Virt::Interface v0.6.3;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v11.10.1;
+use Protocol::Sys::Virt::Remote::XDR v12.3.0;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -29,38 +29,45 @@ use constant {
 };
 
 
-field $_id :param :reader;
+field $_rpc_id :param :reader;
 field $_client :param :reader;
 
+method name() {
+    return $_rpc_id->{name};
+}
+
+method mac() {
+    return $_rpc_id->{mac};
+}
 
 method create($flags = 0) {
     return $_client->_call(
         $remote->PROC_INTERFACE_CREATE,
-        { iface => $_id, flags => $flags // 0 }, empty => 1 );
+        { iface => $_rpc_id, flags => $flags // 0 }, empty => 1 );
 }
 
 method destroy($flags = 0) {
     return $_client->_call(
         $remote->PROC_INTERFACE_DESTROY,
-        { iface => $_id, flags => $flags // 0 }, empty => 1 );
+        { iface => $_rpc_id, flags => $flags // 0 }, empty => 1 );
 }
 
 async method get_xml_desc($flags = 0) {
     return await $_client->_call(
         $remote->PROC_INTERFACE_GET_XML_DESC,
-        { iface => $_id, flags => $flags // 0 }, unwrap => 'xml' );
+        { iface => $_rpc_id, flags => $flags // 0 }, unwrap => 'xml' );
 }
 
 async method is_active() {
     return await $_client->_call(
         $remote->PROC_INTERFACE_IS_ACTIVE,
-        { iface => $_id }, unwrap => 'active' );
+        { iface => $_rpc_id }, unwrap => 'active' );
 }
 
 method undefine() {
     return $_client->_call(
         $remote->PROC_INTERFACE_UNDEFINE,
-        { iface => $_id }, empty => 1 );
+        { iface => $_rpc_id }, empty => 1 );
 }
 
 
@@ -76,7 +83,7 @@ Sys::Async::Virt::Interface - Client side proxy to remote LibVirt (network) inte
 
 =head1 VERSION
 
-v0.2.3
+v0.6.3
 
 =head1 SYNOPSIS
 
@@ -89,6 +96,18 @@ v0.2.3
 =head2 new
 
 =head1 METHODS
+
+=head2 name
+
+  my $name = $iface->name;
+
+Returns the name of the interface.
+
+=head2 mac
+
+  my $mac = $iface->mac;
+
+Returns the MAC address of the interface.
 
 =head2 create
 
@@ -135,6 +154,15 @@ See documentation of L<virInterfaceUndefine|https://libvirt.org/html/libvirt-lib
 
 =head1 CONSTANTS
 
+
+   my $value = Sys::Async::Virt::Interface->XML_INACTIVE;
+
+   # - or -
+
+   my $value = $iface->XML_INACTIVE;
+
+
+
 =over 8
 
 =item XML_INACTIVE
@@ -148,7 +176,7 @@ L<LibVirt|https://libvirt.org>, L<Sys::Virt>
 =head1 LICENSE AND COPYRIGHT
 
 
-  Copyright (C) 2024-2025 Erik Huelsmann
+  Copyright (C) 2024-2026 Erik Huelsmann
 
 All rights reserved. This program is free software;
 you can redistribute it and/or modify it under the same terms as Perl itself.

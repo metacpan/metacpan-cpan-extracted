@@ -1,5 +1,5 @@
 package Muster;
-$Muster::VERSION = '0.93';
+$Muster::VERSION = '0.9501';
 # ABSTRACT: web application for content management
 =head1 NAME
 
@@ -7,7 +7,7 @@ Muster - web application for content management
 
 =head1 VERSION
 
-version 0.93
+version 0.9501
 
 =head1 SYNOPSIS
 

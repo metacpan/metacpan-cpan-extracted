@@ -4084,6 +4084,25 @@ Multiplicative inverse of C<n>: C<1/n>.
 
 =cut
 
+=head2 inverse_count
+
+    inverse_count(target, count_func, bsearch_method='bsearch_min')
+
+Finds the smallest integer C<<< m >= 0 >>> such that C<<< count_func(m) >= target >>>.
+
+This method implements the following search strategy:
+
+1. B<Exponential Search:> Rapidly doubles the search range to find an upper bound C<hi> such that C<<< count_func(hi) >= target >>>.
+
+2. B<Binary Search:> Refines the range between C<lo> and C<hi> using the specified C<bsearch_method> (defaults to C<'bsearch_min'>).
+
+The complexity is logarithmic relative to the value of the result, making it suitable for inverting monotonic functions like prime counts or smooth counts. Returns C<NaN> if C<target> is negative.
+
+    say inverse_count(25, { .prime_count })             #=> 97
+    say inverse_count(100, { 10.smooth_count(_) })      #=> 450
+
+=cut
+
 =head2 inverse_phi
 
     n.inverse_phi
@@ -6460,6 +6479,22 @@ Given a nonnegative integer C<n>, returns the next prime power (C<p^k> with k >=
 
 =cut
 
+=head2 next_rough(n, k)
+
+Returns the smallest C<k>-rough integer strictly greater than C<n>.
+
+If C<n> is zero, it returns C<1>.
+
+=cut
+
+=head2 next_smooth(n, k)
+
+Returns the smallest C<k>-smooth integer strictly greater than C<n>.
+
+If C<n> is zero, it returns C<1>.
+
+=cut
+
 =head2 next_semiprime
 
     n.next_semiprime
@@ -6776,6 +6811,30 @@ Returns the n-th k-powerful (or k-full) number.
 Returns the n-th prime power C<p^k> with k >= 1.
 
     say nth_prime_power(1e12)   #=> 29996212395727
+
+=cut
+
+=head2 nth_rough
+
+    nth_rough(n, k)
+
+Returns the C<n>-th C<k>-rough integer.
+
+A number is considered C<k>-rough (or C<k>-resilient) if all of its prime factors are greater than or equal to C<k>. This is the inverse of the C<rough_count> function.
+
+Returns C<NaN> if C<<< n <= 0 >>>.
+
+=cut
+
+=head2 nth_smooth
+
+    nth_smooth(n, k)
+
+Returns the C<n>-th C<k>-smooth integer (a B<Hamming number> if C<k=3>).
+
+A number is considered C<k>-smooth if all of its prime factors are less than or equal to C<k>. This is the inverse of the C<smooth_count> function.
+
+Returns C<NaN> if C<<< n <= 0 >>> or C<<< k <= 1 >>>.
 
 =cut
 
@@ -7708,6 +7767,22 @@ Returns an array with C<n> consecutive decreasing prime numbers starting from C<
 
 =cut
 
+=head2 prev_rough(n, k)
+
+Returns the largest C<k>-rough integer strictly less than C<n>.
+
+Returns C<NaN> if C<<< n <= 1 >>>.
+
+=cut
+
+=head2 prev_smooth(n, k)
+
+Returns the largest C<k>-smooth integer strictly less than C<n>.
+
+Returns C<NaN> if C<<< n <= 1 >>>.
+
+=cut
+
 =head2 prev_semiprime
 
     n.prev_semiprime
@@ -8038,6 +8113,31 @@ This is the exponents of the prime-power factorization of C<n>, sorted in descen
 
     say prime_signature(324)                                      #=> [4, 2]  (324 = 2^2 * 3^4)
     say 30.of { .prime_signature.prod_kv{|k,v| prime(k+1)**v } }  #=> OEIS: A046523
+
+=cut
+
+=head2 prime_signature_numbers
+
+    prime_signature_numbers(lo, hi, prime_signature)
+
+Returns an array of numbers in range C<[lo, hi]> that have a given prime signature.
+
+    say prime_signature_numbers(1, 1e3, [1])        #=> prime numbers
+    say prime_signature_numbers(1, 1e3, [2])        #=> squares of numbers
+    say prime_signature_numbers(1, 1e3, [2,1])      #=> squares of primes times another prime
+    say prime_signature_numbers(1, 1e3, [2,1,1])    #=> numbers of the form p^2*q*r
+
+=cut
+
+=head2 prime_signature_count
+
+    prime_signature_count(lo, hi, prime_signature)
+
+Count numbers in range C<[lo, hi]> that have a given prime signature.
+
+    say 10.of {|n| prime_signature_count(1, 10**n, [1]) }      # prime number count
+    say 10.of {|n| prime_signature_count(1, 10**n, [1,1]) }    # A036351
+    say 10.of {|n| prime_signature_count(1, 10**n, [1,1,1]) }  # A215218
 
 =cut
 
@@ -8477,11 +8577,17 @@ Aliases: I<to_r>, I<to_rat>
 =head2 rat_approx
 
     x.rat_approx
+    x.rat_approx(max_den)
 
 Given a real number C<x>, it returns a very good (sometimes exact) rational approximation to C<n>, computed with continued fractions.
 
     say rat_approx(3.14).as_frac        #=> 22/7
     say rat_approx(zeta(-5)).as_frac    #=> -1/252
+
+It also accepts and optional argument C<max_den>, returning the best rational approximation to C<<x>> with denominator C<<< q <= max_den >>>.
+
+    say rat_approx(Num.pi, 1e4).as_frac    #=> 355/113
+    say rat_approx(Num.pi, 1e9).as_frac    #=> 2549491779/811528438
 
 Returns C<NaN> when C<x> is not a real number.
 
@@ -9468,9 +9574,7 @@ Returns an array with the subsets of the integers in the range C<0..n-1>, or ite
 
     sum_of_squares(n)
 
-Returns an array of C<[a,b]> pairs, with C<a> <= C<b>, containing all the positive solutions to the equation:
-
-    n = a^2 + b^2
+Returns all representations C<n = x² + y²> with C<0 ≤ x ≤ y>, as an array of C<[x, y]> arrays, sorted by x.
 
 Example:
 

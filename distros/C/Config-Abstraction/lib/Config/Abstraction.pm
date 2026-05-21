@@ -3,6 +3,7 @@ package Config::Abstraction;
 # TODO: add TOML file support
 # TODO: environment-specific encodings - automatic loading of dev/staging/prod
 # TODO: devise a scheme to encrypt passwords in config files
+# TODO: Think of a way of validating values - e.g. a value must be an integer, or match a regex
 
 use strict;
 use warnings;
@@ -12,7 +13,7 @@ use JSON::MaybeXS 'decode_json';	# Doesn't behave well with require
 use File::Slurp qw(read_file);
 use File::Spec;
 use Hash::Merge qw(merge);
-use Params::Get 0.13;
+use Params::Get 0.14;
 use Params::Validate::Strict 0.11;
 use Scalar::Util;
 
@@ -22,11 +23,11 @@ Config::Abstraction - Merge and manage configuration data from different sources
 
 =head1 VERSION
 
-Version 0.37
+Version 0.38
 
 =cut
 
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 
 =head1 SYNOPSIS
 
@@ -266,6 +267,19 @@ options directly to C<new>.
       }
   );
 
+=item * C<defaults>
+
+A hash reference that provides default values for the object's own attributes (such as C<config_dirs>, C<logger>, C<flatten>, etc.).
+If this option is supplied,
+the object is initialized using the keys in this hash as the base;
+any other options passed directly to C<new()> (aside from C<env_prefix>) are ignored.
+This allows you to pre-define a standard configuration profile for the object itself.
+Note that C<defaults> is distinct from the C<data> option - C<data> supplies the initial configuration values that will be merged with files, environment, and command line,
+while C<defaults> sets the object's internal parameters.
+The C<env_prefix> value,
+if provided as a top-level argument,
+still takes precedence over any C<env_prefix> that might exist inside the C<defaults> hash.
+
 =item * C<env_prefix>
 
 A prefix for environment variable keys and comment line options, e.g. C<MYAPP_DATABASE__USER>,
@@ -327,9 +341,7 @@ sub new
 
 	$params->{'config_dirs'} //= $params->{'path'};	# Compatibility with Config::Auto
 
-	if((!defined($params->{'config_dirs'})) && $params->{'file'}) {
-		$params->{'config_file'} = $params->{'file'};
-	}
+	$params->{'config_file'} //= $params->{'file'} if($params->{'file'});
 
 	if(!defined($params->{'config_dirs'})) {
 		if($params->{'config_file'} && File::Spec->file_name_is_absolute($params->{'config_file'})) {
@@ -369,10 +381,16 @@ sub new
 
 	if(my $logger = $self->{'logger'}) {
 		if(!Scalar::Util::blessed($logger)) {
-			$self->_load_driver('Log::Abstraction');
-			$self->{'logger'} = Log::Abstraction->new($logger);
-			if($params->{'level'} && $self->{'logger'}->can('level')) {
-				$self->{'logger'}->level($params->{'level'});
+			# Don't call $self->_load_driver('Log::Abstraction') as it can make a call to logger, which is yet to be set up
+			eval "require Log::Abstraction";
+			if($@) {
+				carp(ref($self), ": Log::Abstraction failed to load: $@");
+			} else {
+				Log::Abstraction->import();
+				$self->{'logger'} = Log::Abstraction->new($logger);
+				if($params->{'level'} && $self->{'logger'}->can('level')) {
+					$self->{'logger'}->level($params->{'level'});
+				}
 			}
 		}
 	}
@@ -386,6 +404,20 @@ sub new
 		return $self;
 	}
 	return undef;
+}
+
+# Determine if a value is a plain, unblessed, non-reference scalar
+# safe to use in regex/string operations.
+# Args:   value to test
+# Returns: 1 if plain scalar, 0 otherwise
+sub _is_plain_scalar
+{
+	my $val = $_[0];
+
+	return 0 if !defined($val);
+	return 0 if Scalar::Util::blessed($val);
+	return 0 if ref($val);
+	return 1;
 }
 
 sub _load_config
@@ -440,10 +472,24 @@ sub _load_config
 			if ($file =~ /\.ya?ml$/) {
 				$self->_load_driver('YAML::XS', ['LoadFile']);
 				$data = eval { LoadFile($path) };
-				croak "Failed to load YAML from $path: $@" if $@;
+				if($@) {
+					if($logger) {
+						$logger->notice("Failed to load YAML from $path: $@");
+					} else {
+						Carp::carp("Failed to load YAML from $path: $@");
+					}
+					next;
+				}
 			} elsif ($file =~ /\.json$/) {
 				$data = eval { decode_json(read_file($path)) };
-				croak "Failed to load JSON from $path: $@" if $@;
+					if($@) {
+						if($logger) {
+							$logger->notice("Failed to load JSON from $path: $@");
+						} else {
+							Carp::carp("Failed to load JSON from $path: $@");
+						}
+						next;
+					}
 			} elsif($file =~ /\.xml$/) {
 				my $rc;
 				if($self->_load_driver('XML::Simple', ['XMLin'])) {
@@ -580,6 +626,9 @@ sub _load_config
 									$data->{$k} = undef;
 									next;
 								}
+								# Do not inspect or modify coderefs, blessed objects, or any reference
+								next unless _is_plain_scalar($v);
+
 								next if($v =~ /^".+"$/);	# Quotes to keep in one field
 								if($v =~ /,/) {
 									my @vals = split(/\s*,\s*/, $v);
@@ -728,21 +777,17 @@ sub get
 	my $ref = $self->{'config'};
 	for my $part (split qr/\Q$self->{sep_char}\E/, $key) {
 		return undef unless ref $ref eq 'HASH';
+		return unless exists $ref->{$part};
 		$ref = $ref->{$part};
 	}
-	if((defined($ref) && !$self->{'no_fixate'})) {
-		if(!$self->{reuse_loaded}) {
-			eval {
-				require Data::Reuse;
-				Data::Reuse->import();
-			};
-			unless($@) {
-				$self->{reuse_loaded} = 1;
-			}
-		}
-		if($self->{reuse_loaded}) {
+	if((defined($ref) && (ref($ref) eq 'HASH') && !$self->{'no_fixate'})) {
+		if($self->_load_data_reuse()) {
 			if(ref($ref) eq 'HASH') {
-				Data::Reuse::fixate(%{$ref});
+				if(!tied %$ref) {
+					# Pass the hashref directly (not dereferenced) so fixate receives
+					# a named scalar it can make read-only without flattening the hash
+					Data::Reuse::fixate($ref) if scalar(keys %{$ref});
+				}
 			} elsif(ref($ref) eq 'ARRAY') {
 				# RT#171980
 				# Data::Reuse::fixate(@{$ref});
@@ -750,6 +795,30 @@ sub get
 		}
 	}
 	return $ref;
+}
+
+sub _load_data_reuse
+{
+	my $self = $_[0];
+
+	# Skip fixation entirely if caller has opted out
+	return 0 if($self->{'no_fixate'});
+
+	# Return cached result to avoid repeated require attempts
+	return 1 if($self->{reuse_loaded});
+	return 0 if($self->{reuse_failed});
+
+	eval {
+		require Data::Reuse;
+		Data::Reuse->import();
+	};
+	if($@) {
+		# Cache the failure so we do not attempt to load again
+		$self->{reuse_failed} = 1;
+		return 0;
+	}
+	$self->{reuse_loaded} = 1;
+	return 1;
 }
 
 =head2 exists(key)
@@ -764,7 +833,7 @@ sub exists
 	my ($self, $key) = @_;
 
 	if($self->{flatten}) {
-		return exists($self->{config}{$key});
+		return exists($self->{config}{$key}) ? 1 : 0;
 	}
 	my $ref = $self->{'config'};
 	for my $part (split qr/\Q$self->{sep_char}\E/, $key) {
@@ -788,7 +857,14 @@ sub all
 {
 	my $self = shift;
 
-	return($self->{'config'} && scalar(keys %{$self->{'config'}})) ? $self->{'config'} : undef;
+	return if(!$self->{config});
+
+	# This is good for debugging, but not much more and it breaks inheritance, so disabled
+	# if($self->_load_data_reuse()) {
+		# Data::Reuse::fixate($self->{config});
+	# }
+
+	return(scalar(keys %{$self->{'config'}})) ? $self->{'config'} : undef;
 }
 
 =head2 merge_defaults
@@ -849,7 +925,7 @@ sub merge_defaults
 
 	Hash::Merge::set_clone_behavior(0);
 
-	if($config->{'global'}) {
+	if(exists $config->{'global'}) {
 		if($params->{'deep'}) {
 			$defaults = merge($config->{'global'}, $defaults);
 		} else {
@@ -857,7 +933,7 @@ sub merge_defaults
 		}
 		delete $config->{'global'};
 	}
-	if($section && $config->{$section}) {
+	if($section && exists $config->{$section}) {
 		$config = $config->{$section};
 	}
 	if($params->{'merge'}) {
@@ -866,7 +942,11 @@ sub merge_defaults
 	return { %{$defaults}, %{$config} };
 }
 
-# Helper routine to load a driver
+# Helper routine to load a driver.
+# NOTE: Log::Abstraction must NOT be loaded via this method - it is
+# bootstrapped directly in new() to avoid a circular initialisation
+# dependency where _load_driver would attempt to log via an as-yet
+# uninitialised logger.
 sub _load_driver
 {
 	my($self, $driver, $imports) = @_;
@@ -1013,7 +1093,7 @@ Used to C<fixate()> elements when installed, unless C<no-fixate> is given
 
 =item * L<Log::Abstraction>
 
-=item * Test Dashboard L<https://nigelhorne.github.io/Config-Abstraction/coverage/>
+=item * L<Test Dashboard|https://nigelhorne.github.io/Config-Abstraction/coverage/>
 
 =item * Development version on GitHub L<https://github.com/nigelhorne/Config-Abstraction>
 

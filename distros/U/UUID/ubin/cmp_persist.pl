@@ -78,7 +78,7 @@ print <<'EOT';
     case6  ->  persistent; eval 'my $s = uuid1()' # deferred 1ms
     case7  ->  persistent; eval 'my $s = uuid1()' # deferred 10ms
     case8  ->  persistent; eval 'my $s = uuid1()' # deferred 100ms
-    case9  ->  persistent; eval 'my $s = uuid1()' # deferred 1ms
+    case9  ->  persistent; eval 'my $s = uuid1()' # deferred 1s
 EOT
 
 exit 0;

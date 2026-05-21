@@ -1,4 +1,4 @@
-package Trog::TOTP 1.005;
+package Trog::TOTP 1.006;
 
 use strict;
 use warnings;
@@ -12,6 +12,7 @@ use Ref::Util qw{is_coderef is_hashref};
 use Digest::SHA();
 use Encode::Base2N();
 use List::Util qw{first};
+use Crypt::PRNG();
 use POSIX qw{floor};
 
 use Carp::Always;
@@ -268,8 +269,8 @@ sub _gen_secret {
 
     my $secret;
     ## no critic (Variables::RequireLexicalLoopIterators)
-    for ( 0 .. int( rand($length) ) + $length ) {
-        $secret .= join '', ( '/', 1 .. 9, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '+', '=', 'A' .. 'H', 'J' .. 'N', 'P' .. 'Z', 'a' .. 'h', 'm' .. 'z' )[ rand 58 ];
+    for ( 0 .. int( Crypt::PRNG::rand($length) ) + $length ) {
+        $secret .= join '', ( '/', 1 .. 9, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '+', '=', 'A' .. 'H', 'J' .. 'N', 'P' .. 'Z', 'a' .. 'h', 'm' .. 'z' )[ int(Crypt::PRNG::rand(58)) ];
     }
     if ( length($secret) > ( $length + 1 ) ) {
         $self->_debug_print( "have len " . length($secret) . " ($secret) so cutting down" );
@@ -341,7 +342,7 @@ Trog::TOTP - Fork of Authen::TOTP
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 DESCRIPTION
 

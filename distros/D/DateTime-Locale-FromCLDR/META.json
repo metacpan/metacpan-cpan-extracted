@@ -1,5 +1,5 @@
 {
-   "abstract" : "DateTime Localised Data from Unicode CLDR",
+   "abstract" : "DateTime/DateTime::Lite Localised Data from Unicode CLDR",
    "author" : [
       "Jacques Deguest (jack@deguest.jp)"
    ],
@@ -47,11 +47,10 @@
       "test" : {
          "requires" : {
             "DBD::SQLite" : "1.27",
-            "DateTime" : "0.42",
             "File::Find" : "0",
             "Test::More" : "1.302120",
             "Test::Pod" : "1.52",
-            "lib" : "0.63",
+            "lib" : "0",
             "utf8" : "0",
             "version" : "0"
          }
@@ -67,6 +66,6 @@
          "web" : "https://gitlab.com/jackdeguest/DateTime-Locale-FromCLDR"
       }
    },
-   "version" : "v0.8.2",
+   "version" : "v0.8.5",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

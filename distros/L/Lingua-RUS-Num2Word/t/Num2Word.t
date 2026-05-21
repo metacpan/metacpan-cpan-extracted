@@ -10,9 +10,15 @@ use strict;
 use warnings;
 use 5.10.1;
 
+use utf8;
+
 use Test::More;
-use Test::More::UTF8;
-# use utf8;
+
+# Test names contain Cyrillic; encode TAP handles to avoid
+# "Wide character in print" from Test2::Formatter::TAP.
+binmode Test::More->builder->output,         ':encoding(UTF-8)';
+binmode Test::More->builder->failure_output, ':encoding(UTF-8)';
+binmode Test::More->builder->todo_output,    ':encoding(UTF-8)';
 
 # }}}
 
@@ -25,7 +31,7 @@ BEGIN {
     $tests++;
 }
 
-use Lingua::RUS::Num2Word            qw(rur_in_words get_string);
+use Lingua::RUS::Num2Word            qw(rur_in_words get_string num2rus_ordinal);
 
 # }}}
 
@@ -119,6 +125,57 @@ for my $test (@{$gs}) {
     my $got = get_string(@{$test->[0]});
     my $exp = $test->[1];
     is($got, $exp, $test->[2] . ' in RUS');
+    $tests++;
+}
+
+# }}}
+# {{{ num2rus_ordinal
+
+my %ordinals = (
+    0   => 'нулевой',
+    1   => 'первый',
+    2   => 'второй',
+    3   => 'третий',
+    4   => 'четвёртый',
+    5   => 'пятый',
+    6   => 'шестой',
+    7   => 'седьмой',
+    8   => 'восьмой',
+    9   => 'девятый',
+    10  => 'десятый',
+    11  => 'одиннадцатый',
+    12  => 'двенадцатый',
+    13  => 'тринадцатый',
+    14  => 'четырнадцатый',
+    15  => 'пятнадцатый',
+    16  => 'шестнадцатый',
+    17  => 'семнадцатый',
+    18  => 'восемнадцатый',
+    19  => 'девятнадцатый',
+    20  => 'двадцатый',
+    21  => 'двадцать первый',
+    22  => 'двадцать второй',
+    23  => 'двадцать третий',
+    30  => 'тридцатый',
+    40  => 'сороковой',
+    50  => 'пятидесятый',
+    60  => 'шестидесятый',
+    70  => 'семидесятый',
+    80  => 'восьмидесятый',
+    90  => 'девяностый',
+    99  => 'девяносто девятый',
+    100 => 'сотый',
+    101 => 'сто первый',
+    200 => 'двухсотый',
+    300 => 'трёхсотый',
+    1000 => 'тысячный',
+    1001 => 'тысяча первый',
+    2000 => 'два тысячный',
+);
+
+for my $num (sort { $a <=> $b } keys %ordinals) {
+    my $got = num2rus_ordinal($num);
+    is($got, $ordinals{$num}, "ordinal $num => $ordinals{$num}");
     $tests++;
 }
 

@@ -57,7 +57,7 @@ async sub main() {
 }
 
 
-await Future->await_all(
+await Future->needs_all(
     Future::IO->sleep(1), # work around some futures not having ->await()
     $virt->run,
     main()

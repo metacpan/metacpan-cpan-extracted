@@ -1,6 +1,6 @@
 package Google::RestApi::CalendarApi3::Colors;
 
-our $VERSION = '2.2.2';
+our $VERSION = '2.2.3';
 
 use Google::RestApi::Setup;
 

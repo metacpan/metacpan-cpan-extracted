@@ -1,5 +1,45 @@
 Revision history for Langertha
 
+0.502     2026-05-15 23:02:10Z
+
+    - Fix Langertha::Engine::OpenAIResponses to handle function_call as a
+      top-level output[] item, which is what the real OpenAI Responses API
+      emits for reasoning-only models like gpt-5.5-pro. Previously only
+      the nested output[type=message].content[type=function_call] shape
+      was walked, so tool_calls came back empty against the live endpoint
+      and forced tool_choice retries failed with "no tool call returned".
+      response_tool_calls() and Langertha::ToolCall::extract() walk both
+      shapes now.
+
+0.501     2026-05-14 22:35:35Z
+
+    - New Langertha::Engine::OpenAIResponses for OpenAI's Responses API
+      (POST /v1/responses) - serves reasoning-only models like gpt-5.5-pro
+      and o3-pro that are not available on the Chat Completions endpoint.
+      Maps input/instructions/output to the same messages/system/choices
+      contract that Langertha::Response expects.
+      Normalises input_tokens/output_tokens and
+      output_tokens_details.reasoning_tokens to the chat-style names
+      Goldmine's cost lookup expects. Streaming not supported.
+
+    - Langertha::ToolCall gained from_responses() constructor for
+      extracting tool calls from Responses API
+      output[type=message].content[type=function_call] blocks.
+      ToolCall::extract now also searches the Responses output array
+      when the chat-completions path finds nothing.
+
+    - Langertha::ToolChoice gained to_responses() serializer:
+      type => 'function', name => N for named tool forcing,
+      plain strings for auto/none/required.
+
+    - Langertha::Tool gained to_responses() serializer: flat
+      {type, name, description, parameters} object (no nested
+      {type:'function', function: ... } wrapper).
+
+    - New test: t/60_responses_requests.t - 17 tests covering engine
+      creation, request building, response parsing, tool call extraction,
+      and format conversions for the Responses API path.
+
 0.500     2026-04-26 18:50:51Z
 
     !!! Heads-up for callers upgrading from 0.404 — items marked [BREAKING]

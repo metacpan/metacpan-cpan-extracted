@@ -306,7 +306,7 @@ CODE:
     }
 }
 
-# ---- DESTROY — prevent native window leak --------------------------------
+# ---- DESTROY - prevent native window leak --------------------------------
 
 void
 DESTROY(self)
@@ -323,7 +323,7 @@ CODE:
     }
 }
 
-# ---- close_if_expired — check timeout deadline, close if past ------------
+# ---- close_if_expired - check timeout deadline, close if past ------------
 
 int
 close_if_expired(self)
@@ -338,7 +338,7 @@ CODE:
         gettimeofday(&tv, NULL);
         IV now_ms = (IV)tv.tv_sec * 1000 + (IV)tv.tv_usec / 1000;
         if (now_ms >= SvIV(*dl)) {
-            /* Deadline passed — close the window */
+            /* Deadline passed - close the window */
             SV **wid_svp = hv_fetchs(hv, "_wid", 0);
             if (wid_svp && SvOK(*wid_svp)) {
                 int wid = (int)SvIV(*wid_svp);

@@ -1,5 +1,5 @@
 package Crypt::Passphrase::System;
-$Crypt::Passphrase::System::VERSION = '0.022';
+$Crypt::Passphrase::System::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -123,7 +123,7 @@ Crypt::Passphrase::System - An system crypt() encoder for Crypt::Passphrase
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 

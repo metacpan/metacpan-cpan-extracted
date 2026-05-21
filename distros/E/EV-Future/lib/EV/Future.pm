@@ -4,143 +4,135 @@ use 5.010000;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use EV ();
 use base 'Exporter';
-our @EXPORT = qw(parallel parallel_limit series);
+our @EXPORT = qw(parallel parallel_limit series race);
 
 require XSLoader;
 XSLoader::load('EV::Future', $VERSION);
 
 =head1 NAME
 
-EV::Future - Minimalist and high-performance async control flow for EV
+EV::Future - Minimalist high-performance async control flow for EV
 
 =head1 SYNOPSIS
 
   use EV;
   use EV::Future;
 
-  my @watchers;
+  my @w;
   parallel([
-      sub { my $done = shift; push @watchers, EV::timer 0.1, 0, sub { print "Task 1 done\n"; $done->() } },
-      sub { my $done = shift; push @watchers, EV::timer 0.2, 0, sub { print "Task 2 done\n"; $done->() } },
-  ], sub {
-      print "All parallel tasks finished\n";
-  });
+      sub { my $done = shift; push @w, EV::timer 0.1, 0, sub { $done->() } },
+      sub { my $done = shift; push @w, EV::timer 0.2, 0, sub { $done->() } },
+  ], sub { print "all done\n" });
 
   parallel_limit([
-      sub { my $done = shift; push @watchers, EV::timer 0.1, 0, sub { print "Task A\n"; $done->() } },
-      sub { my $done = shift; push @watchers, EV::timer 0.2, 0, sub { print "Task B\n"; $done->() } },
-      sub { my $done = shift; push @watchers, EV::timer 0.1, 0, sub { print "Task C\n"; $done->() } },
-  ], 2, sub {
-      print "All limited-parallel tasks finished\n";
-  });
+      sub { my $done = shift; push @w, EV::timer 0.1, 0, sub { $done->() } },
+      sub { my $done = shift; push @w, EV::timer 0.2, 0, sub { $done->() } },
+      sub { my $done = shift; push @w, EV::timer 0.1, 0, sub { $done->() } },
+  ], 2, sub { print "all done (max 2 in-flight)\n" });
 
   series([
-      sub { my $done = shift; print "Task 1 start\n"; $done->() },
-      sub { my $done = shift; print "Task 2 start\n"; $done->() },
-  ], sub {
-      print "All series tasks finished\n";
-  });
+      sub { my $done = shift; $done->() },
+      sub { my $done = shift; $done->() },
+  ], sub { print "all done in order\n" });
+
+  race([
+      sub { my $done = shift; push @w, EV::timer 0.1, 0, sub { $done->("a") } },
+      sub { my $done = shift; push @w, EV::timer 0.2, 0, sub { $done->("b") } },
+  ], sub { my $winner = shift; print "winner: $winner\n" });
 
   EV::run;
 
 =head1 DESCRIPTION
 
-Focuses on performance and minimalism, offloading task management to XS.
+Four control-flow primitives (C<parallel>, C<parallel_limit>, C<series>,
+C<race>), implemented in XS for minimal overhead. All four are exported by
+default.
 
-All three functions (C<parallel>, C<parallel_limit>, C<series>) are exported
-by default.
+Each task is a coderef that receives a single C<done> callback as its only
+argument; the task must invoke C<done> exactly once to mark completion.
 
-If C<\@tasks> is empty, C<final_cb> is called immediately. Non-coderef
-elements in C<\@tasks> are treated as immediately-completed no-op tasks.
+If C<\@tasks> is empty, C<final_cb> fires immediately. Non-coderef elements
+in C<\@tasks> are treated as no-op tasks that complete instantly.
 
-=head2 TASKS
+=head2 Safe vs unsafe mode
 
-Each task is a coderef that receives a single argument: a "done" callback. 
-The task MUST call this callback exactly once when it is finished.
-
-=head3 Exceptions
-
-In safe mode (the default), if a task throws an exception (e.g., via C<die>),
-the exception will be propagated immediately and internal memory is cleaned up
-correctly. In unsafe mode, exceptions bypass cleanup and will leak memory.
-
-=head3 Double-calls
-
-Calling the C<done> callback more than once for a single task is considered
-incorrect usage. In safe mode (the default), C<EV::Future> prevents
-catastrophic failure:
+Each function takes an optional trailing C<$unsafe> flag. In safe mode (the
+default), each dispatch is wrapped in C<G_EVAL>, every task gets its own
+C<done> CV, and double-calls are silently dropped. Unsafe mode skips
+C<G_EVAL> and reuses a single shared CV, roughly doubling throughput at the
+cost of:
 
 =over 4
 
 =item *
 
-In C<parallel> and C<parallel_limit>, extra calls to a specific C<done>
-callback are silently ignored.
+Exceptions from a task bypass cleanup and leak the internal context.
 
 =item *
 
-In C<series>, extra calls to a specific C<done> callback are ignored. Only
-the C<done> callback provided to the I<currently active> task can advance the
-series.
+Double-calling C<done> corrupts the completion counter, which may invoke
+C<final_cb> before all tasks have actually finished.
 
 =back
 
-In unsafe mode, these protections are B<not active>. Double-calls will
-corrupt the internal completion counter, which may cause premature
-invocation of C<final_cb> (before all tasks have actually completed).
+Use unsafe mode only when tasks are well-behaved and performance is
+critical.
 
 =head1 FUNCTIONS
 
 =head2 parallel(\@tasks, \&final_cb, [$unsafe])
 
-Executes all tasks concurrently. The C<final_cb> is called once all tasks 
-have invoked their C<done> callback.
-
-If the optional C<$unsafe> flag is set to a true value, C<EV::Future> will skip 
-evaluating tasks inside a C<eval> block and will reuse a single callback 
-object for all tasks. This provides a massive performance boost (up to 100% 
-faster) but bypasses per-task double-call protection and will cause issues 
-if tasks throw exceptions. Use only when performance is critical and tasks 
-are well-behaved.
+Dispatch every task immediately; call C<final_cb> once each task has invoked
+its C<done> callback.
 
 =head2 parallel_limit(\@tasks, $limit, \&final_cb, [$unsafe])
 
-Executes tasks concurrently, but with at most C<$limit> tasks in-flight at
-any time. As each task completes, the next pending task is dispatched.
+Dispatch tasks with at most C<$limit> in flight at any time. C<$limit> is
+clamped to C<1..scalar(@tasks)>: C<$limit == 1> degenerates to C<series>,
+C<$limit E<gt>= @tasks> degenerates to C<parallel>.
 
-C<$limit> is clamped to the range C<1..scalar(@tasks)>. With C<$limit E<gt>= @tasks>
-this behaves like C<parallel>; with C<$limit == 1> it runs tasks sequentially.
-
-There is no cancellation mechanism for C<parallel_limit>; all dispatched
-tasks must complete.
-
-The C<$unsafe> flag has the same meaning as in C<parallel>.
+There is no cancellation mechanism; all dispatched tasks must complete.
+The truthy-C<done> cancellation supported by C<series> does not apply here.
 
 =head2 series(\@tasks, \&final_cb, [$unsafe])
 
-Executes tasks one by one. The next task is only started after the current 
-task calls its C<done> callback.
-
-If the optional C<$unsafe> flag is set to a true value, error-checking overhead 
-is bypassed for maximum performance. See C<parallel> for warnings about exceptions.
-
-To cancel the series and skip all subsequent tasks (in both safe and
-unsafe modes), pass a true value to the C<done> callback:
+Run tasks sequentially; each task starts only after the previous calls its
+C<done>. To cancel the series and skip remaining tasks, pass a true value
+to C<done>:
 
   series([
-      sub { my $d = shift; $d->(1) }, # Cancel here
-      sub { die "This will never run" },
-  ], sub {
-      print "Series finished early\n";
-  });
+      sub { my $d = shift; $d->(1) },        # cancel here
+      sub { die "never reached" },
+  ], sub { print "finished early\n" });
+
+Cancellation works in both safe and unsafe modes.
+
+=head2 race(\@tasks, \&final_cb, [$unsafe])
+
+Dispatch every task; call C<final_cb> with the arguments passed to the
+first C<done> invocation. Subsequent C<done> calls (whether from the
+winning task or losers) are silently ignored.
+
+Losing tasks continue to run; C<EV::Future> does not cancel their EV
+watchers (it didn't create them). To tear losers down, hold their
+watchers in a shared lvalue and clear it from C<final_cb>:
+
+  my @w;
+  race([
+      sub { my $d = shift; push @w, EV::timer 0.1, 0, sub { $d->("a") } },
+      sub { my $d = shift; push @w, EV::timer 0.2, 0, sub { $d->("b") } },
+  ], sub { my $winner = shift; @w = () });
+
+Non-coderef elements in C<\@tasks> count as instantly-completed winners
+(with no arguments) and short-circuit dispatch.
 
 =head1 BENCHMARKS
 
-1000 synchronous tasks, 5000 iterations (C<bench/benchmark.pl>):
+1000 synchronous tasks, 5000 iterations (C<bench/comparison.pl>):
 
   --- PARALLEL (iterations/sec) ---
   EV::Future (unsafe)          4,386
@@ -160,10 +152,6 @@ unsafe modes), pass a true value to the C<done> callback:
   EV::Future (safe)            2,591
   Future::XS (chain)             893
   Promise::XS (chain)            809
-
-Safe mode allocates a per-task CV for double-call protection and wraps
-each dispatch in C<G_EVAL>. Unsafe mode reuses a single shared CV and
-skips C<G_EVAL>, roughly doubling throughput.
 
 =head1 SEE ALSO
 

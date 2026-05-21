@@ -85,7 +85,7 @@ OUTPUT:
     RETVAL
 
  # ============================================================
- # Chandra::Tray — high-level tray API (all in XS)
+ # Chandra::Tray - high-level tray API (all in XS)
  # ============================================================
 
 MODULE = Chandra    PACKAGE = Chandra::Tray
@@ -494,7 +494,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- items() — returns arrayref copy ----
+ # ---- items() - returns arrayref copy ----
 
 SV *
 items(self)
@@ -555,13 +555,13 @@ CODE:
     SV **active_svp = hv_fetchs(hv, "_active", 0);
     SV **app_svp = hv_fetchs(hv, "app", 0);
 
-    /* Already active — no-op */
+    /* Already active - no-op */
     if (active_svp && SvIV(*active_svp)) {
         RETVAL = SvREFCNT_inc(self);
         goto done_show;
     }
 
-    /* No app — return self */
+    /* No app - return self */
     if (!app_svp || !SvOK(*app_svp)) {
         RETVAL = SvREFCNT_inc(self);
         goto done_show;
@@ -581,7 +581,7 @@ CODE:
         started_svp = hv_fetchs(app_hv, "_started", 0);
 
         if (!started_svp || !SvTRUE(*started_svp)) {
-            /* Defer — set pending flag */
+            /* Defer - set pending flag */
             (void)hv_stores(hv, "_pending", newSViv(1));
             RETVAL = SvREFCNT_inc(self);
             goto done_show;
@@ -700,7 +700,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- _sync() — update the native tray if active ----
+ # ---- _sync() - update the native tray if active ----
 
 void
 _sync(self)
@@ -745,7 +745,7 @@ CODE:
     }
 }
 
- # ---- _menu_json() — build JSON array from items ----
+ # ---- _menu_json() - build JSON array from items ----
 
 SV *
 _menu_json(self)
@@ -759,7 +759,7 @@ CODE:
     dSP;
     int count;
 
-    /* Use Cpanel::JSON::XS to encode — build a Perl array, then encode it */
+    /* Use Cpanel::JSON::XS to encode - build a Perl array, then encode it */
     {
         AV *out = newAV();
 

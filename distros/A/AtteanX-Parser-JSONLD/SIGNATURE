@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.81.
+signed via the Module::Signature module, version 0.93.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,30 +12,29 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 1c8e8fed9d6b2fb96b0716daec7e82113678eaff Changes
-SHA1 1a8122e2829ec3d4522f2437190eba7fa637dda6 MANIFEST
-SHA1 0a0985fd4b475ce5d9a739607f913b65ae9b1533 META.yml
-SHA1 d2952f4dff7210e07483a9f735faba0e4da7bfeb Makefile.PL
-SHA1 16151cc94dcad347b6b642d3b8d2fb47baa34171 README.md
-SHA1 05a17c51aceb6435a1eac17137f19911a09e5050 inc/Module/Install.pm
-SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 dc73c2baf4357ad1cc884146147f557a50a29300 inc/Module/Install/Base.pm
-SHA1 c7f311a5bc5a7f96e9105d5f16a0e13fc596899d inc/Module/Install/Can.pm
-SHA1 470809a1dbe03e197e74dde79c6af40b5f7f9b26 inc/Module/Install/DOAPChangeSets.pm
-SHA1 8c8f9ff5b0a536af59814e16a901ce39fbc23299 inc/Module/Install/Fetch.pm
-SHA1 4f77eb02e104324b08a047585c498146b045613b inc/Module/Install/Makefile.pm
-SHA1 2f5be6af6098acf6d786a4a7299a34d0c6c04ef9 inc/Module/Install/Metadata.pm
-SHA1 aa6723cc4a8d4475026f6ceb28e1f16459e8a11b inc/Module/Install/Win32.pm
-SHA1 6661285caedfe012cb5a1ca915a422ffc292ae2b inc/Module/Install/WriteAll.pm
-SHA1 920b4c76c19a8a5600822dfcab8e7244f209539b lib/AtteanX/Parser/JSONLD.pm
-SHA1 8896e09116d033dde3f45d832d2b333e70160d08 meta/changes.ttl
-SHA1 6a09c6bb5d1759632c30cda9088e77da60614a5f t/parser.t
+SHA256 1c19d9607ebc5f02e4dde4d0b25386a9faf70ee6983e9367334ec197d8786d19 Changes
+SHA256 d4bc6d104d38c84ef2ea1b7f8b057f4ce69b94d867b35d8f00efa90468ba0991 MANIFEST
+SHA256 c762a4a60272818f1ae33b4c7f65addb8bc847d327462d944675b9ebf2cbb4b0 META.yml
+SHA256 703aac8667dd206be03ba07aa2e1b2f742f5706a2889ec06cd089446fc5fde89 Makefile.PL
+SHA256 7ed900a472027b7b65192c4ba5a8e1c35a104e6ed1180e4918b0f948a1c66217 README.md
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 668306ae2fad17b3049f885251b8679497c4eb8d5c4b0d13f5c95bda331d1f00 inc/Module/Install/DOAPChangeSets.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 84f088e899491b0de3ad1e8e64981541a0534d4f658a32c05ff2bf9770e3a343 lib/AtteanX/Parser/JSONLD.pm
+SHA256 24289999a3eb5f0943a83b7a219eca561da052270990ae810cba897f3f62d2fe meta/changes.ttl
+SHA256 0dff0db723d1c2aac69c5b61f6532af3e7f8467902b4efffaff37b1ee417b3e5 t/parser.t
 -----BEGIN PGP SIGNATURE-----
-Comment: GPGTools - http://gpgtools.org
 
-iEYEARECAAYFAl4t3OYACgkQhPK6VMqoyC2R0QCglF6sIJFZGX8+sYvXj+JXKXSA
-JiIAoLVgH2bGd1UCnQRHIgewOs6TtApu
-=QzEi
+iF0EAREDAB0WIQSC+8GhU5AgVmDLxA+E8rpUyqjILQUCafv3ngAKCRCE8rpUyqjI
+LbV5AJ9hOJwnSkoM0pnZQKwuv4Afe3jvPQCZAYF0YrKGoXY4undymHoLRi0zCHk=
+=kIg6
 -----END PGP SIGNATURE-----

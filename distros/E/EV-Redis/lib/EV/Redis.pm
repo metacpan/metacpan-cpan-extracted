@@ -7,7 +7,7 @@ use EV;
 
 BEGIN {
     use XSLoader;
-    our $VERSION = '0.09';
+    our $VERSION = '0.11';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -90,18 +90,6 @@ sub AUTOLOAD {
     no strict 'refs';
     *$method = $sub;
     goto $sub;
-}
-
-sub can {
-    my ($self, $method) = @_;
-
-    # Check for installed methods (including those installed by AUTOLOAD)
-    no strict 'refs';
-    my $code = *{"EV::Redis::$method"}{CODE};
-    return $code if $code;
-
-    # Fall back to SUPER::can for inherited methods
-    return $self->SUPER::can($method);
 }
 
 1;
@@ -384,8 +372,6 @@ is equivalent to:
 
     $redis->get('foo', sub { ... });
 
-    $redis->set('counter', 42);  # fire-and-forget via AUTOLOAD
-
 B<Note:> Calling C<command()> while not connected will croak with
 "connection required before calling command", unless automatic reconnection
 is active (reconnect timer running). In that case, commands are
@@ -407,7 +393,6 @@ from an active connection. When called while already disconnected, clears
 any waiting commands (e.g., preserved by C<resume_waiting_on_reconnect>),
 invoking their callbacks with a "disconnected" error (C<on_disconnect>
 does not fire in this case).
-This method is usable for exiting event loop.
 
 =head2 is_connected
 
@@ -425,14 +410,16 @@ false (0) otherwise.
 
 =head2 connect_timeout([$ms])
 
-Get or set the connection timeout in milliseconds. Returns the current value,
-or undef if not set. Can also be set via constructor.
+Get or set the connection timeout in milliseconds. Pass C<0> to disable.
+Returns the current value, or undef if never set. Can also be set via
+constructor.
 
 =head2 command_timeout([$ms])
 
-Get or set the command timeout in milliseconds. Returns the current value,
-or undef if not set. Can also be set via constructor. When changed while
-connected, takes effect immediately on the active connection.
+Get or set the command timeout in milliseconds. Pass C<0> to disable.
+Returns the current value, or undef if never set. Can also be set via
+constructor. When changed while connected, takes effect immediately on
+the active connection.
 
 =head2 on_error([$cb->($errstr)])
 

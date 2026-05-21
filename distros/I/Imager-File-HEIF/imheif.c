@@ -2,26 +2,71 @@
 #include "libheif/heif.h"
 #include "imext.h"
 #include <errno.h>
+#include <string.h>
 
 #define START_SLURP_SIZE 8192
 #define next_slurp_size(old) ((size_t)((old) * 3 / 2) + 10)
 
 #define my_size_t_max (~(size_t)0)
 
+static const struct compression_names_t
+compression_names[] =
+{
+  { heif_compression_undefined, "undefined" },
+  { heif_compression_HEVC, "hevc" },
+  { heif_compression_AVC, "avc" },
+  { heif_compression_JPEG, "jpeg" },
+  { heif_compression_AV1, "av1" },
+#if LIBHEIF_HAVE_VERSION(1, 15, 0)
+  { heif_compression_VVC, "vvc" },
+  { heif_compression_EVC, "evc" },
+  { heif_compression_JPEG2000, "jpeg2000" },
+#endif
+#if LIBHEIF_HAVE_VERSION(1, 16, 0)
+  { heif_compression_uncompressed, "uncompressed" },
+#endif
+#if LIBHEIF_HAVE_VERSION(1, 17, 0)
+  { heif_compression_mask, "mask" },
+#endif
+#if LIBHEIF_HAVE_VERSION(1, 18, 0)
+  { heif_compression_HTJ2K, "jpeg2000ht" },
+#endif
+};
+
+static const size_t compression_name_count =
+    sizeof(compression_names) / sizeof(compression_names[0]);
+
+const struct compression_names_t *
+i_heif_compression_names(size_t *count) {
+  *count = compression_name_count;
+  return compression_names;
+}
+
 static int heif_init_done = 0;
+
+static int
+get_compression_from_name(const char *name,
+                          enum heif_compression_format *pfmt) {
+  size_t i;
+  for (i = 0; i < compression_name_count; ++i) {
+    if (strcmp(name, compression_names[i].name) == 0) {
+      *pfmt = compression_names[i].fmt;
+      return 1;
+    }
+  }
+  return 0;
+}
 
 static i_img *
 get_image(struct heif_context *ctx, heif_item_id id) {
-  i_img *img = NULL;
   struct heif_error err;
-  struct heif_image_handle *img_handle = NULL;
-  struct heif_image *him = NULL;
-  int stride;
-  const uint8_t *data;
-  int width, height, channels;
   i_img_dim y;
-  enum heif_colorspace cs;
-  enum heif_chroma chroma = heif_chroma_interleaved_RGB;
+  /* these are all referenced in the fail block, so initialize
+     early
+  */
+  i_img *img = NULL;
+  struct heif_image *him = NULL;
+  struct heif_image_handle *img_handle = NULL;
 
   err = heif_context_get_image_handle(ctx, id, &img_handle);
   if (err.code != heif_error_Ok) {
@@ -29,40 +74,60 @@ get_image(struct heif_context *ctx, heif_item_id id) {
     goto fail;
   }
 
-  /* libheif or HEIF itself might not support grayscale images.
-     The chroma and colorspace constants appears to be for defining
-     (en|de)coding targets/sources, so you can supply grey scale to the
-     API, but it ends up as YCbCr in any case.
-  */
-  width = heif_image_handle_get_width(img_handle);
-  height = heif_image_handle_get_height(img_handle);
-  channels = 3;
-  if (heif_image_handle_has_alpha_channel(img_handle)) {
-    ++channels;
-    chroma = heif_chroma_interleaved_RGBA;
-  }
+  int width = heif_image_handle_get_width(img_handle);
+  int height = heif_image_handle_get_height(img_handle);
+  int has_alpha = heif_image_handle_has_alpha_channel(img_handle);
 
-  /* try a default decode, this typically gives us monochrome or RGB,
-     but we need to consider whether it might give us a YCbCr image,
-     or an RGB image without alpha when the file has alpha.
+  enum heif_colorspace try_cs = heif_colorspace_undefined;
+  enum heif_chroma try_chroma = heif_chroma_undefined;
+#if LIBHEIF_HAVE_VERSION(1, 17, 0)
+  err = heif_image_handle_get_preferred_decoding_colorspace
+    (img_handle, &try_cs, &try_chroma);
+  if (err.code == heif_error_Ok) {
+    mm_log((1, "readheif: detected chroma %d cs %d\n",
+            try_chroma, try_cs));
+    if (try_chroma != heif_chroma_monochrome) {
+      try_cs = heif_colorspace_RGB;
+      try_chroma = has_alpha
+        ? heif_chroma_interleaved_RGBA
+        : heif_chroma_interleaved_RGB;
+    }
+  }
+#endif
+
+  /*
+    heif can store the image as mono, YCbCr or RGB, but we only handle
+    mono or RGB.
+
+    If we have 1.17.0 or later the above may get us a usable
+    colorspace, but for older libheif or if the image has some issues,
+    it may not.
+
+     If it didn't try a default decode, this typically gives us
+     monochrome or RGB, but we need to consider whether it might give
+     us a YCbCr image, or an RGB image without alpha when the file has
+     alpha.
   */
-  mm_log((1, "readheif: image (" i_DFp ") %d channels\n",
-          i_DFcp(width, height), channels));
-  err = heif_decode_image(img_handle, &him, heif_colorspace_undefined,
-                          heif_chroma_undefined, NULL);
+  err = heif_decode_image(img_handle, &him, try_cs, try_chroma, NULL);
   if (err.code != heif_error_Ok) {
     i_push_errorf(err.code, "failed to decoded image: %s", err.message);
     goto fail;
   }
 
-  cs = heif_image_get_colorspace(him);
+  int color_channels;
+  enum heif_colorspace cs = heif_image_get_colorspace(him);
   if (cs == heif_colorspace_monochrome
       && heif_image_get_chroma_format(him) == heif_chroma_monochrome) {
     mm_log((1, "readheif: image is monochrome\n"));
-    channels = heif_image_has_channel(him, heif_channel_Alpha) ? 2 : 1;
+    color_channels = 1;
   }
   else {
-    if (heif_image_get_chroma_format(him) != chroma) {
+    enum heif_chroma want_chroma = has_alpha
+      ? heif_chroma_interleaved_RGBA
+      : heif_chroma_interleaved_RGB;
+    color_channels = 3;
+    if (heif_image_get_chroma_format(him) != want_chroma) {
+      /* hopefully this is unusual */
       mm_log((1, "readheif: image isn't RGB, cs is %d chroma %d\n",
               (int)cs, (int)heif_image_get_chroma_format(him)));
 
@@ -71,13 +136,18 @@ get_image(struct heif_context *ctx, heif_item_id id) {
       him = NULL;
 
       err = heif_decode_image(img_handle, &him, heif_colorspace_RGB,
-                              chroma, NULL);
+                              want_chroma, NULL);
       if (err.code != heif_error_Ok) {
         i_push_errorf(err.code, "failed to decode image (second try): %s", err.message);
         goto fail;
       }
     }
   }
+
+  int channels = color_channels + (has_alpha != 0);
+
+  mm_log((1, "readheif: image (" i_DFp ") %d channels\n",
+          i_DFcp(width, height), channels));
 
   img = i_img_8_new(width, height, channels);
   if (!img) {
@@ -86,7 +156,8 @@ get_image(struct heif_context *ctx, heif_item_id id) {
   }
 
   if (channels > 2) {
-    data = heif_image_get_plane_readonly(him, heif_channel_interleaved, &stride);
+    int stride;
+    const uint8_t *data = heif_image_get_plane_readonly(him, heif_channel_interleaved, &stride);
 
     for (y = 0; y < height; ++y) {
       const uint8_t *p = data + stride * y;
@@ -94,14 +165,15 @@ get_image(struct heif_context *ctx, heif_item_id id) {
     }
   }
   else {
-    data = heif_image_get_plane_readonly(him, heif_channel_Y, &stride);
+    int stride;
+    const uint8_t *data = heif_image_get_plane_readonly(him, heif_channel_Y, &stride);
     for (y = 0; y < height; ++y, data += stride) {
       i_psamp(img, 0, width, y, data, NULL, 1);
     }
-    if (channels == 2) {
-      int alpha_chan = 1;
+    if (has_alpha) {
+      int alpha_chan = color_channels;
       data = heif_image_get_plane_readonly(him, heif_channel_Alpha, &stride);
-
+      
       for (y = 0; y < height; ++y, data += stride) {
         i_psamp(img, 0, width, y, data, &alpha_chan, 1);
       }
@@ -134,6 +206,14 @@ get_image(struct heif_context *ctx, heif_item_id id) {
     }
   }
 
+#if LIBHEIF_HAVE_VERSION(1, 15, 0)
+  uint32_t aspect_h, aspect_v;
+  heif_image_get_pixel_aspect_ratio(him, &aspect_h, &aspect_v);
+  i_tags_setn(&img->tags, "i_xres", aspect_h);
+  i_tags_setn(&img->tags, "i_yres", aspect_v);
+  i_tags_setn(&img->tags, "i_aspect_only", 1);
+#endif
+
   heif_image_release(him);
   heif_image_handle_release(img_handle);
 
@@ -163,7 +243,7 @@ typedef struct {
 static int
 my_read(void *data, size_t size, void *userdata) {
   my_reader_data *rdp = userdata;
-  return i_io_read(rdp->ig, data, size) == size ? 0 : -1;
+  return i_io_read(rdp->ig, data, size) == (ssize_t)size ? 0 : -1;
 }
 
 static int
@@ -197,7 +277,6 @@ i_readheif(io_glue *ig, int page, int max_threads) {
   int total_top_level = 0;
   int id_count;
   heif_item_id *img_ids = NULL;
-  size_t ids_size;
 
   mm_log((1, "readheif: ig %p page %d max_threads %d\n",
           (void *)ig, page, max_threads));
@@ -249,7 +328,7 @@ i_readheif(io_glue *ig, int page, int max_threads) {
     goto fail;
   }
 
-  if (total_top_level > my_size_t_max / sizeof(*img_ids)) {
+  if ((size_t)total_top_level > my_size_t_max / sizeof(*img_ids)) {
     i_push_error(0, "calculation overflow for image id allocation");
     goto fail;
   }
@@ -285,7 +364,6 @@ i_readheif_multi(io_glue *ig, int *count, int max_threads) {
   int total_top_level = 0;
   int id_count;
   heif_item_id *img_ids = NULL;
-  size_t ids_size;
   i_img **result = NULL;
   int img_count = 0;
   int i;
@@ -330,7 +408,7 @@ i_readheif_multi(io_glue *ig, int *count, int max_threads) {
   */
   total_top_level = heif_context_get_number_of_top_level_images(ctx);
 
-  if (total_top_level > my_size_t_max / sizeof(*img_ids)) {
+  if ((size_t)total_top_level > my_size_t_max / sizeof(*img_ids)) {
     i_push_error(0, "calculation overflow for image id allocation");
     goto fail;
   }
@@ -376,8 +454,6 @@ i_writeheif(i_img *im, io_glue *ig) {
   return i_writeheif_multi(ig, &im, 1);
 }
 
-static const int gray_chans[4] = { 0, 0, 0, 1 };
-
 struct write_context {
   io_glue *io;
   char error_buf[80];
@@ -386,11 +462,12 @@ struct write_context {
 static struct heif_error
 write_heif(struct heif_context *ctx, const void *data,
 	   size_t size, void *userdata) {
+  (void)ctx;
   struct write_context *wc = (struct write_context *)userdata;
   io_glue *ig = wc->io;
   struct heif_error err = { heif_error_Ok, heif_suberror_Unspecified, "No error" };
 
-  if (i_io_write(ig, data, size) != size) {
+  if (i_io_write(ig, data, size) != (ssize_t)size) {
     i_push_error(errno, "failed to write");
     err.code = heif_error_Encoding_error;
     err.subcode = heif_suberror_Cannot_write_output_data;
@@ -401,6 +478,17 @@ write_heif(struct heif_context *ctx, const void *data,
   return err;
 }
 
+#if LIBHEIF_HAVE_VERSION(1, 15, 0)
+static void
+set_ratio(i_img *im, struct heif_image *him) {
+  int xres, yres;
+  if (i_tags_get_int(&im->tags, "i_xres", 0, &xres)
+      && i_tags_get_int(&im->tags, "i_yres", 0, &yres)) {
+    heif_image_set_pixel_aspect_ratio(him, xres, yres);
+  }
+}
+#endif
+
 undef_int
 i_writeheif_multi(io_glue *ig, i_img **imgs, int count) {
   struct heif_context *ctx = heif_context_alloc();
@@ -409,7 +497,6 @@ i_writeheif_multi(io_glue *ig, i_img **imgs, int count) {
   struct heif_encoder *encoder = NULL;
   struct write_context wc;
   int i;
-  int def_quality;
 
   i_clear_error();
 
@@ -421,68 +508,161 @@ i_writeheif_multi(io_glue *ig, i_img **imgs, int count) {
   writer.writer_api_version = 1; /* FIXME: named constant? */
   writer.write = write_heif;
 
-  err = heif_context_get_encoder_for_format(ctx, heif_compression_HEVC, &encoder);
-  if (err.code != heif_error_Ok) {
-    i_push_errorf(0, "heif error %d", (int)err.code);
-    goto fail;
-  }
-
-  err = heif_encoder_get_parameter_integer(encoder, "quality", &def_quality);
-  if (err.code != heif_error_Ok) {
-    mm_log((3, "Could not read default quality from encoder, falling back to 75: %s", err.message));
-    def_quality = 75;
-  }
-
-  heif_encoder_release(encoder);
-  encoder = NULL;
-
   for (i = 0; i < count; ++i) {
     i_img *im = imgs[i];
-    int ch;
     int alpha_chan;
     int has_alpha = i_img_alpha_channel(im, &alpha_chan);
-    int lossless = 0;
-    int quality = def_quality;
+    int lossless;
+    int quality;
+    enum heif_compression_format fmt = heif_compression_HEVC;
+    char compression_name[100];
+    int compression_set;
+    char encoder_name[100];
+    int encoder_set;
+    const struct heif_encoder_parameter* const* params = NULL;
 
-    err = heif_context_get_encoder_for_format(ctx, heif_compression_HEVC, &encoder);
-    if (err.code != heif_error_Ok) {
-      i_push_errorf(0, "heif error %d", (int)err.code);
-      goto fail;
+    compression_set =
+      i_tags_get_string(&im->tags, "heif_compression", 0,
+                        compression_name, sizeof(compression_name));
+    if (compression_set) {
+      if (!get_compression_from_name(compression_name, &fmt)) {
+        i_push_errorf(0, "Unknown heif compression '%s'",
+                      compression_name);
+        goto fail;
+      }
+      /* this would be dumb */
+      if (fmt == heif_compression_undefined) {
+        i_push_errorf(0, "compression not valid for encoding '%s'",
+                      compression_name);
+        goto fail;
+        
+      }
+    }
+    encoder_set =
+      i_tags_get_string(&im->tags, "heif_encoder", 0,
+                        encoder_name, sizeof(encoder_name));
+    if (encoder_set) {
+      const struct heif_encoder_descriptor *desc = NULL;
+      if (!compression_set)
+        fmt = heif_compression_undefined;
+#if LIBHEIF_HAVE_VERSION(1, 15, 0)
+      int count = heif_get_encoder_descriptors(fmt, encoder_name, &desc, 1);
+#else
+      int count = heif_context_get_encoder_descriptors(ctx, fmt, encoder_name, &desc, 1);
+#endif
+      if (count == 0) {
+        if (compression_set) {
+          i_push_errorf(0, "no encoder named '%s' found with compression '%s'",
+                        encoder_name, compression_name);
+        }
+        else {
+          i_push_errorf(0, "no encoder named '%s' found",
+                        encoder_name);
+        }
+        goto fail;
+      }
+      err = heif_context_get_encoder(ctx, desc, &encoder);
+      if (err.code != heif_error_Ok) {
+        i_push_errorf(0, "cannot get encoder for '%s': %s",
+                      encoder_name, err.message);
+        goto fail;
+      }
+    }
+    else {
+      err = heif_context_get_encoder_for_format(ctx, fmt, &encoder);
+      if (err.code != heif_error_Ok) {
+        i_push_errorf(0, "heif error %s (%d)", err.message, (int)err.code);
+        goto fail;
+      }
     }
 
-    (void)i_tags_get_int(&im->tags, "heif_lossless", 0, &lossless);
-    (void)i_tags_get_int(&im->tags, "heif_quality", 0, &quality);
-    heif_encoder_set_lossy_quality(encoder, quality);
+    params = heif_encoder_list_parameters(encoder);
+    while (*params) {
+      enum heif_encoder_parameter_type type =
+        heif_encoder_parameter_get_type(*params);
+      const char *name = heif_encoder_parameter_get_name(*params);
 
-    heif_encoder_set_lossless(encoder, lossless);
+      /* handled below */
+      if (strcmp(name, "quality") != 0
+          && strcmp(name, "lossless") != 0) {
+        char fullname[80];
+        int len = snprintf(fullname, sizeof(fullname), "heif_%s", name);
+        if ((size_t)len < sizeof(fullname)) {
+          switch (type) {
+          case heif_encoder_parameter_type_integer:
+          case heif_encoder_parameter_type_boolean:
+            {
+              int val;
+              if (i_tags_get_int(&im->tags, fullname, 0, &val)) {
+                err = heif_encoder_set_parameter_integer(encoder, name, val);
+                if (err.code != heif_error_Ok) {
+                  mm_log((0, "heif: fail set %s to %d: %s\n", name, val,
+                          err.message));
+                  i_push_errorf(0, "error setting %s to %d: %s", fullname,
+                                val, err.message);
+                  goto fail;
+                }
+                mm_log((1, "heif: set %s: %d\n", name, val));
+              }
+            }
+            break;
+
+          case heif_encoder_parameter_type_string:
+            {
+              char val[80];
+              if (i_tags_get_string(&im->tags, fullname, 0, val, sizeof(val))) {
+                err = heif_encoder_set_parameter_string(encoder, name, val);
+                if (err.code != heif_error_Ok) {
+                  mm_log((0, "heif: fail set %s to '%s': %s\n", name, val,
+                          err.message));
+                  i_push_errorf(0, "error setting %s to '%s': %s",
+                                fullname, val, err.message);
+                  goto fail;
+                }
+                mm_log((1, "heif: set %s: '%s'\n", name, val));
+              }
+            }
+            break;
+          }
+        }
+        else {
+          mm_log((0, "Cannot fetch heif parameter '%s': too long", name));
+        }
+      }
+      ++params;
+    }
+
+    if (i_tags_get_int(&im->tags, "heif_lossless", 0, &lossless))
+      heif_encoder_set_lossless(encoder, lossless);
+    if (i_tags_get_int(&im->tags, "heif_quality", 0, &quality))
+      heif_encoder_set_lossy_quality(encoder, quality);
 
     if (im->channels >= 3) {
       struct heif_image *him = NULL;
       enum heif_chroma chroma = has_alpha ? heif_chroma_interleaved_RGBA : heif_chroma_interleaved_RGB;
-      mm_log((1, "heif: chroma %d lossless %d quality %d\n",
-              (int)chroma, lossless, quality));
+      mm_log((1, "heif: chroma %d\n", (int)chroma));
 
       err = heif_image_create(im->xsize, im->ysize, heif_colorspace_RGB, chroma, &him);
       if (err.code != heif_error_Ok) {
-        i_push_errorf(0, "heif error %d", (int)err.code);
+        i_push_errorf(0, "heif error %s (%d)", err.message, (int)err.code);
         goto fail;
       }
+
+#if LIBHEIF_HAVE_VERSION(1, 15, 0)
+      set_ratio(im, him);
+#endif
       /* FIXME: metadata */
       /* FIXME: leaks? */
       {
         i_img_dim y;
         int stride;
         uint8_t *p;
-        uint8_t *pa;
-        int alpha_stride;
-        int samp_chan;
         struct heif_image_handle *him_h;
         struct heif_encoding_options *options = NULL;
-        int color_chans = i_img_color_channels(im);
 
         err = heif_image_add_plane(him, heif_channel_interleaved, im->xsize, im->ysize, has_alpha ? 32 : 24);
         if (err.code != heif_error_Ok) {
-          i_push_error(0, "failed to add plane");
+          i_push_errorf(0, "failed to add plane '%s'", err.message);
         failimagergb:
           heif_image_release(him);
           goto fail;
@@ -496,7 +676,7 @@ i_writeheif_multi(io_glue *ig, i_img **imgs, int count) {
         err = heif_context_encode_image(ctx, him, encoder, options, &him_h);
         heif_encoding_options_free(options);
         if (err.code != heif_error_Ok) {
-          i_push_error(0, "fail to encode");
+          i_push_errorf(0, "fail to encode: %s", err.message);
           goto failimagergb;
         }
         heif_image_release(him);
@@ -518,6 +698,9 @@ i_writeheif_multi(io_glue *ig, i_img **imgs, int count) {
         goto fail;
       }
 
+#if LIBHEIF_HAVE_VERSION(1, 15, 0)
+      set_ratio(im, him);
+#endif
       err = heif_image_add_plane(him, heif_channel_Y, im->xsize, im->ysize, 8);
       if (err.code != heif_error_Ok) {
         i_push_errorf(err.code, "failed to add Y plane: %s", err.message);
@@ -580,6 +763,260 @@ i_writeheif_multi(io_glue *ig, i_img **imgs, int count) {
   heif_context_free(ctx);
 
   return 0;
+}
+
+const char *
+i_heif_compression_name(enum heif_compression_format fmt) {
+  switch (fmt) {
+  case heif_compression_undefined:
+    return "undefined";
+    
+  case heif_compression_HEVC:
+    return "hevc";
+    
+  case heif_compression_AVC:
+    return "avc";
+    
+  case heif_compression_JPEG:
+    return "jpeg";
+    
+  case heif_compression_AV1:
+    return "av1";
+
+#if LIBHEIF_HAVE_VERSION(1, 15, 0)
+  case heif_compression_VVC:
+    return "vvc";
+
+  case heif_compression_EVC:
+    return "evc";
+
+  case heif_compression_JPEG2000:
+    return "jpeg2000";
+#endif
+
+#if LIBHEIF_HAVE_VERSION(1, 16, 0)
+  case heif_compression_uncompressed:
+    return "uncompressed";
+#endif
+    
+#if LIBHEIF_HAVE_VERSION(1, 17, 0)
+  case heif_compression_mask:
+    return "mask";
+#endif
+    
+#if LIBHEIF_HAVE_VERSION(1, 18, 0)
+  case heif_compression_HTJ2K:
+    return "jpeg2000ht";
+#endif
+    
+  default:
+    return "unknown";
+  }
+}
+
+static void
+dump_int_enc_param(struct heif_encoder *enc, const char *name,
+                   const struct heif_encoder_parameter *param) {
+  struct heif_error err;
+  int have_min, have_max, minimum, maximum, num_values;
+  const int *valid_ints = NULL;
+  int def;
+  err = heif_encoder_parameter_get_valid_integer_values
+    (param, &have_min, &have_max, &minimum, &maximum,
+     &num_values, &valid_ints);
+  if (err.code == heif_error_Ok) {
+    printf("(int): ");
+    if (have_min && have_max) {
+      printf("%d ... %d", minimum, maximum);
+    }
+    else if (have_min) {
+      printf("%d ...", minimum);
+    }
+    else if (have_max) {
+      printf(" ... %d", maximum);
+    }
+    else if (num_values)  {
+      int i;
+      for (i = 0; i < num_values; ++i) {
+        if (i) printf(", ");
+        printf("%d", valid_ints[i]);
+      }
+    }
+    else {
+      printf("unlimited");
+    }
+  }
+  else {
+    printf("Error fetching valid values: %s", err.message);
+  }
+  err = heif_encoder_get_parameter_integer(enc, name, &def);
+  if (err.code == heif_error_Ok) {
+    printf(" (default %d)", def);
+  }
+  else {
+    printf("(failed to fetch default %s)", err.message);
+  }
+  putchar('\n');
+}
+
+static void
+dump_str_enc_param(struct heif_encoder *enc, const char *name,
+                   const struct heif_encoder_parameter *param) {
+  struct heif_error err;
+  const char * const *valid_strs;
+  char value[100];
+  err = heif_encoder_parameter_get_valid_string_values(param, &valid_strs);
+  printf("(str):");
+  if (err.code == heif_error_Ok) {
+    if (valid_strs) {
+      while (*valid_strs) {
+        printf(" \"%s\"", *valid_strs);
+        ++valid_strs;
+      }
+    }
+    else {
+      printf("(unrestricted)");
+    }
+  }
+  *value = '\0';
+  err = heif_encoder_get_parameter_string(enc, name, value, sizeof(value));
+  if (err.code == heif_error_Ok) {
+    printf(" (default \"%s\")", value);
+  }
+  else {
+    printf("(failed to fetch default %s)", err.message);
+  }
+  putchar('\n');
+}
+
+static void
+dump_encoder(struct heif_encoder *enc) {
+  struct heif_error err;
+  printf("  Parameters:\n");
+  const struct heif_encoder_parameter * const * params = heif_encoder_list_parameters(enc);
+  while (*params) {
+    const char *name = heif_encoder_parameter_get_name(*params);
+    printf("    %s ", name);
+    switch (heif_encoder_parameter_get_type(*params)) {
+    case heif_encoder_parameter_type_integer:
+      dump_int_enc_param(enc, name, *params);
+      break;
+    case heif_encoder_parameter_type_boolean:
+      {
+        printf("(boolean):");
+        int val;
+        err = heif_encoder_get_parameter_boolean(enc, name, &val);
+        if (err.code == heif_error_Ok) {
+          printf(" (default %s)", val ? "true" : "false");
+        }
+        else {
+          printf("(failed to fetch default %s)", err.message);
+        }
+        putchar('\n');
+      }
+      break;
+    case heif_encoder_parameter_type_string:
+      dump_str_enc_param(enc, name, *params);
+      break;
+    default:
+      printf("(unknown type)\n");
+      break;
+    }
+    ++params;
+  }
+}
+
+static int
+dump_encoder_type(struct heif_context *ctx,
+                  enum heif_compression_format fmt) {
+#define MAX_ENCODERS 20
+  const struct heif_encoder_descriptor *descs[MAX_ENCODERS];
+#if LIBHEIF_HAVE_VERSION(1, 15, 0)
+  int count = heif_get_encoder_descriptors(fmt, NULL, descs, MAX_ENCODERS);
+#else
+  int count = heif_context_get_encoder_descriptors(ctx, fmt, NULL, descs, MAX_ENCODERS);
+#endif
+  int i;
+
+  for (i = 0; i < count; ++i) {
+    const struct heif_encoder_descriptor *desc = descs[i];
+    struct heif_encoder *enc = NULL;
+    struct heif_error err;
+
+    printf("%s (%s):\n", heif_encoder_descriptor_get_name(desc),
+           heif_encoder_descriptor_get_id_name(desc));
+    printf("  Format: %s\n", i_heif_compression_name(heif_encoder_descriptor_get_compression_format(desc)));
+    printf("  Lossless: %s\n", heif_encoder_descriptor_supports_lossless_compression(desc) ? "Yes" : "No");
+    printf("  Lossy: %s\n", heif_encoder_descriptor_supports_lossy_compression(desc) ? "Yes" : "No");
+
+    err = heif_context_get_encoder(ctx, desc, &enc);
+    if (err.code == heif_error_Ok) {
+      dump_encoder(enc);
+      heif_encoder_release(enc);
+    }
+    else {
+      printf("** Could not make encoder\n");
+    }
+  }
+  return count;
+}
+
+void
+i_heif_dump_encoders(void) {
+  struct heif_context *ctx = heif_context_alloc();
+  int total;
+
+  if (!ctx) {
+    printf("Failed to allocate heif context\n");
+    return;
+  }
+  total = dump_encoder_type(ctx, heif_compression_undefined);
+
+  if (total == 0)
+    printf("No encoders found\n");
+  
+  heif_context_free(ctx);
+}
+
+#if LIBHEIF_HAVE_VERSION(1, 15, 0)
+
+static void
+dump_decoder(const struct heif_decoder_descriptor *desc,
+             const char *fmt_name) {
+  printf("%s (%s):\n", heif_decoder_descriptor_get_name(desc),
+         heif_decoder_descriptor_get_id_name(desc));
+  printf("  Format: %s\n", fmt_name);
+}
+
+/* the API doesn't let us fetch the compression type for a decoder
+   so we need to search each compression individually
+ */
+static void
+dump_decoder_fmt(enum heif_compression_format fmt, const char *fmt_name) {
+#define MAX_DECODERS 50
+  const struct heif_decoder_descriptor *descs[MAX_DECODERS];
+  int count = heif_get_decoder_descriptors(fmt, descs, MAX_DECODERS);
+
+  int i;
+  for (i = 0; i < count; ++i) {
+    dump_decoder(descs[i], fmt_name);
+  }
+}
+
+#endif
+
+void
+i_heif_dump_decoders(void) {
+#if LIBHEIF_HAVE_VERSION(1, 15, 0)
+  size_t i;
+  for (i = 0; i < compression_name_count; ++i) {
+    enum heif_compression_format fmt = compression_names[i].fmt;
+    if (fmt != heif_compression_undefined)
+        dump_decoder_fmt(fmt, compression_names[i].name);
+  }
+#else
+  printf("Can't dump decoders for this version\n");
+#endif
 }
 
 char const *

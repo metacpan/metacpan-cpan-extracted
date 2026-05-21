@@ -43,7 +43,7 @@ subtest 'buffer is multiple of input' => sub {
 
     }
 
-    subtest 'intial run' => sub {
+    subtest 'initial run' => sub {
         check( U() );
     };
 
@@ -118,7 +118,7 @@ subtest 'buffer is not multiple of input' => sub {
 
     }
 
-    subtest 'intial run' => sub {
+    subtest 'initial run' => sub {
         check( U() );
     };
 

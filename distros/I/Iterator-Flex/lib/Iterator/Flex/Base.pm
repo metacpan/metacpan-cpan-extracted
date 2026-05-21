@@ -8,7 +8,7 @@ use warnings;
 
 use experimental qw( signatures postderef declared_refs );
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use Ref::Util;
 use Scalar::Util;
@@ -546,6 +546,9 @@ sub batch;
 
 sub drain ( $self, $n = undef ) {
 
+    throw_failure( parameter => '$n is not a positive integer' )
+      if defined $n && !( Scalar::Util::looks_like_number( $n ) && int( $n ) == $n && $n > 0 );
+
     my @values;
 
     eval {
@@ -607,7 +610,7 @@ sub foreach ( $self, $code ) {    ## no critic (BuiltinHomonyms)
     if ( $self->throws_on_exhaustion ) {
         eval {
             local $_;    ## no critic (InitializationForLocalVars)
-            while ( $_ = $self->() ) { $code->() }
+            while ( 1 ) { $_ = $self->(); $code->() }
             1;
         } or do {
             die $@
@@ -723,7 +726,7 @@ Iterator::Flex::Base - Iterator object
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 METHODS
 

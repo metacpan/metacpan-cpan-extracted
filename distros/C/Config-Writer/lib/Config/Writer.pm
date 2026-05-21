@@ -66,6 +66,7 @@ use feature qw(signatures);
 use boolean qw(:all);
 use version;
 
+use Class::XSAccessor { 'getters' => [ qw(fh filename fullname tmpfile workdir) ] };
 use Cwd;
 use Data::Dumper;
 use Fcntl qw(:DEFAULT);
@@ -83,7 +84,7 @@ BEGIN {
     $Data::Dumper::Sortkeys = 1;
 }
 
-our $VERSION = version->declare('v0.0.4')->stringify;
+our $VERSION = version->declare('v0.0.5')->stringify;
 our $ERROR = boolean::false;
 
 =pod
@@ -417,13 +418,61 @@ If any errors occurs, `error` flag is set.
 
 =pod
 
+=over 4
+
+=item B<fh()>
+
+Returns a reference to a File::Temp file handle blessed object to be used
+like that:
+
+    use Config::Writer;
+    use Template;
+    
+    my $t = Template->new( ... );
+    my $fh = Config::Writer->new( ... );
+
+    $t->process('template.tmpl', { ... }, $fh->fh);
+    
+    # OR
+    
+    print { $fh->fh } "Some text\n";
+
+    $fh->close;
+
+=back
+
+=head3 GETTER METHODS
+
+The next methods returns appropriate properties of B<Config::Writer>
+class object.
+
+=over 4
+
+=item *
+
+filename()
+
+=item *
+
+fullname()
+
+=item *
+
+tmpfile()
+
+=item *
+
+workdir()
+
+=back
+
 =head1 B<AUTHORS>
 
 =over 4
 
 =item *
 
-Volodymyr Pidgornyi, vpE<lt>atE<gt>dtel-ix.net;
+Volodymyr Pidgornyi, vpE<lt>atE<gt>dtel-ix.net
 
 =back
 
@@ -431,33 +480,59 @@ Volodymyr Pidgornyi, vpE<lt>atE<gt>dtel-ix.net;
 
 =over 4
 
-=item B<v0.0.4>
-
-- Minor CPAN compatibility fixes;
-
-- README.md is generated from Netbox/Config.pm now.
-
-=item B<v0.0.3>
-
-PAUSE compatibility issues fixed.
-
-=item B<v0.0.2>
-
-B<sayf()> metrod added.
-
-=item B<v0.0.1>
-
-Initial release, since basic features seems to work as intended.
-
-=back
-
-=head1 B<TODO>
+=item B<v0.0.5> - 2026-05-20
 
 =over 4
 
 =item *
 
-Implement helpers for a different configuration files formats.
+added getter methods to retrieve Config::Writer object properties in a convenient way
+
+=back
+
+=item B<v0.0.4>
+
+=over 4
+
+=item *
+
+minor CPAN compatibility fixes
+
+=item *
+
+README.md is generated from Config/Writer.pm now
+
+=back
+
+=item B<v0.0.3>
+
+=over 4
+
+=item *
+
+PAUSE compatibility issues fixed
+
+=back
+
+=item B<v0.0.2>
+
+=over 4
+
+=item *
+
+B<sayf()> method added
+
+=back
+
+=item B<v0.0.1>
+
+=over 4
+
+=item *
+
+initial release, since basic features seems to work as intended
+
+=back
 
 =back
 

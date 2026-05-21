@@ -34,6 +34,23 @@ use EV::cares qw(:all);
     $r->set_servers('8.8.8.8', '1.1.1.1');
     like($r->servers, qr/8\.8\.8\.8/, 'servers() returns current list');
     like($r->servers, qr/1\.1\.1\.1/, 'servers() includes second server');
+
+    # arrayref form mirrors new(servers => [...])
+    $r->set_servers(['9.9.9.9', '149.112.112.112']);
+    like($r->servers, qr/9\.9\.9\.9/, 'set_servers accepts arrayref');
+    like($r->servers, qr/149\.112\.112\.112/, 'set_servers arrayref second entry');
+
+    eval { $r->set_servers() };
+    like($@, qr/at least one/, 'set_servers with no args croaks');
+
+    eval { $r->set_servers([]) };
+    like($@, qr/empty arrayref/, 'set_servers with empty arrayref croaks');
+
+    eval { EV::cares->new(servers => []) };
+    like($@, qr/empty/, 'new(servers => []) croaks consistently');
+
+    eval { $r->set_servers({host => '127.0.0.1'}) };
+    like($@, qr/reference/i, 'set_servers flat-list rejects hashref with descriptive croak');
 }
 
 # --- resolve localhost (files only, no network) ---
@@ -149,6 +166,18 @@ use EV::cares qw(:all);
 {
     like(EV::cares::strerror(ARES_ETIMEOUT), qr/imeout/i, 'strerror timeout');
     like(EV::cares->strerror(ARES_ENOTFOUND), qr/not found/i, 'strerror class method');
+
+    eval { EV::cares->strerror() };
+    like($@, qr/Usage/, 'class method with no arg croaks');
+
+    eval { EV::cares::strerror() };
+    like($@, qr/Usage/, 'function form with no arg croaks');
+
+    eval { EV::cares::strerror('foo') };
+    like($@, qr/Usage/, 'non-numeric arg croaks');
+
+    eval { EV::cares->strerror('foo') };
+    like($@, qr/Usage/, 'class method with non-numeric arg croaks');
 }
 
 # --- invalid arguments ---
@@ -181,6 +210,28 @@ use EV::cares qw(:all);
     ok(@got > 1, 'getaddrinfo returned addresses');
     # with AF_INET hint, should only get IPv4
     ok(!grep({ /::/ } @got[1..$#got]), 'AF_INET hint excludes IPv6');
+}
+
+# --- getaddrinfo with numeric service ---
+
+{
+    my $r = EV::cares->new(lookups => 'f');
+    my @got;
+    my $done;
+
+    $r->getaddrinfo('localhost', '80', { family => AF_INET }, sub {
+        @got = @_;
+        $done = 1;
+    });
+
+    my $timer = EV::timer 5, 0, sub { $done = 1 };
+    EV::run until $done;
+
+    SKIP: {
+        skip 'getaddrinfo with service not supported in this build', 1
+            if $got[0] != ARES_SUCCESS;
+        ok(@got > 1, 'getaddrinfo accepted a service argument and returned addresses');
+    }
 }
 
 # --- concurrent queries ---
@@ -268,7 +319,12 @@ use EV::cares qw(:all);
     my $r = EV::cares->new;
     $r->destroy;
     eval { $r->destroy };
-    pass('double destroy did not crash');
+    is($@, '', 'double destroy is silent (no croak)');
+
+    # cancel() vs the read-only getters: cancel croaks on destroyed
+    # (matches every other mutating method); the getters return values.
+    eval { $r->cancel };
+    like($@, qr/destroyed/, 'cancel croaks on destroyed resolver');
 }
 
 # --- constructor options smoke tests ---
@@ -367,6 +423,33 @@ SKIP: {
     my $r = EV::cares->new;
     eval { $r->getnameinfo("x", 0, sub {}) };
     like($@, qr/too short/, 'getnameinfo rejects short sockaddr');
+
+    # AF_UNIX (1) family — sa_family_t is 2 bytes on Linux; pad to typical size
+    my $bad = pack('S', 1) . ("\0" x 30);
+    eval { $r->getnameinfo($bad, 0, sub {}) };
+    like($@, qr/unsupported sockaddr family/, 'getnameinfo rejects AF_UNIX');
+
+    # AF_INET6 family with len in [sizeof(struct sockaddr), sizeof(struct
+    # sockaddr_in6)).  On every supported platform sizeof(struct sockaddr)
+    # == sizeof(struct sockaddr_in) == 16, so the truncated-AF_INET path
+    # is provably unreachable: any short v4 sockaddr is caught earlier by
+    # the universal "too short to read sa_family" check.  Only the v6
+    # branch is reachable, with len 16..27 inclusive.
+    #
+    # Build a real v6 sockaddr via Socket so the sa_family byte lands at
+    # the platform's actual offset (Linux: bytes 0-1; BSD: byte 1 with
+    # sa_len at byte 0), then truncate to land in the [16,27] window.
+    SKIP: {
+        my $full_v6 = eval {
+            require Socket;
+            Socket::pack_sockaddr_in6(0, Socket::inet_pton(Socket::AF_INET6(), '::1'));
+        };
+        skip 'Socket::pack_sockaddr_in6 unavailable', 1 unless $full_v6;
+        my $short_v6 = substr($full_v6, 0, 20);   # 20 bytes, family preserved
+        eval { $r->getnameinfo($short_v6, 0, sub {}) };
+        like($@, qr/too short for AF_INET6/,
+            'getnameinfo rejects truncated AF_INET6 sockaddr');
+    }
 }
 
 done_testing;

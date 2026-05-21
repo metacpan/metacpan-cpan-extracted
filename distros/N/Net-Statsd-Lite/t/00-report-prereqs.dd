@@ -1,4 +1,10 @@
 do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'ExtUtils::MakeMaker' => '7.22',
+                                    'Module::Metadata' => '1.000015'
+                                  }
+                  },
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0'
@@ -6,31 +12,53 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
+                                      'Dist::Zilla::Plugin::UsefulReadme' => 'v0.4.3',
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
                                       'Pod::Coverage::TrustPod' => '0',
+                                      'Pod::Markdown::Github' => '0',
+                                      'Pod::Wordlist' => '0',
+                                      'Software::Security::Policy::Individual' => '0.10',
+                                      'Test2::Require::AuthorTesting' => '0',
+                                      'Test2::Tools::Basic' => '1.302200',
+                                      'Test2::V0' => '0',
+                                      'Test::CPAN::Changes' => '0.19',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::CVE' => '0.10',
                                       'Test::CleanNamespaces' => '0.15',
                                       'Test::DistManifest' => '0',
                                       'Test::EOF' => '0',
                                       'Test::EOL' => '0',
+                                      'Test::Fixme' => '0',
                                       'Test::Kwalitee' => '1.21',
                                       'Test::MinimumVersion' => '0',
-                                      'Test::More' => '0.88',
+                                      'Test::MixedScripts' => 'v0.3.0',
+                                      'Test::Mojibake' => '0',
+                                      'Test::More' => '0.96',
                                       'Test::NoTabs' => '0',
                                       'Test::Perl::Critic' => '0',
                                       'Test::Pod' => '1.41',
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Pod::LinkCheck' => '0',
                                       'Test::Portability::Files' => '0',
+                                      'Test::Spelling' => '0.17',
                                       'Test::TrailingSpace' => '0.0203',
-                                      'Test::Vars' => '0.015'
+                                      'Test::Vars' => '0.015',
+                                      'Test::Version' => '1',
+                                      'warnings' => '0'
                                     }
                     },
        'runtime' => {
                       'recommends' => {
                                         'Ref::Util::XS' => '0',
+                                        'Socket' => '2.026',
                                         'Type::Tiny::XS' => '0'
                                       },
                       'requires' => {
+                                      'Carp' => '0',
                                       'Devel::StrictMode' => '0',
+                                      'Digest::SHA' => '5.96',
                                       'IO::Socket' => '1.18',
                                       'Moo' => '1.000000',
                                       'MooX::TypeTiny' => '0',
@@ -50,11 +78,12 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
-                                   'Carp' => '0',
                                    'File::Spec' => '0',
+                                   'IO::Handle' => '0',
                                    'IO::Select' => '0',
+                                   'IPC::Open3' => '0',
                                    'Module::Load' => '0',
-                                   'Module::Metadata' => '0',
+                                   'Module::Metadata' => '1.000015',
                                    'Net::EmptyPort' => '0',
                                    'Socket' => '0',
                                    'Test::Deep' => '0',

@@ -5,6 +5,14 @@ Created:      2020-01-06
 Home page:    <http://search.cpan.org/dist/AtteanX-Parser-JSONLD/>
 Bug tracker:  <https://github.com/kasei/atteanx-parser-jsonld/issues>
 
+0.002  2026-05-06
+
+ - (Update) Fix typo in references to JSON-LD 1.1 (#2).
+ - (Update) Improve naming terminology in README and POD (#3).
+ - (Update) Update Makefile.PL to use GNU tar on MacOS when creating new
+   releases.
+ - (Update) Use v5.18 throughout the module (#4 from @gregoa).
+
 0.001  2020-01-26
 
  - (Addition) First release.

@@ -18,6 +18,7 @@ use Developer::Dashboard::Config;
 use Developer::Dashboard::EnvAudit;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::PathRegistry;
+use Developer::Dashboard::Platform qw(command_in_path);
 use Developer::Dashboard::SkillDispatcher;
 use Developer::Dashboard::SkillManager;
 
@@ -33,10 +34,13 @@ my $apt_log = File::Spec->catfile( $fake_bin, 'apt.log' );
 my $apk_log = File::Spec->catfile( $fake_bin, 'apk.log' );
 my $dnf_log = File::Spec->catfile( $fake_bin, 'dnf.log' );
 my $brew_log = File::Spec->catfile( $fake_bin, 'brew.log' );
+my $winget_log = File::Spec->catfile( $fake_bin, 'winget.log' );
 my $npx_log = File::Spec->catfile( $fake_bin, 'npx.log' );
+my $python_log = File::Spec->catfile( $fake_bin, 'python.log' );
 my $sudo_log = File::Spec->catfile( $fake_bin, 'sudo.log' );
 my $dashboard_log = File::Spec->catfile( $fake_bin, 'dashboard.log' );
 my $dependency_log = File::Spec->catfile( $fake_bin, 'dependency-install.log' );
+my $runtime_path = join ':', grep { defined && $_ ne '' && $_ ne $fake_bin } split /:/, ( $ENV{PATH} || '' );
 _write_file(
     File::Spec->catfile( $fake_bin, 'cpanm' ),
     <<"SH",
@@ -58,6 +62,16 @@ SH
     0755,
 );
 _write_file(
+    File::Spec->catfile( $fake_bin, 'winget' ),
+    <<"SH",
+#!/bin/sh
+printf '%s\\n' "\$*" >> "$winget_log"
+printf 'WINGET:%s\\n' "\$*" >> "$dependency_log"
+exit 0
+SH
+    0755,
+);
+_write_file(
     File::Spec->catfile( $fake_bin, 'npx' ),
     <<"SH",
 #!/bin/sh
@@ -70,6 +84,16 @@ for spec in "\$@"; do
   name=\${spec%%@*}
   mkdir -p "\$PWD/node_modules/\$name"
 done
+exit 0
+SH
+    0755,
+);
+_write_file(
+    File::Spec->catfile( $fake_bin, 'python' ),
+    <<"SH",
+#!/bin/sh
+printf '%s|cwd=%s\\n' "\$*" "\$PWD" >> "$python_log"
+printf 'PYTHON:%s\\n' "\$*" >> "$dependency_log"
 exit 0
 SH
     0755,
@@ -195,8 +219,10 @@ PL
     aptfile_body => "git\ncurl\n",
     apkfile_body => "procps-dev\n",
     dnfile_body => "git-core\njq\n",
+    wingetfile_body => "Git.Git\nMicrosoft.PowerShell\n",
     brewfile_body => "jq\n",
     package_json_body => qq|{"name":"alpha-skill-node","version":"0.01.0","dependencies":{"express":"^4.19.2","uuid":"^11.0.0"},"devDependencies":{"playwright":"^1.52.0"}}\n|,
+    requirements_txt_body => "requests==2.32.3\nrich==13.9.4\n",
     cpanfile_local_body => "requires 'YAML::XS';\n",
     bookmark_body => <<'BOOKMARK',
 TITLE: Skill Bookmark
@@ -222,7 +248,9 @@ ok( -f File::Spec->catfile( $install->{path}, 'cpanfile' ), 'test skill includes
 ok( -f File::Spec->catfile( $install->{path}, 'aptfile' ), 'test skill includes aptfile for dependency handling' );
 ok( -f File::Spec->catfile( $install->{path}, 'apkfile' ), 'test skill includes apkfile for dependency handling' );
 ok( -f File::Spec->catfile( $install->{path}, 'dnfile' ), 'test skill includes dnfile for dependency handling' );
+ok( -f File::Spec->catfile( $install->{path}, 'wingetfile' ), 'test skill includes wingetfile for dependency handling' );
 ok( -f File::Spec->catfile( $install->{path}, 'brewfile' ), 'test skill includes brewfile for dependency handling' );
+ok( -f File::Spec->catfile( $install->{path}, 'requirements.txt' ), 'test skill includes requirements.txt for Python dependency handling' );
 ok( -f File::Spec->catfile( $install->{path}, 'cpanfile.local' ), 'test skill includes cpanfile.local for local dependency handling' );
 ok( -f $apt_log, 'install runs apt-get for isolated skill apt dependencies when an aptfile is present' );
 ok( -f $cpanm_log, 'install runs cpanm for isolated skill dependencies when a cpanfile is present' );
@@ -235,15 +263,15 @@ open my $dependency_log_fh, '<', $dependency_log or die "Unable to read $depende
 my @dependency_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$dependency_log_fh>;
 close $dependency_log_fh;
 is_deeply(
-    [ map { (/^(DDFILE_LOCAL|DDFILE|APT|BREW|NPM|CPANM):/)[0] } @dependency_steps ],
-    [ 'APT', 'NPM', 'CPANM', 'CPANM', 'DDFILE', 'DDFILE_LOCAL' ],
-    'skill install processes aptfile, package.json, cpanfile, cpanfile.local, ddfile, and ddfile.local in policy order on Debian-like hosts while leaving apkfile and brewfile inactive',
+    [ map { (/^(DDFILE_LOCAL|DDFILE|APT|BREW|NPM|PYTHON|CPANM):/)[0] } @dependency_steps ],
+    [ 'APT', 'NPM', 'PYTHON', 'CPANM', 'CPANM', 'DDFILE', 'DDFILE_LOCAL' ],
+    'skill install processes aptfile, package.json, requirements.txt, cpanfile, cpanfile.local, ddfile, and ddfile.local in policy order on Debian-like hosts while leaving apkfile, wingetfile, dnfile, and brewfile inactive',
 );
 open my $cpanm_log_fh, '<', $cpanm_log or die "Unable to read $cpanm_log: $!";
 my @cpanm_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$cpanm_log_fh>;
 close $cpanm_log_fh;
-like( $cpanm_steps[0], qr/^--notest -L \Q$ENV{HOME}\/perl5\E --cpanfile \Q$install->{path}\/cpanfile\E --installdeps \Q$install->{path}\E$/, 'cpanfile installs shared Perl dependencies into HOME perl5 with cpanm --notest' );
-is( $cpanm_steps[1], "--notest -L $install->{path}/perl5 --cpanfile $install->{path}/cpanfile.local --installdeps $install->{path}", 'cpanfile.local installs local Perl dependencies into the skill perl5 root with cpanm --notest' );
+like( $cpanm_steps[0], qr/^--notest -L \Q$ENV{HOME}\/perl5\E --cpanfile \Q$install->{path}\/cpanfile\E --installdeps \.$/, 'cpanfile installs shared Perl dependencies into HOME perl5 with cpanm --notest from the skill root itself' );
+is( $cpanm_steps[1], "--notest -L $install->{path}/perl5 --cpanfile $install->{path}/cpanfile.local --installdeps .", 'cpanfile.local installs local Perl dependencies into the skill perl5 root with cpanm --notest from the skill root itself' );
 open my $npx_log_fh, '<', $npx_log or die "Unable to read $npx_log: $!";
 my @npm_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$npx_log_fh>;
 close $npx_log_fh;
@@ -251,6 +279,14 @@ like(
     $npm_steps[0],
     qr/^--yes npm install express\@\^4\.19\.2 uuid\@\^11\.0\.0 playwright\@\^1\.52\.0\|cwd=\Q$ENV{HOME}\E\/\.developer-dashboard\/cache\/node-package-installs\/npm-install-/,
     'package.json installs declared Node dependencies through npx from a private staging workspace instead of using bare HOME as the npm project root',
+);
+open my $python_log_fh, '<', $python_log or die "Unable to read $python_log: $!";
+my @python_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$python_log_fh>;
+close $python_log_fh;
+is(
+    $python_steps[0],
+    "-m pip install --user --requirement $install->{path}/requirements.txt|cwd=$install->{path}",
+    'requirements.txt installs declared Python dependencies through python -m pip install --user from the skill root itself',
 );
 ok( -d File::Spec->catdir( $ENV{HOME}, 'node_modules', 'express' ), 'package.json merges staged Node dependencies into HOME/node_modules' );
 ok( -d File::Spec->catdir( $ENV{HOME}, 'node_modules', 'uuid' ), 'package.json merges additional staged Node dependencies into HOME/node_modules' );
@@ -260,6 +296,33 @@ my @dashboard_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$dashboard
 close $dashboard_log_fh;
 is( $dashboard_steps[0], 'skills install dep-alpha', 'deferred ddfile installs dependent skills through dashboard skills install' );
 is( $dashboard_steps[1], 'skills install dep-beta', 'deferred ddfile.local installs dependent skills through dashboard skills install at the current skill level' );
+{
+    local $ENV{DD_TEST_OS} = 'MSWin32';
+    unlink $winget_log;
+    my $root_winget = $manager->_install_skill_wingetfile( $install->{path} );
+    ok( !$root_winget->{error}, '_install_skill_wingetfile succeeds on Windows hosts when a wingetfile is present' )
+      or diag $root_winget->{error};
+    open my $root_winget_fh, '<', $winget_log or die "Unable to read $winget_log: $!";
+    my @root_winget_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$root_winget_fh>;
+    close $root_winget_fh;
+    is_deeply(
+        \@root_winget_steps,
+        [
+            'install --id Git.Git --exact --accept-package-agreements --accept-source-agreements --disable-interactivity',
+            'install --id Microsoft.PowerShell --exact --accept-package-agreements --accept-source-agreements --disable-interactivity',
+        ],
+        '_install_skill_wingetfile installs every declared Windows package through winget when running on Windows',
+    );
+}
+{
+    local $ENV{DD_TEST_OS} = 'linux';
+    unlink $winget_log;
+    my $skip_winget = $manager->_install_skill_wingetfile( $install->{path} );
+    ok( !$skip_winget->{error}, '_install_skill_wingetfile succeeds on non-Windows hosts when a wingetfile is present' )
+      or diag $skip_winget->{error};
+    ok( $skip_winget->{skipped}, '_install_skill_wingetfile reports a skip outside Windows hosts' );
+    ok( !-f $winget_log, '_install_skill_wingetfile does not invoke winget outside Windows hosts' );
+}
 {
     local $ENV{DD_TEST_OS} = 'linux';
     local $ENV{DD_TEST_FEDORA} = 1;
@@ -578,6 +641,73 @@ PL
     is( $dotted_exit >> 8, 0, 'dashboard <skill>.<command> loads runtime and skill env layers through the public dotted switchboard path' );
     my $dotted_payload = decode_json($dotted_stdout);
     is( $dotted_payload->{shared}, 'skill-child', 'dashboard <skill>.<command> keeps the deepest skill env override through the public path' );
+    chdir $previous_cwd or die "Unable to chdir back to $previous_cwd: $!";
+}
+
+{
+    my $nested_home = tempdir( CLEANUP => 1 );
+    local $ENV{HOME} = $nested_home;
+    my $nested_root = File::Spec->catdir( $nested_home, 'nested-skill-app' );
+    make_path(
+        File::Spec->catdir( $nested_home, '.developer-dashboard', 'skills', 'foo', 'skills', 'bar', 'skills', 'zzz', 'cli' ),
+        File::Spec->catdir( $nested_root, '.git' ),
+    );
+    my $previous_cwd = getcwd();
+    chdir $nested_root or die "Unable to chdir to $nested_root: $!";
+
+    _write_file(
+        File::Spec->catfile( $nested_home, '.developer-dashboard', 'skills', 'foo', '.env' ),
+        "VERSION=foo\nSHARED_CHAIN=foo\n",
+        0644,
+    );
+    _write_file(
+        File::Spec->catfile( $nested_home, '.developer-dashboard', 'skills', 'foo', 'skills', 'bar', '.env' ),
+        "VERSION=bar\nSHARED_CHAIN=bar\n",
+        0644,
+    );
+    _write_file(
+        File::Spec->catfile( $nested_home, '.developer-dashboard', 'skills', 'foo', 'skills', 'bar', 'skills', 'zzz', '.env' ),
+        "VERSION=zzz\nSHARED_CHAIN=zzz\n",
+        0644,
+    );
+    _write_file(
+        File::Spec->catfile( $nested_home, '.developer-dashboard', 'skills', 'foo', 'skills', 'bar', 'skills', 'zzz', 'cli', 'show' ),
+        <<'PL',
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use JSON::XS qw(encode_json);
+print encode_json(
+    {
+        version         => $ENV{VERSION},
+        foo_version     => $ENV{foo_VERSION},
+        foo_bar_version => $ENV{foo_bar_VERSION},
+        shared          => $ENV{SHARED_CHAIN},
+    }
+), "\n";
+PL
+        0755,
+    );
+
+    my $nested_paths = Developer::Dashboard::PathRegistry->new( home => $nested_home );
+    my $nested_dispatcher = Developer::Dashboard::SkillDispatcher->new( paths => $nested_paths );
+    my $nested_dispatch = $nested_dispatcher->dispatch( 'foo', 'bar.zzz.show' );
+    ok( !$nested_dispatch->{error}, 'dispatcher resolves nested skill env chains from root to leaf for dotted nested commands' )
+      or diag $nested_dispatch->{error};
+    my $nested_payload = decode_json( $nested_dispatch->{stdout} );
+    is( $nested_payload->{version}, 'zzz', 'nested skill dispatch lets the leaf .env value win' );
+    is( $nested_payload->{foo_version}, 'foo', 'nested skill dispatch preserves the root skill env value under the root alias' );
+    is( $nested_payload->{foo_bar_version}, 'bar', 'nested skill dispatch preserves the parent skill env value under the cumulative parent alias' );
+    is( $nested_payload->{shared}, 'zzz', 'nested skill dispatch applies nested skill env files in root-to-leaf order' );
+
+    my ( $nested_stdout, $nested_stderr, $nested_exit ) = capture {
+        system( $^X, '-I', 'lib', $repo_bin, 'foo.bar.zzz.show' );
+    };
+    is( $nested_exit >> 8, 0, 'dashboard <root>.<parent>.<leaf>.<command> loads nested skill env layers through the public dotted switchboard path' );
+    my $nested_dotted_payload = decode_json($nested_stdout);
+    is( $nested_dotted_payload->{version}, 'zzz', 'public nested skill dispatch keeps the leaf env value as the effective key' );
+    is( $nested_dotted_payload->{foo_version}, 'foo', 'public nested skill dispatch preserves the root env value under the root alias' );
+    is( $nested_dotted_payload->{foo_bar_version}, 'bar', 'public nested skill dispatch preserves the parent env value under the cumulative parent alias' );
     chdir $previous_cwd or die "Unable to chdir back to $previous_cwd: $!";
 }
 
@@ -950,6 +1080,66 @@ is(
     'dashboard which --edit <skill>.<command> opens the resolved skill command path through dashboard open-file',
 );
 
+my $python_skill_repo = _create_skill_repo('python-dotted-skill');
+_append_repo_commit(
+    $python_skill_repo,
+    File::Spec->catfile( 'cli', 'bar.py' ),
+    <<'PY',
+import sys
+
+print("python-dotted:" + "|".join(sys.argv[1:]))
+PY
+);
+my $python_skill_install = $manager->install( 'file://' . $python_skill_repo );
+ok( !$python_skill_install->{error}, 'python dotted skill installs cleanly' ) or diag $python_skill_install->{error};
+my ( $python_dotted_stdout, $python_dotted_stderr, $python_dotted_exit ) = capture {
+    local $ENV{PATH} = $runtime_path;
+    system( $^X, '-I', 'lib', $repo_bin, 'python-dotted-skill.bar', 'py-arg' );
+};
+is( $python_dotted_exit >> 8, 0, 'dashboard <skill>.<command> dispatch exits cleanly for cli/<command>.py' );
+is( $python_dotted_stderr, '', 'python dotted skill dispatch keeps stderr clean' );
+like( $python_dotted_stdout, qr/^python-dotted:py-arg\r?\n\z/, 'dashboard <skill>.<command> runs cli/<command>.py through python' );
+my ( $python_which_stdout, $python_which_stderr, $python_which_exit ) = capture {
+    system( $^X, '-I', 'lib', $repo_bin, 'which', 'python-dotted-skill.bar' );
+};
+is( $python_which_exit >> 8, 0, 'dashboard which resolves dotted python skill commands' );
+is( $python_which_stderr, '', 'dashboard which keeps stderr clean for dotted python skill commands' );
+like(
+    $python_which_stdout,
+    qr/^COMMAND \Q@{[ File::Spec->catfile( $python_skill_install->{path}, 'cli', 'bar.py' ) ]}\E$/m,
+    'dashboard which reports the cli/<command>.py path for dotted python skill commands',
+);
+
+my $javascript_skill_repo = _create_skill_repo('javascript-dotted-skill');
+_append_repo_commit(
+    $javascript_skill_repo,
+    File::Spec->catfile( 'cli', 'foo.js' ),
+    <<'JS',
+console.log("javascript-dotted:" + process.argv.slice(2).join("|"));
+JS
+);
+my $javascript_skill_install = $manager->install( 'file://' . $javascript_skill_repo );
+ok( !$javascript_skill_install->{error}, 'javascript dotted skill installs cleanly' ) or diag $javascript_skill_install->{error};
+SKIP: {
+    skip 'javascript dotted skill dispatch requires node on PATH', 6 if !command_in_path('node');
+    my ( $javascript_dotted_stdout, $javascript_dotted_stderr, $javascript_dotted_exit ) = capture {
+        system( $^X, '-I', 'lib', $repo_bin, 'javascript-dotted-skill.foo', 'js-arg' );
+    };
+    is( $javascript_dotted_exit >> 8, 0, 'dashboard <skill>.<command> dispatch exits cleanly for cli/<command>.js' );
+    is( $javascript_dotted_stderr, '', 'javascript dotted skill dispatch keeps stderr clean' );
+    like( $javascript_dotted_stdout, qr/^javascript-dotted:js-arg\r?\n\z/, 'dashboard <skill>.<command> runs cli/<command>.js through node' );
+    my ( $javascript_which_stdout, $javascript_which_stderr, $javascript_which_exit ) = capture {
+        system( $^X, '-I', 'lib', $repo_bin, 'which', 'javascript-dotted-skill.foo' );
+    };
+    is( $javascript_which_exit >> 8, 0, 'dashboard which resolves dotted javascript skill commands' );
+    is( $javascript_which_stderr, '', 'dashboard which keeps stderr clean for dotted javascript skill commands' );
+    like(
+        $javascript_which_stdout,
+        qr/^COMMAND \Q@{[ File::Spec->catfile( $javascript_skill_install->{path}, 'cli', 'foo.js' ) ]}\E$/m,
+        'dashboard which reports the cli/<command>.js path for dotted javascript skill commands',
+    );
+}
+
 make_path( File::Spec->catdir( $install->{path}, 'skills', 'foo', 'cli' ) );
 _write_file(
     File::Spec->catfile( $install->{path}, 'skills', 'foo', 'cli', 'foo' ),
@@ -991,11 +1181,10 @@ my ( $uninstall_stdout, $uninstall_stderr, $uninstall_exit ) = capture {
     system( $^X, '-I', 'lib', $repo_bin, 'skills', 'uninstall', 'alpha-skill' );
 };
 is( $uninstall_exit >> 8, 0, 'dashboard skills uninstall exits cleanly' );
-is_deeply(
-    [ map { $_->{name} } @{ $manager->list } ],
-    [ 'home-only-skill', 'shared-skill' ],
-    'uninstall removes the targeted base skill without touching layered skills from other DD-OOP-LAYERS',
-);
+my @remaining_skills = map { $_->{name} } @{ $manager->list };
+ok( !grep { $_ eq 'alpha-skill' } @remaining_skills, 'uninstall removes the targeted base skill' );
+ok( grep { $_ eq 'home-only-skill' } @remaining_skills, 'uninstall preserves inherited home-only layered skills' );
+ok( grep { $_ eq 'shared-skill' } @remaining_skills, 'uninstall preserves shared layered skills from other DD-OOP-LAYERS' );
 
 done_testing();
 
@@ -1040,11 +1229,17 @@ sub _create_skill_repo {
     if ( defined $args{dnfile_body} ) {
         _write_file( 'dnfile', $args{dnfile_body}, 0644 );
     }
+    if ( defined $args{wingetfile_body} ) {
+        _write_file( 'wingetfile', $args{wingetfile_body}, 0644 );
+    }
     if ( defined $args{brewfile_body} ) {
         _write_file( 'brewfile', $args{brewfile_body}, 0644 );
     }
     if ( defined $args{package_json_body} ) {
         _write_file( 'package.json', $args{package_json_body}, 0644 );
+    }
+    if ( defined $args{requirements_txt_body} ) {
+        _write_file( 'requirements.txt', $args{requirements_txt_body}, 0644 );
     }
     if ( defined $args{cpanfile_local_body} ) {
         _write_file( 'cpanfile.local', $args{cpanfile_local_body}, 0644 );

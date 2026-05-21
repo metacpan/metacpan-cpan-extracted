@@ -39,8 +39,8 @@ XML::LibXML::Node - Abstract Base Class of XML::LibXML Nodes
   $node->insertBefore( $newNode, $refNode );
   $node->insertAfter( $newNode, $refNode );
   @nodes = $node->findnodes( $xpath_expression );
-  $result = $node->find( $xpath );
-  print $node->findvalue( $xpath );
+  $result = $node->find( $xpath_expression );
+  print $node->findvalue( $xpath_expression );
   $bool = $node->exists( $xpath_expression );
   @childnodes = $node->childNodes();
   @childnodes = $node->nonBlankChildNodes();
@@ -296,7 +296,7 @@ Returns simply the Parent Node of the current node.
 
   $nextnode = $node->nextSibling();
 
-Returns the next sibling if any .
+Returns the next sibling, if any.
 
 
 =item nextNonBlankSibling
@@ -461,7 +461,7 @@ See also XML::LibXML::XPathContext->findnodes.
 
 =item find
 
-  $result = $node->find( $xpath );
+  $result = $node->find( $xpath_expression );
 
 I<<<<<< find >>>>>> evaluates the XPath 1.0 expression using the current node as the context of the
 expression, and returns the result depending on what type of result the XPath
@@ -475,13 +475,13 @@ See also L<<<<<< XML::LibXML::XPathContext >>>>>>->find.
 
 =item findvalue
 
-  print $node->findvalue( $xpath );
+  print $node->findvalue( $xpath_expression );
 
 I<<<<<< findvalue >>>>>> is exactly equivalent to:
 
 
 
-  $node->find( $xpath )->to_literal;
+  $node->find( $xpath_expression )->to_literal;
 
 That is, it returns the literal value of the results. This enables you to
 ensure that you get a string back from your search, allowing certain shortcuts.
@@ -768,7 +768,7 @@ Petr Pajas
 
 =head1 VERSION
 
-2.0210
+2.0213
 
 =head1 COPYRIGHT
 

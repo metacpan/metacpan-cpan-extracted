@@ -3,12 +3,21 @@
 ## Lightweight DateTime Alternative - t/14.tz_coordinates.t
 ## Tests for timezone resolution from GPS coordinates (latitude/longitude)
 ##----------------------------------------------------------------------------
+BEGIN
+{
+    use strict;
+    use warnings;
+    use lib './lib';
+    use Test::More;
+};
+
 use strict;
 use warnings;
-use lib './lib';
-use Test::More;
 
-use_ok( 'DateTime::Lite::TimeZone' ) or BAIL_OUT( 'Cannot load DateTime::Lite::TimeZone' );
+BEGIN
+{
+    use_ok( 'DateTime::Lite::TimeZone' ) or BAIL_OUT( 'Cannot load DateTime::Lite::TimeZone' );
+};
 
 # NOTE: Basic coordinate resolution - well-known cities
 subtest 'Tokyo coordinates resolve to Asia/Tokyo' => sub

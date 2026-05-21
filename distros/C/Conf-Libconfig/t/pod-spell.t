@@ -29,3 +29,4 @@ yaml
 MERCHANTABILITY
 transportability
 API
+bitmask

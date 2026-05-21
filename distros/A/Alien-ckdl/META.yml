@@ -1,0 +1,56 @@
+---
+abstract: 'Build and install ckdl, a C library for KDL documents'
+author:
+  - 'Davenonymous <perl@davenonymous.com>'
+build_requires:
+  Alien::Build::MM: '0.32'
+  Archive::Tar: '0'
+  HTML::LinkExtor: '0'
+  HTTP::Tiny: '0.044'
+  IO::Socket::SSL: '1.56'
+  IO::Zlib: '0'
+  Mozilla::CA: '0'
+  Net::SSLeay: '1.49'
+  Test::Alien: '0'
+  Test::More: '0.88'
+  URI: '0'
+  URI::Escape: '0'
+configure_requires:
+  Alien::Build: '1.19'
+  Alien::Build::MM: '0.32'
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-ckdl
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Alien::Base: '0'
+  Alien::Build: '0.25'
+  perl: '5.012'
+resources:
+  bugtracker: https://github.com/Davenonymous/perl-alien-ckdl/issues
+  homepage: https://github.com/tjol/ckdl
+  repository: https://github.com/Davenonymous/perl-alien-ckdl.git
+version: '0.001'
+x_alienfile:
+  generated_by: 'Alien::Build::MM version 2.84'
+  requires:
+    share:
+      Archive::Tar: '0'
+      HTML::LinkExtor: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      IO::Zlib: '0'
+      Mozilla::CA: '0'
+      Net::SSLeay: '1.49'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

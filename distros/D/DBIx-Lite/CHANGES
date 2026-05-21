@@ -1,67 +1,149 @@
 ==================================================
-Changes from 2023-11-01 00:00:00 +0000 to present.
+Changes from 2025-05-05 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.36 at 2024-10-31 10:04:03 +0000
+version 0.37 at 2026-05-05 08:01:10 +0000
 -----------------------------------------
 
-  Change: e7ce6958565bb35741e11e6abedf23dc2d8e6ca1
+  Change: a5b80aff2ea9fa4a60cd1d335b22987e9fec6395
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2026-05-05 08:01:10 +0000
+
+    v0.37 
+
+  Change: da21afa3f22692873c597c9068e6469c275366cb
+  Author: Diab Jerius <djerius@cfa.harvard.edu>
+  Date : 2026-05-04 23:11:39 +0000
+
+    backcompat: ensure that default select expression is created prior to
+    calls to select_also()
+
+    A previous edit changed the initial state of the select expression
+    list from a default value to undef.
+
+    In general, the code assumes that unless otherwise added to by the
+    caller, an undef list indicates that the default select expression
+    should be inserted.
+
+    However, select_also() assumes than an undef list means something
+    else, and rather than creating a list with the default expression and
+    then adding to it, it creates a list with just its contents.
+
+    Later on, after the call to select_also() the code which would have
+    inserted the default expression interprets the non-undef value for
+    the list as indication that the user has explicitly called select(),
+    and thus doesn't add the default.
+
+    The end result is that calling select_also() without calling select()
+    ends up with a final select expression without the default
+    expression, which breaks with previous behavior.
+
+    The change in the value for the default expression came about during
+    the addition of the table_alias attribute.
+
+    Prior to that the expression was initialized in the constructor to
+    'me.*'.
+
+    With the addition of the table_alias attribute, this is now
+    [$self->{table_alias} . '.*'], and that is how it is set in later
+    parts of the code which treat an undef select expression as
+    equivalent to setting the default expression.
+
+    The initialization in the constructor was previsouly done prior to
+    incorporating constructor arguments; presumably its removal was made
+    under the assumption that later code would catch the undef list and
+    insert the proper default expression using $self->{table_alias}.
+
+    This commit changes the assumptions of select_also() when faced with
+    an undef expression list to match that of the rest of the code. All
+    code which access $self->{select} now performs the same operation
+    when presented an undef expression list.
+
+    This also resolves similar behavior that arises by calling select()
+    without arguments, which sets the list to undef. A subsequent call to
+    select_also() would cause the same issue as is fixed here. 
+
+  Change: 5d6a5c4f26ba8591ed3c059def8415f6458d0374
+  Author: Diab Jerius <djerius@cfa.harvard.edu>
+  Date : 2026-05-04 23:10:28 +0000
+
+    bugfix: check for acceptable input in with() did not recognize refs
+    to arrayrefs 
+
+  Change: ab4b316ad48d8a8402637d01ede0547b703548ba
+  Author: Diab Jerius <djerius@cfa.harvard.edu>
+  Date : 2026-05-04 23:10:09 +0000
+
+    add support for UPSERT on versions of PostgreSQL and SQLite which
+    support it 
+
+  Change: 42ff6b40eca2b60e9e8e83ef04d1d0a50390dbf4
+  Author: Diab Jerius <djerius@cfa.harvard.edu>
+  Date : 2026-05-04 23:09:38 +0000
+
+    _autopk: add support for table schema for PostgreSQL 
+
+  Change: 5228110bfb51dae8c0e1ac0c1f0d15b45ae990b5
+  Author: Diab Jerius <djerius@cfa.harvard.edu>
+  Date : 2026-05-04 23:09:08 +0000
+
+    bugfix: table alias failed for update & delete if SQLA's quote_char
+    was set.
+
+    Prior to version 1.44 of SQL::Abstract::More, specifying a table
+    alias as "$table_name|$table_alias" was supported only for select,
+    not for delete or update.
+
+    DBIx::Lite worked around this by calling SQLA::M's table_alias
+    method, which returns a string of
+
+    "$table_name as $table_alias"
+
+    If SQLA's quote_char option is set, this entire construct is quoted,
+    rather than just $table_name, leading to illegal SQL.
+
+    This commit will use the "$name|$alias" form if SQLA::M is version
+    1.44 or higher. 
+
+  Change: 1bf2cd1459fcffb29401c27804a3907d24049d48
+  Author: Diab Jerius <djerius@cfa.harvard.edu>
+  Date : 2026-05-04 23:08:27 +0000
+
+    Sybase is not fond of using "count" as an identifier, so make it
+    unique 
+
+  Change: 1750abfad485b3925f4b92a15fd55cb89abb8944
+  Author: Diab Jerius <djerius@cfa.harvard.edu>
+  Date : 2026-05-04 23:08:27 +0000
+
+    create a column alias for COUNT(*) so that optional
+    SQL::Abstract::More column quoting works
+
+    The existing code passes the expression COUNT(*) to
+    SQL::Abstract::More, which intepreted it as a column name and if its
+    quote_char option was set, quoted it, leading to errors such as
+
+    DBD::Pg::st execute failed: ERROR: column "COUNT(*)" does not exist
+    LINE 1: SELECT "COUNT(*)" FROM "temp0002" AS "me"
+
+    ^ [for Statement "SELECT "COUNT(*)" FROM "temp0002" AS "me""]
+
+    This commit creates a column alias for COUNT(*), providing something
+    appropriate for SQL::Abstract::More to quote. 
+
+  Change: 1021974da7a20ae9acca519b8e3f1ad3695a458f
   Author: Alessandro Ranellucci <alessandro@pintle.it>
-  Date : 2024-10-31 11:01:38 +0000
+  Date : 2025-07-17 17:20:40 +0000
 
-    Add table_alias() 
+    Fixed warning about operator precedence 
 
------------------------------------------
-version 0.35 at 2024-09-18 21:43:06 +0000
------------------------------------------
-
-  Change: 44a1d870107df8ba77f77aa165f24619a69d5dcd
+  Change: e5bddafc1ca80843e19e3e5689ec67b091775489
   Author: Alessandro Ranellucci <alessandro@pintle.it>
-  Date : 2024-09-18 23:43:06 +0000
+  Date : 2024-10-31 18:09:57 +0000
 
-    v0.35 
-
-  Change: 15de2fbefbab13d28189a70ed243e4761a108fad
-  Author: Alessandro Ranellucci <alessandro@pintle.it>
-  Date : 2024-09-18 23:42:29 +0000
-
-    Remove debugging line 
-
-  Change: 814fbcbf3733837bcdc9a74dbabf6dd1481a5962
-  Author: Alessandro Ranellucci <alessandro@pintle.it>
-  Date : 2024-09-18 23:41:41 +0000
-
-    Fix distinct 
-
-  Change: cacf263fcd30470787f21ebb5b57e9372843999f
-  Author: Alessandro Ranellucci <alessandro@pintle.it>
-  Date : 2024-09-18 23:35:16 +0000
-
-    Fix disconnected mode. #11 
-
-  Change: aff4aba8fbaf3d1f170a2f37c7f64bc196cae62f
-  Author: Alessandro Ranellucci <alessandro@pintle.it>
-  Date : 2024-09-18 23:18:41 +0000
-
-    Support DISTINCT ON () 
-
------------------------------------------
-version 0.34 at 2024-09-12 00:39:25 +0000
------------------------------------------
-
-  Change: 4195bbbc82ad63b28266b2edd7e96de5b42c1ab8
-  Author: Alessandro Ranellucci <alessandro@pintle.it>
-  Date : 2024-09-12 02:39:25 +0000
-
-    v0.34 
-
-  Change: 3a0146df7488b287e74f75a7b972c9c05837033b
-  Author: Alessandro Ranellucci <alessandro@pintle.it>
-  Date : 2024-09-12 02:38:27 +0000
-
-    Add a ->distinct method 
+    Add test for default functionality 
 
 =================================================
-Plus 24 releases after 2023-11-01 00:00:00 +0000.
+Plus 27 releases after 2025-05-05 00:00:00 +0000.
 =================================================

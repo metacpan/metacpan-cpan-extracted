@@ -4,6 +4,7 @@
 .claude/skills/perl-release-author-getty/SKILL.md
 .claude/skills/perl-release-dist-ini/SKILL.md
 .gitignore
+CLAUDE.md
 Changes
 Dockerfile
 LICENSE
@@ -27,3 +28,4 @@ t/10-bash.t
 t/20-integration.t
 t/author-pod-syntax.t
 t/compress.t
+test_ci.txt

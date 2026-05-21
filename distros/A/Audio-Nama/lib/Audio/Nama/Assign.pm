@@ -92,7 +92,6 @@ use Carp;
 	$seek_end_margin			   $config->{seek_end_margin}
 	$use_pager     					$config->{use_pager}
 	$use_placeholders  				$config->{use_placeholders}
-	$use_autocomplete_popup			$config->{use_autocomplete_popup}
     $edit_playback_end_margin  		$config->{edit_playback_end_margin}
     $edit_crossfade_time  			$config->{edit_crossfade_time}
 	$default_fade_length 			$config->{engine_fade_default_length}
@@ -106,9 +105,6 @@ use Carp;
 	$midi_output_dev   				$midi->{output_dev}
 	$controller_ports				$midi->{controller_ports}
     $midi_inputs					$midi->{inputs}
-	$osc_listener_port 				$config->{osc_listener_port}
-	$osc_reply_port 				$config->{osc_reply_port}
-	$remote_control_port 			$config->{remote_control_port}
 	$engines						$config->{engines}
 	$default_waveform_height 			$config->{default_waveform_height}
 	$loop_chain_channel_width 	$config->{loop_chain_channel_width}

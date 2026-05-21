@@ -1,0 +1,77 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Basename qw(basename);
+use File::Spec;
+use FindBin qw($Bin);
+
+my $command = basename($0);
+my $core = File::Spec->catfile( $Bin, '_dashboard-core' );
+exec { $^X } $^X, $core, $command, @ARGV;
+die "Unable to exec $core for $command: $!";
+
+__END__
+
+=pod
+
+=head1 NAME
+
+log - private built-in log helper for Developer Dashboard
+
+=head1 SYNOPSIS
+
+  dashboard log
+  dashboard log web
+  dashboard log collector
+  dashboard log collector alpha.collector
+
+=head1 DESCRIPTION
+
+This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
+public C<dashboard> entrypoint can stay a thin switchboard.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+This staged helper exposes the top-level log viewer for Developer Dashboard so
+operators can inspect web logs, collector logs, or both from one command family
+without needing to remember the nested collector and serve subcommands.
+
+=head1 WHY IT EXISTS
+
+It exists because log viewing is built-in runtime behavior, but the public
+switchboard should dispatch to a staged helper while shared log parsing and
+rendering live in reusable Perl modules.
+
+=head1 WHEN TO USE
+
+Use this file when changing the public C<dashboard log> or C<dashboard logs>
+CLI contract, the staged helper dispatch path, or the examples operators use
+for web versus collector log inspection.
+
+=head1 HOW TO USE
+
+Users run C<dashboard log>, C<dashboard logs>, C<dashboard log web>, or
+C<dashboard log collector [name]>. The helper re-enters the private runtime,
+which loads the shared runtime-control module and prints the requested log
+stream.
+
+=head1 WHAT USES IT
+
+It is used by operators inspecting runtime logs, by smoke tests that pin the
+public log contract, and by the thin loader tests that ensure log stays a
+staged built-in helper instead of bloating the public entrypoint.
+
+=head1 EXAMPLES
+
+  dashboard log
+  dashboard logs
+  dashboard log web -n 50
+  dashboard log collector housekeeper
+
+=for comment FULL-POD-DOC END
+
+=cut

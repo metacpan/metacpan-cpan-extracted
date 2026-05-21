@@ -2,7 +2,7 @@ package Data::HashMap::Shared::I16S;
 use strict;
 use warnings;
 use Data::HashMap::Shared;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub import {
     $^H{"Data::HashMap::Shared::I16S/shm_i16s_put"}        = 1;
@@ -44,8 +44,12 @@ sub import {
     $^H{"Data::HashMap::Shared::I16S/shm_i16s_arena_used"}       = 1;
     $^H{"Data::HashMap::Shared::I16S/shm_i16s_arena_cap"}        = 1;
     $^H{"Data::HashMap::Shared::I16S/shm_i16s_add"}              = 1;
+    $^H{"Data::HashMap::Shared::I16S/shm_i16s_add_ttl"}          = 1;
+    $^H{"Data::HashMap::Shared::I16S/shm_i16s_update_ttl"}       = 1;
     $^H{"Data::HashMap::Shared::I16S/shm_i16s_update"}           = 1;
     $^H{"Data::HashMap::Shared::I16S/shm_i16s_swap"}             = 1;
+    $^H{"Data::HashMap::Shared::I16S/shm_i16s_cas"}              = 1;
+    $^H{"Data::HashMap::Shared::I16S/shm_i16s_cas_take"}        = 1;
     $^H{"Data::HashMap::Shared::I16S/shm_i16s_persist"}         = 1;
     $^H{"Data::HashMap::Shared::I16S/shm_i16s_set_ttl"}         = 1;
 }

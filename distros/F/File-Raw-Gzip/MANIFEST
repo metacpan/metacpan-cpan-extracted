@@ -1,0 +1,32 @@
+bench/gzip.pl
+Changes
+gz.c
+gz.h
+Gzip.xs
+ignore.txt
+lib/File/Raw/Gzip.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-roundtrip.t
+t/02-decode-real-gz.t
+t/03-decode-foreign.t
+t/04-decode-auto.t
+t/05-level.t
+t/06-large.t
+t/07-corrupt.t
+t/08-empty.t
+t/09-bad-options.t
+t/10-stream-basic.t
+t/11-stream-large.t
+t/12-stream-cancel.t
+t/13-stream-corrupt.t
+t/14-stream-modes.t
+t/15-chain-csv.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

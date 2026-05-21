@@ -2,16 +2,16 @@ use strict;
 use warnings;
 package MetaCPAN::Client::ResultSet;
 # ABSTRACT: A Result Set
-$MetaCPAN::Client::ResultSet::VERSION = '2.042000';
+$MetaCPAN::Client::ResultSet::VERSION = '2.043000';
 use Moo;
 use Carp;
 
 use MetaCPAN::Client::Types qw< ArrayRef >;
 
-has type => (
+has index => (
     is       => 'ro',
     isa      => sub {
-        croak 'Invalid type' unless
+        croak 'Invalid index' unless
             grep { $_ eq $_[0] } qw<author cover cve distribution favorite
                                    file module permission release mirror package>;
     },
@@ -60,11 +60,11 @@ sub BUILDARGS {
     exists $args{scroller} and exists $args{items}
         and croak 'ResultSet must get either scroller or items, not both';
 
-    exists $args{type} or exists $args{class}
-        or croak 'Must pass either type or target class to ResultSet';
+    exists $args{index} or exists $args{class}
+        or croak 'Must pass either index or target class to ResultSet';
 
-    exists $args{type} and exists $args{class}
-        and croak 'Must pass either type or target class to ResultSet, not both';
+    exists $args{index} and exists $args{class}
+        and croak 'Must pass either index or target class to ResultSet, not both';
 
     return \%args;
 }
@@ -92,7 +92,7 @@ sub aggregations {
 
 sub _build_class {
     my $self = shift;
-    return 'MetaCPAN::Client::' . ucfirst $self->type;
+    return 'MetaCPAN::Client::' . ucfirst $self->index;
 }
 
 1;
@@ -109,7 +109,7 @@ MetaCPAN::Client::ResultSet - A Result Set
 
 =head1 VERSION
 
-version 2.042000
+version 2.043000
 
 =head1 DESCRIPTION
 
@@ -127,9 +127,9 @@ An L<MetaCPAN::Client::Scroll> object.
 
 An arrayref of items to manually scroll over, instead of a scroller object.
 
-=head2 type
+=head2 index
 
-The entity of the result set. Available types:
+The entity of the result set. Available indices:
 
 =over 4
 

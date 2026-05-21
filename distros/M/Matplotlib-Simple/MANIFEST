@@ -12,6 +12,7 @@ change.log.txt
 css4.colors.txt
 dist.ini
 lib/Matplotlib/Simple.pm
+lib/Matplotlib/bu.Simple.pm
 make.subs.pl
 md2pod.pl
 methods.txt
@@ -55,6 +56,7 @@ output.images/twinx.hash.png
 output.images/violin.png
 output.images/wide.subplots.png
 sha.sums.tsv
+single.arr.pl
 t/01.all.tests.t
 t/debug.pl
 t/make.SHA.sum.pl
@@ -69,6 +71,7 @@ t/output.images/dssp.multiple.svg
 t/output.images/dssp.single.svg
 t/output.images/hexbin.sub.svg
 t/output.images/hexbin.svg
+t/output.images/hist.arr.svg
 t/output.images/hist.sub.svg
 t/output.images/hist2d.logscale.svg
 t/output.images/hist2d.pads.svg

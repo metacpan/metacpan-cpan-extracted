@@ -15,24 +15,22 @@ extern "C" {
 
 #define xo_rotl(x,k) (((x) << (k)) | ((x) >> (64 - (k))))
 
-void xo_srand(pUCXT, Pid_t pid) {
-  U64 n, *xo_s = UCXT.xo_s;
+void uu_xoshiro_srand(pUCXT) {
+  U64 n, *xo_s = SMEM->xo_s;
 
-  (void)pid;
-
-  xo_s[0] = sm_rand(aUCXT);
-  xo_s[1] = sm_rand(aUCXT);
-  xo_s[2] = sm_rand(aUCXT);
-  xo_s[3] = sm_rand(aUCXT);
+  xo_s[0] = uu_splitmix_rand(aUCXT);
+  xo_s[1] = uu_splitmix_rand(aUCXT);
+  xo_s[2] = uu_splitmix_rand(aUCXT);
+  xo_s[3] = uu_splitmix_rand(aUCXT);
 
   /* stir 16 - 31 times */
-  n = 16 + (sm_rand(aUCXT) >> 60);
+  n = 16 + (uu_splitmix_rand(aUCXT) >> 60);
   while (n-- > 0)
-    (void)xo_rand(aUCXT);
+    (void)uu_xoshiro_rand(aUCXT);
 }
 
-U64 xo_rand(pUCXT) {
-  U64 *xo_s = UCXT.xo_s;
+U64 uu_xoshiro_rand(pUCXT) {
+  U64 *xo_s = SMEM->xo_s;
 
   const U64 result = xo_rotl(xo_s[0] + xo_s[3], 23) + xo_s[0];
 

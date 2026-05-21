@@ -1,14 +1,15 @@
 use strict;
 use warnings;
-use Test::More;
-use MyNote;
 
 BEGIN {
     my $has_md5 = eval 'require Digest::MD5';
     unless ($has_md5) {
-        plan skip_all => 'no Digest::MD5';
+        print "1..0 # SKIP no Digest::MD5\n";
+        exit 0;
     }
 }
+
+use MyTest;
 
 use UUID qw(parse uuid3);
 

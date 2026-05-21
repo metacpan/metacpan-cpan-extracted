@@ -1,0 +1,41 @@
+blake3.c
+Changes
+crc32.c
+Hash.xs
+hashx.c
+ignore.txt
+include/blake3.h
+include/crc32.h
+include/hashx.h
+include/md5.h
+include/sha1.h
+include/sha2.h
+include/xxh64.h
+lib/File/Raw/Hash.pm
+Makefile.PL
+MANIFEST			This list of files
+md5.c
+README
+sha1.c
+sha2.c
+t/00-load.t
+t/01-known-vectors.t
+t/02-formats.t
+t/03-passthrough.t
+t/04-multi-algo.t
+t/05-stream.t
+t/06-chain.t
+t/07-large.t
+t/08-bad-options.t
+t/09-empty.t
+t/10-xxh64.t
+t/11-blake3.t
+t/12-hmac.t
+t/13-record.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+xxh64.c
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

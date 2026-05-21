@@ -5,11 +5,12 @@ use warnings;
 
 use Class::Utils qw(set_params);
 use Data::MARC::Leader 0.05;
+use English;
 use Error::Pure qw(err);
 use Mo::utils 0.06 qw(check_bool);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Constructor.
 sub new {
@@ -18,11 +19,17 @@ sub new {
 	# Create object.
 	my $self = bless {}, $class;
 
+	# Mode strict.
+	$self->{'mode_strict'} = 0;
+
 	# Verbose mode.
 	$self->{'verbose'} = 0;
 
 	# Process parameters.
 	set_params($self, @params);
+
+	# Check 'mode_strict'.
+	check_bool($self, 'mode_strict');
 
 	# Check verbose.
 	check_bool($self, 'verbose');
@@ -40,34 +47,44 @@ sub parse {
 		;
 	}
 
-	$leader =~ s/\-/\ /msg;
+	# Dashes are spaces.
+	if (! $self->{'mode_strict'}) {
+		$leader =~ s/\-/\ /msg;
+	}
 
 	if ($self->{'verbose'}) {
 		print "Leader: |$leader|\n";
 	}
 
-	my %params = (
-		'raw' => $leader,
+	my $leader_obj = eval {
+		my %params = (
+			'raw' => $leader,
 
-		'length' => $self->_int($leader, 0, 5, 'Bad number in length.'),
-		'status' => (substr $leader, 5, 1),
-		'type' => (substr $leader, 6, 1),
-		'bibliographic_level' => (substr $leader, 7, 1),
-		'type_of_control' => (substr $leader, 8, 1),
-		'char_coding_scheme' => (substr $leader, 9, 1),
-		'indicator_count' => (substr $leader, 10, 1),
-		'subfield_code_count' => (substr $leader, 11, 1),
-		'data_base_addr' => $self->_int($leader, 12, 5, 'Bad number in data base address.'),
-		'encoding_level' => (substr $leader, 17, 1),
-		'descriptive_cataloging_form' => (substr $leader, 18, 1),
-		'multipart_resource_record_level' => (substr $leader, 19, 1),
-		'length_of_field_portion_len' => (substr $leader, 20, 1),
-		'starting_char_pos_portion_len' => (substr $leader, 21, 1),
-		'impl_def_portion_len' => (substr $leader, 22, 1),
-		'undefined' => (substr $leader, 23, 1),
-	);
+			'length' => $self->_int($leader, 0, 5, 'Bad number in length.'),
+			'status' => (substr $leader, 5, 1),
+			'type' => (substr $leader, 6, 1),
+			'bibliographic_level' => (substr $leader, 7, 1),
+			'type_of_control' => (substr $leader, 8, 1),
+			'char_coding_scheme' => (substr $leader, 9, 1),
+			'indicator_count' => (substr $leader, 10, 1),
+			'subfield_code_count' => (substr $leader, 11, 1),
+			'data_base_addr' => $self->_int($leader, 12, 5, 'Bad number in data base address.'),
+			'encoding_level' => (substr $leader, 17, 1),
+			'descriptive_cataloging_form' => (substr $leader, 18, 1),
+			'multipart_resource_record_level' => (substr $leader, 19, 1),
+			'length_of_field_portion_len' => (substr $leader, 20, 1),
+			'starting_char_pos_portion_len' => (substr $leader, 21, 1),
+			'impl_def_portion_len' => (substr $leader, 22, 1),
+			'undefined' => (substr $leader, 23, 1),
+		);
+		Data::MARC::Leader->new(%params);
+	};
+	if ($EVAL_ERROR) {
+		err "Couldn't parse MARC leader.";
+	}
 
-	return Data::MARC::Leader->new(%params);
+	return $leader_obj;
+
 }
 
 sub serialize {
@@ -146,6 +163,15 @@ Constructor.
 
 =over 8
 
+=item * C<mode_strict>
+
+Strict mode for parsing.
+
+In not strict mode, parser could parse MARC leader with dashes instead of
+spaces,
+
+Default is 0.
+
 =item * C<verbose>
 
 Verbose mode flag.
@@ -185,10 +211,13 @@ Returns string.
  parse():
          Bad length of MARC leader.
                  Length: %s
-         Bad number in data base address.
-                 String: %s
-         Bad number in length.
-                 String: %s
+         Couldn't parse MARC leader.
+         (Errors in stack trace are:
+                 Bad number in data base address.
+                         String: %s
+                 Bad number in length.
+                         String: %s
+         and from L<Data::MARC::Leader>, see documentation.)
 
  serialize():
          Bad 'Data::MARC::Leader' instance to serialize.
@@ -338,6 +367,7 @@ Returns string.
 
 L<Class::Utils>,
 L<Data::MARC::Leader>,
+L<English>,
 L<Error::Pure>,
 L<Mo::utils>,
 L<Scalar::Util>.
@@ -377,6 +407,6 @@ the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

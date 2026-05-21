@@ -1,3 +1,4 @@
+AI_POLICY.md
 bin/README
 bin/tpage
 bin/tt-bench.pl
@@ -83,6 +84,7 @@ parser/Parser.yp
 parser/README
 parser/yc
 README.md
+SECURITY.md
 t/anycase.t
 t/args.t
 t/assert.t
@@ -99,9 +101,13 @@ t/compile2.t
 t/compile3.t
 t/compile4.t
 t/compile5.t
+t/compile6.t
+t/compile_error.t
 t/config.t
+t/config_methods.t
 t/constants.t
 t/context.t
+t/context_methods.t
 t/datafile.t
 t/date.t
 t/date_offset.t
@@ -110,6 +116,7 @@ t/debug.t
 t/directive.t
 t/directry.t
 t/document.t
+t/document_methods.t
 t/dumper.t
 t/error.t
 t/evalperl.t
@@ -120,6 +127,7 @@ t/fileline.t
 t/filter.t
 t/foreach.t
 t/format.t
+t/grammar-factory.t
 t/html.t
 t/image.t
 t/include.t
@@ -142,6 +150,7 @@ t/output.t
 t/parser.t
 t/parser2.t
 t/plugins.t
+t/plugins_preloaded.t
 t/plusfile.t
 t/pod.t
 t/prefix.t
@@ -158,6 +167,7 @@ t/skel.t
 t/stash-xs-unicode.t
 t/stash-xs.t
 t/stash.t
+t/stash_clone.t
 t/stashc.t
 t/stop.t
 t/strcat.t
@@ -228,6 +238,7 @@ t/text.t
 t/throw.t
 t/tiedhash.t
 t/trace_vars.t
+t/truncate_cer.t
 t/try.t
 t/unicode.t
 t/url.t
@@ -241,6 +252,8 @@ t/vmethods/text.t
 t/while.t
 t/wrap.t
 t/wrapper.t
+t/zz-error-exception-gh-373.t
+t/zz-grammar-factory-leak.t
 t/zz-plugin-cycle.t
 t/zz-plugin-leak-gh-213.t
 t/zz-plugin-leak-rt-46691.t

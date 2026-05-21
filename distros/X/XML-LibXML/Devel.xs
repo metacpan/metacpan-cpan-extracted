@@ -20,7 +20,6 @@
 #include "perl.h"
 #include "XSUB.h"
 
-#include "ppport.h"
 
 #include <stdlib.h>
 
@@ -31,6 +30,15 @@
 #undef NDEBUG
 #include <assert.h>
 
+/* libxml2's custom memory-allocator and tracking API was removed in 2.14.
+ * Apple SDKs (macOS 15.4 / iOS 18.4 / etc.) pre-flag it as deprecated even
+ * while shipping libxml2 < 2.14. Only expose debug_memory() and mem_used()
+ * when the API is genuinely supported by the installed libxml2. */
+#if LIBXML_VERSION < 21400 && !defined(LIBXML_HAS_DEPRECATED_MEMORY_ALLOCATION_FUNCTIONS)
+#define HAVE_LIBXML_MEMORY_DEBUG 1
+#endif
+
+#ifdef HAVE_LIBXML_MEMORY_DEBUG
 static void *	xmlMemMallocAtomic(size_t size)
 {
     return xmlMallocAtomicLoc(size, "none", 0);
@@ -44,15 +52,18 @@ static int debug_memory()
                           xmlMemRealloc,
                           xmlMemStrdup);
 }
+#endif
 
 MODULE = XML::LibXML::Devel		PACKAGE = XML::LibXML::Devel
 
 PROTOTYPES: DISABLE
 
 BOOT:
+#ifdef HAVE_LIBXML_MEMORY_DEBUG
     if (getenv("DEBUG_MEMORY")) {
         debug_memory();
     }
+#endif
 
 
 
@@ -118,11 +129,15 @@ fix_owner( n, p )
     OUTPUT:
         RETVAL
 
+#ifdef HAVE_LIBXML_MEMORY_DEBUG
+
 int
 mem_used()
     CODE:
         RETVAL = xmlMemUsed();
     OUTPUT:
         RETVAL
+
+#endif
 
 

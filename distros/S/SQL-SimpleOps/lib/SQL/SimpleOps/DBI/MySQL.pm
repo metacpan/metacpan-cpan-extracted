@@ -29,7 +29,7 @@
 
 	our @EXPORT = qw(new Open $VERSION);
 
-	our $VERSION = "2023.284.1";
+	our $VERSION = "2026.129.1";
 
 	our @EXPORT_OK = @EXPORT;
 
@@ -71,11 +71,12 @@ sub Open()
 
 	## sets the dsnam here
 	my @options;
-	push(@options,"database=".$self->{sql_simple}->{argv}{db}) if (defined($self->{sql_simple}->{argv}{db}) && $self->{sql_simple}->{argv}{db}ne ""); 
+	push(@options,"database=".$self->{sql_simple}->{argv}{db}) if (defined($self->{sql_simple}->{argv}{db}) && $self->{sql_simple}->{argv}{db} ne ""); 
 	push(@options,"host=".$self->{sql_simple}->{argv}{server}) if (defined($self->{sql_simple}->{argv}{server}) && $self->{sql_simple}->{argv}{server} ne "");
 	push(@options,$self->{sql_simple}->{argv}{port}) if (defined($self->{sql_simple}->{argv}{port}) && $self->{sql_simple}->{argv}{port} ne "");
-	$self->{sql_simple}->{argv}{dsname} = "DBI:mysql:".join(';',@options);
 
+	## sets the dsnam here
+	$self->{sql_simple}->{argv}{dsname} = "DBI:mysql:".join(';',@options);
 	return 0;
 }
 

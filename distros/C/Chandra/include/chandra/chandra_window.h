@@ -1,5 +1,5 @@
 /*
- * chandra_window.h — Child-window management for Chandra
+ * chandra_window.h - Child-window management for Chandra
  *
  * On macOS: creates real NSWindow + WKWebView instances that share the
  * existing NSApplication event loop.  Messages from child-window JS
@@ -545,7 +545,7 @@ static LRESULT CALLBACK _cwin_wndproc(HWND hwnd, UINT msg,
         return 0;
     }
     case WM_CLOSE:
-        /* Deactivate in table, just destroy window — don't quit app */
+        /* Deactivate in table, just destroy window - don't quit app */
         if (cw) {
             cw->active = 0;
             if (cw->browser) {

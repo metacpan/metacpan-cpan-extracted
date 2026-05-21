@@ -4,9 +4,15 @@ package Crypt::Cipher::MULTI2;
 
 use strict;
 use warnings;
-our $VERSION = '0.088';
+our $VERSION = '0.089';
 
 use base qw(Crypt::Cipher);
+
+sub new {
+  my ($class, @args) = @_;
+  my $obj = Crypt::Cipher->new('MULTI2', @args);
+  return bless $obj, $class;
+}
 
 sub blocksize      { Crypt::Cipher::blocksize('MULTI2')      }
 sub keysize        { Crypt::Cipher::keysize('MULTI2')        }
@@ -27,7 +33,7 @@ Crypt::Cipher::MULTI2 - Symmetric cipher MULTI2, key size: 320 bits
   ### example 1
   use Crypt::Mode::CBC;
 
-  my $key = '...'; # length has to be valid key size for this cipher
+  my $key = '...'; # length must be a valid key size for this cipher
   my $iv = '...';  # 16 bytes
   my $cbc = Crypt::Mode::CBC->new('MULTI2');
   my $ciphertext = $cbc->encrypt("secret data", $key, $iv);
@@ -36,36 +42,58 @@ Crypt::Cipher::MULTI2 - Symmetric cipher MULTI2, key size: 320 bits
   use Crypt::CBC;
   use Crypt::Cipher::MULTI2;
 
-  my $key = '...'; # length has to be valid key size for this cipher
+  my $key = '...'; # length must be a valid key size for this cipher
   my $iv = '...';  # 16 bytes
   my $cbc = Crypt::CBC->new( -cipher=>'Cipher::MULTI2', -key=>$key, -iv=>$iv );
   my $ciphertext = $cbc->encrypt("secret data");
 
 =head1 DESCRIPTION
 
-This module implements the MULTI2 cipher. Provided interface is compliant with L<Crypt::CBC|Crypt::CBC> module.
+This module implements the MULTI2 cipher. Its interface is compatible with L<Crypt::CBC>.
 
-B<BEWARE:> This module implements just elementary "one-block-(en|de)cryption" operation - if you want to
-encrypt/decrypt generic data you have to use some of the cipher block modes - check for example
-L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CTR|Crypt::Mode::CTR> or L<Crypt::CBC|Crypt::CBC> (which will be slower).
+B<Note:> This module only implements single-block encryption and decryption.
+For general data, use a block mode such as
+L<Crypt::Mode::CBC>, L<Crypt::Mode::CTR>, or L<Crypt::CBC> (which is slower).
 
 =head1 METHODS
 
+Unless noted otherwise, assume C<$c> is an existing cipher object created via
+C<new>, for example:
+
+ my $c = Crypt::Cipher::MULTI2->new($key);
+
 =head2 new
 
- $c = Crypt::Cipher::MULTI2->new($key);
+ my $c = Crypt::Cipher::MULTI2->new($key);
  #or
- $c = Crypt::Cipher::MULTI2->new($key, $rounds);
+ my $c = Crypt::Cipher::MULTI2->new($key, $rounds);
+
+ # $key .... [binary string] key of an accepted length (see keysize, min_keysize, max_keysize)
+ # $rounds . [integer] optional, number of rounds (if supported by the cipher; croaks on invalid value)
 
 =head2 encrypt
 
- $ciphertext = $c->encrypt($plaintext);
+Encrypts exactly one block of plaintext. The length of C<$plaintext> must
+equal L</blocksize>; croaks otherwise. An empty string is accepted and
+returned unchanged.
+
+ my $ciphertext = $c->encrypt($plaintext);
+
+Returns the encrypted block as a binary string (raw bytes).
 
 =head2 decrypt
 
- $plaintext = $c->decrypt($ciphertext);
+Decrypts exactly one block of ciphertext. The length of C<$ciphertext> must
+equal L</blocksize>; croaks otherwise. An empty string is accepted and
+returned unchanged.
+
+ my $plaintext = $c->decrypt($ciphertext);
+
+Returns the decrypted block as a binary string (raw bytes).
 
 =head2 keysize
+
+Just an alias for C<max_keysize>.
 
   $c->keysize;
   #or
@@ -75,6 +103,8 @@ L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CTR|Crypt::Mode::CTR> or L<
 
 =head2 blocksize
 
+Returns the cipher block size (in bytes).
+
   $c->blocksize;
   #or
   Crypt::Cipher::MULTI2->blocksize;
@@ -82,6 +112,8 @@ L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CTR|Crypt::Mode::CTR> or L<
   Crypt::Cipher::MULTI2::blocksize;
 
 =head2 max_keysize
+
+Returns the maximum key size (in bytes).
 
   $c->max_keysize;
   #or
@@ -91,6 +123,8 @@ L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CTR|Crypt::Mode::CTR> or L<
 
 =head2 min_keysize
 
+Returns the minimum key size (in bytes).
+
   $c->min_keysize;
   #or
   Crypt::Cipher::MULTI2->min_keysize;
@@ -98,6 +132,8 @@ L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CTR|Crypt::Mode::CTR> or L<
   Crypt::Cipher::MULTI2::min_keysize;
 
 =head2 default_rounds
+
+Returns the cipher's default round count.
 
   $c->default_rounds;
   #or
@@ -109,7 +145,7 @@ L<Crypt::Mode::CBC|Crypt::Mode::CBC>, L<Crypt::Mode::CTR|Crypt::Mode::CTR> or L<
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Cipher>
+=item * L<CryptX>, L<Crypt::Cipher>
 
 =item * L<https://en.wikipedia.org/wiki/MULTI2>
 

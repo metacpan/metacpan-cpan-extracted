@@ -1,5 +1,11 @@
 Revision history for EV::Websockets
 
+0.06    2026-05-02
+        - Fixed recursive Context::DESTROY use-after-free
+        - Proxy env var: accept any scheme prefix (was http/https only)
+        - close() no-op while already closing; send/send_binary croak mid-fragment
+        - POD polish; cleanup; coverage tests
+
 0.05    2026-04-04
         - Fixed test timing issues on slow cpantesters machines
         - Fixed repository URL in META

@@ -17,11 +17,20 @@ BEGIN {
 use My::App;
 
 lives_and {
-    is one_ring->rule, 'them all';
+    is My::App::one_ring->rule, 'them all';
 } 'shortcut magic executed correctly';
 
 throws_ok {
+    package My::Err;
     Resource::Silo->import( -shortcut => "foo bar" );
 } qr/shortcut.*identifier/, "bad name = no go";
+
+throws_ok {
+    package My::Err2;
+    # meh...
+    local $SIG{__WARN__} = sub { die $_[0] };
+    Resource::Silo->import( -class );
+    silo();
+} qr/explicit.*shortcut/, "no more bare silo in class mode";
 
 done_testing;

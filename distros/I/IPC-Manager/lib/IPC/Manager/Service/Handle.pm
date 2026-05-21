@@ -2,7 +2,7 @@ package IPC::Manager::Service::Handle;
 use strict;
 use warnings;
 
-our $VERSION = '0.000035';
+our $VERSION = '0.000037';
 
 use Carp qw/croak/;
 use Time::HiRes qw/time/;
@@ -94,19 +94,30 @@ sub sync_request {
     return $self->await_response($id, $timeout);
 }
 
-# Returns true if the named peer is still considered live for the purpose
-# of expecting a response.  Protocols that advertise suspend_supported let
-# peers suspend cleanly (pidfile dropped) or restart under a new pid while
-# the registration stays in place — a missing pid or a pid mismatch is
-# therefore not a failure on its own, only full unregistration is.
-# Protocols without suspend treat a dead or missing pid as a permanent loss.
 sub _pending_peer_active {
     my $self = shift;
     my ($peer, $pid) = @_;
 
     my $client = $self->client;
 
-    return $client->peer_exists($peer) ? 1 : 0 if $client->suspend_supported;
+    if ($client->can('peer_suspend_expires')) {
+        if (defined(my $exp = $client->peer_suspend_expires($peer))) {
+            return 0 if $exp < time;
+        }
+    }
+
+    if ($client->suspend_supported) {
+        return 0 unless $client->peer_exists($peer);
+
+        if (defined $pid) {
+            my $cur = $client->peer_pid($peer);
+            if (defined($cur) && $cur && $cur == $pid && !$client->pid_is_running($pid)) {
+                return 0;
+            }
+        }
+        return 1;
+    }
+
     return $client->pid_is_running($pid) ? 1 : 0 if defined $pid;
     return $client->peer_active($peer);
 }

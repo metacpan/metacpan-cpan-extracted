@@ -57,3 +57,22 @@ void fill_segment(const argon2_instance_t *instance, argon2_position_t position)
 	fill_segment_ref(instance, position);
 }
 #endif
+
+const char* argon2_implementation() {
+#ifdef HAVE_AVX512
+	if (__builtin_cpu_supports("avx512f"))
+		return "avx512";
+	else
+#endif
+#ifdef HAVE_AVX2
+	if (__builtin_cpu_supports("avx2"))
+		return "avx2";
+	else
+#endif
+#ifdef HAVE_SSE3
+	if (__builtin_cpu_supports("sse3"))
+		return "sse3";
+	else
+#endif
+	return "reference";
+}

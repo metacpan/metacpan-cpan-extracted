@@ -78,30 +78,26 @@ make-cpan-dist.pl -h
 ```
 
 If you want to install this by building the project make sure you have
-the `autotools` toolchain installed (`autoconf` and `automake`). If
-you are using a RedHat derived Linux distribution, install the
-`autoconf` and `automake` packages using `yum`. If you are using a
-Debian based system then you may have success using `apt` to install
-the necessary dependencies. There are also some Perl module
-dependencies that are checked when you run `./configure`.
-
-The `build-github` script in the root directory is executed by GitHub
-actions to verify the build. If you want to build the project manually:
+all of the dependencies necessary to perform a build installed on your
+system.
 
 ```
+apt-get update && apt-get install -y \
+  git gcc make automake autoconf perl curl ca-certificates
+
+curl -L https://cpanmin.us | perl - App::cpanminus 
+
 git clone https://github.com/rlauer6/CPAN-Maker.git
 cd CPAN-Maker
-./bootstrap
-./configure
-make
-```
 
-Then to create a CPAN distribution:
+for a in $(cat build-requires); do
+    cpanm -n -v $a;
+done
 
-```
-cd cpan
-make cpan
-cpanm -n -v CPAN-Maker-1.7.2.tar
+./bootstrap && ./configure && make
+
+cd cpan && make cpan
+cpanm -n -v CPAN-Maker.tar.gz
 ```
 
 [Back to Table of Contents](#table-of-contents)
@@ -224,8 +220,6 @@ utilities is to provide a __simple__ solution right?  So the
 _simplest_ thing you can do is run the utility against a
 `buildspec.yml` file that describes the distribution you would like to
 create.
-
-[Back to Table of Contents](#table-of-contents)
 
 ## The Easy Way
 
@@ -462,7 +456,7 @@ Well, to be upfront about it, __maybe it's not__, especially for
 smaller projects. Using the buildspec approach does make it
 particulary easy though. And as your project grows modifying the
 buildspec file is probably easier than remembering how
-`ExtUtils::MakeMaker` works.  
+`ExtUtils::MakeMaker` works.
 
 Moreover, I feel this approach makes automation easier. I alway find
 it best to take a bunch of steps I will seldom remember and package
@@ -536,6 +530,11 @@ make-cpan-dist -l lib -S bin -t t -m Foo::Bar
 By creating a `Makefile` recipe, whenever I update the buildspec or
 any of the modules or scripts and run `make`, I'll automatically
 create a new distribution.
+
+> See
+> [CPAN::Maker::Bootstrapper](https://github.com/rlauer6/CPAN-Maker-Bootstrapper)
+> if you want to bootstrap a new project. The bootstrapper will create
+> a project hierarchy and buildspec automatically.
 
 [Back to Table of Contents](#table-of-contents)
 

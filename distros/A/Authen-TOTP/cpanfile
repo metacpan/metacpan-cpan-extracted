@@ -1,10 +1,10 @@
 requires 'perl' => '5.008001';
-
-if  ((eval {require MIME::Base32::XS;1;} || 0) ne 1) {
+requires 'Crypt::PRNG';
+if  ((eval {require Encode::Base2N;1;} || 0) ne 1) {
     requires 'MIME::Base32';
 }
 else {
-    requires 'MIME::Base32::XS';
+    requires 'Encode::Base2N';
 }
 
 if  ((eval {require Digest::SHA;1;} || 0) ne 1) {
@@ -12,7 +12,7 @@ if  ((eval {require Digest::SHA;1;} || 0) ne 1) {
 }
 else {
     #this is quite pointless but anyhow
-    requires 'Digest::SHA'; 
+    requires 'Digest::SHA';
 }
 
 on 'test' => sub {

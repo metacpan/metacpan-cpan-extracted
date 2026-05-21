@@ -2,9 +2,6 @@ use ExtUtils::MakeMaker;
 use strict;
 use warnings;
 
-# Call 'perldoc ExtUtils::MakeMaker' for details of how to influence
-# the contents of the Makefile that is written.
-
 my %WriteMakefileArgs = (
     NAME                => 'Storable::Improved',
     AUTHOR              => 'Jacques Deguest (jack@deguest.jp)',
@@ -20,12 +17,12 @@ my %WriteMakefileArgs = (
     },
     TEST_REQUIRES =>
     {
-        'Test::More'    => 0,
-        'IO::File'      => 0,
+        'Test::More'      => 0,
+        'IO::File'        => 0,
         'HTTP::XSHeaders' => 0,
     },
     LICENSE             => 'perl_5',
-    MIN_PERL_VERSION    => 'v5.26.1',
+    MIN_PERL_VERSION    => 'v5.10.1',
     (MM->can('signature_target') ? (SIGN => 1) : ()),
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Storable-Improved-*' },

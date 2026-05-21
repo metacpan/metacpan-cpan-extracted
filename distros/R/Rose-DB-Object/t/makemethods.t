@@ -6,7 +6,7 @@ use Test::More tests => 125;
 
 BEGIN
 {
-  require 't/test-lib.pl';
+  require './t/test-lib.pl';
   use_ok('Rose::DB::Object');
   use_ok('Rose::DB::Object::MakeMethods::Generic');
   use_ok('Rose::DB::Object::MakeMethods::Pg');

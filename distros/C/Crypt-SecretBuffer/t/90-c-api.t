@@ -31,7 +31,7 @@ is \%Crypt::SecretBuffer::C_API,
       secret_buffer_sizeof_transcode =>
          'SSize_t secret_buffer_sizeof_transcode(secret_buffer_parse *src, int dst_encoding)',
       secret_buffer_transcode =>
-         'bool secret_buffer_transcode(secret_buffer_parse *src, secret_buffer_parse *dst)',
+         'bool secret_buffer_transcode(secret_buffer_parse *src, secret_buffer_parse_rw *dst)',
       secret_buffer_copy_to =>
          'bool secret_buffer_copy_to(secret_buffer_parse *src, SV *dst_sv, int encoding, bool append)',
       secret_buffer_span_new_obj =>

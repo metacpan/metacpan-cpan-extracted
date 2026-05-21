@@ -1,5 +1,15 @@
 Revision history for Container-Builder
 
+0.12  2026-05-17 14:30:34 BST
+	- Added annotation possibility of container name in build phase. Allows a "podman load" to immediately tag the loaded container image.
+
+0.11  2026-05-16 15:28:04 BST
+	- Moved the digest and size calculations to the parent Layer class.
+	- Added tests for compression in SingleFile and DebianPackageFile layers.
+	- Added tests for the bugfix.
+	- Bugfix for the "diff IDs" in the Config JSON. They need to be the uncompressed digest. https://github.com/adriaandens/Container-Builder/issues/2
+	- Adding extra example for a fatpacked plackup container with debian trixie.
+
 0.10  2026-03-07 21:57:25 GMT
 	- Fix crash on debugging Perls (-DDEBUGGING). https://github.com/adriaandens/Container-Builder/issues/1
 	- Add more tests.

@@ -17,7 +17,7 @@ use namespace::autoclean;
 
 requires qw/ log_stats /;
 
-our $VERSION = 'v0.9.0';
+our $VERSION = 'v0.10.1';
 
 
 sub statsd_client($c) {
@@ -66,15 +66,15 @@ around log_stats => sub ( $next, $c ) {
 
 around finalize => sub ( $next, $c ) {
 
-    if (my $client = $c->statsd_client) {
+    if (my $secure = $c->req->env->{'psgix.monitor.statsd_secure_set_add'}) {
 
         if ($c->can("sessionid") && (my $id = $c->sessionid)) {
-            $client->set_add("catalyst.sessionid", "$id");
+            $secure->("catalyst.sessionid", "$id");
         }
         # Plack::Middleware::Session
         elsif (my $options = $c->req->env->{'psgix.session.options'}) {
             if (my $id = $options->{id}) {
-                $client->set_add("catalyst.sessionid", "$id");
+                $secure->("catalyst.sessionid", "$id");
             }
         }
     }
@@ -91,13 +91,15 @@ __END__
 
 =encoding UTF-8
 
+=for stopwords statsd
+
 =head1 NAME
 
 Catalyst::Plugin::Statsd - Log Catalyst stats to statsd
 
 =head1 VERSION
 
-version v0.9.0
+version v0.10.1
 
 =head1 SYNOPSIS
 
@@ -182,7 +184,7 @@ want logged, or to change the names of the metrics.
 
 =head2 C<catalyst.response.time>
 
-This logs the Catalyst reponse time that is normally reported by
+This logs the Catalyst response time that is normally reported by
 Catalyst.  However, it is probably unnecessary since
 L<Plack::Middleware::Statsd> also logs response times.
 
@@ -192,6 +194,11 @@ If L<Catalyst::Plugin::Session> or L<Plack::Middleware::Session> is
 used, or anything that adds a C<sessionid> method to the context, then
 the session id is added as a set, to count the number of unique
 sessions.
+
+Note: this will only be logged if L<Plack::Middleware::Statsd> version
+v0.9.0 or later is used and configured to with the C<secure_set_key>
+option.  The actual session id will be encrypted to prevent leaking of
+a potential authentication token.
 
 =head2 C<catalyst.stats.*.time>
 
@@ -232,11 +239,20 @@ grow quite large.
 Your database storage and retention settings should be adjusted
 accordingly.
 
-=head1 SUPPORT FOR OLDER PERL VERSIONS
+=head1 SECURITY CONSIDERATIONS
 
-Since v0.9.0, the this module requires Perl v5.20 or later.
+If the L</statsd_client> does not have a secure communications channel to the
+statsd server, then there is the risk that information such as IP
+addresses or session ids will be leaked.
 
-Future releases may only support Perl versions released in the last ten years.
+Anything that needs to log information in a set that contains
+personally identifiable information, authentication tokens or other
+sensitive data should use the C<psgix.monitor.statsd_secure_set_add>
+function instead of the client's C<set_add> method, for example:
+
+    if (my $secure_set_add = $c->req->env->{'psgix.monitor.statsd_secure_set_add'}) {
+        $secure_set_add->( $c->body_param->{name_of_sheep} );
+    }
 
 =head1 SEE ALSO
 
@@ -259,9 +275,14 @@ L<Net::Statsd::Tiny>
 =head1 SOURCE
 
 The development version is on github at L<https://github.com/robrwo/CatalystX-Statsd>
-and may be cloned from L<git://github.com/robrwo/CatalystX-Statsd.git>
+and may be cloned from L<https://github.com/robrwo/CatalystX-Statsd.git>
 
-=head1 BUGS
+=head1 SUPPORT
+
+Only the latest version of this module will be supported.
+
+This module requires Perl v5.20 or later.
+Future releases may only support Perl versions released in the last ten (10) years.
 
 Please report any bugs or feature requests on the bugtracker website
 L<https://github.com/robrwo/CatalystX-Statsd/issues>
@@ -270,9 +291,12 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+If the bug you are reporting has security implications which make it inappropriate to send to a public issue tracker,
+then see F<SECURITY.md> for instructions how to report security vulnerabilities.
+
 =head1 AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 The initial development of this module was sponsored by Science Photo
 Library L<https://www.sciencephoto.com>.
@@ -285,7 +309,7 @@ Slaven Rezić <slaven@rezic.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2024 by Robert Rothenberg.
+This software is Copyright (c) 2018-2026 by Robert Rothenberg.
 
 This is free software, licensed under:
 

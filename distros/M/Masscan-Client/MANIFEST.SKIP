@@ -1,0 +1,8 @@
+^\.git/
+^\.github/
+^Makefile$
+^MYMETA\.
+^Masscan-Client-[0-9._]+\.tar\.gz$
+^blib/
+^MANIFEST\.bak$
+^pm_to_blib$

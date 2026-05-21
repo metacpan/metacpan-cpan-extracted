@@ -27,7 +27,7 @@ Readonly::Scalar our $FALSE => 0;
 
 use parent qw(Class::Accessor::Validated);
 
-our $VERSION = '1.0.0';
+our $VERSION = '1.1.0';
 
 our @EXPORT_OK = qw(parse_distribution_path);
 

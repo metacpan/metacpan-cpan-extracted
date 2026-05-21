@@ -1,3 +1,7 @@
+Travel::Status::DE::DBRIS 0.28 - Tue May 05 2026
+
+    * Location: adjust for bahn.de-internal API changes
+
 Travel::Status::DE::DBRIS 0.27 - Sat Mar 28 2026
 
     * Handle wonky backend timestamps during DST transition (e.g. CET to CEST)

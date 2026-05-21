@@ -3,7 +3,7 @@ package Developer::Dashboard::EnvLoader;
 use strict;
 use warnings;
 
-our $VERSION = '3.14';
+our $VERSION = '3.90';
 
 use Cwd qw(abs_path cwd);
 use File::Basename qw(dirname);
@@ -34,12 +34,44 @@ sub load_runtime_layers {
 # Output: ordered array reference of loaded env file paths.
 sub load_skill_layers {
     my ( $class, %args ) = @_;
-    my @skill_layers = @{ $args{skill_layers} || [] };
-    my @files;
-    for my $skill_root (@skill_layers) {
-        push @files, $class->_env_file_candidates($skill_root);
+    return $class->_load_skill_layer_specs(
+        specs => $class->_skill_layer_specs( @{ $args{skill_layers} || [] } ),
+    );
+}
+
+# load_skill_layers_into_hash(%args)
+# Loads the ordered nested skill env chain into an isolated temporary
+# environment and returns only the added or changed keys.
+# Input: hash with skill_layers => array reference of skill root paths and
+# optional base_env => hash reference of starting environment values.
+# Output: hash reference with loaded file list and env overlay hash.
+sub load_skill_layers_into_hash {
+    my ( $class, %args ) = @_;
+    my $base_env = ref( $args{base_env} ) eq 'HASH' ? { %{ $args{base_env} } } : { %ENV };
+    my %before = %{$base_env};
+
+    local %ENV = %{$base_env};
+    local $ENV{DEVELOPER_DASHBOARD_ENV_AUDIT};
+    local %Developer::Dashboard::EnvAudit::AUDIT;
+
+    my $loaded = $class->_load_skill_layer_specs(
+        specs => $class->_skill_layer_specs( @{ $args{skill_layers} || [] } ),
+    );
+    my %overlay;
+    for my $key ( sort keys %ENV ) {
+        next
+          if exists $before{$key}
+          && (
+               ( !defined $before{$key} && !defined $ENV{$key} )
+            || ( defined $before{$key} && defined $ENV{$key} && $before{$key} eq $ENV{$key} )
+          );
+        $overlay{$key} = $ENV{$key};
     }
-    return $class->load_files( files => \@files );
+
+    return {
+        files => $loaded,
+        env   => \%overlay,
+    };
 }
 
 # load_files(%args)
@@ -66,6 +98,39 @@ sub load_files {
         push @loaded, $file;
     }
     return \@loaded;
+}
+
+# load_files_into_hash(%args)
+# Loads a specific ordered list of env files into an isolated temporary
+# environment and returns only the added or changed keys.
+# Input: hash with files => array reference of candidate file paths and
+# optional base_env => hash reference of starting environment values.
+# Output: hash reference with loaded file list and env overlay hash.
+sub load_files_into_hash {
+    my ( $class, %args ) = @_;
+    my $base_env = ref( $args{base_env} ) eq 'HASH' ? { %{ $args{base_env} } } : { %ENV };
+    my %before = %{$base_env};
+
+    local %ENV = %{$base_env};
+    local $ENV{DEVELOPER_DASHBOARD_ENV_AUDIT};
+    local %Developer::Dashboard::EnvAudit::AUDIT;
+
+    my $loaded = $class->load_files( files => $args{files} );
+    my %overlay;
+    for my $key ( sort keys %ENV ) {
+        next
+          if exists $before{$key}
+          && (
+               ( !defined $before{$key} && !defined $ENV{$key} )
+            || ( defined $before{$key} && defined $ENV{$key} && $before{$key} eq $ENV{$key} )
+          );
+        $overlay{$key} = $ENV{$key};
+    }
+
+    return {
+        files => $loaded,
+        env   => \%overlay,
+    };
 }
 
 # _plain_directory_env_files($paths)
@@ -103,7 +168,7 @@ sub _runtime_layer_env_files {
 # Output: ordered list of directory paths from root to cwd.
 sub _plain_directory_layers {
     my ( $class, $paths ) = @_;
-    my $cwd = cwd();
+    my $cwd = $paths->current_working_directory;
     return () if !defined $cwd || $cwd eq '';
     my $home = $paths->home;
     my $project_root = eval { $paths->current_project_root } || '';
@@ -140,6 +205,118 @@ sub _env_file_candidates {
         File::Spec->catfile( $root, '.env' ),
         File::Spec->catfile( $root, '.env.pl' ),
     );
+}
+
+# _load_skill_layer_specs(%args)
+# Loads the ordered nested skill env chain while preserving overwritten parent
+# values under their cumulative skill-name aliases before deeper skill segments
+# replace them.
+# Input: hash with specs => array reference of { root, prefix } hashes.
+# Output: ordered array reference of the env files that were actually loaded.
+sub _load_skill_layer_specs {
+    my ( $class, %args ) = @_;
+    my @specs = @{ $args{specs} || [] };
+    my @loaded;
+    my %seen;
+    my %key_prefix;
+    for my $spec (@specs) {
+        next if ref($spec) ne 'HASH';
+        my $prefix = $spec->{prefix} || '';
+        for my $file ( $class->_env_file_candidates( $spec->{root} ) ) {
+            next if !defined $file || $file eq '';
+            my $identity = $class->_path_identity($file);
+            next if $seen{$identity}++;
+            next if !-f $file;
+
+            my %before_env = %ENV;
+            my $before_audit = Developer::Dashboard::EnvAudit->keys;
+            if ( $file =~ /\.env\.pl\z/ ) {
+                $class->_load_env_pl_file($file);
+            }
+            else {
+                $class->_load_env_file($file);
+            }
+
+            for my $key ( sort keys %ENV ) {
+                next if $key eq 'DEVELOPER_DASHBOARD_ENV_AUDIT';
+                next
+                  if exists $before_env{$key}
+                  && (
+                       ( !defined $before_env{$key} && !defined $ENV{$key} )
+                    || ( defined $before_env{$key} && defined $ENV{$key} && $before_env{$key} eq $ENV{$key} )
+                  );
+                if ( exists $key_prefix{$key} && $key_prefix{$key} ne '' && $key_prefix{$key} ne $prefix && exists $before_env{$key} ) {
+                    my $parent_key = $key_prefix{$key} . '_' . $key;
+                    my $parent_source = ref($before_audit) eq 'HASH' && ref( $before_audit->{$key} ) eq 'HASH'
+                      ? ( $before_audit->{$key}{envfile} || $file )
+                      : $file;
+                    $ENV{$parent_key} = $before_env{$key};
+                    Developer::Dashboard::EnvAudit->record( $parent_key, $before_env{$key}, $parent_source );
+                }
+                $key_prefix{$key} = $prefix if $prefix ne '';
+            }
+            push @loaded, $file;
+        }
+    }
+    return \@loaded;
+}
+
+# _skill_layer_specs(@skill_layers)
+# Expands one ordered list of effective skill roots into their root-to-leaf
+# nested skill env chain, preserving DD-OOP layer order while deduplicating
+# repeated ancestry roots.
+# Input: ordered list of absolute skill root paths.
+# Output: ordered list of hash references with root and cumulative prefix.
+sub _skill_layer_specs {
+    my ( $class, @skill_layers ) = @_;
+    my @specs;
+    my %seen;
+    for my $skill_root (@skill_layers) {
+        for my $spec ( $class->_nested_skill_layer_specs($skill_root) ) {
+            my $identity = $class->_path_identity( $spec->{root} );
+            next if $seen{$identity}++;
+            push @specs, $spec;
+        }
+    }
+    return \@specs;
+}
+
+# _nested_skill_layer_specs($skill_root)
+# Expands one effective installed skill root into the cumulative nested
+# root-to-leaf skill chain used for env loading and preserved-parent aliases.
+# Input: absolute installed skill root path string.
+# Output: ordered list of hash references with root and cumulative prefix.
+sub _nested_skill_layer_specs {
+    my ( $class, $skill_root ) = @_;
+    return () if !defined $skill_root || $skill_root eq '';
+    my @parts = File::Spec->splitdir( File::Spec->canonpath($skill_root) );
+    my @skill_indexes = grep { $parts[$_] eq 'skills' && defined $parts[ $_ + 1 ] && $parts[ $_ + 1 ] ne '' } 0 .. $#parts - 1;
+    return ( { root => $skill_root, prefix => $class->_normalize_skill_env_prefix( $parts[-1] || '' ) } ) if !@skill_indexes;
+
+    my @specs;
+    my @segments;
+    for my $index (@skill_indexes) {
+        push @segments, $parts[ $index + 1 ];
+        my @root_parts = @parts[ 0 .. $index + 1 ];
+        push @specs, {
+            root   => File::Spec->catdir(@root_parts),
+            prefix => join( '_', map { $class->_normalize_skill_env_prefix($_) } @segments ),
+        };
+    }
+    return @specs;
+}
+
+# _normalize_skill_env_prefix($skill_name)
+# Normalizes one skill segment into the underscore-safe env prefix used when a
+# deeper nested skill preserves the parent segment's overwritten env keys.
+# Input: skill segment name string.
+# Output: normalized env-prefix fragment.
+sub _normalize_skill_env_prefix {
+    my ( $class, $skill_name ) = @_;
+    return '' if !defined $skill_name || $skill_name eq '';
+    $skill_name =~ s/[^A-Za-z0-9]+/_/g;
+    $skill_name =~ s/\A_+|_+\z//g;
+    return $skill_name;
 }
 
 # _load_env_file($file)

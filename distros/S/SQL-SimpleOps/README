@@ -1,4 +1,4 @@
-SQL-SimpleOps version 2026.101.1
+SQL-SimpleOps version 2026.131.1
 ================================
 
  The README is used to introduce the module and provide instructions on
@@ -20,6 +20,10 @@ INSTALLATION
   make
   make test		# see: TESTS, considerations and retrictions
   make install
+
+PACKAGE STRUCT
+
+  see: MANIFEST file
 
 TESTS
 
@@ -72,6 +76,9 @@ TESTS
    tables, schema and database. See: "Making the Tests inside Databases".
 
    see: "PREPARATION - MAKING THE TESTS INSIDE DATABASES" how to execute database tests.
+
+   NOTE: Only MariaDB, Postgress, SQLite databases can be test on installation.
+   No database test exists for standard DBI connectors.
 
 PREPARATION
 

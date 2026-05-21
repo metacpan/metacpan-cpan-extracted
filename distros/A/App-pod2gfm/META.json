@@ -20,7 +20,6 @@
          "eg",
          "examples",
          "share",
-         "t",
          "xt"
       ]
    },
@@ -40,6 +39,7 @@
             "App::CPANTS::Lint" : "0",
             "Data::Printer" : "0",
             "Devel::Cover" : "0",
+            "Devel::NYTProf" : "0",
             "Perl::Critic" : "0",
             "Perl::Tidy" : "0"
          },
@@ -53,11 +53,13 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Getopt::Long::More" : "0.007"
+         },
          "requires" : {
             "File::Basename" : "0",
             "File::Spec" : "0",
-            "Getopt::Long::More" : "0",
-            "Object::Pad" : "0.800",
+            "Object::Pad" : "0.825",
             "Pod::Markdown::Githubert" : "0.05",
             "Pod::Usage" : "0",
             "perl" : "5.040000"
@@ -65,10 +67,10 @@
       },
       "test" : {
          "requires" : {
-            "Capture::Tiny" : "0",
+            "Capture::Tiny" : "0.50",
             "File::Spec" : "0",
             "File::Spec::Functions" : "0",
-            "Path::Tiny" : "0",
+            "Path::Tiny" : "0.150",
             "Test2::V1" : "0"
          }
       }
@@ -84,9 +86,10 @@
          "web" : "https://github.com/ryoskzypu/App-pod2gfm"
       }
    },
-   "version" : "v1.0.1",
+   "version" : "v1.1.0",
    "x_contributors" : [
       "ryoskzypu <ryoskzypu@proton.me>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_spdx_expression" : "MIT-0"
 }

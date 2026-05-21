@@ -10,53 +10,64 @@ BEGIN {
     require "./$path";
 }
 
-my ($r, $w) = Atomic::Pipe->pair;
+BEGIN {
+    my $path = __FILE__;
+    $path =~ s{[^/]+\.t$}{select_mode.pm};
+    require "./$path";
+}
 
-worker { $w->write_message("aaa") };
-worker { $w->write_message("bbb") };
-worker { $w->write_message("ccc") };
+for my $use_select (io_select_modes()) {
+    subtest "use_io_select=$use_select" => sub {
+        my ($r, $w) = Atomic::Pipe->pair(use_io_select => $use_select);
 
-my @messages;
-push @messages => $r->read_message for 1 .. 3;
+        worker { $w->write_message("aaa") };
+        worker { $w->write_message("bbb") };
+        worker { $w->write_message("ccc") };
 
-is(
-    [sort @messages],
-    [sort qw/aaa bbb ccc/],
-    "Got all 3 short messages"
-);
+        my @messages;
+        push @messages => $r->read_message for 1 .. 3;
 
-worker { $w->write_message("aa" x PIPE_BUF) };
-worker { $w->write_message("bb" x PIPE_BUF) };
-worker { $w->write_message("cc" x PIPE_BUF) };
+        is(
+            [sort @messages],
+            [sort qw/aaa bbb ccc/],
+            "Got all 3 short messages"
+        );
 
-sleep 2 if $^O eq 'MSWin32';
+        worker { $w->write_message("aa" x PIPE_BUF) };
+        worker { $w->write_message("bb" x PIPE_BUF) };
+        worker { $w->write_message("cc" x PIPE_BUF) };
 
-@messages = ();
-push @messages => $r->read_message for 1 .. 3;
+        sleep 2 if $^O eq 'MSWin32';
 
-is(
-    [sort @messages],
-    [sort(('aa' x PIPE_BUF), ('bb' x PIPE_BUF), ('cc' x PIPE_BUF))],
-    "Got all 3 long messages, not mangled or mixed"
-);
+        @messages = ();
+        push @messages => $r->read_message for 1 .. 3;
 
-cleanup();
+        is(
+            [sort @messages],
+            [sort(('aa' x PIPE_BUF), ('bb' x PIPE_BUF), ('cc' x PIPE_BUF))],
+            "Got all 3 long messages, not mangled or mixed"
+        );
 
-worker { $w->write_message("dd" x PIPE_BUF) };
+        cleanup();
 
-sleep 2 if $^O eq 'MSWin32';
+        worker { $w->write_message("dd" x PIPE_BUF) };
 
-is(
-    $r->read_message(debug => 1),
-    {
-        message => ("dd" x PIPE_BUF),
-        # We are testing that we got 3 parts
-        parts => [2, 1 ,0],
-        pid => D(),
-        tid => D(),
-    },
-    "Got the pid, tid, message, and 3 parts were used"
-);
+        sleep 2 if $^O eq 'MSWin32';
 
-cleanup();
+        is(
+            $r->read_message(debug => 1),
+            {
+                message => ("dd" x PIPE_BUF),
+                # We are testing that we got 3 parts
+                parts => [2, 1 ,0],
+                pid => D(),
+                tid => D(),
+            },
+            "Got the pid, tid, message, and 3 parts were used"
+        );
+
+        cleanup();
+    };
+}
+
 done_testing;

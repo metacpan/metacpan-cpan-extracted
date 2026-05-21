@@ -1,8 +1,8 @@
 package Future::Uring;
-$Future::Uring::VERSION = '0.004';
+$Future::Uring::VERSION = '0.005';
 use 5.020;
 use warnings;
-use experimental 'signatures';
+use experimental qw/signatures lexical_subs/;
 
 use IO::Uring 0.012
 	qw/IOSQE_ASYNC IOSQE_IO_LINK IOSQE_IO_HARDLINK IOSQE_IO_DRAIN/,
@@ -444,7 +444,7 @@ Future::Uring - Future-returning io_uring functions
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

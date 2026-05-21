@@ -5,7 +5,7 @@ package Win32::NetAdmin;
 #Written by Douglas_Lankshear@ActiveWare.com
 #
 
-$VERSION = '0.13';
+$VERSION = '0.14';
 
 require Exporter;
 require DynaLoader;
@@ -131,7 +131,7 @@ $EXPORT_TAGS{ALL}= \@EXPORT_OK;
 
 =head1 NAME
 
-Win32::NetAdmin - Manage network groups and users in Perl
+Win32::NetAdmin - Manage network groups and users
 
 =head1 SYNOPSIS
 

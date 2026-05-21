@@ -2,7 +2,25 @@ use strict;
 use warnings;
 use Module::Build;
 
-my $builder = Module::Build->new(
+# Subclass to add a `./Build critic` action that runs Perl::Critic
+# against lib/ and t/ at the project's --gentle severity. Same check
+# as the author-mode test in t/author-perlcritic.t -- this just lets
+# you invoke it standalone without running the full test suite.
+my $class = Module::Build->subclass(
+	class => 'Test::MockModule::Builder',
+	code => <<'CRITIC_ACTION',
+sub ACTION_critic {
+	my $self = shift;
+	eval { require Test::Perl::Critic; 1 }
+		or die "./Build critic requires Test::Perl::Critic. "
+		     . "Install it with: cpanm Test::Perl::Critic\n";
+	Test::Perl::Critic->import(-severity => 'gentle');
+	Test::Perl::Critic::all_critic_ok('lib', 't');
+}
+CRITIC_ACTION
+);
+
+my $builder = $class->new(
 	module_name         => 'Test::MockModule',
 	create_license      => 1,
 	license             => 'perl',
@@ -26,7 +44,11 @@ my $builder = Module::Build->new(
 	},
 	test_requires => {
 		'Test::More'          => 0.88,
-		'Test::Warnings'      => 0
+		'Test::Warnings'      => 0,
+		'Test::Exception'     => 0,
+		'Class::Load'         => 0,
+		'Moose'               => 0,
+		'Mouse'               => 0,
 	},
 
 	add_to_cleanup => [

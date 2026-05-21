@@ -1,20 +1,16 @@
-package GDPR::IAB::TCFv2::Constants::RestrictionType;
-use strict;
+package GDPR::IAB::TCFv2::Constants::RestrictionType 0.520;
+use v5.12;
 use warnings;
 
 require Exporter;
-use base qw<Exporter>;
+use parent qw<Exporter>;
 
-use constant {
-    NotAllowed                => 0,
-    RequireConsent            => 1,
-    RequireLegitimateInterest => 2,
-};
+use constant {NotAllowed => 0, RequireConsent => 1, RequireLegitimateInterest => 2,};
 
 use constant RestrictionTypeDescription => {
-    NotAllowed                => "Purpose Flatly Not Allowed by Publisher",
-    RequireConsent            => "Require Consent",
-    RequireLegitimateInterest => "Require Legitimate Interest",
+  NotAllowed                => "Purpose Flatly Not Allowed by Publisher",
+  RequireConsent            => "Require Consent",
+  RequireLegitimateInterest => "Require Legitimate Interest",
 };
 
 our @EXPORT_OK = qw<
@@ -24,7 +20,7 @@ our @EXPORT_OK = qw<
   RestrictionTypeDescription
 >;
 
-our %EXPORT_TAGS = ( all => \@EXPORT_OK );
+our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 1;
 
@@ -32,11 +28,10 @@ __END__
 
 =head1 NAME
 
-GDPR::IAB::TCFv2::Constants::RestrictionType - TCF v2.2 publisher restriction type for vendor 
+GDPR::IAB::TCFv2::Constants::RestrictionType - TCF v2.3 publisher restriction types
 
 =head1 SYNOPSIS
 
-    use strict;
     use warnings;
     
     use GDPR::IAB::TCFv2::Constants::RestrictionType qw<:all>;

@@ -2,7 +2,7 @@ package LWP::ConsoleLogger::Everywhere;
 use strict;
 use warnings;
 
-our $VERSION = '1.000001';
+our $VERSION = '1.000002';
 
 use Class::Method::Modifiers ();
 use LWP::ConsoleLogger::Easy qw( debug_ua );
@@ -20,7 +20,12 @@ my $dispatch_logger;
         my $filename = $ENV{$key};
         $dispatch_logger = Log::Dispatch->new(
             outputs => [
-                [ 'File', min_level => 'debug', filename => $filename ],
+                [
+                    'File',
+                    min_level => 'debug',
+                    filename  => $filename,
+                    binmode   => ':encoding(UTF-8)',
+                ],
             ],
         );
     }
@@ -80,7 +85,7 @@ LWP::ConsoleLogger::Everywhere - LWP tracing everywhere
 
 =head1 VERSION
 
-version 1.000001
+version 1.000002
 
 =head1 SYNOPSIS
 

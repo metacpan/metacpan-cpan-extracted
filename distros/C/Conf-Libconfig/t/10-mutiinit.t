@@ -1,7 +1,6 @@
 #!perl -T
 use strict;
 use warnings;
-use bigint;
 use Data::Dumper;
 use Test::More tests => 5;
 

@@ -17,7 +17,7 @@ use Export::Attrs;
 
 # }}}
 # {{{ variables declaration
-our $VERSION = '0.2603300';
+our $VERSION = '0.2604300';
 
 # Preloaded methods go here.
 use vars qw(%diw %nom);
@@ -91,17 +91,18 @@ sub rur_in_words :Export {
 
     $retval = "";
     $out_rub = ($sum >= 1) ? 0 : 1;
-    $sum_rub = sprintf("%d", $sum);
-    $sum_rub-- if (($sum_rub - $sum) > 0);
-    $sum_kop = sprintf("%0.2f", ($sum - $sum_rub)) * 100;
+
+    # Split into integer rubles and integer kopecks via a single rounding
+    # decision in integer-kopeck space. Avoids NV->IV fragility on perls
+    # built with -Duselongdouble where sprintf("%d", 8) may yield "7".
+    my $total_kop = ($sum >= 0) ? int($sum * 100 + 0.5) : 0;
+    $sum_rub = int($total_kop / 100);
+    $sum_kop = $total_kop % 100;
     my $kop  = get_string($sum_kop, 0);
 
     for ($i=1; $i<6 && $sum_rub >= 1; $i++) {
-        my $sum_tmp  = $sum_rub / 1000;
-        my $sum_part = sprintf("%0.3f", $sum_tmp - sprintf("%d", $sum_tmp) ) * 1000;
-        $sum_rub     = sprintf("%d", $sum_tmp);
-
-        $sum_rub-- if ($sum_rub - $sum_tmp > 0);
+        my $sum_part = $sum_rub % 1000;
+        $sum_rub     = int($sum_rub / 1000);
         $retval = get_string($sum_part, $i)." ".$retval;
     }
     $retval .= " рублей" if ($out_rub == 0);
@@ -430,7 +431,7 @@ Lingua::RUS::Num2Word - Converts numbers to money sum in words (in Russian roubl
 
 =head1 VERSION
 
-version 0.2603300
+version 0.2604300
 
 =head1 SYNOPSIS
 

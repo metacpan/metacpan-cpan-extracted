@@ -13,17 +13,16 @@
 package Module::Generic::DateTime;
 BEGIN
 {
-    use v5.26.1;
+    use v5.16.0;
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'Module::Generic' );
     use parent qw( Module::Generic );
-    use vars qw( $ERROR $TS_RE $VERSION );
+    use vars qw( $ERROR $TS_RE $VERSION $NUMBER_REAL_RE $NUMBER_INT_RE );
     use DateTime::Lite v0.6.3;
     use DateTime::Format::Lite v0.1.2;
     use DateTime::Lite::TimeZone v0.5.3;
     use Module::Generic::Global ':const';
-    use Regexp::Common;
     use Scalar::Util ();
     use overload (
         q{""}   => sub{ $_[0]->{dt}->stringify },
@@ -59,10 +58,11 @@ BEGIN
         )?
     )?
     /x;
+    $NUMBER_REAL_RE = qr/(?:(?i)(?:[-+]?)(?:(?=[.]?[0123456789])(?:[0123456789]*)(?:(?:[.])(?:[0123456789]{0,}))?)(?:(?:[E])(?:(?:[-+]?)(?:[0123456789]+))|))/;
+    $NUMBER_INT_RE = qr/(?:(?:[-+]?)(?:[0123456789]+))/;
     our $VERSION = 'v0.6.4';
 };
 
-use v5.26.1;
 # use strict;
 no warnings 'redefine';
 
@@ -305,7 +305,7 @@ sub op_minus_plus
 
     my $v;
     $v = "$other" if( !ref( $other ) || ( ref( $other ) && overload::Method( $other => '""' ) ) );
-    die( "\$other (", overload::StrVal( $other // '' ), ") is not a number, a DateTime, a DateTime::Lite, or a DateTime::Duration object!\n" ) if( !defined( $v ) || $v !~ /^(?:$RE{num}{real}|$RE{num}{int})$/ );
+    die( "\$other (", overload::StrVal( $other // '' ), ") is not a number, a DateTime, a DateTime::Lite, or a DateTime::Duration object!\n" ) if( !defined( $v ) || $v !~ /^(?:$NUMBER_REAL_RE|$NUMBER_INT_RE)$/ );
     my $new_dt;
     if( $op eq '-' )
     {
@@ -501,7 +501,7 @@ sub DESTROY
 {
     # <https://perldoc.perl.org/perlobj#Destructors>
     CORE::local( $., $@, $!, $^E, $? );
-    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    CORE::return if( Module::Generic::_in_global_destruction() );
     my $self = CORE::shift( @_ );
     CORE::return if( !CORE::defined( $self ) );
     undef( $self->{dt} ) if( defined( $self->{dt} ) );
@@ -976,7 +976,7 @@ DESTROY
     # <https://perldoc.perl.org/perlobj#Destructors>
     CORE::local( $., $@, $!, $^E, $? );
     my $self = CORE::shift( @_ );
-    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    CORE::return if( Module::Generic::_in_global_destruction() );
     CORE::return if( !CORE::defined( $self ) );
     undef( $self->{interval} ) if( defined( $self->{interval} ) );
     return( $self );

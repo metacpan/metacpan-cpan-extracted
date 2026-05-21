@@ -233,6 +233,124 @@ my $env = { PATH_INFO => '/' };
         qr/^500/,
         're-throws error on development'
     );
+
+    # We're in production and there is no error page
+    $ENV{PLACK_ENV} = 'deployment';
+    $routes->spew('* /d C unimplemented');
+    $app->_load_routes;
+    like(
+        dies { $app->run },
+        qr/dispatch failed/i,
+        're-throws even in production if no error route is set'
+    );
+
+    # Incomplete route
+    $routes->spew(<<~EOF);
+        * a C
+        * b
+        EOF
+    $app->_load_routes;
+    $r_env->{PATH_INFO} = 'a';
+    like(
+        dies { $app->run },
+        qr/no action configured/i,
+        'dies if action is undef'
+    );
+    $r_env->{PATH_INFO} = 'b';
+    like(
+        dies { $app->run },
+        qr/no controller/i,
+        'dies if controller is undef'
+    );
+
+    # Simulate a defined but empty action
+    like(
+        dies {
+            $app->_setup_controller ({
+                    controller => 'C', action => ''
+                })
+        },
+        qr/no action configured/i,
+        'dies if action is empty'
+    );
+}
+
+# Action hooks
+{
+    local @INC = ( $dir->absolute, @INC );
+    my $a_env = { };
+    my $hooked_controller = $dir->child('H.pm');
+    $hooked_controller->spew(<<~\EOF);
+        use v5.40;
+        use experimental 'class';
+        class H {
+            field $app :param;
+            field $route :param;
+
+            method before_action ($break) { $break eq 'halt' ? 'halt' : undef }
+            method after_action ($r) { $r->[0]++ if $route->{action} eq 'alter' }
+            method normal { [1] }
+            method alter  { [1] }
+            method halt   {     }
+        }
+        EOF
+    my $routes = $dir->child('etc/routes.map');
+    $routes->spew(<<~'EOF'
+        * n H normal
+        * h H halt
+        * a H alter
+        EOF
+    );
+
+    my $app = Minima::App->new(environment => $a_env);
+
+    # no before_action break
+    $a_env->{PATH_INFO} = 'n';
+    is( $app->run, [1], 'before_action passes' );
+
+    # break on before_action
+    $a_env->{PATH_INFO} = 'h';
+    is( $app->run, 'halt', 'before_action can halt normal response' );
+
+    # after_action works
+    $a_env->{PATH_INFO} = 'a';
+    is( $app->run, [2], 'after_action modifies response' );
+
+    $routes->remove;
+}
+
+# Routes redirect
+{
+    my $r_env = { PATH_INFO => '/old', REQUEST_METHOD => 'GET' };
+    my $routes = $dir->child('etc/routes.map');
+
+    $routes->spew(<<~'EOF'
+        GET /old @redirect /new
+        GET /gone @rp /here
+        EOF
+    );
+
+    my $app = Minima::App->new(environment => $r_env);
+    my $response = $app->run;
+
+    is( $response->[0], 302, 'routes temporary redirect' );
+    is(
+        +{ $response->[1]->@* }->{Location},
+        '/new',
+        'sets temporary redirect location'
+    );
+
+    $r_env->{PATH_INFO} = '/gone';
+    $response = $app->run;
+
+    is( $response->[0], 301, 'routes permanent redirect alias' );
+    is(
+        +{ $response->[1]->@* }->{Location},
+        '/here',
+        'sets permanent redirect location'
+    );
+
+    $routes->remove;
 }
 
 # Routes with custom controller prefixes
@@ -265,6 +383,8 @@ my $env = { PATH_INFO => '/' };
         qr/SecretPrefix::X/,
         'adds custom controller prefix'
     );
+
+    $routes->remove;
 }
 
 chdir;

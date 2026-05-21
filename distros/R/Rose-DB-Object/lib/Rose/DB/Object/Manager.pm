@@ -374,6 +374,27 @@ sub get_objects_count
 sub get_objects_iterator { shift->get_objects(@_, return_iterator => 1) }
 sub get_objects_sql      { shift->get_objects(@_, return_sql => 1) }
 
+sub _include_sort_column
+{
+  my($columns, $methods, $di_keys, $table, $class, $meta, $column) = @_;
+
+  my $col_meta = $meta->column($column) or return;
+
+  my $cols = $columns->{$table} ||= [];
+  return  if(grep { $_ eq $column } @$cols);
+
+  $columns->{$table} = $cols = [ @$cols ];
+  push(@$cols, $column);
+
+  my $method = $meta->column_mutator_method_name($column);
+  my $method_list = $methods->{$table} ||= [];
+  $methods->{$table} = $method_list = [ @$method_list ];
+  push(@$method_list, $method);
+
+  $di_keys->{$class} = { %{ $di_keys->{$class} || {} } };
+  $di_keys->{$class}{$method} = $col_meta->db_value_hash_key;
+}
+
 use constant WITH => 555; # arbitrary
 
 sub get_objects
@@ -1235,11 +1256,26 @@ sub get_objects
             my $sort_by = ref $mgr_args->{'sort_by'} eq 'ARRAY' ?
               [ @{$mgr_args->{'sort_by'}} ] : [ $mgr_args->{'sort_by'} ];
 
+            my $mysql = $db->dbi_driver eq 'mysql';
+
             foreach my $sort (@$sort_by)
             {
               no warnings 'uninitialized';
-              $sort =~ s/^(['"`]?)(\w+)\1(\s+(?:ASC|DESC))?$/t$i.$1$2$1$3/i
-                unless(ref $sort);
+              if(!ref $sort && $sort =~ /^(['"`]?)(\w+)\1(\s+(?:ASC|DESC))?$/i)
+              {
+                my $matched_col = $2;
+
+                $sort =~ s/^(['"`]?)(\w+)\1(\s+(?:ASC|DESC))?$/t$i.$1$2$1$3/i
+                  unless(ref $sort);
+
+                # When ONLY_FULL_GROUP_BY is enabled in MySQL, we need to make sure
+                # the ORDER BY columns are in the SELECT list when DISTINCT is used.
+                # Do it for all MySQL SELECT DISTINCT queries, because it's simpler.
+                if($mysql && $args{'distinct'})
+                {
+                  _include_sort_column(\%columns, \%methods, \%di_keys, $tables[-1], $ft_class, $ft_meta, $matched_col);
+                }
+              }
             }
 
             push(@{$args{'sort_by'}}, @$sort_by);
@@ -1506,12 +1542,27 @@ sub get_objects
             my $sort_by = ref $mgr_args->{'sort_by'} eq 'ARRAY' ?
               [ @{$mgr_args->{'sort_by'}} ] : [ $mgr_args->{'sort_by'} ];
 
+            my $mysql = $db->dbi_driver eq 'mysql';
+
             # translate un-prefixed simple columns
             foreach my $sort (@$sort_by)
             {
               no warnings 'uninitialized';
-              $sort =~ s/^(['"`]?)(\w+)\1(\s+(?:ASC|DESC))?$/t$i.$1$2$1$3/i
-                unless(ref $sort);
+              if(!ref $sort && $sort =~ /^(['"`]?)(\w+)\1(\s+(?:ASC|DESC))?$/i)
+              {
+				my $matched_col = $2;
+
+                $sort =~ s/^(['"`]?)(\w+)\1(\s+(?:ASC|DESC))?$/t$i.$1$2$1$3/i
+                  unless(ref $sort);
+
+                # When ONLY_FULL_GROUP_BY is enabled in MySQL, we need to make sure
+                # the ORDER BY columns are in the SELECT list when DISTINCT is used.
+                # We will just do this for all MySQL queries, because it's simpler.
+                if($mysql && $args{'distinct'})
+                {
+                  _include_sort_column(\%columns, \%methods, \%di_keys, $tables[-1], $ft_class, $ft_meta, $matched_col);
+                }
+              }
             }
 
             push(@{$args{'sort_by'}}, @$sort_by);
@@ -3221,6 +3272,8 @@ sub delete_objects
       my $sth = $prepare_cached ? $dbh->prepare_cached($sql, undef, 3) : 
                                   $dbh->prepare($sql) or die $dbh->errstr;
 
+      my $rv;
+
       if(@bind_params)
       {
         my $i = 1;
@@ -3231,14 +3284,16 @@ sub delete_objects
           $i++;
         }
 
-        $sth->execute;
+        $rv = $sth->execute;
       }
       else
       {
-        $sth->execute(@$bind);
+        $rv = $sth->execute(@$bind);
       }
 
       $count = $sth->rows || 0;
+      $count = $rv  if($count < 0);
+      $count = 0    if(defined $count && $count eq '0E0');
     };
 
     $error = $@;
@@ -3358,6 +3413,8 @@ sub update_objects
       my $sth = $prepare_cached ? $dbh->prepare_cached($sql, undef, 3) : 
                                   $dbh->prepare($sql) or die $dbh->errstr;
 
+      my $rv;
+
       if(@bind_params)
       {
         my $i = 1;
@@ -3368,14 +3425,17 @@ sub update_objects
           $i++;
         }
 
-        $sth->execute;
+        $rv = $sth->execute;
       }
       else
       {
-        $sth->execute(@$set_bind, @$where_bind);
+        $rv = $sth->execute(@$set_bind, @$where_bind);
       }
 
+      # When running queries that affect zero rows, DBD::Pg now returns 
+      # 0E0 from execute() and -1 from rows(), so handle that below.
       $count = $sth->rows || 0;
+      $count = int($rv)  if($count < 0); # coerce 0E0 to 0
     };
 
     $error = $@;

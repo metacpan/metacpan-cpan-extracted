@@ -2,7 +2,7 @@ package IPC::Manager::Client::LocalMemory;
 use strict;
 use warnings;
 
-our $VERSION = '0.000035';
+our $VERSION = '0.000037';
 
 use Carp qw/croak/;
 
@@ -73,9 +73,16 @@ sub init {
         }
     }
     else {
-        if ($store->{clients}{$id}) {
-            $self->{disconnected} = 1;
-            croak "Client '$id' already exists";
+        if (my $existing = $store->{clients}{$id}) {
+            my $epid = $existing->{pid};
+            if ($epid && !$self->pid_is_running($epid)) {
+                delete $store->{clients}{$id};
+                delete $store->{stats}{$id};
+            }
+            else {
+                $self->{disconnected} = 1;
+                croak "Client '$id' already exists";
+            }
         }
         $store->{clients}{$id} = {
             pid      => $$,
@@ -84,6 +91,7 @@ sub init {
     }
 
     $store->{clients}{$id}{pid} = $$;
+    delete $store->{clients}{$id}{suspend_expires_at};
 }
 
 sub pending_messages { 0 }
@@ -126,7 +134,34 @@ sub send_message {
 sub peers {
     my $self  = shift;
     my $store = $self->_store;
-    return sort grep { $_ ne $self->{id} } keys %{$store->{clients}};
+
+    my @out;
+    for my $peer (keys %{$store->{clients}}) {
+        next if $peer eq $self->{id};
+        my $pid = $store->{clients}{$peer}{pid};
+        next if $pid && !$self->pid_is_running($pid);
+        push @out => $peer;
+    }
+    return sort @out;
+}
+
+sub peer_left {
+    my $self  = shift;
+    my $store;
+    unless (eval { $store = $self->_store; 1 }) { warn $@; return 0 }
+
+    my $removed = 0;
+    for my $peer (keys %{$store->{clients}}) {
+        next if $peer eq $self->{id};
+        my $pid = $store->{clients}{$peer}{pid};
+        next unless $pid;
+        next if $self->pid_is_running($pid);
+
+        delete $store->{clients}{$peer};
+        delete $store->{stats}{$peer};
+        $removed++;
+    }
+    return $removed;
 }
 
 sub peer_exists {
@@ -173,6 +208,31 @@ sub post_disconnect_hook {
     my $store;
     unless (eval { $store = $self->_store; 1 }) { warn $@; return }
     delete $store->{clients}{$self->{id}};
+}
+
+sub pre_suspend_hook {
+    my $self = shift;
+    my (%params) = @_;
+
+    my $expires_at = $params{expires_at};
+    return unless defined $expires_at;
+
+    my $store;
+    unless (eval { $store = $self->_store; 1 }) { warn $@; return }
+
+    my $entry = $store->{clients}{$self->{id}} or return;
+    $entry->{suspend_expires_at} = $expires_at + 0;
+}
+
+sub peer_suspend_expires {
+    my $self = shift;
+    my ($peer_id) = @_;
+    return undef unless defined $peer_id && length $peer_id;
+
+    my $store;
+    return undef unless eval { $store = $self->_store; 1 };
+    my $entry = $store->{clients}{$peer_id} or return undef;
+    return $entry->{suspend_expires_at};
 }
 
 1;

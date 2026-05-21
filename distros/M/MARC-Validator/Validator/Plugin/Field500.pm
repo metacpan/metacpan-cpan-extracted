@@ -12,7 +12,7 @@ use MARC::Leader 0.08;
 use MARC::Field008;
 use MARC::Validator::Const;
 
-our $VERSION = 0.17;
+our $VERSION = 0.21;
 
 sub module_name {
 	my $self = shift;
@@ -67,6 +67,7 @@ sub process {
 			my $lang = $marc_record->subfield('040', 'b');
 			my $qr;
 			if (defined $lang
+				&& exists $MARC::Validator::Const::FIELD_500{$lang}
 				&& exists $MARC::Validator::Const::FIELD_500{$lang}->{'index'}) {
 
 				$qr = $MARC::Validator::Const::FIELD_500{$lang}->{'index'};

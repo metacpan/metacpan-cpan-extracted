@@ -2,7 +2,7 @@
 #define CHANDRA_SOCKET_HUB_H
 
 /*
- * chandra_socket_hub.h — C helpers for Chandra::Socket::Hub
+ * chandra_socket_hub.h - C helpers for Chandra::Socket::Hub
  *
  * Static functions for listener setup, polling, broadcasting, and cleanup.
  * Depends on chandra_socket_common.h for shared utilities.
@@ -174,7 +174,7 @@ _hub_start_listener(pTHX_ SV *self)
         ? SvPV_nolen(*transport_svp) : "unix";
 
 #ifdef _WIN32
-    /* Auto-upgrade to TCP on Windows — Unix domain sockets not available */
+    /* Auto-upgrade to TCP on Windows - Unix domain sockets not available */
     if (!strEQ(transport, "tcp")) {
         transport = "tcp";
         (void)hv_stores(hv, "transport", newSVpvs("tcp"));
@@ -320,7 +320,7 @@ _hub_process_handshake(pTHX_ SV *self, HV *hv, SV *conn, IV fh_fileno,
     htok_svp  = hv_fetchs(hdata_hv, "token", 0);
     hname_svp = hv_fetchs(hdata_hv, "name", 0);
 
-    /* Verify token — use Token manager if available, else raw compare */
+    /* Verify token - use Token manager if available, else raw compare */
     if (htok_svp && SvOK(*htok_svp) && token_sv && SvOK(token_sv)) {
         SV **tm_svp = hv_fetchs(hv, "_token_manager", 0);
         if (tm_svp && SvOK(*tm_svp) && SvROK(*tm_svp)) {

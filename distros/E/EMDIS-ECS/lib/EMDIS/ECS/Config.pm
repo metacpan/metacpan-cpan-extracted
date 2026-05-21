@@ -21,8 +21,8 @@ use vars qw($AUTOLOAD %ok_attr);
 BEGIN
 {
     my @attrlist = qw(
-        MSG_PROC MAIL_MRK THIS_NODE T_CHK T_SCN ERR_FILE LOG_FILE ADM_ADDR
-        M_MSG_PROC BCK_DIR ACK_THRES LOG_LEVEL MAIL_LEVEL
+        MSG_PROC MAIL_MRK THIS_NODE T_CHK T_SCN T_INBOUND ERR_FILE LOG_FILE
+        ADM_ADDR M_MSG_PROC BCK_DIR ACK_THRES LOG_LEVEL MAIL_LEVEL
         ECS_BIN_DIR ECS_DAT_DIR ECS_TO_DIR ECS_FROM_DIR ECS_DEBUG
         NODE_TBL NODE_TBL_LCK T_ADM_DELAY T_ADM_REMIND T_MSG_PROC
         ADAPTER_CMD ALWAYS_ACK GNU_TAR T_RESEND_DELAY
@@ -324,6 +324,7 @@ sub _set_defaults
     $this->{MAIL_MRK}          = "EMDIS";
     $this->{T_CHK}             = "7200";
     $this->{T_SCN}             = "3600";
+    $this->{T_INBOUND}         = "2400";
     $this->{ENABLE_ENV_CONFIG} = 'YES';
     my $basename = basename($0);   # default;  use magic logfile name
     $this->{ERR_FILE}          = "$basename.err";
@@ -393,8 +394,8 @@ sub _validate_config
     my $this = shift;
     my @errors = ();
     my @required_attrlist = qw(
-        MSG_PROC MAIL_MRK THIS_NODE T_CHK T_SCN ERR_FILE LOG_FILE ADM_ADDR
-        M_MSG_PROC BCK_DIR ACK_THRES
+        MSG_PROC MAIL_MRK THIS_NODE T_CHK T_SCN T_INBOUND ERR_FILE LOG_FILE
+        ADM_ADDR M_MSG_PROC BCK_DIR ACK_THRES
         ECS_BIN_DIR ECS_DAT_DIR ECS_DEBUG
         NODE_TBL NODE_TBL_LCK T_ADM_REMIND T_MSG_PROC
         SMTP_HOST SMTP_DOMAIN SMTP_TIMEOUT SMTP_DEBUG SMTP_FROM
@@ -529,6 +530,13 @@ sub _validate_config
     {
         push(@errors,
             "T_SCN ($this->{T_SCN}) is required to be greater than zero.");
+    }
+
+    # validate T_INBOUND
+    if($this->{T_INBOUND} < 0)
+    {
+        push(@errors,
+            "T_INBOUND ($this->{T_INBOUND}) is required to be non-negative.");
     }
 
     # validate T_ADM_REMIND
@@ -1033,6 +1041,10 @@ seconds to wait before repeating admin notification of communication loss
 
 seconds between ECS connection checks
 
+=item T_INBOUND
+
+inbound processing time limit (seconds) per scan
+
 =item T_MSG_PROC
 
 message processing time limit, in seconds
@@ -1043,7 +1055,8 @@ seconds to delay before automatically sending a batch of RE_SEND requests
 
 =item T_SCN
 
-seconds between scans of email inbox
+seconds between scans of email inbox, and processing time limit per scan
+interval
 
 =item THIS_NODE
 

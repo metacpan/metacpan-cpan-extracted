@@ -1,0 +1,38 @@
+---
+config:
+  close_stdin: 0
+  dedup: 1
+  test_empty: 1
+  test_non_ascii: 0
+  test_nuls: 0
+  test_security: 0
+  test_undef: 0
+
+function: originating_ip
+
+module: Email::Abuse::Investigator
+new: Email::Abuse::Investigator
+accessor:
+  property: _origin
+  type: getter
+output:
+  type: hashref
+# TODO: looks like a bug in Return::Set or Params::Validate::Strict
+# schema:
+#   ip:
+#     type: string
+#     semantic: ipv4
+#   rdns:
+#     type: string
+#   org:
+#     type: string
+#   abuse:
+#     type: string
+#   confidence:
+#     type: string
+#   note:
+#     type: string
+#   country:
+#     type: string
+#     optional: 1
+#     matches: '^[A-Z]{2}$'

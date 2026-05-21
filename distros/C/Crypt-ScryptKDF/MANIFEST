@@ -7,6 +7,7 @@ MANIFEST			This list of files
 META.json
 META.yml
 README
+SECURITY.md
 src/crypto_scrypt-nosse.c
 src/crypto_scrypt.h
 src/msinttypes.h

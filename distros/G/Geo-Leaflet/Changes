@@ -1,5 +1,12 @@
 Revision history for Perl extension Geo::Leaflet.
 
+0.04 2024-12-03
+  - BREAKING CHANGE - Renamed method html_head_link to html_head_links
+  - Moved package variables @ICONS and @OBJECTS to object methods icon_objects and map_objects
+  - Added method divIcon and package Geo::Leaflet::DivIcon
+  - Renamed packages to use proper case, added _method_name property, replaced class parsing logic with _method_name property
+  - Updated example script to show divIcon capabilities
+
 0.03 2024-11-14
   - BREAKING CHANGE - Changed map width and height from integer pixel to string percent or pixel
   - Change default height and width to 100%

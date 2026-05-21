@@ -7,6 +7,7 @@ inc/Module/Install/DOAPChangeSets.pm
 inc/Module/Install/Fetch.pm
 inc/Module/Install/Makefile.pm
 inc/Module/Install/Metadata.pm
+inc/Module/Install/Scripts.pm
 inc/Module/Install/Share.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
@@ -42,6 +43,9 @@ share/endpoint/www/js/undo.js
 share/endpoint/www/js/unittests.js
 share/endpoint/www/js/util.js
 t/00.load.t
+t/gsp-custom-endpoint.t
+t/gsp-read-only.t
+t/gsp.t
 t/simple.t
 xt/pod-coverage.t
 xt/pod.t

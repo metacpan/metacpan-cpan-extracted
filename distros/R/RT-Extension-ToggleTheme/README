@@ -1,11 +1,14 @@
 NAME
-    RT-Extension-ToggleTheme - Toggle elevator light and dark theme.
+    RT-Extension-ToggleTheme - Toggle light and dark theme.
 
 DESCRIPTION
-    To save your eyes in the dark.
+    Adds a light/dark mode toggle button to the RT 6 navigation bar. Works
+    with any Bootstrap 5 theme. The toggle button displays for users who
+    have the ModifySelf right and appears in both the privileged and
+    self-service interfaces.
 
 RT VERSION
-    Works with RT 5
+    Works with RT 6
 
 INSTALLATION
     perl Makefile.PL
@@ -13,16 +16,13 @@ INSTALLATION
     make install
         May need root permissions
 
-    Edit your /opt/rt5/etc/RT_SiteConfig.pm
+    Edit your /opt/rt6/etc/RT_SiteConfig.pm
         Add this line:
 
             Plugin('RT::Extension::ToggleTheme');
 
-    Apply patch to RT5
-            patch -d /opt/r5 -p1 < patches/header-callback.patch
-
     Clear your mason cache
-            rm -rf /opt/rt5/var/mason_data/obj
+            rm -rf /opt/rt6/var/mason_data/obj
 
     Restart your webserver
 

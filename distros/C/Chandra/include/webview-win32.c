@@ -1,5 +1,5 @@
 /*
- * webview-win32.c — Windows backend for webview.h
+ * webview-win32.c - Windows backend for webview.h
  *
  * Tries Edge/WebView2 at runtime; falls back to MSHTML (IE11) if unavailable.
  * Included by webview.h when WEBVIEW_WINAPI is defined.

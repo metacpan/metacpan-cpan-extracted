@@ -5,20 +5,39 @@ our @CustomFields = (
     {   Name        => 'MISP Event ID',
         Type        => 'FreeformSingle',
         Disabled    => 0,
-        Queue       => 'Incidents',
+        Queue       => [],
         LinkValueTo => '__MISPURL__/events/view/__CustomField__',
     },
     {   Name        => 'MISP Event UUID',
         Type        => 'FreeformSingle',
         Disabled    => 0,
-        Queue       => 'Incidents',
+        Queue       => [],
         LinkValueTo => '__MISPURL__/events/view/__CustomField__',
     },
     {   Name        => 'MISP RTIR Object ID',
         Type        => 'FreeformSingle',
         Disabled    => 0,
-        Queue       => 'Incidents',
+        Queue       => [],
     },
+);
+
+our @Final = (
+    sub {
+        my $incidents = RT::Queues->new( RT->SystemUser );
+        $incidents->Limit( FIELD => 'Lifecycle', VALUE => 'incidents' );
+        my @incidents = @{ $incidents->ItemsArrayRef };
+
+        for my $field ( 'MISP Event ID', 'MISP Event UUID', 'MISP RTIR Object ID' ) {
+            my $cf = RT::CustomField->new( RT->SystemUser );
+            $cf->LoadByName( Name => $field, LookupType => RT::Ticket->CustomFieldLookupType );
+            for my $incident (@incidents) {
+                my ( $ret, $msg ) = $cf->AddToObject($incident);
+                if ( !$ret ) {
+                    RT->Logger->error( "Couldn't apply $field to incident queue #" . $incident->Id . ": $msg" );
+                }
+            }
+        }
+    }
 );
 
 1;

@@ -60,7 +60,7 @@
          "web" : "https://github.com/giterlizzi/perl-SBOM-CycloneDX"
       }
    },
-   "version" : 1.07,
+   "version" : 1.08,
    "x_purl" : "pkg:cpan/GDT/SBOM-CycloneDX",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

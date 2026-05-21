@@ -6,9 +6,10 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   Test2::V0: '0'
 configure_requires:
+  ExtUtils::MakeMaker: '7.78'
   ExtUtils::MakeMaker::CPANfile: '0.09'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,6 +19,8 @@ no_index:
   directory:
     - t
     - inc
+recommends:
+  Future::IO::Resolver: '0'
 requires:
   Feature::Compat::Try: '0'
   Future: '0'
@@ -27,16 +30,17 @@ requires:
   Future::Selector: '0'
   Log::Any: '0'
   Object::Pad: '0.821'
-  Protocol::Sys::Virt: v11.10.1
-  Protocol::Sys::Virt::KeepAlive: v11.10.1
-  Protocol::Sys::Virt::Remote: v11.10.1
-  Protocol::Sys::Virt::Remote::XDR: v11.10.1
-  Protocol::Sys::Virt::UNIXSocket: v11.10.1
-  Protocol::Sys::Virt::URI: v11.10.1
+  Protocol::Sys::Virt: v12.3.0
+  Protocol::Sys::Virt::KeepAlive: v12.3.0
+  Protocol::Sys::Virt::Remote: v12.3.0
+  Protocol::Sys::Virt::Remote::XDR: v12.3.0
+  Protocol::Sys::Virt::TypedParams: v12.3.0
+  Protocol::Sys::Virt::UNIXSocket: v12.3.0
+  Protocol::Sys::Virt::URI: v12.3.0
   Sublike::Extended: '0.29'
   perl: v5.26.0
 resources:
   bugtracker: https://github.com/ehuelsmann/perl-sys-async-virt/issues
   repository: git://github.com/ehuelsmann/perl-sys-async-virt.git
-version: v0.2.3
+version: v0.6.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

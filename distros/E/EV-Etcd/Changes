@@ -1,5 +1,13 @@
 Revision history for EV-Etcd
 
+0.07  2026-04-29
+    - Fix use-after-free on cancelled streaming handles past client cleanup
+    - Fix memory leak in txn op size validation
+    - Fix int64/uint64 truncation on 32-bit Perl
+    - Document response shapes; add ENCODING section; polish POD
+    - CI: add Linux ARM runners
+    - Expand t/ coverage; add xt/ author tests and four eg/ patterns
+
 0.06  2026-03-17
     - Add opts to lease_keepalive (auto_reconnect) and member_list (linearizable)
     - Preserve watch_id across reconnects

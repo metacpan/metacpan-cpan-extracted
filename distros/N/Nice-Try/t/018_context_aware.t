@@ -5,7 +5,7 @@ BEGIN
     use warnings;
     use Test::More qw( no_plan );
     use Nice::Try;
-    use Want;
+    use Wanted;
     our $DEBUG = 0;
 };
 
@@ -70,32 +70,32 @@ sub try_me
     my @args = @_;
     try
     {
-        if( Want::want( 'OBJECT' ) )
+        if( Wanted::want( 'OBJECT' ) )
         {
             diag( "Called in object context" ) if( $DEBUG );
             $cb->( $expect => 'object' );
             # return( main, [qw( Hello world )] );
             return( My::Object->new( qw( Hello world ) ) );
         }
-        elsif( Want::want( 'HASH' ) )
+        elsif( Wanted::want( 'HASH' ) )
         {
             diag( "Called in hash context" ) if( $DEBUG );
             $cb->( $expect => 'hash' );
             return( { name => 'John Doe' } );
         }
-        elsif( Want::want( 'ARRAY' ) )
+        elsif( Wanted::want( 'ARRAY' ) )
         {
             diag( "Called in array context" ) if( $DEBUG );
             $cb->( $expect => 'array' );
             return( [qw( Jack John Paul Mark Peter )] );
         }
-        elsif( Want::want( 'CODE' ) )
+        elsif( Wanted::want( 'CODE' ) )
         {
             diag( "Called in code context" ) if( $DEBUG );
             $cb->( $expect => 'code' );
             return( sub{ $args[0] } );
         }
-        elsif( Want::want( 'GLOB' ) )
+        elsif( Wanted::want( 'GLOB' ) )
         {
             diag( "Called in glob context" ) if( $DEBUG );
             $cb->( $expect => 'glob' );
@@ -103,19 +103,19 @@ sub try_me
             open( my $fh, '>', \$ref );
             return( $fh );
         }
-        elsif( Want::want( 'SCALAR REF' ) )
+        elsif( Wanted::want( 'SCALAR REF' ) )
         {
             diag( "Called in scalar ref context" ) if( $DEBUG );
             $cb->( $expect => 'scalar ref' );
             return( \"Jack" );
         }
-        elsif( Want::want( 'BOOLEAN' ) )
+        elsif( Wanted::want( 'BOOLEAN' ) )
         {
             diag( "Called in boolean context" ) if( $DEBUG );
             $cb->( $expect => 'boolean' );
             return( 1 );
         }
-        elsif( Want::want( 'SCALAR' ) )
+        elsif( Wanted::want( 'SCALAR' ) )
         {
             diag( "Called in scalar context" ) if( $DEBUG );
             $cb->( $expect => 'scalar' );
@@ -147,32 +147,32 @@ sub catch_me
     }
     catch( $e )
     {
-        if( Want::want( 'OBJECT' ) )
+        if( Wanted::want( 'OBJECT' ) )
         {
             diag( "Called in object context" ) if( $DEBUG );
             $cb->( $expect => 'object' );
             # return( main, [qw( Hello world )] );
             return( My::Object->new( qw( Hello world ) ) );
         }
-        elsif( Want::want( 'HASH' ) )
+        elsif( Wanted::want( 'HASH' ) )
         {
             diag( "Called in hash context" ) if( $DEBUG );
             $cb->( $expect => 'hash' );
             return( { name => 'John Doe' } );
         }
-        elsif( Want::want( 'ARRAY' ) )
+        elsif( Wanted::want( 'ARRAY' ) )
         {
             diag( "Called in array context" ) if( $DEBUG );
             $cb->( $expect => 'array' );
             return( [qw( Jack John Paul Mark Peter )] );
         }
-        elsif( Want::want( 'CODE' ) )
+        elsif( Wanted::want( 'CODE' ) )
         {
             diag( "Called in code context" ) if( $DEBUG );
             $cb->( $expect => 'code' );
             return( sub{ $args[0] } );
         }
-        elsif( Want::want( 'GLOB' ) )
+        elsif( Wanted::want( 'GLOB' ) )
         {
             diag( "Called in glob context" ) if( $DEBUG );
             $cb->( $expect => 'glob' );
@@ -180,19 +180,19 @@ sub catch_me
             open( my $fh, '>', \$ref );
             return( $fh );
         }
-        elsif( Want::want( 'SCALAR REF' ) )
+        elsif( Wanted::want( 'SCALAR REF' ) )
         {
             diag( "Called in scalar ref context" ) if( $DEBUG );
             $cb->( $expect => 'scalar ref' );
             return( \"Jack" );
         }
-        elsif( Want::want( 'BOOLEAN' ) )
+        elsif( Wanted::want( 'BOOLEAN' ) )
         {
             diag( "Called in boolean context" ) if( $DEBUG );
             $cb->( $expect => 'boolean' );
             return( 0 );
         }
-        elsif( Want::want( 'SCALAR' ) )
+        elsif( Wanted::want( 'SCALAR' ) )
         {
             diag( "Called in scalar context" ) if( $DEBUG );
             $cb->( $expect => 'scalar' );

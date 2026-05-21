@@ -1,0 +1,30 @@
+<%INIT>
+use RT::Attachment;
+use RT::Ticket;
+
+my $id = $ARGS{id};
+
+my $att = RT::Attachment->new($session{CurrentUser});
+$att->Load($id);
+
+unless ($att->id) {
+    $r->status(404);
+    return;
+}
+
+# Check ACL
+my $txn = $att->TransactionObj;
+my $ticket = $txn ? $txn->TicketObj : undef;
+
+unless ($ticket && $ticket->CurrentUserHasRight('ShowTicket')) {
+    $r->status(403);
+    return;
+}
+
+$r->content_type('application/json');
+
+print encode_json({
+    id   => $id,
+    mime => $att->ContentType || 'application/octet-stream',
+});
+</%INIT>

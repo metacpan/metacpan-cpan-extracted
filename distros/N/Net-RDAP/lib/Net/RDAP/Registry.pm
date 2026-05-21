@@ -1,14 +1,16 @@
 package Net::RDAP::Registry;
 use Carp qw(croak);
 use File::Basename qw(basename);
+use File::Path qw(make_path);
 use File::Slurp;
 use File::Spec;
 use File::stat;
+use File::XDG;
 use JSON;
 use POSIX qw(getpwuid);
 use Net::RDAP::UA;
 use Net::RDAP::Registry::IANARegistry;
-use vars qw($UA $REGISTRY);
+use vars qw($UA $REGISTRY $CACHE_DIR);
 use constant {
     IP4_URL             => 'https://data.iana.org/rdap/ipv4.json',
     IP6_URL             => 'https://data.iana.org/rdap/ipv6.json',
@@ -22,6 +24,15 @@ use strict;
 our $UA;
 
 our $REGISTRY = {};
+
+our $CACHE_DIR = File::XDG->new(path_class => 'File::Spec', name => __PACKAGE__)->cache_home;
+
+#
+# untaint $CACHE_DIR
+#
+if ($CACHE_DIR =~ /(.+)/) {
+    $CACHE_DIR = $1;
+}
 
 =pod
 
@@ -326,13 +337,16 @@ sub load_registry {
     if (!defined($REGISTRY->{$url})) {
         $package =~ s/:+/-/g;
 
-        my $file = sprintf(
-            '%s/%s-%s-%s',
-            File::Spec->tmpdir,
-            $package,
-            basename($url),
-            getpwuid($<),
-        );
+        croak(sprintf("Unable to create '%s'", $CACHE_DIR)) if (!-d $CACHE_DIR && !make_path($CACHE_DIR, { mode => 0700 }));
+
+        my $file = File::Spec->catfile($CACHE_DIR, basename($url));
+
+        #
+        # untaint file
+        #
+        if ($file =~ /(.+)/) {
+            $file = $1;
+        }
 
         #
         # $UA may have been injected by Net::RDAP->ua()

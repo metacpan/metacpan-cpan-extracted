@@ -6,6 +6,7 @@ extern "C" {
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include "ppport.h"
 #include "Av_CharPtrPtr.h"  /* XS_*_charPtrPtr() */
 #ifdef __cplusplus
 }

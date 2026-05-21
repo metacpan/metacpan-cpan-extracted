@@ -1,0 +1,9 @@
+Build.PL
+shotgun.pl
+wall.txt
+lib/Acme/Shotgun.pm
+MANIFEST			This list of files
+META.json
+META.yml
+Readme.md
+t/01_blastin.t

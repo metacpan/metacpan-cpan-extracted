@@ -1,0 +1,24 @@
+Revision history for Genealogy-Occupation
+
+0.02	Mon May 11 07:58:27 EDT 2026
+
+      [BUG FIXES]
+      - Fixed deduplication failing in non-English locales (consecutive
+        identical occupations were not collapsed in French or German because
+        the dedup check compared the already-translated $result[-1] against
+        the pre-translation English form).  Now tracks the last normalised
+        English form in $last_normalised separately.
+
+      [TEST FIXES]
+      - All English-locale subtests in unit.t, edge_cases.t, and
+        extended_tests.t now delete local LANGUAGE, LC_ALL, and LC_MESSAGES
+        before setting LANG=en_GB.UTF-8, preventing smokers with a non-English
+        LC_ALL from causing false failures.
+	Fixes https://www.cpantesters.org/cpan/report/8ebd4948-4c33-11f1-a584-66046e8775ea
+      - Replaced each(%hash) iterator loops in integration.t and
+        extended_tests.t with (sort keys %hash) to avoid iterator-state
+        surprises on older Perls and to give deterministic test ordering.
+      - Removed dead _locale_env helper from integration.t.
+
+0.01	Sat May  9 16:46:21 EDT 2026
+        First draft

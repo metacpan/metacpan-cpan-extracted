@@ -1,12 +1,12 @@
 package File::Sticker::Scribe;
-$File::Sticker::Scribe::VERSION = '4.401';
+$File::Sticker::Scribe::VERSION = '4.603';
 =head1 NAME
 
 File::Sticker::Scribe - read, write and standardize meta-data from files
 
 =head1 VERSION
 
-version 4.401
+version 4.603
 
 =head1 SYNOPSIS
 
@@ -56,6 +56,7 @@ Other fields will be called whatever the user has pre-configured.
 
 use common::sense;
 use File::LibMagic;
+use YAML::Any;
 use List::MoreUtils qw(uniq);
 
 =head1 DEBUGGING
@@ -199,12 +200,11 @@ then this returns true.
 sub allow {
     my $self = shift;
     my $file = shift;
-    say STDERR whoami(), " file=$file" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     my $okay = $self->allowed_file($file);
     if ($okay) # okay so far
     {
-        say STDERR 'Scribe ' . $self->name() . ' allows filetype of ' . $file if $self->{verbose} > 1;
         $okay = $self->allowed_fields();
     }
     return $okay;
@@ -349,7 +349,7 @@ This requires the old meta-data for the file to be passed in.
 sub add_field_to_file {
     my $self = shift;
     my %args = @_;
-    say STDERR whoami(), " filename=$args{filename}" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     my $filename = $args{filename};
     my $field = $args{field};
@@ -410,7 +410,7 @@ Overwrite the existing meta-data with that given.
 sub replace_all_meta {
     my $self = shift;
     my %args = @_;
-    say STDERR whoami(), " filename=$args{filename}" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     my $filename = $args{filename};
     my $meta = $args{meta};
@@ -458,13 +458,17 @@ The old values are either a reference to an array, or a string with comma-separa
 sub update_multival_field {
     my $self = shift;
     my %args = @_;
-    say STDERR whoami(), " filename=$args{filename}" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     my $filename = $args{filename};
     my $field = $args{field};
     my $value = $args{value};
     my $old_vals = $args{old_vals};
 
+    if ($self->{verbose} > 2 and ref $value)
+    {
+        say STDERR "$field is ", ref $value, " ", Dump($value);
+    }
     my $prefix = '+';
     if ($value =~ /^([+=-])(.*)/)
     {
@@ -515,7 +519,7 @@ The old values are either a reference to an array, or a string with comma-separa
 sub add_multival_to_file {
     my $self = shift;
     my %args = @_;
-    say STDERR whoami(), " filename=$args{filename}" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     my $filename = $args{filename};
     my $fname = $args{field};
@@ -563,7 +567,7 @@ The old values are either a reference to an array, or a string with comma-separa
 sub delete_multival_from_file ($%) {
     my $self = shift;
     my %args = @_;
-    say STDERR whoami(), " filename=$args{filename}" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     my $filename = $args{filename};
     my $fname = $args{field};

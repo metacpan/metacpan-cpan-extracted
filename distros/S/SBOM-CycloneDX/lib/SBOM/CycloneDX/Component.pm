@@ -111,7 +111,7 @@ has components => (
     default => sub { SBOM::CycloneDX::List->new }
 );
 
-has evidence => (is => 'rw', isa => Str);    # TODO
+has evidence => (is => 'rw', isa => HashRef);    # TODO
 
 has release_notes => (is => 'rw', isa => InstanceOf ['SBOM::CycloneDX::ReleaseNotes']);
 

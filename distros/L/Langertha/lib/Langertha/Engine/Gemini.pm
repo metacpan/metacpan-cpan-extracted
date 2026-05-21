@@ -1,6 +1,6 @@
 package Langertha::Engine::Gemini;
 # ABSTRACT: Google Gemini API
-our $VERSION = '0.500';
+our $VERSION = '0.502';
 use Moose;
 use Carp qw( croak );
 use JSON::MaybeXS;
@@ -427,7 +427,7 @@ Langertha::Engine::Gemini - Google Gemini API
 
 =head1 VERSION
 
-version 0.500
+version 0.502
 
 =head1 SYNOPSIS
 

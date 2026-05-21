@@ -4,7 +4,7 @@
       "Petr Pajas <PAJAS@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "dom",
       "html",
@@ -71,7 +71,6 @@
             "parent" : "0",
             "perl" : "5.008001",
             "strict" : "0",
-            "vars" : "0",
             "warnings" : "0"
          }
       },
@@ -91,12 +90,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cpan-authors/XML-LibXML/issues"
+      },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/shlomif/perl-XML-LibXML.git",
-         "web" : "https://github.com/shlomif/perl-XML-LibXML"
+         "url" : "https://github.com/cpan-authors/XML-LibXML.git",
+         "web" : "https://github.com/cpan-authors/XML-LibXML"
       }
    },
-   "version" : "2.0210",
+   "version" : "2.0213",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

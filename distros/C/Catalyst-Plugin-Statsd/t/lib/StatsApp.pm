@@ -16,6 +16,7 @@ __PACKAGE__->config(
     'psgi_middleware', [
         Statsd => {
             client => MockStatsd->new( autoflush => 1 ),
+            secure_set_key => 'xyz123',
         },
     ],
     'Plugin::Statsd' => {

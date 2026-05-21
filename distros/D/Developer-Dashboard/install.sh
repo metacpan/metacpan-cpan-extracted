@@ -16,6 +16,7 @@ ca-certificates
 cpanminus
 curl
 git
+libcrypt-dev
 libexpat1-dev
 libssl-dev
 npm
@@ -23,6 +24,7 @@ nodejs
 perl
 perlbrew
 pkg-config
+tmux
 zlib1g-dev
 '
 BREWFILE_DEFAULT_CONTENT='
@@ -35,6 +37,7 @@ node
 openssl@3
 perl
 pkgconf
+tmux
 '
 APKFILE_DEFAULT_CONTENT='
 # Repo bootstrap packages for Alpine hosts.
@@ -50,6 +53,7 @@ perl
 perl-app-cpanminus
 perl-dev
 pkgconf
+tmux
 zlib-dev
 '
 DNFILE_DEFAULT_CONTENT='
@@ -67,10 +71,13 @@ perl
 perl-App-cpanminus
 perl-devel
 pkgconf-pkg-config
+tmux
 zlib-devel
 '
 INSTALL_ROOT="${HOME:?Missing HOME}/perl5"
-CPAN_TARGET="${DD_INSTALL_CPAN_TARGET:-Developer::Dashboard}"
+CPAN_TARGET="${DD_INSTALL_CPAN_TARGET:-}"
+DEFAULT_BOOTSTRAP_REPOSITORY_URL="${DD_INSTALL_BOOTSTRAP_REPOSITORY_URL:-https://github.com/manif3station/developer-dashboard.git}"
+DEFAULT_BOOTSTRAP_CHECKOUT_DIR="${DD_INSTALL_BOOTSTRAP_CHECKOUT_DIR:-}"
 OS_OVERRIDE="${DD_INSTALL_OS_OVERRIDE:-}"
 PERLBREW_ROOT="${PERLBREW_ROOT:-$INSTALL_ROOT/perlbrew}"
 PERLBREW_HOME="${PERLBREW_HOME:-$PERLBREW_ROOT}"
@@ -85,6 +92,7 @@ CPANM_SCRIPT=''
 RC_FILE=''
 ACTIVATION_FILE=''
 DASHBOARD_BIN=''
+EFFECTIVE_CPAN_TARGET=''
 AUTO_SHELL_MODE="${DD_INSTALL_AUTO_SHELL:-auto}"
 POST_INSTALL_SHELL_COMMANDS="${DD_INSTALL_SHELL_COMMANDS:-}"
 SHELL_BIN_OVERRIDE="${DD_INSTALL_SHELL_BIN:-}"
@@ -551,6 +559,72 @@ append_once() {
     fi
 }
 
+normalize_bash_rc_line() {
+    file_path=$1
+    line=$2
+
+    touch "$file_path"
+    perl_edit_bin='/usr/bin/perl'
+    if [ ! -x "$perl_edit_bin" ]; then
+        perl_edit_bin=$(command -v perl)
+    fi
+    "$perl_edit_bin" - "$file_path" "$line" <<'PL'
+use strict;
+use warnings;
+
+my ( $file_path, $line ) = @ARGV;
+
+open my $read_fh, '<', $file_path or die "Unable to read $file_path: $!";
+local $/;
+my $text = <$read_fh>;
+close $read_fh or die "Unable to close $file_path after reading: $!";
+$text = '' if !defined $text;
+
+$text =~ s/^\Q$line\E\n?//mg;
+
+my $guard_re = qr{
+    (?:
+        ^case \s+ \$- \s+ in \s* \n
+        (?:
+            (?! ^[ \t]* esac \s* $ )
+            .*\n
+        )*?
+        ^[ \t]* \*i\* \) \s* ;; \s* \n
+        ^[ \t]* \* \) \s* return \s* ;; \s* \n
+        ^[ \t]* esac \s* \n?
+    )
+    |
+    (?:
+        ^[ \t]* \[ \s* -z \s+ "\$PS1" \s* \] \s* && \s* return \s* \n?
+    )
+}xms;
+
+if ( $text =~ /$guard_re/ ) {
+    $text =~ s/$guard_re/$line\n$&/ms;
+}
+else {
+    $text .= "\n" if length($text) && $text !~ /\n\z/;
+    $text .= $line . "\n";
+}
+
+open my $write_fh, '>', $file_path or die "Unable to write $file_path: $!";
+print {$write_fh} $text;
+close $write_fh or die "Unable to close $file_path after writing: $!";
+PL
+}
+
+write_rc_line() {
+    file_path=$1
+    line=$2
+
+    if [ "$(basename "$file_path")" = '.bashrc' ]; then
+        normalize_bash_rc_line "$file_path" "$line"
+        return 0
+    fi
+
+    append_once "$file_path" "$line"
+}
+
 append_block_once() {
     file_path=$1
     marker=$2
@@ -663,11 +737,42 @@ install_debian_node_packages() {
 }
 
 install_brew_packages() {
-    require_command brew
+    ensure_homebrew
     packages=$(manifest_packages "$BREWFILE" | tr '\n' ' ' | sed 's/[[:space:]]*$//')
     [ -n "$packages" ] || return 0
     say "Installing Homebrew packages from $BREWFILE: $packages"
     brew install $packages
+}
+
+homebrew_bin_candidates() {
+    printf '%s\n' \
+        "$HOME/.homebrew/bin" \
+        '/opt/homebrew/bin' \
+        '/usr/local/bin'
+}
+
+ensure_homebrew() {
+    if command -v brew >/dev/null 2>&1; then
+        return 0
+    fi
+
+    say "Bootstrapping Homebrew because brew is missing on this macOS host."
+    bootstrap_script="${TMPDIR:-/tmp}/developer-dashboard-homebrew-install.sh"
+    download_to_path 'https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh' "$bootstrap_script"
+    chmod 0755 "$bootstrap_script" ||
+        fail "Unable to chmod Homebrew bootstrap script $bootstrap_script"
+    NONINTERACTIVE=1 bash -c "$bootstrap_script" ||
+        fail "Unable to bootstrap Homebrew automatically on this macOS host"
+
+    for candidate in $(homebrew_bin_candidates); do
+        if [ -x "$candidate/brew" ]; then
+            PATH="$candidate:$PATH"
+            export PATH
+            break
+        fi
+    done
+
+    require_command brew
 }
 
 install_apk_packages() {
@@ -769,8 +874,8 @@ bootstrap_perlbrew_perl() {
 
     PERLBREW_HOME_LINE=$(printf 'export PERLBREW_HOME="%s"' "$PERLBREW_HOME")
     PERLBREW_PATH_LINE=$(printf 'export PATH="%s/perls/%s/bin:$PATH"' "$PERLBREW_ROOT" "$PERLBREW_PERL")
-    append_once "$RC_FILE" "$PERLBREW_HOME_LINE"
-    append_once "$RC_FILE" "$PERLBREW_PATH_LINE"
+    write_rc_line "$RC_FILE" "$PERLBREW_HOME_LINE"
+    write_rc_line "$RC_FILE" "$PERLBREW_PATH_LINE"
     PATH="$PERLBREW_ROOT/bin:$PERLBREW_ROOT/perls/$PERLBREW_PERL/bin:$PATH"
     export PATH
     say "Updated $RC_FILE so perlbrew metadata and $PERLBREW_PERL load automatically in new shells."
@@ -813,17 +918,51 @@ bootstrap_local_lib() {
     resolve_perl
 
     mkdir -p "$INSTALL_ROOT"
-    run_cpanm --notest --local-lib-contained "$INSTALL_ROOT" local::lib App::cpanminus
+    run_cpanm --notest --local-lib-contained "$INSTALL_ROOT" local::lib App::cpanminus File::ShareDir::Install
 
     LOCAL_LIB_LINE=$(printf 'eval "$("%s" -I "%s/lib/perl5" -Mlocal::lib)"' "$PERL_BIN" "$INSTALL_ROOT")
-    append_once "$RC_FILE" "$LOCAL_LIB_LINE"
+    write_rc_line "$RC_FILE" "$LOCAL_LIB_LINE"
 
     # shellcheck disable=SC2046
     eval "$("$PERL_BIN" -I "$INSTALL_ROOT/lib/perl5" -Mlocal::lib)"
 }
 
+resolve_default_dashboard_checkout() {
+    if [ -f "$SCRIPT_DIR/lib/Developer/Dashboard.pm" ] && [ -f "$SCRIPT_DIR/Makefile.PL" ]; then
+        printf '%s\n' "$SCRIPT_DIR"
+        return 0
+    fi
+
+    require_command git
+
+    if [ -n "$DEFAULT_BOOTSTRAP_CHECKOUT_DIR" ]; then
+        checkout_root=$DEFAULT_BOOTSTRAP_CHECKOUT_DIR
+        rm -rf "$checkout_root"
+        mkdir -p "$(dirname "$checkout_root")" ||
+            fail "Unable to create the parent directory for $checkout_root"
+    else
+        checkout_root=$(mktemp -d "${TMPDIR:-/tmp}/developer-dashboard-install.XXXXXX") ||
+            fail "Unable to allocate a temporary checkout for Developer Dashboard under ${TMPDIR:-/tmp}"
+    fi
+
+    run_logged_command git clone --depth 1 --branch master "$DEFAULT_BOOTSTRAP_REPOSITORY_URL" "$checkout_root" ||
+        fail "Unable to clone Developer Dashboard from $DEFAULT_BOOTSTRAP_REPOSITORY_URL"
+    printf '%s\n' "$checkout_root"
+}
+
 install_dashboard() {
-    run_cpanm --notest "$CPAN_TARGET"
+    if [ -n "$CPAN_TARGET" ]; then
+        EFFECTIVE_CPAN_TARGET=$CPAN_TARGET
+        run_cpanm --notest "$CPAN_TARGET"
+        return 0
+    fi
+
+    checkout_root=$(resolve_default_dashboard_checkout)
+    EFFECTIVE_CPAN_TARGET=$checkout_root
+    (
+        cd "$checkout_root" || exit 1
+        run_cpanm --notest .
+    ) || fail "Unable to install Developer Dashboard from $checkout_root"
 }
 
 shell_bootstrap_target() {
@@ -860,7 +999,7 @@ write_dashboard_shell_bootstrap() {
     [ -x "$DASHBOARD_BIN" ] || fail "Developer Dashboard was installed but $DASHBOARD_BIN is not executable"
 
     SHELL_BOOTSTRAP_LINE=$(printf 'eval "$("%s" shell %s)"' "$DASHBOARD_BIN" "$(shell_bootstrap_target)")
-    append_once "$RC_FILE" "$SHELL_BOOTSTRAP_LINE"
+    write_rc_line "$RC_FILE" "$SHELL_BOOTSTRAP_LINE"
 }
 
 run_post_install_shell_commands() {
@@ -948,7 +1087,7 @@ main() {
     progress_start install_dashboard_package
     install_dashboard
     write_dashboard_shell_bootstrap
-    progress_done install_dashboard_package "$CPAN_TARGET"
+    progress_done install_dashboard_package "$EFFECTIVE_CPAN_TARGET"
     progress_start initialize_dashboard
     initialize_dashboard
     progress_done initialize_dashboard "$HOME/.developer-dashboard"

@@ -4,7 +4,7 @@ use warnings;
 
 use Getopt::Yath;
 
-our $VERSION = '2.000012';
+our $VERSION = '2.000016';
 
 my @BEGIN_ARGS;
 
@@ -80,7 +80,7 @@ specified multiple times.
 
 =head1 EXAMPLE
 
-    $ PERL_HASH_SEED=1 yath --begin hello --begin world foo bar
+    $ yath --begin hello --begin world foo bar
 
     BEGIN: hello
     BEGIN: world

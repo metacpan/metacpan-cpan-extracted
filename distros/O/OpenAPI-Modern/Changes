@@ -1,5 +1,18 @@
 Revision history for OpenAPI-Modern
 
+0.137     2026-05-12 18:09:22Z
+          - switch to non-deprecated JSM config "max_depth"
+
+0.136     2026-05-02 15:42:44Z
+          - revert change of YAML backend in tests from YAML::PP to YAML::XS
+
+0.135     2026-05-01 23:41:42Z
+          - "$ref"s to media-type objects are now respected, new in OpenAPI
+            v3.2
+          - support added for the "itemSchema" keyword in media-type objects,
+            new in OpenAPI v3.2
+          - YAML backend in tests changed from YAML::PP to YAML::XS
+
 0.134     2026-04-19 16:29:03Z
           - add new JSON Schema format "media-range", used in the OAD schema
           - improvements to media-type decoding and matching appropriate
@@ -85,7 +98,7 @@ Revision history for OpenAPI-Modern
 0.116     2025-12-16 23:36:39Z
           - the converted response object is now added to the optional hashref
             used in validate_response()
-          - fix usage of --with-defaults in "openapi-validate'
+          - fix usage of --with-defaults in "openapi-validate"
 
 0.115     2025-12-14 20:15:30Z
           - drop the --document argument in "openapi-validate" in favour of
@@ -126,7 +139,7 @@ Revision history for OpenAPI-Modern
           - prereq bump on Test2::Warnings for an import fix
 
 0.106     2025-11-19 20:28:01Z
-          - fix invalid restriction on trailing '/' in server urls (added in
+          - fix invalid restriction on trailing "/" in server urls (added in
             v0.086)
 
 0.105     2025-11-03 20:04:48Z
@@ -156,7 +169,7 @@ Revision history for OpenAPI-Modern
             for what is new or changed.
 
 0.099     2025-10-13 19:44:43Z
-          - fixed bug: properly support operation_id = '0'
+          - fixed bug: properly support operation_id = "0"
 
 0.098     2025-10-09 21:01:35Z
           - fixed bug: we no longer assume that a /paths entry can be inferred
@@ -183,10 +196,10 @@ Revision history for OpenAPI-Modern
           - fix error in tests exposed by JSON::Schema::Modern 0.618
 
 0.092     2025-09-03 22:49:24Z
-          - removed the 'json_schema_dialect' constructor argument for
+          - removed the "json_schema_dialect" constructor argument for
             JSON::Schema::Modern::Document::OpenAPI (use jsonSchemaDialect in
             the document instead)
-          - the 'openapi_uri' constructor argument for OpenAPI::Modern is no
+          - the "openapi_uri" constructor argument for OpenAPI::Modern is no
             longer required, as it can be calculated from the JSMDO default
 
 0.091     2025-08-16 20:52:35Z
@@ -222,7 +235,7 @@ Revision history for OpenAPI-Modern
 0.084     2025-04-11 21:10:20Z
           - no longer require the user to define a custom metaschema when
             changing jsonSchemaDialect (we dynamically create one for you)
-          - pre-emptive support for '$self' property in the OpenAPI document
+          - pre-emptive support for "$self" property in the OpenAPI document
             (to be officially added in v3.2)
 
 0.083     2025-02-28 23:48:29Z

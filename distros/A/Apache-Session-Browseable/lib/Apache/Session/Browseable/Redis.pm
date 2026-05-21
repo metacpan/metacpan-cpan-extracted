@@ -38,12 +38,17 @@ sub searchOn {
     my %res = ();
     if ( $class->isIndexed( $args, $selectField ) ) {
 
-        my $redisObj = $class->_getRedis($args);
-        my @keys     = $redisObj->smembers("${selectField}_$value");
+        my $redisObj  = $class->_getRedis($args);
+        my $index_key = "${selectField}_$value";
+        my @keys      = $redisObj->smembers($index_key);
         foreach my $k (@keys) {
             next unless ($k);
             my $tmp = $redisObj->get($k);
-            next unless ($tmp);
+            unless ($tmp) {
+                # Lazy cleanup: remove orphan from index
+                eval { $redisObj->srem( $index_key, $k ) };
+                next;
+            }
             eval {
                 $tmp = unserialize($tmp);
                 if (@fields) {
@@ -95,7 +100,11 @@ sub searchOnExpr {
                 my @keys = $redisObj->smembers($set);
                 foreach my $k (@keys) {
                     my $v = $redisObj->get($k);
-                    next unless $v;
+                    unless ($v) {
+                        # Lazy cleanup: remove orphan from index
+                        eval { $redisObj->srem( $set, $k ) };
+                        next;
+                    }
                     my $tmp = unserialize($v);
                     if ($tmp) {
                         $res{$k} = $class->extractFields( $tmp, @fields );
@@ -126,6 +135,11 @@ sub deleteIfLowerThan {
     my ( $class, $args, $rule ) = @_;
     my $deleted  = 0;
     my $redisObj = $class->_getRedis($args);
+    my $index =
+      ref( $args->{Index} )
+      ? $args->{Index}
+      : [ split /\s+/, $args->{Index} ];
+
     $class->get_key_from_all_sessions(
         $args,
         sub {
@@ -137,13 +151,21 @@ sub deleteIfLowerThan {
                     }
                 }
             }
-            if ( $rule->{or} ) {
+            # Empty or data-less sessions should be purged
+            my $dominated = 0;
+            if ( !$v || !%$v || !exists $v->{_session_id} ) {
+                $dominated = 1;
+            }
+            elsif ( $rule->{or} ) {
                 foreach ( keys %{ $rule->{or} } ) {
-                    if ( defined( $v->{$_} ) and $v->{$_} < $rule->{or}->{$_} )
-                    {
-                        $redisObj->del($k);
-                        $deleted++;
-                        return ();
+                    if ( !defined( $v->{$_} ) ) {
+                        # Session missing a required field: treat as expired
+                        $dominated = 1;
+                        last;
+                    }
+                    if ( $v->{$_} < $rule->{or}->{$_} ) {
+                        $dominated = 1;
+                        last;
                     }
                 }
             }
@@ -151,12 +173,29 @@ sub deleteIfLowerThan {
                 my $res = 1;
                 foreach ( keys %{ $rule->{and} } ) {
                     $res = 0
-                      unless defined( $v->{$_} )
-                      and $v->{$_} < $rule->{not}->{$_};
+                      unless !defined( $v->{$_} )
+                      or $v->{$_} < $rule->{and}->{$_};
                 }
-                if ($res) {
+                $dominated = $res;
+            }
+            if ($dominated) {
+                # Clean up index entries before deleting the session
+                my $index_ok = 1;
+                foreach my $i (@$index) {
+                    my $t = $v->{$i};
+                    next unless ( defined($t) and length($t) > 0 );
+                    eval { $redisObj->srem( "${i}_$t", $k ) };
+                    if ($@) {
+                        warn "Failed to remove '$k' from index '${i}_$t': $@";
+                        $index_ok = 0;
+                    }
+                }
+                if ($index_ok) {
                     $redisObj->del($k);
                     $deleted++;
+                }
+                else {
+                    warn "Skipping deletion of session '$k' due to index cleanup failure";
                 }
             }
             return ();
@@ -264,6 +303,9 @@ Apache::Session::Redis
 
        # Choose your browseable fields
        Index          => 'uid mail',
+
+       # Optional: set a Redis TTL on session keys (in seconds)
+       # TTL => 86400,
   };
   
   # Use it like Apache::Session

@@ -1,3 +1,173 @@
+Tue May 19 14:51:05 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.2]:
+	* bin/cli-simple.in: renamed from .in.sh
+	* lib/CLI/Simple/Shell.pm.in: new
+	* lib/CLI/Simple.pm.in
+	(usage)
+	- display shell usage if cli-simple
+	* .gitignore: add bin/cli-simple
+	* README.md: generated
+	* VERSION: bump
+	* buildspec.yml: man link for cli-simple
+
+Mon May  4 13:54:48 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.1]:
+	* release-notes/release-notes-2.0.1.md: new
+	* VERSION: bump
+	* builder
+	- renamed
+	- updated from CPAN::Maker::Bootstrapper
+	* Makefile: likewise
+	* .github/workflows/build.yml: likewise
+	* .includes/perl.mk: likewise
+	* .includes/update.mk: likewise
+	* build-requires
+	- removed Text::CSV_XS
+	* buildspec.yml: replace '_' with '-'
+	* lib/CLI/Simple.pm.in
+	(_load_manifest): YAML::XS => YAML::Tiny
+	* lib/CLI/Simple/Helpers.pm.in
+	(_resolve_spec): likewise
+	(_generate_spec_file): likewise
+	* lib/CLI/Simple/Scaffold.pm.in
+	(_cmd_scaffold): likewise
+	* requires: likewise
+	* cpanfile: likewise
+	* test-requires: likewise
+	* t/cli-simple-manifest.t: likewise
+	* lib/CLI/Simple/Constants.pm.in
+	- + $FAT_ARROW
+	* lib/CLI/Simple/Utils.pm.in: typo (NAAME)
+
+Thu Apr 23 13:25:42 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.0]: CPAN::Maker::Bootstrapper build update
+	* .github/workflows/build.yml: new
+	* .includes/git.mk: new
+	* .includes/help.mk: new
+	* .includes/perl.mk: new
+	* .includes/update.mk: new
+	* .includes/upgrade.mk: new
+	* Makefile: new
+	* build-requires: new
+	* test-requires.skip: new
+	* build-github: new
+	* .autoconf-template-perlrc: deleted
+	* COPYING: deleted
+	* LICENSE: deleted
+	* Makefile.am: deleted
+	* README: deleted
+	* autotools/ads_PERL_INCLUDES.m4: deleted
+	* autotools/ads_PERL_MODULE.m4: deleted
+	* autotools/ads_PROG_PERL.m4: deleted
+	* autotools/am_build_mode.m4: deleted
+	* autotools/am_perlcritic_mode.m4: deleted
+	* autotools/apache_config.m4: deleted
+	* autotools/ax-extra-opts.m4: deleted
+	* autotools/ax_am_conditional_example.m4: deleted
+	* autotools/ax_deps_check.m4: deleted
+	* autotools/ax_distcheck_hack.m4: deleted
+	* autotools/ax_perlcritic_config.m4: deleted
+	* autotools/ax_requirements_check.m4: deleted
+	* autotools/prove.sh.in: deleted
+	* config/Makefile.am: deleted
+	* configure.ac: deleted
+	* cpan/Makefile.am: deleted
+	* cpan/requires: deleted
+	* cpan/test-requires: deleted
+	* includes/apache-directories.inc: deleted
+	* includes/bash-bin.inc: deleted
+	* includes/directories.inc: deleted
+	* includes/perl-bin.inc: deleted
+	* includes/perl-cgi-bin.inc: deleted
+	* includes/perl-modules.inc: deleted
+	* includes/perlcritic.inc: deleted
+	* install-from-cpan.in: deleted
+	* perl-CLI-Simple.spec.in: deleted
+	* perlcriticrc: deleted
+	* perltidyrc: deleted
+	* project.yaml: deleted
+	* requires.json: deleted
+	* requires.txt: deleted
+	* resources/Makefile.am: deleted
+	* src/Makefile.am: deleted
+	* src/examples/MyScript.pm: deleted
+	* src/main/Makefile.am: deleted
+	* src/main/bash/Makefile.am: deleted
+	* src/main/bash/bin/Makefile.am: deleted
+	* src/main/perl/Makefile.am: deleted
+	* src/main/perl/bin/Makefile.am: deleted
+	* src/main/perl/lib/Makefile.am: deleted
+	* bootstrap: deleted
+	* cpan/buildspec.yml => buildspec.yml
+	* release-notes.mk => .includes/release-notes.mk
+	* src/main/perl/lib/t/00-cli-simple-constants.t.in => t/00-cli-simple-constants.t
+	* src/main/perl/lib/t/00-cli-simple-utils.t.in => t/00-cli-simple-utils.t
+	* src/main/perl/lib/t/00-cli-simple.t.in => t/00-cli-simple.t
+	* src/main/perl/lib/t/01-cli-simple.t.in => t/01-cli-simple.t
+	* src/main/perl/lib/t/02-cli-simple-logging.t.in => t/02-cli-simple-logging.t
+	* src/main/perl/lib/t/03-cli-simple-types.t.in => t/03-cli-simple-types.t
+	* src/main/perl/lib/t/04-cli-simple-help.t.in => t/04-cli-simple-help.t
+	* src/main/perl/lib/t/05-cli-simple-args.t.in => t/05-cli-simple-args.t
+	* src/main/perl/lib/t/06-cli-simple-default.t.in => t/06-cli-simple-default.t
+	* version.mk => .includes/version.mk
+	* src/main/bash/bin => bin}/cli-simple.sh.in
+	* src/main/perl/bin => bin}/create-modulino.pl.in
+	* src/main/perl/lib => lib}/CLI/Simple.pm.in
+	* src/main/perl/lib => lib}/CLI/Simple/Constants.pm.in
+	* src/main/perl/lib => lib}/CLI/Simple/DumpSpec.pm.in
+	* src/main/perl/lib => lib}/CLI/Simple/Helpers.pm.in
+	* src/main/perl/lib => lib}/CLI/Simple/Migrate.pm.in
+	* src/main/perl/lib => lib}/CLI/Simple/Scaffold.pm.in
+	* src/main/perl/lib => lib}/CLI/Simple/Utils.pm.in
+	* src/main/perl/lib/t => t}/cli-simple-manifest.t
+
+	[2.0.0]:
+	* VERSION: modified
+	* release-notes-2.0.0.md: new
+	* Makefile.am: + release-notes.mk
+	* includes/bash.inc: + cli-simple.sh.in, -modulino.sh.in, -cli-simple-example.sh.in
+	* cpan/buildspec.yml
+	- +CLI::Simple::Helper, CLI::Simple::DumpSpec, CLI::Simple::Migrate, CLI::Simple::Scaffold
+	* includes/perl-modules.inc: add above to build
+	* src/main/perl/bin/create-modulino.pl.in: refactored to use CLI::Simple
+	* cpan/requires
+	- +Role::Tiny, Role::Tiny::With, YAML:::XS
+	* src/main/perl/lib/CLI/Simple/Utils.pm.in: modified
+	* src/main/perl/lib/CLI/Simple/README.md: generated
+	* src/main/perl/lib/CLI/Simple.pm.in
+	- load manifest to specify commands and options
+	- pod updates
+	- caller or __PACKAGE__->main
+	(main): don't croak if no manifest
+	(%INTERNAL_COMMANDS): new
+	($MANIFEST): new
+	(import): new
+	(load_manifest): new
+	(new)
+	- dispatch to internal commands
+	(get_args): return ref or list
+	(set_args): new
+	(_cmd_generate_completion)
+	- generate a bash completion script based on options and commands
+	* src/main/perl/lib/CLI/Simple/DumpSpec.pm.in: new
+	* src/main/perl/lib/CLI/Simple/Helpers.pm.in: new
+	* src/main/perl/lib/CLI/Simple/Migrate.pm.in: new
+	* src/main/perl/lib/CLI/Simple/Scaffold.pm.in: new
+
+Sat Feb 14 16:03:49 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.12]:
+	* VERSION: bump
+	* LICENSE: align with code
+	* cpan/Makefile.am: add README.md
+	* cpan/buildspec.yml: likewise
+	* src/main/perl/lib/CLI/Simple/Utils.pm.in: align license
+	* src/main/perl/lib/CLI/Simple/README.md: generated
+	* src/main/perl/lib/CLI/Simple/Utils/README.md: likewise
+
 Tue Feb  3 16:20:20 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[1.0.11]:

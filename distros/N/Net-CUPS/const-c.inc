@@ -343,157 +343,165 @@ static int
 constant_12 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     CUPS_VERSION HTTP_CREATED HTTP_MAX_URI HTTP_OPTIONS HTTP_WAITING
-     IPP_CONFLICT IPP_GET_JOBS IPP_HOLD_JOB IPP_JOB_HELD IPP_MAX_NAME
-     IPP_OK_SUBST IPP_PORTRAIT IPP_SEND_URI IPP_TAG_COPY IPP_TAG_DATE
-     IPP_TAG_ENUM IPP_TAG_MASK IPP_TAG_NAME IPP_TAG_TEXT IPP_TAG_ZERO
-     PPD_MAX_LINE PPD_MAX_NAME PPD_MAX_TEXT */
-  /* Offset 8 gives the best switch position.  */
-  switch (name[8]) {
-  case 'A':
-    if (memEQ(name, "HTTP_CREATED", 12)) {
-    /*                       ^          */
-      *iv_return = HTTP_CREATED;
-      return PERL_constant_ISIV;
-    }
-    break;
-  case 'C':
-    if (memEQ(name, "IPP_TAG_COPY", 12)) {
-    /*                       ^          */
-      *iv_return = IPP_TAG_COPY;
-      return PERL_constant_ISIV;
-    }
-    break;
-  case 'D':
-    if (memEQ(name, "IPP_TAG_DATE", 12)) {
-    /*                       ^          */
-      *iv_return = IPP_TAG_DATE;
-      return PERL_constant_ISIV;
-    }
-    break;
-  case 'E':
-    if (memEQ(name, "IPP_TAG_ENUM", 12)) {
-    /*                       ^          */
-      *iv_return = IPP_TAG_ENUM;
-      return PERL_constant_ISIV;
-    }
-    break;
-  case 'H':
-    if (memEQ(name, "IPP_JOB_HELD", 12)) {
-    /*                       ^          */
-      *iv_return = IPP_JOB_HELD;
-      return PERL_constant_ISIV;
-    }
-    break;
-  case 'I':
-    if (memEQ(name, "HTTP_OPTIONS", 12)) {
-    /*                       ^          */
-      *iv_return = HTTP_OPTIONS;
-      return PERL_constant_ISIV;
-    }
-    break;
-  case 'J':
+     CF_IMAGE_CMY CF_IMAGE_RGB CUPS_VERSION HTTP_CREATED HTTP_MAX_URI
+     HTTP_OPTIONS HTTP_WAITING IPP_CONFLICT IPP_GET_JOBS IPP_HOLD_JOB
+     IPP_JOB_HELD IPP_MAX_NAME IPP_OK_SUBST IPP_PORTRAIT IPP_SEND_URI
+     IPP_TAG_COPY IPP_TAG_DATE IPP_TAG_ENUM IPP_TAG_MASK IPP_TAG_NAME
+     IPP_TAG_TEXT IPP_TAG_ZERO PPD_MAX_LINE PPD_MAX_NAME PPD_MAX_TEXT */
+  /* Offset 10 gives the best switch position.  */
+  switch (name[10]) {
+  case 'B':
     if (memEQ(name, "IPP_GET_JOBS", 12)) {
-    /*                       ^          */
+    /*                         ^        */
       *iv_return = IPP_GET_JOBS;
       return PERL_constant_ISIV;
     }
     break;
-  case 'L':
+  case 'C':
     if (memEQ(name, "IPP_CONFLICT", 12)) {
-    /*                       ^          */
+    /*                         ^        */
       *iv_return = IPP_CONFLICT;
       return PERL_constant_ISIV;
     }
-    if (memEQ(name, "PPD_MAX_LINE", 12)) {
-    /*                       ^          */
-      *iv_return = PPD_MAX_LINE;
+    break;
+  case 'E':
+    if (memEQ(name, "HTTP_CREATED", 12)) {
+    /*                         ^        */
+      *iv_return = HTTP_CREATED;
       return PERL_constant_ISIV;
     }
     break;
-  case 'M':
-    if (memEQ(name, "IPP_TAG_MASK", 12)) {
-    /*                       ^          */
-      *iv_return = IPP_TAG_MASK;
+  case 'G':
+    if (memEQ(name, "CF_IMAGE_RGB", 12)) {
+    /*                         ^        */
+      *iv_return = CF_IMAGE_RGB;
       return PERL_constant_ISIV;
     }
     break;
-  case 'N':
-    if (memEQ(name, "IPP_MAX_NAME", 12)) {
-    /*                       ^          */
-      *iv_return = IPP_MAX_NAME;
-      return PERL_constant_ISIV;
-    }
-    if (memEQ(name, "IPP_TAG_NAME", 12)) {
-    /*                       ^          */
-      *iv_return = IPP_TAG_NAME;
-      return PERL_constant_ISIV;
-    }
-    if (memEQ(name, "PPD_MAX_NAME", 12)) {
-    /*                       ^          */
-      *iv_return = PPD_MAX_NAME;
-      return PERL_constant_ISIV;
-    }
-    break;
-  case 'R':
+  case 'I':
     if (memEQ(name, "IPP_PORTRAIT", 12)) {
-    /*                       ^          */
+    /*                         ^        */
       *iv_return = IPP_PORTRAIT;
       return PERL_constant_ISIV;
     }
     break;
-  case 'S':
-    if (memEQ(name, "CUPS_VERSION", 12)) {
-    /*                       ^          */
-      *iv_return = CUPS_VERSION;
+  case 'L':
+    if (memEQ(name, "IPP_JOB_HELD", 12)) {
+    /*                         ^        */
+      *iv_return = IPP_JOB_HELD;
       return PERL_constant_ISIV;
     }
     break;
-  case 'T':
+  case 'M':
+    if (memEQ(name, "CF_IMAGE_CMY", 12)) {
+    /*                         ^        */
+      *iv_return = CF_IMAGE_CMY;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "IPP_MAX_NAME", 12)) {
+    /*                         ^        */
+      *iv_return = IPP_MAX_NAME;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "IPP_TAG_NAME", 12)) {
+    /*                         ^        */
+      *iv_return = IPP_TAG_NAME;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "PPD_MAX_NAME", 12)) {
+    /*                         ^        */
+      *iv_return = PPD_MAX_NAME;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'N':
+    if (memEQ(name, "HTTP_OPTIONS", 12)) {
+    /*                         ^        */
+      *iv_return = HTTP_OPTIONS;
+      return PERL_constant_ISIV;
+    }
     if (memEQ(name, "HTTP_WAITING", 12)) {
-    /*                       ^          */
+    /*                         ^        */
       *iv_return = HTTP_WAITING;
       return PERL_constant_ISIV;
     }
-    if (memEQ(name, "IPP_TAG_TEXT", 12)) {
-    /*                       ^          */
-      *iv_return = IPP_TAG_TEXT;
-      return PERL_constant_ISIV;
-    }
-    if (memEQ(name, "PPD_MAX_TEXT", 12)) {
-    /*                       ^          */
-      *iv_return = PPD_MAX_TEXT;
+    if (memEQ(name, "PPD_MAX_LINE", 12)) {
+    /*                         ^        */
+      *iv_return = PPD_MAX_LINE;
       return PERL_constant_ISIV;
     }
     break;
-  case 'U':
-    if (memEQ(name, "IPP_OK_SUBST", 12)) {
-    /*                       ^          */
-      *iv_return = IPP_OK_SUBST;
+  case 'O':
+    if (memEQ(name, "CUPS_VERSION", 12)) {
+    /*                         ^        */
+      *iv_return = CUPS_VERSION;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "IPP_HOLD_JOB", 12)) {
+    /*                         ^        */
+      *iv_return = IPP_HOLD_JOB;
       return PERL_constant_ISIV;
     }
     break;
-  case 'Z':
+  case 'P':
+    if (memEQ(name, "IPP_TAG_COPY", 12)) {
+    /*                         ^        */
+      *iv_return = IPP_TAG_COPY;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'R':
+    if (memEQ(name, "HTTP_MAX_URI", 12)) {
+    /*                         ^        */
+      *iv_return = HTTP_MAX_URI;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "IPP_SEND_URI", 12)) {
+    /*                         ^        */
+      *iv_return = IPP_SEND_URI;
+      return PERL_constant_ISIV;
+    }
     if (memEQ(name, "IPP_TAG_ZERO", 12)) {
-    /*                       ^          */
+    /*                         ^        */
       *iv_return = IPP_TAG_ZERO;
       return PERL_constant_ISIV;
     }
     break;
-  case '_':
-    if (memEQ(name, "HTTP_MAX_URI", 12)) {
-    /*                       ^          */
-      *iv_return = HTTP_MAX_URI;
+  case 'S':
+    if (memEQ(name, "IPP_OK_SUBST", 12)) {
+    /*                         ^        */
+      *iv_return = IPP_OK_SUBST;
       return PERL_constant_ISIV;
     }
-    if (memEQ(name, "IPP_HOLD_JOB", 12)) {
-    /*                       ^          */
-      *iv_return = IPP_HOLD_JOB;
+    if (memEQ(name, "IPP_TAG_MASK", 12)) {
+    /*                         ^        */
+      *iv_return = IPP_TAG_MASK;
       return PERL_constant_ISIV;
     }
-    if (memEQ(name, "IPP_SEND_URI", 12)) {
-    /*                       ^          */
-      *iv_return = IPP_SEND_URI;
+    break;
+  case 'T':
+    if (memEQ(name, "IPP_TAG_DATE", 12)) {
+    /*                         ^        */
+      *iv_return = IPP_TAG_DATE;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'U':
+    if (memEQ(name, "IPP_TAG_ENUM", 12)) {
+    /*                         ^        */
+      *iv_return = IPP_TAG_ENUM;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'X':
+    if (memEQ(name, "IPP_TAG_TEXT", 12)) {
+    /*                         ^        */
+      *iv_return = IPP_TAG_TEXT;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "PPD_MAX_TEXT", 12)) {
+    /*                         ^        */
+      *iv_return = PPD_MAX_TEXT;
       return PERL_constant_ISIV;
     }
     break;
@@ -505,11 +513,11 @@ static int
 constant_13 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     CUPS_DATE_ANY CUPS_GET_PPDS CUPS_MOVE_JOB CUPS_US_ASCII HTTP_ACCEPTED
-     HTTP_AUTH_MD5 HTTP_CONFLICT HTTP_CONTINUE HTTP_GET_SEND HTTP_MAX_HOST
-     HTTP_PUT_RECV IPP_ATTRIBUTE IPP_FORBIDDEN IPP_LANDSCAPE IPP_NOT_FOUND
-     IPP_PRINT_JOB IPP_PRINT_URI IPP_TAG_RANGE PPD_NULL_FILE PPD_ORDER_ANY
-     PPD_ORDER_JCL */
+     CF_IMAGE_CMYK CUPS_DATE_ANY CUPS_GET_PPDS CUPS_MOVE_JOB CUPS_US_ASCII
+     HTTP_ACCEPTED HTTP_AUTH_MD5 HTTP_CONFLICT HTTP_CONTINUE HTTP_GET_SEND
+     HTTP_MAX_HOST HTTP_PUT_RECV IPP_ATTRIBUTE IPP_FORBIDDEN IPP_LANDSCAPE
+     IPP_NOT_FOUND IPP_PRINT_JOB IPP_PRINT_URI IPP_TAG_RANGE PPD_NULL_FILE
+     PPD_ORDER_ANY PPD_ORDER_JCL */
   /* Offset 6 gives the best switch position.  */
   switch (name[6]) {
   case 'A':
@@ -556,6 +564,11 @@ constant_13 (pTHX_ const char *name, IV *iv_return) {
     }
     break;
   case 'G':
+    if (memEQ(name, "CF_IMAGE_CMYK", 13)) {
+    /*                     ^             */
+      *iv_return = CF_IMAGE_CMYK;
+      return PERL_constant_ISIV;
+    }
     if (memEQ(name, "IPP_TAG_RANGE", 13)) {
     /*                     ^             */
       *iv_return = IPP_TAG_RANGE;
@@ -651,14 +664,15 @@ static int
 constant_14 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     CUPS_ADD_CLASS CUPS_FILE_GZIP CUPS_FILE_NONE CUPS_IMAGE_CMY CUPS_IMAGE_RGB
-     CUPS_ISO8859_1 CUPS_ISO8859_2 CUPS_ISO8859_3 CUPS_ISO8859_4 CUPS_ISO8859_5
-     CUPS_ISO8859_6 CUPS_ISO8859_7 CUPS_ISO8859_8 CUPS_ISO8859_9 CUPS_MAC_ROMAN
-     HTTP_AUTH_NONE HTTP_FIELD_MAX HTTP_FORBIDDEN HTTP_MAX_VALUE HTTP_NOT_FOUND
-     HTTP_POST_RECV HTTP_POST_SEND HTTP_SEE_OTHER HTTP_USE_PROXY IPP_ATTRIBUTES
-     IPP_CANCEL_JOB IPP_CREATE_JOB IPP_MAX_VALUES IPP_PURGE_JOBS IPP_RESUME_JOB
-     IPP_RES_PER_CM IPP_TAG_STRING IPP_URI_SCHEME PPD_CUSTOM_INT PPD_ORDER_EXIT
-     PPD_ORDER_PAGE PPD_UI_BOOLEAN PPD_UI_PICKONE */
+     CF_IMAGE_BLACK CF_IMAGE_WHITE CUPS_ADD_CLASS CUPS_FILE_GZIP CUPS_FILE_NONE
+     CUPS_IMAGE_CMY CUPS_IMAGE_RGB CUPS_ISO8859_1 CUPS_ISO8859_2 CUPS_ISO8859_3
+     CUPS_ISO8859_4 CUPS_ISO8859_5 CUPS_ISO8859_6 CUPS_ISO8859_7 CUPS_ISO8859_8
+     CUPS_ISO8859_9 CUPS_MAC_ROMAN HTTP_AUTH_NONE HTTP_FIELD_MAX HTTP_FORBIDDEN
+     HTTP_MAX_VALUE HTTP_NOT_FOUND HTTP_POST_RECV HTTP_POST_SEND HTTP_SEE_OTHER
+     HTTP_USE_PROXY IPP_ATTRIBUTES IPP_CANCEL_JOB IPP_CREATE_JOB IPP_MAX_VALUES
+     IPP_PURGE_JOBS IPP_RESUME_JOB IPP_RES_PER_CM IPP_TAG_STRING IPP_URI_SCHEME
+     PPD_CUSTOM_INT PPD_ORDER_EXIT PPD_ORDER_PAGE PPD_UI_BOOLEAN PPD_UI_PICKONE
+     */
   /* Offset 13 gives the best switch position.  */
   switch (name[13]) {
   case '1':
@@ -727,7 +741,7 @@ constant_14 (pTHX_ const char *name, IV *iv_return) {
   case 'B':
     if (memEQ(name, "CUPS_IMAGE_RG", 13)) {
     /*                            B      */
-      *iv_return = CUPS_IMAGE_RGB;
+      *iv_return = CF_IMAGE_RGB;
       return PERL_constant_ISIV;
     }
     if (memEQ(name, "IPP_CANCEL_JO", 13)) {
@@ -759,6 +773,11 @@ constant_14 (pTHX_ const char *name, IV *iv_return) {
     }
     break;
   case 'E':
+    if (memEQ(name, "CF_IMAGE_WHIT", 13)) {
+    /*                            E      */
+      *iv_return = CF_IMAGE_WHITE;
+      return PERL_constant_ISIV;
+    }
     if (memEQ(name, "CUPS_FILE_NON", 13)) {
     /*                            E      */
       *iv_return = CUPS_FILE_NONE;
@@ -794,6 +813,13 @@ constant_14 (pTHX_ const char *name, IV *iv_return) {
     if (memEQ(name, "IPP_TAG_STRIN", 13)) {
     /*                            G      */
       *iv_return = IPP_TAG_STRING;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'K':
+    if (memEQ(name, "CF_IMAGE_BLAC", 13)) {
+    /*                            K      */
+      *iv_return = CF_IMAGE_BLACK;
       return PERL_constant_ISIV;
     }
     break;
@@ -886,7 +912,7 @@ constant_14 (pTHX_ const char *name, IV *iv_return) {
   case 'Y':
     if (memEQ(name, "CUPS_IMAGE_CM", 13)) {
     /*                            Y      */
-      *iv_return = CUPS_IMAGE_CMY;
+      *iv_return = CF_IMAGE_CMY;
       return PERL_constant_ISIV;
     }
     if (memEQ(name, "HTTP_USE_PROX", 13)) {
@@ -1026,7 +1052,7 @@ constant_15 (pTHX_ const char *name, IV *iv_return) {
   case 'K':
     if (memEQ(name, "CUPS_IMAGE_CMY", 14)) {
     /*                             K      */
-      *iv_return = CUPS_IMAGE_CMYK;
+      *iv_return = CF_IMAGE_CMYK;
       return PERL_constant_ISIV;
     }
     if (memEQ(name, "HTTP_FIELD_LIN", 14)) {
@@ -1173,7 +1199,7 @@ constant_16 (pTHX_ const char *name, IV *iv_return) {
   case 'A':
     if (memEQ(name, "CUPS_IMAGE_BLACK", 16)) {
     /*                            ^         */
-      *iv_return = CUPS_IMAGE_BLACK;
+      *iv_return = CF_IMAGE_BLACK;
       return PERL_constant_ISIV;
     }
     if (memEQ(name, "IPP_TAG_LANGUAGE", 16)) {
@@ -1230,7 +1256,7 @@ constant_16 (pTHX_ const char *name, IV *iv_return) {
   case 'I':
     if (memEQ(name, "CUPS_IMAGE_WHITE", 16)) {
     /*                            ^         */
-      *iv_return = CUPS_IMAGE_WHITE;
+      *iv_return = CF_IMAGE_WHITE;
       return PERL_constant_ISIV;
     }
     if (memEQ(name, "CUPS_MAX_USTRING", 16)) {
@@ -1352,16 +1378,16 @@ static int
 constant_17 (pTHX_ const char *name, IV *iv_return) {
   /* When generated this function returned values for the list of names given
      here.  However, subsequent manual editing may have added or removed some.
-     CUPS_DELETE_CLASS CUPS_GET_PRINTERS CUPS_PRINTER_BIND CUPS_PRINTER_SORT
-     CUPS_WINDOWS_1250 CUPS_WINDOWS_1251 CUPS_WINDOWS_1252 CUPS_WINDOWS_1253
-     CUPS_WINDOWS_1254 CUPS_WINDOWS_1255 CUPS_WINDOWS_1256 CUPS_WINDOWS_1257
-     CUPS_WINDOWS_1258 CUPS_WINDOWS_1361 HTTP_AUTH_MD5_INT HTTP_KEEPALIVE_ON
-     HTTP_NOT_MODIFIED HTTP_PRECONDITION HTTP_SERVER_ERROR HTTP_UNAUTHORIZED
-     HTTP_URI_BAD_PORT HTTP_URI_OVERFLOW HTTP_URI_TOO_LONG IPP_HOLD_NEW_JOBS
-     IPP_JOB_CANCELLED IPP_JOB_COMPLETED IPP_NOT_ACCEPTING IPP_PAUSE_PRINTER
-     IPP_QUALITY_DRAFT IPP_REPROCESS_JOB IPP_REQUEST_VALUE IPP_SEND_DOCUMENT
-     IPP_TAG_OPERATION IPP_TAG_URISCHEME PPD_CUSTOM_POINTS PPD_CUSTOM_STRING
-     PPD_LINE_TOO_LONG PPD_MISSING_VALUE */
+     CF_IMAGE_RGB_CMYK CUPS_DELETE_CLASS CUPS_GET_PRINTERS CUPS_PRINTER_BIND
+     CUPS_PRINTER_SORT CUPS_WINDOWS_1250 CUPS_WINDOWS_1251 CUPS_WINDOWS_1252
+     CUPS_WINDOWS_1253 CUPS_WINDOWS_1254 CUPS_WINDOWS_1255 CUPS_WINDOWS_1256
+     CUPS_WINDOWS_1257 CUPS_WINDOWS_1258 CUPS_WINDOWS_1361 HTTP_AUTH_MD5_INT
+     HTTP_KEEPALIVE_ON HTTP_NOT_MODIFIED HTTP_PRECONDITION HTTP_SERVER_ERROR
+     HTTP_UNAUTHORIZED HTTP_URI_BAD_PORT HTTP_URI_OVERFLOW HTTP_URI_TOO_LONG
+     IPP_HOLD_NEW_JOBS IPP_JOB_CANCELLED IPP_JOB_COMPLETED IPP_NOT_ACCEPTING
+     IPP_PAUSE_PRINTER IPP_QUALITY_DRAFT IPP_REPROCESS_JOB IPP_REQUEST_VALUE
+     IPP_SEND_DOCUMENT IPP_TAG_OPERATION IPP_TAG_URISCHEME PPD_CUSTOM_POINTS
+     PPD_CUSTOM_STRING PPD_LINE_TOO_LONG PPD_MISSING_VALUE */
   /* Offset 16 gives the best switch position.  */
   switch (name[16]) {
   case '0':
@@ -1502,6 +1528,13 @@ constant_17 (pTHX_ const char *name, IV *iv_return) {
     if (memEQ(name, "PPD_LINE_TOO_LON", 16)) {
     /*                               G      */
       *iv_return = PPD_LINE_TOO_LONG;
+      return PERL_constant_ISIV;
+    }
+    break;
+  case 'K':
+    if (memEQ(name, "CF_IMAGE_RGB_CMY", 16)) {
+    /*                               K      */
+      *iv_return = CF_IMAGE_RGB_CMYK;
       return PERL_constant_ISIV;
     }
     break;
@@ -1877,7 +1910,7 @@ constant_19 (pTHX_ const char *name, IV *iv_return) {
   case 'C':
     if (memEQ(name, "CUPS_IMAGE_RGB_CMYK", 19)) {
     /*                              ^          */
-      *iv_return = CUPS_IMAGE_RGB_CMYK;
+      *iv_return = CF_IMAGE_RGB_CMYK;
       return PERL_constant_ISIV;
     }
     if (memEQ(name, "PPD_CUSTOM_PASSCODE", 19)) {
@@ -3267,6 +3300,12 @@ use ExtUtils::Constant qw (constant_types C_constant XS_constant);
 my $types = {map {($_, 1)} qw(IV)};
 my @names = (qw(INET6),
             {name=>"AF_LOCAL", type=>"IV", macro=>"1"},
+            {name=>"CF_IMAGE_BLACK", type=>"IV", macro=>"1"},
+            {name=>"CF_IMAGE_CMY", type=>"IV", macro=>"1"},
+            {name=>"CF_IMAGE_CMYK", type=>"IV", macro=>"1"},
+            {name=>"CF_IMAGE_RGB", type=>"IV", macro=>"1"},
+            {name=>"CF_IMAGE_RGB_CMYK", type=>"IV", macro=>"1"},
+            {name=>"CF_IMAGE_WHITE", type=>"IV", macro=>"1"},
             {name=>"CUPS_ACCEPT_JOBS", type=>"IV", macro=>"1"},
             {name=>"CUPS_ADD_CLASS", type=>"IV", macro=>"1"},
             {name=>"CUPS_ADD_MODIFY_CLASS", type=>"IV", macro=>"1"},
@@ -3291,12 +3330,12 @@ my @names = (qw(INET6),
             {name=>"CUPS_GET_DEVICES", type=>"IV", macro=>"1"},
             {name=>"CUPS_GET_PPDS", type=>"IV", macro=>"1"},
             {name=>"CUPS_GET_PRINTERS", type=>"IV", macro=>"1"},
-            {name=>"CUPS_IMAGE_BLACK", type=>"IV", macro=>"1"},
-            {name=>"CUPS_IMAGE_CMY", type=>"IV", macro=>"1"},
-            {name=>"CUPS_IMAGE_CMYK", type=>"IV", macro=>"1"},
-            {name=>"CUPS_IMAGE_RGB", type=>"IV", macro=>"1"},
-            {name=>"CUPS_IMAGE_RGB_CMYK", type=>"IV", macro=>"1"},
-            {name=>"CUPS_IMAGE_WHITE", type=>"IV", macro=>"1"},
+            {name=>"CUPS_IMAGE_BLACK", type=>"IV", macro=>"1", value=>"CF_IMAGE_BLACK"},
+            {name=>"CUPS_IMAGE_CMY", type=>"IV", macro=>"1", value=>"CF_IMAGE_CMY"},
+            {name=>"CUPS_IMAGE_CMYK", type=>"IV", macro=>"1", value=>"CF_IMAGE_CMYK"},
+            {name=>"CUPS_IMAGE_RGB", type=>"IV", macro=>"1", value=>"CF_IMAGE_RGB"},
+            {name=>"CUPS_IMAGE_RGB_CMYK", type=>"IV", macro=>"1", value=>"CF_IMAGE_RGB_CMYK"},
+            {name=>"CUPS_IMAGE_WHITE", type=>"IV", macro=>"1", value=>"CF_IMAGE_WHITE"},
             {name=>"CUPS_ISO8859_1", type=>"IV", macro=>"1"},
             {name=>"CUPS_ISO8859_10", type=>"IV", macro=>"1"},
             {name=>"CUPS_ISO8859_11", type=>"IV", macro=>"1"},

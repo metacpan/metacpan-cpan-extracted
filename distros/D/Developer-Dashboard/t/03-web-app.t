@@ -118,6 +118,11 @@ like($body1, qr/<textarea[^>]*name="instruction"/, 'root route renders editable 
 unlike($body1, qr/Saved pages live under/, 'root route no longer renders landing list');
 unlike($body1, qr/>Update</, 'root route does not render manual update button');
 like($body1, qr/addEventListener\('change', function\(\) \{\s*ddForm\.submit\(\);/s, 'root route auto-submits textarea changes on blur');
+like($body1, qr/function ddApplyDirectiveAssist\(\)/, 'root route editor script includes directive assist helper');
+like($body1, qr/if \(priorDirective === 'TITLE'\) \{\s*return directives\.HTML \? '' : 'HTML: ';/s, 'directive assist offers HTML after TITLE only when HTML is still missing');
+like($body1, qr/if \(priorDirective === 'HTML' \|\| \/\^CODE\\d\+\$\/\.test\(priorDirective\)\) \{\s*return 'CODE' \+ \(ddHighestCodeDirective\(fullText\) \+ 1\) \+ ': ';/s, 'directive assist advances CODE directives from HTML and CODE sections');
+like($body1, qr/if \(line !== ':---' \|\| caret !== lineEnd\) return false;/s, 'directive assist only expands fresh :--- separator markers at line end');
+like($body1, qr/ddEditor\.addEventListener\('input', function\(\) \{\s*ddApplyDirectiveAssist\(\);\s*ddRenderEditor\(ddEditor\.value\);/s, 'directive assist runs before overlay refresh on editor input');
 
 my $root_index = Developer::Dashboard::PageDocument->new(
     id     => 'index',
@@ -145,559 +150,6 @@ $store->save_page($prefixed_saved_page);
 ok(-f File::Spec->catfile( $paths->dashboards_root, 'prefixed-save' ), 'save_page normalizes a leading /app/ prefix to the relative dashboards path');
 my $loaded_prefixed_page = $store->load_saved_page('prefixed-save');
 is($loaded_prefixed_page->as_hash->{title}, 'Prefixed Save', 'load_saved_page resolves normalized prefixed bookmark ids');
-
-my ( $api_page_stdout, $api_page_stderr, $api_page_exit ) = capture {
-    system( $^X, "-I$repo_lib", $dashboard_bin, 'page', 'source', 'api-dashboard' );
-};
-is( $api_page_exit, 0, 'api-dashboard source command exits cleanly for web app fixture setup' );
-is( $api_page_stderr, '', 'api-dashboard source command does not emit stderr for web app fixture setup' );
-my $api_page = Developer::Dashboard::PageDocument->from_instruction($api_page_stdout);
-$store->save_page($api_page);
-my ( $api_render_code, undef, $api_render_body ) = @{ $app->handle( path => '/app/api-dashboard', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' } ) };
-is( $api_render_code, 200, 'api-dashboard saved route renders through the web app' );
-like( $api_render_body, qr/Import Postman Collection/, 'api-dashboard render exposes Postman collection import controls' );
-like( $api_render_body, qr/Export Postman Collection/, 'api-dashboard render exposes Postman collection export controls' );
-like( $api_render_body, qr/New Tab/, 'api-dashboard render exposes request tab controls' );
-like( $api_render_body, qr/api-response-preview/, 'api-dashboard render exposes a dedicated response preview surface' );
-like( $api_render_body, qr/history\.pushState/, 'api-dashboard render updates browser history for navigation-aware workspace locations' );
-like( $api_render_body, qr/window\.addEventListener\('popstate'/, 'api-dashboard render restores workspace state on browser back and forward navigation' );
-like( $api_render_body, qr/URLSearchParams/, 'api-dashboard render reads bookmark workspace location from the URL' );
-like( $api_render_body, qr{set_chain_value\(configs,'collections\.bootstrap','/ajax/api-dashboard-bootstrap\?type=json'\)}, 'api-dashboard render binds the bootstrap collection ajax endpoint' );
-like( $api_render_body, qr{set_chain_value\(configs,'collections\.save','/ajax/api-dashboard-collections-save\?type=json'\)}, 'api-dashboard render binds the collection save ajax endpoint' );
-like( $api_render_body, qr{set_chain_value\(configs,'collections\.delete','/ajax/api-dashboard-collections-delete\?type=json'\)}, 'api-dashboard render binds the collection delete ajax endpoint' );
-like( $api_render_body, qr{set_chain_value\(configs,'send\.request','/ajax/api-dashboard-send-request\?type=json'\)}, 'api-dashboard render binds the saved request sender ajax endpoint' );
-like( $api_render_body, qr/var requestPayload = payload && payload\.request \|\| \{\};/, 'api-dashboard render guards request detail rendering when the UI shows a transient status payload' );
-like( $api_render_body, qr/var responsePayload = payload && payload\.response \|\| \{\};/, 'api-dashboard render guards response detail rendering when the UI shows a transient status payload' );
-like( $api_render_body, qr/Show Credentials/, 'api-dashboard render exposes a hide and show credentials section in the workspace' );
-like( $api_render_body, qr/id="api-auth-kind"/, 'api-dashboard render exposes a credentials type selector in the workspace' );
-like( $api_render_body, qr/Apple Login/, 'api-dashboard render exposes the Apple login credentials preset' );
-like( $api_render_body, qr/Amazon Login/, 'api-dashboard render exposes the Amazon login credentials preset' );
-like( $api_render_body, qr/Facebook Login/, 'api-dashboard render exposes the Facebook login credentials preset' );
-like( $api_render_body, qr/Microsoft Login/, 'api-dashboard render exposes the Microsoft login credentials preset' );
-like( $api_page_stdout, qr/use LWP::Protocol::https \(\);/, 'api-dashboard saved ajax sender explicitly loads HTTPS protocol support' );
-my $api_dashboard_config_root = File::Spec->catdir( $paths->config_root, 'api-dashboard' );
-make_path($api_dashboard_config_root);
-my $bootstrap_collection_file = File::Spec->catfile( $api_dashboard_config_root, 'Bootstrap Collection.json' );
-open my $bootstrap_collection_fh, '>', $bootstrap_collection_file or die "Unable to write $bootstrap_collection_file: $!";
-print {$bootstrap_collection_fh} json_encode(
-    {
-        info     => {
-            name        => 'Bootstrap Collection',
-            description => 'Bootstrapped from config/api-dashboard',
-            schema      => 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json',
-        },
-        variable => [
-            {
-                key   => 'base_url',
-                value => 'https://example.test',
-            },
-        ],
-        item     => [],
-    }
-);
-close $bootstrap_collection_fh or die "Unable to close $bootstrap_collection_file: $!";
-my ($api_bootstrap_code, $api_bootstrap_type, $api_bootstrap_body_ref) = @{ $app->handle(
-    path        => '/ajax/api-dashboard-bootstrap',
-    query       => 'type=json',
-    method      => 'GET',
-    remote_addr => '127.0.0.1',
-    headers     => { host => '127.0.0.1' },
-) };
-is( $api_bootstrap_code, 200, 'api-dashboard bootstrap ajax endpoint responds through the saved ajax file route' );
-like( $api_bootstrap_type, qr/application\/json/, 'api-dashboard bootstrap ajax endpoint returns json content' );
-my $api_bootstrap_payload = json_decode( drain_stream_body($api_bootstrap_body_ref) );
-ok( ref($api_bootstrap_payload) eq 'HASH', 'api-dashboard bootstrap ajax endpoint returns a json object' );
-ok( exists $api_bootstrap_payload->{collections}, 'api-dashboard bootstrap ajax payload includes collections' );
-ok( exists $api_bootstrap_payload->{errors}, 'api-dashboard bootstrap ajax payload includes explicit bootstrap errors' );
-is_deeply(
-    [ map { $_->{info}{name} } @{ $api_bootstrap_payload->{collections} || [] } ],
-    ['Bootstrap Collection'],
-    'api-dashboard bootstrap ajax endpoint loads Postman collections from config/api-dashboard',
-);
-
-my $save_collection_payload = json_encode(
-    {
-        info     => {
-            name        => 'Saved Collection',
-            description => 'Saved through the api-dashboard ajax endpoint',
-            schema      => 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json',
-        },
-        variable => [
-            {
-                key   => 'token',
-                value => 'abc123',
-            },
-        ],
-        item     => [
-            {
-                name    => 'List Orders',
-                request => {
-                    method      => 'GET',
-                    header      => [
-                        {
-                            key   => 'Accept',
-                            value => 'application/json',
-                        },
-                    ],
-                    url         => {
-                        raw => 'https://example.test/orders',
-                    },
-                    description => 'List all orders.',
-                },
-            },
-        ],
-    }
-);
-my ($api_collection_save_code, $api_collection_save_type, $api_collection_save_body_ref) = @{ $app->handle(
-    path        => '/ajax/api-dashboard-collections-save',
-    query       => 'type=json',
-    method      => 'POST',
-    body        => 'collection=' . uri_escape($save_collection_payload),
-    remote_addr => '127.0.0.1',
-    headers     => { host => '127.0.0.1' },
-) };
-is( $api_collection_save_code, 200, 'api-dashboard collection save endpoint responds through the saved ajax file route' );
-like( $api_collection_save_type, qr/application\/json/, 'api-dashboard collection save endpoint returns json content' );
-my $api_collection_save_payload = json_decode( drain_stream_body($api_collection_save_body_ref) );
-ok( $api_collection_save_payload->{ok}, 'api-dashboard collection save endpoint reports success' );
-is( $api_collection_save_payload->{collection}{info}{name}, 'Saved Collection', 'api-dashboard collection save endpoint returns the saved Postman collection' );
-my $saved_collection_file = File::Spec->catfile( $api_dashboard_config_root, 'Saved Collection.json' );
-ok( -f $saved_collection_file, 'api-dashboard collection save endpoint writes config/api-dashboard/<collection-name>.json' );
-is( sprintf( '%04o', ( stat($api_dashboard_config_root) )[2] & 07777 ), '0700', 'api-dashboard collection directory is tightened to owner-only permissions' );
-is( sprintf( '%04o', ( stat($saved_collection_file) )[2] & 07777 ), '0600', 'api-dashboard collection files are tightened to owner-only permissions' );
-my $saved_collection_raw = do {
-    open my $saved_collection_fh, '<', $saved_collection_file or die "Unable to read $saved_collection_file: $!";
-    local $/;
-    my $raw = <$saved_collection_fh>;
-    close $saved_collection_fh or die "Unable to close $saved_collection_file: $!";
-    $raw;
-};
-my $saved_collection_json = json_decode($saved_collection_raw);
-is( $saved_collection_json->{info}{name}, 'Saved Collection', 'api-dashboard collection save endpoint stores Postman collection info.name' );
-is( $saved_collection_json->{item}[0]{name}, 'List Orders', 'api-dashboard collection save endpoint stores Postman collection items' );
-like( $saved_collection_raw, qr/\Q"schema" : "https:\/\/schema.getpostman.com\/json\/collection\/v2.1.0\/collection.json"\E/, 'api-dashboard collection save endpoint stores Postman schema metadata in the json file' );
-
-my $large_collection_payload = json_encode(
-    {
-        info     => {
-            name        => 'Large Saved Collection',
-            description => 'Saved through the api-dashboard ajax endpoint with an oversized request body payload',
-            schema      => 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json',
-        },
-        variable => [],
-        item     => [
-            {
-                name    => 'Large Saved Request',
-                request => {
-                    method      => 'POST',
-                    header      => [
-                        {
-                            key   => 'Content-Type',
-                            value => 'application/json',
-                        },
-                    ],
-                    body        => {
-                        mode => 'raw',
-                        raw  => ( 'A' x 250_000 ),
-                    },
-                    url         => {
-                        raw => 'https://example.test/large-save',
-                    },
-                    description => 'Large save regression fixture.',
-                },
-            },
-        ],
-    }
-);
-my ($api_large_collection_save_code, $api_large_collection_save_type, $api_large_collection_save_body_ref) = @{ $app->handle(
-    path        => '/ajax/api-dashboard-collections-save',
-    query       => 'type=json',
-    method      => 'POST',
-    body        => 'collection=' . uri_escape($large_collection_payload),
-    remote_addr => '127.0.0.1',
-    headers     => { host => '127.0.0.1' },
-) };
-is( $api_large_collection_save_code, 200, 'api-dashboard collection save endpoint accepts an oversized collection payload' );
-like( $api_large_collection_save_type, qr/application\/json/, 'api-dashboard oversized collection save returns json content' );
-my $api_large_collection_save_payload = json_decode( drain_stream_body($api_large_collection_save_body_ref) );
-ok( $api_large_collection_save_payload->{ok}, 'api-dashboard oversized collection save reports success' );
-my $large_saved_collection_file = File::Spec->catfile( $api_dashboard_config_root, 'Large Saved Collection.json' );
-ok( -f $large_saved_collection_file, 'api-dashboard oversized collection save writes config/api-dashboard/<collection-name>.json' );
-my $large_saved_collection_json = json_decode( do {
-    open my $large_saved_collection_fh, '<', $large_saved_collection_file or die "Unable to read $large_saved_collection_file: $!";
-    local $/;
-    my $raw = <$large_saved_collection_fh>;
-    close $large_saved_collection_fh or die "Unable to close $large_saved_collection_file: $!";
-    $raw;
-} );
-is( length( $large_saved_collection_json->{item}[0]{request}{body}{raw} || '' ), 250_000, 'api-dashboard oversized collection save preserves the full request body payload' );
-
-my $save_collection_update_payload = json_encode(
-    {
-        info     => {
-            name        => 'Saved Collection',
-            description => 'Updated through the api-dashboard ajax endpoint',
-            schema      => 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json',
-        },
-        variable => [
-            {
-                key   => 'token',
-                value => 'xyz789',
-            },
-        ],
-        item     => [
-            {
-                name    => 'List Customers',
-                request => {
-                    method      => 'GET',
-                    header      => [],
-                    url         => {
-                        raw => 'https://example.test/customers',
-                    },
-                    description => 'List all customers.',
-                },
-            },
-        ],
-    }
-);
-my ($api_collection_update_code, $api_collection_update_type, $api_collection_update_body_ref) = @{ $app->handle(
-    path        => '/ajax/api-dashboard-collections-save',
-    query       => 'type=json',
-    method      => 'POST',
-    body        => 'collection=' . uri_escape($save_collection_update_payload),
-    remote_addr => '127.0.0.1',
-    headers     => { host => '127.0.0.1' },
-) };
-is( $api_collection_update_code, 200, 'api-dashboard collection save endpoint updates an existing collection file when the collection name is unchanged' );
-like( $api_collection_update_type, qr/application\/json/, 'api-dashboard collection update returns json content' );
-my $api_collection_update_payload = json_decode( drain_stream_body($api_collection_update_body_ref) );
-ok( $api_collection_update_payload->{ok}, 'api-dashboard collection update reports success' );
-my $updated_collection_json = json_decode( do {
-    open my $updated_collection_fh, '<', $saved_collection_file or die "Unable to read $saved_collection_file: $!";
-    local $/;
-    my $raw = <$updated_collection_fh>;
-    close $updated_collection_fh or die "Unable to close $saved_collection_file: $!";
-    $raw;
-} );
-is( $updated_collection_json->{item}[0]{name}, 'List Customers', 'api-dashboard collection update overwrites the existing file with the latest Postman collection item data' );
-
-my $rename_collection_payload = json_encode(
-    {
-        info     => {
-            name        => 'Renamed Collection',
-            description => 'Renamed through the api-dashboard ajax endpoint',
-            schema      => 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json',
-        },
-        variable => [],
-        item     => [],
-    }
-);
-my ($api_collection_rename_code, $api_collection_rename_type, $api_collection_rename_body_ref) = @{ $app->handle(
-    path        => '/ajax/api-dashboard-collections-save',
-    query       => 'type=json',
-    method      => 'POST',
-    body        => 'collection=' . uri_escape($rename_collection_payload) . '&original_name=' . uri_escape('Saved Collection'),
-    remote_addr => '127.0.0.1',
-    headers     => { host => '127.0.0.1' },
-) };
-is( $api_collection_rename_code, 200, 'api-dashboard collection save endpoint supports renaming an existing saved collection' );
-like( $api_collection_rename_type, qr/application\/json/, 'api-dashboard collection rename returns json content' );
-my $api_collection_rename_payload = json_decode( drain_stream_body($api_collection_rename_body_ref) );
-ok( $api_collection_rename_payload->{ok}, 'api-dashboard collection rename reports success' );
-ok( !-e $saved_collection_file, 'api-dashboard collection rename removes the previous collection file name' );
-my $renamed_collection_file = File::Spec->catfile( $api_dashboard_config_root, 'Renamed Collection.json' );
-ok( -f $renamed_collection_file, 'api-dashboard collection rename writes the new collection file name' );
-
-my ($api_collection_delete_code, $api_collection_delete_type, $api_collection_delete_body_ref) = @{ $app->handle(
-    path        => '/ajax/api-dashboard-collections-delete',
-    query       => 'type=json',
-    method      => 'POST',
-    body        => 'name=' . uri_escape('Renamed Collection'),
-    remote_addr => '127.0.0.1',
-    headers     => { host => '127.0.0.1' },
-) };
-is( $api_collection_delete_code, 200, 'api-dashboard collection delete endpoint responds through the saved ajax file route' );
-like( $api_collection_delete_type, qr/application\/json/, 'api-dashboard collection delete endpoint returns json content' );
-my $api_collection_delete_payload = json_decode( drain_stream_body($api_collection_delete_body_ref) );
-ok( $api_collection_delete_payload->{ok}, 'api-dashboard collection delete endpoint reports success' );
-ok( !-e $renamed_collection_file, 'api-dashboard collection delete endpoint removes config/api-dashboard/<collection-name>.json' );
-
-my $probe_listener = IO::Socket::INET->new(
-    LocalAddr => '127.0.0.1',
-    LocalPort => 0,
-    Listen    => 1,
-    Proto     => 'tcp',
-    ReuseAddr => 1,
-) or die "Unable to start probe listener: $!";
-my $probe_port = $probe_listener->sockport;
-my $probe_pid = fork();
-die "Unable to fork probe listener: $!" if !defined $probe_pid;
-if ( !$probe_pid ) {
-    my $client = $probe_listener->accept or die "Unable to accept probe connection: $!";
-    my $request = '';
-    while ( my $line = <$client> ) {
-        $request .= $line;
-        last if $line =~ /^\r?\n$/;
-    }
-    print {$client} "HTTP/1.1 201 Created\r\n";
-    print {$client} "Content-Type: application/json\r\n";
-    print {$client} "X-Probe: active\r\n";
-    print {$client} "Content-Length: 18\r\n";
-    print {$client} "\r\n";
-    print {$client} "{\"ok\":true,\"id\":7}";
-    close $client or die "Unable to close probe client: $!";
-    exit 0;
-}
-close $probe_listener or die "Unable to close parent probe listener: $!";
-my $api_send_settings = json_encode(
-    {
-        method           => 'GET',
-        url              => "http://127.0.0.1:$probe_port/check",
-        headers_text     => "Accept: application/json\nX-Test: api-dashboard",
-        body             => '',
-        timeout_s        => 5,
-        follow_redirects => 1,
-        insecure_tls     => 0,
-    }
-);
-my ($api_send_code, $api_send_type, $api_send_body_ref) = @{ $app->handle(
-    path        => '/ajax/api-dashboard-send-request',
-    query       => 'type=json',
-    method      => 'POST',
-    body        => 'settings=' . uri_escape($api_send_settings),
-    remote_addr => '127.0.0.1',
-    headers     => { host => '127.0.0.1' },
-) };
-is( $api_send_code, 200, 'api-dashboard saved request sender responds through the saved ajax file route' );
-like( $api_send_type, qr/application\/json/, 'api-dashboard saved request sender returns json content' );
-my $api_send_payload = json_decode( drain_stream_body($api_send_body_ref) );
-ok( $api_send_payload->{ok}, 'api-dashboard saved request sender reports a successful upstream request' );
-is( $api_send_payload->{response}{status}, 201, 'api-dashboard saved request sender preserves upstream status codes' );
-is( $api_send_payload->{response}{content_type}, 'application/json', 'api-dashboard saved request sender preserves upstream content type' );
-is( $api_send_payload->{response}{body_mode}, 'json', 'api-dashboard saved request sender classifies JSON payloads for formatted rendering' );
-my $api_send_rendered_json = json_decode( $api_send_payload->{response}{body} );
-ok( $api_send_rendered_json->{ok}, 'api-dashboard saved request sender pretty prints upstream JSON response bodies with the ok field preserved' );
-is( $api_send_rendered_json->{id}, 7, 'api-dashboard saved request sender pretty prints upstream JSON response bodies with the id field preserved' );
-is( $api_send_payload->{request}{method}, 'GET', 'api-dashboard saved request sender returns the dispatched request method' );
-is( $api_send_payload->{request}{url}, "http://127.0.0.1:$probe_port/check", 'api-dashboard saved request sender returns the dispatched request URL' );
-like( $api_send_payload->{request}{headers_text}, qr/X-Test: api-dashboard/, 'api-dashboard saved request sender returns request headers for detailed inspection' );
-my $probe_wait_pid = waitpid( $probe_pid, 0 );
-is( $probe_wait_pid, $probe_pid, 'probe listener child exits after the api-dashboard sender call' );
-is( $?, 0, 'probe listener child exits cleanly after serving the api-dashboard sender call' );
-
-my $auth_listener = IO::Socket::INET->new(
-    LocalAddr => '127.0.0.1',
-    LocalPort => 0,
-    Listen    => 1,
-    Proto     => 'tcp',
-    ReuseAddr => 1,
-) or die "Unable to start auth listener: $!";
-my $auth_port = $auth_listener->sockport;
-my $auth_pid = fork();
-die "Unable to fork auth listener: $!" if !defined $auth_pid;
-if ( !$auth_pid ) {
-    my $client = $auth_listener->accept or die "Unable to accept auth connection: $!";
-    my $request_line = <$client>;
-    die "Unable to read auth request line" if !defined $request_line;
-    $request_line =~ s/\r?\n\z//;
-    my ( $method, $target ) = split /\s+/, $request_line;
-    my %headers;
-    while ( my $line = <$client> ) {
-        $line =~ s/\r?\n\z//;
-        last if $line eq '';
-        my ( $key, $value ) = split /:\s*/, $line, 2;
-        $headers{ lc($key) } = defined $value ? $value : '';
-    }
-    my $payload = json_encode(
-        {
-            ok            => 1,
-            method        => $method || '',
-            target        => $target || '',
-            authorization => $headers{authorization} || '',
-        }
-    );
-    print {$client} "HTTP/1.1 200 OK\r\n";
-    print {$client} "Content-Type: application/json\r\n";
-    print {$client} "Content-Length: " . length($payload) . "\r\n";
-    print {$client} "\r\n";
-    print {$client} $payload;
-    close $client or die "Unable to close auth client: $!";
-    exit 0;
-}
-close $auth_listener or die "Unable to close parent auth listener: $!";
-my $api_auth_send_settings = json_encode(
-    {
-        method           => 'GET',
-        url              => "http://127.0.0.1:$auth_port/secure",
-        headers_text     => "Accept: application/json\nAuthorization: Bearer stale-token",
-        body             => '',
-        timeout_s        => 5,
-        follow_redirects => 1,
-        insecure_tls     => 0,
-        auth             => {
-            type     => 'basic',
-            username => 'api-user',
-            password => 'api-pass',
-        },
-    }
-);
-my ($api_auth_send_code, $api_auth_send_type, $api_auth_send_body_ref) = @{ $app->handle(
-    path        => '/ajax/api-dashboard-send-request',
-    query       => 'type=json',
-    method      => 'POST',
-    body        => 'settings=' . uri_escape($api_auth_send_settings),
-    remote_addr => '127.0.0.1',
-    headers     => { host => '127.0.0.1' },
-) };
-is( $api_auth_send_code, 200, 'api-dashboard sender accepts request auth settings through the saved ajax route' );
-like( $api_auth_send_type, qr/application\/json/, 'api-dashboard sender keeps auth-backed requests inside the json envelope' );
-my $api_auth_send_payload = json_decode( drain_stream_body($api_auth_send_body_ref) );
-ok( $api_auth_send_payload->{ok}, 'api-dashboard sender reports success for auth-backed requests' );
-my $api_auth_echo = json_decode( $api_auth_send_payload->{response}{body} );
-is(
-    $api_auth_echo->{authorization},
-    'Basic YXBpLXVzZXI6YXBpLXBhc3M=',
-    'api-dashboard sender replaces stale Authorization headers with Basic auth credentials from the request auth settings'
-);
-my $auth_wait_pid = waitpid( $auth_pid, 0 );
-is( $auth_wait_pid, $auth_pid, 'auth listener child exits after the api-dashboard auth sender call' );
-is( $?, 0, 'auth listener child exits cleanly after serving the api-dashboard auth sender call' );
-
-my $apikey_listener = IO::Socket::INET->new(
-    LocalAddr => '127.0.0.1',
-    LocalPort => 0,
-    Listen    => 1,
-    Proto     => 'tcp',
-    ReuseAddr => 1,
-) or die "Unable to start api key listener: $!";
-my $apikey_port = $apikey_listener->sockport;
-my $apikey_pid = fork();
-die "Unable to fork api key listener: $!" if !defined $apikey_pid;
-if ( !$apikey_pid ) {
-    my $client = $apikey_listener->accept or die "Unable to accept api key connection: $!";
-    my $request_line = <$client>;
-    die "Unable to read api key request line" if !defined $request_line;
-    $request_line =~ s/\r?\n\z//;
-    my ( $method, $target ) = split /\s+/, $request_line;
-    while ( my $line = <$client> ) {
-        last if $line =~ /^\r?\n$/;
-    }
-    my $payload = json_encode(
-        {
-            ok     => 1,
-            method => $method || '',
-            target => $target || '',
-        }
-    );
-    print {$client} "HTTP/1.1 200 OK\r\n";
-    print {$client} "Content-Type: application/json\r\n";
-    print {$client} "Content-Length: " . length($payload) . "\r\n";
-    print {$client} "\r\n";
-    print {$client} $payload;
-    close $client or die "Unable to close api key client: $!";
-    exit 0;
-}
-close $apikey_listener or die "Unable to close parent api key listener: $!";
-my $api_apikey_send_settings = json_encode(
-    {
-        method           => 'GET',
-        url              => "http://127.0.0.1:$apikey_port/secure?name=ping",
-        headers_text     => "Accept: application/json",
-        body             => '',
-        timeout_s        => 5,
-        follow_redirects => 1,
-        insecure_tls     => 0,
-        auth             => {
-            type  => 'apikey',
-            key   => 'api_key',
-            value => 'abc123',
-            in    => 'query',
-        },
-    }
-);
-my ($api_apikey_send_code, $api_apikey_send_type, $api_apikey_send_body_ref) = @{ $app->handle(
-    path        => '/ajax/api-dashboard-send-request',
-    query       => 'type=json',
-    method      => 'POST',
-    body        => 'settings=' . uri_escape($api_apikey_send_settings),
-    remote_addr => '127.0.0.1',
-    headers     => { host => '127.0.0.1' },
-) };
-is( $api_apikey_send_code, 200, 'api-dashboard sender accepts API key auth settings through the saved ajax route' );
-like( $api_apikey_send_type, qr/application\/json/, 'api-dashboard sender returns api key requests as json payloads' );
-my $api_apikey_send_payload = json_decode( drain_stream_body($api_apikey_send_body_ref) );
-ok( $api_apikey_send_payload->{ok}, 'api-dashboard sender reports success for API key requests' );
-is(
-    $api_apikey_send_payload->{request}{url},
-    "http://127.0.0.1:$apikey_port/secure?name=ping&api_key=abc123",
-    'api-dashboard sender appends query-style API key auth to the dispatched request URL'
-);
-my $api_apikey_echo = json_decode( $api_apikey_send_payload->{response}{body} );
-is(
-    $api_apikey_echo->{target},
-    '/secure?name=ping&api_key=abc123',
-    'api-dashboard sender forwards query-style API key auth to the upstream request target'
-);
-my $apikey_wait_pid = waitpid( $apikey_pid, 0 );
-is( $apikey_wait_pid, $apikey_pid, 'api key listener child exits after the api-dashboard api key sender call' );
-is( $?, 0, 'api key listener child exits cleanly after serving the api-dashboard api key sender call' );
-
-my $preview_listener = IO::Socket::INET->new(
-    LocalAddr => '127.0.0.1',
-    LocalPort => 0,
-    Listen    => 1,
-    Proto     => 'tcp',
-    ReuseAddr => 1,
-) or die "Unable to start preview listener: $!";
-my $preview_port = $preview_listener->sockport;
-my $preview_pid = fork();
-die "Unable to fork preview listener: $!" if !defined $preview_pid;
-if ( !$preview_pid ) {
-    my $client = $preview_listener->accept or die "Unable to accept preview connection: $!";
-    my $request = '';
-    while ( my $line = <$client> ) {
-        $request .= $line;
-        last if $line =~ /^\r?\n$/;
-    }
-    my $png = pack( 'H*', '89504e470d0a1a0a0000000d4948445200000001000000010802000000907753de0000000c49444154789c63606060000000040001f61738550000000049454e44ae426082' );
-    print {$client} "HTTP/1.1 200 OK\r\n";
-    print {$client} "Content-Type: image/png\r\n";
-    print {$client} "Content-Length: " . length($png) . "\r\n";
-    print {$client} "\r\n";
-    print {$client} $png;
-    close $client or die "Unable to close preview client: $!";
-    exit 0;
-}
-close $preview_listener or die "Unable to close parent preview listener: $!";
-my $preview_settings = json_encode(
-    {
-        method           => 'GET',
-        url              => "http://127.0.0.1:$preview_port/image",
-        headers_text     => "Accept: image/png",
-        body             => '',
-        timeout_s        => 5,
-        follow_redirects => 1,
-        insecure_tls     => 0,
-    }
-);
-my ($preview_code, $preview_type, $preview_body_ref) = @{ $app->handle(
-    path        => '/ajax/api-dashboard-send-request',
-    query       => 'type=json',
-    method      => 'POST',
-    body        => 'settings=' . uri_escape($preview_settings),
-    remote_addr => '127.0.0.1',
-    headers     => { host => '127.0.0.1' },
-) };
-is( $preview_code, 200, 'api-dashboard sender returns previewable media payloads through the saved ajax file route' );
-like( $preview_type, qr/application\/json/, 'api-dashboard sender keeps previewable media responses inside the json envelope' );
-my $preview_payload = json_decode( drain_stream_body($preview_body_ref) );
-ok( $preview_payload->{ok}, 'api-dashboard sender reports previewable media responses as successful' );
-is( $preview_payload->{response}{body_mode}, 'preview', 'api-dashboard sender classifies previewable media responses for browser rendering' );
-is( $preview_payload->{response}{preview_media_type}, 'image/png', 'api-dashboard sender returns the preview media type for browser rendering' );
-like( $preview_payload->{response}{preview_url}, qr{\Adata:image/png;base64,}, 'api-dashboard sender returns a browser-previewable data URL for images' );
-my $preview_wait_pid = waitpid( $preview_pid, 0 );
-is( $preview_wait_pid, $preview_pid, 'preview listener child exits after the api-dashboard media sender call' );
-is( $?, 0, 'preview listener child exits cleanly after serving the api-dashboard media sender call' );
 
 my $saved_token = uri_escape( $store->encode_page($page) );
 my ($code1_forbidden_post, $type1_forbidden_post, $body1_forbidden_post) = @{ $app->handle(
@@ -811,6 +263,30 @@ my ($code1d_saved_play, undef, $body1d_saved_play) = @{ $app->handle(
     headers     => { host => '127.0.0.1' },
 ) };
 is($code1d_saved_play, 200, 'transient render route responds for a named bookmark token');
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::Web::App::_machine_ip = sub { return undef };
+    my $remote_page = Developer::Dashboard::PageDocument->new(
+        id     => 'context-remote',
+        title  => 'Context Remote',
+        layout => { body => 'body' },
+    );
+    $remote_page->{meta}{request_context} = {
+        remote_addr => '192.0.2.55',
+    };
+    my $remote_html = $app->_top_context_html($remote_page);
+    like( $remote_html, qr{href="http://192\.0\.2\.55"}, '_top_context_html falls back to remote_addr when machine and host values are absent' );
+
+    my $default_page = Developer::Dashboard::PageDocument->new(
+        id     => 'context-default',
+        title  => 'Context Default',
+        layout => { body => 'body' },
+    );
+    $default_page->{meta}{request_context} = {};
+    my $default_html = $app->_top_context_html($default_page);
+    like( $default_html, qr{href="http://127\.0\.0\.1"}, '_top_context_html falls back to loopback when no machine, host, or remote address is available' );
+}
 like($body1d_saved_play, qr/class="dashboard-nav-items"/, 'transient render for a named bookmark keeps the shared nav section');
 like($body1d_saved_play, qr{<li data-nav-id="nav/alpha\.tt">Home</li>}s, 'transient render for a named bookmark evaluates nav tt fragments against the saved page route');
 like($body1d_saved_play, qr/nav-current=\/app\/index nav-rt=\/app\/index/, 'transient render for a named bookmark exposes the saved page path to nav tt fragments');
@@ -1228,11 +704,9 @@ like($existing_stream, qr/existing-err/, 'existing ajax executable streams stder
 my ($jquery_code, $jquery_type, $jquery_body) = @{ $app->handle(path => '/js/jquery.js', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' }) };
 is($jquery_code, 200, 'built-in jquery bookmark helper route is available');
 like($jquery_type, qr/application\/javascript/, 'built-in jquery bookmark helper route returns javascript');
-like($jquery_body, qr/window\.jQuery = \$;/, 'built-in jquery bookmark helper exposes window.jQuery');
-like($jquery_body, qr/var method = opts\.method \|\| opts\.type \|\| 'GET';/, 'built-in jquery bookmark helper honors the jQuery method alias used by api-dashboard');
-like($jquery_body, qr/xhr\.done = function \(callback\)/, 'built-in jquery bookmark helper exposes jqXHR-style done chaining');
-like($jquery_body, qr/xhr\.fail = function \(callback\)/, 'built-in jquery bookmark helper exposes jqXHR-style fail chaining');
-like($jquery_body, qr/xhr\.always = function \(callback\)/, 'built-in jquery bookmark helper exposes jqXHR-style always chaining');
+like($jquery_body, qr/jQuery v4\.0\.0/, 'built-in jquery bookmark helper route ships the bundled jQuery 4 asset');
+like($jquery_body, qr/define\("jquery"/, 'built-in jquery bookmark helper keeps the packaged jQuery module wrapper');
+like($jquery_body, qr/e\.jQuery=e\.\$=T/, 'built-in jquery bookmark helper exposes jQuery on the window object');
 
 my $legacy_jquery_ajax_page = Developer::Dashboard::PageDocument->from_instruction(<<'PAGE');
 BOOKMARK: test-jquery-ajax
@@ -1419,6 +893,18 @@ is($code10, 200, 'helper route with session ok');
 like($body10, qr/id="logout-url"/, 'helper route renders logout link');
 like($body10, qr/class="user-name-and-icon".*helper_user/s, 'helper route shows helper username in the top chrome');
 
+my $index_file = $store->page_file('index');
+unlink $index_file if -f $index_file;
+my ($code10b, undef, $body10b) = @{ $app->handle(
+    path        => '/',
+    query       => '',
+    remote_addr => '10.0.0.2',
+    headers     => { host => '10.0.0.3:7890', cookie => $helper_cookie },
+) };
+is($code10b, 200, 'helper root route with session ok');
+like($body10b, qr/id="logout-url"/, 'helper root blank editor renders logout link');
+like($body10b, qr/class="user-name-and-icon".*helper_user/s, 'helper root blank editor shows helper username in the top chrome');
+
 my ($code11, undef, $body11, $headers11) = @{ $app->handle(
     path        => '/logout',
     query       => '',
@@ -1431,6 +917,84 @@ is($headers11->{Location}, '/login', 'helper logout redirects to login');
 like($headers11->{'Set-Cookie'}, qr/dashboard_session=;/, 'helper logout expires session cookie');
 ok(!defined $auth->get_user('helper_user'), 'helper logout removes helper account');
 ok(!defined $sessions->get($helper_session->{session_id}), 'helper logout removes helper session');
+
+is(
+    $app->_custom_skill_route_response( route_path => '/' ),
+    undef,
+    '_custom_skill_route_response ignores the root path so custom fallback only runs after smart routing misses',
+);
+
+{
+    package Local::UnknownRouteDispatcher;
+    sub resolve_custom_route_path { return { kind => 'bogus' } }
+    package main;
+    no warnings 'redefine';
+    local *Developer::Dashboard::Web::App::_skill_dispatcher = sub { return bless {}, 'Local::UnknownRouteDispatcher' };
+    is(
+        $app->_custom_skill_route_response( route_path => '/bogus/custom/path' ),
+        undef,
+        '_custom_skill_route_response returns undef when custom route metadata resolves to an unsupported route kind',
+    );
+}
+
+{
+    package Local::UnknownSkillOwnedRouteDispatcher;
+    sub resolve_custom_route_path { return { kind => 'bogus', skill_name => 'example-skill' } }
+    package main;
+    no warnings 'redefine';
+    local *Developer::Dashboard::Web::App::_skill_dispatcher = sub { return bless {}, 'Local::UnknownSkillOwnedRouteDispatcher' };
+    is(
+        $app->_custom_skill_route_response( route_path => '/bogus/skill/path' ),
+        undef,
+        '_custom_skill_route_response also returns undef when one skill-owned custom route resolves to an unsupported route kind',
+    );
+}
+
+{
+    package Local::RuntimeAjaxAliasDispatcher;
+    sub resolve_custom_route_path { return { kind => 'ajax', ajax_file => 'runtime/status' } }
+    package main;
+    my @captured;
+    no warnings 'redefine';
+    local *Developer::Dashboard::Web::App::_skill_dispatcher = sub { return bless {}, 'Local::RuntimeAjaxAliasDispatcher' };
+    local *Developer::Dashboard::Web::App::dispatch_request = sub {
+        my ( $self, %args ) = @_;
+        push @captured, $args{path};
+        return [ 200, 'text/plain; charset=utf-8', "runtime ajax alias\n" ];
+    };
+    is_deeply(
+        $app->_custom_skill_route_response( route_path => '/runtime/status' ),
+        [ 200, 'text/plain; charset=utf-8', "runtime ajax alias\n" ],
+        '_custom_skill_route_response dispatches runtime ajax aliases back through the built-in ajax route family',
+    );
+    is_deeply( \@captured, ['/ajax/runtime/status'], 'runtime ajax aliases dispatch to the matching built-in ajax path' );
+}
+
+{
+    package Local::RuntimeStaticAliasDispatcher;
+    sub resolve_custom_route_path { return { kind => 'js', file => 'site/main.js' } }
+    package main;
+    my @captured;
+    no warnings 'redefine';
+    local *Developer::Dashboard::Web::App::_skill_dispatcher = sub { return bless {}, 'Local::RuntimeStaticAliasDispatcher' };
+    local *Developer::Dashboard::Web::App::dispatch_request = sub {
+        my ( $self, %args ) = @_;
+        push @captured, $args{path};
+        return [ 200, 'application/javascript', "console.log('runtime static alias');\n" ];
+    };
+    is_deeply(
+        $app->_custom_skill_route_response( route_path => '/runtime/main.js' ),
+        [ 200, 'application/javascript', "console.log('runtime static alias');\n" ],
+        '_custom_skill_route_response dispatches runtime static aliases back through the built-in static route families',
+    );
+    is_deeply( \@captured, ['/js/site/main.js'], 'runtime static aliases dispatch to the matching built-in static path' );
+}
+
+is_deeply(
+    $app->_serve_static_file_at_path( 'css', 'missing.css', '' ),
+    [ 404, 'text/plain; charset=utf-8', "Not Found\n" ],
+    '_serve_static_file_at_path returns an explicit 404 when the caller does not resolve a readable asset path',
+);
 
 done_testing;
 

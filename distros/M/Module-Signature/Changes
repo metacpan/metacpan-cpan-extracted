@@ -1,5 +1,9 @@
 Revision history for Module::Signature.
 
+0.96 -- Mon Apr 27 11:27:02 ADT 2026
+
+* Fix issue from last release where search keys is interactive
+
 0.95 -- Sun Apr 26 11:44:20 ADT 2026
 
 * Announce deprecation of the module

@@ -1,12 +1,12 @@
 package Muster::Hook::FieldSubst;
-$Muster::Hook::FieldSubst::VERSION = '0.93';
+$Muster::Hook::FieldSubst::VERSION = '0.9501';
 =head1 NAME
 
 Muster::Hook::FieldSubst - Muster hook for field substitution
 
 =head1 VERSION
 
-version 0.93
+version 0.9501
 
 =head1 SYNOPSIS
 

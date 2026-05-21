@@ -6,6 +6,7 @@ typedef struct {
 #ifdef WIN32
    HANDLE hdl;
    DWORD orig_mode, mode;
+   int pending_high_surrogate;
 #else /* not WIN32 */
    int fd;
    struct termios orig_state, cur_state;
@@ -21,6 +22,8 @@ static bool sb_console_state_init(pTHX_ sb_console_state *state, PerlIO *stream)
 static bool sb_console_state_get_echo(sb_console_state *state);
 /* write console state with echo bit enabled or disabled */
 static bool sb_console_state_set_echo(sb_console_state *state, bool enable);
+/* wait until a character is available to be read from the console/tty */
+static bool sb_console_state_wait_char_readable(pTHX_ sb_console_state *state, SV *timeout_sv);
 /* return status of "line input" bit (ICANON mode on Posix) */
 static bool sb_console_state_get_line_input(sb_console_state *state);
 /* write console state with new value for line-input */
@@ -223,6 +226,116 @@ static void sb_console_state_destroy(pTHX_ sb_console_state *state) {
             warn("BUG: CloseHandle failed");
       state->hdl= INVALID_HANDLE_VALUE;
    }
+   state->pending_high_surrogate= 0;
+}
+
+static bool
+sb_console_state_wait_char_readable(pTHX_ sb_console_state *state, SV *timeout_sv) {
+   return sb_wait_win32_handle_readable(aTHX_ state->hdl, timeout_sv);
+}
+
+/* Windows API provides unicode key characters when you use ReadConsoleInputW.
+ * SecretBuffer is UTF-8 by default, so this function translates them.
+ * Returns true if it added a character, and false if no character is available yet,
+ * and croaks on OS errors or invalid surrogate pairs.
+ * It only appends whole characters (encoded as UTF-8) and may store half a
+ * surrogate pair into `state` to be combined with a subsequent call.
+ */
+static bool
+sb_append_console_char(pTHX_ sb_console_state *state, secret_buffer *dest) {
+   INPUT_RECORD in_rec[16];
+   const char *error= NULL;
+   DWORD err_code= 0;
+   int cp= -1;
+   /* Inspect pending console events until we find a real character-producing key event,
+    * including looking for surrogate pair if half a character is received.
+    * Discard non-character events.
+    */
+   while (cp < 0 && !error) {
+      DWORD i, nread;
+      if (!PeekConsoleInputW(state->hdl, in_rec, sizeof(in_rec)/sizeof(*in_rec), &nread)) {
+         error= "PeekConsoleInputW failed";
+         err_code= GetLastError();
+         translate_to_errno();
+         break;
+      }
+      if (!nread)
+         break;
+      for (i = 0; i < nread && cp < 0 && !error; i++) {
+         if (in_rec[i].EventType == KEY_EVENT
+             && in_rec[i].Event.KeyEvent.bKeyDown
+             && in_rec[i].Event.KeyEvent.uChar.UnicodeChar != 0
+         ) {
+            cp= (int) in_rec[i].Event.KeyEvent.uChar.UnicodeChar;
+            if (state->pending_high_surrogate) {
+               /* this needs to be the low surrogate, or die */
+               if (cp >= 0xDC00 && cp <= 0xDFFF) {
+                  /* combine them */
+                  cp = 0x10000 + ((state->pending_high_surrogate - 0xD800) << 10) + (cp - 0xDC00);
+                  state->pending_high_surrogate= 0;
+               } else {
+                  /* croak, but also clear the surrogate so the next read can succeed */
+                  state->pending_high_surrogate= 0;
+                  error= "received unpaired high UTF-16 surrogate";
+                  break; /* stop before i++ so that this event is available later */
+               }
+            }
+            /* new high surrogate? */
+            else if (cp >= 0xD800 && cp <= 0xDBFF) {
+               state->pending_high_surrogate= cp;
+               cp= -1; /* keep looping since the low surrogate is probably in a following event */
+            }
+            /* low surrogate without high surrogate */
+            else if (cp >= 0xDC00 && cp <= 0xDFFF) {
+               error= "received unpaired low UTF-16 surrogate";
+            }
+         }
+      }
+      /* discard consumed events */
+      if (i > 0) {
+         DWORD nread2;
+         if (!ReadConsoleInputW(state->hdl, in_rec, i, &nread2)) {
+            error= "ReadConsoleInputW failed";
+            err_code= GetLastError();
+            translate_to_errno();
+         }
+         else if (nread2 != i)
+            error= "ReadConsoleInputW returned short count";
+      }
+   }
+   secret_buffer_wipe((char*) in_rec, sizeof(in_rec));
+   if (error) {
+      if (err_code)
+         croak_with_syserror(error, err_code);
+      else
+         croak("%s", error);
+   }
+   /* append character */
+   if (cp >= 0) {
+      secret_buffer_parse_rw out;
+      size_t old_len = dest->len;
+      int need = sizeof_codepoint_encoding(cp, SECRET_BUFFER_ENCODING_UTF8);
+      if (need < 0) /* probably impossible */
+         croak("utf-8 encode failed");
+      secret_buffer_alloc_at_least(dest, old_len + need);
+
+      out.pos = (U8 *) dest->data + old_len;
+      out.lim = out.pos + need;
+      out.error = NULL;
+      out.encoding = SECRET_BUFFER_ENCODING_UTF8;
+      out.pos_bit = out.lim_bit = 0;
+      out.sbuf = dest;
+
+      if (!sb_parse_encode_codepoint(&out, cp)) /* probably impossible */
+         croak("utf-8 encode failed");
+
+      secret_buffer_set_len(dest, (size_t)(out.pos - (U8 *) dest->data));
+      return true;
+   }
+   else {
+      /* either no characters available, or read the high half of a surrogate pair */
+      return false;
+   }
 }
 
 #else /* not WIN32 */
@@ -302,6 +415,11 @@ static void sb_console_state_destroy(pTHX_ sb_console_state *state) {
             warn("BUG: close(tty_dup) failed");
       state->fd= -1;
    }
+}
+
+static bool
+sb_console_state_wait_char_readable(pTHX_ sb_console_state *state, SV *timeout_sv) {
+   return sb_wait_fd_readable(aTHX_ state->fd, timeout_sv);
 }
 
 #endif

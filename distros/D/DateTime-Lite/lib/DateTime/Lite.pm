@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Lightweight DateTime Alternative - ~/lib/DateTime/Lite.pm
-## Version v0.6.5
+## Version v0.7.1
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/04/03
-## Modified 2026/04/24
+## Modified 2026/05/20
 ## All rights reserved
 ## 
 ## 
@@ -40,7 +40,7 @@ BEGIN
         'ne'     => '_string_not_equals_overload',
     );
 
-    our $VERSION = 'v0.6.5';
+    our $VERSION = 'v0.7.1';
 
     @MonthLengths = ( 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 );
     @LeapYearMonthLengths = @MonthLengths;
@@ -74,7 +74,12 @@ use warnings;
         };
         if( $@ )
         {
-            die( $@ ) if( $@ && $@ !~ /object version|loadable object/ );
+            # Fall back to pure-Perl silently on:
+            # - version mismatch ("object version")
+            # - not a shared lib ("loadable object")
+            # - missing compiler builtin not available on old GCC/platforms
+            #   ("Undefined symbol" covers __builtin_unreachable on GCC < 4.5)
+            die( $@ ) if( $@ && $@ !~ /object version|loadable object|Undefined symbol/i );
         }
     }
     unless( $loaded )
@@ -317,13 +322,27 @@ sub new
     return( $class->_new( %p ) );
 }
 
+my %valid_new = map{ $_ => 1 } qw( year month day hour minute second nanosecond time_zone locale formatter fatal );
 sub _new
 {
     my $this  = shift( @_ );
     my $class = ref( $this ) || $this;
     my %p     = @_;
 
-    return( $class->error( "Constructor called with reference, expected a package name." ) ) if( ref( $class ) );
+    return( $class->error( "Constructor called with reference, expected a package name." ) ) if( ref( $this ) );
+
+    my @unknown = sort( grep{ !exists( $valid_new{ $_ } ) } keys( %p ) );
+    if( @unknown )
+    {
+        my $sub = (caller(1))[3];
+        return( $class->error( sprintf(
+            "Unknown argument%s passed to %s->%s: %s",
+            @unknown > 1 ? 's' : '',
+            $class,
+            $sub,
+            join( ', ', map{ qq{'$_'} } @unknown ),
+        ) ) );
+    }
 
     $p{month}      //= 1;
     $p{day}        //= 1;
@@ -448,12 +467,13 @@ sub add_duration
 
     return( $self ) if( $self->is_infinite );
 
-    my %orig = %{ $self };
-    my $ok   = eval { $self->_add_duration( $dur ); 1 };
+    local $@;
+    my %orig = %$self;
+    my $ok   = eval{ $self->_add_duration( $dur ); 1 };
     unless( $ok )
     {
         my $err = $@;
-        %{ $self } = %orig;
+        %$self  = %orig;
         die( $err );
     }
     return( $self );
@@ -466,6 +486,39 @@ sub add_duration
 # NOTE: sub christian_era is autoloaded
 
 # NOTE: sub clone is implemented in the XS code in DateTime-Lite.xs
+# Pure-Perl fallback: used when XS is not available (PERL_DATETIME_LITE_PP=1 or on
+# platforms where the .so fails to load such as old GCC on FreeBSD).
+# Mirrors the XS implementation: scalar values are copied, nested blessed hashrefs are
+# shallow-cloned one level deep and re-blessed.
+if( $IsPurePerl )
+{
+    *clone = sub
+    {
+        my $self  = shift( @_ );
+        my $class = ref( $self );
+        my %copy;
+        foreach my $key ( keys( %$self ) )
+        {
+            my $val = $self->{ $key };
+            # Use reftype() to detect underlying HASH regardless of blessing
+            if( defined( $val ) &&
+                ( Scalar::Util::reftype( $val ) // '' ) eq 'HASH' )
+            {
+                my $inner = { %$val };
+                if( Scalar::Util::blessed( $val ) )
+                {
+                    bless( $inner, ref( $val ) );
+                }
+                $copy{ $key } = $inner;
+            }
+            else
+            {
+                $copy{ $key } = $val;
+            }
+        }
+        return( bless( \%copy, $class ) );
+    };
+}
 
 # NOTE: Comparison
 sub compare { return( shift->_compare( @_, 0 ) ); }
@@ -909,9 +962,11 @@ sub from_epoch
     }
 
     @args{ qw( second minute hour day month year ) }
-        = ( gmtime( $p{epoch} ) )[ 0 .. 5 ];
+        = ( gmtime( $p{epoch} ) )[0 .. 5];
     $args{year}  += 1900;
     $args{month} += 1;
+    # We do not need 'epoch' argument anymore
+    delete( $p{epoch} );
 
     my $self = $class->_new( %p, %args, time_zone => 'UTC' ) || return( $class->pass_error );
 
@@ -1201,7 +1256,7 @@ sub pass_error
         $self->{error} = ${ $pack . '::ERROR' } = ( defined( $class ) ? bless( $err => $class ) : $err );
         $self->{error}->code( $code ) if( defined( $code ) && $self->{error}->can( 'code' ) );
 
-        if( $self->{fatal} || ( defined( ${"${class}\::FATAL_EXCEPTIONS"} ) && ${"${class}\::FATAL_EXCEPTIONS"} ) )
+        if( $self->{fatal} || ( defined( ${"${pack}\::FATAL_EXCEPTIONS"} ) && ${"${pack}\::FATAL_EXCEPTIONS"} ) )
         {
             die( $self->{error} );
         }
@@ -2819,6 +2874,22 @@ sub _compare
         die( "A DateTime::Lite object can only be compared to another compatible object ($s1, $s2)." );
     }
 
+    # Short-circuit for Infinite objects before any clone/set_time_zone call: their
+    # utc_rd_days is ±INFINITY, which overflows an XS IV parameter.
+    # Use Perl <=> directly on the NV.
+    # Cloning an Infinite object in pure-Perl mode requires special handling,
+    # and Infinite objects are always UTC so floating-zone adjustment is moot.
+    if( $dt1->is_infinite || $dt2->is_infinite )
+    {
+        my @c1 = $dt1->utc_rd_values;
+        my @c2 = $dt2->utc_rd_values;
+        for my $i ( 0 .. 2 )
+        {
+            return( $c1[$i] <=> $c2[$i] ) if( $c1[$i] != $c2[$i] );
+        }
+        return(0);
+    }
+
     if( !$consistent &&
         $dt1->can( 'time_zone' ) &&
         $dt2->can( 'time_zone' ) )
@@ -2833,19 +2904,6 @@ sub _compare
         {
             $dt2 = $dt2->clone->set_time_zone( $dt1->time_zone );
         }
-    }
-
-    # Short-circuit for Infinite objects: their utc_rd_days is ±INFINITY,
-    # which overflows an XS IV parameter. Use Perl <=> directly on the NV.
-    if( $dt1->is_infinite || $dt2->is_infinite )
-    {
-        my @c1 = $dt1->utc_rd_values;
-        my @c2 = $dt2->utc_rd_values;
-        for my $i ( 0 .. 2 )
-        {
-            return( $c1[$i] <=> $c2[$i] ) if( $c1[$i] != $c2[$i] );
-        }
-        return(0);
     }
 
     # Use XS fast-path when available
@@ -3439,7 +3497,7 @@ DateTime::Lite - Lightweight, low-dependency drop-in replacement for DateTime
 
 =head1 VERSION
 
-    v0.6.5
+    v0.7.1
 
 =head1 DESCRIPTION
 
@@ -3610,7 +3668,7 @@ If you provide the C<time_zone> argument, it will be applied I<after> the object
 
 For example:
 
-    my $dt = DateTime->from_epoch(
+    my $dt = DateTime::Lite->from_epoch(
         epoch     => 0,
         time_zone => 'Asia/Tokyo'
     );
@@ -3735,12 +3793,6 @@ Returns the hour (0-23).
     my $min = $dt->minute;
 
 Returns the minute (0-59).
-
-=head2 second
-
-    my $s = $dt->second;
-
-Returns the second (0-59, or 60 on a leap second).
 
 =head2 second
 
@@ -4342,7 +4394,7 @@ Returns the date portion as C<YYYY-MM-DD> (default separator C<"-">).
     my $time = $dt->hms;          # "12:34:56"
     my $time = $dt->hms( '.' );   # "12.34.56"
 
-Returns the time portion as C<HH:MM:SS> (default separator C<":">>).
+Returns the time portion as C<HH:MM:SS> (default separator C<":">).
 
 =head2 dmy( [$sep] )
 
@@ -4443,7 +4495,7 @@ Sets the month (1-12). Returns C<$self>.
 
 =head2 set_day
 
-    $dt->set_month(31);
+    $dt->set_day(31);
 
 Sets the day of the month. Returns C<$self>.
 
@@ -4463,7 +4515,7 @@ Sets the minute (0-59). Returns C<$self>.
 
     $dt->set_second(30);
 
-Sets the second (0-59). Returns C<$self>.
+Sets the second (0-59 normally, up to 61 for leap-second compatibility). Returns C<$self>.
 
 =head2 set_nanosecond
 
@@ -4511,7 +4563,7 @@ Supported units are: C<second>, C<minute>, C<hour>, C<day>, C<week>, C<local_wee
 
 The result is the last nanosecond before the start of the next unit, so the timezone and variable-length units such as months and years are handled correctly without hardcoding boundary values.
 
-Returns the modified object on success, or sets an L<error object|DateTime::Lite::Exception> and returns C<undef> in scalar context, or an empty list in list context. In chaining (object context), it returns a dummy object (C<DateTime::Lite::Null>) to avoid the typical C<Can't call method '%s' on an undefined value>
+Returns the modified object on success, or sets an L<error object|DateTime::Lite::Exception> and returns C<undef> in scalar context, or an empty list in list context. In chaining (object context), it returns a dummy object (C<DateTime::Lite::Null>) to avoid the typical C<Can't call method '%s' on an undefined value>.
 
 See also L</start_of> and L</truncate>.
 
@@ -4534,7 +4586,7 @@ Supported units are: C<second>, C<minute>, C<hour>, C<day>, C<week>, C<local_wee
 
 For most units this delegates to L</truncate>. C<decade> and C<century> are handled independently: C<start_of('decade')> for 2026 returns 2020-01-01, and C<start_of('century')> returns 2001-01-01.
 
-Returns the modified object on success, or sets an L<error object|DateTime::Lite::Exception> and returns C<undef> in scalar context, or an empty list in list context. In chaining (object context), it returns a dummy object (C<DateTime::Lite::Null>) to avoid the typical C<Can't call method '%s' on an undefined value>
+Returns the modified object on success, or sets an L<error object|DateTime::Lite::Exception> and returns C<undef> in scalar context, or an empty list in list context. In chaining (object context), it returns a dummy object (C<DateTime::Lite::Null>) to avoid the typical C<Can't call method '%s' on an undefined value>.
 
 See also L</end_of> and L</truncate>.
 
@@ -5149,7 +5201,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 Copyright(c) 2026 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

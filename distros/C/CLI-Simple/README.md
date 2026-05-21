@@ -1,3 +1,70 @@
+# Table of Contents
+
+* [NAME](#name)
+* [SYNOPSIS](#synopsis)
+* [DESCRIPTION](#description)
+* [VERSION](#version)
+* [FEATURES](#features)
+* [MODULINOS](#modulinos)
+  * [Why Modulinos?](#why-modulinos)
+  * [The Bash Wrapper](#the-bash-wrapper)
+  * [create-modulino](#create-modulino)
+  * [MODULINO\_WRAPPER](#modulino\wrapper)
+* [QUICK START](#quick-start)
+  * [Single-Module Application](#single-module-application)
+  * [Role-Based Application](#role-based-application)
+* [ROLE-BASED ARCHITECTURE](#role-based-architecture)
+  * [The YAML Manifest](#the-yaml-manifest)
+  * [Command Values](#command-values)
+  * [Roles With No Commands](#roles-with-no-commands)
+  * [Activating Role-Based Architecture](#activating-role-based-architecture)
+  * [The Inherited main()](#the-inherited-main)
+  * [Distributing the Manifest](#distributing-the-manifest)
+  * [Not a Framework](#not-a-framework)
+  * [Validation, Defaults, and Configuration](#validation-defaults-and-configuration)
+  * [When to Use](#when-to-use)
+  * [The init-run Lifecycle](#the-init-run-lifecycle)
+  * ["opt-in" Default Command](#"opt-in"-default-command)
+  * [`$AUTO_HELP` and `$AUTO_DEFAULT`](#$autohelp-and-$autodefault)
+* [CONSTANTS](#constants)
+* [ADDITIONAL NOTES](#additional-notes)
+* [INTERNAL COMMANDS](#internal-commands)
+  * [-generate-completion](#-generate-completion)
+  * [-dump-spec](#-dump-spec)
+  * [-scaffold](#-scaffold)
+  * [-migrate](#-migrate)
+* [METHODS AND SUBROUTINES](#methods-and-subroutines)
+  * [new](#new)
+  * [command](#command)
+  * [commands (required)](#commands-required)
+  * [main](#main)
+  * [run](#run)
+  * [get\_args](#get\args)
+    * [With names](#with-names)
+    * [With no names](#with-no-names)
+  * [init](#init)
+* [USING PACKAGE VARIABLES](#using-package-variables)
+* [COMMAND LINE OPTIONS](#command-line-options)
+  * [set\_args](#set\args)
+* [COMMAND ARGUMENTS](#command-arguments)
+* [CUSTOM ERROR HANDLER](#custom-error-handler)
+* [SETTING DEFAULT VALUES FOR OPTIONS](#setting-default-values-for-options)
+* [ADDING USAGE TO YOUR SCRIPTS](#adding-usage-to-your-scripts)
+  * [Custom help() Method](#custom-help-method)
+* [ADDING ADDITIONAL SETTERS](#adding-additional-setters)
+* [LOGGING](#logging)
+  * [Per Command Log Levels](#per-command-log-levels)
+* [FAQ](#faq)
+* [ALIASING OPTIONS AND COMMANDS](#aliasing-options-and-commands)
+  * [How option aliases work](#how-option-aliases-work)
+  * [How command aliases work](#how-command-aliases-work)
+  * [Usage examples](#usage-examples)
+  * [Recommendations](#recommendations)
+* [ERRORS/EXIT CODES](#errorsexit-codes)
+  * [Exit Codes](#exit-codes)
+* [LICENSE AND COPYRIGHT](#license-and-copyright)
+* [SEE ALSO](#see-also)
+* [AUTHOR](#author)
 # NAME
 
 CLI::Simple - a minimalist object oriented base class for CLI applications
@@ -15,7 +82,9 @@ CLI::Simple - a minimalist object oriented base class for CLI applications
     use CLI::Simple qw($AUTO_HELP $AUTO_DEFAULT);
 
     use parent qw(CLI::Simple);
-    
+
+    caller or __PACKAGE__->main();
+
     sub execute {
       my ($self) = @_;
 
@@ -23,7 +92,7 @@ CLI::Simple - a minimalist object oriented base class for CLI applications
       my $file = $self->get_file;
       ...
     }
-    
+
     sub list { 
       my ($self) = @_
 
@@ -49,42 +118,88 @@ CLI::Simple - a minimalist object oriented base class for CLI applications
       return $cli->run();
     }
 
-    exit main();
+    1;
+
+\# role-based CLI Application (2.0.0)
+
+\# create a YAML manifest `my-script.yml` in your project root:
+
+    ---
+    commands:
+      frobnicate: My::Script::Role::Frobnicate
+      list:       My::Script::Role::List
+    options:
+      - help|h
+      - verbose|v
+      - output|o=s
+
+\# create a main module
+
+    package My::Script;
+
+    use CLI::Simple qw(:roles);
+    use parent qw(CLI::Simple);
+
+    our $VERSION = '1.0.0';
+
+    caller or exit __PACKAGE__->main;
+
+    1;
+
+\# create implementation roles
+
+    package My::Script::Role::Frobnicate;
+
+    use Role::Tiny;
+    use CLI::Simple::Constants qw(:booleans);
+
+    sub cmd_frobnicate {
+      my ($self) = @_;
+      ...
+      return $SUCCESS;
+    }
 
     1;
 
 # DESCRIPTION
+
+[![CLI-Simple](https://github.com/rlauer6/CLI-Simple/actions/workflows/build.yml/badge.svg)](https://github.com/rlauer6/CLI-Simple/actions/workflows/build.yml)
 
 Tired of writing the same 'ol boilerplate code for command line
 scripts? Want a standard, simple way to create a Perl script that
 takes options and commands?  `CLI::Simple` makes it easy to create
 scripts that take _options_, _commands_ and _arguments_.
 
+`CLI::Simple` is designed around the _modulino_ pattern - Perl
+modules that can be executed directly as scripts. See ["MODULINOS"](#modulinos).
+
 For common constant values (like `$TRUE`, `$DASH`, or `$SUCCESS`), see
 [CLI::Simple::Constants](https://metacpan.org/pod/CLI%3A%3ASimple%3A%3AConstants), which pairs naturally with this module.
 
+Version 2.0.0 introduces optional role-based architecture for applications
+that have outgrown a single module. Declare your commands and options in a
+YAML manifest, implement each command in a dedicated [Role::Tiny](https://metacpan.org/pod/Role%3A%3ATiny) role, and
+`CLI::Simple` handles composition, dispatch, and lifecycle automatically.
+Your main module shrinks to a single line:
+
+    caller or exit __PACKAGE__->main;
+
+Not ready for a full refactor? Start smaller. The built-in `-dump-spec`
+command introspects your existing module and writes a YAML manifest that
+makes your configuration data-driven without moving a single line of
+implementation code. Adopt roles incrementally, one command at a time.
+
+When you are ready to scaffold a full role-based project, `-scaffold`
+generates role stubs, a slimmed main module, and inter-module dependencies
+from your manifest. Feed the resulting tarball to
+[CPAN::Maker::Bootstrapper](https://metacpan.org/pod/CPAN%3A%3AMaker%3A%3ABootstrapper) and you have a complete, buildable CPAN
+distribution in one step.
+
 # VERSION
 
-This documentation refers to version 1.0.12.
+This documentation refers to version 2.0.2.
 
-## Changes from Version 1.0.8
-
-- New package variables $AUTO\_HELP and $AUTO\_DEFAULT
-
-    These new package variables allow finer grained control over default
-    behaviors when no command is provided on the command line. These
-    changes were made to allow for a more flexible lifecycle. See ["The
-    init-run Lifecycle"](#the-init-run-lifecycle).
-
-    - In previous versions, by default, `CLI::Simple` would print help
-    information if it was available and if there was no command provided
-    on the command line. That behavior is now controlled by $AUTO\_HELP.
-    - In previous versions, by default, `CLI::Simple` would run a
-    default command if only one command was defined and there was no
-    command on the command line. That behavior is now controlled by
-    $AUTO\_DEFAULT.
-
-## Features
+# FEATURES
 
 - accept command line arguments ala [Getopt::Long](https://metacpan.org/pod/Getopt%3A%3ALong)
 - supports commands and command arguments
@@ -93,57 +208,331 @@ This documentation refers to version 1.0.12.
 - easily add usage notes
 - automatically create setter/getters for your script
 - low dependency profile
+- optional role-based architecture via YAML manifest
+- built-in scaffolding tools for migrating legacy scripts to roles
+- bash completion script generation for modulino wrappers
 
-Command line scripts often take _options_, sometimes a _command_ and
-perhaps _arguments_ to those commands.  For example, consider the
-script `myscript` that takes options and implements a few commands
-(_send-message_, _receive-message_) that also take arguments.
+# MODULINOS
 
-    myscript [options] command args
-
-or
-
-    myscript command [options] args
-
-Examples:
-
-    myscript --foo bar --log-level debug send-message "Hello World" now
-
-    myscript --bar --log-level info receive-message
-
-Using `CLI::Simple` to implement this script looks like this...
-
-    package MyScript;
-
-    use parent qw(CLI::Simple);
+A _modulino_ is a Perl module that can also be run directly as a
+script. The term was coined by Brian D. Foy and the pattern is simple:
 
     caller or __PACKAGE__->main();
 
-    sub send_message {...}
+When the file is `require`d or `use`d by another module, `caller`
+returns the calling package and the expression short-circuits -
+`main()` is never called. When the file is executed directly by Perl,
+`caller` returns false and `main()` runs. The same file serves as
+both a reusable module and an executable script.
 
-    sub default {...}
+`CLI::Simple` is designed around this pattern. Every `CLI::Simple`
+application is expected to be a modulino. The framework's lifecycle,
+internal commands, bash completion, and scaffolding tools all assume
+this dual-use design.
 
-    sub receive_message {...}
-    
+## Why Modulinos?
+
+The modulino pattern offers several advantages over a traditional
+script:
+
+- **Testable** - your script logic lives in a proper Perl module
+that can be `use`d in test files without executing `main()`
+- **Reusable** - other scripts and modules can `use` your
+modulino and call its methods directly
+- **Introspectable** - tools like `-dump-spec` and
+`-generate-completion` can load your modulino and inspect its live
+state without running it as a script
+- **Installable** - modulinos distribute cleanly as CPAN modules
+with full man page support via [CPAN::Maker::Bootstrapper](https://metacpan.org/pod/CPAN%3A%3AMaker%3A%3ABootstrapper)
+
+## The Bash Wrapper
+
+Perl modulinos are invoked via a thin bash wrapper script that locates
+the installed module file and passes all arguments through to Perl:
+
+    #!/usr/bin/env bash
+    #-*- mode: sh; -*-
+
+    MODULINO_WRAPPER=my-script
+    MODULE_NAME=My::Script
+    MODULE_PATH=$(MODULE_PATH="${MODULE_NAME//:://}.pm" \
+      perl -M$MODULE_NAME -e 'print $INC{$ENV{MODULE_PATH}};')
+
+    MODULINO_WRAPPER=$MODULINO_WRAPPER perl $MODULE_PATH "$@"
+
+The wrapper locates the installed `.pm` file via `%INC` and sets
+`MODULINO_WRAPPER` in the environment so `CLI::Simple` knows the
+name of the script the user actually typed. This is used by
+`-generate-completion` to name the bash completion function correctly
+and by [CPAN::Maker::Bootstrapper](https://metacpan.org/pod/CPAN%3A%3AMaker%3A%3ABootstrapper) to create man page symlinks.
+
+## create-modulino
+
+`CLI::Simple` ships with a `create-modulino` tool that generates the
+bash wrapper for any `CLI::Simple` modulino:
+
+    # create wrapper using module name convention (My::Script -> my-script)
+    create-modulino -m My::Script
+
+    # install to a specific directory
+    create-modulino -m My::Script -i /usr/local/bin
+
+    # use a custom wrapper name
+    create-modulino -m My::Script -a my-alias -i /usr/local/bin
+
+`create-modulino` is itself a modulino - an example of the pattern it
+creates. The bash wrapper template lives in its `__DATA__` section,
+keeping the tool entirely self-contained.
+
+If you are building a CPAN distribution, [CPAN::Maker::Bootstrapper](https://metacpan.org/pod/CPAN%3A%3AMaker%3A%3ABootstrapper)
+integrates `create-modulino` into the `make modulino` target,
+generating and installing the wrapper as part of the build process.
+
+## MODULINO\_WRAPPER
+
+The `MODULINO_WRAPPER` environment variable tells `CLI::Simple` the
+name of the wrapper script that invoked the modulino. It is set by the
+wrapper and used by:
+
+- `-generate-completion` - to name the bash completion function
+and `complete` target correctly
+- Man page symlinks via [CPAN::Maker::Bootstrapper](https://metacpan.org/pod/CPAN%3A%3AMaker%3A%3ABootstrapper) - so
+`man my-script` resolves to the module's man page
+
+If `MODULINO_WRAPPER` is not set, `CLI::Simple` infers the script
+name from the module name by convention - `My::Script` becomes
+`my-script`. Set it explicitly when the wrapper name does not follow
+this convention.
+
+# QUICK START
+
+## Single-Module Application
+
+The simplest way to use `CLI::Simple` is to subclass it and define
+your commands as methods in the same module:
+
+    package My::Script;
+
+    use strict;
+    use warnings;
+
+    use CLI::Simple::Constants qw(:booleans);
+
+    use parent qw(CLI::Simple);
+
+    caller or __PACKAGE__->main;
+
+    sub cmd_frobnicate {
+      my ($self) = @_;
+      my $output = $self->get_output;
+      ...
+      return $SUCCESS;
+    }
+
     sub main {
-      return __PACKAGE__->new(
-        option_specs => [
-          qw(
-            foo=s
-            bar
-            log-level
-          )
-        ],
-        commands => {
-          send    => \&send_message,
-          receive => \&receive_message,
-        },
+      __PACKAGE__->new(
+        option_specs => [ qw( help|h verbose|v output|o=s ) ],
+        commands     => { frobnicate => \&cmd_frobnicate },
       )->run;
     }
 
     1;
 
-# PHILOSOPHY AND DESIGN PRINCIPLES
+## Role-Based Application
+
+For larger applications, declare your commands and options in a YAML
+manifest and implement each command in a dedicated [Role::Tiny](https://metacpan.org/pod/Role%3A%3ATiny) role.
+Your main module becomes a single declaration:
+
+    package My::Script;
+
+    use strict;
+    use warnings;
+
+    use CLI::Simple qw(:roles);
+    use parent qw(CLI::Simple);
+
+    our $VERSION = '1.0.0';
+
+    caller or exit __PACKAGE__->main;
+
+    1;
+
+**Naming convention:** The YAML manifest filename is derived from your
+module name - `My::Script` looks for `my-script.yml` in the
+distribution share directory. You must package the spec file with your
+distribution.
+
+The manifest maps commands to roles:
+
+    ---
+    commands:
+      frobnicate: My::Script::Role::Frobnicate
+      list:       My::Script::Role::List
+    options:
+      - help|h
+      - verbose|v
+      - output|o=s
+
+Each role implements one or more commands:
+
+    package My::Script::Role::Frobnicate;
+
+    use Role::Tiny;
+    use CLI::Simple::Constants qw(:booleans);
+
+    sub cmd_frobnicate {
+      my ($self) = @_;
+      ...
+      return $SUCCESS;
+    }
+
+    1;
+
+To scaffold role stubs from an existing modulino, run the built-in
+`-scaffold` command:
+
+    my-script -scaffold
+
+To scaffold from an existing manifest - including a new one written by hand
+or generated by `-dump-spec` - pass the spec file path:
+
+    cli-simple -scaffold my-script.yml
+
+Or let `CLI::Simple` generate the manifest and scaffold from an
+existing modulino in one step:
+
+    my-script -migrate
+
+See ["ROLE-BASED ARCHITECTURE"](#role-based-architecture) for the complete workflow including
+the baby-step migration path.
+
+# ROLE-BASED ARCHITECTURE
+
+`CLI::Simple` 2.0.0 introduces an optional role-based architecture
+for applications that have grown beyond a single module. Commands are
+implemented in dedicated [Role::Tiny](https://metacpan.org/pod/Role%3A%3ATiny) roles and declared in a YAML
+manifest. `CLI::Simple` composes the roles, builds the dispatch
+table, and provides an inherited `main()` - potentially reducing your
+main module to a single declaration.
+
+## The YAML Manifest
+
+The manifest is a YAML file that declares your commands, options, and
+defaults. By convention the filename is derived from your module name:
+
+    My::Script        ->  my-script.yml
+    CPAN::Maker::Bootstrapper  ->  cpan-maker-bootstrapper.yml
+
+`CLI::Simple` locates the manifest via [File::ShareDir](https://metacpan.org/pod/File%3A%3AShareDir) using the
+distribution name derived from the module name. The manifest must be
+installed as part of the distribution - it cannot be loaded from an
+arbitrary location.
+
+_Security note: The manifest is loaded exclusively from the
+distribution share directory via [File::ShareDir](https://metacpan.org/pod/File%3A%3AShareDir). A manifest that
+was not installed as part of the distribution cannot be loaded. This
+provides the same security model as Perl module loading itself._
+
+A minimal manifest:
+
+    ---
+    commands:
+      frobnicate: My::Script::Role::Frobnicate
+      list:       My::Script::Role::List
+    options:
+      - help|h
+      - verbose|v
+      - output|o=s
+
+A complete manifest with all supported keys:
+
+    ---
+    commands:
+      frobnicate: My::Script::Role::Frobnicate
+      list:       My::Script::Role::List
+      default:    cmd_frobnicate
+    options:
+      - help|h
+      - verbose|v
+      - output|o=s
+    default_options:
+      verbose: 0
+    extra_options:
+      - dbh
+      - config_data
+
+## Command Values
+
+Each command in the manifest maps to either a role class name or a
+sub name:
+
+- **Role class name** (contains `::`) - the role is composed
+into your main module and the method `cmd__command_` is resolved
+from the role. `code-review` resolves to `cmd_code_review`.
+- **Sub name** - resolved directly via `can()` on your class.
+Use this for alias commands that point to an existing method:
+
+        default: cmd_frobnicate
+
+## Roles With No Commands
+
+Some roles provide framework behavior rather than commands - for
+example an `init()` method for startup validation. Since these roles
+have no command entry in the manifest they must be composed manually
+in your main module:
+
+    package My::Script;
+
+    use CLI::Simple qw(:roles);
+    use Role::Tiny::With;
+    use parent qw(CLI::Simple);
+
+    with 'My::Script::Role::Init';
+
+    caller or exit __PACKAGE__->main;
+
+    1;
+
+_Note: A future version of `CLI::Simple` will support an
+`extra_roles` key in the manifest to handle this automatically._
+
+## Activating Role-Based Architecture
+
+Add `:roles` to your `use CLI::Simple` statement:
+
+    use CLI::Simple qw(:roles);
+
+This triggers manifest loading at compile time. The manifest is
+located using the fallback chain described above. Roles are composed
+into your class and the dispatch table is built before `new()` is
+called.
+
+## The Inherited main()
+
+When using `:roles`, your class inherits `main()` from
+`CLI::Simple`. It reads the manifest, constructs the object with the
+manifest's options and dispatch table, and calls `run()`:
+
+    caller or exit __PACKAGE__->main;
+
+Override `main()` in your subclass only if you need to add behaviour
+that cannot be expressed in the manifest or `init()`.
+
+## Distributing the Manifest
+
+Add the manifest to your distribution's share
+directory. `CPAN::Maker` users can add it `extra-files` in
+`buildspec.yml` so it is installed into the share directory:
+
+    extra-files:
+      - share:
+        - my-script.yml
+
+During development the manifest is found via `%INC`. After
+installation it is found via [File::ShareDir](https://metacpan.org/pod/File%3A%3AShareDir). No code changes
+required between the two environments.
+&#x3d;head1 PHILOSOPHY AND DESIGN PRINCIPLES
 
 `CLI::Simple` is intentionally minimalist. It provides just enough
 structure to build command-line tools with subcommands, option
@@ -159,6 +548,7 @@ application toolkit.  Instead, it offers:
 - Command-line parsing via `Getopt::Long`
 - Built-in logging via `Log::Log4perl`
 - Subclass hooks like `init()` for setup and validation
+- Optional role-based architecture via YAML manifest for larger applications
 
 The philosophy is: provide just enough infrastructure, then get out of your way.
 
@@ -180,22 +570,32 @@ you want to add on top of it.
 - Internal tools and admin scripts
 - Bootstrapped CLIs where you don't want a framework
 - Users who want to subclass a clean, minimal interface
+- Applications that have grown beyond a single module and benefit from
+role-based command composition
 
-For more advanced features - like command trees, plugin support, or interactive
-CLI handling - consider heavier modules like [App::Cmd](https://metacpan.org/pod/App%3A%3ACmd), [CLI::Framework](https://metacpan.org/pod/CLI%3A%3AFramework), or
-[MooX::Options](https://metacpan.org/pod/MooX%3A%3AOptions).
+For interactive CLI handling or complex command trees, consider
+[App::Cmd](https://metacpan.org/pod/App%3A%3ACmd) or [CLI::Framework](https://metacpan.org/pod/CLI%3A%3AFramework).
 
 ## The init-run Lifecycle
 
-`CLI::Simple` is built on a flexible, two-phase lifecycle that 
-separates application setup from command execution.
+- **Phase 0: Internal Commands**
 
-- **Phase 1: Initialization (`new` => `init`)**
+    Before anything else, `CLI::Simple` checks `@ARGV` for internal
+    commands prefixed with `-`. If one is found it executes immediately
+    and exits. See ["INTERNAL COMMANDS"](#internal-commands).
 
-    When your script calls `CLI::Simple->`new()>, the constructor parses
-    all command-line arguments and then immediately calls your `init()` 
-    method.
+- **Phase 1: Manifest Loading**
 
+    For role-based applications using `use CLI::Simple qw(:roles)`, the
+    YAML manifest is loaded at compile time during `import`. Roles are
+    composed into the calling class and the dispatch table is built before
+    `new()` is ever called. Single-module applications skip this phase
+    entirely.
+
+- **Phase 2: Initialization (`new` =** `init`)>
+
+    The constructor parses command-line arguments via `Getopt::Long`,
+    creates accessors for all options, and calls your `init()` method.
     Inside `init()`, your application has full access to the parsed options 
     and arguments. This phase is the ideal hook for all final setup tasks, 
     such as:
@@ -205,13 +605,9 @@ separates application setup from command execution.
     - Dynamically overriding the command (e..g, `$self->command('new_default')`).
     - Performing any setup required **before** a command is run.
 
-    This `init()` phase **always runs** as part of object construction.
+- **Phase 3: Execution (`run`)**
 
-- **Phase 2: Execution (`run`)**
-
-    After the `new()` method returns your object, your script then calls
-    the `run()` method. This method is responsible for dispatching to 
-    the **currently set** command.
+    Dispatches to the command method determined during initialization.
 
 ## "opt-in" Default Command
 
@@ -221,7 +617,7 @@ This provides total flexibility for the application author:
 - **You Can Set a Default:** If your application needs a default
 command (e.g., to run `help` when no command is given), you can set
 `$AUTO_HELP`, explicitly set the `default` command in the `command`
-hash you pass to the constructor or uset `command()` to set one
+hash you pass to the constructor or use `command()` to set one
 inside the `init()` method.
 - **You Can Have No Default:** If you do **not** set a default,
 `run()` will simply do nothing and return cleanly if no command
@@ -238,6 +634,14 @@ This provides an ideal hook for applications that need to perform
 "on-demand initialization" (e.g., seeding a database, authenticating)
 by checking for a specific flag inside `init()`, without also
 triggering an unwanted command.
+
+In role-based applications using a YAML manifest, a `default` command
+that aliases another command should map to the sub name directly rather
+than a role class:
+
+    commands:
+      default: cmd_install
+      install: My::Module::Role::Installer
 
 ## `$AUTO_HELP` and `$AUTO_DEFAULT`
 
@@ -283,8 +687,154 @@ To use them in your script:
 # ADDITIONAL NOTES
 
 - All options are case insensitive
-- See [CLI::Simple::Utils](https://metacpan.org/pod/CLI%3A%3ASimple%3A%3AUtils) to learn about some additional
-utililities that are useful when writing scripts.
+- See [CLI::Simple::Utils](https://metacpan.org/pod/CLI%3A%3ASimple%3A%3AUtils) to learn about additional utilities
+useful when writing scripts, including `choose`, `slurp`, and `dmp`.
+- `%INTERNAL_COMMANDS` is a package variable - subclasses can
+add their own internal commands by pushing entries into the hash before
+calling `new()`.
+
+# INTERNAL COMMANDS
+
+`CLI::Simple` reserves command names beginning with `-` for its own
+use. These commands are intercepted before option parsing begins and
+execute immediately, bypassing the normal lifecycle entirely. See
+["The init-run Lifecycle"](#the-init-run-lifecycle).
+
+Internal commands are dispatched via the `%INTERNAL_COMMANDS` package
+variable:
+
+    our %INTERNAL_COMMANDS = (
+      '-generate-completion' => \&_cmd_generate_completion,
+      '-dump-spec'           => \&_cmd_dump_spec,
+      '-scaffold'            => \&_cmd_scaffold,
+      '-migrate'             => \&_cmd_migrate,
+    );
+
+Subclasses can add their own internal commands by extending the hash
+before `new()` is called:
+
+    our %INTERNAL_COMMANDS = (
+      %CLI::Simple::INTERNAL_COMMANDS,
+      '-my-command' => \&_cmd_my_command,
+    );
+
+## -generate-completion
+
+Generates a bash completion script for the script's commands and
+options, derived from the live object state. Bash completions are a
+feature that allows the shell to automatically finish commands, file
+paths, and options when you press the Tab key.
+
+    my-script -generate-completion > \
+      ~/.local/share/bash-completion/completions/my-script
+
+After generating the bash completion script, source it in your current
+shell to test:
+
+    source ~/.local/share/bash-completion/completions/my-script
+
+Test by typing your script name followed by a space and pressing Tab.
+You should see the available commands. To verify option completion,
+type `--` and press Tab.
+
+To make completions permanent, most systems automatically source files
+placed in `~/.local/share/bash-completion/completions/` when
+`bash-completion` 2.x is installed. If your system does not pick
+them up automatically, add the following to your `~/.bashrc`:
+
+    source ~/.local/share/bash-completion/completions/my-script
+
+Alternatively, place the generated file in the system-wide completion
+directory (requires root):
+
+    my-script -generate-completion > \
+      /etc/bash_completion.d/my-script
+
+The script name is taken from the first argument if provided, then
+`MODULINO_WRAPPER` if set, then inferred from the module name. If the
+inferred name cannot be found in `PATH`, a warning is issued but the
+completion script is still generated.
+
+_Note: If you created the modulino with the supplied
+`create-modulino` tool `MODULINO_WRAPPER` is already set inside the
+bash script that invokes the modulino._
+
+- Case 1: Your modulino wrapper and module name are aligned 
+
+    The modulino script `my-modulino` refers to My::Modulino
+
+        my-modulino -generate-completion
+
+- Case 2: Your modulino wrapper was created using `create-modulino`
+
+    The modulino script `my-alias` refers to My::Modulino. They are not
+    aligned however `MODULINO_WRAPPER` is set by the bash wrapper.
+
+        my-alias -generate-completion
+
+- Case 3: Your modulino is an alias not created by `create-modulino`
+
+    The script name `my-alias` is not aligned with your module name
+    `My::Module` and your modulino wrapper does not set
+    `MODULINO_WRAPPER`. The `-generate-completion` script called by 
+    your custom wrapper most likely only resolves the program name as the path to
+    your Perl module:
+
+        path-to-modules/My/Module.pm
+
+    ...in this case you need to supply the alias name or set
+    `MODULINO_WRAPPER` in the environment.
+
+        my-alias -generate-completion my-alias
+
+## -dump-spec
+
+Introspects the running modulino and writes a YAML manifest to the
+current directory. The filename is derived from the module name by
+convention.
+
+    my-script -dump-spec           # sub names - baby step toward roles
+    my-script -dump-spec roles     # role class names - full commitment
+
+Without the `roles` argument, commands map to their existing sub
+names so the manifest can be used immediately without moving any
+code. With `roles`, commands map to derived role class names suitable
+for use with `-scaffold`.
+
+Alias commands - those whose coderef resolves to a sub name that does
+not match the command key - are always written as sub names regardless
+of mode.
+
+## -scaffold
+
+Generates a role-based project tarball from the running modulino or
+from an explicit spec file. The tarball contains role stubs, a slimmed
+main module with extracted POD, a `project.mk` with inter-module
+dependencies, and the YAML manifest.
+
+    my-script -scaffold                        # introspect live module
+    cli-simple -scaffold my-script.yml         # scaffold from spec file
+
+The tarball is named `my-script-roles.tar.gz` by convention (the
+lower case snake cased version of the class name). The name is used to
+infer the class name. If your filename is different than the
+classes you want to scaffold, you will need to edit the files. 
+
+Feed the tarball to [CPAN::Maker::Bootstrapper](https://metacpan.org/pod/CPAN%3A%3AMaker%3A%3ABootstrapper) via the
+`import-scaffold` command to produce a complete buildable CPAN
+distribution.
+
+## -migrate
+
+Combines `-dump-spec roles` and `-scaffold` in a single step.
+
+    my-script -migrate
+
+Writes the YAML manifest then generates the role-based tarball. Use
+this when you are ready for a full migration and do not need to inspect
+or edit the manifest first. If you want to review or adjust the
+manifest before scaffolding, run `-dump-spec` and `-scaffold`
+separately.
 
 # METHODS AND SUBROUTINES
 
@@ -343,7 +893,7 @@ name and its arguments._
     If no default is provided, the behavior is controlled by the
     `$AUTO_DEFAULT` and `$AUTO_HELP` package variables.
 
-    Setting `$AUTO_DEFAULT` to true will when your `commands` hash
+    Setting `$AUTO_DEFAULT` to true when your `commands` hash
     contains only a single command, will cause that command to be run
     automatically when no command name is given on the command line. This
     allows you to treat the program like a single-command tool, where
@@ -380,7 +930,7 @@ on the command line after all options have been parsed. There are
 times when you might want to override the argument. You can pass a new
 command that will be executed when you call the `run()` method.
 
-## commands
+## commands (required)
 
     commands
     commands(command, handler)
@@ -390,6 +940,22 @@ be used to insert a new command into the `commands` hash. `handler`
 should be a code reference.
 
     commands(foo => sub { return 'foo' });
+
+## main
+
+    __PACKAGE__->main;
+
+For role-based applications, `main` is inherited from `CLI::Simple`
+and reads the YAML manifest loaded during `import`. It constructs the
+object with the manifest's options, default options, extra options, and
+dispatch table, then calls `run()`.
+
+In a role-based modulino the entire `main` sub reduces to:
+
+    caller or exit __PACKAGE__->main;
+
+For single-module applications, override `main` in your subclass as
+usual.
 
 ## run
 
@@ -406,16 +972,11 @@ Return the arguments that follow the command.
     get_args(NAME, ... )     # with names
     get_args()               # raw positional args
 
-With names:
+### With names
 
-\- In scalar context, returns a hash reference mapping each NAME to the
-  corresponding positional argument.
-\- In list context, returns a flat list of `(name =` value)> pairs.
-
-With no names:
-
-\- Returns the command's positional arguments (array in list context;
-  array reference in scalar context).
+- In scalar context, returns a hash reference mapping each NAME to
+the corresponding positional argument.
+- In list context, returns a flat list of `(name =` value)> pairs.
 
 Example:
 
@@ -438,6 +999,13 @@ If there are fewer positional arguments than names, the remaining names
 are set to `undef`. Extra positional arguments (beyond the provided
 names) are ignored.
 
+### With no names
+
+- In scalar context returns an array reference containing the
+command's positional arguments.
+- In list context returns a list containing the command's
+positional arguments.
+
 ## init
 
 If you define your own `init()` method, it will be called by the
@@ -459,11 +1027,19 @@ case).
         debug|d
       )
     ];
-    
+
     our $COMMANDS = {
       foo => \&foo,
       bar => \&bar,
     };
+
+Subclasses can also extend the built-in internal commands by adding
+entries to `%INTERNAL_COMMANDS`:
+
+    our %INTERNAL_COMMANDS = (
+      %CLI::Simple::INTERNAL_COMMANDS,
+      '-my-command' => \&_cmd_my_command,
+    );
 
 # COMMAND LINE OPTIONS
 
@@ -489,6 +1065,22 @@ snake\_case for the accessor methods. For example:
 ...results in:
 
     $cli->get_foo_bar();
+
+## set\_args
+
+Resets the positional arguments.
+
+    $self->set_args(qw(foo 1));
+
+This method overrides the positional arguments originally passed to
+the script. You can achieve the same behavior by calling the
+`get_args` in scalar context and modifying the reference.
+
+    my $args = $self->get_args;
+    $args->[1] = '2';
+
+Use this technique when you want don't want to alter the entire set of
+arguments.
 
 # COMMAND ARGUMENTS
 
@@ -523,7 +1115,7 @@ By default, `CLI::Simple` will exit if `GetOptions` returns a false
 value, indicating an error while parsing options. You can override this
 behavior in one of two ways:
 
-- Set `$CLI::Simple::EXIT_ON_ERROR` to a false value.
+- Set `$CLI::Simple::GETOPT_EXIT_ON_ERROR` to a false value.
 
     This disables automatic exiting and lets your program decide what to do
     after an option-parsing failure.
@@ -683,6 +1275,9 @@ Example:
 
 _TIP: add other elements to the array for your command to process._
 
+_Note: Per-command log levels are not currently supported in the YAML
+manifest. Define them programmatically by overriding `main()` if needed._
+
 # FAQ
 
 - How do I execute startup code before my command runs?
@@ -721,26 +1316,43 @@ _TIP: add other elements to the array for your command to process._
 
     This lets the file be used as both a module and an executable script.
 
-- How do the helper scripts work?
+- How do I migrate an existing script to role-based architecture?
 
-    This distribution includes two scripts to help with modulino-style
-    scripts:
+    Run the built-in `-dump-spec` command to generate a YAML manifest from
+    your existing script, then `-scaffold` to generate role stubs:
 
-    - modulino
+        my-script -dump-spec        # generates my-script.yml
+        my-script -scaffold         # generates my-script-roles.tar.gz
 
-        A generic launcher that runs a Perl module as a script.
+    See ["ROLE-BASED ARCHITECTURE"](#role-based-architecture) for the full migration workflow.
 
-    - create-modulino.pl
+- How do I start a new role-based project from scratch?
 
-        Creates a symbolic link or wrapper script to make your modulino-based
-        module runnable from the command line.
+    Write a YAML manifest and use the `cli-simple` wrapper to scaffold it:
 
-        Example:
+        cli-simple -scaffold my-script.yml
 
-            sudo create-modulino.pl Foo::Bar foo-bar
+    See ["ROLE-BASED ARCHITECTURE"](#role-based-architecture) for the manifest format.
 
-        This creates an executable called `foo-bar` that loads and invokes
-        `Foo::Bar` as a modulino script.
+- How do I enable bash completion for my script?
+
+    Your script must be invoked via a bash modulino wrapper with
+    `MODULINO_WRAPPER` set. Then run:
+
+        my-script -generate-completion > \
+          ~/.local/share/bash-completion/completions/my-script
+
+    Wrappers generated by [CPAN::Maker::Bootstrapper](https://metacpan.org/pod/CPAN%3A%3AMaker%3A%3ABootstrapper) set
+    `MODULINO_WRAPPER` automatically.
+
+- How do I add my own internal commands?
+
+    Add entries to `%INTERNAL_COMMANDS` before calling `new()`:
+
+        our %INTERNAL_COMMANDS = (
+          %CLI::Simple::INTERNAL_COMMANDS,
+          '-my-command' => \&_cmd_my_command,
+        );
 
 # ALIASING OPTIONS AND COMMANDS
 
@@ -829,6 +1441,10 @@ After parsing, both `get_config()` and `get_cfg()` will return the
 same value. If the user passes both `--config` and `--cfg`, the value
 from `--cfg` (the alias) is used.
 
+_Note: In role-based applications using a YAML manifest, command
+aliases are expressed by mapping the alias command directly to the
+target sub name rather than a role class. See ["ROLE-BASED ARCHITECTURE"](#role-based-architecture)._
+
 ## Recommendations
 
 - Keep the canonical spec single-named
@@ -847,8 +1463,8 @@ from `--cfg` (the alias) is used.
 
 When you execute the `run()` method it passes control to the method
 that implements the command specified on the command line. Your method
-is expected to return 0 for success or an error code that you can the
-pass to the shell on exit.
+is expected to return 0 for success or an error code that you can pass
+to the shell on exit.
 
     exit CLI::Simple->new(commands => { foo => \&cmd_foo })->run();
 
@@ -877,13 +1493,6 @@ can distinguish between normal completion and error conditions.
     returns a numeric value other than 0 - 2, that code is passed through
     unchanged to the shell. This allows application-specific exit codes.
 
-# EXAMPLE
-
-Run the shell script that comes with the distribution to output a
-working example.
-
-    cli-simple-example > example.pl
-
 # LICENSE AND COPYRIGHT
 
 This module is free software; you can redistribute it and/or modify it
@@ -892,9 +1501,10 @@ under the same terms as Perl itself.  See
 
 # SEE ALSO
 
-[Getopt::Long](https://metacpan.org/pod/Getopt%3A%3ALong), [CLI::Simple::Utils](https://metacpan.org/pod/CLI%3A%3ASimple%3A%3AUtils), [Pod::Usage](https://metacpan.org/pod/Pod%3A%3AUsage), [App::Cmd](https://metacpan.org/pod/App%3A%3ACmd),
-[CLI::Framework](https://metacpan.org/pod/CLI%3A%3AFramework), [MooX::Options](https://metacpan.org/pod/MooX%3A%3AOptions)
+[Getopt::Long](https://metacpan.org/pod/Getopt%3A%3ALong), [CLI::Simple::Constants](https://metacpan.org/pod/CLI%3A%3ASimple%3A%3AConstants), [CLI::Simple::Utils](https://metacpan.org/pod/CLI%3A%3ASimple%3A%3AUtils),
+[Pod::Usage](https://metacpan.org/pod/Pod%3A%3AUsage), [App::Cmd](https://metacpan.org/pod/App%3A%3ACmd), [CLI::Framework](https://metacpan.org/pod/CLI%3A%3AFramework), [Role::Tiny](https://metacpan.org/pod/Role%3A%3ATiny),
+[CPAN::Maker::Bootstrapper](https://metacpan.org/pod/CPAN%3A%3AMaker%3A%3ABootstrapper)
 
 # AUTHOR
 
-Rob Lauer - <bigfoot@cpan.org>
+Rob Lauer - <rlauer@treasurersbriefcase.com>

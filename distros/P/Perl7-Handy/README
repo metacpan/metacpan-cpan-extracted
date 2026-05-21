@@ -15,11 +15,42 @@ DESCRIPTION
   - gives caller package "no bareword::filehandles;"
   - gives caller package "no multidimensional;"
   - gives caller package "use feature qw(signatures); no warnings qw(experimental::signatures);" (only perl 5.020 or later)
-  - gives caller package "no feature qw(indirect); (only perl 5.031009 or later)
+  - gives caller package "no feature qw(indirect);" (only perl 5.031009 or later)
   - removes ".(dot)" from @INC (CVE-2016-1238: Important unsafe module load path flaw)
+
+INSTALLATION
+
+  To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+COMPATIBILITY
+
+  This module requires Perl 5.00503 or later and runs on all versions through
+  the current release.
+
+  Optional modules bareword::filehandles and multidimensional are used
+  automatically on Perl 5.010001 or later when available.
 
 SEE ALSO
 
   Announcing Perl 7 - Jun 24, 2020 by brian d foy
   https://www.perl.com/article/announcing-perl-7/
 
+AUTHOR
+
+  INABA Hitoshi <ina@cpan.org>
+
+  This project was originated by INABA Hitoshi.
+
+COPYRIGHT AND LICENSE
+
+  This software is free software; you can redistribute it and/or
+  modify it under the same terms as Perl itself. See perlartistic.
+
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

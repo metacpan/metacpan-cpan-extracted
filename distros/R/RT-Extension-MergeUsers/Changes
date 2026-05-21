@@ -1,5 +1,8 @@
 Revision history for RT-Extension-MergeUsers
 
+1.15 2026-04-29
+ - Allow for group to have same name as user in custom role Name searches
+
 1.14 2026-02-10
  - Add French translation (Thanks Emmanuel Lacour)
 

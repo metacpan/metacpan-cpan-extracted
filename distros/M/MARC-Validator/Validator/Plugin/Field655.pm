@@ -12,7 +12,7 @@ use MARC::Leader 0.08;
 use MARC::Field008;
 use MARC::Validator::Const;
 
-our $VERSION = 0.17;
+our $VERSION = 0.21;
 
 sub module_name {
 	my $self = shift;
@@ -70,7 +70,9 @@ sub process {
 			}
 			my $qr;
 			foreach my $qr_ar (['comics', '6'], ['textbook', 'p']) {
-				if (exists $MARC::Validator::Const::FIELD_655{$lang}->{$qr_ar->[0]}) {
+				if (exists $MARC::Validator::Const::FIELD_655{$lang}
+					&& exists $MARC::Validator::Const::FIELD_655{$lang}->{$qr_ar->[0]}) {
+
 					$qr = $MARC::Validator::Const::FIELD_655{$lang}->{$qr_ar->[0]};
 				}
 				if (! defined $qr) {

@@ -15,7 +15,7 @@ use Win32::EventLog;
 
 plan tests => 11;
 
-ok(Win32::EventLog::Open(my $EventObj, "WinApp", ""));
+ok(Win32::EventLog::Open(my $EventObj, "Win32-EventLog testsuite", ""));
 
 ok($EventObj->GetNumber(my $number));
 

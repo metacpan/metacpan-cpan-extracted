@@ -1,5 +1,5 @@
 package DBIx::Lite::ResultSet;
-$DBIx::Lite::ResultSet::VERSION = '0.36';
+$DBIx::Lite::ResultSet::VERSION = '0.38';
 use strict;
 use warnings;
 
@@ -7,6 +7,7 @@ use Carp qw(croak);
 use Clone qw(clone);
 use Data::Page;
 use List::MoreUtils qw(uniq firstval);
+use version 0.77;
 use vars qw($AUTOLOAD);
 $Carp::Internal{$_}++ for __PACKAGE__;
 
@@ -94,7 +95,7 @@ sub select {
 
 sub select_also {
     my $self = shift;
-    return $self->select(@{$self->{select} // []}, @_);
+    return $self->select(@{$self->{select} // [$self->{table_alias} . '.*']}, @_);
 }
 
 sub with {
@@ -102,7 +103,9 @@ sub with {
     my %with = @_;
     
     croak "with() requires a hash of scalarrefs or refs to arrayrefs"
-        if grep { !ref($_) eq 'SCALAR' } values %with;
+      if grep { ref($_) ne 'SCALAR'
+                and ! ( ref($_) eq 'REF' && ref($$_) eq 'ARRAY' )
+            } values %with;
     
     my $new_self = $self->_clone;
     $new_self->{with} = %with ? {%with} : undef;
@@ -436,12 +439,36 @@ sub find_or_insert {
     my $cols = shift;
     ref $cols eq 'HASH' or croak "find_or_insert() requires a hashref";
     
+    my $sub;
     my $object;
-    $self->{dbix_lite}->txn(sub {
-        if (!($object = $self->find($cols))) {
-            $object = $self->insert($cols);
-        }
-    });
+
+    my $driver_name = $self->{dbix_lite}->driver_name;
+
+    # does the database support the PosttgreSQL "ON CONFLICT ... DO
+    # ..." UPSERT clause as well as the RETURNING clause
+    my $pg_upsert =
+      ( $driver_name eq 'Pg' && $self->{dbix_lite}->dbh->{pg_server_version} > 10_00_00 )
+      ||
+      ($driver_name eq 'SQLite' && DBD::SQLite::Constants::SQLITE_VERSION_NUMBER() >= 3_035_000 );
+
+    if ( $pg_upsert ) {
+        $sub = sub {
+            my ( $sql, @bind ) = $self->insert_sql( $cols );
+            $sql .= ' on conflict do nothing returning *';
+            my $sth = $self->{dbix_lite}->dbh->prepare( $sql );
+            return if !$sth->execute( @bind );
+            my $hash = $sth->fetchrow_hashref;
+            $object = $hash ? $self->_inflate_row( $hash ) : $self->find( $cols );
+        };
+    }
+    else {
+        $sub = sub {
+            if (!($object = $self->find($cols))) {
+                $object = $self->insert($cols);
+            }
+        };
+    }
+    $self->{dbix_lite}->txn( $sub );
     return $object;
 }
 
@@ -465,8 +492,8 @@ sub delete_sql {
     }
     
     return $self->{dbix_lite}->{abstract}->delete(
-        $self->_table_alias_expr($self->{cur_table}{name}, 'delete'),
-        $delete_where,
+        -from => $self->_table_alias_expr($self->{cur_table}{name}, 'delete'),
+        -where => $delete_where,
     );
 }
 
@@ -542,7 +569,9 @@ sub count {
     my $count;
     $self->{dbix_lite}->dbh_do(sub {
         # Postgres throws an error when using ORDER BY clauses with COUNT(*)
-        my $count_rs = $self->select(\ "COUNT(*)")->order_by(undef);
+        # create a column alias so that if SQL::Abstract::More quotes columns
+        # it'll quote the column "count" rather than the expression "COUNT(*)"
+        my $count_rs = $self->select( [\'COUNT(*)', 'dbix_lite_rs_count' ])->order_by(undef);
         my ($sth, @bind) = $count_rs->select_sth;
         $sth->execute(@bind);
         $count = +($sth->fetchrow_array)[0];
@@ -645,13 +674,24 @@ sub _table_alias_expr {
     my ($table_name, $op) = @_;
     
     my $table_alias = $self->_table_alias($table_name, $op);
+
     if ($table_name eq $table_alias) {
         # foo
         return $table_name;
     } else {
-        # foo AS my_foo
-        return $self->{dbix_lite}->{abstract}->table_alias($table_name, $table_alias);
+
+        # As of SQL::Abstract::More v1.44, table alias syntax works for select, update, delete
+        my $supported_op = $op eq 'select' || $op eq 'update' || $op eq 'delete';
+        if ( $supported_op && version->parse(SQL::Abstract::More->VERSION) >= version->parse('1.44') ) {
+            return "$table_name|$table_alias";
+        }
+        else {
+            # foo AS my_foo
+            return $self->{dbix_lite}->{abstract}->table_alias($table_name, $table_alias);
+        }
+
     }
+
 }
 
 sub _inflate_row {
@@ -732,7 +772,7 @@ DBIx::Lite::ResultSet
 
 =head1 VERSION
 
-version 0.36
+version 0.38
 
 =head1 OVERVIEW
 
@@ -1190,7 +1230,7 @@ Alessandro Ranellucci <aar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Alessandro Ranellucci.
+This software is copyright (c) 2026 by Alessandro Ranellucci.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

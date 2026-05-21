@@ -1,52 +1,62 @@
 use Test2::V0;
 use Atomic::Pipe;
 
-my ($r, $w) = Atomic::Pipe->pair();
+BEGIN {
+    my $path = __FILE__;
+    $path =~ s{[^/]+\.t$}{select_mode.pm};
+    require "./$path";
+}
 
-sub push_buffer {
-    my $data = shift;
+for my $use_select (io_select_modes()) {
+    subtest "use_io_select=$use_select" => sub {
+        my ($r, $w) = Atomic::Pipe->pair(use_io_select => $use_select);
 
-    my $size = $w->fits_in_burst($data);
-    push @{$w->{out_buffer} //= []} => [$data, $size];
-};
+        sub push_buffer {
+            my ($w, $data) = @_;
 
-push_buffer("aaaaa");
-push_buffer("bbbbb");
-push_buffer("ccccc");
+            my $size = $w->fits_in_burst($data);
+            push @{$w->{out_buffer} //= []} => [$data, $size];
+        };
 
-ok($w->pending_output, "Have output ready to go");
+        push_buffer($w, "aaaaa");
+        push_buffer($w, "bbbbb");
+        push_buffer($w, "ccccc");
 
-$r->close();
-$r = undef;
+        ok($w->pending_output, "Have output ready to go");
 
-my $sigpipe = 0;
-like(
-    dies {
-        local $SIG{PIPE} = sub { $sigpipe++ };
-        $w->flush();
-    },
-    qr/Disconnected pipe/,
-    "We saw the pipe disconnect"
-);
+        $r->close();
+        $r = undef;
 
-is($sigpipe, 1, "Sigpipe handler was used") unless $w->IS_WIN32;
+        my $sigpipe = 0;
+        like(
+            dies {
+                local $SIG{PIPE} = sub { $sigpipe++ };
+                $w->flush();
+            },
+            qr/Disconnected pipe/,
+            "We saw the pipe disconnect"
+        );
 
-ok(!$w->pending_output, "Cleared pending output");
+        is($sigpipe, 1, "Sigpipe handler was used") unless $w->IS_WIN32;
 
-push_buffer("aaaaa");
+        ok(!$w->pending_output, "Cleared pending output");
 
-$sigpipe = 0;
-like(
-    dies {
-        local $SIG{PIPE} = sub { $sigpipe++ };
-        $w->flush();
-    },
-    qr/Disconnected pipe/,
-    "Still disconnected"
-);
+        push_buffer($w, "aaaaa");
 
-ok(!$sigpipe, "No additional sigpipe") unless $w->IS_WIN32;
+        $sigpipe = 0;
+        like(
+            dies {
+                local $SIG{PIPE} = sub { $sigpipe++ };
+                $w->flush();
+            },
+            qr/Disconnected pipe/,
+            "Still disconnected"
+        );
 
-delete $w->{out_buffer};
+        ok(!$sigpipe, "No additional sigpipe") unless $w->IS_WIN32;
+
+        delete $w->{out_buffer};
+    };
+}
 
 done_testing;

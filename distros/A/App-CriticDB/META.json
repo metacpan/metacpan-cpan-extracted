@@ -1,0 +1,41 @@
+{
+	"version" : "0.0.3",
+	"name"    : "App-CriticDB",
+	"author"  : ["Brian Blackmore <brian@mediaalpha.com>"],
+	"abstract": "Store Perl::Critic violations",
+	"license" : ["gpl_3"],
+	"prereqs" : {
+		"configure": {
+			"requires": {
+				"Module::Build::Tiny": "0.040"
+			}
+		},
+		"runtime": {
+			"requires": {
+				"perl": "0",
+				"Carp": "0",
+				"Perl::Critic": "0"
+			},
+			"suggests": {
+				"Data::Dumper": "2.183",
+				"Getopt::Long": "2.58",
+				"Pod::Usage": "1.64",
+				"Storable": "0"
+			}
+		},
+		"test": {
+			"requires": {
+				"File::Temp": "0.2301",
+				"Test::More": "0.61"
+			}
+		}
+	},
+	"resources": {
+		"bugtracker": {"web":"https://github.com/MediaAlpha/perl-app-criticdb/issues"},
+		"repository": {"url":"git://github.com/MediaAlpha/perl-app-criticdb.git"}
+	},
+	"meta-spec": {"url":"http://search.cpan.org/perldoc?CPAN::Meta::Spec","version":"2"},
+	"dynamic_config": 1,
+	"generated_by": "Brian Blackmore",
+	"release_status": "stable"
+}

@@ -1,5 +1,26 @@
 Revision history for Config::Abstraction - Merge and manage configuration data from different sources
 
+0.38	Wed May 20 21:46:58 EDT 2026
+
+	[ Enhancements ]
+	- Document the "defaults" argument to new()
+	- Fix fatal croak on malformed or degenerate YAML/JSON files in config_dirs;
+		parse failures now warn and skip the file rather than aborting construction,
+		consistent with existing XML and INI error handling
+
+	[ Bug Fixes]
+	- Fix corruption of coderefs and blessed objects passed via the 'data' argument;
+		added _is_plain_scalar() guard to skip non-string scalars in the YAML colon-file
+		value-munging loop, and fixed Data::Reuse::fixate() being called with a
+		dereferenced hash instead of a hashref in get()
+	- Fix Data::Reuse::fixate() crash in get() by passing hashref scalar directly
+	  rather than dereferencing, and guard against double-fixation with !tied check
+	- Fix exists() to return explicit 0 rather than empty string in flat mode
+	- Fix circular initialisation crash when logger option is provided:
+		Log::Abstraction is now bootstrapped directly in new() rather than
+		via _load_driver(), which would attempt to use the logger before
+		it was fully set up
+
 0.37	Mon Dec  1 07:43:07 EST 2025
 	Only use Data::Reuse if it's installed - its installation often fails
 	Added the --version option to config-dump

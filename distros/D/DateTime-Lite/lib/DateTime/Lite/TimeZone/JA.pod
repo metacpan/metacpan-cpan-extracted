@@ -1,0 +1,1683 @@
+=encoding utf-8
+
+=head1 NAME
+
+DateTime::Lite::TimeZone - DateTime::Liteのための軽量なタイムゾーンサポート
+
+=head1 SYNOPSIS
+
+    use DateTime::Lite::TimeZone;
+
+    my $tz = DateTime::Lite::TimeZone->new( name => 'Asia/Tokyo' ) ||
+        die( DateTime::Lite::TimeZone->error );
+
+    my $dt = DateTime::Lite->now( time_zone => $tz );
+
+    # エイリアス
+    my $tz2 = DateTime::Lite::TimeZone->new( name => 'US/Eastern' );
+
+    # 固定オフセット
+    my $tz3 = DateTime::Lite::TimeZone->new( name => '+09:00' );
+
+    # 特別なゾーン
+    my $utc  = DateTime::Lite::TimeZone->new( name => 'UTC' );
+    my $flt  = DateTime::Lite::TimeZone->new( name => 'floating' );
+
+    # 単一引数の省略形
+    my $tz4 = DateTime::Lite::TimeZone->new( 'Europe/Paris' );
+
+    # 緯度と経度を使用
+    my $tz = DateTime::Lite::TimeZone->new(
+        latitude  => 35.658558,
+        longitude => 139.745504,
+    ) || die( "Could not find a timezone: ", DateTime::Lite::TimeZone->error );
+
+    # 'lat'と'lon'も使用できます
+    my $tz = DateTime::Lite::TimeZone->new(
+        lat => 35.658558,
+        lon => 139.745504,
+    ) || die( "Could not find a timezone: ", DateTime::Lite::TimeZone->error );
+    say $tz->name;  # Asia/Tokyo
+
+    # メモリキャッシュ（3層：object + span + POSIX footer）
+    # 最良のパフォーマンスを得るには、アプリケーション起動時に一度だけ有効化します:
+    DateTime::Lite::TimeZone->enable_mem_cache;
+
+    # または呼び出しごとに:
+    my $tz5 = DateTime::Lite::TimeZone->new(
+        name          => 'America/New_York',
+        use_cache_mem => 1,
+    );
+
+    DateTime::Lite::TimeZone->disable_mem_cache;  # 無効化してクリアします
+    DateTime::Lite::TimeZone->clear_mem_cache;    # 無効化せずにクリアします
+
+    # オフセットおよびDSTクエリ
+    use DateTime::Lite;
+    my $dt = DateTime::Lite->now( time_zone => $tz );
+
+    my $offset_secs = $tz->offset_for_datetime( $dt );        # 例：-18000
+    my $local_off   = $tz->offset_for_local_datetime( $dt );  # 壁時計時刻から
+    my $is_dst      = $tz->is_dst_for_datetime( $dt );        # 1または0
+    my $abbr        = $tz->short_name_for_datetime( $dt );    # 例："EDT"
+
+    printf "%s", $tz->offset_as_string( $offset_secs );       # "-0500"
+    printf "%s", $tz->offset_as_string( $offset_secs, ':' );  # "-05:00"
+
+    # オフセット文字列を秒数へ解析:
+    my $secs = DateTime::Lite::TimeZone->offset_as_seconds( '-05:00' );  # -18000
+
+    # ゾーンメタデータ
+    $tz->name;             # 正規名。例："America/New_York"
+    $tz->is_olson;         # IANA名前付きゾーンなら1
+    $tz->is_utc;           # UTCなら1
+    $tz->is_floating;      # floatingなら1
+    $tz->has_dst;          # ゾーンが過去または現在DSTを採用するなら1
+    $tz->country_codes;    # ISO 3166-1 alpha-2コードの配列リファレンス。例：['US']
+    $tz->countries;        # 国データを含むハッシュリファレンスの配列リファレンス
+    $tz->coordinates;      # 例："+404251-0740023"
+    $tz->comment;          # IANAデータ由来の自由記述注釈
+    $tz->latitude;
+    $tz->longitude;
+    $tz->tz_version;       # IANAリリース文字列。例："2026a"
+    $tz->tzif_version;     # TZifバイナリ形式バージョン（1, 2, 3, または 4）
+    $tz->footer_tz_string; # 繰り返しDST規則用のPOSIX TZ文字列
+    $tz->transition_count;
+    $tz->type_count;
+    $tz->leap_count;
+
+    # ゾーン探索
+    my $all      = DateTime::Lite::TimeZone->all_names;  # 配列リファレンス
+    my @all      = DateTime::Lite::TimeZone->all_names;
+    my $cats     = DateTime::Lite::TimeZone->categories; # 配列リファレンス
+    my @cats     = DateTime::Lite::TimeZone->categories;
+    my $in_cat   = DateTime::Lite::TimeZone->names_in_category('America');  # 配列リファレンス
+    my @in_cat   = DateTime::Lite::TimeZone->names_in_category('America');
+    my $in_cc    = DateTime::Lite::TimeZone->names_in_country('JP');        # 配列リファレンス
+    my @in_cc    = DateTime::Lite::TimeZone->names_in_country('JP');
+    my $is_valid = DateTime::Lite::TimeZone->is_valid_name('Asia/Tokyo');   # 1
+
+    my $aliases  = DateTime::Lite::TimeZone->aliases;   # hashref alias => canonical
+    my %aliases  = DateTime::Lite::TimeZone->aliases;   # hash    alias => canonical
+    my $links    = $tz->links;                          # エイリアス名の配列リファレンス
+
+    # IANA types テーブルに対してタイムゾーン略称を解決
+    my $results = DateTime::Lite::TimeZone->resolve_abbreviation( 'JST' );
+    # $results = [
+    #     {
+    #         ambiguous        => 0,
+    #         extended         => 0,
+    #         first_trans_time => -2587712400,
+    #         is_active        => 1,
+    #         is_dst           => 0,
+    #         last_trans_time  => -577962000,
+    #         utc_offset       => 32400,
+    #         zone_name        => "Asia/Tokyo",
+    #     },
+    #     {
+    #         ambiguous        => 0,
+    #         extended         => 0,
+    #         first_trans_time => -1830414600,
+    #         is_active        => 0,
+    #         is_dst           => 0,
+    #         last_trans_time  => -1830414600,
+    #         utc_offset       => 32400,
+    #         zone_name        => "Asia/Pyongyang",
+    #     },
+    #     # etc...
+    # ]
+
+    # 一緒に解析された数値オフセットで絞り込み
+    my $pst = DateTime::Lite::TimeZone->resolve_abbreviation( 'PST',
+        utc_offset => -28800
+    );
+
+    # 期間フィルタ：1950年以降もJSTを使用していたゾーン
+    my $modern = DateTime::Lite::TimeZone->resolve_abbreviation( 'JST',
+        period => '>1950-01-01'
+    );
+
+    # 2つのISO日付境界を持つ期間フィルタ
+    my $wartime = DateTime::Lite::TimeZone->resolve_abbreviation( 'JST',
+        period => ['>1941-01-01', '<1946-01-01']
+    );
+
+    # 生のエポック整数を使った期間フィルタ（1970 年以降の値なら全プラットフォームで安全）
+    my $epoch_2010 = 1262304000;  # 2010-01-01 00:00:00 UTC
+    my $recent = DateTime::Lite::TimeZone->resolve_abbreviation( 'EST',
+        period => ">$epoch_2010"
+    );
+
+    # 期間フィルタ：現在この略称を使用しているゾーンのみ
+    my $current = DateTime::Lite::TimeZone->resolve_abbreviation( 'JST',
+        period => 'current'
+    );
+
+    # 拡張モード：IANA typesにない場合、extended_aliases にフォールバック
+    # （AFT, AMST, CEST, HAEC など、実際に使われる略称をカバーします）
+    my $aft = DateTime::Lite::TimeZone->resolve_abbreviation( 'AFT',
+        extended => 1
+    );
+    # $aft = [
+    #     {
+    #         ambiguous  => 0,
+    #         extended   => 1,
+    #         is_dst     => undef,
+    #         is_primary => 1,
+    #         utc_offset => undef,
+    #         zone_name  => "Asia/Kabul",
+    #     },
+    # ]
+
+    # データベースアクセス（低レベル）
+    my $path = DateTime::Lite::TimeZone->datafile;  # tz.sqlite3へのパス
+    # public viewメソッド経由の生SQLiteクエリ（DBI statement handleを返します）:
+    #   $tz->zones, $tz->spans, $tz->transition, $tz->types,
+    #   $tz->aliases, $tz->countries, $tz->leap_second, $tz->metadata
+
+    # エラー処理
+    my $bad = DateTime::Lite::TimeZone->new( name => 'Mars/Olympus' );
+    if( !defined( $bad ) )
+    {
+        warn DateTime::Lite::TimeZone->error;  # "Unknown time zone 'Mars/Olympus'"
+    }
+    $tz->fatal(1);  # エラーを warn+undef ではなく die にします
+
+    # エラー時でもオブジェクトコンテキストを検出し、典型的な
+    # "Can't call method "%s" on an undefined value"を避けるため、
+    # チェーンが最後まで展開されるようにします。
+    # https://perldoc.perl.org/perldiag#Can't-call-method-%22%25s%22-on-an-undefined-value を参照
+    my $bad = DateTime::Lite::TimeZone->new( name => 'Mars/Olympus' )->name;
+
+=head1 VERSION
+
+    v0.5.7
+
+=head1 DESCRIPTION
+
+C<DateTime::Lite::TimeZone>は、L<DateTime::TimeZone>の重い依存関係とメモリフットプリントを取り除くことを目的とした、ドロップイン代替モジュールです。
+
+L<DateTime::TimeZone>は、コンストラクタ引数を検証するだけのために、L<Specio>、L<Params::ValidationCompiler>、L<Exception::Class>スタック全体を含む85個のモジュールを起動時に読み込みます。C<DateTime::Lite::TimeZone>は、そのすべてを、同梱されたコンパクトなデータベース（C<tz.sqlite3>）に対する単一のL<DBD::SQLite>クエリで置き換えます。
+
+L<Locale::Unicode::Data>モジュールによって提供されるUnicode CLDR（Common Locale Data Repository）にも関心があるかもしれません。これはC<metazones>、C<regions>、履歴タイムゾーンデータなど、より豊富なタイムゾーン情報を提供します。
+
+たとえば：
+
+    my $cldr = Locale::Unicode::Data->new;
+    my $ref  = $cldr->timezone( timezone => 'Asia/Tokyo' );
+
+これは次のような情報を含むハッシュリファレンスを返します。
+
+    {
+       timezone_id => 281,
+       timezone    => 'Asia/Tokyo',
+       territory   => 'JP',
+       region      => 'Asia',
+       tzid        => 'japa',
+       metazone    => 'Japan',
+       tz_bcpid    => 'jptyo',
+       is_golden   => 1,
+       is_primary  => 0,
+       is_preferred => 0,
+       is_canonical => 0,
+    }
+
+国コードに対応するすべてのタイムゾーンを取得することもできます。
+
+    my $array_ref = $cldr->timezones( territory => 'US' );
+
+これは次のような55件の結果を返します。
+
+    {
+        alias => [qw( America/Atka US/Aleutian )],
+        is_canonical => 1,
+        is_golden => 1,
+        is_preferred => 0,
+        is_primary => 0,
+        metazone => "Hawaii_Aleutian",
+        region => "America",
+        territory => "US",
+        timezone => "America/Adak",
+        timezone_id => 55,
+        tz_bcpid => "usadk",
+        tzid => "haal",
+    }
+
+タイムゾーンに対応するローカライズ済み都市名も取得できます。
+
+    my $ref = $cldr->timezone_city(
+        locale   => 'de',
+        timezone => 'Asia/Tokyo',
+    );
+
+これは次のような値を返します。
+
+    {
+       tz_city_id  => 7486,
+       locale      => 'de',
+       timezone    => 'Asia/Tokyo',
+       city        => 'Tokio',
+       alt         => undef,
+    }
+
+履歴情報へアクセスしたい場合は、次のようにできます。
+
+    my $ref = $cldr->timezone_info(
+        timezone    => 'Europe/Simferopol',
+        start       => '1994-04-30T21:00:00',
+    );
+
+これは次のような値を返します。
+
+    {
+       tzinfo_id   => 594,
+       timezone    => 'Europe/Simferopol',
+       metazone    => 'Moscow',
+       start       => '1994-04-30T21:00:00',
+       until       => '1997-03-30T01:00:00',
+    }
+
+または、次のようにすることもできます。
+
+    my $ref = $cldr->timezone_info(
+        timezone    => 'Europe/Simferopol',
+        start       => ['>1992-01-01', '<1995-01-01'],
+    );
+
+正確な日付が分からず、代わりに範囲を指定したい場合に便利です。
+
+=head2 データベーススキーマ
+
+同梱のC<tz.sqlite3>は、主に次のテーブルを使用します。
+
+=over 4
+
+=item C<aliases>
+
+エイリアスからzone_idへのFKマッピングです（例：C<US/Eastern>からC<America/New_York>）。
+
+=item C<metadata>
+
+tzdataバージョンを含むキー/値ペアです。
+
+=item C<spans>
+
+遷移とtypesから導出された事前計算済みの期間です。高速な範囲検索のためにインデックスされています。
+
+=item C<types>
+
+TZifファイル由来のローカル時刻タイプレコードです。
+
+=item C<zones>
+
+国コードと座標を含む、正規IANAゾーン名です。
+
+=back
+
+=head2 フォールバックモード
+
+L<DBD::SQLite>が利用できない場合、または同梱のC<tz.sqlite3>が見つからない場合、C<DateTime::Lite::TimeZone>は透過的にL<DateTime::TimeZone>へフォールバックし、警告が許可されていれば一度だけ警告を出します。
+
+L<DateTime::TimeZone>も利用できない場合は、C<die>します。
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+    my $zone = DateTime::Lite::TimeZone->new( 'Asia/Tokyo' );
+    my $zone = DateTime::Lite::TimeZone->new(
+        name  => 'Asia/Tokyo',
+        fatal => 1, # すべてのエラーを fatal にします
+    );
+
+    # 緯度と経度を使用
+    my $tz = DateTime::Lite::TimeZone->new(
+        latitude  => 35.658558,
+        longitude => 139.745504,
+    ) || die( "Could not find a timezone: ", DateTime::Lite::TimeZone->error );
+
+    # 'lat'と'lon'も使用できます
+    my $tz = DateTime::Lite::TimeZone->new(
+        lat => 35.658558,
+        lon => 139.745504,
+    ) || die( "Could not find a timezone: ", DateTime::Lite::TimeZone->error );
+    say $tz->name;  # Asia/Tokyo
+
+新しいC<DateTime::Lite::TimeZone>オブジェクトは、タイムゾーンを単一引数として渡すか、C<< name => 'Asia/Tokyo' >>のようなハッシュとして渡すことで生成できます。
+
+認識される形式：
+
+=over 4
+
+=item C<America/New_York>、C<Europe/Paris>のような名前付きIANAタイムゾーン。
+
+=item C<US/Eastern>、C<Japan>のようなエイリアス。
+
+=item C<+09:00>、C<-0500>のような固定オフセット文字列。
+
+=item 特別な名前C<UTC>、C<floating>、C<local>。
+
+C<local>という名前は、外部モジュールを必要とせずに、システムのローカルタイムゾーンを自動判定するようC<DateTime::Lite::TimeZone>に指示します。判定戦略はOS固有で、L<$^O|perlvar/"$^O">に依存します。
+
+=over 8
+
+=item B<Linux、macOS (darwin)、FreeBSD、OpenBSD、NetBSD、Solaris、AIX、HP-UX、OS/2、Cygwin>
+
+次の順に試します。
+
+=over 12
+
+=item * C<$ENV{TZ}>
+
+=item * C</etc/localtime>のsymlink先、またはC</usr/share/zoneinfo>に対するバイナリ一致
+
+=item * C</etc/timezone>（Debian/Ubuntu）
+
+=item * C<TZ=>行を含むC</etc/TIMEZONE>（Solaris, HP-UX）
+
+=item * C<ZONE=>またはC<TIMEZONE=>行を含むC</etc/sysconfig/clock>（RedHat/CentOS）
+
+=item * C<TZ=>行を含むC</etc/default/init>（古いUnix）
+
+=back
+
+=item B<Windows (MSWin32、NetWare)>
+
+まずC<$ENV{TZ}>を試し、その後Windows Registry（C<SYSTEM/CurrentControlSet/Control/TimeZoneInformation>）からタイムゾーン名を読み取り、CLDRのC<windowsZones.xml>テーブルを使ってIANA名へマッピングします。
+C<Win32::TieRegistry>が必要です（CPANで利用可能ですが、必須依存ではありません）。
+
+=item B<Android>
+
+C<$ENV{TZ}>、次にC<getprop persist.sys.timezone>を試し、その後C<UTC>へフォールバックします。
+
+=item B<VMS>
+
+環境変数C<TZ>、C<SYS$TIMEZONE_RULE>、C<SYS$TIMEZONE_NAME>、C<UCX$TZ>、C<TCPIP$TZ>を確認します。
+
+=item B<Symbian、EPOC、MS-DOS、Mac OS 9以前>
+
+C<$ENV{TZ}>のみを確認します。
+
+=back
+
+ローカルタイムゾーンを判定できない場合は、エラーが設定され、スカラコンテキストではC<undef>、リストコンテキストでは空リストが返されます。チェーン呼び出し（オブジェクトコンテキスト）では、典型的なC<Can't call method '%s' on an undefined value>を避けるため、ダミーオブジェクト（C<DateTime::Lite::Null>）を返します。
+
+=item C<latitude>およびC<longitude>引数による座標。
+
+C<name>の代わりに10進度の座標を渡すことで、C<DateTime::Lite::TimeZone>に最も近いIANAタイムゾーンを自動解決させることができます。
+
+    my $tz = DateTime::Lite::TimeZone->new(
+        latitude  => 35.658558,
+        longitude => 139.745504,
+    );
+    say $tz->name;  # Asia/Tokyo
+
+解決にはIANAC<zone1970.tab>ファイルに保存された参照座標（正規ゾーンごとに1つの代表点）を使用し、L<haversine great-circle distance|https://en.wikipedia.org/wiki/Haversine_formula>により最も近いゾーンを探します。これはB<近似>です。ほとんどの場所では正確ですが、タイムゾーン境界付近、係争地域、またはKaliningradのような飛び地では誤った結果になる可能性があります。境界に厳密な解決が必要な場合は、代わりにL<Geo::Location::TimeZoneFinder>を検討してください。
+
+C<latitude>はC<-90>からC<90>、C<longitude>はC<-180>からC<180>の範囲でなければなりません。値が範囲外である場合、またはデータベース内に座標付きゾーンが見つからない場合、L<エラーオブジェクト|DateTime::Lite::Exception>が設定され、スカラコンテキストではC<undef>、リストコンテキストでは空リストが返されます。
+
+haversine公式は、データベースがC<-DSQLITE_ENABLE_MATH_FUNCTIONS>付きでコンパイルされている場合、SQLite内で計算されます（SQLite version E<gt>= 3.35.0、L<2021年3月リリース|https://sqlite.org/changes.html>）。
+
+古いシステム、または数学関数が存在しないビルドでは、必要な関数（C<sqrt>、C<sin>、C<cos>、C<asin>）が、初回使用時にL<DBD::SQLite/sqlite_create_function>経由でPerl UDF（User Defined Functions）として自動登録されます。そのため、座標解決はサポートされるすべてのSQLiteバージョンで透過的に動作します。
+
+検出はバージョンを考慮して行われます。つまり：
+
+=over 8
+
+=item * SQLite version E<gt>= 3.35.0では、UDFを登録する前に特殊なsystem table C<pragma_function_list>でC<sqrt>を問い合わせ、ネイティブ関数を優先的に使用することを確認します。
+
+=item * SQLite version E<lt>3.35.0では、数学関数がまだ存在しないため、C<pragma_function_list>を問い合わせずにUDFを直接登録します。
+
+=item * SQLite version E<lt>3.16.0では、C<pragma_function_list>はtable-valued functionとして利用できないため、UDFを直接登録します。
+
+=back
+
+UDFはSQLite version E<gt>= 3.0.0のすべてで利用できます。
+
+古いシステムでSQLite 3.31.1が同梱されている場合も、必要な関数（C<sqrt>、C<sin>、C<cos>、C<asin>）は初回使用時にL<DBD::SQLite/sqlite_create_function>経由でPerl UDF（User Defined Functions）として自動登録されるため、座標解決はサポートされるすべてのSQLiteバージョンで透過的に動作します。
+
+=back
+
+真の値を持つbooleanオプションC<use_cache_mem>は、この呼び出しに対してプロセスレベルのメモリキャッシュを有効化します。設定されると、同じゾーン名（またはそのエイリアス）での以後の呼び出しは、データベースクエリなしでキャッシュ済みオブジェクトを返します。詳細およびクラスレベルの代替であるL</enable_mem_cache>についてはL</メモリキャッシュ>を参照してください。
+
+    # これらは最初の構築後、キャッシュにヒットします:
+    my $tz = DateTime::Lite::TimeZone->new(
+        name          => 'America/New_York',
+        use_cache_mem => 1,
+    );
+
+真の値を持つbooleanオプションC<extended>は、名前が有効なIANAタイムゾーン名として認識されない場合に、略称解決をフォールバックとして有効化します。これは、呼び出し元が外部ソースからC<JST>、C<CET>、C<EST>のようなタイムゾーン略称を受け取り、L</resolve_abbreviation>を明示的に呼び出さずに正規IANAゾーンへ解決したい場合に便利です。
+
+C<extended>が設定され、名前がIANAタイムゾーンとして未知の場合、C<new>は内部的にC<extended>オプションを真にしてC<resolve_abbreviation>を呼び出します。そして単一の曖昧でない候補が見つかった場合、その解決済み正規名で再帰的に呼び出します。略称が曖昧である場合、またはextended aliasesテーブルでも見つからない場合は、通常のC<Unknown time zone>エラーが返されます。
+
+    my $tz = DateTime::Lite::TimeZone->new( name => 'JST', extended => 1 );
+    say $tz->name;  # Asia/Tokyo
+
+成功時には新しいオブジェクトを返します。エラー時にはC<error()>によりL<例外オブジェクト|DateTime::Lite::Exception>を設定し、スカラコンテキストではC<undef>、リストコンテキストでは空リストを返します。メソッドチェーン（オブジェクト）コンテキストでは、C<Can't call method '%s' on an undefined value>エラーを避けるため、C<DateTime::Lite::NullObject>を返します。ただし、チェーンの最後ではC<undef>または空リストが返されます。
+
+=head1 メモリキャッシュ
+
+デフォルトでは、L</new>を呼び出すたびにSQLiteクエリを使って新しいオブジェクトを構築します。同じゾーン名でC<DateTime::Lite::TimeZone>オブジェクトを繰り返し構築するアプリケーション向けに、3層のキャッシュが用意されています。
+
+B<Layer 1 - オブジェクトキャッシュ>：有効化されている場合、同じゾーン名に対する2回目以降の呼び出しは、データベースを完全に迂回し、元のオブジェクトをハッシュから直接返します。
+
+B<Layer 2 - spanキャッシュ>：キャッシュ済みの各TimeZoneオブジェクトは、直近に一致したUTCおよびローカル時刻spanを保存します。C<offset_for_datetime>およびC<offset_for_local_datetime>の呼び出しでは、タイムスタンプがキャッシュ済みspanのC<[utc_start, utc_end)>またはC<[local_start, local_end)>範囲内にある場合、SQLiteクエリを省略します。
+
+B<Layer 3 - POSIX footerキャッシュ>：現在の日付が繰り返しDST規則（POSIX TZ footer文字列）によって管理されるゾーンでは、footer計算の結果が暦日単位でキャッシュされます。DST遷移は年に2回発生するだけなので、それ以外の日では規則を再評価せずにキャッシュ済みの結果を返します。
+
+これら3層により、C<< DateTime::Lite->new( time_zone => 'America/New_York' ) >>の呼び出しごとのコストは約430 µsから約25 µsまで低下し、C<DateTime>と同等になります。
+
+キャッシュエントリは、L</new>に渡された名前と、エイリアス解決後の正規名をキーにします。そのため、C<US/Eastern>とC<America/New_York>は同じキャッシュ済みオブジェクトへ対応します。
+
+通常の使用では、キャッシュ済みオブジェクトは不変です。すべてのpublic accessorは読み取り専用なので、複数の呼び出し元でオブジェクトを共有しても安全です。
+
+=head2 enable_mem_cache
+
+クラスメソッドです。以後のすべてのL</new>呼び出しに対してメモリキャッシュを有効化します。
+
+    DateTime::Lite::TimeZone->enable_mem_cache;
+
+    # すべての new() 呼び出しは、最初の構築後にキャッシュへヒットします:
+    my $tz = DateTime::Lite::TimeZone->new( name => 'America/New_York' );
+    my $tz2 = DateTime::Lite::TimeZone->new( name => 'America/New_York' );
+    # $tz と $tz2 は同じオブジェクトです
+
+すべてのL</new>呼び出しにC<< use_cache_mem => 1 >>を渡すことと同等ですが、プロセスの存続期間中キャッシュを有効にしたい場合には、こちらの方が便利です。チェーン呼び出しを可能にするため、クラス名を返します。
+
+=head2 disable_mem_cache
+
+クラスメソッドです。メモリキャッシュを無効化し、すべてのキャッシュエントリをクリアします。以後のL</new>呼び出しでは、新しいオブジェクトが構築されます。
+
+    DateTime::Lite::TimeZone->disable_mem_cache;
+
+クラス名を返します。
+
+=head2 clear_mem_cache
+
+クラスメソッドです。キャッシュを無効化せずに空にします。任意のゾーン名に対する次のL</new>呼び出しでは、データベースへ再クエリし、キャッシュを再構築します。
+
+C<tz.sqlite3>データベースが実行時に置き換えられた場合に便利です（通常はまれな操作です）。
+
+    DateTime::Lite::TimeZone->clear_mem_cache;
+
+クラス名を返します。
+
+=head1 METHODS
+
+=head2 aliases
+
+    # エラーも確認します
+    my $aliases  = DateTime::Lite::TimeZone->aliases ||
+        die( DateTime::Lite::TimeZone->error );
+    my( %aliases ) = DateTime::Lite::TimeZone->aliases ||
+        die( DateTime::Lite::TimeZone->error );
+    my $aliases    = $zone->aliases ||
+        die( $zone->error );
+    my( %aliases ) = $zone->aliases ||
+        die( $zone->error );
+
+これはインスタンスメソッドとしても、クラス関数としても呼び出せます。
+
+すべてのゾーンエイリアス（古く、非推奨となった名前）から、それぞれ対応する正規名へのハッシュを返します。
+
+例：
+
+    Japan -> Asia/Tokyo
+
+スカラコンテキストではハッシュリファレンスを返し、リストコンテキストではハッシュを返します。
+
+エラーが発生した場合はL<例外オブジェクト|DateTime::Lite::Exception>を設定し、スカラコンテキストではC<undef>、リストコンテキストでは空リストを返します。例外オブジェクトはその後L</error>で取得できます。
+
+=head2 all_names
+
+    # エラーも確認します
+    my $names    = DateTime::Lite::TimeZone->all_names ||
+        die( DateTime::Lite::TimeZone->error );
+    my( @names ) = DateTime::Lite::TimeZone->all_names ||
+        die( DateTime::Lite::TimeZone->error );
+    my $names    = $zone->all_names ||
+        die( $zone->error );
+    my( @names ) = $zone->all_names ||
+        die( $zone->error );
+
+これはインスタンスメソッドとしても、クラス関数としても呼び出せます。
+
+すべてのタイムゾーン名をアルファベット順に並べたリストを返します。
+このリストにはゾーンエイリアス（いわゆる “links”）は含まれません。
+
+スカラコンテキストでは配列リファレンスを返し、リストコンテキストでは配列を返します。
+
+エラーが発生した場合はL<例外オブジェクト|DateTime::Lite::Exception>を設定し、スカラコンテキストではC<undef>、リストコンテキストでは空リストを返します。例外オブジェクトはその後L</error>で取得できます。
+
+=head2 categories
+
+    # エラーも確認します
+    my $categories    = DateTime::Lite::TimeZone->categories ||
+        die( DateTime::Lite::TimeZone->error );
+    my( @categories ) = DateTime::Lite::TimeZone->categories ||
+        die( DateTime::Lite::TimeZone->error );
+    my $categories    = $zone->categories ||
+        die( $zone->error );
+    my( @categories ) = $zone->categories ||
+        die( $zone->error );
+
+これはインスタンスメソッドとしても、クラス関数としても呼び出せます。
+
+すべてのタイムゾーンカテゴリのリストを返します。C<category>とは、ゾーン名のスラッシュより前にある部分が存在する場合、その部分を指します。たとえばC<Asia/Tokyo>では、categoryはC<Asia>になります。ただし、特別なゾーンC<Factory>にはcategoryはありません。
+
+スカラコンテキストでは配列リファレンスを返し、リストコンテキストでは配列を返します。
+
+エラーが発生した場合はL<例外オブジェクト|DateTime::Lite::Exception>を設定し、スカラコンテキストではC<undef>、リストコンテキストでは空リストを返します。例外オブジェクトはその後L</error>で取得できます。
+
+=head2 category
+
+    my $zone = DateTime::Lite::TimeZone->new( name => "Asia/Tokyo" );
+    say $zone->category; # Asia
+    my $zone = DateTime::Lite::TimeZone->new( name => "UTC" );
+    say $zone->category; # undef
+
+タイムゾーン名の最初のスラッシュより前の部分を返します。たとえばC<Asia/Tokyo>ではC<Asia>です。
+
+=head2 comment
+
+C<zone1970.tab>に由来する任意のゾーンコメントを返します。たとえばC<"Mountain Time - south Idaho and east Oregon">のような値です。
+
+コメントが記録されていない場合は、スカラコンテキストではC<undef>、リストコンテキストでは空リストを返します。
+
+=head2 coordinates
+
+C<zone1970.tab>に由来するコンパクトな座標文字列を返します。たとえば東京の場合はC<+3518+13942>です。
+C<UTC>、C<floating>、固定オフセットゾーンのように座標が存在しない場合は、スカラコンテキストではC<undef>、リストコンテキストでは空リストを返します。
+
+=head2 country_codes
+
+このタイムゾーンに関連付けられたISO 3166-1 alpha-2国コードの配列リファレンスを返します。たとえばC<["JP"]>またはC<["US","CA"]>です。
+
+C<UTC>、C<floating>、固定オフセットゾーンのように、このタイムゾーンに関連付けられた国がない場合は、スカラコンテキストではC<undef>、リストコンテキストでは空リストを返します。
+
+=head2 countries
+
+    # エラーも確認します
+    my $countries    = DateTime::Lite::TimeZone->countries ||
+        die( DateTime::Lite::TimeZone->error );
+    my( @countries ) = DateTime::Lite::TimeZone->countries ||
+        die( DateTime::Lite::TimeZone->error );
+    my $countries    = $zone->countries ||
+        die( $zone->error );
+    my( @countries ) = $zone->countries ||
+        die( $zone->error );
+
+これはインスタンスメソッドとしても、クラス関数としても呼び出せます。
+
+ISO 3166の2文字国コードをすべて、アルファベット順かつ小文字で並べたリストを返します。これらのコードはL</names_in_country>の呼び出しに使用できます。
+
+スカラコンテキストでは配列リファレンスを返し、リストコンテキストでは配列を返します。
+
+エラーが発生した場合はL<例外オブジェクト|DateTime::Lite::Exception>を設定し、スカラコンテキストではC<undef>、リストコンテキストでは空リストを返します。例外オブジェクトはその後L</error>で取得できます。
+
+国コードをローカライズされた国名へ変換したい場合は、そのために設計されたL<Unicode CLDR database|Locale::Unicode::Data>を使用できます。
+
+たとえばC<locale> C<en>を使う場合：
+
+    use Locale::Unicode::Data;
+    my $cldr = Locale::Unicode::Data->new;
+    my $ref  = $cldr->territory_l10n( locale => 'en', territory => 'JP', alt => undef );
+
+    # 次のようなハッシュリファレンスを返します：
+    {
+       terr_l10n_id    => 13385,
+       locale          => 'en',
+       territory       => 'JP',
+       locale_name     => 'Japan',
+       alt             => undef,
+    }
+
+また、ローカライズされた国名からISO3166コードを検索したい場合は、次のようにできます。ここでは、日本語でC<America>を意味するC<アメリカ>に一致する国コードを検索しています。
+
+    use strict;
+    use warnings;
+    use utf8;
+    use open ':std' => ':utf8';
+    use Data::Pretty qw( dump );
+    use Locale::Unicode::Data;
+    my $cldr = Locale::Unicode::Data->new;
+    my $all = $cldr->territories_l10n( locale => 'ja' );
+    foreach my $ref ( @$all )
+    {
+        if( $ref->{locale_name} =~ /アメリカ/ &&
+            $ref->{territory} =~ /^[A-Z]{2}$/ ) # Unicode CLDR では territory が 3 桁コードの場合もあるため
+        {
+            say dump( $ref );
+        }
+    }
+
+これは次のような出力を生成します。
+
+    {
+        alt => undef,
+        locale => "ja",
+        locale_name => "アメリカ合衆国",
+        terr_l10n_id => 26334,
+        territory => "US",
+    }
+
+=head2 datafile
+
+同梱されているC<tz.sqlite3>データベースファイルへの絶対パスを返します。
+
+=head2 designation_charcount
+
+略称文字列テーブルの合計サイズをバイト単位で返します。
+
+これはTZifヘッダーフィールドC<charcnt>に相当し、末尾のNULバイトも含みます。
+
+L<rfc9636, section 3.1|https://www.rfc-editor.org/rfc/rfc9636.html#name-tzif-header>を参照してください。
+
+=head2 error
+
+    my $ex = $zone->error;
+
+直近のL<例外オブジェクト|DateTime::Lite::Exception>があれば、それを返します。
+
+=head2 extended_aliases
+
+    my $aliases = DateTime::Lite::TimeZone->extended_aliases;
+    my $aliases = $tz->extended_aliases;
+
+    # エラーも確認します
+    my $aliases  = DateTime::Lite::TimeZone->extended_aliases ||
+        die( DateTime::Lite::TimeZone->error );
+    my( %aliases ) = DateTime::Lite::TimeZone->extended_aliases ||
+        die( DateTime::Lite::TimeZone->error );
+    my $aliases    = $zone->extended_aliases ||
+        die( $zone->error );
+    my( %aliases ) = $zone->extended_aliases ||
+        die( $zone->error );
+
+これはインスタンスメソッドとしても、クラス関数としても呼び出せます。
+
+すべての拡張ゾーンエイリアスから、それぞれ対応する正規名へのハッシュを返します。
+
+例：
+
+    JST -> Asia/Tokyo
+
+スカラコンテキストではハッシュリファレンスを返し、リストコンテキストではハッシュを返します。
+
+エラーが発生した場合はL<例外オブジェクト|DateTime::Lite::Exception>を設定し、スカラコンテキストではC<undef>、リストコンテキストでは空リストを返します。例外オブジェクトはその後L</error>で取得できます。
+
+=head2 fatal
+
+このオブジェクトのC<fatal>プロパティを設定または取得します。
+
+有効化されている場合、任意のエラーはfatal exceptionを発生させ、L<perlfunc/die>を呼び出します。
+
+=head2 footer_tz_string
+
+タイムゾーンのfooter部分を返します。
+
+L<rfc9636, section 3.3|https://www.rfc-editor.org/rfc/rfc9636.html#name-tzif-footer>を参照してください。
+
+=head2 has_dst
+
+L</has_dst_changes>のエイリアスです。
+
+=head2 has_dst_changes
+
+このタイムゾーンが夏時間の遷移を持つ場合に真を返します。
+
+=head2 is_canonical
+
+    my $zone = DateTime::Lite::TimeZone->new( 'Japan' );
+    say $zone->is_canonical; # false
+    my $zone = DateTime::Lite::TimeZone->new( 'Asia/Tokyo' );
+    say $zone->is_canonical; # true
+
+指定されたタイムゾーン名が正規名であれば真を返し、そうでなければ偽を返します。
+
+=head2 is_dst_for_datetime( $dt )
+
+C<$dt>がこのタイムゾーンにおけるDST期間内にある場合に真を返します。
+
+=head2 is_floating
+
+特別なC<floating>タイムゾーンであれば真を返します。
+
+=head2 is_olson
+
+IANA/Olson由来のタイムゾーンであれば真を返します。
+
+=head2 is_utc
+
+C<UTC>タイムゾーン、または固定オフセットC<+0000>であれば真を返します。
+
+=head2 is_valid_name
+
+    say DateTime::Lite::TimeZone->is_valid_name( 'Singapore' );  # true
+    say $zone->is_valid_name( 'Singapore' );                     # true
+    say DateTime::Lite::TimeZone->is_valid_name( 'Paris' );      # false
+    say $zone->is_valid_name( 'Paris' );                         # false
+    say DateTime::Lite::TimeZone->is_valid_name( 'Asia/Seoul' ); # true
+    say $zone->is_valid_name( 'Asia/Seoul' );                    # true
+
+正規タイムゾーン名またはタイムゾーンエイリアスを受け取り、指定された値が有効であれば真を、そうでなければ偽を返します。
+
+値が渡されなかった場合にのみL<例外オブジェクト|DateTime::Lite::Exception>を設定してエラーを返します。そのため、戻り値が定義されているか確認した方がよい場合があります。
+
+C<DateTime::TimeZone>とは異なり、L<DateTime::TimeZone::Alias>を渡しても、そのゾーンが有効になるわけではありません。このクラスはIANAタイムゾーンに厳密に従います。
+
+=head2 isstd_count
+
+C<standard time>（別名 “standard/wall”）インジケータの数を返します。
+
+これは「0であるか、またはL<typecnt|/type_count>と等しくなければなりません」。
+
+L<rfc9636, section 3.1|https://www.rfc-editor.org/rfc/rfc9636.html#name-tzif-header>を参照してください。
+
+=head2 isut_count
+
+C<UT/local time>インジケータの数を返します。
+
+これは「0であるか、またはL<typecnt|/type_count>と等しくなければなりません」。
+
+L<rfc9636, section 3.1|https://www.rfc-editor.org/rfc/rfc9636.html#name-tzif-header>を参照してください。
+
+=head2 latitude
+
+このゾーンの緯度が存在する場合、実数として返します。
+
+=head2 links
+
+L</aliases>のエイリアスです。
+
+=head2 longitude
+
+このゾーンの経度が存在する場合、実数として返します。
+
+=head2 name
+
+    my $zone = DateTime::Lite::TimeZone->new( name => 'Japan' );
+    say $zone->name; # Asia/Tokyo
+
+C<Asia/Tokyo>のような正規タイムゾーン名を返します。
+
+これは、インスタンス化時にエイリアスを指定した場合、それが解決され、このメソッドからアクセスできることを意味します。
+
+=head2 names_in_category
+
+    # エラーも確認します
+    my $names    = DateTime::Lite::TimeZone->names_in_category( 'Asia' ) ||
+        die( DateTime::Lite::TimeZone->error );
+    my( @names ) = DateTime::Lite::TimeZone->names_in_category( 'Asia' ) ||
+        die( DateTime::Lite::TimeZone->error );
+    my $names    = $zone->names_in_category( 'America' ) ||
+        die( $zone->error );
+    my( @names ) = $zone->names_in_category( 'America' ) ||
+        die( $zone->error );
+
+これはC<category>を受け取ります。このクラスでは、C<category>とは、スラッシュで区切られたゾーン名の左側の部分を意味します。したがって、C<Asia/Seoul>の例では、C<category>はC<Asia>になります。
+
+このC<category>が指定されると、最初のスラッシュの右側にある名前のリストを返します。
+
+例：
+
+C<Asia/Taipei>の場合、categoryはC<Asia>であり、返される74件の結果の中にはC<Taipei>という名前が含まれます。
+
+category C<America>の場合は121件の結果があり、その中には完全なタイムゾーン名がC<America/Indiana/Vincennes>であるC<Indiana/Vincennes>も含まれます。
+
+スカラコンテキストでは配列リファレンスを返し、リストコンテキストでは配列を返します。
+
+エラーが発生した場合はL<例外オブジェクト|DateTime::Lite::Exception>を設定し、スカラコンテキストではC<undef>、リストコンテキストでは空リストを返します。例外オブジェクトはその後L</error>で取得できます。
+
+=head2 names_in_country
+
+    # エラーも確認します
+    my $names    = DateTime::Lite::TimeZone->names_in_country( 'US' ) ||
+        die( DateTime::Lite::TimeZone->error );
+    my( @names ) = DateTime::Lite::TimeZone->names_in_country( 'US' ) ||
+        die( DateTime::Lite::TimeZone->error );
+    my $names    = $zone->names_in_country( 'US' ) ||
+        die( $zone->error );
+    my( @names ) = $zone->names_in_country( 'US' ) ||
+        die( $zone->error );
+
+2文字のISO3166国コードを受け取り、それに関連付けられたすべてのタイムゾーンのリストを返します。
+
+大文字小文字は区別されないため、C<US>とC<us>のような国コードは同じように扱われます。
+
+スカラコンテキストでは配列リファレンスを返し、リストコンテキストでは配列を返します。
+
+エラーが発生した場合はL<例外オブジェクト|DateTime::Lite::Exception>を設定し、スカラコンテキストではC<undef>、リストコンテキストでは空リストを返します。例外オブジェクトはその後L</error>で取得できます。
+
+返されるタイムゾーンの順序は、IANAデータベースで設定されている順序と同じです。
+
+=head2 offset_as_seconds
+
+C<+09:00>のようなオフセット文字列を受け取り、そのオフセットが表す秒数を符号付き整数として返します。
+
+値が渡されなかった場合、その値がC<-99:59:59>からC<+99:59:59>の範囲に含まれない場合、または渡されたオフセット文字列が次の2つのパターンのいずれにも一致しない場合、L<エラーオブジェクト|DateTime::Lite::Exception>を設定し、スカラコンテキストではC<undef>、リストコンテキストでは空リストを返します。
+
+サポートされるオフセットパターンは次のとおりです（符号が省略された場合、デフォルトはC<+>です）。
+
+=over 4
+
+=item コロン形式：C<[+-]H:MM>, C<[+-]HH:MM>, C<[+-]HH:MM:SS>
+
+正規表現は次のとおりです：C<\A([+-])?(\d{1,2}):(\d{2})(?::(\d{2}))?\z>
+
+例：C<+09:00>, C<-02:00>, C<9:0:0>
+
+=item コンパクト形式：C<[+-]HHMM>, C<[+-]HHMMSS>
+
+正規表現は次のとおりです：C</\A([+-])?(\d{2})(\d{2})(\d{2})?\z/>
+
+例：C<+0900>, C<-0200>, C<0900>, C<+090000>, C<090000>
+
+=item 特別な文字列C<"0">（C<0>を返します）。
+
+=back
+
+=head2 offset_as_string
+
+    say DateTime::Lite::TimeZone->offset_as_string(32400);       # +0900
+    say DateTime::Lite::TimeZone->offset_as_string(32400, ':' ); # +09:00
+    say $zone->offset_as_string(32400);                          # +0900
+    say $zone->offset_as_string(32400, ':');                     # +09:00
+
+クラスメソッドまたはインスタンスメソッドです。秒単位の数値UTCオフセットを、C<+0900>（デフォルト）またはC<:>を区切り文字とするC<+09:00>のような書式付き文字列へ変換します。
+
+L<DateTime::TimeZone/offset_as_string>とドロップイン互換です。
+
+=head2 offset_for_datetime
+
+    my $offset = $zone->offset_for_datetime( $dt );
+
+L<DateTime::Lite>オブジェクトを受け取り、そのオブジェクトに適用されるUTCオフセットを秒単位で返します。
+
+エラー時にはL<エラーオブジェクト|DateTime::Lite::Exception>を設定し、スカラコンテキストではC<undef>、リストコンテキストでは空リストを返します。
+
+=head2 offset_for_local_datetime
+
+    my $offset = $zone->offset_for_local_datetime( $dt );
+
+L<DateTime::Lite>オブジェクトを受け取り、ローカル時刻（壁時計時刻）に対するUTCオフセットを秒単位で返します。
+
+タイムゾーン変換時に内部で使用されます。
+
+エラー時にはL<エラーオブジェクト|DateTime::Lite::Exception>を設定し、スカラコンテキストではC<undef>、リストコンテキストでは空リストを返します。
+
+=for Pod::Coverage pass_error
+
+=head2 resolve_abbreviation
+
+    # 曖昧ではない例: JST は単一の UTC オフセットへ対応します
+    # 結果は is_active DESC, first_trans_time ASC, last_trans_time DESC, name ASC でソートされます。
+    my $results = DateTime::Lite::TimeZone->resolve_abbreviation( 'JST' );
+    # $results = [
+    #     {
+    #         ambiguous        => 0,
+    #         extended         => 0,
+    #         first_trans_time => -2587712400,
+    #         is_active        => 1,
+    #         is_dst           => 0,
+    #         last_trans_time  => -577962000,
+    #         utc_offset       => 32400,
+    #         zone_name        => "Asia/Tokyo",
+    #     },
+    #     {
+    #         ambiguous        => 0,
+    #         extended         => 0,
+    #         first_trans_time => -1830414600,
+    #         is_active        => 0,
+    #         is_dst           => 0,
+    #         last_trans_time  => -1830414600,
+    #         utc_offset       => 32400,
+    #         zone_name        => "Asia/Pyongyang",
+    #     },
+    #     # etc...
+    # ]
+
+    # 本当に曖昧な例: CST はアジアとアメリカで異なるオフセットを持ちます
+    my $cst = DateTime::Lite::TimeZone->resolve_abbreviation( 'CST' );
+    # $cst->[0]{ambiguous} == 1
+
+    # オフセットが既に分かっている場合に絞り込みます（同時に解析された %z トークンなど）
+    my $filtered = DateTime::Lite::TimeZone->resolve_abbreviation(
+        'PST', utc_offset => -28800
+    );
+
+    # 期間フィルタ: 1950 年以降に JST を使用していたゾーンのみ
+    my $modern = DateTime::Lite::TimeZone->resolve_abbreviation(
+        'JST', period => '>1950-01-01'
+    );
+
+    # 2 つの境界を持つ期間フィルタ: 第二次世界大戦中に JST を使用していたゾーン
+    my $wartime = DateTime::Lite::TimeZone->resolve_abbreviation(
+        'JST', period => ['>1941-01-01', '<1946-01-01']
+    );
+
+    # 期間フィルタ: 現在この略称を使用しているゾーンのみ
+    my $current = DateTime::Lite::TimeZone->resolve_abbreviation(
+        'JST', period => 'current'
+    );
+
+    # 拡張モード: IANA types にない場合は extended_aliases にフォールバックします
+    my $aft = DateTime::Lite::TimeZone->resolve_abbreviation(
+        'AFT', extended => 1
+    );
+    # $aft = [
+    #   { zone_name => 'Asia/Kabul', utc_offset => undef, is_dst => undef,
+    #     ambiguous => 0, is_primary => 1, extended => 1 },
+    # ]
+
+    # extended => 1 は、IST や CST のように既に IANA types に存在する略称では何もしません。
+    # IANA の結果が返され、extended_aliases テーブルは参照されません。
+
+クラスメソッドまたはインスタンスメソッドです。C<JST>やC<EST>のようなタイムゾーン略称を、同梱のC<tz.sqlite3>データベース内のIANAデータに対して解決し、その略称を過去に使用したことのあるすべての正規ゾーンを返します。
+
+IANAの結果は、4段階のキーでソートされます。
+
+=over 4
+
+=item 1. C<is_active>降順：POSIX footerが現在もその略称を参照しているゾーンが、既に使用しなくなったゾーンより先に来ます。
+
+=item 2. C<first_trans_time>昇順：同じC<is_active>値を持つゾーンの中では、その略称を最も早く採用したゾーンが先に来ます。
+
+=item 3. C<last_trans_time>降順：最初の2つのキーが同じゾーンの中では、その略称を最も最近まで使用していたゾーンが先に来ます。
+
+=item 4. C<zone_name>昇順：最後の決定的なタイブレーカーです。
+
+=back
+
+実際には、C<CEST>のような略称では、現在も有効な中央ヨーロッパのゾーンが先に来ます（採用日の順）。その後に、C<Europe/Kaliningrad>のように、後にCESTから移行したゾーンが続きます。C<Europe/Kaliningrad>は2014年にCESTを廃止しました。
+
+extended aliasの結果（C<extended =E<gt> 1>によりC<extended_aliases>テーブルへフォールバックした場合）は、異なる順序を使用します：C<is_primary>降順、その後C<zone_name>昇順です。下記のL</is_primary>を参照してください。
+
+唯一必須の引数は略称文字列です。次の任意のキーワード引数を受け付けます。
+
+=over 4
+
+=item C<extended>
+
+真偽値です。真で、略称がIANA typesテーブルに見つからない場合、このメソッドはC<extended_aliases>テーブルの問い合わせへフォールバックします。これにより、C<AFT>, C<AMST>, C<HAEC>のような、日付文字列には現れるもののIANAデータベースのTZif type略称としては保存されていない実世界の略称を扱えます。
+
+extendedの結果が返される場合、C<extended_aliases>テーブルは略称をゾーン名へ対応付けるだけなので、C<utc_offset>とC<is_dst>はC<undef>になります。オフセットが必要な場合は、返されたC<zone_name>からC<DateTime::Lite::TimeZone>オブジェクトを生成してください。
+
+=item C<period>
+
+直近の一致する遷移（C<MAX(trans_time)>）が指定された時間範囲に含まれるゾーンに結果を制限します。単一の文字列、または複数条件用の文字列配列リファレンスを受け付けます。
+
+各値には比較演算子を接頭辞として付けることができます。
+
+=over 4
+
+=item C<< > >>（演算子がない場合のデフォルト）
+
+より大きい。最も一般的な演算子です。指定された日付よりも最近にその略称を使用したゾーンを返します。
+
+=item C<< >= >>
+
+以上。
+
+=item C<< < >>
+
+より小さい。その略称の最後の使用が指定日より古いゾーンを返します。
+
+=item C<< <= >>
+
+以下。
+
+=back
+
+演算子C<=>とC<!=>も受け付けますが、それぞれSQLのC<IS>とC<IS NOT>に対応します。タイムスタンプ比較では実用性がなく、推奨されません。
+
+B<値の型>: C<1950-01-01>のようなISO日付文字列は、SQLiteのC<strftime('%s', ...)>によりUnix epochへ変換されます。通常の整数はepoch秒として扱われ、Perlスカラの内部表現に関係なく正しい数値比較を行うため、C<CAST(? AS INTEGER)>として渡されます。可搬性のため、生の整数を渡す場合は1970年以降のepoch値を使用してください。1970年以前の負の値は、一部のプラットフォームで予期しない挙動をする可能性があります。
+
+特別な値C<current>は、その略称の直近の使用が過去にあり、かつ次に予定されている遷移がまだ発生していないゾーンのみを返します。つまり、現在その略称を使用しているゾーンを意味します。
+
+    period => '>1950-01-01'                   # 1950 年以降に最後に使用されたもの（ISO 日付）
+    period => ['>1941-01-01', '<1946-01-01']  # 第二次世界大戦中の範囲で最後に使用されたもの
+    period => '>1262304000'                   # 2010-01-01 以降に最後に使用されたもの（epoch int）
+    period => 'current'                       # 現在有効なもののみ
+
+periodフィルタはextended aliasの結果には適用されません。
+
+=item C<utc_offset>
+
+UTCの東側を正とする整数秒です。同じ文字列から一緒に解析された数値オフセット（たとえばC<%z>トークン由来）が既に分かっている場合に、結果を一致するオフセットの候補へ絞り込めます。IANA types lookupにのみ適用され、extended aliasesフォールバックには使用されません。
+
+=back
+
+成功時には、次のキーを持つハッシュリファレンスの配列リファレンスを返します。
+
+=over 4
+
+=item C<zone_name>
+
+C<Asia/Tokyo>のような正規IANAゾーン名です。
+
+=item C<utc_offset>
+
+このゾーンでこの略称が表す、UTCの東側を正とするUTCオフセット秒数です。extended aliasの結果ではC<undef>です。
+
+=item C<is_dst>
+
+この略称がDST期間を表す場合はC<1>、そうでなければC<0>です。extended aliasの結果ではC<undef>です。
+
+=item C<ambiguous>
+
+IANAの結果では、この略称が複数の異なるUTCオフセットへ対応する場合（C<IST>やC<CST>のような真の曖昧性）はC<1>、すべての候補が同じUTCオフセットを共有する場合はC<0>です。
+
+extended aliasの結果では、候補が複数あり、かつC<is_primary>として印が付いた候補が0個または複数ある場合にC<1>、ちょうど1つの候補がC<is_primary = 1>を持つ場合にC<0>です。
+
+=item C<extended>
+
+結果がC<extended_aliases>テーブル由来であればC<1>、IANA typesテーブル由来であればC<0>です。
+
+=item C<is_active>
+
+IANAの結果（C<extended =E<gt> 0>）にのみ存在します。ゾーンのPOSIX C<TZ> footer文字列が現在もこの略称を参照している場合はC<1>です。これは、そのゾーンが現在の夏時間規則の下でこの略称を循環的に使い続けている、または恒久的な略称として使っていることを意味します。footerがその略称をもはや含まない場合はC<0>で、通常はそのゾーンがその略称から移行したことを意味します。
+
+たとえばC<Europe/Berlin>のfooterはC<CET-1CEST,M3.5.0,M10.5.0/3>なので、C<CET>とC<CEST>はどちらもC<is_active =E<gt> 1>になります。対照的に、C<Europe/Kaliningrad>のfooterはC<EET-2>です。そのため、C<resolve_abbreviation('CEST')>はKaliningradも一覧に含めます（2014年までCESTを使用していたため）が、C<is_active =E<gt> 0>になります。
+
+このフィールドは主要なソートキーとして使用されるため、C<is_active =E<gt> 1>のゾーンはC<is_active =E<gt> 0>のゾーンより先に表示されます。現在有効なゾーンのみが必要な呼び出し元は、C<grep { $_-E<gt>{is_active} } @$results>でフィルタできます。
+
+検出はfooter文字列に対する単語境界正規表現です。アルファベット略称は非アルファベット文字に隣接していなければなりません（そのためC<CST>はC<CEST>に一致しません）。また、C<-03>やC<+0430>のような数値または符号付きの略称は、POSIX TZ構文に従ってC<E<lt>...E<gt>>の中に現れる必要があります。この正規表現は、同梱データベース内の1449個すべての（zone, abbreviation）ペアに対して検証され、経験的なground truthに対するfalse negativeは0でした。詳細に興味がある場合は、内部文書C<RESOLVE_ABBREVIATION_DESIGN_NOTES.md>を参照してください。
+
+extended aliasの結果には存在しません。そこでは代わりに編集上のC<is_primary>マーカーが順序付けのシグナルになります。
+
+=item C<is_primary>
+
+extended aliasの結果（C<extended =E<gt> 1>）にのみ存在します。複数の候補が一致する場合、C<1>はその略称に対して編集上選ばれた正規ゾーン（たとえばC<BRT>に対するC<America/Sao_Paulo>）を示し、C<0>はその他を示します。IANAの結果には存在しません。略称のIANA候補の中で単一のゾーンが正規に指定されているわけではないためです。IANAの結果では、C<is_active>マーカーとソート順（最初に使用されたものを優先し、現在も有効なものを優先）が類似の役割を果たします。
+
+CLDR的な意味での正規または優先ゾーン指定が必要な場合は、L<Locale::Unicode::Data>を使用してください。これはタイムゾーンごとにCLDRのC<is_golden>, C<is_primary>, C<is_preferred>フラグを公開しています。例については、下記のL</正規指定にLocale::Unicode::Dataを使用する>を参照してください。
+
+=item C<first_trans_time>
+
+このゾーンでその略称を使用した最も古い遷移のUnix epochです。extended aliasの結果には存在しません。C<is_active>の後、昇順のソートキーとして使用されます。そのため、同じC<is_active>値を持つゾーンの中では、その略称を最初に採用したゾーンが先に表示されます。
+
+=item C<last_trans_time>
+
+このゾーンでその略称を使用した最も新しい遷移のUnix epochです。extended aliasの結果には存在しません。降順の副次ソートキーとして使用されます。同じC<is_active>および同じC<first_trans_time>を持つゾーンの中では、その略称を最も最近まで使用していたゾーンが先に表示されます。
+
+=back
+
+エラーが発生した場合はL<例外オブジェクト|DateTime::Lite::Exception>を設定し、スカラコンテキストではC<undef>、リストコンテキストでは空リストを返します。例外オブジェクトはその後L</error>で取得できます。
+
+C<EST>やC<PST>のような多くの略称は、同じUTCオフセットを共有する複数のゾーン名に一致する点に注意してください。これらはdatetime文字列の解析という目的では真に曖昧ではありません。そのような場合、C<ambiguous>フラグはC<0>になります。C<IST>（Irish Summer Time、Indian Standard Time、Israel Standard Time）のような真に曖昧な略称では、C<ambiguous =E<gt> 1>になります。
+
+クラスメソッドまたはインスタンスメソッドです。C<JST>やC<EST>のようなタイムゾーン略称を、同梱されているC<tz.sqlite3>データベース内のIANAデータに照合し、その略称を過去に使用したことのあるすべての正規ゾーンを返します。
+
+IANAの結果は、次の4段階のキーでソートされます。
+
+=over 4
+
+=item 1. C<is_active>の降順：POSIX footerが現在もその略称を参照しているゾーンが、すでに使用しなくなったゾーンより先に表示されます。
+
+=item 2. C<first_trans_time>の昇順：同じC<is_active>値を持つゾーンの中では、その略称を最も早く採用したゾーンが先に表示されます。
+
+=item 3. C<last_trans_time>の降順：最初の2つのキーが同じゾーンの中では、その略称をより最近まで使用していたゾーンが先に表示されます。
+
+=item 4. C<zone_name>の昇順：最後の決定的なタイブレークです。
+
+=back
+
+実際には、C<CEST>のような略称では、現在も有効な中央ヨーロッパのゾーンが先に表示されます（採用日の順）。その後に、C<Europe/Kaliningrad>のように、過去にはCESTを使用していたものの、2014年に使用をやめたゾーンが続きます。
+
+拡張エイリアスの結果（C<extended =E<gt> 1>によりC<extended_aliases>テーブルへフォールバックした場合）は、異なる順序を使用します。C<is_primary>の降順、次にC<zone_name>の昇順です。下記のL</is_primary>を参照してください。
+
+必須引数は略称文字列1つです。次の任意のキーワード引数を受け付けます。
+
+=over 4
+
+=item C<extended>
+
+真偽値です。真の場合で、略称がIANA typesテーブルに見つからないとき、このメソッドはC<extended_aliases>テーブルの検索にフォールバックします。これは、C<AFT>, C<AMST>, C<HAEC>のように、実際の日時文字列には現れるものの、IANAデータベース内のTZif type略称としては保存されていない現実世界の略称を扱うためのものです。
+
+拡張結果が返される場合、C<utc_offset>とC<is_dst>はC<undef>になります。これは、拡張エイリアステーブルが略称をゾーン名に対応付けるだけだからです。オフセットが必要な場合は、返されたC<zone_name>からC<DateTime::Lite::TimeZone>オブジェクトを生成してください。
+
+=item C<period>
+
+結果を、最も新しい一致する遷移時刻（C<MAX(trans_time)>）が指定された時間範囲内にあるゾーンに限定します。単一の文字列、または複数条件用の文字列の配列リファレンスを受け付けます。
+
+各値には比較演算子を前置できます。
+
+=over 4
+
+=item C<< > >>（演算子がない場合のデフォルト）
+
+より大きい。最も一般的な演算子です。略称の最後の使用時刻が、指定された日付より新しいゾーンを返します。
+
+=item C<< >= >>
+
+以上。
+
+=item C<< < >>
+
+より小さい。最後の使用時刻が、指定された日付より古いゾーンを返します。
+
+=item C<< <= >>
+
+以下。
+
+=back
+
+演算子C<=>とC<!=>も受け付けますが、それぞれSQLのC<IS>とC<IS NOT>に対応します。タイムスタンプ比較では実用的な意味がなく、推奨されません。
+
+B<値の型>: C<1950-01-01>のようなISO日付文字列は、SQLiteのC<strftime('%s', ...)>によってUnix epochに変換されます。単なる整数はepoch秒として扱われ、Perlスカラーの内部表現にかかわらず正しい数値比較を行うためにC<CAST(? AS INTEGER)>として渡されます。移植性のため、生の整数を渡す場合は1970年以降のepoch値を使用してください。1970年より前の負の値は、一部のプラットフォームで予期しない挙動になる可能性があります。
+
+特別な値C<current>は、その略称の最も新しい使用時刻が過去にあり、かつ次に予定されている遷移がまだ発生していないゾーンだけを返します。つまり、現在その略称を使用しているゾーンを意味します。
+
+    period => '>1950-01-01'                   # 1950 年以降に最後に使用されたもの（ISO 日付）
+    period => ['>1941-01-01', '<1946-01-01']  # 第二次世界大戦中の範囲で最後に使用されたもの
+    period => '>1262304000'                   # 2010-01-01 以降に最後に使用されたもの（epoch 整数）
+    period => 'current'                       # 現在有効なもののみ
+
+期間フィルタは、拡張エイリアスの結果には適用されません。
+
+=item C<utc_offset>
+
+UTCの東方向を正とする整数秒です。結果を、一致するオフセットを持つ候補に絞り込みます。これは、同じ文字列から数値オフセットもすでに解析済みの場合（たとえば同時に解析されたC<%z>トークンから得られた場合）に便利です。IANA typesの検索にのみ適用され、拡張エイリアスへのフォールバックでは使用されません。
+
+=back
+
+成功時には、ハッシュリファレンスの配列リファレンスを返します。各ハッシュには次のキーが含まれます。
+
+=over 4
+
+=item C<zone_name>
+
+C<Asia/Tokyo>のような正規IANAゾーン名です。
+
+=item C<utc_offset>
+
+このゾーンでこの略称が表す、UTCの東方向を正とするUTCオフセット秒です。拡張エイリアスの結果ではC<undef>です。
+
+=item C<is_dst>
+
+この略称が夏時間期間を表す場合はC<1>、そうでない場合はC<0>です。拡張エイリアスの結果ではC<undef>です。
+
+=item C<ambiguous>
+
+IANAの結果では、この略称が複数の異なるUTCオフセットに対応する場合（C<IST>やC<CST>のような真の曖昧性）はC<1>です。すべての候補が同じUTCオフセットを共有する場合はC<0>です。
+
+拡張エイリアスの結果では、候補が複数あり、C<is_primary>が付いた候補が1つもない、または複数ある場合はC<1>です。C<is_primary = 1>の候補がちょうど1つだけある場合はC<0>です。
+
+=item C<extended>
+
+この結果がC<extended_aliases>テーブル由来であればC<1>、IANA typesテーブル由来であればC<0>です。
+
+=item C<is_active>
+
+IANAの結果（C<extended =E<gt> 0>）にのみ存在します。そのゾーンのPOSIX C<TZ> footer文字列が現在もこの略称を参照している場合はC<1>です。これは、そのゾーンが現在の夏時間規則のもとで引き続きこの略称を周期的に使用している、または恒久的な略称として使用していることを意味します。footerがその略称をもう含んでいない場合はC<0>です。通常これは、そのゾーンがその略称から移行済みであることを意味します。
+
+たとえば、C<Europe/Berlin>のfooterはC<CET-1CEST,M3.5.0,M10.5.0/3>なので、C<CET>とC<CEST>のどちらもC<is_active =E<gt> 1>になります。一方、C<Europe/Kaliningrad>のfooterはC<EET-2>なので、C<resolve_abbreviation('CEST')>はKaliningradを一覧に含めます（2014年までCESTを使用していたため）が、C<is_active =E<gt> 0>になります。
+
+このフィールドは主ソートキーとして使用されるため、C<is_active =E<gt> 1>のゾーンはC<is_active =E<gt> 0>のゾーンより前に表示されます。現在有効なゾーンだけが必要な呼び出し側は、C<grep { $_-E<gt>{is_active} } @$results>でフィルタできます。
+
+検出はfooter文字列に対する単語境界の正規表現で行われます。アルファベット略称は非アルファベット文字に隣接している必要があります（そのためC<CST>はC<CEST>に一致しません）。また、数値または符号付きの略称（C<-03>, C<+0430>など）は、POSIX TZ構文に従ってC<E<lt>...E<gt>>の中に現れる必要があります。この正規表現は、同梱データベース内の1449個の（zone, abbreviation）ペアすべてに対して検証され、経験的な正解データに対するfalse negativeは0件でした。詳細に興味があれば、内部文書C<RESOLVE_ABBREVIATION_DESIGN_NOTES.md>を参照してください。
+
+拡張エイリアスの結果には存在しません。そこでは、編集上のC<is_primary>マーカーが順序付けのシグナルになります。
+
+=item C<is_primary>
+
+拡張エイリアスの結果（C<extended =E<gt> 1>）にのみ存在します。複数の候補が一致する場合、C<1>はこの略称に対して編集上選ばれた正規ゾーンを示します（たとえばC<BRT>に対するC<America/Sao_Paulo>）。C<0>はその他の候補を示します。IANAの結果には存在しません。略称のIANA候補の中で、単一のゾーンが正規として指定されることはないためです。IANAの結果では、C<is_active>マーカーとソート順（最初に使用されたものを優先し、現在も有効なものを優先）が、これに類似した役割を果たします。
+
+CLDR的な意味での正規または優先ゾーン指定が必要な場合は、L<Locale::Unicode::Data>を使用してください。このモジュールは、タイムゾーンごとにCLDRのC<is_golden>, C<is_primary>, C<is_preferred>フラグを公開しています。例については、下記のL</"USING Locale::Unicode::Data FOR CANONICAL DESIGNATION">を参照してください。
+
+=item C<first_trans_time>
+
+このゾーンでその略称を使用した最も古い遷移のUnix epochです。拡張エイリアスの結果には存在しません。C<is_active>の後に昇順のソートキーとして使用されるため、同じC<is_active>値を持つゾーンの中では、その略称を最も早く採用したゾーンが先に表示されます。
+
+=item C<last_trans_time>
+
+このゾーンでその略称を使用した最も新しい遷移のUnix epochです。拡張エイリアスの結果には存在しません。二次ソートキーとして降順で使用されます。つまり、C<is_active>とC<first_trans_time>が同じゾーンの中では、その略称をより最近まで使用していたゾーンが先に表示されます。
+
+=back
+
+エラーが発生した場合、このメソッドはL<例外オブジェクト|DateTime::Lite::Exception>を設定し、スカラーコンテキストではC<undef>、リストコンテキストでは空リストを返します。その後、例外オブジェクトはL</error>で取得できます。
+
+C<EST>やC<PST>のような多くの略称は、すべて同じUTCオフセットを共有する複数のゾーン名に一致することに注意してください。これらは日時文字列の解析という目的では真に曖昧ではありません。そのため、そのような場合C<ambiguous>フラグはC<0>になります。C<IST>（Irish Summer Time, Indian Standard Time, Israel Standard Time）のような真に曖昧な略称では、C<ambiguous =E<gt> 1>になります。
+
+=head2 short_name_for_datetime
+
+    say $zone->short_name_for_datetime( $dt );
+
+L<DateTime::Lite>オブジェクトを受け取り、C<JST>やC<EDT>のような、該当する省略形のタイムゾーン名を返します。
+
+=head2 transition_count
+
+このタイムゾーンの遷移レコード数を返します。
+
+TZifヘッダーフィールドC<timecnt>に相当します。
+
+L<rfc9636, section 3.1|https://www.rfc-editor.org/rfc/rfc9636.html#name-tzif-header>を参照してください。
+
+=head2 type_count
+
+このタイムゾーンのtype数を返します。
+
+L<rfc9636, section 3.1|https://www.rfc-editor.org/rfc/rfc9636.html#name-tzif-header>を参照してください。
+
+=head2 tz_version
+
+データベースのC<metadata>テーブルから、C<2026a>のようなIANA tzdataバージョン文字列を返します。
+
+=head2 tzif_version
+
+タイムゾーンデータのTZifバージョン文字列を返します。
+
+可能な値はC<1>, C<2>, C<3>, C<4>です。
+
+L<rfc9636, section 3.1|https://www.rfc-editor.org/rfc/rfc9636.html#name-tzif-header>を参照してください。
+
+=head1 正規指定のためにLocale::Unicode::Dataを使用する
+
+L</resolve_abbreviation>が、ある略称に対して複数のIANA候補を返す場合（たとえばC<CEST>に一致する30個のゾーンなど）、その結果セットにはC<is_primary>マーカーは含まれません。C<DateTime::Lite::TimeZone>は、IANA候補の中から正規ゾーンを選ぼうとは意図的にしていません。どの略称にも満足に適用できる単一のヒューリスティックは存在しないためです。
+
+L<Locale::Unicode::Data>は、CLDR独自の正規指定フラグ（C<is_golden>, C<is_primary>, C<is_preferred>, C<is_canonical>）をタイムゾーンごとに公開しています。単一の代表ゾーンが必要な場合は、これを信頼できる情報源として使うことを推奨します。典型的な使い方は、まずここで略称を解決し、その候補の中でどれがCLDRのgolden zoneであるかをL<Locale::Unicode::Data>に問い合わせる、というものです。
+
+    use DateTime::Lite::TimeZone;
+    use Locale::Unicode::Data;
+
+    my $candidates = DateTime::Lite::TimeZone->resolve_abbreviation( 'CEST' );
+    my $cldr       = Locale::Unicode::Data->new;
+
+    my $golden;
+    foreach my $c ( @$candidates )
+    {
+        my $info = $cldr->timezone( timezone => $c->{zone_name} ) || next;
+        if( $info->{is_golden} )
+        {
+            $golden = $c->{zone_name};
+            last;
+        }
+    }
+    # $golden は現在 'Europe/Paris' です
+    # （'Europe_Central' メタゾーンに対する CLDR golden zone）
+
+別の方法として、その略称が特定のメタゾーンに対応することが分かっている場合は、golden zoneを直接問い合わせることもできます。
+
+    my $zones  = $cldr->timezones( metazone => 'Europe_Central', is_golden => 1 );
+    my $golden = $zones->[0]->{timezone};  # 'Europe/Paris'
+
+IANA typesテーブルにI<含まれていない>略称（C<BRT>, C<HAEC>, C<AFT>など多数）については、C<extended>フラグ付きでL</resolve_abbreviation>を使用してください。C<extended_aliases>テーブルには、候補の中で優先されるゾーンを示す独自の編集上のC<is_primary>マーカーがあります。
+
+=head1 エラー処理
+
+エラーが発生した場合、このクラスのメソッドはL<例外オブジェクト|DateTime::Lite::Exception>を設定し、スカラーコンテキストではC<undef>、リストコンテキストでは空リストを返します。例外は次のように取得できます。
+
+    my $err = DateTime::Lite::TimeZone->error;   # クラスメソッド
+    my $err = $tz->error;                        # インスタンスメソッド
+
+例外オブジェクトは、ソースファイル名と行番号を含む、人間が読めるメッセージへ文字列化されます。
+
+インスタンスオプションL<fatal|/fatal>が有効になっている場合、発生したエラーはすべてfatalになります。
+
+=head1 EPOCHの規約
+
+C<tz.sqlite3>データベースは、span境界をUnix秒（1970-01-01T00:00:00 UTCからの秒数）として保存します。これはTZifバイナリファイル内の生の値と一致します。L<DateTime::Lite>はRata Die秒（0001-01-01T00:00:00からの秒数）を使用します。
+
+変換定数は次のとおりです。
+
+    UNIX_TO_RD = 62_135_683_200
+
+すべての検索メソッドは、データベースに問い合わせる前にC<< $dt->utc_rd_as_seconds >>からC<UNIX_TO_RD>を差し引きます。C<NULL>のspan境界は ±無限大（最初に記録された遷移より前、および最後の遷移より後）を表します。
+
+=head1 データベースの構築
+
+同梱されているC<tz.sqlite3>は、次を実行して生成されます。
+
+    perl scripts/build_tz_database.pl [--verbose, --debug 3]
+
+このスクリプトは、IANAから最新のC<tzcode>およびC<tzdata>リリースを取得し、GPG署名を検証し、C<zic(1)>でコンパイルして、データベースに投入します。tzdataの各リリースごとにこのスクリプトを一度実行し、更新されたC<lib/DateTime/Lite/tz.sqlite3>をコミットしてください。
+
+=head1 SQLスキーマ
+
+SQLiteのSQLスキーマは、ファイルC<scripts/tz_schema.sql>にあります。
+
+データは、C<scripts/build_tz_database.pl>にあるスクリプトと、L<https://ftp.iana.org/tz/releases>から取得できるデータを使ってSQLiteデータベースに投入されます。
+
+SQLiteデータベースを作成するために使用されるSQLスキーマは、このディストリビューションのC<scripts>ディレクトリ内のC<tz_schema.sql>ファイルにあります。
+
+使用されるテーブルは、アルファベット順で次のとおりです。
+
+=head2 aliases
+
+=over 4
+
+=item * C<alias>
+
+大文字小文字を区別しない文字列フィールドです。
+
+=item * C<zone_id>
+
+整数フィールドです。
+
+=back
+
+=head2 countries
+
+=over 4
+
+=item * C<code>
+
+大文字小文字を区別しない文字列フィールドです。
+
+=item * C<name>
+
+大文字小文字を区別しない文字列フィールドです。
+
+=back
+
+=head2 extended_aliases
+
+=over 4
+
+=item * C<abbr_id>
+
+整数フィールドです。
+
+=item * C<abbreviation>
+
+大文字小文字を区別しない文字列フィールドです。
+
+=item * C<zone_id>
+
+整数フィールドです。
+
+=item * C<is_primary>
+
+真偽値フィールドです。
+
+デフォルトはfalseです。
+
+=item * C<comment>
+
+文字列フィールドです。
+
+=back
+
+=head2 leap_second
+
+=over 4
+
+=item * C<leap_sec_id>
+
+整数フィールドです。
+
+=item * C<zone_id>
+
+整数フィールドです。
+
+=item * C<leap_index>
+
+整数フィールドです。
+
+=item * C<occurrence_time>
+
+整数フィールドです。
+
+=item * C<correction>
+
+整数フィールドです。
+
+=item * C<is_expiration>
+
+真偽値フィールドです。
+
+デフォルトはfalseです。
+
+=back
+
+=head2 metadata
+
+=over 4
+
+=item * C<key>
+
+文字列フィールドです。
+
+=item * C<value>
+
+文字列フィールドです。
+
+=back
+
+=head2 spans
+
+=over 4
+
+=item * C<span_id>
+
+整数フィールドです。
+
+=item * C<zone_id>
+
+整数フィールドです。
+
+=item * C<type_id>
+
+整数フィールドです。
+
+=item * C<span_index>
+
+整数フィールドです。
+
+=item * C<utc_start>
+
+整数フィールドです。
+
+=item * C<utc_end>
+
+整数フィールドです。
+
+=item * C<local_start>
+
+整数フィールドです。
+
+=item * C<local_end>
+
+整数フィールドです。
+
+=item * C<offset>
+
+整数フィールドです。
+
+=item * C<is_dst>
+
+真偽値フィールドです。
+
+デフォルトはfalseです。
+
+=item * C<short_name>
+
+大文字小文字を区別しない文字列フィールドです。
+
+=back
+
+=head2 transition
+
+=over 4
+
+=item * C<trans_id>
+
+整数フィールドです。
+
+=item * C<zone_id>
+
+整数フィールドです。
+
+=item * C<trans_index>
+
+整数フィールドです。
+
+=item * C<trans_time>
+
+整数フィールドです。
+
+=item * C<type_id>
+
+整数フィールドです。
+
+=back
+
+=head2 types
+
+=over 4
+
+=item * C<type_id>
+
+整数フィールドです。
+
+=item * C<zone_id>
+
+整数フィールドです。
+
+=item * C<type_index>
+
+整数フィールドです。
+
+=item * C<utc_offset>
+
+整数フィールドです。
+
+=item * C<is_dst>
+
+真偽値フィールドです。
+
+=item * C<abbreviation>
+
+大文字小文字を区別しない文字列フィールドです。
+
+=item * C<designation_index>
+
+整数フィールドです。
+
+=item * C<is_standard_time>
+
+真偽値フィールドです。
+
+=item * C<is_ut_time>
+
+真偽値フィールドです。
+
+=item * C<is_placeholder>
+
+真偽値フィールドです。
+
+デフォルトはfalseです。
+
+=back
+
+=head2 zones
+
+=over 4
+
+=item * C<zone_id>
+
+整数フィールドです。
+
+=item * C<name>
+
+大文字小文字を区別しない文字列フィールドです。
+
+=item * C<canonical>
+
+真偽値フィールドです。
+
+デフォルトはtrueです。
+
+=item * C<has_dst>
+
+真偽値フィールドです。
+
+デフォルトはfalseです。
+
+=item * C<countries>
+
+文字列配列フィールドです。
+
+=item * C<coordinates>
+
+文字列フィールドです。
+
+=item * C<latitude>
+
+実数フィールドです。
+
+=item * C<longitude>
+
+実数フィールドです。
+
+=item * C<comment>
+
+文字列フィールドです。
+
+=item * C<tzif_version>
+
+整数フィールドです。
+
+=item * C<footer_tz_string>
+
+文字列フィールドです。
+
+=item * C<transition_count>
+
+整数フィールドです。
+
+=item * C<type_count>
+
+整数フィールドです。
+
+=item * C<leap_count>
+
+整数フィールドです。
+
+=item * C<isstd_count>
+
+整数フィールドです。
+
+=item * C<isut_count>
+
+整数フィールドです。
+
+=item * C<designation_charcount>
+
+整数フィールドです。
+
+=item * C<category>
+
+大文字小文字を区別しない文字列フィールドです。
+
+=item * C<subregion>
+
+大文字小文字を区別しない文字列フィールドです。
+
+=item * C<location>
+
+大文字小文字を区別しない文字列フィールドです。
+
+=back
+
+=head1 SEE ALSO
+
+L<DateTime::Lite>, L<DateTime::TimeZone>, L<Locale::Unicode::Data>
+
+RFC 9636（The Time Zone Information Format (TZif)）L<https://www.rfc-editor.org/rfc/rfc9636>
+
+タイムゾーン、メタゾーン、およびBCP47タイムゾーンデータの履歴情報については、L<Locale::Unicode::Data>を参照してください。
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright(c) 2026 DEGUEST Pte. Ltd.
+
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

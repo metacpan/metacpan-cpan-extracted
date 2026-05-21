@@ -1,0 +1,30 @@
+* Development Notes
+
+
+** Run tests on the development code
+
+#+BEGIN_SRC 
+# Frequently do
+prove -l
+#+END_SRC
+
+#+BEGIN_SRC 
+# Occasionally do (slower)
+RELEASE_TESTING=1  prove -l
+#+END_SRC
+
+#+BEGIN_SRC 
+# To run specific test, e.g.
+perl -I./lib t/pgn-reader.t
+#+END_SRC
+
+
+** Mutation testing
+
+#+BEGIN_SRC
+cpan install Devel::Mutator
+
+mutator mutate lib/Chess4p/Board.pm
+mutator test
+
+#+END_SRC

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use Data::Dumper;
-use Test::More tests => 42;
+use Test::More tests => 43;
 use Test::Deep;
 
 use Conf::Libconfig;
@@ -47,6 +47,11 @@ is($foo->set_boolean_value("abc.boolean2", "tRuE"),
 is($foo->value("abc.boolean2"),
 	1,
 	"get boolean2 value - status ok"
+);
+
+is($foo->set_boolean_value("abc.boolean3", "maybe"),
+	-2,
+	"set boolean with invalid string returns ERR_INPUT"
 );
 
 is($foo->set_value("abc.int", 0b1),

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::MandatoryOnTransition;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 =head1 NAME
 
@@ -876,12 +876,18 @@ sub CheckMandatoryFields {
 
         # Do we have a submitted value for update?
         my $value;
+        my $cf_was_submitted = 0;
         if ( HTML::Mason::Commands->can('_ParseObjectCustomFieldArgs') ) {
             # steal code from /Elements/ValidateCustomFields
             my $CFArgs = HTML::Mason::Commands::_ParseObjectCustomFieldArgs( $ARGSRef )->{'RT::Ticket'}{$TicketId || 0} || {};
             my $submitted = $CFArgs->{$cf->id};
             # Pick the first grouping
             $submitted = $submitted ? $submitted->{(sort keys %$submitted)[0]} : {};
+
+            # Values-Magic is a hidden field always present when a CF edit
+            # widget was rendered, so its presence means the user submitted
+            # the field (possibly clearing it).
+            $cf_was_submitted = exists $submitted->{'Values-Magic'};
 
             my @values;
             for my $argtype (qw/Values Value Upload/) {
@@ -902,6 +908,7 @@ sub CheckMandatoryFields {
             } else {
                 $arg   = "Object-RT::Ticket-".$TicketId."-CustomField-".$cf->Id."-Value";
             }
+            $cf_was_submitted = exists $ARGSRef->{"${arg}s-Magic"};
             $value = ($ARGSRef->{"${arg}s-Magic"} and exists $ARGSRef->{"${arg}s"}) ? $ARGSRef->{$arg . "s"} : $ARGSRef->{$arg};
             ($value) = grep length, map {
                 s/\r+\n/\n/g;
@@ -920,7 +927,7 @@ sub CheckMandatoryFields {
         if ( exists $must_values->{$cf->Name} ){
             my $cf_value = $value;
 
-            if ( not defined $cf_value and $args{'Ticket'} ){
+            if ( not defined $cf_value and !$cf_was_submitted and $args{'Ticket'} ){
                 # Fetch the current value if we didn't receive a new one
                 # TODO: Understand multi-value CFs
                 $cf_value = $args{'Ticket'}->FirstCustomFieldValue($cf->Name);
@@ -970,7 +977,10 @@ sub CheckMandatoryFields {
 
         # Is there a current value?  (Particularly important for Date/Datetime CFs
         # since they don't submit a value on update.)
-        next if $args{'Ticket'} && $cf->ValuesForObject($args{'Ticket'})->Count;
+        # Only fall back to the existing DB value when the CF widget was not
+        # present in the submitted form - if it was present but empty the user
+        # is actively clearing the field and the transition should be blocked.
+        next if !$cf_was_submitted && $args{'Ticket'} && $cf->ValuesForObject($args{'Ticket'})->Count;
 
         push @errors,
           $CurrentUser->loc("[_1] is required when changing [_2] to [_3]",

@@ -4,7 +4,7 @@
       "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "open_source"
    ],
@@ -43,7 +43,7 @@
             "Hash::Merge" : "0",
             "JSON::MaybeXS" : "0",
             "JSON::Parse" : "0",
-            "Params::Get" : "0.13",
+            "Params::Get" : "0.14",
             "Params::Validate::Strict" : "0.11",
             "Pod::Usage" : "0",
             "Scalar::Util" : "0",
@@ -60,6 +60,7 @@
             "POSIX" : "0",
             "Readonly" : "0",
             "Test::DescribeMe" : "0",
+            "Test::Mockingbird" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::TempDir::Tiny" : "0",
@@ -82,6 +83,6 @@
          "x_repository" : "https://github.com/nigelhorne/Config-Abstraction"
       }
    },
-   "version" : "0.37",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.38",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

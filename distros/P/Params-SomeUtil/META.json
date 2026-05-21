@@ -53,6 +53,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "1.08",
+   "version" : "1.09",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

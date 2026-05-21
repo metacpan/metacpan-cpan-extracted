@@ -60,7 +60,21 @@ subtest 'cmd args not an arrayref croaks' => sub {
             name       => 'test',
             cmd_schema => { foo => { exec => $dummy_exec, args => 'bad' } },
         })
-    } qr/args is NOT a arrayref/, 'croaks when args is not an arrayref';
+    } qr/args is NOT a arrayref/, 'croaks when args is a plain string';
+
+    throws_ok {
+        Term::ReadLine::Repl->new({
+            name       => 'test',
+            cmd_schema => { foo => { exec => $dummy_exec, args => {} } },
+        })
+    } qr/args is NOT a arrayref/, 'croaks when args is a hashref';
+
+    throws_ok {
+        Term::ReadLine::Repl->new({
+            name       => 'test',
+            cmd_schema => { foo => { exec => $dummy_exec, args => sub {} } },
+        })
+    } qr/args is NOT a arrayref/, 'croaks when args is a coderef';
 };
 
 subtest 'cmd args empty arrayref croaks' => sub {

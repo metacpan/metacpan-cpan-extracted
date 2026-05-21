@@ -3,14 +3,26 @@
 use strict;
 use warnings;
 
-# search for Module in same directory where this script is
 use FindBin;
-use File::Spec;
-use lib File::Spec->catdir($FindBin::Bin);
+
+# search for Module in same directory where this script is
+# use File::Spec;
+# use lib File::Spec->catdir($FindBin::Bin);
 
 use Getopt::Std;
 use OcToolkit;
+
 use Data::Dumper;
+
+my $projectDir =  "$FindBin::Bin"."/";
+my $customCallbacksObj;
+eval {
+    unshift @INC, $projectDir;
+    require CustomCallbacks;
+    CustomCallbacks->import();
+    $customCallbacksObj = CustomCallbacks->new();
+};
+warn "CustomCallbacks.pm file not found, continuing without it" if $@;
 
 my $help = "Install/uninstall/backup/validate/upgrade instances and they components into/from Openshift/Kubernetes cluster
 Put your templates in 'templates_tt' dir located in current dir. Every component should have own dir(10-api,20-solr,...) inside of it.
@@ -20,36 +32,37 @@ Put your config into oc_config.json. Located in current dir.
    'instance_specific_name' : instance string will be automatically added at the end of every entry, see example belove and in git
    'project': project specifc data
    oc_config.json root data are fix for every instance
+   put your secrets into 'secrets' dir, see example from git repo
   
 Flags description:
   -A cluster base address, e.g.: 'apps.clusterintern' or 'apps.clusterpublic', used in default route url generation
   -a advance features:
-    '-a multipleClusters'  if cluster specific templates are required, put them into nested dir
-                           e.g.: templates_tt/50-api/clusterIntern/50-deployment-config-api.tt, 
-                           ocToolkit will automatically select corresponding templates
-                           (currently this flag is selected by default)
      '-a kubectl'          use Kubernetes 'kubectl' instead of default Openshift 'oc' command
      '-a removeClutter'    remove clutter yaml fields during backup
-    Use multiple: -a 'multipleClusters;kubectl;removeClutter'
-  -b instance name(s), backups specific instance(s) sorted by components e.g.: -b 'dev;test' or -b all to backup whole project(unsorted) 
-     if '-a multipleClusters' and not '-b all' is used then '-c' flag is mandatory
+    Use multiple: -a 'kubectl;removeClutter'
+  -b instance name(s), backups specific instance(s) sorted by components e.g.: -b 'dev;test' or -b 'all' to backup whole project(unsorted) 
   -c cluster name e.g.: 'clusterIntern','clusterPublic'... Default is defined in oc_config.json->project->default_cluster. 
      You should be logged in into corresponding cluster
      If cluster label in url should be different then cluster name, use '-A' flag to set custom cluster url label
   -C config file, default: 'oc_config.json'
   -d instanceName(s), deletes instances from logged in project e.g.: '-d test', see -i documentation
+  -g instanceName(s), generates 'oc_config.json' template for given instances based on components defined in 'templates_tt' directory
+      e.g.: -g 'test;prod'
   -h help, prints this help
   -H host, used in default route url generation
   -i instance name(s) e.g.: installs given instances e.g.: 'test;prod'
+  -j set custom 'secrets.json' file name
   -k use(install/delete/validate/upgrade/generate yamls/backup) only specific Openshift/Kubernetes resource kind(s) 
      e.g.: -k 'DeploymentConfig;Service;Route' Default is defined in oc_config.json->project->oc_resource_kinds
   -m component directory names e.g.: 'init-project;init-api;init-gateway;solr;api;gateway;public-ui;admin-ui;swagger;cron-jobs'
      omit flag or use '-m all' to select all defined in oc_config.json->project->component_dirs
-  -n openshift project namespace e.g.: 'myNameSpace' if not set, current oc project name will be used as default namespace
+  -n openshift project namespace e.g.: 'myNameSpace' 
+     if not set, current oc project name or oc_config->project->namespace will be used as default namespace
   -N project name, used in default route url generation
   -o 'init', all directories which name string includes 'init' will be omitted,
            useful if you like to preserve data volumes during install/delete operations
      'oc', only yaml files will be generated
+     Use multiple: -o 'init;oc'
   -p url prefix, adds prefix to all route urls, useful when running in Openshift sandbox in oder to avoid network routes conflicts
   -r openshift cluster IP range(first three numbers) e.g.: '112.20.14', last number will be randomly generated
   -s use this flag to change secrets directory. Default is 'secrets'
@@ -58,13 +71,12 @@ Flags description:
   -T directoryName, convert '.yaml' files extension into '.tt' extention inside of given directory
   -u instanceName(s), runs validation, creates 'validation_report.txt' und then runs upgrade of components that are modified,
      e.g.: -u test
-  -v instanceName(s), validates given instance(s) between template version and Openshift version in cloud e.g.: -v test, 
+  -v instanceName(s), validates given instance(s) between template version and Openshift/Kubernetes version in cloud e.g.: -v test, 
      report is written in 'validation_report.txt' file
   -y use(install/delete/validate/upgrade/generate yamls) only for yaml files that includes given substring
   -Y set custom 'templates_yaml' directory
-  
+  -x custom flag value: set it in CustomCallbacks::addFlagValuesToConfig and then use it in tt template with [% my_custom_value %]
 
-  see '-a multipleClusters' flag
   oc_config.json magic nodes:
       'instance_specific_data': instance will be automatically selected, e.g.: for json node 'instance_specific_data.api.test.limits.memory'  
                                 you can access instance specific data in tt template by 
@@ -97,44 +109,35 @@ Flags description:
         # of 'solr' component for 'test' instance for 'clusterPublic' cluster
         ocToolkit -c clusterPublic -i test -m solr -k 'DeploymentConfig;Service' -o oc
   
-  Place instance specific secretes in e.g.: secrets/instance/test/my_secret.txt for 'test' instance and 
-  access them by [% secrets.instance_specific.item('my_secret.txt') %] from tt template
-  Make sure that oc_config.json->project node values are set correctly.
+  Place instance specific secretes files in e.g.: 
+      - secrets/my_secret.txt or
+        secrets/instance/test/my_secret.txt or
+        secrets/clusterPublic/my_secret.txt or
+        secrets/clusterPublic/instance/prod/my_secret.txt
+        for corresponding instance and cluster 
+        access them by [% secrets.item('my_secret.txt') %] from tt template
+      - secrets value from secretes.json file will be automatically selected depending on current instance and cluster,
+        they are accessible from tt template by [% secrets_json.someSecret1 %] 
+  See example in git repo
 
   ";
   
+sub _loopInstances($$);
 sub addFlagValuesToConfig($);
 sub componentIsAllowed($$$$);
 sub generateUrl($$$$$$);
 sub removeClutter($$);
-sub _loopInstances($$);
 
-my $clusterBaseAddress;
-my $advanceFeatures;
-my $backupSpecificInstances;
-my $cluster = "clusterPublic"; # default
-my $ocConfigFile;
-my $deleteInstances;
-my $host;
-my $installInstances;
-my $ocResourceKinds;
-my $componentDirs;
-my $namespace;
-my $projectName; # used in default url generation
-my $omit   = ""; 
-my $urlPrefix;
-my $clusterIpRange;
-my $secretsDir;
-my $sortType;
-my $templatesTTDir;
-my $yamlToTTconvertDir;
-my $upgradeInstances;
-my $validateInstances;
-my $specificYamlFile;
-my $templatesYamlDir;
+# $projectName; # used in default url generation
+my ($clusterBaseAddress, $advanceFeatures, $backupSpecificInstances, $cluster, $ocConfigFile, 
+    $generateConfigTemplate, $deleteInstances, $host, $installInstances, $secretsJson, 
+    $ocResourceKinds, $componentDirs, $namespace, $projectName, $urlPrefix, $clusterIpRange,
+    $secretsDir, $sortType, $templatesTTDir, $yamlToTTconvertDir, $upgradeInstances, $validateInstances, 
+    $specificYamlFile, $templatesYamlDir);
+my $omit = ""; 
 
 my %opts;
-getopts("a:A:b:c:d:H:h:i:k:m:M:n:N:o:O:p:r:s:S:t:T:u:v:y:Y:", \%opts);
+getopts("a:A:b:c:d:H:g:h:i:j;k:m:M:n:N:o:O:p:r:s:S:t:T:u:v:y:Y:x:", \%opts);
 
 if($opts{h}){
     print $help;
@@ -147,8 +150,10 @@ $backupSpecificInstances = $opts{b} if defined $opts{b};
 $cluster                 = $opts{c} if defined $opts{c};
 $ocConfigFile            = $opts{C} if defined $opts{C};
 $deleteInstances         = $opts{d} if defined $opts{d};
+$generateConfigTemplate  = $opts{g} if defined $opts{g};
 $host                    = $opts{H} if defined $opts{H};
 $installInstances        = $opts{i} if defined $opts{i};
+$secretsJson             = $opts{j} if defined $opts{j};
 $ocResourceKinds         = $opts{k} if defined $opts{k};
 $componentDirs           = $opts{m} if (defined $opts{m}) && ($opts{m} ne "all");
 $namespace               = $opts{n} if defined $opts{n};
@@ -165,21 +170,20 @@ $validateInstances       = $opts{v} if defined $opts{v};
 $specificYamlFile        = $opts{y} if defined $opts{y};
 $templatesYamlDir        = $opts{Y} if defined $opts{Y};
 
-if(defined $installInstances){
-    die("Please set working cluster with -c flag, e.g.: perl ocToolkit.pl -c clusterPublic -i prod") if not defined $cluster;
-}
-
 my $flag;
 $flag = $deleteInstances         if defined $deleteInstances;
 $flag = $installInstances        if defined $installInstances;
 $flag = $backupSpecificInstances if defined $backupSpecificInstances;
 $flag = $validateInstances       if defined $validateInstances;
 $flag = $upgradeInstances        if defined $upgradeInstances;
-die("Flags -i -d -b -v -u can't be left empty.") if (defined $flag) && (length($flag) eq 2) && ($flag =~ /\-/ ); 
+$flag = $generateConfigTemplate  if defined $generateConfigTemplate;
+die("Flags -i -d -b -v -u -g can't be left empty.") if (defined $flag) && (length($flag) eq 2) && ($flag =~ /\-/ ); 
 
-if(not defined $clusterBaseAddress){
-    my $clusterLc = lc $cluster;
-    $clusterBaseAddress = "apps.$clusterLc";
+my $clusterText = `oc config current-context`;
+if((defined $cluster) && (lc($clusterText) !~ lc($cluster))){
+    print "Cluster you entered in -c flag '$cluster' doesn't correspondent to cluster that you are currently logged in.
+Press enter if you still want to continue or press ctrl+c to abort.";
+    my $continue = <>;
 }
 
 if(defined $deleteInstances){
@@ -191,6 +195,7 @@ if(defined $deleteInstances){
         $myComponentDirs       = join( ';', @componentsDirArray);
     }
     $myComponentDirs = "all" if not defined $myComponentDirs;
+    $cluster = "unknown" if not defined $cluster;
     print qx/oc project/;
     print "Deleting $myComponentDirs component(s) in '$deleteInstances' instance in '$cluster' cluster.
     \nPress enter to continue or ctrl+c to abort";
@@ -200,18 +205,17 @@ if(defined $deleteInstances){
 ############################################################################
 # install/delete/validate/update/backup/create yamls for specific instance #
 ############################################################################
+$ocConfigFile     = $projectDir.$ocConfigFile     if defined $ocConfigFile;
+$secretsDir       = $projectDir.$secretsDir       if defined $secretsDir;
+$templatesTTDir   = $projectDir.$templatesTTDir   if defined $templatesTTDir;
+$templatesYamlDir = $projectDir.$templatesYamlDir if defined $templatesYamlDir;
 
-# set 'multipleClusters' as default
-if(not defined $advanceFeatures){
-    $advanceFeatures = "multipleClusters";
-}else{
-    $advanceFeatures .= ";multipleClusters";
-}
 my $ocObj = OcToolkit->new( advanceFeatures       => $advanceFeatures,
                             clusterBaseAddress    => $clusterBaseAddress,
                             cluster               => $cluster,
                             ocConfigFile          => $ocConfigFile,
                             host                  => $host,
+                            secretsJson           => $secretsJson,
                             ocResourceKinds       => $ocResourceKinds,
                             componentDirs         => $componentDirs,
                             namespace             => $namespace,
@@ -225,11 +229,14 @@ my $ocObj = OcToolkit->new( advanceFeatures       => $advanceFeatures,
                             yamlToTTconvertDir    => $yamlToTTconvertDir,
                             specificYamlFile      => $specificYamlFile,
                             templatesYamlDir      => $templatesYamlDir,
-                            addFlagValuesToConfig => \&addFlagValuesToConfig,
+                            validationReportFile  => $projectDir.'validation_report.txt',
+                            projectDir            => $projectDir,
                             componentIsAllowed    => \&componentIsAllowed,
                             generateUrl           => \&generateUrl,
                             removeClutter         => \&removeClutter,
                             removeClutterBackup   => \&removeClutterBackup);
+
+$ocObj->setParams({addFlagValuesToConfig => \&addFlagValuesToConfig}) if defined $opts{x};
 
 # $ocObj->setParams({omit => "oc"});
 _loopInstances($deleteInstances,         "delete")   if defined $deleteInstances;
@@ -243,201 +250,9 @@ if(defined $backupSpecificInstances){
         _loopInstances($backupSpecificInstances, "backup");
     }
 }
-$ocObj->convertYamlToTTExtention($yamlToTTconvertDir) if defined $yamlToTTconvertDir;
+$ocObj->convertYamlToTTExtention($yamlToTTconvertDir)       if defined $yamlToTTconvertDir;
+$ocObj->generateConfigJsonTemplate($generateConfigTemplate) if defined $generateConfigTemplate;
 
-#####################################################################################
-# use this functions to add custom config/logic without need to change OcToolkit.pm # 
-#####################################################################################
-
-# add some script input flag value to config file, access them then in TT Template by [% my_custom_value %]
-sub addFlagValuesToConfig($){
-    my ($config) = @_;
-
-    $config->{my_custom_value} = "some custom value received from flag";
-
-    return $config;
-}
-
-# some specific rules about what components are allowed to be installed on given cluster and instance
-# if you need completely different tt template files for specific clusters use '-a multipleClusters' flag
-# put tt template file into nested directory, named by your cluster, inside of your tt template component dirs
-sub componentIsAllowed($$$$){
-    my ($myTemplateName, $myDir, $myCluster, $myInstance) = @_;
-
-#     my $clusterLowerCase = lc $myCluster;
-#     if($clusterLowerCase =~ /clusterPublic/){
-#         if($myTemplateName =~ /route/){
-#             return 0 if $myDir =~ /solr/;
-#             return 0 if $myDir =~ /api/;
-#             return 0 if $myDir =~ /admin\-ui/;
-#         }
-#         return 0 if $myDir =~ /swagger/;
-#     }
-
-    return 1;
-}
-
-# define default routes url pattern
-sub generateUrl($$$$$$){
-    my ($urlPrefix, $projectName, $componentName, $instanceKey, $clusterBaseAddress, $host) = @_;
-    
-    if(defined $urlPrefix){
-        $urlPrefix .= "-";
-    }else{
-        $urlPrefix = "";
-    }
-    if(defined $projectName){
-        $projectName .= "-";
-    }else{
-        $projectName = "";
-    }
-    if(defined $clusterBaseAddress){
-        $clusterBaseAddress .= ".";
-    }else{
-        $clusterBaseAddress = "";
-    }
-
-    return $urlPrefix.$projectName.$componentName."-".$instanceKey.".".$clusterBaseAddress.$host;
-}
-
-# ignore some specific fields during validation and upgrade
-sub removeClutter($$){
-    my ($ocJsonHash, $params) = @_;
-
-    $ocJsonHash = removeClutterBackup($ocJsonHash, $params);
-    
-    my $dir          = $params->{dir};
-    my $templateName = $params->{templateName};
-    my $ocKind       = $params->{ocKind};
-    my $ocName       = $params->{ocName};
-
-    # some extra fields(in comparison to backup) to be ignored during validation and upgrade
-    foreach my $i ((0..7)){
-        if($ocKind eq "BuildConfig"){
-            if((defined $ocJsonHash->{spec}) &&
-               (defined $ocJsonHash->{spec}->{triggers}) &&
-               (defined $ocJsonHash->{spec}->{triggers}->[$i]) &&
-               (defined $ocJsonHash->{spec}->{triggers}->[$i]->{github}) &&
-               (defined $ocJsonHash->{spec}->{triggers}->[$i]->{github}->{secret})
-            ){
-                delete $ocJsonHash->{spec}->{triggers}->[$i]->{github}->{secret};
-            }
-            if((defined $ocJsonHash->{spec}) &&
-               (defined $ocJsonHash->{spec}->{triggers}) &&
-               (defined $ocJsonHash->{spec}->{triggers}->[$i]) &&
-               (defined $ocJsonHash->{spec}->{triggers}->[$i]->{generic}) &&
-               (defined $ocJsonHash->{spec}->{triggers}->[$i]->{generic}->{secret})
-            ){
-                delete $ocJsonHash->{spec}->{triggers}->[$i]->{generic}->{secret};
-            }
-        }
-        if($ocKind eq "ImageStream"){
-            if((defined $ocJsonHash->{spec}) &&
-               (defined $ocJsonHash->{spec}->{tags}) &&
-               (defined $ocJsonHash->{spec}->{tags}->[$i]) &&
-               (defined $ocJsonHash->{spec}->{tags}->[$i]->{importPolicy})
-            ){
-                delete $ocJsonHash->{spec}->{tags}->[$i]->{importPolicy};
-            }
-        }
-        if($ocKind eq "DeploymentConfig"){
-            if((defined $ocJsonHash->{spec}) &&
-               (defined $ocJsonHash->{spec}->{template}) &&
-               (defined $ocJsonHash->{spec}->{template}->{spec}) &&
-               (defined $ocJsonHash->{spec}->{template}->{spec}->{containers}) &&
-               (defined $ocJsonHash->{spec}->{template}->{spec}->{containers}->[$i]) &&
-               (defined $ocJsonHash->{spec}->{template}->{spec}->{containers}->[$i]->{resources}) &&
-               (not defined $ocJsonHash->{spec}->{template}->{spec}->{containers}->[$i]->{resources}->{limits}) &&
-               (not defined $ocJsonHash->{spec}->{template}->{spec}->{containers}->[$i]->{resources}->{requests})
-            ){
-                $ocJsonHash->{spec}->{template}->{spec}->{containers}->[$i]->{resources} = {};
-            }
-        }
-    }
-
-    delete $ocJsonHash->{spec}->{clusterIPs};
-    delete $ocJsonHash->{spec}->{clusterIP};
-    delete $ocJsonHash->{spec}->{volumeName} if $ocKind eq "PersistentVolumeClaim";
-    
-    return $ocJsonHash;
-}
-
-# ignore some specific fields during backup of the whole project
-sub removeClutterBackup($$){
-    my ($ocJsonHash, $params) = @_;
-
-    my $dir          = $params->{dir};
-    my $templateName = $params->{templateName};
-    my $ocKind       = $params->{ocKind};
-    my $ocName       = $params->{ocName};
-    
-    delete $ocJsonHash->{status};
-    
-    delete $ocJsonHash->{metadata}->{annotations}->{'openshift.io/generated-by'};
-    delete $ocJsonHash->{metadata}->{annotations}->{'openshift.io/restore-server-version'};
-    delete $ocJsonHash->{metadata}->{annotations}->{'openshift.io/backup-server-version'};
-    delete $ocJsonHash->{metadata}->{annotations}->{'openshift.io/backup-registry-hostname'};
-    delete $ocJsonHash->{metadata}->{annotations}->{'openshift.io/migration-registry'};
-    delete $ocJsonHash->{metadata}->{annotations}->{'openshift.io/restore-registry-hostname'};
-    delete $ocJsonHash->{metadata}->{annotations}->{'openshift.io/image.dockerRepositoryCheck'};
-    delete $ocJsonHash->{metadata}->{annotations}->{'kubectl.kubernetes.io/last-applied-configuration'};
-    delete $ocJsonHash->{metadata}->{annotations}->{'kubernetes.io/service-account.name'};
-    delete $ocJsonHash->{metadata}->{annotations}->{'kubernetes.io/service-account.uid'};
-    delete $ocJsonHash->{metadata}->{annotations}->{'openshift.io/token-secret.value'};
-    delete $ocJsonHash->{metadata}->{annotations}->{'openshift.io/token-secret.name'};
-    delete $ocJsonHash->{metadata}->{annotations}->{'kubernetes.io/created-by'};
-    delete $ocJsonHash->{metadata}->{annotations}->{'volume.beta.kubernetes.io/storage-provisioner'};
-    delete $ocJsonHash->{metadata}->{annotations}->{'pv.kubernetes.io/bind-completed'};
-    delete $ocJsonHash->{metadata}->{annotations}->{'pv.kubernetes.io/bound-by-controller'};
-    delete $ocJsonHash->{metadata}->{annotations}->{'volume.kubernetes.io/storage-provisioner'};
-    
-    delete $ocJsonHash->{metadata}->{labels}->{'migration.openshift.io/migrated-by-migmigration'};
-    delete $ocJsonHash->{metadata}->{labels}->{'migration.openshift.io/migrated-by-migplan'};
-    delete $ocJsonHash->{metadata}->{labels}->{'velero.io/backup-name'};
-    delete $ocJsonHash->{metadata}->{labels}->{'velero.io/restore-name'};
-    delete $ocJsonHash->{metadata}->{labels}->{'app.kubernetes.io/component'};
-    delete $ocJsonHash->{metadata}->{labels}->{'app.kubernetes.io/instance'};
-    
-    delete $ocJsonHash->{metadata}->{resourceVersion};
-    delete $ocJsonHash->{metadata}->{uid};
-    delete $ocJsonHash->{metadata}->{creationTimestamp};
-    delete $ocJsonHash->{metadata}->{generation};
-    delete $ocJsonHash->{metadata}->{managedFields};
-    delete $ocJsonHash->{metadata}->{selfLink};
-    delete $ocJsonHash->{metadata}->{deletionTimestamp};
-    delete $ocJsonHash->{metadata}->{deletionGracePeriodSeconds};
-
-    foreach my $i ((0..7)){
-        if((defined $ocJsonHash->{spec}) &&
-           (defined $ocJsonHash->{spec}->{triggers}) &&
-           (defined $ocJsonHash->{spec}->{triggers}->[$i]) &&
-           (defined $ocJsonHash->{spec}->{triggers}->[$i]->{imageChangeParams}) &&
-           (defined $ocJsonHash->{spec}->{triggers}->[$i]->{imageChangeParams}->{lastTriggeredImage})
-        ){
-            delete $ocJsonHash->{spec}->{triggers}->[$i]->{imageChangeParams}->{lastTriggeredImage};
-        }
-        
-        if((defined $ocJsonHash->{spec}) &&
-           (defined $ocJsonHash->{spec}->{tags}) &&
-           (defined $ocJsonHash->{spec}->{tags}->[$i]) &&
-           (defined $ocJsonHash->{spec}->{tags}->[$i]->{generation})
-        ){
-            delete $ocJsonHash->{spec}->{tags}->[$i]->{generation};
-        }
-        
-        if((defined $ocJsonHash->{spec}) &&
-           (defined $ocJsonHash->{spec}->{template}) &&
-           (defined $ocJsonHash->{spec}->{template}->{spec}) &&
-           (defined $ocJsonHash->{spec}->{template}->{spec}->{containers}) &&
-           (defined $ocJsonHash->{spec}->{template}->{spec}->{containers}->[$i]) &&
-           (defined $ocJsonHash->{spec}->{template}->{spec}->{containers}->[$i]->{image})
-        ){
-            delete $ocJsonHash->{spec}->{template}->{spec}->{containers}->[$i]->{image};
-        }
-    }
-
-    return $ocJsonHash;
-}
 
 sub _loopInstances($$){
     my ($instancesString, $methodName) = @_;
@@ -448,6 +263,40 @@ sub _loopInstances($$){
         print "$methodNameU instance: $instance\n";
         $ocObj->$methodName($instance) if $ocObj->can($methodName); 
     }
+}
+
+#####################################################################################
+# use this functions to add custom config/logic without need to change OcToolkit.pm # 
+#####################################################################################
+
+sub addFlagValuesToConfig($){
+    my ($config) = @_;    
+    return defined $customCallbacksObj ? $customCallbacksObj->addFlagValuesToConfig($config, \%opts) : undef;
+}
+
+sub componentIsAllowed($$$$){
+    my ($myTemplateName, $myDir, $myCluster, $myInstance) = @_;
+    return defined $customCallbacksObj ? $customCallbacksObj->componentIsAllowed($myTemplateName, $myDir, $myCluster, $myInstance) : undef;
+}
+
+sub generateUrl($$$$$$){
+    my ($urlPrefix, $projectName, $componentName, $instanceKey, $clusterBaseAddress, $host) = @_;
+
+    if(defined $customCallbacksObj){
+        return $customCallbacksObj->generateUrl($urlPrefix, $projectName, $componentName, $instanceKey, $clusterBaseAddress, $host);
+    }else{
+        return;
+    }
+}
+
+sub removeClutter($$){
+    my ($ocJsonHash, $params) = @_;
+    return defined $customCallbacksObj ? $customCallbacksObj->removeClutter($ocJsonHash, $params) : undef;
+}
+
+sub removeClutterBackup($$){
+    my ($ocJsonHash, $params) = @_;
+    return defined $customCallbacksObj ? $customCallbacksObj->removeClutterBackup($ocJsonHash, $params) : undef;
 }
 
 1;

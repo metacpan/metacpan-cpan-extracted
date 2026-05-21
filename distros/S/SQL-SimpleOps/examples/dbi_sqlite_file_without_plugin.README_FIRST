@@ -1,0 +1,16 @@
+# 
+## Copyright (C) Carlos Celso
+# 
+## see: https://metacpan.org/pod/DBD::SQLite
+#
+## see: dbi_sqlite_file.README_FIRST
+
+*) NOTE:
+
+ The option 'driver => [dbd_drive_name]' must be the correct CPAN "DBD:[drive]" name
+
+ For Postgress drvier the name is "DBD::SQLite" (case sensitive)
+
+ SQL::SimpleOps->new( ... driver => 'SQLite', ignore_plugin => 1 ...);
+
+ENDED

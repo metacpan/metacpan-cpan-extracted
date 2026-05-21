@@ -1,0 +1,26 @@
+---
+abstract: 'Run code under C<eval> without leaking C<$@> and get a rich error object back on failure.'
+author:
+  - 'Chad Granum <exodist@cpan.org>'
+build_requires:
+  Test2::V0: '1.302219'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Clean-Eval
+requires:
+  Importer: '0.025'
+  overload: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/exodist/Clean-Eval/issues
+  repository: https://github.com/exodist/Clean-Eval/
+version: '0.000002'
+x_generated_by_perl: v5.42.2
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

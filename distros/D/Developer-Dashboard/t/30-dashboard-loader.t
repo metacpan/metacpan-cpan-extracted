@@ -13,10 +13,7 @@ my $dashboard = File::Spec->catfile( $repo_root, 'bin', 'dashboard' );
 my $source = _slurp($dashboard);
 
 like( $source, qr/\A#!\/usr\/bin\/env perl\b/, 'dashboard entrypoint uses /usr/bin/env perl' );
-unlike( $source, qr/TITLE:\s+API Dashboard/, 'dashboard entrypoint no longer embeds the api-dashboard bookmark source' );
-unlike( $source, qr/BOOKMARK:\s+api-dashboard/, 'dashboard entrypoint no longer embeds the api-dashboard bookmark id source' );
-unlike( $source, qr/TITLE:\s+SQL Dashboard/, 'dashboard entrypoint no longer embeds the sql-dashboard bookmark source' );
-unlike( $source, qr/BOOKMARK:\s+sql-dashboard/, 'dashboard entrypoint no longer embeds the sql-dashboard bookmark id source' );
+unlike( $source, qr/BOOKMARK:\s+\S+-dashboard/, 'dashboard entrypoint no longer embeds extracted dashboard bookmark ids' );
 unlike( $source, qr/Developer::Dashboard::CLI::SeededPages/, 'dashboard entrypoint no longer loads the seeded bookmark loader directly' );
 unlike( $source, qr/Developer::Dashboard::CLI::Query/, 'dashboard entrypoint no longer loads the query CLI module directly' );
 unlike( $source, qr/Developer::Dashboard::CLI::OpenFile/, 'dashboard entrypoint no longer loads the open-file CLI module directly' );
@@ -30,11 +27,15 @@ like( $source, qr/_builtin_helper_path\('skills'\)/, 'dashboard dotted skill dis
 like( $source, qr/_exec_switchboard_command\( \$helper_path, '_exec', \$skill_name, \$skill_command, \@ARGV \)/, 'dashboard dotted skill dispatch hands skill commands through the internal skills exec route' );
 
 my $share_seeded_root = File::Spec->catdir( $repo_root, 'share', 'seeded-pages' );
-ok( -d $share_seeded_root, 'seeded bookmark assets are shipped outside the dashboard entrypoint' );
-for my $page (qw(api-dashboard.page sql-dashboard.page)) {
-    ok( -f File::Spec->catfile( $share_seeded_root, $page ), "share/seeded-pages/$page is shipped" );
-}
-ok( !-f File::Spec->catfile( $share_seeded_root, 'welcome.page' ), 'share/seeded-pages/welcome.page is no longer shipped' );
+ok(
+    !-e $share_seeded_root || -d $share_seeded_root,
+    'share/seeded-pages is either omitted from the dist or present as a directory outside the dashboard entrypoint',
+);
+is_deeply(
+    [ sort glob( File::Spec->catfile( $share_seeded_root, '*' ) ) ],
+    [],
+    'share/seeded-pages no longer ships extracted starter dashboard pages in core',
+);
 
 my $lib = File::Spec->catdir( $repo_root, 'lib' );
 my $fake_lib = tempdir( CLEANUP => 1 );

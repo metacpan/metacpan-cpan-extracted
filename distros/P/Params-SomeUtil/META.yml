@@ -28,5 +28,5 @@ resources:
   bugtracker: https://github.com/uperl/Params-SomeUtil/issues
   homepage: https://metacpan.org/pod/Params::SomeUtil
   repository: https://github.com/uperl/Params-SomeUtil.git
-version: '1.08'
+version: '1.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

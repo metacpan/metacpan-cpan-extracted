@@ -1,13 +1,14 @@
 package Crypt::SecretBuffer;
 # VERSION
 # ABSTRACT: Prevent accidentally leaking a string of sensitive data
-$Crypt::SecretBuffer::VERSION = '0.023';
+$Crypt::SecretBuffer::VERSION = '0.024';
 
 use strict;
 use warnings;
 use Carp;
 use IO::Handle;
 use Scalar::Util ();
+use Time::HiRes;
 use Fcntl ();
 use parent qw( DynaLoader );
 use overload '""' => \&stringify,
@@ -19,12 +20,13 @@ bootstrap Crypt::SecretBuffer;
 
 {
    package Crypt::SecretBuffer::Exports;
-$Crypt::SecretBuffer::Exports::VERSION = '0.023';
+$Crypt::SecretBuffer::Exports::VERSION = '0.024';
    use Exporter 'import';
    @Crypt::SecretBuffer::Exports::EXPORT_OK= qw(
       secret_buffer secret span unmask_secrets_to memcmp
       NONBLOCK AT_LEAST ISO8859_1 ASCII UTF8 UTF16LE UTF16BE HEX BASE64
       MATCH_MULTI MATCH_REVERSE MATCH_NEGATE MATCH_ANCHORED MATCH_CONST_TIME
+      _wait_fh_readable
    );
 }
 
@@ -55,87 +57,172 @@ sub stringify_mask {
 
 sub append_console_line {
    my $self= shift;
-   my ($input_fh, %options);
+   my %options;
+
    # First argument can be input_fh, or just straight key/value list.
    if (@_ && ref($_[0]) && (ref $_[0] eq 'GLOB' || ref($_[0])->can('getc'))) {
       croak "Expected even-length list of options" unless @_ & 1;
-      ($input_fh, %options)= @_;
+      %options= (input_fh => @_);
    } else {
       croak "Expected even-length list of options" if @_ & 1;
       %options= @_;
-      $input_fh= delete $options{input_fh};
    }
-   my ($prompt, $prompt_fh, $char_mask, $char_count, $char_max, $char_class)
-      = delete @options{qw( prompt prompt_fh char_mask char_count char_max char_class )};
+
+   # This routine can resume where it left off by keeping most variables in %state
+   my $state= delete $options{state} || {};
+
+   # If 'start_len' is set, it means the prompt was already started and this is a continuation.
+   # The prompt is only printed on the initial call, unless they set 're_prompt'.
+   my $print_prompt= defined $state->{start_len}? delete $state->{re_prompt} : defined $options{prompt};
+   $state->{start_len}= $self->length
+      unless defined $state->{start_len};
+
+   # copy new parameters into state hash
+   for (qw( input_fh prompt prompt_fh char_mask char_count char_max char_class utf8 )) {
+      $state->{$_}= delete $options{$_}
+         if exists $options{$_};
+   }
+   # the default char_class for utf8 is the set of valid printable characters
+   $state->{char_class} ||= qr/[\p{Print}]/
+      if $state->{utf8};
+
+   # local vars for convenience
+   my ($input_fh, $prompt_fh, $char_mask, $char_count, $char_max, $char_class, $start_len, $utf8)
+      = @{$state}{qw( input_fh prompt_fh char_mask char_count char_max char_class start_len utf8)};
+
+   # timeout is per-call
+   my $timeout= delete $options{timeout};
+
    warn "unknown option: ".join(', ', keys %options)
       if keys %options;
-   my ($reading_from, $writing_to)= ('supplied handle', 'supplied handle');
+
+   # Resolve input file handle if not specified
    if (!defined $input_fh) {
-      # user is requesting a read from the controlling terminal
+      # undef is a request to read from the controlling terminal
       if ($^O eq 'MSWin32') {
          open $input_fh, '+<', 'CONIN$' or croak 'open(CONIN$): '.$!;
-         open $prompt_fh, '>', 'CONOUT$' or croak 'open(CONOUT$): '.$!
-            unless defined $prompt_fh;
-         $reading_from= 'CONIN$';
-         $writing_to= 'CONOUT$';
+         $state->{reading_from}= 'CONIN$';
+         unless (defined $state->{prompt_fh}) {
+            open $prompt_fh, '>', 'CONOUT$' or croak 'open(CONOUT$): '.$!;
+            $state->{prompt_fh}= $prompt_fh;
+            $state->{writing_to}= 'CONOUT$';
+         }
       } else {
          open $input_fh, '+<', '/dev/tty' or croak "open(/dev/tty): $!";
-         $prompt_fh= $input_fh unless defined $prompt_fh;
-         $reading_from= $writing_to= '/dev/tty';
-      }
-   }
-   if (!defined $prompt_fh && (defined $prompt || defined $char_mask)) {
-      # Determine default prompt_fh
-      # For terminals, if it was STDIN then the underlying descriptors or libc FILE handle
-      # are probably read-only, so open a new writeable handle.  Also MSWin32 only has one
-      # console, so do this even if it isn't currently set as STDIN.
-      my $fd= fileno($input_fh);
-      if (-t $input_fh && ((defined $fd && $fd == 0) || \*STDIN == $input_fh || $^O eq 'MSWin32')) {
-         if ($^O eq 'MSWin32') {
-            open $prompt_fh, '>', 'CONOUT$' or croak 'open(CONOUT$): '.$!;
-            $writing_to= 'CONOUT$';
-         } else {
-            open $prompt_fh, '+<', '/dev/tty' or croak "open(/dev/tty): $!";
-            $writing_to= '/dev/tty';
+         $state->{reading_from}= '/dev/tty';
+         unless (defined $state->{prompt_fh}) {
+            $state->{prompt_fh}= $state->{input_fh};
+            $state->{writing_to}= '/dev/tty';
          }
       }
-      # For sockets or tty, default to the same file descriptor as input_fh.
-      # If the descriptor is read-only, things will fail, and it's the caller's
-      # job to fix the bug.
-      elsif (-S $input_fh || -t $input_fh) {
-         $prompt_fh= $input_fh;
-         $writing_to= 'input handle';
-      }
-      # Suppress prompt unless the handle looks like a TTY or Socket.  e.g. input from file
-      # or pipe can't usefully be prompted.  It could be that the parent process created a
-      # return pipe on STDOUT and wants to see the prompt there, but it would be too bold to
-      # take a guess at that.  The caller can supply prompt_fh => \*STDOUT if they want to.
-      else {
-         $prompt= $char_mask= undef;
+      $state->{input_fh}= $input_fh;
+   } else {
+      $state->{reading_from} ||= 'supplied_handle';
+   }
+
+   # Resolve prompt file handle if required and not specified
+   if (defined $state->{prompt} || defined $char_mask) {
+      if (!defined $prompt_fh) {
+         # Determine default prompt_fh
+         # For terminals, if it was STDIN then the underlying descriptors or libc FILE handle
+         # are probably read-only, so open a new writeable handle.  Also MSWin32 only has one
+         # console, so do this even if it isn't currently set as STDIN.
+         my $fd= fileno($input_fh);
+         if (-t $input_fh && ((defined $fd && $fd == 0) || \*STDIN == $input_fh || $^O eq 'MSWin32')) {
+            if ($^O eq 'MSWin32') {
+               open $prompt_fh, '>', 'CONOUT$' or croak 'open(CONOUT$): '.$!;
+               $state->{writing_to}= 'CONOUT$';
+            } else {
+               open $prompt_fh, '+<', '/dev/tty' or croak "open(/dev/tty): $!";
+               $state->{writing_to}= '/dev/tty';
+            }
+            $state->{prompt_fh}= $prompt_fh;
+         }
+         # For sockets or tty, default to the same file descriptor as input_fh.
+         # If the descriptor is read-only, things will fail, and it's the caller's
+         # job to fix the bug.
+         elsif (-S $input_fh || -t $input_fh) {
+            $state->{prompt_fh}= $prompt_fh= $input_fh;
+            $state->{writing_to}= 'input handle';
+         }
+         # Suppress prompt unless the handle looks like a TTY or Socket.  e.g. input from file
+         # or pipe can't usefully be prompted.  It could be that the parent process created a
+         # return pipe on STDOUT and wants to see the prompt there, but it would be too bold to
+         # take a guess at that.  The caller can supply prompt_fh => \*STDOUT if they want to.
+         else {
+            delete @{$state}{qw( prompt char_mask )};
+         }
+      } else {
+         $state->{writing_to} ||= 'supplied_handle';
       }
    }
+
    # If the user wants control over the keypresses, need to disable line-editing mode.
    # ConsoleState obj with auto_restore restores the console state when it goes out of scope.
-   my $input_by_chars= defined $char_mask || defined $char_count || defined $char_class;
-   my $ttystate= Crypt::SecretBuffer::ConsoleState->maybe_new(
-      handle => $input_fh,
-      echo => 0,
-      (line_input => 0)x!!$input_by_chars,
-      auto_restore => 1
-   );
-   # Write the initial prompt
-   if (defined $prompt) {
-      $prompt_fh->print($prompt) && $prompt_fh->flush
-         or croak "Failed to write $writing_to: $!";
+   my $input_by_chars= defined $char_mask  || defined $char_count
+                    || defined $char_class || defined $timeout
+                    || $utf8;
+   $state->{ttystate} ||= Crypt::SecretBuffer::ConsoleState->maybe_new(handle => $input_fh);
+   my $ttystate= $state->{ttystate};
+   if ($ttystate && $ttystate->echo) {
+      $ttystate->auto_restore(1);
+      $ttystate->echo(0);
    }
-   my $start_len= $self->length;
+   if ($ttystate && $ttystate->line_input && $input_by_chars) {
+      $ttystate->auto_restore(1);
+      $ttystate->line_input(0);
+   }
+   # Write the initial prompt
+   if ($print_prompt) {
+      my $suffix= '';
+      if (defined $start_len && defined $char_mask) {
+         my $n= $self->len - $start_len;
+         if ($n && $utf8) {
+            $n= 0;
+            my $span= $self->span(pos => $start_len, encoding => 'UTF-8');
+            ++$n while $span->len && eval { $span->ltrim(qr/./) };
+         }
+         $suffix= $char_mask x $n;
+      }
+      $prompt_fh->print($state->{prompt} . $suffix) && $prompt_fh->flush
+         or croak "Failed to write $state->{writing_to}: $!";
+   }
    my $ret;
    if ($input_by_chars) {
-      while (1) {
-         $ret= $self->append_read($input_fh, 1)
-            or last;
-         # Handle control characters
+      read_loop: while (1) {
+         if (defined $timeout) {
+            my $start_t= Time::HiRes::time();
+            if (Crypt::SecretBuffer::Exports::_wait_fh_readable($input_fh, $timeout)) {
+               # deduct from timeout
+               $timeout -= Time::HiRes::time() - $start_t;
+               $timeout= 0 if $timeout < 0;
+            } else {
+               # use EINTR to signal a timeout was reached, same as if we'd used alarm()
+               $!= Errno::EINTR();
+               $ret= undef;
+               last;
+            }
+         }
+         # Windows Console events can deliver UTF-16 characters which we can transcode to UTF-8
+         if ($utf8 && $ttystate && $^O eq 'MSWin32') {
+            $ret= eval { $ttystate->_append_console_char($self) };
+            unless (defined $ret) {
+               # Errors about invalid surrogate pairs probably need seen by the user
+               # because their unicode input is not reaching the buffer reliably.
+               if ($@ =~ /surrogate/) {
+                  my $msg= "\nWarning: $@.  Your console settings are probably wrong.\n";
+                  $prompt_fh? $prompt_fh->print($msg) : warn $msg;
+               }
+               $ret= undef;
+               last;
+            }
+            next unless $ret; # false means no complete character yet, try again
+         } else {
+            $ret= $self->append_read($input_fh, 1)
+               or last; # EOF or system error
+         }
          my $end_pos= $self->length - 1;
+         # Handle control characters
          if ($self->index(qr/[\0-\x1F\x7F]/, $end_pos) == $end_pos) {
             # If it is \r or \n, end.  If char_count was requested, and we didn't
             # end by that logic, then we don't have the requested char count, so
@@ -156,7 +243,7 @@ sub append_console_line {
                        .(" "  x length $char_mask)
                        .("\b" x length $char_mask))
                      && $prompt_fh->flush
-                        or croak "Failed to write $writing_to: $!";
+                        or croak "Failed to write $state->{writing_to}: $!";
                   }
                }
             }
@@ -165,22 +252,63 @@ sub append_console_line {
                $self->length($end_pos);
             }
          }
-         elsif ($char_class && $self->index($char_class, $end_pos) == -1) {
-            # not part of the permitted char class
-            $self->length($end_pos);
-         }
-         elsif ($char_max && $self->length - $start_len > $char_max) {
-            # refuse to add more characters
-            $self->length($end_pos);
-         }
-         else {
-            # char added
+         elsif ($utf8) {
+            # count chars, and also find out if there are invalid or incomplete characters
+            my $span= $self->span(pos => ($start_len || 0), encoding => 'UTF-8');
+            my $count= 0;
+            while ($span->len) {
+               my $ch= eval { $span->parse($char_class) };
+               unless ($ch) {
+                  if (!defined $ch) {
+                     # partial character? loop again until we get all of it.
+                     $span->encoding(0);
+                     my $ch_len= $span->starts_with(qr/[\xC0-\xDF]/)? 2
+                               : $span->starts_with(qr/[\xE0-\xEF]/)? 3
+                               : 4;
+                     next read_loop if $span->len < $ch_len;
+                     # else it's an invalid UTF-8 sequence.  Hard to say what the right thing to
+                     # do is here, but since passwords need to be an exact match, lets delete
+                     # the invalid chars and emit a warning that hopefully the user can see.
+                     my $msg= "\nWarning: discarding invalid UTF-8 sequence.  Your console settings are probably wrong.\n";
+                     $prompt_fh? $prompt_fh->print($msg) : warn $msg;
+                  }
+                  # else just not a permitted character. Truncate / ignore it.
+                  $self->length($span->pos);
+                  last;
+               }
+               if ($char_max && $count >= $char_max) {
+                  # truncate at max chars
+                  $self->length($ch->pos);
+                  last;
+               }
+               ++$count;
+            }
+            # char added successfully; show progress
             if (length $char_mask) {
                $prompt_fh->print($char_mask) && $prompt_fh->flush
-                  or croak "Failed to write $writing_to: $!";
+                  or croak "Failed to write $state->{writing_to}: $!";
             }
             # If reached the char_count, return success
-            last if $char_count && $self->length - $start_len == $char_count;
+            last if $char_count && $count == $char_count;
+         }
+         else {
+            if ($char_class && $self->index($char_class, $end_pos) == -1) {
+               # not part of the permitted char class
+               $self->length($end_pos);
+            }
+            elsif ($char_max && $self->length - $start_len > $char_max) {
+               # refuse to add more characters
+               $self->length($end_pos);
+            }
+            else {
+               # char added
+               if (length $char_mask) {
+                  $prompt_fh->print($char_mask) && $prompt_fh->flush
+                     or croak "Failed to write $state->{writing_to}: $!";
+               }
+               # If reached the char_count, return success
+               last if $char_count && $self->length - $start_len == $char_count;
+            }
          }
       }
    }
@@ -191,14 +319,19 @@ sub append_console_line {
          $self->length($start_len + $char_max);
       }
    }
+   # timeout or system error (including EINTR and EAGAIN)
+   if (!defined $ret) {
+      return undef;
+   }
    # If we're responsible for the prompt, also echo the newline to the user so that the caller
    # doesn't need to figure out what to use for $prompt_fh.
    $prompt_fh->print("\n") && $prompt_fh->flush
-      if defined $prompt;
-
-   return !$ret? $ret
-      : $char_count? $self->length - $start_len == $char_count
-      : 1;
+      if defined $state->{prompt};
+   # Not a temporary failuire.  Wipe the state.
+   %$state= ();
+   return !$ret? 0
+        : $char_count? $self->length - $start_len == $char_count
+        : 1;
 }
 
 
@@ -459,6 +592,14 @@ This gets or sets the length of the string in the buffer.  If you set it to a sm
 the string is truncated.  If you set it to a larger value, the L</capacity> is raised as needed
 and the bytes are initialized with zeroes.
 
+=over
+
+=item len
+
+Convenient alias, matching Span object's "len" attribute
+
+=back
+
 =head2 stringify_mask
 
   $buf->stringify_mask;           # "[REDACTED]"
@@ -580,10 +721,11 @@ C<< ($ofs .. $ofs+$len) >> rather than just starting before the ending offset.
 
 Eventually, this function may be enhanced with full regex support, but for now
 it is limited to one character class and optionally a '+' modifier as an alias
-for flag C<MATCH_MULTI>.  Until that enhancement occurs, your regex notation must
-start with C<[> and must end with either C<]> or C<+>.
+for flag C<MATCH_MULTI>.  Until that enhancement occurs, your regex notation
+for the character class must start with C<[> and end with C<]>, or be one of
+the special classes C<< . \s \S \d \D \w \W >>.
 
-  ($ofs, $len)= $buf->scan(qr/[\w]+/); # implies MATCH_MULTI
+  ($ofs, $len)= $buf->scan(qr/\w+/); # implies MATCH_MULTI
 
 The C<$flags> may be a bitwise OR of the L</Match Flags> and one
 L<Character Encoding|/Character Encodings>.
@@ -599,8 +741,10 @@ L<Span object|Crypt::SecretBuffer::Span> and then call its methods.
   $cmp= $buf->memcmp($buf2);
 
 Compare contents of the buffer byte-by-byte to another SecretBuffer (or Span, or plain scalar)
-in the same manner as the C function C<memcmp> but in constant time. (iterating the full length
-of the shortest string to prevent timing attacks)
+in the same manner as the C function C<memcmp>.  Since version 0.019 this runs in constant time
+of the shortest string.  This may or may not be enough timing obfuscation to prevent
+side-channel attacks in your application; better constant-time algorithms exist, and it is up
+to you to decide whether you need one.
 
 =head2 append_lenprefixed
 
@@ -652,10 +796,13 @@ of bytes and never blocks.
   # prompt     => "Enter Password: "    print prompt after disabling echo
   # input_fh   => $readable_handle      handle for reading chars
   # prompt_fh  => $writeable_handle     handle for writing prompt
+  # utf8       => $bool                 add only valid utf-8 sequences to the buffer
   # char_mask  => "*"                   show each char typed as '*'
   # char_count => $n                    return success only at exactly N characters
   # char_max   => $n                    stop adding characters after $n added
   # char_class => qr/[...]/             limit to members of character class
+  # timeout    => $seconds              abort collecting characters, return undef
+  # state      => \%state               track state across calls
 
 This turns off TTY echo (if the handle is a Unix TTY or Windows Console) and reads and appends
 characters until newline or EOF (and does not store the \r or \n characters).
@@ -694,6 +841,12 @@ cases is true then the default is to suppress all prompting.  These defaults sho
 to pass C<< input_fh => \*STDIN >> for the behavior of simply allowing the password to be piped
 into the command when it isn't a terminal without having to test those conditions yourself.
 
+=item utf8
+
+Read unicode characters into the buffer as UTF-8 byte sequences.  If the input contains a
+malformed or invalid character, croak.  This option implies a default C<char_class> of
+C<< qr/[\p{Print}]/ >>. (i.e. by default only printable characters can be added to the password)
+
 =item char_mask
 
 Display this static string every time the user types a key, for feedback.  A common choice would
@@ -719,6 +872,20 @@ additional keys are not being accepted.
 Restrict the permitted characters.  This must be a Regexp-ref of a single character class.
 Any character the user enters which is not in this class will be ignored and not added to the
 buffer.
+
+=item timeout
+
+If a complete line has not been received within this number of seconds (may be fractional or
+zero) return C<undef> and set C<$!> to C<EINTR>.  This can be combined with C<state> to get the
+rough equivalent of nonblocking behavior.
+
+=item state
+
+On an error, store the state of prompt collection into this hashref.  Passing the same hashref
+to the next call will resume the password prompt where it left off.  If you destroyed the
+printed state of the prompt on the terminal inbetween calls, set field
+C<< $state->{re_prompt} = 1 >> to request re-printing the prompt.  Beware that you need to
+clear this hashref to trigger a restore of the console's 'echo' state flag.
 
 =back
 
@@ -869,7 +1036,10 @@ as well as the C<wantarray> context.
   $cmp= memcmp($thing1, $thing2);
 
 This function always compares bytes, and the arguments can be L<SecretBuffer|Crypt::SecretBuffer>
-objects, L<Span|Crypt::SecretBuffer::Span> objects, scalar-refs, and scalars.
+objects, L<Span|Crypt::SecretBuffer::Span> objects, scalar-refs, and scalars.  Since version
+0.019 this runs in constant time of the shortest string.  This may or may not be enough timing
+obfuscation to prevent side-channel attacks in your application; better constant-time algorithms
+exist, and it is up to you to decide whether you need one.
 
 =back
 
@@ -941,14 +1111,14 @@ Require the match begin at the start of the specified span of the buffer.
 
 =item MATCH_CONST_TIME
 
-Don't shortcut any loops on a non-matching byte/character.  This helps prevent timing attacks
-by making all searches take the same length of time, but beware that this guarantees you always
+Don't shortcut any loops on a non-matching byte/character.  This helps mitigate timing attacks
+by making all searches take similar lengths of time, but beware that this guarantees you always
 get the worst-case performance of C<< O(N*M) >> when searching for a string within a secret.
 
-NOTE: currently there is still about 15% difference in speed between the different code paths
-of L</scan> between matching the start of the buffer vs. matching the end, due to complex
-branching with all these match options.  An attacker would likely only be able to measure this
-for particularly large buffers, though.  Patches welcome.
+NOTE: currently there can still be about 15% difference in speed between the different code
+paths of L</scan> between matching the start of the buffer vs. matching the end, due to complex
+branching with all these match options.  This may or may not be enough timing obfuscation to
+prevent side-channel attacks in your application; it is up to you to decide this.
 
 =back
 
@@ -1006,7 +1176,7 @@ instructions how to report security vulnerabilities.
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 AUTHOR
 

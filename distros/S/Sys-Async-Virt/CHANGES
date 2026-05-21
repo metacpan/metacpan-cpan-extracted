@@ -1,5 +1,92 @@
 -----
 
+0.6.3    2026-05-02
+   [Fixed]
+       * cpanfile ExtUtil::MakeMaker -> ExtUtils::MakeMaker
+   [Changed]
+       * Updated libvirt to v12.3.0
+   [Added]
+       * New constants BLOCK_RESIZE_EXTEND, MEMORY_STATS_AVAILABLE
+
+0.6.2    2026-04-01
+   [Changed]
+       * Updated libvirt to v12.2.0
+   [Added]
+       * New constants GET_DOMAIN_CAPABILITIES_EXPAND_CPU_FEATURES,
+         MIGRATE_PARAM_MIGRATE_DISKS_TARGET_ZERO,
+         BLOCK_COPY_TARGET_ZEROED
+
+0.6.1    2026-03-02
+   [Changed]
+       * Updated libvirt to v12.1.0
+   [Added]
+       * STATS_BLOCK_SUFFIX_LATENCY_HISTOGRAM_* constants added from
+         LibVirt v12.1.0
+
+0.6.0    2026-02-01
+   [Changed]
+       * TCP class no longer hard-codes default port (for TLS support)
+       * Connection class read/write methods now have overridable
+         implementations
+       * Restructured code around Future::Selector as part of TLS testing
+   [Fixed]
+       * TCP connection failure not reported
+
+0.5.2    2026-01-31
+   [Fixed]
+       * Errors thrown when Future::IO::Resolver isn't installed
+   [Changed]
+       * Inheritable fields for TLS subclass to access
+       * Workaround added for parent class fields that TLS subclass
+         needs access to
+
+0.5.1    2026-01-31
+   [Fixed]
+       * TCP module missing from distribution (because not added to MANIFEST)
+
+0.5.0    2026-01-31
+   [Added]
+       * Support for TCP connections in preparation of TLS connection support
+
+0.4.0    2026-01-28
+   [Added]
+       * SASL authentication and security layer support
+
+0.3.0    2026-01-25
+   [Added]
+       * Support for all types of migrations
+   [Changed]
+       * Dependency version of Protocol::Sys::Virt
+
+0.2.6    2026-01-15
+   [Changed]
+       * Updated libvirt to v12.0.0 (from v11.10.0)
+   [Added]
+       * Image format parameters SAVE_PARAM_IMAGE_FORMAT_* to be used
+         with the virDomainSaveParams() [$domain->save_params()] call
+   [Fixed]
+       * C<> quoting in Sys::Async::Virt POD
+
+0.2.5    2026-01-11
+   [Fixed]
+       * Failed to rename constructor argument 'id' to 'rpc_id'
+       * Release tarball naming includes 'v' prefix on version number
+
+0.2.4    2026-01-10
+   [Added]
+       * Accessors for name, UUID, MAC, etc
+       * Accessors for related intances: 'pool' on volumes, 'domain' on
+         checkpoints and snapshots, 'network' on ports and 'port' on bindings
+       * Code examples at the top of the CONSTANTS sections
+   [Changed]
+       * Minimum dependency Protocol::Sys::Virt is now 11.10.3
+   [Fixed]
+       * Detection of end-of-stream on transport streams ('connections')
+       * Handling of stream termination for LibVirt streams (e.g. volume
+         upload/download streams)
+       * Process connections ('*+ext://' URI) don't pick up the 'command'
+         query parameter
+
 0.2.3    2026-01-06
    [Fixed]
        * Remove v5.32+ specific syntax

@@ -1,6 +1,30 @@
 BATsh Hoja de referencia [ES] Espanol
 ======================================
 
+----------------------------------------------------------------------
+RESUMEN
+  BATsh es un interprete de shell bilingue que ejecuta sintaxis cmd.exe
+  y bash/sh en el mismo archivo, cambiando de modo linea por linea
+  automaticamente. No requiere shell externo -- implementacion pura Perl.
+
+EJEMPLO MIXTO
+  :: Seccion CMD (primer token en mayusculas)
+  @ECHO OFF
+  SET LANG=BATsh
+
+  # Seccion SH (primer token con minusculas)
+  greet() { echo "Hola $1 (modo bash)"; }
+  greet $LANG
+  result=$(echo $LANG | perl -e 'while(<STDIN>){chomp;print uc}')
+  echo "Mayusculas: $result"
+
+  :: De vuelta en CMD (leer resultado SH)
+  ECHO De vuelta CMD: %result%
+
+  # Ejecucion: perl lib/BATsh.pm script.batsh
+----------------------------------------------------------------------
+
+
 BATsh es un shell bilingue que ejecuta sintaxis de cmd.exe y bash/sh
 en el mismo script. El primer token de cada linea determina el modo.
 
@@ -99,3 +123,21 @@ en el mismo script. El primer token de cada linea determina el modo.
   Sin dependencias de CPAN.
 
 Ver tambien: https://metacpan.org/dist/BATsh
+
+11. Tuberia CMD y modificadores de parametros
+----------------------------------------------
+  cmd1 | cmd2              # Tuberia via archivo temporal (Pure Perl)
+  SET /P VAR=Aviso:        # Leer una linea de STDIN en VAR
+  %~dp0                    # Unidad+directorio de %0 (uso mas comun)
+  %~n1, %~x1, %~nx1       # Nombre de archivo, extension, ambos
+
+12. Funciones SH y expansion de variables
+------------------------------------------
+  f() { echo $1; }         # Definicion de funcion
+  ${var%.*}  ${var%%.*}    # Eliminar sufijo (mas corto/mas largo)
+  ${var#*.}  ${var##*.}    # Eliminar prefijo (mas corto/mas largo)
+  ${var/a/b} ${var//a/b}   # Sustituir (primera/todas)
+  ${var^^} ${var,,}        # Mayusculas/minusculas
+  cmd > f  cmd >> f  2>&1  # Redireccion
+  cmd1 && cmd2             # Y-encadenamiento
+  cmd1 || cmd2             # O-encadenamiento

@@ -2,7 +2,7 @@ package Object::HashBase;
 use strict;
 use warnings;
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 our $HB_VERSION = $VERSION;
 # The next line is for inlining
 # <-- START -->
@@ -38,6 +38,12 @@ BEGIN {
     }
 }
 
+sub _is_role {
+    my $pkg = shift;
+    return 0 unless $INC{'Role/Tiny.pm'};
+    return Role::Tiny->is_role($pkg) ? 1 : 0;
+}
+
 my %SPEC = (
     '^' => {reader => 1, writer => 0, dep_writer => 1, read_only => 0, strip => 1},
     '-' => {reader => 1, writer => 0, dep_writer => 0, read_only => 1, strip => 1},
@@ -63,6 +69,36 @@ sub do_import {
     my $ver = $Object::HashBase::HB_VERSION || $Object::HashBase::VERSION;
     $Object::HashBase::VERSION{$into} = $ver if !$Object::HashBase::VERSION{$into} || $Object::HashBase::VERSION{$into} > $ver;
 
+    my (@parents, @roles, @attrs);
+    for my $arg (@_) {
+        if (defined($arg) && length($arg)) {
+            my $p = substr($arg, 0, 1);
+            if ($p eq '@') {
+                push @parents, substr($arg, 1);
+                next;
+            }
+            if ($p eq '&') {
+                push @roles, substr($arg, 1);
+                next;
+            }
+        }
+        push @attrs, $arg;
+    }
+
+    for my $parent (@parents) {
+        my $pm = $parent;
+        $pm =~ s{::}{/}g;
+        $pm .= '.pm';
+        unless ($INC{$pm}) {
+            local ($@);
+            unless (eval { require $pm; 1 }) {
+                Carp::croak("Could not load parent class '$parent': $@");
+            }
+        }
+        no strict 'refs';
+        push @{"$into\::ISA"}, $parent unless grep { $_ eq $parent } @{"$into\::ISA"};
+    }
+
     my $isa = _isa($into);
     my $attr_list = $Object::HashBase::ATTR_LIST{$into} ||= [];
     my $attr_subs = $Object::HashBase::ATTR_SUBS{$into} ||= {};
@@ -70,9 +106,9 @@ sub do_import {
     my @pre_init;
     my @post_init;
 
-    my $add_new = 1;
+    my $add_new = _is_role($into) ? 0 : 1;
 
-    if (my $have_new = $into->can('new')) {
+    if ($add_new && (my $have_new = $into->can('new'))) {
         my $new_lookup = $Object::HashBase::NEW_LOOKUP //= {};
         $add_new = 0 unless $new_lookup->{$have_new};
     }
@@ -80,7 +116,7 @@ sub do_import {
     my %subs = (
         ($add_new ? ($class->_build_new($into, \@pre_init, \@post_init)) : ()),
         (map %{$Object::HashBase::ATTR_SUBS{$_} || {}}, @{$isa}[1 .. $#$isa]),
-        ($class->args_to_subs($attr_list, $attr_subs, \@_, $into)),
+        ($class->args_to_subs($attr_list, $attr_subs, \@attrs, $into)),
     );
 
     no strict 'refs';
@@ -92,6 +128,56 @@ sub do_import {
             my ($sub, @args) = @$v;
             $sub->(@args);
         }
+    }
+
+    if (@roles) {
+        Carp::croak("Object::HashBase '&' role prefix requires Perl 5.010 or newer (this is $])")
+            if $] < 5.010;
+
+        unless ($INC{'Role/Tiny.pm'}) {
+            local ($@);
+            unless (eval { require Role::Tiny; 1 }) {
+                Carp::croak("Object::HashBase '&' role prefix requires Role::Tiny but it could not be loaded: $@");
+            }
+        }
+
+        unless (Role::Tiny->can('is_role')) {
+            Carp::croak("Object::HashBase '&' role prefix requires Role::Tiny 1.003000 or newer (is_role missing)");
+        }
+
+        for my $role (@roles) {
+            my $pm = $role;
+            $pm =~ s{::}{/}g;
+            $pm .= '.pm';
+
+            unless ($INC{$pm}) {
+                local ($@);
+                unless (eval { require $pm; 1 }) {
+                    Carp::croak("Could not load role '$role': $@");
+                }
+            }
+
+            Carp::croak("'$role' is not a Role::Tiny role")
+                unless Role::Tiny->is_role($role);
+
+            Carp::croak("'$role' does not use Object::HashBase")
+                unless exists $Object::HashBase::VERSION{$role};
+
+            my $role_subs = $Object::HashBase::ATTR_SUBS{$role} || {};
+
+            no strict 'refs';
+            for my $const (keys %$role_subs) {
+                next if defined &{"$into\::$const"};   # keep existing sub, no override, no warn
+                *{"$into\::$const"} = $role_subs->{$const};
+            }
+
+            my $role_attr_list = $Object::HashBase::ATTR_LIST{$role} || [];
+            push @{$Object::HashBase::ROLE_ATTRS{$into} ||= []}, @$role_attr_list;
+        }
+
+        my $key = "Object::HashBase::role_applier::$into";
+        my $applier = $^H{$key} ||= Object::HashBase::_RoleApplier->new($into);
+        $applier->add($_) for @roles;
     }
 }
 
@@ -162,19 +248,18 @@ sub attr_list {
     my $isa = _isa($class);
 
     my %seen;
-    my @list = grep { !$seen{$_}++ } map {
-        my @out;
-
-        if (0.004 > ($Object::HashBase::VERSION{$_} || 0)) {
-            Carp::carp("$_ uses an inlined version of Object::HashBase too old to support attr_list()");
+    my @list;
+    for my $pkg (reverse @$isa) {
+        if (0.004 > ($Object::HashBase::VERSION{$pkg} || 0)) {
+            Carp::carp("$pkg uses an inlined version of Object::HashBase too old to support attr_list()");
+            next;
         }
-        else {
-            my $list = $Object::HashBase::ATTR_LIST{$_};
-            @out = $list ? @$list : ()
+        my $own = $Object::HashBase::ATTR_LIST{$pkg};
+        my $role_attrs = $Object::HashBase::ROLE_ATTRS{$pkg} || [];
+        for my $a (@$role_attrs, ($own ? @$own : ())) {
+            push @list, $a unless $seen{$a}++;
         }
-
-        @out;
-    } reverse @$isa;
+    }
 
     return @list;
 }
@@ -248,6 +333,41 @@ sub _build_new {
     }
 
     return %out;
+}
+
+# _RoleApplier — deferred Role::Tiny composition.
+#
+# Object::HashBase's '&' import prefix copies role constants into the consumer
+# eagerly (so `$self->{+FOO}` resolves at compile time), then defers actual
+# Role::Tiny->apply_roles_to_package to end of consumer's compile scope by
+# storing a blessed object in %^H. Perl destroys %^H entries at end of compile
+# scope, triggering DESTROY here, which finally composes the role(s).
+
+package    # hide from PAUSE indexer
+    Object::HashBase::_RoleApplier;
+
+sub new {
+    my ($class, $into) = @_;
+    return bless { into => $into, roles => [] }, $class;
+}
+
+sub add {
+    my ($self, $role) = @_;
+    push @{$self->{roles}}, $role
+        unless grep { $_ eq $role } @{$self->{roles}};
+}
+
+sub DESTROY {
+    my $self = shift;
+    return unless @{$self->{roles}};
+    local $@;
+    my $ok = eval { Role::Tiny->apply_roles_to_package($self->{into}, @{$self->{roles}}); 1 };
+    unless ($ok) {
+        my $err = $@ || 'unknown error';
+        my $into = $self->{into};
+        my $roles = join(', ', @{$self->{roles}});
+        warn "Object::HashBase: failed to compose role(s) [$roles] into $into: $err";
+    }
 }
 
 1;
@@ -592,6 +712,65 @@ This does not create any methods for you, it just adds the C<FOO> constant.
 This enforces that the getter and setter generated for C<foo> will NOT use
 L<Class::XSAccessor> even if it is installed.
 
+=head1 ISA AND ROLE PREFIXES
+
+Two import prefixes provide shortcuts for declaring parent classes and
+consuming roles.
+
+=head2 PARENT PREFIX: @
+
+    use Object::HashBase qw/@Some::Parent::Class foo bar/;
+
+This loads C<Some::Parent::Class> and pushes it onto C<@ISA>. Equivalent to:
+
+    use parent 'Some::Parent::Class';
+    use Object::HashBase qw/foo bar/;
+
+Multiple parents can be declared:
+
+    use Object::HashBase qw/@Parent::A @Parent::B foo/;
+
+The prefix may be combined freely with attribute declarations in any order;
+parents are processed first regardless of position.
+
+=head2 ROLE PREFIX: &
+
+    use Object::HashBase qw/&Some::Role::Name foo/;
+
+This consumes a L<Role::Tiny> role that itself uses L<Object::HashBase>. The
+role's constants are copied into the consumer immediately so the
+C<< $self->{+FOO} >> pattern resolves at compile time. The actual role
+composition via C<< Role::Tiny->apply_roles_to_package >> is deferred until
+the end of the consumer's compile scope, so the consumer's own methods are
+present when role methods are composed (correct method-modifier and
+required-method semantics).
+
+Requirements:
+
+=over 4
+
+=item *
+
+L<Role::Tiny> 1.003000 or newer must be installed. It is not a hard
+dependency of L<Object::HashBase>; it is loaded on demand when the C<&>
+prefix is used.
+
+=item *
+
+Perl 5.10 or newer. The compile-scope deferral relies on the lexically-scoped
+C<%^H> hints hash, which was made reliable in 5.10.
+
+=item *
+
+The target package must be a Role::Tiny role that itself uses
+L<Object::HashBase>.
+
+=back
+
+If a sub of the same name as a role constant already exists in the consumer
+package, the existing sub is kept and the role constant is not copied. No
+warning is issued.
+
 =head1 SUBCLASSING
 
 You can subclass an existing HashBase class.
@@ -601,6 +780,32 @@ You can subclass an existing HashBase class.
 
 The base class is added to C<@ISA> for you, and all constants from base classes
 are added to subclasses automatically.
+
+=head1 USING IN A ROLE
+
+Object::HashBase can be used inside a L<Role::Tiny> role:
+
+    package My::Role;
+    use Role::Tiny;
+    use Object::HashBase qw/foo -bar/;
+
+    sub greet { "hello " . $_[0]->{+FOO} }
+
+When the package being imported into is a Role::Tiny role, Object::HashBase
+skips injection of C<new()>, C<add_pre_init>, C<add_post_init>,
+C<_pre_init>, and C<_post_init>. Only accessor methods and constants are
+installed.
+
+B<Important:> C<use Role::Tiny;> must appear B<before> C<use Object::HashBase>
+in the role package. Object::HashBase detects the role status of the target
+package at import time; if Role::Tiny has not yet been loaded, the target
+will be treated as a plain class and C<new()> and the init hooks will be
+injected.
+
+Consumers compose the role with the C<&> prefix (recommended) or with a
+direct C<with()> call. The C<&> prefix copies the role's constants into the
+consumer at compile time, which is required for the C<< $self->{+FOO} >>
+pattern in consumer methods to resolve.
 
 =head1 GETTING A LIST OF ATTRIBUTES FOR A CLASS
 
@@ -617,6 +822,10 @@ Either form above will work. This will return a list of attributes defined on
 the object. This list is returned in the attribute definition order, parent
 class attributes are listed before subclass attributes. Duplicate attributes
 will be removed before the list is returned.
+
+Attributes from roles composed via the C<&> prefix are included in the
+returned list, ordered before the consumer's own attributes at the same ISA
+level.
 
 B<Note:> This list is used in the C<< $class->new(\@ARRAY) >> constructor to
 determine the attribute to which each value will be paired.

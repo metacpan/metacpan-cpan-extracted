@@ -45,7 +45,7 @@ CODE:
         app_sv = *app_svp;
 
     if (app_sv) {
-        /* Bind __devtools_list_bindings — static XS callback, no closure */
+        /* Bind __devtools_list_bindings - static XS callback, no closure */
         {
             CV *cb_cv = newXS(NULL, xs_devtools_list_bindings, __FILE__);
             SV *cb_ref = sv_2mortal(newRV_noinc((SV *)cb_cv));
@@ -60,7 +60,7 @@ CODE:
             FREETMPS; LEAVE;
         }
 
-        /* Bind __devtools_reload — closure captures $dt via CvXSUBANY */
+        /* Bind __devtools_reload - closure captures $dt via CvXSUBANY */
         {
             CV *cb_cv = newXS(NULL, xs_devtools_reload_cb, __FILE__);
             CvXSUBANY(cb_cv).any_ptr = (void *)SvREFCNT_inc(self);
@@ -76,7 +76,7 @@ CODE:
             FREETMPS; LEAVE;
         }
 
-        /* Register error handler — closure captures $dt via CvXSUBANY */
+        /* Register error handler - closure captures $dt via CvXSUBANY */
         {
             CV *cb_cv = newXS(NULL, xs_devtools_error_handler, __FILE__);
             CvXSUBANY(cb_cv).any_ptr = (void *)SvREFCNT_inc(self);

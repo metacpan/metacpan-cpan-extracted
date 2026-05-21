@@ -6,7 +6,7 @@ use diagnostics;
 use mro 'c3';
 use English qw(-no_match_vars);
 use Carp qw[carp croak confess cluck longmess shortmess];
-our $VERSION = 35;
+our $VERSION = 36;
 use autodie qw( close );
 use Array::Contains;
 use utf8;
@@ -111,6 +111,35 @@ sub init($self, $username, $password, $clientname, $iscaching) {
     $self->{inlines} = [];
     $self->{firstconnect} = 1;
 
+    # Maximum number of seconds any synchronous request (retrieve, flush, keylist,
+    # clientlist) will wait for a server response before giving up. Without this
+    # cap a hung or silently-dropped server connection turned into an indefinite
+    # client-side hang. Callers can override this after construction.
+    $self->{requesttimeout} = 30;
+
+    # Maximum time to spend trying to drain the outbuffer when the server isn't
+    # reading (kernel send buffer full -> syswrite returns EAGAIN repeatedly).
+    # Tracked in doNetwork() via writefailtime; on expiry the connection is
+    # marked for reconnect. This is the symmetric counterpart of the server's
+    # stalledwritetimeout and is what stops the many "send loop" sites that
+    # otherwise spin forever when the server is alive but not consuming.
+    $self->{stalledwritetimeout} = 30;
+
+    # TCP connect timeout. Without this, a TCP connect to an unreachable host
+    # waits for the kernel SYN-retransmit timeout (~75 s on Linux) before
+    # giving up. Defaulted generously so a transiently-busy server (full
+    # listen backlog, scheduler delays under load) or a slow link doesn't
+    # produce false-positive failures. Unix-domain sockets are not affected —
+    # connect there fails or succeeds immediately.
+    $self->{connecttimeout} = 60;
+
+    # TLS handshake timeout. Implemented via deferred handshake + IO::Select
+    # polling so we don't depend on SIGALRM, which is unsafe in applications
+    # that already use signals or have their own event loop. Defaulted
+    # generously to tolerate slow servers (RSA signing on a small CPU is not
+    # instant) and high-RTT links.
+    $self->{ssltimeout} = 60;
+
     $self->{memcached_compatibility} = 0;
 
     $self->{remembrancenames} = [
@@ -127,17 +156,74 @@ sub init($self, $username, $password, $clientname, $iscaching) {
     return;
 }
 
+sub _safeCloseSocket($self, $socket) {
+    return if(!defined($socket));
+    eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
+        if(ref($socket) =~ /^IO::Socket::SSL/) {
+            $socket->close(SSL_no_shutdown => 1, SSL_fast_shutdown => 1);
+        } else {
+            $socket->close;
+        }
+    };
+    return;
+}
+
+# Perform a TLS handshake with our own deadline, without using SIGALRM.
+# Strategy: put the socket into non-blocking mode up front, defer the handshake
+# at start_SSL (SSL_startHandshake => 0), then drive connect_SSL() ourselves and
+# poll with IO::Select::can_read / can_write between attempts. This is safe in
+# applications that already use signals or have their own event loop.
+#
+# Returns the wrapped socket on success, or undef on timeout / handshake error.
+# On failure, the caller is responsible for closing the original $socket.
+sub _sslHandshakeWithTimeout($self, $socket, $timeout) {
+    $socket->blocking(0);
+    my $wrapped = IO::Socket::SSL->start_SSL($socket,
+                                             SSL_verify_mode => SSL_VERIFY_NONE,
+                                             SSL_startHandshake => 0,
+                                            );
+    if(!$wrapped) {
+        return;
+    }
+
+    my $deadline = time + $timeout;
+    my $select = IO::Select->new($wrapped);
+    while(1) {
+        if($wrapped->connect_SSL) {
+            return $wrapped;
+        }
+        # connect_SSL returned false; figure out why and (maybe) wait for the
+        # right kind of socket readiness.
+        my $remaining = $deadline - time;
+        if($remaining <= 0) {
+            return;
+        }
+        if($SSL_ERROR == SSL_WANT_READ) {
+            $select->can_read($remaining);
+        } elsif($SSL_ERROR == SSL_WANT_WRITE) {
+            $select->can_write($remaining);
+        } else {
+            # Real handshake error (cert mismatch, protocol error, etc.).
+            return;
+        }
+    }
+}
+
 sub reconnect($self) {
-    # Clean up old selector before deleting socket
+    # Tear the old connection down: remove from the selector first (otherwise the
+    # selector keeps the handle alive and the OS FD stays open), then explicitly
+    # close. Without the explicit close, server-side FDs accumulate until the
+    # ping timeout — under reconnect churn the server can run out of FDs.
     if(defined($self->{selector}) && defined($self->{socket})) {
         eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
             $self->{selector}->remove($self->{socket});
         };
     }
+    undef $self->{selector};
     if(defined($self->{socket})) {
+        $self->_safeCloseSocket($self->{socket});
         delete $self->{socket};
     }
-    undef $self->{selector};
 
     if(!$self->{firstconnect}) {
         # Not our first connection (=real reconnect).
@@ -150,10 +236,13 @@ sub reconnect($self) {
 
     my $socket;
     if(defined($self->{server}) && defined($self->{port})) {
+        # Cap TCP connect at $self->{connecttimeout} so an unreachable host
+        # doesn't make us wait for the kernel SYN-retransmit timeout (~75s).
         $socket = IO::Socket::IP->new(
             PeerHost => $self->{server},
             PeerPort => $self->{port},
             Type => SOCK_STREAM,
+            Timeout => $self->{connecttimeout},
         ) or croak("Failed to connect to Clacks TCP message service: $ERRNO");
     } elsif(defined($self->{socketpath})) {
         $socket = IO::Socket::UNIX->new(
@@ -164,21 +253,29 @@ sub reconnect($self) {
         croak("Neither TCP nor Unix domain socket specified. Don't know where to connect to.");
     }
 
-    #binmode($socket, ':bytes');
-    $socket->blocking(0);
-
-
     if(ref $socket ne 'IO::Socket::UNIX') {
         # ONLY USE SSL WHEN RUNNING OVER THE NETWORK
         # There is simply no point in running it over a local socket.
-        IO::Socket::SSL->start_SSL($socket,
-                                   SSL_verify_mode => SSL_VERIFY_NONE,
-                                   ) or croak("Can't use SSL: " . $SSL_ERROR);
+        # Use the non-SIGALRM-based handshake helper so we get a hard deadline
+        # without interfering with the embedding application's signal handling.
+        my $sslsocket = $self->_sslHandshakeWithTimeout($socket, $self->{ssltimeout});
+        if(!defined($sslsocket)) {
+            # Release the underlying TCP FD — otherwise a flapping server /
+            # cert mismatch / handshake hang leaks one FD per reconnect attempt.
+            $self->_safeCloseSocket($socket);
+            croak("Can't use SSL (handshake failed or timed out after $self->{ssltimeout}s): " . $SSL_ERROR);
+        }
+        $socket = $sslsocket;
     }
+
+    # _sslHandshakeWithTimeout already left the TCP+SSL socket non-blocking.
+    # For Unix-domain sockets we still need to set non-blocking explicitly.
+    $socket->blocking(0);
 
     $self->{socket} = $socket;
     $self->{selector} = IO::Select->new($self->{socket});
     $self->{failcount} = 0;
+    $self->{writefailtime} = 0; # Stalled-write streak start; 0 = no streak in progress
     $self->{lastping} = time;
     $self->{inbuffer} = '';
     $self->{incharbuffer} = [];
@@ -262,6 +359,7 @@ sub doNetwork($self, $readtimeout = 0) {
     # elephants stomping about my rubber-padded room are such a distraction...
 
     my $workCount = 0;
+    my $now = time;
 
     if(length($self->{outbuffer})) {
         my $brokenpipe = 0;
@@ -279,12 +377,31 @@ sub doNetwork($self, $readtimeout = 0) {
             return;
         }
 
-        if(defined($written) && $written) {
+        if(defined($written) && $written > 0) {
+            # Forward progress: clear the stalled-write streak.
+            $self->{writefailtime} = 0;
             $workCount += $written;
             if(length($self->{outbuffer}) == $written) {
                 $self->{outbuffer} = '';
             } else {
                 $self->{outbuffer} = substr($self->{outbuffer}, $written);
+            }
+        } else {
+            # No bytes written. Either undef ($! = EAGAIN/EWOULDBLOCK — kernel
+            # send buffer full because the server isn't reading) or a defined-
+            # but-zero return. Start (or continue) the stalled-write streak;
+            # if we go stalledwritetimeout seconds without a single successful
+            # byte while we have data queued, mark the connection for reconnect.
+            # This is the global counterpart to the server-side stall check
+            # and is what stops the various "send loop" call sites
+            # (notify/set/store/...) from spinning forever when the server is
+            # alive but not consuming.
+            if($self->{writefailtime} == 0) {
+                $self->{writefailtime} = $now;
+            } elsif(($now - $self->{writefailtime}) > $self->{stalledwritetimeout}) {
+                $self->{needreconnect} = 1;
+                push @{$self->{inlines}}, "TIMEOUT";
+                return;
             }
         }
     }
@@ -308,9 +425,10 @@ sub doNetwork($self, $readtimeout = 0) {
     my $totalread = 0;
     while(1) {
         my $buf;
+        my $bytes;
         my $readok = 0;
         eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
-            sysread($self->{socket}, $buf, 10_000); # Read in at most 10kB at once
+            $bytes = sysread($self->{socket}, $buf, 10_000); # Read in at most 10kB at once
             $readok = 1;
         };
         if(!$readok) {
@@ -318,12 +436,22 @@ sub doNetwork($self, $readtimeout = 0) {
             push @{$self->{inlines}}, "TIMEOUT";
             return;
         }
-        if(defined($buf) && length($buf)) {
-            $totalread += length($buf);
-            #print STDERR "+ $buf\n--\n";
+        if(defined($bytes) && $bytes == 0) {
+            # sysread returns 0 on EOF — the peer cleanly closed the socket
+            # (FIN received). The previous code ignored the return value and
+            # only relied on the failcount-after-many-empty-reads heuristic
+            # below, which took ~250ms to trigger and was unnecessarily fuzzy.
+            $self->{needreconnect} = 1;
+            push @{$self->{inlines}}, "TIMEOUT";
+            return;
+        }
+        if(defined($bytes) && $bytes > 0) {
+            $totalread += $bytes;
             push @{$self->{incharbuffer}}, split//, $buf;
             next;
         }
+        # $bytes is undef -> $! = EAGAIN/EWOULDBLOCK or a real error.
+        # Falls through to the totalread / failcount check below.
         last;
     }
     
@@ -705,7 +833,15 @@ sub retrieve($self, $varname) {
 
     # Now, wait for the answer
     my $answerline;
+    my $deadline = time + $self->{requesttimeout};
     while(1) {
+        if(time > $deadline) {
+            # Server didn't answer in time — assume the connection is wedged so
+            # the next call reconnects rather than hanging here forever.
+            carp("retrieve($varname) timed out after $self->{requesttimeout}s; marking connection for reconnect");
+            $self->{needreconnect} = 1;
+            return;
+        }
         $self->doNetwork(0.5);
         if($self->{needreconnect}) {
             # Nothing we can do, really...
@@ -875,7 +1011,13 @@ sub keylist($self) {
     # Now, wait for the answer
     my $liststartfound = 0;
     my $listendfound = 0;
+    my $deadline = time + $self->{requesttimeout};
     while(1) {
+        if(time > $deadline) {
+            carp("keylist() timed out after $self->{requesttimeout}s; marking connection for reconnect");
+            $self->{needreconnect} = 1;
+            return;
+        }
         $self->doNetwork(0.5);
         if($self->{needreconnect}) {
             # Nothing we can do, really...
@@ -958,7 +1100,13 @@ sub clientlist($self) {
     # Now, wait for the answer
     my $liststartfound = 0;
     my $listendfound = 0;
+    my $deadline = time + $self->{requesttimeout};
     while(1) {
+        if(time > $deadline) {
+            carp("clientlist() timed out after $self->{requesttimeout}s; marking connection for reconnect");
+            $self->{needreconnect} = 1;
+            return;
+        }
         $self->doNetwork(0.5);
         if($self->{needreconnect}) {
             # Nothing we can do, really...
@@ -1048,7 +1196,13 @@ sub flush($self, $flushid = '') {
 
     # Now, wait for the answer
     my $answerline;
+    my $deadline = time + $self->{requesttimeout};
     while(1) {
+        if(time > $deadline) {
+            carp("flush($flushid) timed out after $self->{requesttimeout}s; marking connection for reconnect");
+            $self->{needreconnect} = 1;
+            return;
+        }
         $self->doNetwork(0.5);
         if($self->{needreconnect}) {
             # Nothing we can do, really...
@@ -1135,7 +1289,17 @@ sub setAndStore($self, $varname, $value, $forcesend = 0) {
 }
 
 sub fastdisconnect($self) {
+    # Mirror reconnect()'s teardown sequence: remove from selector, close, then
+    # delete. The previous "delete only" approach left the FD open whenever the
+    # selector or any other reference still pinned the socket.
+    if(defined($self->{selector}) && defined($self->{socket})) {
+        eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
+            $self->{selector}->remove($self->{socket});
+        };
+    }
+    undef $self->{selector};
     if(defined($self->{socket})) {
+        $self->_safeCloseSocket($self->{socket});
         delete $self->{socket};
     }
     $self->{needreconnect} = 1;
@@ -1165,16 +1329,43 @@ sub disconnect($self) {
     }
     sleep(0.2); # Wait for the OS to flush the socket
 
-    delete $self->{socket};
+    # Tear down properly: deselect, close, delete. Just `delete` left the FD open
+    # whenever IO::Select still held a reference, which is true here because we
+    # never removed it from the selector.
+    if(defined($self->{selector}) && defined($self->{socket})) {
+        eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
+            $self->{selector}->remove($self->{socket});
+        };
+    }
+    undef $self->{selector};
+    if(defined($self->{socket})) {
+        $self->_safeCloseSocket($self->{socket});
+        delete $self->{socket};
+    }
     $self->{needreconnect} = 1;
 
     return;
 }
 
 sub DESTROY($self) {
-    # Try to disconnect cleanly, but socket might already be DESTROYed, so catch any errors
+    # During Perl's global destruction phase, package symbol tables are torn
+    # down in arbitrary order. By the time DESTROY runs here, methods on
+    # IO::Socket::SSL, IO::Select, or even IO::Socket may already be
+    # unavailable. Skip cleanup entirely in that phase — the kernel closes
+    # any leftover FD when the process exits, and the server detects that
+    # as EOF and removes us cleanly. Trying to be "polite" here can stall
+    # exit (flush() waits up to requesttimeout seconds) or call methods on
+    # half-destroyed package state.
+    return if(${^GLOBAL_PHASE} eq 'DESTRUCT');
+
+    # Outside global destruction we do a *fast* close (no flush(), no QUIT,
+    # no sleeps). DESTROY can run at moments where the graceful path is
+    # inappropriate — e.g. a worker child unwinding after fork, an exception
+    # being propagated, a local-block exit. Callers who want a graceful
+    # protocol-level close should call $client->disconnect() explicitly
+    # before dropping their reference; this DESTROY is just the safety net.
     eval { ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
-        $self->disconnect();
+        $self->fastdisconnect();
     };
 
     return;

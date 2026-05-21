@@ -1,7 +1,10 @@
+ChangeLog
 lib/DarkPAN/Utils.pm
 lib/DarkPAN/Utils/Docs.pm
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
+share/README.md
 t/00-darkpan-utils.t
 t/00-darkpan.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

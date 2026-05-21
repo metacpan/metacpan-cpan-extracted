@@ -112,5 +112,6 @@ t/2100-ua-integration.t
 t/2101-ua-async-integration.t
 t/2102-ua-keepalive.t
 t/2103-ua-minimal-compile.t
+t/lib/HypersonicTest.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

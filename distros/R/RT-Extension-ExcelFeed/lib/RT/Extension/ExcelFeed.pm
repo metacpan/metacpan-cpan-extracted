@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package RT::Extension::ExcelFeed;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 =head1 NAME
 
@@ -79,6 +79,17 @@ if ( RT->Config->can('RegisterPluginConfig') ) {
     );
 }
 
+sub WriteExcel {
+    my $class = shift;
+    my $sheet = shift;
+    my $row   = shift;
+    my $col   = shift;
+    my $value = shift;
+
+    my $write_method = $value =~ /^(-|\+|=|\@|")/ ? 'write_string' : 'write';
+    $sheet->$write_method( $row, $col, $value );
+}
+
 =head1 AUTHOR
 
 Best Practical Solutions, LLC E<lt>modules@bestpractical.comE<gt>
@@ -95,7 +106,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2015-2025 by Best Practical Solutions, LLC
+This software is Copyright (c) 2015-2026 by Best Practical Solutions, LLC
 
 This is free software, licensed under:
 

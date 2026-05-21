@@ -4,7 +4,7 @@
       "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "open_source"
    ],
@@ -81,6 +81,6 @@
          "x_repository" : "https://github.com/nigelhorne/Log-Abstraction"
       }
    },
-   "version" : 0.27,
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : 0.28,
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

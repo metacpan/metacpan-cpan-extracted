@@ -1,8 +1,14 @@
 <%init>
-my $new_theme = RT->Config->Get('WebDefaultStylesheet', $session{'CurrentUser'}) =~ /-dark$/ ? 'elevator-light' : 'elevator-dark';
+my $current  = RT->Config->Get('WebDefaultThemeMode', $session{'CurrentUser'}) // 'light';
+my $new_mode = ( $current eq 'dark' ) ? 'light' : 'dark';
 
-my ($ok, $msg) = $session{'CurrentUser'}->SetPreferences( $RT::System => { %{ $session{'CurrentUser'}->Preferences( $RT::System ) || {}}, WebDefaultStylesheet => $new_theme } );
-RT::Logger->error( "$msg" ) unless $ok;
+my ($ok, $msg) = $session{'CurrentUser'}->SetPreferences(
+    $RT::System => {
+        %{ $session{'CurrentUser'}->Preferences($RT::System) || {} },
+        WebDefaultThemeMode => $new_mode,
+    }
+);
+RT::Logger->error($msg) unless $ok;
 
 $m->abort();
 </%init>

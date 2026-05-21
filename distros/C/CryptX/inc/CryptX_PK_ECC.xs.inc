@@ -13,11 +13,13 @@ _new(Class)
         RETVAL->last_pid = (IV)PerlProc_getpid();
         RETVAL->key.type = -1;
         if (RETVAL->pindex == -1) {
+          zeromem(RETVAL, sizeof(*RETVAL));
           Safefree(RETVAL);
           croak("FATAL: find_prng('chacha20') failed");
         }
         rv = rng_make_prng(320, RETVAL->pindex, &RETVAL->pstate, NULL); /* 320bits = 40bytes */
         if (rv != CRYPT_OK) {
+          zeromem(RETVAL, sizeof(*RETVAL));
           Safefree(RETVAL);
           croak("FATAL: rng_make_prng failed: %s", error_to_string(rv));
         }
@@ -300,32 +302,32 @@ export_key_der(Crypt::PK::ECC self, char * type)
         unsigned long int out_len = 4096;
 
         if (self->key.type == -1) croak("FATAL: export_key_der no key");
-        if (strnEQ(type, "private_short", 16)) {
+        if (strEQ(type, "private_short")) {
           rv = ecc_export_openssl(out, &out_len, PK_PRIVATE|PK_CURVEOID, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: ecc_export_openssl(PK_PRIVATE|PK_CURVEOID) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
         }
-        else if (strnEQ(type, "private_compressed", 16)) {
+        else if (strEQ(type, "private_compressed")) {
           rv = ecc_export_openssl(out, &out_len, PK_PRIVATE|PK_CURVEOID|PK_COMPRESSED, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: ecc_export_openssl(PK_PRIVATE|PK_CURVEOID|PK_COMPRESSED) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
         }
-        else if (strnEQ(type, "private", 7)) {
+        else if (strEQ(type, "private")) {
           rv = ecc_export_openssl(out, &out_len, PK_PRIVATE, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: ecc_export_openssl(PK_PRIVATE) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
         }
-        else if (strnEQ(type, "public_compressed", 15)) {
+        else if (strEQ(type, "public_compressed")) {
           rv = ecc_export_openssl(out, &out_len, PK_PUBLIC|PK_CURVEOID|PK_COMPRESSED, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: ecc_export_openssl(PK_PUBLIC|PK_CURVEOID|PK_COMPRESSED) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
         }
-        else if (strnEQ(type, "public_short", 15)) {
+        else if (strEQ(type, "public_short")) {
           rv = ecc_export_openssl(out, &out_len, PK_PUBLIC|PK_CURVEOID, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: ecc_export_openssl(PK_PUBLIC|PK_CURVEOID) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
         }
-        else if (strnEQ(type, "public", 6)) {
+        else if (strEQ(type, "public")) {
           rv = ecc_export_openssl(out, &out_len, PK_PUBLIC, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: ecc_export_openssl(PK_PUBLIC) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
@@ -333,6 +335,7 @@ export_key_der(Crypt::PK::ECC self, char * type)
         else {
           croak("FATAL: export_key_der invalid type '%s'", type);
         }
+        zeromem(out, sizeof(out));
     }
     OUTPUT:
         RETVAL
@@ -345,18 +348,18 @@ export_key_raw(Crypt::PK::ECC self, char * type)
         unsigned char out[4096];
         unsigned long int out_len = sizeof(out);
 
-        if (self->key.type == -1) croak("FATAL: export_key_der no key");
-        if (strnEQ(type, "private", 7)) {
+        if (self->key.type == -1) croak("FATAL: export_key_raw no key");
+        if (strEQ(type, "private")) {
           rv = ecc_get_key(out, &out_len, PK_PRIVATE, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: ecc_get_key(private) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
         }
-        else if (strnEQ(type, "public_compressed", 17)) {
+        else if (strEQ(type, "public_compressed")) {
           rv = ecc_get_key(out, &out_len, PK_PUBLIC|PK_COMPRESSED, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: ecc_get_key(public_compressed) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
         }
-        else if (strnEQ(type, "public", 6)) {
+        else if (strEQ(type, "public")) {
           rv = ecc_get_key(out, &out_len, PK_PUBLIC, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: ecc_get_key(public) failed: %s", error_to_string(rv));
           RETVAL = newSVpvn((char*)out, out_len);
@@ -364,6 +367,7 @@ export_key_raw(Crypt::PK::ECC self, char * type)
         else {
           croak("FATAL: export_key_raw invalid type '%s'", type);
         }
+        zeromem(out, sizeof(out));
     }
     OUTPUT:
         RETVAL
@@ -388,6 +392,7 @@ encrypt(Crypt::PK::ECC self, SV * data, const char * hash_name = "SHA1")
                              hash_id, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: ecc_encrypt_key failed: %s", error_to_string(rv));
         RETVAL = newSVpvn((char*)buffer, buffer_len);
+        zeromem(buffer, sizeof(buffer));
     }
     OUTPUT:
         RETVAL
@@ -405,8 +410,9 @@ decrypt(Crypt::PK::ECC self, SV * data)
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
 
         rv = ecc_decrypt_key(data_ptr, (unsigned long)data_len, buffer, &buffer_len, &self->key);
-        if (rv != CRYPT_OK) croak("FATAL: ecc_decrypt_key_ex failed: %s", error_to_string(rv));
+        if (rv != CRYPT_OK) croak("FATAL: ecc_decrypt_key failed: %s", error_to_string(rv));
         RETVAL = newSVpvn((char*)buffer, buffer_len);
+        zeromem(buffer, sizeof(buffer));
     }
     OUTPUT:
         RETVAL
@@ -420,11 +426,18 @@ sign_hash(Crypt::PK::ECC self, SV * data, const char * hash_name = NULL, const c
         sign_hash_eth        = 4
     CODE:
     {
-        int rv, id, hash_rfc6979_id, r = -1;
+        int rv, id, hash_rfc6979_id;
         unsigned char buffer[1024], tmp[MAXBLOCKSIZE], *data_ptr = NULL;
         unsigned long tmp_len = MAXBLOCKSIZE, buffer_len = 1024;
         STRLEN data_len = 0;
-        ltc_ecc_sig_opts sig_opts = { .prng = &self->pstate, .wprng = self->pindex, .type = LTC_ECCSIG_ANSIX962, .recid = &r, .rfc6979_hash_alg = NULL };
+        ltc_ecc_sig_opts sig_opts;
+
+        sig_opts.type = LTC_ECCSIG_ANSIX962;
+        sig_opts.prng = &self->pstate;
+        sig_opts.wprng = self->pindex;
+        sig_opts.enable_recovery_id = 0;
+        sig_opts.recovery_id = -1;
+        sig_opts.rfc6979_hash_alg = NULL;
 
         /* Handle dual signature modes for backward compatibility: if only 2 params passed, treat second as RFC6979 hash */
         if ((ix == 0 || ix == 3 || ix == 4) && hash_name != NULL && hash_rfc6979_name == NULL) {
@@ -468,6 +481,8 @@ sign_hash(Crypt::PK::ECC self, SV * data, const char * hash_name = NULL, const c
         rv = ecc_sign_hash_v2(data_ptr, (unsigned long)data_len, buffer, &buffer_len, &sig_opts, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: ecc_sign_hash_v2 failed: %s", error_to_string(rv));
         RETVAL = newSVpvn((char*)buffer, buffer_len);
+        zeromem(buffer, sizeof(buffer));
+        zeromem(tmp, sizeof(tmp));
     }
     OUTPUT:
         RETVAL
@@ -481,11 +496,18 @@ verify_hash(Crypt::PK::ECC self, SV * sig, SV * data, const char * hash_name = "
         verify_hash_eth        = 4
     CODE:
     {
-        int rv, stat, id, r = -1;
+        int rv, stat, id;
         unsigned char tmp[MAXBLOCKSIZE], *data_ptr = NULL, *sig_ptr = NULL;
         unsigned long tmp_len = MAXBLOCKSIZE;
         STRLEN data_len = 0, sig_len = 0;
-        ltc_ecc_sig_opts sig_opts = { .prng = &self->pstate, .wprng = self->pindex, .type = LTC_ECCSIG_ANSIX962, .recid = &r, .rfc6979_hash_alg = NULL };
+        ltc_ecc_sig_opts sig_opts;
+
+        sig_opts.type = LTC_ECCSIG_ANSIX962;
+        sig_opts.prng = &self->pstate;
+        sig_opts.wprng = self->pindex;
+        sig_opts.enable_recovery_id = 0;
+        sig_opts.recovery_id = -1;
+        sig_opts.rfc6979_hash_alg = NULL;
 
         data_ptr = (unsigned char *)SvPVbyte(data, data_len);
         sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
@@ -529,6 +551,7 @@ shared_secret(Crypt::PK::ECC self, Crypt::PK::ECC pubkey)
         rv = ecc_shared_secret(&self->key, &pubkey->key, buffer, &buffer_len);
         if (rv != CRYPT_OK) croak("FATAL: ecc_shared_secret failed: %s", error_to_string(rv));
         RETVAL = newSVpvn((char*)buffer, buffer_len);
+        zeromem(buffer, sizeof(buffer));
     }
     OUTPUT:
         RETVAL
@@ -540,13 +563,21 @@ recovery_pub(Crypt::PK::ECC self, SV * sig, SV* hash, SV* recid = NULL)
         recovery_pub_eth     = 2
     CODE:
     {
-        int rv, r = -1;
+        int rv;
         unsigned char *sig_ptr = NULL, *hash_ptr = NULL;
         STRLEN hash_len = 0, sig_len = 0;
-        ltc_ecc_sig_opts sig_opts = { .prng = &self->pstate, .wprng = self->pindex, .type = LTC_ECCSIG_ANSIX962, .recid = &r, .rfc6979_hash_alg = NULL };
+        ltc_ecc_sig_opts sig_opts;
+
+        sig_opts.type = LTC_ECCSIG_ANSIX962;
+        sig_opts.prng = &self->pstate;
+        sig_opts.wprng = self->pindex;
+        sig_opts.enable_recovery_id = 0;
+        sig_opts.recovery_id = -1;
+        sig_opts.rfc6979_hash_alg = NULL;
 
         if (recid != NULL) {
-          r = (int) SvIV(recid);
+          sig_opts.enable_recovery_id = 1;
+          sig_opts.recovery_id = (int) SvIV(recid);
         }
         else if (ix != 2) {
           if (ix == 1) {
@@ -579,4 +610,8 @@ void
 DESTROY(Crypt::PK::ECC self)
     CODE:
         if (self->key.type != -1) { ecc_free(&self->key); self->key.type = -1; }
+        if (self->pindex >= 0 && prng_is_valid(self->pindex) == CRYPT_OK && prng_descriptor[self->pindex].done) {
+          prng_descriptor[self->pindex].done(&self->pstate);
+        }
+        zeromem(self, sizeof(*self));
         Safefree(self);

@@ -3,12 +3,10 @@ use strict;
 use feature 'say';
 use warnings FATAL => 'all';
 use autodie ':all';
-use DDP { output => 'STDOUT', array_max => 10, show_memsize => 1 };
-use Devel::Confess 'color';
 
 package Matplotlib::Simple;
 require 5.010;
-our $VERSION = 0.25;
+our $VERSION = 0.26;
 use Scalar::Util 'looks_like_number';
 use List::Util qw(max sum min);
 use Term::ANSIColor;
@@ -138,11 +136,13 @@ my @plt_methods = (
 #	'xlim','xticks','yticks'
 );
 
-my @arg = ('add', 'cmap', 'data', 'execute', 'fh','ncols', 'plot.type',  'plots', 'plot', 'output.file', 'nrows', 'scale', 'scalex', 'scaley', 'shared.colorbar', 'show', 'twinx');
+my @arg = ('add', 'cmap', 'data', 'execute', 'fh', 'ncol', 'ncols', 'nrow', 'nrows', 'plot.type',  'plots', 'plot', 'output.file', 'scale', 'scalex', 'scaley', 'shared.colorbar', 'show', 'twinx');
 my @cb_arg = (
 'cbdrawedges', # for colarbar: Whether to draw lines at color boundaries
 'cblabel',		# The label on the colorbar's long axis
 'cblocation', # of the colorbar None or {'left', 'right', 'top', 'bottom'}
+'cb_min',
+'cb_max',
 'cborientation', # None or {'vertical', 'horizontal'}
 'cbpad',         # pad : float, default: 0.05 if vertical, 0.15 if horizontal; Fraction of original Axes between colorbar and new image Axes
 'cb_logscale');
@@ -209,6 +209,7 @@ my %opt = (
 	  'logscale',       # if set to > 1, the y-axis will be logarithmic
 	  'orientation',    # {'vertical', 'horizontal'}, default: 'vertical'
 	  'shared.colorbar', # array of 0-based indices for sharing a colorbar
+	  'show.legend'
 	],
 	hist2d_helper => [@cb_arg,
 	  'cb_logscale',
@@ -611,6 +612,10 @@ sub boxplot_helper {
 	  die
 	"$current_sub needs either \"horizontal\" or \"vertical\", not \"$plot->{orientation}\"";
 	}
+	if (ref $plot->{data} eq 'ARRAY') {
+		my $tmp = delete $plot->{data};
+		$plot->{data}{''} = $tmp;
+	}
 	my ( @xticks, @key_order );
 	if ( defined $plot->{'key.order'} ) {
 	  @key_order = @{ $plot->{'key.order'} };
@@ -636,9 +641,13 @@ sub boxplot_helper {
 	}
 	say { $args->{fh} } 'd = []';
 	foreach my $key (@key_order) {
-	  @{ $plot->{data}{$key} } = grep { defined } @{ $plot->{data}{$key} };
-	  say { $args->{fh} } 'd.append(['
-		 . join( ',', @{ $plot->{data}{$key} } ) . '])';
+		@{ $plot->{data}{$key} } = grep { defined } @{ $plot->{data}{$key} };
+		my @non_numeric = grep {!looks_like_number($_)} @{ $plot->{data}{$key} };
+		if (scalar @non_numeric > 0) {
+			p @non_numeric;
+			die "$key has non-numeric values";
+		}
+		say { $args->{fh} } 'd.append([' . join( ',', @{ $plot->{data}{$key} } ) . '])';
 	}
 	say { $args->{fh} } "bp = ax$ax.boxplot(d, patch_artist = True, $options)";
 	if ( defined $plot->{colors} ){ # every hash key should have its own color defined
@@ -759,6 +768,9 @@ sub colored_table_helper {
 		push @options, "$translate{$opt} = $plot->{$opt}";
 	}
 	my $opt = join (',', @options);
+	if (scalar @options > 0) {
+		$opt = ", $opt";
+	}
 	if ($plot->{cb_logscale}) {
 		say {$args->{fh}} "img = ax$ax.imshow(d, cmap='$plot->{cmap}', norm=colors.LogNorm($opt))";
 	} else {
@@ -937,23 +949,23 @@ sub hist_helper {
 	"args must be given as a hash ref, e.g. \"$current_sub({ data => \@blah })\"";
 	}
 	my @reqd_args = (
-		'ax',      # used for multiple plots
-		'fh',      # e.g. $py, $fh, which will be passed by the subroutine
-		'plot',    # args to original function
+		'ax',   # used for multiple plots
+		'fh',   # e.g. $py, $fh, which will be passed by the subroutine
+		'plot', # args to original function
 	);
-	my @undef_args = grep { !defined $args->{$_} } @reqd_args;
-	if ( scalar @undef_args > 0 ) {
-		p @undef_args;
+	my @undef = grep { !defined $args->{$_} } @reqd_args;
+	if ( scalar @undef > 0 ) {
+		p @undef;
 		die 'the above args are necessary, but were not defined.';
 	}
 	my @opt = (@ax_methods, @plt_methods, @fig_methods, @arg, 'ax', @{ $opt{$current_sub} });
 	my $plot      = $args->{plot};
-	my @undef_opt = grep {
+	@undef = grep {
 		my $key = $_;
 		not grep { $_ eq $key } @opt
 	} keys %{$plot};
-	if ( scalar @undef_opt > 0 ) {
-		p @undef_opt;
+	if ( scalar @undef > 0 ) {
+		p @undef;
 		die "The above arguments aren't defined for $plot->{'plot.type'}";
 	}
 	my $options = '';    # these args go to the plt.hist call
@@ -981,7 +993,21 @@ sub hist_helper {
 		}
 		say {$args->{fh}} "ax$args->{ax}.set_$axis" . 'scale("log")';
 	}
+	if (ref $plot->{data} eq 'ARRAY') {
+		my $tmp = delete $plot->{data};
+		$plot->{data}{A} = $tmp;
+	}
+	if (scalar keys %{ $plot->{data} } > 1) {
+		$plot->{'show.legend'} = $plot->{'show.legend'} // 1;
+	} else {
+		$plot->{'show.legend'} = $plot->{'show.legend'} // 0;
+	}
 	foreach my $set ( sort keys %{ $plot->{data} } ) {
+		my @non_numeric = grep {not looks_like_number($_)} @{ $plot->{data}{$set} };
+		if (scalar @non_numeric > 0) {
+			p @non_numeric;
+			die "$set has non-numeric values; which for hist must be numeric";
+		}
 		my $set_options = '';
 		foreach
 		 my $arg ( grep { ref $plot->{$_} eq 'HASH' } ( 'bins', 'color' ) )
@@ -993,12 +1019,12 @@ sub hist_helper {
 				$set_options .= ", $arg = $plot->{$arg}{$set}";
 			}
 		}
-		write_data({
-			data => $plot->{data}{$set},
-			fh   => $args->{fh},
-			name => 'd'
-		});
-		say { $args->{fh} } "ax$args->{ax}.hist(d, alpha = $plot->{alpha}, label = '$set' $options $set_options)";
+		say {$args->{fh}} 'd = [' . join (',', @{ $plot->{data}{$set} }) . ']';
+		if ($plot->{'show.legend'}) {
+			say { $args->{fh} } "ax$args->{ax}.hist(d, alpha = $plot->{alpha}, label = '$set' $options $set_options)";
+		} else {
+			say { $args->{fh} } "ax$args->{ax}.hist(d, alpha = $plot->{alpha} $options $set_options)";
+		}
 	}
 }
 
@@ -1752,6 +1778,10 @@ sub violin_helper {
 		die "$current_sub needs either \"horizontal\" or \"vertical\", not \"$plot->{orientation}\"";
 	}
 	$args->{whiskers} = $args->{whiskers} // 1;    # by default, make whiskers
+	if (ref $plot->{data} eq 'ARRAY') {
+		my $tmp = delete $plot->{data};
+		$plot->{data}{''} = $tmp;
+	}
 	my ( @xticks, @key_order );
 	if ( defined $plot->{'key.order'} ) {
 		@key_order = @{ $plot->{'key.order'} };
@@ -1851,16 +1881,12 @@ sub violin_helper {
 		if ( $plot->{orientation} eq 'vertical' ) {
 			say { $args->{fh} } "ax$ax.plot("
 			  . scalar @xticks . ', '
-			  . ( sum( @{ $plot->{data}{$key} } ) /
-				   scalar @{ $plot->{data}{$key} } )
+			  . ( sum( @{ $plot->{data}{$key} } ) / scalar @{ $plot->{data}{$key} } )
 			  . ', "ro")';    # plot mean point, which is red
 		} else {                # orientation = horizontal
 			say { $args->{fh} } "ax$ax.plot("
-			 . ( sum( @{ $plot->{data}{$key} } ) /
-				   scalar @{ $plot->{data}{$key} } )
-			 . ', '
-			 . scalar @xticks
-			 . ', "ro")';    # plot mean point, which is red
+			 . ( sum( @{ $plot->{data}{$key} } ) / scalar @{ $plot->{data}{$key} } )
+			 . ', ' . scalar @xticks . ', "ro")';    # plot mean point, which is red
 		}
 	}
 	if ( $plot->{orientation} eq 'vertical' ) {
@@ -1976,6 +2002,8 @@ sub print_type {
 	}
    if ($str =~ m/^\w+$/) {
    	return 'single quotes';
+   } elsif ($str =~ m/^\[\h*\-?\d.+\d\h*\]$/) {
+   	return 'no quotes';
    } elsif ($str =~ m/[!@#\$\%^&*\(\)\{\}\[\]\<\>,\/\-\h:;\+=\w]+$/) {
    	return 'single quotes';
    } elsif (($str =~ m/,/) && ($str !~ m/[\]\[]/)) {
@@ -2057,6 +2085,10 @@ sub plt {
 	  say STDERR 'the 2nd group of arguments are not recognized, while the 1st is the defined list';
 	  die "The above args are accepted by \"$current_sub\"";
 	}
+	$args->{nrows} = $args->{nrow} if defined $args->{nrow}; # allow synonyms
+	$args->{ncols} = $args->{ncol} if defined $args->{ncol}; # allow synonyms
+	$args->{nrows} = $args->{nrows} // 1;
+	$args->{ncols} = $args->{ncols} // 1;
 	my $single_plot = 0; # false
 	if ( ( defined $args->{'plot.type'} ) && ( defined $args->{data} ) ) {
 	  $single_plot = 1; # true
@@ -2084,8 +2116,6 @@ sub plt {
 			$args->{$arg} = 1;
 		}
 	}
-	$args->{nrows} = $args->{nrows} // 1;
-	$args->{ncols} = $args->{ncols} // 1;
 	if (   ( $single_plot == 0 )
 	  && ( ( $args->{nrows} * $args->{ncols} ) < scalar @{ $args->{plots} } )
 	)
@@ -2135,6 +2165,9 @@ sub plt {
 	}
 	foreach my $y (@y) {
 		push @py, '(' . join( ',', @{$y} ) . ')';
+	}
+	if ($args->{arr}) {
+		
 	}
 	if ((defined $args->{'shared.colorbar'}) && ($single_plot == 1)) {
 		warn 'There is only 1 plot/subplot, shared colorbars make no sense... deleting';
@@ -2271,10 +2304,9 @@ sub plt {
 				plot => $graph
 			});
 		}
-		delete $plot->{add};
 		my @reqd_keys = (
-			'data',         # data type, of which several are available
-			'plot.type',    # "bar", "barh", "hist", etc.
+			'data',      # data type, of which several are available
+			'plot.type', # "bar", "barh", "hist", etc.
 		);
 		my @undef_keys = grep { !defined $plot->{$_} } @reqd_keys;
 		if ( scalar @undef_keys > 0 ) {
@@ -3335,6 +3367,15 @@ Plot a hash of arrays as a series of histograms
 
 =head3 single, simple plot
 
+as of version 0.26, single arrays can be given to C<hist> instead of a hash, simplifying the call:
+
+ hist({
+     data          => [0..9],
+     'output.file' => '/tmp/hist.arr.svg',
+ });
+
+for slightly more complex data sets, hashes are taken:
+
  use Matplotlib::Simple 'hist';
  
  my @e = generate_normal_dist( 100, 15, 3 * 200 );
@@ -3476,9 +3517,9 @@ which makes the following simple plot:
 <p>
 
 
-Make a 2-D histogram from a hash of arrays
-
 =head2 hist2d
+
+Make a 2-D histogram from a hash of arrays
 
 =head3 single, simple plot
 

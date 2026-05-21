@@ -1,7 +1,11 @@
 package DBIx::Class::Async::Schema;
 
-$DBIx::Class::Async::Schema::VERSION   = '0.65';
-$DBIx::Class::Async::Schema::AUTHORITY = 'cpan:MANWAR';
+use strict;
+use warnings;
+use version;
+
+our $VERSION   = qv('v1.0.3');
+our $AUTHORITY = 'cpan:MANWAR';
 
 =encoding utf8
 
@@ -11,7 +15,7 @@ DBIx::Class::Async::Schema - Non-blocking, worker-pool based Proxy for DBIx::Cla
 
 =head1 VERSION
 
-Version 0.65
+Version v1.0.3
 
 =head1 SYNOPSIS
 
@@ -49,8 +53,6 @@ managed pool of background worker processes.
 
 =cut
 
-use strict;
-use warnings;
 use utf8;
 
 use Carp;

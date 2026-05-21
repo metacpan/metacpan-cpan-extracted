@@ -1,52 +1,59 @@
 Revision history for Qhull
 
+0.08      2026-04-27 14:09:28 EDT
+
+  [BUG FIX]
+
+    * qhull: passing a Qhull::Options object via the qh_opts option
+      was broken.
+
 0.07      2025-02-26 16:22:45-05:00 America/New_York
 
   [BUG FIX]
 
-     * ensure that the filehandle connected to the qhull sub-process'
-       stdin is closed. Workaround for
-       https://github.com/book/System-Command/pull/31
+    * ensure that the filehandle connected to the qhull sub-process'
+      stdin is closed. Workaround for
+      https://github.com/book/System-Command/pull/31
 
 0.06      2024-03-29 17:56:08-04:00 America/New_York
 
   [BUG FIX]
 
-     * incorrect logic failed to load Data::Dump during debug logging.
+    * incorrect logic failed to load Data::Dump during debug logging.
 
 0.05      2024-03-11 10:51:24-04:00 America/New_York
 
   [BUILD]
 
-     * used experimental refaliasing feature, but didn't request it.
+    * used experimental refaliasing feature, but didn't request it.
 
 0.04      2024-03-09 13:35:47-05:00 America/New_York
 
   [TESTS]
 
-     * Yet another attempt to fix tests to use floating point
+    * Yet another attempt to fix tests to use floating point
        comparisons
 
 0.03      2024-03-08 17:26:33-05:00 America/New_York
 
   [TESTS]
 
-     * use floating point comparison (++SREZIC)
+    * use floating point comparison (++SREZIC)
 
 0.02      2024-03-07 22:13:57-05:00 America/New_York
 
   [BUG FIX]
 
-     * ensure that the qhull executable is finished before reading its
+    * ensure that the qhull executable is finished before reading its
        output file
 
   [ENHANCEMENT]
 
-     * Support for size (area and volume) output format (FS)
+    * Support for size (area and volume) output format (FS)
 
   [TESTS]
 
-     * end-to-end call out to qhull executable
+    * end-to-end call out to qhull executable
 
 0.01      2024-03-05 15:37:02-05:00 America/New_York
 

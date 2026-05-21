@@ -291,7 +291,7 @@ CODE:
             STRLEN plen = SvCUR(path_sv);
             (void)hv_store(files_hv, path, (I32)plen, newSVnv((NV)st.st_mtime), 0);
         } else if (S_ISDIR(st.st_mode)) {
-            /* Recursive C directory walk — no File::Find / eval_pv */
+            /* Recursive C directory walk - no File::Find / eval_pv */
             _hotreload_scan_recursive(aTHX_ path, files_hv);
         }
     }

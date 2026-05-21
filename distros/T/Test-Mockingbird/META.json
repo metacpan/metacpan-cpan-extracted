@@ -40,6 +40,7 @@
       "test" : {
          "requires" : {
             "Class::Simple" : "0",
+            "Readonly" : "0",
             "Test::DescribeMe" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
@@ -63,6 +64,6 @@
          "x_repository" : "https://github.com/nigelhorne/Test-Mockingbird"
       }
    },
-   "version" : "0.08",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

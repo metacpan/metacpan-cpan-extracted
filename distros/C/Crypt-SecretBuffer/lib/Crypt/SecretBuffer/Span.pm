@@ -1,7 +1,7 @@
 package Crypt::SecretBuffer::Span;
 # VERSION
 # ABSTRACT: Reference a span of bytes within a SecretBuffer
-$Crypt::SecretBuffer::Span::VERSION = '0.023';
+$Crypt::SecretBuffer::Span::VERSION = '0.024';
 use strict;
 use warnings;
 use Crypt::SecretBuffer; # loads XS methods into this package
@@ -275,8 +275,7 @@ Return a boolean of whether $pattern matches ending at the end of the Span.
   $span= $span->scan($pattern, $flags=0);
 
 Look for the first occurrence of a pattern in this Span.  Return a new Span describing where it
-was found, or undef if not found.  The current Span is unchanged.  This is I<not> a
-constant-time operation but can be made pretty close to one with the C<MATCH_CONST_TIME> flag.
+was found, or undef if not found.  The current Span is unchanged.
 See L<Crypt::SecretBuffer/Match Flags> for the list of flags.
 
 =head2 copy
@@ -312,22 +311,24 @@ bytes of UTF-8 rather than perl wide characters.
 
   $cmp= $span->memcmp($other_thing);
 
-Compare contents of the span byte-by-byte to another Span (or SecretBuffer, or plain scalar) in
-the same manner as the C function C<memcmp> but in constant time. (iterating the full length of
-the shortest string to prevent timing attacks)
+Compare contents of the span byte-by-byte to another Span (or SecretBuffer, or plain scalar).
+See L<Crypt::SecretBuffer/memcmp>.
 
 =head2 cmp
 
   $cmp= $span->cmp($other_thing);
 
 Iterate codepoints of this Span and compare each numerically to the codepoints of another Span
-(or SecretBuffer, or plain scalar).  This iterates the full length of the shortest string to
-prevent timing attacks.  This method is also used as the overloaded 'cmp' operator.
+(or SecretBuffer, or plain scalar).  Like C<memcmp>, since version 0.019 this iterates the full
+length of the shortest string to help mitigate side-channel timing attacks, but there are better
+constant-time algorithms available and you are responsible for deciding whether this
+implementation is sufficient to prevent side-channel attacks in your application.
+This method is also used as the overloaded 'cmp' operator.
 This is B<not> a locale-aware comparison.
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 AUTHOR
 

@@ -176,6 +176,8 @@ EOF
 	# Check deep merge
 	ok(ref $result->{database} eq 'HASH', 'database is a hash');
 	is($result->{database}{host}, 'child_host', 'child overrides database.host');
+	ok(exists($result->{database}));
+	ok(exists($result->{database}{port}));
 	is($result->{database}{port}, 5432, 'child inherits database.port from parent');
 	is($result->{database}{name}, 'child_db', 'child overrides database.name');
 }

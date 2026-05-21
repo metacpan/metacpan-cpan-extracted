@@ -4,10 +4,10 @@ NAME
 DESCRIPTION
     MISP <https://www.misp-project.org/> is a platform for sharing threat
     intelligence among security teams, and this extension provides
-    integration from "https://bestpractical.com/rtir" in RTIR.
+    integration from RTIR <https://bestpractical.com/rtir>.
 
 RTIR VERSION
-    Works with RTIR 5.0
+    Works with RTIR 6.0
 
 INSTALLATION
     perl Makefile.PL
@@ -15,10 +15,7 @@ INSTALLATION
     make install
         May need root permissions
 
-    Patch RTIR for versions prior to 5.0.2
-            patch -p1 -d /opt/rt5/local/plugins/RT-IR < patches/Add-callbacks-to-the-feed-listing-and-display-pages.patch
-
-    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+    Edit your /opt/rt6/etc/RT_SiteConfig.pm
         Add this line:
 
             Plugin('RTIR::Extension::MISP');
@@ -33,7 +30,7 @@ INSTALLATION
         in case changes need to be made to your database.
 
     Clear your mason cache
-            rm -rf /opt/rt4/var/mason_data/obj
+            rm -rf /opt/rt6/var/mason_data/obj
 
     Restart your webserver
 
@@ -54,20 +51,36 @@ CONFIGURATION
         );
 
   MISP Custom Fields
-    If you want to display the MISP ID custom fields in a separate portlet
-    on the incident page, you can customize your custom field portlets with
-    something like this:
+    This extension ships a MISP custom field grouping in etc/MISP_Config.pm
+    which is picked up automatically for file-based installs. If your
+    installation has edited %CustomFieldGroupings via the RT database (Admin
+    > Tools > Configuration), the database value takes precedence over
+    file-based config and the MISP grouping must be added manually by
+    merging the following into your existing CustomFieldGroupings setting:
 
-        Set(%CustomFieldGroupings,
-            'RTIR::Ticket' => [
-                'Networking'     => ['IP', 'Domain'],
-                'Details' => ['How Reported','Reporter Type','Customer',
-                              'Description', 'Resolution', 'Function', 'Classification',
-                              'Customer',
-                              'Netmask','Port','Where Blocked'],
-                'MISP IDs'     => ['MISP Event ID', 'MISP Event UUID'],  # Add/remove CFs as needed
-            ],
-        );
+        {
+            "RT::Ticket": {
+                "Incidents": [
+                    "MISP",
+                    ["MISP Event ID", "MISP Event UUID", "MISP RTIR Object ID"]
+                ]
+            }
+        }
+
+  Page Layouts
+    Since this extension integrates with RTIR, which defines its own page
+    layouts, the MISP page components must be added manually via Admin >
+    Page Layouts to avoid overwriting existing layouts.
+
+    Ticket Create (Incidents)
+        Add CustomFieldCustomGroupings:MISP (or the default CustomFields
+        grouping) so that the MISP Event ID and UUID are set when creating a
+        ticket from the External Feeds page.
+
+    Ticket Display (Incidents)
+        Add CustomFieldCustomGroupings:MISP (or CustomFields) to show the
+        MISP custom fields on the incident, and MISPEventDetails to display
+        the MISP event details widget.
 
 DETAILS
     This integration adds several different ways to work between the MISP
@@ -81,10 +94,12 @@ DETAILS
     the "Create new ticket" button to create a ticket with information from
     the MISP event.
 
-  MISP Portlet on Incident Display
-    On the Incident Display page, if the custom field MISP Event ID has a
-    value, a portlet MISP Event Details will be displayed, showing details
-    pulled in from the event via the MISP REST API.
+  MISP Event Details Widget
+    This extension provides a MISPEventDetails page layout widget for RT 6.
+    When the MISP Event ID custom field has a value, the widget displays
+    event details fetched from the MISP REST API including threat level,
+    analysis status, creator org, and attribute counts. See "Page Layouts"
+    above for instructions on adding it to your Incidents Display layout.
 
   Update MISP Event
     On an incident with a MISP Event ID, the Actions menu will have an
@@ -97,7 +112,29 @@ DETAILS
     option to "Create MISP Event". Select this to create an event in MISP
     with details from the incident ticket.
 
-  
+  Customizing MISP Sync with Callbacks
+    When creating or updating a MISP event, this extension fires two Mason
+    callbacks that allow you to customize the data sent to and received from
+    MISP without modifying the extension itself. This can be used to push
+    additional indicators (domains, hashes, URLs from custom CFs), add
+    taxonomy tags, perform data mappings, or take action based on the result
+    of the sync.
+
+    BeforeMISPSync
+        Fires before the MISP event is created or updated. Receives $Ticket,
+        $Actions, and $ARGSRef.
+
+    AfterMISPSync
+        Fires after the MISP event is created or updated. Receives $Ticket,
+        $Actions, $ARGSRef, $OK (1 on success, 0 on failure), and $Msg (the
+        result message). The MISP Event ID is available on the ticket via
+        $Ticket->FirstCustomFieldValue('MISP Event ID').
+
+    Callback files should be placed at:
+
+        html/Callbacks/<YourPlugin>/RTIR/Incident/Display.html/ProcessArguments/BeforeMISPSync
+        html/Callbacks/<YourPlugin>/RTIR/Incident/Display.html/ProcessArguments/AfterMISPSync
+
 AUTHOR
     Best Practical Solutions, LLC <modules@bestpractical.com>
 

@@ -3,7 +3,7 @@ package Developer::Dashboard::SKILLS;
 use strict;
 use warnings;
 
-our $VERSION = '3.14';
+our $VERSION = '3.90';
 
 1;
 
@@ -56,6 +56,17 @@ C</app/E<lt>repo-nameE<gt>/E<lt>idE<gt>>
 
 =item *
 
+skill-local saved Ajax handlers rendered from
+C</ajax/E<lt>repo-nameE<gt>/...>
+
+=item *
+
+skill-local public assets rendered from
+C</js/E<lt>repo-nameE<gt>/...>, C</css/E<lt>repo-nameE<gt>/...>, and
+C</others/E<lt>repo-nameE<gt>/...>
+
+=item *
+
 collectors and indicator definitions in skill-local C<config/config.json>
 that join the managed fleet under repo-qualified names
 
@@ -99,7 +110,9 @@ already exists. Bare C<dashboard skills install> reads that root F<ddfile>
 and reinstalls every listed source, which gives operators one update command
 for all registered skills. Install prints a progress rundown before long work
 starts and defaults to a table summary with each skill's F<.env> C<VERSION>
-before and after the install; pass C<-o json> for the raw result payload.
+before and after the install; first-time installs from that root F<ddfile>
+still report C<installed> even when the skill ships no F<.env> C<VERSION>
+metadata. Pass C<-o json> for the raw result payload.
 C<dashboard skill> is only a singular alias for the
 skills management command family; installed commands still use the dotted
 C<dashboard E<lt>skillE<gt>.E<lt>commandE<gt>> form. If the home runtime
@@ -130,6 +143,8 @@ Open its bookmark:
 
   /app/example-skill
   /app/example-skill/welcome
+  /ajax/example-skill/status?type=text
+  /js/example-skill/app.js
 
 =head1 LAYOUT
 
@@ -183,6 +198,50 @@ layer instead of treating the home skill tree as the only skill-docker source.
 
 Bookmark instruction files shipped by the skill, including
 C<dashboards/index> for C</app/E<lt>repo-nameE<gt>>.
+
+Top-level skill routes are:
+
+=over 4
+
+=item *
+
+C</app/E<lt>repo-nameE<gt>> and C</app/E<lt>repo-nameE<gt>/E<lt>pageE<gt>>
+
+=item *
+
+C</ajax/E<lt>repo-nameE<gt>/E<lt>fileE<gt>>
+
+=item *
+
+C</js/E<lt>repo-nameE<gt>/E<lt>fileE<gt>>,
+C</css/E<lt>repo-nameE<gt>/E<lt>fileE<gt>>, and
+C</others/E<lt>repo-nameE<gt>/E<lt>fileE<gt>>
+
+=back
+
+Nested child skills under C<skills/E<lt>sub-skillE<gt>/> extend those same
+prefixes, for example
+C</app/E<lt>repo-nameE<gt>/E<lt>sub-skillE<gt>>,
+C</ajax/E<lt>repo-nameE<gt>/E<lt>sub-skillE<gt>/E<lt>fileE<gt>>, and
+C</js/E<lt>repo-nameE<gt>/E<lt>sub-skillE<gt>/E<lt>fileE<gt>>.
+
+Developer Dashboard resolves the longest installed skill prefix first and, if
+the skill-local ajax or public asset file does not exist, falls back to the
+normal nested saved-bookmark file path instead of assuming the leading path
+segments must always belong to a skill.
+
+Optional C<config/routes.json> metadata can also publish canonical custom
+paths for skill-local C<dashboards/> pages, C<dashboards/ajax/*> handlers, and
+C<dashboards/public/*> assets. The schema is a JSON object whose keys are the
+public custom paths and whose values are either one smart local route string
+such as C</ajax/status> or an object with C<to> plus an optional C<type>. When
+this metadata exists, skill pages emit the declared canonical custom Ajax path
+instead of the default C</ajax/E<lt>repo-nameE<gt>/...> url. The smart
+longest-prefix C</app/...>, C</ajax/...>, C</js/...>, C</css/...>, and
+C</others/...> routes still stay the parent resolvers, custom paths are
+fallback-only after smart route lookup misses, and a total miss still returns
+the normal C<404>. Ajax custom routes default to C<json> unless an explicit
+C<type> such as C<html>, C<text>, or a raw mime type string is supplied.
 
 =item B<dashboards/nav/>
 

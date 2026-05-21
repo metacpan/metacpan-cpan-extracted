@@ -82,7 +82,7 @@ static int  deliver_result(ev_pg_t *self, PGresult *res);
 static void process_results(ev_pg_t *self);
 static void check_flush(ev_pg_t *self);
 static void emit_error(ev_pg_t *self, const char *msg);
-static void cleanup_connection(ev_pg_t *self);
+static int  cleanup_connection(ev_pg_t *self);
 static HV*  build_error_fields(PGresult *res);
 static HV*  build_result_meta(PGresult *res);
 static void cancel_pending(ev_pg_t *self, const char *errmsg);
@@ -239,6 +239,7 @@ static void cleanup_cancel(ev_pg_t *self) {
         ENTER;
         SAVETMPS;
         PUSHMARK(SP);
+        XPUSHs(&PL_sv_undef);
         XPUSHs(sv_2mortal(newSVpv("connection closed", 0)));
         PUTBACK;
         CALL_SV_GUARDED(cb, "cancel_async cleanup");
@@ -296,7 +297,7 @@ static void cancel_poll_cb(EV_P_ ev_io *w, int revents) {
             ENTER;
             SAVETMPS;
             PUSHMARK(SP);
-            /* success: no args (Perl sees ($err) = @_ → $err = undef) */
+            XPUSHs(sv_2mortal(newSViv(1)));
             PUTBACK;
             CALL_SV_GUARDED(cb, "cancel_async callback");
             FREETMPS;
@@ -318,6 +319,7 @@ static void cancel_poll_cb(EV_P_ ev_io *w, int revents) {
             ENTER;
             SAVETMPS;
             PUSHMARK(SP);
+            XPUSHs(&PL_sv_undef);
             XPUSHs(sv_2mortal(errsv));
             PUTBACK;
             CALL_SV_GUARDED(cb, "cancel_async callback");
@@ -823,7 +825,7 @@ static int handle_conn_loss(ev_pg_t *self) {
     if (check_destroyed(self)) return 1;
     /* If on_error called reset/finish, conn has already changed */
     if (self->conn == old_conn) {
-        cleanup_connection(self);
+        if (cleanup_connection(self)) return check_destroyed(self);
         cancel_pending(self, "connection lost");
     }
     return check_destroyed(self);
@@ -935,6 +937,10 @@ static void reinit_io_watchers(ev_pg_t *self) {
     stop_reading(self);
     stop_writing(self);
 
+    /* notice_receiver firing during the prior PQconnectPoll could have
+     * triggered finish() in user code, nulling self->conn */
+    if (NULL == self->conn) { self->fd = -1; return; }
+
     self->fd = PQsocket(self->conn);
     if (self->fd < 0) return;
 
@@ -1016,7 +1022,7 @@ static void connect_poll_cb(EV_P_ ev_io *w, int revents) {
         if (self->magic != EV_PG_MAGIC) break;
         /* If on_error called reset, conn has already changed */
         if (self->conn == old_conn) {
-            cleanup_connection(self);
+            if (cleanup_connection(self)) break;
             cancel_pending(self, "connection failed");
         }
         break;
@@ -1031,8 +1037,12 @@ out:
     check_destroyed(self);
 }
 
-static void cleanup_connection(ev_pg_t *self) {
+/* Returns 1 if self was destroyed during cleanup (cancel callback
+ * dropped the last ref).  Callers must then check_destroyed and bail
+ * out without further use of self. */
+static int cleanup_connection(ev_pg_t *self) {
     PGconn *conn;
+    int outer_depth;
 
     stop_reading(self);
     stop_writing(self);
@@ -1041,7 +1051,17 @@ static void cleanup_connection(ev_pg_t *self) {
     self->copy_mode = 0;
     self->draining_single_row = 0;
     self->draining_copy = 0;
+
+    /* CLEANUP_CANCEL fires the user's cancel callback (if any).  If
+     * that callback drops the last $pg ref, DESTROY runs synchronously
+     * and would Safefree(self) at depth 0 — leaving the rest of this
+     * function reading freed memory.  Bump callback_depth across it so
+     * DESTROY defers the free until our caller's check_destroyed. */
+    outer_depth = self->callback_depth;
+    self->callback_depth++;
     CLEANUP_CANCEL(self);
+    self->callback_depth--;
+    if (self->magic != EV_PG_MAGIC) return 1;
 
     if (self->pending_result) {
         PQclear(self->pending_result);
@@ -1051,6 +1071,9 @@ static void cleanup_connection(ev_pg_t *self) {
         PQclear(self->meta_res);
         self->meta_res = NULL;
     }
+    /* meta_res is gone — drop the lazily-built cache too, otherwise
+     * result_meta would keep returning the previous connection's data */
+    RELEASE_LAST_HV(self->last_result_meta);
 
     if (self->trace_fp) {
         if (self->conn) PQuntrace(self->conn);
@@ -1062,7 +1085,7 @@ static void cleanup_connection(ev_pg_t *self) {
     self->conn = NULL;
     self->skip_results = 0;
     if (conn) {
-        if (self->callback_depth > 0) {
+        if (outer_depth > 0) {
             /* Defer PQfinish — we may be inside libpq (e.g. notice_receiver) */
             if (self->conn_to_finish)
                 PQfinish(self->conn_to_finish);
@@ -1071,6 +1094,7 @@ static void cleanup_connection(ev_pg_t *self) {
             PQfinish(conn);
         }
     }
+    return 0;
 }
 
 static void cancel_pending(ev_pg_t *self, const char *errmsg) {
@@ -1332,8 +1356,17 @@ static const char** marshal_params(AV *params, int nparams,
         SV **svp = av_fetch(params, i, 0);
         if (svp) {
             SvGETMAGIC(*svp);
-            if (SvOK(*svp))
-                pv[i] = SvPV_nolen(*svp);
+            if (SvOK(*svp)) {
+                STRLEN len;
+                const char *s = SvPV(*svp, len);
+                if (memchr(s, '\0', len)) {
+                    if (pv != stack_buf) Safefree(pv);
+                    croak("parameter %d contains NUL byte; "
+                          "text-format params cannot contain NULs "
+                          "(use escape_bytea for binary data)", i);
+                }
+                pv[i] = s;
+            }
         }
     }
 
@@ -1359,7 +1392,6 @@ CODE:
 #ifdef LIBPQ_HAS_ASYNC_CANCEL
     RETVAL->cancel_fd = -1;
 #endif
-    /* cb_head/cb_tail already NULL from Newxz */
 }
 OUTPUT:
     RETVAL
@@ -1390,7 +1422,7 @@ CODE:
         }
         if (self->conn) PQfinish(self->conn);
         if (self->conn_to_finish) PQfinish(self->conn_to_finish);
-        if (NULL != self->conninfo) Safefree(self->conninfo);
+        Safefree(self->conninfo);
         RELEASE_HANDLER(self->on_connect);
         RELEASE_HANDLER(self->on_error);
         RELEASE_HANDLER(self->on_notify);
@@ -1441,11 +1473,8 @@ CODE:
     RELEASE_HANDLER(self->on_drain);
     RELEASE_LAST_HV(self->last_error_fields);
     RELEASE_LAST_HV(self->last_result_meta);
-    if (self->trace_fp) { fclose(self->trace_fp); self->trace_fp = NULL; }
-    if (NULL != self->conninfo) {
-        Safefree(self->conninfo);
-        self->conninfo = NULL;
-    }
+    if (self->trace_fp) fclose(self->trace_fp);
+    Safefree(self->conninfo);
 
     if (self->callback_depth == 0)
         Safefree(self);
@@ -1460,7 +1489,7 @@ CODE:
         croak("already connected");
     }
 
-    if (NULL != self->conninfo) Safefree(self->conninfo);
+    Safefree(self->conninfo);
     self->conninfo = savepv(conninfo);
 
     begin_connect(self, conninfo, "connection");
@@ -1492,20 +1521,20 @@ CODE:
     keywords[i] = NULL;
     values[i] = NULL;
 
-    if (NULL != self->conninfo) Safefree(self->conninfo);
-    self->conninfo = NULL;
-
     self->conn = PQconnectStartParams(keywords, values, expand_dbname);
     Safefree(keywords);
     Safefree(values);
     setup_new_conn(self, "connection");
 
-    /* store conninfo for reset — reconstruct from live connection */
+    /* store conninfo for reset — reconstruct from live connection.
+     * Replace the old conninfo only after the new one is in hand, so
+     * an OOM in PQconninfo doesn't strand the user with no reset path. */
     {
         PQconninfoOption *opts = PQconninfo(self->conn);
         if (opts) {
             SV *buf = newSVpvs("");
             PQconninfoOption *o;
+            char *new_conninfo;
             for (o = opts; o->keyword; o++) {
                 if (o->val && o->val[0]) {
                     if (SvCUR(buf) > 0) sv_catpvs(buf, " ");
@@ -1526,9 +1555,13 @@ CODE:
                 }
             }
             PQconninfoFree(opts);
-            self->conninfo = savepv(SvPV_nolen(buf));
+            new_conninfo = savepv(SvPV_nolen(buf));
             SvREFCNT_dec(buf);
+            Safefree(self->conninfo);
+            self->conninfo = new_conninfo;
         }
+        /* If PQconninfo returned NULL (OOM), keep the previous conninfo
+         * so reset() still works.  reset() uses the same parameters. */
     }
 }
 
@@ -1550,7 +1583,10 @@ CODE:
     }
     /* If a cancel callback already called reset, conn has changed */
     if (self->conn == old_conn) {
-        cleanup_connection(self);
+        if (cleanup_connection(self)) {
+            check_destroyed(self);
+            return;
+        }
         /* Drain any callbacks re-enqueued during cancel_pending;
          * conn is NULL now so retries will croak "not connected" */
         if (self->cb_head) {
@@ -1573,7 +1609,10 @@ CODE:
         check_destroyed(self);
         return;
     }
-    cleanup_connection(self);
+    if (cleanup_connection(self)) {
+        check_destroyed(self);
+        return;
+    }
     /* Drain any callbacks re-enqueued during cancel_pending */
     if (self->cb_head) {
         cancel_pending(self, "connection finished");

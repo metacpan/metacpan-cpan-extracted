@@ -28,7 +28,7 @@
 
 	our @EXPORT = qw(new Open $VERSION);
 
-	our $VERSION = "2023.284.1";
+	our $VERSION = "2026.129.1";
 
 	our @EXPORT_OK = @EXPORT;
 
@@ -75,8 +75,9 @@ sub Open()
 
 	## sets the dsnam here
 	$self->{sql_simple}->{argv}{dbfile} = $self->{sql_simple}->{argv}{db}.".db" if (!defined($self->{sql_simple}->{argv}{dbfile}) || $self->{sql_simple}->{argv}{dbfile} eq "");
-	$self->{sql_simple}->{argv}{dsname} = "DBI:SQLite:dbname=$self->{sql_simple}->{argv}{dbfile}";
 
+	## sets the connector here
+	$self->{sql_simple}->{argv}{dsname} = "DBI:SQLite:dbname=".$self->{sql_simple}->{argv}{dbfile};
 	return 0;
 }
 

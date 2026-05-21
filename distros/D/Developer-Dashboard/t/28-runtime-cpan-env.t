@@ -59,7 +59,7 @@ my $parent_lib_dir = File::Spec->catdir( $parent_root, 'local', 'lib', 'perl5' )
     local $ENV{PERL5LIB} = 'alpha:beta';
     my %env = $runtime->_saved_ajax_env(
         path   => '/tmp/example.pl',
-        page   => 'sql-dashboard',
+        page   => 'index',
         type   => 'json',
         params => { one => 1 },
     );
@@ -71,7 +71,7 @@ make_path($lib_dir);
     local $ENV{PERL5LIB} = 'alpha:beta';
     my %env = $runtime->_saved_ajax_env(
         path   => '/tmp/example.pl',
-        page   => 'sql-dashboard',
+        page   => 'index',
         type   => 'json',
         params => { one => 1 },
     );
@@ -87,7 +87,7 @@ make_path($parent_lib_dir);
     local $ENV{PERL5LIB} = 'alpha:beta';
     my %env = $runtime->_saved_ajax_env(
         path   => '/tmp/example.pl',
-        page   => 'sql-dashboard',
+        page   => 'index',
         type   => 'json',
         params => { one => 1 },
     );
@@ -107,7 +107,7 @@ make_path($parent_lib_dir);
     local $ENV{PERL5LIB} = join( ':', $lib_dir, $parent_lib_dir, 'alpha' );
     my %env = $runtime->_saved_ajax_env(
         path   => '/tmp/example.pl',
-        page   => 'sql-dashboard',
+        page   => 'index',
         type   => 'json',
         params => { one => 1 },
     );

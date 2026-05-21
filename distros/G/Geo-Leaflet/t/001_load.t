@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use Test::More tests => 11;
 BEGIN { use_ok('Geo::Leaflet') };
-BEGIN { use_ok('Geo::Leaflet::tileLayer') };
+BEGIN { use_ok('Geo::Leaflet::TileLayer') };
 
 my $map = Geo::Leaflet->new;
 isa_ok($map, 'Geo::Leaflet');
@@ -16,4 +16,4 @@ is($map->zoom, 4.5, 'zoom');
 can_ok($map, 'setView');
 isa_ok($map->setView, 'Geo::Leaflet');
 
-isa_ok($map->tileLayer, 'Geo::Leaflet::tileLayer');
+isa_ok($map->tileLayer, 'Geo::Leaflet::TileLayer');

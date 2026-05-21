@@ -1,5 +1,10 @@
 Revision history for perl module Net::RDAP:
 
+0.42 - 2026-05-07
+  - use File::XDG to get the user's cache directory instead of using /tmp. Thanks
+	  to Dan Church (@h3xx) for reporting this issue, and Olaf Alders (@oalders)
+		for suggesting File::XDG as the solution.
+
 0.41 - 2026-01-27
   - add support for the ttl0 extension.
 

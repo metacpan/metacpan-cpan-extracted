@@ -1,13 +1,49 @@
 Revision history for XML-PP
 
+0.08	Mon Apr 27 19:55:33 EDT 2026
+
+	- Fixed parse() returning a non-empty hashref instead of {} for inputs
+          that contain only whitespace, only an XML declaration, or only comments;
+          the empty-string guard now re-checks after preprocessing strips those
+          constructs rather than only checking the raw input
+        - Fixed _parse_node attribute-value regex not matching newlines inside
+          quoted attribute values; added /s flag so .*? crosses line boundaries
+        - Fixed _parse_node only capturing text content before the first child
+          element; mixed content with text between sibling elements (e.g.
+          <p>Hello<br/>World</p>) was silently lost; the text-capture step is now
+          inside the child-parsing loop so it runs between every pair of siblings
+        - Fixed collapse_structure producing { "" => {} } with an uninitialised-
+          value warning when the input node has no name key; the entry guard now
+          checks defined $node->{name} before proceeding
+        - Fixed _parse_node silently ignoring missing and mismatched closing tags
+          even in strict mode; the closing-tag substitution result is now checked
+          and routes through _handle_error, so strict mode dies and warn_on_error
+          mode warns as expected
+        - Fixed unreachable self-closing tag guard in _parse_node: the check ran
+          before $self_close was set, so it could never fire; moved to after the
+          attr_string strip block that actually sets the flag
+        - Fixed inverted condition in self-closing tag guard: previously errored
+          when no closing tag was present (the valid case); now correctly errors
+          when a redundant closing tag follows a self-closing tag
+        - Improved error message for malformed self-closing tags to state
+          explicitly that a redundant closing tag was found
+        - Fixed greedy regex in parse(): s/<\?xml.+\?>//  changed to
+          s/<\?xml.*?\?>//  to avoid over-consuming if multiple ?> sequences
+          appear on the XML declaration line
+        - Removed no-op pos($attr_string) = 0 in _parse_node: pos() is always
+          undef at the start of a fresh //g match on a new variable
+        - Added comment to closing-tag namespace strip in _parse_node documenting
+          that prefix mismatch between open and close tags is not verified, which
+          is intentional given the lightweight scope of this module
+
 0.07	Fri Dec 26 21:32:41 EST 2025
 	Use Return::Set to verify correct output type
 	Ignore comments in the XML
-	Added bib/xmlpp-cli, and command line program to parse XML files
+	Added bin/xmlpp-cli, a command-line program to parse XML files
 	Improved attribute parsing
 	Accept single-quoted attributes
 	Normalize whitespace between attributes
-	Added testing dashboard
+	Added a testing dashboard
 
 0.06	Thu May 22 13:44:50 EDT 2025
 	Use positional parameters when parsing children

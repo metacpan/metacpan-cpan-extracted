@@ -4,13 +4,13 @@
       "Karel Miko"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Crypt-ScryptKDF",
    "prereqs" : {
@@ -38,7 +38,7 @@
    "provides" : {
       "Crypt::ScryptKDF" : {
          "file" : "lib/Crypt/ScryptKDF.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
          "url" : "https://github.com/DCIT/perl-Crypt-ScryptKDF"
       }
    },
-   "version" : "0.010",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.011",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

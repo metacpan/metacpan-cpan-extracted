@@ -11,6 +11,8 @@ BEGIN {
   use_ok('Time::Str', qw[str2time str2date time2str]);
 }
 
+diag('Test::Str IMPLEMENTATION: ', Time::Str::IMPLEMENTATION);
+
 # str2date usage
 throws_ok { str2date() }
   qr/^Usage: str2date/,
@@ -22,7 +24,7 @@ throws_ok { str2date('2012-12-24T15:30:45Z', 'extra') }
 
 # str2date parameter 'format'
 throws_ok { str2date('2012-12-24', format => 'NOSUCH') }
-  qr/Parameter 'format' is unknown: 'nosuch'/,
+  qr/Parameter 'format' is unknown: 'NOSUCH'/,
   'str2date: unknown format';
 
 # str2date parameter 'pivot_year'
@@ -36,29 +38,25 @@ throws_ok { str2date('121224153045Z', format => 'ASN1UT', pivot_year => 9900) }
 
 # str2date unknown named parameter
 throws_ok { str2date('2012-12-24T15:30:45Z', color => 'red') }
-  qr/Unknown named parameter: color/,
+  qr/Unrecognised named parameter: 'color'/,
   'str2date: unknown named parameter';
-
-throws_ok { str2date('2012-12-24T15:30:45Z', color => 'red', style => 'bold') }
-  qr/Unknown named parameter: color, style/,
-  'str2date: multiple unknown named parameters';
 
 # str2date parse failure
 throws_ok { str2date('not-a-date') }
-  qr/Unable to parse: string does not match the rfc3339 format/,
+  qr/Unable to parse: string does not match the RFC 3339 format/,
   'str2date: parse failure (default format)';
 
 throws_ok { str2date('not-a-date', format => 'RFC2822') }
-  qr/Unable to parse: string does not match the rfc2822 format/,
+  qr/Unable to parse: string does not match the RFC 2822 format/,
   'str2date: parse failure (explicit format)';
 
 # str2date date out of range
 throws_ok { str2date('2012-13-24T15:30:45Z') }
-  qr/Unable to parse: date is out of range/,
+  qr/Unable to parse: month is invalid/,
   'str2date: month 13';
 
 throws_ok { str2date('2012-00-24T15:30:45Z') }
-  qr/Unable to parse: date is out of range/,
+  qr/Unable to parse: month is invalid/,
   'str2date: month 0';
 
 throws_ok { str2date('2013-02-29T15:30:45Z') }
@@ -80,7 +78,7 @@ throws_ok { str2date('2012-12-24T23:59:61Z') }
 
 # str2date timezone offset out of range
 throws_ok { str2date('2012-12-24T15:30:45+25:00') }
-  qr/Unable to parse: timezone offset is out of range/,
+  qr/Unable to parse: timezone offset is invalid/,
   'str2date: timezone offset hour out of range';
 
 # str2time usage
@@ -158,12 +156,8 @@ throws_ok { time2str(0, nanosecond => 1_000_000_000) }
 
 # time2str unknown named parameter
 throws_ok { time2str(0, color => 'red') }
-  qr/Unknown named parameter: color/,
+  qr/Unrecognised named parameter: 'color'/,
   'time2str: unknown named parameter';
-
-throws_ok { time2str(0, color => 'red', style => 'bold') }
-  qr/Unknown named parameter: color, style/,
-  'time2str: multiple unknown named parameters';
 
 # time2str time out of range for given offset
 throws_ok { time2str(Time::Str::MAX_TIME, offset => 1) }

@@ -1,0 +1,108 @@
+NAME
+    CSV::LINQ - LINQ-style query interface for CSV files
+
+SYNOPSIS
+        use CSV::LINQ;
+
+        # Read CSV file and query
+        my @results = CSV::LINQ->FromCSV("sales.csv")
+            ->Where(sub { $_[0]{amount} > 1000 })
+            ->Select(sub { $_[0]{name} })
+            ->Distinct()
+            ->ToArray();
+
+        # DSL syntax for simple filtering
+        my @tokyo = CSV::LINQ->FromCSV("users.csv")
+            ->Where(city => 'Tokyo')
+            ->ToArray();
+
+        # TSV support
+        my @data = CSV::LINQ->FromCSV("data.tsv", sep => "\t")->ToArray();
+
+        # Write filtered result back to CSV
+        CSV::LINQ->FromCSV("input.csv")
+            ->Where(sub { $_[0]{active} eq '1' })
+            ->ToCSV("output.csv");
+
+DESCRIPTION
+    CSV::LINQ provides a LINQ-style query interface for CSV (Comma-Separated
+    Values) files. Inspired by LTSV::LINQ by INABA Hitoshi.
+
+    Features:
+
+    * Lazy evaluation with iterators
+    * RFC 4180 compliant CSV parsing
+    * TSV support (sep => "\t")
+    * 60 LINQ-style methods
+    * Smart sort: OrderBy detects numeric vs string values automatically
+    * Stable multi-key sort with ThenBy/ThenByStr/ThenByNum and variants
+    * Compatible with Perl 5.005_03 and later
+    * Pure Perl, no XS dependencies
+
+INCLUDED DOCUMENTATION
+    Full documentation is available via:
+
+        perldoc CSV::LINQ
+
+INSTALLATION
+    To install this module, run:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    On Windows with Perl 5.005_03:
+
+        perl Makefile.PL
+        pmake
+        pmake test
+        pmake install
+
+COMPATIBILITY
+    Compatible with Perl 5.005_03 and later. No CPAN dependencies required.
+
+TARGET USE CASES
+
+  - Querying CSV data files (sales, logs, exports, etc.)
+  - Filtering and transforming arrays of hashrefs
+  - Data analysis and aggregation without external dependencies
+  - TSV and custom-delimiter files via the sep option
+  - Educational use: learning LINQ concepts in Perl
+
+SORT METHODS
+
+    OrderBy / OrderByDescending
+        Smart comparison: numeric strings sort numerically, others sort as
+        strings. Matches the behaviour of LTSV::LINQ and JSON::LINQ.
+
+    OrderByStr / OrderByStrDescending
+        Unconditional string comparison (cmp).
+
+    OrderByNum / OrderByNumDescending
+        Unconditional numeric comparison (<=>). undef treated as 0.
+
+    ThenBy / ThenByDescending (smart)
+    ThenByStr / ThenByStrDescending
+    ThenByNum / ThenByNumDescending
+        Secondary sort keys, available after any OrderBy* method.
+        Non-destructive: branching from one Ordered object is safe.
+        Sort is stable: equal keys preserve original input order.
+
+LIMITATIONS
+
+  - All ordering and grouping operations materialise the full sequence in memory
+  - CSV parsing is line-oriented; embedded newlines in quoted fields are not
+    supported
+  - Lazy evaluation defers errors until a terminal method is called
+  - Iterator-based sequences can only be consumed once (Ordered objects are
+    re-iterable)
+
+AUTHOR
+    INABA Hitoshi <ina@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2026 INABA Hitoshi
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.

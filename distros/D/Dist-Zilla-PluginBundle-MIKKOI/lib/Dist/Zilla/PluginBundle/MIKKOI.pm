@@ -2,7 +2,7 @@ package Dist::Zilla::PluginBundle::MIKKOI;
 use strict;
 use warnings;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 # ABSTRACT: BeLike::MIKKOI when you build your dists
 
@@ -69,11 +69,8 @@ sub configure {
             # 'CheckExtraTests', We already run RunExtraTests
             'MojibakeTests',
             'Test::NoTabs',
-            'Signature',
-            'AuthorSignatureTest',
             ['Test::Software::Policies' => {
                     'include_policy' => [
-                        'AIDisclosure',
                         'Contributing',
                         'CodeOfConduct',
                         'License',

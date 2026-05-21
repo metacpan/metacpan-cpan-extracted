@@ -1,5 +1,114 @@
 Revision history for JSON::LINQ
 
+1.02  2026-05-17 JST (Japan Standard Time)
+
+    Add CSV I/O support (FromCSV, ToCSV):
+    - lib/JSON/LINQ.pm: add _parse_csv_line (RFC 4180 compliant CSV parser)
+    - lib/JSON/LINQ.pm: add _format_csv_field (CSV field quoting helper)
+    - lib/JSON/LINQ.pm: add FromCSV($file, %opts) - read CSV/TSV file lazily;
+      options: sep (default ','), headers (explicit column names),
+      skip_header (skip existing header row when headers is given)
+    - lib/JSON/LINQ.pm: add ToCSV($file, %opts) - write sequence as CSV;
+      options: sep (default ','), headers/label_order (column order),
+      no_header (suppress header row)
+    - lib/JSON/LINQ.pm: method count updated to 67 (was 65)
+    - lib/JSON/LINQ.pm: POD updated - SYNOPSIS, TABLE OF CONTENTS,
+      DESCRIPTION, METHODS (new "CSV Interoperability" section),
+      EXAMPLES (Basic CSV Query, DSL Filtering, Grouping, JOIN Two CSVs,
+      TSV Support, Round-Trip, CSV to JSON), ARCHITECTURE, Memory
+      Characteristics, LIMITATIONS AND KNOWN ISSUES, DIAGNOSTICS,
+      SEE ALSO (L<CSV::LINQ> retained)
+    - t/0010-csv-io.t: 40 new tests covering FromCSV, ToCSV, TSV,
+      quoted fields, round-trip, concurrent Join, GroupBy, Distinct,
+      FromCSV->ToJSON conversion
+    - eg/07_csv_query.pl: CSV query examples
+      (FromCSV, Where, GroupBy, Distinct, ToCSV, TSV)
+    - eg/08_csv_json_join.pl: CSV/JSON interoperability examples
+      (CSV x CSV Join, CSV x JSON Join, GroupJoin, CSV->JSON, JSON->CSV)
+    - doc/json_linq_cheatsheet.*.txt: FromCSV, ToCSV, headers,
+      label_order, skip_header, no_header, sep options added to all
+      21 language cheat sheets; CSV x JSON JOIN example added
+    - MANIFEST: added t/0010-csv-io.t, eg/07_csv_query.pl,
+      eg/08_csv_json_join.pl
+
+    Pre-release fix:
+    - lib/JSON/LINQ.pm: SEE ALSO now includes L<CSV::LINQ>
+
+    Add:
+    - lib/JSON/LINQ.pm: ToLTSV now accepts label_order => \@labels
+      (and its alias headers => \@labels) to control which labels are
+      emitted and in what order; labels absent from a record are
+      silently skipped; without the option all keys are emitted
+      alphabetically as before
+    - t/0007-ltsv-io.t: three new tests for label_order, headers alias,
+      and missing-label skipping (tests 15-17)
+
+    Fix:
+    - lib/JSON/LINQ.pm: From* and To* on Perl 5.005_03 now use a
+      unique numbered package glob per call
+      (JSON::LINQ::FH::H1, JSON::LINQ::FH::H2, ...) instead of
+      \do{local *_}, which always resolves to *main::_ and caused IO
+      slot collision when two iterators were open concurrently
+      (e.g. Join or GroupJoin with two From* sources).
+      Affected methods: FromJSON, FromJSONL, FromLTSV, ToJSON, ToJSONL, ToLTSV.
+    - lib/JSON/LINQ.pm: $_fh_seq added to use vars and initialized to 0.
+    - lib/JSON/LINQ.pm: POD From* sections (FromJSON, FromJSONL, FromLTSV)
+      updated to document concurrent-use safety on all supported Perl versions.
+
+    Tests:
+    - t/0009-concurrent-fh.t: new test (21 tests) covering concurrent
+      From* in Join, GroupJoin, Concat+Join, and To* round-trip.
+
+1.01  2026-05-03 JST (Japan Standard Time)
+
+    LTSV interoperability.
+
+    Features:
+    - FromLTSV($file)         : read LTSV file (streaming, one line at a time)
+                                ported from LTSV::LINQ 1.08
+    - ToLTSV($file)           : write sequence as LTSV file (streaming)
+                                ported from LTSV::LINQ 1.08
+    - Method count: 63 -> 65
+    - POD additions:
+      * "LTSV Interoperability" subsection under METHODS
+      * "JOIN: JSON (main) with LTSV (sub-table)" example
+      * "JOIN: LTSV (main) with JSON (sub-table)" example
+      * Updated DIAGNOSTICS to cover FromLTSV/ToLTSV file errors
+      * Updated ARCHITECTURE / Memory Characteristics
+    - Documentation:
+      * 21-language cheat sheets updated with FromLTSV/ToLTSV and the
+        two JOIN patterns
+      * README updated
+    - Examples:
+      * eg/05_json_ltsv_join.pl   main JSON x sub-table LTSV
+      * eg/06_ltsv_json_join.pl   main LTSV x sub-table JSON
+    - Tests:
+      * t/0007-ltsv-io.t          FromLTSV / ToLTSV round-trip
+      * t/0008-json-ltsv-join.t   the two JOIN patterns
+
+    Bug fixes:
+    - INA_CPAN_Check::end_testing() no longer calls exit(); it sets
+      $? instead and lets the END block unwind naturally.  This avoids
+      the "Callback called exit. END failed--cleanup aborted." warning
+      that older Perl harnesses (notably Windows + pmake test) reported
+      as a spurious failure of the next test file.
+    - t/9001-load.t END block no longer calls exit() either.
+    - INA_CPAN_Check J1 (PREREQ_PM dep version vs module VERSION) now
+      exempts core pragmas (strict, warnings, vars, base, ...).  Their
+      pinned baseline versions can legitimately equal the module's own
+      VERSION by coincidence (e.g. strict 1.01 vs JSON::LINQ 1.01),
+      which is not a copy-paste bug.  Non-pragma deps remain checked
+      so real copy-paste bugs are still detected.  This fixes the J1
+      failure that surfaced after `pmake.bat dist` regenerated META.yml
+      with the canonical `strict: 1.01` requirement.
+    - New checks added to t/9030-distribution.t (Category L):
+      * L1  No .t file's END {} block contains a literal `exit`
+      * L2  No sub invoked from a .t file's END {} block contains `exit`
+        (transitive scan into t/lib/*.pm)
+      These prevent regressions of the same class.
+
+    No external dependencies added.  Pure Perl, Perl 5.005_03+ compatible.
+
 1.00  2026-04-20 JST (Japan Standard Time)
 
     Initial release.

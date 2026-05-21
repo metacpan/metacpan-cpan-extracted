@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: MIDI Utilities
 
-our $VERSION = '0.1304';
+our $VERSION = '0.1305';
 
 use strict;
 use warnings;
@@ -192,6 +192,10 @@ sub reverse_dump {
 
 sub midi_format {
     my (@notes) = @_;
+    my $flag = 1;
+    if ($notes[0] =~ /^(\d)$/) {
+        $flag = shift @notes;
+    }
     my @formatted;
     for my $note (@notes) {
         $note =~ s/C##/D/;
@@ -210,8 +214,10 @@ sub midi_format {
         $note =~ s/Cb/B/;
         $note =~ s/Fb/E/;
 
-        $note =~ s/#/s/;
-        $note =~ s/b/f/;
+        if ($flag) {
+            $note =~ s/#/s/;
+            $note =~ s/b/f/;
+        }
 
         push @formatted, $note;
     }
@@ -277,6 +283,7 @@ sub play_timidity {
 
 sub play_fluidsynth {
     my ($score, $midi, $soundfont, $config) = @_;
+    $score->write_score($midi);
     if (!$config && $^O eq 'darwin') {
         $config = [qw(-a coreaudio -m coremidi -i)];
     }
@@ -318,7 +325,7 @@ MIDI::Util - MIDI Utilities
 
 =head1 VERSION
 
-version 0.1304
+version 0.1305
 
 =head1 SYNOPSIS
 
@@ -451,12 +458,14 @@ Return the reversed hashref from the B<midi_dump> routine hashes section.
 =head2 midi_format
 
   @formatted = midi_format(@notes);
+  @formatted = midi_format($bool, @notes);
 
-Change sharp C<#> and flat C<b>, in the list of named notes, to the
-L<MIDI::Simple> C<s> and C<f> respectively.
-
-Also change accidentals and double-accidentals into their note
+Change accidentals and double-accidentals into their note
 equivalents, e.g. C<Cb> to C<B>, C<C##> to C<D>, etc.
+
+If the <bool> flag is set to C<1> (the default), change sharp C<#>
+and flat C<b>, in the list of named notes, to the L<MIDI::Simple>
+C<s> and C<f> respectively.
 
 =head2 set_time_signature
 
@@ -509,7 +518,7 @@ not rendered and used.
 Play a given B<score> named B<midi_file> with C<fluidsynth> and a
 B<soundfont> file and optional system B<config>.
 
-For C,darwin> is is C<-a coreaudio -m coremidi>. For linux systems,
+For C<darwin> is is C<-a coreaudio -m coremidi>. For linux systems,
 this is C<-a alsa -m alsa_seq>.
 
 Of course you'll need to have C<fludisynth> installed.
@@ -549,7 +558,7 @@ Gene Boggs <gene.boggs@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019-2025 by Gene Boggs.
+This software is copyright (c) 2019-2026 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -17,6 +17,7 @@ void process_resign_response(pTHX_ pending_call_t *pc);
 void process_observe_response(pTHX_ observe_call_t *oc);
 void observe_rearm_recv(pTHX_ observe_call_t *oc);
 void cleanup_observe(pTHX_ observe_call_t *oc);
+void observe_call_perl_release(pTHX_ observe_call_t *oc);
 int try_reconnect_observe(pTHX_ observe_call_t *oc);
 
 /* Helper to convert LeaderKey to hash */

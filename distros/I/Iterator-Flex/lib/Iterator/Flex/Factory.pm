@@ -8,7 +8,7 @@ use warnings;
 
 use experimental qw( signatures declared_refs refaliasing);
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use Ref::Util        ();
 use Role::Tiny       ();
@@ -204,10 +204,13 @@ sub construct_from_iterable ( $obj, $pars = {} ) {
 
     my ( $mpars, $ipars, $spars ) = parse_pars( $pars );
 
-    my $action_on_failure = delete $mpars->{action_on_failure};
+    my $action_on_failure = delete $mpars->{action_on_failure} // THROW;
+
+    throw_failure( parameter => "illegal value for action_on_failure: $action_on_failure" )
+      if $action_on_failure ne THROW && $action_on_failure ne RETURN;
 
     throw_failure( parameter =>
-          "unknown parameters pased to construct_from_iterable: @{[ join ', ', keys $mpars->%* ]}" )
+          "unknown parameters passed to construct_from_iterable: @{[ join ', ', keys $mpars->%* ]}" )
       if $mpars->%*;
 
     ## no critic ( CascadingIfElse )
@@ -221,7 +224,7 @@ sub construct_from_iterable ( $obj, $pars = {} ) {
 
     elsif ( Ref::Util::is_arrayref( $obj ) ) {
         throw_failure(
-            parameter => "unknown parameters pased to construct_from_iterable: @{[ join ', ', $ipars->%* ]}" )
+            parameter => "unknown parameters passed to construct_from_iterable: @{[ join ', ', $ipars->%* ]}" )
           if $ipars->%*;
         require Iterator::Flex::Array;
         return Iterator::Flex::Array->new( $obj, $spars );
@@ -396,7 +399,7 @@ Iterator::Flex::Factory - Create on-the-fly Iterator::Flex classes/objects
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 SUBROUTINES
 

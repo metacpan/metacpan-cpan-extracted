@@ -31,7 +31,7 @@ sub ok {
     return $ok;
 }
 sub diag { print "# $_[0]\n" }
-END { exit 1 if $T_PLAN && $T_FAIL }
+END { $? = 1 if $T_PLAN && $T_FAIL }
 
 my @linq_methods = qw(
     new From FromJSON FromJSONL FromJSONString Range Empty Repeat

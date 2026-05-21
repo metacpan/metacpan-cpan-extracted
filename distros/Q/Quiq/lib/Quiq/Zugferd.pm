@@ -42,7 +42,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.237';
+our $VERSION = '1.238';
 
 use Quiq::PerlModule;
 use Quiq::Path;
@@ -943,31 +943,45 @@ sub toXml {
         'BT-86' => $rch->bic,
         # Verkäufer
         'BT-27' => $rch->verkaeufer->name,
+        'BT-29' => $rch->verkaeufer->kennung,
+        'BT-30' => $rch->verkaeufer->id,
+        'BT-33' => $rch->verkaeufer->information,
         'BT-38' => $rch->verkaeufer->plz,
         'BT-35' => $rch->verkaeufer->strasse,
         'BT-37' => $rch->verkaeufer->ort,
         'BT-40' => $rch->verkaeufer->land,
         'BT-41' => $rch->verkaeufer->kontakt,
         'BT-42' => $rch->verkaeufer->telefon,
-        'BT-34' => $rch->verkaeufer->email,
-        'BT-34-1' => $rch->verkaeufer->email? '0088': undef,
+        'BT-34' => $rch->verkaeufer->contactEmail,
+        'BT-34-1' => $rch->verkaeufer->contactEmail? '0088': undef,
+        # 'BT-34' => $rch->verkaeufer->umsatzsteuernummer,
+        # 'BT-34-1' => $rch->verkaeufer->umsatzsteuernummer? '9930': undef,
         'BT-43' => $rch->verkaeufer->contactEmail,
+        # wg. Vertauschung UST-ID und Steuernummer
         # 'BT-14' => $rch->verkaeufer->auftragsreferenz,
-        'BT-31' => $rch->verkaeufer->umsatzsteuerId,
+        # 'BT-31' => $rch->verkaeufer->umsatzsteuernummer,
+        # 'BT-31-0' => 'VA',
+        # 'BT-32' => $rch->verkaeufer->steuernummer,
+        # 'BT-32-0' => 'FC',
+        'BT-31' => $rch->verkaeufer->umsatzsteuernummer,
         'BT-31-0' => 'VA',
+        'BT-32' => $rch->verkaeufer->steuernummer,
+        'BT-32-0' => 'FC',
         # Käufer (Zahler)
         'BT-44' => $rch->kaeufer->name,
         'BT-56' => $rch->kaeufer->kontakt,
         'BT-46' => $rch->kaeufer->kundennummer,
-        'BT-49' => $rch->kaeufer->email,
-        'BT-49-1' => $rch->kaeufer->email? '0088': undef,
+        # 'BT-49' => $rch->kaeufer->email,
+        # 'BT-49-1' => $rch->kaeufer->email? '0088': undef,
+        'BT-49' => $rch->leitwegId,
+        'BT-49-1' => $rch->leitwegId? '0204': undef,
         'BT-50' => $rch->kaeufer->strasse,
         'BT-53' => $rch->kaeufer->plz,
         'BT-52' => $rch->kaeufer->ort,
         'BT-55' => $rch->kaeufer->land,
         'BT-13' => $rch->kaeufer->auftragsreferenz,
-        'BT-48' => $rch->kaeufer->umsatzsteuerId,
-        'BT-48-0' => $rch->kaeufer->umsatzsteuerId? 'VA': undef,
+        'BT-48' => $rch->kaeufer->umsatzsteuernummer,
+        'BT-48-0' => $rch->kaeufer->umsatzsteuernummer? 'VA': undef,
         # Empfänger
         'BT-70' => $rch->empfaenger->name,
         'BT-76' => $rch->empfaenger->kontakt,
@@ -1459,7 +1473,7 @@ Klassen:
 
 =head1 VERSION
 
-1.237
+1.238
 
 =head1 AUTHOR
 

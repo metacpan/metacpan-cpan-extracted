@@ -3,6 +3,14 @@
 use Test2::V0;
 use Iterator::Flex::Common qw[ iseq  ];
 
+subtest 'invalid capacity' => sub {
+
+    for my $capacity ( 0, -1, 1.5, 'not-a-number' ) {
+        like( dies { iseq( 9 )->ichunk( { capacity => $capacity } ) },
+            qr/capacity/, "reject capacity $capacity" );
+    }
+};
+
 subtest 'exact capacity' => sub {
     my $iter = iseq( 9 )->ichunk( { capacity => 5 } );
 

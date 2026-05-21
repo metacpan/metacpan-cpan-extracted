@@ -1,5 +1,5 @@
 Name:           perl-NetBox-Client
-Version:        0.1.7
+Version:        0.2.0
 Release:        1%{?dist}
 Summary:        NetBox API perl client
 License:        Distributable, see LICENSE
@@ -56,6 +56,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/NetBox*
 
 %changelog
+
+* Wed May  6 2026 Volodymyr Pidgornyi <vp@dtel-ix.net> 0.2.0
+- added v2 authorization token support;
 
 * Fri Apr  3 2026 Volodymyr Pidgornyi <vp@dtel-ix.net> 0.1.7
 - fixed contents passing when updating objects;

@@ -33,7 +33,7 @@ CODE:
     cid_len = snprintf(cid_buf, sizeof(cid_buf), "_canvas_%d", ++_canvas_id);
     (void)hv_stores(self_hv, "_cid", newSVpvn(cid_buf, cid_len));
 
-    /* id — use provided or auto-assign from _cid */
+    /* id - use provided or auto-assign from _cid */
     id_svp = args ? hv_fetchs(args, "id", 0) : NULL;
     if (id_svp && *id_svp && SvOK(*id_svp)) {
         (void)hv_stores(self_hv, "id", newSVsv(*id_svp));

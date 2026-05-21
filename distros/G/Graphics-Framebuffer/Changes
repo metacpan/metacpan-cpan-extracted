@@ -1,13 +1,43 @@
 Change log for Graphics::Framebuffer
 
+7.03   May 14, 2026
+
+       Documentation update
+       Easter egg addition
+
+7.02   May 04, 2026
+
+       Corrected bad index links in MANUAL.md.
+       Changed information in README.md
+	   Added up to 30 threads for the threaded_slideshow.pl script.
+	   Some minor POD changes.
+	   Changed the alpha value of the default background color.
+
+7.01   May 03, 2026
+
+       Minor optimizations.
+       Better vsync handling, whether supported or unsupported.
+
+7.00   April 28, 2026
+
+       Testing improved.  Recognizes environment and behaves accordingly, instead of just dying for everything.
+
+       Manual updated and improved.
+
+       Author,md modified.  t/README.md modified.  Images added.
+
+       Splash screen slightly changed.
+	   
+	   Simplified the make process.
+
 6.99   April 25, 2026
 
        Removed the VirtualBox babysitting code and left the screen flushing
-	   up to the user instead.  The variable 'IS_VBOX' can be used for
-	   detection in your own code.
-	   
-	   Two special variables 'IS_VBOX' and 'LAST_FLUSHED' have been added to
-	   the MANUAL.md file.
+       up to the user instead.  The variable 'IS_VBOX' can be used for
+       detection in your own code.
+       
+       Two special variables 'IS_VBOX' and 'LAST_FLUSHED' have been added to
+       the MANUAL.md file.
 
 6.98   April 22, 2026
 
@@ -16,7 +46,7 @@ Change log for Graphics::Framebuffer
 6.97   April 19, 2026
 
        Added the "ball" method.  Allows you to draw pseudo 3D balls.
-	   The "ball" method was also added to "examples/primitives.pl".
+       The "ball" method was also added to "examples/primitives.pl".
 
 6.96   April 11, 2026
 
@@ -25,9 +55,9 @@ Change log for Graphics::Framebuffer
 6.95   April 04, 2026
 
        Implemented a searchable manual in GitHub markdown format.  I suggest
-	   simply reading it online on GitHub, or you can view it with:
-	   
-	       pandoc MANUAL.md | lynx -stdin
+       simply reading it online on GitHub, or you can view it with:
+       
+           pandoc MANUAL.md | lynx -stdin
 
 6.94   April 01, 2026
 
@@ -36,10 +66,10 @@ Change log for Graphics::Framebuffer
        Fixed bug in "examples/vector-usa.txt".
 
        "examples/primitives.pl" Coded to check for the Virtualbox framebuffer
-	   ID and it turns on forced flushing if found.  This seems to mostly
-	   overcome the new VirtualBox weirdness.
+       ID and it turns on forced flushing if found.  This seems to mostly
+       overcome the new VirtualBox weirdness.
 
-	   Added sanity checks to Makefile.PL
+       Added sanity checks to Makefile.PL
 
 6.93   March 29, 2026
 
@@ -52,11 +82,11 @@ Change log for Graphics::Framebuffer
 6.91   March 17, 2026
 
        The latest VirtualBox version (7.2.6) has totally messed up its
-	   framebuffer driver.  Improved "_flush_screen" handling to improve
-	   response to VirtualBox weirdness.
+       framebuffer driver.  Improved "_flush_screen" handling to improve
+       response to VirtualBox weirdness.
 
-	   Added "--flush" option to the "primitive.pl" script for lessening
-	   VirtualBox weirdness.
+       Added "--flush" option to the "primitive.pl" script for lessening
+       VirtualBox weirdness.
 
 6.90   March 17, 2026
 
@@ -65,28 +95,28 @@ Change log for Graphics::Framebuffer
 6.89   March 12, 2026
 
        Fixed bugs in the Debian install script.
-	   Code cleanup in the module.
-	   Edited all README files.
+       Code cleanup in the module.
+       Edited all README files.
 
 6.88   February 14, 2026
 
        Removed the Q to escape for play_animation
-	   Improved the examples/vector.pl
+       Improved the examples/vector.pl
 
 6.87   February 14, 2026
 
        Added forced buffer flushing.
-	   Splash coloring for Perl and Acceleration modes changed.
+       Splash coloring for Perl and Acceleration modes changed.
 
 6.86   January 26, 2026
 
-       Bugs corrected in the C code by snakpak.
-	   Also, speed increased.
+       Bugs corrected in the C code by Rick Myers (snakpak).
+       Also, speed increased.
 
 6.85   January 19, 2026
 
        Minor blitting bugs fixed, thanks to snakpak.
-	   Documentation updated for Linux specificity.
+       Documentation updated for Linux specificity.
 
 6.84   January 17, 2026
 

@@ -14,10 +14,15 @@ t/30-basics.t
 t/code.t
 t/comment-spelling.t
 t/config_file.t
+t/edge_cases.t
 t/eof.t
 t/eol.t
 t/error.t
+t/extended_tests.t
+t/function.t
+t/integration.t
 t/manifest.t
+t/mutant_killers.t
 t/pod-cm.t
 t/pod-coverage.t
 t/pod-synopsis.t
@@ -25,5 +30,6 @@ t/pod.t
 t/sendmail.t
 t/subclass.t
 t/syslog.t
+t/unit.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

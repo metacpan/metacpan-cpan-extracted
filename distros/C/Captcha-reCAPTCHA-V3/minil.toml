@@ -1,5 +1,5 @@
 name = "Captcha-reCAPTCHA-V3"
-badges = ["travis-ci.com"]
+badges = ["github-actions/test.yml"]
 authority="cpan:WORTHMINE"
 
 module_maker="ModuleBuildTiny"

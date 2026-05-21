@@ -1,292 +1,12 @@
 #!/usr/bin/env perl
-#
-#   A script that performs semantic similarity in PXF|BFF data structures
-#
-#   Last Modified: Feb/01/2025
-#
-#   $VERSION taken from Pheno::Ranker
-#
-#   Copyright (C) 2023-2025 Manuel Rueda - CNAG (manuel.rueda@cnag.eu)
-#
-#   License: Artistic License 2.0
-#
-#   If this program helps you in your research, please cite.
-
-package main;
-
 use strict;
 use warnings;
-use autodie;
-use feature      qw(say);
-use Getopt::Long qw(:config no_ignore_case);
-use Pod::Usage;
-use Data::Dumper;
-use Sys::Hostname;
-use POSIX                          qw(strftime);
-use Term::ANSIColor                qw(:constants);
-use File::ShareDir::ProjectDistDir qw(dist_dir);
-use FindBin                        qw($Bin);
+
+use FindBin qw($Bin);
 use lib "$Bin/../lib";
-use Pheno::Ranker qw($VERSION write_json);
+use Pheno::Ranker::CLI;
 
-# Defining a few variables
-my $out_file_cohort      = 'matrix.txt';
-my $out_file_patient     = 'rank.txt';
-my $out_file_graph       = 'graph.json';
-my $out_file_graph_stats = 'graph_stats.txt';
-my $export_basename      = 'export';
-my $align_basename       = 'alignment';
-my $log_file             = 'pheno-ranker-log.json';
-my $color                = 1;
-my $age                  = 0;
-my $cli                  = 1;
-
-# Reading arguments
-GetOptions(
-    'reference|r=s{1,}'                  => \my @reference_files,             # array
-    'target|t=s'                         => \my $target_file,                 # string
-    'weights|w=s'                        => \my $weights_file,                # string
-    'append-prefixes=s{1,}'              => \my @append_prefixes,             # array
-    'out-file|o=s'                       => \my $out_file_arg,                # string
-    'max-out:i'                          => \my $max_out,                     # integer
-    'max-number-vars:i'                  => \my $max_number_vars,             # integer
-    'include-hpo-ascendants'             => \my $include_hpo_ascendants,      # flag
-    'export|e:s'                         => \my $export,                      # opt-string (defined)
-    'align|a:s'                          => \my $align,                       # opt-string (defined)
-    'cytoscape-json:s'                   => \my $cytoscape_json,              # opt-string (defined)
-    'graph-stats:s'                      => \my $graph_stats,                 # opt-string (defined)
-    'sort-by=s'                          => \my $sort_by,                     # string
-    'similarity-metric-cohort=s'         => \my $similarity_metric_cohort,    # string
-    'patients-of-interest|poi=s{1,}'     => \my @patients_of_interest,        # array
-    'poi-out-dir=s'                      => \my $poi_out_dir,                 # string
-    'include-terms=s{1,11}'              => \my @include_terms,               # array
-    'exclude-terms=s{1,11}'              => \my @exclude_terms,               # array
-    'retain-excluded-phenotypicFeatures' => \
-      my $retain_excluded_phenotypicFeatures,                                 # flag
-    'prp|precomputed-ref-prefix=s' => \my $precomputed_ref_prefix,            # string
-    'max-matrix-records-in-ram=i'  => \my $max_matrix_records_in_ram,         # integer
-    'config=s'                     => \my $config_file,                       # string
-    'age!'                         => \$age,                                  # flag
-    'help|?'                       => \my $help,                              # flag
-    'log:s'                        => \my $log,                               # opt-string (defined)
-    'man'                          => \my $man,                               # flag
-    'debug=i'                      => \my $debug,                             # integer
-    'verbose|'                     => \my $verbose,                           # flag
-    'color!'                       => \$color,                                # flag
-    'version|V'                    => sub { say "$0 Version $VERSION"; exit; }
-) or pod2usage(2);
-pod2usage(1)                              if $help;
-pod2usage( -verbose => 2, -exitval => 0 ) if $man;
-pod2usage(
-    -message => "Please specify a reference-cohort(s) with <--r>\n",
-    -exitval => 1
-) unless ( @reference_files || $precomputed_ref_prefix );
-pod2usage(
-    -message =>
-      "<--graph_stats> only works in conjunction with <--cytoscape-json>\n",
-    -exitval => 1
-) if ( defined $graph_stats && !defined $cytoscape_json );
-pod2usage(
-    -message => "Weights file <$weights_file> does not exist\n",
-    -exitval => 1
-) if ( defined $weights_file && !-f $weights_file );
-
-# Set the name of the output
-my $out_file = $out_file_arg
-  // ( $target_file ? $out_file_patient : $out_file_cohort );
-
-# Set import data
-my (
-    $glob_hash_file,       $ref_hash_file,
-    $ref_binary_hash_file, $coverage_stats_file
-);
-if ( defined $precomputed_ref_prefix ) {
-
-    # Check if any incompatible parameters are provided
-    my $has_incompatible_options =
-         @reference_files
-      || @append_prefixes
-      || $age
-      || defined $include_hpo_ascendants
-      || defined $retain_excluded_phenotypicFeatures
-      || defined $weights_file;
-
-    my @incompatible_flags = (
-        '--reference',      '--age',
-        '--hpo-ascendants', '--retain-excluded-phenotypicFeatures',
-        '--weights',        '--append-prefixes'
-    );
-
-    if ($has_incompatible_options) {
-        my $flags_str = join( "\n", @incompatible_flags );
-        pod2usage(
-            -message =>
-"Sorry, but the options\n$flags_str\nare incompatible with --prp <$precomputed_ref_prefix>\n",
-            -exitval => 1,
-        );
-    }
-
-    # Generate file names based on precomputed_ref_prefix
-    my $base_glob           = $precomputed_ref_prefix . '.glob_hash.json';
-    my $base_ref            = $precomputed_ref_prefix . '.ref_hash.json';
-    my $base_ref_binary     = $precomputed_ref_prefix . '.ref_binary_hash.json';
-    my $base_coverage_stats = $precomputed_ref_prefix . '.coverage_stats.json';
-
-    # Use the helper to check for .gz versions if needed.
-    $glob_hash_file       = resolve_file($base_glob);
-    $ref_hash_file        = resolve_file($base_ref);
-    $ref_binary_hash_file = resolve_file($base_ref_binary);
-    $coverage_stats_file  = resolve_file($base_coverage_stats);
-}
-
-# Set cytoscape-json logic
-handle_option( \$cytoscape_json, "<--cytoscape-json> only works in cohort-mode",
-    $target_file, $out_file_graph );
-
-# Set graph-stats logic
-handle_option( \$graph_stats, "<--graph-stats> only works in cohort-mode",
-    $target_file, $out_file_graph_stats );
-
-# Turning color off if argument <--no-color>
-$ENV{'ANSI_COLORS_DISABLED'} = 1 unless $color;
-
-# Start printing to STDOUT
-say BOLD CYAN program_header($VERSION), RESET if $verbose;
-
-######################
-# START PHENO-RANKER #
-######################
-
-# Load data as hashref
-my $data = {
-    reference_files                    => \@reference_files,
-    target_file                        => $target_file,
-    weights_file                       => $weights_file,
-    include_hpo_ascendants             => $include_hpo_ascendants,
-    hpo_file                           => undef,
-    align                              => $align,
-    align_basename                     => $align_basename,
-    export                             => $export,
-    export_basename                    => $export_basename,
-    out_file                           => $out_file,
-    cytoscape_json                     => $cytoscape_json,
-    graph_stats                        => $graph_stats,
-    max_out                            => $max_out,
-    max_number_vars                    => $max_number_vars,
-    sort_by                            => $sort_by,
-    similarity_metric_cohort           => $similarity_metric_cohort,
-    patients_of_interest               => \@patients_of_interest,
-    poi_out_dir                        => $poi_out_dir,
-    include_terms                      => \@include_terms,
-    exclude_terms                      => \@exclude_terms,
-    retain_excluded_phenotypicFeatures => $retain_excluded_phenotypicFeatures,
-    precomputed_ref_prefix             => $precomputed_ref_prefix,
-    max_matrix_records_in_ram          => $max_matrix_records_in_ram,
-    glob_hash_file                     => $glob_hash_file,
-    ref_hash_file                      => $ref_hash_file,
-    ref_binary_hash_file               => $ref_binary_hash_file,
-    coverage_stats_file                => $coverage_stats_file,
-    config_file                        => $config_file,
-    age                                => $age,                                # Solution, use ageRange in PXF/BFF, measures' values more difficult
-    cli                                => $cli,
-    append_prefixes                    => \@append_prefixes,
-    log                                => $log,
-    debug                              => $debug,
-    verbose                            => $verbose
-};
-
-# Create object
-my $ranker = Pheno::Ranker->new($data);
-
-# Run method
-$ranker->run();
-
-# Create log if <--log>
-write_log( $log ? $log : $log_file, $data, $VERSION )
-  if defined $log;
-
-####################
-# END PHENO-RANKER #
-####################
-
-sub handle_option {
-    my ( $option_ref, $message, $target_file, $default ) = @_;
-    if ( defined $$option_ref ) {
-        pod2usage( -message => $message, -exitval => 1 ) if $target_file;
-        $$option_ref = $$option_ref ? $$option_ref : $default;
-    }
-}
-
-sub resolve_file {
-    my $base = shift;
-
-    # If the base file exists, use it.
-    return $base if -e $base;
-
-    # If a gzipped version exists, use that.
-    my $gz = $base . '.gz';
-    return $gz if -e $gz;
-
-    # If neither exists, just return the base file (you might want to warn or error here)
-    return $base;
-}
-
-sub write_log {
-    my ( $log, $data, $VERSION ) = @_;
-
-    # NB: Darwin does not have nproc to show #logical-cores, using sysctl instead
-    my $os = $^O;
-    chomp(
-        my $threadshost =
-          lc($os) eq 'darwin' ? qx{/usr/sbin/sysctl -n hw.logicalcpu}
-        : lc($os) eq 'freebsd' ? qx{sysctl -n hw.ncpu}
-        : $os eq 'MSWin32'     ? qx{wmic cpu get NumberOfLogicalProcessors}
-        :                        qx{/usr/bin/nproc} // 1
-    );
-
-    # For the Windows command, the result will also contain the string
-    # "NumberOfLogicalProcessors" which is the header of the output.
-    # So we need to extract the actual number from it:
-    if ( $os eq 'MSWin32' ) {
-        ($threadshost) = $threadshost =~ /(\d+)/;
-    }
-    $threadshost = 0 + $threadshost;    # coercing it to be a number
-
-    my $info = {
-        date        => ( strftime "%a %b %e %H:%M:%S %Y", localtime ),
-        threadshost => $threadshost,
-        hostname    => hostname,
-        id          => time . substr( "00000$$", -5 ),                   # string
-        version     => $VERSION,
-             user   => $ENV{'LOGNAME'}
-          || $ENV{'USER'}
-          || $ENV{'USERNAME'}
-          || 'dummy-user'
-    };
-
-    # Saving file
-    say BOLD GREEN "Writing <$log> file\n" if $data->{verbose};
-    write_json(
-        {
-            filepath => $log,
-            data     => { info => $info, data => $data }
-        }
-    );
-}
-
-sub program_header {
-    my $VERSION = shift;
-    my $str     = <<EOF;
-****************************************
-*   Rank against cohort(s) (BFF/PXF)   *
-*          - PHENO-RANKER -            *
-*          Version: $VERSION              *
-*   (C) 2023-2025 Manuel Rueda, PhD    *
-*       The Artistic License 2.0       *
-****************************************
-EOF
-    return $str;
-}
+exit Pheno::Ranker::CLI->new( pod_file => __FILE__ )->run(@ARGV);
 
 =head1 NAME
 
@@ -308,13 +28,16 @@ pheno-ranker: A script that performs semantic similarity in PXF/BFF data structu
      -a, --align [path/basename]      Write alignment file(s). If not specified, default filenames are used [default: alignment.*]
      -append-prefixes <prefixes>      Prefixes for primary_key when #cohorts >= 2 [default: C]
      -config <file>                   YAML config file to modify default parameters [default: share/conf/config.yaml]
-     -cytoscape-json [file]           Serializes the pairwise comparison matrix as an undirected graph in JSON, compatible with Cytoscape [default: graph.json]
+     -cytoscape-json [file]           Writes an undirected graph in Cytoscape-compatible JSON [default: graph.json]
      -e, --export [path/basename]     Export miscellaneous JSON files. If not specified, default filenames are used [default: export.*]
-     -exclude-terms <terms>           Exclude BFF/PXF terms (e.g., --exclude-terms sex, id) or column names in JSON-derived from CSV 
+     -exclude-terms <terms>           Exclude BFF/PXF terms (e.g., --exclude-terms sex id) or column names in JSON-derived from CSV 
      -graph-stats [file]              Generates a text file with key graph metrics, for use with <-cytoscape-json> [default: graph_stats.txt]
+     -graph-min-weight <number>        Keep graph edges with weight greater than or equal to this value
+     -graph-max-weight <number>        Keep graph edges with weight less than or equal to this value
      -include-hpo-ascendants          Include ascendant terms from the Human Phenotype Ontology (HPO)
      -include-terms <terms>           Include BFF/PXF terms (e.g., --include-terms diseases) or column names in JSON-derived from CSV
-     -max-matrix-items-in-ram <number>   In cohort mode, set max items before switching to RAM-efficient mode (default: 5000)
+     -max-matrix-records-in-ram <number> In cohort mode, set max records before switching to RAM-efficient mode (default: 5000)
+     -matrix-format <format>          Matrix output format in cohort mode [>dense|mtx]
      -max-number-vars <number>        Maximum number of variables for binary string [default: 10000]
      -max-out <number>                Print only N comparisons [default: 50]
      -o, --out-file <file>            Output file path [default: -r matrix.txt | -t rank.txt]
@@ -345,8 +68,7 @@ If you plan to only use C<pheno-ranker> CLI, we recommend installing it via CPAN
 
 =head2 Non containerized
 
-The script runs on command-line Linux and it has been tested on Debian/RedHat/macOS based distributions (only showing commands for Debian). Perl 5 is installed by default on Linux, 
-but we will install a few CPAN modules with C<cpanminus>.
+The Perl command-line interface is tested on Linux, macOS, and Windows via GitHub Actions. The commands below focus on Debian-based Linux systems, where Perl 5 is typically available by default and extra CPAN modules can be installed with C<cpanminus>. On Windows, use Docker, WSL, or a Perl environment such as Strawberry Perl.
 
 =head3 Method 1: From CPAN
 
@@ -354,14 +76,7 @@ First install system level dependencies:
 
   sudo apt-get install cpanminus libperl-dev gcc make
 
-Now you have to choose between one of the 2 options below:
-
-B<Option 1:> System-level installation:
-
-  cpanm --notest --sudo Pheno::Ranker
-  pheno-ranker -h
-
-B<Option 2:> Install Pheno-Ranker and the dependencies at C<~/perl5>
+We will install Pheno-Ranker and the dependencies at C<~/perl5>
 
   cpanm --local-lib=~/perl5 local::lib && eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)
   cpanm --notest Pheno::Ranker
@@ -371,7 +86,7 @@ To ensure Perl recognizes your local modules every time you start a new terminal
 
   echo 'eval $(perl -I ~/perl5/lib/perl5/ -Mlocal::lib)' >> ~/.bashrc
 
-To B<update> to the newest version (showing commands for Option 2):
+To B<update> to the newest version:
     
   cpanm Pheno::Ranker
 
@@ -482,7 +197,7 @@ Then I will do something like this:
 
   - OS/ARCH supported: B<linux/amd64> and B<linux/arm64>.
   - Ideally a Debian-based distribution (Ubuntu or Mint), but any other (e.g., CentOS, OpenSUSE) should do as well (untested).
-    (It should also work on macOS and Windows Server, but we are only providing information for Linux here)
+    The Perl CLI is also tested on macOS and Windows; container images are Linux-based.
   * Perl 5 (>= 5.26 core; installed by default in most Linux distributions). Check the version with "perl -v".
   * >= 4GB of RAM
   * 1 core

@@ -144,7 +144,7 @@ XS(XS_WIN32__Pipe_Constant)
 /*----------------------- M I S C   F U N C T I O N S -------------------*/
 int	Error(int iErrorNum, const char *szErrorText){
 	strncpy((char *)gszError, szErrorText, ERROR_TEXT_SIZE);
-	gszError[ERROR_TEXT_SIZE] = '\0';
+	gszError[ERROR_TEXT_SIZE - 1] = '\0';
 	giError = iErrorNum;
 	return giError;
 }		

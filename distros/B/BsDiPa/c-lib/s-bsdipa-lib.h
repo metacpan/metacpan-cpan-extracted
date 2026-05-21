@@ -4,10 +4,12 @@
  *@ Remarks:
  *@ - If s_BSDIPA_32 is defined, 31-bit instead of 63-bit limits.
  *@ - Note: the real limit is maximally
- *@	MIN(s_BSDIPA_OFF_MAX, SIZE_MAX) / sizeof(s_bsdipa_off_t)
+ *@   MIN(s_BSDIPA_OFF_MAX, SIZE_MAX) / sizeof(s_bsdipa_off_t)
  *@   (with 32-bit size_t this can be restrictive)!
  *@ - Algorithm requires a lot of memory, multiple times the input size!
  *@   With s_BSDIPA_32 the overhead can almost be halved.
+ *@ - If s_BSDIPA_SMALL is defined, libdivsufsort is not actually used,
+ *@   but only the original BSDiff algorithm of Colin Percival.
  *@ - Code requires an ISO STD C99 environment.
  *@
  *@ Changes to original bsdiff / libdivsufsort:
@@ -16,17 +18,21 @@
  *@ - The s_BSDIPA_MAGIC_WINDOW is configurable: the original is bound to
  *@   (32- and) 64-bit binary diffs (8), but eg 16 or 32 are better (for text).
  *@ - Data serialization is in big endian/network byte order.
+ *@ - No file I/O, everything is stored on the heap.
  *@ - No bzip2 compression: callee should compress result.
  *@   NOTE: compression is necessary since data is stored in full, meaning
  *@   that identical bytes are stored as NUL.
  *@ -- The s-bsdipa-io.h header is a readily available I/O layer.
  *@    NOTE: I/O layers may impose further size limit restrictions!
- *@ - No file I/O, everything is stored on the heap.
  *@ - Internally diff- and extra data share heap to reduce memory overhead.
  *@ -- As a result diff data is stored in reverse order, last byte first.
  *@ - Memory allocation is solely done via user provided allocator.
  *@ - The header includes the extra data length, so that all information
  *@   is available through it.
+ *@ - "Data-less" control blocks cannot occur (but for the first):
+ *@   BSDiff may generate control blocks which contain no data, but only seek.
+ *@   Such fragments are instead collapsed to the former control block,
+ *@   tightening testable constraints on the header and control chunks.
  *@
  *@ Informational: original bsdiff file format:
  *@	0	8	"BSDIFF40"
@@ -42,18 +48,18 @@
  */
 #define s_BSDIPA_COPYRIGHT \
 	"S-bsdipa is\n" \
-	"	Copyright (c) 2024 - 2025 Steffen Nurpmeso\n" \
+	"	Copyright (c) 2024 - 2026 Steffen Nurpmeso\n" \
 	"	SPDX-License-Identifier: ISC\n" \
 	"The used BSDiff algorithm is\n" \
 	"	Copyright 2003-2005 Colin Percival\n" \
 	"	SPDX-License-Identifier: BSD-2-Clause\n" \
-	"and it uses libdivsufsort that is\n" \
+	"and it optionally (!s_BSDIPA_SMALL) uses libdivsufsort that is\n" \
 	"	Copyright (c) 2003 Yuta Mori All rights reserved.\n" \
 	"	SPDX-License-Identifier: MIT\n"
 /* L5E> */
 /*@ S-bsdipa copyright:
  *
- * Copyright (c) 2024 - 2025 Steffen Nurpmeso <steffen@sdaoden.eu>.
+ * Copyright (c) 2024 - 2026 Steffen Nurpmeso <steffen@sdaoden.eu>.
  * SPDX-License-Identifier: ISC
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -68,7 +74,7 @@
  * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
-/*@ The algorithm as is used inside the library actually is:
+/*@ The algorithm as is used inside the library (s-bsdiff.c) is:
  *
  * SPDX-License-Identifier: BSD-2-Clause
  *
@@ -96,7 +102,7 @@
  * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-/*@ The library used by the algorithm actually is:
+/*@ The optional (!s_BSDIPA_SMALL) libdivsufsort algorithm (for s-bsdiff.c) is:
  *
  * SPDX-License-Identifier: MIT
  *
@@ -126,8 +132,8 @@
 #ifndef s_BSDIPA_LIB_H
 #define s_BSDIPA_LIB_H
 
-/* s_BSDIPA_{VERSION,CONTACT, 32,MAGIC_WINDOW,SMALL}.
- * The latter three must be tested via defined(). */
+/* s_BSDIPA_{VERSION,CONTACT} and s_BSDIPA_{32,MAGIC_WINDOW,SMALL}.
+ * The latter series must be tested via defined(). */
 #include <s-bsdipa-config.h>
 
 #include <sys/types.h>
@@ -140,7 +146,7 @@ extern "C" {
 #endif
 
 /* Integer type for header and control block triples: file size / offsets.
- * For easy overflow avoidance (left hand value) we also test >s_BSDOFF_MAX-1.
+ * For easy overflow avoidance usual test is >s_BSDIPA_OFF_MAX-1.
  * The real limit is even smaller; for patch preparation:
  *	MIN(s_BSDIPA_OFF_MAX, SIZE_MAX) / sizeof(s_bsdipa_off_t)
  * (I/O layers of s-bsdipa-io.h may impose further size constraints.) */
@@ -183,7 +189,7 @@ struct s_bsdipa_header{
 	s_bsdipa_off_t h_before_len; /* Equals s_bsdipa_diff_ctx::dc_before_len. */
 };
 
-/* Informational: a control triple. */
+/* Informational: a control triple (to be worked in sequential order). */
 struct s_bsdipa_ctrl_triple{
 	s_bsdipa_off_t ct_diff_len; /* Copy that much from diff block. */
 	s_bsdipa_off_t ct_extra_len; /* Copy that much from extra block. */
@@ -205,8 +211,8 @@ struct s_bsdipa_diff_ctx{
 	uint8_t const *dc_after_dat; /* New data after changes, plus length. */
 	uint64_t dc_after_len;
 	/* Number of bytes in "a window".  If <=0 s_BSDIPA_MAGIC_WINDOW is assigned and used.
-	 * For binary data sizeof(void*) is useful, higher values (16, 32) impose savings for text.
-	 * There is no maximum imposed, but the algorithm does *not* perform integer overflow checks! */
+	 * For binary data sizeof(void*) is useful, higher values (16, 32) may benefit text (better).
+	 * "No maximum" (only within 7-bit useful), but note integer overflow checks are *not* performed! */
 	int32_t dc_magic_window;
 	int8_t dc__dummy[3];
 	/* Outputs: (allocated result data; freed by s_bsdipa_diff_free()). */
@@ -254,7 +260,7 @@ struct s_bsdipa_patch_ctx{
 	uint8_t const *pc_extra_dat;
 	struct s_bsdipa_header pc_header; /* Deserialized header. */
 	/* Outputs (allocated result data; freed by s_bsdipa_patch_free()).
-	 * (The buffer is guaranteed to have room for one additional byte.) */
+	 * Remark: the buffer is guaranteed to have room for one additional byte. */
 	uint8_t *pc_restored_dat;
 	s_bsdipa_off_t pc_restored_len; /* (Actually a copy of pc_header.h_before_len.) */
 };

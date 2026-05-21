@@ -7,10 +7,10 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use Iterator::Flex::Factory 'to_iterator';
-use Iterator::Flex::Utils qw[ THROW STATE EXHAUSTION :IterAttrs :IterStates ];
+use Iterator::Flex::Utils qw[ THROW STATE EXHAUSTION :IterAttrs :IterStates throw_failure ];
 use Ref::Util;
 use parent 'Iterator::Flex::Base';
 
@@ -55,6 +55,9 @@ sub new ( $class, $iterable, $pars = {} ) {
 
     my %pars     = $pars->%*;
     my $capacity = delete $pars{capacity} // 1;
+    Scalar::Util::looks_like_number( $capacity ) && int( $capacity ) == $capacity && $capacity > 0
+      or throw_failure( parameter => "parameter 'capacity' ($capacity) is not a positive integer" );
+
     $class->SUPER::new( {
             capacity => $capacity,
             src      => $iterable,
@@ -143,13 +146,13 @@ Iterator::Flex::Chunk - Chunk Iterator Class
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 METHODS
 
 =head2 new
 
-  $iterator = Ierator::Flex::Chunk->new( $iterable, ?\%pars );
+  $iterator = Iterator::Flex::Chunk->new( $iterable, ?\%pars );
 
 Returns an iterator which, for each iteration, reads up to a specified
 number of elements from C<$iterable>, and returns an arrayref containing

@@ -1,5 +1,19 @@
 Revision history for this software.
 
+0.12  2026-05-17 00:00:00
+  - add =head1 VERSION to POD
+  - add =head1 TABLE OF CONTENTS to POD
+  - add =head1 INSTALLATION to POD
+  - add =head1 COMPATIBILITY to POD
+  - add =head1 DIAGNOSTICS to POD
+  - update README: add INSTALLATION, COMPATIBILITY, LICENSE AND COPYRIGHT sections
+  - replace \do{local*_} globref with named glob string (Module::FH::H<n>)
+    in open(), opendir(), sysopen(), pipe(), socket(), accept()
+  - add no strict 'refs' guards for all named glob dereferences
+  - Perl 5.005_03 does not support I/O via globref; named glob string
+    works on Perl 5.005_03 and all later versions
+  - created by INABA Hitoshi
+
 0.11  2021-08-29 00:00:00
   - Perl 5.8 is now considered older Perl
   - created by INABA Hitoshi

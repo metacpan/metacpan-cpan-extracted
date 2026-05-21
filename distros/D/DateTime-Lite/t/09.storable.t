@@ -2,18 +2,27 @@
 ##----------------------------------------------------------------------------
 ## Lightweight DateTime Alternative - t/09.storable.t
 ##----------------------------------------------------------------------------
+BEGIN
+{
+    use strict;
+    use warnings;
+    use lib './lib';
+    use Test::More;
+    local $@;
+    eval{ require Storable };
+    if( $@ )
+    {
+        plan( skip_all => 'Storable not available' );
+    }
+};
+
 use strict;
 use warnings;
-use lib './lib';
-use Test::More;
 
-use_ok( 'DateTime::Lite' ) or BAIL_OUT( 'Cannot load DateTime::Lite' );
-
-eval { require Storable };
-if( $@ )
+BEGIN
 {
-    plan( skip_all => 'Storable not available' );
-}
+    use_ok( 'DateTime::Lite' ) or BAIL_OUT( 'Cannot load DateTime::Lite' );
+};
 
 # NOTE: Round-trip via Storable::dclone (deep clone through freeze/thaw)
 subtest 'Round-trip via Storable::dclone (deep clone through freeze/thaw)' => sub

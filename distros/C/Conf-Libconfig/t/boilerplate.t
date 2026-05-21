@@ -1,7 +1,7 @@
 #!perl -T
 use strict;
 use warnings;
-use Test::More tests => 3;
+use Test::More tests => 4;
 
 sub not_in_file_ok {
     my ($filename, %regex) = @_;
@@ -35,12 +35,16 @@ sub module_boilerplate_ok {
     );
 }
 
-  not_in_file_ok(README =>
+  not_in_file_ok("README.md" =>
     "The README is used..."       => qr/The README is used/,
     "'version information here'"  => qr/to provide version information/,
   );
 
-  not_in_file_ok(Changes =>
+  not_in_file_ok("Changes.md" =>
+    "placeholder date/time"       => qr(Date/time)
+  );
+
+  not_in_file_ok("Conf-Libconfig.spec" =>
     "placeholder date/time"       => qr(Date/time)
   );
 

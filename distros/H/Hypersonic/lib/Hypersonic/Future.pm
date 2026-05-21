@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 # High-performance JIT-compiled Future for async operations
 # Serves as the foundation for all async in Hypersonic:
@@ -1311,11 +1311,19 @@ sub compile {
 
     my $code = $builder->code;
 
+    # Pool emits pthread_create/_mutex_*/_cond_* calls. Linux's libc
+    # provides these via libc symbols (glibc) so the link often succeeds
+    # without -lpthread, but on FreeBSD/OpenBSD and on Linux with musl
+    # they live in libpthread and the JIT-compiled .so fails dlopen
+    # with "Undefined symbol 'pthread_create'". Add the flags
+    # unconditionally - they're no-ops on platforms that don't need them.
     XS::JIT->compile(
-        code      => $code,
-        name      => $MODULE_NAME,
-        cache_dir => $cache_dir,
-        functions => \%functions,
+        code         => $code,
+        name         => $MODULE_NAME,
+        cache_dir    => $cache_dir,
+        functions    => \%functions,
+        extra_cflags => '-pthread',
+        extra_ldflags => '-lpthread',
     );
 
     # Register custom ops to replace method calls at compile time

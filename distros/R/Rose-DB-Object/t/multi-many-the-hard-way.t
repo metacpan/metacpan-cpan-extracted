@@ -6,7 +6,7 @@ use Test::More tests => 37;
 
 use Rose::DB::Object;
 
-BEGIN { require 't/test-lib.pl' }
+BEGIN { require './t/test-lib.pl' }
 
 our %Have;
 

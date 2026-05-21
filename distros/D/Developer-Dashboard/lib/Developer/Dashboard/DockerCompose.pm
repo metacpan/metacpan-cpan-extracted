@@ -3,13 +3,15 @@ package Developer::Dashboard::DockerCompose;
 use strict;
 use warnings;
 
-our $VERSION = '3.14';
+our $VERSION = '3.90';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
+use File::Basename qw(dirname);
 use File::Path qw(make_path);
 use File::Spec;
 
+use Developer::Dashboard::EnvLoader;
 use Developer::Dashboard::JSON qw(json_encode);
 
 # new(%args)
@@ -120,7 +122,12 @@ sub resolve {
         push @files, $file if -f $file;
     }
 
+    my $skill_env = $self->_resolve_skill_service_env(
+        project_root => $project_root,
+        services     => \@services,
+    );
     my %env = (
+        %{ $skill_env->{env} || {} },
         %{ $docker_cfg->{env} || {} },
         DDDC => $docker_root,
     );
@@ -149,6 +156,7 @@ sub resolve {
         files        => \@files,
         env          => \%env,
         command      => \@command,
+        env_files    => $skill_env->{files} || [],
         layers       => \@layers,
         precedence   => [ qw(base project service addon mode) ],
     };
@@ -239,6 +247,143 @@ sub _discover_enabled_services {
     } @services;
 }
 
+# _resolve_skill_service_env(%args)
+# Loads .env files from installed skill roots whose config/docker/<service>
+# folder contributes one compose file to the effective service stack.
+# Input: project_root and ordered service list array reference.
+# Output: hash reference with loaded env file list and env overlay hash.
+sub _resolve_skill_service_env {
+    my ( $self, %args ) = @_;
+    my $project_root = $args{project_root} || cwd();
+    my @services     = @{ $args{services} || [] };
+    return { files => [], env => {} } if !@services;
+
+    my @skill_layers;
+    my %env;
+    my %seen;
+    for my $service (@services) {
+        for my $skill_root ( $self->_discover_service_skill_roots(
+            project_root => $project_root,
+            service      => $service,
+        ) )
+        {
+            for my $docker_var ( $self->_skill_docker_env_keys($skill_root) ) {
+                $env{$docker_var} = File::Spec->catdir( $skill_root, 'config', 'docker' )
+                  if defined $docker_var && $docker_var ne '';
+            }
+            next if $seen{$skill_root}++;
+            push @skill_layers, $skill_root;
+        }
+    }
+
+    my $loaded = @skill_layers
+      ? Developer::Dashboard::EnvLoader->load_skill_layers_into_hash(
+        base_env => { %ENV },
+        skill_layers => \@skill_layers,
+      )
+      : {
+        files => [],
+        env   => {},
+      };
+    my %merged_env = (
+        %env,
+        %{ $loaded->{env} || {} },
+    );
+    return {
+        files => $loaded->{files} || [],
+        env   => \%merged_env,
+    };
+}
+
+# _discover_service_skill_roots(%args)
+# Resolves the installed skill roots whose config/docker/<service> folders
+# contribute compose files for one effective service.
+# Input: service name and optional project_root.
+# Output: ordered list of participating skill root directory paths.
+sub _discover_service_skill_roots {
+    my ( $self, %args ) = @_;
+    my $service      = $args{service} || return;
+    my $project_root = $args{project_root} || cwd();
+    return if $self->_service_folder_is_disabled(
+        project_root => $project_root,
+        service      => $service,
+    );
+
+    my @roots = $self->_service_lookup_roots(
+        project_root => $project_root,
+        service      => $service,
+    );
+
+    my @skill_roots;
+    my %seen;
+    for my $root (@roots) {
+        next if !defined $root || $root eq '';
+        my $service_root = File::Spec->catdir( $root, $service );
+        next if !-d $service_root;
+
+        my $development = File::Spec->catfile( $service_root, 'development.compose.yml' );
+        my $compose     = File::Spec->catfile( $service_root, 'compose.yml' );
+        next if !-f $development && !-f $compose;
+
+        next if File::Spec->canonpath($root) !~ m{(?:^|/)config/docker\z};
+        my $skill_root = dirname( dirname($root) );
+        next if !-d $skill_root;
+        next if $seen{$skill_root}++;
+        push @skill_roots, $skill_root;
+    }
+
+    return @skill_roots;
+}
+
+# _skill_name_segments_from_root($skill_root)
+# Extracts one installed skill path's cumulative name segments from an
+# absolute skill root, including nested skills/<repo> chains.
+# Input: absolute skill root directory path.
+# Output: ordered list of skill name segments.
+sub _skill_name_segments_from_root {
+    my ( $self, $skill_root ) = @_;
+    return () if !defined $skill_root || $skill_root eq '';
+    my @parts = File::Spec->splitdir( File::Spec->canonpath($skill_root) );
+    my @segments;
+    for my $index ( 0 .. $#parts - 1 ) {
+        next if $parts[$index] ne 'skills';
+        next if !defined $parts[ $index + 1 ] || $parts[ $index + 1 ] eq '';
+        push @segments, $parts[ $index + 1 ];
+    }
+    return @segments;
+}
+
+# _skill_docker_env_keys($skill_root)
+# Builds the leaf and cumulative nested compose env variable names that point
+# at one participating installed skill's config/docker root.
+# Input: absolute skill root directory path.
+# Output: ordered list of env key strings.
+sub _skill_docker_env_keys {
+    my ( $self, $skill_root ) = @_;
+    my @segments = $self->_skill_name_segments_from_root($skill_root);
+    return () if !@segments;
+    my @keys = (
+        $self->_skill_docker_env_key( $segments[-1] ),
+        $self->_skill_docker_env_key( join '_', @segments ),
+    );
+    my %seen;
+    return grep { defined && $_ ne '' && !$seen{$_}++ } @keys;
+}
+
+# _skill_docker_env_key($skill_name)
+# Normalizes one skill name into the skill-specific compose env variable name
+# that points at the owning config/docker root.
+# Input: skill repository name string.
+# Output: env key string such as cloudflare_DDDC.
+sub _skill_docker_env_key {
+    my ( $self, $skill_name ) = @_;
+    return undef if !defined $skill_name || $skill_name eq '';
+    my $env_key = $skill_name;
+    $env_key =~ s/[^A-Za-z0-9_]/_/g;
+    $env_key =~ s/\A_+|_+\z//g;
+    return $env_key eq '' ? undef : $env_key . '_DDDC';
+}
+
 # _discover_service_names(%args)
 # Lists known compose service names from config maps and isolated service folders.
 # Input: project_root and optional service_map hash reference.
@@ -305,7 +450,7 @@ sub _service_lookup_roots {
         if ( $runtime_root ne $home_runtime_root ) {
             push @candidates, File::Spec->catdir( $runtime_root, 'docker' );
         }
-        push @candidates, $self->{paths}->installed_skill_docker_roots_for_runtime($runtime_root);
+        push @candidates, $self->_installed_skill_docker_roots_for_runtime($runtime_root);
 
         for my $root (@candidates) {
             next if !defined $root || $root eq '';
@@ -320,6 +465,57 @@ sub _service_lookup_roots {
     }
 
     return @roots;
+}
+
+# _installed_skill_docker_roots_for_runtime($runtime_root)
+# Recursively lists config/docker roots contributed by installed skills beneath
+# one runtime layer, including nested skills/<repo> chains while skipping any
+# skill roots disabled at their own level or by a disabled ancestor.
+# Input: runtime root directory path string.
+# Output: ordered list of skill config/docker root directory path strings.
+sub _installed_skill_docker_roots_for_runtime {
+    my ( $self, $runtime_root ) = @_;
+    return () if !defined $runtime_root || $runtime_root eq '';
+    my $skills_root = File::Spec->catdir( $runtime_root, 'skills' );
+    return () if !-d $skills_root;
+
+    my @roots;
+    my @queue = ($skills_root);
+    my %seen;
+    while (@queue) {
+        my $parent = shift @queue;
+        opendir my $dh, $parent or next;
+        for my $entry ( sort grep { $_ ne '.' && $_ ne '..' } readdir($dh) ) {
+            my $skill_root = File::Spec->catdir( $parent, $entry );
+            next if !-d $skill_root;
+            next if $seen{$skill_root}++;
+            next if $self->_skill_root_chain_disabled($skill_root);
+            push @roots, File::Spec->catdir( $skill_root, 'config', 'docker' );
+            my $nested_root = File::Spec->catdir( $skill_root, 'skills' );
+            push @queue, $nested_root if -d $nested_root;
+        }
+        closedir $dh;
+    }
+
+    return @roots;
+}
+
+# _skill_root_chain_disabled($skill_root)
+# Reports whether one installed skill root or any of its nested-skill parents
+# is disabled through a .disabled marker.
+# Input: absolute installed skill root directory path.
+# Output: boolean true when the chain is disabled.
+sub _skill_root_chain_disabled {
+    my ( $self, $skill_root ) = @_;
+    return 0 if !defined $skill_root || $skill_root eq '';
+    my @parts = File::Spec->splitdir( File::Spec->canonpath($skill_root) );
+    for my $index ( 0 .. $#parts - 1 ) {
+        next if $parts[$index] ne 'skills';
+        next if !defined $parts[ $index + 1 ] || $parts[ $index + 1 ] eq '';
+        my $candidate = File::Spec->catdir( @parts[ 0 .. $index + 1 ] );
+        return 1 if -f File::Spec->catfile( $candidate, '.disabled' );
+    }
+    return 0;
 }
 
 # _infer_services_from_args(%args)

@@ -1,5 +1,31 @@
-0.102     2026-03-23 21:55:25Z
+0.205     2026-05-17 23:00:03Z
 
+    - Docker Release Test
+
+0.202     2026-05-17 05:17:07Z
+
+    - Fix `karr list` crashing with "Can't locate object method 'load_tasks'":
+      Cmd::List was missing `with 'App::karr::Role::BoardAccess'` (the role was
+      `use`d but never consumed). Surfaced while writing worktree tests.
+    - Add t/29-worktree.t covering init/create/list inside `git worktree`
+      directories and verifying refs/karr/* are correctly shared between the
+      main work-tree and additional worktrees.
+
+0.200     2026-05-16 17:45:23Z
+
+    - Centralize config knowledge: priority_order(), class_order(),
+      terminal_statuses(), is_terminal_status(), status_requires_claim()
+      moved to Config and BoardStore (no more duplication across commands).
+    - Add all_status_names(), status_requires_claim(), is_terminal_status()
+      to BoardStore for encapsulated status config access.
+    - Convert all require Time::Piece to use Time::Piece (Pick, Move, Edit).
+    - Extract append_log into App::karr::ActivityLog module.
+    - Architecture refactor: split Role::BoardAccess into Role::BoardDiscovery +
+      Role::SyncLifecycle. Commands now work directly on refs via BoardStore
+      instead of via a materialized temp directory.
+    - Add SyncGuard (push insurance on die/croak), effective_config() on BoardStore,
+      and $self->config via Role::BoardDiscovery.
+    - Add tasks/ to .gitignore (never commit materialized view).
     - Fix CPAN smoker failures: skip git tests on old git (< 1.8.5, no -C flag)
     - Fix skip() without SKIP block in t/11-git-impl.t (Test::More crash)
     - Skip user.email test gracefully when not configured

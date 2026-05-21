@@ -13,9 +13,10 @@
 package Module::Generic::File::Cache;
 BEGIN
 {
+    use v5.16.0;
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'Module::Generic' );
     use parent qw( Module::Generic );
     use vars qw( $DEBUG $HAS_B64 );
     use Data::UUID;
@@ -32,7 +33,6 @@ BEGIN
     our $VERSION = 'v0.3.0';
 };
 
-use v5.26.1;
 use strict;
 use warnings;
 
@@ -807,7 +807,7 @@ sub DESTROY
 {
     # <https://perldoc.perl.org/perlobj#Destructors>
     CORE::local( $., $@, $!, $^E, $? );
-    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    CORE::return if( Module::Generic::_in_global_destruction() );
     my $self = CORE::shift( @_ );
     CORE::return if( !CORE::defined( $self ) );
     CORE::return unless( CORE::exists( $self->{_cache_file} ) && CORE::defined( $self->{_cache_file} ) && CORE::length( $self->{_cache_file} ) );

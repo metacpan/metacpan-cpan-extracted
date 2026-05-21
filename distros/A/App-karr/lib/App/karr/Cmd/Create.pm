@@ -1,7 +1,7 @@
 # ABSTRACT: Create a new task
 
 package App::karr::Cmd::Create;
-our $VERSION = '0.102';
+our $VERSION = '0.205';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -76,10 +76,8 @@ sub execute {
   my $title = $self->title // $args_ref->[0]
     or die "Title is required. Use --title or pass as argument.\n";
 
-  my $config = App::karr::Config->new(
-    file => $self->board_dir->child('config.yml'),
-  );
-  my $defaults = $config->data->{defaults} // {};
+  my $ec = $self->store->effective_config;
+  my $defaults = $ec->{defaults} // {};
 
   my %task_args = (
     id       => $self->allocate_next_id,
@@ -96,11 +94,11 @@ sub execute {
   $task_args{body}     = $self->body if $self->body;
 
   my $task = App::karr::Task->new(%task_args);
-  my $file = $task->save($self->tasks_dir);
+  $self->save_task($task);
 
   $self->sync_after;
 
-  printf "Created task %d: %s (%s)\n", $task->id, $task->title, $file->basename;
+  printf "Created task %d: %s\n", $task->id, $task->title;
 }
 
 1;
@@ -117,7 +115,7 @@ App::karr::Cmd::Create - Create a new task
 
 =head1 VERSION
 
-version 0.102
+version 0.205
 
 =head1 SYNOPSIS
 
@@ -163,11 +161,11 @@ L<App::karr::Cmd::Edit>, L<App::karr::Cmd::Move>
 =head2 Issues
 
 Please report bugs and feature requests on GitHub at
-L<https://github.com/Getty/p5-app-karr/issues>.
+L<https://github.com/Getty/karr/issues>.
 
 =head2 IRC
 
-Join C<#ai> on C<irc.perl.org> or message Getty directly.
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -175,7 +173,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

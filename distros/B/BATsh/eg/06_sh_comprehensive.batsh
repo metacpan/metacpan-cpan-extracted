@@ -221,3 +221,72 @@ echo "  (local is effective inside subroutines invoked by CMD CALL)"
 
 # ---------------------------------------------------------------
 echo "[SH comprehensive] Done."
+
+# ---------------------------------------------------------------
+# 21. Pipelines (cmd1 | cmd2)
+# ---------------------------------------------------------------
+echo "[21] Pipelines"
+echo "hello pipeline" | perl -e "while(<STDIN>){chomp;print uc(\$_).chr(10)}"
+COUNT=$(echo "alpha beta gamma" | perl -e "my @w=split;print scalar @w")
+echo "  word count: $COUNT"
+
+# ---------------------------------------------------------------
+# 22. I/O redirection (> >> < 2>&1)
+# ---------------------------------------------------------------
+echo "[22] I/O redirection"
+TMPF=$(perl -e "use File::Spec; print File::Spec->catfile(File::Spec->tmpdir(),'batsh_eg06_$$.txt')")
+echo "line1" > $TMPF
+echo "line2" >> $TMPF
+echo "  file contents:"
+while IFS= read -r LINE 2>/dev/null || true; do
+    echo "    $LINE"
+done < $TMPF
+echo "hello stderr" 2>&1
+perl -e 'print STDERR "captured_err\n"' > /dev/null 2>&1
+echo "  (stderr was merged to stdout above)"
+rm -f $TMPF 2>/dev/null || true
+
+# ---------------------------------------------------------------
+# 23. Compound commands (&& || ;)
+# ---------------------------------------------------------------
+echo "[23] Compound commands"
+true && echo "  true && echo: executed"
+false && echo "  false && echo: skipped (should not appear)"
+false || echo "  false || echo: executed"
+true || echo "  true || echo: skipped (should not appear)"
+echo "  a"; echo "  b"; echo "  c"
+
+# ---------------------------------------------------------------
+# 24. Function definitions
+# ---------------------------------------------------------------
+echo "[24] Function definitions"
+greet() {
+    echo "  Hello, $1! (from function)"
+}
+greet BATsh
+greet world
+
+add_nums() {
+    echo "  $1 + $2 = $(( $1 + $2 ))"
+}
+add_nums 3 4
+add_nums 10 25
+
+double() { echo "  double($1) = $(( $1 * 2 ))"; }
+double 7
+double 21
+
+# ---------------------------------------------------------------
+# 25. local variable scoping in functions
+# ---------------------------------------------------------------
+echo "[25] local variable scoping"
+OUTER=global_value
+test_local() {
+    local OUTER=local_value
+    echo "  inside function: OUTER=$OUTER"
+}
+test_local
+echo "  after function:  OUTER=$OUTER"
+
+# ---------------------------------------------------------------
+echo "[SH comprehensive] All done."

@@ -26,7 +26,8 @@ use strict;
 use warnings;
 use Test::More;
 
-use lib::relative 'lib';
+use File::Basename qw(dirname);
+use lib dirname(__FILE__) . '/lib';
 use Local::Fork qw(run_fork);
 
 my %trace;

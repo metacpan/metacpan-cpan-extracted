@@ -1,55 +1,127 @@
 ======================================================================
- JSON::LINQ အမြန်ကိုးကားချက်                                  [BM] မြန်မာဘာသာ
+ JSON::LINQ — Helaian Rujukan Pantas                        [BM] Bahasa Melayu
 ======================================================================
 
-JSON နှင့် JSONL ဖိုင်များအတွက် LINQ-ပုံစံ မေးမြန်းမှု ဝိနည်းချပ်
+[ 1. 1. Mencipta Kueri ]
 
-[ 1. 1. မေးမြန်းမှု ဖန်တီးခြင်း ]
+  use JSON::LINQ;
+  my $q = JSON::LINQ->FromJSON('data.json');
+  my $q = JSON::LINQ->FromJSONL('events.jsonl');
+  my $q = JSON::LINQ->FromJSONString('[{"id":1}]');
 
-  FromJSON, FromJSONL, FromJSONString, From, Empty, Range, Repeat
+  # From an LTSV file (label:value, TAB-separated, streaming)
+  my $q = JSON::LINQ->FromLTSV('data.ltsv');
+  # Dari fail CSV (baris pertama = pengepala, penstriman)
+  my $q = JSON::LINQ->FromCSV('data.csv');
+  my $q = JSON::LINQ->FromCSV('data.csv', sep => "\t");         # TSV
+  my $q = JSON::LINQ->FromCSV('f.csv', headers=>[qw(a b c)]);  # tanpa pengepala
+  my $q = JSON::LINQ->FromCSV('f.csv', headers=>[qw(a b c)], skip_header=>1);
+  my $q = JSON::LINQ->From(\@array);
+  my $q = JSON::LINQ->Empty();
+  my $q = JSON::LINQ->Range(1, 5);
+  my $q = JSON::LINQ->Repeat('x', 3);
 
-[ 2. 2. စစ်ထုတ်ခြင်း ]
+[ 2. 2. Penapisan ]
 
-  Where
+  ->Where(sub { $_[0]{status} eq '200' })
+  ->Where(sub { $_[0]{score} >= 80 })
 
-[ 3. 3. ပုံစံပြောင်းခြင်း ]
+[ 3. 3. Unjuran ]
 
-  Select, SelectMany
+  ->Select(sub { $_[0]{name} })
+  ->SelectMany(sub { [ @{ $_[0]{tags} } ] })
 
-[ 4. 4. စီစစ်ခြင်း ]
+[ 4. 4. Pengisihan ]
 
-  OrderBy, OrderByDescending, OrderByNum, OrderByStr, ThenBy, Reverse
+  ->OrderBy(sub { $_[0]{name} })
+  ->OrderByDescending(sub { $_[0]{score} })
+  ->OrderByNum(sub { $_[0]{price} })
+  ->OrderByStr(sub { $_[0]{code} })
+  ->ThenBy(sub { $_[0]{name} })
+  ->Reverse()
 
-[ 5. 5. စာမျက်နှာ ခွဲခြင်း ]
+[ 5. 5. Penomboran Halaman ]
 
-  Skip, Take, SkipWhile, TakeWhile
+  ->Skip(10)  ->Take(5)
+  ->SkipWhile(sub { ... })  ->TakeWhile(sub { ... })
 
-[ 6. 6. အုပ်စုဖွဲ့ခြင်း ]
+[ 6. 6. Pengelompokan ]
 
-  GroupBy, ToLookup
+  my @g = $q->GroupBy(sub { $_[0]{cat} })->ToArray();
+  my $l = $q->ToLookup(sub { $_[0]{dept} });
 
-[ 7. 7. စုစည်းခြင်း ]
+[ 7. 7. Pengagregatan (kaedah terminal) ]
 
-  Count, Sum, Average, Min, Max, First, Last, Any, All, ForEach, Aggregate
+  ->Count()  ->Sum(sub { $_[0]{v} })  ->Average(sub { ... })
+  ->Min(sub { ... })  ->Max(sub { ... })
+  ->First()  ->FirstOrDefault()
+  ->Last()   ->LastOrDefault()
+  ->Any()    ->All(sub { ... })
+  ->ForEach(sub { ... })  ->Aggregate($s, sub { ... })
 
-[ 8. 8. အစုအဝေး လုပ်ဆောင်ချက်များ ]
+[ 8. 8. Operasi Set ]
 
-  Distinct, Union, Intersect, Except
+  ->Distinct()  ->Union($q2)  ->Intersect($q2)  ->Except($q2)
+  ->SequenceEqual($q2)
 
-[ 9. 9. ပြောင်းလဲခြင်း ]
+[ 9. 9. Penukaran ]
 
-  ToJSON, ToJSONL, ToArray, ToDictionary, ToLookup
+  ->ToJSON('out.json')   ->ToJSONL('out.jsonl')
+  ->ToLTSV('output.ltsv')                        # write as LTSV file (all keys, alphabetical)
+  ->ToLTSV('out.ltsv', label_order=>[qw(a b c)]) # emit specified labels in order
+  ->ToLTSV('out.ltsv', headers    =>[qw(a b c)]) # alias for label_order
+  ->ToCSV('output.csv')                        # tulis sebagai fail CSV (semua kunci, abjad)
+  ->ToCSV('out.csv', headers    =>[qw(a b c)]) # lajur yang ditentukan mengikut urutan
+  ->ToCSV('out.csv', label_order=>[qw(a b c)]) # alias untuk headers
+  ->ToCSV('out.csv', sep=>"\t", no_header=>1)   # TSV, tanpa pengepala
+  ->ToArray()  ->ToDictionary(sub { ... })  ->ToLookup(sub { ... })
 
-[ 10. 10. ချိတ်ဆက်ခြင်း ]
+[ 10. 10. Nilai Boolean ]
 
-  Join, GroupJoin, Concat, Zip
+  JSON::LINQ::true   # 1 / "true"
+  JSON::LINQ::false  # 0 / "false"
 
-[ 11. 11. Boolean တန်ဖိုးများ ]
+[ 11. 11. Cantuman ]
 
-  JSON::LINQ::true / JSON::LINQ::false
+  $outer->Join($inner, sub{$_[0]{k}}, sub{$_[0]{k}}, sub{...})
+  $outer->GroupJoin($inner, sub{...}, sub{...}, sub{...})
 
-[ 12. 12. ကိုးကားချက် လင့်ခ်များ ]
+  # JOIN: main JSON x sub-table LTSV (department lookup)
+  my $depts = JSON::LINQ->FromLTSV('departments.ltsv');
+  JSON::LINQ->FromJSON('employees.json')
+      ->Join($depts,
+          sub { $_[0]{dept_id} },
+          sub { $_[0]{id}      },
+          sub { { name => $_[0]{name}, dept => $_[1]{name} } })
+      ->ToArray();
 
-  https://metacpan.org/dist/JSON-LINQ
+  # JOIN: main LTSV x sub-table JSON (price master)
+  my $prices = JSON::LINQ->FromJSON('prices.json');
+  JSON::LINQ->FromLTSV('orders.ltsv')
+      ->Join($prices,
+          sub { $_[0]{sku} },
+          sub { $_[0]{sku} },
+          sub { { order_id => $_[0]{id},
+                  amount   => $_[0]{qty} * $_[1]{price} } })
+      ->ToArray();
+
+  # JOIN: main CSV x sub-table JSON (senarai harga)
+  my $prices = JSON::LINQ->FromJSON('prices.json');
+  JSON::LINQ->FromCSV('orders.csv')
+      ->Join($prices,
+          sub { $_[0]{sku} }, sub { $_[0]{sku} },
+          sub { { order_id => $_[0]{id},
+                  amount   => $_[0]{qty} * $_[1]{price} } })
+      ->ToArray();
+
+[ 12. 12. Kaedah Lain ]
+
+  ->Concat($q2)  ->Zip($q2, sub{...})  ->DefaultIfEmpty($d)
+
+[ 13. 13. Pautan Rujukan ]
+
+  JSON::LINQ: https://metacpan.org/dist/JSON-LINQ
+  JSONL:      https://jsonlines.org/
+  LINQ:       https://docs.microsoft.com/dotnet/api/system.linq
 
 ======================================================================

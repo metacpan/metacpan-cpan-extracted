@@ -1,5 +1,5 @@
 package Muster::Assemble;
-$Muster::Assemble::VERSION = '0.93';
+$Muster::Assemble::VERSION = '0.9501';
 #ABSTRACT: Muster::Assemble - page rendering
 =head1 NAME
 
@@ -7,7 +7,7 @@ Muster::Assemble - page rendering
 
 =head1 VERSION
 
-version 0.93
+version 0.9501
 
 =head1 SYNOPSIS
 

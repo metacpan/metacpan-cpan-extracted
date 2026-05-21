@@ -31,10 +31,9 @@ sub TO_JSON {
 
     my $self = shift;
 
-    my $json = {ref => $self->ref};
+    my $json = {ref => $self->ref, dependsOn => $self->depends_on};
 
-    $json->{dependsOn} = $self->depends_on if @{$self->depends_on};
-    $json->{provides}  = $self->provides   if @{$self->provides};
+    $json->{provides} = $self->provides if @{$self->provides};
 
     return $json;
 

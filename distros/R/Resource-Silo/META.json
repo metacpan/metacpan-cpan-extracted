@@ -42,8 +42,7 @@
          "requires" : {
             "JSON::PP" : "0",
             "Test::Exception" : "0.29",
-            "Test::More" : "1.302015",
-            "lib::relative" : "0"
+            "Test::More" : "1.302015"
          }
       }
    },
@@ -58,5 +57,5 @@
          "web" : "https://github.com/dallaylaen/resource-silo-p5"
       }
    },
-   "version" : "0.1502"
+   "version" : "0.1703"
 }

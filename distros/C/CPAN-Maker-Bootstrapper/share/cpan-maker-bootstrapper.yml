@@ -1,0 +1,44 @@
+---
+commands:
+  annotate: CPAN::Maker::Bootstrapper::Role::LLM::Annotator
+  code-finding: CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
+  code-review: CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
+  create-config: CPAN::Maker::Bootstrapper::Role::CreateConfig
+  default: cmd_install
+  install: CPAN::Maker::Bootstrapper::Role::Installer
+  import-scaffold:  CPAN::Maker::Bootstrapper::Role::ScaffoldImporter
+  models: CPAN::Maker::Bootstrapper::Role::LLM::Models
+  pod-finding: CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
+  pod-review: CPAN::Maker::Bootstrapper::Role::LLM::Reviewer
+  release-notes: CPAN::Maker::Bootstrapper::Role::LLM::ReleaseNotes
+  update-annotations: CPAN::Maker::Bootstrapper::Role::LLM::Annotator
+options:
+- auto-annotate|A
+- annotate|a=s@
+- color!
+- comment|co=s
+- context|C=s@
+- dry-run|D
+- finalize-annotations|F
+- history!
+- max-diff-files=i
+- max-tokens|t=i
+- model|M=s
+- prompt|p=s
+- prompt-profile|P=s@
+- help|h
+- basedir|b=s
+- config|c=s
+- email|e=s
+- force|f!
+- github-user|g=s
+- installdir|i=s
+- import|I=s@
+- module|m=s
+- resources|r=s
+- stub|s=s
+- username|u=s
+extra_options:
+  - llm_api_key_helper
+  - dist_dir
+  - import_file_listing

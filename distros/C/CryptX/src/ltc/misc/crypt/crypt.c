@@ -13,9 +13,9 @@ const char *crypt_build_settings =
    "LibTomCrypt " SCRYPT " (www.libtom.net)\n"
    "LibTomCrypt is public domain software.\n"
 #if defined(INCLUDE_BUILD_DATE)
-   "Built on " __DATE__ " at " __TIME__ "\n"
+   "Built on " __DATE__ " at " __TIME__ "\n\n"
 #endif
-   "\n\nEndianness: "
+   "\nEndianness: "
 #if defined(ENDIAN_NEUTRAL)
    "neutral/"
 #endif
@@ -133,6 +133,9 @@ const char *crypt_build_settings =
    "Stream ciphers built-in:\n"
 #if defined(LTC_CHACHA)
    "   ChaCha\n"
+#endif
+#if defined(LTC_XCHACHA20)
+   "   XChaCha20\n"
 #endif
 #if defined(LTC_SALSA20)
    "   Salsa20\n"
@@ -378,6 +381,10 @@ const char *crypt_build_settings =
     "   X25519\n"
 #endif
 #endif
+#if defined(LTC_CURVE448)
+    "   Ed448\n"
+    "   X448\n"
+#endif
 #if defined(LTC_PK_MAX_RETRIES)
     "   "NAME_VALUE(LTC_PK_MAX_RETRIES)"\n"
 #endif
@@ -427,6 +434,12 @@ const char *crypt_build_settings =
 #endif
 #if defined(LTC_PPC32)
     "   PPC32 detected.\n"
+#endif
+#if defined(LTC_ARCH_X86)
+   "    LTC_ARCH_X86\n"
+#endif
+#if defined(LTC_ARCH_AARCH64)
+   "    LTC_ARCH_AARCH64\n"
 #endif
 
     "\nVarious others: "
@@ -502,13 +515,13 @@ const char *crypt_build_settings =
 #if defined(LTC_PEM_SSH)
     " OpenSSH-PEM "
 #endif
-#if defined(LTC_SHA1_X86)
+#if defined(LTC_SHA1) && defined(LTC_SHA1_X86)
    " SHA1-NI "
 #endif
-#if defined(LTC_SHA224_X86)
+#if defined(LTC_SHA224) && defined(LTC_SHA224_X86)
    " SHA224-NI "
 #endif
-#if defined(LTC_SHA256_X86)
+#if defined(LTC_SHA256) && defined(LTC_SHA256_X86)
    " SHA256-NI "
 #endif
 #if defined(LTC_DEVRANDOM)

@@ -2,7 +2,7 @@ package IPC::Manager::Client::SharedMem;
 use strict;
 use warnings;
 
-our $VERSION = '0.000027';
+our $VERSION = '0.000028';
 
 # Set to 1 by Makefile.PL at install time when the host's SysV IPC is
 # unreliable.  When true, _viable() throws an exception explaining how
@@ -14,6 +14,7 @@ use Carp qw/croak/;
 
 use IPC::Manager::Message;
 use IPC::Manager::Serializer::JSON;
+use IPC::Manager::Util qw/pid_is_running/;
 
 use parent 'IPC::Manager::Client';
 use Object::HashBase qw{
@@ -299,15 +300,24 @@ sub init {
             }
         }
         else {
-            if ($state->{clients}{$id}) {
-                $self->{disconnected} = 1;
-                croak "Client '$id' already exists";
+            if (my $existing = $state->{clients}{$id}) {
+                my $epid = $existing->{pid};
+                if ($epid && pid_is_running($epid) == 0) {
+                    delete $state->{clients}{$id};
+                    delete $state->{messages}{$id};
+                    delete $state->{stats}{$id};
+                }
+                else {
+                    $self->{disconnected} = 1;
+                    croak "Client '$id' already exists";
+                }
             }
             $state->{clients}{$id} = {pid => $$};
             $state->{messages}{$id} //= [];
         }
 
         $state->{clients}{$id}{pid} = $$;
+        delete $state->{clients}{$id}{suspend_expires_at};
 
         $self->_commit($state);
         1;
@@ -387,7 +397,60 @@ sub send_message {
 sub peers {
     my $self  = shift;
     my $state = $self->_lock_read;
-    return sort grep { $_ ne $self->{id} } keys %{$state->{clients}};
+    my $my_id = $self->{id};
+    my @out;
+    for my $peer_id (keys %{$state->{clients}}) {
+        next if $peer_id eq $my_id;
+        my $data = $state->{clients}{$peer_id};
+        my $pid  = $data ? $data->{pid} : undef;
+        next if $pid && pid_is_running($pid) == 0;
+        push @out, $peer_id;
+    }
+    return sort @out;
+}
+
+sub peer_left {
+    my $self = shift;
+
+    my $state;
+    unless (eval { $state = $self->_lock_write; 1 }) {
+        warn $@;
+        return 0;
+    }
+
+    my $removed = 0;
+    my $ok      = eval {
+        my $my_id = $self->{id};
+        for my $peer_id (keys %{$state->{clients}}) {
+            next if $peer_id eq $my_id;
+            my $data = $state->{clients}{$peer_id};
+            my $pid  = $data ? $data->{pid} : undef;
+            next unless $pid;
+            next unless pid_is_running($pid) == 0;
+
+            delete $state->{clients}{$peer_id};
+            delete $state->{messages}{$peer_id};
+            delete $state->{stats}{$peer_id};
+            $removed++;
+        }
+
+        if ($removed) {
+            $self->_commit($state);
+        }
+        else {
+            $self->_unlock;
+        }
+        1;
+    };
+
+    unless ($ok) {
+        my $err = $@;
+        $self->_unlock;
+        warn $err;
+        return 0;
+    }
+
+    return $removed;
 }
 
 sub peer_exists {
@@ -443,6 +506,50 @@ sub all_stats {
         $out{$id} = $state->{stats}{$id};
     }
     return \%out;
+}
+
+# --- Suspend ---
+
+sub pre_suspend_hook {
+    my $self = shift;
+    my (%params) = @_;
+
+    my $expires_at = $params{expires_at};
+    return unless defined $expires_at;
+
+    my $state;
+    unless (eval { $state = $self->_lock_write; 1 }) {
+        warn $@;
+        return;
+    }
+
+    my $ok = eval {
+        my $entry = $state->{clients}{$self->{id}};
+        if ($entry) {
+            $entry->{suspend_expires_at} = $expires_at + 0;
+            $self->_commit($state);
+        }
+        else {
+            $self->_unlock;
+        }
+        1;
+    };
+
+    unless ($ok) {
+        my $err = $@;
+        $self->_unlock;
+        warn $err;
+    }
+}
+
+sub peer_suspend_expires {
+    my $self = shift;
+    my ($peer_id) = @_;
+    return undef unless defined $peer_id && length $peer_id;
+
+    my $state = $self->_lock_read;
+    my $entry = $state->{clients}{$peer_id} or return undef;
+    return $entry->{suspend_expires_at};
 }
 
 # --- Disconnect ---

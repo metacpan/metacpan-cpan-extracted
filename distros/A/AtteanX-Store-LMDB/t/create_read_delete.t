@@ -1,5 +1,4 @@
 use Test::More;
-use Test::Modern;
 use Test::Exception;
 
 use v5.14;

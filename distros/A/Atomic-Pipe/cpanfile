@@ -11,6 +11,8 @@ requires "Scalar::Util" => "0";
 requires "bytes" => "0";
 requires "constant" => "0";
 requires "perl" => "5.010000";
+recommends "Compress::Zstd" => "0";
+recommends "IO::Select" => "0";
 
 on 'test' => sub {
   requires "Test2::V0" => "0.000127";

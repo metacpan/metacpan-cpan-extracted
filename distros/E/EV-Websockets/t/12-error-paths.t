@@ -20,6 +20,17 @@ like($@, qr/reserved/, "listen with name 'default' croaks");
 eval { $ctx->connect(url => "http://example.com") };
 like($@, qr/URL must start with ws:\/\/ or wss:\/\//, "connect with http:// croaks");
 
+# adopt() input validation
+eval { $ctx->adopt(on_message => sub {}) };
+like($@, qr/fh parameter is required/, "adopt without fh croaks");
+
+{
+    open(my $fh, '<', '/dev/null') or die "open: $!";
+    close $fh;  # closed handle has no valid fileno
+    eval { $ctx->adopt(fh => $fh, on_message => sub {}) };
+    like($@, qr/Invalid filehandle/, "adopt with closed handle croaks");
+}
+
 # Double close should not crash
 my %keep;
 my $double_close_ok;

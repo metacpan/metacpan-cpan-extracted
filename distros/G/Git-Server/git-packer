@@ -1,7 +1,36 @@
 #!/usr/bin/perl
 
-# Program: git-packer
-# Purpose: Wrapper for git-{upload|receive}-pack to go through git-server for hooks
+=pod
+
+=head1 NAME
+
+git-packer - Wrapper for git-{upload|receive}-pack to go through git-server for hooks
+
+=head1 DESCRIPTION
+
+The git-packer wrapper is intended to be used to allow
+custom hooks to be caught earlier by the git operation.
+This can help when SSH ForceCommand isn't configured
+properly or if git isn't being run through SSH at all.
+
+=head1 SYNOPSIS
+
+  [git@gitsrvhost ~]$ mkdir -v ~/bin
+  [git@gitsrvhost ~]$ ln -s -v /usr/bin/git-packer ~/bin/git-upload-pack
+  [git@gitsrvhost ~]$ ln -s -v /usr/bin/git-packer ~/bin/git-receive-pack
+  [git@gitsrvhost ~]$
+
+=head1 AUTHOR
+
+Rob Brown <bbb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2015-2026 by Rob Brown <bbb@cpan.org>
+
+This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut
 
 use strict;
 use warnings;

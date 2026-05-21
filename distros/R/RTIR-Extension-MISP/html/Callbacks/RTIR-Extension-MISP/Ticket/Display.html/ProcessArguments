@@ -1,0 +1,29 @@
+<%init>
+if ( $ARGSRef->{CreateMISPEvent} || $ARGSRef->{UpdateMISPEvent} ) {
+    $m->callback(
+        CallbackName => 'BeforeMISPSync',
+        CallbackPage => '/RTIR/Incident/Display.html/ProcessArguments',
+        Ticket       => $Ticket,
+        Actions      => $Actions,
+        ARGSRef      => $ARGSRef,
+    );
+
+    my ($ok, $msg) = RTIR::Extension::MISP::AddRTIRObjectToMISP($Ticket);
+    push @$Actions, $msg;
+
+    $m->callback(
+        CallbackName => 'AfterMISPSync',
+        CallbackPage => '/RTIR/Incident/Display.html/ProcessArguments',
+        Ticket       => $Ticket,
+        Actions      => $Actions,
+        ARGSRef      => $ARGSRef,
+        OK           => $ok,
+        Msg          => $msg,
+    );
+}
+</%init>
+<%args>
+$Ticket
+$Actions
+$ARGSRef
+</%args>

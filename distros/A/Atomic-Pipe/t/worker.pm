@@ -51,5 +51,47 @@ sub note_sleep {
     }
 }
 
+sub make_sync {
+    pipe(my $tw_r, my $tw_w) or die "pipe: $!";
+    pipe(my $fw_r, my $fw_w) or die "pipe: $!";
+    my $old = select $tw_w; $| = 1; select $fw_w; $| = 1; select $old;
+    return {
+        to_worker_r   => $tw_r, to_worker_w   => $tw_w,
+        from_worker_r => $fw_r, from_worker_w => $fw_w,
+    };
+}
+
+sub sync_signal {
+    my ($fh, $byte) = @_;
+    $byte //= "X";
+    my $n = syswrite($fh, $byte);
+    die "sync_signal: $!" unless defined $n;
+    die "sync_signal: short write ($n of " . length($byte) . ")" unless $n == length($byte);
+}
+
+sub sync_wait {
+    my ($fh) = @_;
+    my $buf = '';
+    my $n = sysread($fh, $buf, 1);
+    die "sync_wait: $!" unless defined $n;
+    die "sync_wait: EOF before signal" unless $n;
+    return $buf;
+}
+
+sub can_read_now {
+    my ($fh) = @_;
+    my $rin = '';
+    vec($rin, fileno($fh), 1) = 1;
+    my $n = select(my $rout = $rin, undef, undef, 0);
+    return $n && $n > 0;
+}
+
+sub can_write_now {
+    my ($fh) = @_;
+    my $win = '';
+    vec($win, fileno($fh), 1) = 1;
+    my $n = select(undef, my $wout = $win, undef, 0);
+    return $n && $n > 0;
+}
 
 1;

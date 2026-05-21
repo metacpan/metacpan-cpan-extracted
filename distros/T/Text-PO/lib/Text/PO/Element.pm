@@ -248,7 +248,7 @@ sub msgstr
         }
         else
         {
-            if( !ref( $_[0] ) )
+            if( !ref( $_[0] ) && defined( $_[0] ) )
             {
                 chomp( @_ );
             }

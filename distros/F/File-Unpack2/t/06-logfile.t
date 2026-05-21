@@ -1,4 +1,4 @@
-#!perl -T
+#!perl
 
 # number of tests is variable here. using no_plan, as this works on both SLE11_SP2 and 12.1
 use Test::More qw(no_plan);

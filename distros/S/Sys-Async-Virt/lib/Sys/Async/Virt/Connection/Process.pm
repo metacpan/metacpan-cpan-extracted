@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1
-#                   and LibVirt version v11.10.0
+#                   and LibVirt version v12.3.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -16,7 +16,7 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad ':experimental(inherit_field)';
 
-class Sys::Async::Virt::Connection::Process v0.2.3;
+class Sys::Async::Virt::Connection::Process v0.6.3;
 
 inherit Sys::Async::Virt::Connection '$_in', '$_out';
 
@@ -26,7 +26,7 @@ use IO::Handle;
 use IPC::Open2;
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::URI v11.10.1; # imports parse_url
+use Protocol::Sys::Virt::URI v12.3.0; # imports parse_url
 
 field $_url :param :reader;
 field $_pid;
@@ -42,7 +42,7 @@ async method close() {
 
 method _command( $url ) {
     my %c = parse_url( $url );
-    return $c{command};
+    return $c{query}->{command};
 }
 
 async method connect() {
@@ -56,6 +56,7 @@ async method connect() {
     $_in->autoflush( 1 );
     $_in->blocking( 0 );
     $_exit_f = Future::IO->waitpid( $_pid );
+    $_exit_f->on_ready(sub { $self->_finalize_io });
 
     return;
 }
@@ -72,7 +73,7 @@ Sys::Async::Virt::Connection::Process - Connection to LibVirt server using
 
 =head1 VERSION
 
-v0.2.3
+v0.6.3
 
 =head1 SYNOPSIS
 
@@ -131,7 +132,7 @@ L<LibVirt|https://libvirt.org>, L<Sys::Virt>
 =head1 LICENSE AND COPYRIGHT
 
 
-  Copyright (C) 2024-2025 Erik Huelsmann
+  Copyright (C) 2024-2026 Erik Huelsmann
 
 All rights reserved. This program is free software;
 you can redistribute it and/or modify it under the same terms as Perl itself.

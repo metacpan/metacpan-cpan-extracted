@@ -14,7 +14,7 @@ use Plack::Test                          ();
 use Plack::Test::Agent                   ();
 use Test::Warnings;
 use Test::Fatal qw( exception );
-use Test::Most import => [qw( diag done_testing is is_deeply ok skip )];
+use Test::More import => [qw( diag done_testing is is_deeply ok skip )];
 use Try::Tiny      qw( catch try );
 use WWW::Mechanize ();
 
@@ -141,8 +141,9 @@ EOF
 
     {
         my $html = q[<ul><li>one</li><li>two</li></ul>];
-        my $app
-            = sub { return [ 200, [ 'Content-Type' => 'text/html' ], [$html] ] };
+        my $app  = sub {
+            return [ 200, [ 'Content-Type' => 'text/html' ], [$html] ];
+        };
 
         my $server_agent = Plack::Test::Agent->new(
             app    => $app,
@@ -212,7 +213,7 @@ sub test_content_lwp {
         }
     }
 
-    # NOTE: $text passed here is a Text::SimpleTable string, not the bare
+    # NOTE: $text passed here is a Term::Table string, not the bare
     # content.  So your tests need to accommodate this.
     $test_sub->($text);
 }
@@ -260,7 +261,7 @@ sub test_content_mojo {
         }
     }
 
-    # NOTE: $text passed here is a Text::SimpleTable string, not the bare
+    # NOTE: $text passed here is a Term::Table string, not the bare
     # content.  So your tests need to accommodate this.
     $test_sub->($text);
 }

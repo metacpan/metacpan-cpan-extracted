@@ -1470,19 +1470,19 @@
 1,[save dungeontype as monsters][save rooms]This is *[here dungeon name]*.<p class="sidebar">Wandering monsters: [[same monsters] encounter].<p>[dungeon header][dungeon map with [same rooms] rooms]
 
 ;dungeon map with 5 rooms
-1,<img class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&seed=$seed]]" alt="5 room dungeon" title="5 room dungeon"/><ol>[entrance room html][interior room html][interior room html][interior room html][final room html]</ol>
+1,<img loading="lazy" class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&seed=$seed]]" alt="5 room dungeon" title="5 room dungeon"/><ol>[entrance room html][interior room html][interior room html][interior room html][final room html]</ol>
 
 ;dungeon map with 7 rooms
-1,<img class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&rooms=7&seed=$seed]]" alt="7 room dungeon" title="7 room dungeon"/>[dungeon header]<ol>[entrance room html][interior room html][interior room html][interior room html][interior room html][interior room html][final room html]</ol>
+1,<img loading="lazy" class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&rooms=7&seed=$seed]]" alt="7 room dungeon" title="7 room dungeon"/>[dungeon header]<ol>[entrance room html][interior room html][interior room html][interior room html][interior room html][interior room html][final room html]</ol>
 
 ;dungeon map with 10 rooms
-1,<img class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&rooms=10&seed=$seed]]" alt="10 room dungeon" title="10 room dungeon"/>[dungeon header]<ol>[entrance room html][interior room html][interior room html][interior room html][final room html][entrance room html][interior room html][interior room html][interior room html][final room html]</ol>
+1,<img loading="lazy" class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&rooms=10&seed=$seed]]" alt="10 room dungeon" title="10 room dungeon"/>[dungeon header]<ol>[entrance room html][interior room html][interior room html][interior room html][final room html][entrance room html][interior room html][interior room html][interior room html][final room html]</ol>
 
 ;dungeon map with 12 rooms
-1,<img class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&rooms=12&seed=$seed]]" alt="12 room dungeon" title="12 room dungeon"/>[dungeon header]<ol>[entrance room html][interior room html][interior room html][interior room html][final room html][entrance room html][interior room html][interior room html][interior room html][interior room html][interior room html][final room html]</ol>
+1,<img loading="lazy" class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&rooms=12&seed=$seed]]" alt="12 room dungeon" title="12 room dungeon"/>[dungeon header]<ol>[entrance room html][interior room html][interior room html][interior room html][final room html][entrance room html][interior room html][interior room html][interior room html][interior room html][interior room html][final room html]</ol>
 
 ;dungeon map with 14 rooms
-1,<img class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&rooms=14&seed=$seed]]" alt="14 room dungeon" title="14 room dungeon"/><ol>[entrance room html][interior room html][interior room html][interior room html][interior room html][interior room html][final room html][entrance room html][interior room html][interior room html][interior room html][interior room html][interior room html][final room html]</ol>
+1,<img loading="lazy" class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&rooms=14&seed=$seed]]" alt="14 room dungeon" title="14 room dungeon"/><ol>[entrance room html][interior room html][interior room html][interior room html][interior room html][interior room html][final room html][entrance room html][interior room html][interior room html][interior room html][interior room html][interior room html][final room html]</ol>
 
 ;entrance room html
 1,<li>[entrance room]</li>
@@ -2214,7 +2214,7 @@
 
 # This is not themed correctly!
 ;devil dungeon
-1,<img class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&seed=$seed]]" alt="5 room dungeon" title="5 room dungeon"/><ol><li>The cave entrance is filled with **hot steam** (1d6 scalding damage to each non-devil who enters), but the water smells and tastes of [sulfur|decaying corpses|burnt bones], revolting all who enter.<li>Stretched on a metal rack is a prisoner with scalded skin, [ettercap prisoner feeling]. This is *[human name]* from *[same village name]*, taken while [herding|fetching water|worshiping|going to see the smith].<li>Here, [1d4+1] [devils] [cavort|caper in a macabre dance|sing in disharmony|strum soundless lutes] ([devil stats]). An [unearthly|unsettling|undulating] music echoes in these halls.<li>This chamber contains a sunken bath, warmed by the hot springs. A [devil] hangs upside down in one of [2d20] niches, asleep. The devil will wake and attack if anyone [whispers|tiptoes|touches the water].<li>A great hall holds a throne and tables full of food and wine. Queen *[devil name]*, a [devil], presides over her court here, [1d6+1] [devils] and [1d2+1] [devils]. The devils will fight to the death to protect their queen ([devil stats]).</li></ol>
+1,<img loading="lazy" class="map" src="[[redirect https://campaignwiki.org/text-mapper/gridmapper/redirect?pillars=0&seed=$seed]]" alt="5 room dungeon" title="5 room dungeon"/><ol><li>The cave entrance is filled with **hot steam** (1d6 scalding damage to each non-devil who enters), but the water smells and tastes of [sulfur|decaying corpses|burnt bones], revolting all who enter.<li>Stretched on a metal rack is a prisoner with scalded skin, [ettercap prisoner feeling]. This is *[human name]* from *[same village name]*, taken while [herding|fetching water|worshiping|going to see the smith].<li>Here, [1d4+1] [devils] [cavort|caper in a macabre dance|sing in disharmony|strum soundless lutes] ([devil stats]). An [unearthly|unsettling|undulating] music echoes in these halls.<li>This chamber contains a sunken bath, warmed by the hot springs. A [devil] hangs upside down in one of [2d20] niches, asleep. The devil will wake and attack if anyone [whispers|tiptoes|touches the water].<li>A great hall holds a throne and tables full of food and wine. Queen *[devil name]*, a [devil], presides over her court here, [1d6+1] [devils] and [1d2+1] [devils]. The devils will fight to the death to protect their queen ([devil stats]).</li></ol>
 
 
 # Monster stats
@@ -3348,7 +3348,7 @@
 
 ;temple of Set
 1,[here store Set as temple power][here store temple of [same temple power]]Once past the entrance, a tunnel winds itself up into the hollow sphere of the snake sanctum: the upper hemisphere is decorated with [with Set decoration] and [and Set decoration]. Above hangs a chandelier about 50ft wide beset with a thousand stones glowing in a warm light. It’s impossibly hot in here.<p>Ramps connect rows and rows of circular platforms leading down the lower hemisphere to the bottom of the sphere. One these platforms are the huts of [temple servants]<p>At the very bottom of the sphere is a ramp descending into the darkness below.
-1,[here store Set as temple power][here store temple of [same temple power]]Inside, the central temple contains four bronze snake statues oriented towards the cardinal directions. Large red candles at the base of each statute give a flickering and smoky light. Each statute has a different colored gem set in its forehead (500gp each). The north wall contains a giant mural of [with Set decoration] and the floor is decorated with a mosaic of [and Set decoration].<p> Under the mural, a passage leads further north, past the quarters of [temple servants]<p>At the end of the hallway, stairs lead upwards.
+1,[here store Set as temple power][here store temple of [same temple power]]Inside, the central temple contains four bronze snake statues oriented towards the cardinal directions. Large red candles at the base of each statue give a flickering and smoky light. Each statue has a different colored gem set in its forehead (500gp each). The north wall contains a giant mural of [with Set decoration] and the floor is decorated with a mosaic of [and Set decoration].<p> Under the mural, a passage leads further north, past the quarters of [temple servants]<p>At the end of the hallway, stairs lead upwards.
 1,[here store Set as temple power][here store temple of [same temple power]]The air inside the temple is surprisingly warm and damp. Lush green plants scramble over stairs and wrap around pools of steaming water. Hidden in the greenery, humans with patches of iridescent scales on their skin observe and wait, for now. [snake people]
 
 ;temple servants
@@ -6247,7 +6247,7 @@
 1,You enter a cave with that smells of stomach acid and wet dog. The air is warm and the sound of breathing surrounds you. This is the home of the **three-headed giant hell hound** *[cerberus name]* ([cerberus stats]). [terror treasure]
 1,The tunnels start branching off in all directions and the heat grows more intense. Some of these passages glowing red hot. These are the hunting grounds of [2d4] *hell hounds* led by *[hell hound name]* ([hell hound stats]).
 1,The air grows hotter, a red glow fills the tunnel, and finally it opens into a cavern filled with a lava lake inhabited by [2d4] **salamanders** led by *[salamander name]* ([salamander stats]). [terror treasure]
-1,The tunnel opens up into a cavern 100ft across and at the far end, the exit is guarded by a **pyrohydra** ([pyrohydra stats]).
+1,The tunnel opens up into a cavern 100ft across and at the far end, the exit is guarded by a **pyrohydra** ([pyrohydra stats]). [terror treasure]
 1,The tunnel leads up to a great iron gate. This is the upper gate of the dwarven forge *[here dwarf forge]*. [5d8] **dwarves** live and work here ([dwarf stats]) led by [dwarf with portrait] (level [1d6+2 as level]). [luxurious context] [dwarven treasure] From the lower gate, the tunnel continues towards Muspelheim.
 1,The tunnel opens up into a huge vertical shaft, disappearing into darkness above and ending in a bubbling lava lake at the bottom. Narrow stairs lead down to the lake. This is the home of the **red dragon** *[here red dragon name as dragon name]*[dragon portrait] ([red dragon stats])[store dragon as treasure type] A path continues along the lava lake and leads to the next tunnel entrance.
 
@@ -6460,7 +6460,7 @@
 1,Forever
 
 ;dragon portrait
-1,<img class="landscape" src="[[redirect https://campaignwiki.org/face/redirect/alex/dragon?seed=$seed]]" alt="[same dragon name]" title="[same dragon name]"/>
+1,<img loading="lazy" class="landscape" src="[[redirect https://campaignwiki.org/face/redirect/alex/dragon?seed=$seed]]" alt="[same dragon name]" title="[same dragon name]"/>
 
 ;white dragon stats
 1,HD 6 AC 3 1d4/1d4/2d8 F6 MV 24 ML 8 XP 600; *ice* (as much as the dragon has hp left, save vs. dragon breath for half)
@@ -7376,7 +7376,7 @@
 1,[dwarf stats]; immune to fire
 
 ;dwarf with portrait
-1,*[dwarf name]*<img class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/dwarf?seed=$seed]]" alt="[same dwarf name]" title="[same dwarf name]"/>[store [same dwarf name] as dwarf patron]
+1,*[dwarf name]*<img loading="lazy" class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/dwarf?seed=$seed]]" alt="[same dwarf name]" title="[same dwarf name]"/>[store [same dwarf name] as dwarf patron]
 
 ;dwarf name
 1,[dwarf name for men] [dwarf clan]
@@ -8648,7 +8648,7 @@
 1,Gold
 1,Dark
 1,Forge
-1,Haf
+1,Half
 1,Gnarl
 1,Quartz
 1,Sure
@@ -8746,7 +8746,7 @@
 1,[5d8] **froglings** ([frogling stats]) live here, led by *[frogling with portrait]*, a priest of Tsathoggua: *lightning bolt* 2×/day (5d6, save vs. spells for half). [poor treasure] The mud village built around the temple[here store Tsathoggua as temple power][here store temple of [same temple power]] is guarded by [frogling companions].
 
 ;frogling with portrait
-1,*[frogling name]*<img class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/frog?seed=$seed]]" alt="[same frogling name]" title="[same frogling name]"/>
+1,*[frogling name]*<img loading="lazy" class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/frog?seed=$seed]]" alt="[same frogling name]" title="[same frogling name]"/>
 
 ;frogling name
 1,[frogling 1] [frogling 2]
@@ -9204,7 +9204,7 @@
 1,Thrash
 
 ;orc with portrait
-1,*[orc name]*<img class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/orc?seed=$seed]]" alt="[same orc name]" title="[same orc name]" />[store [same orc name] as orc patron]
+1,*[orc name]*<img loading="lazy" class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/orc?seed=$seed]]" alt="[same orc name]" title="[same orc name]" />[store [same orc name] as orc patron]
 
 ;orc name
 1,[orc 1][orc 2]
@@ -9387,8 +9387,8 @@
 4,[1d4+1] **badgers** ([weasel stats])
 
 ;gnome with portrait
-1,*[gnome man as gnome name]*<img class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/gnome?seed=$seed]]" alt="[same gnome name]" title="[same gnome name]"/>
-1,*[gnome woman as gnome name]*<img class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/tuiren/gnome?seed=$seed]]" alt="[same gnome name]" title="[same gnome name]"/>
+1,*[gnome man as gnome name]*<img loading="lazy" class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/gnome?seed=$seed]]" alt="[same gnome name]" title="[same gnome name]"/>
+1,*[gnome woman as gnome name]*<img loading="lazy" class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/tuiren/gnome?seed=$seed]]" alt="[same gnome name]" title="[same gnome name]"/>
 
 ;gnome name
 1,[gnome man]
@@ -9549,7 +9549,7 @@
 3,[1d3+1] **squid people** led by [squid leader] ([squid person stats])
 
 ;squid leader
-1,*[squid]*<img class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/squid?seed=$seed]]" alt="[same squid]" title="[same squid]"/>
+1,*[squid]*<img loading="lazy" class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/squid?seed=$seed]]" alt="[same squid]" title="[same squid]"/>
 
 ;squid
 1,[squid 1] [star name]
@@ -9785,7 +9785,7 @@
 5,an **ogre** called *[ogre name]*[ogre portrait]
 
 ;ogre portrait
-1,<img class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/demon?seed=$seed]]" alt="[same ogre name]" title="[same ogre name]"/>
+1,<img loading="lazy" class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/demon?seed=$seed]]" alt="[same ogre name]" title="[same ogre name]"/>
 
 ;ogre mage stats
 1,HD 6+1 AC 5 1d10 + 1d6 *fire* F6 MV 9 ML 10 XP 600; *fog*; *invisibility*; *snow storm* 3×/day for 6d6 damage up to 30ft., save vs. spells for half
@@ -10052,7 +10052,7 @@
 # Agrimach
 
 ;home of Agrimach
-1,One of the dry patches of land has some shabby wooden huts on it, connected by gangways. This is the home of [bandits] These people are [lazy drunkards|reckless fools|greedy bastards|mean bullies robbing the poor], and yet they are protected by the necromancer *Agrimach*.<p>[swamp gnome spies] They act as the eyes and ears of the necromancer *Agrimach*.<p>The necromancer’s tower stands in a small lake guarded by a **pyrohydra** ([pyrohydra stats]).<p>The main hall is guarded by 20 watchful **zombies** ([zombie stats]) and the loyal **ghoul** *Fiala* ([ghoul stats]), a distant ancestor of *[same human name]*, the bandit leader.<p>The upper level of the necromancer’s lair is protected by [Agrimach companions].<p>Above all of this lives the **necromancer** *[quote Agrimach as human name]*<img class="portrait" src="https://campaignwiki.org/pics/Spellcasters/Agrimach.png" alt="[same human name]" title="[same human name]"/>[here store [same human name] as alchemist patron] himself (hp [10d4] AC 9 MU10). [store agrimach as spellbook] He’s the author of [[same spellbook]]: [spellbook 10]. [luxurious context] [leader treasure for magic user]
+1,One of the dry patches of land has some shabby wooden huts on it, connected by gangways. This is the home of [bandits] These people are [lazy drunkards|reckless fools|greedy bastards|mean bullies robbing the poor], and yet they are protected by the necromancer *Agrimach*.<p>[swamp gnome spies] They act as the eyes and ears of the necromancer *Agrimach*.<p>The necromancer’s tower stands in a small lake guarded by a **pyrohydra** ([pyrohydra stats]).<p>The main hall is guarded by 20 watchful **zombies** ([zombie stats]) and the loyal **ghoul** *Fiala* ([ghoul stats]), a distant ancestor of *[same human name]*, the bandit leader.<p>The upper level of the necromancer’s lair is protected by [Agrimach companions].<p>Above all of this lives the **necromancer** *[quote Agrimach as human name]*<img loading="lazy" class="portrait" src="https://campaignwiki.org/pics/Spellcasters/Agrimach.png" alt="[same human name]" title="[same human name]"/>[here store [same human name] as alchemist patron] himself (hp [10d4] AC 9 MU10). [store agrimach as spellbook] He’s the author of [[same spellbook]]: [spellbook 10]. [luxurious context] [leader treasure for magic user]
 
 ;Agrimach companions
 1,[4d6] **skeletons** standing guard for decades, with unrelenting attention ([skeleton stats])
@@ -10325,7 +10325,7 @@
 1,They hate and fear all outsiders. And what they fear most of all is that somebody would betray the location of their home.
 
 ;halfling with portrait
-1,*[halfling name]*<img class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/woman?seed=$seed]]" alt="[same halfling name]" title="[same halfling name]"/>
+1,*[halfling name]*<img loading="lazy" class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/woman?seed=$seed]]" alt="[same halfling name]" title="[same halfling name]"/>
 
 ;halfling name
 1,[gothic names for men]
@@ -12825,7 +12825,7 @@
 1,HD 5 AC 5 1d4/1d4/1d6 + *poison* F5 MV 12 ML 9 XP 500; *climb*; *poison*: when bit, save vs. poison or be paralysed for 2h
 
 ;ettercap with portrait
-1,*[ettercap name]*<img class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/spider?seed=$seed]]" alt="[same ettercap name]" title="[same ettercap name]"/>
+1,*[ettercap name]*<img loading="lazy" class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/spider?seed=$seed]]" alt="[same ettercap name]" title="[same ettercap name]"/>
 
 ;ettercap name
 1,[spider name 1] [spider name 2]
@@ -13145,7 +13145,7 @@
 1,HD 9 AC 1 3d6 MV 12 ML 12 XP 900; immune to *arrows*, immune to *poison*; immune to *spells*
 
 ;elf with portrait
-1,*[elf name]*<img class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/elf?seed=$seed]]" alt="[same elf name]" title="[same elf name]"/>[store [same elf name] as elf patron]
+1,*[elf name]*<img loading="lazy" class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/elf?seed=$seed]]" alt="[same elf name]" title="[same elf name]"/>[store [same elf name] as elf patron]
 
 # Not accounted for: Letter changes when combining words
 # http://sindarinlessons.weebly.com/37---how-to-make-names-1.html
@@ -14208,8 +14208,8 @@
 # note plural form below!
 
 ;special ants
-1,**giant bombardier ants** ([giant ant stats]; *acid*: can spray cone of corrosive acids for 3d6)
-1,**giant suicide ants** ([giant ant stats]; *suicide: explodes as a fireball for 5d6)
+1,**giant bombardier ants** ([giant ant stats]; *acid*: can spray cone of corrosive acids for 3d6, save vs. dragon breath for half)
+1,**giant suicide ants** ([giant ant stats]; *suicide*: explodes as a fireball for 5d6, save vs. dragon breath for half)
 1,**giant trap jaw ants** ([giant ant stats]; *hold*: holds on after a bite and continues to deal damage, no additional to-hit rolls required)
 1,**giant door-headed ants** ([giant ant stats]; *huge head*: can block tunnels using head)
 1,**giant weaver ants** ([giant ant stats]; *sticky*: sticky saliva to immobilise victims reduced to 0hp; *camouflage*: surprise on 1–4 in 6)
@@ -15644,7 +15644,7 @@
 1,HD 9 AC 2 1d8/1d8/1d12 F9 MV 18 ML 11 XP 900; only harmed by magic or magic weapons; immune to spells of casters up to fifth level; *[devil breath]*: 2d6, save vs. rays for half
 
 ;devil portrait
-1,<img class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/demon?seed=$seed]]" alt="[same devil name]" title="[same devil name]"/>
+1,<img loading="lazy" class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/demon?seed=$seed]]" alt="[same devil name]" title="[same devil name]"/>
 
 ;local smith
 1,The local **smith** is [smith description] called [human with portrait]. [local smith inventory description:] [local smith inventory].
@@ -17183,15 +17183,15 @@
 1,[woman with portrait]
 
 ;man with portrait
-1,*[man as human name]*<img class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/man?seed=$seed]]" alt="[same human name]" title="[same human name]"/>
+1,*[man as human name]*<img loading="lazy" class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/man?seed=$seed]]" alt="[same human name]" title="[same human name]"/>
 
 ;woman with portrait
-1,*[woman as human name]*<img class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/woman?seed=$seed]]" alt="[same human name]" title="[same human name]"/>
+1,*[woman as human name]*<img loading="lazy" class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/woman?seed=$seed]]" alt="[same human name]" title="[same human name]"/>
 
 ;human portrait
 # use this when you need a portrait of either sex and you have already picked a non-standard human name
-1,<img class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/man?seed=$seed]]" alt="[same human name]" title="[same human name]"/>
-1,<img class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/woman?seed=$seed]]" alt="[same human name]" title="[same human name]"/>
+1,<img loading="lazy" class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/man?seed=$seed]]" alt="[same human name]" title="[same human name]"/>
+1,<img loading="lazy" class="portrait" src="[[redirect https://campaignwiki.org/face/redirect/alex/woman?seed=$seed]]" alt="[same human name]" title="[same human name]"/>
 
 ;human name
 1,[man]
@@ -40621,6 +40621,7 @@
 1,A pair of *gloves of strength* (strength 18).
 1,A *ring of invisibility* which turns you invisible until you attempt to harm somebody.
 1,A *ring of the bully* which allows you to shove anybody and anything within 60ft, and if this puts your victim in harm’s way then they must save vs. death or suffer the consequence.
+1,A *ring of seeing* which allows you to send your gaze out over the land and see anybody who mentions your name and what they’re looking at within 60ft; they feel your eye fall on them may save vs. spells to avoid being seein. For this to work both you and the target must be able to see the sky.
 1,A *helmet of the bull*, grants an extra attack when charging into a fight: on a hit, an opponent no larger than yourself is thrown to the ground such that your allies get a +4 to attack them.
 1,The *helmet of the dark lord* with smoke and red light dripping out of its visor grants the ability to tell when others within 10ft are lying.
 1,The *gloves of the dark lord* allows you to lift anybody no larger than yourself and strangle them: they must save vs. spells or be held and suffer 1d6 damage.

@@ -3,11 +3,11 @@
 .claude/agents/perl-test-writer.md
 .claude/agents/pod-writer.md
 .claude/settings.json
-.claude/skills/dzil-author-getty/SKILL.md
-.claude/skills/dzil-distini/SKILL.md
 .claude/skills/kanban-issues-karr-cli/SKILL.md
-.claude/skills/karr/SKILL.md
-.claude/skills/perl-share-files/SKILL.md
+.claude/skills/perl-file-sharedir/SKILL.md
+.claude/skills/perl-moo/SKILL.md
+.claude/skills/perl-release-author-getty/SKILL.md
+.claude/skills/perl-release-dist-ini/SKILL.md
 .gitignore
 CLAUDE.md
 Changes
@@ -18,7 +18,6 @@ META.json
 META.yml
 Makefile.PL
 README
-README.md
 bin/karr
 cpanfile
 dist.ini
@@ -32,7 +31,13 @@ docs/superpowers/specs/2026-03-15-karr-git-sync-design.md
 docs/superpowers/specs/2026-03-19-v0004-release-design.md
 docs/superpowers/specs/2026-03-22-helper-refs-design.md
 docs/superpowers/specs/2026-03-22-ref-first-board-design.md
+docs/superpowers/specs/2026-05-15-config-access-patterns-design.md
+docs/superpowers/specs/2026-05-15-git-instantiation-design.md
+docs/superpowers/specs/2026-05-15-lock-encapsulation-design.md
+docs/superpowers/specs/2026-05-15-role-boardaccess-split-design.md
+docs/superpowers/specs/2026-05-15-tasksource-interface-deferred.md
 lib/App/karr.pm
+lib/App/karr/ActivityLog.pm
 lib/App/karr/BoardStore.pm
 lib/App/karr/Cmd/AgentName.pm
 lib/App/karr/Cmd/Archive.pm
@@ -60,8 +65,11 @@ lib/App/karr/Config.pm
 lib/App/karr/Git.pm
 lib/App/karr/Lock.pm
 lib/App/karr/Role/BoardAccess.pm
+lib/App/karr/Role/BoardDiscovery.pm
 lib/App/karr/Role/ClaimTimeout.pm
 lib/App/karr/Role/Output.pm
+lib/App/karr/Role/SyncLifecycle.pm
+lib/App/karr/SyncGuard.pm
 lib/App/karr/Task.pm
 share/claude-skill.md
 t/00-load.t
@@ -90,5 +98,7 @@ t/25-init-ref-first.t
 t/26-skill-share-dir.t
 t/27-backup-restore.t
 t/28-destroy.t
+t/29-worktree.t
 t/author-pod-syntax.t
 t/lib/TestGit.pm
+t/release-changes_has_content.t

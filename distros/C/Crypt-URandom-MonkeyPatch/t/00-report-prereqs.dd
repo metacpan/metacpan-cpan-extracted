@@ -43,7 +43,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Crypt::URandom' => '0',
+                                      'Crypt::URandom' => '0.55',
                                       'constant' => '0',
                                       'perl' => 'v5.8.0',
                                       'strict' => '0',

@@ -57,6 +57,11 @@ has output => (
     required => 1,
 );
 
+has secure_set_key => (
+    is      => 'ro',
+    default => 'notagoodsecretbutconsistentfortesting',
+);
+
 test "test client" => sub {
     my ($self) = @_;
 
@@ -84,6 +89,10 @@ sub send_tests {
 }
 
 # Adapted from Log-Dispatch-UDP-0.01/t/01-basic.t
+
+# SPDX-SnippetBegin
+# SPDX-SnippetCopyrightText: 2012 by Rob Hoelz
+# SPDX-License-Identifier: Artistic-1.0-Perl
 
 sub test_udp {
     my ( $self, $callback ) = @_;
@@ -129,6 +138,7 @@ sub test_udp {
             prefix          => $self->prefix,
             max_buffer_size => $self->max_buffer_size,
             autoflush       => $self->autoflush,
+            secure_set_key  => $self->secure_set_key,
         );
 
         sleep 1;    # wait for server to start
@@ -142,5 +152,7 @@ sub test_udp {
     }
 
 }
+
+# SPDX-SnippetEnd
 
 1;

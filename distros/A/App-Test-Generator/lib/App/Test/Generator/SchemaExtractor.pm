@@ -65,11 +65,11 @@ App::Test::Generator::SchemaExtractor - Extract test schemas from Perl modules
 
 =head1 VERSION
 
-Version 0.33
+Version 0.38
 
 =cut
 
-our $VERSION = '0.33';
+our $VERSION = '0.38';
 
 =head1 SYNOPSIS
 
@@ -4541,17 +4541,19 @@ sub _infer_type_from_expression {
 		return { type => 'string' };
 	}
 
-	# Check for numbers
-	if ($expr =~ /^-?\d+$/) {
-		return { type => 'integer' };
-	}
-	if ($expr =~ /^-?\d+\.\d+$/) {
-		return { type => 'number' };
+	# Check for booleans first — must come before the integer check
+	# since /^-?\d+$/ would otherwise match 0 and 1 as integers
+	if($expr =~ /^[01]$/) {
+		return { type => 'boolean' };
 	}
 
-	# Check for booleans
-	if ($expr =~ /^[01]$/) {
-		return { type => 'boolean' };
+	# Check for integers
+	if($expr =~ /^-?\d+$/) {
+		return { type => 'integer' };
+	}
+
+	if ($expr =~ /^-?\d+\.\d+$/) {
+		return { type => 'number' };
 	}
 
 	# Check for objects
@@ -9410,6 +9412,13 @@ This is pre-pre-alpha proof of concept code.
 Nevertheless,
 it is useful for creating a template which you can modify to create a working schema to pass into L<App::Test::Generator>.
 
+=head1 TODO
+
+Parse =head4 Input / =head4 Output POD blocks
+(in L<Params::Validate::Strict> schema format)
+as a high-confidence input source,
+falling back to runtime introspection only when POD is absent.
+
 =head1 SEE ALSO
 
 =over 4
@@ -9427,8 +9436,13 @@ So with well-documented code, you can automatically create your tests.
 
 Nigel Horne, C<< <njh at nigelhorne.com> >>
 
-Portions of this module's initial design and documentation were created with the
-assistance of AI.
+=head1 LICENCE AND COPYRIGHT
+
+Copyright 2025-2026 Nigel Horne.
+
+Usage is subject to GPL2 licence terms.
+If you use it,
+please let me know.
 
 =cut
 

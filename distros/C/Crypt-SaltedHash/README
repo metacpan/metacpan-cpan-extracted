@@ -1,14 +1,43 @@
+NAME
 
+    Crypt::SaltedHash - Perl interface to functions that assist in working
+    with salted hashes.
 
-This archive contains the distribution Crypt-SaltedHash,
-version 0.09:
+SYNOPSIS
 
-  Perl interface to functions that assist in working
-with salted hashes.
+            use Crypt::SaltedHash;
+    
+            my $csh = Crypt::SaltedHash->new(algorithm => 'SHA-1');
+            $csh->add('secret');
+    
+            my $salted = $csh->generate;
+            my $valid = Crypt::SaltedHash->validate($salted, 'secret');
 
-This software is copyright (c) 2013 by Sascha Kiefer.
+STATUS
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+    This module is deprecated.
 
+    This module has not had significant updates since 2006. There are newer
+    modules that support more secure algorithms and hashing options, and
+    are extensible, such as Crypt::Passphrase.
+
+DESCRIPTION
+
+    The Crypt::SaltedHash module provides an object oriented interface to
+    create salted (or seeded) hashes of clear text data. The original
+    formalization of this concept comes from RFC-3112 and is extended by
+    the use of different digital algorithms.
+
+AUTHOR
+
+    Sascha Kiefer, <esskar@cpan.org>
+
+    The current maintainer is Robert Rothenberg <perl@rhizomnic.com>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2005-2006, 2010, 2013, 2026 Sascha Kiefer
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
 

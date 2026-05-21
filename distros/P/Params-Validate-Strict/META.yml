@@ -14,13 +14,14 @@ build_requires:
   Readonly: '0'
   Test::Compile: '0'
   Test::DescribeMe: '0'
+  Test::Mockingbird: '0.1'
   Test::Most: '0'
   Test::Needs: '0'
   Test::Warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150011'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -37,6 +38,7 @@ requires:
   ExtUtils::MakeMaker: '6.64'
   List::Util: '1.33'
   Params::Get: '0.13'
+  Readonly::Values::Boolean: '0'
   Scalar::Util: '0'
   Unicode::GCString: '0'
   perl: '5.008'
@@ -46,5 +48,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Params-Validate-Strict
   homepage: https://metacpan.org/pod/Params::Validate::Strict
   repository: git://github.com/nigelhorne/Params-Validate-Strict.git
-version: '0.30'
+version: '0.32'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

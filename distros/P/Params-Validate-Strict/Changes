@@ -1,11 +1,77 @@
 Revision history for Params-Validate-Strict
 
+0.32	Mon May 11 20:34:23 EDT 2026
+
+  [Enhancements]
+  - Schema now accepts an arrayref of parameter hashrefs as an alternative
+    to the named-parameter hashref format:
+
+      schema => [
+        { name => 'username', type => 'string', min => 3 },
+        { name => 'age',      type => 'integer', min => 0 },
+      ]
+
+    The arrayref is normalised to the standard hashref form before any
+    further processing.  All existing rules (optional, default, transform,
+    schema, relationships, cross_validation, positional position, etc.)
+    continue to work unchanged.  Particularly useful for modules that use
+    positional or mixed calling conventions.  Duplicate names and missing
+    'name' keys are caught and reported.  The members wrapper also accepts
+    arrayref form.
+
+  - 'enum' is now fully synonymous with 'memberof': the min/max
+    incompatibility guard (which previously only checked 'memberof') now
+    also fires when 'enum' is combined with min or max.
+
+  - 'values' added as a synomym for 'memberof'
+
+  [Bug Fixes]
+  - In the case of position parameters, an input value of 0, could set an output value of undef.
+    Fixed by using exists() in the return loop
+
+0.31	Fri May  8 08:03:03 EDT 2026
+
+  [Enhancements]
+  - Use Readonly::Values::Boolean for the boolean type — boolean values are
+    now drawn from that module's %booleans hash, giving a consistent and
+    extensible set of recognised truthy/falsy strings across the codebase.
+  - Allow 'minimum' as a synonym for 'min' in schema rules.
+  - Allow 'regex' as a synonym for 'matches' in schema rules.
+
+  [Bug Fixes]
+  - Fixed: 'nullable' with a present value triggered "Unknown rule 'nullable'"
+    because the rule-name was handled before the dispatch loop (to set
+    $is_optional) but had no corresponding no-op elsif in the loop itself.
+    The absent-value path was unaffected because the optional block exits
+    with 'next' before the loop runs; only the present-value path was broken.
+  - Fixed: nested hashref defaults were not applied when the input hashref
+    was empty ({}).  The guard condition checked scalar keys of the original
+    input value rather than of the post-defaults hashref, so an empty input
+    caused the nested validate_strict call to be skipped entirely.
+  - Fixed: when an optional parameter had both 'default' and 'schema' set and
+    the parameter was absent, the 'default' value was overwritten by the
+    result of nested schema processing because there was no 'next' after
+    storing the default.  The default now wins: a 'next' is inserted
+    immediately after $validated_args{$key} = $rules->{'default'}.
+  - Fixed: arrayref fields with a field-schema hash (e.g. schema => { name =>
+    { type => 'string' }, age => { type => 'integer' } }) caused "Unknown
+    rule 'name'" because the inner validate_strict call wrapped the element
+    and schema incorrectly, causing field names to be treated as rule names.
+    The handler now distinguishes a field-schema hash (no top-level 'type'
+    key) from a rule hash (has 'type') and calls validate_strict accordingly.
+  - Fixed: the 'transform' coderef was invoked twice for every present field —
+    once explicitly before the rule-dispatch loop, and again by the generic
+    "coerce CODE rule-values by calling them" guard inside the loop.  The
+    'optional' coderef had the same double-invocation bug.  Both are now
+    added to the exclusion list alongside 'validate', 'callback', and
+    'validator'.
+
 0.30	Sun Feb 22 21:03:42 EST 2026
 	Added carp_on_warn support
-	In support of better OOP, a value can now be an object, if that understands 'as_string()'
-	If no schema is given allow all arguments
+	In support of better OOP, a value can now be an object if it understands 'as_string()'
+	If no schema is given, allow all arguments
 	Better error message when a positional argument makes no sense
-	Pass $args and $schema to a callback
+	Pass $args and $schema to a validation callback
 
 0.29	Sat Jan 31 16:29:42 EST 2026
 	Document "can" and "optional" as a code ref a bit more

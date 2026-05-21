@@ -1,0 +1,8 @@
+0.002   2026-02-22  Released-By: PERLANCAR; Urgency: medium
+
+        - Add options: --items (-n), --shuffle (-r), --separator (-s).
+
+
+0.001   2026-02-21  Released-By: PERLANCAR
+
+        - First release.

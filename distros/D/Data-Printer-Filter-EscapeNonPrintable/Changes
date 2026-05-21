@@ -1,4 +1,10 @@
 Revision history for Data::Printer::Filter::EscapeNonPrintable
 
+v1.0.1    2026-05-12T20:17:44Z
+          - Replace wrong shebangs in scripts, otherwise EU::MM will not rewrite
+            them on installation
+          - Tidy tests
+          - Minor metadata fixes
+
 v1.0.0    2026-02-05T21:46:24Z
           - Initial release

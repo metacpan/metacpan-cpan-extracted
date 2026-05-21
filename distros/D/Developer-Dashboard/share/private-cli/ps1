@@ -67,6 +67,8 @@ my $cwd  = cwd();
 my $mode = 'compact';
 my $color = 0;
 my $max_age = 300;
+my $no_indicators = 0;
+my $width = 0;
 GetOptionsFromArray(
     \@ARGV,
     'jobs=i'    => \$jobs,
@@ -74,6 +76,8 @@ GetOptionsFromArray(
     'mode=s'    => \$mode,
     'color!'    => \$color,
     'max-age=i' => \$max_age,
+    'width=i'   => \$width,
+    'no-indicators!' => \$no_indicators,
 );
 
 my @roots = _default_roots();
@@ -93,15 +97,29 @@ my $prompt = Developer::Dashboard::Prompt->new(
 );
 
 $indicators->sync_collectors( $config->collectors );
+$indicators->refresh_core_indicators( cwd => $cwd );
 _prime_ticket_ref_env();
 
-print $prompt->render(
-    jobs    => $jobs,
-    cwd     => $cwd,
-    mode    => $mode,
-    color   => $color,
-    max_age => $max_age,
-);
+if ( $mode eq 'tmux-status' || $mode eq 'tmux-status-top' || $mode eq 'tmux-status-bottom' ) {
+    my $line = $mode eq 'tmux-status-bottom' ? 'bottom' : 'top';
+    $line = '' if $mode eq 'tmux-status';
+    print $prompt->render_tmux_status(
+        color   => $color,
+        max_age => $max_age,
+        width   => $width,
+        ( $line ne '' ? ( line => $line ) : () ),
+    );
+}
+else {
+    print $prompt->render(
+        jobs          => $jobs,
+        cwd           => $cwd,
+        mode          => $mode,
+        color         => $color,
+        max_age       => $max_age,
+        no_indicators => $no_indicators,
+    );
+}
 
 __END__
 

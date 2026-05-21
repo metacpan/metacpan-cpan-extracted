@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::DescribeMe qw(extended);
+# use Test::DescribeMe qw(extended);
 use Test::Most;
 use File::Temp qw(tempdir);
 use File::Spec;
@@ -396,8 +396,7 @@ subtest 'enum_validation method' => sub {
 	is($status_param->{semantic}, 'enum', 'semantic type is enum');
 	ok($status_param->{enum}, 'has enum values');
 	is(ref($status_param->{enum}), 'ARRAY', 'enum is arrayref');
-	cmp_deeply($status_param->{enum}, bag('active', 'inactive', 'pending'),
-	           'enum contains correct values');
+	cmp_deeply($status_param->{enum}, bag('active', 'inactive', 'pending'), 'enum contains correct values');
 };
 
 # Enum detection via hash lookup
@@ -414,8 +413,7 @@ subtest 'enum_hash_lookup method' => sub {
 
 		is($color_param->{semantic}, 'enum', 'semantic type is enum');
 		ok($color_param->{enum}, 'has enum values');
-		cmp_deeply($color_param->{enum}, bag('red', 'green', 'blue', 'yellow'),
-		           'enum contains correct colors');
+		cmp_deeply($color_param->{enum}, bag('red', 'green', 'blue', 'yellow'), 'enum contains correct colors');
 	}
 };
 
@@ -429,8 +427,7 @@ subtest 'enum_grep_check method' => sub {
 	is($fruit_param->{type}, 'string', 'type is string');
 	is($fruit_param->{semantic}, 'enum', 'semantic type is enum');
 	ok($fruit_param->{enum}, 'has enum values');
-	cmp_deeply($fruit_param->{enum}, bag('apple', 'banana', 'orange', 'grape'),
-	           'enum contains correct fruits');
+	cmp_deeply($fruit_param->{enum}, bag('apple', 'banana', 'orange', 'grape'), 'enum contains correct fruits');
 };
 
 # Enum detection via if/elsif chain
@@ -444,8 +441,7 @@ subtest 'enum_if_elsif method' => sub {
 	is($priority_param->{semantic}, 'enum', 'semantic type is enum');
 	ok($priority_param->{enum}, 'has enum values');
 	cmp_ok(scalar(@{$priority_param->{enum}}), '>=', 3, 'has at least 3 enum values');
-	cmp_deeply($priority_param->{enum}, supersetof('low', 'medium', 'high', 'critical'),
-	           'enum contains priority levels');
+	cmp_deeply($priority_param->{enum}, supersetof('low', 'medium', 'high', 'critical'), 'enum contains priority levels');
 };
 
 # IO::File object detection
@@ -484,11 +480,9 @@ subtest 'datetime_parser method' => sub {
 	is($date_str_param->{type}, 'string', 'type is string');
 
 	SKIP: {
-		skip 'DateTime parser detection may not work with module reference', 1
-		    unless $date_str_param->{semantic};
+		skip 'DateTime parser detection may not work with module reference', 1 unless $date_str_param->{semantic};
 
-		is($date_str_param->{semantic}, 'datetime_parseable',
-		   'semantic type is datetime_parseable');
+		is($date_str_param->{semantic}, 'datetime_parseable', 'semantic type is datetime_parseable');
 	}
 };
 

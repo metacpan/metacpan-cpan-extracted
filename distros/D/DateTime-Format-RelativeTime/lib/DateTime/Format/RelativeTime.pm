@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
-## DateTime Format Relative Time - ~/lib/DateTime/Format/RelativeTime.pm
-## Version v0.2.1
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## DateTime Format Relative Time - ~/lib/m
+## Version v0.2.3
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/12/30
-## Modified 2025/10/19
+## Modified 2026/05/04
 ## All rights reserved
 ## 
 ## 
@@ -21,13 +21,13 @@ BEGIN
     use vars qw(
         $VERSION $DEBUG $ERROR $FATAL_EXCEPTIONS
     );
-    use DateTime;
+    use DateTime::Lite;
     use DateTime::Locale::FromCLDR;
     use Locale::Intl;
-    use Locale::Unicode::Data v1.3.2;
+    use Locale::Unicode::Data v0.8.2;
     use Scalar::Util ();
     use Wanted;
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.2.3';
 };
 
 use strict;
@@ -352,7 +352,7 @@ sub format_to_parts
     if( @_ >= 1 && 
         defined( $_[0] ) &&
         Scalar::Util::blessed( $_[0] ) &&
-        $_[0]->isa( 'DateTime' ) )
+        ( $_[0]->isa( 'DateTime::Lite' ) || $_[0]->isa( 'DateTime' ) ) )
     {
         my( $dt, $now );
         if( @_ > 2 )
@@ -366,7 +366,7 @@ sub format_to_parts
         {
             if( defined( $_[1] ) &&
                 Scalar::Util::blessed( $_[1] ) &&
-                $_[1]->isa( 'DateTime' ) )
+                ( $_[1]->isa( 'DateTime::Lite' ) || $_[1]->isa( 'DateTime' ) ) )
             {
                 ( $dt, $now ) = @_;
             }
@@ -381,7 +381,7 @@ sub format_to_parts
         else
         {
             $dt = shift( @_ );
-            $now = DateTime->now( time_zone => $dt->time_zone );
+            $now = DateTime::Lite->now( time_zone => $dt->time_zone );
         }
         my( $diff_val, $diff_unit ) = $self->_greatest_interval( $dt => $now );
         return( $self->pass_error ) if( !defined( $diff_val ) );
@@ -425,7 +425,7 @@ sub format_to_parts
     {
         return( $self->error({
             type => 'RangeError',
-            message => "format_to_parts() requires either a numerical value and a unit, or a DateTime object."
+            message => "format_to_parts() requires either a numerical value and a unit, or a DateTime::Lite or a DateTime object."
         }) );
     }
     my $opts = $self->resolvedOptions;
@@ -765,15 +765,15 @@ sub _greatest_interval
     my( $self, $dt1, $dt2 ) = @_;
     unless( defined( $dt1 ) &&
             Scalar::Util::blessed( $dt1 ) &&
-            $dt1->isa( 'DateTime' ) )
+            ( $dt1->isa( 'DateTime::Lite' ) || $dt1->isa( 'DateTime' ) ) )
     {
-        return( $self->error( "The first argument provided is not a DateTime object." ) );
+        return( $self->error( "The first argument provided is not a DateTime::Lite or DateTime object." ) );
     }
     unless( defined( $dt2 ) &&
             Scalar::Util::blessed( $dt2 ) &&
-            $dt2->isa( 'DateTime' ) )
+            ( $dt2->isa( 'DateTime::Lite' ) || $dt2->isa( 'DateTime' ) ) )
     {
-        return( $self->error( "The second argument provided is not a DateTime object." ) );
+        return( $self->error( "The second argument provided is not a DateTime::Lite or a DateTime object." ) );
     }
 
     # Factor for direction of time
@@ -799,7 +799,7 @@ sub _greatest_interval
         second  => $duration->in_units( 'seconds' ),
     );
 
-    # DateTime::Duration does not support quarters, so we check ourself if the difference spans across quarters
+    # DateTime::Lite::Duration or DateTime::Duration does not support quarters, so we check ourself if the difference spans across quarters
     my $start_quarter = int( ( $dt1->month - 1 ) / 3 ) + 1;
     my $end_quarter   = int( ( $dt2->month - 1 ) / 3 ) + 1;
     my $quarter_diff  = ( $dt2->year - $dt1->year ) * 4 + ( $end_quarter - $start_quarter );
@@ -852,7 +852,7 @@ BEGIN
         bool    => sub{ $_[0] },
         fallback => 1,
     );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.2';
 };
 use strict;
 use warnings;
@@ -1086,6 +1086,8 @@ DateTime::Format::RelativeTime - A Web Intl.RelativeTimeFormat Class Implementat
 
 =head1 SYNOPSIS
 
+    use DateTime::Lite;
+    # or
     use DateTime;
     use DateTime::Format::RelativeTime;
     my $fmt = DateTime::Format::RelativeTime->new(
@@ -1107,24 +1109,26 @@ DateTime::Format::RelativeTime - A Web Intl.RelativeTimeFormat Class Implementat
     # Format relative time using positive value (1).
     $fmt->format( 1, 'day' ); # "in 1 day"
 
-You can also pass one or two L<DateTime> objects, and let this interface find out the greatest difference between the two objects. If you pass only one L<DateTime> object, this will instantiate another L<DateTime> object, using the method L<now|DateTime/now> with the C<time_zone> value from the first object.
+You can also pass one or two L<DateTime::Lite> or L<DateTime> objects, and let this interface find out the greatest difference between the two objects. If you pass only one L<DateTime::Lite> or L<DateTime> object, this will instantiate another L<DateTime::Lite> or L<DateTime> object, using the method L<now|DateTime::Lite/now> with the C<time_zone> value from the first object.
 
-    my $dt = DateTime->new(
-        year => 2024,
+Nota bene: L<DateTime::Lite> is an improved, faster, and less memory-consuming drop-in replacement for L<DateTime>
+
+    my $dt = DateTime::Lite->new(
+        year  => 2024,
         month => 8,
-        day => 15,
+        day   => 15,
     );
     $fmt->format( $dt );
     # Assuming today is 2024-12-31, this would return: "1 qtr. ago"
 
-or, with 2 L<DateTime> objects:
+or, with 2 L<DateTime::Lite> objects:
 
-    my $dt = DateTime->new(
-        year => 2024,
+    my $dt = DateTime::Lite->new(
+        year  => 2024,
         month => 8,
-        day => 15,
+        day   => 15,
     );
-    my $dt2 = DateTime->new(
+    my $dt2 = DateTime::Lite->new(
         year => 2022,
         month => 2,
         day => 22,
@@ -1158,7 +1162,7 @@ For users requiring exact decimal representation beyond this precision, consider
 
 =head1 VERSION
 
-    v0.2.1
+    v0.2.3
 
 =head1 DESCRIPTION
 
@@ -1269,27 +1273,27 @@ Whether to use numeric values in the output. Possible values are C<always> and C
     say $fmt->format( 10, 'seconds' );
     # Expected output: "in 10 sec."
 
-Alternatively, you can pass two L<DateTime> objects, and C<format> will calculate the greatest time difference between the two. If you provide only one L<DateTime>, C<format> will instantiate a new L<DateTime> object using the C<time_zone> value from the first L<DateTime> object.
+Alternatively, you can pass two L<DateTime::Lite> or L<DateTime> objects, and C<format> will calculate the greatest time difference between the two. If you provide only one L<DateTime::Lite> or L<DateTime>, C<format> will instantiate a new L<DateTime> object using the C<time_zone> value from the first L<DateTime::Lite> or L<DateTime> object.
 
-    my $dt = DateTime->new(
-        year => 2024,
+    my $dt = DateTime::Lite->new(
+        year  => 2024,
         month => 8,
-        day => 15,
+        day   => 15,
     );
     $fmt->format( $dt );
     # Assuming today is 2024-12-31, this would return: "1 qtr. ago"
 
-or, with 2 L<DateTime> objects:
+or, with 2 L<DateTime::Lite> objects:
 
-    my $dt = DateTime->new(
-        year => 2024,
+    my $dt = DateTime::Lite->new(
+        year  => 2024,
         month => 8,
-        day => 15,
+        day   => 15,
     );
-    my $dt2 = DateTime->new(
-        year => 2022,
+    my $dt2 = DateTime::Lite->new(
+        year  => 2022,
         month => 2,
-        day => 22,
+        day   => 22,
     );
     $fmt->format( $dt => $dt2 ); # "2 yr. ago"
 
@@ -1345,7 +1349,7 @@ B<Note>: Most of the time, the formatting returned by C<format()> is consistent.
     #     { type => 'literal', value => ' days' }
     # ]
 
-Just like for L<format|/format>, you can alternatively provide one or two L<DateTime> objects.
+Just like for L<format|/format>, you can alternatively provide one or two L<DateTime::Lite> or L<DateTime> objects.
 
 The C<formatToParts()> method of C<DateTime::Format::RelativeTime> instances returns an array reference of hash reference representing the relative time format in parts that can be used for custom locale-aware formatting.
 
@@ -1477,15 +1481,16 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 =head1 SEE ALSO
 
-L<Locale::Unicode::Data>, L<Locale::Unicode>, L<Locale::Intl>, L<DateTime::Format::Intl>, L<DateTime::Locale::FromCLDR>
+L<DateTime::Lite>, L<Locale::Unicode::Data>, L<Locale::Unicode>, L<Locale::Intl>, L<DateTime::Format::Intl>, L<DateTime::Locale::FromCLDR>
 
 L<DateTime::Format::Natural>, L<DateTimeX::Format::Ago>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright(c) 2024-2025 DEGUEST Pte. Ltd.
+Copyright(c) 2024-2026 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
+
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =cut

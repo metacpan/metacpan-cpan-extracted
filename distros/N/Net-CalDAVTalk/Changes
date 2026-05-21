@@ -1,5 +1,26 @@
 Revision history for Net-CalDAVTalk
 
+0.17    Fri May 16 2026
+   - Update for jscalendarbis-15 (Text::JSCalendar 0.05):
+   - _stripNonICal: delete organizerCalendarAddress instead of replyTo
+   - %EventKeys schema: replace replyTo/sendTo/isAllDay/showAsFree/useDefaultAlerts
+     with organizerCalendarAddress/calendarAddress/showWithoutTime/freeBusyStatus;
+     update recurrenceRule (byDate->byMonthDay, firstDayOfWeek default mo);
+     update participants (roles now String[Boolean] map, calendarAddress string)
+   - Bump Text::JSCalendar requirement to 0.05
+
+0.16    Sun May  3 2026
+   - Add Schedule-Reply: false header support via _no_schedule flag in
+     NewEvent and UpdateEvent (RFC 6638 §8.1 scheduling suppression)
+
+0.15    Thu May  1 2026
+   - Fix _updateEvent: was iterating keys %EventKeys (outer structural
+     keys like '', replyTo, links) instead of merging flat JSCalendar
+     event hashes, causing every UpdateEvent call to silently wipe the
+     event on the CalDAV server
+   - Add sequence number handling for recurrenceOverrides entries
+     alongside existing exceptions handling
+
 0.14    Mon Apr  6 11:11 2026
    - add missing dep on Text::JSCalendar
    - update dep on Net::DAVTalk

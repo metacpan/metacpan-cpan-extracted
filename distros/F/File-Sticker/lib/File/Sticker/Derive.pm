@@ -1,12 +1,12 @@
 package File::Sticker::Derive;
-$File::Sticker::Derive::VERSION = '4.401';
+$File::Sticker::Derive::VERSION = '4.603';
 =head1 NAME
 
 File::Sticker::Derive - derive values from existing meta-data
 
 =head1 VERSION
 
-version 4.401
+version 4.603
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@ package Data::HashMap::Shared::IS;
 use strict;
 use warnings;
 use Data::HashMap::Shared;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub import {
     $^H{"Data::HashMap::Shared::IS/shm_is_put"}        = 1;
@@ -44,8 +44,12 @@ sub import {
     $^H{"Data::HashMap::Shared::IS/shm_is_arena_used"}       = 1;
     $^H{"Data::HashMap::Shared::IS/shm_is_arena_cap"}        = 1;
     $^H{"Data::HashMap::Shared::IS/shm_is_add"}              = 1;
+    $^H{"Data::HashMap::Shared::IS/shm_is_add_ttl"}          = 1;
+    $^H{"Data::HashMap::Shared::IS/shm_is_update_ttl"}       = 1;
     $^H{"Data::HashMap::Shared::IS/shm_is_update"}           = 1;
     $^H{"Data::HashMap::Shared::IS/shm_is_swap"}             = 1;
+    $^H{"Data::HashMap::Shared::IS/shm_is_cas"}              = 1;
+    $^H{"Data::HashMap::Shared::IS/shm_is_cas_take"}        = 1;
     $^H{"Data::HashMap::Shared::IS/shm_is_persist"}         = 1;
     $^H{"Data::HashMap::Shared::IS/shm_is_set_ttl"}         = 1;
 }

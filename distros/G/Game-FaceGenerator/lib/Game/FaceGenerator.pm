@@ -33,7 +33,7 @@ See L<Mojolicious::Guides> for more information.
 
 package Game::FaceGenerator;
 
-our $VERSION = 1.03;
+our $VERSION = 1.04;
 
 use Modern::Perl;
 use Mojolicious::Lite;
@@ -168,7 +168,7 @@ plugin 'Config' => {
     empty => {},
     loglevel => 'debug',
     logfile => undef,
-    contrib => dist_dir('Game-FaceGenerator'),
+    contrib => undef,
   },
   file => getcwd() . '/face-generator.conf',
   empty => {
@@ -206,7 +206,7 @@ plugin 'authentication', {
     },
 };
 
-dir(app->config('contrib'));
+dir(app->config('contrib') // dist_dir('Game-FaceGenerator'));
 no_flip(app->config('no_flip'));
 
 get '/' => sub {
@@ -421,7 +421,7 @@ Debugging:
 <% } %>
 <p>
 Would you like to see your name on this list? Check out our
-<a href="https://alexschroeder.ch/cgit/face-generator/about/#how-to-contribute">tutorial</a>.
+<a href="https://src.alexschroeder.ch/face-generator.git/#how-to-contribute">tutorial</a>.
 
 @@ view.html.ep
 % layout 'default';
@@ -432,7 +432,7 @@ Would you like to see your name on this list? Check out our
 Or take a look at the <%= link_to url_for(gallery => {artist => $artist, type => $type}) => begin %>Gallery<% end %>.
 <% if (@{$artists->{$artist}->{types}} > 1) { =%>
 <br>Or switch type:
-<% for my $t (@{$artists->{$artist}->{types}}) {
+<% for my $t (@{$artists->{$artist}->{types}}, 'random') {
      $self->stash('t', $t);
      if ($type eq $t) { %>\
 <b><%= $t %></b>
@@ -619,7 +619,7 @@ label { display: inline-block; width: 10ex }
 <p>
 All the images generated are <a href="http://creativecommons.org/publicdomain/zero/1.0/">dedicated to the public domain</a>.<br>
 <%= link_to 'Faces' => 'main' %> &nbsp;
-<a href="https://alexschroeder.ch/wiki/Contact">Alex Schroeder</a> &nbsp; <a href="https://alexschroeder.ch/cgit/face-generator/about/">Source</a> &nbsp;
+<a href="https://alexschroeder.ch/view/Contact">Alex Schroeder</a> &nbsp; <a href="https://src.alexschroeder.ch/face-generator.git/">Source</a> &nbsp;
 <% if ($self->is_user_authenticated()) { %>
 <%= link_to 'Logout' => 'logout' %>
 <% } else { %>

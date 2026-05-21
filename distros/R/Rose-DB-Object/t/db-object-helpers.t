@@ -7,7 +7,7 @@ use Test::More tests => (91 * 4) + 3;
 
 BEGIN 
 {
-  require 't/test-lib.pl';
+  require './t/test-lib.pl';
   use_ok('Rose::DB::Object');
   use_ok('Rose::DB::Object::Manager');
   use_ok('Rose::DB::Object::Helpers');
@@ -241,14 +241,15 @@ foreach my $db_type (qw(mysql pg informix sqlite))
     local $YAML::Syck::SortKeys = 1;
     $YAML::Syck::SortKeys = 1; # quiet stupid perl 5.6.x warning
     my $yaml = $o->column_values_as_yaml;
-    $yaml =~ s/'//g; # number/string issues are annoying...
-    is($yaml, "--- \nage: 6\nid: 2\nlaz: Z2\nname: Alex3\n",
-       "column_values_as_yaml() - $db_type");
+    is_deeply(YAML::Syck::Load($yaml),
+              { age => 6, id => 2, laz => 'Z2', name => 'Alex3' },
+              "column_values_as_yaml() - $db_type");
 
     my $c = $class->new(age => 456);
     $c->init_with_yaml($yaml);
-    is($c->column_values_as_yaml, "--- \nage: 6\nid: 2\nlaz: Z2\nname: Alex3\n",
-       "init_with_yaml() - $db_type")
+    is_deeply(YAML::Syck::Load($c->column_values_as_yaml),
+              { age => 6, id => 2, laz => 'Z2', name => 'Alex3' },
+              "init_with_yaml() - $db_type")
   }
   else 
   {

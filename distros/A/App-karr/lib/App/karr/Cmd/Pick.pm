@@ -1,7 +1,7 @@
 # ABSTRACT: Atomically find and claim the next available task
 
 package App::karr::Cmd::Pick;
-our $VERSION = '0.102';
+our $VERSION = '0.205';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -46,9 +46,7 @@ sub execute {
 
   $self->sync_before;
 
-  my $config = App::karr::Config->new(
-    file => $self->board_dir->child('config.yml'),
-  );
+  my $ec = $self->store->effective_config;
 
   my @tasks = $self->load_tasks;
 
@@ -58,11 +56,12 @@ sub execute {
     @tasks = grep { $allowed{$_->status} } @tasks;
   } else {
     # Exclude terminal statuses
-    @tasks = grep { $_->status ne 'done' && $_->status ne 'archived' } @tasks;
+    # Exclude terminal statuses
+    @tasks = grep { !App::karr::Config->is_terminal_status($_->status) } @tasks;
   }
 
   # Exclude claimed tasks (unless claim expired)
-  my $timeout = $self->_parse_timeout($config->claim_timeout);
+  my $timeout = $self->_parse_timeout($ec->{claim_timeout} // '1h');
   @tasks = grep {
     !$_->has_claimed_by || $self->_claim_expired($_, $timeout)
   } @tasks;
@@ -80,8 +79,8 @@ sub execute {
   }
 
   # Sort by class priority, then by priority
-  my %class_order = (expedite => 0, 'fixed-date' => 1, standard => 2, intangible => 3);
-  my %pri_order   = (critical => 0, high => 1, medium => 2, low => 3);
+  my %class_order = App::karr::Config->class_order;
+  my %pri_order   = App::karr::Config->priority_order;
 
   @tasks = sort {
     ($class_order{$a->class} // 2) <=> ($class_order{$b->class} // 2)
@@ -95,15 +94,13 @@ sub execute {
   }
 
   # Try to lock + claim
-  require App::karr::Git;
-  my $git = App::karr::Git->new(dir => $self->board_dir->parent->stringify);
-  my $use_lock = $git->is_repo;
+  my $use_lock = $self->git->is_repo;
   my $lock;
   if ($use_lock) {
     require App::karr::Lock;
-    $lock = App::karr::Lock->new(git => $git);
+    $lock = App::karr::Lock->new(git => $self->git);
   }
-  my $email = $use_lock ? ($git->git_user_email || $self->claim) : $self->claim;
+  my $email = $use_lock ? ($self->git->git_user_email || $self->claim) : $self->claim;
 
   my $picked;
   for my $task (@tasks) {
@@ -122,7 +119,7 @@ sub execute {
       }
     }
 
-    $task->save;
+    $self->save_task($task);
     $picked = $task;
     last;
   }
@@ -137,7 +134,7 @@ sub execute {
 
   # Log the pick action
   if ($use_lock) {
-    $self->append_log($git,
+    $self->append_log($self->git,
       agent   => $self->claim,
       action  => 'pick',
       task_id => $picked->id,
@@ -178,7 +175,7 @@ App::karr::Cmd::Pick - Atomically find and claim the next available task
 
 =head1 VERSION
 
-version 0.102
+version 0.205
 
 =head1 SYNOPSIS
 
@@ -226,11 +223,11 @@ L<App::karr::Cmd::Handoff>, L<App::karr::Cmd::AgentName>
 =head2 Issues
 
 Please report bugs and feature requests on GitHub at
-L<https://github.com/Getty/p5-app-karr/issues>.
+L<https://github.com/Getty/karr/issues>.
 
 =head2 IRC
 
-Join C<#ai> on C<irc.perl.org> or message Getty directly.
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -238,7 +235,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

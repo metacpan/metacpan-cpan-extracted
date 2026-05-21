@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1
-#                   and LibVirt version v11.10.0
+#                   and LibVirt version v12.3.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -16,30 +16,42 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad;
 
-class Sys::Async::Virt::NwFilter v0.2.3;
+class Sys::Async::Virt::NwFilter v0.6.3;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v11.10.1;
+use Protocol::Sys::Virt::Remote::XDR v12.3.0;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 
 
-field $_id :param :reader;
+field $_rpc_id :param :reader;
 field $_client :param :reader;
+
+method name() {
+    return $_rpc_id->{name};
+}
+
+method uuid() {
+    return $_rpc_id->{uuid};
+}
+
+method uuid_string() {
+    return join( '-', unpack('H8H4H4H4H12', $_rpc_id->{uuid}) );
+}
 
 
 async method get_xml_desc($flags = 0) {
     return await $_client->_call(
         $remote->PROC_NWFILTER_GET_XML_DESC,
-        { nwfilter => $_id, flags => $flags // 0 }, unwrap => 'xml' );
+        { nwfilter => $_rpc_id, flags => $flags // 0 }, unwrap => 'xml' );
 }
 
 method undefine() {
     return $_client->_call(
         $remote->PROC_NWFILTER_UNDEFINE,
-        { nwfilter => $_id }, empty => 1 );
+        { nwfilter => $_rpc_id }, empty => 1 );
 }
 
 
@@ -54,7 +66,7 @@ Sys::Async::Virt::NwFilter - Client side proxy to remote LibVirt network filter
 
 =head1 VERSION
 
-v0.2.3
+v0.6.3
 
 =head1 SYNOPSIS
 
@@ -67,6 +79,24 @@ v0.2.3
 =head2 new
 
 =head1 METHODS
+
+=head2 name
+
+  $name = $filter->name;
+
+Returns the name of the network filter.
+
+=head2 uuid
+
+  $uuid = $filter->uuid;
+
+Returns a 16-byte string containing the (binary) UUID.
+
+=head2 uuid_string
+
+  $str = $filter->uuid_string;
+
+Returns the string representation of the UUID (C<xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx>).
 
 =head2 get_xml_desc
 
@@ -90,6 +120,10 @@ See documentation of L<virNWFilterUndefine|https://libvirt.org/html/libvirt-libv
 
 =head1 CONSTANTS
 
+
+
+
+
 =over 8
 
 
@@ -103,7 +137,7 @@ L<LibVirt|https://libvirt.org>, L<Sys::Virt>
 =head1 LICENSE AND COPYRIGHT
 
 
-  Copyright (C) 2024-2025 Erik Huelsmann
+  Copyright (C) 2024-2026 Erik Huelsmann
 
 All rights reserved. This program is free software;
 you can redistribute it and/or modify it under the same terms as Perl itself.

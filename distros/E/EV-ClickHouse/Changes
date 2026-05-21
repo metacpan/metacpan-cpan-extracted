@@ -1,3 +1,11 @@
+0.02  2026-04-30
+    - Bug fixes: keepalive PING/PONG callback routing; last_error_code
+      now reports the top-level exception code; IPv6 URI literals;
+      skip_pending socket teardown.
+    - HTTP arrayref insert() croaks on nested refs; nested Array/Tuple/Map
+      columns require the native protocol.
+    - POD rewrite; expanded t/, xt/, and eg/.
+
 0.01  2026-03-15
     Core:
     - Async queries via HTTP protocol (port 8123)

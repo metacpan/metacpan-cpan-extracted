@@ -91,6 +91,14 @@ Fork example from tests:
 
     done_testing;
 
+Optional Zstd compression for bursts and messages (both ends must agree):
+
+    my ($r, $w) = Atomic::Pipe->pair(compression => 'zstd');
+    $w->write_message($big_payload);   # compressed on the wire
+    my $msg = $r->read_message;        # decompressed transparently
+
+See ["COMPRESSION"](#compression) for details and options.
+
 # MIXED DATA MODE
 
 Mixed data mode is a special use-case for Atomic::Pipe. In this mode the
@@ -177,6 +185,150 @@ You can also turn mixed-data mode after construction, but you must do so on both
 Doing so will make the pipe non-blocking, and will make all bursts/messages
 include the necessary control characters.
 
+# COMPRESSION
+
+`Atomic::Pipe` can transparently compress **bursts** and **messages** (including
+in mixed-data mode) with Zstandard. Plain `print $wh ...` traffic is **not**
+compressed. Both ends of the pipe must be configured the same way; mismatch
+produces protocol errors (or, in the case of mismatched dictionaries, silent
+corruption -- see ["Custom dictionary"](#custom-dictionary) below).
+
+Requires [Compress::Zstd](https://metacpan.org/pod/Compress%3A%3AZstd) (a soft / recommended dependency, loaded only when
+compression is enabled).
+
+## Constructor options
+
+All constructors (`new`, `pair`, `from_fh`, `from_fd`, `read_fifo`,
+`write_fifo`) accept:
+
+- compression => 'zstd'
+
+    Enable Zstd compression. Currently `'zstd'` is the only supported algorithm;
+    any other value croaks at construction.
+
+- compression\_level => $level
+
+    Zstd compression level, defaults to 3. Only meaningful when `compression` is
+    enabled.
+
+- compression\_dictionary => $bytes
+
+    Optional shared Zstd dictionary, supplied as raw bytes. Both ends must use the
+    same dictionary content. Mutually exclusive with `compression_dictionary_file`.
+
+- compression\_dictionary\_file => $path
+
+    Same as `compression_dictionary` but loaded from a file via
+    ["new\_from\_file" in Compress::Zstd::CompressionDictionary](https://metacpan.org/pod/Compress%3A%3AZstd%3A%3ACompressionDictionary#new_from_file). The file is read on
+    demand.
+
+- keep\_compressed => $bool
+
+    When set together with `compression`, reads expose the on-wire compressed
+    bytes alongside the decompressed payload. See ["read\_message"](#read_message) and
+    ["get\_line\_burst\_or\_data"](#get_line_burst_or_data) for the exact return-shape changes. Has no effect
+    without `compression`.
+
+## Custom dictionary
+
+Custom Zstd dictionaries can dramatically reduce frame size for small,
+repetitive payloads. Either form (bytes or file) may be supplied at
+construction or via ["set\_compression\_dictionary"](#set_compression_dictionary) /
+["set\_compression\_dictionary\_file"](#set_compression_dictionary_file).
+
+**Caveat:** raw zstd dictionaries do not embed a dict-ID. As a result a
+**mismatched** peer dictionary will silently decode to garbage rather than
+fail. (Hard frame corruption -- truncated or invalid frames -- still raises
+fatally.) Both ends must agree on byte-identical dictionary content.
+
+## Performance
+
+Compression is not just a wire-size optimization for `Atomic::Pipe`: when
+messages exceed `PIPE_BUF` (typically 4096 bytes on Linux) the writer must
+fragment them into multiple non-atomic chunks, and the reader must reassemble
+them. Compressing the payload first frequently collapses a multi-part message
+back into a single atomic burst, which avoids that per-message protocol
+overhead entirely. As a result, on workloads dominated by larger-than-PIPE\_BUF
+messages, compression is often **much faster end-to-end than no compression**,
+even after accounting for the CPU cost of compress/decompress.
+
+The kernel pipe buffer size (see ["resize"](#resize)) does **not** affect this --
+fragmentation is keyed on the POSIX `PIPE_BUF` atomic-write threshold, not on
+the buffer capacity.
+
+### Benchmark: streaming JSON objects
+
+Numbers below are from `bench/zstd_compression.pl` in the distribution. The
+workload is a synthetic but representative stream of JSON log/event objects
+sent in mixed-data mode via `write_message`. The corpus is generated once and
+reused across all runs; sizes are JSON-encoded byte counts.
+
+Two corpora were measured:
+
+- Small JSON (10 MB total, 11785 objects)
+
+    Object sizes 181 .. 1977 bytes, average ~890 B; ~37% of objects under 500 B.
+    Most messages fit in a single `PIPE_BUF` burst regardless of compression.
+
+        level     raw MB/s   wire MB    ratio   saved
+        plain         9.74    10.00       -        -
+        L-3          15.98     6.68    1.50x    33.2%
+        L1           24.55     4.92    2.03x    50.8%
+        L3 (def)     27.79     4.91    2.04x    50.9%
+        L5           46.34     4.87    2.05x    51.3%
+        L7           63.72     4.87    2.05x    51.3%
+        L12          27.02     4.85    2.06x    51.5%
+        L22          14.43     4.84    2.07x    51.6%
+
+    For this size distribution, levels 1..7 are all faster than no compression
+    (pipe back-pressure on the uncompressed run still dominates).
+
+- Larger JSON (100 MB total, 20407 objects)
+
+    Object sizes 187 .. 10000 bytes, average ~5.1 KB, evenly distributed across
+    the 1..10 KB range. Most objects exceed `PIPE_BUF`, so the uncompressed path
+    pays the multi-part fragmentation cost on nearly every message.
+
+        level     raw MB/s   wire MB    ratio   saved
+        plain         0.29   100.00       -        -
+        L-3         287.85    35.61    2.81x    64.4%
+        L-1         273.56    33.92    2.95x    66.1%
+        L1          237.04    30.56    3.27x    69.4%
+        L3 (def)    207.61    30.25    3.31x    69.7%
+        L5          113.02    30.01    3.33x    70.0%
+        L9           39.35    29.93    3.34x    70.1%
+        L18           7.81    28.14    3.55x    71.9%
+        L22           7.85    28.14    3.55x    71.9%
+
+    Here the uncompressed run collapses to ~0.29 MB/s, while even modest
+    compression levels achieve 200+ MB/s -- a ~1000x throughput improvement
+    driven almost entirely by avoided fragmentation. Levels above ~5 trade
+    significant CPU for negligible additional ratio.
+
+- Pipe buffer size has minimal impact
+
+    The same 100 MB corpus, holding mode constant and varying the kernel pipe
+    buffer (32 KB, 128 KB, 512 KB, 1 MB), shows almost no movement in either
+    direction. The bottleneck is `PIPE_BUF`-aligned framing, not buffer fill, so
+    calling ["resize"](#resize) with a larger size will not rescue an uncompressed
+    large-message workload.
+
+### Practical guidance
+
+- If your messages are routinely larger than `PIPE_BUF` (~4 KB), enabling
+compression is almost always a throughput win, not just a bandwidth win.
+- For mixed JSON-like payloads, **level 1** or the default **level 3** are good
+starting points. Level -3 is the throughput champion when CPU is precious and
+some ratio can be sacrificed.
+- Levels above ~7 buy single-digit-percent ratio gains for multi-x CPU cost; in
+an IPC path they are rarely worth it.
+- A custom dictionary (["Custom dictionary"](#custom-dictionary)) helps most when payloads are
+small and share structure -- e.g. identical JSON keys across every message.
+
+These results depend heavily on payload entropy and CPU. Re-run
+`bench/zstd_compression.pl` against a representative slice of your own data
+before committing to a level.
+
 # METHODS
 
 ## CLASS METHODS
@@ -184,6 +336,12 @@ include the necessary control characters.
 - $bytes = Atomic::Pipe->PIPE\_BUF
 
     Get the maximum number of bytes for an atomic write to a pipe.
+
+- $bool = Atomic::Pipe->HAVE\_IO\_SELECT
+
+    True if [IO::Select](https://metacpan.org/pod/IO%3A%3ASelect) is available on this system. When available, it is used by
+    default in `fill_buffer()` to efficiently wait for pipe readability instead of
+    relying on blocking `sysread()` with an EINTR retry loop.
 
 - ($r, $w) = Atomic::Pipe->pair
 
@@ -278,6 +436,15 @@ include the necessary control characters.
     this will return undef. This will also return undef when the pipe is closed
     (EOF).
 
+    When `compression` and `keep_compressed` are both enabled, list-context calls
+    additionally return the raw on-wire compressed bytes:
+
+        my ($message, $compressed) = $p->read_message;
+
+    In `debug => 1` mode the returned hashref gains a `compressed` key
+    holding the raw compressed bytes. Scalar-context calls always return just the
+    decompressed message, regardless of `keep_compressed`.
+
 - $p->blocking($bool)
 - $bool = $p->blocking
 
@@ -341,6 +508,18 @@ include the necessary control characters.
     Get/set the read size. This is how much data to ATTEMPT to read each time
     `fill_buffer()` is called. The default is 65,536 which is the default pipe
     size on linux, though the value is hardcoded currently.
+
+- $bool = $p->use\_io\_select
+- $p->use\_io\_select($bool)
+
+    Get/Set whether this pipe instance uses [IO::Select](https://metacpan.org/pod/IO%3A%3ASelect) for readability checks in
+    `fill_buffer()`. When true (and IO::Select is available), `fill_buffer()` uses
+    `IO::Select->can_read()` to wait for data. When false, it falls back to a
+    blocking `sysread()` with an EINTR retry loop.
+
+    Defaults to true if IO::Select is installed (false on Windows, where
+    `PeekNamedPipe` is used instead). Can also be passed as a constructor
+    parameter, e.g. `Atomic::Pipe->pair(use_io_select => 0)`.
 
 - $bytes = $p->fill\_buffer
 
@@ -433,6 +612,62 @@ into readers and writers. These help you do that.
     pending in the buffer. Calling this multiple times will return the same peek
     line (and anything added to the buffer since the last read) until the buffer
     reads a newline or hits EOF.
+
+    When `compression` and `keep_compressed` are both enabled, the `burst` and
+    `message` return paths additionally yield a `compressed => $raw_bytes`
+    pair:
+
+        (burst   => $decompressed, compressed => $raw)
+        (message => $decompressed, compressed => $raw)
+
+    The `line` and `peek` paths never include a `compressed` key. The 2-tuple
+    idiom
+
+        my ($type, $data) = $p->get_line_burst_or_data;
+
+    remains valid; the extra elements are simply discarded.
+
+### COMPRESSION METHODS
+
+- $algo\_or\_undef = $p->compression
+- $level\_or\_undef = $p->compression\_level
+- $bytes\_or\_undef = $p->compression\_dictionary
+- $path\_or\_undef = $p->compression\_dictionary\_file
+- $bool = $p->keep\_compressed
+
+    Read-only accessors for the corresponding compression settings. See
+    ["COMPRESSION"](#compression).
+
+- $p->set\_compression('zstd', $level)
+- $p->set\_compression(undef)
+
+    Enable, change, or disable compression on an existing pipe. `$level` is
+    optional; calling `$p->set_compression('zstd')` with no level preserves
+    whatever level was previously set. To reset the level to its default, call
+    `$p->set_compression(undef)` first (which clears compression, level,
+    and any cached compressors), then re-enable.
+
+    `set_compression(undef)` does **not** clear `compression_dictionary` or
+    `compression_dictionary_file`; the dictionary is preserved across
+    disable/re-enable. Use the dictionary setters to clear those slots.
+
+- $p->set\_compression\_dictionary($bytes)
+- $p->set\_compression\_dictionary(undef)
+
+    Set, replace, or clear the raw-bytes dictionary. Setting clears any
+    file-path dictionary (mutually exclusive). Cached preprocessed dictionaries
+    are rebuilt on next compress/decompress.
+
+- $p->set\_compression\_dictionary\_file($path)
+- $p->set\_compression\_dictionary\_file(undef)
+
+    Set, replace, or clear the file-path dictionary. Setting clears any
+    raw-bytes dictionary.
+
+- $p->set\_keep\_compressed($bool)
+
+    Toggle whether reads expose the raw compressed bytes alongside the
+    decompressed payload.
 
 # SOURCE
 

@@ -1,10 +1,12 @@
 Changes
+LICENSE
 MANIFEST
 META.yml
 Makefile.PL
 Process.hpp
 Process.pm
 Process.xs
+README.md
 hints/cygwin.pl
 ppport.h
 t/basic.t

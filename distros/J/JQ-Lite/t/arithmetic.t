@@ -19,6 +19,14 @@ is_deeply(
     'id + 5 > 20 selects only 25'
 );
 
+my @division_by_zero_condition = $jq->run_query($json, 'map(select(.id / 0 > 1))');
+
+is_deeply(
+    $division_by_zero_condition[0],
+    [],
+    'division by zero inside select arithmetic condition is treated as false'
+);
+
 my @incremented = $jq->run_query($json, 'map(.id + 1)');
 
 is_deeply(

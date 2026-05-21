@@ -42,4 +42,6 @@ t/SharedMem/test_try_message.t
 t/SharedMem/test_watch_pids.t
 t/SharedMem/test_workers.t
 t/unit/Client-SharedMem.t
+t/unit/SharedMem-peer-cleanup.t
+t/unit/SharedMem-suspend-deadline.t
 xt/author/pod-syntax.t

@@ -3,7 +3,6 @@ children_fuser2.pl
 contrib/multipart_mime.pl
 contrib/stringsx.c
 contrib/stringsx.pl
-file_unpack2
 file_unpack2.pl
 FIXME.txt
 helper/application=msword
@@ -11,6 +10,7 @@ helper/application=x-iso9660-image
 helper/application=x-shellscript
 helper/text=x-shellscript
 ignore.txt
+LICENSES/MIT.txt
 Makefile.PL
 MANIFEST			This list of files
 META.yml
@@ -24,6 +24,7 @@ t/05-list.t
 t/06-logfile.t
 t/07-cmdline.t
 t/08-survive-corrupt.t
+t/09-no-intermediate-tar.t
 t/boilerplate.t
 t/data/Archive.pax
 t/data/bad34.pdf
@@ -31,10 +32,14 @@ t/data/columns-snippet.fo
 t/data/Desktop.directory
 t/data/empty.odt
 t/data/good10.pdf
+t/data/intermediate-removal-test.tar.gz
+t/data/intermediate-removal-test.tar.xz
 t/data/IPA-snippet.pfa
 t/data/lxknf09SCc0.bin
 t/data/monotone.info
 t/data/pdftex-a.txt
+t/data/recursive-3level-removal-test.tar.gz
+t/data/recursive-3level-removal-test.tar.xz
 t/data/ruhyphal.tex
 t/data/test.mht
 t/data/test2.tga

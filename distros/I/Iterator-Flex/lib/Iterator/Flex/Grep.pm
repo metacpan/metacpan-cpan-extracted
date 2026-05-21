@@ -7,10 +7,10 @@ use strict;
 use warnings;
 use experimental 'signatures';
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use Iterator::Flex::Factory 'to_iterator';
-use Iterator::Flex::Utils qw[ THROW STATE EXHAUSTION :IterAttrs :IterStates ];
+use Iterator::Flex::Utils qw[ THROW STATE EXHAUSTION :IterAttrs :IterStates throw_failure ];
 use Ref::Util;
 use parent 'Iterator::Flex::Base';
 
@@ -75,20 +75,20 @@ sub construct ( $class, $state ) {
             return $self->signal_exhaustion
               if $iterator_state == IterState_EXHAUSTED;
 
-            my $ret = eval {
+            my $rv;
+            eval {
                 while ( 1 ) {
-                    my $rv = $src->();
-                    local $_ = $rv;
-                    return $rv if $code->();
+                    local $_ = $rv = $src->();
+                    return !!1 if $code->();
                 }
-                1;
+                !!1;
             } or do {
                 die $@
                   unless Ref::Util::is_blessed_ref( $@ )
                   && $@->isa( 'Iterator::Flex::Failure::Exhausted' );
                 return $self->signal_exhaustion;
             };
-            return $ret;
+            return $rv;
         },
         ( +RESET )    => sub { },
         ( +_DEPENDS ) => $src,
@@ -127,13 +127,13 @@ Iterator::Flex::Grep - Grep Iterator Class
 
 =head1 VERSION
 
-version 0.33
+version 0.34
 
 =head1 METHODS
 
 =head2 new
 
-  $iterator = Ierator::Flex::Grep->new( $coderef, $iterable, ?\%pars );
+  $iterator = Iterator::Flex::Grep->new( $coderef, $iterable, ?\%pars );
 
 Returns an iterator equivalent to running C<grep> on each element of
 C<$iterable> with the specified code.

@@ -10,7 +10,7 @@
 
 Many features this module have were as a result of user requests.
 
------
+![Divider](../pics/pink.jpg?raw=true "Divider")
 
 ### Completely C accelerate all primitive drawing
 
@@ -20,7 +20,7 @@ The slowest will be addressed first.
 
 Realistically though, I doubt some specific routines will be converted, as they would be determined to be sufficiently quick.
 
------
+![Divider](../pics/pink.jpg?raw=true "Divider")
 
 ### Incorporate all methods that need Imager to use their own C code, so Imager is no longer needed.
 

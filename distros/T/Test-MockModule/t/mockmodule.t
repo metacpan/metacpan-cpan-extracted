@@ -10,7 +10,7 @@ BEGIN {
 	use_ok('Test::MockModule') or BAIL_OUT "Could not load Test::MockModule. Giving up";
 }
 
-package Test_Package;
+package Test_Package; ## no critic (Modules::RequireFilenameMatchesPackage)
 our $VERSION=1;
 sub listify {
 	my ($lower, $upper) = @_;
@@ -38,7 +38,7 @@ like($@, qr/Invalid package name/, ' ... croaks if package is undefined');
 	ok($mcgi->isa('Test::MockModule'), '... returns a Test::MockModule object');
 	my $mcgi2 = Test::MockModule->new('ExampleModule');
 	is($mcgi, $mcgi2,
-		"... returns existing object if there's already one for the package");
+		"... returns the same singleton object on a subsequent call (default behavior)");
 
 	# get_package()
 	ok($mcgi->can('get_package'), 'get_package');
@@ -88,10 +88,10 @@ like($@, qr/Invalid package name/, ' ... croaks if package is undefined');
 	ok($mcgi->can('original'), 'original()');
 	is($mcgi->original('param'), $orig_param,
 		'... returns the original subroutine');
-	my ($warn);
-	local $SIG{__WARN__} = sub {$warn = shift};
-	$mcgi->original('Vars');
-	like($warn, qr/ is not mocked/, "... warns if a subroutine isn't mocked");
+	# GH #42: original() on unmocked sub returns the actual sub
+	my $vars_orig = $mcgi->original('Vars');
+	is(ref $vars_orig, 'CODE', '... returns coderef for unmocked sub (GH #42)');
+	is($vars_orig, \&ExampleModule::Vars, '... returns the actual sub when not mocked');
 
 	# unmock()
 	ok($mcgi->can('unmock'), 'unmock()');
@@ -99,6 +99,8 @@ like($@, qr/Invalid package name/, ' ... croaks if package is undefined');
 	like($@, qr/Invalid subroutine name/,
 		'... dies if the subroutine is invalid');
 
+	my ($warn);
+	local $SIG{__WARN__} = sub {$warn = shift};
 	$warn = '';
 	$mcgi->unmock('Vars');
 	like($warn, qr/ was not mocked/, "... warns if a subroutine isn't mocked");
@@ -133,8 +135,11 @@ like($@, qr/Invalid package name/, ' ... croaks if package is undefined');
 	$mcgi->unmock('cookie');
 	$mcgi->unmock('Vars');
 	$mcgi->noop('cookie', 'Vars');
-	is(ExampleModule::cookie(), 1, 'now cookie does nothing');
-	is(ExampleModule::Vars(), 1, 'now Vars does nothing');
+	# GH #81 contract: noop() mocked subs MUST return 1 (truthy).
+	# Downstream callers (e.g. openSUSE packaging) depend on this — do not
+	# "fix" the assertion to undef without auditing the public-API impact.
+	is(ExampleModule::cookie(), 1, 'noop subs return 1 (GH #81 contract — DO NOT CHANGE)');
+	is(ExampleModule::Vars(),   1, 'noop subs return 1 (GH #81 contract — DO NOT CHANGE)');
 }
 
 isnt(ExampleModule::param(), 'This sub is mocked',

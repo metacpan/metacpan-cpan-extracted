@@ -12,9 +12,11 @@ MANIFEST			This list of files
 README.md
 t/01-basic.t
 t/02-nested.t
+t/03-race.t
 t/repro_async_uaf.t
 t/repro_dangling_cv.t
 t/repro_parallel_uaf.t
 t/repro_series_double_call.t
+t/repro_unsafe_exception_uaf.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

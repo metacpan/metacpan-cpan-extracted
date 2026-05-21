@@ -1,4 +1,5 @@
 use strict;
+use utf8;
 use IO::Capture::Stderr;
 use Test::More;
 use JSON::API;
@@ -56,6 +57,76 @@ use JSON::API;
 		'hash- or arrayref expected (not a simple scalar, use allow_nonref to allow this)',
 		'Bad encode sets proper errstr'
 	);
+}
+
+{ # Issue #10: _encode produces UTF-8 bytes for non-ASCII payloads
+	# (HTTP::Request requires bytes; without ->utf8, JSON->encode returns
+	# a Unicode string which HTTP::Message rejects: "content must be bytes")
+	my $obj = { name => "snowman \x{2603}" };
+	my $api = JSON::API->new('test');
+	my $json = $api->_encode($obj);
+	ok(defined $json, '_encode of non-ASCII obj is defined');
+	ok(!utf8::is_utf8($json),
+		'_encode returns byte string (utf8 flag clear) for non-ASCII');
+	is($json, '{"name":"snowman ' . "\xe2\x98\x83" . '"}',
+		'_encode emits UTF-8 octets for snowman codepoint');
+}
+
+{ # Issue #10: _decode handles UTF-8 bytes from server into Unicode
+	my $bytes = '{"name":"snowman ' . "\xe2\x98\x83" . '"}';
+	my $api = JSON::API->new('test');
+	my $obj = $api->_decode($bytes);
+	is($obj->{name}, "snowman \x{2603}",
+		'_decode parses UTF-8 byte input into Unicode codepoint');
+}
+
+{ # Issue #3: _encode strips Perl's "<FH> line/chunk N" suffix from errstr
+	# Perl appends ", <FH> line N" (or "chunk N") when <> was active
+	package JSON::API::Test::EncodeFH; ## no critic (Modules::RequireFilenameMatchesPackage)
+	sub encode { die "boom at -e line 1, <STDIN> line 1.\n" }
+	package main;
+
+	my $api = JSON::API->new('test');
+	$api->{_json} = bless {}, 'JSON::API::Test::EncodeFH';
+	is($api->_encode({}), undef, '_encode returns undef on encode failure');
+	is($api->errstr, 'boom',
+		'_encode strips both " at FILE line N" and trailing ", <FH> line N" suffix');
+}
+
+{ # Issue #3: _encode strips multi-line carp trace from errstr
+	package JSON::API::Test::EncodeCarp; ## no critic (Modules::RequireFilenameMatchesPackage)
+	sub encode { die "boom at -e line 1.\n\teval {...} called at -e line 1\n" }
+	package main;
+
+	my $api = JSON::API->new('test');
+	$api->{_json} = bless {}, 'JSON::API::Test::EncodeCarp';
+	is($api->_encode({}), undef, '_encode returns undef on encode failure');
+	is($api->errstr, 'boom',
+		'_encode strips multi-line carp trace beyond first "at FILE line N"');
+}
+
+{ # Issue #3: _decode strips Perl's "<FH> line/chunk N" suffix from errstr
+	package JSON::API::Test::DecodeFH; ## no critic (Modules::RequireFilenameMatchesPackage)
+	sub decode { die "boom at -e line 1, <STDIN> line 1.\n" }
+	package main;
+
+	my $api = JSON::API->new('test');
+	$api->{_json} = bless {}, 'JSON::API::Test::DecodeFH';
+	is($api->_decode('{}'), undef, '_decode returns undef on decode failure');
+	is($api->errstr, 'boom',
+		'_decode strips both " at FILE line N" and trailing ", <FH> line N" suffix');
+}
+
+{ # Issue #3: _decode strips multi-line carp trace from errstr
+	package JSON::API::Test::DecodeCarp; ## no critic (Modules::RequireFilenameMatchesPackage)
+	sub decode { die "boom at -e line 1.\n\teval {...} called at -e line 1\n" }
+	package main;
+
+	my $api = JSON::API->new('test');
+	$api->{_json} = bless {}, 'JSON::API::Test::DecodeCarp';
+	is($api->_decode('{}'), undef, '_decode returns undef on decode failure');
+	is($api->errstr, 'boom',
+		'_decode strips multi-line carp trace beyond first "at FILE line N"');
 }
 
 { # test _debug prints to stderr

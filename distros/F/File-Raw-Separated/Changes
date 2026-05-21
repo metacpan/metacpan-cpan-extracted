@@ -1,0 +1,15 @@
+Revision history for File-Raw-Separated
+
+0.04    2026-05-17
+        - Bumped File::Raw prereq to 0.13 to pick up the streaming
+          O_BINARY fix on Windows.
+	- Remove pax headers
+
+0.03    2026-05-07
+        - C89 fixes
+        - Bumped File::Raw prereq to 0.12
+
+0.02    Initial release on CPAN.
+
+0.01    Date/time
+        First version, released on an unsuspecting world.

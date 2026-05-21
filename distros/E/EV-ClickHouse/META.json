@@ -46,7 +46,7 @@
    "provides" : {
       "EV::ClickHouse" : {
          "file" : "lib/EV/ClickHouse.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -60,6 +60,6 @@
          "web" : "https://github.com/vividsnow/perl5-ev-clickhouse"
       }
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

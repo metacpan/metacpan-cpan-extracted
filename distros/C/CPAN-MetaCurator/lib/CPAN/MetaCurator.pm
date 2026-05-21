@@ -2,7 +2,7 @@ package CPAN::MetaCurator;
 
 use 5.36.0;
 
-our $VERSION = '1.15';
+our $VERSION = '1.17';
 
 #-------------------------------------------------
 
@@ -24,7 +24,7 @@ Note: My web host and I use case-sensitive file systems.
 =item Edit Perl.Wiki, etc. Includes updating the release date. Save to ~/Downloads/
 =item cp ~/Downloads/*.Wiki.html to misc/
 =item git commit -am"Update Perl.Wiki V 1.xx"
-=item mv ~/Downloads/*.Wiki.html to $DH (/dev/shm/html on my machine) for eye-ball check via FF
+=item mv misc/*.Wiki.html to $DH (/dev/shm/html on my machine) for eye-ball check via FF
 =back
 
 =head2 Export Perl.Wiki.html

@@ -10,11 +10,8 @@ META.yml
 README
 README.md
 TODO
-benchmark.pl
-combo.pl
 dist.ini
 examples/Common/iterator.pl
-heap.pl
 lib/Iterator/Flex.pm
 lib/Iterator/Flex/Array.pm
 lib/Iterator/Flex/ArrayLike.pm
@@ -77,7 +74,6 @@ lib/Iterator/Flex/Utils.pm
 lib/Iterator/Flex/Zip.pm
 perlcritic.rc
 perltidy.rc
-t.pl
 t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
@@ -108,6 +104,7 @@ t/Common/itake.t
 t/Common/iterator.t
 t/Common/izip.t
 t/Factory/construct_from_attrs.t
+t/Factory/construct_from_iterable.t
 t/Permute.t
 t/Role/Utils.t
 t/lib/MyTest/Tests/May/Iter.pm

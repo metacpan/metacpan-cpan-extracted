@@ -1,0 +1,375 @@
+Wed May  6 05:57:59 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.2]:
+	* release-notes-2.0.2.md: new
+	* build-requires: deleted
+	* buildspec.yml: remove above
+	* Makefile
+	(scan-deps): interate over list (lib bin)
+	(check): new
+	(test): new
+	(build-ci)
+	- create symlink for build.log
+	- record total build time
+	* VERSION: bump
+	* builder
+	- embed build required modules
+	- conditionally install Perl::Tidy, Perl::Critic
+	* lib/CPAN/Maker/Bootstrapper/Role/Installer.pm.in
+	(_install_files)
+	- make Makefile, builder ro
+	- make .includes/ ro (again)
+	* .includes/update.mk
+	- update permission with +w, then -w
+	- use version to compare versions
+
+Sat May  2 09:35:22 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.1]:
+	* VERSION: bump
+	* release-notes/release-notes-2.0.1.md: new
+	* release-notes/release-notes-1.0.1.md: renamed
+	* release-notes/release-notes-1.0.2.md: renamed
+	* release-notes/release-notes-1.0.3.md: renamed
+	* release-notes/release-notes-1.0.4.md: renamed
+	* release-notes/release-notes-1.0.5.md: renamed
+	* release-notes/release-notes-1.1.0.md: renamed
+	* release-notes/release-notes-2.0.0.md: renamed
+	* .github/workflows/build.yml
+	- bring in git first
+	* buildspec.yml
+	- +builder, build-requires, .github/workflows/build.yml
+	* .includes/update.mk
+	(update-available): new
+	* Makefile
+	(build-ci): new
+	(LOG_LEVEL): new, add to $(MAKE_CPAN_DIST) command
+	(all): + update-available
+	(test.t.tmpl): fix missing file
+	(buildspec.yml.tmpl): likewise
+	(scan-deps): YAML::Tiny, not YAML
+	(workflow): new
+	* requires
+	- -YAML::XS, +YAML::Tiny
+	* cpanfile: likewise
+	* build-requires
+	- YAML::Tiny, not YAML::XS
+	- +CPAN::Maker@1.9.0, File::ShareDir, File::ShareDir::Install
+	- -Text::CSV_XS
+	* builder
+	- renamed from build-github
+	- more comments
+	- add perltidy, perlcritic to build
+	- support cpm or cpanm installers
+	- read mirrors from build-mirrors
+	- read additional deps from build-apt-deps
+	(installdeps)
+	- new
+	- use cpanfile instead of just looping through build-requires
+	* lib/CPAN/Maker/Bootstrapper/Role/Installer
+	- -YAML::XS, +YAML::Tiny
+	* .includes/update.mk: don't check for updates on this project
+
+Sun Apr 26 17:17:42 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.0]:
+	* release-notes-2.0.0.md: new
+	* README.md: generated
+	* VERSION: bump
+	* build-github: new
+	* .github/workflows/build.yml: new
+	* .gitignore
+	- +*.crit, *.pod, *-review-2*.code/pod/annotate, bin/bootstrapper
+	* gitignore: +*-review-2*.pod/annotate/code
+	* .includes/git.mk
+	- add a ChangeLog
+	* .includes/help.mk
+	(Variables): MODULINO_NAME, ALIAS
+	* .includes/perl.mk
+	- $(NO_ECHO)
+	- +TIDY_FILES, CRITIC_FILES, ERR_FILES
+	- write sytax errors to STDOUTxi
+	- don't redirect output from perltidy or perlcritic
+	- add errfile to local_cleanfiles
+	* .prompts/code-review.prompt: compact JSON
+	* .prompts/pod-review.prompt
+	- added suggestion other prompts to reduce noice
+	* MANIFEST: -modulino.tmpl
+	* Makefile
+	- +$(NO_ECHO), $(BOOTSTRAPPER), $(CONFIG_READER), $(BASE_DIR)
+	- -$(BUILDSPEC_TEMPLATE), $(UNIT_TEST_TEMPLATE)
+	(DEPS): +cpanfile
+	(cpanfile): new
+	(scan-deps)
+	- display Scanning...messsage
+	- set -m from  min-perl-version
+	(buildspec.yml.tmpl): new
+	(buildspec.yml)
+	- add specfile if exists
+	- add extra_files if exists
+	(CLEANFILES): +resources
+	* buildspec.yml
+	- +man-links, cpan-make-bootstrapper.yml
+	* lib/CPAN/Maker/Bootstrapper.pm.in
+	- pod updates
+	- moved commands to role classes
+	* modulino.tmpl: MODULINO_WRAPPER
+	* project.mk
+	- + $(ROLES)
+	- dependency recipe for roles
+	* requires
+	- +CPAN::Maker 1.8.0, CLI::Simple 2.0.0, File::Copy::Recursive, Role::Tiny
+	* t/find-primary-package.t: modified
+	* test-requires.skip: new, CPAN::Maker::Bootstrapper
+	* bin/bootstrapper.in: new
+	* cpan-maker-bootstrapper.yml: new
+	* lib/CPAN/Maker/Bootstrapper/ConfigReader.pm.in: renamed
+	* lib/CPAN/Maker/Bootstrapper/Constants.pm.in: new
+	* lib/CPAN/Maker/Bootstrapper/Role/CreateConfig.pm.in: new
+	* lib/CPAN/Maker/Bootstrapper/Role/Init.pm.in: new
+	* lib/CPAN/Maker/Bootstrapper/Role/Installer.pm.in: new
+	(cmd_install)
+	- minor refactoring
+	(_import_files)
+	- remove executable permission from source
+	- install .t files
+	(_import_file_listing)
+	- use abs_path of import directories
+	- find .t files
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/Annotator.pm.in: new
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/Models.pm.in: new
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/ReleaseNotes.pm.in: new
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/Reviewer.pm.in: new
+	* lib/CPAN/Maker/Bootstrapper/Role/LLM/Utils.pm.in: new
+	* lib/CPAN/Maker/Bootstrapper/Role/ScaffoldImporter.pm.in: new
+
+Mon Apr 20 04:40:24 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.1.0]:
+	* release-notes-1.1.0.md: new
+	* Makefile
+	(buildspec.yml): use $(BUILDSPEC_TEMPLATE) as input, not first dependency
+	* README.md: generated
+	* VERSION: bump
+	* buildspec.yml
+	- +recommend
+	- +.prompts/code-review.prompt, +.prompts/pod-review.prompt
+	* recommends: new
+	* requires.skip: new
+	* requires
+	- +Archiuve::Tar, Email::Valid, JSON::PP, Module::Metadata,
+	- +Readonly, Text::ASCIITable
+	* .gitignore: +*.pod, *-review-*.code
+	* .includes/git.mk
+	(RECOMMMENDED): -README.md, +.includes/, +.prompts/
+	- only add recommended file if it exists
+	* .includes/help.mk: +LINT
+	* .includes/release-notes.mk
+	- allow make release-notes LAST_TAG=
+	* .prompts/code-review.prompt: modified
+	* .prompts/pod-review.prompt: modified
+	* lib/CPAN/Maker/Bootstrapper.pm.in
+	- new commands: code-review, pod-review, release-notes, annotate
+	- new options: auto-annotate, annotate, context,
+	  finalize-annotations, max-diff-files, prompt, prompt-profile
+	- updated pod for new commands and options
+	(init): set max_diff_files
+	(_get_latest_review): new
+	(_show_annotations): new
+	(_annotate): new
+	(_set_finding_disposition): new
+	(cmd_annotate): new
+	(_finalize_annotations): new
+	(_check_annotation_dispostions): new
+	(_print_token_usage): new
+	(_import_file_listing)
+	- use Module::Metadata for determing packages in file
+	(_init_config)
+	- get resources object from config
+	- get github user from config
+	- get llm_api_key_helper from config
+	- get basedir from config
+	(cmd_code_review): new
+	(cmd_pod_review): new
+	(_cmd_review): new
+	(_strip_pod): new
+	(_get_review_prompt): new
+	(_install_prompts): new
+	(cmd_release_notes): new
+	* lib/CPAN/Maker/ConfigReader.pm.in
+	- updated POD
+	(cpan_maker_llm_api_help): new
+	* .prompts/cli-tool.prompt: new
+	* .prompts/code-review.prompt: new
+	* .prompts/pod-review.prompt: new
+	* Bootstrapper-1.1.0.review: new
+	* t/find-primary-package.t: new
+
+Wed Apr 15 13:32:16 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.5]:
+	* .includes/git.mk: renamed, update RECOMMENDED_ARTIFACTS
+	* .includes/help.mk: renamed
+	* .includes/release-notes.mk: renamed
+	* .includes/update.mk
+	- renamed
+	- add perl.mk to MANAGED_FILES
+	- update files to .includes/ directory now
+	* .includes/upgrade.mk: renamed
+	* .includes/version.mk: renamed
+	* .includes/perl.mk: modified
+	* .includes/update.mk: modified
+	* MANIFEST: add update.mk, upgrade.mk, perl.mk
+	* Makefile
+	- move pattern rules to perl.mk to support linting
+	- add .DEFAULT_GOAL, make sure TARBALL defined before target all
+	- use $(pwd) for SOURCE when defining MODULE_NAME
+	- include .mk files from .includes directory
+	- CLEANFILES += so we don't clobber CLEANFILES from perl.mk
+	* README.md: generated
+	* TODO.md: updated
+	* VERSION: bump
+	* buildspec.yml: update .mk list
+	* lib/CPAN/Maker/Bootstrapper.pm.in
+	- removed CPAN::Maker::ConfigReader to new file
+	- POD updates
+	(cmd_create_config): new
+	(cmd_install): install .mk files to .includes/
+	(main): +cmd_install
+	* project.mk: new
+	* lib/CPAN/Maker/ConfigReader.pm.in: new
+	* .includes/perl.mk: new
+
+Wed Apr 15 07:34:50 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.4]:
+	* release-note-1.0.4.md: new
+	* VERSION: bump
+	* README.md: generated
+	* Makefile
+	- conditionally add project.mk (custom make rules)
+	- include new update.mk, upgrade.mk
+	* upgrade.mk: new
+	* update.mk: new
+	* TODO.md: modified
+	* lib/CPAN/Maker/Bootstrapper.pm.in
+	- modify POD with new EXTENDING THE BUILD SYSTEM section
+
+Tue Apr 14 08:02:13 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.3]:
+	* release-notes-1.0.3.md: new
+	* help.mk: new
+	* requires: +YAML::XS
+	* VERSION: bump
+	* git.mk: new
+	* ChangeLog: modified
+	* MANIFEST: +git.mk, +help.mk, gitignore
+	* buildspec.yml.tmpl
+	- set timestamp in past so older Makefiles do not trigger rebuild of buildspec.yml
+	* buildspec.yml
+	- likewise
+	- remove resources section
+	* Makefile
+	- build README.mds from either .md.in or POD
+	- create a TOC for module POD
+	- include git.mk
+	- include help.mk
+	- add ## comments for make help
+	- tack on resources.yml to buildspec.yml if found
+	- make the buildspec.yml.tmpl an order-only dependency (build buildspec.yml once)
+	* README.md: generated
+	* TODO.md: updated
+	* release-notes.mk: add comments for make help
+	* version.mk: likewise
+	* lib/CPAN/Maker/Bootstrapper.pm.in
+	- add blurb about README.md files
+	- POD updates
+	(cmd_install)
+	- cp gitignore -> .gitignore
+	- import files
+	- add resources to buildspec if --resources = github
+	(CPAN::Maker::ConfigReader::cpan_maker_resources): new
+	(init)
+	- read import file listing
+	(_import_file_listing): new
+	(init_config)
+	- renamed from init_git_config()
+	- conditionally set options
+	(main)
+	- +--import, --resources
+
+Fri Apr 10 14:55:23 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.2]:
+	* release-notes-1.0.2.md: new
+        * README.md: generated
+        * TODO.md: new
+        * VERSION: bump
+	* MANIFEST: + modulino.tmpl, .gitignore
+	* .gitignore: cleaned up, *.diffs, *.lst
+	* buildspec.yml
+	- + .gitignore, modulino.tmpl
+        * Makefile:
+	- new target 'modulino'
+	- requires, test-requires now preserve pinned version and modules marked with '+'
+	- new options make SCAN=off (formerly CPAN_MAKER_SCAN)
+	- make POD=remove, make POD=extract
+	- support requires.skip to avoid adding unwanted modules
+	- script targets more specific (bin/)
+        * TODO.md: new
+        * bin/cpan-maker-bootstrapper.in: new
+        * bin/cpan-maker.sh.in: deleted, replaced with above
+        * modulino.tmpl: new
+        * requires: modified
+        * requires.skip: new
+        * ChangeLog: modified
+        * lib/CPAN/Maker/Bootstrapper.pm.in
+	- updated pod
+	- +help option
+	(cmd_install): class-module.pm.tmpl, not module.pm.tmpl
+
+Fri Apr  3 10:06:54 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.1]:
+	* release-notes-1.0.1.md: new
+	* Makefile
+	- prevent regeneration of .pm.in file
+	* VERSION: bump
+	* README.md: generated
+	* lib/CPAN/Maker/Bootstrapper.pm.in
+	- pod updates
+	(CPAN::Maker::GitConfig::Reader::cpan_maker_basedir): new
+	(init)
+	- set basedir option
+	(_find_package_name): new
+	(_init_git_config): get basedir
+	(cmd_install)
+	- derive module name from stub file
+	- check for Makefile in actuall install directory
+	- set stub to custom, cli or normal stub file, pass STUB to Makefile
+	(main)
+	- add --stub,--basedir options
+	* release-notes.mk: compare staged to last tagged version
+
+Fri Apr  3 06:39:20 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.0]:
+	* ChangeLog: new
+	* MANIFEST: new
+	* Makefile: new
+	* Makefile.txt: new
+	* README.md: new
+	* VERSION: new
+	* bin/cpan-maker.sh.in: new
+	* buildspec.yml: new
+	* buildspec.yml.tmpl: new
+	* class-module.pm.tmpl: new
+	* cli-module.pm.tmpl: new
+	* lib/CPAN/Maker/Bootstrapper.pm.in: new
+	* release-notes.mk: new
+	* requires: new
+	* t/00-cpan-maker-bootstrapper.t: new
+	* test-requires: new
+	* test.t.tmpl: new
+	* version.mk: new

@@ -1,0 +1,22 @@
+Revision history for File-Raw-JSON
+
+0.04    2026-05-17
+        - Fix FreeBSD 9.2 / old-GCC builds: pass
+          -DYYJSON_HAS_STDINT_H=1 -DYYJSON_HAS_STDBOOL_H=1 in DEFINE
+          so yyjson uses system <stdint.h> instead of re-typedeffing
+          int64_t and colliding with sys/_stdint.h.
+        - Fix perl 5.10/5.12/5.14/5.16 builds: shim PERL_STATIC_INLINE
+          to plain `static` when undefined.
+
+0.03    2026-05-17
+        - Fix Strawberry / Win32 build: undef malloc/free/realloc/
+          calloc before including yyjson.h. Perl's iperlsys.h wraps
+          these as 1-arg PerlMem_* macros and collided with yyjson's
+          struct member named `free`.
+        - Fix Test fixtures
+
+0.02    2026-05-10
+        - Bump Tie::OrderedHash dependency to 0.02
+
+0.01    2026-05-09
+        First version, released on an unsuspecting world.

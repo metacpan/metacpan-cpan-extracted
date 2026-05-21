@@ -8,7 +8,7 @@ use Moo;
 
 use Types::Standard qw/Object Str/;
 
-our $VERSION = '1.15';
+our $VERSION = '1.17';
 
 # -----------------------------------------------
 
@@ -105,11 +105,13 @@ sub create_modules_table
 	my($table_name)  = 'modules';
 	my($engine)      = $self -> engine;
 	my($primary_key) = $self -> creator -> generate_primary_key_sql($table_name);
+	my($time_option) = $self -> time_option;
 	my($result)      = $self -> creator -> create_table(<<SQL);
 create table $table_name
 (
-id		$primary_key,
-name	text not null
+id			$primary_key,
+name		text not null,
+timestamp	text $time_option not null default current_timestamp
 ) strict $engine
 SQL
 
@@ -119,7 +121,7 @@ SQL
 
 # --------------------------------------------------
 # Note: The columns are not in alphabetical order
-# so that they display prettily in SQLite.
+# so that they display prettily in sqlite3.
 # create table topics(id integer primary key autoincrement, parent_id integer references topics(id),
 #	title text not null, text text not null, timestamp text not null default current_timestamp);
 

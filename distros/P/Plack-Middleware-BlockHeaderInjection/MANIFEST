@@ -4,13 +4,11 @@ INSTALL
 LICENSE
 MANIFEST
 MANIFEST.SKIP
-MANIFEST.bak
 META.json
 META.yml
 Makefile.PL
 README.md
 SECURITY.md
-SIGNATURE
 cpanfile
 dist.ini
 doap.xml
@@ -32,7 +30,7 @@ xt/author/pod-linkcheck.t
 xt/author/pod-syntax.t
 xt/author/portability.t
 xt/etc/perlcritic.rc
-xt/release/check-manifest.t
+xt/release/dist-manifest.t
 xt/release/fixme.t
 xt/release/kwalitee.t
 xt/release/trailing-space.t

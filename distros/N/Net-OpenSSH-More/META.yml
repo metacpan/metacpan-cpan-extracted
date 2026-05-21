@@ -27,10 +27,10 @@ name: Net-OpenSSH-More
 provides:
   Net::OpenSSH::More:
     file: lib/Net/OpenSSH/More.pm
-    version: '1.00'
+    version: '1.01'
   Net::OpenSSH::More::Linux:
     file: lib/Net/OpenSSH/More/Linux.pm
-    version: '1.00'
+    version: '1.01'
 requires:
   Data::Dumper: '0'
   Data::UUID: '0'
@@ -55,11 +55,13 @@ requires:
   perl: '5.020'
   strict: '0'
   warnings: '0'
-resources: {}
-version: '1.00'
+resources:
+  bugtracker: https://github.com/troglodyne-internet-widgets/perl-Net-Openssh-More/issues
+  homepage: https://github.com/troglodyne-internet-widgets/perl-Net-Openssh-More
+  repository: https://github.com/troglodyne-internet-widgets/perl-Net-Openssh-More.git
+version: '1.01'
 x_contributors:
   - 'Andy Baugh <andy@troglodyne.net>'
-  - 'teo <Andy Baugh>'
-x_generated_by_perl: v5.40.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: MIT

@@ -1,5 +1,5 @@
-package GDPR::IAB::TCFv2::Publisher;
-use strict;
+package GDPR::IAB::TCFv2::Publisher 0.520;
+use v5.12;
 use warnings;
 
 use Carp qw<croak>;
@@ -7,106 +7,123 @@ use Carp qw<croak>;
 use GDPR::IAB::TCFv2::PublisherRestrictions;
 use GDPR::IAB::TCFv2::PublisherTC;
 
-
 sub Parse {
-    my ( $klass, %args ) = @_;
+  my ($klass, %args) = @_;
 
-    croak "missing 'core_data'"      unless defined $args{core_data};
-    croak "missing 'core_data_size'" unless defined $args{core_data_size};
+  croak "missing 'core_data'"      unless defined $args{core_data};
+  croak "missing 'core_data_size'" unless defined $args{core_data_size};
+  croak "missing 'offset'"         unless defined $args{offset};
 
-    croak "missing 'options'"      unless defined $args{options};
-    croak "missing 'options.json'" unless defined $args{options}->{json};
+  croak "missing 'options'"      unless defined $args{options};
+  croak "missing 'options.json'" unless defined $args{options}->{json};
 
-    my $core_data      = $args{core_data};
-    my $core_data_size = $args{core_data_size};
+  my $core_data      = $args{core_data};
+  my $core_data_size = $args{core_data_size};    # size in bytes
+  my $offset         = $args{offset};
 
-    my $restrictions = GDPR::IAB::TCFv2::PublisherRestrictions->Parse(
-        data      => $core_data,
-        data_size => $core_data_size,
-        options   => $args{options},
+  my $restrictions = GDPR::IAB::TCFv2::PublisherRestrictions->Parse(
+    data      => $core_data,
+    data_size => $core_data_size << 3,           # convert to bits
+    offset    => $offset,
+    options   => $args{options},
+  );
+
+  my $self = {restrictions => $restrictions, publisher_tc => undef,};
+
+  if (defined $args{publisher_tc_data}) {
+    my $publisher_tc_data      = $args{publisher_tc_data};
+    my $publisher_tc_data_bits = length($publisher_tc_data) << 3;
+
+    my $publisher_tc = GDPR::IAB::TCFv2::PublisherTC->Parse(
+      data      => $publisher_tc_data,
+      data_size => $publisher_tc_data_bits,
+      options   => $args{options},
     );
 
-    my $self = {
-        restrictions => $restrictions,
-        publisher_tc => undef,
-    };
+    $self->{publisher_tc} = $publisher_tc;
+  }
 
-    if ( defined $args{publisher_tc_data} ) {
-        my $publisher_tc_data = $args{publisher_tc_data};
-        my $publisher_tc_data_size =
-          $args{publisher_tc_data_size} || length($publisher_tc_data);
+  bless $self, $klass;
 
-        my $publisher_tc = GDPR::IAB::TCFv2::PublisherTC->Parse(
-            data      => $publisher_tc_data,
-            data_size => $publisher_tc_data_size,
-            options   => $args{options},
-        );
-
-        $self->{publisher_tc} = $publisher_tc;
-    }
-
-    bless $self, $klass;
-
-    return $self;
+  return $self;
 }
 
 sub check_restriction {
-    my ( $self, $purpose_id, $restriction_type, $vendor_id ) = @_;
+  my ($self, $purpose_id, $restriction_type, $vendor_id) = @_;
 
-    return $self->{restrictions}
-      ->check_restriction( $purpose_id, $restriction_type, $vendor_id );
+  return 0 unless defined $self->{restrictions};
+
+  return $self->{restrictions}->check_restriction($purpose_id, $restriction_type, $vendor_id);
 }
 
 sub restrictions {
-    my ( $self, $vendor_id ) = @_;
+  my ($self, $vendor_id) = @_;
 
-    return $self->{restrictions}->restrictions($vendor_id);
+  return {} unless defined $self->{restrictions};
+
+  return $self->{restrictions}->restrictions($vendor_id);
+}
+
+sub has_restrictions {
+  my $self = shift;
+
+  return defined $self->{restrictions} ? $self->{restrictions}->has_restrictions : 0;
 }
 
 sub publisher_tc {
-    my ( $self, $callback ) = @_;
+  my ($self) = @_;
 
-    return $self->{publisher_tc};
+  return $self->{publisher_tc};
 }
 
 sub TO_JSON {
-    my $self = shift;
+  my ($self, $filter_id) = @_;
 
-    my %tags = (
-        restrictions => $self->{restrictions}->TO_JSON,
-    );
+  my %tags;
 
-    if ( defined $self->{publisher_tc} ) {
-        %tags = ( %tags, %{ $self->{publisher_tc}->TO_JSON } );
-    }
+  if (defined $self->{restrictions}) {
+    $tags{restrictions} = $self->{restrictions}->TO_JSON($filter_id);
+  }
 
-    return \%tags;
+  if (defined $self->{publisher_tc}) {
+    %tags = (%tags, %{$self->{publisher_tc}->TO_JSON});
+  }
+
+  return \%tags;
 }
+
 
 1;
 __END__
 
 =head1 NAME
 
-GDPR::IAB::TCFv2::Publisher - Transparency & Consent String version 2 publisher
+GDPR::IAB::TCFv2::Publisher - TCF v2.3 publisher section parser
 
 Combines the creation of L<GDPR::IAB::TCFv2::PublisherRestrictions> and L<GDPR::IAB::TCFv2::PublisherTC> based on the data available.
 
 =head1 SYNOPSIS
 
+    use GDPR::IAB::TCFv2::Publisher;
+    my $core_data = '...'; # raw binary
+    my $core_data_size = length($core_data);
+    my $publisher_tc_data = '...';
+
     my $publisher = GDPR::IAB::TCFv2::Publisher->Parse(
         core_data         => $core_data,
         core_data_size    => $core_data_size,
+        offset            => 284,
         publisher_tc_data => $publisher_tc_data, # optional
-        options           => { json => ... },
+        options           => { json => {} },
     );
 
-    say "there is publisher restriction on purpose id 1, type 0 on vendor_id 284"
-        if $publisher->check_restriction(1, 0, 284);
+    if ($publisher->check_restriction(1, 0, 284)) {
+        # ...
+    }
 
 =head1 CONSTRUCTOR
 
-Constructor C<Parse> receives an hash of 4 parameters: 
+Constructor C<Parse> receives a hash of 5 parameters: 
 
 =over
 
@@ -117,6 +134,10 @@ Key C<core_data> is the binary core data
 =item *
 
 Key C<core_data_size> is the original binary core data size
+
+=item *
+
+Key C<offset> is the bit offset where the publisher section starts
 
 =item *
 
@@ -193,7 +214,7 @@ Example, by parsing the consent C<COwAdDhOwAdDhN4ABAENAPCgAAQAAv___wAAAFP_AAp_4A
          7,
          10
       ],
-      "custom_purpose" : {
+      "custom_purposes" : {
          "consents" : [],
          "legitimate_interests" : []
       },

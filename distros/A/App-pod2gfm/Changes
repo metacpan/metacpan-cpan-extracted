@@ -1,5 +1,14 @@
 Revision history for App::pod2gfm
 
+v1.1.0    2026-05-12T18:25:33Z
+          - Add bash completion as optional (Getopt::Long::More)
+          - Replace wrong shebangs in scripts, otherwise EU::MM will not rewrite
+            them on installation
+          - Use true and false as bool
+          - Tidy tests
+          - Minor metadata fixes + require newer prereqs versions
+          - Minor documentation fixes
+
 v1.0.1    2026-02-13T16:10:36Z
           - Use abstract description from script
 

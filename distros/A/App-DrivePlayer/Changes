@@ -1,5 +1,44 @@
 Revision history for App::DrivePlayer.
 
+0.2.9 2026-04-30
+        - Fix: player IPC no longer drops mpv events when a recv()
+          slices an event mid-line.  _drain_events and
+          _send_command_sync now share _pending_buf so partial
+          events get reassembled across reads.  Symptom: roughly
+          every 15-20 tracks playback would stick on a finished
+          track because end-file was lost and on_track_end never
+          fired.
+        - Settings: saving with changed Google credentials now
+          tears down rest_api / drive / player and rebuilds them
+          against the new config, so a refreshed token takes
+          effect without restarting the app.
+        - Errors: HTTP 4xx / OAuth-grant failures from Google now
+          pop the Settings dialog automatically after the error
+          is dismissed, routing the user straight to the
+          credentials.  Re-entry from errors fired inside the
+          Settings dialog itself (e.g. Find-or-Create) is
+          suppressed.
+        - Tracklist: Artist, Album and Genre cells are now click
+          targets that switch the sidebar to that group; the
+          existing cursor-changed signal repopulates the
+          tracklist.  A hand cursor on hover indicates the cell
+          is clickable.
+        - Edit metadata: when an artist / album / genre value
+          changes and other tracks share the previous value, a
+          single confirmation dialog offers to apply the rename
+          across all matching tracks -- so one mojibake fix can
+          clean up the lingering sidebar entry instead of leaving
+          it stuck behind unrenamed siblings.
+        - Edit metadata: small grey help label under the Fetch
+          button states that Fetch only fills blank fields, and
+          that clearing a populated field lets Fetch replace it.
+        - Config: write 'class: OAuth2Client' on the
+          google_restapi blob (in addition to under auth) and
+          require Google::RestApi >= 2.2.3.
+        - Docs: README Files section converted from a GFM pipe
+          table to a bulleted list so it renders correctly on
+          MetaCPAN (Text::Markdown doesn't support tables).
+
 0.2.8 2026-04-23
         - Fix: Scanner now decodes UTF-8 at the Drive API boundary,
           preventing double-encoded mojibake (e.g. "Nazan Ãncel"

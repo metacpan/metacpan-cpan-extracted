@@ -1,6 +1,6 @@
 package Langertha::ToolCall;
 # ABSTRACT: Immutable canonical tool invocation emitted by an LLM
-our $VERSION = '0.500';
+our $VERSION = '0.502';
 use Moose;
 use JSON::MaybeXS qw( encode_json decode_json );
 
@@ -103,6 +103,24 @@ sub from_gemini {
   );
 }
 
+# OpenAI Responses API: function_call appears either as a top-level output[]
+# item or nested inside output[type=message].content[]. Both shapes look like:
+#   { "type": "function_call", "call_id": "call_abc", "name": "foo", "arguments": "{...}" }
+sub from_responses {
+  my ($class, $block) = @_;
+  return undef unless ref($block) eq 'HASH';
+  return undef unless ( $block->{type} // '' ) eq 'function_call';
+  my $name = $block->{name} // '';
+  return undef unless length $name;
+  my $args = $block->{arguments};
+  $args = _decode_args($args);
+  return $class->new(
+    name      => $name,
+    arguments => ( ref($args) eq 'HASH' ? $args : {} ),
+    id        => ( $block->{call_id} // '' ),
+  );
+}
+
 # Pull every tool call out of an upstream response, in any of the formats
 # we know about. Returns a list of ToolCall objects (possibly empty).
 sub extract {
@@ -134,6 +152,32 @@ sub extract {
     return grep { defined }
       map { $class->from_gemini($_) }
       @{ $raw->{candidates}[0]{content}{parts} };
+  }
+
+  # OpenAI Responses shape: function_call appears either as a top-level
+  # output[] item (real API) or nested under output[type=message].content[]
+  # (older / streaming shape). Walk both.
+  if ( ref( $raw->{output} ) eq 'ARRAY' ) {
+    my @calls;
+    for my $item (@{$raw->{output}}) {
+      next unless ref($item) eq 'HASH';
+      my $type = $item->{type} // '';
+      if ( $type eq 'function_call' ) {
+        if ( my $tc = $class->from_responses($item) ) {
+          push @calls, $tc;
+        }
+      }
+      elsif ( $type eq 'message' ) {
+        for my $block (@{$item->{content} // []}) {
+          if (($block->{type} // '') eq 'function_call') {
+            if (my $tc = $class->from_responses($block)) {
+              push @calls, $tc;
+            }
+          }
+        }
+      }
+    }
+    return @calls if @calls;
   }
 
   return ();
@@ -220,7 +264,7 @@ Langertha::ToolCall - Immutable canonical tool invocation emitted by an LLM
 
 =head1 VERSION
 
-version 0.500
+version 0.502
 
 =head2 synthetic
 

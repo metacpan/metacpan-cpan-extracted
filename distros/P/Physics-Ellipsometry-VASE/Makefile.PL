@@ -44,5 +44,23 @@ WriteMakefile(
     PM        => {
         'lib/Physics/Ellipsometry/VASE.pm' =>
             '$(INST_LIB)/Physics/Ellipsometry/VASE.pm',
+        'lib/Physics/Ellipsometry/VASE/TMM.pm' =>
+            '$(INST_LIB)/Physics/Ellipsometry/VASE/TMM.pm',
+        'lib/Physics/Ellipsometry/VASE/Dispersion.pm' =>
+            '$(INST_LIB)/Physics/Ellipsometry/VASE/Dispersion.pm',
+        'lib/Physics/Ellipsometry/VASE/EMA.pm' =>
+            '$(INST_LIB)/Physics/Ellipsometry/VASE/EMA.pm',
+        'lib/Physics/Ellipsometry/VASE/Materials.pm' =>
+            '$(INST_LIB)/Physics/Ellipsometry/VASE/Materials.pm',
+        'lib/Physics/Ellipsometry/VASE/Parameter.pm' =>
+            '$(INST_LIB)/Physics/Ellipsometry/VASE/Parameter.pm',
+        'lib/Physics/Ellipsometry/VASE/Optimizer.pm' =>
+            '$(INST_LIB)/Physics/Ellipsometry/VASE/Optimizer.pm',
+        'lib/PDL/Demos/Ellipsometry.pm' =>
+            '$(INST_LIB)/PDL/Demos/Ellipsometry.pm',
+        'lib/PDL/Demos/demo_wafer.dat' =>
+            '$(INST_LIB)/PDL/Demos/demo_wafer.dat',
+        'lib/PDL/Demos/demo_ta_metal.mat' =>
+            '$(INST_LIB)/PDL/Demos/demo_ta_metal.mat',
     },
 );

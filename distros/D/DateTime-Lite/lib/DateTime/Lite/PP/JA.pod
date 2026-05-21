@@ -1,0 +1,35 @@
+=encoding utf-8
+
+=head1 NAME
+
+DateTime::Lite::PP - DateTime::LiteのXS層のPure-Perlフォールバック
+
+=head1 DESCRIPTION
+
+このモジュールは、XS共有オブジェクトを読み込めない場合に、L<DateTime::Lite>によって自動的に読み込まれます。たとえば、Cコンパイラなしでディストリビューションがインストールされた場合や、環境変数C<PERL_DATETIME_LITE_PP>に真の値が設定されている場合です。
+
+ここで定義されるすべての関数は、C<DateTime::Lite>名前空間へ直接注入されるため、呼び出し側からは透過的にメソッドとして見えます。
+
+通常、このモジュールを直接読み込んだり呼び出したりするべきではありません。
+
+=head1 VERSION
+
+    v0.1.1
+
+=head1 SEE ALSO
+
+L<DateTime::Lite>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright(c) 2026 DEGUEST Pte. Ltd.
+
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

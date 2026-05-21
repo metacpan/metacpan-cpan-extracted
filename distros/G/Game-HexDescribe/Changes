@@ -1,3 +1,8 @@
+1.04
+
+- Add "closest" keyword.
+- For "same": Return "…" instead of a new pick.
+
 1.03
 
 - Add option to not show the map.

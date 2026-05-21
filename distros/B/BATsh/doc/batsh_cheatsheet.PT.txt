@@ -1,6 +1,30 @@
 BATsh Folha de referencia [PT] Portugues
 =========================================
 
+----------------------------------------------------------------------
+RESUMO
+  BATsh e um interpretador de shell bilingue que executa sintaxe cmd.exe
+  e bash/sh no mesmo arquivo, alternando de modo linha por linha
+  automaticamente. Nenhum shell externo necessario -- Perl puro.
+
+EXEMPLO MISTO
+  :: Secao CMD (primeiro token em maiusculas)
+  @ECHO OFF
+  SET LANG=BATsh
+
+  # Secao SH (primeiro token com minusculas)
+  greet() { echo "Ola $1 (modo bash)"; }
+  greet $LANG
+  result=$(echo $LANG | perl -e 'while(<STDIN>){chomp;print uc}')
+  echo "Maiusculas: $result"
+
+  :: De volta ao CMD (ler resultado SH)
+  ECHO De volta CMD: %result%
+
+  # Execucao: perl lib/BATsh.pm script.batsh
+----------------------------------------------------------------------
+
+
 BATsh e um shell bilingue que executa sintaxe cmd.exe e bash/sh
 no mesmo script. O primeiro token de cada linha determina o modo.
 
@@ -99,3 +123,21 @@ no mesmo script. O primeiro token de cada linha determina o modo.
   Sem dependencias do CPAN.
 
 Veja tambem: https://metacpan.org/dist/BATsh
+
+11. Pipeline CMD e modificadores de parametros
+------------------------------------------------
+  cmd1 | cmd2              # Pipeline via arquivo temporario (Pure Perl)
+  SET /P VAR=Aviso:        # Ler uma linha do STDIN para VAR
+  %~dp0                    # Unidade+diretorio de %0 (uso mais comum)
+  %~n1, %~x1, %~nx1       # Nome de arquivo, extensao, ambos
+
+12. Funcoes SH e expansao de variaveis
+----------------------------------------
+  f() { echo $1; }         # Definicao de funcao
+  ${var%.*}  ${var%%.*}    # Remover sufixo (mais curto/mais longo)
+  ${var#*.}  ${var##*.}    # Remover prefixo (mais curto/mais longo)
+  ${var/a/b} ${var//a/b}   # Substituir (primeiro/todos)
+  ${var^^} ${var,,}        # Maiusculas/minusculas
+  cmd > f  cmd >> f  2>&1  # Redirecionamento
+  cmd1 && cmd2             # Encadeamento E
+  cmd1 || cmd2             # Encadeamento OU

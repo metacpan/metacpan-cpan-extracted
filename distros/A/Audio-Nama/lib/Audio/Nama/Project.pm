@@ -88,7 +88,7 @@ sub initialize_project_data {
 	$project->{nama_version} = $VERSION;
 	( $project->{nama_commit} ) = 
 	qw( 
-		397c1fd33
+		ceff2b486
 
 	);
 	$project->{repo} = undef;

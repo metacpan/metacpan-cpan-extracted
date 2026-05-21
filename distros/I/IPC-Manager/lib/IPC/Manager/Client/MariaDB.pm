@@ -2,7 +2,7 @@ package IPC::Manager::Client::MariaDB;
 use strict;
 use warnings;
 
-our $VERSION = '0.000035';
+our $VERSION = '0.000037';
 
 use Carp qw/croak/;
 use File::Temp qw/tempdir/;
@@ -35,10 +35,11 @@ sub table_sql {
     return (
         <<"        EOT",
             CREATE TABLE IF NOT EXISTS ipcm_peers(
-                `id`        VARCHAR(512)    NOT NULL PRIMARY KEY,
-                `pid`       INTEGER         DEFAULT NULL,
-                `active`    DOUBLE          DEFAULT UNIX_TIMESTAMP(),
-                `stats`     BLOB            DEFAULT NULL
+                `id`                VARCHAR(512)    NOT NULL PRIMARY KEY,
+                `pid`               INTEGER         DEFAULT NULL,
+                `active`            DOUBLE          DEFAULT UNIX_TIMESTAMP(),
+                `stats`             BLOB            DEFAULT NULL,
+                `suspend_expires`   DOUBLE          DEFAULT NULL
             );
         EOT
         <<"        EOT",
@@ -60,7 +61,10 @@ sub spawn {
 
     my $dsn = $params{route};
 
-    unless ($dsn) {
+    if (!$dsn && $params{dbh}) {
+        $dsn = $params{+ROUTE} = $class->route_from_dbh($params{dbh});
+    }
+    elsif (!$dsn) {
         require DBIx::QuickDB;
         my $qdb = DBIx::QuickDB->build_db(m_db => {driver => 'MariaDB'});
         $params{+QDB}  = $qdb;

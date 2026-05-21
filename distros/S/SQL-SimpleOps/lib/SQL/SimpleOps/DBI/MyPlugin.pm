@@ -18,6 +18,11 @@
 ## along with this program.  If not, see L<http://www.gnu.org/licenses/>.
 #
 
+## NOTE: The plugin is NOT REQUIRED for standard DBI connectors
+#
+## Use the plugin for required condition to pre/post module calls.
+#
+
 	package SQL::SimpleOps::DBI::MyPlugin;
 
 	use 5.006001;
@@ -29,7 +34,7 @@
 
 	our @EXPORT = qw(new Open Select SelectCursor Delete Insert Update Call $VERSION);
 
-	our $VERSION = "2023.284.1";
+	our $VERSION = "2026.129.1";
 
 	our @EXPORT_OK = @EXPORT;
 
@@ -48,7 +53,7 @@ sub new()
 	$self->{sql_simple}->{init}{plugin_id} = "MyPlugin";
 	
 	# use '1' if your db have schema option format
-	$self->{sql_simple}->{init}{schema} = 1;
+	$self->{sql_simple}->{init}{schema} = 0;
 	
 	# use '1' if your args must have server/tcport values
 	$self->{sql_simple}->{init}{test_server} = 1;

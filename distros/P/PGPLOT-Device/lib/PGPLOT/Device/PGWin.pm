@@ -7,7 +7,7 @@ use warnings;
 
 use v5.10;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 use List::Util 1.33;
 
@@ -244,7 +244,7 @@ PGPLOT::Device::PGWin - convenience class for PDL::Graphics::PGPLOT::Window
 
 =head1 VERSION
 
-version 0.13
+version 0.14
 
 =head1 SYNOPSIS
 
@@ -388,11 +388,11 @@ Please report any bugs or feature requests to bug-pgplot-device@rt.cpan.org  or 
 
 Source is available at
 
-  https://gitlab.com/djerius/pgplot-device
+  https://codeberg.org/djerius/p5-PGPLOT-Device
 
 and may be cloned from
 
-  https://gitlab.com/djerius/pgplot-device.git
+  https://codeberg.org/djerius/p5-PGPLOT-Device.git
 
 =head1 SEE ALSO
 

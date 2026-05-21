@@ -1,0 +1,46 @@
+#
+## CopyRight (C) - Carlos Celso
+#
+## see: https://metacpan.org/pod/DBD::mysql
+
+*) step1, create database, table, users, grants
+   
+   # mysql << EOF
+   create database my_db;
+   create table my_db.my_users
+   (
+   	login varchar(128),
+   	password varchar(256),
+   	uid integer unsigned,
+   	gid integer unsigned,
+   	name varchar(128),
+   	home varchar(256),
+   	shell varchar(256)
+   );
+   create user 'my_user'@'localhost' identified by 'my_password';
+   grant select,insert,update,delete on my_db.my_users to 'my_user'@'localhost';
+   EOF
+
+*) step2, test db
+
+   # mysql -p -u my_user my_db
+   Enter password: [pasword]
+   ..
+   MariaDB [my_db]> exit
+
+*) step3, test perl
+
+   # export MY_DB=my_db
+   # export MY_USER=my_user
+   # export MY_PASSWORD=my_password
+   # perl dbi_mysql.pl
+   
+*) step4, cleanup
+   
+   # mysql <<EOF
+   drop user 'my_user'@'localhost';
+   drop table my_db.my_users;
+   drop database my_db;
+   EOF
+   
+ENDED

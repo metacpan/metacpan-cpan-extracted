@@ -2,7 +2,7 @@
  *
  * SPDX-License-Identifier: BSD-2-Clause
  *
- * Copyright (c) 2024 - 2025 Steffen Nurpmeso <steffen@sdaoden.eu>.
+ * Copyright (c) 2024 - 2026 Steffen Nurpmeso <steffen@sdaoden.eu>.
  * (Only technical surroundings, algorithm is solely Colin Percival.)
  *
  * Copyright 2003-2005 Colin Percival
@@ -137,7 +137,7 @@ a_bsdiff_search(s_bsdipa_off_t const *Ip, uint8_t const *aftdat, s_bsdipa_off_t 
 		x = st + ((en - st) / 2);
 		y = aftlen - Ip[x];
 		y = MIN(y, beflen);
-		if(memcmp(aftdat + Ip[x], befdat, y) < 0)
+		if(memcmp(aftdat + Ip[x], befdat, (size_t)y) < 0)
 			r = a_bsdiff_search(Ip, aftdat, aftlen, befdat, beflen, x, en, posp);
 		else
 			r = a_bsdiff_search(Ip, aftdat, aftlen, befdat, beflen, st, x, posp);
@@ -155,16 +155,15 @@ a_bsdiff_xout(s_bsdipa_off_t x, uint8_t *buf){ /* xxx use endian.h stuff */
 	y = lt0 ? -x : x;
 
 #ifndef s_BSDIPA_32
-			buf[7] = y % 256; y -= buf[7];
-	y = y / 256;	buf[6] = y % 256; y -= buf[6];
-	y = y / 256;	buf[5] = y % 256; y -= buf[5];
-	y = y / 256;	buf[4] = y % 256; y -= buf[4];
-	y = y / 256;
+	buf[7] = (uint8_t)(y & 0xFF); y >>= 8;
+	buf[6] = (uint8_t)(y & 0xFF); y >>= 8;
+	buf[5] = (uint8_t)(y & 0xFF); y >>= 8;
+	buf[4] = (uint8_t)(y & 0xFF); y >>= 8;
 #endif
-			buf[3] = y % 256; y -= buf[3];
-	y = y / 256;	buf[2] = y % 256; y -= buf[2];
-	y = y / 256;	buf[1] = y % 256; y -= buf[1];
-	y = y / 256;	buf[0] = y % 256;
+	buf[3] = (uint8_t)(y & 0xFF); y >>= 8;
+	buf[2] = (uint8_t)(y & 0xFF); y >>= 8;
+	buf[1] = (uint8_t)(y & 0xFF); y >>= 8;
+	buf[0] = (uint8_t)(y /*& 0xFF*/);
 	if(lt0)
 		buf[0] |= 0x80;
 }
@@ -254,7 +253,7 @@ s_bsdipa_diff(struct s_bsdipa_diff_ctx *dcp){
 		ccpp = NULL;
 		ccp = NULL; /* xxx UNINIT() */
 		ctrlno = 0; /* xxx UNINIT() */
-		ctrl_len_max = s_BSDIPA_OFF_MAX - beflen - (sizeof(s_bsdipa_off_t) * 3) - 1;
+		ctrl_len_max = s_BSDIPA_OFF_MAX - beflen - 1;
 		scan = len = pos = lastscan = lastpos = lastoff = super_pos = 0;
 
 		/* a_bsdiff_search() is called with aftlen-a_BSDIPA_DIVSUFSORT, so bypass algorithm as such, then */
@@ -286,11 +285,6 @@ s_bsdipa_diff(struct s_bsdipa_diff_ctx *dcp){
 					lenf = lenb = 0;
 					j = scan = beflen;
 					goto j_aftlen0_bypass;
-				}
-
-				if(dcp->dc_ctrl_len >= ctrl_len_max){
-					rv = s_BSDIPA_FBIG;
-					goto jdone;
 				}
 
 				s = Sf = lenf = 0;
@@ -390,6 +384,10 @@ j_aftlen0_bypass:
 						ccp->cc_len += sizeof(s_bsdipa_off_t);
 					need_dump = 1;
 					dcp->dc_ctrl_len += sizeof(s_bsdipa_off_t) * 3;
+					if(dcp->dc_ctrl_len > ctrl_len_max){
+						rv = s_BSDIPA_FBIG;
+						goto jdone;
+					}
 				}
 
 				super_pos += (pos - lenb) - (lastpos + lenf);
@@ -452,24 +450,24 @@ a_bsdiff_split(s_bsdipa_off_t *I, s_bsdipa_off_t *V, s_bsdipa_off_t start, s_bsd
 				if(V[I[k+i]+h]<x) {
 					x=V[I[k+i]+h];
 					j=0;
-				};
+				}
 				if(V[I[k+i]+h]==x) {
 					tmp=I[k+j];I[k+j]=I[k+i];I[k+i]=tmp;
 					j++;
-				};
-			};
+				}
+			}
 			for(i=0;i<j;i++) V[I[k+i]]=k+j-1;
 			if(j==1) I[k]=-1;
-		};
+		}
 		return;
-	};
+	}
 
 	x=V[I[start+len/2]+h];
 	jj=0;kk=0;
 	for(i=start;i<start+len;i++) {
 		if(V[I[i]+h]<x) jj++;
 		if(V[I[i]+h]==x) kk++;
-	};
+	}
 	jj+=start;kk+=jj;
 
 	i=start;j=0;k=0;
@@ -482,8 +480,8 @@ a_bsdiff_split(s_bsdipa_off_t *I, s_bsdipa_off_t *V, s_bsdipa_off_t start, s_bsd
 		} else {
 			tmp=I[i];I[i]=I[kk+k];I[kk+k]=tmp;
 			k++;
-		};
-	};
+		}
+	}
 
 	while(jj+j<kk) {
 		if(V[I[jj+j]+h]==x) {
@@ -491,8 +489,8 @@ a_bsdiff_split(s_bsdipa_off_t *I, s_bsdipa_off_t *V, s_bsdipa_off_t start, s_bsd
 		} else {
 			tmp=I[jj+j];I[jj+j]=I[kk+k];I[kk+k]=tmp;
 			k++;
-		};
-	};
+		}
+	}
 
 	if(jj>start) a_bsdiff_split(I,V,start,jj-start,h);
 
@@ -538,10 +536,10 @@ a_bsdiff_qsufsort(s_bsdipa_off_t *I,const uint8_t *aftdat,s_bsdipa_off_t aftlen,
 				a_bsdiff_split(I,V,i,len,h);
 				i+=len;
 				len=0;
-			};
-		};
+			}
+		}
 		if(len) I[i-len]=-len;
-	};
+	}
 
 	for(i=0;i<aftlen+1;i++) I[V[i]]=i;
 

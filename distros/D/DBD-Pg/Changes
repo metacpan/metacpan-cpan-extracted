@@ -1,6 +1,41 @@
 Changes for the DBD::Pg module
 
-RT refers to rt.cpan.org
+RT items can be found by using: https://rt.cpan.org/Public/Bug/Display.html?id=XXX
+Github items can be found by using: https://github.com/bucardo/dbdpg/issues/XXX
+
+
+Version 3.20.2  (released May 1, 2026)
+
+ - Fix incorrect path separator which may impede Mac compilation.
+   [Ed Sabol, reported by Éric Cholet]
+   (Github pull request #191)
+
+
+Version 3.20.1  (released April 30, 2026)
+
+ - Set imp_dbh->async_sth when a prepare is successfully sent from pg_st_prepare_statement
+   Don't execute "result auto-retrieve" code for a successful async prepare
+   Increment imp_dbh->prepare_number when success of an async prepare is detected in handle_old_async
+   [Rainer Weikusat, reported by Michael Kröll]
+   (Github issue #183, pull request #184)
+
+ - Fix hangup of queries like "COPY TO STDOUT" in async mode
+   [Ed Sabol, Alexander Gorlov]
+   (Github issue #98, pull request #101 and #163)
+
+ - Improve documentation about sslmode options
+   [Ed Sabol, reported by Alexander Karelas]
+   (Github issue #180, pull request #186)
+
+ - Drop ExtUtils::MakeMaker requirement back to 6.58, but recommend 7.64
+   [Greg Sabino Mullane, Ed Sabol, reported by Peter Tribble]
+   (Github issue #170)
+
+ - Shorten path for test database to reduce OS errors
+   [Greg Sabino Mullane, Ed Sabol, reported by Gianni Ceccarelli and Peter Dyballa]
+   (Github issue #78 and #185)
+   (RT ticket #157598)
+
 
 Version 3.20.0  (released March 19, 2026)
 
@@ -18,7 +53,7 @@ Version 3.20.0  (released March 19, 2026)
    (Github pull request #167)
 
  - Fix failing test due to localized error messages.
-   [Ed Sabol]
+   [Ed Sabol, reported by Slaven Rezić]
    (Github issue #169)
    (Github pull request #164)
 
@@ -29,6 +64,7 @@ Version 3.20.0  (released March 19, 2026)
 
  - Cleanup and improve the primary_key_info() function.
    [Greg Sabino Mullane]
+   (Github pull request #175)
 
 
 Version 3.19.0  (released March 14, 2026)

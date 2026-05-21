@@ -90,6 +90,7 @@ for my $tester (' -r -w -f ') {
 
         push @test, sub {
             return 'SKIP' if $^O =~ /cygwin/;
+            return 'SKIP' if $> == 0; # root always passes file permission tests
 
             # make testee file
             my $filename = "$tempdir/testee";

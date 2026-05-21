@@ -49,7 +49,7 @@ Users run C<dashboard cpan E<lt>Module...E<gt>> from the runtime they want to ex
 
 =head1 WHAT USES IT
 
-It is used by developers enabling optional SQL dashboard drivers and by tests and docs that verify runtime-local dependency installation instead of shipping those modules by default.
+It is used by developers enabling optional runtime integrations and by tests and docs that verify runtime-local dependency installation instead of shipping those modules by default.
 
 =head1 EXAMPLES
 

@@ -98,11 +98,9 @@ unless( defined( $smtp_from ) && length( $smtp_from ) &&
         'or configure [smtp] from/to in ~/.mailmakerc' );
 }
 
-eval{ require IPC::Run }
-    or plan( skip_all => 'IPC::Run not installed - required for GPG operations' );
+eval{ require IPC::Run } or plan( skip_all => 'IPC::Run not installed - required for GPG operations' );
 
-eval{ require File::Which }
-    or plan( skip_all => 'File::Which not installed - required to locate gpg binary' );
+eval{ require File::Which } or plan( skip_all => 'File::Which not installed - required to locate gpg binary' );
 
 # Locate gpg binary early so we can skip cleanly if absent
 my $gpg_bin_found;
@@ -138,8 +136,8 @@ my %smtp_common = (
     Hello => $smtp_hello,
     Debug => $smtp_debug,
 );
-$smtp_common{StartTLS} = 1            if( $smtp_starttls );
-$smtp_common{SSL}      = 1            if( $smtp_ssl );
+$smtp_common{StartTLS} = 1              if( $smtp_starttls );
+$smtp_common{SSL}      = 1              if( $smtp_ssl );
 $smtp_common{Username} = $smtp_username if( defined( $smtp_username ) && length( $smtp_username ) );
 $smtp_common{Password} = $smtp_password if( defined( $smtp_password ) && length( $smtp_password ) );
 
@@ -177,6 +175,7 @@ SKIP:
 {
     skip( 'MM_GPG_KEY_ID not set - signing tests skipped', 2 ) unless( $can_sign );
 
+    # NOTE: live: gpg_sign - multipart/signed delivered
     subtest 'live: gpg_sign - multipart/signed delivered' => sub
     {
         plan( tests => 2 );
@@ -262,6 +261,7 @@ SKIP:
 {
     skip( 'MM_GPG_KEY_ID not set - sign+encrypt test skipped', 1 ) unless( $can_sign );
 
+    # NOTE: live: gpg_sign_encrypt - signed and encrypted delivered
     subtest 'live: gpg_sign_encrypt - signed and encrypted delivered' => sub
     {
         plan( tests => 2 );
@@ -325,6 +325,7 @@ subtest 'structure: gpg_sign produces multipart/signed entity' => sub
     like( $ct, qr{multipart/signed}i, 'Content-Type is multipart/signed' );
 };
 
+# NOTE: structure: gpg_encrypt produces multipart/encrypted entity
 subtest 'structure: gpg_encrypt produces multipart/encrypted entity' => sub
 {
     plan( tests => 3 );

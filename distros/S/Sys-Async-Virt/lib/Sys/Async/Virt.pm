@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1
-#                   and LibVirt version v11.10.0
+#                   and LibVirt version v12.3.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -19,7 +19,7 @@ use Future::AsyncAwait;
 use Object::Pad 0.821;
 use Sublike::Extended 0.29 'method', 'sub'; # From XS-Parse-Sublike, used by Future::AsyncAwait
 
-class Sys::Async::Virt v0.2.3;
+class Sys::Async::Virt v0.6.3;
 
 
 use Carp qw(croak);
@@ -29,30 +29,30 @@ use Future::Selector;
 use Log::Any qw($log);
 use Scalar::Util qw(reftype weaken);
 
-use Protocol::Sys::Virt::Remote::XDR v11.10.1;
+use Protocol::Sys::Virt::Remote::XDR v12.3.0;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
-use Protocol::Sys::Virt::KeepAlive v11.10.1;
-use Protocol::Sys::Virt::Remote v11.10.1;
-use Protocol::Sys::Virt::Transport v11.10.1;
-use Protocol::Sys::Virt::URI v11.10.1; # imports parse_url
+use Protocol::Sys::Virt::KeepAlive v12.3.0;
+use Protocol::Sys::Virt::Remote v12.3.0;
+use Protocol::Sys::Virt::Transport v12.3.0;
+use Protocol::Sys::Virt::URI v12.3.0; # imports parse_url
 
-use Sys::Async::Virt::Connection::Factory v0.2.3;
-use Sys::Async::Virt::Domain v0.2.3;
-use Sys::Async::Virt::DomainCheckpoint v0.2.3;
-use Sys::Async::Virt::DomainSnapshot v0.2.3;
-use Sys::Async::Virt::Network v0.2.3;
-use Sys::Async::Virt::NetworkPort v0.2.3;
-use Sys::Async::Virt::NwFilter v0.2.3;
-use Sys::Async::Virt::NwFilterBinding v0.2.3;
-use Sys::Async::Virt::Interface v0.2.3;
-use Sys::Async::Virt::StoragePool v0.2.3;
-use Sys::Async::Virt::StorageVol v0.2.3;
-use Sys::Async::Virt::NodeDevice v0.2.3;
-use Sys::Async::Virt::Secret v0.2.3;
+use Sys::Async::Virt::Connection::Factory v0.6.3;
+use Sys::Async::Virt::Domain v0.6.3;
+use Sys::Async::Virt::DomainCheckpoint v0.6.3;
+use Sys::Async::Virt::DomainSnapshot v0.6.3;
+use Sys::Async::Virt::Network v0.6.3;
+use Sys::Async::Virt::NetworkPort v0.6.3;
+use Sys::Async::Virt::NwFilter v0.6.3;
+use Sys::Async::Virt::NwFilterBinding v0.6.3;
+use Sys::Async::Virt::Interface v0.6.3;
+use Sys::Async::Virt::StoragePool v0.6.3;
+use Sys::Async::Virt::StorageVol v0.6.3;
+use Sys::Async::Virt::NodeDevice v0.6.3;
+use Sys::Async::Virt::Secret v0.6.3;
 
-use Sys::Async::Virt::Callback v0.2.3;
-use Sys::Async::Virt::Stream v0.2.3;
+use Sys::Async::Virt::Callback v0.6.3;
+use Sys::Async::Virt::Stream v0.6.3;
 
 use constant {
     CLOSE_REASON_ERROR                                  => 0,
@@ -69,6 +69,7 @@ use constant {
     TYPED_PARAM_STRING_OKAY                             => 1 << 2,
     TYPED_PARAM_FIELD_LENGTH                            => 80,
     GET_DOMAIN_CAPABILITIES_DISABLE_DEPRECATED_FEATURES => (1 << 0),
+    GET_DOMAIN_CAPABILITIES_EXPAND_CPU_FEATURES         => (1 << 1),
     DOMAIN_DEFINE_VALIDATE                              => (1 << 0),
     LIST_DOMAINS_ACTIVE                                 => 1 << 0,
     LIST_DOMAINS_INACTIVE                               => 1 << 1,
@@ -151,6 +152,7 @@ use constant {
     MEMORY_STATS_FREE                                   => "free",
     MEMORY_STATS_BUFFERS                                => "buffers",
     MEMORY_STATS_CACHED                                 => "cached",
+    MEMORY_STATS_AVAILABLE                              => "available",
     MEMORY_SHARED_PAGES_TO_SCAN                         => "shm_pages_to_scan",
     MEMORY_SHARED_SLEEP_MILLISECS                       => "shm_sleep_millisecs",
     MEMORY_SHARED_PAGES_SHARED                          => "shm_pages_shared",
@@ -295,8 +297,8 @@ use constant {
 use constant {
     _STATE_NONE           => 0,
     _STATE_INITIALIZING   => 1,
-    _STATE_INITIALIZED    => 2,
-    _STATE_AUTHENTICATING => 3,
+    _STATE_INITIALIZED    => 2, # Process transports: in/out pipes have been connected
+    _STATE_AUTHENTICATING => 3, # Process transports: failure to start is discovered in this state
     _STATE_AUTHENTICATED  => 4,
     _STATE_OPENING        => 5,
     _STATE_OPENED         => 6,
@@ -327,10 +329,11 @@ field $_typed_param_string_okay = undef;
 
 
 field $_url           :param = $ENV{LIBVIRT_DEFAULT_URI};
-field $_readonly      :param = undef;
+field $_readonly      :reader :param = undef;
+field $_sasl          :param = undef;
 field $_connection    :param = undef;
 field $_transport     :param = undef;
-field $_remote        :param = undef;
+field $_remote        :reader :param = undef;
 field $_factory       :param = undef;
 field $_keepalive     :param = undef;
 field $_ping_interval :param = 60;
@@ -339,6 +342,7 @@ field $_on_close      :param = sub {};
 field $_on_stream     :param = undef;
 field $_on_message    :param = sub {};
 
+field $_sasl_session     = undef;
 field $_selector         = Future::Selector->new;
 field $_completed_f      = undef;
 field $_eof              = 0;
@@ -961,7 +965,7 @@ method _domain_instance($id) {
         $c = $_domains->{$key} = _domain_factory(
             client => $self,
             remote => $_remote,
-            id => $id );
+            rpc_id => $id );
         weaken $_domains->{$key};
     }
     return $c;
@@ -975,7 +979,7 @@ method _domain_checkpoint_instance($id) {
             _domain_checkpoint_factory(
                 client => $self,
                 remote => $_remote,
-                id => $id );
+                rpc_id => $id );
         weaken $_domain_checkpoints->{$key};
     }
     return $c;
@@ -989,7 +993,7 @@ method _domain_snapshot_instance($id) {
             _domain_snapshot_factory(
                 client => $self,
                 remote => $_remote,
-                id => $id );
+                rpc_id => $id );
         weaken $_domain_snapshots->{$id->{uuid}};
     }
     return $c;
@@ -1002,7 +1006,7 @@ method _network_instance($id) {
             _network_factory(
                 client => $self,
                 remote => $_remote,
-                id => $id );
+                rpc_id => $id );
         weaken $_networks->{$id->{uuid}};
     }
     return $c;
@@ -1015,7 +1019,7 @@ method _network_port_instance($id) {
             _network_port_factory(
                 client => $self,
                 remote => $_remote,
-                id => $id );
+                rpc_id => $id );
         weaken $_network_ports->{$id->{uuid}};
     }
     return $c;
@@ -1028,7 +1032,7 @@ method _nwfilter_instance($id) {
             _nwfilter_factory(
                 client => $self,
                 remote => $_remote,
-                id => $id );
+                rpc_id => $id );
         weaken $_nwfilters->{$id->{uuid}};
     }
     return $c;
@@ -1042,7 +1046,7 @@ method _nwfilter_binding_instance($id) {
             _nwfilter_binding_factory(
                 client => $self,
                 remote => $_remote,
-                id => $id );
+                rpc_id => $id );
         weaken $_nwfilter_bindings->{$key};
     }
     return $c;
@@ -1056,7 +1060,7 @@ method _interface_instance($id) {
             _interface_factory(
                 client => $self,
                 remote => $_remote,
-                id => $id );
+                rpc_id => $id );
         weaken $_interfaces->{$key};
     }
     return $c;
@@ -1069,7 +1073,7 @@ method _storage_pool_instance($id) {
             _storage_pool_factory(
                 client => $self,
                 remote => $_remote,
-                id => $id );
+                rpc_id => $id );
         weaken $_storage_pools->{$id->{uuid}};
     }
     return $c;
@@ -1082,7 +1086,7 @@ method _storage_vol_instance($id) {
             _storage_vol_factory(
                 client => $self,
                 remote => $_remote,
-                id => $id );
+                rpc_id => $id );
         weaken $_storage_vols->{$id->{key}};
     }
     return $c;
@@ -1095,7 +1099,7 @@ method _node_device_instance($id) {
             _node_device_factory(
                 client => $self,
                 remote => $_remote,
-                id => $id );
+                rpc_id => $id );
         weaken $_node_devices->{$id->{name}};
     }
     return $c;
@@ -1108,7 +1112,7 @@ method _secret_instance($id) {
             _secret_factory(
                 client => $self,
                 remote => $_remote,
-                id => $id );
+                rpc_id => $id );
         weaken $_secrets->{$id->{uuid}};
     }
     return $c;
@@ -1131,7 +1135,7 @@ async method _call($proc, $args = {}, :$unwrap = '', :$stream = '', :$empty = ''
     shift @rv if $empty;
     if ($stream) {
         my $s = Sys::Async::Virt::Stream->new(
-            id => $serial,
+            rpc_id => $serial,
             proc => $proc,
             client => $self,
             direction => ($stream eq 'write' ? 'send' : 'receive'),
@@ -1247,12 +1251,13 @@ method _dispatch_stream(:$header, %args) {
     if ($_keepalive) {
         $_keepalive->mark_active;
     }
+
     if (my $stream = $_streams->{$header->{serial}}) {
         if ($args{error}) {
             return $stream->_dispatch_error($args{error});
         }
         else {
-            return $stream->_dispatch_receive($args{data}, $args{final});
+            return $stream->_dispatch_receive($args{data}, $args{hole}, $args{eof}, $args{final});
         }
     }
     else {
@@ -1277,12 +1282,28 @@ method register($r) {
 }
 
 async method run_once() {
+    return if $_eof;
     my ($len, $type) = $_transport->need;
     $log->trace( 'Reading data from connection' );
 
+    ###BUG: what if $type == 'fd' and we have sasl encodng??
+    my ($data, $eof);
+    if ($_sasl_session) {
+         my $buf;
+         ($buf, $eof) = await $_connection->read( 'data', 4 );
+
+         return (undef, $eof) if $eof;
+
+         my $sasl_len = unpack( 'L>', $buf );
+         ($buf, $eof) = await $_connection->read( 'data', $sasl_len );
+
+         return (undef, $eof) if $eof;
+
+         return ( $_sasl_session->decode( $buf, $sasl_len ), $eof );
+    }
+
     # closing the connection will kill the 'read' action
-    my ($data, $eof) = await $_connection->read( $type, $len );
-    $_keepalive->mark_active if $_keepalive and $data;
+    ($data, $eof) = await $_connection->read( $type, $len );
     $log->trace( 'Reading data from connection: completed' );
 
     return ($data, $eof);
@@ -1300,7 +1321,7 @@ method _deregister_callback($f, $proc, $id) {
     return;
 }
 
-method _send_finish($f, $proc, $serial, $abort) {
+method _send_finish($proc, $serial, $abort) {
     my $r = $_remote->stream_end($proc, $serial, $abort);
     # streams send a final "OK" message; we should be awaiting that
     # instead of declaring the future $f done here
@@ -1326,7 +1347,22 @@ async method initialize() {
         $_transport = Protocol::Sys::Virt::Transport->new(
             role => 'client',
             on_send => async sub($opaque, @data) {
-                await $_connection->write( @data );
+                if ($_sasl_session) {
+                    my $bufsize = $_sasl_session->property('maxbuf');
+                    my $buf = join( '', @data );
+                    my $idx = 0;
+                    my $len = length $buf;
+                    while ($len > 0) {
+                        my $enc =
+                            $_sasl_session->encode( substr( $buf, $idx, $bufsize ) );
+                        await $_connection->write( pack('L>', length($enc)), $enc );
+                        $len -= $bufsize;
+                        $idx += $bufsize;
+                    }
+                }
+                else {
+                    await $_connection->write( @data );
+                }
                 return $opaque;
             });
     }
@@ -1343,70 +1379,49 @@ async method initialize() {
             );
     }
     $log->trace( "Connected" );
-    $_selector->add( data => 'data',
-                     gen  => sub { $_completed_f->is_ready ? undef : $self->run_once } );
-
+    $_selector->add( data => undef, f => $self->_dispatch_loop );
     $_state = _STATE_INITIALIZED;
 }
 
-async method _dispatch_data( $f ) {
-    my ($data, $eof) = do {
-        try {
-            await $f;
+async method _dispatch_loop() {
+    while (not $_completed_f->is_ready) {
+        my ($data, $eof) = do {
+            try {
+                await $self->run_once;
+            }
+            catch ($e) {
+                # closing the server stream here doesn't make sense:
+                # throwing this exception will kill the loop, which
+                # means we can't process further server frames
+                die $e;
+            }
+        };
+
+
+        # submit $data to $_transport, allowing $transport to raise an error
+        # if the stream is terminated early.
+        #
+        # $_transport->receive() may return a list of futures to be awaited.
+        if (my @dispatch_values = $_transport->receive($data)) {
+            await Future->wait_all( @dispatch_values );
+            $log->trace( 'Processed input data from connection' );
         }
-        catch ($e) {
+        if ($eof) {
+            $_eof = 1;
+            $log->info( 'EOF' );
             $_selector->add(
                 data => 'closing',
-                f    => $self->_close( $self->CLOSE_REASON_ERROR )
+                f    => $self->_close( $self->CLOSE_REASON_EOF )
                 );
-            die $e;
         }
-    };
-
-
-    # submit $data to $_transport, allowing $transport to raise an error
-    # if the stream is terminated early.
-    #
-    # $_transport->receive() may return a list of futures to be awaited.
-    if (my @dispatch_values = $_transport->receive($data)) {
-        my $p = Future->wait_all( @dispatch_values )
-            ->on_done(sub {
-                $log->trace( 'Processed input data from connection' )
-                      });
-
-        # Enable async handling while we process further input from
-        # the connection.
-        $_selector->add( data => 'dispatch',
-                         f    => $p );
-    }
-    if (length($data) == 0 and $eof) {
-        $_eof = 1;
-        $log->info( 'EOF' );
-        $_selector->add(
-            data => 'closing',
-            f    => $self->_close( $self->CLOSE_REASON_EOF )
-            );
     }
 }
 
 async method run() {
     return if $_completed_f;
 
-    my $running = 1;
-    $_completed_f = Future->new->on_ready(sub { $running = 0 });
-    $_selector->add( data => '',
-                     f    => $_completed_f );
-    while ($running) {
-        my ( $tag, $f ) = await $_selector->select;
-        $tag //= '';
-
-        if ( $tag eq 'data' ) {
-            await $self->_dispatch_data( $f );
-        }
-        else {
-            await $f;
-        }
-    }
+    $_completed_f = Future->new;
+    await $_selector->run_until_ready( $_completed_f );
 }
 
 method stop() {
@@ -1446,7 +1461,7 @@ async method connect() {
 # ENTRYPOINT: REMOTE_PROC_CONNECT_DOMAIN_EVENT_CALLBACK_REGISTER_ANY
 # ENTRYPOINT: REMOTE_PROC_CONNECT_DOMAIN_EVENT_CALLBACK_DEREGISTER_ANY
 async method domain_event_register_any($eventID, $domain = undef) {
-    my $dom = $domain ? $domain->id : undef;
+    my $dom = $domain ? $domain->rpc_id : undef;
     my $rv = await $self->_call(
         $remote->PROC_CONNECT_DOMAIN_EVENT_CALLBACK_REGISTER_ANY,
         { eventID => $eventID, dom => $dom });
@@ -1466,7 +1481,7 @@ async method domain_event_register_any($eventID, $domain = undef) {
 # ENTRYPOINT: REMOTE_PROC_CONNECT_NETWORK_EVENT_REGISTER_ANY
 # ENTRYPOINT: REMOTE_PROC_CONNECT_NETWORK_EVENT_DEREGISTER_ANY
 async method network_event_register_any($eventID, $network = undef) {
-    my $net = $network ? $network->id : undef;
+    my $net = $network ? $network->rpc_id : undef;
     my $rv = await $self->_call(
         $remote->PROC_CONNECT_NETWORK_EVENT_REGISTER_ANY,
         { eventID => $eventID, net => $net });
@@ -1485,7 +1500,7 @@ async method network_event_register_any($eventID, $network = undef) {
 # ENTRYPOINT: REMOTE_PROC_CONNECT_STORAGE_POOL_EVENT_REGISTER_ANY
 # ENTRYPOINT: REMOTE_PROC_CONNECT_STORAGE_POOL_EVENT_DEREGISTER_ANY
 async method storage_pool_event_register_any($eventID, $pool = undef) {
-    my $p = $pool ? $pool->id : undef;
+    my $p = $pool ? $pool->rpc_id : undef;
     my $rv = await $self->_call(
         $remote->PROC_CONNECT_STORAGE_POOL_EVENT_REGISTER_ANY,
         { eventID => $eventID, pool => $p });
@@ -1504,7 +1519,7 @@ async method storage_pool_event_register_any($eventID, $pool = undef) {
 # ENTRYPOINT: REMOTE_PROC_CONNECT_NODE_DEVICE_EVENT_REGISTER_ANY
 # ENTRYPOINT: REMOTE_PROC_CONNECT_NODE_DEVICE_EVENT_DEREGISTER_ANY
 async method node_device_event_register_any($eventID, $dev = undef) {
-    my $d = $dev ? $dev->id : undef;
+    my $d = $dev ? $dev->rpc_id : undef;
     my $rv = await $self->_call(
         $remote->PROC_CONNECT_NODE_DEVICE_EVENT_REGISTER_ANY,
         { eventID => $eventID, dev => $d });
@@ -1523,7 +1538,7 @@ async method node_device_event_register_any($eventID, $dev = undef) {
 # ENTRYPOINT: REMOTE_PROC_CONNECT_SECRET_EVENT_REGISTER_ANY
 # ENTRYPOINT: REMOTE_PROC_CONNECT_SECRET_EVENT_DEREGISTER_ANY
 async method secret_event_register_any($eventID, $secret = undef) {
-    my $s = $secret ? $secret->id : undef;
+    my $s = $secret ? $secret->rpc_id : undef;
     my $rv = await $self->_call(
         $remote->PROC_CONNECT_SECRET_EVENT_REGISTER_ANY,
         { eventID => $eventID, secret => $s });
@@ -1542,6 +1557,8 @@ async method secret_event_register_any($eventID, $secret = undef) {
 # ENTRYPOINT: REMOTE_PROC_AUTH_LIST
 # ENTRYPOINT: REMOTE_PROC_AUTH_POLKIT
 # ENTRYPOINT: REMOTE_PROC_AUTH_SASL_INIT
+# ENTRYPOINT: REMOTE_PROC_AUTH_SASL_START
+# ENTRYPOINT: REMOTE_PROC_AUTH_SASL_STEP
 
 # auth( $auth_type )
 #  --> clients take the selected auth mechanism from the
@@ -1591,7 +1608,49 @@ async method auth($auth_type = undef) {
     elsif ($selected == $remote->AUTH_SASL) {
         my $mechs = await $self->_call( $remote->PROC_AUTH_SASL_INIT, {},
                                         unwrap => 'mechlist' );
-        ...
+        $_sasl->mechanism( $mechs );
+
+        my %uri   = parse_url( $_url );
+        my $auth  = $_sasl->client_new(
+            'libvirt', $uri{host},
+            $_connection->is_secure ? '' : 'noplaintext noanonymous' );
+        $auth->property('maxbuf', 65536);
+
+        my $initial = $auth->client_start;
+        my $rv = await $self->_call( $remote->PROC_AUTH_SASL_START,
+                                     {
+                                         mech => $auth->mechanism,
+                                         nil => (defined $initial ? 0 : 1),
+                                         data => ($initial // '')
+                                     } );
+        my ($complete, $data) = $rv->@{ qw( complete data ) };
+
+        while (not $complete or $auth->need_step) {
+            my $next_data = $auth->client_step( $data );
+            last if ($complete and not $auth->need_step);
+            last if $auth->error;
+
+            $rv = await $self->_call( $remote->PROC_AUTH_SASL_STEP,
+                                      {
+                                          nil => (defined $next_data ? 0 : 1),
+                                          data => ($next_data // '')
+                                      } );
+            ( $complete, $data ) = $rv->@{ qw( complete data ) };
+        }
+        if (my $err = $auth->error) {
+            die $err;
+        }
+        elsif (not $auth->is_success) {
+            die 'Unknown SASL error';
+        }
+
+        if (defined $auth->property( 'ssf' )
+            and $auth->property( 'ssf' ) > 0) {
+            $log->trace( '"ssf" set; setting codec' );
+            $log->trace( '"maxbuf" set: ' . $auth->property('maxbuf') );
+
+            $_sasl_session = $auth;
+        }
     }
 
     $_state = _STATE_AUTHENTICATED;
@@ -1654,7 +1713,10 @@ async method open() {
 # ENTRYPOINT: REMOTE_PROC_CONNECT_CLOSE
 # ENTRYPOINT: REMOTE_PROC_CONNECT_UNREGISTER_CLOSE_CALLBACK
 async method _close($reason) {
-    return unless (_STATE_INITIALIZED <= $_state and $_state <= _STATE_OPENED );
+    unless (_STATE_INITIALIZED <= $_state and $_state <= _STATE_OPENED) {
+        $_completed_f->done unless $_completed_f->is_ready;
+        return;
+    }
     $_state = _STATE_CLEANING_UP;
 
     unless ($_connection->is_read_eof
@@ -1725,7 +1787,7 @@ async method _close($reason) {
 
     $_state = _STATE_CLOSED;
     $self->_dispatch_closed( $reason );
-    $_completed_f->done;
+    $_completed_f->done unless $_completed_f->is_ready;
     return;
 }
 
@@ -2438,9 +2500,9 @@ Sys::Async::Virt - LibVirt protocol implementation for clients
 
 =head1 VERSION
 
-v0.2.3
+v0.6.3
 
-Based on LibVirt tag v11.10.0
+Based on LibVirt tag v12.3.0
 
 =head1 SYNOPSIS
 
@@ -2457,8 +2519,8 @@ Based on LibVirt tag v11.10.0
      $virt->stop;
   }
 
-  my $c = Sys::Async::Virt->new(url => 'qemu:///system');
-  await Future->await(
+  my $client = Sys::Async::Virt->new(url => 'qemu:///system');
+  await Future->needs_all(
      $client->run,
      main( $client )
   );
@@ -2479,8 +2541,11 @@ broken links.)
 
 An important difference with the C API is that this API only lists the
 C<INPUT> and C<INPUT|OUTPUT (as input)> arguments for its functions.  The
-C<OUTPUT> and C<INPUT|OUTPUT (as output)> arguments will be returned in the
-C<on_reply> event.
+C<OUTPUT> and C<INPUT|OUTPUT (as output)> arguments will be returned from
+the function call (in a hash, if multiple values are to be returned):
+
+  my $cpumap = $client->get_cpu_map;
+  # $cpumap is a hash with the elements of the 'cpumap' LibVirt elements
 
 =head2 Data type differences between C and Perl API
 
@@ -2506,7 +2571,7 @@ value.
 
 =head2 RUNNING AGAINST OLDER SERVERS
 
-The reference LibVirt version of this module is v11.10.0. This means
+The reference LibVirt version of this module is v12.3.0. This means
 all API entry points have been implemented as they are declared in the
 protocol of that version (except for the ones listed in the section
 L</UNIMPLEMENTED ENTRYPOINTS>).  The consequence of a server being of a lower
@@ -2515,7 +2580,7 @@ supported by the server.
 
 =head2 RUNNING AGAINST NEWER SERVERS
 
-The module can run against any version of LibVirt newer than v11.10.0;
+The module can run against any version of LibVirt newer than v12.3.0;
 any new entry points in the API will not be available, but all existing APIs
 can be used as per the stability guarantees.
 
@@ -2533,10 +2598,11 @@ The API calls in these modules invoke remote procedure calls (RPC) on a
 LibVirt server (which may run locally). The return values are L<Future>s
 which can be C<await>ed using L<Future::AsyncAwait>.  Many calls start a
 process on the server without awaiting the result.  One example is the
-C<$domain->shutdown()> invocation: it returns when shut down has been
-initiated, not when the domain is actually shut off. Other calls query
-the server for state (such as C<$domain->get_state()>) and return the
-state when the server replies to the invocation.
+C<< $domain->shutdown() >> invocation: it returns when shutdown has been
+initiated, not when the domain is actually shut off. Domain life cycle
+events can be used to learn about domain state changes.
+Other calls query the server for state (such as C<< $domain->get_state() >>)
+and return the state when the server replies to the invocation.
 
 The LibVirt protocol and server support concurrent requests: requests
 issued before earlier requests have finished. The server responds as soon
@@ -2681,6 +2747,10 @@ before a dead connection will be killed, if the operating system doesn't throw
 an error before it.
 
 When not supplied, defaults to C<60>.
+
+=item * C<sasl> (optional)
+
+An L<Authen::SASL> instance configured for authentication against the server.
 
 =item * C<url> (optional)
 
@@ -3547,6 +3617,15 @@ See documentation of L<virStorageVolLookupByPath|https://libvirt.org/html/libvir
 
 =head1 CONSTANTS
 
+
+   my $value = Sys::Async::Virt->CLOSE_REASON_ERROR;
+
+   # - or -
+
+   my $value = $client->CLOSE_REASON_ERROR;
+
+
+
 =over 8
 
 =item CLOSE_REASON_ERROR
@@ -3576,6 +3655,8 @@ See documentation of L<virStorageVolLookupByPath|https://libvirt.org/html/libvir
 =item TYPED_PARAM_FIELD_LENGTH
 
 =item GET_DOMAIN_CAPABILITIES_DISABLE_DEPRECATED_FEATURES
+
+=item GET_DOMAIN_CAPABILITIES_EXPAND_CPU_FEATURES
 
 =item DOMAIN_DEFINE_VALIDATE
 
@@ -3740,6 +3821,8 @@ See documentation of L<virStorageVolLookupByPath|https://libvirt.org/html/libvir
 =item MEMORY_STATS_BUFFERS
 
 =item MEMORY_STATS_CACHED
+
+=item MEMORY_STATS_AVAILABLE
 
 =item MEMORY_SHARED_PAGES_TO_SCAN
 
@@ -4051,6 +4134,18 @@ replies.
 
 =over 8
 
+=item * Talking to servers without the REMOTE_EVENT_CALLBACK feature
+ (v1.3.3 - 2016-04-06) is not - currently - supported
+
+=begin fill-templates
+
+# ENTRYPOINT: REMOTE_PROC_CONNECT_DOMAIN_EVENT_DEREGISTER
+# ENTRYPOINT: REMOTE_PROC_CONNECT_DOMAIN_EVENT_DEREGISTER_ANY
+# ENTRYPOINT: REMOTE_PROC_CONNECT_DOMAIN_EVENT_REGISTER
+# ENTRYPOINT: REMOTE_PROC_CONNECT_DOMAIN_EVENT_REGISTER_ANY
+
+=end fill-templates
+
 =item * Talking to servers without the MIGRATION_PARAM feature
  (v1.1.0 - 2013-07-01) is not - currently - supported
 
@@ -4070,7 +4165,7 @@ replies.
 
 # ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_PREPARE3
 # ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_BEGIN3
-# ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_PERFORM3
+# used in domain migrations: ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_PERFORM3
 # ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_CONFIRM3
 # ENTRYPOINT: REMOTE_PROC_DOMAIN_MIGRATE_FINISH3
 
@@ -4079,17 +4174,8 @@ replies.
 
 =end fill-templates
 
-=item * Talking to servers without the REMOTE_EVENT_CALLBACK feature
- (v1.3.3 - 2016-04-06) is not - currently - supported
-
-=begin fill-templates
-
-# ENTRYPOINT: REMOTE_PROC_CONNECT_DOMAIN_EVENT_DEREGISTER
-# ENTRYPOINT: REMOTE_PROC_CONNECT_DOMAIN_EVENT_DEREGISTER_ANY
-# ENTRYPOINT: REMOTE_PROC_CONNECT_DOMAIN_EVENT_REGISTER
-# ENTRYPOINT: REMOTE_PROC_CONNECT_DOMAIN_EVENT_REGISTER_ANY
-
-=end fill-templates
+=item * Talking to servers without the MIGRATE_CHANGE_PROTECTION feature
+ (v0.10.0 - 2012-08-29) is not - currently - supported
 
 =back
 
@@ -4097,16 +4183,11 @@ replies.
 
 =over 8
 
-=item * Streams created with << $vol->upload() >> broken
+=item * Configuration of the C<externalssf> parameter on the C<sasl> field in
+  the Sys::Async::Virt instance (required for SASL over TLS)
 
-These streams seem to be malfunctioning, albeit that the tests were very limited:
-Only on Ubuntu Noble with LibVirt 10.0.0 ; this could very well be a problem
-long solved. If you have other experiences, please share them through the issue
-tracker.
-
-=item * Modules implementing connections for various protocols (tcp, tls, etc)
-
-=item * C<@generate: none> entrypoints review (and implement relevant ones)
+=item * Implement file descriptor related entry points (= the remaining
+  C<@generate: none> entrypoints)
 
 =item * libvirt client configuration (C</etc/libvirt/libvirt.conf> (for C<root>)
  or C<$XDG_CONFIG_HOME/libvirt/libvirt.conf> (for other users))
@@ -4121,18 +4202,6 @@ towards implementation are greatly appreciated.
 =over 8
 
 =over 8
-
-=item * @generate: none
-
-=over 8
-
-=item * REMOTE_PROC_AUTH_SASL_START
-
-=item * REMOTE_PROC_AUTH_SASL_STEP
-
-=back
-
-
 
 =item * @generate: none (include/libvirt/libvirt-domain.h)
 
@@ -4152,24 +4221,6 @@ towards implementation are greatly appreciated.
 
 
 
-=item * @generate: none (src/libvirt_internal.h)
-
-=over 8
-
-=item * REMOTE_PROC_DOMAIN_MIGRATE_BEGIN3_PARAMS
-
-=item * REMOTE_PROC_DOMAIN_MIGRATE_CONFIRM3_PARAMS
-
-=item * REMOTE_PROC_DOMAIN_MIGRATE_FINISH3_PARAMS
-
-=item * REMOTE_PROC_DOMAIN_MIGRATE_PERFORM3_PARAMS
-
-=item * REMOTE_PROC_DOMAIN_MIGRATE_PREPARE3_PARAMS
-
-=back
-
-
-
 =back
 
 =back
@@ -4180,7 +4231,7 @@ L<LibVirt|https://libvirt.org>, L<Sys::Virt>
 
 =head1 LICENSE AND COPYRIGHT
 
-  Copyright (C) 2024-2025 Erik Huelsmann
+  Copyright (C) 2024-2026 Erik Huelsmann
 
 All rights reserved. This program is free software;
 you can redistribute it and/or modify it under the same terms as Perl itself.

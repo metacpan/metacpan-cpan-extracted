@@ -1,5 +1,37 @@
 Revision history for Hypersonic
 
+0.14    2026-05-17
+	- Fix Hypersonic::Event::IOUring missing async-slot methods
+	  (gen_create_loop, gen_add_with_slot, gen_get_slot,
+	  gen_wait_once). 
+	- Improve IOUring backend detection: read
+	  /proc/sys/kernel/io_uring_disabled and reject if non-zero
+	  (RHEL9 sets this to 2 by default); add a runtime probe via
+	  Hypersonic::JIT::Util->can_run that actually opens and closes
+	  a ring, catching kernels that link liburing but reject
+	  io_uring_setup().
+	- Fix `return -1;` leaking into the void XS body of
+	  hypersonic_run_event_loop from IOUring's and Select's
+	  gen_create. 
+	- Fix Hypersonic::Compress::get_zlib_flags using `//` (defined-or)
+	  where it needed `||` (string-falsy)
+	- Fix pthread linking for Hypersonic::Future: Future->compile now
+	  passes -pthread / -lpthread. Linux+glibc auto-resolves the
+	  symbols via libc; FreeBSD, OpenBSD and Linux+musl don't, and the
+	  JIT-compiled .so failed at dlopen with "Undefined symbol
+	  'pthread_create'".
+	- Diagnostics: Hypersonic::Socket::create_listen_socket now
+	  croak()s with strerror(errno) on socket/bind/listen failure
+	  instead of returning silent -1; new t/lib/HypersonicTest.pm
+	  helper captures the forked server child's STDERR/STDOUT and
+	  diag()s it when wait_for_port times out. 
+
+0.13    2026-05-09
+	- Fix Hypersonic::Event::Epoll gen_add_with_slot using out-of-scope
+	  'ev' variable
+	- Fix Hypersonic::SSE call_method() return handling: SvTRUE(POPs)
+	- Bump XS::JIT to 0.22
+
 0.11    2026-01-31
 	- Fix can_link() to properly pass headers to Devel::CheckLib
 	- Fix can_link() test to work reliably with compiler builtins (libm sin)

@@ -1,5 +1,46 @@
 Revision history for Perl extension Text::JSCalendar
 
+0.05  2026-05-11
+	- jscalendarbis-15 (draft-ietf-calext-jscalendarbis-15) compliance:
+	- recurrenceRule is now a singular object (not the RFC 8984 plural array)
+	- Add organizerCalendarAddress top-level property; remove replyTo
+	- Add endTimeZone top-level Event property
+	- Remove useDefaultAlerts (and X-APPLE-DEFAULT-ALARM handling)
+	- Add version: "2.0" to all parsed events
+	- Rename byDate -> byMonthDay in RecurrenceRule
+	- Fix firstDayOfWeek default "monday" -> "mo"
+	- Restructure alerts: flat {action,relativeTo,offset} ->
+	  {action, trigger: OffsetTrigger/AbsoluteTrigger}; restore action field
+	- Fix TRIGGER RELATED=END: written as parameter on TRIGGER not standalone property
+	- Rename links[*].type -> contentType; remove links[*].cid
+	- Link.display type changed to String[Boolean]
+	- Location: remove description, relativeTo, timeZone sub-properties
+	- VirtualLocation: remove description sub-property
+	- Participant: sendTo -> calendarAddress (single URI string)
+	- Participant: kind default changed to "individual"
+	- Participant: remove language; add description, descriptionContentType,
+	  progressUpdated, links
+	- Participants roles: String[Boolean] map (was String[] array)
+	- privacy: CLASS:CONFIDENTIAL now maps to "secret"
+	- task.progress: use "in-process" (correct JSCalendar value)
+	- Add excludedRecurrenceRules support (EXRULE) and remove again: jscalendarbis
+	  drops excludedRecurrenceRules entirely; exclusions via recurrenceOverrides only
+	- Add @type to RecurrenceRule, NDay, Relation, VirtualLocation, Location sub-objects
+	- relatedTo: type changed from keywords to object (with Relation sub-schema)
+	- Remove isAllDay (replaced by showWithoutTime)
+	- Remove endTimeZone that was removed in 0.04 draft work, then re-added
+	- Remove lastModified (use updated instead)
+	- Remove organizerCalendarAddress that was removed in 0.04 draft work, then re-added
+
+0.04  2026-05-11
+	- RFC 8984 compliance fixes (superseded by 0.05 jscalendarbis work):
+	- Remove isAllDay (replaced by showWithoutTime)
+	- Rename recurrenceRule to recurrenceRules (array per RFC 8984)
+	- Remove endTimeZone (not in RFC 8984)
+	- Remove lastModified (use updated instead)
+	- Remove organizerCalendarAddress (use participants with role=owner)
+	- Replace attendance field with roles (optional/informational) in participants
+
 0.03  2026-04-05
 	- Update for latest JSCalendar drafts (jscalendarbis,
 	  jscalendar-icalendar, icalendar-jscalendar-extensions)
@@ -25,4 +66,3 @@ Revision history for Perl extension Text::JSCalendar
 
 0.01  2019-02-09
 	- original release
-

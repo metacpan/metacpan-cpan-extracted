@@ -1,5 +1,8 @@
 Revision history for Future-Uring
 
+0.005     2026-05-01 17:30:34+02:00 Europe/Brussels
+          - Explicitly enable lexical subs
+
 0.004     2026-04-05 22:05:13+02:00 Europe/Brussels
           - Bump IO::Uring dependency for statx
           - Remove tmpfile named argument

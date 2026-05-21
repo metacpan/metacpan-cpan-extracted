@@ -31,7 +31,7 @@ BEGIN
 			Compress::Raw::Zlib
             );
 
-    my $VERSION = '2.219';
+    my $VERSION = '2.220';
     my @NAMES = qw(
 			Compress::Zlib
 

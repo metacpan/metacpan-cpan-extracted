@@ -4,7 +4,7 @@
       "John Siracusa <siracusa@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -41,7 +41,7 @@
             "File::Path" : "0",
             "File::Spec" : "0",
             "Math::BigInt" : "1.77",
-            "Rose::DB" : "0.782",
+            "Rose::DB" : "0.787",
             "Rose::DateTime::Util" : "0.532",
             "Rose::Object" : "0.854",
             "Scalar::Util" : "0",
@@ -65,6 +65,6 @@
       },
       "x_MailingList" : "http://groups.google.com/group/rose-db-object"
    },
-   "version" : "0.822",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.823",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

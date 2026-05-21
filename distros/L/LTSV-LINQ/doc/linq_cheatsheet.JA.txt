@@ -168,6 +168,10 @@
   ->ToLookup(sub { $_[0]{dept} },       # hashref: キー => [値]
              sub { $_[0]{name} })
   ->ToLTSV('output.ltsv')              # シーケンスをLTSVファイルに書き出す
+  ->ToLTSV('output.ltsv',              # ラベル順を指定して書き出す
+      label_order => [qw(host status bytes url)])
+  ->ToLTSV('output.ltsv',              # headersはlabel_orderの別名
+      headers => [qw(host status bytes url)])
 
 [ 12. 公式資料リンク ]
 

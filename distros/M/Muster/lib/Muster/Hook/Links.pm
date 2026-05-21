@@ -1,12 +1,12 @@
 package Muster::Hook::Links;
-$Muster::Hook::Links::VERSION = '0.93';
+$Muster::Hook::Links::VERSION = '0.9501';
 =head1 NAME
 
 Muster::Hook::Links - Muster hook for links
 
 =head1 VERSION
 
-version 0.93
+version 0.9501
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.638';
+our $VERSION = '0.639';
 
 use 5.020;
 use strictures 2;
@@ -24,7 +24,7 @@ use builtin::compat qw(blessed created_as_number);
 use Scalar::Util 'looks_like_number';
 use if "$]" < 5.041010, 'List::Util' => 'any';
 use if "$]" >= 5.041010, experimental => 'keyword_any';
-use Storable 'dclone';
+use Clone 'clone';
 use Feature::Compat::Try;
 use Mojo::JSON ();
 use Mojo::JSON::Pointer ();
@@ -80,7 +80,7 @@ use if HAVE_BUILTIN, experimental => 'builtin';
 
 use constant _BUILTIN_BOOLS => 0;
 use constant {
-  _BUILTIN_BOOLS && HAVE_BUILTIN && eval { +require Storable; Storable->VERSION(3.27); 1 }
+  _BUILTIN_BOOLS && HAVE_BUILTIN
       && Mojo::JSON::JSON_XS && eval { Cpanel::JSON::XS->VERSION(4.38); 1 }
     ? (true => builtin::true, false => builtin::false)
     : (true => JSON::PP::true, false => JSON::PP::false)
@@ -93,7 +93,7 @@ use constant {
 use constant _JSON_BACKEND =>
     Mojo::JSON::JSON_XS && eval { Cpanel::JSON::XS->VERSION('4.38'); 1 } ? 'Cpanel::JSON::XS'
   : eval { JSON::PP->VERSION('4.11'); 1 } ? 'JSON::PP'
-  : die 'Cpanel::JSON::XS 4.38 or JSON::PP 4.11 is required';
+  : croak 'Cpanel::JSON::XS 4.38 or JSON::PP 4.11 is required';
 
 # supports the six core types, plus integer (which is also a number)
 # we do NOT check stringy_numbers here -- you must do that in the caller
@@ -343,7 +343,7 @@ sub jsonp_elements ($data, $prefix = '') {
       ref $data eq '' ? ($prefix => $data)
     : ref $data eq 'HASH' ? map jsonp_elements($data->{$_}, $prefix.'/'.$_)->%*, keys %$data
     : ref $data eq 'ARRAY' ? map jsonp_elements($data->[$_], $prefix.'/'.$_)->%*, 0..$data->$#*
-    : die 'unrecognized type: '. ref $data
+    : croak 'unrecognized type: '. ref $data
   };
 }
 
@@ -440,7 +440,7 @@ sub core_formats_type () {
     # otherwise, load it from disk using our filename cache and create the document
     if (not $document and my $filename = get_schema_filename($uri)) {
       my $file = path($filename);
-      die "uri $uri maps to file $file which does not exist" if not -f $file;
+      croak "uri $uri maps to file $file which does not exist" if not -f $file;
       my $schema = $evaluator->_json_decoder->decode($file->slurp);
 
       # avoid calling add_schema, which checksums the file to look for duplicates
@@ -585,7 +585,7 @@ sub core_formats_type () {
         \[ map {
             do {
               try { ++$line; $decoder->decode($_) }
-              catch ($e) { die 'parse error at line '.$line.': '.$e }
+              catch ($e) { croak 'parse error at line '.$line.': '.$e }
             }
           }
           split(/\r?\n/, $content_ref->$*)
@@ -653,7 +653,7 @@ sub core_formats_type () {
   # wildcards, parameters supported
   # always returns a reference to the decoded data, or undef if no decoder is found
   sub decode_media_type ($media_type_string, $content_ref) {
-    die 'decoder payload must be a reference to a string' if ref $content_ref ne 'SCALAR';
+    croak 'decoder payload must be a reference to a string' if ref $content_ref ne 'SCALAR';
 
     my $matched_string = match_media_type($media_type_string);
     return if not $matched_string;
@@ -670,7 +670,7 @@ sub core_formats_type () {
 
   # wildcards, parameters supported
   sub encode_media_type ($media_type_string, $content_ref) {
-    die 'encoder payload must be a reference' if ref $content_ref ne 'REF' and ref $content_ref ne 'SCALAR';
+    croak 'encoder payload must be a reference' if ref $content_ref ne 'REF' and ref $content_ref ne 'SCALAR';
 
     my $matched_string = match_media_type($media_type_string);
     return if not $matched_string;
@@ -915,7 +915,7 @@ sub assert_uri ($state, $schema, $override = undef) {
 # produces an annotation whose value is the same as that of the current schema keyword
 # makes a copy as this is passed back to the user, who cannot be trusted to not mutate it
 sub annotate_self ($state, $schema) {
-  A($state, ref $schema->{$state->{keyword}} ? dclone($schema->{$state->{keyword}})
+  A($state, ref $schema->{$state->{keyword}} ? clone($schema->{$state->{keyword}})
     : $schema->{$state->{keyword}});
 }
 
@@ -953,7 +953,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.638
+version 0.639
 
 =head1 SYNOPSIS
 

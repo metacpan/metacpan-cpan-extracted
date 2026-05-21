@@ -1,11 +1,8 @@
-# -*- mode: cperl -*-
 package Chess4p::Move;
 
 use strict;
 use warnings;
 use v5.36;
-
-use Chess4p::Common;
 
 use overload ('""', => 'uci');
 
@@ -51,9 +48,12 @@ Move - Chess move class
 
 =head1 SYNOPSIS
 
-    use Move;
+    use Chess4p::Move;
 
     my $move = Move->new($from, $to);
+
+    say $move->uci();
+
 
 =head1 DESCRIPTION
 
@@ -63,27 +63,39 @@ Furthermore, optional property promotion piece.
 
 =head1 METHODS
 
+=over 4
 
-=head2 new($from, $to, $piece_type);
+=item new($from, $to, $piece_type);
 
 Constructor.
 Create a Move by from/to squares, and optional promotion piece type.
+From/to are non-negative integers from 0 to 63.
+Piece type is one of 'Q', 'R', 'B', or 'N'.
 
-=head2 from()
+=item from()
 
 Get the from square.
 
-=head2 to()
+=item to()
 
 Get the to square.
 
-=head2 promotion()
+=item promotion()
 
 Get the promotion piece type, or undefined if none.
 
-=head2 uci()
+=item uci()
 
 Get the UCI move representation.
+
+=back
+
+
+=head1 SEE ALSO
+
+There are many methods on Chess4p::Board that deal with moves,
+among them those that deal with SAN input/output - those methods need the Board context.
+
 
 =head1 AUTHOR
 

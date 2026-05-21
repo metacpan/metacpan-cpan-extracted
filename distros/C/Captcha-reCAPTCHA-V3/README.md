@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/worthmine/Captcha-reCAPTCHA-V3.svg?branch=master)](https://travis-ci.com/worthmine/Captcha-reCAPTCHA-V3)
+[![Actions Status](https://github.com/worthmine/Captcha-reCAPTCHA-V3/actions/workflows/test.yml/badge.svg)](https://github.com/worthmine/Captcha-reCAPTCHA-V3/actions)
 # NAME
 
 Captcha::reCAPTCHA::V3 - A Perl implementation of reCAPTCHA API version v3

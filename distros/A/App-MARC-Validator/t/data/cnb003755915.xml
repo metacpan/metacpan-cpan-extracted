@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?><collection xmlns="http://www.loc.gov/MARC21/slim">
+<collection>
+<record>
+<leader>01286nam-a2200385-i-450</leader>
+<controlfield tag="001">1426868</controlfield>
+<controlfield tag="003">CZ-CbJVK</controlfield>
+<controlfield tag="005">20260521105235.1</controlfield>
+<controlfield tag="007">ta</controlfield>
+<controlfield tag="008">260506s2026----xr-----g------000-f-cze--</controlfield>
+<datafield tag="015" ind1=" " ind2=" ">
+  <subfield code="a">cnb003755915</subfield>
+</datafield>
+<datafield tag="020" ind1=" " ind2=" ">
+  <subfield code="a">978-80-7260-668-9</subfield>
+  <subfield code="q">(brožováno)</subfield>
+</datafield>
+<datafield tag="040" ind1=" " ind2=" ">
+  <subfield code="a">ABG001</subfield>
+  <subfield code="b">cze</subfield>
+  <subfield code="e">rda</subfield>
+</datafield>
+<datafield tag="041" ind1="1" ind2=" ">
+  <subfield code="a">cze</subfield>
+  <subfield code="h">eng</subfield>
+</datafield>
+<datafield tag="072" ind1=" " ind2="7">
+  <subfield code="a">821</subfield>
+  <subfield code="x">Literatura v různých jazycích</subfield>
+  <subfield code="2">Konspekt</subfield>
+  <subfield code="9">25</subfield>
+</datafield>
+<datafield tag="080" ind1=" " ind2=" ">
+  <subfield code="a">821(678)-31</subfield>
+  <subfield code="2">MRF</subfield>
+</datafield>
+<datafield tag="080" ind1=" " ind2=" ">
+  <subfield code="a">(0:82-31)</subfield>
+  <subfield code="2">MRF</subfield>
+</datafield>
+<datafield tag="100" ind1="1" ind2=" ">
+  <subfield code="7">cbvk_us_auth*0350514</subfield>
+  <subfield code="a">Gurnah, Abdulrazak,</subfield>
+  <subfield code="d">1948-</subfield>
+  <subfield code="4">aut</subfield>
+</datafield>
+<datafield tag="240" ind1="1" ind2="0">
+  <subfield code="a">Theft.</subfield>
+  <subfield code="l">Česky</subfield>
+</datafield>
+<datafield tag="245" ind1="1" ind2="0">
+  <subfield code="a">Krádež /</subfield>
+  <subfield code="c">Abdulrazak Gurnah ; přeložil Rani Tolimat</subfield>
+</datafield>
+<datafield tag="250" ind1=" " ind2=" ">
+  <subfield code="a">V českém jazyce vydání první</subfield>
+</datafield>
+<datafield tag="264" ind1=" " ind2="1">
+  <subfield code="a">Praha :</subfield>
+  <subfield code="b">Prostor,</subfield>
+  <subfield code="c">2026</subfield>
+</datafield>
+<datafield tag="300" ind1=" " ind2=" ">
+  <subfield code="a">332 stran ;</subfield>
+  <subfield code="c">20 cm</subfield>
+</datafield>
+<datafield tag="336" ind1=" " ind2=" ">
+  <subfield code="a">text</subfield>
+  <subfield code="b">txt</subfield>
+  <subfield code="2">rdacontent</subfield>
+</datafield>
+<datafield tag="337" ind1=" " ind2=" ">
+  <subfield code="a">bez média</subfield>
+  <subfield code="b">n</subfield>
+  <subfield code="2">rdamedia</subfield>
+</datafield>
+<datafield tag="338" ind1=" " ind2=" ">
+  <subfield code="a">svazek</subfield>
+  <subfield code="b">nc</subfield>
+  <subfield code="2">rdacarrier</subfield>
+</datafield>
+<datafield tag="490" ind1="1" ind2=" ">
+  <subfield code="a">Současná světová próza ;</subfield>
+  <subfield code="v">47. svazek</subfield>
+</datafield>
+<datafield tag="500" ind1=" " ind2=" ">
+  <subfield code="a">Přeloženo z angličtiny</subfield>
+</datafield>
+<datafield tag="500" ind1=" " ind2=" ">
+  <subfield code="a">Terminologický slovník</subfield>
+</datafield>
+<datafield tag="520" ind1="3" ind2=" ">
+  <subfield code="c">okcz</subfield>
+  <subfield code="u">https://www.obalkyknih.cz/view?isbn=9788072606689</subfield>
+  <subfield code="2">Web obalkyknih.cz</subfield>
+</datafield>
+<datafield tag="655" ind1=" " ind2="7">
+  <subfield code="7">cbvk_us_auth*f0001262</subfield>
+  <subfield code="a">tanzanské romány</subfield>
+  <subfield code="2">czenas</subfield>
+</datafield>
+<datafield tag="700" ind1="1" ind2=" ">
+  <subfield code="7">cbvk_us_auth*0039459</subfield>
+  <subfield code="a">Tolimat, Rani,</subfield>
+  <subfield code="d">1970-</subfield>
+  <subfield code="4">trl</subfield>
+</datafield>
+<datafield tag="710" ind1="2" ind2=" ">
+  <subfield code="7">cbvk_us_auth*0249729</subfield>
+  <subfield code="a">Prostor (nakladatelství)</subfield>
+  <subfield code="4">pbl</subfield>
+</datafield>
+<datafield tag="830" ind1=" " ind2="0">
+  <subfield code="a">Současná světová próza (Prostor) ;</subfield>
+  <subfield code="v">47</subfield>
+  <subfield code="7">cbvk_us_auth*0325462</subfield>
+</datafield>
+<datafield tag="852" ind1=" " ind2=" ">
+  <subfield code="b">B</subfield>
+</datafield>
+<datafield tag="910" ind1=" " ind2=" ">
+  <subfield code="a">CBA001</subfield>
+</datafield>
+<datafield tag="928" ind1="9" ind2=" ">
+  <subfield code="7">cbvk_us_auth*p0016727</subfield>
+  <subfield code="a">Prostor</subfield>
+  <subfield code="4">pbl</subfield>
+</datafield>
+<datafield tag="969" ind1=" " ind2=" ">
+  <subfield code="f">G</subfield>
+  <subfield code="g">20260521</subfield>
+</datafield>
+<datafield tag="970" ind1=" " ind2=" ">
+  <subfield code="b">AMG</subfield>
+  <subfield code="k">pavlas</subfield>
+</datafield>
+<datafield tag="999" ind1=" " ind2=" ">
+  <subfield code="a">7</subfield>
+  <subfield code="b">CBVK</subfield>
+  <subfield code="d">mk-20260514#svejdova-20260519-200182535#pavlas-20260520-200219561#imp_sys-20260521-200239744#be-20260521-200241081</subfield>
+</datafield>
+<datafield tag="C85" ind1=" " ind2="1">
+  <subfield code="h">ereading</subfield>
+  <subfield code="b">427288</subfield>
+  <subfield code="v">0</subfield>
+  <subfield code="d">https://core.palmknihy.cz/api/books/427288/preview.pdf</subfield>
+  <subfield code="d">https://core.palmknihy.cz/api/books/427288/preview.epub</subfield>
+  <subfield code="p">49</subfield>
+  <subfield code="x">20260521</subfield>
+</datafield>
+<datafield tag="C99" ind1=" " ind2=" ">
+  <subfield code="a">nkc20263755915</subfield>
+  <subfield code="d">DFLT_US_CAT_BK_A</subfield>
+</datafield>
+</record>
+</collection>

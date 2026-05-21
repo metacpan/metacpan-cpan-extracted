@@ -3,67 +3,19 @@ package CPAN::Maker::Utils;
 use strict;
 use warnings;
 
-use parent qw( Exporter );
-
-our @EXPORT_OK   = qw( trim make_path_from_module get_module_version is_core );
-our %EXPORT_TAGS = ( 'all' => [@EXPORT_OK], );
-
-our $VERSION = '1.8.0';  ## no critic (RequireInterpolationOfMetachars)
-
 use CPAN::Maker::Constants qw( :all );
-
+use CLI::Simple::Constants qw(:booleans);
+use CLI::Simple::Utils qw(slurp_json);
 use Data::Dumper;
-use ExtUtils::MM;
 use Module::CoreList;
+use Scalar::Util qw(reftype);
 use version;
 
-########################################################################
-sub make_path_from_module {
-########################################################################
-  my ($module) = @_;
+our $VERSION = '1.9.1';
 
-  my $file = join $SLASH, split /$DOUBLE_COLON/xsm, $module;
+use parent qw(Exporter);
 
-  return "$file.pm";
-}
-
-########################################################################
-sub get_module_version {
-########################################################################
-  my ( $module_w_version, @include_path ) = @_;
-
-  if ( !@include_path ) {
-    @include_path = $DOT;
-  }
-
-  my ( $module, $version ) = split /\s+/xsm, $module_w_version;
-
-  my %module_version = (
-    module  => $module,
-    version => $version,
-    path    => undef,
-  );
-
-  return \%module_version
-    if $version;
-
-  $module_version{'file'} = make_path_from_module($module);
-
-  foreach my $prefix (@include_path) {
-    my $path = $prefix . $SLASH . $module_version{'file'};
-
-    next if !-e $path;
-
-    $module_version{'path'} = $path;
-
-    $module_version{'version'}
-      = eval { return ExtUtils::MM->parse_version($path) // 0; };
-
-    last;
-  }
-
-  return \%module_version;
-}
+our @EXPORT = qw(is_core trim is_array is_hash is_scalar get_json_file);
 
 ########################################################################
 sub is_core {
@@ -96,6 +48,46 @@ sub is_core {
 }
 
 ########################################################################
+sub get_json_file {
+########################################################################
+  my ($file) = @_;
+
+  return slurp_json($file);
+}
+
+########################################################################
+sub _is_obj {
+########################################################################
+  my ( $this, $type ) = @_;
+
+  return ref $this && reftype($this) eq $type;
+}
+
+########################################################################
+sub is_array {
+########################################################################
+  my ($this) = @_;
+
+  return _is_obj( $this, 'ARRAY' );
+}
+
+########################################################################
+sub is_scalar {
+########################################################################
+  my ($this) = @_;
+
+  return !ref $this;
+}
+
+########################################################################
+sub is_hash {
+########################################################################
+  my ($this) = @_;
+
+  return _is_obj( $this, 'HASH' );
+}
+
+########################################################################
 sub trim {
 ########################################################################
   my ($s) = @_;
@@ -108,8 +100,6 @@ sub trim {
 }
 
 1;
-
-## no critic (RequirePodSections)
 
 __END__
 

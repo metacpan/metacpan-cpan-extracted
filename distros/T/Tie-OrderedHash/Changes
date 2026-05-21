@@ -1,0 +1,28 @@
+Revision history for Tie-OrderedHash
+
+0.03    2026-05-17
+        - t/09-large-load.t: reduce to 10_000 from 100_000 to support smaller systems
+
+0.02    2026-05-10
+        - Load via DynaLoader instead of XSLoader for dl_load_flags 
+
+0.01    2026-05-08
+        First version, released on an unsuspecting world.
+        - XS-backed insertion-ordered hash with a public C ABI under
+          include/tie_orderedhash.h.
+        - Drop-in replacement for Tie::IxHash on the tied-hash side;
+          additional OO push/pop/keys/values surface.
+        - Windows: emit a MinGW import library (libOrderedHash.dll.a)
+          alongside OrderedHash.dll at build time and publish its
+          location through ExtUtils::Depends's set_libs(). Downstream
+          XS dists that want to call our exported tie_oh_* C symbols
+          (eg File::Raw::JSON) link automatically via
+          $pkg->get_makefile_vars after
+            ExtUtils::Depends->new($consumer, 'Tie::OrderedHash')
+          - no per-consumer DLL-finding hack needed. Same recipe
+          File::Raw 0.12 uses for Raw.dll.
+        - Internal tidy: oh_core.h lives under include/ alongside the
+          public tie_orderedhash.h. The path-prefixed `#include
+          "include/foo.h"` references in oh_core.c / OrderedHash.xs /
+          include/oh_core.h are now plain `#include "foo.h"` since
+          -Iinclude is in the build's INC.

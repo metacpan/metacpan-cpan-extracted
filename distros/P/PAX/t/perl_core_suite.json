@@ -1,0 +1,29 @@
+{
+  "cases": [
+    {
+      "id": "version-baseline",
+      "description": "Pinned Perl reports a usable version",
+      "argv": ["-MConfig", "-e", "die unless $Config{version} =~ /^5\\./; print $Config{version}, qq(\\n)"]
+    },
+    {
+      "id": "strict-warnings",
+      "description": "Core strict and warnings pragmas load",
+      "argv": ["-Mstrict", "-Mwarnings", "-e", "print qq(ok\\n)"]
+    },
+    {
+      "id": "json-pp-core",
+      "description": "Dual-life JSON::PP loads and encodes",
+      "argv": ["-MJSON::PP=encode_json", "-e", "print encode_json({ok=>1})"]
+    },
+    {
+      "id": "test-more-core",
+      "description": "Test::More executes a basic assertion",
+      "argv": ["-MTest::More=no_plan", "-e", "ok(1, q(core harness))"]
+    },
+    {
+      "id": "digest-sha-core",
+      "description": "Digest::SHA computes a stable digest",
+      "argv": ["-MDigest::SHA=sha256_hex", "-e", "die unless sha256_hex(q(pax)) =~ /^[0-9a-f]{64}$/; print qq(ok\\n)"]
+    }
+  ]
+}

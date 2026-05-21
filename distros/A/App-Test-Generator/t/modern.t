@@ -4,7 +4,7 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
-use Test::DescribeMe qw(extended);
+# use Test::DescribeMe qw(extended);
 use Test::Most;
 use File::Temp qw(tempdir);
 

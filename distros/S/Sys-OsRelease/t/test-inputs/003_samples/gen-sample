@@ -3,7 +3,7 @@
 # where imagename is a container image name loadable from podman
 if [ $# -eq 0 ]
 then
-    names="almalinux alpine archlinux debian fedora opensuse/leap rockylinux ubuntu"
+    names="almalinux alpine archlinux debian fedora opensuse/leap rockylinux ubuntu kalilinux/kali-last-release"
 else
     names=$1
 fi

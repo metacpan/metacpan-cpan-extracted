@@ -1,0 +1,50 @@
+# 
+## Copyright (C) Carlos Celso
+# 
+## see: https://metacpan.org/pod/DBD::Pg
+#
+## see: /var/lib/pgsql/data/pg_hba.conf
+
+*) step1, create database, table, users, grants
+   
+   # su - postgres
+   # echo "create database my_db" | psql
+   CREATE DATABASE
+
+   # psql my_db <<EOF
+   create table my_users
+   (
+   	login varchar(128),
+   	password varchar(256),
+   	uid integer,
+   	gid integer,
+   	name varchar(128),
+   	home varchar(256),
+   	shell varchar(256)
+   );
+   create role my_user login password 'my_password';
+   grant select,insert,update,delete on my_users to my_user;
+   EOF
+
+*) step2, test db
+
+   # psql -W -U my_user -h localhost -d my_db
+   Password: [password]
+   ..
+   my_db=# exit
+
+*) step3, test perl
+
+   # export MY_DB=my_db
+   # export MY_USER=my_user
+   # export MY_PASSWORD=my_password
+   # perl dbi_postgres_without_schema.pl
+   
+*) step4, cleanup
+   
+   # su - postgres
+   # echo "DROP TABLE my_users;" | psql my_db
+   # echo "DROP DATABASE my_db;" | psql
+   # echo "DROP role my_user;" | psql
+   
+ENDED

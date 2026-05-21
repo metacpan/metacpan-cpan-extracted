@@ -175,6 +175,37 @@ sub update_track_metadata {
     $row->update(\%update) if %update;
 }
 
+# Count tracks whose $field exactly equals $value, optionally excluding one
+# track id. Used to decide whether an edit should offer to propagate a
+# rename to siblings (e.g. cleaning up mojibake artist/album/genre values
+# without having to revisit every track).
+sub count_tracks_with_field {
+    my ($self, $field, $value, $exclude_id) = @_;
+    return 0 unless defined $value && length $value;
+    my %where = ($field => $value);
+    $where{id} = { '!=' => $exclude_id } if defined $exclude_id;
+    return $self->_rs('Track')->search(\%where)->count;
+}
+
+# Bulk-rename: set $field = $new for every track where $field = $old.
+# Returns the number of rows updated.
+sub rename_field {
+    my ($self, $field, $old, $new) = @_;
+    return 0 unless defined $old && length $old;
+    return $self->_rs('Track')->search({ $field => $old })
+                              ->update({ $field => $new });
+}
+
+# Track ids whose $field exactly equals $value. Used to drive a targeted
+# sheet sync after a bulk rename so we don't rewrite the whole spreadsheet.
+sub track_ids_with_field {
+    my ($self, $field, $value) = @_;
+    return () unless defined $value && length $value;
+    return $self->_rs('Track')->search({ $field => $value },
+                                       { columns => ['id'] })
+                              ->get_column('id')->all;
+}
+
 # Insert or update a track using only the metadata fields available from the
 # sheet (drive_id + title/artist/album etc.).  Structural fields (folder_id,
 # mime_type, size, …) are left null or at their placeholder values so that a

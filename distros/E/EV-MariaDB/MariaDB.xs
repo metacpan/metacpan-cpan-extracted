@@ -99,6 +99,15 @@ struct ev_mariadb_s {
     int          ssl_verify_server_cert;
     int          utf8;  /* auto-flag result strings as UTF-8 */
     unsigned long client_flags;
+
+    /* Pending cache values for in-flight change_user/select_db/set_charset.
+       Committed by on_utility_done on success, freed on failure. The strings
+       are also passed to the libmariadb start function so they remain valid
+       across the async op. */
+    char *pending_user;
+    char *pending_password;
+    char *pending_database;
+    char *pending_charset;
 };
 
 struct ev_mariadb_cb_s {
@@ -136,6 +145,10 @@ struct ev_mariadb_stmt_s {
 
 #define IS_FORKED(self) \
     ((self)->connect_pid != 0 && (self)->connect_pid != getpid())
+
+/* Safefree is NULL-safe; the NULL assignment matters for callers where
+   self survives the call (cleanup_connection, reconnect via reset()). */
+#define FREE_STR(p) do { Safefree(p); (p) = NULL; } while (0)
 
 #define CHECK_READY(self, cb) \
     do { \
@@ -183,13 +196,14 @@ static void on_stream_fetch_done(ev_mariadb_t *self);
 static void on_close_done(ev_mariadb_t *self);
 
 static void maybe_pipeline(ev_mariadb_t *self) {
-    if (self->state == STATE_IDLE && !ngx_queue_empty(&self->send_queue))
+    if (self->state != STATE_IDLE) return;
+    if (!ngx_queue_empty(&self->send_queue)) {
         pipeline_advance(self);
-    else if (self->state == STATE_IDLE) {
-        stop_reading(self);
-        stop_writing(self);
-        stop_timer(self);
+        return;
     }
+    stop_reading(self);
+    stop_writing(self);
+    stop_timer(self);
 }
 
 /* --- freelist for cb_queue entries --- */
@@ -244,6 +258,23 @@ static void release_send(ev_mariadb_send_t *s) {
     *(ev_mariadb_send_t **)s = send_freelist;
     send_freelist = s;
     send_freelist_size++;
+}
+
+/* Drain freelists at interpreter shutdown so Valgrind reports zero leaks. */
+static void drain_freelists(pTHX_ void *unused) {
+    PERL_UNUSED_VAR(unused);
+    while (cbt_freelist) {
+        ev_mariadb_cb_t *next = *(ev_mariadb_cb_t **)cbt_freelist;
+        Safefree(cbt_freelist);
+        cbt_freelist = next;
+    }
+    cbt_freelist_size = 0;
+    while (send_freelist) {
+        ev_mariadb_send_t *next = *(ev_mariadb_send_t **)send_freelist;
+        Safefree(send_freelist);
+        send_freelist = next;
+    }
+    send_freelist_size = 0;
 }
 
 static void push_send(ev_mariadb_t *self, const char *sql, STRLEN sql_len, SV *cb) {
@@ -311,14 +342,15 @@ static void stop_writing(ev_mariadb_t *self) {
 }
 
 static void start_timer(ev_mariadb_t *self) {
-    if (!self->timing) {
-        unsigned int ms = mysql_get_timeout_value_ms(self->conn);
-        if (ms > 0) {
-            ev_timer_set(&self->timer, ms / 1000.0, 0.0);
-            ev_timer_start(self->loop, &self->timer);
-            self->timing = 1;
-        }
-    }
+    /* libmariadb may report a fresh timeout on each _cont; always re-arm.
+       ms == 0 means "fire as soon as possible" — use 1ms so the timer fires
+       on the next loop iteration rather than stalling. */
+    unsigned int ms = mysql_get_timeout_value_ms(self->conn);
+    if (ms == 0) ms = 1;
+    if (self->timing) ev_timer_stop(self->loop, &self->timer);
+    ev_timer_set(&self->timer, ms / 1000.0, 0.0);
+    ev_timer_start(self->loop, &self->timer);
+    self->timing = 1;
 }
 
 static void stop_timer(ev_mariadb_t *self) {
@@ -569,6 +601,12 @@ static void cleanup_connection(ev_mariadb_t *self) {
         Safefree(self->op_data_ptr);
         self->op_data_ptr = NULL;
     }
+
+    /* Discard any pending utility-op cache update — the op was cancelled. */
+    FREE_STR(self->pending_user);
+    FREE_STR(self->pending_password);
+    FREE_STR(self->pending_database);
+    FREE_STR(self->pending_charset);
 
     self->op_stmt_ctx = NULL;
 
@@ -1118,6 +1156,7 @@ static void on_stmt_execute_done(ev_mariadb_t *self) {
         cb = pop_cb(self);
         if (cb == NULL) {
             if (self->op_result) {
+                mysql_stmt_free_result(stmt);
                 mysql_free_result(self->op_result);
                 self->op_result = NULL;
             }
@@ -1278,14 +1317,75 @@ static void on_stmt_reset_done(ev_mariadb_t *self) {
 
 /* --- Async utility operation done handler --- */
 
+/* mysql_reset_connection / mysql_change_user drop all server-side prepared
+   statements; invalidate every tracked wrapper so user code can't keep using
+   them. Closes the local libmariadb stmt state and marks closed=1, mirroring
+   cleanup_connection's pattern but without touching the live connection. */
+static void invalidate_all_stmts(ev_mariadb_t *self) {
+    ev_mariadb_stmt_t *ctx = self->stmt_list;
+    while (ctx) {
+        free_stmt_bind_params(ctx);
+        if (ctx->stmt) {
+            mysql_stmt_close(ctx->stmt);
+            ctx->stmt = NULL;
+        }
+        ctx->closed = 1;
+        ctx = ctx->next;
+    }
+    self->op_stmt = NULL;
+    self->op_stmt_ctx = NULL;
+}
+
+/* Commit (success) or discard (failure) any pending utility-op cache update. */
+static void resolve_pending_cache(ev_mariadb_t *self, int failed) {
+    if (failed) {
+        FREE_STR(self->pending_user);
+        FREE_STR(self->pending_password);
+        FREE_STR(self->pending_database);
+        FREE_STR(self->pending_charset);
+        return;
+    }
+    if (self->pending_user) {
+        Safefree(self->user);
+        self->user = self->pending_user;
+        self->pending_user = NULL;
+    }
+    if (self->pending_password) {
+        Safefree(self->password);
+        self->password = self->pending_password;
+        self->pending_password = NULL;
+    }
+    if (self->pending_database) {
+        Safefree(self->database);
+        self->database = self->pending_database;
+        self->pending_database = NULL;
+    }
+    if (self->pending_charset) {
+        Safefree(self->charset);
+        self->charset = self->pending_charset;
+        self->pending_charset = NULL;
+    }
+}
+
 static void on_utility_done(ev_mariadb_t *self, int failed) {
+    enum ev_mariadb_state prev = self->state;
     self->state = STATE_IDLE;
+    resolve_pending_cache(self, failed);
+    if (!failed && (prev == STATE_RESET_CONNECTION || prev == STATE_CHANGE_USER))
+        invalidate_all_stmts(self);
     if (failed) {
         if (deliver_error(self, mysql_error(self->conn))) return;
     } else {
         if (deliver_value(self, newSViv(1))) return;
     }
     maybe_pipeline(self);
+}
+
+/* Trailing dispatch shared by every utility op start/cont site:
+   completed → on_utility_done; otherwise → arm watchers. */
+static void dispatch_utility(ev_mariadb_t *self, int status, int failed) {
+    if (status == 0) on_utility_done(self, failed);
+    else update_watchers(self, status);
 }
 
 static void free_stmt_bind_params(ev_mariadb_stmt_t *ctx) {
@@ -1429,7 +1529,10 @@ static void on_stream_fetch_done(ev_mariadb_t *self) {
 
                 /* Was stream cancelled (finish/reset from callback)? */
                 if (self->stream_cb != NULL) {
-                    /* callback started a new stream — don't touch */
+                    /* Defence: unreachable via the public API — query_stream's
+                       CHECK_READY rejects the only way stream_cb could be
+                       reset while we're inside on_stream_fetch_done. Drop the
+                       saved cb so the (hypothetical) new stream owns the slot. */
                     SvREFCNT_dec(saved_cb);
                 } else if (self->conn == NULL || self->op_result == NULL) {
                     /* connection torn down — stream is over */
@@ -1646,74 +1749,42 @@ static void continue_operation(ev_mariadb_t *self, int events) {
 
     case STATE_PING:
         status = mysql_ping_cont(&self->op_ret, self->conn, events);
-        if (status == 0) {
-            on_utility_done(self, self->op_ret != 0);
-        } else {
-            update_watchers(self, status);
-        }
+        dispatch_utility(self, status, self->op_ret != 0);
         break;
 
     case STATE_CHANGE_USER:
         status = mysql_change_user_cont(&self->op_bool_ret, self->conn, events);
-        if (status == 0) {
-            on_utility_done(self, self->op_bool_ret != 0);
-        } else {
-            update_watchers(self, status);
-        }
+        dispatch_utility(self, status, self->op_bool_ret != 0);
         break;
 
     case STATE_SELECT_DB:
         status = mysql_select_db_cont(&self->op_ret, self->conn, events);
-        if (status == 0) {
-            on_utility_done(self, self->op_ret != 0);
-        } else {
-            update_watchers(self, status);
-        }
+        dispatch_utility(self, status, self->op_ret != 0);
         break;
 
     case STATE_RESET_CONNECTION:
         status = mysql_reset_connection_cont(&self->op_ret, self->conn, events);
-        if (status == 0) {
-            on_utility_done(self, self->op_ret != 0);
-        } else {
-            update_watchers(self, status);
-        }
+        dispatch_utility(self, status, self->op_ret != 0);
         break;
 
     case STATE_SET_CHARSET:
         status = mysql_set_character_set_cont(&self->op_ret, self->conn, events);
-        if (status == 0) {
-            on_utility_done(self, self->op_ret != 0);
-        } else {
-            update_watchers(self, status);
-        }
+        dispatch_utility(self, status, self->op_ret != 0);
         break;
 
     case STATE_COMMIT:
         status = mysql_commit_cont(&self->op_bool_ret, self->conn, events);
-        if (status == 0) {
-            on_utility_done(self, self->op_bool_ret != 0);
-        } else {
-            update_watchers(self, status);
-        }
+        dispatch_utility(self, status, self->op_bool_ret != 0);
         break;
 
     case STATE_ROLLBACK:
         status = mysql_rollback_cont(&self->op_bool_ret, self->conn, events);
-        if (status == 0) {
-            on_utility_done(self, self->op_bool_ret != 0);
-        } else {
-            update_watchers(self, status);
-        }
+        dispatch_utility(self, status, self->op_bool_ret != 0);
         break;
 
     case STATE_AUTOCOMMIT:
         status = mysql_autocommit_cont(&self->op_bool_ret, self->conn, events);
-        if (status == 0) {
-            on_utility_done(self, self->op_bool_ret != 0);
-        } else {
-            update_watchers(self, status);
-        }
+        dispatch_utility(self, status, self->op_bool_ret != 0);
         break;
 
     case STATE_STMT_SEND_LONG_DATA:
@@ -1763,7 +1834,7 @@ static void io_cb(EV_P_ ev_io *w, int revents) {
     int events = 0;
     (void)loop;
 
-    if (self == NULL || self->magic != EV_MARIADB_MAGIC) return;
+    if (self->magic != EV_MARIADB_MAGIC) return;
     if (NULL == self->conn) return;
 
     if (revents & EV_READ)  events |= MYSQL_WAIT_READ | MYSQL_WAIT_EXCEPT;
@@ -1777,7 +1848,7 @@ static void timer_cb(EV_P_ ev_timer *w, int revents) {
     (void)loop;
     (void)revents;
 
-    if (self == NULL || self->magic != EV_MARIADB_MAGIC) return;
+    if (self->magic != EV_MARIADB_MAGIC) return;
     if (NULL == self->conn) return;
 
     self->timing = 0;
@@ -1794,22 +1865,34 @@ static char* safe_strdup(const char *s) {
     return d;
 }
 
+/* newSVpv on a non-empty string, &PL_sv_undef otherwise. Used by accessors
+   that wrap a libmariadb getter returning a NUL-terminated string or NULL. */
+static SV* str_or_undef(const char *s) {
+    return (s && s[0]) ? newSVpv(s, 0) : &PL_sv_undef;
+}
+
+/* Free *slot then replace it with a fresh copy of src (or NULL). */
+static void replace_str(char **slot, const char *src) {
+    Safefree(*slot);
+    *slot = safe_strdup(src);
+}
+
 static void free_connect_strings(ev_mariadb_t *self) {
-    if (self->host)        { Safefree(self->host);        self->host = NULL; }
-    if (self->user)        { Safefree(self->user);        self->user = NULL; }
-    if (self->password)    { Safefree(self->password);    self->password = NULL; }
-    if (self->database)    { Safefree(self->database);    self->database = NULL; }
-    if (self->unix_socket) { Safefree(self->unix_socket); self->unix_socket = NULL; }
+    FREE_STR(self->host);
+    FREE_STR(self->user);
+    FREE_STR(self->password);
+    FREE_STR(self->database);
+    FREE_STR(self->unix_socket);
 }
 
 static void free_option_strings(ev_mariadb_t *self) {
-    if (self->charset)     { Safefree(self->charset);     self->charset = NULL; }
-    if (self->init_command) { Safefree(self->init_command); self->init_command = NULL; }
-    if (self->ssl_key)     { Safefree(self->ssl_key);     self->ssl_key = NULL; }
-    if (self->ssl_cert)    { Safefree(self->ssl_cert);    self->ssl_cert = NULL; }
-    if (self->ssl_ca)      { Safefree(self->ssl_ca);      self->ssl_ca = NULL; }
-    if (self->ssl_capath)  { Safefree(self->ssl_capath);  self->ssl_capath = NULL; }
-    if (self->ssl_cipher)  { Safefree(self->ssl_cipher);  self->ssl_cipher = NULL; }
+    FREE_STR(self->charset);
+    FREE_STR(self->init_command);
+    FREE_STR(self->ssl_key);
+    FREE_STR(self->ssl_cert);
+    FREE_STR(self->ssl_ca);
+    FREE_STR(self->ssl_capath);
+    FREE_STR(self->ssl_cipher);
 }
 
 static void apply_options(ev_mariadb_t *self) {
@@ -1981,6 +2064,7 @@ MODULE = EV::MariaDB  PACKAGE = EV::MariaDB
 BOOT:
 {
     I_EV_API("EV::MariaDB");
+    call_atexit(drain_freelists, NULL);
 }
 
 EV::MariaDB
@@ -2033,13 +2117,20 @@ CODE:
             Safefree(cbt);
         }
         if (self->op_data_ptr) Safefree(self->op_data_ptr);
+        Safefree(self->pending_user);
+        Safefree(self->pending_password);
+        Safefree(self->pending_database);
+        Safefree(self->pending_charset);
         self->stream_cb = NULL;
         {
             ev_mariadb_stmt_t *ctx = self->stmt_list;
             while (ctx) {
                 ev_mariadb_stmt_t *next = ctx->next;
                 free_stmt_bind_params(ctx);
-                if (!is_fork && ctx->stmt) mysql_stmt_close(ctx->stmt);
+                if (!is_fork && ctx->stmt) {
+                    if (ctx->stmt == self->op_stmt) self->op_stmt = NULL;
+                    mysql_stmt_close(ctx->stmt);
+                }
                 Safefree(ctx);
                 ctx = next;
             }
@@ -2064,6 +2155,11 @@ CODE:
         self->op_data_ptr = NULL;
     }
 
+    FREE_STR(self->pending_user);
+    FREE_STR(self->pending_password);
+    FREE_STR(self->pending_database);
+    FREE_STR(self->pending_charset);
+
     /* Free all tracked stmt wrappers and connection resources */
     {
         int is_fork = IS_FORKED(self);
@@ -2071,12 +2167,18 @@ CODE:
         while (ctx) {
             ev_mariadb_stmt_t *next = ctx->next;
             free_stmt_bind_params(ctx);
-            if (!is_fork && ctx->stmt) mysql_stmt_close(ctx->stmt);
+            if (!is_fork && ctx->stmt) {
+                /* op_stmt may equal a tracked stmt (e.g. STATE_STMT_RESET,
+                   STATE_STMT_STORE, STATE_STMT_SEND_LONG_DATA where op_stmt_ctx
+                   is NULL); avoid the double-close below. */
+                if (ctx->stmt == self->op_stmt) self->op_stmt = NULL;
+                mysql_stmt_close(ctx->stmt);
+            }
             Safefree(ctx);
             ctx = next;
         }
         self->stmt_list = NULL;
-        /* Close op_stmt if not tracked in stmt_list (e.g., in-flight prepare) */
+        /* Close op_stmt only if it was never linked into stmt_list (in-flight prepare). */
         if (!is_fork && self->op_stmt && !self->op_stmt_ctx) {
             mysql_stmt_close(self->op_stmt);
         }
@@ -2097,18 +2199,19 @@ CODE:
                 if (conn) mysql_close(conn);
             }
         }
-        self->loop = NULL;
-        self->fd = -1;
     }
 
-    if (NULL != self->on_connect) {
-        SvREFCNT_dec(self->on_connect);
-        self->on_connect = NULL;
+    /* Drop handler SVs before zeroing loop/fd so any re-entrant destructors
+       see NULL handler fields (and a still-valid loop while unwinding). */
+    {
+        SV *cb;
+        if ((cb = self->on_connect)) { self->on_connect = NULL; SvREFCNT_dec(cb); }
+        if ((cb = self->on_error))   { self->on_error   = NULL; SvREFCNT_dec(cb); }
     }
-    if (NULL != self->on_error) {
-        SvREFCNT_dec(self->on_error);
-        self->on_error = NULL;
-    }
+
+    self->loop = NULL;
+    self->fd = -1;
+
     free_connect_strings(self);
     free_option_strings(self);
 
@@ -2290,6 +2393,8 @@ CODE:
         croak("connection not valid after fork");
     if (self->state != STATE_IDLE)
         croak("another operation is in progress");
+    if (self->send_count > 0)
+        croak("cannot bind while pipeline results are pending");
     if (!SvROK(params_ref) || SvTYPE(SvRV(params_ref)) != SVt_PVAV)
         croak("params must be an ARRAY reference");
 
@@ -2308,6 +2413,7 @@ CODE:
     CHECK_READY(self, cb);
 
     ctx = INT2PTR(ev_mariadb_stmt_t *, stmt_iv);
+    if (!ctx) croak("invalid statement handle");
     if (ctx->closed) {
         /* already closed by cleanup_connection — just free the wrapper */
         unlink_stmt(self, ctx);
@@ -2366,11 +2472,7 @@ CODE:
 
     self->state = STATE_PING;
     status = mysql_ping_start(&self->op_ret, self->conn);
-    if (status == 0) {
-        on_utility_done(self, self->op_ret != 0);
-    } else {
-        update_watchers(self, status);
-    }
+    dispatch_utility(self, status, self->op_ret != 0);
 }
 
 void
@@ -2384,26 +2486,20 @@ CODE:
 
     db = (SvOK(db_sv)) ? SvPV_nolen(db_sv) : NULL;
 
-    /* Update cached credentials so reset() reconnects with the new ones */
-    if (self->user) Safefree(self->user);
-    self->user = safe_strdup(user);
-    if (self->password) Safefree(self->password);
-    self->password = safe_strdup(password);
-    if (db) {
-        if (self->database) Safefree(self->database);
-        self->database = safe_strdup(db);
-    }
-    /* if db is NULL (undef), keep self->database for reset() */
+    /* Stash the new credentials; on_utility_done commits them on success or
+       discards on failure so reset() never sees credentials we couldn't use.
+       Pass the pending pointers to libmariadb so the strings live across the
+       async start/cont sequence (Perl args expire when the XS body returns). */
+    replace_str(&self->pending_user, user);
+    replace_str(&self->pending_password, password);
+    if (db) replace_str(&self->pending_database, db);
 
     push_cb(self, cb);
 
     self->state = STATE_CHANGE_USER;
-    status = mysql_change_user_start(&self->op_bool_ret, self->conn, user, password, db);
-    if (status == 0) {
-        on_utility_done(self, self->op_bool_ret != 0);
-    } else {
-        update_watchers(self, status);
-    }
+    status = mysql_change_user_start(&self->op_bool_ret, self->conn,
+        self->pending_user, self->pending_password, self->pending_database);
+    dispatch_utility(self, status, self->op_bool_ret != 0);
 }
 
 void
@@ -2414,19 +2510,14 @@ CODE:
 {
     CHECK_READY(self, cb);
 
-    /* Update cached database so reset() reconnects to the right one */
-    if (self->database) Safefree(self->database);
-    self->database = safe_strdup(db);
+    /* Stash the new database; on_utility_done commits on success. */
+    replace_str(&self->pending_database, db);
 
     push_cb(self, cb);
 
     self->state = STATE_SELECT_DB;
-    status = mysql_select_db_start(&self->op_ret, self->conn, db);
-    if (status == 0) {
-        on_utility_done(self, self->op_ret != 0);
-    } else {
-        update_watchers(self, status);
-    }
+    status = mysql_select_db_start(&self->op_ret, self->conn, self->pending_database);
+    dispatch_utility(self, status, self->op_ret != 0);
 }
 
 void
@@ -2441,11 +2532,7 @@ CODE:
 
     self->state = STATE_RESET_CONNECTION;
     status = mysql_reset_connection_start(&self->op_ret, self->conn);
-    if (status == 0) {
-        on_utility_done(self, self->op_ret != 0);
-    } else {
-        update_watchers(self, status);
-    }
+    dispatch_utility(self, status, self->op_ret != 0);
 }
 
 void
@@ -2456,19 +2543,14 @@ CODE:
 {
     CHECK_READY(self, cb);
 
-    /* Update cached charset so reset() reconnects with the right one */
-    if (self->charset) Safefree(self->charset);
-    self->charset = safe_strdup(charset);
+    /* Stash the new charset; on_utility_done commits on success. */
+    replace_str(&self->pending_charset, charset);
 
     push_cb(self, cb);
 
     self->state = STATE_SET_CHARSET;
-    status = mysql_set_character_set_start(&self->op_ret, self->conn, charset);
-    if (status == 0) {
-        on_utility_done(self, self->op_ret != 0);
-    } else {
-        update_watchers(self, status);
-    }
+    status = mysql_set_character_set_start(&self->op_ret, self->conn, self->pending_charset);
+    dispatch_utility(self, status, self->op_ret != 0);
 }
 
 void
@@ -2483,11 +2565,7 @@ CODE:
 
     self->state = STATE_COMMIT;
     status = mysql_commit_start(&self->op_bool_ret, self->conn);
-    if (status == 0) {
-        on_utility_done(self, self->op_bool_ret != 0);
-    } else {
-        update_watchers(self, status);
-    }
+    dispatch_utility(self, status, self->op_bool_ret != 0);
 }
 
 void
@@ -2502,11 +2580,7 @@ CODE:
 
     self->state = STATE_ROLLBACK;
     status = mysql_rollback_start(&self->op_bool_ret, self->conn);
-    if (status == 0) {
-        on_utility_done(self, self->op_bool_ret != 0);
-    } else {
-        update_watchers(self, status);
-    }
+    dispatch_utility(self, status, self->op_bool_ret != 0);
 }
 
 void
@@ -2521,11 +2595,7 @@ CODE:
 
     self->state = STATE_AUTOCOMMIT;
     status = mysql_autocommit_start(&self->op_bool_ret, self->conn, (my_bool)(mode ? 1 : 0));
-    if (status == 0) {
-        on_utility_done(self, self->op_bool_ret != 0);
-    } else {
-        update_watchers(self, status);
-    }
+    dispatch_utility(self, status, self->op_bool_ret != 0);
 }
 
 void
@@ -2654,13 +2724,7 @@ SV*
 error_message(EV::MariaDB self)
 CODE:
 {
-    if (NULL != self->conn) {
-        const char *msg = mysql_error(self->conn);
-        RETVAL = (msg && msg[0]) ? newSVpv(msg, 0) : &PL_sv_undef;
-    }
-    else {
-        RETVAL = &PL_sv_undef;
-    }
+    RETVAL = self->conn ? str_or_undef(mysql_error(self->conn)) : &PL_sv_undef;
 }
 OUTPUT:
     RETVAL
@@ -2678,13 +2742,7 @@ SV*
 sqlstate(EV::MariaDB self)
 CODE:
 {
-    if (NULL != self->conn) {
-        const char *s = mysql_sqlstate(self->conn);
-        RETVAL = (s && s[0]) ? newSVpv(s, 0) : &PL_sv_undef;
-    }
-    else {
-        RETVAL = &PL_sv_undef;
-    }
+    RETVAL = self->conn ? str_or_undef(mysql_sqlstate(self->conn)) : &PL_sv_undef;
 }
 OUTPUT:
     RETVAL
@@ -2717,13 +2775,7 @@ SV*
 info(EV::MariaDB self)
 CODE:
 {
-    if (NULL != self->conn) {
-        const char *i = mysql_info(self->conn);
-        RETVAL = (i && i[0]) ? newSVpv(i, 0) : &PL_sv_undef;
-    }
-    else {
-        RETVAL = &PL_sv_undef;
-    }
+    RETVAL = self->conn ? str_or_undef(mysql_info(self->conn)) : &PL_sv_undef;
 }
 OUTPUT:
     RETVAL
@@ -2741,13 +2793,7 @@ SV*
 server_info(EV::MariaDB self)
 CODE:
 {
-    if (NULL != self->conn) {
-        const char *info = mysql_get_server_info(self->conn);
-        RETVAL = (info && info[0]) ? newSVpv(info, 0) : &PL_sv_undef;
-    }
-    else {
-        RETVAL = &PL_sv_undef;
-    }
+    RETVAL = self->conn ? str_or_undef(mysql_get_server_info(self->conn)) : &PL_sv_undef;
 }
 OUTPUT:
     RETVAL
@@ -2765,13 +2811,7 @@ SV*
 host_info(EV::MariaDB self)
 CODE:
 {
-    if (NULL != self->conn) {
-        const char *info = mysql_get_host_info(self->conn);
-        RETVAL = (info && info[0]) ? newSVpv(info, 0) : &PL_sv_undef;
-    }
-    else {
-        RETVAL = &PL_sv_undef;
-    }
+    RETVAL = self->conn ? str_or_undef(mysql_get_host_info(self->conn)) : &PL_sv_undef;
 }
 OUTPUT:
     RETVAL
@@ -2780,13 +2820,7 @@ SV*
 character_set_name(EV::MariaDB self)
 CODE:
 {
-    if (NULL != self->conn) {
-        const char *cs = mysql_character_set_name(self->conn);
-        RETVAL = (cs && cs[0]) ? newSVpv(cs, 0) : &PL_sv_undef;
-    }
-    else {
-        RETVAL = &PL_sv_undef;
-    }
+    RETVAL = self->conn ? str_or_undef(mysql_character_set_name(self->conn)) : &PL_sv_undef;
 }
 OUTPUT:
     RETVAL
@@ -2823,11 +2857,10 @@ PREINIT:
     unsigned long elen;
 CODE:
 {
-    if (NULL == self->conn || self->state == STATE_CONNECTING
-        || self->state == STATE_CLOSE
-        || IS_FORKED(self)) {
+    if (NULL == self->conn || self->state == STATE_CONNECTING || IS_FORKED(self))
         croak("not connected");
-    }
+    if (self->state == STATE_CLOSE)
+        croak("connection is closing");
     s = SvPV(str, len);
     if (SvUTF8(str)) {
         const char *cs = mysql_character_set_name(self->conn);
@@ -2835,6 +2868,8 @@ CODE:
             warn("EV::MariaDB: escaping a UTF-8 string on a non-utf8 connection (%s) may cause corruption or injection vulnerabilities", cs ? cs : "unknown");
         }
     }
+    if (len > (STRLEN)((~(STRLEN)0) / 2 - 1))
+        croak("string too large to escape");
     RETVAL = newSV(len * 2 + 1);
     SvPOK_on(RETVAL);
     elen = mysql_real_escape_string(self->conn, SvPVX(RETVAL), s, (unsigned long)len);

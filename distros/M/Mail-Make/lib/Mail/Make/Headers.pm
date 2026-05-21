@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## MIME Email Builder - ~/lib/Mail/Make/Headers.pm
-## Version v0.9.0
+## Version v0.9.1
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/03/02
-## Modified 2026/03/05
+## Modified 2026/05/11
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -39,7 +40,7 @@ BEGIN
         messageid                   => 'Mail::Make::Headers::MessageID',
         subject                     => 'Mail::Make::Headers::Subject',
     };
-    our $VERSION = 'v0.9.0';
+    our $VERSION = 'v0.9.1';
 };
 
 use strict;
@@ -105,7 +106,7 @@ sub init
     {
         if( @_ % 2 )
         {
-            return( $self->error( "new needs an even number of arguments" ) );
+            return( $self->error( "new() needs an even number of arguments" ) );
         }
         # We need to preserve the order in which the header field names were provided.
         for( my $i = 0; $i < scalar( @_ ); $i += 2 )
@@ -202,7 +203,7 @@ sub clone
     return( $c );
 }
 
-# content_disposition - convenience typed accessor
+# content_disposition is a convenience typed accessor
 sub content_disposition
 {
     my $self = shift( @_ );
@@ -216,7 +217,7 @@ sub content_disposition
     return( $self->new_field( 'Content-Disposition' ) );
 }
 
-# content_id - convenience accessor for Content-ID
+# content_id is a convenience accessor for Content-ID
 sub content_id
 {
     my $self = shift( @_ );
@@ -236,7 +237,7 @@ sub content_id
     return( $self->get( 'Content-ID' ) );
 }
 
-# content_transfer_encoding - convenience accessor
+# content_transfer_encoding is a convenience accessor
 sub content_transfer_encoding
 {
     my $self = shift( @_ );
@@ -253,7 +254,7 @@ sub content_transfer_encoding
     return( $self->get( 'Content-Transfer-Encoding' ) );
 }
 
-# content_type - convenience typed accessor
+# content_type is a convenience typed accessor
 sub content_type
 {
     my $self = shift( @_ );
@@ -336,7 +337,7 @@ sub exists
     return( defined( $v ) ? 1 : 0 );
 }
 
-# get( $name ) - returns the raw string value of the first matching header
+# get( $name ) returns the raw string value of the first matching header
 sub get
 {
     my $self = shift( @_ );
@@ -349,7 +350,7 @@ sub get
     return( $self->header( $_[0] ) );
 }
 
-# has( $name ) - boolean existence check
+# has( $name ) is a boolean existence check
 {
     no warnings 'once';
     # NOTE: sub has aliased to 'has'
@@ -384,7 +385,7 @@ sub header
     # Setter
     if( @_ % 2 )
     {
-        return( $self->error( "header needs one or an even number of arguments" ) );
+        return( $self->error( "header() needs one or an even number of arguments" ) );
     }
 
     my %cleared;
@@ -448,7 +449,7 @@ sub init_header
 
     if( @_ % 2 )
     {
-        return( $self->error( "init_header needs an even number of arguments" ) );
+        return( $self->error( "init_header() needs an even number of arguments" ) );
     }
 
     for( my $i = 0; $i < @_; $i += 2 )
@@ -568,7 +569,7 @@ sub message_id
     return( $self );
 }
 
-# new_field( $name, $value ) - factory returning a typed object or Generic
+# new_field( $name, $value ) is a factory returning a typed object or Generic
 # e.g. $headers->new_field( 'Content-Type' )
 sub new_field
 {
@@ -585,7 +586,7 @@ sub new_field
     return( $class->new || $self->pass_error( $class->error ) );
 }
 
-# print( $fh ) - writes all headers + blank line to filehandle
+# print( $fh ) writes all headers + blank line to filehandle
 sub print
 {
     my $self = shift( @_ );
@@ -604,7 +605,7 @@ sub push_header
 
     if( @_ % 2 )
     {
-        return( $self->error( "push_header needs an even number of arguments" ) );
+        return( $self->error( "push_header() needs an even number of arguments" ) );
     }
 
     for( my $i = 0; $i < @_; $i += 2 )
@@ -629,7 +630,7 @@ sub push_header
     return( $self );
 }
 
-# remove( $name ) - removes all headers with the given name
+# remove( $name ) removes all headers with the given name
 {
     no warnings 'once';
     # NOTE: sub remove is aliased to remove_header()
@@ -641,7 +642,7 @@ sub remove_header
     my $self = shift( @_ );
     if( @_ == 0 )
     {
-        return( $self->error( "remove_header called with no arguments" ) );
+        return( $self->error( "remove_header() called with no arguments" ) );
     }
 
     my @removed_all;
@@ -674,12 +675,12 @@ sub replace_header
 
     if( @_ == 0 )
     {
-        return( $self->error( "replace_header called with no arguments" ) );
+        return( $self->error( "replace_header() called with no arguments" ) );
     }
 
     if( @_ % 2 )
     {
-        return( $self->error( "replace_header needs an even number of arguments" ) );
+        return( $self->error( "replace_header() needs an even number of arguments" ) );
     }
 
     my %cleared;
@@ -746,7 +747,7 @@ sub scan
 # instead of aliasing it, we redirect so it shows up in a stack trace.
 sub set { return( shift->replace_header( @_ ) ); }
 
-# replace( $name, $value ) - alias for set(). Provided for API compatibility.
+# replace( $name, $value ) is an alias for set(). Provided for API compatibility.
 # sub replace { return( shift->set( @_ ) ); }
 
 sub _canon_name
@@ -997,7 +998,7 @@ sub _sanitize_value
     $v =~ s/\r/\n/g;
     # Unwrap legal folding: LF + WSP -> single space
     $v =~ s/\n[ \t]+/ /g;
-    # Any remaining LF is injection - replace with space
+    # Any remaining LF is injection; it replaces with space
     $v =~ s/\n/ /g;
 
     # Remove ASCII control chars except tab
@@ -1024,11 +1025,7 @@ sub _timegm_approx
     {
         if( !$self->_is_number( $args[$i] ) )
         {
-            return( $self->error(
-                "The ", $params[$i],
-                " parameter at offset $i needs to be an integer, but I got '",
-                $self->_str_val( $args[$i] // 'undef' ), "'"
-            ) );
+            return( $self->error( "The ", $params[$i], " parameter at offset $i needs to be an integer, but I got '", $self->_str_val( $args[$i] // 'undef' ), "'" ) );
         }
     }
     my( $sec, $min, $hour, $mday, $mon, $year, $wday ) = @args;
@@ -1215,7 +1212,7 @@ Mail::Make::Headers - Mail Header Collection for Mail::Make
 
 =head1 VERSION
 
-    v0.9.0
+    v0.9.1
 
 =head1 DESCRIPTION
 

@@ -12,6 +12,7 @@ sudo apt install -y build-essential \
                     libjpeg-dev \
                     libpng-dev \
                     libtiff-dev \
+		    libperl-dev \
                     ffmpeg \
                     fonts-freefont-ttf \
                     fonts-wine

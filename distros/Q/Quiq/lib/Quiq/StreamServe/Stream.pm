@@ -38,7 +38,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.237';
+our $VERSION = '1.238';
 
 use Quiq::StreamServe::Block;
 use Quiq::FileHandle;
@@ -569,6 +569,45 @@ sub get {
 
 # -----------------------------------------------------------------------------
 
+=head3 set() - Setze Wert
+
+=head4 Synopsis
+
+  $ssf->set($name,$val,$i);
+  $ssf->set($name,$val);
+
+=head4 Arguments
+
+=over 4
+
+=item $name
+
+Name des zu setzenden Feldes
+
+=item $val
+
+Wert, der gesetzt werden soll
+
+=item $i (Default: 0)
+
+Index im Falle mehrfachen Vorkommens des Feldes
+
+=back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub set {
+    my ($self,$name,$val) = splice @_,0,3;
+    my $i = shift // 0;
+
+    my $prefix = substr($name,0,1) eq '*'? '*': substr($name,0,2);
+    return $self->sectionH->get($prefix)->[$i]->set($name,$val);
+}
+
+# -----------------------------------------------------------------------------
+
 =head3 prefixes() - Liste der Blockarten (Präfixe)
 
 =head4 Synopsis
@@ -667,7 +706,7 @@ Index im Falle mehrfachen Vorkommens des Feldes
 =head4 Description
 
 Wie get(), nur dass der Zugriff auf ein nicht-existentes Feld nicht
-zu einer Exception führt, sondern C<undef> geliefert wird.
+zu einer Exception führt, sondern C<undef> liefert.
 
 =cut
 
@@ -744,7 +783,7 @@ sub type {
 
 =head1 VERSION
 
-1.237
+1.238
 
 =head1 AUTHOR
 

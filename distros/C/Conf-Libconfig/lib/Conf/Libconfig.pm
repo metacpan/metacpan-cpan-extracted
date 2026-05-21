@@ -3,11 +3,42 @@ package Conf::Libconfig;
 use 5.006001;
 use strict;
 use warnings;
+use Exporter 'import';
 
-our $VERSION = '1.0.3';
+our $VERSION = '1.1.2';
 
 require XSLoader;
 XSLoader::load('Conf::Libconfig', $VERSION);
+
+use constant {
+    CONFIG_FORMAT_DEFAULT => 0,
+    CONFIG_FORMAT_HEX     => 1,
+    CONFIG_FORMAT_BIN     => 2,
+    CONFIG_FORMAT_OCT     => 3,
+
+    CONFIG_OPTION_AUTOCONVERT                     => 0x01,
+    CONFIG_OPTION_SEMICOLON_SEPARATORS            => 0x02,
+    CONFIG_OPTION_COLON_ASSIGNMENT_FOR_GROUPS     => 0x04,
+    CONFIG_OPTION_COLON_ASSIGNMENT_FOR_NON_GROUPS => 0x08,
+    CONFIG_OPTION_OPEN_BRACE_ON_SEPARATE_LINE     => 0x10,
+    CONFIG_OPTION_ALLOW_SCIENTIFIC_NOTATION       => 0x20,
+    CONFIG_OPTION_FSYNC                           => 0x40,
+    CONFIG_OPTION_ALLOW_OVERRIDES                 => 0x80,
+};
+
+our @EXPORT_OK = qw(
+    CONFIG_FORMAT_DEFAULT CONFIG_FORMAT_HEX CONFIG_FORMAT_BIN CONFIG_FORMAT_OCT
+    CONFIG_OPTION_AUTOCONVERT
+    CONFIG_OPTION_SEMICOLON_SEPARATORS
+    CONFIG_OPTION_COLON_ASSIGNMENT_FOR_GROUPS
+    CONFIG_OPTION_COLON_ASSIGNMENT_FOR_NON_GROUPS
+    CONFIG_OPTION_OPEN_BRACE_ON_SEPARATE_LINE
+    CONFIG_OPTION_ALLOW_SCIENTIFIC_NOTATION
+    CONFIG_OPTION_FSYNC
+    CONFIG_OPTION_ALLOW_OVERRIDES
+);
+
+our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
 sub add {
    my ($self, $path, $key, $item) = @_;
@@ -67,7 +98,15 @@ Conf::Libconfig - Perl extension for libconfig
   $self->add("fghj.rtyu", "binarykey", "0b1");
   $self->add_boolscalar("fghj.rtyu", "binarykey", 0);
 
-  # if program is over, DESTROY can auto exit, and you can ignore function delete. 
+  # 1.8.x new features
+  $self->set_options(CONFIG_OPTION_FSYNC | CONFIG_OPTION_ALLOW_OVERRIDES);
+  $self->set_float_precision(4);
+  $self->set_default_format(CONFIG_FORMAT_HEX);
+  my $err = $self->error_text();
+  my $line = $self->error_line();
+  $self->clear();
+
+  # if program is over, DESTROY can auto exit, and you can ignore function delete.
   $self->delete();
 
 =head1 DESCRIPTION
@@ -199,6 +238,206 @@ return true if delete node key of path successfully.
 
 return true if delete node element of path successfully.
 
+=head2 $self->set_options($options)
+
+set multiple options at once (libconfig >= 1.8). Combine options with bitwise OR, e.g. C<CONFIG_OPTION_FSYNC | CONFIG_OPTION_ALLOW_OVERRIDES>.
+
+=head2 $self->get_options()
+
+get the current options bitmask (libconfig >= 1.8).
+
+=head2 $self->set_option($option, $flag)
+
+set or clear a single option (libconfig >= 1.8).
+
+=head2 $self->get_option($option)
+
+get the current flag for a single option (libconfig >= 1.8).
+
+=head2 $self->set_auto_convert($flag)
+
+enable or disable automatic type conversion (libconfig >= 1.8).
+
+=head2 $self->get_auto_convert()
+
+get the current auto-convert flag (libconfig >= 1.8).
+
+=head2 $self->set_float_precision($digits)
+
+set the number of decimal digits for float output (libconfig >= 1.8). B<$digits> is an unsigned short (0-65535).
+
+=head2 $self->get_float_precision()
+
+get the current float precision (libconfig >= 1.8).
+
+=head2 $self->set_tab_width($width)
+
+set the tab width for indentation in output (libconfig >= 1.8).
+
+=head2 $self->get_tab_width()
+
+get the current tab width (libconfig >= 1.8).
+
+=head2 $self->set_default_format($format)
+
+set the default format for integer output. Valid formats: C<CONFIG_FORMAT_DEFAULT>, C<CONFIG_FORMAT_HEX>, C<CONFIG_FORMAT_BIN>, C<CONFIG_FORMAT_OCT>.
+
+=head2 $self->get_default_format()
+
+get the current default integer format.
+
+=head2 $self->set_hook($hook)
+
+set a custom hook pointer on the config object.
+
+=head2 $self->get_hook()
+
+get the custom hook pointer.
+
+=head2 $self->clear()
+
+clear all configuration contents without destroying the config object (libconfig >= 1.8).
+
+=head2 $self->error_text()
+
+get the last error text message.
+
+=head2 $self->error_file()
+
+get the file name where the last error occurred.
+
+=head2 $self->error_line()
+
+get the line number where the last error occurred.
+
+=head2 $self->error_type()
+
+get the last error type: 0 = none, 1 = file I/O, 2 = parse error.
+
+=head2 $self->getversion()
+
+get current libconfig version.
+
+=head2 $self->set_include_func($func)
+
+set a custom include function callback (libconfig >= 1.8).
+
+=head2 $self->set_destructor($func)
+
+set a custom destructor callback for the config object.
+
+=head2 $self->set_fatal_error_func($func)
+
+set a global fatal error handler callback. This is a class method -- it affects all config instances (libconfig >= 1.8).
+
+=head2 $setting->lookup ($path)
+
+lookup a setting by path from this setting (libconfig >= 1.8).
+
+=head2 $setting->lookup_int ($name)
+
+lookup an int value by name from this setting (libconfig >= 1.8).
+
+=head2 $setting->lookup_int64 ($name)
+
+lookup an int64 value by name from this setting (libconfig >= 1.8).
+
+=head2 $setting->lookup_bool ($name)
+
+lookup a bool value by name from this setting (libconfig >= 1.8).
+
+=head2 $setting->lookup_float ($name)
+
+lookup a float value by name from this setting (libconfig >= 1.8).
+
+=head2 $setting->lookup_string ($name)
+
+lookup a string value by name from this setting (libconfig >= 1.8).
+
+=head2 $setting->get_int_safe ()
+
+safely get int value, returns 0 on type mismatch (libconfig >= 1.8).
+
+=head2 $setting->get_int64_safe ()
+
+safely get int64 value, returns 0 on type mismatch (libconfig >= 1.8).
+
+=head2 $setting->get_float_safe ()
+
+safely get float value, returns 0.0 on type mismatch (libconfig >= 1.8).
+
+=head2 $setting->get_bool_safe ()
+
+safely get bool value, returns 0 on type mismatch (libconfig >= 1.8).
+
+=head2 $setting->get_string_safe ()
+
+safely get string value, returns empty string on type mismatch (libconfig >= 1.8).
+
+=head2 $setting->set_format ($format)
+
+set the numeric format for this setting (libconfig >= 1.8). See C<CONFIG_FORMAT_*> constants.
+
+=head2 $setting->get_format ()
+
+get the numeric format of this setting (libconfig >= 1.8).
+
+=head2 $setting->is_scalar ()
+
+returns true if this setting is a scalar type (int, int64, float, bool, string).
+
+=head2 $setting->is_aggregate ()
+
+returns true if this setting is an aggregate type (group, array, list).
+
+=head2 $setting->is_group ()
+
+returns true if this setting is a group.
+
+=head2 $setting->is_array ()
+
+returns true if this setting is an array.
+
+=head2 $setting->is_list ()
+
+returns true if this setting is a list.
+
+=head2 $setting->is_number ()
+
+returns true if this setting is a numeric type (int, int64, float).
+
+=head2 $setting->name ()
+
+get the name of this setting.
+
+=head2 $setting->parent ()
+
+get the parent setting, or NULL for root.
+
+=head2 $setting->is_root ()
+
+returns true if this setting is the root.
+
+=head2 $setting->index ()
+
+get the index of this setting within its parent.
+
+=head2 $setting->source_line ()
+
+get the source file line number where this setting was defined.
+
+=head2 $setting->source_file ()
+
+get the source file name where this setting was defined.
+
+=head2 $setting->set_hook ($hook)
+
+set a custom hook pointer on this setting (libconfig >= 1.4).
+
+=head2 $setting->get_hook ()
+
+get the custom hook pointer from this setting (libconfig >= 1.4).
+
 =head2 $setting->length ()
 
 return count of setting resource.
@@ -206,6 +445,10 @@ return count of setting resource.
 =head2 $setting->get_item ($i)
 
 return value of the $i item.
+
+=head2 $setting->get_elem ($idx)
+
+return the child setting at index $idx as a Settings object.
 
 =head2 $setting->get_type ()
 

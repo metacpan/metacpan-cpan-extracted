@@ -6,11 +6,10 @@ README.md
 cpanfile
 lib/Captcha/reCAPTCHA/V3.pm
 minil.toml
-share/Plack.pl
-share/template.tx
 t/00_compile.t
 t/01_compatibility.t
 t/02_javascript.t
 t/03_overload.t
+t/04_verify_integration.t
 META.yml
 MANIFEST

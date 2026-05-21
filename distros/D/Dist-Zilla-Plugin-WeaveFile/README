@@ -1,5 +1,5 @@
 This archive contains the distribution Dist-Zilla-Plugin-WeaveFile,
-version 0.002:
+version 0.003:
 
   Keep files updated in a repository by weaving them from POD documents and other files, and then testing their content.
 

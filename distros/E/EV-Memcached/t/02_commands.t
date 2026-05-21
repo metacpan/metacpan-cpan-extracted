@@ -163,6 +163,37 @@ my $prefix = "ev_mc_test_$$\_";
     run_with_timeout();
 }
 
+# --- INCR auto-create with $initial and $expiry (20-byte extras) ---
+{
+    my $key = "${prefix}incr_auto_$$";  # ensure non-existent
+    $mc->incr($key, 1, 42, 60, sub {
+        my ($val, $err) = @_;
+        ok(!$err, "incr auto-create: no error");
+        is($val, 42, "incr auto-create: returns initial value");
+
+        $mc->incr($key, 8, sub {
+            my ($val, $err) = @_;
+            is($val, 50, "incr auto-create: subsequent incr 42 + 8 = 50");
+            EV::break;
+        });
+    });
+    run_with_timeout();
+}
+
+# --- DECR clamps at 0 (never negative) ---
+{
+    my $key = "${prefix}decr_clamp";
+    $mc->set($key, "3", sub {
+        $mc->decr($key, 10, sub {
+            my ($val, $err) = @_;
+            ok(!$err, "decr clamp: no error");
+            is($val, 0, "decr clamp: 3 - 10 clamped to 0 (unsigned read)");
+            EV::break;
+        });
+    });
+    run_with_timeout();
+}
+
 # --- APPEND / PREPEND ---
 {
     my $key = "${prefix}appendtest";
@@ -236,6 +267,35 @@ my $prefix = "ev_mc_test_$$\_";
     run_with_timeout();
 }
 
+# --- STATS with named group (argument-parsing path) ---
+{
+    $mc->stats("settings", sub {
+        my ($stats, $err) = @_;
+        ok(!$err, "stats(name): no error");
+        is(ref $stats, 'HASH', "stats(name): returns hashref");
+        ok(exists $stats->{maxbytes}, "stats(name): settings group has maxbytes");
+        EV::break;
+    });
+    run_with_timeout();
+}
+
+# --- APPEND/PREPEND on non-existent key returns NOT_STORED ---
+{
+    my $key = "${prefix}missing_appendpath";  # nonexistent
+    $mc->append($key, "data", sub {
+        my ($res, $err) = @_;
+        ok($err, "append on missing key: error returned");
+        like($err, qr/NOT_STORED/, "append on missing key: NOT_STORED error");
+        $mc->prepend($key, "x", sub {
+            my ($res, $err) = @_;
+            ok($err, "prepend on missing key: error returned");
+            like($err, qr/NOT_STORED/, "prepend on missing key: NOT_STORED error");
+            EV::break;
+        });
+    });
+    run_with_timeout();
+}
+
 # --- NOOP ---
 {
     $mc->noop(sub {
@@ -278,6 +338,20 @@ my $prefix = "ev_mc_test_$$\_";
             }
         });
     }
+    run_with_timeout();
+}
+
+# --- FLUSH with delay encodes 4-byte extras ---
+# Note: an immediate flush is issued right after to cancel the pending
+# delay (flush() with no extras supersedes the schedule). Otherwise the
+# delayed flush would wipe data in subsequent test files.
+{
+    $mc->flush(1, sub {
+        my ($res, $err) = @_;
+        ok(!$err, "flush(delay): no error");
+        ok($res, "flush(delay): success");
+        $mc->flush(sub { EV::break });
+    });
     run_with_timeout();
 }
 

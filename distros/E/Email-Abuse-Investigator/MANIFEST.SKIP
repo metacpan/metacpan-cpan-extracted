@@ -69,3 +69,4 @@ schemas\.yml$
 Mail-.*
 .test-script-*
 typescript
+mutation.json

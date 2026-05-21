@@ -1,0 +1,93 @@
+=pod
+
+=head1 OVERVIEW
+
+=head2 Class Hierarchy
+
+The following diagram shows the main inheritance tree of TUI::Vision.
+Indentation represents inheritance (derived classes are indented).
+
+    TObject
+    |
+    +- TView
+    |  |
+    |  +- TFrame
+    |  +- TScrollBar
+    |  +- TScroller
+    |  |  +- TTextDevice
+    |  |     +- TTerminal
+    |  |
+    |  +- TStaticText
+    |  |  +- TLabel
+    |  |  +- TParamText
+    |  |
+    |  +- TInputLine
+    |  |  +- TFileInputLine
+    |  |
+    |  +- TButton
+    |  +- TCluster
+    |  |  +- TRadioButtons
+    |  |  +- TCheckBoxes
+    |  |  +- TMultiCheckBoxes
+    |  |
+    |  +- TListViewer
+    |  |  +- TListBox
+    |  |  |  +- TEditListBox
+    |  |  |  +- TSortedListBox
+    |  |  |     +- TFileList
+    |  |  +- THistoryViewer
+    |  |
+    |  +- THistory
+    |  +- TMenuView
+    |  |  +- TMenuBar
+    |  |  +- TMenuBox
+    |  |     +- TMenuPopup
+    |  |
+    |  +- TStatusLine
+    |  +- TClockView
+    |  +- THeapView
+    |  +- TEventViewer
+    |
+    +- TGroup
+    |  |
+    |  +- TWindow
+    |  |  |
+    |  |  +- TDialog
+    |  |  |  +- TFileDialog
+    |  |  |  +- TChDirDialog
+    |  |  |  +- TColorDialog
+    |  |  |
+    |  |  +- THistoryWindow
+    |  |
+    |  +- TDeskTop
+    |  +- TProgram
+    |     +- TApplication
+    |
+    +- TCollection
+       |
+       +- TSortedCollection
+       |  +- TStringCollection
+       |  +- TFileCollection
+       |
+       +- TDirCollection
+
+
+=head2 Source Module Inventory
+
+  lib/TUI/
+    +-- App/      - TProgram, TApplication, TDeskTop, TBackground, etc.
+    +-- Dialogs/  - TDialog, TButton, TInputLine, TLabel, etc.
+    +-- Drivers/  - TEvent, TScreen, TEventQueue, THardwareInfo, etc.
+    +-- Editors/  - TEditor, TMemo, TFileEditor, TIndicator, etc.
+    +-- Gadgets/  - TClickTester, TEventViewer, THeapView, etc.
+    +-- Help/     - THelpFile, THelpTopic, THelpViewer, etc.
+    +-- Memory/   - Memory manager
+    +-- Menus/    - TMenuBar, TMenuBox, TStatusLine, etc.
+    +-- Objects/  - TObject, TPoint, TRect, TCollection, TSortedCollection, etc.
+    +-- StdDlg/   - TFileDialog, TChDirDialog, TDirListBox, etc.
+    +-- TextView/ - TTextDevice, TTerminal, etc.
+    +-- toolkit/  - Object toolkit
+    +-- Validate/ - TValidator, TFilterValidator, TPXPictureValidator, etc.
+    +-- Views/    - TDrawBuffer, TView, TGroup, TFrame, TScroller, TWindow, etc.
+
+=cut

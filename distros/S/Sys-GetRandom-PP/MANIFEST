@@ -1,5 +1,4 @@
 Changes
-_Bits.pm.PL
 lib/Sys/GetRandom/PP.pm
 Makefile.PL
 Makefile_PL_settings.plx

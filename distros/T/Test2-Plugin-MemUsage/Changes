@@ -1,3 +1,33 @@
+0.002006  2026-04-28 22:09:45-07:00 America/Los_Angeles
+
+    - Add [PruneCruft] to dist.ini so blib/ and pm_to_blib are excluded
+      from the released tarball (GH #1)
+    - Drop the "< 100 GB sanity" upper bound on rss/size in t/ps.t real
+      collect subtest; macOS reports virtual size well above 100 GB,
+      causing spurious failures (GH #3)
+
+0.002005  2026-04-26 01:49:37-07:00 America/Los_Angeles
+
+    - Replace defined-or (//) operator with explicit defined() checks so
+      the module loads on the declared MIN_PERL_VERSION 5.008009
+    - Use 'ps -o rss= -o vsz= -p $$' instead of 'ps -o rss=,vsz= -p $$'
+      so FreeBSD's ps parses the format string correctly (it treated
+      the comma as part of the rss= header)
+    - Force the linux _collect_proc collector inside t/memusage.t so
+      the mocked t/procfile drives the assertions on every host (the
+      previous mock was ignored on *BSD/Solaris/MSWin32, which used
+      their native collectors and produced unrelated values)
+    - Skip the real-* subtests in t/ps.t when ps exits non-zero or
+      returns output our parser cannot match (covers BusyBox/Alpine
+      and FreeBSD ps differences)
+    - Skip the real-* subtests in t/proc.t on non-Linux hosts; Solaris
+      /proc/PID/status is a binary pstatus_t struct, not the Linux
+      text format
+    - Guard t/win32.t real-* subtests with defined() checks on
+      GetProcessMemoryInfo and short-circuit after a failed lives
+      check so a single broken Win32::Process::Memory install does
+      not cascade into multiple failures
+
 0.002004  2026-04-25 07:18:08-07:00 America/Los_Angeles
 
     - Fix broken grep filter in send_mem_event that referenced @_ of

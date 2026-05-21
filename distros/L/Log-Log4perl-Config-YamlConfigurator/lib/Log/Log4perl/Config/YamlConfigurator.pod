@@ -17,7 +17,7 @@ Log::Log4perl::Config::YamlConfigurator - Reads Log4perl YAML configurations
     category:
       Foo:
         Bar:
-          name: DEBUG, SCREEN, FILE
+          name: ${level}, SCREEN, FILE
           Baz: INFO, FILE
     additivity:
       Foo:
@@ -28,7 +28,7 @@ Log::Log4perl::Config::YamlConfigurator - Reads Log4perl YAML configurations
         layout: Log::Log4perl::Layout::SimpleLayout
       FILE: 
         name: Log::Log4perl::Appender::File
-        filename: file.log
+        filename: file.${DATE}.log
         mode: append
         create_at_logtime: 1
         layout:
@@ -41,17 +41,24 @@ Log::Log4perl::Config::YamlConfigurator - Reads Log4perl YAML configurations
         layout: Log::Log4perl::Layout::SimpleLayout
   EOT
 
+  # Create configurator object with external variables to be substituted
+  # while parsing
   my $configurator = Log::Log4perl::Config::YamlConfigurator->new(
-    data => Load( $text )
+    data  => Load( $text ),
+    subst => { level => 'DEBUG' }
   );
 
   # or
 
   my $configurator = Log::Log4perl::Config::YamlConfigurator->new(
-    text => [ $text ]
+    text  => [ $text ],
+    subst => { level => 'DEBUG' }
   );
 
-  # calls $configurator->parse implicitly
+  # Set environment variables to be substituted while parsing
+  local $ENV{ DATE } = '2026-05-05';
+
+  # Calls $configurator->parse implicitly
   Log::Log4perl->init( $configurator );
 
   # or
@@ -60,7 +67,7 @@ Log::Log4perl::Config::YamlConfigurator - Reads Log4perl YAML configurations
 
   my $appender = $configurator->create_appender_instance( 'STDERR' );
 
-  # add appender to a given logger object
+  # Add appender to a given logger object
   $logger->add_appender( $appender );
 
 =head1 DESCRIPTION
@@ -73,19 +80,25 @@ configurations.
 
 =head2 new()
 
-The constructor has one additional optional parameter C<data>. Its value is a
-specific Perl data structure: a HASH reference with the mandatory keys
-C<category>, and C<appender>. Optional keys are C<rootLogger>, C<additivity>,
-and some more. The HASH reference is usually the return value of a
-C<YAML::PP::Load()> function call, if a Log4perl configuration is passed as a
-YAML stream to this function. Alternatively you may use the C<text> parameter
-to pass the Log4perl YAML configuration directly to the constructor.
+The constructor has two additional optional attributes C<data> and C<subst>.
+
+The value of the C<data> attribute is a specific Perl data structure: a HASH
+reference with the mandatory keys C<category>, and C<appender>. Optional
+keys are C<rootLogger>, C<additivity>, and some more. The HASH reference is
+usually the return value of a C<YAML::PP::Load()> function call, if a Log4perl
+configuration is passed as a YAML stream to this function. Alternatively
+you may use the C<text> attribute to pass the Log4perl YAML configuration
+directly to the constructor.
+
+The value of the C<subst> attribute is a HASH reference. The keys are variable
+names used for L<Log::Log4perl/Variable-Substitution>.
 
 =head2 parse()
 
 The implementation of this abstract object method fulfills the
-L<Log::Log4perl::Config::BaseConfigurator/Parser-requirements>. It does not
-provide variable substitution functionality yet.
+L<Log::Log4perl::Config::BaseConfigurator/Parser-requirements>. It does provide
+external variable (based on the C<subst> attribute) and environment variable
+(based on L<perlvar/%ENV>) substitution functionality.
 
 =head2 create_appender_instance()
 

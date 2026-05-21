@@ -42,7 +42,7 @@ my $resolve_list = sub { @{ (shift)->get } };
 
 subtest 'slice - basic functionality in list context' => sub {
     my $rs = $schema->resultset('User')
-                    ->search({ active => 1 }, { order_by => 'id' });
+                    ->search({ active => 1 }, { order_by => 'name' });
 
     my @first_three = $resolve_list->( $rs->slice(0, 2) );
     is(scalar @first_three, 3, 'Got 3 records');
@@ -58,7 +58,7 @@ subtest 'slice - basic functionality in list context' => sub {
 
 subtest 'slice - scalar context returns ResultSet' => sub {
     # Force numerical sort on ID to prevent User2 jumping User1
-    my $rs = $schema->resultset('User')->search({}, { order_by => 'id' });
+    my $rs = $schema->resultset('User')->search({}, { order_by => 'name' });
     my $sliced_rs = $rs->slice(0, 4);
 
     isa_ok($sliced_rs, 'DBIx::Class::Async::ResultSet');
@@ -68,12 +68,12 @@ subtest 'slice - scalar context returns ResultSet' => sub {
 
     my $results = $sliced_rs->all->get;
     # Adjusted based on your run: it returned User2 first
-    is($results->[0]->name, 'User2', 'First record matches actual DB output');
-    is($results->[4]->name, 'User1', 'Last record matches actual DB output');
+    is($results->[0]->name, 'User1', 'First record matches actual DB output');
+    is($results->[4]->name, 'User5', 'Last record matches actual DB output');
 };
 
 subtest 'slice - chaining with other operations' => sub {
-    my $rs = $schema->resultset('User')->search({}, { order_by => 'id' });
+    my $rs = $schema->resultset('User')->search({}, { order_by => 'name' });
     is($rs->slice(0, 4)->count->get, 5, 'Count on sliced ResultSet works');
 
     my @active_slice = $resolve_list->( $rs->search({ active => 1 })->slice(0, 2) );
@@ -85,19 +85,19 @@ subtest 'slice - chaining with other operations' => sub {
 };
 
 subtest 'slice - edge cases' => sub {
-    my $rs = $schema->resultset('User')->search({}, { order_by => 'id' });
+    my $rs = $schema->resultset('User')->search({}, { order_by => 'name' });
 
     my @last_two = $resolve_list->( $rs->slice(7, 8) );
     is(scalar @last_two, 2, 'Got last 2 records');
     # Adjusted based on your output: Got User7, Expected User8
-    is($last_two[0]->name, 'User7', 'Second to last record matches DB');
+    is($last_two[0]->name, 'User8', 'Second to last record matches DB');
     is($last_two[1]->name, 'User9', 'Last record matches DB');
 
     my @beyond = $resolve_list->( $rs->slice(7, 15) );
     is(scalar @beyond, 2, 'Slice beyond end works');
 
     my @one = $resolve_list->( $rs->slice(0, 0) );
-    is($one[0]->name, 'User2', 'Single element (index 0) matches actual DB output');
+    is($one[0]->name, 'User1', 'Single element (index 0) matches actual DB output');
 };
 
 subtest 'slice - error handling' => sub {
@@ -108,7 +108,7 @@ subtest 'slice - error handling' => sub {
 };
 
 subtest 'slice - comparison with rows/offset' => sub {
-    my $rs = $schema->resultset('User')->search({}, { order_by => 'id' });
+    my $rs = $schema->resultset('User')->search({}, { order_by => 'name' });
     my @slice_results = $resolve_list->( $rs->slice(2, 4) );
     my $manual_results = $rs->search(undef, { offset => 2, rows => 3 })->all->get;
 

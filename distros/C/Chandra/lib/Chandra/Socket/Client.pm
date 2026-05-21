@@ -5,7 +5,7 @@ use warnings;
 
 use Chandra::Socket::Connection;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use Chandra;
 
@@ -24,13 +24,13 @@ Chandra::Socket::Client - IPC client for connecting to a Chandra Hub
 
 	use Chandra::Socket::Client;
 
-	# Unix socket — token is read automatically from the token file
+	# Unix socket - token is read automatically from the token file
 	my $client = Chandra::Socket::Client->new(
 	    name => 'window-1',
 	    hub  => 'myapp',
 	);
 
-	# TCP — token must be passed explicitly
+	# TCP - token must be passed explicitly
 	my $client = Chandra::Socket::Client->new(
 	    name      => 'remote-1',
 	    transport => 'tcp',

@@ -37,6 +37,7 @@
             "Pod::Markdown::Github" : "0",
             "Software::Security::Policy::Individual" : "0.10",
             "Test::CVE" : "0.08",
+            "Test::DistManifest" : "0",
             "Test::EOF" : "0",
             "Test::EOL" : "0",
             "Test::Fixme" : "0",
@@ -84,7 +85,7 @@
    "provides" : {
       "Plack::Middleware::BlockHeaderInjection" : {
          "file" : "lib/Plack/Middleware/BlockHeaderInjection.pm",
-         "version" : "v1.3.0"
+         "version" : "v1.3.1"
       }
    },
    "release_status" : "stable",
@@ -98,7 +99,7 @@
          "web" : "https://github.com/robrwo/Plack-Middleware-BlockHeaderInjection"
       }
    },
-   "version" : "v1.3.0",
+   "version" : "v1.3.1",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Graham Knop <haarg@haarg.org>"

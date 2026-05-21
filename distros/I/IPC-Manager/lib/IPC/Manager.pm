@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use feature qw/state/;
 
-our $VERSION = '0.000035';
+our $VERSION = '0.000037';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
@@ -79,6 +79,24 @@ sub _parse_protocol {
     return $protocol;
 }
 
+# Map DBI driver name (from $dbh->{Driver}{Name}) to an
+# IPC::Manager::Client::* protocol class.
+my %DBD_PROTOCOL_MAP = (
+    Pg      => 'PostgreSQL',
+    MariaDB => 'MariaDB',
+    mysql   => 'MariaDB',
+    SQLite  => 'SQLite',
+);
+
+sub _protocol_from_dbh {
+    my $dbh = shift;
+    my $drv = eval { $dbh->{Driver}->{Name} }
+        or croak "Could not introspect DBI driver from \$dbh: $@";
+    my $proto = $DBD_PROTOCOL_MAP{$drv}
+        or croak "No IPC::Manager protocol mapping for DBI driver '$drv'";
+    return _parse_protocol($proto);
+}
+
 sub _serializer_class {
     my $name = shift;
     $name = "IPC::Manager::Serializer::$name"
@@ -121,7 +139,27 @@ sub _parse_serializer {
 sub _connect {
     my ($meth, $id, $cinfo, %params) = @_;
 
-    my ($protocol, $serializer, $route) = _parse_cinfo($cinfo);
+    # Two cinfo shapes:
+    #   - normal cinfo (string/arrayref): parse it for [protocol, serializer, route]
+    #   - hashref of params (caller passes dbh + protocol omitted): derive
+    #     protocol from $dbh, route from $dbh->{Driver}{Name} + ->{Name}
+    if (ref($cinfo) eq 'HASH') {
+        %params = (%$cinfo, %params);
+        $cinfo = undef;
+    }
+
+    my ($protocol, $serializer, $route);
+    if (!defined($cinfo) && $params{dbh}) {
+        $protocol   = delete($params{protocol})
+            ? _parse_protocol(delete $params{protocol})
+            : _protocol_from_dbh($params{dbh});
+        require_mod($protocol);
+        $route      = delete($params{route}) // $protocol->route_from_dbh($params{dbh});
+        $serializer = _parse_serializer(delete($params{serializer}) // ipcm_default_serializer());
+    }
+    else {
+        ($protocol, $serializer, $route) = _parse_cinfo($cinfo);
+    }
 
     return $protocol->$meth($id, $serializer, $route, %params);
 }
@@ -191,7 +229,11 @@ sub ipcm_spawn {
     my $protocol        = delete $params{protocol}        // ipcm_default_protocol();
     my $protocols       = delete $params{protocols}       // ipcm_default_protocol_list();
 
-    if ($protocol) {
+    if (!$protocol && $params{dbh}) {
+        $protocol = _protocol_from_dbh($params{dbh});
+        require_mod($protocol);
+    }
+    elsif ($protocol) {
         $protocol = _parse_protocol($protocol);
         require_mod($protocol);
     }
@@ -340,6 +382,8 @@ C<ipcm_spawn> / C<ipcm_connect> calls with the same spec reuse it.
 
 =item $ipcm = ipcm_spawn(serializer => 'JSON', guard => 1, signal => $SIGNAL)
 
+=item $ipcm = ipcm_spawn(dbh => $dbh)
+
 This will create a new data store for IPC. By default it will be temporary and
 will be destroyed when the $ipcm object falls out of scope.
 
@@ -371,6 +415,40 @@ If you want to narrow down to a specific set of protocols you may provide a
 list: C<< protocols => [ 'AtomicPipe', 'UnixSocket', 'PostgreSQL', ... ] >>.
 The first viable protocol will be used.
 
+B<Spawning against an existing DBI handle.>
+For DBI-backed protocols you may pass C<< dbh => $dbh >> instead of letting
+the protocol bootstrap its own database. The protocol is auto-detected from
+C<< $dbh->{Driver}{Name} >> using this map:
+
+    Pg      -> IPC::Manager::Client::PostgreSQL
+    MariaDB -> IPC::Manager::Client::MariaDB
+    mysql   -> IPC::Manager::Client::MariaDB   (see DBD::mysql note below)
+    SQLite  -> IPC::Manager::Client::SQLite
+
+You can still pass C<< protocol => $CLASS >> alongside C<< dbh => $dbh >> to
+override the auto-detection.
+
+C<ipcm_spawn> runs C<init_db> against the supplied handle to create the
+C<ipcm_peers> and C<ipcm_messages> tables, then returns a Spawn object whose
+route is reassembled from C<< $dbh->{Driver}{Name} >> and C<< $dbh->{Name} >>
+so that the C<< $ipcm->info >> string is still usable by peers reconnecting
+from another process (each peer constructs its own DBI handle from the
+reassembled DSN — the in-process handle is not, and cannot be, shared
+across processes).
+
+Useful for embedding IPC::Manager inside an application that already owns a
+DBI connection without forcing it to bootstrap a separate one (e.g. you
+already have a long-lived $dbh in a web app and want to use the same
+database for IPC).
+
+B<DBD::mysql note.>
+C<IPC::Manager::Client::MySQL> is built against L<DBD::MariaDB>, not
+L<DBD::mysql>. If you happen to pass in a C<$dbh> whose driver name is
+C<mysql>, it is tolerated — the auto-detect map points it at the MariaDB
+client class and things will normally work — but C<DBD::mysql> is not in
+the dependency list and is not exercised by the test suite, so this path
+is best-effort only. Prefer L<DBD::MariaDB>.
+
 The object returned is an instance of L<IPC::Manager::Spawn>.
 
 =item $con = ipcm_connect($name => $info)
@@ -394,6 +472,20 @@ string itself is always plain JSON; only message payloads carried over the
 chosen protocol are subject to the serializer's encoding (e.g. zstd
 compression). The route is protocol specific, it may be a file, a directory,
 a DBI DSN string, etc.
+
+=item $con = ipcm_connect($name, undef, dbh => $dbh)
+
+=item $con = ipcm_reconnect($name, undef, dbh => $dbh)
+
+For DBI-backed protocols you may pass a pre-connected C<$dbh> in place of an
+C<$info> string. The protocol is auto-detected from C<< $dbh->{Driver}{Name} >>
+(same map as documented under C<ipcm_spawn>), the route is reassembled from
+C<< $dbh->{Driver}{Name} + $dbh->{Name} >> for storage in the resulting
+Client object, and the Client reuses the supplied handle directly instead of
+calling C<< DBI->connect >>.
+
+The same C<DBD::mysql>-is-tolerated-not-supported caveat applies — see the
+C<ipcm_spawn> section above.
 
 =item $con = ipcm_reconnect($name => $info)
 

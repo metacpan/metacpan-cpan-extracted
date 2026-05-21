@@ -6,7 +6,7 @@ use warnings;
 # Load XS functions from Chandra bootstrap
 use Chandra ();
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 1;
 
@@ -28,7 +28,7 @@ Chandra::Assets - Asset bundling and resource loading for Chandra apps
     # Register with app (sets up protocol handler)
     $assets->mount($app);
 
-    # Now in HTML — use data-href / data-src to avoid console
+    # Now in HTML - use data-href / data-src to avoid console
     # "unsupported URL" warnings from the native resource loader:
     # <link rel="stylesheet" data-href="app://css/style.css">
     # <script data-src="app://js/main.js"></script>

@@ -85,7 +85,7 @@ use parent qw(NetBox::Client::Common);
 use Class::Load qw(:all);
 use Class::XSAccessor {
     'accessors' => [ qw(errno errmsg) ],
-    'getters' =>   [ qw(baseurl headers limit mode sslcheck timeout token ua) ],
+    'getters' =>   [ qw(baseurl headers limit mode sslcheck timeout token ua version) ],
 };
 use Data::Dumper;
 use JSON;
@@ -98,12 +98,13 @@ use constant {
     #{{{
     DEFAULTS => {
         'baseurl'  => 'http://localhost:8001',
+        'key'      => undef,
         'mode'     => 'rest',
         'token'    => '',
         'limit'    => 250,
         'timeout'  => 15,
         'sslcheck' => 1,
-        'quiet'    => 1
+        'quiet'    => 1,
     },
     MODULES        => { 'rest' => 'REST', 'graphql' => 'GraphQL' },
 }; #}}}
@@ -140,6 +141,7 @@ NetBox::Client object constructor. Is used as follows:
                                                                                                                                     
     my $netbox = NetBox::Client->new(
         'baseurl' => 'http://localhost:8001',
+        'key'     => 'authorization+key',
         'token'   => 'authorization+token',
         'mode'    => 'rest',
     );
@@ -155,6 +157,14 @@ NetBox instance base URL. Mandatory. Defaults to 'http://localhost:8001'.
 =item B<token> => STRING
 
 Authorization token. Mandatory. Defaults to empty string.
+
+=item B<key> => STRING
+
+Authorization key. Optional. If set, v2 authorization schema will be used,
+v1 (legacy) otherwise.
+
+It is highly recommended to deploy v2 token format since v1 tokens will be
+obsoleted in NetBox 4.6+ releases.
 
 =item B<mode> => 'rest' | 'graphql'
 
@@ -183,9 +193,9 @@ Be quiet when set to `true` (which is default). Currently not implemented.
 =cut #}}}
 
     my $self = bless {
-        'errno'  => NetBox::Client::Common::E_OK->[0],
-        'errmsg' => NetBox::Client::Common::E_OK->[1],
-        'error'  => boolean::false,
+        'errno'   => NetBox::Client::Common::E_OK->[0],
+        'errmsg'  => NetBox::Client::Common::E_OK->[1],
+        'error'   => boolean::false,
     }, __PACKAGE__;
     foreach my $key (keys %{(DEFAULTS)}) {
         $self->{$key} = defined($options{$key})
@@ -195,11 +205,10 @@ Be quiet when set to `true` (which is default). Currently not implemented.
     $self->{'baseurl'} .= ($self->{'mode'} eq 'graphql')
         ? '/graphql/'
         : '/api';
-    $self->{'headers'} = {
-        'Accept'        => 'application/json',
-        'Authorization' => sprintf('Token %s', $self->{'token'}),
-        'Content-Type'  => 'application/json',
-    };
+    $self->{'headers'} = { 'Accept' => 'application/json', 'Content-Type' => 'application/json', };
+    $self->{'headers'}{'Authorization'} = defined $self->{'key'}
+        ? sprintf('Bearer nbt_%s.%s', $self->{'key'}, $self->{'token'})
+        : sprintf('Token %s', $self->{'token'});
     $self->{'ua'} = LWP::UserAgent->new(
         'protocols_allowed' => [ qw(http https) ],
         'ssl_opts'          => { 'verify_hostname' => $self->{'sslcheck'} },
@@ -492,6 +501,14 @@ sub DESTROY {}
 =back
 
 =head1 B<CHANGELOG>
+
+=head3 v0.2.0 - 2026-05-06
+
+=over 4
+
+=item added v2 authorization token support;
+
+=back
 
 =head3 v0.1.7 - 2026-04-03
 

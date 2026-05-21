@@ -1,0 +1,33 @@
+{
+  "lastUpdated": "2026-04-01T12:00:00Z",
+  "cmps": {
+    "21": {
+      "id": 21,
+      "name": "Traffective GmbH",
+      "isCommercial": true,
+      "deletedDate": null
+    },
+    "3": {
+      "id": 3,
+      "name": "LiveRamp",
+      "deletedDate": "2024-11-13T14:55:31Z",
+      "isCommercial": true
+    },
+    "10": {
+      "id": 10,
+      "name": "InMobi PTE Ltd",
+      "isCommercial": true
+    },
+    "489": {
+      "id": 489,
+      "name": "Mindearth SRL",
+      "deletedDate": "2025-11-24T16:34:27Z",
+      "isCommercial": false
+    },
+    "999": {
+      "id": 999,
+      "name": "Future Deleted",
+      "deletedDate": "2026-12-31T23:59:59Z"
+    }
+  }
+}

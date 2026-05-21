@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1
-#                   and LibVirt version v11.10.0
+#                   and LibVirt version v12.3.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -16,12 +16,12 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad;
 
-class Sys::Async::Virt::DomainCheckpoint v0.2.3;
+class Sys::Async::Virt::DomainCheckpoint v0.6.3;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v11.10.1;
+use Protocol::Sys::Virt::Remote::XDR v12.3.0;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -39,32 +39,40 @@ use constant {
 };
 
 
-field $_id :param :reader;
+field $_rpc_id :param :reader;
 field $_client :param :reader;
+
+method domain() {
+    return $_client->_domain_instance( $_rpc_id->{dom} );
+}
+
+method name() {
+    return $_rpc_id->{name};
+}
 
 
 method delete($flags = 0) {
     return $_client->_call(
         $remote->PROC_DOMAIN_CHECKPOINT_DELETE,
-        { checkpoint => $_id, flags => $flags // 0 }, empty => 1 );
+        { checkpoint => $_rpc_id, flags => $flags // 0 }, empty => 1 );
 }
 
 async method get_parent($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_CHECKPOINT_GET_PARENT,
-        { checkpoint => $_id, flags => $flags // 0 }, unwrap => 'parent' );
+        { checkpoint => $_rpc_id, flags => $flags // 0 }, unwrap => 'parent' );
 }
 
 async method get_xml_desc($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_CHECKPOINT_GET_XML_DESC,
-        { checkpoint => $_id, flags => $flags // 0 }, unwrap => 'xml' );
+        { checkpoint => $_rpc_id, flags => $flags // 0 }, unwrap => 'xml' );
 }
 
 async method list_all_children($flags = 0) {
     return await $_client->_call(
         $remote->PROC_DOMAIN_CHECKPOINT_LIST_ALL_CHILDREN,
-        { checkpoint => $_id, need_results => $remote->DOMAIN_SNAPSHOT_LIST_MAX, flags => $flags // 0 }, unwrap => 'checkpoints' );
+        { checkpoint => $_rpc_id, need_results => $remote->DOMAIN_SNAPSHOT_LIST_MAX, flags => $flags // 0 }, unwrap => 'checkpoints' );
 }
 
 
@@ -80,7 +88,7 @@ Sys::Async::Virt::DomainCheckpoint - Client side proxy to remote LibVirt domain 
 
 =head1 VERSION
 
-v0.2.3
+v0.6.3
 
 =head1 SYNOPSIS
 
@@ -105,6 +113,18 @@ No (LibVirt) events available for domain checkpoints.
 Not to be called directly. Various APIs return instances of this type.
 
 =head1 METHODS
+
+=head2 domain
+
+  my $dom = $checkpoint->domain;
+
+Returns the L<Sys::Async::Virt::Domain> instance this is a checkpoint of.
+
+=head2 name
+
+  $name = $checkpoint->name;
+
+Returns the name of the domain checkpoint.
 
 =head2 delete
 
@@ -142,6 +162,15 @@ See documentation of L<virDomainCheckpointListAllChildren|https://libvirt.org/ht
 
 =head1 CONSTANTS
 
+
+   my $value = Sys::Async::Virt::DomainCheckpoint->XML_SECURE;
+
+   # - or -
+
+   my $value = $checkpoint->XML_SECURE;
+
+
+
 =over 8
 
 =item XML_SECURE
@@ -175,7 +204,7 @@ L<LibVirt|https://libvirt.org>, L<Sys::Virt>
 =head1 LICENSE AND COPYRIGHT
 
 
-  Copyright (C) 2024-2025 Erik Huelsmann
+  Copyright (C) 2024-2026 Erik Huelsmann
 
 All rights reserved. This program is free software;
 you can redistribute it and/or modify it under the same terms as Perl itself.

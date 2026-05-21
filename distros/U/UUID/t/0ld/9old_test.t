@@ -1,6 +1,7 @@
 use warnings;
-use Test::More tests => 40;
+use MyTest;
 use UUID 'uuid';
+plan tests => 40;
 
 
 UUID::generate( $bin );
@@ -111,4 +112,4 @@ is length($rc), 36;
 $rc = UUID::uuid();
 is length($rc), 36;
 
-exit 0;
+done_testing;

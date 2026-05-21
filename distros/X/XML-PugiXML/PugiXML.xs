@@ -44,8 +44,6 @@ typedef PugiNode*  XML__PugiXML__Node;
 typedef PugiAttr*  XML__PugiXML__Attr;
 typedef PugiXPath* XML__PugiXML__XPath;
 
-/* UTF-8 input type — mapped via custom typemap to upgrade before extraction */
-typedef const char* utf8_str;
 
 #define CHECK_NODE_ALIVE(self) \
     if (self->gen_snap != *self->gen_ptr) \
@@ -161,7 +159,7 @@ CODE:
 }
 
 bool
-load_file(XML::PugiXML self, utf8_str path, unsigned int parse_options = parse_default)
+load_file(XML::PugiXML self, const char* path, unsigned int parse_options = parse_default)
 CODE:
 {
     self->generation++;
@@ -173,7 +171,7 @@ OUTPUT:
     RETVAL
 
 bool
-load_string(XML::PugiXML self, utf8_str xml, unsigned int parse_options = parse_default)
+load_string(XML::PugiXML self, const char* xml, unsigned int parse_options = parse_default)
 CODE:
 {
     self->generation++;
@@ -193,7 +191,7 @@ CODE:
 }
 
 bool
-save_file(XML::PugiXML self, utf8_str path, const char* indent = "\t", unsigned int flags = format_default)
+save_file(XML::PugiXML self, const char* path, const char* indent = "\t", unsigned int flags = format_default)
 CODE:
 {
     RETVAL = self->doc->save_file(path, indent, flags);
@@ -229,7 +227,7 @@ OUTPUT:
     RETVAL
 
 SV*
-child(XML::PugiXML self, utf8_str name)
+child(XML::PugiXML self, const char* name)
 CODE:
 {
     xml_node child = self->doc->child(name);
@@ -239,7 +237,7 @@ OUTPUT:
     RETVAL
 
 SV*
-select_node(XML::PugiXML self, utf8_str xpath)
+select_node(XML::PugiXML self, const char* xpath)
 CODE:
 {
     try {
@@ -255,7 +253,7 @@ OUTPUT:
     RETVAL
 
 void
-select_nodes(XML::PugiXML self, utf8_str xpath)
+select_nodes(XML::PugiXML self, const char* xpath)
 PPCODE:
 {
     try {
@@ -273,7 +271,7 @@ PPCODE:
 }
 
 SV*
-compile_xpath(XML::PugiXML self, utf8_str xpath)
+compile_xpath(XML::PugiXML self, const char* xpath)
 CODE:
 {
     PERL_UNUSED_VAR(self);
@@ -388,7 +386,7 @@ OUTPUT:
     RETVAL
 
 SV*
-child(XML::PugiXML::Node self, utf8_str name)
+child(XML::PugiXML::Node self, const char* name)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -408,7 +406,7 @@ OUTPUT:
     RETVAL
 
 SV*
-next_sibling(XML::PugiXML::Node self, utf8_str name = NULL)
+next_sibling(XML::PugiXML::Node self, const char* name = NULL)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -422,7 +420,7 @@ OUTPUT:
     RETVAL
 
 SV*
-previous_sibling(XML::PugiXML::Node self, utf8_str name = NULL)
+previous_sibling(XML::PugiXML::Node self, const char* name = NULL)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -446,7 +444,7 @@ OUTPUT:
     RETVAL
 
 void
-children(XML::PugiXML::Node self, utf8_str name = NULL)
+children(XML::PugiXML::Node self, const char* name = NULL)
 PPCODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -469,7 +467,7 @@ PPCODE:
 }
 
 SV*
-attr(XML::PugiXML::Node self, utf8_str name)
+attr(XML::PugiXML::Node self, const char* name)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -479,7 +477,7 @@ OUTPUT:
     RETVAL
 
 SV*
-append_child(XML::PugiXML::Node self, utf8_str name)
+append_child(XML::PugiXML::Node self, const char* name)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -490,7 +488,7 @@ OUTPUT:
     RETVAL
 
 SV*
-prepend_child(XML::PugiXML::Node self, utf8_str name)
+prepend_child(XML::PugiXML::Node self, const char* name)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -501,7 +499,7 @@ OUTPUT:
     RETVAL
 
 SV*
-insert_child_before(XML::PugiXML::Node self, utf8_str name, XML::PugiXML::Node ref_node)
+insert_child_before(XML::PugiXML::Node self, const char* name, XML::PugiXML::Node ref_node)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -513,7 +511,7 @@ OUTPUT:
     RETVAL
 
 SV*
-insert_child_after(XML::PugiXML::Node self, utf8_str name, XML::PugiXML::Node ref_node)
+insert_child_after(XML::PugiXML::Node self, const char* name, XML::PugiXML::Node ref_node)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -525,7 +523,7 @@ OUTPUT:
     RETVAL
 
 SV*
-append_cdata(XML::PugiXML::Node self, utf8_str content)
+append_cdata(XML::PugiXML::Node self, const char* content)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -539,7 +537,7 @@ OUTPUT:
     RETVAL
 
 SV*
-append_comment(XML::PugiXML::Node self, utf8_str content)
+append_comment(XML::PugiXML::Node self, const char* content)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -574,7 +572,7 @@ OUTPUT:
     RETVAL
 
 SV*
-find_child_by_attribute(XML::PugiXML::Node self, utf8_str name, utf8_str attr_name, utf8_str attr_value)
+find_child_by_attribute(XML::PugiXML::Node self, const char* name, const char* attr_name, const char* attr_value)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -597,7 +595,7 @@ OUTPUT:
     RETVAL
 
 bool
-set_name(XML::PugiXML::Node self, utf8_str name)
+set_name(XML::PugiXML::Node self, const char* name)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -607,7 +605,7 @@ OUTPUT:
     RETVAL
 
 bool
-set_value(XML::PugiXML::Node self, utf8_str value)
+set_value(XML::PugiXML::Node self, const char* value)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -617,7 +615,7 @@ OUTPUT:
     RETVAL
 
 bool
-set_text(XML::PugiXML::Node self, utf8_str text)
+set_text(XML::PugiXML::Node self, const char* text)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -627,7 +625,7 @@ OUTPUT:
     RETVAL
 
 SV*
-select_node(XML::PugiXML::Node self, utf8_str xpath)
+select_node(XML::PugiXML::Node self, const char* xpath)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -644,7 +642,7 @@ OUTPUT:
     RETVAL
 
 void
-select_nodes(XML::PugiXML::Node self, utf8_str xpath)
+select_nodes(XML::PugiXML::Node self, const char* xpath)
 PPCODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -673,7 +671,7 @@ OUTPUT:
     RETVAL
 
 SV*
-append_attr(XML::PugiXML::Node self, utf8_str name)
+append_attr(XML::PugiXML::Node self, const char* name)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -684,7 +682,7 @@ OUTPUT:
     RETVAL
 
 SV*
-prepend_attr(XML::PugiXML::Node self, utf8_str name)
+prepend_attr(XML::PugiXML::Node self, const char* name)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -706,7 +704,7 @@ OUTPUT:
     RETVAL
 
 bool
-remove_attr(XML::PugiXML::Node self, utf8_str name)
+remove_attr(XML::PugiXML::Node self, const char* name)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -766,7 +764,7 @@ OUTPUT:
     RETVAL
 
 SV*
-set_attr(XML::PugiXML::Node self, utf8_str name, utf8_str value)
+set_attr(XML::PugiXML::Node self, const char* name, const char* value)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -783,7 +781,7 @@ OUTPUT:
     RETVAL
 
 SV*
-append_pi(XML::PugiXML::Node self, utf8_str target, utf8_str data = NULL)
+append_pi(XML::PugiXML::Node self, const char* target, const char* data = NULL)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -925,7 +923,7 @@ OUTPUT:
     RETVAL
 
 bool
-set_value(XML::PugiXML::Attr self, utf8_str value)
+set_value(XML::PugiXML::Attr self, const char* value)
 CODE:
 {
     CHECK_ATTR_ALIVE(self);
@@ -935,7 +933,7 @@ OUTPUT:
     RETVAL
 
 bool
-set_name(XML::PugiXML::Attr self, utf8_str name)
+set_name(XML::PugiXML::Attr self, const char* name)
 CODE:
 {
     CHECK_ATTR_ALIVE(self);

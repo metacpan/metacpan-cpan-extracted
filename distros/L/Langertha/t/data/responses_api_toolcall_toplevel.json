@@ -1,0 +1,33 @@
+{
+  "id": "resp_real789",
+  "object": "response",
+  "status": "completed",
+  "created_at": 1761000002,
+  "model": "gpt-5.5-pro",
+  "output": [
+    {
+      "type": "reasoning",
+      "id": "rs_real",
+      "summary": []
+    },
+    {
+      "type": "function_call",
+      "id": "fc_real",
+      "call_id": "call_real789",
+      "name": "get_weather",
+      "arguments": "{\"location\":\"Berlin, Germany\",\"units\":\"celsius\"}",
+      "status": "completed"
+    }
+  ],
+  "usage": {
+    "input_tokens": 88,
+    "input_tokens_details": {
+      "cached_tokens": 0
+    },
+    "output_tokens": 24,
+    "output_tokens_details": {
+      "reasoning_tokens": 12
+    },
+    "total_tokens": 112
+  }
+}

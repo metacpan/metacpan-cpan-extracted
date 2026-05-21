@@ -1,5 +1,16 @@
 Revision history for Perl extension Google::RestApi.
 
+2.2.3 2026-04-30
+        - Declare UTF-8 charset on JSON request bodies (Content-Type:
+          application/json; charset=utf-8) so non-ASCII payloads aren't
+          mis-decoded by the server.
+        - Accept absolute token_file/account_file paths in the OAuth2Client
+          token creator script and the auth modules; resolve relative names
+          (loaded from YAML) against the auth config_file's directory, then
+          the main config_file's directory.
+        - Expand test coverage for token_file path resolution and UTF-8
+          request/response round-trips.
+
 2.2.2 2026-04-16
         - Add MIME::Lite to dependencies (was missing; required by GmailApi1).
         - Remove File::Slurp from dependencies (not used).

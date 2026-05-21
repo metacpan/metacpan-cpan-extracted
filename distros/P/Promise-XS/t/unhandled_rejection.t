@@ -273,6 +273,50 @@ use Promise::XS;
     ) or diag explain \@w;
 }
 
+# should NOT warn because all() output rejection is caught
+{
+    my @w;
+    local $SIG{'__WARN__'} = sub { push @w, @_ };
+
+    {
+        my $d1 = Promise::XS::deferred();
+        my $d2 = Promise::XS::deferred();
+
+        Promise::XS::Promise->all($d1->promise(), $d2->promise())->catch( sub { } );
+
+        $d1->reject('first');
+        $d2->reject('second');
+    }
+
+    cmp_deeply(
+        \@w,
+        [],
+        'no warning when all() rejection is caught',
+    ) or diag explain \@w;
+}
+
+# should warn exactly once because all() output owns the rejection
+{
+    my @w;
+    local $SIG{'__WARN__'} = sub { push @w, @_ };
+
+    {
+        my $d1 = Promise::XS::deferred();
+        my $d2 = Promise::XS::deferred();
+
+        Promise::XS::Promise->all($d1->promise(), $d2->promise());
+
+        $d1->reject('first');
+        $d2->reject('second');
+    }
+
+    cmp_deeply(
+        \@w,
+        [ re( qr<first> ) ],
+        'all() emits one warning from the output promise',
+    ) or diag explain \@w;
+}
+
 #----------------------------------------------------------------------
 
 {

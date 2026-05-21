@@ -1,7 +1,10 @@
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Test::More;
 use IO::Socket::INET;
+use HypersonicTest qw(spawn_server wait_for_port);
 
 
 use Hypersonic;
@@ -12,29 +15,9 @@ plan skip_all => 'fork not available' unless $^O ne 'MSWin32';
 my $port = 22000 + ($$%1000);
 my $cache_dir = "_test_cache_mw_$$";  # Capture before fork!
 
-# Wait for server with port probing (works across all platforms)
-sub wait_for_port {
-    my ($port, $max_tries) = @_;
-    $max_tries //= 50;
-    for (1..$max_tries) {
-        my $sock = IO::Socket::INET->new(
-            PeerAddr => '127.0.0.1',
-            PeerPort => $port,
-            Proto    => 'tcp',
-            Timeout  => 0.1,
-        );
-        if ($sock) { close($sock); return 1; }
-        select(undef, undef, undef, 0.1);
-    }
-    return 0;
-}
-
-# Fork a server process to test middleware
-my $pid = fork();
-die "Fork failed: $!" unless defined $pid;
-
-if ($pid == 0) {
-    # Child - run server
+# spawn_server captures the child STDERR so we can diag the real
+# failure if the server child dies before binding (see OpenBSD reports).
+my ($pid, $log) = spawn_server(sub {
     my $server = Hypersonic->new(cache_dir => $cache_dir);
 
     # Global before middleware - adds request ID
@@ -119,11 +102,11 @@ if ($pid == 0) {
 
     $server->compile();
     $server->run(port => $port);
-    exit(0);
-}
+});
 
 # Parent - run tests
-wait_for_port($port) or die "Server failed to start on port $port";
+wait_for_port($port, { pid => $pid, log => $log, tries => 50 })
+    or BAIL_OUT("server child failed to bind port $port (see diag above)");
 
 sub make_request {
     my ($method, $path, $headers) = @_;

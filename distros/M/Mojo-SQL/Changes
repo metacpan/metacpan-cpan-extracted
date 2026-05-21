@@ -1,0 +1,6 @@
+
+0.02  2026-05-12
+  - Added support for escaping literal question marks with ?? in sql and sql_unsafe.
+
+0.01  2026-05-09
+  - First release.

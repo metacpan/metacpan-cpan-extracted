@@ -1,4 +1,4 @@
-#!perl -T
+#!perl
 
 use Test::More;
 use FindBin;
@@ -79,9 +79,9 @@ my $sample = 'monotone.info';	# one of the below files, without regexps, for fur
 	  'Targa image data - RGB - RLE 32 x 32',
 	  ['application/octet-stream','image/x-tga']],
 
-  ## actually a 'audio/x-mpegurl'
+  ## actually a 'audio/x-mpegurl'; newer shared-mime-info may return text/plain
   'wzbc-2009-06-28-17-00.m3u' => 
-  	[ 'text/plain', 'us-ascii',
+  	[ qr{^(audio/x-mpegurl|text/plain)$}, 'us-ascii',
 	  'M3U playlist text'],
 
   ## File::LibMagic says application/octet-stream here:
@@ -92,7 +92,23 @@ my $sample = 'monotone.info';	# one of the below files, without regexps, for fur
   ## this is actually plain text, but we are fooled by its apparent magic.
   'pdftex-a.txt' =>  
   	[ 'application/pdf', 'utf-8', 
-	  'PDF document, version 1.4' ]
+	  'PDF document, version 1.4' ],
+
+  'intermediate-removal-test.tar.gz' =>
+  	[ qr{^application/(x-tar\+gzip|x-gzip|gzip)$}, qr{^(binary|unknown|)$},
+	  'gzip compressed data' ],
+
+  'recursive-3level-removal-test.tar.gz' =>
+  	[ qr{^application/(x-tar\+gzip|x-gzip|gzip)$}, qr{^(binary|unknown|)$},
+    'gzip compressed data' ],
+
+  'intermediate-removal-test.tar.xz' =>
+  	[ 'application/x-xz', qr{^(binary|unknown|)$},
+	  'XZ compressed data' ],
+
+  'recursive-3level-removal-test.tar.xz' =>
+  	[ 'application/x-xz', qr{^(binary|unknown|)$},
+	  'XZ compressed data' ],
   #
 );
 plan tests => (-f $shared_mime_info_db ? 2 * keys %exp : 0) + 5;

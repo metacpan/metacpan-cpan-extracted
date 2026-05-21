@@ -37,13 +37,18 @@ the first data that is added to it.
 
 # RECENT CHANGES
 
-Changes for version 0.19 (2025-08-05)
+Changes for version 0.20 (2026-04-27)
 
 - Documentation
-    - Fixed typos in documentation RT#168697 (thanks Thomas Eckardt).
-    - Removed the separate INSTALL file.
-    - Fixed the CONTRIBUTORS setion of the README.
-    - Added CONTRIBUTING.md file.
+    - Mentioned CONTRIBUTING.md in SOURCE.
+    - Updated copyright year.
+    - Updated the current maintainer email.
+- Tests
+    - Added and improved author tests.
+    - Moved author tests into xt.
+- Toolchain
+    - Set up GitHub workflow for testing.
+    - Stopped using Module::Signature for signing modules.
 
 See the `Changes` file for more details.
 
@@ -115,13 +120,15 @@ then see `SECURITY.md` for instructions how to report security vulnerabilities.
 # SOURCE
 
 The development version is on github at [https://github.com/robrwo/perl-Net-CIDR-Set](https://github.com/robrwo/perl-Net-CIDR-Set)
-and may be cloned from [git://github.com/robrwo/perl-Net-CIDR-Set.git](git://github.com/robrwo/perl-Net-CIDR-Set.git)
+and may be cloned from [https://github.com/robrwo/perl-Net-CIDR-Set.git](https://github.com/robrwo/perl-Net-CIDR-Set.git)
+
+See `CONTRIBUTING.md` for more information.
 
 # AUTHOR
 
 Andy Armstrong <andy@hexten.net>
 
-The current maintainer is Robert Rothenberg <rrwo@cpan.org>.
+The current maintainer is Robert Rothenberg <perl@rhizomnic.com>.
 
 The encode and decode routines were stolen en masse from Douglas Wilson's [Net::CIDR::Lite](https://metacpan.org/pod/Net%3A%3ACIDR%3A%3ALite).
 
@@ -129,12 +136,12 @@ The encode and decode routines were stolen en masse from Douglas Wilson's [Net::
 
 - Thomas Eckardt <Thomas.Eckardt@thockar.com>
 - Brian Gottreu <gottreu@cpan.org>
-- Robert Rothenberg <rrwo@cpan.org>
+- Robert Rothenberg <perl@rhizomnic.com>
 - Stig Palmquist <stigtsp@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2009, 2014, 2025 by Message Systems, Inc.
+This software is copyright (c) 2009, 2014, 2025-2026 by Message Systems, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

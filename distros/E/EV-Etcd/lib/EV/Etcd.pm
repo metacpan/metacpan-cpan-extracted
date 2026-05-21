@@ -1,8 +1,10 @@
 package EV::Etcd;
+use 5.010;
 use strict;
 use warnings;
+use Carp ();
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use EV ();
 require XSLoader;
@@ -16,8 +18,12 @@ no warnings 'redefine';
 *txn = sub {
     my $self = shift;
 
-    # If called with positional args (4 args: compare, success, failure, callback), pass through
-    if (@_ == 4 && ref($_[0]) eq 'ARRAY') {
+    # Positional fast-path: (\@compare, \@success, \@failure, $cb)
+    if (@_ == 4
+        && ref($_[0]) eq 'ARRAY'
+        && ref($_[1]) eq 'ARRAY'
+        && ref($_[2]) eq 'ARRAY'
+        && ref($_[3]) eq 'CODE') {
         return $_xs_txn->($self, @_);
     }
 
@@ -30,7 +36,12 @@ no warnings 'redefine';
     my %args = @_;
     $callback //= $args{callback};
 
-    # Extract arrays, default to empty
+    for my $k (qw(compare success failure)) {
+        next unless defined $args{$k};
+        ref($args{$k}) eq 'ARRAY'
+            or Carp::croak("txn '$k' must be an array reference");
+    }
+
     my $compare = $args{compare} // [];
     my $success = $args{success} // [];
     my $failure = $args{failure} // [];
@@ -43,12 +54,15 @@ use warnings 'redefine';
 
 __END__
 
+=encoding utf8
+
 =head1 NAME
 
 EV::Etcd - Async etcd v3 client using native gRPC and EV/libev
 
 =head1 SYNOPSIS
 
+    use v5.10;
     use EV;
     use EV::Etcd;
 
@@ -98,7 +112,9 @@ Options:
 
 =item endpoints
 
-ArrayRef of etcd endpoints (host:port).
+ArrayRef of etcd endpoints (host:port). Optional; defaults to
+C<['127.0.0.1:2379']>. When more than one is provided, the client uses the
+first endpoint and rotates to subsequent endpoints on connection failure.
 
 =item timeout
 
@@ -144,6 +160,25 @@ token from a previous session.
 
 =back
 
+=head1 ENCODING
+
+Keys and values are stored by etcd as raw bytes; this module does not perform
+any character encoding. If you pass a Perl string with the UTF-8 flag set
+(e.g. a literal containing non-ASCII characters under C<use utf8>), the UTF-8
+byte representation is what gets stored. Values returned by C<get> are byte
+strings without the UTF-8 flag — string-equality with the original literal
+will fail unless you decode explicitly.
+
+For character data, encode/decode at the boundary using L<Encode>:
+
+    use Encode qw(encode_utf8 decode_utf8);
+
+    $client->put($key, encode_utf8($value), sub { ... });
+    $client->get($key, sub {
+        my ($resp) = @_;
+        my $value = decode_utf8($resp->{kvs}[0]{value});
+    });
+
 =head1 ERROR HANDLING
 
 Errors are returned as hash references with the following structure:
@@ -162,6 +197,8 @@ Streaming operations (watch, keepalive, observe) automatically reconnect
 on transient failures according to the C<max_retries> configuration.
 Unary RPCs (get, put, delete, etc.) do not retry automatically; use the
 C<retryable> field to implement application-level retry logic.
+
+=head1 KEY-VALUE OPERATIONS
 
 =head2 put
 
@@ -191,6 +228,9 @@ If true, updates the lease without changing the value.
 If true, updates the value without changing the lease.
 
 =back
+
+The callback receives C<($response, $error)>. Response keys: C<header>, plus
+C<prev_kv> (a kv hashref) when the C<prev_kv> option is set.
 
 =head2 get
 
@@ -249,6 +289,31 @@ Filter keys by creation revision.
 
 =back
 
+The callback receives C<($response, $error)>. Response keys:
+
+=over 4
+
+=item kvs
+
+Array reference of key-value hashrefs (C<key>, C<value>, C<create_revision>,
+C<mod_revision>, C<version>, C<lease>).
+
+=item count
+
+Total number of keys matched (may exceed C<scalar @{$resp->{kvs}}> when
+C<limit> is in effect).
+
+=item more
+
+True if more keys exist beyond the returned C<kvs> (C<limit> truncated the
+result).
+
+=item header
+
+Cluster response header (see L</ERROR HANDLING>).
+
+=back
+
 =head2 delete
 
     $client->delete($key, $callback);
@@ -274,6 +339,12 @@ If true, returns the deleted key-value pairs in the response.
 
 =back
 
+The callback receives C<($response, $error)>. Response keys: C<header>,
+C<deleted> (count of keys deleted), plus C<prev_kvs> (array of kv hashrefs)
+when the C<prev_kv> option is set.
+
+=head1 WATCH SERVICE
+
 =head2 watch
 
     my $watch = $client->watch($key, $callback);
@@ -281,8 +352,35 @@ If true, returns the deleted key-value pairs in the response.
 
 Create a watch on a key or key range. Returns an EV::Etcd::Watch object.
 
-The callback is called with C<($response, $error)> for each watch event.
-The response contains an C<events> array with the watch events.
+The callback is invoked with C<($response, $error)> for each watch message.
+Response keys:
+
+=over 4
+
+=item events
+
+Array reference of event hashrefs (C<type> = "PUT" or "DELETE", C<kv>, and
+optionally C<prev_kv> when the C<prev_kv> option is set).
+
+=item watch_id
+
+Server-assigned watch identifier. Stable for the lifetime of the watch
+(including across auto-reconnect).
+
+=item created
+
+True on the first message after the watch is established.
+
+=item header
+
+Cluster response header.
+
+=back
+
+Server-side cancellation (including compaction-induced) is delivered through
+the I<error> callback path, not as a success response — C<$err->{source}>
+will be C<"watch"> and C<$err->{message}> will contain the server's reason
+(typically including the compact revision when relevant).
 
 Options:
 
@@ -345,6 +443,10 @@ long-running watches that should survive network interruptions.
 Cancel the watch. The callback receives C<($response, $error)> when
 cancellation is complete. The response is an empty hash reference on success.
 
+Calling C<cancel> on an already-cancelled handle is safe: the callback fires
+immediately with success. The handle remains valid as a Perl reference until
+you drop it.
+
     $watch->cancel(sub {
         my ($resp, $err) = @_;
         if ($err) {
@@ -354,13 +456,15 @@ cancellation is complete. The response is an empty hash reference on success.
         }
     });
 
+=head1 LEASE SERVICE
+
 =head2 lease_grant
 
     $client->lease_grant($ttl, $callback);
 
 Grant a lease with the specified TTL (time-to-live) in seconds.
 
-The callback receives C<($response, $error)> where response contains:
+The callback receives C<($response, $error)>. Response keys:
 
 =over 4
 
@@ -372,13 +476,18 @@ The lease ID.
 
 The actual TTL granted by the server.
 
+=item header
+
+Standard response header.
+
 =back
 
 =head2 lease_revoke
 
     $client->lease_revoke($lease_id, $callback);
 
-Revoke a lease. All keys attached to the lease will be deleted.
+Revoke a lease. All keys attached to the lease will be deleted. The response
+contains C<header> only.
 
 =head2 lease_keepalive
 
@@ -393,7 +502,20 @@ used to cancel the keepalive stream:
 
 Options:
 
-    auto_reconnect => 1   # auto-reconnect on failure (default: 1)
+=over 4
+
+=item auto_reconnect
+
+If true, the keepalive stream will automatically reconnect after a connection
+failure, with exponential backoff up to C<max_retries> (set on the client).
+Default is 1 (enabled). Pass C<0> to disable.
+
+=back
+
+The keepalive callback receives C<($response, $error)> for each tick. On
+success the response includes C<id>, C<ttl>, and C<header>. When the lease
+has expired the server sends C<ttl=0>; the client maps that to an error
+callback with C<< source => "keepalive" >> and status C<NOT_FOUND>.
 
 =head2 EV::Etcd::Keepalive Methods
 
@@ -405,6 +527,10 @@ Cancel the keepalive stream. The callback receives C<($response, $error)>
 when cancellation is complete. The response is an empty hash reference on
 success.
 
+Calling C<cancel> on an already-cancelled handle is safe: the callback fires
+immediately with success. The handle remains valid as a Perl reference until
+you drop it.
+
 =head2 lease_time_to_live
 
     $client->lease_time_to_live($lease_id, $callback);
@@ -412,7 +538,17 @@ success.
 
 Get the remaining TTL of a lease.
 
-The callback receives C<($response, $error)> where response contains:
+Options:
+
+=over 4
+
+=item keys
+
+If true, also return the list of keys attached to this lease.
+
+=back
+
+The callback receives C<($response, $error)>. Response keys:
 
 =over 4
 
@@ -430,17 +566,11 @@ The original TTL granted when the lease was created.
 
 =item keys
 
-Array of keys attached to this lease (only if C<keys> option is true).
+Array of keys attached to this lease (only when the C<keys> option is true).
 
-=back
+=item header
 
-Options:
-
-=over 4
-
-=item keys
-
-If true, also return the list of keys attached to this lease.
+Standard response header.
 
 =back
 
@@ -448,97 +578,9 @@ If true, also return the list of keys attached to this lease.
 
     $client->lease_leases($callback);
 
-List all active leases.
-
-The callback receives C<($response, $error)> where response contains:
-
-=over 4
-
-=item leases
-
-Array of lease objects, each containing:
-
-=over 4
-
-=item id
-
-The lease ID.
-
-=back
-
-=back
-
-=head2 compact
-
-    $client->compact($revision, $callback);
-    $client->compact($revision, \%opts, $callback);
-
-Compact the etcd key-value store up to the given revision. All keys
-with revisions less than the compaction revision will be removed.
-
-B<Warning>: This operation is irreversible. After compaction, you cannot
-retrieve data from revisions before the compacted revision.
-
-Options:
-
-=over 4
-
-=item physical
-
-If true, the RPC will wait until the compaction is physically applied
-to the local database such that compacted entries are totally removed
-from the backend database. Default is false.
-
-=back
-
-=head2 status
-
-    $client->status($callback);
-
-Get the status of the etcd cluster member this client is connected to.
-Useful for health checks and cluster monitoring.
-
-The callback receives C<($response, $error)> where response contains:
-
-=over 4
-
-=item version
-
-The etcd server version.
-
-=item db_size
-
-The size of the backend database in bytes.
-
-=item leader
-
-The member ID of the cluster leader.
-
-=item raft_index
-
-The current raft index of the member.
-
-=item raft_term
-
-The current raft term of the cluster.
-
-=item raft_applied_index
-
-The raft applied index of the member.
-
-=item db_size_in_use
-
-The actual size of the database in use (after compaction).
-
-=item is_learner
-
-True if this member is a learner (non-voting member).
-
-=item errors
-
-Array of any errors on this member (if any).
-
-=back
+List all active leases. The callback receives C<($response, $error)>.
+Response keys: C<header>, and C<leases> — an array of hashrefs each with an
+C<id> key.
 
 =head1 LOCK SERVICE
 
@@ -742,6 +784,39 @@ Example:
     $client->auth_disable($callback);
 
 Disable authentication on the etcd cluster. Requires root privileges.
+
+=head2 auth_status
+
+    $client->auth_status($callback);
+
+Check whether authentication is enabled on the etcd cluster. Response keys:
+
+=over 4
+
+=item enabled
+
+Boolean indicating whether authentication is enabled.
+
+=item auth_revision
+
+The current revision of the auth store.
+
+=item header
+
+Standard response header.
+
+=back
+
+Example:
+
+    $client->auth_status(sub {
+        my ($resp, $err) = @_;
+        if ($resp->{enabled}) {
+            say "Authentication is enabled (revision: $resp->{auth_revision})";
+        } else {
+            say "Authentication is disabled";
+        }
+    });
 
 =head2 User Management
 
@@ -1049,6 +1124,82 @@ Called with C<($response, $error)> when complete.
 EV::Etcd provides access to etcd's maintenance operations for cluster
 administration and monitoring.
 
+=head2 status
+
+    $client->status($callback);
+
+Get the status of the etcd member this client is connected to. Useful for
+health checks and cluster monitoring. Response keys:
+
+=over 4
+
+=item version
+
+The etcd server version.
+
+=item db_size
+
+Backend database size in bytes.
+
+=item db_size_in_use
+
+Database size in use after compaction.
+
+=item leader
+
+Member ID of the cluster leader.
+
+=item raft_index
+
+Current raft index of this member.
+
+=item raft_term
+
+Current raft term of the cluster.
+
+=item raft_applied_index
+
+Raft applied index of this member.
+
+=item is_learner
+
+True if this member is a learner (non-voting).
+
+=item errors
+
+Array of error strings if this member has any. Absent when no errors.
+
+=item header
+
+Standard response header.
+
+=back
+
+=head2 compact
+
+    $client->compact($revision, $callback);
+    $client->compact($revision, \%opts, $callback);
+
+Compact the key-value store up to the given revision. All revisions older
+than C<$revision> are discarded.
+
+B<Warning>: compaction is irreversible — historical reads of older revisions
+fail after the compact completes.
+
+Options:
+
+=over 4
+
+=item physical
+
+If true, the RPC waits until the compaction is physically applied to the
+local backend (entries fully removed). Default is false (the call returns
+once the compaction is logically committed).
+
+=back
+
+The response contains C<header> only.
+
 =head2 alarm
 
     $client->alarm($action, $callback);
@@ -1275,41 +1426,6 @@ Example:
         });
     });
 
-=head2 auth_status
-
-    $client->auth_status($callback);
-
-Check whether authentication is enabled on the etcd cluster.
-
-The response contains:
-
-=over 4
-
-=item enabled
-
-Boolean indicating whether authentication is enabled.
-
-=item auth_revision
-
-The current revision of the auth store.
-
-=item header
-
-Standard response header.
-
-=back
-
-Example:
-
-    $client->auth_status(sub {
-        my ($resp, $err) = @_;
-        if ($resp->{enabled}) {
-            say "Authentication is enabled (revision: $resp->{auth_revision})";
-        } else {
-            say "Authentication is disabled";
-        }
-    });
-
 =head1 ELECTION SERVICE
 
 EV::Etcd provides leader election support through the etcd Election service.
@@ -1396,8 +1512,7 @@ Example:
                 return;
             }
             say "Elected as leader!";
-            my $leader_key = $resp->{leader};
-            # Store $leader_key for later use with proclaim/resign
+            my $leader = $resp->{leader};   # hashref — pass to proclaim/resign
         });
     });
 
@@ -1450,17 +1565,18 @@ Example:
 
 =head2 election_proclaim
 
-    $client->election_proclaim($leader_key, $value, $callback);
+    $client->election_proclaim($leader, $value, $callback);
 
-Update the leader's value. Only the current leader can proclaim.
+Update the leader's value. Only the current leader can proclaim. The
+response contains C<header> only.
 
 Arguments:
 
 =over 4
 
-=item leader_key
+=item leader
 
-The leader key hash returned from C<election_campaign>.
+The leader hashref returned in C<< $resp->{leader} >> from C<election_campaign>.
 
 =item value
 
@@ -1474,26 +1590,24 @@ Called with C<($response, $error)> when complete.
 
 Example:
 
-    $client->election_proclaim($leader_key, "new-value", sub {
+    $client->election_proclaim($leader, "new-value", sub {
         my ($resp, $err) = @_;
-        if ($err) {
-            warn "Proclaim failed: $err->{message}";
-        }
+        warn "Proclaim failed: $err->{message}" if $err;
     });
 
 =head2 election_resign
 
-    $client->election_resign($leader_key, $callback);
+    $client->election_resign($leader, $callback);
 
-Voluntarily give up leadership.
+Voluntarily give up leadership. The response contains C<header> only.
 
 Arguments:
 
 =over 4
 
-=item leader_key
+=item leader
 
-The leader key hash returned from C<election_campaign>.
+The leader hashref returned in C<< $resp->{leader} >> from C<election_campaign>.
 
 =item callback
 
@@ -1503,7 +1617,7 @@ Called with C<($response, $error)> when complete.
 
 Example:
 
-    $client->election_resign($leader_key, sub {
+    $client->election_resign($leader, sub {
         my ($resp, $err) = @_;
         say "Resigned from leadership" unless $err;
     });
@@ -1578,6 +1692,10 @@ Cancel the observe stream. The callback receives C<($response, $error)>
 when cancellation is complete. The response is an empty hash reference on
 success.
 
+Calling C<cancel> on an already-cancelled handle is safe: the callback fires
+immediately with success. The handle remains valid as a Perl reference until
+you drop it.
+
 =head1 CLUSTER SERVICE
 
 EV::Etcd provides cluster membership management through the Cluster service.
@@ -1591,7 +1709,14 @@ List all members in the etcd cluster.
 
 Options:
 
-    linearizable => 1   # linearizable read (default: 0)
+=over 4
+
+=item linearizable
+
+If true, perform a linearizable (strongly consistent) read. Default is 0
+(serializable read — faster but may be slightly stale).
+
+=back
 
 The response contains:
 
@@ -1676,19 +1801,21 @@ If true, add the member as a non-voting learner.
 
     $client->member_remove($member_id, $callback);
 
-Remove a member from the cluster.
+Remove a member from the cluster. The response contains C<header> and
+C<members> (the cluster's remaining members after removal).
 
 =head2 member_update
 
     $client->member_update($member_id, \@peer_urls, $callback);
 
-Update a member's peer URLs.
+Update a member's peer URLs. The response contains C<header> and C<members>.
 
 =head2 member_promote
 
     $client->member_promote($member_id, $callback);
 
-Promote a learner member to a voting member.
+Promote a learner member to a voting member. The response contains C<header>
+and C<members>.
 
 =head1 TRANSACTIONS
 

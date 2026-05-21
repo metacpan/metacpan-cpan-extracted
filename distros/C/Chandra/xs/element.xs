@@ -69,7 +69,7 @@ CODE:
                        ++_elem_element_id);
     (void)hv_stores(self_hv, "_eid", newSVpvn(eid_buf, eid_len));
 
-    /* id — use provided or auto-assign from _eid */
+    /* id - use provided or auto-assign from _eid */
     id_svp = args ? hv_fetchs(args, "id", 0) : NULL;
     if (id_svp && *id_svp && SvOK(*id_svp)) {
         (void)hv_stores(self_hv, "id", newSVsv(*id_svp));

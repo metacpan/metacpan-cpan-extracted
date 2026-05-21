@@ -140,10 +140,15 @@
   ->ToLookup(sub { $_[0]{dept} })
   ->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} })
   ->ToLTSV('output.ltsv')
+  ->ToLTSV('output.ltsv',              # label_order: specify output label order
+      label_order => [qw(host status bytes url)])
+  ->ToLTSV('output.ltsv',              # headers: alias for label_order (CSV-LINQ interop)
+      headers => [qw(host status bytes url)])
 
   ToDictionary ले hashref key=>element फिर्ता गर्छ।
     ToLookup ले hashref key=>[elements] फिर्ता गर्छ।
     ToLTSV ले अनुक्रम LTSV फाइलमा लेख्छ।
+    label_order ले लेबलको क्रम निर्दिष्ट गर्छ; headers यसको उपनाम हो (CSV-LINQ अन्तरसञ्चालन)।
 
 [ 12. आधिकारिक स्रोतहरू (Official resources) ]
 

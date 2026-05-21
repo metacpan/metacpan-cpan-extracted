@@ -1,0 +1,77 @@
+package @MODULE_NAME@;
+
+use strict;
+use warnings;
+
+use Data::Dumper;
+use English qw(-no_match_vars);
+use CLI::Simple::Constants qw(:booleans);
+
+our $VERSION = '@PACKAGE_VERSION@';
+
+use parent qw(CLI::Simple);
+
+__PACKAGE__->use_log4perl( level => 'info' );
+
+caller or __PACKAGE__->main;
+
+########################################################################
+sub init {
+########################################################################
+  my ($self) = @_;
+
+  return $SUCCESS;
+}
+
+########################################################################
+sub cmd_foo {
+########################################################################
+  my ($self) = @_;
+
+  return $SUCCESS;
+}
+
+########################################################################
+sub main {
+########################################################################
+  my %commands = (
+    foo     => \&cmd_foo,
+    default => \&cmd_foo
+  );
+
+  my @option_specs = qw(
+    help|h
+  );
+
+  my $cli = __PACKAGE__->new(
+    commands      => \%commands,
+    option_specs  => \@option_specs,
+    extra_options => [],
+  );
+
+  return $cli->run();
+}
+
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+@MODULE_NAME@ - 
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 METHODS AND SUBROUTINES
+
+=head1 AUTHOR
+
+@GIT_NAME@ - @GIT_EMAIL@
+
+=head1 SEE ALSO
+
+=cut

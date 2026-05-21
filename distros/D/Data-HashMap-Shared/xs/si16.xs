@@ -103,6 +103,36 @@ set_multi(SV* self_sv, ...)
     OUTPUT:
         RETVAL
 
+UV
+remove_multi(SV* self_sv, ...)
+    CODE:
+        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
+        uint32_t count = 0;
+        if (h->shard_handles) {
+            for (int i = 1; i < items; i++) {
+                STRLEN _kl; const char *_ks = SvPV(ST(i), _kl);
+                bool _ku = SvUTF8(ST(i)) ? 1 : 0;
+                if (_kl > SHM_MAX_STR_LEN) croak("key too long (max 2GB)");
+                count += shm_si16_remove(h, _ks, (uint32_t)_kl, _ku);
+            }
+        } else {
+            ShmHeader *hdr = h->hdr;
+            shm_rwlock_wrlock(hdr);
+            shm_seqlock_write_begin(&hdr->seq);
+            for (int i = 1; i < items; i++) {
+                STRLEN _kl; const char *_ks = SvPV(ST(i), _kl);
+                bool _ku = SvUTF8(ST(i)) ? 1 : 0;
+                if (_kl > SHM_MAX_STR_LEN) { shm_seqlock_write_end(&hdr->seq); shm_rwlock_wrunlock(hdr); croak("key too long (max 2GB)"); }
+                count += shm_si16_remove_inner(h, _ks, (uint32_t)_kl, _ku);
+            }
+            if (count) shm_si16_maybe_shrink(h);
+            shm_seqlock_write_end(&hdr->seq);
+            shm_rwlock_wrunlock(hdr);
+        }
+        RETVAL = count;
+    OUTPUT:
+        RETVAL
+
 void
 get_multi(SV* self_sv, ...)
     PPCODE:
@@ -158,6 +188,19 @@ get_multi(SV* self_sv, ...)
             }
         }
 
+void
+get_with_ttl(SV* self_sv, SV* key_sv)
+    PPCODE:
+        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
+        EXTRACT_STR_KEY(key_sv);
+        int16_t out_value;
+        int64_t out_ttl;
+        if (!shm_si16_get_with_ttl(h, _kstr, (uint32_t)_klen, _kutf8, &out_value, &out_ttl)) XSRETURN_EMPTY;
+        EXTEND(SP, 2);
+        mPUSHi(out_value);
+        if (out_ttl < 0) PUSHs(&PL_sv_undef);
+        else mPUSHi(out_ttl);
+
 SV*
 stats(SV* self_sv)
     CODE:
@@ -185,6 +228,17 @@ cas(SV* self_sv, SV* key_sv, int16_t expected, int16_t desired)
         EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
         EXTRACT_STR_KEY(key_sv);
         RETVAL = shm_si16_cas(h, _kstr, (uint32_t)_klen, _kutf8, expected, desired);
+    OUTPUT:
+        RETVAL
+
+SV*
+cas_take(SV* self_sv, SV* key_sv, int16_t expected)
+    CODE:
+        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
+        EXTRACT_STR_KEY(key_sv);
+        int16_t out_value;
+        if (!shm_si16_cas_take(h, _kstr, (uint32_t)_klen, _kutf8, expected, &out_value)) XSRETURN_UNDEF;
+        RETVAL = newSViv(out_value);
     OUTPUT:
         RETVAL
 
@@ -601,11 +655,31 @@ add(SV* self_sv, SV* key_sv, int16_t value)
         RETVAL
 
 bool
+add_ttl(SV* self_sv, SV* key_sv, int16_t value, UV ttl_sec)
+    CODE:
+        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
+        EXTRACT_STR_KEY(key_sv);
+        REQUIRE_TTL(h);
+        RETVAL = shm_si16_add_ttl(h, _kstr, (uint32_t)_klen, _kutf8, value, (uint32_t)ttl_sec);
+    OUTPUT:
+        RETVAL
+
+bool
 update(SV* self_sv, SV* key_sv, int16_t value)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
         EXTRACT_STR_KEY(key_sv);
         RETVAL = shm_si16_update(h, _kstr, (uint32_t)_klen, _kutf8, value);
+    OUTPUT:
+        RETVAL
+
+bool
+update_ttl(SV* self_sv, SV* key_sv, int16_t value, UV ttl_sec)
+    CODE:
+        EXTRACT_MAP("Data::HashMap::Shared::SI16", self_sv);
+        EXTRACT_STR_KEY(key_sv);
+        REQUIRE_TTL(h);
+        RETVAL = shm_si16_update_ttl(h, _kstr, (uint32_t)_klen, _kutf8, value, (uint32_t)ttl_sec);
     OUTPUT:
         RETVAL
 

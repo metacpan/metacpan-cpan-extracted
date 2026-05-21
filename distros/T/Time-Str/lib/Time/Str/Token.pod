@@ -1,0 +1,124 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Time::Str::Token - Convert captured date/time tokens to semantic values
+
+=head1 SYNOPSIS
+
+    use Time::Str::Token qw( parse_day
+                             parse_day_name
+                             parse_meridiem
+                             parse_month
+                             parse_tz_offset );
+
+=head1 DESCRIPTION
+
+This module provides functions for converting individual captured
+date/time tokens into their numeric equivalents. Each function accepts
+a single string and returns an integer, croaking on invalid input.
+
+These functions are intended for use with captures from
+L<Time::Str::Regexp> when building custom parsers.
+
+=head1 FUNCTIONS
+
+All functions are exportable on request. Use C<:all> to import everything.
+
+=head2 parse_day
+
+    my $day = parse_day($string);
+
+Converts a day-of-month string to an integer (1-31). Accepts numeric
+values with or without leading zero, and ordinal suffixes. Case-insensitive.
+
+    parse_day('3')     # 3
+    parse_day('03')    # 3
+    parse_day('3rd')   # 3
+    parse_day('24th')  # 24
+    parse_day('31st')  # 31
+
+Croaks with C<Unable to parse: day is invalid> on failure.
+
+=head2 parse_month
+
+    my $month = parse_month($string);
+
+Converts a month string to an integer (1-12). Accepts numeric values
+with or without leading zero, abbreviated names, full names, and 
+Roman numerals. Case-insensitive.
+
+    parse_month('1')         # 1
+    parse_month('01')        # 1
+    parse_month('Jan')       # 1
+    parse_month('january')   # 1
+    parse_month('IX')        # 9
+    parse_month('sept')      # 9
+
+Croaks with C<Unable to parse: month is invalid> on failure.
+
+=head2 parse_day_name
+
+    my $dow = parse_day_name($string);
+
+Converts a day name to an integer (1=Monday .. 7=Sunday). Accepts
+abbreviated and full names. Case-insensitive.
+
+    parse_day_name('Mon')       # 1
+    parse_day_name('monday')    # 1
+    parse_day_name('Tues')      # 2
+    parse_day_name('Thu')       # 4
+    parse_day_name('Thurs')     # 4
+    parse_day_name('Sunday')    # 7
+
+Croaks with C<Unable to parse: day name is invalid> on failure.
+
+=head2 parse_meridiem
+
+    my $offset = parse_meridiem($string);
+
+Converts an AM/PM indicator to an hour offset (0 for AM, 12 for PM).
+Accepts C<AM>, C<PM>, C<A.M.>, and C<P.M.>. Case-insensitive.
+
+    parse_meridiem('am')    # 0
+    parse_meridiem('PM')    # 12
+    parse_meridiem('a.m.')  # 0
+    parse_meridiem('P.M.')  # 12
+
+Croaks with C<Unable to parse: meridiem is invalid> on failure.
+
+=head2 parse_tz_offset
+
+    my $minutes = parse_tz_offset($string);
+
+Converts a timezone offset string to a signed offset in minutes
+from UTC. Positive is east, negative is west.
+
+Accepted formats:
+
+    ±H       +5, -5
+    ±HH      +05, -05
+    ±H:MM    +5:30, -5:30
+    ±HHMM    +0530, -0500
+    ±HH:MM   +05:30, -05:00
+
+Croaks with C<Unable to parse: timezone offset is invalid> on failure.
+
+=head1 SEE ALSO
+
+L<Time::Str>, L<Time::Str::Regexp>, L<Time::Str::Calendar>
+
+=head1 AUTHOR
+
+Christian Hansen
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 by Christian Hansen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

@@ -1,7 +1,6 @@
 #include "easyxs/easyxs.h"
 
 #include <stdbool.h>
-#include <unistd.h>
 
 #define MY_CXT_KEY "Promise::XS::_guts" XS_VERSION
 
@@ -57,6 +56,7 @@ typedef struct xspr_callback_s xspr_callback_t;
 typedef struct xspr_promise_s xspr_promise_t;
 typedef struct xspr_result_s xspr_result_t;
 typedef struct xspr_callback_queue_s xspr_callback_queue_t;
+typedef struct pxs_all_state_s pxs_all_state_t;
 
 typedef enum {
     XSPR_STATE_NONE,
@@ -83,7 +83,10 @@ typedef enum {
     XSPR_CALLBACK_CHAIN,
 
     // from a promise returned from a finally() callback
-    XSPR_CALLBACK_FINALLY_CHAIN
+    XSPR_CALLBACK_FINALLY_CHAIN,
+
+    // from all()
+    XSPR_CALLBACK_ALL
 } xspr_callback_type_t;
 
 struct xspr_callback_s {
@@ -107,7 +110,21 @@ struct xspr_callback_s {
             xspr_result_t* original_result;
             xspr_promise_t* chain_promise;
         } finally_chain;
+
+        struct {
+            pxs_all_state_t* state;
+            unsigned index;
+        } all;
     };
+};
+
+struct pxs_all_state_s {
+    xspr_promise_t* output;
+    unsigned total;
+    unsigned remaining;
+    bool done;
+    SV** results;   /* array[total] of AV refs, one per input */
+    int refs;
 };
 
 struct xspr_result_s {
@@ -148,6 +165,22 @@ xspr_callback_t* xspr_callback_new_chain(pTHX_ xspr_promise_t* chain);
 xspr_callback_t* xspr_callback_new_finally_chain(pTHX_ xspr_result_t* original_result, xspr_promise_t* next_promise);
 void xspr_callback_process(pTHX_ xspr_callback_t* callback, xspr_promise_t* origin);
 void xspr_callback_free(pTHX_ xspr_callback_t* callback);
+
+static xspr_callback_t* xspr_callback_new_all(pTHX_ pxs_all_state_t* state, unsigned index);
+static void pxs_all_state_decref(pTHX_ pxs_all_state_t* state);
+static void pxs_all_state_finish_resolved(pTHX_ pxs_all_state_t* state);
+
+/* Guard used by SAVEDESTRUCTOR_X to free partially-initialised all() state
+   on exception (croak/die).  Both pointers must be set to NULL once they
+   are owned by normal reference-counting so the destructor becomes a no-op. */
+typedef struct {
+    xspr_promise_t*  output;
+    pxs_all_state_t* state;
+} pxs_all_guard_t;
+
+typedef struct {
+    xspr_callback_t* callback;
+} pxs_callback_guard_t;
 
 xspr_promise_t* xspr_promise_new(pTHX);
 void xspr_promise_then(pTHX_ xspr_promise_t* promise, xspr_callback_t* callback);
@@ -349,6 +382,43 @@ void xspr_callback_process(pTHX_ xspr_callback_t* callback, xspr_promise_t* orig
             xspr_promise_finish(aTHX_ next_promise, result);
         }
 
+    } else if (callback->type == XSPR_CALLBACK_ALL) {
+        pxs_all_state_t* state = callback->all.state;
+        unsigned index = callback->all.index;
+
+        if (state->done) {
+            /* Already finished - suppress unhandled rejection warnings */
+            if (RESULT_IS_REJECTED(origin->finished.result)) {
+                origin->finished.result->rejection_should_warn = false;
+            }
+        } else if (RESULT_IS_RESOLVED(origin->finished.result)) {
+            /* Store results for this index as an AV ref */
+            AV* av = newAV();
+            unsigned i;
+            for (i = 0; i < (unsigned)origin->finished.result->count; i++) {
+                av_push(av, SvREFCNT_inc(origin->finished.result->results[i]));
+            }
+            state->results[index] = newRV_noinc((SV*)av);
+
+            state->remaining--;
+            if (state->remaining == 0) {
+                state->done = true;
+                pxs_all_state_finish_resolved(aTHX_ state);
+            }
+        } else {
+            ASSUME(RESULT_IS_REJECTED(origin->finished.result));
+            /* First rejection - clone the result for output so that output
+               has its own independent rejection_should_warn flag.  The user
+               must still .catch() the all() promise; if they don't, the
+               cloned result will warn.  Mark the source result as handled
+               since all() is consuming it. */
+            state->done = true;
+            xspr_result_t* rejection = pxs_result_clone(aTHX_ origin->finished.result);
+            origin->finished.result->rejection_should_warn = false;
+            xspr_promise_finish(aTHX_ state->output, rejection);
+            xspr_result_decref(aTHX_ rejection);
+        }
+
     } else {
         ASSUME(0);
     }
@@ -374,6 +444,9 @@ void xspr_callback_free(pTHX_ xspr_callback_t *callback)
     } else if (callback->type == XSPR_CALLBACK_FINALLY_CHAIN) {
         xspr_promise_decref(aTHX_ callback->finally_chain.chain_promise);
         xspr_result_decref(aTHX_ callback->finally_chain.original_result);
+
+    } else if (callback->type == XSPR_CALLBACK_ALL) {
+        pxs_all_state_decref(aTHX_ callback->all.state);
 
     } else {
         ASSUME(0);
@@ -815,6 +888,61 @@ xspr_callback_t* xspr_callback_new_finally_chain(pTHX_ xspr_result_t* original_r
     callback->finally_chain.chain_promise = next_promise;
     xspr_promise_incref(aTHX_ next_promise);
 
+    return callback;
+}
+
+static void pxs_all_state_finish_resolved(pTHX_ pxs_all_state_t* state)
+{
+    xspr_result_t* result = xspr_result_new(aTHX_ XSPR_RESULT_RESOLVED, state->total);
+    unsigned i;
+
+    for (i = 0; i < state->total; i++) {
+        result->results[i] = SvREFCNT_inc(state->results[i]);
+    }
+
+    xspr_promise_finish(aTHX_ state->output, result);
+    xspr_result_decref(aTHX_ result);
+}
+
+static void pxs_all_state_decref(pTHX_ pxs_all_state_t* state)
+{
+    state->refs--;
+
+    if (state->refs == 0) {
+        xspr_promise_decref(aTHX_ state->output);
+        unsigned i;
+        for (i = 0; i < state->total; i++) {
+            if (state->results[i]) SvREFCNT_dec(state->results[i]);
+        }
+        Safefree(state->results);
+        Safefree(state);
+    }
+}
+
+static void _pxs_all_guard_cleanup(pTHX_ void* vp)
+{
+    pxs_all_guard_t* g = (pxs_all_guard_t*)vp;
+    /* Only non-NULL when an exception aborted all() before ref-counting
+       took ownership.  Free in reverse-allocation order. */
+    if (g->state)  pxs_all_state_decref(aTHX_ g->state);
+    if (g->output) xspr_promise_decref(aTHX_ g->output);
+    Safefree(g);
+}
+
+static void _pxs_callback_guard_cleanup(pTHX_ void* vp)
+{
+    pxs_callback_guard_t* g = (pxs_callback_guard_t*)vp;
+    if (g->callback) xspr_callback_free(aTHX_ g->callback);
+    Safefree(g);
+}
+
+static xspr_callback_t* xspr_callback_new_all(pTHX_ pxs_all_state_t* state, unsigned index)
+{
+    xspr_callback_t* callback;
+    Newxz(callback, 1, xspr_callback_t);
+    callback->type = XSPR_CALLBACK_ALL;
+    callback->all.state = state;
+    callback->all.index = index;
     return callback;
 }
 
@@ -1425,6 +1553,84 @@ DESTROY(SV *self_sv)
 MODULE = Promise::XS     PACKAGE = Promise::XS::Promise
 
 PROTOTYPES: DISABLE
+
+SV*
+all(...)
+    CODE:
+        /* items includes the class/self as the first argument;
+           the actual promises start at ST(1). */
+        unsigned count = (unsigned)(items - 1);
+
+        if (count == 0) {
+            RETVAL = _create_preresolved_promise(aTHX_ NULL, 0, false);
+        } else {
+            /* Guard freed by SAVEDESTRUCTOR_X on both normal and exceptional
+               exits.  Pointers are nulled out once ref-counting takes over,
+               making the destructor a no-op on the happy path. */
+            pxs_all_guard_t* guard;
+            Newxz(guard, 1, pxs_all_guard_t);
+            SAVEDESTRUCTOR_X(_pxs_all_guard_cleanup, guard);
+
+            xspr_promise_t* output = create_promise(aTHX);
+
+            pxs_all_state_t* state;
+            Newxz(state, 1, pxs_all_state_t);
+            *guard = (pxs_all_guard_t) {
+                .output = output,
+                .state = state,
+            };
+            *state = (pxs_all_state_t) {
+                .output = output,
+                .total = count,
+                .remaining = count,
+                .refs = 1,
+            };
+            xspr_promise_incref(aTHX_ output);  /* state holds one ref */
+            Newxz(state->results, count, SV*);
+
+            unsigned i;
+            for (i = 0; i < count; i++) {
+                SV* input_sv = ST(i + 1);
+                xspr_promise_t* input_promise = xspr_promise_from_sv(aTHX_ input_sv);
+
+                if (input_promise == NULL) {
+                    /* Plain scalar - treat as already resolved */
+                    AV* av = newAV();
+                    av_push(av, newSVsv(input_sv));
+                    state->results[i] = newRV_noinc((SV*)av);
+
+                    state->remaining--;
+
+                    if (state->remaining == 0 && !state->done) {
+                        state->done = true;
+                        pxs_all_state_finish_resolved(aTHX_ state);
+                    }
+                } else {
+                    /* Keep the callback guarded until xspr_promise_then()
+                       successfully takes ownership. */
+                    pxs_callback_guard_t* callback_guard;
+                    Newxz(callback_guard, 1, pxs_callback_guard_t);
+                    SAVEDESTRUCTOR_X(_pxs_callback_guard_cleanup, callback_guard);
+
+                    xspr_callback_t* callback = xspr_callback_new_all(aTHX_ state, i);
+                    callback_guard->callback = callback;
+                    state->refs++;  /* callback now owns this ref */
+                    xspr_promise_then(aTHX_ input_promise, callback);
+                    callback_guard->callback = NULL;
+                    xspr_promise_decref(aTHX_ input_promise);
+                }
+            }
+
+            /* Release our initial ref; state is kept alive by callbacks */
+            pxs_all_state_decref(aTHX_ state);
+            guard->state = NULL;  /* ref-counting owns state now */
+
+            /* _promise_to_sv takes ownership of the refs=1 from create_promise */
+            RETVAL = _promise_to_sv(aTHX_ output);
+            guard->output = NULL;  /* RETVAL's DESTROY owns output now */
+        }
+    OUTPUT:
+        RETVAL
 
 void
 then(SV* self_sv, SV* on_resolve = NULL, SV* on_reject = NULL)

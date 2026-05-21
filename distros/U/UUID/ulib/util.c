@@ -8,84 +8,6 @@ extern "C" {
 }
 #endif
 
-static NV uu_time_v1(const struct_uu_t *in) {
-  U64   sum;
-  NV    rv;
-
-  sum = ((U64)in->v1.time_high_and_version & 0x0fff) << 48
-    | ((U64)in->v1.time_mid) << 32
-    | (U64)in->v1.time_low;
-  sum -= 122192928000000000ULL;
-  rv = (NV)sum / 10000000.0;
-
-  return rv;
-}
-
-static NV uu_time_v4(const struct_uu_t *in) {
-  return 0.0;
-}
-
-static NV uu_time_v6(const struct_uu_t *in) {
-  U64   sum;
-  NV    rv;
-
-  sum = ((U64)in->v6.time_high) << 28
-    | ((U64)in->v6.time_mid) << 12
-    | ((U64)in->v6.time_low_and_version & 0x0fff);
-  sum -= 122192928000000000ULL;
-  rv = (NV)sum / 10000000.0;
-
-  return rv;
-}
-
-static NV uu_time_v7(const struct_uu_t *in) {
-  U64   sum;
-  NV    rv;
-
-  sum = ((U64)in->v7.time_high) << 16
-    | (U64)in->v7.time_low;
-  rv = (NV)sum / 1000.0;
-
-  return rv;
-}
-
-
-NV uu_time(const struct_uu_t *in) {
-  int version;
-
-  version = in->v1.time_high_and_version >> 12;
-
-  switch(version) {
-    case 1: return uu_time_v1(in);
-    case 4: return uu_time_v4(in);
-    case 6: return uu_time_v6(in);
-    case 7: return uu_time_v7(in);
-  }
-  return 0;
-}
-
-/* a.k.a. version */
-UV uu_type(const struct_uu_t *in) {
-  UV  type;
-
-  type = in->v1.time_high_and_version >> 12;
-
-  if (type <= 8)
-    return type;
-  return 0;
-}
-
-UV uu_variant(const struct_uu_t *in) {
-  U16 variant;
-
-  variant = in->v1.clock_seq_and_variant;
-
-  if ((variant & 0x8000) == 0) return 0;
-  if ((variant & 0x4000) == 0) return 1;
-  if ((variant & 0x2000) == 0) return 2;
-  return 3;
-}
-
 /******************************************************************************
  * all for croak_caller before 5.13.4.
 */
@@ -187,6 +109,121 @@ void my_croak_caller(const char *pat, ...)  {
   NOT_REACHED; /* NOTREACHED */
   va_end(args);
 }
+
 /******************************************************************************/
+
+void uu_clear(struct_uu_t *io) {
+  io->v1.time_low              = 0;
+  io->v1.time_mid              = 0;
+  io->v1.time_high_and_version = 0;
+  io->v1.clock_seq_and_variant = 0;
+  io->v1.node[0]               = 0;
+  io->v1.node[1]               = 0;
+  io->v1.node[2]               = 0;
+  io->v1.node[3]               = 0;
+  io->v1.node[4]               = 0;
+  io->v1.node[5]               = 0;
+}
+
+void uu_copy_binary(pUCXT, const uu_t in, uu_t out) {
+  /* XXX use Copy */
+  U8  *cp1 = (U8*)&in;
+  U8  *cp2 = out;
+  UV  i;
+
+  for (i=0; i < 16; i++)
+    *cp1++ = *cp2++;
+}
+
+void uu_copy_struct(pUCXT, const struct_uu_t *in, struct_uu_t *out) {
+  /* XXX use Copy */
+  out->v1.time_low = in->v1.time_low;
+  out->v1.time_mid = in->v1.time_mid;
+  out->v1.time_high_and_version = in->v1.time_high_and_version;
+  out->v1.clock_seq_and_variant = in->v1.clock_seq_and_variant;
+  out->v1.node[0] = in->v1.node[0];
+  out->v1.node[1] = in->v1.node[1];
+  out->v1.node[2] = in->v1.node[2];
+  out->v1.node[3] = in->v1.node[3];
+  out->v1.node[4] = in->v1.node[4];
+  out->v1.node[5] = in->v1.node[5];
+}
+
+static NV uu_time_v1(const struct_uu_t *in) {
+  U64   sum;
+  NV    rv;
+
+  sum = ((U64)in->v1.time_high_and_version & 0x0fff) << 48
+    | ((U64)in->v1.time_mid) << 32
+    | (U64)in->v1.time_low;
+  sum -= 122192928000000000ULL;
+  rv = (NV)sum / 10000000.0;
+
+  return rv;
+}
+
+static NV uu_time_v4(const struct_uu_t *in) {
+  return 0.0;
+}
+
+static NV uu_time_v6(const struct_uu_t *in) {
+  U64   sum;
+  NV    rv;
+
+  sum = ((U64)in->v6.time_high) << 28
+    | ((U64)in->v6.time_mid) << 12
+    | ((U64)in->v6.time_low_and_version & 0x0fff);
+  sum -= 122192928000000000ULL;
+  rv = (NV)sum / 10000000.0;
+
+  return rv;
+}
+
+static NV uu_time_v7(const struct_uu_t *in) {
+  U64   sum;
+  NV    rv;
+
+  sum = ((U64)in->v7.time_high) << 16
+    | (U64)in->v7.time_low;
+  rv = (NV)sum / 1000.0;
+
+  return rv;
+}
+
+NV uu_time(const struct_uu_t *in) {
+  int version;
+
+  version = in->v1.time_high_and_version >> 12;
+
+  switch(version) {
+    case 1: return uu_time_v1(in);
+    case 4: return uu_time_v4(in);
+    case 6: return uu_time_v6(in);
+    case 7: return uu_time_v7(in);
+  }
+  return 0;
+}
+
+/* a.k.a. version */
+UV uu_type(const struct_uu_t *in) {
+  UV  type;
+
+  type = in->v1.time_high_and_version >> 12;
+
+  if (type <= 8)
+    return type;
+  return 0;
+}
+
+UV uu_variant(const struct_uu_t *in) {
+  U16 variant;
+
+  variant = in->v1.clock_seq_and_variant;
+
+  if ((variant & 0x8000) == 0) return 0;
+  if ((variant & 0x4000) == 0) return 1;
+  if ((variant & 0x2000) == 0) return 2;
+  return 3;
+}
 
 /* ex:set ts=2 sw=2 itab=spaces: */

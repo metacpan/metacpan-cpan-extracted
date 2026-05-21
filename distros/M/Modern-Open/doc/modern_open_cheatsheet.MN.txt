@@ -1,0 +1,122 @@
+======================================================================
+ Modern::Open Ð¥ÑÑÑÑÐ°Ð³                        [MN] ÐÐ¾Ð½Ð³Ð¾Ð»
+======================================================================
+
+[ 1. Installation / [MN] ÐÐ¾Ð½Ð³Ð¾Ð» ]
+
+  Ð¡ÑÑÐ»Ð³Ð°Ñ:
+    cpan Modern::Open
+
+  Ð¡ÐºÑÐ¸Ð¿ÑÑÐ´ Ð°ÑÐ¸Ð³Ð»Ð°Ñ:
+    use Modern::Open;
+
+  Ò®Ð¹Ð»ÑÐ»ÑÐ»: open(), opendir(), sysopen(), pipe(), socket(),
+            accept() ÑÑÐ½ÐºÑÑÑÐ´ÑÐ³ autovivification + autodie ÑÑÐ²Ð¸Ð»Ð±Ð°ÑÐ°Ð°Ñ ÑÐ¾Ð»Ð¸Ð½Ð¾.
+            Perl 5.005_03 Ð±Ð¾Ð»Ð¾Ð½ ÑÒ¯Ò¯Ð½ÑÑÑ ÑÐ¾Ð¹ÑÑ Ð±Ò¯Ñ ÑÑÐ²Ð¸Ð»Ð±Ð°ÑÑ Ð°Ð¶Ð¸Ð»Ð»Ð°Ð´Ð°Ð³.
+            Тэмдэглэл: socket() нь autovivification-г дэмждэг ч autodie хийдэггүй.
+
+[ 2. open() -- 2-arg ]
+
+  my $fh;
+  open($fh, "< file.txt");   # ÑÐ½ÑÐ¸Ñ
+  open($fh, "> file.txt");   # Ð±Ð¸ÑÐ¸Ñ (Ð´Ð°ÑÐ¶ Ð±Ð¸ÑÐ¸Ñ)
+  open($fh, ">> file.txt");  # Ð½ÑÐ¼ÑÑ
+  open($fh, "+< file.txt");  # ÑÐ½ÑÐ¸Ñ/Ð±Ð¸ÑÐ¸Ñ
+  open($fh, "cmd |");        # ÐºÐ¾Ð¼Ð°Ð½Ð´ÑÐ½ ÑÐ¾Ð¾Ð»Ð¾Ð¹Ð³Ð¾Ð¾Ñ ÑÐ½ÑÐ¸Ñ
+  open($fh, "| cmd");        # ÐºÐ¾Ð¼Ð°Ð½Ð´ÑÐ½ ÑÐ¾Ð¾Ð»Ð¾Ð¹Ð´ Ð±Ð¸ÑÐ¸Ñ
+
+  while (my $line = readline($fh)) { ... }
+  print $fh "text\n";
+  close($fh);
+
+[ 3. open() -- 3-arg ]
+
+  my $fh;
+  open($fh, '<',  "file.txt");   # ÑÐ½ÑÐ¸Ñ
+  open($fh, '>',  "file.txt");   # Ð±Ð¸ÑÐ¸Ñ (Ð´Ð°ÑÐ¶ Ð±Ð¸ÑÐ¸Ñ)
+  open($fh, '>>', "file.txt");   # Ð½ÑÐ¼ÑÑ
+  open($fh, '+<', "file.txt");   # ÑÐ½ÑÐ¸Ñ/Ð±Ð¸ÑÐ¸Ñ
+  open($fh, '+>', "file.txt");   # ÑÐ½ÑÐ¸Ñ/Ð±Ð¸ÑÐ¸Ñ (Ð´Ð°ÑÐ¶ Ð±Ð¸ÑÐ¸Ñ)
+  open($fh, '-|', "cmd");        # ÐºÐ¾Ð¼Ð°Ð½Ð´ÑÐ½ ÑÐ¾Ð¾Ð»Ð¾Ð¹Ð³Ð¾Ð¾Ñ ÑÐ½ÑÐ¸Ñ
+  open($fh, '|-', "cmd");        # ÐºÐ¾Ð¼Ð°Ð½Ð´ÑÐ½ ÑÐ¾Ð¾Ð»Ð¾Ð¹Ð´ Ð±Ð¸ÑÐ¸Ñ
+
+[ 4. opendir() ]
+
+  my $dh;
+  opendir($dh, "/path/to/dir");
+  while (my $e = readdir($dh)) {
+      next if $e eq '.' or $e eq '..';
+      print "$e\n";
+  }
+  closedir($dh);
+
+[ 5. sysopen() ]
+
+  use Fcntl qw(O_RDONLY O_WRONLY O_CREAT O_TRUNC);
+
+  my $fh;
+  sysopen($fh, "file.txt", O_RDONLY);
+  sysopen($fh, "file.txt", O_WRONLY | O_CREAT | O_TRUNC);
+  sysopen($fh, "file.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+
+[ 6. pipe() ]
+
+  my($reader, $writer);
+  pipe($reader, $writer);
+  if (my $pid = fork()) {
+      close($writer);
+      while (my $line = readline($reader)) { print $line }
+      close($reader);
+  } else {
+      close($reader);
+      print $writer "Ð¥Ò¯Ò¯ÑÑÐ´ Ð¿ÑÐ¾ÑÐµÑÑÐ¾Ð¾Ñ ÑÐ°Ð¹Ð½ Ð±Ð°Ð¹Ð½Ð° ÑÑ\n";
+      close($writer);
+      exit 0;
+  }
+
+[ 7. socket() / accept() ]
+
+  use Socket qw(AF_INET SOCK_STREAM sockaddr_in inet_aton);
+  my $server;
+  socket($server, AF_INET, SOCK_STREAM, 0);
+  # Тэмдэглэл: socket() autodie хийдэггүй; буцах утгыг өөрөө шалгана уу.
+  my $client;
+  accept($client, $server);
+
+[ 8. autodie ]
+
+  # void ÐºÐ¾Ð½ÑÐµÐºÑÑ: Ð°Ð¼Ð¶Ð¸Ð»ÑÐ³Ò¯Ð¹ Ð±Ð¾Ð»Ð²Ð¾Ð» die
+  open($fh, "< no_such_file.txt");   # dies: Can't open(...)
+
+  # ÐÑÑÐ°Ñ ÑÑÐ³Ð°ÑÐ°Ð¹: Ð°Ð¼Ð¶Ð¸Ð»ÑÐ³Ò¯Ð¹ Ð±Ð¾Ð»Ð²Ð¾Ð» undef/0
+  my $rc = open($fh, "< file.txt");
+  unless ($rc) { warn "open Ð°Ð¼Ð¶Ð¸Ð»ÑÐ³Ò¯Ð¹: $!" }
+
+  open(FILE, "< file.txt");   # dies: Bare handle no longer supported
+
+[ 9. Handle ]
+
+  readline($fh)        # Ð½ÑÐ³ Ð¼Ó©Ñ ÑÐ½ÑÐ¸Ñ
+  read($fh, $buf, $n)  # N Ð±Ð°Ð¹Ñ ÑÐ½ÑÐ¸Ñ
+  print $fh "..."      # Ð±Ð¸ÑÐ¸Ñ
+  binmode($fh)         # ÑÐ¾ÑÑÑÑÐ½ Ð³Ð¾ÑÐ¸Ð¼
+  seek($fh, 0, 0)      # ÑÑÑÐ½Ð´ Ð¾ÑÐ¸Ñ
+  tell($fh)            # Ð¾Ð´Ð¾Ð¾Ð³Ð¸Ð¹Ð½ Ð±Ð°Ð¹ÑÐ»Ð°Ð»
+  close($fh)           # ÑÐ°Ð°Ñ
+  eof($fh)             # ÑÐ°Ð¹Ð»ÑÐ½ ÑÓ©Ð³ÑÐ³Ó©Ð»Ð¸Ð¹Ð³ ÑÐ°Ð»Ð³Ð°Ñ
+
+[ 10. Compatibility ]
+
+  Perl ÑÑÐ²Ð¸Ð»Ð±Ð°Ñ : 5.005_03 Ð±Ð° Ð´ÑÐ»ÑÐ¸Ð¹ (5.42 Ð¾ÑÐ½Ð¾)
+  ÐÐ»Ð°ÑÑÐ¾ÑÐ¼      : Unix, Linux, macOS, Windows (CRLF Ð°Ð²ÑÐ¾Ð¼Ð°ÑÐ°Ð°Ñ)
+  Ð¥Ð°Ð¼Ð°Ð°ÑÐ°Ð»      : Fcntl (Ò¯Ð½Ð´ÑÑÐ½ Ð¼Ð¾Ð´ÑÐ»Ñ)
+
+[ 11. Official resources ]
+
+  Modern::Open (MetaCPAN):
+    https://metacpan.org/dist/Modern-Open
+
+  INABA Hitoshi (ina) on CPAN:
+    https://metacpan.org/author/INA
+
+======================================================================

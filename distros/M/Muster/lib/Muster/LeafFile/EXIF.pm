@@ -1,5 +1,5 @@
 package Muster::LeafFile::EXIF;
-$Muster::LeafFile::EXIF::VERSION = '0.93';
+$Muster::LeafFile::EXIF::VERSION = '0.9501';
 #ABSTRACT: Muster::LeafFile::EXIF - an EXIF-containing file in a Muster content tree
 =head1 NAME
 
@@ -7,7 +7,7 @@ Muster::LeafFile::EXIF - an EXIF-containing file in a Muster content tree
 
 =head1 VERSION
 
-version 0.93
+version 0.9501
 
 =head1 DESCRIPTION
 
@@ -21,6 +21,8 @@ use Mojo::Base 'Muster::LeafFile';
 use Carp;
 use Image::ExifTool qw(:Public);
 use Text::Markdown::Discount 'markdown';
+use YAML::Any;
+use List::MoreUtils qw(uniq);
 
 sub is_this_a_binary {
     my $self = shift;
@@ -33,9 +35,11 @@ sub build_meta {
 
     my $meta = $self->SUPER::build_meta();
 
-    # What is in the EXIF overrides the defaults
-    my $info = ImageInfo($self->filename);
+    # Fields found in the EXIF will replace the defaults (e.g. title)
+    my $exif_options = {DateFormat => "%Y-%m-%d %H:%M:%S"};
+    my $info = ImageInfo($self->filename,$exif_options);
 
+    # Check if this is a Gutenberg book; they have quirks.
     my $is_gutenberg_book = 0;
     if (exists $info->{Identifier}
             and $info->{'Identifier'} =~ m!http://www.gutenberg.org/ebooks/\d+!)
@@ -61,7 +65,7 @@ sub build_meta {
     # There are multiple fields which could be used as a file content creator.
     # Check through them until you find a non-empty one.
     my $creator = '';
-    foreach my $field (qw(Author Artist Creator))
+    foreach my $field (qw(Author Artist Creator MetadataCreator))
     {
         if (exists $info->{$field} and $info->{$field} and !$creator)
         {
@@ -82,9 +86,20 @@ sub build_meta {
     }
     $meta->{copyright} = $copyright if $copyright;
 
+    # Alt text!
+    my $alt_text = '';
+    foreach my $field (qw(AltTextAccessibility))
+    {
+        if (exists $info->{$field} and $info->{$field} and !$alt_text)
+        {
+            $alt_text = $info->{$field};
+        }
+    }
+    $meta->{alt_text} = $alt_text if $alt_text;
+
     # The URL could be from the Source or the Identifier
     # Check through them until you find a non-empty one which contains an actual URL
-    foreach my $field (qw(Source Identifier))
+    foreach my $field (qw(Source Identifier MetadataIdentifier))
     {
         if (exists $info->{$field}
                 and $info->{$field}
@@ -95,44 +110,74 @@ sub build_meta {
         }
     }
 
+    # CreateDate is going to be treated as a separate field
+    my $create_date = '';
+    foreach my $field (qw(CreateDate))
+    {
+        if (exists $info->{$field} and $info->{$field} and !$create_date)
+        {
+            $create_date = $info->{$field};
+        }
+    }
+    $meta->{create_date} = $create_date if $create_date;
+
     # There are multiple fields which could be used as a file date.
     # Check through them until you find a non-empty one.
     my $date = '';
-    foreach my $field (qw(CreateDate DateTimeOriginal Date PublishedDate PublicationDate))
+    foreach my $field (qw(DateTimeOriginal Date PublishedDate PublicationDate))
     {
         if (exists $info->{$field} and $info->{$field} and !$date)
         {
             $date = $info->{$field};
-            # often the formatting can be different
-            # Change YYYY:MM:DD to YYYY-MM-DD
-            $date =~ s/^(\d+):(\d+):(\d+)/$1-$2-$3/;
         }
     }
     $meta->{date} = $date if $date;
-    $meta->{creation_date} = $date if $date;
 
     # Use a consistent naming for tag fields.
     # Combine the tag-like fields together.
-    # Put them in a hash because there might be duplicates
-    my %tags = ();
+    # Preserve the order and check for dupicates later with uniq
+    my @tags = ();
     foreach my $field (qw(Keywords Subject))
     {
         if (exists $info->{$field} and $info->{$field})
         {
-            my @tags = split(/,\s*/, $info->{$field});
-            foreach my $t (@tags)
+            my $val = $info->{$field};
+            my @these_tags;
+            if ($is_gutenberg_book)
+            {
+                # gutenberg tags are multi-word, separated by comma-space or ' -- '
+                # and can have parens in them
+                $val =~ s/\(//g;
+                $val =~ s/\)//g;
+                $val =~ s/\s--\s/,/g;
+                @these_tags = split(/,\s?/, $val);
+            }
+            else
+            {
+                @these_tags = split(/,\s*/, $val);
+            }
+            foreach my $t (@these_tags)
             {
                 $t =~ s/ - / /g; # remove isolated dashes
                 $t =~ s/[^\w\s,-]//g; # remove non-word characters
-                $tags{$t}++;
+                push @tags, $t;
             }
         }
     }
-    $meta->{tags} = join('|', sort keys %tags);
-    delete $meta->{tags} if !$meta->{tags}; # remove empty tag-field
+    # Are there any tags?
+    if (@tags)
+    {
+        # remove duplicates
+        $meta->{tags} = [uniq @tags];
+    }
+    else # remove empty tag-field
+    {
+        delete $meta->{tags};
+    }
 
     # There are SOOOOOO many fields in EXIF data, just remember a subset of them
     foreach my $field (qw(
+Flash
 FileSize
 ImageHeight
 ImageSize
@@ -148,6 +193,32 @@ Title
         }
     }
 
+    # -------------------------------------------------
+    # Freeform Fields
+    # These are stored as YAML data in the Instructions field.
+    # -------------------------------------------------
+    if (exists $info->{Instructions}
+            and $info->{Instructions}
+            and $info->{Instructions} =~ /^---/)
+    {
+        my $data;
+        eval {$data = Load($info->{Instructions});};
+        if ($@)
+        {
+            warn __PACKAGE__, " Load of YAML data failed: $@";
+        }
+        elsif (!$data)
+        {
+            warn __PACKAGE__, " no legal YAML";
+        }
+        else # okay
+        {
+            foreach my $field (sort keys %{$data})
+            {
+                $meta->{$field} = $data->{$field};
+            }
+        }
+    }
     return $meta;
 }
 

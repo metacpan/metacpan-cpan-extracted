@@ -14,7 +14,6 @@ plan skip_all => 'Scorecard guardrails are source-tree-only checks'
   if !-d File::Spec->catdir( $ROOT, '.git' ) || !-f $repo_workflow;
 
 ok( _git_tracks('LICENSE'), 'root LICENSE is tracked for Scorecard license detection' );
-ok( _git_tracks('LICENSE-Artistic-1.0-Perl'), 'alternate Artistic license text is tracked explicitly for the Perl 5 dual-license contract' );
 ok( _git_tracks('SECURITY.md'), 'root SECURITY.md is tracked for Scorecard security-policy detection' );
 ok( _git_tracks('.github/dependabot.yml'), 'Dependabot config is tracked for Scorecard dependency-update-tool detection' );
 ok( _git_tracks('.github/workflows/codeql.yml'), 'CodeQL workflow is tracked for Scorecard SAST detection' );
@@ -24,11 +23,8 @@ ok( _git_tracks('.github/workflows/release-github.yml'), 'GitHub release workflo
 ok( _git_tracks('.clusterfuzzlite/Dockerfile'), 'ClusterFuzzLite Dockerfile is tracked for Scorecard fuzzing detection' );
 
 my $license = _slurp('LICENSE');
-like( $license, qr/\AGNU GENERAL PUBLIC LICENSE/, 'LICENSE uses a canonical GPL text that GitHub can classify' );
-unlike( $license, qr/The "Artistic License"/, 'LICENSE keeps the alternate Artistic text out of the root file so GitHub does not classify it as an unknown composite blob' );
-
-my $license_artistic = _slurp('LICENSE-Artistic-1.0-Perl');
-like( $license_artistic, qr/\AThe "Artistic License"/, 'alternate Artistic license file ships the canonical Artistic text' );
+like( $license, qr/\AMIT License\n\nCopyright \(c\) \d{4} Developer Dashboard Contributors\n\nPermission is hereby granted, free of charge, to any person obtaining a copy/s, 'LICENSE uses the canonical MIT text that GitHub can classify' );
+like( $license, qr/THE SOFTWARE IS PROVIDED "AS IS"/, 'LICENSE includes the canonical MIT warranty disclaimer' );
 
 my $security = _slurp('SECURITY.md');
 like( $security, qr/Reporting A Vulnerability/i, 'SECURITY.md documents vulnerability reporting' );
@@ -56,6 +52,7 @@ unlike( $github_release_workflow, qr/^permissions:\s*$(?:\n^[^\n]*:\s*write\s*$)
 like( $github_release_workflow, qr/jobs:\n\s+release:\n(?:.+\n)*?\s+permissions:\n(?:.+\n)*?\s+contents:\s*write\b/ms, 'GitHub release workflow grants release-publish access only at the job level' );
 like( $github_release_workflow, qr/gh\s+release\s+create\b/, 'GitHub release workflow creates GitHub releases' );
 like( $github_release_workflow, qr/gh\s+release\s+upload\b/, 'GitHub release workflow updates existing GitHub releases' );
+like( $github_release_workflow, qr/cpanm\s+--notest\s+Devel::Cover\b/, 'GitHub release workflow installs Devel::Cover before it runs the numeric coverage gate' );
 like( $github_release_workflow, qr/\.asc\b/, 'GitHub release workflow publishes a detached signature asset next to the release tarball' );
 like( $github_release_workflow, qr/Developer-Dashboard-\*\.tar\.gz/, 'GitHub release workflow locates built distribution tarballs from the repo root' );
 
@@ -125,7 +122,11 @@ for my $coverage_workflow (
 }
 
 my $blank_env_dockerfile = _slurp('integration/blank-env/Dockerfile');
-like( $blank_env_dockerfile, qr/\AFROM\s+ubuntu:24\.04\@sha256:/, 'blank-env Dockerfile pins its Ubuntu base image by digest' );
+like(
+    $blank_env_dockerfile,
+    qr/\AFROM\s+perl:5\.38-bookworm\@sha256:[0-9a-f]{64}\b/,
+    'blank-env Dockerfile pins the Debian perl:5.38-bookworm base image by digest for dependency hygiene',
+);
 
 done_testing;
 

@@ -184,12 +184,12 @@ subtest 'Dynamic SQL simulation with SQLite' => sub {
         $schema->resultset('User')->search(
             { id => 1 },
             {
-                '+select' => [ { '' => \"datetime('now')", -as => 'current_time' } ],
+                '+select'    => [ { '' => \"strftime('%Y-%m-%d %H:%M:%f', 'now')", -as => 'current_time' } ],
                 result_class => 'DBIx::Class::ResultClass::HashRefInflator',
             }
         )->all
     );
-    my $time1 = $result1->[0]{current_time};
+    my $time1 = $result1->[0]->{current_time};
     ok($time1, 'Got timestamp from first query');
 
     sleep 1.5;  # Wait 1.5 seconds
@@ -199,12 +199,13 @@ subtest 'Dynamic SQL simulation with SQLite' => sub {
         $schema->resultset('User')->search(
             { id => 1 },
             {
-                '+select' => [ { '' => \"datetime('now')", -as => 'current_time' } ],
+                '+select'    => [ { '' => \"strftime('%Y-%m-%d %H:%M:%f', 'now')", -as => 'current_time' } ],
                 result_class => 'DBIx::Class::ResultClass::HashRefInflator',
+                cache_ttl    => 0, # Disable caching for this specific search
             }
         )->all
     );
-    my $time2 = $result2->[0]{current_time};
+    my $time2 = $result2->[0]->{current_time};
     ok($time2, 'Got timestamp from second query');
 
     # Times should be different (if cache is properly bypassed)

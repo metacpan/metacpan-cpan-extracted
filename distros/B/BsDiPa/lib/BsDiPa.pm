@@ -29,15 +29,21 @@ S-bsdipa -- create or apply binary difference patch
 	my ($b, $a) = ("\012\013\00\01\02\03\04\05\06\07" x 3,
 			"\010\011\012\013\014" x 4);
 
-	my $pz, $px, $pb, $pr, $iseq;
+	my $pz, $px, $pb, $pZ, $pr, $iseq;
 	die if BsDiPa::core_diff_zlib($b, $a, \$pz, undef, \$iseq) ne BsDiPa::OK;
 	die unless(!$iseq);
+	if(BsDiPa::HAVE_BZ2){
+		die if BsDiPa::core_diff_bz2($b, $a, \$pb, undef, \$iseq) ne BsDiPa::OK;
+		die unless(!$iseq)
+	}
 	if(BsDiPa::HAVE_XZ){
 		die if BsDiPa::core_diff_xz($b, $a, \$px, undef, \$iseq) ne BsDiPa::OK;
 		die unless(!$iseq)
 	}
-	if(BsDiPa::HAVE_BZ2){
-		die if BsDiPa::core_diff_bz2($b, $a, \$pb, undef, \$iseq) ne BsDiPa::OK;
+	my $cZ;
+	if(BsDiPa::HAVE_ZSTD){
+		$cZ = BsDiPa::core_io_cookie_new_zstd(9);
+		die if BsDiPa::core_diff_zstd($b, $a, \$pZ, undef, \$iseq, $cZ) ne BsDiPa::OK;
 		die unless(!$iseq)
 	}
 	die if BsDiPa::core_diff_raw($b, $a, \$pr) ne BsDiPa::OK;
@@ -45,19 +51,24 @@ S-bsdipa -- create or apply binary difference patch
 		my $x = uncompress($pz);
 		die unless(($pr cmp $x) == 0);
 
-	my $rz, $rx, $rb, $rr;
+	my $rz, $rx, $rb, $rZ, $rr;
 	die if BsDiPa::core_patch_zlib($a, $pz, \$rz) ne BsDiPa::OK;
+	if(BsDiPa::HAVE_BZ2){
+		die if BsDiPa::core_patch_bz2($a, $pb, \$rb) ne BsDiPa::OK
+	}
 	if(BsDiPa::HAVE_XZ){
 		die if BsDiPa::core_patch_xz($a, $px, \$rx) ne BsDiPa::OK
 	}
-	if(BsDiPa::HAVE_BZ2){
-		die if BsDiPa::core_patch_bz2($a, $pb, \$rb) ne BsDiPa::OK
+	if(BsDiPa::HAVE_ZSTD){
+		die if BsDiPa::core_patch_zstd($a, $pZ, \$rZ, undef, $cZ) ne BsDiPa::OK;
+		BsDiPa::core_io_cookie_gut($cZ)
 	}
 	die if BsDiPa::core_patch_raw($a, $pr, \$rr) ne BsDiPa::OK;
 	die unless(($rr cmp $b) == 0);
 	die unless(($rz cmp $rr) == 0);
-	die unless(!BsDiPa::HAVE_XZ || ($rx cmp $rr) == 0);
 	die unless(!BsDiPa::HAVE_BZ2 || ($rb cmp $rb) == 0);
+	die unless(!BsDiPa::HAVE_XZ || ($rx cmp $rr) == 0);
+	die unless(!BsDiPa::HAVE_ZSTD || ($rZ cmp $rr) == 0);
 
 =head1 DESCRIPTION
 
@@ -71,7 +82,7 @@ and always uses the (integrated) libdivsufsort optimization.
 
 =over
 
-=item C<VERSION> (string, eg, '0.9.0')
+=item C<VERSION> (string, eg, '0.9.1')
 
 A version string.
 
@@ -84,14 +95,19 @@ Could be multiline, but has no trailing newline.
 
 A multiline string containing a copyright license summary.
 
+=item C<HAVE_BZ2> (number / boolean)
+
+Returns 1 if support for libbz2 (BZIP2) is available, 0 otherwise.
+This is a compile time detection feature.
+
 =item C<HAVE_XZ> (number / boolean)
 
 Returns 1 if support for liblzma (XZ) is available, 0 otherwise.
 This is a compile time detection feature.
 
-=item C<HAVE_BZ2> (number / boolean)
+=item C<HAVE_ZSTD> (number / boolean)
 
-Returns 1 if support for libbz2 (BZIP2) is available, 0 otherwise.
+Returns 1 if support for libzstd (ZSTD) is available, 0 otherwise.
 This is a compile time detection feature.
 
 =item C<OK> (number)
@@ -119,10 +135,13 @@ neither multithread-safe nor generally applicable.
 =item C<core_diff_level_set($level)>
 
 Sets a default compression C<$level>.
-This is only used if no I/O cookie is used (see below),
-and what it actually means depends on the used compression.
-No value check is performed for this global setting that is
-neither multithread-safe nor generally applicable.
+C<$level> must be 0, or is cramped to within and including 1 and 9;
+the actual I/O layer maps this to a range meaning minimum to maximum.
+Only used if no dedicated I/O cookie is used (see below).
+Setting this is not multithread-safe.
+By default the strongest possible compression is used,
+unless its resource usage seems excessive (in comparison to the
+next weaker).
 
 =item C<core_diff_zlib($before_sv, $after_sv, $patch_sv, $magic_window=0, $is_equal_data=0, $io_cookie=0)>
 
@@ -139,15 +158,20 @@ if C<$before_sv> and C<$after_sv> represent identical data,
 to 0 otherwise; it is only defined on success.
 See below for C<$io_cookie>.
 
+=item C<core_diff_bz2($before_sv, $after_sv, $patch_sv, $magic_window=0, $is_equal_data=0, $io_cookie=0)>
+
+Exactly like C<core_diff_zlib()>, but with BZIP2 compression scheme.
+Only available if C<HAVE_BZ2> is true.
+
 =item C<core_diff_xz($before_sv, $after_sv, $patch_sv, $magic_window=0, $is_equal_data=0, $io_cookie=0)>
 
 Exactly like C<core_diff_zlib()>, but with XZ (lzma) compression scheme.
 Only available if C<HAVE_XZ> is true.
 
-=item C<core_diff_bz2($before_sv, $after_sv, $patch_sv, $magic_window=0, $is_equal_data=0, $io_cookie=0)>
+=item C<core_diff_zstd($before_sv, $after_sv, $patch_sv, $magic_window=0, $is_equal_data=0, $io_cookie=0)>
 
-Exactly like C<core_diff_zlib()>, but with BZIP2 compression scheme.
-Only available if C<HAVE_BZ2> is true.
+Exactly like C<core_diff_zlib()>, but with ZSTD compression scheme.
+Only available if C<HAVE_ZSTD> is true.
 
 =item C<core_diff_raw($before_sv, $after_sv, $patch_sv, $magic_window=0, $is_equal_data=0, $io_cookie=0)>
 
@@ -166,15 +190,20 @@ if 0 the effective limit is 31-bit.
 On error C<undef> is stored if at least C<$before_sv> is accessible.
 See below for C<$io_cookie>.
 
+=item C<core_patch_bz2($after_sv, $patch_sv, $before_sv, $max_allowed_restored_len=0, $io_cookie=0)>
+
+Exactly like C<core_patch_zlib()>, but expects a BZIP2 compressed patch.
+Only available if C<HAVE_BZ2> is true.
+
 =item C<core_patch_xz($after_sv, $patch_sv, $before_sv, $max_allowed_restored_len=0, $io_cookie=0)>
 
 Exactly like C<core_patch_zlib()>, but expects a XZ (lzma) compressed patch.
 Only available if C<HAVE_XZ> is true.
 
-=item C<core_patch_bz2($after_sv, $patch_sv, $before_sv, $max_allowed_restored_len=0, $io_cookie=0)>
+=item C<core_patch_zstd($after_sv, $patch_sv, $before_sv, $max_allowed_restored_len=0, $io_cookie=0)>
 
-Exactly like C<core_patch_zlib()>, but expects a BZIP2 compressed patch.
-Only available if C<HAVE_BZ2> is true.
+Exactly like C<core_patch_zlib()>, but expects a ZSTD compressed patch.
+Only available if C<HAVE_ZSTD> is true.
 
 =item C<core_patch_raw($after_sv, $patch_sv, $before_sv, $max_allowed_restored_len=0, $io_cookie=0)>
 
@@ -183,14 +212,21 @@ Exactly like C<core_patch_zlib()>, but expects an uncompressed raw patch.
 =item C<core_io_cookie_gut($io_cookie)>
 
 Delete an I/O cookie that was created via one of the C<core_io_cookie_new*()> functions below.
-An I/O cookie can be used for diffing and patching in any order,
-and can (massively) reduce memory and other creation/release costs, where supported.
+An I/O cookie can be used to specify a per-object compression level.
+It can (massively) reduce memory and other creation/release costs.
+(Multi-threading is not supported, etc.)
 
 =item C<core_io_cookie_new_xz($level=0)>
 
 Create an I/O cookie for the XZ compression scheme.
-C<$level> will be used for the compression level (no value check) if set.
+See C<core_diff_level_set($level)> for the meaning of C<$level>.
 Only available if C<HAVE_XZ> is true.
+
+=item C<core_io_cookie_new_zstd($level=0)>
+
+Create an I/O cookie for the ZSTD compression scheme.
+See C<core_diff_level_set($level)> for the meaning of C<$level>.
+Only available if C<HAVE_ZSTD> is true.
 
 =back
 

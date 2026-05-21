@@ -2,7 +2,7 @@ package Resource::Silo::Metadata;
 
 use strict;
 use warnings;
-our $VERSION = '0.1502';
+our $VERSION = '0.1703';
 
 =head1 NAME
 
@@ -73,6 +73,7 @@ my %known_args = (
     argument        => 1,
     class           => 1,
     check           => 1,
+    coerce          => 1,
     dependencies    => 1,
     derived         => 1,
     cleanup         => 1,
@@ -153,6 +154,15 @@ sub add {
     croak "resource '$name': 'init' must be a function"
         unless ref $spec{init} and reftype $spec{init} eq $CODE;
 
+    if ($spec{preload}) {
+        if (defined $spec{argument}) {
+            croak "resource '$name': 'preload' must be an array of strings if 'argument' is specified"
+                unless ref $spec{preload} eq 'ARRAY' and !grep {ref $_} @{$spec{preload}};
+        } else {
+            $spec{preload} = [undef]; # a dummy argument so that preload itself has unified code
+        }
+    };
+
     if (!defined $spec{argument}) {
         $spec{orig_argument} = '';
         $spec{argument} = \&_is_empty;
@@ -172,6 +182,8 @@ sub add {
 
     croak "resource '$name': 'check' must be a function"
         if defined $spec{check} and (reftype $spec{check} // '') ne $CODE;
+    croak "resource '$name': 'coerce' must be a function"
+        if defined $spec{coerce} and (reftype $spec{coerce} // '') ne $CODE;
     croak "resource '$name': 'cleanup' must be a function"
         if defined $spec{cleanup} and (reftype $spec{cleanup} // '') ne $CODE;
     croak "resource '$name': 'fork_cleanup' must be a function"
@@ -180,10 +192,6 @@ sub add {
         if $spec{fork_cleanup} and $spec{fork_safe};
 
     $spec{fork_cleanup} //= $spec{cleanup};
-
-    if ($spec{preload}) {
-        push @{ $self->{preload} }, $name;
-    };
 
     $spec{origin} = Carp::shortmess("declared");
     $spec{origin} =~ s/\D+$//s;
@@ -214,6 +222,7 @@ sub add {
         $self->{pending_deps}->drop_sink_cascade($name);
     };
     $self->{resource}{$name} = \%spec;
+    push @{ $self->{preload} }, $name if $spec{preload};
 
     return $self;
 };
@@ -409,7 +418,7 @@ sub elaborate_name {
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2023, Konstantin Uvarin, C<< <khedin@gmail.com> >>
+Copyright (c) 2023-2026, Konstantin Uvarin, C<< <khedin@gmail.com> >>
 
 This program is free software.
 You can redistribute it and/or modify it under the terms of either:

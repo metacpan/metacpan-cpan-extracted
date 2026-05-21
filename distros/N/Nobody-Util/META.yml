@@ -1,0 +1,34 @@
+---
+abstract: 'Utility modules used by Nobody (but useful to everybody)'
+author:
+  - 'Rich Paul <rpaul@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Nobody-Util
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  JSON::XS: '0'
+  List::Util: '1.45'
+  POSIX: '0'
+  Path::Tiny: '0'
+  Scalar::Util: '0'
+  Sub::Util: '0'
+  URI: '0'
+  common::sense: '0'
+  perl: '5.020'
+resources:
+  repository: https://gitlab.com/nobody-does-ai/nobody.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

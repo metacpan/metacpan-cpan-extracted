@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 #
 # Test every component of App::pod2gfm to ensure correct behavior. App::pod2gfm
 # must run as documented in its POD (and its wrapper POD).
@@ -20,8 +20,8 @@ use Test2::V1 qw<
 use App::pod2gfm;
 
 use File::Spec::Functions qw< catdir >;
-use Capture::Tiny         qw< capture_stdout capture_stderr >;
-use Path::Tiny;
+use Capture::Tiny 0.50 qw< capture_stdout capture_stderr >;
+use Path::Tiny 0.150;
 
 my %DEFAULTS = (
     class => 'App::pod2gfm',
@@ -219,7 +219,7 @@ subtest 'Unit test' => sub {
                         $arg =
                           defined $opts{no_force}
                           ? Path::Tiny->tempfile
-                          : catdir( $tempdir, 'foo.md' );
+                          : $tempdir->child('foo.md');
                     }
 
                     push @args, $arg;
@@ -362,7 +362,7 @@ subtest 'Integration test' => sub {
             my $return;
 
             if ( $opts{in_fh} eq 'infile' ) {
-                $infile = catdir( $tempdir, 'file.pod' );
+                $infile = $tempdir->child('file.pod');
                 path($infile)->spew_utf8($data);
             }
 
@@ -371,7 +371,7 @@ subtest 'Integration test' => sub {
                     $outfile = Path::Tiny->tempfile;
                 }
                 else {
-                    $outfile = catdir( $tempdir, 'file.md' );
+                    $outfile = $tempdir->child('file.md');
                 }
             }
 
@@ -404,11 +404,11 @@ subtest 'Integration test' => sub {
                         pop @args if $opt eq '--auto';
 
                         if ( $opt eq '--file-extension=markdown' ) {
-                            $outfile = catdir( $tempdir, 'file.markdown' );
+                            $outfile = $tempdir->child('file.markdown');
                             push @args, $outfile;
                         }
                         elsif ( $opt eq '--no-strip-ext' ) {
-                            $outfile = catdir( $tempdir, 'file.pod.md' );
+                            $outfile = $tempdir->child('file.pod.md');
                             push @args, $outfile;
                         }
                     }
@@ -468,7 +468,7 @@ subtest 'Integration test' => sub {
                 @args = ( '--auto', $files{foo}{in}, $files{bar}{in}, $files{baz}{in} );
 
                 if ( $opts{mode} eq 'multi_auto_target' ) {
-                    my $target_dir = catdir( $tempdir, 'docs' );
+                    my $target_dir = $tempdir->child('docs');
                     path($target_dir)->mkdir;
 
                     push @args, "--target-directory=$target_dir";

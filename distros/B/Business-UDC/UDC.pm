@@ -5,9 +5,9 @@ use warnings;
 
 use Business::UDC::Parser qw(parse);
 use English;
-use Error::Pure::Utils qw(clean);
+use Error::Pure::Utils qw(err_get);
 
-our $VERSION = 0.03;
+our $VERSION = 0.08;
 
 # Constructor.
 sub new {
@@ -17,7 +17,7 @@ sub new {
 	my $self = bless {
 		'source' => $source,
 		'_ast' => undef,
-		'_error' => undef,
+		'_error' => [],
 		'_tokens' => [],
 		'_valid' => 0,
 	}, $class;
@@ -27,8 +27,9 @@ sub new {
 	};
 	if ($EVAL_ERROR) {
 		chomp $EVAL_ERROR;
-		$self->{'_error'} = $EVAL_ERROR;
-		clean();
+		my ($error_hr) = err_get(1);
+		my @err = @{$error_hr->{'msg'}};
+		$self->{'_error'} = \@err;
 	} else {
 		$self->{'_ast'} = $res_hr->{'ast'};
 		$self->{'_tokens'} = $res_hr->{'tokens'};
@@ -47,7 +48,7 @@ sub ast {
 sub error {
 	my $self = shift;
 
-	return $self->{'_error'};
+	return wantarray ? @{$self->{'_error'}} : $self->{'_error'}->[0];
 }
 
 sub is_valid {
@@ -87,6 +88,7 @@ Business::UDC - Class to work with Universal Decimal Classification.
  my $obj = Business::UDC->new($udc_string);
  my $ast_hr = $obj->ast;
  my $error = $obj->error;
+ my ($error, %params) = $obj->error;
  my $is_valid = $obj->is_valid;
  my $source = $obj->source;
  my $tokens_ar = $obj->tokens;
@@ -112,12 +114,15 @@ Returns reference to hash with structure.
 =head2 C<error>
 
  my $error = $obj->error;
+ my ($error, %params) = $obj->error;
 
-Get error.
+Get error in scalar mode.
+
+Get error and error parameters in array mode.
 
 TODO Errors.
 
-Returns string or undef.
+Returns string or undef and optional list of strings.
 
 =head2 C<is_valid>
 
@@ -202,6 +207,6 @@ the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
 
 =head1 VERSION
 
-0.03
+0.08
 
 =cut

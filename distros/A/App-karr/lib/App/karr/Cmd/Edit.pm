@@ -1,7 +1,7 @@
 # ABSTRACT: Modify an existing task
 
 package App::karr::Cmd::Edit;
-our $VERSION = '0.102';
+our $VERSION = '0.205';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -10,6 +10,7 @@ use MooX::Options (
 use App::karr::Role::BoardAccess;
 use App::karr::Role::Output;
 use App::karr::Task;
+use Time::Piece;
 
 with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output';
 
@@ -128,8 +129,7 @@ sub execute {
 
     if ($self->claim) {
       $task->claimed_by($self->claim);
-      require Time::Piece;
-      $task->claimed_at(Time::Piece::gmtime()->datetime . 'Z');
+      $task->claimed_at(gmtime->datetime . 'Z');
     }
 
     if ($self->release) {
@@ -145,15 +145,7 @@ sub execute {
       $task->blocked(undef);
     }
 
-    # Handle title change -> file rename
-    if ($self->title && $task->has_file_path) {
-      my $old_file = $task->file_path;
-      my $new_file = $self->tasks_dir->child($task->filename);
-      $task->save($self->tasks_dir);
-      $old_file->remove if "$old_file" ne "$new_file";
-    } else {
-      $task->save;
-    }
+    $self->save_task($task);
 
     push @results, { id => $task->id, title => $task->title };
     printf "Updated task %d: %s\n", $task->id, $task->title unless $self->json;
@@ -180,7 +172,7 @@ App::karr::Cmd::Edit - Modify an existing task
 
 =head1 VERSION
 
-version 0.102
+version 0.205
 
 =head1 SYNOPSIS
 
@@ -230,11 +222,11 @@ L<App::karr::Cmd::Handoff>, L<App::karr::Cmd::List>
 =head2 Issues
 
 Please report bugs and feature requests on GitHub at
-L<https://github.com/Getty/p5-app-karr/issues>.
+L<https://github.com/Getty/karr/issues>.
 
 =head2 IRC
 
-Join C<#ai> on C<irc.perl.org> or message Getty directly.
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -242,7 +234,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

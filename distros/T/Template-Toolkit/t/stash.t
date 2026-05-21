@@ -402,3 +402,33 @@ PASS: stringified from GetNumbersome
 [% cmp_ol.hello %]
 -- expect --
 Hello
+
+# Verify that hash vmethods (e.g. keys, size) work on non-root hashes
+# and that 'import' works on root stash (operator precedence fix)
+
+-- test --
+[% myhash = { a => 1, b => 2 }; myhash.keys.sort.join(', ') %]
+-- expect --
+a, b
+
+-- test --
+[% myhash = { x => 10 }; CALL myhash.import({ y => 20 }); myhash.keys.sort.join(', ') %]
+-- expect --
+x, y
+
+# DEFAULT on array elements — _assign() line 614 used hash deref on array ref
+# (GH issue: _assign checks $root->{$item} instead of $root->[$item] for arrays)
+
+-- test --
+[% mylist = [ 'alpha', '', 'charlie' ];
+   DEFAULT mylist.1 = 'BRAVO';
+   mylist.0 %] [% mylist.1 %] [% mylist.2 %]
+-- expect --
+alpha BRAVO charlie
+
+-- test --
+[% mylist = [ 'alpha', 'bravo', 'charlie' ];
+   DEFAULT mylist.1 = 'REPLACED';
+   mylist.0 %] [% mylist.1 %] [% mylist.2 %]
+-- expect --
+alpha bravo charlie

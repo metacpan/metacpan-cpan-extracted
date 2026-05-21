@@ -15,6 +15,8 @@
 #include <errno.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdlib.h>
+#include <time.h>
 #include <arpa/inet.h>
 
 #ifdef HAVE_OPENSSL
@@ -28,7 +30,6 @@
  * ================================================================ */
 
 #define NATS_MAGIC_ALIVE 0xCA5E4A75
-#define NATS_MAGIC_FREED 0xDEAD4A75
 
 #define BUF_INIT_SIZE  16384
 #define MAX_CONTROL_LINE 4096
@@ -266,6 +267,32 @@ static void nats_cancel_all_requests(nats_t *self, const char *err);
 static void nats_resub_all(nats_t *self);
 
 /* ================================================================
+ * String helpers
+ * ================================================================ */
+
+/* Replace *dst with a fresh copy of NUL-terminated src; frees existing. */
+static void nats_set_str(char **dst, const char *src)
+{
+    if (*dst) { Safefree(*dst); *dst = NULL; }
+    if (src) {
+        size_t l = strlen(src);
+        Newx(*dst, l + 1, char);
+        memcpy(*dst, src, l + 1);
+    }
+}
+
+/* Replace *dst with a copy of an SV's bytes (handles non-NUL-terminated PV). */
+static void nats_set_str_sv(char **dst, SV *val)
+{
+    STRLEN l;
+    const char *s = SvPV(val, l);
+    if (*dst) { Safefree(*dst); *dst = NULL; }
+    Newx(*dst, l + 1, char);
+    memcpy(*dst, s, l);
+    (*dst)[l] = '\0';
+}
+
+/* ================================================================
  * Buffer helpers
  * ================================================================ */
 
@@ -334,6 +361,33 @@ static int nats_base32_decode(const char *src, size_t src_len, unsigned char *ds
     return 0;
 }
 
+/* NATS base32 encode (RFC 4648, no padding). Streams 8-bit input through
+   a 5-bit accumulator. Returns number of chars written, or -1 if dst is
+   too small. */
+static int nats_base32_encode(const unsigned char *src, size_t src_len,
+                              char *dst, size_t dst_size)
+{
+    static const char b32[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+    size_t di = 0;
+    uint64_t buf = 0;
+    int bits = 0;
+    size_t i;
+    for (i = 0; i < src_len; i++) {
+        buf = (buf << 8) | src[i];
+        bits += 8;
+        while (bits >= 5) {
+            if (di >= dst_size) return -1;
+            bits -= 5;
+            dst[di++] = b32[(buf >> bits) & 0x1F];
+        }
+    }
+    if (bits > 0) {
+        if (di >= dst_size) return -1;
+        dst[di++] = b32[(buf << (5 - bits)) & 0x1F];
+    }
+    return (int)di;
+}
+
 /* NATS base64url encode (no padding) */
 static int nats_base64url_encode(const unsigned char *src, size_t src_len, char *dst, size_t dst_size)
 {
@@ -360,17 +414,18 @@ static int nats_base64url_encode(const unsigned char *src, size_t src_len, char 
     return (int)di;
 }
 
-/* CRC16/IBM for NATS NKey validation */
+/* CRC-16/XMODEM (CRC-CCITT, poly 0x1021, init 0x0000) — what NATS NKeys
+   use. NOT CRC-16/IBM. Used for seed/pubkey integrity. */
 static uint16_t nats_crc16(const unsigned char *data, size_t len)
 {
     uint16_t crc = 0;
     size_t i;
+    int j;
     for (i = 0; i < len; i++) {
-        crc ^= (uint16_t)data[i];
-        int j;
+        crc ^= ((uint16_t)data[i]) << 8;
         for (j = 0; j < 8; j++) {
-            if (crc & 1) crc = (crc >> 1) ^ 0xA001;
-            else crc >>= 1;
+            if (crc & 0x8000) crc = (uint16_t)((crc << 1) ^ 0x1021);
+            else crc = (uint16_t)(crc << 1);
         }
     }
     return crc;
@@ -436,16 +491,18 @@ static int nats_nkey_public(const char *seed_encoded, char *pub_out, size_t pub_
     EVP_PKEY_free(pkey);
     if (!ok) return -1;
 
-    /* Derive public key prefix from seed prefix.
-       Seed prefix byte encodes type in bits 3-7: User=0xD0>>3, etc.
-       The first two decoded bytes encode: byte0 = (prefix >> 3), byte1 = (prefix << 5) | ... */
-    unsigned char seed_prefix = (raw[0] << 3) | (raw[1] >> 5);
+    /* Derive public-key prefix from the role embedded in the seed prefix.
+       Seed encoding (NATS Go nkeys EncodeSeed):
+           raw[0] = PrefixByteSeed | (role >> 5)
+           raw[1] = (role & 31) << 3
+       so role = ((raw[0] & 7) << 5) | (raw[1] >> 3). */
+    unsigned char role = (unsigned char)(((raw[0] & 0x07) << 5) | (raw[1] >> 3));
     unsigned char pub_prefix;
-    switch (seed_prefix & 0xF8) {
-        case 0x90: pub_prefix = 0xD0; break; /* S+User -> U */
-        case 0x38: pub_prefix = 0x38; break; /* S+Operator -> O */
-        case 0x00: pub_prefix = 0x00; break; /* S+Account -> A */
-        default:   pub_prefix = 0xD0; break;
+    switch (role) {
+        case 0xA0: pub_prefix = 0xA0; break; /* User */
+        case 0x70: pub_prefix = 0x70; break; /* Operator */
+        case 0x00: pub_prefix = 0x00; break; /* Account */
+        default:   pub_prefix = 0xA0; break; /* default to User */
     }
 
     /* Build: prefix(1) + pubkey(32) + CRC16(2) = 35 bytes */
@@ -456,21 +513,12 @@ static int nats_nkey_public(const char *seed_encoded, char *pub_out, size_t pub_
     full[33] = crc & 0xFF;
     full[34] = (crc >> 8) & 0xFF;
 
-    /* Base32 encode 35 bytes -> 56 chars */
-    static const char b32_chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-    size_t di = 0, ci;
-    uint64_t buf = 0;
-    int bits = 0;
-    for (ci = 0; ci < 35 && di < pub_out_size - 1; ci++) {
-        buf = (buf << 8) | full[ci];
-        bits += 8;
-        while (bits >= 5 && di < pub_out_size - 1) {
-            bits -= 5;
-            pub_out[di++] = b32_chars[(buf >> bits) & 0x1F];
-        }
-    }
-    if (di < pub_out_size) pub_out[di] = '\0';
-    return (int)di;
+    /* Base32 encode 35 bytes -> 56 chars (35*8 = 280 bits, 280/5 = 56). */
+    int n = nats_base32_encode(full, sizeof(full), pub_out,
+                               pub_out_size > 0 ? pub_out_size - 1 : 0);
+    if (n < 0) return -1;
+    if ((size_t)n < pub_out_size) pub_out[n] = '\0';
+    return n;
 }
 #endif
 
@@ -541,8 +589,19 @@ static int nats_ssl_setup(nats_t *self)
     if (!self->ssl) return -1;
 
     SSL_set_fd(self->ssl, self->fd);
-    if (self->host)
+    if (self->host) {
         SSL_set_tlsext_host_name(self->ssl, self->host);
+        if (!self->tls_skip_verify) {
+            X509_VERIFY_PARAM *vpm = SSL_get0_param(self->ssl);
+            /* set1_ip_asc parses host as a textual IP and returns 0 on
+               failure — fall back to set1_host for DNS names. */
+            if (vpm && !X509_VERIFY_PARAM_set1_ip_asc(vpm, self->host)) {
+                X509_VERIFY_PARAM_set_hostflags(vpm, X509_CHECK_FLAG_NO_PARTIAL_WILDCARDS);
+                if (!X509_VERIFY_PARAM_set1_host(vpm, self->host, 0))
+                    return -1;
+            }
+        }
+    }
 
     return 0;
 }
@@ -579,6 +638,23 @@ static int nats_ssl_handshake(nats_t *self)
         return 0;
     }
     return -1;
+}
+
+/* Emit "<prefix>: <openssl-error>", clean up the connection. */
+static void nats_ssl_fail(nats_t *self, const char *prefix)
+{
+    char errbuf[256];
+    char msg[320];
+    unsigned long e = ERR_peek_last_error();
+    if (e) {
+        ERR_error_string_n(e, errbuf, sizeof(errbuf));
+        ERR_clear_error();
+    } else {
+        snprintf(errbuf, sizeof(errbuf), "unknown SSL error");
+    }
+    snprintf(msg, sizeof(msg), "%s: %s", prefix, errbuf);
+    nats_emit_error(self, msg);
+    nats_cleanup(self);
 }
 #endif
 
@@ -623,24 +699,32 @@ static int json_escape_string(char *dst, size_t dst_size, const char *src)
  * Random hex for inbox prefix
  * ================================================================ */
 
-static void nats_gen_hex(char *buf, int nbytes)
+/* Read nbytes from /dev/urandom; fall back to rand() per byte. */
+static void nats_random_bytes(unsigned char *out, int nbytes)
 {
-    static const char hex[] = "0123456789abcdef";
-    unsigned char rnd[16];
-    int i, got = 0;
-
+    int got = 0;
     int fd = open("/dev/urandom", O_RDONLY);
     if (fd >= 0) {
         while (got < nbytes) {
-            ssize_t n = read(fd, rnd + got, nbytes - got);
+            ssize_t n = read(fd, out + got, nbytes - got);
             if (n > 0) got += n;
             else if (n == 0 || (errno != EINTR && errno != EAGAIN)) break;
         }
         close(fd);
     }
+    int i;
     for (i = got; i < nbytes; i++)
-        rnd[i] = (unsigned char)(rand() & 0xFF);
+        out[i] = (unsigned char)(rand() & 0xFF);
+}
 
+static void nats_gen_hex(char *buf, int nbytes)
+{
+    static const char hex[] = "0123456789abcdef";
+    unsigned char rnd[16];
+    if (nbytes < 0) nbytes = 0;
+    if (nbytes > (int)sizeof(rnd)) nbytes = (int)sizeof(rnd);
+    nats_random_bytes(rnd, nbytes);
+    int i;
     for (i = 0; i < nbytes; i++) {
         buf[i*2]   = hex[rnd[i] >> 4];
         buf[i*2+1] = hex[rnd[i] & 0x0F];
@@ -816,6 +900,7 @@ static void nats_cleanup(nats_t *self)
     self->connecting = 0;
     self->pings_outstanding = 0;
     self->parse_state = PARSE_OP;
+    self->ldm = 0;  /* lame-duck flag is per-connection */
 
 #ifdef HAVE_OPENSSL
     nats_ssl_cleanup(self);
@@ -832,13 +917,39 @@ static void nats_cleanup(nats_t *self)
 
     nats_cancel_all_requests(self, "disconnected");
 
-    /* Clear flush callbacks */
+    /* Drain pending PONG callbacks (flush + drain markers). Fire each
+       cb with a single error arg so callers learn the flush failed
+       rather than hang forever waiting for a PONG that won't arrive. */
     while (!ngx_queue_empty(&self->pong_cbs)) {
         ngx_queue_t *pq = ngx_queue_head(&self->pong_cbs);
         nats_pong_cb_t *pcb = ngx_queue_data(pq, nats_pong_cb_t, queue);
         ngx_queue_remove(pq);
-        CLEAR_HANDLER(pcb->cb);
+        if (pcb->cb) {
+            dSP;
+            ENTER; SAVETMPS;
+            PUSHMARK(SP);
+            EXTEND(SP, 1);
+            PUSHs(sv_2mortal(newSVpvn("disconnected", 12)));
+            PUTBACK;
+            call_sv(pcb->cb, G_DISCARD);
+            FREETMPS; LEAVE;
+            SvREFCNT_dec(pcb->cb);
+        }
         Safefree(pcb);
+    }
+    /* Drain marker (drain_cb) is a separate field, fired on PONG normally;
+       on cleanup it would otherwise leak. Fire it with error too. */
+    if (self->draining && self->drain_cb) {
+        dSP;
+        ENTER; SAVETMPS;
+        PUSHMARK(SP);
+        EXTEND(SP, 1);
+        PUSHs(sv_2mortal(newSVpvn("disconnected", 12)));
+        PUTBACK;
+        call_sv(self->drain_cb, G_DISCARD);
+        FREETMPS; LEAVE;
+        CLEAR_HANDLER(self->drain_cb);
+        self->draining = 0;
     }
 
     if (was_connected && self->on_disconnect) {
@@ -876,14 +987,17 @@ static void nats_emit_error(nats_t *self, const char *err)
 #define CONNECT_BUF_SIZE 8192
 #define CONNECT_APPEND(fmt, ...) \
     do { \
-        if (off < (int)sizeof(buf)) \
-            off += snprintf(buf + off, sizeof(buf) - off, fmt, ##__VA_ARGS__); \
+        if (off >= (int)sizeof(buf)) { overflow = 1; break; } \
+        int _n = snprintf(buf + off, sizeof(buf) - off, fmt, ##__VA_ARGS__); \
+        if (_n < 0 || _n >= (int)(sizeof(buf) - off)) { overflow = 1; break; } \
+        off += _n; \
     } while(0)
 
 static void nats_send_connect(nats_t *self)
 {
     char buf[CONNECT_BUF_SIZE];
     int off = 0;
+    int overflow = 0;
     char escaped[1024];
 
     CONNECT_APPEND("CONNECT {");
@@ -895,7 +1009,7 @@ static void nats_send_connect(nats_t *self)
     if (self->no_responders)
         CONNECT_APPEND(",\"no_responders\":true");
     CONNECT_APPEND(",\"headers\":true");
-    CONNECT_APPEND(",\"lang\":\"perl-xs\",\"version\":\"0.01\"");
+    CONNECT_APPEND(",\"lang\":\"perl-xs\",\"version\":\"0.02\"");
 
     if (self->user) {
         int elen = json_escape_string(escaped, sizeof(escaped), self->user);
@@ -932,8 +1046,11 @@ static void nats_send_connect(nats_t *self)
 
     CONNECT_APPEND("}\r\n");
 
-    if (off > (int)sizeof(buf))
-        off = (int)sizeof(buf);
+    if (overflow) {
+        nats_emit_error(self, "CONNECT command too long (auth/name fields)");
+        nats_cleanup(self);
+        return;
+    }
 
     wbuf_append(self, buf, off);
 
@@ -945,6 +1062,23 @@ static void nats_send_connect(nats_t *self)
 /* ================================================================
  * Protocol parser
  * ================================================================ */
+
+/* Parse a decimal token as size_t. Returns 0 on success, -1 on
+   non-digits, empty input, or overflow. */
+static int nats_parse_decimal(const char *tok, size_t tok_len, size_t *out)
+{
+    size_t v = 0;
+    size_t i;
+    if (tok_len == 0) return -1;
+    for (i = 0; i < tok_len; i++) {
+        if (tok[i] < '0' || tok[i] > '9') return -1;
+        size_t d = (size_t)(tok[i] - '0');
+        if (v > (SIZE_MAX - d) / 10) return -1;
+        v = v * 10 + d;
+    }
+    *out = v;
+    return 0;
+}
 
 static int nats_parse_msg_args(nats_t *self, char *line, size_t len)
 {
@@ -967,15 +1101,10 @@ static int nats_parse_msg_args(nats_t *self, char *line, size_t len)
     /* sid */
     tok_start = p;
     while (p < end && *p != ' ' && *p != '\t') p++;
-    if (p == tok_start) return -1;
-    self->msg_sid = 0;
     {
-        char *s = tok_start;
-        while (s < p) {
-            if (*s < '0' || *s > '9') return -1;
-            self->msg_sid = self->msg_sid * 10 + (*s - '0');
-            s++;
-        }
+        size_t sid;
+        if (nats_parse_decimal(tok_start, p - tok_start, &sid) != 0) return -1;
+        self->msg_sid = (uint64_t)sid;
     }
 
     while (p < end && (*p == ' ' || *p == '\t')) p++;
@@ -998,24 +1127,14 @@ static int nats_parse_msg_args(nats_t *self, char *line, size_t len)
         /* no reply-to, just #bytes */
         self->msg_reply_off = 0;
         self->msg_reply_len = 0;
-        self->msg_total_len = 0;
-        char *s = tokens[0]; char *e = s + token_lens[0];
-        while (s < e) {
-            if (*s < '0' || *s > '9') return -1;
-            self->msg_total_len = self->msg_total_len * 10 + (*s - '0');
-            s++;
-        }
+        if (nats_parse_decimal(tokens[0], token_lens[0], &self->msg_total_len) != 0)
+            return -1;
     } else if (ntokens == 2) {
         /* reply-to + #bytes */
         self->msg_reply_off = tokens[0] - self->rbuf;
         self->msg_reply_len = token_lens[0];
-        self->msg_total_len = 0;
-        char *s = tokens[1]; char *e = s + token_lens[1];
-        while (s < e) {
-            if (*s < '0' || *s > '9') return -1;
-            self->msg_total_len = self->msg_total_len * 10 + (*s - '0');
-            s++;
-        }
+        if (nats_parse_decimal(tokens[1], token_lens[1], &self->msg_total_len) != 0)
+            return -1;
     } else {
         return -1;
     }
@@ -1046,15 +1165,10 @@ static int nats_parse_hmsg_args(nats_t *self, char *line, size_t len)
     /* sid */
     tok_start = p;
     while (p < end && *p != ' ' && *p != '\t') p++;
-    if (p == tok_start) return -1;
-    self->msg_sid = 0;
     {
-        char *s = tok_start;
-        while (s < p) {
-            if (*s < '0' || *s > '9') return -1;
-            self->msg_sid = self->msg_sid * 10 + (*s - '0');
-            s++;
-        }
+        size_t sid;
+        if (nats_parse_decimal(tok_start, p - tok_start, &sid) != 0) return -1;
+        self->msg_sid = (uint64_t)sid;
     }
 
     while (p < end && (*p == ' ' || *p == '\t')) p++;
@@ -1072,21 +1186,20 @@ static int nats_parse_hmsg_args(nats_t *self, char *line, size_t len)
         ntokens++;
     }
 
+    int hdr_idx, len_idx;
     if (ntokens == 2) {
         self->msg_reply_off = 0;
         self->msg_reply_len = 0;
-        self->msg_hdr_len = 0;
-        self->msg_total_len = 0;
-        { char *s = tokens[0]; char *e = s + token_lens[0]; while (s < e) { if (*s < '0' || *s > '9') return -1; self->msg_hdr_len = self->msg_hdr_len * 10 + (*s - '0'); s++; } }
-        { char *s = tokens[1]; char *e = s + token_lens[1]; while (s < e) { if (*s < '0' || *s > '9') return -1; self->msg_total_len = self->msg_total_len * 10 + (*s - '0'); s++; } }
+        hdr_idx = 0; len_idx = 1;
     } else if (ntokens == 3) {
         self->msg_reply_off = tokens[0] - self->rbuf;
         self->msg_reply_len = token_lens[0];
-        self->msg_hdr_len = 0;
-        self->msg_total_len = 0;
-        { char *s = tokens[1]; char *e = s + token_lens[1]; while (s < e) { if (*s < '0' || *s > '9') return -1; self->msg_hdr_len = self->msg_hdr_len * 10 + (*s - '0'); s++; } }
-        { char *s = tokens[2]; char *e = s + token_lens[2]; while (s < e) { if (*s < '0' || *s > '9') return -1; self->msg_total_len = self->msg_total_len * 10 + (*s - '0'); s++; } }
+        hdr_idx = 1; len_idx = 2;
     } else {
+        return -1;
+    }
+    if (nats_parse_decimal(tokens[hdr_idx], token_lens[hdr_idx], &self->msg_hdr_len) != 0
+     || nats_parse_decimal(tokens[len_idx], token_lens[len_idx], &self->msg_total_len) != 0) {
         return -1;
     }
 
@@ -1266,6 +1379,27 @@ static void nats_process_line(nats_t *self, char *line, size_t len)
         }
 
         if (self->connecting) {
+#ifdef HAVE_OPENSSL
+            if (self->tls && !self->ssl) {
+                if (nats_ssl_setup(self) != 0) {
+                    nats_ssl_fail(self, "SSL setup failed");
+                    return;
+                }
+                self->ssl_handshaking = 1;
+                int hret = nats_ssl_handshake(self);
+                if (hret < 0) {
+                    nats_ssl_fail(self, "SSL handshake failed");
+                    return;
+                }
+                if (hret == 1) {
+                    self->ssl_handshaking = 0;
+                    nats_send_connect(self);
+                    nats_try_write(self);
+                }
+                /* hret == 0: handshake in progress; nats_on_read will resume. */
+                return;
+            }
+#endif
             nats_send_connect(self);
             nats_try_write(self);
         }
@@ -1343,6 +1477,8 @@ static void nats_process_line(nats_t *self, char *line, size_t len)
                 dSP;
                 ENTER; SAVETMPS;
                 PUSHMARK(SP);
+                EXTEND(SP, 1);
+                PUSHs(&PL_sv_undef);  /* success: no error */
                 PUTBACK;
                 call_sv(pcb->cb, G_DISCARD);
                 FREETMPS; LEAVE;
@@ -1354,6 +1490,8 @@ static void nats_process_line(nats_t *self, char *line, size_t len)
                     dSP;
                     ENTER; SAVETMPS;
                     PUSHMARK(SP);
+                    EXTEND(SP, 1);
+                    PUSHs(&PL_sv_undef);  /* success: no error */
                     PUTBACK;
                     call_sv(self->drain_cb, G_DISCARD);
                     FREETMPS; LEAVE;
@@ -1408,14 +1546,19 @@ static void nats_on_read(struct ev_loop *loop, ev_io *w, int revents)
         int hret = nats_ssl_handshake(self);
         if (hret == 0) return;
         if (hret < 0) {
-            nats_emit_error(self, "SSL handshake failed");
-            nats_cleanup(self);
+            nats_ssl_fail(self, "SSL handshake failed");
             return;
         }
         self->ssl_handshaking = 0;
         if (self->writing) {
             ev_io_stop(self->loop, &self->wio);
             self->writing = 0;
+        }
+        /* Handshake completed after the post-INFO upgrade. Send CONNECT
+           over the now-encrypted channel. */
+        if (self->connecting) {
+            nats_send_connect(self);
+            nats_try_write(self);
         }
     }
 #endif
@@ -1441,6 +1584,11 @@ static void nats_on_read(struct ev_loop *loop, ev_io *w, int revents)
 
     while (consumed < self->rbuf_len) {
         if (self->fd < 0) break;
+#ifdef HAVE_OPENSSL
+        /* If processing INFO triggered a TLS upgrade, stop parsing rbuf as
+           plaintext — subsequent bytes belong to the TLS handshake. */
+        if (self->ssl_handshaking) break;
+#endif
 
         if (self->parse_state == PARSE_OP) {
             char *start = self->rbuf + consumed;
@@ -1540,26 +1688,9 @@ static void nats_on_write(struct ev_loop *loop, ev_io *w, int revents)
             nats_cleanup(self);
             return;
         }
-#ifdef HAVE_OPENSSL
-        if (self->tls && !self->ssl) {
-            if (nats_ssl_setup(self) != 0) {
-                nats_emit_error(self, "SSL setup failed");
-                nats_cleanup(self);
-                return;
-            }
-            self->ssl_handshaking = 1;
-        }
-        if (self->ssl_handshaking) {
-            int hret = nats_ssl_handshake(self);
-            if (hret == 0) return; /* want read/write */
-            if (hret < 0) {
-                nats_emit_error(self, "SSL handshake failed");
-                nats_cleanup(self);
-                return;
-            }
-            /* handshake done, fall through to wait for INFO */
-        }
-#endif
+        /* TCP connect complete. NATS speaks plain text until INFO arrives;
+           if TLS is configured, we upgrade once we've parsed INFO. So just
+           switch to reading and wait for the server's INFO greeting. */
         if (self->writing) {
             ev_io_stop(self->loop, &self->wio);
             self->writing = 0;
@@ -1739,6 +1870,10 @@ static void nats_queue_write(nats_t *self, const char *data, size_t len)
 
 static void nats_schedule_reconnect(nats_t *self)
 {
+    /* If a user callback (on_disconnect/on_error) already kicked off a fresh
+       connect, don't stomp on it. */
+    if (self->fd >= 0 || self->connecting || self->reconnect_timer_active)
+        return;
     if (!self->intentional_disconnect && self->reconnect_enabled) {
         if (self->max_reconnect_attempts == 0 ||
             self->reconnect_attempts < self->max_reconnect_attempts) {
@@ -1748,7 +1883,10 @@ static void nats_schedule_reconnect(nats_t *self)
             if (self->max_reconnect_delay_ms > 0 && delay > self->max_reconnect_delay_ms)
                 delay = self->max_reconnect_delay_ms;
             double base = delay / 1000.0;
-            double jitter = base * (0.5 + (double)(rand() % 1000) / 2000.0);
+            unsigned char r[2];
+            nats_random_bytes(r, 2);
+            unsigned int rv = ((unsigned)r[0] << 8) | r[1];
+            double jitter = base * (0.5 + (double)(rv % 1000) / 2000.0);
             ev_timer_set(&self->reconnect_timer, jitter, 0.0);
             ev_timer_start(self->loop, &self->reconnect_timer);
             self->reconnect_timer_active = 1;
@@ -1832,10 +1970,7 @@ static void nats_next_server(nats_t *self)
     ngx_queue_t *q = ngx_queue_head(&self->server_pool);
     nats_server_t *srv = ngx_queue_data(q, nats_server_t, queue);
 
-    if (self->host) Safefree(self->host);
-    size_t hlen = strlen(srv->host);
-    Newx(self->host, hlen + 1, char);
-    memcpy(self->host, srv->host, hlen + 1);
+    nats_set_str(&self->host, srv->host);
     self->port = srv->port;
 
     /* Rotate this server to end of pool */
@@ -1927,13 +2062,14 @@ static void nats_connect_unix(nats_t *self)
 
     if (!self->path || strlen(self->path) >= sizeof(addr.sun_path)) {
         nats_emit_error(self, "invalid unix socket path");
+        nats_schedule_reconnect(self);
         return;
     }
 
     fd = socket(AF_UNIX, SOCK_STREAM, 0);
     if (fd < 0) {
-        nats_schedule_reconnect(self);
         nats_emit_error(self, strerror(errno));
+        nats_schedule_reconnect(self);
         return;
     }
 
@@ -1946,8 +2082,8 @@ static void nats_connect_unix(nats_t *self)
     int rv = connect(fd, (struct sockaddr *)&addr, sizeof(addr));
     if (rv != 0 && errno != EINPROGRESS) {
         close(fd);
-        nats_schedule_reconnect(self);
         nats_emit_error(self, strerror(errno));
+        nats_schedule_reconnect(self);
         return;
     }
 
@@ -1998,6 +2134,16 @@ PROTOTYPES: DISABLE
 BOOT:
 {
     I_EV_API("EV::Nats");
+    {
+        HV *stash = gv_stashpv("EV::Nats", GV_ADD);
+#ifdef HAVE_OPENSSL
+        newCONSTSUB(stash, "HAS_TLS",  newSViv(1));
+        newCONSTSUB(stash, "HAS_NKEY", newSViv(1));
+#else
+        newCONSTSUB(stash, "HAS_TLS",  newSViv(0));
+        newCONSTSUB(stash, "HAS_NKEY", newSViv(0));
+#endif
+    }
 }
 
 EV::Nats
@@ -2042,46 +2188,19 @@ new(class, ...)
             const char *key = SvPV_nolen(ST(i));
             SV *val = ST(i + 1);
 
-            if (strcmp(key, "host") == 0) {
-                STRLEN l;
-                const char *s = SvPV(val, l);
-                Newx(self->host, l + 1, char);
-                Copy(s, self->host, l + 1, char);
-            }
-            else if (strcmp(key, "port") == 0)
-                self->port = SvIV(val);
-            else if (strcmp(key, "path") == 0) {
-                STRLEN l;
-                const char *s = SvPV(val, l);
-                Newx(self->path, l + 1, char);
-                Copy(s, self->path, l + 1, char);
-            }
+            if      (strcmp(key, "host")  == 0) nats_set_str_sv(&self->host,  val);
+            else if (strcmp(key, "port")  == 0) self->port = SvIV(val);
+            else if (strcmp(key, "path")  == 0) nats_set_str_sv(&self->path,  val);
+            else if (strcmp(key, "user")  == 0) nats_set_str_sv(&self->user,  val);
+            else if (strcmp(key, "pass")  == 0) nats_set_str_sv(&self->pass,  val);
+            else if (strcmp(key, "token") == 0) nats_set_str_sv(&self->token, val);
+            else if (strcmp(key, "name")  == 0) nats_set_str_sv(&self->name,  val);
             else if (strcmp(key, "on_error") == 0)
                 self->on_error = newSVsv(val);
             else if (strcmp(key, "on_connect") == 0)
                 self->on_connect = newSVsv(val);
             else if (strcmp(key, "on_disconnect") == 0)
                 self->on_disconnect = newSVsv(val);
-            else if (strcmp(key, "user") == 0) {
-                STRLEN l; const char *s = SvPV(val, l);
-                Newx(self->user, l + 1, char);
-                Copy(s, self->user, l + 1, char);
-            }
-            else if (strcmp(key, "pass") == 0) {
-                STRLEN l; const char *s = SvPV(val, l);
-                Newx(self->pass, l + 1, char);
-                Copy(s, self->pass, l + 1, char);
-            }
-            else if (strcmp(key, "token") == 0) {
-                STRLEN l; const char *s = SvPV(val, l);
-                Newx(self->token, l + 1, char);
-                Copy(s, self->token, l + 1, char);
-            }
-            else if (strcmp(key, "name") == 0) {
-                STRLEN l; const char *s = SvPV(val, l);
-                Newx(self->name, l + 1, char);
-                Copy(s, self->name, l + 1, char);
-            }
             else if (strcmp(key, "verbose") == 0)
                 self->verbose = SvTRUE(val) ? 1 : 0;
             else if (strcmp(key, "pedantic") == 0)
@@ -2111,24 +2230,15 @@ new(class, ...)
   #ifdef HAVE_OPENSSL
             else if (strcmp(key, "tls") == 0)
                 self->tls = SvTRUE(val) ? 1 : 0;
-            else if (strcmp(key, "tls_ca_file") == 0) {
-                STRLEN l; const char *s = SvPV(val, l);
-                Newx(self->tls_ca_file, l + 1, char);
-                Copy(s, self->tls_ca_file, l + 1, char);
-            }
+            else if (strcmp(key, "tls_ca_file") == 0)
+                nats_set_str_sv(&self->tls_ca_file, val);
             else if (strcmp(key, "tls_skip_verify") == 0)
                 self->tls_skip_verify = SvTRUE(val) ? 1 : 0;
-            else if (strcmp(key, "nkey_seed") == 0) {
-                STRLEN l; const char *s = SvPV(val, l);
-                Newx(self->nkey_seed, l + 1, char);
-                Copy(s, self->nkey_seed, l + 1, char);
-            }
+            else if (strcmp(key, "nkey_seed") == 0)
+                nats_set_str_sv(&self->nkey_seed, val);
   #endif
-            else if (strcmp(key, "jwt") == 0) {
-                STRLEN l; const char *s = SvPV(val, l);
-                Newx(self->jwt, l + 1, char);
-                Copy(s, self->jwt, l + 1, char);
-            }
+            else if (strcmp(key, "jwt") == 0)
+                nats_set_str_sv(&self->jwt, val);
             else if (strcmp(key, "slow_consumer_bytes") == 0)
                 self->slow_consumer_bytes = (size_t)SvUV(val);
             else if (strcmp(key, "on_slow_consumer") == 0)
@@ -2163,11 +2273,8 @@ connect(self, host, port = 4222)
         self->reconnect_timer_active = 0;
     }
 
-    if (self->host) { Safefree(self->host); self->host = NULL; }
-    if (self->path) { Safefree(self->path); self->path = NULL; }
-    STRLEN l = strlen(host);
-    Newx(self->host, l + 1, char);
-    Copy(host, self->host, l + 1, char);
+    nats_set_str(&self->path, NULL);
+    nats_set_str(&self->host, host);
     self->port = port;
     self->intentional_disconnect = 0;
 
@@ -2186,11 +2293,8 @@ connect_unix(self, path)
         self->reconnect_timer_active = 0;
     }
 
-    if (self->host) { Safefree(self->host); self->host = NULL; }
-    if (self->path) Safefree(self->path);
-    STRLEN l = strlen(path);
-    Newx(self->path, l + 1, char);
-    Copy(path, self->path, l + 1, char);
+    nats_set_str(&self->host, NULL);
+    nats_set_str(&self->path, path);
     self->intentional_disconnect = 0;
 
     nats_connect_unix(self);
@@ -2237,7 +2341,7 @@ publish(self, subject, payload = &PL_sv_undef, reply = NULL)
         pay_len = 0;
     }
 
-    if ((int)pay_len > self->max_payload)
+    if (self->max_payload > 0 && pay_len > (size_t)self->max_payload)
         croak("payload exceeds max_payload (%d)", self->max_payload);
 
     int hdr_len;
@@ -2294,7 +2398,7 @@ hpublish(self, subject, headers, payload = &PL_sv_undef, reply = NULL)
     }
 
     size_t total_size = hdr_data_len + pay_len;
-    if ((int)total_size > self->max_payload)
+    if (self->max_payload > 0 && total_size > (size_t)self->max_payload)
         croak("message exceeds max_payload (%d)", self->max_payload);
 
     self->msgs_out++;
@@ -2377,18 +2481,25 @@ unsubscribe(self, sid, max_msgs = 0)
   PREINIT:
     char buf[64];
   CODE:
+    /* Queue UNSUB while connected/connecting/reconnecting, mirroring
+       subscribe(). When fully disconnected (no reconnect armed) the
+       local-only update is enough; nats_resub_all will not resubscribe
+       a removed sub on the next reconnect. */
+    int can_queue = self->connected || self->connecting
+                  || (self->reconnect_enabled && self->reconnect_timer_active);
+
     if (max_msgs > 0) {
         nats_sub_t *sub = nats_find_sub(self, (uint64_t)sid);
         if (sub)
             sub->max_msgs = max_msgs;
 
         int n = snprintf(buf, sizeof(buf), "UNSUB %" UVuf " %d\r\n", sid, max_msgs);
-        if (self->connected)
+        if (can_queue)
             nats_queue_write(self, buf, n);
     } else {
         nats_sub_t *sub = nats_find_sub(self, (uint64_t)sid);
         int n = snprintf(buf, sizeof(buf), "UNSUB %" UVuf "\r\n", sid);
-        if (self->connected)
+        if (can_queue)
             nats_queue_write(self, buf, n);
         if (sub)
             nats_remove_sub(self, sub);
@@ -2416,6 +2527,9 @@ request(self, subject, payload, cb, timeout_ms = 5000)
         pay_pv = "";
         pay_len = 0;
     }
+
+    if (self->max_payload > 0 && pay_len > (size_t)self->max_payload)
+        croak("payload exceeds max_payload (%d)", self->max_payload);
 
     if (!self->inbox_sub_sid) {
         char inbox_wild[48];
@@ -2526,15 +2640,13 @@ skip_waiting(self)
     nats_skip_waiting(self);
 
 void
-reconnect(self, enable, delay_ms = 2000, max_attempts = 60)
+reconnect(self, enable, ...)
     EV::Nats self
     int enable
-    int delay_ms
-    int max_attempts
   CODE:
     self->reconnect_enabled = enable;
-    self->reconnect_delay_ms = delay_ms;
-    self->max_reconnect_attempts = max_attempts;
+    if (items > 2) self->reconnect_delay_ms = SvIV(ST(2));
+    if (items > 3) self->max_reconnect_attempts = SvIV(ST(3));
 
 int
 reconnect_enabled(self)
@@ -2641,12 +2753,7 @@ tls(self, enable, ca_file = NULL, skip_verify = 0)
   CODE:
     self->tls = enable;
     self->tls_skip_verify = skip_verify;
-    if (self->tls_ca_file) { Safefree(self->tls_ca_file); self->tls_ca_file = NULL; }
-    if (ca_file && *ca_file) {
-        STRLEN l = strlen(ca_file);
-        Newx(self->tls_ca_file, l + 1, char);
-        Copy(ca_file, self->tls_ca_file, l + 1, char);
-    }
+    nats_set_str(&self->tls_ca_file, (ca_file && *ca_file) ? ca_file : NULL);
 
 #endif
 
@@ -2759,10 +2866,47 @@ nkey_seed(self, seed)
     EV::Nats self
     const char *seed
   CODE:
-    if (self->nkey_seed) Safefree(self->nkey_seed);
-    STRLEN l = strlen(seed);
-    Newx(self->nkey_seed, l + 1, char);
-    Copy(seed, self->nkey_seed, l + 1, char);
+    nats_set_str(&self->nkey_seed, seed);
+
+SV *
+nkey_public_from_seed(class, seed)
+    SV *class
+    const char *seed
+  CODE:
+    (void)class;
+    {
+        char pub[64];
+        int n = nats_nkey_public(seed, pub, sizeof(pub));
+        if (n <= 0)
+            croak("invalid NKey seed");
+        RETVAL = newSVpvn(pub, n);
+    }
+  OUTPUT:
+    RETVAL
+
+SV *
+nkey_generate_user_seed(class)
+    SV *class
+  CODE:
+    (void)class;
+    {
+        unsigned char raw[36];
+        /* S+User seed: b1 = PrefixByteSeed | (PrefixByteUser >> 5) = 0x95;
+           b2 = (PrefixByteUser & 31) << 3 = 0x00. */
+        raw[0] = 0x95;
+        raw[1] = 0x00;
+        nats_random_bytes(raw + 2, 32);
+        uint16_t crc = nats_crc16(raw, 34);
+        raw[34] = crc & 0xFF;
+        raw[35] = (crc >> 8) & 0xFF;
+        /* 36 bytes -> 58 base32 chars (288 bits, 57 full chars + 1 flush). */
+        char enc[60];
+        int n = nats_base32_encode(raw, sizeof(raw), enc, sizeof(enc));
+        if (n < 0) croak("base32 buffer overflow");
+        RETVAL = newSVpvn(enc, n);
+    }
+  OUTPUT:
+    RETVAL
 
   #endif
 
@@ -2771,10 +2915,7 @@ jwt(self, jwt_token)
     EV::Nats self
     const char *jwt_token
   CODE:
-    if (self->jwt) Safefree(self->jwt);
-    STRLEN l = strlen(jwt_token);
-    Newx(self->jwt, l + 1, char);
-    Copy(jwt_token, self->jwt, l + 1, char);
+    nats_set_str(&self->jwt, jwt_token);
 
 void
 drain(self, cb = NULL)
@@ -2817,7 +2958,7 @@ DESTROY(self)
     if (self->magic != NATS_MAGIC_ALIVE)
         return;
 
-    self->magic = NATS_MAGIC_FREED;
+    self->magic = 0;
     self->intentional_disconnect = 1;
 
     if (PL_dirty) {
@@ -2875,20 +3016,20 @@ DESTROY(self)
   #ifdef HAVE_OPENSSL
     nats_ssl_cleanup(self);
     if (self->ssl_ctx) { SSL_CTX_free(self->ssl_ctx); self->ssl_ctx = NULL; }
-    if (self->tls_ca_file) Safefree(self->tls_ca_file);
+    Safefree(self->tls_ca_file);
   #endif
 
-    if (self->rbuf)  Safefree(self->rbuf);
-    if (self->wbuf)  Safefree(self->wbuf);
-    if (self->host)  Safefree(self->host);
-    if (self->path)  Safefree(self->path);
-    if (self->user)  Safefree(self->user);
-    if (self->pass)  Safefree(self->pass);
-    if (self->token) Safefree(self->token);
-    if (self->name)  Safefree(self->name);
-    if (self->nkey_seed) Safefree(self->nkey_seed);
-    if (self->jwt) Safefree(self->jwt);
-    if (self->server_nonce) Safefree(self->server_nonce);
+    Safefree(self->rbuf);
+    Safefree(self->wbuf);
+    Safefree(self->host);
+    Safefree(self->path);
+    Safefree(self->user);
+    Safefree(self->pass);
+    Safefree(self->token);
+    Safefree(self->name);
+    Safefree(self->nkey_seed);
+    Safefree(self->jwt);
+    Safefree(self->server_nonce);
     CLEAR_HANDLER(self->on_slow_consumer);
     CLEAR_HANDLER(self->on_ldm);
 

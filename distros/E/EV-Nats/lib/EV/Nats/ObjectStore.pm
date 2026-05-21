@@ -23,6 +23,7 @@ sub new {
 sub create_bucket {
     my ($self, $opts, $cb) = @_;
     $opts //= {};
+    require JSON::PP;
     my $config = {
         name     => $self->{stream},
         subjects => [
@@ -34,7 +35,7 @@ sub create_bucket {
         ($opts->{max_age}      ? (max_age      => $opts->{max_age})     : ()),
         ($opts->{replicas}     ? (num_replicas => $opts->{replicas})    : ()),
         discard      => 'new',
-        allow_rollup_hdrs => 1,
+        allow_rollup_hdrs => JSON::PP::true(),
     };
     $self->{js}->stream_create($config, $cb);
 }
@@ -90,17 +91,17 @@ sub put {
         });
     };
 
-    while ($offset < $size) {
-        my $end = $offset + $self->{chunk_size};
-        $end = $size if $end > $size;
-        $publish_chunk->(substr($data, $offset, $end - $offset));
-        $chunks++;
-        $offset = $end;
-    }
-
     if ($size == 0) {
-        $publish_chunk->('');
         $chunks = 1;
+        $publish_chunk->('');
+    } else {
+        while ($offset < $size) {
+            my $end = $offset + $self->{chunk_size};
+            $end = $size if $end > $size;
+            $publish_chunk->(substr($data, $offset, $end - $offset));
+            $chunks++;
+            $offset = $end;
+        }
     }
 }
 
@@ -116,14 +117,16 @@ sub get {
             my ($resp, $err) = @_;
             return $cb->(undef, $err) if $err;
 
-            require JSON::PP;
+            my $msg = $resp->{message} or return $cb->(undef, undef);
+            # Object was deleted: tombstone is on the metadata subject.
+            return $cb->(undef, undef)
+                if EV::Nats::JetStream::msg_is_tombstone($msg);
+
             require MIME::Base64;
-            my $raw = $resp->{message}{data} || '';
+            my $raw = $msg->{data} || '';
             my $meta_json = MIME::Base64::decode_base64($raw);
-            my $meta = eval { JSON::PP::decode_json($meta_json) };
-            if ($@ || !$meta) {
-                return $cb->(undef, "invalid metadata: $@");
-            }
+            my ($meta, $derr) = EV::Nats::JetStream::decode_json_or_error($meta_json);
+            return $cb->(undef, "invalid metadata: $derr") if $derr;
 
             my $nuid = $meta->{nuid};
             my $expected = $meta->{chunks} || 0;
@@ -133,9 +136,11 @@ sub get {
                 return $cb->('', undef, $meta);
             }
 
-            # Fetch chunks sequentially via STREAM.MSG.GET
+            # Fetch chunks sequentially via STREAM.MSG.GET.
+            # next_by_subj returns first matching message with seq >= start_sequence,
+            # so after each hit we must advance past the returned seq.
             my @chunks;
-            my $seq = 0; # next_by_subj starts from seq+1
+            my $seq = 1;
 
             my $fetch_next;
             $fetch_next = sub {
@@ -147,9 +152,11 @@ sub get {
                         if ($err) {
                             return $cb->(undef, "chunk fetch error: $err", $meta);
                         }
-                        my $data = MIME::Base64::decode_base64($resp->{message}{data} || '');
+                        my $msg = $resp->{message} or
+                            return $cb->(undef, "missing chunk message", $meta);
+                        my $data = MIME::Base64::decode_base64($msg->{data} || '');
                         push @chunks, $data;
-                        $seq = $resp->{message}{seq} || ($seq + 1);
+                        $seq = ($msg->{seq} || $seq) + 1;
 
                         if (scalar @chunks >= $expected) {
                             my $assembled = join('', @chunks);
@@ -172,38 +179,85 @@ sub get {
 
 sub delete {
     my ($self, $name, $cb) = @_;
-    # Purge metadata entry
-    my $headers = "NATS/1.0\r\nKV-Operation: PURGE\r\nNats-Rollup: sub\r\n\r\n";
-    my $meta_subj = '$O.' . $self->{bucket} . '.M.' . _encode_name($name);
-    $self->{js}{nats}->hpublish($meta_subj, $headers, '');
-    $cb->(1, undef) if $cb;
+    my $nats = $self->{js}{nats};
+
+    my $tombstone = sub {
+        my $purge_err = shift;
+        my $headers = "NATS/1.0\r\nKV-Operation: PURGE\r\nNats-Rollup: sub\r\n\r\n";
+        my $meta_subj = '$O.' . $self->{bucket} . '.M.' . _encode_name($name);
+        $nats->hpublish($meta_subj, $headers, '');
+        # Flush so the tombstone reaches the server before $cb fires; this
+        # avoids a race with a subsequent info()/get() that would otherwise
+        # see the pre-tombstone metadata.
+        $nats->flush(sub {
+            my ($flush_err) = @_;
+            return unless $cb;
+            my $err = $purge_err // $flush_err;
+            $cb->($err ? undef : 1, $err);
+        });
+    };
+
+    # Look up the object's nuid so we can purge its chunks.
+    $self->info($name, sub {
+        my ($meta, $err) = @_;
+        if ($err || !$meta || !$meta->{nuid}) {
+            return $tombstone->($err);
+        }
+        my $chunk_subj = '$O.' . $self->{bucket} . '.C.' . $meta->{nuid};
+        $self->{js}->_json_api(
+            'STREAM.PURGE.' . $self->{stream},
+            { filter => $chunk_subj },
+            sub {
+                my ($resp, $purge_err) = @_;
+                $tombstone->($purge_err);
+            },
+        );
+    });
 }
 
 sub info {
     my ($self, $name, $cb) = @_;
     my $meta_subj = '$O.' . $self->{bucket} . '.M.' . _encode_name($name);
-    $self->{js}{nats}->request($meta_subj, '', sub {
-        my ($resp, $err) = @_;
-        return $cb->(undef, $err) if $err;
-        require JSON::PP;
-        my $meta = eval { JSON::PP::decode_json($resp) };
-        $cb->($meta, $@ ? "JSON error: $@" : undef);
-    }, $self->{timeout});
+    $self->{js}->_json_api(
+        'STREAM.MSG.GET.' . $self->{stream},
+        { last_by_subj => $meta_subj },
+        sub {
+            my ($resp, $err) = @_;
+            if ($err) {
+                return $cb->(undef, undef) if $err =~ /no message found|10037/;
+                return $cb->(undef, $err);
+            }
+            my $msg = $resp->{message} or return $cb->(undef, undef);
+            # Tombstone: PURGE/DEL on the metadata subject -> object is gone.
+            return $cb->(undef, undef)
+                if EV::Nats::JetStream::msg_is_tombstone($msg);
+
+            require MIME::Base64;
+            my $raw = $msg->{data} || '';
+            my $meta_json = MIME::Base64::decode_base64($raw);
+            my ($meta, $derr) = EV::Nats::JetStream::decode_json_or_error($meta_json);
+            $cb->($meta, $derr ? "invalid metadata: $derr" : undef);
+        },
+    );
 }
 
 sub list {
     my ($self, $cb) = @_;
-    $self->{js}->stream_info($self->{stream}, sub {
-        my ($info, $err) = @_;
-        return $cb->(undef, $err) if $err;
-        my $subjects = $info->{state}{subjects} || {};
-        my $prefix = '$O.' . $self->{bucket} . '.M.';
-        my $plen = length $prefix;
-        my @names = map { _decode_name(substr($_, $plen)) }
-                    grep { substr($_, 0, $plen) eq $prefix }
-                    keys %$subjects;
-        $cb->(\@names, undef);
-    });
+    my $prefix = '$O.' . $self->{bucket} . '.M.';
+    $self->{js}->stream_info(
+        $self->{stream},
+        { subjects_filter => $prefix . '>' },
+        sub {
+            my ($info, $err) = @_;
+            return $cb->(undef, $err) if $err;
+            my $subjects = $info->{state}{subjects} || {};
+            my $plen = length $prefix;
+            my @names = map { _decode_name(substr($_, $plen)) }
+                        grep { substr($_, 0, $plen) eq $prefix }
+                        keys %$subjects;
+            $cb->(\@names, undef);
+        },
+    );
 }
 
 sub status {
@@ -231,54 +285,131 @@ sub _decode_name { my $n = $_[0]; $n =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge; $n 
 
 =head1 NAME
 
-EV::Nats::ObjectStore - Object store API for NATS JetStream
+EV::Nats::ObjectStore - Chunked object store on top of NATS JetStream
 
 =head1 SYNOPSIS
 
+    use EV;
     use EV::Nats;
     use EV::Nats::JetStream;
     use EV::Nats::ObjectStore;
 
     my $nats = EV::Nats->new(host => '127.0.0.1');
-    my $js = EV::Nats::JetStream->new(nats => $nats);
-    my $os = EV::Nats::ObjectStore->new(js => $js, bucket => 'files');
+    my $js   = EV::Nats::JetStream->new(nats => $nats);
+    my $os   = EV::Nats::ObjectStore->new(js => $js, bucket => 'files');
 
-    $os->create_bucket({}, sub { ... });
-
-    # Store object (automatically chunked)
-    $os->put('report.pdf', $pdf_data, sub {
-        my ($info, $err) = @_;
-        print "stored: $info->{size} bytes in $info->{chunks} chunks\n";
+    $os->create_bucket({}, sub {
+        $os->put('report.pdf', $pdf_data, sub {
+            my ($info, $err) = @_;
+            print "stored: $info->{size} bytes in $info->{chunks} chunks\n";
+            $os->get('report.pdf', sub {
+                my ($data, $err, $meta) = @_;
+                print "got $meta->{size} bytes back\n";
+            });
+        });
     });
 
-    # Retrieve
-    $os->get('report.pdf', sub {
-        my ($data, $err, $meta) = @_;
-        print "got $meta->{size} bytes\n";
-    });
+    EV::run;
+
+=head1 DESCRIPTION
+
+An object-store bucket is a JetStream stream named C<OBJ_E<lt>bucketE<gt>>
+with two subject groups:
+
+=over
+
+=item * C<$O.E<lt>bucketE<gt>.C.E<lt>nuidE<gt>> - opaque chunks for one
+object (one chunk per stream message; the nuid is generated per object).
+
+=item * C<$O.E<lt>bucketE<gt>.M.E<lt>encoded-nameE<gt>> - last-write-wins
+metadata describing an object (name, size, chunk count, SHA-256 digest).
+
+=back
+
+C<put> chunks the input, publishes each chunk via C<js_publish> for
+durability, then writes a metadata entry. C<get> fetches the metadata,
+walks the chunks back via C<STREAM.MSG.GET>, and verifies the digest.
 
 =head1 METHODS
 
+All callbacks fire on the L<EV> loop, not synchronously.
+
 =head2 new(js => $js, bucket => $name, [chunk_size => $bytes])
 
-Default chunk size: 128KB.
+Default C<chunk_size> is 128 KiB. C<timeout> defaults to the timeout
+of C<$js>.
 
 =head2 create_bucket(\%opts, $cb)
 
+Provision the underlying stream. Recognised C<\%opts>:
+
+=over
+
+=item * C<max_bytes> - bucket-wide storage cap.
+
+=item * C<max_age> - per-message TTL in nanoseconds.
+
+=item * C<replicas> - cluster replication factor.
+
+=back
+
+Callback: C<($info, $err)>.
+
 =head2 delete_bucket($cb)
+
+Tear down the underlying stream. Callback: C<($info, $err)>.
 
 =head2 put($name, $data, $cb)
 
+Store C<$data> under C<$name>, automatically chunked. Each chunk is
+published with JetStream ack; the metadata entry is written last so
+a partial upload doesn't surface a half-stored object. Callback:
+C<($info, $err)> where C<$info> is C<{ name, size, chunks, seq }>.
+
 =head2 get($name, $cb)
 
-Callback: C<($data, $err, $meta)>.
+Retrieve a previously-stored object. Callback: C<($data, $err, $meta)>.
+C<$data> is C<undef> if the object does not exist or has been deleted
+(the tombstone is recognised). On digest mismatch, C<$data> is C<undef>
+and C<$err> is C<"digest mismatch">.
 
 =head2 delete($name, [$cb])
 
+Looks up the object's nuid via metadata, purges all chunks under
+C<$O.E<lt>bucketE<gt>.C.E<lt>nuidE<gt>> via C<STREAM.PURGE>, then
+publishes a C<KV-Operation: PURGE> tombstone on the metadata subject
+followed by a C<flush> fence. Callback: C<($ok, $err)>; C<$err> is
+set if the chunk purge or flush failed.
+
 =head2 info($name, $cb)
+
+Fetch only the metadata entry for an object, without downloading
+chunks. Callback: C<(\%meta, $err)>; C<\%meta> is C<undef> if the
+object does not exist or was deleted (the tombstone is recognised).
+This is the recommended way to filter live objects out of a
+L</list> result.
 
 =head2 list($cb)
 
+List names of all live objects in the bucket. Callback:
+C<(\@names, $err)>. Tombstoned entries appear in the listing -- call
+C<info> to filter.
+
 =head2 status($cb)
+
+Returns a snapshot hashref:
+
+    { bucket => $name, bytes => $n, sealed => 0|1 }
+
+C<sealed> reflects the underlying stream's C<config.sealed> flag;
+this client never seals on its own, so unless someone manually
+sealed the stream out-of-band the value is always 0.
+
+Callback: C<(\%status, $err)>.
+
+=head1 SEE ALSO
+
+L<EV::Nats>, L<EV::Nats::JetStream>, L<EV::Nats::KV>,
+L<NATS Object Store|https://docs.nats.io/using-nats/developer/develop_jetstream/object>.
 
 =cut

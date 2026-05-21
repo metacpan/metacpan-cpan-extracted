@@ -5,8 +5,10 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README.md
+SECURITY.md
 t/compile.t
 t/flattened.t
+t/jwe_ecdh_es_cbc_hs_tv.t
 t/jws_empty_payload.t
 t/jws_no_key.t
 t/jws_with_padding.t
@@ -19,5 +21,13 @@ t/kw_ecdhaes.t
 t/kw_gcm.t
 t/kw_pbes2.t
 t/kw_rsa.t
+t/rfc3394.t
+t/rfc5649.t
+t/rfc7515.t
+t/rfc7516.t
+t/rfc7518.t
+t/rfc7519.t
+t/rfc7520.t
+t/rfc8037.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

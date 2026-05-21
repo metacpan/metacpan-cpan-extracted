@@ -16,6 +16,10 @@ t/0003-dsl.t
 t/0004-grouping.t
 t/0005-ordering.t
 t/0006-set-aggregate.t
+t/0007-ltsv-io.t
+t/0008-json-ltsv-join.t
+t/0009-concurrent-fh.t
+t/0010-csv-io.t
 t/9001-load.t
 t/9010-encoding.t
 t/9020-perl5compat.t
@@ -29,6 +33,10 @@ eg/01_json_query.pl
 eg/02_jsonl_query.pl
 eg/03_grouping.pl
 eg/04_sorting.pl
+eg/05_json_ltsv_join.pl
+eg/06_ltsv_json_join.pl
+eg/07_csv_query.pl
+eg/08_csv_json_join.pl
 doc/json_linq_cheatsheet.BM.txt
 doc/json_linq_cheatsheet.BN.txt
 doc/json_linq_cheatsheet.EN.txt

@@ -1,0 +1,9 @@
+name: demo-app
+entrypoint: "examples/webapp/bin/pax-webapp"
+libs:
+  - "examples/webapp/lib"
+cpanfiles:
+  - "examples/webapp/cpanfile"
+asset_dirs:
+  - "examples/webapp/share"
+runtime_mode: bundled_perl

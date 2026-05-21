@@ -2,6 +2,9 @@ use strict;
 use warnings;
 
 use inc::Module::Install;
+use Module::Install::DOAPChangeSets;
+use Module::Install::AuthorTests;
+use Module::Install::Scripts;
 
 name			'AtteanX-Endpoint';
 all_from		'lib/AtteanX/Endpoint.pm';
@@ -18,7 +21,7 @@ test_requires	'Test::LWP::UserAgent'			=> 0;
 test_requires	'Test::WWW::Mechanize::PSGI'	=> 0;
 perl_version	'5.014';
 
-requires		'Attean'						=> 0.013;
+requires		'Attean'						=> 0.038;
 requires		'File::ShareDir'				=> 0;
 requires		'HTML::HTML5::Writer'			=> 0;
 requires		'HTTP::Negotiate'				=> 0;
@@ -32,10 +35,11 @@ requires		'namespace::clean'				=> 0;
 requires		'Plack'							=> 0;
 requires		'TryCatch'						=> 0;
 requires		'Types::Standard'				=> 0;
+requires		'Config::JFDI'					=> 0;
 
 resources(
-	'homepage'   => "http://search.cpan.org/dist/AtteanX-Endpoint/",
-	'repository' => "http://github.com/kasei/atteanx-endpoint/",
+	'homepage'   => "https://metacpan.org/release/AtteanX-Endpoint/",
+	'repository' => "https://github.com/kasei/atteanx-endpoint/",
 	'bugtracker' => "https://github.com/kasei/atteanx-endpoint/issues",
 	'IRC'        => "irc://irc.perl.org/#perlrdf",
 );
@@ -43,8 +47,20 @@ resources(
 author_tests('xt');
 
 install_share;
+install_script 'scripts/endpoint.psgi';
 
 write_doap_changes "meta/changes.ttl", "Changes", "turtle";
 
-sign;
+# On MacOS, prefer homebrew-installed GNU tar so that we don't include Mac-specific
+# extended header data (which results in "Ignoring unknown extended header keyword"
+# messages on non-Mac systems when extracting data.
+if (-x '/opt/homebrew/bin/gtar') {
+	makemaker_args(
+		dist => {
+			TAR => '/opt/homebrew/bin/gtar'
+		}
+	);
+}
+
+sign if ! exists $ENV{CI};
 WriteAll;

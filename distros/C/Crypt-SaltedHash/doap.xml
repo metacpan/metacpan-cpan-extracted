@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Project
+  xmlns="http://usefulinc.com/ns/doap#"
+  xmlns:dc="http://purl.org/dc/terms/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  >
+  <name>Crypt-SaltedHash</name>
+  <shortdesc>Perl interface to functions that assist in working with salted hashes.</shortdesc>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Robert Rothenberg</foaf:name>
+      <foaf:mbox rdf:resource="mailto:perl@rhizomnic.com" />
+    </foaf:Person>
+  </developer>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Chris Weyl</foaf:name>
+      <foaf:mbox rdf:resource="mailto:cweyl@alumni.drew.edu" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>David Steinbrunner</foaf:name>
+      <foaf:mbox rdf:resource="mailto:dsteinbrunner@pobox.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Gerda Shank</foaf:name>
+      <foaf:mbox rdf:resource="mailto:gerda.shank@gmail.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Sascha Kiefer</foaf:name>
+      <foaf:mbox rdf:resource="mailto:perl@intertivityNOSP4M.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Sergey Romanov</foaf:name>
+      <foaf:mbox rdf:resource="mailto:complefor@rambler.ru" />
+    </foaf:Person>
+  </helper>
+  <license rdf:resource="http://dev.perl.org/licenses/" />
+  <bug-database rdf:resource="http://rt.cpan.org/Public/Dist/Display.html?Name=Crypt-SaltedHash" />
+  <repository>
+    <GitRepository>
+      <browse rdf:resource="https://github.com/robrwo/perl-Crypt-SaltedHash" />
+      <location rdf:resource="git://github.com/robrwo/perl-Crypt-SaltedHash.git" />
+    </GitRepository>
+  </repository>
+  <programming-language>Perl</programming-language>
+</Project>

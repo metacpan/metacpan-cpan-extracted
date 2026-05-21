@@ -1,6 +1,38 @@
 Revision history for MCP-Run
 
+0.103     2026-05-07 13:28:39Z
+  - Fix MCP::Run::Compress->transform_command injecting Co-Authored-By
+    *outside* the closing quote when the original git commit had no
+    signature, which made bash run the model line as a separate command
+    and choke on `<model@host>` as a redirection. The signature now
+    lands inside the quoted commit message where it belongs.
+
+0.102     2026-05-02 03:19:04Z
+  - Pass the original command through to the compressor in
+    MCP::Run::format_result so command-specific filters (ls, git,
+    make, …) match when mcp-run-bash runs with compression enabled.
+    Subclasses overriding format_result should accept the new
+    fourth argument: format_result($tool, $result, $compress, $command).
+  - Add CLAUDE.md and reframe README around mcp-run-bash as the
+    primary product (stdio MCP server) and mcp-run-compress as the
+    bonus PreToolUse hook for Claude Code, standalone-installable
+    via the raudssus/mcp-run-compress Docker image.
+
+
+0.101     2026-05-02 02:08:56Z
+  - Fix "Wide character in subroutine entry" in bin/mcp-run-compress
+    --hook when the Bash command contains non-ASCII characters: encode
+    the command as UTF-8 octets before base64-encoding it.
+
 0.100     2026-04-27 02:36:52Z
+
+  - Add command_transform filter and process() method for git commit hooks
+    - Register command_transform filter for git commit to auto-add/replace
+      Co-Authored-By line using CO_AUTHORED_BY or ANTHROPIC_MODEL env vars
+    - Add process() method that takes command, stdout, stderr and returns
+      a hash with processed output
+    - Add MCP_RUN_COMPRESS_NO_CO_AUTHORED to disable Co-Authored-By replacement
+    - Update README with new environment variables and feature documentation
 
 0.004     2026-04-25 04:02:17Z
 

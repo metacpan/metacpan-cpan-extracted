@@ -3,7 +3,7 @@ package Developer::Dashboard::UpdateManager;
 use strict;
 use warnings;
 
-our $VERSION = '3.14';
+our $VERSION = '3.90';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -198,7 +198,7 @@ Do a direct compile-and-load check against the module from a source checkout.
 
 Example 2:
 
-  prove -lv t/04-update-manager.t t/26-sql-dashboard.t
+  prove -lv t/04-update-manager.t t/05-cli-smoke.t
 
 Run the focused regression tests that most directly exercise this module's behavior.
 

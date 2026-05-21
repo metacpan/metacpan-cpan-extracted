@@ -6,6 +6,7 @@ use strict;
 use warnings;
 use Getopt::Long qw( GetOptions );
 use MIME::Base64 qw( encode_base64 decode_base64 );
+use Encode qw( encode_utf8 );
 use JSON::MaybeXS ();
 use Path::Tiny qw( path );
 use MCP::Run::Bash;
@@ -70,7 +71,8 @@ sub run_hook {
   }
 
   unless ($bypass) {
-    my $encoded  = encode_base64( $cmd, '' );
+    $cmd = MCP::Run::Compress->new->transform_command($cmd);
+    my $encoded  = encode_base64( encode_utf8($cmd), '' );
     my $rewrite  = install_mode() eq 'docker'
       ? docker_pipe_rewrite($encoded)
       : "mcp-run-compress --b64 $encoded";
@@ -339,7 +341,7 @@ mcp-run-compress - Wrap a shell command through MCP::Run::Compress for LLM-frien
 
 =head1 VERSION
 
-version 0.100
+version 0.103
 
 =head1 SYNOPSIS
 
@@ -468,7 +470,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -28,6 +28,7 @@ SUPPORT AND DOCUMENTATION
 After installing, you can find documentation for this module with the perldoc
 command:
 
+    perldoc pod2gfm
     perldoc App::pod2gfm
 
 You can also look for information at:

@@ -1,0 +1,118 @@
+=encoding utf-8
+
+=head1 NAME
+
+DateTime::Lite::Infinite - DateTime::Liteの無限過去および無限未来オブジェクト
+
+=head1 SYNOPSIS
+
+    use DateTime::Lite::Infinite;
+
+    my $future = DateTime::Lite::Infinite::Future->new;
+    my $past   = DateTime::Lite::Infinite::Past->new;
+
+    # 述語
+    $future->is_infinite;   # 1
+    $future->is_finite;     # 0
+    $past->is_infinite;     # 1
+    $past->is_finite;       # 0
+
+    # 文字列表現
+    # すべてのアクセサメソッドは、"Inf"/"-Inf"のような、
+    # プラットフォームの無限大文字列を返します。文字列化も直接利用できます：
+    print $future->stringify;  # "Inf"
+    print "$past";             # "-Inf"
+
+    # hour_12とhour_12_0も無限大文字列を返します：
+    $future->hour_12;    # "Inf"
+    $future->hour_12_0;  # "Inf"
+
+    # 比較
+    use DateTime::Lite;
+    my $dt = DateTime::Lite->now( time_zone => 'UTC' );
+
+    DateTime::Lite->compare( $dt, $future );   # -1  ($dtはより前)
+    DateTime::Lite->compare( $dt, $past   );   #  1  ($dtはより後)
+    DateTime::Lite->compare( $future, $past ); #  1
+
+    # オーバーロードされた演算子も動作します：
+    print "before end of time" if( $dt < $future );
+    print "after beginning"    if( $dt > $past );
+
+    # 無限datetimeを生成する算術演算
+    use DateTime::Lite;
+    my $dt2 = DateTime::Lite->now( time_zone => 'UTC' );
+    my $inf_dur = DateTime::Lite::Duration->new(
+        seconds => DateTime::Lite::INFINITY(),
+    );
+    $dt2->add_duration( $inf_dur );
+    # $dt2はDateTime::Lite::Infinite::Futureオブジェクトになります
+
+    # ミューテータはno-opです
+    # set()、set_time_zone()、truncate()はオブジェクトを変更せずに返します。
+    $future->set_time_zone('America/New_York');  # no-op
+    $future->truncate( to => 'day' );            # no-op
+
+=head1 VERSION
+
+    v0.1.0
+
+=head1 DESCRIPTION
+
+C<DateTime::Lite::Infinite>は、L<DateTime::Lite>の2つのsingletonサブクラスを提供します。
+
+=over 4
+
+=item C<DateTime::Lite::Infinite::Future>
+
+無限に遠い未来の一点を表します。
+
+=item C<DateTime::Lite::Infinite::Past>
+
+無限に遠い過去の一点を表します。
+
+=back
+
+どちらのオブジェクトも常にfloatingタイムゾーンにあり、変更することはできません。
+
+すべてのアクセサメソッドは、システムにおける正または負の無限大の文字列表現（C<Inf>/C<-Inf>など）を返します。変更系メソッドC<set()>、C<set_time_zone()>、C<truncate()>はno-opであり、単にそのオブジェクトを返します。
+
+これらのオブジェクトはL<Storable>ではシリアライズできません。
+
+=head1 METHODS
+
+=head2 hour_12
+
+    my $h = $dt_inf->hour_12;  # 'Inf'または'-Inf'
+
+12時間制の表現として、無限大文字列（システムに応じてC<Inf>またはC<-Inf>）を返します。無限datetimeには意味のある時刻値はありません。
+
+=head2 hour_12_0
+
+    my $h = $dt_inf->hour_12_0;
+
+L</hour_12>と同じです。0起点の12時間制スロットとして、無限大文字列を返します。
+
+=head2 stringify
+
+    my $str = "$dt_inf";  # 'DateTime::Lite::Infinite::Future'は'Inf'を出力します
+
+このオブジェクトの無限大文字列表現を返します。これはC<"">オーバーロード演算子からも呼び出されます。
+
+=head1 SEE ALSO
+
+L<DateTime::Lite>, L<DateTime::Lite::Duration>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright(c) 2026 DEGUEST Pte. Ltd.
+
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

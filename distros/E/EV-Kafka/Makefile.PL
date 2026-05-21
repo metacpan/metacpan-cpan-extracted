@@ -64,6 +64,44 @@ if ($lz4_libs) {
 push @libs, '-lz';
 $extra_inc .= ' -DHAVE_ZLIB';
 
+# zstd (optional)
+my $zstd_cflags = `pkg-config --cflags libzstd 2>/dev/null`;
+my $zstd_libs   = `pkg-config --libs libzstd 2>/dev/null`;
+chomp $zstd_cflags;
+chomp $zstd_libs;
+if ($zstd_libs) {
+    $extra_inc .= " $zstd_cflags -DHAVE_ZSTD";
+    push @libs, $zstd_libs;
+} else {
+    my $test = `echo '#include <zstd.h>' | $Config{cc} -xc -fsyntax-only - 2>/dev/null; echo \$?`;
+    chomp $test;
+    if ($test eq '0') {
+        push @libs, '-lzstd';
+        $extra_inc .= ' -DHAVE_ZSTD';
+    } else {
+        warn "libzstd not found, building without zstd compression\n";
+    }
+}
+
+# snappy (optional, framed format per xerial)
+my $snappy_cflags = `pkg-config --cflags snappy 2>/dev/null`;
+my $snappy_libs   = `pkg-config --libs snappy 2>/dev/null`;
+chomp $snappy_cflags;
+chomp $snappy_libs;
+if ($snappy_libs) {
+    $extra_inc .= " $snappy_cflags -DHAVE_SNAPPY";
+    push @libs, $snappy_libs;
+} else {
+    my $test = `echo '#include <snappy-c.h>' | $Config{cc} -xc -fsyntax-only - 2>/dev/null; echo \$?`;
+    chomp $test;
+    if ($test eq '0') {
+        push @libs, '-lsnappy';
+        $extra_inc .= ' -DHAVE_SNAPPY';
+    } else {
+        warn "libsnappy not found, building without snappy compression\n";
+    }
+}
+
 WriteMakefile(
     NAME             => 'EV::Kafka',
     VERSION_FROM     => 'lib/EV/Kafka.pm',

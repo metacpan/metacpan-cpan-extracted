@@ -1,7 +1,7 @@
 package Data::HashMap::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 require XSLoader;
 XSLoader::load('Data::HashMap::Shared', $VERSION);
@@ -34,6 +34,9 @@ Data::HashMap::Shared - Type-specialized shared-memory hash maps for multiproces
     # Atomic counters (lock-free fast path)
     shm_ii_incr $map, 1;
     shm_ii_incr_by $map, 1, 10;
+
+    # Compare-and-swap (all variants; byte-compare for string values)
+    shm_ii_cas $map, 1, 11, 42;     # swap to 42 only if current == 11
 
     # LRU cache (evicts least-recently-used when full)
     my $cache = Data::HashMap::Shared::II->new('/tmp/cache.shm', 100000, 1000);
@@ -152,13 +155,13 @@ correctness. Set to 0 for strict LRU ordering.
 B<Zero-cost when disabled>: with both C<$max_size=0> and C<$ttl=0>, the fast
 lock-free read path is used. The only overhead is a branch (predicted away).
 
-=head2 String Keys and UTF-8
+=head2 String Keys/Values and UTF-8
 
-String-key variants (C<SS>, C<SI>, C<IS>, C<I16S>, C<I32S>, C<SI16>, C<SI32>)
-compare keys as raw bytes: two keys are the same entry if and only if they
-contain the same byte sequence. The SV UTF-8 flag is stored alongside the
-key so retrieval round-trips it to the returned SV, but it is B<not> part
-of key identity. Consequences:
+String-key variants (C<SS>, C<SI>, C<SI16>, C<SI32>) compare keys as raw
+bytes: two keys are the same entry if and only if they contain the same
+byte sequence. The SV UTF-8 flag is stored alongside the key so retrieval
+round-trips it to the returned SV, but it is B<not> part of key identity.
+Consequences:
 
 =over
 
@@ -177,6 +180,12 @@ C<Encode::encode_utf8> before use.
 
 =back
 
+String-value variants (C<SS>, C<IS>, C<I16S>, C<I32S>) store the SV UTF-8
+flag alongside each value and round-trip it on retrieval. The C<cas>
+comparison of C<$expected> against the stored value is byte-only — the
+UTF-8 flag on C<$expected> is ignored (same rationale as string-key
+equality).
+
 =head2 Sharding
 
     my $map = Data::HashMap::Shared::II->new_sharded($path_prefix, $shards, $max_entries, ...);
@@ -188,10 +197,11 @@ route to the correct shard via hash dispatch. Writes to different shards
 proceed in parallel with independent locks.
 
 All operations work transparently on sharded maps: C<put>, C<get>, C<remove>,
-C<exists>, C<add>, C<update>, C<swap>, C<take>, C<incr>, C<cas>,
-C<get_or_set>, C<put_ttl>, C<touch>, C<persist>, C<set_ttl>, C<keys>,
-C<values>, C<items>, C<to_hash>, C<set_multi> (method only),
-C<get_multi> (method only), C<each>, C<pop>, C<shift>, C<drain>,
+C<exists>, C<add>, C<update>, C<swap>, C<take>, C<incr>, C<cas>, C<cas_take>,
+C<get_or_set>, C<put_ttl>, C<add_ttl>, C<update_ttl>, C<touch>, C<persist>,
+C<set_ttl>, C<keys>, C<values>, C<items>, C<to_hash>, C<set_multi> (method only),
+C<remove_multi> (method only), C<get_multi> (method only),
+C<get_with_ttl> (method only), C<each>, C<pop>, C<shift>, C<drain>,
 C<clear>, C<flush_expired>, C<flush_expired_partial>, C<size>,
 C<stats> (method only), C<reserve>, and all diagnostic keywords.
 
@@ -208,8 +218,12 @@ C<i32s>, C<is>, C<si16>, C<si32>, C<si>, C<ss>.
     my $ok = shm_xx_add $map, $key, $value;   # insert only if key absent
     my $ok = shm_xx_update $map, $key, $value; # overwrite only if key exists
     my $old = shm_xx_swap $map, $key, $value; # put + return old value (undef if new)
+    my $ok = shm_xx_cas $map, $key, $expected, $desired; # compare-and-swap
+    my $v  = shm_xx_cas_take $map, $key, $expected; # compare-and-remove; returns value on match, undef otherwise
     my $n  = $map->set_multi($k, $v, ...);   # batch put under single lock, returns count
+    my $n  = $map->remove_multi(@keys);      # batch remove under single lock, returns count
     my @v  = $map->get_multi($k1, $k2, ...); # batch get under single lock with prefetch pipeline
+    my ($v, $ttl) = $map->get_with_ttl($key); # atomic snapshot; () if missing, $ttl is undef on non-TTL map, 0 = permanent; does not promote in LRU
     my $v  = shm_xx_get $map, $key;           # returns undef if not found
     my $ok = shm_xx_remove $map, $key;        # returns false if not found
     my $ok = shm_xx_exists $map, $key;        # returns boolean
@@ -224,16 +238,23 @@ C<i32s>, C<is>, C<si16>, C<si32>, C<si>, C<ss>.
     my $href = shm_xx_to_hash $map;
     my $v  = shm_xx_get_or_set $map, $key, $default;  # returns value
 
+C<cas> is available for all variants. Returns true when the stored value
+matched C<$expected> and was atomically replaced with C<$desired>; false
+if the key is missing or expired, the value did not match, or (string-value
+variants) the arena is full. See L</"String Keys/Values and UTF-8"> for
+the byte-only comparison rule.
+
 Integer-value variants also have:
 
     my $n = shm_xx_incr $map, $key;           # returns new value
     my $n = shm_xx_decr $map, $key;           # returns new value
-    my $ok = shm_xx_cas $map, $key, $expected, $desired; # compare-and-swap
     my $n = shm_xx_incr_by $map, $key, $delta;
 
-LRU/TTL operations (require TTL-enabled map for C<put_ttl>):
+LRU/TTL operations (C<put_ttl>, C<add_ttl>, and C<update_ttl> require a TTL-enabled map):
 
     my $ok = shm_xx_put_ttl $map, $key, $value, $ttl_sec;  # per-key TTL (0 = permanent); requires TTL-enabled map
+    my $ok = shm_xx_add_ttl $map, $key, $value, $ttl_sec;  # insert-if-absent with per-key TTL (0 = permanent)
+    my $ok = shm_xx_update_ttl $map, $key, $value, $ttl_sec; # overwrite-only with per-key TTL (0 = permanent)
     my $ms = shm_xx_max_size $map;            # LRU capacity (0 = disabled)
     my $t  = shm_xx_ttl $map;                 # default TTL in seconds
     my $r  = shm_xx_ttl_remaining $map, $key; # seconds left (0 = permanent, undef if missing/expired/no TTL)
@@ -283,7 +304,8 @@ Diagnostics:
     # stats keys: size, capacity, max_entries, tombstones, mmap_size,
     #   arena_used, arena_cap, evictions, expired, recoveries, max_size, ttl
 
-C<set_multi>, C<stats>, C<path>, and C<unlink> are method-only (no keyword form).
+C<set_multi>, C<get_multi>, C<remove_multi>, C<get_with_ttl>, C<stats>,
+C<path>, and C<unlink> are method-only (no keyword form).
 
 File management:
 

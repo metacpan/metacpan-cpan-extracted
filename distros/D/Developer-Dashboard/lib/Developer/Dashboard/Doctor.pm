@@ -3,11 +3,12 @@ package Developer::Dashboard::Doctor;
 use strict;
 use warnings;
 
-our $VERSION = '3.14';
+our $VERSION = '3.90';
 
 use File::Find ();
 use File::Spec;
 
+use Developer::Dashboard::InternalCLI ();
 use Developer::Dashboard::JSON qw(json_decode);
 
 # new(%args)
@@ -21,15 +22,20 @@ sub new {
 }
 
 # run(%args)
-# Audits dashboard runtime trees for owner-only file-system permissions and
-# merges any pre-run doctor hook results exported through RESULT.
+# Audits dashboard runtime trees for owner-only file-system permissions,
+# checks staged helper drift, and merges any pre-run doctor hook results
+# exported through RESULT.
 # Input: optional fix boolean.
 # Output: hash reference with ok flag, root reports, issues, and hook results.
 sub run {
     my ( $self, %args ) = @_;
     my $fix = $args{fix} ? 1 : 0;
     my @roots = $self->_audit_roots( fix => $fix );
+    my @helper_issues = $self->_helper_issues( fix => $fix );
+    my @shell_issues = $self->_shell_bootstrap_issues( fix => $fix );
     my @issues = map { @{ $_->{issues} || [] } } @roots;
+    push @issues, @helper_issues;
+    push @issues, @shell_issues;
     my $hooks = $self->_doctor_hook_results;
     my @hook_failures = grep { ( $_->{exit_code} || 0 ) != 0 } values %{$hooks};
 
@@ -39,6 +45,8 @@ sub run {
         roots         => \@roots,
         issues        => \@issues,
         issue_count   => scalar @issues,
+        helper_issues => \@helper_issues,
+        shell_issues  => \@shell_issues,
         hooks         => $hooks,
         hook_failures => scalar @hook_failures,
     };
@@ -167,6 +175,251 @@ sub _doctor_hook_results {
     return $results;
 }
 
+# _helper_issues(%args)
+# Audits the staged managed helper namespace for missing or stale dashboard
+# helper assets and optionally restages them through the managed helper path.
+# Input: optional fix boolean.
+# Output: list of helper issue hash references.
+sub _helper_issues {
+    my ( $self, %args ) = @_;
+    my $fix = $args{fix} ? 1 : 0;
+    my $helper_root = File::Spec->catdir( $self->{paths}->cli_root, 'dd' );
+    my @issues;
+
+    for my $name ( '_dashboard-core', Developer::Dashboard::InternalCLI::helper_names() ) {
+        my $path = File::Spec->catfile( $helper_root, $name );
+        my $issue = $self->_helper_issue_for_path( name => $name, path => $path );
+        push @issues, $issue if $issue;
+    }
+
+    if ( $fix && @issues ) {
+        Developer::Dashboard::InternalCLI::ensure_helpers( paths => $self->{paths} );
+        for my $issue (@issues) {
+            my $post_issue = $self->_helper_issue_for_path(
+                name => $issue->{helper_name},
+                path => $issue->{path},
+            );
+            $issue->{fixed} = $post_issue ? 0 : 1;
+        }
+    }
+
+    return @issues;
+}
+
+# _helper_issue_for_path(%args)
+# Compares one staged managed helper file against the currently shipped helper
+# body and reports missing or stale content drift.
+# Input: helper name plus expected staged path.
+# Output: hash reference describing the helper drift, or undef when current.
+sub _helper_issue_for_path {
+    my ( $self, %args ) = @_;
+    my $name = $args{name} || die 'Missing helper audit name';
+    my $path = $args{path} || die 'Missing helper audit path';
+    my $expected = Developer::Dashboard::InternalCLI::_managed_helper_content($name);
+
+    if ( !-f $path ) {
+        return {
+            path          => $path,
+            kind          => 'helper',
+            helper_name   => $name,
+            current_mode  => 'missing',
+            expected_mode => 'managed-helper-current',
+            problem       => 'missing managed helper',
+            fixed         => 0,
+        };
+    }
+
+    open my $fh, '<:raw', $path or die "Unable to read $path: $!";
+    local $/;
+    my $current = <$fh>;
+    close $fh;
+
+    return undef if defined $current && $current eq $expected;
+
+    return {
+        path          => $path,
+        kind          => 'helper',
+        helper_name   => $name,
+        current_mode  => 'stale',
+        expected_mode => 'managed-helper-current',
+        problem       => 'stale managed helper content',
+        fixed         => 0,
+    };
+}
+
+# _shell_bootstrap_issues(%args)
+# Audits shell bootstrap files for dashboard-managed lines that are unreachable
+# in non-interactive shells such as tmux status commands on Debian-family bash
+# setups, and optionally rewrites those lines above the early-return guard.
+# Input: optional fix boolean.
+# Output: list of shell bootstrap issue hash references.
+sub _shell_bootstrap_issues {
+    my ( $self, %args ) = @_;
+    my $fix = $args{fix} ? 1 : 0;
+    my $bashrc = File::Spec->catfile( $self->{paths}->home, '.bashrc' );
+    my @issues;
+
+    my $issue = $self->_bashrc_bootstrap_issue( path => $bashrc );
+    if ($issue) {
+        if ($fix) {
+            $self->_rewrite_bashrc_dashboard_lines($bashrc);
+            my $post_issue = $self->_bashrc_bootstrap_issue( path => $bashrc );
+            $issue->{fixed} = $post_issue ? 0 : 1;
+        }
+        push @issues, $issue;
+    }
+
+    return @issues;
+}
+
+# _bashrc_bootstrap_issue(%args)
+# Detects whether dashboard-managed bash bootstrap lines appear after the
+# standard bash non-interactive return guard in ~/.bashrc.
+# Input: bashrc path.
+# Output: hash reference describing the misplaced bootstrap issue, or undef.
+sub _bashrc_bootstrap_issue {
+    my ( $self, %args ) = @_;
+    my $path = $args{path} || die 'Missing bashrc audit path';
+    return undef if !-f $path;
+
+    my $text = $self->_slurp_text_file($path);
+    my ( $guard_start, $guard_end ) = $self->_bash_noninteractive_guard_offsets($text);
+    return undef if !defined $guard_end;
+
+    my @dashboard_lines = $self->_dashboard_bashrc_lines($text);
+    return undef if !@dashboard_lines;
+
+    my $after_guard = 0;
+    for my $line (@dashboard_lines) {
+        my $position = index( $text, $line );
+        next if $position < 0;
+        if ( $position >= $guard_end ) {
+            $after_guard = 1;
+            last;
+        }
+    }
+    return undef if !$after_guard;
+
+    return {
+        path          => $path,
+        kind          => 'shell-bootstrap',
+        current_mode  => 'after-noninteractive-return',
+        expected_mode => 'before-noninteractive-return',
+        problem       => 'dashboard-managed bash bootstrap is hidden behind the non-interactive return guard',
+        fixed         => 0,
+    };
+}
+
+# _rewrite_bashrc_dashboard_lines($path)
+# Moves dashboard-managed bash bootstrap lines ahead of the standard bash
+# non-interactive return guard so tmux status commands can resolve dashboard in
+# non-interactive shells.
+# Input: bashrc path string.
+# Output: none. Dies on read or write failures.
+sub _rewrite_bashrc_dashboard_lines {
+    my ( $self, $path ) = @_;
+    my $text = $self->_slurp_text_file($path);
+    my ( $guard_start, $guard_end ) = $self->_bash_noninteractive_guard_offsets($text);
+    return if !defined $guard_start || !defined $guard_end;
+
+    my @dashboard_lines = $self->_dashboard_bashrc_lines($text);
+    return if !@dashboard_lines;
+
+    for my $line (@dashboard_lines) {
+        $text =~ s/^\Q$line\E\n?//mg;
+    }
+
+    my $before = substr( $text, 0, $guard_start );
+    my $guard  = substr( $text, $guard_start, $guard_end - $guard_start );
+    my $after  = substr( $text, $guard_end );
+
+    $before =~ s/\s+\z//;
+    my $replacement = join( "\n", @dashboard_lines ) . "\n";
+    my $rewritten = q{};
+    $rewritten .= $before . "\n" if length $before;
+    $rewritten .= $replacement;
+    $rewritten .= $guard;
+    $rewritten .= $after;
+
+    open my $write_fh, '>', $path or die "Unable to write $path: $!";
+    print {$write_fh} $rewritten;
+    close $write_fh or die "Unable to close $path after writing: $!";
+}
+
+# _dashboard_bashrc_lines($text)
+# Extracts dashboard-managed bash bootstrap lines from one bashrc body while
+# preserving their original order.
+# Input: bashrc text string.
+# Output: list of dashboard-managed line strings.
+sub _dashboard_bashrc_lines {
+    my ( $self, $text ) = @_;
+    my @matches;
+    for my $line ( split /\n/, defined($text) ? $text : q{} ) {
+        next if !$self->_is_dashboard_bashrc_line($line);
+        push @matches, $line;
+    }
+    return @matches;
+}
+
+# _is_dashboard_bashrc_line($line)
+# Recognizes one dashboard-managed bash bootstrap line that must remain
+# reachable in non-interactive shells.
+# Input: one bashrc line string.
+# Output: true when the line belongs to the dashboard-managed bootstrap set.
+sub _is_dashboard_bashrc_line {
+    my ( $self, $line ) = @_;
+    return 0 if !defined $line || $line eq q{};
+    return 1 if $line =~ /\Aexport PERLBREW_HOME=.*perlbrew.*\z/;
+    return 1 if $line =~ /\Aexport PATH=.*perlbrew\/perls\/.*:\$PATH"?\z/;
+    return 1 if $line =~ /\Aeval "\$\(".*-Mlocal::lib\)"\z/;
+    return 1 if $line =~ /\Aeval "\$\(".*dashboard" shell bash\)"\z/;
+    return 0;
+}
+
+# _bash_noninteractive_guard_offsets($text)
+# Locates the standard bash non-interactive early-return guard inside one
+# bashrc body.
+# Input: bashrc text string.
+# Output: two-element list containing the guard start and end offsets, or
+#         undef values when the guard is absent.
+sub _bash_noninteractive_guard_offsets {
+    my ( $self, $text ) = @_;
+    return ( undef, undef ) if !defined $text;
+    my $guard_re = qr{
+        (?:
+            ^case \s+ \$- \s+ in \s* \n
+            (?:
+                (?! ^[ \t]* esac \s* $ )
+                .*\n
+            )*?
+            ^[ \t]* \*i\* \) \s* ;; \s* \n
+            ^[ \t]* \* \) \s* return \s* ;; \s* \n
+            ^[ \t]* esac \s* \n?
+        )
+        |
+        (?:
+            ^[ \t]* \[ \s* -z \s+ "\$PS1" \s* \] \s* && \s* return \s* \n?
+        )
+    }xms;
+    return ( undef, undef ) if $text !~ /$guard_re/;
+    my $start = $-[0];
+    my $end   = $+[0];
+    return ( $start, $end );
+}
+
+# _slurp_text_file($path)
+# Reads one UTF-8-safe text file body for doctor audits and repairs.
+# Input: file path string.
+# Output: complete file contents as a string.
+sub _slurp_text_file {
+    my ( $self, $path ) = @_;
+    open my $read_fh, '<', $path or die "Unable to read $path: $!";
+    local $/;
+    my $text = <$read_fh>;
+    close $read_fh or die "Unable to close $path after reading: $!";
+    return defined($text) ? $text : q{};
+}
+
 # _mode_octal($path)
 # Returns the permission bits for one file-system entry in four-digit octal form.
 # Input: file or directory path string.
@@ -195,8 +448,10 @@ Developer::Dashboard::Doctor - runtime permission doctor for Developer Dashboard
 
 This module audits the current home runtime and any older dashboard roots that
 still exist in the user's home directory, checking that directories are
-owner-only and that files are readable only by the owner unless they are meant
-to stay owner-executable.
+owner-only, that files are readable only by the owner unless they are meant
+to stay owner-executable, and that staged dashboard-managed helpers under
+F<~/.developer-dashboard/cli/dd/> still match the currently shipped helper
+assets.
 
 =head1 METHODS
 
@@ -208,7 +463,7 @@ Construct the doctor service and audit the known dashboard roots.
 
 =head1 PURPOSE
 
-This module audits and optionally repairs runtime permissions. It checks the home runtime and older dashboard roots for owner-only directory and file modes, applies the expected C<0700>/C<0600> policy where needed, and returns a structured report that the CLI can print or act on.
+This module audits and optionally repairs runtime permissions. It checks the home runtime and older dashboard roots for owner-only directory and file modes, inspects staged dashboard-managed helpers for missing or stale helper drift, applies the expected C<0700>/C<0600> policy where needed, restages helpers through the managed helper path when possible, and returns a structured report that the CLI can print or act on.
 
 =head1 WHY IT EXISTS
 

@@ -29,7 +29,7 @@ void process_range_response(pTHX_ pending_call_t *pc) {
     }
     hv_store(result, "kvs", 3, newRV_noinc((SV *)kvs), 0);
     hv_store(result, "more", 4, newSViv(resp->more), 0);
-    hv_store(result, "count", 5, newSViv(resp->count), 0);
+    hv_store(result, "count", 5, newSVi64(resp->count), 0);
 
     etcdserverpb__range_response__free_unpacked(resp, NULL);
 
@@ -65,7 +65,7 @@ void process_delete_response(pTHX_ pending_call_t *pc) {
     HV *result = newHV();
     add_header_to_hv(aTHX_ result, resp->header);
 
-    hv_store(result, "deleted", 7, newSViv(resp->deleted), 0);
+    hv_store(result, "deleted", 7, newSVi64(resp->deleted), 0);
 
     if (resp->n_prev_kvs > 0) {
         AV *prev_kvs = newAV();

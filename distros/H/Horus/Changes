@@ -1,5 +1,8 @@
 Revision history for Horus
 
+0.09    2026-05-17
+        - Skip t/19-thread-safety.t on perl < 5.012.
+
 0.08    2026-04-25
         - Widen timestamp-comparison tolerance in t/03, t/07, t/08, t/14
           from 1-5s to 10s to absorb gettimeofday/time() on CPAN tester environments

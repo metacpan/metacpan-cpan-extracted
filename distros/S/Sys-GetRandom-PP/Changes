@@ -1,3 +1,14 @@
+0.06  2026-05-04
+    - Switch from h2ph to hardcoded syscall numbers. Removes the h2ph and
+      system header build requirements and makes the module fatpackable, but
+      limits support to known platforms. Currently these are:
+       - Dragonfly BSD
+       - FreeBSD
+       - MidnightBSD
+       - NetBSD
+       - Illumos
+       - Linux (aarch64, armv6l, i686, x86_64)
+
 0.05  2024-09-25
     - More ad-hoc hackery in the build step to support more recent versions of
       FreeBSD.

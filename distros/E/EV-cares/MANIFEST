@@ -3,13 +3,34 @@ Changes
 cpanfile
 eg/bench.pl
 eg/bulk.pl
+eg/bulk_reverse.pl
+eg/cache_demo.pl
+eg/cli.pl
+eg/dane.pl
+eg/dns_compare.pl
+eg/dns_proxy.pl
 eg/dns_types.pl
+eg/dnssec_chain.pl
+eg/email_health.pl
+eg/futures.pl
 eg/healthcheck.pl
+eg/healthmon.pl
+eg/keep_alive.pl
+eg/mta_probe.pl
 eg/parallel.pl
 eg/resolve.pl
+eg/resolver_pool.pl
 eg/reverse.pl
 eg/spf.pl
+eg/spf_chain.pl
 eg/srv.pl
+eg/svcb.pl
+eg/timing.pl
+eg/upstream_ad_check.pl
+eg/with_mojo.pl
+eg/zone_audit.pl
+eg/zone_trace.pl
+eg/zone_walk.pl
 lib/EV/cares.pm
 Makefile.PL
 MANIFEST			This list of files
@@ -18,6 +39,22 @@ README
 t/00_load.t
 t/01_resolve.t
 t/02_search_types.t
+t/03_constants.t
+t/04_resolve_all.t
+t/05_ttl.t
+t/06_loop.t
+t/07_https.t
+t/08_fd_overflow.t
+t/09_features.t
+t/10_lifecycle.t
+t/11_errors.t
+t/12_reverse_all.t
+t/13_introspection.t
+t/14_concurrent.t
+t/15_utilities.t
+t/16_recovery.t
+t/17_wait_idle.t
+t/18_parse_header_integration.t
 typemap
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

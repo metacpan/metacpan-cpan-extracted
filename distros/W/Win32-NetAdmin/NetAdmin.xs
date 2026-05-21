@@ -58,6 +58,23 @@
 
 #define PREFLEN 0x20000
 
+/* Cygwin's <lmaccess.h> and <lmwksta.h> declare the resumehandle
+ * parameter of NetUserEnum, NetWkstaTransportEnum, NetWkstaUserEnum,
+ * NetServerEnum, and NetServerDiskEnum as LPDWORD, while MSDN and the
+ * Windows SDK use PDWORD or PDWORD_PTR. The underlying netapi32.dll
+ * on x64 still writes a pointer-sized value through the argument, so
+ * DWORD_PTR storage is required to avoid stack corruption; we only
+ * cast the address to match Cygwin's narrower signature. gcc accepts
+ * the conversion with a warning; g++ rejects it. NetGroupGetUsers and
+ * NetLocalGroupGetMembers declare the parameter as PDWORD_PTR even on
+ * Cygwin and need no cast.
+ */
+#ifdef __CYGWIN__
+#  define CYG_RESUME_HANDLE(h) ((LPDWORD)&(h))
+#else
+#  define CYG_RESUME_HANDLE(h) (&(h))
+#endif
+
 /* constant function for exporting NT definitions. */
 
 static long
@@ -972,7 +989,7 @@ XS(XS_NT__NetAdmin_GetUsers)
 		lastError = NetUserEnum(lpwServer, 0, filter,
 					(LPBYTE*)&pwzUsers, PREFLEN,
 					&entriesRead, &totalEntries,
-					&resumeHandle);
+					CYG_RESUME_HANDLE(resumeHandle));
 		if (lastError != 0 && lastError != ERROR_MORE_DATA)
 		    break;
 		for (index = 0; index < entriesRead; ++index) {
@@ -990,7 +1007,7 @@ XS(XS_NT__NetAdmin_GetUsers)
 		lastError = NetUserEnum(lpwServer,10, filter,
 					(LPBYTE*)&pwzUsers10, PREFLEN,
 					&entriesRead, &totalEntries,
-					&resumeHandle);
+					CYG_RESUME_HANDLE(resumeHandle));
 		if (lastError != 0 && lastError != ERROR_MORE_DATA)
 		    break;
 		for (index = 0; index < entriesRead; ++index) {
@@ -1043,7 +1060,7 @@ XS(XS_NT__NetAdmin_GetTransports)
 		lastError = NetWkstaTransportEnum(lpwServer, 0,
 					  (LPBYTE*) &pws,
 					  PREFLEN, &entriesRead,
-					  &totalEntries, &resumeHandle);
+					  &totalEntries, CYG_RESUME_HANDLE(resumeHandle));
 		if (lastError != 0 && lastError != ERROR_MORE_DATA)
 		    break;
 		for (index = 0; index < entriesRead; ++index) {
@@ -1062,7 +1079,7 @@ XS(XS_NT__NetAdmin_GetTransports)
 		lastError = NetWkstaTransportEnum(lpwServer, 0,
 						  (LPBYTE*) &pws,
 						  PREFLEN, &entriesRead,
-						  &totalEntries, &resumeHandle);
+						  &totalEntries, CYG_RESUME_HANDLE(resumeHandle));
 		if (lastError != 0 && lastError != ERROR_MORE_DATA)
 		    break;
 		for (index = 0; index < entriesRead; ++index) {
@@ -1136,7 +1153,7 @@ XS(XS_NT__NetAdmin_LoggedOnUsers)
 		lastError = NetWkstaUserEnum(lpwServer, 0,
 					(LPBYTE*)&pwzUser0, PREFLEN,
 					&entriesRead, &totalEntries,
-					&resumeHandle);
+					CYG_RESUME_HANDLE(resumeHandle));
 		if (lastError != 0 && lastError != ERROR_MORE_DATA)
 		    break;
 		for (index = 0; index < entriesRead; ++index) {
@@ -1154,7 +1171,7 @@ XS(XS_NT__NetAdmin_LoggedOnUsers)
 		lastError = NetWkstaUserEnum(lpwServer,1,
 					     (LPBYTE*)&pwzUser1, PREFLEN,
 					     &entriesRead, &totalEntries,
-					     &resumeHandle);
+					     CYG_RESUME_HANDLE(resumeHandle));
 		if (lastError != 0 && lastError != ERROR_MORE_DATA)
 		    break;
 		for (index = 0; index < entriesRead; ++index) {
@@ -1714,22 +1731,25 @@ XS(XS_NT__NetAdmin_LocalGroupIsMember)
 	AllocWideName((char*)SvPV(ST(0),n_a), lpwServer);
 	AllocWideName((char*)SvPV(ST(1),n_a), lpwGroup);
 	do {
-	    PLOCALGROUP_MEMBERS_INFO_0 pwzMembersInfo;
+	    PLOCALGROUP_MEMBERS_INFO_0 pwzMembersInfo = NULL;
 	    lastError = NetLocalGroupGetMembers(lpwServer, lpwGroup, 0,
 						(LPBYTE*)&pwzMembersInfo,
 		    				PREFLEN, &entriesRead,
 						&totalEntries, &resumeHandle);
-	    if (lastError != 0 && lastError != ERROR_MORE_DATA)
+	    if (lastError != 0 && lastError != ERROR_MORE_DATA) {
+		if (pwzMembersInfo != NULL)
+		    NetApiBufferFree(pwzMembersInfo);
 		break;
+	    }
 	    for (index = 0; index < entriesRead; ++index)
-		if (EqualSid(pSid, pwzMembersInfo[index].lgrmi0_sid) != 0){
+		if (EqualSid(pSid, pwzMembersInfo[index].lgrmi0_sid) != 0) {
 		    bReturn = TRUE;
 		    break;
 		}
 
 	    NetApiBufferFree(pwzMembersInfo);
 	} while(bReturn == FALSE &&
-		(lastError == ERROR_MORE_DATA ||  resumeHandle != 0));
+		(lastError == ERROR_MORE_DATA || resumeHandle != 0));
 
 	free(pSid);
 	FreeWideName(lpwServer);
@@ -1929,7 +1949,7 @@ XS(XS_NT__NetAdmin_GetServers)
 					  (LPBYTE*) &pwzServerInfo,
 					  PREFLEN, &entriesRead,
 					  &totalEntries, (DWORD)SvIV(ST(2)),
-					  lpwDomain, &resumeHandle);
+					  lpwDomain, CYG_RESUME_HANDLE(resumeHandle));
 		if (lastError != 0 && lastError != ERROR_MORE_DATA)
 		    break;
 		for (index = 0; index < entriesRead; ++index) {
@@ -1951,7 +1971,7 @@ XS(XS_NT__NetAdmin_GetServers)
 					  (LPBYTE*) &pwzServerInfo101,
 					  PREFLEN, &entriesRead,
 					  &totalEntries, (DWORD)SvIV(ST(2)),
-					  lpwDomain, &resumeHandle);
+					  lpwDomain, CYG_RESUME_HANDLE(resumeHandle));
 		if (lastError != 0 && lastError != ERROR_MORE_DATA)
 		    break;
 		for (index = 0; index < entriesRead; ++index) {
@@ -2006,7 +2026,7 @@ XS(XS_NT__NetAdmin_GetServerDisks)
 						    (LPBYTE*)&disks,
 						    PREFLEN, &entriesRead,
 						    &totalEntries,
-						    &resumeHandle);
+						    CYG_RESUME_HANDLE(resumeHandle));
 		if (lastError != 0 && lastError != ERROR_MORE_DATA)
 		    break;
 		p = disks;
@@ -2156,7 +2176,11 @@ XS(XS_NT__NetAdmin_GetUserGroupFromRID)
     RETURNRESULT(bSuccess);
 }
 
-XS(boot_Win32__NetAdmin)
+/* Force C linkage on the boot symbol so XSLoader/DynaLoader can find
+ * it by its unmangled name when the file is compiled as C++ (e.g.,
+ * Cygwin g++). The XS() macro alone does not declare extern "C".
+ */
+EXTERN_C XS(boot_Win32__NetAdmin)
 {
     dXSARGS;
     char* file = __FILE__;

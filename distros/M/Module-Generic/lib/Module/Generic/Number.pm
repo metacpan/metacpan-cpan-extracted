@@ -13,17 +13,65 @@
 package Module::Generic::Number;
 BEGIN
 {
-    use v5.26.1;
+    use v5.16.0;
     use strict;
     use warnings;
+    warnings::register_categories( 'Module::Generic' );
     use parent qw( Module::Generic );
-    use warnings::register;
     use vars qw( $SUPPORTED_LOCALES $DEFAULT $NUMBER_RE $LOCALE_LOCK );
     use Config;
-    # use Nice::Try;
-    use POSIX qw( Inf NaN );
-    use Regexp::Common qw( number );
-    $NUMBER_RE = $RE{num}{real};
+    if( $] >= 5.022 )
+    {
+        require POSIX;
+        POSIX->import( qw( cbrt isfinite isinf isnan isnormal signbit ) );
+    }
+    else
+    {
+        my $POS_INF = 9**9**9;
+        my $NEG_INF = -$POS_INF;
+        *isinf = sub
+        {
+            return(0) if( !defined( $_[0] ) );
+            no warnings 'numeric';
+            return( $_[0] == $POS_INF || $_[0] == $NEG_INF );
+        };
+        *isnan = sub
+        {
+            return(0) if( !defined( $_[0] ) );
+            no warnings 'numeric';
+            return( $_[0] != $_[0] );
+        };
+        *isfinite = sub { my $n = $_[0]; return( $n == $n && $n != $POS_INF && $n != $NEG_INF ? 1 : 0 ); };
+        *isnormal = sub
+        {
+            my $n = $_[0];
+            return(0) if( $n != $n );
+            return(0) if( $n == 0 );
+            return(0) if( $n == $POS_INF || $n == $NEG_INF );
+            my $abs = $n < 0 ? -$n : $n;
+            return( $abs >= 2.2250738585072014e-308 ? 1 : 0 );
+        };
+        # signbit: returns non-zero for negative numbers (including -0.0)
+        *signbit = sub
+        {
+            my $n = $_[0];
+            return(1) if( $n < 0 );
+            return(0) if( $n > 0 );
+            # zero or NaN: check string representation for -0
+            return( sprintf( "%g", $n ) =~ /^-/ ? 1 : 0 );
+        };
+        # cbrt: handle negatives correctly (real cube root)
+        *cbrt = sub
+        {
+            my $n = $_[0];
+            return( $n < 0 ? -( ( -$n ) ** ( 1/3 ) ) : $n ** ( 1/3 ) );
+        };
+    }
+
+    # 2026-05-17: Regexp::Common does not install under perl v5.10.1 because of an error in its test t/test_comments.t
+    # use Regexp::Common qw( number );
+    # $NUMBER_RE = $RE{num}{real};
+    $NUMBER_RE = qr/(?:(?i)(?:[-+]?)(?:(?=[.]?[0123456789])(?:[0123456789]*)(?:(?:[.])(?:[0123456789]{0,}))?)(?:(?:[E])(?:(?:[-+]?)(?:[0123456789]+))|))/;
     use Scalar::Util ();
     use overload (
         # I know there is the nomethod feature, but I need to provide return_object set to true or false
@@ -66,7 +114,7 @@ BEGIN
             no strict;
             my $operation = $swap ? "${other} ${op} \$self->{_number}" : "\$self->{_number} ${op} ${other}";
             my $res = eval( $operation );
-            warn( "Error with formula \"$operation\": $@" ) if( $@ && $self->_warnings_is_enabled );
+            warn( "Error with formula \"$operation\": $@" ) if( $@ && $self->_warnings_is_enabled( 'Module::Generic' ) );
             return if( $@ );
             # Concatenated something. If it still look like a number, we return it as an object
             if( $res =~ /^$NUMBER_RE$/ )
@@ -119,7 +167,6 @@ BEGIN
     our( $VERSION ) = 'v2.3.5';
 };
 
-use v5.26.1;
 # use strict;
 no warnings 'redefine';
 use utf8;
@@ -524,8 +571,8 @@ sub init
     return( $self->error( "Number value provided is empty" ) ) if( !CORE::length( $num ) );
     {
         no warnings;
-        return( Module::Generic::Infinity->new( $num ) ) if( POSIX::isinf( $num ) );
-        return( Module::Generic::Nan->new( $num ) ) if( POSIX::isnan( $num ) );
+        return( Module::Generic::Infinity->new( $num ) ) if( isinf( $num ) );
+        return( Module::Generic::Nan->new( $num ) ) if( isnan( $num ) );
     }
     use utf8;
     my @k = keys( %$map );
@@ -614,7 +661,7 @@ sub init
             } || 'utf-8';
             if( $@ )
             {
-                warn( "Error trying to resolve alias for POSIX::localeconv codeset: $@" ) if( $self->_is_warnings_enabled );
+                warn( "Error trying to resolve alias for POSIX::localeconv codeset: $@" ) if( $self->_is_warnings_enabled( 'Module::Generic' ) );
             }
             $self->encoding( $encoding );
             # Set back the LC_ALL to what it was, because we do not want to disturb the user environment
@@ -652,7 +699,7 @@ sub init
         } || 'utf-8';
         if( $@ )
         {
-            warn( "Error trying to resolve alias for POSIX::localeconv codeset: $@" ) if( $self->_is_warnings_enabled );
+            warn( "Error trying to resolve alias for POSIX::localeconv codeset: $@" ) if( $self->_is_warnings_enabled( 'Module::Generic' ) );
         }
         $self->encoding( $encoding );
         if( scalar( keys( %$lconv ) ) )
@@ -779,7 +826,24 @@ sub as_scalar
 
 sub as_string { return( shift->{_number} ) }
 
-sub cbrt { return( shift->_func( 'cbrt', { posix => 1 } ) ); }
+sub cbrt
+{
+    my $self = shift( @_ );
+    if( $] >= 5.022 )
+    {
+        return( $self->_func( 'cbrt', { posix => 1 } ) );
+    }
+    else
+    {
+        my $n = $self->{_number};
+        # Handle negative numbers properly: cbrt(-x) = -cbrt(x)
+        my $res = $n < 0 ? -( ( -$n ) ** ( 1/3 ) ) : $n ** ( 1/3 );
+        return if( !defined( $res ) );
+        return( Module::Generic::Infinity->new( $res ) ) if( isinf( $res ) );
+        return( Module::Generic::Nan->new( $res ) ) if( isnan( $res ) );
+        return( $self->clone( $res ) );
+    }
+}
 
 sub ceil { return( shift->_func( 'ceil', { posix => 1 } ) ); }
 
@@ -804,8 +868,8 @@ sub clone
     else
     {
         my $num = @_ ? shift( @_ ) : $self->{_number};
-        return( Module::Generic::Infinity->new( $num ) ) if( POSIX::isinf( $num ) );
-        return( Module::Generic::Nan->new( $num ) ) if( POSIX::isnan( $num ) );
+        return( Module::Generic::Infinity->new( $num ) ) if( isinf( $num ) );
+        return( Module::Generic::Nan->new( $num ) ) if( isnan( $num ) );
         $new = $self->SUPER::clone;
         return( $self->pass_error ) if( !defined( $new ) );
         $new->{_number} = ( $self->_is_a( $num => 'Module::Generic::Number' ) ? $num->{_number} : $num );
@@ -836,15 +900,15 @@ sub compute
     {
         my $res = eval( $operation );
         no overloading;
-        warn( "Error with return formula \"$operation\" using object $self having number '$self->{_number}': $@" ) if( $@ && $self->_warnings_is_enabled );
+        warn( "Error with return formula \"$operation\" using object $self having number '$self->{_number}': $@" ) if( $@ && $self->_warnings_is_enabled( 'Module::Generic' ) );
         return if( $@ );
 
         # Here we need to die, because we are inside 'compute', which is call in overloading. We simply cannot return an error object.
         $self->_load_class( 'Module::Generic::Scalar' ) ||
             die( "Unable to load Module::Generic::Scalar" );
         return( Module::Generic::Scalar->new( $res ) ) if( $opts->{type} eq 'scalar' );
-        return( Module::Generic::Infinity->new( $res ) ) if( POSIX::isinf( $res ) );
-        return( Module::Generic::Nan->new( $res ) ) if( POSIX::isnan( $res ) );
+        return( Module::Generic::Infinity->new( $res ) ) if( isinf( $res ) );
+        return( Module::Generic::Nan->new( $res ) ) if( isnan( $res ) );
         # undef may be returned for example on platform supporting NaN when using <=>
         return( $self->clone( $res ) ) if( defined( $res ) );
         return;
@@ -853,7 +917,7 @@ sub compute
     {
         my $res = eval( $operation );
         no overloading;
-        warn( "Error with boolean formula \"$operation\" using object $self having number '$self->{_number}': $@" ) if( $@ && $self->_warnings_is_enabled );
+        warn( "Error with boolean formula \"$operation\" using object $self having number '$self->{_number}': $@" ) if( $@ && $self->_warnings_is_enabled( 'Module::Generic' ) );
         return if( $@ );
         # return( $res ? $self->true : $self->false );
         return( $res );
@@ -897,7 +961,7 @@ sub decode_lconv
         };
         if( $@ )
         {
-            warn( "Error trying to decode POSIX::localeconv property ${prop} and language $self->{lang}: $@" ) if( $self->_is_warnings_enabled );
+            warn( "Error trying to decode POSIX::localeconv property ${prop} and language $self->{lang}: $@" ) if( $self->_is_warnings_enabled( 'Module::Generic' ) );
             next;
         }
         $ref->{ $prop } = $rv;
@@ -1464,24 +1528,24 @@ sub is_empty { return( CORE::length( shift->{_number} ) == 0 ); }
 
 sub is_even { return( !( shift->{_number} % 2 ) ); }
 
-sub is_finite { return( shift->_func( 'isfinite', { posix => 1 }) ); }
+sub is_finite { return( isfinite( shift->{_number} ) ? 1 : 0 ); }
 
 sub is_float { return( (POSIX::modf( shift->{_number} ))[0] != 0 ); }
 
-sub is_infinite { return( shift->_func( 'isinf', { posix => 1 }) ); }
+sub is_infinite { return( isinf( shift->{_number} ) ? 1 : 0 ); }
 
 sub is_int { return( (POSIX::modf( shift->{_number} ))[0] == 0 ); }
 
-sub is_nan { return( shift->_func( 'isnan', { posix => 1}) ); }
+sub is_nan { return( isnan( shift->{_number} ) ); }
 
 {
     no warnings 'once';
     *is_neg = \&is_negative;
 }
 
-sub is_negative { return( shift->_func( 'signbit', { posix => 1 }) != 0 ); }
+sub is_negative { return( signbit( shift->{_number} ) != 0 ? 1 : 0 ); }
 
-sub is_normal { return( shift->_func( 'isnormal', { posix => 1}) ); }
+sub is_normal { return( isnormal( shift->{_number} ) ? 1 : 0 ); }
 
 sub is_odd { return( shift->{_number} % 2 ); }
 
@@ -1490,7 +1554,7 @@ sub is_odd { return( shift->{_number} % 2 ); }
     *is_pos = \&is_positive;
 }
 
-sub is_positive { return( shift->_func( 'signbit', { posix => 1 }) == 0 ); }
+sub is_positive { return( signbit( shift->{_number} ) == 0 ? 1 : 0 ); }
 
 sub kibi_suffix { return( shift->_set_get_prop( 'kibi_suffix', @_ ) ); }
 
@@ -1504,17 +1568,75 @@ sub locale { return( shift->_set_get_scalar_as_object( 'lang', @_ ) ); }
 
 sub log { return( shift->_func( 'log' ) ); }
 
-sub log2 { return( shift->_func( 'log2', { posix => 1 } ) ); }
+sub log2
+{
+    my $self = shift( @_ );
+    if( $] >= 5.022 )
+    {
+        return( $self->_func( 'log2', { posix => 1 } ) );
+    }
+    else
+    {
+        my $n = $self->{_number};
+        my $res = ( CORE::log( $n ) / CORE::log(2) );
+        return if( !defined( $res ) );
+        return( Module::Generic::Infinity->new( $res ) ) if( isinf( $res ) );
+        return( Module::Generic::Nan->new( $res ) ) if( isnan( $res ) );
+        return( $self->clone( $res ) );
+    }
+}
 
 sub log10 { return( shift->_func( 'log10', { posix => 1 } ) ); }
 
-sub max { return( shift->_func( 'fmax', @_, { posix => 1 } ) ); }
+sub max
+{
+    my $self = shift( @_ );
+    my $other = shift( @_ );
+    if( $] >= 5.022 )
+    {
+        return( $self->_func( 'fmax', $other, { posix => 1 } ) );
+    }
+    else
+    {
+        my $n = $self->{_number};
+        # fmax: if one is NaN, return the other; otherwise the larger.
+        # We don't fully replicate IEEE NaN semantics here, just the common case.
+        my $res;
+        if( isnan( $n ) ) { $res = $other; }
+        elsif( isnan( $other ) ) { $res = $n; }
+        else { $res = $n > $other ? $n : $other; }
+        return if( !defined( $res ) );
+        return( Module::Generic::Infinity->new( $res ) ) if( isinf( $res ) );
+        return( Module::Generic::Nan->new( $res ) ) if( isnan( $res ) );
+        return( $self->clone( $res ) );
+    }
+}
 
 sub mebi_suffix { return( shift->_set_get_prop( 'mebi_suffix', @_ ) ); }
 
 sub mega_suffix { return( shift->_set_get_prop( 'mega_suffix', @_ ) ); }
 
-sub min { return( shift->_func( 'fmin', @_, { posix => 1 } ) ); }
+sub min
+{
+    my $self = shift( @_ );
+    my $other = shift( @_ );
+    if( $] >= 5.022 )
+    {
+        return( $self->_func( 'fmin', $other, { posix => 1 } ) );
+    }
+    else
+    {
+        my $n = $self->{_number};
+        my $res;
+        if( isnan( $n ) ) { $res = $other; }
+        elsif( isnan( $other ) ) { $res = $n; }
+        else { $res = $n < $other ? $n : $other; }
+        return if( !defined( $res ) );
+        return( Module::Generic::Infinity->new( $res ) ) if( isinf( $res ) );
+        return( Module::Generic::Nan->new( $res ) ) if( isnan( $res ) );
+        return( $self->clone( $res ) );
+    }
+}
 
 sub mod { return( shift->_func( 'fmod', @_, { posix => 1 } ) ); }
 
@@ -1565,7 +1687,33 @@ sub round
     return( $self->clone( $new ) );
 }
 
-sub round_zero { return( shift->_func( 'round', @_, { posix => 1 } ) ); }
+sub round_zero
+{
+    my $self = shift( @_ );
+    my @args = @_;
+    if( $] >= 5.022 )
+    {
+        return( $self->_func( 'round', @args, { posix => 1 } ) );
+    }
+    else
+    {
+        my $n = $self->{_number};
+        # round to nearest, ties away from zero (same semantics as C99 round())
+        my $res;
+        if( $n >= 0 )
+        {
+            $res = CORE::int( $n + 0.5 );
+        }
+        else
+        {
+            $res = -CORE::int( -$n + 0.5 );
+        }
+        return if( !defined( $res ) );
+        return( Module::Generic::Infinity->new( $res ) ) if( isinf( $res ) );
+        return( Module::Generic::Nan->new( $res ) ) if( isnan( $res ) );
+        return( $self->clone( $res ) );
+    }
+}
 
 sub round2
 {
@@ -1736,8 +1884,8 @@ sub _func
     my $res = eval( $expr );
     return( $self->pass_error( $@ ) ) if( $@ );
     return if( !defined( $res ) );
-    return( Module::Generic::Infinity->new( $res ) ) if( POSIX::isinf( $res ) );
-    return( Module::Generic::Nan->new( $res ) ) if( POSIX::isnan( $res ) );
+    return( Module::Generic::Infinity->new( $res ) ) if( isinf( $res ) );
+    return( Module::Generic::Nan->new( $res ) ) if( isnan( $res ) );
     return( $self->clone( $res ) );
 }
 
@@ -1904,6 +2052,7 @@ BEGIN
     use strict;
     use warnings;
     use parent -norequire, qw( Module::Generic::Number );
+    use vars qw( $POS_INF $NEG_INF );
     use overload ('""'      => sub{ $_[0]->{_number} },
                   '+='      => sub{ &_catchall( @_[0..2], '+' ) },
                   '-='      => sub{ &_catchall( @_[0..2], '-' ) },
@@ -1918,15 +2067,74 @@ BEGIN
                   nomethod  => \&_catchall,
                   fallback  => 1,
                  );
+    $POS_INF = 9**9**9;
+    $NEG_INF = -$POS_INF;
+    if( $] >= 5.022 )
+    {
+        require POSIX;
+        POSIX->import( qw( isinf isnan ) );
+    }
+    else
+    {
+        *isinf = sub
+        {
+            return(0) if( !defined( $_[0] ) );
+            no warnings 'numeric';
+            return( $_[0] == $POS_INF || $_[0] == $NEG_INF );
+        };
+        *isnan = sub
+        {
+            return(0) if( !defined( $_[0] ) );
+            no warnings 'numeric';
+            return( $_[0] != $_[0] );
+        };
+    }
     use Wanted;
-    use POSIX qw( Inf NaN );
     our( $VERSION ) = '0.1.0';
 };
 
 sub new
 {
-    my $this = shift( @_ );
-    return( bless( { _number => CORE::shift( @_ ) } => ( ref( $this ) || $this ) ) );
+    my $this = CORE::shift( @_ );
+    my $val  = CORE::shift( @_ );
+    if( $] < 5.022 )
+    {
+        my $str = "$val";
+        my $is_nan;
+        {
+            # Suppress numeric comparison warnings: on perl < 5.22, IEEE special values
+            # may carry a non-numeric string representation depending on the C library,
+            # and the standard NaN-detection idiom ($val != $val) will warn if $val
+            # happens to be a plain non-numeric string. The check is still semantically
+            # correct.
+            no warnings 'numeric';
+            $is_nan = ( $val != $val );
+        }
+        # Fallback to string pattern matching (covers libc variants like:
+        # "nan", "-nan", "nan(0x...)", "1.#QNAN", "1.#IND", "nanq", etc.)
+        $is_nan ||= ( $str =~ /^[+-]?(?:nan|1\.\#(?:ind|qnan|snan))/i );
+        if( $is_nan )
+        {
+            $val = 'NaN';
+        }
+        else
+        {
+            no warnings 'numeric';
+            if( $val == $POS_INF )
+            {
+                $val = 'Inf';
+            }
+            elsif( $val == -$POS_INF )
+            {
+                $val = '-Inf';
+            }
+            elsif( $str =~ /^([+-]?)(?:inf(?:inity)?|1\.\#inf)/i )
+            {
+                $val = ( $1 eq '-' ) ? '-Inf' : 'Inf';
+            }
+        }
+    }
+    return( bless( { _number => $val } => ( ref( $this ) || $this ) ) );
 }
 
 sub clone { return( shift->new( @_ ) ); }
@@ -1954,9 +2162,9 @@ sub _catchall
     my $res = eval( $expr );
     CORE::warn( "Error evaluating expression \"$expr\": $@" ) if( $@ );
     return if( $@ );
-    return( Module::Generic::Number->new( $res ) ) if( POSIX::isnormal( $res ) );
-    return( Module::Generic::Infinity->new( $res ) ) if( POSIX::isinf( $res ) );
-    return( Module::Generic::Nan->new( $res ) ) if( POSIX::isnan( $res ) );
+    return( Module::Generic::Number->new( $res ) ) if( isnormal( $res ) );
+    return( Module::Generic::Infinity->new( $res ) ) if( isinf( $res ) );
+    return( Module::Generic::Nan->new( $res ) ) if( isnan( $res ) );
     return( $res );
 }
 
@@ -1974,9 +2182,9 @@ sub _func
     my $res = eval( $expr );
     CORE::warn( $@ ) if( $@ );
     return if( !defined( $res ) );
-    return( Module::Generic::Number->new( $res ) ) if( POSIX::isnormal( $res ) );
-    return( Module::Generic::Infinity->new( $res ) ) if( POSIX::isinf( $res ) );
-    return( Module::Generic::Nan->new( $res ) ) if( POSIX::isnan( $res ) );
+    return( Module::Generic::Number->new( $res ) ) if( isnormal( $res ) );
+    return( Module::Generic::Infinity->new( $res ) ) if( isinf( $res ) );
+    return( Module::Generic::Nan->new( $res ) ) if( isnan( $res ) );
     return( $res );
 }
 
@@ -2006,6 +2214,11 @@ BEGIN
     use strict;
     use warnings;
     use parent -norequire, qw( Module::Generic::NumberSpecial );
+    use overload (
+        '""' => sub { return( $_[0]->{_number} ); },
+        fallback => 1,
+    );
+
     our( $VERSION ) = '0.1.0';
 };
 
@@ -2018,6 +2231,10 @@ BEGIN
     use strict;
     use warnings;
     use parent -norequire, qw( Module::Generic::NumberSpecial );
+    use overload (
+        '""' => sub { 'NaN' },
+        fallback => 1,
+    );
     our( $VERSION ) = '0.1.0';
 };
 

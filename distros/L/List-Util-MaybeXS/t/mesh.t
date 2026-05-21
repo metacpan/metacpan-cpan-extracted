@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 9;
 use List::Util::PP qw(mesh mesh_longest mesh_shortest);
 
 is_deeply( [mesh ()], [],
@@ -9,6 +9,12 @@ is_deeply( [mesh ()], [],
 
 is_deeply( [mesh ['a'..'c']], [ 'a', 'b', 'c' ],
   'mesh of one list returns the list' );
+
+is_deeply( [mesh ['one'], [1]], [ 'one' => 1 ],
+  'mesh of two single-element lists returns a one-element list of pairs' );
+
+is_deeply( [mesh_shortest ['one'], [1]], [ 'one' => 1 ],
+  'mesh_shortest of two single-element lists returns a one-element list of pairs' );
 
 is_deeply( [mesh ['one', 'two'], [1, 2]], [ one => 1, two => 2 ],
   'mesh of two lists returns a list of two pairs' );

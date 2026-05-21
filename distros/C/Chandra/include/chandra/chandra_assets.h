@@ -2,7 +2,7 @@
 #define CHANDRA_ASSETS_H
 
 /*
- * chandra_assets.h — MIME type lookup and path security for Chandra::Assets
+ * chandra_assets.h - MIME type lookup and path security for Chandra::Assets
  *
  * Inline C helpers called from xs/assets.xs.
  * Keeps hot-path MIME detection out of Perl.
@@ -118,7 +118,7 @@ chandra_assets_path_safe(const char *path, STRLEN path_len)
 #endif /* CHANDRA_ASSETS_H */
 
 /*
- * XS callback for protocol handler — serves asset files.
+ * XS callback for protocol handler - serves asset files.
  * CvXSUBANY stores a reference to the Chandra::Assets object.
  * Called by the protocol system with ($path, $params).
  */

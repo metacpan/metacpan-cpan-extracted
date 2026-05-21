@@ -7,7 +7,7 @@ use strict;
 use File::Spec::Functions;
 
 our(@ISA)=qw(Exporter);
-our $VERSION = "1.11";
+our $VERSION = "1.12";
 our @EXPORT_OK = qw(
 	schdir      schmod  sclose       sexec  sfork      slink
 	smkdir      sopen   sopendir     spipe  sreadlink  srename

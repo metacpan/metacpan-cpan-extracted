@@ -114,7 +114,9 @@ ISSUES AND CONTRIBUTIONS
         delimiters, and provided examples for removing quoted text from
         messages sent from Outlook (#1
         <https://codeberg.org/ivarch/rt-extension-emailreplydelimiter/pulls/
-        1>).
+        1>); and added base64 encoding support (#2
+        <https://codeberg.org/ivarch/rt-extension-emailreplydelimiter/pulls/
+        2>).
 
 LICENSE AND COPYRIGHT
     Copyright 2023, 2026 Andrew Wood.

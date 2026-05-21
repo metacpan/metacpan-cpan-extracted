@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "MCP server with a command execution tool",
-  "AUTHOR" => "Torsten Raudssus <torsten\@raudssus.de>",
+  "AUTHOR" => "Torsten Raudssus <getty\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.100",
+  "VERSION" => "0.103",
   "test" => {
     "TESTS" => "t/*.t"
   }

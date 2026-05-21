@@ -2,11 +2,16 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
+# Windows support is single-process / single-worker only and excludes
+# Future/Pool (no fork(), no pthread/eventfd). The basic HTTP server
+# works via Winsock + the select() event backend. See Changes 0.14
+# for details. We no longer OS_UNSUPPORTED here; install proceeds.
+
 # Check if Alien::OpenSSL is available for TLS support
 my $has_alien_openssl = eval { require Alien::OpenSSL; 1 };
 
 my %prereqs = (
-    'XS::JIT' => '0.15',
+    'XS::JIT' => '0.22',
     'Cpanel::JSON::XS' => '0',
 );
 
@@ -39,16 +44,18 @@ WriteMakefile(
                 recommends => \%recommends,
             },
         },
-        resources => {
-            bugtracker => { web => 'https://github.com/ThisUsedToBeAnEmail/Hypersonic/issues' },
-            repository => {
-                type => 'git',
-                url  => 'https://github.com/ThisUsedToBeAnEmail/Hypersonic.git',
-                web  => 'https://github.com/ThisUsedToBeAnEmail/Hypersonic',
-            },
-        },
     },
     macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Hypersonic-* _hypersonic_cache' },
 );
+
+# Pure-Perl at install time; XS is JIT-compiled at run time by XS::JIT.
+# Older MakeMaker versions otherwise emit a `cc ... Hypersonic.o -o
+# .../Hypersonic.so` rule that fails because there's no Hypersonic.xs.
+package MY;
+sub dynamic     { '' }
+sub dynamic_lib { '' }
+sub dynamic_bs  { '' }
+sub static      { '' }
+sub static_lib  { '' }

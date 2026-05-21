@@ -6,6 +6,9 @@ use Imager::File::HEIF;
 use Imager::Test qw(test_image is_image_similar);
 use lib 't/lib';
 
+-d "testout" or mkdir "testout";
+Imager->open_log(log => "testout/30read.log");
+
 {
   my $cmp = test_image;
 

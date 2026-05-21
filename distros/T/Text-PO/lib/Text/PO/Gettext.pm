@@ -185,7 +185,7 @@ sub dngettext
     my $dict = $self->getDomainHash({ domain => $domain });
     my $plural = $self->plural;
     my $def = $dict->{ $msgid };
-    if( $def )
+    if( defined( $def ) && length( $def // '' ) )
     {
         if( $plural->length == 0 )
         {
@@ -221,9 +221,9 @@ sub dngettext
         }
         return( $def || $default );
     }
-    else
+    elsif( !exists( $dict->{ $msgid } ) )
     {
-        warn( "No dictionary was found for msgid \"${msgid}\" and domain \"${domain}\"" ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
+        warn( "No dictionary was found for msgid \"${msgid}\" and domain \"${domain}\" and locale \"", $self->locale_unix, "\"." ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
     }
     return( $default );
 }
@@ -676,6 +676,7 @@ sub textdomain
         my $e = shift( @_ );
         my $msgid  = $e->msgid_as_text;
         my $msgstr = $e->msgstr;
+        return(1) if( !defined( $msgid ) || !length( $msgid // '' ) );
         # We store the msgid
         $dict->{ $msgid } = $msgstr;
         # Also store the plural version, if any

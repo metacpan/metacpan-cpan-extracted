@@ -91,7 +91,7 @@ END {
     # Close all open filehandles before rmtree.
     # On Windows, open filehandles prevent file and directory deletion.
     if (defined $HTTP::Handy::ACCESS_LOG_FH) {
-        close $HTTP::Handy::ACCESS_LOG_FH;
+        { no strict 'refs'; close $HTTP::Handy::ACCESS_LOG_FH }
         $HTTP::Handy::ACCESS_LOG_FH = undef;
     }
     # Restore STDERR to the original handle so the log file can be deleted.
@@ -142,10 +142,10 @@ ok(-f $HTTP::Handy::CURRENT_LOG_FILE, '_open_access_log: file exists on disk'); 
 # ok 20: calling again with the same time slot is a no-op (returns same fh)
 my $fh_before = $HTTP::Handy::ACCESS_LOG_FH;
 HTTP::Handy::_open_access_log();
-ok($HTTP::Handy::ACCESS_LOG_FH == $fh_before, '_open_access_log: no reopen within same slot'); # ok 20
+ok($HTTP::Handy::ACCESS_LOG_FH eq $fh_before, '_open_access_log: no reopen within same slot'); # ok 20
 
 # ok 21: we can write to the filehandle without dying
-eval { print $HTTP::Handy::ACCESS_LOG_FH "test\tline\n" };
+eval { no strict 'refs'; print $HTTP::Handy::ACCESS_LOG_FH "test\tline\n" };
 ok(!$@, '_open_access_log: writing to fh does not die'); # ok 21
 
 # ok 22: the written content appears in the file
@@ -225,7 +225,7 @@ my $test_line = join("\t",
     "ua:",
     "referer:",
 ) . "\n";
-print $HTTP::Handy::ACCESS_LOG_FH $test_line;
+{ no strict 'refs'; print $HTTP::Handy::ACCESS_LOG_FH $test_line }
 
 {
     local *RF;

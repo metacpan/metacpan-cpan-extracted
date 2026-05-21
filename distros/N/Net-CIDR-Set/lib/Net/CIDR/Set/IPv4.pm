@@ -8,7 +8,7 @@ use namespace::autoclean;
 
 # ABSTRACT: Encode / decode IPv4 addresses
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 sub new { bless \my $x, shift }
 
@@ -110,7 +110,7 @@ Net::CIDR::Set::IPv4 - Encode / decode IPv4 addresses
 
 =head1 VERSION
 
-version 0.19
+version 0.20
 
 =for Pod::Coverage new
 
@@ -123,7 +123,7 @@ version 0.19
 =head1 SOURCE
 
 The development version is on github at L<https://github.com/robrwo/perl-Net-CIDR-Set>
-and may be cloned from L<git://github.com/robrwo/perl-Net-CIDR-Set.git>
+and may be cloned from L<https://github.com/robrwo/perl-Net-CIDR-Set.git>
 
 =head1 SUPPORT
 
@@ -140,7 +140,7 @@ Andy Armstrong <andy@hexten.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2009, 2014, 2025 by Message Systems, Inc.
+This software is copyright (c) 2009, 2014, 2025-2026 by Message Systems, Inc.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

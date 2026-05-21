@@ -1,5 +1,5 @@
 
-# sRGB color space IEC 61966-2-1 has two special formats
+# sRGB color space IEC 61966-2-1 with two special formats: hex_string and array
 
 package Graphics::Toolkit::Color::Space::Instance::RGB;
 use v5.12;
@@ -20,7 +20,7 @@ sub tuple_from_hex {                                          # translate #00000
 }
 
 Graphics::Toolkit::Color::Space->new (
-        alias => 'sRGB',              # standard RGB
+        alias => 'SRGB',              # standard RGB
          axis => [qw/red green blue/],
         range => 255,
     precision => 0,

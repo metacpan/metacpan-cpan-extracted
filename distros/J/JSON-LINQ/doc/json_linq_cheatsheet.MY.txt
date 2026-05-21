@@ -1,84 +1,240 @@
 ======================================================================
- JSON::LINQ — Helaian Rujukan Pantas                        [MY] Bahasa Melayu
+ JSON::LINQ အမြန်ကိုးကားချက်                           [MY] မြန်မာဘာသာ
 ======================================================================
 
-[ 1. 1. Mencipta Kueri ]
+[ 1. မေးမြန်းမှု ဖန်တီးခြင်း ]
 
   use JSON::LINQ;
-  my $q = JSON::LINQ->FromJSON('data.json');
-  my $q = JSON::LINQ->FromJSONL('events.jsonl');
-  my $q = JSON::LINQ->FromJSONString('[{"id":1}]');
-  my $q = JSON::LINQ->From(\@array);
-  my $q = JSON::LINQ->Empty();
-  my $q = JSON::LINQ->Range(1, 5);
-  my $q = JSON::LINQ->Repeat('x', 3);
 
-[ 2. 2. Penapisan ]
+  # JSON ဖိုင်မှ (အထက်ဆုံး array)
+  my $q = JSON::LINQ->FromJSON('data.json');
+
+  # JSONL ဖိုင်မှ (streaming)
+  my $q = JSON::LINQ->FromJSONL('events.jsonl');
+
+  # JSON string မှ
+  my $q = JSON::LINQ->FromJSONString('[{"id":1},{"id":2}]');
+
+  # LTSV ဖိုင်မှ (label:value, TAB-ပိုင်းခြား, streaming)
+  my $q = JSON::LINQ->FromLTSV('data.ltsv');
+
+  # CSV ဖိုင်မှ (ပထမအတန်း = ခေါင်းစဉ်၊ streaming)
+  my $q = JSON::LINQ->FromCSV('data.csv');
+  my $q = JSON::LINQ->FromCSV('data.csv', sep => "\t");        # TSV
+  my $q = JSON::LINQ->FromCSV('f.csv', headers=>[qw(a b c)]); # ခေါင်းစဉ်မပါ
+  my $q = JSON::LINQ->FromCSV('f.csv', headers=>[qw(a b c)], skip_header=>1);
+
+  # Memory ထဲ array မှ
+  my $q = JSON::LINQ->From(\@array);
+
+  # ဗလာ sequence
+  my $q = JSON::LINQ->Empty();
+
+  # ကိန်းပြည့် sequence: 1, 2, 3, 4, 5
+  my $q = JSON::LINQ->Range(1, 5);
+
+  # ဒြပ်စင် N ကြိမ် ထပ်ခါတလဲလဲ
+  my $q = JSON::LINQ->Repeat("x", 3);
+
+  # မှတ်ချက်: Terminal method ခေါ်ပြီးနောက် iterator ကုန်သည်။
+  # ပြန်မေးရန် From*/From ကို ထပ်ခေါ်ပါ။
+
+[ 2. စစ်ထုတ်ခြင်း ]
 
   ->Where(sub { $_[0]{status} eq '200' })
   ->Where(sub { $_[0]{score} >= 80 })
+  ->Where(sub { defined $_[0]{email} && $_[0]{email} ne '' })
 
-[ 3. 3. Unjuran ]
+[ 3. ပုံစံပြောင်းခြင်း ]
 
+  # Select: ဒြပ်စင်တစ်ခုချင်းကို ပြောင်းလဲပါ
+  ->Select(sub { { path => $_[0]{url}, code => $_[0]{status} } })
   ->Select(sub { $_[0]{name} })
+
+  # SelectMany: Nested array ဖြန့်ပါ (selector သည် ARRAY ref ပြန်ရမည်)
   ->SelectMany(sub { [ @{ $_[0]{tags} } ] })
 
-[ 4. 4. Pengisihan ]
+[ 4. စီစစ်ခြင်း ]
 
+  # ပထမ key -- smart (နှစ်ဖက်လုံး ကိန်းဂဏာန်းနှင့် တူလျှင် ကိန်းဂဏာန်းဖြင့်)
   ->OrderBy(sub { $_[0]{name} })
   ->OrderByDescending(sub { $_[0]{score} })
+
+  # ပထမ key -- ကိန်းဂဏာန်း နှိုင်းယှဉ်မှု အတင်း
   ->OrderByNum(sub { $_[0]{price} })
+  ->OrderByNumDescending(sub { $_[0]{amount} })
+
+  # ပထမ key -- string နှိုင်းယှဉ်မှု အတင်း (cmp)
   ->OrderByStr(sub { $_[0]{code} })
-  ->ThenBy(sub { $_[0]{name} })
-  ->Reverse()
+  ->OrderByStrDescending(sub { $_[0]{name} })
 
-[ 5. 5. Penomboran Halaman ]
+  # ဒုတိယ key (OrderBy* နောက် chain ချိတ်ဆက်)
+  ->ThenBy(sub { $_[0]{name} })              # smart ascending
+  ->ThenByDescending(sub { $_[0]{score} })   # smart descending
+  ->ThenByNum(sub { $_[0]{age} })            # ကိန်းဂဏာန်း ascending
+  ->ThenByNumDescending(sub { $_[0]{age} })  # ကိန်းဂဏာန်း descending
+  ->ThenByStr(sub { $_[0]{name} })           # string ascending
+  ->ThenByStrDescending(sub { $_[0]{name} }) # string descending
 
-  ->Skip(10)  ->Take(5)
-  ->SkipWhile(sub { ... })  ->TakeWhile(sub { ... })
+  ->Reverse()  # လက်ရှိ ကြည့်ရှုမှုကို ပြောင်းပြန်
 
-[ 6. 6. Pengelompokan ]
+[ 5. စာမျက်နှာ ခွဲခြင်း ]
 
-  my @g = $q->GroupBy(sub { $_[0]{cat} })->ToArray();
-  my $l = $q->ToLookup(sub { $_[0]{dept} });
+  ->Skip(10)  # ပထမ 10 ကို ကျော်
+  ->Take(5)   # နောက် 5 ကို ယူ
+  ->SkipWhile(sub { $_[0]{score} < 80 })
+  ->TakeWhile(sub { $_[0]{score} >= 80 })
 
-[ 7. 7. Pengagregatan (kaedah terminal) ]
+[ 6. အုပ်စုဖွဲ့ခြင်း ]
 
-  ->Count()  ->Sum(sub { $_[0]{v} })  ->Average(sub { ... })
-  ->Min(sub { ... })  ->Max(sub { ... })
-  ->First()  ->FirstOrDefault()
-  ->Last()   ->LastOrDefault()
-  ->Any()    ->All(sub { ... })
-  ->ForEach(sub { ... })  ->Aggregate($s, sub { ... })
+  # GroupBy: { Key => '...', Elements => [...] } ပြန်သည်
+  my @groups = $q->GroupBy(sub { $_[0]{category} })->ToArray();
+  for my $g (@groups) {
+      printf "%s: %d\n", $g->{Key}, scalar @{$g->{Elements}};
+  }
 
-[ 8. 8. Operasi Set ]
+  # ToLookup: hashref of arrayrefs ပြန်သည်
+  my %lookup = %{ $q->ToLookup(sub { $_[0]{dept} }) };
+  my @eng = @{ $lookup{Engineering} };
 
-  ->Distinct()  ->Union($q2)  ->Intersect($q2)  ->Except($q2)
-  ->SequenceEqual($q2)
+  # value selector ပါ ToLookup
+  my %names = %{ $q->ToLookup(sub { $_[0]{dept} },
+                               sub { $_[0]{name} }) };
 
-[ 9. 9. Penukaran ]
+[ 7. အစုအဝေး လုပ်ဆောင်ချက်များ ]
 
-  ->ToJSON('out.json')   ->ToJSONL('out.jsonl')
-  ->ToArray()  ->ToDictionary(sub { ... })  ->ToLookup(sub { ... })
+  ->Distinct()                          # deduplicate (by value)
+  ->Distinct(sub { $_[0]{id} })         # deduplicate by key
+  ->Union($other_q)                     # set union (no duplicates)
+  ->Union($other_q, sub { $_[0]{id} })  # union by key
+  ->Intersect($other_q)                 # set intersection
+  ->Intersect($other_q, sub { ... })    # intersection by key
+  ->Except($other_q)                    # set difference
+  ->Except($other_q, sub { ... })       # difference by key
+  ->SequenceEqual($other_q)             # true if equal sequence
 
-[ 10. 10. Nilai Boolean ]
+[ 8. ချိတ်ဆက်ခြင်း (Join) ]
 
-  JSON::LINQ::true   # 1 / "true"
-  JSON::LINQ::false  # 0 / "false"
+  # Join (inner join)
+  $outer->Join($inner_q,
+      sub { $_[0]{dept_id} },              # outer key selector
+      sub { $_[0]{id} },                   # inner key selector
+      sub { { name => $_[0]{name},
+              dept => $_[1]{name} } }      # result selector
+  )
 
-[ 11. 11. Cantuman ]
+  # GroupJoin (left outer join)
+  $outer->GroupJoin($inner_q,
+      sub { $_[0]{id} },                   # outer key selector
+      sub { $_[0]{user_id} },              # inner key selector
+      sub { my($o, $i_group) = @_;
+            { name   => $o->{name},
+              orders => [ $i_group->ToArray() ] } }
+  )
 
-  $outer->Join($inner, sub{$_[0]{k}}, sub{$_[0]{k}}, sub{...})
-  $outer->GroupJoin($inner, sub{...}, sub{...}, sub{...})
+  # JOIN: JSON အဓိက × LTSV ဆော (ဌာန lookup)
+  my $depts = JSON::LINQ->FromLTSV('departments.ltsv');
+  JSON::LINQ->FromJSON('employees.json')
+      ->Join($depts,
+          sub { $_[0]{dept_id} },
+          sub { $_[0]{id}      },
+          sub { { name => $_[0]{name}, dept => $_[1]{name} } })
+      ->ToArray();
 
-[ 12. 12. Kaedah Lain ]
+  # JOIN: LTSV အဓိက × JSON ဆော (စျေးနှုန်း master)
+  my $prices = JSON::LINQ->FromJSON('prices.json');
+  JSON::LINQ->FromLTSV('orders.ltsv')
+      ->Join($prices,
+          sub { $_[0]{sku} },
+          sub { $_[0]{sku} },
+          sub { { order_id => $_[0]{id},
+                  amount   => $_[0]{qty} * $_[1]{price} } })
+      ->ToArray();
 
-  ->Concat($q2)  ->Zip($q2, sub{...})  ->DefaultIfEmpty($d)
+  # JOIN: CSV မူ × JSON အကူ (ဈေးနှုန်းမာစတာ)
+  my $prices = JSON::LINQ->FromJSON('prices.json');
+  JSON::LINQ->FromCSV('orders.csv')
+      ->Join($prices, sub { $_[0]{sku} }, sub { $_[0]{sku} },
+          sub { { order_id => $_[0]{id}, amount => $_[0]{qty} * $_[1]{price} } })
+      ->ToArray();
 
-[ 13. 13. Pautan Rujukan ]
+[ 9. စုစည်းခြင်း (Terminal) ]
 
-  JSON::LINQ: https://metacpan.org/dist/JSON-LINQ
-  JSONL:      https://jsonlines.org/
-  LINQ:       https://docs.microsoft.com/dotnet/api/system.linq
+  ->ToArray()                            # collect all elements
+  ->ToList()                             # same as ToArray()
+  ->Count()                              # element count
+  ->Count(sub { $_[0] > 5 })            # conditional count
+  ->Sum(sub { $_[0]{amount} })          # sum of selector values
+  ->Average(sub { $_[0]{score} })       # mean (die if empty)
+  ->AverageOrDefault(sub { ... })       # mean or undef if empty
+  ->Min(sub { $_[0]{price} })           # minimum
+  ->Max(sub { $_[0]{price} })           # maximum
+  ->First()                             # first element (die if empty)
+  ->First(sub { $_[0] > 5 })            # first match (die if none)
+  ->FirstOrDefault()                    # first or undef
+  ->FirstOrDefault(sub { $_[0] > 5 })   # first match or undef
+  ->Last()                              # last element (die if empty)
+  ->Last(sub { $_[0] > 5 })             # last match (die if none)
+  ->LastOrDefault()                     # last or undef
+  ->LastOrDefault(sub { $_[0] > 5 })    # last match or undef
+  ->Single()                            # exactly one (else die)
+  ->SingleOrDefault()                   # one or undef
+  ->ElementAt($n)                       # element at index $n (0-based)
+  ->ElementAtOrDefault($n)              # element at $n or undef
+  ->Any()                               # true if non-empty
+  ->Any(sub { $_[0] > 5 })              # true if any match
+  ->All(sub { $_[0] > 0 })              # true if all match
+  ->Contains($value)                    # true if value present
+  ->ForEach(sub { print $_[0] })        # side-effect per element
+  ->Aggregate($seed, sub { $_[0] + $_[1] })  # fold/reduce
+
+[ 10. အခြား မက်သဒ်များ ]
+
+  ->Concat($other_q)                    # concatenate two sequences
+  ->DefaultIfEmpty($default)            # return $default if empty
+  ->Zip($other_q, sub { "$_[0]-$_[1]" }) # combine element-wise
+
+[ 11. ပြောင်းလဲခြင်း မက်သဒ်များ ]
+
+  ->ToArray()                           # returns Perl array
+  ->ToList()                            # alias for ToArray()
+  ->ToDictionary(sub { $_[0]{id} })     # hashref: key => element
+  ->ToDictionary(sub { $_[0]{id} },     # hashref: key => value
+                 sub { $_[0]{name} })
+  ->ToLookup(sub { $_[0]{dept} })       # hashref: key => [elements]
+  ->ToLookup(sub { $_[0]{dept} },       # hashref: key => [values]
+             sub { $_[0]{name} })
+  ->ToJSON('output.json')               # JSON array ဖိုင်အဖြစ် ရေးသည်
+  ->ToJSONL('output.jsonl')             # JSONL ဖိုင်အဖြစ် ရေးသည်
+  ->ToLTSV('output.ltsv')                        # LTSV ဖိုင်အဖြစ် ရေးသည် (key အားလုံး၊ အက္ခရာစဉ်)
+  ->ToLTSV('out.ltsv', label_order=>[qw(a b c)]) # သတ်မှတ် label များကို သတ်မှတ် အစဉ်ဖြင့် ထုတ်ပေး
+  ->ToLTSV('out.ltsv', headers    =>[qw(a b c)]) # label_order ၏ တစ်နည်းခေါ်အမည်
+  ->ToCSV('output.csv')                                   # CSV ဖိုင်အဖြစ် ရေးသွင်းသည်
+  ->ToCSV('out.csv', headers=>[qw(a b c)])                # သတ်မှတ်ထားသော ကော်လံများ
+  ->ToCSV('out.csv', label_order=>[qw(a b c)])            # headers ၏ အမည်တူ
+  ->ToCSV('out.csv', sep=>"\t")                           # TSV ထွက်ရှိမှု
+  ->ToCSV('out.csv', no_header=>1)                        # ခေါင်းစဉ်တန်း မထည့်ပါ
+
+[ 12. Boolean တန်ဖိုးများ ]
+
+  JSON::LINQ::true    # string "true"၊ ကိန်းဂဏာန်း 1
+  JSON::LINQ::false   # string "false"၊ ကိန်းဂဏာန်း 0
+
+  my $rec = { active => JSON::LINQ::true };
+  # ToJSON encode: {"active":true}
+
+[ 13. ကိုးကားချက် လင့်ခ်များ ]
+
+  JSON::LINQ (MetaCPAN):
+    https://metacpan.org/dist/JSON-LINQ
+
+  JSONL specification:
+    https://jsonlines.org/
+
+  LINQ (.NET) reference (semantic inspiration):
+    https://docs.microsoft.com/en-us/dotnet/api/system.linq
+
+  LTSV::LINQ (sister module for LTSV files):
+    https://metacpan.org/dist/LTSV-LINQ
 
 ======================================================================

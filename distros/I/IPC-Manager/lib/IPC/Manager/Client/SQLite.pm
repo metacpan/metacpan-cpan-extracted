@@ -2,7 +2,7 @@ package IPC::Manager::Client::SQLite;
 use strict;
 use warnings;
 
-our $VERSION = '0.000035';
+our $VERSION = '0.000037';
 
 use Carp qw/croak/;
 use File::Temp qw/tempfile/;
@@ -23,16 +23,25 @@ use Object::HashBase;
 
 sub dsn { "dbi:SQLite:dbname=" . (@_ > 1 ? $_[1] : $_[0]->{+ROUTE}) }
 
+# SQLite's route is the bare db file path, not a full DBI DSN.
+sub route_from_dbh {
+    my ($class_or_self, $dbh) = @_;
+    my $name = $dbh->{Name};
+    $name =~ s/^dbname=//;
+    return $name;
+}
+
 sub escape { '`' }
 
 sub table_sql {
     return (
         <<"        EOT",
             CREATE TABLE IF NOT EXISTS ipcm_peers(
-                `id`        VARCHAR(512)    NOT NULL PRIMARY KEY,
-                `pid`       INTEGER         DEFAULT NULL,
-                `active`    REAL            DEFAULT (strftime('%s', 'now')),
-                `stats`     BLOB            DEFAULT NULL
+                `id`                VARCHAR(512)    NOT NULL PRIMARY KEY,
+                `pid`               INTEGER         DEFAULT NULL,
+                `active`            REAL            DEFAULT (strftime('%s', 'now')),
+                `stats`             BLOB            DEFAULT NULL,
+                `suspend_expires`   REAL            DEFAULT NULL
             );
         EOT
         <<"        EOT",
@@ -53,6 +62,9 @@ sub spawn {
     my (%params) = @_;
 
     my $dbfile = delete $params{route};
+    if (!$dbfile && $params{dbh}) {
+        $dbfile = $class->route_from_dbh($params{dbh});
+    }
     unless ($dbfile) {
         my $template = delete $params{template} // "PerlIPCManager-$$-XXXXXX";
         my ($fh, $file) = tempfile($template, TMPDIR => 1, CLEANUP => 0, SUFFIX => '.sqlite', EXLOCK => 0);

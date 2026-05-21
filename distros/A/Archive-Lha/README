@@ -1,0 +1,43 @@
+Archive-Lha
+
+Read and extract .LZH/.LHA archives (Amiga, MS-DOS, Japanese).
+
+Supports header levels 0, 1 and 2, and decompression methods lh0
+(stored), lh5, lh6 and lh7. XS/C decompression based on LHa for UNIX.
+
+Includes two command-line tools: plha (LhA-compatible) and plhasa
+(lhasa-compatible, activated via symlink).
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+    Exporter::Lite
+    Encode
+    File::Basename, File::Path
+    Getopt::Long
+    Log::Dispatch
+    Time::Moment
+    Data::Dump
+
+COMMAND LINE TOOLS
+
+    plha v archive.lha       # list (LhA verbose format)
+    plha l archive.lha       # list (terse format)
+    plha x archive.lha       # extract
+    plha t archive.lha       # test integrity
+
+    plhasa -v archive.lha    # lhasa-compatible listing
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2007 Kenichi Ishigaki
+Copyright (C) 2025-2026 Nicolas Mendoza
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

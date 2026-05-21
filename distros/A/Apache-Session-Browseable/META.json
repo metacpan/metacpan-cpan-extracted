@@ -28,6 +28,7 @@
          },
          "requires" : {
             "Apache::Session" : "0",
+            "Crypt::URandom" : "0",
             "JSON" : "0"
          }
       },
@@ -41,7 +42,7 @@
    "provides" : {
       "Apache::Session::Browseable" : {
          "file" : "lib/Apache/Session/Browseable.pm",
-         "version" : "v1.3.18"
+         "version" : "v1.3.19"
       },
       "Apache::Session::Browseable::Cassandra" : {
          "file" : "lib/Apache/Session/Browseable/Cassandra.pm",
@@ -77,7 +78,7 @@
       },
       "Apache::Session::Browseable::Patroni" : {
          "file" : "lib/Apache/Session/Browseable/Patroni.pm",
-         "version" : "v1.3.17"
+         "version" : "v1.3.19"
       },
       "Apache::Session::Browseable::PgHstore" : {
          "file" : "lib/Apache/Session/Browseable/PgHstore.pm",
@@ -129,7 +130,7 @@
       },
       "Apache::Session::Browseable::Store::Patroni" : {
          "file" : "lib/Apache/Session/Browseable/Store/Patroni.pm",
-         "version" : "v1.3.17"
+         "version" : "v1.3.19"
       },
       "Apache::Session::Browseable::Store::Postgres" : {
          "file" : "lib/Apache/Session/Browseable/Store/Postgres.pm",
@@ -153,7 +154,7 @@
       },
       "Apache::Session::Generate::SHA256" : {
          "file" : "lib/Apache/Session/Generate/SHA256.pm",
-         "version" : "v1.2.2"
+         "version" : "v1.3.19"
       },
       "Apache::Session::Serialize::Hstore" : {
          "file" : "lib/Apache/Session/Serialize/Hstore.pm",
@@ -173,6 +174,6 @@
          "url" : "https://github.com/LemonLDAPNG/Apache-Session-Browseable"
       }
    },
-   "version" : "v1.3.18",
+   "version" : "v1.3.19",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

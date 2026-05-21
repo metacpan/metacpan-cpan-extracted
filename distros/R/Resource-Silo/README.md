@@ -64,7 +64,7 @@ Declaring a resource:
     resource user_agent => sub {
         require LWP::UserAgent;
         LWP::UserAgent->new();
-        # set your custon UserAgent header or SSL certificate(s) here
+        # set your custom UserAgent header or SSL certificate(s) here
     };
 ```
 

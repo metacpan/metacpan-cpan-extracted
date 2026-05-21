@@ -1,10 +1,13 @@
 Changes
 EventLog.pm
 EventLog.xs
+LICENSE
 MANIFEST
 Makefile.PL
 META.yml
+README.md
 ppport.h
+t/RT61484.t
 t/eventlog.t
 typemap
 INSTALL

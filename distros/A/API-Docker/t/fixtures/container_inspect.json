@@ -1,0 +1,62 @@
+{
+  "Id": "abc123def456789abc123def456789abc123def456789abc123def456789abcd",
+  "Created": "2025-01-15T08:00:00.000000000Z",
+  "Path": "nginx",
+  "Args": ["-g", "daemon off;"],
+  "State": {
+    "Status": "running",
+    "Running": true,
+    "Paused": false,
+    "Restarting": false,
+    "OOMKilled": false,
+    "Dead": false,
+    "Pid": 12345,
+    "ExitCode": 0,
+    "Error": "",
+    "StartedAt": "2025-01-15T08:00:01.000000000Z",
+    "FinishedAt": "0001-01-01T00:00:00Z"
+  },
+  "Image": "sha256:abc123def456",
+  "Name": "/my-container",
+  "RestartCount": 0,
+  "Driver": "overlay2",
+  "Platform": "linux",
+  "HostConfig": {
+    "NetworkMode": "default",
+    "RestartPolicy": {
+      "Name": "no",
+      "MaximumRetryCount": 0
+    }
+  },
+  "Config": {
+    "Hostname": "abc123def456",
+    "Env": [
+      "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+      "NGINX_VERSION=1.25.3"
+    ],
+    "Cmd": ["nginx", "-g", "daemon off;"],
+    "Image": "nginx:latest",
+    "Labels": {
+      "maintainer": "NGINX"
+    }
+  },
+  "NetworkSettings": {
+    "Bridge": "",
+    "Ports": {
+      "80/tcp": [
+        {
+          "HostIp": "0.0.0.0",
+          "HostPort": "8080"
+        }
+      ]
+    },
+    "Networks": {
+      "bridge": {
+        "IPAddress": "172.17.0.2",
+        "Gateway": "172.17.0.1",
+        "MacAddress": "02:42:ac:11:00:02"
+      }
+    }
+  },
+  "Mounts": []
+}

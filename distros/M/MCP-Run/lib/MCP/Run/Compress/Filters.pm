@@ -1,6 +1,6 @@
 package MCP::Run::Compress::Filters;
 # ABSTRACT: Command Output Compression Reference
-our $VERSION = '0.100';
+our $VERSION = '0.103';
 
 
 1;
@@ -17,7 +17,7 @@ MCP::Run::Compress::Filters - Command Output Compression Reference
 
 =head1 VERSION
 
-version 0.100
+version 0.103
 
 =head1 DESCRIPTION
 
@@ -525,7 +525,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

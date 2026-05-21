@@ -1,5 +1,11 @@
 Revision history for Role-Tiny
 
+2.002005 - 2026-05-17
+  - split role initialization from setting pragmas to allow more flexibility
+    for subclasses
+  - ensure consistent internal handling of Class::C3 vs mro
+  - reduced Exporter dependency to 0 (any version)
+
 2.002004 - 2021-01-24
   - restore requiring base class when using create_class_with_roles, which was
     accidentally lost in 2.002_000 (RT#134075)

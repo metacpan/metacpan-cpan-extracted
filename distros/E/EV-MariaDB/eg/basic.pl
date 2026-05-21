@@ -33,8 +33,9 @@ $m->query("create temporary table eg_basic (id int auto_increment primary key, n
 
         # SELECT
         $m->query("select * from eg_basic", sub {
-            my ($rows, $err) = @_;
+            my ($rows, $err, $fields) = @_;
             die "select: $err\n" if $err;
+            print join("\t", @$fields), "\n";
             for my $row (@$rows) {
                 print join("\t", @$row), "\n";
             }

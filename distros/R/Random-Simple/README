@@ -1,13 +1,11 @@
-# NAME
+## Name
 
 Random::Simple - Generate good random numbers in a user consumable way.
 
-# SYNOPSIS
+## Synopsis
 
 ```perl
 use Random::Simple;
-
-my $prng           = new Random::Simple();
 
 my $coin_flip      = random_int(1, 2);
 my $die_roll       = random_int(1, 6);
@@ -19,7 +17,7 @@ my $rand_item      = random_elem(@arr);
 my @mixed          = shuffle_array(@arr);
 ```
 
-# DESCRIPTION
+## Description
 
 Perl's internal `rand()` function uses `drand48` which is an older
 pseudorandom number generator and may have limitations. `Random::Simple` uses
@@ -35,11 +33,11 @@ When you `use Random::Simple` we automatically upgrade `rand()` and `srand()`
 to use a modern PRNG with better statistical properties. As a bonus you also
 get a handful of other useful random related methods.
 
-# METHODS
+## Methods
 
 - **random\_int($min, $max)**
 
-    returns a non-biased integer between `$min` and `$max` (inclusive). Range must be no larger than 2\*\*32 - 2.
+    returns a non-biased integer between `$min` and `$max` (inclusive). Range must be no larger than 2\*\*64 - 2.
 
 - **random\_float()**
 
@@ -73,7 +71,7 @@ get a handful of other useful random related methods.
     only be used in specific cases where you need repeatable or testable
     randomness.
 
-# CAVEATS
+## Caveats
 
 PCG uses two 64bit unsigned integers for seeding. High quality seeds are needed
 to generate good random numbers. `Random::Simple` automatically generates high
@@ -84,17 +82,17 @@ If you manually seed `Random::Simple`, make sure you use good seeds that
 are mostly non-zero. The larger the number the better seed it will make. A good
 seed is a decimal number with 18 or 19 digits.
 
-# BUGS
+## Bugs
 
 Submit issues on Github: [https://github.com/scottchiefbaker/perl-Random-Simple/issues](https://github.com/scottchiefbaker/perl-Random-Simple/issues)
 
-# SEE ALSO
+## See Also
 
 - [Math::Random::PCG32](https://metacpan.org/pod/Math%3A%3ARandom%3A%3APCG32)
 - [Math::Random::ISAAC](https://metacpan.org/pod/Math%3A%3ARandom%3A%3AISAAC)
 - [Math::Random::MT](https://metacpan.org/pod/Math%3A%3ARandom%3A%3AMT)
 - [Math::Random::Secure](https://metacpan.org/pod/Math%3A%3ARandom%3A%3ASecure)
 
-# AUTHOR
+## Author
 
 Scott Baker - [https://www.perturb.org/](https://www.perturb.org/)

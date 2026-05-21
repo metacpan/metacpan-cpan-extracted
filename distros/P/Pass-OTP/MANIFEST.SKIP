@@ -1,0 +1,39 @@
+# Avoid version control files and directories
+^\.git/
+^\.github/
+^\.gitignore$
+
+# Avoid Makemaker generated and utility files
+^MANIFEST\.bak$
+^Makefile$
+^blib/
+^MakeMaker-\d
+
+# Avoid MYMETA files (generated during configuration)
+^MYMETA\.
+^MYMETA\.json$
+^MYMETA\.yml$
+
+# Avoid temporary and backup files
+~$
+\.old$
+\.bak$
+\.tmp$
+\.swp$
+^#.*#$
+\.\#
+
+# Avoid Devel::Cover and test artifacts
+^cover_db/
+^pod2htm.*
+
+# Avoid the final distribution tarball
+\.tar\.gz$
+
+# Avoid Perl author/tooling configurations
+^\.perlcriticrc$
+^\.perltidyrc$
+^\.tidyallrc$
+
+# Avoid TidyAll runtime cache directories
+^\.tidyall\.d/

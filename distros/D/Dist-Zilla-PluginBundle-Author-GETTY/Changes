@@ -1,209 +1,250 @@
+0.312     2026-05-18 19:54:12Z
+
+  - [@Author::GETTY::Docker]: default `tags` is now `latest %V %v`
+    (was `latest %v`), matching the new Docker::API default. A
+    subsection without an explicit `tags = ...` will push three tags
+    by default — e.g. `latest`, `0`, and `0.402` for a `0.402`
+    release.
+  - [@Author::GETTY::Docker]: stop forwarding the removed `context`
+    attribute to [Docker::API]; the plugin no longer accepts it.
+
+0.311     2026-05-17 02:29:04Z
+
+  - Add [GitHub::CreateRelease] by default when GitHub integration is active
+    (i.e. no_github is not set); reads release notes from Changes file
+  - New no_github_release option to opt out without disabling all GitHub integration
+
+0.310     2026-05-17 01:37:28Z
+
+  - Rewrite Author::GETTY::Docker from a non-functional stub into a real
+    PluginBundle::Easy subsection bundle; each occurrence creates one Docker::API plugin
+  - Subsections inherit image, tags, and local from docker_image / docker_tags /
+    docker_local in the parent Author::GETTY section; all three can be overridden
+    per subsection
+  - Remove single-image Docker path from Author::GETTY: docker_image now acts
+    purely as a default for subsections, not as a standalone trigger
+  - Remove docker_build and docker_release attributes (were only used by the
+    removed single-image path)
+  - Subsection without image in either subsection or parent now dies with a
+    clear error message instead of silently falling back to dist-name
+  - Add comprehensive test suite for all subsection-inheritance scenarios
+  - Author::GETTY::Docker now passes the single canonical `tag` attribute
+    to Docker::API instead of the deprecated build_tag / release_tag pair;
+    requires Docker::API 0.004
+
+0.309     2026-05-16 01:58:24Z
+
+0.308     2026-05-01
+
+  - Add docker_image, docker_build, docker_release, docker_local attributes
+  - docker_local=1 adds localhost:5000/ tag variant and forces release_push=0
+  - Remove deprecated phase, repository, tag, push, load attributes
+  - Requires Dist::Zilla::Plugin::Docker::API 0.003 (was 0.002)
+
 0.307     2026-04-22 04:34:31Z
 
- - Forward commit_files_after_release option to @Git::VersionManager so files
-   bumped in run_before_release actually land in the release commit
+  - Forward commit_files_after_release option to Git::VersionManager so files
+    bumped in run_before_release actually land in the release commit
 
 0.306     2026-03-29 02:24:59Z
 
 0.305     2026-03-28 00:00:54Z
 
- - Exclude README.md from gathered distribution files by default; allow opt-in with include_readme = 1
- - Add xs_alien and xs_object parameters for automatic MakeMaker::Awesome configuration
- - Add =synopsis, =description, =seealso section shortcuts (→ =head1)
- - Remove =event and =resource commands (not needed)
- - Include AI skill file (share/claude-skill.yaml) in distribution
- - Add alien_build parameter for Alien::Build-based distributions (adds AlienBuild plugin, implies no_makemaker)
- - Fix no_makemaker incorrectly implied by alien_build (AlienBuild needs MakeMaker, not replaces it)
+  - Exclude README.md from gathered distribution files by default; allow opt-in with include_readme = 1
+  - Add xs_alien and xs_object parameters for automatic MakeMaker::Awesome configuration
+  - Add =synopsis, =description, =seealso section shortcuts (→ =head1)
+  - Remove =event and =resource commands (not needed)
+  - Include AI skill file (share/claude-skill.yaml) in distribution
+  - Add alien_build parameter for Alien::Build-based distributions (adds AlienBuild plugin, implies no_makemaker)
+  - Fix no_makemaker incorrectly implied by alien_build (AlienBuild needs MakeMaker, not replaces it)
 
 0.304     2026-01-26 05:55:39Z
 
- - Add alien_build_command, alien_install_command, alien_test_command parameters
- - Add adoptme attribute to mark distributions as available for adoption
- - Add irc_user attribute for configurable IRC contact in SUPPORT section
+  - Add alien_build_command, alien_install_command, alien_test_command parameters
+  - Add adoptme attribute to mark distributions as available for adoption
+  - Add irc_user attribute for configurable IRC contact in SUPPORT section
 
 0.303     2026-01-13 23:01:57Z
 
- - Add authority attribute to override x_authority metadata
- - Fix Git::Push not being added after @Git::VersionManager
+  - Add authority attribute to override x_authority metadata
+  - Fix Git::Push not being added after Git::VersionManager
+
+0.302     2026-01-13 22:58:13Z
+
+  - Add alien_repo, alien_name, alien_bins, alien_pattern parameters for Alien distributions
 
 0.301     2026-01-10 23:37:10Z
 
- - Added missing changelog entries for 0.300
+  - Added missing changelog entries for 0.300
 
 0.300     2026-01-10 23:34:35Z
 
- - Add Pod::Elemental::Transformer::Author::GETTY for inline POD commands
- - New commands: =attr, =method, =func, =opt, =env, =event, =hook, =resource, =seealso, =example
- - Commands transform to =head2 and stay inline with code (not collected into sections)
- - SUPPORT section now shows GitHub Issues and IRC info
- - Add separate CONTRIBUTING section
- - Add irc and irc_server attributes for IRC metadata
- - Enable GithubMeta issues => 1 for automatic bugtracker URLs
- - Change default release_branch from master to main
+  - Add Pod::Elemental::Transformer::Author::GETTY for inline POD commands
+  - New commands: =attr, =method, =func, =opt, =env, =event, =hook, =resource, =seealso, =example
+  - Commands transform to =head2 and stay inline with code (not collected into sections)
+  - SUPPORT section now shows GitHub Issues and IRC info
+  - Add separate CONTRIBUTING section
+  - Add irc and irc_server attributes for IRC metadata
+  - Enable GithubMeta issues => 1 for automatic bugtracker URLs
+  - Change default release_branch from master to main
 
 0.204     2025-12-25 22:30:43Z
 
- - Removing unnecessary Moose::Autobox include
+  - Removing unnecessary Moose::Autobox include
 
 0.203     2025-12-25 19:41:43Z
 
- - Updated Changes file to new format.
+  - Updated Changes file to new format.
 
 0.202     2025-12-25 05:23:30Z
 
- - Switch to Dist::Zilla::PluginBundle::Git::VersionManager
+  - Switch to Dist::Zilla::PluginBundle::Git::VersionManager
 
 0.120     2024-08-10 02:38:09Z
 
- - Fixing some details after hints of ether 
+  - Fixing some details after hints of ether
 
 0.117     2024-08-10 00:17:10Z
 
- - Adding Encoding Plugin 
+  - Adding Encoding Plugin
 
 0.116     2024-07-03 00:59:55Z
 
- - Weaver Section Support added 
+  - Weaver Section Support added
 
 0.115     2024-06-16 04:38:21Z
 
- - Removing TravisCI completely, removing BumpVersionFromGit
+  - Removing TravisCI completely, removing BumpVersionFromGit
 
 0.114     2023-05-22 21:45:41Z
 
- - Added deprecated feature
+  - Added deprecated feature
 
 0.113     2023-05-21 18:19:59Z
 
- - Adapting documentation 
- - Remove travis.yml, adding gather parameters
+  - Adapting documentation
+  - Remove travis.yml, adding gather parameters
 
 0.112     2021-10-23 14:44:59Z
 
- - Updated .travis.yml 
- - Merge pull request #5 from yoe/master
- - Alien: also support the version_check attribute 
- - Alien: also support the version_check attribute 
- - Updated .travis.yml with newest version of TravisCI plugin 
- - New travis configuration 
+  - Updated .travis.yml
+  - Alien: also support the version_check attribute (Wouter Verhelst, PR #5)
+  - Updated .travis.yml with newest version of TravisCI plugin
+  - New travis configuration
 
 0.111     2019-08-25 16:33:10Z
 
- - Remove PruneCruft, updated doc 
- - Starting to add dotfiles in Git::Gathering 
+  - Remove PruneCruft, updated doc
+  - Starting to add dotfiles in Git::Gathering
 
 0.110     2015-02-05 04:36:52Z
 
- - New travis.yml 
- - Merge pull request #4 from kentfredric/vregexp
- - Attempt to resolve version regexp for changelog generation. 
- - Merge pull request #3 from plicease/bin_requires
- - add support for [Alien] bin_requires 
- - Attempt to resolve version regexp for changelog generation.
-    This will permit tags that are versions but lack a 'v' prefix to be
-    considered version tags, and will thus make the changelog actually
-    make sense instead of being a continuous stream of garbage. 
+  - New travis.yml
+  - Attempt to resolve version regexp for changelog generation; permit
+    tags that are versions but lack a 'v' prefix to be considered version
+    tags (Kent Fredric, PR #4)
+  - Add support for [Alien] bin_requires (Graham Ollis, PR #3)
 
 0.109     2015-02-05 04:22:14Z
 
- - Fixed docs 
+  - Fixed docs
 
 0.108     2015-02-05 03:32:16Z
 
- - XS functionality 
+  - XS functionality
 
 0.107     2014-12-31 22:32:59Z
 
- - GatherDir replaced with Git::GatherDir
+  - GatherDir replaced with Git::GatherDir
 
 0.106     2014-11-27 04:22:53Z
 
- - Fixed huge bug about travis and run integration, logical this gives
-   also a new .travis.yml ;) 
+  - Fixed huge bug about travis and run integration, logical this gives
+    also a new .travis.yml ;)
 
 0.105     2014-11-25 16:13:47Z
 
- - Removed legacy, fixed the Repository<=>GithubMeta collide introduced
-   by latest Dist::Zilla updates
+  - Removed legacy, fixed the Repository<=>GithubMeta collide introduced
+    by latest Dist::Zilla updates
 
 0.104     2014-09-25 12:43:09Z
 
- - Bootstrapme! kentnl++
+  - Bootstrapme! kentnl++
 
 0.103     2014-09-22 18:11:23Z
 
- - Bumped requirement of dzil alien plugin
- - Support for Alien::Base 0.005 features
+  - Bumped requirement of dzil alien plugin
+  - Support for Alien::Base 0.005 features (Graham Ollis, PR #2)
 
 0.101     2014-07-05 19:20:21Z
 
- - Switched to Prereqs::FromCPANfile
+  - Switched to Prereqs::FromCPANfile
 
 0.016     2013-12-24 00:44:53Z
 
- - Several changes involving adding more no_ parameter for non cpan
-   distributions
+  - Several changes involving adding more no_ parameter for non cpan
+    distributions
 
 0.015     2013-05-02 11:55:41Z
 
- - Switched over to [TravisCI]
+  - Switched over to [TravisCI]
 
 0.014     2013-04-21 00:01:41Z
 
- - Added switch to deactivate ChangelogFromGit in favour for NextRelease
+  - Added switch to deactivate ChangelogFromGit in favour for NextRelease
 
 0.013     2013-04-20 23:21:32Z
 
- - Now with working requirements
+  - Now with working requirements
 
 0.012     2013-04-20 23:19:59Z
 
- - Added TravisYML
- - Micro documentation flaw fixed (bad example distribution name)
+  - Added TravisYML
+  - Micro documentation flaw fixed (bad example distribution name)
 
 0.011     2013-03-02 22:54:30Z
 
- - Bumped requirement versions, tuned documentation massively
+  - Bumped requirement versions, tuned documentation massively
 
 0.010     2013-03-02 19:21:42Z
 
- - Option to directly add [Alien] for the test
+  - Option to directly add [Alien] for the test
 
 0.009     2013-03-02 17:02:49Z
 
- - Added Test::LoadAllModules to requirement base
+  - Added Test::LoadAllModules to requirement base
 
 0.008     2013-02-26 21:26:23Z
 
- - Added new features to modify install release command (or deactivate
-   it totally)
+  - Added new features to modify install release command (or deactivate
+    it totally)
 
 0.007     2013-02-26 01:46:49Z
 
- - Added no_makemaker flag
+  - Added no_makemaker flag
 
 0.006     2013-02-08 00:20:20Z
 
- - Fixed the new features
- - Fixed small typo in SYNOPSIS
+  - Hups... fixed the new features ;)
+  - Fixed small typo in SYNOPSIS
 
 0.005     2013-02-04 02:10:04Z
 
- - Added several features like Dist::Zilla::Plugin::Run integration and
-   duckpan / no_cpan / no_install options
+  - Added several features like Dist::Zilla::Plugin::Run integration and
+    duckpan / no_cpan / no_install options
 
 0.004     2013-02-03 23:50:08Z
 
- - Added author and release_branch option for configuration
+  - Added author and release_branch option for configuration
 
 0.003     2012-10-01 01:37:30Z
 
- - Added Git::CheckFor::CorrectBranch
+  - Added Git::CheckFor::CorrectBranch
 
 0.002     2012-07-05 12:37:17Z
 
- - Missed adding ChangelogFromGit to the POD documentation
+  - Missed adding ChangelogFromGit to the POD documentation
 
 0.001     2012-07-05 11:48:31Z
 
- - Initial commit, copy of old bundle + adding Changes from git
+  - Initial commit, copy of old bundle + adding Changes from git

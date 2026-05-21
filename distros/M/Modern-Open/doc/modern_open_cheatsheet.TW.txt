@@ -1,0 +1,130 @@
+======================================================================
+ Modern::Open 速查表                              [TW] 中文（繁體）
+======================================================================
+
+[ 1. 安裝與使用 ]
+
+  安裝:
+    cpan Modern::Open
+
+  在腳本中使用:
+    use Modern::Open;
+
+  效果: 將 open(), opendir(), sysopen(), pipe(), socket(), accept()
+        替換為支援自動變數建立和自動報錯的版本。
+        支援 Perl 5.005_03 及更新版本。
+        注意: socket() 僅支援自動變數建立，不支援自動報錯。
+
+[ 2. open() -- 2引數形式 ]
+
+  my $fh;
+  open($fh, "< file.txt");   # 讀取
+  open($fh, "> file.txt");   # 寫入（清空）
+  open($fh, ">> file.txt");  # 附加
+  open($fh, "+< file.txt");  # 讀寫
+  open($fh, "cmd |");        # 從命令管道讀取
+  open($fh, "| cmd");        # 向命令管道寫入
+
+  while (my $line = readline($fh)) { ... }
+  print $fh "text\n";
+  close($fh);
+
+[ 3. open() -- 3引數形式 ]
+
+  my $fh;
+  open($fh, '<',  "file.txt");   # 讀取
+  open($fh, '>',  "file.txt");   # 寫入（清空）
+  open($fh, '>>', "file.txt");   # 附加
+  open($fh, '+<', "file.txt");   # 讀寫
+  open($fh, '+>', "file.txt");   # 讀寫（清空）
+  open($fh, '-|', "cmd");        # 從命令管道讀取
+  open($fh, '|-', "cmd");        # 向命令管道寫入
+
+  # 3引數形式內部使用 CORE::sysopen。
+  # 檔名中的模式字元不會被誤解析。
+
+[ 4. opendir() ]
+
+  my $dh;
+  opendir($dh, "/path/to/dir");
+
+  while (my $entry = readdir($dh)) {
+      next if $entry eq '.' or $entry eq '..';
+      print "$entry\n";
+  }
+  closedir($dh);
+
+[ 5. sysopen() ]
+
+  use Fcntl qw(O_RDONLY O_WRONLY O_CREAT O_TRUNC);
+
+  my $fh;
+  sysopen($fh, "file.txt", O_RDONLY);
+  sysopen($fh, "file.txt", O_WRONLY | O_CREAT | O_TRUNC);
+  sysopen($fh, "file.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+
+[ 6. pipe() ]
+
+  my($reader, $writer);
+  pipe($reader, $writer);
+
+  if (my $pid = fork()) {
+      close($writer);
+      while (my $line = readline($reader)) { print $line }
+      close($reader);
+  } else {
+      close($reader);
+      print $writer "來自子行程的訊息\n";
+      close($writer);
+      exit 0;
+  }
+
+[ 7. socket() 和 accept() ]
+
+  use Socket qw(AF_INET SOCK_STREAM sockaddr_in inet_aton);
+
+  my $server;
+  socket($server, AF_INET, SOCK_STREAM, 0);
+  # 注意: socket() 不支援 autodie，需手動檢查回傳值。
+
+  my $client;
+  accept($client, $server);
+
+[ 8. 自動報錯行為 ]
+
+  # 空上下文（不接收回傳值）: 失敗時 die
+  open($fh, "< no_such_file.txt");   # dies: Can't open(...)
+
+  # 接收回傳值: 失敗時回傳 undef/0
+  my $rc = open($fh, "< file.txt");
+  unless ($rc) { warn "open 失敗: $!" }
+
+  # 裸字句柄被拒絕:
+  open(FILE, "< file.txt");   # dies: Bare handle no longer supported
+
+[ 9. 回傳的句柄 ]
+
+  readline($fh)        # 讀取一行
+  read($fh, $buf, $n)  # 讀取N位元組
+  print $fh "..."      # 寫入
+  binmode($fh)         # 設定二進位模式
+  seek($fh, 0, 0)      # 定位到開頭
+  tell($fh)            # 目前位置
+  close($fh)           # 關閉
+  eof($fh)             # 檢查檔案結尾
+
+[ 10. 相容性 ]
+
+  Perl 版本  : 5.005_03 及更新版本（含 5.42）
+  平台       : Unix, Linux, macOS, Windows（自動處理CRLF）
+  依賴模組   : Fcntl（核心模組）
+
+[ 11. 官方資源 ]
+
+  Modern::Open (MetaCPAN):
+    https://metacpan.org/dist/Modern-Open
+
+  INABA Hitoshi (ina) on CPAN:
+    https://metacpan.org/author/INA
+
+======================================================================

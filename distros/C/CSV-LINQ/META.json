@@ -1,0 +1,75 @@
+{
+    "name" : "CSV-LINQ",
+    "version" : "1.00",
+    "abstract" : "LINQ-style query interface for CSV files",
+    "author" : [
+        "ina <ina@cpan.org>"
+    ],
+    "dynamic_config" : 1,
+    "generated_by" : "pmake.bat",
+    "license" : [
+        "perl_5"
+    ],
+    "meta-spec" : {
+        "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+        "version" : 2
+    },
+    "release_status" : "stable",
+    "resources" : {
+        "license" : [
+            "http://dev.perl.org/licenses/"
+        ],
+        "bugtracker" : {
+            "web" : "https://github.com/ina-cpan/CSV-LINQ/issues"
+        },
+        "repository" : {
+            "url"  : "https://github.com/ina-cpan/CSV-LINQ",
+            "web"  : "https://github.com/ina-cpan/CSV-LINQ",
+            "type" : "git"
+        }
+    },
+    "prereqs" : {
+        "build" : {
+            "requires" : {
+                "perl" : "5.005_03",
+                "strict" : "1.01",
+                "vars" : "0",
+                "warnings" : "0"
+            }
+        },
+        "configure" : {
+            "requires" : {
+                "perl" : "5.005_03",
+                "strict" : "1.01",
+                "vars" : "0",
+                "warnings" : "0"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+                "perl" : "5.005_03",
+                "strict" : "1.01",
+                "vars" : "0",
+                "warnings" : "0"
+            }
+        },
+        "test" : {
+            "requires" : {
+                "perl" : "5.005_03",
+                "strict" : "1.01",
+                "vars" : "0",
+                "warnings" : "0"
+            }
+        }
+    },
+    "provides" : {
+        "CSV::LINQ" : {
+            "file" : "lib/CSV/LINQ.pm",
+            "version" : "1.00"
+        },
+        "CSV::LINQ::Ordered" : {
+            "file" : "lib/CSV/LINQ.pm",
+            "version" : "1.00"
+        }
+    }
+}

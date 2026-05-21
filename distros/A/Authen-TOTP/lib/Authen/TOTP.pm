@@ -1,4 +1,4 @@
-# Authen::TOTP version 0.0.7
+# Authen::TOTP version 0.1.1
 #
 # Copyright (c) 2020 Thanos Chatziathanassiou <tchatzi@arx.net>. All rights reserved.
 # This program is free software; you can redistribute it and/or
@@ -12,7 +12,7 @@ use vars qw(@ISA @EXPORT @EXPORT_OK);
 
 @EXPORT_OK = qw();
 
-$Authen::TOTP::VERSION='0.0.7';
+$Authen::TOTP::VERSION='0.1.1';
 $Authen::TOTP::ver=$Authen::TOTP::VERSION;
 
 use strict;
@@ -20,6 +20,7 @@ use warnings;
 use utf8;
 use Carp;
 use Data::Dumper;
+use Crypt::PRNG;
 
 sub debug_print {
 	my $self = shift;
@@ -199,33 +200,33 @@ sub hmac {
 
 sub base32enc {
 	my $self = shift;
-	
-	if  ((eval {require MIME::Base32::XS;1;} || 0) ne 1) {
+
+	if  ((eval {require Encode::Base2N;1;} || 0) ne 1) {
 		# if module can't load
 		require MIME::Base32;
-		$self->{DEBUG} and $self->debug_print("MIME::Base32::XS unavailable, using MIME::Base32()");
+		$self->{DEBUG} and $self->debug_print("Encode::Base2N unavailable, using MIME::Base32()");
 		return MIME::Base32::encode_base32(shift);
 	}
 	else {
 		#we have XS!
-		$self->{DEBUG} and $self->debug_print("using MIME::Base32::XS()");
-		return MIME::Base32::XS::encode_base32(shift);
+		$self->{DEBUG} and $self->debug_print("using Encode::Base2N()");
+		return Encode::Base2N::encode_base32(shift);
 	}
 }
 
 sub base32dec {
 	my $self = shift;
-	
-	if  ((eval {require MIME::Base32::XS;1;} || 0) ne 1) {
+
+	if  ((eval {require Encode::Base2N;1;} || 0) ne 1) {
 		# if module can't load
 		require MIME::Base32;
-		$self->{DEBUG} and $self->debug_print("MIME::Base32::XS unavailable, using MIME::Base32()");
+		$self->{DEBUG} and $self->debug_print("Encode::Base2N unavailable, using MIME::Base32()");
 		return MIME::Base32::decode_base32(shift);
 	}
 	else {
 		#we have XS!
-		$self->{DEBUG} and $self->debug_print("using MIME::Base32::XS()");
-		return MIME::Base32::XS::decode_base32(shift);
+		$self->{DEBUG} and $self->debug_print("using Encode::Base2N()");
+		return Encode::Base2N::decode_base32(shift);
 	}
 }
 
@@ -233,10 +234,8 @@ sub gen_secret {
 	my $self = shift;
 	my $length = shift || 20;
 
-	my $secret;
-	for my $i(0..int(rand($length))+$length) {
-		$secret .= join '',('/', 1..9,'!','@','#','$','%','^','&','*','(',')','-','_','+','=', 'A'..'H','J'..'N','P'..'Z', 'a'..'h','m'..'z')[rand 58];
-	}
+    my $secret = Crypt::PRNG::random_string_from('/123456789!@#$%^&*()-_+=ABCDIEFGJKLMNPQRSTUVWXYZabcdefghmnopqrstuvwxyz', $length);
+
 	if (length($secret) > ($length+1)) {
 		$self->{DEBUG} and $self->debug_print("have len ".length($secret)." ($secret) so cutting down");
 		return substr($secret,0,$length);
@@ -299,18 +298,8 @@ sub validate_otp {
 	foreach $when (@tests) {
 		$self->{DEBUG} and $self->debug_print("using when $when (". ($when - $self->{when}). ")");
 
-		my $T = sprintf("%016x", int($when / $self->{period}) );
-		my $Td = pack('H*', $T);
-		
-		my $hmac = $self->hmac($Td);
-		
-		# take the 4 least significant bits (1 hex char) from the encrypted string as an offset
-		my $offset = hex(substr($hmac, -1));
-		# take the 4 bytes (8 hex chars) at the offset (* 2 for hex), and drop the high bit
-		my $encrypted = hex(substr($hmac, $offset * 2, 8)) & 0x7fffffff;
+		my $code = $self->otp($when);
 
-		my $code = sprintf("%0".$self->{digits}."d", ($encrypted % (10**$self->{digits}) ) );
-		
 		$self->{DEBUG} and $self->debug_print("comparing $code to $otp");
 
 		if ($code eq sprintf("%0".$self->{digits}."d", $otp) ) {
@@ -321,6 +310,34 @@ sub validate_otp {
 
 	return undef;
 }
+
+# Return OTP as digits
+# 
+# @param ?int $when
+#
+# @return string Numeric code as string
+sub otp {
+	my $self = shift;
+	my $when = shift;
+
+	if(!defined($when)) {
+		$when=$self->{when};
+	}
+	my $T = sprintf("%016x", int($when / $self->{period}) );
+	my $Td = pack('H*', $T);
+	
+	my $hmac = $self->hmac($Td);
+	
+	# take the 4 least significant bits (1 hex char) from the encrypted string as an offset
+	my $offset = hex(substr($hmac, -1));
+	# take the 4 bytes (8 hex chars) at the offset (* 2 for hex), and drop the high bit
+	my $encrypted = hex(substr($hmac, $offset * 2, 8)) & 0x7fffffff;
+
+	my $code = sprintf("%0".$self->{digits}."d", ($encrypted % (10**$self->{digits}) ) );
+
+	return $code;
+}
+
 
 sub initialize {
 	my $self = shift;
@@ -368,7 +385,7 @@ __END__
 
 Authen::TOTP - Interface to RFC6238 two factor authentication (2FA)
 
-Version 0.0.7
+Version 0.1.1
 
 =head1 SYNOPSIS
 
@@ -415,6 +432,12 @@ It currently passes RFC6238 Test Vectors for SHA1, SHA256, SHA512
  else {
 	#no match
  }
+
+ # Get generated OTP and validate it
+ my $otp=$gen->otp();
+ print "Generated OTP is $otp\n";
+ my $matches=$gen->validate_otp(otp => $otp);
+ print "Self generated OTP is ".($matches?"OK":"NOK")."\n";
 
 =head1 new Authen::TOTP
 
@@ -501,6 +524,8 @@ Usage:
 	 tolerance	=>	<try this many iterations before/after when>
 	 otp		=>	<OTP to compare to>
  );
+
+ $gen->otp( <when> ); # Get the TOTP token at <epoch_to_use>
  
 =back
 
@@ -508,6 +533,15 @@ Usage:
 
 =head1 Revision History
 
+ 0.1.1
+    Replace rand() with Crypt::PRNG::random_string_from() following
+    advisory from rrwo@cpansec.org and CVE-2026-46473
+ 0.1.0
+	Fix documentation inaccuracies (still referenced MIME::Base32::XS)
+ 0.0.9
+	Added otp method to get user code, and updated tests for this.
+ 0.0.8
+	Remove usage of MIME::Base32::XS, in favor of the faster Encode::Base2N
  0.0.7
 	Moved git repo to github
 	Added CONTRIBUTING.md file
@@ -533,7 +567,10 @@ one of
 L<Digest::SHA> or L<Digest::SHA::PurePerl>
 
 and
-L<MIME::Base32::XS> or L<MIME::Base32>
+L<Encode::Base2N> or L<MIME::Base32>
+
+and
+L<Crypt::PRNG> since version 0.1.1 for safer random secrets
 
 L<Imager::QRCode> if you want to generate QRCodes as well
 
@@ -556,6 +593,8 @@ Let me know if you find anything that's not working
 =head1 ACKNOWLEDGEMENTS
 
 Github user j256 for his example implementation
+
+Github users teodesian and mdeweerd for their PRs
 
 Gryphon Shafer <gryphon@cpan.org> for his L<Auth::GoogleAuth> module
 that does mostly the same job, but I discovered after I had written 

@@ -23,7 +23,7 @@ requires:
 resources:
   bugtracker: http://github.com/Test-More/Test2-Plugin-MemUsage/issues
   repository: http://github.com/Test-More/Test2-Plugin-MemUsage/
-version: '0.002004'
+version: '0.002006'
 x_generated_by_perl: v5.42.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

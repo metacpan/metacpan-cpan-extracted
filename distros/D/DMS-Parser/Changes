@@ -1,0 +1,22 @@
+Revision history for DMS
+
+0.3.0   2026-04-29
+        - SPEC v0.14: rename DMS::Parser::parse(),
+          DMS::Parser::parse_document(), DMS::Parser::parse_lite(),
+          DMS::Parser::parse_lite_document(),
+          DMS::Parser::parse_document_unordered() and
+          DMS::Parser::parse_lite_document_unordered() to decode(),
+          decode_document(), decode_lite(), decode_lite_document(),
+          decode_document_unordered() and
+          decode_lite_document_unordered() respectively. The old names
+          remain as deprecated aliases that emit a one-time
+          Carp::carp warning and forward to the new sub. The old
+          names will be removed in the release after this one.
+        - SPEC v0.14: rename DMS::Parser::to_dms() / ::to_dms_lite() and
+          DMS::Emitter::to_dms() / ::to_dms_lite() to encode() /
+          encode_lite(). Old names retained as deprecated aliases.
+        - decode_front_matter() is intentionally not yet added; that
+          API arrives in a follow-up release.
+
+0.2.0   prior
+        - Pre-rename baseline (parse / to_dms naming).

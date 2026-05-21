@@ -1,0 +1,2296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta content="Common,Latin" name="scripts">
+<meta content="initial-scale=1.0" name="viewport">
+<title>CLACKS interprocess messaging protocol</title>
+<meta content="Rene Schickbauer" name="author">
+<meta content="
+       CLACKS interprocess messaging is an asyncronous protocol used in various web- and homeautomation applications. 
+       
+          The protocol implements real-time signalling and data caching. It also implements a master/slave mode for distributed servers
+          for load balancing and reducing network load between internet hosts.
+       
+    " name="description">
+<meta content="xml2rfc 3.20.0" name="generator">
+<meta content="clacks" name="keyword">
+<meta name="ietf.draft">
+<!-- Generator version information:
+  xml2rfc 3.20.0
+    Python 3.12.3
+    ConfigArgParse 1.7
+    google-i18n-address 2.4.0
+    intervaltree 3.0.2
+    Jinja2 3.1.2
+    lxml 5.2.1
+    platformdirs 4.2.0
+    pycountry 23.12.11
+    PyYAML 6.0.1
+    requests 2.31.0
+    setuptools 68.1.2
+    six 1.16.0
+    wcwidth 0.2.5
+    weasyprint 61.1
+-->
+<link href="clacks.xml" rel="alternate" type="application/rfc+xml">
+<link href="#copyright" rel="license">
+<style type="text/css">/*
+
+  NOTE: Changes at the bottom of this file overrides some earlier settings.
+
+  Once the style has stabilized and has been adopted as an official RFC style,
+  this can be consolidated so that style settings occur only in one place, but
+  for now the contents of this file consists first of the initial CSS work as
+  provided to the RFC Formatter (xml2rfc) work, followed by itemized and
+  commented changes found necessary during the development of the v3
+  formatters.
+
+*/
+
+/* fonts */
+@import url('https://fonts.googleapis.com/css?family=Noto+Sans'); /* Sans-serif */
+@import url('https://fonts.googleapis.com/css?family=Noto+Serif'); /* Serif (print) */
+@import url('https://fonts.googleapis.com/css?family=Roboto+Mono'); /* Monospace */
+
+:root {
+  --font-sans: 'Noto Sans', Arial, Helvetica, sans-serif;
+  --font-serif: 'Noto Serif', 'Times', 'Times New Roman', serif;
+  --font-mono: 'Roboto Mono', Courier, 'Courier New', monospace;
+}
+
+@viewport {
+  zoom: 1.0;
+}
+@-ms-viewport {
+  width: extend-to-zoom;
+  zoom: 1.0;
+}
+/* general and mobile first */
+html {
+}
+body {
+  max-width: 90%;
+  margin: 1.5em auto;
+  color: #222;
+  background-color: #fff;
+  font-size: 14px;
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  scroll-behavior: smooth;
+  overflow-wrap: break-word;
+}
+.ears {
+  display: none;
+}
+
+/* headings */
+#title, h1, h2, h3, h4, h5, h6 {
+  margin: 1em 0 0.5em;
+  font-weight: bold;
+  line-height: 1.3;
+}
+#title {
+  clear: both;
+  border-bottom: 1px solid #ddd;
+  margin: 0 0 0.5em 0;
+  padding: 1em 0 0.5em;
+}
+.author {
+  padding-bottom: 4px;
+}
+h1 {
+  font-size: 26px;
+  margin: 1em 0;
+}
+h2 {
+  font-size: 22px;
+  margin-top: -20px;  /* provide offset for in-page anchors */
+  padding-top: 33px;
+}
+h3 {
+  font-size: 18px;
+  margin-top: -36px;  /* provide offset for in-page anchors */
+  padding-top: 42px;
+}
+h4 {
+  font-size: 16px;
+  margin-top: -36px;  /* provide offset for in-page anchors */
+  padding-top: 42px;
+}
+h5, h6 {
+  font-size: 14px;
+}
+#n-copyright-notice {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 1em;
+  margin-bottom: 1em;
+}
+/* general structure */
+p {
+  padding: 0;
+  margin: 0 0 1em 0;
+  text-align: left;
+}
+div, span {
+  position: relative;
+}
+div {
+  margin: 0;
+}
+.alignRight.art-text {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 3px;
+  padding: 1em 1em 0;
+  margin-bottom: 1.5em;
+}
+.alignRight.art-text pre {
+  padding: 0;
+}
+.alignRight {
+  margin: 1em 0;
+}
+.alignRight > *:first-child {
+  border: none;
+  margin: 0;
+  float: right;
+  clear: both;
+}
+.alignRight > *:nth-child(2) {
+  clear: both;
+  display: block;
+  border: none;
+}
+svg {
+  display: block;
+}
+svg[font-family~="serif" i], svg [font-family~="serif" i] {
+  font-family: var(--font-serif);
+}
+svg[font-family~="sans-serif" i], svg [font-family~="sans-serif" i] {
+  font-family: var(--font-sans);
+}
+svg[font-family~="monospace" i], svg [font-family~="monospace" i] {
+  font-family: var(--font-mono);
+}
+.alignCenter.art-text {
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  border-radius: 3px;
+  padding: 1em 1em 0;
+  margin-bottom: 1.5em;
+}
+.alignCenter.art-text pre {
+  padding: 0;
+}
+.alignCenter {
+  margin: 1em 0;
+}
+.alignCenter > *:first-child {
+  display: table;
+  border: none;
+  margin: 0 auto;
+}
+
+/* lists */
+ol, ul {
+  padding: 0;
+  margin: 0 0 1em 2em;
+}
+ol ol, ul ul, ol ul, ul ol {
+  margin-left: 1em;
+}
+li {
+  margin: 0 0 0.25em 0;
+}
+.ulCompact li {
+  margin: 0;
+}
+ul.empty, .ulEmpty {
+  list-style-type: none;
+}
+ul.empty li, .ulEmpty li {
+  margin-top: 0.5em;
+}
+ul.ulBare, li.ulBare {
+  margin-left: 0em !important;
+}
+ul.compact, .ulCompact,
+ol.compact, .olCompact {
+  line-height: 100%;
+  margin: 0 0 0 2em;
+}
+
+/* definition lists */
+dl {
+}
+dl > dt {
+  float: left;
+  margin-right: 1em;
+}
+/* 
+dl.nohang > dt {
+  float: none;
+}
+*/
+dl > dd {
+  margin-bottom: .8em;
+  min-height: 1.3em;
+}
+dl.compact > dd, .dlCompact > dd {
+  margin-bottom: 0em;
+}
+dl > dd > dl {
+  margin-top: 0.5em;
+  margin-bottom: 0em;
+}
+
+/* links */
+a {
+  text-decoration: none;
+}
+a[href] {
+  color: #22e; /* Arlen: WCAG 2019 */
+}
+a[href]:hover {
+  background-color: #f2f2f2;
+}
+figcaption a[href],
+a[href].selfRef {
+  color: #222;
+}
+/* XXX probably not this:
+a.selfRef:hover {
+  background-color: transparent;
+  cursor: default;
+} */
+
+/* Figures */
+tt, code, pre {
+  background-color: #f9f9f9;
+  font-family: var(--font-mono);
+}
+pre {
+  border: 1px solid #eee;
+  margin: 0;
+  padding: 1em;
+}
+img {
+  max-width: 100%;
+}
+figure {
+  margin: 0;
+}
+figure blockquote {
+  margin: 0.8em 0.4em 0.4em;
+}
+figcaption {
+  font-style: italic;
+  margin: 0 0 1em 0;
+}
+@media screen {
+  pre {
+    overflow-x: auto;
+    max-width: 100%;
+    max-width: calc(100% - 22px);
+  }
+}
+
+/* aside, blockquote */
+aside, blockquote {
+  margin-left: 0;
+  padding: 1.2em 2em;
+}
+blockquote {
+  background-color: #f9f9f9;
+  color: #111; /* Arlen: WCAG 2019 */
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  margin: 1em 0;
+}
+blockquote > *:last-child {
+  margin-bottom: 0;
+}
+cite {
+  display: block;
+  text-align: right;
+  font-style: italic;
+}
+
+/* tables */
+table {
+  width: 100%;
+  margin: 0 0 1em;
+  border-collapse: collapse;
+  border: 1px solid #eee;
+}
+th, td {
+  text-align: left;
+  vertical-align: top;
+  padding: 0.5em 0.75em;
+}
+th {
+  text-align: left;
+  background-color: #e9e9e9;
+}
+tr:nth-child(2n+1) > td {
+  background-color: #f5f5f5;
+}
+table caption {
+  font-style: italic;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+table p {
+  /* XXX to avoid bottom margin on table row signifiers. If paragraphs should
+     be allowed within tables more generally, it would be far better to select on a class. */
+  margin: 0;
+}
+
+/* pilcrow */
+a.pilcrow {
+  color: #666; /* Arlen: AHDJ 2019 */
+  text-decoration: none;
+  visibility: hidden;
+  user-select: none;
+  -ms-user-select: none;
+  -o-user-select:none;
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+@media screen {
+  aside:hover > a.pilcrow,
+  p:hover > a.pilcrow,
+  blockquote:hover > a.pilcrow,
+  div:hover > a.pilcrow,
+  li:hover > a.pilcrow,
+  pre:hover > a.pilcrow {
+    visibility: visible;
+  }
+  a.pilcrow:hover {
+    background-color: transparent;
+  }
+}
+
+/* misc */
+hr {
+  border: 0;
+  border-top: 1px solid #eee;
+}
+.bcp14 {
+  font-variant: small-caps;
+}
+
+.role {
+  font-variant: all-small-caps;
+}
+
+/* info block */
+#identifiers {
+  margin: 0;
+  font-size: 0.9em;
+}
+#identifiers dt {
+  width: 3em;
+  clear: left;
+}
+#identifiers dd {
+  float: left;
+  margin-bottom: 0;
+}
+/* Fix PDF info block run off issue */
+@media print {
+  #identifiers dd {
+    float: none;
+  }
+}
+#identifiers .authors .author {
+  display: inline-block;
+  margin-right: 1.5em;
+}
+#identifiers .authors .org {
+  font-style: italic;
+}
+
+/* The prepared/rendered info at the very bottom of the page */
+.docInfo {
+  color: #666; /* Arlen: WCAG 2019 */
+  font-size: 0.9em;
+  font-style: italic;
+  margin-top: 2em;
+}
+.docInfo .prepared {
+  float: left;
+}
+.docInfo .prepared {
+  float: right;
+}
+
+/* table of contents */
+#toc  {
+  padding: 0.75em 0 2em 0;
+  margin-bottom: 1em;
+}
+nav.toc ul {
+  margin: 0 0.5em 0 0;
+  padding: 0;
+  list-style: none;
+}
+nav.toc li {
+  line-height: 1.3em;
+  margin: 0.75em 0;
+  padding-left: 1.2em;
+  text-indent: -1.2em;
+}
+/* references */
+.references dt {
+  text-align: right;
+  font-weight: bold;
+  min-width: 7em;
+}
+.references dd {
+  margin-left: 8em;
+  overflow: auto;
+}
+
+.refInstance {
+  margin-bottom: 1.25em;
+}
+
+.refSubseries {
+  margin-bottom: 1.25em;
+}
+
+.references .ascii {
+  margin-bottom: 0.25em;
+}
+
+/* index */
+.index ul {
+  margin: 0 0 0 1em;
+  padding: 0;
+  list-style: none;
+}
+.index ul ul {
+  margin: 0;
+}
+.index li {
+  margin: 0;
+  text-indent: -2em;
+  padding-left: 2em;
+  padding-bottom: 5px;
+}
+.indexIndex {
+  margin: 0.5em 0 1em;
+}
+.index a {
+  font-weight: 700;
+}
+/* make the index two-column on all but the smallest screens */
+@media (min-width: 600px) {
+  .index ul {
+    -moz-column-count: 2;
+    -moz-column-gap: 20px;
+  }
+  .index ul ul {
+    -moz-column-count: 1;
+    -moz-column-gap: 0;
+  }
+}
+
+/* authors */
+address.vcard {
+  font-style: normal;
+  margin: 1em 0;
+}
+
+address.vcard .nameRole {
+  font-weight: 700;
+  margin-left: 0;
+}
+address.vcard .label {
+  font-family: var(--font-sans);
+  margin: 0.5em 0;
+}
+address.vcard .type {
+  display: none;
+}
+.alternative-contact {
+  margin: 1.5em 0 1em;
+}
+hr.addr {
+  border-top: 1px dashed;
+  margin: 0;
+  color: #ddd;
+  max-width: calc(100% - 16px);
+}
+
+/* temporary notes */
+.rfcEditorRemove::before {
+  position: absolute;
+  top: 0.2em;
+  right: 0.2em;
+  padding: 0.2em;
+  content: "The RFC Editor will remove this note";
+  color: #9e2a00; /* Arlen: WCAG 2019 */
+  background-color: #ffd; /* Arlen: WCAG 2019 */
+}
+.rfcEditorRemove {
+  position: relative;
+  padding-top: 1.8em;
+  background-color: #ffd; /* Arlen: WCAG 2019 */
+  border-radius: 3px;
+}
+.cref {
+  background-color: #ffd; /* Arlen: WCAG 2019 */
+  padding: 2px 4px;
+}
+.crefSource {
+  font-style: italic;
+}
+/* alternative layout for smaller screens */
+@media screen and (max-width: 1023px) {
+  body {
+    padding-top: 2em;
+  }
+  #title {
+    padding: 1em 0;
+  }
+  h1 {
+    font-size: 24px;
+  }
+  h2 {
+    font-size: 20px;
+    margin-top: -18px;  /* provide offset for in-page anchors */
+    padding-top: 38px;
+  }
+  #identifiers dd {
+    max-width: 60%;
+  }
+  #toc {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    right: 0;
+    padding: 0;
+    margin: 0;
+    background-color: inherit;
+    border-bottom: 1px solid #ccc;
+  }
+  #toc h2 {
+    margin: -1px 0 0 0;
+    padding: 4px 0 4px 6px;
+    padding-right: 1em;
+    min-width: 190px;
+    font-size: 1.1em;
+    text-align: right;
+    background-color: #444;
+    color: white;
+    cursor: pointer;
+  }
+  #toc h2::before { /* css hamburger */
+    float: right;
+    position: relative;
+    width: 1em;
+    height: 1px;
+    left: -164px;
+    margin: 6px 0 0 0;
+    background: white none repeat scroll 0 0;
+    box-shadow: 0 4px 0 0 white, 0 8px 0 0 white;
+    content: "";
+  }
+  #toc nav {
+    display: none;
+    padding: 0.5em 1em 1em;
+    overflow: auto;
+    height: calc(100vh - 48px);
+    border-left: 1px solid #ddd;
+  }
+}
+
+/* alternative layout for wide screens */
+@media screen and (min-width: 1024px) {
+  body {
+    max-width: 724px;
+    margin: 42px auto;
+    padding-left: 1.5em;
+    padding-right: 29em;
+  }
+  #toc {
+    position: fixed;
+    top: 42px;
+    right: 42px;
+    width: 25%;
+    margin: 0;
+    padding: 0 1em;
+    z-index: 1;
+  }
+  #toc h2 {
+    border-top: none;
+    border-bottom: 1px solid #ddd;
+    font-size: 1em;
+    font-weight: normal;
+    margin: 0;
+    padding: 0.25em 1em 1em 0;
+  }
+  #toc nav {
+    display: block;
+    height: calc(90vh - 84px);
+    bottom: 0;
+    padding: 0.5em 0 0;
+    overflow: auto;
+  }
+  img { /* future proofing */
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* pagination */
+@media print {
+  body {
+    width: 100%;
+  }
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+  #n-copyright-notice {
+    border-bottom: none;
+  }
+  #toc, #n-introduction {
+    page-break-before: always;
+  }
+  #toc {
+    border-top: none;
+    padding-top: 0;
+  }
+  figure, pre {
+    page-break-inside: avoid;
+  }
+  figure {
+    overflow: scroll;
+  }
+  .breakable pre {
+    break-inside: auto;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+  h2+*, h3+*, h4+*, h5+*, h6+* {
+    page-break-before: avoid;
+  }
+  pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-size: 10pt;
+  }
+  table {
+    border: 1px solid #ddd;
+  }
+  td {
+    border-top: 1px solid #ddd;
+  }
+}
+
+/* This is commented out here, as the string-set: doesn't
+   pass W3C validation currently */
+/*
+.ears thead .left {
+  string-set: ears-top-left content();
+}
+
+.ears thead .center {
+  string-set: ears-top-center content();
+}
+
+.ears thead .right {
+  string-set: ears-top-right content();
+}
+
+.ears tfoot .left {
+  string-set: ears-bottom-left content();
+}
+
+.ears tfoot .center {
+  string-set: ears-bottom-center content();
+}
+
+.ears tfoot .right {
+  string-set: ears-bottom-right content();
+}
+*/
+
+@page :first {
+  padding-top: 0;
+  @top-left {
+    content: normal;
+    border: none;
+  }
+  @top-center {
+    content: normal;
+    border: none;
+  }
+  @top-right {
+    content: normal;
+    border: none;
+  }
+}
+
+@page {
+  size: A4;
+  margin-bottom: 45mm;
+  padding-top: 20px;
+  /* The following is commented out here, but set appropriately by in code, as
+     the content depends on the document */
+  /*
+  @top-left {
+    content: 'Internet-Draft';
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-left {
+    content: string(ears-top-left);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-center {
+    content: string(ears-top-center);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @top-right {
+    content: string(ears-top-right);
+    vertical-align: bottom;
+    border-bottom: solid 1px #ccc;
+  }
+  @bottom-left {
+    content: string(ears-bottom-left);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-center {
+    content: string(ears-bottom-center);
+    vertical-align: top;
+    border-top: solid 1px #ccc;
+  }
+  @bottom-right {
+      content: '[Page ' counter(page) ']';
+      vertical-align: top;
+      border-top: solid 1px #ccc;
+  }
+  */
+
+}
+
+/* Changes introduced to fix issues found during implementation */
+/* Make sure links are clickable even if overlapped by following H* */
+a {
+  z-index: 2;
+}
+/* Separate body from document info even without intervening H1 */
+section {
+  clear: both;
+}
+
+
+/* Top align author divs, to avoid names without organization dropping level with org names */
+.author {
+  vertical-align: top;
+}
+
+/* Leave room in document info to show Internet-Draft on one line */
+#identifiers dt {
+  width: 8em;
+}
+
+/* Don't waste quite as much whitespace between label and value in doc info */
+#identifiers dd {
+  margin-left: 1em;
+}
+
+/* Give floating toc a background color (needed when it's a div inside section */
+#toc {
+  background-color: white;
+}
+
+/* Make the collapsed ToC header render white on gray also when it's a link */
+@media screen and (max-width: 1023px) {
+  #toc h2 a,
+  #toc h2 a:link,
+  #toc h2 a:focus,
+  #toc h2 a:hover,
+  #toc a.toplink,
+  #toc a.toplink:hover {
+    color: white;
+    background-color: #444;
+    text-decoration: none;
+  }
+}
+
+/* Give the bottom of the ToC some whitespace */
+@media screen and (min-width: 1024px) {
+  #toc {
+    padding: 0 0 1em 1em;
+  }
+}
+
+/* Style section numbers with more space between number and title */
+.section-number {
+  padding-right: 0.5em;
+}
+
+/* prevent monospace from becoming overly large */
+tt, code, pre {
+  font-size: 95%;
+}
+
+/* Fix the height/width aspect for ascii art*/
+.sourcecode pre,
+.art-text pre {
+  line-height: 1.12;
+}
+
+
+/* Add styling for a link in the ToC that points to the top of the document */
+a.toplink {
+  float: right;
+  margin-right: 0.5em;
+}
+
+/* Fix the dl styling to match the RFC 7992 attributes */
+dl > dt,
+dl.dlParallel > dt {
+  float: left;
+  margin-right: 1em;
+}
+dl.dlNewline > dt {
+  float: none;
+}
+
+/* Provide styling for table cell text alignment */
+table td.text-left,
+table th.text-left {
+  text-align: left;
+}
+table td.text-center,
+table th.text-center {
+  text-align: center;
+}
+table td.text-right,
+table th.text-right {
+  text-align: right;
+}
+
+/* Make the alternative author contact information look less like just another
+   author, and group it closer with the primary author contact information */
+.alternative-contact {
+  margin: 0.5em 0 0.25em 0;
+}
+address .non-ascii {
+  margin: 0 0 0 2em;
+}
+
+/* With it being possible to set tables with alignment
+  left, center, and right, { width: 100%; } does not make sense */
+table {
+  width: auto;
+}
+
+/* Avoid reference text that sits in a block with very wide left margin,
+   because of a long floating dt label.*/
+.references dd {
+  overflow: visible;
+}
+
+/* Control caption placement */
+caption {
+  caption-side: bottom;
+}
+
+/* Limit the width of the author address vcard, so names in right-to-left
+   script don't end up on the other side of the page. */
+
+address.vcard {
+  max-width: 30em;
+  margin-right: auto;
+}
+
+/* For address alignment dependent on LTR or RTL scripts */
+address div.left {
+  text-align: left;
+}
+address div.right {
+  text-align: right;
+}
+
+/* Provide table alignment support.  We can't use the alignX classes above
+   since they do unwanted things with caption and other styling. */
+table.right {
+ margin-left: auto;
+ margin-right: 0;
+}
+table.center {
+ margin-left: auto;
+ margin-right: auto;
+}
+table.left {
+ margin-left: 0;
+ margin-right: auto;
+}
+
+/* Give the table caption label the same styling as the figcaption */
+caption a[href] {
+  color: #222;
+}
+
+@media print {
+  .toplink {
+    display: none;
+  }
+
+  /* avoid overwriting the top border line with the ToC header */
+  #toc {
+    padding-top: 1px;
+  }
+
+  /* Avoid page breaks inside dl and author address entries */
+  .vcard {
+    page-break-inside: avoid;
+  }
+
+}
+/* Tweak the bcp14 keyword presentation */
+.bcp14 {
+  font-variant: small-caps;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+/* Tweak the invisible space above H* in order not to overlay links in text above */
+ h2 {
+  margin-top: -18px;  /* provide offset for in-page anchors */
+  padding-top: 31px;
+ }
+ h3 {
+  margin-top: -18px;  /* provide offset for in-page anchors */
+  padding-top: 24px;
+ }
+ h4 {
+  margin-top: -18px;  /* provide offset for in-page anchors */
+  padding-top: 24px;
+ }
+/* Float artwork pilcrow to the right */
+@media screen {
+  .artwork a.pilcrow {
+    display: block;
+    line-height: 0.7;
+    margin-top: 0.15em;
+  }
+}
+/* Make pilcrows on dd visible */
+@media screen {
+  dd:hover > a.pilcrow {
+    visibility: visible;
+  }
+}
+/* Make the placement of figcaption match that of a table's caption
+   by removing the figure's added bottom margin */
+.alignLeft.art-text,
+.alignCenter.art-text,
+.alignRight.art-text {
+   margin-bottom: 0;
+}
+.alignLeft,
+.alignCenter,
+.alignRight {
+  margin: 1em 0 0 0;
+}
+/* In print, the pilcrow won't show on hover, so prevent it from taking up space,
+   possibly even requiring a new line */
+@media print {
+  a.pilcrow {
+    display: none;
+  }
+}
+/* Styling for the external metadata */
+div#external-metadata {
+  background-color: #eee;
+  padding: 0.5em;
+  margin-bottom: 0.5em;
+  display: none;
+}
+div#internal-metadata {
+  padding: 0.5em;                       /* to match the external-metadata padding */
+}
+/* Styling for title RFC Number */
+h1#rfcnum {
+  clear: both;
+  margin: 0 0 -1em;
+  padding: 1em 0 0 0;
+}
+/* Make .olPercent look the same as <ol><li> */
+dl.olPercent > dd {
+  margin-bottom: 0.25em;
+  min-height: initial;
+}
+/* Give aside some styling to set it apart */
+aside {
+  border-left: 1px solid #ddd;
+  margin: 1em 0 1em 2em;
+  padding: 0.2em 2em;
+}
+aside > dl,
+aside > ol,
+aside > ul,
+aside > table,
+aside > p {
+  margin-bottom: 0.5em;
+}
+/* Additional page break settings */
+@media print {
+  figcaption, table caption {
+    page-break-before: avoid;
+  }
+}
+/* Font size adjustments for print */
+@media print {
+  body  { font-size: 10pt;      line-height: normal; max-width: 96%; }
+  h1    { font-size: 1.72em;    padding-top: 1.5em; } /* 1*1.2*1.2*1.2 */
+  h2    { font-size: 1.44em;    padding-top: 1.5em; } /* 1*1.2*1.2 */
+  h3    { font-size: 1.2em;     padding-top: 1.5em; } /* 1*1.2 */
+  h4    { font-size: 1em;       padding-top: 1.5em; }
+  h5, h6 { font-size: 1em;      margin: initial; padding: 0.5em 0 0.3em; }
+}
+/* Sourcecode margin in print, when there's no pilcrow */
+@media print {
+  .artwork,
+  .artwork > pre,
+  .sourcecode {
+    margin-bottom: 1em;
+  }
+}
+/* Avoid narrow tables forcing too narrow table captions, which may render badly */
+table {
+  min-width: 20em;
+}
+/* ol type a */
+ol.type-a { list-style-type: lower-alpha; }
+ol.type-A { list-style-type: upper-alpha; }
+ol.type-i { list-style-type: lower-roman; }
+ol.type-I { list-style-type: lower-roman; }
+/* Apply the print table and row borders in general, on request from the RPC,
+and increase the contrast between border and odd row background slightly */
+table {
+  border: 1px solid #ddd;
+}
+td {
+  border-top: 1px solid #ddd;
+}
+tr {
+  break-inside: avoid;
+}
+tr:nth-child(2n+1) > td {
+  background-color: #f8f8f8;
+}
+/* Use style rules to govern display of the TOC. */
+@media screen and (max-width: 1023px) {
+  #toc nav { display: none; }
+  #toc.active nav { display: block; }
+}
+/* Add support for keepWithNext */
+.keepWithNext {
+  break-after: avoid-page;
+  break-after: avoid-page;
+}
+/* Add support for keepWithPrevious */
+.keepWithPrevious {
+  break-before: avoid-page;
+}
+/* Change the approach to avoiding breaks inside artwork etc. */
+figure, pre, table, .artwork, .sourcecode  {
+  break-before: auto;
+  break-after: auto;
+}
+/* Avoid breaks between <dt> and <dd> */
+dl {
+  break-before: auto;
+  break-inside: auto;
+}
+dt {
+  break-before: auto;
+  break-after: avoid-page;
+}
+dd {
+  break-before: avoid-page;
+  break-after: auto;
+  orphans: 3;
+  widows: 3
+}
+span.break, dd.break {
+  margin-bottom: 0;
+  min-height: 0;
+  break-before: auto;
+  break-inside: auto;
+  break-after: auto;
+}
+/* Undo break-before ToC */
+@media print {
+  #toc {
+    break-before: auto;
+  }
+}
+/* Text in compact lists should not get extra bottom margin space,
+   since that would makes the list not compact */
+ul.compact p, .ulCompact p,
+ol.compact p, .olCompact p {
+ margin: 0;
+}
+/* But the list as a whole needs the extra space at the end */
+section ul.compact,
+section .ulCompact,
+section ol.compact,
+section .olCompact {
+  margin-bottom: 1em;                    /* same as p not within ul.compact etc. */
+}
+/* The tt and code background above interferes with for instance table cell
+   backgrounds.  Changed to something a bit more selective. */
+tt, code {
+  background-color: transparent;
+}
+p tt, p code, li tt, li code {
+  background-color: #f8f8f8;
+}
+/* Tweak the pre margin -- 0px doesn't come out well */
+pre {
+   margin-top: 0.5px;
+}
+/* Tweak the compact list text */
+ul.compact, .ulCompact,
+ol.compact, .olCompact,
+dl.compact, .dlCompact {
+  line-height: normal;
+}
+/* Don't add top margin for nested lists */
+li > ul, li > ol, li > dl,
+dd > ul, dd > ol, dd > dl,
+dl > dd > dl {
+  margin-top: initial;
+}
+/* Elements that should not be rendered on the same line as a <dt> */
+/* This should match the element list in writer.text.TextWriter.render_dl() */
+dd > div.artwork:first-child,
+dd > aside:first-child,
+dd > figure:first-child,
+dd > ol:first-child,
+dd > div.sourcecode:first-child,
+dd > table:first-child,
+dd > ul:first-child {
+  clear: left;
+}
+/* fix for weird browser behaviour when <dd/> is empty */
+dt+dd:empty::before{
+  content: "\00a0";
+}
+/* Make paragraph spacing inside <li> smaller than in body text, to fit better within the list */
+li > p {
+  margin-bottom: 0.5em
+}
+/* Don't let p margin spill out from inside list items */
+li > p:last-of-type:only-child {
+  margin-bottom: 0;
+}
+</style>
+<link href="rfc-local.css" rel="stylesheet" type="text/css">
+<script type="application/javascript">async function addMetadata(){try{const e=document.styleSheets[0].cssRules;for(let t=0;t<e.length;t++)if(/#identifiers/.exec(e[t].selectorText)){const a=e[t].cssText.replace("#identifiers","#external-updates");document.styleSheets[0].insertRule(a,document.styleSheets[0].cssRules.length)}}catch(e){console.log(e)}const e=document.getElementById("external-metadata");if(e)try{var t,a="",o=function(e){const t=document.getElementsByTagName("meta");for(let a=0;a<t.length;a++)if(t[a].getAttribute("name")===e)return t[a].getAttribute("content");return""}("rfc.number");if(o){t="https://www.rfc-editor.org/rfc/rfc"+o+".json";try{const e=await fetch(t);a=await e.json()}catch(e){t=document.URL.indexOf("html")>=0?document.URL.replace(/html$/,"json"):document.URL+".json";const o=await fetch(t);a=await o.json()}}if(!a)return;e.style.display="block";const s="",d="https://datatracker.ietf.org/doc",n="https://datatracker.ietf.org/ipr/search",c="https://www.rfc-editor.org/info",l=a.doc_id.toLowerCase(),i=a.doc_id.slice(0,3).toLowerCase(),f=a.doc_id.slice(3).replace(/^0+/,""),u={status:"Status",obsoletes:"Obsoletes",obsoleted_by:"Obsoleted By",updates:"Updates",updated_by:"Updated By",see_also:"See Also",errata_url:"Errata"};let h="<dl style='overflow:hidden' id='external-updates'>";["status","obsoletes","obsoleted_by","updates","updated_by","see_also","errata_url"].forEach(e=>{if("status"==e){a[e]=a[e].toLowerCase();var t=a[e].split(" "),o=t.length,w="",p=1;for(let e=0;e<o;e++)p<o?w=w+r(t[e])+" ":w+=r(t[e]),p++;a[e]=w}else if("obsoletes"==e||"obsoleted_by"==e||"updates"==e||"updated_by"==e){var g,m="",b=1;g=a[e].length;for(let t=0;t<g;t++)a[e][t]&&(a[e][t]=String(a[e][t]).toLowerCase(),m=b<g?m+"<a href='"+s+"/rfc/".concat(a[e][t])+"'>"+a[e][t].slice(3)+"</a>, ":m+"<a href='"+s+"/rfc/".concat(a[e][t])+"'>"+a[e][t].slice(3)+"</a>",b++);a[e]=m}else if("see_also"==e){var y,L="",C=1;y=a[e].length;for(let t=0;t<y;t++)if(a[e][t]){a[e][t]=String(a[e][t]);var _=a[e][t].slice(0,3),v=a[e][t].slice(3).replace(/^0+/,"");L=C<y?"RFC"!=_?L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+_+" "+v+"</a>, ":L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+v+"</a>, ":"RFC"!=_?L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+_+" "+v+"</a>":L+"<a href='"+s+"/info/"+_.toLowerCase().concat(v.toLowerCase())+"'>"+v+"</a>",C++}a[e]=L}else if("errata_url"==e){var R="";R=a[e]?R+"<a href='"+a[e]+"'>Errata exist</a> | <a href='"+d+"/"+l+"'>Datatracker</a>| <a href='"+n+"/?"+i+"="+f+"&submit="+i+"'>IPR</a> | <a href='"+c+"/"+l+"'>Info page</a>":"<a href='"+d+"/"+l+"'>Datatracker</a> | <a href='"+n+"/?"+i+"="+f+"&submit="+i+"'>IPR</a> | <a href='"+c+"/"+l+"'>Info page</a>",a[e]=R}""!=a[e]?"Errata"==u[e]?h+=`<dt>More info:</dt><dd>${a[e]}</dd>`:h+=`<dt>${u[e]}:</dt><dd>${a[e]}</dd>`:"Errata"==u[e]&&(h+=`<dt>More info:</dt><dd>${a[e]}</dd>`)}),h+="</dl>",e.innerHTML=h}catch(e){console.log(e)}else console.log("Could not locate metadata <div> element");function r(e){return e.charAt(0).toUpperCase()+e.slice(1)}}window.removeEventListener("load",addMetadata),window.addEventListener("load",addMetadata);</script>
+</head>
+<body class="xml2rfc">
+<script src="metadata.min.js"></script>
+<table class="ears">
+<thead><tr>
+<td class="left"></td>
+<td class="center">CLACKS protocol</td>
+<td class="right">January 2026</td>
+</tr></thead>
+<tfoot><tr>
+<td class="left">Schickbauer</td>
+<td class="center">Informational</td>
+<td class="right">[Page]</td>
+</tr></tfoot>
+</table>
+<div id="external-metadata" class="document-information"></div>
+<div id="internal-metadata" class="document-information">
+<dl id="identifiers">
+<dt class="label-published">Published:</dt>
+<dd class="published">
+<time datetime="2026-01-15" class="published">15 January 2026</time>
+    </dd>
+<dt class="label-authors">Author:</dt>
+<dd class="authors">
+<div class="author">
+      <div class="author-name">R. Schickbauer</div>
+<div class="org">cavac.at</div>
+</div>
+</dd>
+</dl>
+</div>
+<h1 id="title">CLACKS interprocess messaging protocol</h1>
+<section id="section-abstract">
+      <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
+<p id="section-abstract-1">CLACKS interprocess messaging is an asyncronous protocol used in various web- and homeautomation applications.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-2">
+          The protocol implements real-time signalling and data caching. It also implements a master/slave mode for distributed servers
+          for load balancing and reducing network load between internet hosts.<a href="#section-abstract-2" class="pilcrow">¶</a></p>
+</section>
+<div id="toc">
+<section id="section-toc.1">
+        <a href="#" onclick="scroll(0,0)" class="toplink">▲</a><h2 id="name-table-of-contents">
+<a href="#name-table-of-contents" class="section-name selfRef">Table of Contents</a>
+        </h2>
+<nav class="toc"><ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1">
+            <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.1.2.1">
+                <p id="section-toc.1-1.1.2.1.1" class="keepWithNext"><a href="#section-1.1" class="auto internal xref">1.1</a>.  <a href="#name-requirements-language" class="internal xref">Requirements Language</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
+            <p id="section-toc.1-1.2.1"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-technical-terms" class="internal xref">Technical terms</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.1">
+                <p id="section-toc.1-1.2.2.1.1" class="keepWithNext"><a href="#section-2.1" class="auto internal xref">2.1</a>.  <a href="#name-signal" class="internal xref">Signal</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.2">
+                <p id="section-toc.1-1.2.2.2.1"><a href="#section-2.2" class="auto internal xref">2.2</a>.  <a href="#name-overhead" class="internal xref">Overhead</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.3">
+                <p id="section-toc.1-1.2.2.3.1"><a href="#section-2.3" class="auto internal xref">2.3</a>.  <a href="#name-cache" class="internal xref">Cache</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.4">
+                <p id="section-toc.1-1.2.2.4.1"><a href="#section-2.4" class="auto internal xref">2.4</a>.  <a href="#name-interclacks" class="internal xref">Interclacks</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2.2.5">
+                <p id="section-toc.1-1.2.2.5.1"><a href="#section-2.5" class="auto internal xref">2.5</a>.  <a href="#name-variables" class="internal xref">Variables</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
+            <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-protocol-overview" class="internal xref">Protocol overview</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1">
+                <p id="section-toc.1-1.3.2.1.1"><a href="#section-3.1" class="auto internal xref">3.1</a>.  <a href="#name-transport-layers" class="internal xref">Transport layers</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1.2.1">
+                    <p id="section-toc.1-1.3.2.1.2.1.1"><a href="#section-3.1.1" class="auto internal xref">3.1.1</a>.  <a href="#name-tcp" class="internal xref">TCP</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1.2.2">
+                    <p id="section-toc.1-1.3.2.1.2.2.1"><a href="#section-3.1.2" class="auto internal xref">3.1.2</a>.  <a href="#name-unix-domain-sockets" class="internal xref">Unix Domain Sockets</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.1.2.3">
+                    <p id="section-toc.1-1.3.2.1.2.3.1"><a href="#section-3.1.3" class="auto internal xref">3.1.3</a>.  <a href="#name-point-to-point-links" class="internal xref">Point-to-Point links</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.2">
+                <p id="section-toc.1-1.3.2.2.1"><a href="#section-3.2" class="auto internal xref">3.2</a>.  <a href="#name-line-breaks" class="internal xref">Line breaks</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.3">
+                <p id="section-toc.1-1.3.2.3.1"><a href="#section-3.3" class="auto internal xref">3.3</a>.  <a href="#name-asyncronous-behaviour" class="internal xref">Asyncronous behaviour</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.4">
+                <p id="section-toc.1-1.3.2.4.1"><a href="#section-3.4" class="auto internal xref">3.4</a>.  <a href="#name-units-and-measurements" class="internal xref">Units and measurements</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.5">
+                <p id="section-toc.1-1.3.2.5.1"><a href="#section-3.5" class="auto internal xref">3.5</a>.  <a href="#name-value-encoding" class="internal xref">Value encoding</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.5.2.1">
+                    <p id="section-toc.1-1.3.2.5.2.1.1"><a href="#section-3.5.1" class="auto internal xref">3.5.1</a>.  <a href="#name-multi-line-string-values" class="internal xref">Multi-line string values</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3.2.5.2.2">
+                    <p id="section-toc.1-1.3.2.5.2.2.1"><a href="#section-3.5.2" class="auto internal xref">3.5.2</a>.  <a href="#name-complex-data-structures" class="internal xref">Complex data structures</a></p>
+</li>
+                </ul>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-commands" class="internal xref">Commands</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
+                <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-session-initiation" class="internal xref">Session initiation</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1.2.1">
+                    <p id="section-toc.1-1.4.2.1.2.1.1"><a href="#section-4.1.1" class="auto internal xref">4.1.1</a>.  <a href="#name-clacks-software-identificat" class="internal xref">CLACKS software-identification</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2">
+                <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-system-commands" class="internal xref">System commands</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.1">
+                    <p id="section-toc.1-1.4.2.2.2.1.1"><a href="#section-4.2.1" class="auto internal xref">4.2.1</a>.  <a href="#name-overhead-flags-data-string" class="internal xref">OVERHEAD flags data-string</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.2">
+                    <p id="section-toc.1-1.4.2.2.2.2.1"><a href="#section-4.2.2" class="auto internal xref">4.2.2</a>.  <a href="#name-ping" class="internal xref">PING</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.3">
+                    <p id="section-toc.1-1.4.2.2.2.3.1"><a href="#section-4.2.3" class="auto internal xref">4.2.3</a>.  <a href="#name-noping" class="internal xref">NOPING</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.4">
+                    <p id="section-toc.1-1.4.2.2.2.4.1"><a href="#section-4.2.4" class="auto internal xref">4.2.4</a>.  <a href="#name-timeout" class="internal xref">TIMEOUT</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.5">
+                    <p id="section-toc.1-1.4.2.2.2.5.1"><a href="#section-4.2.5" class="auto internal xref">4.2.5</a>.  <a href="#name-quit" class="internal xref">QUIT</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.6">
+                    <p id="section-toc.1-1.4.2.2.2.6.1"><a href="#section-4.2.6" class="auto internal xref">4.2.6</a>.  <a href="#name-nop" class="internal xref">NOP</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.7">
+                    <p id="section-toc.1-1.4.2.2.2.7.1"><a href="#section-4.2.7" class="auto internal xref">4.2.7</a>.  <a href="#name-monitor" class="internal xref">MONITOR</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.8">
+                    <p id="section-toc.1-1.4.2.2.2.8.1"><a href="#section-4.2.8" class="auto internal xref">4.2.8</a>.  <a href="#name-unmonitor" class="internal xref">UNMONITOR</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.9">
+                    <p id="section-toc.1-1.4.2.2.2.9.1"><a href="#section-4.2.9" class="auto internal xref">4.2.9</a>.  <a href="#name-debug-value" class="internal xref">DEBUG value</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.10">
+                    <p id="section-toc.1-1.4.2.2.2.10.1"><a href="#section-4.2.10" class="auto internal xref">4.2.10</a>. <a href="#name-keysync-cachetime-accesstim" class="internal xref">KEYSYNC cachetime accesstime mode variable=value</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.11">
+                    <p id="section-toc.1-1.4.2.2.2.11.1"><a href="#section-4.2.11" class="auto internal xref">4.2.11</a>. <a href="#name-flush-value" class="internal xref">FLUSH value</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.11.2.1">
+                        <p id="section-toc.1-1.4.2.2.2.11.2.1.1"><a href="#section-4.2.11.1" class="auto internal xref">4.2.11.1</a>.  <a href="#name-flushed-value" class="internal xref">FLUSHED value</a></p>
+</li>
+                    </ul>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.12">
+                    <p id="section-toc.1-1.4.2.2.2.12.1"><a href="#section-4.2.12" class="auto internal xref">4.2.12</a>. <a href="#name-clientlist" class="internal xref">CLIENTLIST</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.12.2.1">
+                        <p id="section-toc.1-1.4.2.2.2.12.2.1.1"><a href="#section-4.2.12.1" class="auto internal xref">4.2.12.1</a>.  <a href="#name-clientliststart" class="internal xref">CLIENTLISTSTART</a></p>
+</li>
+                      <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.12.2.2">
+                        <p id="section-toc.1-1.4.2.2.2.12.2.2.1"><a href="#section-4.2.12.2" class="auto internal xref">4.2.12.2</a>.  <a href="#name-client-keyvaluekeyvalue" class="internal xref">CLIENT key=value;key=value;...</a></p>
+</li>
+                      <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.12.2.3">
+                        <p id="section-toc.1-1.4.2.2.2.12.2.3.1"><a href="#section-4.2.12.3" class="auto internal xref">4.2.12.3</a>.  <a href="#name-clientlistend" class="internal xref">CLIENTLISTEND</a></p>
+</li>
+                    </ul>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.2.2.13">
+                    <p id="section-toc.1-1.4.2.2.2.13.1"><a href="#section-4.2.13" class="auto internal xref">4.2.13</a>. <a href="#name-clientdisconnect-client-id" class="internal xref">CLIENTDISCONNECT client-id</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
+                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-instant-communication" class="internal xref">Instant communication</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3.2.1">
+                    <p id="section-toc.1-1.4.2.3.2.1.1"><a href="#section-4.3.1" class="auto internal xref">4.3.1</a>.  <a href="#name-listen-variable" class="internal xref">LISTEN variable</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3.2.2">
+                    <p id="section-toc.1-1.4.2.3.2.2.1"><a href="#section-4.3.2" class="auto internal xref">4.3.2</a>.  <a href="#name-unlisten-variable" class="internal xref">UNLISTEN variable</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3.2.3">
+                    <p id="section-toc.1-1.4.2.3.2.3.1"><a href="#section-4.3.3" class="auto internal xref">4.3.3</a>.  <a href="#name-notify-variable" class="internal xref">NOTIFY variable</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3.2.4">
+                    <p id="section-toc.1-1.4.2.3.2.4.1"><a href="#section-4.3.4" class="auto internal xref">4.3.4</a>.  <a href="#name-set-variablevalue" class="internal xref">SET variable=value</a></p>
+</li>
+                </ul>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4">
+                <p id="section-toc.1-1.4.2.4.1"><a href="#section-4.4" class="auto internal xref">4.4</a>.  <a href="#name-caching" class="internal xref">Caching</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4.2.1">
+                    <p id="section-toc.1-1.4.2.4.2.1.1"><a href="#section-4.4.1" class="auto internal xref">4.4.1</a>.  <a href="#name-store-variablevalue" class="internal xref">STORE variable=value</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4.2.2">
+                    <p id="section-toc.1-1.4.2.4.2.2.1"><a href="#section-4.4.2" class="auto internal xref">4.4.2</a>.  <a href="#name-remove-variable" class="internal xref">REMOVE variable</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4.2.3">
+                    <p id="section-toc.1-1.4.2.4.2.3.1"><a href="#section-4.4.3" class="auto internal xref">4.4.3</a>.  <a href="#name-retrieve-variable" class="internal xref">RETRIEVE variable</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4.2.3.2.1">
+                        <p id="section-toc.1-1.4.2.4.2.3.2.1.1"><a href="#section-4.4.3.1" class="auto internal xref">4.4.3.1</a>.  <a href="#name-retrieved-variablevalue" class="internal xref">RETRIEVED variable=value</a></p>
+</li>
+                      <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4.2.3.2.2">
+                        <p id="section-toc.1-1.4.2.4.2.3.2.2.1"><a href="#section-4.4.3.2" class="auto internal xref">4.4.3.2</a>.  <a href="#name-notretrieved-variable" class="internal xref">NOTRETRIEVED variable</a></p>
+</li>
+                    </ul>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4.2.4">
+                    <p id="section-toc.1-1.4.2.4.2.4.1"><a href="#section-4.4.4" class="auto internal xref">4.4.4</a>.  <a href="#name-increment-variablevalue" class="internal xref">INCREMENT variable=value</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4.2.5">
+                    <p id="section-toc.1-1.4.2.4.2.5.1"><a href="#section-4.4.5" class="auto internal xref">4.4.5</a>.  <a href="#name-decrement-variablevalue" class="internal xref">DECREMENT variable=value</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4.2.6">
+                    <p id="section-toc.1-1.4.2.4.2.6.1"><a href="#section-4.4.6" class="auto internal xref">4.4.6</a>.  <a href="#name-setandstore-variablevalue" class="internal xref">SETANDSTORE variable=value</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4.2.7">
+                    <p id="section-toc.1-1.4.2.4.2.7.1"><a href="#section-4.4.7" class="auto internal xref">4.4.7</a>.  <a href="#name-keylist" class="internal xref">KEYLIST</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4.2.7.2.1">
+                        <p id="section-toc.1-1.4.2.4.2.7.2.1.1"><a href="#section-4.4.7.1" class="auto internal xref">4.4.7.1</a>.  <a href="#name-keyliststart" class="internal xref">KEYLISTSTART</a></p>
+</li>
+                      <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4.2.7.2.2">
+                        <p id="section-toc.1-1.4.2.4.2.7.2.2.1"><a href="#section-4.4.7.2" class="auto internal xref">4.4.7.2</a>.  <a href="#name-key-variable" class="internal xref">KEY variable</a></p>
+</li>
+                      <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4.2.7.2.3">
+                        <p id="section-toc.1-1.4.2.4.2.7.2.3.1"><a href="#section-4.4.7.3" class="auto internal xref">4.4.7.3</a>.  <a href="#name-keylistend" class="internal xref">KEYLISTEND</a></p>
+</li>
+                    </ul>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4.2.8">
+                    <p id="section-toc.1-1.4.2.4.2.8.1"><a href="#section-4.4.8" class="auto internal xref">4.4.8</a>.  <a href="#name-clearcache" class="internal xref">CLEARCACHE</a></p>
+</li>
+                </ul>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-reference-implementation" class="internal xref">Reference implementation</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-dedication" class="internal xref">Dedication</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
+                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
+                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-authors-address" class="internal xref">Author's Address</a></p>
+</li>
+        </ul>
+</nav>
+</section>
+</div>
+<section id="section-1">
+      <h2 id="name-introduction">
+<a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
+      </h2>
+<p id="section-1-1">
+              For many distributed applications there exists a requirement for fire-and-forget messaging between processes and/or devices in order to communicate state changes,
+              events and changed settings. CLACKS is designed to provide a number of different signals to fill those needs as well as provide hub-and-spoke routing through 
+              its interclacks mode.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<section id="section-1.1">
+        <h3 id="name-requirements-language">
+<a href="#section-1.1" class="section-number selfRef">1.1. </a><a href="#name-requirements-language" class="section-name selfRef">Requirements Language</a>
+        </h3>
+<p id="section-1.1-1">The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+       "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+       document are to be interpreted as described in <span><a href="#RFC2119" class="internal xref">RFC 2119</a> [<a href="#RFC2119" class="cite xref">RFC2119</a>]</span>.<a href="#section-1.1-1" class="pilcrow">¶</a></p>
+</section>
+</section>
+<section id="section-2">
+      <h2 id="name-technical-terms">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-technical-terms" class="section-name selfRef">Technical terms</a>
+      </h2>
+<p id="section-2-1">This section gives a short explanation of the technical terms used in the CLACKS protocol.<a href="#section-2-1" class="pilcrow">¶</a></p>
+<section id="section-2.1">
+        <h3 id="name-signal">
+<a href="#section-2.1" class="section-number selfRef">2.1. </a><a href="#name-signal" class="section-name selfRef">Signal</a>
+        </h3>
+<p id="section-2.1-1">A signal is an information that is sent asyncronous to all clients listening for it, of either an event, a value change or an
+                information about a previously stored value. Examples of these would be "Event 7 has happened" or "Sensor 12 value is 127"<a href="#section-2.1-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-2.2">
+        <h3 id="name-overhead">
+<a href="#section-2.2" class="section-number selfRef">2.2. </a><a href="#name-overhead" class="section-name selfRef">Overhead</a>
+        </h3>
+<p id="section-2.2-1">
+                Overhead are signals exchanged between servers or a server and a client library that, in most cases, has no direct implication for a
+                client application. These include keep alive packets, interclacks syncronizations, authentication, test messages and error messages,
+                among others.<a href="#section-2.2-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-2.3">
+        <h3 id="name-cache">
+<a href="#section-2.3" class="section-number selfRef">2.3. </a><a href="#name-cache" class="section-name selfRef">Cache</a>
+        </h3>
+<p id="section-2.3-1">
+                The Clacks cache is a storage for values in clacks servers. This cache is syncronized via interclacks links between clacks servers. The cache
+                also implements vary basic mathematical functions (increment, decrement), so cached variables can act as asyncronous counters.<a href="#section-2.3-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-2.4">
+        <h3 id="name-interclacks">
+<a href="#section-2.4" class="section-number selfRef">2.4. </a><a href="#name-interclacks" class="section-name selfRef">Interclacks</a>
+        </h3>
+<p id="section-2.4-1">
+                This is a special mode of clacks links that enables multiple servers in a master/slave configuration to participate in the same clacks network.
+                This is useful for load sharing. It is also very useful for running different servers with a limited bandwidth between them, as all
+                clients only connect to their local node and there is only a single link sharing data between those servers.<a href="#section-2.4-1" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-2.4-2">
+<pre>
+
+       +----------+           +----------+
+       |          |Interclacks|          |
+       | Server A +-----------+ Server B |
+       |          |           |          |
+       +-+------+-+           +-+------+-+
+         |      |               |      |
+         |      |               |      |
+   +-----+--+ +-+------+  +-----+--+ +-+------+
+   |Client 1| |Client 2|  |Client 3| |Client 4|
+   +--------+ +--------+  +--------+ +--------+
+</pre><a href="#section-2.4-2" class="pilcrow">¶</a>
+</div>
+</section>
+<section id="section-2.5">
+        <h3 id="name-variables">
+<a href="#section-2.5" class="section-number selfRef">2.5. </a><a href="#name-variables" class="section-name selfRef">Variables</a>
+        </h3>
+<p id="section-2.5-1">
+                Variables are the names (keys) for notifications, value-transmitting signals and data stored in the clacks cache. Variables may only contain letters, numbers and colons. It is RECOMMENDED that logical
+                parts of the variable names (e.g. variables for sub-systems) be separated by double-colons. Variable names <span class="bcp14">MUST NOT</span> contain spaces or euqal signs ("="). Examples would be "Sensor17" and "Kitchen::Sensorbox2::Temperature".<a href="#section-2.5-1" class="pilcrow">¶</a></p>
+</section>
+</section>
+<section id="section-3">
+      <h2 id="name-protocol-overview">
+<a href="#section-3" class="section-number selfRef">3. </a><a href="#name-protocol-overview" class="section-name selfRef">Protocol overview</a>
+      </h2>
+<p id="section-3-1">
+            CLACKS is designed to be asyncronous for the client in order to limit delays introduced by the network and server side processing. Some operations like fetching stored values MAY be processed by 
+            the client as syncronous operations. Servers process any messages in the order of arrival except when an interclacks lock is active during syncronization of clacks servers.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-2">
+            By default, TLS encryption and authentication is rquired, but TLS can be seen as OPTIONAL under specific circumstances if other methods of protecting communication are provided,
+            for example running a unix-domain-sockets network only or for point-to-point links that are physically secured. These circumstances must be evaluated before deploying a less secure CLACKS network.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<p id="section-3-3">
+            The protocol is a server/client protocol. The interclacks OVERHEAD commands allow a master/slave architecture of servers. This interclacks mode allows for handling local connections 
+            (Unix Domain Sockets, Point-to-Point links) over multiple devices as well as limiting the number of connections a single server has to handle.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-4">
+            For ease of implementation, the protocol is designed entirely in plaintext, Unicode in UTF-8 encoding <span class="bcp14">SHOULD</span> be supported by all systems. Binary data <span class="bcp14">MUST</span> be encoded in Base64.<a href="#section-3-4" class="pilcrow">¶</a></p>
+<section id="section-3.1">
+        <h3 id="name-transport-layers">
+<a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-transport-layers" class="section-name selfRef">Transport layers</a>
+        </h3>
+<p id="section-3.1-1">CLACKS is designed to allow different transport layers, depending on the application requirements. These can be combined as needed.<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<section id="section-3.1.1">
+          <h4 id="name-tcp">
+<a href="#section-3.1.1" class="section-number selfRef">3.1.1. </a><a href="#name-tcp" class="section-name selfRef">TCP</a>
+          </h4>
+<p id="section-3.1.1-1">TCP on port of 49888 is the default. This allows multiple hosts to communicate. TCP transport <span class="bcp14">MUST</span> use TLS encryption and <span class="bcp14">MUST</span> use Authentication.<a href="#section-3.1.1-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-3.1.2">
+          <h4 id="name-unix-domain-sockets">
+<a href="#section-3.1.2" class="section-number selfRef">3.1.2. </a><a href="#name-unix-domain-sockets" class="section-name selfRef">Unix Domain Sockets</a>
+          </h4>
+<p id="section-3.1.2-1">Transport over Unix Domain Sockets MAY disable encryption for faster communication and lower processor usage. It is RECOMMENDED that other access control methods (e.g. file permissions/access control lists) are used to limit access to the socket. Authentication <span class="bcp14">MUST</span> be used to further limit unauthorized access.<a href="#section-3.1.2-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-3.1.3">
+          <h4 id="name-point-to-point-links">
+<a href="#section-3.1.3" class="section-number selfRef">3.1.3. </a><a href="#name-point-to-point-links" class="section-name selfRef">Point-to-Point links</a>
+          </h4>
+<p id="section-3.1.3-1">
+                    Point-to-point links MAY be supported by CLACKS server to connect local devices through serial connections, point-to-point radio links and similar setups. This is to support embedded systems with very low processing power.
+                    For point-to-point links, TLS encryption is OPTIONAL, although authentication <span class="bcp14">MUST</span> still be implemented.<a href="#section-3.1.3-1" class="pilcrow">¶</a></p>
+</section>
+</section>
+<section id="section-3.2">
+        <h3 id="name-line-breaks">
+<a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-line-breaks" class="section-name selfRef">Line breaks</a>
+        </h3>
+<p id="section-3.2-1">Each command and response line <span class="bcp14">MUST</span> be ended by a linebreak consisting of the characters "carriage return" (ASCII 13) and "line feed" (ASCII 10).<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-3.3">
+        <h3 id="name-asyncronous-behaviour">
+<a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-asyncronous-behaviour" class="section-name selfRef">Asyncronous behaviour</a>
+        </h3>
+<p id="section-3.3-1">In this sample client/server session, the client (C) connects to the server (S), authenticates and retrieves the value for the variable X from clacks cache.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+<div class="sourcecode" id="section-3.3-2">
+<pre>
+C: CLACKS testclient
+S: CLACKS Server version 22
+S: OVERHEAD M Authentication required
+C: OVERHEAD A ZXhhbXBsZXVzZXI=:dW5zYWZlcGFzc3dvcmQ=
+S: OVERHEAD O Welcome!
+C: RETRIEVE X
+S: RETRIEVED X=12
+C: QUIT
+</pre><a href="#section-3.3-2" class="pilcrow">¶</a>
+</div>
+<p id="section-3.3-3">
+                It is important to note that, as an async protocol, both server and client can send at the same time, or even before an expected request has been recieved. For example, the client can send an authentication response before it has
+                recieved the authentication request by the server. It can even send the request to retrieve the data, but it still has to check the server responses in the correct order to know if the request worked as expected.<a href="#section-3.3-3" class="pilcrow">¶</a></p>
+<div class="sourcecode" id="section-3.3-4">
+<pre>
+C: CLACKS testclient
+C: OVERHEAD A ZXhhbXBsZXVzZXI=:dW5zYWZlcGFzc3dvcmQ=
+C: RETRIEVE X
+S: CLACKS Server version 22
+S: OVERHEAD M Authentication required
+S: OVERHEAD O Welcome!
+S: RETRIEVED X=12
+C: QUIT
+</pre><a href="#section-3.3-4" class="pilcrow">¶</a>
+</div>
+<p id="section-3.3-5">
+                In the same way, the client can request multiple retrievals at once, even sending requests to change the cached data inbetween.<a href="#section-3.3-5" class="pilcrow">¶</a></p>
+<div class="sourcecode" id="section-3.3-6">
+<pre>
+C: SET X=10
+C: RETRIEVE X
+C: INCREMENT X=2
+C: RETRIEVE X
+S: RETRIEVED X=10
+S: RETRIEVED X=12
+</pre><a href="#section-3.3-6" class="pilcrow">¶</a>
+</div>
+<p id="section-3.3-7">
+                This allows the protocol handlers to pack multiple requests/responses into a single network packet, reducing the roundtrip delay. For the last sample above, all four client commands can be packed
+                into a single packet, and the same is true for the server responses. Thus (in theory) reducing the network delay to a single roundtrip. The server still has to respond to each RETRIEVE request to
+                enable the client tracking the correct order of responses.<a href="#section-3.3-7" class="pilcrow">¶</a></p>
+<p id="section-3.3-8">
+                As the server potentially handles other clients that change the same stored value, a client <span class="bcp14">MUST</span> expect a value to change without actively changing it. This MAY happen even within the same response
+                network packet for multiple requests of the same variable.<a href="#section-3.3-8" class="pilcrow">¶</a></p>
+<div class="sourcecode" id="section-3.3-9">
+<pre>
+C: RETRIEVE X
+C: RETRIEVE X
+S: RETRIEVED X=10
+S: RETRIEVED X=12
+</pre><a href="#section-3.3-9" class="pilcrow">¶</a>
+</div>
+</section>
+<section id="section-3.4">
+        <h3 id="name-units-and-measurements">
+<a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-units-and-measurements" class="section-name selfRef">Units and measurements</a>
+        </h3>
+<p id="section-3.4-1">
+                To reduce problems with different measurement systems, all values send through clacks <span class="bcp14">MUST</span> conform to the metric system.<a href="#section-3.4-1" class="pilcrow">¶</a></p>
+<p id="section-3.4-2">
+                All timestamps be in UTC, either as unix epoch (seconds since "1970-01-01 00:00:00") or in the format "YYYY-MM-DD hh:mi:ss". When more precision is required,
+                the timestamp <span class="bcp14">MUST</span> be send as unix epoch with a decimal point.<a href="#section-3.4-2" class="pilcrow">¶</a></p>
+</section>
+<section id="section-3.5">
+        <h3 id="name-value-encoding">
+<a href="#section-3.5" class="section-number selfRef">3.5. </a><a href="#name-value-encoding" class="section-name selfRef">Value encoding</a>
+        </h3>
+<p id="section-3.5-1">
+                Since the CLACKS protocol uses line-based communication, values that contain line breaks (carriage return or line feed characters)
+                <span class="bcp14">MUST</span> be encoded before transmission. The reference implementation uses the following encoding scheme:<a href="#section-3.5-1" class="pilcrow">¶</a></p>
+<section id="section-3.5.1">
+          <h4 id="name-multi-line-string-values">
+<a href="#section-3.5.1" class="section-number selfRef">3.5.1. </a><a href="#name-multi-line-string-values" class="section-name selfRef">Multi-line string values</a>
+          </h4>
+<p id="section-3.5.1-1">
+                    Values containing newline characters are encoded using Base64 with a special prefix. The format is:<a href="#section-3.5.1-1" class="pilcrow">¶</a></p>
+<div class="sourcecode" id="section-3.5.1-2">
+<pre>
+PAGECAMELCLACKSB64:&lt;base64-encoded-data&gt;
+</pre><a href="#section-3.5.1-2" class="pilcrow">¶</a>
+</div>
+<p id="section-3.5.1-3">
+                    For example, a value containing "line1\nline2" would be encoded as:<a href="#section-3.5.1-3" class="pilcrow">¶</a></p>
+<div class="sourcecode" id="section-3.5.1-4">
+<pre>
+PAGECAMELCLACKSB64:bGluZTEKbGluZTI=
+</pre><a href="#section-3.5.1-4" class="pilcrow">¶</a>
+</div>
+<p id="section-3.5.1-5">
+                    The receiving client library <span class="bcp14">SHOULD</span> automatically detect this prefix and decode the value
+                    transparently, so the application receives the original multi-line string.<a href="#section-3.5.1-5" class="pilcrow">¶</a></p>
+</section>
+<section id="section-3.5.2">
+          <h4 id="name-complex-data-structures">
+<a href="#section-3.5.2" class="section-number selfRef">3.5.2. </a><a href="#name-complex-data-structures" class="section-name selfRef">Complex data structures</a>
+          </h4>
+<p id="section-3.5.2-1">
+                    Complex data structures (hashes, arrays, nested structures) are serialized to YAML format first,
+                    then Base64-encoded with a different prefix:<a href="#section-3.5.2-1" class="pilcrow">¶</a></p>
+<div class="sourcecode" id="section-3.5.2-2">
+<pre>
+PAGECAMELCLACKSYAMLB64:&lt;base64-encoded-yaml&gt;
+</pre><a href="#section-3.5.2-2" class="pilcrow">¶</a>
+</div>
+<p id="section-3.5.2-3">
+                    The receiving client library <span class="bcp14">SHOULD</span> detect this prefix, decode the Base64, parse the YAML,
+                    and return the reconstructed data structure to the application.<a href="#section-3.5.2-3" class="pilcrow">¶</a></p>
+<p id="section-3.5.2-4">
+                    Note: Storing values that begin with the literal string "PAGECAMELCLACKSB64" is not permitted,
+                    as this would be ambiguous with encoded values.<a href="#section-3.5.2-4" class="pilcrow">¶</a></p>
+</section>
+</section>
+</section>
+<section id="section-4">
+      <h2 id="name-commands">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-commands" class="section-name selfRef">Commands</a>
+      </h2>
+<section id="section-4.1">
+        <h3 id="name-session-initiation">
+<a href="#section-4.1" class="section-number selfRef">4.1. </a><a href="#name-session-initiation" class="section-name selfRef">Session initiation</a>
+        </h3>
+<p id="section-4.1-1">To initiate a connection, the first thing both sides send is a CLACKS command.<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<section id="section-4.1.1">
+          <h4 id="name-clacks-software-identificat">
+<a href="#section-4.1.1" class="section-number selfRef">4.1.1. </a><a href="#name-clacks-software-identificat" class="section-name selfRef">CLACKS software-identification</a>
+          </h4>
+<p id="section-4.1.1-1">
+                    The CLACKS command <span class="bcp14">MUST</span> be the first command sent when a connection is established. Failure to recieve a CLACKS command from the communication partner means that
+                        the other side is not running the clacks protocol and the connection <span class="bcp14">MUST</span> be closed.<a href="#section-4.1.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.1.1-2">
+                    The "software-identification" is an arbitrary string that gives information what software (and which version) is running. For clacks clients, this often includes an
+                    identification of the program program using a generic client library. This information is part of the CLIENTLIST server response and can be useful in monitoring
+                    specific programs.<a href="#section-4.1.1-2" class="pilcrow">¶</a></p>
+<p id="section-4.1.1-3">
+                    The "software-identification" string <span class="bcp14">MUST NOT</span> contain semicolons.<a href="#section-4.1.1-3" class="pilcrow">¶</a></p>
+<p id="section-4.1.1-4">
+                    Examples:<a href="#section-4.1.1-4" class="pilcrow">¶</a></p>
+<div class="sourcecode" id="section-4.1.1-5">
+<pre>
+CLACKS Net::Clacks Server Version 23
+</pre><a href="#section-4.1.1-5" class="pilcrow">¶</a>
+</div>
+<div class="sourcecode" id="section-4.1.1-6">
+<pre>
+CLACKS Homeautomation ZigBee Bridge
+</pre><a href="#section-4.1.1-6" class="pilcrow">¶</a>
+</div>
+</section>
+</section>
+<section id="section-4.2">
+        <h3 id="name-system-commands">
+<a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-system-commands" class="section-name selfRef">System commands</a>
+        </h3>
+<p id="section-4.2-1">This section lists commands required for authentification, monitoring, debugging and server managment.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+<section id="section-4.2.1">
+          <h4 id="name-overhead-flags-data-string">
+<a href="#section-4.2.1" class="section-number selfRef">4.2.1. </a><a href="#name-overhead-flags-data-string" class="section-name selfRef">OVERHEAD flags data-string</a>
+          </h4>
+<p id="section-4.2.1-1">
+                    The OVERHEAD command is used for system-level communication between clients and servers. It carries one or more single-letter flags
+                    followed by an optional data string. Multiple flags can be combined in a single command.<a href="#section-4.2.1-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.1-2">Available flags:<a href="#section-4.2.1-2" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.2.1-3.1">
+              <strong>A</strong> - Authentication token. The data-string contains base64-encoded credentials in the format "username:password".<a href="#section-4.2.1-3.1" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-4.2.1-3.2">
+              <strong>O</strong> - Authentication OK. Sent by server to confirm successful authentication.<a href="#section-4.2.1-3.2" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-4.2.1-3.3">
+              <strong>F</strong> - Authentication failed. Sent by server when authentication fails.<a href="#section-4.2.1-3.3" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-4.2.1-3.4">
+              <strong>E</strong> - Error message. Server to client error notification.<a href="#section-4.2.1-3.4" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-4.2.1-3.5">
+              <strong>M</strong> - Informal message. No operation required, used for human-readable status messages.<a href="#section-4.2.1-3.5" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-4.2.1-3.6">
+              <strong>C</strong> - Close all connections. Instructs the server to disconnect all clients.<a href="#section-4.2.1-3.6" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-4.2.1-3.7">
+              <strong>D</strong> - Discard message. The message should not be logged or forwarded.<a href="#section-4.2.1-3.7" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-4.2.1-3.8">
+              <strong>G</strong> - Forward message. The message should be forwarded to interclacks peers.<a href="#section-4.2.1-3.8" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-4.2.1-3.9">
+              <strong>I</strong> - Set interclacks mode. Value: 1 (enable) or 0 (disable). Enables server-to-server communication mode.<a href="#section-4.2.1-3.9" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-4.2.1-3.10">
+              <strong>L</strong> - Lock for sync. Value: 1 (lock) or 0 (unlock). Used during KEYSYNC to prevent data races.<a href="#section-4.2.1-3.10" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-4.2.1-3.11">
+              <strong>N</strong> - No logging. The message should not be logged (useful for sensitive data like credentials).<a href="#section-4.2.1-3.11" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-4.2.1-3.12">
+              <strong>S</strong> - Shutdown service. Value: number of seconds before shutdown. Requires manage permission.<a href="#section-4.2.1-3.12" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-4.2.1-3.13">
+              <strong>T</strong> - Timestamp. Used before KEYSYNC to calculate time offset between servers.<a href="#section-4.2.1-3.13" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-4.2.1-3.14">
+              <strong>U</strong> - Return to sender. The message should also be sent back to the originating client.<a href="#section-4.2.1-3.14" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-4.2.1-3.15">
+              <strong>Z</strong> - No flags. Placeholder when no other flags are set.<a href="#section-4.2.1-3.15" class="pilcrow">¶</a>
+</li>
+          </ul>
+<p id="section-4.2.1-4">Examples:<a href="#section-4.2.1-4" class="pilcrow">¶</a></p>
+<div class="sourcecode" id="section-4.2.1-5">
+<pre>
+OVERHEAD A dXNlcm5hbWU6cGFzc3dvcmQ=
+OVERHEAD O Welcome!
+OVERHEAD F Login failed!
+OVERHEAD M Authentication required
+OVERHEAD E unknown_command BADCMD
+OVERHEAD I 1
+OVERHEAD L 1
+</pre><a href="#section-4.2.1-5" class="pilcrow">¶</a>
+</div>
+</section>
+<section id="section-4.2.2">
+          <h4 id="name-ping">
+<a href="#section-4.2.2" class="section-number selfRef">4.2.2. </a><a href="#name-ping" class="section-name selfRef">PING</a>
+          </h4>
+<p id="section-4.2.2-1">
+                    Clients <span class="bcp14">MUST</span> send a PING command at least every 60 seconds. This shows the server that the client is still alive.
+                    The server <span class="bcp14">MAY</span> disconnect any client that has not sent any PING command within that timeout interval.<a href="#section-4.2.2-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.2-2">
+                    From experience, it is <span class="bcp14">RECOMMENDED</span> that the PING command is send from the main loop of the client, to check that the client
+                    is not stuck in a sub-program/function.<a href="#section-4.2.2-2" class="pilcrow">¶</a></p>
+</section>
+<section id="section-4.2.3">
+          <h4 id="name-noping">
+<a href="#section-4.2.3" class="section-number selfRef">4.2.3. </a><a href="#name-noping" class="section-name selfRef">NOPING</a>
+          </h4>
+<p id="section-4.2.3-1">
+                    Clients can send a NOPING command in cases when they may not be able to fullfill the 60 second timeout requirement. Examples of this
+                    would be waiting for user input or processing a large dataset.<a href="#section-4.2.3-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.3-2">
+                    When the server recieves a NOPING command, it <span class="bcp14">SHOULD</span> suspend timeout handling for that client until the next PING is recieved.<a href="#section-4.2.3-2" class="pilcrow">¶</a></p>
+</section>
+<section id="section-4.2.4">
+          <h4 id="name-timeout">
+<a href="#section-4.2.4" class="section-number selfRef">4.2.4. </a><a href="#name-timeout" class="section-name selfRef">TIMEOUT</a>
+          </h4>
+<p id="section-4.2.4-1">
+                    If the server detects a timeout condition, it sends a TIMEOUT command to the client and closes the connection.<a href="#section-4.2.4-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-4.2.5">
+          <h4 id="name-quit">
+<a href="#section-4.2.5" class="section-number selfRef">4.2.5. </a><a href="#name-quit" class="section-name selfRef">QUIT</a>
+          </h4>
+<p id="section-4.2.5-1">A client or server whishing to close a connection <span class="bcp14">MUST</span> try to send a QUIT command before disconnecting.<a href="#section-4.2.5-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-4.2.6">
+          <h4 id="name-nop">
+<a href="#section-4.2.6" class="section-number selfRef">4.2.6. </a><a href="#name-nop" class="section-name selfRef">NOP</a>
+          </h4>
+<p id="section-4.2.6-1">
+                    NOP is a No OPeration command. It <span class="bcp14">MUST</span> be ignored by the communication partner. This command <span class="bcp14">MAY</span> be used to
+                    fault conditions that require a network packet to be send. Examples of this include a network route becoming unavailble or a client loosing power.<a href="#section-4.2.6-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-4.2.7">
+          <h4 id="name-monitor">
+<a href="#section-4.2.7" class="section-number selfRef">4.2.7. </a><a href="#name-monitor" class="section-name selfRef">MONITOR</a>
+          </h4>
+<p id="section-4.2.7-1">
+                    The MONITOR command turns on server monitoring. The server <span class="bcp14">SHOULD</span> start sending implementation-specific DEBUG commands to the client,
+                    showing server activity, state changes and other information useful for debugging and monitoring the clacks server.<a href="#section-4.2.7-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-4.2.8">
+          <h4 id="name-unmonitor">
+<a href="#section-4.2.8" class="section-number selfRef">4.2.8. </a><a href="#name-unmonitor" class="section-name selfRef">UNMONITOR</a>
+          </h4>
+<p id="section-4.2.8-1">
+                    The UNMONITOR turns off server monitoring. The server <span class="bcp14">MUST</span> stop sending DEBUG commands to the client.<a href="#section-4.2.8-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-4.2.9">
+          <h4 id="name-debug-value">
+<a href="#section-4.2.9" class="section-number selfRef">4.2.9. </a><a href="#name-debug-value" class="section-name selfRef">DEBUG value</a>
+          </h4>
+<p id="section-4.2.9-1">
+                    The DEBUG command is used to sending implementation-specific server activity, state changes and other useful information to the client. Example:<a href="#section-4.2.9-1" class="pilcrow">¶</a></p>
+<div class="sourcecode" id="section-4.2.9-2">
+<pre>
+                    DEBUG CLIENT TestClient22 connected
+                    DEBUG Testclient22=SET X=22
+                    DEBUG TestClient22=RETRIEVE Y
+                    DEBUG TestClient22=PING
+                    DEBUG client TestClient22 disconnected
+                    DEBUG saving persistance file
+</pre><a href="#section-4.2.9-2" class="pilcrow">¶</a>
+</div>
+</section>
+<section id="section-4.2.10">
+          <h4 id="name-keysync-cachetime-accesstim">
+<a href="#section-4.2.10" class="section-number selfRef">4.2.10. </a><a href="#name-keysync-cachetime-accesstim" class="section-name selfRef">KEYSYNC cachetime accesstime mode variable=value</a>
+          </h4>
+<p id="section-4.2.10-1">
+                    The KEYSYNC command is used exclusively on interclacks links to synchronize cached data between servers.
+                    It is only valid after interclacks mode has been enabled via OVERHEAD I.<a href="#section-4.2.10-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.10-2">
+                    When an interclacks connection is established, the master server locks the slave (OVERHEAD L 1), sends its
+                    timestamp (OVERHEAD T), transmits all cached values via KEYSYNC commands, then unlocks the slave (OVERHEAD L 0).
+                    The slave then sends its cached values to the master in the same manner.<a href="#section-4.2.10-2" class="pilcrow">¶</a></p>
+<p id="section-4.2.10-3">Parameters:<a href="#section-4.2.10-3" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.2.10-4.1">
+              <strong>cachetime</strong> - Unix timestamp when the value was last modified.<a href="#section-4.2.10-4.1" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-4.2.10-4.2">
+              <strong>accesstime</strong> - Unix timestamp when the value was last accessed.<a href="#section-4.2.10-4.2" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-4.2.10-4.3">
+              <strong>mode</strong> - Either "S" (store/active) or "D" (deleted).<a href="#section-4.2.10-4.3" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-4.2.10-4.4">
+              <strong>variable</strong> - The cache key name.<a href="#section-4.2.10-4.4" class="pilcrow">¶</a>
+</li>
+            <li class="normal" id="section-4.2.10-4.5">
+              <strong>value</strong> - The cached data value.<a href="#section-4.2.10-4.5" class="pilcrow">¶</a>
+</li>
+          </ul>
+<p id="section-4.2.10-5">
+                    The receiving server compares the cachetime with its local copy. If the incoming cachetime is newer,
+                    the value is updated. This ensures that the most recent value wins in case of conflicts.<a href="#section-4.2.10-5" class="pilcrow">¶</a></p>
+<p id="section-4.2.10-6">Example:<a href="#section-4.2.10-6" class="pilcrow">¶</a></p>
+<div class="sourcecode" id="section-4.2.10-7">
+<pre>
+KEYSYNC 1704067200 1704067100 S sensor::temperature=21.5
+KEYSYNC 1704067000 1704066900 D old::deleted::key=
+</pre><a href="#section-4.2.10-7" class="pilcrow">¶</a>
+</div>
+</section>
+<section id="section-4.2.11">
+          <h4 id="name-flush-value">
+<a href="#section-4.2.11" class="section-number selfRef">4.2.11. </a><a href="#name-flush-value" class="section-name selfRef">FLUSH value</a>
+          </h4>
+<p id="section-4.2.11-1">
+                    The FLUSH command is used by a client or server to check when a communication partner has caught up with any previously sent commands,
+                    since many of them may not generate an answer. The communication partner <span class="bcp14">MUST</span> return a FLUSHED command with the same value.
+                    The value can be any arbitrary string.<a href="#section-4.2.11-1" class="pilcrow">¶</a></p>
+<section id="section-4.2.11.1">
+            <h5 id="name-flushed-value">
+<a href="#section-4.2.11.1" class="section-number selfRef">4.2.11.1. </a><a href="#name-flushed-value" class="section-name selfRef">FLUSHED value</a>
+            </h5>
+<p id="section-4.2.11.1-1">
+                        Upon reciept of a FLUSH command, a server or client <span class="bcp14">MUST</span> generate a FLUSHED command with the same value.<a href="#section-4.2.11.1-1" class="pilcrow">¶</a></p>
+</section>
+</section>
+<section id="section-4.2.12">
+          <h4 id="name-clientlist">
+<a href="#section-4.2.12" class="section-number selfRef">4.2.12. </a><a href="#name-clientlist" class="section-name selfRef">CLIENTLIST</a>
+          </h4>
+<p id="section-4.2.12-1">
+                    The CLIENTLIST command requests a list of all connected clients from the server. This command requires
+                    manage permission. The server responds with CLIENTLISTSTART, followed by zero or more CLIENT entries,
+                    followed by CLIENTLISTEND.<a href="#section-4.2.12-1" class="pilcrow">¶</a></p>
+<section id="section-4.2.12.1">
+            <h5 id="name-clientliststart">
+<a href="#section-4.2.12.1" class="section-number selfRef">4.2.12.1. </a><a href="#name-clientliststart" class="section-name selfRef">CLIENTLISTSTART</a>
+            </h5>
+<p id="section-4.2.12.1-1">Marks the beginning of the client list response.<a href="#section-4.2.12.1-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-4.2.12.2">
+            <h5 id="name-client-keyvaluekeyvalue">
+<a href="#section-4.2.12.2" class="section-number selfRef">4.2.12.2. </a><a href="#name-client-keyvaluekeyvalue" class="section-name selfRef">CLIENT key=value;key=value;...</a>
+            </h5>
+<p id="section-4.2.12.2-1">
+                        Each CLIENT line contains semicolon-separated key=value pairs describing one connected client.
+                        Available fields include:<a href="#section-4.2.12.2-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-4.2.12.2-2.1">
+                <strong>CID</strong> - Unique client identifier assigned by the server.<a href="#section-4.2.12.2-2.1" class="pilcrow">¶</a>
+</li>
+              <li class="normal" id="section-4.2.12.2-2.2">
+                <strong>HOST</strong> - Client's hostname or IP address.<a href="#section-4.2.12.2-2.2" class="pilcrow">¶</a>
+</li>
+              <li class="normal" id="section-4.2.12.2-2.3">
+                <strong>PORT</strong> - Client's source port number.<a href="#section-4.2.12.2-2.3" class="pilcrow">¶</a>
+</li>
+              <li class="normal" id="section-4.2.12.2-2.4">
+                <strong>CLIENTINFO</strong> - Software identification string from the client's CLACKS command.<a href="#section-4.2.12.2-2.4" class="pilcrow">¶</a>
+</li>
+              <li class="normal" id="section-4.2.12.2-2.5">
+                <strong>OUTBUFFER_LENGTH</strong> - Bytes pending in the output buffer for this client.<a href="#section-4.2.12.2-2.5" class="pilcrow">¶</a>
+</li>
+              <li class="normal" id="section-4.2.12.2-2.6">
+                <strong>INBUFFER_LENGTH</strong> - Bytes pending in the input buffer from this client.<a href="#section-4.2.12.2-2.6" class="pilcrow">¶</a>
+</li>
+              <li class="normal" id="section-4.2.12.2-2.7">
+                <strong>INTERCLACKS</strong> - 1 if this is an interclacks connection, 0 otherwise.<a href="#section-4.2.12.2-2.7" class="pilcrow">¶</a>
+</li>
+              <li class="normal" id="section-4.2.12.2-2.8">
+                <strong>MONITOR</strong> - 1 if monitor mode is enabled for this client, 0 otherwise.<a href="#section-4.2.12.2-2.8" class="pilcrow">¶</a>
+</li>
+              <li class="normal" id="section-4.2.12.2-2.9">
+                <strong>LASTPING</strong> - Unix timestamp of the last PING received from this client.<a href="#section-4.2.12.2-2.9" class="pilcrow">¶</a>
+</li>
+              <li class="normal" id="section-4.2.12.2-2.10">
+                <strong>LASTINTERCLACKSPING</strong> - Unix timestamp of the last interclacks ping.<a href="#section-4.2.12.2-2.10" class="pilcrow">¶</a>
+</li>
+            </ul>
+</section>
+<section id="section-4.2.12.3">
+            <h5 id="name-clientlistend">
+<a href="#section-4.2.12.3" class="section-number selfRef">4.2.12.3. </a><a href="#name-clientlistend" class="section-name selfRef">CLIENTLISTEND</a>
+            </h5>
+<p id="section-4.2.12.3-1">Marks the end of the client list response.<a href="#section-4.2.12.3-1" class="pilcrow">¶</a></p>
+</section>
+</section>
+<section id="section-4.2.13">
+          <h4 id="name-clientdisconnect-client-id">
+<a href="#section-4.2.13" class="section-number selfRef">4.2.13. </a><a href="#name-clientdisconnect-client-id" class="section-name selfRef">CLIENTDISCONNECT client-id</a>
+          </h4>
+<p id="section-4.2.13-1">
+                    The CLIENTDISCONNECT command forces the server to disconnect a specific client identified by its CID.
+                    This command requires manage permission. The server will attempt to send a QUIT message to the target
+                    client before closing the connection.<a href="#section-4.2.13-1" class="pilcrow">¶</a></p>
+<p id="section-4.2.13-2">Example:<a href="#section-4.2.13-2" class="pilcrow">¶</a></p>
+<div class="sourcecode" id="section-4.2.13-3">
+<pre>
+CLIENTDISCONNECT unixdomainsocket:1704067200.12345:67890
+</pre><a href="#section-4.2.13-3" class="pilcrow">¶</a>
+</div>
+</section>
+</section>
+<section id="section-4.3">
+        <h3 id="name-instant-communication">
+<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-instant-communication" class="section-name selfRef">Instant communication</a>
+        </h3>
+<p id="section-4.3-1">
+                This section lists commands for instant data communication. By default, the client is in "send-only" mode after establishing a connection and does not
+                recieve any NOTIFY and SET commands from the server. In CLACKS parlance, messages send via NOTIFY and SET are called "signals".<a href="#section-4.3-1" class="pilcrow">¶</a></p>
+<p id="section-4.3-2">
+                If a link is in interclacks mode (a link between two servers), all NOTIFY and SET commands <span class="bcp14">MUST</span> be forwarded by default and all LISTEN
+                and UNLISTEN commands <span class="bcp14">MUST</span> be ignored.<a href="#section-4.3-2" class="pilcrow">¶</a></p>
+<p id="section-4.3-3">
+                SET and NOTIFY are transmitted "in the blind" from client to server, meaning a client does not know if another client is LISTENing to that signal. The signal
+                if then processed by the server (or servers) and sent to any client listening to it. The signal <span class="bcp14">MUST NOT</span> be transmitted back to the original
+                sending client, even if it is listening for that signal name.<a href="#section-4.3-3" class="pilcrow">¶</a></p>
+<section id="section-4.3.1">
+          <h4 id="name-listen-variable">
+<a href="#section-4.3.1" class="section-number selfRef">4.3.1. </a><a href="#name-listen-variable" class="section-name selfRef">LISTEN variable</a>
+          </h4>
+<p id="section-4.3.1-1">
+                    The LISTEN command is used by a client to tell the server it wants to recieve any NOTIFY or SET commands send to the server that have the same variable name.
+                    The server <span class="bcp14">MUST</span> start forwarding any such messages to that client until it either recieves a matching UNLISTEN command or the client disconnects.<a href="#section-4.3.1-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-4.3.2">
+          <h4 id="name-unlisten-variable">
+<a href="#section-4.3.2" class="section-number selfRef">4.3.2. </a><a href="#name-unlisten-variable" class="section-name selfRef">UNLISTEN variable</a>
+          </h4>
+<p id="section-4.3.2-1">
+                    The UNLISTEN command is used a client to tell the server it wants to stop recieving NOTIFY and SET commands with the same variable name. The server <span class="bcp14">MUST</span> stop
+                    forwarding any such messages to that client.<a href="#section-4.3.2-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-4.3.3">
+          <h4 id="name-notify-variable">
+<a href="#section-4.3.3" class="section-number selfRef">4.3.3. </a><a href="#name-notify-variable" class="section-name selfRef">NOTIFY variable</a>
+          </h4>
+<p id="section-4.3.3-1">
+                    The NOTIFY command notifies a server or client that an event has happened. The NOTIFY command does not convey a value. For example, a time service might notify clients listening
+                    to a specific variable that the date has changed, so that they can run some daily tasks.<a href="#section-4.3.3-1" class="pilcrow">¶</a></p>
+<div class="sourcecode" id="section-4.3.3-2">
+<pre>
+NOTIFY Clock::DayChange
+</pre><a href="#section-4.3.3-2" class="pilcrow">¶</a>
+</div>
+</section>
+<section id="section-4.3.4">
+          <h4 id="name-set-variablevalue">
+<a href="#section-4.3.4" class="section-number selfRef">4.3.4. </a><a href="#name-set-variablevalue" class="section-name selfRef">SET variable=value</a>
+          </h4>
+<p id="section-4.3.4-1">
+                    The SET command notifies a server or client about a new value or reading. For example, a temperature sensor could broadcast a new reading:<a href="#section-4.3.4-1" class="pilcrow">¶</a></p>
+<div class="sourcecode" id="section-4.3.4-2">
+<pre>
+SET Kitchen::Temperature=21.8
+</pre><a href="#section-4.3.4-2" class="pilcrow">¶</a>
+</div>
+</section>
+</section>
+<section id="section-4.4">
+        <h3 id="name-caching">
+<a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-caching" class="section-name selfRef">Caching</a>
+        </h3>
+<p id="section-4.4-1">This section lists commands for caching.<a href="#section-4.4-1" class="pilcrow">¶</a></p>
+<section id="section-4.4.1">
+          <h4 id="name-store-variablevalue">
+<a href="#section-4.4.1" class="section-number selfRef">4.4.1. </a><a href="#name-store-variablevalue" class="section-name selfRef">STORE variable=value</a>
+          </h4>
+<p id="section-4.4.1-1">The STORE command stores a variable to the cache.<a href="#section-4.4.1-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-4.4.2">
+          <h4 id="name-remove-variable">
+<a href="#section-4.4.2" class="section-number selfRef">4.4.2. </a><a href="#name-remove-variable" class="section-name selfRef">REMOVE variable</a>
+          </h4>
+<p id="section-4.4.2-1">The REMOVE command deletes a variable from the cache.<a href="#section-4.4.2-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-4.4.3">
+          <h4 id="name-retrieve-variable">
+<a href="#section-4.4.3" class="section-number selfRef">4.4.3. </a><a href="#name-retrieve-variable" class="section-name selfRef">RETRIEVE variable</a>
+          </h4>
+<p id="section-4.4.3-1">The RETRIEVE command requests retrieval of a variable from the cache. The server <span class="bcp14">MUST</span> either reply with a RETRIEVED or a NOTRETRIEVED command.<a href="#section-4.4.3-1" class="pilcrow">¶</a></p>
+<section id="section-4.4.3.1">
+            <h5 id="name-retrieved-variablevalue">
+<a href="#section-4.4.3.1" class="section-number selfRef">4.4.3.1. </a><a href="#name-retrieved-variablevalue" class="section-name selfRef">RETRIEVED variable=value</a>
+            </h5>
+<p id="section-4.4.3.1-1">The server has found the variable in the cache with a value.<a href="#section-4.4.3.1-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-4.4.3.2">
+            <h5 id="name-notretrieved-variable">
+<a href="#section-4.4.3.2" class="section-number selfRef">4.4.3.2. </a><a href="#name-notretrieved-variable" class="section-name selfRef">NOTRETRIEVED variable</a>
+            </h5>
+<p id="section-4.4.3.2-1">The server has not found the variable.<a href="#section-4.4.3.2-1" class="pilcrow">¶</a></p>
+</section>
+</section>
+<section id="section-4.4.4">
+          <h4 id="name-increment-variablevalue">
+<a href="#section-4.4.4" class="section-number selfRef">4.4.4. </a><a href="#name-increment-variablevalue" class="section-name selfRef">INCREMENT variable=value</a>
+          </h4>
+<p id="section-4.4.4-1">
+                    This command is used to increment a variable with a given value. If the variable is not known to the server, it <span class="bcp14">MUST</span> be created with the value of
+                    zero before incrementing. If the variable is non-numeric, a conversion to a number <span class="bcp14">MUST</span> be attempted, defaulting to zero if conversion fails. The same
+                    conversion process is applied to the value in the increment command. The value in the increment command <span class="bcp14">MUST NOT</span> be empty.<a href="#section-4.4.4-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-4.4.5">
+          <h4 id="name-decrement-variablevalue">
+<a href="#section-4.4.5" class="section-number selfRef">4.4.5. </a><a href="#name-decrement-variablevalue" class="section-name selfRef">DECREMENT variable=value</a>
+          </h4>
+<p id="section-4.4.5-1">
+                    This command is used to decrement a variable with a given value. If the variable is not known to the server, it <span class="bcp14">MUST</span> be created with the value of
+                    zero before decrementing. If the variable is non-numeric, a conversion to a number <span class="bcp14">MUST</span> be attempted, defaulting to zero if conversion fails. The same
+                    conversion process is applied to the value in the decrement command. The value in the decrement command <span class="bcp14">MUST NOT</span> be empty.<a href="#section-4.4.5-1" class="pilcrow">¶</a></p>
+<p id="section-4.4.5-2"></p>
+</section>
+<section id="section-4.4.6">
+          <h4 id="name-setandstore-variablevalue">
+<a href="#section-4.4.6" class="section-number selfRef">4.4.6. </a><a href="#name-setandstore-variablevalue" class="section-name selfRef">SETANDSTORE variable=value</a>
+          </h4>
+<p id="section-4.4.6-1">
+                    The SETANDSTORE command is a compound of the SET and STORE command. It stores the given value in the given variable, but also forwards it as SET command to all clients.<a href="#section-4.4.6-1" class="pilcrow">¶</a></p>
+<p id="section-4.4.6-2">
+                    On interclacks links, the SETANDSTORE command is forwarded as such and <span class="bcp14">MUST NOT</span> be transmitted as separate SET and STORE commands.
+                    On client links, the SETANDSTORE command <span class="bcp14">MUST</span> only be transmitted SET command from servers to clients.<a href="#section-4.4.6-2" class="pilcrow">¶</a></p>
+<p id="section-4.4.6-3">
+                    The purpose of the compound SETANDSTORE command is to save bandwidth. It allows clients to SET and STORE a variable without transmitting it twice. The same applies to
+                    interclacks links.<a href="#section-4.4.6-3" class="pilcrow">¶</a></p>
+</section>
+<section id="section-4.4.7">
+          <h4 id="name-keylist">
+<a href="#section-4.4.7" class="section-number selfRef">4.4.7. </a><a href="#name-keylist" class="section-name selfRef">KEYLIST</a>
+          </h4>
+<p id="section-4.4.7-1">
+                    The KEYLIST command requests a list of all keys currently stored in the cache. This command requires
+                    read permission. The server responds with KEYLISTSTART, followed by zero or more KEY entries,
+                    followed by KEYLISTEND. Example response:<a href="#section-4.4.7-1" class="pilcrow">¶</a></p>
+<div class="sourcecode" id="section-4.4.7-2">
+<pre>
+KEYLISTSTART
+KEY sensor::temperature
+KEY sensor::humidity
+KEY config::update_interval
+KEYLISTEND
+</pre><a href="#section-4.4.7-2" class="pilcrow">¶</a>
+</div>
+<section id="section-4.4.7.1">
+            <h5 id="name-keyliststart">
+<a href="#section-4.4.7.1" class="section-number selfRef">4.4.7.1. </a><a href="#name-keyliststart" class="section-name selfRef">KEYLISTSTART</a>
+            </h5>
+<p id="section-4.4.7.1-1">Marks the beginning of the key list response.<a href="#section-4.4.7.1-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-4.4.7.2">
+            <h5 id="name-key-variable">
+<a href="#section-4.4.7.2" class="section-number selfRef">4.4.7.2. </a><a href="#name-key-variable" class="section-name selfRef">KEY variable</a>
+            </h5>
+<p id="section-4.4.7.2-1">Each KEY line contains a single variable name that exists in the cache.<a href="#section-4.4.7.2-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-4.4.7.3">
+            <h5 id="name-keylistend">
+<a href="#section-4.4.7.3" class="section-number selfRef">4.4.7.3. </a><a href="#name-keylistend" class="section-name selfRef">KEYLISTEND</a>
+            </h5>
+<p id="section-4.4.7.3-1">Marks the end of the key list response.<a href="#section-4.4.7.3-1" class="pilcrow">¶</a></p>
+</section>
+</section>
+<section id="section-4.4.8">
+          <h4 id="name-clearcache">
+<a href="#section-4.4.8" class="section-number selfRef">4.4.8. </a><a href="#name-clearcache" class="section-name selfRef">CLEARCACHE</a>
+          </h4>
+<p id="section-4.4.8-1">
+                    The CLEARCACHE command removes all entries from the server's cache. This command requires manage permission.
+                    Use with caution as this operation cannot be undone. On interclacks networks, the CLEARCACHE command
+                    is forwarded to peer servers, clearing the cache across the entire network.<a href="#section-4.4.8-1" class="pilcrow">¶</a></p>
+</section>
+</section>
+</section>
+<section id="section-5">
+      <h2 id="name-reference-implementation">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-reference-implementation" class="section-name selfRef">Reference implementation</a>
+      </h2>
+<p id="section-5-1">An open source reference implementation in Perl called <span><a href="#NetClacks" class="internal xref">Net::Clacks</a> [<a href="#NetClacks" class="cite xref">NetClacks</a>]</span> is available on MetaCPAN.<a href="#section-5-1" class="pilcrow">¶</a></p>
+</section>
+<section id="section-6">
+      <h2 id="name-dedication">
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-dedication" class="section-name selfRef">Dedication</a>
+      </h2>
+<p id="section-6-1">
+            The name of the protocol is a direct reference to the Discworld novel <span><a href="#GoingPostal" class="internal xref">"Going Postal"</a> [<a href="#GoingPostal" class="cite xref">GoingPostal</a>]</span> by Terry Pratchett.
+            In this book, the author describes an interconnected optical telegraph system for passing messages at high speed. The command OVERHEAD is named after a short
+            mentioning of "passing names in the overhead" in the story. This is done to keep the memory of those people alive.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<blockquote id="section-6-2">
+        <p id="section-6-2.1">“Do you not know that a man is not dead while his name is still spoken?”<a href="#section-6-2.1" class="pilcrow">¶</a></p>
+</blockquote>
+<p id="section-6-3">
+            The book mentions that the names are passed with the flags "GNU" (send message to next tower, don't log, turn around at the end). The clacks protocol defined in
+            this document offers compatibility with the description in the book, and it is possible to send the following command:<a href="#section-6-3" class="pilcrow">¶</a></p>
+<div class="sourcecode" id="section-6-4">
+<pre>
+OVERHEAD GNU Terry Pratchett
+</pre><a href="#section-6-4" class="pilcrow">¶</a>
+</div>
+</section>
+<section id="section-7">
+      <h2 id="name-references">
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-references" class="section-name selfRef">References</a>
+      </h2>
+<section id="section-7.1">
+        <h3 id="name-normative-references">
+<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+        </h3>
+<dl class="references">
+<dt id="RFC2119">[RFC2119]</dt>
+      <dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+<section id="section-7.2">
+        <h3 id="name-informative-references">
+<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+        </h3>
+<dl class="references">
+<dt id="GoingPostal">[GoingPostal]</dt>
+        <dd>
+<span class="refAuthor">Pratchett, T.</span>, <span class="refTitle">"Going Postal"</span>, <span class="seriesInfo">ISBN 0-385-60342-8</span>, <time datetime="2004" class="refDate">2004</time>. </dd>
+<dd class="break"></dd>
+<dt id="NetClacks">[NetClacks]</dt>
+      <dd>
+<span class="refAuthor">Schickbauer, R.</span>, <span class="refTitle">"Reference implementation of the Clacks protocol"</span>, <time datetime="2026" class="refDate">2026</time>, <span>&lt;<a href="https://metacpan.org/pod/Net::Clacks">https://metacpan.org/pod/Net::Clacks</a>&gt;</span>. </dd>
+<dd class="break"></dd>
+</dl>
+</section>
+</section>
+<div id="authors-addresses">
+<section id="appendix-A">
+      <h2 id="name-authors-address">
+<a href="#name-authors-address" class="section-name selfRef">Author's Address</a>
+      </h2>
+<address class="vcard">
+        <div dir="auto" class="left"><span class="fn nameRole">Rene Schickbauer</span></div>
+<div dir="auto" class="left"><span class="org">cavac.at</span></div>
+<div class="url">
+<span>URI:</span>
+<a href="https://cavac.at" class="url">https://cavac.at</a>
+</div>
+</address>
+</section>
+</div>
+<script>const toc = document.getElementById("toc");
+toc.querySelector("h2").addEventListener("click", e => {
+  toc.classList.toggle("active");
+});
+toc.querySelector("nav").addEventListener("click", e => {
+  toc.classList.remove("active");
+});
+</script>
+</body>
+</html>

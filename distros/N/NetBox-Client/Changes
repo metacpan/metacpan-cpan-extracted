@@ -1,5 +1,8 @@
 Revision history for perl module NetBox::API.
 
+0.2.0 Wed May  6 10:27:40 EEST 2025
+	- added v2 authorization token support;
+
 0.1.7 Fri Apr  3 14:27:55 EEST 2026
 	- fixed contents passing when updating objects;
 	- fixed booleans passing when updating objects.

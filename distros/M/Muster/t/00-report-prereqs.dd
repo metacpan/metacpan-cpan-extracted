@@ -41,6 +41,7 @@ do { my $x = {
                                       'Image::Magick' => '0',
                                       'Lingua::EN::Inflexion' => '0',
                                       'Lingua::EN::Titlecase' => '0',
+                                      'List::MoreUtils' => '0',
                                       'Math::Calc::Parser' => '0',
                                       'Module::Pluggable' => '0',
                                       'Mojo::Base' => '0',

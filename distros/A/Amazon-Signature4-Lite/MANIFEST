@@ -1,0 +1,10 @@
+ChangeLog
+lib/Amazon/Signature4/Lite.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+share/README.md
+t/00-amazon-signature4-lite.t
+t/01-signature4-lite.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

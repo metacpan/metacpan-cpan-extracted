@@ -1,4 +1,10 @@
 do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'ExtUtils::MakeMaker' => '7.22',
+                                    'Module::Metadata' => '1.000015'
+                                  }
+                  },
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0'
@@ -6,20 +12,42 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
+                                      'Dist::Zilla::Plugin::UsefulReadme' => 'v0.4.3',
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
                                       'Pod::Coverage::TrustPod' => '0',
+                                      'Pod::Markdown::Github' => '0',
+                                      'Pod::Wordlist' => '0',
+                                      'Software::Security::Policy::Individual' => '0.10',
+                                      'Test2::Require::AuthorTesting' => '0',
+                                      'Test2::Tools::Basic' => '1.302200',
+                                      'Test2::V0' => '0',
+                                      'Test::CPAN::Changes' => '0.19',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::CVE' => '0.11',
                                       'Test::CleanNamespaces' => '0.15',
+                                      'Test::DistManifest' => '0',
                                       'Test::EOF' => '0',
                                       'Test::EOL' => '0',
+                                      'Test::Fixme' => '0',
                                       'Test::Kwalitee' => '1.21',
                                       'Test::MinimumVersion' => '0',
-                                      'Test::More' => '0.88',
+                                      'Test::MixedScripts' => 'v0.3.0',
+                                      'Test::Mojibake' => '0',
+                                      'Test::More' => '0.96',
                                       'Test::NoTabs' => '0',
                                       'Test::Perl::Critic' => '0',
                                       'Test::Pod' => '1.41',
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Pod::LinkCheck' => '0',
                                       'Test::Portability::Files' => '0',
-                                      'Test::TrailingSpace' => '0.0203'
+                                      'Test::Spelling' => '0.17',
+                                      'Test::TrailingSpace' => '0.0203',
+                                      'Test::Vars' => '0',
+                                      'Test::Version' => '1',
+                                      'strict' => '0',
+                                      'warnings' => '0'
                                     }
                     },
        'runtime' => {
@@ -30,7 +58,7 @@ do { my $x = {
                                       'Catalyst' => '5.90123',
                                       'Moose::Role' => '0',
                                       'POSIX' => '0',
-                                      'Plack::Middleware::Statsd' => 'v0.6.0',
+                                      'Plack::Middleware::Statsd' => 'v0.9.0',
                                       'Ref::Util' => '0',
                                       'experimental' => '0',
                                       'namespace::autoclean' => '0',
@@ -46,17 +74,21 @@ do { my $x = {
                                    'Catalyst::Controller' => '0',
                                    'Catalyst::Test' => '0',
                                    'File::Spec' => '0',
-                                   'Module::Metadata' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Module::Metadata' => '1.000015',
                                    'Moo' => '0',
                                    'Moose' => '0',
                                    'Net::Statsd::Tiny' => 'v0.3.0',
                                    'Plack::Middleware::MethodOverride' => '0',
+                                   'Plack::Middleware::Statsd' => 'v0.9.0',
                                    'Term::Size::Any' => '0',
                                    'Test::Log::Dispatch' => '0',
                                    'Test::More' => '0',
                                    'Test::Most' => '0',
                                    'lib' => '0',
                                    'strict' => '0',
+                                   'version' => '0',
                                    'warnings' => '0'
                                  }
                  }

@@ -12,7 +12,6 @@ BEGIN
 BEGIN
 {
     use_ok( 'Locale::Unicode' ) || BAIL_OUT( 'Unable to load Locale::Unicode' );
-    use_ok( 'DateTime::Locale' ) || BAIL_OUT( "Cannot load DateTime::Locale" );
 };
 
 use strict;
@@ -146,9 +145,137 @@ can_ok( $loc, 'x0' );
 my $re;
 # NOTE: Using all locale codes provided by DateTime::Locale to test
 # From version 0.90 onward, the method 'codes' is available
-if( $DateTime::Locale::VERSION >= 0.90 )
+# if( $DateTime::Locale::VERSION >= 0.90 )
+# {
+#     my $codes = DateTime::Locale->codes;
+#     diag( "Found ", scalar( @$codes ), " locales." ) if( $DEBUG );
+#     foreach my $code ( @$codes )
+#     {
+#         $code = 'und' if( $code eq 'root' );
+#         $re = Locale::Unicode->matches( $code );
+#         diag( "Failed matching for locale '", ( $code // 'undef' ), "'" ) if( !defined( $re ) || ref( $re ) ne 'HASH' );
+#         ok( ( defined( $re ) && ref( $re ) eq 'HASH' && scalar( keys( %$re ) ) ), $code );
+#     }
+# }
+# 2026-05-19: DateTime::Locale comes with a lot of dependencies, some of which are not compatible with perl v5.10.1, so we store here the static list of locales
+# perl -MData::Pretty=dump -MDateTime::Locale -lE 'my $codes = DateTime::Locale->codes; say dump $codes'
+subtest 'Checking against a lot of possible locales' => sub
 {
-    my $codes = DateTime::Locale->codes;
+    # Extracted from DateTime::Locale to avoid dependency.
+    my $codes = [qw(
+        bal yrl-CO rw so-ET rwk-TZ ln-CD vai-Vaii-LR jv cch-NG
+        pa-Arab cy-GB es-NI fr-GA es-HN rm-CH ccp-BD es-GQ bss
+        fr-CM tpi-PG syr-IQ zh-Hans-MO sbp fr-CF nl-CW hi-IN
+        wae-CH fr-MF pt-GQ fr-GQ tzm ms-ID ca-IT su-Latn-ID om
+        ar moh-CA hi-Latn-IN ja dyo en-CC fr-BE az fr-BF bez-TZ
+        nv-US sma bgn kde-TZ pt-CH fr-CH ha-NE en-LS nr-ZA
+        ff-Adlm-BF kcg-NG en-ER en-AE bn-IN fr-WF io-001 fr-KM
+        tzm-MA oc-ES vai-Latn-LR ti-ET so-DJ sd-Deva-IN en-PR
+        nyn-UG mt mer-KE fr-TN ksf-CM mua pap-CW mai en-PK kk-KZ
+        ff-Adlm-SL lg vo cch mk-MK trv dyo-SN rhg-Rohg-BD ru-KG
+        smj-SE en-IL ug-CN ur-IN fr-TG bho mni-Beng ky ca-ES
+        es-VE ks-Arab-IN gl en-PG prg ff-Adlm-GM ko wo-SN
+        ff-Adlm-LR en-VC xog-UG uz-Cyrl en-MP brx-IN ar-SD es-DO
+        en-SB kam-KE asa-TZ kcg bem-ZM lag-TZ cgg en-BZ luo-KE
+        mn-Mong-MN gaa-GH en-PN brx en-BW ksb nyn en-MT en-150
+        it bm-Nkoo-ML scn osa-US km dav mgh-MZ ar-LY xh ak
+        ewo-CM fil kn ga-IE en-DG kkj th-TH cy ckb-IR bs ta-IN
+        quc-GT luy ckb-IQ en-FJ te-IN ar-EH tt ar-JO ms-Arab
+        fr-MA pa-Guru an-ES chr-US en-GD ff-Latn-BF mai-IN aa
+        fr-CA sg-CF en-TO xog co ms-Arab-MY bgn-OM lu kaj eu
+        en-MW shn fr-MQ vai-Vaii smn-FI fr-GF lt-LT be-BY st-LS
+        lb-LU bho-IN sr-Cyrl-ME cgg-UG gv-IM en-DK rof ebu bo-IN
+        vec-IT sk-SK nso-ZA naq mgo-CM fr-SN yo zh-Hant-TW
+        ms-Arab-BN ssy ff-Latn-SL az-Arab-IQ chr lv es-UY sw-CD
+        tk-TM ar-TD ii-CN zh-Hant-MO zu hnj-Hmnp-US ss mg-MG
+        fr-RW kaj-NG pl-PL szl en-Dsrt el-CY tt-RU mr-IN zh ee
+        ss-SZ dv-MV hnj-Hmnp ff-Latn-LR es-SV la vai-Latn ne-IN
+        zh-Hans-SG osa bo-CN sl my-MM ff-Latn-GM dua sat-Olck-IN
+        en-LR en-SE sma-SE es-PA shn-MM nb-SJ agq-CM en-GI
+        be-tarask en-VU ps-AF am-ET nb ha-Arab ken-CM no as vec
+        dz-BT sl-SI kl-GL sat-Olck en-WS ff-Adlm-GW pcm en-ZM
+        en-PW ln-AO en-BS byn-ER en-US jbo-001 ar-LB su en-NA
+        es-BO om-KE fr-SC ar-KM ha-Arab-SD si pt-MO kab sw-UG
+        quc it-VA ar-TN ar-001 sv-AX en-FK ee-GH en-LC gez-ET
+        en-CX ar-YE hi-Latn en-SH en-MS sc ti-ER ff-Adlm-NG be
+        es-CO ny st-ZA ba ff-Adlm-NE uz-Arab ebu-KE se vo-001
+        scn-IT es-PY en-MU bal-Latn-PK sid-ET pt sa fr el vun-TZ
+        ks-Arab io ak-GH syr es ksh-DE raj sd-Deva ha-Arab-NG
+        fr-HT ar-SS gd af-NA la-VA pcm-NG ksh nmg-CM cs-CZ
+        ff-Adlm kw-GB smj uz-Latn ccp-IN to ps-PK hsb nqo-GN
+        luy-KE rn so-SO hsb-DE sv mfe sq-MK tig trv-TW bal-Latn
+        ba-RU yav de-LU ga-GB rm en-FI dav-KE es-EA ts-ZA
+        rhg-Rohg-MM bgn-IR sk en-GG ar-BH en-Dsrt-US mn fo-DK
+        fr-TD luo ca-FR kgp da-DK qu-EC bg pt-ST de-IT vai kam
+        en-KN jmc ff-Latn-GW ccp en-BI el-polyton cic tok-001
+        es-PH de-LI ro nds-NL cad-US tn arn sms-FI gsw-CH fr-NC
+        oc-FR en-VG ta-LK vi-VN ff-Latn-NG rw-RW es-PE
+        ff-Latn-NE yrl-BR en-NF gez-ER mgh bm-Nkoo bas fr-PF haw
+        fi br rhg fr-PM en-ZA sr-Latn-ME or-IN pa-Guru-IN gu
+        mni-Beng-IN my hy km-KH mer bm-ML raj-IN jgo nnh-CM gv
+        ar-MA wbp-AU iu-Latn-CA ru-MD ms-BN sr fa trw gd-GB
+        id-ID iu-Latn ml-IN bal-Arab-PK haw-US pap ru-KZ he-IL
+        dsb-DE ses en-MG ckb dsb es-AR gsw-FR khq-ML sd-Arab-PK
+        ln-CG ast-ES ses-ML tpi wo pt-TL yo-NG en-MV ceb en-KI
+        en-GU is-IS cad khq bn-BD syr-SY ur-PK en-VI ee-TG ga
+        ar-IQ ve-ZA nn cic-US it-CH en-CK en-IN ff-Latn af-ZA
+        mas-TZ da-GL kea sg wal-ET bal-Arab sd kw en-UG nqo hu
+        bgn-AE sah en-GH nl-BE ko-KR seh ken se-NO sw-KE bm
+        sr-Cyrl-XK ar-MR tg agq ca-AD kl si-LK to-TO ky-KG
+        su-Latn ff-Latn-CM nus nl-SX bn ru ar-SY yue-Hant-HK ks
+        bs-Latn-BA nus-SS cho fo ig en-AT id smj-NO szl-PL fy
+        gsw-LI eo-001 shi-Tfng az-Cyrl fa-AF mi wa en-CA sat wae
+        en-GM mzn-IR shn-TH en-SI hi en-KY tr ann aa-ET
+        sr-Cyrl-BA ro-MD zh-Hant-HK lij-IT ny-MW en-FM ug kln-KE
+        en-SG fr-YT nb-NO ne-NP sc-IT pap-AW nso ff-Adlm-SN
+        it-SM ka-GE nmg ru-RU ms-MY nr co-FR ar-SA fr-GP tok ha
+        sq-AL hy-AM he ar-QA hnj ff-Adlm-GN cho-US shi-Latn
+        ms-SG nd zh-Hans-CN en-NU teo-KE trw-PK kpe-GN mk lg-UG
+        et-EE sn uz en-Shaw-GB en-CY es-ES ann-NG yi-001 ast
+        yav-CM yue-Hans-CN dz en-MY en-JM fur kpe-LR guz-KE
+        aa-DJ en-JE vun en-RW ur ff-Adlm-CM ln-CF kgp-BR tk
+        tg-TJ zu-ZA ss-ZA es-IC so sn-ZW en-CM ab-GE kab-DZ
+        nd-ZW mus ia mi-NZ az-Cyrl-AZ pt-GW fr-CD bs-Cyrl en-IM
+        en-SX frr-DE bas-CM es-GT en-CH saq-KE rhg-Rohg en-IE
+        mn-Mong-CN en-MH zh-Hans-HK fo-FO sd-Arab frr ssy-ER
+        en-SS az-Arab-TR yrl en-HK nl-BQ os en-BM ta jgo-CM
+        myv-RU en-BE nnh om-ET nn-NO te jmc-TZ en-UM ks-Deva
+        es-419 fy-NL sdh fr-MC kn-IN uz-Latn-UZ nl-AW sr-Latn-RS
+        iu mas tn-BW ar-OM sr-Latn gn moh ff-Latn-SN es-PR uk dv
+        pt-MZ en-GY fr-RE en-001 ti mdf-RU pt-LU gn-PY en-NR hr
+        jbo fr-LU mr sq-XK ki-KE mni-Mtei cs en-KE fr-BL nl-SR
+        ne ku-TR de xh-ZA de-DE da mus-US pl sms lt et en-TK lrc
+        bo es-CL mg twq ar-DZ lmo kea-CV en-TV kpe fr-ML en-NG
+        ps ar-DJ uz-Arab-AF nv nds ff es-BZ yue-Hant fil-PH dje
+        th nds-DE ff-Latn-GN fr-BJ sat-Deva os-RU ii kde
+        sr-Latn-XK uk-UA sw en-AI tr-TR bss-CM fi-FI bem wal
+        ig-NG bez ar-KW sat-Deva-IN arn-CL shi bs-Cyrl-BA ts
+        fr-BI ta-MY bgc tig-ER zgh-MA bgn-AF cv-RU de-AT hr-BA
+        mt-MT en-PH ta-SG cu en-Shaw lo eo fr-NE ro-RO lmo-IT lb
+        en-ZW as-IN twq-NE seh-MZ sbp-TZ rif-MA iu-CA doi dje-NE
+        ce-RU fr-CI yue-Hans en-TC mni-Mtei-IN ff-Adlm-GH rn-BI
+        az-Latn rwk is mas-KE en-GB yue mua-CM mn-Mong en-TZ
+        ca-ES-valencia zgh fr-CG pt-BR qu-PE und sr-Latn-BA asa
+        aa-ER yrl-VE ff-Adlm-MR br-FR ksf en-NL fr-MG sq lag
+        es-BR blt-VN cv st kok pa saq wa-BE teo-UG os-GE mni
+        es-EC byn zh-Hant az-Arab az-Arab-IR wbp oc nl mn-MN
+        fr-MR cu-RU sah-RU sa-IN mfe-MU rif en-NZ en-AG sma-NO
+        yo-BJ ha-NG lu-CD pt-CV mzn es-CR pa-Arab-PK gl-ES ab
+        ar-PS fr-SY ca ja-JP yi ce en-IO guz pt-AO shi-Tfng-MA
+        lij an ha-GH kk eu-ES zh-Hans de-BE ceb-PH fr-DZ fr-VU
+        en-TT es-US so-KE en-AS ru-BY tr-CY fr-DJ en-SD bgn-PK
+        bs-Latn az-Latn-AZ ia-001 af teo sw-TZ ko-KP or ewo
+        se-SE de-CH am ve kkj-CM gu-IN bg-BG ks-Deva-IN pis-SB
+        pis lrc-IQ pt-PT lrc-IR gaa prg-001 ff-Latn-GH ar-IL kln
+        fur-IT sid hr-HR es-MX sr-Cyrl-RS qu sv-SE uz-Cyrl-UZ
+        mdf ksb-TZ lkt en-SC kok-IN fr-FR ka en-MO gsw doi-IN
+        sv-FI el-GR mgo ar-AE es-CU en-BB lkt-US ar-ER lo-LA
+        sr-Cyrl smn en-SZ naq-NA hu-HU ff-Latn-MR shi-Latn-MA
+        apc-SY ru-UA fa-IR myv fr-MU ki en-DE en-DM ln ar-SO gez
+        en ar-EG ku en-AU ml se-FI jv-ID it-IT lv-LV en-SL
+        dua-CM ms tn-ZA fr-GN blt rof-TZ sdh-IR nl-NL qu-BO
+        sdh-IQ bgc-IN vi
+    )];
     diag( "Found ", scalar( @$codes ), " locales." ) if( $DEBUG );
     foreach my $code ( @$codes )
     {
@@ -157,7 +284,7 @@ if( $DateTime::Locale::VERSION >= 0.90 )
         diag( "Failed matching for locale '", ( $code // 'undef' ), "'" ) if( !defined( $re ) || ref( $re ) ne 'HASH' );
         ok( ( defined( $re ) && ref( $re ) eq 'HASH' && scalar( keys( %$re ) ) ), $code );
     }
-}
+};
 
 # NOTE: Various locales form test data
 my @tests = (

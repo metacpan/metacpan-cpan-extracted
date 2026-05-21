@@ -15,6 +15,16 @@
   # JSON文字列から
   my $q = JSON::LINQ->FromJSONString('[{"id":1},{"id":2}]');
 
+  # LTSVファイル（label:value、TAB区切り、ストリーミング）から
+  my $q = JSON::LINQ->FromLTSV('data.ltsv');
+
+  # CSVファイル（1行目をヘッダとして使用、ストリーミング）から
+  my $q = JSON::LINQ->FromCSV('data.csv');
+  my $q = JSON::LINQ->FromCSV('data.csv', sep => "\t");        # TSV
+  my $q = JSON::LINQ->FromCSV('f.csv', headers=>[qw(a b c)]); # ヘッダなし
+  my $q = JSON::LINQ->FromCSV('f.csv', headers=>[qw(a b c)],  # ヘッダ行をスキップ
+                               skip_header=>1);
+
   # ハッシュリファレンスの配列から（スカラーの配列も可）
   my $q = JSON::LINQ->From(\@array);
 
@@ -124,6 +134,35 @@
               orders => [ $i_group->ToArray() ] } }
   )
 
+  # JOIN: 主表JSON × 副表LTSV（部署マスター）
+  my $depts = JSON::LINQ->FromLTSV('departments.ltsv');
+  JSON::LINQ->FromJSON('employees.json')
+      ->Join($depts,
+          sub { $_[0]{dept_id} },
+          sub { $_[0]{id}      },
+          sub { { name => $_[0]{name}, dept => $_[1]{name} } })
+      ->ToArray();
+
+  # JOIN: 主表LTSV × 副表JSON（価格マスター）
+  my $prices = JSON::LINQ->FromJSON('prices.json');
+  JSON::LINQ->FromLTSV('orders.ltsv')
+      ->Join($prices,
+          sub { $_[0]{sku} },
+          sub { $_[0]{sku} },
+          sub { { order_id => $_[0]{id},
+                  amount   => $_[0]{qty} * $_[1]{price} } })
+      ->ToArray();
+
+  # JOIN: 主表CSV × 副表JSON（価格マスター）
+  my $prices = JSON::LINQ->FromJSON('prices.json');
+  JSON::LINQ->FromCSV('orders.csv')
+      ->Join($prices,
+          sub { $_[0]{sku} },
+          sub { $_[0]{sku} },
+          sub { { order_id => $_[0]{id},
+                  amount   => $_[0]{qty} * $_[1]{price} } })
+      ->ToArray();
+
 [ 9. 集計（終端メソッド） ]
 
   ->ToArray()                            # 全要素をPerl配列に収集
@@ -172,6 +211,14 @@
              sub { $_[0]{name} })
   ->ToJSON('output.json')               # JSON配列ファイルとして書き出す
   ->ToJSONL('output.jsonl')             # JSONLファイルとして書き出す
+  ->ToLTSV('output.ltsv')                        # LTSVファイルとして書き出す（全ラベル、アルファベット順）
+  ->ToLTSV('out.ltsv', label_order=>[qw(a b c)]) # 指定ラベルを指定順で出力
+  ->ToLTSV('out.ltsv', headers    =>[qw(a b c)]) # label_order の別名
+  ->ToCSV('output.csv')                                   # CSVファイルとして書き出す（全列、アルファベット順）
+  ->ToCSV('out.csv', headers    =>[qw(a b c)])            # 指定列を指定順で出力
+  ->ToCSV('out.csv', label_order=>[qw(a b c)])            # headers の別名
+  ->ToCSV('out.csv', sep=>"\t")                           # TSV出力
+  ->ToCSV('out.csv', no_header=>1)                        # ヘッダ行を出力しない
 
 [ 12. 真偽値 ]
 

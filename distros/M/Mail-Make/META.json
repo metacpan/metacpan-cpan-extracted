@@ -40,7 +40,7 @@
             "IPC::Run" : "20250809.0",
             "MIME::Base64" : "3.16",
             "MIME::QuotedPrint" : "3.16",
-            "Module::Generic" : "v1.2.2",
+            "Module::Generic" : "v1.4.0",
             "Net::SMTP" : "3.06",
             "URI::Escape::XS" : "0.14",
             "bytes" : "0",
@@ -64,13 +64,13 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://gitlab.com/jackdeguest/Mail-Make/issues"
+         "web" : "https://gitlab.com/deguest/Mail-Make/issues"
       },
       "repository" : {
          "type" : "git",
-         "web" : "https://gitlab.com/jackdeguest/Mail-Make"
+         "web" : "https://gitlab.com/deguest/Mail-Make"
       }
    },
-   "version" : "v0.22.0",
+   "version" : "v0.23.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -9,7 +9,7 @@ use parent 'Class::Accessor';
 use DateTime::Duration;
 use Travel::Status::DE::DBRIS::Location;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 Travel::Routing::DE::DBRIS::Connection::Segment->mk_ro_accessors(
 	qw(
@@ -49,18 +49,18 @@ sub new {
 
 	bless( $ref, $obj );
 
-	if ( my $ts = $json->{abfahrtsZeitpunkt} ) {
+	if ( my $ts = $json->{abfahrt}{sollzeit} ) {
 		$ref->{sched_dep} = $ref->parse_datetime( $strptime, $ts );
 	}
-	if ( my $ts = $json->{ezAbfahrtsZeitpunkt} ) {
+	if ( my $ts = $json->{abfahrt}{echtzeit} ) {
 		$ref->{rt_dep} = $ref->parse_datetime( $strptime, $ts );
 	}
 	$ref->{dep} = $ref->{rt_dep} // $ref->{sched_dep};
 
-	if ( my $ts = $json->{ankunftsZeitpunkt} ) {
+	if ( my $ts = $json->{ankunft}{sollzeit} ) {
 		$ref->{sched_arr} = $ref->parse_datetime( $strptime, $ts );
 	}
-	if ( my $ts = $json->{ezAnkunftsZeitpunkt} ) {
+	if ( my $ts = $json->{ankunft}{echtzeit} ) {
 		$ref->{rt_arr} = $ref->parse_datetime( $strptime, $ts );
 	}
 	$ref->{arr} = $ref->{rt_arr} // $ref->{sched_arr};

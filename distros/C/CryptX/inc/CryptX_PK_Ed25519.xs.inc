@@ -13,11 +13,13 @@ _new(Class)
         RETVAL->pindex = find_prng("chacha20");
         RETVAL->last_pid = (IV)PerlProc_getpid();
         if (RETVAL->pindex == -1) {
+          zeromem(RETVAL, sizeof(*RETVAL));
           Safefree(RETVAL);
           croak("FATAL: find_prng('chacha20') failed");
         }
         rv = rng_make_prng(320, RETVAL->pindex, &RETVAL->pstate, NULL); /* 320bits = 40bytes */
         if (rv != CRYPT_OK) {
+          zeromem(RETVAL, sizeof(*RETVAL));
           Safefree(RETVAL);
           croak("FATAL: rng_make_prng failed: %s", error_to_string(rv));
         }
@@ -218,19 +220,20 @@ export_key_der(Crypt::PK::Ed25519 self, char * type)
         unsigned long int out_len = sizeof(out);
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
-        if (strnEQ(type, "private", 7)) {
+        if (strEQ(type, "private")) {
           rv = ed25519_export(out, &out_len, PK_PRIVATE|PK_STD, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: ed25519_export(PK_PRIVATE|PK_STD) failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char*)out, out_len);
+          sv_setpvn(RETVAL, (char*)out, out_len);
         }
-        else if (strnEQ(type, "public", 6)) {
+        else if (strEQ(type, "public")) {
           rv = ed25519_export(out, &out_len, PK_PUBLIC|PK_STD, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: ed25519_export(PK_PUBLIC|PK_STD) failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char*)out, out_len);
+          sv_setpvn(RETVAL, (char*)out, out_len);
         }
         else {
           croak("FATAL: export_key_der invalid type '%s'", type);
         }
+        zeromem(out, sizeof(out));
     }
     OUTPUT:
         RETVAL
@@ -244,19 +247,20 @@ export_key_raw(Crypt::PK::Ed25519 self, char * type)
         unsigned long int out_len = sizeof(out);
 
         RETVAL = newSVpvn(NULL, 0); /* undef */
-        if (strnEQ(type, "private", 7)) {
+        if (strEQ(type, "private")) {
           rv = ed25519_export(out, &out_len, PK_PRIVATE, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: ed25519_export(PK_PRIVATE) failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char*)out, out_len);
+          sv_setpvn(RETVAL, (char*)out, out_len);
         }
-        else if (strnEQ(type, "public", 6)) {
+        else if (strEQ(type, "public")) {
           rv = ed25519_export(out, &out_len, PK_PUBLIC, &self->key);
           if (rv != CRYPT_OK) croak("FATAL: ed25519_export(PK_PUBLIC) failed: %s", error_to_string(rv));
-          RETVAL = newSVpvn((char*)out, out_len);
+          sv_setpvn(RETVAL, (char*)out, out_len);
         }
         else {
           croak("FATAL: export_key_raw invalid type '%s'", type);
         }
+        zeromem(out, sizeof(out));
     }
     OUTPUT:
         RETVAL
@@ -274,6 +278,7 @@ sign_message(Crypt::PK::Ed25519 self, SV * data)
         rv = ed25519_sign(data_ptr, (unsigned long)data_len, buffer, &buffer_len, &self->key);
         if (rv != CRYPT_OK) croak("FATAL: ed25519_sign failed: %s", error_to_string(rv));
         RETVAL = newSVpvn((char*)buffer, buffer_len);
+        zeromem(buffer, sizeof(buffer));
     }
     OUTPUT:
         RETVAL
@@ -296,7 +301,99 @@ verify_message(Crypt::PK::Ed25519 self, SV * sig, SV * data)
     OUTPUT:
         RETVAL
 
+SV *
+sign_message_ctx(Crypt::PK::Ed25519 self, SV * data, SV * ctx)
+    CODE:
+    {
+        int rv;
+        unsigned char buffer[64], *data_ptr = NULL, *ctx_ptr = NULL;
+        unsigned long buffer_len = 64;
+        STRLEN data_len = 0, ctx_len = 0;
+
+        data_ptr = (unsigned char *)SvPVbyte(data, data_len);
+        ctx_ptr = (unsigned char *)SvPVbyte(ctx, ctx_len);
+        if (ctx_len > 255) croak("FATAL: context must be at most 255 bytes");
+        rv = ed25519ctx_sign(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
+                             ctx_ptr, (unsigned long)ctx_len, &self->key);
+        if (rv != CRYPT_OK) croak("FATAL: ed25519ctx_sign failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn((char*)buffer, buffer_len);
+        zeromem(buffer, sizeof(buffer));
+    }
+    OUTPUT:
+        RETVAL
+
+int
+verify_message_ctx(Crypt::PK::Ed25519 self, SV * sig, SV * data, SV * ctx)
+    CODE:
+    {
+        int rv, stat;
+        unsigned char *data_ptr = NULL, *sig_ptr = NULL, *ctx_ptr = NULL;
+        STRLEN data_len = 0, sig_len = 0, ctx_len = 0;
+
+        data_ptr = (unsigned char *)SvPVbyte(data, data_len);
+        sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
+        ctx_ptr = (unsigned char *)SvPVbyte(ctx, ctx_len);
+        if (ctx_len > 255) croak("FATAL: context must be at most 255 bytes");
+        RETVAL = 0;
+        stat = 0;
+        rv = ed25519ctx_verify(data_ptr, (unsigned long)data_len, sig_ptr, (unsigned long)sig_len,
+                               ctx_ptr, (unsigned long)ctx_len, &stat, &self->key);
+        if (rv == CRYPT_OK && stat == 1) RETVAL = 1;
+    }
+    OUTPUT:
+        RETVAL
+
+SV *
+sign_message_ph(Crypt::PK::Ed25519 self, SV * data, ...)
+    CODE:
+    {
+        int rv;
+        unsigned char buffer[64], *data_ptr = NULL, *ctx_ptr = NULL;
+        unsigned long buffer_len = 64;
+        STRLEN data_len = 0, ctx_len = 0;
+
+        data_ptr = (unsigned char *)SvPVbyte(data, data_len);
+        if (items > 2 && SvOK(ST(2))) {
+            ctx_ptr = (unsigned char *)SvPVbyte(ST(2), ctx_len);
+            if (ctx_len > 255) croak("FATAL: context must be at most 255 bytes");
+        }
+        rv = ed25519ph_sign(data_ptr, (unsigned long)data_len, buffer, &buffer_len,
+                            ctx_ptr, (unsigned long)ctx_len, &self->key);
+        if (rv != CRYPT_OK) croak("FATAL: ed25519ph_sign failed: %s", error_to_string(rv));
+        RETVAL = newSVpvn((char*)buffer, buffer_len);
+        zeromem(buffer, sizeof(buffer));
+    }
+    OUTPUT:
+        RETVAL
+
+int
+verify_message_ph(Crypt::PK::Ed25519 self, SV * sig, SV * data, ...)
+    CODE:
+    {
+        int rv, stat;
+        unsigned char *data_ptr = NULL, *sig_ptr = NULL, *ctx_ptr = NULL;
+        STRLEN data_len = 0, sig_len = 0, ctx_len = 0;
+
+        data_ptr = (unsigned char *)SvPVbyte(data, data_len);
+        sig_ptr = (unsigned char *)SvPVbyte(sig, sig_len);
+        if (items > 3 && SvOK(ST(3))) {
+            ctx_ptr = (unsigned char *)SvPVbyte(ST(3), ctx_len);
+            if (ctx_len > 255) croak("FATAL: context must be at most 255 bytes");
+        }
+        RETVAL = 0;
+        stat = 0;
+        rv = ed25519ph_verify(data_ptr, (unsigned long)data_len, sig_ptr, (unsigned long)sig_len,
+                              ctx_ptr, (unsigned long)ctx_len, &stat, &self->key);
+        if (rv == CRYPT_OK && stat == 1) RETVAL = 1;
+    }
+    OUTPUT:
+        RETVAL
+
 void
 DESTROY(Crypt::PK::Ed25519 self)
     CODE:
+        if (self->pindex >= 0 && prng_is_valid(self->pindex) == CRYPT_OK && prng_descriptor[self->pindex].done) {
+          prng_descriptor[self->pindex].done(&self->pstate);
+        }
+        zeromem(self, sizeof(*self));
         Safefree(self);

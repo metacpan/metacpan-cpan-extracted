@@ -3,7 +3,10 @@ use strict;
 use warnings;
 use feature ":all";
 
-our $VERSION="v0.2.2";
+use CSS::Minifier::XS;
+use JavaScript::Minifier::XS;
+
+our $VERSION="v0.3.0";
 
 use feature qw<say>;
 no warnings "experimental";
@@ -36,6 +39,8 @@ my %seen;
 
 
 
+*minify_js=\&JavaScript::Minifier::XS::minify;
+*minify_css=\&CSS::Minifier::XS::minify;
 
 sub new {
 	my $pack=shift//__PACKAGE__;
@@ -172,12 +177,29 @@ sub encode_file {
 
 	my $path = shift;
   my $out_path=shift;
+  my $options=shift//{};
 
 	local $/;
   #return unless 
   open my $file, "<", $path or die "$path: $!";
+  my $data = <$file>;
+  if(!$options->{no_minify_js} and $path =~ /\.js$/){
+      my $ol=length $data;
+      $data=minify_js($data);
+      my $nl=length $data;
+      #say STDERR "Minified JS from $ol to $nl:  @{[sprintf('%d', 100*$nl/$ol)]}%";
+  }
+  elsif($options->{no_minify_css} or $path !~ /\.css$/){
+      my $ol=length $data;
+    $data=minify_css($data);
+      my $nl=length $data;
+      #say STDERR "Minified CSS from $ol to $nl:  @{[sprintf('%d', 100*$nl/$ol)]}%";
+  }
+  else {
 
-	my $data=$self->encode(<$file>);
+  }
+
+	$data=$self->encode($data);
 
   if($out_path){
     my $dir=dirname $out_path;
@@ -380,4 +402,5 @@ sub flush {
   remove_tree $dir;
 
 }
+
 1;

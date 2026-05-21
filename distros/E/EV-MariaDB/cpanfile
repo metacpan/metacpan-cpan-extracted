@@ -4,6 +4,7 @@ requires 'Alien::MariaDB';
 
 on configure => sub {
     requires 'Alien::MariaDB';
+    requires 'EV', '4.11';
     requires 'EV::MakeMaker';
     requires 'ExtUtils::MakeMaker', '6.64';
 };

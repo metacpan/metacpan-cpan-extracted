@@ -4,7 +4,7 @@ package Crypt::Digest::CHAES;
 
 use strict;
 use warnings;
-our $VERSION = '0.088';
+our $VERSION = '0.089';
 
 use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( chaes chaes_hex chaes_b64 chaes_b64u chaes_file chaes_file_hex chaes_file_b64 chaes_file_b64u )] );
@@ -14,6 +14,18 @@ our @EXPORT = qw();
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
 use Crypt::Digest;
+
+sub new {
+  my ($class) = @_;
+  my $obj = Crypt::Digest->new('CHAES');
+  return bless $obj, $class;
+}
+
+sub clone {
+  my ($self) = @_;
+  my $obj = Crypt::Digest::clone($self);
+  return bless $obj, ref($self) || $self;
+}
 
 sub hashsize                { Crypt::Digest::hashsize('CHAES')             }
 sub chaes             { Crypt::Digest::digest_data('CHAES', @_)      }
@@ -40,32 +52,35 @@ Crypt::Digest::CHAES - Hash function - CipherHash based on AES [size: 128 bits]
                                 chaes_file chaes_file_hex chaes_file_b64 chaes_file_b64u );
 
    # calculate digest from string/buffer
-   $chaes_raw  = chaes('data string');
-   $chaes_hex  = chaes_hex('data string');
-   $chaes_b64  = chaes_b64('data string');
-   $chaes_b64u = chaes_b64u('data string');
-   # calculate digest from file
-   $chaes_raw  = chaes_file('filename.dat');
-   $chaes_hex  = chaes_file_hex('filename.dat');
-   $chaes_b64  = chaes_file_b64('filename.dat');
-   $chaes_b64u = chaes_file_b64u('filename.dat');
-   # calculate digest from filehandle
-   $chaes_raw  = chaes_file(*FILEHANDLE);
-   $chaes_hex  = chaes_file_hex(*FILEHANDLE);
-   $chaes_b64  = chaes_file_b64(*FILEHANDLE);
-   $chaes_b64u = chaes_file_b64u(*FILEHANDLE);
+   my $data = 'data string';
+   my $chaes_raw  = chaes($data);
+   my $chaes_hex  = chaes_hex($data);
+   my $chaes_b64  = chaes_b64($data);
+   my $chaes_b64u = chaes_b64u($data);
+   # or from file
+   my $chaes_file_raw  = chaes_file('filename.dat');
+   my $chaes_file_hex  = chaes_file_hex('filename.dat');
+   my $chaes_file_b64  = chaes_file_b64('filename.dat');
+   my $chaes_file_b64u = chaes_file_b64u('filename.dat');
+   # or from filehandle
+   my $filehandle = ...; # existing binary-mode filehandle
+   my $chaes_fh_raw  = chaes_file($filehandle);
+   my $chaes_fh_hex  = chaes_file_hex($filehandle);
+   my $chaes_fh_b64  = chaes_file_b64($filehandle);
+   my $chaes_fh_b64u = chaes_file_b64u($filehandle);
 
    ### OO interface:
    use Crypt::Digest::CHAES;
 
-   $d = Crypt::Digest::CHAES->new;
+   my $d = Crypt::Digest::CHAES->new;
    $d->add('any data');
-   $d->addfile('filename.dat');
-   $d->addfile(*FILEHANDLE);
-   $result_raw  = $d->digest;     # raw bytes
-   $result_hex  = $d->hexdigest;  # hexadecimal form
-   $result_b64  = $d->b64digest;  # Base64 form
-   $result_b64u = $d->b64udigest; # Base64 URL Safe form
+   my $result_raw  = $d->digest;     # raw bytes
+   my $result_hex  = $d->hexdigest;  # hexadecimal form
+   my $result_b64  = $d->b64digest;  # Base64 form
+   my $result_b64u = $d->b64udigest; # Base64 URL-safe form
+
+   # or hash a file instead
+   my $file_result_raw = Crypt::Digest::CHAES->new->addfile('filename.dat')->digest;
 
 =head1 DESCRIPTION
 
@@ -88,77 +103,92 @@ Or all of them at once:
 
 =head2 chaes
 
-Logically joins all arguments into a single string, and returns its CHAES digest encoded as a binary string.
+Joins all arguments into a single string and returns its CHAES digest encoded as a binary string.
 
- $chaes_raw = chaes('data string');
+Data arguments for the functional helpers are converted to byte strings using
+Perl's usual scalar stringification. Defined scalars, including numbers and
+string-overloaded objects, are accepted. C<undef> is treated as an empty
+string and may emit Perl's usual "uninitialized value" warning. The same
+rules apply to C<chaes_hex>, C<chaes_b64>, and
+C<chaes_b64u>.
+
+ my $chaes_raw = chaes('data string');
  #or
- $chaes_raw = chaes('any data', 'more data', 'even more data');
+ my $chaes_raw = chaes('any data', 'more data', 'even more data');
 
 =head2 chaes_hex
 
-Logically joins all arguments into a single string, and returns its CHAES digest encoded as a hexadecimal string.
+Joins all arguments into a single string and returns its CHAES digest encoded as a hexadecimal string.
 
- $chaes_hex = chaes_hex('data string');
+ my $chaes_hex = chaes_hex('data string');
  #or
- $chaes_hex = chaes_hex('any data', 'more data', 'even more data');
+ my $chaes_hex = chaes_hex('any data', 'more data', 'even more data');
 
 =head2 chaes_b64
 
-Logically joins all arguments into a single string, and returns its CHAES digest encoded as a Base64 string, B<with> trailing '=' padding.
+Joins all arguments into a single string and returns its CHAES digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $chaes_b64 = chaes_b64('data string');
+ my $chaes_b64 = chaes_b64('data string');
  #or
- $chaes_b64 = chaes_b64('any data', 'more data', 'even more data');
+ my $chaes_b64 = chaes_b64('any data', 'more data', 'even more data');
 
 =head2 chaes_b64u
 
-Logically joins all arguments into a single string, and returns its CHAES digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+Joins all arguments into a single string and returns its CHAES digest encoded as a Base64 URL-safe string (see RFC 4648 section 5).
 
- $chaes_b64url = chaes_b64u('data string');
+ my $chaes_b64url = chaes_b64u('data string');
  #or
- $chaes_b64url = chaes_b64u('any data', 'more data', 'even more data');
+ my $chaes_b64url = chaes_b64u('any data', 'more data', 'even more data');
 
 =head2 chaes_file
 
-Reads file (defined by filename or filehandle) content, and returns its CHAES digest encoded as a binary string.
+Reads a file given by a filename or filehandle and returns its CHAES digest encoded as a binary string.
 
- $chaes_raw = chaes_file('filename.dat');
+ my $chaes_raw = chaes_file('filename.dat');
  #or
- $chaes_raw = chaes_file(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $chaes_raw = chaes_file($filehandle);
 
 =head2 chaes_file_hex
 
-Reads file (defined by filename or filehandle) content, and returns its CHAES digest encoded as a hexadecimal string.
+Reads a file given by a filename or filehandle and returns its CHAES digest encoded as a hexadecimal string.
 
- $chaes_hex = chaes_file_hex('filename.dat');
+ my $chaes_hex = chaes_file_hex('filename.dat');
  #or
- $chaes_hex = chaes_file_hex(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $chaes_hex = chaes_file_hex($filehandle);
 
-B<BEWARE:> You have to make sure that the filehandle is in binary mode before you pass it as argument to the addfile() method.
+B<Note:> The filehandle must be in binary mode before you pass it to C<addfile()>.
 
 =head2 chaes_file_b64
 
-Reads file (defined by filename or filehandle) content, and returns its CHAES digest encoded as a Base64 string, B<with> trailing '=' padding.
+Reads a file given by a filename or filehandle and returns its CHAES digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $chaes_b64 = chaes_file_b64('filename.dat');
+ my $chaes_b64 = chaes_file_b64('filename.dat');
  #or
- $chaes_b64 = chaes_file_b64(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $chaes_b64 = chaes_file_b64($filehandle);
 
 =head2 chaes_file_b64u
 
-Reads file (defined by filename or filehandle) content, and returns its CHAES digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+Reads a file given by a filename or filehandle and returns its CHAES digest encoded as a Base64 URL-safe string (see RFC 4648 section 5).
 
- $chaes_b64url = chaes_file_b64u('filename.dat');
+ my $chaes_b64url = chaes_file_b64u('filename.dat');
  #or
- $chaes_b64url = chaes_file_b64u(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $chaes_b64url = chaes_file_b64u($filehandle);
 
 =head1 METHODS
 
 The OO interface provides the same set of functions as L<Crypt::Digest>.
+Unless noted otherwise, assume C<$d> is an existing digest object created via
+C<new>, for example:
+
+ my $d = Crypt::Digest::CHAES->new();
 
 =head2 new
 
- $d = Crypt::Digest::CHAES->new();
+ my $d = Crypt::Digest::CHAES->new();
 
 =head2 clone
 
@@ -170,21 +200,25 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head2 add
 
+Appends data to the message. Returns the object itself (for chaining).
+
+Each argument is converted to bytes using Perl's usual scalar stringification.
+Defined scalars, including numbers and string-overloaded objects, are
+accepted. C<undef> is treated as an empty string and may emit Perl's usual
+"uninitialized value" warning.
+
  $d->add('any data');
  #or
  $d->add('any data', 'more data', 'even more data');
 
 =head2 addfile
 
+Reads the file content and appends it to the message. Returns the object itself (for chaining).
+
  $d->addfile('filename.dat');
  #or
- $d->addfile(*FILEHANDLE);
-
-=head2 add_bits
-
- $d->add_bits($bit_string);   # e.g. $d->add_bits("111100001010");
- #or
- $d->add_bits($data, $nbits); # e.g. $d->add_bits("\xF0\xA0", 16);
+ my $filehandle = ...; # existing binary-mode filehandle
+ $d->addfile($filehandle);
 
 =head2 hashsize
 
@@ -196,25 +230,39 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head2 digest
 
- $result_raw = $d->digest();
+Returns the binary digest (raw bytes).
+The first call finalizes the digest object. Any later C<add()>,
+C<addfile()>, C<digest()>, C<hexdigest()>, C<b64digest()>, or
+C<b64udigest()> call will fail until you call C<reset()>.
+
+ my $result_raw = $d->digest();
 
 =head2 hexdigest
 
- $result_hex = $d->hexdigest();
+Returns the digest encoded as a lowercase hexadecimal string.
+Like C<digest()>, the first call finalizes the digest object.
+
+ my $result_hex = $d->hexdigest();
 
 =head2 b64digest
 
- $result_b64 = $d->b64digest();
+Returns the digest encoded as a Base64 string with trailing C<=> padding.
+Like C<digest()>, the first call finalizes the digest object.
+
+ my $result_b64 = $d->b64digest();
 
 =head2 b64udigest
 
- $result_b64url = $d->b64udigest();
+Returns the digest encoded as a Base64 URL-safe string (no trailing C<=>).
+Like C<digest()>, the first call finalizes the digest object.
+
+ my $result_b64url = $d->b64udigest();
 
 =head1 SEE ALSO
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Digest>
+=item * L<CryptX>, L<Crypt::Digest>
 
 =item * L<https://en.wikipedia.org/wiki/Cryptographic_hash_function#Hash_functions_based_on_block_ciphers>
 

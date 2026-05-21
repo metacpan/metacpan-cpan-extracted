@@ -1,0 +1,23 @@
+name: lint
+
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+
+jobs:
+  perlcritic:
+    name: Perl::Critic (gentle)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: install Perl::Critic
+        uses: perl-actions/install-with-cpm@v1.8
+        with:
+          install: |
+            Perl::Critic
+      - name: run perlcritic
+        run: perlcritic --gentle lib/

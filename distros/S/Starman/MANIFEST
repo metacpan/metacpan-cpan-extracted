@@ -34,3 +34,4 @@ t/ssl_ca.pem
 t/ssl_key.pem
 t/ssl_largebody.t
 t/suite.t
+t/te_cl_precedence.t

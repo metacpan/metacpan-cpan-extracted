@@ -1,25 +1,37 @@
 Chess4p
 
-A chess library inspired by the high quality Python module python-chess.
+A library for chess related functionality.
+
+The work is inspired by the Python module python-chess,
+although the main emphasis for Chess4p is thought to be on
+features needed by chess database applications, and not so much features needed by
+chess engines.
+
 
 Features include
 
 * Legal moves
-* Board state handling
+* Board state handling, FEN input/output
 * Perft testing
-* UCI move format
+* UCI move input/output
+* SAN move input/output
+* PGN file reader
 
 Planned enhancements
 
-* SAN move input/output
-* PGN parsing
+* Move and position binary encoding/decoding
+* Support for Fischer Random chess
+* EPD
+
 
 Only 64-bit systems are supported, due to heavy use of the 'bitboard' data type.
 
 
 INSTALLATION
 
-To install this module, run the following commands:
+The module can be fetched from CPAN.
+
+To instead install it from this source, run the following commands:
 
 	perl Makefile.PL
 	make

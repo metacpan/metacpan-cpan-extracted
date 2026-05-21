@@ -1,4 +1,4 @@
-Changes.md
+Changes
 lib/Resource/Silo.pm
 lib/Resource/Silo/Container.pm
 lib/Resource/Silo/Metadata.pm
@@ -32,6 +32,7 @@ t/222-fork-override.t
 t/223-fork-edge-cases.t
 t/224-post-init.t
 t/225-nullable.t
+t/226-coerce.t
 t/301-class-init.t
 t/302-require.t
 t/401-circular.t

@@ -109,6 +109,36 @@ set_multi(SV* self_sv, ...)
     OUTPUT:
         RETVAL
 
+UV
+remove_multi(SV* self_sv, ...)
+    CODE:
+        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
+        uint32_t count = 0;
+        if (h->shard_handles) {
+            for (int i = 1; i < items; i++) {
+                STRLEN _kl; const char *_ks = SvPV(ST(i), _kl);
+                bool _ku = SvUTF8(ST(i)) ? 1 : 0;
+                if (_kl > SHM_MAX_STR_LEN) croak("key too long (max 2GB)");
+                count += shm_ss_remove(h, _ks, (uint32_t)_kl, _ku);
+            }
+        } else {
+            ShmHeader *hdr = h->hdr;
+            shm_rwlock_wrlock(hdr);
+            shm_seqlock_write_begin(&hdr->seq);
+            for (int i = 1; i < items; i++) {
+                STRLEN _kl; const char *_ks = SvPV(ST(i), _kl);
+                bool _ku = SvUTF8(ST(i)) ? 1 : 0;
+                if (_kl > SHM_MAX_STR_LEN) { shm_seqlock_write_end(&hdr->seq); shm_rwlock_wrunlock(hdr); croak("key too long (max 2GB)"); }
+                count += shm_ss_remove_inner(h, _ks, (uint32_t)_kl, _ku);
+            }
+            if (count) shm_ss_maybe_shrink(h);
+            shm_seqlock_write_end(&hdr->seq);
+            shm_rwlock_wrunlock(hdr);
+        }
+        RETVAL = count;
+    OUTPUT:
+        RETVAL
+
 void
 get_multi(SV* self_sv, ...)
     PPCODE:
@@ -168,6 +198,21 @@ get_multi(SV* self_sv, ...)
                 }
             }
         }
+
+void
+get_with_ttl(SV* self_sv, SV* key_sv)
+    PPCODE:
+        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
+        EXTRACT_STR_KEY(key_sv);
+        const char *out_s; uint32_t out_l; bool out_u;
+        int64_t out_ttl;
+        if (!shm_ss_get_with_ttl(h, _kstr, (uint32_t)_klen, _kutf8, &out_s, &out_l, &out_u, &out_ttl)) XSRETURN_EMPTY;
+        EXTEND(SP, 2);
+        SV *vsv = newSVpvn(out_s, out_l);
+        if (out_u) SvUTF8_on(vsv);
+        mPUSHs(vsv);
+        if (out_ttl < 0) PUSHs(&PL_sv_undef);
+        else mPUSHi(out_ttl);
 
 SV*
 stats(SV* self_sv)
@@ -631,12 +676,35 @@ add(SV* self_sv, SV* key_sv, SV* val_sv)
         RETVAL
 
 bool
+add_ttl(SV* self_sv, SV* key_sv, SV* val_sv, UV ttl_sec)
+    CODE:
+        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
+        EXTRACT_STR_KEY(key_sv);
+        EXTRACT_STR_VAL(val_sv);
+        REQUIRE_TTL(h);
+        RETVAL = shm_ss_add_ttl(h, _kstr, (uint32_t)_klen, _kutf8,
+                                _vstr, (uint32_t)_vlen, _vutf8, (uint32_t)ttl_sec);
+    OUTPUT:
+        RETVAL
+
+bool
 update(SV* self_sv, SV* key_sv, SV* val_sv)
     CODE:
         EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
         EXTRACT_STR_KEY(key_sv);
         EXTRACT_STR_VAL(val_sv);
         RETVAL = shm_ss_update(h, _kstr, (uint32_t)_klen, _kutf8, _vstr, (uint32_t)_vlen, _vutf8);
+    OUTPUT:
+        RETVAL
+
+bool
+update_ttl(SV* self_sv, SV* key_sv, SV* val_sv, UV ttl_sec)
+    CODE:
+        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
+        EXTRACT_STR_KEY(key_sv);
+        EXTRACT_STR_VAL(val_sv);
+        REQUIRE_TTL(h);
+        RETVAL = shm_ss_update_ttl(h, _kstr, (uint32_t)_klen, _kutf8, _vstr, (uint32_t)_vlen, _vutf8, (uint32_t)ttl_sec);
     OUTPUT:
         RETVAL
 
@@ -649,6 +717,30 @@ swap(SV* self_sv, SV* key_sv, SV* val_sv)
         const char *out_s; uint32_t out_l; bool out_u;
         int rc = shm_ss_swap(h, _kstr, (uint32_t)_klen, _kutf8, _vstr, (uint32_t)_vlen, _vutf8, &out_s, &out_l, &out_u);
         if (rc != 1) XSRETURN_UNDEF;
+        RETVAL = newSVpvn(out_s, out_l);
+        if (out_u) SvUTF8_on(RETVAL);
+    OUTPUT:
+        RETVAL
+
+bool
+cas(SV* self_sv, SV* key_sv, SV* expected_sv, SV* desired_sv)
+    CODE:
+        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
+        EXTRACT_STR_KEY(key_sv);
+        EXTRACT_STR_EXPECTED_DESIRED(expected_sv, desired_sv);
+        RETVAL = shm_ss_cas(h, _kstr, (uint32_t)_klen, _kutf8,
+                            _estr, (uint32_t)_elen, _dstr, (uint32_t)_dlen, _dutf8);
+    OUTPUT:
+        RETVAL
+
+SV*
+cas_take(SV* self_sv, SV* key_sv, SV* expected_sv)
+    CODE:
+        EXTRACT_MAP("Data::HashMap::Shared::SS", self_sv);
+        EXTRACT_STR_KEY(key_sv);
+        EXTRACT_STR_EXPECTED(expected_sv);
+        const char *out_s; uint32_t out_l; bool out_u;
+        if (!shm_ss_cas_take(h, _kstr, (uint32_t)_klen, _kutf8, _estr, (uint32_t)_elen, &out_s, &out_l, &out_u)) XSRETURN_UNDEF;
         RETVAL = newSVpvn(out_s, out_l);
         if (out_u) SvUTF8_on(RETVAL);
     OUTPUT:

@@ -1,0 +1,279 @@
+#!perl
+
+use strict;
+use warnings;
+
+use App::cpan2arch;
+
+exit App::cpan2arch->new->init(@ARGV)->run;
+
+=encoding UTF-8
+
+=head1 NAME
+
+cpan2arch - generate PKGBUILD from CPAN metadata
+
+=head1 SYNOPSIS
+
+B<cpan2arch> [I<OPTION>]... I<MODULE> [I<VERSION>]
+
+Options:
+
+  -w, --write       write to PKGBUILD in current dir
+      --force       overwrite existing PKGBUILD
+  -u, --update      rewrite PKGBUILD (show comparison + preserve attribs + bump pkgrel)
+  -c, --clear       clear all caches before HTTP requests
+      --clear-mcpan clear MetaCPAN cache
+      --clear-arch  clear Arch Linux cache
+  -h, --help        show this help and exit
+  -v, --version     show version info and exit
+
+I<VERSION> is only supported for distribution names, not module names.
+
+Examples:
+
+=for highlighter language=shell
+
+  $ cpan2arch -w Foo::Bar        # Module
+  $ cpan2arch -w Foo-Bar v1.0.0  # Dist + version
+
+=head1 DESCRIPTION
+
+B<cpan2arch> is a command-line utility that generates an L<Arch Linux|https://wiki.archlinux.org/title/Arch_Linux>
+C<< L<PKGBUILD|https://wiki.archlinux.org/title/PKGBUILD> >> based on module/distribution
+L<metadata|https://metacpan.org/pod/CPAN::Meta::Spec>. It relies on the
+L<MetaCPAN API|https://github.com/metacpan/metacpan-api> to fetch metadata and
+the L<Official repositories web interface|https://wiki.archlinux.org/title/Official_repositories_web_interface>
++ L<Aurweb RPC interface|https://wiki.archlinux.org/title/Aurweb_RPC_interface>
+for Arch Linux packages information.
+
+Warnings about flagged out-of-date packages, missing packages, license problems,
+and other issues are added as comments in the C<PKGBUILD> to inform the packager.
+
+The generated C<PKGBUILD> follows L<Perl package guidelines|https://wiki.archlinux.org/title/Perl_package_guidelines>
+and is printed to C<STDOUT> by default, unless B<--update> or B<--write> is passed.
+
+See L<App::cpan2arch::WritePkgbuild/"PKGBUILD EXAMPLE">.
+
+=head2 NOTE
+
+This tool is intended to ease the maintenance of Perl packages through automation,
+but blindly relying on it is not recommended since distributions might depend on
+external libraries or even have wrong metadata, thus
+L<manual inspection|https://wiki.archlinux.org/title/AUR_submission_guidelines#Maintaining_packages>
+is always advised.
+
+=head2 OPTIONAL DEPENDENCIES
+
+The following modules are highly recommended for performance but not required:
+
+=over 4
+
+=item L<Mojo::UserAgent::Cached> + L<CHI>
+
+Enables caching of HTTP requests to MetaCPAN and Arch Linux APIs. This speeds up
+repeated queries and reduces server load.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-w>, B<--write>
+
+Write to a file named F<PKGBUILD> in the current directory.
+
+=item B<--force>
+
+Overwrite an existing F<PKGBUILD> silently.
+
+=item B<-u>, B<--update>
+
+Rewrite the F<PKGBUILD> file in the current directory using the generated C<PKGBUILD>:
+
+=over 4
+
+=item *
+
+F<< L<.SRCINFO|https://wiki.archlinux.org/title/.SRCINFO> >> metadata is compared
+against the generated C<PKGBUILD> metadata to show differences.
+
+=item *
+
+Contributor attributions are preserved and C<pkgrel> is bumped whenever C<pkgver>
+numbers from both metadatas are equal.
+
+=item *
+
+C<epoch> is added or bumped whenever a newer version breaks pacman's
+L<version comparison logic|https://man.archlinux.org/man/vercmp.8>.
+
+=back
+
+B<Notes>
+
+=over 4
+
+=item *
+
+Intended to quickly update obsolete C<PKGBUILD>s from adopted AUR Perl packages.
+
+=item *
+
+Only metadata differences are shown in the comparison table and printed to C<STDERR>,
+so C<PKGBUILD> syntax and functions are ignored.
+
+Example:
+
+=for highlighter
+
+  +--------------+------------------+---------------------------------+------------------------+
+  | Variable     | .SRCINFO         | Generated                       | Status                 |
+  +--------------+------------------+---------------------------------+------------------------+
+  | checkdepends | -                | N/A                             | Missing from Generated |
+  | checkdepends | perl-test-simple | -                               | Only in .SRCINFO       |
+  | depends      | -                | perl-version, perl>=5.10.1      | Only in Generated      |
+  | pkgdesc      | Bogus abstract   | Visually debug regexes in-place | Differs                |
+  +--------------+------------------+---------------------------------+------------------------+
+
+The table width defaults to 80, unless L<Term::ReadKey> is installed.
+
+=item *
+
+B<--write> and B<--force> are implied.
+
+=item *
+
+To only update C<pkgver>, C<pkgrel>,
+and C<sha256sums>, use C<< L<pkgctl version upgrade|https://man.archlinux.org/man/extra/devtools/pkgctl-version-upgrade.1> >>,
+not this.
+
+=back
+
+=item B<-c>, B<--clear>
+
+=item B<--clear-mcpan>
+
+=item B<--clear-arch>
+
+Clear all caches, or only MetaCPAN or Arch Linux cache, before HTTP requests to
+refresh stale data.
+
+=item B<-h>, B<--help>
+
+Display a summary of options and exit.
+
+=item B<-v>, B<--version>
+
+Display the B<cpan2arch> version number and exit.
+
+=back
+
+=head2 COMPLETION
+
+To enable tab completion in bash, put the script in the C<PATH> and run this
+in the shell or add it to a bash startup file (e.g. F</etc/bash.bashrc> or F<~/.bashrc>):
+
+=for highlighter language=shell
+
+  complete -C cpan2arch cpan2arch
+
+Note that L<Getopt::Long::More> is required.
+
+=head1 EXIT STATUS
+
+=for highlighter
+
+  0  success
+  1  general failure
+  2  command-line usage error
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item B<PACKAGER>
+
+If set, overrides the default packager attribution info. Default: C<< Your Name <email@domain.tld> >>.
+
+=item B<C2A_USER_AGENT>
+
+If set, overrides the default user agent string. Default: C<App::cpan2arch/$VERSION>.
+
+=item B<C2A_CACHE_MCPAN_PATH>
+
+If set, overrides the default MetaCPAN cache path. Default: C</tmp/mcpan_cache>.
+
+=item B<C2A_CACHE_ARCH_PATH>
+
+If set, overrides the default Arch Linux cache path. Default: C</tmp/arch_cache>.
+
+=item B<C2A_CACHE_EXPIRATION>
+
+If set, overrides the default cache expiration. Default: C<1d>.
+
+=item B<C2A_CACHE_IGNORE>
+
+If true, disables the cache for HTTP requests. Default: C<false>.
+
+=item B<C2A_DEBUG>
+
+If true, displays debug information to C<STDERR> (Requires L<Data::Printer>).
+Default: C<false>.
+
+=back
+
+=head1 BUGS
+
+Report bugs at L<https://github.com/ryoskzypu/App-cpan2arch/issues>.
+
+=head1 AUTHOR
+
+ryoskzypu <ryoskzypu@proton.me>
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<https://blogs.perl.org/users/neilb/2017/04/an-introduction-to-distribution-metadata.html>
+
+=item *
+
+L<https://neilb.org/2015/09/25/dependencies-model.html>
+
+=item *
+
+L<https://blogs.perl.org/users/neilb/2016/11/an-overview-of-metacpan.html>
+
+=item *
+
+L<SRCINFO(5)|https://man.archlinux.org/man/SRCINFO.5>
+
+=item *
+
+L<PKGBUILD(5)|https://man.archlinux.org/man/core/pacman/PKGBUILD.5>
+
+=back
+
+This module ships with a similar utility that generates a F<PKGBUILD>, but it is
+tied to L<CPANPLUS> and does more stuff like packaging and installing CPAN modules
+on Arch using C<makepkg> and C<pacman>, without depending on the AUR.
+
+=over 4
+
+=item *
+
+L<CPANPLUS::Dist::Arch>
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright © 2026 ryoskzypu
+
+MIT-0 License. See LICENSE for details.
+
+=cut

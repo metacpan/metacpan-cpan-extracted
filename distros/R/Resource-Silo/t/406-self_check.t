@@ -45,7 +45,7 @@ subtest 'bad dependencies' => sub {
     local $Carp::Internal{'Bad::Deps'} = 1;
     throws_ok {
         Bad::Deps->new;
-    } qr(unsatisfied)i, "imcomplete dependencies = no go";
+    } qr(unsatisfied)i, "incomplete dependencies = no go";
 };
 
 subtest 'unloadable modules' => sub {

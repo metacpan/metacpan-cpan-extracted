@@ -86,4 +86,39 @@ sub run_ev {
     run_ev();
 }
 
+# --- DESTROY with pending callbacks: every callback fires, no leak ---
+# Regression for two distinct bugs:
+#   1. cancel_pending_impl previously called check_destroyed unconditionally
+#      when magic==FREED, which fired during DESTROY itself (where DESTROY
+#      pre-set magic=FREED) and Safefree-d self mid-loop -> UAF.
+#   2. DESTROY pre-setting magic=FREED before cancel_pending caused the
+#      magic-check inside the loop to bail after the first callback,
+#      leaking every remaining cb_queue entry's allocations and SV refs.
+{
+    my $mc = EV::Memcached->new(
+        host => $host, port => $port,
+        on_error => sub {},
+    );
+    $mc->on_connect(sub { EV::break });
+    run_ev();
+
+    # Queue multiple commands and break before any response is processed.
+    my @fired;
+    for my $i (1..5) {
+        $mc->set("destroy_multi_$i", "v$i", sub {
+            my ($res, $err) = @_;
+            push @fired, [$i, $err // 'ok'];
+        });
+    }
+    # Don't EV::run again — let $mc go out of scope with 5 cb_queue entries.
+    undef $mc;
+
+    is(scalar @fired, 5, "DESTROY: every pending callback fired, none leaked")
+        or diag explain \@fired;
+    is_deeply([sort map { $_->[0] } @fired], [1..5],
+        "DESTROY: callbacks fired in order");
+    is_deeply([map { $_->[1] } @fired], [('disconnected') x 5],
+        "DESTROY: each pending callback received 'disconnected' error");
+}
+
 done_testing;

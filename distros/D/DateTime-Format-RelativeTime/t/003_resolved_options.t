@@ -239,6 +239,7 @@ my $tests =
     },
 ];
 
+no warnings 'DateTime::Format::RelativeTime';
 my $failed = [];
 for( my $i = 0; $i < scalar( @$tests ); $i++ )
 {

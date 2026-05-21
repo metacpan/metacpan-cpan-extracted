@@ -1,5 +1,11 @@
 Revision history for EV-Future
 
+0.05    Sat May  2 2026
+        - Add race(); first done wins, args forwarded to final_cb
+
+0.04    Fri May  1 2026
+        - Harden unsafe-mode exception path; valgrind + ASan in CI
+
 0.03    Fri Mar 13 2026
         - Fix POD: unsafe double-call causes premature completion, not UAF
 

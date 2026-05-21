@@ -42,7 +42,7 @@ my $f = Module::Generic::Finfo->new( $file, debug => $DEBUG );
 isa_ok( $f, 'Module::Generic::Finfo' );
 
 {
-    no warnings 'Module::Generic::Finfo';
+    no warnings 'Module::Generic';
     my $failed = Module::Generic::Finfo->new( './not-existing.txt' );
     ok( defined( $failed ), 'Non-existing file' );
     ok( $failed->filetype == Module::Generic::Finfo::FILETYPE_NOFILE, 'Non-existing file type' );

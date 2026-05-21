@@ -1,6 +1,30 @@
 BATsh Lembar Contekan [ID] Bahasa Indonesia
 ============================================
 
+----------------------------------------------------------------------
+RINGKASAN
+  BATsh adalah interpreter shell dua bahasa yang menjalankan sintaks
+  cmd.exe batch dan bash/sh dalam satu file skrip yang sama, beralih mode
+  secara otomatis per baris. Tidak perlu shell eksternal -- murni Perl.
+
+CONTOH CAMPURAN
+  :: Bagian CMD (token pertama huruf besar)
+  @ECHO OFF
+  SET LANG=BATsh
+
+  # Bagian SH (token pertama berisi huruf kecil)
+  greet() { echo "Halo $1 (mode bash)"; }
+  greet $LANG
+  result=$(echo $LANG | perl -e 'while(<STDIN>){chomp;print uc}')
+  echo "Huruf besar: $result"
+
+  :: Kembali ke CMD (baca hasil SH)
+  ECHO Kembali CMD: %result%
+
+  # Jalankan: perl lib/BATsh.pm script.batsh
+----------------------------------------------------------------------
+
+
 BATsh adalah shell bilingual yang menjalankan sintaks cmd.exe dan bash/sh
 dalam satu skrip. Token pertama setiap baris menentukan mode eksekusi.
 
@@ -97,3 +121,21 @@ dalam satu skrip. Token pertama setiap baris menentukan mode eksekusi.
   Perl 5.005_03 atau lebih baru. Hanya modul inti (File::Spec, Carp).
 
 Lihat juga: https://metacpan.org/dist/BATsh
+
+11. Jalur CMD dan Pengubah Parameter
+--------------------------------------
+  cmd1 | cmd2              # Jalur pipa melalui file sementara (Pure Perl)
+  SET /P VAR=Perintah:     # Baca satu baris dari STDIN ke VAR
+  %~dp0                    # Drive+direktori %0 (paling umum digunakan)
+  %~n1, %~x1, %~nx1       # Nama file, ekstensi, keduanya
+
+12. Fungsi SH dan Ekspansi Variabel
+--------------------------------------
+  f() { echo $1; }         # Definisi fungsi
+  ${var%.*}  ${var%%.*}    # Hapus sufiks (terpendek/terpanjang)
+  ${var#*.}  ${var##*.}    # Hapus prefiks (terpendek/terpanjang)
+  ${var/a/b} ${var//a/b}   # Ganti (pertama/semua)
+  ${var^^} ${var,,}        # Huruf besar/kecil
+  cmd > f  cmd >> f  2>&1  # Pengalihan
+  cmd1 && cmd2             # Rantai DAN
+  cmd1 || cmd2             # Rantai ATAU

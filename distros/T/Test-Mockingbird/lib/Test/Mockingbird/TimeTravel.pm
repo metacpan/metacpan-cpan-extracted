@@ -21,7 +21,7 @@ our @EXPORT = qw(
 # Internal state
 # ----------------------------------------------------------------------
 
-our $ACTIVE		= 0;	  # whether time is frozen
+our $ACTIVE	= 0;	  # whether time is frozen
 our $CURRENT_EPOCH = undef;  # current simulated time
 our $BASE_EPOCH	= undef;  # epoch at moment of freeze
 
@@ -31,11 +31,11 @@ Test::Mockingbird::TimeTravel - Deterministic, controllable time for Perl tests
 
 =head1 VERSION
 
-Version 0.08
+Version 0.10
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 =head1 SYNOPSIS
 
@@ -1139,19 +1139,9 @@ This module is provided as-is without any warranty.
 
 Copyright 2026 Nigel Horne.
 
-Usage is subject to licence terms.
-
-The licence terms of this software are as follows:
-
-=over 4
-
-=item * Personal single user, single computer use: GPL2
-
-=item * All other users (including Commercial, Charity, Educational, Government)
-  must apply in writing for a licence for use from Nigel Horne at the
-  above e-mail.
-
-=back
+Usage is subject to GPL2 licence terms.
+If you use it,
+please let me know.
 
 =cut
 

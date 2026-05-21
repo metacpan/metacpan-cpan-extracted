@@ -1,5 +1,101 @@
 Revision history for Geo-Address-Parser-Country
 
+0.04	Wed May  6 11:15:09 EDT 2026
+
+      [Enhancements]
+      - resolve() now accepts place as the only required argument.
+        The component (last comma-separated token) is extracted
+        automatically when not supplied explicitly.  Existing callers
+        passing component explicitly are unaffected.
+      - Added normalise_place() stub.  The method accepts a place
+        string and will eventually insert missing commas before
+        country and state names in raw uncleaned input.  Currently
+        returns the place string unchanged.  Full POD, input/output
+        schemas, and test coverage are in place ahead of
+        implementation.
+
+      [Bug fixes]
+      - Fixed trailing whitespace being included in the auto-extracted
+        component.  The extraction regex now uses a non-greedy
+        quantifier ([^,]+?) so trailing spaces are trimmed cleanly
+        before resolution begins.
+      - Fixed "Wide character in print" noise in edge_cases.t output
+        caused by em dash characters in subtest names becoming decoded
+        Unicode after adding "use utf8".  Fixed by adding
+        "use open qw(:std :utf8)" to bind stdout to UTF-8.
+      - Fixed "can't be decoded" failures in Params::Validate::Strict
+        on Perl 5.18 for Unicode wide-character inputs (NBSP, EM SPACE,
+        Arabic script) in edge_cases.t.  Fixed by adding "use utf8" to
+        the test file and SKIP guards for Perl < 5.20.
+      - Fixed NU (Nunavut) test failure on systems with Locale::CA
+        0.06, which predates the addition of NU.  The integration and
+        edge_cases tests now check Locale::CA->VERSION at runtime and
+        skip gracefully on older installs.
+      - Bump minumum Locale::CA to fix https://www.cpantesters.org/cpan/report/ebaa0a06-37fc-11f1-acb9-eb813c3f718f
+
+      [Tests]
+      - function.t: added white-box subtests for component
+        auto-extraction (two-segment, three-segment, no-comma,
+        trailing-whitespace, explicit-override, US state) and
+        normalise_place() schema and return-value invariants.
+      - unit.t: added black-box subtests for the simple resolve()
+        form and all normalise_place() API contract assertions.
+        Plan count updated to 56.
+      - integration.t: added end-to-end subtests for the simple
+        resolve() form with real genealogy place strings and the
+        normalise_place() -> resolve() pipeline.
+      - Added six targeted regression subtests to edge_cases.t covering
+        the above CPAN Testers failures, with report reference for the
+        Unicode issue.  These will catch recurrence if Perl or
+        Params::Validate::Strict behaviour changes in future.
+
+0.03	Tue May  5 07:38:37 EDT 2026
+
+      [Bug fixes]
+      - Fixed: NL (Newfoundland and Labrador) was resolving to Netherlands
+        because the %DIRECT table entry 'nl' shadowed the Locale::CA
+        province-code lookup at step 4.  Removed 'nl' from %DIRECT.
+      - Fixed: _geonames_lookup() would die under strict refs when the
+        GeoNames search returned a plain scalar instead of an arrayref or
+        hashref.  Added ref() guard before the hash dereference.
+      - Fixed: _geonames_lookup() would die via Return::Set schema
+        validation when countryName was itself a reference (e.g. a nested
+        hashref).  Added !ref() guard before returning the country name.
+      - Fixed: step 6 (Australian state code lookup) used the raw,
+        un-normalised component as the hash key, making the lookup
+        case-sensitive unlike steps 2-5.  uc($component) now applied
+        consistently.  (TODO: pending release)
+
+      [Enhancements]
+      - Added Object::Configure support to new(), allowing locale objects
+        to be supplied via environment variables or a config file rather
+        than always being passed explicitly at construction time.
+      - Removed the can('new') requirement from the $NEW_SCHEMA locale
+        object entries.  The locale objects are used as data containers,
+        not factories, so this check was incorrect and prevented plain
+        blessed hashrefs from being used as stubs.
+      - Removed the can('search') requirement from the geonames schema
+        entry.  Geo::GeoNames dispatches via AUTOLOAD so can('search')
+        returns false at the Perl level even though ->search() works at
+        runtime.  The check is commented out pending a fix to
+        Geo::GeoNames itself.
+      - NU (Nunavut) now resolves correctly to Canada following an update
+        to Locale::CA.
+
+      [Dependencies]
+      - Added: Object::Configure
+      - Minimum ExtUtils::MakeMaker bumped to 6.64 for TEST_REQUIRES
+        support.
+
+      [Tests]
+      - Added comprehensive test suite: function.t (white-box), unit.t
+        (black-box API), integration.t (end-to-end with real locale
+        packages), edge_cases.t (destructive and boundary conditions), and
+        extended_tests.t (coverage and LCSAJ gap-filling).
+      - Identified and documented two remaining known-bug TODO items:
+        step 6 AU code case-sensitivity and the %DIRECT hashref
+        warning-absent dead branch.
+
 0.02	Sat Apr 11 08:24:22 EDT 2026
 	Fix CI
 

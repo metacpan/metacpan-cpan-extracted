@@ -180,4 +180,43 @@ subtest 'on_empty fallback' => sub {
   done_testing;
 };
 
+subtest 'transform_command Co-Authored-By override' => sub {
+  local $ENV{ANTHROPIC_MODEL} = 'MiniMax-M2.7';
+  delete local $ENV{CO_AUTHORED_BY};
+  delete local $ENV{MCP_RUN_COMPRESS_NO_CO_AUTHORED};
+
+  my $c = MCP::Run::Compress->new;
+
+  my $heredoc = qq{git commit -m "\$(cat <<EOF\nfix bug\n\nCo-Authored-By: Claude Opus <noreply\@anthropic.com>\nEOF\n)"};
+  like $c->transform_command($heredoc), qr/Co-Authored-By: MiniMax-M2\.7\nEOF/, 'heredoc form replaced';
+
+  my $no_signature = qq{git commit -m "fix bug"};
+  my $signed = $c->transform_command($no_signature);
+  like $signed, qr/Co-Authored-By: MiniMax-M2\.7/, 'signature added when missing';
+  like $signed, qr/Co-Authored-By: MiniMax-M2\.7"\z/, 'signature stays inside the closing quote';
+
+  my $multiline = qq{git commit -m "docs: rewrite README\nreferencing Manual::Migration"};
+  my $multiline_signed = $c->transform_command($multiline);
+  like $multiline_signed, qr/Co-Authored-By: MiniMax-M2\.7"\z/, 'multi-line message: signature stays inside the closing quote';
+  unlike $multiline_signed, qr/"\s*\n\s*\n\s*Co-Authored-By/, 'multi-line message: no Co-Authored-By outside the quoted string';
+
+  local $ENV{MCP_RUN_COMPRESS_NO_CO_AUTHORED} = 1;
+  is $c->transform_command($heredoc), $heredoc, 'opt-out env disables transform';
+
+  my $non_git = q{ls -l};
+  delete local $ENV{MCP_RUN_COMPRESS_NO_CO_AUTHORED};
+  is $c->transform_command($non_git), $non_git, 'non-git commands untouched';
+
+  my $compound = qq{cd /tmp && git add foo && git commit -m "\$(cat <<'EOF'\nfix bug\n\nCo-Authored-By: Claude Opus <noreply\@anthropic.com>\nEOF\n)" && git log -1};
+  like $c->transform_command($compound), qr/Co-Authored-By: MiniMax-M2\.7\nEOF/, 'compound command with git commit replaced';
+
+  my $with_flags = qq{git -c user.email=x\@y -c user.name=Foo commit -m "fix\n\nCo-Authored-By: Claude Opus <noreply\@anthropic.com>"};
+  like $c->transform_command($with_flags), qr/Co-Authored-By: MiniMax-M2\.7/, 'git -c flags between git and commit replaced';
+
+  my $across_separator = q{git status; git log --grep=commit -m "fix"};
+  is $c->transform_command($across_separator), $across_separator, 'pattern does not cross command separators';
+
+  done_testing;
+};
+
 done_testing;

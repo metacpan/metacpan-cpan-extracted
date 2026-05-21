@@ -21,9 +21,12 @@ t/function_bail.t
 t/function_die.t
 t/import_bail.t
 t/import_die.t
+t/import_list.t
 t/import_strict_and_warnings.t
 t/lib/DuplicatePlanRegression.pm
 t/lib/OurTester.pm
 t/timex.t
 xt/author/pod-coverage.t
 xt/author/pod.t
+t/carried-over-imports.t
+t/lib/UsesTestMost.pm

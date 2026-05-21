@@ -1,0 +1,38 @@
+Revision history for Dist-Zilla-Plugin-SigStore::SignRelease
+
+0.05 -- Thu May 07 23:01:56 ADT 2026
+
+    [Changes since 0.03]
+    - Patch from @Grinnz to fix synopsis Filter bundle example
+
+0.04 -- Thu May 07 20:00:56 ADT 2026
+
+    [Changes since 0.03]
+    - Fix the example verification to require identity to be specified
+    - Fix pod formating
+
+0.03 -- Wed May 06 21:31:53 ADT 2026
+
+    [Changes since 0.02]
+    - Subclass Dist::Zilla::Plugin::UploadToCPAN
+    - This release removed the releaser_name option introduced in 0.02
+    - SigStore::UploadToCPAN replaces UploadToCPAN as the CPAN Uploader
+
+0.02 -- Sun May 03 21:57:11 ADT 2026
+
+    [Changes since 0.01]
+    - Replaced the custom SigStore::UploadToCPAN
+    - Added optional attribute for releaser_name
+    - Fix issue with non-functional answer_yes attribute in prior version
+
+    [Detailed Change Log]
+    - 0834404 Replace custom SigStore::UploadToCPAN with direct use of @Filter/UploadToCPAN
+    - 128c04e Fix some pod formatting
+    - 45b2ba5 v0.01
+
+0.01 -- Sat May 02 22:30:39 ADT 2026
+
+    - Initial Version
+
+    [Detailed Change Log]
+

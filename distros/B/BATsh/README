@@ -1,17 +1,77 @@
 NAME
-    BATsh - Bilingual Shell: cmd.exe and bash in one script (self-contained)
+    BATsh - Bilingual Shell for cmd.exe and bash in one script
+    (self-contained)
 
 VERSION
-    Version 0.01
+    Version 0.02
 
 SYNOPSIS
       use BATsh;
 
+      # Run a bilingual .batsh script
       BATsh->run('myscript.batsh');
+      BATsh->run('myscript.batsh', args => ['arg1', 'arg2']);
+
+      # Run source inline
       BATsh->run_string('echo hello from sh');
+      BATsh->run_string("SET MSG=hello\nECHO %MSG%");
+
+      # Interactive REPL
       BATsh->repl();
 
+      # CMD features: pipe, tilde modifiers, SET /P
+      BATsh->run_string('ECHO hello | perl -e "while(<STDIN>){chomp;print uc(\$_).chr(10)}"');
+      BATsh->run_string("SET /P NAME=Enter name: ");
+
+      # SH features: functions, expansions, pipelines, redirection
+      BATsh->run_string(<<'BATSH');
+      greet() {
+          echo "Hello, \$1"
+      }
+      greet world
+      x=\$(echo hello | perl -e 'while(<STDIN>){chomp;print uc}')
+      echo \$x
+      echo out > /tmp/out.txt
+      BATSH
+
+      # Perl 5.005_03 and later; pure-Perl, no external shell required.
+
 DESCRIPTION
+  Executive Summary
+    BATsh is a self-contained bilingual shell interpreter written in pure
+    Perl. It runs cmd.exe batch syntax and bash/sh syntax in the same script
+    file, switching automatically between CMD mode and SH mode on a
+    line-by-line basis. No external cmd.exe, bash, or sh is required --
+    everything runs inside Perl.
+
+  Mixed-Mode Sample
+    The following script demonstrates cmd.exe and bash sections coexisting
+    and sharing variables through the common BATsh::Env variable store.
+
+      :: -- CMD section: sets a variable and calls a SH function via bridge --
+      @ECHO OFF
+      SET LANG=BATsh
+      SET COUNT=3
+
+      # -- SH section: reads CMD variables, uses functions and pipeline --
+      greet() {
+          echo "Hello from $1 (bash/sh mode)"
+      }
+      greet $LANG
+      for i in 1 2 3; do echo "  item $i of $COUNT"; done
+      result=$(echo "$LANG" | perl -e 'while(<STDIN>){chomp;print uc}')
+      echo "Uppercase: $result"
+      echo "log line" >> /tmp/batsh_demo.txt
+
+      :: -- CMD section again: reads variable set by SH side --
+      ECHO Back in CMD mode
+      ECHO Uppercase result: %result%
+
+    BATsh features (both modes): pipelines (|), I/O redirection (> >> <
+    2>&1), variable expansion (${var%pat} ${var^^} ${#var}), functions,
+    shift, local.
+
+FULL DESCRIPTION
     BATsh is a self-contained bilingual shell interpreter written in pure
     Perl. It implements both the cmd.exe command set and the sh/bash command
     set entirely in Perl -- no external cmd.exe, bash, or sh is required.
@@ -26,14 +86,68 @@ CMD MODE
     CMD line. CMD sections are executed by BATsh::CMD, which implements:
 
       ECHO, @ECHO OFF/ON
-      SET VAR=value, SET /A expr
-      IF "A"=="B" ... ELSE ..., IF EXIST, IF DEFINED, IF ERRORLEVEL
+      SET VAR=value, SET /A expr (arithmetic)
+      SET /P VAR=Prompt  (interactive prompt input from STDIN)
+      IF "A"=="B" ... ELSE ..., IF /I (case-insensitive), IF NOT
+      IF EXIST "path with spaces", IF DEFINED var, IF ERRORLEVEL n
       FOR %%V IN (list) DO ..., FOR /L %%V IN (s,step,e) DO ...
-      GOTO :label, :label
+      FOR /F "tokens= delims= skip= eol= usebackq" %%V IN (src) DO ...
+      GOTO :label, :label, GOTO :EOF
       CALL :label [args], CALL file.batsh
-      SETLOCAL, ENDLOCAL
+      SHIFT, SHIFT /N
+      SETLOCAL [ENABLEDELAYEDEXPANSION|DISABLEDELAYEDEXPANSION], ENDLOCAL
       CD, DIR, COPY, DEL, MOVE, MKDIR, RMDIR, REN, TYPE
-      PAUSE, EXIT, CLS, TITLE, VER, PUSHD, POPD
+      PAUSE, EXIT [/B] [code], CLS, TITLE, VER, PUSHD, POPD
+      cmd1 | cmd2  (pipeline via temporary file)
+      &, &&, ||  (sequential, conditional-and, conditional-or)
+
+  Variable Expansion
+    "%VAR%" references are expanded before each line is dispatched. Variable
+    names are case-insensitive ("SET foo=x" is visible as "%FOO%").
+
+    Inside parenthesised IF and FOR blocks, "%VAR%" is expanded at parse
+    time (before any commands in the block run), matching cmd.exe behaviour.
+    To see a value updated inside a block, use delayed expansion:
+
+      SETLOCAL ENABLEDELAYEDEXPANSION
+      SET X=old
+      IF 1==1 (
+          SET X=new
+          ECHO !X!       &:: prints "new" (delayed)
+          ECHO %X%       &:: prints "old" (parse-time)
+      )
+      ENDLOCAL
+
+  Batch Parameters
+    %0 is the script path (absolute); %1..%9 are positional arguments; "%*"
+    is all arguments joined by space. "SHIFT" / "SHIFT /N" shifts the
+    positional parameters. "CALL :label" saves and restores caller's
+    arguments.
+
+    Batch-parameter tilde modifiers expand %0..%9 components:
+
+      %~0    dequote (strip surrounding "...")
+      %~f1   full absolute path of %1
+      %~d1   drive letter only   (e.g. C:)
+      %~p1   directory path only (with trailing /)
+      %~n1   filename without extension
+      %~x1   extension only       (e.g. .bat)
+      %~dp0  drive + directory    (most common usage)
+      %~nx1  filename + extension
+
+  Redirection and Compound Commands
+      ECHO text > file      stdout overwrite
+      ECHO text >> file     stdout append
+      prog 2> err.txt       stderr redirect
+      & cmd                 sequential execution
+      cmd1 && cmd2          run cmd2 only if cmd1 succeeded (ERRORLEVEL 0)
+      cmd1 || cmd2          run cmd2 only if cmd1 failed   (ERRORLEVEL != 0)
+
+    The "^" character escapes the next character:
+
+      ECHO a^&b    prints  a&b   (& not treated as compound separator)
+      ECHO a^^b    prints  a^b
+      ECHO text^   next line is joined (line continuation)
 
 SH MODE
     Any line whose first token contains a lowercase letter is a SH line. SH
@@ -46,21 +160,47 @@ SH MODE
       while condition; do ... done
       until condition; do ... done
       case $var in pattern) ... ;; esac
-      test / [ ... ]  (file tests, string, integer comparisons)
-      cd, pwd, exit, true, false, :, read, shift
-      $(( arithmetic )), $( command substitution )
-      ${VAR}, ${VAR:-default}, ${VAR:=default}
+      test / [ ... ]  (file, string, and integer comparisons)
+      cd, pwd, exit, true, false, :, read, shift [N], local VAR=value
+      $(( arithmetic )) -- +, -, *, /, %, and $1..$9 inside
+      $( command ) and `command`  (command substitution, nested)
+      cmd1 | cmd2 [| cmd3 ...]  (pipeline via temporary file)
+      cmd1 && cmd2, cmd1 || cmd2, cmd1 ; cmd2  (compound commands)
+      > >> < 2> 2>> 2>&1 1>&2  (I/O redirection)
+      name() { ... }, function name { ... }  (function definitions)
+      $VAR, ${VAR}, $1..$9, $@, $*, $#, $?, $$, $0
+      ${VAR:-default}, ${VAR:=default}, ${VAR:+alt}
+      ${VAR%pat}, ${VAR%%pat}   -- shortest/longest suffix removal
+      ${VAR#pat}, ${VAR##pat}   -- shortest/longest prefix removal
+      ${VAR/pat/rep}, ${VAR//pat/rep}  -- first/all substitution
+      ${VAR^^}, ${VAR^}, ${VAR,,}, ${VAR,}  -- case conversion
+      ${VAR:N:L}, ${VAR:N}  -- substring
+      ${#VAR}  -- string length
       source / . file
 
 REQUIREMENTS
     Perl 5.005_03 or later. Core modules only. No external shell required.
 
 BUGS AND LIMITATIONS
-    The built-in CMD interpreter does not support all cmd.exe extensions
-    (e.g. FOR /F with complex token options, delayed expansion with !VAR!).
+    The built-in CMD interpreter does not support:
 
-    The built-in SH interpreter does not support pipelines (|), redirection
-    (> >> <), background execution (&), or here-documents (<<).
+    *   "FOR /F" with "usebackq" backtick-quoted commands on Windows (the
+        "cmd /c" subprocess path is untested on Windows)
+
+    *   "CHOICE", "TIMEOUT", "XCOPY", "ROBOCOPY", "FINDSTR", "SORT", "MORE"
+        and other external utilities (delegated to the OS)
+
+    The built-in SH interpreter does not support:
+
+    *   Background execution ("&" at end of command)
+
+    *   Here-documents ("<<")
+
+    *   Process substitution ("<(cmd)")
+
+    Pipeline ("|"), I/O redirection (">" ">>" "<" "2>" "2>>" "2>&1"),
+    compound commands ("&&" "||" ";"), and function definitions are all
+    supported.
 
     Section boundary detection is token-based (uppercase vs. lowercase first
     token). Mixed-case first tokens are treated as SH.

@@ -7,7 +7,7 @@ use strict;
 use warnings;
 use experimental 'signatures', 'lexical_subs', 'declared_refs';
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 
 use Exporter::Shiny 'qhull';
@@ -171,20 +171,20 @@ sub qhull ( @coords ) {
         is_hashref( $coords[-1] ) ? %{ pop @coords } : (),
     );
 
-    my $raw        = delete $option{raw};
-    my $trace      = delete $option{trace};
-    my $qh_opts    = delete( $option{qh_opts} ) // [];
-    my $save_input = delete $option{save_input};
+    my $raw         = delete $option{raw};
+    my $trace       = delete $option{trace};
+    my $qh_opts     = delete( $option{qh_opts} ) // [];
+    my $save_input  = delete $option{save_input};
+    my $passthrough = delete $option{passthrough};
 
     if ( is_arrayref( $qh_opts ) ) {
         $qh_opts = Qhull::Options->new_from_options( $qh_opts );
-        my $passthrough = delete $option{passthrough};
-        $qh_opts = $qh_opts->filter_args( passthrough => $passthrough )
-          if !$raw;
     }
     elsif ( !blessed( $qh_opts ) || !$qh_opts->isa( 'Qhull::Options' ) ) {
         croak( 'qh_opts must be a Qhull::Options object or an arrayref' );
     }
+
+    $qh_opts = $qh_opts->filter_args( passthrough => $passthrough );
 
     # default mode is convex hull, return orderd list of indices (extrema), (format => 'Fx')
     $qh_opts = $qh_opts->clone_with_options( ['Fx'] )
@@ -279,7 +279,7 @@ Qhull::PP - Pure Perl interface to Qhull
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 

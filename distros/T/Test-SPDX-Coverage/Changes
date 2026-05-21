@@ -1,0 +1,18 @@
+Revision history for Perl extension Test::SPDX::Coverage.
+
+0.04 2026-05-05
+  - Added UTF-8 support in t/pod-spell.t
+
+0.03 2026-05-05
+  - Added license expression capability to support AND, OR, and WITH expressions
+  - TODO: License expression WITH Classpath-exception-2.0 fails check
+
+0.02 2026-05-04
+  - Added license verification PR #1
+  - Added test cases
+    - "Same as Perl" test case fails due to https://github.com/michal-josef-spacek/License-SPDX/issues/2
+  - TODO: Support license expressions
+
+0.01 2026-04-27
+  - original version
+  - TODO: Add license verification

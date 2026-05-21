@@ -140,10 +140,15 @@
   ->ToLookup(sub { $_[0]{dept} })
   ->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} })
   ->ToLTSV('output.ltsv')
+  ->ToLTSV('output.ltsv',              # label_order: specify output label order
+      label_order => [qw(host status bytes url)])
+  ->ToLTSV('output.ltsv',              # headers: alias for label_order (CSV-LINQ interop)
+      headers => [qw(host status bytes url)])
 
   ToDictionary trả về hashref key=>element.
     ToLookup trả về hashref key=>[elements].
     ToLTSV ghi chuỗi vào tệp LTSV.
+    label_order chỉ định thứ tự nhãn; headers là bí danh của nó (tương thích CSV-LINQ).
 
 [ 12. Tài nguyên chính thức (Official resources) ]
 

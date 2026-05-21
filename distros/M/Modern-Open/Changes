@@ -1,5 +1,14 @@
 Revision history for this software.
 
+0.15  2026-05-17 00:00:00
+  - replace \do{local*_} globref with named glob string (Module::FH::H<n>)
+    in open(), opendir(), sysopen(), pipe(), socket(), accept()
+  - add no strict 'refs' guards for all named glob dereferences
+  - Perl 5.005_03 does not support I/O via globref; named glob string
+    works on Perl 5.005_03 and all later versions
+  - remove checking $_[1] of accept()
+  - created by INABA Hitoshi
+
 0.14  2023-03-25 00:00:00
   - update POD
   - created by INABA Hitoshi

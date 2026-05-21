@@ -2,7 +2,7 @@ package IPC::Manager::Client;
 use strict;
 use warnings;
 
-our $VERSION = '0.000035';
+our $VERSION = '0.000037';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed weaken/;
@@ -46,6 +46,7 @@ sub pre_suspend_hook     { }
 sub post_suspend_hook    { }
 sub post_disconnect_hook { }
 sub peer_left            { }
+sub peer_suspend_expires { undef }
 
 sub reconnect { shift->connect(@_, reconnect => 1) }
 sub pid_check { croak "Client used from wrong PID" if $_[0]->{+PID} != $$; $_[0] }
@@ -313,9 +314,14 @@ sub disconnect {
 
 sub suspend {
     my $self = shift;
+    my (%params) = @_;
     $self->pid_check;
 
-    $self->pre_suspend_hook;
+    my $expires_at = $params{expires_at};
+    $expires_at = time + $params{expires_in}
+        if !defined($expires_at) && defined $params{expires_in};
+
+    $self->pre_suspend_hook(expires_at => $expires_at);
 
     $self->{+DISCONNECTED} = 1;
 

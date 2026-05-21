@@ -47,15 +47,15 @@ is(Baz->motto(), "Foo!", "post-unmock: Baz inherit's Bar's inheritance of Foo's 
 		$INC{'InvalidChild.pm'} = '__MOCKED__';
 		$INC{'ValidChild.pm'} = '__MOCKED__';
 	}
-	package Mother;
+	package Mother; ## no critic (Modules::RequireFilenameMatchesPackage)
 
 	sub do_something { 1 }
 
-	package InvalidChild;
+	package InvalidChild; ## no critic (Modules::RequireFilenameMatchesPackage)
 
 	sub abcd { 1 }
 
-	package ValidChild;
+	package ValidChild; ## no critic (Modules::RequireFilenameMatchesPackage)
 
 	use parent q{Mother};
 

@@ -1,0 +1,38 @@
+#
+## CopyRight (C) - Carlos Celso
+#
+## see: https://metacpan.org/pod/DBD::CSV
+
+*) step1
+
+   This example is based Standard DBI connector.
+   - No predefined plugin is required.
+   - All specifications must by formated by the caller.
+
+   NOTE: The following options is required:
+   - dsname		(is required)
+   - interface_options	(is required)
+   - login		(depends on the DBD driver)
+   - password		(depends on the DBD driver)
+   - schema		(depends on the DBD driver)
+
+   The following options will be ignored:
+   - db
+   - dbfile
+   - port
+   - server
+
+*) step2
+
+   The script will create the file /tmp/users.csv
+   The first line contains the rows separated by ':'
+
+*) step3, test perl
+
+   # perl dbi_csv_file.pl
+   
+*) step4, cleanup
+   
+   # rm /tmp/users.csv
+   
+ENDED

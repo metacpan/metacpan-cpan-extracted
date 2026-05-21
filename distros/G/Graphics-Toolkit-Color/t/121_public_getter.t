@@ -1,0 +1,153 @@
+#!/usr/bin/perl
+
+use v5.12;
+use warnings;
+use lib 'lib', '../lib/', '.', './t';
+use Test::Color;
+use Test::More tests => 94;
+use Graphics::Toolkit::Color::Space::Util 'round_decimals';
+use Graphics::Toolkit::Color qw/color is_in_gamut/;
+
+my $red    = color( 255,0,0 );
+my $blue   = color( {r => 0, g => 0, b=>255} );
+my $purple = color( {hue => 300, s => 100, l => 25} );
+my $black  = color( [0,0,0] );
+my $white  = color( 'cmy',0,0,0 );
+my @names;
+
+#### name ##############################################################
+is( $red->name,          'red', 'color name "red" is correct');
+is( $blue->name,        'blue', 'color name "blue" is correct');
+is( $purple->name,    'purple', 'color name "purple" is correct');
+is( $black->name,      'black', 'color name "black" is correct');
+is( $white->name,      'white', 'color name "white" is correct');
+
+is( $red->closest_name,          'red', 'color "red" is also closest name');
+is( $blue->closest_name,        'blue', 'color "blue" is also closest name');
+is( $purple->closest_name,    'purple', 'color "purple" is also closest name');
+is( $black->closest_name,      'black', 'color "black" is also closest name');
+is( $white->closest_name,      'white', 'color "white" is also closest name');
+
+@names = $blue->name(all => 1, full => 1);
+is( int @names,                 2, '"blue" has two names');
+is( $names[0],             'blue', '"blue" is first, no default name space name in color name');
+is( $names[1],            'blue1', '"blue1" is second"');
+@names = sort $blue->name(all => 1, distance => 25);
+is( int @names,                 3, 'around "blue" with distance 25 you get 3 colors');
+is( $names[0],             'blue', '"blue" is first, no default name space name in color name');
+is( $names[1],            'blue1', '"blue1" is second"');
+is( $names[2],            'blue2', '"blue2" is third"');
+
+#### closest_name ######################################################
+my ($name, $d) = $red->closest_name;
+is( $name,               'red', 'color name is "red" also in array context');
+is( $d,                      0, 'and has no distance');
+($name, $d) = $blue->closest_name;
+is( $name,              'blue', 'color name is "blue" also in array context');
+is( $d,                      0, 'and has no distance');
+($name, $d) = $purple->closest_name;
+is( $name,            'purple', 'color name is "purple" also in array context');
+is( $d,                      0, 'and has no distance');
+($name, $d) = $black->closest_name;
+is( $name,             'black', 'color name is "black" also in array context');
+is( $d,                      0, 'and has no distance');
+($name, $d) = $white->closest_name;
+is( $name,             'white', 'color name is "white" also in array context');
+is( $d,                      0, 'and has no distance');
+
+my $snow = color(['rgb', 254, 255, 255]);
+is( $snow->name,               '', 'this color has no name in default constants');
+($name, $d) = $snow->closest_name;
+is( $name,             'white', 'color "white" is closest to snow');
+is( $d,                      1, 'and has a distance of 1');
+
+#### distance ##########################################################
+is( round_decimals($snow->distance($white), 5), 1, 'distance method calculates (almost) the same');
+is( round_decimals($snow->distance(to => $white), 5), 1, 'use named argument to calculate distance');
+is( round_decimals($snow->distance(to => $white, range => 510), 3), 2, 'test reaction to the "range" argument');
+is( round_decimals($snow->distance(to => $white, select => 'red'), 5), 1, 'test reaction to the "select" argument');
+is( round_decimals($snow->distance(to => $white, select => 'blue'), 5), 0, 'select axis with no value difference');
+is( round_decimals($snow->distance(to => $white, select => ['red','blue']), 5), 1, 'select axis with and without value difference');
+is( round_decimals($snow->distance(to => $white, in => 'cmy', range => 255), 5), 1, 'test reaction to the "in" argument');
+is( ref $snow->distance( to => $white, blub => '-'),           '', 'false arguments get caught');
+is( ref $snow->distance( in => 'LAB'),                         '', 'missing required argument gets caught');
+
+#### values ############################################################
+my @values = $blue->values();
+is_tuple( \@values, [0, 0, 255], [qw/red green blue/], 'default output of "values is a RGB list"');
+
+@values = $blue->values(as => 'array');
+is( int @values,                 1, 'ordered one ARRAY ref');
+is_tuple( $values[0], [0, 0, 255], [qw/red green blue/], '"ARRAY" format is for RGB');
+
+@values = $blue->values(as => 'named_array');
+is( int @values,                 1, 'named ARRAY ref');
+is( ref $values[0],        'ARRAY', 'is an ARRAY ref');
+is( int @{$values[0]},           4, 'has four values inside');
+is( $values[0][0],           'RGB', 'color space name is first');
+is( $values[0][1],               0, 'red value is correct');
+is( $values[0][2],               0, 'green value is correct');
+is( $values[0][3],             255, 'blue value is correct');
+is( ref $blue->values( in => 'LAB', as => 'array'),       'ARRAY', 'ARRAY ref format is now for every space');
+is( ref $blue->values( in => 'LAB', as => 'hex_string'),  '', 'hex_string format is RGB only');
+is( ref $blue->values( in => 'LAB', was => 'array'),      '', 'reject fantasy arguments');
+is( ref $blue->values( in => 'LAB', suffix => {}),        '', 'bad ref type for suffix def');
+is( ref $blue->values( in => 'LAB', suffix => [1,2]),     '', 'suffix def too short');
+is( ref $blue->values( in => 'LAB', suffix => [1,2,3,4]), '', 'suffix def too long');
+
+@values = $blue->values(in => 'CMYK');
+is_tuple( \@values, [1, 1, 0, 0], [qw/cyan magenta yellow key/], 'value list in CMYK');
+
+is( $blue->values(as => 'css_string'),      'rgb(0, 0, 255)', 'blue in CSS string format');
+is( $blue->values(as => 'named_string'),    'rgb: 0, 0, 255', 'blue in named string format');
+is( $blue->values(as => 'hex_string'),             '#0000FF', 'blue in hex string format');
+is( $snow->values(as => 'css_string'),      'rgb(254, 255, 255)', 'blue in CSS string format');
+is( $snow->values(as => 'named_string'),    'rgb: 254, 255, 255', 'blue in named string format');
+is( $snow->values(as => 'hex_string'),                 '#FEFFFF', 'blue in hex string format');
+is( $snow->values(as => 'HEX_string'),                 '#FEFFFF', 'format name is case insensitive');
+is( $red->values(in => 'HWB', as => 'named_string'), 'hwb: 0, 0%, 0%', 'red as named string in HWB');
+is( $red->values(in => 'HWB', as => 'named_string', suffix => ''),        'hwb: 0, 0, 0',           'without any suffix');
+is( $red->values(in => 'RGB', as => 'css_string', suffix => ['-','/','']),'rgb(255-, 0/, 0)',       'RGB with taylor made suffix');
+is( $red->values(in => 'XYZ', as => 'css_string' ),                   'xyz(41.246, 21.267, 1.933)', 'XYZ red CSS string ');
+is( $red->values(in => 'XYZ', as => 'css_string', precision => 1 ),   'xyz(41.2, 21.3, 1.9)',       'XYZ red CSS string with reduced precision');
+is( $red->values(in => 'XYZ', as => 'css_string', precision => [3,2,0] ),'xyz(41.246, 21.27, 2)',   'XYZ red CSS string with inidividual precision');
+is( $blue->values(in => 'RGB', as => 'named_string', range => '10'),     'rgb: 0, 0, 10',           'RGB blue with custom ranges');
+is( $blue->values(in => 'RGB', as => 'named_string', range => [[-1,1],[-2,2],1]), 'rgb: -1, -2, 1', 'RGB blue with with very custom ranges');
+
+my $values = $blue->values( as => 'hash');
+is( ref $values,           'HASH', 'got a value HASH ref');
+is( keys %$values,              3, 'RGB has 3 keays');
+is( $values->{'red'},           0, '"red" value is correct');
+is( $values->{'green'},         0, '"green" value is correct');
+is( $values->{'blue'},        255, '"blue" value is correct');
+
+$values = $blue->values( in => 'HSL', as => 'char_hash', suffix => '');
+is( ref $values,           'HASH', 'got a value HASH ref');
+is( keys %$values,              3, 'HSL has 3 keays');
+is( $values->{'h'},           240, '"hue" value is correct');
+is( $values->{'s'},           100, '"saturation" value is correct');
+is( $values->{'l'},            50, '"lightness" value is correct');
+
+my $too_blue = Graphics::Toolkit::Color->new( color => [-1, 10, 256], raw => 1);
+my @rgb = $too_blue->values(range => {red => 100, green => 510, blue => 255});
+is_tuple( \@rgb, [0, 20, 255], [qw/red green blue/], 'clamped RGB values in custom range in HASH definition');
+@rgb = $too_blue->values(range => {red => 100, green => 510 });
+is_tuple( \@rgb, [0, 20, 255], [qw/red green blue/], 'same, but missing axis in HASH definition, gets replaced with default');
+@rgb = $too_blue->values(range => 1, precision => 3);
+is_tuple( \@rgb, [0, 0.039, 1], [qw/red green blue/], 'clamped RGB values in normal range and custom precision');
+@rgb = $too_blue->values(raw => 1);
+is_tuple( \@rgb, [-1, 10, 256], [qw/red green blue/], 'raw RGB values');
+@rgb = Graphics::Toolkit::Color->new( color => [4,5,6], range => 10)->values(range => 'normal');
+is_tuple( \@rgb, [0.4, .50, .6], [qw/red green blue/], 'custom ranged RGB values as input, normalized');
+
+#### is_in_gamut #######################################################
+is( $blue->is_in_gamut(),                   1, 'blue is_in_gamut');
+is( $blue->is_in_gamut( in => 'XYZ'),       1, 'blue is_in_gamut in CIEXYZ');
+is( $blue->is_in_gamut('xyz:1,1,1'),        1, 'xyz white is in xyz gamut');
+is( $blue->is_in_gamut(color => 'xyz:1,1,1', in => 'SRGB', range => 1), 0, 'xyz white is not in RGB');
+is( $blue->is_in_gamut('xyz: 100,100,100'), 0, 'x value is out of gamut');
+is( $blue->is_in_gamut('hsl: 10,10,10'),    1, 'is_in_gamut method works with normal HSL color');
+is( $blue->is_in_gamut('hsl: -10,10,10'),   1, 'is_in_gamut checks only linear axis');
+is( $blue->is_in_gamut('hsl: 0,1000,10'),   0, 'is_in_gamut checks saturation was out of gamut');
+
+exit 0;

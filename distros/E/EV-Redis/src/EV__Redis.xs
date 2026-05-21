@@ -234,7 +234,7 @@ static void stop_reconnect_timer(EV__Redis self) {
     }
 }
 
-/* Maximum timeout: ~24 days (fits safely in 32-bit calculations) */
+/* Maximum timeout: ~23 days (fits safely in 32-bit calculations) */
 #define MAX_TIMEOUT_MS 2000000000
 
 static void validate_timeout_ms(IV ms, const char* name) {
@@ -301,11 +301,10 @@ static void remove_cb_queue_sv(EV__Redis self, SV* error_sv) {
         cbt = ngx_queue_data(q, ev_redis_cb_t, queue);
 
         if (cbt == self->current_cb) {
-            /* Skip current_cb - check if it's the only item left */
+            /* Skip current_cb - it is owned by an in-flight reply_cb. */
             if (ngx_queue_next(q) == ngx_queue_sentinel(&self->cb_queue)) {
-                break;  /* Only current_cb remains, we're done */
+                break;
             }
-            /* Move to next item */
             q = ngx_queue_next(q);
             cbt = ngx_queue_data(q, ev_redis_cb_t, queue);
         }
@@ -376,19 +375,17 @@ static void schedule_waiting_timer(EV__Redis self);
 static void expire_waiting_commands(EV__Redis self);
 static void schedule_reconnect(EV__Redis self);
 static void EV__redis_connect_cb(redisAsyncContext* c, int status);
-static void EV__redis_disconnect_cb(redisAsyncContext* c, int status);
+static void EV__redis_disconnect_cb(const redisAsyncContext* c, int status);
 static void EV__redis_push_cb(redisAsyncContext* ac, void* reply_ptr);
 static SV* EV__redis_decode_reply(redisReply* reply);
+/* Recursion limit for nested array/map/set replies. Bounds C-stack growth
+ * when decoding maliciously deep replies from an untrusted server. */
+#define EV_REDIS_MAX_REPLY_DEPTH 512
+static SV* decode_reply_depth(redisReply* reply, int depth);
 
 static void clear_connection_params(EV__Redis self) {
-    if (NULL != self->host) {
-        Safefree(self->host);
-        self->host = NULL;
-    }
-    if (NULL != self->path) {
-        Safefree(self->path);
-        self->path = NULL;
-    }
+    if (NULL != self->host) { Safefree(self->host); self->host = NULL; }
+    if (NULL != self->path) { Safefree(self->path); self->path = NULL; }
 }
 
 static void reconnect_timer_cb(EV_P_ ev_timer* w, int revents) {
@@ -556,9 +553,7 @@ static void do_reconnect(EV__Redis self) {
 static void EV__redis_connect_cb(redisAsyncContext* c, int status) {
     EV__Redis self = (EV__Redis)c->data;
 
-    /* Safety check: if self is NULL or already freed, skip callback */
-    if (self == NULL) return;
-    if (self->magic != EV_REDIS_MAGIC) return;
+    if (NULL == self || self->magic != EV_REDIS_MAGIC) return;
 
     self->callback_depth++;
 
@@ -594,7 +589,6 @@ static void EV__redis_connect_cb(redisAsyncContext* c, int status) {
             LEAVE;
         }
 
-        /* Resume waiting commands if any. */
         send_next_waiting(self);
     }
 
@@ -602,16 +596,14 @@ static void EV__redis_connect_cb(redisAsyncContext* c, int status) {
     check_destroyed(self);
 }
 
-static void EV__redis_disconnect_cb(redisAsyncContext* c, int status) {
+static void EV__redis_disconnect_cb(const redisAsyncContext* c, int status) {
     EV__Redis self = (EV__Redis)c->data;
     SV* error_sv;
     int should_reconnect = 0;
     int was_intentional;
     int will_reconnect;
 
-    /* Safety check: if self is NULL or already freed, skip callback */
-    if (self == NULL) return;
-    if (self->magic != EV_REDIS_MAGIC) return;
+    if (NULL == self || self->magic != EV_REDIS_MAGIC) return;
 
     /* Stale disconnect callback: user already established a new connection
      * (e.g., called disconnect() then connect() before the old deferred
@@ -661,8 +653,14 @@ static void EV__redis_disconnect_cb(redisAsyncContext* c, int status) {
 
         /* Re-check: user's handler might have called connect() or reconnect()
          * establishing a new ac. If so, skip clearing cb_queue to avoid
-         * freeing new commands. ac_saved is also already handled or NULL. */
+         * freeing new commands; still honour resume_waiting_on_reconnect=0
+         * by clearing the old wait queue (its entries belong to the prior
+         * connection, not the new one). ac_saved is already handled or NULL. */
         if (self->ac != NULL && self->ac != c) {
+            if (!self->resume_waiting_on_reconnect) {
+                clear_wait_queue_sv(self, error_sv);
+                stop_waiting_timer(self);
+            }
             self->callback_depth--;
             check_destroyed(self);
             return;
@@ -671,8 +669,6 @@ static void EV__redis_disconnect_cb(redisAsyncContext* c, int status) {
 
     remove_cb_queue_sv(self, error_sv);
 
-    /* Clear waiting queue unless we will actually reconnect and
-     * resume_waiting_on_reconnect is enabled. */
     will_reconnect = should_reconnect && !self->intentional_disconnect && self->reconnect;
     if (!self->resume_waiting_on_reconnect || was_intentional || !will_reconnect) {
         clear_wait_queue_sv(self, error_sv);
@@ -691,10 +687,8 @@ static void EV__redis_push_cb(redisAsyncContext* ac, void* reply_ptr) {
     EV__Redis self = (EV__Redis)ac->data;
     redisReply* reply = (redisReply*)reply_ptr;
 
-    if (self == NULL) return;
-    if (self->magic != EV_REDIS_MAGIC) return;
-    if (NULL == self->push_handler) return;
-    if (NULL == reply) return;
+    if (NULL == self || self->magic != EV_REDIS_MAGIC) return;
+    if (NULL == self->push_handler || NULL == reply) return;
 
     self->callback_depth++;
 
@@ -784,7 +778,7 @@ static int post_connect_setup(EV__Redis self, const char* err_prefix) {
     }
 
     redisAsyncSetConnectCallbackNC(self->ac, EV__redis_connect_cb);
-    redisAsyncSetDisconnectCallback(self->ac, (redisDisconnectCallback*)EV__redis_disconnect_cb);
+    redisAsyncSetDisconnectCallback(self->ac, EV__redis_disconnect_cb);
     if (NULL != self->push_handler) {
         redisAsyncSetPushCallback(self->ac, EV__redis_push_cb);
     }
@@ -800,7 +794,7 @@ static int post_connect_setup(EV__Redis self, const char* err_prefix) {
     return REDIS_OK;
 }
 
-static SV* EV__redis_decode_reply(redisReply* reply) {
+static SV* decode_reply_depth(redisReply* reply, int depth) {
     SV* res;
 
     switch (reply->type) {
@@ -835,11 +829,17 @@ static SV* EV__redis_decode_reply(redisReply* reply) {
         case REDIS_REPLY_PUSH: {
             AV* av = newAV();
             size_t i;
+            if (depth >= EV_REDIS_MAX_REPLY_DEPTH) {
+                /* Stop recursing: an empty array placeholder bounds C-stack
+                 * usage against a hostile server replying with deep nesting. */
+                res = newRV_noinc((SV*)av);
+                break;
+            }
             if (reply->elements > 0) {
                 av_extend(av, (SSize_t)(reply->elements - 1));
                 for (i = 0; i < reply->elements; i++) {
                     if (NULL != reply->element[i]) {
-                        av_push(av, EV__redis_decode_reply(reply->element[i]));
+                        av_push(av, decode_reply_depth(reply->element[i], depth + 1));
                     }
                     else {
                         av_push(av, newSV(0));
@@ -851,12 +851,15 @@ static SV* EV__redis_decode_reply(redisReply* reply) {
         }
 
         default:
-            /* Unknown type, return undef */
             res = newSV(0);
             break;
     }
 
     return res;
+}
+
+static SV* EV__redis_decode_reply(redisReply* reply) {
+    return decode_reply_depth(reply, 0);
 }
 
 static void EV__redis_reply_cb(redisAsyncContext* c, void* reply, void* privdata) {
@@ -1126,7 +1129,6 @@ static void send_next_waiting(EV__Redis self) {
     ngx_queue_t* q;
     ev_redis_wait_t* wt;
     ev_redis_cb_t* cbt;
-    int r;
 
     while (1) {
         /* Check preconditions each iteration - they may change after callbacks */
@@ -1149,12 +1151,11 @@ static void send_next_waiting(EV__Redis self) {
         ngx_queue_insert_tail(&self->cb_queue, &cbt->queue);
         if (!cbt->persist) self->pending_count++;
 
-        r = submit_to_redis(self, cbt, wt->argc,
+        /* Ignore submit_to_redis return: on failure it invokes cbt's error
+         * callback and frees cbt, so the loop continues to try the next entry. */
+        (void)submit_to_redis(self, cbt, wt->argc,
             (const char**)wt->argv, wt->argvlen);
         free_wait_entry(wt);
-
-        /* If command failed, loop to try next from queue. 
-         * If command succeeded, continue loop to fill more slots up to max_pending. */
     }
 }
 
@@ -1339,7 +1340,7 @@ CODE:
     REDIS_OPTIONS_SET_TCP(&opts, hostname, port);
     self->ac = redisAsyncConnectWithOptions(&opts);
     if (NULL == self->ac) {
-        croak("cannot allocate memory");
+        croak("connect error: cannot allocate memory");
     }
 
     (void)post_connect_setup(self, "connect error");
@@ -1365,7 +1366,7 @@ CODE:
     REDIS_OPTIONS_SET_UNIX(&opts, path);
     self->ac = redisAsyncConnectWithOptions(&opts);
     if (NULL == self->ac) {
-        croak("cannot allocate memory");
+        croak("connect error: cannot allocate memory");
     }
 
     (void)post_connect_setup(self, "connect error");
@@ -1552,6 +1553,11 @@ CODE:
         wt->argc = argc;
         wt->cb = SvREFCNT_inc(cb);
         wt->persist = persist;
+        /* Refresh ev_now: command() may be called outside an ev_run iteration
+         * (e.g. during initial setup), where the cached time is stale. Without
+         * this, queued_at reflects an old time base and a later expire check
+         * against the up-to-date ev_now would compute an inflated elapsed. */
+        ev_now_update(self->loop);
         wt->queued_at = ev_now(self->loop);
         ngx_queue_init(&wt->queue);
         ngx_queue_insert_tail(&self->wait_queue, &wt->queue);
@@ -1676,9 +1682,8 @@ CODE:
 {
     if (NULL != value && SvOK(value)) {
         int prio = SvIV(value);
-        /* Clamp priority to libev valid range: EV_MINPRI (-2) to EV_MAXPRI (+2) */
-        if (prio < -2) prio = -2;
-        if (prio > 2) prio = 2;
+        if (prio < EV_MINPRI) prio = EV_MINPRI;
+        if (prio > EV_MAXPRI) prio = EV_MAXPRI;
         self->priority = prio;
         if (NULL != self->ac) {
             redisLibevSetPriority(self->ac, prio);
@@ -1926,7 +1931,6 @@ CODE:
     ssl_opts.server_name = (SvOK(server_name)) ? SvPV_nolen(server_name) : NULL;
     ssl_opts.verify_mode = verify ? REDIS_SSL_VERIFY_PEER : REDIS_SSL_VERIFY_NONE;
 
-    /* Free existing SSL context if any */
     if (NULL != self->ssl_ctx) {
         redisFreeSSLContext(self->ssl_ctx);
         self->ssl_ctx = NULL;

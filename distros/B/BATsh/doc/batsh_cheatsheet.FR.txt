@@ -1,6 +1,30 @@
 BATsh Aide-memoire [FR] Francais
 =================================
 
+----------------------------------------------------------------------
+RESUME
+  BATsh est un interpreteur de shell bilingue qui execute la syntaxe
+  cmd.exe et bash/sh dans le meme fichier de script, en changeant de
+  mode ligne par ligne automatiquement. Aucun shell externe requis.
+
+EXEMPLE MIXTE
+  :: Section CMD (premier jeton en majuscules)
+  @ECHO OFF
+  SET LANG=BATsh
+
+  # Section SH (premier jeton avec minuscules)
+  greet() { echo "Bonjour $1 (mode bash)"; }
+  greet $LANG
+  result=$(echo $LANG | perl -e 'while(<STDIN>){chomp;print uc}')
+  echo "Majuscules: $result"
+
+  :: Retour en CMD (lecture resultat SH)
+  ECHO Retour CMD: %result%
+
+  # Execution: perl lib/BATsh.pm script.batsh
+----------------------------------------------------------------------
+
+
 BATsh est un shell bilingue qui execute la syntaxe cmd.exe et bash/sh
 dans le meme script. Le premier token de chaque ligne determine le mode.
 
@@ -98,3 +122,21 @@ dans le meme script. Le premier token de chaque ligne determine le mode.
   Aucune dependance CPAN.
 
 Voir aussi : https://metacpan.org/dist/BATsh
+
+11. Pipeline CMD et modificateurs de parametres
+-------------------------------------------------
+  cmd1 | cmd2              # Pipeline via fichier temporaire (Pure Perl)
+  SET /P VAR=Invite:       # Lire une ligne de STDIN dans VAR
+  %~dp0                    # Lecteur+repertoire de %0 (usage le plus courant)
+  %~n1, %~x1, %~nx1       # Nom de fichier, extension, les deux
+
+12. Fonctions SH et expansion de variables
+-------------------------------------------
+  f() { echo $1; }         # Definition de fonction
+  ${var%.*}  ${var%%.*}    # Supprimer suffixe (court/long)
+  ${var#*.}  ${var##*.}    # Supprimer prefixe (court/long)
+  ${var/a/b} ${var//a/b}   # Remplacer (premier/tous)
+  ${var^^} ${var,,}        # Majuscules/minuscules
+  cmd > f  cmd >> f  2>&1  # Redirection
+  cmd1 && cmd2             # Enchainement ET
+  cmd1 || cmd2             # Enchainement OU

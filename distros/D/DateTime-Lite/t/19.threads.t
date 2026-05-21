@@ -4,20 +4,29 @@
 ## Thread safety tests for the $DBH and $STHS package-level caches.
 ## Skipped entirely when Perl is not compiled with useithreads.
 ##----------------------------------------------------------------------------
+BEGIN
+{
+    use strict;
+    use warnings;
+    use lib './lib';
+    use vars qw( $DEBUG );
+    use Test::More;
+    use Config;
+    unless( $Config{useithreads} )
+    {
+        plan( skip_all => "Perl $^V is not compiled with useithreads, skipping thread safety tests" );
+    }
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
+};
+
 use strict;
 use warnings;
-use lib './lib';
-use Test::More;
-use Config;
-our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 
-unless( $Config{useithreads} )
+BEGIN
 {
-    plan( skip_all => "Perl $^V is not compiled with useithreads, skipping thread safety tests" );
-}
-
-use_ok( 'DateTime::Lite' ) or BAIL_OUT( 'Cannot load DateTime::Lite' );
-use_ok( 'DateTime::Lite::TimeZone' ) or BAIL_OUT( 'Cannot load DateTime::Lite::TimeZone' );
+    use_ok( 'DateTime::Lite' ) or BAIL_OUT( 'Cannot load DateTime::Lite' );
+    use_ok( 'DateTime::Lite::TimeZone' ) or BAIL_OUT( 'Cannot load DateTime::Lite::TimeZone' );
+};
 
 require threads;
 

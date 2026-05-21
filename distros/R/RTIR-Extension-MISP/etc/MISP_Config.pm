@@ -1,7 +1,8 @@
 =pod
 
-This is an example configuration for a MISP feed. Replace the
-URI/ApiKeyAuth with the MISP instance you want to query.
+Replace the URI/ApiKeyAuth with details for your MISP instance.
+
+=cut
 
 Set(%ExternalFeeds,
     'MISP' => [
@@ -14,4 +15,10 @@ Set(%ExternalFeeds,
     ],
 );
 
-=cut
+Set(%CustomFieldGroupings,
+    'RT::Ticket' => {
+        'Incidents' => {
+            'MISP' => ['MISP Event ID', 'MISP Event UUID', 'MISP RTIR Object ID'],
+        },
+    },
+);

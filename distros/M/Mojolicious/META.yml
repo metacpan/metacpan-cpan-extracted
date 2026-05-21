@@ -33,7 +33,7 @@ resources:
     web: https://web.libera.chat/#mojo
   bugtracker: https://github.com/mojolicious/mojo/issues
   homepage: https://mojolicious.org
-  license: http://www.opensource.org/licenses/artistic-license-2.0
+  license: https://opensource.org/license/artistic-2-0
   repository: https://github.com/mojolicious/mojo.git
-version: '9.42'
+version: '9.45'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

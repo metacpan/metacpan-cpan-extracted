@@ -1,5 +1,5 @@
 package Crypt::Passphrase::Util::Crypt64;
-$Crypt::Passphrase::Util::Crypt64::VERSION = '0.022';
+$Crypt::Passphrase::Util::Crypt64::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -90,7 +90,7 @@ Crypt::Passphrase::Util::Crypt64 - An implementation of the crypt64 encoding
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 

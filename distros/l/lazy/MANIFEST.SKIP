@@ -5,4 +5,3 @@ git
 .gitignore
 local
 pre-commit
-.tidyallrc

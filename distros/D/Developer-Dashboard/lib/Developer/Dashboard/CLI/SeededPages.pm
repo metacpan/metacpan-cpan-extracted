@@ -3,53 +3,20 @@ package Developer::Dashboard::CLI::SeededPages;
 use strict;
 use warnings;
 
-our $VERSION = '3.14';
+our $VERSION = '3.90';
 
-use File::Basename qw(dirname);
 use File::Spec;
-use File::ShareDir qw(dist_dir);
 use Developer::Dashboard::JSON qw(json_decode json_encode);
 use Developer::Dashboard::SeedSync ();
-
 use Developer::Dashboard::PageDocument;
 
-my %PAGE_CACHE;
-my %ID_TO_ASSET = (
-    'api-dashboard' => 'api-dashboard.page',
-    'sql-dashboard' => 'sql-dashboard.page',
-);
-my %LEGACY_MANAGED_PAGE_MD5 = (
-    'sql-dashboard' => [
-        '7d9101e0e2585c159e575f0dbd49b3ef',
-        'f62a03c9ff7d25cdce65ce569cf2e07b',
-        '10a14e5749f374a78429654b6c49b5f0',
-    ],
-);
-
-# api_dashboard_page()
-# Loads the seeded api-dashboard bookmark definition from the shipped asset file.
-# Input: none.
-# Output: Developer::Dashboard::PageDocument object.
-sub api_dashboard_page {
-    return _page_from_asset('api-dashboard.page');
-}
-
-# sql_dashboard_page()
-# Loads the seeded sql-dashboard bookmark definition from the shipped asset file.
-# Input: none.
-# Output: Developer::Dashboard::PageDocument object.
-sub sql_dashboard_page {
-    return _page_from_asset('sql-dashboard.page');
-}
-
 # page_for_id($id)
-# Loads one shipped seeded bookmark page by its saved bookmark id.
-# Input: seeded bookmark id string such as api-dashboard or sql-dashboard.
+# Loads one seeded bookmark page by its saved bookmark id.
+# Input: seeded bookmark id string.
 # Output: Developer::Dashboard::PageDocument object.
 sub page_for_id {
     my ($id) = @_;
-    my $filename = _seeded_page_asset_filename($id);
-    return _page_from_asset($filename);
+    die "Unknown seeded page id '$id'\n";
 }
 
 # seed_manifest_path(%args)
@@ -69,14 +36,7 @@ sub seed_manifest_path {
 # Input: seeded bookmark id string.
 # Output: ordered list of lowercase md5 hex strings.
 sub known_managed_page_md5s {
-    my ($id) = @_;
-    my $filename = _seeded_page_asset_filename($id);
-    my %seen;
-    my @md5s = (
-        Developer::Dashboard::SeedSync::content_md5( _seeded_page_instruction($filename) ),
-        @{ $LEGACY_MANAGED_PAGE_MD5{$id} || [] },
-    );
-    return grep { defined $_ && $_ ne '' && !$seen{$_}++ } @md5s;
+    return;
 }
 
 # is_known_managed_page_md5(%args)
@@ -86,11 +46,9 @@ sub known_managed_page_md5s {
 # Output: boolean true when the digest belongs to a known dashboard-managed copy.
 sub is_known_managed_page_md5 {
     my (%args) = @_;
-    my $id  = $args{id}  || '';
     my $md5 = $args{md5} || '';
-    return 0 if $id eq '' || $md5 eq '';
-    my $matches = scalar grep { $_ eq $md5 } known_managed_page_md5s($id);
-    return $matches ? 1 : 0;
+    return 0 if $md5 eq '';
+    return 0;
 }
 
 # ensure_seeded_page(%args)
@@ -154,81 +112,6 @@ sub ensure_seeded_page {
     return 'preserved';
 }
 
-# _page_from_asset($filename)
-# Reads one seeded bookmark instruction file and parses it into a page document.
-# Input: asset filename under share/seeded-pages.
-# Output: Developer::Dashboard::PageDocument object.
-sub _page_from_asset {
-    my ($filename) = @_;
-    die "Missing seeded page filename\n" if !defined $filename || $filename eq '';
-    my $instruction = _seeded_page_instruction($filename);
-    return Developer::Dashboard::PageDocument->from_instruction($instruction);
-}
-
-# _seeded_page_instruction($filename)
-# Returns one shipped seeded bookmark instruction string, caching repeated reads.
-# Input: asset filename under share/seeded-pages.
-# Output: bookmark instruction string.
-sub _seeded_page_instruction {
-    my ($filename) = @_;
-    die "Missing seeded page filename\n" if !defined $filename || $filename eq '';
-    return $PAGE_CACHE{$filename} if exists $PAGE_CACHE{$filename};
-
-    my $path = _seeded_page_asset_path($filename);
-    open my $fh, '<:raw', $path or die "Unable to read $path: $!";
-    my $instruction = do { local $/; <$fh> };
-    close $fh or die "Unable to close $path: $!";
-    $PAGE_CACHE{$filename} = $instruction;
-    return $instruction;
-}
-
-# _seeded_page_asset_filename($id)
-# Resolves the shipped seeded-page asset filename for one seeded bookmark id.
-# Input: seeded bookmark id string.
-# Output: asset filename string.
-sub _seeded_page_asset_filename {
-    my ($id) = @_;
-    die "Unknown seeded page id '$id'\n" if !defined $id || !$ID_TO_ASSET{$id};
-    return $ID_TO_ASSET{$id};
-}
-
-# _seeded_page_asset_path($filename)
-# Resolves one shipped seeded bookmark asset path from the repo tree during
-# development or from the installed distribution share dir after install.
-# Input: asset filename under share/seeded-pages.
-# Output: absolute asset path string.
-sub _seeded_page_asset_path {
-    my ($filename) = @_;
-    die "Missing seeded page filename\n" if !defined $filename || $filename eq '';
-    my $repo_path = File::Spec->catfile( _repo_seeded_pages_root(), $filename );
-    return $repo_path if -f $repo_path;
-    return File::Spec->catfile( _shared_seeded_pages_root(), $filename );
-}
-
-# _repo_seeded_pages_root()
-# Resolves the repo-tree seeded-pages directory for development checkouts.
-# Input: none.
-# Output: absolute seeded-pages directory path.
-sub _repo_seeded_pages_root {
-    return File::Spec->catdir(
-        dirname(__FILE__),
-        File::Spec->updir,
-        File::Spec->updir,
-        File::Spec->updir,
-        File::Spec->updir,
-        'share',
-        'seeded-pages',
-    );
-}
-
-# _shared_seeded_pages_root()
-# Resolves the installed distribution share directory for seeded bookmark assets.
-# Input: none.
-# Output: absolute seeded-pages directory path inside the installed dist share.
-sub _shared_seeded_pages_root {
-    return File::Spec->catdir( dist_dir('Developer-Dashboard'), 'seeded-pages' );
-}
-
 # _read_manifest(%args)
 # Loads the runtime seeded-page manifest when present.
 # Input: hash containing a required path registry under the "paths" key.
@@ -277,7 +160,7 @@ sub _record_manifest_md5 {
     my $md5   = $args{md5}   || die 'Missing seeded page md5';
     my $manifest = _read_manifest( paths => $paths );
     $manifest->{$id} = {
-        asset => _seeded_page_asset_filename($id),
+        asset => $id,
         md5   => $md5,
     };
     _write_manifest(
@@ -309,43 +192,46 @@ __END__
 
 =head1 NAME
 
-Developer::Dashboard::CLI::SeededPages - shipped bookmark assets for dashboard init
+Developer::Dashboard::CLI::SeededPages - manifest-based tracking for dashboard-managed starter pages
 
 =head1 SYNOPSIS
 
   use Developer::Dashboard::CLI::SeededPages;
-  my $page = Developer::Dashboard::CLI::SeededPages::api_dashboard_page();
+  my $status = Developer::Dashboard::CLI::SeededPages::ensure_seeded_page(
+      page  => $page,
+      pages => $page_store,
+      paths => $paths,
+  );
 
 =head1 DESCRIPTION
 
-Loads the shipped seeded bookmark instruction files used by C<dashboard init>
-and runtime bootstrap so the public C<dashboard> entrypoint does not need to
-embed the full bookmark source for the API and SQL dashboards. It also owns
-the non-destructive starter-page refresh contract: missing or stale
-dashboard-managed copies may refresh to the latest shipped seed, while
-diverged user-edited saved pages stay untouched.
+Tracks the manifest used for dashboard-managed starter pages and owns the
+non-destructive refresh contract for already-materialized saved pages. Core no
+longer ships the extracted optional browser workspaces, so this module now
+focuses on deciding whether an existing managed page may be refreshed safely
+or must be preserved.
 
 =for comment FULL-POD-DOC START
 
 =head1 PURPOSE
 
-This module manages shipped starter pages such as C<project-home>, C<api-dashboard>, and C<sql-dashboard>. It decides whether a runtime should receive a seed, whether a dashboard-managed copy is still safe to refresh, and how bridged historical managed digests are recognized during upgrades.
+This module manages the manifest and refresh policy for dashboard-managed starter pages that already exist in a runtime.
 
 =head1 WHY IT EXISTS
 
-It exists because seeding starter pages is not just a copy operation. The runtime must preserve real user edits while still refreshing dashboard-managed pages when the shipped content changed or when an older managed digest needs to be upgraded in place.
+It exists because refreshing dashboard-managed starter pages is not just a copy operation. The runtime must preserve real user edits while still refreshing managed pages when shipped content changed.
 
 =head1 WHEN TO USE
 
-Use this file when changing dashboard init seeding rules, starter-page refresh behavior, bridge digests for older releases, or the safe-update policy for managed seed copies in runtime dashboards.
+Use this file when changing starter-page refresh behavior or the safe-update policy for managed page copies in runtime dashboards.
 
 =head1 HOW TO USE
 
-Call the seeding and refresh routines from init/update flows with the active runtime paths and page store. Keep managed-seed detection here so the command layer does not guess about whether a page is user-owned or dashboard-managed.
+Call the refresh routines from init or runtime update flows with the active runtime paths and page store. Keep managed-page detection here so the command layer does not guess about whether a page is user-owned or dashboard-managed.
 
 =head1 WHAT USES IT
 
-It is used by C<dashboard init>, runtime bootstrap/update scripts, seed-refresh regressions for stale managed copies, and the SQL/API dashboard starter-page tests.
+It is used by C<dashboard init>, runtime bootstrap/update scripts, and seed-refresh regressions for stale managed copies.
 
 =head1 EXAMPLES
 
@@ -357,7 +243,7 @@ Do a direct compile-and-load check against the module from a source checkout.
 
 Example 2:
 
-  prove -lv t/04-update-manager.t t/26-sql-dashboard.t
+  prove -lv t/04-update-manager.t t/05-cli-smoke.t
 
 Run the focused regression tests that most directly exercise this module's behavior.
 

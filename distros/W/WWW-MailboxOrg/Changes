@@ -1,0 +1,24 @@
+0.001     2026-05-07 03:36:59Z
+
+  - Initial release with full Mailbox.org API support
+  - JSON-RPC 2.0 over HTTPS with session-based authentication (HPLS-AUTH)
+  - Complete API coverage:
+    - account: add, del, get, list, set
+    - domain: add, del, get, list, set
+    - mail: find, fetch, list, send, copy, move, delete, create_folder, list_folders, update_folder, delete_folder
+    - mailinglist: add, del, get, list, set, add_member, del_member, list_members
+    - blacklist: add, del, list
+    - spamprotect: status, set
+    - videochat: status, create_room, list_rooms, delete_room
+    - backup: list, create, restore, delete
+    - invoice: list, get, download
+    - system: hello, test, capabilities
+    - passwordreset: request, set
+    - validate: email
+    - utils: parse_headers, parse_date, generate_message_id
+  - Moo-based architecture with Role::HTTP and pluggable LWPIO backend
+  - Entity objects for Account and Domain
+  - Custom Types: EmailAddress, DomainName, Boolean
+  - mborg CLI tool with config file support (~/.mailboxrc)
+  - Environment variable support (MAILBOX_USER, MAILBOX_PASSWORD)
+  - Interactive credential prompt for login command

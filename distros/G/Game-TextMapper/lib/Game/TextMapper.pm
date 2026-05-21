@@ -1,22 +1,8 @@
 #!/usr/bin/env perl
-# Copyright (C) 2009-2023  Alex Schroeder <alex@gnu.org>
-#
-# This program is free software: you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation, either version 3 of the License, or (at your option) any
-# later version.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program. If not, see <http://www.gnu.org/licenses/>.
-
+# License: AGPL 3 (see below)
 package Game::TextMapper;
 
-our $VERSION = 1.08;
+our $VERSION = 1.09;
 
 use Game::TextMapper::Log;
 use Game::TextMapper::Point;
@@ -175,6 +161,7 @@ sub alpine_map {
 		$c->param('steepness'),
 		$c->param('peaks'),
 		$c->param('peak'),
+		$c->param('peak-min'),
 		$c->param('bumps'),
 		$c->param('bump'),
 		$c->param('bottom'),
@@ -264,6 +251,7 @@ get '/alpine/document' => sub {
 	     steepness => $data->steepness,
 	     peaks => $data->peaks,
 	     peak => $data->peak,
+	     peak_min => $data->peak_min,
 	     bumps => $data->bumps,
 	     bump => $data->bump,
 	     bottom => $data->bottom,
@@ -697,6 +685,68 @@ Game::TextMapper - a web app to generate maps based on text files
 The script parses a text description of a hex map and produces SVG output. Use
 your browser to view SVG files and use Inkscape to edit them.
 
+=over
+
+=item * L<Tutorial|/Tutorial>
+
+=item * L<Colours and Transparency|/Colours and Transparency>
+
+=item * L<Include a Library|/Include a Library>
+
+=over
+
+=item * L<The default library|/The default library>
+
+=item * L<Bright library|/Bright library>
+
+=item * L<Gazetteer library|/Gazetteer library>
+
+=item * L<Gnomeyland library|/Gnomeyland library>
+
+=item * L<Gridmapper library|/Gridmapper library>
+
+=item * L<Traveller library|/Traveller library>
+
+=back
+
+=item * L<Large Areas|/Large Areas>
+
+=item * L<SVG|/SVG>
+
+=item * L<Deprecated|/Deprecated>
+
+=item * L<Other|/Other>
+
+=item * L<URL|/URL>
+
+=item * L<License|/License>
+
+=item * L<Algorithms|/Algorithms>
+
+=over
+
+=item * L<Smale|/Smale>
+
+=item * L<Alpine|/Alpine>
+
+=item * L<Apocalypse|/Apocalypse>
+
+=item * L<Gridmapper|/Gridmapper>
+
+=item * L<Islands|/Islands>
+
+=item * L<Traveller|/Traveller>
+
+=back
+
+=item * L<Border Adjustments|/Border Adjustments>
+
+=item * L<Configuration|/Configuration>
+
+=item * L<Command Line|/Command Line>
+
+=back
+
 =head2 Tutorial
 
 Note that if you look at the help page
@@ -803,7 +853,9 @@ The mid point between two hexes would therefore be a translation of
 
 You can define SVG B<path> elements to use for your map. These can be
 independent of a type (such as an icon for a settlement) or they can
-be part of a type (such as a bit of grass).
+be part of a type (such as a bit of grass). Take a look at various
+path editors like L<SvgPathEditor|https://yqnn.github.io/svg-path-editor/>
+if you need more complex shapes.
 
 Here, we add a bit of grass to the appropriate hex type:
 
@@ -1016,6 +1068,17 @@ L<https://campaignwiki.org/contrib/default.txt>
 Result:
 L<https://campaignwiki.org/text-mapper?map=include+forgotten-depths.txt>
 
+=head3 Apocalypse library
+
+Example data:
+L<https://campaignwiki.org/contrib/apocalypse-example.txt>
+
+Library:
+L<https://campaignwiki.org/contrib/apocalypse.txt>
+
+Result:
+L<https://campaignwiki.org/text-mapper?map=include+apocalypse-example.txt>
+
 =head3 Bright library
 
 Example data:
@@ -1026,6 +1089,17 @@ L<https://campaignwiki.org/contrib/bright.txt>
 
 Result:
 L<https://campaignwiki.org/text-mapper?map=include+bright-example.txt>
+
+=head3 Gazetteer library
+
+Example data:
+L<https://campaignwiki.org/contrib/gazetteer-example.txt>
+
+Library:
+L<https://campaignwiki.org/contrib/gazetteer.txt>
+
+Result:
+L<https://campaignwiki.org/text-mapper?map=include+gazetteer-example.txt>
 
 =head3 Gnomeyland library
 
@@ -1038,6 +1112,17 @@ L<https://campaignwiki.org/contrib/gnomeyland.txt>
 Result:
 L<https://campaignwiki.org/text-mapper?map=include+gnomeyland-example.txt>
 
+=head3 Gridmapper library
+
+Example:
+L<https://campaignwiki.org/contrib/gridmapper-example.txt>
+
+Library:
+L<https://campaignwiki.org/contrib/gridmapper.txt>
+
+Result:
+L<https://campaignwiki.org/text-mapper?type=square&map=include+gridmapper-example.txt>
+
 =head3 Traveller library
 
 Example:
@@ -1048,17 +1133,6 @@ L<https://campaignwiki.org/contrib/traveller.txt>
 
 Result:
 L<https://campaignwiki.org/text-mapper?map=include+traveller-example.txt>
-
-=head3 Dungeons library
-
-Example:
-L<https://campaignwiki.org/contrib/gridmapper-example.txt>
-
-Library:
-L<https://campaignwiki.org/contrib/gridmapper.txt>
-
-Result:
-L<https://campaignwiki.org/text-mapper?type=square&map=include+gridmapper-example.txt>
 
 =head2 Large Areas
 
@@ -1090,11 +1164,29 @@ then we drop a jungle on top of the green area.
 
 You can define shapes using arbitrary SVG. Your SVG will end up in the
 B<defs> section of the SVG output. You can then refer to the B<id>
-attribute in your map definition. For the moment, all your SVG needs to
-fit on a single line.
+attribute in your map definition. Tag must start at the beginning of the
+line for it to get used.
 
-    <circle id="thorp" fill="#ffd700" stroke="black" stroke-width="7" cx="0" cy="0" r="15"/>
-    0101 thorp
+This works:
+
+    <circle id="settlement" fill="#ffd700" stroke="black" stroke-width="7" cx="0" cy="0" r="15"/>
+    0101 settlement
+
+This does not:
+
+    <circle id="settlement"
+            fill="#ffd700" stroke="black" stroke-width="7"
+            cx="0" cy="0" r="15"/>
+    0101 settlement
+
+Spreading an element and its children over multiple lines works as long as the
+the tags all start at the beginning of the line:
+
+    <g id="village" transform="scale(0.6), translate(0,40)">
+    <path stroke="black" stroke-width="7" d="M-15,0 v-50 m-15,0 h60 m-15,0 v50 M0,0 v-37"/>
+    <circle fill="#ffd700" stroke="black" stroke-width="7" cx="0" cy="0" r="15"/>
+    </g>
+    0101 village
 
 Shapes can include each other:
 
@@ -1109,6 +1201,26 @@ When creating new shapes, remember the dimensions of the hex. Your shapes must
 be centered around (0,0). The width of the hex is 200px, the height of the hex
 is 100 √3 = 173.2px. A good starting point would be to keep it within (-50,-50)
 and (50,50).
+
+=head2 Deprecated
+
+A deprecated alternative to using SVG directly is the C<xml> keywod. This is how
+it looks:
+
+    settlement xml <circle id="settlement" fill="#ffd700" stroke="black" stroke-width="7" cx="0" cy="0" r="15"/>
+    house xml <path stroke="black" stroke-width="7" d="M-15,0 v-50 m-15,0 h60 m-15,0 v50 M0,0 v-37"/>
+    village xml <use xlink:href="#house" transform="scale(0.6), translate(0,40)"/><use xlink:href="#settlement" transform="scale(0.6), translate(0,40)"/>
+    0101 village
+
+This above is the equivalent to the following:
+
+    <g id="house"><path stroke="black" stroke-width="7" d="M-15,0 v-50 m-15,0 h60 m-15,0 v50 M0,0 v-37"/></g>
+    <g id="settlement"><circle id="settlement" fill="#ffd700" stroke="black" stroke-width="7" cx="0" cy="0" r="15"/></g>
+    <g id="village"><use xlink:href="#house" transform="scale(0.6), translate(0,40)"/><use xlink:href="#settlement" transform="scale(0.6), translate(0,40)"/></g>
+    0101 village
+
+Since you have no control over the group element that wraps the XML provided,
+using SVG directly is preferred.
 
 =head2 Other
 
@@ -1140,7 +1252,7 @@ C<%s> in the URL and then this placeholder will be replaced with the
 
 =head2 License
 
-This program is copyright (C) 2007-2019 Alex Schroeder <alex@gnu.org>.
+This program is copyright (C) 2007-2024 Alex Schroeder <alex@gnu.org>.
 
 This program is free software: you can redistribute it and/or modify it under
 the terms of the GNU Affero General Public License as published by the Free
@@ -1153,15 +1265,25 @@ FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
 details.
 
 You should have received a copy of the GNU Affero General Public License along
-with this program. If not, see <http://www.gnu.org/licenses/>.
+with this program. If not, see L<http://www.gnu.org/licenses/>.
 
 The maps produced by the program are obviously copyrighted by I<you>,
 the author. If you're using SVG icons, these I<may> have a separate
-license. Thus, if you produce a map using the I<Gnomeyland> icons by
-Gregory B. MacKenzie, the map is automatically licensed under the
-Creative Commons Attribution-ShareAlike 3.0 Unported License. To view
-a copy of this license, visit
-L<http://creativecommons.org/licenses/by-sa/3.0/>.
+license.
+
+=over
+
+=item * If you produce a map using the I<Gazetteer> icons by Thorfinn Tait, the
+map is automatically licensed under the Creative Commons
+Attribution-NonCommercial-ShareAlike 4.0 International License. To view a copy
+of this license, visit L<https://creativecommons.org/licenses/by-nc-sa/4.0/>.
+
+=item * If you produce a map using the I<Gnomeyland> icons by Gregory B.
+MacKenzie, the map is automatically licensed under the Creative Commons
+Attribution-ShareAlike 3.0 Unported License. To view a copy of this license,
+visit L<https://creativecommons.org/licenses/by-sa/3.0/>.
+
+=back
 
 You can add arbitrary SVG using the B<license> keyword (without a
 tile). This is what the Gnomeyland library does, for example.
@@ -1192,6 +1314,10 @@ The viewport for the map is determined by the hexes of the map. You need to take
 this into account when putting a license onto the map. Thus, if your map does
 not include the hex 0101, you can't use coordinates for the license text around
 the origin at (0,0) – you'll have to move it around.
+
+=head2 Algorithms
+
+Text Mapper implements a number of different algorithms.
 
 =head3 Smale
 
@@ -1230,8 +1356,8 @@ The Apocalypse algorithm was developed by Alex Schroeder. See L<Hex describing t
 post-apocalypse|https://alexschroeder.ch/wiki/2020-10-02_Hex_describing_the_post-apocalypse>
 for more information.
 
-The output uses the default library. This library is dedicated to the public.
-domain.
+The output uses the I<Apocalypse> library. This library is dedicated to the
+public domain.
 
 See L<Game::TextMapper::Schroeder::Alpine> for more information.
 
@@ -1242,8 +1368,8 @@ geomorph sketches by Robin Green. See L<The Nine Forms of the Five Room
 Dungeon|https://gnomestew.com/the-nine-forms-of-the-five-room-dungeon/> by
 Matthew J. Neagley for more information.
 
-The output uses the Dungeons library. This library is dedicated to the public
-domain.
+The output uses the I<Gridmapper> library. This library is dedicated to the
+public domain.
 
 See L<Game::TextMapper::Gridmapper> for more information.
 
@@ -1569,6 +1695,8 @@ You'll find the map description in a comment within the SVG file.
 %= number_field arid => 2, min => 0, max => 2
 </td><td>Desert:</td><td>
 %= check_box climate => 'desert'
+</td><td>Min. peak:</td><td>
+%= number_field 'peak-min' => 10, min => 0, max => 10
 </td></tr></table>
 <p>
 See the <%= link_to alpineparameters => begin %>documentation<% end %> for an
@@ -1763,9 +1891,16 @@ parameter to something higher than 10 just makes sure that there will be a lot
 of mountain peaks.
 </p>
 <p>
+The optional <strong>peak-min</strong> parameter determines a lower end of the
+peaks. It follows a square distribution. If there are 10 peaks, with the peak
+set to 10, and peak-min set to 7, then there is one peak at altitude 10 (this
+one is fixed), and the distribution of altitudes 7, 8 and 9 is going to be 4:2:1.
+</p>
+<p>
 Examples:
 <%= link_to url_for('alpinerandom')->query(height => 10, width => 15, peak => 11) => begin %>big mountains<% end %>,
 <%= link_to url_for('alpinerandom')->query(height => 10, width => 15, steepness => 3, bottom => 3, peak => 8) => begin %>old country<% end %>
+<%= link_to url_for('alpinerandom')->query(height => 10, width => 15, bottom => 3, peaks => 7, steepness => 1.2, 'peak-min' => 6, peak => 8) => begin %>islands<% end %>
 </p>
 <p>
 You can also control how high the extra bumps will be using the
@@ -1804,16 +1939,19 @@ Example:
 <h1>Alpine Map: How does it get created?</h1>
 
 <p>How do we get to the following map?
-<%= link_to url_for('alpinedocument')->query(width => $width, height => $height, steepness => $steepness, peaks => $peaks, peak => $peak, bumps => $bumps, bump => $bump, bottom => $bottom, arid => $arid, climate => $climate) => begin %>Reload<% end %>
+<%= link_to url_for('alpinedocument')->query(width => $width, height => $height, steepness => $steepness, peaks => $peaks, peak => $peak, 'peak-min' => $peak_min, bumps => $bumps, bump => $bump, bottom => $bottom, arid => $arid, climate => $climate) => begin %>Reload<% end %>
 to get a different one. If you like this particular map, bookmark
-<%= link_to url_for('alpinerandom')->query(seed => $seed, width => $width, height => $height, steepness => $steepness, peaks => $peaks, peak => $peak, bumps => $bumps, bump => $bump, bottom => $bottom, arid => $arid, climate => $climate) => begin %>this link<% end %>,
+<%= link_to url_for('alpinerandom')->query(seed => $seed, width => $width, height => $height, steepness => $steepness, peaks => $peaks, peak => $peak, 'peak-min' => $peak_min, bumps => $bumps, bump => $bump, bottom => $bottom, arid => $arid, climate => $climate) => begin %>this link<% end %>,
 and edit it using
-<%= link_to url_for('alpine')->query(seed => $seed, width => $width, height => $height, steepness => $steepness, peaks => $peaks, peak => $peak, bumps => $bumps, bump => $bump, bottom => $bottom, arid => $arid, climate => $climate) => begin %>this link<% end %>,
+<%= link_to url_for('alpine')->query(seed => $seed, width => $width, height => $height, steepness => $steepness, peaks => $peaks, peak => $peak, 'peak-min' => $peak_min, bumps => $bumps, bump => $bump, bottom => $bottom, arid => $arid, climate => $climate) => begin %>this link<% end %>,
 </p>
 
 %== $maps->[$#$maps]
 
-<p>First, we pick <%= $peaks %> peaks and set their altitude to <%= $peak %>.
+<p>First, we pick <%= $peaks %> peaks and set the first one to altitude <%=
+$peak %>. Then we set the remaining peaks to random altitudes between <%=
+$peak_min %> and <%= $peak %>. Lower peaks are more common.
+
 Then we loop down to 1 and for every hex we added in the previous run, we add
 <%= $steepness %> neighbours at a lower altitude, if possible. We take fractions
 into account: 2.2 means we'll add 2 neighbours and there's a 20% we'll add a
@@ -1827,6 +1965,9 @@ note that 0 <em>peaks</em> will result in no land mass.</p>
 <p>The initial altitude of those peaks can be changed using the <em>peak</em>
 parameter. Please note that a <em>peak</em> smaller than 7 will result in no
 sources for rivers.</p>
+
+<p>If the <em>peak-min</em> parameter is set, it determines the lower end of the
+range for peak altitude.</p>
 
 %== shift(@$maps)
 
@@ -2014,10 +2155,12 @@ replace operation to use more reds, to use more bushland, to use more desert.
 </td></tr>
 <tr><td>Arid:</td><td>
 %= number_field arid => 2, min => 0, max => 2, step => 0.1
-</td><td>Step:</td><td>
-%= number_field step => undef, min => 1, max => 20
 </td><td>Desert:</td><td>
 %= check_box climate => 'desert'
+</td><td>Min. peak:</td><td>
+%= number_field 'peak-min' => 10, min => 0, max => 10
+</td><td>Step:</td><td>
+%= number_field step => undef, min => 1, max => 20
 </td></tr></table>
 <p>
 See the <%= link_to alpineparameters => begin %>documentation<% end %> for an

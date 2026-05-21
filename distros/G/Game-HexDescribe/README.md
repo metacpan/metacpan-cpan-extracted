@@ -125,9 +125,74 @@ named `hex-describe.conf` like the following:
 }
 ```
 
+Depending on the complexity of the tables and the size of the map,
+generating a new document can take a long time. By default, the
+inactivity timeout is 30s. One way to increase it is to set the
+`MOJO_INACTIVITY_TIMEOUT` environment variable. See the
+`Mojolicious::Guides::FAQ` man page for more.
+
+## Deployment
+
+Deployment is a little tricky because you don't want to install the
+web app as the sole web app. This requires a "mount" that associates a
+path such as `/hex-describe` with the real Hex Describe. The following
+tiny web app does that, assuming that Hex Describe is available from
+the same directory as the Perl interpreter. I saved it as
+`/home/alex/farm/hex-describe.pl`:
+
+```
+use Mojolicious::Lite -signatures;
+use File::Basename;
+
+my $dirname  = dirname($^X);
+
+plugin Mount => {'/hex-describe' => "$dirname/hex-describe"};
+
+app->start;
+```
+
+Here's an example service file for systemd. It uses a specific Perl
+interpreter I installed using Perlbrew, calls the script that mounts
+the real Hex Describe and serves is on localhost port 4010:
+
+```
+[Unit]
+Description=Hex Describe
+After=network.target
+[Install]
+WantedBy=multi-user.target
+[Service]
+Type=simple
+WorkingDirectory=/home/alex/farm
+Restart=always
+DynamicUser=yes
+MemoryMax=300M
+MemoryHigh=280M
+Environment="MOJO_INACTIVITY_TIMEOUT=60"
+Environment="PERL5LIB=/home/alex/perl5/perlbrew/perls/perl-5.40.0/lib"
+ExecStart=/home/alex/perl5/perlbrew/perls/perl-5.40.0/bin/perl \
+ /home/alex/farm/hex-describe.pl \
+ daemon --mode production -l http://localhost:4010
+```
+
+I use Apache as a reverse proxy so that I can use the web server's
+features to renew the certificate, block bots, rate limit, and so on.
+Here's part of the config file:
+
+```
+MDomain campaignwiki.org
+<VirtualHost *:443>
+    ServerName campaignwiki.org
+    SSLEngine on
+    ProxyPreserveHost On
+    RequestHeader set X-Forwarded-Proto "https"
+    ProxyPass /hex-describe http://localhost:4010/hex-describe
+</VirtualHost>
+```
+
 ## Development
 
-As a developer, morbo makes sure to restart the web app whenever a
+As a developer, `morbo` makes sure to restart the web app whenever a
 file changes:
 
 ```bash

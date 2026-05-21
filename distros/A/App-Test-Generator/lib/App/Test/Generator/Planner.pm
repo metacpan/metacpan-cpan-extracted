@@ -2,6 +2,8 @@ package App::Test::Generator::Planner;
 
 use strict;
 use warnings;
+use Carp qw(croak);
+use Readonly;
 
 use App::Test::Generator::TestStrategy;
 use App::Test::Generator::Planner::Isolation;
@@ -9,79 +11,143 @@ use App::Test::Generator::Planner::Fixture;
 use App::Test::Generator::Planner::Mock;
 use App::Test::Generator::Planner::Grouping;
 
-our $VERSION = '0.33';
+our $VERSION = '0.38';
+
+# Accessor type strings used in plan_all() strategy mapping
+Readonly my $ACCESSOR_GET      => 'get';
+Readonly my $ACCESSOR_GETSET   => 'getset';
+Readonly my $ACCESSOR_INJECTOR => 'injector';
+
+# Output type string for boolean detection
+Readonly my $OUTPUT_BOOLEAN => 'boolean';
 
 =head1 VERSION
 
-Version 0.33
+Version 0.38
+
+=head2 new
+
+Construct a new Planner instance.
+
+    my $planner = App::Test::Generator::Planner->new(
+        schemas => \%schemas,
+        package => 'My::Module',
+    );
+
+=head3 Arguments
+
+=over 4
+
+=item * C<schemas> - hashref of method name to schema hashref. Required.
+
+=item * C<package> - the Perl package name of the module under test. Required.
+
+=back
+
+=head3 Returns
+
+A blessed hashref.
 
 =cut
 
 sub new {
 	my ($class, %args) = @_;
-	bless {
-		schemas  => $args{schemas},
+
+	# schemas and package are required for meaningful planning
+	croak 'schemas required' unless defined $args{schemas};
+	croak 'package required' unless defined $args{package};
+
+	return bless {
+		schemas => $args{schemas},
 		package => $args{package},
 	}, $class;
 }
 
+=head2 plan_all
+
+Generate a test plan for every method in the schema.
+
+    my $plans = $planner->plan_all();
+
+=head3 Arguments
+
+None beyond C<$self>.
+
+=head3 Returns
+
+A hashref mapping method name to a plan hashref. Each plan hashref
+contains boolean flags such as C<getter_test>, C<getset_test>,
+C<object_injection_test>, and C<boolean_test> indicating which test
+types should be emitted for that method.
+
+=cut
+
 sub plan_all {
 	my $self = $_[0];
-
-	# my $global = $self->build_plan();
-
 	my %method_plan;
 
+	# Build a plan for each method in the schema
 	foreach my $method (keys %{ $self->{schemas} }) {
-
 		my $schema = $self->{schemas}{$method};
-
 		my %plan;
 
-		# -----------------------------------
-		# Strategy mapping
-		# -----------------------------------
-
-		if ($schema->{accessor} && $schema->{accessor}->{type}) {
-			if ($schema->{accessor}->{type} eq 'get') {
+		# Map accessor type to the appropriate test flag
+		if($schema->{accessor} && $schema->{accessor}->{type}) {
+			my $type = $schema->{accessor}->{type};
+			if($type eq $ACCESSOR_GET) {
 				$plan{getter_test} = 1;
-			} elsif ($schema->{accessor}->{type} eq 'getset') {
+			} elsif($type eq $ACCESSOR_GETSET) {
 				$plan{getset_test} = 1;
-			} elsif ($schema->{accessor}->{type} eq 'injector') {
+			} elsif($type eq $ACCESSOR_INJECTOR) {
+				# Object injection requires a mock object in the test
 				$plan{object_injection_test} = 1;
 			}
 		}
 
-		if ($schema->{output}->{type} && $schema->{output}->{type} eq 'boolean') {
+		# Boolean output type requires a predicate test
+		if($schema->{output}->{type} && $schema->{output}->{type} eq $OUTPUT_BOOLEAN) {
 			$plan{boolean_test} = 1;
 		}
 
 		$method_plan{$method} = \%plan;
 	}
 
-	# die Dumper(\%method_plan);
 	return \%method_plan;
 }
 
-# TODO:  This doesn't seem to be called anywhere.  Should it be removed?
+# --------------------------------------------------
+# build_plan
+#
+# Build a comprehensive test plan using
+#     all available planning subsystems:
+#     strategy, isolation, fixture, mock,
+#     and grouping.
+#
+# Entry:      None beyond $self.
+# Exit:       Returns a hashref with keys: strategy,
+#             isolation, fixture, mock, groups.
+#
+# Notes:      TODO: This method does not appear to be
+#             called anywhere. Consider removing it or
+#             integrating it into plan_all().
+# --------------------------------------------------
 sub build_plan {
 	my $self = $_[0];
 
-	# Strategy
-	my $strategy_engine = App::Test::Generator::TestStrategy->new(schema => $self->{schemas});
-
+	# Generate the base strategy from the schema
+	my $strategy_engine = App::Test::Generator::TestStrategy->new(
+		schema => $self->{schemas}
+	);
 	my $strategy = $strategy_engine->generate_plan();
 
-	# Isolation
-	my $isolation = App::Test::Generator::Planner::Isolation->new()->plan($self->{schemas}, $strategy);
-
-	# Fixture
-	my $fixture = App::Test::Generator::Planner::Fixture->new()->plan($self->{schemas}, $isolation);
-
-	# Mock
-	my $mock = App::Test::Generator::Planner::Mock->new()->plan($self->{schemas});
-
-	# Grouping
+	# Apply isolation, fixture, mock and grouping layers
+	my $isolation = App::Test::Generator::Planner::Isolation->new()->plan(
+		$self->{schemas}, $strategy
+	);
+	my $fixture = App::Test::Generator::Planner::Fixture->new()->plan(
+		$self->{schemas}, $isolation
+	);
+	my $mock   = App::Test::Generator::Planner::Mock->new()->plan($self->{schemas});
 	my $groups = App::Test::Generator::Planner::Grouping->new()->plan($self->{schemas});
 
 	return {
@@ -92,5 +158,11 @@ sub build_plan {
 		groups    => $groups,
 	};
 }
+
+=head1 AUTHOR
+
+Nigel Horne
+
+=cut
 
 1;

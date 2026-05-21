@@ -2,7 +2,7 @@ package Data::HashMap::Shared::I32S;
 use strict;
 use warnings;
 use Data::HashMap::Shared;
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 sub import {
     $^H{"Data::HashMap::Shared::I32S/shm_i32s_put"}        = 1;
@@ -44,8 +44,12 @@ sub import {
     $^H{"Data::HashMap::Shared::I32S/shm_i32s_arena_used"}       = 1;
     $^H{"Data::HashMap::Shared::I32S/shm_i32s_arena_cap"}        = 1;
     $^H{"Data::HashMap::Shared::I32S/shm_i32s_add"}              = 1;
+    $^H{"Data::HashMap::Shared::I32S/shm_i32s_add_ttl"}          = 1;
+    $^H{"Data::HashMap::Shared::I32S/shm_i32s_update_ttl"}       = 1;
     $^H{"Data::HashMap::Shared::I32S/shm_i32s_update"}           = 1;
     $^H{"Data::HashMap::Shared::I32S/shm_i32s_swap"}             = 1;
+    $^H{"Data::HashMap::Shared::I32S/shm_i32s_cas"}              = 1;
+    $^H{"Data::HashMap::Shared::I32S/shm_i32s_cas_take"}        = 1;
     $^H{"Data::HashMap::Shared::I32S/shm_i32s_persist"}         = 1;
     $^H{"Data::HashMap::Shared::I32S/shm_i32s_set_ttl"}         = 1;
 }

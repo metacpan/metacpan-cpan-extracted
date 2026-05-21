@@ -445,8 +445,8 @@ is ($dbh->do($SQL), '3', $t);
 
 SKIP: {
 
-    if ($pgversion < 80200) {
-        skip ('Cannot test standard_conforming_strings on pre 8.2 servers', 3);
+    if ($pgversion < 80200 or $pgversion >= 19000) {
+        skip ('Cannot test standard_conforming_strings on this version of Postgres', 3);
     }
 
     $t='DB handle attribute "pg_standard_conforming_strings" returns a valid value';

@@ -28,9 +28,20 @@ examples/vector.pl
 examples/vector-usa.gfb
 examples/viewpic.pl
 pics/author.jpg
+pics/cpan.jpg
 pics/GFB.png
+pics/GFB-Testing.png
 pics/pink.jpg
-ignore.txt
+pics/Win-No.png
+pics/LinkedIn.jpg
+pics/Linux.png
+pics/Makefile.jpg
+pics/MetaCPAN.jpg
+pics/Perl.jpg
+pics/PerlSplash.png
+pics/CSplash.png
+pics/YouTube.jpg
+pics/TinyPrint.jpg
 installing/detect.sh
 installing/FAQ.md
 installing/INSTALL.md
@@ -50,9 +61,7 @@ src/Framebuffer.pm
 src/metadata.txt
 src/README.md
 t/01-splash.t
-pics/Win-No.png
-pics/Linux.png
-pics/TinyPrint.jpg
 LICENSE
+ignore.txt
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

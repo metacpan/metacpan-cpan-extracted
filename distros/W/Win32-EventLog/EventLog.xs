@@ -26,9 +26,8 @@ typedef struct _EvtLogCtlBuf
     BOOL   wideEntries;			/* has unicode character entries */
     LPBYTE BufPtr;			/* pointer to data buffer */
     DWORD  BufLen;			/* size of buffer */
-    DWORD  NumEntries;			/* number of entries in buffer */
-    DWORD  CurEntryNum;			/* next entry to return */
     EVENTLOGRECORD *CurEntry;		/* point to next entry to return */
+    EVENTLOGRECORD *EndEntry;		/* point to after the last entry read */
     DWORD  Flags;			/* read flags for ReadEventLog */
 } EvtLogCtlBuf, *lpEvtLogCtlBuf;
 
@@ -278,12 +277,14 @@ CODE:
     lpEvtLog = SVE(handle);
     if ((lpEvtLog != NULL) && (lpEvtLog->dwID == EVTLOGID)) {
 	DWORD NumRead, Required;
-	if (Flags != lpEvtLog->Flags) {
+	if (  (Flags != lpEvtLog->Flags)
+	    || (lpEvtLog->CurEntry >= lpEvtLog->EndEntry)
+	    || (((Flags & EVENTLOG_SEEK_READ) == EVENTLOG_SEEK_READ) && Record != lpEvtLog->CurEntry->RecordNumber)) {
 	    /* Reset to new read mode & force a re-read call */
 	    lpEvtLog->Flags      = Flags;
-	    lpEvtLog->NumEntries = 0;
+	    lpEvtLog->EndEntry = (EVENTLOGRECORD*) lpEvtLog->BufPtr;
 	}
-	if ((lpEvtLog->NumEntries == 0) || (Record != 0)) {
+	if (lpEvtLog->CurEntry >= lpEvtLog->EndEntry) {
 	redo_read:
             result = ReadEventLogA(lpEvtLog->hLog, Flags, Record,
                                    lpEvtLog->BufPtr, lpEvtLog->BufLen,
@@ -291,9 +292,9 @@ CODE:
             lpEvtLog->wideEntries = FALSE;
 
 	    if (result)
-		lpEvtLog->NumEntries = NumRead;
+		lpEvtLog->EndEntry = (EVENTLOGRECORD*) (lpEvtLog->BufPtr + NumRead);
 	    else {
-		lpEvtLog->NumEntries = 0;
+		lpEvtLog->EndEntry = (EVENTLOGRECORD*) lpEvtLog->BufPtr;
 		if (Required > lpEvtLog->BufLen
 		    && GetLastError() == ERROR_INSUFFICIENT_BUFFER)
 		{
@@ -302,11 +303,10 @@ CODE:
 		    goto redo_read;
 		}
 	    }
-	    lpEvtLog->CurEntryNum = 0;
 	    lpEvtLog->CurEntry    = (EVENTLOGRECORD*)lpEvtLog->BufPtr;
 	}
 
-	if (lpEvtLog->CurEntryNum < lpEvtLog->NumEntries) {
+	if (lpEvtLog->CurEntry < lpEvtLog->EndEntry) {
 	    EVENTLOGRECORD *LogBuf;
 	    LogBuf = lpEvtLog->CurEntry;
 	    SETPVN(3, (char*)LogBuf, LogBuf->Length);
@@ -348,13 +348,7 @@ CODE:
 		SETPVN(8, ((LPBYTE)LogBuf)+LogBuf->StringOffset, LogBuf->DataOffset-LogBuf->StringOffset);
 
 	    /* to next entry in buffer */
-	    lpEvtLog->CurEntryNum += LogBuf->Length;
 	    lpEvtLog->CurEntry = (EVENTLOGRECORD*)(((LPBYTE)LogBuf) + LogBuf->Length);
-	    if (lpEvtLog->CurEntryNum == lpEvtLog->NumEntries) {
-		lpEvtLog->NumEntries  = 0;
-		lpEvtLog->CurEntryNum = 0;
-		lpEvtLog->CurEntry    = NULL;
-	    }
 	    RETVAL = TRUE;
 	}
     }
@@ -684,9 +678,8 @@ CODE:
     if (lpEvtLog->hLog) {
 	/* return info... */
 	lpEvtLog->dwID          = EVTLOGID;
-	lpEvtLog->NumEntries    = 0;
-	lpEvtLog->CurEntryNum   = 0;
-	lpEvtLog->CurEntry      = NULL;
+	lpEvtLog->CurEntry      = (EVENTLOGRECORD*) lpEvtLog->BufPtr;
+	lpEvtLog->EndEntry      = (EVENTLOGRECORD*) lpEvtLog->BufPtr;
 	lpEvtLog->Flags         = 0;
 	hEventLog = (size_t)lpEvtLog;
 	RETVAL = TRUE;
@@ -718,9 +711,8 @@ CODE:
     if (lpEvtLog->hLog) {
 	/* return info... */
 	lpEvtLog->dwID          = EVTLOGID;
-	lpEvtLog->NumEntries    = 0;
-	lpEvtLog->CurEntryNum   = 0;
-	lpEvtLog->CurEntry      = NULL;
+	lpEvtLog->CurEntry      = (EVENTLOGRECORD*) lpEvtLog->BufPtr;
+	lpEvtLog->EndEntry      = (EVENTLOGRECORD*) lpEvtLog->BufPtr;
 	lpEvtLog->Flags         = 0;
 	hEventLog = (size_t)lpEvtLog;
 	RETVAL = TRUE;

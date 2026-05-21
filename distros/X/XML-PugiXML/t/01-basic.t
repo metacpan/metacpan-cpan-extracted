@@ -1145,20 +1145,39 @@ ok(!defined $invalid_attr, 'invalid attr returns undef');
 }
 
 #--------------------------------------------------
-# UTF-8 input upgrade
+# UTF-8 input round-trip (raw bytes + flagged Perl Unicode)
 #--------------------------------------------------
 
-# Test Latin-1 input gets upgraded to UTF-8
+# Raw UTF-8 byte input (the common :raw / network-fetched case): bytes
+# pass through unchanged so pugixml decodes them correctly. Earlier
+# versions silently double-encoded these via sv_utf8_upgrade.
 {
     my $doc = XML::PugiXML->new;
-    # Create a Latin-1 byte string (not UTF-8 flagged)
-    my $latin1_xml = "<root>\xC3\xA9</root>";  # UTF-8 bytes for 'é' but no flag
-    utf8::downgrade($latin1_xml);  # ensure no UTF-8 flag
-    ok(!utf8::is_utf8($latin1_xml), 'test string is not UTF-8 flagged');
+    my $bytes_xml = "<root>\xC3\xA9</root>";  # UTF-8 bytes for U+00E9
+    utf8::downgrade($bytes_xml);
+    ok(!utf8::is_utf8($bytes_xml), 'input is byte string');
 
-    ok($doc->load_string($latin1_xml), 'load_string accepts non-flagged UTF-8 bytes');
+    my $orig_bytes = $bytes_xml;
+    ok($doc->load_string($bytes_xml), 'load_string accepts UTF-8 byte input');
+    is($bytes_xml, $orig_bytes, 'caller SV not mutated by load_string');
+
     my $text = $doc->root->text;
     ok(utf8::is_utf8($text), 'output is UTF-8 flagged');
+    is(length($text), 1, 'text decodes to 1 codepoint, not 2');
+    is(ord($text), 0x00E9, 'roundtrip preserves U+00E9');
+}
+
+# Flagged Perl Unicode input
+{
+    my $doc = XML::PugiXML->new;
+    my $unicode_xml = "<root>" . chr(0x00E9) . "</root>";
+    utf8::upgrade($unicode_xml);
+    ok(utf8::is_utf8($unicode_xml), 'input is UTF-8 flagged');
+
+    ok($doc->load_string($unicode_xml), 'load_string accepts flagged Unicode');
+    my $text = $doc->root->text;
+    is(length($text), 1, 'flagged input roundtrip is 1 char');
+    is(ord($text), 0x00E9, 'flagged input preserves U+00E9');
 }
 
 #--------------------------------------------------

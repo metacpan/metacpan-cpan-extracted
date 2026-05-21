@@ -41,6 +41,7 @@ has _track_by_id     => ( is => 'rw', default => sub { {} } );
 has _playing_row_ref => ( is => 'rw', default => sub { undef } );
 has _playing_track_id => ( is => 'rw', default => sub { undef } );
 has _progress_dragging => ( is => 'rw', isa => Bool, default => 0 );
+has _settings_open     => ( is => 'rw', isa => Bool, default => 0 );
 
 # Widget accessors — set during _build_ui
 has win                => ( is => 'rw' );
@@ -48,6 +49,7 @@ has sidebar_store      => ( is => 'rw' );
 has sidebar_view       => ( is => 'rw' );
 has alpha_view         => ( is => 'rw' );
 has _alpha_category    => ( is => 'rw', default => sub { 'Artists' } );
+has _suppress_sidebar_activated => ( is => 'rw', isa => Bool, default => 0 );
 has track_store        => ( is => 'rw' );
 has _track_iter_map    => ( is => 'rw', default => sub { {} } );
 has track_view         => ( is => 'rw' );
@@ -166,6 +168,17 @@ sub _init_api {
     ));
 
     return $self->rest_api;
+}
+
+sub _reinit_api {
+    my ($self) = @_;
+    if ($self->player) {
+        $self->player->quit();
+        $self->player(undef);
+    }
+    $self->rest_api(undef);
+    $self->drive(undef);
+    return $self->_init_api();
 }
 
 # ---- UI Construction ----
@@ -413,6 +426,43 @@ sub _sidebar_jump_to_letter {
     }
 }
 
+sub _navigate_sidebar_to {
+    my ($self, $kind, $value) = @_;
+    my $cat_label = $kind eq 'artist' ? 'Artists'
+                  : $kind eq 'album'  ? 'Albums'
+                  : $kind eq 'genre'  ? 'Genres'
+                  :                     return;
+    my $store = $self->sidebar_store;
+    my $view  = $self->sidebar_view;
+
+    # Locate the category header (top-level row whose label matches).
+    my $cat_iter = $store->get_iter_first() or return;
+    my $cat_path;
+    while (1) {
+        if (($store->get($cat_iter, 0) // '') eq $cat_label) {
+            $cat_path = $store->get_path($cat_iter);
+            last;
+        }
+        last unless $store->iter_next($cat_iter);
+    }
+    return unless $cat_path;
+
+    # Match against the raw value stored in column 2, not the display label
+    # in column 0 (which may carry LRM markers from _display_text/_album).
+    my $cat_iter2 = $store->get_iter($cat_path) or return;
+    my $n = $store->iter_n_children($cat_iter2);
+    for my $i (0 .. $n - 1) {
+        my $child  = $store->iter_nth_child($cat_iter2, $i) or next;
+        my $stored = $store->get($child, 2);
+        next unless defined $stored && $stored eq $value;
+        my $path = $store->get_path($child);
+        $view->expand_to_path($path);
+        $view->set_cursor($path, undef, FALSE);
+        $view->scroll_to_cell($path, undef, TRUE, 0.5, 0.0);
+        return;
+    }
+}
+
 sub _update_alpha_category {
     my ($self, $label) = @_;
     my $enabled = defined $label
@@ -473,6 +523,10 @@ sub _build_tracklist {
         ['Year',     6,  60],
         ['Duration', 7,  65],
     );
+    # Map: column-index → sidebar 'kind' for cells that act as navigation
+    # links to the corresponding sidebar category.
+    my %link_kind_by_col_idx = (3 => 'artist', 4 => 'album', 5 => 'genre');
+    my %link_kind;   # TreeViewColumn ref → kind string
     for my $col_def (@cols) {
         my ($title, $idx, $width) = @$col_def;
         my $r = Gtk3::CellRendererText->new();
@@ -482,6 +536,8 @@ sub _build_tracklist {
         $c->set_sizing('fixed');
         $c->set_fixed_width($width);
         $view->append_column($c);
+        $link_kind{$c} = $link_kind_by_col_idx{$idx}
+            if exists $link_kind_by_col_idx{$idx};
     }
 
     # Take full control of left-click so GTK's default handler (which
@@ -505,6 +561,20 @@ sub _build_tracklist {
             return TRUE;
         }
 
+        # Single-click on a "link" cell (Artist / Album / Genre) jumps the
+        # sidebar to that group. The sidebar's cursor-changed signal then
+        # repopulates the tracklist, so no further work is needed here.
+        if ($col && (my $kind = $link_kind{$col})) {
+            my $iter  = $self->track_store->get_iter($path);
+            my $id    = $iter ? $self->track_store->get($iter, 0) : undef;
+            my $track = $id ? $self->_track_by_id->{$id} : undef;
+            my $value = $track ? $track->{$kind} : undef;
+            if (defined $value && length $value) {
+                $self->_navigate_sidebar_to($kind, $value);
+                return TRUE;
+            }
+        }
+
         my $sel   = $w->get_selection();
         my $state = $event->state;
         if ($state & 'control-mask') {
@@ -521,6 +591,43 @@ sub _build_tracklist {
             $sel->select_path($path);
         }
         return TRUE;
+    });
+
+    # Hover affordance: show the link/hand cursor over Artist and Album
+    # cells that hold a value, so users see those columns are clickable.
+    my $is_link_cursor = 0;
+    my $set_cursor = sub {
+        my ($want_link) = @_;
+        return if $want_link == $is_link_cursor;
+        my $window = $view->get_bin_window() or return;
+        if ($want_link) {
+            my $display = $window->get_display();
+            my $cursor  = Gtk3::Gdk::Cursor->new_for_display($display, 'hand2');
+            $window->set_cursor($cursor);
+        } else {
+            $window->set_cursor(undef);
+        }
+        $is_link_cursor = $want_link;
+    };
+
+    $view->signal_connect('motion-notify-event' => sub {
+        my ($w, $event) = @_;
+        my ($path, $col) = $w->get_path_at_pos($event->x, $event->y);
+        my $want_link = 0;
+        if ($path && $col && (my $kind = $link_kind{$col})) {
+            my $iter  = $self->track_store->get_iter($path);
+            my $id    = $iter ? $self->track_store->get($iter, 0) : undef;
+            my $track = $id ? $self->_track_by_id->{$id} : undef;
+            my $value = $track ? $track->{$kind} : undef;
+            $want_link = 1 if defined $value && length $value;
+        }
+        $set_cursor->($want_link);
+        return FALSE;
+    });
+
+    $view->signal_connect('leave-notify-event' => sub {
+        $set_cursor->(0);
+        return FALSE;
     });
 
     $sw->add($view);
@@ -631,6 +738,55 @@ sub _load_library {
     $self->_populate_tracklist($self->db->all_tracks());
     my $count = $self->db->track_count();
     $self->_set_status("$count tracks in library");
+}
+
+# Rebuild the sidebar tree (so renamed/added/dropped artists, albums, and
+# genres are reflected) without losing the user's current selection or
+# kicking off a tracklist reload.  Used after a metadata edit when an
+# artist/album/genre changed.
+sub _refresh_sidebar_keep_selection {
+    my ($self) = @_;
+    my $store = $self->sidebar_store;
+    my $view  = $self->sidebar_view;
+
+    my $sel;
+    if (my ($path) = $view->get_cursor()) {
+        if (my $iter = $store->get_iter($path)) {
+            $sel = {
+                type  => $store->get($iter, 1),
+                value => $store->get($iter, 2),
+            };
+        }
+    }
+
+    $self->_suppress_sidebar_activated(1);
+    $self->_populate_sidebar();
+
+    if ($sel) {
+        my $cat = $store->get_iter_first;
+        TOP: while ($cat) {
+            my $check = sub {
+                my $iter = shift;
+                return ($store->get($iter, 1) // '') eq ($sel->{type}  // '')
+                    && ($store->get($iter, 2) // '') eq ($sel->{value} // '');
+            };
+            if ($check->($cat)) {
+                $view->set_cursor($store->get_path($cat), undef, FALSE);
+                last TOP;
+            }
+            my $n = $store->iter_n_children($cat);
+            for my $i (0 .. $n - 1) {
+                my $child = $store->iter_nth_child($cat, $i) or next;
+                next unless $check->($child);
+                my $cp = $store->get_path($child);
+                $view->expand_to_path($cp);
+                $view->set_cursor($cp, undef, FALSE);
+                last TOP;
+            }
+            last unless $store->iter_next($cat);
+        }
+    }
+    $self->_suppress_sidebar_activated(0);
 }
 
 sub _populate_sidebar {
@@ -859,6 +1015,7 @@ sub _player_poll {
 
 sub _sidebar_activated {
     my ($self, $view) = @_;
+    return if $self->_suppress_sidebar_activated;
     my ($path) = $view->get_cursor();
     return unless $path;
     my $store = $self->sidebar_store;
@@ -1047,6 +1204,7 @@ sub _show_sync_dialog {
 
 sub _settings_dialog {
     my ($self) = @_;
+    $self->_settings_open(1);
     my $dlg = Gtk3::Dialog->new_with_buttons(
         'Settings', $self->win,
         [qw/ modal destroy-with-parent /],
@@ -1315,15 +1473,27 @@ sub _settings_dialog {
 
     if ($response eq 'ok') {
         my $auth = $self->config->auth_config();
+        my %before = map { $_ => ($auth->{$_} // '') } keys %entries;
         for my $key (keys %entries) {
             $auth->{$key} = $entries{$key}->get_text();
         }
         $self->config->_data->{acoustid_key} = $aid_entry->get_text();
         $self->config->_data->{sheet_id}     = $sid_entry->get_text();
         $self->config->save();
-        $self->_set_status('Settings saved. Restart to apply API credential changes.');
+
+        my $auth_changed = grep {
+            $before{$_} ne ($auth->{$_} // '')
+        } keys %entries;
+
+        if ($auth_changed && $self->rest_api) {
+            $self->_reinit_api();
+            $self->_set_status('Settings saved. Reconnected to Google Drive.');
+        } else {
+            $self->_set_status('Settings saved.');
+        }
     }
     $dlg->destroy();
+    $self->_settings_open(0);
 }
 
 sub _tracklist_context_menu {
@@ -1465,27 +1635,116 @@ sub _edit_metadata_dialog {
             if $log;
     });
     $grid->attach($fetch_btn, 0, $row, 2, 1);
+    $row++;
+
+    my $fetch_help = Gtk3::Label->new();
+    $fetch_help->set_markup(
+        '<span size="small" foreground="#555555">'
+        . 'Fetch only fills blank fields. To replace a field with looked-up '
+        . 'data, clear it first and then click Fetch.'
+        . '</span>'
+    );
+    $fetch_help->set_xalign(0.0);
+    $fetch_help->set_line_wrap(TRUE);
+    $fetch_help->set_max_width_chars(60);
+    $grid->attach($fetch_help, 0, $row, 2, 1);
 
     $dlg->show_all();
     if ($dlg->run() eq 'ok') {
         my %fields;
         for my $key (keys %entries) {
-            my $val = $get->($entries{$key});
+            # Trim leading/trailing whitespace so "Beatles " and "Beatles"
+            # don't end up as separate sidebar entries.
+            my $val = $trimmed->($get->($entries{$key}));
             $fields{$key} = length($val) ? $val : undef;
         }
         # Coerce numeric fields
         for my $key (qw( track_number year )) {
             $fields{$key} = $fields{$key} ? int($fields{$key}) : undef;
         }
+
+        # Detect whether the sidebar tree (Artists / Albums / Genres) needs
+        # rebuilding because a grouping field changed.
+        my $sidebar_dirty = 0;
+        for my $f (qw( artist album genre )) {
+            next if (($track->{$f} // '') eq ($fields{$f} // ''));
+            $sidebar_dirty = 1;
+            last;
+        }
+
+        # If the user changed an artist/album/genre value that other tracks
+        # also use, offer to apply the rename to every matching track.  This
+        # is what lets a single mojibake fix clean up the lingering sidebar
+        # entry instead of leaving it stuck behind the still-broken siblings.
+        my @propagate;   # ([field, old, new, sibling_count], ...)
+        for my $f (qw( artist album genre )) {
+            my $old = $track->{$f}  // '';
+            my $new = $fields{$f}   // '';
+            next if $old eq $new;
+            next unless length $old;     # only meaningful when there's an old
+                                         # value to rename away from
+            my $n = $self->db->count_tracks_with_field($f, $old, $track->{id});
+            push @propagate, [$f, $old, $new, $n] if $n > 0;
+        }
+
+        my $apply_to_all = 0;
+        if (@propagate) {
+            my $body = "Apply these changes to all matching tracks?\n\n";
+            for my $p (@propagate) {
+                my ($f, $old, $new, $n) = @$p;
+                my $shown_new = length $new ? "'$new'" : '(empty)';
+                $body .= sprintf("  \x{2022} Rename %s '%s' to %s  (%d other %s)\n",
+                                  $f, $old, $shown_new,
+                                  $n, $n == 1 ? 'track' : 'tracks');
+            }
+            my $confirm = Gtk3::MessageDialog->new(
+                $self->win, 'destroy-with-parent', 'question', 'none', $body
+            );
+            $confirm->add_button('Only this track', 'no');
+            $confirm->add_button('Apply to all',    'yes');
+            $confirm->set_default_response('yes');
+            my $resp = $confirm->run();
+            $confirm->destroy();
+            $apply_to_all = ($resp eq 'yes');
+        }
+
+        my @synced_ids;
+        if ($apply_to_all) {
+            for my $p (@propagate) {
+                my ($f, $old, $new) = @$p;
+                # Capture ids before the rename so we can sync each affected
+                # row to the sheet with its new value.
+                push @synced_ids, $self->db->track_ids_with_field($f, $old);
+                $self->db->rename_field($f, $old, $new);
+            }
+        }
+
         $self->db->update_track_metadata($track->{id}, %fields);
         # Refresh the single row in place so the user's sidebar selection
         # and tracklist scroll position are preserved.  A full _load_library
         # would clear the sidebar store and reload all_tracks, bumping them
         # back to the top-level "All Tracks" view.
         $self->_refresh_track_row($track->{id});
+        if ($apply_to_all) {
+            # Other tracks' rows may now show different artist/album/genre
+            # text; refresh each that changed.
+            my %seen = ($track->{id} => 1);
+            for my $tid (@synced_ids) {
+                next if $seen{$tid}++;
+                $self->_refresh_track_row($tid);
+            }
+        }
+        $self->_refresh_sidebar_keep_selection() if $sidebar_dirty || $apply_to_all;
         # Targeted single-row sheet sync — avoids rewriting every worksheet
         # tab for a single metadata edit.
         $self->_auto_sync_track_to_sheet($track->{id});
+        if ($apply_to_all) {
+            my %seen = ($track->{id} => 1);
+            for my $tid (@synced_ids) {
+                next if $seen{$tid}++;
+                $self->_auto_sync_track_to_sheet($tid);
+            }
+        }
     }
     $dlg->destroy();
 }
@@ -1549,6 +1808,35 @@ sub _show_error {
     );
     $dlg->run();
     $dlg->destroy();
+
+    if (_is_auth_error($msg) && !$self->_settings_open) {
+        $self->_settings_dialog();
+    }
+}
+
+# Heuristic: does an error message look like a Google API auth/connection
+# failure that the user can fix in the Settings dialog (bad credentials,
+# expired/revoked token, etc.)?
+sub _is_auth_error {
+    my ($msg) = @_;
+    return 0 unless defined $msg && length $msg;
+
+    return 1 if $msg =~ m{
+        \b (?: 401 | 403 ) \b           # unauthorized / forbidden
+        | \b invalid _ grant \b
+        | \b invalid _ token \b
+        | \b invalid _ client \b
+        | \b token \b .* \b (?: expired | revoked ) \b
+        | \b (?: expired | revoked ) \b .* \b token \b
+        | unauthenti(?: cated | c )
+    }xi;
+
+    return 1 if $msg =~ m{ \b 400 \b }x
+        && $msg =~ m{
+            \b (?: token | grant | oauth | credential s? | auth ) \b
+        }xi;
+
+    return 0;
 }
 
 sub _quit {

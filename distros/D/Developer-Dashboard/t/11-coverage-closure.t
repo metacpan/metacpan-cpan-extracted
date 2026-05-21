@@ -3,15 +3,17 @@ use warnings;
 use utf8;
 
 use Cwd qw(getcwd);
-use File::Path qw(make_path);
+use File::Path qw(make_path remove_tree);
 use File::Spec;
 use File::Temp qw(tempdir);
 use Test::More;
+use Time::HiRes qw(sleep);
 
 use lib 'lib';
 
 use Developer::Dashboard::ActionRunner;
 use Developer::Dashboard::Auth;
+use Developer::Dashboard::Codec qw(encode_payload);
 use Developer::Dashboard::Collector;
 use Developer::Dashboard::CollectorRunner;
 use Developer::Dashboard::Config;
@@ -37,6 +39,7 @@ sub dies_like {
     like( $error, $pattern, $label );
 }
 
+my $original_cwd = getcwd();
 my $home = tempdir(CLEANUP => 1);
 local $ENV{HOME} = $home;
 local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS};
@@ -242,6 +245,91 @@ my $alias_result = $actions->run_page_action(
 );
 like( $alias_result->{stdout}, qr/alias-ok/, 'action runner resolves named cwd aliases' );
 
+dies_like(
+    sub {
+        $actions->run_page_action(
+            action => 'not-a-hash',
+            page   => $saved_page,
+            source => 'saved',
+        );
+    },
+    qr/Page action must be a hash/,
+    'action runner rejects non-hash page action payloads explicitly',
+);
+
+dies_like(
+    sub {
+        $actions->decode_action_payload( encode_payload('[1]') );
+    },
+    qr/Action payload must be a hash/,
+    'action runner rejects encoded action payloads that decode to non-hash data',
+);
+
+dies_like(
+    sub {
+        $actions->run_command_action(
+            command => 'printf never-runs',
+            cwd     => File::Spec->catdir( $home, 'missing-action-cwd' ),
+        );
+    },
+    qr/Action cwd '.*missing-action-cwd' does not exist/,
+    'action runner rejects command actions whose cwd does not exist',
+);
+
+dies_like(
+    sub {
+        $actions->_run_builtin_action(
+            action => {},
+            page   => $saved_page,
+        );
+    },
+    qr/Unsupported builtin action ''/,
+    'action runner rejects builtin actions that provide no builtin or id',
+);
+
+my $empty_state_builtin = $actions->_run_builtin_action(
+    action => { builtin => 'page.state' },
+    page   => Developer::Dashboard::PageDocument->new(
+        id     => 'empty-state-page',
+        title  => 'Empty State Page',
+        layout => { body => 'body' },
+    ),
+);
+is( $empty_state_builtin->{body}, "{}\n", 'action runner serializes an empty page.state payload when a page has no state hash' );
+
+ok(
+    $actions->_is_action_trusted(
+        action => { id => 'safe', safe => 1 },
+        page   => Developer::Dashboard::PageDocument->new( permissions => {} ),
+        source => 'transient',
+    ),
+    'action runner trusts actions explicitly marked safe even for transient sources',
+);
+
+ok(
+    !$actions->_is_action_trusted(
+        action => { id => 'blocked-no-permissions' },
+        page   => Developer::Dashboard::PageDocument->new(
+            id     => 'no-permissions-page',
+            title  => 'No Permissions',
+            layout => { body => 'body' },
+        ),
+        source => 'transient',
+    ),
+    'action runner rejects transient actions when the page has no permissions hash',
+);
+
+dies_like(
+    sub {
+        $actions->_run_command(
+            cmd => 'printf never-runs',
+            cwd => File::Spec->catdir( $home, 'missing-run-command-cwd' ),
+        );
+    },
+    qr/Unable to chdir to .*missing-run-command-cwd/,
+    'action runner foreground command runner surfaces cwd chdir failures explicitly',
+);
+
 my $background_result = $actions->run_command_action(
     command    => 'printf background-ok',
     cwd        => $repo,
@@ -249,8 +337,335 @@ my $background_result = $actions->run_command_action(
     timeout_ms => 1000,
 );
 ok( $background_result->{pid} > 0, 'background action forks a child process' );
-waitpid( $background_result->{pid}, 0 );
-ok( !kill( 0, $background_result->{pid} ), 'background action child exits cleanly after running' );
+my $background_wait_loops = $INC{'Devel/Cover.pm'} ? 100 : 20;
+for ( 1 .. $background_wait_loops ) {
+    last if !$actions->_pid_is_running( $background_result->{pid} );
+    sleep 0.1;
+}
+ok( !$actions->_pid_is_running( $background_result->{pid} ), 'background action child exits cleanly after running without requiring the caller to reap an intermediate zombie' );
+
+my $signalled_background = $actions->run_command_action(
+    command    => qq{$^X -e 'kill q{KILL}, \$\$'},
+    cwd        => $repo,
+    background => 1,
+    timeout_ms => 1000,
+);
+ok( $signalled_background->{pid} > 0, 'background action returns a pid when the detached command exits by signal' );
+for ( 1 .. $background_wait_loops ) {
+    last if !$actions->_pid_is_running( $signalled_background->{pid} );
+    sleep 0.1;
+}
+ok( !$actions->_pid_is_running( $signalled_background->{pid} ), 'background action reaps a detached command that exits by signal' );
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::ActionRunner::_fork_process = sub { return undef };
+    my $error = eval {
+        $actions->run_command_action(
+            command    => 'printf fork-fail',
+            cwd        => $repo,
+            background => 1,
+            timeout_ms => 1000,
+        );
+        return '';
+    } || $@;
+    like( $error, qr/Unable to fork background action:/, 'background action surfaces direct fork failures explicitly' );
+}
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::ActionRunner::_detach_background_session = sub {
+        $! = 1;
+        return undef;
+    };
+    my $error = eval {
+        $actions->run_command_action(
+            command    => 'printf background-fail',
+            cwd        => $repo,
+            background => 1,
+            timeout_ms => 1000,
+        );
+        return '';
+    } || $@;
+    like( $error, qr/Unable to detach background action session:/, 'background action surfaces detach failures explicitly' );
+}
+
+{
+    no warnings qw(redefine once);
+    local *File::Spec::devnull = sub { return File::Spec->catfile( $home, 'missing-devnull' ) };
+    my $error = eval {
+        $actions->run_command_action(
+            command    => 'printf bad-stdin',
+            cwd        => $repo,
+            background => 1,
+            timeout_ms => 1000,
+        );
+        return '';
+    } || $@;
+    like( $error, qr/Unable to redirect background action stdin:/, 'background action surfaces stdin redirect failures explicitly' );
+}
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::FileRegistry::dashboard_log = sub { return $repo };
+    my $error = eval {
+        $actions->run_command_action(
+            command    => 'printf bad-stdout',
+            cwd        => $repo,
+            background => 1,
+            timeout_ms => 1000,
+        );
+        return '';
+    } || $@;
+    like( $error, qr/Unable to redirect background action stdout:/, 'background action surfaces stdout redirect failures explicitly' );
+}
+
+{
+    my $valid_log = $files->dashboard_log;
+    my $dashboard_log_calls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::FileRegistry::dashboard_log = sub {
+        $dashboard_log_calls++;
+        return $dashboard_log_calls == 1 ? $valid_log : $repo;
+    };
+    my $error = eval {
+        $actions->run_command_action(
+            command    => 'printf bad-stderr',
+            cwd        => $repo,
+            background => 1,
+            timeout_ms => 1000,
+        );
+        return '';
+    } || $@;
+    like( $error, qr/Unable to redirect background action stderr:/, 'background action surfaces stderr redirect failures explicitly' );
+}
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::ActionRunner::_detach_background_session = sub {
+        exit 0;
+    };
+    my $error = eval {
+        $actions->run_command_action(
+            command    => 'printf no-start-line',
+            cwd        => $repo,
+            background => 1,
+            timeout_ms => 1000,
+        );
+        return '';
+    } || $@;
+    like( $error, qr/Unable to start background action/, 'background action reports startup EOF when the detached child exits before acknowledging readiness' );
+}
+
+{
+    my $fork_calls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::ActionRunner::_fork_process = sub {
+        $fork_calls++;
+        return fork() if $fork_calls == 1;
+        return undef;
+    };
+    my $error = eval {
+        $actions->run_command_action(
+            command    => 'printf detached-child-fail',
+            cwd        => $repo,
+            background => 1,
+            timeout_ms => 1000,
+        );
+        return '';
+    } || $@;
+    like( $error, qr/Unable to fork detached background action command:/, 'background action surfaces detached command fork failures explicitly' );
+}
+
+{
+    my $transient_cwd = tempdir( CLEANUP => 1 );
+    my $fork_calls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::ActionRunner::_fork_process = sub {
+        $fork_calls++;
+        return fork() if $fork_calls == 1;
+        return 0;
+    };
+    local *Developer::Dashboard::ActionRunner::_detach_background_session = sub {
+        remove_tree($transient_cwd);
+        return 1;
+    };
+    my $error = eval {
+        $actions->run_command_action(
+            command    => 'printf missing-cwd-after-fork',
+            cwd        => $transient_cwd,
+            background => 1,
+            timeout_ms => 1000,
+        );
+        return '';
+    } || $@;
+    like( $error, qr/Unable to chdir to background action cwd '.*'/, 'background action surfaces detached child cwd failures explicitly' );
+}
+
+{
+    my $fork_calls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::ActionRunner::_fork_process = sub {
+        $fork_calls++;
+        return fork() if $fork_calls == 1;
+        return 0;
+    };
+    local *Developer::Dashboard::ActionRunner::shell_command_argv = sub { return ('/definitely/missing-action-runner-binary') };
+    my $error = eval {
+        $actions->run_command_action(
+            command    => 'printf never-execs',
+            cwd        => $repo,
+            background => 1,
+            timeout_ms => 1000,
+        );
+        return '';
+    } || $@;
+    like( $error, qr/Unable to exec background action command:/, 'background action surfaces detached child exec failures explicitly' );
+}
+
+my $interrupt_result = $actions->run_command_action(
+    command    => "$^X -e 'sleep 2'",
+    cwd        => $repo,
+    background => 1,
+    timeout_ms => 5000,
+);
+ok( $interrupt_result->{pid} > 0, 'background action returns a pid for interrupt coverage' );
+kill 'INT', $interrupt_result->{pid};
+for ( 1 .. $background_wait_loops ) {
+    last if !$actions->_pid_is_running( $interrupt_result->{pid} );
+    sleep 0.1;
+}
+ok( !$actions->_pid_is_running( $interrupt_result->{pid} ), 'background action INT handler stops the detached wrapper cleanly' );
+
+my $timeout_background = $actions->run_command_action(
+    command    => "$^X -e 'sleep 2'",
+    cwd        => $repo,
+    background => 1,
+    timeout_ms => 100,
+);
+ok( $timeout_background->{pid} > 0, 'background action returns a pid for timeout coverage' );
+for ( 1 .. $background_wait_loops ) {
+    last if !$actions->_pid_is_running( $timeout_background->{pid} );
+    sleep 0.1;
+}
+ok( !$actions->_pid_is_running( $timeout_background->{pid} ), 'background action timeout path stops the detached wrapper cleanly' );
+
+my $forced_kill_timeout = $actions->run_command_action(
+    command    => "$^X -e '\$SIG{TERM}=sub{}; sleep 2'",
+    cwd        => $repo,
+    background => 1,
+    timeout_ms => 100,
+);
+ok( $forced_kill_timeout->{pid} > 0, 'background action returns a pid for forced-KILL timeout coverage' );
+for ( 1 .. $background_wait_loops ) {
+    last if !$actions->_pid_is_running( $forced_kill_timeout->{pid} );
+    sleep 0.1;
+}
+ok( !$actions->_pid_is_running( $forced_kill_timeout->{pid} ), 'background action timeout escalates through KILL when TERM is ignored' );
+
+ok( !$actions->_reap_child_process('abc'), '_reap_child_process ignores invalid pid values' );
+ok( !$actions->_pid_is_running('abc'), '_pid_is_running ignores invalid pid values' );
+is( $actions->_wait_status_exit_code( 3 << 8 ), 3, '_wait_status_exit_code keeps normal process exit codes unchanged' );
+is( $actions->_wait_status_exit_code(9), 137, '_wait_status_exit_code maps signal-only wait statuses into shell-style 128+signal codes' );
+{
+    my $child = fork();
+    die "fork failed for background child exit helper coverage: $!" if !defined $child;
+    if ( !$child ) {
+        exit 7;
+    }
+    my $observed;
+    for ( 1 .. $background_wait_loops ) {
+        my $status = $actions->_background_child_exit_status($child);
+        if ( defined $status ) {
+            $observed = 1;
+            is( $status, 7, '_background_child_exit_status returns the direct child exit code when the detached child is reaped' );
+            last;
+        }
+        sleep 0.05;
+    }
+    ok( $observed, '_background_child_exit_status eventually reaps an exited child' );
+}
+{
+    my $running_child = fork();
+    die "fork failed for background child running coverage: $!" if !defined $running_child;
+    if ( !$running_child ) {
+        sleep 2;
+        exit 0;
+    }
+    is( scalar $actions->_background_child_exit_status($running_child), undef, '_background_child_exit_status returns undef while the detached child is still running' );
+    kill 'TERM', $running_child;
+    waitpid( $running_child, 0 );
+}
+ok( !defined $actions->_read_process_state(999999), '_read_process_state falls back cleanly when proc and ps both fail for a missing pid' );
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::ActionRunner::capture = sub (&) {
+        return ( "S\n", '', 0 );
+    };
+    is( $actions->_read_process_state(999998), 'S', '_read_process_state falls back to ps output when proc state is unavailable but ps succeeds' );
+}
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::ActionRunner::capture = sub (&) {
+        return ( "   \n", '', 0 );
+    };
+    is( scalar $actions->_read_process_state(999997), undef, '_read_process_state returns undef when ps output is empty after trimming' );
+}
+
+{
+    my $child = fork();
+    die "fork failed for action runner reap helper coverage: $!" if !defined $child;
+    if ( !$child ) {
+        exit 0;
+    }
+    my $zombie_seen = 0;
+    for ( 1 .. $background_wait_loops ) {
+        my $state = $actions->_read_process_state($child);
+        if ( defined $state && $state eq 'Z' ) {
+            $zombie_seen = 1;
+            last;
+        }
+        sleep 0.1;
+    }
+    ok( $zombie_seen, 'action runner child becomes a zombie before the helper reaps it' );
+    ok( $actions->_reap_child_process($child), '_reap_child_process reaps one exited direct child pid' );
+    ok( !$actions->_pid_is_running($child), '_pid_is_running treats an already-reaped background pid as stopped' );
+}
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::ActionRunner::_reap_child_process = sub { return 0 };
+    local *Developer::Dashboard::ActionRunner::_read_process_state = sub { return 'Z' };
+    ok( !$actions->_pid_is_running(424242), '_pid_is_running treats zombie action wrappers as stopped even when signal 0 could still succeed' );
+}
+
+{
+    my $child = fork();
+    die "fork failed for action runner live-pid coverage: $!" if !defined $child;
+    if ( !$child ) {
+        sleep 2;
+        exit 0;
+    }
+    ok( $actions->_pid_is_running($child), '_pid_is_running reports a live action wrapper when signal 0 still succeeds' );
+    waitpid( $child, 0 );
+}
+
+{
+    my $old_dir = tempdir( CLEANUP => 0 );
+    chdir $old_dir or die "Unable to chdir to temporary original cwd $old_dir: $!";
+    my $error = eval {
+        $actions->_run_command(
+            cmd => qq{$^X -e 'use File::Path qw(remove_tree); remove_tree(shift @ARGV);' '$old_dir'},
+            cwd => $repo,
+        );
+        return '';
+    } || $@;
+    like( $error, qr/Unable to restore cwd to \Q$old_dir\E/, '_run_command surfaces restore-cwd failures when the original cwd disappears mid-run' );
+    chdir $repo or die "Unable to chdir back to repo $repo after restore-cwd coverage: $!";
+    remove_tree($old_dir);
+}
 
 ok(
     !$actions->_is_action_trusted(
@@ -567,6 +982,7 @@ unlike( $project_only_prompt, qr/\{coverage-app\}/, 'prompt no longer appends th
     like( $branch_only_prompt, qr{\Q[~/outside] 🌿main\E}, 'prompt renders branch-only context as a trailing branch marker when no project root resolves' );
 }
 
+chdir $original_cwd or die "Unable to restore original cwd $original_cwd: $!";
 done_testing;
 
 __END__

@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($MARC::Validator::Abstract::VERSION, 0.17, 'Version.');
+is($MARC::Validator::Abstract::VERSION, 0.21, 'Version.');

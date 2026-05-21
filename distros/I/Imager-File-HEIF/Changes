@@ -1,3 +1,67 @@
+Imager-File-HEIF 0.006 - 30 Apr 2026
+======================
+
+- accept a main brand of "heix" in addition to "heic" for monochrome
+   images.  libheif started producing this brand for monochrome images
+   in 1.20 and it seems to be the correct behaviour.  Continue to
+   accept "heic" since older libheif produces it.
+   https://github.com/strukturag/libheif/issues/1765
+
+ - with libheif 1.17.0 or later, use a new API to try to detect
+   whether the image is mono or color without having to do a trial
+   decode.  Previously this would require decoding the image twice for
+   nearly all color images.
+   https://github.com/tonycoz/imager-file-heif/issues/6
+
+ - require libheif 1.11.0 or later
+   I don't feel a need to deal with older API differences in 1.9
+
+ - you can now set the type of compression used with heif_compression,
+   this defaults to HEVC, but you can also use other ISOBMFF
+   compressions supported by libheif
+
+ - you can select the encoder to use with heif_encoder, which may also
+   select the compression used
+
+ - the defaults for heif_lossless and heif_quality are now set by the
+   libheif encoder.
+
+ - you can now use tags to set encoder parameters, eg, you can
+     $img->write(... heif_chroma => 444)
+   to change the way color is stored.
+
+ - added the dump_encoders() and dump_decoders() methods which dump
+   information about each encoder (detailed) or decoder (minimal)
+
+ - added the encoder() method which returns a list of
+   Imager::File::HEIF::Encoder objects
+
+ - added have_encoder_for() and have_decoder_for() methods which return
+   whether a given compression can be encoded or decoded.
+
+ - added the compression_names method that returns a list of the
+   compression types supported by this version of libheif.  These
+   compression types may or may not have encoders in the current build
+   of libheif, you can test for this with have_encoder_for() and
+   have_decoder_for().
+
+ - support fetching and storing the pixel aspect ratio in the i_xres
+   and i_yres tags from libheif 1.15.0 or later.
+
+ - github action:
+
+   - enable Imager logs and output the logs as an artifact
+
+   - cache installation of the apt packages with
+     awalsh128/cache-apt-pkgs-action.
+
+   - cache installation of the libheif build
+
+   - cache installation of Imager
+
+   - this took workflow runs from 2-4 minutes down to ~20 seconds when
+     everything is cached.
+
 Imager-File-HEIF 0.005 - 26 Nov 2023
 ======================
 

@@ -6,7 +6,7 @@ use EV;
 
 BEGIN {
     use XSLoader;
-    our $VERSION = '0.05';
+    our $VERSION = '0.06';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -21,15 +21,15 @@ sub new {
 
     if (!defined $proxy) {
         my $env_proxy = $ENV{https_proxy} // $ENV{http_proxy} // $ENV{all_proxy};
-        if ($env_proxy && $env_proxy =~ m{^(?:https?://)?(?:[^@]+\@)?(\[[\w:]+\]|[^:/]+)(?::(\d+))?}) {
+        if ($env_proxy && $env_proxy =~ m{^(?:\w+://)?(?:[^@]+\@)?(\[[\w:]+\]|[^:/]+)(?::(\d+))?}) {
             $proxy      = $1;
             $proxy_port = $2 // 1080;
         }
     }
-    
+
     $proxy      //= "";
     $proxy_port //= 0;
-    
+
     return $class->_new($loop, $proxy, $proxy_port,
         $args{ssl_cert} // "", $args{ssl_key} // "", $args{ssl_ca} // "",
         exists $args{ssl_init} ? ($args{ssl_init} ? 1 : 0) : -1);
@@ -40,6 +40,8 @@ package EV::Websockets::Connection;
 1;
 
 __END__
+
+=encoding utf-8
 
 =head1 NAME
 
@@ -129,25 +131,32 @@ Create a new WebSocket connection.
         max_message_size => 1048576,             # optional, 0 = unlimited
         connect_timeout  => 5.0,                 # optional, seconds
         on_connect  => sub { my ($conn, $headers) = @_; ... },
-        on_message  => sub { my ($conn, $data, $is_binary, $is_final) = @_; ... },
+        on_message  => sub { my ($conn, $data, $is_binary) = @_; ... },
         on_close    => sub { my ($conn, $code, $reason) = @_; ... },
         on_error    => sub { my ($conn, $err) = @_; ... },
         on_pong     => sub { my ($conn, $payload) = @_; ... },
         on_drain    => sub { my ($conn) = @_; ... },
     );
 
-Returns an EV::Websockets::Connection object. C<$is_final> is always 1
-(messages are fully reassembled before delivery).
+Returns an L<EV::Websockets::Connection> object.
+
+C<on_message> receives complete reassembled messages; fragmented frames are
+buffered internally up to C<max_message_size>. For backwards compatibility a
+fourth argument C<$is_final> is also passed but is always C<1>.
 
 C<connect_timeout> sets a deadline (in seconds) for the WebSocket handshake.
 If the connection is not established within this time, C<on_error> fires with
-"connect timeout" and the connection is closed.
+C<"connect timeout"> and the connection is closed.
 
 C<$headers> in C<on_connect> is a hashref of response headers from the server
 (Set-Cookie, Content-Type, Server, Sec-WebSocket-Protocol, and when available
 Location, WWW-Authenticate).
 
-C<on_drain> fires when the send queue becomes empty after a write.
+C<on_drain> fires from the writeable callback when the send queue empties.
+It will B<not> fire if C<close()> has already been queued - once closing is
+in progress the connection short-circuits to teardown without emitting drain.
+If you need to act after the queue empties, do so before calling C<close()>,
+or rely on C<on_close> instead.
 
 =head3 listen(%options)
 
@@ -165,7 +174,7 @@ Create a WebSocket listener. Returns the port number being listened on
         headers          => { 'Set-Cookie' => 'session=abc123' }, # response headers
         on_handshake => sub { my ($headers) = @_; return { 'X-Custom' => 'val' } },
         on_connect  => sub { my ($conn, $headers) = @_; ... },
-        on_message  => sub { my ($conn, $data, $is_binary, $is_final) = @_; ... },
+        on_message  => sub { my ($conn, $data, $is_binary) = @_; ... },
         on_close    => sub { my ($conn, $code, $reason) = @_; ... },
         on_error    => sub { my ($conn, $err) = @_; ... },
         on_pong     => sub { my ($conn, $payload) = @_; ... },
@@ -192,7 +201,10 @@ a 403).
 
 =head3 connections
 
-Returns a list of all currently connected Connection objects.
+Returns a list of Connection objects whose state is C<"connected"> or
+C<"closing"> (i.e. the WebSocket handshake completed and the underlying
+wsi still exists). Conns still in C<"connecting"> and conns already
+C<"closed">/C<"destroyed"> are omitted.
 
     my @conns = $ctx->connections;
     $_->send("broadcast!") for @conns;
@@ -206,7 +218,7 @@ Adopt an existing IO handle (socket).
         initial_data     => $already_read_bytes, # optional pre-read data
         max_message_size => 1048576,
         on_connect => sub { my ($conn, $headers) = @_; ... },
-        on_message => sub { my ($conn, $data, $is_binary, $is_final) = @_; ... },
+        on_message => sub { my ($conn, $data, $is_binary) = @_; ... },
         on_close   => sub { my ($conn, $code, $reason) = @_; ... },
         on_error   => sub { my ($conn, $err) = @_; ... },
         on_pong    => sub { my ($conn, $payload) = @_; ... },
@@ -227,78 +239,111 @@ Represents a WebSocket connection.
 
 =head3 send($data)
 
-Send text data over the connection.
+Queue a text frame. Croaks if the connection is not open.
 
 =head3 send_binary($data)
 
-Send binary data over the connection.
+Queue a binary frame. Croaks if the connection is not open.
 
-=head3 send_ping($data)
+=head3 send_ping([$payload])
 
-Send a Ping frame. Payload is silently truncated to 125 bytes per RFC 6455.
+Queue a Ping frame. C<$payload> is optional; if supplied it is silently
+truncated to 125 bytes per RFC 6455 §5.5. Croaks if the connection is not
+open.
 
-=head3 send_pong($data)
+=head3 send_pong([$payload])
 
-Send a Pong frame. Payload is silently truncated to 125 bytes per RFC 6455.
+Queue a Pong frame. Same payload rules as C<send_ping>. Most peers send Pong
+automatically in response to Ping; you only need this to send an unsolicited
+Pong (e.g. as a one-way keepalive).
 
-=head3 send_fragment($data, $is_binary, $is_final)
+=head3 send_fragment($data, $is_binary = 0, $is_final = 1)
 
-Send a WebSocket message fragment for streaming large messages. The first
-call starts a new fragmented message (text or binary based on C<$is_binary>).
-Subsequent calls send continuation frames. Set C<$is_final> to true on the
-last fragment.
+Send one fragment of a streaming message. The first call starts a new
+fragmented message (text or binary per C<$is_binary>); subsequent calls send
+continuation frames. Set C<$is_final> true on the last fragment.
 
     $conn->send_fragment("part1", 0, 0);   # text, not final
     $conn->send_fragment("part2", 0, 0);   # continuation, not final
     $conn->send_fragment("part3", 0, 1);   # continuation, final
 
-C<$is_binary> defaults to 0, C<$is_final> defaults to 1.
+Use this only if you need to interleave outbound writes with other I/O while
+streaming a single message. For ordinary sends, prefer C<send>/C<send_binary>.
+
+=head3 send_queue_size
+
+Returns the number of payload bytes currently queued for sending (excludes
+WebSocket framing overhead). Useful for backpressure monitoring; pair with
+C<on_drain> to gate further sends.
 
 =head3 stash
 
 Returns a hashref for storing arbitrary per-connection metadata. The hashref
-is lazily created on first access and persists for the lifetime of the
-connection.
+is lazily created on first access and lives until the connection is freed.
 
     $conn->stash->{user_id} = 42;
     my $uid = $conn->stash->{user_id};
 
-=head3 send_queue_size
-
-Returns the number of payload bytes currently queued for sending.
-
 =head3 get_protocol
 
-Returns the negotiated C<Sec-WebSocket-Protocol> value, or C<undef>.
+Returns the negotiated C<Sec-WebSocket-Protocol> value, or C<undef> if no
+subprotocol was negotiated or the connection is closed.
 
 =head3 peer_address
 
-Returns the peer IP address as a string, or C<undef>.
+Returns the peer's IP address as a printable string (IPv4 dotted-quad or
+IPv6 colon notation, no brackets, no port), or C<undef> if unavailable.
 
-=head3 close($code, $reason)
+=head3 close([$code = 1000], [$reason])
 
-Close the connection with the given status code and reason.
+Initiate a clean WebSocket close. Sends a Close frame with C<$code> (default
+1000, normal closure) and an optional UTF-8 C<$reason> (truncated by lws to
+fit the frame). Pending sends are drained first, then the connection is torn
+down and C<on_close> fires.
+
+This is a no-op (does not croak) if the connection is already closed,
+closing, or destroyed. It is also a no-op while the connection is still
+in the C<"connecting"> state - calling C<close()> before the handshake
+completes does not cancel the in-flight connect; use C<connect_timeout>
+to bound the handshake instead.
 
 =head3 pause_recv
 
-Stop receiving data from this connection (flow control).
+Stop reading frames from this connection (TCP flow control). New incoming
+frames will back up in the kernel's socket buffer until C<resume_recv> is
+called. Silently does nothing on a closed or destroyed connection.
 
 =head3 resume_recv
 
-Resume receiving data after C<pause_recv>.
+Resume receiving after C<pause_recv>. Silently does nothing on a closed or
+destroyed connection.
 
 =head3 is_connected
 
-Returns true if the connection is established and open.
+Returns true while C<state> is C<"connected">.
 
 =head3 is_connecting
 
-Returns true if the connection is in progress.
+Returns true while C<state> is C<"connecting">. Returns false once the
+connection is established, closing, closed, or destroyed.
 
 =head3 state
 
-Returns the current state as a string: "connecting", "connected", "closing",
-"closed", or "destroyed".
+Returns the current state as one of:
+
+=over 4
+
+=item C<"connecting"> - TCP/TLS handshake or HTTP upgrade in progress
+
+=item C<"connected"> - open and ready to send/receive
+
+=item C<"closing"> - C<close()> has been called; pending sends still draining
+
+=item C<"closed"> - the underlying wsi is gone but the Perl object is still alive
+
+=item C<"destroyed"> - the C struct has been freed (further method calls will croak)
+
+=back
 
 =head1 DEBUGGING
 
@@ -366,7 +411,42 @@ Typical results on Linux (localhost, 1000 round-trips, 64-byte payload):
 
 =head1 URL FORMATS
 
-The module supports both C<ws://> and C<wss://> (TLS) URLs.
+C<connect> accepts C<ws://> (plaintext) and C<wss://> (TLS) URLs:
+
+    ws://host[:port]/path
+    wss://host[:port]/path
+    ws://[2001:db8::1]:9001/         # IPv6 (brackets required)
+
+The default port is 80 for C<ws://> and 443 for C<wss://>. Userinfo
+(C<user:pass@>) in the URL is not parsed; pass HTTP auth via the
+C<headers> option instead.
+
+=head1 ERRORS AND EXCEPTIONS
+
+Methods on L</EV::Websockets::Connection> fall into two groups:
+
+=over 4
+
+=item Send / accessors that croak when the connection is gone
+
+C<send>, C<send_binary>, C<send_ping>, C<send_pong>, C<send_fragment>, and
+C<stash> croak with C<"Connection has been destroyed"> or C<"Connection is
+not open"> if invoked after the connection has closed or been DESTROYed.
+Wrap in C<eval { ... }> if you may race connection teardown.
+
+=item Lifecycle / control that silently no-op
+
+C<close>, C<pause_recv>, and C<resume_recv> return silently when the
+connection is already closed or destroyed. This makes them safe to call
+from cleanup paths without guarding.
+
+=back
+
+User-supplied callbacks (C<on_connect>, C<on_message>, C<on_close>,
+C<on_error>, C<on_pong>, C<on_drain>, C<on_handshake>) are invoked under
+C<G_EVAL>: a die inside a callback is caught, warned, and the connection
+continues. C<on_error> is itself wrapped, so a die inside C<on_error> will
+not recurse.
 
 =head1 SEE ALSO
 

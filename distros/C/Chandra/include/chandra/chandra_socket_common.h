@@ -2,7 +2,7 @@
 #define CHANDRA_SOCKET_COMMON_H
 
 /*
- * chandra_socket_common.h — Shared helpers for Hub and Client socket code.
+ * chandra_socket_common.h - Shared helpers for Hub and Client socket code.
  *
  * Small utility functions that eliminate repetition across
  * chandra_socket_hub.h and chandra_socket_client.h.

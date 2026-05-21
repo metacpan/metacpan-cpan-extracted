@@ -25,8 +25,7 @@ my $node_modules = File::Spec->catdir( $ROOT, 'node_modules' );
 if ( !-d $node_modules ) {
     my ( $stdout, $stderr, $exit ) = capture {
         local %ENV = %ENV;
-        $ENV{npm_config_audit} = 'false';
-        $ENV{npm_config_fund}  = 'false';
+        _configure_npm_test_env();
         system( $npm_bin, 'ci', '--ignore-scripts' );
     };
     is( $exit, 0, 'npm ci prepares the fast-check dependency tree' )
@@ -34,6 +33,8 @@ if ( !-d $node_modules ) {
 }
 
 my ( $stdout, $stderr, $exit ) = capture {
+    local %ENV = %ENV;
+    _configure_npm_test_env();
     system( $npm_bin, 'run', 'fuzz:scorecard' );
 };
 
@@ -49,6 +50,14 @@ sub _find_command {
         my $candidate = File::Spec->catfile( $dir, $name );
         return $candidate if -x $candidate;
     }
+    return;
+}
+
+sub _configure_npm_test_env {
+    $ENV{npm_config_audit}           = 'false';
+    $ENV{npm_config_fund}            = 'false';
+    $ENV{npm_config_update_notifier} = 'false';
+    $ENV{NO_UPDATE_NOTIFIER}         = '1';
     return;
 }
 

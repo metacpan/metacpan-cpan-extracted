@@ -6,6 +6,7 @@ use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
 use Test::More;
+use Time::HiRes qw(sleep);
 use URI::Escape qw(uri_escape);
 
 use lib 'lib';
@@ -131,13 +132,36 @@ make_path($skill_orange_root);
 open my $skill_orange_fh, '>', File::Spec->catfile( $skill_orange_root, 'compose.yml' ) or die $!;
 print {$skill_orange_fh} "services:\n  orange:\n    image: alpine\n";
 close $skill_orange_fh;
+open my $skill_orange_env_fh, '>', File::Spec->catfile( $home, '.developer-dashboard', 'skills', 'alpha-skill', '.env' ) or die $!;
+print {$skill_orange_env_fh} "ORANGE_SKILL_ENV=orange-skill\nSKILL_ENV_REF=\${DOCKER_SKILL_BASE:-fallback}\n";
+close $skill_orange_env_fh;
 my $skill_green_root = File::Spec->catdir( $home, '.developer-dashboard', 'skills', 'beta-skill', 'config', 'docker', 'green' );
 make_path($skill_green_root);
 open my $skill_green_fh, '>', File::Spec->catfile( $skill_green_root, 'compose.yml' ) or die $!;
 print {$skill_green_fh} "services:\n  green:\n    environment:\n      GREEN_DEV: skill\n";
 close $skill_green_fh;
+open my $skill_green_env_fh, '>', File::Spec->catfile( $home, '.developer-dashboard', 'skills', 'beta-skill', '.env' ) or die $!;
+print {$skill_green_env_fh} "DISABLED_SKILL_ENV=beta-skill\n";
+close $skill_green_env_fh;
 open my $skill_green_disabled_fh, '>', File::Spec->catfile( $home, '.developer-dashboard', 'skills', 'beta-skill', '.disabled' ) or die $!;
 close $skill_green_disabled_fh;
+my $nested_skill_leaf_root = File::Spec->catdir(
+    $home, '.developer-dashboard', 'skills', 'foo', 'skills', 'bar', 'skills', 'zzz'
+);
+my $nested_skill_compose_root = File::Spec->catdir( $nested_skill_leaf_root, 'config', 'docker', 'zzz' );
+make_path($nested_skill_compose_root);
+open my $nested_skill_compose_fh, '>', File::Spec->catfile( $nested_skill_compose_root, 'compose.yml' ) or die $!;
+print {$nested_skill_compose_fh} "services:\n  zzz:\n    image: alpine\n";
+close $nested_skill_compose_fh;
+open my $nested_skill_root_env_fh, '>', File::Spec->catfile( $home, '.developer-dashboard', 'skills', 'foo', '.env' ) or die $!;
+print {$nested_skill_root_env_fh} "VERSION=foo\nSHARED_CHAIN=root\n";
+close $nested_skill_root_env_fh;
+open my $nested_skill_parent_env_fh, '>', File::Spec->catfile( $home, '.developer-dashboard', 'skills', 'foo', 'skills', 'bar', '.env' ) or die $!;
+print {$nested_skill_parent_env_fh} "VERSION=bar\nSHARED_CHAIN=bar\n";
+close $nested_skill_parent_env_fh;
+open my $nested_skill_leaf_env_fh, '>', File::Spec->catfile( $nested_skill_leaf_root, '.env' ) or die $!;
+print {$nested_skill_leaf_env_fh} "VERSION=zzz\nSHARED_CHAIN=zzz\n";
+close $nested_skill_leaf_env_fh;
 my $local_docker_green_root = File::Spec->catdir( $repo, '.developer-dashboard', 'docker', 'green' );
 make_path($local_docker_green_root);
 open my $local_green_dev_fh, '>', File::Spec->catfile( $local_docker_green_root, 'development.compose.yml' ) or die $!;
@@ -251,9 +275,14 @@ my $background_result = $actions->run_command_action(
     background => 1,
 );
 ok( $background_result->{pid} > 0, 'background command action returns a child pid' );
-ok( kill( 0, $background_result->{pid} ), 'background action child is running initially' );
+ok( $actions->_pid_is_running( $background_result->{pid} ), 'background action child is running initially' );
 kill 'TERM', $background_result->{pid};
-waitpid( $background_result->{pid}, 0 );
+my $background_wait_loops = $INC{'Devel/Cover.pm'} ? 100 : 20;
+for ( 1 .. $background_wait_loops ) {
+    last if !$actions->_pid_is_running( $background_result->{pid} );
+    sleep 0.1;
+}
+ok( !$actions->_pid_is_running( $background_result->{pid} ), 'background action child stops cleanly without leaving a direct child for the caller to reap' );
 
 my $transient = Developer::Dashboard::PageDocument->new(
     title       => 'Transient',
@@ -315,6 +344,7 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
         config  => $config,
         paths   => $paths,
     );
+    local $ENV{DOCKER_SKILL_BASE} = 'skill-base';
     local $ENV{DD_TEST_DOCKER_ROOT} = File::Spec->catdir( $home, '.developer-dashboard', 'config', 'docker' );
     is(
         $docker->_expand_env_path('${DD_TEST_DOCKER_ROOT}/green/compose.yml'),
@@ -340,7 +370,7 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
         addons => [ 'mailhog' ],
         args   => [ 'config', 'green' ],
         modes  => ['dev'],
-        services => ['worker'],
+        services => [ 'worker', 'orange' ],
     );
     chdir $old or die $!;
     is_same_path( $resolved->{project_root}, $repo, 'docker compose resolver uses current project root' );
@@ -352,6 +382,15 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
     ok( grep( { /green\/development\.compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes isolated development compose files automatically for selected services' );
     ok( !grep( { /skills\/beta-skill\/config\/docker\/green\/compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver excludes docker roots contributed by disabled skills' );
     is( $resolved->{env}{APP_MODE}, 'dev', 'docker compose resolver merges mode env' );
+    is_same_path(
+        $resolved->{env}{alpha_skill_DDDC},
+        File::Spec->catdir( $home, '.developer-dashboard', 'skills', 'alpha-skill', 'config', 'docker' ),
+        'docker compose resolver exports one skill-specific DDDC variable for each participating skill docker root',
+    );
+    is( $resolved->{env}{ORANGE_SKILL_ENV}, 'orange-skill', 'docker compose resolver loads .env from participating skill docker roots' );
+    is( $resolved->{env}{SKILL_ENV_REF}, 'skill-base', 'docker compose resolver expands participating skill .env values against the current process environment' );
+    ok( !exists $resolved->{env}{DISABLED_SKILL_ENV}, 'docker compose resolver skips .env from disabled skill docker roots' );
+    ok( grep( { /skills\/alpha-skill\/\.env$/ } @{ $resolved->{env_files} } ), 'docker compose resolver reports participating skill .env files in dry-run data' );
     is_same_path( $resolved->{env}{DDDC}, File::Spec->catdir( $repo, '.developer-dashboard', 'config', 'docker' ), 'docker compose resolver exports DDDC as the effective project-local docker config root' );
     is( $resolved->{env}{MAILHOG_ENABLED}, '1', 'docker compose resolver merges addon env' );
     is_deeply( [ @{ $resolved->{command} }[0,1] ], [ 'docker', 'compose' ], 'docker compose resolver produces docker compose command' );
@@ -372,6 +411,7 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
         config  => $config,
         paths   => $paths,
     );
+    local $ENV{ORANGE_SKILL_ENV};
     my $resolved = $docker->resolve(
         args => ['config'],
     );
@@ -385,7 +425,46 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
     ok( grep( { /skills\/alpha-skill\/config\/docker\/orange\/compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes skill docker compose roots during plain docker compose passthrough' );
     ok( grep( { /purple\/compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver includes non-disabled isolated compose folders during plain docker compose passthrough' );
     ok( !grep( { /blue\/compose\.yml$/ } @{ $resolved->{files} } ), 'docker compose resolver does not include disabled isolated compose folders' );
+    is_same_path(
+        $resolved->{env}{alpha_skill_DDDC},
+        File::Spec->catdir( $home, '.developer-dashboard', 'skills', 'alpha-skill', 'config', 'docker' ),
+        'docker compose resolver auto-loads one skill-specific DDDC variable for auto-discovered skill services',
+    );
+    is( $resolved->{env}{ORANGE_SKILL_ENV}, 'orange-skill', 'docker compose resolver auto-loads participating skill .env values alongside auto-discovered services' );
+    ok( !exists $resolved->{env}{DISABLED_SKILL_ENV}, 'docker compose resolver still skips disabled skill .env values during auto-discovery' );
+    ok( !defined $ENV{ORANGE_SKILL_ENV}, 'docker compose resolver does not leak participating skill .env values into the caller environment' );
     is( $resolved->{command}[-1], 'config', 'docker compose resolver preserves passthrough config invocation with active auto-discovery' );
+}
+
+{
+    my $old = Cwd::getcwd();
+    chdir $repo or die $!;
+    my $docker = Developer::Dashboard::DockerCompose->new(
+        config  => $config,
+        paths   => $paths,
+    );
+    my $resolved = $docker->resolve(
+        services => ['zzz'],
+        args     => ['config'],
+    );
+    chdir $old or die $!;
+    is( $resolved->{env}{VERSION}, 'zzz', 'docker compose resolver lets the leaf nested skill .env win for overlapping keys' );
+    is( $resolved->{env}{foo_VERSION}, 'foo', 'docker compose resolver preserves the root nested skill .env value under the root skill alias' );
+    is( $resolved->{env}{foo_bar_VERSION}, 'bar', 'docker compose resolver preserves the parent nested skill .env value under the cumulative parent alias' );
+    is( $resolved->{env}{SHARED_CHAIN}, 'zzz', 'docker compose resolver loads nested skill env files from root to leaf so the leaf override wins' );
+    is_same_path(
+        $resolved->{env}{zzz_DDDC},
+        File::Spec->catdir( $nested_skill_leaf_root, 'config', 'docker' ),
+        'docker compose resolver exports the leaf nested skill DDDC alias for a participating nested skill compose root',
+    );
+    is_same_path(
+        $resolved->{env}{foo_bar_zzz_DDDC},
+        File::Spec->catdir( $nested_skill_leaf_root, 'config', 'docker' ),
+        'docker compose resolver exports the cumulative nested skill DDDC alias for a participating nested skill compose root',
+    );
+    ok( grep( { /skills\/foo\/\.env$/ } @{ $resolved->{env_files} } ), 'docker compose resolver reports the root nested skill .env file when a nested compose service participates' );
+    ok( grep( { /skills\/foo\/skills\/bar\/\.env$/ } @{ $resolved->{env_files} } ), 'docker compose resolver reports the parent nested skill .env file when a nested compose service participates' );
+    ok( grep( { /skills\/foo\/skills\/bar\/skills\/zzz\/\.env$/ } @{ $resolved->{env_files} } ), 'docker compose resolver reports the leaf nested skill .env file when a nested compose service participates' );
 }
 
 {
@@ -431,8 +510,8 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
     );
     is_deeply(
         [ map { $_->{service} } @{$all_services} ],
-        [ qw(blue green orange purple worker) ],
-        'list_services returns isolated docker services in sorted order',
+        [ qw(blue green orange purple worker zzz) ],
+        'list_services returns isolated docker services in sorted order including nested skill compose services',
     );
     is_deeply(
         {
@@ -444,13 +523,14 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
             orange => 0,
             purple => 0,
             worker => 0,
+            zzz    => 0,
         },
-        'list_services reports enabled and disabled service state',
+        'list_services reports enabled and disabled service state including nested skill compose services',
     );
     is_deeply(
         [ map { $_->{service} } @{ $docker->list_services( project_root => $repo, filter => 'enabled' ) } ],
-        [ qw(green orange purple worker) ],
-        'list_services filter enabled keeps only enabled services',
+        [ qw(green orange purple worker zzz) ],
+        'list_services filter enabled keeps only enabled services including nested skill compose services',
     );
     is_deeply(
         [ map { $_->{service} } @{ $docker->list_services( project_root => $repo, filter => 'disabled' ) } ],

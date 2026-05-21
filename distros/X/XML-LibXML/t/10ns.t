@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # Should be 137.
-use Test::More tests => 137;
+use Test::More tests => 140;
 
 use XML::LibXML;
 use XML::LibXML::Common qw(:libxml);
@@ -581,4 +581,25 @@ print "# 11. empty namespace\n";
     is($attr->namespaceURI, undef, 'ns removed from attr');
     # TEST
     is($attr->getName, 'href', 'ns removed from attr name');
+}
+
+print "# 12. namespace reconciliation during cross-document adoption\n";
+{
+    my $src = XML::LibXML->load_xml(string =>
+        '<root xmlns:ns1="http://ns1.example.com"><ns1:child ns1:attr="val"/></root>');
+    my $dst = XML::LibXML->createDocument('http://other.example.com', 'other:root');
+
+    my $node = $src->documentElement->firstChild;
+    $dst->adoptNode($node);
+    $dst->documentElement->appendChild($node);
+
+    # TEST
+    is($node->namespaceURI, 'http://ns1.example.com',
+       'namespace URI preserved after cross-document adoption');
+    # TEST
+    is($node->prefix, 'ns1',
+       'namespace prefix preserved after cross-document adoption');
+    # TEST
+    is($node->getAttributeNS('http://ns1.example.com', 'attr'), 'val',
+       'namespaced attribute preserved after cross-document adoption');
 }

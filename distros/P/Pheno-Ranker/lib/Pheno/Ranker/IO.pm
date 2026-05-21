@@ -18,7 +18,7 @@ use JSON::XS;
 #use Sort::Naturally qw(nsort);
 use Exporter 'import';
 our @EXPORT =
-  qw(serialize_hashes write_alignment io_yaml_or_json read_json read_yaml write_json write_array2txt array2object validate_json write_poi coverage_stats check_existence_of_include_terms append_and_rename_primary_key restructure_pxf_interpretations);
+  qw(serialize_hashes write_alignment io_yaml_or_json read_json read_yaml write_json write_array2txt array2object validate_json write_poi poi_output_filename coverage_stats check_existence_of_include_terms append_and_rename_primary_key restructure_pxf_interpretations);
 use constant DEVEL_MODE => 0;
 
 #########################
@@ -166,7 +166,7 @@ sub write_poi {
     for my $name (@$poi) {
         my ($match) = grep { $name eq $_->{$primary_key} } @$ref_data;
         if ($match) {
-            my $out = catfile( $poi_out_dir, "$name.json" );
+            my $out = catfile( $poi_out_dir, poi_output_filename($name) );
             say "Writting <$out>" if $verbose;
             write_json( { filepath => $out, data => $match } );
         }
@@ -176,6 +176,30 @@ sub write_poi {
         }
     }
     return 1;
+}
+
+sub poi_output_filename {
+    my ( $name, $portable ) = @_;
+    $portable = $^O eq 'MSWin32' unless defined $portable;
+
+    my $filename = defined $name ? "$name" : '';
+
+    # Always encode path separators and percent to avoid directory traversal
+    # and ambiguous percent-encoded names. Encode extra characters on Windows.
+    my $unsafe = $portable
+      ? qr/([<>:"\/\\|?*\x00-\x1F%])/
+      : qr/([\/\\\x00-\x1F%])/;
+    $filename =~ s/$unsafe/sprintf '%%%02X', ord($1)/eg;
+
+    if ($portable) {
+        $filename =~ s/([ .])\z/sprintf '%%%02X', ord($1)/eg
+          while $filename =~ /[ .]\z/;
+        $filename = "_$filename"
+          if $filename =~ /^(?:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\z|\.)/i;
+    }
+
+    $filename = 'poi' if $filename eq '';
+    return "$filename.json";
 }
 
 sub array2object {
@@ -239,8 +263,10 @@ sub validate_json {
 }
 
 sub coverage_stats {
-    my ( $data, $format ) = @_;
+    my ( $data, $format, $arg ) = @_;
+    $arg ||= {};
     my $coverage = {};
+    my $retain_excluded = $arg->{retain_excluded_phenotypicFeatures};
 
     for my $item (@$data) {
         for my $key ( keys %$item ) {
@@ -248,15 +274,11 @@ sub coverage_stats {
             # Initialize key in coverage with 0 if not already present
             $coverage->{$key} //= 0;
 
-# Increment count only if value is not undef, not an empty hash, not an empty array,
-# and not equal to 'NA' or 'NaN'
-            unless (
-                   !defined $item->{$key}
-                || ( ref $item->{$key} eq 'HASH'  && !%{ $item->{$key} } )
-                || ( ref $item->{$key} eq 'ARRAY' && !@{ $item->{$key} } )
-                || $item->{$key} eq 'NA'    # Check for 'NA'
-                || $item->{$key} eq 'NaN'
-              )                             # Check for 'NaN'
+            if (
+                coverage_value_is_present(
+                    $key, $item->{$key}, $retain_excluded
+                )
+              )
             {
                 $coverage->{$key}++;
             }
@@ -267,6 +289,31 @@ sub coverage_stats {
         cohort_size    => scalar @$data,
         coverage_terms => $coverage
     };
+}
+
+sub coverage_value_is_present {
+    my ( $key, $value, $retain_excluded ) = @_;
+
+    return 0 unless defined $value;
+
+    if ( ref $value eq 'HASH' ) {
+        return keys %{$value} ? 1 : 0;
+    }
+
+    if ( ref $value eq 'ARRAY' ) {
+        return 0 unless @{$value};
+
+        if ( $key eq 'phenotypicFeatures' && !$retain_excluded ) {
+            return any {
+                ref $_ ne 'HASH' || !$_->{excluded}
+            } @{$value};
+        }
+
+        return 1;
+    }
+
+    return 0 if $value eq 'NA' || $value eq 'NaN';
+    return 1;
 }
 
 sub check_existence_of_include_terms {
@@ -458,4 +505,3 @@ sub restructure_pxf_interpretations {
 
     return 1;
 }
-

@@ -76,7 +76,7 @@ argon2-calibrate - a script to find the appropriate argon2 parameters
 
 =head1 VERSION
 
-version 0.030
+version 0.031
 
 =head1 DESCRIPTION
 
@@ -104,7 +104,7 @@ This program implements the following procedure, as recommended by the argon2 au
 
 =head1 AUTHOR
 
-Leon Timmermans <leont@cpan.org>
+Leon Timmermans <fawaka@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

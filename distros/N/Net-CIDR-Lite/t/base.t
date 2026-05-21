@@ -8,7 +8,7 @@
 use Test;
 use strict;
 $|++;
-BEGIN { plan tests => 51 };
+BEGIN { plan tests => 66 };
 use Net::CIDR::Lite;
 ok(1); # If we made it this far, we are ok.
 
@@ -161,4 +161,31 @@ ok(! $mapped->find("::ffff:192.168.2.1"));
 my $mapped2 = Net::CIDR::Lite->new("::ffff:10.0.0.0/104");
 ok($mapped2->find("::ffff:10.0.0.1"));
 ok(! $mapped2->find("::ffff:11.0.0.1"));
+
+# CVE-2026-45190: Reject trailing newline in parser inputs
+ok(! defined Net::CIDR::Lite::_pack_ipv4("1.2.3.4\n"));
+ok(! defined Net::CIDR::Lite::_pack_ipv6("::1\n"));
+eval { Net::CIDR::Lite->new("1.2.3.4\n") };
+ok($@=~/Can't determine ip format/);
+eval { Net::CIDR::Lite->new("::1\n") };
+ok($@=~/Can't determine ip format/);
+eval { Net::CIDR::Lite->new("1.2.3.4/24\n") };
+ok($@=~/Bad mask/);
+
+# CVE-2026-45190: Reject non-ASCII Unicode digits in parser inputs
+ok(! defined Net::CIDR::Lite::_pack_ipv4("\x{0661}.2.3.4"));
+ok(! defined Net::CIDR::Lite::_pack_ipv4("\x{ff11}.2.3.4"));
+ok(! defined Net::CIDR::Lite::_pack_ipv6("\x{ff10}1::1"));
+ok(! defined Net::CIDR::Lite::_pack_ipv6("\x{0966}1::1"));
+ok(! defined Net::CIDR::Lite::_pack_ipv6(chr(0x1D7CF) . "::1"));
+eval { Net::CIDR::Lite->new("1.2.3.4/1\x{ff10}") };
+ok($@=~/Bad mask/);
+
+# CVE-2026-45191: Reject zero-padded CIDR masks
+foreach my $padded ("00", "01", "032") {
+    eval { Net::CIDR::Lite->new("1.2.3.4/$padded") };
+    ok($@=~/Bad mask/);
+}
+eval { Net::CIDR::Lite->new("::/00") };
+ok($@=~/Bad mask/);
 

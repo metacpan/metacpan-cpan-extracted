@@ -28,7 +28,7 @@ sub wrapper($@) {
   btwN $N,@_;
 }
 
-for my $with_color (0, 1) {
+for my $with_color (0, (Spreadsheet::Edit::Log::_can_colorize() ? (1):())) {
   my $say_withcolor = $with_color ? "(with color)" : "(no color)";
   my $color_re = $with_color ? qr/\033.*?m/ : "";
   $ENV{NO_COLOR} = $with_color ? 0 : 1;

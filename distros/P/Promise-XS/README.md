@@ -193,7 +193,7 @@ mid-flight controls like cancellation.
 
 # TODO
 
-- `all()` and `race()` should ideally be implemented in XS.
+- `race()` should ideally be implemented in XS.
 
 # KNOWN ISSUES
 

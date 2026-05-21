@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1
-#                   and LibVirt version v11.10.0
+#                   and LibVirt version v12.3.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -16,7 +16,7 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad;
 
-class Sys::Async::Virt::Connection::Factory v0.2.3;
+class Sys::Async::Virt::Connection::Factory v0.6.3;
 
 use Carp qw(croak);
 use Log::Any qw($log);
@@ -25,9 +25,9 @@ use Protocol::Sys::Virt::URI; # imports 'parse_url'
 our @default_drivers = (
     { transport => '', class => 'Local', host => 0 },
     { transport => 'unix', class => 'Local', host => 0 },
-    # { transport => '', class => 'TCP', host => 1 },
-    # { transport => 'tls', class => 'TCP' },
-    # { transport => 'tcp', class => 'TCP' },
+    { transport => '', class => 'TLS', host => 1 },
+    { transport => 'tls', class => 'TLS' },
+    { transport => 'tcp', class => 'TCP' },
     { transport => 'ext', class => 'Process' },
     { transport => 'ssh', class => 'SSH' },
     );
@@ -82,7 +82,7 @@ Sys::Async::Virt::Connection::Factory - Class for
 
 =head1 VERSION
 
-v0.2.3
+v0.6.3
 
 =head1 SYNOPSIS
 
@@ -150,7 +150,8 @@ C<+YourPackage::Local> resolves to C<YourPackage::Local>.
 
 =back
 
-The default value maps the following transports: C<''>, C<unix>.
+The default value maps the following transports: C<''>, C<unix>, C<ext>,
+C<tcp>, C<tls> and C<ssh>.
 
 =back
 
@@ -169,7 +170,7 @@ L<LibVirt|https://libvirt.org>, L<Sys::Virt>
 =head1 LICENSE AND COPYRIGHT
 
 
-  Copyright (C) 2024-2025 Erik Huelsmann
+  Copyright (C) 2024-2026 Erik Huelsmann
 
 All rights reserved. This program is free software;
 you can redistribute it and/or modify it under the same terms as Perl itself.

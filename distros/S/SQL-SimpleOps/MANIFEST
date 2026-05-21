@@ -1,32 +1,52 @@
-AUTHORS
-Changes
-LICENSE
-MANIFEST
-Makefile.PL
-README
-SAMPLE-01-PRECREATE-DB
-SAMPLE-01-PRECREATE-DB-MYSQL
-SAMPLE-01-PRECREATE-DB-PG
-SAMPLE-01-PRECREATE-DB-SQLITE
-SAMPLE-02-MYTEST-MYSQL
-SAMPLE-02-MYTEST-POSTGRES
-SAMPLE-02-MYTEST-SQLITE
-lib/SQL/SimpleOps/DBI/MyPlugin.pm
-lib/SQL/SimpleOps/DBI/MySQL.pm
-lib/SQL/SimpleOps/DBI/ODBC.pm
-lib/SQL/SimpleOps/DBI/PG.pm
-lib/SQL/SimpleOps/DBI/SQLite.pm
-lib/SQL/SimpleOps.pm
-lib/SQL/SimpleOps.pod
-t/testDB.t
-t/testDB_mysql.pm
-t/testDB_mysql.sql
-t/testDB_postgres.pm
-t/testDB_postgres.sql
-t/testDB_sqlite.pm
-t/testDB_sqlite.sql
-t/testFirst.t
-t/testSQL.t
-t/testWhere.t
+AUTHORS							list of authors
+Changes							changelog summary
+examples/dbi_csv_file.pl				example DBI with DBD::CSV
+examples/dbi_csv_file.README_FIRST
+examples/dbi_mysql.pl					example DBI with DBD:mysql
+examples/dbi_mysql.README_FIRST	
+examples/dbi_mysql_without_plugin.pl			example DBI with DBD:mysql wo/predefined plugin
+examples/dbi_mysql_without_plugin.README_FIRST
+examples/dbi_postgres_without_schema.pl			example DBI with DBD::Pg wo/schema
+examples/dbi_postgres_without_schema.README_FIRST
+examples/dbi_postgres_with_schema.pl			example DBI with DBD::Pg w/schema
+examples/dbi_postgres_with_schema.README_FIRST
+examples/dbi_postgres_with_schema_without_plugin.pl	example DBI with DBD::Pg wo/predefined plugin
+examples/dbi_postgres_with_schema_without_plugin.README_FIRST
+examples/dbi_sqlite_file.pl				example DBI with DBD::SQLite file based
+examples/dbi_sqlite_file.README_FIRST
+examples/dbi_sqlite_file_without_plugin.pl		example DBI with DBD::SQLite wo/predefined plugin
+examples/dbi_sqlite_file_without_plugin.README_FIRST
+examples/dbi_sqlite_memory.pl				example DBI with DBD::SQLite memory based
+examples/dbi_sqlite_memory.README_FIRST
+lib/SQL/SimpleOps/DBI/MyPlugin.pm			Plugin Example
+lib/SQL/SimpleOps/DBI/MySQL.pm				plugin MySQL
+lib/SQL/SimpleOps/DBI/PG.pm				plugin Postgres
+lib/SQL/SimpleOps/DBI/SQLite.pm				plugin SQLite
+lib/SQL/SimpleOps.pm					Main lib
+lib/SQL/SimpleOps.pod					Main POD
+LICENSE							License Aggrement
+Makefile.PL						Make Install
+MANIFEST						this file
+README							Main ReadMe
+REFERENCES						References
+SAMPLE-01-PRECREATE-DB					Database test
+SAMPLE-01-PRECREATE-DB-MYSQL				Database test based MySQL
+SAMPLE-01-PRECREATE-DB-PG				Database test based Postgres
+SAMPLE-01-PRECREATE-DB-PG-STEP1				Database test based Postgres, step1
+SAMPLE-01-PRECREATE-DB-PG-STEP2				Database test based Postgres, step2
+SAMPLE-01-PRECREATE-DB-SQLITE				Database test based SQLite
+SAMPLE-02-MYTEST-MYSQL					Stdout Database test MySQL
+SAMPLE-02-MYTEST-POSTGRES				Stdout Database test Postgres
+SAMPLE-02-MYTEST-SQLITE					Stdout Database test SQLite
+t/testDB_mysql.pm					test MySQL script
+t/testDB_mysql.sql					test MySQL command
+t/testDB_postgres.pm					test Postgres script
+t/testDB_postgres.sql					test Postgres command
+t/testDB_sqlite.pm					test SQLite script
+t/testDB_sqlite.sql					test SQLite command
+t/testDB.t						test Database common script
+t/testFirst.t						test MyFirst script, by Main POD
+t/testSQL.t						test SQL script
+t/testWhere.t						test Where clause script
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

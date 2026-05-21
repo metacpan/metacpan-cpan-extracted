@@ -27,15 +27,18 @@ WriteMakefile(
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 	}, PREREQ_PM => {
+		'autodie' => 0,
 		'IO::Socket::INET' => 0,
 		'MIME::QuotedPrint' => 0,
 		'MIME::Base64' => 0,
+		'IPC::System::Simple' => 0,
 		'Object::Configure' => 0,
 		'Params::Get' => 0,
 		'Params::Validate::Strict' => 0,
 		'Params::Validate::Strict' => 0,
 		'Readonly::Values::Months' => 0,
 		'Socket' => 0,
+		'Time::Piece' => 0,
 	# }, RECOMMENDED => {
 		# 'Net::DNS' => 0,
 		# 'LWP::UserAgent' => 0,
@@ -48,6 +51,9 @@ WriteMakefile(
 		'Scalar::Util' => 0,
 		'Test::DescribeMe' => 0,
 		'Test::Most' => 0,
+		'Test::Needs' => 0,
+		'Test::Returns' => 0,
+		'Test::Which' => 0,
 	}, dist => $dist,
 	clean		=> { FILES => 'Email-Abuse-Investigator-*' },
 	# META_ADD => {

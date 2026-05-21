@@ -8,6 +8,7 @@ use File::Find;
 install_share dist => 'share';
 
 my $GITHUB_URL = 'https://github.com/CNAG-Biomedical-Informatics/pheno-ranker';
+my $pm_files    = discover_pm_files();
 
 WriteMakefile(
     NAME          => 'Pheno::Ranker',
@@ -18,7 +19,7 @@ WriteMakefile(
     META_MERGE    => {
         'dynamic_config' => 0,
         'meta-spec' => { version   => 0 },
-        'no_index'  => { directory => [qw(docs t)] },
+        'no_index'  => { directory => [qw(docs t lib/Pheno/bck lib/Pheno/Ranker/bck)] },
         'prereqs'   => { runtime   => { requires => { perl => '5.026000' } } },
         'resources' => {
             bugtracker => { web => "$GITHUB_URL/issues" },
@@ -56,6 +57,7 @@ WriteMakefile(
         'utils/csv2pheno_ranker/csv2pheno-ranker'
 
     ],
+    PM => $pm_files,
     TEST_REQUIRES => {
         'Test::More'      => '1.30',
         'Test::Exception' => '0.43',
@@ -72,6 +74,21 @@ WriteMakefile(
         'ExtUtils::MakeMaker'     => '7.70'
     }
 );
+
+sub discover_pm_files {
+    my %pm;
+
+    find(
+        sub {
+            return unless /\.pm\z/;
+            return if $File::Find::name =~ m{\Alib/Pheno/(?:Ranker/)?bck/};
+            $pm{$File::Find::name} = $File::Find::name =~ s{\Alib/}{\$(INST_LIB)/}r;
+        },
+        'lib'
+    );
+
+    return \%pm;
+}
 
 package MY;
 use File::ShareDir::Install 'postamble';

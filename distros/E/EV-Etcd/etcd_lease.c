@@ -25,8 +25,8 @@ void process_lease_grant_response(pTHX_ pending_call_t *pc) {
 
     HV *result = newHV();
     add_header_to_hv(aTHX_ result, resp->header);
-    hv_store(result, "id", 2, newSViv(resp->id), 0);
-    hv_store(result, "ttl", 3, newSViv(resp->ttl), 0);
+    hv_store(result, "id", 2, newSVi64(resp->id), 0);
+    hv_store(result, "ttl", 3, newSVi64(resp->ttl), 0);
     etcdserverpb__lease_grant_response__free_unpacked(resp, NULL);
 
     CALL_SUCCESS_CALLBACK(pc->callback, result);
@@ -55,9 +55,9 @@ void process_lease_time_to_live_response(pTHX_ pending_call_t *pc) {
 
     HV *result = newHV();
     add_header_to_hv(aTHX_ result, resp->header);
-    hv_store(result, "id", 2, newSViv(resp->id), 0);
-    hv_store(result, "ttl", 3, newSViv(resp->ttl), 0);
-    hv_store(result, "granted_ttl", 11, newSViv(resp->grantedttl), 0);
+    hv_store(result, "id", 2, newSVi64(resp->id), 0);
+    hv_store(result, "ttl", 3, newSVi64(resp->ttl), 0);
+    hv_store(result, "granted_ttl", 11, newSVi64(resp->grantedttl), 0);
 
     if (resp->n_keys > 0) {
         AV *keys_av = newAV();
@@ -92,7 +92,7 @@ void process_lease_leases_response(pTHX_ pending_call_t *pc) {
     }
     for (size_t i = 0; i < resp->n_leases; i++) {
         HV *lease_hv = newHV();
-        hv_store(lease_hv, "id", 2, newSViv(resp->leases[i]->id), 0);
+        hv_store(lease_hv, "id", 2, newSVi64(resp->leases[i]->id), 0);
         av_push(leases_av, newRV_noinc((SV *)lease_hv));
     }
     hv_store(result, "leases", 6, newRV_noinc((SV *)leases_av), 0);
@@ -121,21 +121,23 @@ void keepalive_rearm_recv(pTHX_ keepalive_call_t *kc) {
     grpc_call_error err = grpc_call_start_batch(kc->call, &op, 1, &kc->base, NULL);
     if (err != GRPC_CALL_OK) {
         kc->active = 0;
-        CALL_SIMPLE_ERROR_CALLBACK(kc->callback, "Keepalive rearm failed");
+        CALL_STATUS_ERROR_CALLBACK(kc->callback, GRPC_STATUS_INTERNAL, "Keepalive rearm failed", "keepalive");
         cleanup_keepalive(aTHX_ kc);
     }
 }
 
-/* Cleanup keepalive and remove from client list */
-void cleanup_keepalive(pTHX_ keepalive_call_t *kc) {
-    ev_etcd_t *client = kc->client;
+static void keepalive_call_free(pTHX_ keepalive_call_t *kc) {
+    Safefree(kc);
+}
 
+/* See cleanup_watch — same dual-ownership pattern */
+void cleanup_keepalive(pTHX_ keepalive_call_t *kc) {
+    if (!kc->client_owns) return;
+
+    ev_etcd_t *client = kc->client;
     keepalive_call_t **kp = &client->keepalives;
     while (*kp) {
-        if (*kp == kc) {
-            *kp = kc->next;
-            break;
-        }
+        if (*kp == kc) { *kp = kc->next; break; }
         kp = &(*kp)->next;
     }
 
@@ -145,27 +147,38 @@ void cleanup_keepalive(pTHX_ keepalive_call_t *kc) {
     grpc_metadata_array_destroy(&kc->trailing_metadata);
     if (kc->recv_buffer) {
         grpc_byte_buffer_destroy(kc->recv_buffer);
+        kc->recv_buffer = NULL;
     }
     grpc_slice_unref(kc->status_details);
     if (kc->call) {
         grpc_call_unref(kc->call);
+        kc->call = NULL;
     }
     SvREFCNT_dec(kc->callback);
-    Safefree(kc);
+    kc->callback = NULL;
+    kc->active = 0;
+    kc->client_owns = 0;
+
+    if (!kc->perl_owns) keepalive_call_free(aTHX_ kc);
+}
+
+void keepalive_call_perl_release(pTHX_ keepalive_call_t *kc) {
+    kc->perl_owns = 0;
+    if (!kc->client_owns) keepalive_call_free(aTHX_ kc);
 }
 
 /* Process LeaseKeepAliveResponse */
 void process_keepalive_response(pTHX_ keepalive_call_t *kc) {
     if (!kc->recv_buffer) {
         kc->active = 0;
-        CALL_SIMPLE_ERROR_CALLBACK(kc->callback, "No keepalive response received");
+        CALL_STATUS_ERROR_CALLBACK(kc->callback, GRPC_STATUS_INTERNAL, "No keepalive response received", "keepalive");
         return;
     }
 
     grpc_byte_buffer_reader reader;
     if (!grpc_byte_buffer_reader_init(&reader, kc->recv_buffer)) {
         kc->active = 0;
-        CALL_SIMPLE_ERROR_CALLBACK(kc->callback, "Failed to read keepalive response buffer");
+        CALL_STATUS_ERROR_CALLBACK(kc->callback, GRPC_STATUS_INTERNAL, "Failed to read keepalive response buffer", "keepalive");
         return;
     }
 
@@ -178,7 +191,7 @@ void process_keepalive_response(pTHX_ keepalive_call_t *kc) {
 
     if (!resp) {
         kc->active = 0;
-        CALL_SIMPLE_ERROR_CALLBACK(kc->callback, "Failed to parse keepalive response");
+        CALL_STATUS_ERROR_CALLBACK(kc->callback, GRPC_STATUS_INTERNAL, "Failed to parse keepalive response", "keepalive");
         return;
     }
 
@@ -193,8 +206,8 @@ void process_keepalive_response(pTHX_ keepalive_call_t *kc) {
 
     HV *result = newHV();
     add_header_to_hv(aTHX_ result, resp->header);
-    hv_store(result, "id", 2, newSViv(resp->id), 0);
-    hv_store(result, "ttl", 3, newSViv(resp->ttl), 0);
+    hv_store(result, "id", 2, newSVi64(resp->id), 0);
+    hv_store(result, "ttl", 3, newSVi64(resp->ttl), 0);
     etcdserverpb__lease_keep_alive_response__free_unpacked(resp, NULL);
 
     CALL_SUCCESS_CALLBACK(kc->callback, result);
@@ -239,7 +252,7 @@ static void keepalive_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revent
         grpc_byte_buffer_destroy(send_buffer);
         kc->active = 0;
         client->in_callback = 1;
-        CALL_SIMPLE_ERROR_CALLBACK(kc->callback, "Keepalive reconnect failed");
+        CALL_STATUS_ERROR_CALLBACK(kc->callback, GRPC_STATUS_INTERNAL, "Keepalive reconnect failed", "keepalive");
         client->in_callback = 0;
         if (!client->active) {
             finish_client_destroy(aTHX_ client);
@@ -261,7 +274,7 @@ static void keepalive_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revent
     if (err != GRPC_CALL_OK) {
         STREAMING_CALL_BATCH_ERROR(kc);
         client->in_callback = 1;
-        CALL_SIMPLE_ERROR_CALLBACK(kc->callback, "Keepalive reconnect batch failed");
+        CALL_STATUS_ERROR_CALLBACK(kc->callback, GRPC_STATUS_INTERNAL, "Keepalive reconnect batch failed", "keepalive");
         client->in_callback = 0;
         if (!client->active) {
             finish_client_destroy(aTHX_ client);

@@ -2,6 +2,10 @@
 RT::Interface::Web::RedirectBoostedRequest();
 use Excel::Writer::XLSX;
 
+# Flag for other components to know we are exporting textual data
+# so don't render content like images.
+$m->notes( 'render-text-only' => 1 );
+
 
 my $report;
 
@@ -92,7 +96,7 @@ for my $section (qw(thead tbody tfoot)) {
         $current_cell = 0;
         for my $cell ( @{ $row->{'cells'} } ) {
             my $value = $cell->{value};
-            $worksheet->write($current_row, $current_cell, $value);
+            RT::Extension::ExcelFeed->WriteExcel( $worksheet, $current_row, $current_cell, $value );
             $current_cell++;
         }
         $current_row++;

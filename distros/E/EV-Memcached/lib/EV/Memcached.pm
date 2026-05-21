@@ -5,7 +5,7 @@ use EV;
 
 BEGIN {
     use XSLoader;
-    our $VERSION = '0.01';
+    our $VERSION = '0.02';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -13,26 +13,26 @@ BEGIN {
 
 =head1 NAME
 
-EV::Memcached - High-performance asynchronous memcached client using EV
+EV::Memcached - asynchronous memcached client on libev
 
 =head1 SYNOPSIS
 
+    use EV;
     use EV::Memcached;
 
     my $mc = EV::Memcached->new(
-        host       => '127.0.0.1',
-        port       => 11211,
-        on_error   => sub { warn "memcached error: @_" },
-        on_connect => sub { warn "connected" },
+        host     => '127.0.0.1',
+        port     => 11211,
+        on_error => sub { warn "memcached: @_" },
     );
 
     $mc->set('foo', 'bar', sub {
-        my ($result, $err) = @_;
-        die $err if $err;
+        my ($ok, $err) = @_;
+        warn "set failed: $err" if $err;
 
         $mc->get('foo', sub {
             my ($value, $err) = @_;
-            print "foo = $value\n";  # bar
+            print "foo = $value\n";   # bar
             $mc->disconnect;
         });
     });
@@ -41,426 +41,507 @@ EV::Memcached - High-performance asynchronous memcached client using EV
 
 =head1 DESCRIPTION
 
-EV::Memcached is a high-performance asynchronous memcached client that
-implements the memcached binary protocol in pure XS with L<EV> event loop
-integration. No external C memcached client library is required.
+A pure-XS memcached client built on the L<EV> event loop. Implements the
+memcached binary protocol directly -- no external C client library is
+needed. All commands are non-blocking; results are delivered through
+callbacks dispatched by the EV loop.
 
-Features:
+Highlights:
 
 =over
 
-=item * Binary protocol for efficient encoding and pipelining
+=item *
 
-=item * Automatic pipelining (multiple commands in flight)
+Binary protocol with pipelining, multi-get via GETKQ + NOOP fence, and
+fire-and-forget quiet variants (SETQ, FLUSHQ).
 
-=item * Multi-get optimization via GETKQ + NOOP fence
+=item *
 
-=item * Flow control (max_pending, waiting queue)
+TCP and Unix socket transports, optional SASL PLAIN authentication
+(automatic re-auth on reconnect).
 
-=item * Automatic reconnection
+=item *
 
-=item * Fire-and-forget mode (no callback)
+Flow control via C<max_pending>, local C<waiting_queue> with optional
+replay across reconnects, configurable connect / command / waiting
+timeouts.
 
-=item * TCP and Unix socket support
+=item *
 
-=item * SASL PLAIN authentication (auto-auth on connect)
-
-=item * Connect and command timeouts
-
-=item * Key length validation (250-byte protocol limit)
+Predictable lifecycle: pending callbacks always fire (with the
+disconnect reason on teardown), DESTROY is reentrancy-safe across
+callback contexts.
 
 =back
 
-=head1 ANYEVENT INTEGRATION
+L<AnyEvent> applications can use this module unchanged, since AnyEvent
+runs on top of EV when EV is loaded.
 
-L<AnyEvent> has EV as one of its backends, so EV::Memcached can be used
-in AnyEvent applications seamlessly.
+=head1 ENCODING
 
-=head1 NO UTF-8 SUPPORT
-
-This module handles all variables as bytes. Encode your UTF-8 strings
-before passing them:
+This module treats all keys and values as byte strings. Encode UTF-8
+strings before passing them in:
 
     use Encode;
-
     $mc->set(foo => encode_utf8($val), sub { ... });
-
     $mc->get('foo', sub {
         my $val = decode_utf8($_[0]);
     });
 
-=head1 METHODS
+=head1 CALLBACK CONVENTIONS
+
+Every command callback receives C<($result, $err)>. On success C<$err>
+is C<undef>; on protocol error C<$err> holds a string like C<NOT_STORED>
+or C<NOT_FOUND>. On a cache miss for C<get>/C<gat>, B<both> arguments
+are C<undef> (a miss is not an error).
+
+Callback exceptions are caught with C<G_EVAL> and reported via C<warn>
+so a stray C<die> never unwinds the libev event loop. To abort on
+errors, set a flag and break the loop; do not rely on C<die>
+propagating out of a callback.
+
+=head1 CONSTRUCTOR
 
 =head2 new(%options)
 
-Create a new EV::Memcached instance. All options are optional.
+Construct an instance. All options are optional; with none, the client
+is unconfigured and you must call C<connect> / C<connect_unix> later.
+Specifying C<host> (or C<path>) at construction time triggers an
+immediate non-blocking connect.
 
     my $mc = EV::Memcached->new(
         host     => '127.0.0.1',
         port     => 11211,
-        on_error => sub { die @_ },
+        on_error => sub { warn "@_" },
     );
 
-Options:
+=head3 Connection
 
 =over
 
-=item host => 'Str'
+=item host => $str
 
-=item port => 'Int' (default 11211)
+=item port => $int (default 11211)
 
-Hostname and port. Mutually exclusive with C<path>.
+TCP host and port. Mutually exclusive with C<path>.
 
-=item path => 'Str'
+=item path => $str
 
 Unix socket path. Mutually exclusive with C<host>.
 
-=item on_error => $cb->($errstr)
+=item loop => $ev_loop
 
-Error callback for connection-level errors. Default: C<die>.
-
-=item on_connect => $cb->()
-
-Called when connection is established.
-
-=item on_disconnect => $cb->()
-
-Called when disconnected.
-
-=item connect_timeout => $ms
-
-Connection timeout in milliseconds. 0 = no timeout (default).
-Only applies to non-blocking TCP connects (not Unix sockets
-or immediate localhost connections).
-
-=item command_timeout => $ms
-
-Command timeout in milliseconds. When set, if no response is received
-within this interval, the connection is terminated with "command timeout"
-error. The timer resets on every response from the server. 0 = no timeout
-(default).
-
-=item max_pending => $num
-
-Maximum concurrent commands. 0 = unlimited (default).
-
-=item waiting_timeout => $ms
-
-Max time in local queue before cancellation. 0 = unlimited.
-
-=item resume_waiting_on_reconnect => $bool
-
-Keep waiting queue on disconnect for replay after reconnect.
-
-=item reconnect => $bool
-
-Enable automatic reconnection.
-
-=item reconnect_delay => $ms (default 1000)
-
-=item max_reconnect_attempts => $num (0 = unlimited)
+EV loop to attach to. Default: C<EV::default_loop>.
 
 =item priority => $num (-2 to +2)
 
-EV watcher priority.
+EV watcher priority. Higher = serviced before other EV watchers.
 
 =item keepalive => $seconds
 
-TCP keepalive interval.
-
-=item username => 'Str'
-
-=item password => 'Str'
-
-SASL PLAIN authentication credentials. When both are set, the client
-automatically authenticates after connecting (and after each reconnect).
-Requires memcached started with C<-S> flag and SASL support compiled in.
-
-=item loop => EV::Loop
-
-EV loop to use. Default: C<EV::default_loop>.
+TCP keepalive idle time. Set to 0 to disable. Ignored on Unix sockets.
 
 =back
 
+=head3 Timeouts and flow control
+
+=over
+
+=item connect_timeout => $ms
+
+Abort an in-progress non-blocking connect after this many milliseconds.
+0 = no timeout (default). Does not apply to Unix sockets or to
+immediately-completing localhost connects.
+
+=item command_timeout => $ms
+
+Disconnect with C<"command timeout"> error if no response arrives
+within this interval. The timer resets on every response from the
+server. 0 = no timeout (default).
+
+=item max_pending => $num
+
+Cap on concurrent in-flight commands. Excess commands are held in a
+local waiting queue. 0 = unlimited (default).
+
+=item waiting_timeout => $ms
+
+Maximum time a command may sit in the waiting queue before its callback
+fires with C<"waiting timeout">. 0 = unlimited (default).
+
+=item resume_waiting_on_reconnect => $bool
+
+If true, the waiting queue survives a disconnect and is replayed on
+reconnect. Default: false.
+
+=back
+
+=head3 Reconnect
+
+=over
+
+=item reconnect => $bool
+
+Enable automatic reconnection on transport errors.
+
+=item reconnect_delay => $ms (default 1000)
+
+Delay before each reconnect attempt. The delay is always honored via a
+timer; setting it to 0 still defers through the event loop (no
+synchronous retry recursion).
+
+=item max_reconnect_attempts => $num
+
+Give up after this many consecutive failures and emit
+C<"max reconnect attempts reached">. 0 = unlimited (default).
+
+=back
+
+=head3 Authentication
+
+=over
+
+=item username => $str
+
+=item password => $str
+
+SASL PLAIN credentials. When both are set, the client authenticates
+after every successful connect (and reconnect). Pre-connect commands
+sit in the waiting queue until SASL completes. Requires a memcached
+build with SASL support and the C<-S> flag.
+
+=back
+
+=head3 Event handlers
+
+=over
+
+=item on_error => $cb->($errstr)
+
+Connection-level error callback. Default: write the message to
+C<STDERR> via C<warn>. Callbacks are run under C<G_EVAL>, so any
+C<die> in a custom handler is demoted to a warning -- use an explicit
+flag if you need to terminate.
+
+=item on_connect => $cb->()
+
+Fires once the connection is fully established (after SASL, when
+applicable).
+
+=item on_disconnect => $cb->()
+
+Fires after a disconnect, after pending callbacks have been cancelled.
+For server-initiated close, this fires before C<on_error>.
+
+=back
+
+=head1 LIFECYCLE
+
 =head2 connect($host, [$port])
 
-Connect to memcached server. Port defaults to 11211.
+Connect to a TCP host. Port defaults to 11211. Stops any pending
+auto-reconnect timer and clears any prior C<path> setting.
 
 =head2 connect_unix($path)
 
-Connect via Unix socket.
+Connect via Unix domain socket. Stops any pending auto-reconnect timer
+and clears any prior C<host> setting.
 
 =head2 disconnect
 
-Disconnect from server. Stops reconnect timer. Pending command callbacks
-receive C<(undef, "disconnected")> error. C<on_disconnect> fires after
-pending callbacks have been cancelled.
-
-For intentional disconnect, only C<on_disconnect> fires. For
-server-initiated close or errors, C<on_disconnect> fires first, then
-C<on_error> fires with the reason (e.g., "connection closed by server",
-"command timeout"). This lets you distinguish the two cases.
+Disconnect cleanly. Cancels any pending reconnect, drains pending
+command callbacks with C<(undef, "disconnected")>, then fires
+C<on_disconnect>. For an intentional disconnect, C<on_error> does B<not>
+fire -- that distinction lets you tell user-initiated teardown from
+server-side close.
 
 =head2 is_connected
 
-Returns true if connected or connecting.
-
-=head2 get($key, [$cb->($value, $err)])
-
-Retrieve a value. On miss: C<($value, $err)> are both C<undef>.
-
-=head2 gets($key, [$cb->($result, $err)])
-
-Retrieve with metadata. C<$result> is C<{ value, flags, cas }>.
-
-=head2 set($key, $value, [$expiry, [$flags,]] [$cb])
-
-Store a value. Without callback: fire-and-forget.
-
-=head2 add($key, $value, [$expiry, [$flags,]] [$cb])
-
-Store only if key does not exist.
-
-=head2 replace($key, $value, [$expiry, [$flags,]] [$cb])
-
-Store only if key exists.
-
-=head2 cas($key, $value, $cas, [$expiry, [$flags,]] [$cb])
-
-Compare-and-swap: store only if CAS value matches.
-
-=head2 delete($key, [$cb])
-
-Delete a key.
-
-=head2 incr($key, [$delta, [$initial, [$expiry,]]] [$cb])
-
-Atomic increment. C<$delta> defaults to 1. C<$expiry> defaults to
-0xFFFFFFFF (don't create if key doesn't exist).
-
-    $mc->incr('counter', 1, sub {
-        my ($new_value, $err) = @_;
-    });
-
-    # Auto-create with initial value 100, TTL 300s:
-    $mc->incr('counter', 1, 100, 300, sub { ... });
-
-=head2 decr($key, [$delta, [$initial, [$expiry,]]] [$cb])
-
-Atomic decrement. Memcached clamps at 0 (never goes negative).
-
-=head2 append($key, $data, [$cb])
-
-Append data to existing value.
-
-=head2 prepend($key, $data, [$cb])
-
-Prepend data to existing value.
-
-=head2 touch($key, $expiry, [$cb])
-
-Update expiration time without fetching.
-
-=head2 gat($key, $expiry, [$cb->($value, $err)])
-
-Get and touch: retrieve value and update expiration.
-
-=head2 gats($key, $expiry, [$cb->($result, $err)])
-
-Get and touch with metadata.
-
-=head2 mget(\@keys, [$cb->(\%results, $err)])
-
-Multi-get using GETKQ + NOOP fence optimization. Results hash
-contains only found keys:
-
-    $mc->mget([qw(k1 k2 k3)], sub {
-        my ($results, $err) = @_;
-        # $results = { k1 => 'val1', k3 => 'val3' }
-        # k2 was a miss (not in hash)
-    });
-
-=head2 mgets(\@keys, [$cb->(\%results, $err)])
-
-Like C<mget> but returns full metadata per key:
-
-    $mc->mgets([qw(k1 k2)], sub {
-        my ($results, $err) = @_;
-        # $results = { k1 => { value => 'v', flags => 0, cas => 123 } }
-    });
-
-=head2 version([$cb->($version, $err)])
-
-Get server version string.
-
-=head2 stats([$name,] [$cb->(\%stats, $err)])
-
-Get server statistics. Optional C<$name> for specific stat group.
-
-=head2 flush([$expiry,] [$cb])
-
-Invalidate all items. Optional delay in seconds.
-
-=head2 noop([$cb])
-
-No-operation. Useful as a pipeline fence.
+Returns true while a session is established B<or> in progress (TCP
+handshake / SASL exchange). Commands issued in the connecting phase
+are queued and sent on completion.
 
 =head2 quit([$cb])
 
-Send quit command. Server will close connection.
+Send a memcached C<QUIT> and let the server close the connection.
+
+=head1 STORAGE COMMANDS
+
+Each command's callback receives C<($result, $err)>. C<$result> is C<1>
+on success.
+
+=head2 set($key, $value, [$expiry, [$flags,]] [$cb])
+
+Store unconditionally. Without C<$cb> this becomes fire-and-forget
+(SETQ): no response is received and any server-side failure is silently
+dropped.
+
+=head2 add($key, $value, [$expiry, [$flags,]] [$cb])
+
+Store only if the key does not exist. Errors with C<NOT_STORED> if
+present.
+
+=head2 replace($key, $value, [$expiry, [$flags,]] [$cb])
+
+Store only if the key already exists. Errors with C<NOT_STORED> if
+absent.
+
+=head2 cas($key, $value, $cas, [$expiry, [$flags,]] [$cb])
+
+Compare-and-swap. The C<$cas> token comes from a prior C<gets> /
+C<gats> / C<mgets>. Errors with C<EXISTS> on token mismatch or
+C<NOT_FOUND> if the key disappeared.
+
+=head2 append($key, $data, [$cb])
+
+Append bytes to an existing value. Errors with C<NOT_STORED> if the
+key does not exist. Without C<$cb>, errors are silently dropped.
+
+=head2 prepend($key, $data, [$cb])
+
+Prepend bytes to an existing value. Same error and fire-and-forget
+semantics as C<append>.
+
+=head2 delete($key, [$cb])
+
+Delete a key. Errors with C<NOT_FOUND> if absent.
+
+=head1 RETRIEVAL COMMANDS
+
+=head2 get($key, [$cb->($value, $err)])
+
+Retrieve a value. On a cache miss, both C<$value> and C<$err> are
+C<undef> -- a miss is not an error.
+
+=head2 gets($key, [$cb->($info, $err)])
+
+Like C<get> but returns C<{ value =E<gt> ..., flags =E<gt> ..., cas =E<gt> ... }>.
+
+=head2 mget(\@keys, [$cb->(\%values, $err)])
+
+Multi-get, internally pipelined as a sequence of GETKQ packets
+terminated by a NOOP fence. Returns a hash containing only the keys
+that were hits:
+
+    $mc->mget([qw(k1 k2 k3)], sub {
+        my ($values, $err) = @_;
+        # $values = { k1 => 'v1', k3 => 'v3' }   # k2 was a miss
+    });
+
+=head2 mgets(\@keys, [$cb->(\%info, $err)])
+
+Like C<mget> but each value carries metadata:
+
+    $mc->mgets([qw(k1 k2)], sub {
+        my ($info, $err) = @_;
+        # $info = { k1 => { value => 'v', flags => 0, cas => 123 } }
+    });
+
+=head1 ATOMIC COUNTERS
+
+=head2 incr($key, [$delta, [$initial, [$expiry,]]] [$cb->($new_value, $err)])
+
+Atomic increment. C<$delta> defaults to 1. C<$expiry> defaults to
+C<0xFFFFFFFF>, which means "do not auto-create" (the call then errors
+with C<NOT_FOUND>). Pass any other expiry to auto-create with
+C<$initial>:
+
+    $mc->incr('counter', 1, sub { ... });          # require existing
+    $mc->incr('counter', 1, 100, 300, sub { ... }); # auto-create at 100, 5min TTL
+
+C<$new_value> is the post-increment counter value.
+
+=head2 decr($key, [$delta, [$initial, [$expiry,]]] [$cb->($new_value, $err)])
+
+Atomic decrement. Memcached clamps the result at 0 (never negative).
+Same auto-create semantics as C<incr>.
+
+=head1 EXPIRATION
+
+=head2 touch($key, $expiry, [$cb])
+
+Update an existing key's expiration without fetching the value. Errors
+with C<NOT_FOUND> if absent.
+
+=head2 gat($key, $expiry, [$cb->($value, $err)])
+
+Get-and-touch: retrieve and update expiration in one round-trip. Same
+miss semantics as C<get>.
+
+=head2 gats($key, $expiry, [$cb->($info, $err)])
+
+Get-and-touch with metadata. Same shape as C<gets>.
+
+=head1 SERVER COMMANDS
+
+=head2 flush([$expiry,] [$cb])
+
+Invalidate every item. Optional delay in seconds before the flush takes
+effect. Without C<$cb>, sent as fire-and-forget (FLUSHQ).
+
+=head2 noop([$cb])
+
+No-operation round-trip. Useful as a pipeline fence to wait until all
+previously-sent commands have been processed.
+
+=head2 version([$cb->($version, $err)])
+
+Server version string.
+
+=head2 stats([$name,] [$cb->(\%stats, $err)])
+
+Server statistics. Without C<$name>, returns the default stats group.
+Common groups: C<settings>, C<items>, C<sizes>, C<slabs>, C<conns>.
+
+=head1 AUTHENTICATION
 
 =head2 sasl_auth($username, $password, [$cb])
 
-Authenticate using SASL PLAIN mechanism. Called automatically on
-connect when C<username> and C<password> constructor options are set.
-
-    $mc->sasl_auth('user', 'secret', sub {
-        my ($result, $err) = @_;
-        die "auth failed: $err" if $err;
-        # authenticated -- proceed with commands
-    });
+Authenticate via SASL PLAIN. Auto-invoked on connect when both
+C<username> and C<password> were passed to the constructor; call
+manually only when authenticating after a no-auth construction.
 
 =head2 sasl_list_mechs([$cb->($mechs, $err)])
 
-Query available SASL mechanisms. Returns a space-separated string
-(e.g., C<"PLAIN">).
+Query the server's supported mechanisms; returns a space-separated
+string such as C<"PLAIN">.
 
-=head2 reconnect($enable, [$delay_ms], [$max_attempts])
-
-Configure automatic reconnection.
-
-=head2 reconnect_enabled
-
-Returns true if reconnect is enabled.
-
-=head2 connect_timeout([$ms])
-
-Get/set connection timeout in milliseconds.
-
-=head2 command_timeout([$ms])
-
-Get/set command timeout in milliseconds. When a response is received,
-the timer resets. If no response arrives within the timeout, the
-connection is disconnected with "command timeout" error.
-
-=head2 pending_count
-
-Number of commands awaiting server response.
-
-=head2 waiting_count
-
-Number of commands in local queue (flow control).
-
-=head2 max_pending([$limit])
-
-Get/set concurrent command limit.
-
-=head2 waiting_timeout([$ms])
-
-Get/set local queue timeout.
-
-=head2 resume_waiting_on_reconnect([$bool])
-
-Get/set waiting queue behavior on disconnect.
-
-=head2 priority([$num])
-
-Get/set EV watcher priority (-2 to +2).
-
-=head2 keepalive([$seconds])
-
-Get/set TCP keepalive.
+=head1 LOCAL CONTROL
 
 =head2 skip_pending
 
-Cancel all pending command callbacks with C<(undef, "skipped")>.
+Drain the in-flight queue, firing every callback with
+C<(undef, "skipped")>. The connection itself is left intact.
 
 =head2 skip_waiting
 
-Cancel all waiting command callbacks with C<(undef, "skipped")>.
+Same, but for the local waiting queue (commands not yet sent).
 
-=head2 on_error([$cb])
+=head2 pending_count
 
-=head2 on_connect([$cb])
+Number of commands sent and awaiting a response.
 
-=head2 on_disconnect([$cb])
+=head2 waiting_count
 
-Get/set handler callbacks.
+Number of commands held in the local waiting queue (because the
+connection is not ready, SASL is in progress, or C<max_pending> is
+saturated).
 
-=head1 DESTRUCTION BEHAVIOR
+=head1 ACCESSORS
 
-When an EV::Memcached object is destroyed while commands are still
-pending or waiting, all pending callbacks receive C<(undef, "disconnected")>
-and all waiting callbacks likewise.
+Every option from C<new> has a getter/setter of the same name. Calling
+without arguments reads the current value; with one argument it writes
+and (where meaningful, e.g. C<keepalive>) takes effect immediately.
 
-For predictable cleanup:
+=over
 
-    $mc->disconnect;
+=item C<connect_timeout([$ms])>
+
+=item C<command_timeout([$ms])>
+
+=item C<max_pending([$num])>
+
+=item C<waiting_timeout([$ms])>
+
+=item C<resume_waiting_on_reconnect([$bool])>
+
+=item C<priority([$num])>
+
+=item C<keepalive([$seconds])>
+
+=item C<reconnect_enabled>
+
+Read-only; configure via C<reconnect>.
+
+=item C<reconnect($enable, [$delay_ms], [$max_attempts])>
+
+Reconfigure auto-reconnect at runtime.
+
+=item C<on_error([$cb])>
+
+=item C<on_connect([$cb])>
+
+=item C<on_disconnect([$cb])>
+
+Get/set the corresponding handler. Pass C<undef> to clear.
+
+=back
+
+=head1 DESTRUCTION
+
+If C<$mc> goes out of scope while commands are in flight or queued,
+every pending and waiting callback fires once with
+C<(undef, "disconnected")>. This holds whether you call C<disconnect>
+first or simply drop the reference.
+
+The clean shutdown idiom is:
+
+    $mc->disconnect;   # drains queues, fires on_disconnect
     undef $mc;
 
-Or cancel callbacks first:
-
-    $mc->skip_pending;
-    $mc->skip_waiting;
-    $mc->disconnect;
-
-B<Circular references:> If callbacks close over C<$mc>, break the cycle
-before the object goes out of scope:
+If a callback closes over C<$mc> (a common mistake -- every reference
+inside a callback closure keeps the object alive), break the cycle
+before dropping the outer reference:
 
     $mc->on_error(undef);
     $mc->on_connect(undef);
     $mc->on_disconnect(undef);
+    undef $mc;
+
+DESTROY is reentrant-safe: if a callback fired during teardown drops
+the last external reference to a separate C<EV::Memcached>, that
+object's DESTROY is correctly deferred and run once unwound.
+
+=head1 BINARY PROTOCOL NOTES
+
+The wire format is the memcached binary protocol -- a 24-byte header
+plus body, with each request tagged by an opaque field used for
+in-flight matching and pipelining. Multi-get is sent as a run of
+GETKQ packets ending in a NOOP fence: the server emits a response
+only on hit, and the NOOP reply terminates the batch. Fire-and-forget
+C<set>/C<flush> use the quiet SETQ / FLUSHQ opcodes so the server
+sends no response at all.
+
+Commands that can legitimately fail (C<add>, C<replace>, C<delete>,
+C<incr>, ...) always use the non-quiet opcode so error responses are
+consumed by the client even when the user passed no callback. Keys are
+validated against the 250-byte protocol limit before any bytes go on
+the wire.
 
 =head1 BENCHMARKS
 
-Measured on Linux with TCP loopback connection, 100-byte values, Perl 5.40,
-memcached 1.6.41 (C<bench/benchmark.pl>):
+Numbers from C<bench/benchmark.pl> on Linux, TCP loopback, 100-byte
+values, Perl 5.40, memcached 1.6.41:
 
                          50K cmds    200K cmds
     Pipeline SET           213K        68K ops/sec
     Pipeline GET           216K        67K ops/sec
     Mixed workload         226K        69K ops/sec
-    Fire-and-forget SET   1.13M      1.29M ops/sec  (SETQ)
-    Multi-get (GETKQ)    1.30M       1.17M ops/sec  (per key)
+    Fire-and-forget SET    1.13M      1.29M ops/sec  (SETQ)
+    Multi-get (GETKQ)      1.30M      1.17M ops/sec  (per key)
     Sequential round-trip   41K        38K ops/sec
 
-Fire-and-forget mode (no callback) is roughly 5x faster than callback mode
-due to zero Perl-side overhead per command. Multi-get is the fastest path
-since quiet commands suppress miss responses.
+Fire-and-forget is roughly 5x faster than callback mode because there
+is no per-command Perl SV allocation. Multi-get is the fastest read
+path since misses generate no traffic. Callback-mode throughput drops
+as batch size grows because SV allocation for closures dominates;
+realistic workloads (interleaved sends and receives) stay close to the
+50K-command column.
 
-Callback-based throughput scales inversely with batch size because Perl SV
-allocation dominates when many closures are queued at once. In real
-workloads (commands interleaved with responses), performance stays near
-the 50K-column numbers.
+C<max_pending> overhead (200K commands):
 
-Flow control (C<max_pending>) impact (200K commands):
+    unlimited        ~131K ops/sec
+    max_pending=500  ~126K ops/sec
+    max_pending=100  ~120K ops/sec
+    max_pending=50   ~117K ops/sec
 
-    unlimited       ~131K ops/sec
-    max_pending=500 ~126K ops/sec
-    max_pending=100 ~120K ops/sec
-    max_pending=50  ~117K ops/sec
+Override C<BENCH_COMMANDS>, C<BENCH_VALUE_SIZE>, C<BENCH_HOST>, and
+C<BENCH_PORT> to retune.
 
-Run C<perl bench/benchmark.pl> for full results. Set C<BENCH_COMMANDS>,
-C<BENCH_VALUE_SIZE>, C<BENCH_HOST>, and C<BENCH_PORT> to customize.
+=head1 SEE ALSO
 
-=head1 BINARY PROTOCOL
-
-This module implements the memcached binary protocol directly in XS.
-The binary protocol provides efficient encoding with a fixed 24-byte
-header, support for pipelining via the opaque field, and quiet command
-variants for reduced network traffic.
-
-Multi-get uses the GETKQ (quiet get with key) opcode followed by a
-NOOP fence. Only cache hits generate responses; misses are silent.
-The NOOP response signals completion of the batch.
-
-Fire-and-forget C<set> uses the SETQ (quiet SET) opcode -- the server
-suppresses the response entirely, eliminating network and parsing
-overhead. Other commands that can fail (add, replace, delete, incr, etc.)
-use normal opcodes even in fire-and-forget mode so error responses are
-properly consumed.
-
-Keys are validated against the 250-byte protocol limit.
+L<EV>, L<AnyEvent>, L<Cache::Memcached::Fast>, L<Memcached::Client>,
+L<https://github.com/memcached/memcached/wiki/BinaryProtocolRevamped>.
 
 =head1 AUTHOR
 

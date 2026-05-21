@@ -1,5 +1,66 @@
 Revision history for DBIx::Class::Async
 
+v1.0.3   2026-05-06
+         [IMPROVEMENTS]
+          - Fix non-deterministic failures in t/020-slice.t by forcing
+            'name' sort order, ensuring consistent results across
+            asynchronous worker insertions.
+          - Improve reliability of caching tests (t/148-caching.t and
+            t/149-scalar-ref-char-pk.t) by using high-precision fractional
+            seconds with SQLite's strftime.
+          - Explicitly disable Resultset caching in t/148-caching.t using
+            'cache_ttl => 0' to verify cache-bypass logic regardless of
+            execution speed.
+          - Fix incorrect HashRefInflator accessors in test suites.
+
+v1.0.2   2026-05-06
+         [IMPROVEMENTS]
+         - Tidied up unit test for Oracle and MySQL to use deploy().
+
+v1.0.1   2026-05-06
+         [IMPROVEMENTS]
+         - Added MySQL database support and verified the following features
+           work correctly against MySQL 8.0.45 (Ubuntu 24.04):
+           CRUD operations, search/count/all, belongs_to and has_many
+           relationships, transactions via txn_do(), and concurrent async
+           queries across multiple workers.
+
+         - Added xt/002-mysql.t as an author integration test for MySQL.
+           Requires DBD::mysql. Connection details are configurable via
+           environment variables:
+           DBIC_ASYNC_MYSQL_DSN,
+           DBIC_ASYNC_MYSQL_USER,
+           DBIC_ASYNC_MYSQL_PASS.
+
+         - Updated POD documenting MySQL compatibility and instructions for
+           running the MySQL test suite.
+
+v1.0.0   2026-05-01
+         [IMPROVEMENTS]
+         - PAUSE didn't like the v-string move:
+                Status: Decreasing version number
+           So, bumped the version to v1.0.0.
+
+v0.66.0  2026-05-01
+         [IMPROVEMENTS]
+         - Switched to v-string versioning (semantic versioning going forward).
+
+         - Added Oracle database support and verified the following features
+           work correctly against Oracle AI Database 23ai Free (via Docker):
+           CRUD operations, search/count/all, belongs_to and has_many
+           relationships, transactions via txn_do(), and concurrent async
+           queries across multiple workers.
+
+         - Added xt/001-oracle.t as an author integration test for Oracle.
+           Requires DBD::Oracle and Math::Base36 >= 0.07. Connection details
+           are configurable via environment variables:
+           DBIC_ASYNC_ORACLE_DSN,
+           DBIC_ASYNC_ORACLE_USER,
+           DBIC_ASYNC_ORACLE_PASS.
+
+         - Added DATABASE SUPPORT section to main POD documenting Oracle
+           compatibility and instructions for running the Oracle test suite.
+
 0.65 2026-03-15
      [IMPROVEMENTS]
      - Added security document SECURITY.md as recommended in the issue #11.

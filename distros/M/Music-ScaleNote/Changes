@@ -1,6 +1,31 @@
 Revision history for Music-ScaleNote
 
-0.0804 2024-08-18 16:01:29
+0.0905 2026-05-04 11:40:44
+    - Fix scale creation logic.
+    - Wow... Remove more cruft. :\
+    - Improve documentation.
+
+0.0904 2026-04-30 13:24:14
+    - Ack - remove more cruft!
+
+0.0903 2026-04-30 13:20:43
+    - Remove cruft and comment debugging.
+
+0.0902 2026-04-30 08:39:18
+    - Oops. Fix the eg/tonnetz.pl program.
+
+0.0901 2026-04-30 08:35:35
+    - Correctly handle requesting flat logic.
+
+0.0900 2026-04-29 10:22:51
+    - Simplify logic greatly.
+    - Update tests.
+    - Improve documentation.
+
+0.0805 2026-04-27 07:36:47
+    - Use the new version of the MIDI::Util::midi_format() function.
+
+0.0804 2024-08-18
     - Specify the right version of Array::Circular.
 
 0.0803 2024-07-27 16:28:38

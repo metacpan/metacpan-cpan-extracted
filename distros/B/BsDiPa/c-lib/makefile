@@ -19,9 +19,12 @@ RM ?= rm
 
 LIB = libsbsdipa.a
 
-SUFWW = #-Weverything
-#	-Wconversion -Wsign-conversion \
+# smake predefines this (cannot handle # in variables)
+NUMBER_SIGN?=\#
+SUFLVLC=-std=c99
 
+SUFWW =# -Weverything -Wno-unsafe-buffer-usage -Wno-old-style-cast
+#	-Wconversion -Wsign-conversion
 SUFW = -W -Wall -pedantic $(SUFWW) \
 	\
 	-Wno-atomic-implicit-seq-cst \
@@ -33,8 +36,6 @@ SUFW = -W -Wall -pedantic $(SUFWW) \
 	\
 	-Werror=format-security -Werror=int-conversion \
 
-# smake predefines this (cannot handle # in variables)
-NUMBER_SIGN?=\#
 SUFS = -fno-common \
 	-fstrict-aliasing -fstrict-overflow \
 	-fstack-protector-strong \
@@ -47,7 +48,7 @@ SUFS = -fno-common \
 
 SUFX = $(SUFW) $(SUFS)
 
-CFLAGS+=-std=c99 $(s_BSDIPA_CFLAGS) -I.
+CFLAGS+= $(SUFLVLC) $(s_BSDIPA_CFLAGS) -I.
 
 CONFIGH = s-bsdipa-config.h
 
@@ -64,7 +65,7 @@ $(CONFIGH):
 	[ -n "$(s_BSDIPA_32)" ] && v1=s_BSDIPA_32="$(s_BSDIPA_32)";\
 	[ -n "$(s_BSDIPA_MAGIC_WINDOW)" ] && v2=s_BSDIPA_MAGIC_WINDOW="$(s_BSDIPA_MAGIC_WINDOW)";\
 	[ -n "$(s_BSDIPA_SMALL)" ] && v3=s_BSDIPA_SMALL=y;\
-	./configh.sh "$$v1" "$$v2"
+	./configh.sh "$$v1" "$$v2" "$$v3"
 $(LIB): $(CONFIGH) $(OBJS)
 	$(AR) crs $(@) $(OBJS)
 test: all

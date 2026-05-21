@@ -1,3 +1,11 @@
+v0.17  2026-05-01Z
+    - Corrected support for GIMP Palette files (gpl)
+    - Corrected some regex for binary data
+    - Improved extraction of FLAC metadata
+    - Use local character set for file-information-dump
+    - Improved support for RIFF files
+    - Added support to extract metadata from RIFF/WAVE files
+
 v0.16  2025-12-26Z
     - Improved digest info interface
     - Improved documentation

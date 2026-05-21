@@ -41,5 +41,8 @@ WriteMakefile(
                 web => 'https://github.com/vividsnow/perl5-ev-cares/issues',
             },
         },
+        no_index => {
+            directory => ['eg', 't'],
+        },
     },
 );

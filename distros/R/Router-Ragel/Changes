@@ -1,0 +1,8 @@
+Revision history for Router-Ragel
+
+0.02    2026-05-03
+    - Typed and inline placeholders.
+    - Stricter pattern validation at compile time.
+
+0.01    2025-04-07
+    - Initial release.

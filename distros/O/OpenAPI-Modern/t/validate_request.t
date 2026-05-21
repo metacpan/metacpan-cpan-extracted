@@ -21,7 +21,6 @@ use OpenAPI::Modern::Utilities 'uri_encode';
 
 my $doc_uri_rel = Mojo::URL->new('/api');
 my $doc_uri = $doc_uri_rel->to_abs(Mojo::URL->new('http://example.com'));
-my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
 
 my $type_index = 0;
 
@@ -32,7 +31,7 @@ note 'REQUEST/RESPONSE TYPE: '.$::TYPE;
 subtest $::TYPE.': missing or invalid arguments' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths: {}
 YAML
 
@@ -78,7 +77,7 @@ YAML
 subtest $::TYPE.': validation errors, request uri paths' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     get:
@@ -137,7 +136,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
     get:
@@ -168,7 +167,10 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+components:
+  mediaTypes:
+    bloop: {}
 paths:
   /foo/{foo_id}:
     get:
@@ -178,6 +180,12 @@ paths:
         required: true
         content:
           application/json: {}
+      - name: bloop
+        in: query
+        required: false
+        content:
+          application/json:
+            $ref: '#/components/mediaTypes/bloop'
       - name: Bar
         in: header
         required: false
@@ -186,7 +194,7 @@ paths:
 YAML
 
   cmp_result(
-    $openapi->validate_request(request('GET', 'http://example.com/foo/corrupt_json'))->TO_JSON,
+    $openapi->validate_request(request('GET', 'http://example.com/foo/corrupt_json?bloop=x'))->TO_JSON,
     {
       valid => false,
       errors => [
@@ -196,9 +204,15 @@ YAML
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} get parameters 0 content application/json)))->to_string,
           error => re(qr/^could not decode content as application\/json: malformed JSON string/),
         },
+        {
+          instanceLocation => '/request/uri/query/bloop',
+          keywordLocation => jsonp(qw(/paths /foo/{foo_id} get parameters 1 content application/json)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{foo_id} get parameters 1 content application/json)))->to_string,
+          error => re(qr/^could not decode content as application\/json: malformed JSON string/),
+        },
       ],
     },
-    'corrupt data is detected, even when there is no schema',
+    'corrupt data is detected, even when there is no schema; errors are correct, even with a $ref',
   );
 
   is_equal(
@@ -210,7 +224,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
     get:
@@ -265,7 +279,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}/bar/{bar_id}:
     parameters:
@@ -319,7 +333,7 @@ YAML
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
     openapi_schema => do {
-      $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML');
+      decode_yaml(OPENAPI_PREAMBLE.<<'YAML');
 paths:
   /foo/{foo_id}:
     get: {}
@@ -347,7 +361,7 @@ YAML
 subtest $::TYPE.': path-item lookup' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.'paths: {}'),
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.'paths: {}'),
   );
   my $result = $openapi->validate_request(request('GET', 'https://example.com'), my $options = {});
   isa_ok($result, ['JSON::Schema::Modern::Result'], 'got a result object back');
@@ -380,7 +394,7 @@ subtest $::TYPE.': path-item lookup' => sub {
 subtest $::TYPE.': validation errors in requests' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     post: {}
@@ -396,7 +410,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     post:
@@ -423,7 +437,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     parameters:
@@ -450,7 +464,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   parameters:
     foo:
@@ -481,7 +495,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   parameters:
     foo-header:
@@ -500,6 +514,10 @@ components:
       schema:
         type: string
         pattern: ^[0-9]+$
+  mediaTypes:
+    delta:
+      schema:
+        not: true
 paths:
   /foo:
     parameters:
@@ -531,8 +549,7 @@ paths:
         required: false
         content:
           unknown/encodingtype:
-            schema:
-              not: true
+            $ref: '#/components/mediaTypes/delta'
       - name: epsilon
         in: query
         required: false
@@ -605,8 +622,8 @@ YAML
       errors => [
         {
           instanceLocation => '/request/uri/query/delta',
-          keywordLocation => jsonp(qw(/paths /foo post parameters 4 content unknown/encodingtype schema not)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 4 content unknown/encodingtype schema not)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo post parameters 4 content unknown/encodingtype $ref schema not)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/mediaTypes/delta/schema/not')->to_string,
           error => 'subschema is true',
         },
       ],
@@ -687,7 +704,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{null_path}/{boolean_path}:
     parameters:
@@ -787,7 +804,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     parameters:
@@ -852,7 +869,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   schemas:
     simple_object:
@@ -1062,7 +1079,7 @@ YAML
   # see examples in 3.2.0 §4.12.8
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{username}:
     get: {}
@@ -1104,7 +1121,7 @@ YAML
   # see examples in 3.2.0 §4.12.8
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     get: {}
@@ -1183,7 +1200,7 @@ YAML
   # see examples in 3.2.0 §4.12.8
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     get: {}
@@ -1224,7 +1241,7 @@ YAML
   # see examples in 3.2.0 §4.12.8
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     get: {}
@@ -1259,7 +1276,7 @@ YAML
   # see examples in 3.2.0 §4.12.8
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     get: {}
@@ -1297,7 +1314,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     get: {}
@@ -1344,7 +1361,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{path_token}:
     get: {}
@@ -1405,7 +1422,7 @@ YAML
   # note: characters in parameter names and values that look like - are actually − U+2212 %E2%88%92
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 servers:
   - url: http://{host}.example.com/{subdir}
     variables:
@@ -1441,14 +1458,14 @@ paths:
         required: true
         schema:
           type: object
-          const: { blue−black: yes!, blackish﹠green: ¿no?, 100𝑥brown: fl¡p }
+          const: { blue−black: yes!, blackish﹠green: '¿no?', 100𝑥brown: fl¡p }
       - name: path−simple−object−true
         in: path
         required: true
         explode: true
         schema:
           type: object
-          const: { blue−black: yes!, blackish﹠green: ¿no?, 100𝑥brown: fl¡p }
+          const: { blue−black: yes!, blackish﹠green: '¿no?', 100𝑥brown: fl¡p }
       - name: cølör0
         in: path
         required: true
@@ -1476,7 +1493,7 @@ paths:
         style: matrix
         schema:
           type: object
-          const: { blue−black: yes!, blackish﹠green: ¿no?, 100𝑥brown: fl¡p }
+          const: { blue−black: yes!, blackish﹠green: '¿no?', 100𝑥brown: fl¡p }
       - name: cølör4
         in: path
         required: true
@@ -1484,7 +1501,7 @@ paths:
         explode: true
         schema:
           type: object
-          const: { blue−black: yes!, blackish﹠green: ¿no?, 100𝑥brown: fl¡p }
+          const: { blue−black: yes!, blackish﹠green: '¿no?', 100𝑥brown: fl¡p }
       - name: path−label−string
         in: path
         required: true
@@ -1512,7 +1529,7 @@ paths:
         style: label
         schema:
           type: object
-          const: { blue−black: yes!, blackish﹠green: ¿no?, 100𝑥brown: fl¡p }
+          const: { blue−black: yes!, blackish﹠green: '¿no?', 100𝑥brown: fl¡p }
       - name: path−label−object−true
         in: path
         required: true
@@ -1520,7 +1537,7 @@ paths:
         explode: true
         schema:
           type: object
-          const: { blue−black: yes!, blackish﹠green: ¿no?, 100𝑥brown: fl¡p }
+          const: { blue−black: yes!, blackish﹠green: '¿no?', 100𝑥brown: fl¡p }
       - name: header-simple-string
         in: header
         required: true
@@ -1544,14 +1561,14 @@ paths:
         required: true
         schema:
           type: object
-          const: { blue−black: yes!, blackish﹠green: ¿no?, 100𝑥brown: fl¡p }
+          const: { blue−black: yes!, blackish﹠green: '¿no?', 100𝑥brown: fl¡p }
       - name: header-simple-object-true
         in: header
         required: true
         explode: true
         schema:
           type: object
-          const: { blue−black: yes!, blackish﹠green: ¿no?, 100𝑥brown: fl¡p }
+          const: { blue−black: yes!, blackish﹠green: '¿no?', 100𝑥brown: fl¡p }
       - name: query−form−string
         in: query
         required: true
@@ -1796,7 +1813,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /:
     get: {}
@@ -1835,7 +1852,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /:
     get: {}
@@ -1870,7 +1887,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /:
     get: {}
@@ -1909,7 +1926,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     get:
@@ -1981,7 +1998,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     parameters:
@@ -2063,7 +2080,159 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+components:
+  mediaTypes:
+    json_object:
+      schema:
+        type: boolean
+        const: true
+    unknown_object:
+      schema:
+        const: true
+paths:
+  /foo/{path}:
+    post:
+      parameters:
+        - name: path
+          in: path
+          content:
+            application/json:
+              $ref: '#/components/mediaTypes/json_object'
+        - name: q
+          in: query
+          content:
+            application/json:
+              $ref: '#/components/mediaTypes/json_object'
+        - name: header
+          in: header
+          content:
+            application/json:
+              $ref: '#/components/mediaTypes/json_object'
+        - name: cookie
+          in: cookie
+          content:
+            application/json:
+              $ref: '#/components/mediaTypes/json_object'
+        - name: r
+          in: query
+          content:
+            unknown/type:
+              $ref: '#/components/mediaTypes/unknown_object'
+      requestBody:
+        content:
+          application/json:
+            $ref: '#/components/mediaTypes/json_object'
+  /foo:
+    post:
+      parameters:
+        - name: q
+          in: querystring
+          content:
+            application/json:
+              $ref: '#/components/mediaTypes/json_object'
+YAML
+
+  is_equal(
+    ($result = $openapi->validate_request(request('POST', 'http://example.com/foo/false?q=false',
+      [ 'Header' => 'false', 'Cookie' => 'cookie=false', 'Content-Type' => 'application/json', 'Content-Length' => 5 ], 'false')))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/uri/path/path',
+          keywordLocation => jsonp(qw(/paths /foo/{path} post parameters 0 content application/json $ref schema const)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/mediaTypes/json_object/schema/const')->to_string,
+          error => 'value does not match',
+        },
+        {
+          instanceLocation => '/request/uri/query/q',
+          keywordLocation => jsonp(qw(/paths /foo/{path} post parameters 1 content application/json $ref schema const)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/mediaTypes/json_object/schema/const')->to_string,
+          error => 'value does not match',
+        },
+        {
+          instanceLocation => '/request/header/header',
+          keywordLocation => jsonp(qw(/paths /foo/{path} post parameters 2 content application/json $ref schema const)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/mediaTypes/json_object/schema/const')->to_string,
+          error => 'value does not match',
+        },
+        {
+          instanceLocation => '/request/header/Cookie/cookie',
+          keywordLocation => jsonp(qw(/paths /foo/{path} post parameters 3 content application/json $ref schema const)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/mediaTypes/json_object/schema/const')->to_string,
+          error => 'value does not match',
+        },
+        {
+          instanceLocation => '/request/body/content',
+          keywordLocation => jsonp(qw(/paths /foo/{path} post requestBody content application/json $ref schema const)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/mediaTypes/json_object/schema/const')->to_string,
+          error => 'value does not match',
+        },
+      ],
+    },
+    '$ref to media-type is followed to find the schema',
+  );
+  is_equal(
+    $result->data,
+    {
+      request => {
+        uri => {
+          path => { path => false },
+          query => { q => false },
+        },
+        header => {
+          Cookie => { cookie => false },
+          header => false,
+        },
+        body => { content => false },
+      },
+    },
+    'boolean data is properly decoded from parameters and request body',
+  );
+
+  is_equal(
+    ($result = $openapi->validate_request(request('POST', 'http://example.com/foo/true?r=0')))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/uri/query/r',
+          keywordLocation => jsonp(qw(/paths /foo/{path} post parameters 4 content unknown/type)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/mediaTypes/unknown_object')->to_string,
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{path} post parameters 4 content unknown/type)))->to_string,
+          error => 'EXCEPTION: unsupported media type "unknown/type": add support with JSON::Schema::Modern::Utilities::add_media_type(...)',
+        },
+      ],
+    },
+    '$ref to media-type is followed to find the schema, which is defined, but type is unsupported',
+  );
+
+  is_equal(
+    ($result = $openapi->validate_request(request('POST', 'http://example.com/foo?false')))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/uri/query',
+          keywordLocation => jsonp(qw(/paths /foo post parameters 0 content application/json $ref schema const)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/mediaTypes/json_object/schema/const')->to_string,
+          error => 'value does not match',
+        },
+      ],
+    },
+    '$ref to media-type is followed to find the schema in querystring',
+  );
+  is_equal(
+    $result->data,
+    { request => { uri => { query => false } } },
+    'data is properly decoded from querystring',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     get:
@@ -2072,7 +2241,7 @@ paths:
 YAML
 
   is_equal(
-    $openapi->validate_request($request)->TO_JSON,
+    $openapi->validate_request(request('GET', 'http://example.com/foo'))->TO_JSON,
     {
       valid => false,
       errors => [
@@ -2090,7 +2259,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     post:
@@ -2466,7 +2635,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     post:
@@ -2515,7 +2684,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     post:
@@ -2559,7 +2728,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     post:
@@ -2636,7 +2805,7 @@ subtest $::TYPE.': document errors' => sub {
   my $request = request('GET', 'http://example.com/foo?alpha=1');
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   parameters:
     alpha:
@@ -2671,7 +2840,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   parameters:
     alpha:
@@ -2706,7 +2875,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     post:
@@ -2765,7 +2934,7 @@ YAML
 subtest $::TYPE.': type handling of values for evaluation' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
     parameters:
@@ -2851,7 +3020,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
     parameters:
@@ -2897,7 +3066,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
     parameters:
@@ -2951,7 +3120,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{path_plain}/bar/{path_encoded}:
     parameters:
@@ -3098,7 +3267,7 @@ YAML
 subtest $::TYPE.': parameter parsing' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     get:
@@ -3332,7 +3501,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     get:
@@ -3368,8 +3537,8 @@ YAML
 subtest $::TYPE.': max_depth' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    max_traversal_depth => 15,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    max_depth => 15,
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   parameters:
     foo:
@@ -3404,7 +3573,7 @@ YAML
 subtest $::TYPE.': unevaluatedProperties and annotations' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     post:
@@ -3445,7 +3614,7 @@ YAML
 subtest $::TYPE.': readOnly' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     post:
@@ -3494,7 +3663,7 @@ YAML
 subtest $::TYPE.': no bodies in GET or HEAD requests without requestBody' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo:
     head: {}
@@ -3554,7 +3723,7 @@ SKIP: {
 subtest $::TYPE.': custom error messages for false schemas' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}/{bar_id}:
     post:
@@ -3704,7 +3873,7 @@ YAML
 subtest $::TYPE.': multiple documents' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri_rel,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /foo/{foo_id}:
     get:
@@ -3749,7 +3918,7 @@ YAML
 
   $openapi = OpenAPI::Modern->new(
     openapi_uri => '/mydoc/api',  # intentionally relative, to see how uris resolve
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 paths:
   /alpha:
     $ref: /otherdoc/api/definitions#/components/pathItems/alpha_path
@@ -3776,14 +3945,14 @@ YAML
     },
   });
 
-  add_media_type('application/yaml' => sub ($dataref) { \ $yamlpp->load_string($$dataref) });
+  add_media_type('application/yaml' => sub ($dataref) { \ decode_yaml($$dataref) });
 
   $openapi->evaluator->add_document(
     JSON::Schema::Modern::Document::OpenAPI->new(
       canonical_uri => '/otherdoc/api/definitions', # intentionally relative, to see how uris resolve
       evaluator => $openapi->evaluator,
       metaschema_uri => DEFAULT_METASCHEMA->{+OAS_VERSION}, # more lax, as we use multiple $schema values in schemas
-      schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML')));
+      schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML')));
 jsonSchemaDialect: https://my_custom_dialect
 components:
   pathItems:
@@ -3941,7 +4110,7 @@ YAML
 
 subtest $::TYPE.': example of cookie decomposition with encoding and media-type' => sub {
   my ($openapi, $result);
-  my $schema = $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML');
+  my $schema = decode_yaml(OPENAPI_PREAMBLE.<<'YAML');
 paths:
   /foo:
     get:
@@ -4013,7 +4182,7 @@ subtest $::TYPE.': validation with schema defaults' => sub {
   #      with top-level defaults.
 
   my ($openapi, $result);
-  my $schema = $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML');
+  my $schema = decode_yaml(OPENAPI_PREAMBLE.<<'YAML');
 paths:
   /{path-array}/{path-object}:    # styled parameters, and media-type parameters and body
     get:
@@ -4781,6 +4950,273 @@ YAML
       {},
     ],
     'querystring parameter data does not include any defaults when schemas do not exist',
+  );
+};
+
+subtest 'itemSchema' => sub {
+  my $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /foo:
+    post:
+      parameters:
+        - name: q
+          in: query
+          content:
+            application/json:
+              itemSchema:
+                const: a
+      requestBody:
+        content:
+          application/json:
+            itemSchema:
+              const: a
+YAML
+
+  is_equal(
+    # q={"x":"y"}
+    $openapi->validate_request(request('POST', 'http://example.com/foo?q=%7B%22x%22:%22y%22%7D',
+      [ 'Content-Type' => 'application/json' ], '{"x":"y"}'))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/uri/query/q',
+          keywordLocation => jsonp(qw(/paths /foo post parameters 0 content application/json itemSchema)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 0 content application/json itemSchema)))->to_string,
+          error => 'deserialized query parameter content is not an array',
+        },
+        {
+          instanceLocation => '/request/body/content',
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json itemSchema)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json itemSchema)))->to_string,
+          error => 'deserialized message content is not an array',
+        },
+      ],
+    },
+    'non-array is detected by itemSchema',
+  );
+
+  is_equal(
+    # ["a","b"]
+    $openapi->validate_request(request('POST', 'http://example.com/foo?q=%5B%22a%22,%22b%22%5D',
+      [ 'Content-Type' => 'application/json' ], '["a","b"]'))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/uri/query/q/1',
+          keywordLocation => jsonp(qw(/paths /foo post parameters 0 content application/json itemSchema const)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 0 content application/json itemSchema const)))->to_string,
+          error => 'value does not match',
+        },
+        {
+          instanceLocation => '/request/body/content/1',
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json itemSchema const)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json itemSchema const)))->to_string,
+          error => 'value does not match',
+        },
+      ],
+    },
+    'every array item in the decoded body is evaluated against itemSchema',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+paths:
+  /foo:
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items: false
+            itemSchema: false
+YAML
+
+  is_equal(
+    $openapi->validate_request(request('POST', 'http://example.com/foo',
+      [ 'Content-Type' => 'application/json' ], '[0,1]'))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        (map +{
+          instanceLocation => '/request/body/content/'.$_,
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json schema items)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json schema items)))->to_string,
+          error => 'item not permitted',
+        }, 0..1),
+        {
+          instanceLocation => '/request/body/content',
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json schema items)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json schema items)))->to_string,
+          error => 'subschema is not valid against all items',
+        },
+        (map +{
+          instanceLocation => '/request/body/content/'.$_,
+          keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json itemSchema)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json itemSchema)))->to_string,
+          error => 'item not permitted',
+        }, 0..1),
+      ],
+    },
+    'itemSchema evaluates each array item of the data',
+  );
+
+
+  $openapi = OpenAPI::Modern->new(
+    openapi_uri => $doc_uri,
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
+components:
+  mediaTypes:
+    json_object:
+      itemSchema:
+        type: boolean
+        const: true
+    unknown_object:
+      schema: true
+      itemSchema:
+        const: true
+paths:
+  /foo/{path}:
+    post:
+      parameters:
+        - name: path
+          in: path
+          content:
+            application/json:
+              $ref: '#/components/mediaTypes/json_object'
+        - name: q
+          in: query
+          content:
+            application/json:
+              $ref: '#/components/mediaTypes/json_object'
+        - name: header
+          in: header
+          content:
+            application/json:
+              $ref: '#/components/mediaTypes/json_object'
+        - name: cookie
+          in: cookie
+          content:
+            application/json:
+              $ref: '#/components/mediaTypes/json_object'
+        - name: r
+          in: query
+          content:
+            unknown/type:
+              $ref: '#/components/mediaTypes/unknown_object'
+      requestBody:
+        content:
+          application/json:
+            $ref: '#/components/mediaTypes/json_object'
+  /foo:
+    post:
+      parameters:
+        - name: q
+          in: querystring
+          content:
+            application/json:
+              $ref: '#/components/mediaTypes/json_object'
+YAML
+
+  is_equal(
+    (my $result = $openapi->validate_request(request('POST', 'http://example.com/foo/%5Bfalse%5D?q=%5Bfalse%5D',
+      [ 'Header' => '[false]', 'Cookie' => 'cookie=[false]', 'Content-Type' => 'application/json', 'Content-Length' => 7 ], '[false]')))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/uri/path/path/0',
+          keywordLocation => jsonp(qw(/paths /foo/{path} post parameters 0 content application/json $ref itemSchema const)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/mediaTypes/json_object/itemSchema/const')->to_string,
+          error => 'value does not match',
+        },
+        {
+          instanceLocation => '/request/uri/query/q/0',
+          keywordLocation => jsonp(qw(/paths /foo/{path} post parameters 1 content application/json $ref itemSchema const)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/mediaTypes/json_object/itemSchema/const')->to_string,
+          error => 'value does not match',
+        },
+        {
+          instanceLocation => '/request/header/header/0',
+          keywordLocation => jsonp(qw(/paths /foo/{path} post parameters 2 content application/json $ref itemSchema const)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/mediaTypes/json_object/itemSchema/const')->to_string,
+          error => 'value does not match',
+        },
+        {
+          instanceLocation => '/request/header/Cookie/cookie/0',
+          keywordLocation => jsonp(qw(/paths /foo/{path} post parameters 3 content application/json $ref itemSchema const)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/mediaTypes/json_object/itemSchema/const')->to_string,
+          error => 'value does not match',
+        },
+        {
+          instanceLocation => '/request/body/content/0',
+          keywordLocation => jsonp(qw(/paths /foo/{path} post requestBody content application/json $ref itemSchema const)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/mediaTypes/json_object/itemSchema/const')->to_string,
+          error => 'value does not match',
+        },
+      ],
+    },
+    '$ref to media-type is followed to find the itemSchema',
+  );
+  is_equal(
+    $result->data,
+    {
+      request => {
+        uri => {
+          path => { path => [ false ] },
+          query => { q => [ false ] },
+        },
+        header => {
+          Cookie => { cookie => [ false ] },
+          header => [ false ],
+        },
+        body => { content => [ false ] },
+      },
+    },
+    'array-of-boolean data is properly decoded from parameters and request body',
+  );
+
+  is_equal(
+    ($result = $openapi->validate_request(request('POST', 'http://example.com/foo/%5Btrue%5D?r=%5B0%5D')))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/uri/query/r',
+          keywordLocation => jsonp(qw(/paths /foo/{path} post parameters 4 content unknown/type)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{path} post parameters 4 content unknown/type)))->to_string,
+          error => 'EXCEPTION: unsupported media type "unknown/type": add support with JSON::Schema::Modern::Utilities::add_media_type(...)',
+        },
+      ],
+    },
+    '$ref to media-type is followed to find the itemSchema, which is defined, but type is unsupported',
+  );
+
+  is_equal(
+    ($result = $openapi->validate_request(request('POST', 'http://example.com/foo?%5Bfalse%5D')))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/uri/query/0',
+          keywordLocation => jsonp(qw(/paths /foo post parameters 0 content application/json $ref itemSchema const)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment('/components/mediaTypes/json_object/itemSchema/const')->to_string,
+          error => 'value does not match',
+        },
+      ],
+    },
+    '$ref to media-type is followed to find the itemSchema in querystring',
+  );
+  is_equal(
+    $result->data,
+    { request => { uri => { query => [ false ] } } },
+    'data is properly decoded from querystring',
   );
 };
 

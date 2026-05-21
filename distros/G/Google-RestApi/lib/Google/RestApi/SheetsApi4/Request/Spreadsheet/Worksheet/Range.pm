@@ -1,6 +1,6 @@
 package Google::RestApi::SheetsApi4::Request::Spreadsheet::Worksheet::Range;
 
-our $VERSION = '2.2.2';
+our $VERSION = '2.2.3';
 
 use Google::RestApi::Setup;
 

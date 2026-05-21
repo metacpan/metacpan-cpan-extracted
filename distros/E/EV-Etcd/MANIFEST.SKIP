@@ -1,0 +1,35 @@
+# Version control
+^\.git/
+^\.gitignore$
+
+# Editor / IDE / Claude
+^\.claude/
+^CLAUDE\.md$
+
+# Build artifacts
+^Makefile$
+^Makefile\.old$
+^MYMETA\.(yml|json)$
+^blib/
+^pm_to_blib$
+^Etcd\.bs$
+^Etcd\.c$
+^Etcd\.o$
+\.o$
+
+# Generated headers we ship as .c (the .o is generated)
+# protobuf-c .c/.h are generated but checked in; only the .o is excluded above
+
+# Distribution tarballs and the staging dir `make dist` / `make distmeta` build
+^EV-Etcd-[\d.]+\.tar\.gz$
+^EV-Etcd-[\d.]+/
+
+# Backup files
+~$
+\.bak$
+\.swp$
+\.tmp$
+
+# OS junk
+\.DS_Store
+^Thumbs\.db$

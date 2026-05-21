@@ -10,7 +10,8 @@ requires 'Template', '3.100';
 requires 'YAML::XS', '0.904.0';
 
 on 'configure' => sub {
-    requires 'Module::Build', '0.42';
+    requires 'ExtUtils::MakeMaker', '7';
+    requires 'File::ShareDir::Install', '0.14';
 };
 
 on 'test' => sub {

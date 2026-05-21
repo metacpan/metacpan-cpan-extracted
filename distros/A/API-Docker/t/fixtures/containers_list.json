@@ -1,0 +1,63 @@
+[
+  {
+    "Id": "abc123def456",
+    "Names": ["/my-container"],
+    "Image": "nginx:latest",
+    "ImageID": "sha256:abc123",
+    "Command": "nginx -g 'daemon off;'",
+    "Created": 1705300000,
+    "State": "running",
+    "Status": "Up 2 hours",
+    "Ports": [
+      {
+        "IP": "0.0.0.0",
+        "PrivatePort": 80,
+        "PublicPort": 8080,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "maintainer": "NGINX"
+    },
+    "SizeRw": 12288,
+    "SizeRootFs": 187654321,
+    "HostConfig": {
+      "NetworkMode": "default"
+    },
+    "NetworkSettings": {
+      "Networks": {
+        "bridge": {
+          "IPAddress": "172.17.0.2",
+          "Gateway": "172.17.0.1"
+        }
+      }
+    },
+    "Mounts": []
+  },
+  {
+    "Id": "def789ghi012",
+    "Names": ["/redis-cache"],
+    "Image": "redis:7",
+    "ImageID": "sha256:def789",
+    "Command": "docker-entrypoint.sh redis-server",
+    "Created": 1705290000,
+    "State": "exited",
+    "Status": "Exited (0) 1 hour ago",
+    "Ports": [],
+    "Labels": {},
+    "SizeRw": 0,
+    "SizeRootFs": 130000000,
+    "HostConfig": {
+      "NetworkMode": "default"
+    },
+    "NetworkSettings": {
+      "Networks": {
+        "bridge": {
+          "IPAddress": "",
+          "Gateway": ""
+        }
+      }
+    },
+    "Mounts": []
+  }
+]

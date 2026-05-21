@@ -1,0 +1,23 @@
+Revision history for API-Docker
+
+0.002     2026-05-17 05:36:20Z
+  - HTTP role: `_request` now accepts a `headers => {}` option to set
+    extra HTTP request headers. Headers are sanitised against CR/LF
+    injection. Used by `images->push` to send `X-Registry-Auth`, and
+    available to any caller that needs custom headers.
+  - `images->push` now always sends an `X-Registry-Auth` header — the
+    Docker Engine refuses pushes without it (`HTTP 400: missing
+    X-Registry-Auth: invalid X-Registry-Auth header: EOF`). A new `auth`
+    option accepts a hashref of credentials (`username`, `password`,
+    `serveraddress`, or `identitytoken`) which is JSON-encoded and
+    base64url-wrapped per the Docker Engine spec. Without `auth` the
+    header carries an empty JSON object so unauthenticated/public
+    pushes succeed where they previously failed at the HTTP layer.
+
+0.001     2026-04-29 00:40:43Z
+    - Initial release as API::Docker
+    - Docker Engine API client with Unix socket and TCP support
+    - Auto-negotiate API version from daemon
+    - Container, Image, Network, Volume, System, and Exec APIs
+    - Pure Perl implementation with minimal dependencies (no LWP)
+    - HTTP/1.1 transport with chunked transfer encoding support

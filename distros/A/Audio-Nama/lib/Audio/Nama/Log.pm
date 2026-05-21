@@ -21,7 +21,9 @@ Audio::Nama::Bus
 Audio::Nama::BusUtil
 Audio::Nama::CacheTrack
 Audio::Nama::ChainSetup
+Audio::Nama::Completion
 Audio::Nama::Config
+Audio::Nama::Console
 Audio::Nama::Custom
 Audio::Nama::EcasoundCleanup
 Audio::Nama::EcasoundRun

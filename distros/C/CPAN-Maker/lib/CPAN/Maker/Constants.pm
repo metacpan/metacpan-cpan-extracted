@@ -3,32 +3,18 @@ package CPAN::Maker::Constants;
 use strict;
 use warnings;
 
-use parent qw{ Exporter };
+use parent qw( Exporter );
 
-our $VERSION = '1.8.0';  ## no critic (RequireInterpolation)
+our $VERSION = '1.9.1';
 
 our @EXPORT_OK = ();
 
 use Readonly;
 
-# booleans
-Readonly our $TRUE       => 1;
-Readonly our $FALSE      => 0;
-Readonly our $SUCCESS    => 1;
-Readonly our $FAILURE    => 0;
-Readonly our $SH_FAILURE => 1;
-Readonly our $SH_SUCCESS => 0;
-
 # chars
-Readonly our $DASH         => q{-};
-Readonly our $DOT          => q{.};
-Readonly our $DOUBLE_COLON => q{::};
-Readonly our $EMPTY        => q{};
-Readonly our $FAT_ARROW    => q{=>};
-Readonly our $INDENT       => 4;
-Readonly our $NL           => qq{\n};
-Readonly our $SLASH        => q{/};
-Readonly our $SPACE        => q{ };
+Readonly our $FAT_ARROW => q{=>};
+Readonly our $INDENT    => 4;
+Readonly our $NL        => qq{\n};
 
 # defaults
 Readonly our $DEFAULT_PERL_VERSION => '5.010';
@@ -41,27 +27,11 @@ our %EXPORT_TAGS = (
       $NO_VERSION
     }
   ],
-  'booleans' => [
-    qw{
-      $TRUE
-      $FALSE
-      $SUCCESS
-      $FAILURE
-      $SH_FAILURE
-      $SH_SUCCESS
-    }
-  ],
   'chars' => [
     qw{
-      $DASH
-      $DOUBLE_COLON
-      $DOT
-      $EMPTY
       $FAT_ARROW
       $INDENT
       $NL
-      $SLASH
-      $SPACE
     }
   ],
 );
@@ -93,7 +63,6 @@ CPAN::Maker::Constants - constants to support CPAN::Maker
 Import tags:
 
  chars
- booleans
  defaults
 
 =head1 AUTHOR

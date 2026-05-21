@@ -1,0 +1,26 @@
+Revision history for DMS-XS
+
+0.3.0   2026-04-29
+        - SPEC v0.14: rename DMS::XS::Parser::parse(),
+          ::parse_document(), ::parse_document_lite(), ::parse_lite(),
+          ::parse_document_unordered() and
+          ::parse_lite_document_unordered() to decode(),
+          decode_document(), decode_document_lite(), decode_lite(),
+          decode_document_unordered() and
+          decode_lite_document_unordered(). Old names retained as
+          deprecated aliases that emit a one-time Carp::carp warning
+          and forward to the new sub.
+        - SPEC v0.14: rename DMS::XS::Parser::to_dms() and ::to_dms_lite()
+          to encode() and encode_lite(). Old names retained as deprecated
+          aliases.
+        - The vendored dms-c sources still expose the old C-side names
+          (dms_parse_document, dms_to_dms, ...). The new C-side spelling
+          (dms_decode_document, dms_encode, ...) is being added in
+          parallel; the XS bindings will switch once dms-c v0.14 is
+          merged. No user-visible Perl API change is needed for that
+          internal switch.
+        - decode_front_matter() is intentionally not yet added; that
+          API arrives in a follow-up release.
+
+0.2.0   prior
+        - Pre-rename baseline (parse / to_dms naming).

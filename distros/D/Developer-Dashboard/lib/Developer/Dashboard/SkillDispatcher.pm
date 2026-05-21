@@ -3,7 +3,7 @@ package Developer::Dashboard::SkillDispatcher;
 use strict;
 use warnings;
 
-our $VERSION = '3.14';
+our $VERSION = '3.90';
 
 use Config ();
 use IPC::Open3 qw(open3);
@@ -633,9 +633,7 @@ sub skill_nav_pages {
 sub all_skill_nav_pages {
     my ($self) = @_;
     my @pages;
-    for my $skill_root ( $self->{manager}{paths}->installed_skill_roots ) {
-        my ($skill_name) = $skill_root =~ m{/([^/]+)\z};
-        next if !defined $skill_name || $skill_name eq '';
+    for my $skill_name ( $self->_all_installed_skill_names ) {
         push @pages, @{ $self->skill_nav_pages($skill_name) || [] };
     }
     return \@pages;
@@ -759,10 +757,32 @@ sub _skill_env {
 sub _skill_layers {
     my ( $self, $skill_name, %args ) = @_;
     return () if !$skill_name;
+    my @segments = grep { defined && $_ ne '' } split m{/+}, $skill_name;
+    return () if !@segments;
+    my $root_skill = shift @segments;
     my $paths = $self->{manager}{paths};
-    return $paths->skill_layers( $skill_name, %args ) if $paths->can('skill_layers');
-    my $skill_path = $self->{manager}->get_skill_path( $skill_name, %args ) or return ();
-    return ($skill_path);
+    my @layers = $paths->can('skill_layers')
+      ? $paths->skill_layers( $root_skill, %args )
+      : do {
+            my $skill_path = $self->{manager}->get_skill_path( $root_skill, %args ) or return ();
+            ($skill_path);
+        };
+    return @layers if !@segments;
+
+    for my $nested_skill (@segments) {
+        my @next_layers;
+        for my $skill_path (@layers) {
+            my $nested_path = $self->_nested_skill_path( $skill_path, [$nested_skill] );
+            next if !-d $nested_path;
+            my $disabled = -f File::Spec->catfile( $nested_path, '.disabled' ) ? 1 : 0;
+            next if !$args{include_disabled} && $disabled;
+            push @next_layers, $nested_path;
+        }
+        return () if !@next_layers;
+        @layers = @next_layers;
+    }
+
+    return @layers;
 }
 
 # _skill_lookup_roots($skill_name)
@@ -772,6 +792,28 @@ sub _skill_layers {
 sub _skill_lookup_roots {
     my ( $self, $skill_name, %args ) = @_;
     return reverse $self->_skill_layers( $skill_name, %args );
+}
+
+# resolve_route_segments($segments)
+# Resolves the longest installed skill-prefix from one slash-delimited route tail.
+# Input: array reference of path segments and optional include_disabled flag.
+# Output: hash reference containing skill_name, route_segments, and skill_layers, or undef.
+sub resolve_route_segments {
+    my ( $self, $segments, %args ) = @_;
+    my @segments = grep { defined && $_ ne '' } @{ $segments || [] };
+    return if !@segments;
+    my $best;
+    for my $prefix_length ( 1 .. scalar @segments ) {
+        my $candidate_skill = join '/', @segments[ 0 .. $prefix_length - 1 ];
+        my @skill_layers = $self->_skill_layers( $candidate_skill, %args );
+        next if !@skill_layers;
+        $best = {
+            skill_name    => $candidate_skill,
+            route_segments => [ @segments[ $prefix_length .. $#segments ] ],
+            skill_layers  => \@skill_layers,
+        };
+    }
+    return $best;
 }
 
 # _command_spec($skill_name, $command)
@@ -871,6 +913,310 @@ sub _page_location {
     return;
 }
 
+# skill_route_spec($kind, $skill_name, $target)
+# Resolves one custom config/routes.json route definition for a skill route kind.
+# Input: route kind string, skill repository name string, and relative route target path.
+# Output: normalized route spec hash reference or undef when no custom route exists.
+sub skill_route_spec {
+    my ( $self, $kind, $skill_name, $target ) = @_;
+    return if !$kind || !$skill_name || !$target;
+    my $routes = $self->_skill_routes_for( $skill_name, $kind );
+    return $routes->{$target};
+}
+
+# skill_ajax_route_spec($skill_name, $ajax_file)
+# Resolves one custom config/routes.json ajax route definition for a skill.
+# Input: skill repository name string and relative ajax file path.
+# Output: normalized route spec hash reference or undef when no custom route exists.
+sub skill_ajax_route_spec {
+    my ( $self, $skill_name, $ajax_file ) = @_;
+    return $self->skill_route_spec( 'ajax', $skill_name, $ajax_file );
+}
+
+# resolve_custom_route_path($path)
+# Resolves one canonical or alias custom route path across installed skills and route kinds.
+# Input: absolute request path string.
+# Output: normalized route spec hash reference or undef when no custom route matches.
+sub resolve_custom_route_path {
+    my ( $self, $path ) = @_;
+    return if !defined $path || $path eq '';
+    for my $spec ( reverse $self->_runtime_custom_route_specs ) {
+        return $spec if ( $spec->{path} || '' ) eq $path;
+        my $aliases = $spec->{aliases};
+        $aliases = [] if ref($aliases) ne 'ARRAY';
+        return $spec if grep { $_ eq $path } @{$aliases};
+    }
+    for my $skill_name ( $self->_all_installed_skill_names ) {
+        for my $kind (qw(app ajax js css others)) {
+            my $routes = $self->_skill_routes_for( $skill_name, $kind );
+            for my $target ( sort keys %{$routes} ) {
+                my $spec = $routes->{$target};
+                return $spec if ( $spec->{path} || '' ) eq $path;
+                my $aliases = $spec->{aliases};
+                $aliases = [] if ref($aliases) ne 'ARRAY';
+                return $spec if grep { $_ eq $path } @{$aliases};
+            }
+        }
+    }
+    return;
+}
+
+# _runtime_custom_route_specs()
+# Loads runtime-level config/routes.json custom route metadata across every
+# participating DD-OOP-LAYER config root.
+# Input: none.
+# Output: ordered list of normalized route specs from home to deepest layer.
+sub _runtime_custom_route_specs {
+    my ($self) = @_;
+    my $paths = $self->{manager}{paths};
+    return () if !$paths || !$paths->can('config_layers');
+
+    my @specs;
+    for my $config_root ( $paths->config_layers ) {
+        my $routes_file = File::Spec->catfile( $config_root, 'routes.json' );
+        next if !-f $routes_file;
+        my $payload = $self->_load_skill_routes_file($routes_file);
+        for my $kind (qw(app ajax js css others)) {
+            my $kind_routes = $payload->{$kind} || {};
+            for my $target ( sort keys %{$kind_routes} ) {
+                push @specs, $self->_normalize_skill_route_spec(
+                    kind        => $kind,
+                    routes_file => $routes_file,
+                    spec        => $kind_routes->{$target},
+                    target      => $target,
+                );
+            }
+        }
+    }
+
+    return @specs;
+}
+
+# resolve_ajax_route_path($path)
+# Resolves one canonical or alias custom ajax route path across installed skills.
+# Input: absolute request path string.
+# Output: normalized route spec hash reference or undef when no custom ajax route matches.
+sub resolve_ajax_route_path {
+    my ( $self, $path ) = @_;
+    my $spec = $self->resolve_custom_route_path($path);
+    return if !$spec || ( $spec->{kind} || '' ) ne 'ajax';
+    return $spec;
+}
+
+# _skill_routes_for($skill_name, $kind)
+# Loads and merges config/routes.json metadata for one layered skill and route kind.
+# Input: skill repository name string and route kind string.
+# Output: hash reference keyed by relative route target with normalized route specs.
+sub _skill_routes_for {
+    my ( $self, $skill_name, $kind ) = @_;
+    return {} if !$skill_name || !$kind;
+    my %routes;
+    my %claimed_paths;
+
+    for my $skill_path ( $self->_skill_lookup_roots($skill_name) ) {
+        my $routes_file = File::Spec->catfile( $skill_path, 'config', 'routes.json' );
+        next if !-f $routes_file;
+        my $payload = $self->_load_skill_routes_file($routes_file);
+        my $kind_routes = $payload->{$kind} || {};
+        for my $target ( sort keys %{$kind_routes} ) {
+            next if exists $routes{$target};
+            my $spec = $self->_normalize_skill_route_spec(
+                kind       => $kind,
+                skill_name => $skill_name,
+                target     => $target,
+                routes_file => $routes_file,
+                spec       => $kind_routes->{$target},
+            );
+            for my $route_path ( $spec->{path}, @{ $spec->{aliases} || [] } ) {
+                next if !defined $route_path || $route_path eq '';
+                die "Duplicate $kind route path '$route_path' in skill '$skill_name'"
+                  if $claimed_paths{$route_path}++;
+            }
+            $routes{$target} = $spec;
+        }
+    }
+
+    return \%routes;
+}
+
+# _skill_ajax_routes_for($skill_name)
+# Backward-compatible wrapper for the ajax-specific custom route map loader.
+# Input: skill repository name string.
+# Output: hash reference keyed by ajax file path.
+sub _skill_ajax_routes_for {
+    my ( $self, $skill_name ) = @_;
+    return $self->_skill_routes_for( $skill_name, 'ajax' );
+}
+
+# _load_skill_routes_file($routes_file)
+# Parses one config/routes.json file and validates the top-level schema.
+# Input: absolute routes.json file path.
+# Output: decoded hash reference.
+sub _load_skill_routes_file {
+    my ( $self, $routes_file ) = @_;
+    open my $fh, '<', $routes_file or die "Unable to read $routes_file: $!";
+    local $/;
+    my $json_text = <$fh>;
+    close $fh;
+    my $payload = eval { decode_json($json_text) };
+    die "Invalid JSON in $routes_file: $@" if $@;
+    die "$routes_file must contain a JSON object" if ref($payload) ne 'HASH';
+    my @non_version_keys = grep { $_ ne 'version' } keys %{$payload};
+    my $has_flat_keys = grep { m{\A/} } @non_version_keys;
+    my $has_typed_keys = grep { /^(?:app|ajax|js|css|others)$/ } @non_version_keys;
+    die "$routes_file must not mix flat custom-path routes with typed route sections"
+      if $has_flat_keys && $has_typed_keys;
+    if ($has_flat_keys) {
+        my @invalid = grep { $_ !~ m{\A/} } @non_version_keys;
+        die "$routes_file flat routes must use absolute custom-path keys"
+          if @invalid;
+        return $self->_expand_flat_skill_routes_payload( $routes_file, $payload );
+    }
+    my @unknown = grep { $_ !~ /^(?:app|ajax|js|css|others)$/ } @non_version_keys;
+    die "$routes_file contains unsupported top-level keys: @unknown"
+      if @unknown;
+    die "$routes_file version must be 1" if exists $payload->{version} && ( $payload->{version} || 0 ) != 1;
+    for my $kind (qw(app ajax js css others)) {
+        if ( exists $payload->{$kind} ) {
+            die "$routes_file $kind must be a JSON object" if ref( $payload->{$kind} ) ne 'HASH';
+        }
+        else {
+            $payload->{$kind} = {};
+        }
+    }
+    return $payload;
+}
+
+# _expand_flat_skill_routes_payload($routes_file, $payload)
+# Converts the flat custom-path config/routes.json schema into the internal typed route map.
+# Input: absolute routes.json file path and decoded payload hash reference.
+# Output: normalized payload hash reference with app/ajax/js/css/others maps.
+sub _expand_flat_skill_routes_payload {
+    my ( $self, $routes_file, $payload ) = @_;
+    my %expanded = map { $_ => {} } qw(app ajax js css others);
+    my %claimed_targets;
+    for my $route_path ( sort grep { $_ ne 'version' } keys %{$payload} ) {
+        die "$routes_file route path '$route_path' must start with /"
+          if $route_path !~ m{\A/};
+        my $route = $payload->{$route_path};
+        my ( $to, $type );
+        if ( !ref($route) ) {
+            $to = $route;
+        }
+        elsif ( ref($route) eq 'HASH' ) {
+            my @unknown = grep { $_ ne 'to' && $_ ne 'type' } keys %{$route};
+            die "$routes_file route path '$route_path' contains unsupported keys: @unknown"
+              if @unknown;
+            $to   = $route->{to};
+            $type = $route->{type};
+        }
+        else {
+            die "$routes_file route path '$route_path' must map to a string or JSON object";
+        }
+        die "$routes_file route path '$route_path' must map to a non-empty route target"
+          if !defined $to || ref($to) || $to eq '';
+        my ( $kind, $target ) = $to =~ m{\A/(ajax|app|js|css|others)/(.*)\z};
+        die "$routes_file route path '$route_path' must map to /ajax/, /app/, /js/, /css/, or /others/"
+          if !$kind;
+        die "$routes_file route path '$route_path' target must not be empty"
+          if !defined $target || $target eq '';
+        die "$routes_file route path '$route_path' type must be a scalar"
+          if defined $type && ref($type);
+        die "$routes_file route path '$route_path' type must not be empty"
+          if defined $type && $type eq '';
+        die "$routes_file route path '$route_path' does not allow type for /app targets"
+          if defined $type && $kind eq 'app';
+        die "$routes_file route path '$route_path' does not allow type for /js targets"
+          if defined $type && $kind eq 'js';
+        die "$routes_file route path '$route_path' does not allow type for /css targets"
+          if defined $type && $kind eq 'css';
+        die "Duplicate $kind route target '/$kind/$target' in $routes_file"
+          if $claimed_targets{"$kind:$target"}++;
+        $type = 'json' if !defined $type && $kind eq 'ajax';
+        $expanded{$kind}{$target} = {
+            path => $route_path,
+            ( defined $type ? ( type => $type ) : () ),
+        };
+    }
+    return \%expanded;
+}
+
+# _normalize_skill_route_spec(%args)
+# Validates and normalizes one config/routes.json route entry.
+# Input: kind, skill_name, target, routes_file, and raw spec hash reference.
+# Output: normalized route spec hash reference.
+sub _normalize_skill_route_spec {
+    my ( $self, %args ) = @_;
+    my $kind = $args{kind} || die 'Missing kind';
+    my $skill_name = $args{skill_name};
+    my $target = $args{target} || die 'Missing target';
+    my $routes_file = $args{routes_file} || die 'Missing routes_file';
+    my $spec = $args{spec};
+    die "$routes_file $kind entry '$target' must be a JSON object" if ref($spec) ne 'HASH';
+    die "$routes_file $kind entry '$target' path is required"
+      if !defined $spec->{path} || $spec->{path} eq '';
+    die "$routes_file $kind entry '$target' path must start with /"
+      if $spec->{path} !~ m{\A/};
+    my $aliases = $spec->{aliases};
+    $aliases = [] if !defined $aliases;
+    die "$routes_file $kind entry '$target' aliases must be an array"
+      if ref($aliases) ne 'ARRAY';
+    my @aliases = grep { defined $_ && $_ ne '' } @{$aliases};
+    for my $alias (@aliases) {
+        die "$routes_file $kind entry '$target' aliases must start with /"
+          if $alias !~ m{\A/};
+    }
+    if ( exists $spec->{type} ) {
+        die "$routes_file $kind entry '$target' type must be a scalar"
+          if ref( $spec->{type} );
+        die "$routes_file $kind entry '$target' type must not be empty"
+          if !defined $spec->{type} || $spec->{type} eq '';
+        die "$routes_file app entry '$target' must not declare type"
+          if $kind eq 'app';
+    }
+    my $normalized = {
+        aliases     => \@aliases,
+        kind        => $kind,
+        path        => $spec->{path},
+        source_file => $routes_file,
+        target      => $target,
+        type        => $spec->{type},
+    };
+    $normalized->{skill_name} = $skill_name if defined $skill_name && $skill_name ne '';
+    $normalized->{ajax_file} = $target if $kind eq 'ajax';
+    $normalized->{route_id}  = $target if $kind eq 'app';
+    $normalized->{file}      = $target if $kind ne 'ajax' && $kind ne 'app';
+    return $normalized;
+}
+
+# skill_ajax_file_path($skill_name, $ajax_file)
+# Resolves one layered skill-local dashboards/ajax file in deepest-first order.
+# Input: skill repository name string and relative ajax file path.
+# Output: absolute file path string or undef when missing.
+sub skill_ajax_file_path {
+    my ( $self, $skill_name, $ajax_file ) = @_;
+    return if !$skill_name || !$ajax_file;
+    for my $skill_path ( $self->_skill_lookup_roots($skill_name) ) {
+        my $file = File::Spec->catfile( $skill_path, 'dashboards', 'ajax', split m{/+}, $ajax_file );
+        return $file if -f $file;
+    }
+    return;
+}
+
+# skill_static_file_path($skill_name, $type, $file)
+# Resolves one layered skill-local dashboards/public asset in deepest-first order.
+# Input: skill repository name string, static asset type, and relative file path.
+# Output: absolute file path string or undef when missing.
+sub skill_static_file_path {
+    my ( $self, $skill_name, $type, $file ) = @_;
+    return if !$skill_name || !$type || !$file;
+    for my $skill_path ( $self->_skill_lookup_roots($skill_name) ) {
+        my $candidate = File::Spec->catfile( $skill_path, 'dashboards', 'public', $type, split m{/+}, $file );
+        return $candidate if -f $candidate;
+    }
+    return;
+}
+
 # _skill_bookmark_entries($skill_name)
 # Enumerates non-nav bookmark files contributed by one layered skill with deepest
 # duplicates overriding shallower layers.
@@ -889,6 +1235,7 @@ sub _skill_bookmark_entries {
                    $_ ne '.'
                 && $_ ne '..'
                 && $_ ne 'nav'
+                && $_ ne 'routes.json'
                 && -f File::Spec->catfile( $dashboards_root, $_ )
             } readdir($dh)
           )
@@ -912,20 +1259,83 @@ sub _skill_nav_route_ids {
     for my $skill_path ( $self->_skill_lookup_roots($skill_name) ) {
         my $nav_root = File::Spec->catdir( $skill_path, 'dashboards', 'nav' );
         next if !-d $nav_root;
-        opendir my $dh, $nav_root or die "Unable to read $nav_root: $!";
-        for my $entry (
-            grep {
-                   $_ ne '.'
-                && $_ ne '..'
-                && -f File::Spec->catfile( $nav_root, $_ )
-            } readdir $dh
-          )
-        {
+        for my $entry ( $self->_relative_files($nav_root) ) {
             $routes{$entry} ||= 'nav/' . $entry;
         }
-        closedir $dh;
     }
     return %routes;
+}
+
+# _all_installed_skill_names()
+# Enumerates every enabled installed skill name, including nested skills/<repo>
+# trees, in deterministic order for shared nav rendering and similar global
+# skill discovery paths.
+# Input: none.
+# Output: ordered list of slash-delimited installed skill names.
+sub _all_installed_skill_names {
+    my ($self) = @_;
+    my @names;
+    for my $skill_root ( $self->{manager}{paths}->installed_skill_roots ) {
+        my ($skill_name) = $skill_root =~ m{/([^/]+)\z};
+        next if !defined $skill_name || $skill_name eq '';
+        push @names, $self->_descendant_skill_names( $skill_name, $skill_root );
+    }
+    return @names;
+}
+
+# _descendant_skill_names($skill_name, $skill_root)
+# Recursively enumerates one installed skill and any nested skills/<repo>
+# descendants while skipping disabled nested skills from normal runtime lookup.
+# Input: installed skill name string and absolute skill root path.
+# Output: ordered list of slash-delimited skill names.
+sub _descendant_skill_names {
+    my ( $self, $skill_name, $skill_root ) = @_;
+    return () if !$skill_name || !$skill_root || !-d $skill_root;
+
+    my @names = ($skill_name);
+    my $nested_root = File::Spec->catdir( $skill_root, 'skills' );
+    return @names if !-d $nested_root;
+
+    opendir my $dh, $nested_root or die "Unable to read $nested_root: $!";
+    for my $entry (
+        sort grep {
+               $_ ne '.'
+            && $_ ne '..'
+            && -d File::Spec->catdir( $nested_root, $_ )
+        } readdir $dh
+      )
+    {
+        my $child_root = File::Spec->catdir( $nested_root, $entry );
+        next if -f File::Spec->catfile( $child_root, '.disabled' );
+        push @names, $self->_descendant_skill_names( $skill_name . '/' . $entry, $child_root );
+    }
+    closedir $dh;
+
+    return @names;
+}
+
+# _relative_files($root)
+# Recursively lists files beneath one root as forward-slash relative paths so
+# nested nav fragments can be routed without flattening subdirectories.
+# Input: absolute root directory path.
+# Output: sorted list of relative file path strings.
+sub _relative_files {
+    my ( $self, $root ) = @_;
+    return () if !$root || !-d $root;
+
+    my @relative_files;
+    opendir my $dh, $root or die "Unable to read $root: $!";
+    for my $entry ( sort grep { $_ ne '.' && $_ ne '..' } readdir $dh ) {
+        my $path = File::Spec->catfile( $root, $entry );
+        if ( -d $path ) {
+            push @relative_files, map { $entry . '/' . $_ } $self->_relative_files($path);
+            next;
+        }
+        push @relative_files, $entry if -f $path;
+    }
+    closedir $dh;
+
+    return @relative_files;
 }
 
 # _merge_skill_hashes($left, $right)

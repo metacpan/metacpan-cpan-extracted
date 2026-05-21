@@ -1,5 +1,5 @@
-#ifndef UU_PORT_H
-#define UU_PORT_H
+#ifndef ULIB__PORT_H
+#define ULIB__PORT_H
 
 #ifdef cBOOL
 #undef cBOOL

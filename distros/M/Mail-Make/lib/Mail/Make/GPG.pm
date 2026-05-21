@@ -1,12 +1,13 @@
 ##----------------------------------------------------------------------------
 ## MIME Email Builder - ~/lib/Mail/Make/GPG.pm
-## Version v0.1.4
+## Version v0.1.5
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/03/05
-## Modified 2026/03/05
-## All rights reserved.
-##
+## Modified 2026/05/11
+## All rights reserved
+## 
+## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -20,7 +21,7 @@ BEGIN
     use vars qw( $VERSION $EXCEPTION_CLASS );
     use Mail::Make::Exception;
     our $EXCEPTION_CLASS = 'Mail::Make::Exception';
-    our $VERSION         = 'v0.1.4';
+    our $VERSION         = 'v0.1.5';
 };
 
 use strict;
@@ -55,13 +56,13 @@ sub encrypt
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
     my $entity     = $opts->{entity} ||
-        return( $self->error( 'encrypt(): entity option is required.' ) );
+        return( $self->error( "The option 'entity' is required." ) );
     my $recipients = $opts->{recipients} ||
-        return( $self->error( 'encrypt(): recipients option is required.' ) );
+        return( $self->error( "The option 'recipients' is required." ) );
     $recipients = [ $recipients ] unless( ref( $recipients ) eq 'ARRAY' );
     unless( scalar( @$recipients ) )
     {
-        return( $self->error( 'encrypt(): recipients must not be empty.' ) );
+        return( $self->error( "The value for the 'recipients' must not be empty." ) );
     }
 
     $self->_maybe_fetch_keys( $recipients ) || return( $self->pass_error );
@@ -70,7 +71,7 @@ sub encrypt
     my $plaintext = $self->_serialise_for_gpg( $entity ) || return( $self->pass_error );
 
     my @args = ( $self->_base_gpg_args, '--encrypt', '--armor' );
-    push( @args, '--recipient', $_ ) for( @{ $recipients } );
+    push( @args, '--recipient', $_ ) for( @$recipients );
 
     my $ciphertext = $self->_run_gpg( \@args, \$plaintext ) || return( $self->pass_error );
 
@@ -93,10 +94,10 @@ sub sign
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
     my $entity = $opts->{entity} ||
-        return( $self->error( 'sign(): entity option is required.' ) );
+        return( $self->error( "The option ¶entity' is required." ) );
 
     my $key_id = $self->_resolve_key_id( $opts ) ||
-        return( $self->error( 'sign(): KeyId is required (set via option or gpg_sign() default).' ) );
+        return( $self->error( 'KeyId is required (set via option or gpg_sign() default).' ) );
     my $digest = uc( $opts->{digest} // $self->{digest} );
 
     # Ensure Date and Message-ID are committed to the Mail::Make object's own _headers 
@@ -104,7 +105,7 @@ sub sign
     # RFC 2822 headers onto $self->{_parts}[0].
     $self->_ensure_envelope_headers( $entity ) || return( $self->pass_error );
 
-    # Serialise the MIME body that will be signed - Part 1 of multipart/signed.
+    # Serialise the MIME body that will be signed: Part 1 of multipart/signed.
     # Per RFC 3156 §5.1 this is the entity with CRLF line endings, exactly as it will 
     # appear on the wire.
     my $canonical = $self->_serialise_for_gpg( $entity ) || return( $self->pass_error );
@@ -136,15 +137,15 @@ sub sign_encrypt
 {
     my $self       = shift( @_ );
     my $opts       = $self->_get_args_as_hash( @_ );
-    my $entity     = $opts->{entity} || return( $self->error( 'sign_encrypt(): entity option is required.' ) );
-    my $recipients = $opts->{recipients} || return( $self->error( 'sign_encrypt(): recipients option is required.' ) );
+    my $entity     = $opts->{entity} || return( $self->error( "The option 'entity' is required." ) );
+    my $recipients = $opts->{recipients} || return( $self->error( "The option recipients is required." ) );
     $recipients    = [ $recipients ] unless( ref( $recipients ) eq 'ARRAY' );
     unless( scalar( @$recipients ) )
     {
-        return( $self->error( 'sign_encrypt(): recipients must not be empty.' ) );
+        return( $self->error( "The value for the option 'recipients' must not be empty." ) );
     }
 
-    my $key_id = $self->_resolve_key_id( $opts ) || return( $self->error( 'sign_encrypt(): KeyId is required.' ) );
+    my $key_id = $self->_resolve_key_id( $opts ) || return( $self->error( 'KeyId is required.' ) );
     my $digest = uc( $opts->{digest} // $self->{digest} );
 
     $self->_maybe_fetch_keys( $recipients ) || return( $self->pass_error );
@@ -162,7 +163,7 @@ sub sign_encrypt
         '--digest-algo', $digest,
         '--local-user',  $key_id,
     );
-    push( @args, '--recipient', $_ ) for( @{ $recipients } );
+    push( @args, '--recipient', $_ ) for( @$recipients );
     if( defined( $passphrase ) )
     {
         push( @args, '--passphrase-fd', '0', '--pinentry-mode', 'loopback' );
@@ -237,7 +238,7 @@ sub _build_encrypted_mail
 #
 # Structure:
 #   multipart/signed; protocol="application/pgp-signature"; micalg="pgp-sha256"
-#   ├── <original MIME body - the part that was signed>
+#   ├── <original MIME body: the part that was signed>
 #   └── application/pgp-signature   (ASCII-armoured detached signature)
 sub _build_signed_mail
 {
@@ -332,7 +333,7 @@ sub _entity_from_canonical
     my $pos = index( $canonical, "\015\012\015\012" );
     if( $pos < 0 )
     {
-        return( $self->error( '_entity_from_canonical(): no header/body separator.' ) );
+        return( $self->error( 'No header/body separator.' ) );
     }
 
     my $hdr_block = substr( $canonical, 0, $pos );
@@ -412,12 +413,12 @@ sub _find_gpg_bin
             return( $path );
         }
     }
-    return( $self->error( 'gpg binary not found in PATH. Install GnuPG or set the GpgBin option.' ) );
+    return( $self->error( 'The gpg binary is not found in PATH. Install GnuPG or set the GpgBin option.' ) );
 }
 
 # _maybe_fetch_keys( \@recipients )
 # When auto_fetch is enabled and a keyserver is configured, attempts to retrieve missing 
-# public keys for each recipient. Failures are silently ignored - the key may already be 
+# public keys for each recipient. Failures are silently ignored and the key may already be 
 # in the local keyring.
 sub _maybe_fetch_keys
 {
@@ -479,7 +480,7 @@ sub _resolve_passphrase
         $pp = eval{ $pp->() };
         if( $@ )
         {
-            return( $self->error( "gpg_sign/encrypt: passphrase callback failed: $@" ) );
+            return( $self->error( "Passphrase callback failed: $@" ) );
         }
     }
     return( $pp );
@@ -487,8 +488,8 @@ sub _resolve_passphrase
 
 # _run_gpg( \@args, \$input, passphrase => $pp ) → $stdout_string | undef
 #
-# Executes gpg via IPC::Run. IPC::Run handles multiplexed I/O internally,
-# avoiding the select()-loop complexity of a raw fork/pipe approach.
+# Executes gpg via IPC::Run. IPC::Run handles multiplexed I/O internally, avoiding the
+# select()-loop complexity of a raw fork/pipe approach.
 #
 # Passphrase handling (--passphrase-fd 0 + --pinentry-mode loopback):
 # We prepend the passphrase (followed by a newline) to the stdin payload.
@@ -547,12 +548,12 @@ sub _serialise_for_gpg
     my( $self, $mail ) = @_;
     unless( defined( $mail ) )
     {
-        return( $self->error( '_serialise_for_gpg(): no Mail::Make object supplied.' ) );
+        return( $self->error( 'No Mail::Make object supplied.' ) );
     }
 
     unless( $mail->can( 'as_entity' ) )
     {
-        return( $self->error( '_serialise_for_gpg(): argument must be a Mail::Make object.' ) );
+        return( $self->error( 'Argument must be a Mail::Make object.' ) );
     }
 
     # RFC 3156 §5.1: Part 1 of multipart/signed must carry only MIME
@@ -576,7 +577,7 @@ sub _serialise_for_gpg
     my $pos = index( $full, "\015\012\015\012" );
     if( $pos < 0 )
     {
-        return( $self->error( '_serialise_for_gpg(): no header/body separator found.' ) );
+        return( $self->error( 'No header/body separator found.' ) );
     }
 
     # Include the \r\n that terminates the last header in hdr_block,
@@ -707,7 +708,7 @@ Mail::Make::GPG - OpenPGP signing and encryption for Mail::Make
 
 =head1 VERSION
 
-    v0.1.4
+    v0.1.5
 
 =head1 DESCRIPTION
 

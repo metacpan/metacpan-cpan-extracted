@@ -1,43 +1,43 @@
-#### NAME
+# RT-Extension-ToggleTheme
 
-    RT-Extension-ToggleTheme - Toggle elevator light and dark theme.
+Adds a light/dark mode toggle button to the RT 6 navigation bar.
 
-#### DESCRIPTION
+Clicking the icon switches Bootstrap 5's `data-bs-theme` attribute between `light` and `dark` and persists the choice to the user's RT preferences (`WebDefaultThemeMode`). Works with any Bootstrap 5 theme — not just Elevator.
 
-    To save your eyes in the dark. The theme toggle button only displays for
-users who have the ModifySelf right.
+Only users with the `ModifySelf` right see the button. It appears in both the privileged interface and the self-service portal.
 
 ![Demo](./static/images/demo.gif)
 
-#### RT VERSION
+## RT Version
 
-    Works with RT 5
+Works with RT 6
 
-#### INSTALLATION
+## Installation
 
-    perl Makefile.PL
-    make
-    make install
+```
+perl Makefile.PL
+make
+make install
+```
 
-##### May need root permissions
+May need root permissions.
 
-##### Edit your /opt/rt4/etc/RT_SiteConfig.pm
+Edit `/opt/rt6/etc/RT_SiteConfig.pm` and add:
 
-##### Add this line:
+```perl
+Plugin('RT::Extension::ToggleTheme');
+```
 
-    Plugin('RT::Extension::ToggleTheme');
+Clear the Mason cache and restart your webserver:
 
-##### Apply patch to RT5
+```bash
+rm -rf /opt/rt6/var/mason_data/obj
+```
 
-    patch -d /opt/r5 -p1 < patches/header-callback.patch
+## Author
 
-##### Clear your mason cache
+Craig Kaiser <modules@ceal.dev>
 
-    rm -rf /opt/rt5/var/mason_data/obj
+## License
 
-##### Restart your webserver
-
-#### AUTHOR
-
-    Craig Kaiser <modules@ceal.dev>
-
+GNU General Public License version 2

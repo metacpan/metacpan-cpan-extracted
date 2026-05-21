@@ -6,7 +6,7 @@ use warnings;
 # Load XS functions from Chandra bootstrap
 use Chandra ();
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 1;
 
@@ -43,7 +43,7 @@ Chandra::Store - Persistent key-value storage for Chandra apps
     my $all = $store->all;
     $store->clear;
 
-    # Manual save mode — batch multiple writes into one disk write
+    # Manual save mode - batch multiple writes into one disk write
     my $s = Chandra::Store->new(name => 'myapp', auto_save => 0);
     $s->set('x', 1)->set('y', 2)->set('z', 3);
     $s->save;

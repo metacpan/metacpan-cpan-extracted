@@ -3,7 +3,7 @@ use warnings;
 
 package Term::ReadLine::Repl;
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.2';
 
 =head1 NAME
 
@@ -225,7 +225,7 @@ Passthrough commands (those beginning with C<!>) are excluded from completion.
 
 =head1 AUTHORS
 
-Written by John R. Copyright (c) 2026
+Written by John L. Radford, Copyright (c) 2026
 
 =head1 LICENSE
 
@@ -285,7 +285,7 @@ sub validate_args {
 
         # Ensure that args is an array
         if (exists $schema->{args} && defined $schema->{args}) {
-            croak "'$cmd' args is NOT a arrayref!" unless ref $schema->{args};
+            croak "'$cmd' args is NOT a arrayref!" unless ref $schema->{args} eq 'ARRAY';
 
             croak "'$cmd' args array is empty!" if scalar @{$schema->{args}} < 1;
 
@@ -321,11 +321,12 @@ sub run {
     # Simple REPL loop.
     while (defined (my $input = $term->readline($prompt))) {
         chomp $input;
+        $input =~ s/^\s+|\s+$//g;
         last if ($input =~ /^(exit|quit)$/);
 
         next unless $input;
 
-        if ($input =~ 'help') {
+        if ($input eq 'help') {
             $self->_help();
             next;
         }
@@ -334,7 +335,7 @@ sub run {
 
         # Command line passthrough.
         if ($self->{passthrough} && @args && $args[0] =~ /^\!/) {
-            $args[0] =~ s/\!//g;
+            $args[0] =~ s/^\!//;
             system(@args);
             next;
         }
@@ -456,7 +457,7 @@ sub _help {
             for my $arg (keys %{$args}) {
                 my $opt = $args->{$arg};
                 $output .= "$arg";
-                $output .= defined $opt ? "=<$opt>, " : ", ";
+                $output .= defined $opt ? " <$opt>, " : ", ";
             }
             substr($output, -1) = "";  # Remove trailing space
             substr($output, -1) = "";  # Remove trailing ,
@@ -470,7 +471,7 @@ sub _read_history {
     my ($self, $term) = @_;
 
     if (-f $self->{hist_file}) {
-        open my $fh, '<', $self->{hist_file} or warn "Couldn't read auto bal history file: $!";
+        open my $fh, '<', $self->{hist_file} or warn "Couldn't read history file: $!";
         while (my $line = <$fh>) {
             chomp $line;
             $term->addhistory($line);
@@ -484,7 +485,7 @@ sub _save_history {
 
     my $attribs = $term->Attribs;
 
-    open my $fh, '>>', $self->{hist_file} or warn "Couldn't save auto bal history: $!";
+    open my $fh, '>', $self->{hist_file} or warn "Couldn't save history file: $!";
     if ($term->ReadLine =~ /Gnu/) {
         for my $line ($term->GetHistory) {
             print $fh "$line\n";

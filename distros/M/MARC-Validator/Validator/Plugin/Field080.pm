@@ -4,11 +4,11 @@ use base qw(MARC::Validator::Abstract);
 use strict;
 use warnings;
 
-use Business::UDC;
+use Business::UDC 0.07;
 use Data::MARC::Validator::Report::Error 0.02;
 use Data::MARC::Validator::Report::Plugin::Errors 0.02;
 
-our $VERSION = 0.17;
+our $VERSION = 0.21;
 
 sub module_name {
 	my $self = shift;
@@ -33,18 +33,35 @@ sub process {
 		my $field_080a = $field_080->subfield('a');
 		my $udc = Business::UDC->new($field_080a);
 		if (! $udc->is_valid) {
-			if ($udc->error eq "Unexpected token ']'.") {
+			my ($udc_error, %udc_error_params) = $udc->error;
+			if ($udc_error eq 'Alphabetical specification cannot appear standalone.') {
 				push @record_errors, Data::MARC::Validator::Report::Error->new(
-					'error' => "Field 080a has missing '['.",
+					'error' => "Field 080a has name standalone.",
 					'params' => {
-						'value' => $field_080a,
+						'field_080_a' => $field_080a,
 					},
 				);
-			} elsif ($udc->error eq "Unclosed subgroup '['.") {
+			} elsif ($udc_error eq 'Whitespace is not allowed in UDC string.') {
 				push @record_errors, Data::MARC::Validator::Report::Error->new(
-					'error' => "Field 080a has missing ']'.",
+					'error' => "Field 080a has trailing space.",
 					'params' => {
-						'value' => $field_080a,
+						'field_080_a' => $field_080a,
+					},
+				);
+			} elsif ($udc_error eq 'Bad apostrophe character.') {
+				push @record_errors, Data::MARC::Validator::Report::Error->new(
+					'error' => "Field 080a has bad apostrophe character.",
+					'params' => {
+						'field_080_a' => $field_080a,
+						'character' => $udc_error_params{'character'},
+					},
+				);
+			} elsif ($udc_error eq 'Bad quotation mark character.') {
+				push @record_errors, Data::MARC::Validator::Report::Error->new(
+					'error' => "Field 080a has bad quotation mark character.",
+					'params' => {
+						'field_080_a' => $field_080a,
+						'character' => $udc_error_params{'character'},
 					},
 				);
 			}

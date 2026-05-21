@@ -3,16 +3,14 @@
 #
 use strict;
 use warnings;
-use Test::More;
-use MyNote;
-use Config;
+use MyTest;
 use File::Temp;
 
 use vars qw(@OPTS $tmpdir $fn0 $fn1 $fn2);
 
 BEGIN {
-    $tmpdir = File::Temp->newdir(CLEANUP => 0);
-    $fn0 = File::Temp::tempnam($tmpdir, 'UUID.test');
+    $tmpdir = File::Temp->newdir('UUID-test-XXXXXXXX', TMPDIR => 1, CLEANUP => 0);
+    $fn0 = File::Temp::tempnam($tmpdir, 'UUID.test.');
     $fn1 = File::Temp::tempnam($tmpdir, 'UUID.test.');
     $fn2 = File::Temp::tempnam($tmpdir, 'UUID.test.');
     @OPTS = ('uuid1', ':persist='.$fn0, ':defer=999999');

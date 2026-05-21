@@ -1,0 +1,52 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "automation-policy.json",
+    "title": "Automation Policy",
+    "description": "Automation Policy",
+    "type": "object",
+    "properties": {
+
+        "version": {
+            "description": "The version of the automation policy schema",
+            "type": "integer"
+        },
+
+        "distribution": {
+            "description": "An optional name of the software distribution that this applies to",
+            "type": "string"
+        },
+
+        "description": {
+            "description": "An optional description of this policy",
+            "type": "string"
+        },
+
+        "document": {
+            "description": "The path of an AI_POLICY document",
+            "type": "string"
+        },
+
+        "code_generation": {
+            "description": "A level of how automated systems may change the code or documentation",
+            "enum": [ "toolchain", "external_sources", "machine_generated" ]
+        },
+
+        "automated_contributions": {
+            "description": "A level of how non-maintainers may submit automated contributions",
+            "enum": [ "none", "comment", "issue", "code_request" ]
+        },
+
+        "automated_actions": {
+            "description": "A level of how maintainers may use automated changes",
+            "enum": [ "none", "comment", "issue", "code_request", "code_change", "release" ]
+        },
+        "models": {
+            "description": "A list of models used for automated_actions",
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        }
+    },
+    "required": [ "version", "code_generation", "automated_contributions", "automated_actions" ]
+}

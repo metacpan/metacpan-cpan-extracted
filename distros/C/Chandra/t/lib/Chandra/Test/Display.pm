@@ -20,9 +20,9 @@ sub skip_unless_display {
         plan skip_all => 'No display server available';
     }
 
-    # GTK g_error() aborts the process — eval can't catch it.
+    # GTK g_error() aborts the process - eval can't catch it.
     # Fork a child to probe display connectivity safely.
-    # Always probe with Chandra::Window — some modules (e.g. Splash)
+    # Always probe with Chandra::Window - some modules (e.g. Splash)
     # defer GTK init until show(), so probing with $module->new is
     # not reliable.
     my $pid = fork;

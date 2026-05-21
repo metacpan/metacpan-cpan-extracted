@@ -1,0 +1,11 @@
+Revision history for Perl module PDF::FacturX
+
+0.01    2026-05-04
+        - Initial release.
+        - Generates Factur-X CrossIndustryInvoice XML (profiles MINIMUM,
+          BASIC WL, BASIC, EN 16931).
+        - Embeds XML into a PDF/A-3 envelope via Ghostscript + PDF::Builder
+          (XMP metadata stream, AFRelationship=/Data, OutputIntent sRGB).
+        - Validates generated XML against bundled official Factur-X 1.08 XSD.
+        - Bundled sRGB ICC profile fallback when Ghostscript install path
+          cannot be located.

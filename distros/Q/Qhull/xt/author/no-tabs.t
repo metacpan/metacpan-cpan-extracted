@@ -26,6 +26,7 @@ my @files = (
     't/data/Util/parse_output/vertex2D.txt',
     't/data/qhull/qhull.in',
     't/data/qhull/qhull.out',
+    't/qh_opts.t',
     't/qhull.t'
 );
 

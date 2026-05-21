@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Progress;
 use strict;
 use warnings;
 
-our $VERSION = '3.14';
+our $VERSION = '3.90';
 
 # new(%args)
 # Constructs a terminal progress renderer for restart/stop lifecycle commands.
@@ -18,9 +18,10 @@ sub new {
         my $task = $_;
         my $id   = $task->{id} || die 'Progress task missing id';
         $id => {
-            id     => $id,
-            label  => $task->{label} || $id,
-            status => 'pending',
+            id           => $id,
+            label        => $task->{label} || $id,
+            status       => 'pending',
+            detail_lines => [],
         }
     } @{$tasks};
     my $stream = $args{stream} || \*STDERR;
@@ -32,6 +33,8 @@ sub new {
         dynamic  => $args{dynamic} ? 1 : 0,
         color    => $args{color} ? 1 : 0,
         rendered => 0,
+        max_detail_lines => $args{max_detail_lines},
+        last_rendered_line_count => 0,
     }, $class;
     $self->render;
     return $self;
@@ -49,6 +52,30 @@ sub callback {
     };
 }
 
+# add_tasks($tasks)
+# Appends newly discovered tasks to the rendered board without disturbing the
+# status and order of already registered tasks.
+# Input: array reference of task hashes with id and optional label.
+# Output: true value.
+sub add_tasks {
+    my ( $self, $tasks ) = @_;
+    return 1 if ref($tasks) ne 'ARRAY' || !@{$tasks};
+    for my $task ( @{$tasks} ) {
+        next if ref($task) ne 'HASH';
+        my $id = $task->{id} || next;
+        next if $self->{tasks}{$id};
+        push @{ $self->{order} }, $id;
+        $self->{tasks}{$id} = {
+            id           => $id,
+            label        => $task->{label} || $id,
+            status       => 'pending',
+            detail_lines => [],
+        };
+    }
+    $self->render;
+    return 1;
+}
+
 # update($event)
 # Applies one lifecycle progress event to the tracked task board.
 # Input: hash reference with task_id, status, and optional label.
@@ -56,10 +83,31 @@ sub callback {
 sub update {
     my ( $self, $event ) = @_;
     return 1 if !$event || ref($event) ne 'HASH';
+    $self->add_tasks( $event->{add_tasks} ) if exists $event->{add_tasks};
     my $id = $event->{task_id} || return 1;
     my $task = $self->{tasks}{$id} || return 1;
     $task->{status} = $event->{status} if defined $event->{status} && $event->{status} ne '';
     $task->{label}  = $event->{label}  if defined $event->{label}  && $event->{label} ne '';
+    if ( exists $event->{detail_lines} ) {
+        my @detail_lines = ref( $event->{detail_lines} ) eq 'ARRAY' ? @{ $event->{detail_lines} } : ();
+        my $max = $self->_detail_line_limit;
+        if ( defined $max && @detail_lines > $max ) {
+            @detail_lines = @detail_lines[ @detail_lines - $max .. $#detail_lines ];
+        }
+        $task->{detail_lines} = \@detail_lines;
+    }
+    elsif ( exists $event->{detail_line} ) {
+        my @detail_lines = @{ $task->{detail_lines} || [] };
+        push @detail_lines, $event->{detail_line};
+        my $max = $self->_detail_line_limit;
+        if ( defined $max && @detail_lines > $max ) {
+            @detail_lines = @detail_lines[ @detail_lines - $max .. $#detail_lines ];
+        }
+        $task->{detail_lines} = \@detail_lines;
+    }
+    if ( $task->{status} eq 'done' ) {
+        $task->{detail_lines} = [];
+    }
     $self->render;
     return 1;
 }
@@ -85,13 +133,13 @@ sub render {
     my $stream = $self->{stream};
     my $board  = $self->render_text;
     if ( $self->{dynamic} && $self->{rendered} ) {
-        my $line_count = scalar( split /\n/, $board );
-        for ( 1 .. $line_count ) {
+        for ( 1 .. ( $self->{last_rendered_line_count} || 0 ) ) {
             print {$stream} "\e[1A\e[2K";
         }
     }
     print {$stream} $board;
     $self->{rendered} = 1;
+    $self->{last_rendered_line_count} = scalar grep { defined } split /\n/, $board;
     return 1;
 }
 
@@ -106,8 +154,25 @@ sub render_text {
         my $task   = $self->{tasks}{$id} || next;
         my $prefix = $self->_status_prefix( $task->{status} );
         push @lines, sprintf '%s %s', $self->_colorize( $prefix, $task->{status} ), $task->{label};
+        if ( $task->{status} ne 'done' && ref( $task->{detail_lines} ) eq 'ARRAY' ) {
+            push @lines, map { sprintf '   %s', $self->_colorize_detail( $_, $task->{status} ) } @{ $task->{detail_lines} };
+        }
     }
     return join( "\n", @lines ) . "\n";
+}
+
+# _detail_line_limit()
+# Normalizes the configured rolling detail-line cap for runtime updates.
+# Input: none.
+# Output: positive integer line cap, 10 when explicitly configured falsey, or
+# undef when no cap was requested.
+sub _detail_line_limit {
+    my ($self) = @_;
+    return undef if !exists $self->{max_detail_lines};
+    my $max = $self->{max_detail_lines};
+    return undef if !defined $max;
+    return $max if $max =~ /^\d+$/ && $max > 0;
+    return 10;
 }
 
 # _status_prefix($status)
@@ -130,7 +195,19 @@ sub _colorize {
     my ( $self, $text, $status ) = @_;
     return $text if !$self->{color};
     return "\e[32m$text\e[0m" if defined $status && $status eq 'done';
-    return "\e[33m$text\e[0m" if defined $status && $status eq 'running';
+    return "\e[34m$text\e[0m" if defined $status && $status eq 'running';
+    return "\e[31m$text\e[0m" if defined $status && $status eq 'failed';
+    return $text;
+}
+
+# _colorize_detail($text, $status)
+# Wraps one detail line with ANSI color escapes when terminal color output is enabled.
+# Input: detail text string and status string.
+# Output: plain or ANSI-colored detail-line string.
+sub _colorize_detail {
+    my ( $self, $text, $status ) = @_;
+    return $text if !$self->{color};
+    return "\e[34m$text\e[0m" if defined $status && $status eq 'running';
     return "\e[31m$text\e[0m" if defined $status && $status eq 'failed';
     return $text;
 }
@@ -219,8 +296,8 @@ Example 3:
 
   dashboard restart
 
-Render the interactive lifecycle board with yellow running markers, green
-C<[OK]> completion markers, and red C<[X]> failure markers when stderr is a
-real terminal.
+Render the interactive lifecycle board with blue running markers and detail
+lines, green C<[OK]> completion markers, and red C<[X]> failure markers plus
+failure detail lines when stderr is a real terminal.
 
 =cut

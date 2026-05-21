@@ -557,10 +557,8 @@ elsif ( $cmd eq 'collector' ) {
     }
     elsif ( $action eq 'start' ) {
         my $name = shift @ARGV || die "Usage: dashboard collector start <name>\n";
-        my $job = _find_collector_job($name);
-        die "Unknown collector '$name'\n" if !$job;
-        my $pid = $runner->start_loop($job);
-        print "$pid\n";
+        my $started = $runtime->start_named_collector( name => $name );
+        print $started->{pid} . "\n";
         exit 0;
     }
     elsif ( $action eq 'stop' ) {
@@ -571,11 +569,9 @@ elsif ( $cmd eq 'collector' ) {
     }
     elsif ( $action eq 'restart' ) {
         my $name = shift @ARGV || die "Usage: dashboard collector restart <name>\n";
-        my $job = _find_collector_job($name);
-        die "Unknown collector '$name'\n" if !$job;
-        $runner->stop_loop($name);
-        my $pid = $runner->start_loop($job);
-        print "$pid\n";
+        my $result = $runtime->restart_target( scope => 'collector', name => $name );
+        my $collector = $result->{collectors}[0] || {};
+        print $collector->{pid} . "\n" if defined $collector->{pid};
         exit 0;
     }
 }
@@ -626,8 +622,6 @@ elsif ( $cmd eq 'init' ) {
     my $config_file = $config->ensure_global_file;
 
     my @pages = $pages->list_saved_pages;
-    _seed_init_page( $pages, \@pages, Developer::Dashboard::CLI::SeededPages::api_dashboard_page() );
-    _seed_init_page( $pages, \@pages, Developer::Dashboard::CLI::SeededPages::sql_dashboard_page() );
     my $internal_cli = Developer::Dashboard::InternalCLI::ensure_helpers( paths => $paths );
 
     print json_encode(
@@ -974,20 +968,9 @@ elsif ( $cmd eq 'serve' ) {
     }
     exit 0;
 }
-elsif ( $cmd eq 'stop' ) {
-    my $progress = _lifecycle_progress(
-        title => 'dashboard stop progress',
-        tasks => $runtime->stop_progress_tasks,
-    );
-    my $result = $runtime->stop_all(
-        progress => $progress ? $progress->callback : undef,
-    );
-    $progress->finish if $progress;
-    print json_encode($result);
-    exit 0;
-}
-elsif ( $cmd eq 'restart' ) {
+elsif ( $cmd eq 'web-foreground' ) {
     _load_configured_path_aliases();
+    _migrate_saved_pages();
     my $settings = $config->web_settings;
     my $host = $settings->{host};
     my $port = $settings->{port};
@@ -1000,20 +983,55 @@ elsif ( $cmd eq 'restart' ) {
         'workers=i' => \$workers,
         'ssl!'      => \$ssl,
     );
-    my $progress = _lifecycle_progress(
-        title => 'dashboard restart progress',
-        tasks => $runtime->restart_progress_tasks,
+    die "Usage: dashboard web-foreground [--host HOST] [--port PORT] [--workers N] [--ssl|--no-ssl]\n" if @ARGV;
+    $runtime->start_web(
+        foreground => 1,
+        host       => $host,
+        port       => $port,
+        workers    => $workers,
+        ssl        => $ssl,
     );
-    my $result = $runtime->restart_all(
-        host     => $host,
-        port     => $port,
-        workers  => $workers,
-        ssl      => $ssl,
-        progress => $progress ? $progress->callback : undef,
-    );
-    $progress->finish if $progress;
-    print json_encode($result);
     exit 0;
+}
+elsif ( $cmd eq 'collector-supervisor-foreground' ) {
+    _load_configured_path_aliases();
+    _migrate_saved_pages();
+    $runtime->_run_collector_supervisor_child(
+        daemonize => 0,
+        redirect  => 0,
+    );
+    exit 0;
+}
+elsif ( $cmd eq 'stop' ) {
+    require Developer::Dashboard::CLI::RuntimeControl;
+    exit Developer::Dashboard::CLI::RuntimeControl::run_runtime_command(
+        command    => $cmd,
+        args       => \@ARGV,
+        runtime    => $runtime,
+        config     => $config,
+        collectors => $collectors,
+    );
+}
+elsif ( $cmd eq 'restart' ) {
+    _load_configured_path_aliases();
+    require Developer::Dashboard::CLI::RuntimeControl;
+    exit Developer::Dashboard::CLI::RuntimeControl::run_runtime_command(
+        command    => $cmd,
+        args       => \@ARGV,
+        runtime    => $runtime,
+        config     => $config,
+        collectors => $collectors,
+    );
+}
+elsif ( $cmd eq 'log' || $cmd eq 'logs' ) {
+    require Developer::Dashboard::CLI::RuntimeControl;
+    exit Developer::Dashboard::CLI::RuntimeControl::run_runtime_command(
+        command    => $cmd,
+        args       => \@ARGV,
+        runtime    => $runtime,
+        config     => $config,
+        collectors => $collectors,
+    );
 }
 elsif ( $cmd eq 'shell' ) {
     my $shell = normalize_shell_name( shift @ARGV || native_shell_name() );
@@ -1121,6 +1139,7 @@ sub _shell_dashboard_command {
 sub _shell_bootstrap {
     my ($shell) = @_;
     my $dashboard_cmd = _shell_dashboard_command($shell);
+    my $tmux_status_cmd = shell_quote_for( 'sh', $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} || File::Spec->rel2abs($0) );
     my $dashboard_json_matches = _shell_json_extract_command(
         $shell,
         'my $h=JSON::XS->new->decode($_); print join qq(\n), @{ $h->{matches} || [] }',
@@ -1131,6 +1150,7 @@ sub _shell_bootstrap {
     );
     my $bootstrap = _shell_navigation_bootstrap($shell) . "\n" . _shell_prompt_bootstrap($shell);
     $bootstrap =~ s/__DASHBOARD_CMD__/$dashboard_cmd/g;
+    $bootstrap =~ s/__DASHBOARD_TMUX_STATUS_CMD__/$tmux_status_cmd/g;
     $bootstrap =~ s/__DASHBOARD_JSON_MATCHES__/$dashboard_json_matches/g;
     $bootstrap =~ s/__DASHBOARD_JSON_TARGET__/$dashboard_json_target/g;
     return $bootstrap;
@@ -1454,15 +1474,82 @@ sub _shell_prompt_bootstrap {
     if ( $shell eq 'bash' ) {
         return <<'BASH';
 
-export PS1='$(__DASHBOARD_CMD__ ps1 --jobs \j --mode compact)'
+# Guard for macOS Terminal.app update_terminal_cwd
+if [ -z "${update_terminal_cwd+x}" ] && [ -f /etc/bashrc_Apple_Terminal ]; then
+  source /etc/bashrc_Apple_Terminal 2>/dev/null || true
+fi
+
+_dd_tmux_status_active() {
+  [ -n "${TMUX:-}" ] && { [ "${DEVELOPER_DASHBOARD_TMUX_STATUS:-0}" = "1" ] || [ -n "${TICKET_REF:-}" ]; }
+}
+_dd_apply_tmux_ticket_status() {
+  _dd_default_status="$(tmux show-options -gqv @dd_ticket_status_default 2>/dev/null)"
+  if [ -z "$_dd_default_status" ]; then
+    _dd_default_status="$(tmux show-options -gqv status-format[0] 2>/dev/null)"
+    [ -n "$_dd_default_status" ] && tmux set-option -gq @dd_ticket_status_default "$_dd_default_status" >/dev/null 2>&1
+  fi
+  tmux set-option -q status-position bottom >/dev/null 2>&1
+  tmux set-option -q status 2 >/dev/null 2>&1
+  tmux set-option -q status-interval 2 >/dev/null 2>&1
+  tmux set-option -q status-format[0] "#(__DASHBOARD_TMUX_STATUS_CMD__ ps1 --mode tmux-status-top --width #{client_width})" >/dev/null 2>&1
+  if [ -n "$_dd_default_status" ]; then
+    tmux set-option -q status-format[1] "$_dd_default_status" >/dev/null 2>&1
+  fi
+  tmux set-option -uq status-format[2] >/dev/null 2>&1
+}
+_dd_update_prompt() {
+  if [ -n "$TMUX" ] && _dd_tmux_status_active; then
+    _dd_apply_tmux_ticket_status
+    PS1='$(__DASHBOARD_CMD__ ps1 --jobs \j --mode compact --no-indicators)'
+  else
+    PS1='$(__DASHBOARD_CMD__ ps1 --jobs \j --mode compact)'
+  fi
+  export PS1
+}
+case ";${PROMPT_COMMAND:-};" in
+  *";_dd_update_prompt;"*) ;;
+  *)
+    if [ -n "${PROMPT_COMMAND:-}" ]; then
+      PROMPT_COMMAND="_dd_update_prompt;${PROMPT_COMMAND}"
+    else
+      PROMPT_COMMAND="_dd_update_prompt"
+    fi
+    export PROMPT_COMMAND
+    ;;
+esac
+_dd_update_prompt
 BASH
     }
     if ( $shell eq 'zsh' ) {
         return <<'ZSH';
 
 autoload -Uz add-zsh-hook
+_dd_tmux_status_active() {
+  [[ -n "${TMUX:-}" && ( "${DEVELOPER_DASHBOARD_TMUX_STATUS:-0}" = "1" || -n "${TICKET_REF:-}" ) ]]
+}
+_dd_apply_tmux_ticket_status() {
+  local default_status
+  default_status="$(tmux show-options -gqv @dd_ticket_status_default 2>/dev/null)"
+  if [[ -z "$default_status" ]]; then
+    default_status="$(tmux show-options -gqv status-format[0] 2>/dev/null)"
+    [[ -n "$default_status" ]] && tmux set-option -gq @dd_ticket_status_default "$default_status" >/dev/null 2>&1
+  fi
+  tmux set-option -q status-position bottom >/dev/null 2>&1
+  tmux set-option -q status 2 >/dev/null 2>&1
+  tmux set-option -q status-interval 2 >/dev/null 2>&1
+  tmux set-option -q status-format[0] "#(__DASHBOARD_TMUX_STATUS_CMD__ ps1 --mode tmux-status-top --width #{client_width})" >/dev/null 2>&1
+  if [[ -n "$default_status" ]]; then
+    tmux set-option -q status-format[1] "$default_status" >/dev/null 2>&1
+  fi
+  tmux set-option -uq status-format[2] >/dev/null 2>&1
+}
 _dd_update_prompt() {
-  PS1="$(__DASHBOARD_CMD__ ps1 --jobs ${#jobstates} --mode compact)"
+  if _dd_tmux_status_active; then
+    _dd_apply_tmux_ticket_status
+    PS1="$(__DASHBOARD_CMD__ ps1 --jobs ${#jobstates} --mode compact --no-indicators)"
+  else
+    PS1="$(__DASHBOARD_CMD__ ps1 --jobs ${#jobstates} --mode compact)"
+  fi
 }
 add-zsh-hook precmd _dd_update_prompt
 _dd_update_prompt
@@ -1471,17 +1558,85 @@ ZSH
     if ( $shell eq 'sh' ) {
         return <<'SH';
 
-_dd_prompt_command() {
-  __DASHBOARD_CMD__ ps1 --mode compact
+_dd_tmux_status_active() {
+  [ -n "${TMUX:-}" ] && { [ "${DEVELOPER_DASHBOARD_TMUX_STATUS:-0}" = "1" ] || [ -n "${TICKET_REF:-}" ]; }
 }
+_dd_apply_tmux_ticket_status() {
+  _dd_default_status="$(tmux show-options -gqv @dd_ticket_status_default 2>/dev/null)"
+  if [ -z "$_dd_default_status" ]; then
+    _dd_default_status="$(tmux show-options -gqv status-format[0] 2>/dev/null)"
+    [ -n "$_dd_default_status" ] && tmux set-option -gq @dd_ticket_status_default "$_dd_default_status" >/dev/null 2>&1
+  fi
+  tmux set-option -q status-position bottom >/dev/null 2>&1
+  tmux set-option -q status 2 >/dev/null 2>&1
+  tmux set-option -q status-interval 2 >/dev/null 2>&1
+  tmux set-option -q status-format[0] "#(__DASHBOARD_TMUX_STATUS_CMD__ ps1 --mode tmux-status-top --width #{client_width})" >/dev/null 2>&1
+  if [ -n "$_dd_default_status" ]; then
+    tmux set-option -q status-format[1] "$_dd_default_status" >/dev/null 2>&1
+  fi
+  tmux set-option -uq status-format[2] >/dev/null 2>&1
+}
+_dd_prompt_command() {
+  if _dd_tmux_status_active; then
+    __DASHBOARD_CMD__ ps1 --mode compact --no-indicators
+  else
+    __DASHBOARD_CMD__ ps1 --mode compact
+  fi
+}
+if _dd_tmux_status_active; then
+  _dd_apply_tmux_ticket_status
+fi
 PS1='$(_dd_prompt_command)'
 export PS1
 SH
     }
     if ( $shell eq 'powershell' || $shell eq 'pwsh' ) {
         return <<'POWERSHELL';
+[Console]::InputEncoding = [System.Text.UTF8Encoding]::new($false)
+[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+function Test-DashboardTmuxStatusActive {
+  return [bool]($env:TMUX -and (($env:DEVELOPER_DASHBOARD_TMUX_STATUS -eq '1') -or -not [string]::IsNullOrWhiteSpace($env:TICKET_REF)))
+}
+function Set-DashboardTmuxTicketStatus {
+  $ddDefaultStatus = (& tmux show-options -gqv @dd_ticket_status_default 2>$null) -join ''
+  if ([string]::IsNullOrWhiteSpace($ddDefaultStatus)) {
+    $ddDefaultStatus = (& tmux show-options -gqv status-format[0] 2>$null) -join ''
+    if (-not [string]::IsNullOrWhiteSpace($ddDefaultStatus)) {
+      & tmux set-option -gq @dd_ticket_status_default $ddDefaultStatus | Out-Null
+    }
+  }
+  & tmux set-option -q status-position bottom | Out-Null
+  & tmux set-option -q status 2 | Out-Null
+  & tmux set-option -q status-interval 2 | Out-Null
+  & tmux set-option -q status-format[0] "#(__DASHBOARD_TMUX_STATUS_CMD__ ps1 --mode tmux-status-top --width #{client_width})" | Out-Null
+  if (-not [string]::IsNullOrWhiteSpace($ddDefaultStatus)) {
+    & tmux set-option -q status-format[1] $ddDefaultStatus | Out-Null
+  }
+  & tmux set-option -uq status-format[2] | Out-Null
+}
+if (Test-DashboardTmuxStatusActive) {
+  Set-DashboardTmuxTicketStatus
+}
 function prompt {
-  & __DASHBOARD_CMD__ ps1 --mode compact
+  if (Test-DashboardTmuxStatusActive) {
+    $ddPrompt = & __DASHBOARD_CMD__ ps1 --mode compact --no-indicators
+  } else {
+    $ddPrompt = & __DASHBOARD_CMD__ ps1 --mode compact
+  }
+  $ddPromptText = ((@($ddPrompt | Where-Object { $null -ne $_ } | ForEach-Object { "$_" })) -join [Environment]::NewLine)
+  if ([string]::IsNullOrWhiteSpace($ddPromptText)) {
+    return '> '
+  }
+  $ddPromptText = $ddPromptText.TrimEnd("`r", "`n")
+  $ddPromptLines = @($ddPromptText -split "`r?`n")
+  if ($ddPromptLines.Length -gt 1) {
+    $header = ($ddPromptLines[0..($ddPromptLines.Length - 2)] -join [Environment]::NewLine)
+    if ($header -ne '') {
+      Write-Host $header
+    }
+    return $ddPromptLines[$ddPromptLines.Length - 1]
+  }
+  return $ddPromptText
 }
 POWERSHELL
     }
@@ -1522,7 +1677,7 @@ _dashboard-core - contains the shared private built-in command runtime that the 
 
 =head1 PURPOSE
 
-This private staged runtime owns the heavier built-in command implementations after C<bin/dashboard> has already done hook execution and helper dispatch. It is also where the generated shell bootstrap snippets come from, including C<cdr>, C<which_dir>, and prompt wiring across bash, zsh, POSIX sh, and PowerShell. While it runs, it normalizes the live process title to C<developer-dashboard ...> so operators see the public command name in C<ps> output instead of the staged helper path under F<~/.developer-dashboard/cli/dd/>.
+This private staged runtime owns the heavier built-in command implementations after C<bin/dashboard> has already done hook execution and helper dispatch. It is also where the generated shell bootstrap snippets come from, including C<cdr>, C<which_dir>, and prompt wiring across bash, zsh, POSIX sh, and PowerShell. Detached internal foreground helpers such as the web listener and collector watchdog also re-enter through this file when the runtime needs a background-managed process without bloating the public entrypoint. While it runs, it normalizes the live process title to C<developer-dashboard ...> so operators see the public command name in C<ps> output instead of the staged helper path under F<~/.developer-dashboard/cli/dd/>.
 
 =head1 WHY IT EXISTS
 
@@ -1530,7 +1685,7 @@ It exists so the public entrypoint stays thin while dashboard-managed built-ins 
 
 =head1 WHEN TO USE
 
-Use this file when changing built-in command dispatch after helper staging, shell bootstrap generation, or behavior shared across multiple staged helper wrappers.
+Use this file when changing built-in command dispatch after helper staging, shell bootstrap generation, detached foreground helper entrypoints such as the web listener or collector watchdog, or behavior shared across multiple staged helper wrappers.
 
 =head1 HOW TO USE
 

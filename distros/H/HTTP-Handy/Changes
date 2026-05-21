@@ -1,5 +1,17 @@
 Revision history for HTTP-Handy
 
+1.05  2026-05-17 JST (Japan Standard Time)
+
+    Fixes:
+      - Replace \do{local*_} globref pattern with named glob string
+        (Package::FH::H<n>) in _log_message(), serve_static(), and
+        _open_access_log(). Perl 5.005_03 does not support readline/
+        print/binmode/close via globref; the named glob string approach
+        works on Perl 5.005_03 and all later versions.
+      - lib/HTTP/Handy.pm: add missing =head1 AUTHOR section (the author
+        line was present but lacked the =head1 heading; MetaCPAN requires
+        a proper =head1 AUTHOR section to populate the author sidebar).
+
 1.04  2026-04-04 JST (Japan Standard Time)
 
     Fixes:

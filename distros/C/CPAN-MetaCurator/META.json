@@ -55,6 +55,7 @@
             "Moo" : "2.005005",
             "Path::Tiny" : "0.146",
             "Pod::Usage" : "2.03",
+            "Syntax::Keyword::Match" : "0.15",
             "Text::Balanced" : "2.07",
             "Text::CSV::Encoded" : "0.25",
             "Types::Standard" : "2.006",
@@ -62,7 +63,7 @@
             "lib" : "0.65",
             "open" : "1.13",
             "parent" : "0.242",
-            "perl" : "5.36",
+            "perl" : "v5.40.0",
             "strict" : "1.12",
             "warnings" : "1.58"
          }
@@ -89,6 +90,6 @@
          "web" : "https://github.com/ronsavage/CPAN-MetaCurator"
       }
    },
-   "version" : "1.15",
+   "version" : "1.17",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -18,13 +18,18 @@ no_index:
   directory:
     - t
     - inc
+    - eg
+    - examples
+    - share
+    - xt
 requires:
-  Software::License: '0'
+  Software::License: '0.104007'
   perl: '5.012000'
 resources:
   bugtracker: https://github.com/ryoskzypu/Software-License-MIT_0/issues
   repository: https://github.com/ryoskzypu/Software-License-MIT_0.git
-version: v1.0.0
+version: v1.0.1
 x_contributors:
   - 'ryoskzypu <ryoskzypu@proton.me>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_spdx_expression: MIT-0

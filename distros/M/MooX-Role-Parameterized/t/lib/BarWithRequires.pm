@@ -1,5 +1,6 @@
 package BarWithRequires;
 
+use v5.12;
 use MooX::Role::Parameterized;
 
 role {

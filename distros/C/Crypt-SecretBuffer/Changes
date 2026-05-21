@@ -1,3 +1,16 @@
+Version 0.024 - 2026-05-05
+  - New append_console_line features: timeout, state, utf8
+  - buf->len is now available as an alias for buf->length
+  - scan (and Span methods) now can parse regex charclasses \w, \s, \d,
+    \W, \S, \D without [] brackets, and '.'
+  - Further semi-breaking change related to secret_buffer_parse: the
+    secret_buffer_transcode second parameter is now a secret_buffer_parse_rw
+    which requires edits to any C code that was directly compiling against
+    SecretBuffer.h.  However, runtime linking is unaffected because it is
+    binary-compatible with the previous.
+  - New bundled version of inc/ExtUtils/CFeatureTest.pm
+  - Added disclaimers about constant-time memcmp, scan, and Span->cmp
+
 Version 0.023 - 2026-04-05
   - Fix 5.8 compat
   - Documentation fix on ->append and ->assign

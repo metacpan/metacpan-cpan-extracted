@@ -7,11 +7,11 @@ use parent 'App::Test::Generator::Mutation::Base';
 use App::Test::Generator::Mutant;
 use PPI;
 
-our $VERSION = '0.33';
+our $VERSION = '0.38';
 
 =head1 VERSION
 
-Version 0.33
+Version 0.38
 
 =cut
 
@@ -29,6 +29,30 @@ my %FLIP = (
 	'==' => [ '!=' ],
 	'!=' => [ '==' ],
 );
+
+=head2 applies_to
+
+Returns true if the document contains any comparison operators that this
+mutator can target (C<E<gt>>, C<E<lt>>, C<E<gt>=>, C<E<lt>=>, C<==>,
+C<!=>).
+
+=cut
+
+sub applies_to {
+	my ($self, $doc) = @_;
+	my $ops = $doc->find('PPI::Token::Operator') || [];
+	for my $op (@{$ops}) {
+		next unless exists $FLIP{$op->content()};
+		my $next_sib = $op->next_sibling();
+		next if $next_sib && $next_sib->isa('PPI::Token::Symbol');
+		my $parent = $op->parent();
+		next unless $parent->isa('PPI::Statement')
+			|| $parent->isa('PPI::Structure::Condition')
+			|| $parent->isa('PPI::Structure::Block');
+		return 1;
+	}
+	return 0;
+}
 
 =head2 mutate
 
@@ -133,7 +157,7 @@ sub mutate {
 
 		# Only mutate operators that are direct children of
 		# a condition or expression, not list arguments
-		my $parent = $op->parent;
+		my $parent = $op->parent();
 		next unless $parent->isa('PPI::Statement')
 			|| $parent->isa('PPI::Structure::Condition')
 			|| $parent->isa('PPI::Structure::Block');
@@ -145,7 +169,6 @@ sub mutate {
 
 		# Generate one mutant per flip of this operator
 		for my $change (@{ $FLIP{$original} }) {
-
 			# Build a unique id from location and the specific flip
 			# so multiple operators on the same line don't collide
 			my $id = "NUM_BOUNDARY_${line}_${col}_${change}";
@@ -187,10 +210,10 @@ sub mutate {
 				);
 			};
 
-			# If Mutant construction fails, report clearly rather than
+			# If the Mutant construction fails, report clearly rather than
 			# silently dropping the mutant from the results
 			if($@ || !$mutant) {
-				warn "Failed to construct mutant $id: $@\n" if $@;
+				warn "Failed to construct mutant $id: $@" if $@;
 				next;
 			}
 

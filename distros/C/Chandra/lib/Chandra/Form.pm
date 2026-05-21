@@ -5,7 +5,7 @@ use warnings;
 
 use Chandra ();
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 1;
 
@@ -349,16 +349,16 @@ Get or set the form submit action handler.
 
 The generated HTML uses these CSS classes for styling:
 
-    .chandra-form              — the <form> element
-    .chandra-field             — wrapper <div> around each field
-    .chandra-field-checkbox    — checkbox field wrapper
-    .chandra-field-radio       — radio group wrapper
-    .chandra-field-submit      — submit button wrapper
-    .chandra-label             — <label> elements
-    .chandra-submit            — submit <button>
-    .chandra-error             — error message <span>
-    .chandra-group             — <fieldset> from group()
-    .chandra-radio-option      — individual radio <div>
+    .chandra-form              - the <form> element
+    .chandra-field             - wrapper <div> around each field
+    .chandra-field-checkbox    - checkbox field wrapper
+    .chandra-field-radio       - radio group wrapper
+    .chandra-field-submit      - submit button wrapper
+    .chandra-label             - <label> elements
+    .chandra-submit            - submit <button>
+    .chandra-error             - error message <span>
+    .chandra-group             - <fieldset> from group()
+    .chandra-radio-option      - individual radio <div>
 
 =head1 SEE ALSO
 

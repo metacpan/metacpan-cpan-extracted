@@ -9,6 +9,14 @@
 
 #if defined(LTC_GCM_MODE) || defined(LTC_LRW_MODE)
 #if defined(LTC_GCM_PCLMUL)
+
+#define LTC_GCM_PCLMUL_TARGET LTC_TARGET("pclmul,ssse3")
+
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
+#pragma GCC diagnostic ignored "-Wdeclaration-after-statement"
+#endif
 #if defined(_MSC_VER)
 #include <intrin.h>
 #else
@@ -17,28 +25,42 @@
 #include <wmmintrin.h>
 #include <smmintrin.h>
 #include <emmintrin.h>
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
+
+#if !defined (LTC_S_X86_CPUID)
+#define LTC_S_X86_CPUID
+static LTC_INLINE void s_x86_cpuid(int* regs, int leaf)
+{
+#if defined _MSC_VER
+   __cpuid(regs, leaf);
+#else
+   int a, b, c, d;
+
+   a = leaf;
+   b = c = d = 0;
+   asm volatile ("cpuid"
+       :"=a"(a), "=b"(b), "=c"(c), "=d"(d)
+       :"a"(a), "c"(c)
+   );
+   regs[0] = a;
+   regs[1] = b;
+   regs[2] = c;
+   regs[3] = d;
+#endif
+}
+#endif /* LTC_S_X86_CPUID */
 
 static LTC_INLINE int s_pclmul_is_supported(void)
 {
    static int initialized = 0, is_supported = 0;
 
    if (initialized == 0) {
-      /* Test CPUID.1.0.ECX[1]
-       * EAX = 1, ECX = 0 */
-#if defined(_MSC_VER)
-      int cpuInfo[4];
-      __cpuid(cpuInfo, 1);
-      is_supported = ((cpuInfo[2] >> 1) & 1);
-#else
-      int a = 1 , b, c = 0, d;
-
-      asm volatile ("cpuid"
-           :"=a"(a), "=b"(b), "=c"(c), "=d"(d)
-           :"a"(a), "c"(c)
-          );
-
-      is_supported = ((c >> 1) & 1);
-#endif
+      int regs[4];
+      s_x86_cpuid(regs, 1);
+      /* Test CPUID.1.0.ECX[1] (PCLMUL) and CPUID.1.0.ECX[9] (SSSE3) */
+      is_supported = ((regs[2] >> 1) & 1) && ((regs[2] >> 9) & 1);
       initialized = 1;
    }
 
@@ -113,13 +135,17 @@ static void s_gcm_gf_mult_pclmul(const unsigned char *a, const unsigned char *b,
 #endif /* defined(LTC_GCM_PCLMUL) */
 
 #if defined(LTC_GCM_PMULL)
+
+#define LTC_GCM_PMULL_TARGET LTC_TARGET("+crypto")
+
 #if defined(__GNUC__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wbad-function-cast"
-#pragma GCC diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wcast-align"
 #pragma GCC diagnostic ignored "-Wmissing-braces"
-#pragma GCC diagnostic ignored "-Wsign-compare"
 #pragma GCC diagnostic ignored "-Wshadow"
+#pragma GCC diagnostic ignored "-Wsign-compare"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif
 #include <arm_neon.h>
 #if defined(__GNUC__)
@@ -465,4 +491,15 @@ void gcm_gf_mult(const unsigned char *a, const unsigned char *b, unsigned char *
 
 
 #endif
+
+int gcm_hw_pmul_is_supported(void)
+{
+#if defined(LTC_GCM_PCLMUL_TARGET)
+   return s_pclmul_is_supported();
+#elif defined(LTC_GCM_PMULL_TARGET)
+   return s_pmull_is_supported();
+#else
+   return 0;
+#endif
+}
 

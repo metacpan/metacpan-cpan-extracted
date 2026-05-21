@@ -1,5 +1,5 @@
-#ifndef UU_TYPE_H
-#define UU_TYPE_H
+#ifndef ULIB__TYPE_H
+#define ULIB__TYPE_H
 
 #ifndef PERL_VERSION
 # undef SUBVERSION /* OS/390 */
@@ -65,7 +65,7 @@
  *
  * U64 made available outside core in 5.27.7.
 */
-#if PERL_VERSION_LT(5, 27, 7)
+#ifndef U64
 #  ifdef U64TYPE
      typedef U64TYPE U64;
 #  else
@@ -131,46 +131,84 @@ typedef unsigned char UCHAR;
 #define CC_ROUNDS   20
 
 typedef struct {
-  U32           state[CC_STATESZ];
-  UCHAR         buf[CC_BUFSZ];
-  U16           have;
-  unsigned int  pid;
-  U64           __align;
-} cc_st;
+  U32    state[CC_STATESZ];
+  UCHAR  buf[CC_BUFSZ];
+  U16    have;
+  U64    __align;
+} chacha_t;
+
+/* not including trailing null */
+#define MAX_PERSIST_LEN  512 - sizeof(UV) - 1
 
 typedef struct {
-  char    *path;
-  STRLEN  len;
-} struct_pathlen_t;
+  STRLEN  len; /* not including trailing null, so <= MAX_PERSIST_LEN */
+  UCHAR   path[MAX_PERSIST_LEN];
+} persist_t;
+
+#if defined(HAVE_SRWLOCK)
+typedef SRWLOCK              uu_lock_t;
+#elif defined(USE_WIN32_ALIEN) || defined(USE_WIN32_NATIVE)
+typedef CRITICAL_SECTION     uu_lock_t;
+#elif defined(__OpenBSD__)
+typedef uint32_t             uu_lock_t;
+#elif defined(__APPLE__) && defined(HAVE_DISPATCH_DISPATCH_H)
+typedef dispatch_semaphore_t uu_lock_t;
+#else
+typedef sem_t                uu_lock_t;
+#endif
+
+typedef struct {
+  uu_lock_t         LOCK;               /*   ?? bytes (on Linux) */
+  U8                __pad0[64 - sizeof(uu_lock_t)];
+  /* -- 64 bytes -- */
+  struct timeval    clock_last;         /*   16 bytes (8 on win32) */
+  U64               clock_prev_reg;     /*    8 bytes */
+  U64               clock_defer_100ns;  /*    8 bytes */
+  I16               clock_adj;          /*    2 bytes */
+  U16               clock_seq;          /*    2 bytes */
+  U8                __pad1[64 - 20 - sizeof(struct timeval)];
+  /* -- 64 bytes -- */
+  U64               gen_epoch;          /*    8 bytes */
+  U8                gen_node[6];        /*    6 bytes */  /* need 64bit align */
+  U16               gen_has_real_node;  /*    2 bytes */
+  U8                gen_real_node[6];   /*    6 bytes */  /* need 64bit align */
+  U16               gen_use_unique;     /*    2 bytes */
+  U8                __pad2[64 - 24];
+  /* -- 64 bytes -- */
+  chacha_t          cc;                 /* 1104 bytes */  /* aligned 64bit */
+  U64               xo_s[4];            /*   32 bytes */
+  U64               sm_x;               /*    8 bytes */
+  U8                __pad3[1152 - 40 - sizeof(chacha_t)];
+  /* -- 18 * 64 bytes -- */
+  persist_t         clock_persist;      /*  512 bytes */
+  /* -- 8 * 64 bytes -- */
+} shared_mem_t;
 
 /* this should be aligned at least 4 bytes, better yet 16 */
 typedef U8 uu_t[16];
 
 typedef struct {
-  U64               xo_s[4];
-  U64               sm_x;
-  U64               gen_epoch;
-  U8                gen_node[6];  /* need 64bit align */
-  U16               __align;
-  U8                gen_real_node[6];  /* need 64bit align */
-  void              (*myU2time)(pTHX_ UV ret[2]);
-  int               gen_has_real_node;
-  int               gen_use_unique;
-  cc_st             cc;  /* aligned 64bit */
-  int               clock_state_fd;
-  FILE              *clock_state_f;
-  struct_pathlen_t  clock_pathlen;
-  int               clock_adj;
-  struct timeval    clock_last;
-  U16               clock_seq;
-  UV                thread_id;
-  U64               clock_defer_100ns;
-  U64               clock_prev_reg;
+  shared_mem_t      *shared;            /*    8 bytes */
+  IV                shared_len;         /*    8 bytes */
+  FILE              *clock_state_f;     /*    8 bytes */
+  I32               clock_state_fd;     /*    4 bytes */
+  U8                __pad5[64 - 4 - sizeof(shared_mem_t*) - sizeof(IV) - sizeof(FILE*)];
+  /* -- 64 bytes -- */
+  persist_t         clock_persist;      /*  512 bytes */
+  /* -- 8 * 64 bytes -- */
 } my_cxt_t;
+/*} __attribute__ ((aligned (64))) my_cxt_t;
+*
+*   Align 64 bytes vs 8.
+*
+*   It's a toss-up as to whether this helps -- faster some places,
+*   slower others.
+*/
 
+/* no *UCXT_ variants, just use a comma */
 #define pUCXT pTHX_ my_cxt_t *my_cxtp
 #define aUCXT aTHX_ my_cxtp
 #define UCXT  (*my_cxtp)
 
 #endif
-/* ex:set ts=2 sw=2 itab=spaces */
+/* ex:set ts=2 sw=2 itab=spaces: */

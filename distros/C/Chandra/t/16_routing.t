@@ -226,7 +226,7 @@ use_ok('Chandra::App');
     $app->route('/' => sub { 'home' });
     $app->route('/about' => sub { 'about' });
 
-    # Not started yet — navigate just stores the route
+    # Not started yet - navigate just stores the route
     $app->navigate('/about');
     is($app->{_current_route}, '/about', 'navigate sets _current_route');
 }

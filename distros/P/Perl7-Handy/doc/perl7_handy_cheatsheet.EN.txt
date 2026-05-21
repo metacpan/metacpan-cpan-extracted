@@ -1,0 +1,179 @@
+======================================================================
+ Perl7::Handy Cheat Sheet                                [EN] English
+======================================================================
+
+[ 1. Installation and usage ]
+
+  Install:
+    cpan Perl7::Handy
+
+  Use in your script:
+    use Perl7::Handy;
+
+  Effect (Perl 5.010001 and later):
+    * use strict          -- enforces strict variable declarations
+    * use warnings        -- enables warnings
+    * no bareword::filehandles -- rejects open(FILE, ...) style
+    * no multidimensional  -- disables $hash{a,b} emulation
+    * use feature qw(signatures)  (Perl 5.020+)
+    * no feature qw(indirect)     (Perl 5.031009+)
+
+  Effect (Perl 5.005_03 -- 5.008):
+    * use strict
+    * open/opendir/sysopen/pipe/socket/accept with autovivification
+    # socket() does not autodie on failure (returns false in void context)
+    * tie-based $; trap for multidimensional arrays
+
+[ 2. open() -- autovivification, no bareword ]
+
+  # Correct: lexical variable receives a GLOB reference
+  my $fh;
+  open($fh, "< file.txt");   # read
+  open($fh, "> file.txt");   # write (truncate)
+  open($fh, ">> file.txt");  # append
+  open($fh, "+< file.txt");  # read/write
+
+  while (my $line = readline($fh)) { ... }
+  print $fh "text\n";
+  close($fh);
+
+  # Rejected: bareword filehandle
+  open(FILE, "< file.txt");   # dies: Use of bareword handle in open
+
+[ 3. open() -- 3-argument form ]
+
+  my $fh;
+  open($fh, '<',  "file.txt");   # read     (sysopen O_RDONLY)
+  open($fh, '>',  "file.txt");   # write    (sysopen O_WRONLY|O_TRUNC|O_CREAT)
+  open($fh, '>>', "file.txt");   # append   (sysopen O_WRONLY|O_APPEND|O_CREAT)
+  open($fh, '+<', "file.txt");   # read/write
+  open($fh, '+>', "file.txt");   # read/write truncate
+  open($fh, '-|', "cmd");        # pipe from command
+  open($fh, '|-', "cmd");        # pipe to command
+
+  # 3-argument open uses CORE::sysopen internally.
+  # Filename is never parsed for mode characters.
+
+[ 4. opendir(), sysopen() ]
+
+  my $dh;
+  opendir($dh, "/path/to/dir");
+  while (my $e = readdir($dh)) {
+      next if $e eq '.' or $e eq '..';
+      print "$e\n";
+  }
+  closedir($dh);
+
+  use Fcntl qw(O_RDONLY O_WRONLY O_CREAT O_TRUNC);
+  my $fh;
+  sysopen($fh, "file.txt", O_RDONLY);
+  sysopen($fh, "file.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+
+[ 5. pipe() ]
+
+  my($reader, $writer);
+  pipe($reader, $writer);
+
+  if (my $pid = fork()) {
+      close($writer);
+      while (my $line = readline($reader)) { print $line }
+      close($reader);
+  } else {
+      close($reader);
+      print $writer "hello from child\n";
+      close($writer);
+      exit 0;
+  }
+
+[ 6. socket() and accept() ]
+
+  use Socket qw(AF_INET SOCK_STREAM sockaddr_in inet_aton);
+
+  my $server;
+  socket($server, AF_INET, SOCK_STREAM, 0);
+  # Note: socket() does not autodie on failure; check return value explicitly.
+
+  my $client;
+  accept($client, $server);
+
+[ 7. no bareword::filehandles (Perl 5.010001+) ]
+
+  # Any use of bareword filehandles raises a compile-time error:
+  open(FILE, "< file.txt");    # error: Bareword filehandle
+  print FILE "hello\n";        # error: Bareword filehandle
+  close(FILE);                 # error: Bareword filehandle
+
+  # Always use lexical variables:
+  my $fh;
+  open($fh, "< file.txt");
+  print $fh "hello\n";
+  close($fh);
+
+[ 8. no multidimensional (Perl 5.010001+) ]
+
+  # Old Perl multidimensional hash emulation is disabled:
+  my %h;
+  $h{1,2} = "val";    # error: Use of multidimensional array emulation
+
+  # Use explicit key construction instead:
+  $h{"1\x1c2"} = "val";   # explicit $; separator
+  $h{"$x,$y"}  = "val";   # string key
+
+[ 9. Subroutine signatures (Perl 5.020+) ]
+
+  use Perl7::Handy;
+
+  sub greet($name) {
+      return "Hello, $name!";
+  }
+
+  sub add($x, $y) {
+      return $x + $y;
+  }
+
+  # Automatically enabled: use feature qw(signatures)
+  # Warnings suppressed:   no warnings qw(experimental::signatures)
+
+[ 10. no feature qw(indirect) (Perl 5.031009+) ]
+
+  # Indirect object syntax is disabled:
+  my $obj = new MyClass;   # error: indirect syntax
+
+  # Use direct syntax:
+  my $obj = MyClass->new;
+
+[ 11. CVE-2016-1238: removes "." from @INC ]
+
+  # Perl7::Handy removes the current directory from the module
+  # search path at startup, preventing relative-path injection.
+  # BEGIN { pop @INC if $INC[-1] eq '.' }
+
+[ 12. Compatibility matrix ]
+
+  Feature                     Perl 5.005_03  5.006-5.009  5.010+  5.020+  5.031009+
+  --------------------------  -------------  -----------  ------  ------  ---------
+  use strict                  yes            yes          yes     yes     yes
+  use warnings                no             yes          yes     yes     yes
+  autovivification open()     yes            yes          yes*    yes*    yes*
+  no bareword::filehandles    emulated       emulated     yes     yes     yes
+  no multidimensional         tie-based      tie-based    yes     yes     yes
+  signatures                  no             no           no      yes     yes
+  no indirect                 no             no           no      no      yes
+
+  (*) On 5.010+, bareword::filehandles handles this natively.
+
+[ 13. Official resources ]
+
+  Perl7::Handy on MetaCPAN:
+    https://metacpan.org/dist/Perl7-Handy
+
+  bareword::filehandles:
+    https://metacpan.org/dist/bareword-filehandles
+
+  multidimensional:
+    https://metacpan.org/dist/multidimensional
+
+  INABA Hitoshi (ina) on CPAN:
+    https://metacpan.org/author/INA
+
+======================================================================

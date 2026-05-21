@@ -1,12 +1,14 @@
 package Net::Statsd::Lite;
 
-# ABSTRACT: A lightweight StatsD client that supports multimetric packets
+# ABSTRACT: A StatsD client that supports multimetric packets
 
 use v5.20;
 
 use Moo 1.000000;
 
+use Carp qw/ croak /;
 use Devel::StrictMode;
+use Digest::SHA 5.96 qw/ hmac_sha256_base64 /;
 use IO::Socket 1.18 ();
 use MooX::TypeTiny;
 use Ref::Util qw/ is_plain_hashref /;
@@ -14,7 +16,7 @@ use Scalar::Util qw/ refaddr /;
 use Sub::Quote qw/ quote_sub /;
 use Sub::Util 1.40 qw/ set_subname /;
 use Types::Common 2.000000 qw/ Bool Enum InstanceOf Int IntRange NonEmptySimpleStr
-  NumRange PositiveInt PositiveOrZeroInt PositiveOrZeroNum SimpleStr StrMatch
+  NumRange PositiveInt PositiveOrZeroInt PositiveOrZeroNum SimpleStr StrMatch Value
   /;
 
 use namespace::autoclean;
@@ -22,9 +24,10 @@ use namespace::autoclean;
 use experimental qw/ signatures /;
 
 # RECOMMEND PREREQ: Ref::Util::XS
+# RECOMMEND PREREQ: Socket 2.026
 # RECOMMEND PREREQ: Type::Tiny::XS
 
-our $VERSION = 'v0.8.0';
+our $VERSION = 'v0.10.2';
 
 
 has host => (
@@ -78,10 +81,19 @@ has _socket => (
             PeerAddr => $self->host,
             PeerPort => $self->port,
             Proto    => $self->proto,
-        ) or die "Failed to initialize socket: $!";
+        ) or croak "Failed to initialize socket: $!";
         return $sock;
     },
     handles => { _send => 'send' },
+);
+
+
+has secure_set_key => (
+    is        => 'lazy',
+    isa       => Value,
+    builder   => sub($self) {
+        croak "secure_set_key has not been set";
+    },
 );
 
 
@@ -164,8 +176,16 @@ sub decrement( $self, $metric, $opts = undef ) {
     $self->counter( $metric, -1, $opts );
 }
 
+sub secure_set_add( $self, $metric, $value, $opts = undef ) {
+    $self->set_add( $metric, hmac_sha256_base64( $value, $self->secure_set_key ), $opts );
+}
+
 
 sub record_metric( $self, $suffix, $metric, $value, $ ) {
+
+    croak "malformed suffix" if $suffix =~ /[\n]/;
+    croak "malformed metric" if $metric =~ /[\N{U+00}-\N{U+1f}:|]/;
+    croak "malformed value"  if $value  =~ /[\N{U+00}-\N{U+1f}:|]/;
 
     my $data = $self->prefix . $metric . ':' . $value . $suffix . "\n";
 
@@ -214,13 +234,15 @@ __END__
 
 =encoding UTF-8
 
+=for stopwords CloudWatch DogStatsd UDP multimetric compatability StatsD statsd
+
 =head1 NAME
 
-Net::Statsd::Lite - A lightweight StatsD client that supports multimetric packets
+Net::Statsd::Lite - A StatsD client that supports multimetric packets
 
 =head1 VERSION
 
-version v0.8.0
+version v0.10.2
 
 =head1 SYNOPSIS
 
@@ -230,13 +252,16 @@ version v0.8.0
       prefix          => 'myapp.',
       autoflush       => 0,
       max_buffer_size => 8192,
+      secure_set_key  => 'MySecretKey!',
     );
 
     ...
 
     $stats->increment('this.counter');
 
-    $stats->set_add( 'this.users', $username ) if $username;
+    $stats->set_add( 'this.users', $user->id ) if $user;
+
+    $stats->secure_set_add( 'this.session', $session->id );
 
     $stats->timing( $run_time * 1000 );
 
@@ -244,7 +269,7 @@ version v0.8.0
 
 =head1 DESCRIPTION
 
-This is a small StatsD client that supports the
+This is a StatsD client that supports the
 L<StatsD Metrics Export Specification v0.1|https://github.com/b/statsd_spec>.
 
 It supports the following features:
@@ -262,6 +287,10 @@ It supports the meter and histogram metric types.
 =item *
 
 It can extended to support extensions such as tagging.
+
+=item *
+
+It supports a L</secure_set_key> method for logging sensitive data.
 
 =back
 
@@ -308,6 +337,15 @@ packet.
 =head2 C<max_buffer_size>
 
 Specifies the maximum buffer size. It defaults to C<512>.
+
+=head2 secure_set_key
+
+This is the key used by the L</secure_set_add> method.
+It must be initialized if that feature will be used.
+
+Note that if this is being used in a multi-process environment, then ensure that it is initialised before forking, or that the constructor specifies a secret key.
+If this is being used in a multi-host environment, then all hosts should use the same secret key.
+Otherwise the statistics for the sets may be multiplied by the number of workers and hosts.
 
 =head1 METHODS
 
@@ -406,7 +444,20 @@ L</timing> for the same effect.
   $stats->set_add( $metric, $string, $opts );
 
 This adds the the C<$string> to a set, for logging the number of
-unique things, e.g. IP addresses or usernames.
+unique things, e.g. IP addresses or user ids.
+
+Use L</secure_set_add> for logging sensitive information.
+
+=head2 C<secure_set_add>
+
+  $stats->secure_set_add( $metric, $string, $opts );
+
+This is a variant of L</set_add> that hashes the value with the HMAC-SHA-256 algorithm before adding it,
+which allows logging of sensitive information such as session ids or email addresses.
+
+Note that if the L</secure_set_key> is inconsistent across processes or even hosts, then the statistics will be inaccurate.
+
+The hashing algorithm may change in future versions.
 
 =head2 record_metric
 
@@ -451,11 +502,11 @@ tagging can be added using something like
       $self->$next( $suffix, $metric, $value, $opts );
   };
 
-=head1 SUPPORT FOR OLDER PERL VERSIONS
+=head1 SECURITY CONSIDERATIONS
 
-Since v0.8.0, the this module requires Perl v5.20 or later.
+When using the L</set_add> method, be wary of exposing sensitive information like IP addresses, usernames, email addresses or even session ids over insecure channels.  Use the L</secure_set_add> method instead.
 
-Future releases may only support Perl versions released in the last ten years.
+When generating metric names based on untrusted sources (such as HTTP requests), ensure that the metrics contain only printable characters and do not contain colons (":") or pipes ("|"), since these are used by the statsd protocol.
 
 =head1 SEE ALSO
 
@@ -468,9 +519,16 @@ L<https://github.com/b/statsd_spec>
 =head1 SOURCE
 
 The development version is on github at L<https://github.com/robrwo/Net-Statsd-Lite>
-and may be cloned from L<git://github.com/robrwo/Net-Statsd-Lite.git>
+and may be cloned from L<https://github.com/robrwo/Net-Statsd-Lite.git>
 
-=head1 BUGS
+=head1 SUPPORT
+
+Only the latest version of this module will be supported.
+
+This module requires Perl v5.20 or later.
+Future releases may only support Perl versions released in the last ten (10) years.
+
+=head2 Reporting Bugs and Submitting Feature Requests
 
 Please report any bugs or feature requests on the bugtracker website
 L<https://github.com/robrwo/Net-Statsd-Lite/issues>
@@ -479,9 +537,14 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head2 Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website. Please see F<SECURITY.md> for instructions how to
+report security vulnerabilities
+
 =head1 AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 The initial development of this module was sponsored by Science Photo
 Library L<https://www.sciencephoto.com>.
@@ -504,7 +567,7 @@ Toby Inkster <tobyink@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018-2024 by Robert Rothenberg.
+This software is Copyright (c) 2018-2026 by Robert Rothenberg.
 
 This is free software, licensed under:
 

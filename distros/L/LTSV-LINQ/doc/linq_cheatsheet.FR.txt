@@ -140,10 +140,15 @@
   ->ToLookup(sub { $_[0]{dept} })
   ->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} })
   ->ToLTSV('output.ltsv')
+  ->ToLTSV('output.ltsv',              # label_order: specify output label order
+      label_order => [qw(host status bytes url)])
+  ->ToLTSV('output.ltsv',              # headers: alias for label_order (CSV-LINQ interop)
+      headers => [qw(host status bytes url)])
 
   ToDictionary retourne un hashref key=>element.
     ToLookup retourne un hashref key=>[elements].
     ToLTSV écrit la séquence dans un fichier LTSV.
+    label_order spécifie l'ordre des étiquettes; headers en est l'alias (interop CSV-LINQ).
 
 [ 12. Ressources officielles (Official resources) ]
 

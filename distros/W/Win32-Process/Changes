@@ -1,6 +1,9 @@
 Revision history for Perl extension Win32::Process.
 
-0.17  Wed May 12 2021
+0.18    [2026-05-10]
+- Move repository to the perl-libwin32 GitHub organization [PR/9]
+
+0.17    [2021-05-12]
         - Move test file into t directory [PR#3].
           Thanks to Adam Herzog <adam@adamherzog.com>.
 

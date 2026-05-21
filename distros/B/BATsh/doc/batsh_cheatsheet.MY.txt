@@ -1,6 +1,30 @@
 BATsh Helaian Rujukan [MY] Bahasa Melayu
 ==========================================
 
+----------------------------------------------------------------------
+RINGKASAN
+  BATsh ialah penterjemah shell dwibahasa yang menjalankan sintaks
+  cmd.exe batch dan bash/sh dalam fail skrip yang sama, bertukar mod
+  secara automatik baris demi baris. Tiada shell luaran diperlukan.
+
+CONTOH CAMPURAN
+  :: Bahagian CMD (token pertama huruf besar)
+  @ECHO OFF
+  SET LANG=BATsh
+
+  # Bahagian SH (token pertama mengandungi huruf kecil)
+  greet() { echo "Helo $1 (mod bash)"; }
+  greet $LANG
+  result=$(echo $LANG | perl -e 'while(<STDIN>){chomp;print uc}')
+  echo "Huruf besar: $result"
+
+  :: Kembali ke CMD (baca hasil SH)
+  ECHO Kembali CMD: %result%
+
+  # Jalankan: perl lib/BATsh.pm script.batsh
+----------------------------------------------------------------------
+
+
 BATsh ialah shell dwibahasa yang menjalankan sintaks cmd.exe dan bash/sh
 dalam skrip yang sama. Token pertama setiap baris menentukan mod.
 

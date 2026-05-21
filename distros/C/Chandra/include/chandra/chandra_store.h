@@ -1,5 +1,5 @@
 /*
- * chandra_store.h — Persistent key-value storage for Chandra apps
+ * chandra_store.h - Persistent key-value storage for Chandra apps
  *
  * Storage: JSON file, default ~/.chandra/<name>/store.json
  * Features: dot-notation keys, atomic writes, flock concurrency safety
@@ -261,7 +261,7 @@ chandra_store_traverse(pTHX_ HV *data, const char *key, STRLEN klen,
 }
 
 /* ============================================================================
- * File I/O — save & reload
+ * File I/O - save & reload
  * ============================================================================ */
 
 static void
@@ -348,7 +348,7 @@ chandra_store_reload_c(pTHX_ HV *self_hv)
     path = SvPV_nolen(*path_svp);
 
     fh = fopen(path, "rb");
-    if (!fh) return;  /* File doesn't exist yet — start fresh */
+    if (!fh) return;  /* File doesn't exist yet - start fresh */
 
     fd = fileno(fh);
     flock(fd, LOCK_SH);
@@ -387,7 +387,7 @@ chandra_store_reload_c(pTHX_ HV *self_hv)
 }
 
 /* ============================================================================
- * Constructor helper — build default path from name
+ * Constructor helper - build default path from name
  * ============================================================================ */
 
 static SV *

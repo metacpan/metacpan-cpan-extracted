@@ -1,0 +1,5 @@
+drug_exposure_id	person_id	drug_concept_id	drug_exposure_start_date	drug_exposure_start_datetime	drug_exposure_end_date	drug_exposure_end_datetime	verbatim_end_date	drug_type_concept_id	stop_reason	refills	quantity	days_supply	sig	route_concept_id	lot_number	provider_id	visit_occurrence_id	visit_detail_id	drug_source_value	drug_source_concept_id	route_source_value	dose_unit_source_value
+26318	573	40213160	1960-04-09	"1960-04-09 00:00:00"	1960-04-09	"1960-04-09 00:00:00"	1960-04-09	581452		0	0	0		0	0	0	38004	0	10	40213160		
+60926	1332	40213198	2010-10-06	"2010-10-06 00:00:00"	2010-10-06	"2010-10-06 00:00:00"	2010-10-06	581452		0	0	0		0	0	0	88400	0	133	40213198		
+26418	576	40213260	2017-10-25	"2017-10-25 00:00:00"	2017-10-25	"2017-10-25 00:00:00"	2017-10-25	581452		0	0	0		0	0	0	38145	0	121	40213260		
+54785	4550	1118084	2000-11-13	"2000-11-13 00:00:00"	2000-11-13	"2000-11-13 00:00:00"	\N	38000177		0	0	0		0	0	0	303185	0	25152531	44923712		

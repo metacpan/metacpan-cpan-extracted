@@ -5,7 +5,7 @@ use EV;
 
 BEGIN {
     use XSLoader;
-    our $VERSION = '0.01';
+    our $VERSION = '0.02';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -21,13 +21,17 @@ sub creds_file {
     my $content = do { local $/; <$fh> };
     close $fh;
 
-    # NATS creds format: --- BEGIN USER JWT --- / jwt / --- END / --- BEGIN NKEY SEED --- / seed / --- END
-    if ($content =~ /-----BEGIN NATS USER JWT-----\s*\n\s*(\S+)\s*\n/) {
-        $self->jwt($1);
-    }
-    if ($content =~ /-----BEGIN USER NKEY SEED-----\s*\n\s*(\S+)\s*\n/) {
-        $self->nkey_seed($1);
-    }
+    # NATS .creds is two PEM-style blocks. Require both BEGIN+END markers.
+    my ($jwt) = $content =~
+        /-----BEGIN\s+NATS\s+USER\s+JWT-----\r?\n\s*(\S+)\s*\r?\n-+END\s+NATS\s+USER\s+JWT-+/;
+    my ($seed) = $content =~
+        /-----BEGIN\s+USER\s+NKEY\s+SEED-----\r?\n\s*(\S+)\s*\r?\n-+END\s+USER\s+NKEY\s+SEED-+/;
+
+    die "$path: missing NATS USER JWT block\n"        unless defined $jwt;
+    die "$path: missing USER NKEY SEED block\n"       unless defined $seed;
+
+    $self->jwt($jwt);
+    $self->nkey_seed($seed);
     $self;
 }
 
@@ -36,7 +40,7 @@ sub subscribe_max {
     my $sid = defined $queue_group
         ? $self->subscribe($subject, $cb, $queue_group)
         : $self->subscribe($subject, $cb);
-    $self->unsubscribe($sid, $max_msgs) if $max_msgs;
+    $self->unsubscribe($sid, $max_msgs) if $max_msgs && $max_msgs > 0;
     $sid;
 }
 
@@ -48,100 +52,78 @@ EV::Nats - High-performance asynchronous NATS client using EV
 
 =head1 SYNOPSIS
 
+    use EV;
     use EV::Nats;
 
     my $nats = EV::Nats->new(
         host       => '127.0.0.1',
         port       => 4222,
-        on_error   => sub { warn "nats error: @_" },
-        on_connect => sub { warn "connected to NATS" },
+        reconnect  => 1,
+        on_error   => sub { warn "nats: $_[0]\n" },
+        on_connect => sub { warn "connected\n" },
     );
 
-    # Subscribe
+    # Subscribe (plain or queue group)
     my $sid = $nats->subscribe('foo.>', sub {
-        my ($subject, $payload, $reply) = @_;
+        my ($subject, $payload, $reply, $headers) = @_;
         print "[$subject] $payload\n";
     });
+    $nats->subscribe('work.>', sub { ... }, 'workers');
 
-    # Subscribe with queue group
-    $nats->subscribe('worker.>', sub {
-        my ($subject, $payload, $reply) = @_;
-    }, 'workers');
-
-    # Publish
+    # Publish (fire-and-forget) and headered publish
     $nats->publish('foo.bar', 'hello world');
+    $nats->hpublish('foo.bar', "NATS/1.0\r\nX-Trace: 42\r\n\r\n", 'body');
 
-    # Request/reply
+    # Request / reply
     $nats->request('service.echo', 'ping', sub {
         my ($response, $err) = @_;
         die $err if $err;
         print "reply: $response\n";
-    }, 5000);  # 5s timeout
+    }, 5000);                       # 5s timeout
 
-    # Unsubscribe
     $nats->unsubscribe($sid);
-
     EV::run;
 
 =head1 DESCRIPTION
 
-EV::Nats is a high-performance asynchronous NATS client that implements
-the NATS client protocol in pure XS with L<EV> event loop integration.
-No external C NATS library is required.
+EV::Nats is an async NATS client that implements the protocol directly
+in XS on top of L<EV>. There is no external C library dependency.
 
-Features:
+=head2 Protocol
 
-=over
+Full NATS client protocol (PUB, SUB, UNSUB, MSG, HMSG, PING/PONG),
+including headered publish/receive, wildcard subjects (C<*>, C<E<gt>>),
+queue groups, and request/reply with an automatic shared inbox
+subscription.
 
-=item * Full NATS client protocol (PUB, SUB, UNSUB, MSG, HMSG)
+=head2 Connectivity
 
-=item * Request/reply with automatic inbox management
+TCP and Unix-domain sockets; TCP keepalive; connect timeout; auto
+reconnect with exponential backoff and jitter; subscription and
+auto-unsub state restored on reconnect; cluster failover from INFO
+C<connect_urls>; lame-duck-mode (leaf node graceful shutdown) callback;
+graceful C<drain>.
 
-=item * Queue group subscriptions for load balancing
+=head2 Auth
 
-=item * Wildcard subjects (C<*> and C<E<gt>>)
+Token, user/pass, NKey/JWT (Ed25519 via OpenSSL).
 
-=item * Headers support (HPUB/HMSG)
+=head2 TLS
 
-=item * Automatic PING/PONG keep-alive
+Optional, auto-detected at build time. STARTTLS-style upgrade after
+INFO; full hostname verification (DNS or IP literal) by default;
+opt-out C<tls_skip_verify>; custom CA via C<tls_ca_file>.
 
-=item * Automatic reconnection with subscription and queue group restore
+=head2 Performance
 
-=item * Fire-and-forget publish (no callback overhead)
+Write coalescing via C<ev_prepare> (one C<write()> per loop
+iteration); O(1) subscription lookup; per-publish allocation-free
+fast path; explicit C<batch> mode for tight loops; per-connection
+stats counters.
 
-=item * Token, user/pass authentication
+=head2 Higher-level APIs
 
-=item * TCP keepalive and connect timeout
-
-=item * Write coalescing via ev_prepare (batches writes per event loop iteration)
-
-=item * O(1) subscription lookup via hash table
-
-=item * Graceful drain (unsubscribe all, flush, then disconnect)
-
-=item * Server pool with cluster URL failover from INFO connect_urls
-
-=item * Optional TLS via OpenSSL (auto-detected at build time)
-
-=item * Reconnect jitter to prevent thundering herd
-
-=item * Per-connection stats counters (msgs/bytes in/out)
-
-=item * JetStream API (L<EV::Nats::JetStream>)
-
-=item * Key-Value store (L<EV::Nats::KV>)
-
-=item * Object store with chunking (L<EV::Nats::ObjectStore>)
-
-=item * NKey/JWT authentication (Ed25519 via OpenSSL)
-
-=item * Slow consumer detection with configurable threshold
-
-=item * Publish batching API (C<batch>)
-
-=item * Lame duck mode (leaf node graceful shutdown) notification
-
-=back
+L<EV::Nats::JetStream>, L<EV::Nats::KV>, L<EV::Nats::ObjectStore>.
 
 B<Note:> DNS resolution via C<getaddrinfo> is blocking. Use numeric IP
 addresses for latency-sensitive applications.
@@ -150,125 +132,190 @@ addresses for latency-sensitive applications.
 
 =head2 new(%options)
 
-Create a new EV::Nats instance. Connects automatically if C<host> is given.
+Create an EV::Nats instance. If C<host> or C<path> is supplied,
+connection is initiated immediately and the C<on_connect> callback
+fires once the CONNECT/PONG handshake completes.
 
     my $nats = EV::Nats->new(
-        host     => '127.0.0.1',
-        port     => 4222,
-        on_error => sub { die @_ },
+        host       => '127.0.0.1',
+        port       => 4222,
+        reconnect  => 1,
+        on_error   => sub { warn "nats: $_[0]\n" },
+        on_connect => sub { warn "ready\n" },
     );
 
-Options:
+=head3 Connection options
 
 =over
 
-=item host => 'Str'
+=item host => Str
 
-=item port => 'Int' (default 4222)
+Server hostname (numeric IP recommended; see L</CAVEATS>). When set,
+connection starts immediately.
 
-Server hostname and port. If C<host> is provided, connection starts
-immediately.
+=item port => Int (default 4222)
 
-=item on_error => $cb->($errstr)
+Server port.
 
-Error callback. Default: C<croak>.
+=item path => Str
 
-=item on_connect => $cb->()
+Unix-domain socket path. Mutually exclusive with C<host>.
 
-Called when connection is fully established (after CONNECT/PONG handshake).
+=item connect_timeout => Int (ms; 0 = none)
 
-=item on_disconnect => $cb->()
+How long to wait for the TCP/TLS handshake before giving up.
 
-Called on disconnect.
+=item keepalive => Int (seconds)
 
-=item user => 'Str'
+If set, enables C<SO_KEEPALIVE> with this idle interval.
 
-=item pass => 'Str'
+=item priority => Int (-2 .. +2)
 
-Username/password authentication. Values are JSON-escaped in the
-CONNECT command.
+L<EV> watcher priority for the I/O watchers on this connection.
 
-=item token => 'Str'
+=item loop => EV::Loop (default C<EV::default_loop>)
+
+The L<EV> loop to attach watchers to.
+
+=item name => Str
+
+Client name advertised in CONNECT.
+
+=back
+
+=head3 Auth options
+
+=over
+
+=item user => Str / pass => Str
+
+Username/password authentication. JSON-escaped in CONNECT.
+
+=item token => Str
 
 Token authentication.
 
-=item name => 'Str'
+=item nkey_seed => Str
 
-Client name sent in CONNECT.
+NATS NKey seed (the C<SU...> form). Requires the build to have
+OpenSSL (C<EV::Nats::HAS_NKEY>).
 
-=item verbose => $bool (default 0)
+=item jwt => Str
 
-Request +OK acknowledgments from server.
+User JWT, paired with C<nkey_seed> for decentralized auth. See also
+L</creds_file>.
 
-=item pedantic => $bool (default 0)
+=item tls => Bool / tls_ca_file => Str / tls_skip_verify => Bool
 
-Enable strict subject checking.
+See L</tls> for details.
 
-=item echo => $bool (default 1)
+=back
 
-Receive messages published by this client.
+=head3 Protocol options
 
-=item no_responders => $bool (default 0)
+=over
 
-Enable no-responders notification for requests.
+=item verbose => Bool (default 0)
 
-=item reconnect => $bool (default 0)
+Request C<+OK> acknowledgments after each command.
+
+=item pedantic => Bool (default 0)
+
+Server-side strict subject checking.
+
+=item echo => Bool (default 1)
+
+Receive messages this client itself publishes.
+
+=item no_responders => Bool (default 0)
+
+Ask the server to send a 503 status reply when a request has no
+responders, surfaced as the C<"no responders"> error in C<request>.
+
+=item ping_interval => Int (ms, default 120000; 0 = disabled)
+
+Client-initiated PING interval for keep-alive.
+
+=item max_pings_outstanding => Int (default 2)
+
+Maximum unacked PINGs before the connection is declared stale.
+
+=back
+
+=head3 Reconnect options
+
+=over
+
+=item reconnect => Bool (default 0)
 
 Enable automatic reconnection.
 
-=item reconnect_delay => $ms (default 2000)
+=item reconnect_delay => Int (ms, default 2000)
 
-Delay between reconnect attempts.
+Initial delay between reconnect attempts; subsequent attempts use
+exponential backoff with jitter, capped by C<max_reconnect_delay>.
 
-=item max_reconnect_attempts => $num (default 60)
+=item max_reconnect_delay => Int (ms, default 30000)
 
-Maximum reconnect attempts. 0 = unlimited.
+Upper bound on the backoff delay.
 
-=item connect_timeout => $ms
+=item max_reconnect_attempts => Int (default 60; 0 = unlimited)
 
-Connection timeout. 0 = no timeout.
+Give up after this many consecutive failures.
 
-=item ping_interval => $ms (default 120000)
+=back
 
-Interval for client-initiated PING. 0 = disabled.
+=head3 Callback options
 
-=item max_pings_outstanding => $num (default 2)
+All callbacks fire on the L<EV> loop, never inline.
 
-Max unanswered PINGs before declaring stale connection.
+=over
 
-=item priority => $num (-2 to +2)
+=item on_connect => sub { }
 
-EV watcher priority.
+Called after the CONNECT/PONG handshake completes.
 
-=item keepalive => $seconds
+=item on_disconnect => sub { }
 
-TCP keepalive interval.
+Called when the connection drops, before any auto-reconnect attempt.
 
-=item path => 'Str'
+=item on_error => sub { my ($err) = @_ }
 
-Unix socket path. Mutually exclusive with C<host>.
+Receives a string. If unset, errors C<croak>.
 
-=item loop => EV::Loop
+=item on_lame_duck => sub { }
 
-EV loop to use. Default: C<EV::default_loop>.
+Called once when the server signals lame-duck-mode shutdown via
+INFO C<ldm:true>.
+
+=item on_slow_consumer => sub { my ($pending_bytes) = @_ }
+
+See L</slow_consumer>.
 
 =back
 
 =head2 connect($host, [$port])
 
-Connect to NATS server. Port defaults to 4222.
+Initiate a TCP connection. Port defaults to 4222. Croaks if already
+connected or in the middle of connecting; otherwise returns
+immediately and signals completion via C<on_connect>.
 
 =head2 connect_unix($path)
 
-Connect via Unix domain socket.
+Initiate a Unix-domain-socket connection. Same async semantics as
+L</connect>.
 
 =head2 disconnect
 
-Graceful disconnect.
+Cancel any pending reconnect, drop queued writes, close the socket,
+and fire C<on_disconnect>. C<intentional_disconnect> is set so no
+auto-reconnect is scheduled. For a clean shutdown that flushes
+pending writes first, see L</drain>.
 
 =head2 is_connected
 
-Returns true if connected.
+True if the CONNECT/PONG handshake has completed and no disconnect
+or reconnect is in progress.
 
 =head2 publish($subject, [$payload], [$reply_to])
 
@@ -309,12 +356,15 @@ Callback receives:
 
 =head2 subscribe_max($subject, $cb, $max_msgs, [$queue_group])
 
-Subscribe and auto-unsubscribe after C<$max_msgs> messages in one call.
+Convenience: L</subscribe> followed by an auto-unsubscribe after
+C<$max_msgs> messages have been delivered.
 
 =head2 unsubscribe($sid, [$max_msgs])
 
-Unsubscribe. With C<$max_msgs>, auto-unsubscribes after receiving that many
-messages. Auto-unsub state is restored on reconnect. Alias: C<unsub>.
+Unsubscribe. With C<$max_msgs>, the server is told to deliver that
+many more messages and then drop the subscription. The auto-unsub
+state is restored on reconnect (so the partial count survives a
+disconnect). Alias: C<unsub>.
 
 =head2 request($subject, $payload, $cb, [$timeout_ms])
 
@@ -326,7 +376,9 @@ Request/reply. Uses automatic inbox subscription. Alias: C<req>.
         print "got: $response\n";
     }, 5000);
 
-Callback receives C<($response, $error)>. Error is set on timeout
+Callback receives C<($response, $error)>. For replies that include
+NATS message headers (HMSG), a third argument C<$headers> with the
+raw header block is also passed. Error is set on timeout
 ("request timeout") or no responders ("no responders").
 
 =head2 drain([$cb])
@@ -336,7 +388,13 @@ writes with a PING fence, fires C<$cb> when the server confirms with
 PONG, then disconnects. No new messages will be received after drain
 is initiated.
 
+C<$cb> receives a single argument: C<undef> on clean drain, or an error
+string (e.g. C<"disconnected">) if the connection dropped before the
+PONG arrived.
+
     $nats->drain(sub {
+        my ($err) = @_;
+        die "drain failed: $err" if $err;
         print "drained, safe to exit\n";
     });
 
@@ -344,30 +402,63 @@ is initiated.
 
 Send PING to server.
 
-=head2 flush
+=head2 flush([$cb])
 
 Send PING as a write fence; the subsequent PONG guarantees all prior
-messages were processed by the server.
+messages were processed by the server. If C<$cb> is given, it is invoked
+when the PONG arrives. The callback receives a single argument: C<undef>
+on success, or an error string (e.g. C<"disconnected">) if the connection
+dropped before the PONG arrived.
+
+=head2 creds_file($path)
+
+Read a NATS C<.creds> file and apply the embedded JWT and NKey seed
+via L</jwt> and L</nkey_seed>. Apply this BEFORE C<connect> so the
+credentials are available during the CONNECT handshake. Dies if the
+file is unreadable or missing either the C<USER JWT> or
+C<USER NKEY SEED> block.
+
+=head2 new_inbox
+
+Returns a fresh subject suitable for use as a private reply target
+(C<_INBOX.E<lt>randE<gt>.E<lt>nE<gt>>). Each call burns a slot from
+the same counter that L</request> uses, so manual subscribers must
+treat the returned subject as opaque.
+
+=head2 subscription_count
+
+Returns the number of currently-registered subscriptions, including
+the implicit C<_INBOX.E<gt>> subscription used by L</request>.
 
 =head2 server_info
 
-Returns raw INFO JSON string from server.
+Returns the raw JSON string of the most recent INFO frame received
+from the server (or C<undef> before the first INFO). Useful for
+inspecting C<server_id>, C<version>, C<cluster>, C<connect_urls>,
+etc.
 
 =head2 max_payload([$limit])
 
-Get/set max payload size.
+Server-advertised maximum payload size in bytes. Returns the current
+value; with an argument, overrides it (publishes above this croak
+locally before reaching the wire).
 
 =head2 waiting_count
 
-Number of writes queued locally (during connect/reconnect).
+Number of writes queued locally during connect or reconnect (i.e.
+C<publish>/C<request> calls made while the connection is not yet
+ready). They flush when the handshake completes.
 
 =head2 skip_waiting
 
-Cancel all waiting writes.
+Drop all queued writes without sending them. Useful before
+C<disconnect> if reconnect is enabled and you don't want stale
+publishes replayed.
 
 =head2 reconnect($enable, [$delay_ms], [$max_attempts])
 
-Configure reconnection.
+Configure reconnection. C<$delay_ms> and C<$max_attempts> are only
+written when supplied; omitted args leave the existing value unchanged.
 
 =head2 reconnect_enabled
 
@@ -414,45 +505,62 @@ C<$bytes_threshold> bytes, C<$cb> is called with the current buffer size.
 
 =head2 on_lame_duck([$cb])
 
-Get/set callback for lame duck mode. Fired when the server signals
-it's shutting down (leaf node / rolling restart). Use this to migrate
-to another server.
+Get/set the lame-duck callback. Fires once when the server signals
+shutdown (leaf node, rolling restart) via INFO C<ldm:true>. Use this
+to migrate work to another server before the grace period elapses.
 
 =head2 nkey_seed($seed)
 
-Set NKey seed for Ed25519 authentication (requires OpenSSL at build time).
-The seed is a base32-encoded NATS NKey. The server nonce from INFO is
-automatically signed during CONNECT.
-
-    $nats->nkey_seed('SUAM...');
-
-Or via constructor: C<nkey_seed =E<gt> 'SUAM...'>.
+Set the NKey seed (the C<SU...> base32-encoded form) for Ed25519
+authentication. Requires the build to have OpenSSL (see
+L<EV::Nats/HAS_NKEY>). The server nonce from INFO is automatically
+signed during CONNECT. May also be passed to L</new> as
+C<nkey_seed =E<gt> ...>.
 
 =head2 jwt($token)
 
-Set user JWT for authentication. Combined with C<nkey_seed> for
-NATS decentralized auth.
+Set the user JWT. Combine with L</nkey_seed> for NATS decentralized
+auth. May also be passed to L</new>. See L</creds_file> for the
+common case of loading both from a C<.creds> file.
+
+=head2 EV::Nats->nkey_generate_user_seed
+
+Class method. Returns a fresh, valid NATS User NKey seed (the
+C<SU...> form). Useful for tests and provisioning scripts that
+don't have the C<nk> CLI available. Requires C<HAS_NKEY>; croaks
+otherwise.
+
+=head2 EV::Nats->nkey_public_from_seed($seed)
+
+Class method. Derives the matching public key (the C<U...> form)
+from a User NKey seed. Croaks on an invalid seed. Pair with
+L</nkey_generate_user_seed> to provision the server with the public
+key while the client keeps the seed.
 
 =head2 tls($enable, [$ca_file], [$skip_verify])
 
-Configure TLS (requires OpenSSL at build time).
+Configure TLS. Requires OpenSSL at build time (see
+L<EV::Nats/HAS_TLS>).
 
     $nats->tls(1);                           # system CA
     $nats->tls(1, '/path/to/ca.pem');        # custom CA
     $nats->tls(1, undef, 1);                 # skip verification
 
-Or via constructor: C<tls =E<gt> 1, tls_ca_file =E<gt> $path>.
+When verification is enabled (the default), the server certificate's
+SAN must match either the resolved IP literal or the DNS hostname
+passed to L</connect>. May also be passed to L</new> as C<tls =E<gt> 1,
+tls_ca_file =E<gt> $path>.
 
 =head2 stats
 
-Returns a hash of connection statistics:
+Returns a hash of connection counters:
 
     my %s = $nats->stats;
-    # msgs_in, msgs_out, bytes_in, bytes_out
+    # ( msgs_in, msgs_out, bytes_in, bytes_out )
 
 =head2 reset_stats
 
-Reset all stats counters to zero.
+Zero all counters returned by L</stats>.
 
 =head2 on_error([$cb])
 
@@ -460,7 +568,23 @@ Reset all stats counters to zero.
 
 =head2 on_disconnect([$cb])
 
-Get/set handler callbacks.
+Get/set the corresponding callback at runtime. With no argument,
+returns the current value (or C<undef>). With an argument, replaces
+it; pass C<undef> to clear.
+
+=head1 BUILD-TIME FEATURES
+
+=over
+
+=item EV::Nats::HAS_TLS
+
+True if compiled with OpenSSL (TLS supported).
+
+=item EV::Nats::HAS_NKEY
+
+True if NKey/JWT signing is available (also requires OpenSSL).
+
+=back
 
 =head1 BENCHMARKS
 
@@ -471,7 +595,7 @@ Measured on Linux with TCP loopback, Perl 5.40, nats-server 2.12,
     PUB fire-and-forget         4.7M         5.0M msgs/sec
     PUB + SUB (loopback)        1.8M         1.6M msgs/sec
     PUB + SUB (8B payload)      2.2M         1.9M msgs/sec
-    REQ/REP (pipelined, 128)    334K               msgs/sec
+    REQ/REP (pipelined, 64)     334K               msgs/sec
 
 Connected-path publish appends directly to the write buffer with no
 per-message allocation. Write coalescing via C<ev_prepare> batches
@@ -510,6 +634,23 @@ addresses for latency-sensitive applications.
 =item * The module handles all data as bytes. Encode UTF-8 strings before
 passing them.
 
+=item * Do not let the C<EV::Nats> instance go out of scope (or be
+explicitly C<undef>-ed) from inside a callback while that callback is
+still executing. The callback closure normally references C<$nats>
+(via C<< $nats->publish(...) >> etc.), which keeps it alive; if you
+write a callback that does not capture C<$nats> and you C<undef> the
+last outer reference inside that callback, Perl will run C<DESTROY>
+mid-callback and free the underlying state. Any subsequent operation
+on C<$nats> in that callback is undefined behavior.
+
+=item * Cluster URL discovery (the C<connect_urls> field of INFO) is
+trusted by default. On failover the client connects to whatever
+hostnames the previous server advertised, and TLS hostname verification
+is performed against those names. Use a private CA (C<tls_ca_file>) to
+restrict which certificates are acceptable, or do not enable C<tls> on
+public-CA topologies where any holder of a valid cert could redirect
+clients.
+
 =back
 
 =head1 ENVIRONMENT
@@ -525,8 +666,10 @@ Set these to run the test suite against a NATS server
 
 =head1 SEE ALSO
 
-L<EV>, L<NATS protocol|https://docs.nats.io/reference/reference-protocols/nats-protocol>,
-L<nats-server|https://github.com/nats-io/nats-server>
+L<EV::Nats::JetStream>, L<EV::Nats::KV>, L<EV::Nats::ObjectStore>,
+L<EV>,
+L<NATS protocol|https://docs.nats.io/reference/reference-protocols/nats-protocol>,
+L<nats-server|https://github.com/nats-io/nats-server>.
 
 =head1 AUTHOR
 

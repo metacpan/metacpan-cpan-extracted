@@ -135,7 +135,7 @@ my @files = (
     't/lib/MyVocabulary/MissingSub.pm',
     't/lib/MyVocabulary/ReservedKeyword.pm',
     't/lib/MyVocabulary/StringComparison.pm',
-    't/max_traversal_depth.t',
+    't/max_depth.t',
     't/multipleOf.t',
     't/pattern.t',
     't/read_serialized_file',

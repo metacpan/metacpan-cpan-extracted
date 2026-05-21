@@ -140,10 +140,15 @@
   ->ToLookup(sub { $_[0]{dept} })
   ->ToLookup(sub { $_[0]{dept} }, sub { $_[0]{name} })
   ->ToLTSV('output.ltsv')
+  ->ToLTSV('output.ltsv',              # label_order: specify output label order
+      label_order => [qw(host status bytes url)])
+  ->ToLTSV('output.ltsv',              # headers: alias for label_order (CSV-LINQ interop)
+      headers => [qw(host status bytes url)])
 
   ToDictionary သည် hashref key=>element ပြန်ပေးသည်
     ToLookup သည် hashref key=>[elements] ပြန်ပေးသည်
     ToLTSV သည် sequence ကို LTSV ဖိုင်သို့ ရေးသည်
+    label_order သည် label အစီအစဉ်ကို သတ်မှတ်သည်; headers သည် ၎င်း၏ နာမည်တစ်လှည့် (CSV-LINQ interop)
 
 [ 12. တရားဝင် ရင်းမြစ်များ (Official resources) ]
 

@@ -2,12 +2,12 @@ package App::Test::Generator::Mutator;
 
 use strict;
 use warnings;
-use Carp                qw(croak);
+use Carp qw(croak);
 use Config;
-use File::Copy          qw(copy);
+use File::Copy qw(copy);
 use File::Copy::Recursive qw(dircopy);
 use File::Spec;
-use File::Temp          qw(tempdir);
+use File::Temp qw(tempdir);
 use PPI;
 use Readonly;
 
@@ -17,18 +17,18 @@ use App::Test::Generator::Mutation::NumericBoundary;
 use App::Test::Generator::Mutation::ReturnUndef;
 
 # --------------------------------------------------
-# Default values for optional constructor arguments
-# --------------------------------------------------
-Readonly my $DEFAULT_LIB_DIR        => 'lib';
-Readonly my $DEFAULT_MUTATION_LEVEL => 'full';
-
-# --------------------------------------------------
 # Valid mutation level values
 # --------------------------------------------------
 Readonly my $LEVEL_FULL => 'full';
 Readonly my $LEVEL_FAST => 'fast';
 
-our $VERSION = '0.33';
+# --------------------------------------------------
+# Default values for optional constructor arguments
+# --------------------------------------------------
+Readonly my $DEFAULT_LIB_DIR => 'lib';
+Readonly my $DEFAULT_MUTATION_LEVEL => $LEVEL_FULL;
+
+our $VERSION = '0.38';
 
 =head1 NAME
 
@@ -36,7 +36,7 @@ App::Test::Generator::Mutator - Generate and apply mutation tests
 
 =head1 VERSION
 
-Version 0.33
+Version 0.38
 
 =head1 DESCRIPTION
 
@@ -72,13 +72,13 @@ Path to the Perl source file to mutate. Required. Must exist on disk.
 
 =item * C<lib_dir>
 
-Root library directory. Optional — defaults to C<lib>.
+Root library directory. Optional - defaults to C<lib>.
 
 =item * C<mutation_level>
 
 Controls the breadth of mutation. C<full> applies all mutations;
 C<fast> deduplicates and removes redundant mutants first.
-Optional — defaults to C<full>.
+Optional - defaults to C<full>.
 
 =back
 
@@ -109,7 +109,7 @@ sub new {
 	my ($class, %args) = @_;
 
 	# file is required and must exist on disk
-	croak 'file required'           unless defined $args{file};
+	croak 'file required' unless defined $args{file};
 	croak "file not found: $args{file}" unless -f $args{file};
 
 	return bless {
@@ -140,8 +140,15 @@ None beyond C<$self>.
 
 =head3 Returns
 
+=head3 Returns
+
 A list of L<App::Test::Generator::Mutant> objects. In C<fast> mode,
 redundant and duplicate mutants are removed before returning.
+Lines within C<## MUTANT_SKIP_BEGIN> / C<## MUTANT_SKIP_END> annotation
+blocks are excluded from the candidate list entirely.
+After this method returns,
+C<$self-E<gt>{skip_lines}> contains a hashref mapping excluded
+line numbers to 1.
 
 =head3 API specification
 
@@ -164,19 +171,52 @@ sub generate_mutants {
 	my $self = $_[0];
 
 	# Parse the target file into a PPI document
-	my $doc = PPI::Document->new($self->{file})
-		or croak "Unable to parse $self->{file}";
+	my $doc = PPI::Document->new($self->{file}) or croak "Unable to parse $self->{file}";
+
+	# Build set of lines excluded by ## MUTANT_SKIP_BEGIN / ## MUTANT_SKIP_END
+	my %skip_lines;
+	my $in_skip  = 0;
+	my $skip_start = 0;
+	my $line_num = 0;
+
+	for my $line (split /\n/, $doc->serialize()) {
+		$line_num++;
+
+		# Match only lines where the annotation is the entire content —
+		# prevents false positives in comments or POD that mention the tag
+		if($line =~ /^\s*##\s*MUTANT_SKIP_BEGIN\s*$/) {
+			croak "$self->{file}: MUTANT_SKIP_BEGIN at line $line_num with no prior MUTANT_SKIP_END"
+				if $in_skip;
+			$in_skip    = 1;
+			$skip_start = $line_num;
+		}
+		$skip_lines{$line_num} = 1 if $in_skip;
+
+		# Match only lines where the annotation is the entire content —
+		# prevents false positives in comments or POD that mention the tag
+		if($line =~ /^\s*##\s*MUTANT_SKIP_END\s*$/) {
+			croak "$self->{file}: MUTANT_SKIP_END at line $line_num with no matching MUTANT_SKIP_BEGIN"
+				unless $in_skip;
+			$in_skip = 0;
+		}
+	}
+	# Unclosed MUTANT_SKIP_BEGIN is fatal
+	croak "$self->{file}: MUTANT_SKIP_BEGIN at line $skip_start has no matching MUTANT_SKIP_END" if $in_skip;
+
+	# Store skip lines for use by the report generator
+	$self->{skip_lines} = \%skip_lines;
 
 	my @mutants;
 
-	# Run each registered mutation strategy against the document
-	for my $mutation (@{ $self->{mutations} }) {
-		push @mutants, $mutation->mutate($doc);
+	# Run each registered mutation strategy against the document,
+	# excluding any candidates on skip-annotated lines
+	for my $mutation (@{$self->{mutations}}) {
+		push @mutants, grep { !$skip_lines{$_->line} } $mutation->mutate($doc);
 	}
 
 	# In fast mode deduplicate and remove redundant mutants
 	if($self->{mutation_level} eq $LEVEL_FAST) {
-		return @{ _dedup_mutants(\@mutants) };
+		return @{_dedup_mutants(\@mutants)};
 	}
 
 	return @mutants;
@@ -239,16 +279,20 @@ sub prepare_workspace {
 	# Create a self-cleaning temporary directory
 	my $tmp = tempdir(CLEANUP => 1);
 
+	# Normalise lib_dir to its final component so workspace paths
+	# are relative regardless of whether an absolute path was passed in
+	my $lib_basename = (File::Spec->splitdir($self->{lib_dir}))[-1];
+
 	# Derive the file's path relative to lib_dir for use by apply_mutant
 	my $relative = $self->{file};
 	$relative =~ s/^\Q$self->{lib_dir}\E\/?//;
 
 	# Copy the entire lib tree so all dependencies resolve in the workspace
-	dircopy($self->{lib_dir}, File::Spec->catfile($tmp, $self->{lib_dir}))
-		or croak "dircopy failed: $!";
+	dircopy($self->{lib_dir}, File::Spec->catfile($tmp, $lib_basename)) or croak "dircopy failed: $!";
 
 	$self->{workspace} = $tmp;
 	$self->{relative}  = $relative;
+	$self->{lib_dir}   = $lib_basename;	# normalise for apply_mutant
 
 	return $tmp;
 }
@@ -311,8 +355,7 @@ sub apply_mutant {
 	);
 
 	# Parse the workspace copy and apply the mutation transform
-	my $doc = PPI::Document->new($target)
-		or croak "Failed to parse $target";
+	my $doc = PPI::Document->new($target) or croak "Failed to parse $target";
 
 	$mutant->{transform}->($doc);
 
@@ -410,15 +453,13 @@ sub _dedup_mutants {
 # --------------------------------------------------
 # _is_redundant_mutation
 #
-# Purpose:    Return true if a mutant is considered
-#             redundant and should be skipped in fast
-#             mutation mode.
+# Return true if a mutant is considered
+#     redundant and should be skipped in fast
+#     mutation mode.
 #
 # Entry:      $m - a Mutant hashref.
 #
 # Exit:       Returns 1 if redundant, 0 otherwise.
-#
-# Side effects: None.
 #
 # Notes:      Checks for arithmetic no-ops, double
 #             negation inside conditionals, boolean
@@ -464,9 +505,6 @@ sub _is_redundant_mutation {
 =head1 AUTHOR
 
 Nigel Horne, C<< <njh at nigelhorne.com> >>
-
-Portions of this module's initial design and documentation were created
-with the assistance of AI.
 
 =head1 LICENCE AND COPYRIGHT
 

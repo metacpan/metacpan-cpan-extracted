@@ -1,0 +1,5 @@
+<script src="<% RT->Config->Get('WebPath') %>/static/js/attachment-viewer.js"></script>
+<script type="text/javascript">
+window.RT = window.RT || {};
+RT.AttachmentViewerRT6 = <% RT::Handle::cmp_version($RT::VERSION, '6.0.0') >= 0 ? 1 : 0 |n%>;
+</script>

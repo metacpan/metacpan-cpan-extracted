@@ -339,7 +339,7 @@ sub help_text {
 ║     Markup text to ANSI encoder.                                          ║
 ╟───────────────────────────────────────────────────────────────────────────╢
 ║[% B_COLOR 52 %][% BRIGHT YELLOW %] USAGE                                                                     [% RESET %]║
-║     [% CYAN %]ansi-encode[% RESET %] [options] [text file]                                     ║
+║     [% CYAN %]ansiencode[% RESET %] [options] [text file]                                      ║
 ╟───────────────────────────────────────────────────────────────────────────╢
 ║[% B_COLOR 52 %][% BRIGHT YELLOW %] OPTIONS                                                                   [% RESET %]║
 ║     -[% BRIGHT CYAN %]a[% RESET %] or --[% BRIGHT CYAN %]ansi-modes[% RESET %]                                                    ║

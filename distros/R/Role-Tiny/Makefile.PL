@@ -11,7 +11,7 @@ my %META = (
     runtime => {
       requires => {
         'perl'     => '5.006',
-        'Exporter' => '5.57',
+        'Exporter' => '0',
       },
       recommends => {
         'Class::Method::Modifiers' => '1.05',

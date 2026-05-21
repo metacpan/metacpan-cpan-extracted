@@ -5,7 +5,7 @@ package WWW::YaCyBlacklist;
 # ABSTRACT: a Perl module to parse and execute YaCy blacklists
 
 our $AUTHORITY = 'cpan:IBRAUN';
-$WWW::YaCyBlacklist::VERSION = '0.8';
+$WWW::YaCyBlacklist::VERSION = '0.9';
 
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -78,12 +78,13 @@ sub read_from_array {
     my ($self, @lines) = @_;
 
     foreach my $line ( @lines ) {
-        if ( CORE::length $line > 0 ) {
+        if ( CORE::length $line > 0 && $line =~ /.+\/.+/ ) {
             ${ $self->patterns }{ $line }{ 'origorder' } = $self->origorder( $self->origorder + 1 );
             ( ${ $self->patterns }{ $line }{ 'host' }, ${ $self->patterns }{ $line }{ 'path' } ) = split /(?!\\)\/+?/, $line, 2;
             ${ $self->patterns }{ $line }{ 'path' } = '/' . ${ $self->patterns }{ $line }{ 'path' };
             ${ $self->patterns }{ $line }{ 'host_regex' } = $self->_check_host_regex( ${ $self->patterns }{ $line }{ 'host' } );
         }
+        else { print STDERR "\n\tWARNING: ignoring broken pattern '", $line, "'\n"; }
     }
 }
 
@@ -207,7 +208,7 @@ WWW::YaCyBlacklist - a Perl module to parse and execute YaCy blacklists
 
 =head1 VERSION
 
-version 0.8
+version 0.9
 
 =head1 SYNOPSIS
 
@@ -360,7 +361,7 @@ Ingram Braun <carlorff1@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Ingram Braun.
+This software is copyright (c) 2025–2026 by Ingram Braun.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,16 @@
+# Version control
+^\.git/
+
+# Editor/IDE
+^\.vscode/
+^\.claude/
+
+# Build artifacts
+^blib/
+^Makefile$
+^pm_to_blib$
+^MYMETA\.(json|yml)$
+^\.gitignore$
+
+# Distribution tarballs
+\.tar\.gz$

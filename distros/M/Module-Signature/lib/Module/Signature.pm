@@ -4,7 +4,7 @@ use warnings;
 
 # ABSTRACT: DEPRECATED Module signature file manipulation
 package Module::Signature;
-our $VERSION = '0.95'; #VERSION
+our $VERSION = '0.96'; #VERSION
 
 use vars qw($VERSION $SIGNATURE @ISA @EXPORT_OK);
 use vars qw($Preamble $Cipher $Debug $Verbose $Timeout $AUTHOR);
@@ -477,16 +477,16 @@ sub _sign_gpg {
             $key_name = $1;
         }
     }
-
     my $found_name;
     my $found_key;
     if (defined $key_id && defined $key_name) {
         my $keyserver = _keyserver($version);
-        foreach (`$gpg --batch --keyserver=$keyserver --search-keys '$key_name'`) {
+        foreach (`$gpg --output - --keyserver=$keyserver --recv-key '$key_id' 2>&1`) {
             if (/^\(\d+\)/) {
                 $found_name = 0;
-            } elsif ($found_name) {
-                if (/key \Q$key_id\E/) {
+            } elsif ($key_id) {
+                my $short_key_id = substr($key_id, (length($key_id) - 16));
+                if (/key \Q$short_key_id\E/) {
                     $found_key = 1;
                     last;
                 }
@@ -712,7 +712,7 @@ Module::Signature - DEPRECATED Module signature file manipulation
 
 =head1 VERSION
 
-version 0.95
+version 0.96
 
 =head1 SYNOPSIS
 

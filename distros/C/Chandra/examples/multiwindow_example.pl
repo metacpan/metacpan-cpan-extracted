@@ -9,9 +9,9 @@ use List::Util qw(max);
 # Multi-window todo list application
 #
 # Layout:
-#   Main window  — displays the todo list and an "Add" button
-#   Add dialog   — modal form to enter a new todo item
-#   Settings     — non-modal window for app preferences
+#   Main window  - displays the todo list and an "Add" button
+#   Add dialog   - modal form to enter a new todo item
+#   Settings     - non-modal window for app preferences
 # -----------------------------------------------------------------------
 
 my @todos    = ();    # shared in-process state
@@ -343,7 +343,7 @@ if (my $saved = $store->get('todos')) {
 }
 
 # -----------------------------------------------------------------------
-# Main window close — close all children
+# Main window close - close all children
 # -----------------------------------------------------------------------
 
 # Close all child windows when the app exits

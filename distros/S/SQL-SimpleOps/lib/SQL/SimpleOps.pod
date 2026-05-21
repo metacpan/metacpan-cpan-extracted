@@ -35,18 +35,27 @@ X<Constructor>
 
        # connections process
 
+       driver => mysql | mariadb | postgres | sqlite, # (no defaults)
        interface => interface_name,                   # (default: 'dbi')
        interface_options =>
        {
-          ...                                         # (see interface options)
+          ...   # driver additional options, see interface DBD::[driver]
        },
-       driver => mysql | mariadb | postgres | sqlite, # (no defaults)
+
+
+       # driver information, based predefined plugin
        
        db => dnsname,               # (no defaults)
        server => dbservername,      # (no defaults)
        port => tcpport_number,      # (optional)
        login => login_name,         # (optional)
        password => login_password,  # (optional)
+
+       or                           # based without predefined plugin
+
+       dsname => dsname,            # dsname string format, depends on the driver
+       login => login_name,         # (depends on the driver)
+       password => login_password,  # (depends on the driver)
 
        # tables definitions (no defaults)
 
@@ -66,9 +75,11 @@ X<Constructor>
 
        # generic options
 
-       quote => character,  # (default: apostrophe)
-       connect => 0 | 1,    # (default: 1 )
-       commit => 0 | 1,     # (default: 0 )
+       alias_with_as => 0 | 1,   # (default: 0, driver=pg the default: 1)
+       commit => 0 | 1,          # (default: 0 )
+       connect => 0 | 1,         # (default: 1 )
+       ignore_plugin => 0 | 1,   # (default: 0)
+       quote => character,       # (default: apostrophe)
 
        # message log options (default: SQL_SIMPLE_LOG_STD)
 
@@ -76,6 +87,8 @@ X<Constructor>
 
        message_syslog_facility => string,  # (default: 'local0')
        message_syslog_service => string,   # (default: 'SQL-SimpleOps')
+
+       message_warning_off => 0 | 1,       # (default: 0)
 
        # sql_save options (default: SQL_SIMPLE_CMD_OFF)
 
@@ -321,7 +334,6 @@ X<SQL Commands>
 
        # options
 
-       commit => 0 | 1,                # (default: global value)
        force => 0 | 1,                 # (default: 0)
        notfound => 0 | 1,              # (default: 0)
 
@@ -429,8 +441,13 @@ It makes the necessary adjusments in SQL statement according the database engine
 reducing the complexity in the applications's code.
 
 The current version has built-in support for the databases: I<MySQL>, I<MariaDB>, I<Postgres> and I<SQLite3>.
+However, the module can beu used with others DBD drivers, but, no tests were carried out to ensure proper operation.
 
-However, the module does not convert the fields format in the databases,
+To be used with other DBD driver (no supported by default) the module must correctly format the
+I<dsname>, I<login>, I<password> and I<interface_options>.
+The I<login> and I<password> must be specified as I<undef> value if not required for the DBD driver.
+ 
+The module does not convert the fields format in the databases,
 where each one has its restrictions and rules.
 
 By definition, we assume that switching databases will use supported fields between the engines.
@@ -984,6 +1001,21 @@ in this case, to obtain all fields you must impose C<fields => "*">:
 
   SQL::SimpleOps->Select ( ... fields => "*", ... );
 
+B<NOTE:> Some databases add the "AS" between the real name and the aliases name. This tag is defined by the option I<alias_with_as> and defined on plugin initialization, however, the option I<alias_with_as> may be required for unsupported plugins (no predefined plugins). To enable the option use:
+
+  SQL::SimpleOps->new
+  (
+    ...
+    alias_with_as => 1,
+    ...
+  );
+
+The values by predefined plugins:
+
+  MySQL,       alias_with_as => 0,
+  Postgres,    alias_with_as => 1,
+  SQLite,      alias_with_as => 0,
+
 =head2 Escape or Backslash
 X<Escape or Backslash>
 
@@ -1226,6 +1258,20 @@ Sets the name of database engine (see L<DBI> module).
 
 Defaults: no defaults
 
+=item B<dsname:>
+
+Set the I<dsname> string of database enine (see L<DBI> module and L<DBD> module)
+The script depends on the DBD driver format requirements.
+
+The I<dsname> is required for unsupported driver plugins.
+
+=item B<ignore_plugin:>
+
+Disable the embeded plugin. No pre-definitions or pre-validations will be made.
+The option I<dsname> must be specified to use.
+
+This option must be used for unsupported drivers, otherwise, warning messages will be shown.
+
 =item B<interface:>
 
 Sets the interface module to use.
@@ -1273,6 +1319,10 @@ Sets the Syslog Facility for the messages on the System Syslog Messages, must be
 See: L<Sys::Syslog> module
 
 Defaults: The default value is C<local0>.
+
+=item B<message_warning_off:>
+
+Disable warning message in stdout. Recommended for unsupported drivers and is not required if I<ingore_plugin> is enabled.
 
 =item B<password:>
 
@@ -1495,7 +1545,7 @@ B<Example5:> The database "my_db" forcing commit for each update command.
      driver => "mysql",
      db => "my_db",
      ...
-     commit => 1,    # (default is OFF)
+     commit => 1,    # (default: depends on the driver)
      ...
   );
 
@@ -3054,7 +3104,7 @@ X<EXAMPLES>
 
 The following example allow simple test between the SQLite, MySQL/MariaDB and Postgres Databases (see: I<t/testFirst.t>)
 
-NOTE: For more examples see test modules (I<t/testSQL.t>, I<t/testWhere.t> and I<t/testDB.t>) in source code.
+NOTE: For more examples see the I<examples> folder and I<test modules> (I<t/testSQL.t>, I<t/testWhere.t> and I<t/testDB.t>) in source code.
 
 To test you need:
 
@@ -3468,10 +3518,14 @@ B<NOTE:> Copy and Paste the following lines, until I<__END__>:
 =head1 EXTENDED EXAMPLES
 X<EXTENDED EXAMPLES>
 
-This data consists in the list of test in 't/testSQL.t'
+The following commands list some examples of implementing the module's methods, presenting two distinct scenarios:
 
-The test run two differnts context. The first use an L<Aliases Table> as contents tables.
-The second does not use an L<Aliases Table> (no aliases available).
+The first using the module's "aliases" feature; and
+
+The second without using the module's "aliases table" feature.
+
+NOTE: We are referring to "aliases table" explicitly implemented by the module, which may or may not be applied to SQL commands, depending on the implementation scenario.
+This data consists in the list of test in 't/testSQL.t'
 
 =head3 Glossary
 
@@ -4673,7 +4727,7 @@ B<Command:> Insert and Update
 
 =back
 
-=head2 019E [I<command>] Interface '[interface]::[driver]' missing
+=head2 019W [I<command>] Interface '[interface]::[driver]' missing
 
 =over
 
@@ -5372,7 +5426,7 @@ Carlos Celso, E<lt>ccelso@cpan.orgE<gt>
 =head1 COPYRIGHT
 X<COPYRIGHT>
 
-Copyright (C) 2008-2025 by Carlos Celso
+Copyright (C) 2008-2026 by Carlos Celso
 
 =head1 LICENSE
 X<LICENSE>

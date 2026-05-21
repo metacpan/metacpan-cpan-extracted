@@ -1,5 +1,5 @@
 package Muster::Scanner;
-$Muster::Scanner::VERSION = '0.93';
+$Muster::Scanner::VERSION = '0.9501';
 #ABSTRACT: Muster::Scanner - updating meta-data about pages
 =head1 NAME
 
@@ -7,7 +7,7 @@ Muster::Scanner - updating meta-data about pages
 
 =head1 VERSION
 
-version 0.93
+version 0.9501
 
 =head1 DESCRIPTION
 

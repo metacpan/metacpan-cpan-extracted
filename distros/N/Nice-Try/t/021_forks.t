@@ -25,7 +25,7 @@ BEGIN
     }
     use Test::More qw( no_plan );
     use Nice::Try;
-    use Want;
+    use Wanted;
     our $DEBUG = 0;
 };
 
@@ -44,25 +44,25 @@ SKIP:
         &tryme();
         sub tryme
         {
-            my $expect = Want::want( 'LIST' )
+            my $expect = Wanted::want( 'LIST' )
                 ? 'LIST'
-                : Want::want( 'HASH' )
+                : Wanted::want( 'HASH' )
                     ? 'HASH'
-                    : Want::want( 'ARRAY' )
+                    : Wanted::want( 'ARRAY' )
                         ? 'ARRAY'
-                        : Want::want( 'OBJECT' )
+                        : Wanted::want( 'OBJECT' )
                             ? 'OBJECT'
-                            : Want::want( 'CODE' )
+                            : Wanted::want( 'CODE' )
                                 ? 'CODE'
-                                : Want::want( 'REFSCALAR' )
+                                : Wanted::want( 'REFSCALAR' )
                                     ? 'REFSCALAR'
-                                    : Want::want( 'BOOLEAN' )
+                                    : Wanted::want( 'BOOLEAN' )
                                         ? 'BOOLEAN'
-                                        : Want::want( 'GLOB' )
+                                        : Wanted::want( 'GLOB' )
                                             ? 'GLOB'
-                                            : Want::want( 'SCALAR' )
+                                            : Wanted::want( 'SCALAR' )
                                                 ? 'SCALAR'
-                                                : Want::want( 'VOID' )
+                                                : Wanted::want( 'VOID' )
                                                     ? 'VOID'
                                                     : '';
             diag( "Caller expects '$expect'" ) if( $DEBUG );
@@ -70,7 +70,7 @@ SKIP:
             {
                 my $want = wantarray;
                 diag( "Caller wants ", ( defined( $want ) ? $want ? 'list' : 'scalar' : 'void' ) ) if( $DEBUG );
-                if( Want::want('LIST') )
+                if( Wanted::want('LIST') )
                 {
                     return( qw( Hello world ) );
                 }

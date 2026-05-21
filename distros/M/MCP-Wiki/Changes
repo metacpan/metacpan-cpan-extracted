@@ -1,0 +1,7 @@
+0.001     2026-04-29 00:26:18Z
+
+0.001  2026-04-28
+  - Initial release
+  - MCP server for markdown wiki management
+  - TOC extraction and paragraph-level editing
+  - Git integration for history tracking

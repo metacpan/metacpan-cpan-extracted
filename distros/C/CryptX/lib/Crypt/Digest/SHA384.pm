@@ -4,7 +4,7 @@ package Crypt::Digest::SHA384;
 
 use strict;
 use warnings;
-our $VERSION = '0.088';
+our $VERSION = '0.089';
 
 use base qw(Crypt::Digest Exporter);
 our %EXPORT_TAGS = ( all => [qw( sha384 sha384_hex sha384_b64 sha384_b64u sha384_file sha384_file_hex sha384_file_b64 sha384_file_b64u )] );
@@ -14,6 +14,18 @@ our @EXPORT = qw();
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
 use Crypt::Digest;
+
+sub new {
+  my ($class) = @_;
+  my $obj = Crypt::Digest->new('SHA384');
+  return bless $obj, $class;
+}
+
+sub clone {
+  my ($self) = @_;
+  my $obj = Crypt::Digest::clone($self);
+  return bless $obj, ref($self) || $self;
+}
 
 sub hashsize                { Crypt::Digest::hashsize('SHA384')             }
 sub sha384             { Crypt::Digest::digest_data('SHA384', @_)      }
@@ -40,32 +52,35 @@ Crypt::Digest::SHA384 - Hash function SHA-384 [size: 384 bits]
                                 sha384_file sha384_file_hex sha384_file_b64 sha384_file_b64u );
 
    # calculate digest from string/buffer
-   $sha384_raw  = sha384('data string');
-   $sha384_hex  = sha384_hex('data string');
-   $sha384_b64  = sha384_b64('data string');
-   $sha384_b64u = sha384_b64u('data string');
-   # calculate digest from file
-   $sha384_raw  = sha384_file('filename.dat');
-   $sha384_hex  = sha384_file_hex('filename.dat');
-   $sha384_b64  = sha384_file_b64('filename.dat');
-   $sha384_b64u = sha384_file_b64u('filename.dat');
-   # calculate digest from filehandle
-   $sha384_raw  = sha384_file(*FILEHANDLE);
-   $sha384_hex  = sha384_file_hex(*FILEHANDLE);
-   $sha384_b64  = sha384_file_b64(*FILEHANDLE);
-   $sha384_b64u = sha384_file_b64u(*FILEHANDLE);
+   my $data = 'data string';
+   my $sha384_raw  = sha384($data);
+   my $sha384_hex  = sha384_hex($data);
+   my $sha384_b64  = sha384_b64($data);
+   my $sha384_b64u = sha384_b64u($data);
+   # or from file
+   my $sha384_file_raw  = sha384_file('filename.dat');
+   my $sha384_file_hex  = sha384_file_hex('filename.dat');
+   my $sha384_file_b64  = sha384_file_b64('filename.dat');
+   my $sha384_file_b64u = sha384_file_b64u('filename.dat');
+   # or from filehandle
+   my $filehandle = ...; # existing binary-mode filehandle
+   my $sha384_fh_raw  = sha384_file($filehandle);
+   my $sha384_fh_hex  = sha384_file_hex($filehandle);
+   my $sha384_fh_b64  = sha384_file_b64($filehandle);
+   my $sha384_fh_b64u = sha384_file_b64u($filehandle);
 
    ### OO interface:
    use Crypt::Digest::SHA384;
 
-   $d = Crypt::Digest::SHA384->new;
+   my $d = Crypt::Digest::SHA384->new;
    $d->add('any data');
-   $d->addfile('filename.dat');
-   $d->addfile(*FILEHANDLE);
-   $result_raw  = $d->digest;     # raw bytes
-   $result_hex  = $d->hexdigest;  # hexadecimal form
-   $result_b64  = $d->b64digest;  # Base64 form
-   $result_b64u = $d->b64udigest; # Base64 URL Safe form
+   my $result_raw  = $d->digest;     # raw bytes
+   my $result_hex  = $d->hexdigest;  # hexadecimal form
+   my $result_b64  = $d->b64digest;  # Base64 form
+   my $result_b64u = $d->b64udigest; # Base64 URL-safe form
+
+   # or hash a file instead
+   my $file_result_raw = Crypt::Digest::SHA384->new->addfile('filename.dat')->digest;
 
 =head1 DESCRIPTION
 
@@ -88,77 +103,92 @@ Or all of them at once:
 
 =head2 sha384
 
-Logically joins all arguments into a single string, and returns its SHA384 digest encoded as a binary string.
+Joins all arguments into a single string and returns its SHA384 digest encoded as a binary string.
 
- $sha384_raw = sha384('data string');
+Data arguments for the functional helpers are converted to byte strings using
+Perl's usual scalar stringification. Defined scalars, including numbers and
+string-overloaded objects, are accepted. C<undef> is treated as an empty
+string and may emit Perl's usual "uninitialized value" warning. The same
+rules apply to C<sha384_hex>, C<sha384_b64>, and
+C<sha384_b64u>.
+
+ my $sha384_raw = sha384('data string');
  #or
- $sha384_raw = sha384('any data', 'more data', 'even more data');
+ my $sha384_raw = sha384('any data', 'more data', 'even more data');
 
 =head2 sha384_hex
 
-Logically joins all arguments into a single string, and returns its SHA384 digest encoded as a hexadecimal string.
+Joins all arguments into a single string and returns its SHA384 digest encoded as a hexadecimal string.
 
- $sha384_hex = sha384_hex('data string');
+ my $sha384_hex = sha384_hex('data string');
  #or
- $sha384_hex = sha384_hex('any data', 'more data', 'even more data');
+ my $sha384_hex = sha384_hex('any data', 'more data', 'even more data');
 
 =head2 sha384_b64
 
-Logically joins all arguments into a single string, and returns its SHA384 digest encoded as a Base64 string, B<with> trailing '=' padding.
+Joins all arguments into a single string and returns its SHA384 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $sha384_b64 = sha384_b64('data string');
+ my $sha384_b64 = sha384_b64('data string');
  #or
- $sha384_b64 = sha384_b64('any data', 'more data', 'even more data');
+ my $sha384_b64 = sha384_b64('any data', 'more data', 'even more data');
 
 =head2 sha384_b64u
 
-Logically joins all arguments into a single string, and returns its SHA384 digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+Joins all arguments into a single string and returns its SHA384 digest encoded as a Base64 URL-safe string (see RFC 4648 section 5).
 
- $sha384_b64url = sha384_b64u('data string');
+ my $sha384_b64url = sha384_b64u('data string');
  #or
- $sha384_b64url = sha384_b64u('any data', 'more data', 'even more data');
+ my $sha384_b64url = sha384_b64u('any data', 'more data', 'even more data');
 
 =head2 sha384_file
 
-Reads file (defined by filename or filehandle) content, and returns its SHA384 digest encoded as a binary string.
+Reads a file given by a filename or filehandle and returns its SHA384 digest encoded as a binary string.
 
- $sha384_raw = sha384_file('filename.dat');
+ my $sha384_raw = sha384_file('filename.dat');
  #or
- $sha384_raw = sha384_file(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $sha384_raw = sha384_file($filehandle);
 
 =head2 sha384_file_hex
 
-Reads file (defined by filename or filehandle) content, and returns its SHA384 digest encoded as a hexadecimal string.
+Reads a file given by a filename or filehandle and returns its SHA384 digest encoded as a hexadecimal string.
 
- $sha384_hex = sha384_file_hex('filename.dat');
+ my $sha384_hex = sha384_file_hex('filename.dat');
  #or
- $sha384_hex = sha384_file_hex(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $sha384_hex = sha384_file_hex($filehandle);
 
-B<BEWARE:> You have to make sure that the filehandle is in binary mode before you pass it as argument to the addfile() method.
+B<Note:> The filehandle must be in binary mode before you pass it to C<addfile()>.
 
 =head2 sha384_file_b64
 
-Reads file (defined by filename or filehandle) content, and returns its SHA384 digest encoded as a Base64 string, B<with> trailing '=' padding.
+Reads a file given by a filename or filehandle and returns its SHA384 digest encoded as a Base64 string, B<with> trailing '=' padding.
 
- $sha384_b64 = sha384_file_b64('filename.dat');
+ my $sha384_b64 = sha384_file_b64('filename.dat');
  #or
- $sha384_b64 = sha384_file_b64(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $sha384_b64 = sha384_file_b64($filehandle);
 
 =head2 sha384_file_b64u
 
-Reads file (defined by filename or filehandle) content, and returns its SHA384 digest encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+Reads a file given by a filename or filehandle and returns its SHA384 digest encoded as a Base64 URL-safe string (see RFC 4648 section 5).
 
- $sha384_b64url = sha384_file_b64u('filename.dat');
+ my $sha384_b64url = sha384_file_b64u('filename.dat');
  #or
- $sha384_b64url = sha384_file_b64u(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ my $sha384_b64url = sha384_file_b64u($filehandle);
 
 =head1 METHODS
 
 The OO interface provides the same set of functions as L<Crypt::Digest>.
+Unless noted otherwise, assume C<$d> is an existing digest object created via
+C<new>, for example:
+
+ my $d = Crypt::Digest::SHA384->new();
 
 =head2 new
 
- $d = Crypt::Digest::SHA384->new();
+ my $d = Crypt::Digest::SHA384->new();
 
 =head2 clone
 
@@ -170,21 +200,25 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head2 add
 
+Appends data to the message. Returns the object itself (for chaining).
+
+Each argument is converted to bytes using Perl's usual scalar stringification.
+Defined scalars, including numbers and string-overloaded objects, are
+accepted. C<undef> is treated as an empty string and may emit Perl's usual
+"uninitialized value" warning.
+
  $d->add('any data');
  #or
  $d->add('any data', 'more data', 'even more data');
 
 =head2 addfile
 
+Reads the file content and appends it to the message. Returns the object itself (for chaining).
+
  $d->addfile('filename.dat');
  #or
- $d->addfile(*FILEHANDLE);
-
-=head2 add_bits
-
- $d->add_bits($bit_string);   # e.g. $d->add_bits("111100001010");
- #or
- $d->add_bits($data, $nbits); # e.g. $d->add_bits("\xF0\xA0", 16);
+ my $filehandle = ...; # existing binary-mode filehandle
+ $d->addfile($filehandle);
 
 =head2 hashsize
 
@@ -196,25 +230,39 @@ The OO interface provides the same set of functions as L<Crypt::Digest>.
 
 =head2 digest
 
- $result_raw = $d->digest();
+Returns the binary digest (raw bytes).
+The first call finalizes the digest object. Any later C<add()>,
+C<addfile()>, C<digest()>, C<hexdigest()>, C<b64digest()>, or
+C<b64udigest()> call will fail until you call C<reset()>.
+
+ my $result_raw = $d->digest();
 
 =head2 hexdigest
 
- $result_hex = $d->hexdigest();
+Returns the digest encoded as a lowercase hexadecimal string.
+Like C<digest()>, the first call finalizes the digest object.
+
+ my $result_hex = $d->hexdigest();
 
 =head2 b64digest
 
- $result_b64 = $d->b64digest();
+Returns the digest encoded as a Base64 string with trailing C<=> padding.
+Like C<digest()>, the first call finalizes the digest object.
+
+ my $result_b64 = $d->b64digest();
 
 =head2 b64udigest
 
- $result_b64url = $d->b64udigest();
+Returns the digest encoded as a Base64 URL-safe string (no trailing C<=>).
+Like C<digest()>, the first call finalizes the digest object.
+
+ my $result_b64url = $d->b64udigest();
 
 =head1 SEE ALSO
 
 =over
 
-=item * L<CryptX|CryptX>, L<Crypt::Digest>
+=item * L<CryptX>, L<Crypt::Digest>
 
 =item * L<https://en.wikipedia.org/wiki/SHA-2>
 

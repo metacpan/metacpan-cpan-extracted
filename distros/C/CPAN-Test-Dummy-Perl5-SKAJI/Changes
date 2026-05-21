@@ -1,0 +1,16 @@
+Revision history for CPAN-Test-Dummy-Perl5-SKAJI
+
+v0.0.12  2026-05-10
+  - Use skaji/action-pause-upload
+
+v0.0.11  2026-05-09
+  - Use GitHub Artifact Attestations again; see https://github.com/skaji/perl-CPAN-Test-Dummy-Perl5-SKAJI/attestations
+
+v0.0.8  2026-05-09
+  - Use GitHub Artifact Attestations; see https://github.com/skaji/perl-CPAN-Test-Dummy-Perl5-SKAJI/attestations
+
+v0.0.4  2026-05-09
+  - Sign release tarballs with Sigstore in GitHub Actions; see also https://blogs.perl.org/users/timothy_legge/2026/05/signing-cpan-releases-with-sigstore.html
+
+v0.0.2  2026-05-09
+  - Upload using a PAUSE token

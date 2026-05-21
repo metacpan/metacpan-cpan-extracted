@@ -8,6 +8,7 @@ use utf8;
 require SBOM::CycloneDX::Schema;
 require SBOM::CycloneDX::Util;
 
+use SBOM::CycloneDX::Enum::AggregateType;
 use SBOM::CycloneDX::Enum::CommonExtensionName;
 use SBOM::CycloneDX::Enum::ComponentType;
 use SBOM::CycloneDX::Enum::CryptoAssetType;
@@ -35,6 +36,7 @@ use Cpanel::JSON::XS qw(decode_json);
 use Exporter 'import';
 
 our @EXPORT_OK = qw(
+    AGGREGATE_TYPE
     COMMON_EXTENSION_NAME
     COMPONENT_TYPE
     CRYPTO_ASSET_TYPE
@@ -70,6 +72,7 @@ unless (@SPDX_LICENSES) {
 use constant SPDX_LICENSES => \@SPDX_LICENSES;
 
 use constant {
+    AGGREGATE_TYPE                 => 'SBOM::CycloneDX::Enum::AggregateType',
     COMMON_EXTENSION_NAME          => 'SBOM::CycloneDX::Enum::CommonExtensionName',
     COMPONENT_TYPE                 => 'SBOM::CycloneDX::Enum::ComponentType',
     CRYPTO_ASSET_TYPE              => 'SBOM::CycloneDX::Enum::CryptoAssetType',
@@ -152,6 +155,8 @@ Return the provided C<CONSTANT> Enum values.
 =head1 CONSTANTS
 
 =over
+
+=item * C<AGGREGATE_TYPE>, L<SBOM::CycloneDX::Enum::AggregateType>
 
 =item * C<COMMON_EXTENSION_NAME>, L<SBOM::CycloneDX::Enum::CommonExtensionName>
 

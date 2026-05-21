@@ -15,7 +15,7 @@ BEGIN {
 use Test::LeakTrace;
 
 my $cache_dir = '_CACHED_XS_test_memory';
-remove_tree($cache_dir) if -d $cache_dir;
+remove_tree($cache_dir, { safe => 1, error => \my $err13 }) if -d $cache_dir;
 
 use_ok('XS::JIT');
 
@@ -249,6 +249,6 @@ C_CODE
 }
 
 # Clean up
-remove_tree($cache_dir) if -d $cache_dir;
+remove_tree($cache_dir, { safe => 1, error => \my $err14 }) if -d $cache_dir;
 
 done_testing();

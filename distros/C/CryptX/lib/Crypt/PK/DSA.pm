@@ -2,7 +2,7 @@ package Crypt::PK::DSA;
 
 use strict;
 use warnings;
-our $VERSION = '0.088';
+our $VERSION = '0.089';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 our %EXPORT_TAGS = ( all => [qw( dsa_encrypt dsa_decrypt dsa_sign_message dsa_verify_message dsa_sign_hash dsa_verify_hash )] );
@@ -12,8 +12,7 @@ our @EXPORT = qw();
 use Carp;
 $Carp::Internal{(__PACKAGE__)}++;
 use CryptX;
-use Crypt::Digest 'digest_data';
-use Crypt::Misc qw(read_rawfile encode_b64u decode_b64u encode_b64 decode_b64 pem_to_der der_to_pem);
+use Crypt::Misc qw(read_rawfile encode_b64 decode_b64 pem_to_der der_to_pem);
 use Crypt::PK;
 
 sub new {
@@ -32,6 +31,9 @@ sub generate_key {
     $p =~ s/^0x//;
     $q =~ s/^0x//;
     $g =~ s/^0x//;
+    croak "FATAL: 'p' param is empty after stripping '0x' prefix" unless length $p;
+    croak "FATAL: 'q' param is empty after stripping '0x' prefix" unless length $q;
+    croak "FATAL: 'g' param is empty after stripping '0x' prefix" unless length $g;
     return $self->_generate_key_pqg_hex($p, $q, $g);
   }
   elsif (@_ == 1 && ref $_[0] eq 'SCALAR') {
@@ -46,7 +48,9 @@ sub generate_key {
 
 sub export_key_pem {
   my ($self, $type, $password, $cipher) = @_;
-  my $key = $self->export_key_der($type||'');
+  # public_x509 uses the same DER as public, just different PEM header
+  my $der_type = ($type || '') eq 'public_x509' ? 'public' : ($type || '');
+  my $key = $self->export_key_der($der_type);
   return unless $key;
   return der_to_pem($key, "DSA PRIVATE KEY", $password, $cipher) if $type eq 'private';
   return der_to_pem($key, "DSA PUBLIC KEY") if $type eq 'public';
@@ -103,51 +107,51 @@ sub import_key {
 
 ### FUNCTIONS
 
-sub dsa_encrypt {
+sub dsa_encrypt { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  croak "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->encrypt(@_);
 }
 
-sub dsa_decrypt {
+sub dsa_decrypt { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  croak "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->decrypt(@_);
 }
 
-sub dsa_sign_message {
+sub dsa_sign_message { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  croak "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->sign_message(@_);
 }
 
-sub dsa_verify_message {
+sub dsa_verify_message { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  croak "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->verify_message(@_);
 }
 
-sub dsa_sign_hash {
+sub dsa_sign_hash { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  croak "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->sign_hash(@_);
 }
 
-sub dsa_verify_hash {
+sub dsa_verify_hash { # legacy/obsolete
   my $key = shift;
   local $SIG{__DIE__} = \&CryptX::_croak;
   $key = __PACKAGE__->new($key) unless ref $key;
-  carp "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
+  croak "FATAL: invalid 'key' param" unless ref($key) eq __PACKAGE__;
   return $key->verify_hash(@_);
 }
 
@@ -165,70 +169,65 @@ Crypt::PK::DSA - Public key cryptography based on DSA
 
  ### OO interface
 
- #Encryption: Alice
- my $pub = Crypt::PK::DSA->new('Bob_pub_dsa1.der');
- my $ct = $pub->encrypt("secret message");
- #
- #Encryption: Bob (received ciphertext $ct)
- my $priv = Crypt::PK::DSA->new('Bob_priv_dsa1.der');
- my $pt = $priv->decrypt($ct);
+ my $message = 'hello world';
+ my $signer = Crypt::PK::DSA->new();
+ $signer->generate_key(30, 256);
 
- #Signature: Alice
- my $priv = Crypt::PK::DSA->new('Alice_priv_dsa1.der');
- my $sig = $priv->sign_message($message);
- #
- #Signature: Bob (received $message + $sig)
- my $pub = Crypt::PK::DSA->new('Alice_pub_dsa1.der');
- $pub->verify_message($sig, $message) or die "ERROR";
+ my $signature = $signer->sign_message($message);
+ my $public_der = $signer->export_key_der('public');
+ my $verifier = Crypt::PK::DSA->new(\$public_der);
+ $verifier->verify_message($signature, $message) or die "ERROR";
 
- #Key generation
- my $pk = Crypt::PK::DSA->new();
- $pk->generate_key(30, 256);
- my $private_der = $pk->export_key_der('private');
- my $public_der = $pk->export_key_der('public');
- my $private_pem = $pk->export_key_pem('private');
- my $public_pem = $pk->export_key_pem('public');
+ my $ciphertext = $verifier->encrypt("secret message");
+ my $plaintext = $signer->decrypt($ciphertext);
 
- ### Functional interface
+ my $private_der = $signer->export_key_der('private');
+ my $private_pem = $signer->export_key_pem('private');
+ my $public_pem = $verifier->export_key_pem('public');
 
- #Encryption: Alice
- my $ct = dsa_encrypt('Bob_pub_dsa1.der', "secret message");
- #Encryption: Bob (received ciphertext $ct)
- my $pt = dsa_decrypt('Bob_priv_dsa1.der', $ct);
+=head1 DESCRIPTION
 
- #Signature: Alice
- my $sig = dsa_sign_message('Alice_priv_dsa1.der', $message);
- #Signature: Bob (received $message + $sig)
- dsa_verify_message('Alice_pub_dsa1.der', $sig, $message) or die "ERROR";
+DSA is primarily a digital signature scheme. In this module, signing and
+verification are the most common operations and therefore the primary examples.
+
+Legacy function-style wrappers still exist in code for backwards compatibility,
+but they are intentionally undocumented.
 
 =head1 METHODS
 
 =head2 new
 
-  my $pk = Crypt::PK::DSA->new();
-  #or
-  my $pk = Crypt::PK::DSA->new($priv_or_pub_key_filename);
-  #or
-  my $pk = Crypt::PK::DSA->new(\$buffer_containing_priv_or_pub_key);
+  my $source = Crypt::PK::DSA->new();
+  $source->generate_key(20, 128);
 
-Support for password protected PEM keys
+  my $public_der = $source->export_key_der('public');
+  my $pub = Crypt::PK::DSA->new(\$public_der);
 
-  my $pk = Crypt::PK::DSA->new($priv_pem_key_filename, $password);
-  #or
-  my $pk = Crypt::PK::DSA->new(\$buffer_containing_priv_pem_key, $password);
+  my $private_pem = $source->export_key_pem('private', 'secret', 'AES-256-CBC');
+  my $priv = Crypt::PK::DSA->new(\$private_pem, 'secret');
+
+Passing C<$filename> or C<\$buffer> to C<new> is equivalent: both forms
+immediately import the key material into the new object.
 
 =head2 generate_key
 
-Uses Yarrow-based cryptographically strong random number generator seeded with
-random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
+Uses the bundled C<chacha20> PRNG via libtomcrypt's C<rng_make_prng>.
+Returns the object itself (for chaining).
 
  $pk->generate_key($group_size, $modulus_size);
- # $group_size  ... in bytes .. 15 < $group_size < 1024
- # $modulus_size .. in bytes .. ($modulus_size - $group_size) < 512
+ # $group_size  ... [integer] size of the subgroup (q) in bytes; must satisfy: 15 < $group_size < 1024
+ # $modulus_size .. [integer] size of the prime (p) in bytes; must satisfy: ($modulus_size - $group_size) < 512
+ #                  $modulus_size must be >= $group_size
+ #
+ # The two-integer form uses Perl's usual numeric-to-integer coercion before
+ # the XS call. Callers should therefore pass exact integers; values like
+ # C<10.9> or C<"1e1"> will be coerced according to Perl's integer conversion.
 
- ### Bits of Security according to libtomcrypt documentation
- # 80 bits   => generate_key(20, 128)
- # 120 bits  => generate_key(30, 256)
+ ### Common parameter pairs (group_size, modulus_size) => security level:
+ # generate_key(20, 128)   => 80-bit security  (1024-bit p, 160-bit q)
+ # generate_key(30, 256)   => 120-bit security (2048-bit p, 240-bit q)
+ # generate_key(32, 256)   => 128-bit security (2048-bit p, 256-bit q)
+ # generate_key(35, 384)   => ~140-bit security (3072-bit p, 280-bit q)
  # 140 bits  => generate_key(35, 384)
  # 160 bits  => generate_key(40, 512)
 
@@ -240,8 +239,8 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
  # L = 3072, N = 256 => generate_key(32, 384)
 
  $pk->generate_key($param_hash)
- # $param_hash is { d => $d, p => $p, q => $q }
- # where $d, $p, $q are hex strings
+ # $param_hash is { p => $p, q => $q, g => $g }
+ # where $p, $q, $g are hex strings
 
  $pk->generate_key(\$dsa_param)
  # $dsa_param is the content of DER or PEM file with DSA params
@@ -251,17 +250,20 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 
 Loads private or public key in DER or PEM format.
 
-  $pk->import_key($filename);
-  #or
-  $pk->import_key(\$buffer_containing_key);
+  my $source = Crypt::PK::DSA->new();
+  $source->generate_key(20, 128);
 
-Support for password protected PEM keys
+  my $public_der = $source->export_key_der('public');
+  my $pub = Crypt::PK::DSA->new();
+  $pub->import_key(\$public_der);
 
-  $pk->import_key($pem_filename, $password);
-  #or
-  $pk->import_key(\$buffer_containing_pem_key, $password);
+  my $private_pem = $source->export_key_pem('private', 'secret', 'AES-256-CBC');
+  my $priv = Crypt::PK::DSA->new();
+  $priv->import_key(\$private_pem, 'secret');
 
-Loading private or public keys form perl hash:
+The same method also accepts filenames instead of buffers.
+
+Loading private or public keys from a Perl HASH:
 
  $pk->import_key($hashref);
 
@@ -349,11 +351,15 @@ Supported key formats:
 
 =head2 export_key_der
 
+Returns the key as a binary DER-encoded string.
+
  my $private_der = $pk->export_key_der('private');
  #or
  my $public_der = $pk->export_key_der('public');
 
 =head2 export_key_pem
+
+Returns the key as a PEM-encoded string (ASCII).
 
  my $private_pem = $pk->export_key_pem('private');
  #or
@@ -389,45 +395,60 @@ Support for password protected PEM keys
 
 =head2 encrypt
 
+Returns the ciphertext as a binary string.
+
+DSA is usually used for signatures. This helper is available because the
+underlying library exposes a DSA-based encryption primitive.
+
  my $pk = Crypt::PK::DSA->new($pub_key_filename);
  my $ct = $pk->encrypt($message);
  #or
  my $ct = $pk->encrypt($message, $hash_name);
 
- #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ # $hash_name .. [string] 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
 =head2 decrypt
+
+Returns the plaintext as a binary string.
 
  my $pk = Crypt::PK::DSA->new($priv_key_filename);
  my $pt = $pk->decrypt($ciphertext);
 
 =head2 sign_message
 
- my $pk = Crypt::PK::DSA->new($priv_key_filename);
- my $signature = $priv->sign_message($message);
- #or
- my $signature = $priv->sign_message($message, $hash_name);
+Returns the signature as a binary string.
 
- #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ my $pk = Crypt::PK::DSA->new($priv_key_filename);
+ my $signature = $pk->sign_message($message);
+ #or
+ my $signature = $pk->sign_message($message, $hash_name);
+
+ # $hash_name .. [string] 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
 =head2 verify_message
 
- my $pk = Crypt::PK::DSA->new($pub_key_filename);
- my $valid = $pub->verify_message($signature, $message)
- #or
- my $valid = $pub->verify_message($signature, $message, $hash_name);
+Returns C<1> if the signature is valid, C<0> otherwise.
 
- #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
+ my $pk = Crypt::PK::DSA->new($pub_key_filename);
+ my $valid = $pk->verify_message($signature, $message);
+ #or
+ my $valid = $pk->verify_message($signature, $message, $hash_name);
+
+ # $hash_name .. [string] 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
 
 =head2 sign_hash
 
+Returns the signature as a binary string.
+
  my $pk = Crypt::PK::DSA->new($priv_key_filename);
- my $signature = $priv->sign_hash($message_hash);
+ my $signature = $pk->sign_hash($message_hash);
 
 =head2 verify_hash
 
+Returns C<1> if the signature is valid, C<0> otherwise.
+
  my $pk = Crypt::PK::DSA->new($pub_key_filename);
- my $valid = $pub->verify_hash($signature, $message_hash);
+ my $valid = $pk->verify_hash($signature, $message_hash);
 
 =head2 is_private
 
@@ -448,6 +469,8 @@ Support for password protected PEM keys
 
 =head2 key2hash
 
+Returns a hashref with the key components, or C<undef> if no key is loaded.
+
  my $hash = $pk->key2hash;
 
  # returns hash like this (or undef if no key loaded):
@@ -461,67 +484,6 @@ Support for password protected PEM keys
    x => "6C801901AC74E2DC714D75A9F6969483CF...", #private key, random  0 < x < q
    y => "8F7604D77FA62C7539562458A63C7611B7...", #public key, where y = g^x mod p
  }
-
-=head1 FUNCTIONS
-
-=head2 dsa_encrypt
-
-DSA based encryption as implemented by libtomcrypt. See method L</encrypt> below.
-
- my $ct = dsa_encrypt($pub_key_filename, $message);
- #or
- my $ct = dsa_encrypt(\$buffer_containing_pub_key, $message);
- #or
- my $ct = dsa_encrypt($pub_key_filename, $message, $hash_name);
-
- #NOTE: $hash_name can be 'SHA1' (DEFAULT), 'SHA256' or any other hash supported by Crypt::Digest
-
-Encryption works similar to the L<Crypt::PK::ECC> encryption whereas shared DSA key is computed, and
-the hash of the shared key XOR'ed against the plaintext forms the ciphertext.
-
-=head2 dsa_decrypt
-
-DSA based decryption as implemented by libtomcrypt. See method L</decrypt> below.
-
- my $pt = dsa_decrypt($priv_key_filename, $ciphertext);
- #or
- my $pt = dsa_decrypt(\$buffer_containing_priv_key, $ciphertext);
-
-=head2 dsa_sign_message
-
-Generate DSA signature. See method L</sign_message> below.
-
- my $sig = dsa_sign_message($priv_key_filename, $message);
- #or
- my $sig = dsa_sign_message(\$buffer_containing_priv_key, $message);
- #or
- my $sig = dsa_sign_message($priv_key, $message, $hash_name);
-
-=head2 dsa_verify_message
-
-Verify DSA signature. See method L</verify_message> below.
-
- dsa_verify_message($pub_key_filename, $signature, $message) or die "ERROR";
- #or
- dsa_verify_message(\$buffer_containing_pub_key, $signature, $message) or die "ERROR";
- #or
- dsa_verify_message($pub_key, $signature, $message, $hash_name) or die "ERROR";
-
-=head2 dsa_sign_hash
-
-Generate DSA signature. See method L</sign_hash> below.
-
- my $sig = dsa_sign_hash($priv_key_filename, $message_hash);
- #or
- my $sig = dsa_sign_hash(\$buffer_containing_priv_key, $message_hash);
-
-=head2 dsa_verify_hash
-
-Verify DSA signature. See method L</verify_hash> below.
-
- dsa_verify_hash($pub_key_filename, $signature, $message_hash) or die "ERROR";
- #or
- dsa_verify_hash(\$buffer_containing_pub_key, $signature, $message_hash) or die "ERROR";
 
 =head1 OpenSSL interoperability
 
@@ -544,7 +506,7 @@ Verify signature (Perl code):
 
  my $pkdsa = Crypt::PK::DSA->new("dsakey.pub.pem");
  my $signature = read_rawfile("input.sha1-dsa.sig");
- my $valid = $pkdsa->verify_hash($signature, digest_file("SHA1", "input.data"), "SHA1", "v1.5");
+ my $valid = $pkdsa->verify_hash($signature, digest_file("SHA1", "input.data"));
  print $valid ? "SUCCESS" : "FAILURE";
 
 =head2 Sign by Crypt::PK::DSA, verify by OpenSSL
@@ -556,7 +518,7 @@ Create signature (Perl code):
  use Crypt::Misc 'write_rawfile';
 
  my $pkdsa = Crypt::PK::DSA->new("dsakey.priv.pem");
- my $signature = $pkdsa->sign_hash(digest_file("SHA1", "input.data"), "SHA1", "v1.5");
+ my $signature = $pkdsa->sign_hash(digest_file("SHA1", "input.data"));
  write_rawfile("input.sha1-dsa.sig", $signature);
 
 Verify signature (from commandline):
@@ -611,7 +573,7 @@ Load keys (Perl code):
 
 =over
 
-=item * L<https://en.wikipedia.org/wiki/Digital_Signature_Algorithm|https://en.wikipedia.org/wiki/Digital_Signature_Algorithm>
+=item * L<https://en.wikipedia.org/wiki/Digital_Signature_Algorithm>
 
 =back
 

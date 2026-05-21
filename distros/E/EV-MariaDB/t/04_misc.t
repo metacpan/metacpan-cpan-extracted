@@ -4,7 +4,7 @@ use Test::More;
 use lib 't/lib';
 use TestMariaDB;
 plan skip_all => 'No MariaDB/MySQL server' unless TestMariaDB::server_available();
-plan tests => 9;
+plan tests => 10;
 use EV;
 use EV::MariaDB;
 
@@ -30,6 +30,7 @@ with_mariadb(sub {
     my $escaped = $m->escape("it's a test");
     like($escaped, qr/it\\'s a test|it''s a test/, 'escape: quote escaped');
     is($m->escape("hello"), 'hello', 'escape: no special chars');
+    is($m->escape(""), '', 'escape: empty string');
 
     # accessors
     ok($m->server_version > 0, 'server_version is positive');

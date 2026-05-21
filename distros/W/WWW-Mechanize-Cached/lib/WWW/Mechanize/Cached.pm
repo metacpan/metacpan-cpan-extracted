@@ -1,21 +1,18 @@
-use strict;
-use warnings FATAL => 'all';
-
 package WWW::Mechanize::Cached;
 
-use 5.006;
-
-use Module::Runtime 'use_module';
 use Moo 1.004005;
-use MooX::Types::MooseLike::Base qw(AnyOf Bool Enum Maybe);
+use warnings FATAL => 'all';
+
+our $VERSION = '2.00';
+
+use Carp                         qw( carp croak );
+use Module::Runtime              qw( use_module );
+use MooX::Types::MooseLike::Base qw( AnyOf Bool Enum Maybe );
+use Storable                     qw( nfreeze thaw );
+
 use namespace::clean;
+
 extends 'WWW::Mechanize';
-
-use Carp qw( carp croak );
-use Data::Dump qw( dump );
-use Storable qw( nfreeze thaw );
-
-our $VERSION = '1.55';
 
 has is_cached        => ( is => 'rw', isa => Maybe [Bool], default => undef );
 has positive_cache   => ( is => 'rw', isa => Bool, default => 1 );
@@ -68,12 +65,23 @@ sub _isa_warn_cache {
 sub _build_cache {
     my $self = shift;
 
-    return Cache::FileCache->new(
-        {
-            default_expires_in => '1d',
-            namespace          => 'www-mechanize-cached',
-        }
-    ) if eval { use_module('Cache::FileCache') };
+    if ( eval { use_module('Cache::FileCache') && use_module('File::XDG') } )
+    {
+        my $cache_root = File::XDG->new(
+            name => 'WWW-Mechanize-Cached',
+            api  => 1,
+        )->cache_home;
+        $cache_root->mkdir( { mode => 0700 } );
+        chmod 0700, "$cache_root";
+        return Cache::FileCache->new(
+            {
+                default_expires_in => '1d',
+                namespace          => 'www-mechanize-cached',
+                cache_root         => "$cache_root",
+                directory_umask    => 077,
+            }
+        );
+    }
 
     return CHI->new(
         driver     => 'File',
@@ -281,7 +289,7 @@ WWW::Mechanize::Cached - Cache response to be polite
 
 =head1 VERSION
 
-version 1.55
+version 2.00
 
 =head1 SYNOPSIS
 
@@ -325,17 +333,22 @@ C<Cache::Cache> family.
 
 The default Cache object is set up with the following params:
 
+    use File::XDG;
     my $cache_params = {
-        default_expires_in => "1d", namespace => 'www-mechanize-cached',
+        default_expires_in => '1d',
+        namespace          => 'www-mechanize-cached',
+        cache_root         => File::XDG->new(
+            name => 'WWW-Mechanize-Cached',
+            api  => 1,
+        )->cache_home->stringify,
+        directory_umask    => 077,
     };
 
     $cache = Cache::FileCache->new( $cache_params );
 
-This should be fine if you only want to use a disk-based cache, you only want
-to cache results for 1 day and you're not in a shared hosting environment.
-If any of this presents a problem for you, you should pass in your own Cache
-object.  These defaults will remain unchanged in order to maintain backwards
-compatibility.
+This should be fine if you only want to use a disk-based cache and you
+only want to cache results for 1 day. If this presents a problem for
+you, you should pass in your own Cache object.
 
 For example, you may want to try something like this:
 

@@ -64,9 +64,9 @@ my @include = qw(
   File::Temp
   JSON::PP
   Module::Runtime
-  Pod::Coverage
   Sub::Name
-  YAML
+  YAML::PP
+  YAML::XS
   autodie
 );
 

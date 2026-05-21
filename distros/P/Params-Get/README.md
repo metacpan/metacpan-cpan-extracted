@@ -4,16 +4,14 @@ Params::Get - Get the parameters to a subroutine in any way you want
 
 # VERSION
 
-Version 0.13
+Version 0.14
 
 # DESCRIPTION
 
 Exports a single function, `get_params`, which returns a given value.
-If a validation schema is provided, the value is validated using
-[Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict).
-If validation fails, it croaks.
 
-When used hand-in-hand with [Return::Set](https://metacpan.org/pod/Return%3A%3ASet) you should be able to formally specify the input and output sets for a method.
+When used hand-in-hand with [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict) and [Return::Set](https://metacpan.org/pod/Return%3A%3ASet),
+you should be able to formally specify the input and output sets for a method.
 
 # SYNOPSIS
 
@@ -27,8 +25,8 @@ When used hand-in-hand with [Return::Set](https://metacpan.org/pod/Return%3A%3AS
             schema => {
                 'latitude' => {
                     type => 'number',
-                    min => -180,
-                    max => 180
+                    min => -90,
+                    max => 90
                 }, 'longitude' => {
                     type => 'number',
                     min => -180,
@@ -77,6 +75,59 @@ Some people like this sort of model, which is also supported.
         return bless $rc, $class;
     }
 
+## The `$default` Parameter
+
+The first argument is the `$default` parameter controls how single-argument calls are interpreted and provides
+a default key name for parameter extraction in those cases.
+
+When no arguments are provided with a defined `$default`:
+
+    get_params('required'); # Throws usage error
+
+The function requires either arguments or an undefined `$default`.
+
+### Usage Examples
+
+- Simple scalar parameter:
+
+        sub set_country {
+            my $params = get_params('country', @_);
+            # Accepts: set_country('US')
+            # Returns: { country => 'US' }
+        }
+
+- Object constructor with options:
+
+        sub new {
+            my $class = shift;
+            my $params = get_params('value', @_);
+            # Accepts: MyClass->new($object)
+            # Accepts: MyClass->new($object, { option => 'value' })
+            # Returns: { value => $object } or { value => $object, option => 'value' }
+        }
+
+- Hash parameter:
+
+        sub configure {
+            my $params = get_params('config', @_);
+            # Accepts: configure({ db => 'mysql', host => 'localhost' })
+            # Returns: { config => { db => 'mysql', host => 'localhost' } }
+        }
+
+- Without default (named parameters only):
+
+        sub process {
+            my $params = get_params(undef, @_);
+            # Accepts: process(name => 'John', age => 30)
+            # Returns: { name => 'John', age => 30 }
+        }
+
+### Caveats
+
+- When `$default` is defined and no arguments are provided, an error is thrown
+- There's no way to specify that a default parameter is optional
+- Single hash references always bypass the default parameter naming
+
 # AUTHOR
 
 Nigel Horne, `<njh at nigelhorne.com>`
@@ -87,8 +138,10 @@ Sometimes giving an array ref rather than array fails.
 
 # SEE ALSO
 
+- [Params::Smart](https://metacpan.org/pod/Params%3A%3ASmart)
 - [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict)
 - [Return::Set](https://metacpan.org/pod/Return%3A%3ASet)
+- [Test Dashboard](https://nigelhorne.github.io/Params-Get/coverage/)
 
 # SUPPORT
 
@@ -122,8 +175,10 @@ You can also look for information at:
 
     [http://deps.cpantesters.org/?module=Params::Get](http://deps.cpantesters.org/?module=Params::Get)
 
-# LICENSE AND COPYRIGHT
+# LICENCE AND COPYRIGHT
 
-Copyright 2025 Nigel Horne.
+Copyright 2025-2026 Nigel Horne.
 
-This program is released under the following licence: GPL2
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.

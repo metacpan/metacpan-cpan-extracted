@@ -53,7 +53,7 @@ sub init
     return( $self );
 }
 
-# as_string() - returns the RFC 2047 encoded form suitable for the wire.
+# as_string() returns the RFC 2047 encoded form suitable for the wire.
 # Pure ASCII values are returned unchanged.
 sub as_string
 {
@@ -64,7 +64,7 @@ sub as_string
     return( $self->{_encoded} );
 }
 
-# decode( $encoded_string ) - class or instance method.
+# decode( $encoded_string ) is a class or instance method.
 # Decodes an RFC 2047 encoded Subject value back to a Perl string.
 sub decode
 {
@@ -73,13 +73,13 @@ sub decode
     return( _decode_subject( $str ) );
 }
 
-# field_name() - always returns 'Subject'
+# field_name() always returns 'Subject'
 sub field_name { return( 'Subject' ); }
 
-# raw() - returns the decoded Perl string (the original value before encoding)
+# raw() returns the decoded Perl string (the original value before encoding)
 sub raw { return( shift->{_raw} ); }
 
-# value( [$text] ) - sets or gets the subject text.
+# value( [$text] ) sets or gets the subject text.
 # On assignment: stores the raw Perl string; clears the encoded cache.
 # On retrieval: returns the decoded Perl string (i.e. human-readable).
 sub value

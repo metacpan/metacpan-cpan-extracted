@@ -1,11 +1,17 @@
 .cvsignore
 Changes
 eg/WonderBra.pl
+Getopt/WonderBra.pm
 GNUmakefile
-lib/Getopt/WonderBra.pm
+Makefile
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST
+MANIFEST.bak
+MANIFEST.SKIP
 META.yml
+MYMETA.json
+MYMETA.yml
 README
 t/00_useok.t
 t/01_wonderbra.t
+META.json                                Module JSON meta-data (added by MakeMaker)

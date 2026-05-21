@@ -9,44 +9,29 @@ open my $fh, '<', $dist_ini or BAIL_OUT("Could not open $dist_ini: $!");
 my @lines = <$fh>;
 close $fh;
 
-my @run_after_build = grep { /^run_after_build = / } @lines;
-my @run_after_release = grep { /^run_after_release = / } @lines;
+my $config = join( '', @lines );
 
-ok( @run_after_build, 'docker build hooks exist for run_after_build' );
-like(
-    join( '', @run_after_build ),
-    qr/docker build .*--target runtime-root .*raudssus\/karr:latest/s,
-    'run_after_build builds the dynamic latest Docker tag from runtime-root',
-);
+my $docker_marker = '@Author::GETTY::Docker / ';
+my @docker_subsections = grep { index( $_, $docker_marker ) >= 0 } @lines;
 
-like(
-    join( '', @run_after_build ),
-    qr/docker build .*--target runtime-user .*raudssus\/karr:user/s,
-    'run_after_build also builds the fixed user Docker tag from runtime-user',
-);
+ok( scalar(@docker_subsections) >= 2, 'two [@Author::GETTY::Docker] subsections exist' );
 
-like(
-    join( '', @run_after_release ),
-    qr/release upload %v -R Getty\/p5-app-karr %a --clobber/,
-    'run_after_release uploads the documented release archive placeholder',
-);
+ok( index( $config, '[@Author::GETTY::Docker / runtime-root]' ) >= 0,
+    'runtime-root subsection exists' );
 
-like(
-    join( '', @run_after_release ),
-    qr/docker build .*--target runtime-root .*raudssus\/karr:%v .*raudssus\/karr:\$\(echo %v \| cut -d\. -f1\)/s,
-    'run_after_release still builds versioned Docker tags from runtime-root',
-);
+ok( index( $config, '[@Author::GETTY::Docker / runtime-user]' ) >= 0,
+    'runtime-user subsection exists' );
 
-like(
-    join( '', @run_after_release ),
-    qr/docker build .*--target runtime-user .*raudssus\/karr:user/s,
-    'run_after_release also publishes the fixed user Docker tag',
-);
+ok( index( $config, "target = runtime-root" ) >= 0 && index( $config, "image = raudssus/karr" ) >= 0,
+    'runtime-root has target and image' );
 
-like(
-    join( '', @run_after_release ),
-    qr/docker push raudssus\/karr:user/,
-    'run_after_release pushes the fixed user Docker tag',
-);
+ok( index( $config, "target = runtime-user" ) >= 0 && index( $config, "image = raudssus/karr" ) >= 0,
+    'runtime-user has target and image' );
+
+ok( index( $config, "tags = latest" ) >= 0,
+    'runtime-root has latest tag' );
+
+ok( index( $config, "tags = user" ) >= 0,
+    'runtime-user has user tag' );
 
 done_testing;

@@ -183,9 +183,14 @@ with_mariadb(sub {
     $m->q("select 3", sub {
         my ($rows, $err) = @_;
         push @results, $err ? "err:$err" : "ok";
-        is_deeply(\@results, ['ok', 'err:skipped', 'err:skipped'],
-            'pipeline: skip_pending cancels remaining with error');
-        is($m->pending_count, 0, 'pipeline: pending_count 0 after skip');
-        EV::break;
+        # Defer assertions until skip_pending/cancel_pending fully unwinds,
+        # so pending_count and queue state are stable.
+        my $t; $t = EV::timer(0, 0, sub {
+            undef $t;
+            is_deeply(\@results, ['ok', 'err:skipped', 'err:skipped'],
+                'pipeline: skip_pending cancels remaining with error');
+            is($m->pending_count, 0, 'pipeline: pending_count 0 after skip');
+            EV::break;
+        });
     });
 });

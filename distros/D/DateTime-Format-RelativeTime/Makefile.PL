@@ -27,17 +27,17 @@ my %WriteMakefileArgs = (
         'warnings'                      => 0,
         'warnings::register'            => 0,
         # 2008-02-29
-        'DateTime'                      => '0.42',
-        'DateTime::Locale::FromCLDR'    => 'v0.6.1',
-        'Locale::Intl'                  => 'v0.1.3',
-        'Locale::Unicode::Data'         => 'v1.3.2',
+        'DateTime::Lite'                => 'v0.6.6',
+        'DateTime::Locale::FromCLDR'    => 'v0.8.2',
+        'Locale::Intl'                  => 'v0.3.0',
+        'Locale::Unicode::Data'         => 'v1.8.3',
         'Scalar::Util'                  => 0,
         # Version compatible with perl v5.10.1
         'Wanted'                        => 'v0.1.0',
     },
     TEST_REQUIRES =>
     {
-        'lib'               => '0.63',
+        'lib'               => 0,
         'open'              => 0,
         'utf8'              => 0,
         # Released 2017-11-30
@@ -57,12 +57,12 @@ my %WriteMakefileArgs = (
         resources => {
             # homepage    => undef,
             repository  => {
-                url         => 'git@gitlab.com:jackdeguest/DateTime-Format-RelativeTime.git',
-                web         => 'https://gitlab.com/jackdeguest/DateTime-Format-RelativeTime',
+                url         => 'git@gitlab.com:deguest/DateTime-Format-RelativeTime.git',
+                web         => 'https://gitlab.com/deguest/DateTime-Format-RelativeTime',
                 type        => 'git',
             },
             bugtracker => {
-                web         => 'https://gitlab.com/jackdeguest/DateTime-Format-RelativeTime/issues',
+                web         => 'https://gitlab.com/deguest/DateTime-Format-RelativeTime/issues',
             },
         },
     }) : ()),

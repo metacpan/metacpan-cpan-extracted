@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.638';
+our $VERSION = '0.639';
 
 use 5.020;
 use Moo;
@@ -34,10 +34,6 @@ use Safe::Isa;
 use namespace::clean;
 
 use overload
-  'bool'  => sub {
-    croak 'boolean overload is deprecated and could be removed anytime after 2026-02-01';
-    $_[0]->valid;
-  },
   '&'     => \&combine,
   '""' => sub { $_[0]->stringify },
   fallback => 1;
@@ -296,7 +292,7 @@ JSON::Schema::Modern::Result - Contains the result of a JSON Schema evaluation
 
 =head1 VERSION
 
-version 0.638
+version 0.639
 
 =head1 SYNOPSIS
 

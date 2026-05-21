@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 314;
+use Test::More tests => 319;
 use Crypt::Mode::CBC;
 
 my @tests;
@@ -94,5 +94,25 @@ for (@tests) {
       }
 
     }
+  }
+}
+
+{
+  my $key = pack("H*", '2b7e151628aed2a6abf7158809cf4f3c');
+  my $iv  = pack("H*", '000102030405060708090a0b0c0d0e0f');
+  my $m   = Crypt::Mode::CBC->new('AES');
+
+  eval { $m->add("x") };
+  like($@, qr/call start_decrypt or start_encrypt first/, 'add() before start croaks');
+
+  eval { $m->finish };
+  like($@, qr/mode not active; call start_decrypt or start_encrypt first/, 'finish() before start croaks');
+
+  {
+    local $SIG{__WARN__} = sub { };
+    is(length(Crypt::Mode::CBC->new('AES')->encrypt(undef, $key, $iv)), 16, 'encrypt(undef) uses empty plaintext with padding');
+    eval { Crypt::Mode::CBC->new('AES')->decrypt('', $key, $iv) };
+    like($@, qr/at least one block with padding/, 'decrypt(empty) rejects empty padded ciphertext');
+    is(Crypt::Mode::CBC->new('AES', 0)->decrypt('', $key, $iv), '', 'decrypt(empty) without padding returns empty string');
   }
 }

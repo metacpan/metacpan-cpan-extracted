@@ -20,6 +20,8 @@ do { my $x = {
                                       'Software::Security::Policy::Individual' => '0.10',
                                       'Test2::Require::AuthorTesting' => '0',
                                       'Test2::Tools::Basic' => '1.302200',
+                                      'Test2::Tools::Warnings' => '0',
+                                      'Test2::V0' => '0',
                                       'Test::CPAN::Changes' => '0.500002',
                                       'Test::CleanNamespaces' => '0.15',
                                       'Test::DistManifest' => '0',
@@ -41,7 +43,8 @@ do { my $x = {
                                       'Test::Spelling' => '0.17',
                                       'Test::TrailingSpace' => '0.0203',
                                       'Test::Vars' => '0.015',
-                                      'Test::XS::Check' => '0'
+                                      'Test::XS::Check' => '0',
+                                      'utf8' => '0'
                                     }
                     },
        'runtime' => {

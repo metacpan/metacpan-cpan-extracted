@@ -1,0 +1,15 @@
+blib*
+Makefile
+Makefile.old
+pm_to_blib*
+*.tar.gz
+.lwpcookies
+cover_db
+pod2htm*.tmp
+/RTIR-Extension-MISP*
+*.bak
+*.swp
+/MYMETA.*
+/t/tmp
+/xt/tmp
+/.claude/

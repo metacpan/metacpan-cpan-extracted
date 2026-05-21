@@ -20,6 +20,8 @@ WriteMakefile(
       "File::ShareDir"=>0,
       "IO::Compress::RawDeflate"=>0,
       "IO::Uncompress::RawInflate"=>0,
+      "CSS::Minifier::XS"=>0,
+      "JavaScript::Minifier::XS"=>0,
 
     }, # e.g., Module::Name => 1.1
     ABSTRACT_FROM     => 'lib/Data/JPack.pod', # retrieve abstract from module

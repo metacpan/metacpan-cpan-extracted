@@ -17,11 +17,9 @@ use Helper;
 use JSON::Schema::Modern::Utilities qw(is_bool get_type is_type jsonp_set);
 use OpenAPI::Modern::Utilities qw(coerce_primitive uri_encode);
 
-my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
-
 my $openapi = OpenAPI::Modern->new(
   openapi_uri => 'http://localhost:1234/api',
-  openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+  openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 components: {}
 YAML
 
@@ -2255,12 +2253,12 @@ subtest 'cookie parameters' => sub {
       ],
     },
     {
-      name => 'empty header but not required',
+      name => 'missing parameter but not required',
       param_obj => { name => 'q', content => { 'application/json' => {} } },
       cookie => 'foo=bar; baz=qux',
     },
     {
-      name => 'empty header, required',
+      name => 'missing parameter, required',
       param_obj => { name => 'q', required => true, content => { 'application/json' => {} } },
       cookie => 'foo=bar; baz=qux',
       errors => [
@@ -2289,7 +2287,7 @@ subtest 'cookie parameters' => sub {
       cookie => 'ಠ_ಠ=foo',
       errors => [
         {
-          instanceLocation => '/request/header/Cookie',
+          instanceLocation => '/request/header/Cookie/ಠ_ಠ',
           keywordLocation => $keyword_path,
           absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
           error => 'invalid cookie name: "ಠ_ಠ"',
@@ -2302,13 +2300,151 @@ subtest 'cookie parameters' => sub {
       cookie => 'q=ಠ_ಠ',
       errors => [
         {
-          instanceLocation => '/request/header/Cookie',
+          instanceLocation => '/request/header/Cookie/q',
           keywordLocation => $keyword_path,
           absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
           error => 'invalid cookie value: "ಠ_ಠ"',
         },
       ],
     },
+
+    (map +(
+      {
+        name => 'missing Cookie header but not required',
+        param_obj => { style => $_ },
+      },
+      {
+        name => 'missing Cookie header, required',
+        param_obj => { style => $_, required => true },
+        errors => [
+          {
+            instanceLocation => '/request/header/Cookie',
+            keywordLocation => $keyword_path.'/required',
+            absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+            error => 'missing header: Cookie',
+          },
+        ],
+      },
+      {
+        name => 'missing cookie parameter but not required',
+        param_obj => { style => $_ },
+        cookie => 'foo=1&bar=2',
+      },
+      {
+        name => 'missing cookie parameter, required',
+        param_obj => { style => $_, required => true },
+        cookie => 'foo=1&bar=2',
+        errors => [
+          {
+            instanceLocation => '/request/header/Cookie',
+            keywordLocation => $keyword_path.'/required',
+            absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
+            error => 'missing cookie parameter: q',
+          },
+        ],
+      },
+      {
+        name => 'missing cookie-value',
+        param_obj => { style => $_ },
+        cookie => 'x',
+        errors => [
+          {
+            instanceLocation => '/request/header/Cookie/x',
+            keywordLocation => $keyword_path,
+            absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+            error => 'cookie-string "x" is missing a value',
+          },
+        ],
+      },
+      {
+        name => 'missing cookie-values',
+        param_obj => { style => $_ },
+        cookie => 'x; y',
+        errors => [
+          {
+            instanceLocation => '/request/header/Cookie/x',
+            keywordLocation => $keyword_path,
+            absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+            error => 'cookie-string "x" is missing a value',
+          },
+          {
+            instanceLocation => '/request/header/Cookie/y',
+            keywordLocation => $keyword_path,
+            absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+            error => 'cookie-string "y" is missing a value',
+          },
+        ],
+      },
+      {
+        name => 'with boolean schema, return empty string as string',
+        param_obj => { style => $_, schema => true },
+        cookie => 'q=',
+        content => '',
+      },
+      {
+        name => 'with boolean schema, return data as string',
+        param_obj => { style => $_, schema => true },
+        cookie => 'q=42',
+        content => '42',
+      },
+      {
+        name => 'parameter name is valid even if not valid as a cookie name',
+        param_obj => { name => 'q=hello', style => $_, schema => { type => 'object' } },
+        cookie => 'q=hello=there',
+        content => { q => 'hello=there' },
+      },
+      {
+        name => 'invalid cookie name, but wrong name is parsed so value is not found',
+        param_obj => { name => 'q=hello', style => $_, schema => { type => 'string' } },
+        cookie => 'q=hello=there',
+        # parsed as name = 'q', value = 'hello=there'
+      },
+      {
+        name => 'invalid cookie name',
+        param_obj => { name => 'foo[bar]', style => $_, schema => { type => 'string' } },
+        cookie => 'foo[bar]=hi',
+        errors => [
+          {
+            instanceLocation => '/request/header/Cookie/foo[bar]',
+            keywordLocation => $keyword_path,
+            absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+            error => 'invalid cookie name: "foo[bar]"',
+          },
+        ],
+      },
+      {
+        name => 'invalid cookie values (bad character)',
+        param_obj => { style => $_, schema => { type => 'string' } },
+        cookie => 'foo=bad,value; bar=worse,value',
+        errors => [
+          {
+            instanceLocation => '/request/header/Cookie/foo',
+            keywordLocation => $keyword_path,
+            absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+            error => 'invalid cookie value: "bad,value"',
+          },
+          {
+            instanceLocation => '/request/header/Cookie/bar',
+            keywordLocation => $keyword_path,
+            absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+            error => 'invalid cookie value: "worse,value"',
+          },
+        ],
+      },
+      {
+        name => 'invalid cookie values (mismatched quotes)',
+        param_obj => { style => $_, schema => { type => 'string' } },
+        cookie => 'foo=bad"',
+        errors => [
+          {
+            instanceLocation => '/request/header/Cookie/foo',
+            keywordLocation => $keyword_path,
+            absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+            error => 'invalid cookie value: "bad\""',
+          },
+        ],
+      },
+    ), qw(form cookie)),
 
     # style=form - copied from query tests
 
@@ -2327,25 +2463,6 @@ subtest 'cookie parameters' => sub {
       }
       : ()
     ), @query_tests),
-
-    {
-      name => 'missing but not required',
-      param_obj => {},
-      cookie => 'foo=1&bar=2',
-    },
-    {
-      name => 'missing, required',
-      param_obj => { required => true },
-      cookie => 'foo=1&bar=2',
-      errors => [
-        {
-          instanceLocation => '/request/header/Cookie',
-          keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
-          error => 'missing cookie parameter: q',
-        },
-      ],
-    },
 
     [
       [ qw(style content cookie) ],
@@ -2439,137 +2556,6 @@ subtest 'cookie parameters' => sub {
       [ 'cookie', true,  { R => '100', G => '200', B => '' }, 'R=100; G=200; B=' ],
       [ 'cookie', true,  { qw(R 100 G 200 B 150) }, 'R=100; G=200; B=150' ],
     ],
-
-    {
-      name => 'missing header but not required',
-      param_obj => { style => 'cookie' },
-    },
-    {
-      name => 'missing header, required',
-      param_obj => { style => 'cookie', required => true },
-      errors => [
-        {
-          instanceLocation => '/request/header/Cookie',
-          keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
-          error => 'missing header: Cookie',
-        },
-      ],
-    },
-    {
-      name => 'missing cookie parameter but not required',
-      param_obj => { style => 'cookie' },
-      cookie => 'foo=bar; baz=qux',
-    },
-    {
-      name => 'missing header, required',
-      param_obj => { style => 'cookie', required => true },
-      errors => [
-        {
-          instanceLocation => '/request/header/Cookie',
-          keywordLocation => $keyword_path.'/required',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/required',
-          error => 'missing header: Cookie',
-        },
-      ],
-    },
-    {
-      name => 'missing cookie-value',
-      param_obj => { style => 'cookie' },
-      cookie => 'q',
-      errors => [
-        {
-          instanceLocation => '/request/header/Cookie',
-          keywordLocation => $keyword_path.'/style',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
-          error => 'cookie-string "q" is missing a value',
-        },
-      ],
-    },
-    {
-      name => 'missing cookie-values',
-      param_obj => { style => 'cookie' },
-      cookie => 'q; r',
-      errors => [
-        {
-          instanceLocation => '/request/header/Cookie',
-          keywordLocation => $keyword_path.'/style',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
-          error => 'cookie-string "q" is missing a value',
-        },
-        {
-          instanceLocation => '/request/header/Cookie',
-          keywordLocation => $keyword_path.'/style',
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
-          error => 'cookie-string "r" is missing a value',
-        },
-      ],
-    },
-    {
-      name => 'with boolean schema, return empty string as string',
-      param_obj => { style => 'cookie', schema => true },
-      cookie => 'q=',
-      content => '',
-    },
-    {
-      name => 'with boolean schema, return data as string',
-      param_obj => { style => 'cookie', schema => true },
-      cookie => 'q=42',
-      content => '42',
-    },
-    (map +(
-      {
-        name => 'parameter name is valid even if not valid as a cookie name',
-        param_obj => { name => 'q=hello', style => $_, schema => { type => 'object' } },
-        cookie => 'q=hello=there',
-        content => { q => 'hello=there' },
-      },
-      {
-        name => 'invalid cookie name, but wrong name is parsed so value is not found',
-        param_obj => { name => 'q=hello', style => $_, schema => { type => 'string' } },
-        cookie => 'q=hello=there',
-        # parsed as name = 'q', value = 'hello=there'
-      },
-      {
-        name => 'invalid cookie name',
-        param_obj => { name => 'foo[bar]', style => $_, schema => { type => 'string' } },
-        cookie => 'foo[bar]=hi',
-        errors => [
-          {
-            instanceLocation => '/request/header/Cookie',
-            keywordLocation => $keyword_path,
-            absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
-            error => 'invalid cookie name: "foo[bar]"',
-          },
-        ],
-      },
-      {
-        name => 'invalid cookie values (bad character)',
-        param_obj => { style => $_, schema => { type => 'string' } },
-        cookie => 'foo=bad,value; bar=worse,value',
-        errors => [
-          {
-            instanceLocation => '/request/header/Cookie',
-            keywordLocation => $keyword_path,
-            absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
-            error => 'invalid cookie values: "bad,value", "worse,value"',
-          },
-        ],
-      },
-      {
-        name => 'invalid cookie values (mismatched quotes)',
-        param_obj => { style => $_, schema => { type => 'string' } },
-        cookie => 'foo=bad"',
-        errors => [
-          {
-            instanceLocation => '/request/header/Cookie',
-            keywordLocation => $keyword_path,
-            absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
-            error => 'invalid cookie value: "bad\""',
-          },
-        ],
-      },
-    ), qw(form cookie)),
   );
 
   @tests = map +(
@@ -2654,7 +2640,7 @@ subtest 'cookie parameters' => sub {
 subtest 'type inference and coercion' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => 'http://localhost:1234/api',
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   parameters:
     MyParameter:
@@ -2822,7 +2808,7 @@ YAML
 
   $openapi->evaluator->add_document(JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'https://example.com/my_3.0_oad',
-    schema => my $schema_3_0 = $yamlpp->load_string(<<'YAML')));
+    schema => my $schema_3_0 = decode_yaml(<<'YAML')));
 openapi: 3.0.4
 info:
   title: Test API

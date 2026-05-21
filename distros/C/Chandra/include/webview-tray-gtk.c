@@ -1,5 +1,5 @@
 /*
- * webview-tray-gtk.c — Linux system tray (GtkStatusIcon) backend
+ * webview-tray-gtk.c - Linux system tray (GtkStatusIcon) backend
  *
  * Uses GtkStatusIcon (deprecated but widely supported) with GtkMenu.
  * Falls back gracefully if no system tray is available.
@@ -83,7 +83,7 @@ static GtkWidget *tray_gtk_build_menu(struct webview_tray *t,
 static void tray_gtk_activate(GtkStatusIcon *icon, gpointer user_data) {
   (void)icon;
   struct webview_tray *t = (struct webview_tray *)user_data;
-  /* Left click — invoke item 0 if it exists, or just show menu */
+  /* Left click - invoke item 0 if it exists, or just show menu */
   if (t->menu_cb && t->item_count > 0) {
     t->menu_cb(t->w, -1); /* -1 = tray icon clicked */
   }

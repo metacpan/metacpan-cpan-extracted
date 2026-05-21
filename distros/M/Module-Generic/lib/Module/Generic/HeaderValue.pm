@@ -15,7 +15,7 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'Module::Generic' );
     use parent qw( Module::Generic );
     use vars qw( $QUOTE_REGEXP $DELIMITER $DELIMITERS $VCHAR $VCHAR_WITHOUT_DELIM
                  $TOKEN_REGEXP $TEXT_REGEXP );
@@ -214,7 +214,7 @@ sub new_from_header
                 }
                 else
                 {
-                    warnings::warn( "Value for property \"$attribute\" contained some illegal characters or exceeded the maximum size of '$value_max_len'.\n" ) if( warnings::enabled() );
+                    warnings::warn( "Value for property \"$attribute\" contained some illegal characters or exceeded the maximum size of '$value_max_len'.\n" ) if( warnings::enabled( 'Module::Generic' ) );
                 }
             }
             else
@@ -224,7 +224,7 @@ sub new_from_header
         }
         else
         {
-            warnings::warn( "Token \"$attribute\" contains illegal characters or exceeds the maximum size of '$token_max_len'.\n" ) if( warnings::enabled() );
+            warnings::warn( "Token \"$attribute\" contains illegal characters or exceeds the maximum size of '$token_max_len'.\n" ) if( warnings::enabled( 'Module::Generic' ) );
         }
     }
     return( $obj );

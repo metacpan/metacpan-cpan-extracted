@@ -35,7 +35,9 @@ UV _hash_mur3(UV seed1)
 
 void _seed(UV seed1, UV seed2)
 
-U32 _bounded_rand(UV range)
+U32 _bounded_rand32_lemire(UV range)
+
+UV _bounded_rand64_rejection(UV range)
 
 double _uint64_to_double(UV num, U8 inclusive)
 

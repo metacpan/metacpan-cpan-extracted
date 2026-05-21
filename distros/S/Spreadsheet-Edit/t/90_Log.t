@@ -169,14 +169,14 @@ foreach my $with_color (0, 1) {
   { my $obj = Outer->new("btw_test"); # equivalent to btwN 0,...
     my $explno = __LINE__ + 1;
     checklog { $obj->doeval('btwbt "FOO-1"') } qr{^
-                              (?:main:)?${explno}${SP}
-                              .* \d+${SP}
+                              (?:main:)?${explno}\D+
+                              .* \d+\D+
                               .*  #capture internals
-                              .* (?:main:)?${checklog_callback_lno}${SP}
-                              .* \d+${SP}
-                              .* \d+${SP}
-                              .* \d+${SP}
-                              .* \(eval${SP}\d+\)\D*1${SP}?[^\w\s]${SP}
+                              .* (?:main:)?${checklog_callback_lno}\D+
+                              .* \d+\D+
+                              .* \d+\D+
+                              .* \d+\D+
+                              .* \(eval${SP}\d+\):\D*1${SP}?[^\w\s]${SP}
                               ${color_re}FOO-1${color_re} }msx,
                             "btwbt-FOO-1 (${color_onoff})", "NOHEAD" ;
   }
@@ -184,7 +184,7 @@ foreach my $with_color (0, 1) {
   { my $obj = Outer->new("btwN3_test");
     my $explno = __LINE__ + 1;
     checklog { $obj->doeval('btwN 3,"FOO-2"') } qr{^
-                              (?:main:)?${explno}${SP}?[^\w\s]${SP}
+                              (?:main:)?${explno}${SP}?[^\w\s]\D+
                               ${color_re}FOO-2${color_re} }msx,
                             "btwN 3,... (${color_onoff})", "NOHEAD" ;
   }
@@ -203,9 +203,9 @@ foreach my $with_color (0, 1) {
     # btwN \3,... means 3-level backtrace
     my $explno = (__LINE__)+1;
     checklog { $obj->doeval('btwN \3, "FOO-4"') }  qr{^
-                              Outer:\d+${SP}
-                              .* Inner:\d+${SP}
-                              .* \(eval${SP}\d+\)\D*1${SP}?[^\w\s]${SP}
+                              Outer:\d+\D+
+                              Inner:\d+\D+
+                              \(eval${SP}\d+\)\D*1${SP}?[^\w\s]${SP}
                               ${color_re}FOO-4${color_re} }msx,
              "btwN \\3,... (${color_onoff})", "NOHEAD" ;
   }
@@ -214,10 +214,10 @@ foreach my $with_color (0, 1) {
     # btwN \4,... means 4-level backtrace
     my $explno = (__LINE__)+1;
     checklog { $obj->doeval('btwN \4, "FOO-5"') }  qr{^
-                              ^(?:main:)?${explno}${SP}
-                              .* Outer:\d+${SP}
-                              .* Inner:\d+${SP}
-                              .* \(eval${SP}\d+\)\D*1${SP}?[^\w\s]${SP}
+                              ^(?:main:)?${explno}\D+
+                              Outer:\d+\D+
+                              Inner:\d+\D+
+                              \(eval${SP}\d+\)\D*1${SP}?[^\w\s]${SP}
                               ${color_re}FOO-5${color_re} }msx,
              "btwN \\4,... (${color_onoff})", "NOHEAD" ;
   }

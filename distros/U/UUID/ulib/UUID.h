@@ -1,5 +1,5 @@
-#ifndef UU_UUID_H
-#define UU_UUID_H
+#ifndef ULIB__UUID_H
+#define ULIB__UUID_H
 
 /* Enable extensions on AIX 3, Interix.  */
 #ifndef _ALL_SOURCE
@@ -88,12 +88,15 @@
 # undef _XOPEN_SOURCE
 #endif
 
+
 #define PERL_NO_GET_CONTEXT
 #include "ulib/EUMM.h"
 #include "EXTERN.h"
 #include "perl.h"
 #include "ulib/TYPE.h"
+#define SMEM UCXT.shared
 #include "ulib/PORT.h"
+#include "ulib/UMTX.h"
 
 #ifdef SvPVbyte
 # if PERL_VERSION_EQ(5,6,1)

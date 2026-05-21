@@ -7,7 +7,7 @@ use parent 'App::Test::Generator::Mutation::Base';
 use App::Test::Generator::Mutant;
 use PPI;
 
-our $VERSION = '0.33';
+our $VERSION = '0.38';
 
 =head1 NAME
 
@@ -16,7 +16,9 @@ expressions to expose missing assertion coverage
 
 =head1 VERSION
 
-Version 0.33
+Version 0.38
+
+=head1 METHODS
 
 =head2 applies_to
 
@@ -58,9 +60,13 @@ True if the node is a C<PPI::Statement::Return>, false otherwise.
 sub applies_to {
 	my ($self, $node) = @_;
 
-	# This strategy only targets return statements — other node
-	# types cannot produce boolean negation mutants
-	return $node->isa('PPI::Statement::Return');
+	# PPI >= 1.270 classifies return as PPI::Statement::Break
+	# rather than PPI::Statement::Return
+	return 0 unless $node->isa('PPI::Statement::Break');
+
+	# Must specifically be a return statement, not last/next/redo
+	my $first = $node->schild(0) or return 0;
+	return $first->content eq 'return';
 }
 
 =head2 mutate
@@ -141,13 +147,35 @@ C<return;> statements) are mutated.
 sub mutate {
 	my ($self, $doc) = @_;
 
-	# Find all return statements in the document
-	my $returns = $doc->find('PPI::Statement::Return') || [];
+	# PPI >= 1.270 classifies return statements as PPI::Statement::Break
+	# (alongside last/next/redo) rather than PPI::Statement::Return.
+	# Use a custom predicate to match only 'return' Break nodes.
+	my $returns = $doc->find(sub {
+		my $node = $_[1];
+		# Must be a Break statement -- the parent class for return in
+		# newer PPI versions
+		return 0 unless $node->isa('PPI::Statement::Break');
+		# Distinguish return from last/next/redo by checking the
+		# first significant child token
+		my $first = $node->schild(0) or return 0;
+		return $first->content eq 'return';
+	}) || [];
+
 	my @mutants;
 
 	for my $ret (@{$returns}) {
-		# Skip bare return statements with no expression to negate
+		# Skip bare return statements with no expression to negate.
+		# Also skip if the only child after 'return' is a semicolon —
+		# PPI may include the statement terminator as a significant child
 		my $expr = $ret->schild(1) or next;
+		next if $expr->isa('PPI::Token::Structure') && $expr->content eq ';';
+
+		# Skip structure nodes (e.g. return ($x, $y) gives a
+		# PPI::Structure::List) — set_content only exists on tokens
+		next unless $expr->isa('PPI::Token');
+
+		# Skip postfix conditionals — wrapping 'unless ...' in !() is invalid syntax
+		next if $expr->isa('PPI::Token::Word') && $expr->content =~ /^(?:if|unless|while|until|for|foreach)$/;
 
 		# Capture location so the transform closure targets the
 		# exact statement rather than the first match on that line
@@ -173,8 +201,17 @@ sub mutate {
 				transform => sub {
 					my $doc  = $_[0];
 
-					# Find all return statements in the fresh document copy
-					my $rets = $doc->find('PPI::Statement::Return') || [];
+					# Locate all return statements in the fresh document copy using
+					# the same PPI::Statement::Break predicate as the outer find --
+					# PPI >= 1.270 no longer uses PPI::Statement::Return
+					my $rets = $doc->find(sub {
+						my $node = $_[1];
+						# Match Break nodes only -- covers return/last/next/redo
+						return 0 unless $node->isa('PPI::Statement::Break');
+						# Filter to return specifically by inspecting the first token
+						my $first = $node->schild(0) or return 0;
+						return $first->content eq 'return';
+					}) || [];
 
 					for my $ret (@{$rets}) {
 						# Match by line and column to avoid mutating
@@ -185,11 +222,16 @@ sub mutate {
 						# Skip bare returns with no expression
 						my $expr = $ret->schild(1) or last;
 
-						# Wrap the expression in logical negation.
-						# Operate on the token content directly to
-						# avoid PPI document ownership issues that
-						# arise when replacing entire statement nodes
-						my $content = $expr->content;
+						# Skip bare semicolon
+						next if $expr->isa('PPI::Token::Structure') && $expr->content eq ';';
+
+						# Skip structure nodes — set_content only exists on tokens
+						next unless $expr->isa('PPI::Token');
+
+						# Skip postfix conditionals — wrapping 'unless ...' in !() is invalid syntax
+						next if $expr->isa('PPI::Token::Word') && $expr->content =~ /^(?:if|unless|while|until|for|foreach)$/;
+
+						my $content = $expr->content();
 						$expr->set_content("!($content)");
 						last;
 					}
@@ -197,7 +239,7 @@ sub mutate {
 			);
 		};
 
-		# If Mutant construction fails, report clearly rather than
+		# If the Mutant construction fails, report clearly rather than
 		# silently dropping the mutant from the results
 		if($@ || !$mutant) {
 			warn "Failed to construct mutant $id: $@" if $@;

@@ -2,8 +2,10 @@ Makefile
 Makefile.old
 Build
 Build.bat
-META.*
-MYMETA.*
+META.json
+META.yml
+MYMETA.json
+MYMETA.yml
 .build/
 _build/
 cover_db/

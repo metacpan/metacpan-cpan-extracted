@@ -1,0 +1,9 @@
+package Module::Install::RTx;
+
+@remove_files = (
+    'html/Callbacks/RTIR-Extension-MISP/RTIR/Incident/Display.html/ProcessArguments',
+    'html/Callbacks/RTIR-Extension-MISP/RTIR/Incident/Display.html/RightColumnEnd',
+    'html/Helpers/MISPEventDetails',
+);
+
+1;

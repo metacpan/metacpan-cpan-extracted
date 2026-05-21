@@ -1,0 +1,48 @@
+commit 1f5ba96369fcfd0e50cfd05e657d8da0b832ee53
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun May 10 00:57:20 2026 +0930
+
+    Unify module syntax and .sha generation with other Task::WebDyne module suites
+
+commit 9aab2fd44bf78b40fdbeb5c23d8c0046f84d86d7
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun May 10 00:56:54 2026 +0930
+
+    VERSION increment: 0.003
+
+commit 987477178ccf2363b7816f27c6e87308667ebbf1
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sun May 10 00:56:43 2026 +0930
+
+    Unify module syntax and .sha generation with other Task::WebDyne module suites
+
+commit 975850f278e362dc996e3409dacbf5c766428303
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat May 9 23:58:59 2026 +0930
+
+    Version increment
+
+commit db5dcf9ce31fb1c8bb86e291ddb8ea39197d5ef1
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat May 9 23:58:49 2026 +0930
+
+    VERSION increment: 0.002
+
+commit 3cb1fde4010a1dd308dbc8deb7c06f4c52ee7a70
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat May 9 23:58:26 2026 +0930
+
+    Add .sha test file
+
+commit 75c16a0c0f1968b9d8ed0e24dc01dc574620f718
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat May 9 23:51:22 2026 +0930
+
+    Initial commit
+
+commit 9f7ed7663d666807ff2e98617bdb9e928126a1cb
+Author: Andrew Speer <andrew.speer@isolutions.com.au>
+Date:   Sat May 9 23:51:06 2026 +0930
+
+    MANIFEST Import
+

@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2025 Philipp Schafft
+# Copyright (c) 2023-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -20,7 +20,7 @@ use Data::Identifier::Generate;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.28;
+our $VERSION = v0.29;
 
 use constant {
     WK_UUID => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31', # uuid
@@ -102,6 +102,10 @@ sub import {
                 %generator = split(/[,=]/, $arg);
                 $id_type = undef;
                 $namespace = undef;
+                foreach my $key (qw(generator namespace)) {
+                    next unless defined $generator{$key};
+                    $generator{$key} = Data::Identifier->new(from => $generator{$key})->register;
+                }
             } elsif ($command eq '$namespace') {
                 $namespace = $arg;
             } elsif ($command eq '$end') {
@@ -117,6 +121,9 @@ sub import {
             @classes = ($default_class);
         } else {
             @classes = split(',', $classes);
+        }
+        if (defined($displayname)) {
+            $displayname = undef if $displayname eq '.';
         }
 
         push(@classes, @extra_classes);
@@ -137,13 +144,13 @@ sub import {
             if (defined $id_type) {
                 $identifier = Data::Identifier->new(
                     $id_type => $id,
-                    (defined($displayname) && $displayname ne '.') ? (displayname => $displayname) : (),
+                    defined($displayname) ? (displayname => $displayname) : (),
                 );
             } else {
                 $identifier = Data::Identifier::Generate->generic(
                     %generator,
                     request => $id,
-                    (defined($displayname) && $displayname ne '.') ? (displayname => $displayname) : (),
+                    defined($displayname) ? (displayname => $displayname) : (),
                 );
             }
 
@@ -173,6 +180,7 @@ sub import {
                 }
             }
 
+            $identifier->{displayname} //= $displayname; # force-update, using internal API. DO NOT TRY AT HOME!
             $identifier->register;
 
             foreach my $class (@classes) {
@@ -259,7 +267,7 @@ Data::Identifier::Wellknown - format independent identifier object
 
 =head1 VERSION
 
-version v0.28
+version v0.29
 
 =head1 SYNOPSIS
 
@@ -337,7 +345,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023-2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2023-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 
@@ -426,6 +434,7 @@ $type uuid
 .   3be53c82-b542-478c-92c4-cfdaed047d83    unicode-block-namespace
 .   eb239013-7556-4091-959f-4d78ca826757    dot-comments-category-namespace
 .   4004c90f-fe88-4c2e-9f92-e678f54c6417    dot-comments-rating-namespace
+.   01a1ba02-c6a4-4468-a0dd-2944896c14c7    day-of-week-namespace
 
 
 $class subject-type
@@ -470,6 +479,8 @@ $type uuid
 .   63da70a8-78a4-51b0-8b87-86872b474a5d    specific-proto-file-state
 .   0406b78b-741d-48f4-9acd-5e27b5e29d48    directory
 .   61fba55f-1ba3-460d-85a7-9262557f41c9    hardlink
+
+.   1c0dad03-519f-4bce-af41-19191af655c7    day-of-week
 
 $extra_classes identifier
 .   8be115d2-dc2f-4a98-91e1-a6e3075cbc31    uuid                        sid=2,sni=119
@@ -927,6 +938,21 @@ $generator style=integer-based,namespace=5dd8ddbb-13a8-4d6c-9264-36e6dd6f9c99,ge
 .   2   two     sid=50
 .   3   three   sid=144
 .   4   four    sid=145
+.   5   five
+.   7   seven
+.   10  ten
+.   12
+.   24
+.   28
+.   29
+.   30
+.   31
+.   61
+.   73
+.   365
+.   366
+.   3600
+.   86400
 
 
 $class digest-algorithm
@@ -947,6 +973,18 @@ $namespace 34f1f1d2-51be-4754-9585-83e33c5cb7e8
 .   sha-3-256
 .   sha-3-384
 .   sha-3-512       .   sni=186
+
+
+$class day-of-week
+$generator style=integer-based,namespace=01a1ba02-c6a4-4468-a0dd-2944896c14c7,generator=7d7e0a5c-a244-43b6-90be-414059279a1e
+
+.   1   Monday
+.   2   Tuesday
+.   3   Wednesday
+.   4   Thursday
+.   5   Friday
+.   6   Saturday
+.   7   Sunday
 
 
 $class rdf
@@ -1452,6 +1490,7 @@ $extra_classes generator
 .   d74f8c35-bcb8-465c-9a77-01010e8ed25c    unicode-character-generator
 .   a649d48d-35b0-4454-81af-c5fd2eb40373    media-sub-type-generator
 .   5c8c072e-f1a2-4824-9721-d57e811b6b4f    media-super-type-generator
+.   7d7e0a5c-a244-43b6-90be-414059279a1e    day-of-week-generator
 
 
 $class _leftover_sids

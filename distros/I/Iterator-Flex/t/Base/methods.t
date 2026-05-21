@@ -54,6 +54,14 @@ subtest 'drain' => sub {
         is( \@values,            [ 0 .. 20 ], 'values' );
     };
 
+    subtest 'invalid count' => sub {
+        my $iter = iseq( 2 );
+        isa_ok(
+            dies { $iter->drain( 0 ) },
+            ['Iterator::Flex::Failure::parameter'],
+            'throws parameter failure',
+        );
+    };
 };
 
 subtest 'flatten' => sub {
@@ -62,9 +70,17 @@ subtest 'flatten' => sub {
 };
 
 subtest 'foreach' => sub {
-    my $count = 0;
-    iseq( 1, 4 )->foreach( sub { $count += $_ } );
-    is( $count, 10 );
+    subtest 'return on exhaustion' => sub {
+        my $count = 0;
+        iseq( 1, 4 )->foreach( sub { $count += $_ } );
+        is( $count, 10 );
+    };
+
+    subtest 'throw on exhaustion preserves false values' => sub {
+        my @values;
+        iseq( 0, 2, { exhaustion => 'throw' } )->foreach( sub { push @values, $_ } );
+        is( \@values, [ 0 .. 2 ] );
+    };
 };
 
 subtest 'gather' => sub {

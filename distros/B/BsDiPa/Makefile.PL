@@ -23,32 +23,44 @@ sub version_and_contact{
 	die "close failed: $f: $^E" unless close F;
 }
 
-sub have_xz{
-	if(system 'xz --version >/dev/null 2>&1' == 0){
-		print "Adding support for liblzma (XZ)\n";
-		$ADDCCF .= ' -Ds__BSDIPA_XZ=1 ';
-		$ADDLDF .= ' -llzma '
-	}else{
-		print "! Cannot find xz(1), skipping support for liblzma (XZ)\n";
-		$ADDCCF .= ' -Ds__BSDIPA_XZ=0 '
-	}
-}
-
 sub have_bz2{
-	if(system 'bzip2 --help >/dev/null 2>&1' == 0){
+	if(system('make -f c-lib/ioconf.mk bz2') == 0){
 		print "Adding support for libbz2 (BZIP2)\n";
 		$ADDCCF .= ' -Ds__BSDIPA_BZ2=1 ';
 		$ADDLDF .= ' -lbz2 '
 	}else{
-		print "! Cannot find bzip2(1), skipping support for libbz2 (BZIP2)\n";
+		print STDERR "! Cannot find bzip2, skipping support for libbz2 (BZIP2)\n";
 		$ADDCCF .= ' -Ds__BSDIPA_BZ2=0 '
+	}
+}
+
+sub have_xz{
+	if(system('make -f c-lib/ioconf.mk xz') == 0){
+		print "Adding support for liblzma (XZ)\n";
+		$ADDCCF .= ' -Ds__BSDIPA_XZ=1 ';
+		$ADDLDF .= ' -llzma '
+	}else{
+		print STDERR "! Cannot find xz/LZMA, skipping support for liblzma (XZ)\n";
+		$ADDCCF .= ' -Ds__BSDIPA_XZ=0 '
+	}
+}
+
+sub have_zstd{
+	if(system('make -f c-lib/ioconf.mk zstd') == 0){
+		print "Adding support for libzstd (ZSTD)\n";
+		$ADDCCF .= ' -Ds__BSDIPA_ZSTD=1 ';
+		$ADDLDF .= ' -lzstd '
+	}else{
+		print STDERR "! Cannot find zstd, skipping support for libzstd (ZSTD)\n";
+		$ADDCCF .= ' -Ds__BSDIPA_ZSTD=0 '
 	}
 }
 
 version_and_contact 'c-lib/configh.sh';
 system 'cd c-lib; ./configh.sh s_BSDIPA_32=y';
-have_xz;
 have_bz2;
+have_xz;
+have_zstd;
 
 WriteMakefile(
 #	'OPTIMIZE' => '-g',

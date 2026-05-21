@@ -11,8 +11,6 @@
 #define isEOL(c) ((c >= 0xa) && (c <= 0xd ) || (c == 0x85))
 #define isEOL_UTF8(c) (isEOL(c) || c == 0x2028 || c == 0x2029)
 
-// isutf8 space function?
-
 char* _minify_ascii(pTHX_ char* src, STRLEN len, STRLEN* packed) {
 
   char* dest;
@@ -42,7 +40,7 @@ char* _minify_ascii(pTHX_ char* src, STRLEN len, STRLEN* packed) {
     src ++;
     len --;
 
-    if (leading && !isSPACE(c))
+    if (leading && !isSPACE_L1(c))
       leading = NULL;
 
     if (!leading) {
@@ -52,7 +50,7 @@ char* _minify_ascii(pTHX_ char* src, STRLEN len, STRLEN* packed) {
         if ( c == '\r' ) c = '\n'; /* Normalise EOL */
         leading = ptr;
       }
-      else if (isSPACE(c)) {
+      else if (isSPACE_L1(c)) {
         if (!trailing) trailing = ptr;
       }
       else {

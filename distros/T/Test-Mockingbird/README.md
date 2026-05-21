@@ -4,7 +4,7 @@ Test::Mockingbird - Advanced mocking library for Perl with support for dependenc
 
 # VERSION
 
-Version 0.08
+Version 0.10
 
 # SYNOPSIS
 
@@ -191,6 +191,18 @@ or the shorthand:
 
     mock 'My::Module::method' => sub { ... };
 
+If the original function carries a Perl prototype, the same prototype is
+automatically applied to the replacement coderef before it is installed.
+This prevents Perl from emitting `Prototype mismatch` warnings at call
+sites that were compiled against the original signature. The canonical
+case is functions declared with a `()` no-args prototype, such as
+`I18N::LangTags::Detect::detect`. The replacement is almost always an
+anonymous `sub {}` created for the mock, so mutating its prototype
+in-place is safe.
+
+If the original has no prototype, no prototype is imposed on the
+replacement.
+
 ## unmock($package, $method)
 
 Restores the original method for a mocked method.
@@ -202,15 +214,50 @@ or the shorthand:
 
     unmock 'My::Module::method';
 
+Because `mock` stores the original coderef (not a copy), reinstating it
+via glob assignment also restores its prototype automatically. No explicit
+prototype handling is required in `unmock`.
+
 ## mock\_scoped
 
-Creates a scoped mock that is automatically restored when it goes out of scope.
+Creates a scoped mock that is automatically restored when the returned guard
+goes out of scope.
 
 This behaves like `mock`, but instead of requiring an explicit call to
-`unmock` or `restore_all`, the mock is reverted automatically when the
-returned guard object is destroyed.
+`unmock` or `restore_all`, all mocked methods are reverted automatically
+when the guard object is destroyed.
 
-This is useful when you want a mock to apply only within a lexical block:
+### Single-method forms
+
+Shorthand:
+
+    my $g = mock_scoped 'My::Module::method' => sub { 'mocked' };
+
+Longhand:
+
+    my $g = mock_scoped('My::Module', 'method', sub { ... });
+
+### Multi-method forms
+
+Mock several methods on one package with a single guard:
+
+    my $g = mock_scoped('My::Module',
+        fetch  => sub { 'mocked_fetch'  },
+        save   => sub { 'mocked_save'   },
+        delete => sub { 'mocked_delete' },
+    );
+
+Mock methods across different packages in one call (shorthand pairs):
+
+    my $g = mock_scoped(
+        'My::Module::fetch'  => sub { 'mocked_fetch'  },
+        'Other::Module::save' => sub { 'mocked_save'  },
+    );
+
+In both multi-method forms, every mocked method is restored when `$g`
+goes out of scope or is explicitly undefed.
+
+### Scoped lifecycle
 
     {
         my $g = mock_scoped 'My::Module::method' => sub { 'mocked' };
@@ -219,13 +266,42 @@ This is useful when you want a mock to apply only within a lexical block:
 
     My::Module::method();       # original behaviour restored
 
-Supports both the longhand and shorthand forms:
+### Interaction with spy
 
-    my $g = mock_scoped('My::Module', 'method', sub { ... });
+A `spy` is not automatically restored when a `mock_scoped` guard
+goes out of scope. `mock_scoped` only manages the specific mock
+layer it installs. If you install a spy inside a scoped block, you
+must restore it explicitly:
 
-    my $g = mock_scoped 'My::Module::method' => sub { ... };
+    {
+        my $g   = mock_scoped 'My::Module::method' => sub { 1 };
+        my $spy = spy 'My::Module::method';
 
-Returns a guard object whose destruction triggers automatic unmocking.
+        My::Module->method('arg');
+    }
+    # $g is destroyed here -- the mock_scoped layer is restored
+    # but the spy layer is still active
+
+    restore_all();    # needed to fully restore method
+
+The safe pattern when combining `mock_scoped` and `spy` is to
+call `restore_all` at the end of the block, or to avoid combining
+them and use `mock` with an explicit `restore_all` instead:
+
+    spy 'My::Module::method';
+    My::Module->method('arg');
+    my @calls = $spy->();
+    restore_all();
+
+### Notes
+
+If you need both a modified implementation and call recording in
+the same test, install the spy first and then the mock. The spy
+will still capture calls even when the implementation is replaced
+by the mock layer above it, because the spy wraps the layer below
+it at installation time, not the current top of the stack. To avoid
+confusion, prefer explicit `restore_all` over `mock_scoped` when
+combining with spies.
 
 ## spy($package, $method)
 
@@ -241,6 +317,59 @@ or the shorthand:
 Returns a coderef which, when invoked, returns the list of captured calls.
 The original method is preserved and still executed.
 
+### Call record format
+
+Each captured call is an arrayref with the following structure:
+
+    [ $method_name, $invocant, @arguments ]
+
+where:
+
+- `$method_name` - the fully qualified method name as a string
+(e.g. `'My::Module::method'`)
+- `$invocant` - the first argument to the call, typically `$self`
+for method calls or the first positional argument for function calls
+- `@arguments` - the remaining arguments passed to the method,
+in the order they were supplied. For named-parameter calls these will
+be alternating key/value pairs suitable for assignment to a hash:
+`my %args = @{$call}[2..$#{$call}]`
+
+### Example
+
+    spy 'My::Module::process';
+    My::Module->process(name => 'foo', value => 42);
+
+    my @calls = $spy->();
+    my $call  = $calls[0];
+
+    # $call->[0] eq 'My::Module::process'
+    # $call->[1] is the My::Module object
+    # @{$call}[2..$#{$call}] gives (name => 'foo', value => 42)
+
+    my %args = @{$call}[2..$#{$call}];
+    is($args{name},  'foo', 'name arg captured');
+    is($args{value}, 42,    'value arg captured');
+
+### Limitations
+
+`spy` installs its wrapper coderef directly into the glob without going
+through `mock`, so the prototype-preservation logic in `mock` does not
+apply. If the target function carries a Perl prototype (for example a
+`()` no-args prototype), installing a spy will emit a
+`Prototype mismatch` warning.
+
+If you need warning-free wrapping of a prototyped function, install the
+spy on a non-prototyped alias, or use `mock` with a wrapper that records
+calls and delegates to the original:
+
+    my @calls;
+    mock 'My::Module::detect' => sub {
+        push @calls, [@_];
+        return My::Module::_real_detect(@_);   # delegate manually
+    };
+
+This limitation will be addressed in a future release.
+
 ## inject($package, $dependency, $mock\_object)
 
 Injects a mock dependency. Supports two forms:
@@ -253,20 +382,37 @@ or the shorthand:
 
 The injected dependency can be restored with `restore_all` or `unmock`.
 
-## restore\_all()
+## restore\_all
 
-Restores mocked methods and injected dependencies.
+Restores all mocked methods and injected dependencies.
 
-Called with no arguments, it restores everything:
+Called with no arguments, restores everything that has been mocked
+in the current test run:
 
     restore_all();
 
-You may also restore only a specific package:
+Called with a package name, restores only the mocks whose fully
+qualified names begin with that package:
 
     restore_all 'My::Module';
 
-This restores all mocked methods whose fully qualified names begin with
-`My::Module::`.
+This is useful when a test installs mocks across multiple packages
+and needs to tear down only one package's mocks without disturbing
+the others:
+
+    mock 'My::Module::fetch'   => sub { 'mocked_fetch' };
+    mock 'Other::Module::save' => sub { 'mocked_save'  };
+
+    # Tear down only My::Module mocks
+    restore_all 'My::Module';
+
+    # Other::Module::save is still mocked here
+    restore_all();    # now everything is restored
+
+### Notes
+
+Restoring a package that was never mocked is a no-op and does not
+warn or croak.
 
 ## mock\_return
 
@@ -274,7 +420,7 @@ Mock a method so that it always returns a fixed value.
 
 Takes a single target (either `'Pkg::method'` or `('Pkg','method')`) and
 a value to return. Returns nothing. Side effects: installs a mock layer
-using ["mock"](#mock).
+using `mock`.
 
 ### API specification
 
@@ -297,7 +443,7 @@ Mock a method so that it always throws an exception.
 
 Takes a single target (either `'Pkg::method'` or `('Pkg','method')`) and
 an exception message. Returns nothing. Side effects: installs a mock layer
-using ["mock"](#mock).
+using `mock`.
 
 ### API specification
 
@@ -320,7 +466,7 @@ Mock a method so that it returns a sequence of values over successive calls.
 
 Takes a single target (either `'Pkg::method'` or `('Pkg','method')`) and
 one or more values. Returns nothing. Side effects: installs a mock layer
-using ["mock"](#mock). When the sequence is exhausted, the last value is repeated.
+using `mock`. When the sequence is exhausted, the last value is repeated.
 
 ### API specification
 
@@ -482,11 +628,6 @@ This module is provided as-is without any warranty.
 
 Copyright 2025-2026 Nigel Horne.
 
-Usage is subject to licence terms.
-
-The licence terms of this software are as follows:
-
-- Personal single user, single computer use: GPL2
-- All other users (including Commercial, Charity, Educational, Government)
-  must apply in writing for a licence for use from Nigel Horne at the
-  above e-mail.
+Usage is subject to GPL2 licence terms.
+If you use it,
+please let me know.

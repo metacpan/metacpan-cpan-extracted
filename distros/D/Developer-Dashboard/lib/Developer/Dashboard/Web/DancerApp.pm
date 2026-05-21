@@ -3,7 +3,7 @@ package Developer::Dashboard::Web::DancerApp;
 use strict;
 use warnings;
 
-our $VERSION = '3.14';
+our $VERSION = '3.90';
 
 use Dancer2 appname => 'DeveloperDashboard';
 
@@ -215,7 +215,7 @@ any [qw(get post)] => '/ajax/singleton/stop' => sub {
 };
 
 any [qw(get post)] => qr{^/ajax/(.+)$} => sub {
-    return _run_authorized( 'legacy_ajax_file_response', ajax_file => _capture(0) );
+    return _run_authorized('dispatch_request');
 };
 
 get '/system/status' => sub {
@@ -235,35 +235,27 @@ get '/loading.webp' => sub {
 };
 
 get qr{^/(js|css|others)/(.+)$} => sub {
-    return _run_authorized(
-        'static_file_response',
-        type => _capture(0),
-        file => _capture(1),
-    );
+    return _run_authorized('dispatch_request');
 };
 
 get qr{^/app/(.+)/source$} => sub {
-    return _run_authorized( 'page_source_response', id => _capture(0) );
+    return _run_authorized('dispatch_request');
 };
 
 post qr{^/app/(.+)/edit$} => sub {
-    return _run_authorized( 'page_edit_post_response', id => _capture(0) );
+    return _run_authorized('dispatch_request');
 };
 
 get qr{^/app/(.+)/edit$} => sub {
-    return _run_authorized( 'page_edit_response', id => _capture(0) );
+    return _run_authorized('dispatch_request');
 };
 
 post qr{^/app/(.+)/action/([^/]+)$} => sub {
-    return _run_authorized(
-        'page_action_response',
-        id        => _capture(0),
-        action_id => _capture(1),
-    );
+    return _run_authorized('dispatch_request');
 };
 
 get qr{^/app/(.+)$} => sub {
-    return _run_authorized( 'legacy_app_response', id => _capture(0) );
+    return _run_authorized('dispatch_request');
 };
 
 post '/action' => sub {
@@ -292,7 +284,10 @@ Developer::Dashboard::Web::DancerApp - Dancer2 route layer for Developer Dashboa
 
 This module owns the HTTP route table for the dashboard web UI under Dancer2.
 It normalizes each request, enforces authorization for protected routes, and
-delegates the page and action work to C<Developer::Dashboard::Web::App>.
+delegates the page and action work to C<Developer::Dashboard::Web::App>. The
+route adapter intentionally hands the namespaced C</app>, C</ajax>, C</js>,
+C</css>, and C</others> surfaces back to the backend dispatcher so the
+installed PSGI server stays in lock-step with the backend smart router.
 
 =head1 METHODS
 
@@ -316,7 +311,7 @@ Use this file when changing PSGI wrapping, response translation, or the way the 
 
 =head1 HOW TO USE
 
-Call C<build_psgi_app> with the backend app object and default headers, then pass the returned coderef to a PSGI server. Route behavior and auth logic should stay in C<Developer::Dashboard::Web::App>.
+Call C<build_psgi_app> with the backend app object and default headers, then pass the returned coderef to a PSGI server. Route behavior and auth logic should stay in C<Developer::Dashboard::Web::App>, including the smart namespaced route resolution for installed skill-local pages, Ajax handlers, and public assets.
 
 =head1 WHAT USES IT
 

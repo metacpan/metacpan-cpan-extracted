@@ -1,5 +1,5 @@
 /*
- * chandra_canvas.h — Canvas module static helpers
+ * chandra_canvas.h - Canvas module static helpers
  * Included from Chandra.xs before the INCLUDE: xs/canvas.xs
  */
 
@@ -183,7 +183,7 @@ _canvas_push_op_6nv(pTHX_ AV *buf, int op, NV v1, NV v2, NV v3, NV v4, NV v5, NV
 #define CANVAS_NV_BUFSZ 64
 
 /* Stringify an NV from cmd[idx]. Uses Gconvert which is portable across
- * NV types (double, long double, __float128) — unlike literal "%g" in
+ * NV types (double, long double, __float128) - unlike literal "%g" in
  * sv_catpvf, which reads only `double` from va_args and produces garbage
  * when NV is wider. */
 static const char *
@@ -581,7 +581,7 @@ _canvas_serialize_buffer(pTHX_ HV *self)
     /* Create context variable name */
     snprintf(ctx_var, sizeof(ctx_var), "_ctx_%s", canvas_id);
 
-    /* Build JS — wrapped in requestAnimationFrame for vsync */
+    /* Build JS - wrapped in requestAnimationFrame for vsync */
     js = newSVpvs("");
     sv_catpvf(js, "requestAnimationFrame(function(){var c=document.getElementById('%s');if(!c)return;var %s=c.getContext('2d');",
               canvas_id, ctx_var);

@@ -4,6 +4,7 @@ ca-certificates
 cpanminus
 curl
 git
+libcrypt-dev
 libexpat1-dev
 libssl-dev
 npm
@@ -11,4 +12,5 @@ nodejs
 perl
 perlbrew
 pkg-config
+tmux
 zlib1g-dev

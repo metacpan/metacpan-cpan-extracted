@@ -1,6 +1,8 @@
 # Graphics::Framebuffer Images For Examples
 
-[![Graphics::Framebuffer Logo](../../pics/GFB.png?raw=true "Graphics::Framebuffer Click For Demo Video")](https://www.youtube.com/watch?v=X8RpFBq6F9I)
+[![Graphics::Framebuffer Theme Music](../../pics/GFB.png?raw=true "Graphics::Framebuffer Click For Music Video")](https://www.youtube.com/watch?v=kNKmUpUTlC4)
+
+<sup>Click the image for something fun.</sup>
 
 ![Divider](../../pics/pink.jpg?raw=true "Divider")
 

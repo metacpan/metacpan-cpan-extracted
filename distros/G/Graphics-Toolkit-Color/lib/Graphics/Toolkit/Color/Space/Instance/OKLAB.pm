@@ -4,7 +4,7 @@
 package Graphics::Toolkit::Color::Space::Instance::OKLAB;
 use v5.12;
 use warnings;
-use Graphics::Toolkit::Color::Space qw/mult_matrix_vector_3/;
+use Graphics::Toolkit::Color::Space qw/gamma_correct mult_matrix_vector_3/;
 
 my @D65 = (0.95047, 1, 1.08883); # illuminant
 
@@ -15,7 +15,7 @@ sub from_xyz {
                                     [ 0.0329845436, 0.9293118715, 0.0361456387],
                                     [ 0.0482003018, 0.2643662691, 0.6338517070]], @xyz);
 
-    @lms = map {$_ ** (1/3)} @lms;
+    @lms = map {gamma_correct($_, 1/3)} @lms;
 
     my @lab = mult_matrix_vector_3([[ 0.2104542553,  0.7936177850, -0.0040720468],
                                     [ 1.9779984951, -2.4285922050,  0.4505937099],
@@ -32,7 +32,7 @@ sub to_xyz {
                                     [ 1, -0.105561 , -0.0638542 ],
                                     [ 1, -0.0894842, -1.29149   ]], @lab);
 
-    @lms = map {$_ ** 3} @lms;
+    @lms = map {gamma_correct($_, 3)} @lms;
 
     my @xyz = mult_matrix_vector_3([[ 1.22701  , -0.5578  , 0.281256 ],
                                     [-0.0405802,  1.11226 ,-0.0716767],

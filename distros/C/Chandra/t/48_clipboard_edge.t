@@ -31,7 +31,7 @@ Chandra::Test::Display->skip_unless_clipboard;
 {
     my $with_null = "before\x00after";
     Chandra::Clipboard->set_text($with_null);
-    # Clipboard likely truncates at null — just verify no crash
+    # Clipboard likely truncates at null - just verify no crash
     my $got = Chandra::Clipboard->get_text;
     ok(defined $got, 'text with null byte does not crash');
 }

@@ -1,4 +1,4 @@
-package Debug::Easy 2.26;
+package Debug::Easy 2.27;
 
 use strict;
 # use warnings;
@@ -346,8 +346,6 @@ sub new {
         'Prefix'             => '%Date% %Time% %Benchmark% %Loglevel%[%Subroutine%][%Lastline%] ',
         'DEBUGMAX-Prefix'    => '%Date% %Time% %Benchmark% %Loglevel%[%Module%][%Lines%] ',
         'Filename'           => '[' . colored(['magenta'], $filename) . ']',
-#        'TIMEZONE'           => DateTime::TimeZone->new(name => 'local'),
-#        'DATETIME'           => DateTime->now('time_zone' => DateTime::TimeZone->new(name => 'local')),
         'ANSILevel'          => {
             'ERR'      => colored(['white on_red'],        '[ ERROR  ]'),
             'WARN'     => colored(['black on_yellow'],     '[WARNING ]'),
@@ -378,7 +376,9 @@ sub new {
     {                                     # This makes sure the user overrides actually override
         my %params = (@_);
         foreach my $Key (keys %params) {
-            $self->{ uc($Key) } = $params{$Key};
+			my $new_name = $Key;
+			$new_name =~ s/ATTENTION/NOTICE/i;
+            $self->{ uc($new_name) } = $params{$Key};
         }
     }
 
@@ -392,8 +392,6 @@ sub new {
     # This instructs the ANSIColor library to turn off coloring,
     # if the Color attribute is set to zero.
     unless ($self->{'COLOR'}) {
-#        local $ENV{'ANSI_COLORS_DISABLED'} = TRUE; # Only this module should be set
-
         # If COLOR is FALSE, then clear color data from ANSILEVEL, as these were
         # defined before color was turned off.
         $self->{'ANSILEVEL'} = {
@@ -554,7 +552,6 @@ sub debug {
 
     # Figure out the benchmarks, but only if it is in the prefix
     if ($effective_prefix =~ /\%Benchmark\%/i) {
-
         # For multiline output, only output the bench data on the first line.  Use padded spaces for the rest.
         $thisBench  = sprintf('%7s', sprintf(' %.02f', time - $self->{'ANY_LASTSTAMP'}));
         $thisBench2 = ' ' x length($thisBench);
@@ -613,7 +610,7 @@ sub debug {
 
 sub _send_to_dumper {
 	my $msg = shift;
-	# Set up dumper variables for friendly output that doesn't interfere with the script Dumpor variables.
+	# Set up dumper variables for friendly output that doesn't interfere with the script Dumpor variables (if applicable).
 	local $Data::Dumper::Terse         = TRUE;
 	local $Data::Dumper::Indent        = TRUE;
 	local $Data::Dumper::Useqq         = TRUE;

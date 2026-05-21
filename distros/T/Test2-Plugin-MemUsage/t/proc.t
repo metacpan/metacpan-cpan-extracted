@@ -71,6 +71,12 @@ subtest partial_vm_lines => sub {
 # procfile; fail loudly if the procfile exists but the format has
 # drifted away from what our regex expects.
 subtest real_procfile_matches_mock_shape => sub {
+    # /proc/PID/status is Linux-format text only on Linux/Cygwin/gnukfreebsd.
+    # On Solaris it is a binary pstatus_t struct; on *BSD /proc may not be
+    # mounted at all. Mirror the dispatcher in _collector_for_os.
+    skip_all "procfile parser is linux-only (\$^O = $^O)"
+        unless $^O eq 'linux' || $^O eq 'cygwin' || $^O eq 'gnukfreebsd';
+
     my $f = Test2::Plugin::MemUsage::proc_file();
     skip_all "no procfile at $f" unless -e $f;
 
@@ -89,6 +95,9 @@ subtest real_procfile_matches_mock_shape => sub {
 # host kernel. Skip if /proc is absent; fail if the values come back
 # non-numeric, missing units, or wildly out of range.
 subtest real_collect_proc_meaningful => sub {
+    skip_all "procfile parser is linux-only (\$^O = $^O)"
+        unless $^O eq 'linux' || $^O eq 'cygwin' || $^O eq 'gnukfreebsd';
+
     my $f = Test2::Plugin::MemUsage::proc_file();
     skip_all "no procfile at $f" unless -e $f;
 

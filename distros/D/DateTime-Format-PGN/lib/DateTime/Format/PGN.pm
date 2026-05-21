@@ -4,7 +4,7 @@ use warnings;
 package DateTime::Format::PGN;
 # ABSTRACT: a Perl module for parsing and formatting date fields in chess game databases in PGN format
 
-our $VERSION = '0.05';
+our $VERSION = '1.01';
 
 use DateTime::Incomplete 0.08;
 use Params::Validate 1.23 qw( validate BOOLEAN );
@@ -190,7 +190,7 @@ DateTime::Format::PGN - a Perl module for parsing and formatting date fields in 
 
 =head1 VERSION
 
-version 0.05
+version 1.01
 
 =head1 SYNOPSIS
 
@@ -235,33 +235,37 @@ a C<DateTime::Incomplete> object (the C<use_incomplete> option does not affect t
 
 =head1 Source
 
-L<PGN spec|https://www.chessclub.com/user/help/PGN-spec> by Steven J. Edwards.
+L<PGN spec|https://web.archive.org/web/20160830115945/https://www.chessclub.com/user/help/PGN-spec> by Steven J. Edwards.
 
 =head1 See also
 
 =over 4
 
-=item *
 
-L<Chess::PGN::Parse>
 
-=item *
-
-L<DateTime::Incomplete>
+=back
 
 =item *
 
-L<http://datetime.perl.org/>
+* L<Chess::PGN::Parse>
+
+=item *
+
+* L<DateTime::Incomplete>
+
+=item *
+
+* L<https://github.com/houseabsolute/DateTime.pm/wiki>
 
 =back
 
 =head1 AUTHOR
 
-Ingram Braun <ibraun@cpan.org>
+Ingram Braun <carlorff1@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Ingram Braun.
+This software is copyright (c) 2016–2026 by Ingram Braun.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

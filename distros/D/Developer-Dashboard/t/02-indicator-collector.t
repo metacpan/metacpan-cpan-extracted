@@ -47,10 +47,74 @@ my @items = $indicators->list_indicators;
 is(scalar @items, 1, 'one indicator listed');
 is($items[0]{name}, 'docker', 'indicator stored');
 
+local $ENV{TMUX} = '';
 my $rendered = $prompt->render(jobs => 2, cwd => '/tmp/project');
 like($rendered, qr/^\(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\)/, 'prompt renders legacy timestamp prefix');
 like($rendered, qr/✅🐳.*\[\/tmp\/project\]/, 'compact prompt includes status glyph plus indicator icon before the bracketed path');
 like($rendered, qr/\(2 jobs\)/, 'job count included');
+like($rendered, qr/\n> \z/, 'prompt leaves the typing cursor marker on the next line');
+my $tmux_status = $prompt->render_tmux_status(width => 200);
+like($tmux_status, qr/✅🐳/, 'tmux status rendering still includes prompt-visible indicators');
+unlike($tmux_status, qr/\n/, 'tmux status rendering stays on one line when the indicator strip fits');
+like($tmux_status, qr/🕒\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\z/, 'tmux status rendering keeps the trailing date-time segment on the visible indicator line');
+unlike($tmux_status, qr/🎫:/, 'tmux status rendering leaves ticket context to the prompt or tmux session line instead of duplicating it in the indicator strip');
+like($prompt->render_tmux_status(line => 'top', width => 200), qr/✅🐳.*🕒\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\z/, 'tmux top status line includes prompt-visible indicators and the trailing date-time when the strip fits');
+is($prompt->render_tmux_status(line => 'bottom', width => 200), q{}, 'tmux overflow status line stays empty when the top line can hold the full strip');
+my $wrapped_tmux_status = $prompt->render_tmux_status(width => 4);
+like($wrapped_tmux_status, qr/\n/, 'tmux status rendering emits an overflow line when the indicator strip does not fit on one line');
+like($prompt->render_tmux_status(line => 'top', width => 4), qr/✅🐳\z/, 'tmux top status line keeps the first indicator when the strip wraps');
+like($prompt->render_tmux_status(line => 'bottom', width => 4), qr/🕒\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\z/, 'tmux overflow status line carries the trailing date-time segment when the strip wraps');
+{
+    local $ENV{TMUX} = '';
+    local $ENV{DEVELOPER_DASHBOARD_TMUX_STATUS} = 1;
+    my $non_tmux_flag_prompt = $prompt->render(jobs => 0, cwd => '/tmp/project');
+    like($non_tmux_flag_prompt, qr/✅🐳/, 'ticket-session tmux status flag alone does not suppress indicators outside tmux');
+}
+{
+    local $ENV{TMUX} = 'tmux-session';
+    local $ENV{DEVELOPER_DASHBOARD_TMUX_STATUS} = 1;
+    my $tmux_prompt = $prompt->render(jobs => 0, cwd => '/tmp/project');
+    unlike($tmux_prompt, qr/✅🐳/, 'inline prompt suppresses indicators automatically when tmux owns the status line');
+    like($tmux_prompt, qr/\[\/tmp\/project\]/, 'inline prompt still includes the bracketed path when tmux owns the status line');
+}
+{
+    local $ENV{TMUX} = 'tmux-session';
+    local $ENV{DEVELOPER_DASHBOARD_TMUX_STATUS} = '';
+    local $ENV{TICKET_REF} = '';
+    local $ENV{WORKSPACE_REF} = '';
+    my $plain_tmux_prompt = $prompt->render(jobs => 0, cwd => '/tmp/project');
+    like($plain_tmux_prompt, qr/✅🐳/, 'plain tmux sessions keep inline indicators when dashboard-managed ticket markers are absent');
+}
+{
+    local $ENV{TMUX} = 'tmux-session';
+    local $ENV{DEVELOPER_DASHBOARD_TMUX_STATUS} = '';
+    local $ENV{TICKET_REF} = 'DD-4242';
+    local $ENV{WORKSPACE_REF} = '';
+    my $ticket_tmux_prompt = $prompt->render(jobs => 0, cwd => '/tmp/project');
+    unlike($ticket_tmux_prompt, qr/✅🐳/, 'ticket tmux prompts suppress inline indicators even when older sessions only expose TICKET_REF');
+    like($ticket_tmux_prompt, qr/🎫:DD-4242/, 'ticket tmux prompts still render the ticket reference inline');
+}
+{
+    my $empty_home = tempdir(CLEANUP => 1);
+    my $empty_paths = Developer::Dashboard::PathRegistry->new(
+        home            => $empty_home,
+        cwd             => $empty_home,
+        workspace_roots => [],
+        project_roots   => [],
+    );
+    my $empty_indicators = Developer::Dashboard::IndicatorStore->new(paths => $empty_paths);
+    my $empty_prompt = Developer::Dashboard::Prompt->new(paths => $empty_paths, indicators => $empty_indicators);
+    like(
+        $empty_prompt->render_tmux_status(width => 200),
+        qr/\A🕒\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\z/,
+        'tmux status rendering falls back to the timestamp-only line when no indicators are available',
+    );
+    is(
+        $empty_prompt->render_tmux_status(line => 'bottom', width => 200),
+        q{},
+        'tmux overflow line stays empty when only the timestamp remains',
+    );
+}
 
 $indicators->set_indicator(
     'stale',
@@ -71,10 +135,10 @@ my $page_payload = $indicators->page_header_payload;
 is_deeply(
     $page_payload->{array},
     [
-        { prog => 'docker', alias => '🐳', status => '&#x2705;' },
         { prog => 'stale',  alias => 'S',  status => '&#x2705;' },
+        { prog => 'docker', alias => '🐳', status => '&#x2705;' },
     ],
-    'page header payload renders legacy status-plus-alias entries',
+    'page header payload keeps indicator priority order while rendering status-plus-alias entries',
 );
 {
     my $repo = "$ENV{HOME}/repo";
@@ -84,6 +148,7 @@ is_deeply(
     local *Developer::Dashboard::Prompt::_git_branch = sub { 'main' };
     my $with_branch = $prompt->render( jobs => 0, cwd => $repo );
     like( $with_branch, qr/\[~\/repo\].*🌿main/, 'prompt includes git branch in the legacy trailing branch format' );
+    like( $with_branch, qr/\n> \z/, 'prompt keeps the trailing command marker on its own next line when the branch suffix is present' );
 }
 
 my $core = $indicators->refresh_core_indicators( cwd => "$ENV{HOME}/repo" );

@@ -1,0 +1,23 @@
+Revision history for File-Raw-Base64
+
+0.04    2026-05-17
+        - Bumped File::Raw prereq to 0.13 to pick up the streaming
+          O_BINARY fix on Windows.
+	- Remove pax headers
+
+0.03    2026-05-07
+        - C89 cleanup
+        - t/08-empty-and-large.t: replaced the `pack 'C*', map {...}
+        - Bumped File::Raw prereq to 0.12
+
+0.02    2026-05-04
+        Initial release on CPAN. (No 0.01 was published.)
+        - Two plugins registered with File::Raw: 'base64' (RFC 4648
+          standard alphabet) and 'base64url' (URL-safe alphabet).
+        - READ + WRITE phases. Per-call options: wrap, urlsafe,
+          padding, pem, pem_label, strict, eol.
+        - PEM envelope handling on both encode and decode.
+        - Verified against RFC 4648 section 10 vectors.
+
+0.01    2026-05-04
+        Internal preview; not released.

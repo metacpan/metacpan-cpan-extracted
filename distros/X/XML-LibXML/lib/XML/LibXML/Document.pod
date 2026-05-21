@@ -23,8 +23,8 @@ XML::LibXML::Document - XML::LibXML DOM Document Class
   my $compression = $doc->compression;
   $doc->setCompression($ziplevel);
   $docstring = $dom->toString($format);
-  $c14nstr = $doc->toStringC14N($comment_flag, $xpath [, $xpath_context ]);
-  $ec14nstr = $doc->toStringEC14N($comment_flag, $xpath [, $xpath_context ], $inclusive_prefix_list);
+  $c14nstr = $doc->toStringC14N($comment_flag, $xpath_expression [, $xpath_context ]);
+  $ec14nstr = $doc->toStringEC14N($comment_flag, $xpath_expression [, $xpath_context ], $inclusive_prefix_list);
   $str = $doc->serialize($format);
   $state = $doc->toFile($filename, $format);
   $state = $doc->toFH($fh, $format);
@@ -268,14 +268,14 @@ level. This value can not be altered on run-time.
 
 =item toStringC14N
 
-  $c14nstr = $doc->toStringC14N($comment_flag, $xpath [, $xpath_context ]);
+  $c14nstr = $doc->toStringC14N($comment_flag, $xpath_expression [, $xpath_context ]);
 
 See the documentation in L<<<<<< XML::LibXML::Node >>>>>>.
 
 
 =item toStringEC14N
 
-  $ec14nstr = $doc->toStringEC14N($comment_flag, $xpath [, $xpath_context ], $inclusive_prefix_list);
+  $ec14nstr = $doc->toStringEC14N($comment_flag, $xpath_expression [, $xpath_context ], $inclusive_prefix_list);
 
 See the documentation in L<<<<<< XML::LibXML::Node >>>>>>.
 
@@ -686,7 +686,7 @@ Petr Pajas
 
 =head1 VERSION
 
-2.0210
+2.0213
 
 =head1 COPYRIGHT
 

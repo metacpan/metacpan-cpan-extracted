@@ -8,7 +8,10 @@ eg/distributed_lock.pl
 eg/event_sourcing.pl
 eg/health_checker.pl
 eg/jetstream.pl
+eg/js_pull_worker.pl
 eg/kv_store.pl
+eg/leader_election.pl
+eg/object_cli.pl
 eg/log_aggregator.pl
 eg/monitoring.pl
 eg/nkey_auth.pl
@@ -16,6 +19,7 @@ eg/pubsub.pl
 eg/queue_workers.pl
 eg/rate_limiter.pl
 eg/reconnect.pl
+eg/replay.pl
 eg/request_reply.pl
 eg/task_pipeline.pl
 eg/tls.pl
@@ -30,6 +34,7 @@ MANIFEST.SKIP
 README
 src/EV__Nats.xs
 src/ngx-queue.h
+src/ppport.h
 t/00_load.t
 t/01_connect.t
 t/02_pubsub.t
@@ -44,6 +49,9 @@ t/10_batch.t
 t/11_multi_conn.t
 t/12_multi_process.t
 t/13_misc.t
+t/14_module_load.t
+t/15_creds_file.t
+t/16_max_payload.t
 typemap
 xt/01_cluster_failover.t
 xt/02_unix_socket.t
@@ -54,5 +62,16 @@ xt/06_large_fanout.t
 xt/07_slow_consumer.t
 xt/08_drain_under_load.t
 xt/09_max_payload.t
+xt/10_tls.t
+xt/11_jetstream.t
+xt/12_kv.t
+xt/13_object_store.t
+xt/14_lame_duck.t
+xt/15_nkey_auth.t
+xt/16_kv_watch.t
+xt/17_flush_disconnect.t
+xt/18_js_ack_flow.t
+xt/lib/EVNatsHelpers.pm
+xt/release_pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

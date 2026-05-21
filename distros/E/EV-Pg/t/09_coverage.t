@@ -8,7 +8,7 @@ use TestHelper;
 
 require_pg;
 use Socket;
-plan tests => 69;
+plan tests => 76;
 
 # --- handler getter round-trip ---
 with_pg(cb => sub {
@@ -153,6 +153,57 @@ with_pg(cb => sub {
             ok($err, 'copy abort: got error from put_copy_end errmsg');
             like($err, qr/user aborted/, 'copy abort: error contains abort message');
             EV::break;
+        });
+    });
+});
+
+# --- COPY IN with empty put_copy_data and a UTF-8-flagged row ---
+with_pg(cb => sub {
+    my ($pg) = @_;
+    $pg->query("create temp table copy_utf (payload text)", sub {
+        $pg->query("copy copy_utf from stdin", sub {
+            my ($data, $err) = @_;
+            if (($data // '') eq 'COPY_IN') {
+                is($pg->put_copy_data(""), 1, 'put_copy_data empty: ok');
+                my $utf = "smiley \x{263A}\n";
+                utf8::encode($utf);
+                $pg->put_copy_data($utf);
+                $pg->put_copy_end;
+                return;
+            }
+            die $err if $err;
+            $pg->query("select payload from copy_utf", sub {
+                my ($rows, $e) = @_;
+                ok(!$e, 'copy utf-8: select ok');
+                like($rows->[0][0], qr/smiley/, 'copy utf-8: row stored');
+                EV::break;
+            });
+        });
+    });
+});
+
+# --- COPY IN: server-side abort mid-stream (type violation) ---
+with_pg(cb => sub {
+    my ($pg) = @_;
+    $pg->query("create temp table copy_typed (n int)", sub {
+        $pg->query("copy copy_typed from stdin", sub {
+            my ($data, $err) = @_;
+            if (($data // '') eq 'COPY_IN') {
+                $pg->put_copy_data("notanint\n");
+                $pg->put_copy_end;
+                return;
+            }
+            ok($err, 'copy server-abort: got error');
+            like($err, qr/invalid input syntax|copy/i,
+                 'copy server-abort: error mentions invalid input or copy');
+            # Connection must still be usable after server-side abort.
+            $pg->query("select 42", sub {
+                my ($rows, $e) = @_;
+                ok(!$e, 'copy server-abort: connection usable after abort');
+                is($rows->[0][0], '42',
+                   'copy server-abort: subsequent query works');
+                EV::break;
+            });
         });
     });
 });

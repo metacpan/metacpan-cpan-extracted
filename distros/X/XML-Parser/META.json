@@ -50,11 +50,11 @@
    "provides" : {
       "XML::Parser" : {
          "file" : "Parser.pm",
-         "version" : "2.58"
+         "version" : "2.59"
       },
       "XML::Parser::Expat" : {
          "file" : "Expat/Expat.pm",
-         "version" : "2.58"
+         "version" : "2.59"
       },
       "XML::Parser::Style::Debug" : {
          "file" : "Parser/Style/Debug.pm"
@@ -83,6 +83,6 @@
          "web" : "https://github.com/cpan-authors/XML-Parser"
       }
    },
-   "version" : "2.58",
+   "version" : "2.59",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

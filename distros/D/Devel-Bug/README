@@ -1,0 +1,253 @@
+NAME
+    Devel::Bug - Transparent inline debugging probe (pure Perl)
+
+SYNOPSIS
+        use Devel::Bug;                           # output to STDERR
+        use Devel::Bug out => *STDOUT;            # redirect output
+        use Devel::Bug ':pfl';                    # package + filename + lineno by default
+        use Devel::Bug ':pfl', out => *STDOUT;    # label:flags with options
+        use Devel::Bug bug => 'dbg';              # export under a different name
+
+        # Scalar: value passes through; appears on STDERR (no label)
+        my $result = bug = substr($str, $offset);
+        # OUTPUT: (value)
+
+        # Inline in any expression
+        my $path = $dir . '/' . (bug('label') = substr($str, $offset));
+        # OUTPUT: label=(images/logo.png)
+
+        # List: parens around bug() are required to force list-context assignment
+        my @items = (bug 'items') = get_items();
+        # OUTPUT: items=(foo bar baz)
+
+        # Flags in the label string
+        my @items = (bug 'items:@')  = get_items();   # N: index prefixes
+        my %hash  = (bug 'data:%')   = get_pairs();   # key => value format
+        my %hash  = (bug 'data:@%')  = get_pairs();   # both
+        my @items = (bug 'items:m')  = get_items();   # multiline
+
+        # Per-call options
+        my $x = (bug 'result', vc => 'green') = compute();
+
+DESCRIPTION
+    "Devel::Bug" exports bug(), named for the wiretap sense of the word:
+    plant it inline inside any existing assignment to tap into values as
+    they flow through your code. The value(s) assigned *through* bug() will
+    reach the left-hand side unmodified; the only side effect is output to
+    the configured filehandle. *For list assignments*, bug() must be
+    *wrapped in parentheses* to force list context: "(bug ...) =
+    list_expr()". Without them "bug" is called in scalar context and
+    captures only a single value.
+
+    Output format:
+
+        label=(value)               # scalar
+        label=(v1 v2 v3)            # list
+        label=(a => 1 b => 2)       # keyval
+        pkg file line: label=(...)  # with caller info enabled
+
+    By default, ANSI colors are applied when the output handle is a
+    terminal, and multiline layout is applied automatically when output
+    would overflow the terminal width. Both behaviors are configurable; see
+    "color", "delims", and "noterm".
+
+IMPORT AND CALL OPTIONS
+    Options apply in two contexts: as import-time defaults via "use" or
+    import(), and as per-call overrides passed directly to bug().
+
+        use Devel::Bug out => *STDOUT, lineno => 1;       # import-time defaults
+        my $x = (bug 'result', vc => 'green') = ...;      # per-call override
+
+    Options follow an optional label:flags string as key/value pairs (see
+    "LABEL:FLAGS SYNTAX"). The "bug" option (export name) is only valid at
+    import time.
+
+  Output
+    out (aliases: output, o)
+        Filehandle to print to. Accepts anything "print" accepts as an
+        indirect filehandle: typeglobs, lexical filehandles, and filehandle
+        objects. Default: *STDERR.
+
+            use Devel::Bug out => *STDOUT;    # typeglob
+            use Devel::Bug out => $fh;        # lexical filehandle or object
+
+  Caller information
+    When enabled, the corresponding field is prepended to every line of
+    output.
+
+    package (aliases: pkg, p)
+        Calling package name.
+
+    filename (aliases: fn, f)
+        Source filename.
+
+    lineno (aliases: line, ln, l)
+        Source line number.
+
+  Display
+    multiline (aliases: ml, m)
+        Print each value on its own indented line.
+
+    indices (aliases: indexes, index, i, @)
+        Prefix each list element with "N:". Implies multiline.
+
+    keyval (aliases: kv, k, %)
+        Treat the list as alternating key/value pairs and format each as
+        "key => value". Combine with "indices"/"@" to add "N:" prefixes; the
+        index counts pairs, not individual elements. Implies multiline.
+
+    delims (aliases: delimiters, d)
+        Controls whether the value is wrapped in parentheses. Three states:
+
+        "on" (also 1)
+            Always wrap in parentheses.
+
+        "off" (also "undef")
+            Never wrap in parentheses.
+
+        "auto" (also '', default)
+            Wrap when output is not colored; omit when colored (color
+            already delineates the value visually).
+
+  Colors
+    color
+        Controls when ANSI colors are applied. Three states:
+
+        "on" (also 1)
+            Always apply colors, even to non-terminal output.
+
+        "off" (also "undef")
+            Never apply colors.
+
+        "auto" (also '', default)
+            Apply colors only when the output handle is a terminal.
+
+    infocolor (alias: ic)
+        Term::ANSIColor color specification for the caller-info prefix, e.g.
+        'bold', 'cyan on_black'. Default: none.
+
+    labelcolor (alias: lc)
+        Color specification for the label. Default: 'bold'.
+
+    valcolor (aliases: vc, valuecolor)
+        Color specification for values. Default: 'red on_grey23'.
+
+  Terminal detection
+    noterm (aliases: noterminal, n)
+        Disable terminal width detection. When set, neither "stty" nor
+        Term::Size::Perl is consulted, making both entirely optional. With
+        "noterm" enabled, terminal-width-based multiline layout is
+        suppressed, and "color => 'auto'" behaves as if the output is not a
+        terminal.
+
+        A warning is issued if terminal detection is attempted, "stty size"
+        fails, and Term::Size::Perl cannot be loaded. Set "noterm" to
+        suppress both the detection and the warning.
+
+  Pretty-printer
+    pp  Fully-qualified name of the function used to format reference
+        values, in the form 'Module::Name::function'. The function is called
+        with the reference as its first argument and must return a string.
+        The module is loaded automatically on first use. If the specified
+        module cannot be loaded or the named sub does not exist, a warning
+        is issued and the default is used instead.
+
+        Default: 'Data::Dumper::Dumper'.
+
+            use Devel::Bug pp => 'Data::Dump::pp';          # import-time default
+            my $x = (bug 'data', pp => 'Data::Dump::pp') = get_data();  # per-call
+
+  Alternative display value
+    val (aliases: value, v, override)
+        Display a different value in the output than the one being assigned.
+        The actual assigned value still passes through unchanged.
+
+        Use this when the assigned value is opaque or uninteresting, but a
+        related value at the same point in the code is more informative.
+        Particularly useful in ternary expressions, where the probe fires
+        only when that branch is taken.
+
+            # Without bug(): a do {} block is needed to log and still return a value
+            my $installed =
+                $sub =~ /^(.+)::/
+                ?   do {
+                        print "package=($1)\n";
+                        *{ $caller . '::' . $name }= \&{ $sub }
+                    }
+                :   carp "Cannot determine package from '$sub'";
+
+            # With bug(): val => $1 is displayed; the glob assignment passes through
+            my $installed =
+                $sub =~ /^(.+)::/
+                ?   bug('package', val => $1)=
+                        *{ $caller . '::' . $name }= \&{ $sub }
+                :   carp "Cannot determine package from '$sub'";
+
+  Export name
+    bug Rename or suppress the exported function.
+
+            use Devel::Bug bug => 'tap';   # exports as tap()
+            use Devel::Bug bug => '';      # suppresses export  ('', 0, undef all work)
+
+        The name must be a valid Perl identifier ("/^[a-z]\w*$/i" or
+        "/^_\w+$/"). This option is only valid at import time; it may not be
+        passed to bug().
+
+LABEL:FLAGS SYNTAX
+    A label:flags string may optionally appear as the *first* argument to
+    bug() or "use" (import()).
+
+    The string has the form "label:flags", where both parts are optional. A
+    leading colon means an empty label; the characters after the colon each
+    enable a boolean option by its single-char alias.
+
+        use Devel::Bug ':pfl';            # empty label, flags p, f, l
+        use Devel::Bug 'app:pf';          # label 'app', flags p, f
+        use Devel::Bug 'app';             # label 'app', no flags
+
+        my @r = (bug 'data:@%') = ...;   # label 'data', flags @ and %
+        my @r = (bug ':m')      = ...;   # empty label, flag m
+
+    Flag characters:
+
+        @   i   indices      %   k   keyval       m   multiline
+        p       package      f       filename     l   lineno
+        d       delims       n       noterm
+
+CHAINING
+    Bug probes can be placed at different points in a pipeline to capture
+    each intermediate value independently.
+
+        my @data = (1, 2, 3, 4, 5, 6);
+        my @doubled =
+            (bug 'doubled')=      # parens make this a list assignment; bug() passes the whole list through
+            map  { $_ * 2 }
+            (bug 'evens')=        # parens force list context; without them bug() captures only one value
+            grep { $_ % 2 == 0 } @data;
+
+        # OUTPUT:
+        # doubled=(4 8 12)
+        # evens=(2 4 6)
+
+    'evens' captures the elements that passed the grep; 'doubled' captures
+    those elements after multiplication. Output fires left-to-right as Perl
+    frees temporaries at end-of-statement, which is the reverse of data flow
+    - hence 'doubled' prints before 'evens'.
+
+DEPENDENCIES
+    Term::ANSIColor, Data::Dumper.
+
+    Terminal width detection first tries "stty size". Term::Size::Perl is
+    loaded on demand only if "stty" is unavailable or returns no output, and
+    is never consulted when "noterm" is set.
+
+    Data::Dump and other pretty-printer modules are optional; see the "pp"
+    option.
+
+AUTHOR
+    Kevin Shea
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

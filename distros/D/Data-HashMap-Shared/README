@@ -20,6 +20,9 @@ SYNOPSIS
         shm_ii_incr $map, 1;
         shm_ii_incr_by $map, 1, 10;
 
+        # Compare-and-swap (all variants; byte-compare for string values)
+        shm_ii_cas $map, 1, 11, 42;     # swap to 42 only if current == 11
+
         # LRU cache (evicts least-recently-used when full)
         my $cache = Data::HashMap::Shared::II->new('/tmp/cache.shm', 100000, 1000);
         shm_ii_put $cache, 42, 100;    # auto-evicts LRU entry if size > 1000
@@ -120,12 +123,12 @@ DESCRIPTION
     lock-free read path is used. The only overhead is a branch (predicted
     away).
 
-  String Keys and UTF-8
-    String-key variants ("SS", "SI", "IS", "I16S", "I32S", "SI16", "SI32")
-    compare keys as raw bytes: two keys are the same entry if and only if
-    they contain the same byte sequence. The SV UTF-8 flag is stored
-    alongside the key so retrieval round-trips it to the returned SV, but it
-    is not part of key identity. Consequences:
+  String Keys/Values and UTF-8
+    String-key variants ("SS", "SI", "SI16", "SI32") compare keys as raw
+    bytes: two keys are the same entry if and only if they contain the same
+    byte sequence. The SV UTF-8 flag is stored alongside the key so
+    retrieval round-trips it to the returned SV, but it is not part of key
+    identity. Consequences:
 
     *   ASCII keys with a toggled UTF-8 flag hash and match the same entry
         ("use utf8", "utf8::upgrade", and "utf8::downgrade" on ASCII are all
@@ -135,6 +138,12 @@ DESCRIPTION
         (latin-1, 4 bytes) and "café" with "use utf8" (5 UTF-8 bytes) are
         two different keys. If your input comes in mixed encodings,
         normalize with "Encode::encode_utf8" before use.
+
+    String-value variants ("SS", "IS", "I16S", "I32S") store the SV UTF-8
+    flag alongside each value and round-trip it on retrieval. The "cas"
+    comparison of $expected against the stored value is byte-only — the
+    UTF-8 flag on $expected is ignored (same rationale as string-key
+    equality).
 
   Sharding
         my $map = Data::HashMap::Shared::II->new_sharded($path_prefix, $shards, $max_entries, ...);
@@ -148,9 +157,10 @@ DESCRIPTION
 
     All operations work transparently on sharded maps: "put", "get",
     "remove", "exists", "add", "update", "swap", "take", "incr", "cas",
-    "get_or_set", "put_ttl", "touch", "persist", "set_ttl", "keys",
-    "values", "items", "to_hash", "set_multi" (method only), "get_multi"
-    (method only), "each", "pop", "shift", "drain", "clear",
+    "cas_take", "get_or_set", "put_ttl", "add_ttl", "update_ttl", "touch",
+    "persist", "set_ttl", "keys", "values", "items", "to_hash", "set_multi"
+    (method only), "remove_multi" (method only), "get_multi" (method only),
+    "get_with_ttl" (method only), "each", "pop", "shift", "drain", "clear",
     "flush_expired", "flush_expired_partial", "size", "stats" (method only),
     "reserve", and all diagnostic keywords.
 
@@ -166,8 +176,12 @@ DESCRIPTION
         my $ok = shm_xx_add $map, $key, $value;   # insert only if key absent
         my $ok = shm_xx_update $map, $key, $value; # overwrite only if key exists
         my $old = shm_xx_swap $map, $key, $value; # put + return old value (undef if new)
+        my $ok = shm_xx_cas $map, $key, $expected, $desired; # compare-and-swap
+        my $v  = shm_xx_cas_take $map, $key, $expected; # compare-and-remove; returns value on match, undef otherwise
         my $n  = $map->set_multi($k, $v, ...);   # batch put under single lock, returns count
+        my $n  = $map->remove_multi(@keys);      # batch remove under single lock, returns count
         my @v  = $map->get_multi($k1, $k2, ...); # batch get under single lock with prefetch pipeline
+        my ($v, $ttl) = $map->get_with_ttl($key); # atomic snapshot; () if missing, $ttl is undef on non-TTL map, 0 = permanent; does not promote in LRU
         my $v  = shm_xx_get $map, $key;           # returns undef if not found
         my $ok = shm_xx_remove $map, $key;        # returns false if not found
         my $ok = shm_xx_exists $map, $key;        # returns boolean
@@ -182,16 +196,24 @@ DESCRIPTION
         my $href = shm_xx_to_hash $map;
         my $v  = shm_xx_get_or_set $map, $key, $default;  # returns value
 
+    "cas" is available for all variants. Returns true when the stored value
+    matched $expected and was atomically replaced with $desired; false if
+    the key is missing or expired, the value did not match, or (string-value
+    variants) the arena is full. See "String Keys/Values and UTF-8" for the
+    byte-only comparison rule.
+
     Integer-value variants also have:
 
         my $n = shm_xx_incr $map, $key;           # returns new value
         my $n = shm_xx_decr $map, $key;           # returns new value
-        my $ok = shm_xx_cas $map, $key, $expected, $desired; # compare-and-swap
         my $n = shm_xx_incr_by $map, $key, $delta;
 
-    LRU/TTL operations (require TTL-enabled map for "put_ttl"):
+    LRU/TTL operations ("put_ttl", "add_ttl", and "update_ttl" require a
+    TTL-enabled map):
 
         my $ok = shm_xx_put_ttl $map, $key, $value, $ttl_sec;  # per-key TTL (0 = permanent); requires TTL-enabled map
+        my $ok = shm_xx_add_ttl $map, $key, $value, $ttl_sec;  # insert-if-absent with per-key TTL (0 = permanent)
+        my $ok = shm_xx_update_ttl $map, $key, $value, $ttl_sec; # overwrite-only with per-key TTL (0 = permanent)
         my $ms = shm_xx_max_size $map;            # LRU capacity (0 = disabled)
         my $t  = shm_xx_ttl $map;                 # default TTL in seconds
         my $r  = shm_xx_ttl_remaining $map, $key; # seconds left (0 = permanent, undef if missing/expired/no TTL)
@@ -242,8 +264,8 @@ DESCRIPTION
         # stats keys: size, capacity, max_entries, tombstones, mmap_size,
         #   arena_used, arena_cap, evictions, expired, recoveries, max_size, ttl
 
-    "set_multi", "stats", "path", and "unlink" are method-only (no keyword
-    form).
+    "set_multi", "get_multi", "remove_multi", "get_with_ttl", "stats",
+    "path", and "unlink" are method-only (no keyword form).
 
     File management:
 

@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.96.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 f159880b5b6fb224baf8ffe62084385eaea2ea574b976993941a4e42c9fd819b Build.PL
+SHA256 0a37de4f791e00e5ca8d857489fdb6565b03eae55113f5bc84cf9b7f5f45d202 Changes
+SHA256 99e7eae5f83de59f4a39c289b0dcc705abf60978c708c705898e5be9971f9c5b LICENSE
+SHA256 3fc1de05d9724c52d57e687fdfe604512a1bcb06bc2fdb97d01c6ecddd08f3ce MANIFEST
+SHA256 d4b9227cb1187fbe97c42f7888a276ee5b2738c4608fbeff17f66c438485d613 META.json
+SHA256 fe24af881163a5c75115c09efa636eb276f968735ec2fe1b8cdaef59389b6eb5 META.yml
+SHA256 abfb7835f5dba6e5f687afb12af18f83b17b8a5d4e2b95fa617ede953d6020ac Makefile.PL
+SHA256 087f934634c8c0abab1d90271128c225a6a01741ac5788e6b1ed1b3888c41e21 README.md
+SHA256 2e114c4afddad48acdaabe19bbb312a410a6a75e37f1dec4aa0316a625094b41 ignore.txt
+SHA256 bb9d37995424bb57644ec7668008775aac7be19589e3a12b3a4243d79f87076a lib/Lingua/RO/Numbers.pm
+SHA256 281d96404ad701f08b80d51a0b38c2212e6be0fbf932e5d499e492e6fb5118b1 t/00-load.t
+SHA256 e7243454cc88b98a48d9a7f909a999cefded743c5152d0ac3479fb89930df9b9 t/01-num_to_ro.t
+SHA256 5e7627e30684df1bab7a7bf7b0278c7d91aab4e6a409369bb09f6d4342ebb248 t/02-ro_to_num.t
+SHA256 bc6bacebd8e3967572149a6bffe240b28aefc773efdb7c5e3c0ad2bfca86c708 t/pod-coverage.t
+SHA256 69a39e15ffd8e533230052376d3b8f87f9be65e3aaf1d6124bc2bd14b3d8c467 t/pod.t
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEEic0FAy7a5F/LlG8fvY5VX0p+GdEFAmoEYVkACgkQvY5VX0p+
+GdHLYQ/7BpsAGjmG3tU+D3b/ZSn5AqNkA0NxbnITchDGVrYEEbIdEy2rSObv0/P7
+sqbuzlUY2KLvEXCGvnSgvEjIW/4fPHfmXOtnw9NslmTGjgC0a73kEgdihTDvLe25
+LnnMPhMmmZYfkqCOuOoIS0EUdwbqgHp5pAry4WPGFIMstuyK6H+lJFGwf/7hyP14
+m43l1XIp4YTeY0vL/OJbat9M7DU6sV8q9WYFKIULiKSlfjyIwhqBXF2ReCWkzkK/
+l7WytMldwT34zl9853bqfkZ93dQISmvP1g3rRl//CdfjC2U84zOwfdQ9Xqeq76uo
+fy3gglg1zxnDyna/Bjz8TWKPVGGkARGbAxCm+hyg9eqvbnP0R5aGnZv/rqvaxCXo
+TLS1acMoRGWCip/rdN2DB64uIVHQ7oTZpia4WWrdFByqxL6oR2/2kn4nLNL6tH6Z
+Utgopa8PjNW9YvmRSFIc050JCdVXVlVNFDUA2HxkYPtL8mP+FcHjunVGVPeXcBnS
+Z5a5WGbYfH85G82fuKkgBY2jds3roIL1I6Xz7uxciwPQlBkWHvvwwDR7Wgf6LZBY
+UOHnsL6+xXuw8oazkcxlQqVhAl5qugOvaRNa8bOiCvQruIjhdqzeMj0W9ydJS4qg
+LxJVBW0aYSJBDF9IiPZiZTOpwfHTO9talI96/dHVJlVm6utvALM=
+=Fxph
+-----END PGP SIGNATURE-----

@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-use 5.042;
+use 5.042.2;
 no source::encoding;
 use warnings FATAL => 'all';
 use autodie ':default';

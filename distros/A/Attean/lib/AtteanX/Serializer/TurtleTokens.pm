@@ -4,7 +4,7 @@ AtteanX::Serializer::TurtleTokens - Turtle Serializer
 
 =head1 VERSION
 
-This document describes AtteanX::Serializer::TurtleTokens version 0.035
+This document describes AtteanX::Serializer::TurtleTokens version 0.038
 
 =head1 SYNOPSIS
 
@@ -39,7 +39,7 @@ This document describes AtteanX::Serializer::TurtleTokens version 0.035
 use v5.14;
 use warnings;
 
-package AtteanX::Serializer::TurtleTokens 0.035 {
+package AtteanX::Serializer::TurtleTokens 0.038 {
 	use Moo;
 	use Data::Dumper;
 	use Types::Standard qw(Bool ArrayRef HashRef ConsumerOf);
@@ -195,6 +195,10 @@ L<IO::Handle> object C<< $fh >>.
 				my $value	= $t->value;
 				$value		=~ s/'''/''\\'/g;
 				$io->print("'''");
+				if ($value =~ /'$/) {
+					chop($value);
+					$value	.= "\\'";
+				}
 				$io->print($value);
 				$io->print("'''");
 				$need_space++;
@@ -202,6 +206,10 @@ L<IO::Handle> object C<< $fh >>.
 				my $value	= $t->value;
 				$value		=~ s/"""/""\\"/g;
 				$io->print('"""');
+				if ($value =~ /"$/) {
+					chop($value);
+					$value	.= "\\\"";
+				}
 				$io->print($value);
 				$io->print('"""');
 				$need_space++;

@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.042000
+    version 2.043000
 
 SYNOPSIS
 
@@ -230,6 +230,12 @@ METHODS
         my $download_url = $mcpan->download_url('Moose', '>1.01', 1);
 
     Returns a MetaCPAN::Client::DownloadURL object
+
+ count
+
+    Returns the count of records in a given index.
+
+        my $count = $mcpan->count('release');
 
  all
 

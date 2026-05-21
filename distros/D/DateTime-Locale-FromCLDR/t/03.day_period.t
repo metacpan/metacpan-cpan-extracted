@@ -5,7 +5,7 @@ BEGIN
     use warnings;
     use lib './lib';
     use open ':std' => ':utf8';
-    use vars qw( $DEBUG );
+    use vars qw( $DEBUG $dt_class );
     use utf8;
     use version;
     use Test::More;
@@ -18,11 +18,22 @@ BEGIN
     {
         plan skip_all => 'Weird memory bug out of my control on OpenBSD for v5.12.0 to 5';
     }
-    # I am getting weird error like:
-    # perl(74608) in free(): bogus pointer (double free?) 0xfcc0f72e800
-    # that are most likely coming from DateTime, so I am switching for testing to its pure-perl equivalent
-    $ENV{PERL_DATETIME_PP} = 1;
-    use DateTime;
+
+    # NOTE: We support both DateTime::Lite (preferred for speed) and DateTime.
+    # If neither is installed, the tests are skipped. This avoids a circular dependency
+    # between DateTime::Locale::FromCLDR and DateTime::Lite.
+    if( eval{ require DateTime::Lite; 1 } )
+    {
+        $dt_class = 'DateTime::Lite';
+    }
+    elsif( eval{ require DateTime; 1 } )
+    {
+        $dt_class = 'DateTime';
+    }
+    else
+    {
+        plan skip_all => 'Neither DateTime::Lite nor DateTime is installed; cannot run day period tests';
+    }
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
@@ -42,32 +53,32 @@ my $tests = [
         terms =>
         [
             # midnight
-            DateTime->new(
+            $dt_class->new(
                 year => 2024,
                 hour => 0
             ) => 'midnight',
             # morning1
-            DateTime->new(
+            $dt_class->new(
                 year => 2024,
                 hour => 7
             ) => 'in the morning',
             # noon
-            DateTime->new(
+            $dt_class->new(
                 year => 2024,
                 hour => 12
             ) => 'noon',
             # afternoon1
-            DateTime->new(
+            $dt_class->new(
                 year => 2024,
                 hour => 13
             ) => 'in the afternoon',
             # evening1
-            DateTime->new(
+            $dt_class->new(
                 year => 2024,
                 hour => 19
             ) => 'in the evening',
             # night1
-            DateTime->new(
+            $dt_class->new(
                 year => 2024,
                 hour => 22
             ) => 'at night',
@@ -78,37 +89,37 @@ my $tests = [
         terms =>
         [
             # midnight
-            DateTime->new(
+            $dt_class->new(
                 year => 2024,
                 hour => 0
             ) => '真夜中',
             # morning1
-            DateTime->new(
+            $dt_class->new(
                 year => 2024,
                 hour => 7
             ) => '朝',
             # noon
-            DateTime->new(
+            $dt_class->new(
                 year => 2024,
                 hour => 12
             ) => '正午',
             # afternoon1
-            DateTime->new(
+            $dt_class->new(
                 year => 2024,
                 hour => 13
             ) => '昼',
             # evening1
-            DateTime->new(
+            $dt_class->new(
                 year => 2024,
                 hour => 18
             ) => '夕方',
             # night1
-            DateTime->new(
+            $dt_class->new(
                 year => 2024,
                 hour => 20
             ) => '夜',
             # night2
-            DateTime->new(
+            $dt_class->new(
                 year => 2024,
                 hour => 23
             ) => '夜中',
@@ -119,37 +130,37 @@ my $tests = [
         terms =>
         [
             # midnight
-            DateTime->new(
+            $dt_class->new(
                 year => 2024,
                 hour => 0
             ) => 'minuit',
             # morning1
-            DateTime->new(
+            $dt_class->new(
                 year => 2024,
                 hour => 7
             ) => 'matin',
             # noon
-            DateTime->new(
+            $dt_class->new(
                 year => 2024,
                 hour => 12
             ) => 'midi',
             # afternoon1
-            DateTime->new(
+            $dt_class->new(
                 year => 2024,
                 hour => 13
             ) => 'après-midi',
             # evening1
-            DateTime->new(
+            $dt_class->new(
                 year => 2024,
                 hour => 18
             ) => 'soir',
             # evening1
-            DateTime->new(
+            $dt_class->new(
                 year => 2024,
                 hour => 20
             ) => 'soir',
             # night1
-            DateTime->new(
+            $dt_class->new(
                 year => 2024,
                 hour => 3
             ) => 'matin',
@@ -157,7 +168,7 @@ my $tests = [
     },
 ];
 
-my $year = DateTime->now->year;
+my $year = $dt_class->now->year;
 my( $dt1, $dt2, $diff );
 
 foreach my $def ( @$tests )

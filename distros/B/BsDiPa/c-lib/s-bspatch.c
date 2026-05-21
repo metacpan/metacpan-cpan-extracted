@@ -1,33 +1,19 @@
 /*@ Implementation of s-bsdipa-lib.h: s_bsdipa_patch() and support.
  *
- * SPDX-License-Identifier: BSD-2-Clause
+ * Copyright (c) 2024 - 2026 Steffen Nurpmeso <steffen@sdaoden.eu>.
+ * SPDX-License-Identifier: ISC
  *
- * Copyright (c) 2024 - 2025 Steffen Nurpmeso <steffen@sdaoden.eu>.
- * (Only technical surroundings, algorithm is solely Colin Percival.)
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose with or without fee is hereby granted, provided that the above
+ * copyright notice and this permission notice appear in all copies.
  *
- * Copyright 2003-2005 Colin Percival
- * All rights reserved
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted providing that the following conditions 
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
- * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
- * IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ * MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
 #include "s-bsdipa-lib.h"
@@ -67,14 +53,14 @@ a_bspatch_xin(uint8_t const *buf){
 	s_bsdipa_off_t y;
 
 	y = buf[0] & 0x7F;
-	y = y * 256; y += buf[1];
-	y = y * 256; y += buf[2];
-	y = y * 256; y += buf[3];
+	y <<= 8; y += buf[1];
+	y <<= 8; y += buf[2];
+	y <<= 8; y += buf[3];
 #ifndef s_BSDIPA_32
-	y = y * 256; y += buf[4];
-	y = y * 256; y += buf[5];
-	y = y * 256; y += buf[6];
-	y = y * 256; y += buf[7];
+	y <<= 8; y += buf[4];
+	y <<= 8; y += buf[5];
+	y <<= 8; y += buf[6];
+	y <<= 8; y += buf[7];
 #endif
 	if(buf[0] & 0x80)
 		y = -y;
@@ -119,6 +105,10 @@ s_bsdipa_patch_parse_header(struct s_bsdipa_header *hp, uint8_t const *dat){
 
 	x = a_bspatch_xin(dat);
 	if(x < 0)
+		goto jleave;
+	if(x & (sizeof(s_bsdipa_off_t) - 1))
+		goto jleave;
+	if(x % (sizeof(s_bsdipa_off_t) * 3))
 		goto jleave;
 	y = x; /* If we generated the header, data *plus* control block fits in _OFF_MAX! */
 	hp->h_ctrl_len = x;
@@ -192,13 +182,13 @@ s_bsdipa_patch(struct s_bsdipa_patch_ctx *pcp){
 		respos = pcp->pc_header.h_ctrl_len;
 		if(respos < 0 || x < (uint64_t)respos)
 			goto jleave;
-		x -= respos;
+		x -= (uint64_t)respos;
 		pcp->pc_diff_dat += respos;
 
 		respos = pcp->pc_header.h_diff_len;
 		if(respos < 0 || x < (uint64_t)respos)
 			goto jleave;
-		x -= respos;
+		x -= (uint64_t)respos;
 		pcp->pc_diff_dat += respos;
 
 		pcp->pc_extra_dat = pcp->pc_diff_dat;
@@ -286,21 +276,11 @@ s_bsdipa_patch(struct s_bsdipa_patch_ctx *pcp){
 
 			if(!a_bspatch_check_add_positive(respos, j) || respos + j > pcp->pc_header.h_before_len)
 				goto jleave;
-			if(!a_bspatch_check_add_positive(aftpos, j))
+			if(!a_bspatch_check_add_positive(aftpos, j) || aftpos + j > (s_bsdipa_off_t)pcp->pc_after_len)
 				goto jleave;
 
-			for(i = j; i--;)
-				pcp->pc_restored_dat[respos++] = *--pcp->pc_diff_dat;
-			respos -= j;
-
-			k = j;
-			if(aftpos + k >= (s_bsdipa_off_t)pcp->pc_after_len)
-				k = (s_bsdipa_off_t)pcp->pc_after_len - aftpos;
-			for(i = 0; i < k; ++i)
-				pcp->pc_restored_dat[respos + i] += pcp->pc_after_dat[aftpos + i];
-
-			respos += j;
-			aftpos += j;
+			while(j-- != 0)
+				pcp->pc_restored_dat[respos++] = *--pcp->pc_diff_dat + pcp->pc_after_dat[aftpos++];
 		}
 
 		/* Extra dat */
@@ -313,7 +293,7 @@ s_bsdipa_patch(struct s_bsdipa_patch_ctx *pcp){
 			if(!a_bspatch_check_add_positive(respos, j) || respos + j > pcp->pc_header.h_before_len)
 				goto jleave;
 
-			memcpy(&pcp->pc_restored_dat[respos], pcp->pc_extra_dat, j);
+			memcpy(&pcp->pc_restored_dat[respos], pcp->pc_extra_dat, (size_t)j);
 			pcp->pc_extra_dat += j;
 
 			respos += j;
@@ -330,7 +310,9 @@ s_bsdipa_patch(struct s_bsdipa_patch_ctx *pcp){
 		}
 	}
 
-	rv = s_BSDIPA_OK;
+	if(pcp->pc_header.h_ctrl_len == 0)
+		rv = s_BSDIPA_OK;
+
 jleave:
 	return rv;
 }

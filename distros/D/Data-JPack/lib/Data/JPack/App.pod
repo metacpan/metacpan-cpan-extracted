@@ -1,0 +1,73 @@
+=head1 NAME
+
+Data::JPack::App - Glue to build Data::JPack web applications
+
+
+=head1 SYNOPISIS
+
+For use inside a L<Template::Plexsite> HTML template. In your top level class,
+inherit from L<Data::JPack::App> to ensure slot initialisation
+
+  @{[init {
+
+    inherit "Data::JPack::App";
+
+  }]}
+  ... 
+  
+  
+  
+
+=head1 DESCRIPTION
+
+Provides the base tempating and bootstraping of a Data::JPack application via
+L<Template::Plexsite>. Sub class this for easy addition of resources to a
+template.
+
+
+
+
+
+
+
+=head1 Template Slots
+
+=over
+
+=item title
+
+The Content between the opening and closing title tags
+
+=item head_start
+
+
+=item head_end
+
+
+=item body_start
+
+=item body_end
+
+
+=head1 API
+
+A sub class or package must include the following:
+
+
+=head2 template_path
+
+Returns the path to the L<Template::Plexsite> template assosicated with this
+package. This will be used during an 'inherit' in a template when using the
+package name.
+
+
+=head2 localize_table
+
+Not a user function. Do not override. Temporarily sets a templates url table to
+this packages template path root. 
+
+=head2 add_to_container
+
+Takes the a L<Template::Plexsite> template as an argument. Ands resources to the container or slots of the template
+
+Sub classes must must localise the table manuall

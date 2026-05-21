@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use Carp       qw( croak );
 use Path::Tiny qw( path );
@@ -163,7 +163,7 @@ Dist::Zilla::Plugin::WeaveFile::Engine
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 

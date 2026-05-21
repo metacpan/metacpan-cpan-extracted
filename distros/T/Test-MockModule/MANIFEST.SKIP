@@ -82,3 +82,7 @@
 
 # Avoid Travis-CI configuration file
 \.travis.yml
+
+# Avoid maintainer-only docs
+^RELEASING\.md
+^docs\b

@@ -3,6 +3,8 @@ Changes
 cpanfile
 eg/basic.pl
 eg/copy_in.pl
+eg/copy_out.pl
+eg/describe.pl
 eg/error_handling.pl
 eg/notify.pl
 eg/params.pl
@@ -34,3 +36,4 @@ t/10_timeouts.t
 t/11_bug_skip_pending.t
 t/TestHelper.pm
 typemap
+xt/valgrind.t

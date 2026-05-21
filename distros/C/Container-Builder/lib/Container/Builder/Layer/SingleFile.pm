@@ -15,9 +15,6 @@ class Container::Builder::Layer::SingleFile :isa(Container::Builder::Layer) {
 	field $mode :param;
 	field $user :param;
 	field $group :param;
-	field $generated_artifact = 0;
-	field $size = 0;
-	field $digest = 0;
 
 	method generate_artifact() {
 		my $tar = Container::Builder::Tar->new();
@@ -32,14 +29,9 @@ class Container::Builder::Layer::SingleFile :isa(Container::Builder::Layer) {
 		}
 		$tar->add_file($dest, $data, $mode, $user, $group);
 		my $tar_content = $tar->get_tar();
-		$digest = Crypt::Digest::SHA256::sha256_hex($tar_content);
-		$size = length($tar_content);
-		return $tar_content;
+		my $data_ref = $self->_parent_does_stuff(\$tar_content);
+		return $$data_ref;
 	}
-
-	method get_media_type() { return "application/vnd.oci.image.layer.v1.tar" }
-	method get_digest() { return lc($digest) }
-	method get_size() { return $size }
 }
 
 

@@ -16,11 +16,11 @@ OSLV::Monitor::Backends::cgroups - Backend for Linux cgroups.
 
 =head1 VERSION
 
-Version 1.0.2
+Version 1.0.3
 
 =cut
 
-our $VERSION = '1.0.2';
+our $VERSION = '1.0.3';
 
 =head1 SYNOPSIS
 
@@ -414,28 +414,55 @@ sub run {
 	#
 	my @podman_compatible = ( 'docker', 'podman' );
 	foreach my $cgroup_jank_type (@podman_compatible) {
-		my $podman_output = `$cgroup_jank_type ps --format json 2> /dev/null`;
+		my $podman_output;
+		if ( $cgroup_jank_type eq 'podman' ) {
+			$podman_output = `podman ps --format json 2> /dev/null`;
+		} elsif ( $cgroup_jank_type eq 'docker' ) {
+			# --no-trunc is needed as for some unfathonable reason it truncates even when outputting json
+			$podman_output = `docker ps --no-trunc --format json 2> /dev/null`;
+			# returns a series of json entries seperated by a newline... the following expects it as
+			# a array like podman outputs
+			my @podman_outputA = split( /\n/, $podman_output );
+			# and it is now a array of hashes as expected
+			$podman_output = '[' . join( ',', @podman_outputA ) . ']';
+		}
 		if ( $? == 0 ) {
 			my $podman_parsed;
 			eval { $podman_parsed = decode_json($podman_output); };
 			if ( defined($podman_parsed) && ref($podman_parsed) eq 'ARRAY' ) {
 				foreach my $pod ( @{$podman_parsed} ) {
-					if ( defined( $pod->{Id} ) && defined( $pod->{Names} ) && defined( $pod->{Names}[0] ) ) {
-						$self->{ $cgroup_jank_type . '_mapping' }{ $pod->{Id} } = {
-							podname  => $pod->{PodName},
+					my $pod_id;
+					if ( defined( $pod->{'Id'} ) ) {
+						$pod_id = $pod->{'Id'};
+					} elsif ( defined( $pod->{'ID'} ) ) {
+						$pod_id = $pod->{'ID'};
+					}
+
+					my $pod_name;
+					if ( defined( $pod->{'PodName'} )
+						&& ( $pod->{'PodName'} ne '' ) )
+					{
+						$pod_name = $pod->{'PodName'};
+					} elsif ( defined( $pod->{'Names'} )
+						&& ( ref( $pod->{'Names'} ) eq '' ) )
+					{
+						$pod_name = $pod->{'Names'};
+					} elsif ( defined( $pod->{'Names'} )
+						&& ( ref( $pod->{'Names'} ) eq 'ARRAY' )
+						&& defined( $pod->{'Names'}[0] )
+						&& ( ref( $pod->{'Names'}[0] ) eq '' ) )
+					{
+						$pod_name = $pod->{'Names'}[0];
+					}
+
+					if ( defined($pod_id) && defined($pod_name) ) {
+						$self->{ $cgroup_jank_type . '_mapping' }{$pod_id} = {
+							name     => $pod_name,
 							Networks => $pod->{Networks},
 						};
-						if ( $self->{ $cgroup_jank_type . '_mapping' }{ $pod->{Id} }{podname} ne '' ) {
-							$self->{ $cgroup_jank_type . '_mapping' }{ $pod->{Id} }{name}
-								= $self->{ $cgroup_jank_type . '_mapping' }{ $pod->{Id} }{podname} . '-'
-								. $pod->{Names}[0];
-						} else {
-							$self->{ $cgroup_jank_type . '_mapping' }{ $pod->{Id} }{name} = $pod->{Names}[0];
-						}
-						my $container_id   = $pod->{Id};
-						my $inspect_output = `$cgroup_jank_type inspect $container_id 2> /dev/null`;
+						my $inspect_output = `$cgroup_jank_type inspect $pod_id 2> /dev/null`;
 						my $inspect_parsed;
-						$self->{ $cgroup_jank_type . '_info' }{$container_id} = { ip => [] };
+						$self->{ $cgroup_jank_type . '_info' }{$pod_id} = { ip => [] };
 						eval { $inspect_parsed = decode_json($inspect_output) };
 						if (   defined($inspect_parsed)
 							&& ref($inspect_parsed) eq 'ARRAY'
@@ -502,14 +529,11 @@ sub run {
 											}
 										}
 									} ## end if ( defined( $net_work_info->{if} ) && defined...)
-									push(
-										@{ $self->{ $cgroup_jank_type . '_info' }{ $pod->{Names}[0] }{ip} },
-										$net_work_info
-									);
+									push( @{ $self->{ $cgroup_jank_type . '_info' }{$pod_name}{ip} }, $net_work_info );
 								} ## end if ( ref($current_network) eq 'HASH' && ref...)
 							} ## end foreach my $network_to_process (@podman_networks)
 						} ## end if ( defined($inspect_parsed) && ref($inspect_parsed...))
-					} ## end if ( defined( $pod->{Id} ) && defined( $pod...))
+					} ## end if ( defined($pod_id) && defined($pod_name...))
 				} ## end foreach my $pod ( @{$podman_parsed} )
 			} ## end if ( defined($podman_parsed) && ref($podman_parsed...))
 		} ## end if ( $? == 0 )
@@ -804,6 +828,9 @@ sub cgroup_mapping {
 	if ( $cgroup_name =~ /^0\:\:\/system\.slice\/docker\-[a-zA-Z0-9]+\.scope/ ) {
 		$cgroup_name =~ s/^0\:\:\/system\.slice\/docker\-//;
 		$cgroup_name =~ s/\.scope.*$//;
+		if ( defined( $self->{docker_mapping}{$cgroup_name} ) ) {
+			return 'd_' . $self->{docker_mapping}{$cgroup_name}{name};
+		}
 		return 'd_' . $cgroup_name;
 	} elsif ( $cgroup_name =~ /^0\:\:\/docker\// ) {
 		$cgroup_name =~ s/^0\:\:\/docker\///;

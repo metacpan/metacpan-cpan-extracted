@@ -4,7 +4,7 @@ Log::Abstraction - Logging Abstraction Layer
 
 # VERSION
 
-0.27
+0.28
 
 # SYNOPSIS
 
@@ -83,6 +83,7 @@ The following arguments can be provided:
         - line
         - level
         - message - an arrayref of messages
+        - ctx - passed to `new()`, a argument that can help to give context to the caller
 
     - an object
     - a hash of options
@@ -207,7 +208,7 @@ Logs a notice message.
 
 Logs an error message. This method also supports logging to syslog if configured.
 If not logging mechanism is set,
-falls back to `Croak`.
+falls back to `croak`.
 
 ## fatal
 
@@ -241,7 +242,7 @@ Nigel Horne `njh@nigelhorne.com`
 
 # SEE ALSO
 
-- Test coverage report: [https://nigelhorne.github.io/Log-Abstraction/coverage/](https://nigelhorne.github.io/Log-Abstraction/coverage/)
+- [Test Dashboard](https://nigelhorne.github.io/Log-Abstraction/coverage/)
 
 # SUPPORT
 
@@ -279,5 +280,6 @@ You can also look for information at:
 
 Copyright (C) 2025-2026 Nigel Horne
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.

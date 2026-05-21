@@ -1,3 +1,9 @@
+0.823 (05.04.2025) - John Siracusa <siracusa@gmail.com>
+
+    * Handle some new behaviors from DBD::Pg when running queries that affect
+      zero rows.
+    * Account for MySQL's ONLY_FULL_GROUP_BY setting when building queries.
+
 0.822 (01.06.2025) - John Siracusa <siracusa@gmail.com>
 
     * Replaced List::MoreUtils with List::Util. (Patch by github.com/plicease)

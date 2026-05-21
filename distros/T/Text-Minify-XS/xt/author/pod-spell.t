@@ -19,4 +19,4 @@ Williamson
 XS
 kwh
 lib
-rrwo
+perl

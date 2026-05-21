@@ -26,7 +26,7 @@ no_index:
 requires:
   Config: '0'
   Cwd: '0'
-  DateTime::Locale::FromCLDR: v0.8.0
+  DateTime::Locale::FromCLDR: v0.8.5
   JSON: '2.20'
   Locale::Unicode: v0.4.0
   POSIX: '0'
@@ -43,6 +43,6 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/DateTime-Lite/issues
   repository: https://gitlab.com/jackdeguest/DateTime-Lite
-version: v0.6.5
+version: v0.7.1
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

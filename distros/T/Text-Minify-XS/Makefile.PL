@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Remove indentation and trailing whitespace from multi-line text",
-  "AUTHOR" => "Robert Rothenberg <rrwo\@cpan.org>",
+  "AUTHOR" => "Robert Rothenberg <perl\@rhizomnic.com>",
   "BUILD_REQUIRES" => {
     "ExtUtils::MakeMaker" => "7.22",
     "Module::Metadata" => "1.000015"
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "utf8" => 0
   },
-  "VERSION" => "v0.7.8",
+  "VERSION" => "v0.7.9",
   "test" => {
     "TESTS" => "t/*.t"
   }

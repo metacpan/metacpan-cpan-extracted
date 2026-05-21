@@ -314,8 +314,10 @@ share {
       }
     }
     if ($^O eq 'MSWin32') {
-      #  should add an env flag for this
-      push @with_args, '-DGDAL_USE_CURL=OFF';
+      #  Should add an env flag for these.
+      #  Disabling postgres due to issues with Strawberry Perl 5.42.
+      #  Probably overkill but will do for now.
+      push @with_args, ('-DGDAL_USE_CURL=OFF', '-DGDAL_USE_POSTGRESQL=OFF');
     }    
 
     my @env_args;

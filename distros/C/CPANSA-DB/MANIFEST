@@ -22,6 +22,7 @@ t/load.t
 t/pod.t
 t/pod_coverage.t
 t/test_manifest
+t/utils/find_file_paths.t
 t/yamllint.config
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -15,9 +15,9 @@ use parent 'File::Information::Base';
 
 use Carp;
 use Scalar::Util qw(weaken);
-use Fcntl qw(SEEK_SET);
+use Fcntl qw(SEEK_SET SEEK_CUR);
 
-our $VERSION = v0.16;
+our $VERSION = v0.17;
 
 my %_PNG_colour_types = ( # namespace: 4c11d438-f6f3-417f-85e3-e56e46851dae
     0   => {ise => 'a3934b85-5bec-5cd7-a571-727e4cecfcb1', displayname => 'Greyscale'},
@@ -48,13 +48,40 @@ my %_vmv0_section_types = (
     6   => {ise => '9bbc79eb-5a31-5797-8a05-56e58c530289', displayname => 'resources'},
 );
 
+my %_flac_metadata_blocks = (
+    0   => {ise => '92fd400d-4c47-5db2-b237-f3a0baf5343b', displayname => 'Streaminfo'},
+    1   => {ise => 'e54c4b6f-b427-56d1-af10-dccf2aad38d2', displayname => 'Padding'},
+    2   => {ise => 'c6e38060-7aa9-5d2c-b657-c9384d45dbe1', displayname => 'Application'},
+    3   => {ise => 'f0aa49be-a79a-5fb6-aa78-05a3ee902ce6', displayname => 'Seek table'},
+    4   => {ise => 'bdf21d34-8843-5f1e-8a5f-776c151991cd', displayname => 'Vorbis comment'},
+    5   => {ise => '4c8656e4-a204-55d0-a5d9-a227200f1fce', displayname => 'Cuesheet'},
+    6   => {ise => '97d2ac83-ab79-5715-8115-096a6ab05189', displayname => 'Picture'},
+);
+
+# RIFF/WAVE codecs:
+my @_riff_wave_codecs = (
+    {ise => '00000001-0000-0010-8000-00aa00389b71', displayname => 'PCM'},
+    {ise => '00000003-0000-0010-8000-00aa00389b71', displayname => 'IEEE FLOAT'},
+    {ise => '00000006-0000-0010-8000-00aa00389b71', displayname => 'ALAW'},
+    {ise => '00000007-0000-0010-8000-00aa00389b71', displayname => 'MULAW'},
+    {ise => '00000050-0000-0010-8000-00aa00389b71', displayname => 'MPEG-1 Layer I, II'},
+    {ise => '00000055-0000-0010-8000-00aa00389b71', displayname => 'MPEG-1 Layer III (MP3)'},
+);
+
 # Extra tags that do not belong into one of the other lists.
 my %_wk = (
-    '.section'  => {ise => 'dad2de0d-9711-5b57-9a31-562122d756ba', displayname => '.section'},
-    '.chunk'    => {ise => 'bff479fa-a818-58dc-b5df-539852fa8b80', displayname => '.chunk'},
+    '.section'              => {ise => 'dad2de0d-9711-5b57-9a31-562122d756ba', displayname => '.section'},
+    '.chunk'                => {ise => 'bff479fa-a818-58dc-b5df-539852fa8b80', displayname => '.chunk'},
+    'flac-metadata-block'   => {ise => '71edae67-d10e-48d3-ab69-4dfc88e9081c', displayname => 'flac-metadata-block'},
+    'riff-master-chunk'     => {ise => '66f903f6-e2de-4871-916e-e82f68d100a3', displayname => 'riff-master-chunk'},
+    'riff-slave-chunk'      => {ise => '07ef1e35-b1c1-43c8-bb8b-ffd24c759bcb', displayname => 'riff-slave-chunk'},
+    'mono'                  => {ise => 'a7747b62-cbb1-4912-976d-9840ce230d78', displayname => 'mono'},
+    #'stereo'                => {ise => 'e9302902-8a56-490f-bcbe-60bdc2ce3ea9', displayname => 'stereo'}, # not yet used.
+    'l-r-stereo'            => {ise => '0687c0ed-1138-4265-97bc-78b448292647', displayname => 'L-R-stereo'},
 );
 
 my %_properties = (
+    chunk_inner_type            => {},
     pdf_version                 => {loader => \&_load_pdf},
     pdf_pages                   => {loader => \&_load_pdf},
     odf_keywords                => {loader => \&_load_odf},
@@ -83,6 +110,26 @@ my %_properties = (
     libpng_ihdr_height          => {loader => \&_load_libpng},
     libpng_ihdr_color_type      => {loader => \&_load_libpng},
     libpng_plte_colours         => {loader => \&_load_libpng},
+    riff_format                 => {loader => \&_load_riff, rawtype => 'binary'},
+    riff_root_chunk             => {loader => \&_load_riff, rawtype => 'File::Information::Chunk'},
+    riff_wave_fmt_format            => {loader => \&_load_riff_chunks},
+    riff_wave_fmt_channels          => {loader => \&_load_riff_chunks},
+    riff_wave_fmt_frequency         => {loader => \&_load_riff_chunks},
+    riff_wave_fmt_bytes_per_second  => {loader => \&_load_riff_chunks},
+    riff_wave_fmt_bytes_per_block   => {loader => \&_load_riff_chunks},
+    riff_wave_fmt_bits_per_sample   => {loader => \&_load_riff_chunks},
+    riff_wave_fact_frames           => {loader => \&_load_riff_chunks},
+    flac_file_metadata              => {loader => \&_load_flac, rawtype => 'File::Information::Chunk'},
+    flac_streaminfo_min_block_size  => {loader => \&_load_flac_metadata_blocks},
+    flac_streaminfo_max_block_size  => {loader => \&_load_flac_metadata_blocks},
+    flac_streaminfo_min_frame_size  => {loader => \&_load_flac_metadata_blocks},
+    flac_streaminfo_max_frame_size  => {loader => \&_load_flac_metadata_blocks},
+    flac_streaminfo_sample_rate     => {loader => \&_load_flac_metadata_blocks},
+    flac_streaminfo_channels        => {loader => \&_load_flac_metadata_blocks},
+    flac_streaminfo_bits            => {loader => \&_load_flac_metadata_blocks},
+    flac_streaminfo_total_samples   => {loader => \&_load_flac_metadata_blocks},
+    flac_streaminfo_md5_checksum    => {loader => \&_load_flac_metadata_blocks},
+    flac_vorbiscomment_vendor       => {loader => \&_load_flac_metadata_blocks},
 );
 
 my %_vmv0_code_P1_info = (
@@ -96,7 +143,7 @@ my %_vmv0_code_P1_info = (
 my @_odf_medadata_keys = qw(title description subject creator language initial_creator editing_cycles editing_duration generator creation_date date);
 my @_image_info_keys   = qw(height width file_media_type file_ext color_type resolution SamplesPerPixel BitsPerSample Comment Interlace Compression Gamma LastModificationTime);
 my @_image_extra_keys  = qw(Thumb::URI Thumb::Image::Width Thumb::Image::Height Thumb::MTime Software);
-my @_dynamic_loaders   = (\&_load_odf, \&_load_audio_scan);
+my @_dynamic_loaders   = (\&_load_odf, \&_load_audio_scan, \&_load_flac_metadata_blocks);
 
 my %_audio_scan_tags = (
     vorbiscomments => {
@@ -140,7 +187,9 @@ foreach my $value (
     values(%_PNG_filter_method),
     values(%_PNG_compression_method),
     values(%_vmv0_section_types),
+    values(%_flac_metadata_blocks),
     values(%_wk),
+    @_riff_wave_codecs,
 ) {
     Data::Identifier->new(ise => $value->{ise}, displayname => $value->{displayname})->register;
 }
@@ -175,8 +224,10 @@ sub _new {
     weaken($self->{parent});
 
     # copy a few critical values:
-    $pv->{contentise} = {raw => $parent->get('contentise', lifecycle => 'current', as => 'uuid')};
-    eval { $pv->{mediatype}  = {raw => $parent->get('mediatype',  lifecycle => 'current', as => 'mediatype')} };
+    eval { $pv->{contentise}        = {raw => $parent->get('contentise',        lifecycle => 'current', as => 'uuid')} };
+    eval { $pv->{mediatype}         = {raw => $parent->get('mediatype',         lifecycle => 'current', as => 'mediatype')} };
+    eval { $pv->{chunk_inner_type}  = {ise => $parent->get('chunk_inner_type',  lifecycle => 'current', as => 'ise')} };
+    eval { $pv->{size}              = {raw => $parent->get('size',              lifecycle => 'current', as => 'raw')} };
 
     return $self;
 }
@@ -450,9 +501,8 @@ sub _load_vmv0 {
 
     return unless $self->_check_mediatype(qw(application/vnd.sirtx.vmv0));
 
-    {
-        my $inode = $self->parent->inode;
-        my $data = $inode->peek(wanted => 1024);
+    if (defined(my $inode = eval { $self->inode })) {
+        my $data = $self->peek(wanted => 1024);
         my %section_pointer;
 
         while (length($data)) {
@@ -531,8 +581,8 @@ sub _load_png {
     return unless $self->_check_mediatype(qw(image/png));
 
     {
-        my $inode = $self->parent->inode;
-        my $data = $inode->peek(wanted => 1024);
+        my $inode = $self->inode;
+        my $data = $self->peek(wanted => 1024);
 
         if (substr($data, 0, 8) eq "\x89\x50\x4e\x47\x0d\x0a\x1a\x0a") {
             if (substr($data, 8, 8) eq "\0\0\0\x0dIHDR") {
@@ -569,8 +619,8 @@ sub _load_gif {
     return unless $self->_check_mediatype(qw(image/gif));
 
     {
-        my $inode = $self->parent->inode;
-        my $data = $inode->peek(wanted => 1024);
+        my $inode = $self->inode;
+        my $data = $self->peek(wanted => 1024);
 
         if (substr($data, 0, 6) eq 'GIF89a') { # TODO: check if the following code also holds true for GIF87a
             my ($width, $height) = unpack('vv', substr($data, 6, 4));
@@ -587,9 +637,8 @@ sub _load_gpl {
     return if defined $self->{_loaded_gpl};
     $self->{_loaded_gpl} = 1;
 
-    {
-        my $inode = $self->parent->inode;
-        my $data = $inode->peek(wanted => 64);
+    if (defined(my $inode = eval { $self->inode })) {
+        my $data = $self->peek(wanted => 64);
 
         if ($data =~ /^GIMP Palette\r?\n/) {
             my $fh = $inode->_get_fh;
@@ -607,7 +656,7 @@ sub _load_gpl {
                     $pv->{gpl_palette_name} = {raw => $1};
                 } elsif ($line =~ /^Columns:\s+([1-9][0-9]*)$/) {
                     $pv->{gpl_palette_columns} = {raw => int($1)};
-                } elsif ($line =~ /^(0|[1-9][0-9]*)\s+(0|[1-9][0-9]*)\s+(0|[1-9][0-9]*)\s+(\S(?:.*\S)?)$/) {
+                } elsif ($line =~ /^\s*(0|[1-9][0-9]*)\s+(0|[1-9][0-9]*)\s+(0|[1-9][0-9]*)\s+(\S(?:.*\S)?)$/) {
                     push(@colours, {raw => Data::URIID::Colour->new(
                             rgb => sprintf('#%02x%02x%02x', $1, $2, $3),
                             displayname => $4,
@@ -633,9 +682,8 @@ sub _load_rgbtxt {
     return if defined $self->{_loaded_rgbtxt};
     $self->{_loaded_rgbtxt} = 1;
 
-    {
-        my $inode = $self->parent->inode;
-        my $data = $inode->peek(wanted => 64);
+    if (defined(my $inode = eval { $self->inode })) {
+        my $data = $self->peek(wanted => 64);
 
         if ($data =~ /^\! \$Xorg: rgb\.txt,v .+ Exp \$\r?\n/) {
             my $fh = $inode->_get_fh;
@@ -813,6 +861,267 @@ sub _load_libpng {
     }
 }
 
+sub _load_riff__load_subchunks {
+    my ($self, $fh, $offset, $length, $chunk_common) = @_;
+    my $end = $offset + $length;
+    my @ret;
+
+    require Data::Identifier::Generate;
+
+    while ($offset < ($end - 8)) {
+        my $header;
+        my $chunk_length;
+        my $subtype;
+        my $skip = 8;
+        my $inner_type;
+
+        $fh->seek($offset, SEEK_SET);
+
+        croak 'IO error' if read($fh, $header, 8) != 8;
+
+        $chunk_length = unpack('V', substr($header, 4, 4, ''));
+        croak sprintf('Bad length: %u (max: %u - %u = %u)', $chunk_length, $length, $skip, $length - $skip) if $chunk_length > ($length - $skip);
+
+        $skip += $chunk_length;
+        $skip += 1 if $chunk_length & 1; # Additional padding byte
+
+        if ($header eq 'RIFF' || $header eq 'LIST') {
+            croak 'IO error' if read($fh, $subtype, 4) != 4;
+        }
+
+        {
+            my $displayname;
+
+            if (defined $subtype) {
+                $displayname = sprintf('%s/%s', $header, $subtype) if $header =~ /^[0-9a-zA-Z_ ]{4}\z/ && $subtype =~ /^[0-9a-zA-Z_ ]{4}\z/;
+            } else {
+                $displayname = $header if $header =~ /^[0-9a-zA-Z_ ]{4}\z/;
+            }
+
+            $displayname =~ s/\s+\z// if defined $displayname;
+
+            $inner_type = Data::Identifier::Generate->generic(
+                namespace => 'a416135e-c0b0-4d40-8eb0-24f164c0ad74',
+                input => $header.(defined $subtype ? $subtype : ''),
+                displayname => $displayname,
+            );
+
+            $inner_type->register;
+        }
+
+        push(@ret, File::Information::Chunk->_new(
+                %{$chunk_common},
+                start => $offset,
+                size => $chunk_length + 8,
+                inner_start => $offset + 8,
+                inner_size => $chunk_length,
+                outer_type => {ise => $_wk{defined $subtype ? 'riff-master-chunk' : 'riff-slave-chunk'}->{ise}},
+                inner_type => {ise => $inner_type->uuid},
+                subchunks => (defined $subtype ? $self->_load_riff__load_subchunks($fh, $offset + 12, $chunk_length - 4, $chunk_common) : undef),
+            ));
+
+        $offset += $skip,
+        $length -= $skip;
+    }
+
+    return \@ret;
+}
+
+sub _load_riff {
+    my ($self, $key, %opts) = @_;
+    my $pv = ($self->{properties_values} //= {})->{current} //= {};
+    my %chunk_common;
+
+    return if defined $self->{_loaded_riff};
+    $self->{_loaded_riff} = 1;
+
+    if (defined(my $inode = eval { $self->inode })) {
+        if (defined(my $header = eval {$inode->peek(required => 4*3)})) {
+            my $size = $self->get('size');
+            my $fh;
+
+            return unless substr($header, 0, 4) eq 'RIFF';
+            return unless substr($header, 4, 4) eq pack('V', $size - 8);
+
+            $fh = $inode->_get_fh;
+
+            $pv->{riff_format} = {raw => substr($header, 8, 4)};
+
+            require File::Information::Chunk;
+
+            %chunk_common = (
+                instance => $self->instance,
+                parent => $self,
+                inode => $self->inode,
+            );
+            $pv->{riff_root_chunk} = {raw => $self->_load_riff__load_subchunks($fh, 0, $size, \%chunk_common)->[0]};
+        }
+    }
+}
+
+sub _load_riff_chunks {
+    my ($self, $key, %opts) = @_;
+    my $pv = ($self->{properties_values} //= {})->{current} //= {};
+    my $chunk_inner_type;
+
+    return if defined $self->{_loaded_riff_chunks};
+    $self->{_loaded_riff_chunks} = 1;
+
+    $chunk_inner_type = $self->get('chunk_inner_type', as => 'ise', default => undef);
+    return unless defined $chunk_inner_type;
+
+    if ($chunk_inner_type eq 'e3596805-82a2-572a-88af-ab3ce127bb10') { # 'fmt '
+        my ($AudioFormat, $NbrChannels, $Frequency, $BytePerSec, $BytePerBloc, $BitsPerSample) = unpack('vvVVvv', $self->peek(required => 16));
+        $pv->{riff_wave_fmt_format} = {raw => $AudioFormat, ise => sprintf('%08x-0000-0010-8000-00aa00389b71', $AudioFormat)};
+        $pv->{riff_wave_fmt_channels} = {raw => $NbrChannels};
+        $pv->{riff_wave_fmt_frequency} = {raw => $Frequency};
+        $pv->{riff_wave_fmt_bytes_per_second} = {raw => $BytePerSec};
+        $pv->{riff_wave_fmt_bytes_per_block} = {raw => $BytePerBloc};
+        $pv->{riff_wave_fmt_bits_per_sample} = {raw => $BitsPerSample};
+
+        if ($NbrChannels == 1) {
+            $pv->{riff_wave_fmt_channels}{ise} = $_wk{'mono'}{ise};
+        } elsif ($NbrChannels == 2) {
+            $pv->{riff_wave_fmt_channels}{ise} = $_wk{'l-r-stereo'}{'ise'};
+        }
+    } elsif ($chunk_inner_type eq '41ee7c44-704c-50fc-99b7-a2fed7456b4c') { # 'fact'
+        my ($frames) = unpack('V', $self->peek(required => 4));
+        $pv->{riff_wave_fact_frames} = {raw => $frames};
+    }
+}
+
+sub _load_flac {
+    my ($self, $key, %opts) = @_;
+    my $pv = ($self->{properties_values} //= {})->{current} //= {};
+    my $fh;
+    my $data;
+    my @blocks;
+    my %chunk_common;
+
+    return if defined $self->{_loaded_flac};
+    $self->{_loaded_flac} = 1;
+
+    return unless $self->_check_mediatype(qw(audio/flac));
+
+    $fh = $self->inode->_get_fh;
+    return if read($fh, $data, 4) != 4 || $data ne 'fLaC';
+
+    require File::Information::Chunk;
+
+    %chunk_common = (
+        instance => $self->instance,
+        parent => $self,
+        inode => $self->inode,
+        outer_type => {ise => '71edae67-d10e-48d3-ab69-4dfc88e9081c'}, # flac-metadata-block
+    );
+
+    while (read($fh, $data, 4) == 4) {
+        my $start = $fh->tell - 4;
+        my ($first, $second, $tail) = unpack('CCn', $data);
+        my $length = ($second << 8) + $tail;
+
+        push(@blocks, File::Information::Chunk->_new(
+                %chunk_common,
+                start => $start,
+                size => $length + 4,
+                inner_start => $start + 4,
+                inner_size => $length,
+                inner_type => {ise => $_flac_metadata_blocks{$first & 0x7F}->{ise}},
+            ));
+
+        if (($first & 0x7F) == 1) {
+            # This is a padding block. It is always boring.
+            (($blocks[-1]->{properties_values} //= {})->{current} //= {})->{boring} = {raw => 1};
+        }
+
+        last if $first & 0x80;
+
+        $fh->seek($length, SEEK_CUR);
+    }
+
+    $pv->{flac_file_metadata} = [map {{raw => $_}} @blocks];
+}
+
+sub _load_flac_metadata_blocks__read24 {
+    my ($v) = @_;
+    my ($x, $y) = unpack('Cn', ${$v});
+    substr(${$v}, 0, 3, '');
+    return ($x << 16) | $y;
+}
+
+sub _load_flac_metadata_blocks__read_string {
+    state $UTF8 = do { require Encode; Encode::find_encoding('UTF-8') };
+    my ($v) = @_;
+    my $len = unpack('V', ${$v});
+    my $s = $UTF8->decode(substr(${$v}, 4, $len));
+    substr(${$v}, 0, $len + 4, '');
+    return $s;
+}
+
+sub _load_flac_metadata_blocks {
+    my ($self, $key, %opts) = @_;
+    my $pv = ($self->{properties_values} //= {})->{current} //= {};
+    my $chunk_inner_type;
+
+    return if defined $self->{_loaded_flac_metadata_blocks};
+    $self->{_loaded_flac_metadata_blocks} = 1;
+
+    $chunk_inner_type = $self->get('chunk_inner_type', as => 'ise', default => undef);
+    return unless defined $chunk_inner_type;
+
+    if ($chunk_inner_type eq '92fd400d-4c47-5db2-b237-f3a0baf5343b') {
+        my $data = $self->peek(required => 34);
+        return if length($data) != 34;
+
+        $pv->{flac_streaminfo_min_block_size} = {raw => vec($data, 0, 16)};
+        $pv->{flac_streaminfo_max_block_size} = {raw => vec($data, 1, 16)};
+        substr($data, 0, 2*2, '');
+
+        $pv->{flac_streaminfo_min_frame_size} = {raw => _load_flac_metadata_blocks__read24(\$data)};
+        $pv->{flac_streaminfo_max_frame_size} = {raw => _load_flac_metadata_blocks__read24(\$data)};
+
+        {
+            my ($x, $y) = unpack('NN', $data);
+            substr($data, 0, 8, '');
+
+            $pv->{flac_streaminfo_sample_rate}  = {raw =>   $x >> 12};
+            $pv->{flac_streaminfo_channels}     = {raw => (($x >>  9) & 0x07) + 1};
+            $pv->{flac_streaminfo_bits}         = {raw => (($x >>  4) & 0x1F) + 1};
+
+            $pv->{flac_streaminfo_total_samples}= {raw => (($x & 0xF) << 32) | $y};
+        }
+
+        $pv->{flac_streaminfo_md5_checksum} = {raw => unpack('H32', $data)};
+
+        # Data   Description
+        # u(16)  The minimum block size (in samples) used in the stream, excluding the last block.
+        # u(16)  The maximum block size (in samples) used in the stream.
+        # u(24)  The minimum frame size (in bytes) used in the stream. A value of 0 signifies that the value is not known.
+        # u(24)  The maximum frame size (in bytes) used in the stream. A value of 0 signifies that the value is not known.
+        # u(20)  Sample rate in Hz.
+        # u(3)   (number of channels)-1. FLAC supports from 1 to 8 channels.
+        # u(5)   (bits per sample)-1. FLAC supports from 4 to 32 bits per sample.
+        # u(36)  Total number of interchannel samples in the stream. A value of 0 here means the number of total samples is unknown.
+        # u(128) MD5 checksum of the unencoded audio data. This allows the decoder to determine if an error exists in the audio data even when, despite the error, the bitstream itself is valid. A value
+        #        of 0 signifies that the value is not known.
+    } elsif ($chunk_inner_type eq 'bdf21d34-8843-5f1e-8a5f-776c151991cd') {
+        my $data = $self->peek(required => 8, wanted => 1024);
+        my $len;
+
+        $pv->{flac_vorbiscomment_vendor} = {raw => _load_flac_metadata_blocks__read_string(\$data)};
+
+        $len = unpack('V', $data);
+        substr($data, 0, 4, '');
+
+        for (my $i = 0; $i < $len; $i++) {
+            my ($k, $v) = _load_flac_metadata_blocks__read_string(\$data) =~ /^([\x20-\x3E\x3F-\x7D]+)=(.*)\z/s;
+            my $pv_key = $self->_dynamic_property(flac_vorbiscomment_comment => uc($k));
+            my $e = $pv->{$pv_key} //= [];
+            push(@{$e}, {raw => $v});
+        }
+    }
+}
+
 1;
 
 __END__
@@ -827,7 +1136,7 @@ File::Information::Deep - generic module for extracting information from filesys
 
 =head1 VERSION
 
-version v0.16
+version v0.17
 
 =head1 SYNOPSIS
 
@@ -862,7 +1171,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024-2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2024-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

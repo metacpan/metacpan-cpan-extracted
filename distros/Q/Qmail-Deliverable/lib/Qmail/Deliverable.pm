@@ -4,12 +4,19 @@ use strict;
 use 5.006;
 use Carp qw(carp);
 use base 'Exporter';
+use Qmail::Deliverable::Status qw(:status);
 
-our $VERSION = '1.09';
-our @EXPORT_OK = qw/reread_config qmail_local dot_qmail deliverable qmail_user/;
-our %EXPORT_TAGS = (all => \@EXPORT_OK);
+our $VERSION   = '1.12';
+our @EXPORT_OK = (
+    qw(reread_config qmail_local dot_qmail deliverable qmail_user),
+    @Qmail::Deliverable::Status::STATUS,
+);
+our %EXPORT_TAGS = (
+    all    => \@EXPORT_OK,
+    status => \@Qmail::Deliverable::Status::STATUS,
+);
 our $VPOPMAIL_EXT = 0;
-our $qmail_dir = '/var/qmail';
+our $qmail_dir    = '/var/qmail';
 
 # rfc2822's "atext"
 my $atext = "[A-Za-z0-9!#\$%&\'*+\/=?^_\`{|}~-]";
@@ -19,24 +26,24 @@ my $valid = qr/^(?!.*\@.*\@)($atext+(?:[\@.]$atext+)*)\.?\z/;
 my $ascii = qr/^([\x20-\x7e]*)\z/;
 
 # parse shell line
-my $shell_sq = qr/'[^']+'/;  # no escaping in single quotes!
-my $shell_dq = qr/(?:(?:\")(?:[^\\\"]*(?:\\.[^\\\"]*)*)(?:\"))/;  # from Regexp::Common
-my $shell_bare = qr/[^"'\\\s]+/;  # no sq, dq, backslash, or space
+my $shell_sq    = qr/'[^']+'/;                                      # no escaping in single quotes!
+my $shell_dq    = qr/(?:(?:\")(?:[^\\\"]*(?:\\.[^\\\"]*)*)(?:\"))/; # from Regexp::Common
+my $shell_bare  = qr/[^"'\\\s]+/;                                   # no sq, dq, backslash, or space
 my $shell_token = qr/(\\.|$shell_sq|$shell_dq|$shell_bare)+/;
 
 sub _readpipe {
-    my ($command, @args) = @_;
+    my ( $command, @args ) = @_;
     local %ENV = ();
     open my $fh, '-|', $command, @args or die "open: @_: $!";
     my @data = readline $fh;
-    close $fh;  # Without explicit close, $? is unreliable later
-    return wantarray ? @data : join("", @data);
+    close $fh;    # Without explicit close, $? is unreliable later
+    return wantarray ? @data : join( "", @data );
 }
 
 sub _slurp {
     my ($fn) = @_;
     open my $fh, '<', $fn or return;
-    return wantarray ? readline $fh : join("", readline $fh);
+    return wantarray ? readline $fh : join( "", readline $fh );
 }
 
 sub _first (&@) {
@@ -47,15 +54,16 @@ sub _first (&@) {
 
 sub _findinpath {
     my ($command) = @_;
+
     # Attempt to retain some level of security against PATH attacks
-    my @path = grep defined, map /($ascii)/,  # untaint
+    my @path = grep defined, map /($ascii)/,    # untaint
         grep m{^/[^<>|]+$}, split /:/, $ENV{PATH};
     return _first { -x $_ } map "$_/$command", @path;
 }
 
 # Resolve only once to further reduce risk of PATH attacks
 my $valias_exec = _findinpath 'valias';
-my $vuser_exec = _findinpath 'vuserinfo';
+my $vuser_exec  = _findinpath 'vuserinfo';
 
 my %locals;
 my %virtualdomains;
@@ -67,32 +75,37 @@ sub reread_config {
     %virtualdomains = ();
     %users_exact    = ();
     %users_wild     = ();
-    my $locals_fn = -e "$qmail_dir/control/locals"
+    my $locals_fn =
+        -e "$qmail_dir/control/locals"
         ? "$qmail_dir/control/locals"
         : "$qmail_dir/control/me";
-    for (_slurp $locals_fn) {
+    for ( _slurp $locals_fn ) {
         chomp;
         ($_) = lc =~ /$ascii/ or do { warn "Invalid character"; next; };
         $locals{$_} = 1;
     }
-    for (_slurp "$qmail_dir/control/virtualdomains") {
+    for ( _slurp "$qmail_dir/control/virtualdomains" ) {
         chomp;
         ($_) = lc =~ /$ascii/ or do { warn "Invalid character"; next; };
-        my ($domain, $prepend) = split /:/, $_, 2;
+        my ( $domain, $prepend ) = split /:/, $_, 2;
         $virtualdomains{$domain} = $prepend;
     }
-    for (_slurp "$qmail_dir/users/assign") {
+    for ( _slurp "$qmail_dir/users/assign" ) {
         chomp;
         ($_) = /$ascii/ or do { warn "Invalid character"; next; };
-        if (/^#/) {  # comment
+        if (/^#/) {    # comment
             next;
-        } elsif (s/^=([^:]+)://) {
-            $users_exact{lc $1} = $_;
-        } elsif (s/^\+([^:]+)://) {
-            $users_wild{lc $1} = $_;
-        } elsif (/^\.$/) {
+        }
+        elsif (s/^=([^:]+)://) {
+            $users_exact{ lc $1 } = $_;
+        }
+        elsif (s/^\+([^:]+)://) {
+            $users_wild{ lc $1 } = $_;
+        }
+        elsif (/^\.$/) {
             last;
-        } else {
+        }
+        else {
             warn "Invalid line in users/assign: '$_'\n";
         }
     }
@@ -115,8 +128,8 @@ sub _prepend {
     return $virtualdomains{$domain} if exists $virtualdomains{$domain};
 
     my @parts = split /\./, $domain;
-    for (reverse 1 .. @parts) {
-        my $wildcard = join "", map ".$_", @parts[-$_ .. -1];
+    for ( reverse 1 .. @parts ) {
+        my $wildcard = join "", map ".$_", @parts[ -$_ .. -1 ];
         return $virtualdomains{$wildcard} if exists $virtualdomains{$wildcard};
     }
 
@@ -129,50 +142,50 @@ sub _potential_exts {
     my @exts;
 
     # Exact match has highest precedence
-    push @exts, $ext;  # user, or user-ext
+    push @exts, $ext;    # user, or user-ext
 
     # Then user-default
     my @parts = split /(-)/, $ext;
-    for (reverse 1 .. $#parts) {
+    for ( reverse 1 .. $#parts ) {
         next unless $parts[$_] eq '-';
-        push @exts, join("", @parts[0..$_]) . "default";
+        push @exts, join( "", @parts[ 0 .. $_ ] ) . "default";
     }
 
     return @exts;
 }
 
-
 sub qmail_user {
-    my ($in) = @_;
+    my ($in)    = @_;
     my ($local) = lc($in) =~ /$valid/
         or do { carp "Invalid address: $in"; return; };
 
-    if (exists $users_exact{$local}) {
-        return split /:/, $users_exact{$local}, 7;  # colon terminated
-    } else {
-        for (reverse 1 .. length $local) {
+    if ( exists $users_exact{$local} ) {
+        return split /:/, $users_exact{$local}, 7;    # colon terminated
+    }
+    else {
+        for ( reverse 1 .. length $local ) {
             my $try = substr $local, 0, $_;
-            if (exists $users_wild{$try}) {
+            if ( exists $users_wild{$try} ) {
                 my @assign = split /:/, $users_wild{$try}, 7;
-                $assign[5] .= substr($local, $_);
+                $assign[5] .= substr( $local, $_ );
                 return @assign;
             }
         }
     }
 
-    if ($qmail_dir eq "t/fixtures") {
+    if ( $qmail_dir eq "t/fixtures" ) {
         return $local;
     }
     return _qmail_getpw $local;
 }
 
 sub qmail_local {
-    my ($in) = @_;
-    my ($address) = lc($in) =~ /$valid/ or
-        do { carp "Invalid address: $in"; return; };
+    my ($in)      = @_;
+    my ($address) = lc($in) =~ /$valid/
+        or do { carp "Invalid address: $in"; return; };
 
     return $address if $address !~ /\@/;
-    my ($local, $domain) = split /\@/, $address;
+    my ( $local, $domain ) = split /\@/, $address;
 
     return $local if exists $locals{$domain};
 
@@ -183,25 +196,25 @@ sub qmail_local {
 }
 
 sub dot_qmail {
-    my ($user, $uid, $gid, $homedir, $dash, $ext) = @_;
-    if (@_ == 1) {
-        my ($in) = @_;
+    my ( $user, $uid, $gid, $homedir, $dash, $ext ) = @_;
+    if ( @_ == 1 ) {
+        my ($in)      = @_;
         my ($address) = lc($in) =~ /$valid/
             or do { carp "Invalid address: $in"; return; };
 
         my $local = qmail_local $address;
         return undef if not defined $local;
 
-        ($user, $uid, $gid, $homedir, $dash, $ext) = qmail_user $local;
+        ( $user, $uid, $gid, $homedir, $dash, $ext ) = qmail_user $local;
     }
 
     $ext =~ s/\./:/g;
 
     my $dashext = $dash . $ext;
 
-    if (not length $dashext) {
+    if ( not length $dashext ) {
         return "$homedir/.qmail" if -e "$homedir/.qmail";
-        return "";  # defaultdelivery
+        return "";    # defaultdelivery
     }
 
     for ( _potential_exts($ext), 'default' ) {
@@ -213,21 +226,21 @@ sub dot_qmail {
 
 sub valias {
     my ($address) = @_;
-    if (not $valias_exec) {
+    if ( not $valias_exec ) {
         warn "Cannot check valias; valias executable not found";
         return 0;
     }
-    my ($local, $domain) = split /\@/, $address;
+    my ( $local, $domain ) = split /\@/, $address;
     for ( _potential_exts($local) ) {
-        eval { _readpipe( $valias_exec, "$_\@$domain") };
+        eval { _readpipe( $valias_exec, "$_\@$domain" ) };
         return 1 if $? == 0;
-    };
+    }
     return 0;
 }
 
 sub vuser {
     my ($address) = @_;
-    if (not $vuser_exec) {
+    if ( not $vuser_exec ) {
         warn "Cannot check vuser; vuser executable not found";
         return 0;
     }
@@ -237,68 +250,69 @@ sub vuser {
 }
 
 sub deliverable {
-    my ($in) = @_;
+    my ($in)      = @_;
     my ($address) = lc($in) =~ /$valid/
         or do { carp "Invalid address: $in"; return; };
 
     my $local = qmail_local $address;
-    return 0xff if not defined $local;
+    return QD_NOT_LOCAL if not defined $local;
 
-    my ($user, $uid, $gid, $homedir, $dash, $ext) = qmail_user $local;
+    my ( $user, $uid, $gid, $homedir, $dash, $ext ) = qmail_user $local;
 
-    return 0x11 if not -r $homedir or not -x _;
-    return 0x21 if (stat _)[2] & 0020;  # group writable
-    return 0x21 if (stat _)[2] & 0002;  # world writable
-    return 0x22 if -T _;
+    return QD_UNKNOWN_PERM_DENIED     if not -r $homedir or not -x _;
+    return QD_TEMPFAIL_GROUP_WRITABLE if ( stat _ )[2] & 0020;
+    return QD_TEMPFAIL_GROUP_WRITABLE if ( stat _ )[2] & 0002;
+    return QD_TEMPFAIL_STICKY         if -k _;
 
     my $dot_qmail = dot_qmail $user, $uid, $gid, $homedir, $dash, $ext;
 
-    return 0x00 if not defined $dot_qmail;
-    return 0xf1 if not length $dot_qmail;  # no .qmail => defaultdelivery
+    return QD_NOT_DELIVERABLE if not defined $dot_qmail;
+    return QD_DELIVERABLE     if not length $dot_qmail;    # defaultdelivery
 
-    return 0x00 if not -e $dot_qmail;
-    return 0x11 if not -r $dot_qmail;
-    return 0xf1 if not -s _;  # empty => defaultdelivery
+    return QD_NOT_DELIVERABLE     if not -e $dot_qmail;
+    return QD_UNKNOWN_PERM_DENIED if not -r $dot_qmail;
+    return QD_DELIVERABLE         if not -s _;             # empty => defaultdelivery
 
     my @dot_qmail = _slurp $dot_qmail;
 
-    if ($dot_qmail[0] =~ /^\|\s*\S*vdelivermail/) {
-        if ($address !~ /\@/) {
+    if ( $dot_qmail[0] =~ /^\|\s*\S*vdelivermail/ ) {
+        if ( $address !~ /\@/ ) {
             carp "vpopmail support not available if no domain given";
-            return 0xfe;
+            return QD_VPOPMAIL_NO_DOMAIN;
         }
-        my $origlocal = (split /\@/, $address)[0];
+        my $origlocal = ( split /\@/, $address )[0];
 
         # Update domain with user field in assign file, just like vpopmail
         # does. This way we support alias domains. See vpopmail.c,
         # vget_assign().
         $address = $origlocal . '@' . $user;
 
-        if ($dot_qmail[0] =~ /bounce-no-mailbox/) {
-            return 0xf2 if -d "$homedir/$origlocal";
-            return 0xf3 if valias $address;
-            return 0xf5 if vuser $address;
-            if ( $VPOPMAIL_EXT ) {
-                my ($local, $domain) = split /@/, $address;
-                my @chunks = split /\-/, $local; # vpopmails qmail-ext option
+        if ( $dot_qmail[0] =~ /bounce-no-mailbox/ ) {
+            return QD_VPOPMAIL_DIR    if -d "$homedir/$origlocal";
+            return QD_VPOPMAIL_VALIAS if valias $address;
+            return QD_VPOPMAIL_VUSER  if vuser $address;
+            if ($VPOPMAIL_EXT) {
+                my ( $local, $domain ) = split /@/, $address;
+                my @chunks = split /\-/, $local;    # vpopmail qmail-ext option
                 for ( 0 .. $#chunks ) {
-                    return 0xf6 if vuser $chunks[$_] .'@'.$domain;
-                };
-            };
-            return 0x00;
+                    return QD_VPOPMAIL_QMAIL_EXT
+                        if vuser $chunks[$_] . '@' . $domain;
+                }
+            }
+            return QD_NOT_DELIVERABLE;
         }
-        return 0xf4;
+        return QD_VPOPMAIL_CATCHALL;
     }
-    if ($dot_qmail[0] =~ /^\|bouncesaying\s+(.*)/) {
+    if ( $dot_qmail[0] =~ /^\|bouncesaying\s+(.*)/ ) {
         my @args = $1 =~ /$shell_token/g;
-        return 0x13 if @args > 1;
-        return 0x00;
+        return QD_UNKNOWN_BOUNCESAYING if @args > 1;
+        return QD_NOT_DELIVERABLE;
     }
 
-    return 0x14 if grep /ezmlm/, @dot_qmail;
-    return 0x12 if grep /^\|/, @dot_qmail;
+    return QD_EZMLM        if grep /ezmlm/, @dot_qmail;
+    return QD_UNKNOWN_PIPE if grep /^\|/,   @dot_qmail;
 
-    return 0xf1;
+    return QD_DELIVERABLE;
 }
 
 reread_config;
@@ -350,7 +364,8 @@ user, and the client is used by the unprivileged smtpd.
 =head2 Functions
 
 All documented functions are exportable, and a tag :all is available for
-convenience.
+convenience. Status-code constants (see L</Status codes>) are exported via
+the C<:status> tag, and are also included in C<:all>.
 
 Note that addresses and local user names must be in user@domain form, just like
 qmail internally uses. Comments, angle brackets, etcetera, must be stripped
@@ -401,27 +416,28 @@ if deliverability could not be determined.
 The system default delivery method, and mailbox, maildir, and forward
 instructions in dot-qmail files, are assumed to always succeed.
 
-Possible return values are:
+Possible return values (with the constant name from
+L<Qmail::Deliverable::Status>):
 
-    0x00   Not deliverable
+    0x00   QD_NOT_DELIVERABLE          Not deliverable
 
-    0x11   Deliverability unknown: permission denied for any file
-    0x12   Deliverability unknown: qmail-command called in dot-qmail file
-    0x13   Deliverability unknown: bouncesaying with program
-    0x14   Deliverable, probable:  ezmlm mailing list
+    0x11   QD_UNKNOWN_PERM_DENIED      Deliverability unknown: permission denied
+    0x12   QD_UNKNOWN_PIPE             Deliverability unknown: qmail-command
+    0x13   QD_UNKNOWN_BOUNCESAYING     Deliverability unknown: bouncesaying with program
+    0x14   QD_EZMLM                    Deliverable, probable: ezmlm mailing list
 
-    0x21   Temporarily undeliverable: group/world writable
-    0x22   Temporarily undeliverable: homedir is sticky
+    0x21   QD_TEMPFAIL_GROUP_WRITABLE  Temporarily undeliverable: group/world writable
+    0x22   QD_TEMPFAIL_STICKY          Temporarily undeliverable: homedir is sticky
 
-    0xf1   Deliverable, almost certainly
-    0xf2   Deliverable, vdelivermail: directory exists
-    0xf3   Deliverable, vdelivermail: valias exists
-    0xf4   Deliverable, vdelivermail: catch-all defined
-    0xf5   Deliverable, vdelivermail: vuser exists
-    0xf6   Deliverable, vdelivermail: qmail-ext
+    0xf1   QD_DELIVERABLE              Deliverable, almost certainly
+    0xf2   QD_VPOPMAIL_DIR             vdelivermail: directory exists
+    0xf3   QD_VPOPMAIL_VALIAS          vdelivermail: valias exists
+    0xf4   QD_VPOPMAIL_CATCHALL        vdelivermail: catch-all defined
+    0xf5   QD_VPOPMAIL_VUSER           vdelivermail: vuser exists
+    0xf6   QD_VPOPMAIL_QMAIL_EXT       vdelivermail: qmail-ext
 
-    0xfe   vpopmail (vdelivermail) detected but no domain was given
-    0xff   Domain is not local
+    0xfe   QD_VPOPMAIL_NO_DOMAIN       vpopmail detected but no domain was given
+    0xff   QD_NOT_LOCAL                Domain is not local
 
 (These values are, currently, not bitmasks. Do not treat them as such.)
 
@@ -446,6 +462,22 @@ Re-reads the config files /var/qmail/control/locals,
 /var/qmail/control/virtualdomains, and /var/qmail/users/assign.
 
 =back
+
+=head2 Status codes
+
+The numeric values returned by C<deliverable> have symbolic constants
+defined in L<Qmail::Deliverable::Status> and re-exported by this module
+under the C<:status> tag:
+
+    use Qmail::Deliverable qw(deliverable :status);
+
+    my $rv = deliverable $address;
+    return DECLINED if $rv == QD_DELIVERABLE;
+    return DENY     if $rv == QD_NOT_DELIVERABLE;
+
+See L<Qmail::Deliverable::Status> for the full list. Numeric values are
+unchanged from earlier releases, so the constants are a drop-in
+readability improvement.
 
 =head1 CAVEATS
 
@@ -538,5 +570,24 @@ LICENSE file to reflect the license(s) they chose to redistribute under.
 
 =head1 AUTHORS
 
-Matt Simerson <msimerson@cpan.org>
-Juerd Waalboer <#####@juerd.nl>
+=over 4
+
+=item *
+
+Juerd Waalboer <#####@juerd.nl> (original author)
+
+=item *
+
+Matt Simerson <msimerson@cpan.org> (current maintainer)
+
+=back
+
+=head1 CONTRIBUTORS
+
+=over 4
+
+=item *
+
+Martin Sluka (1.09)
+
+=back

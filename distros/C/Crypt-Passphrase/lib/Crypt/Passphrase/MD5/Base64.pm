@@ -1,5 +1,5 @@
 package Crypt::Passphrase::MD5::Base64;
-$Crypt::Passphrase::MD5::Base64::VERSION = '0.022';
+$Crypt::Passphrase::MD5::Base64::VERSION = '0.023';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ sub accepts_hash {
 sub verify_password {
 	my ($self, $password, $hash) = @_;
 	my $new_hash = md5($password);
-	return $new_hash eq decode_base64($hash);
+	return $self->secure_compare($new_hash, decode_base64($hash));
 }
 
 1;
@@ -40,7 +40,7 @@ Crypt::Passphrase::MD5::Base64 - Validate against base64ed MD5 hashes with Crypt
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 

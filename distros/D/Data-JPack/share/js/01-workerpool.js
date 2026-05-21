@@ -6,7 +6,7 @@ catch(e){
 //Find all chunks
 //
 //
-function bootstrap(parameters){
+function wp_bootstrap(parameters){
 	//Also will have options passsed here
 //	setInterval(()=>{console.log("From template worker", JSON.parse(parameters))},1000);
 	let scope=self;
@@ -81,7 +81,7 @@ class WorkerTemplate{
 		this.id=parameters.id;
 		let p=JSON.stringify(parameters);
 
-		let code="("+bootstrap.toString();
+		let code="("+wp_bootstrap.toString();
 		code+=")(\'"+p+"\')";
 		//console.log(code);
 		//this.promise=undefined;
@@ -355,20 +355,22 @@ class LoadingDisplay {
     window.addEventListener("JPACK_STATUS",(e)=>{
       //console.log(e.detail);
       scope._setProgress(e.detail.progress); 
-      scope._setLabel(e.detail.message);
-      if(e.detail.mode){
-        //This is close
-        this.dc.style.display="none";
+      if(e.detail.message != undefined){
+        scope._setLabel(e.detail.message);
       }
-      else {
-        this.dc.style.display="block";
-      }
+        if(e.detail.mode){
+          //This is close
+          this.dc.style.display="none";
+        }
+        else {
+          this.dc.style.display="block";
+        }
 
     });
 	}
   
   _setLabel(label){
-    this.label.innerHTML="<br>"+label;
+    this.label.innerHTML=label;
   }
 
   _setProgress(progress){

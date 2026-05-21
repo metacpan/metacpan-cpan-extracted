@@ -6,6 +6,9 @@ use lib 't/lib';
 
 use Catalyst::Test 'StatsApp';
 
+use version;
+use Plack::Middleware::Statsd;
+
 my $log    = StatsApp->log;
 
 my $res = request('/');
@@ -18,7 +21,7 @@ my $res = request('/');
         re('^catalyst\.response\.time:\d+\|ms$'),
         re('^catalyst\.stats\.root\.base\.time:\d+\|ms$'),
         re('^catalyst\.stats\.rootx\.foo-bar_baz\.time:\d+\|ms$'),
-        re('^catalyst.sessionid:\d+\|s$'),
+        re('^catalyst.sessionid:[\w\-_]+\|s$'),
       ),
       'expected metrics'
       or diag( explain \@MockStatsd::Data );

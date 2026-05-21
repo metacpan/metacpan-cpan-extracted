@@ -260,7 +260,7 @@ SV   *chandra_error_format_text(pTHX_ HV *err);
 SV   *chandra_error_format_js(pTHX_ HV *err);
 
 /* ================================================================
- * Implementation-only section — compiled only in Chandra.xs
+ * Implementation-only section - compiled only in Chandra.xs
  * (CHANDRA_XS_IMPLEMENTATION is defined there before including us)
  * ================================================================ */
 #ifdef CHANDRA_XS_IMPLEMENTATION

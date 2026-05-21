@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.18';
+our $VERSION = '0.22';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
@@ -1016,8 +1016,8 @@ Attribute spec options:
     default_av - If true, default to empty []
     default_hv - If true, default to empty {}
 
-Processing order: coercion → required check → type validation → 
-defaults → weak refs → BUILD.
+Processing order: coercion -> required check -> type validation ->
+defaults -> weak refs -> BUILD.
 
 =item constructor($func_name, \@attrs)
 

@@ -6,7 +6,7 @@ use v5.34.0; # The Perl version on Slackware 15.0 (sbozyp's min supported versio
 
 package Sbozyp;
 
-our $VERSION = 'v1.7.1';
+our $VERSION = 'v1.7.2';
 
 use Cwd qw();
 use Digest::MD5 qw();
@@ -44,7 +44,7 @@ sub main {
     # determine the command main function
     my $cmd = shift(@argv) or die command_usage('main');
     my $cmd_main;
-    if    ($cmd =~ /^(?:--help|-h)$/)    { print command_help_msg('main'); return  }
+    if    ($cmd =~ /^(?:--help|-h)$/)    { print command_help_msg('main');  return }
     elsif ($cmd =~ /^(?:--version|-V)$/) { print $VERSION =~ s/^v//r, "\n"; return }
     elsif ($cmd =~ /^(?:build|bu)$/)     { $cmd_main = \&main_build                }
     elsif ($cmd =~ /^(?:install|in)$/)   { $cmd_main = \&main_install              }
@@ -52,7 +52,7 @@ sub main {
     elsif ($cmd =~ /^(?:query|qr)$/)     { $cmd_main = \&main_query                }
     elsif ($cmd =~ /^(?:remove|rm)$/)    { $cmd_main = \&main_remove               }
     elsif ($cmd =~ /^(?:search|se)$/)    { $cmd_main = \&main_search               }
-    else                                 { sbozyp_die("invalid command: $cmd")    }
+    else                                 { sbozyp_die("invalid command: $cmd")     }
     # set the configuration
     parse_config_file($opt_configfile); # mutates the global %CONFIG
     set_repo_name_or_die($opt_reponame // $CONFIG{REPO_PRIMARY});
@@ -772,7 +772,9 @@ sub clone_repo {
     }
     my $repo_git_branch = repo_git_branch();
     my $repo_git_url = repo_git_url();
-    sbozyp_system('git', 'clone', '--single-branch', '--branch', $repo_git_branch, '--no-tags', $repo_git_url, $repo_dir);
+    with_stdout_to_stderr(sub {
+        sbozyp_system('git', 'clone', '--progress', '--single-branch', '--branch', $repo_git_branch, '--no-tags', $repo_git_url, $repo_dir);
+    });
 }
 
 sub sync_repo {
@@ -780,8 +782,8 @@ sub sync_repo {
     if (repo_is_cloned()) {
         my $repo_git_branch = repo_git_branch();
         with_stdout_to_stderr(sub {
-            sbozyp_system('git', '-C', $repo_dir, 'fetch', '--verbose');
-            sbozyp_system('git', '-C', $repo_dir, 'reset', '--hard', "origin/$repo_git_branch");
+            sbozyp_system('git', '-C', $repo_dir, 'fetch', '--progress', '--verbose');
+            sbozyp_system('git', '-C', $repo_dir, 'reset', '--hard', '--quiet', "origin/$repo_git_branch");
         });
     } else {
         sbozyp_die("cannot sync non-existent git repository at '$repo_dir'");

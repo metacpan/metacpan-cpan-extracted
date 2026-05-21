@@ -3,11 +3,11 @@ package Developer::Dashboard::CLI::Query;
 use strict;
 use warnings;
 
-our $VERSION = '3.14';
+our $VERSION = '3.90';
 
 use Exporter 'import';
 
-use TOML::Tiny ();
+use TOML::Parser ();
 use XML::Parser ();
 use YAML::XS ();
 
@@ -83,13 +83,28 @@ sub _parse_query_input {
 
     return json_decode($text)           if $command eq 'pjq' || $command eq 'jq';
     return YAML::XS::Load($text)        if $command eq 'pyq' || $command eq 'yq';
-    return TOML::Tiny::from_toml($text) if $command eq 'ptomq' || $command eq 'tomq';
+    return _parse_toml($text)          if $command eq 'ptomq' || $command eq 'tomq';
     return _parse_java_properties($text) if $command eq 'pjp' || $command eq 'propq';
     return _parse_ini($text)             if $command eq 'iniq';
     return _parse_csv($text)             if $command eq 'csvq';
     return _parse_xml($text)             if $command eq 'xmlq';
 
     die "Unsupported data query command '$command'\n";
+}
+
+# _parse_toml($text)
+# Parses TOML input into plain Perl scalars, arrays, and hashes.
+# Input: raw TOML text string.
+# Output: parsed hash reference or array-backed structure from TOML::Parser.
+sub _parse_toml {
+    my ($text) = @_;
+    my $parser = TOML::Parser->new(
+        inflate_boolean => sub {
+            my ($boolean) = @_;
+            return $boolean eq 'true' ? 1 : 0;
+        },
+    );
+    return $parser->parse($text);
 }
 
 # _extract_query_path($data, $path)

@@ -1,0 +1,12 @@
+^Makefile$
+^MYMETA\.
+^MANIFEST\.bak$
+^\.git/
+^\.gitignore$
+^Radamsa-.*\.tar\.gz$
+^Radamsa-[\d._]+/
+^Radamsa\.(?:bs|c|o)$
+^blib/
+^pm_to_blib$
+^libradamsa\.o$
+^radamsa/c/libradamsa\.o$

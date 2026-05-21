@@ -29,7 +29,10 @@ new(char * cname, char * pname = NULL)
 void
 DESTROY(Crypt::Digest self)
     CODE:
+    {
+        zeromem(self, sizeof(*self));
         Safefree(self);
+    }
 
 void
 reset(Crypt::Digest self)
@@ -38,15 +41,19 @@ reset(Crypt::Digest self)
         int rv;
         rv = self->desc->init(&self->state);
         if (rv != CRYPT_OK) croak("FATAL: digest init failed: %s", error_to_string(rv));
+        self->finalized = 0;
         XPUSHs(ST(0)); /* return self */
     }
 
 Crypt::Digest
 clone(Crypt::Digest self)
     CODE:
+        if (self->desc != NULL && cryptx_internal_noclone_hash(self->desc->name)) {
+          croak("FATAL: clone is not supported for given hash state");
+        }
         Newz(0, RETVAL, 1, struct digest_struct);
         if (!RETVAL) croak("FATAL: Newz failed");
-        Copy(&self->state, &RETVAL->state, 1, struct digest_struct);
+        Copy(self, RETVAL, 1, struct digest_struct);
     OUTPUT:
         RETVAL
 
@@ -58,6 +65,7 @@ add(Crypt::Digest self, ...)
         int rv, i;
         unsigned char *in;
 
+        if (self->finalized) croak("FATAL: digest object already finalized");
         for(i = 1; i < items; i++) {
           in = (unsigned char *)SvPVbyte(ST(i), inlen);
           if (inlen > 0) {
@@ -81,8 +89,10 @@ digest(Crypt::Digest self)
         unsigned char hash[MAXBLOCKSIZE];
         char out[MAXBLOCKSIZE*2+1];
 
+        if (self->finalized) croak("FATAL: digest object already finalized");
         rv = self->desc->done(&self->state, hash);
         if (rv != CRYPT_OK) croak("FATAL: digest done failed: %s", error_to_string(rv));
+        self->finalized = 1;
 
         outlen = sizeof(out);
         if (ix == 3) {
@@ -173,8 +183,9 @@ hashsize(SV * param, char * extra = NULL)
         }
         else {
           char *digest_name;
+          STRLEN plen;
           int rv, id;
-          digest_name = SvPOK(param) && strcmp(SvPVX(param), "Crypt::Digest") ? SvPVX(param) : extra;
+          digest_name = SvPOK_spec(param) && strcmp(SvPVbyte(param, plen), "Crypt::Digest") ? SvPVbyte(param, plen) : extra;
           id = cryptx_internal_find_hash(digest_name);
           if (id == -1) croak("FATAL: find_hash failed for '%s'", digest_name);
           rv = hash_descriptor[id].hashsize;

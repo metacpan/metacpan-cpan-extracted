@@ -1,3 +1,34 @@
+# Claude Code — commit: skills/, agents/, hooks/, settings.json
+# Ignore: local overrides, credentials, session data
+
+# Tracked: shared config & extensibility
+!/.claude/
+.claude/*
+!.claude/settings.json
+!.claude/settings.local.json
+!.claude/agents/
+!.claude/agents/**
+!.claude/skills/
+!.claude/skills/**
+!.claude/hooks/
+!.claude/hooks/**
+
+# Local overrides (machine-specific)
+.claude/*.local.*
+.claude/local/
+
+# Credentials & session state (never track)
+.claude/.credentials.json
+.claude/statsig/
+.claude/todos/
+.claude/projects/
+
+# AGENTS.md ignored - our-codex
+AGENTS.md
+
+# karr materialized task view — never commit
+tasks/
+
 App-karr-*
 *.bak
 *.old
@@ -7,23 +38,3 @@ App-karr-*
 /cover_db/
 /blib/
 /pm_to_blib
-
-# Claude Code - commit: skills/, agents/, hooks/, settings.json
-# Ignore: local overrides, credentials, session data
-!/.claude/
-.claude/*
-!.claude/settings.json
-!.claude/agents/
-!.claude/agents/**
-!.claude/skills/
-!.claude/skills/**
-!.claude/hooks/
-!.claude/hooks/**
-.claude/*.local.*
-.claude/local/
-.claude/.credentials.json
-.claude/statsig/
-.claude/todos/
-.claude/projects/
-
-AGENTS.md

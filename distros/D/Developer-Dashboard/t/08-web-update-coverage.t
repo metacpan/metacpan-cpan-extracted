@@ -11,11 +11,11 @@ use File::Temp qw(tempdir);
 use HTTP::Request::Common qw(GET POST);
 use HTTP::Response;
 use POSIX qw(:sys_wait_h);
-use Plack::Test;
 use Test::More;
 use URI::Escape qw(uri_escape);
 
 use lib 'lib';
+use lib 't/lib';
 
 use Developer::Dashboard::Auth;
 use Developer::Dashboard::Collector;
@@ -27,10 +27,12 @@ use Developer::Dashboard::PageRuntime;
 use Developer::Dashboard::PageStore;
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::SessionStore;
+use Developer::Dashboard::SkillManager;
 use Developer::Dashboard::UpdateManager;
 use Developer::Dashboard::Web::App;
 use Developer::Dashboard::Web::DancerApp;
 use Developer::Dashboard::Web::Server;
+use Local::PSGITest;
 
 sub dies_like {
     my ( $code, $pattern, $label ) = @_;
@@ -68,6 +70,7 @@ local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS};
 local $ENV{DEVELOPER_DASHBOARD_CONFIGS};
 local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
 chdir $home or die "Unable to chdir to $home: $!";
+my $test_repos = tempdir( CLEANUP => 1 );
 my $paths = Developer::Dashboard::PathRegistry->new( home => $home );
 my $files = Developer::Dashboard::FileRegistry->new( paths => $paths );
 my $store = Developer::Dashboard::PageStore->new( paths => $paths );
@@ -81,6 +84,20 @@ my $page = Developer::Dashboard::PageDocument->new(
     layout => { body => 'body text [% stash.name %]' },
 );
 $store->save_page($page);
+my $dotted_page = Developer::Dashboard::PageDocument->new(
+    id     => 'learn.ai',
+    title  => 'Learn AI',
+    layout => { body => 'learn ai body' },
+);
+$store->save_page($dotted_page);
+open my $runtime_routes, '>:raw', File::Spec->catfile( $paths->config_root, 'routes.json' )
+  or die "Unable to write runtime routes.json: $!";
+print {$runtime_routes} <<'JSON';
+{
+   "/java" : "/app/learn.ai"
+}
+JSON
+close $runtime_routes or die "Unable to close runtime routes.json: $!";
 
 my $app = Developer::Dashboard::Web::App->new(
     auth     => $auth,
@@ -88,6 +105,85 @@ my $app = Developer::Dashboard::Web::App->new(
     runtime  => $runtime,
     sessions => $sessions,
 );
+
+my $skill_manager = Developer::Dashboard::SkillManager->new( paths => $paths );
+my $dancer_skill_repo = _create_dancer_route_skill_repo('dancer-route-skill');
+my $dancer_skill_install = $skill_manager->install( 'file://' . $dancer_skill_repo );
+ok( !$dancer_skill_install->{error}, 'dancer route skill installs cleanly for PSGI route coverage' )
+  or diag $dancer_skill_install->{error};
+
+{
+    my $psgi_app = Developer::Dashboard::Web::DancerApp->build_psgi_app( app => $app );
+    Local::PSGITest::test_psgi $psgi_app, sub {
+        my ($cb) = @_;
+        my $ajax = $cb->( GET 'http://127.0.0.1/v1/dancer-route-skill/bar' );
+        is( $ajax->code, 200, 'Dancer custom ajax route serves top-level skill-local ajax handlers' );
+        is( $ajax->content_type, 'application/json', 'Dancer custom ajax route applies its default json content type' );
+        is( decode_body_text( $ajax->content ), qq|{"route":"dancer-top"}\n|, 'Dancer custom ajax route streams the top-level skill-local ajax body' );
+
+        my $legacy_ajax = $cb->( GET 'http://127.0.0.1/ajax/dancer-route-skill/bar' );
+        is( $legacy_ajax->code, 200, 'Dancer smart ajax route still serves the top-level skill-local ajax handler' );
+        is( decode_body_text( $legacy_ajax->content ), qq|{"route":"dancer-top"}\n|, 'Dancer smart ajax route still streams the top-level skill-local ajax body' );
+
+        my $nested = $cb->( GET 'http://127.0.0.1/v1/dancer-route-skill/nested' );
+        is( $nested->code, 200, 'Dancer custom ajax route serves nested skill-local ajax handlers' );
+        is( $nested->content_type, 'text/html', 'Dancer nested custom ajax route applies its default html content type' );
+        is( decode_body_text( $nested->content ), "<p>dancer nested ajax</p>\n", 'Dancer custom ajax route streams the nested skill-local ajax body' );
+
+        my $legacy_nested = $cb->( GET 'http://127.0.0.1/ajax/dancer-route-skill/def/nested' );
+        is( $legacy_nested->code, 200, 'Dancer smart ajax route still serves nested skill-local ajax handlers' );
+        is( decode_body_text( $legacy_nested->content ), "<p>dancer nested ajax</p>\n", 'Dancer smart ajax route still streams the nested skill-local ajax body' );
+
+        my $custom_page = $cb->( GET 'http://127.0.0.1/apps/dancer-route-skill/home' );
+        is( $custom_page->code, 200, 'Dancer custom app route serves the top-level skill bookmark page' );
+        like( decode_body_text( $custom_page->content ), qr/Dancer Skill Index/, 'Dancer custom app route renders the top-level skill bookmark body' );
+
+        my $page = $cb->( GET 'http://127.0.0.1/app/dancer-route-skill' );
+        is( $page->code, 200, 'Dancer app route serves the top-level skill bookmark page' );
+        like( decode_body_text( $page->content ), qr/Dancer Skill Index/, 'Dancer app route renders the top-level skill bookmark body' );
+
+        my $custom_nested_page = $cb->( GET 'http://127.0.0.1/apps/dancer-route-skill/child' );
+        is( $custom_nested_page->code, 200, 'Dancer custom app route serves the nested skill bookmark page' );
+        like( decode_body_text( $custom_nested_page->content ), qr/Dancer Nested Index/, 'Dancer custom app route renders the nested skill bookmark body' );
+
+        my $nested_page = $cb->( GET 'http://127.0.0.1/app/dancer-route-skill/def' );
+        is( $nested_page->code, 200, 'Dancer app route serves the nested skill bookmark page' );
+        like( decode_body_text( $nested_page->content ), qr/Dancer Nested Index/, 'Dancer app route renders the nested skill bookmark body' );
+
+        my $custom_js = $cb->( GET 'http://127.0.0.1/assets/dancer-route-skill.js' );
+        is( $custom_js->code, 200, 'Dancer custom js route serves top-level skill-local assets' );
+        is( decode_body_text( $custom_js->content ), qq{console.log("dancer top-level js");\n}, 'Dancer custom js route returns the top-level skill-local asset body' );
+
+        my $js = $cb->( GET 'http://127.0.0.1/js/dancer-route-skill/skill.js' );
+        is( $js->code, 200, 'Dancer js route serves top-level skill-local assets' );
+        is( decode_body_text( $js->content ), qq{console.log("dancer top-level js");\n}, 'Dancer js route returns the top-level skill-local asset body' );
+
+        my $custom_nested_js = $cb->( GET 'http://127.0.0.1/assets/dancer-route-skill-nested.js' );
+        is( $custom_nested_js->code, 200, 'Dancer custom js route serves nested skill-local assets' );
+        is( decode_body_text( $custom_nested_js->content ), qq{console.log("dancer nested js");\n}, 'Dancer custom js route returns the nested skill-local asset body' );
+
+        my $nested_js = $cb->( GET 'http://127.0.0.1/js/dancer-route-skill/def/ijk/lmn.js' );
+        is( $nested_js->code, 200, 'Dancer js route serves nested skill-local assets' );
+        is( decode_body_text( $nested_js->content ), qq{console.log("dancer nested js");\n}, 'Dancer js route returns the nested skill-local asset body' );
+
+        my $custom_css = $cb->( GET 'http://127.0.0.1/assets/dancer-route-skill.css' );
+        is( $custom_css->code, 200, 'Dancer custom css route serves top-level skill-local assets' );
+        is( decode_body_text( $custom_css->content ), qq{body { color: #654321; }\n}, 'Dancer custom css route returns the top-level skill-local css body' );
+
+        my $css = $cb->( GET 'http://127.0.0.1/css/dancer-route-skill/skill.css' );
+        is( $css->code, 200, 'Dancer css route serves top-level skill-local assets' );
+        is( decode_body_text( $css->content ), qq{body { color: #654321; }\n}, 'Dancer css route returns the top-level skill-local css body' );
+
+        my $custom_other = $cb->( GET 'http://127.0.0.1/downloads/dancer-route-skill.txt' );
+        is( $custom_other->code, 200, 'Dancer custom others route serves top-level skill-local assets' );
+        is( decode_body_text( $custom_other->content ), "dancer top-level other\n", 'Dancer custom others route returns the top-level skill-local other asset body' );
+
+        my $other = $cb->( GET 'http://127.0.0.1/others/dancer-route-skill/info.txt' );
+        is( $other->code, 200, 'Dancer others route serves top-level skill-local assets' );
+        is( decode_body_text( $other->content ), "dancer top-level other\n", 'Dancer others route returns the top-level skill-local other asset body' );
+    };
+}
+
 dies_like( sub { Developer::Dashboard::Web::App->new( pages => $store, sessions => $sessions ) }, qr/Missing auth store/, 'web app requires auth store' );
 dies_like( sub { Developer::Dashboard::Web::App->new }, qr/Missing auth store/, 'web app requires auth before other dependencies' );
 dies_like( sub { Developer::Dashboard::Web::App->new( auth => $auth, sessions => $sessions ) }, qr/Missing page store/, 'web app requires page store' );
@@ -96,6 +192,10 @@ dies_like( sub { Developer::Dashboard::Web::App->new( auth => $auth, pages => $s
 my ( $root_code, $root_type, $root_body ) = @{ $app->handle( path => '/', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' } ) };
 is( $root_code, 200, 'root route responds with success' );
 like( $root_body, qr/<textarea[^>]*name="instruction"/, 'root route renders free-form instruction editor' );
+
+my ( $runtime_alias_code, undef, $runtime_alias_body ) = @{ $app->handle( path => '/java', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' } ) };
+is( $runtime_alias_code, 200, 'runtime config custom app route serves a saved bookmark with a dotted filename id' );
+like( $runtime_alias_body, qr/learn ai body/, 'runtime config custom app route renders the same saved bookmark body as /app/learn\.ai' );
 
 my $index_page = Developer::Dashboard::PageDocument->new(
     id     => 'index',
@@ -734,7 +834,7 @@ is( $server->listening_url($daemon), 'http://127.0.0.1:' . $daemon->sockport . '
 
 {
     my $res;
-    test_psgi $server->psgi_app, sub {
+    Local::PSGITest::test_psgi $server->psgi_app, sub {
         my ($cb) = @_;
         $res = $cb->( GET 'http://127.0.0.1/app/sample/source' );
     };
@@ -763,7 +863,7 @@ my $header_app = bless {}, 'Local::HeaderApp';
 my $header_server = Developer::Dashboard::Web::Server->new( app => $header_app );
 {
     my $res;
-    test_psgi $header_server->psgi_app, sub {
+    Local::PSGITest::test_psgi $header_server->psgi_app, sub {
         my ($cb) = @_;
         $res = $cb->( POST 'http://127.0.0.1/login', [ username => 'helper', password => 'helper-pass-123' ] );
     };
@@ -792,7 +892,7 @@ my $streaming_app = bless {}, 'Local::StreamingApp';
 my $streaming_server = Developer::Dashboard::Web::Server->new( app => $streaming_app );
 {
     my $res;
-    test_psgi $streaming_server->psgi_app, sub {
+    Local::PSGITest::test_psgi $streaming_server->psgi_app, sub {
         my ($cb) = @_;
         $res = $cb->( GET 'http://127.0.0.1/ajax' );
     };
@@ -822,7 +922,7 @@ my $failing_stream_app = bless {}, 'Local::FailingStreamApp';
 my $failing_stream_server = Developer::Dashboard::Web::Server->new( app => $failing_stream_app );
 {
     my $res;
-    test_psgi $failing_stream_server->psgi_app, sub {
+    Local::PSGITest::test_psgi $failing_stream_server->psgi_app, sub {
         my ($cb) = @_;
         $res = $cb->( GET 'http://127.0.0.1/ajax' );
     };
@@ -878,7 +978,7 @@ my $failing_app = bless {}, 'Local::FailingApp';
 my $failing_server = Developer::Dashboard::Web::Server->new( app => $failing_app );
 {
     my $res;
-    test_psgi $failing_server->psgi_app, sub {
+    Local::PSGITest::test_psgi $failing_server->psgi_app, sub {
         my ($cb) = @_;
         $res = $cb->( GET 'http://127.0.0.1/' );
     };
@@ -896,7 +996,7 @@ my $missing_route_app = bless {}, 'Local::MissingRouteApp';
 my $missing_route_server = Developer::Dashboard::Web::Server->new( app => $missing_route_app );
 {
     my $res;
-    test_psgi $missing_route_server->psgi_app, sub {
+    Local::PSGITest::test_psgi $missing_route_server->psgi_app, sub {
         my ($cb) = @_;
         $res = $cb->( POST 'http://127.0.0.1/login', [ username => 'helper', password => 'helper-pass-123' ] );
     };
@@ -906,7 +1006,7 @@ my $missing_route_server = Developer::Dashboard::Web::Server->new( app => $missi
 
 {
     my $res;
-    test_psgi $missing_route_server->psgi_app, sub {
+    Local::PSGITest::test_psgi $missing_route_server->psgi_app, sub {
         my ($cb) = @_;
         $res = $cb->( GET 'http://127.0.0.1/' );
     };
@@ -915,26 +1015,7 @@ my $missing_route_server = Developer::Dashboard::Web::Server->new( app => $missi
 }
 
 {
-    my $res = HTTP::Response->from_psgi(
-        $server->psgi_app->(
-            {
-                REQUEST_METHOD    => 'GET',
-                PATH_INFO         => '/',
-                SCRIPT_NAME       => '',
-                SERVER_NAME       => '127.0.0.1',
-                SERVER_PORT       => 7890,
-                'psgi.version'    => [ 1, 1 ],
-                'psgi.url_scheme' => 'http',
-                'psgi.input'      => do { open my $fh, '<', \q{} or die $!; $fh },
-                'psgi.errors'     => *STDERR,
-                'psgi.multithread' => 0,
-                'psgi.multiprocess' => 0,
-                'psgi.run_once'     => 0,
-                'psgi.streaming'    => 1,
-                'psgi.nonblocking'  => 0,
-            }
-        )
-    );
+    my $res = Local::PSGITest::request( $server->psgi_app, GET 'http://127.0.0.1:7890/' );
     is( $res->code, 200, 'server treats missing URI queries as empty strings' );
 }
 
@@ -988,6 +1069,28 @@ my $missing_route_server = Developer::Dashboard::Web::Server->new( app => $missi
         \@Local::FakeRunner::parse_options,
         [ '--server', 'Starman', '--host', '127.0.0.1', '--port', 5998, '--env', 'deployment', '--workers', '4' ],
         'serve_daemon forwards the configured worker count to Starman',
+    );
+}
+
+{
+    no warnings 'redefine';
+    local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+    local *Plack::Runner::new = sub { return Local::FakeRunner->new };
+    my $windows_server = Developer::Dashboard::Web::Server->new(
+        app     => $app,
+        host    => '127.0.0.1',
+        port    => 5997,
+        workers => 4,
+    );
+    my $fake_daemon = Developer::Dashboard::Web::Server::Daemon->new(
+        host => '127.0.0.1',
+        port => 5997,
+    );
+    ok( $windows_server->serve_daemon($fake_daemon), 'serve_daemon still runs on Windows hosts' );
+    is_deeply(
+        \@Local::FakeRunner::parse_options,
+        [ '--server', 'Standalone', '--host', '127.0.0.1', '--port', 5997, '--env', 'deployment' ],
+        'serve_daemon switches Windows hosts to the non-prefork Standalone Plack server without worker flags',
     );
 }
 
@@ -1138,6 +1241,122 @@ my $loop_updater = Developer::Dashboard::UpdateManager->new(
     runner => Local::RunnerWithLoops->new,
 );
 is_deeply( [ $loop_updater->_running_collectors ], [ 'alpha', 'beta' ], '_running_collectors delegates validation to collector runner state' );
+
+sub _create_dancer_route_skill_repo {
+    my ($name) = @_;
+    my $repo = File::Spec->catdir( $test_repos, $name );
+    make_path(
+        File::Spec->catdir( $repo, 'config' ),
+        File::Spec->catdir( $repo, 'dashboards', 'ajax' ),
+        File::Spec->catdir( $repo, 'dashboards', 'public', 'js' ),
+        File::Spec->catdir( $repo, 'dashboards', 'public', 'css' ),
+        File::Spec->catdir( $repo, 'dashboards', 'public', 'others' ),
+        File::Spec->catdir( $repo, 'skills', 'def', 'dashboards', 'ajax' ),
+        File::Spec->catdir( $repo, 'skills', 'def', 'dashboards', 'public', 'js', 'ijk' ),
+    );
+
+    open my $meta, '>:raw', File::Spec->catfile( $repo, '.skill.json' )
+      or die "Unable to write skill metadata: $!";
+    print {$meta} qq|{"name":"$name","version":"0.01","commands":[]}\n|;
+    close $meta or die "Unable to close skill metadata: $!";
+
+    open my $top_ajax, '>:raw', File::Spec->catfile( $repo, 'dashboards', 'ajax', 'bar' )
+      or die "Unable to write top-level skill ajax file: $!";
+    print {$top_ajax} "print qq({\"route\":\"dancer-top\"}\\n);\n";
+    close $top_ajax or die "Unable to close top-level skill ajax file: $!";
+    chmod 0700, File::Spec->catfile( $repo, 'dashboards', 'ajax', 'bar' )
+      or die "Unable to chmod top-level skill ajax file: $!";
+
+    open my $top_routes, '>:raw', File::Spec->catfile( $repo, 'config', 'routes.json' )
+      or die "Unable to write top-level skill routes file: $!";
+    print {$top_routes} <<'JSON';
+{
+   "/apps/dancer-route-skill/home" : "/app/index",
+   "/v1/dancer-route-skill/bar" : "/ajax/bar",
+   "/assets/dancer-route-skill.css" : "/css/skill.css",
+   "/assets/dancer-route-skill.js" : "/js/skill.js",
+   "/downloads/dancer-route-skill.txt" : "/others/info.txt"
+}
+JSON
+    close $top_routes or die "Unable to close top-level skill routes file: $!";
+
+    open my $index, '>:raw', File::Spec->catfile( $repo, 'dashboards', 'index' )
+      or die "Unable to write top-level skill index bookmark: $!";
+    print {$index} <<'BOOKMARK';
+TITLE: Dancer Skill Index
+:--------------------------------------------------------------------------------:
+BOOKMARK: index
+:--------------------------------------------------------------------------------:
+HTML:
+Dancer Skill Index
+BOOKMARK
+    close $index or die "Unable to close top-level skill index bookmark: $!";
+
+    open my $js, '>:raw', File::Spec->catfile( $repo, 'dashboards', 'public', 'js', 'skill.js' )
+      or die "Unable to write top-level skill js asset: $!";
+    print {$js} qq{console.log("dancer top-level js");\n};
+    close $js or die "Unable to close top-level skill js asset: $!";
+
+    open my $css, '>:raw', File::Spec->catfile( $repo, 'dashboards', 'public', 'css', 'skill.css' )
+      or die "Unable to write top-level skill css asset: $!";
+    print {$css} qq{body { color: #654321; }\n};
+    close $css or die "Unable to close top-level skill css asset: $!";
+
+    open my $other, '>:raw', File::Spec->catfile( $repo, 'dashboards', 'public', 'others', 'info.txt' )
+      or die "Unable to write top-level skill other asset: $!";
+    print {$other} "dancer top-level other\n";
+    close $other or die "Unable to close top-level skill other asset: $!";
+
+    open my $nested_ajax, '>:raw', File::Spec->catfile( $repo, 'skills', 'def', 'dashboards', 'ajax', 'nested' )
+      or die "Unable to write nested skill ajax file: $!";
+    print {$nested_ajax} qq|print "<p>dancer nested ajax</p>\\n";\n|;
+    close $nested_ajax or die "Unable to close nested skill ajax file: $!";
+    chmod 0700, File::Spec->catfile( $repo, 'skills', 'def', 'dashboards', 'ajax', 'nested' )
+      or die "Unable to chmod nested skill ajax file: $!";
+
+    make_path( File::Spec->catdir( $repo, 'skills', 'def', 'config' ) );
+    open my $nested_routes, '>:raw', File::Spec->catfile( $repo, 'skills', 'def', 'config', 'routes.json' )
+      or die "Unable to write nested skill routes file: $!";
+    print {$nested_routes} <<'JSON';
+{
+   "/apps/dancer-route-skill/child" : "/app/index",
+   "/v1/dancer-route-skill/nested" : {
+      "to" : "/ajax/nested",
+      "type" : "html"
+   },
+   "/assets/dancer-route-skill-nested.js" : "/js/ijk/lmn.js"
+}
+JSON
+    close $nested_routes or die "Unable to close nested skill routes file: $!";
+
+    open my $nested_index, '>:raw', File::Spec->catfile( $repo, 'skills', 'def', 'dashboards', 'index' )
+      or die "Unable to write nested skill index bookmark: $!";
+    print {$nested_index} <<'BOOKMARK';
+TITLE: Dancer Nested Index
+:--------------------------------------------------------------------------------:
+BOOKMARK: index
+:--------------------------------------------------------------------------------:
+HTML:
+Dancer Nested Index
+BOOKMARK
+    close $nested_index or die "Unable to close nested skill index bookmark: $!";
+
+    open my $nested_js, '>:raw', File::Spec->catfile( $repo, 'skills', 'def', 'dashboards', 'public', 'js', 'ijk', 'lmn.js' )
+      or die "Unable to write nested skill js asset: $!";
+    print {$nested_js} qq{console.log("dancer nested js");\n};
+    close $nested_js or die "Unable to close nested skill js asset: $!";
+
+    my $cwd = getcwd();
+    chdir $repo or die "Unable to chdir to $repo: $!";
+    system( 'git', 'init', '-q' ) == 0 or die "Unable to git init $repo: $!";
+    system( 'git', 'config', 'user.email', 'test@example.invalid' ) == 0 or die "Unable to configure git user.email for $repo: $!";
+    system( 'git', 'config', 'user.name', 'Developer Dashboard Test' ) == 0 or die "Unable to configure git user.name for $repo: $!";
+    system( 'git', 'add', '.' ) == 0 or die "Unable to git add fixture repo contents: $!";
+    system( 'git', 'commit', '-qm', 'fixture' ) == 0 or die "Unable to commit fixture repo contents: $!";
+    chdir $cwd or die "Unable to chdir back to $cwd: $!";
+
+    return $repo;
+}
 
 done_testing;
 

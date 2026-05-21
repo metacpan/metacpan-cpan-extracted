@@ -2,14 +2,13 @@ package lazy;
 
 use strict;
 use warnings;
-use feature qw( say state );
+use feature qw( state );
 
-our $VERSION = '1.000000';
+our $VERSION = '1.000002';
 
 use App::cpm 0.997017 ();                # CLI has no $VERSION
 use App::cpm::CLI     ();
 use Carp              qw( longmess );
-use Capture::Tiny     qw( :all );        ## no perlimports
 use Sub::Name         qw( subname );
 use Sub::Identify     qw( sub_name );
 use Try::Tiny         qw( catch try );
@@ -28,7 +27,6 @@ sub import {
     shift;
     my @args = @_;
 
-    my $is_global;
     my $local_lib;
 
     # Don't add this to @INC twice
@@ -41,9 +39,10 @@ sub import {
         local @ARGV = @args;
 
         # Stolen from App::cpm::CLI::parse_options()
+        # We only need to peek at -L here; everything else (including -g) is
+        # forwarded to App::cpm via pass_through.
         GetOptions(
             'L|local-lib-contained=s' => \$local_lib,
-            'g|global'                => \$is_global,
         );
     }
 
@@ -86,15 +85,20 @@ sub import {
         $name =~ s{/}{::}g;
         $name =~ s{\.pm\z}{};
 
-        if ( $name =~ qr{\A(?:auto::.*\.al\Z)} ) {
+        if ( $name =~ qr{\Aauto::.*\.al\z} ) {
             warn "skipping autoloader file $name";
-            return 1;
+            return;
         }
-        if ( $name =~ qr{\A(?:Net::DNS::Resolver::.*\Z)} ) {
+        if ( $name =~ qr{\ANet::DNS::Resolver::} ) {
             warn "skipping $name";
-            return 1;
+            return;
+        }
+        if ( $name eq 'Encode::ConfigLocal' ) {
+            warn "skipping $name";
+            return;
         }
 
+        warn "lazy: installing $name ...\n";
         try {
             $cpm->run( 'install', @args, $name );
         }
@@ -103,7 +107,7 @@ sub import {
             warn $_;
         };
 
-        return 1;
+        return;
     };
     subname '_lazy_worker', $_lazy;
     push @INC, $_lazy, @INC;
@@ -125,7 +129,7 @@ lazy - Lazily install missing Perl modules
 
 =head1 VERSION
 
-version 1.000000
+version 1.000002
 
 =head1 SYNOPSIS
 
@@ -140,6 +144,12 @@ version 1.000000
 
     # Auto-install missing modules into ./some-other-dir
     perl -Mlazy='-Lsome-other-dir' foo.pl
+
+    # Via PERL5OPT, e.g. when prove invokes perl for you
+    # --------------------------------------------------
+
+    PERL5OPT=-Mlazy prove -lvr t
+    PERL5OPT=-Mlazy=-Llocal prove -lvr t
 
     # In your code
     # --------------------------------------------------
@@ -165,7 +175,7 @@ version 1.000000
     # Install App::perlimports via a one-liner, but why would you want to?
     perl -Mlazy -MApp::perlimports -E 'say "ok"'
 
-=head2 DESCRIPTION
+=head1 DESCRIPTION
 
 Your co-worker sends you a one-off script to use.  You fire it up and realize
 you haven't got all of the dependencies installed in your work environment.
@@ -178,7 +188,7 @@ C<lazy> will try to install any missing modules automatically, making your day
 just a little less long.  C<lazy> uses L<App::cpm> to perform this magic in the
 background.
 
-=head2 USAGE
+=head1 USAGE
 
     perl -Mlazy foo.pl
 
@@ -208,15 +218,26 @@ If you want to install to a local lib, use L<local::lib> first:
     use local::lib qw( my-local-lib );
     use lazy    q( -L my-local-lib );
 
-=head2 CAVEATS
+=head2 Via C<PERL5OPT>
+
+If C<prove> is invoking C<perl> for you, set L<perlrun/PERL5OPT> in the
+environment and each spawned C<perl> will pick C<lazy> up automatically:
+
+    PERL5OPT=-Mlazy prove -lvr t
+    PERL5OPT=-Mlazy=-Llocal prove -lvr t
+
+Note that C<PERL5OPT> uses commas to separate import arguments (per
+L<perlrun>), where C<-M> on the command line uses spaces.
+
+=head1 CAVEATS
 
 * Remove C<lazy> before you put your work into production.
 
-=head2 SEE ALSO
+=head1 SEE ALSO
 
 L<Acme::Intraweb>, L<Acme::Magic::Pony>, L<CPAN::AutoINC>, L<lib::xi>, L<Module::AutoINC>, L<Module::AutoLoad>, L<The::Net> and L<Class::Autouse>
 
-=head2 ACKNOWLEDGEMENTS
+=head1 ACKNOWLEDGEMENTS
 
 This entire idea was ripped off from L<Acme::Magic::Pony>.  The main difference
 is that we use L<App::cpm> rather than L<CPAN::Shell>.

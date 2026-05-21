@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Project
+  xmlns="http://usefulinc.com/ns/doap#"
+  xmlns:dc="http://purl.org/dc/terms/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  >
+  <name>Crypt-URandom-MonkeyPatch</name>
+  <shortdesc>override core rand function to use system random sources</shortdesc>
+  <category rdfs:label="random" />
+  <category rdfs:label="security" />
+  <category rdfs:label="monkey" />
+  <category rdfs:label="patch" />
+  <category rdfs:label="legacy" />
+  <category rdfs:label="tech" />
+  <category rdfs:label="debt" />
+  <category rdfs:label="technical" />
+  <category rdfs:label="debt" />
+  <category rdfs:label="bodge" />
+  <category rdfs:label="kluge" />
+  <category rdfs:label="hack" />
+  <category rdfs:label="deprecated" />
+  <developer>
+    <foaf:Person>
+      <foaf:name>Robert Rothenberg</foaf:name>
+      <foaf:mbox rdf:resource="mailto:perl@rhizomnic.com" />
+    </foaf:Person>
+  </developer>
+  <license rdf:resource="http://www.perlfoundation.org/artistic_license_2_0" />
+  <bug-database rdf:resource="https://github.com/robrwo/perl-Crypt-URandom-MonkeyPatch/issues" />
+  <repository>
+    <GitRepository>
+      <browse rdf:resource="https://github.com/robrwo/perl-Crypt-URandom-MonkeyPatch" />
+      <location rdf:resource="git://github.com/robrwo/perl-Crypt-URandom-MonkeyPatch.git" />
+    </GitRepository>
+  </repository>
+  <programming-language>Perl</programming-language>
+</Project>

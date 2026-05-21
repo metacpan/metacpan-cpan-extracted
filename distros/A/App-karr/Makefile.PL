@@ -14,7 +14,7 @@ install_share dist => "share";
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Kanban Assignment & Responsibility Registry",
-  "AUTHOR" => "Torsten Raudssus <torsten\@raudssus.de>",
+  "AUTHOR" => "Torsten Raudssus <getty\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::ShareDir::Install" => "0.06"
@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.102",
+  "VERSION" => "0.205",
   "test" => {
     "TESTS" => "t/*.t"
   }

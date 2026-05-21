@@ -231,7 +231,6 @@ if (my $crashed = $ref->{error_code}) {
 }
 else {
     # Operation completed successfully.
-    my @refs = map { " $_->{type}:$_->{ref}" } @{ $ref->{refs} };
     my $pull_branch = ($ENV{XMODIFIERS}||="") =~ /\bpull_branch=(\S+)\n/ ? $1 : "";
     my $client = $ENV{XMODIFIERS} =~ /^client=.*(git-?\w*)/m ? $1 : "";
     (my $msg = $op) =~ s/e?$/ed/;
@@ -248,7 +247,7 @@ else {
             $op eq "push" ? " [git push]" : "";
     }
     $msg .= " ($ref->{client_git_version})" if $ref->{client_git_version};
-    $msg .= "@refs" if @refs;
+    $msg .= " $_->{type}:$_->{ref}" foreach @{ $ref->{refs} };
     logger $msg;
 }
 

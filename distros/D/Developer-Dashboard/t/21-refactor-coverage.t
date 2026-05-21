@@ -16,6 +16,7 @@ use Developer::Dashboard::CLI::SeededPages ();
 use Developer::Dashboard::CLI::Files ();
 use Developer::Dashboard::CLI::Query ();
 use Developer::Dashboard::CLI::Ticket ();
+use Developer::Dashboard::CollectorRunner;
 use Developer::Dashboard::CLI::Paths ();
 use Developer::Dashboard::Collector;
 use Developer::Dashboard::InternalCLI ();
@@ -266,18 +267,21 @@ like(
 is_deeply(
     Developer::Dashboard::InternalCLI::helper_aliases(),
     {
-        pjq   => 'jq',
-        pyq   => 'yq',
-        ptomq => 'tomq',
-        pjp   => 'propq',
-        skill => 'skills',
+        pjq    => 'jq',
+        pyq    => 'yq',
+        ptomq  => 'tomq',
+        pjp    => 'propq',
+        ticket => 'workspace',
+        skill  => 'skills',
+        logs   => 'log',
     },
     'internal CLI exposes the expected helper aliases',
 );
 is( Developer::Dashboard::InternalCLI::canonical_helper_name('pjq'), 'jq', 'legacy helper alias normalizes to jq' );
 is( Developer::Dashboard::InternalCLI::canonical_helper_name('skill'), 'skills', 'singular skill helper alias normalizes to skills' );
 is( Developer::Dashboard::InternalCLI::canonical_helper_name('xmlq'), 'xmlq', 'current helper name stays unchanged' );
-is( Developer::Dashboard::InternalCLI::canonical_helper_name('ticket'), 'ticket', 'ticket helper name stays unchanged' );
+is( Developer::Dashboard::InternalCLI::canonical_helper_name('ticket'), 'workspace', 'ticket helper name now aliases to workspace' );
+is( Developer::Dashboard::InternalCLI::canonical_helper_name('workspace'), 'workspace', 'workspace helper name stays unchanged' );
 is( Developer::Dashboard::InternalCLI::canonical_helper_name('paths'), 'paths', 'paths helper name stays unchanged' );
 is( Developer::Dashboard::InternalCLI::canonical_helper_name('bogus'), '', 'unsupported helper names normalize to empty string' );
 is(
@@ -299,143 +303,27 @@ is(
     'SeededPages stores the managed seed manifest under the active runtime config root',
 );
 {
-    my $api_dashboard_page = Developer::Dashboard::CLI::SeededPages::page_for_id('api-dashboard');
-    isa_ok( $api_dashboard_page, 'Developer::Dashboard::PageDocument', 'page_for_id loads one shipped seeded page document' );
-    is( $api_dashboard_page->as_hash->{id}, 'api-dashboard', 'page_for_id returns the seeded page requested by id' );
-}
-{
-    my $sql_dashboard_page = Developer::Dashboard::CLI::SeededPages::sql_dashboard_page();
-    isa_ok( $sql_dashboard_page, 'Developer::Dashboard::PageDocument', 'sql_dashboard_page loads the shipped SQL dashboard bookmark definition' );
-    is( $sql_dashboard_page->as_hash->{id}, 'sql-dashboard', 'sql_dashboard_page returns the shipped SQL dashboard bookmark id' );
-}
-ok(
-    Developer::Dashboard::CLI::SeededPages::is_known_managed_page_md5(
-        id  => 'sql-dashboard',
-        md5 => '7d9101e0e2585c159e575f0dbd49b3ef',
-    ),
-    'SeededPages recognizes the pre-refresh shipped sql-dashboard digest as dashboard-managed for upgrade bridging',
-);
-ok(
-    Developer::Dashboard::CLI::SeededPages::is_known_managed_page_md5(
-        id  => 'sql-dashboard',
-        md5 => 'f62a03c9ff7d25cdce65ce569cf2e07b',
-    ),
-    'SeededPages recognizes the older home-runtime sql-dashboard splitter digest as dashboard-managed for upgrade bridging',
-);
-ok(
-    Developer::Dashboard::CLI::SeededPages::is_known_managed_page_md5(
-        id  => 'sql-dashboard',
-        md5 => '10a14e5749f374a78429654b6c49b5f0',
-    ),
-    'SeededPages recognizes the older hov1 sql-dashboard splitter digest as dashboard-managed for upgrade bridging',
-);
-ok(
-    !Developer::Dashboard::CLI::SeededPages::is_known_managed_page_md5(
-        id  => 'sql-dashboard',
-        md5 => 'ffffffffffffffffffffffffffffffff',
-    ),
-    'SeededPages rejects unknown sql-dashboard digests from automatic refresh',
-);
-{
-    my $shared_root = tempdir( CLEANUP => 1 );
-    my $shared_seeded_pages_root = File::Spec->catdir( $shared_root, 'seeded-pages' );
-    make_path($shared_seeded_pages_root);
-    my $shared_seeded_page = File::Spec->catfile( $shared_seeded_pages_root, 'api-dashboard.page' );
-    _write_file(
-        $shared_seeded_page,
-        Developer::Dashboard::CLI::SeededPages::api_dashboard_page()->canonical_instruction,
-    );
-
-    local *Developer::Dashboard::CLI::SeededPages::_repo_seeded_pages_root = sub {
-        return File::Spec->catdir( $shared_root, 'missing-repo-seeded-pages' );
-    };
-    local *Developer::Dashboard::CLI::SeededPages::dist_dir = sub { return $shared_root };
-
-    is(
-        Developer::Dashboard::CLI::SeededPages::_shared_seeded_pages_root(),
-        $shared_seeded_pages_root,
-        'SeededPages resolves the installed shared seeded-pages root through File::ShareDir',
-    );
-    is(
-        Developer::Dashboard::CLI::SeededPages::_seeded_page_asset_path('api-dashboard.page'),
-        $shared_seeded_page,
-        'SeededPages falls back to the installed shared seeded-page asset path when the repo asset is unavailable',
+    like(
+        _dies( sub { Developer::Dashboard::CLI::SeededPages::page_for_id('missing-dashboard') } ),
+        qr/Unknown seeded page id 'missing-dashboard'/,
+        'page_for_id rejects unknown seeded page ids after dashboard extraction from core',
     );
 }
 {
-    my $create_home = tempdir( CLEANUP => 1 );
-    my $cwd         = getcwd();
-    chdir $create_home or die "Unable to chdir to $create_home: $!";
-    my $create_paths = Developer::Dashboard::PathRegistry->new( home => $create_home );
-    my $create_seeded_page = Developer::Dashboard::CLI::SeededPages::sql_dashboard_page();
-    my $create_store = bless {
-        saved => [],
-    }, 'Local::SeededPageStore';
-
-    no warnings qw(redefine once);
-    local *Local::SeededPageStore::read_saved_entry = sub {
-        my ( $self, $id ) = @_;
-        die "Page '$id' not found\n";
-    };
-    local *Local::SeededPageStore::save_page = sub {
-        my ( $self, $page ) = @_;
-        push @{ $self->{saved} }, $page;
-        return $page;
-    };
-
-    is(
-        Developer::Dashboard::CLI::SeededPages::ensure_seeded_page(
-            pages => $create_store,
-            paths => $create_paths,
-            page  => $create_seeded_page,
-        ),
-        'created',
-        'ensure_seeded_page creates a missing shipped seeded page when no saved copy exists yet',
-    );
-    is( scalar @{ $create_store->{saved} }, 1, 'ensure_seeded_page saves a newly created seeded page exactly once' );
     ok(
-        -f Developer::Dashboard::CLI::SeededPages::seed_manifest_path( paths => $create_paths ),
-        'ensure_seeded_page records the seed manifest after creating a missing shipped seeded page',
+        !Developer::Dashboard::CLI::SeededPages::is_known_managed_page_md5(
+            id  => 'missing-dashboard',
+            md5 => 'ffffffffffffffffffffffffffffffff',
+        ),
+        'SeededPages rejects unknown digests from automatic refresh after dashboard extraction',
     );
-    chdir $cwd or die "Unable to chdir back to $cwd: $!";
 }
 {
-    my $current_home = tempdir( CLEANUP => 1 );
-    my $cwd          = getcwd();
-    chdir $current_home or die "Unable to chdir to $current_home: $!";
-    my $current_paths = Developer::Dashboard::PathRegistry->new( home => $current_home );
-    my $current_page  = Developer::Dashboard::CLI::SeededPages::sql_dashboard_page();
-    my $current_store = bless {
-        current => $current_page->canonical_instruction,
-        saved   => [],
-    }, 'Local::SeededPageStore';
-
-    no warnings qw(redefine once);
-    local *Local::SeededPageStore::read_saved_entry = sub {
-        my ( $self, $id ) = @_;
-        return $self->{current};
-    };
-    local *Local::SeededPageStore::save_page = sub {
-        my ( $self, $page ) = @_;
-        push @{ $self->{saved} }, $page;
-        return $page;
-    };
-
-    is(
-        Developer::Dashboard::CLI::SeededPages::ensure_seeded_page(
-            pages => $current_store,
-            paths => $current_paths,
-            page  => $current_page,
-        ),
-        'current',
-        'ensure_seeded_page records the manifest and returns current when the saved page already matches the shipped seed',
+    is_deeply(
+        [ Developer::Dashboard::CLI::SeededPages::known_managed_page_md5s('seeded-demo') ],
+        [],
+        'SeededPages reports no shipped managed digests once optional browser workspaces are extracted from core',
     );
-    is_deeply( $current_store->{saved}, [], 'ensure_seeded_page does not rewrite an already-current shipped seeded page' );
-    ok(
-        -f Developer::Dashboard::CLI::SeededPages::seed_manifest_path( paths => $current_paths ),
-        'ensure_seeded_page records the seed manifest when the saved page already matches the shipped seed',
-    );
-    chdir $cwd or die "Unable to chdir back to $cwd: $!";
 }
 {
     my $manifest_home = tempdir( CLEANUP => 1 );
@@ -443,14 +331,14 @@ ok(
     my $manifest_path = Developer::Dashboard::CLI::SeededPages::seed_manifest_path( paths => $manifest_paths );
 
     open my $manifest_fh, '>:raw', $manifest_path or die "Unable to write $manifest_path: $!";
-    print {$manifest_fh} qq|{"sql-dashboard":{"asset":"sql-dashboard.page","md5":"abc123"}}\n|;
+    print {$manifest_fh} qq|{"removed-dashboard":{"asset":"removed-dashboard.page","md5":"abc123"}}\n|;
     close $manifest_fh or die "Unable to close $manifest_path: $!";
 
     is_deeply(
         Developer::Dashboard::CLI::SeededPages::_read_manifest( paths => $manifest_paths ),
         {
-            'sql-dashboard' => {
-                asset => 'sql-dashboard.page',
+            'removed-dashboard' => {
+                asset => 'removed-dashboard.page',
                 md5   => 'abc123',
             },
         },
@@ -466,93 +354,148 @@ ok(
         {},
         '_read_manifest treats a blank seeded-page manifest file as an empty hash',
     );
-}
-{
-    my $legacy_home = tempdir( CLEANUP => 1 );
-    my $legacy_paths = Developer::Dashboard::PathRegistry->new( home => $legacy_home );
-    my $legacy_seeded_page_hash = Developer::Dashboard::CLI::SeededPages::page_for_id('sql-dashboard')->as_hash;
-    my $legacy_current = "legacy-managed-sql-dashboard\n";
-    my $legacy_saved = bless {
-        current => $legacy_current,
-        saved   => [],
-    }, 'Local::SeededPageStore';
-    my $original_content_md5 = \&Developer::Dashboard::SeedSync::content_md5;
 
-    no warnings qw(redefine once);
-    local *Local::SeededPageStore::read_saved_entry = sub {
-        my ( $self, $id ) = @_;
-        return $self->{current};
-    };
-    local *Local::SeededPageStore::save_page = sub {
-        my ( $self, $page ) = @_;
-        push @{ $self->{saved} }, $page;
-        return $page;
-    };
-    local *Developer::Dashboard::SeedSync::content_md5 = sub {
-        my ($content) = @_;
-        return '10a14e5749f374a78429654b6c49b5f0' if defined $content && $content eq $legacy_current;
-        return $original_content_md5->($content);
-    };
+    like(
+        _dies( sub { Developer::Dashboard::CLI::SeededPages::_write_manifest( paths => $manifest_paths, manifest => undef ) } ),
+        qr/Missing seeded page manifest hash/,
+        '_write_manifest requires a manifest hash reference',
+    );
+
+    my $written = Developer::Dashboard::CLI::SeededPages::_write_manifest(
+        paths    => $manifest_paths,
+        manifest => { seeded_demo => { md5 => 'abc' } },
+    );
+    ok( -f $written, '_write_manifest persists a seeded-page manifest file' );
 
     is(
+        Developer::Dashboard::CLI::SeededPages::_record_manifest_md5(
+            paths => $manifest_paths,
+            id    => 'seeded-demo',
+            md5   => '0123456789abcdef0123456789abcdef',
+        ),
+        '0123456789abcdef0123456789abcdef',
+        '_record_manifest_md5 returns the newly recorded digest',
+    );
+    ok(
+        Developer::Dashboard::CLI::SeededPages::_manifest_md5_matches(
+            paths => $manifest_paths,
+            id    => 'seeded-demo',
+            md5   => '0123456789abcdef0123456789abcdef',
+        ),
+        '_manifest_md5_matches accepts a matching manifest digest',
+    );
+    ok(
+        !Developer::Dashboard::CLI::SeededPages::_manifest_md5_matches(
+            paths => $manifest_paths,
+            id    => 'seeded-demo',
+            md5   => 'ffffffffffffffffffffffffffffffff',
+        ),
+        '_manifest_md5_matches rejects a different manifest digest',
+    );
+}
+{
+    package Local::SeededPageStore;
+
+    sub new {
+        my ( $class, %args ) = @_;
+        return bless {
+            saved        => $args{saved},
+            missing      => $args{missing} || 0,
+            saved_pages  => [],
+        }, $class;
+    }
+
+    sub read_saved_entry {
+        my ( $self, $id ) = @_;
+        die "Page '$id' not found" if $self->{missing};
+        return $self->{saved};
+    }
+
+    sub save_page {
+        my ( $self, $page ) = @_;
+        push @{ $self->{saved_pages} }, $page;
+        $self->{saved}   = $page->canonical_instruction;
+        $self->{missing} = 0;
+        return 1;
+    }
+}
+{
+    my $manifest_home = tempdir( CLEANUP => 1 );
+    my $manifest_paths = Developer::Dashboard::PathRegistry->new( home => $manifest_home );
+    my $page = Developer::Dashboard::PageDocument->from_instruction(<<'PAGE');
+TITLE: Seeded Demo
+:--------------------------------------------------------------------------------:
+BOOKMARK: seeded-demo
+:--------------------------------------------------------------------------------:
+HTML: <div>seeded</div>
+PAGE
+    my $missing_store = Local::SeededPageStore->new( missing => 1 );
+    is(
         Developer::Dashboard::CLI::SeededPages::ensure_seeded_page(
-            pages => $legacy_saved,
-            paths => $legacy_paths,
-            page  => $legacy_seeded_page_hash,
+            page  => $page,
+            pages => $missing_store,
+            paths => $manifest_paths,
+        ),
+        'created',
+        'ensure_seeded_page creates a missing seeded page',
+    );
+
+    my $current_store = Local::SeededPageStore->new( saved => $page->canonical_instruction );
+    is(
+        Developer::Dashboard::CLI::SeededPages::ensure_seeded_page(
+            page  => $page,
+            pages => $current_store,
+            paths => $manifest_paths,
+        ),
+        'current',
+        'ensure_seeded_page reports current for an unchanged managed page',
+    );
+
+    my $stale_page = Developer::Dashboard::PageDocument->from_instruction(<<'PAGE');
+TITLE: Seeded Demo
+:--------------------------------------------------------------------------------:
+BOOKMARK: seeded-demo
+:--------------------------------------------------------------------------------:
+HTML: <div>stale</div>
+PAGE
+    my $stale_md5 = Developer::Dashboard::SeedSync::content_md5( $stale_page->canonical_instruction );
+    Developer::Dashboard::CLI::SeededPages::_write_manifest(
+        paths    => $manifest_paths,
+        manifest => {
+            'seeded-demo' => {
+                asset => 'seeded-demo',
+                md5   => $stale_md5,
+            },
+        },
+    );
+    my $stale_store = Local::SeededPageStore->new( saved => $stale_page->canonical_instruction );
+    is(
+        Developer::Dashboard::CLI::SeededPages::ensure_seeded_page(
+            page  => $page->as_hash,
+            pages => $stale_store,
+            paths => $manifest_paths,
         ),
         'updated',
-        'ensure_seeded_page refreshes a stale managed sql-dashboard copy even when the older runtime never wrote a seed manifest',
+        'ensure_seeded_page refreshes a manifest-matched managed page',
     );
-    is( scalar @{ $legacy_saved->{saved} }, 1, 'ensure_seeded_page rewrites the stale managed sql-dashboard copy once' );
-    ok(
-        -f Developer::Dashboard::CLI::SeededPages::seed_manifest_path( paths => $legacy_paths ),
-        'ensure_seeded_page backfills the seed manifest after refreshing a recognized legacy managed sql-dashboard copy',
-    );
-}
-{
-    my $preserve_home = tempdir( CLEANUP => 1 );
-    my $cwd           = getcwd();
-    chdir $preserve_home or die "Unable to chdir to $preserve_home: $!";
-    my $preserve_paths = Developer::Dashboard::PathRegistry->new( home => $preserve_home );
-    my $seeded_page_hash = Developer::Dashboard::CLI::SeededPages::page_for_id('api-dashboard')->as_hash;
-    my $saved_instruction = <<'BOOKMARK';
-TITLE: api-dashboard
-:--------------------------------------------------------------------------------:
-BOOKMARK: api-dashboard
-:--------------------------------------------------------------------------------:
-HTML: <div>user-edited seeded page</div>
-BOOKMARK
-    my $page_store = bless {
-        current => $saved_instruction,
-        saved   => [],
-    }, 'Local::SeededPageStore';
 
-    no warnings qw(redefine once);
-    local *Local::SeededPageStore::read_saved_entry = sub {
-        my ( $self, $id ) = @_;
-        return $self->{current};
-    };
-    local *Local::SeededPageStore::save_page = sub {
-        my ( $self, $page ) = @_;
-        push @{ $self->{saved} }, $page;
-        return $page;
-    };
-
+    my $edited_page = Developer::Dashboard::PageDocument->from_instruction(<<'PAGE');
+TITLE: Seeded Demo
+:--------------------------------------------------------------------------------:
+BOOKMARK: seeded-demo
+:--------------------------------------------------------------------------------:
+HTML: <div>edited</div>
+PAGE
+    my $edited_store = Local::SeededPageStore->new( saved => $edited_page->canonical_instruction );
     is(
         Developer::Dashboard::CLI::SeededPages::ensure_seeded_page(
-            pages => $page_store,
-            paths => $preserve_paths,
-            page  => $seeded_page_hash,
+            page  => $page,
+            pages => $edited_store,
+            paths => $manifest_paths,
         ),
         'preserved',
-        'ensure_seeded_page preserves a diverged saved seed when it no longer matches any dashboard-managed digest',
+        'ensure_seeded_page preserves a diverged user-edited page',
     );
-    is_deeply( $page_store->{saved}, [], 'ensure_seeded_page does not rewrite a preserved user-edited seeded page' );
-    ok(
-        !-f Developer::Dashboard::CLI::SeededPages::seed_manifest_path( paths => $preserve_paths ),
-        'ensure_seeded_page does not create or update the seed manifest when it preserves a diverged page',
-    );
-    chdir $cwd or die "Unable to chdir back to $cwd: $!";
 }
 like(
     _dies( sub { Developer::Dashboard::InternalCLI::helper_path( paths => $paths, name => 'bogus' ) } ),
@@ -566,7 +509,7 @@ like(
 );
 for my $helper ( Developer::Dashboard::InternalCLI::helper_names() ) {
     my $content = Developer::Dashboard::InternalCLI::helper_content($helper);
-    if ( $helper =~ /\A(?:encode|decode|indicator|collector|config|auth|init|cpan|page|action|docker|serve|stop|restart|shell|doctor|skills|skill)\z/ ) {
+    if ( $helper =~ /\A(?:encode|decode|indicator|collector|config|auth|init|cpan|page|action|docker|serve|stop|restart|log|shell|doctor|skills|skill)\z/ ) {
         like(
             $content,
             qr/\Q_dashboard-core\E/,
@@ -585,6 +528,13 @@ for my $helper ( Developer::Dashboard::InternalCLI::helper_names() ) {
             $content,
             qr/\Qrun_ticket_command( args => \@ARGV );\E/,
             'helper_content renders the embedded ticket helper body',
+        );
+    }
+    elsif ( $helper eq 'workspace' ) {
+        like(
+            $content,
+            qr/\Qrun_workspace_command( args => \@ARGV );\E/,
+            'helper_content renders the shipped workspace helper body',
         );
     }
     elsif ( $helper eq 'path' || $helper eq 'paths' ) {
@@ -637,6 +587,34 @@ for my $helper ( Developer::Dashboard::InternalCLI::helper_names() ) {
         );
     }
 }
+for my $wrapper_helper (qw(encode decode indicator collector config auth init cpan page action docker serve stop restart log shell doctor housekeeper skills)) {
+    my $managed_content = Developer::Dashboard::InternalCLI::_managed_helper_content($wrapper_helper);
+    like(
+        $managed_content,
+        qr/^# developer-dashboard-managed-helper-version: \Q$Developer::Dashboard::InternalCLI::VERSION\E$/m,
+        "_managed_helper_content stamps the $wrapper_helper wrapper with the current helper-version marker",
+    );
+    like(
+        $managed_content,
+        qr/my \$command = '\Q$wrapper_helper\E';/,
+        "_managed_helper_content stages the $wrapper_helper wrapper with an explicit built-in command name",
+    );
+    unlike(
+        $managed_content,
+        qr/basename\(\$0\)/,
+        "_managed_helper_content no longer relies on \$0 basename discovery for the staged $wrapper_helper wrapper",
+    );
+    like(
+        $managed_content,
+        qr/use Developer::Dashboard::Platform qw\(is_windows\);/,
+        "_managed_helper_content stages the $wrapper_helper wrapper with the Windows-aware helper runtime import",
+    );
+    like(
+        $managed_content,
+        qr/if \(is_windows\(\)\) \{\n    system \@command;\n    my \$status = \$\?;\n    my \$exit_code = \$status > 255 \? \$status >> 8 : \$status;\n    exit \$exit_code;\n\}/,
+        "_managed_helper_content stages the $wrapper_helper wrapper with Windows-native child-exit propagation instead of raw exec",
+    );
+}
 my $seeded_helpers = Developer::Dashboard::InternalCLI::ensure_helpers( paths => $paths );
 my @helper_names = Developer::Dashboard::InternalCLI::helper_names();
 is( scalar(@$seeded_helpers), scalar(@helper_names), 'ensure_helpers writes every shipped helper once' );
@@ -645,7 +623,7 @@ is_deeply( $seeded_helpers_second, [], 'ensure_helpers skips rewriting staged he
 ok( -f File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'cli', 'dd', '_dashboard-core' ), 'ensure_helpers also stages the shared _dashboard-core runtime under the dd namespace' );
 ok( grep( $_ =~ m{/\Qof\E$}, @$seeded_helpers ), 'ensure_helpers writes the private of helper' );
 ok( grep( $_ =~ m{/\Qopen-file\E$}, @$seeded_helpers ), 'ensure_helpers writes the private open-file helper' );
-ok( grep( $_ =~ m{/\Qticket\E$}, @$seeded_helpers ), 'ensure_helpers writes the private ticket helper' );
+ok( grep( $_ =~ m{/\Qworkspace\E$}, @$seeded_helpers ), 'ensure_helpers writes the private workspace helper' );
 ok( grep( $_ =~ m{/\Qpath\E$}, @$seeded_helpers ), 'ensure_helpers writes the private path helper' );
 ok( grep( $_ =~ m{/\Qpaths\E$}, @$seeded_helpers ), 'ensure_helpers writes the private paths helper' );
 ok( grep( $_ =~ m{/\Qps1\E$}, @$seeded_helpers ), 'ensure_helpers writes the private ps1 helper' );
@@ -657,6 +635,33 @@ ok(
     ),
     'SeedSync file_matches_content_md5 confirms the staged helper content matches the shipped helper body',
 );
+{
+    my $legacy_flat_core = File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'cli', '_dashboard-core' );
+    my $legacy_flat_shell = File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'cli', 'shell' );
+    open my $legacy_core_fh, '>:raw', $legacy_flat_core or die "Unable to write $legacy_flat_core: $!";
+    print {$legacy_core_fh} Developer::Dashboard::InternalCLI::_managed_helper_content('_dashboard-core');
+    close $legacy_core_fh or die "Unable to close $legacy_flat_core: $!";
+    open my $legacy_shell_fh, '>:raw', $legacy_flat_shell or die "Unable to write $legacy_flat_shell: $!";
+    print {$legacy_shell_fh} Developer::Dashboard::InternalCLI::_managed_helper_content('shell');
+    close $legacy_shell_fh or die "Unable to close $legacy_flat_shell: $!";
+
+    my $cleanup_result = Developer::Dashboard::InternalCLI::ensure_helpers( paths => $paths );
+    is_deeply( $cleanup_result, [], 'ensure_helpers can rerun purely as a legacy flat-helper cleanup pass' );
+    ok( !-e $legacy_flat_core, 'ensure_helpers removes dashboard-managed legacy flat _dashboard-core files from the cli root' );
+    ok( !-e $legacy_flat_shell, 'ensure_helpers removes dashboard-managed legacy flat helper wrappers from the cli root' );
+}
+{
+    my $shell_helper = File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'cli', 'dd', 'shell' );
+    my ( $stdout, $stderr, $exit ) = capture {
+        system $^X, $shell_helper, 'bash';
+        return $? >> 8;
+    };
+    is( $exit, 0, 'the staged shell helper executes successfully from the managed dd helper root' );
+    is( $stderr, '', 'the staged shell helper writes no stderr for shell bash output' );
+    like( $stdout, qr/_dd_tmux_status_active/, 'the staged shell helper bootstrap includes the ticket tmux-status detection helper' );
+    like( $stdout, qr/status-format\[0\].*tmux-status-top --width #\{client_width\}/s, 'the staged shell helper bootstrap includes the tmux ticket status format wiring' );
+    like( $stdout, qr/ps1 --jobs \\j --mode compact --no-indicators/, 'the staged shell helper bootstrap suppresses prompt indicators when tmux owns the status line' );
+}
 {
     my $preserve_home = tempdir( CLEANUP => 1 );
     my $preserve_paths = Developer::Dashboard::PathRegistry->new( home => $preserve_home );
@@ -690,8 +695,8 @@ ok(
     };
     is(
         Developer::Dashboard::InternalCLI::_managed_helper_content('jq'),
-        "#!/usr/bin/env perl\n# developer-dashboard-managed-helper: jq\nprint qq(managed\\n);\n",
-        '_managed_helper_content leaves already-marked helper bodies unchanged',
+        "#!/usr/bin/env perl\n# developer-dashboard-managed-helper: jq\n# developer-dashboard-managed-helper-version: $Developer::Dashboard::InternalCLI::VERSION\nprint qq(managed\\n);\n",
+        '_managed_helper_content injects the current helper-version marker into already-managed helper bodies when it is missing',
     );
 }
 {
@@ -700,8 +705,8 @@ ok(
     };
     is(
         Developer::Dashboard::InternalCLI::_managed_helper_content('jq'),
-        "# developer-dashboard-managed-helper: jq\nprint qq(no-shebang\\n);\n",
-        '_managed_helper_content prepends the ownership marker when helper content has no shebang',
+        "# developer-dashboard-managed-helper: jq\n# developer-dashboard-managed-helper-version: $Developer::Dashboard::InternalCLI::VERSION\nprint qq(no-shebang\\n);\n",
+        '_managed_helper_content prepends the ownership and helper-version markers when helper content has no shebang',
     );
 }
 {
@@ -727,6 +732,77 @@ ok(
     my $managed_verify = do { local $/; <$managed_verify_fh> };
     close $managed_verify_fh;
     is( $managed_verify, $managed_body, '_stage_managed_helper leaves an already-managed matching helper unchanged on disk' );
+}
+{
+    my $repair_home = tempdir( CLEANUP => 1 );
+    my $repair_paths = Developer::Dashboard::PathRegistry->new( home => $repair_home );
+    my $repair_cli_root = File::Spec->catdir( $repair_home, '.developer-dashboard', 'cli', 'dd' );
+    make_path($repair_cli_root);
+    my $repair_target = File::Spec->catfile( $repair_cli_root, '_dashboard-core' );
+    open my $repair_target_fh, '>', $repair_target or die "Unable to write $repair_target: $!";
+    close $repair_target_fh;
+
+    ok(
+        Developer::Dashboard::InternalCLI::_stage_managed_helper(
+            paths  => $repair_paths,
+            name   => '_dashboard-core',
+            target => $repair_target,
+        ),
+        '_stage_managed_helper repairs a zero-byte managed helper target under the dd namespace',
+    );
+    open my $repair_verify_fh, '<', $repair_target or die "Unable to read $repair_target: $!";
+    my $repair_verify = do { local $/; <$repair_verify_fh> };
+    close $repair_verify_fh;
+    is(
+        $repair_verify,
+        Developer::Dashboard::InternalCLI::_managed_helper_content('_dashboard-core'),
+        '_stage_managed_helper rewrites the full managed helper body when the target was truncated to zero bytes',
+    );
+}
+{
+    my $atomic_home = tempdir( CLEANUP => 1 );
+    my $atomic_target = File::Spec->catfile( $atomic_home, 'helper' );
+    my $read_atomic_target = sub {
+        open my $fh, '<', $atomic_target or die "Unable to read $atomic_target: $!";
+        my $content = do { local $/; <$fh> };
+        close $fh;
+        return $content;
+    };
+    ok(
+        Developer::Dashboard::InternalCLI::_write_helper_atomically( $atomic_target, "one\n" ),
+        '_write_helper_atomically writes the first helper payload through a temp file and rename',
+    );
+    is( $read_atomic_target->(), "one\n", '_write_helper_atomically leaves the requested helper body on disk' );
+    ok(
+        Developer::Dashboard::InternalCLI::_write_helper_atomically( $atomic_target, "two\n" ),
+        '_write_helper_atomically also replaces an existing helper payload atomically',
+    );
+    is( $read_atomic_target->(), "two\n", '_write_helper_atomically leaves the replacement helper body on disk' );
+    is_deeply(
+        [ sort glob( $atomic_target . '.tmp.*' ) ],
+        [],
+        '_write_helper_atomically does not leave temporary helper fragments behind',
+    );
+}
+{
+    my $rename_fail_home = tempdir( CLEANUP => 1 );
+    my $rename_fail_target = File::Spec->catdir( $rename_fail_home, 'helper-target-dir' );
+    make_path($rename_fail_target);
+
+    my $error = eval {
+        Developer::Dashboard::InternalCLI::_write_helper_atomically( $rename_fail_target, "broken\n" );
+        return;
+    };
+    like(
+        $@,
+        qr/\AUnable to rename \Q$rename_fail_target\E\.tmp\.\d+\.\d+ to \Q$rename_fail_target\E:/,
+        '_write_helper_atomically reports rename failures explicitly when the final helper target cannot be replaced',
+    );
+    is_deeply(
+        [ sort glob( $rename_fail_target . '.tmp.*' ) ],
+        [],
+        '_write_helper_atomically cleans up the temporary helper file after a rename failure',
+    );
 }
 {
     my $cleanup_home = tempdir( CLEANUP => 1 );
@@ -801,7 +877,9 @@ like(
 );
 {
     my $shared_root = tempdir( CLEANUP => 1 );
+    local $ENV{HOME} = tempdir( CLEANUP => 1 );
     local *Developer::Dashboard::InternalCLI::_repo_private_cli_root = sub { return File::Spec->catdir( $shared_root, 'missing-private-cli' ) };
+    local *Developer::Dashboard::InternalCLI::_repo_private_cli_root_candidates = sub { return File::Spec->catdir( $shared_root, 'missing-private-cli' ) };
     local *Developer::Dashboard::InternalCLI::dist_dir = sub { return $shared_root };
 
     is(
@@ -813,6 +891,154 @@ like(
         Developer::Dashboard::InternalCLI::_helper_asset_path('jq'),
         File::Spec->catfile( $shared_root, 'private-cli', 'jq' ),
         'internal CLI falls back to the installed shared helper asset path when the repo asset is unavailable',
+    );
+}
+{
+    my $install_root = tempdir( CLEANUP => 1 );
+    my $shared_private_cli_root = File::Spec->catdir( $install_root, 'private-cli' );
+    make_path($shared_private_cli_root);
+    my $shared_helper = File::Spec->catfile( $shared_private_cli_root, '_dashboard-core' );
+    open my $shared_fh, '>:raw', $shared_helper or die "Unable to write $shared_helper: $!";
+    print {$shared_fh} "#!/usr/bin/env perl\nprint qq(core\\n);\n";
+    close $shared_fh or die "Unable to close $shared_helper: $!";
+
+    local $ENV{HOME} = tempdir( CLEANUP => 1 );
+    local *Developer::Dashboard::InternalCLI::_repo_private_cli_root = sub { return File::Spec->catdir( $install_root, 'missing-private-cli' ) };
+    local *Developer::Dashboard::InternalCLI::_repo_private_cli_root_candidates = sub { return File::Spec->catdir( $install_root, 'missing-private-cli' ) };
+    local *Developer::Dashboard::InternalCLI::dist_dir = sub { return $shared_private_cli_root };
+    local *Developer::Dashboard::InternalCLI::_module_install_lib_root = sub { return File::Spec->catdir( $install_root, 'missing-lib-root' ) };
+
+    is(
+        Developer::Dashboard::InternalCLI::_shared_private_cli_root(),
+        $shared_private_cli_root,
+        'internal CLI accepts a dist_dir result that already points at the private-cli root',
+    );
+    is(
+        Developer::Dashboard::InternalCLI::_helper_asset_path('_dashboard-core'),
+        $shared_helper,
+        'internal CLI resolves helper assets when File::ShareDir already returns the private-cli root itself',
+    );
+}
+{
+    my $install_root = tempdir( CLEANUP => 1 );
+    local $ENV{HOME} = tempdir( CLEANUP => 1 );
+    my $module_lib_root = File::Spec->catdir( $install_root, 'lib', 'perl5' );
+    my $broken_dist_root = File::Spec->catdir(
+        $install_root,
+        'lib',
+        'perl5',
+        'MSWin32-x64-multi-thread',
+        'auto',
+        'Developer',
+        'Dashboard',
+    );
+    my $broken_private_cli_root = File::Spec->catdir( $broken_dist_root, 'private-cli' );
+    my $shared_private_cli_root = File::Spec->catdir(
+        $module_lib_root,
+        'auto',
+        'share',
+        'dist',
+        'Developer-Dashboard',
+        'private-cli',
+    );
+    make_path( $broken_private_cli_root, $shared_private_cli_root );
+    my $shared_helper = File::Spec->catfile( $shared_private_cli_root, '_dashboard-core' );
+    open my $shared_fh, '>:raw', $shared_helper or die "Unable to write $shared_helper: $!";
+    print {$shared_fh} "#!/usr/bin/env perl\nprint qq(core\\n);\n";
+    close $shared_fh or die "Unable to close $shared_helper: $!";
+
+    local *Developer::Dashboard::InternalCLI::_repo_private_cli_root = sub { return File::Spec->catdir( $install_root, 'missing-private-cli' ) };
+    local *Developer::Dashboard::InternalCLI::_repo_private_cli_root_candidates = sub { return File::Spec->catdir( $install_root, 'missing-private-cli' ) };
+    local *Developer::Dashboard::InternalCLI::dist_dir = sub { return $broken_dist_root };
+    local *Developer::Dashboard::InternalCLI::_module_install_lib_root = sub { return $module_lib_root };
+
+    is(
+        Developer::Dashboard::InternalCLI::_shared_private_cli_root(),
+        $shared_private_cli_root,
+        'internal CLI falls back to the module-relative auto/share dist helper root when File::ShareDir points at an existing but empty arch auto private-cli directory',
+    );
+    is(
+        Developer::Dashboard::InternalCLI::_helper_asset_path('_dashboard-core'),
+        $shared_helper,
+        'internal CLI finds _dashboard-core through the module-relative shared helper fallback when the default dist_dir root is wrong',
+    );
+}
+{
+    my $home = tempdir( CLEANUP => 1 );
+    my $home_private_cli_root = File::Spec->catdir( $home, '.developer-dashboard', 'cli' );
+    my $managed_dd_root = File::Spec->catdir( $home_private_cli_root, 'dd' );
+    make_path($managed_dd_root);
+    make_path($home_private_cli_root);
+    my $home_helper = File::Spec->catfile( $home_private_cli_root, '_dashboard-core' );
+    open my $home_fh, '>:raw', $home_helper or die "Unable to write $home_helper: $!";
+    print {$home_fh} "#!/usr/bin/env perl\nprint qq(home\\n);\n";
+    close $home_fh or die "Unable to close $home_helper: $!";
+    my $managed_core = File::Spec->catfile( $managed_dd_root, '_dashboard-core' );
+    open my $managed_fh, '>:raw', $managed_core or die "Unable to write $managed_core: $!";
+    print {$managed_fh} "#!/usr/bin/env perl\nprint qq(managed\\n);\n";
+    close $managed_fh or die "Unable to close $managed_core: $!";
+    my $home_jq = File::Spec->catfile( $home_private_cli_root, 'jq' );
+    open my $home_jq_fh, '>:raw', $home_jq or die "Unable to write $home_jq: $!";
+    print {$home_jq_fh} "#!/usr/bin/env perl\nprint qq(jq\\n);\n";
+    close $home_jq_fh or die "Unable to close $home_jq: $!";
+
+    local $ENV{HOME} = $home;
+    local *Developer::Dashboard::InternalCLI::_repo_private_cli_root = sub { return File::Spec->catdir( $home, 'missing-private-cli' ) };
+    local *Developer::Dashboard::InternalCLI::_repo_private_cli_root_candidates = sub { return File::Spec->catdir( $home, 'missing-private-cli' ) };
+    local *Developer::Dashboard::InternalCLI::dist_dir = sub { return File::Spec->catdir( $home, 'missing-dist-root' ) };
+    local *Developer::Dashboard::InternalCLI::_module_install_lib_root = sub { return File::Spec->catdir( $home, 'missing-lib-root' ) };
+
+    is(
+        Developer::Dashboard::InternalCLI::_shared_private_cli_root(),
+        $managed_dd_root,
+        'internal CLI prefers the managed dd helper root once checkout installs have already staged _dashboard-core there',
+    );
+    is(
+        Developer::Dashboard::InternalCLI::_helper_asset_path('_dashboard-core'),
+        $managed_core,
+        'internal CLI finds _dashboard-core through the managed dd helper root once checkout installs have staged it there',
+    );
+    is(
+        Developer::Dashboard::InternalCLI::_helper_asset_path('jq'),
+        $home_jq,
+        'internal CLI still falls back to the home bootstrap helper file for non-core helpers while the managed dd helper root is only partially staged',
+    );
+}
+{
+    my $install_root = tempdir( CLEANUP => 1 );
+    my $blib_root = File::Spec->catdir( $install_root, 'blib', 'lib' );
+    my $shared_private_cli_root = File::Spec->catdir( $install_root, 'auto', 'share', 'dist', 'Developer-Dashboard', 'private-cli' );
+    make_path($shared_private_cli_root);
+    my $shared_helper = File::Spec->catfile( $shared_private_cli_root, '_dashboard-core' );
+    open my $shared_fh, '>:raw', $shared_helper or die "Unable to write $shared_helper: $!";
+    print {$shared_fh} "#!/usr/bin/env perl\nprint qq(core\\n);\n";
+    close $shared_fh or die "Unable to close $shared_helper: $!";
+
+    local *Developer::Dashboard::InternalCLI::_repo_private_cli_root = sub { return File::Spec->catdir( $install_root, 'missing-private-cli' ) };
+    local *Developer::Dashboard::InternalCLI::_repo_private_cli_root_candidates = sub { return File::Spec->catdir( $install_root, 'missing-private-cli' ) };
+    local *Developer::Dashboard::InternalCLI::_module_source_path = sub { return File::Spec->catfile( $blib_root, 'Developer', 'Dashboard', 'InternalCLI.pm' ) };
+    local *Developer::Dashboard::InternalCLI::dist_dir = sub { return File::Spec->catdir( $install_root, 'missing-dist-root' ) };
+    local *Developer::Dashboard::InternalCLI::_shared_private_cli_root_candidates = sub { return ($shared_private_cli_root) };
+
+    is(
+        Developer::Dashboard::InternalCLI::_helper_asset_path('_dashboard-core'),
+        $shared_helper,
+        'internal CLI uses shared helper candidates directly when the module source path comes from a blib build tree',
+    );
+}
+{
+    my $candidate_root = tempdir( CLEANUP => 1 );
+    my $first = File::Spec->catdir( $candidate_root, 'first-private-cli' );
+    my $second = File::Spec->catdir( $candidate_root, 'second-private-cli' );
+    make_path( $first, $second );
+
+    local *Developer::Dashboard::InternalCLI::_repo_private_cli_root_candidates = sub { return ( $first, $second ) };
+    local *Developer::Dashboard::InternalCLI::_private_cli_root_has_dashboard_core = sub { return 0 };
+
+    is(
+        Developer::Dashboard::InternalCLI::_repo_private_cli_root(),
+        $first,
+        'internal CLI falls back to the first repo helper candidate when none of them expose _dashboard-core',
     );
 }
 
@@ -1218,12 +1444,18 @@ like(
     qr/Please specify a ticket name/,
     'resolve_ticket_request rejects empty ticket requests',
 );
+like(
+    _dies( sub { Developer::Dashboard::CLI::Ticket::resolve_ticket_request( args => 'DD-123' ) } ),
+    qr/Ticket args must be an array reference/,
+    'resolve_ticket_request rejects non-array argv containers',
+);
 is_deeply(
     Developer::Dashboard::CLI::Ticket::ticket_environment('DD-123'),
     {
-        TICKET_REF => 'DD-123',
-        B          => 'DD-123',
-        OB         => 'origin/DD-123',
+        TICKET_REF                      => 'DD-123',
+        B                               => 'DD-123',
+        OB                              => 'origin/DD-123',
+        DEVELOPER_DASHBOARD_TMUX_STATUS => 1,
     },
     'ticket_environment builds the expected tmux environment values',
 );
@@ -1232,6 +1464,28 @@ like(
     qr/Ticket name is required/,
     'ticket_environment rejects empty ticket names',
 );
+{
+    my $workspace_root = tempdir( CLEANUP => 1 );
+    my $workspace_parent = File::Spec->catdir( $workspace_root, 'parent' );
+    my $workspace_child  = File::Spec->catdir( $workspace_parent, 'child' );
+    make_path($workspace_child);
+    _write_file( File::Spec->catfile( $workspace_root, '.env' ), "ROOT_ONLY=root\nSHARED=root\n" );
+    _write_file( File::Spec->catfile( $workspace_parent, '.env' ), "PARENT_ONLY=parent\nSHARED=parent\n" );
+    _write_file( File::Spec->catfile( $workspace_child, '.env' ), "CHILD_ONLY=child\nSHARED=child\n" );
+
+    my $workspace_env = Developer::Dashboard::CLI::Ticket::workspace_environment( 'DD-123', cwd => $workspace_child );
+    is( $workspace_env->{ROOT_ONLY}, 'root', 'workspace_environment loads the highest ancestor .env as the base layer' );
+    is( $workspace_env->{PARENT_ONLY}, 'parent', 'workspace_environment loads parent .env files after the root base layer' );
+    is( $workspace_env->{CHILD_ONLY}, 'child', 'workspace_environment loads the current directory .env last' );
+    is( $workspace_env->{SHARED}, 'child', 'workspace_environment lets the current directory .env override shallower values' );
+    is( $workspace_env->{WORKSPACE_REF}, 'DD-123', 'workspace_environment seeds WORKSPACE_REF for workspace sessions' );
+    is( $workspace_env->{TICKET_REF}, 'DD-123', 'workspace_environment keeps TICKET_REF for compatibility with older prompt flows' );
+    is(
+        $workspace_env->{DEVELOPER_DASHBOARD_WORKSPACE_ENV_KEYS},
+        'CHILD_ONLY:PARENT_ONLY:ROOT_ONLY:SHARED',
+        'workspace_environment records the layered .env keys for later tmux session refresh',
+    );
+}
 is(
     Developer::Dashboard::CLI::Ticket::session_exists(
         session => 'exists',
@@ -1260,6 +1514,41 @@ like(
     qr/Unable to inspect tmux session 'broken': bad\noops\n/,
     'session_exists surfaces unexpected tmux failures',
 );
+is_deeply(
+    [
+        Developer::Dashboard::CLI::Ticket::list_sessions(
+            tmux => sub {
+                return {
+                    exit_code => 0,
+                    stdout    => "DD-100\n\nDD-200\n",
+                    stderr    => '',
+                };
+            },
+        )
+    ],
+    [ qw(DD-100 DD-200) ],
+    'list_sessions returns one ordered tmux session name per line',
+);
+is_deeply(
+    [
+        Developer::Dashboard::CLI::Ticket::list_sessions(
+            tmux => sub { return { exit_code => 1, stdout => '', stderr => '' } },
+        )
+    ],
+    [],
+    'list_sessions returns an empty list when tmux reports no sessions are available',
+);
+like(
+    _dies(
+        sub {
+            Developer::Dashboard::CLI::Ticket::list_sessions(
+                tmux => sub { return { exit_code => 2, stdout => "oops\n", stderr => "bad\n" } },
+            );
+        }
+    ),
+    qr/Unable to list tmux ticket sessions: bad\noops\n/,
+    'list_sessions surfaces unexpected tmux list failures',
+);
 
 my $ticket_plan = Developer::Dashboard::CLI::Ticket::build_ticket_plan(
     args => ['DD-456'],
@@ -1284,6 +1573,15 @@ my $existing_ticket_plan = Developer::Dashboard::CLI::Ticket::build_ticket_plan(
     tmux => sub { return { exit_code => 0, stdout => '', stderr => '' } },
 );
 ok( !$existing_ticket_plan->{create}, 'build_ticket_plan skips creation for existing sessions' );
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::CLI::Ticket::cwd = sub { return '/tmp/default-ticket-cwd' };
+    my $default_cwd_plan = Developer::Dashboard::CLI::Ticket::build_ticket_plan(
+        args => ['DD-456'],
+        tmux => sub { return { exit_code => 1, stdout => '', stderr => '' } },
+    );
+    is( $default_cwd_plan->{cwd}, '/tmp/default-ticket-cwd', 'build_ticket_plan falls back to cwd when no explicit cwd is provided' );
+}
 
 {
     my @tmux_calls;
@@ -1301,7 +1599,7 @@ ok( !$existing_ticket_plan->{create}, 'build_ticket_plan skips creation for exis
     );
     is( $result->{session}, 'DD-789', 'run_ticket_command returns the executed plan' );
     is_deeply( $tmux_calls[1][0], 'new-session', 'run_ticket_command creates a missing tmux session before attaching' );
-    is_deeply( $tmux_calls[2], [ 'attach-session', '-t', 'DD-789' ], 'run_ticket_command attaches to the requested tmux session' );
+    is_deeply( $tmux_calls[-1], [ 'attach-session', '-t', 'DD-789' ], 'run_ticket_command attaches to the requested tmux session after configuring tmux status' );
 }
 {
     my @tmux_calls;
@@ -1314,7 +1612,55 @@ ok( !$existing_ticket_plan->{create}, 'build_ticket_plan skips creation for exis
             return { exit_code => 0, stdout => '', stderr => '' };
         },
     );
-    is( scalar(@tmux_calls), 2, 'run_ticket_command only checks and attaches when the session already exists' );
+    is( $tmux_calls[0][0], 'has-session', 'run_ticket_command still checks whether the session exists first' );
+    is_deeply( $tmux_calls[-1], [ 'attach-session', '-t', 'DD-790' ], 'run_ticket_command still finishes by attaching to an existing session' );
+    ok( scalar(@tmux_calls) > 2, 'run_ticket_command also refreshes tmux status before attaching to an existing session' );
+}
+{
+    my $workspace_root = tempdir( CLEANUP => 1 );
+    my $workspace_parent = File::Spec->catdir( $workspace_root, 'parent' );
+    my $workspace_child  = File::Spec->catdir( $workspace_parent, 'child' );
+    make_path($workspace_child);
+    _write_file( File::Spec->catfile( $workspace_root, '.env' ), "ROOT_ONLY=root\nSHARED=root\n" );
+    _write_file( File::Spec->catfile( $workspace_parent, '.env' ), "PARENT_ONLY=parent\nSHARED=parent\n" );
+    _write_file( File::Spec->catfile( $workspace_child, '.env' ), "CHILD_ONLY=child\nSHARED=child\n" );
+
+    my @tmux_calls;
+    Developer::Dashboard::CLI::Ticket::run_workspace_command(
+        args => ['DD-790A'],
+        cwd  => $workspace_child,
+        tmux => sub {
+            my (%call) = @_;
+            push @tmux_calls, [ @{ $call{args} } ];
+            return { exit_code => 0, stdout => '', stderr => '' } if $call{args}[0] eq 'has-session';
+            return {
+                exit_code => 0,
+                stdout    => "DEVELOPER_DASHBOARD_WORKSPACE_ENV_KEYS=OLD_ONLY:SHARED\n",
+                stderr    => '',
+            } if $call{args}[0] eq 'show-environment';
+            return { exit_code => 0, stdout => '', stderr => '' };
+        },
+    );
+    ok(
+        scalar( grep { $_->[0] eq 'set-environment' && $_->[3] eq '-u' && $_->[4] eq 'OLD_ONLY' } @tmux_calls ),
+        'run_workspace_command unsets stale layered tmux env keys when a workspace session is resumed',
+    );
+    ok(
+        scalar( grep { $_->[0] eq 'set-environment' && $_->[3] eq 'ROOT_ONLY' && $_->[4] eq 'root' } @tmux_calls ),
+        'run_workspace_command refreshes root-layer .env values into resumed workspace sessions',
+    );
+    ok(
+        scalar( grep { $_->[0] eq 'set-environment' && $_->[3] eq 'PARENT_ONLY' && $_->[4] eq 'parent' } @tmux_calls ),
+        'run_workspace_command refreshes parent-layer .env values into resumed workspace sessions',
+    );
+    ok(
+        scalar( grep { $_->[0] eq 'set-environment' && $_->[3] eq 'CHILD_ONLY' && $_->[4] eq 'child' } @tmux_calls ),
+        'run_workspace_command refreshes current-directory .env values into resumed workspace sessions',
+    );
+    ok(
+        scalar( grep { $_->[0] eq 'set-environment' && $_->[3] eq 'SHARED' && $_->[4] eq 'child' } @tmux_calls ),
+        'run_workspace_command applies current-directory .env values as the final override when a workspace session is resumed',
+    );
 }
 like(
     _dies(
@@ -1343,13 +1689,171 @@ like(
                 tmux => sub {
                     my (%call) = @_;
                     return { exit_code => 0, stdout => '', stderr => '' } if $call{args}[0] eq 'has-session';
-                    return { exit_code => 3, stdout => "attach\n", stderr => "denied\n" };
+                    return {
+                        exit_code => 0,
+                        stdout    => "DEVELOPER_DASHBOARD_WORKSPACE_ENV_KEYS=\n",
+                        stderr    => '',
+                    } if $call{args}[0] eq 'show-environment';
+                    return { exit_code => 0, stdout => '', stderr => '' } if $call{args}[0] eq 'set-environment';
+                    return { exit_code => 3, stdout => "attach\n", stderr => "denied\n" } if $call{args}[0] eq 'set-option';
+                    return { exit_code => 0, stdout => '', stderr => '' };
                 },
             );
         }
     ),
-    qr/Unable to attach tmux ticket session 'DD-792': denied\nattach\n/,
-    'run_ticket_command surfaces tmux attach failures',
+    qr/Unable to configure tmux ticket status for 'DD-792': denied\nattach\n/,
+    'run_ticket_command surfaces tmux status configuration failures before attach',
+);
+like(
+    _dies(
+        sub {
+            Developer::Dashboard::CLI::Ticket::run_ticket_command(
+                args => ['DD-793'],
+                cwd  => '/tmp/work-here',
+                tmux => sub {
+                    my (%call) = @_;
+                    return { exit_code => 0, stdout => '', stderr => '' } if $call{args}[0] eq 'has-session';
+                    return { exit_code => 0, stdout => '', stderr => '' } if $call{args}[0] eq 'show-options';
+                    return { exit_code => 0, stdout => '', stderr => '' } if $call{args}[0] eq 'set-option' || $call{args}[0] eq 'set-option';
+                    return { exit_code => 4, stdout => "attach-out\n", stderr => "attach-err\n" } if $call{args}[0] eq 'attach-session';
+                    return { exit_code => 0, stdout => '', stderr => '' };
+                },
+            );
+        }
+    ),
+    qr/Unable to attach tmux ticket session 'DD-793': attach-err\nattach-out\n/,
+    'run_ticket_command surfaces tmux attach failures after status setup succeeds',
+);
+{
+    my @tmux_calls;
+    local $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} = '/tmp/fake-dashboard';
+    is(
+        Developer::Dashboard::CLI::Ticket::apply_ticket_status(
+            session => 'DD-794',
+            tmux    => sub {
+                my (%call) = @_;
+                push @tmux_calls, [ @{ $call{args} } ];
+                return { exit_code => 0, stdout => '', stderr => '' } if $call{args}[0] eq 'show-options';
+                return { exit_code => 0, stdout => '', stderr => '' };
+            },
+        ),
+        1,
+        'apply_ticket_status succeeds when it resolves the dashboard entrypoint from the environment',
+    );
+    like(
+        join( "\n", map { join ' ', @{$_} } @tmux_calls ),
+        qr{/tmp/fake-dashboard' ps1 --mode tmux-status-top --width \#\{client_width\}},
+        'apply_ticket_status uses the environment-provided dashboard entrypoint in the tmux status command',
+    );
+}
+{
+    my @tmux_calls;
+    is(
+        Developer::Dashboard::CLI::Ticket::apply_workspace_status(
+            session => 'DD-794W',
+            tmux    => sub {
+                my (%call) = @_;
+                push @tmux_calls, [ @{ $call{args} } ];
+                return { exit_code => 0, stdout => '', stderr => '' };
+            },
+        ),
+        1,
+        'apply_workspace_status delegates through the shared tmux status configurator',
+    );
+    is_deeply(
+        $tmux_calls[0],
+        [ 'show-options', '-gqv', '@dd_ticket_status_default' ],
+        'apply_workspace_status starts from the same tmux default-status lookup as apply_ticket_status',
+    );
+}
+{
+    my @tmux_calls;
+    no warnings 'redefine';
+    local $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} = '';
+    local *Developer::Dashboard::CLI::Ticket::command_in_path = sub { return '/tmp/bin/dashboard'; };
+    is(
+        Developer::Dashboard::CLI::Ticket::apply_ticket_status(
+            session => 'DD-795',
+            tmux    => sub {
+                my (%call) = @_;
+                push @tmux_calls, [ @{ $call{args} } ];
+                return { exit_code => 0, stdout => '', stderr => '' } if $call{args}[0] eq 'show-options';
+                return { exit_code => 0, stdout => '', stderr => '' };
+            },
+        ),
+        1,
+        'apply_ticket_status succeeds when it resolves the dashboard entrypoint from PATH',
+    );
+    like(
+        join( "\n", map { join ' ', @{$_} } @tmux_calls ),
+        qr{/tmp/bin/dashboard' ps1 --mode tmux-status-top --width \#\{client_width\}},
+        'apply_ticket_status uses the PATH-resolved dashboard entrypoint in the tmux status command',
+    );
+}
+{
+    my @tmux_calls;
+    no warnings 'redefine';
+    local $ENV{DEVELOPER_DASHBOARD_ENTRYPOINT} = '';
+    local *Developer::Dashboard::CLI::Ticket::command_in_path = sub { return undef; };
+    is(
+        Developer::Dashboard::CLI::Ticket::apply_ticket_status(
+            session => 'DD-795A',
+            tmux    => sub {
+                my (%call) = @_;
+                push @tmux_calls, [ @{ $call{args} } ];
+                return { exit_code => 0, stdout => '', stderr => '' } if $call{args}[0] eq 'show-options';
+                return { exit_code => 0, stdout => '', stderr => '' };
+            },
+        ),
+        1,
+        'apply_ticket_status falls back to the literal dashboard command name when no explicit entrypoint can be resolved',
+    );
+    like(
+        join( "\n", map { join ' ', @{$_} } @tmux_calls ),
+        qr/\#\('dashboard' ps1 --mode tmux-status-top --width \#\{client_width\}\)/,
+        'apply_ticket_status uses the literal dashboard command fallback in the tmux status command',
+    );
+}
+{
+    my @tmux_calls;
+    is(
+        Developer::Dashboard::CLI::Ticket::apply_ticket_status(
+            session => 'DD-796',
+            dashboard => '/tmp/custom-dashboard',
+            tmux    => sub {
+                my (%call) = @_;
+                push @tmux_calls, [ @{ $call{args} } ];
+                return { exit_code => 0, stdout => '', stderr => '' } if $call{args}[0] eq 'show-options' && $call{args}[2] eq '@dd_ticket_status_default';
+                return { exit_code => 0, stdout => "#[default-status]\n", stderr => '' } if $call{args}[0] eq 'show-options' && $call{args}[2] eq 'status-format[0]';
+                return { exit_code => 0, stdout => '', stderr => '' };
+            },
+        ),
+        1,
+        'apply_ticket_status records the tmux default status row when it is missing',
+    );
+    ok(
+        ( scalar grep { $_->[0] eq 'set-option' && $_->[2] eq '@dd_ticket_status_default' && $_->[3] eq '#[default-status]' } @tmux_calls ),
+        'apply_ticket_status saves the discovered default tmux status row before overriding it',
+    );
+}
+like(
+    _dies(
+        sub {
+            Developer::Dashboard::CLI::Ticket::apply_ticket_status(
+                session   => 'DD-797',
+                dashboard => '/tmp/custom-dashboard',
+                tmux      => sub {
+                    my (%call) = @_;
+                    return { exit_code => 0, stdout => '', stderr => '' } if $call{args}[0] eq 'show-options' && $call{args}[2] eq '@dd_ticket_status_default';
+                    return { exit_code => 0, stdout => "#[default-status]\n", stderr => '' } if $call{args}[0] eq 'show-options' && $call{args}[2] eq 'status-format[0]';
+                    return { exit_code => 7, stdout => "save-out\n", stderr => "save-err\n" } if $call{args}[0] eq 'set-option' && $call{args}[2] eq '@dd_ticket_status_default';
+                    return { exit_code => 0, stdout => '', stderr => '' };
+                },
+            );
+        }
+    ),
+    qr/Unable to record tmux ticket default status for 'DD-797': save-err\nsave-out\n/,
+    'apply_ticket_status surfaces failures while recording the default tmux status row',
 );
 
 {
@@ -1379,6 +1883,11 @@ SH
     like( do { local $/; <$tmux_log_fh> }, qr/attach-session -t DD-800/, 'tmux_command runs tmux with the requested argv' );
     close $tmux_log_fh;
 }
+like(
+    _dies( sub { Developer::Dashboard::CLI::Ticket::tmux_command( args => 'attach-session -t DD-800' ) } ),
+    qr/tmux args must be an array reference/,
+    'tmux_command rejects non-array tmux argv payloads',
+);
 
 is_deeply(
     [ Developer::Dashboard::CLI::Query::_split_query_args() ],
@@ -1670,9 +2179,12 @@ my $cpanm_log = File::Spec->catfile( $fake_bin, 'cpanm.log' );
 my $apt_log = File::Spec->catfile( $fake_bin, 'apt.log' );
 my $apk_log = File::Spec->catfile( $fake_bin, 'apk.log' );
 my $brew_log = File::Spec->catfile( $fake_bin, 'brew.log' );
+my $make_log = File::Spec->catfile( $fake_bin, 'make.log' );
 my $npx_log = File::Spec->catfile( $fake_bin, 'npx.log' );
+my $python_log = File::Spec->catfile( $fake_bin, 'python.log' );
 my $sudo_log = File::Spec->catfile( $fake_bin, 'sudo.log' );
 my $dashboard_log = File::Spec->catfile( $fake_bin, 'dashboard.log' );
+my $docker_log = File::Spec->catfile( $fake_bin, 'docker.log' );
 my $dependency_log = File::Spec->catfile( $fake_bin, 'dependency-install.log' );
 _write_file(
     File::Spec->catfile( $fake_bin, 'cpanm' ),
@@ -1724,6 +2236,32 @@ SH
     0755,
 );
 _write_file(
+    File::Spec->catfile( $fake_bin, 'python' ),
+    <<"SH",
+#!/bin/sh
+printf '%s|cwd=%s\\n' "\$*" "\$PWD" >> "$python_log"
+printf 'PYTHON:%s\\n' "\$*" >> "$dependency_log"
+if [ "\$DD_TEST_PYTHON_FAIL" = "1" ]; then
+  exit 1
+fi
+exit 0
+SH
+    0755,
+);
+_write_file(
+    File::Spec->catfile( $fake_bin, 'make' ),
+    <<"SH",
+#!/bin/sh
+printf '%s|cwd=%s\\n' "\$*" "\$PWD" >> "$make_log"
+printf 'MAKE:%s\\n' "\$*" >> "$dependency_log"
+if [ "\$DD_TEST_MAKE_FAIL" = "\${1:-default}" ]; then
+  exit 1
+fi
+exit 0
+SH
+    0755,
+);
+_write_file(
     File::Spec->catfile( $fake_bin, 'sudo' ),
     <<"SH",
 #!/bin/sh
@@ -1744,6 +2282,19 @@ else
   printf 'DDFILE:%s\\n' "\$*" >> "$dependency_log"
 fi
 if [ "\$DD_TEST_DDFILE_FAIL" = "1" ]; then
+  exit 1
+fi
+exit 0
+SH
+    0755,
+);
+_write_file(
+    File::Spec->catfile( $fake_bin, 'docker' ),
+    <<"SH",
+#!/bin/sh
+printf '%s|cwd=%s\\n' "\$*" "\$PWD" >> "$docker_log"
+printf 'DOCKER:%s\\n' "\$*" >> "$dependency_log"
+if [ "\$DD_TEST_DOCKER_FAIL" = "1" ]; then
   exit 1
 fi
 exit 0
@@ -1810,10 +2361,14 @@ is_deeply(
         { id => 'install_aptfile',      label => 'Install aptfile dependencies' },
         { id => 'install_apkfile',      label => 'Install apkfile dependencies' },
         { id => 'install_dnfile',       label => 'Install dnfile dependencies' },
+        { id => 'install_wingetfile',   label => 'Install wingetfile dependencies' },
         { id => 'install_brewfile',     label => 'Install brewfile dependencies' },
         { id => 'install_package_json', label => 'Install package.json dependencies' },
+        { id => 'install_requirements_txt', label => 'Install requirements.txt dependencies' },
         { id => 'install_cpanfile',     label => 'Install cpanfile dependencies' },
         { id => 'install_cpanfile_local', label => 'Install cpanfile.local dependencies' },
+        { id => 'install_makefile',     label => 'Install Makefile dependencies' },
+        { id => 'install_dockerfile', label => 'Install dockerfile dependencies' },
         { id => 'install_ddfile',       label => 'Install ddfile dependencies' },
         { id => 'install_ddfile_local', label => 'Install ddfile.local dependencies' },
     ],
@@ -1835,8 +2390,12 @@ is_deeply(
 {
     my $label_skill = File::Spec->catdir( $ENV{HOME}, 'label-skill' );
     my $label_package_json = File::Spec->catfile( $label_skill, 'package.json' );
+    my $label_requirements = File::Spec->catfile( $label_skill, 'requirements.txt' );
+    my $label_makefile = File::Spec->catfile( $label_skill, 'Makefile' );
     make_path($label_skill);
     _write_file( $label_package_json, qq|{"name":"label-skill","version":"1.0.0"}\n| );
+    _write_file( $label_requirements, "requests==2.32.3\n" );
+    _write_file( $label_makefile, "all:\n\t\@:\n" );
     is(
         $manager->_dependency_progress_label( 'install_package_json', $label_skill ),
         "Install package.json dependencies from $label_package_json",
@@ -1862,6 +2421,54 @@ is_deeply(
         "Install package.json dependencies from $label_package_json (error: Failed to install skill Node dependencies for $label_skill: npm blew up with details)",
         '_dependency_progress_label carries one compact failure reason into the visible progress board',
     );
+    is(
+        $manager->_dependency_progress_label( 'install_requirements_txt', $label_skill ),
+        "Install requirements.txt dependencies from $label_requirements",
+        '_dependency_progress_label surfaces the detected requirements.txt path while pip work is in progress',
+    );
+    is(
+        $manager->_dependency_progress_label(
+            'install_requirements_txt',
+            $label_skill,
+            result => { success => 1, skipped => 1 },
+        ),
+        'Install requirements.txt dependencies (skipped: requirements.txt not present)',
+        '_dependency_progress_label makes skipped requirements.txt work explicit in the progress board',
+    );
+    is(
+        $manager->_dependency_progress_label(
+            'install_requirements_txt',
+            $label_skill,
+            result => {
+                error => "Failed to install skill Python dependencies for $label_skill: pip blew up\nwith details",
+            },
+        ),
+        "Install requirements.txt dependencies from $label_requirements (error: Failed to install skill Python dependencies for $label_skill: pip blew up with details)",
+        '_dependency_progress_label carries requirements.txt failures into the visible progress board',
+    );
+    is(
+        $manager->_dependency_progress_label( 'install_makefile', $label_skill ),
+        "Install Makefile dependencies from $label_makefile",
+        '_dependency_progress_label surfaces the detected Makefile path while make work is in progress',
+    );
+    {
+        local $ENV{DD_TEST_OS} = 'linux';
+        local $ENV{DD_TEST_DEBIAN_LIKE} = 1;
+        local $ENV{DD_TEST_ALPINE} = 0;
+        local $ENV{DD_TEST_FEDORA} = 0;
+        _write_file( File::Spec->catfile( $label_skill, 'aptfile' ), "jq\n" );
+        _write_file( File::Spec->catfile( $label_skill, 'brewfile' ), "jq\n" );
+        is_deeply(
+            $manager->dependency_progress_tasks_for_skill_path($label_skill),
+            [
+                { id => 'install_aptfile', label => 'Install aptfile dependencies' },
+                { id => 'install_package_json', label => 'Install package.json dependencies' },
+                { id => 'install_requirements_txt', label => 'Install requirements.txt dependencies' },
+                { id => 'install_makefile', label => 'Install Makefile dependencies' },
+            ],
+            'dependency_progress_tasks_for_skill_path keeps only present cross-platform manifests plus the host-relevant package manager task',
+        );
+    }
 }
 is( $manager->get_skill_path('missing'), undef, 'get_skill_path returns undef for missing skills' );
 is( $manager->_normalize_install_source('browser'), 'https://github.com/manif3station/browser', '_normalize_install_source expands bare skill names against the official GitHub base' );
@@ -2040,7 +2647,10 @@ my $dep_repo = _create_skill_repo(
     with_apkfile => 1,
     with_ddfile  => 1,
     with_ddfile_local => 1,
+    with_makefile => 1,
+    with_dockerfile => 1,
     with_package_json => 1,
+    with_requirements_txt => 1,
     with_cpanfile_local => 1,
 );
 my $install = $manager->install( 'file://' . $dep_repo );
@@ -2077,15 +2687,15 @@ open my $dependency_log_fh, '<', $dependency_log or die "Unable to read $depende
 my @dependency_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$dependency_log_fh>;
 close $dependency_log_fh;
 is_deeply(
-    [ map { (/^(DDFILE_LOCAL|DDFILE|APT|BREW|NPM|CPANM):/)[0] } @dependency_steps[-6 .. -1] ],
-    [ 'APT', 'NPM', 'CPANM', 'CPANM', 'DDFILE', 'DDFILE_LOCAL' ],
-    '_install_skill_dependencies follows the documented aptfile -> apkfile -> dnfile -> brewfile -> package.json -> cpanfile -> cpanfile.local -> ddfile -> ddfile.local order on Debian-like hosts while leaving apkfile, dnfile, and brewfile inactive',
+    [ map { (/^(DDFILE_LOCAL|DDFILE|DOCKER|APT|BREW|NPM|PYTHON|CPANM|MAKE):/)[0] } @dependency_steps[-12 .. -1] ],
+    [ 'APT', 'NPM', 'PYTHON', 'CPANM', 'CPANM', 'MAKE', 'MAKE', 'MAKE', 'MAKE', 'DOCKER', 'DDFILE', 'DDFILE_LOCAL' ],
+    '_install_skill_dependencies follows the documented aptfile -> apkfile -> dnfile -> brewfile -> package.json -> requirements.txt -> cpanfile -> cpanfile.local -> Makefile -> dockerfile -> ddfile -> ddfile.local order on Debian-like hosts while leaving apkfile, dnfile, and brewfile inactive',
 );
 open my $cpanm_log_fh, '<', $cpanm_log or die "Unable to read $cpanm_log: $!";
 my @cpanm_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$cpanm_log_fh>;
 close $cpanm_log_fh;
-like( $cpanm_steps[-2], qr/^--notest -L \Q$ENV{HOME}\/skills-home\/perl5\E --cpanfile .*\/cpanfile --installdeps /, '_install_skill_dependencies installs cpanfile dependencies into HOME perl5 with cpanm --notest' );
-like( $cpanm_steps[-1], qr/^--notest -L .*\/perl5 --cpanfile .*\/cpanfile\.local --installdeps /, '_install_skill_dependencies installs cpanfile.local dependencies into the skill-local perl5 root with cpanm --notest' );
+like( $cpanm_steps[-2], qr/^--notest -L \Q$ENV{HOME}\/skills-home\/perl5\E --cpanfile .*\/cpanfile --installdeps \.$/, '_install_skill_dependencies installs cpanfile dependencies into HOME perl5 with cpanm --notest from the skill root itself' );
+like( $cpanm_steps[-1], qr/^--notest -L .*\/perl5 --cpanfile .*\/cpanfile\.local --installdeps \.$/, '_install_skill_dependencies installs cpanfile.local dependencies into the skill-local perl5 root with cpanm --notest from the skill root itself' );
 open my $npm_log_fh, '<', $npx_log or die "Unable to read $npx_log: $!";
 my @npm_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$npm_log_fh>;
 close $npm_log_fh;
@@ -2094,6 +2704,57 @@ like(
     qr/^--yes npm install dep-skill-runtime\@\^1\.2\.3 dep-skill-dev\@\^4\.5\.6\|cwd=\Q$ENV{HOME}\E\/skills-home\/\.developer-dashboard\/cache\/node-package-installs\/npm-install-/,
     '_install_skill_dependencies stages package.json work under the dashboard runtime cache through npx instead of using bare HOME as the npm project root',
 );
+open my $python_log_fh, '<', $python_log or die "Unable to read $python_log: $!";
+my @python_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$python_log_fh>;
+close $python_log_fh;
+is(
+    $python_steps[-1],
+    "-m pip install --user --requirement $dep_skill_root/requirements.txt|cwd=$dep_skill_root",
+    '_install_skill_dependencies installs requirements.txt through python -m pip install --user from the installed skill root',
+);
+open my $make_log_fh, '<', $make_log or die "Unable to read $make_log: $!";
+my @make_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$make_log_fh>;
+close $make_log_fh;
+is_deeply(
+    [ @make_steps[ -4 .. -1 ] ],
+    [
+        "|cwd=$dep_skill_root",
+        "test|cwd=$dep_skill_root",
+        "install|cwd=$dep_skill_root",
+        "clean|cwd=$dep_skill_root",
+    ],
+    '_install_skill_dependencies runs the default Makefile command chain before ddfile processing',
+);
+open my $docker_log_fh, '<', $docker_log or die "Unable to read $docker_log: $!";
+my @docker_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$docker_log_fh>;
+close $docker_log_fh;
+like(
+    $docker_steps[-1],
+    qr/^build -t dep-skill -f \Q$dep_skill_root\E\/dockerfile \Q$dep_skill_root\E\|cwd=\Q$dep_skill_root\E$/,
+    '_install_skill_dependencies builds dockerfile-based skill images from the installed skill root',
+);
+{
+    unlink $make_log;
+    my $skip_test_manager = Developer::Dashboard::SkillManager->new(
+        paths      => $skill_paths,
+        skip_tests => 1,
+    );
+    my $skip_make = $skip_test_manager->_install_skill_makefile($dep_skill_root);
+    ok( !$skip_make->{error}, '_install_skill_makefile succeeds when --notest-style skips are requested' )
+      or diag $skip_make->{error};
+    open my $skip_make_fh, '<', $make_log or die "Unable to read $make_log after skip-test install: $!";
+    my @skip_make_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$skip_make_fh>;
+    close $skip_make_fh;
+    is_deeply(
+        \@skip_make_steps,
+        [
+            "|cwd=$dep_skill_root",
+            "install|cwd=$dep_skill_root",
+            "clean|cwd=$dep_skill_root",
+        ],
+        '_install_skill_makefile skips the test target when the manager is configured for --notest installs',
+    );
+}
 ok( -d File::Spec->catdir( $ENV{HOME}, 'skills-home', 'node_modules', 'dep-skill-runtime' ), '_install_skill_dependencies merges staged Node dependencies into the manager HOME node_modules tree' );
 ok( -d File::Spec->catdir( $ENV{HOME}, 'skills-home', 'node_modules', 'dep-skill-dev' ), '_install_skill_dependencies merges staged dev Node dependencies into the manager HOME node_modules tree' );
 {
@@ -2153,6 +2814,36 @@ ok( !$home_manifest_result->{error}, '_install_skill_package_json ignores an npm
   or diag $home_manifest_result->{error};
 ok( -d File::Spec->catdir( $ENV{HOME}, 'skills-home', 'node_modules', 'left-pad' ), '_install_skill_package_json still lands packages in the manager HOME node_modules tree when HOME/package.json is npm-invalid' );
 {
+    local $ENV{PATH} = $fake_bin;
+    my $portable_copy_result = $manager->_install_skill_package_json($home_manifest_skill);
+    ok( !$portable_copy_result->{error}, '_install_skill_package_json merges staged Node dependencies without requiring a Unix cp command on PATH' )
+      or diag $portable_copy_result->{error};
+    ok( -d File::Spec->catdir( $ENV{HOME}, 'skills-home', 'node_modules', 'left-pad' ), '_install_skill_package_json still merges the staged node_modules tree when PATH omits cp' );
+}
+{
+    my $runner_home = tempdir( CLEANUP => 1 );
+    my $runner_paths = Developer::Dashboard::PathRegistry->new( home => $runner_home );
+    my $runner = Developer::Dashboard::CollectorRunner->new(
+        collectors => Developer::Dashboard::Collector->new( paths => $runner_paths ),
+        files      => Developer::Dashboard::FileRegistry->new( paths => $runner_paths ),
+        paths      => $runner_paths,
+    );
+    local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+    no warnings 'redefine';
+    local *POSIX::setsid = sub { die "setsid should not run on Windows\n" };
+    ok( $runner->_detach_process_session, '_detach_process_session skips POSIX::setsid on Windows collector loops' );
+}
+is(
+    $manager->_remove_tree_error_text(
+        [
+            { 'C:\\Users\\Docker\\.developer-dashboard\\skills\\browser' => 'Permission denied' },
+            'fallback cleanup message',
+        ]
+    ),
+    'C:\\Users\\Docker\\.developer-dashboard\\skills\\browser: Permission denied, fallback cleanup message',
+    '_remove_tree_error_text renders structured remove_tree errors without Perl hash stringification',
+);
+{
     local $ENV{DD_TEST_NPM_NO_MODULES} = '1';
     my $no_modules_result = $manager->_install_skill_package_json($home_manifest_skill);
     ok( !$no_modules_result->{error}, '_install_skill_package_json treats a successful npm run without a node_modules tree as a successful no-op merge' )
@@ -2165,6 +2856,8 @@ is( $metadata->{has_ddfile}, 1, 'skill metadata records ddfile presence' );
 is( $metadata->{has_cpanfile}, 1, 'skill metadata records cpanfile presence' );
 is( $metadata->{has_aptfile}, 1, 'skill metadata records aptfile presence' );
 is( $metadata->{has_apkfile}, 1, 'skill metadata records apkfile presence' );
+is( $metadata->{has_makefile}, 1, 'skill metadata records Makefile presence' );
+is( $metadata->{has_dockerfile}, 1, 'skill metadata records dockerfile presence' );
 is( $metadata->{has_cpanfile_local}, 1, 'skill metadata records cpanfile.local presence' );
 is_deeply( $metadata->{docker_services}, ['postgres'], 'skill metadata records docker service folders' );
 is_deeply( $metadata->{cli_commands}, ['run-test'], 'skill metadata records cli commands only, not hook directories' );
@@ -2180,6 +2873,7 @@ my $usage = $manager->usage('dep-skill');
 ok( !$usage->{error}, 'usage succeeds for an installed skill' ) or diag $usage->{error};
 ok( $usage->{enabled}, 'usage reports enabled state for active skills' );
 ok( scalar( grep { $_->{name} eq 'run-test' && $_->{has_hooks} } @{ $usage->{cli} } ), 'usage reports command hook metadata' );
+ok( $usage->{config}{has_makefile}, 'usage reports Makefile presence in the skill config metadata' );
 ok( scalar( grep { $_ eq 'index' } @{ $usage->{pages}{entries} } ), 'usage reports dashboard pages' );
 ok( scalar( grep { $_ eq 'nav/skill.tt' } @{ $usage->{pages}{nav_entries} } ), 'usage reports nav pages separately' );
 ok( scalar( grep { $_->{name} eq 'postgres' } @{ $usage->{docker}{services} } ), 'usage reports docker services' );
@@ -2463,15 +3157,15 @@ ok( !$manager->install( 'file://' . $no_dep_repo )->{error}, 'skill manager inst
     my $error;
     {
         no warnings 'redefine';
-        local *Developer::Dashboard::SkillManager::capture = sub (&) {
-            die "synthetic npm capture failure\n";
+        local *Developer::Dashboard::SkillManager::_run_streaming_command = sub {
+            die "synthetic npm streaming failure\n";
         };
         $error = eval { $manager->_install_skill_package_json($capture_fail_repo); 1 } ? '' : $@;
     }
     like(
         $error,
-        qr/synthetic npm capture failure/,
-        '_install_skill_package_json surfaces capture failures from the staged npm install workspace',
+        qr/synthetic npm streaming failure/,
+        '_install_skill_package_json surfaces streaming failures from the staged npm install workspace',
     );
     is(
         getcwd(),
@@ -2599,8 +3293,8 @@ SH
                 path           => File::Spec->catdir( $ENV{HOME}, 'skills-home', '.developer-dashboard', 'skills', 'manifest-global-skill' ),
                 version_before => undef,
                 version_after  => undef,
-                status         => 'unknown',
-                changed        => 0,
+                status         => 'installed',
+                changed        => 1,
             },
             {
                 manifest       => 'ddfile.local',
@@ -2609,11 +3303,11 @@ SH
                 path           => File::Spec->catdir( $manifest_root, 'skills', 'manifest-local-skill' ),
                 version_before => undef,
                 version_after  => undef,
-                status         => 'unknown',
-                changed        => 0,
+                status         => 'installed',
+                changed        => 1,
             },
         ],
-        'install_from_ddfiles processes ddfile before ddfile.local',
+        'install_from_ddfiles treats first-time manifest installs without VERSION metadata as installed and still processes ddfile before ddfile.local',
     );
 }
 {
@@ -2719,7 +3413,7 @@ SH
                 changed        => 0,
             },
         ],
-        'install_registered_skills reports the manifest update operations from the home root ddfile',
+        'install_registered_skills keeps existing root-ddfile refreshes without VERSION metadata classified as unknown',
     );
     my $registry_dispatcher = Developer::Dashboard::SkillDispatcher->new( paths => $registry_paths );
     like(
@@ -2773,6 +3467,23 @@ SH
     );
 }
 {
+    my $newline_gitignore_home = tempdir( CLEANUP => 1 );
+    my $newline_gitignore_paths = Developer::Dashboard::PathRegistry->new( home => $newline_gitignore_home );
+    my $newline_gitignore_manager = Developer::Dashboard::SkillManager->new( paths => $newline_gitignore_paths );
+    my $newline_gitignore_repo = _create_skill_repo( $test_repos, 'newline-gitignore-skill', with_cpanfile => 0 );
+    my $newline_gitignore = File::Spec->catfile( $newline_gitignore_paths->home_runtime_root, '.gitignore' );
+    _write_file( $newline_gitignore, '# dashboard runtime ignores' );
+
+    my $newline_gitignore_install = $newline_gitignore_manager->install("file://$newline_gitignore_repo");
+    ok( !$newline_gitignore_install->{error}, 'explicit install appends to an existing home .gitignore without a trailing newline' )
+      or diag $newline_gitignore_install->{error};
+    is(
+        _read_file($newline_gitignore),
+        "# dashboard runtime ignores\nskills/newline-gitignore-skill/\n",
+        'home .gitignore registration repairs a missing trailing newline before appending a new skill entry',
+    );
+}
+{
     my $multi_registry_home = tempdir( CLEANUP => 1 );
     my $multi_registry_paths = Developer::Dashboard::PathRegistry->new( home => $multi_registry_home );
     my $multi_registry_manager = Developer::Dashboard::SkillManager->new( paths => $multi_registry_paths );
@@ -2806,6 +3517,33 @@ SH
     is( _read_file($multi_root_ddfile), join( "\n", @multi_sources ) . "\n", 'install_many does not duplicate root ddfile entries on refresh' );
 }
 {
+    my $multi_fail_home = tempdir( CLEANUP => 1 );
+    my $multi_fail_paths = Developer::Dashboard::PathRegistry->new( home => $multi_fail_home );
+    my @multi_fail_events;
+    my $multi_fail_manager = Developer::Dashboard::SkillManager->new(
+        paths    => $multi_fail_paths,
+        progress => sub {
+            my ($event) = @_;
+            push @multi_fail_events, { %{$event} };
+        },
+    );
+    my $good_repo = _create_skill_repo( $test_repos, 'multi-fail-good', with_cpanfile => 0 );
+    my $bad_local_source = File::Spec->catdir( $test_repos, 'multi-fail-bad' );
+    make_path($bad_local_source);
+
+    my $multi_fail = $multi_fail_manager->install_many( "file://$good_repo", $bad_local_source );
+    ok( $multi_fail->{error}, 'install_many returns an explicit error when one later source fails' );
+    like(
+        $multi_fail->{error},
+        qr/^Failed to install skill source \Q$bad_local_source\E: Local skill source '\Q$bad_local_source\E' is missing a \.git directory/,
+        'install_many error text names the failing source and underlying cause',
+    );
+    is( scalar @{ $multi_fail->{results} || [] }, 2, 'install_many returns the completed per-source results before aborting' );
+    ok( @multi_fail_events >= 2, 'install_many emits visible progress events while processing multiple sources' );
+    is( $multi_fail_events[0]{status}, 'running', 'install_many marks the first source as running before work begins' );
+    is( $multi_fail_events[-1]{status}, 'failed', 'install_many marks the broken later source as failed before aborting' );
+}
+{
     my $cli_home = tempdir( CLEANUP => 1 );
     local $ENV{HOME} = $cli_home;
     my $cli_paths = Developer::Dashboard::PathRegistry->new( home => $cli_home );
@@ -2833,11 +3571,11 @@ SH
                 path           => File::Spec->catdir( $cli_paths->home_runtime_root, 'skills', 'cli-root-ddfile-skill' ),
                 version_before => undef,
                 version_after  => undef,
-                status         => 'unknown',
-                changed        => 0,
+                status         => 'installed',
+                changed        => 1,
             },
         ],
-        'bare dashboard skills install updates every source from the home root ddfile',
+        'bare dashboard skills install reports a first root-ddfile install without VERSION metadata as installed',
     );
 }
 {
@@ -2887,6 +3625,34 @@ SH
         $manager->update('broken-update-skill')->{error},
         qr/Failed to update skill:/,
         'update reports git pull failures',
+    );
+}
+{
+    my $uninstall_repo = _create_skill_repo( $test_repos, 'registered-uninstall-skill', with_cpanfile => 0 );
+    my $keep_repo      = _create_skill_repo( $test_repos, 'registered-keep-skill',      with_cpanfile => 0 );
+    my $root_ddfile    = File::Spec->catfile( $skill_paths->home_runtime_root, 'ddfile' );
+    $skill_paths->ensure_dir( $skill_paths->home_runtime_root );
+
+    my $install_source = 'file://' . $uninstall_repo;
+    my $keep_source    = 'file://' . $keep_repo;
+    _write_file(
+        $root_ddfile,
+        join(
+            "\n",
+            '# dashboard skills',
+            $install_source,
+            $keep_source,
+            'owner/registered-uninstall-skill',
+            q{},
+        ),
+    );
+
+    ok( !$manager->install($install_source)->{error}, 'registered-uninstall-skill installs cleanly before uninstalling it' );
+    ok( !$manager->uninstall('registered-uninstall-skill')->{error}, 'uninstall succeeds for a skill registered in the root ddfile' );
+    is(
+        _read_file($root_ddfile),
+        join( "\n", '# dashboard skills', $keep_source, q{} ),
+        'uninstall removes matching root ddfile entries while preserving unrelated sources and comments',
     );
 }
 {
@@ -3636,6 +4402,18 @@ sub _create_skill_repo {
     if ( $args{with_ddfile_local} ) {
         _write_file( 'ddfile.local', "shared-local-skill\n" );
     }
+    if ( $args{with_makefile} ) {
+    if ( $args{with_dockerfile} ) {
+        _write_file(
+            'dockerfile',
+            "FROM alpine:latest\nRUN echo 'test dockerfile'\n",
+        );
+    }
+        _write_file(
+            'Makefile',
+            ".PHONY: all test install clean\nall:\n\t\@:\ntest:\n\t\@:\ninstall:\n\t\@:\nclean:\n\t\@:\n",
+        );
+    }
     if ( $args{with_brewfile} ) {
         _write_file( 'brewfile', "jq\n" );
     }
@@ -3644,6 +4422,9 @@ sub _create_skill_repo {
             'package.json',
             qq|{"name":"$name-node","version":"0.01.0","dependencies":{"$name-runtime":"^1.2.3"},"devDependencies":{"$name-dev":"^4.5.6"}}\n|
         );
+    }
+    if ( $args{with_requirements_txt} ) {
+        _write_file( 'requirements.txt', "requests==2.32.3\nrich==13.9.4\n" );
     }
     if ( $args{with_cpanfile_local} ) {
         _write_file( 'cpanfile.local', "requires 'YAML::XS';\n" );
@@ -3741,18 +4522,301 @@ sub _dies {
     my $output = '';
     open my $fh, '>', \$output or die "Unable to open scalar handle for progress output: $!";
     my $progress = Developer::Dashboard::CLI::Progress->new(
+        title   => 'dashboard skills install progress',
+        tasks   => [
+            { id => 'fetch_source',   label => 'Fetch skill source' },
+            { id => 'prepare_layout', label => 'Prepare skill layout' },
+        ],
+        stream  => $fh,
+        dynamic => 0,
+    );
+    $progress->update(
+        {
+            add_tasks => [
+                { id => 'install_package_json', label => 'Install package.json dependencies' },
+                { id => 'install_cpanfile',     label => 'Install cpanfile dependencies' },
+            ],
+        }
+    );
+    like( $output, qr/\[ \] Install package\.json dependencies/, 'CLI::Progress can append newly discovered tasks after the board is created' );
+    like( $output, qr/\[ \] Install cpanfile dependencies/, 'CLI::Progress keeps appended tasks pending until work begins' );
+}
+
+{
+    require Developer::Dashboard::CLI::Progress;
+    my $output = '';
+    open my $fh, '>', \$output or die "Unable to open scalar handle for progress output: $!";
+    my $progress = Developer::Dashboard::CLI::Progress->new(
+        title   => 'dashboard skills install progress',
+        max_detail_lines => 10,
+        tasks   => [
+            { id => 'install_brewfile',     label => 'Install brewfile dependencies' },
+            { id => 'install_package_json', label => 'Install package.json dependencies' },
+            { id => 'install_requirements_txt', label => 'Install requirements.txt dependencies' },
+        ],
+        stream  => $fh,
+        dynamic => 1,
+    );
+    $progress->update(
+        {
+            task_id      => 'install_brewfile',
+            status       => 'running',
+            label        => 'Install brewfile dependencies from /tmp/skill/brewfile',
+            detail_lines => [ map { sprintf 'brew line %02d', $_ } 1 .. 12 ],
+        }
+    );
+    like(
+        $output,
+        qr/-> Install brewfile dependencies from \/tmp\/skill\/brewfile\n(?:   .*?\n){10}\[ \] Install package\.json dependencies\n\[ \] Install requirements\.txt dependencies/s,
+        'CLI::Progress renders a ten-line rolling detail window beneath the active task without displacing later epic tasks',
+    );
+    unlike( $output, qr/brew line 01/, 'CLI::Progress drops detail lines older than the rolling ten-line window' );
+    like( $output, qr/brew line 12/, 'CLI::Progress keeps the newest detail lines in the rolling window' );
+    $progress->update(
+        {
+            task_id => 'install_brewfile',
+            status  => 'done',
+            label   => 'Install brewfile dependencies from /tmp/skill/brewfile',
+        }
+    );
+    my @boards = $output =~ /(dashboard skills install progress.*?)(?=dashboard skills install progress|\z)/sg;
+    my $last_board = $boards[-1] || '';
+    unlike( $last_board, qr/brew line 12/, 'CLI::Progress collapses active detail lines once the task completes successfully' );
+}
+
+{
+    require Developer::Dashboard::CLI::Progress;
+    my $output = '';
+    open my $fh, '>', \$output or die "Unable to open scalar handle for progress output: $!";
+    my $progress = Developer::Dashboard::CLI::Progress->new(
         title   => 'dashboard restart progress',
         tasks   => [ { id => 'stop_web', label => 'Stop dashboard web service' } ],
         stream  => $fh,
         dynamic => 0,
         color   => 1,
     );
-    $progress->update( { task_id => 'stop_web', status => 'running' } );
-    like( $output, qr/\x1b\[33m->\x1b\[0m Stop dashboard web service/, 'CLI::Progress colors the running marker yellow when color output is enabled' );
+    $progress->update(
+        {
+            task_id      => 'stop_web',
+            status       => 'running',
+            detail_lines => ['waiting for listener'],
+        }
+    );
+    like( $output, qr/\x1b\[34m->\x1b\[0m Stop dashboard web service/, 'CLI::Progress colors the running marker blue when color output is enabled' );
+    like( $output, qr/   \x1b\[34mwaiting for listener\x1b\[0m/, 'CLI::Progress colors running detail lines blue when color output is enabled' );
     $progress->update( { task_id => 'stop_web', status => 'done' } );
     like( $output, qr/\x1b\[32m\[OK\]\x1b\[0m Stop dashboard web service/, 'CLI::Progress colors the done marker green when color output is enabled' );
-    $progress->update( { task_id => 'stop_web', status => 'failed' } );
+    $progress->update(
+        {
+            task_id      => 'stop_web',
+            status       => 'failed',
+            detail_lines => ['listener never stopped'],
+        }
+    );
     like( $output, qr/\x1b\[31m\[X\]\x1b\[0m Stop dashboard web service/, 'CLI::Progress colors the failed marker red when color output is enabled' );
+    like( $output, qr/   \x1b\[31mlistener never stopped\x1b\[0m/, 'CLI::Progress colors failed detail lines red when color output is enabled' );
+}
+
+{
+    require Developer::Dashboard::CLI::Progress;
+
+    my $invalid_array_error;
+    eval { Developer::Dashboard::CLI::Progress->new( tasks => {} ); 1 } or $invalid_array_error = $@;
+    like( $invalid_array_error, qr/Progress tasks must be an array reference/, 'CLI::Progress rejects non-array task lists' );
+
+    my $missing_id_error;
+    eval { Developer::Dashboard::CLI::Progress->new( tasks => [ {} ] ); 1 } or $missing_id_error = $@;
+    like( $missing_id_error, qr/Progress task missing id/, 'CLI::Progress rejects task entries without ids' );
+
+    my $output = '';
+    open my $fh, '>', \$output or die "Unable to open scalar handle for progress output: $!";
+    my $progress = Developer::Dashboard::CLI::Progress->new(
+        title   => 'dashboard progress edge coverage',
+        tasks   => [ { id => 'only_task', label => 'Only task label' } ],
+        stream  => $fh,
+        dynamic => 0,
+        color   => 0,
+    );
+
+    is( $progress->_detail_line_limit, undef, 'CLI::Progress leaves the detail-line limit undefined when no cap is configured' );
+    is( $progress->_status_prefix('pending'), '[ ]', 'CLI::Progress uses the pending prefix for unknown statuses' );
+    is( $progress->_colorize( '[ ]', 'pending' ), '[ ]', 'CLI::Progress leaves pending markers uncolored' );
+    is( $progress->_colorize_detail( 'detail line', 'pending' ), 'detail line', 'CLI::Progress leaves pending detail text uncolored' );
+    like( $progress->render_text, qr/\[ \] Only task label/, 'CLI::Progress render_text includes the pending task board text' );
+
+    my $callback = $progress->callback;
+    ok( ref($callback) eq 'CODE', 'CLI::Progress callback returns a coderef' );
+    ok( $callback->( { task_id => 'only_task', status => 'running', label => 'Only task running' } ), 'CLI::Progress callback forwards runtime events to update' );
+    like( $output, qr/-> Only task running/, 'CLI::Progress callback updates the rendered board' );
+
+    ok( $progress->add_tasks(), 'CLI::Progress ignores missing appended task lists' );
+    ok( $progress->add_tasks('not-an-array'), 'CLI::Progress ignores non-array appended task lists' );
+    ok(
+        $progress->add_tasks(
+            [
+                'not-a-hash',
+                {},
+                { id => 'only_task', label => 'Duplicate id stays ignored' },
+                { id => 'second_task', label => 'Second task label' },
+            ]
+        ),
+        'CLI::Progress ignores invalid or duplicate appended tasks while accepting valid new tasks'
+    );
+    like( $output, qr/\[ \] Second task label/, 'CLI::Progress appends only valid new tasks' );
+
+    ok( $progress->update( { add_tasks => [ { id => 'third_task', label => 'Third task label' } ] } ), 'CLI::Progress accepts add_tasks-only events' );
+    like( $output, qr/\[ \] Third task label/, 'CLI::Progress add_tasks-only events still render appended tasks' );
+
+    ok(
+        $progress->update(
+            {
+                task_id     => 'second_task',
+                status      => 'running',
+                label       => 'Second task running',
+                detail_line => 'one appended line',
+            }
+        ),
+        'CLI::Progress accepts one-by-one detail lines'
+    );
+    like( $output, qr/one appended line/, 'CLI::Progress renders appended single detail lines' );
+
+    ok(
+        $progress->update(
+            {
+                task_id      => 'second_task',
+                status       => 'failed',
+                detail_lines => 'not-an-array',
+            }
+        ),
+        'CLI::Progress clears detail lines when detail_lines is not an array reference'
+    );
+    my @boards = $output =~ /(dashboard progress edge coverage.*?)(?=dashboard progress edge coverage|\z)/sg;
+    my $last_board = $boards[-1] || '';
+    unlike( $last_board, qr/one appended line/, 'CLI::Progress drops stale detail lines when a malformed detail_lines payload arrives' );
+
+    my $zero_output = '';
+    open my $zero_fh, '>', \$zero_output or die "Unable to open scalar handle for zero-limit progress output: $!";
+    my $zero_limit_progress = Developer::Dashboard::CLI::Progress->new(
+        title            => 'dashboard zero detail limit',
+        tasks            => [ { id => 'zero_task', label => 'Zero task label' } ],
+        stream           => $zero_fh,
+        dynamic          => 0,
+        max_detail_lines => 0,
+    );
+    is( $zero_limit_progress->_detail_line_limit, 10, 'CLI::Progress normalizes a falsey configured detail limit back to ten lines' );
+    $zero_limit_progress->update(
+        {
+            task_id      => 'zero_task',
+            status       => 'running',
+            detail_lines => [ map { sprintf 'line %02d', $_ } 1 .. 12 ],
+        }
+    );
+    unlike( $zero_output, qr/line 01/, 'CLI::Progress trims older lines when a falsey configured detail limit falls back to ten lines' );
+    like( $zero_output, qr/line 12/, 'CLI::Progress keeps the newest detail lines after the falsey limit fallback' );
+
+    my $undef_output = '';
+    open my $undef_fh, '>', \$undef_output or die "Unable to open scalar handle for undef-limit progress output: $!";
+    my $undef_limit_progress = Developer::Dashboard::CLI::Progress->new(
+        title            => 'dashboard undef detail limit',
+        tasks            => [ { id => 'undef_task', label => 'Undef task label' } ],
+        stream           => $undef_fh,
+        dynamic          => 0,
+        max_detail_lines => undef,
+    );
+    is( $undef_limit_progress->_detail_line_limit, undef, 'CLI::Progress preserves an explicit undef detail-line limit as unlimited' );
+    $undef_limit_progress->update(
+        {
+            task_id      => 'undef_task',
+            status       => 'running',
+            detail_lines => [ map { sprintf 'line %02d', $_ } 1 .. 12 ],
+        }
+    );
+    like( $undef_output, qr/line 01/, 'CLI::Progress keeps older detail lines when the configured limit is explicitly undef' );
+    like( $undef_output, qr/line 12/, 'CLI::Progress also keeps the newest detail lines when the configured limit is explicitly undef' );
+
+    ok( $undef_limit_progress->finish, 'CLI::Progress finish succeeds without emitting a newline when the board is static' );
+}
+{
+    my $versionless_skill_root = tempdir( CLEANUP => 1 );
+    _write_file( File::Spec->catfile( $versionless_skill_root, '.env' ), "# no version here\nNAME=demo\n" );
+    is(
+        $manager->_skill_env_version($versionless_skill_root),
+        undef,
+        '_skill_env_version returns undef when the .env file has no VERSION assignment',
+    );
+}
+{
+    my $label_root = tempdir( CLEANUP => 1 );
+    is(
+        $manager->_dependency_progress_label(
+            'install_aptfile',
+            $label_root,
+            result => { error => "apt exploded\nwith details" },
+        ),
+        'Install aptfile dependencies (error: apt exploded with details)',
+        '_dependency_progress_label still surfaces dependency errors when the manifest file is absent',
+    );
+}
+{
+    my $manifest_progress_home = tempdir( CLEANUP => 1 );
+    my $manifest_progress_paths = Developer::Dashboard::PathRegistry->new( home => $manifest_progress_home );
+    my @manifest_progress_events;
+    my $manifest_progress_manager = Developer::Dashboard::SkillManager->new(
+        paths    => $manifest_progress_paths,
+        progress => sub {
+            my ($event) = @_;
+            push @manifest_progress_events, { %{$event} };
+        },
+    );
+    my $manifest_dir = tempdir( CLEANUP => 1 );
+    my $broken_dependency = File::Spec->catdir( $manifest_dir, 'broken-dependency' );
+    make_path($broken_dependency);
+    my $manifest_path = File::Spec->catfile( $manifest_dir, 'ddfile' );
+    _write_file( $manifest_path, "$broken_dependency\n" );
+    my @operations;
+
+    my $manifest_failure = $manifest_progress_manager->_install_manifest_file(
+        $manifest_path,
+        manifest_name => 'ddfile',
+        skills_root   => File::Spec->catdir( $manifest_progress_paths->home_runtime_root, 'skills' ),
+        operations    => \@operations,
+        progress      => 1,
+    );
+    ok( $manifest_failure->{error}, '_install_manifest_file returns an explicit error when one manifest source fails' );
+    like(
+        $manifest_failure->{error},
+        qr/Local skill source '\Q$broken_dependency\E' is missing a \.git directory/,
+        '_install_manifest_file forwards the underlying manifest install failure',
+    );
+    is_deeply( \@operations, [], '_install_manifest_file records no completed operations when the first source fails' );
+    is_deeply(
+        [ map { $_->{status} } @manifest_progress_events ],
+        [ 'running', 'failed' ],
+        '_install_manifest_file emits running and failed progress events for a broken source',
+    );
+}
+{
+    my $default_fail_skill = _create_skill_repo( $test_repos, 'make-default-fail', with_cpanfile => 0 );
+    _write_file( File::Spec->catfile( $default_fail_skill, 'Makefile' ), "install:\n\t\@true\n" );
+    local $ENV{DD_TEST_MAKE_FAIL} = 'default';
+
+    my $default_make_failure = $manager->_install_skill_makefile($default_fail_skill);
+    ok( $default_make_failure->{error}, '_install_skill_makefile returns an explicit error when the default make target fails' );
+    like(
+        $default_make_failure->{error},
+        qr/^Failed to run skill Makefile target 'default' for \Q$default_fail_skill\E: /,
+        '_install_skill_makefile names the failing default target in its error message',
+    );
+}
+{
+    local $ENV{DD_TEST_MAKE_FAIL} = 'install';
+    my $install_target_make_failure = $manager->_install_skill_makefile($dep_skill_root);
+    ok( $install_target_make_failure->{error}, '_install_skill_makefile returns an explicit error when a named target fails' );
+    like(
+        $install_target_make_failure->{error},
+        qr/^Failed to run skill Makefile target 'install' for \Q$dep_skill_root\E: /,
+        '_install_skill_makefile names the failing non-default target in its error message',
+    );
 }
 
 done_testing();

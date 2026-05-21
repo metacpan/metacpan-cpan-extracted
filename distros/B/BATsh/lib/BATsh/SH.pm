@@ -3,6 +3,8 @@ package BATsh::SH;
 #
 # BATsh::SH - Pure Perl sh/bash interpreter
 #
+# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org>
+#
 # Implements sh/bash command set in Perl.
 # No external sh or bash required.
 #
@@ -10,19 +12,31 @@ package BATsh::SH;
 #   Variable assignment: VAR=value
 #   export VAR=value, export VAR, unset VAR
 #   echo, printf
-#   if/then/else/elif/fi
+#   if/then/elif/else/fi
 #   for VAR in list; do ... done
 #   while condition; do ... done
 #   until condition; do ... done
 #   case $var in pattern) ... ;; esac
-#   test / [ ... ]  (file tests, string, integer comparisons)
-#   cd, pwd, exit
-#   true, false, :
-#   read VAR
-#   $(( arithmetic ))
-#   $(...) command substitution (recursive BATsh execution)
+#   test / [ ... ]  (file, string, integer comparisons)
+#   cd, pwd, exit, true, false, :
+#   read VAR  (reads one line from STDIN)
+#   shift [N]  (shift positional parameters left)
+#   local VAR=value  (function-scoped variable)
+#   $(( arithmetic ))  -- +,-,*,/,%, and $1..$9 inside
+#   $( command ) and `command`  (command substitution, nested)
+#   name() { ... }, function name { ... }  (function definitions)
+#   cmd1 | cmd2 [| cmd3 ...]  (pipeline via tmpfile, 5.005_03)
+#   cmd1 && cmd2, cmd1 || cmd2, cmd1 ; cmd2  (compound commands)
+#   > >> < 2> 2>> 2>&1 1>&2  (I/O redirection)
+#   $VAR, ${VAR}, $1..$9, $@, $*, $#, $?, $$, $0
+#   ${VAR:-def}, ${VAR:=def}, ${VAR:+alt}
+#   ${VAR%pat}, ${VAR%%pat}  (shortest/longest suffix removal)
+#   ${VAR#pat}, ${VAR##pat}  (shortest/longest prefix removal)
+#   ${VAR/pat/rep}, ${VAR//pat/rep}  (first/all substitution)
+#   ${VAR^^}, ${VAR^}, ${VAR,,}, ${VAR,}  (case conversion)
+#   ${VAR:N:L}, ${VAR:N}  (substring)
+#   ${#VAR}  (string length)
 #   source / . file
-#   local VAR=value  (inside function context)
 #
 ######################################################################
 
@@ -34,13 +48,17 @@ BEGIN { pop @INC if $INC[-1] eq '.' }
 use File::Spec ();
 use Carp qw(croak);
 use vars qw($VERSION);
-$VERSION = '0.01';
+$VERSION = '0.02';
 $VERSION = $VERSION;
 
-require BATsh::Env;
+# Bareword filehandle globs for SH pipeline (Perl 5.005_03 compatible)
+use vars qw(*_SH_PIPE_SAVOUT *_SH_PIPE_SAVIN *_SH_PIPE_WFH *_SH_PIPE_RFH);
 
-# ----------------------------------------------------------------
-# State
+# Bareword filehandle globs for SH I/O redirection (Perl 5.005_03 compatible)
+use vars qw(*_SH_REDIR_SRC *_SH_REDIR_DST *_SH_REDIR_SAVOUT *_SH_REDIR_SAVERR *_SH_REDIR_SAVIN);
+
+# SH function registry -- must be package-level for access from _expand and _exec_line
+use vars qw(%_SH_FUNCTIONS);
 # ----------------------------------------------------------------
 my $LAST_STATUS = 0;   # $?
 my @FUNCTION_STACK = ();   # for 'local' variable scoping
@@ -112,6 +130,12 @@ sub _run_lines {
             next;
         }
 
+        # Function definition: "name() {" or "function name {"
+        if ($stripped =~ /\A(?:function\s+[A-Za-z_]|[A-Za-z_][A-Za-z0-9_]*\s*\(\s*\))/) {
+            ($status, $i) = _parse_function($class, \@lines, $i - 1, $opts_ref);
+            next;
+        }
+
         $status = _exec_line($class, $line, $opts_ref);
         $_CONTINUE = 0 if $_CONTINUE;
     }
@@ -132,11 +156,34 @@ sub _exec_line {
     # Shebang: treat as comment
     return 0 if $line =~ /\A#!/;
 
+    # Detect && / || / ; compound commands BEFORE expansion.
+    # These must be split before _expand so that short-circuit logic works.
+    my @compound = _split_sh_compound($line);
+    if (@compound > 1) {
+        return _exec_sh_compound($class, \@compound, $opts_ref);
+    }
+
+    # Detect pipeline BEFORE variable expansion to avoid expanding
+    # pipe-like characters inside command substitutions prematurely.
+    # _split_sh_pipe returns >1 segment only when bare | is present.
+    my @pipe_segs = _split_sh_pipe($line);
+    if (@pipe_segs > 1) {
+        return _exec_sh_pipe($class, \@pipe_segs, $opts_ref);
+    }
+
     # Expand variables and command substitutions
     $line = _expand($class, $line);
 
     # Strip trailing ;
     $line =~ s/\s*;\s*\z//;
+
+    # Detect I/O redirections: >, >>, <, 2>, 2>>, 2>&1
+    # Must be done after expansion so that variable-in-filename works.
+    my ($clean_line, $sh_redirs_ref) = _sh_strip_redirects($line);
+    if (@{$sh_redirs_ref}) {
+        return _sh_exec_with_redirs($class, $clean_line, $sh_redirs_ref, $opts_ref);
+    }
+    $line = $clean_line;
 
     my ($cmd, $rest) = _split_sh($line);
     return 0 unless defined $cmd && $cmd ne '';
@@ -174,6 +221,11 @@ sub _exec_line {
     if ($lc_cmd eq 'local')   { return _cmd_local($rest) }
     if ($lc_cmd eq 'set')     { return _cmd_set_sh($rest) }
 
+    # Defined SH function
+    if (exists $_SH_FUNCTIONS{$cmd}) {
+        return _call_sh_function($class, $cmd, $rest, $opts_ref);
+    }
+
     # Unknown: try as external (runs via Perl system)
     return _cmd_external($cmd, $rest);
 }
@@ -189,9 +241,88 @@ sub _expand {
     $str =~ s/\$\(\(\s*(.*?)\s*\)\)/_eval_arith($1)/ge;
 
     # $( command ) substitution
-    $str =~ s/\$\(([^)]*)\)/_cmd_subst($class, $1)/ge;
+    # Use _extract_cmd_subst to correctly handle nested () and quoted ) chars.
+    $str = _replace_cmd_subst($class, $str);
 
-    # ${VAR:-default} ${VAR:=default} ${VAR:+alt} ${VAR}
+    # backtick command substitution: `cmd`
+    $str =~ s/`([^`]*)`/_cmd_subst($class, $1)/ge;
+
+    # ${#VAR} -- length of value
+    $str =~ s/\$\{#([A-Za-z_][A-Za-z0-9_]*)\}/
+        do { my $v = BATsh::Env->get($1); defined $v ? length($v) : 0 }
+    /ge;
+
+    # ${VAR%%pattern} -- remove longest suffix   (MUST be before single %)
+    $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)%%([^}]*)\}/
+        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _sh_remove_suffix($v,$2,1) }
+    /ge;
+
+    # ${VAR%pattern}  -- remove shortest suffix  (single %, not %%)
+    $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)%(?!%)([^}]*)\}/
+        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _sh_remove_suffix($v,$2,0) }
+    /ge;
+
+    # ${VAR##pattern} -- remove longest prefix   (MUST be before single #)
+    $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)##([^}]*)\}/
+        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _sh_remove_prefix($v,$2,1) }
+    /ge;
+
+    # ${VAR#pattern}  -- remove shortest prefix  (single #, not ##)
+    $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)#(?!#)([^}]*)\}/
+        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _sh_remove_prefix($v,$2,0) }
+    /ge;
+
+    # ${VAR//pat/rep} -- replace all occurrences  (MUST be before single /)
+    $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)\/\/([^\/}]*)\/([^}]*)\}/
+        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _sh_replace($v,$2,$3,1) }
+    /ge;
+
+    # ${VAR/pat/rep} -- replace first occurrence  (single /, not //)
+    $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)\/(?!\/)([^\/}]*)\/([^}]*)\}/
+        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _sh_replace($v,$2,$3,0) }
+    /ge;
+
+    # ${VAR^^} -- uppercase all
+    $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)\^\^\}/
+        do { my $v = BATsh::Env->get($1); defined $v ? uc($v) : '' }
+    /ge;
+
+    # ${VAR^} -- uppercase first char
+    $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)\^\}/
+        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; ucfirst($v) }
+    /ge;
+
+    # ${VAR,,} -- lowercase all
+    $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*),,\}/
+        do { my $v = BATsh::Env->get($1); defined $v ? lc($v) : '' }
+    /ge;
+
+    # ${VAR,} -- lowercase first char
+    $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*),\}/
+        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; lcfirst($v) }
+    /ge;
+
+    # ${VAR:offset:length} and ${VAR:offset}
+    $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*):(-?\d+):(\d+)\}/
+        do {
+            my $v = BATsh::Env->get($1); $v = defined $v ? $v : '';
+            my $off = int($2); my $len = int($3);
+            $off = length($v) + $off if $off < 0;
+            $off = 0 if $off < 0;
+            substr($v, $off, $len)
+        }
+    /ge;
+    $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*):(-?\d+)\}/
+        do {
+            my $v = BATsh::Env->get($1); $v = defined $v ? $v : '';
+            my $off = int($2);
+            $off = length($v) + $off if $off < 0;
+            $off = 0 if $off < 0;
+            substr($v, $off)
+        }
+    /ge;
+
+    # ${VAR:-default} ${VAR:=default} ${VAR:+alt}
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*):-(.*?)\}/
         do { my $v = BATsh::Env->get($1); (defined $v && $v ne '') ? $v : $2 }
     /ge;
@@ -202,12 +333,51 @@ sub _expand {
             $v
         }
     /ge;
+    $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*):\+([^}]*)\}/
+        do { my $v = BATsh::Env->get($1); (defined $v && $v ne '') ? $2 : '' }
+    /ge;
+
+    # ${VAR} -- plain expansion
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)\}/
         do { my $v = BATsh::Env->get($1); defined $v ? $v : '' }
     /ge;
 
     # $? last status
     $str =~ s/\$\?/$LAST_STATUS/g;
+
+    # $$  PID
+    $str =~ s/\$\$/$$/g;
+
+
+    # $0 script name
+    $str =~ s/\$0/do { my $v=BATsh::Env->get('%0'); defined $v ? $v : '' }/ge;
+
+    # $1..$9 positional parameters
+    $str =~ s/\$([1-9])/
+        do {
+            my $n = $1;
+            my $v = BATsh::Env->get("%$n");
+            $v = BATsh::Env->get("BATSH_ARG$n") unless defined $v && $v ne '';
+            defined $v ? $v : ''
+        }
+    /ge;
+
+    # $@ and $* all positional parameters
+    $str =~ s/\$\@/do { my $v=BATsh::Env->get('%*'); defined $v ? $v : '' }/ge;
+
+    # $# number of positional parameters
+    $str =~ s/\$#/
+        do {
+            my $c = 0;
+            for my $nn (1..9) {
+                my $vv = BATsh::Env->get("%$nn");
+                $vv = BATsh::Env->get("BATSH_ARG$nn") unless defined $vv && $vv ne '';
+                last unless defined $vv && $vv ne '';
+                $c = $nn;
+            }
+            $c
+        }
+    /ge;
 
     # $VAR
     $str =~ s/\$([A-Za-z_][A-Za-z0-9_]*)/
@@ -222,14 +392,25 @@ sub _expand {
 # ----------------------------------------------------------------
 sub _eval_arith {
     my ($expr) = @_;
-    # Replace VAR names with numeric values
+    # Expand $1..$9 positional params before further processing
+    $expr =~ s/\$([1-9])/_arith_pos($1)/ge;
+    # Expand $VAR names with numeric values
+    $expr =~ s/\$([A-Za-z_][A-Za-z0-9_]*)/_arith_var($1)/ge;
+    # Replace bare VAR names with numeric values
     $expr =~ s/([A-Za-z_][A-Za-z0-9_]*)/_arith_var($1)/ge;
-    # Safe eval: digits, operators, parens only
+    # Safe eval: digits, operators, parens, spaces only
     if ($expr =~ /\A[\d\s\+\-\*\/\%\(\)]+\z/) {
         my $result = eval $expr;
         return defined $result ? int($result) : 0;
     }
     return 0;
+}
+
+sub _arith_pos {
+    my ($n) = @_;
+    my $v = BATsh::Env->get("%$n");
+    $v = BATsh::Env->get("BATSH_ARG$n") unless defined $v && $v ne '';
+    return (defined $v && $v =~ /\A-?\d+\z/) ? $v : 0;
 }
 
 sub _arith_var {
@@ -241,28 +422,103 @@ sub _arith_var {
 # ----------------------------------------------------------------
 # Command substitution $( cmd )
 # ----------------------------------------------------------------
+# _replace_cmd_subst: replace all $(...) in $str with their output.
+# Unlike a simple [^)]* regex, this function tracks nesting depth
+# and quoted strings so that $(cmd | perl -e "...)" works correctly.
+# ----------------------------------------------------------------
+sub _replace_cmd_subst {
+    my ($class, $str) = @_;
+    return '' unless defined $str;
+
+    my $result = '';
+    my @chars  = split //, $str;
+    my $n      = scalar @chars;
+    my $i      = 0;
+
+    while ($i < $n) {
+        my $ch = $chars[$i];
+
+        # $( ... ) -- find matching close paren respecting nesting and quotes
+        if ($ch eq '$' && $i+1 < $n && $chars[$i+1] eq '(') {
+            $i += 2;   # skip $(
+            my $depth  = 1;
+            my $body   = '';
+            my $in_sq  = 0;
+            my $in_dq  = 0;
+
+            while ($i < $n && $depth > 0) {
+                my $c = $chars[$i];
+
+                if ($in_sq) {
+                    if ($c eq "'") { $in_sq = 0 }
+                    $body .= $c; $i++; next;
+                }
+                if ($c eq "'" && !$in_dq) {
+                    $in_sq = 1; $body .= $c; $i++; next;
+                }
+                if ($c eq '"' && !$in_sq) {
+                    $in_dq = !$in_dq; $body .= $c; $i++; next;
+                }
+                if ($in_dq) {
+                    if ($c eq '\\') {
+                        $body .= $c; $i++;
+                        $body .= $chars[$i] if $i < $n; $i++; next;
+                    }
+                    $body .= $c; $i++; next;
+                }
+                if ($c eq '\\') {
+                    $body .= $c; $i++;
+                    $body .= $chars[$i] if $i < $n; $i++; next;
+                }
+                if ($c eq '(') { $depth++; $body .= $c; $i++; next }
+                if ($c eq ')') {
+                    $depth--;
+                    if ($depth == 0) { $i++; last }  # closing )
+                    $body .= $c; $i++; next;
+                }
+                $body .= $c; $i++;
+            }
+
+            $result .= _cmd_subst($class, $body);
+            next;
+        }
+
+        $result .= $ch; $i++;
+    }
+
+    return $result;
+}
+
+# ----------------------------------------------------------------
 sub _cmd_subst {
     my ($class, $cmd_str) = @_;
-    # Capture stdout via temporary file (5.005_03 compatible)
+    # Capture stdout via temporary file (Perl 5.005_03 compatible).
+    # We use _run_lines so that all BATsh::SH builtins, functions,
+    # and pipelines work recursively inside $(...) and `...`.
     my $tmpfile = File::Spec->catfile(
         File::Spec->tmpdir(), "batsh_cap_$$.tmp");
-    local *OLD_STDOUT;
-    open(OLD_STDOUT, '>&STDOUT') or return '';
-    local *CAPFH;
-    open(CAPFH, "> $tmpfile") or do { open(STDOUT, '>&OLD_STDOUT'); return '' };
-    open(STDOUT, '>&CAPFH');
+    local *_SUBST_SAVOUT;
+    open(_SUBST_SAVOUT, '>&STDOUT') or return '';
+    local *_SUBST_CAPFH;
+    open(_SUBST_CAPFH, "> $tmpfile")
+        or do { open(STDOUT, '>&_SUBST_SAVOUT'); return '' };
+    open(STDOUT, '>&_SUBST_CAPFH')
+        or do { close(_SUBST_CAPFH); open(STDOUT, '>&_SUBST_SAVOUT'); return '' };
+    close(_SUBST_CAPFH);
     eval {
+        # Use _run_lines for full recursive BATsh::SH execution.
+        # $cmd_str may contain pipes, builtins, functions, etc.
         my @sub_lines = split /\n/, $cmd_str;
         _run_lines($class, \@sub_lines, {});
     };
-    open(STDOUT, '>&OLD_STDOUT');
-    close(CAPFH);
-    close(OLD_STDOUT);
+    open(STDOUT, '>&_SUBST_SAVOUT');
+    close(_SUBST_SAVOUT);
     my $output = '';
-    if (open(READFH, "< $tmpfile")) {
+    local *_SUBST_READFH;
+    if (open(_SUBST_READFH, "< $tmpfile")) {
         local $/;
-        $output = <READFH>;
-        close(READFH);
+        $output = <_SUBST_READFH>;
+        close(_SUBST_READFH);
     }
     unlink $tmpfile;
     $output = '' unless defined $output;
@@ -423,12 +679,38 @@ sub _cmd_read {
 # shift
 # ----------------------------------------------------------------
 sub _cmd_shift {
-    # Shift positional params $1..$9
-    for my $n (1 .. 8) {
-        my $next = BATsh::Env->get('BATSH_ARG' . ($n + 1));
-        BATsh::Env->set('BATSH_ARG' . $n, defined($next) ? $next : '');
+    my ($rest) = @_;
+    $rest = '' unless defined $rest;
+    $rest =~ s/\A\s+//;
+
+    # Optional /N offset (bash: shift N shifts N positions)
+    my $n_shift = 1;
+    if ($rest =~ /\A(\d+)\s*\z/) { $n_shift = int($1); $n_shift = 1 if $n_shift < 1 }
+
+    for my $step (1 .. $n_shift) {
+        # Shift BATSH_ARG* (legacy)
+        for my $n (1 .. 8) {
+            my $next = BATsh::Env->get('BATSH_ARG' . ($n + 1));
+            BATsh::Env->set('BATSH_ARG' . $n, defined($next) ? $next : '');
+        }
+        BATsh::Env->set('BATSH_ARG9', '');
+
+        # Shift %1..%9 (used by _expand $1..$9)
+        for my $n (1 .. 8) {
+            my $next = BATsh::Env->get('%' . ($n + 1));
+            BATsh::Env->set('%' . $n, defined($next) ? $next : '');
+        }
+        BATsh::Env->set('%9', '');
+
+        # Rebuild %*
+        my @args;
+        for my $n (1 .. 9) {
+            my $v = BATsh::Env->get("%$n");
+            last unless defined $v && $v ne '';
+            push @args, $v;
+        }
+        BATsh::Env->set('%*', join(' ', @args));
     }
-    BATsh::Env->set('BATSH_ARG9', '');
     $LAST_STATUS = 0;
     return 0;
 }
@@ -439,9 +721,34 @@ sub _cmd_shift {
 sub _cmd_local {
     my ($rest) = @_;
     $rest =~ s/\A\s+//;
+
+    my ($var, $val);
     if ($rest =~ /\A([A-Za-z_][A-Za-z0-9_]*)=(.*)\z/s) {
-        BATsh::Env->set($1, $2);
+        ($var, $val) = ($1, $2);
+        # Strip surrounding quotes from value
+        $val =~ s/\A"(.*)"\z/$1/s;
+        $val =~ s/\A'(.*)'\z/$1/s;
     }
+    elsif ($rest =~ /\A([A-Za-z_][A-Za-z0-9_]*)\s*\z/) {
+        $var = $1;
+        $val = BATsh::Env->get($var);
+        $val = '' unless defined $val;
+    }
+    else {
+        $LAST_STATUS = 0;
+        return 0;
+    }
+
+    # Save old value in innermost function scope so it can be restored on return
+    if (@FUNCTION_STACK) {
+        my $frame = $FUNCTION_STACK[-1];
+        # Only save once per variable per frame (first local declaration wins)
+        unless (exists $frame->{$var}) {
+            my $old = BATsh::Env->get($var);
+            $frame->{$var} = defined $old ? $old : undef;
+        }
+    }
+    BATsh::Env->set($var, $val);
     $LAST_STATUS = 0;
     return 0;
 }
@@ -837,6 +1144,750 @@ sub _match_pattern {
 # ----------------------------------------------------------------
 # External command
 # ----------------------------------------------------------------
+# ----------------------------------------------------------------
+# _split_sh_pipe: split a SH command line on bare | characters,
+# respecting single-quoted, double-quoted, and $(...) regions.
+# Returns a list of segment strings; length 1 means no pipe found.
+# ----------------------------------------------------------------
+# _split_sh_compound: split a SH line on bare && / || / ;
+# Returns list of { op => '', cmd => '...' } hashrefs.
+# Length 1 means no compound operator found.
+# Respects single-quotes, double-quotes, and $(...) nesting.
+# ----------------------------------------------------------------
+# _sh_strip_redirects: parse SH-style redirections from a command line.
+#
+# Recognized forms (processed right-to-left, last one wins per fd):
+#   cmd > file       stdout overwrite
+#   cmd >> file      stdout append
+#   cmd < file       stdin
+#   cmd 2> file      stderr overwrite
+#   cmd 2>> file     stderr append
+#   cmd 2>&1         stderr to stdout (recorded as fd=2, file='&1')
+#   cmd 1>&2         stdout to stderr (recorded as fd=1, file='&2')
+#
+# Returns ($clean_cmd, \@redirs) where each redir is [fd, append, file].
+# Parsing respects single-quotes, double-quotes, and backslash escapes.
+# ----------------------------------------------------------------
+sub _sh_strip_redirects {
+    my ($line) = @_;
+    my @chars  = split //, $line;
+    my $n      = scalar @chars;
+    my @found;
+    my $clean  = '';
+    my $in_sq  = 0;
+    my $in_dq  = 0;
+    my $i      = 0;
+
+    while ($i < $n) {
+        my $ch = $chars[$i];
+
+        # Single-quote passthrough
+        if ($in_sq) {
+            if ($ch eq "'") { $in_sq = 0 }
+            $clean .= $ch; $i++; next;
+        }
+        if ($ch eq "'" && !$in_dq) { $in_sq = 1; $clean .= $ch; $i++; next }
+
+        # Double-quote toggle
+        if ($ch eq '"' && !$in_sq) { $in_dq = !$in_dq; $clean .= $ch; $i++; next }
+
+        # Inside double-quotes: only escape matters
+        if ($in_dq) {
+            if ($ch eq '\\') {
+                $clean .= $ch; $i++;
+                $clean .= $chars[$i] if $i < $n; $i++; next;
+            }
+            $clean .= $ch; $i++; next;
+        }
+
+        # Backslash escape outside quotes
+        if ($ch eq '\\') {
+            $clean .= $ch; $i++;
+            $clean .= $chars[$i] if $i < $n; $i++; next;
+        }
+
+        # 2>&1 or 2>>&1 or 1>&2
+        if ($ch =~ /[012]/ && $i+2 < $n
+                && $chars[$i+1] eq '>'
+                && ($i+3 < $n ? $chars[$i+2] eq '>' : 0)
+                && $chars[$i+3] eq '&') {
+            # 2>>&1 form (rare but handle)
+            my $fd  = int($ch);
+            my $j   = $i + 4;
+            my $tgt = '';
+            while ($j < $n && $chars[$j] =~ /\S/) { $tgt .= $chars[$j]; $j++ }
+            push @found, [$fd, 0, "&$tgt"];
+            $i = $j; next;
+        }
+        if ($ch =~ /[012]/ && $i+2 < $n
+                && $chars[$i+1] eq '>' && $chars[$i+2] eq '&') {
+            my $fd  = int($ch);
+            my $j   = $i + 3;
+            my $tgt = '';
+            while ($j < $n && $chars[$j] =~ /\S/) { $tgt .= $chars[$j]; $j++ }
+            push @found, [$fd, 0, "&$tgt"];
+            $i = $j; next;
+        }
+
+        # fd> or fd>> (fd is 0,1,2; or implicit 1 when just > or >>)
+        my $redir_fd = undef;
+        if ($ch =~ /[012]/ && $i+1 < $n && $chars[$i+1] eq '>') {
+            $redir_fd = int($ch); $i++;
+        }
+        elsif ($ch eq '<') {
+            # < file  (stdin)
+            my $j = $i + 1;
+            $j++ while $j < $n && $chars[$j] eq ' ';
+            my $file = '';
+            while ($j < $n && $chars[$j] !~ /[\s<>]/) { $file .= $chars[$j]; $j++ }
+            push @found, [0, 0, $file] if $file ne '';
+            $i = $j; next;
+        }
+        elsif ($ch eq '>') {
+            $redir_fd = 1;
+        }
+
+        if (defined $redir_fd) {
+            # Check for >>
+            my $append = 0;
+            if ($i+1 < $n && $chars[$i+1] eq '>') { $append = 1; $i++ }
+            # Skip spaces
+            $i++;
+            $i++ while $i < $n && $chars[$i] eq ' ';
+            my $file = '';
+            # Read filename (stop at space unless quoted)
+            while ($i < $n && $chars[$i] !~ /[\s<>]/) {
+                $file .= $chars[$i]; $i++;
+            }
+            push @found, [$redir_fd, $append, $file] if $file ne '';
+            next;
+        }
+
+        $clean .= $ch; $i++;
+    }
+
+    $clean =~ s/\s+\z//;
+    return ($clean, \@found);
+}
+
+# ----------------------------------------------------------------
+# _sh_exec_with_redirs: apply I/O redirections then execute a SH line.
+# Perl 5.005_03 compatible: fixed bareword FHs, 2-argument open.
+# Supports: > >> < 2> 2>> 2>&1 1>&2
+# ----------------------------------------------------------------
+sub _sh_exec_with_redirs {
+    my ($class, $line, $redirs_ref, $opts_ref) = @_;
+
+    # Collect per-fd: stdin, stdout, stderr
+    my ($in_file, $out_file, $out_app, $err_file, $err_app);
+    my $err_to_stdout = 0;   # 2>&1
+    my $out_to_stderr = 0;   # 1>&2
+
+    for my $r (@{$redirs_ref}) {
+        my ($fd, $append, $file) = @{$r};
+        if    ($fd == 0) { $in_file  = $file; }
+        elsif ($fd == 1) {
+            if ($file eq '&2') { $out_to_stderr = 1 }
+            else               { $out_file = $file; $out_app = $append }
+        }
+        else {  # fd == 2
+            if ($file eq '&1') { $err_to_stdout = 1 }
+            else               { $err_file = $file; $err_app = $append }
+        }
+    }
+
+    my $ok = 1;
+    my ($saved_in, $saved_out, $saved_err) = (0, 0, 0);
+
+    # --- stdin ---
+    if (defined $in_file && $ok) {
+        open(_SH_REDIR_SRC, $in_file)
+            or do { warn "sh: $in_file: $!\n"; $ok = 0 };
+        if ($ok) {
+            open(_SH_REDIR_SAVIN, '<&STDIN')  or do { $ok = 0 };
+        }
+        if ($ok) {
+            open(STDIN, '<&_SH_REDIR_SRC')    or do { $ok = 0 };
+            close(_SH_REDIR_SRC);
+            $saved_in = 1;
+        }
+    }
+
+    # --- stdout ---
+    if (defined $out_file && $ok) {
+        my $mode = $out_app ? '>>' : '>';
+        open(_SH_REDIR_DST, "$mode$out_file")
+            or do { warn "sh: $out_file: $!\n"; $ok = 0 };
+        if ($ok) {
+            open(_SH_REDIR_SAVOUT, '>&STDOUT') or do { $ok = 0 };
+        }
+        if ($ok) {
+            open(STDOUT, '>&_SH_REDIR_DST')   or do { $ok = 0 };
+            close(_SH_REDIR_DST);
+            $saved_out = 1;
+        }
+    }
+    elsif ($out_to_stderr && $ok) {
+        open(_SH_REDIR_SAVOUT, '>&STDOUT')    or do { $ok = 0 };
+        if ($ok) {
+            open(STDOUT, '>&STDERR')           or do { $ok = 0 };
+            $saved_out = 1;
+        }
+    }
+
+    # --- stderr ---
+    if (defined $err_file && $ok) {
+        my $mode = $err_app ? '>>' : '>';
+        open(_SH_REDIR_DST, "$mode$err_file")
+            or do { warn "sh: $err_file: $!\n"; $ok = 0 };
+        if ($ok) {
+            open(_SH_REDIR_SAVERR, '>&STDERR') or do { $ok = 0 };
+        }
+        if ($ok) {
+            open(STDERR, '>&_SH_REDIR_DST')   or do { $ok = 0 };
+            close(_SH_REDIR_DST);
+            $saved_err = 1;
+        }
+    }
+    elsif ($err_to_stdout && $ok) {
+        # Redirect stderr to the current STDOUT (which may itself be redirected)
+        open(_SH_REDIR_SAVERR, '>&STDERR')    or do { $ok = 0 };
+        if ($ok) {
+            open(STDERR, '>&STDOUT')           or do { $ok = 0 };
+            $saved_err = 1;
+        }
+    }
+
+    my $rc = 0;
+    if ($ok) {
+        $rc = _exec_line($class, $line, $opts_ref);
+    }
+
+    # Restore in reverse order
+    if ($saved_err) { open(STDERR, '>&_SH_REDIR_SAVERR'); close(_SH_REDIR_SAVERR) }
+    if ($saved_out) { open(STDOUT, '>&_SH_REDIR_SAVOUT'); close(_SH_REDIR_SAVOUT) }
+    if ($saved_in)  { open(STDIN,  '<&_SH_REDIR_SAVIN');  close(_SH_REDIR_SAVIN)  }
+
+    return $rc;
+}
+
+# ----------------------------------------------------------------
+sub _split_sh_compound {
+    my ($line) = @_;
+    my @parts;
+    my $cur   = '';
+    my $in_sq = 0;
+    my $in_dq = 0;
+    my $depth = 0;   # $( nesting
+    my @chars = split //, $line;
+    my $n     = scalar @chars;
+    my $i     = 0;
+
+    while ($i < $n) {
+        my $ch = $chars[$i];
+
+        # Single-quote region
+        if ($in_sq) {
+            if ($ch eq "'") { $in_sq = 0 }
+            $cur .= $ch; $i++; next;
+        }
+        if ($ch eq "'" && !$in_dq) { $in_sq = 1; $cur .= $ch; $i++; next }
+
+        # Double-quote toggle
+        if ($ch eq '"' && !$in_sq) { $in_dq = !$in_dq; $cur .= $ch; $i++; next }
+
+        # $( nesting inside double-quotes
+        if ($in_dq) {
+            if ($ch eq '$' && $i+1 < $n && $chars[$i+1] eq '(') { $depth++ }
+            elsif ($ch eq ')' && $depth > 0) { $depth-- }
+            $cur .= $ch; $i++; next;
+        }
+
+        # Track $( nesting outside quotes
+        if ($ch eq '$' && $i+1 < $n && $chars[$i+1] eq '(') {
+            $depth++; $cur .= $ch; $i++; next;
+        }
+        if ($ch eq ')' && $depth > 0) {
+            $depth--; $cur .= $ch; $i++; next;
+        }
+
+        # Inside $(...) don't split on operators
+        if ($depth > 0) { $cur .= $ch; $i++; next }
+
+        # Backslash escape
+        if ($ch eq '\\') {
+            $cur .= $ch; $i++;
+            $cur .= $chars[$i] if $i < $n; $i++; next;
+        }
+
+        # && operator
+        if ($ch eq '&' && $i+1 < $n && $chars[$i+1] eq '&') {
+            push @parts, { op => '', cmd => $cur };
+            push @parts, { op => '&&', cmd => '' };
+            $cur = ''; $i += 2; next;
+        }
+
+        # || operator
+        if ($ch eq '|' && $i+1 < $n && $chars[$i+1] eq '|') {
+            push @parts, { op => '', cmd => $cur };
+            push @parts, { op => '||', cmd => '' };
+            $cur = ''; $i += 2; next;
+        }
+
+        # ; separator (not inside any quote or subst)
+        if ($ch eq ';') {
+            push @parts, { op => '', cmd => $cur };
+            push @parts, { op => ';', cmd => '' };
+            $cur = ''; $i++; next;
+        }
+
+        $cur .= $ch; $i++;
+    }
+    push @parts, { op => '', cmd => $cur };
+
+    # If only one cmd part with no operators, return single element
+    my $has_op = 0;
+    for my $p (@parts) { $has_op = 1 if $p->{op} ne '' }
+    return @parts if $has_op;
+    return ({ op => '', cmd => $line });
+}
+
+# ----------------------------------------------------------------
+# _exec_sh_compound: execute && / || / ; compound SH commands
+# ----------------------------------------------------------------
+sub _exec_sh_compound {
+    my ($class, $parts, $opts_ref) = @_;
+    my $pending_op = '';
+    my $rc = 0;
+
+    for my $part (@{$parts}) {
+        my $op  = $part->{op};
+        my $cmd = $part->{cmd};
+        $cmd =~ s/\A\s+//; $cmd =~ s/\s+\z//;
+
+        if ($op eq '') {
+            # Execute according to pending operator
+            if ($pending_op eq '') {
+                $rc = _exec_line($class, $cmd, $opts_ref) if $cmd =~ /\S/;
+            }
+            elsif ($pending_op eq '&&') {
+                if ($LAST_STATUS == 0 && $cmd =~ /\S/) {
+                    $rc = _exec_line($class, $cmd, $opts_ref);
+                }
+            }
+            elsif ($pending_op eq '||') {
+                if ($LAST_STATUS != 0 && $cmd =~ /\S/) {
+                    $rc = _exec_line($class, $cmd, $opts_ref);
+                }
+            }
+            elsif ($pending_op eq ';') {
+                $rc = _exec_line($class, $cmd, $opts_ref) if $cmd =~ /\S/;
+            }
+            $pending_op = '';
+        }
+        else {
+            $pending_op = $op;
+        }
+    }
+    return $rc;
+}
+
+# ----------------------------------------------------------------
+sub _split_sh_pipe {
+    my ($line) = @_;
+    my @segs;
+    my $cur   = '';
+    my $in_sq = 0;   # inside single quotes
+    my $in_dq = 0;   # inside double quotes
+    my $depth = 0;   # $( nesting depth
+    my @chars = split //, $line;
+    my $n     = scalar @chars;
+    my $i     = 0;
+
+    while ($i < $n) {
+        my $ch = $chars[$i];
+
+        # Single-quote region: nothing special until closing '
+        if ($in_sq) {
+            if ($ch eq "'") { $in_sq = 0 }
+            $cur .= $ch; $i++; next;
+        }
+
+        # Toggle double-quote
+        if ($ch eq '"' && !$in_sq) {
+            $in_dq = !$in_dq;
+            $cur .= $ch; $i++; next;
+        }
+
+        # Inside double-quotes only $( nesting matters
+        if ($in_dq) {
+            if ($ch eq '$' && $i+1 < $n && $chars[$i+1] eq '(') {
+                $depth++; $cur .= $ch; $i++; next;
+            }
+            if ($ch eq ')' && $depth > 0) {
+                $depth--; $cur .= $ch; $i++; next;
+            }
+            # backslash escape inside "
+            if ($ch eq '\\') {
+                $cur .= $ch; $i++;
+                $cur .= $chars[$i] if $i < $n; $i++; next;
+            }
+            $cur .= $ch; $i++; next;
+        }
+
+        # Enter single-quote
+        if ($ch eq "'") { $in_sq = 1; $cur .= $ch; $i++; next }
+
+        # $( command substitution: track nesting so | inside is not a pipe
+        if ($ch eq '$' && $i+1 < $n && $chars[$i+1] eq '(') {
+            $depth++; $cur .= $ch; $i++; next;
+        }
+        if ($ch eq '(' ) { $depth++ if $depth > 0; $cur .= $ch; $i++; next }
+        if ($ch eq ')' ) {
+            if ($depth > 0) { $depth-- }
+            $cur .= $ch; $i++; next;
+        }
+
+        # Bare | outside any quote/subst => pipeline separator
+        if ($ch eq '|' && $depth == 0) {
+            # Peek: || is logical-or, not a pipe
+            if ($i+1 < $n && $chars[$i+1] eq '|') {
+                $cur .= '||'; $i += 2; next;
+            }
+            push @segs, $cur;
+            $cur = '';
+            $i++; next;
+        }
+
+        # Backslash escape (outside quotes)
+        if ($ch eq '\\') {
+            $cur .= $ch; $i++;
+            $cur .= $chars[$i] if $i < $n; $i++; next;
+        }
+
+        $cur .= $ch; $i++;
+    }
+    push @segs, $cur;
+    return @segs;
+}
+
+# ----------------------------------------------------------------
+# _exec_sh_pipe: run a SH pipeline via temporary files.
+# Each segment's stdout feeds the next segment's stdin.
+# Perl 5.005_03 compatible: bareword FHs, 2-arg open.
+# ----------------------------------------------------------------
+sub _exec_sh_pipe {
+    my ($class, $segs_ref, $opts_ref) = @_;
+    my @segs   = @{$segs_ref};
+    my $n_segs = scalar @segs;
+    my $base   = File::Spec->catfile(File::Spec->tmpdir(), "batsh_shp_$$");
+    my $rc     = 0;
+    my $input_f = undef;   # tmpfile that feeds this segment's STDIN
+
+    for my $idx (0 .. $n_segs - 1) {
+        my $seg = $segs[$idx];
+        $seg =~ s/\A\s+//; $seg =~ s/\s+\z//;
+        next unless $seg =~ /\S/;
+
+        my $is_last  = ($idx == $n_segs - 1) ? 1 : 0;
+        my $output_f = $is_last ? undef : "${base}_${idx}.tmp";
+
+        # --- redirect STDIN from previous segment's output ---
+        my $saved_in = 0;
+        if (defined $input_f && -f $input_f) {
+            open(_SH_PIPE_RFH, $input_f)
+                or do { warn "SH pipe: open $input_f: $!\n"; last };
+            open(_SH_PIPE_SAVIN, '<&STDIN')
+                or do { close(_SH_PIPE_RFH); last };
+            open(STDIN, '<&_SH_PIPE_RFH')
+                or do {
+                    close(_SH_PIPE_RFH);
+                    open(STDIN, '<&_SH_PIPE_SAVIN'); close(_SH_PIPE_SAVIN);
+                    last;
+                };
+            close(_SH_PIPE_RFH);
+            $saved_in = 1;
+        }
+
+        # --- redirect STDOUT to next segment's input file ---
+        my $saved_out = 0;
+        if (defined $output_f) {
+            open(_SH_PIPE_WFH, ">$output_f")
+                or do {
+                    if ($saved_in) {
+                        open(STDIN, '<&_SH_PIPE_SAVIN'); close(_SH_PIPE_SAVIN);
+                    }
+                    warn "SH pipe: open $output_f: $!\n";
+                    last;
+                };
+            open(_SH_PIPE_SAVOUT, '>&STDOUT')
+                or do {
+                    close(_SH_PIPE_WFH);
+                    if ($saved_in) {
+                        open(STDIN, '<&_SH_PIPE_SAVIN'); close(_SH_PIPE_SAVIN);
+                    }
+                    last;
+                };
+            open(STDOUT, '>&_SH_PIPE_WFH')
+                or do {
+                    close(_SH_PIPE_WFH);
+                    open(STDOUT, '>&_SH_PIPE_SAVOUT'); close(_SH_PIPE_SAVOUT);
+                    if ($saved_in) {
+                        open(STDIN, '<&_SH_PIPE_SAVIN'); close(_SH_PIPE_SAVIN);
+                    }
+                    last;
+                };
+            close(_SH_PIPE_WFH);
+            $saved_out = 1;
+        }
+
+        # --- execute the segment as a SH line ---
+        $rc = _exec_line($class, $seg, $opts_ref);
+
+        # --- restore STDOUT ---
+        if ($saved_out) {
+            open(STDOUT, '>&_SH_PIPE_SAVOUT');
+            close(_SH_PIPE_SAVOUT);
+        }
+
+        # --- restore STDIN and remove input tmpfile ---
+        if ($saved_in) {
+            open(STDIN, '<&_SH_PIPE_SAVIN');
+            close(_SH_PIPE_SAVIN);
+            unlink $input_f;
+        }
+
+        $input_f = $output_f;
+    }
+
+    unlink $input_f if defined $input_f && -f $input_f;
+    return $rc;
+}
+
+# ----------------------------------------------------------------
+# Pattern helpers for ${var%pat}, ${var#pat}, ${var/pat/rep}
+# Converts glob-style pattern to Perl regex (*, ?, [abc]).
+# ----------------------------------------------------------------
+sub _glob_to_re {
+    my ($pat, $greedy) = @_;
+    my $re = '';
+    my @chars = split //, $pat;
+    my $n = scalar @chars;
+    my $i = 0;
+    while ($i < $n) {
+        my $c = $chars[$i];
+        if ($c eq '*') {
+            $re .= $greedy ? '.*' : '.*?';
+        }
+        elsif ($c eq '?') { $re .= '.' }
+        elsif ($c eq '[') {
+            my $cls = '[';
+            $i++;
+            while ($i < $n && $chars[$i] ne ']') {
+                $cls .= $chars[$i]; $i++;
+            }
+            $cls .= ']';
+            $re .= $cls;
+        }
+        else { $re .= quotemeta($c) }
+        $i++;
+    }
+    return $re;
+}
+
+sub _sh_remove_suffix {
+    my ($val, $pat, $greedy) = @_;
+    # %  (greedy=0, shortest suffix): keep longest prefix
+    #    => /\A(.*) PATTERN \z/s  with greedy prefix  => $1
+    # %% (greedy=1, longest suffix):  keep shortest prefix
+    #    => /\A(.*?)PATTERN \z/s  with lazy   prefix  => $1
+    my $re = _glob_to_re($pat, 1);  # pattern itself is always greedy for suffix
+    if ($greedy) {
+        # longest suffix removed: lazy prefix
+        return ($val =~ /\A(.*?)$re\z/s) ? $1 : $val;
+    }
+    else {
+        # shortest suffix removed: greedy prefix
+        return ($val =~ /\A(.*)$re\z/s) ? $1 : $val;
+    }
+}
+
+sub _sh_remove_prefix {
+    my ($val, $pat, $greedy) = @_;
+    # #  (greedy=0, shortest prefix): keep longest suffix
+    #    => /\A PATTERN(.*) \z/s  with lazy   pattern  => $1
+    # ## (greedy=1, longest prefix):  keep shortest suffix
+    #    => /\A PATTERN(.*) \z/s  with greedy pattern  => $1
+    my $re = _glob_to_re($pat, $greedy);
+    return ($val =~ /\A$re(.*)\z/s) ? $1 : $val;
+}
+
+sub _sh_replace {
+    my ($val, $pat, $rep, $global) = @_;
+    my $re = _glob_to_re($pat, 1);
+    if ($global) { $val =~ s/$re/$rep/g }
+    else          { $val =~ s/$re/$rep/ }
+    return $val;
+}
+
+# ----------------------------------------------------------------
+# Shell function registry  { name => \@body_lines }
+# ----------------------------------------------------------------
+
+# ----------------------------------------------------------------
+# _parse_function: parse "name() {" or "function name {" blocks
+# Returns ($status, $new_i).
+# ----------------------------------------------------------------
+sub _parse_function {
+    my ($class, $lines_ref, $start, $opts_ref) = @_;
+    my @lines = @{$lines_ref};
+    my $line  = $lines[$start];
+    $line =~ s/\r?\n\z//;
+    $line =~ s/\A\s+//;
+
+    my $name = '';
+    if ($line =~ /\A([A-Za-z_][A-Za-z0-9_]*)\s*\(\s*\)\s*(?:\{.*)?\z/) {
+        $name = $1;
+    }
+    elsif ($line =~ /\Afunction\s+([A-Za-z_][A-Za-z0-9_]*)\s*(?:\(\s*\))?\s*(?:\{.*)?\z/i) {
+        $name = $1;
+    }
+    else {
+        return (0, $start + 1);
+    }
+
+    my @body;
+    my $depth = ($line =~ /\{/) ? 1 : 0;
+    my $i = $start + 1;
+
+    # Check if the function body is on the same line as the definition
+    # e.g. "name() { cmd1; cmd2; }"
+    if ($depth >= 1 && $line =~ /\{(.*)\}\s*\z/s) {
+        my $inline = $1;
+        $inline =~ s/\A\s+//; $inline =~ s/\s+\z//;
+        # Split on ; to get individual commands
+        for my $part (split /;/, $inline) {
+            $part =~ s/\A\s+//; $part =~ s/\s+\z//;
+            push @body, $part if $part =~ /\S/;
+        }
+        $_SH_FUNCTIONS{$name} = \@body;
+        return (0, $i);
+    }
+
+    if ($depth == 0) {
+        while ($i <= $#lines) {
+            my $l = $lines[$i]; $l =~ s/\r?\n\z//; $l =~ s/\A\s+//;
+            $i++;
+            if ($l =~ /\{/) { $depth = 1; last }
+        }
+    }
+
+    while ($i <= $#lines) {
+        my $l = $lines[$i]; $l =~ s/\r?\n\z//;
+        $i++;
+        my $opens  = () = ($l =~ /\{/g);
+        my $closes = () = ($l =~ /\}/g);
+        $depth += $opens - $closes;
+        if ($depth <= 0) {
+            my $before = $l;
+            $before =~ s/\}\s*\z//;
+            push @body, $before if $before =~ /\S/;
+            last;
+        }
+        push @body, $l;
+    }
+
+    $_SH_FUNCTIONS{$name} = \@body;
+    return (0, $i);
+}
+
+# ----------------------------------------------------------------
+# _call_sh_function: execute a registered SH function
+# ----------------------------------------------------------------
+sub _call_sh_function {
+    my ($class, $name, $args_str, $opts_ref) = @_;
+    return 1 unless exists $_SH_FUNCTIONS{$name};
+
+    my @args = _parse_args($args_str);
+
+    my @saved_arg;
+    for my $n (1 .. 9) {
+        push @saved_arg, BATsh::Env->get("BATSH_ARG$n");
+        BATsh::Env->set("BATSH_ARG$n",
+            defined($args[$n-1]) ? $args[$n-1] : '');
+    }
+    my @saved_pct;
+    for my $n (1 .. 9) {
+        push @saved_pct, BATsh::Env->get("%$n");
+        BATsh::Env->set("%$n", defined($args[$n-1]) ? $args[$n-1] : '');
+    }
+    my $saved_star = BATsh::Env->get('%*');
+    BATsh::Env->set('%*', join(' ', @args));
+
+    push @FUNCTION_STACK, {};
+    my $saved_ret = $_RETURN;
+    $_RETURN = 0;
+
+    my $rc = _run_lines($class, $_SH_FUNCTIONS{$name}, $opts_ref);
+
+    $_RETURN = $saved_ret;
+
+    # Restore local variables saved in this function's scope
+    if (@FUNCTION_STACK) {
+        my $frame = $FUNCTION_STACK[-1];
+        for my $var (keys %{$frame}) {
+            my $old = $frame->{$var};
+            if (defined $old) { BATsh::Env->set($var, $old) }
+            else              { BATsh::Env->unset($var) }
+        }
+    }
+    pop @FUNCTION_STACK;
+
+    for my $n (1 .. 9) {
+        my $v = $saved_arg[$n-1];
+        BATsh::Env->set("BATSH_ARG$n", defined $v ? $v : '');
+    }
+    for my $n (1 .. 9) {
+        my $v = $saved_pct[$n-1];
+        BATsh::Env->set("%$n", defined $v ? $v : '');
+    }
+    BATsh::Env->set('%*', defined $saved_star ? $saved_star : '');
+
+    $LAST_STATUS = $rc;
+    return $rc;
+}
+
+# ----------------------------------------------------------------
+# _parse_args: split a string into arguments respecting quotes
+# ----------------------------------------------------------------
+sub _parse_args {
+    my ($str) = @_;
+    $str = '' unless defined $str;
+    $str =~ s/\A\s+//; $str =~ s/\s+\z//;
+    return () unless $str =~ /\S/;
+    my @args;
+    my $cur = '';
+    my $in_sq = 0;
+    my $in_dq = 0;
+    for my $ch (split //, $str) {
+        if ($in_sq) {
+            if ($ch eq "'") { $in_sq = 0 } else { $cur .= $ch }
+            next;
+        }
+        if ($ch eq "'" && !$in_dq) { $in_sq = 1; next }
+        if ($ch eq '"'  && !$in_sq) { $in_dq = !$in_dq; next }
+        if ($ch =~ /\s/ && !$in_sq && !$in_dq) {
+            push @args, $cur; $cur = '';
+            next;
+        }
+        $cur .= $ch;
+    }
+    push @args, $cur if $cur ne '' || @args;
+    return @args;
+}
+
+# ----------------------------------------------------------------
+# ----------------------------------------------------------------
 sub _cmd_external {
     my ($cmd, $rest) = @_;
     $rest = '' unless defined $rest;
@@ -884,9 +1935,50 @@ BATsh::SH - Pure Perl bash/sh interpreter for BATsh
 =head1 SYNOPSIS
 
   # Used internally by BATsh; not normally called directly.
-  BATsh::SH::exec_block('BATsh::SH', \@lines, _batsh => $batsh);
+  # BATsh::SH implements the SH-mode interpreter invoked when BATsh
+  # detects a bash/sh section in a .batsh script.
+
+  # Executed via BATsh:
+  use BATsh;
+  BATsh->run_string(<<'END');
+  x=hello
+  greet() {
+      echo "Hello, $1 -- ${#1} chars"
+  }
+  greet world
+  echo ${x^^}
+  for i in 1 2 3; do
+      echo item $i
+  done
+  ls /tmp | perl -e 'while(<STDIN>){print}'
+  echo out > /tmp/out.txt
+  END
 
 =head1 DESCRIPTION
+
+=head2 Executive Summary
+
+BATsh::SH is the sh/bash interpreter component of BATsh.  It handles any
+script section whose first token contains a lowercase letter, executing it
+entirely in Pure Perl -- no external shell required.  It supports pipelines
+(|), I/O redirection (> >> 2>&1), functions, compound commands (&&/||/;),
+and rich parameter expansion: ${var%pat}, ${var^^}, ${var:N:L}, ${#var}.
+
+=head2 Mixed-Mode Sample (via BATsh)
+
+  use BATsh;
+  BATsh->run_string(<<'SCRIPT');
+  :: CMD section: uppercase first token
+  SET CITY=Tokyo
+
+  # SH section: lowercase first token
+  greet() { echo "Hello from $1!"; }
+  greet $CITY
+  echo "lower: ${CITY,,}"
+  echo $CITY | perl -e 'while(<STDIN>){chomp;print uc,chr(10)}'
+  SCRIPT
+
+=head1 FULL DESCRIPTION
 
 BATsh::SH implements the POSIX sh / bash command set entirely in Perl.
 No external sh or bash is required.
@@ -902,16 +1994,104 @@ No external sh or bash is required.
   case $var in pattern) ... ;; esac
   test / [ ... ]  (file tests, string, integer comparisons)
   cd, pwd, exit, true, false, :, read, shift, local, set
-  $(( arithmetic ))
-  $( command substitution )
-  ${VAR}, ${VAR:-default}, ${VAR:=default}
+  $(( arithmetic )) -- supports $1..$9 positional params
+  $( command substitution ), `backtick substitution`
+  $VAR, ${VAR}, $1..$9, $@, $*, $#, $?, $$
+  ${VAR:-default}, ${VAR:=default}, ${VAR:+alt}
+  ${VAR%pat}, ${VAR%%pat}  -- suffix removal (shortest/longest)
+  ${VAR#pat}, ${VAR##pat}  -- prefix removal (shortest/longest)
+  ${VAR/pat/rep}, ${VAR//pat/rep}  -- substitution (first/all)
+  ${VAR^^}, ${VAR^}, ${VAR,,}, ${VAR,}  -- case conversion
+  ${VAR:offset:length}, ${VAR:offset}  -- substring
+  ${#VAR}  -- string length
   source / . file
+  name() { ... }, function name { ... }  -- function definition
+  cmd1 | cmd2 [| cmd3 ...]  (pipeline via temporary file)
+  cmd1 && cmd2  (run cmd2 only if cmd1 succeeds)
+  cmd1 || cmd2  (run cmd2 only if cmd1 fails)
+  cmd1 ; cmd2   (sequential execution)
+  > file, >> file, < file  (I/O redirection)
+  2> file, 2>> file        (stderr redirect)
+  2>&1                     (merge stderr into stdout)
 
 =head2 Variable Expansion
 
-C<$VAR> and C<${VAR}> references are expanded before each line executes.
-Arithmetic expressions C<$(( expr ))> support +, -, *, /, % and
-parentheses.
+C<$VAR>, C<${VAR}>, and positional parameters C<$1>..C<$9> are expanded
+before each line executes.  C<$@> and C<$*> expand to all positional
+parameters space-joined; C<$#> gives their count.
+
+The following parameter expansion forms are supported:
+
+  ${VAR:-default}   value if set, else default
+  ${VAR:=default}   set and use default if unset
+  ${VAR:+alt}       alt if set, else empty
+  ${VAR%pat}        remove shortest suffix matching pat
+  ${VAR%%pat}       remove longest suffix matching pat
+  ${VAR#pat}        remove shortest prefix matching pat
+  ${VAR##pat}       remove longest prefix matching pat
+  ${VAR/pat/rep}    replace first match of pat with rep
+  ${VAR//pat/rep}   replace all matches of pat with rep
+  ${VAR^^}          convert to uppercase
+  ${VAR^}           uppercase first character
+  ${VAR,,}          convert to lowercase
+  ${VAR,}           lowercase first character
+  ${VAR:N:L}        substring from offset N, length L
+  ${VAR:N}          substring from offset N to end
+  ${#VAR}           length of value
+
+Patterns use shell glob syntax: C<*> matches any string, C<?>
+matches any single character, C<[abc]> matches a character class.
+
+=head2 Function Definitions
+
+Shell functions are defined with C<name() { ... }> or
+C<function name { ... }>.  Inline single-line bodies are also
+supported: C<name() { cmd; }>.  Functions receive arguments as
+C<$1>..C<$9> and C<$@>.  The caller's positional parameters are
+saved before the call and restored on return.
+
+=head2 Pipeline
+
+The C<|> operator is supported in SH mode.  The left side's standard output
+is written to a temporary file (C<File::Spec-E<gt>tmpdir()>), which is then
+fed as standard input to the right side.  Multiple pipes (cmd1 | cmd2 | cmd3)
+are handled by chaining temporary files.  All temporary files are removed
+after use.  This implementation is Pure Perl and Perl 5.005_03 compatible.
+
+=head2 I/O Redirection
+
+  cmd > file      stdout overwrite (create or truncate)
+  cmd >> file     stdout append
+  cmd < file      stdin from file
+  cmd 2> file     stderr overwrite
+  cmd 2>> file    stderr append
+  cmd 2>&1        merge stderr into stdout (current stdout target)
+  cmd 1>&2        merge stdout into stderr
+
+Redirections are parsed B<after> variable expansion, so filenames may
+contain variables (e.g. C<echo text E<gt> $outfile>).  All file handles
+use bareword globs for Perl 5.005_03 compatibility.
+
+=head2 Compound Commands
+
+  cmd1 && cmd2    run cmd2 only if cmd1 exits with status 0
+  cmd1 || cmd2    run cmd2 only if cmd1 exits with non-zero status
+  cmd1 ; cmd2     run cmd2 unconditionally after cmd1
+
+These are detected B<before> variable expansion to ensure short-circuit
+logic works correctly.  Quoting (C<'>, C<">) and C<$(...)> nesting are
+respected when splitting.
+
+=head2 Function Definitions
+
+  name() { body }
+  function name { body }
+  name() { cmd1; cmd2; }   # inline single-line body
+
+Functions are registered in a package-level hash C<%_SH_FUNCTIONS>.
+The caller's positional parameters (C<$1>..C<$9>, C<$*>) are saved before
+the call and restored on return.  C<local VAR=value> saves the existing
+value of C<VAR> in the function's stack frame and restores it on return.
 
 =head1 AUTHOR
 

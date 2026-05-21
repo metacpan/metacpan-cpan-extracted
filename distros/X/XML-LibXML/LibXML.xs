@@ -151,6 +151,7 @@ typedef enum {
 
 /* this should keep the default */
 static xmlExternalEntityLoader LibXML_old_ext_ent_loader = NULL;
+static xmlExternalEntityLoader LibXML_old_ext_ent_loader_global = NULL;
 
 /* global external entity loader */
 SV *EXTERNAL_ENTITY_LOADER_FUNC = (SV *)NULL;
@@ -802,6 +803,10 @@ LibXML_output_close_handler( void * handler )
     return 1;
 }
 
+/* Dispatcher for user-installed Perl entity loaders (per-parser
+ * "ext_ent_handler" or process-global externalEntityLoader()). DO NOT add
+ * URL filtering or no_network checks here -- the user's callback is the
+ * policy authority. See CLAUDE.md "Entity loaders" and GH #168/#133/#143. */
 xmlParserInputPtr
 LibXML_load_external_entity(
         const char * URL,
@@ -962,6 +967,9 @@ LibXML_init_parser( SV * self, xmlParserCtxtPtr ctxt ) {
             if (ctxt) ctxt->linenumbers = 0;
         }
 
+       /* If a user installed a process-global loader via externalEntityLoader(),
+        * leave it alone -- they're the policy authority. See CLAUDE.md
+        * "Entity loaders". */
        if(EXTERNAL_ENTITY_LOADER_FUNC == NULL)
        {
             item = hv_fetch(real_obj, "ext_ent_handler", 15, 0);
@@ -992,46 +1000,18 @@ LibXML_cleanup_parser() {
     if (EXTERNAL_ENTITY_LOADER_FUNC == NULL && LibXML_old_ext_ent_loader != NULL)
     {
         xmlSetExternalEntityLoader( (xmlExternalEntityLoader)LibXML_old_ext_ent_loader );
+        LibXML_old_ext_ent_loader = NULL;
     }
 }
 
 int
 LibXML_test_node_name( xmlChar * name )
 {
-    xmlChar * cur = name;
-    int tc  = 0;
-    int len = 0;
-
-    if ( cur == NULL || *cur == 0 ) {
-        /* warn("name is empty" ); */
+    if ( name == NULL || *name == 0 ) {
         return(0);
     }
 
-    tc = domParseChar( cur, &len );
-
-    if ( !( IS_LETTER( tc ) || (tc == '_') || (tc == ':')) ) {
-        /* warn( "is not a letter\n" ); */
-        return(0);
-    }
-
-    tc  =  0;
-    cur += len;
-
-    while (*cur != 0 ) {
-        tc = domParseChar( cur, &len );
-
-        if (!(IS_LETTER(tc) || IS_DIGIT(tc) || (tc == '_') ||
-             (tc == '-') || (tc == ':') || (tc == '.') ||
-             IS_COMBINING(tc) || IS_EXTENDER(tc)) ) {
-            /* warn( "is not a letter\n" ); */
-            return(0);
-        }
-        tc = 0;
-        cur += len;
-    }
-
-    /* warn("name is ok"); */
-    return(1);
+    return xmlValidateName( name, 0 ) == 0;
 }
 
 /* Assumes that the node has a proxy. */
@@ -1417,7 +1397,11 @@ LibXML_generic_extension_function(xmlXPathParserContextPtr ctxt, int nargs)
         default:
             warn("Unknown XPath return type (%d) in call to {%s}%s - assuming string", obj->type, uri, function);
             XPUSHs(sv_2mortal(newSVpv("XML::LibXML::Literal", 0)));
-            XPUSHs(sv_2mortal(C2Sv(xmlXPathCastToString(obj), 0)));
+            {
+                xmlChar *str = xmlXPathCastToString(obj);
+                XPUSHs(sv_2mortal(C2Sv(str, 0)));
+                xmlFree(str);
+            }
         }
         xmlXPathFreeObject(obj);
     }
@@ -2778,12 +2762,16 @@ load_catalog( self, filename )
         const char * fn = (const char *) Sv2C(filename, NULL);
     INIT:
         if ( fn == NULL || xmlStrlen( (xmlChar *)fn ) == 0 ) {
+            if ( fn != NULL )
+                xmlFree( (xmlChar *)fn );
             croak( "cannot load catalog" );
         }
     CODE:
 #ifdef LIBXML_CATALOG_ENABLED
         RETVAL = xmlLoadCatalog( fn );
+        xmlFree( (xmlChar *)fn );
 #else
+        xmlFree( (xmlChar *)fn );
         XSRETURN_UNDEF;
 #endif
     OUTPUT:
@@ -2808,21 +2796,54 @@ _default_catalog( self, catalog )
     OUTPUT:
         RETVAL
 
+# Set or clear the global external entity loader callback.
+# When called with a coderef: saves the current libxml2 loader, installs
+# LibXML_load_external_entity as the global loader, and stores the Perl
+# callback in EXTERNAL_ENTITY_LOADER_FUNC (freeing any previous one).
+# When called with undef: decrefs the stored callback, restores the
+# original libxml2 loader, and NULLs both global tracking variables.
+# Always returns a copy of the previous Perl callback (or undef).
 SV*
 _externalEntityLoader( loader )
         SV* loader
     CODE:
         {
-            RETVAL = EXTERNAL_ENTITY_LOADER_FUNC;
-            if(EXTERNAL_ENTITY_LOADER_FUNC == NULL)
-            {
-                EXTERNAL_ENTITY_LOADER_FUNC = newSVsv(loader);
-            }
+            /* Always return a fresh refcount-1 SV: xsubpp auto-mortalizes
+             * RETVAL for SV*, and mortalizing the &PL_sv_undef singleton on
+             * every call eventually drives its refcount negative (SEGV under
+             * repeated invocation). Use newSV(0) for "no previous handler". */
+            RETVAL = EXTERNAL_ENTITY_LOADER_FUNC
+                ? newSVsv(EXTERNAL_ENTITY_LOADER_FUNC)
+                : newSV(0);
 
-            if (LibXML_old_ext_ent_loader == NULL )
+            if (SvOK(loader))
             {
-                LibXML_old_ext_ent_loader = xmlGetExternalEntityLoader();
-                xmlSetExternalEntityLoader((xmlExternalEntityLoader)LibXML_load_external_entity);
+                if (EXTERNAL_ENTITY_LOADER_FUNC != NULL)
+                {
+                    SvREFCNT_dec(EXTERNAL_ENTITY_LOADER_FUNC);
+                }
+                EXTERNAL_ENTITY_LOADER_FUNC = newSVsv(loader);
+
+                if (LibXML_old_ext_ent_loader_global == NULL)
+                {
+                    LibXML_old_ext_ent_loader_global = xmlGetExternalEntityLoader();
+                    xmlSetExternalEntityLoader(
+                        (xmlExternalEntityLoader)LibXML_load_external_entity);
+                }
+            }
+            else
+            {
+                if (EXTERNAL_ENTITY_LOADER_FUNC != NULL)
+                {
+                    SvREFCNT_dec(EXTERNAL_ENTITY_LOADER_FUNC);
+                    EXTERNAL_ENTITY_LOADER_FUNC = NULL;
+                }
+                if (LibXML_old_ext_ent_loader_global != NULL)
+                {
+                    xmlSetExternalEntityLoader(
+                        (xmlExternalEntityLoader)LibXML_old_ext_ent_loader_global);
+                    LibXML_old_ext_ent_loader_global = NULL;
+                }
             }
         }
     OUTPUT:
@@ -3075,6 +3096,8 @@ URI( self )
         RETVAL = (const char*)xmlStrdup(self->URL );
     OUTPUT:
         RETVAL
+    CLEANUP:
+        xmlFree((xmlChar*)RETVAL);
 
 void
 setURI( self, new_URI )
@@ -3617,12 +3640,12 @@ createAttributeNS( self, URI, pname, pvalue=&PL_sv_undef )
                 }
             }
             else {
-                croak( "can't create a new namespace on an attribute!" );
+                xmlFree(nsURI);
                 xmlFree(name);
                 if ( value ) {
                     xmlFree(value);
                 }
-                XSRETURN_UNDEF;
+                croak( "can't create a new namespace on an attribute!" );
             }
         }
         else {
@@ -4340,6 +4363,8 @@ lookupNamespacePrefix( self, svuri )
             }
         }
         else {
+            if ( href != NULL )
+                xmlFree( href );
             XSRETURN_UNDEF;
         }
     OUTPUT:
@@ -4825,7 +4850,7 @@ replaceChild( self, nNode, oNode )
     PREINIT:
         xmlNodePtr ret = NULL;
     CODE:
-        // if newNode == oldNode or self == newNode then do nothing, just return nNode.
+        /* if newNode == oldNode or self == newNode then do nothing, just return nNode. */
         if (nNode == oNode || self == nNode ) {
             ret = nNode;
             RETVAL = PmmNodeToSv(ret, PmmOWNERPO(PmmPROXYNODE(ret)));
@@ -5202,6 +5227,7 @@ setBaseURI( self, URI )
         uri = nodeSv2C( URI, self );
         if ( uri != NULL ) {
             xmlNodeSetBase( self, uri );
+            xmlFree( uri );
         }
 
 SV*
@@ -5319,6 +5345,7 @@ _toStringC14N(self, comments=0, xpath=&PL_sv_undef, exclusive=0, inc_prefix_list
 	    if (SvOK(xpath_context)) {
 	      child_ctxt = INT2PTR(xmlXPathContextPtr,SvIV(SvRV(xpath_context)));
 	      if ( child_ctxt == NULL ) {
+		xmlFree( nodepath );
 		croak("XPathContext: missing xpath context\n");
 	      }
 	    } else {
@@ -5521,6 +5548,7 @@ _find( pnode, pxpath, to_bool )
                     XPUSHs(sv_2mortal(C2Sv(found->stringval, NULL)));
                     break;
                 default:
+                    xmlXPathFreeObject(found);
                     croak("Unknown XPath return type");
             }
             xmlXPathFreeObject(found);
@@ -5738,6 +5766,8 @@ _setNamespace(self, namespaceURI, namespacePrefix = &PL_sv_undef, flag = 1 )
         xmlNsPtr ns = NULL;
     INIT:
         if ( node == NULL ) {
+            if ( nsURI != NULL )
+                xmlFree( nsURI );
             croak( "lost node" );
         }
     CODE:
@@ -7357,6 +7387,8 @@ parse_location( self, url, parser_options = 0, recover = FALSE )
                                   saved_error );
 #endif
 
+        /* EXTERNAL_ENTITY_LOADER_FUNC == NULL guard preserves a user-installed
+         * global loader. See CLAUDE.md "Entity loaders" and GH #168. */
         if ( EXTERNAL_ENTITY_LOADER_FUNC == NULL && (parser_options & XML_PARSE_NONET) ) {
             old_ext_ent_loader = xmlGetExternalEntityLoader();
             xmlSetExternalEntityLoader( xmlNoNetExternalEntityLoader );
@@ -7406,6 +7438,8 @@ parse_buffer( self, perlstring, parser_options = 0, recover = FALSE )
                                   saved_error );
 #endif
 
+        /* EXTERNAL_ENTITY_LOADER_FUNC == NULL guard preserves a user-installed
+         * global loader. See CLAUDE.md "Entity loaders" and GH #168. */
         if ( EXTERNAL_ENTITY_LOADER_FUNC == NULL && (parser_options & XML_PARSE_NONET) ) {
             old_ext_ent_loader = xmlGetExternalEntityLoader();
             xmlSetExternalEntityLoader( xmlNoNetExternalEntityLoader );
@@ -7448,6 +7482,8 @@ parse_document( self, doc, parser_options = 0, recover = FALSE )
                                   saved_error );
 #endif
 
+        /* EXTERNAL_ENTITY_LOADER_FUNC == NULL guard preserves a user-installed
+         * global loader. See CLAUDE.md "Entity loaders" and GH #168. */
         if ( EXTERNAL_ENTITY_LOADER_FUNC == NULL && (parser_options & XML_PARSE_NONET) ) {
             old_ext_ent_loader = xmlGetExternalEntityLoader();
             xmlSetExternalEntityLoader( xmlNoNetExternalEntityLoader );
@@ -7547,6 +7583,8 @@ parse_location( self, url, parser_options = 0, recover = FALSE )
                                   (xmlSchemaValidityWarningFunc)LibXML_error_handler_ctx,
                                   saved_error );
 
+        /* EXTERNAL_ENTITY_LOADER_FUNC == NULL guard preserves a user-installed
+         * global loader. See CLAUDE.md "Entity loaders" and GH #168. */
         if ( EXTERNAL_ENTITY_LOADER_FUNC == NULL && (parser_options & XML_PARSE_NONET) ) {
             old_ext_ent_loader = xmlGetExternalEntityLoader();
             xmlSetExternalEntityLoader( xmlNoNetExternalEntityLoader );
@@ -7597,6 +7635,8 @@ parse_buffer( self, perlstring, parser_options = 0, recover = FALSE )
                                   (xmlSchemaValidityWarningFunc)LibXML_error_handler_ctx,
                                   saved_error );
 
+        /* EXTERNAL_ENTITY_LOADER_FUNC == NULL guard preserves a user-installed
+         * global loader. See CLAUDE.md "Entity loaders" and GH #168. */
         if ( EXTERNAL_ENTITY_LOADER_FUNC == NULL && (parser_options & XML_PARSE_NONET) ) {
             old_ext_ent_loader = xmlGetExternalEntityLoader();
             xmlSetExternalEntityLoader( xmlNoNetExternalEntityLoader );
@@ -8273,6 +8313,7 @@ _find( pxpath_context, pxpath, to_bool )
                     XPUSHs(sv_2mortal(C2Sv(found->stringval, NULL)));
                     break;
                 default:
+                    xmlXPathFreeObject(found);
                     croak("Unknown XPath return type");
             }
             xmlXPathFreeObject(found);
@@ -8326,6 +8367,9 @@ _newForIO(CLASS, fh, url, encoding, options)
         RETVAL = xmlReaderForIO((xmlInputReadCallback) LibXML_read_perl,
 				(xmlInputCloseCallback) LibXML_close_perl,
 				(void *) fh, url, encoding, options);
+        if (RETVAL == NULL) {
+            SvREFCNT_dec(fh);
+        }
 	INIT_READER_ERROR_HANDLER(RETVAL)
     OUTPUT:
 	RETVAL

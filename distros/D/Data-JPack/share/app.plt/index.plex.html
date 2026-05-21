@@ -1,0 +1,60 @@
+@{[ init {
+  use feature ":all";
+  use Data::JPack::App;
+
+
+  # BOOTSTAPPING OF A JPACK APP
+  # 
+  my %map=Data::JPack::App->_bootstrap;
+
+  for(keys %map){
+    $self->add_resource($_, output=>$map{$_});
+    append_slot(head_start=>qq{<script src="@{[res $_]}"></script>});
+  }
+
+  #
+
+}]}
+
+<!doctype html>
+<html lan="en" data-bs-theme="dark">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@{[slot "title"=>""]}</title>
+
+
+    <!-- head start -->
+    @{[slot head_start=>""]}
+
+    <!-- head end -->
+    @{[slot head_end=>""]}
+
+  </head>
+
+  <body>
+    <!-- body start -->
+    @{[slot body_start=>""]}
+
+    <!-- sub class body -->
+    @{[slot]}
+
+    <!-- body end -->
+    @{[slot body_end=>""]}
+    <style>
+      #chunkloadingdiv {
+        position:fixed;
+        bottom:0;
+        left:0;
+        width:100%;
+        background-color:black;
+        transition-property:bottom;
+        transition-duration: .2s;
+        display:none;
+        z-index:100;
+
+      }
+    </style>
+  </body>
+</html>
+

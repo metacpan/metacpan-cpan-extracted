@@ -1,11 +1,11 @@
-use ExtUtils::MakeMaker 7.64;
+use ExtUtils::MakeMaker;
 use Config;
 use strict;
 use warnings;
 use 5.008001;
 
 ## No version.pm for this one, as the prereqs are not loaded yet.
-my $VERSION = '3.20.0';
+my $VERSION = '3.20.2';
 
 ## App::Info is stored inside t/lib
 ## Create a proper path so we can use it below
@@ -28,6 +28,11 @@ use lib $lib;
 
 if ($VERSION =~ /_/) {
     print "WARNING! This is a test version ($VERSION) and should not be used in production!\n";
+}
+
+my $emmv = $ExtUtils::MakeMaker::VERSION;
+if (($^O eq 'MacOS' or $^O eq 'darwin') and $emmv < 7.64) {
+    print "WARNING! Compilation may not work unless ExtUtils::MakeMaker is version 7.64 or higher (you are at $emmv)\n";
 }
 
 if (grep { /help/ } @ARGV) {
@@ -221,7 +226,7 @@ my %opts =
      AUTHOR         => 'Greg Sabino Mullane',
      ABSTRACT       => 'PostgreSQL database driver for the DBI module',
      PREREQ_PM      => {
-                        'ExtUtils::MakeMaker' => '7.64',
+                        'ExtUtils::MakeMaker' => '6.58',
                         'DBI'                 => '1.614',
                         'File::Temp'          => '0',
                         'Test::More'          => '0.88',
@@ -238,7 +243,7 @@ my %opts =
                         'lib/Bundle/DBD/Pg.pm' => '$(INST_LIB)/Bundle/DBD/Pg.pm',
                        },
      clean          => { FILES => 'trace Pg.xsi README.testdatabase cover_db *.tst' },
-     realclean      => { FILES => 'dbdpg_test_database/' },
+     realclean      => { FILES => 'testdb/' },
 );
 
 if ($os eq 'hpux') {

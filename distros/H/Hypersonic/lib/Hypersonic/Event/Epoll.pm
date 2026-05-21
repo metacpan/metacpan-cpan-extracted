@@ -6,7 +6,7 @@ use 5.010;
 
 use parent 'Hypersonic::Event::Role';
 
-our $VERSION = '0.12';
+our $VERSION = '0.14';
 
 sub name { 'epoll' }
 
@@ -108,9 +108,7 @@ sub gen_get_fd {
 sub gen_create_loop {
     my ($class, $builder, $loop_var) = @_;
 
-    $builder->line('struct epoll_event ev;')
-      ->blank
-      ->line("$loop_var = epoll_create1(0);")
+    $builder->line("$loop_var = epoll_create1(0);")
       ->if("$loop_var < 0")
         ->line('croak("epoll_create1() failed");')
       ->endif;
@@ -120,14 +118,17 @@ sub gen_create_loop {
 # Note: epoll_event.data is a union - we use data.u32 for slot
 sub gen_add_with_slot {
     my ($class, $builder, $loop_var, $fd_var, $slot_var, $events) = @_;
-    
-    my $ev_flags = $events eq 'read' ? 'EPOLLIN | EPOLLET | EPOLLONESHOT' 
+
+    my $ev_flags = $events eq 'read' ? 'EPOLLIN | EPOLLET | EPOLLONESHOT'
                  : $events eq 'write' ? 'EPOLLOUT | EPOLLET | EPOLLONESHOT'
                  : 'EPOLLIN | EPOLLET | EPOLLONESHOT';
-    
-    $builder->line("ev.events = $ev_flags;")
-      ->line("ev.data.u32 = (uint32_t)$slot_var;")
-      ->line("epoll_ctl($loop_var, EPOLL_CTL_ADD, $fd_var, &ev);");
+
+    $builder->line('{')
+      ->line('    struct epoll_event _ev;')
+      ->line("    _ev.events = $ev_flags;")
+      ->line("    _ev.data.u32 = (uint32_t)$slot_var;")
+      ->line("    epoll_ctl($loop_var, EPOLL_CTL_ADD, $fd_var, &_ev);")
+      ->line('}');
 }
 
 # Generate: extract slot from event data

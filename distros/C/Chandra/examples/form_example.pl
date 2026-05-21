@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 #
-# Example: Form API — build and render a settings form with two-way binding
+# Example: Form API - build and render a settings form with two-way binding
 #
 # Demonstrates Chandra::Form with field types, groups, validation feedback,
 # change handlers, and form submission via the webview bridge.
@@ -200,7 +200,7 @@ my $html = $css
 
 $app->set_content($html);
 
-# Attach form to app — binds bridge events and injects two-way binding JS
+# Attach form to app - binds bridge events and injects two-way binding JS
 $form->attach($app);
 
 print "Starting form example...\n";

@@ -1,6 +1,30 @@
 BATsh Cheat Sheet [TL] Filipino
 =================================
 
+----------------------------------------------------------------------
+BUOD
+  Ang BATsh ay isang bilinggwal na shell interpreter na nagpapatakbo ng
+  cmd.exe batch at bash/sh syntax sa iisang script file, awtomatikong
+  nagpapalit ng mode bawat linya. Walang kailangan na panlabas na shell.
+
+HALIMBAWA NG HALO
+  :: CMD na seksyon (unang token ay malalaking titik)
+  @ECHO OFF
+  SET LANG=BATsh
+
+  # SH na seksyon (unang token ay may maliliit na titik)
+  greet() { echo "Kamusta $1 (bash mode)"; }
+  greet $LANG
+  result=$(echo $LANG | perl -e 'while(<STDIN>){chomp;print uc}')
+  echo "Malalaking titik: $result"
+
+  :: Balik sa CMD (basahin ang resulta ng SH)
+  ECHO Balik CMD: %result%
+
+  # Patakbuhin: perl lib/BATsh.pm script.batsh
+----------------------------------------------------------------------
+
+
 Ang BATsh ay isang dalawang-wikang shell na nagpapatakbo ng cmd.exe
 at bash/sh na syntax sa iisang script. Ang unang token ng bawat linya
 ang nagtatakda ng mode.

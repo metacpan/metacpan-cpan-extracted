@@ -7,6 +7,7 @@ use lib "$FindBin::RealBin/../lib";
 
 use Cwd qw( abs_path );
 use File::Basename qw( dirname );
+use File::Spec::Functions qw( catfile file_name_is_absolute );
 use Storable qw( store );
 use Term::Prompt qw( prompt );
 use Type::Params qw( signature );
@@ -88,8 +89,11 @@ print "\nToken obtained successfully!\n";
 print "Here are the token contents:\n\n";
 print $token->to_string(), "\n\n";
 
-# Save the token for future use:
-my $token_file = dirname($config_file) . "/$config->{auth}->{token_file}";
+# Save the token for future use. token_file may be an absolute path or a
+# bare filename relative to the config file's directory.
+my $token_file = $config->{auth}->{token_file};
+$token_file = catfile(dirname($config_file), $token_file)
+  unless file_name_is_absolute($token_file);
 store($token->session_freeze(), $token_file);
 
 print <<END2
@@ -267,7 +271,7 @@ C<google_restapi> top-level key; otherwise place it at the root:
             class: OAuth2Client
             client_id: <client-id-from-google>
             client_secret: <client-secret-from-google>
-            token_file: <filename-for-the-stored-token>  # filename only, not a path
+            token_file: <filename-for-the-stored-token>  # bare filename (resolved against the config file's directory) or an absolute path
             scope:
                 - https://www.googleapis.com/auth/drive
                 - https://www.googleapis.com/auth/spreadsheets
@@ -295,8 +299,9 @@ Only include the scopes for APIs you actually use — requesting unnecessary sco
 may cause Google to show a warning during authorisation. If omitted, a minimal
 default scope is used (userinfo only).
 
-The token file will be written to the same directory as this config file. The
-same config file is used by this package at runtime to access the Google APIs.
+If C<token_file> is a bare filename it is written to the same directory as the
+config file; if it is an absolute path it is written there directly. The same
+config file is used by this package at runtime to access the Google APIs.
 
 =head2 6. Run This Script
 

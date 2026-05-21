@@ -1,4 +1,4 @@
-# Copyright (c) 2024-2025 Philipp Schafft <lion@cpan.org>
+# Copyright (c) 2024-2026 Philipp Schafft <lion@cpan.org>
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -20,7 +20,7 @@ use Fcntl qw(S_ISREG S_ISDIR S_ISLNK S_ISBLK S_ISCHR S_ISFIFO S_ISSOCK S_IWUSR S
 use Data::Identifier v0.08;
 use Data::Identifier::Generate;
 
-our $VERSION = v0.16;
+our $VERSION = v0.17;
 
 my $HAVE_XATTR              = eval {require File::ExtAttr; 1;};
 my $HAVE_FILE_VALUEFILE     = eval {require File::ValueFile::Simple::Reader; 1;};
@@ -804,7 +804,7 @@ sub _load_magic {
         $media_type = 'text/html';
     } elsif ($data =~ /^<\?xml version="1\.0" encoding="UTF-8"\?>\s*<office:document xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1\.0"[^>]+office:mimetype="(application\/vnd\.oasis\.opendocument\.(?:text|spreadsheet|presentation|graphics|chart|formula|image|text-master|(?:text|spreadsheet|presentation|graphics)-template))"[^>]*>/) {
         $media_type = $1;
-    } elsif ($data =~ /^PK\003\004....\0\0................\010\0\0\0mimetype(application\/vnd\.oasis\.opendocument\.(?:text|spreadsheet|presentation|graphics|chart|formula|image|text-master|(?:text|spreadsheet|presentation|graphics)-template))PK\003\004/) {
+    } elsif ($data =~ /^PK\003\004....\0\0................\010\0\0\0mimetype(application\/vnd\.oasis\.opendocument\.(?:text|spreadsheet|presentation|graphics|chart|formula|image|text-master|(?:text|spreadsheet|presentation|graphics)-template))PK\003\004/s) {
         $media_type = $1;
     } elsif (substr($data, 0, 8) eq "!<arch>\n") {
         if ($data =~ /^!<arch>\ndebian-binary   [0-9 ]{12}0     0     [0-7 ]{8}[0-9]         `\n/) {
@@ -818,7 +818,7 @@ sub _load_magic {
         $pv->{magic_valuefile_format}  = {raw => $format} unless $format =~ /^!/;
     } elsif ($data =~ /^\0([\x07-\x3f])VM\x0d\x0a\xc0\x0a/ && (ord($1) & 07) == 07) {
         $media_type = 'application/vnd.sirtx.vmv0';
-    } elsif ($data =~ /^RIFF.{4}WEBPVP8/) {
+    } elsif ($data =~ /^RIFF.{4}WEBPVP8/s) {
         $media_type = 'image/webp';
     } else {
         foreach my $magic (sort {length($b) <=> length($a)} keys %_magic_map) {
@@ -1013,7 +1013,7 @@ File::Information::Inode - generic module for extracting information from filesy
 
 =head1 VERSION
 
-version v0.16
+version v0.17
 
 =head1 SYNOPSIS
 
@@ -1118,7 +1118,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024-2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2024-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

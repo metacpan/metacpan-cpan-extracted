@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-# Copyright (c) 2023-2025 Philipp Schafft
+# Copyright (c) 2023-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -19,19 +19,19 @@ use Carp;
 use Math::BigInt lib => 'GMP';
 use URI;
 
-our $VERSION = v0.28;
+our $VERSION = v0.29;
 
 use constant {
-    RE_UUID         => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}$/,
-    RE_OID          => qr/^[0-2](?:\.(?:0|[1-9][0-9]*))+$/,
+    RE_UUID         => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}\z/,
+    RE_OID          => qr/^[0-2](?:\.(?:0|[1-9][0-9]*))+\z/,
     RE_URI          => qr/^[a-zA-Z][a-zA-Z0-9\+\.\-]+:/,
-    RE_UINT         => qr/^(?:0|[1-9][0-9]*)$/,
-    RE_SINT         => qr/^(?:0|-?[1-9][0-9]*)$/,
-    RE_QID          => qr/^[QPL][1-9][0-9]*$/,
+    RE_UINT         => qr/^(?:0|[1-9][0-9]*)\z/,
+    RE_SINT         => qr/^(?:0|-?[1-9][0-9]*)\z/,
+    RE_QID          => qr/^[QPL][1-9][0-9]*\z/,
     RE_DOI          => qr/^10\.[1-9][0-9]+(?:\.[0-9]+)*\/./,
-    RE_GTIN         => qr/^[0-9]{8}(?:[0-9]{4,6})?$/,
-    RE_UNICODE      => qr/^U\+([0-9A-F]{4,7})$/,
-    RE_SIMPLE_TAG   => qr/^[^\p{upper case}\s]+$/,
+    RE_GTIN         => qr/^[0-9]{8}(?:[0-9]{4,6})?\z/,
+    RE_UNICODE      => qr/^U\+([0-9A-F]{4,7})\z/,
+    RE_SIMPLE_TAG   => qr/^[^\p{upper case}\s]+\z/,
 };
 
 use constant {
@@ -474,6 +474,14 @@ sub new {
         }
     }
 
+    if (defined(my $tagname = $opts{tagname})) {
+        $tagname = [$tagname] unless ref $tagname;
+        $tagname = [grep {defined} @{$tagname}];
+        if (scalar(@{$tagname})) {
+            $self->{tagname} = $tagname;
+        }
+    }
+
     return bless $self;
 }
 
@@ -884,6 +892,10 @@ sub displayname {
         return $displayname if defined($displayname) && length($displayname);
     }
 
+    if (defined(my $tagname = $self->tagname(default => undef, no_defaults => 1))) {
+        return $tagname;
+    }
+
     return $self->id.'' unless $opts{no_defaults}; # force stringification.
     return $opts{default} if exists $opts{default};
     croak 'No value for displayname';
@@ -893,6 +905,30 @@ sub displayname {
 sub displaycolour { my ($self, %opts) = @_; return $opts{default}; }
 sub icontext { my ($self, %opts) = @_; return $opts{default}; }
 sub description { my ($self, %opts) = @_; return $opts{default}; }
+
+
+sub tagname {
+    my ($self, %opts) = @_;
+    my $had_default = exists $opts{default};
+    my $default = delete $opts{default};
+    my $list = delete $opts{list};
+
+    delete $opts{no_defaults}; # for compatibility.
+
+    croak 'Stray options passed' if scalar keys %opts;
+
+    if (defined(my $tagname = $self->{tagname})) {
+        return @{$tagname} if $list;
+
+        return $tagname->[0];
+    }
+
+    if ($had_default) {
+        return @{$default} if $list;
+        return $default;
+    }
+    croak 'No value for tagname found';
+}
 
 # ---- Private helpers ----
 
@@ -979,7 +1015,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.28
+version v0.29
 
 =head1 SYNOPSIS
 
@@ -1164,6 +1200,12 @@ An instance of L<File::Information>. This option is currently ignored.
 =item C<store>
 
 An instance of L<File::FStore>. This option is currently ignored.
+
+=item C<tagname>
+
+A tagname or a list of tagnames (arrayref).
+Undefined elements are removed.
+See L</tagname> for details.
 
 =back
 
@@ -1565,6 +1607,7 @@ This can be set to C<undef> to let this method return C<undef> (not C<die>).
 =item C<no_defaults>
 
 If set true do not try to use any identifier or other fallback as displayname.
+It is undefined (since v0.29) if this includes names known by L</tagname>.
 
 =back
 
@@ -1598,13 +1641,61 @@ This is for compatibility with L</displayname> and implementations of other pack
 
 =back
 
+=head2 tagname
+
+    my $tagname = $identifier->tagname;
+    my @tagname = $identifier->tagname(list => 1);
+
+(experimental since v0.29)
+
+Returns the tagnames for the given identifier (as passed to L</new>).
+This property represents the identifiers of the C<tagname> type
+(UUID C<bfae7574-3dae-425d-89b1-9c087c140c23>, sid C<3>).
+In contrast to L</displayname> this represents permanent names for the given identifier.
+
+B<When in doubt always use displaynames.>
+
+This implementation supports or zero or more tagnames per identifier.
+When this getter is called with C<list> unset or false only one is returned.
+There is no specific order or preference.
+An application must assume that any of them could be returned
+and that different versions of this module might return different values.
+Repeated calls on the same object will however return the same tagname.
+(See also L</register> regarding object lifetime.)
+
+If no tagname is available this function C<die>s unless C<default> is provided.
+
+tagnames might be used as values for displaynames.
+See L</displayname> for details.
+
+The following (all optional) options are supported:
+
+=over
+
+=item C<default>
+
+The default value to return if no other value is available.
+This can be set to C<undef> to let this method return C<undef> (not C<die>).
+If C<list> is given to a trueish value this must be an array reference.
+
+=item C<list>
+
+Returns a list (not a listref) not just one entry.
+
+=item C<no_defaults>
+
+This option is ignored for compatibility.
+Future versions might use this option.
+
+=back
+
 =head1 AUTHOR
 
 Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023-2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2023-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

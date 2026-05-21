@@ -39,7 +39,7 @@ my @_EXPORT = qw(
     check_A count_A  check_B count_B  check_C count_C
     check_D count_D  check_E count_E  check_F count_F
     check_G count_G  check_H count_H  check_I count_I
-    check_J count_J  check_K count_K
+    check_J count_J  check_K count_K  check_L count_L
 );
 
 sub import {
@@ -84,8 +84,17 @@ sub diag {
 }
 
 sub end_testing {
-    exit 1 if $T_PLAN && $T_FAIL;
-    exit 0;
+    # Do NOT call exit() here.  This sub is invoked from an END block, and
+    # calling exit() from inside END triggers Perl's "Callback called exit.
+    # END failed--cleanup aborted." warning on some platforms (notably
+    # Windows + older Perl harnesses).  The TAP harness already determines
+    # pass/fail from the "1..N" plan and "ok"/"not ok" lines; the script's
+    # numeric exit code does not matter here.  Just set $? so the process
+    # exits non-zero on internal failures, and let END unwind naturally.
+    if ($T_PLAN && $T_FAIL) {
+        $? = 1;
+    }
+    return;
 }
 
 ######################################################################
@@ -623,15 +632,38 @@ sub check_J {
     my $meta_yml = _slurp("$root/META.yml");
 
     # J1: no PREREQ_PM dep version equals module VERSION
+    #
+    # Heuristic to catch copy-paste bugs where someone writes the module's
+    # own VERSION as a dep version.  Core *pragmas* (strict, warnings,
+    # vars, ...) have their own pinned baseline versions historically
+    # tied to Perl 5.005_03 and may legitimately equal a module's own
+    # VERSION by pure coincidence (e.g. strict 1.01 vs a module reaching
+    # version 1.01).  Exempt those from the check.  Non-pragma core
+    # modules (Carp, Cwd, Exporter, ...) are *not* exempt because their
+    # version numbers are not pinned and a coincidental equal value is
+    # likely a real copy-paste bug.
+    my %J1_EXEMPT = map { $_ => 1 } qw(
+        strict warnings vars base lib utf8 bytes integer overload
+        constant subs filetest charnames diagnostics fields locale
+        feature mro re sigtrap sort encoding open
+    );
     my $pm_ver = _pm_version("$root/$pm_files[0]") if @pm_files;
     my $j1 = 1;
+    my @j1_bad;
     if ($meta_yml =~ /^requires:(.*?)(?=^\S)/ms) {
         my $block = $1;
-        while ($block =~ /:\s*([\d._]+)/g) {
-            if (defined $pm_ver && $1 eq $pm_ver) { $j1 = 0; last }
+        for my $line (split /\n/, $block) {
+            next unless $line =~ /^\s+(\S+)\s*:\s*([\d._]+)\s*$/;
+            my ($dep, $ver) = ($1, $2);
+            next if $J1_EXEMPT{$dep};
+            if (defined $pm_ver && $ver eq $pm_ver) {
+                $j1 = 0;
+                push @j1_bad, "$dep:$ver";
+            }
         }
     }
-    ok($j1, 'J - PREREQ_PM: no core dep version equals module VERSION');
+    ok($j1, 'J - PREREQ_PM: no non-pragma dep version equals module VERSION'
+            . (@j1_bad ? " (offending: @j1_bad)" : ''));
 
     # J2: BUGS AND LIMITATIONS has no stale entries
     my @stale = exists $opt{j2_stale} ? @{$opt{j2_stale}} : ();
@@ -764,5 +796,117 @@ sub count_K {
     my @pm_files = grep { /^lib\/.*\.pm$/ && -f "$root/$_" } @manifest;
     return scalar(@pm_files) * 3;
 }
+
+######################################################################
+# Category L: END-block safety
+#
+# On Windows + older Perl, calling exit() from inside an END { ... } block
+# triggers the warning:
+#   "Callback called exit. END failed--cleanup aborted."
+# which the harness reports as a spurious test failure in the next test
+# file.  This category catches that class of bug at distribution test time:
+#
+#   L1  No .t file's END block contains a literal `exit`
+#   L2  No sub invoked from a .t file's END block contains `exit`
+#       (transitive check: scans t/lib/*.pm definitions of those subs)
+######################################################################
+
+sub check_L {
+    my ($root) = @_;
+    my @manifest  = _manifest_files($root);
+    my @t_files   = sort grep { /\.t$/ && -f "$root/$_" } @manifest;
+    my @lib_files = sort grep { m{^t/lib/.*\.pm$} && -f "$root/$_" } @manifest;
+
+    # L1: scan each .t file's END blocks for literal `exit`.
+    # Also collect the names of subs invoked from inside END.
+    my %end_subs;   # name => 1
+    my $l1 = 1;
+    my @l1_bad;
+    for my $tf (@t_files) {
+        my $text = _slurp("$root/$tf");
+        # Strip POD and __END__
+        $text =~ s/\n__END__\b.*\z//s;
+        $text =~ s/^=[a-zA-Z].*?^=cut[ \t]*$//msg;
+
+        # Match END { ... } blocks.  Bodies contain no nested braces in our
+        # convention, so a non-greedy match is sufficient.
+        while ($text =~ /\bEND\s*\{([^{}]*)\}/g) {
+            my $body = $1;
+            # Strip comments and strings inside the body so `exit` in a
+            # comment or string literal isn't flagged.
+            my $clean = $body;
+            $clean =~ s/'[^']*'//g;
+            $clean =~ s/"[^"]*"//g;
+            $clean =~ s/#.*$//mg;
+            if ($clean =~ /\bexit\b/) {
+                $l1 = 0;
+                push @l1_bad, $tf;
+            }
+            # Collect bareword sub calls from END body (including pkg::sub)
+            while ($clean =~ /\b((?:[A-Za-z_][\w]*::)*[A-Za-z_]\w*)\s*\(/g) {
+                my $name = $1;
+                # Skip Perl built-ins and control words we don't care about
+                next if $name =~ /^(?:if|unless|while|for|foreach|return
+                                    |my|our|local|do|defined|ref|scalar
+                                    |print|printf|sprintf|warn|die|chomp
+                                    |chop|join|split|sort|grep|map|push
+                                    |pop|shift|unshift|wantarray|exists
+                                    |delete|keys|values|each|bless|caller
+                                    |eval|require|use|no|sub|sprintf
+                                    |ok|diag|plan_tests|plan_skip
+                                    |open|close|binmode|read|write
+                                    |chdir|opendir|readdir|closedir|stat
+                                    |unlink|mkdir|rmdir|rename|chmod
+                                    |length|substr|index|rindex|lc|uc
+                                    |lcfirst|ucfirst|reverse|tr|y)$/x;
+                # Strip package qualifier; we want the local sub name
+                $name =~ s/.*:://;
+                $end_subs{$name} = 1;
+            }
+        }
+    }
+    ok($l1, 'L - no literal `exit` inside END {} blocks of .t files'
+            . (@l1_bad ? " (offending: @l1_bad)" : ''));
+
+    # L2: for each sub name collected from END bodies, locate its definition
+    # in t/lib/*.pm and verify the body does not contain `exit`.
+    my $l2 = 1;
+    my @l2_bad;
+    for my $lib (@lib_files) {
+        my $libtext = _slurp("$root/$lib");
+        $libtext =~ s/\n__END__\b.*\z//s;
+        $libtext =~ s/^=[a-zA-Z].*?^=cut[ \t]*$//msg;
+
+        for my $sub_name (sort keys %end_subs) {
+            # Match: sub NAME { ... }   where the body has no nested braces
+            # (Ina convention: subs don't open extra blocks at top level).
+            # If a sub has nested braces, fall back to greedy-then-balance:
+            # we approximate by capturing up to the next "^sub " or EOF.
+            my $body;
+            if ($libtext =~ /^sub\s+\Q$sub_name\E\b\s*\{([^{}]*)\}/m) {
+                $body = $1;
+            }
+            elsif ($libtext =~ /^sub\s+\Q$sub_name\E\b\s*\{(.*?)(?=^sub\s+\w+\b|^\}\s*$)/ms) {
+                $body = $1;
+            }
+            else {
+                next;   # sub not defined here; skip
+            }
+
+            my $clean = $body;
+            $clean =~ s/'[^']*'//g;
+            $clean =~ s/"[^"]*"//g;
+            $clean =~ s/#.*$//mg;
+            if ($clean =~ /\bexit\b/) {
+                $l2 = 0;
+                push @l2_bad, "$lib:$sub_name";
+            }
+        }
+    }
+    ok($l2, 'L - no `exit` in subs invoked from END {} of .t files'
+            . (@l2_bad ? " (offending: @l2_bad)" : ''));
+}
+
+sub count_L { return 2 }
 
 1;

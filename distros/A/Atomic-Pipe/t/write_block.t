@@ -8,57 +8,104 @@ BEGIN {
     require "./$path";
 }
 
-my ($r, $w) = Atomic::Pipe->pair;
-
-$r->blocking(1);
-$w->blocking(0);
-
-worker { note_sleep 10; while (my $msg = $r->read_message) { last if $msg =~ m/END/i } };
-
-my $count = 0;
-my $start = time;
-until ($w->{out_buffer} && @{$w->{out_buffer}}) {
-    $w->resize(PIPE_BUF * 2);    # Might not work, but nicer on systems where it does
-    $w->write_message("aa" x PIPE_BUF);
-    $count++;
-
-    next unless $count > 1000;
-    fail "Count got too high!";
-    last;
-}
-ok(time - $start < 8, "Did not block");
-
-$w->write_message("END");
-
-# Clear the buffer
-while (@{$w->{out_buffer}}) {
-    $w->flush;
+BEGIN {
+    my $path = __FILE__;
+    $path =~ s{[^/]+\.t$}{select_mode.pm};
+    require "./$path";
 }
 
-ok(1, "Was able to flush the buffer");
+for my $use_select (io_select_modes()) {
+    subtest "use_io_select=$use_select" => sub {
+        my ($r, $w) = Atomic::Pipe->pair(use_io_select => $use_select);
 
-cleanup();
+        $r->blocking(1);
+        $w->blocking(0);
 
-# Also checks the blocking flush on destroy
-worker { sleep 1; $w->write_message("zz" x PIPE_BUF); do { $w = undef } };
-my $msg = $r->read_message;
-is($msg, "zz" x PIPE_BUF, "Got expected message when writing is non-blocking");
+        # Test 1: non-blocking writes overflow into the internal buffer.
+        # Worker waits for a "go" signal so the parent can fill the pipe
+        # without the reader draining it.
+        my $sync = make_sync();
+        worker {
+            sync_signal($sync->{from_worker_w});
+            sync_wait($sync->{to_worker_r});
+            while (my $msg = $r->read_message) { last if $msg =~ m/END/i }
+        };
+        sync_wait($sync->{from_worker_r});
 
-cleanup();
+        my $count = 0;
+        until ($w->{out_buffer} && @{$w->{out_buffer}}) {
+            $w->resize(PIPE_BUF * 2);    # Might not work, but nicer on systems where it does
+            $w->write_message("aa" x PIPE_BUF);
+            $count++;
 
-worker { note_sleep 10; while (my $msg = $r->read_message) { last if $msg =~ m/END/i } };
+            next unless $count > 1000;
+            fail "Count got too high!";
+            last;
+        }
+        ok(@{$w->{out_buffer}} > 0, "Non-blocking writes filled the internal buffer");
 
-$w->blocking(1);
+        $w->write_message("END");
 
-$start = time;
-for ( 0 .. $count ) {
-    $w->write_message("aa" x PIPE_BUF);
+        sync_signal($sync->{to_worker_w});
+
+        # Clear the buffer
+        while (@{$w->{out_buffer}}) {
+            $w->flush;
+        }
+
+        ok(1, "Was able to flush the buffer");
+
+        cleanup();
+
+        # Test 2: blocking flush on destroy. Worker writes a single message
+        # and lets $w go out of scope, which performs a blocking flush.
+        $sync = make_sync();
+        worker {
+            sync_signal($sync->{from_worker_w});
+            sync_wait($sync->{to_worker_r});
+            $w->write_message("zz" x PIPE_BUF);
+            do { $w = undef };
+        };
+        sync_wait($sync->{from_worker_r});
+        sync_signal($sync->{to_worker_w});
+
+        my $msg = $r->read_message;
+        is($msg, "zz" x PIPE_BUF, "Got expected message when writing is non-blocking");
+
+        cleanup();
+
+        # Test 3: blocking writes succeed once the reader drains. Fill the OS
+        # pipe so further writes would block, verify via select(), then release
+        # the worker and complete the writes in blocking mode.
+        $sync = make_sync();
+        worker {
+            sync_signal($sync->{from_worker_w});
+            sync_wait($sync->{to_worker_r});
+            while (my $msg = $r->read_message) { last if $msg =~ m/END/i }
+        };
+        sync_wait($sync->{from_worker_r});
+
+        $w->blocking(0);
+        for (0 .. $count) {
+            $w->write_message("aa" x PIPE_BUF);
+        }
+
+        ok(!can_write_now($w->wh), "OS pipe is full; a blocking write would block");
+
+        $w->blocking(1);
+        sync_signal($sync->{to_worker_w});
+
+        for (0 .. $count) {
+            $w->write_message("aa" x PIPE_BUF);
+        }
+        ok(1, "Blocking writes completed once reader drained");
+
+        $w->write_message("END");
+
+        delete $w->{out_buffer};
+
+        cleanup();
+    };
 }
-ok(time - $start > 5, "Blocked");
 
-$w->write_message("END");
-
-delete $w->{out_buffer};
-
-cleanup();
 done_testing;

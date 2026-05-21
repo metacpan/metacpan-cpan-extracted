@@ -23,6 +23,7 @@ lib/Crypt/SecretBuffer/INI.pm
 lib/Crypt/SecretBuffer/PEM.pm
 lib/Crypt/SecretBuffer/PEM/Headers.pm
 lib/Crypt/SecretBuffer/Span.pm
+perl_win32_excerpt.c
 ppport.h
 secret_buffer_async_write.c
 secret_buffer_base.c
@@ -31,6 +32,7 @@ secret_buffer_console.c
 secret_buffer_parse.c
 secret_buffer_parse_match_str.c
 secret_buffer_span.c
+secret_buffer_wait_readable.c
 t/01-ctor.t
 t/02-allocate.t
 t/03-leak-check.t

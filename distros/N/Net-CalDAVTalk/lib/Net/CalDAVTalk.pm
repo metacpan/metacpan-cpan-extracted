@@ -66,22 +66,17 @@ BEGIN {
       locale               => [0, 'string',    0, undef],
       localizations        => [0, 'patch',     0, undef],
       locations            => [0, 'object',    0, undef],
-      isAllDay             => [0, 'bool',      0, $JSON::false],
+      showWithoutTime      => [0, 'bool',      0, $JSON::false],
       start                => [0, 'localdate', 1, undef],
       timeZone             => [0, 'timezone',  0, undef],
       duration             => [0, 'duration',  0, undef],
       recurrenceRule       => [0, 'object',    0, undef],
       recurrenceOverrides  => [0, 'patch',     0, undef],
       status               => [0, 'string',    0, undef],
-      showAsFree           => [0, 'bool',      0, undef],
-      replyTo              => [0, 'object',    0, undef],
+      freeBusyStatus       => [0, 'string',    0, undef],
+      organizerCalendarAddress => [0, 'string', 0, undef],
       participants         => [0, 'object',    0, undef],
-      useDefaultAlerts     => [0, 'bool',      0, $JSON::false],
       alerts               => [0, 'object',    0, undef],
-    },
-    replyTo => {
-      imip                 => [0, 'mailto',    0, undef],
-      web                  => [0, 'href',      0, undef],
     },
     links => {
       href                 => [0, 'string',    1, undef],
@@ -105,9 +100,9 @@ BEGIN {
       interval             => [0, 'number',    0, undef],
       rscale               => [0, 'string',    0, 'gregorian'],
       skip                 => [0, 'string',    0, 'omit'],
-      firstDayOfWeek       => [0, 'string',    0, 'monday'],
+      firstDayOfWeek       => [0, 'string',    0, 'mo'],
       byDay                => [1, 'object',    0, undef],
-      byDate               => [1, 'number',    0, undef],
+      byMonthDay           => [1, 'number',    0, undef],
       byMonth              => [1, 'string',    0, undef],
       byYearDay            => [1, 'number',    0, undef],
       byWeekNo             => [1, 'number',    0, undef],
@@ -125,22 +120,18 @@ BEGIN {
     participants => {
       name                 => [0, 'string',    1, undef],
       email                => [0, 'string',    1, undef],
-      kind                 => [0, 'string',    0, 'unknown'],
-      roles                => [1, 'string',    1, undef],
-      locationId           => [0, 'string',    0, undef],
-      scheduleStatus       => [0, 'string',    0, 'needs-action'],
-      schedulePriority     => [0, 'string',    0, 'required'],
-      scheduleRSVP         => [0, 'bool',      0, $JSON::false],
+      kind                 => [0, 'string',    0, 'individual'],
+      roles                => [0, 'object',    0, undef],
+      calendarAddress      => [0, 'string',    0, undef],
+      participationStatus  => [0, 'string',    0, 'needs-action'],
+      expectReply          => [0, 'bool',      0, $JSON::false],
+      scheduleAgent        => [0, 'string',    0, undef],
       scheduleUpdated      => [0, 'utcdate',   0, undef],
-      memberOf             => [1, 'string',    0, undef],
+      memberOf             => [0, 'object',    0, undef],
     },
     alerts => {
-      relativeTo           => [0, 'string',    0, 'before-start'],
-      offset               => [0, 'duration',  1, undef],
-      action               => [0, 'object',    1, undef],
-    },
-    action => {
-      type                 => [0, 'string',    1, undef],
+      action               => [0, 'string',    1, undef],
+      trigger              => [0, 'object',    1, undef],
     },
   );
 
@@ -322,11 +313,11 @@ Net::CalDAVTalk - Module to talk CalDAV and give a JSON interface to the data
 
 =head1 VERSION
 
-Version 0.14
+Version 0.16
 
 =cut
 
-our $VERSION = '0.14';
+our $VERSION = '0.17';
 
 
 =head1 SYNOPSIS
@@ -1264,6 +1255,17 @@ Returns the href, but also updates 'uid' in $Args.
 
 Also updates 'sequence'.
 
+Special keys consumed from $Args (not stored in the event):
+
+=over 4
+
+=item _no_schedule
+
+If true, sends C<Schedule-Reply: false> on the PUT request, suppressing
+iTIP scheduling replies from the server (RFC 6638 section 8.1).
+
+=back
+
 e.g.
 
     my $href = $CalDAV->NewEvent('Default', $Args);
@@ -1278,7 +1280,9 @@ sub NewEvent {
 
   confess "invalid event" unless ref($Args) eq 'HASH';
 
-  my $UseEvent = delete $Args->{_put_event_json};
+  my $UseEvent    = delete $Args->{_put_event_json};
+  my $no_schedule = delete $Args->{_no_schedule};
+  my @sched_header = $no_schedule ? ('Schedule-Reply' => 'false') : ();
 
   # calculate updated sequence numbers
   unless (exists $Args->{sequence}) {
@@ -1307,6 +1311,7 @@ sub NewEvent {
       $href,
       encode_json($Args),
       'Content-Type'  => 'application/event+json',
+      @sched_header,
     );
   }
   else {
@@ -1316,6 +1321,7 @@ sub NewEvent {
       $href,
       $VCalendar->as_string(),
       'Content-Type'  => 'text/calendar',
+      @sched_header,
     );
   }
 
@@ -1327,12 +1333,16 @@ sub NewEvent {
 Like NewEvent, but you only need to specify keys that you want to change,
 and it takes the full href to the card instead of the containing calendar.
 
+Accepts the same special keys as NewEvent (e.g. C<_no_schedule>).
+
 =cut
 
 sub UpdateEvent {
   my ($Self, $href, $Args) = @_;
 
-  my $UseEvent = delete $Args->{_put_event_json};
+  my $UseEvent    = delete $Args->{_put_event_json};
+  my $no_schedule = delete $Args->{_no_schedule};
+  my @sched_header = $no_schedule ? ('Schedule-Reply' => 'false') : ();
 
   my ($OldEvent, $NewEvent) = $Self->_updateEvent($href, $Args);
 
@@ -1342,6 +1352,7 @@ sub UpdateEvent {
       $href,
       encode_json($NewEvent),
       'Content-Type'  => 'application/event+json',
+      @sched_header,
     );
   }
   else {
@@ -1351,6 +1362,7 @@ sub UpdateEvent {
       $href,
       $VCalendar->as_string(),
       'Content-Type'  => 'text/calendar',
+      @sched_header,
     );
   }
 
@@ -1365,16 +1377,13 @@ sub _updateEvent {
   confess "Error getting old event for $href"
     unless $OldEvent;
 
-  my %NewEvent;
-
-  foreach my $Property (keys %EventKeys) {
-    if (exists $Args->{$Property}) {
-      if (defined $Args->{$Property}) {
-        $NewEvent{$Property} = $Args->{$Property};
-      }
-    }
-    elsif (exists $OldEvent->{$Property}) {
-      $NewEvent{$Property} = $OldEvent->{$Property};
+  # Merge patch onto old event (both are flat JSCalendar hashes)
+  my %NewEvent = %$OldEvent;
+  for my $key (keys %$Args) {
+    if (defined $Args->{$key}) {
+      $NewEvent{$key} = $Args->{$key};
+    } else {
+      delete $NewEvent{$key};
     }
   }
 
@@ -1394,7 +1403,22 @@ sub _updateEvent {
       if ($old && exists $old->{sequence}) {
         $sequence = $old->{sequence} + 1 unless $sequence > $old->{sequence};
       }
-      $val->{sequence} = $sequence;
+      $val->{sequence} = $sequence if $sequence > $NewEvent{sequence};
+    }
+  }
+
+  if ($NewEvent{recurrenceOverrides}) {
+    foreach my $recurrenceId (sort keys %{$NewEvent{recurrenceOverrides}}) {
+      my $val = $NewEvent{recurrenceOverrides}{$recurrenceId};
+      next unless $val;
+      next if exists $val->{sequence};
+
+      my $old = ($OldEvent->{recurrenceOverrides} || {})->{$recurrenceId};
+      my $sequence = $NewEvent{sequence};
+      if ($old && exists $old->{sequence}) {
+        $sequence = $old->{sequence} + 1 unless $sequence > $old->{sequence};
+      }
+      $val->{sequence} = $sequence if $sequence > $NewEvent{sequence};
     }
   }
 
@@ -1544,7 +1568,7 @@ sub _stripNonICal {
   delete $Event->{attendees};
   delete $Event->{organizer};
   delete $Event->{participants};
-  delete $Event->{replyTo};
+  delete $Event->{organizerCalendarAddress};
 
   foreach my $exception (values %{$Event->{exceptions} || $Event->{recurrenceOverrides} || {}}) {
     next unless $exception;

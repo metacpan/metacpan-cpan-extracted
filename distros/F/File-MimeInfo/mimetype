@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 $|++;
 
 # ########## #
@@ -10,7 +10,8 @@ $|++;
 # ########## #
 use Encode::Locale;
 use Encode;
-@ARGV = map { decode(locale => $_, 1) } @ARGV;
+use B qw(cstring);
+@ARGV = map { my $d = eval { decode(locale => $_, 1) }; defined $d ? $d : $_ } @ARGV;
 
 # Set up output encoding
 if (-t) {
@@ -88,6 +89,7 @@ if ($args{help} || $args{usage}) {
 if ($args{version}) {
     print "mimetype $VERSION\n\n", << 'EOV';
 Copyright (c) 2003, 2012 Jaap G Karssenberg. All rights reserved.
+Copyright (c) 2013-2026 Michiel W. Beijen. All rights reserved.
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl.
 
@@ -140,8 +142,8 @@ $args{describe}++ if $args{'file-compat'} && !$args{mimetype};
 
 # --namefile
 if ($args{namefile}) {
-    open IN, $args{namefile}
-        || die "Couldn't open file: $args{namefile}\n";
+    open IN, '<', $args{namefile}
+        or die "Couldn't open file: $args{namefile}\n";
     unshift @ARGV, map {chomp; $_} (<IN>);
     close IN;
 }
@@ -153,9 +155,10 @@ if ($args{namefile}) {
 }
 
 # Formatting stuff
+my $name_of = -t STDOUT ? sub { cstring($_[0]) } : sub { $_[0] };
 my $l = 5; # "STDIN"
 unless ($args{brief} || $args{noalign}) {
-    for (@ARGV) { $l = length($_) if $l < length($_) }
+    for (@ARGV) { my $n = length $name_of->($_); $l = $n if $l < $n }
 }
 
 $args{separator} = ':' unless defined $args{separator};
@@ -202,19 +205,20 @@ if ($args{stdin}) {
 foreach my $file (@ARGV) {
     # --dereference
     my $f = ($args{dereference} && -l $file) ? resolvelink($file) : $file;
+    my $name = $name_of->($file);
     # --magic-only
     if ($args{'magic-only'}) {
-        print $format->($file, magic($f) || default($f)), "\n";
+        print $format->($name, magic($f) || default($f)), "\n";
     }
     # --all
     elsif ($args{all}) {
         for (qw#inodetype globs magic default#) {
             my $m = eval "$_(\$f)";
-            print $format->($file, $m), "\n" if $m;
+            print $format->($name, $m), "\n" if $m;
         }
     }
     else {
-        print $format->($file, mimetype($f)), "\n"
+        print $format->($name, mimetype($f)), "\n"
     }
 }
 
@@ -251,11 +255,8 @@ sub parse_format { # Advanced formatting
 
 sub resolvelink { # --dereference
     my $file = shift;
-    my $link = readlink($file) || return $file;
-    my (undef, $dir, undef) = File::Spec->splitpath($file);
-    $link = File::Spec->rel2abs($link, $dir);
-    $link = resolvelink($link) if -l $link; # recurs
-    return $link;
+    require Cwd;
+    return Cwd::abs_path($file) // $file; # undef on cycles
 }
 
 sub desc { # Cache description
@@ -482,6 +483,7 @@ Maintained by Michiel Beijen E<lt>mb@x14.nlE<gt>
 =head1 COPYRIGHT
 
 Copyright (c) 2003, 2012 Jaap G Karssenberg. All rights reserved.
+Copyright (c) 2013-2026 Michiel W. Beijen. All rights reserved.
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl.
 

@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v1.3.1
+## Version v1.5.0
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2026/03/31
+## Modified 2026/05/19
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -14,7 +14,7 @@
 package Module::Generic;
 BEGIN
 {
-    use v5.26.1;
+    use v5.16.0;
     use strict;
     use warnings;
     use warnings::register;
@@ -22,6 +22,7 @@ BEGIN
     $MOD_PERL $AUTOLOAD $ERROR $PARAM_CHECKER_LOAD_ERROR $VERBOSE $DEBUG 
     $SILENT_AUTOLOAD $PARAM_CHECKER_LOADED $CALLER_LEVEL $COLOUR_NAME_TO_RGB 
     $true $false $DEBUG_LOG_IO %RE $stderr $stderr_raw $SERIALISER 
+    $NUMBER_REAL_RE $IPV4_RE $IPV6_RE
     $AUTOLOAD_SUBS $SUB_ATTR_LIST $DATA_POS $HAS_LOCAL_TZ $VERSION_LAX_REGEX
     $PARSE_DATE_FRACTIONAL1_RE $PARSE_DATE_WITH_MILI_SECONDS_RE $PARSE_DATE_HTTP_RE
     $PARSE_DATE_NON_STDANDARD_RE $PARSE_DATE_ONLY_RE $PARSE_DATE_ONLY_US_SHORT_RE
@@ -34,17 +35,9 @@ BEGIN
     use utf8;
     use B ();
     use Config;
-    use Class::Load ();
-    use Clone ();
-    use Data::Dump;
-    use Devel::StackTrace;
-    use Encode ();
-    use File::Spec ();
     use Module::Generic::Global ':const';
-    use Module::Metadata;
     use POSIX;
     use Scalar::Util qw( openhandle );
-    use Sub::Util ();
     # To get some context on what the caller expect. This is used in our error() method to allow chaining without breaking
     use version;
     use Wanted;
@@ -93,17 +86,37 @@ BEGIN
         )*
     }x;
     # From version::regex
-    $VERSION_LAX_REGEX = qr/(?^x: (?^x:
-        (?<has_v>v) (?<ver>(?^:[0-9]+) (?: (?^:\.[0-9]+)+ (?^:_[0-9]+)? )?)
+    # We use /x rather than (?^x: because the (?^alupimnsx) embedded pattern-match modifiers were not fully implemented until perl v5.12 or v5.14.
+    $VERSION_LAX_REGEX = qr/(?: (?:
+        (?<has_v>v) (?<ver>(?:[0-9]+) (?: (?:\.[0-9]+)+ (?:_[0-9]+)? )?)
         |
-        (?<ver>(?^:[0-9]+)? (?^:\.[0-9]+){2,} (?^:_[0-9]+)?)
-    ) | (?^x: (?<ver>(?^:[0-9]+) (?: (?^:\.[0-9]+) | \. )? (?^:_[0-9]+)?)
+        (?<ver>(?:[0-9]+)? (?:\.[0-9]+){2,} (?:_[0-9]+)?)
+    ) | (?: (?<ver>(?:[0-9]+) (?: (?:\.[0-9]+) | \. )? (?:_[0-9]+)?)
         |
-        (?<ver>(?^:\.[0-9]+) (?^:_[0-9]+)?)
+        (?<ver>(?:\.[0-9]+) (?:_[0-9]+)?)
         )
-    )/;
+    )/x;
+    # Unfortunately, Regexp::Common does not install under perl v5.10.1 because of a bug in its test t/test_comments.t, so we copy here those regular expression constants
+    $NUMBER_REAL_RE = qr/(?:(?i)(?:[-+]?)(?:(?=[.]?[0123456789])(?:[0123456789]*)(?:(?:[.])(?:[0123456789]{0,}))?)(?:(?:[E])(?:(?:[-+]?)(?:[0123456789]+))|))/;
+    $IPV4_RE = qr/(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))/;
+    $IPV6_RE = qr/(?:(?|(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4})|(?::(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?::(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?::(?:)(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?::(?:)(?:)(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?::(?:)(?:)(?:)(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?::(?:)(?:)(?:)(?:)(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}))|(?::(?:)(?:)(?:)(?:)(?:)(?:)(?:)(?:):)|(?:(?:[0-9a-fA-F]{1,4}):(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:)(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:)(?:)(?:)(?:)(?:):)|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:)(?:)(?:)(?:):)|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:)(?:)(?:):)|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:)(?:):)|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:):(?:[0-9a-fA-F]{1,4}))|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:)(?:):)|(?:(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:[0-9a-fA-F]{1,4}):(?:)(?:):)))/;
     our $XS_LOADED = 0;
-    our $VERSION   = 'v1.3.1';
+    # Used by all modules, and possibly from other classes too.
+    if( defined( ${^GLOBAL_PHASE} ) )
+    {
+        # perl 5.14+: use the built-in
+        *_in_global_destruction = sub{ ${^GLOBAL_PHASE} eq 'DESTRUCT' };
+    }
+    else
+    {
+        # perl < 5.14: detect via B::main_cv. During global destruction, PL_main_cv is
+        # set to Nullcv, which B exposes as a B::SPECIAL whose dereferenced value is 0.
+        # B is use'd earlier in our BEGIN block.
+        # require B;
+        *_in_global_destruction = sub{ ${B::main_cv()} == 0 };
+    }
+
+    our $VERSION   = 'v1.5.0';
 };
 
 # Load the XS shared library (Generic.so) which provides faster implementations of
@@ -126,7 +139,6 @@ BEGIN
     };
 }
 
-use v5.26.1;
 use utf8;
 # use strict;
 
@@ -1379,6 +1391,7 @@ sub error
             {
                 local $@;
                 $self->__message( 106, "Encoding error string '$o' (", $o->message, ")" );
+                require Encode;
                 my $enc_str = eval{ Encode::encode( 'UTF-8', "$o", Encode::FB_CROAK ) };
                 # Display warnings if warnings for this class is registered and enabled or if not registered
                 $self->__message( 106, "Encoded error string is '$enc_str'" );
@@ -1390,6 +1403,7 @@ sub error
         {
             my $overload_meth_ref = overload::Method( $self, '""' );
             my $overload_meth_name = '';
+            require Sub::Util;
             $overload_meth_name = Sub::Util::subname( $overload_meth_ref ) if( ref( $overload_meth_ref ) );
             # use Sub::Identify ();
             # my( $over_file, $over_line ) = Sub::Identify::get_code_location( $overload_meth_ref );
@@ -2788,25 +2802,14 @@ sub __instantiate_object
             {
                 $self->__message( 107, "Loading class '", ( $class->[0] // 'undef' ), "'." );
                 next unless( defined( $class->[0] ) );
-                # try-catch
-                local $@;
-                my $class_name = eval{ Class::Load::load_class( $class->[0] ) };
-                if( $@ )
-                {
-                    return( $self->error( "Error trying to load class '", $class->[0], "': $@" ) );
-                }
+                my $class_name = $self->_load_class( $class->[0] ) ||
+                    return( $self->pass_error );
             }
         }
         else
         {
             $self->__message( 107, "Loading class '$class'." );
-            # try-catch
-            local $@;
-            my $rc = eval{ Class::Load::load_class( $class ) };
-            if( $@ )
-            {
-                return( $self->error( "Error trying to load class '$class': $@" ) );
-            }
+            my $rc = $self->_load_class( $class ) || return( $self->pass_error );
         }
         # $self->__message( 106, "Loading class ${class} resulted in return value '${rc}'" );
         @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
@@ -2960,6 +2963,7 @@ sub _get_stack_trace
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
     $opts->{skip_frames} //= 0;
+    require Devel::StackTrace;
     my $trace = Devel::StackTrace->new( skip_frames => ( 1 + $opts->{skip_frames} ), indent => 1 );
     return( $trace );
 }
@@ -3006,6 +3010,7 @@ sub _is_class_loadable
     my $class = shift( @_ ) || return(0);
     my $version = shift( @_ );
     no strict 'refs';
+    require File::Spec;
     my $file  = File::Spec->catfile( split( /::/, $class ) ) . '.pm';
     my $inc   = File::Spec::Unix->catfile( split( /::/, $class ) ) . '.pm';
     if( defined( $INC{ $inc } ) )
@@ -3032,6 +3037,7 @@ sub _is_class_loadable
         }
     }
 
+    require Module::Metadata;
     foreach my $dir ( @INC )
     {
         my $fpath = File::Spec->catfile( $dir, $file );
@@ -3114,13 +3120,12 @@ sub _is_ip
     my $self = shift( @_ );
     my $ip   = shift( @_ );
     return(0) if( !defined( $ip ) || !length( $ip ) );
-    $self->_load_class( 'Regexp::Common', 'net' ) || return( $self->pass_error );
-    $self->__message( 112, "Regexp IPv4 is: ", ( $RE{net}{IPv4} // 'undef' ) );
-    $self->__message( 112, "Regexp IPv6 is: ", ( $RE{net}{IPv6} // 'undef' ) );
+    $self->__message( 112, "Regexp IPv4 is: ", ( $IPV4_RE // 'undef' ) );
+    $self->__message( 112, "Regexp IPv6 is: ", ( $IPV6_RE // 'undef' ) );
 
     # We need to return either 1 or 0. By default, perl return undef for false
     # supports IPv4 and IPv6 in CIDR notation or not
-    my $ip4or6 = qr/($RE{net}{IPv4}(\/(3[0-2]|[1-2][0-9]|[0-9]))?)|($RE{net}{IPv6}(\/(12[0-8]|1[0-1][0-9]|[1-9][0-9]|[0-9]))?)/;
+    my $ip4or6 = qr/($IPV4_RE(\/(3[0-2]|[1-2][0-9]|[0-9]))?)|($IPV6_RE(\/(12[0-8]|1[0-1][0-9]|[1-9][0-9]|[0-9]))?)/;
     return( $ip =~ /^$ip4or6$/ ? 1 : 0 );
 }
 
@@ -3247,9 +3252,8 @@ sub _look_like_number
     {
         return(1);
     }
-    $self->_load_class( 'Regexp::Common' ) || return( $self->pass_error );
     no warnings 'once';
-    return( $num =~ /^$Regexp::Common::RE{num}{real}$/ );
+    return( $num =~ /^$NUMBER_REAL_RE$/ );
 }
 
 sub _lvalue : lvalue { return( shift->_set_get_callback( @_ ) ); }
@@ -3269,7 +3273,7 @@ sub __message
     {
         my $r;
         # We check which phase we are in, because in destruction phase, Apache2::ApacheRec is not available.
-        if( $MOD_PERL && ${^GLOBAL_PHASE} ne 'DESTRUCT' )
+        if( $MOD_PERL && &_in_global_destruction() )
         {
             # try-catch
             local $@;
@@ -3321,6 +3325,7 @@ sub __message
             }
         }
 
+        require Encode;
         my $txt;
         if( $opts->{message} )
         {
@@ -5299,7 +5304,7 @@ sub _set_get_hash_as_object
     }
     # my $class = shift( @_ );
     my $data = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
-    unless( Class::Load::is_class_loaded( $class ) )
+    unless( $self->_is_class_loaded( $class ) )
     {
         $self->__message( 106, "Generating a new perl class ${class}" );
         my $perl .= <<EOT;
@@ -6051,10 +6056,8 @@ sub _set_get_number_as_scalar : lvalue
                 }
                 return( $self->error( "Invalid value provided." ) ) if( !$rv );
             }
-            $self->_load_class( 'Regexp::Common', 'number' ) ||
-                return( $self->pass_error );
             # If the user wants to remove it
-            if( defined( $v ) && $v !~ /^$RE{num}{real}$/ )
+            if( defined( $v ) && $v !~ /^$NUMBER_REAL_RE$/ )
             {
                 return( $self->error( "Method $field takes only a number, but value provided ($arg) is not a number" ) );
             }
@@ -7895,1668 +7898,8 @@ sub _autoload_subs
 {
     my $subs = 
     {
-    # NOTE: as_hash()
-    as_hash => <<'PERL',
-sub as_hash
-{
-    my $self = shift( @_ );
-    my $p = $self->_get_args_as_hash( @_ );
-    # $p = shift( @_ ) if( scalar( @_ ) == 1 && ref( $_[0] ) eq 'HASH' );
-    $p->{convert_array} //= 1;
-    my $me = $self->_obj2h;
-    my $seen = $p->{seen} || {};
-    my $levels = $p->{levels} || [];
-    my $keys = $p->{fields} || [];
-
-    my $added_subs = CORE::exists( $me->{_added_method} ) && ref( $me->{_added_method} ) eq 'HASH'
-        ? $me->{_added_method}
-        : {};
-    
-    my $crawl;
-    $crawl = sub
-    {
-        my $this = shift( @_ );
-        my $rval = ref( $this ) ? $this : \$this;
-        my( $dataref, $class, $type, $id );
-        my $strval = $dataref = $self->_str_val( $rval // 'undef' );
-        # Parse $strval without using regexps, in order not to clobber $1, $2,...
-        if( ( my $i = rindex( $dataref, '=' ) ) >= 0 )
-        {
-            $class = substr( $dataref, 0, $i );
-            $dataref = substr( $dataref, $i + 1 );
-        }
-        if( ( my $i = index( $dataref, "(0x" ) ) >= 0 )
-        {
-            $type = substr( $dataref, 0, $i );
-            $id = substr( $dataref, $i + 2, -1 );
-        }
-        
-        my $levels = shift( @_ );
-        my $prefix = join( '->', @$levels ) . ':';
-        $self->__message( 112, "$prefix Processing $strval of type $type and class ", ( $class // 'undef' ) );
-        
-        if( defined( $class ) )
-        {
-            if( $class eq 'JSON::PP::Boolean' ||
-                $class eq 'Module::Generic::Boolean' )
-            {
-                $self->__message( 113, "$prefix Converting known boolean object." );
-                return( $$this ? 1 : 0 );
-            }
-            # NOTE: Not sure why I did this, because as_hash is about converting into hash, not stringifying everything
-            # elsif( $this->can( 'as_hash' ) && 
-            #     overload::Overloaded( $this ) && 
-            #     overload::Method( $this, '""' ) )
-            # {
-            #     $self->__message( 105, "$prefix object supports 'as_hash' and can stringify." );
-            #     return( $this . '' );
-            # }
-            elsif( $this->can( 'as_hash' ) )
-            {
-                if( $self->_is_array( $this ) && !$p->{convert_array} )
-                {
-                    return( $this );
-                }
-                elsif( ++$seen->{ Scalar::Util::refaddr( $this ) } < 2 )
-                {
-                    $self->__message( 112, "$prefix object supports 'as_hash', but cannot stringify." );
-                    my $old_debug;
-                    $old_debug = $this->debug if( $this->can( 'debug' ) );
-                    my $rv = $this->as_hash( { %$p, seen => $seen, levels => $levels } );
-                    $this->debug( $old_debug ) if( defined( $old_debug ) );
-                    
-                    if( Scalar::Util::blessed( $rv ) )
-                    {
-                        $self->__message( 112, "$prefix $strval->as_hash() returned a blessed value (", $self->_str_val( $rv // 'undef' ), ")." );
-                        return( $crawl->( $rv, [@$levels, $strval] ) );
-                    }
-                    else
-                    {
-                        $self->__message( 112, "$prefix $strval->as_hash() returned a ", ( ref( $rv ) ? lc( ref( $rv ) ) . ' reference' : "string ($rv)" ) );
-                        return( $rv );
-                    }
-                }
-                else
-                {
-                    $self->__message( 112, "$prefix $strval has already been procesed, avoid looping, returning it as-is." );
-                    return( $this );
-                }
-            }
-            # If the object can be overloaded, and has no TO_JSON method we get its string representation here.
-            # If it has a TO_JSON and we are asked to return data for json, we let the JSON module call the TO_JSON method
-            # NOTE: Not sure why I did this, because as_hash is about converting into hash, not stringifying everything
-            # elsif( overload::Overloaded( $this ) && 
-            #     overload::Method( $this, '""' ) )
-            # {
-            #     $self->__message( 105, "$prefix $strval can stringify, and can it do $strval->TO_JSON ? ", ( $this->can( 'TO_JSON' ) ? 'yes' : 'no' ), " and is option 'json' enabled ? ", ( $p->{json} ? 'yes' : 'no' ), ". Stringifying it ? ", ( ( $p->{json} && $this->can( 'TO_JSON' ) ) ? 'no' : 'yes' ) );
-            #     if( $p->{json} && $this->can( 'TO_JSON' ) )
-            #     {
-            #         return( $this );
-            #     }
-            #     else
-            #     {
-            #         return( "$this" );
-            #     }
-            # }
-            else
-            {
-                $self->__message( 112, "$prefix $strval cannot do as_hash, returning it (", $self->_str_val( $this // 'undef' ), ") as-is." );
-                return( $this );
-            }
-        }
-        elsif( $type eq 'HASH' )
-        {
-            $self->__message( 112, "$prefix $strval is an hash reference." );
-            my $hash = {};
-            foreach my $k ( keys( %$this ) )
-            {
-                if( ref( $this->{ $k } ) )
-                {
-                    if( ++$seen->{ Scalar::Util::refaddr( $this->{ $k } ) } > 1 )
-                    {
-                        next;
-                    }
-                }
-                my $rv = $crawl->( $this->{ $k }, [@$levels, $k] );
-                $hash->{ $k } = $rv;
-            }
-            return( $hash );
-        }
-        elsif( $type eq 'ARRAY' )
-        {
-            $self->__message( 112, "$prefix $strval is an array reference." );
-            my $array = [];
-            for( my $i = 0; $i < scalar( @$this ); $i++ )
-            {
-                if( ref( $this->[$i] ) )
-                {
-                    if( ++$seen->{ Scalar::Util::refaddr( $this->[$i] ) } > 1 )
-                    {
-                        next;
-                    }
-                }
-                my $rv = $crawl->( $this->[$i], [@$levels, "[$i]"] );
-                push( @$array, $rv );
-            }
-            return( $array );
-        }
-        elsif( !ref( $this ) )
-        {
-            $self->__message( 113, "$prefix $strval is a ", ( defined( $this ) ? 'defined' : 'undefined' ), ' string.' );
-            defined( $this )
-                ? return( $this )
-                : return;
-        }
-        elsif( $type eq 'SCALAR' )
-        {
-            $self->__message( 113, "$prefix $strval is a scalar reference." );
-            my $str = $$this;
-            return( \$str );
-        }
-        elsif( $type eq 'CODE' )
-        {
-            $self->__message( 113, "$prefix $strval is a code reference." );
-            return( $this );
-        }
-        elsif( $type eq 'GLOB' )
-        {
-            $self->__message( 113, "$prefix $strval is a glob reference." );
-            return( $this );
-        }
-        elsif( $type eq 'VSTRING' )
-        {
-            $self->__message( 113, "$prefix $strval is a version string." );
-            return( $this );
-        }
-        else
-        {
-            die( "$prefix: Unknown reference ", $self->_str_val( $this // 'undef' ), " with value $this" );
-        }
-    };
-    
-    $self->__message( 112, "Converting object ", $self->_str_val( $self // 'undef' ), " into an hash reference." );
-    my $ref = {};
-    my @keys = ();
-    if( $self->_is_array( $keys ) && scalar( @$keys ) )
-    {
-        @keys = @$keys;
-    }
-    else
-    {
-        @keys = grep( !/^(debug|verbose)$/, keys( %$me ) );
-        push( @keys, 'debug' ) if( $self->_has_symbol( 'debug' ) );
-        push( @keys, 'verbose' ) if( $self->_has_symbol( 'verbose' ) );
-    }
-    foreach my $k ( @keys )
-    {
-        next if( substr( $k, 0, 1 ) eq '_' );
-        next if( CORE::exists( $added_subs->{ $k } ) );
-        my $rv = $crawl->( $me->{ $k }, [@$levels, $k] );
-        next if( !defined( $rv ) );
-        $ref->{ $k } = $rv;
-    }
-    return( $ref );
-}
-PERL
-    # NOTE: clear()
-    clear => <<'PERL',
-sub clear
-{
-    return( shift->clear_error );
-}
-PERL
-    # NOTE: clone()
-    clone => <<'PERL',
-sub clone
-{
-    my $self = shift( @_ );
-    my $new;
-    # try-catch
-    local $@;
-    eval
-    {
-        if( $self->_is_object( $self ) )
-        {
-            $new = Clone::clone( $self );
-        }
-        else
-        {
-            $new = $self->new;
-        }
-    };
-    if( $@ )
-    {
-        return( $self->error( "Error cloning object \"", $self->_str_val( $self // 'undef' ), "\": $@" ) );
-    }
-    return( $new );
-}
-PERL
-    # NOTE: colour_close()
-    colour_close => <<'PERL',
-sub colour_close { return( shift->_set_get( '_colour_close', @_ ) ); }
-PERL
-    # NOTE: colour_closest()
-    colour_closest => <<'PERL',
-sub colour_closest
-{
-    my $self    = shift( @_ );
-    my $colour  = uc( shift( @_ ) );
-    my $this  = $self->_obj2h;
-    my $colours = 
-    {
-    '000000000' => 'black',
-    '000000255' => 'blue',
-    '000255000' => 'green',
-    '000255255' => 'cyan',
-    '255000000' => 'red',
-    '255000255' => 'magenta',
-    '255255000' => 'yellow',
-    '255255255' => 'white',
-    };
-    my( $red, $green, $blue ) = ( '', '', '' );
-    our $COLOUR_NAME_TO_RGB;
-    if( $colour =~ /^[A-Z]+([A-Z\s]+)*$/ )
-    {
-        if( !scalar( keys( %$COLOUR_NAME_TO_RGB ) ) )
-        {
-            my $colour_data = $self->__colour_data;
-            local $@;
-            $COLOUR_NAME_TO_RGB = eval( $colour_data );
-            if( $@ )
-            {
-                return( $self->error( "An error occurred loading data from __colour_data: $@" ) );
-            }
-        }
-        if( CORE::exists( $COLOUR_NAME_TO_RGB->{ lc( $colour ) } ) )
-        {
-            ( $red, $green, $blue ) = @{$COLOUR_NAME_TO_RGB->{ lc( $colour ) }};
-        }
-    }
-    # Colour all in decimal??
-    elsif( $colour =~ /^\d{9}$/ )
-    {
-        $red   = substr( $colour, 0, 3 );
-        $green = substr( $colour, 3, 3 );
-        $blue  = substr( $colour, 6, 3 );
-    }
-    # Colour in hexadecimal, convert it
-    elsif( $colour =~ /^[A-F0-9]+$/ )
-    {
-        $red   = hex( substr( $colour, 0, 2 ) );
-        $green = hex( substr( $colour, 2, 2 ) );
-        $blue  = hex( substr( $colour, 4, 2 ) );
-    }
-    # Clueless
-    else
-    {
-        # Not undef, but rather empty string. Undef is associated with an error
-        return( '' );
-    }
-    my $dec_colour = CORE::sprintf( '%3d%3d%3d', $red, $green, $blue );
-    my $last = '';
-    my @colours = reverse( sort( keys( %$colours ) ) );
-    $red    = CORE::sprintf( '%03d', $red );
-    $green  = CORE::sprintf( '%03d', $green );
-    $blue   = CORE::sprintf( '%03d', $blue );
-    my $cur = CORE::sprintf( '%03d%03d%03d', $red, $green, $blue );
-    my( $red_ok, $green_ok, $blue_ok ) = ( 0, 0, 0 );
-    for( my $i = 0; $i < scalar( @colours ); $i++ )
-    {
-        my $r = CORE::sprintf( '%03d', substr( $colours[ $i ], 0, 3 ) );
-        my $g = CORE::sprintf( '%03d', substr( $colours[ $i ], 3, 3 ) );
-        my $b = CORE::sprintf( '%03d', substr( $colours[ $i ], 6, 3 ) );
-
-        my $r_p = CORE::sprintf( '%03d', substr( $colours[ $i - 1 ], 0, 3 ) );
-        my $g_p = CORE::sprintf( '%03d', substr( $colours[ $i - 1 ], 3, 3 ) );
-        my $b_p = CORE::sprintf( '%03d', substr( $colours[ $i - 1 ], 6, 3 ) );
-
-        if( $red == $r ||
-            ( $red < $r && $red > int( $r / 2 ) ) ||
-            ( $red > $r && $red < int( $r_p / 2 ) && $r_p ) ||
-            $red > $r )
-        {
-            $red_ok++;
-        }
-
-        if( $red_ok )
-        {
-            if( $green == $g ||
-                ( $green < $g && $green > int( $g / 2 ) ) ||
-                ( $green > $g && $green < int( $g_p / 2 ) && $g_p ) ||
-                $green > $g )
-            {
-                $blue_ok++;
-            }
-        } 
-
-        if( $blue_ok )
-        {
-            if( $blue == $b ||
-                ( $blue < $b && $blue > int( $b / 2 ) ) ||
-                ( $blue > $b && $blue < int( $b_p / 2 ) && $b_p ) ||
-                $blue > $b )
-            {
-                $last = $colours[ $i ];
-                last;
-            }
-        }
-    }
-    return( $colours->{ $last } );
-}
-PERL
-    # NOTE: colour_format()
-    colour_format => <<'PERL',
-sub colour_format
-{
-    my $self = shift( @_ );
-    # style, colour or color and text
-    my $opts = shift( @_ );
-    return( $self->error( "Parameter hash provided is not an hash reference." ) ) if( !$self->_is_hash( $opts ) );
-    my $this = $self->_obj2h;
-    # To make it possible to use either text or message property
-    $opts->{text} = CORE::delete( $opts->{message} ) if( CORE::length( $opts->{message} ) && !CORE::length( $opts->{text} ) );
-    return( $self->error( "No text was provided to format." ) ) if( !CORE::length( $opts->{text} ) );
-
-    $opts->{colour} //= CORE::delete( $opts->{color} ) || CORE::delete( $opts->{fg_colour} ) || CORE::delete( $opts->{fg_color} ) || CORE::delete( $opts->{fgcolour} ) || CORE::delete( $opts->{fgcolor} );
-    $opts->{bgcolour} //= CORE::delete( $opts->{bgcolor} ) || CORE::delete( $opts->{bg_colour} ) || CORE::delete( $opts->{bg_color} );
-
-    my $bold      = "\e[1m";
-    my $underline = "\e[4m";
-    my $reverse   = "\e[7m";
-    my $normal    = "\e[m";
-    my $cls       = "\e[H\e[2J";
-    my $styles =
-    {
-        # Bold
-        b       => 1,
-        bold    => 1,
-        strong  => 1,
-        # Italic
-        i       => 3,
-        italic  => 3,
-        # Underline
-        u       => 4,
-        underline => 4,
-        underlined => 4,
-        blink   => 5,
-        # Reverse
-        r       => 7,
-        reverse => 7,
-        reversed => 7,
-        # Concealed
-        c       => 8,
-        conceal => 8,
-        concealed => 8,
-        strike  => 9,
-        striked  => 9,
-        striken  => 9,
-    };
-
-    my $convert_24_To_8bits = sub
-    {
-        my( $r, $g, $b ) = @_;
-        return( ( POSIX::floor( $r * 7 / 255 ) << 5 ) +
-                ( POSIX::floor( $g * 7 / 255 ) << 2 ) +
-                ( POSIX::floor( $b * 3 / 255 ) ) 
-              );
-    };
-
-    # opacity * original + (1-opacity)*background = resulting pixel
-    # https://stackoverflow.com/a/746934/4814971
-    my $colour_with_alpha = sub
-    {
-        my( $r, $g, $b, $a, $bg ) = @_;
-        ## Assuming a white background (255)
-        my( $bg_r, $bg_g, $bg_b ) = ( 255, 255, 255 );
-        if( ref( $bg ) eq 'HASH' )
-        {
-            ( $bg_r, $bg_g, $bg_b ) = @$bg{qw( red green blue )};
-        }
-        $r = POSIX::round( ( $a * $r ) + ( ( 1 - $a ) * $bg_r ) );
-        $g = POSIX::round( ( $a * $g ) + ( ( 1 - $a ) * $bg_g ) );
-        $b = POSIX::round( ( $a * $b ) + ( ( 1 - $a ) * $bg_b ) );
-        return( [$r, $g, $b] );
-    };
-
-    my $check_colour = sub
-    {
-        my $col = shift( @_ );
-        # $colours or $bg_colours
-        my $map = shift( @_ );
-        my $code;
-        my $light;
-        # Example: 'light red' or 'light_red'
-        if( $col =~ /^(?:(?<light>bright|light)[[:blank:]\_]+)?
-        (?<colour>
-            (?:[a-zA-Z]+)(?:[[:blank:]]+\w+)?
-            |
-            (?<rgb_type>rgb[a]?)\([[:blank:]]*(?<red>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<green>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<blue>\d{1,3})
-            (?:[[:blank:]]*\,[[:blank:]]*(?<opacity>\d(?:\.\d+)?))?[[:blank:]]*
-            \)
-        )$/xi )
-        {
-            my %regexp = %+;
-            ( $light, $col ) = ( $+{light}, $+{colour} );
-            if( CORE::length( $+{rgb_type} ) &&
-                CORE::length( $+{red} ) &&
-                CORE::length( $+{green} ) &&
-                CORE::length( $+{blue} ) )
-            {
-                if( $+{opacity} || $light )
-                {
-                    my $opacity = CORE::length( $+{opacity} )
-                        ? $+{opacity}
-                        : $light
-                            ? 0.5
-                            : 1;
-                    $col = CORE::sprintf( 'rgba(%03d%03d%03d,%.1f)', $+{red}, $+{green}, $+{blue}, $opacity );
-                }
-                else
-                {
-                    $col = CORE::sprintf( 'rgb(%03d%03d%03d)', $+{red}, $+{green}, $+{blue} );
-                }
-            }
-            else
-            {
-            }
-        }
-        elsif( $col =~ /^(?<rgb_type>rgb[a]?)\([[:blank:]]*(?<red>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<green>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<blue>\d{1,3})[[:blank:]]*(?:\,[[:blank:]]*(?<opacity>\d(?:\.\d+)?))?[[:blank:]]*\)$/i )
-        {
-            if( $+{opacity} )
-            {
-                $col = CORE::sprintf( 'rgba(%03d%03d%03d,%.1f)', $+{red}, $+{green}, $+{blue}, $+{opacity} );
-            }
-            else
-            {
-                $col = CORE::sprintf( '%03d%03d%03d', $+{red}, $+{green}, $+{blue} );
-            }
-        }
-        else
-        {
-        }
-
-        my $col_ref;
-        if( $col =~ /^rgb[a]?\((?<red>\d{3})(?<green>\d{3})(?<blue>\d{3})\)$/i )
-        {
-            $col_ref = {};
-            %$col_ref = %+;
-            return({
-                _24bits => [@$col_ref{qw( red green blue )}],
-                _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
-            });
-        }
-        # Treating opacity to make things lighter; not ideal, but standard scheme
-        elsif( $col =~ /^rgba\((?<red>\d{3})(?<green>\d{3})(?<blue>\d{3})[[:blank:]]*\,[[:blank:]]*(?<opacity>\d(?:\.\d)?)\)$/i )
-        {
-            $col_ref = {};
-            %$col_ref = %+;
-            if( $+{opacity} )
-            {
-                my $opacity = $+{opacity};
-                my $bg;
-                if( $opts->{bgcolour} )
-                {
-                    $bg = $self->colour_to_rgb( $opts->{bgcolour} );
-                }
-                my $new_col = $colour_with_alpha->( @$col_ref{qw( red green blue )}, $opacity, $bg );
-                @$col_ref{qw( red green blue )} = @$new_col;
-            }
-            return({
-                _24bits => [@$col_ref{qw( red green blue )}],
-                _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
-            });
-        }
-        elsif( $self->__message( 109, "Checking if rgb value exists for colour '$col'" ) &&
-               ( $col_ref = $self->colour_to_rgb( $col ) ) )
-        {
-            # $code = $map->{ $col };
-            return({
-                _24bits => [@$col_ref{qw( red green blue )}],
-                _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
-            });
-        }
-        else
-        {
-            return( {} );
-        }
-#         my $is_bg = ( CORE::substr( $code, 0, 1 ) == 4 );
-#         if( CORE::length( $code ) && $light )
-#         {
-#             ## If the colour is a background colour, replace 4 by 10 (e.g.: 42 becomes 103)
-#             ## and if foreground colour, replace 3 by 9
-#             CORE::substr( $code, 0, 1 ) = ( $is_bg ? 10 : 9 );
-#         }
-#         return( $code );
-    };
-    my $data = [];
-    my $data8 = [];
-    my $params = [];
-    # 8 bits parameters compatible
-    my $params8 = [];
-    if( $opts->{colour} || $opts->{color} || $opts->{fgcolour} || $opts->{fgcolor} || $opts->{fg_colour} || $opts->{fg_color} )
-    {
-        $opts->{colour} ||= CORE::delete( $opts->{color} ) || CORE::delete( $opts->{fg_colour} ) || CORE::delete( $opts->{fg_color} ) || CORE::delete( $opts->{fgcolour} ) || CORE::delete( $opts->{fgcolor} );
-        # my $col_ref = $check_colour->( $opts->{colour}, $colours );
-        my $col_ref = $check_colour->( $opts->{colour} );
-        # CORE::push( @$params, $col ) if( CORE::length( $col ) );
-        if( scalar( keys( %$col_ref ) ) )
-        {
-            CORE::push( @$params8, sprintf( '38;5;%d', $col_ref->{_8bits} ) );
-            CORE::push( @$params, sprintf( '38;2;%d;%d;%d', @{$col_ref->{_24bits}} ) );
-        }
-        else
-        {
-        }
-    }
-    if( $opts->{bgcolour} || $opts->{bgcolor} || $opts->{bg_colour} || $opts->{bg_color} )
-    {
-        $opts->{bgcolour} ||= CORE::delete( $opts->{bgcolor} ) || CORE::delete( $opts->{bg_colour} ) || CORE::delete( $opts->{bg_color} );
-        # my $col_ref = $check_colour->( $opts->{bgcolour}, $bg_colours );
-        my $col_ref = $check_colour->( $opts->{bgcolour} );
-        ## CORE::push( @$params, $col ) if( CORE::length( $col ) );
-        if( scalar( keys( %$col_ref ) ) )
-        {
-            CORE::push( @$params8, sprintf( '48;5;%d', $col_ref->{_8bits} ) );
-            CORE::push( @$params, sprintf( '48;2;%d;%d;%d', @{$col_ref->{_24bits}} ) );
-        }
-        else
-        {
-        }
-    }
-    if( $opts->{style} )
-    {
-        my $those_styles = [CORE::split( /\|/, $opts->{style} )];
-        foreach my $s ( @$those_styles )
-        {
-            if( CORE::exists( $styles->{lc($s)} ) )
-            {
-                CORE::push( @$params, $styles->{lc($s)} );
-                # We add the 8 bits compliant version only if any colour was provided, i.e.
-                # This is not just a style definition
-                CORE::push( @$params8, $styles->{lc($s)} ) if( scalar( @$params8 ) );
-            }
-        }
-    }
-    CORE::push( @$data, "\e[" . CORE::join( ';', @$params8 ) . "m" ) if( scalar( @$params8 ) );
-    CORE::push( @$data, "\e[" . CORE::join( ';', @$params ) . "m" ) if( scalar( @$params ) );
-    # If the text contains libe breaks, we must stop the formatting before, or else there would be an ugly formatting on the entire screen following the line break
-    if( scalar( @$params ) && $opts->{text} =~ /\n+/ )
-    {
-        my $text_parts = [CORE::split( /\n/, $opts->{text} )];
-        my $fmt = CORE::join( '', @$data );
-        my $fmt8 = CORE::join( '', @$data8 );
-        for( my $i = 0; $i < scalar( @$text_parts ); $i++ )
-        {
-            # Empty due to \n repeated
-            next if( !CORE::length( $text_parts->[$i] ) );
-            $text_parts->[$i] = $fmt . $text_parts->[$i] . $normal;
-        }
-        $opts->{text} = CORE::join( "\n", @$text_parts );
-        CORE::push( @$data, $opts->{text} );
-    }
-    else
-    {
-        CORE::push( @$data, $opts->{text} );
-        CORE::push( @$data, $normal ) if( scalar( @$params ) );
-    }
-    return( CORE::join( '', @$data ) );
-}
-PERL
-    # NOTE: colour_max_depth()
-    colour_max_depth => <<'EOT',
-sub colour_max_depth { return( shift->_set_get( 'colour_max_depth', @_ ) ); }
-EOT
-    # NOTE: colour_open()
-    colour_open => <<'PERL',
-sub colour_open { return( shift->_set_get( '_colour_open', @_ ) ); }
-PERL
-    # NOTE: colour_parse()
-    colour_parse => <<'PERL',
-# Term definition:
-# - delimiter is one or more characters used to delimit the start and end of a formatting tag
-# - tag: is a container of colour formatting parameters whose perimeter is marked by 'delimiter'. It is also a closing tag, such as </>, or {/} or custom ones specified.
-sub colour_parse
-{
-    my $self = shift( @_ );
-    my $txt  = join( '', @_ );
-    my $this  = $self->_obj2h;
-    my @opens = ( '{', '<' );
-    my @closes = ( '}', '>' );
-    my $cust_open = $self->colour_open;
-    my $cust_close = $self->colour_close;
-    # If we have custom open / close delimiters, we must make sure we have even pairs
-    # Custom or explicit open and close delimiters replace our prospective set of delimiters, i.e. instead of guessing, we are given explicit delimiters to use.
-    if( defined( $cust_open ) &&
-        length( $cust_open ) &&
-        defined( $cust_close ) &&
-        length( $cust_close ) && 
-        !ref( $cust_open ) &&
-        !ref( $cust_close ) )
-    {
-        if( $cust_open eq $cust_close )
-        {
-            warn( "Warning only: you are using the same delimiter ($cust_open) for open and close!" );
-        }
-        else
-        {
-            @opens  = ( $cust_open );
-            @closes = ( $cust_close );
-        }
-    }
-    # This will prevent an opening delimiter such as '{' to be inadvertently caught as a perl string declaration if a dollar sign '$' is prepended, such as '${blue}Hello world{/}'
-    my $open  = join( '|', map( quotemeta( $_ ), @opens ) );
-    my $close = join( '|', map( quotemeta( $_ ), @closes ) );
-    # Create a quick map of open delimiter to its corresponding closing one
-    my $map = {}; @$map{ @opens } = @closes;
-    my $force_tty = $self->force_tty;
-    my $is_tty = defined( $force_tty ) ? $force_tty : $self->_is_tty;
-    $self->__message( 120, "Is tty enabled ? ", ( $is_tty ? 'yes' : 'no' ) );
-    my $max_depth = $self->colour_max_depth // 10;
-    my $normal = "\e[m";
-
-    my $colour_re = qr{
-        (?:
-            (?:bright|light)
-            [[:blank:]]+
-        )?
-        (?:
-            (?:
-                [a-zA-Z]+
-                (?:[[:blank:]]+[\w\-]+)?
-            )
-            |
-            (?:
-                rgb[a]?\(
-                    [[:blank:]]*\d{1,3}[[:blank:]]*\,
-                    [[:blank:]]*\d{1,3}[[:blank:]]*\,
-                    [[:blank:]]*\d{1,3}[[:blank:]]*
-                    (?:\,[[:blank:]]*\d(?:\.\d)?)?
-                    [[:blank:]]*
-                \)
-            )
-            |
-            (?:
-                rgb[a]?\(
-                    (?<red>\d{3})
-                    (?<green>\d{3})
-                    (?<blue>\d{3})
-                    (?:
-                        [[:blank:]]*\,[[:blank:]]*
-                        (?<opacity>
-                            \d(?:\.\d)?
-                        )
-                    )?
-                \)
-            )
-        )
-    }x;
-    my $style_re = qr/(?:bold|faint|italic|underline|blink|reverse|conceal|strike)/;
-
-    # NOTE: colour_format()
-    my $colour_format = sub
-    {
-        # style, colour or color and text
-        my $opts = shift( @_ );
-        # To make it possible to use either text or message property
-        # $opts->{text} = CORE::delete( $opts->{message} ) if( CORE::length( $opts->{message} ) && !CORE::length( $opts->{text} ) );
-
-        $opts->{colour} //= CORE::delete( $opts->{color} ) || CORE::delete( $opts->{fg_colour} ) || CORE::delete( $opts->{fg_color} ) || CORE::delete( $opts->{fgcolour} ) || CORE::delete( $opts->{fgcolor} );
-        $opts->{bgcolour} //= CORE::delete( $opts->{bgcolor} ) || CORE::delete( $opts->{bg_colour} ) || CORE::delete( $opts->{bg_color} );
-
-        my $bold      = "\e[1m";
-        my $underline = "\e[4m";
-        my $reverse   = "\e[7m";
-        my $normal    = "\e[m";
-        my $cls       = "\e[H\e[2J";
-        my $styles =
-        {
-            # Bold
-            b       => 1,
-            bold    => 1,
-            strong  => 1,
-            # Italic
-            i       => 3,
-            italic  => 3,
-            # Underline
-            u       => 4,
-            underline => 4,
-            underlined => 4,
-            blink   => 5,
-            # Reverse
-            r       => 7,
-            reverse => 7,
-            reversed => 7,
-            # Concealed
-            c       => 8,
-            conceal => 8,
-            concealed => 8,
-            strike  => 9,
-            striked  => 9,
-            striken  => 9,
-        };
-
-        # NOTE: convert_24_To_8bits()
-        my $convert_24_To_8bits = sub
-        {
-            my( $r, $g, $b ) = @_;
-            return( ( POSIX::floor( $r * 7 / 255 ) << 5 ) +
-                    ( POSIX::floor( $g * 7 / 255 ) << 2 ) +
-                    ( POSIX::floor( $b * 3 / 255 ) ) 
-                  );
-        };
-
-        # NOTE: colour_with_alpha()
-        # opacity * original + (1-opacity)*background = resulting pixel
-        # https://stackoverflow.com/a/746934/4814971
-        my $colour_with_alpha = sub
-        {
-            my( $r, $g, $b, $a, $bg ) = @_;
-            ## Assuming a white background (255)
-            my( $bg_r, $bg_g, $bg_b ) = ( 255, 255, 255 );
-            if( ref( $bg ) eq 'HASH' )
-            {
-                ( $bg_r, $bg_g, $bg_b ) = @$bg{qw( red green blue )};
-            }
-            $r = POSIX::round( ( $a * $r ) + ( ( 1 - $a ) * $bg_r ) );
-            $g = POSIX::round( ( $a * $g ) + ( ( 1 - $a ) * $bg_g ) );
-            $b = POSIX::round( ( $a * $b ) + ( ( 1 - $a ) * $bg_b ) );
-            return( [$r, $g, $b] );
-        };
-
-        # NOTE: check_colour()
-        my $check_colour = sub
-        {
-            my $col = shift( @_ );
-            # $colours or $bg_colours
-            my $map = shift( @_ );
-            my $code;
-            my $light;
-            # Example: 'light red' or 'light_red'
-            if( $col =~ m{
-                ^(?:
-                    (?<light>bright|light)
-                    [[:blank:]\_\-]+
-                )?
-                (?<colour>
-                    (?:
-                        (?:[a-zA-Z]+)(?:[[:blank:]]+\w+)?
-                    )
-                    |
-                    (?:
-                        (?<rgb_type>
-                            rgb[a]?
-                        )
-                        \(
-                            [[:blank:]]*(?<red>\d{1,3})[[:blank:]]*\,
-                            [[:blank:]]*(?<green>\d{1,3})[[:blank:]]*\,
-                            [[:blank:]]*(?<blue>\d{1,3})[[:blank:]]*
-                            (?:
-                                \,[[:blank:]]*
-                                (?<opacity>\d(?:\.\d+)?)
-                            )?
-                            [[:blank:]]*
-                        \)
-                    )
-                )$
-            }xi )
-            {
-                my %regexp = %+;
-                ( $light, $col ) = ( $+{light}, $+{colour} );
-                if( CORE::length( $+{rgb_type} ) &&
-                    CORE::length( $+{red} ) &&
-                    CORE::length( $+{green} ) &&
-                    CORE::length( $+{blue} ) )
-                {
-                    if( $+{opacity} || $light )
-                    {
-                        my $opacity = CORE::length( $+{opacity} )
-                            ? $+{opacity}
-                            : $light
-                                ? 0.5
-                                : 1;
-                        $col = CORE::sprintf( 'rgba(%03d%03d%03d,%.1f)', $+{red}, $+{green}, $+{blue}, $opacity );
-                    }
-                    else
-                    {
-                        $col = CORE::sprintf( 'rgb(%03d%03d%03d)', $+{red}, $+{green}, $+{blue} );
-                    }
-                }
-            }
-            elsif( $col =~ m{
-                ^
-                (?<rgb_type>rgb[a]?)
-                \(
-                    [[:blank:]]*(?<red>\d{1,3})[[:blank:]]*\,
-                    [[:blank:]]*(?<green>\d{1,3})[[:blank:]]*\,
-                    [[:blank:]]*(?<blue>\d{1,3})[[:blank:]]*
-                    (?:
-                        \,[[:blank:]]*
-                        (?<opacity>
-                            \d(?:\.\d+)?
-                        )
-                    )?
-                    [[:blank:]]*
-                \)$
-            }xi )
-            {
-                if( $+{opacity} )
-                {
-                    $col = CORE::sprintf( 'rgba(%03d%03d%03d,%.1f)', $+{red}, $+{green}, $+{blue}, $+{opacity} );
-                }
-                else
-                {
-                    $col = CORE::sprintf( '%03d%03d%03d', $+{red}, $+{green}, $+{blue} );
-                }
-            }
-
-            my $col_ref;
-            if( $col =~ /^rgb[a]?\((?<red>\d{3})(?<green>\d{3})(?<blue>\d{3})\)$/i )
-            {
-                $col_ref = {};
-                %$col_ref = %+;
-                return({
-                    _24bits => [@$col_ref{qw( red green blue )}],
-                    _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
-                });
-            }
-            # Treating opacity to make things lighter; not ideal, but standard scheme
-            elsif( $col =~ m{
-                ^rgba
-                \(
-                    (?<red>\d{3})
-                    (?<green>\d{3})
-                    (?<blue>\d{3})
-                    (?:
-                        [[:blank:]]*\,[[:blank:]]*
-                        (?<opacity>
-                            \d(?:\.\d)?
-                        )
-                    )?
-                \)$
-                }xi )
-            {
-                $col_ref = {};
-                %$col_ref = %+;
-                if( $+{opacity} )
-                {
-                    my $opacity = $+{opacity};
-                    my $bg;
-                    if( $opts->{bgcolour} )
-                    {
-                        $bg = $self->colour_to_rgb( $opts->{bgcolour} );
-                    }
-                    my $new_col = $colour_with_alpha->( @$col_ref{qw( red green blue )}, $opacity, $bg );
-                    @$col_ref{qw( red green blue )} = @$new_col;
-                }
-                return({
-                    _24bits => [@$col_ref{qw( red green blue )}],
-                    _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
-                });
-            }
-            elsif( $self->__message( 109, "Checking if rgb value exists for colour '$col'" ) &&
-                   ( $col_ref = $self->colour_to_rgb( $col ) ) )
-            {
-                # $code = $map->{ $col };
-                return({
-                    _24bits => [@$col_ref{qw( red green blue )}],
-                    _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
-                });
-            }
-            else
-            {
-                return({});
-            }
-        };
-
-        my $data    = [];
-        my $data8   = [];
-        my $params  = [];
-        # 8 bits parameters compatible
-        my $params8 = [];
-        if( $opts->{colour} ||
-            $opts->{color} ||
-            $opts->{fgcolour} ||
-            $opts->{fgcolor} ||
-            $opts->{fg_colour} ||
-            $opts->{fg_color} )
-        {
-            $opts->{colour} ||= CORE::delete( $opts->{color} ) || CORE::delete( $opts->{fg_colour} ) || CORE::delete( $opts->{fg_color} ) || CORE::delete( $opts->{fgcolour} ) || CORE::delete( $opts->{fgcolor} );
-            # my $col_ref = $check_colour->( $opts->{colour}, $colours );
-            my $col_ref = $check_colour->( $opts->{colour} );
-            # CORE::push( @$params, $col ) if( CORE::length( $col ) );
-            if( scalar( keys( %$col_ref ) ) )
-            {
-                CORE::push( @$params8, sprintf( '38;5;%d', $col_ref->{_8bits} ) );
-                CORE::push( @$params, sprintf( '38;2;%d;%d;%d', @{$col_ref->{_24bits}} ) );
-            }
-        }
-        if( $opts->{bgcolour} ||
-        $opts->{bgcolor} ||
-        $opts->{bg_colour} ||
-        $opts->{bg_color} )
-        {
-            $opts->{bgcolour} ||= CORE::delete( $opts->{bgcolor} ) || CORE::delete( $opts->{bg_colour} ) || CORE::delete( $opts->{bg_color} );
-            # my $col_ref = $check_colour->( $opts->{bgcolour}, $bg_colours );
-            my $col_ref = $check_colour->( $opts->{bgcolour} );
-            ## CORE::push( @$params, $col ) if( CORE::length( $col ) );
-            if( scalar( keys( %$col_ref ) ) )
-            {
-                CORE::push( @$params8, sprintf( '48;5;%d', $col_ref->{_8bits} ) );
-                CORE::push( @$params, sprintf( '48;2;%d;%d;%d', @{$col_ref->{_24bits}} ) );
-            }
-        }
-        if( $opts->{style} )
-        {
-            my $those_styles = [CORE::split( /\|/, $opts->{style} )];
-            foreach my $s ( @$those_styles )
-            {
-                if( CORE::exists( $styles->{lc($s)} ) )
-                {
-                    CORE::push( @$params, $styles->{lc($s)} );
-                    # We add the 8 bits compliant version only if any colour was provided, i.e.
-                    # This is not just a style definition
-                    CORE::push( @$params8, $styles->{lc($s)} ) if( scalar( @$params8 ) );
-                }
-            }
-        }
-        CORE::push( @$data, "\e[" . CORE::join( ';', @$params8 ) . "m" ) if( scalar( @$params8 ) );
-        CORE::push( @$data, "\e[" . CORE::join( ';', @$params ) . "m" ) if( scalar( @$params ) );
-        return( $data );
-    };
-
-    # NOTE: process_params()
-    my $process_params = sub
-    {
-        my( $params ) = @_;
-        return if( !defined( $params ) || !length( $params // '' ) );
-        my $def = {};
-        # Example: bold green underline on black
-        if( $params =~ m{
-            ^[[:blank:]]*
-            (?:
-                (?<style1>$style_re)
-                [[:blank:]]+
-            )?
-            (?<fg_colour>$colour_re)
-            (?:
-                [[:blank:]]+
-                (?<style2>$style_re)
-            )?
-            (?:
-                [[:blank:]]+on[[:blank:]]+
-                (?<bg_colour>$colour_re)
-            )?
-            [[:blank:]]*$
-            }xi )
-        {
-            my $style = $+{style1} || $+{style2};
-            my $fg = $+{fg_colour};
-            my $bg = $+{bg_colour};
-            $def = 
-            {
-                style     => $style,
-                colour    => $fg,
-                bg_colour => $bg,
-            };
-            $self->__message( 120, "\$process_params->(): Params regular expression matched -> ", sub{ $self->Module::Generic::dump( $def ) } );
-        }
-        else
-        {
-            $self->__message( 120, "\$process_params->(): Params regular expression failed to match. Trying to eval '$params' instead." );
-            # Only allow characters that make sense for hash-like parameters.
-            # This forbids variables, code blocks, Perl ops, backticks, etc.
-            if( $params =~ /[^a-zA-Z0-9_,\=>\s\h[:blank:]'"\|\(\)\.\-]/ )
-            {
-                $self->__message( 120, "\$process_params->(): Illegal characters found inside eval." );
-                return;
-            }
-            # illegal functions that have no business being here, and could pass through the previous check
-            elsif( $params =~ /\b(?:
-                    qx|system|open|exec|fork|require|use|eval|do|
-                    package|sub|BEGIN|UNITCHECK|CHECK|INIT|END|
-                    readpipe|sysopen|unlink|rename|chmod|chown|utime|truncate|mkdir|rmdir|opendir|readdir|closedir|glob
-                )\b/i )
-            {
-                $self->__message( 120, "\$process_params->(): Illegal functions used inside eval." );
-                return;
-            }
-
-            local $SIG{__WARN__} = sub{};
-            local $SIG{__DIE__} = sub{};
-            local $@;
-            my @res = eval( $params );
-            $self->__message( 120, "\$process_params->(): evaluating '$params' produced -> ", sub{ $self->Module::Generic::dump( \@res ) } );
-            $def = { @res } if( scalar( @res ) && !( scalar( @res ) % 2 ) );
-            if( $@ || ref( $def ) ne 'HASH' )
-            {
-                my $err = $@ || "Invalid styling \"${params}\"";
-                $self->__message( 120, "\$process_params->(): Error evaluating '$params' -> $@" );
-                $def = {};
-            }
-        }
-
-        if( scalar( keys( %$def ) ) )
-        {
-            $self->__message( 120, "\$process_params->(): colour definition is: ", sub{ $self->Module::Generic::dump( $def ) } );
-            my $ref = $colour_format->( $def );
-            $self->__message( 120, "\$process_params->(): Returning -> ", sub{ $self->Module::Generic::dump( $ref ) } );
-            return if( !$ref || !scalar( @$ref ) );
-            return( $ref );
-        }
-        $self->__message( 120, "\$process_params->(): Returning nothing." );
-        return;
-    };
-
-    # NOTE: parse()
-    my $parse;
-    $parse = sub
-    {
-        # $chunk is the text from position $pos until the end of the string, as provided by parent
-        my $chunk   = shift( @_ );
-        my $args    = shift( @_ ) || {};
-        my $copy    = $chunk;
-        my $out     = '';
-        my $level   = $args->{level} // 1;
-        my $counter = $args->{counter} // 0;
-        return( $chunk ) if( $level > $max_depth );
-        my( $open_d, $close_d );
-        # If we are given specific open and close delimiter use them, otherwise, use our list of candidates.
-        # This only happens the first time we hist the text to parse and search for those delimiters.
-        # Afterward, as a rule, we always stick to the same delimiters used. The user cannot mix delimiters in the same string.
-        # We create Regexp object on purpose, so we can differentiate from plain string later in our code.
-        # The initial '$open' and '$close' are simple strings, not Regexp object, so we can differentiate them:
-        # Regexp -> confirmed open and close delimiters
-        # Non-Regexp -> prospective open and close delimiters
-        # Once the open and close delimiters are confirmed they never change.
-#         $open_d  = $args->{open}  ? ( ref( $args->{open} )  ? $args->{open}  : qr{(?<open_d>\Q$args->{open}\E)} ) : $open;
-#         $close_d = $args->{close} ? ( ref( $args->{close} ) ? $args->{close} : qr{?<close_d>\Q$args->{close})} )  : $close;
-        $open_d  = $args->{open}  ? $args->{open}  : $open;
-        $close_d = $args->{close} ? $args->{close} : $close;
-        $self->__message( 120, "\$parse->() [LEVEL ${level}]: Using \$open_d '$open_d', and \$close_d '$close_d' with closing counter '$counter'" );
-        $self->__message( 120, "\$parse->() [LEVEL ${level}]: Processing string '", ( $chunk // 'undef' ), "'" );
-        $self->__message( 120, "\$parse->() [LEVEL ${level}]: Have we inherited some formatting ? ", ( $args->{format} ? sub{ ' yes -> ' . $self->Module::Generic::dump( $args->{format} ) } : 'no' ) );
-        # We found our closing mark
-        if( defined( $args->{open} ) &&
-            defined( $args->{close} ) &&
-            $chunk =~ s/^(?<content>.*?)(${open_d}\/${close_d})// )
-        {
-            my $content = $+{content};
-            $self->__message( 120, "\$parse->() [LEVEL ${level}]: Text '", ( $copy // 'undef' ), "' is now '", ( $chunk // 'undef' ), "' and \$content is '", ( $content // 'undef' ), "' after removing a closing tag '$2'" );
-            $self->__message( 120, "\$parse->() [LEVEL ${level}]: Found some text content followed by a close tag '$2'. Checking if captured content contains an open one within data -> '", ( $content // 'undef' ), "'." );
-            # Whether the parameters are in the form of 'bold underline red' or "style => 'bold', colour => 'red'", either way, the parameters must start with an alphabetic character. No space is allowed.
-            # Also, since the opening delimiter may have more than 1 character, we check if the first character is '{' or '['.
-            my $open_re = ( substr( $open_d, 0, 2 ) eq quotemeta('{') || substr( $open_d, 0, 2 ) eq quotemeta('[') )
-                ? "(?<!\\\$)${open_d}"
-                : $open_d;
-            if( $content =~ /${open_re}(?=[a-zA-Z]+)/ )
-            {
-                # Found an opening delimiter before our closing tag, returning the text untouched.
-                $self->__message( 120, "\$parse->() [LEVEL ${level}]: Found an opening delimiter before our closing tag in text content captured (", ( $content // 'undef' ), "), most likely embedded formatting, continuing." );
-                $chunk = $copy;
-            }
-            elsif( !$is_tty )
-            {
-                $out = $content;
-            }
-            else
-            {
-                $self->__message( 120, "\$parse->() [LEVEL ${level}]: No undesired open delimiter found. Do we have formatting ? ", ( $args->{format} ? 'yes' : 'no' ) );
-                if( my $fmt_ref = $args->{format} )
-                {
-                    # We cannot make the assumption that there are any formatting parameters found, and returned by $process_params
-                    # If there is nothing, then there is nothing to format, and we return the text as is.
-                    if( !scalar( @$fmt_ref ) )
-                    {
-                        # We do not format the $content
-                    }
-                    else
-                    {
-                        $self->__message( 120, "\$parse->() [LEVEL ${level}]: Formatting was passed down to us, using it -> ", sub{ $self->Module::Generic::dump( $fmt_ref ) } );
-                        my $fmt = CORE::join( '', @$fmt_ref );
-                        # We differentiate text with and without new lines, because if there are multiple lines, we skip the empty ones.
-                        # However, if there are no multiple line, we surround that (possibly empty) line with the formatting and the normaliser.
-                        if( index( $content, "\n" ) != -1 )
-                        {
-                            my $text_parts = [CORE::split( /\n/, $content )];
-                            for( my $i = 0; $i < scalar( @$text_parts ); $i++ )
-                            {
-                                # Empty due to \n repeated
-                                next if( !CORE::length( $text_parts->[$i] ) );
-                                $text_parts->[$i] = $fmt . $text_parts->[$i] . $normal;
-                            }
-                            $content = CORE::join( "\n", @$text_parts );
-                        }
-                        else
-                        {
-                            $content = $fmt . $content . $normal;
-                        }
-                    }
-                }
-                else
-                {
-                    # Only add a normaliser matching the closing tag we found IF there were valid colouring parameters, otherwise we would be adding normaliser where it is not needed.
-                    $content = $content . ( $counter ? $normal : '' );
-                }
-                # We reduce the closing tag counter since we found one.
-                $counter-- if( $counter > 0 );
-                $self->__message( 120, "\$parse->() [LEVEL ${level}]: \$content is now '", quotemeta( $content // 'undef' ), "'." );
-                $out = $content;
-                # We can only use this once, and if we do not remove it now, it would be used again later in our code...
-                delete( $args->{format} );
-                # Continue, since we got a closing tag
-            }
-        }
-        $copy = $chunk;
-        # Capture the opening delimiter, and everything after, then check that what came after contains a closing delimiter.
-        # We have to do this in two steps, because we cannot use an hash reference in the first part of the regular expression, such as:
-        # s{^(?<before>.*?)(?<open>$open)(?<params>[a-zA-Z]+)(?:<more_params>.*?)(?<close>$map->{ \1 })}
-        # So, we need to do this in two steps
-        $self->__message( 120, "\$parse->() [LEVEL ${level}]: Checking for some text followed by an opening delimiter, and possibly the begining of some parameters from the string '", ( $chunk // 'undef' ), "'" );
-        # Special case for '{' or '['
-        # Since the opening delimiter may have more than 1 character, we check if the first character is '{' or '['.
-        my $open_re = ( substr( $open_d, 0, 2 ) eq quotemeta('{') || substr( $open_d, 0, 2 ) eq quotemeta('[') )
-            ? "(?<!\\\$)${open_d}"
-            : $open_d;
-        $chunk =~ s{^(?<before>.*?)(?<open>$open_re)(?<params>[a-zA-Z]+)(?<remaining>.*?)$}
-        {
-            my $re = { %+ };
-            $self->__message( 120, "\$parse->() [LEVEL ${level}]: Found -> ", sub{ $self->Module::Generic::dump( $re ) } );
-            # Unless the open and close delimiters have already been set and confirmed, i.e. they have been passed as arguments, we set them as Regexp now.
-            unless( $args->{open_d} )
-            {
-                $open_d  = quotemeta( $re->{open} );
-                $close_d = quotemeta( $map->{ $re->{open} } );
-            }
-            my $before    = $re->{before};
-            my $params    = $re->{params};
-            my $remaining = $re->{remaining};
-            # We have been provided with an open and close delimiter, which means we are in a $level > 1, and we have some colour formatting, and we found a closing tag in the leading text chunk, so we need to wrap that leading text in the given colour formatting.
-            if( exists( $args->{open} ) &&
-                exists( $args->{close} ) &&
-                defined( $args->{open} ) &&
-                defined( $args->{close} ) &&
-                $before =~ /${open_d}\/${close_d}/ )
-            {
-                $self->__message( 120, "The leading text has a closing tag, so we append the normaliser \$normal" );
-                my( $before_close, $after_close ) = split( /${open_d}\/${close_d}/, $before, 2 );
-                if( !$is_tty )
-                {
-                    $out .= $before_close . $after_close;
-                }
-                elsif( $args->{format} )
-                {
-                    my $fmt = CORE::join( '', @{$args->{format}} );
-                    my $text_parts = [CORE::split( /\n/, $before_close )];
-                    for( my $i = 0; $i < scalar( @$text_parts ); $i++ )
-                    {
-                        # Empty due to \n repeated
-                        next if( !CORE::length( $text_parts->[$i] ) );
-                        $text_parts->[$i] = $fmt . $text_parts->[$i] . $normal;
-                    }
-                    $before_close = CORE::join( "\n", @$text_parts );
-                    $out .= $before_close . ( $after_close // '' );
-                }
-                else
-                {
-                    $out .= ( $before_close // '' ) . $normal . ( $after_close // '' );
-                }
-                # We reduce the closing tag counter, since we just found one.
-                $counter-- if( $counter > 0 );
-            }
-            else
-            {
-                $out .= $before;
-            }
-
-            $self->__message( 120, "\$parse->() [LEVEL ${level}]: Checking remaining text '", ( $remaining // 'undef' ), "'" );
-            # Closing delimiter for the open tag
-            if( $remaining =~ s/^(?<more_params>.*?)${close_d}// )
-            {
-                my $params2 = $+{more_params};
-                $self->__message( 120, "\$parse->() [LEVEL ${level}]: Found more formatting parameters '", ( $params2 // 'undef' ), "' followed by a closing delimiter." );
-                # We search for another opening delimiter, which would be an error, since we are not closed yet, but could happen.
-                if( $params2 =~ /(?:$open_d)(?=[a-zA-Z]+)/ )
-                {
-                    $self->__message( 120, "\$parse->() [LEVEL ${level}]: The 'remaining' part contains some opening delimiter, so it seems there is a user-error. Returning the backed up string '", ( $copy // 'undef' ), "'" );
-                    $copy;
-                }
-                else
-                {
-                    # Ok, found parameters + close delimiter
-                    $params .= $params2;
-                    $self->__message( 120, "\$parse->() [LEVEL ${level}]: Ok, we found some more parameters in the 'remaining' capture. \$params is now '", ( $params // 'undef' ), "'. Calling \$process_params->()" );
-                    # Get back an array reference of formatting.
-                    my $fmt = $process_params->( $params );
-                    $self->__message( 120, "\$parse->() [LEVEL ${level}]: \$process_params->() returned -> ", sub{ $self->Module::Generic::dump( $fmt ) } );
-                    $self->__message( 120, "\$parse->() [LEVEL ${level}]: Calling ourself recursively to parse the rest of the string caught in 'remaining' -> '", ( $remaining // 'undef' ), "'" );
-                    my $rv = $parse->( $remaining => {
-                        open    => $open_d,
-                        close   => $close_d,
-                        # We pass the colour formatting that will be applied on the text our next round of parsing will extract
-                        format  => $fmt,
-                        level   => ( $level + 1 ),
-                        # We keep track of the number of valid open tags we got, so we can decide to remove any usless one (if its corresponding open tag was improper), or to replace them with a normaliser
-                        counter => ( $fmt ? ( $counter + 1 ) : $counter ),
-                    });
-                    $self->__message( 120, "\$parse->() [LEVEL ${level}]: Our recursive run returned '", quotemeta( $rv // 'undef' ), "'" );
-                    $rv;
-                }
-            }
-            # We could not find a close delimiter; we call the whole thing off
-            else
-            {
-                $self->__message( 120, "\$parse->() [LEVEL ${level}]: Failed to find a closing delimier in the 'remaining' capture. This is a user-error. Stopping here, and returning the text unaltered -> '", ( $copy // 'undef' ), "'" );
-                $copy;
-            }
-            # Or, we search for a closing delimiter
-            # Once we have the closing delimiter, we get the colour formatting the the parmeters in between.
-        }gexs;
-        $out .= $chunk;
-        $self->__message( 120, "\$parse->() [LEVEL ${level}]: Resulting output is so far '", quotemeta( $out // 'undef' ), "'" );
-
-        if( $is_tty && exists( $args->{format} ) && defined( $args->{format} ) )
-        {
-            $self->__message( 120, "\$parse->() [LEVEL ${level}]: Some colour formatting was passed down to us. Applying it now." );
-            $out = CORE::join( '', @{$args->{format}} ) . $out;
-        }
-        # Also ensure that any closing tag leftovers are replaced by the special formatter $normal. $normal closes formatting, so using it is safe.
-        # We do this only if we inherited a previously identified opening and closing delimiter; OR
-        # if we have not inherited any, but identified it earlier
-        if( ( $args->{open} && $args->{close} ) ||
-            ( $open_d && $close_d && $open_d ne $open ) )
-        {
-            $self->__message( 120, "\$parse->() [LEVEL ${level}]: Removing possible closing tags from string '", quotemeta( $out // 'undef' ), "'" );
-            $out =~ s/(?:${open_d}\/${close_d})/$normal/;
-        }
-
-        $self->__message( 120, "\$parse->() [LEVEL ${level}]: Done. Returning the final resulting formatted string '", quotemeta( $out // 'undef' ), "'" );
-        return( $out );
-    };
-    return( $parse->( $txt ) );
-}
-PERL
-    # NOTE: colour_to_rgb()
-    colour_to_rgb => <<'PERL',
-sub colour_to_rgb
-{
-    my $self    = shift( @_ );
-    my $colour  = lc( shift( @_ ) );
-    my $this  = $self->_obj2h;
-    my( $red, $green, $blue ) = ( '', '', '' );
-    our $COLOUR_NAME_TO_RGB;
-    if( $colour =~ /^[A-Za-z]+([\w\-]+)*([[:blank:]]+\w+)?$/ )
-    {
-        if( !scalar( keys( %$COLOUR_NAME_TO_RGB ) ) )
-        {
-            my $colour_data = $self->__colour_data;
-            local $@;
-            $COLOUR_NAME_TO_RGB = eval( $colour_data );
-            if( $@ )
-            {
-                return( $self->error( "An error occurred loading data from __colour_data: $@" ) );
-            }
-        }
-        if( CORE::exists( $COLOUR_NAME_TO_RGB->{ $colour } ) )
-        {
-            ( $red, $green, $blue ) = @{$COLOUR_NAME_TO_RGB->{ $colour }};
-        }
-        else
-        {
-            return( '' );
-        }
-    }
-    ## Colour all in decimal??
-    elsif( $colour =~ /^\d{9}$/ )
-    {
-        $red   = substr( $colour, 0, 3 );
-        $green = substr( $colour, 3, 3 );
-        $blue  = substr( $colour, 6, 3 );
-    }
-    ## Colour in hexadecimal, convert it
-    elsif( $colour =~ /^[A-F0-9]+$/ )
-    {
-        $red   = hex( substr( $colour, 0, 2 ) );
-        $green = hex( substr( $colour, 2, 2 ) );
-        $blue  = hex( substr( $colour, 4, 2 ) );
-    }
-    ## Clueless
-    else
-    {
-        ## Not undef, but rather empty string. Undef is associated with an error
-        return( '' );
-    }
-    return({ red => $red, green => $green, blue => $blue });
-}
-PERL
-    # NOTE: coloured()
-    coloured => <<'PERL',
-sub coloured
-{
-    my $self = shift( @_ );
-    my $pref = shift( @_ );
-    my $text = CORE::join( '', @_ );
-    my $this  = $self->_obj2h;
-    my( $style, $fg, $bg );
-    ## my $colour_re = qr/(?:(?:bright|light)[[:blank:]])?[a-zA-Z]+/;
-    my $colour_re = qr/(?:(?:bright|light)[[:blank:]])?(?:[a-zA-Z]+(?:[[:blank:]]+[\w\-]+)?|rgb[a]?\([[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*(?:\,[[:blank:]]*\d(?:\.\d)?)?[[:blank:]]*\))/;
-    my $style_re = qr/(?:bold|faint|italic|underline|blink|reverse|conceal|strike)/;
-    if( $pref =~ /^(?:(?<style1>$style_re)[[:blank:]]+)?(?<fg_colour>$colour_re)(?:[[:blank:]]+(?<style2>$style_re))?(?:[[:blank:]]+on[[:blank:]]+(?<bg_colour>$colour_re))?$/i )
-    {
-        $style = $+{style1} || $+{style2};
-        $fg = $+{fg_colour};
-        $bg = $+{bg_colour};
-        return( $self->colour_format({ text => $text, style => $style, colour => $fg, bg_colour => $bg }) );
-    }
-    else
-    {
-        return( '' );
-    }
-}
-PERL
-    # NOTE: dump_hex()
-    dump_hex => <<'PERL',
-sub dump_hex
-{
-    my $self = shift( @_ );
-    $self->_load_class( 'Devel::Hexdump' ) ||
-        return( $self->pass_error );
-    # try-catch
-    local $@;
-    my $rv = eval
-    {
-        Devel::Hexdump::xd( shift( @_ ) );
-    };
-    if( $@ )
-    {
-        return( $self->error( "Error dumping with Devel::Hexdump: $@" ) );
-    }
-    return( $rv );
-}
-PERL
-    # NOTE: dump_print()
-    dump_print => <<'PERL',
-# For backward compatibility and traceability
-sub dump_print { return( shift->dumpto_printer( @_ ) ); }
-PERL
-    # NOTE: dumper()
-    dumper => <<'PERL',
-sub dumper
-{
-    my $self = shift( @_ );
-    my $opts = {};
-    $opts = pop( @_ ) if( scalar( @_ ) > 1 && ref( $_[-1] ) eq 'HASH' );
-    $self->_load_class( 'Data::Dumper' ) ||
-        return( $self->pass_error );
-    # try-catch
-    local $@;
-    my $rv = eval
-    {
-        no warnings 'once';
-        # local $Data::Dumper::Sortkeys = 1;
-        local $Data::Dumper::Terse = 1;
-        local $Data::Dumper::Indent = 1;
-        local $Data::Dumper::Useqq = 1;
-        local $Data::Dumper::Maxdepth = $opts->{depth} if( CORE::length( $opts->{depth} ) );
-        local $Data::Dumper::Sortkeys = sub
-        {
-            my $h = shift( @_ );
-            return( [ sort( grep{ ref( $h->{ $_ } ) !~ /^(DateTime\:\:Lite|DateTime\:\:Lite\:\:|DateTime|DateTime\:\:)/ } keys( %$h ) ) ] );
-        };
-        Data::Dumper::Dumper( @_ );
-    };
-    if( $@ )
-    {
-        return( $self->error( "Error dumping with Data::Dumper: $@" ) );
-    }
-    return( $rv );
-}
-PERL
-    # NOTE: dumpto_printer()
-    dumpto_printer => <<'PERL',
-sub dumpto_printer
-{
-    my $self  = shift( @_ );
-    my( $data, $file ) = @_;
-    $self->_load_class( 'Module::Generic::File' ) ||
-        return( $self->pass_error );
-    $file = Module::Generic::File::file( $file );
-    my $fh =  $file->open( '>', { binmode => 'utf-8', autoflush => 1 }) || 
-        die( "Unable to create file '$file': $!\n" );
-    $fh->print( Data::Dump::dump( $data ), "\n" );
-    $fh->close;
-    # 666 so it can work under command line and web alike
-    chmod( 0666, $file );
-    return(1);
-}
-PERL
-    # NOTE: dumpto_dumper()
-    dumpto_dumper => <<'PERL',
-sub dumpto_dumper
-{
-    my $self  = shift( @_ );
-    my( $data, $file ) = @_;
-    $self->_load_class( 'Data::Dumper' ) ||
-        return( $self->pass_error );
-    $self->_load_class( 'Module::Generic::File' ) ||
-        return( $self->pass_error );
-    # try-catch
-    local $@;
-    my $rv = eval
-    {
-        no warnings 'once';
-        local $Data::Dumper::Sortkeys = 1;
-        local $Data::Dumper::Terse = 1;
-        local $Data::Dumper::Indent = 1;
-        local $Data::Dumper::Useqq = 1;
-        $file = Module::Generic::File::file( $file );
-        my $fh =  $file->open( '>', { autoflush => 1 }) || 
-            die( "Unable to create file '$file': $!\n" );
-        if( ref( $data ) )
-        {
-            $fh->print( Data::Dumper::Dumper( $data ), "\n" );
-        }
-        else
-        {
-            $fh->binmode( ':utf8' );
-            $fh->print( $data );
-        }
-        $fh->close;
-        # 666 so it can work under command line and web alike
-        chmod( 0666, $file );
-        return(1);
-    };
-    if( $@ )
-    {
-        return( $self->error( "Unable to dump data to \"$file\" using Data::Dumper: $@" ) );
-    }
-    return( $rv );
-}
-PERL
-    # NOTE: errno()
-    errno => <<'PERL',
-sub errno
-{
-    my $self = shift( @_ );
-    my $this = $self->_obj2h;
-    if( @_ )
-    {
-        $this->{errno} = shift( @_ ) if( $_[ 0 ] =~ /^\-?\d+$/ );
-        return( $self->error( @_ ) ) if( @_ );
-    }
-    return( $this->{errno} );
-}
-PERL
-    # NOTE: force_tty()
-    force_tty => <<'PERL',
-sub force_tty { return( shift->_set_get( 'force_tty', @_ ) ); }
-PERL
-    # NOTE: message_colour()
-    message_colour => <<'PERL',
-sub message_colour
-{
-    my $self  = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $opts = {};
-    my $args = [@_];
-    if( scalar( @$args ) > 1 && 
-        ref( $args->[-1] ) eq 'HASH' && 
-        (
-            CORE::exists( $args->[-1]->{level} ) || 
-            CORE::exists( $args->[-1]->{type} ) || 
-            CORE::exists( $args->[-1]->{message} ) 
-        ) )
-    {
-        $opts = pop( @$args );
-    }
-    $opts->{colour} = 1;
-    return( $self->__message( @$args, $opts ) );
-}
-PERL
-    # NOTE: messagef_colour()
-    messagef_colour => <<'PERL',
-sub messagef_colour
-{
-    my $self  = shift( @_ );
-    my $this  = $self->_obj2h;
-    my $opts = {};
-    my $args = [@_];
-    no strict 'refs';
-    if( scalar( @$args ) > 1 && 
-        ref( $args->[-1] ) eq 'HASH' && 
-        (
-            CORE::exists( $args->[-1]->{level} ) || 
-            CORE::exists( $args->[-1]->{type} ) || 
-            CORE::exists( $args->[-1]->{message} ) 
-        ) )
-    {
-        $opts = pop( @$args );
-    }
-    $opts->{colour} = 1;
-    return( $self->__messagef( @$args, $opts ) );
-}
-PERL
-    # NOTE: printer()
-    printer => <<'PERL',
-sub printer
-{
-    my $self = shift( @_ );
-    my $opts = {};
-    $opts = pop( @_ ) if( scalar( @_ ) > 1 && ref( $_[-1] ) eq 'HASH' );
-    $self->_load_class( 'Data::Printer' ) ||
-        return( $self->pass_error );
-    # try-catch
-    local $@;
-    my $rv = eval
-    {
-        local $SIG{__WARN__} = sub{ };
-        if( scalar( keys( %$opts ) ) )
-        {
-            return( Data::Printer::np( @_, %$opts ) );
-        }
-        else
-        {
-            return( Data::Printer::np( @_ ) );
-        }
-    };
-    if( $@ )
-    {
-        return( $self->error( "Error dumping data using Data::Printer: $@" ) );
-    }
-    return( $rv );
-}
-PERL
-    # NOTE: save()
-    save => <<'PERL',
-sub save
-{
-    my $self = shift( @_ );
-    my $this = $self->_obj2h;
-    my $opts = {};
-    $opts = pop( @_ ) if( ref( $_[-1] ) eq 'HASH' );
-    my( $file, $data );
-    if( @_ == 2 )
-    {
-        $opts->{data} = shift( @_ );
-        $opts->{file} = shift( @_ );
-    }
-    return( $self->error( "No file was provided to save data to." ) ) if( !$opts->{file} );
-    $self->_load_class( 'Module::Generic::File' ) ||
-        return( $self->pass_error );
-    $file = Module::Generic::File::file( $opts->{file} );
-    my $fh = $file->open( '>', {
-        ( $opts->{encoding} ? ( binmode => $opts->{encoding} ) : () ),
-        autoflush => 1,
-    }) ||
-        return( $self->error( "Unable to open file \"$file\" in write mode: $!" ) );
-    if( !defined( $fh->print( ref( $opts->{data} ) eq 'SCALAR' ? ${$opts->{data}} : $opts->{data} ) ) )
-    {
-        return( $self->error( "Unable to write data to file \"$file\": $!" ) )
-    }
-    $fh->close;
-    my $bytes = -s( $opts->{file} );
-    return( $bytes );
-}
-PERL
-    # NOTE: subclasses()
-    subclasses => <<'PERL',
-sub subclasses
-{
-    my $self  = shift( @_ );
-    my $that  = '';
-    $that     = @_ ? shift( @_ ) : $self;
-    my $base  = ref( $that ) || $that;
-    $base  =~ s,::,/,g;
-    $base .= '.pm';
-
-    $self->_load_class( 'IO::Dir' ) ||
-        return( $self->pass_error );
-    # remove '.pm'
-    my $dir = substr( $INC{ $base }, 0, ( length( $INC{ $base } ) ) - 3 );
-
-    my @packages = ();
-    my $io = IO::Dir->open( $dir );
-    if( defined( $io ) )
-    {
-        @packages = map{ substr( $_, 0, length( $_ ) - 3 ) } grep{ substr( $_, -3 ) eq '.pm' && -f( "$dir/$_" ) } $io->read();
-        $io->close ||
-        warn( "Unable to close directory \"$dir\": $!\n" );
-    }
-    else
-    {
-        warn( "Unable to open directory \"$dir\": $!\n" );
-    }
-    return( wantarray() ? @packages : \@packages );
-}
-PERL
-    __dbh => <<'PERL',
-sub __dbh
-{
-    my $self  = shift( @_ );
-    my $class = ref( $self ) || $self;
-    my $this  = $self->_obj2h;
-    no strict 'refs';
-    if( !$this->{__dbh} )
-    {
-        return( '' ) if( !${ "$class\::DB_DSN" } );
-        $self->_load_class( 'DBI' ) ||
-            return( $self->pass_error );
-        # Connecting to database
-        my $db_opt = {};
-        $db_opt->{RaiseError} = ${ "$class\::DB_RAISE_ERROR" } if( length( ${ "$class\::DB_RAISE_ERROR" } ) );
-        $db_opt->{AutoCommit} = ${ "$class\::DB_AUTO_COMMIT" } if( length( ${ "$class\::DB_AUTO_COMMIT" } ) );
-        $db_opt->{PrintError} = ${ "$class\::DB_PRINT_ERROR" } if( length( ${ "$class\::DB_PRINT_ERROR" } ) );
-        $db_opt->{ShowErrorStatement} = ${ "$class\::DB_SHOW_ERROR_STATEMENT" } if( length( ${ "$class\::DB_SHOW_ERROR_STATEMENT" } ) );
-        $db_opt->{client_encoding} = ${ "$class\::DB_CLIENT_ENCODING" } if( length( ${ "$class\::DB_CLIENT_ENCODING" } ) );
-        my $dbh = DBI->connect_cached( ${ "$class\::DB_DSN" } ) ||
-        die( "Unable to connect to sql database with dsn '", ${ "$class\::DB_DSN" }, "'\n" );
-        $dbh->{pg_server_prepare} = 1 if( ${ "$class\::DB_SERVER_PREPARE" } );
-        $this->{__dbh} = $dbh;
-    }
-    return( $this->{__dbh} );
-}
-PERL
-    # NOTE: __colour_data()
-    __colour_data => <<'PERL',
+        # NOTE: __colour_data()
+        __colour_data => <<'PERL',
 # Initially those data were stored after the __END__, but it seems some module is interfering with <DATA>
 # and so those data could not be loaded reliably
 # This is called once by colour_to_rgb to generate the hash reference COLOUR_NAME_TO_RGB
@@ -9567,8 +7910,8 @@ sub __colour_data
 EOT
 }
 PERL
-    # NOTE: __create_class()
-    __create_class => <<'PERL',
+        # NOTE: __create_class()
+        __create_class => <<'PERL',
 sub __create_class
 {
     my $self  = shift( @_ );
@@ -9587,14 +7930,14 @@ sub __create_class
         $new_class = join( '', map( ucfirst( lc( $_ ) ), split( /\_/, $new_class ) ) );
         $class = ( ref( $self ) || $self ) . "\::${new_class}";
     }
-    $self->__message( 112, "Class to be used is '$class' (", ( Class::Load::is_class_loaded( $class ) ? "already loaded" : "not yet loaded" ), ") and dictionary is: ", sub{ $self->Module::Generic::dump( $def ) } );
-    if( Class::Load::is_class_loaded( $class ) )
+    $self->__message( 112, "Class to be used is '$class' (", ( $self->_is_class_loaded( $class ) ? "already loaded" : "not yet loaded" ), ") and dictionary is: ", sub{ $self->Module::Generic::dump( $def ) } );
+    if( $self->_is_class_loaded( $class ) )
     {
         my $ref = eval( "\\%${class}::" );
         # $self->__message( 112, "Class $class seems to be already loaded. Symbols are -> ", sub{ $self->Module::Generic::dump( $ref ) } );
     }
 
-    unless( Class::Load::is_class_loaded( $class ) )
+    unless( $self->_is_class_loaded( $class ) )
     {
         my $type2func =
         {
@@ -9734,6 +8077,7 @@ EOT
                 # $d->Terse( 1 );
                 # $d->Sortkeys( 1 );
                 # my $hash_str = $d->Dump;
+                require Data::Dump;
                 my $hash_str = Data::Dump::dump( $this_def );
                 $self->__message( 112, "For field $f, using dictionary definition string -> $hash_str" );
                 CORE::push( @$code_lines, "sub ${f} { return( shift->${func}( '${f}', ${hash_str}, \@_ ) ); }" );
@@ -9741,6 +8085,7 @@ EOT
             elsif( $type eq 'version' && ( exists( $info->{def} ) || exists( $info->{definition} ) ) )
             {
                 my $this_def = $info->{definition} // $info->{def};
+                require Data::Dump;
                 my $hash_str = Data::Dump::dump( $this_def );
                 CORE::push( @$code_lines, "sub ${f} { return( shift->${func}( '${f}', ${hash_str}, \@_ ) ); }" );
             }
@@ -9848,8 +8193,36 @@ EOT
     return( $class );
 }
 PERL
-    # NOTE: _can_overload
-    _can_overload => <<'PERL',
+        # NOTE: __dbh()
+        __dbh => <<'PERL',
+sub __dbh
+{
+    my $self  = shift( @_ );
+    my $class = ref( $self ) || $self;
+    my $this  = $self->_obj2h;
+    no strict 'refs';
+    if( !$this->{__dbh} )
+    {
+        return( '' ) if( !${ "$class\::DB_DSN" } );
+        $self->_load_class( 'DBI' ) ||
+            return( $self->pass_error );
+        # Connecting to database
+        my $db_opt = {};
+        $db_opt->{RaiseError} = ${ "$class\::DB_RAISE_ERROR" } if( length( ${ "$class\::DB_RAISE_ERROR" } ) );
+        $db_opt->{AutoCommit} = ${ "$class\::DB_AUTO_COMMIT" } if( length( ${ "$class\::DB_AUTO_COMMIT" } ) );
+        $db_opt->{PrintError} = ${ "$class\::DB_PRINT_ERROR" } if( length( ${ "$class\::DB_PRINT_ERROR" } ) );
+        $db_opt->{ShowErrorStatement} = ${ "$class\::DB_SHOW_ERROR_STATEMENT" } if( length( ${ "$class\::DB_SHOW_ERROR_STATEMENT" } ) );
+        $db_opt->{client_encoding} = ${ "$class\::DB_CLIENT_ENCODING" } if( length( ${ "$class\::DB_CLIENT_ENCODING" } ) );
+        my $dbh = DBI->connect_cached( ${ "$class\::DB_DSN" } ) ||
+        die( "Unable to connect to sql database with dsn '", ${ "$class\::DB_DSN" }, "'\n" );
+        $dbh->{pg_server_prepare} = 1 if( ${ "$class\::DB_SERVER_PREPARE" } );
+        $this->{__dbh} = $dbh;
+    }
+    return( $this->{__dbh} );
+}
+PERL
+        # NOTE: _can_overload()
+        _can_overload => <<'PERL',
 sub _can_overload
 {
     my $self = shift( @_ );
@@ -9872,8 +8245,8 @@ sub _can_overload
     }
 }
 PERL
-    # NOTE: _get_args_as_array
-    _get_args_as_array => <<'PERL',
+        # NOTE: _get_args_as_array()
+        _get_args_as_array => <<'PERL',
 # NOTE: sub _get_args_as_array() is now a XS method
 sub _get_args_as_array
 {
@@ -9891,8 +8264,8 @@ sub _get_args_as_array
     return( $ref );
 }
 PERL
-    # NOTE: _get_datetime_regexp
-    _get_datetime_regexp => <<'PERL',
+        # NOTE: _get_datetime_regexp()
+        _get_datetime_regexp => <<'PERL',
 sub _get_datetime_regexp
 {
     my $self = shift( @_ );
@@ -9901,11 +8274,11 @@ sub _get_datetime_regexp
     unless( defined( $PARSE_DATE_FRACTIONAL1_RE ) )
     {
         my $aliases = [qw( JST )];
-        if( $self->_load_class( 'DateTime::TimeZone::Catalog::Extend', { version => 'v0.2.0' } ) )
+        if( $self->_load_class( 'DateTime::Lite::TimeZone', { version => 'v0.5.7' } ) )
         {
-            $aliases = DateTime::TimeZone::Catalog::Extend->aliases;
+            $aliases = DateTime::Lite::TimeZone->extended_aliases;
         }
-        my $tz_aliases = join( '|', @$aliases );
+        my $tz_aliases = join( '|', sort( keys( %$aliases ) ) );
         $PARSE_DATE_FRACTIONAL1_RE = qr/
             (?<year>\d{4})
             (?<d_sep>[^\d\+])
@@ -9996,11 +8369,11 @@ sub _get_datetime_regexp
     unless( defined( $PARSE_DATE_NON_STDANDARD_RE ) )
     {
         my $aliases = [qw( JST )];
-        if( $self->_load_class( 'DateTime::TimeZone::Catalog::Extend', { version => 'v0.2.0' } ) )
+        if( $self->_load_class( 'DateTime::Lite::TimeZone', { version => 'v0.5.7' } ) )
         {
-            $aliases = DateTime::TimeZone::Catalog::Extend->aliases;
+            $aliases = DateTime::Lite::TimeZone->extended_aliases;
         }
-        my $tz_aliases = join( '|', @$aliases );
+        my $tz_aliases = join( '|', sort( keys( %$aliases ) ) );
 
         $PARSE_DATE_NON_STDANDARD_RE = qr/
         (?:
@@ -10045,11 +8418,11 @@ sub _get_datetime_regexp
     unless( defined( $PARSE_DATE_NON_STDANDARD2_RE ) )
     {
         my $aliases = [qw( JST )];
-        if( $self->_load_class( 'DateTime::TimeZone::Catalog::Extend', { version => 'v0.2.0' } ) )
+        if( $self->_load_class( 'DateTime::Lite::TimeZone', { version => 'v0.5.7' } ) )
         {
-            $aliases = DateTime::TimeZone::Catalog::Extend->aliases;
+            $aliases = DateTime::Lite::TimeZone->extended_aliases;
         }
-        my $tz_aliases = join( '|', @$aliases );
+        my $tz_aliases = join( '|', sort( keys( %$aliases ) ) );
 
         $PARSE_DATE_NON_STDANDARD2_RE = qr/
         (?:
@@ -10285,8 +8658,8 @@ sub _get_datetime_regexp
     return( ( CORE::defined( $elem ) && CORE::exists( $def->{ $elem } ) ) ? $def->{ $elem } : $def );
 }
 PERL
-    # NOTE: _get_symbol
-    _get_symbol => <<'PERL',
+        # NOTE: _get_symbol()
+        _get_symbol => <<'PERL',
 sub _get_symbol
 {
     my $self = shift( @_ );
@@ -10348,8 +8721,8 @@ sub _get_symbol
     }
 }
 PERL
-    # NOTE: _has_base64()
-    _has_base64 => <<'PERL',
+        # NOTE: _has_base64()
+        _has_base64 => <<'PERL',
 sub _has_base64
 {
     my $self = shift( @_ );
@@ -10364,9 +8737,9 @@ sub _has_base64
     {
         return( $val );
     }
-
+    
     my $class = ref( $self ) || $self;
-
+    
     unless( defined( ${"${class}\::HAS_B64"} ) && ref( ${"${class}\::HAS_B64"} ) eq 'HASH' )
     {
         my $ref = ${"${class}\::HAS_B64"} = {};
@@ -10389,7 +8762,7 @@ sub _has_base64
     }
     my $ref = ${"${class}\::HAS_B64"};
     return( '' ) if( !scalar( keys( %$ref ) ) );
-
+    
     my $prefs = [];
     if( $val eq 'Crypt::Misc' || $val eq 'CryptX' )
     {
@@ -10400,7 +8773,7 @@ sub _has_base64
     {
         push( @$prefs, qw( MIME::Base64 Crypt::Misc ) );
     }
-
+    
     foreach my $mod ( @$prefs )
     {
         if( exists( $ref->{ $mod } ) && $self->_load_class( $mod ) )
@@ -10411,8 +8784,8 @@ sub _has_base64
     return( '' );
 }
 PERL
-    # NOTE: _has_symbol
-    _has_symbol => <<'PERL',
+        # NOTE: _has_symbol()
+        _has_symbol => <<'PERL',
 sub _has_symbol
 {
     my $self = shift( @_ );
@@ -10465,8 +8838,8 @@ sub _has_symbol
     }
 }
 PERL
-    # NOTE: _implement_freeze_thaw()
-    _implement_freeze_thaw => <<'PERL',
+        # NOTE: _implement_freeze_thaw()
+        _implement_freeze_thaw => <<'PERL',
 sub _implement_freeze_thaw
 {
     my $self = shift( @_ );
@@ -10488,7 +8861,7 @@ sub _implement_freeze_thaw
                 CORE::return( $class, \%hash );
             };
         }
-
+        
         unless( defined( &{"${class}\::STORABLE_thaw"} ) )
         {
             no warnings 'once';
@@ -10517,7 +8890,7 @@ sub _implement_freeze_thaw
                 CORE::return( $new );
             };
         }
-
+        
         unless( defined( &{"${class}\::FREEZE"} ) )
         {
             no warnings 'once';
@@ -10545,8 +8918,8 @@ sub _implement_freeze_thaw
     }
 }
 PERL
-    # NOTE: _is_array()
-    _is_array => <<'PERL',
+        # NOTE: _is_array()
+        _is_array => <<'PERL',
 # NOTE: sub _is_array() is now a XS method
 sub _is_array
 {
@@ -10557,8 +8930,8 @@ sub _is_array
     return( $type eq 'ARRAY' );
 }
 PERL
-    # NOTE: _is_code()
-    _is_code => <<'PERL',
+        # NOTE: _is_code()
+        _is_code => <<'PERL',
 # NOTE: sub _is_code() is now a XS method
 sub _is_code
 {
@@ -10569,8 +8942,8 @@ sub _is_code
     return( $type eq 'CODE' );
 }
 PERL
-    # NOTE: _is_empty()
-    _is_empty => <<'PERL',
+        # NOTE: _is_empty()
+        _is_empty => <<'PERL',
 sub _is_empty
 {
     my $self = shift( @_ );
@@ -10609,8 +8982,8 @@ sub _is_empty
     return(0);
 }
 PERL
-    # NOTE: _is_glob()
-    _is_glob => <<'PERL',
+        # NOTE: _is_glob()
+        _is_glob => <<'PERL',
 # NOTE: sub _is_glob() is now a XS method
 sub _is_glob
 {
@@ -10621,8 +8994,8 @@ sub _is_glob
     return( $type eq 'GLOB' );
 }
 PERL
-    # NOTE: _is_hash()
-    _is_hash => <<'PERL',
+        # NOTE: _is_hash()
+        _is_hash => <<'PERL',
 # NOTE: sub _is_hash() is now a XS method
 sub _is_hash
 {
@@ -10641,8 +9014,8 @@ sub _is_hash
     return( $type eq 'HASH' ? 1 : 0 );
 }
 PERL
-    # NOTE: _is_integer()
-    _is_integer => <<'PERL',
+        # NOTE: _is_integer()
+        _is_integer => <<'PERL',
 # NOTE: sub _is_integer() is now a XS method
 sub _is_integer
 {
@@ -10651,8 +9024,8 @@ sub _is_integer
     return( $_[1] =~ /^[\+\-]?\d+$/ ? 1 : 0 );
 }
 PERL
-    # NOTE: _is_number()
-    _is_number => <<'PERL',
+        # NOTE: _is_number()
+        _is_number => <<'PERL',
 # NOTE: sub _is_number() is now a XS method
 sub _is_number
 {
@@ -10677,8 +9050,8 @@ sub _is_number
     return( ( $flags & ( $SVf_IOK | $SVf_NOK ) ) ? 1 : 0 );
 }
 PERL
-    # NOTE: _is_object()
-    _is_object => <<'PERL',
+        # NOTE: _is_object()
+        _is_object => <<'PERL',
 # NOTE: sub _is_object() is now a XS method
 sub _is_object
 {
@@ -10687,8 +9060,8 @@ sub _is_object
     return( Scalar::Util::blessed( $_[1] ) ? 1 : 0 );
 }
 PERL
-    # NOTE: _is_overloaded()
-    _is_overloaded => <<'PERL',
+        # NOTE: _is_overloaded()
+        _is_overloaded => <<'PERL',
 # NOTE: sub _is_overloaded() is now a XS method
 sub _is_overloaded
 {
@@ -10701,8 +9074,8 @@ sub _is_overloaded
     return( overload::Overloaded( $_[0] ) ? 1 : 0 );
 }
 PERL
-    # NOTE: _is_scalar()
-    _is_scalar => <<'PERL',
+        # NOTE: _is_scalar()
+        _is_scalar => <<'PERL',
 # NOTE: sub _is_scalar() is now a XS method
 sub _is_scalar
 {
@@ -10711,86 +9084,86 @@ sub _is_scalar
     return( ( Scalar::Util::reftype( $_[1] ) // '' ) eq 'SCALAR' ? 1 : 0 );
 }
 PERL
-    # NOTE: _is_tty
-    _is_tty => <<'PERL',
+        # NOTE: _is_tty()
+        _is_tty => <<'PERL',
 sub _is_tty
 {
     return( -t( STDIN ) && ( -t( STDOUT ) || !( -f STDOUT || -c STDOUT ) ) );
 }
 PERL
-    # NOTE: _is_version
-    _is_version => <<'PERL',
+        # NOTE: _is_version()
+        _is_version => <<'PERL',
+my $version_lax_regex = qr/
+(?<ver_str>
+    # Lax dotted-decimal version number. Distinguished by having either leading "v" 
+    # or at least three non-alpha parts. Alpha part is only permitted if there are 
+    # at least two non-alpha parts. Strangely enough, without the leading "v", Perl 
+    # takes .1.2 to mean v0.1.2, so when there is no "v", the leading part is optional
+    (?<dotted>
+        (?<has_v>v)
+        (?<ver>
+            (?<major>[0-9]+)
+            (?:
+                (?<minor_patch>(?:\.[0-9]+)+)
+                (?:_(?<alpha>[0-9]+))?
+            )?
+        )
+        |
+        (?<ver>
+            (?<major>[0-9]+)?
+            (?<minor_patch>(?:\.[0-9]+){2,})
+            (?:_(?<alpha>[0-9]+))?
+        )
+    )
+    |
+    (?<dotted>
+        (?<dotted_numified>
+            (?<dotted_numified_under>
+                (?<ver>
+                    (?<release>
+                        (?<major>[0-9]+)
+                        (?<minor_patch>
+                            \.
+                            (?<minor>[0-9]{3})
+                            (?:_(?<patch>[0-9]{3}))
+                        )
+                    )
+                )
+            )
+            |
+            (?<ver>
+                (?<release>
+                    (?<major>[0-9]+)
+                    (?<minor_patch>
+                        \.
+                        (?<minor>0[0-9]{2})
+                        (?<patch>0[0-9]{2})
+                    )
+                )
+                (?:_(?<alpha>[0-9]+))?
+            )
+        )
+    )
+    |
+    # Lax decimal version number. Just like the strict one except for allowing an 
+    # alpha suffix or allowing a leading or trailing decimal-point
+    (?<decimal>
+        (?<ver>(?<release>(?<major>[0-9]+) (?: (?:\.(?<minor>[0-9]+)) | \. )?) (?:_(?<alpha>[0-9]+))?)
+        |
+        (?<ver>(?:\.(?<release>(?<major>[0-9]+))) (?:_(?<alpha>[0-9]+))?)
+    )
+)/x;
 sub _is_version
 {
     my $self = shift( @_ );
     return(0) if( !@_ );
     return(0) if( !defined( $_[0] ) );
     # Taken from Changes::Version
-    state $version_lax_regex = qr/
-    (?<ver_str>
-        # Lax dotted-decimal version number. Distinguished by having either leading "v" 
-        # or at least three non-alpha parts. Alpha part is only permitted if there are 
-        # at least two non-alpha parts. Strangely enough, without the leading "v", Perl 
-        # takes .1.2 to mean v0.1.2, so when there is no "v", the leading part is optional
-        (?<dotted>
-            (?<has_v>v)
-            (?<ver>
-                (?<major>[0-9]+)
-                (?:
-                    (?<minor_patch>(?:\.[0-9]+)+)
-                    (?:_(?<alpha>[0-9]+))?
-                )?
-            )
-            |
-            (?<ver>
-                (?<major>[0-9]+)?
-                (?<minor_patch>(?:\.[0-9]+){2,})
-                (?:_(?<alpha>[0-9]+))?
-            )
-        )
-        |
-        (?<dotted>
-            (?<dotted_numified>
-                (?<dotted_numified_under>
-                    (?<ver>
-                        (?<release>
-                            (?<major>[0-9]+)
-                            (?<minor_patch>
-                                \.
-                                (?<minor>[0-9]{3})
-                                (?:_(?<patch>[0-9]{3}))
-                            )
-                        )
-                    )
-                )
-                |
-                (?<ver>
-                    (?<release>
-                        (?<major>[0-9]+)
-                        (?<minor_patch>
-                            \.
-                            (?<minor>0[0-9]{2})
-                            (?<patch>0[0-9]{2})
-                        )
-                    )
-                    (?:_(?<alpha>[0-9]+))?
-                )
-            )
-        )
-        |
-        # Lax decimal version number. Just like the strict one except for allowing an 
-        # alpha suffix or allowing a leading or trailing decimal-point
-        (?<decimal>
-            (?<ver>(?<release>(?<major>[0-9]+) (?: (?:\.(?<minor>[0-9]+)) | \. )?) (?:_(?<alpha>[0-9]+))?)
-            |
-            (?<ver>(?:\.(?<release>(?<major>[0-9]+))) (?:_(?<alpha>[0-9]+))?)
-        )
-    )/x;
     return( $_[0] =~ /^$version_lax_regex$/ ? 1 : 0 );
 }
 PERL
-    # NOTE: _list_symbols
-    _list_symbols => <<'PERL',
+        # NOTE: _list_symbols()
+        _list_symbols => <<'PERL',
 sub _list_symbols
 {
     # $type can be SCALAR, ARRAY, HASH or CODE (case insensitive)
@@ -10846,8 +9219,20 @@ sub _list_symbols
     }
 }
 PERL
-    # NOTE: _looks_like_path
-    _looks_like_path => <<'PERL',
+        # NOTE: _looks_like_path()
+        _looks_like_path => <<'PERL',
+my $control_chars_re        = qr{[\x00-\x1F\x7F]};
+my $url_scheme_re           = qr{^[a-z][a-z0-9+.\-]*://}i;
+my $non_windows_scheme_re   = qr{^[a-z][a-z0-9+.\-]*:}i;
+my $email_re                = qr{^[^\s@]+@[^\s@]+\.[A-Za-z]{2,}$};
+my $windows_drive_re        = qr{^[A-Za-z]:[\\\/][^\s/\\]+(?:[\\\/][^\s/\\]+)*\.[A-Za-z0-9]{1,4}$};
+my $unc_share_re            = qr{^\\\\(?:\[[0-9A-Fa-f:]+\]|[^\\\/]+)[\\\/][^\\\/]+};
+my $home_expansion_re       = qr{^~(?:[A-Za-z0-9._\-]+)?[\\\/]};
+my $relative_path_re        = qr{^\.(?:\.|)[\\\/]};
+my $separator_re            = qr{[\\\/]};
+my $windows_invalid_char_re = qr{[<>\"|?*]};
+my $no_trailing_space       = qr{(?:^|[\\\/])\s*$};
+my $lone_filename_re        = qr{^[^\s.][^\s]*\.[A-Za-z0-9]{1,4}$};
 sub _looks_like_path
 {
     my $self = shift( @_ );
@@ -10856,21 +9241,17 @@ sub _looks_like_path
     return(0) if( ref( $_[0] ) );
 
     # Avoid control chars (include DEL \x7F)
-    state $control_chars_re = qr{[\x00-\x1F\x7F]};
     return(0) if( $_[0] =~ /$control_chars_re/ );
 
     # Reject obvious non-paths
     # URL schemes: scheme://...
-    state $url_scheme_re = qr{^[a-z][a-z0-9+.\-]*://}i;
     return(0) if( $_[0] =~ m{$url_scheme_re} );
 
     # Other schemes like mailto:, data:, etc., but allow Windows "C:\"
-    state $non_windows_scheme_re = qr{^[a-z][a-z0-9+.\-]*:}i;
     return(0) if( $_[0] =~ m{$non_windows_scheme_re} && $_[0] !~ /^[a-z]:[\\\/]/i );
 
     # "Email-ish" strings (no slashes, single @, plausible TLD at end)
     # We keep this heuristic *narrow* to avoid false rejections.
-    state $email_re = qr{^[^\s@]+@[^\s@]+\.[A-Za-z]{2,}$};
     return(0) if( $_[0] !~ m{[\\/]} && $_[0] =~ /$email_re/ );
 
     # High confidence:
@@ -10879,11 +9260,9 @@ sub _looks_like_path
     # return(1) if( $_[0] =~ /^[A-Za-z]:[\\\/]/ );
 
     # Windows drive path: C:\dir\file.txt, C:/dir
-    state $windows_drive_re = qr{^[A-Za-z]:[\\\/][^\s/\\]+(?:[\\\/][^\s/\\]+)*\.[A-Za-z0-9]{1,4}$};
     return(1) if( $_[0] =~ /$windows_drive_re/ );
 
     # UNC share: \\Server\Share\...  (also allow IPv6 host literal \\[fe80::1]\Share)
-    state $unc_share_re = qr{^\\\\(?:\[[0-9A-Fa-f:]+\]|[^\\\/]+)[\\\/][^\\\/]+};
     return(1) if( $_[0] =~ /$unc_share_re/ );
 
     # Unix absolute: /usr/... (including root "/")
@@ -10891,11 +9270,9 @@ sub _looks_like_path
     # return(1) if( $_[0] =~ m{^/} );
 
     # Home expansion: ~/something   or   ~user/something
-    state $home_expansion_re = qr{^~(?:[A-Za-z0-9._\-]+)?[\\\/]};
     return(1) if( $_[0] =~ m{$home_expansion_re} );
 
     # Relative: ./foo, ../bar, .\foo, ..\bar
-    state $relative_path_re = qr{^\.(?:\.|)[\\\/]};
     return(1) if( $_[0] =~ m{$relative_path_re} );
 
     # Env-based: $HOME/foo, %USERPROFILE%\foo
@@ -10903,14 +9280,11 @@ sub _looks_like_path
     # return(1) if( $_[0] =~ m{^\$[A-Za-z_]\w*[\\\/]} || $_[0] =~ m{^%[A-Za-z_]\w*%[\\\/]} );
 
     # Lower confidence (needs a separator):
-    state $separator_re = qr{[\\\/]};
     if( $_[0] =~ m{$separator_re} )
     {
         # Disallow Windows-invalid chars
-        state $windows_invalid_char_re = qr{[<>\"|?*]};
         return(0) if( $_[0] =~ m{$windows_invalid_char_re} );
         # No empty trailing segment of spaces
-        state $no_trailing_space = qr{(?:^|[\\\/])\s*$};
         return(0) if( $_[0] =~ m{$no_trailing_space} );
         return(1);
     }
@@ -10918,14 +9292,13 @@ sub _looks_like_path
     # Lone filename heuristics (last resort):
     # Useful when the *field name* hints it's a file/path and value is just "config.json".
     # We keep it conservative: require an extension of up to 4 characters; avoid leading/trailing spaces.
-    state $lone_filename_re = qr{^[^\s.][^\s]*\.[A-Za-z0-9]{1,4}$};
     return(1) if( $_[0] =~ /$lone_filename_re/ );
 
     return(0);
 }
 PERL
-    # NOTE: _obj2h()
-    _obj2h => <<'PERL',
+        # NOTE: _obj2h()
+        _obj2h => <<'PERL',
 # NOTE: sub _obj2h() is now a XS method
 sub _obj2h
 {
@@ -10968,12 +9341,12 @@ sub _obj2h
     }
 }
 PERL
-    # NOTE: _on_error()
-    _on_error => <<'PERL',
+        # NOTE: _on_error()
+        _on_error => <<'PERL',
 sub _on_error { return( shift->_set_get_code( '_on_error', @_ ) ); }
 PERL
-    # NOTE: _parse_timestamp()
-    _parse_timestamp => <<'PERL',
+        # NOTE: _parse_timestamp()
+        _parse_timestamp => <<'PERL',
 # Ref:
 # <https://en.wikipedia.org/wiki/Date_format_by_country>
 sub _parse_timestamp
@@ -11696,8 +10069,8 @@ sub _parse_timestamp
     return( $dt );
 }
 PERL
-    # NOTE: _refaddr
-    _refaddr => <<'PERL',
+        # NOTE: _refaddr()
+        _refaddr => <<'PERL',
 # NOTE: sub _refaddr() is now a XS method
 sub _refaddr
 {
@@ -11706,8 +10079,8 @@ sub _refaddr
     return( Scalar::Util::refaddr( $_[1] ) );
 }
 PERL
-    # NOTE: _set_get_class_array_object
-    _set_get_class_array_object => <<'PERL',
+        # NOTE: _set_get_class_array_object()
+        _set_get_class_array_object => <<'PERL',
 sub _set_get_class_array_object
 {
     my $self = shift( @_ );
@@ -11744,8 +10117,8 @@ sub _set_get_class_array_object
     }
 }
 PERL
-    # NOTE: _set_get_datetime()
-    _set_get_datetime => <<'PERL',
+        # NOTE: _set_get_datetime()
+        _set_get_datetime => <<'PERL',
 sub _set_get_datetime : lvalue
 {
     my $self  = shift( @_ );
@@ -12008,8 +10381,8 @@ sub _set_get_datetime : lvalue
     }, @_ ) );
 }
 PERL
-    # NOTE: _set_get_enum
-    _set_get_enum => <<'PERL',
+        # NOTE: _set_get_enum()
+        _set_get_enum => <<'PERL',
 sub _set_get_enum : lvalue
 {
     my $self  = shift( @_ );
@@ -12157,8 +10530,83 @@ sub _set_get_enum : lvalue
     }, @_ ) );
 }
 PERL
-    # NOTE: _set_symbol
-    _set_symbol => <<'PERL',
+        # NOTE: _set_get_hash_as_object()
+        _set_get_hash_as_object => <<'PERL',
+# There is no lvalue here on purpose
+sub _set_get_hash_as_object
+{
+    my $self = shift( @_ );
+    my $this = $self->_obj2h;
+    my $field = shift( @_ ) || return( $self->error( "No field provided for _set_get_hash_as_object" ) );
+    my $class;
+    @_ = () if( @_ == 1 && !defined( $_[0] ) );
+    no strict 'refs';
+    if( @_ )
+    {
+        # No class was provided
+        if( ( Scalar::Util::reftype( $_[0] ) // '' ) eq 'HASH' )
+        {
+            my $new_class = $field;
+            $new_class =~ tr/-/_/;
+            $new_class =~ s/\_{2,}/_/g;
+            $new_class = join( '', map( ucfirst( lc( $_ ) ), split( /\_/, $new_class ) ) );
+            $class = ( ref( $self ) || $self ) . "\::${new_class}";
+        }
+        elsif( ref( $_[0] ) )
+        {
+            return( $self->error( "Class name in _set_get_hash_as_object helper method cannot be a reference. Received: \"", $self->_str_val( $_[0] // 'undef' ), "\"." ) );
+        }
+        else
+        {
+            $class = shift( @_ );
+        }
+    }
+    else
+    {
+        my $new_class = $field;
+        $new_class =~ tr/-/_/;
+        $new_class =~ s/\_{2,}/_/g;
+        $new_class = join( '', map( ucfirst( lc( $_ ) ), split( /\_/, $new_class ) ) );
+        $class = ( ref( $self ) || $self ) . "\::${new_class}";
+    }
+    # my $class = shift( @_ );
+    my $data = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    unless( $self->_is_class_loaded( $class ) )
+    {
+        my $perl .= <<EOT;
+package $class;
+BEGIN
+{
+    use strict;
+    use warnings::register;
+    use Module::Generic;
+    use parent qw( Module::Generic::Dynamic );
+};
+
+1;
+
+EOT
+        local $@;
+        my $rc = eval( $perl );
+        die( "Unable to dynamically create module \"$class\" for field \"$field\" based on our own class \"", ( ref( $self ) || $self ), "\": $@" ) if( $@ );
+    }
+
+    if( @_ )
+    {
+        my $hash = shift( @_ );
+        my $o = $self->__instantiate_object( $field, $class, $hash );
+        $data->{ $field } = $o;
+    }
+
+    if( !$data->{ $field } || !$self->_is_object( $data->{ $field } ) )
+    {
+        my $o = $data->{ $field } = $self->__instantiate_object( $field, $class, $data->{ $field } );
+    }
+    return( $data->{ $field } );
+}
+PERL
+        # NOTE: _set_symbol()
+        _set_symbol => <<'PERL',
 # $o->_set_symbol(
 # class => 'Foo::Bar',
 # variable => '$some_var',
@@ -12300,6 +10748,1692 @@ sub _set_symbol
             *{ $class . '::' . $name } = $defaults->{ $type };
         }
     }
+}
+PERL
+        # NOTE: as_hash()
+        as_hash => <<'PERL',
+sub as_hash
+{
+    my $self = shift( @_ );
+    my $p = $self->_get_args_as_hash( @_ );
+    # $p = shift( @_ ) if( scalar( @_ ) == 1 && ref( $_[0] ) eq 'HASH' );
+    $p->{convert_array} //= 1;
+    my $me = $self->_obj2h;
+    my $seen = $p->{seen} || {};
+    my $levels = $p->{levels} || [];
+    my $keys = $p->{fields} || [];
+
+    my $added_subs = CORE::exists( $me->{_added_method} ) && ref( $me->{_added_method} ) eq 'HASH'
+        ? $me->{_added_method}
+        : {};
+    
+    my $crawl;
+    $crawl = sub
+    {
+        my $this = shift( @_ );
+        my $rval = ref( $this ) ? $this : \$this;
+        my( $dataref, $class, $type, $id );
+        my $strval = $dataref = $self->_str_val( $rval // 'undef' );
+        # Parse $strval without using regexps, in order not to clobber $1, $2,...
+        if( ( my $i = rindex( $dataref, '=' ) ) >= 0 )
+        {
+            $class = substr( $dataref, 0, $i );
+            $dataref = substr( $dataref, $i + 1 );
+        }
+        if( ( my $i = index( $dataref, "(0x" ) ) >= 0 )
+        {
+            $type = substr( $dataref, 0, $i );
+            $id = substr( $dataref, $i + 2, -1 );
+        }
+        
+        my $levels = shift( @_ );
+        my $prefix = join( '->', @$levels ) . ':';
+        $self->__message( 112, "$prefix Processing $strval of type $type and class ", ( $class // 'undef' ) );
+        
+        if( defined( $class ) )
+        {
+            if( $class eq 'JSON::PP::Boolean' ||
+                $class eq 'Module::Generic::Boolean' )
+            {
+                $self->__message( 113, "$prefix Converting known boolean object." );
+                return( $$this ? 1 : 0 );
+            }
+            # NOTE: Not sure why I did this, because as_hash is about converting into hash, not stringifying everything
+            # elsif( $this->can( 'as_hash' ) && 
+            #     overload::Overloaded( $this ) && 
+            #     overload::Method( $this, '""' ) )
+            # {
+            #     $self->__message( 105, "$prefix object supports 'as_hash' and can stringify." );
+            #     return( $this . '' );
+            # }
+            elsif( $this->can( 'as_hash' ) )
+            {
+                if( $self->_is_array( $this ) && !$p->{convert_array} )
+                {
+                    return( $this );
+                }
+                elsif( ++$seen->{ Scalar::Util::refaddr( $this ) } < 2 )
+                {
+                    $self->__message( 112, "$prefix object supports 'as_hash', but cannot stringify." );
+                    my $old_debug;
+                    $old_debug = $this->debug if( $this->can( 'debug' ) );
+                    my $rv = $this->as_hash( { %$p, seen => $seen, levels => $levels } );
+                    $this->debug( $old_debug ) if( defined( $old_debug ) );
+                    
+                    if( Scalar::Util::blessed( $rv ) )
+                    {
+                        $self->__message( 112, "$prefix $strval->as_hash() returned a blessed value (", $self->_str_val( $rv // 'undef' ), ")." );
+                        return( $crawl->( $rv, [@$levels, $strval] ) );
+                    }
+                    else
+                    {
+                        $self->__message( 112, "$prefix $strval->as_hash() returned a ", ( ref( $rv ) ? lc( ref( $rv ) ) . ' reference' : "string ($rv)" ) );
+                        return( $rv );
+                    }
+                }
+                else
+                {
+                    $self->__message( 112, "$prefix $strval has already been procesed, avoid looping, returning it as-is." );
+                    return( $this );
+                }
+            }
+            # If the object can be overloaded, and has no TO_JSON method we get its string representation here.
+            # If it has a TO_JSON and we are asked to return data for json, we let the JSON module call the TO_JSON method
+            # NOTE: Not sure why I did this, because as_hash is about converting into hash, not stringifying everything
+            # elsif( overload::Overloaded( $this ) && 
+            #     overload::Method( $this, '""' ) )
+            # {
+            #     $self->__message( 105, "$prefix $strval can stringify, and can it do $strval->TO_JSON ? ", ( $this->can( 'TO_JSON' ) ? 'yes' : 'no' ), " and is option 'json' enabled ? ", ( $p->{json} ? 'yes' : 'no' ), ". Stringifying it ? ", ( ( $p->{json} && $this->can( 'TO_JSON' ) ) ? 'no' : 'yes' ) );
+            #     if( $p->{json} && $this->can( 'TO_JSON' ) )
+            #     {
+            #         return( $this );
+            #     }
+            #     else
+            #     {
+            #         return( "$this" );
+            #     }
+            # }
+            else
+            {
+                $self->__message( 112, "$prefix $strval cannot do as_hash, returning it (", $self->_str_val( $this // 'undef' ), ") as-is." );
+                return( $this );
+            }
+        }
+        elsif( $type eq 'HASH' )
+        {
+            $self->__message( 112, "$prefix $strval is an hash reference." );
+            my $hash = {};
+            foreach my $k ( keys( %$this ) )
+            {
+                if( ref( $this->{ $k } ) )
+                {
+                    if( ++$seen->{ Scalar::Util::refaddr( $this->{ $k } ) } > 1 )
+                    {
+                        next;
+                    }
+                }
+                my $rv = $crawl->( $this->{ $k }, [@$levels, $k] );
+                $hash->{ $k } = $rv;
+            }
+            return( $hash );
+        }
+        elsif( $type eq 'ARRAY' )
+        {
+            $self->__message( 112, "$prefix $strval is an array reference." );
+            my $array = [];
+            for( my $i = 0; $i < scalar( @$this ); $i++ )
+            {
+                if( ref( $this->[$i] ) )
+                {
+                    if( ++$seen->{ Scalar::Util::refaddr( $this->[$i] ) } > 1 )
+                    {
+                        next;
+                    }
+                }
+                my $rv = $crawl->( $this->[$i], [@$levels, "[$i]"] );
+                push( @$array, $rv );
+            }
+            return( $array );
+        }
+        elsif( !ref( $this ) )
+        {
+            $self->__message( 113, "$prefix $strval is a ", ( defined( $this ) ? 'defined' : 'undefined' ), ' string.' );
+            defined( $this )
+                ? return( $this )
+                : return;
+        }
+        elsif( $type eq 'SCALAR' )
+        {
+            $self->__message( 113, "$prefix $strval is a scalar reference." );
+            my $str = $$this;
+            return( \$str );
+        }
+        elsif( $type eq 'CODE' )
+        {
+            $self->__message( 113, "$prefix $strval is a code reference." );
+            return( $this );
+        }
+        elsif( $type eq 'GLOB' )
+        {
+            $self->__message( 113, "$prefix $strval is a glob reference." );
+            return( $this );
+        }
+        elsif( $type eq 'VSTRING' )
+        {
+            $self->__message( 113, "$prefix $strval is a version string." );
+            return( $this );
+        }
+        else
+        {
+            die( "$prefix: Unknown reference ", $self->_str_val( $this // 'undef' ), " with value $this" );
+        }
+    };
+    
+    $self->__message( 112, "Converting object ", $self->_str_val( $self // 'undef' ), " into an hash reference." );
+    my $ref = {};
+    my @keys = ();
+    if( $self->_is_array( $keys ) && scalar( @$keys ) )
+    {
+        @keys = @$keys;
+    }
+    else
+    {
+        @keys = grep( !/^(debug|verbose)$/, keys( %$me ) );
+        push( @keys, 'debug' ) if( $self->_has_symbol( 'debug' ) );
+        push( @keys, 'verbose' ) if( $self->_has_symbol( 'verbose' ) );
+    }
+    foreach my $k ( @keys )
+    {
+        next if( substr( $k, 0, 1 ) eq '_' );
+        next if( CORE::exists( $added_subs->{ $k } ) );
+        my $rv = $crawl->( $me->{ $k }, [@$levels, $k] );
+        next if( !defined( $rv ) );
+        $ref->{ $k } = $rv;
+    }
+    return( $ref );
+}
+PERL
+        # NOTE: clear()
+        clear => <<'PERL',
+sub clear
+{
+    return( shift->clear_error );
+}
+PERL
+        # NOTE: clear_error()
+        clear_error => <<'PERL',
+sub clear_error
+{
+    my $self  = shift( @_ );
+    my $class = ref( $self ) || $self;
+    my $this  = $self->_obj2h;
+    no strict 'refs';
+    if( HAS_THREADS )
+    {
+        lock( ${ $class . '::ERROR' } );
+        $this->{error} = ${ $class . '::ERROR' } = '';
+    }
+    else
+    {
+        $this->{error} = ${ $class . '::ERROR' } = '';
+    }
+    return( $self );
+}
+PERL
+        # NOTE: clone()
+        clone => <<'PERL',
+sub clone
+{
+    my $self = shift( @_ );
+    require Clone;
+    my $new;
+    # try-catch
+    local $@;
+    eval
+    {
+        if( $self->_is_object( $self ) )
+        {
+            $new = Clone::clone( $self );
+        }
+        else
+        {
+            $new = $self->new;
+        }
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error cloning object \"", $self->_str_val( $self // 'undef' ), "\": $@" ) );
+    }
+    return( $new );
+}
+PERL
+        # NOTE: colour_close()
+        colour_close => <<'PERL',
+sub colour_close { return( shift->_set_get( 'colour_close', @_ ) ); }
+PERL
+        # NOTE: colour_closest()
+        colour_closest => <<'PERL',
+sub colour_closest
+{
+    my $self    = shift( @_ );
+    my $colour  = uc( shift( @_ ) );
+    my $this  = $self->_obj2h;
+    my $colours = 
+    {
+    '000000000' => 'black',
+    '000000255' => 'blue',
+    '000255000' => 'green',
+    '000255255' => 'cyan',
+    '255000000' => 'red',
+    '255000255' => 'magenta',
+    '255255000' => 'yellow',
+    '255255255' => 'white',
+    };
+    my( $red, $green, $blue ) = ( '', '', '' );
+    our $COLOUR_NAME_TO_RGB;
+    if( $colour =~ /^[A-Z]+([A-Z\s]+)*$/ )
+    {
+        if( !scalar( keys( %$COLOUR_NAME_TO_RGB ) ) )
+        {
+            my $colour_data = $self->__colour_data;
+            local $@;
+            $COLOUR_NAME_TO_RGB = eval( $colour_data );
+            if( $@ )
+            {
+                return( $self->error( "An error occurred loading data from __colour_data: $@" ) );
+            }
+        }
+        if( CORE::exists( $COLOUR_NAME_TO_RGB->{ lc( $colour ) } ) )
+        {
+            ( $red, $green, $blue ) = @{$COLOUR_NAME_TO_RGB->{ lc( $colour ) }};
+        }
+    }
+    # Colour all in decimal??
+    elsif( $colour =~ /^\d{9}$/ )
+    {
+        $red   = substr( $colour, 0, 3 );
+        $green = substr( $colour, 3, 3 );
+        $blue  = substr( $colour, 6, 3 );
+    }
+    # Colour in hexadecimal, convert it
+    elsif( $colour =~ /^[A-F0-9]+$/ )
+    {
+        $red   = hex( substr( $colour, 0, 2 ) );
+        $green = hex( substr( $colour, 2, 2 ) );
+        $blue  = hex( substr( $colour, 4, 2 ) );
+    }
+    # Clueless
+    else
+    {
+        # Not undef, but rather empty string. Undef is associated with an error
+        return( '' );
+    }
+    my $dec_colour = CORE::sprintf( '%3d%3d%3d', $red, $green, $blue );
+    my $last = '';
+    my @colours = reverse( sort( keys( %$colours ) ) );
+    $red    = CORE::sprintf( '%03d', $red );
+    $green  = CORE::sprintf( '%03d', $green );
+    $blue   = CORE::sprintf( '%03d', $blue );
+    my $cur = CORE::sprintf( '%03d%03d%03d', $red, $green, $blue );
+    my( $red_ok, $green_ok, $blue_ok ) = ( 0, 0, 0 );
+    for( my $i = 0; $i < scalar( @colours ); $i++ )
+    {
+        my $r = CORE::sprintf( '%03d', substr( $colours[ $i ], 0, 3 ) );
+        my $g = CORE::sprintf( '%03d', substr( $colours[ $i ], 3, 3 ) );
+        my $b = CORE::sprintf( '%03d', substr( $colours[ $i ], 6, 3 ) );
+ 
+        my $r_p = CORE::sprintf( '%03d', substr( $colours[ $i - 1 ], 0, 3 ) );
+        my $g_p = CORE::sprintf( '%03d', substr( $colours[ $i - 1 ], 3, 3 ) );
+        my $b_p = CORE::sprintf( '%03d', substr( $colours[ $i - 1 ], 6, 3 ) );
+ 
+        if( $red == $r ||
+            ( $red < $r && $red > int( $r / 2 ) ) ||
+            ( $red > $r && $red < int( $r_p / 2 ) && $r_p ) ||
+            $red > $r )
+        {
+            $red_ok++;
+        }
+ 
+        if( $red_ok )
+        {
+            if( $green == $g ||
+                ( $green < $g && $green > int( $g / 2 ) ) ||
+                ( $green > $g && $green < int( $g_p / 2 ) && $g_p ) ||
+                $green > $g )
+            {
+                $blue_ok++;
+            }
+        } 
+ 
+        if( $blue_ok )
+        {
+            if( $blue == $b ||
+                ( $blue < $b && $blue > int( $b / 2 ) ) ||
+                ( $blue > $b && $blue < int( $b_p / 2 ) && $b_p ) ||
+                $blue > $b )
+            {
+                $last = $colours[ $i ];
+                last;
+            }
+        }
+    }
+    return( $colours->{ $last } );
+}
+PERL
+        # NOTE: colour_format()
+        colour_format => <<'PERL',
+sub colour_format
+{
+    my $self = shift( @_ );
+    # style, colour or color and text
+    my $opts = shift( @_ );
+    return( $self->error( "Parameter hash provided is not an hash reference." ) ) if( !$self->_is_hash( $opts ) );
+    my $this = $self->_obj2h;
+    # To make it possible to use either text or message property
+    $opts->{text} = CORE::delete( $opts->{message} ) if( CORE::length( $opts->{message} ) && !CORE::length( $opts->{text} ) );
+    return( $self->error( "No text was provided to format." ) ) if( !CORE::length( $opts->{text} ) );
+
+    $opts->{colour} //= CORE::delete( $opts->{color} ) || CORE::delete( $opts->{fg_colour} ) || CORE::delete( $opts->{fg_color} ) || CORE::delete( $opts->{fgcolour} ) || CORE::delete( $opts->{fgcolor} );
+    $opts->{bgcolour} //= CORE::delete( $opts->{bgcolor} ) || CORE::delete( $opts->{bg_colour} ) || CORE::delete( $opts->{bg_color} );
+
+    my $bold      = "\e[1m";
+    my $underline = "\e[4m";
+    my $reverse   = "\e[7m";
+    my $normal    = "\e[m";
+    my $cls       = "\e[H\e[2J";
+    my $styles =
+    {
+        # Bold
+        b       => 1,
+        bold    => 1,
+        strong  => 1,
+        # Italic
+        i       => 3,
+        italic  => 3,
+        # Underline
+        u       => 4,
+        underline => 4,
+        underlined => 4,
+        blink   => 5,
+        # Reverse
+        r       => 7,
+        reverse => 7,
+        reversed => 7,
+        # Concealed
+        c       => 8,
+        conceal => 8,
+        concealed => 8,
+        strike  => 9,
+        striked  => 9,
+        striken  => 9,
+    };
+
+    my $round = sub
+    {
+        my( $num ) = @_;
+        my $res;
+        if( $n >= 0 )
+        {
+            $res = CORE::int( $num + 0.5 );
+        }
+        else
+        {
+            $res = -CORE::int( -$num + 0.5 );
+        }
+        return( $res );
+    };
+
+    my $convert_24_To_8bits = sub
+    {
+        my( $r, $g, $b ) = @_;
+        return( ( POSIX::floor( $r * 7 / 255 ) << 5 ) +
+                ( POSIX::floor( $g * 7 / 255 ) << 2 ) +
+                ( POSIX::floor( $b * 3 / 255 ) ) 
+              );
+    };
+
+    # opacity * original + (1-opacity)*background = resulting pixel
+    # https://stackoverflow.com/a/746934/4814971
+    my $colour_with_alpha = sub
+    {
+        my( $r, $g, $b, $a, $bg ) = @_;
+        ## Assuming a white background (255)
+        my( $bg_r, $bg_g, $bg_b ) = ( 255, 255, 255 );
+        if( ref( $bg ) eq 'HASH' )
+        {
+            ( $bg_r, $bg_g, $bg_b ) = @$bg{qw( red green blue )};
+        }
+        $r = $round->( ( $a * $r ) + ( ( 1 - $a ) * $bg_r ) );
+        $g = $round->( ( $a * $g ) + ( ( 1 - $a ) * $bg_g ) );
+        $b = $round->( ( $a * $b ) + ( ( 1 - $a ) * $bg_b ) );
+        return( [$r, $g, $b] );
+    };
+
+    my $check_colour = sub
+    {
+        my $col = shift( @_ );
+        # $colours or $bg_colours
+        my $map = shift( @_ );
+        my $code;
+        my $light;
+        # Example: 'light red' or 'light_red'
+        if( $col =~ /^(?:(?<light>bright|light)[[:blank:]\_]+)?
+        (?<colour>
+            (?:[a-zA-Z]+)(?:[[:blank:]]+\w+)?
+            |
+            (?<rgb_type>rgb[a]?)\([[:blank:]]*(?<red>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<green>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<blue>\d{1,3})
+            (?:[[:blank:]]*\,[[:blank:]]*(?<opacity>\d(?:\.\d+)?))?[[:blank:]]*
+            \)
+        )$/xi )
+        {
+            my %regexp = %+;
+            ( $light, $col ) = ( $+{light}, $+{colour} );
+            if( CORE::length( $+{rgb_type} ) &&
+                CORE::length( $+{red} ) &&
+                CORE::length( $+{green} ) &&
+                CORE::length( $+{blue} ) )
+            {
+                if( $+{opacity} || $light )
+                {
+                    my $opacity = CORE::length( $+{opacity} )
+                        ? $+{opacity}
+                        : $light
+                            ? 0.5
+                            : 1;
+                    $col = CORE::sprintf( 'rgba(%03d%03d%03d,%.1f)', $+{red}, $+{green}, $+{blue}, $opacity );
+                }
+                else
+                {
+                    $col = CORE::sprintf( 'rgb(%03d%03d%03d)', $+{red}, $+{green}, $+{blue} );
+                }
+            }
+            else
+            {
+            }
+        }
+        elsif( $col =~ /^(?<rgb_type>rgb[a]?)\([[:blank:]]*(?<red>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<green>\d{1,3})[[:blank:]]*\,[[:blank:]]*(?<blue>\d{1,3})[[:blank:]]*(?:\,[[:blank:]]*(?<opacity>\d(?:\.\d+)?))?[[:blank:]]*\)$/i )
+        {
+            if( $+{opacity} )
+            {
+                $col = CORE::sprintf( 'rgba(%03d%03d%03d,%.1f)', $+{red}, $+{green}, $+{blue}, $+{opacity} );
+            }
+            else
+            {
+                $col = CORE::sprintf( '%03d%03d%03d', $+{red}, $+{green}, $+{blue} );
+            }
+        }
+        else
+        {
+        }
+
+        my $col_ref;
+        if( $col =~ /^rgb[a]?\((?<red>\d{3})(?<green>\d{3})(?<blue>\d{3})\)$/i )
+        {
+            $col_ref = {};
+            %$col_ref = %+;
+            return({
+                _24bits => [@$col_ref{qw( red green blue )}],
+                _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
+            });
+        }
+        # Treating opacity to make things lighter; not ideal, but standard scheme
+        elsif( $col =~ /^rgba\((?<red>\d{3})(?<green>\d{3})(?<blue>\d{3})[[:blank:]]*\,[[:blank:]]*(?<opacity>\d(?:\.\d)?)\)$/i )
+        {
+            $col_ref = {};
+            %$col_ref = %+;
+            if( $+{opacity} )
+            {
+                my $opacity = $+{opacity};
+                my $bg;
+                if( $opts->{bgcolour} )
+                {
+                    $bg = $self->colour_to_rgb( $opts->{bgcolour} );
+                }
+                my $new_col = $colour_with_alpha->( @$col_ref{qw( red green blue )}, $opacity, $bg );
+                @$col_ref{qw( red green blue )} = @$new_col;
+            }
+            return({
+                _24bits => [@$col_ref{qw( red green blue )}],
+                _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
+            });
+        }
+        elsif( $self->__message( 109, "Checking if rgb value exists for colour '$col'" ) &&
+               ( $col_ref = $self->colour_to_rgb( $col ) ) )
+        {
+            # $code = $map->{ $col };
+            return({
+                _24bits => [@$col_ref{qw( red green blue )}],
+                _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
+            });
+        }
+        else
+        {
+            return( {} );
+        }
+#         my $is_bg = ( CORE::substr( $code, 0, 1 ) == 4 );
+#         if( CORE::length( $code ) && $light )
+#         {
+#             ## If the colour is a background colour, replace 4 by 10 (e.g.: 42 becomes 103)
+#             ## and if foreground colour, replace 3 by 9
+#             CORE::substr( $code, 0, 1 ) = ( $is_bg ? 10 : 9 );
+#         }
+#         return( $code );
+    };
+    my $data = [];
+    my $data8 = [];
+    my $params = [];
+    # 8 bits parameters compatible
+    my $params8 = [];
+    if( $opts->{colour} || $opts->{color} || $opts->{fgcolour} || $opts->{fgcolor} || $opts->{fg_colour} || $opts->{fg_color} )
+    {
+        $opts->{colour} ||= CORE::delete( $opts->{color} ) || CORE::delete( $opts->{fg_colour} ) || CORE::delete( $opts->{fg_color} ) || CORE::delete( $opts->{fgcolour} ) || CORE::delete( $opts->{fgcolor} );
+        # my $col_ref = $check_colour->( $opts->{colour}, $colours );
+        my $col_ref = $check_colour->( $opts->{colour} );
+        # CORE::push( @$params, $col ) if( CORE::length( $col ) );
+        if( scalar( keys( %$col_ref ) ) )
+        {
+            CORE::push( @$params8, sprintf( '38;5;%d', $col_ref->{_8bits} ) );
+            CORE::push( @$params, sprintf( '38;2;%d;%d;%d', @{$col_ref->{_24bits}} ) );
+        }
+        else
+        {
+        }
+    }
+    if( $opts->{bgcolour} || $opts->{bgcolor} || $opts->{bg_colour} || $opts->{bg_color} )
+    {
+        $opts->{bgcolour} ||= CORE::delete( $opts->{bgcolor} ) || CORE::delete( $opts->{bg_colour} ) || CORE::delete( $opts->{bg_color} );
+        # my $col_ref = $check_colour->( $opts->{bgcolour}, $bg_colours );
+        my $col_ref = $check_colour->( $opts->{bgcolour} );
+        ## CORE::push( @$params, $col ) if( CORE::length( $col ) );
+        if( scalar( keys( %$col_ref ) ) )
+        {
+            CORE::push( @$params8, sprintf( '48;5;%d', $col_ref->{_8bits} ) );
+            CORE::push( @$params, sprintf( '48;2;%d;%d;%d', @{$col_ref->{_24bits}} ) );
+        }
+        else
+        {
+        }
+    }
+    if( $opts->{style} )
+    {
+        my $those_styles = [CORE::split( /\|/, $opts->{style} )];
+        foreach my $s ( @$those_styles )
+        {
+            if( CORE::exists( $styles->{lc($s)} ) )
+            {
+                CORE::push( @$params, $styles->{lc($s)} );
+                # We add the 8 bits compliant version only if any colour was provided, i.e.
+                # This is not just a style definition
+                CORE::push( @$params8, $styles->{lc($s)} ) if( scalar( @$params8 ) );
+            }
+        }
+    }
+    CORE::push( @$data, "\e[" . CORE::join( ';', @$params8 ) . "m" ) if( scalar( @$params8 ) );
+    CORE::push( @$data, "\e[" . CORE::join( ';', @$params ) . "m" ) if( scalar( @$params ) );
+    # If the text contains libe breaks, we must stop the formatting before, or else there would be an ugly formatting on the entire screen following the line break
+    if( scalar( @$params ) && $opts->{text} =~ /\n+/ )
+    {
+        my $text_parts = [CORE::split( /\n/, $opts->{text} )];
+        my $fmt = CORE::join( '', @$data );
+        my $fmt8 = CORE::join( '', @$data8 );
+        for( my $i = 0; $i < scalar( @$text_parts ); $i++ )
+        {
+            # Empty due to \n repeated
+            next if( !CORE::length( $text_parts->[$i] ) );
+            $text_parts->[$i] = $fmt . $text_parts->[$i] . $normal;
+        }
+        $opts->{text} = CORE::join( "\n", @$text_parts );
+        CORE::push( @$data, $opts->{text} );
+    }
+    else
+    {
+        CORE::push( @$data, $opts->{text} );
+        CORE::push( @$data, $normal ) if( scalar( @$params ) );
+    }
+    return( CORE::join( '', @$data ) );
+}
+PERL
+        # NOTE: colour_max_depth()
+        colour_max_depth => <<'PERL',
+sub colour_max_depth { return( shift->_set_get( 'colour_max_depth', @_ ) ); }
+PERL
+        # NOTE: colour_open()
+        colour_open => <<'PERL',
+sub colour_open { return( shift->_set_get( 'colour_open', @_ ) ); }
+PERL
+        # NOTE: colour_parse()
+        colour_parse => <<'PERL',
+# Term definition:
+# - delimiter is one or more characters used to delimit the start and end of a formatting tag
+# - tag: is a container of colour formatting parameters whose perimeter is marked by 'delimiter'. It is also a closing tag, such as </>, or {/} or custom ones specified.
+sub colour_parse
+{
+    my $self = shift( @_ );
+    my $txt  = join( '', @_ );
+    my $this  = $self->_obj2h;
+    my @opens = ( '{', '<' );
+    my @closes = ( '}', '>' );
+    my $cust_open = $self->colour_open;
+    my $cust_close = $self->colour_close;
+    # If we have custom open / close delimiters, we must make sure we have even pairs
+    # Custom or explicit open and close delimiters replace our prospective set of delimiters, i.e. instead of guessing, we are given explicit delimiters to use.
+    if( defined( $cust_open ) &&
+        length( $cust_open ) &&
+        defined( $cust_close ) &&
+        length( $cust_close ) && 
+        !ref( $cust_open ) &&
+        !ref( $cust_close ) )
+    {
+        if( $cust_open eq $cust_close )
+        {
+            warn( "Warning only: you are using the same delimiter ($cust_open) for open and close!" );
+        }
+        else
+        {
+            @opens  = ( $cust_open );
+            @closes = ( $cust_close );
+        }
+    }
+    # This will prevent an opening delimiter such as '{' to be inadvertently caught as a perl string declaration if a dollar sign '$' is prepended, such as '${blue}Hello world{/}'
+    my $open  = join( '|', map( quotemeta( $_ ), @opens ) );
+    my $close = join( '|', map( quotemeta( $_ ), @closes ) );
+    # Create a quick map of open delimiter to its corresponding closing one
+    my $map = {}; @$map{ @opens } = @closes;
+    my $force_tty = $self->force_tty;
+    my $is_tty = defined( $force_tty ) ? $force_tty : $self->_is_tty;
+    $self->__message( 120, "Is tty enabled ? ", ( $is_tty ? 'yes' : 'no' ) );
+    my $max_depth = $self->colour_max_depth // 10;
+    my $normal = "\e[m";
+
+    my $colour_re = qr{
+        (?:
+            (?:bright|light)
+            [[:blank:]]+
+        )?
+        (?:
+            (?:
+                [a-zA-Z]+
+                (?:[[:blank:]]+[\w\-]+)?
+            )
+            |
+            (?:
+                rgb[a]?\(
+                    [[:blank:]]*\d{1,3}[[:blank:]]*\,
+                    [[:blank:]]*\d{1,3}[[:blank:]]*\,
+                    [[:blank:]]*\d{1,3}[[:blank:]]*
+                    (?:\,[[:blank:]]*\d(?:\.\d)?)?
+                    [[:blank:]]*
+                \)
+            )
+            |
+            (?:
+                rgb[a]?\(
+                    (?<red>\d{3})
+                    (?<green>\d{3})
+                    (?<blue>\d{3})
+                    (?:
+                        [[:blank:]]*\,[[:blank:]]*
+                        (?<opacity>
+                            \d(?:\.\d)?
+                        )
+                    )?
+                \)
+            )
+        )
+    }x;
+    my $style_re = qr/(?:bold|faint|italic|underline|blink|reverse|conceal|strike)/;
+
+    # NOTE: colour_format()
+    my $colour_format = sub
+    {
+        # style, colour or color and text
+        my $opts = shift( @_ );
+        # To make it possible to use either text or message property
+        # $opts->{text} = CORE::delete( $opts->{message} ) if( CORE::length( $opts->{message} ) && !CORE::length( $opts->{text} ) );
+
+        $opts->{colour} //= CORE::delete( $opts->{color} ) || CORE::delete( $opts->{fg_colour} ) || CORE::delete( $opts->{fg_color} ) || CORE::delete( $opts->{fgcolour} ) || CORE::delete( $opts->{fgcolor} );
+        $opts->{bgcolour} //= CORE::delete( $opts->{bgcolor} ) || CORE::delete( $opts->{bg_colour} ) || CORE::delete( $opts->{bg_color} );
+
+        my $bold      = "\e[1m";
+        my $underline = "\e[4m";
+        my $reverse   = "\e[7m";
+        my $normal    = "\e[m";
+        my $cls       = "\e[H\e[2J";
+        my $styles =
+        {
+            # Bold
+            b       => 1,
+            bold    => 1,
+            strong  => 1,
+            # Italic
+            i       => 3,
+            italic  => 3,
+            # Underline
+            u       => 4,
+            underline => 4,
+            underlined => 4,
+            blink   => 5,
+            # Reverse
+            r       => 7,
+            reverse => 7,
+            reversed => 7,
+            # Concealed
+            c       => 8,
+            conceal => 8,
+            concealed => 8,
+            strike  => 9,
+            striked  => 9,
+            striken  => 9,
+        };
+
+        my $round = sub
+        {
+            my( $num ) = @_;
+            my $res;
+            if( $n >= 0 )
+            {
+                $res = CORE::int( $num + 0.5 );
+            }
+            else
+            {
+                $res = -CORE::int( -$num + 0.5 );
+            }
+            return( $res );
+        };
+
+        # NOTE: convert_24_To_8bits()
+        my $convert_24_To_8bits = sub
+        {
+            my( $r, $g, $b ) = @_;
+            return( ( POSIX::floor( $r * 7 / 255 ) << 5 ) +
+                    ( POSIX::floor( $g * 7 / 255 ) << 2 ) +
+                    ( POSIX::floor( $b * 3 / 255 ) ) 
+                  );
+        };
+
+        # NOTE: colour_with_alpha()
+        # opacity * original + (1-opacity)*background = resulting pixel
+        # https://stackoverflow.com/a/746934/4814971
+        my $colour_with_alpha = sub
+        {
+            my( $r, $g, $b, $a, $bg ) = @_;
+            ## Assuming a white background (255)
+            my( $bg_r, $bg_g, $bg_b ) = ( 255, 255, 255 );
+            if( ref( $bg ) eq 'HASH' )
+            {
+                ( $bg_r, $bg_g, $bg_b ) = @$bg{qw( red green blue )};
+            }
+            $r = $round->( ( $a * $r ) + ( ( 1 - $a ) * $bg_r ) );
+            $g = $round->( ( $a * $g ) + ( ( 1 - $a ) * $bg_g ) );
+            $b = $round->( ( $a * $b ) + ( ( 1 - $a ) * $bg_b ) );
+            return( [$r, $g, $b] );
+        };
+
+        # NOTE: check_colour()
+        my $check_colour = sub
+        {
+            my $col = shift( @_ );
+            # $colours or $bg_colours
+            my $map = shift( @_ );
+            my $code;
+            my $light;
+            # Example: 'light red' or 'light_red'
+            if( $col =~ m{
+                ^(?:
+                    (?<light>bright|light)
+                    [[:blank:]\_\-]+
+                )?
+                (?<colour>
+                    (?:
+                        (?:[a-zA-Z]+)(?:[[:blank:]]+\w+)?
+                    )
+                    |
+                    (?:
+                        (?<rgb_type>
+                            rgb[a]?
+                        )
+                        \(
+                            [[:blank:]]*(?<red>\d{1,3})[[:blank:]]*\,
+                            [[:blank:]]*(?<green>\d{1,3})[[:blank:]]*\,
+                            [[:blank:]]*(?<blue>\d{1,3})[[:blank:]]*
+                            (?:
+                                \,[[:blank:]]*
+                                (?<opacity>\d(?:\.\d+)?)
+                            )?
+                            [[:blank:]]*
+                        \)
+                    )
+                )$
+            }xi )
+            {
+                my %regexp = %+;
+                ( $light, $col ) = ( $+{light}, $+{colour} );
+                if( CORE::length( $+{rgb_type} ) &&
+                    CORE::length( $+{red} ) &&
+                    CORE::length( $+{green} ) &&
+                    CORE::length( $+{blue} ) )
+                {
+                    if( $+{opacity} || $light )
+                    {
+                        my $opacity = CORE::length( $+{opacity} )
+                            ? $+{opacity}
+                            : $light
+                                ? 0.5
+                                : 1;
+                        $col = CORE::sprintf( 'rgba(%03d%03d%03d,%.1f)', $+{red}, $+{green}, $+{blue}, $opacity );
+                    }
+                    else
+                    {
+                        $col = CORE::sprintf( 'rgb(%03d%03d%03d)', $+{red}, $+{green}, $+{blue} );
+                    }
+                }
+            }
+            elsif( $col =~ m{
+                ^
+                (?<rgb_type>rgb[a]?)
+                \(
+                    [[:blank:]]*(?<red>\d{1,3})[[:blank:]]*\,
+                    [[:blank:]]*(?<green>\d{1,3})[[:blank:]]*\,
+                    [[:blank:]]*(?<blue>\d{1,3})[[:blank:]]*
+                    (?:
+                        \,[[:blank:]]*
+                        (?<opacity>
+                            \d(?:\.\d+)?
+                        )
+                    )?
+                    [[:blank:]]*
+                \)$
+            }xi )
+            {
+                if( $+{opacity} )
+                {
+                    $col = CORE::sprintf( 'rgba(%03d%03d%03d,%.1f)', $+{red}, $+{green}, $+{blue}, $+{opacity} );
+                }
+                else
+                {
+                    $col = CORE::sprintf( '%03d%03d%03d', $+{red}, $+{green}, $+{blue} );
+                }
+            }
+
+            my $col_ref;
+            if( $col =~ /^rgb[a]?\((?<red>\d{3})(?<green>\d{3})(?<blue>\d{3})\)$/i )
+            {
+                $col_ref = {};
+                %$col_ref = %+;
+                return({
+                    _24bits => [@$col_ref{qw( red green blue )}],
+                    _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
+                });
+            }
+            # Treating opacity to make things lighter; not ideal, but standard scheme
+            elsif( $col =~ m{
+                ^rgba
+                \(
+                    (?<red>\d{3})
+                    (?<green>\d{3})
+                    (?<blue>\d{3})
+                    (?:
+                        [[:blank:]]*\,[[:blank:]]*
+                        (?<opacity>
+                            \d(?:\.\d)?
+                        )
+                    )?
+                \)$
+                }xi )
+            {
+                $col_ref = {};
+                %$col_ref = %+;
+                if( $+{opacity} )
+                {
+                    my $opacity = $+{opacity};
+                    my $bg;
+                    if( $opts->{bgcolour} )
+                    {
+                        $bg = $self->colour_to_rgb( $opts->{bgcolour} );
+                    }
+                    my $new_col = $colour_with_alpha->( @$col_ref{qw( red green blue )}, $opacity, $bg );
+                    @$col_ref{qw( red green blue )} = @$new_col;
+                }
+                return({
+                    _24bits => [@$col_ref{qw( red green blue )}],
+                    _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
+                });
+            }
+            elsif( $self->__message( 109, "Checking if rgb value exists for colour '$col'" ) &&
+                   ( $col_ref = $self->colour_to_rgb( $col ) ) )
+            {
+                # $code = $map->{ $col };
+                return({
+                    _24bits => [@$col_ref{qw( red green blue )}],
+                    _8bits => $convert_24_To_8bits->( @$col_ref{qw( red green blue )} )
+                });
+            }
+            else
+            {
+                return({});
+            }
+        };
+
+        my $data    = [];
+        my $data8   = [];
+        my $params  = [];
+        # 8 bits parameters compatible
+        my $params8 = [];
+        if( $opts->{colour} ||
+            $opts->{color} ||
+            $opts->{fgcolour} ||
+            $opts->{fgcolor} ||
+            $opts->{fg_colour} ||
+            $opts->{fg_color} )
+        {
+            $opts->{colour} ||= CORE::delete( $opts->{color} ) || CORE::delete( $opts->{fg_colour} ) || CORE::delete( $opts->{fg_color} ) || CORE::delete( $opts->{fgcolour} ) || CORE::delete( $opts->{fgcolor} );
+            # my $col_ref = $check_colour->( $opts->{colour}, $colours );
+            my $col_ref = $check_colour->( $opts->{colour} );
+            # CORE::push( @$params, $col ) if( CORE::length( $col ) );
+            if( scalar( keys( %$col_ref ) ) )
+            {
+                CORE::push( @$params8, sprintf( '38;5;%d', $col_ref->{_8bits} ) );
+                CORE::push( @$params, sprintf( '38;2;%d;%d;%d', @{$col_ref->{_24bits}} ) );
+            }
+        }
+        if( $opts->{bgcolour} ||
+        $opts->{bgcolor} ||
+        $opts->{bg_colour} ||
+        $opts->{bg_color} )
+        {
+            $opts->{bgcolour} ||= CORE::delete( $opts->{bgcolor} ) || CORE::delete( $opts->{bg_colour} ) || CORE::delete( $opts->{bg_color} );
+            # my $col_ref = $check_colour->( $opts->{bgcolour}, $bg_colours );
+            my $col_ref = $check_colour->( $opts->{bgcolour} );
+            ## CORE::push( @$params, $col ) if( CORE::length( $col ) );
+            if( scalar( keys( %$col_ref ) ) )
+            {
+                CORE::push( @$params8, sprintf( '48;5;%d', $col_ref->{_8bits} ) );
+                CORE::push( @$params, sprintf( '48;2;%d;%d;%d', @{$col_ref->{_24bits}} ) );
+            }
+        }
+        if( $opts->{style} )
+        {
+            my $those_styles = [CORE::split( /\|/, $opts->{style} )];
+            foreach my $s ( @$those_styles )
+            {
+                if( CORE::exists( $styles->{lc($s)} ) )
+                {
+                    CORE::push( @$params, $styles->{lc($s)} );
+                    # We add the 8 bits compliant version only if any colour was provided, i.e.
+                    # This is not just a style definition
+                    CORE::push( @$params8, $styles->{lc($s)} ) if( scalar( @$params8 ) );
+                }
+            }
+        }
+        CORE::push( @$data, "\e[" . CORE::join( ';', @$params8 ) . "m" ) if( scalar( @$params8 ) );
+        CORE::push( @$data, "\e[" . CORE::join( ';', @$params ) . "m" ) if( scalar( @$params ) );
+        return( $data );
+    };
+
+    # NOTE: process_params()
+    my $process_params = sub
+    {
+        my( $params ) = @_;
+        return if( !defined( $params ) || !length( $params // '' ) );
+        my $def = {};
+        # Example: bold green underline on black
+        if( $params =~ m{
+            ^[[:blank:]]*
+            (?:
+                (?<style1>$style_re)
+                [[:blank:]]+
+            )?
+            (?<fg_colour>$colour_re)
+            (?:
+                [[:blank:]]+
+                (?<style2>$style_re)
+            )?
+            (?:
+                [[:blank:]]+on[[:blank:]]+
+                (?<bg_colour>$colour_re)
+            )?
+            [[:blank:]]*$
+            }xi )
+        {
+            my $style = $+{style1} || $+{style2};
+            my $fg = $+{fg_colour};
+            my $bg = $+{bg_colour};
+            $def = 
+            {
+                style     => $style,
+                colour    => $fg,
+                bg_colour => $bg,
+            };
+            $self->__message( 120, "\$process_params->(): Params regular expression matched -> ", sub{ $self->Module::Generic::dump( $def ) } );
+        }
+        else
+        {
+            $self->__message( 120, "\$process_params->(): Params regular expression failed to match. Trying to eval '$params' instead." );
+            # Only allow characters that make sense for hash-like parameters.
+            # This forbids variables, code blocks, Perl ops, backticks, etc.
+            if( $params =~ /[^a-zA-Z0-9_,\=>\s\h[:blank:]'"\|\(\)\.\-]/ )
+            {
+                $self->__message( 120, "\$process_params->(): Illegal characters found inside eval." );
+                return;
+            }
+            # illegal functions that have no business being here, and could pass through the previous check
+            elsif( $params =~ /\b(?:
+                    qx|system|open|exec|fork|require|use|eval|do|
+                    package|sub|BEGIN|UNITCHECK|CHECK|INIT|END|
+                    readpipe|sysopen|unlink|rename|chmod|chown|utime|truncate|mkdir|rmdir|opendir|readdir|closedir|glob
+                )\b/i )
+            {
+                $self->__message( 120, "\$process_params->(): Illegal functions used inside eval." );
+                return;
+            }
+
+            local $SIG{__WARN__} = sub{};
+            local $SIG{__DIE__} = sub{};
+            local $@;
+            my @res = eval( $params );
+            $self->__message( 120, "\$process_params->(): evaluating '$params' produced -> ", sub{ $self->Module::Generic::dump( \@res ) } );
+            $def = { @res } if( scalar( @res ) && !( scalar( @res ) % 2 ) );
+            if( $@ || ref( $def ) ne 'HASH' )
+            {
+                my $err = $@ || "Invalid styling \"${params}\"";
+                $self->__message( 120, "\$process_params->(): Error evaluating '$params' -> $@" );
+                $def = {};
+            }
+        }
+
+        if( scalar( keys( %$def ) ) )
+        {
+            $self->__message( 120, "\$process_params->(): colour definition is: ", sub{ $self->Module::Generic::dump( $def ) } );
+            my $ref = $colour_format->( $def );
+            $self->__message( 120, "\$process_params->(): Returning -> ", sub{ $self->Module::Generic::dump( $ref ) } );
+            return if( !$ref || !scalar( @$ref ) );
+            return( $ref );
+        }
+        $self->__message( 120, "\$process_params->(): Returning nothing." );
+        return;
+    };
+
+    # NOTE: parse()
+    my $parse;
+    $parse = sub
+    {
+        # $chunk is the text from position $pos until the end of the string, as provided by parent
+        my $chunk   = shift( @_ );
+        my $args    = shift( @_ ) || {};
+        my $copy    = $chunk;
+        my $out     = '';
+        my $level   = $args->{level} // 1;
+        my $counter = $args->{counter} // 0;
+        return( $chunk ) if( $level > $max_depth );
+        my( $open_d, $close_d );
+        # If we are given specific open and close delimiter use them, otherwise, use our list of candidates.
+        # This only happens the first time we hist the text to parse and search for those delimiters.
+        # Afterward, as a rule, we always stick to the same delimiters used. The user cannot mix delimiters in the same string.
+        # We create Regexp object on purpose, so we can differentiate from plain string later in our code.
+        # The initial '$open' and '$close' are simple strings, not Regexp object, so we can differentiate them:
+        # Regexp -> confirmed open and close delimiters
+        # Non-Regexp -> prospective open and close delimiters
+        # Once the open and close delimiters are confirmed they never change.
+#         $open_d  = $args->{open}  ? ( ref( $args->{open} )  ? $args->{open}  : qr{(?<open_d>\Q$args->{open}\E)} ) : $open;
+#         $close_d = $args->{close} ? ( ref( $args->{close} ) ? $args->{close} : qr{?<close_d>\Q$args->{close})} )  : $close;
+        $open_d  = $args->{open}  ? $args->{open}  : $open;
+        $close_d = $args->{close} ? $args->{close} : $close;
+        $self->__message( 120, "\$parse->() [LEVEL ${level}]: Using \$open_d '$open_d', and \$close_d '$close_d' with closing counter '$counter'" );
+        $self->__message( 120, "\$parse->() [LEVEL ${level}]: Processing string '", ( $chunk // 'undef' ), "'" );
+        $self->__message( 120, "\$parse->() [LEVEL ${level}]: Have we inherited some formatting ? ", ( $args->{format} ? sub{ ' yes -> ' . $self->Module::Generic::dump( $args->{format} ) } : 'no' ) );
+        # We found our closing mark
+        if( defined( $args->{open} ) &&
+            defined( $args->{close} ) &&
+            $chunk =~ s/^(?<content>.*?)(${open_d}\/${close_d})// )
+        {
+            my $content = $+{content};
+            $self->__message( 120, "\$parse->() [LEVEL ${level}]: Text '", ( $copy // 'undef' ), "' is now '", ( $chunk // 'undef' ), "' and \$content is '", ( $content // 'undef' ), "' after removing a closing tag '$2'" );
+            $self->__message( 120, "\$parse->() [LEVEL ${level}]: Found some text content followed by a close tag '$2'. Checking if captured content contains an open one within data -> '", ( $content // 'undef' ), "'." );
+            # Whether the parameters are in the form of 'bold underline red' or "style => 'bold', colour => 'red'", either way, the parameters must start with an alphabetic character. No space is allowed.
+            # Also, since the opening delimiter may have more than 1 character, we check if the first character is '{' or '['.
+            my $open_re = ( substr( $open_d, 0, 2 ) eq quotemeta('{') || substr( $open_d, 0, 2 ) eq quotemeta('[') )
+                ? "(?<!\\\$)${open_d}"
+                : $open_d;
+            if( $content =~ /${open_re}(?=[a-zA-Z]+)/ )
+            {
+                # Found an opening delimiter before our closing tag, returning the text untouched.
+                $self->__message( 120, "\$parse->() [LEVEL ${level}]: Found an opening delimiter before our closing tag in text content captured (", ( $content // 'undef' ), "), most likely embedded formatting, continuing." );
+                $chunk = $copy;
+            }
+            elsif( !$is_tty )
+            {
+                $out = $content;
+            }
+            else
+            {
+                $self->__message( 120, "\$parse->() [LEVEL ${level}]: No undesired open delimiter found. Do we have formatting ? ", ( $args->{format} ? 'yes' : 'no' ) );
+                if( my $fmt_ref = $args->{format} )
+                {
+                    # We cannot make the assumption that there are any formatting parameters found, and returned by $process_params
+                    # If there is nothing, then there is nothing to format, and we return the text as is.
+                    if( !scalar( @$fmt_ref ) )
+                    {
+                        # We do not format the $content
+                    }
+                    else
+                    {
+                        $self->__message( 120, "\$parse->() [LEVEL ${level}]: Formatting was passed down to us, using it -> ", sub{ $self->Module::Generic::dump( $fmt_ref ) } );
+                        my $fmt = CORE::join( '', @$fmt_ref );
+                        # We differentiate text with and without new lines, because if there are multiple lines, we skip the empty ones.
+                        # However, if there are no multiple line, we surround that (possibly empty) line with the formatting and the normaliser.
+                        if( index( $content, "\n" ) != -1 )
+                        {
+                            my $text_parts = [CORE::split( /\n/, $content )];
+                            for( my $i = 0; $i < scalar( @$text_parts ); $i++ )
+                            {
+                                # Empty due to \n repeated
+                                next if( !CORE::length( $text_parts->[$i] ) );
+                                $text_parts->[$i] = $fmt . $text_parts->[$i] . $normal;
+                            }
+                            $content = CORE::join( "\n", @$text_parts );
+                        }
+                        else
+                        {
+                            $content = $fmt . $content . $normal;
+                        }
+                    }
+                }
+                else
+                {
+                    # Only add a normaliser matching the closing tag we found IF there were valid colouring parameters, otherwise we would be adding normaliser where it is not needed.
+                    $content = $content . ( $counter ? $normal : '' );
+                }
+                # We reduce the closing tag counter since we found one.
+                $counter-- if( $counter > 0 );
+                $self->__message( 120, "\$parse->() [LEVEL ${level}]: \$content is now '", quotemeta( $content // 'undef' ), "'." );
+                $out = $content;
+                # We can only use this once, and if we do not remove it now, it would be used again later in our code...
+                delete( $args->{format} );
+                # Continue, since we got a closing tag
+            }
+        }
+        $copy = $chunk;
+        # Capture the opening delimiter, and everything after, then check that what came after contains a closing delimiter.
+        # We have to do this in two steps, because we cannot use an hash reference in the first part of the regular expression, such as:
+        # s{^(?<before>.*?)(?<open>$open)(?<params>[a-zA-Z]+)(?:<more_params>.*?)(?<close>$map->{ \1 })}
+        # So, we need to do this in two steps
+        $self->__message( 120, "\$parse->() [LEVEL ${level}]: Checking for some text followed by an opening delimiter, and possibly the begining of some parameters from the string '", ( $chunk // 'undef' ), "'" );
+        # Special case for '{' or '['
+        # Since the opening delimiter may have more than 1 character, we check if the first character is '{' or '['.
+        my $open_re = ( substr( $open_d, 0, 2 ) eq quotemeta('{') || substr( $open_d, 0, 2 ) eq quotemeta('[') )
+            ? "(?<!\\\$)${open_d}"
+            : $open_d;
+        $chunk =~ s{^(?<before>.*?)(?<open>$open_re)(?<params>[a-zA-Z]+)(?<remaining>.*?)$}
+        {
+            my $re = { %+ };
+            $self->__message( 120, "\$parse->() [LEVEL ${level}]: Found -> ", sub{ $self->Module::Generic::dump( $re ) } );
+            # Unless the open and close delimiters have already been set and confirmed, i.e. they have been passed as arguments, we set them as Regexp now.
+            unless( $args->{open_d} )
+            {
+                $open_d  = quotemeta( $re->{open} );
+                $close_d = quotemeta( $map->{ $re->{open} } );
+            }
+            my $before    = $re->{before};
+            my $params    = $re->{params};
+            my $remaining = $re->{remaining};
+            # We have been provided with an open and close delimiter, which means we are in a $level > 1, and we have some colour formatting, and we found a closing tag in the leading text chunk, so we need to wrap that leading text in the given colour formatting.
+            if( exists( $args->{open} ) &&
+                exists( $args->{close} ) &&
+                defined( $args->{open} ) &&
+                defined( $args->{close} ) &&
+                $before =~ /${open_d}\/${close_d}/ )
+            {
+                $self->__message( 120, "The leading text has a closing tag, so we append the normaliser \$normal" );
+                my( $before_close, $after_close ) = split( /${open_d}\/${close_d}/, $before, 2 );
+                if( !$is_tty )
+                {
+                    $out .= $before_close . $after_close;
+                }
+                elsif( $args->{format} )
+                {
+                    my $fmt = CORE::join( '', @{$args->{format}} );
+                    my $text_parts = [CORE::split( /\n/, $before_close )];
+                    for( my $i = 0; $i < scalar( @$text_parts ); $i++ )
+                    {
+                        # Empty due to \n repeated
+                        next if( !CORE::length( $text_parts->[$i] ) );
+                        $text_parts->[$i] = $fmt . $text_parts->[$i] . $normal;
+                    }
+                    $before_close = CORE::join( "\n", @$text_parts );
+                    $out .= $before_close . ( $after_close // '' );
+                }
+                else
+                {
+                    $out .= ( $before_close // '' ) . $normal . ( $after_close // '' );
+                }
+                # We reduce the closing tag counter, since we just found one.
+                $counter-- if( $counter > 0 );
+            }
+            else
+            {
+                $out .= $before;
+            }
+
+            $self->__message( 120, "\$parse->() [LEVEL ${level}]: Checking remaining text '", ( $remaining // 'undef' ), "'" );
+            # Closing delimiter for the open tag
+            if( $remaining =~ s/^(?<more_params>.*?)${close_d}// )
+            {
+                my $params2 = $+{more_params};
+                $self->__message( 120, "\$parse->() [LEVEL ${level}]: Found more formatting parameters '", ( $params2 // 'undef' ), "' followed by a closing delimiter." );
+                # We search for another opening delimiter, which would be an error, since we are not closed yet, but could happen.
+                if( $params2 =~ /(?:$open_d)(?=[a-zA-Z]+)/ )
+                {
+                    $self->__message( 120, "\$parse->() [LEVEL ${level}]: The 'remaining' part contains some opening delimiter, so it seems there is a user-error. Returning the backed up string '", ( $copy // 'undef' ), "'" );
+                    $copy;
+                }
+                else
+                {
+                    # Ok, found parameters + close delimiter
+                    $params .= $params2;
+                    $self->__message( 120, "\$parse->() [LEVEL ${level}]: Ok, we found some more parameters in the 'remaining' capture. \$params is now '", ( $params // 'undef' ), "'. Calling \$process_params->()" );
+                    # Get back an array reference of formatting.
+                    my $fmt = $process_params->( $params );
+                    $self->__message( 120, "\$parse->() [LEVEL ${level}]: \$process_params->() returned -> ", sub{ $self->Module::Generic::dump( $fmt ) } );
+                    $self->__message( 120, "\$parse->() [LEVEL ${level}]: Calling ourself recursively to parse the rest of the string caught in 'remaining' -> '", ( $remaining // 'undef' ), "'" );
+                    my $rv = $parse->( $remaining => {
+                        open    => $open_d,
+                        close   => $close_d,
+                        # We pass the colour formatting that will be applied on the text our next round of parsing will extract
+                        format  => $fmt,
+                        level   => ( $level + 1 ),
+                        # We keep track of the number of valid open tags we got, so we can decide to remove any usless one (if its corresponding open tag was improper), or to replace them with a normaliser
+                        counter => ( $fmt ? ( $counter + 1 ) : $counter ),
+                    });
+                    $self->__message( 120, "\$parse->() [LEVEL ${level}]: Our recursive run returned '", quotemeta( $rv // 'undef' ), "'" );
+                    $rv;
+                }
+            }
+            # We could not find a close delimiter; we call the whole thing off
+            else
+            {
+                $self->__message( 120, "\$parse->() [LEVEL ${level}]: Failed to find a closing delimier in the 'remaining' capture. This is a user-error. Stopping here, and returning the text unaltered -> '", ( $copy // 'undef' ), "'" );
+                $copy;
+            }
+            # Or, we search for a closing delimiter
+            # Once we have the closing delimiter, we get the colour formatting the the parmeters in between.
+        }gexs;
+        $out .= $chunk;
+        $self->__message( 120, "\$parse->() [LEVEL ${level}]: Resulting output is so far '", quotemeta( $out // 'undef' ), "'" );
+
+        if( $is_tty && exists( $args->{format} ) && defined( $args->{format} ) )
+        {
+            $self->__message( 120, "\$parse->() [LEVEL ${level}]: Some colour formatting was passed down to us. Applying it now." );
+            $out = CORE::join( '', @{$args->{format}} ) . $out;
+        }
+        # Also ensure that any closing tag leftovers are replaced by the special formatter $normal. $normal closes formatting, so using it is safe.
+        # We do this only if we inherited a previously identified opening and closing delimiter; OR
+        # if we have not inherited any, but identified it earlier
+        if( ( $args->{open} && $args->{close} ) ||
+            ( $open_d && $close_d && $open_d ne $open ) )
+        {
+            $self->__message( 120, "\$parse->() [LEVEL ${level}]: Removing possible closing tags from string '", quotemeta( $out // 'undef' ), "'" );
+            $out =~ s/(?:${open_d}\/${close_d})/$normal/;
+        }
+
+        $self->__message( 120, "\$parse->() [LEVEL ${level}]: Done. Returning the final resulting formatted string '", quotemeta( $out // 'undef' ), "'" );
+        return( $out );
+    };
+    return( $parse->( $txt ) );
+}
+PERL
+        # NOTE: colour_to_rgb()
+        colour_to_rgb => <<'PERL',
+sub colour_to_rgb
+{
+    my $self    = shift( @_ );
+    my $colour  = lc( shift( @_ ) );
+    my $this  = $self->_obj2h;
+    my( $red, $green, $blue ) = ( '', '', '' );
+    our $COLOUR_NAME_TO_RGB;
+    if( $colour =~ /^[A-Za-z]+([\w\-]+)*([[:blank:]]+\w+)?$/ )
+    {
+        if( !scalar( keys( %$COLOUR_NAME_TO_RGB ) ) )
+        {
+            my $colour_data = $self->__colour_data;
+            local $@;
+            $COLOUR_NAME_TO_RGB = eval( $colour_data );
+            if( $@ )
+            {
+                return( $self->error( "An error occurred loading data from __colour_data: $@" ) );
+            }
+        }
+        if( CORE::exists( $COLOUR_NAME_TO_RGB->{ $colour } ) )
+        {
+            ( $red, $green, $blue ) = @{$COLOUR_NAME_TO_RGB->{ $colour }};
+        }
+        else
+        {
+            return( '' );
+        }
+    }
+    ## Colour all in decimal??
+    elsif( $colour =~ /^\d{9}$/ )
+    {
+        $red   = substr( $colour, 0, 3 );
+        $green = substr( $colour, 3, 3 );
+        $blue  = substr( $colour, 6, 3 );
+    }
+    ## Colour in hexadecimal, convert it
+    elsif( $colour =~ /^[A-F0-9]+$/ )
+    {
+        $red   = hex( substr( $colour, 0, 2 ) );
+        $green = hex( substr( $colour, 2, 2 ) );
+        $blue  = hex( substr( $colour, 4, 2 ) );
+    }
+    ## Clueless
+    else
+    {
+        ## Not undef, but rather empty string. Undef is associated with an error
+        return( '' );
+    }
+    return({ red => $red, green => $green, blue => $blue });
+}
+PERL
+        # NOTE: coloured()
+        coloured => <<'PERL',
+sub coloured
+{
+    my $self = shift( @_ );
+    my $pref = shift( @_ );
+    my $text = CORE::join( '', @_ );
+    my $this  = $self->_obj2h;
+    my( $style, $fg, $bg );
+    ## my $colour_re = qr/(?:(?:bright|light)[[:blank:]])?[a-zA-Z]+/;
+    my $colour_re = qr/(?:(?:bright|light)[[:blank:]])?(?:[a-zA-Z]+(?:[[:blank:]]+[\w\-]+)?|rgb[a]?\([[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*\,[[:blank:]]*\d{1,3}[[:blank:]]*(?:\,[[:blank:]]*\d(?:\.\d)?)?[[:blank:]]*\))/;
+    my $style_re = qr/(?:bold|faint|italic|underline|blink|reverse|conceal|strike)/;
+    if( $pref =~ /^(?:(?<style1>$style_re)[[:blank:]]+)?(?<fg_colour>$colour_re)(?:[[:blank:]]+(?<style2>$style_re))?(?:[[:blank:]]+on[[:blank:]]+(?<bg_colour>$colour_re))?$/i )
+    {
+        $style = $+{style1} || $+{style2};
+        $fg = $+{fg_colour};
+        $bg = $+{bg_colour};
+        return( $self->colour_format({ text => $text, style => $style, colour => $fg, bg_colour => $bg }) );
+    }
+    else
+    {
+        return( '' );
+    }
+}
+PERL
+        # NOTE: dump_hex()
+        dump_hex => <<'PERL',
+sub dump_hex
+{
+    my $self = shift( @_ );
+    $self->_load_class( 'Devel::Hexdump' ) ||
+        return( $self->pass_error );
+    # try-catch
+    local $@;
+    my $rv = eval
+    {
+        Devel::Hexdump::xd( shift( @_ ) );
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error dumping with Devel::Hexdump: $@" ) );
+    }
+    return( $rv );
+}
+PERL
+        # NOTE: dump_print()
+        dump_print => <<'PERL',
+# For backward compatibility and traceability
+sub dump_print { return( shift->dumpto_printer( @_ ) ); }
+PERL
+        # NOTE: dumper()
+        dumper => <<'PERL',
+sub dumper
+{
+    my $self = shift( @_ );
+    my $opts = {};
+    $opts = pop( @_ ) if( scalar( @_ ) > 1 && ref( $_[-1] ) eq 'HASH' );
+    $self->_load_class( 'Data::Dumper' ) ||
+        return( $self->pass_error );
+    # try-catch
+    local $@;
+    my $rv = eval
+    {
+        no warnings 'once';
+        # local $Data::Dumper::Sortkeys = 1;
+        local $Data::Dumper::Terse = 1;
+        local $Data::Dumper::Indent = 1;
+        local $Data::Dumper::Useqq = 1;
+        local $Data::Dumper::Maxdepth = $opts->{depth} if( CORE::length( $opts->{depth} ) );
+        local $Data::Dumper::Sortkeys = sub
+        {
+            my $h = shift( @_ );
+            return( [ sort( grep{ ref( $h->{ $_ } ) !~ /^(DateTime\:\:Lite|DateTime\:\:Lite\:\:|DateTime|DateTime\:\:)/ } keys( %$h ) ) ] );
+        };
+        Data::Dumper::Dumper( @_ );
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error dumping with Data::Dumper: $@" ) );
+    }
+    return( $rv );
+}
+PERL
+        # NOTE: dumpto_dumper()
+        dumpto_dumper => <<'PERL',
+sub dumpto_dumper
+{
+    my $self  = shift( @_ );
+    my( $data, $file ) = @_;
+    $self->_load_class( 'Data::Dumper' ) ||
+        return( $self->pass_error );
+    $self->_load_class( 'Module::Generic::File' ) ||
+        return( $self->pass_error );
+    # try-catch
+    local $@;
+    my $rv = eval
+    {
+        no warnings 'once';
+        local $Data::Dumper::Sortkeys = 1;
+        local $Data::Dumper::Terse = 1;
+        local $Data::Dumper::Indent = 1;
+        local $Data::Dumper::Useqq = 1;
+        $file = Module::Generic::File::file( $file );
+        my $fh =  $file->open( '>', { autoflush => 1 }) || 
+            die( "Unable to create file '$file': $!\n" );
+        if( ref( $data ) )
+        {
+            $fh->print( Data::Dumper::Dumper( $data ), "\n" );
+        }
+        else
+        {
+            $fh->binmode( ':utf8' );
+            $fh->print( $data );
+        }
+        $fh->close;
+        # 666 so it can work under command line and web alike
+        chmod( 0666, $file );
+        return(1);
+    };
+    if( $@ )
+    {
+        return( $self->error( "Unable to dump data to \"$file\" using Data::Dumper: $@" ) );
+    }
+    return( $rv );
+}
+PERL
+        # NOTE: dumpto_printer()
+        dumpto_printer => <<'PERL',
+sub dumpto_printer
+{
+    my $self  = shift( @_ );
+    my( $data, $file ) = @_;
+    $self->_load_class( 'Module::Generic::File' ) ||
+        return( $self->pass_error );
+    $self->_load_class( 'Data::Dump' ) ||
+        return( $self->pass_error );
+    $file = Module::Generic::File::file( $file );
+    my $fh =  $file->open( '>', { binmode => 'utf-8', autoflush => 1 }) || 
+        die( "Unable to create file '$file': $!\n" );
+    $fh->print( Data::Dump::dump( $data ), "\n" );
+    $fh->close;
+    # 666 so it can work under command line and web alike
+    chmod( 0666, $file );
+    return(1);
+}
+PERL
+        # NOTE: errno()
+        errno => <<'PERL',
+sub errno
+{
+    my $self = shift( @_ );
+    my $this = $self->_obj2h;
+    if( @_ )
+    {
+        $this->{errno} = shift( @_ ) if( $_[ 0 ] =~ /^\-?\d+$/ );
+        return( $self->error( @_ ) ) if( @_ );
+    }
+    return( $this->{errno} );
+}
+PERL
+        # NOTE: force_tty()
+        force_tty => <<'PERL',
+sub force_tty { return( shift->_set_get( 'force_tty', @_ ) ); }
+PERL
+        # NOTE: message_colour()
+        message_colour => <<'PERL',
+sub message_colour
+{
+    my $self  = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $opts = {};
+    my $args = [@_];
+    if( scalar( @$args ) > 1 && 
+        ref( $args->[-1] ) eq 'HASH' && 
+        (
+            CORE::exists( $args->[-1]->{level} ) || 
+            CORE::exists( $args->[-1]->{type} ) || 
+            CORE::exists( $args->[-1]->{message} ) 
+        ) )
+    {
+        $opts = pop( @$args );
+    }
+    $opts->{colour} = 1;
+    return( $self->__message( @$args, $opts ) );
+}
+PERL
+        # NOTE: messagef_colour()
+        messagef_colour => <<'PERL',
+sub messagef_colour
+{
+    my $self  = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $opts = {};
+    my $args = [@_];
+    no strict 'refs';
+    if( scalar( @$args ) > 1 && 
+        ref( $args->[-1] ) eq 'HASH' && 
+        (
+            CORE::exists( $args->[-1]->{level} ) || 
+            CORE::exists( $args->[-1]->{type} ) || 
+            CORE::exists( $args->[-1]->{message} ) 
+        ) )
+    {
+        $opts = pop( @$args );
+    }
+    $opts->{colour} = 1;
+    return( $self->__messagef( @$args, $opts ) );
+}
+PERL
+        # NOTE: printer()
+        printer => <<'PERL',
+sub printer
+{
+    my $self = shift( @_ );
+    my $opts = {};
+    $opts = pop( @_ ) if( scalar( @_ ) > 1 && ref( $_[-1] ) eq 'HASH' );
+    $self->_load_class( 'Data::Printer' ) ||
+        return( $self->pass_error );
+    # try-catch
+    local $@;
+    my $rv = eval
+    {
+        local $SIG{__WARN__} = sub{ };
+        if( scalar( keys( %$opts ) ) )
+        {
+            return( Data::Printer::np( @_, %$opts ) );
+        }
+        else
+        {
+            return( Data::Printer::np( @_ ) );
+        }
+    };
+    if( $@ )
+    {
+        return( $self->error( "Error dumping data using Data::Printer: $@" ) );
+    }
+    return( $rv );
+}
+PERL
+        # NOTE: save()
+        save => <<'PERL',
+sub save
+{
+    my $self = shift( @_ );
+    my $this = $self->_obj2h;
+    my $opts = {};
+    $opts = pop( @_ ) if( ref( $_[-1] ) eq 'HASH' );
+    my( $file, $data );
+    if( @_ == 2 )
+    {
+        $opts->{data} = shift( @_ );
+        $opts->{file} = shift( @_ );
+    }
+    return( $self->error( "No file was provided to save data to." ) ) if( !$opts->{file} );
+    $self->_load_class( 'Module::Generic::File' ) ||
+        return( $self->pass_error );
+    $file = Module::Generic::File::file( $opts->{file} );
+    my $fh = $file->open( '>', {
+        ( $opts->{encoding} ? ( binmode => $opts->{encoding} ) : () ),
+        autoflush => 1,
+    }) ||
+        return( $self->error( "Unable to open file \"$file\" in write mode: $!" ) );
+    if( !defined( $fh->print( ref( $opts->{data} ) eq 'SCALAR' ? ${$opts->{data}} : $opts->{data} ) ) )
+    {
+        return( $self->error( "Unable to write data to file \"$file\": $!" ) )
+    }
+    $fh->close;
+    my $bytes = -s( $opts->{file} );
+    return( $bytes );
+}
+PERL
+        # NOTE: subclasses()
+        subclasses => <<'PERL',
+sub subclasses
+{
+    my $self  = shift( @_ );
+    my $that  = '';
+    $that     = @_ ? shift( @_ ) : $self;
+    my $base  = ref( $that ) || $that;
+    $base  =~ s,::,/,g;
+    $base .= '.pm';
+
+    $self->_load_class( 'IO::Dir' ) ||
+        return( $self->pass_error );
+    # remove '.pm'
+    my $dir = substr( $INC{ $base }, 0, ( length( $INC{ $base } ) ) - 3 );
+    
+    my @packages = ();
+    my $io = IO::Dir->open( $dir );
+    if( defined( $io ) )
+    {
+        @packages = map{ substr( $_, 0, length( $_ ) - 3 ) } grep{ substr( $_, -3 ) eq '.pm' && -f( "$dir/$_" ) } $io->read();
+        $io->close ||
+        warn( "Unable to close directory \"$dir\": $!\n" );
+    }
+    else
+    {
+        warn( "Unable to open directory \"$dir\": $!\n" );
+    }
+    return( wantarray() ? @packages : \@packages );
 }
 PERL
     };
@@ -12566,10 +12700,10 @@ sub AUTOLOAD : lvalue
     $class = ref( $self ) || $self;
     # Leave this here as we need it a little bit lower
     my( $pkg, $file, $line ) = caller();
-    my $sub = ( caller(1) )[3];
+    my $caller_sub = ( caller(1) )[3];
     no overloading;
     no strict 'refs';
-    if( CORE::defined( $sub ) && $sub eq 'Module::Generic::AUTOLOAD' )
+    if( CORE::defined( $caller_sub ) && $caller_sub eq 'Module::Generic::AUTOLOAD' )
     {
         my $trace = $self->_get_stack_trace;
         my $mesg = "Module::Generic::AUTOLOAD (called at line '$line') is looping for autoloadable method '$AUTOLOAD' and args '" . join( "', '", @_ ) . "'. Trace is: " . $trace->as_string;
@@ -12623,8 +12757,9 @@ sub AUTOLOAD : lvalue
         }
         $@ = $saved;
         my $ref = $class->can( $meth ) || die( "AUTOLOAD inconsistency error for dynamic sub \"$meth\"." );
-        return( &$meth( $self, @_ ) ) if( $self );
-        return( &$AUTOLOAD( @_ ) );
+        # Use goto &$ref to transfer execution to the newly-installed sub.
+        unshift( @_, $self ) if( $self );
+        goto &$ref;
     }
 
     if( $self && $self->can( 'autoload' ) )
@@ -12834,7 +12969,15 @@ sub AUTOLOAD : lvalue
             }
         }
         unshift( @_, $self ) if( $self );
-        goto &$sub;
+#         if( $] >= 5.016 )
+#         {
+#             # goto &$sub;
+#         }
+        # In perl < v5.16, we lose the magic of goto called in AUTOLOAD, i.e. "pretend that the other subroutine had been called in the first place" (perlfunc/goto) 
+#         else
+#         {
+            &$sub( @_ );
+#         }
     }
 };
 
@@ -12851,7 +12994,7 @@ sub DESTROY
 {
     # <https://perldoc.perl.org/perlobj#Destructors>
     CORE::local( $., $@, $!, $^E, $? );
-    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    CORE::return if( Module::Generic::_in_global_destruction() );
     my $self = CORE::shift( @_ );
     CORE::return if( !CORE::defined( $self ) );
     # If the Global repository has already been cleared by the END block, there is
@@ -13172,7 +13315,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v1.3.1
+    v1.5.0
 
 =head1 DESCRIPTION
 
@@ -14594,7 +14737,7 @@ Using the resulting object C<$prod>, we can access this dynamically created clas
         return( $class->parse_bare_address( $args->[0] ) );
     }}, 'Email::Address::XS', @_ );
 
-Provided with an object property name, and a class/package name, this will attempt to load the module if it is not already loaded. It does so using L<Class::Load/load_class>. Once loaded, it will init an object passing it the other arguments received. It returns the object instantiated upon success or undef and sets an L</error>
+Provided with an object property name, and a class/package name, this will attempt to load the module if it is not already loaded. It does so using L</_load_class>. Once loaded, it will init an object passing it the other arguments received. It returns the object instantiated upon success or undef and sets an L</error>
 
 This is a support method used by L</"_instantiate_object">
 
@@ -14898,8 +15041,6 @@ Returns true if the value provided is an integer, or false otherwise. A valid va
 =head2 _is_ip
 
 Returns true if the given IP has a syntax compliant with IPv4 or IPv6 including CIDR notation or not, false otherwise.
-
-For this method to work, you need to have installed L<Regexp::Common::net>
 
 =head2 _is_number
 
@@ -17745,7 +17886,7 @@ B<Warning>: When using mod_perl with threaded MPMs, certain Perl functions and o
 
 L<Module::Generic::Exception>, L<Module::Generic::Array>, L<Module::Generic::Scalar>, L<Module::Generic::Boolean>, L<Module::Generic::Number>, L<Module::Generic::Null>, L<Module::Generic::Dynamic> and L<Module::Generic::Tie>, L<Module::Generic::File>, L<Module::Generic::Finfo>, L<Module::Generic::SharedMem>, L<Module::Generic::Scalar::IO>
 
-L<Number::Format>, L<Class::Load>, L<Scalar::Util>
+L<Scalar::Util>
 
 =head1 AUTHOR
 

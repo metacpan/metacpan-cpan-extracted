@@ -1,9 +1,12 @@
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Test::More;
 use POSIX ":sys_wait_h";
 use IO::Socket::INET;
 use Time::HiRes qw(time);
+use HypersonicTest qw(spawn_server wait_for_port);
 
 # Async integration tests for Hypersonic::UA
 # Note: True async (futures) require additional compilation
@@ -16,12 +19,10 @@ sub res_body   { my $r = shift; ref($r) eq 'HASH' ? $r->{body}   : $r->body }
 
 my $PORT = 32000 + ($$ % 1000);
 my $server_pid;
+my $server_log;
 
 sub start_test_server {
-    $server_pid = fork();
-    die "Fork failed" unless defined $server_pid;
-
-    if ($server_pid == 0) {
+    ($server_pid, $server_log) = spawn_server(sub {
         require Hypersonic;
         my $server = Hypersonic->new(cache_dir => "_test_async_server_$$");
 
@@ -46,20 +47,11 @@ sub start_test_server {
 
         $server->compile();
         $server->run(port => $PORT, workers => 1);
-        exit(0);
-    }
+    });
 
-    for (1..50) {
-        my $sock = IO::Socket::INET->new(
-            PeerAddr => '127.0.0.1',
-            PeerPort => $PORT,
-            Proto    => 'tcp',
-            Timeout  => 0.1,
-        );
-        if ($sock) { close($sock); return 1; }
-        select(undef, undef, undef, 0.1);
-    }
-    die "Server failed to start";
+    wait_for_port($PORT, { pid => $server_pid, log => $server_log, tries => 50 })
+        or die "Server failed to start";
+    return 1;
 }
 
 sub stop_test_server {

@@ -41,9 +41,10 @@ $mc->set('hits', '100', sub {
                     my ($val, $err) = @_;
                     print "After decr(999): hits = $val (clamped to 0)\n";
 
-                    # INCR with auto-create: if key doesn't exist,
-                    # create with initial value.
-                    # expiry=0 means don't auto-create (0xFFFFFFFF by default)
+                    # INCR with auto-create: if key doesn't exist, create
+                    # with the given initial value. Pass expiry=0xFFFFFFFF
+                    # (the default when expiry is omitted) to disable
+                    # auto-create — the call then errors with NOT_FOUND.
                     $mc->delete('new_counter', sub {
                         $mc->incr('new_counter', 1, 1000, 300, sub {
                             my ($val, $err) = @_;

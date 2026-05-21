@@ -1,5 +1,5 @@
 package Crypt::HSM::Decrypt;
-$Crypt::HSM::Decrypt::VERSION = '0.030';
+$Crypt::HSM::Decrypt::VERSION = '0.032';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Crypt::HSM::Decrypt - A PKCS11 ongoing decryption operation.
 
 =head1 VERSION
 
-version 0.030
+version 0.032
 
 =head1 SYNOPSIS
 

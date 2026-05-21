@@ -1,12 +1,12 @@
 use strict;
 use warnings;
-use Test::More;
-use MyNote;
+use MyTest;
 
 BEGIN {
     my $has_sha1 = eval 'require Digest::SHA1';
     unless ($has_sha1) {
-        plan skip_all => 'no Digest::SHA1';
+        print "1..0 # SKIP no Digest::SHA1\n";
+        exit 0;
     }
 }
 

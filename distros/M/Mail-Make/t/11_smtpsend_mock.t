@@ -22,10 +22,10 @@ use Scalar::Util     qw( blessed );
 
 BEGIN
 {
-    use ok( 'Mail::Make' );
+    use_ok( 'Mail::Make' ) or BAIL_OUT( 'Unable to load Mail::Make' );
 };
 
-# ---------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 # Helper: spawn a minimal SMTP server in a forked child.
 #
 # The server:
@@ -44,7 +44,7 @@ BEGIN
 #   $port   - TCP port the child is listening on
 #   $pid    - child PID (caller must waitpid when done)
 #   $log_fh - readable end of a pipe; child writes captured lines there
-# ---------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
 sub _spawn_mock_smtp
 {
     my %opts         = @_;
@@ -56,15 +56,15 @@ sub _spawn_mock_smtp
         Proto     => 'tcp',
         Listen    => 5,
         ReuseAddr => 1,
-    ) or die "Cannot create mock SMTP listener: $!\n";
+    ) or die( "Cannot create mock SMTP listener: $!\n" );
 
     my $port = $listener->sockport;
 
     # Pipe: child writes captured data, parent reads it
-    pipe( my $r_fh, my $w_fh ) or die "Cannot create pipe: $!\n";
+    pipe( my $r_fh, my $w_fh ) or die( "Cannot create pipe: $!\n" );
 
     my $pid = fork();
-    die "fork failed: $!\n" unless( defined( $pid ) );
+    die( "fork failed: $!\n" ) unless( defined( $pid ) );
 
     if( $pid == 0 )
     {
@@ -178,12 +178,9 @@ subtest 'smtpsend: basic plain-text message' => sub
     diag( "SMTP log:\n", join( "\n", @log ) ) if( $DEBUG );
 
     ok( defined( $rv ), 'smtpsend() returns defined value on success' );
-    ok( grep( /^MAIL FROM:.*sender\@example\.com/i, @log ),
-        'MAIL FROM contains envelope sender' );
-    ok( grep( /^RCPT TO:.*recipient\@example\.com/i, @log ),
-        'RCPT TO contains recipient' );
-    ok( grep( /^DATA$/i, @log ),
-        'DATA command issued' );
+    ok( grep( /^MAIL FROM:.*sender\@example\.com/i, @log ), 'MAIL FROM contains envelope sender' );
+    ok( grep( /^RCPT TO:.*recipient\@example\.com/i, @log ), 'RCPT TO contains recipient' );
+    ok( grep( /^DATA$/i, @log ), 'DATA command issued' );
 };
 
 # NOTE: Bcc is in RCPT TO but stripped from the transmitted message
@@ -208,8 +205,7 @@ subtest 'smtpsend: Bcc goes to RCPT TO but not into message headers' => sub
     diag( "Log lines are: ", join( "\n", @log ) ) if( $DEBUG );
 
     ok( defined( $rv ), 'smtpsend() succeeds with Bcc' );
-    ok( grep( /^RCPT TO:.*secret\@example\.com/i, @log ),
-        'Bcc address appears in RCPT TO' );
+    ok( grep( /^RCPT TO:.*secret\@example\.com/i, @log ), 'Bcc address appears in RCPT TO' );
 
     # The Bcc header must not appear inside the DATA block.
     # DATA lines are prefixed "DATA: " by the mock server.
@@ -264,8 +260,7 @@ subtest 'smtpsend: display name in From - addr-spec extracted for MAIL FROM' => 
     diag( "SMTP log:\n", join( "\n", @log ) ) if( $DEBUG );
 
     ok( defined( $rv ), 'smtpsend() succeeds with display name in From' );
-    ok( grep( /^MAIL FROM:.*john\@example\.com/i, @log ),
-        'bare addr-spec used in MAIL FROM, not display name' );
+    ok( grep( /^MAIL FROM:.*john\@example\.com/i, @log ), 'bare addr-spec used in MAIL FROM, not display name' );
 };
 
 # NOTE: Explicit MailFrom override
@@ -290,10 +285,8 @@ subtest 'smtpsend: explicit MailFrom overrides From header' => sub
     diag( "SMTP log:\n", join( "\n", @log ) ) if( $DEBUG );
 
     ok( defined( $rv ), 'smtpsend() succeeds with explicit MailFrom' );
-    ok( grep( /^MAIL FROM:.*bounce\@example\.com/i, @log ),
-        'MailFrom override used in MAIL FROM' );
-    ok( !grep( /^MAIL FROM:.*sender\@example\.com/i, @log ),
-        'From header not used when MailFrom is supplied' );
+    ok( grep( /^MAIL FROM:.*bounce\@example\.com/i, @log ),  'MailFrom override used in MAIL FROM' );
+    ok( !grep( /^MAIL FROM:.*sender\@example\.com/i, @log ), 'From header not used when MailFrom is supplied' );
 };
 
 # NOTE: Pre-built Net::SMTP object passed as Host
@@ -355,11 +348,10 @@ subtest 'smtpsend: return value is arrayref of delivered addresses' => sub
     my @log = _collect_log( $pid, $r_fh );
     diag( "SMTP log:\n", join( "\n", @log ) ) if( $DEBUG );
 
-    ok( defined( $rv ) && ref( $rv ) eq 'ARRAY',
-        'smtpsend() returns an array ref' );
-    is( scalar( @{ $rv } ), 2, 'two addresses returned' );
-    ok( grep( $_ eq 'b@example.com', @{ $rv } ), 'To address in return list' );
-    ok( grep( $_ eq 'c@example.com', @{ $rv } ), 'Cc address in return list' );
+    ok( defined( $rv ) && ref( $rv ) eq 'ARRAY', 'smtpsend() returns an array ref' );
+    is( scalar( @$rv ), 2, 'two addresses returned' );
+    ok( grep( $_ eq 'b@example.com', @$rv ), 'To address in return list' );
+    ok( grep( $_ eq 'c@example.com', @$rv ), 'Cc address in return list' );
 };
 
 # NOTE: Error: no recipients
@@ -402,8 +394,7 @@ subtest 'smtpsend: error when SMTP server unreachable' => sub
     );
 
     ok( !defined( $rv ), 'smtpsend() returns undef when server unreachable' );
-    like( $mail->error, qr/could not connect|SMTP/i,
-        'error message mentions connection failure' );
+    like( $mail->error, qr/could not connect|SMTP/i, 'error message mentions connection failure' );
 };
 
 # NOTE: Password as CODE ref - callback invoked at send time
@@ -439,8 +430,7 @@ subtest 'smtpsend: password CODE ref is called and resolved' => sub
 
     ok( $called, 'password CODE ref was invoked' );
     # Auth will fail against the plain mock - that is expected here
-    ok( !defined( $rv ) || defined( $rv ),
-        'smtpsend() returned without hanging (auth fail or success both acceptable)' );
+    ok( !defined( $rv ) || defined( $rv ), 'smtpsend() returned without hanging (auth fail or success both acceptable)' );
 };
 
 # NOTE: Username without Password - immediate error, no connection attempted
@@ -453,7 +443,8 @@ subtest 'smtpsend: Username without Password returns error' => sub
         ->plain(   "body\n" );
 
     # Silence any warning output.
-    local $SIG{__WARN__} = sub{};
+    no warnings 'Mail::Make';
+    # local $SIG{__WARN__} = sub{};
     # Credential validation happens before any network connection is attempted,
     # so the error is raised regardless of whether the host is reachable.
     my $rv = $mail->smtpsend(
@@ -461,18 +452,17 @@ subtest 'smtpsend: Username without Password returns error' => sub
         Port     => 19998,
         Hello    => 'test.local',
         Username => 'jack@example.com',
-        # No Password - must trigger immediate error
+        # No Password provided must trigger immediate error
     );
 
     diag( "error: " . ( $mail->error // '(none)' ) ) if( $DEBUG );
 
     ok( !defined( $rv ), 'smtpsend() returns undef when Password missing' );
-    like( $mail->error, qr/Password is missing/i,
-        'error mentions missing Password' );
+    like( $mail->error, qr/Password is missing/i, 'error mentions missing Password' );
 };
 
 # NOTE: Timeout option propagated to Net::SMTP
-#       (structural test - verifies no crash, not actual timeout behaviour)
+#       (structural test to verify no crash, not actual timeout behaviour)
 subtest 'smtpsend: Timeout option accepted without error' => sub
 {
     my( $port, $pid, $r_fh ) = _spawn_mock_smtp();

@@ -18,7 +18,7 @@ use MARC::Validator 0.14;
 use MARC::Validator::Filter;
 use Unicode::UTF8 qw(encode_utf8);
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 # Constructor.
 sub new {
@@ -161,6 +161,13 @@ sub _process_validation {
 			print STDERR "\tError: $EVAL_ERROR\n";
 			return 1;
 		}
+
+		# XXX strict mode returns undef in case of warning.
+		$marc_batch->strict_off;
+
+		# Don't print warnings on stdout.
+		$marc_batch->warnings_off;
+
 		my $num = 0;
 		my $previous_record;
 		while (1) {
@@ -264,3 +271,90 @@ sub _use_plugins {
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+App::MARC::Validator - Base class for marc-validator script.
+
+=head1 SYNOPSIS
+
+ use App::MARC::Validator;
+
+ my $app = App::MARC::Validator->new;
+ my $exit_code = $app->run;
+
+=head1 METHODS
+
+=head2 C<new>
+
+ my $app = App::MARC::Validator->new;
+
+Constructor.
+
+Returns instance of object.
+
+=head2 C<run>
+
+ my $exit_code = $app->run;
+
+Run MARC validation command line application.
+
+Returns 1 for error, 0 for success.
+
+=head1 ERRORS
+
+ new():
+         From Class::Utils::set_params():
+                 Unknown parameter '%s'.
+
+=head1 DEPENDENCIES
+
+L<App::MARC::Validator::Utils>,
+L<Class::Utils>,
+L<Data::MARC::Validator::Report>,
+L<DateTime>,
+L<English>,
+L<Getopt::Std>,
+L<IO::Barf>,
+L<IO::Uncompress::AnyUncompress>,
+L<List::Util>,
+L<MARC::Batch>,
+L<MARC::File::XML>,
+L<MARC::Validator>,
+L<MARC::Validator::Filter>,
+L<Unicode::UTF8>.
+
+=head1 REPOSITORY
+
+L<https://github.com/michal-josef-spacek/App-MARC-Validator>
+
+=head1 AUTHOR
+
+Michal Josef Špaček L<mailto:skim@cpan.org>
+
+L<http://skim.cz>
+
+=head1 LICENSE AND COPYRIGHT
+
+© 2025-2026 Michal Josef Špaček
+
+BSD 2-Clause License
+
+=head1 ACKNOWLEDGEMENTS
+
+Development of this software has been made possible by institutional support
+for the long-term strategic development of the National Library of the Czech
+Republic as a research organization provided by the Ministry of Culture of
+the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
+
+=head1 VERSION
+
+0.09
+
+=cut

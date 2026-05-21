@@ -1,0 +1,15 @@
+^src-villasfwi/
+\.git/
+\.gitignore
+\.github/
+\.DS_Store
+\bMakefile$
+\bMakefile\.old$
+^pm_to_blib$
+^blib/
+^MYMETA\.
+^PDF-FacturX-[\d._]+/
+^PDF-FacturX-[\d._]+\.tar\.gz$
+\.bak$
+\.swp$
+~$

@@ -10,7 +10,7 @@ use Graphics::Toolkit::Color::Space::Basis;
 use Graphics::Toolkit::Color::Space::Shape;
 use Graphics::Toolkit::Color::Space::Format;
 use Graphics::Toolkit::Color::Space::Util qw/:all/;
-our @EXPORT_OK = qw/round_int round_decimals mod_real min max uniq mult_matrix_vector_3 is_nr/;
+our @EXPORT_OK = qw/min max uniq round_int round_decimals mod_real gamma_correct mult_matrix_vector_3 is_nr/;
 our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
 ########################################################################
@@ -36,11 +36,11 @@ sub new {
         }
     }
     if (ref $args{'convert'} eq 'HASH'){
-        for my $converter_target (keys %{$args{'convert'}}){
-            my $converter = $args{'convert'}{ $converter_target };
-            next unless ref $converter eq 'ARRAY' and @$converter > 1
-                    and ref $converter->[0] eq 'CODE' and ref $converter->[1] eq 'CODE';
-            $self->add_converter( $converter_target, @$converter );
+        for my $converter_target_space_name (keys %{$args{'convert'}}){
+            my $converter_data = $args{'convert'}{ $converter_target_space_name };
+            next unless ref $converter_data eq 'ARRAY' and @$converter_data > 1
+                    and ref $converter_data->[0] eq 'CODE' and ref $converter_data->[1] eq 'CODE';
+            $self->add_converter( $converter_target_space_name, @$converter_data );
         }
     }
     if (ref $args{'values'} eq 'HASH') {
@@ -54,16 +54,16 @@ sub new {
 
 ########################################################################
 sub basis              { $_[0]{'basis'} }
-sub name               { shift->basis->space_name }           #            --> ~
-sub alias              { shift->basis->alias_name }           #            --> ~
-sub is_name            { shift->basis->is_name(@_) }          #      ~name --> ?
-sub axis_count         { shift->basis->axis_count }           #            --> +
-sub is_axis_name       { shift->basis->is_axis_name(@_) }     # ~axis_name --> ?
-sub is_value_tuple     { shift->basis->is_value_tuple(@_) }   # @+values   --> ?
-sub is_number_tuple    { shift->basis->is_number_tuple(@_) }  # @+values   --> ?
-sub is_partial_hash    { shift->basis->is_partial_hash(@_) }  # %+values   --> ?
-sub pos_from_axis_name { shift->basis->pos_from_axis_name(@_) } # ~name    --> +|
-sub tuple_from_partial_hash { shift->basis->tuple_from_partial_hash(@_) }  # %+values --> ?
+sub name               { shift->basis->space_name(@_) }       #       -- ?alias ?given     --> ~
+sub is_name            { shift->basis->is_name(@_) }          # ~name                      --> ?
+sub normalize_name     { shift->basis->normalize_name(@_) }   # ~name                      --> ~
+sub axis_count         { shift->basis->axis_count }           #                            --> +
+sub is_axis_name       { shift->basis->is_axis_name(@_) }     # ~axis_name                 --> ?
+sub pos_from_axis_name { shift->basis->pos_from_axis_name(@_) }# ~axis_name                --> +|
+sub is_value_tuple     { shift->basis->is_value_tuple(@_) }   # @+tuple                    --> ?
+sub is_number_tuple    { shift->basis->is_number_tuple(@_) }  # @+tuple                    --> ?
+sub is_partial_hash    { shift->basis->is_partial_hash(@_) }  # %+partial_hash             --> ?
+sub tuple_from_partial_hash { shift->basis->tuple_from_partial_hash(@_) } # %+partial_hash --> @+tuple
 
 ########################################################################
 sub shape              { $_[0]{'shape'} }
@@ -87,18 +87,14 @@ sub format             { shift->form->format(@_) }            # @+values, ~forma
 sub deformat           { shift->form->deformat(@_) }          # $*color                -- @~suffix --> @+values, ~format_name
 
 #### conversion ########################################################
-sub converter_names      { keys %{  $_[0]{'convert'} } }
-sub alias_converter_name {
-    my ($self, $space_name, $name_alias) = @_;
-    $self->{'convert'}{ uc $name_alias } = $self->{'convert'}{ uc $space_name };
-}
-sub can_convert          { (defined $_[1] and exists $_[0]{'convert'}{ uc $_[1] }) ? 1 : 0 }
+sub conversion_tree_parent { (keys %{  $_[0]{'convert'} })[0] }
+sub can_convert          { (defined $_[1] and exists $_[0]{'convert'}{ $_[0]->normalize_name($_[1]) }) ? 1 : 0 }
 sub add_converter {
     my ($self, $space_name, $to_code, $from_code, $normal) = @_;
     return 0 if not defined $space_name or ref $space_name or ref $from_code ne 'CODE' or ref $to_code ne 'CODE';
     return 0 if $self->can_convert( $space_name );
     return 0 if defined $normal and ref $normal ne 'HASH';
-    $normal = { from => 1, to => 1, } unless ref $normal; # default is full normalisation
+    $normal = { from => 1, to => 1, } unless ref $normal; # flags: default is full normalisation
     $normal->{'from'} = {} if not exists $normal->{'from'} or (exists $normal->{'from'} and not $normal->{'from'});
     $normal->{'from'} = {in => 1, out => 1} if not ref $normal->{'from'};
     $normal->{'from'}{'in'} = 0 unless exists $normal->{'from'}{'in'};
@@ -107,27 +103,28 @@ sub add_converter {
     $normal->{'to'} = {in => 1, out => 1} if not ref $normal->{'to'};
     $normal->{'to'}{'in'} = 0 unless exists $normal->{'to'}{'in'};
     $normal->{'to'}{'out'} = 0 unless exists $normal->{'to'}{'out'};
-    $self->{'convert'}{ uc $space_name } = { from => $from_code, to => $to_code, normal => $normal };
+    $self->{'convert'}{ $self->normalize_name( $space_name )  } = { from => $from_code, to => $to_code, normal => $normal };
 }
 
 sub convert_to { # convert value tuple from this space into another
-    my ($self, $space_name, $values) = @_;
-    return unless $self->is_value_tuple( $values ) and defined $space_name and $self->can_convert( $space_name );
-    return $self->{'convert'}{ uc $space_name }{'to'}->( $values );
+    my ($self, $space_name, $tuple) = @_;
+    $space_name = $self->normalize_name( $space_name );
+    return unless $self->is_value_tuple( $tuple ) and defined $space_name and $self->can_convert( $space_name );
+    return $self->{'convert'}{ $space_name }{'to'}->( $tuple );
 }
 sub convert_from { # convert value tuple from another space into this
-    my ($self, $space_name, $values) = @_;
-    return unless ref $values eq 'ARRAY' and defined $space_name and $self->can_convert( $space_name );
-    return $self->{'convert'}{ uc $space_name }{'from'}->( $values );
+    my ($self, $space_name, $tuple) = @_;
+    $space_name = $self->normalize_name( $space_name );
+    return unless ref $tuple eq 'ARRAY' and defined $space_name and $self->can_convert( $space_name );
+    return $self->{'convert'}{ $space_name }{'from'}->( $tuple );
 }
-
 sub converter_normal_states {
     my ($self, $direction, $space_name) = @_;
+    $space_name = $self->normalize_name( $space_name );
     return unless $self->can_convert( $space_name )
               and defined $direction and ($direction eq 'from' or $direction eq 'to');
-    return @{$self->{'convert'}{ uc $space_name }{'normal'}{$direction}}{'in', 'out'};
+    return @{$self->{'convert'}{ $space_name }{'normal'}{$direction}}{'in', 'out'};
 }
-
 
 1;
 

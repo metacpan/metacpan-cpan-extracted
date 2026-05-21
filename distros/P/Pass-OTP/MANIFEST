@@ -1,4 +1,3 @@
-.perltidyrc
 bin/oathtool
 bin/otptool
 Changes
@@ -6,10 +5,12 @@ lib/Pass/OTP.pm
 lib/Pass/OTP/URI.pm
 Makefile.PL
 MANIFEST			This list of files
-META.json
-META.yml
+MANIFEST.SKIP
 README
 README.pod
-t/oathtool.t
-t/simple.t
-t/totp-test-vectors.t
+t/01-oathtool.t
+t/02-simple.t
+t/03-totp-test-vectors.t
+t/04-read-from-stdin.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

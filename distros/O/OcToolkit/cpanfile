@@ -8,6 +8,7 @@ requires 'File::Path', '2.18';
 requires 'MIME::Base64', '3.16';
 requires 'YAML', '1.31';
 requires 'YAML::Safe', '0.82';
+requires 'Tie::IxHash', '1.23';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';

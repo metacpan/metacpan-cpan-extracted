@@ -13,10 +13,10 @@
 package Module::Generic::SharedMemXS;
 BEGIN
 {
-    use v5.26.1;
+    use v5.16.0;
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'Module::Generic' );
     use parent qw( Module::Generic );
     use vars qw(
         $SUPPORTED_RE $SYSV_SUPPORTED $SEMOP_ARGS $N $HAS_B64
@@ -115,7 +115,6 @@ EOT
     our $VERSION = 'v0.3.4';
 };
 
-use v5.26.1;
 use strict;
 use warnings;
 # no warnings 'redefine';
@@ -782,7 +781,7 @@ sub remove_semaphore
 
     if( !defined( $rv ) )
     {
-        warn( "Warning only: could not remove the semaphore id \"$semid\" with IPC::SysV::IPC_RMID value '", &IPC::SysV::IPC_RMID, "': $!" ) if( $self->_warnings_is_enabled );
+        warn( "Warning only: could not remove the semaphore id \"$semid\" with IPC::SysV::IPC_RMID value '", &IPC::SysV::IPC_RMID, "': $!" ) if( $self->_warnings_is_enabled( 'Module::Generic' ) );
     }
     $self->{_sem} = undef;
     return( $rv ? 1 : 0 );
@@ -1299,7 +1298,7 @@ sub DESTROY
 {
     # <https://perldoc.perl.org/perlobj#Destructors>
     CORE::local( $., $@, $!, $^E, $? );
-    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    CORE::return if( Module::Generic::_in_global_destruction() );
     my $self = CORE::shift( @_ );
     CORE::return if( !CORE::defined( $self ) );
     CORE::return unless( $self->{_ipc_shared} );

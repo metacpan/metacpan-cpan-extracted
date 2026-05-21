@@ -1,0 +1,80 @@
+Tue Apr 28 16:01:06 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.1.0]: CPAN::Maker::Bootstrap refactor
+	* .gitignore
+	- *.crit, *.tdy, *-review-2*.pod/cod/annotate, extra-files
+	* Makefile: updated from CPAN::Maker::Bootstrapper
+	* README.md: generated
+	* buildspec.yml
+	- exe_files, extra-files
+	* test-requires: -Test::More (core)
+
+	[1.1.0]: new
+	* .includes/git.mk: new
+	* .includes/help.mk: new
+	* .includes/perl.mk: new
+	* .includes/update.mk: new
+	* .includes/upgrade.mk: new
+	* cpanfile: new
+
+	[1.1.0]: renamed
+	* .includes/release-notes.mk: renamed
+	* .includes/version.mk: renamed
+
+Mon Apr 13 09:28:48 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.0]:
+	* release-notes-1.0.0.md: new
+	* .gitignore: +test-dpu.pl, *.tmpl, lib/**/*.pm
+        * VERSION: new
+        * release-notes.mk: new
+        * requires
+	- -HTTP::Request, LWP::UserAgent
+	- +HTTP::Tiny, Net::SSLeay, IO::Socket::SSL, List::Util
+        * t/00-darkpan-utils.t: new
+        * version.mk: new
+        * Makefile
+	- replaced with generic Makefile from CPAN::Maker::Bootstrapper
+        * README.md: generated
+        * lib/DarkPAN/Utils.pm
+	- add POD
+	- replace LWP with HTTP::Tiny
+	(new)
+	- make base_url optional if package provided
+	(parse_distribution_path): fix regexp
+	(extract_module): likewise
+	(fetch_darkpan_index)
+	- use HTTP::Tiny
+	(fetch_package): likewise
+	(_create_module_index): remove old archives from index
+        * lib/DarkPAN/Utils/Docs.pm
+	- add POD
+	- Pod::Markdown (not used?)
+	- use Readonly
+	(new): actually save text!
+	(parse_pod): use getter
+
+Tue Oct 21 08:00:04 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.02]:
+	* lib/DarkPAN/Utils.pm: version bump
+	* lib/DarkPAN/Utils/Docs.pm
+	- + url_prefix
+
+Sat May 17 09:53:19 2025  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.01]: BigBang!
+	* ChangeLog: new
+	* Makefile: new
+	* README.md: new
+	* bin/darkpan-doc.pl: new
+	* buildspec.yml: new
+	* lib/DarkPAN/Utils.pm: new
+	* lib/DarkPAN/Utils/Docs.pm: new
+	* requires: new
+	* t/00-darkpan.t: new
+	* test-requires: new
+	* .gitignore: new
+
+
+

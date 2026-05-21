@@ -1,9 +1,5 @@
 package Graphics::Framebuffer;
 
-## TEMP COPYRIGHT ##
-#  Copyright 2017 - 2026 Richard Kelsch
-## TEMPCOPYRIGHT ##
-
 # Only POD is utf-8.  The module code CANNOT be UTF-8
 
 =encoding utf8
@@ -196,7 +192,7 @@ Indicates if C code or hardware acceleration is being used.
 
 This is a boolean variable that is normally FALSE unless running inside of VirtualBox, else it is TRUE.
 
-Later versions of VirtualBox (from 7.6.6 and above) do not properly flush the framebuffer to the physical framebuffer properly.  This causes jittery output and perceived unfinished output.  Using "_flush_screen" seems to force the update.  This variable allows you to code accordingly.
+Later versions of VirtualBox (from 7.2.6 and above) do not properly flush the framebuffer to the physical framebuffer properly.  This causes jittery output and perceived unfinished output.  Using "_flush_screen" seems to force the update.  This variable allows you to code accordingly.
 
 * B<LAST_FLUSHED>
 
@@ -214,6 +210,7 @@ Many of the parameters you pass to the "new" method are also special variables.
 
 =cut
 
+use 5.20.0;
 use strict;
 no strict 'vars';    # We have to map a variable as the screen.  So strict is going to whine about what we do with it.
 
@@ -403,18 +400,16 @@ use constant {
     pi => (4 * atan2(1, 1)),               # This gets rid of Math::Trig
 };
 
-## THREADS ##
 use threads ('yield', 'stringify', 'stack_size' => 131076, 'exit' => 'threads_only');
 use threads::shared;
-##THREADS##
 
-use POSIX       qw(modf);
-use IO::Handle;
-use Time::HiRes qw(sleep time);                                     # The time accuracy has to be milliseconds on many routines
+use Config;
+use POSIX          qw(modf);
+use Time::HiRes    qw(sleep time);                                  # The time accuracy has to be milliseconds on many routines
 use Math::Bezier;                                                   # Bezier curve calculations done here.
 use Math::Gradient qw( gradient array_gradient multi_gradient );    # Awesome gradient calculation module
 use List::Util     qw(min max);                                     # min and max are very handy!
-use File::Map      qw/:map :extra/;                                 # Absolutely necessary to map the screen to a string.
+use File::Map      qw(:map :extra);                                 # Absolutely necessary to map the screen to a string.
 use Term::ReadKey;
 use Imager;                                                         # This is used for TrueType font printing, image loading.
 use Imager::Matrix2d;
@@ -514,6 +509,7 @@ sub DESTROY {    # Always clean up after yourself before exiting
     _reset()                  if ($self->{'RESET'});       # Exit by calling 'reset' first
 } ## end sub DESTROY
 #
+require "$Config{archlib}/sys/ioctl.ph";
 
 # use Inline 'info', 'noclean', 'noisy'; # Only needed for debugging
 
@@ -625,7 +621,7 @@ Sets the default (global) background color for when 'attribute_reset' is called.
    'red'   => 0,
    'green' => 0,
    'blue'  => 0,
-   'alpha' => 0
+   'alpha' => 255
  }
 
 * Do not use this to change background colors, as "set_b_color" is intended for that.  Use this to set the DEFAULT background color for when "attribute_reset" is called.
@@ -788,7 +784,7 @@ sub new {
             'red'   => 0,
             'green' => 0,
             'blue'  => 0,
-            'alpha' => 0
+            'alpha' => 255
         },
 
         'FONT_PATH' => '/usr/share/fonts/truetype/freefont',       # Default fonts path
@@ -1066,7 +1062,7 @@ sub new {
     if ((!$has_X) && defined($self->{'FB_DEVICE'}) && (-e $self->{'FB_DEVICE'}) && open($self->{'FB'}, '+<', $self->{'FB_DEVICE'})) {    # Can we open the framebuffer device??
         binmode($self->{'FB'});                                                                                                          # We have to be in binary mode first
         select($self->{'FB'});
-		$self->{'FB'}->autoflush(TRUE);
+		$self->{'FB'}->autoflush;
         $| = 1;
         if ($self->{'ACCELERATED'}) {                                                                                                    # Pull in the C structure for the Framebuffer
             (                                                                                                                            # These need to be accurate to give accurate output
@@ -1271,7 +1267,7 @@ sub new {
         # Now that everything is set up, let's map the framebuffer to SCREEN
 
         eval {                    # We use the more stable File::Map now
-            $self->{'SCREEN_ADDRESS'} = map_handle($self->{'SCREEN'}, $self->{'FB'}, '+<', 0, $self->{'fscreeninfo'}->{'smem_len'},);
+            $self->{'SCREEN_ADDRESS'} = map_handle $self->{'SCREEN'}, $self->{'FB'}, '+<', 0, $self->{'fscreeninfo'}->{'smem_len'};
         };
 ###
         if ($@) {
@@ -1426,7 +1422,7 @@ sub _reset {
 sub _fix_mapping {    # File::Map SHOULD make this obsolete
                       # Fixes the mapping if Perl garbage collects (naughty Perl)
     my $self = shift;
-    unmap($self->{'SCREEN'});    # Unmap missing on some File::Maps
+    unmap $self->{'SCREEN'};    # Unmap missing on some File::Maps
     unless (defined($self->{'FB'})) {
         eval { close($self->{'FB'}); };
         open($self->{'FB'}, '+<', $self->{'FB_DEVICE'});
@@ -1437,7 +1433,7 @@ sub _fix_mapping {    # File::Map SHOULD make this obsolete
     $self->{'MAP_ATTEMPTS'}++;
 
     # We don't eval, because it worked originally
-    $self->{'SCREEN_ADDRESS'} = map_handle($self->{'SCREEN'}, $self->{'FB'}, '+<', 0, $self->{'fscreeninfo'}->{'smem_len'});
+    $self->{'SCREEN_ADDRESS'} = map_handle $self->{'SCREEN'}, $self->{'FB'}, '+<', 0, $self->{'fscreeninfo'}->{'smem_len'};
 } ## end sub _fix_mapping
 
 sub _color_order {
@@ -1466,9 +1462,9 @@ sub _color_order {
 sub _screen_close {
     my $self = shift;
     unless (defined($self->{'ERROR'})) {    # Only do it if not in emulation mode
-        unmap($self->{'SCREEN'}) if (defined($self->{'SCREEN'}));    # unmap had issues with File::Map.
-        close($self->{'FB'})     if (defined($self->{'FB'}));
-        delete($self->{'FB'});                                       # We leave no remnants
+        unmap $self->{'SCREEN'} if (defined($self->{'SCREEN'}));    # unmap had issues with File::Map.
+        close($self->{'FB'})    if (defined($self->{'FB'}));
+        delete($self->{'FB'});                                      # We leave no remnants
     }
     delete($self->{'SCREEN'});
 } ## end sub _screen_close
@@ -1641,8 +1637,7 @@ Sets or returns the drawing mode, depending on how it is called.
                                    # When you draw it...
 
  $fb->draw_mode(NORMAL_MODE);      # Replaces the screen pixel with the new
-                                   # pixel. Imager assisted drawing
-                                   # (acceleration) only works in this mode.
+                                   # pixel.
 
  $fb->draw_mode(XOR_MODE);         # Does a bitwise XOR with the new pixel and
                                    # screen pixel.
@@ -2686,10 +2681,11 @@ sub _flush_screen {
 	if ($self->{'DEVICE'} eq 'EMULATED') {
 		select(STDERR);
 		$| = 1;
-	} else {
-		select($self->{'FB'}) if (defined($self->{'FB'}));
+	} elsif (defined($self->{'FB'})) {
+		select($self->{'FB'});
 		$| = 1;
 		$self->{'FB'}->flush();
+		eval {sync $self->{'SCREEN'}, TRUE;};
 		$self->vsync();
 	}
 	$self->{'LAST_FLUSHED'} = time;
@@ -6625,9 +6621,10 @@ sub load_image {
                     $y = 0;
                 }
             } ## end else [ if (exists($params->{'center'...}))]
-            $bench_convert  = sprintf('%.03f', time - $bench_convert);
-            $bench_total    = sprintf('%.03f', time - $bench_start);
-            $bench_subtotal = sprintf('%.03f', time - $bench_subtotal);
+			my $now = time;
+            $bench_convert  = sprintf('%.03f', $now - $bench_convert);
+            $bench_total    = sprintf('%.03f', $now - $bench_start);
+            $bench_subtotal = sprintf('%.03f', $now - $bench_subtotal);
             my $temp_image = {
                 'x'         => $x,
                 'y'         => $y,
@@ -7309,7 +7306,8 @@ Waits for the vertical blank before returning
 
 sub vsync {
     my $self = shift;
-    _set_ioctl(FBIO_WAITFORVSYNC, 'I', $self->{'FB'}, 0);
+    my $response =_set_ioctl(FBIO_WAITFORVSYNC, 'I', $self->{'FB'}, 0);
+	warn __LINE__ . " > $response" if ($self->{'SHOW_ERRORS'} && $response < 0);
 }
 
 =head2 which_console
@@ -7504,7 +7502,7 @@ sub _set_ioctl {
     my @array   = @_;
 
     my $data = pack($format, @array);
-    eval { return (ioctl($fb, $command, $data)); };
+    return (ioctl($fb, $command, $data) || -1);
 } ## end sub _set_ioctl
 
 sub _slurp {    # Just used for /proc
@@ -7707,7 +7705,7 @@ I am not one of those arrogant ogres that spout "RTFM" every time someone asks f
 
 =head1 COPYRIGHT
 
-Copyright © 2003-## YEAR ## Richard Kelsch, All Rights Reserved.
+Copyright © 2003 - 2026 Richard Kelsch
 
 This program is free software; you can redistribute it and/or modify it under the GNU software license.
 

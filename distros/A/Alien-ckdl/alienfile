@@ -1,0 +1,122 @@
+use alienfile;
+
+# Alien::ckdl always installs from source ("share").
+# Pinned to a specific upstream commit of https://github.com/tjol/ckdl
+# so builds are reproducible. Bump $CKDL_COMMIT to roll forward.
+# Built statically; ckdl's CMake build is intentionally bypassed so we
+# do not pull in Python/Cython, the C++ bindings, or the upstream test
+# suite.
+probe sub { 'share' };
+
+# Pinned upstream commit (tjol/ckdl). Update both the SHA and the short
+# version tag together when bumping.
+my $CKDL_COMMIT  = 'c9c33fe64446287215e80705545139d92a48f829';
+my $CKDL_VERSION = '0.0.0-' . substr($CKDL_COMMIT, 0, 12);
+
+share {
+    my $tarball = "https://github.com/tjol/ckdl/archive/$CKDL_COMMIT.tar.gz";
+
+    start_url $tarball;
+
+    plugin 'Fetch::HTTPTiny' => $tarball;
+    plugin 'Decode::HTML'    => ();
+    plugin 'Extract'         => 'tar.gz';
+
+    meta->around_hook(
+        fetch => sub {
+            my ($orig, $build, @args) = @_;
+            my $res = $orig->($build, @args);
+            # GitHub's commit tarballs carry no upstream version metadata;
+            # stamp the pinned commit so Alien::Build has something stable.
+            $res->{version} = $CKDL_VERSION;
+            $res;
+        },
+    );
+
+    build sub {
+        my ($build) = @_;
+        require ExtUtils::CBuilder;
+        require File::Copy;
+        require File::Path;
+        require File::Find;
+        require File::Spec;
+        require Config;
+
+        # Locate the unpacked ckdl source tree. Alien::Build sometimes chdirs
+        # into the extracted directory and sometimes leaves cwd as its parent.
+        my $srcdir;
+        if (-f 'CMakeLists.txt' && -d 'src' && -d 'include') {
+            $srcdir = '.';
+        }
+        else {
+            ($srcdir) = grep { -d $_ && -f File::Spec->catfile($_, 'CMakeLists.txt') }
+                glob 'ckdl-*';
+        }
+        die "could not locate extracted ckdl source tree (cwd=" . `pwd` . ")"
+            unless $srcdir;
+
+        my $cb = ExtUtils::CBuilder->new(quiet => 0);
+
+        my @units = qw(bigint compat emitter parser str tokenizer utf8);
+        my @objects;
+        for my $unit (@units) {
+            my $src = File::Spec->catfile($srcdir, 'src', "$unit.c");
+            my $obj = $cb->compile(
+                source               => $src,
+                include_dirs         => [
+                    File::Spec->catdir($srcdir, 'include'),
+                    File::Spec->catdir($srcdir, 'src'),
+                ],
+                extra_compiler_flags => [
+                    '-DBUILDING_KDL=1',
+                    '-DKDL_STATIC_LIB=1',
+                    '-O2',
+                ],
+            );
+            push @objects, $obj;
+        }
+
+        my $ar = $Config::Config{ar} || 'ar';
+        my $lib = 'libkdl' . ($Config::Config{lib_ext} || '.a');
+        unlink $lib;
+        system($ar, 'rcs', $lib, @objects) == 0
+            or die "static archive step failed: $ar rcs $lib ... -> $?";
+
+        # Install: $build->install_prop->{prefix} is the staging dir.
+        my $prefix  = $build->install_prop->{prefix};
+        my $libdir  = File::Spec->catdir($prefix, 'lib');
+        my $incdir  = File::Spec->catdir($prefix, 'include', 'kdl');
+        my $licdir  = File::Spec->catdir($prefix, 'share',   'doc', 'ckdl');
+        File::Path::make_path($libdir, $incdir, $licdir);
+
+        File::Copy::copy($lib, File::Spec->catfile($libdir, $lib))
+            or die "copy $lib: $!";
+
+        my $hdr_src = File::Spec->catdir($srcdir, 'include', 'kdl');
+        opendir my $dh, $hdr_src or die "opendir $hdr_src: $!";
+        for my $hdr (grep { /\.h$/ } readdir $dh) {
+            File::Copy::copy(
+                File::Spec->catfile($hdr_src,    $hdr),
+                File::Spec->catfile($incdir,     $hdr),
+            ) or die "copy header $hdr: $!";
+        }
+        closedir $dh;
+
+        for my $note (qw(COPYING README.md CHANGELOG.md)) {
+            my $p = File::Spec->catfile($srcdir, $note);
+            next unless -f $p;
+            File::Copy::copy($p, File::Spec->catfile($licdir, $note))
+                or die "copy $note: $!";
+        }
+    };
+
+    # Static-library consumers: -I<prefix>/include and -L<prefix>/lib -lkdl.
+    gather sub {
+        my ($build) = @_;
+        my $prefix = $build->runtime_prop->{prefix};
+        $build->runtime_prop->{cflags}        = "-I$prefix/include";
+        $build->runtime_prop->{cflags_static} = "-I$prefix/include -DKDL_STATIC_LIB=1";
+        $build->runtime_prop->{libs}          = "-L$prefix/lib -lkdl";
+        $build->runtime_prop->{libs_static}   = "-L$prefix/lib -lkdl";
+    };
+};

@@ -243,7 +243,7 @@ with_native(
     tests => 2,
     cb    => sub {
         $ch->query(
-            "SELECT count() FROM system.numbers LIMIT 1",
+            "SELECT sleep(3)",
             { query_timeout => 1 },
             sub {
                 my ($rows, $err) = @_;

@@ -599,18 +599,18 @@ _is_integer( self, ... )
   CODE:
     {
         SV* val = mg_get_sv_arg( 1, items, &ST(0) );
-        /* Mirrors: !defined($_[1]) -> 0 */
         if( !SvOK( val ) )
         {
             RETVAL = 0;
         }
         else
         {
-            /* Stringify via sv_2pv_flags with SV_GMAGIC so that overloaded
-             * objects (e.g. Module::Generic::Number) go through their ""
-             * operator first, exactly as Perl's regex match operator does.
-             * This handles both plain scalars and overloaded objects. */
-            s = sv_2pv_flags( val, &len, SV_GMAGIC );
+            /* Use SvPV macro rather than sv_2pv_flags directly. On perl < 5.18
+             * (at least 5.16 confirmed), calling sv_2pv_flags on a pure SVt_PV scalar
+             * returns an empty string instead of the actual PV. The SvPV macro has a
+             * fast path that reads SvPVX/SvCUR directly when the POK flag is set,
+             * avoiding the buggy code path entirely. */
+            s = SvPV( val, len );
             if( len == 0 )
             {
                 RETVAL = 0;
@@ -619,10 +619,8 @@ _is_integer( self, ... )
             {
                 p   = s;
                 end = s + len;
-                /* Optional leading sign; mirrors: /^[\+\-]?\d+$/ */
                 if( *p == '+' || *p == '-' )
                     p++;
-                /* Must have at least one digit after optional sign */
                 if( p >= end )
                 {
                     RETVAL = 0;
@@ -714,13 +712,6 @@ _is_overloaded( self, ... )
   CODE:
     {
         SV* val = mg_get_sv_arg( 1, items, &ST(0) );
-        /* Mirrors: !scalar(@_) || !defined($_[0]) || !blessed($_[0]) -> 0
-         * Then: overload::Overloaded($_[0]) ? 1 : 0
-         * gv_fetchmeth_pvn looks up "()" in the stash with inheritance (-1),
-         *
-         * HvAMAGIC is unreliable: it is set on all packages that inherit from
-         * any class using overload, not just those that define overloads directly.
-         * The "()" slot is only present when the package itself uses overload. */
         if( !SvROK( val ) || !SvOBJECT( SvRV( val ) ) )
         {
             RETVAL = 0;
@@ -734,7 +725,15 @@ _is_overloaded( self, ... )
             }
             else
             {
+                /* gv_fetchmeth_pvn was added in perl 5.15.4 (became public in 5.16).
+                 * On older perls, fall back to gv_fetchmeth, which has been available
+                 * since perl 5.0 but lacks UTF-8 and flag support. For looking up the
+                 * "()" overload marker, the simpler API is sufficient. */
+#if PERL_VERSION >= 16
                 gv = gv_fetchmeth_pvn( stash, "()", 2, -1, 0 );
+#else
+                gv = gv_fetchmeth( stash, "()", 2, -1 );
+#endif
                 RETVAL = ( gv && isGV( gv ) ) ? 1 : 0;
             }
         }

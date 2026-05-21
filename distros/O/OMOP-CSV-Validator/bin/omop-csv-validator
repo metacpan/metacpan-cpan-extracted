@@ -16,6 +16,7 @@ use Path::Tiny;
 use OMOP::CSV::Validator;
 use JSON::XS;
 use Pod::Usage;
+use Text::CSV_XS;
 #use Data::Dumper;
 use Term::ANSIColor;    # For colored output
 use File::Basename;
@@ -28,18 +29,26 @@ my $VERSION = $OMOP::CSV::Validator::VERSION;
 # Command-line arguments
 my $ddl_file;
 my $csv_file;
-my $sep = ',';
+my $sep;
 my $table_name;         # Optional parameter to override table name
 my $schemas_file;       # Optional: file to save schemas
 my $nocolor = 0;
+my $json_output = 0;
+my $report_tsv;
+my $report_xlsx;
+my $turbo = 0;
 
 GetOptions(
     'ddl=s'          => \$ddl_file,        # Path to the DDL file (PostgreSQL)
     'input=s'        => \$csv_file,        # Path to the input CSV file
-    'sep=s'          => \$sep,             # Field separator (default: comma)
+    'sep=s'          => \$sep,             # Field separator (optional explicit override)
     'table|t=s'      => \$table_name,      # Optional: override table name
     'save-schemas=s' => \$schemas_file,    # Optional: file to save schemas
     'no-color|nc'    => \$nocolor,         # Optional: Turn off STDOUT color
+    'json'           => \$json_output,     # Optional: emit JSON result
+    'report-tsv=s'   => \$report_tsv,      # Optional: write Excel-friendly TSV report
+    'report-xlsx=s'  => \$report_xlsx,     # Optional: write native Excel report
+    'turbo'          => \$turbo,           # Optional: use compiled fast-path validator
     'help|h'         => \my $help,         # Show help message
     'version|V'      => sub {
         say color("cyan"), "$0 Version $VERSION", color("reset");
@@ -67,56 +76,411 @@ my %msg_emoji = (
     save    => '💾'
 );
 
-# Read the DDL file (UTF-8)
-my $ddl_text = path($ddl_file)->slurp_utf8;
-
-# Create the validator object
-my $validator = OMOP::CSV::Validator->new();
-
-# Load schemas from the DDL
-my $schemas = $validator->load_schemas_from_ddl($ddl_text);
-
-# Optionally save schemas to a file if --save-schemas was provided
-if ($schemas_file) {
-    my $json = JSON::XS->new->utf8->pretty->encode($schemas);
-    path($schemas_file)->spew_utf8($json);
-    say color("green"), "$msg_emoji{save} Schemas saved to '$schemas_file'",
-      color("reset");
+sub emit_json_and_exit {
+    my ( $payload, $exit_code ) = @_;
+    say JSON::XS->new->utf8->canonical->encode($payload);
+    exit $exit_code;
 }
 
-# Determine the schema to use (either from --table or derived from CSV filename)
-my ($schema, $schema_name);
-if ($table_name) {
-   $schema = $schemas->{ lc $table_name } or die color("red"), "$msg_emoji{error} No schema found for table '$table_name'\n", color("reset");
-   $schema_name = $table_name;
-}
-else {
-    $schema = $validator->get_schema_from_csv_filename( $csv_file, $schemas ) or die color("red"), "$msg_emoji{error} No schema found for table derived from '$csv_file'\n", color("reset");
-     $schema_name = basename($csv_file);
-     $schema_name =~ s/\.csv$//i;
+sub build_json_result {
+    my (%args) = @_;
+    return {
+        input_file  => $csv_file,
+        schema_name => $args{schema_name},
+        ok          => $args{ok},
+        error_count => 0 + ( $args{error_count} // 0 ),
+        row_errors  => $args{row_errors} // [],
+        ( defined $args{fatal_error} ? ( fatal_error => $args{fatal_error} ) : () ),
+    };
 }
 
-# Validate the CSV file
-my $errors = $validator->validate_csv_file( $csv_file, $schema, $sep );
+sub emit_human_fatal_and_exit {
+    my ($fatal_error) = @_;
+    chomp $fatal_error;
+    warn color("red"), "$msg_emoji{error} $fatal_error\n", color("reset");
+    exit 2;
+}
 
-if (@$errors) {
-    say color("bold white on_red"),
-      "$msg_emoji{error} Validation errors found:",
-      color("reset");
-    foreach my $err (@$errors) {
-        say color("red"),
-          "$msg_emoji{warning} Row $err->{row} validation failed:",
-          color("reset");
-        foreach my $msg ( @{ $err->{errors} } ) {
-            say "   $msg_emoji{dot} $msg";
+sub report_columns {
+    my ($header) = @_;
+    return (
+        @{$header},
+        '_validation_row',
+        '_validation_status',
+        '_validation_error_count',
+        '_validation_messages',
+    );
+}
+
+sub report_row_values {
+    my ( $header, $row_result ) = @_;
+    my @row = map { defined $row_result->{raw}{$_} ? $row_result->{raw}{$_} : '' }
+      @{$header};
+
+    push @row,
+      $row_result->{row},
+      ( $row_result->{ok} ? 'OK' : 'ERROR' ),
+      scalar( @{ $row_result->{errors} } ),
+      join( ' | ', @{ $row_result->{errors} } );
+
+    return @row;
+}
+
+sub open_report_tsv {
+    my ( $report_path, $header ) = @_;
+    my @report_columns = report_columns($header);
+    my $writer = Text::CSV_XS->new(
+        {
+            binary   => 1,
+            eol      => "\n",
+            sep_char => "\t",
+        }
+    ) or die "Cannot create TSV writer: " . Text::CSV_XS->error_diag();
+
+    my $handle = path($report_path)->openw_utf8;
+    $writer->print( $handle, \@report_columns )
+      or die "Failed to write report header to '$report_path'\n";
+
+    return {
+        handle => $handle,
+        writer => $writer,
+        header => $header,
+    };
+}
+
+sub write_report_tsv_row {
+    my ( $state, $row_result ) = @_;
+    my @row = report_row_values( $state->{header}, $row_result );
+    $state->{writer}->print( $state->{handle}, \@row )
+      or die "Failed to write report row to '$report_tsv'\n";
+}
+
+sub close_report_tsv {
+    my ($state) = @_;
+    return unless $state;
+    $state->{handle}->close;
+}
+
+sub excel_column_name {
+    my ($index) = @_;
+    my $name = q{};
+    $index++;
+    while ($index) {
+        my $remainder = ( $index - 1 ) % 26;
+        $name = chr( 65 + $remainder ) . $name;
+        $index = int( ( $index - 1 ) / 26 );
+    }
+    return $name;
+}
+
+sub open_report_xlsx {
+    my ( $report_path, $header, $schema_name ) = @_;
+
+    eval { require Excel::Writer::XLSX; 1 }
+      or die
+"Excel::Writer::XLSX is required for --report-xlsx. Install the distribution dependencies and retry.\n";
+
+    my @report_columns = report_columns($header);
+
+    my $workbook = Excel::Writer::XLSX->new($report_path)
+      or die "Failed to create XLSX report '$report_path'\n";
+    my $summary_ws    = $workbook->add_worksheet('Summary');
+    my $validation_ws = $workbook->add_worksheet('Validation');
+
+    my $header_format = $workbook->add_format(
+        bold     => 1,
+        color    => 'white',
+        bg_color => '#1F4E78',
+    );
+    my $ok_status_format = $workbook->add_format(
+        bold     => 1,
+        align    => 'center',
+        border   => 1,
+        color    => 'white',
+        bg_color => '#1B5E20',
+    );
+    my $error_status_format = $workbook->add_format(
+        bold     => 1,
+        align    => 'center',
+        border   => 1,
+        color    => 'white',
+        bg_color => '#8B0000',
+    );
+    my $ok_row_format = $workbook->add_format( bg_color => '#E2F0D9' );
+    my $error_row_format = $workbook->add_format( bg_color => '#FCE4D6' );
+    my $summary_label_format = $workbook->add_format( bold => 1 );
+
+    $summary_ws->write_row( 0, 0, [ 'Field', 'Value' ], $header_format );
+    $summary_ws->set_column( 0, 0, 20 );
+    $summary_ws->set_column( 1, 1, 40 );
+
+    for my $col_idx ( 0 .. $#report_columns ) {
+        $validation_ws->write( 0, $col_idx, $report_columns[$col_idx], $header_format );
+    }
+
+    my $status_col_idx    = scalar( @{$header} ) + 1;
+    my $row_col_idx       = scalar( @{$header} );
+    my $message_col_idx   = $#report_columns;
+    my $last_col_idx      = $#report_columns;
+    my $last_col_name     = excel_column_name($last_col_idx);
+    my $row_col_name      = excel_column_name($row_col_idx);
+    my $status_col_name   = excel_column_name($status_col_idx);
+
+    $validation_ws->freeze_panes( 1, 0 );
+    $validation_ws->set_column( 0, scalar( @{$header} ) - 1, 18 )
+      if @{$header};
+    $validation_ws->set_column( $status_col_idx - 1, $status_col_idx + 1, 18 );
+    $validation_ws->set_column( $message_col_idx, $message_col_idx, 70 );
+
+    return {
+        report_path         => $report_path,
+        workbook            => $workbook,
+        summary_ws          => $summary_ws,
+        validation_ws       => $validation_ws,
+        header              => $header,
+        schema_name         => $schema_name,
+        header_format       => $header_format,
+        ok_status_format    => $ok_status_format,
+        error_status_format => $error_status_format,
+        ok_row_format       => $ok_row_format,
+        error_row_format    => $error_row_format,
+        summary_label_format => $summary_label_format,
+        status_col_idx      => $status_col_idx,
+        row_col_idx         => $row_col_idx,
+        message_col_idx     => $message_col_idx,
+        last_col_idx        => $last_col_idx,
+        last_col_name       => $last_col_name,
+        row_col_name        => $row_col_name,
+        status_col_name     => $status_col_name,
+        next_excel_row      => 1,
+        total_rows          => 0,
+        invalid_rows        => 0,
+    };
+}
+
+sub write_report_xlsx_row {
+    my ( $state, $row_result ) = @_;
+    my @row_values = report_row_values( $state->{header}, $row_result );
+    my $excel_row  = $state->{next_excel_row};
+
+    for my $col_idx ( 0 .. $#row_values ) {
+        my $value = $row_values[$col_idx];
+        if ( $col_idx == $state->{status_col_idx} ) {
+            my $format =
+              $row_result->{ok} ? $state->{ok_status_format} : $state->{error_status_format};
+            $state->{validation_ws}->write( $excel_row, $col_idx, $value, $format );
+        }
+        else {
+            $state->{validation_ws}->write( $excel_row, $col_idx, $value );
         }
     }
+
+    $state->{next_excel_row}++;
+    $state->{total_rows}++;
+    $state->{invalid_rows}++ unless $row_result->{ok};
+}
+
+sub close_report_xlsx {
+    my ($state) = @_;
+    return unless $state;
+
+    my $valid_rows = $state->{total_rows} - $state->{invalid_rows};
+    my @summary_rows = (
+        [ 'input_file',   $csv_file ],
+        [ 'schema_name',  $state->{schema_name} ],
+        [ 'total_rows',   $state->{total_rows} ],
+        [ 'valid_rows',   $valid_rows ],
+        [ 'invalid_rows', $state->{invalid_rows} ],
+    );
+    for my $i ( 0 .. $#summary_rows ) {
+        $state->{summary_ws}
+          ->write( $i + 1, 0, $summary_rows[$i][0], $state->{summary_label_format} );
+        $state->{summary_ws}->write( $i + 1, 1, $summary_rows[$i][1] );
+    }
+
+    $state->{validation_ws}
+      ->autofilter( 0, 0, $state->{total_rows}, $state->{last_col_idx} );
+
+    if ( $state->{total_rows} ) {
+        my @row_highlight_ranges;
+        push @row_highlight_ranges,
+          "A2:$state->{row_col_name}" . ( $state->{total_rows} + 1 )
+          if $state->{row_col_idx} >= 0;
+        push @row_highlight_ranges,
+          excel_column_name( $state->{status_col_idx} + 1 ) . "2:$state->{last_col_name}" . ( $state->{total_rows} + 1 )
+          if $state->{status_col_idx} + 1 <= $state->{last_col_idx};
+
+        for my $data_range (@row_highlight_ranges) {
+            $state->{validation_ws}->conditional_formatting(
+                $data_range,
+                {
+                    type     => 'formula',
+                    criteria => '=$' . $state->{status_col_name} . '2="ERROR"',
+                    format   => $state->{error_row_format},
+                }
+            );
+            $state->{validation_ws}->conditional_formatting(
+                $data_range,
+                {
+                    type     => 'formula',
+                    criteria => '=$' . $state->{status_col_name} . '2="OK"',
+                    format   => $state->{ok_row_format},
+                }
+            );
+        }
+    }
+
+    $state->{workbook}->close()
+      or die "Failed to finalize XLSX report '$state->{report_path}'\n";
+}
+
+sub emit_saved_reports {
+    say color("green"), "$msg_emoji{save} TSV report saved to '$report_tsv'",
+      color("reset")
+      if $report_tsv;
+    say color("green"), "$msg_emoji{save} XLSX report saved to '$report_xlsx'",
+      color("reset")
+      if $report_xlsx;
+}
+
+sub report_mode_enabled {
+    return $report_tsv || $report_xlsx;
+}
+
+sub run_validation {
+    # Read the DDL file (UTF-8)
+    my $ddl_text = path($ddl_file)->slurp_utf8;
+
+    # Create the validator object
+    my $validator = OMOP::CSV::Validator->new();
+
+    # Load schemas from the DDL
+    my $schemas = $validator->load_schemas_from_ddl($ddl_text);
+
+    # Optionally save schemas to a file if --save-schemas was provided
+    if ($schemas_file) {
+        my $json = JSON::XS->new->utf8->pretty->encode($schemas);
+        path($schemas_file)->spew_utf8($json);
+        say color("green"), "$msg_emoji{save} Schemas saved to '$schemas_file'",
+          color("reset")
+          unless $json_output;
+    }
+
+    # Determine the schema to use (either from --table or derived from CSV filename)
+    my ( $schema, $schema_name );
+    if ($table_name) {
+        $schema =
+          $schemas->{ lc $table_name }
+          or die "No schema found for table '$table_name'\n";
+        $schema_name = $table_name;
+    }
+    else {
+        $schema = $validator->get_schema_from_csv_filename( $csv_file, $schemas )
+          or die "No schema found for table derived from '$csv_file'\n";
+        $schema_name = basename($csv_file);
+        $schema_name =~ s/\.csv$//i;
+    }
+
+    my @errors;
+    my $tsv_state;
+    my $xlsx_state;
+
+    $validator->_stream_csv_rows(
+        $csv_file,
+        $schema,
+        $sep,
+        validation_mode => $turbo ? 'turbo' : 'json',
+        on_header => sub {
+            my ($header) = @_;
+            $tsv_state  = open_report_tsv( $report_tsv, $header ) if $report_tsv;
+            $xlsx_state = open_report_xlsx( $report_xlsx, $header, $schema_name )
+              if $report_xlsx;
+        },
+        on_row => sub {
+            my ($row_result) = @_;
+            push @errors,
+              {
+                row    => $row_result->{row},
+                errors => $row_result->{errors},
+              }
+              if @{ $row_result->{errors} };
+            write_report_tsv_row( $tsv_state, $row_result ) if $tsv_state;
+            write_report_xlsx_row( $xlsx_state, $row_result ) if $xlsx_state;
+        },
+    );
+
+    close_report_tsv($tsv_state)   if $tsv_state;
+    close_report_xlsx($xlsx_state) if $xlsx_state;
+
+    return {
+        errors       => \@errors,
+        schema_name  => $schema_name,
+    };
+}
+
+if ($json_output) {
+    my $result = eval { run_validation() };
+    if ( !$result ) {
+        my $fatal_error = $@ || "Unknown error\n";
+        chomp $fatal_error;
+        emit_json_and_exit( build_json_result(
+                schema_name => undef,
+                ok          => JSON::XS::false,
+                error_count => 0,
+                row_errors  => [],
+                fatal_error => $fatal_error,
+            ),
+            2 );
+    }
+
+    my @row_errors = map {
+        {
+            row      => $_->{row},
+            messages => $_->{errors},
+        }
+    } @{ $result->{errors} };
+
+    emit_json_and_exit( build_json_result(
+            schema_name => $result->{schema_name},
+            ok          => @row_errors ? JSON::XS::false : JSON::XS::true,
+            error_count => scalar(@row_errors),
+            row_errors  => \@row_errors,
+        ),
+        @row_errors ? 1 : 0 );
+}
+
+my $result = eval { run_validation() };
+emit_human_fatal_and_exit( $@ || "Unknown error\n" ) if !$result;
+my $errors = $result->{errors};
+my $schema_name = $result->{schema_name};
+
+if (@$errors) {
+    if ( report_mode_enabled() ) {
+        say color("bold white on_red"),
+          "$msg_emoji{error} Validation failed with " . scalar(@$errors) . " failing row(s). See the generated report.",
+          color("reset");
+    }
+    else {
+        say color("bold white on_red"),
+          "$msg_emoji{error} Validation errors found:",
+          color("reset");
+        foreach my $err (@$errors) {
+            say color("red"),
+              "$msg_emoji{warning} Row $err->{row} validation failed:",
+              color("reset");
+            foreach my $msg ( @{ $err->{errors} } ) {
+                say "   $msg_emoji{dot} $msg";
+            }
+        }
+    }
+    emit_saved_reports();
     exit 1;
 }
 else {
     say color("bold white on_green"),
 "$msg_emoji{success} CSV file '$csv_file' is valid against the '$schema_name' schema.",
       color("reset");
+    emit_saved_reports();
     exit 0;
 }
 
@@ -128,7 +492,7 @@ omop_csv_validator - Validate OMOP CDM CSV files against DDL-derived schemas
 
 =head1 SYNOPSIS
 
-  omop_csv_validator --ddl DDL.sql --input DATA.csv [--sep $'\t'] [--table person] [--save-schemas schemas.json]
+  omop_csv_validator --ddl DDL.sql --input DATA.csv [--sep $'\t'] [--table person] [--save-schemas schemas.json] [--report-tsv validation.tsv] [--report-xlsx validation.xlsx]
 
 =head1 OPTIONS
 
@@ -144,7 +508,8 @@ omop_csv_validator - Validate OMOP CDM CSV files against DDL-derived schemas
 
 =item B<--sep>
 
-CSV field separator (default: comma). For tab, use: --sep $'\t'
+CSV field separator override. If omitted, the validator tries to infer the separator from the file.
+For tab, use: --sep $'\t'
 
 =item B<--table>, B<-t>
 
@@ -158,6 +523,23 @@ to derive the table name from the CSV filename.
 =item B<--no-color>, B<-nc>
 
 (Optional) Turn off STDOUT color
+
+=item B<--json>
+
+(Optional) Emit a machine-readable JSON result object suitable for automation or R clients.
+
+=item B<--report-tsv>
+
+(Optional) Write a tab-separated validation report with the original row data plus C<_validation_*>
+columns that spreadsheet users can open in Excel.
+
+=item B<--report-xlsx>
+
+(Optional) Write a native Excel workbook with a summary sheet, validation sheet, and colored status cues.
+
+=item B<--turbo>
+
+(Optional) Use the compiled fast-path validator instead of the default C<JSON::Validator>-based engine.
 
 =item B<--help>, B<-h>
 
@@ -174,5 +556,7 @@ Show the script's version (which corresponds to C<OMOP::CSV::Validator::VERSION>
   bin/omop_csv_validator --ddl ddl/postgres.sql --input data/person.csv --sep $'\t'
   bin/omop_csv_validator --ddl ddl/postgres.sql --input data/ANY_CSV.csv --table person
   bin/omop_csv_validator --ddl ddl/postgres.sql --input data/ANY_CSV.csv --save-schemas schemas.json
+  bin/omop_csv_validator --ddl ddl/postgres.sql --input data/person.csv --report-tsv validation.tsv
+  bin/omop_csv_validator --ddl ddl/postgres.sql --input data/person.csv --report-xlsx validation.xlsx
 
 =cut

@@ -1,12 +1,11 @@
 ---
-abstract: 'CPAN distribution maker'
+abstract: CPAN::Maker
 author:
-  - 'Rob Lauer <rlauer6@comcast.net>'
+  - 'Rob Lauer <rclauer@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '6.64'
   File::ShareDir::Install: '0'
-  JSON: '0'
-  Text::CSV_XS: '0'
+  JSON: '4.10'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   File::ShareDir::Install: '0'
@@ -24,33 +23,38 @@ no_index:
 provides:
   CPAN::Maker:
     file: lib/CPAN/Maker.pm
-    version: v1.8.0
+    version: v1.9.1
   CPAN::Maker::Constants:
     file: lib/CPAN/Maker/Constants.pm
-    version: v1.8.0
+    version: v1.9.1
+  CPAN::Maker::Role::FileUtils:
+    file: lib/CPAN/Maker/Role/FileUtils.pm
+    version: v1.9.1
+  CPAN::Maker::Role::ModuleUtils:
+    file: lib/CPAN/Maker/Role/ModuleUtils.pm
+    version: v1.9.1
   CPAN::Maker::Utils:
     file: lib/CPAN/Maker/Utils.pm
-    version: v1.8.0
-  File::Process:
-    file: lib/File/Process.pm
-    version: '0.15'
-  File::Process::Utils:
-    file: lib/File/Process/Utils.pm
-    version: '0.12'
+    version: v1.9.1
+recommends:
+  JSON::Validator: '0'
 requires:
-  IO::Scalar: '2.111'
-  JSON: '0'
-  List::Util: '1.33'
-  Log::Log4perl: '0'
-  Module::ScanDeps::Static: '0'
-  Pod::Find: '0'
-  Readonly: '0'
-  Text::CSV_XS: '0'
+  CLI::Simple: v2.0.0
+  CLI::Simple::Constants: v2.0.0
+  CLI::Simple::Utils: v2.0.0
+  File::Process: v1.0.0
+  File::ShareDir: '1.118'
+  JSON: '4.10'
+  Log::Log4perl::Level: '0'
+  Module::CPANfile: '0'
+  Readonly: '2.05'
+  Role::Tiny: '2.002004'
+  Role::Tiny::With: '2.002004'
   YAML::Tiny: '0'
   perl: '5.010'
 resources:
-  bugtracker: http://github.com/rlauer6/CPAN-Maker/issues
-  homepage: http://github.com/rlauer6/CPAN-Maker
-  repository: git://github.com/rlauer6/CPAN-Maker.git
-version: v1.8.0
+  bugtracker: https://github.com/rlauer6/CPAN-Maker/issues
+  homepage: https://github.com/rlauer6/CPAN-Maker
+  repository: https://github.com/rlauer6/CPAN-Maker
+version: v1.9.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

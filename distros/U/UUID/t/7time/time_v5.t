@@ -6,8 +6,7 @@
 #
 use strict;
 use warnings;
-use Test::More;
-use MyNote;
+use MyTest;
 use UUID 'generate_v5';
 
 ok 1, 'loaded';

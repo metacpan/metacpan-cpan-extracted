@@ -1,0 +1,68 @@
+{
+   "abstract" : "Perl API interface to Bizowie's L<erp software|http://bizowie.com/>.",
+   "author" : [
+      "Bizowie <info@bizowie.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "erp",
+      "cloud-erp",
+      "distribution",
+      "wholesale",
+      "manufacturing",
+      "bizowie",
+      "api",
+      "sdk"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WWW-Bizowie-API",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Request::Common" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Mo" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.008006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bizowie/WWW-Bizowie-API/issues"
+      },
+      "homepage" : "https://bizowie.com",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bizowie/WWW-Bizowie-API.git",
+         "web" : "https://github.com/bizowie/WWW-Bizowie-API"
+      }
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

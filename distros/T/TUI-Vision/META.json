@@ -27,77 +27,105 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "1.01",
+            "Class::Struct" : "0",
+            "Devel::StrictMode" : "0.003",
+            "Encode" : "0",
+            "Import::Into" : "1.002005",
+            "Importer" : "0.026",
+            "List::Util" : "1.33",
+            "Module::Loaded" : "0",
+            "Params::Check" : "0",
+            "Scalar::Util" : "1.36",
+            "UNIVERSAL::Object" : "0.17",
+            "Win32" : "0.59",
+            "Win32::API" : "0.84",
+            "Win32::Console" : "0.10",
+            "Win32::Console::PatchForRT33513" : "0.008",
+            "Win32API::File" : "0.1101",
+            "autodie::Scope::Guard" : "0",
             "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Devel::Refcount" : "0.10",
+            "Test::Exception" : "0.43",
+            "Test::More" : "0.95"
          }
       }
    },
    "provides" : {
       "TUI::App" : {
          "file" : "lib/TUI/App.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "TUI::Dialogs" : {
          "file" : "lib/TUI/Dialogs.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "TUI::Drivers" : {
          "file" : "lib/TUI/Drivers.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "TUI::Gadgets" : {
          "file" : "lib/TUI/Gadgets.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "TUI::Memory" : {
          "file" : "lib/TUI/Memory.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "TUI::MsgBox" : {
          "file" : "lib/TUI/MsgBox.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "TUI::Objects" : {
          "file" : "lib/TUI/Objects.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "TUI::StdDlg" : {
          "file" : "lib/TUI/StdDlg.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "TUI::TextView" : {
          "file" : "lib/TUI/TextView.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "TUI::Validate" : {
          "file" : "lib/TUI/Validate.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "TUI::Views" : {
          "file" : "lib/TUI/Views.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "TUI::Vision" : {
          "file" : "lib/TUI/Vision.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       },
       "TUI::toolkit" : {
          "file" : "lib/TUI/toolkit.pm",
-         "version" : "v2.0.0"
+         "version" : "v2.0.1"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/brickpool/TUI-Vision/issues"
+      },
+      "homepage" : "http://brickpool.de",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/brickpool/tvision.git",
-         "web" : "https://github.com/brickpool/tvision"
+         "url" : "https://github.com/brickpool/TUI-Vision.git",
+         "web" : "https://github.com/brickpool/TUI-Vision"
       }
    },
-   "version" : "v2.0.0",
+   "version" : "2.000001",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

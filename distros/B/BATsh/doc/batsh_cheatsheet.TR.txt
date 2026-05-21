@@ -1,6 +1,30 @@
 BATsh Hizli Basvuru [TR] Turkce
 =================================
 
+----------------------------------------------------------------------
+OZET
+  BATsh, cmd.exe toplu is ve bash/sh sozdizimini ayni betik dosyasinda
+  calistiran iki dilli bir kabuk yorumlayicisidir. Satir satir mod otomatik
+  algilanir. Dis kabuk gerekmez -- saf Perl uygulamasi.
+
+KARISIK ORNEK
+  :: CMD bolumu (ilk belirtes buyuk harf)
+  @ECHO OFF
+  SET LANG=BATsh
+
+  # SH bolumu (ilk belirtes kucuk harf icerir)
+  greet() { echo "Merhaba $1 (bash modu)"; }
+  greet $LANG
+  result=$(echo $LANG | perl -e 'while(<STDIN>){chomp;print uc}')
+  echo "Buyuk harf: $result"
+
+  :: CMD'ye geri don (SH sonucunu oku)
+  ECHO CMD'ye donus: %result%
+
+  # Calistirma: perl lib/BATsh.pm script.batsh
+----------------------------------------------------------------------
+
+
 BATsh, cmd.exe ve bash/sh sozdizimini ayni betikte calistiran
 iki dilli bir kabuktur. Her satirin ilk belirteci modu belirler.
 
@@ -97,3 +121,21 @@ iki dilli bir kabuktur. Her satirin ilk belirteci modu belirler.
   CPAN bagimliligi yok.
 
 Ayrica bakiniz: https://metacpan.org/dist/BATsh
+
+11. CMD Boru Hatti ve Parametre Degistiricileri
+-------------------------------------------------
+  cmd1 | cmd2              # Gecici dosya uzerinden boru hatti (Pure Perl)
+  SET /P VAR=Giri:         # STDIN'den bir satir oku, VAR'a yaz
+  %~dp0                    # %0'in surucusu+dizini (en sik kullanim)
+  %~n1, %~x1, %~nx1       # Dosya adi, uzanti, ikisi birden
+
+12. SH Fonksiyonlari ve Degisken Genisletme
+---------------------------------------------
+  f() { echo $1; }         # Fonksiyon tanimi
+  ${var%.*}  ${var%%.*}    # Sonek kaldir (en kisa/en uzun)
+  ${var#*.}  ${var##*.}    # Onek kaldir (en kisa/en uzun)
+  ${var/a/b} ${var//a/b}   # Degistir (ilk/tumune)
+  ${var^^} ${var,,}        # Buyuk/kucuk harf
+  cmd > f  cmd >> f  2>&1  # Yonlendirme
+  cmd1 && cmd2             # VE zincirleme
+  cmd1 || cmd2             # VEYA zincirleme

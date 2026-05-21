@@ -1,5 +1,16 @@
 Revision history for Crypt-HSM
 
+0.032     2026-05-10 15:59:00+02:00 Europe/Brussels
+          - Fix specialization of eddsa, ml_dsa and slh_dsa
+          - Make seed attribute a ByteAttr
+          - Use correct keys in AttrAttr decoding logic
+          - Don't allow for setting of version attributes
+
+0.031     2026-05-01 00:07:45+02:00 Europe/Brussels
+          - [BREAKING] Make get_attributes take a list instead of an arrayref
+          - Expand mechanism attribute values to mechanism objects instead of names
+          - Rename validation types and validation authority types
+
 0.030     2026-03-29 18:58:59+02:00 Europe/Brussels
           - Add partial support for PKCS #11 3.2
           - Use TRUE instead of true for backwards compatability

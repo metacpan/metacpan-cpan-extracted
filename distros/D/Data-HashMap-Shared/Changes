@@ -1,5 +1,9 @@
 Revision history for Data-HashMap-Shared
 
+0.08  2026-05-18
+    - New ops: cas (string values), add_ttl, update_ttl, cas_take,
+      remove_multi (method), get_with_ttl (method)
+
 0.07  2026-04-26
     - anonymous mmap; new memfd/new from fd/sync
     - sharded sync iterates all shards

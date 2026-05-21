@@ -2,7 +2,7 @@
 
 =head1 DESCRIPTION
 
-Showcase bad DSL leading to a runtime expection.
+Showcase bad DSL leading to a runtime exception.
 
 =cut
 

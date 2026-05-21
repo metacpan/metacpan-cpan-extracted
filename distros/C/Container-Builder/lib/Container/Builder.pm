@@ -4,7 +4,7 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 use Cwd;
 use LWP::Simple;
@@ -163,8 +163,8 @@ class Container::Builder {
 		push @layers, Container::Builder::Layer::SingleFile->new(comment => $location_in_ctr, file => $file_on_disk, dest => $location_in_ctr, mode => $mode, user => $user, group => $group);
 	}
 
-	method add_file_from_string($data, $location_in_ctr, $mode, $user, $group) {
-		push @layers, Container::Builder::Layer::SingleFile->new(comment => $location_in_ctr, data => $data, dest => $location_in_ctr, mode => $mode, user => $user, group => $group);
+	method add_file_from_string($data, $location_in_ctr, $mode, $user, $group, $compressed = 0) {
+		push @layers, Container::Builder::Layer::SingleFile->new(comment => $location_in_ctr, data => $data, dest => $location_in_ctr, mode => $mode, user => $user, group => $group, compress => $compressed);
 	}
 
 	method copy($local_dirpath, $location_in_ctr, $mode, $user, $group) {
@@ -256,7 +256,33 @@ class Container::Builder {
 		$work_dir = $workdirectory;
 	}
 
-	method build($filename_result = '') {
+	method build {
+		my $filename_result = '';
+		my $tag_name = '';
+		if(@_ == 4) {
+			if($_[0] eq 'filename_result' && $_[2] eq 'tag_name') {
+				$filename_result = $_[1];
+				$tag_name = $_[3];
+			} elsif($_[0] eq 'tag_name' && $_[2] eq 'filename_result') {
+				$tag_name = $_[1];
+				$filename_result = $_[3];
+			} else {
+				return -1;
+			}
+		} elsif(@_ == 3) {
+				return -1;
+		} elsif(@_ == 2) {
+			if($_[0] eq 'filename_result') {
+				$filename_result = $_[1];
+			} elsif($_[0] eq 'tag_name') {
+				$tag_name = $_[1];
+			} else {
+				$filename_result = $_[0];
+				$tag_name = $_[1];
+			}
+		} elsif(@_ == 1) { # Backwards compatibility
+			$filename_result = $_[0];
+		}
 
 		# Make 1 layer with all the base files
 		my $tar = Container::Builder::Tar->new();
@@ -303,7 +329,7 @@ class Container::Builder {
 		my $oci_layout = '{"imageLayoutVersion": "1.0.0"}';
 		$tar->add_file('oci-layout', '{"imageLayoutVersion": "1.0.0"}', 0644, 0, 0);
 		my $index = Container::Builder::Index->new();
-		$tar->add_file('index.json', $index->generate_index($manifest->get_digest(), $manifest->get_size()), 0644, 0, 0);
+		$tar->add_file('index.json', $index->generate_index($manifest->get_digest(), $manifest->get_size(), $tag_name), 0644, 0, 0);
 
 		if($filename_result) {
 			open(my $o, '>', $filename_result) or die "cannot open $filename_result\n";
@@ -425,9 +451,11 @@ I<This is an experimental method.>
 
 Adds the local file C<$file_on_disk> inside the container at location C<$location_in_ctr> with the specified C<$mode>, C<$user> and C<$group>.
 
-=item add_file_from_string($data, $location_in_ctr, $mode, $user, $group)
+=item add_file_from_string($data, $location_in_ctr, $mode, $user, $group, [$compressed])
 
 Adds the data in the scalar C<$data> to the container at location C<$location_in_ctr> with the specified C<$mode>, C<$user> and C<$group>.
+
+C<$compressed> is a boolean to determine if the image layer will be compressed.
 
 =item copy($local_dirpath, $location_in_ctr, $mode, $user, $group)
 
@@ -469,7 +497,13 @@ Set the default working directory of the container.
 
 =item build('mycontainer.tar')
 
-Build the container and write the result to the filepath specified. If no argument is given, the entire archive is returned as a scalar from the method.
+=item build(filename_result => 'mycontainer.tar')
+
+=item build('mycontainer.tar', 'localhost/ctr:latest')
+
+=item build(filename_result => 'mycontainer.tar', tag_name => 'localhost/ctr:latest')
+
+Build the container and write the result to the filepath specified. C<tag_name> sets an annotation in the Index so that other tooling knows how to tag the image container upon loading.
 
 =item get_digest()
 

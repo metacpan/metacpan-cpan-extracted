@@ -14,13 +14,11 @@ use open ':std', ':encoding(UTF-8)'; # force stdin, stdout, stderr into utf8
 use lib 't/lib';
 use Helper;
 
-my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
-
 subtest recursive_get => sub {
   my $doc = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://localhost:1234/api',
-    evaluator => my $js = JSON::Schema::Modern->new(max_traversal_depth => 15),
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    evaluator => my $js = JSON::Schema::Modern->new(max_depth => 15),
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   parameters:
     foo: { $ref: '#/components/parameters/bar', description: foo description }
@@ -58,7 +56,7 @@ YAML
   my $doc2 = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'http://far_far_away/api2',
     evaluator => $js,
-    schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
 components:
   parameters:
     foo: { $ref: 'http://localhost:1234/api#/components/parameters/baz' }

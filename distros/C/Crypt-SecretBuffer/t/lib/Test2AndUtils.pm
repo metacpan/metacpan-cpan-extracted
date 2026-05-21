@@ -116,6 +116,7 @@ sub setup_tty_helper {
    my $code = shift;
    my $pty = IO::Pty->new;
    my $tty = $pty->slave;
+   #warn "tty=".fileno($tty)." pty=".fileno($pty)."\n";
    $tty->autoflush(1);
    $pty->autoflush(1);
    pipe(my $parent_read, my $child_write) or die "Cannot create pipe: $!";
@@ -136,21 +137,29 @@ sub setup_tty_helper {
             my ($action, $data) = unpack_msg($_);
             if ($action eq 'wait_for') {
                do {
+                  #warn "wait_for calling sysread(".fileno($pty).")\n";
                   sysread($pty, $in_buf, 1, length($in_buf))
                      or sleep(.75), warn "# sysread: $!";
                } while (index($in_buf, $data) == -1);
+               #warn "wait_for done\n";
             } elsif ($action eq 'sleep') {
                sleep $data;
+               #warn "sleep done\n";
             } elsif ($action eq 'type') {
                for (split //, $data) {
+                  #warn "type calling syswrite(".fileno($pty).", $_)\n";
                   syswrite($pty, $_) or warn "# syswrite: $!";
                   sleep 0.05;
                }
+               #warn "type done\n";
             } elsif ($action eq 'read_pty') {
+               #warn "read_pty calling sysread(".fileno($pty).")\n";
                sysread($pty, $in_buf, 4096, length($in_buf)) or warn "# sysread: $!";
+               #warn "read_pty calling child->print(msg)\n";
                $child_write->print(pack_msg(read_pty => $in_buf));
                $in_buf= '';
             } elsif ($action eq 'exit') {
+               #warn "exit\n";
                POSIX::_exit(0);
             }
          }

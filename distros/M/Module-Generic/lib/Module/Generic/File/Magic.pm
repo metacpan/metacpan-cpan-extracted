@@ -15,7 +15,7 @@ BEGIN
 {
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'Module::Generic' );
     use parent qw( Module::Generic );
     use vars qw( $VERSION $BACKEND @EXPORT_OK %EXPORT_TAGS %LIBMAGIC_FLAGS );
     use Exporter qw( import );

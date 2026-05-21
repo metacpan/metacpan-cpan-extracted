@@ -299,7 +299,7 @@ use Params::Validate::Strict qw(validate_strict);
         safe_username => {
             type => 'string',
             notmemberof => ['admin', 'root', 'system', 'administrator'],
-            min => 3,
+            minimum => 3,
             max => 20,
             matches => qr/^[a-z0-9_]+$/
         }

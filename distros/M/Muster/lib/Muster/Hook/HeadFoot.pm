@@ -1,5 +1,5 @@
 package Muster::Hook::HeadFoot;
-$Muster::Hook::HeadFoot::VERSION = '0.93';
+$Muster::Hook::HeadFoot::VERSION = '0.9501';
 use Mojo::Base 'Muster::Hook';
 use Muster::LeafFile;
 use Muster::Hooks;
@@ -14,7 +14,7 @@ Muster::Hook::HeadFoot - Muster header and footer hook.
 
 =head1 VERSION
 
-version 0.93
+version 0.9501
 
 =head1 DESCRIPTION
 

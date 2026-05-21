@@ -1,0 +1,36 @@
+# Version control
+\bRCS\b
+\bCVS\b
+\B\.svn\b
+\B\.git\b
+^\.gitignore$
+^\.github/
+^\.claude/
+
+# ExtUtils::MakeMaker output
+^Makefile$
+^Makefile\.old$
+^pm_to_blib$
+^blib/
+^MYMETA\..*
+
+# Compiled XS artifacts
+\.bs$
+^XS\.c$
+^XS\.o$
+\.so$
+
+# Dist tarballs
+^Data-Path-XS-[0-9.]+\.tar\.gz$
+
+# Local Inline::C cache from ad-hoc testing
+^_Inline/
+
+# Editor/IDE droppings
+~$
+\.swp$
+\.bak$
+\.tmp$
+^\.vscode/
+^\.idea/
+^\.DS_Store$

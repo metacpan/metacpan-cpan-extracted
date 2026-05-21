@@ -1,7 +1,178 @@
+Tue May  5 13:29:52 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.9.1]:
+	* VERSION: bump
+	* Makefile: updated from CPAN::Maker::Bootstrap
+	* lib/CPAN/Maker.pm.in
+	- remove JSON::Validator from use list
+	* requires: remove JSON::Validator
+
+Fri May  1 17:29:22 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.9.0]: CPAN::Maker::Bootstrapper
+	* VERSION: bump
+	* release/release-notes-1.9.0.md: new
+	- refactored: autoconfiscated project -> CPAN::Maker::Bootstrapper
+
+	[1.9.0]: new
+	* .includes/git.mk: new
+	* .includes/help.mk: new
+	* .includes/perl.mk: new
+	* .includes/update.mk: new
+	* .includes/upgrade.mk: new
+	* .includes/version.mk: moved here
+	* .includes/release-notes.mk: moved here
+	* bin/cpan-maker.in: new
+	* Makefile: new
+	* bin/make-cpan-dist.pl.in: new
+	* buildspec-schema.json: new
+	* buildspec.yml: new
+	* lib/CPAN/Maker.pm.in: moved here
+	* lib/CPAN/Maker/Constants.pm.in: moved here
+	* lib/CPAN/Maker/Role/FileUtils.pm.in: new from CPAN::Maker
+	* lib/CPAN/Maker/Role/ModuleUtils.pm.in: ditto
+	* cpanfile: new
+	* project.mk: new
+	* requires
+	- moved from cpan/
+	- +JSON::Validator
+	* t/00-cpan-maker.t: new
+	* test-requires: moved from cpan/
+
+	[1.9.0]: deleted
+	* Makefile.am: deleted
+	* autotools/ads_PERL_INCLUDES.m4: deleted
+	* autotools/ads_PERL_MODULE.m4: deleted
+	* autotools/ads_PROG_PERL.m4: deleted
+	* autotools/am_build_mode.m4: deleted
+	* autotools/ax_am_conditional_example.m4: deleted
+	* autotools/ax_deps_check.m4: deleted
+	* autotools/ax_distcheck_hack.m4: deleted
+	* configure.ac: deleted
+	* cpan/.gitignore: deleted, replaced by CPAN::Maker::Bootstrapper
+	* cpan/Makefile.am: deleted
+	* cpan/README.md: deleted
+	* cpan/build-requires: deleted
+	* cpan/buildspec.yml: deleted
+	* cpan/requires: moved to root
+	* cpan/test-requires: likewise
+	* directories.inc: deleted
+	* src/Makefile.am: deleted
+	* src/main/Makefile.am: deleted
+	* src/main/bash/Makefile.am: deleted
+	* src/main/bash/bin/Makefile.am: deleted
+	* src/main/perl/Makefile.am: deleted
+	* src/main/perl/bin/Makefile.am: deleted
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	- moved to bin
+	- refactored to call the modulino wrapper
+	* src/main/perl/lib/CPAN/Maker.pm.in:
+	- buildspec.yml keys no longer support '_' versions
+	- moved to lib/
+	- refactored as a CLI::Simple script
+	- decomposed some methods into roles
+	(cmd_validate): new
+	(validate_buildspec): new
+	(validate_object): removed
+	(write_makefile)
+	- fix incorrect stripping of version from modules
+	- $pl_file, not $_ in split
+	(read_buildspec)
+	- normalize keys (_ -> -), write .current file
+	(fetch_requires)
+	- unloaded wrong key should be include_core_modules
+	* src/main/perl/lib/CPAN/Maker/Constants.pm.in: deleted
+	* src/main/perl/lib/Makefile.am: deleted
+	* src/main/perl/lib/README.md: deleted
+	* bootstrap: deleted
+
+	[1.9.0]: renamed
+	* release-notes-1.7.1.md => release/release-notes-1.7.1.md: moved
+	* release-notes-1.7.2.md => release/release-notes-1.7.2.md: moved
+	* release-notes-1.7.3.md => release/release-notes-1.7.3.md: moved
+	* release-notes-1.7.4.md => release/release-notes-1.7.4.md: moved
+	* release-notes-1.7.5.md => release/release-notes-1.7.5.md: moved
+	* release-notes-1.8.0.md => release/release-notes-1.8.0.md: moved
+	* release-notes-1.8.1.md => release/release-notes-1.8.1.md: moved
+	* release-notes-1.8.3.md => release/release-notes-1.8.3.md: moved
+	* release-notes-1.8.5.md => release/release-notes-1.8.5.md: moved
+	* {src/main/bash/bin => bin}/make-cpan-dist.in
+	- moved
+	- remove @bashrun@ -> /usr/bin/env bash
+	* {src/main/bash/bin => bin}/upload2cpan.in: moved
+	* {src/main/perl/lib => lib}/CPAN/Maker/Utils.pm.in: moved
+	* {src/main/perl/lib => lib}/File/Process.pm.in: moved
+	* {src/main/perl/lib => lib}/File/Process/Utils.pm.in: moved
+	* {src/main/perl/lib/t => t}/00-file-process.t: moved
+	* {src/main/perl/lib/t => t}/01-filter.t: moved
+	* {src/main/perl/lib/t => t}/02-process.t: moved
+	* {src/main/perl/lib/t => t}/03-process-pre.t: moved
+	* {src/main/perl/lib/t => t}/04-process.t: moved
+
+Fri May  1 06:52:50 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.8.5]:
+	* release-notes-1.8.5.md: new
+	* VERSION: bump
+	* src/main/perl/lib/README.md: generated
+	* src/main/bash/bin/make-cpan-dist.in
+	- grep ... || true
+	* src/main/perl/bin/make-cpan-dist.pl.in
+	(parse_path)
+	- do not add option if directory does not exist
+	(check_path)
+	- warn, don't die when path in buildspec.yml does not exist
+
+Thu Apr 30 17:17:28 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.8.4]:
+	* VERSION: bump
+	* src/main/bash/bin/make-cpan-dist.in
+	- yet another unbound variable
+	* src/main/perl/lib/README.md: generated
+	* .github/workflows/build.yml: add git
+	* build-github: generic version
+	* build-requires: pin version of Markdown::Render
+	* TODO: new
+
+Thu Apr 30 06:06:16 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.8.3]:
+	* VERSION: bump
+	* release-notes-1.8.3.md: new
+	* src/main/bash/bin/make-cpan-dist.in
+	- use make_temp throughout to create temp files to centralize cleanup
+	(make_temp): new
+	(cleanup): refactored
+	* src/main/perl/lib/README.md: generated
+
+Tue Apr 28 06:29:29 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.8.2]:
+	* VERSION: bump
+	* src/main/perl/lib/README.md: generated
+	* src/main/bash/bin/make-cpan-dist.in
+	- initialize some variables
+
+Mon Apr 27 12:34:45 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.8.1]:
+	* VERSION: bump
+	* release-notes-1.8.1.md: new
+	* src/main/bash/bin/make-cpan-dist.in
+	- fix logging
+	- set -euo pipefail to make sure build fail in pipeline properly
+	* src/main/perl/lib/README.md: generated
+	* src/main/perl/bin/Makefile.am
+	(NO_ECHO): new
+	* src/main/perl/lib/Makefile.am: likewise
+	* src/main/perl/lib/File/Process.pm.in: pod whitespace
+	* src/main/perl/lib/File/Process/Utils.pm.in: likewise
+
 Wed Apr 22 16:04:33 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[1.8.0]:
-        * ChangeLog: modified
+        * release-notest-1.8.0.md
 	* VERSION: bump minor
         * src/main/perl/bin/make-cpan-dist.pl.in
 	(write_makefile)

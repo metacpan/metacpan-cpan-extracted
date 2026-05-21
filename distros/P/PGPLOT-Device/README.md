@@ -4,7 +4,7 @@ PGPLOT::Device - autogenerate PGPLOT device names
 
 # VERSION
 
-version 0.13
+version 0.14
 
 # SYNOPSIS
 
@@ -88,7 +88,7 @@ into the class constructor.
 The  internal counter which tracks the number of times the device object has
 been used is available as `${devn}`.
 
-# METHODS
+# CONSTRUCTORS
 
 ## new
 
@@ -163,6 +163,16 @@ constructor.  These are:
     - the device id is constant.
 
     Set to a true or false value to override the automatic configuration.
+
+# CLASS METHODS
+
+## devices
+
+    @devices = PGPLOT::Device->devices;
+
+Returns a list of the devices available in the local PGPLOT installation.
+
+# METHODS
 
 ## override
 
@@ -345,11 +355,11 @@ Please report any bugs or feature requests to bug-pgplot-device@rt.cpan.org  or 
 
 Source is available at
 
-    https://gitlab.com/djerius/pgplot-device
+    https://codeberg.org/djerius/p5-PGPLOT-Device
 
 and may be cloned from
 
-    https://gitlab.com/djerius/pgplot-device.git
+    https://codeberg.org/djerius/p5-PGPLOT-Device.git
 
 # SEE ALSO
 

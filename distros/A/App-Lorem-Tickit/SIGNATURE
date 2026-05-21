@@ -1,0 +1,69 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 8ded0155310b75453f729e0d474ba0cc3e5e59f89bf0c4c6cff1d41b3454298f CONCEPT
+SHA256 2c79d53f4b8f90d454d5ce51c889e71bd693f4030ac5e130059036848d0ad23b Changes
+SHA256 c06cc45fc6d57010cf924da08668c0e571d7ab3f3c56a01470b1a60c5167de49 LICENSE
+SHA256 6d20873472fbbaba40a9383971ed13580ebd44645014991bf78d5bff736c782e MANIFEST
+SHA256 1abb90f80b090c1f47d77e72f3592bae64b201da34354a1627a045c6e1fb3f9a META.yml
+SHA256 319507e7d4e6a91e2889d19be83b966f6e4118529990c42a8ad6e5e648bf5895 Makefile.PL
+SHA256 c171bbeecba436c823a3a131b4c60977b41d451263746a41edfe4f40cf22c552 README
+SHA256 1d585eee0a2b4ab7380073b8bddf41a391f43b0781973e3b30d285538ebf7cd4 Tickit.pm
+SHA256 a9fa293da3f09d08641e38545c9639a1b523e3f0f404aa8dc00dbbc35d9f7d11 Tickit/TextWidget.pm
+SHA256 85e8538e6ab4922cc82c870b2c166725c0039e9aad9630c34c267451c36e0827 Tickit/Widget.pm
+SHA256 bc702bc23d84c037a1742fa918f168557731d4660e76471218993d68dbfe7fbe bin/lorem-tickit
+SHA256 cd5397bbe618f5bbd4e12a33b0cf5d21114e771c2dbd0ce28e2135beb52c35a8 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 798836f9ccb8d204b1be31fc3835631f57e9d818b21a8f0d14bfcfb82ff4a72a inc/Module/Install/Base.pm
+SHA256 d64cd4c16f83c5baf11f64a44bea3a0abc060a49da5aba040f0eb01394bf75ab inc/Module/Install/Can.pm
+SHA256 65d7a6098bf3f829e8c1c2865476d3537aa6f0ad0ffc9149e10812c856529043 inc/Module/Install/Fetch.pm
+SHA256 70c4b77acab3ff51dfb318110369607cb109e1c319459249623b787cf3859750 inc/Module/Install/Makefile.pm
+SHA256 14556386168007ce913e669fc08a332ccdb6140246fd55a90c879b5190c1b57a inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 63ec8405523ae67c33823dcf4b136a46f0711fb17a8b58b49ddd922ed6b69611 inc/Module/Install/Scripts.pm
+SHA256 4c746c02c5cc19bed4c352e76205b4adff4c45ce8310d71294e1b83c059659c2 inc/Module/Install/Win32.pm
+SHA256 d3d9b4583243c470ae895defa4c44564485b53693cba1c50ab0320768f443e97 inc/Module/Install/WriteAll.pm
+SHA256 31a4818da39067180871d74452dc5ed7ab2409b4479e0f6c5a24a8d25b6790dc t/App-Lorem-Tickit-TextWidget/01-use.t
+SHA256 c03dc9b3a5962208ceddda4b3578f9575acac5c9b36ce33cba398869166d34f5 t/App-Lorem-Tickit-TextWidget/02-version.t
+SHA256 e6e211032c4e397e8e131d9e08c67cbf7b1ddbeaca3571c7b69053287982a7b1 t/App-Lorem-Tickit-TextWidget/03-new.t
+SHA256 02dd1c5cff1279635f11758dd959b6d63b4ecb59e281dc005cc38dd63abba780 t/App-Lorem-Tickit-Widget/01-use.t
+SHA256 39a85f2943dbb5228a814ecfee21754972ab3ad9c83c636bc190cc44ee407e76 t/App-Lorem-Tickit-Widget/02-version.t
+SHA256 314089e8a1da574dbd51a2dd9a3269f617537fa0a56a0727b9d656811e049af8 t/App-Lorem-Tickit-Widget/03-new.t
+SHA256 99392a29526cf1eed7cc4ef171ead76922fede4665e5cb9af1613d76f4974a7d t/App-Lorem-Tickit/01-use.t
+SHA256 34c6a312099df68f0d6a89df2ea2e3449992d44ca4c4fdbf053ddcd09c8dfa08 t/App-Lorem-Tickit/02-version.t
+SHA256 e46bd620855330aa1fe76000fe186788e1ac0bed68f49ac75280fa55d24b1cd5 t/App-Lorem-Tickit/03-new.t
+SHA256 db6ff33d16c70dab9a7ce588818a8a72f2e8a5119b5880679464feee22746830 t/App-Lorem-Tickit/04-run.t
+SHA256 74c48ddb304b86c54283e891b6e5aa335a3f5eb7faa00dd1845a2e0d23b163b8 xt/App-Lorem-Tickit-TextWidget/01-pod_coverage.t
+SHA256 7c820ddd76f70aa0b03aeedd8b4ade89a68d845c8b72de7800dbc819e8f99e1b xt/App-Lorem-Tickit-TextWidget/02-pod.t
+SHA256 a90ff8de9f4a433dcc493eee22e047af330165d008d6c23aec5c67dd315c7385 xt/App-Lorem-Tickit-Widget/01-pod_coverage.t
+SHA256 7ad88253b6acde679ddf58aa483f23adb5cc99b742f91edf474a055647129333 xt/App-Lorem-Tickit-Widget/02-pod.t
+SHA256 5caa6b41fe81824f4cfa4eee97bad6224c4e8a12eb62bfb6bec3f49dd250863d xt/App-Lorem-Tickit/01-pod_coverage.t
+SHA256 a809beccee8624f99508e97b7984654bd79e94fe4740fd61d5d72120839eb8cc xt/App-Lorem-Tickit/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEECAMiMrHl7JYa0rZPZ58rGyDXs5UFAmoJYFwACgkQZ58rGyDX
+s5Vg7Av9F3RhQHHZMrnUQ0sseLEbiaJKPvzB8nQM94MmN2FcVTjfuDO0p87+d89R
+hxwDXqGi6yP7h28M9Zz/mqFUSXuiHPQyvzhO7Ph4mbbYACb+jExKMnF+htD+a3Ue
+xtAmLJc8M3detp0s5REy0CzPQGD+Ouq+7h+6av7VpgAfrrR6PHVO64JKMWLs5l56
+cYZYrcTbEEt86Tb3LOay0g6NYb/PJH5doDlrcFKvH/cSfgp1cdwAr82haJpkY0Tb
+FUS/BEWUGUpxFIg6aODZFyTHgaHrnCSCBkHxzBFi3aRaWTuoMerON8Hy9/KpmAmU
+sBIGED0VVgZmn1OOoD5VE70Zho22QDc2xoSK3IutffGXIVYOQYg+6Hh9OwwRSZxH
+dZW0tAZSYlK/YVBe51kabs1ikLHKCj/tmpAOCTrG1gnRfhoWwP4GZPvE+0Cg+MIX
+UDXnMJdnGZo9wQvLbRaVA8vNDv5ALEy1mhTM+4GMv9KbkaeqHdyo7Y9SMad5kHBH
+HdHBRqOr
+=bg8f
+-----END PGP SIGNATURE-----

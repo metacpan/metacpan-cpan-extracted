@@ -39,7 +39,7 @@ my $etcd = EV::Etcd->new(
 ok($etcd, "created client");
 
 my $done = 0;
-my $expected = 8;
+my $expected = 9;  # status + alarm + hash_kv + auth_status + put + compact + hash_kv(rev) + delete + defragment
 
 # Test 1: status (already existed but good to verify)
 $etcd->status(sub {
@@ -82,20 +82,16 @@ $etcd->auth_status(sub {
     $done++;
 });
 
-# Test 5: compact - compaction requires us to first create some revisions
-# First, get the current revision by doing a put
+# Test 5: compact - chain compact + hash_kv(revision) + cleanup off the put
+# callback so the test plan is deterministic regardless of put RTT.
 my $compact_prefix = "/test-compact-$$-" . time();
-my $compact_revision;
 
 $etcd->put("$compact_prefix/key1", "value1", sub {
     my ($result, $err) = @_;
     ok(!$err, "compact prep: put succeeded");
-    $compact_revision = $result->{header}{revision} if $result->{header};
     $done++;
-});
 
-# Wait for the put to complete before compacting
-my $compact_timer = EV::timer 2, 0, sub {
+    my $compact_revision = $result->{header} && $result->{header}{revision};
     return unless $compact_revision;
 
     # Test 6: compact at the revision we just created
@@ -120,7 +116,7 @@ my $compact_timer = EV::timer 2, 0, sub {
             });
         });
     });
-};
+});
 
 # Test 8: defragment
 # Note: defragment can take time on large databases but should complete quickly on test DB

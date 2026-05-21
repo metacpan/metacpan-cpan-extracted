@@ -29,11 +29,11 @@ Readonly my $TEST_BOUNDARY        => 'boundary_tests';
 Readonly my $TYPE_OBJECT  => 'object';
 Readonly my $TYPE_BOOLEAN => 'boolean';
 
-our $VERSION = '0.33';
+our $VERSION = '0.38';
 
 =head1 VERSION
 
-Version 0.33
+Version 0.38
 
 =head1 DESCRIPTION
 
@@ -214,35 +214,25 @@ sub _emit_method_tests {
 	my $code   = "\n# --- Tests for $method ---\n";
 
 	# Emit each test type in a consistent fixed order
-	$code .= $self->_emit_basic_test($method)
-		if $plan->{$TEST_BASIC};
+	$code .= $self->_emit_basic_test($method) if $plan->{$TEST_BASIC};
 
-	$code .= $self->_emit_getter_test($method)
-		if $plan->{$TEST_GETTER};
+	$code .= $self->_emit_getter_test($method) if $plan->{$TEST_GETTER};
 
-	$code .= $self->_emit_setter_test($method)
-		if $plan->{$TEST_SETTER};
+	$code .= $self->_emit_setter_test($method) if $plan->{$TEST_SETTER};
 
-	$code .= $self->_emit_getset_test($method)
-		if $plan->{$TEST_GETSET};
+	$code .= $self->_emit_getset_test($method) if $plan->{$TEST_GETSET};
 
-	$code .= $self->_emit_chaining_test($method)
-		if $plan->{$TEST_CHAINING};
+	$code .= $self->_emit_chaining_test($method) if $plan->{$TEST_CHAINING};
 
-	$code .= $self->_emit_error_test($method)
-		if $plan->{$TEST_ERROR_HANDLING};
+	$code .= $self->_emit_error_test($method) if $plan->{$TEST_ERROR_HANDLING};
 
-	$code .= $self->_emit_context_test($method)
-		if $plan->{$TEST_CONTEXT};
+	$code .= $self->_emit_context_test($method) if $plan->{$TEST_CONTEXT};
 
-	$code .= $self->_emit_object_injection_test($method)
-		if $plan->{$TEST_OBJECT_INJECT};
+	$code .= $self->_emit_object_injection_test($method) if $plan->{$TEST_OBJECT_INJECT};
 
-	$code .= $self->_emit_boolean_test($method)
-		if $plan->{$TEST_PREDICATE} || $plan->{$TEST_BOOLEAN};
+	$code .= $self->_emit_boolean_test($method) if $plan->{$TEST_PREDICATE} || $plan->{$TEST_BOOLEAN};
 
-	$code .= $self->_emit_void_test($method)
-		if $plan->{$TEST_VOID};
+	$code .= $self->_emit_void_test($method) if $plan->{$TEST_VOID};
 
 	return $code;
 }
@@ -491,9 +481,9 @@ END_TEST
 # --------------------------------------------------
 # _emit_void_test
 #
-# Purpose:    Emit a test that verifies the method
-#             does not return a meaningful value,
-#             consistent with a void return type.
+# Emit a test that verifies the method
+#     does not return a meaningful value,
+#     consistent with a void return type.
 #
 # Entry:      $method - method name string.
 # Exit:       Returns a string of Perl test code.
@@ -505,8 +495,8 @@ sub _emit_void_test {
 	return <<"END_TEST";
 {
 	my \$result = eval { \$obj->$method() };
-	ok(!\$@,         '$method does not die');
-	ok(!defined \$result || 1, '$method void return noted');
+	ok(!\$@,          '$method does not die');
+	ok(!defined \$result, '$method returns nothing (void)');
 }
 END_TEST
 }

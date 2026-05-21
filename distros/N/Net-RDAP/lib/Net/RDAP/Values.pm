@@ -1,10 +1,12 @@
 package Net::RDAP::Values;
 use Carp;
 use File::Basename qw(basename);
+use File::Path qw(make_path);
 use File::Spec;
+use File::XDG;
 use Net::RDAP::UA;
 use XML::LibXML;
-use vars qw($UA $REGISTRY @EXPORT);
+use vars qw($UA $REGISTRY @EXPORT $CACHE_DIR);
 use constant {
     IANA_REGISTRY_URL                   => 'https://www.iana.org/assignments/rdap-json-values/rdap-json-values.xml',
 
@@ -37,6 +39,15 @@ our @EXPORT = qw(
 );
 
 our ($UA, $REGISTRY);
+
+our $CACHE_DIR = File::XDG->new(path_class => 'File::Spec', name => __PACKAGE__)->cache_home;
+
+#
+# untaint $CACHE_DIR
+#
+if ($CACHE_DIR =~ /(.+)/) {
+    $CACHE_DIR = $1;
+}
 
 =pod
 
@@ -160,7 +171,9 @@ sub description {
 sub load_registry {
     my $package = shift;
 
-    my $file = sprintf('%s/%s-%s', File::Spec->tmpdir, $package, basename(IANA_REGISTRY_URL));
+    croak(sprintf("Unable to create '%s'", $CACHE_DIR)) if (!-d $CACHE_DIR && !make_path($CACHE_DIR, { mode => 0700 }));
+
+    my $file = File::Spec->catfile($CACHE_DIR, basename(IANA_REGISTRY_URL));
 
     #
     # $UA may have been injected by Net::RDAP->ua()

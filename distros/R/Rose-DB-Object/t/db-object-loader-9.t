@@ -9,7 +9,7 @@ use Test::More tests => 1 + (1 * 3);
 
 BEGIN 
 {
-  require 't/test-lib.pl';
+  require './t/test-lib.pl';
   use_ok('Rose::DB::Object::Loader');
 }
 

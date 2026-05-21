@@ -1,5 +1,13 @@
 Change history for HTML-Parser
 
+3.85      2026-05-19
+    - Replace deprecated uvuni_to_utf8() with uvchr_to_utf8() (GH#50)
+      (GitHub Copilot, reported by James E Keenan)
+
+3.84      2026-05-19
+    - Fix heap-use-after-free in _decode_entities (CVE-2026-8829) (GH#56)
+      (Paul Johnson)
+
 3.83      2024-07-30
     - fix '$\/]' in HTML::Entities::encode_entities (GH#45) (mauke)
 

@@ -3,7 +3,7 @@
  *@ Remarks:
  *@ - code requires ISO STD C99 (for now).
  *
- * Copyright (c) 2024 - 2025 Steffen Nurpmeso <steffen@sdaoden.eu>.
+ * Copyright (c) 2024 - 2026 Steffen Nurpmeso <steffen@sdaoden.eu>.
  * SPDX-License-Identifier: ISC
  *
  * Permission to use, copy, modify, and/or distribute this software for any
@@ -30,15 +30,6 @@
 #define s_BSDIPA_IO_READ
 #define s_BSDIPA_IO_WRITE
 /**/
-#define s_BSDIPA_IO s_BSDIPA_IO_ZLIB
-#include "c-lib/s-bsdipa-io.h"
-/**/
-#if s__BSDIPA_XZ
-# undef s_BSDIPA_IO
-# define s_BSDIPA_IO s_BSDIPA_IO_XZ
-# include "c-lib/s-bsdipa-io.h"
-#endif
-/**/
 #if s__BSDIPA_BZ2
 # undef s_BSDIPA_IO
 # define s_BSDIPA_IO s_BSDIPA_IO_BZ2
@@ -48,22 +39,44 @@
 #undef s_BSDIPA_IO
 #define s_BSDIPA_IO s_BSDIPA_IO_RAW
 #include "c-lib/s-bsdipa-io.h"
+/**/
+#if s__BSDIPA_XZ
+# undef s_BSDIPA_IO
+# define s_BSDIPA_IO s_BSDIPA_IO_XZ
+# include "c-lib/s-bsdipa-io.h"
+#endif
+/**/
+#undef s_BSDIPA_IO
+#define s_BSDIPA_IO s_BSDIPA_IO_ZLIB
+#include "c-lib/s-bsdipa-io.h"
+/**/
+#if s__BSDIPA_ZSTD
+# undef s_BSDIPA_IO
+# define s_BSDIPA_IO s_BSDIPA_IO_ZSTD
+# include "c-lib/s-bsdipa-io.h"
+#endif
 
 #include <c-lib/s-bsdiff.c>
 #include <c-lib/s-bspatch.c>
+
+#define a_LEVEL_SET(LS,LV) LS = (LV < 0 ? 0 : LV > 9 ? 9 : LV)
 
 union a_io_cookie{
 	void *ioc_vp;
 	struct s_bsdipa_io_cookie *ioc_iocp;
 #if s__BSDIPA_XZ
-	struct s_bsdipa_io_cookie_xz *ioc_iocxp;
+	struct s_bsdipa_io_cookie_xz *ioc_iocJp;
+#endif
+#if s__BSDIPA_ZSTD
+	struct s_bsdipa_io_cookie_zstd *ioc_iocZp;
 #endif
 };
 
 static IV a_try_oneshot = -1;
 static IV a_level = 0;
-static IV const a_have_xz = s__BSDIPA_XZ;
 static IV const a_have_bz2 = s__BSDIPA_BZ2;
+static IV const a_have_xz = s__BSDIPA_XZ;
+static IV const a_have_zstd = s__BSDIPA_ZSTD;
 
 static void *a_alloc(size_t size);
 static void a_free(void *vp);
@@ -154,16 +167,21 @@ a_core_diff(int what, SV *before_sv, SV *after_sv, SV *patch_sv, SV *magic_windo
 	if(iseq != NULL)
 		SvIV_set(iseq, d.dc_is_equal_data);
 
+	/* _RAW is very "unlikely" */
 	SvPVCLEAR(pref);
 	if(what == s_BSDIPA_IO_ZLIB)
 		s = s_bsdipa_io_write_zlib(&d, &a_core_diff__write, pref, a_try_oneshot, iocp);
+#if s__BSDIPA_BZ2
+	else if(what == s_BSDIPA_IO_BZ2)
+		s = s_bsdipa_io_write_bz2(&d, &a_core_diff__write, pref, a_try_oneshot, iocp);
+#endif
 #if s__BSDIPA_XZ
 	else if(what == s_BSDIPA_IO_XZ)
 		s = s_bsdipa_io_write_xz(&d, &a_core_diff__write, pref, a_try_oneshot, iocp);
 #endif
-#if s__BSDIPA_BZ2
-	else if(what == s_BSDIPA_IO_BZ2)
-		s = s_bsdipa_io_write_bz2(&d, &a_core_diff__write, pref, a_try_oneshot, iocp);
+#if s__BSDIPA_ZSTD
+	else if(what == s_BSDIPA_IO_ZSTD)
+		s = s_bsdipa_io_write_zstd(&d, &a_core_diff__write, pref, a_try_oneshot, iocp);
 #endif
 	else /*if(what == s_BSDIPA_IO_RAW)*/{
 		s_bsdipa_off_t x;
@@ -279,15 +297,20 @@ a_core_patch(int what, SV *after_sv, SV *patch_sv, SV *before_sv, SV *max_allowe
 	p.pc_patch_len = SvCUR(patch_sv);
 	p.pc_patch_dat = SvPVbyte_nolen(patch_sv);
 
+	/* _RAW is very "unlikely" */
 	if(what == s_BSDIPA_IO_ZLIB)
 		s = s_bsdipa_io_read_zlib(&p, iocp);
+#if s__BSDIPA_BZ2
+	else if(what == s_BSDIPA_IO_BZ2)
+		s = s_bsdipa_io_read_bz2(&p, iocp);
+#endif
 #if s__BSDIPA_XZ
 	else if(what == s_BSDIPA_IO_XZ)
 		s = s_bsdipa_io_read_xz(&p, iocp);
 #endif
-#if s__BSDIPA_BZ2
-	else if(what == s_BSDIPA_IO_BZ2)
-		s = s_bsdipa_io_read_bz2(&p, iocp);
+#if s__BSDIPA_ZSTD
+	else if(what == s_BSDIPA_IO_ZSTD)
+		s = s_bsdipa_io_read_zstd(&p, iocp);
 #endif
 	else /*if(what == s_BSDIPA_IO_RAW)*/
 		s = s_bsdipa_io_read_raw(&p, iocp);
@@ -347,6 +370,13 @@ OUTPUT:
 	RETVAL
 
 SV *
+HAVE_BZ2()
+CODE:
+	RETVAL = newSViv(a_have_bz2);
+OUTPUT:
+	RETVAL
+
+SV *
 HAVE_XZ()
 CODE:
 	RETVAL = newSViv(a_have_xz);
@@ -354,9 +384,9 @@ OUTPUT:
 	RETVAL
 
 SV *
-HAVE_BZ2()
+HAVE_ZSTD()
 CODE:
-	RETVAL = newSViv(a_have_bz2);
+	RETVAL = newSViv(a_have_zstd);
 OUTPUT:
 	RETVAL
 
@@ -399,8 +429,10 @@ void
 core_diff_level_set(nval)
 	SV *nval
 CODE:
-	if(SvIOK(nval))
+	if(SvIOK(nval)){
 		a_level = SvIV(nval);
+		a_LEVEL_SET(a_level, a_level);
+	}
 
 SV *
 core_diff_raw(before_sv, after_sv, patch_sv, magic_window=NULL, is_equal_data=NULL, io_cookie=NULL)
@@ -428,6 +460,21 @@ CODE:
 OUTPUT:
 	RETVAL
 
+#if s__BSDIPA_BZ2
+SV *
+core_diff_bz2(before_sv, after_sv, patch_sv, magic_window=NULL, is_equal_data=NULL, io_cookie=NULL)
+	SV *before_sv
+	SV *after_sv
+	SV *patch_sv
+	SV *magic_window
+	SV *is_equal_data
+	SV *io_cookie
+CODE:
+	RETVAL = a_core_diff(s_BSDIPA_IO_BZ2, before_sv, after_sv, patch_sv, magic_window, is_equal_data, io_cookie);
+OUTPUT:
+	RETVAL
+#endif
+
 #if s__BSDIPA_XZ
 SV *
 core_diff_xz(before_sv, after_sv, patch_sv, magic_window=NULL, is_equal_data=NULL, io_cookie=NULL)
@@ -443,9 +490,9 @@ OUTPUT:
 	RETVAL
 #endif
 
-#if s__BSDIPA_BZ2
+#if s__BSDIPA_ZSTD
 SV *
-core_diff_bz2(before_sv, after_sv, patch_sv, magic_window=NULL, is_equal_data=NULL, io_cookie=NULL)
+core_diff_zstd(before_sv, after_sv, patch_sv, magic_window=NULL, is_equal_data=NULL, io_cookie=NULL)
 	SV *before_sv
 	SV *after_sv
 	SV *patch_sv
@@ -453,7 +500,7 @@ core_diff_bz2(before_sv, after_sv, patch_sv, magic_window=NULL, is_equal_data=NU
 	SV *is_equal_data
 	SV *io_cookie
 CODE:
-	RETVAL = a_core_diff(s_BSDIPA_IO_BZ2, before_sv, after_sv, patch_sv, magic_window, is_equal_data, io_cookie);
+	RETVAL = a_core_diff(s_BSDIPA_IO_ZSTD, before_sv, after_sv, patch_sv, magic_window, is_equal_data, io_cookie);
 OUTPUT:
 	RETVAL
 #endif
@@ -482,20 +529,6 @@ CODE:
 OUTPUT:
 	RETVAL
 
-#if s__BSDIPA_XZ
-SV *
-core_patch_xz(after_sv, patch_sv, before_sv, max_allowed_restored_len=NULL, io_cookie=NULL)
-	SV *after_sv
-	SV *patch_sv
-	SV *before_sv
-	SV *max_allowed_restored_len
-	SV *io_cookie
-CODE:
-	RETVAL = a_core_patch(s_BSDIPA_IO_XZ, after_sv, patch_sv, before_sv, max_allowed_restored_len, io_cookie);
-OUTPUT:
-	RETVAL
-#endif
-
 #if s__BSDIPA_BZ2
 SV *
 core_patch_bz2(after_sv, patch_sv, before_sv, max_allowed_restored_len=NULL, io_cookie=NULL)
@@ -512,19 +545,66 @@ OUTPUT:
 
 #if s__BSDIPA_XZ
 SV *
+core_patch_xz(after_sv, patch_sv, before_sv, max_allowed_restored_len=NULL, io_cookie=NULL)
+	SV *after_sv
+	SV *patch_sv
+	SV *before_sv
+	SV *max_allowed_restored_len
+	SV *io_cookie
+CODE:
+	RETVAL = a_core_patch(s_BSDIPA_IO_XZ, after_sv, patch_sv, before_sv, max_allowed_restored_len, io_cookie);
+OUTPUT:
+	RETVAL
+#endif
+
+#if s__BSDIPA_ZSTD
+SV *
+core_patch_zstd(after_sv, patch_sv, before_sv, max_allowed_restored_len=NULL, io_cookie=NULL)
+	SV *after_sv
+	SV *patch_sv
+	SV *before_sv
+	SV *max_allowed_restored_len
+	SV *io_cookie
+CODE:
+	RETVAL = a_core_patch(s_BSDIPA_IO_ZSTD, after_sv, patch_sv, before_sv, max_allowed_restored_len, io_cookie);
+OUTPUT:
+	RETVAL
+#endif
+
+#if s__BSDIPA_XZ
+SV *
 core_io_cookie_new_xz(level=NULL)
 	SV *level
 CODE:
-	struct s_bsdipa_io_cookie_xz *iocxp;
+	struct s_bsdipa_io_cookie_xz *iocJp;
 	IV lvl;
 
 	lvl = (level != NULL && SvIOK(level)) ? SvIV(level) : 0;
 
-	iocxp = (struct s_bsdipa_io_cookie_xz*)a_alloc(sizeof(*iocxp));
-	memset(iocxp, 0, sizeof(*iocxp));
-	iocxp->iocx_super.ioc_type = s_BSDIPA_IO_XZ;
-	iocxp->iocx_super.ioc_level = lvl;
-	RETVAL = newSViv(PTR2IV(iocxp));
+	iocJp = (struct s_bsdipa_io_cookie_xz*)a_alloc(sizeof(*iocJp));
+	memset(iocJp, 0, sizeof(*iocJp));
+	iocJp->iocx_super.ioc_type = s_BSDIPA_IO_XZ;
+	a_LEVEL_SET(iocJp->iocx_super.ioc_level, lvl);
+	RETVAL = newSViv(PTR2IV(iocJp));
+OUTPUT:
+	RETVAL
+#endif
+
+#if s__BSDIPA_ZSTD
+SV *
+core_io_cookie_new_zstd(level=NULL)
+	SV *level
+CODE:
+	struct s_bsdipa_io_cookie_zstd *iocZp;
+	IV lvl;
+
+	lvl = (level != NULL && SvIOK(level)) ? SvIV(level) : 0;
+
+	iocZp = (struct s_bsdipa_io_cookie_zstd*)a_alloc(sizeof(*iocZp));
+	memset(iocZp, 0, sizeof(*iocZp));
+	iocZp->iocZ_super.ioc_type = s_BSDIPA_IO_ZSTD;
+	a_LEVEL_SET(iocZp->iocZ_super.ioc_level, lvl);
+	RETVAL = newSViv(PTR2IV(iocZp));
 OUTPUT:
 	RETVAL
 #endif
@@ -542,6 +622,10 @@ CODE:
 #if s__BSDIPA_XZ
 			if(ioc.ioc_iocp->ioc_type == s_BSDIPA_IO_XZ)
 				s_bsdipa_io_cookie_gut_xz(ioc.ioc_iocp);
+#endif
+#if s__BSDIPA_ZSTD
+			if(ioc.ioc_iocp->ioc_type == s_BSDIPA_IO_ZSTD)
+				s_bsdipa_io_cookie_gut_zstd(ioc.ioc_iocp);
 #endif
 			a_free(ioc.ioc_vp);
 		}

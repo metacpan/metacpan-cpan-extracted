@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::DescribeMe qw(extended);
+# use Test::DescribeMe qw(extended);
 use Test::Most;
 use Test::Needs 'Params::Validate';
 use File::Temp qw(tempdir);

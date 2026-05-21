@@ -1,9 +1,9 @@
 use strict;
 use warnings FATAL => 'all';
-use Test::Warnings qw( :all :no_end_test );
 
 use Test::More;
-use WWW::Mechanize::Cached;
+use Test::Warnings         qw( :all :no_end_test );
+use WWW::Mechanize::Cached ();
 
 use lib 't';
 use TestCache;

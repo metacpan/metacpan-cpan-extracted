@@ -783,8 +783,8 @@ sub _evaluate_condition {
     
         return 0 unless defined $lhs && $lhs =~ /^-?\d+(?:\.\d+)?$/;
     
-        my $expr = eval "$lhs $op1 $rhs1";
-        return eval "$expr $cmp $rhs2";
+        my $expr = _apply_numeric_operator($lhs, $op1, $rhs1);
+        return _compare_numeric_values($expr, $cmp, $rhs2);
     }
 
     # support for multiple conditions: split and evaluate recursively
@@ -911,6 +911,34 @@ sub _evaluate_condition {
             }
         }
     }
+
+    return 0;
+}
+
+sub _apply_numeric_operator {
+    my ($lhs, $operator, $rhs) = @_;
+
+    return $lhs + $rhs if $operator eq '+';
+    return $lhs - $rhs if $operator eq '-';
+    return $lhs * $rhs if $operator eq '*';
+    return undef if ($operator eq '/' || $operator eq '%') && $rhs == 0;
+    return $lhs / $rhs if $operator eq '/';
+    return $lhs % $rhs if $operator eq '%';
+
+    return undef;
+}
+
+sub _compare_numeric_values {
+    my ($lhs, $operator, $rhs) = @_;
+
+    return 0 unless defined $lhs && defined $rhs;
+
+    return $lhs == $rhs if $operator eq '==';
+    return $lhs != $rhs if $operator eq '!=';
+    return $lhs >= $rhs if $operator eq '>=';
+    return $lhs <= $rhs if $operator eq '<=';
+    return $lhs >  $rhs if $operator eq '>';
+    return $lhs <  $rhs if $operator eq '<';
 
     return 0;
 }

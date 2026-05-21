@@ -4,12 +4,19 @@ use strict;
 use warnings;
 use v5.10;
 
+use Encode::Locale;
 use Scalar::Util qw(blessed looks_like_number);
 
 use File::Information;
 
+if (-t STDOUT) {
+    binmode(STDOUT, ':encoding(console_out)');
+} else {
+    binmode(STDOUT, ':utf8');
+}
+
 # Check which types we, only request data for installed modules.
-my @as_types = qw(bool mediatype raw);
+my @as_types = qw(bool mediatype binary raw);
 unshift(@as_types, 'DateTime')          if eval { require DateTime;         1 };
 unshift(@as_types, 'Data::Identifier');
 
@@ -115,6 +122,7 @@ foreach my $filename (@ARGV) {
                 $found_new = 1;
                 $chunks_seen{$chunk} = undef;
                 dump_base($chunks{$chunk}, \%chunks);
+                dump_base(scalar eval {$chunks{$chunk}->deep}, \%chunks) unless $config{skip_deep};
             }
 
             last unless $found_new;
@@ -222,6 +230,9 @@ sub dump_base {
                     }
                 } elsif ($type eq 'bool') {
                     $value = $value ? 'true' : 'false';
+                } elsif ($type eq 'binary') {
+                    print_hexdump($lifecycle, $max_len, $key, $value);
+                    next;
                 } elsif (looks_like_number($value)) {
                     # no-op
                 } else {

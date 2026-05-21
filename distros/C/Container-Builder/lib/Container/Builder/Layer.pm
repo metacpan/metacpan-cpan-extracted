@@ -4,17 +4,51 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 
+use IO::Compress::Gzip qw(gzip);
+
 class Container::Builder::Layer {
 	field $comment :param = '';
+	field $compress :param = 0;
+	field $uncompressed_digest = '';
+	field $digest = '';
+	field $size = 0;
 
 	# This method is called in the builder to generate the artifact (bytes on disk) that will be put in the container image
 	method generate_artifact() { }
 
 	# These three methods are used by the manifest to generate the layers array
 	method get_comment() { $comment }
-	method get_media_type() { }
-	method get_digest() { }
-	method get_size() { }
+	method get_compression() { $compress }
+	method get_media_type() { 
+		my $s = "application/vnd.oci.image.layer.v1.tar";
+		$s .= '+gzip' if $compress;
+		return $s;
+	}
+	method get_unc_digest() { return $uncompressed_digest }
+	method get_digest() { return $digest }
+	method get_size() { return $size }
+
+	method _parent_does_stuff($data_ref) {
+		# TODO: Is it possible to pass this by ref, so we avoid copying for calculating the digest?
+		$uncompressed_digest = Crypt::Digest::SHA256::sha256_hex($$data_ref);
+		if($compress) {
+			my $gunzip_compressed_data;
+			IO::Compress::Gzip::gzip($data_ref => \$gunzip_compressed_data) or die "Unable to gunzip the data\n";
+			$self->_scrub_gzip_timestamp(\$gunzip_compressed_data);
+			$size = length($gunzip_compressed_data);
+			$digest = Crypt::Digest::SHA256::sha256_hex($gunzip_compressed_data);
+			return \$gunzip_compressed_data;
+		} else {
+			$size = length($$data_ref);
+			$digest = $uncompressed_digest;
+			return $data_ref;
+		}
+	}
+
+	# Pass a ref
+	method _scrub_gzip_timestamp($s) {
+		$$s =~ s/^\x1f\x8b\x08(.).{4}/\x1f\x8b\x08$1\x00\x00\x00\x00/;
+	}
 }
 
 1;

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Copyright (C) 2019-2025 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2019-2026 National Marrow Donor Program. All rights reserved.
 # See also LICENSE file.
 #
 # Usage example:
@@ -18,6 +18,13 @@
 # Influenced by solace-samples-amqp-qpid-proton-python and cli-proton-python:
 # https://github.com/SolaceSamples/solace-samples-amqp-qpid-proton-python
 # https://github.com/rh-messaging/cli-proton-python
+#
+# Qpid Proton Python is dependent on the Qpid Proton C API.  E.g., Receiver.flow(n):
+# https://qpid.apache.org/releases/qpid-proton-0.37.0/proton/python/docs/_modules/proton/_endpoints.html
+# https://qpid.apache.org/releases/qpid-proton-0.37.0/proton/c/api/group__link.html
+#
+# The Red Hat Qpid Python documentation may also be informative:
+# https://docs.redhat.com/en/documentation/red_hat_build_of_apache_qpid_proton_python/0.40/html/using_qpid_python/index
 #
 
 from __future__ import print_function
@@ -61,6 +68,8 @@ def get_options():
                   help="file system directory for output files")
     parser.add_option("-x", "--suffix", default=".amqp.msg",
                   help="filename suffix for output files (default %default)")
+    parser.add_option("-m", "--timelimit", type=int, default=-1,
+                  help="execution time limit, in seconds, if non-negative (default %default)")
 
     opts, args = parser.parse_args()
 
@@ -72,8 +81,11 @@ Creates an amqp connection using ANONYMOUS or PLAIN authentication.
 Then attaches a receiver link to consume messages from the broker.
 """
 class Recv(MessagingHandler):
-    def __init__(self, debug, url, vhost, address, truststore, sslcert, sslkey, sslpass, username, password, timeout, outputdir, suffix):
-        super(Recv, self).__init__()
+    def __init__(self, debug, url, vhost, address, truststore, sslcert,
+                 sslkey, sslpass, username, password, timeout, outputdir,
+                 suffix, timelimit):
+
+        super(Recv, self).__init__(prefetch = 1, peer_close_is_error = True)
 
         self.connection = None
         self.receiver = None
@@ -117,6 +129,10 @@ class Recv(MessagingHandler):
 
         # suffix
         self.suffix = suffix
+
+        # execution time limit
+        self.start_timestamp = time.time()
+        self.timelimit = timelimit
 
     def on_start(self, event):
         if self.debug >= 1:
@@ -172,11 +188,16 @@ class Recv(MessagingHandler):
         if self.debug >= 1:
             print('on_reactor_quiesced [{},{}]:  {}'.format(self.inactivity_timestamp, time.time(), event))
 
-        # TODO: improve robustness of link/session/connection/container teardown (instead of relying solely on inactivity timeout)
+        # TODO: improve link/session/connection/container teardown (to avoid waiting for inactivity)?
         if self.inactivity_timestamp == 0:
             self.inactivity_timestamp = time.time()
         inactivity_seconds = time.time() - self.inactivity_timestamp
-        if inactivity_seconds > 0.1 and inactivity_seconds >= self.inactivity_threshold:
+        runtime_seconds = time.time() - self.start_timestamp
+        if ((inactivity_seconds > 0.1 and inactivity_seconds >= self.inactivity_threshold)
+            or (self.timelimit >= 0 and runtime_seconds >= self.inactivity_threshold
+                and runtime_seconds >= self.timelimit)):
+            if self.receiver:
+                self.receiver.close()
             if self.connection:
                 self.connection.close()
             else:
@@ -195,7 +216,8 @@ class Recv(MessagingHandler):
         filename_prefix += '%03i.' % self.msg_seqnum
 
         created_filename = None
-        with tempfile.NamedTemporaryFile(dir=self.outputdir[0], mode='wt', prefix=filename_prefix, suffix=self.suffix, delete=False) as fd:
+        with tempfile.NamedTemporaryFile(dir=self.outputdir[0], mode='wt',
+            prefix=filename_prefix, suffix=self.suffix, delete=False) as fd:
             if event.message.annotations:
                 for k, v in event.message.annotations.items():
                     print("{}: {}".format(k,v), file=fd)
@@ -223,12 +245,21 @@ class Recv(MessagingHandler):
         for otherdir in self.outputdir[1:]:
             with open(created_filename, mode='rt') as fd1:
                 copied_filename = None
-                with tempfile.NamedTemporaryFile(dir=otherdir, mode='wt', prefix=filename_prefix, suffix='.amqp.msg', delete=False) as fd2:
+                with tempfile.NamedTemporaryFile(dir=otherdir, mode='wt',
+                    prefix=filename_prefix, suffix='.amqp.msg', delete=False) as fd2:
                     shutil.copyfileobj(fd1, fd2)
                     copied_filename = fd2.name
                 print("Copied to file", copied_filename)
 
         self.inactivity_timestamp = 0
+
+        if self.timelimit >= 0 and (time.time() - self.start_timestamp) >= self.timelimit:
+            # exit early if timelimit exceeded
+            event.receiver.close()
+            event.connection.close()
+        else:
+            # add link credit to enable delivery of next message
+            event.receiver.flow(1)
 
     # the on_transport_error event catches socket and authentication failures
     def on_transport_error(self, event):
@@ -267,19 +298,9 @@ the amqp receiver source.
 """
 
 try:
-    recv = Recv(opts.debug,
-                opts.broker,
-                opts.vhost,
-                opts.address,
-                opts.truststore,
-                opts.sslcert,
-                opts.sslkey,
-                sslpass,
-                opts.username,
-                password,
-                opts.timeout,
-                opts.outputdir,
-                opts.suffix)
+    recv = Recv(opts.debug, opts.broker, opts.vhost, opts.address, opts.truststore,
+                opts.sslcert, opts.sslkey, sslpass, opts.username, password,
+                opts.timeout, opts.outputdir, opts.suffix, opts.timelimit)
     container = Container(recv)
     # start proton event reactor
     container.run()

@@ -206,7 +206,7 @@ int CPipe::Disconnect(int iPurge){
 
 int	CPipe::Error(int iErrorNum, char *szErrorText){
 	strncpy((char *)szError, szErrorText, ERROR_TEXT_SIZE);
-	szError[ERROR_TEXT_SIZE] = '\0';
+	szError[ERROR_TEXT_SIZE - 1] = '\0';
 	iError = iErrorNum;
 	return iError;
 }

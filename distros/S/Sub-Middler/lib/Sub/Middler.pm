@@ -5,7 +5,7 @@ use warnings;
 use feature "refaliasing";
 
 
-our $VERSION = 'v0.4.0';
+our $VERSION = 'v0.4.1';
 use Export::These qw<linker>;
 
 sub new {
@@ -87,12 +87,22 @@ sub _sink_sub {
       if(/SCALAR/){
         $out=$is_dispatch
         ?sub {
-          $$in.="@{$_[0]}";
+          if($$in){
+            $$in.=qq|$"@{$_[0]}|;
+          }
+          else {
+            $$in.=qw|@{$_[0]}|;
+          }
           $_[1] and $_[1]->(); # Auto call call back
         }
         :sub {
           #Convert into string
-          $$in.="@{$_[0]}";
+          if($$in){
+            $$in.=qq|$"@{$_[0]}|;
+          }
+          else {
+            $$in.=qq|@{$_[0]}|;
+          }
           &$next;
         }
       }
@@ -147,13 +157,12 @@ sub _sink_sub {
           # treat a ref to a code ref as 
           $out=$is_dispatch
           ?sub {
-            my @res=&$r;
+            &$r;
             $_[1] and $_[1]->();
           }
 
           :sub {
-            my @res=&$r;
-            #$next->(@res);
+            &$r;
             &$next;
           }
         }
@@ -292,14 +301,16 @@ Instead of writing custom middleware, references to variables and CODE can be
 used instead.
 
 If an array reference is used, all elements from the first argument will be
-appended to the array
+appended to the referenced array
 
 If an hash reference is used, the elements from the first argument will be
 treated as key value pairs and set the corresponding elements in the target
 hash
 
-If a scalar reference is use, the elements from the first argument will be
-converted to strings and appending to the target variable
+If a scalar reference is used, the elements from the first argument will be
+converted to strings using the C<$"> variable as the joiner. If the scalar
+already has length, it is treated as another item and joined with the C<$">
+like it was another element in the input;
 
 
 If a reference is a CODE reference is used, the underlying subroutine is

@@ -1,0 +1,127 @@
+======================================================================
+ Tá» Ghi Nhá» Modern::Open                        [VI] Tiáº¿ng Viá»t
+======================================================================
+
+[ 1. CÃ i Äáº·t vÃ  sá»­ dá»¥ng ]
+
+  CÃ i Äáº·t:
+    cpan Modern::Open
+
+  Sá»­ dá»¥ng trong script:
+    use Modern::Open;
+
+  Hiá»u quáº£: thay tháº¿ open(), opendir(), sysopen(), pipe(), socket(),
+             vÃ  accept() báº±ng phiÃªn báº£n autovivification + autodie.
+             Hoáº¡t Äá»ng trÃªn Perl 5.005_03 vÃ  táº¥t cáº£ cÃ¡c phiÃªn báº£n sau.
+             Lưu ý: socket() hỗ trợ autovivification nhưng không autodie.
+
+[ 2. open() -- dáº¡ng 2 Äá»i sá» ]
+
+  my $fh;
+  open($fh, "< file.txt");   # Äá»c
+  open($fh, "> file.txt");   # ghi (ghi ÄÃ¨)
+  open($fh, ">> file.txt");  # thÃªm vÃ o
+  open($fh, "+< file.txt");  # Äá»c/ghi
+  open($fh, "cmd |");        # Äá»c tá»« pipe lá»nh
+  open($fh, "| cmd");        # ghi vÃ o pipe lá»nh
+
+  while (my $line = readline($fh)) { ... }
+  print $fh "text\n";
+  close($fh);
+
+[ 3. open() -- dáº¡ng 3 Äá»i sá» ]
+
+  my $fh;
+  open($fh, '<',  "file.txt");   # Äá»c
+  open($fh, '>',  "file.txt");   # ghi (ghi ÄÃ¨)
+  open($fh, '>>', "file.txt");   # thÃªm vÃ o
+  open($fh, '+<', "file.txt");   # Äá»c/ghi
+  open($fh, '+>', "file.txt");   # Äá»c/ghi (ghi ÄÃ¨)
+  open($fh, '-|', "cmd");        # Äá»c tá»« pipe lá»nh
+  open($fh, '|-', "cmd");        # ghi vÃ o pipe lá»nh
+
+[ 4. opendir() ]
+
+  my $dh;
+  opendir($dh, "/path/to/dir");
+
+  while (my $entry = readdir($dh)) {
+      next if $entry eq '.' or $entry eq '..';
+      print "$entry\n";
+  }
+  closedir($dh);
+
+[ 5. sysopen() ]
+
+  use Fcntl qw(O_RDONLY O_WRONLY O_CREAT O_TRUNC);
+
+  my $fh;
+  sysopen($fh, "file.txt", O_RDONLY);
+  sysopen($fh, "file.txt", O_WRONLY | O_CREAT | O_TRUNC);
+  sysopen($fh, "file.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+
+[ 6. pipe() ]
+
+  my($reader, $writer);
+  pipe($reader, $writer);
+
+  if (my $pid = fork()) {
+      close($writer);
+      while (my $line = readline($reader)) { print $line }
+      close($reader);
+  } else {
+      close($reader);
+      print $writer "Xin chÃ o tá»« tiáº¿n trÃ¬nh con\n";
+      close($writer);
+      exit 0;
+  }
+
+[ 7. socket() vÃ  accept() ]
+
+  use Socket qw(AF_INET SOCK_STREAM sockaddr_in inet_aton);
+
+  my $server;
+  socket($server, AF_INET, SOCK_STREAM, 0);
+  # Lưu ý: socket() không autodie; tự kiểm tra giá trị trả về.
+
+  my $client;
+  accept($client, $server);
+
+[ 8. HÃ nh vi autodie ]
+
+  # Ngá»¯ cáº£nh void: die khi tháº¥t báº¡i
+  open($fh, "< no_such_file.txt");   # dies: Can't open(...)
+
+  # Vá»i giÃ¡ trá» tráº£ vá»: undef/0 khi tháº¥t báº¡i
+  my $rc = open($fh, "< file.txt");
+  unless ($rc) { warn "open tháº¥t báº¡i: $!" }
+
+  # Bareword:
+  open(FILE, "< file.txt");   # dies: Bare handle no longer supported
+
+[ 9. Handle ÄÆ°á»£c tráº£ vá» ]
+
+  readline($fh)        # Äá»c má»t dÃ²ng
+  read($fh, $buf, $n)  # Äá»c N byte
+  print $fh "..."      # ghi
+  binmode($fh)         # cháº¿ Äá» nhá» phÃ¢n
+  seek($fh, 0, 0)      # Äáº¿n Äáº§u
+  tell($fh)            # vá» trÃ­ hiá»n táº¡i
+  close($fh)           # ÄÃ³ng
+  eof($fh)             # kiá»m tra cuá»i file
+
+[ 10. TÆ°Æ¡ng thÃ­ch ]
+
+  PhiÃªn báº£n Perl : 5.005_03 trá» lÃªn (bao gá»m 5.42)
+  Ná»n táº£ng       : Unix, Linux, macOS, Windows (xá»­ lÃ½ CRLF tá»± Äá»ng)
+  Phá»¥ thuá»c      : Fcntl (mÃ´-Äun lÃµi)
+
+[ 11. Official resources ]
+
+  Modern::Open (MetaCPAN):
+    https://metacpan.org/dist/Modern-Open
+
+  INABA Hitoshi (ina) on CPAN:
+    https://metacpan.org/author/INA
+
+======================================================================

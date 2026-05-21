@@ -2,22 +2,35 @@ use 5.008003;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use ExtUtils::Depends;
 use Config;
 
-# Platform-specific linker flags for symbol export.
-#
-# Solaris/SunOS use their own native ld (not GNU ld) which rejects both
-# --export-dynamic and -soname. Their default behaviour already exports
-# symbols, so we leave $Config{lddlflags} alone there. OpenBSD's ld is
-# also non-GNU and gets the same treatment.
 my %platform_args;
 if ($^O eq 'linux' || $^O eq 'freebsd' || $^O eq 'netbsd' ||
     $^O eq 'dragonfly') {
     $platform_args{LDDLFLAGS} = $Config{lddlflags} . ' -Wl,--export-dynamic -Wl,-soname,Raw.so';
 }
 elsif ($^O eq 'MSWin32' || $^O eq 'cygwin' || $^O eq 'msys') {
-    $platform_args{LDDLFLAGS} = ($Config{lddlflags} || '') . ' -Wl,--export-all-symbols';
+    my $implib = 'blib/arch/auto/File/Raw/libRaw.dll.a';
+    $platform_args{LDDLFLAGS} = ($Config{lddlflags} || '')
+        . ' -Wl,--export-all-symbols'
+        . " -Wl,--out-implib=$implib";
 }
+
+my $pkg = ExtUtils::Depends->new('File::Raw');
+$pkg->set_inc('-I. -Iinclude');
+$pkg->install('include/file_plugin.h');
+
+if ($^O eq 'MSWin32' || $^O eq 'cygwin' || $^O eq 'msys') {
+    my $arch = $Config{installsitearch};
+    $pkg->set_libs(qq{-L"$arch/auto/File/Raw" -lRaw});
+}
+
+mkdir 'Install' unless -d 'Install';
+$pkg->save_config('Install/Files.pm');
+my %dep_vars = $pkg->get_makefile_vars;
+
+$dep_vars{PM}{'lib/File/Raw.pm'} = '$(INST_LIB)/File/Raw.pm';
 
 my %WriteMakefileArgs = (
     NAME             => 'File::Raw',
@@ -29,6 +42,7 @@ my %WriteMakefileArgs = (
     macro => { TARFLAGS   => "--format=ustar -c -v -f" },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
+        'ExtUtils::Depends'   => '0.404',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
@@ -38,10 +52,13 @@ my %WriteMakefileArgs = (
     OBJECT       => 'file$(OBJ_EXT)',
     C            => ['file.c'],
     XS           => {},
-    INC          => '-I. -Iinclude',
     dist         => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-    clean        => { FILES => 'File-Raw-*' },
+    clean        => { FILES => 'File-Raw-* Install/Files.pm' },
     %platform_args,
+    # ExtUtils::Depends provides INC (with our set_inc above) and the
+    # PM rules for installing file_plugin.h + Install/Files.pm to
+    # .../File/Raw/Install/. Our own lib/File/Raw.pm is wired in above.
+    %dep_vars,
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker
@@ -63,17 +80,3 @@ delete $WriteMakefileArgs{LICENSE}
     unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
 
 WriteMakefile(%WriteMakefileArgs);
-
-package MY;
-
-sub postamble {
-    # IMPORTANT: Do NOT pass $(PASTHRU) to the test XS module build.
-    # PASTHRU may contain INSTALL_BASE or PREFIX which conflict with
-    # the test module's local blib installation paths.
-    return <<'MAKE_FRAG';
-build_test_xs : $(INST_DYNAMIC)
-	cd t/xs/file_api_test && $(PERL) Makefile.PL && $(MAKE)
-
-all :: build_test_xs
-MAKE_FRAG
-}

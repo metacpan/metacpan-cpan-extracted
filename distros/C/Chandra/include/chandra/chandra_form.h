@@ -1,5 +1,5 @@
 /*
- * chandra_form.h — Form module static helpers
+ * chandra_form.h - Form module static helpers
  * Included from Chandra.xs before INCLUDE: xs/form.xs
  */
 
@@ -13,7 +13,7 @@
 static int _form_field_id = 0;
 
 /* ========================================================================
- * Form registry — maps form id (string) => Perl SV* form objects
+ * Form registry - maps form id (string) => Perl SV* form objects
  * Supports multiple forms attached simultaneously; dispatch routes by id.
  * ======================================================================== */
 

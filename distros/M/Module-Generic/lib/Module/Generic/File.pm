@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.15.2
+## Version v0.16.1
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2026/03/31
+## Modified 2026/05/16
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -13,10 +13,10 @@
 package Module::Generic::File;
 BEGIN
 {
-    use v5.12.0;
+    use v5.16.0;
     use strict;
     use warnings;
-    use warnings::register;
+    warnings::register_categories( 'Module::Generic' );
     use version;
     use parent qw( Module::Generic );
     use vars qw( $OS2SEP $DIR_SEP $MODE_BITS $DEFAULT_MMAP_SIZE 
@@ -143,10 +143,9 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.15.2';
+    our $VERSION = 'v0.16.1';
 };
 
-use v5.12.0;
 use strict;
 no warnings 'redefine';
 
@@ -744,6 +743,28 @@ sub child
     $new = $self->_spec_catpath( $vol, $path, $file );
     # We do not resolve the overall file path, because the user may depend on what he/she provided us initially, or here as a child
     return( $self->new( $new, { resolved => 1, os => $self->{os}, debug => $self->debug } ) );
+}
+
+sub children
+{
+    my $self = shift( @_ );
+    # It does not exist yet, we return an empty array.
+    if( !$self->exists )
+    {
+        require Module::Generic::Array;
+        return( Module::Generic::Array->new );
+    }
+    elsif( !$self->is_directory )
+    {
+        return( $self->error( "children() can only be called on a directory." ) );
+    }
+    $self->open || return( $self->pass_error );
+    my @files = $self->read( exclude_invisible => 1, as_object => 1 );
+    return( $self->pass_error ) if( !scalar( @files ) && $self->error );
+    require Module::Generic::Array;
+    my $all = Module::Generic::Array->new( \@files );
+    $self->close;
+    return( $all );
 }
 
 sub chmod
@@ -1651,22 +1672,22 @@ sub glob
         $opts->{no_case} //= 0;
         $opts->{no_magic} //= 0;
         $flags = 0;
-        $flags |= File::Glob::GLOB_NOCASE if( $opts->{no_case} );
+        $flags |= &File::Glob::GLOB_NOCASE if( $opts->{no_case} );
         if( exists( $opts->{sort} ) )
         {
             # By default, File::Glob sort the files, but you can speed it up by providing 'sort' with a false value to indicate it not to do any sorting.
             if( $opts->{sort} )
             {
-                $flags |= File::Glob::GLOB_ALPHASORT;
+                $flags |= &File::Glob::GLOB_ALPHASORT;
             }
             else
             {
-                $flags |= File::Glob::GLOB_NOSORT;
+                $flags |= &File::Glob::GLOB_NOSORT;
             }
         }
-        $flags |= File::Glob::GLOB_BRACE if( $opts->{brace} );
-        $flags |= File::Glob::GLOB_NOMAGIC if( $opts->{no_magic} );
-        $flags |= File::Glob::GLOB_TILDE if( $opts->{expand} );
+        $flags |= &File::Glob::GLOB_BRACE if( $opts->{brace} );
+        $flags |= &File::Glob::GLOB_NOMAGIC if( $opts->{no_magic} );
+        $flags |= &File::Glob::GLOB_TILDE if( $opts->{expand} );
     }
     # Those do not work in virtualisation
     if( $os eq $^O )
@@ -1681,7 +1702,7 @@ sub glob
             }
             else
             {
-                @files = File::Glob::bsd_glob( ( ( $self->is_dir && defined( $pattern ) ) ? CORE::join( $OS2SEP->{ lc( $os ) }, $path, $pattern ) : $path ), ( ( defined( $flags ) && $flags != 0 ) ? $flags : () ) );
+                @files = &File::Glob::bsd_glob( ( ( $self->is_dir && defined( $pattern ) ) ? CORE::join( $OS2SEP->{ lc( $os ) }, $path, $pattern ) : $path ), ( ( defined( $flags ) && $flags != 0 ) ? $flags : () ) );
                 return( $self->error( "Error globbing with pattern '", ( defined( $pattern ) ? $pattern : $path ), "': $!" ) ) if( !scalar( @files ) && &File::Glob::GLOB_ERROR );
             }
 
@@ -1710,7 +1731,7 @@ sub glob
             }
             else
             {
-                $path = File::Glob::bsd_glob( ( ( $self->is_dir && defined( $pattern ) ) ? CORE::join( $OS2SEP->{ lc( $os ) }, $path, $pattern ) : $path ), ( ( defined( $flags ) && $flags != 0 ) ? $flags : () ) );
+                $path = &File::Glob::bsd_glob( ( ( $self->is_dir && defined( $pattern ) ) ? CORE::join( $OS2SEP->{ lc( $os ) }, $path, $pattern ) : $path ), ( ( defined( $flags ) && $flags != 0 ) ? $flags : () ) );
                 return( $self->error( "Error globbing with pattern '", ( defined( $pattern ) ? $pattern : $path ), "': $!" ) ) if( !$path && &File::Glob::GLOB_ERROR );
             }
         }
@@ -3690,7 +3711,7 @@ sub resolve
         }
         else
         {
-            $path = File::Glob::bsd_glob( $path );
+            $path = &File::Glob::bsd_glob( $path );
         }
     }
     my( $vol, $dirs, $fname ) = $self->_spec_splitpath( $path );
@@ -3957,6 +3978,19 @@ sub root_dir
 
 sub rootdir { return( shift->root_dir ); }
 
+sub save
+{
+    my $self = shift( @_ );
+    my $data = shift( @_ );
+    if( $self->exists && $self->is_directory )
+    {
+        return( $self->error( "save() can only be used on a file." ) );
+    }
+    $self->unload( $data, { binmode => ':raw', autoflush => 1 } ) ||
+        return( $self->pass_error );
+    return( $self );
+}
+
 sub say { return( shift->_filehandle_method( 'say', 'file', @_ ) ); }
 
 sub seek { return( shift->_filehandle_method( 'seek', 'file|directory', @_ ) ); }
@@ -4182,7 +4216,7 @@ sub tempfile
     CORE::delete( @$opts{ qw( dir suffix ) } );
     $opts->{open} //= 0;
     my $open = CORE::delete( $opts->{open} );
-    $opts->{resolved} = 1;
+    # $opts->{resolved} = 1;
     my( $parent, $me );
     ( $base_vol, $parent, $me ) = $self->_spec_splitpath( $dir );
     $dir = $self->_spec_catdir( [ $parent, $me ] );
@@ -4672,7 +4706,7 @@ sub unload_json
         my $ref;
         $ref = $j->can( exists( $equi->{ $opt } ) ? $equi->{ $opt } : $opt ) || do
         {
-            warn( "Unknown JSON option '${opt}'\n" ) if( $self->_warnings_is_enabled );
+            warn( "Unknown JSON option '${opt}'\n" ) if( $self->_warnings_is_enabled( 'Module::Generic' ) );
             next;
         };
 
@@ -4762,7 +4796,7 @@ sub unlock
     my $rv = $repo->lock;
     if( !$rv )
     {
-        warn( "Failed to acquire a shared lock for file $file: ", $repo->error ) if( $self->_is_warnings_enabled );
+        warn( "Failed to acquire a shared lock for file $file: ", $repo->error ) if( $self->_is_warnings_enabled( 'Module::Generic' ) );
     }
     my $current_state = $repo->get || {};
     if( ref( $current_state ) eq 'HASH' &&
@@ -4775,7 +4809,7 @@ sub unlock
             $current_state->{pid} != $$
         ) )
     {
-        warn( "Process $$ from thread ", ( HAS_THREADS ? threads->tid() : 0 ), " attempted to unlock file \"$file\" owned by thread $current_state->{tid} and pid $current_state->{pid} registered in class ", $current_state->{caller}->[0], " at line ", $current_state->{caller}->[2] ) if( $self->_is_warnings_enabled );
+        warn( "Process $$ from thread ", ( HAS_THREADS ? threads->tid() : 0 ), " attempted to unlock file \"$file\" owned by thread $current_state->{tid} and pid $current_state->{pid} registered in class ", $current_state->{caller}->[0], " at line ", $current_state->{caller}->[2] ) if( $self->_is_warnings_enabled( 'Module::Generic' ) );
     }
 
     my $flags = LOCK_UN;
@@ -5442,7 +5476,7 @@ sub DESTROY
 {
     # <https://perldoc.perl.org/perlobj#Destructors>
     CORE::local( $., $@, $!, $^E, $? );
-    CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+    CORE::return if( Module::Generic::_in_global_destruction() );
     my $self = CORE::shift( @_ );
     CORE::return if( !CORE::defined( $self ) );
     my $file = $self->filepath;
@@ -5671,7 +5705,7 @@ sub TO_JSON { return( shift->filepath ); }
     {
         # <https://perldoc.perl.org/perlobj#Destructors>
         CORE::local( $., $@, $!, $^E, $? );
-        CORE::return if( ${^GLOBAL_PHASE} eq 'DESTRUCT' );
+        CORE::return if( Module::Generic::_in_global_destruction() );
         my $self = CORE::shift( @_ );
         CORE::return if( !CORE::defined( $self ) );
         undef( $self );
@@ -5831,7 +5865,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.15.2
+    v0.16.1
 
 =head1 DESCRIPTION
 
@@ -6050,6 +6084,19 @@ It returns the current file object upon success, or undef and sets an exception 
 This should be called using a directory object.
 
 Provided with a file name (not a full path), and this will return a new file object based on the combination of the directory path and the file specified.
+
+=head2 children
+
+    my $d = Module::Generic::File->new( '/some/directory' );
+    # Returns a Module::Generic::Array object.
+    my $files = $d->children;
+    say "Found ", $files->length, " files.";
+
+This method can only be used on a directory object. It returns a L<Module::Generic::Array> object of all the files and directories directly under the current directory object.
+
+if the directory does not exist, it returns an empty L<Module::Generic::Array> object.
+
+Upon error, it sets an L<error object|Module::Generic::Exception>, and returns C<undef> in scalar context, and an empty list in list context.
 
 =head2 chmod
 
@@ -7527,6 +7574,16 @@ This returns an object representation of the system root directory.
 This is an alias for L</root_dir>
 
 This is also a class function that can be imported.
+
+=head2 save
+
+    my $f = Module::Generic::File->new( '/some/where/file.txt' );
+    # Saved as raw binary
+    $f->save( $some_data ) || die( $f->error );
+
+This method takes some data as it unique argument, and save it to the underlying file, as raw binary.
+
+It returns the current object upon success, and upon error, it sets an L<exception object|Module::Generic::Exception> and returns C<undef> in scalar context, or an empty list in list context.
 
 =head2 say
 

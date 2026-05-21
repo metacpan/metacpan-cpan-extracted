@@ -1,0 +1,60 @@
+PDF::FacturX
+============
+
+Copyright (c) 2026 huguesmax
+
+Licensed under the Artistic License 2.0 (see LICENSE).
+
+
+THIRD-PARTY COMPONENTS
+======================
+
+This distribution bundles third-party content covered by separate licenses.
+All such components are redistributable under their respective terms.
+
+
+1. Factur-X XSD schemas (share/xsd/)
+------------------------------------
+
+The XML Schema Definition files in share/xsd/{minimum,basicwl,basic,en16931}
+are official Factur-X 1.0.8 schemas, sourced from:
+
+    https://github.com/akretion/factur-x/tree/master/facturx/xsd
+
+aligned on the publication of FNFE-MPE (Forum National de la Facture
+Electronique et des Marchés Publics Electroniques) and FeRD (Forum
+elektronische Rechnung Deutschland).
+
+License: MIT (per the akretion/factur-x repository).
+
+    Copyright (c) Akretion
+    Permission is hereby granted, free of charge, to any person obtaining
+    a copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software [...]
+
+
+2. sRGB ICC color profile (share/icc/sRGB.icc)
+----------------------------------------------
+
+The bundled sRGB ICC profile (share/icc/sRGB.icc) is the
+"Artifex Software sRGB ICC Profile" (default_rgb.icc) shipped with
+Ghostscript, used as a fallback OutputIntent for PDF/A-3 conversion when
+a system-wide sRGB profile cannot be located at runtime.
+
+Source: Artifex Ghostscript (https://www.ghostscript.com/)
+License: Apache License 2.0
+
+
+3. Perl module dependencies
+---------------------------
+
+This distribution depends on, but does not bundle, the following Perl
+modules from CPAN, each under their own license:
+
+  - XML::LibXML       — Perl Artistic / GPL
+  - PDF::Builder      — Perl Artistic 2.0 / GPL
+  - File::ShareDir    — Perl Artistic 2.0 / GPL
+  - File::Temp        — Perl Artistic / GPL
+  - Compress::Zlib    — Perl Artistic / GPL  (test-only)

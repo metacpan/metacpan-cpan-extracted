@@ -1,0 +1,31 @@
+---
+abstract: 'Pure-Perl parser for DMS, a data syntax with strong typing, ordered maps, and heredocs'
+author:
+  - 'Filip Lopes'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  FindBin: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DMS-Parser
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Encode: '0'
+  Math::BigInt: '0'
+  POSIX: '0'
+  Tie::IxHash: '0'
+  perl: '5.014'
+resources:
+  repository: https://gitlab.com/flo-labs/pub/dms-pl.git
+version: v0.5.3
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

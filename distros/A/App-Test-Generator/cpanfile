@@ -41,11 +41,11 @@ on 'test' => sub {
 	requires 'FindBin';
 	requires 'IPC::Run3';
 	requires 'IPC::System::Simple';
-	requires 'JSON::MaybeXS';
 	requires 'JSON::PP';
 	requires 'Symbol';
 	requires 'Test::DescribeMe';
 	requires 'Test::LectroTest';
+	requires 'Test::Mockingbird', '0.10';
 	requires 'Test::Most';
 	requires 'Test::Needs';
 	requires 'Test::Returns', '0.02';

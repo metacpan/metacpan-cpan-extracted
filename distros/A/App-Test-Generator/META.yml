@@ -13,11 +13,11 @@ build_requires:
   FindBin: '0'
   IPC::Run3: '0'
   IPC::System::Simple: '0'
-  JSON::MaybeXS: '0'
   JSON::PP: '0'
   Symbol: '0'
   Test::DescribeMe: '0'
   Test::LectroTest: '0'
+  Test::Mockingbird: '0.1'
   Test::Most: '0'
   Test::Needs: '0'
   Test::Returns: '0.02'
@@ -70,5 +70,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-Test-Generator
   homepage: https://metacpan.org/pod/App::Test::Generator
   repository: git://github.com/nigelhorne/App-Test-Generator.git
-version: '0.33'
+version: '0.38'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

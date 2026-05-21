@@ -9,7 +9,7 @@ use Crypt::SysRandom 0.007 ();
 
 # RECOMMEND PREREQ:  Crypt::SysRandom::XS 0.010
 
-our $VERSION = '0.002001';
+our $VERSION = '0.002002';
 
 # ABSTRACT: use system randomness for generating session ids
 
@@ -42,7 +42,7 @@ Apache::Session::Generate::Random - use system randomness for generating session
 
 =head1 VERSION
 
-version 0.002001
+version 0.002002
 
 =head1 SYNOPSIS
 
@@ -91,11 +91,11 @@ then see F<SECURITY.md> for instructions how to report security vulnerabilities.
 =head1 SOURCE
 
 The development version is on github at L<https://github.com/robrwo/perl-Apache-Session-Generate-Random>
-and may be cloned from L<git://github.com/robrwo/perl-Apache-Session-Generate-Random.git>
+and may be cloned from L<https://github.com/robrwo/perl-Apache-Session-Generate-Random.git>
 
 =head1 AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 =head1 COPYRIGHT AND LICENSE
 

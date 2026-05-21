@@ -22,7 +22,7 @@ plan tests => 36;
 isnt ($dbh, undef, 'Connect to database for bytea testing');
 
 my $pgversion = $dbh->{pg_server_version};
-if ($pgversion >= 80100) {
+if ($pgversion >= 80100 and $pgversion < 19000) {
     $dbh->do('SET escape_string_warning = false');
 }
 

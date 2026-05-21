@@ -4,7 +4,7 @@
       "John R. <johnlradford23@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -39,7 +39,7 @@
    "provides" : {
       "Term::ReadLine::Repl" : {
          "file" : "lib/Term/ReadLine/Repl.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.0.2"
       }
    },
    "release_status" : "stable",
@@ -48,6 +48,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "v0.0.1",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "v0.0.2",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

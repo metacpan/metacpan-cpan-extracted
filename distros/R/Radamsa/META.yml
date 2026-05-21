@@ -1,0 +1,27 @@
+---
+abstract: 'Perl 5 bindings for the Radamsa mutational fuzzer'
+author:
+  - 'Hugo T. R. Gouvea'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Radamsa
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Exporter: '0'
+  XSLoader: '0'
+  perl: '5.010'
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

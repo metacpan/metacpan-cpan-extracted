@@ -102,21 +102,25 @@
 1501 empty chest-rotated
 1402 "chests"
 
-1701 empty bed
-1801 empty bed-rotated
-1702 "beds"
+1701 empty bed-w
+1801 empty bed-n
+1901 empty bed-e
+2001 empty bed-s
+1802 "beds"
 
-2001 empty table
-2101 empty table-rotated
-2002 "tables"
+2201 empty table
+2301 empty table-rotated
+2202 "tables"
 
-2301 empty chair
-2401 empty chair-rotated
-2302 "chairs"
+2501 empty screen
+2601 empty screen-rotated
+2502 "screens"
 
-2601 empty screen
-2701 empty screen-rotated
-2602 "screens"
+2801 empty chair-w
+2901 empty chair-n
+3001 empty chair-e
+3101 empty chair-s
+2902 "chairs"
 
 1903 "big spiral stairs"
 1904 stair-big-spiral
@@ -237,7 +241,7 @@
 3515 empty pale-green
 3516 "colours"
 
-other <text font-size="100pt" font-family="Arial Narrow" font-weight="800"><tspan x="5500" y="220">Gridmapper</tspan><tspan x="5500" dy="200">&amp; Text Mapper!</tspan></text>
+other <text font-size="100pt" font-family="Arial Narrow" font-weight="800"><tspan x="5540" y="220">Gridmapper</tspan><tspan x="5540" dy="200">&amp; Text Mapper!</tspan></text>
 
 license <text x="50" y="-15" font-size="15pt" fill="#999999"><a style="fill:#8888ff" xlink:href="https://campaignwiki.org/gridmapper">Gridmapper SVG Map Icons</a>. This work is <a style="fill:#8888ff" xlink:href="https://creativecommons.org/publicdomain/zero/1.0/">dedicated to the Public Domain </a>.</text>
 include gridmapper.txt

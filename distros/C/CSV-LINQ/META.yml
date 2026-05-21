@@ -1,0 +1,30 @@
+--- #YAML:1.0
+meta-spec:
+  version: 1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+name: CSV-LINQ
+version: 1.00
+abstract: LINQ-style query interface for CSV files
+author:
+  - ina <ina@cpan.org>
+license: perl
+generated_by: pmake.bat
+requires:
+  perl: 5.005_03
+  strict: 1.01
+  vars: 0
+  warnings: 0
+build_requires:
+  Test: 1.122
+minimum_perl_version: 5.00503
+provides:
+  CSV::LINQ:
+    file: lib/CSV/LINQ.pm
+    version: 1.00
+  CSV::LINQ::Ordered:
+    file: lib/CSV/LINQ.pm
+    version: 1.00
+resources:
+  license: http://dev.perl.org/licenses/
+  bugtracker: https://github.com/ina-cpan/CSV-LINQ/issues
+  repository: https://github.com/ina-cpan/CSV-LINQ

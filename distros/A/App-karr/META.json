@@ -1,7 +1,7 @@
 {
    "abstract" : "Kanban Assignment & Responsibility Registry",
    "author" : [
-      "Torsten Raudssus <torsten@raudssus.de>"
+      "Torsten Raudssus <getty@cpan.org>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
@@ -53,18 +53,18 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/Getty/p5-app-karr/issues"
+         "web" : "https://github.com/Getty/karr/issues"
       },
-      "homepage" : "https://github.com/Getty/p5-app-karr",
+      "homepage" : "https://github.com/Getty/karr",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/Getty/p5-app-karr.git",
-         "web" : "https://github.com/Getty/p5-app-karr"
+         "url" : "https://github.com/Getty/karr.git",
+         "web" : "https://github.com/Getty/karr"
       },
-      "x_IRC" : "irc://irc.perl.org/#ai",
+      "x_IRC" : "irc://irc.perl.org/#langertha",
       "x_IRC_user" : "Getty"
    },
-   "version" : "0.102",
+   "version" : "0.205",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -74,7 +74,9 @@
             "class" : "Dist::Zilla::Plugin::Git::GatherDir",
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
-                  "exclude_filename" : [],
+                  "exclude_filename" : [
+                     "README.md"
+                  ],
                   "exclude_match" : [],
                   "include_dotfiles" : 1,
                   "prefix" : "",
@@ -154,43 +156,6 @@
             "version" : "6.037"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Run::AfterBuild",
-            "config" : {
-               "Dist::Zilla::Plugin::Run::Role::Runner" : {
-                  "fatal_errors" : 1,
-                  "quiet" : 0,
-                  "run" : [
-                     "docker build ${KARR_DOCKER_BUILD_ARGS:-} -f %d/Dockerfile --target runtime-root -t raudssus/karr:latest %d",
-                     "docker build ${KARR_DOCKER_BUILD_ARGS:-} -f %d/Dockerfile --target runtime-user -t raudssus/karr:user %d"
-                  ],
-                  "version" : "0.049"
-               }
-            },
-            "name" : "@Author::GETTY/Run::AfterBuild",
-            "version" : "0.049"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Run::AfterRelease",
-            "config" : {
-               "Dist::Zilla::Plugin::Run::Role::Runner" : {
-                  "fatal_errors" : 1,
-                  "quiet" : 0,
-                  "run" : [
-                     "${GH_BIN:-gh} release view %v -R Getty/p5-app-karr >/dev/null 2>&1 || ${GH_BIN:-gh} release create %v -R Getty/p5-app-karr --title %v --notes 'Dist::Zilla release'",
-                     "${GH_BIN:-gh} release upload %v -R Getty/p5-app-karr %a --clobber",
-                     "docker build ${KARR_DOCKER_BUILD_ARGS:-} -f %d/Dockerfile --target runtime-root -t raudssus/karr:%v -t raudssus/karr:$(echo %v | cut -d. -f1) %d",
-                     "docker build ${KARR_DOCKER_BUILD_ARGS:-} -f %d/Dockerfile --target runtime-user -t raudssus/karr:user %d",
-                     "docker push raudssus/karr:%v",
-                     "docker push raudssus/karr:$(echo %v | cut -d. -f1)",
-                     "docker push raudssus/karr:user"
-                  ],
-                  "version" : "0.049"
-               }
-            },
-            "name" : "@Author::GETTY/Run::AfterRelease",
-            "version" : "0.049"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@Author::GETTY/MetaConfig",
             "version" : "6.037"
@@ -204,6 +169,11 @@
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Author::GETTY/PodSyntaxTests",
             "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::ChangesHasContent",
+            "name" : "@Author::GETTY/Test::ChangesHasContent",
+            "version" : "0.011"
          },
          {
             "class" : "Dist::Zilla::Plugin::GithubMeta",
@@ -428,7 +398,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.102",
+                  "tag" : "0.205",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -512,6 +482,21 @@
             "version" : "2.052"
          },
          {
+            "class" : "Dist::Zilla::Plugin::GitHub::CreateRelease",
+            "name" : "@Author::GETTY/GitHub::CreateRelease",
+            "version" : "0.0008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Docker::API",
+            "name" : "runtime-root/Docker::API",
+            "version" : "0.103"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Docker::API",
+            "name" : "runtime-user/Docker::API",
+            "version" : "0.103"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
             "version" : "6.037"
@@ -572,7 +557,7 @@
    },
    "x_authority" : "cpan:GETTY",
    "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

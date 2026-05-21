@@ -27,11 +27,11 @@ has group            => (is => 'rw', isa => Str);
 has name             => (is => 'rw', isa => Str, required => 1);
 has version          => (is => 'rw', isa => Str);
 has description      => (is => 'rw', isa => Str);
-has endpoints        => (is => 'rw', isa => Str);
+has endpoints        => (is => 'rw', isa => ArrayLike [Str], default => sub { SBOM::CycloneDX::List->new });
 has authenticated    => (is => 'rw', isa => Bool);
 has x_trust_boundary => (is => 'rw', isa => Bool);
 has trust_zone       => (is => 'rw', isa => Str);
-has data             => (is => 'rw', isa => ArrayLike [Str]);
+has data             => (is => 'rw', isa => ArrayLike [Str], default => sub { SBOM::CycloneDX::List->new });
 
 has licenses => (
     is      => 'rw',
@@ -57,7 +57,7 @@ has services => (
     default => sub { SBOM::CycloneDX::List->new }
 );
 
-has release_notes => (is => 'rw', isa => Str);
+has release_notes => (is => 'rw', isa => InstanceOf ['SBOM::CycloneDX::ReleaseNotes']);
 
 has properties => (
     is      => 'rw',
@@ -65,8 +65,8 @@ has properties => (
     default => sub { SBOM::CycloneDX::List->new }
 );
 
-has tags      => (is => 'rw', isa => ArrayLike [Str]);
-has signature => (is => 'rw', isa => ArrayLike [HashRef]);
+has tags => (is => 'rw', isa => ArrayLike [Str], default => sub { SBOM::CycloneDX::List->new });
+has signature => (is => 'rw', isa => HashRef);
 
 
 sub TO_JSON {
@@ -92,7 +92,7 @@ sub TO_JSON {
     $json->{releaseNotes}       = $self->release_notes       if $self->release_notes;
     $json->{properties}         = $self->properties          if @{$self->properties};
     $json->{tags}               = $self->tags                if @{$self->tags};
-    $json->{signature}          = $self->signature           if @{$self->signature};
+    $json->{signature}          = $self->signature           if $self->signature;
 
     return $json;
 

@@ -1,6 +1,7 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
+                                        'ExtUtils::CBuilder' => '0',
                                         'ExtUtils::MakeMaker' => '0'
                                       }
                       },

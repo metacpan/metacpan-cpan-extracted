@@ -6,7 +6,7 @@ use lib '../Rose-DB/lib';
 use lib 'lib';
 use lib 't/cg-lib';
 
-require 't/test-lib.pl';
+require './t/test-lib.pl';
 
 my $db_type = $ARGV[0] or die "Missing database type argument";
 

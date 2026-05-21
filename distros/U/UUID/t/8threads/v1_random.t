@@ -24,8 +24,7 @@ BEGIN {
 }
 
 use threads;
-use Test::More;
-use MyNote;
+use MyTest;
 
 use vars qw(@OPTS);
 

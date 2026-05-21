@@ -18,11 +18,11 @@ sub apply_gamma {
 	} else {
 		$gamma_array = [ ($gamma) x $color_space->axis_count];
 	}
-	my $values = $color_values->normalized( $color_space->name );
+	my $tuple = $color_values->normalized( $color_space->name );
     for my $axis_nr ($color_space->basis->axis_iterator){
-	    $values->[$axis_nr] = $values->[$axis_nr] ** $gamma_array->[$axis_nr] if exists $gamma_array->[$axis_nr];
+	    $tuple->[$axis_nr] = $tuple->[$axis_nr] ** $gamma_array->[$axis_nr] if exists $gamma_array->[$axis_nr];
     }
-    return $color_values->new_from_tuple( $values, $color_space->name, 'normal' );
+    return $color_values->new_from_tuple( $tuple, $color_space->name, 'normal' );
 }
 
 sub set_value { # .values, %newval -- ~space_name --> _
@@ -34,12 +34,12 @@ sub set_value { # .values, %newval -- ~space_name --> _
         return (defined $preselected_space_name) ? $help_start.'the selected color space: '.$preselected_space_name.'!'
                                                  : 'any supported color space!';
     }
-    my $values = $color_values->shaped( $deduced_space_name );
+    my $tuple = $color_values->shaped( $deduced_space_name );
     my $color_space = Graphics::Toolkit::Color::Space::Hub::get_space( $deduced_space_name );
     for my $pos ($color_space->basis->axis_iterator) {
-        $values->[$pos] = $new_values->[$pos] if defined $new_values->[$pos];
+        $tuple->[$pos] = $new_values->[$pos] if defined $new_values->[$pos];
     }
-    return $color_values->new_from_tuple( $values, $color_space->name );
+    return $color_values->new_from_tuple( $tuple, $color_space->name );
 }
 
 sub add_value { # .values, %newval -- ~space_name --> _
@@ -51,12 +51,12 @@ sub add_value { # .values, %newval -- ~space_name --> _
         return (defined $preselected_space_name) ? $help_start.'the selected color space: '.$preselected_space_name.'!'
                                                  : 'any supported color space!';
     }
-    my $values = $color_values->shaped( $deduced_space_name );
+    my $tuple = $color_values->shaped( $deduced_space_name );
     my $color_space = Graphics::Toolkit::Color::Space::Hub::get_space( $deduced_space_name );
     for my $pos ($color_space->basis->axis_iterator) {
-        $values->[$pos] += $new_values->[$pos] if defined $new_values->[$pos];
+        $tuple->[$pos] += $new_values->[$pos] if defined $new_values->[$pos];
     }
-    return $color_values->new_from_tuple( $values, $color_space->name );
+    return $color_values->new_from_tuple( $tuple, $color_space->name );
 }
 
 sub mix { #  @%(+percent, _color)  -- ~space_name --> _
@@ -66,8 +66,8 @@ sub mix { #  @%(+percent, _color)  -- ~space_name --> _
     for my $ingredient (@$recipe){
         return if ref $ingredient ne 'HASH' or not exists $ingredient->{'percent'}
                or not exists $ingredient->{'color'} or ref $ingredient->{'color'} ne ref $color_values;
-        my $values = $ingredient->{'color'}->shaped( $color_space->name );
-        $result_values->[$_] +=  $values->[$_] * $ingredient->{'percent'} / 100 for 0 .. $#$values;
+        my $tuple = $ingredient->{'color'}->shaped( $color_space->name );
+        $result_values->[$_] +=  $tuple->[$_] * $ingredient->{'percent'} / 100 for 0 .. $#$tuple;
     }
     return $color_values->new_from_tuple( $result_values, $color_space->name );
 }
@@ -80,25 +80,27 @@ sub invert {
     if (defined $only) {
 	    for my $axis_name (@$only){
 		    my $pos = $color_space->pos_from_axis_name( $axis_name );
-			return "axis name '$axis_name' is not part of clor space '".$color_space->name.
+			return "axis name '$axis_name' is not part of color space '".$color_space->name.
 			       "', please try: ".(join(' ', $color_space->long_axis_names)).
 			       ' or '.(join(' ', $color_space->short_axis_names)).' !' unless defined $pos;
 			return "axis '$axis_name' is already selected for inversion" if exists $selected_axis->[$pos];
 			$selected_axis->[$pos] = $pos;
 		}
 	} 
-    my $values = $color_values->normalized( $color_space->name );
+    my $tuple = $color_values->normalized( $color_space->name );
 	for my $axis_nr ($color_space->basis->axis_iterator){
         next unless defined $selected_axis->[$axis_nr];
         if ($color_space->shape->is_axis_euclidean( $axis_nr )){
-            $values->[$axis_nr] = 1 - $values->[$axis_nr];
+            $tuple->[$axis_nr] = 0.5 - ($tuple->[$axis_nr] - 0.5);
         } else {
-            $values->[$axis_nr] = ($values->[$axis_nr] < 0.5)
-                                ? $values->[$axis_nr] + 0.5
-                                : $values->[$axis_nr] - 0.5;
+			$tuple->[$axis_nr]++ while $tuple->[$axis_nr] < 0;
+			$tuple->[$axis_nr]-- while $tuple->[$axis_nr] > 1;
+            $tuple->[$axis_nr] = ($tuple->[$axis_nr] < 0.5)
+                                ? $tuple->[$axis_nr] + 0.5
+                                : $tuple->[$axis_nr] - 0.5;
         }
 	}
-    return $color_values->new_from_tuple( $values, $color_space->name, 'normal' );
+    return $color_values->new_from_tuple( $tuple, $color_space->name, 'normal' );
 }
 
 1;

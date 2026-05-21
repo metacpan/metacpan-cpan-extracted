@@ -1,5 +1,5 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "A module that performs semantic similarity in PXF/BFF data structures and beyond (JSON|YAML)",
    "author" : [
       "Manuel Rueda <mrueda@cpan.org>"
    ],
@@ -18,7 +18,9 @@
          "t",
          "inc",
          "docs",
-         "t"
+         "t",
+         "lib/Pheno/bck",
+         "lib/Pheno/Ranker/bck"
       ]
    },
    "prereqs" : {
@@ -83,7 +85,7 @@
          "web" : "https://github.com/CNAG-Biomedical-Informatics/pheno-ranker"
       }
    },
-   "version" : "1.07",
+   "version" : "1.08",
    "x_contributors" : [],
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

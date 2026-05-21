@@ -1,5 +1,5 @@
 package Crypt::HSM::Object;
-$Crypt::HSM::Object::VERSION = '0.030';
+$Crypt::HSM::Object::VERSION = '0.032';
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ Crypt::HSM::Object - A PKCS11 object
 
 =head1 VERSION
 
-version 0.030
+version 0.032
 
 =head1 SYNOPSIS
 
@@ -53,7 +53,7 @@ This deletes this object from the slot.
 
 This returns the value of the named attribute of the object.
 
-=head2 get_attributes(\@attribute_list)
+=head2 get_attributes(@attribute_list)
 
 This returns a hash with the attributes of the object that are asked for.
 
@@ -75,7 +75,7 @@ Only one attribute is present in all objects:
 
 =item * C<class>
 
-This enum value van be one of C<data>, C<certificate>, C<public-key>, C<private-key>, C<secret-key>, C<hw-feature>, C<domain-parameters>, C<mechanism>, C<profile>, or C<vendor-defined>.
+This enum value van be one of C<data>, C<certificate>, C<public-key>, C<private-key>, C<secret-key>, C<hw-feature>, C<domain-parameters>, C<mechanism>, C<profile>, C<validation>, C<trust>, or C<vendor-defined>.
 
 =back
 
@@ -267,7 +267,7 @@ All key types share the following attributes:
 
 =item * C<key-type>
 
-The type of the key (e.g. C<aes>).
+The type of the key. Valid values include: C<rsa>, C<dsa>, C<dh>, C<ec>, C<ecdsa>, C<x9-42-dh>, C<kea>, C<generic-secret>, C<rc2>, C<rc4>, C<des>, C<des2>, C<des3>, C<cast>, C<cast3>, C<cast128>, C<cast5>, C<rc5>, C<idea>, C<skipjack>, C<baton>, C<juniper>, C<cdmf>, C<aes>, C<blowfish>, C<twofish>, C<securid>, C<hotp>, C<acti>, C<camellia>, C<aria>, C<md5-hmac>, C<sha1-hmac>, C<ripemd128-hmac>, C<ripemd160-hmac>, C<sha256-hmac>, C<sha384-hmac>, C<sha512-hmac>, C<sha224-hmac>, C<seed>, C<gostr3410>, C<gostr3411>, C<gost28147>, C<chacha20>, C<poly1305>, C<aes-xts>, C<sha3-224-hmac>, C<sha3-256-hmac>, C<sha3-384-hmac>, C<sha3-512-hmac>, C<blake2b-160-hmac>, C<blake2b-256-hmac>, C<blake2b-384-hmac>, C<blake2b-512-hmac>, C<salsa20>, C<x2ratchet>, C<ec-edwards>, C<ec-montgomery>, C<hkdf>, C<sha512-224-hmac>, C<sha512-256-hmac>, C<sha512-t-hmac>, C<hss>, C<xmss>, C<xmssmt>, C<ml-kem>, C<ml-dsa>, C<slh-dsa>, and C<vendor-defined>
 
 =item * C<id>
 
@@ -304,6 +304,18 @@ The L<mechanism|Crypt::HSM::Mechanism> used to generate a new value of this key 
 =item * C<allowed-mechanisms>
 
 An arrayref of L<mechanisms|Crypt::HSM::Mechanism> that can be used with this key type.
+
+=item * C<parameter-set>
+
+This represents the parameter set of a cryptographic operation. The meaning of this integer depends on the involved algorithm. For some algoritms, textual input aliases are defined:
+
+For C<ml-dsa> the following parameter sets are defined: C<mk-dsa-44> (C<1>), C<ml-dsa-65> (C<2>), and C<ml-dsa-87> (C<3>).
+
+For C<slh-dsa> the following parameter sets are defined: C<slh-dsa-sha2-128s> (C<1>), C<slh-dsa-shake-128s> (C<2>), C<slh-dsa-sha2-128f> (C<3>), C<slh-dsa-shake-128f> (C<4>), C<slh-dsa-sha2-192s> (C<5>), C<slh-dsa-shake-192s> (C<6>), C<slh-dsa-sha2-192f> (C<7>), C<slh-dsa-shake-192f> (C<8>), C<slh-dsa-sha2-256s> (C<9>), C<slh-dsa-shake-256s> (C<10>), C<slh-dsa-sha2-256f> (C<11>), C<slh-dsa-shake-256f> (C<12>) are defined.
+
+For C<ml-kem> the following parameter sets are defined: C<ml-kem-512> (C<1>), C<ml-kem-768> (C<2>), C<ml-kem-1024> (C<3>)
+
+For C<xmms> and C<xmssmt>, valid values are defined by I<NIST SP800-208>.
 
 =back
 
@@ -567,7 +579,7 @@ The L<mechanism|Crypt::HSM::Mechanism> object.
 
 =back
 
-=head3
+=head3 Profile options
 
 =over 4
 
@@ -660,6 +672,166 @@ String indicating supported content transfer encoding methods, as defined by IAN
 String indicating supported (presentable) MIME-types, as defined by IANA (www.iana.org). Supported types are separated with “;”. E.g. a token supporting MIME types "a/b", "a/c" and "a/d" would set the attribute value to “a/b;a/c;a/d”.
 
 =back
+
+=head3 Validation objects
+
+Validation objects describe which third party validations the module conforms to. Validation objects are read only, token objects.
+
+The have the following attributes:
+
+=over 4
+
+=item * C<validation-type>
+
+Identifier indicating the validation type. This must be one of: C<unspecified>, C<software>, C<hardware>, C<firmware> or C<hybrid>
+
+=item * C<validation-version>
+
+Version of the validation standard or specification
+
+=item * C<validation-level>
+
+Validation level, Meaning is Validation type specific
+
+=item * C<validation-module-id>
+
+How the module is identified in the validation documentation
+
+=item * C<validation-flag>
+
+Flags identifying this validation in sessions and objects
+
+=item * C<validation-authority-type>
+
+Identifies the authority that issues the validation. This must be one of: C<unspecified>, C<nist-cmvp> or C<common-criteria>.
+
+=item * C<validation-country>
+
+2 letter ISO country code
+
+=item * C<validation-certificate-identifier>
+
+Identifier of the validation certificate
+
+=item * C<validation-certificate-uri>
+
+Validation authority URI from which information related to the validation is available. If the Validation Certificate URI is not provided, the validation object SHOULD include a Validation Vendor URI.
+
+=item * C<validation-vendor-uri>
+
+Validation Vendor URI from which information related to the validation is available.
+
+=item * C<validation-profile>
+
+Profile used for validation
+
+=back
+
+=head3 Trust objects
+
+Trust objects bind trusted usages to individual certificates. Trust objects for a given certificate are accessed using the C<issuer> and C<serial-number> attributes, and may be confirmed by comparing C<hash-of-certificate> with a recomputed hash value. The corresponding certificate does not necessarily have to exist in the same token as its trust object. Multiple trust objects for the same certificate can exist in different tokens, but each token should have no more than one trust object for a given certificate.
+
+The have the following attributes:
+
+=over 4
+
+=item * C<issuer>
+
+DER-encoding of the certificate issuer name (default empty)
+
+=item * C<serial-number>
+
+DER-encoding of the certificate serial number (default empty)
+
+=item * C<hash-of-certificate>
+
+Cryptographic hash of the certificate computed by C<name-hash-algorithm> (default empty)
+
+=item * C<name-hash-algorithm>
+
+Mechanism used to calculate hash-of-certificate (defaults to SHA-1 if not present)
+
+=item * C<trust-server-auth>
+
+Trust for authenticating the server in a client/server interaction (as in TLS/SSL/SSH)
+
+=item * C<trust-client-auth>
+
+Trust for authenticating the client in a client/server interaction (as in TLS/SSL/SSH)
+
+=item * C<trust-code-signing>
+
+Trust for authenticating a code fragment
+
+=item * C<trust-email-protection>
+
+Trust for authenticating an email user
+
+=item * C<trust-ipsec-ike>
+
+Trust for IPSEC
+
+=item * C<trust-time-stamping>
+
+Trust for timestamping
+
+=item * C<trust-ocsp-signing>
+
+Trust for OCSP Signing
+
+=back
+
+The C<trust-> values
+
+=over 4
+
+=item * C<trusted>
+
+The certificate is trusted for the associated operation.
+
+=item * C<trust-anchor>
+
+The certificate is trusted as a root signing certificate for chain validation of a cert that is trusted for the associate operation; this applies even when the certificate is not self-signed and when the certificate does not have the proper attributes to be CA certificate.
+
+=item * C<not-trusted>
+
+The certificate is explicitly not trusted for the associated operation, nor can trust chain through the certificate to an otherwise trusted root; this attribute can be used to ‘revoke’ intermediate CA certificates that have been compromised without removing trust from the parent certificate.
+
+=item * C<trust-must-verify-trust>
+
+The certificate is neither trusted nor untrusted for the associated operation.
+
+=item * C<trust-unknown>
+
+The certificate is neither trusted nor untrusted for the associated operation.
+
+=back
+
+To obtain the effective trust attributes for a given certificate, the typical application will first:
+
+=over 4
+
+=item 1. identify the tokens containing a Trust object with matching CKA_ISSUER and CKA_SERIAL_NUMBER (and optionally check that CKA_HASH_OF_CERTIFICATE agrees with the hash of the certificate computed using CKA_NAME_HASH_ALGORITHM),
+
+=item 2. determine which of those Trust objects should be processed (presumably according to an established security policy), and
+
+=item 3. arrange the selected Trust objects in a list sorted in order of increasing priority.
+
+=back
+
+Now, taking the first Trust object in the list as the initial working Trust object (WTO) with all omitted attributes assumed to have the value C<trust-unknown>, the remaining Trust objects in the list are iteratively merged into it as follows:
+
+=over 4
+
+=item 1. if the value of a trust attribute in the current object is CKT_TRUST_UNKNOWN, that attribute is left unchanged in the WTO,
+
+=item 2. otherwise, the current attribute value replaces the attribute value in the WTO .
+
+=back
+
+Note that at any step of this process, an attribute value of CKT_TRUST_MUST_VERIFY_TRUST in the current Trust object resets any trust or distrust assigned to that attribute in the WTO by a lower priority token.
+
+When the process is complete, the final (“effective”) trust attribute values are to be interpreted as follows:
 
 =head1 AUTHOR
 

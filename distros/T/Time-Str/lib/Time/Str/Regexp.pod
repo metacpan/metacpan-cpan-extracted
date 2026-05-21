@@ -1,0 +1,252 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Time::Str::Regexp - Precompiled regular expressions for date/time formats
+
+=head1 SYNOPSIS
+
+    use Time::Str::Regexp qw( $RFC3339_Rx $RFC2822_Rx $DateTime_Rx );
+
+    if ($string =~ $RFC3339_Rx) {
+      my %date = %+;
+      ...
+    }
+
+=head1 DESCRIPTION
+
+This module provides precompiled regular expressions for parsing date/time
+strings in various standard formats. Each regex uses named captures to
+extract date and time components.
+
+All regexes are anchored (C<\A> ... C<\z>). They perform structural
+matching only; semantic validation (e.g., day-of-month range, leap
+years) is not performed by the regex.
+
+=head1 NAMED CAPTURES
+
+Successful matches populate C<%+> with the following keys:
+
+=over 4
+
+=item C<year>
+
+Two or four-digit year. Two-digit years appear in C<ASN1UT>,
+C<RFC5280>, and RFC 850 within C<RFC2616>. Use C<resolve_century>
+from L<Time::Str::Calendar> to expand to four digits.
+
+=item C<month>
+
+Month (1-2 digits or name, depending on format). May be a Roman numeral
+(C<I>-C<XII>) in C<DateTime>. Use C<parse_month> from
+L<Time::Str::Token> to convert to an integer.
+
+=item C<day>
+
+Day of month (1-2 digits). May include an ordinal suffix (e.g., C<24th>)
+in C<DateTime>; use C<parse_day> from L<Time::Str::Token> to convert.
+
+=item C<hour>
+
+Hour (1-2 digits). Single-digit hours only appear in C<DateTime>
+when followed by a meridiem or minutes.
+
+=item C<minute>
+
+Minute (2 digits).
+
+=item C<second>
+
+Second (2 digits).
+
+=item C<fraction>
+
+Fractional digits (1-9) of the least significant time component
+present. No leading separator (dot or comma).
+
+Most formats capture fractional seconds only: C<RFC3339>, C<RFC9557>,
+C<RFC4287>, C<W3CDTF>, C<ISO9075>, C<CLF>, C<UnixStamp>, C<DateTime>,
+C<ECMAScript>.
+
+C<ISO8601> and C<ASN1GT> may capture fractional hours, minutes, or
+seconds depending on which is the least significant component present.
+
+=item C<day_name>
+
+Day name when present (e.g., C<Mon>, C<Monday>). Use C<parse_day_name>
+from L<Time::Str::Token> to convert to an integer (1=Monday .. 7=Sunday).
+
+=item C<meridiem>
+
+AM/PM indicator (C<DateTime> only). Accepts C<AM>, C<PM>, C<A.M.>,
+and C<P.M.> (case-insensitive). Use C<parse_meridiem> from
+L<Time::Str::Token> to convert to an hour offset.
+
+=item C<tz_utc>
+
+UTC designator: C<Z>, C<z>, C<UT>, C<UTC>, or C<GMT>. C<UT> is only
+accepted in C<RFC2822> and C<RFC2822FWS>.
+
+=item C<tz_offset>
+
+Numeric timezone offset. Format varies: C<±HHMM>, C<±HH:MM>, C<±HH>,
+C<±H:MM>, or C<±H> depending on the regex matched. Single-digit hour
+forms (C<±H>, C<±H:MM>) are only accepted in C<DateTime> when preceded
+by a UTC designator (e.g., C<UTC+5>, C<GMT+5:30>). Use C<parse_tz_offset>
+from L<Time::Str::Token> to convert to minutes.
+
+Both C<tz_utc> and C<tz_offset> may be present in the same match
+(e.g., C<GMT+0530> in C<DateTime> and C<ECMAScript>).
+
+=item C<tz_abbrev>
+
+Timezone abbreviation matching C<[A-Z][A-Za-z][A-Z]{1,4}> (e.g.,
+C<EST>, C<CET>, C<AEST>).
+
+=item C<tz_annotation>
+
+RFC 9557 annotation tags (C<RFC9557> and C<DateTime>). May contain
+multiple tags (e.g., C<[America/New_York][u-ca=gregory]>).
+
+=back
+
+=head1 EXPORTED VARIABLES
+
+All variables are exportable on request. Nothing is exported by default.
+
+=head2 Profiles of ISO 8601
+
+=over 4
+
+=item C<$ISO8601_Rx> - ISO 8601 (basic and extended format)
+
+=item C<$RFC4287_Rx> - Atom feed timestamp (RFC 4287)
+
+=item C<$W3CDTF_Rx> - W3C Date and Time Format
+
+=item C<$RFC5545_Rx> - iCalendar (RFC 5545)
+
+=back
+
+=head2 Based on ISO 8601
+
+=over 4
+
+=item C<$RFC3339_Rx> - Internet timestamp (RFC 3339)
+
+=item C<$RFC9557_Rx> - Timestamps with annotations (RFC 9557)
+
+=item C<$ISO9075_Rx> - SQL timestamp (ISO 9075)
+
+=item C<$ASN1GT_Rx> - ASN.1 GeneralizedTime
+
+=item C<$ASN1UT_Rx> - ASN.1 UTCTime
+
+=item C<$RFC5280_Rx> - X.509 certificate time (RFC 5280)
+
+=back
+
+=head2 RFC / IMF / HTTP / IMAP
+
+=over 4
+
+=item C<$RFC2822_Rx> - Internet Message Format (RFC 2822, canonical)
+
+=item C<$RFC2822FWS_Rx> - RFC 2822 with folding white space and nested comments
+
+=item C<$RFC2616_Rx> - HTTP-date (RFC 2616 / RFC 7231)
+
+=item C<$RFC3501_Rx> - IMAP date-time (RFC 3501)
+
+=back
+
+=head2 Unix / C Library
+
+=over 4
+
+=item C<$ANSIC_Rx> - ANSI C ctime()/asctime()
+
+=item C<$UnixDate_Rx> - Unix date(1) output
+
+=item C<$UnixStamp_Rx> - Unix date based, with optional fractional seconds and timezone
+
+=item C<$GitDate_Rx> - Git default date format
+
+=item C<$RubyDate_Rx> - Ruby/Rails date format
+
+=back
+
+=head2 Other
+
+=over 4
+
+=item C<$ECMAScript_Rx> - ECMAScript Date.prototype.toString
+
+=item C<$CLF_Rx> - Common Log Format
+
+=item C<$DateTime_Rx> - Permissive multi-format parser
+
+=back
+
+=head1 FUNCTIONS
+
+=head2 mapping
+
+    my %map = Time::Str::Regexp->mapping;
+    my $map = Time::Str::Regexp->mapping;  # hashref in scalar context
+
+Returns the format name to regex mapping. Keys are lowercase format
+names; values are precompiled regexes.
+
+=head1 EXAMPLE
+
+Using L<Time::Str::Regexp>, L<Time::Str::Token>, and
+L<Time::Str::Calendar> together to build a custom parser:
+
+    use Time::Str::Regexp   qw( $DateTime_Rx );
+    use Time::Str::Token    qw( parse_day parse_month parse_day_name
+                                parse_meridiem parse_tz_offset );
+    use Time::Str::Calendar qw( valid_ymd ymd_to_dow );
+
+    my $string = 'Monday, December 24th, 2012 at 3:30:45 PM UTC+1';
+
+    if ($string =~ $DateTime_Rx) {
+      my %m = %+;
+
+      my $dow       = parse_day_name($m{day_name});    # 1 (Monday)
+      $m{month}     = parse_month($m{month});          # 12
+      $m{day}       = parse_day($m{day});              # 24
+      $m{tz_offset} = parse_tz_offset($m{tz_offset});  # 60
+
+      valid_ymd(@m{qw(year month day)})
+        or die "invalid date";
+
+      ($dow == ymd_to_dow(@m{qw(year month day)}))
+        or die "day name does not match date";
+
+      my $hour_offset = parse_meridiem($m{meridiem});  # 12
+      $m{hour} = ($m{hour} % 12) + $hour_offset;       # 15
+
+      printf "%04d-%02d-%02dT%02d:%02d:%02d (%+3.2fH)\n",
+        @m{qw(year month day hour minute second)}, $m{tz_offset} / 60;
+        # 2012-12-24T15:30:45 (+1.00H)
+    }
+
+=head1 SEE ALSO
+
+L<Time::Str>, L<Time::Str::Token>, L<Time::Str::Calendar>
+
+=head1 AUTHOR
+
+Christian Hansen
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 by Christian Hansen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

@@ -1,6 +1,6 @@
 # AtteanX::Parser::JSONLD
 
-## JSONLD RDF Parser
+## JSON-LD 1.1 RDF Parser
 
 ## VERSION
 
@@ -14,7 +14,7 @@ This document describes AtteanX::Parser::JSONLD version 0.001.
 
 ## DESCRIPTION
 
-This module implements a JSON-LD 1.11 RDF parser for [Attean](https://metacpan.org/pod/Attean).
+This module implements a JSON-LD 1.1 RDF parser for [Attean](https://metacpan.org/pod/Attean).
 
 ## ROLES
 

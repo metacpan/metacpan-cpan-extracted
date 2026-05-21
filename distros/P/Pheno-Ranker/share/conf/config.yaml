@@ -8,6 +8,9 @@ sort_by: hamming
 # Set the similarity metric to use in cohort mode (hamming|jaccard)
 similarity_metric_cohort: hamming
 
+# Set the matrix output format in cohort mode (dense|mtx)
+matrix_format: dense
+
 # Set the primary key for the objects
 primary_key: id
 
@@ -26,14 +29,14 @@ seed: 123456789
 # Set the regex to exclude variables matching a specific pattern
 exclude_variables_regex: 'info|notes|label|value|\.high|\.low|metaData|familyHistory|excluded|_visit|dateOfProcedure|files|reference\.id|reference\.description|timeObserved|dateOfBirth|timestamp|treatmentTarget|treatmentIntent|adverseEvents|treatmentTerminationReason|_id|pedigrees|datasetId'
 
-# Set the terms which are arrays
-array_terms: [biosamples,diseases,exposures,interpretations,interventionsOrProcedures,measures,measurements,medicalActions,pedigrees,phenotypicFeatures,treatments]
+# Set the first-level array terms whose numeric indexes are replaced with semantic identities
+indexed_terms: [biosamples,diseases,exposures,interpretations,interventionsOrProcedures,measures,measurements,medicalActions,pedigrees,phenotypicFeatures,treatments]
 
-# Set the regex to identify array indexes, guiding their substitution within array elements
-array_regex: '^([^:]+):(\d+)\.(\S+)'
+# Set the regex to identify first-level array indexes, guiding their substitution within array elements
+index_regex: '^([^:]+):(\d+)\.(\S+)'
 
-# Set the path to select values for substituting array indexes
-id_correspondence:
+# Set the paths used to replace first-level array indexes with semantic identities
+identity_paths:
   BFF:
     diseases: 'diseaseCode.id'
     exposures: 'exposureCode.id'

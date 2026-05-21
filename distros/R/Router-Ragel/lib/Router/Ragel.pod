@@ -1,48 +1,48 @@
 =head1 NAME
 
-Router::Ragel - A high-performance URL router using the Ragel finite state machine
+Router::Ragel - High-performance URL router built on a Ragel-generated state machine
 
 =head1 SYNOPSIS
 
     use Router::Ragel;
 
-    # Create a new router
-    my $router = Router::Ragel->new;
+    my $router = Router::Ragel->new
+        ->add('/users', 'users_list')
+        ->add('/users/:id<int>', 'user_show')
+        ->add('/blog/:year<int>/:month<int>/:slug', 'blog_post')
+        ->compile;
 
-    # Add routes
-    $router->add('/users', { controller => 'users', action => 'index' });
-    $router->add('/users/:id', { controller => 'users', action => 'show' });
-    $router->add('/blog/:year/:month/:slug', { controller => 'blog', action => 'post' });
+    my ($handler, @captures) = $router->match('/users/42');
+    # ('user_show', '42')
 
-    # Compile the routes (must be done before matching)
-    $router->compile;
+    my @no_match = $router->match('/nope');
+    # ()
 
-    # Match a path
-    my ($route_data, @captures) = $router->match('/users/42');
-    # $route_data = { controller => 'users', action => 'show' }
-    # @captures = ('42')
-
-    my ($blog_data, @blog_captures) = $router->match('/blog/2023/04/perl-routing');
-    # $blog_data = { controller => 'blog', action => 'post' }
-    # @blog_captures = ('2023', '04', 'perl-routing')
-
-    # Non-matching path returns empty list
-    my @no_match = $router->match('/nonexistent');
-    # @no_match = ()
+    # Function form, faster than method dispatch:
+    my ($h, @c) = Router::Ragel::match($router, '/users/42');
 
 =head1 DESCRIPTION
 
-Router::Ragel is a fast URI path router for Perl applications that uses the Ragel state machine compiler to generate efficient C code for route matching. This approach offers significant performance advantages over regex-based routers, especially for applications with many routes or high request volumes.
+Router::Ragel compiles a set of URL patterns into a single Ragel finite-state
+machine and emits it as C via L<Inline::C>. Matching a path is a fixed-cost
+walk over a DFA: there is no per-route loop and no regex engine. For
+applications with many routes or high request rates this typically beats
+regex- and trie-based routers by a wide margin (see L</PERFORMANCE>).
 
 The router supports:
 
 =over 4
 
-=item * Static routes (C</users>, C</products>)
+=item * Static segments (C</users>, C</products>)
 
-=item * Dynamic routes with named placeholders (C</users/:id>, C</blog/:year/:month/:day>)
+=item * Named placeholders (C</users/:id>, C</blog/:year/:month>)
 
-=item * Multiple independent router instances
+=item * Typed placeholders (C<< /users/:id<int> >>, C<< /code/:c<[0-9]{4}> >>)
+
+=item * Inline placeholders mixed with literal text in a single segment
+(C<< /v/:major<int>.:minor<int> >>)
+
+=item * Multiple independent router instances in the same process
 
 =back
 
@@ -52,107 +52,197 @@ The router supports:
 
     my $router = Router::Ragel->new;
 
-Creates a new router instance.
+Constructs a new router. Takes no arguments.
 
-=head2 add($pattern, $data)
+=head2 add
 
-    $router->add('/users', { controller => 'users', action => 'index' });
-    $router->add('/users/:id', { controller => 'users', action => 'show' });
-    $router->add('/api', $whatever);
+    $router->add($pattern, $data);
 
-Adds a route to the router. The C<$pattern> parameter defines the URL pattern to match, and C<$data> is the data to be returned when the pattern matches.
+Registers a route. C<$pattern> is a path string (see L</"ROUTE PATTERNS">);
+C<$data> is the value returned by C<match> on a hit and may be any scalar.
+Returns the router, so calls can be chained.
 
-Patterns can include named placeholders that start with a colon, like C<:id> or C<:slug>. These placeholders will capture the corresponding segments from the URL path.
+Adding a route after C<compile> invalidates the compiled state; the next
+C<match> will C<croak> until C<compile> is called again.
 
 =head2 compile
 
     $router->compile;
 
-Compiles the routes into a Ragel state machine. This method must be called after adding all routes and before attempting to match any paths.
+Builds and binds the Ragel state machine. Must be called before C<match>.
+Returns the router. May be called more than once to incorporate routes added
+between calls; see L</LIMITATIONS> for the cost of recompiling.
 
-=head2 match($path)
+=head2 match
 
-    my ($route_data, @captures) = $router->match('/users/42');
+    my ($data, @captures) = $router->match($path);
 
-Matches a path against the compiled routes. Returns the route data and any captured values from placeholders.
+Matches C<$path> against the compiled routes and returns the route data
+followed by captured values, in pattern order. Returns the empty list on no
+match.
 
-If the path doesn't match any route, an empty list is returned.
+For the lowest call overhead, invoke C<match> as a plain function and skip
+Perl's method dispatch:
+
+    my ($data, @captures) = Router::Ragel::match($router, $path);
+
+Both forms run the same compiled state machine.
 
 =head1 ROUTE PATTERNS
 
-Route patterns are strings that define the URL paths to match. They can include:
+A pattern is a string starting with C</>. Each segment between slashes is
+either literal text or contains one or more B<placeholders>. A placeholder is
+C<:NAME> optionally followed by a type constraint C<< <TYPE> >>.
+
+=head2 Placeholder names
+
+The name is a run of word characters (C<\w+>): letters, digits, and
+underscores. With no type, a placeholder matches any non-slash bytes
+(C<[^/]+>).
+
+The name is greedy, so to follow a placeholder with literal characters that
+could otherwise extend the name, terminate the name with an explicit type:
+
+    /:type_extra # one placeholder named "type_extra"
+    /:type<string>_extra # placeholder "type" then literal "_extra"
+
+=head2 Type constraints
+
+Built-in aliases:
 
 =over 4
 
-=item * Static segments: C</users>, C</products>
+=item * C<int> = C<[0-9]+>
 
-=item * Named placeholders: C<:id>, C<:slug>, C<:year>
+=item * C<string> = C<[^/]+> (default; explicit form)
+
+=item * C<hex> = C<[0-9a-fA-F]+>
 
 =back
 
-Named placeholders start with a colon (C<:>) and match any characters except for a forward slash (C</>). The values captured by these placeholders are returned as additional values from the C<match> method.
+Anything else inside C<< <...> >> is passed verbatim to Ragel, so arbitrary
+character classes and quantifiers work:
 
-Examples:
+    /code/:c<[0-9]{4}> # exactly four digits
+    /file/:name<[a-z0-9\-]+> # slug-like (escape '-' inside a class)
 
-    '/users'                  # Matches only '/users'
-    '/users/:id'              # Matches '/users/42', '/users/john', etc.
-    '/blog/:year/:month/:day' # Matches '/blog/2023/04/15', etc.
+The dialect is B<Ragel's>, not Perl/PCRE. Available: character classes,
+quantifiers (C<*>, C<+>, C<?>, C<{n}>, C<{n,m}>), alternation, grouping, and
+Ragel keywords (C<digit>, C<alpha>, C<alnum>, C<xdigit>, C<lower>, C<upper>,
+C<space>, C<punct>, C<print>, C<ascii>, C<any>). B<Not> available: Perl
+shortcuts (C<\d>, C<\w>, C<\s>), anchors, lookaround, and backreferences.
+Anchors are unnecessary anyway: segment boundaries are implicit.
 
-=head1 MULTIPLE ROUTERS
+A literal C<< > >> cannot appear inside a C<< <type> >> expression (the
+parser closes the type at the first C<< > >>); a literal C<< < >> is
+rejected at compile time. A literal C<< - >> inside a character class must
+be escaped as C<< \- >> (Ragel parses an unescaped C<< - >> as a range
+operator and errors out, even at the start or end of the class). For any of
+these, match a permissive class and post-process in user code.
 
-You can create multiple independent router instances:
+=head2 Captures
 
-    my $api_router = Router::Ragel->new;
-    $api_router->add('/api/users', 'api_users_handler');
+Captures are returned positionally by C<match>, in the order their
+placeholders appear in the pattern. Placeholder names are not used at match
+time.
 
-    my $admin_router = Router::Ragel->new;
-    $admin_router->add('/admin/users', 'admin_users_handler');
+=head2 Examples
 
-    $api_router->compile;
-    $admin_router->compile;
+    /users # static
+    /users/:id # untyped placeholder, matches any non-slash
+    /users/:id<int> # typed: digits only
+    /blog/:year<int>/:month<int> # multiple typed placeholders
+    /v/:major<int>.:minor<int> # multiple placeholders in one segment
+    /file/:name<[a-z0-9\-]+>.:ext<[a-z]+> # inline + raw character classes
+    /path/to_:type<string>/id_:id<int>/end # mixed literals and placeholders
+
+=head2 Caveats
+
+Any C<:> inside a segment introduces a placeholder; there is no escaping
+mechanism. Avoid literal colons in path segments.
+
+=head1 DEPLOYMENT
+
+The compiled Ragel machine lives in a shared library that L<Inline::C>
+C<dlopen>s into the process; the function pointer is stored on the router
+object. To avoid every worker compiling its own copy, B<call C<compile>
+once in the parent process before forking>:
+
+    # in app.psgi or equivalent startup code
+    my $router = MyApp->build_router; # calls Router::Ragel->compile
+    # then exec the server with --preload-app or equivalent so children
+    # inherit the loaded .so via copy-on-write
+
+If the cache is cold and several workers reach C<compile> concurrently,
+L<Inline::C> serializes them on a directory lock and only one process runs
+the C compiler -- the rest C<dlopen> the resulting C<.so>. That avoids the
+C<cc>/C<ragel> stampede but every worker still pays the wait. Compiling in
+the parent before fork eliminates the wait too.
+
+For deterministic startup, populate the L<Inline::C> cache at build/deploy
+time and ship the warmed directory with the artifact (e.g., bake C<_Inline/>
+into your Docker image). Pin the cache location for reproducibility:
+
+    use Inline Config => DIRECTORY => '/opt/myapp/inline';
+    use Router::Ragel;
+
+The C<use Inline Config> line must be evaluated before C<Router::Ragel> is
+loaded (place it in the same file above C<use Router::Ragel>, or in a
+B<BEGIN> block that runs first). Once C<Router::Ragel> is loaded, the cache
+location is fixed.
+
+The compiled C<.so> is architecture- and Perl-version-specific; build the
+cache on the same target as production.
 
 =head1 PERFORMANCE
 
-Router::Ragel is designed for high performance. According to benchmarks, it outperforms other popular Perl routing libraries:
+Indicative numbers from C<eg/bench.pl> (Linux x86_64, single core; matches
+per second across seven mixed routes and six paths):
 
-    Benchmark comparing Router::XS (XS), Router::R3 (R3), URI::Router (UR), and Router::Ragel (Ragel):
+                       Rate   Mojo R3(method) R3(fun) XS(fun) UR(method) UR(fun) Ragel(method) Ragel(fun)
+    Mojo             9166/s     --       -97%    -97%    -99%       -99%    -99%          -99%       -99%
+    R3(method)     319956/s  3391%         --     -4%    -55%       -56%    -60%          -68%       -74%
+    R3(fun)        332160/s  3524%         4%      --    -53%       -55%    -59%          -66%       -73%
+    XS(fun)        713678/s  7686%       123%    115%      --        -3%    -11%          -28%       -42%
+    UR(method)     735486/s  7924%       130%    121%      3%         --     -9%          -26%       -41%
+    UR(fun)        804357/s  8675%       151%    142%     13%         9%      --          -19%       -35%
+    Ragel(method)  988728/s 10687%       209%    198%     39%        34%     23%            --       -20%
+    Ragel(fun)    1238754/s 13414%       287%    273%     74%        68%     54%           25%         --
 
-                       Rate R3(method) R3(fun) XS(fun) UR(method) UR(fun) Ragel(method) Ragel(fun)
-    R3(method)     265481/s         --     -4%    -57%       -58%    -63%          -70%       -77%
-    R3(fun)        276801/s         4%      --    -55%       -56%    -61%          -68%       -76%
-    XS(fun)        613304/s       131%    122%      --        -2%    -14%          -30%       -47%
-    UR(method)     625570/s       136%    126%      2%         --    -12%          -29%       -45%
-    UR(fun)        710874/s       168%    157%     16%        14%      --          -19%       -38%
-    Ragel(method)  877196/s       230%    217%     43%        40%     23%            --       -24%
-    Ragel(fun)    1146879/s       332%    314%     87%        83%     61%           31%         --
-
-ref: ex/bench.pl
-
-=head1 HOW IT WORKS
-
-Router::Ragel uses the Ragel state machine compiler to generate efficient C code for route matching. The workflow is:
-
-=over 4
-
-=item 1. Create a new router instance
-
-=item 2. Add routes with patterns and associated data
-
-=item 3. Compile the routes, which generates a Ragel state machine in C
-
-=item 4. Match incoming paths against the compiled state machine
-
-=back
-
-The compiled state machine is highly optimized for path matching and can handle a large number of routes with minimal overhead.
+Run C<eg/bench.pl> to reproduce locally; routers that aren't installed are
+skipped.
 
 =head1 LIMITATIONS
 
 =over 4
 
-=item * Router::Ragel assumes input as byte strings
+=item *
 
-=item * The C<compile> method must be called after adding all routes and before matching
+Patterns and paths are byte strings. Wide-character (utf8-flagged) strings
+are matched against their UTF-8 byte representation.
+
+=item *
+
+Patterns must start with C</> and must not be empty, contain a NUL byte,
+contain consecutive slashes, use a bare C<:> placeholder name, or contain an
+empty or unterminated C<< <type> >>. C<compile> C<croak>s on any of these.
+
+=item *
+
+Matching is exact: C</users> matches only C</users>, not C<//users>,
+C</users/>, or C</users//>. C</users> and C</users/> are distinct routes.
+Normalize input ahead of C<match> to fold repeated or trailing slashes.
+
+=item *
+
+Adding a route after C<compile> invalidates the compiled matcher; C<match>
+C<croak>s until you re-run C<compile>. Each C<compile> C<dlopen>s a new
+shared library; the previous one stays loaded for the lifetime of the
+process. See L</DEPLOYMENT> for the implications under pre-forking servers.
+
+=item *
+
+Calling C<match> before C<compile> C<croak>s.
 
 =back
 
@@ -166,6 +256,8 @@ The compiled state machine is highly optimized for path matching and can handle 
 
 =item * L<URI::Router>
 
+=item * L<Mojolicious::Routes>
+
 =item * L<Inline::C>
 
 =item * L<Inline::Filters::Ragel>
@@ -174,12 +266,13 @@ The compiled state machine is highly optimized for path matching and can handle 
 
 =head1 AUTHOR
 
-Yegor Korablev
+vividsnow
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is copyright (c) 2025 by Yegor Korablev.
+Copyright (c) 2026 vividsnow.
 
-This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.
 
 =cut

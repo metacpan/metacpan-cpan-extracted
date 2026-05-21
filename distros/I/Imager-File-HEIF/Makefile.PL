@@ -12,9 +12,6 @@ GetOptions("incpath=s", \@incpaths,
            "libpath=s" => \@libpaths,
            "verbose|v" => \$verbose);
 
-our $BUILDING_IMAGER;
-our %IMAGER_LIBS;
-
 my %opts = 
   (
    NAME => 'Imager::File::HEIF',
@@ -132,6 +129,10 @@ else {
 
 sub _heif_test_code {
   return <<'CODE';
+
+#if LIBHEIF_HAVE_VERSION(1, 13, 0)
+    heif_init(NULL);
+#endif
     uint32_t ver = heif_get_version_number();
     struct heif_context *ctx = heif_context_alloc();
     const struct heif_encoder_descriptor *encoders[10] = { NULL };
@@ -139,16 +140,11 @@ sub _heif_test_code {
     printf("libheif %d.%d.%d (%#x)\n",
 	    ver >> 24, (ver >> 16) & 0xFF, (ver >> 8) & 0xFF, ver);
 
-    if (ver < 0x01090000) {
-        printf("At least version 1.9.0 of libheif is required\n");
-        printf("Older versions can produce invalid files for non-trivial programs\n");
+    if (ver < 0x010B0000) {
+        printf("At least version 1.11.0 of libheif is required\n");
         return 1;
     }
-    if (ver == 0x10a0000) {
-        printf("** Version 1.10.0 of libheif produces invalid files **\n");
-        return 1;
-    }
-    printf("libheif is sufficiently recent (1.9.0 required).\n");
+    printf("libheif is sufficiently recent (1.11.0 required).\n");
 
     if (!ctx) {
         printf("Couldn't allocate a libheif context - memory?\n");

@@ -3,12 +3,21 @@
 ## Lightweight DateTime Alternative - t/11.accessors.t
 ## Covers public accessors not exercised by the other test files.
 ##----------------------------------------------------------------------------
+BEGIN
+{
+    use strict;
+    use warnings;
+    use lib './lib';
+    use Test::More;
+};
+
 use strict;
 use warnings;
-use lib './lib';
-use Test::More;
 
-use_ok( 'DateTime::Lite' ) or BAIL_OUT( 'Cannot load DateTime::Lite' );
+BEGIN
+{
+    use_ok( 'DateTime::Lite' ) or BAIL_OUT( 'Cannot load DateTime::Lite' );
+};
 
 # Reference date: 2026-04-03T14:30:45.123456789 UTC
 # Friday, day 93 of year, Q2, week 14

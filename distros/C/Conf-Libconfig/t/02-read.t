@@ -1,16 +1,18 @@
 #!perl -T
 use strict;
 use warnings;
-use bigint;
 use Data::Dumper;
-use Test::More tests => 26;
+use Test::More;
 
 use Conf::Libconfig;
 
-my $cfgfile1 = "./t/00-load.t";
-my $cfgfile2 = "./t/test.cfg";
 my $foo1 = Conf::Libconfig->new;
 my $foo2 = Conf::Libconfig->new;
+my $ver = $foo1->getversion();
+$ver =~ s/\.//g;
+
+my $cfgfile1 = "./t/00-load.t";
+my $cfgfile2 = "./t/test.cfg";
 ok(!$foo1->read_file($cfgfile1), "read file - status ok");
 ok($foo2->read_file($cfgfile2), "read file - status ok");
 
@@ -77,7 +79,9 @@ is_deeply($foo2->value("list"),
 	"value for list - status ok",
 );
 
-is_deeply($foo2->value("misc"),
+SKIP: {
+	skip "libconfig $ver hex/int64 differs from >= 1.4", 1 if $ver < 140;
+	is_deeply($foo2->value("misc"),
 	{
 		"port"=>5000,
 		"pi"=>"3.14159265",
@@ -89,6 +93,8 @@ is_deeply($foo2->value("misc"),
 	},
 	"value for list - status ok",
 );
+
+}
 
 is($foo2->lookup_string("application.test-comment"),
 	"/* hello\n \"there\"*/",
@@ -158,3 +164,4 @@ is_deeply($foo2->value("includes"),
 	"",
 	"includes value - status ok",
 );
+done_testing();

@@ -1,6 +1,6 @@
 package Langertha::Tool;
 # ABSTRACT: Immutable canonical tool definition with cross-provider format conversion
-our $VERSION = '0.500';
+our $VERSION = '0.502';
 use Moose;
 
 has name => (
@@ -138,6 +138,17 @@ sub to_gemini {
   };
 }
 
+# OpenAI Responses API: flat tool objects, no {type:'function',function:{...}} wrapper
+sub to_responses {
+  my ($self) = @_;
+  return {
+    type        => 'function',
+    name        => $self->name,
+    description => $self->description,
+    parameters  => $self->input_schema,
+  };
+}
+
 sub to_mcp {
   my ($self) = @_;
   return {
@@ -184,7 +195,7 @@ Langertha::Tool - Immutable canonical tool definition with cross-provider format
 
 =head1 VERSION
 
-version 0.500
+version 0.502
 
 =head1 SUPPORT
 

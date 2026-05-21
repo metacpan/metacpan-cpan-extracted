@@ -11,6 +11,6 @@ README.md
 t/00-load.t
 t/01-num_to_ro.t
 t/02-ro_to_num.t
-t/manifest.t
 t/pod-coverage.t
 t/pod.t
+SIGNATURE    Added here by Module::Build

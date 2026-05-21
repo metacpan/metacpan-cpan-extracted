@@ -47,9 +47,9 @@ sub process_csv {
     pod2usage( -verbose => 2, -exitval => 0 ) if $man;
     pod2usage(
         -message =>
-          "Please specify a valid CSV|TSV input with --i <file.csv>\n",
+          "Please specify a readable CSV|TSV input with --i <file.csv>\n",
         -exitval => 1
-    ) unless ( $input && $input =~ m/\.(csv|tsv)$/ && -f $input );
+    ) unless ( $input && $input =~ m/\.(csv|tsv)$/ && -f $input && -r _ );
     pod2usage(
         -message => "Please specify a --primary-key-name <my_string>\n",
         -exitval => 1
@@ -58,6 +58,15 @@ sub process_csv {
         -message => "Please specify a valid directory for --output-dir\n",
         -exitval => 1
     ) if ( defined $output_dir && !-d $output_dir );
+    pod2usage(
+        -message => "Please specify a writable directory for --output-dir\n",
+        -exitval => 1
+    ) if ( defined $output_dir && !-w _ );
+    pod2usage(
+        -message => "Please specify a single-character --separator\n",
+        -exitval => 1
+    ) if ( defined $sep && length($sep) != 1 );
+    validate_array_separator($array_sep);
 
     # Create object
     my $csv = CSV2PhenoRanker->new(
@@ -75,6 +84,21 @@ sub process_csv {
 
     # Run method
     $csv->run;
+}
+
+sub validate_array_separator {
+    my $array_sep = shift;
+    pod2usage(
+        -message => "Please specify a non-empty --array-separator\n",
+        -exitval => 1
+    ) unless defined $array_sep && length($array_sep);
+
+    my $ok = eval { qr/$array_sep/; 1 };
+    pod2usage(
+        -message => "Please specify a valid regular expression for --array-separator\n",
+        -exitval => 1
+    ) unless $ok;
+    return 1;
 }
 
 package CSV2PhenoRanker;
@@ -109,7 +133,7 @@ sub run {
 
     # Write data as JSON
     my $json_file = catfile( $output_dir, qq/${name}.json/ );
-    say "Writting <$json_file> " if $self->{verbose};
+    say "Writing <$json_file> " if $self->{verbose};
     write_json( { filepath => $json_file, data => $data } );
 
     # Load the configuration file data
@@ -117,7 +141,7 @@ sub run {
 
     # Write the configuration file as YAML
     my $yaml_file = catfile( $output_dir, qq/${name}_config.yaml/ );
-    say "Writting <$yaml_file> " if $self->{verbose};
+    say "Writing <$yaml_file> " if $self->{verbose};
     write_yaml( { filepath => $yaml_file, data => $config } );
     return 1;
 }
@@ -165,9 +189,12 @@ sub read_csv {
 
     # Parse the CSV data
     my $headers = $csv->getline($fh);
+    die "Input file <$input> does not contain a header row\n"
+      unless $headers && @{$headers};
 
     # Get rid of problematic characters on headers
     $_ =~ tr/()//d for @$headers;
+    validate_headers($headers);
 
     # Add $primary_key_name to headers if $generate_primary_key
     if ($generate_primary_key) {
@@ -233,6 +260,18 @@ sub read_csv {
   return ( \@rows, \@array, \@non_array );
 }
 
+sub validate_headers {
+  my $headers = shift;
+  my %seen;
+  for my $header ( @{$headers} ) {
+      die "Input file contains an empty header after normalization\n"
+        unless defined $header && length $header;
+      die "Input file contains duplicated header <$header> after normalization\n"
+        if $seen{$header}++;
+  }
+  return 1;
+}
+
 sub split_array_fields {
   my ( $rows, $array, $array_sep ) = @_;
 
@@ -279,11 +318,11 @@ sub create_config {
   if ( scalar @arrays ) {
 
       # NB: Can't use $array more than once in the hash ref below. Need to deref
-      $config->{array_terms} = [@arrays];
+      $config->{indexed_terms} = [@arrays];
 
       # @non_arrays, @arrays are sorted, but if we merge them we need to re-sort
       $config->{allowed_terms}     = [ sort @non_arrays, @arrays ];
-      $config->{id_correspondence} = {
+      $config->{identity_paths} = {
           CSV => [
               map {
                   my $val = { $_ => $_ };
@@ -331,7 +370,7 @@ csv2pheno-ranker: A script to convert a CSV to an input suitable for Pheno-Ranke
    Options:
      -generate-primary-key            Generates a primary key if absent. Use --primary-key-name to set its name
      -primary-key-name <name>         Sets the name for the primary key. Must be a single, non-array field
-     -sep, --separator <char>         Delimiter for CSV fields [;] (e.g., --sep $'\t' for tabs)
+     -sep, --separator <char>         Delimiter for CSV fields [auto: comma for .csv, tab for .tsv]
      -array-separator <char>          Delimiter for nested arrays [|] (e.g., --array-separator ';' for semicolons)
      -output-dir <directory>          Specify the directory where output files will be stored. If not specified, outputs will be placed in the same directory as the input file
 

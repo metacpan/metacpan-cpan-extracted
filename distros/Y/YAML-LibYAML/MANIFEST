@@ -81,6 +81,7 @@ t/oop/11-schema.t
 t/oop/12-alias.t
 t/oop/13-utf8.t
 t/oop/14-options.pl
+t/oop/15-various.t
 t/oop/schema-core.yaml
 t/path-class.t
 t/pl_sv_undef.t

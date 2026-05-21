@@ -10,11 +10,11 @@ use parent qw/ Plack::Middleware /;
 use Plack::Util;
 use Plack::Util::Accessor qw/ path type /;
 use Ref::Util qw/ is_arrayref is_coderef /;
-use Text::Minify::XS v0.7.0 ();
+use Text::Minify::XS v0.7.8 ();
 
 # RECOMMEND PREREQ:  Ref::Util::XS
 
-our $VERSION = 'v0.4.1';
+our $VERSION = 'v0.4.2';
 
 sub call {
     my ($self, $env) = @_;
@@ -95,7 +95,7 @@ Plack::Middleware::Text::Minify - remove HTML indentation on the fly
 
 =head1 VERSION
 
-version v0.4.1
+version v0.4.2
 
 =head1 SYNOPSIS
 
@@ -124,7 +124,7 @@ to a true value. (Added in v0.2.0.)
 =head2 path
 
 This is a regex or callback that matches against C<PATH_INFO>.  If it
-does not match, then the response won't be minified.
+does not match, then the response won't be processed.
 
 The callback takes the C<PATH_INFO> and Plack environment as arguments.
 
@@ -134,22 +134,20 @@ codes with no bodies, or request methods other than C<GET> or C<POST>.
 =head2 type
 
 This is a regex or callback that matches against the content-type. If it
-does not match, then the response won't be minified.
+does not match, then the response won't be processed.
 
-The callback takes the content-type header and the Plack reponse as
+The callback takes the content-type header and the Plack response as
 arguments.
 
 By default, it will match against any "text/" MIME type.
+
+=for stopwords minifier
 
 =head1 SUPPORT FOR OLDER PERL VERSIONS
 
 This module requires Perl v5.14 or newer.
 
 Future releases may only support Perl versions released in the last ten years.
-
-If you need this module on Perl v5.9.3, please use one of the v0.3.x
-versions of this module.  Significant bug or security fixes may be
-backported to those versions.
 
 =head1 KNOWN ISSUES
 
@@ -182,7 +180,7 @@ L<PSGI>
 =head1 SOURCE
 
 The development version is on github at L<https://github.com/robrwo/Plack-Middleware-Text-Minify>
-and may be cloned from L<git://github.com/robrwo/Plack-Middleware-Text-Minify.git>
+and may be cloned from L<https://github.com/robrwo/Plack-Middleware-Text-Minify.git>
 
 =head1 BUGS
 
@@ -193,13 +191,18 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head2 Reporting Security Vulnerabilities
+
+Security issues should not be reported on the bugtracker website.  Please see F<SECURITY.md> for instructions how to
+report security vulnerabilities
+
 =head1 AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020-2023 by Robert Rothenberg.
+This software is Copyright (c) 2020-2026 by Robert Rothenberg.
 
 This is free software, licensed under:
 

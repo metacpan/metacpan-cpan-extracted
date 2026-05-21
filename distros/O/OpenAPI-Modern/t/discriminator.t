@@ -15,12 +15,11 @@ use lib 't/lib';
 use Helper;
 
 my $doc_uri = Mojo::URL->new('http://example.com/api');
-my $yamlpp = YAML::PP->new(boolean => 'JSON::PP');
 
 subtest 'use discriminator to determine petType' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
   description: 'runtime: use discriminator to determine petType'
 components:
   schemas:
@@ -202,7 +201,7 @@ YAML
 subtest 'discriminator in a parent definition' => sub {
   my $openapi = OpenAPI::Modern->new(
     openapi_uri => $doc_uri,
-    openapi_schema => $yamlpp->load_string(OPENAPI_PREAMBLE.<<'YAML'));
+    openapi_schema => decode_yaml(OPENAPI_PREAMBLE.<<'YAML'));
   description: 'runtime: use discriminator to determine petType'
 components:
   schemas:

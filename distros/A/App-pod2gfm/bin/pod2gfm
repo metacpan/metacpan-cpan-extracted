@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 
 use strict;
 use warnings;
@@ -123,6 +123,8 @@ in the shell or add it to a bash startup file (e.g. F</etc/bash.bashrc> or F<~/.
 =for highlighter language=shell
 
   complete -C pod2gfm pod2gfm
+
+Note that L<Getopt::Long::More> is required.
 
 =head1 EXIT STATUS
 

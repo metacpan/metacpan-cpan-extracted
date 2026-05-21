@@ -190,7 +190,7 @@
         <ram:ID schemeID="">BT-29</ram:ID>
         <ram:GlobalID schemeID=""></ram:GlobalID>
         <ram:Name>BT-27</ram:Name>
-        <ram:Description></ram:Description>
+        <ram:Description>BT-33</ram:Description>
         <ram:SpecifiedLegalOrganization>
           <ram:ID schemeID=""></ram:ID>
           <ram:TradingBusinessName></ram:TradingBusinessName>
@@ -222,6 +222,9 @@
         </ram:URIUniversalCommunication>
         <ram:SpecifiedTaxRegistration>
           <ram:ID schemeID="BT-31-0">BT-31</ram:ID>
+        </ram:SpecifiedTaxRegistration>
+        <ram:SpecifiedTaxRegistration>
+          <ram:ID schemeID="BT-32-0">BT-32</ram:ID>
         </ram:SpecifiedTaxRegistration>
       </ram:SellerTradeParty>
       <ram:BuyerTradeParty>

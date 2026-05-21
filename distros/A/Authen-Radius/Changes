@@ -1,5 +1,21 @@
 Revision history for Perl extension Radius.
 
+0.37 Mon May 18 12:43:27 UTC 2026
+    - Enable Rfc3579MessageAuth by default and emit
+      Message-Authenticator as the first attribute in Access-Request
+      packets (RFC 9716 section 4.2), mitigating the Blast-RADIUS
+      protocol vulnerability. Callers that need the previous
+      behaviour can pass Rfc3579MessageAuth => 0 explicitly.
+    - Stabilise t/eintr.t on loaded smokers and MSWin32 by relaxing
+      the timeout budget and skipping the SIGALRM sub-test on
+      MSWin32 where Time::HiRes::alarm is unimplemented.
+
+0.36 Thu Apr 30 10:14:14 UTC 2026
+    - Treat EINTR from can_read() as a retryable signal interruption
+      rather than ETIMEOUT, so a signal arriving during recv_packet()
+      no longer triggers a spurious retransmit when the reply is
+      actually in flight
+
 0.35 Mon Mar 23 07:02:56 UTC 2026
     - No changes from previous version
 

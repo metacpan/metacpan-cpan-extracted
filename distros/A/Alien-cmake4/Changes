@@ -1,3 +1,14 @@
+0.04 2026-05-05T17:30:25+02:00
+ - Add minimal version of Perl for my code (not Mojo::DOM).
+ - Add missing build dependencies (explicitly for share build).
+ - Fix configure section in Makefile.PL.
+ - Remove Alien::Build::MM and Extutils::MakeMaker from build phase
+   requirements.
+ - Rewrite from base to parent.
+
+0.03 2026-04-27T19:17:10+02:00
+ - Add check for minimal version of glibc for binary installation on Linux.
+
 0.02 2026-04-26T17:40:16+02:00
  - Update MANIFEST.
 

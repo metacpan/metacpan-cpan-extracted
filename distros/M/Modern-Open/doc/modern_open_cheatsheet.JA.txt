@@ -1,0 +1,142 @@
+======================================================================
+ Modern::Open チートシート                             [JA] 日本語
+======================================================================
+
+[ 1. インストールと使い方 ]
+
+  インストール:
+    cpan Modern::Open
+
+  スクリプトでの使用:
+    use Modern::Open;
+
+  効果: open(), opendir(), sysopen(), pipe(), socket(), accept() を
+        オートバイビフィケーション（自動生成）+ autodie 版に置き換える。
+        Perl 5.005_03 以降のすべてのバージョンで動作する。
+        注意: socket() は autovivification のみ対応。autodie は行わない。
+
+[ 2. open() -- 2引数形式 ]
+
+  my $fh;
+  open($fh, "< file.txt");   # 読み込み
+  open($fh, "> file.txt");   # 書き込み（上書き）
+  open($fh, ">> file.txt");  # 追記
+  open($fh, "+< file.txt");  # 読み書き
+  open($fh, "cmd |");        # コマンドからパイプ入力
+  open($fh, "| cmd");        # コマンドへパイプ出力
+
+  # $fh にはグロブリファレンス（GLOB ref）が入る。
+  # readline, print, close をそのまま使用できる:
+  while (my $line = readline($fh)) { ... }
+  print $fh "text\n";
+  close($fh);
+
+[ 3. open() -- 3引数形式 ]
+
+  my $fh;
+  open($fh, '<',  "file.txt");   # 読み込み   (sysopen O_RDONLY)
+  open($fh, '>',  "file.txt");   # 書き込み   (sysopen O_WRONLY|O_TRUNC|O_CREAT)
+  open($fh, '>>', "file.txt");   # 追記       (sysopen O_WRONLY|O_APPEND|O_CREAT)
+  open($fh, '+<', "file.txt");   # 読み書き   (sysopen O_RDWR)
+  open($fh, '+>', "file.txt");   # 読み書き（上書き）
+  open($fh, '-|', "cmd");        # コマンドからパイプ入力
+  open($fh, '|-', "cmd");        # コマンドへパイプ出力
+
+  # 3引数形式は内部で CORE::sysopen を使用する。
+  # ファイル名にモード文字が含まれていても誤解析されない。
+
+[ 4. opendir() ]
+
+  my $dh;
+  opendir($dh, "/path/to/dir");
+
+  while (my $entry = readdir($dh)) {
+      next if $entry eq '.' or $entry eq '..';
+      print "$entry\n";
+  }
+  closedir($dh);
+
+  # Windows: パスの末尾のバックスラッシュは自動処理される。
+
+[ 5. sysopen() ]
+
+  use Fcntl qw(O_RDONLY O_WRONLY O_CREAT O_TRUNC);
+
+  my $fh;
+  sysopen($fh, "file.txt", O_RDONLY);
+  sysopen($fh, "file.txt", O_WRONLY | O_CREAT | O_TRUNC);
+  sysopen($fh, "file.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+
+[ 6. pipe() ]
+
+  my($reader, $writer);
+  pipe($reader, $writer);
+
+  # fork パターン:
+  if (my $pid = fork()) {
+      close($writer);
+      while (my $line = readline($reader)) { print $line }
+      close($reader);
+  } else {
+      close($reader);
+      print $writer "子プロセスからこんにちは\n";
+      close($writer);
+      exit 0;
+  }
+
+[ 7. socket() と accept() ]
+
+  use Socket qw(AF_INET SOCK_STREAM sockaddr_in inet_aton);
+
+  my $server;
+  socket($server, AF_INET, SOCK_STREAM, 0);
+  # 注意: socket() は autodie しない。戻り値を自分で確認すること。
+
+  my $client;
+  accept($client, $server);
+
+[ 8. autodie の動作 ]
+
+  # void コンテキスト（戻り値を受け取らない）: 失敗時に die
+  open($fh, "< no_such_file.txt");   # dies: Can't open(...)
+
+  # 戻り値を受け取る（スカラー/リストコンテキスト）: 失敗時は undef/0
+  my $rc = open($fh, "< file.txt");
+  unless ($rc) { warn "open 失敗: $!" }
+
+  # ベアワードハンドルは拒否される:
+  open(FILE, "< file.txt");   # dies: Bare handle no longer supported
+
+[ 9. 戻り値のハンドル ]
+
+  # open/opendir/sysopen/pipe/socket/accept が成功すると
+  # 第1引数 ($fh) にグロブリファレンスが代入される。
+  # 標準の Perl I/O 操作はすべて使用可能:
+
+  readline($fh)        # 1行読み込み
+  read($fh, $buf, $n)  # Nバイト読み込み
+  print $fh "..."      # 書き込み
+  binmode($fh)         # バイナリモード設定
+  seek($fh, 0, 0)      # 先頭にシーク
+  tell($fh)            # 現在位置
+  close($fh)           # クローズ
+  eof($fh)             # EOF判定
+
+[ 10. 互換性 ]
+
+  Perl バージョン: 5.005_03 以降（5.42 を含む）
+  プラットフォーム: Unix, Linux, macOS, Windows（CRLF 自動処理）
+  依存モジュール : Fcntl（コアモジュール、常に利用可能）
+
+[ 11. 公式リソース ]
+
+  Modern::Open (MetaCPAN):
+    https://metacpan.org/dist/Modern-Open
+
+  Perl open() ドキュメント:
+    https://perldoc.perl.org/functions/open
+
+  INABA Hitoshi (ina) on CPAN:
+    https://metacpan.org/author/INA
+
+======================================================================

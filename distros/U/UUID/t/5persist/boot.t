@@ -3,8 +3,7 @@
 #
 use strict;
 use warnings;
-use Test::More;
-use MyNote;
+use MyTest;
 use File::Spec ();
 use Try::Tiny;
 

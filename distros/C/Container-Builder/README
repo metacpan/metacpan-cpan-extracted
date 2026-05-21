@@ -124,10 +124,14 @@ METHODS
       Adds the local file $file_on_disk inside the container at location
       $location_in_ctr with the specified $mode, $user and $group.
 
-    add_file_from_string($data, $location_in_ctr, $mode, $user, $group)
+    add_file_from_string($data, $location_in_ctr, $mode, $user, $group,
+    [$compressed])
 
       Adds the data in the scalar $data to the container at location
       $location_in_ctr with the specified $mode, $user and $group.
+
+      $compressed is a boolean to determine if the image layer will be
+      compressed.
 
     copy($local_dirpath, $location_in_ctr, $mode, $user, $group)
 
@@ -182,9 +186,16 @@ METHODS
 
     build('mycontainer.tar')
 
+    build(filename_result => 'mycontainer.tar')
+
+    build('mycontainer.tar', 'localhost/ctr:latest')
+
+    build(filename_result => 'mycontainer.tar', tag_name =>
+    'localhost/ctr:latest')
+
       Build the container and write the result to the filepath specified.
-      If no argument is given, the entire archive is returned as a scalar
-      from the method.
+      tag_name sets an annotation in the Index so that other tooling knows
+      how to tag the image container upon loading.
 
     get_digest()
 

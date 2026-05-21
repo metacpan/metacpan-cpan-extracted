@@ -6,7 +6,7 @@ use Test::More tests => 2;
 
 BEGIN 
 {
-  require 't/test-lib.pl';
+  require './t/test-lib.pl';
   use_ok('Rose::DB::Object::QueryBuilder');
   Rose::DB::Object::QueryBuilder->import(qw(build_select));
 }

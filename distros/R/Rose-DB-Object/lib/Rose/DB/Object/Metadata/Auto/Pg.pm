@@ -163,7 +163,8 @@ sub auto_generate_column
 {
   my($self, $name, $col_info) = @_;
 
-  if ($col_info->{'TYPE_NAME'} eq 'bigint')
+  no warnings 'uninitialized';
+  if($col_info->{'TYPE_NAME'} eq 'bigint')
   {
     # Newer versions of DBD::Pg and/or PostgreSQL seem to return default bigint
     # values wrapped in single quotes. Strip them off.

@@ -6,7 +6,7 @@ use Carp;
 use EV;
 
 BEGIN {
-    our $VERSION = '0.04';
+    our $VERSION = '0.06';
     use XSLoader;
     XSLoader::load __PACKAGE__, $VERSION;
 }
@@ -189,53 +189,60 @@ EV::Pg - asynchronous PostgreSQL client using libpq and EV
 
 =head1 DESCRIPTION
 
-EV::Pg is a non-blocking PostgreSQL client that integrates with the L<EV>
-event loop.  It drives the libpq async API (C<PQsendQuery>,
-C<PQconsumeInput>, C<PQgetResult>) via C<ev_io> watchers on the libpq
-socket, so the event loop never blocks on database I/O.
+EV::Pg is a non-blocking PostgreSQL client built on top of libpq and
+the L<EV> event loop.  It drives the libpq async API (C<PQsendQuery>,
+C<PQconsumeInput>, C<PQgetResult>) through C<ev_io> watchers on the
+libpq socket, so the event loop never blocks on database I/O.
 
 Features: parameterized queries, prepared statements, pipeline mode,
-single-row mode, chunked rows (libpq E<gt>= 17), COPY IN/OUT,
-LISTEN/NOTIFY, async cancel (libpq E<gt>= 17), structured error fields,
-protocol tracing, and notice handling.
+single-row and chunked rows (libpq E<gt>= 17), COPY IN/OUT,
+LISTEN/NOTIFY, async cancel (libpq E<gt>= 17), structured error
+fields, protocol tracing, and notice handling.
 
 =head1 CALLBACKS
 
-Query callbacks receive C<($result)> on success, C<(undef, $error)> on error:
+Query callbacks always receive a single positional argument on success
+and C<(undef, $error_message)> on error, so
+
+    my ($result, $err) = @_;
+
+works for every shape: C<$result> is the success payload, C<$err> is
+defined only on error.  The shape of C<$result> depends on the query:
 
 =over
 
-=item B<SELECT> / B<single-row mode>
+=item SELECT (or single-row / chunked mode)
 
-C<(\@rows)> where each row is an arrayref of column values.
-C<undef> columns map to Perl C<undef>.
+C<\@rows> -- arrayref of rows; each row is an arrayref of column values
+with SQL NULL mapping to Perl C<undef>.
 
-=item B<INSERT / UPDATE / DELETE>
+=item INSERT / UPDATE / DELETE
 
-C<($cmd_tuples)> -- the string returned by C<PQcmdTuples>
-(e.g. C<"1">, C<"0">).
+C<$cmd_tuples> -- the string from C<PQcmdTuples> (e.g. C<"1">, C<"0">).
 
-=item B<Describe>
+=item PREPARE / close_prepared / close_portal
 
-C<(\%meta)> with keys C<nfields>, C<nparams>,
-and (when non-zero) C<fields> (arrayref of C<< {name, type} >> hashes)
-and C<paramtypes> (arrayref of OIDs).
+C<""> -- always an empty string (these commands return no row count).
 
-=item B<COPY>
+=item describe_prepared / describe_portal
 
-C<("COPY_IN")>, C<("COPY_OUT")>, or C<("COPY_BOTH")>.
+C<\%meta> -- hashref with C<nfields>, C<nparams>, and (when non-zero)
+C<fields> (arrayref of C<< {name, type} >> hashes) and C<paramtypes>
+(arrayref of OIDs).
 
-=item B<Pipeline sync>
+=item COPY
 
-C<(1)>.
+C<"COPY_IN">, C<"COPY_OUT">, or C<"COPY_BOTH"> -- a string tag
+identifying the COPY direction.
 
-=item B<Error>
+=item pipeline_sync
 
-C<(undef, $error_message)>.
+C<1>.
 
 =back
 
-Exceptions thrown inside callbacks are caught and emitted as warnings.
+Exceptions thrown inside callbacks are caught and reported via C<warn>
+so that one bad callback does not derail the rest of the queue.
 
 =head1 CONSTRUCTOR
 
@@ -243,54 +250,58 @@ Exceptions thrown inside callbacks are caught and emitted as warnings.
 
     my $pg = EV::Pg->new(%args);
 
-Arguments:
+Returns a new EV::Pg object.  If C<conninfo> or C<conninfo_params> is
+supplied, an asynchronous connect starts immediately; otherwise call
+C<connect> later.
+
+Recognized arguments:
 
 =over
 
 =item conninfo
 
-libpq connection string.  If provided, C<connect> is called immediately.
+libpq connection string passed to C<connect>.
 
 =item conninfo_params
 
-Hashref of connection parameters (e.g. C<< { host => 'localhost',
-dbname => 'mydb', port => '5432' } >>).  Alternative to C<conninfo>.
-If provided, C<connect_params> is called immediately.
+Hashref of connection parameters (e.g.
+C<< { host => 'localhost', dbname => 'mydb', port => 5432 } >>),
+passed to C<connect_params>.  Mutually exclusive with C<conninfo>.
 
 =item expand_dbname
 
-If true and C<conninfo_params> is used, the C<dbname> value is parsed
-as a connection string (allowing C<< dbname => 'postgresql://...' >>).
+When true together with C<conninfo_params>, the C<dbname> value is
+itself parsed as a connection string -- so
+C<< dbname => 'postgresql://host/db?sslmode=require' >> works.
 
 =item on_connect
 
-Callback invoked (with no arguments) when the connection is established.
+Fires once with no arguments when the handshake completes.
 
 =item on_error
 
-Callback invoked as C<< ($error_message) >> on connection-level errors.
-Defaults to C<sub { die @_ }>.
+Fires as C<($error_message)> on connection-level errors.  Defaults to
+C<sub { die @_ }>; pass an explicit handler to keep the loop alive.
 
 =item on_notify
 
-Callback invoked as C<< ($channel, $payload, $backend_pid) >> on
-LISTEN/NOTIFY messages.
+Fires as C<($channel, $payload, $backend_pid)> for LISTEN/NOTIFY
+messages.
 
 =item on_notice
 
-Callback invoked as C<< ($message) >> on PostgreSQL notice/warning
-messages.
+Fires as C<($message)> for server NOTICE/WARNING messages.
 
 =item on_drain
 
-Callback invoked (with no arguments) when the send buffer has been
-flushed during a COPY operation.  Useful for resuming C<put_copy_data> after
-it returns 0.
+Fires with no arguments when the libpq send buffer has been fully
+flushed during a COPY -- use it to resume sending after
+C<put_copy_data> returned 0.
 
 =item keep_alive
 
-When true, the connection keeps C<EV::run> alive even when no queries
-are pending.  See L</keep_alive>.
+When true, the connection keeps C<EV::run> alive even with an empty
+callback queue.  See L</keep_alive>.
 
 =item loop
 
@@ -298,51 +309,55 @@ An L<EV> loop object.  Defaults to C<EV::default_loop>.
 
 =back
 
+Unknown arguments produce a C<carp> warning and are otherwise ignored.
+
 =head1 CONNECTION METHODS
 
 =head2 connect
 
     $pg->connect($conninfo);
 
-Initiates an asynchronous connection.  The C<on_connect> handler fires
-on success; C<on_error> fires on failure.
+Starts an asynchronous connection from a libpq connection string.
+C<on_connect> fires on success, C<on_error> on failure.
 
 =head2 connect_params
 
     $pg->connect_params(\%params);
     $pg->connect_params(\%params, $expand_dbname);
 
-Initiates an asynchronous connection using keyword/value parameters
-instead of a connection string.  C<$expand_dbname> allows the C<dbname>
-parameter to contain a full connection URI.
+Like C<connect> but takes a hashref of keyword/value parameters.  When
+C<$expand_dbname> is true, the C<dbname> entry may itself be a
+connection string or URI.
 
 =head2 reset
 
     $pg->reset;
 
-Drops the current connection and reconnects using the original conninfo.
-Pending callbacks receive C<(undef, "connection reset")>.
+Drops the current connection and reconnects with the same parameters.
+Pending callbacks fire with C<(undef, "connection reset")> first.
 Alias: C<reconnect>.
 
 =head2 finish
 
     $pg->finish;
 
-Closes the connection.  Pending callbacks receive
+Closes the connection.  Pending callbacks fire with
 C<(undef, "connection finished")>.  Alias: C<disconnect>.
 
 =head2 is_connected
 
     my $bool = $pg->is_connected;
 
-Returns 1 if connected and ready for queries.
+True if the handshake has completed and the connection is ready for
+queries.  False during connect, after C<finish>, and after a fatal
+error.
 
 =head2 status
 
     my $st = $pg->status;
 
-Returns the libpq connection status (C<CONNECTION_OK> or
-C<CONNECTION_BAD>).
+libpq connection status: C<CONNECTION_OK> or C<CONNECTION_BAD>.
+Returns C<CONNECTION_BAD> when not connected.
 
 =head1 QUERY METHODS
 
@@ -350,31 +365,38 @@ C<CONNECTION_BAD>).
 
     $pg->query($sql, sub { my ($result, $err) = @_; });
 
-Sends a simple query.  B<Not allowed in pipeline mode> -- use
-C<query_params> instead.  Multi-statement strings (e.g. C<"SELECT 1;
-SELECT 2">) are supported but only the last result is delivered to the
-callback.  PostgreSQL stops executing after the first error, so
-errors always appear as the last result.
+Sends a simple query.  Multi-statement strings (e.g.
+C<"SELECT 1; SELECT 2">) are accepted, but only the final result
+reaches the callback -- intermediate results are silently discarded,
+and because PostgreSQL stops at the first error, errors always
+arrive as that final result.  B<Not allowed in pipeline mode> -- use
+C<query_params> there.  Alias: C<q>.
 
 =head2 query_params
 
     $pg->query_params($sql, \@params, sub { my ($result, $err) = @_; });
 
 Sends a parameterized query.  Parameters are referenced in SQL as
-C<$1>, C<$2>, etc.  C<undef> values are sent as SQL NULL.
+C<$1>, C<$2>, etc.; C<undef> elements become SQL NULL.
+
+Values are sent in PostgreSQL's text format.  Embedded NUL bytes
+cause the call to croak (text-format params cannot legally contain
+NULs) -- pass binary data through C<escape_bytea> if you need a
+C<bytea> column.  Alias: C<qp>.
 
 =head2 prepare
 
     $pg->prepare($name, $sql, sub { my ($result, $err) = @_; });
 
-Creates a prepared statement.  The callback receives an empty string
-(C<"">) on success.  Alias: C<prep>.
+Creates a prepared statement at the protocol level (no SQL C<PREPARE>
+parsing).  The callback receives C<""> on success.  Alias: C<prep>.
 
 =head2 query_prepared
 
     $pg->query_prepared($name, \@params, sub { my ($result, $err) = @_; });
 
-Executes a prepared statement.  Alias: C<qx>.
+Executes a prepared statement created by C<prepare>.  Same param
+rules as C<query_params>.  Alias: C<qx>.
 
 =head2 describe_prepared
 
@@ -397,21 +419,24 @@ as C<describe_prepared>.
 
     my $ok = $pg->set_single_row_mode;
 
-Switches the most recently sent query to single-row mode.  Returns 1
-on success, 0 on failure (e.g. no query pending).  The callback fires
-once per row with C<(\@rows)> where C<@rows> is an arrayref
-containing a single row (e.g. C<[[$col1, $col2, ...]]>), then a
-final empty C<(\@rows)> (where C<@rows> has zero elements) for the
-completion.
+Switches the most recently sent query into single-row mode.  Must be
+called immediately after a send method (C<query>, C<query_params>,
+...) and before the event loop delivers any results -- a 0 return
+means no query was in the right async state and should be treated as
+a programmer error rather than a runtime condition.
+
+The query callback then fires once per row with a single-row C<\@rows>
+(e.g. C<[[$col0, $col1, ...]]>), and once more at the end with an
+empty C<\@rows> as the completion sentinel.
 
 =head2 set_chunked_rows_mode
 
     my $ok = $pg->set_chunked_rows_mode($chunk_size);
 
-Switches the most recently sent query to chunked rows mode, delivering
-up to C<$chunk_size> rows at a time (requires libpq E<gt>= 17).
-Like single-row mode, but with lower per-callback overhead for large
-result sets.  Returns 1 on success, 0 on failure.
+Like C<set_single_row_mode> but delivers up to C<$chunk_size> rows per
+callback (requires libpq E<gt>= 17), reducing per-callback overhead for
+large result sets.  Same call-timing constraint and same trailing
+empty-rows completion sentinel.
 
 =head2 close_prepared
 
@@ -432,67 +457,76 @@ The callback receives an empty string (C<"">) on success.
 
     my $err = $pg->cancel;
 
-Sends a cancel request using the legacy C<PQcancel> API.  This is a
-B<blocking> call.  Returns C<undef> on success, an error string on
+Sends a cancel request using the legacy C<PQcancel> API.  B<Blocks>
+the event loop for one network round trip; prefer C<cancel_async> on
+libpq E<gt>= 17.  Returns C<undef> on success or an error string on
 failure.
 
 =head2 cancel_async
 
-    $pg->cancel_async(sub { my ($err) = @_; });
+    $pg->cancel_async(sub { my ($r, $err) = @_; });
 
-Sends an asynchronous cancel request using the C<PQcancelConn> API
-(requires libpq E<gt>= 17).  The callback receives no arguments on
-success, or an error string on failure.
+Sends a non-blocking cancel request using the C<PQcancelConn> API
+(requires libpq E<gt>= 17).  The callback receives C<(1)> on success
+or C<(undef, $errmsg)> on failure.  Croaks if a cancel is already in
+progress.
 
 =head2 pending_count
 
     my $n = $pg->pending_count;
 
-Returns the number of callbacks in the queue.
+Number of callbacks currently in the queue (queries sent but not yet
+delivered).
 
 =head2 keep_alive
 
     $pg->keep_alive(1);
     my $bool = $pg->keep_alive;
 
-When true, the connection's read watcher keeps C<EV::run> alive even when
-no queries are pending.  Useful when waiting for server-side C<NOTIFY>
-events via C<on_notify> — without this flag the event loop would exit
-after the C<LISTEN> query completes.
+When true, the read watcher keeps C<EV::run> alive even when the
+callback queue is empty.  Required when waiting for server-side
+C<NOTIFY> events via C<on_notify> -- without this flag the loop would
+exit as soon as the C<LISTEN> query completes.  Getter/setter.
 
 =head2 skip_pending
 
     $pg->skip_pending;
 
-Cancels all pending callbacks, invoking each with
-C<(undef, "skipped")>.
+Drops every queued callback, invoking each with
+C<(undef, "skipped")>.  Any in-flight server results are drained and
+discarded; the connection remains usable for new queries.
 
 =head1 PIPELINE METHODS
+
+Pipeline mode lets you send multiple queries without waiting for
+individual results, then receive the results in order after a sync
+point.  Inside a pipeline you must use C<query_params> or
+C<query_prepared> -- C<query> is rejected.
 
 =head2 enter_pipeline
 
     $pg->enter_pipeline;
 
-Enters pipeline mode.  Queries are batched and sent without waiting
-for individual results.
+Switches the connection into pipeline mode.  Croaks if there are
+unfinished results outstanding.
 
 =head2 exit_pipeline
 
     $pg->exit_pipeline;
 
-Exits pipeline mode.  Croaks if the pipeline is not idle (has
-pending queries).
+Returns to normal mode.  Croaks if the pipeline is not idle.
 
 =head2 pipeline_sync
 
-    $pg->pipeline_sync(sub { my ($ok) = @_; });
+    $pg->pipeline_sync(sub { my ($r, $err) = @_; });
 
-Sends a pipeline sync point.  The callback fires with C<(1)> when
-all preceding queries have completed.  Alias: C<sync>.
+Sends a pipeline sync point.  The callback fires with C<(1)> after all
+preceding queries in the batch have completed, or
+C<(undef, $errmsg)> if the connection drops first.  Alias: C<sync>.
 
 =head2 send_pipeline_sync
 
-    $pg->send_pipeline_sync(sub { my ($ok) = @_; });
+    $pg->send_pipeline_sync(sub { my ($r, $err) = @_; });
 
 Like C<pipeline_sync> but does B<not> flush the send buffer (requires
 libpq E<gt>= 17).  Useful for batching multiple sync points before a
@@ -502,168 +536,207 @@ single manual flush via C<send_flush_request>.
 
     $pg->send_flush_request;
 
-Sends a flush request, asking the server to deliver results for
-queries sent so far.  Alias: C<flush>.
+Asks the server to deliver results for queries sent so far -- the
+manual companion to C<send_pipeline_sync>.  Alias: C<flush>.
 
 =head2 pipeline_status
 
     my $st = $pg->pipeline_status;
 
-Returns C<PQ_PIPELINE_OFF>, C<PQ_PIPELINE_ON>, or
+One of C<PQ_PIPELINE_OFF>, C<PQ_PIPELINE_ON>, or
 C<PQ_PIPELINE_ABORTED>.
 
 =head1 COPY METHODS
 
+A C<COPY> command runs in two phases: the query callback first fires
+with a string tag (C<"COPY_IN"> / C<"COPY_OUT"> / C<"COPY_BOTH">) to
+signal that streaming has started, then fires a second time with the
+final command result (or error) when the stream ends.  See
+F<eg/copy_in.pl> and F<eg/copy_out.pl>.
+
 =head2 put_copy_data
 
-    my $ok = $pg->put_copy_data($data);
+    my $rc = $pg->put_copy_data($data);
 
-Sends data to the server during a COPY IN operation.  Returns 1 on
-success (data flushed or flush scheduled), 0 if the send buffer is
-full (wait for writability and retry), or -1 on error.
+Sends a chunk during COPY IN.  Returns 1 on success (data buffered or
+flushed), 0 if the send buffer is full (wait for writability via
+C<on_drain>, then retry), or -1 on error.
 
 =head2 put_copy_end
 
-    my $ok = $pg->put_copy_end;
-    my $ok = $pg->put_copy_end($errmsg);
+    my $rc = $pg->put_copy_end;
+    my $rc = $pg->put_copy_end($errmsg);
 
-Ends a COPY IN operation.  Pass an error message to abort the COPY.
-Returns 1 on success, 0 if the send buffer is full (retry after
-writability), or -1 on error.
+Ends a COPY IN.  With C<$errmsg> aborts the COPY server-side.  Same
+return convention as C<put_copy_data>.
 
 =head2 get_copy_data
 
     my $row = $pg->get_copy_data;
 
-Retrieves a row during COPY OUT.  Returns the row data as a string,
-C<-1> when the COPY is complete, or C<undef> if no data is available
-yet.
+Retrieves the next row during COPY OUT.  Returns the row bytes,
+the integer C<-1> when the stream is complete, or C<undef> if nothing
+is currently buffered (call again after the next read).
 
 =head1 HANDLER METHODS
 
-Each handler method is a getter/setter.  Called with an argument, it
-sets the handler and returns the new value (or C<undef> if cleared).
-Called without arguments, it returns the current handler.
+Each handler is a getter/setter: pass a coderef to install it
+(returning the new value), pass C<undef> to clear it, or call without
+arguments to read the current handler.
 
 =head2 on_connect
 
-Called with no arguments on successful connection.
+Fires once with no arguments after the handshake completes.
 
 =head2 on_error
 
-Called as C<< ($error_message) >> on connection-level errors.
+Fires as C<($error_message)> for connection-level errors (handshake
+failure, lost socket, libpq protocol errors).  Per-query errors come
+through the query callback, not here.
 
 =head2 on_notify
 
-Called as C<< ($channel, $payload, $backend_pid) >> on LISTEN/NOTIFY.
+Fires as C<($channel, $payload, $backend_pid)> for each
+LISTEN/NOTIFY message.
 
 =head2 on_notice
 
-Called as C<< ($message) >> on server notice/warning messages.
+Fires as C<($message)> for server NOTICE/WARNING messages.
 
 =head2 on_drain
 
-Called with no arguments when the libpq send buffer has been fully
-flushed during a COPY operation.  Use this to resume sending data
-after C<put_copy_data> returns 0 (buffer full).
+Fires with no arguments when the libpq send buffer has been fully
+flushed during a COPY -- use it to resume C<put_copy_data> after a
+0 return.
 
 =head1 CONNECTION INFO
 
-String accessors (C<db>, C<user>, C<host>, C<port>, C<error_message>,
-C<parameter_status>, C<ssl_attribute>) return C<undef> when not connected.
-Integer accessors return a default value (typically 0 or -1).  Methods that require an
-active connection (C<client_encoding>, C<set_client_encoding>,
-C<set_error_verbosity>, C<set_error_context_visibility>, C<conninfo>)
-croak when not connected.
+String accessors (C<db>, C<user>, C<host>, C<hostaddr>, C<port>,
+C<error_message>, C<parameter_status>, C<ssl_attribute>) return
+C<undef> when not connected.  Integer accessors return a default
+value (typically 0 or -1).  Methods that require an active connection
+(C<client_encoding>, C<set_client_encoding>, C<set_error_verbosity>,
+C<set_error_context_visibility>, C<conninfo>) croak otherwise.
 
 =head2 error_message
 
-Last error message.  Alias: C<errstr>.
+    my $msg = $pg->error_message;
+
+Last error message from libpq.  Alias: C<errstr>.
 
 =head2 transaction_status
 
-Returns C<PQTRANS_IDLE>, C<PQTRANS_ACTIVE>, C<PQTRANS_INTRANS>,
-C<PQTRANS_INERROR>, or C<PQTRANS_UNKNOWN>.  Alias: C<txn_status>.
+    my $st = $pg->transaction_status;
+
+One of C<PQTRANS_IDLE>, C<PQTRANS_ACTIVE>, C<PQTRANS_INTRANS>,
+C<PQTRANS_INERROR>, C<PQTRANS_UNKNOWN>.  Alias: C<txn_status>.
 
 =head2 parameter_status
 
     my $val = $pg->parameter_status($name);
 
-Returns a server parameter (e.g. C<"server_version">,
-C<"client_encoding">).
+Server parameter value (e.g. C<"server_version">, C<"client_encoding">,
+C<"server_encoding">).
 
 =head2 backend_pid
+
+    my $pid = $pg->backend_pid;
 
 Backend process ID.  Alias: C<pid>.
 
 =head2 server_version
 
-Server version as an integer (e.g. 180000 for 18.0).
+    my $ver = $pg->server_version;
+
+Server version as a packed integer: C<MMmmpp> (major * 10000 + minor *
+100 + patch) for releases before 10, C<MM0000 + patch> from 10
+onwards.  PostgreSQL 18.0 returns C<180000>; 17.5 returns C<170005>.
 
 =head2 protocol_version
 
-Protocol version (typically 3).
+    my $ver = $pg->protocol_version;
+
+Frontend/backend protocol version (typically 3).
 
 =head2 db
+
+    my $dbname = $pg->db;
 
 Database name.
 
 =head2 user
 
+    my $user = $pg->user;
+
 Connected user name.
 
 =head2 host
 
-Server host.
+    my $host = $pg->host;
+
+Server host as supplied to C<connect> (may be a hostname or socket dir).
 
 =head2 hostaddr
+
+    my $addr = $pg->hostaddr;
 
 Server IP address.
 
 =head2 port
 
+    my $port = $pg->port;
+
 Server port.
 
 =head2 socket
 
-The underlying file descriptor.
+    my $fd = $pg->socket;
+
+Underlying socket file descriptor (for advanced uses such as installing
+your own watcher).  Returns -1 when not connected.
 
 =head2 ssl_in_use
 
-Returns 1 if the connection uses SSL.
+    my $bool = $pg->ssl_in_use;
+
+True if the connection is encrypted with SSL.
 
 =head2 ssl_attribute
 
     my $val = $pg->ssl_attribute($name);
 
-Returns an SSL attribute (e.g. C<"protocol">, C<"cipher">).
+SSL attribute (e.g. C<"protocol">, C<"cipher">, C<"key_bits">).
 
 =head2 ssl_attribute_names
 
     my $names = $pg->ssl_attribute_names;
 
-Returns an arrayref of available SSL attribute names, or C<undef>
-if the connection does not use SSL.
+Arrayref of available SSL attribute names, or C<undef> if the
+connection does not use SSL.
 
 =head2 client_encoding
 
-Returns the current client encoding name.
+    my $enc = $pg->client_encoding;
+
+Current client encoding name (e.g. C<"UTF8">).
 
 =head2 set_client_encoding
 
     $pg->set_client_encoding($encoding);
 
-Sets the client encoding (e.g. C<"UTF8">, C<"SQL_ASCII">).
-This is a synchronous (blocking) call that stalls the event loop for
-one server round trip.  Best called right after C<on_connect> fires,
-before any queries are dispatched.  Croaks if there are pending queries
-or on failure.
+Sets the client encoding (e.g. C<"UTF8">, C<"SQL_ASCII">).  This is a
+synchronous (blocking) call that stalls the event loop for one server
+round trip, so it is best invoked right after C<on_connect> fires and
+before any queries are dispatched.  Croaks if there are pending
+queries or on failure.
 
 =head2 set_error_verbosity
 
     my $old = $pg->set_error_verbosity($level);
 
-Sets error verbosity.  Returns the previous setting.
+Sets error verbosity.  C<$level> is one of C<PQERRORS_TERSE>,
+C<PQERRORS_DEFAULT>, C<PQERRORS_VERBOSE>, or C<PQERRORS_SQLSTATE>.
+Returns the previous setting.
 
 =head2 set_error_context_visibility
 
@@ -678,29 +751,36 @@ C<PQSHOW_CONTEXT_ALWAYS>.  Returns the previous setting.
     my $fields = $pg->error_fields;
 
 Returns a hashref of structured error fields from the most recent
-C<PGRES_FATAL_ERROR> result, or C<undef> if no error has occurred.
-The value persists until the next fatal error; it is not cleared by
-successful queries.  Keys (present only when non-NULL in the server
-response):
+C<PGRES_FATAL_ERROR> result, or C<undef> if no fatal error has been
+seen.  Persists until the next fatal error; successful queries do not
+clear it.  Each key is present only when the corresponding field is
+non-NULL in the server response:
 
-    sqlstate    severity    primary     detail
-    hint        position    context     schema
-    table       column      datatype    constraint
-    internal_position       internal_query
-    source_file source_line source_function
+    sqlstate            severity            primary
+    detail              hint                position
+    context             schema              table
+    column              datatype            constraint
+    internal_position   internal_query
+    source_file         source_line         source_function
 
 =head2 result_meta
 
     my $meta = $pg->result_meta;
 
-Returns a hashref of metadata from the most recent query result,
-or C<undef> if no result has been delivered.  Updated after each
-successful result (including commands with no columns); not updated
-by errors, COPY, or pipeline sync results.  Keys:
+Returns a hashref of metadata for the most recent query result, or
+C<undef> if no result has been delivered.  Refreshed by every
+successful result (including commands with no columns) but B<not> by
+errors, COPY, or pipeline sync results -- so after an error this
+returns metadata for the last successful query and you should check
+C<$err> before relying on it.  Cleared by C<reset>/C<finish>.
+
+Keys:
 
     nfields       number of columns
     cmd_status    command status string (e.g. "SELECT 3", "INSERT 0 1")
-    inserted_oid  OID of inserted row (only present when valid)
+    inserted_oid  OID of inserted row -- only present for single-row
+                    INSERTs that generated an OID (legacy WITH OIDS
+                    tables); absent for normal INSERTs and other commands
     fields        arrayref of column metadata hashrefs:
                     name, type (OID), ftable (OID), ftablecol,
                     fformat (0=text, 1=binary), fsize, fmod
@@ -734,21 +814,23 @@ Returns 1 if the server requested a password during authentication.
 
     $pg->trace($filename);
 
-Enables libpq protocol tracing to the specified file.  Useful for
-debugging wire-level issues.
+Enables libpq protocol tracing, writing the wire-level frontend/backend
+exchange to C<$filename>.  Croaks if the file cannot be opened.
 
 =head2 untrace
 
     $pg->untrace;
 
-Disables protocol tracing and closes the trace file.
+Stops tracing and closes the trace file.  Safe to call when tracing
+is not active.
 
 =head2 set_trace_flags
 
     $pg->set_trace_flags($flags);
 
-Sets trace output flags (requires libpq E<gt>= 14).  C<$flags> is a
-bitmask of C<PQTRACE_SUPPRESS_TIMESTAMPS> and C<PQTRACE_REGRESS_MODE>.
+Sets the trace output style.  C<$flags> is a bitmask of
+C<PQTRACE_SUPPRESS_TIMESTAMPS> and/or C<PQTRACE_REGRESS_MODE> (handy
+when diffing traces).
 
 =head1 UTILITY METHODS
 
@@ -756,48 +838,56 @@ bitmask of C<PQTRACE_SUPPRESS_TIMESTAMPS> and C<PQTRACE_REGRESS_MODE>.
 
     my $quoted = $pg->escape_literal($string);
 
-Returns a string literal escaped for use in SQL.  Alias: C<quote>.
+Quotes and escapes a string for safe interpolation into SQL (wraps
+the value in single quotes and doubles internal quotes).  Alias:
+C<quote>.
 
 =head2 escape_identifier
 
     my $quoted = $pg->escape_identifier($string);
 
-Returns an identifier escaped for use in SQL.  Alias: C<quote_id>.
+Quotes and escapes an identifier for safe interpolation into SQL
+(wraps in double quotes).  Alias: C<quote_id>.
 
 =head2 escape_bytea
 
     my $escaped = $pg->escape_bytea($binary);
 
-Escapes binary data for use in a bytea column.
+Escapes binary bytes into the textual C<bytea> form expected by the
+server (the C<\x...> hex notation).  Pair with C<unescape_bytea> to
+go the other way.
 
 =head2 encrypt_password
 
-    my $hash = $pg->encrypt_password($password, $user);
-    my $hash = $pg->encrypt_password($password, $user, $algorithm);
+    my $hashed = $pg->encrypt_password($password, $user);
+    my $hashed = $pg->encrypt_password($password, $user, $algorithm);
 
-Encrypts a password for use with C<ALTER ROLE ... PASSWORD>.
-C<$algorithm> is optional; defaults to the server's
-C<password_encryption> setting (typically C<"scram-sha-256">).
+Hashes a password client-side (so the cleartext never reaches the
+server) ready to be passed to C<ALTER ROLE ... PASSWORD>.
+C<$algorithm> is optional; when omitted the server's
+C<password_encryption> setting decides (typically C<"scram-sha-256">).
 
 =head2 unescape_bytea
 
     my $binary = EV::Pg->unescape_bytea($escaped);
 
-Class method.  Unescapes bytea data.
+Class method.  Decodes the textual C<bytea> form back to raw bytes.
 
 =head2 lib_version
 
     my $ver = EV::Pg->lib_version;
 
-Class method.  Returns the libpq version as an integer.
+Class method.  Returns the libpq version as an integer (same encoding
+as C<server_version>; e.g. C<170000> for libpq 17.0).
 
 =head2 conninfo_parse
 
     my $params = EV::Pg->conninfo_parse($conninfo);
 
 Class method.  Parses a connection string and returns a hashref of
-the recognized keyword/value pairs.  Croaks if the string is invalid.
-Useful for validating connection strings before connecting.
+the recognized keyword/value pairs, croaking if the string is
+malformed.  Handy for validating connection strings before
+connecting.
 
 =head1 ALIASES
 
@@ -843,9 +933,11 @@ See F<bench/bench.pl> to reproduce.
 
 =head1 REQUIREMENTS
 
-libpq E<gt>= 14 (PostgreSQL client library) and L<EV>.
-Some features (chunked rows, close prepared/portal, no-flush pipeline
-sync, async cancel) require libpq E<gt>= 17.
+libpq E<gt>= 14 (PostgreSQL client library) and L<EV>.  A handful of
+features -- chunked rows mode, C<close_prepared>/C<close_portal>,
+C<send_pipeline_sync>/C<send_flush_request>, and C<cancel_async> --
+require libpq E<gt>= 17 and degrade gracefully when not available
+(the methods are simply not defined).
 
 =head1 SEE ALSO
 

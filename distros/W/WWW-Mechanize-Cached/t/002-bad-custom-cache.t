@@ -2,7 +2,7 @@ use strict;
 use warnings FATAL => 'all';
 
 use Test::More;
-use WWW::Mechanize::Cached;
+use WWW::Mechanize::Cached ();
 
 BEGIN {
     eval "use Test::Warn";

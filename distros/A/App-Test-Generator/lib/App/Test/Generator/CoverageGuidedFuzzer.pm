@@ -36,16 +36,15 @@ Readonly my $TYPE_STRING  => 'string';
 # --------------------------------------------------
 Readonly my @JSON_MODULES => qw(JSON::MaybeXS JSON);
 
-our $VERSION = '0.33';
+our $VERSION = '0.38';
 
 =head1 NAME
 
-App::Test::Generator::CoverageGuidedFuzzer - AFL-style coverage-guided
-fuzzing for App::Test::Generator
+App::Test::Generator::CoverageGuidedFuzzer - AFL-style coverage-guided fuzzing for App::Test::Generator
 
 =head1 VERSION
 
-Version 0.33
+Version 0.38
 
 =head1 SYNOPSIS
 
@@ -81,6 +80,8 @@ generation it:
 
 This is the Perl equivalent of what AFL/libFuzzer do at the byte level,
 but operating on typed, schema-validated Perl data structures.
+
+=head1 METHODS
 
 =head2 new
 
@@ -179,7 +180,7 @@ sub new {
 	# Warn once per process if coverage guidance is unavailable
 	state $cover_warned = 0;
 	if(!$self->{_cover_available} && !$cover_warned++) {
-		warn "Devel::Cover not available; fuzzing without coverage guidance.\n";
+		warn 'Devel::Cover not available; fuzzing without coverage guidance.';
 	}
 
 	return $self;
@@ -422,8 +423,8 @@ sub load_corpus {
 # --------------------------------------------------
 # _load_json_module
 #
-# Purpose:    Find and load the first available JSON
-#             module from the preference list.
+# Find and load the first available JSON
+#     module from the preference list.
 #
 # Entry:      None.
 # Exit:       Returns the name of the loaded module.
@@ -437,9 +438,11 @@ sub load_corpus {
 # --------------------------------------------------
 sub _load_json_module {
 	for my $mod (@JSON_MODULES) {
-		# Use block eval with require rather than string eval
-		# to avoid security issues with arbitrary module names
-		my $ok = eval { require $mod; 1 };	## no critic (ProhibitStringyEval)
+		# Convert package name to file path — require $var does not
+		# do the :: -> / conversion that bareword require does
+		(my $file = $mod) =~ s{::}{/}g;
+		$file .= '.pm';
+		my $ok = eval { require $file; 1 };
 		return $mod if $ok;
 	}
 	croak 'No JSON module available; install JSON or JSON::MaybeXS';
@@ -448,9 +451,9 @@ sub _load_json_module {
 # --------------------------------------------------
 # _run_one
 #
-# Purpose:    Run the target sub with a single input,
-#             record coverage, detect bugs, and update
-#             the corpus if the input is interesting.
+# Run the target sub with a single input,
+#     record coverage, detect bugs, and update
+#     the corpus if the input is interesting.
 #
 # Entry:      $input - the value to pass to target_sub.
 #
@@ -1233,19 +1236,9 @@ with the assistance of AI.
 
 Copyright 2026 Nigel Horne.
 
-Usage is subject to licence terms.
-
-The licence terms of this software are as follows:
-
-=over 4
-
-=item * Personal single user, single computer use: GPL2
-
-=item * All other users (including Commercial, Charity, Educational,
-Government) must apply in writing for a licence for use from Nigel Horne
-at the above e-mail.
-
-=back
+Usage is subject to GPL2 licence terms.
+If you use it,
+please let me know.
 
 =cut
 

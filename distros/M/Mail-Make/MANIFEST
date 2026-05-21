@@ -37,6 +37,7 @@ t/08_headers_subject.t
 t/09_multipart_structure.t
 t/10_mail_make_headers.t
 t/11_smtpsend_mock.t
+t/12_html_to_inline.t
 t/89_mm_table.t
 t/90_pod.t
 t/91_coverage.t

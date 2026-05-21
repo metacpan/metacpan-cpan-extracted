@@ -2,7 +2,7 @@ package Crypt::PK::DH;
 
 use strict;
 use warnings;
-our $VERSION = '0.088';
+our $VERSION = '0.089';
 
 require Exporter; our @ISA = qw(Exporter); ### use Exporter 5.57 'import';
 our %EXPORT_TAGS = ( all => [qw( dh_shared_secret )] );
@@ -11,7 +11,6 @@ our @EXPORT = qw();
 
 use Carp;
 use CryptX;
-use Crypt::Digest 'digest_data';
 use Crypt::Misc qw(read_rawfile pem_to_der);
 
 my %DH_PARAMS = (
@@ -198,6 +197,8 @@ sub import_key_raw {
     $p = $param->{p} or croak "FATAL: 'p' param not specified";
     $g =~ s/^0x//;
     $p =~ s/^0x//;
+    croak "FATAL: 'g' param is empty after stripping '0x' prefix" unless length $g;
+    croak "FATAL: 'p' param is empty after stripping '0x' prefix" unless length $p;
   } elsif (my $dhparam = $DH_PARAMS{$param}) {
     $g = $dhparam->{g};
     $p = $dhparam->{p};
@@ -219,11 +220,14 @@ sub import_key_raw {
 sub generate_key {
   my ($self, $param) = @_;
 
+  if (!defined $param) {
+    croak "FATAL: DH generate_key - invalid args";
+  }
   if (!ref $param) {
     # group name
-    return $self->_generate_key_gp($DH_PARAMS{$param}{g}, $DH_PARAMS{$param}{p}) if $DH_PARAMS{$param};
+    return $self->_generate_key_gp($DH_PARAMS{$param}{g}, $DH_PARAMS{$param}{p}) if exists $DH_PARAMS{$param};
     # size
-    return $self->_generate_key_size($param) if $param && $param =~ /^[0-9]+/;
+    return $self->_generate_key_size($param) if $param =~ /^[0-9]+\z/;
   }
   elsif (ref $param eq 'SCALAR') {
     my $data = $$param;
@@ -237,6 +241,8 @@ sub generate_key {
     my $p = $param->{p} or croak "FATAL: 'p' param not specified";
     $g =~ s/^0x//;
     $p =~ s/^0x//;
+    croak "FATAL: 'g' param is empty after stripping '0x' prefix" unless length $g;
+    croak "FATAL: 'p' param is empty after stripping '0x' prefix" unless length $p;
     return $self->_generate_key_gp($g, $p);
   }
   croak "FATAL: DH generate_key - invalid args";
@@ -244,31 +250,16 @@ sub generate_key {
 
 ### FUNCTIONS
 
-sub dh_shared_secret {
+sub dh_shared_secret { # legacy/obsolete
   my ($privkey, $pubkey) = @_;
   $privkey = __PACKAGE__->new($privkey) unless ref $privkey;
   $pubkey  = __PACKAGE__->new($pubkey)  unless ref $pubkey;
-  carp "FATAL: invalid 'privkey' param" unless ref($privkey) eq __PACKAGE__ && $privkey->is_private;
-  carp "FATAL: invalid 'pubkey' param"  unless ref($pubkey)  eq __PACKAGE__;
+  croak "FATAL: invalid 'privkey' param" unless ref($privkey) eq __PACKAGE__ && $privkey->is_private;
+  croak "FATAL: invalid 'pubkey' param"  unless ref($pubkey)  eq __PACKAGE__;
   return $privkey->shared_secret($pubkey);
 }
 
 sub CLONE_SKIP { 1 } # prevent cloning
-
-### DEPRECATED functions/methods
-
-sub encrypt           { croak "Crypt::DH::encrypt is deprecated (removed in v0.049)" }
-sub decrypt           { croak "Crypt::DH::decrypt is deprecated (removed in v0.049)" }
-sub sign_message      { croak "Crypt::DH::sign_message is deprecated (removed in v0.049)" }
-sub verify_message    { croak "Crypt::DH::verify_message is deprecated (removed in v0.049)" }
-sub sign_hash         { croak "Crypt::DH::sign_hash is deprecated (removed in v0.049)" }
-sub verify_hash       { croak "Crypt::DH::verify_hash is deprecated (removed in v0.049)" }
-sub dh_encrypt        { croak "Crypt::DH::dh_encrypt is deprecated (removed in v0.049)" }
-sub dh_decrypt        { croak "Crypt::DH::dh_decrypt is deprecated (removed in v0.049)" }
-sub dh_sign_message   { croak "Crypt::DH::dh_sign_message is deprecated (removed in v0.049)" }
-sub dh_verify_message { croak "Crypt::DH::dh_verify_message is deprecated (removed in v0.049)" }
-sub dh_sign_hash      { croak "Crypt::DH::dh_sign_hash is deprecated (removed in v0.049)" }
-sub dh_verify_hash    { croak "Crypt::DH::dh_verify_hash is deprecated (removed in v0.049)" }
 
 1;
 
@@ -283,49 +274,67 @@ Crypt::PK::DH - Public key cryptography based on Diffie-Hellman
  ### OO interface
 
  #Shared secret
- my $priv = Crypt::PK::DH->new('Alice_priv_dh1.key');
- my $pub = Crypt::PK::DH->new('Bob_pub_dh1.key');
- my $shared_secret = $priv->shared_secret($pub);
+ my $alice = Crypt::PK::DH->new();
+ $alice->generate_key('ike2048');
+ my $bob = Crypt::PK::DH->new();
+ $bob->generate_key($alice->params2hash);
+
+ my $alice_public = $alice->export_key('public');
+ my $bob_public = $bob->export_key('public');
+
+ my $alice_shared = $alice->shared_secret(Crypt::PK::DH->new(\$bob_public));
+ my $bob_shared = $bob->shared_secret(Crypt::PK::DH->new(\$alice_public));
 
  #Key generation
  my $pk = Crypt::PK::DH->new();
- $pk->generate_key(128);
+ $pk->generate_key(256);
  my $private = $pk->export_key('private');
  my $public = $pk->export_key('public');
 
- or
+ #or use a named IKE group
 
  my $pk = Crypt::PK::DH->new();
  $pk->generate_key('ike2048');
  my $private = $pk->export_key('private');
  my $public = $pk->export_key('public');
 
- or
+ #or provide explicit parameters
 
  my $pk = Crypt::PK::DH->new();
  $pk->generate_key({ p => $p, g => $g });
  my $private = $pk->export_key('private');
  my $public = $pk->export_key('public');
 
- ### Functional interface
+=head1 DESCRIPTION
 
- #Shared secret
- my $shared_secret = dh_shared_secret('Alice_priv_dh1.key', 'Bob_pub_dh1.key');
+Provides Diffie-Hellman key agreement. Use it to generate a DH private/public
+key pair and to derive a shared secret from your private key and the peer's
+public key.
+
+Parameters can come from libtomcrypt's built-in groups, the named IKE groups,
+an explicit C<{ p =E<gt> ..., g =E<gt> ... }> hash, or a PEM/DER buffer that
+contains DH parameters.
+
+Legacy function-style wrappers still exist in code for backwards compatibility,
+but they are intentionally undocumented.
 
 =head1 METHODS
 
 =head2 new
 
   my $pk = Crypt::PK::DH->new();
-  #or
-  my $pk = Crypt::PK::DH->new($priv_or_pub_key_filename);
-  #or
-  my $pk = Crypt::PK::DH->new(\$buffer_containing_priv_or_pub_key);
+  $pk->generate_key('ike2048');
+
+  my $public_blob = $pk->export_key('public');
+  my $pub = Crypt::PK::DH->new(\$public_blob);
+
+Passing C<$filename> or C<\$buffer> to C<new> is equivalent: both forms
+immediately import the key material into the new object.
 
 =head2 generate_key
 
-Uses Yarrow-based cryptographically strong random number generator seeded with
-random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
+Uses the bundled C<chacha20> PRNG via libtomcrypt's C<rng_make_prng>.
+Returns the object itself (for chaining).
 
  $pk->generate_key($groupsize);
  ### $groupsize (in bytes) corresponds to DH parameters (p, g) predefined by libtomcrypt
@@ -341,19 +350,22 @@ random data taken from C</dev/random> (UNIX) or C<CryptGenRandom> (Win32).
 The following variants are available since CryptX-0.032
 
  $pk->generate_key($groupname)
- ### $groupname corresponds to values defined in RFC7296 and RFC3526
- # 'ike768'  =>  768-bit MODP (Group 1)
- # 'ike1024' => 1024-bit MODP (Group 2)
- # 'ike1536' => 1536-bit MODP (Group 5)
- # 'ike2048' => 2048-bit MODP (Group 14)
- # 'ike3072' => 3072-bit MODP (Group 15)
- # 'ike4096' => 4096-bit MODP (Group 16)
- # 'ike6144' => 6144-bit MODP (Group 17)
- # 'ike8192' => 8192-bit MODP (Group 18)
+ ### $groupname selects a named IKE/MODP group from RFC 7296 and RFC 3526.
+ ### The number suffix is the bit size of the prime (p).
+ # 'ike768'  =>  768-bit MODP (IKE Group 1  - RFC 2409)  -- NOT recommended
+ # 'ike1024' => 1024-bit MODP (IKE Group 2  - RFC 2409)  -- NOT recommended
+ # 'ike1536' => 1536-bit MODP (IKE Group 5  - RFC 3526)
+ # 'ike2048' => 2048-bit MODP (IKE Group 14 - RFC 3526)  -- minimum recommended
+ # 'ike3072' => 3072-bit MODP (IKE Group 15 - RFC 3526)
+ # 'ike4096' => 4096-bit MODP (IKE Group 16 - RFC 3526)
+ # 'ike6144' => 6144-bit MODP (IKE Group 17 - RFC 3526)
+ # 'ike8192' => 8192-bit MODP (IKE Group 18 - RFC 3526)
 
  $pk->generate_key($param_hash)
  # $param_hash is { g => $g, p => $p }
  # where $g is the generator (base) in a hex string and $p is the prime in a hex string
+ # practical current limit: custom p/g values must fit into the current XS buffers
+ # (roughly up to the built-in 8192-bit group sizes)
 
  $pk->generate_key(\$dh_param)
  # $dh_param is the content of DER or PEM file with DH parameters
@@ -363,19 +375,23 @@ The following variants are available since CryptX-0.032
 
 Loads private or public key (exported by L</export_key>).
 
-  $pk->import_key($filename);
-  #or
-  $pk->import_key(\$buffer_containing_key);
+  my $source = Crypt::PK::DH->new();
+  $source->generate_key('ike2048');
+
+  my $public_blob = $source->export_key('public');
+  my $pub = Crypt::PK::DH->new();
+  $pub->import_key(\$public_blob);
+
+The same method also accepts a filename instead of C<\$public_blob>.
 
 =head2 import_key_raw
 
 I<Since: CryptX-0.032>
 
   $pk->import_key_raw($raw_bytes, $type, $params)
-  ### $raw_bytes is a binary string containing the key
-  ### $type is either 'private' or 'public'
-  ### $param is either a name ('ike2038') or hash containing the p,g values { g=>$g, p=>$p }
-  ### in hex strings
+  # $raw_bytes .. [binary string] raw key data
+  # $type ....... [string] 'private' or 'public'
+  # $params ..... [string | hashref] group name (e.g. 'ike2048') or { g => $g, p => $p } with hex strings
 
 =head2 export_key
 
@@ -389,21 +405,26 @@ B<BEWARE:> DH key format change - since v0.049 it is compatible with libtomcrypt
 
 I<Since: CryptX-0.032>
 
+Returns the raw key as a binary string.
+
  $raw_bytes = $dh->export_key_raw('public')
  #or
  $raw_bytes = $dh->export_key_raw('private')
 
 =head2 shared_secret
 
- # Alice having her priv key $pk and Bob's public key $pkb
- my $pk  = Crypt::PK::DH->new($priv_key_filename);
- my $pkb = Crypt::PK::DH->new($pub_key_filename);
- my $shared_secret = $pk->shared_secret($pkb);
+Returns the shared secret as a binary string (raw bytes).
 
- # Bob having his priv key $pk and Alice's public key $pka
- my $pk = Crypt::PK::DH->new($priv_key_filename);
- my $pka = Crypt::PK::DH->new($pub_key_filename);
- my $shared_secret = $pk->shared_secret($pka);  # same value as computed by Alice
+ my $alice = Crypt::PK::DH->new();
+ $alice->generate_key('ike2048');
+ my $bob = Crypt::PK::DH->new();
+ $bob->generate_key($alice->params2hash);
+
+ my $alice_public = $alice->export_key('public');
+ my $bob_public = $bob->export_key('public');
+
+ my $alice_shared = $alice->shared_secret(Crypt::PK::DH->new(\$bob_public));
+ my $bob_shared = $bob->shared_secret(Crypt::PK::DH->new(\$alice_public));
 
 =head2 is_private
 
@@ -419,6 +440,8 @@ I<Since: CryptX-0.032>
 
 =head2 key2hash
 
+Returns a hashref with the key components, or C<undef> if no key is loaded.
+
  my $hash = $pk->key2hash;
 
  # returns hash like this (or undef if no key loaded):
@@ -429,7 +452,7 @@ I<Since: CryptX-0.032>
    y => "AB9AAA40774D3CD476B52F82E7EE2D8A8D40CD88BF4...", #public key
    g => "2", # generator/base
    p => "FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80D...", # prime
-}
+ }
 
 =head2 params2hash
 
@@ -441,43 +464,17 @@ I<Since: CryptX-0.032>
  {
    g => "2", # generator/base
    p => "FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80D...", # prime
-}
-
-=head1 FUNCTIONS
-
-=head2 dh_shared_secret
-
-DH based shared secret generation. See method L</shared_secret> below.
-
- #on Alice side
- my $shared_secret = dh_shared_secret('Alice_priv_dh1.key', 'Bob_pub_dh1.key');
-
- #on Bob side
- my $shared_secret = dh_shared_secret('Bob_priv_dh1.key', 'Alice_pub_dh1.key');
-
-=head1 DEPRECATED INTERFACE
-
-The following functions/methods were removed in removed in v0.049:
-
- encrypt
- decrypt
- sign_message
- verify_message
- sign_hash
- verify_hash
-
- dh_encrypt
- dh_decrypt
- dh_sign_message
- dh_verify_message
- dh_sign_hash
- dh_verify_hash
+ }
 
 =head1 SEE ALSO
 
 =over
 
-=item * L<https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange|https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange>
+=item * L<https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange>
+
+=item * L<https://www.rfc-editor.org/rfc/rfc3526>
+
+=item * L<https://www.rfc-editor.org/rfc/rfc7296>
 
 =back
 

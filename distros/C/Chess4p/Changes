@@ -1,7 +1,16 @@
 Revision history for Chess4p
 
-0.01    Date/time
+0.01    2026-03-19
         First version, released on an unsuspecting world.
-0.02    Date/time
+0.02    2026-03-20
         Use Test::More instead of Test2::V1 because some of the CPAN
         testers systems don't have the latter.
+0.03    2026-03-26
+        Improve testing code in general.
+0.04    2026-05-01
+        Remove square table from Board class, to rely only on bitboards.
+        Improved testing and documentation.
+        Code cleanups, bugfixes.
+        Copy ctor for Board, SAN move input, SAN move output.
+        PGN file reader.
+        

@@ -12,7 +12,7 @@ require 5.014002; # For the utf8 stuff.
 
 my(%params) =
 (
-	($] ge '5.005') ?
+	($] >= 5.005) ?
 	(
 		AUTHOR		=> 'Ron Savage (ron@savage.net.au)',
 		ABSTRACT	=> 'Manage a database of curated Perl modules',
@@ -58,9 +58,10 @@ my(%params) =
 		'open'						=> 1.13,
 		'parent'					=> 0.242,
 		'Path::Tiny'				=> 0.146,
-		'perl'						=> 5.36,
+		'perl'						=> 5.40.0,
 		'Pod::Usage'				=> 2.03,
 		'strict'					=> 1.12,
+		'Syntax::Keyword::Match'	=> 0.15,
 		'Text::Balanced'			=> 2.07,
 		'Text::CSV::Encoded'		=> 0.25,
 		'Types::Standard'			=> 2.006000,

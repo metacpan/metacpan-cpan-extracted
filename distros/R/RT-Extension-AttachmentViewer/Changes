@@ -1,0 +1,15 @@
+Revision history for RT-Extension-AttachmentViewer
+
+0.04 2026-05-04
+ - Update README*
+
+0.03 2026-05-04
+ - Secure code
+ - Fix some typos in doc
+
+0.02 2026-04-29
+ - Make sure preview modal is bounded only once
+ - Enable plugin for RT 5, small changes in bootstrap close button
+
+0.01 2026-04-29
+ - Initial commit

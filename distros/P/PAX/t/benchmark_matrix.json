@@ -1,0 +1,32 @@
+{
+  "classes": [
+    {
+      "id": "micro-arithmetic",
+      "description": "Arithmetic and loop microbenchmark fixtures",
+      "fixtures": [
+        "t/fixtures/native_leafs.pl",
+        "t/fixtures/loop_sum.pl"
+      ],
+      "metrics": [
+        "warm_up_seconds",
+        "native_available",
+        "fallback_share",
+        "memory_impact"
+      ]
+    },
+    {
+      "id": "dynamic-fallback",
+      "description": "Dynamic Perl fallback fixtures",
+      "fixtures": [
+        "t/fixtures/dynamic.pl",
+        "t/fixtures/nasty_tie.pl",
+        "t/fixtures/nasty_overload.pl",
+        "t/fixtures/nasty_typeglob_local.pl"
+      ],
+      "metrics": [
+        "compatibility_level",
+        "fallback_reason"
+      ]
+    }
+  ]
+}

@@ -3,7 +3,7 @@ use warnings;
 use utf8;
 use ExtUtils::MakeMaker;
 
-my $GITHUB_URL = 'https://github.com/mrueda/omop-csv-validator';
+my $GITHUB_URL = 'https://github.com/CNAG-Biomedical-Informatics/omop-csv-validator';
 
 WriteMakefile(
     NAME          => 'OMOP::CSV::Validator',
@@ -27,6 +27,7 @@ WriteMakefile(
         'x_contributors' => [],
     },
     PREREQ_PM => {
+        'Excel::Writer::XLSX'            => '1.12',
         'JSON::XS'                       => '4.03',
         'Path::Tiny'                     => '0.144',
         'Text::CSV_XS'                   => '1.50',

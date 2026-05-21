@@ -1,65 +1,101 @@
-0.501   Wed Jan 03 2024 18:12:22 CET
+0.701   2026-05-18
+  - fix Kwalitee has_readme issue by adding README to distribution
+  - add INSTALLATION section to documentation
+  - fix module abstracts for better documentation rendering
+  - derive version from git tags using Git::NextVersion
+
+0.700   2026-05-17
+  - migrate the build from ExtUtils::MakeMaker to Dist::Zilla
+  - single-source $VERSION in dist.ini, injected into every module
+  - generate README.md from POD; badges sourced from module POD
+  - replace most hand-written xt/ author tests with Dist::Zilla plugins
+  - expand the linux CI matrix to Perl 5.12, 5.20, 5.30, and latest
+  - add tag/version and test gates to the release workflow
+
+0.601   2026-05-16
+  - drop the "experimental" framing from the documentation
+  - add SECURITY.md with a private vulnerability-reporting policy
+  - add MooX::Role::Parameterized::Cookbook documentation page
+  - add examples/basics.pl and examples/applying-roles.pl
+  - bound the arithmetic-stream example so it terminates
+  - add xt/examples.t to run the example scripts
+  - add xt/version.t to check $VERSION coherence across the modules
+  - add xt/synopsis.t to check the SYNOPSIS code compiles
+  - rewrite the MooX::Role::Parameterized::With SYNOPSIS as a runnable example
+
+0.600   2026-05-16
+  - fix issue #22 (CONTRIBUTING.pod gets installed as MooX::Role::CONTRIBUTING)
+  - raise minimum Perl version to 5.12
+  - declare 'use v5.12' in all distributed, test, and example files
+
+0.502   2026-05-15
+  - fix $VERSION typo in MooX::Role::Parameterized::Mop
+  - add automated CPAN + GitHub release workflow triggered on v* tags
+  - add xt/ author tests for perlcritic and perltidy
+  - track AGENTS.md repository guidance in the distribution
+
+0.501   2024-01-03
   - must support arrayref while set parameterized roles, instead repeat the same role name twice
   - fix bug creating a parameterized role with parameter but no role block throw exception
   - fix bug unexpected error while set a parameter in another role
   - make sure we can load a parameterized with no arguments no with keyword (like using default parameters)
 
-0.500   Tue Jan 02 2024 14:12:22 CET
+0.500   2024-01-02
   - add experimental feature; parameter keyword
   - small fixed in pod and documentation
 
-0.300   Mon Jan 01 2024 13:12:22 CET
+0.300   2024-01-01
   - small changes in POD
   - add meta method in mop
   - add is_role static method in MooX::Role::Parameterized
   - fix bug in requires mop method
   - use existing with subroutine if available on target and use as fallback on MooX::Role::Parameterized::With
   - update examples
-  
-0.200   Sat Dec 30 2023 13:12:22 CET
+
+0.200   2023-12-30
   - remove deprecated functions hasp and method
 
-0.101   Fri Dec 29 2023 16:55:22 CET
+0.101   2023-12-29
   - fix versioning
 
-0.100   Fri Dec 29 2023 16:45:22 CET
+0.100   2023-12-29
   - add support to perl 5.8 (thanks @mohawk2)
   - add a with keyword (thanks @perlancar)
   - quote bareword role name (thanks @choroba)
   - fallback to Role::Tiny when applying (thanks @perlancar)
   - fix missing prereqs
 
-0.082	Tue 22 Dez 2015 16:49:22 CET
+0.082   2015-12-22
   - fix meta ( bugtracker, issue tracker)
 
-0.081	Mon 21 Dez 2015 16:49:22 CET
+0.081   2015-12-21
   - update dependencies
 
-0.08	Sun 20 Dez 2015 16:49:22 CET
+0.08    2015-12-20
   - update documentation, promote using of mop object
 
-0.07	Fri Dec 18 16:16:15 CET 2015
+0.07    2015-12-18
   - fix issue with has ( introduct hasp ) see issue #2
   - add mop object to avoid problems with has/around/requires/with/ etc
 
-0.06	Wed Nov 25 17:17:08 CET 2015
+0.06    2015-11-25
   - allowed apply role multiple times with arrayref ( see issue #1 )
 
-0.05	Mon Jul 27 22:50:50 CEST 2015
+0.05    2015-07-27
   - add tests for 'requires'. yes it works.
 
-0.041	Mon Jul 27 10:42:03 CEST 2015
+0.041   2015-07-27
   - force minperl to 5.10.0
   - maybe 'requires' does not work inside role... should check :/
 
-0.04	Sun Jul 26 22:51:48 CEST 2015
+0.04    2015-07-26
   - add ::With package
 
-0.03	Sun Jul 26 19:04:23 CEST 2015
+0.03    2015-07-26
   - apply role does not need 'with'
 
-0.02	Sun Jul 26 15:38:58 CEST 2015
+0.02    2015-07-26
   - fix pod
 
-0.01	Sun Jul 26 15:07:39 CEST 2015
+0.01    2015-07-26
   - Initial version

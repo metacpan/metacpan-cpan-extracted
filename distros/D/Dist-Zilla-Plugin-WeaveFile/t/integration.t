@@ -111,7 +111,7 @@ subtest_streamed 'Build succeeds and generates author test' => sub {
     T2->is( scalar @weave_tests, 1, 'exactly one weave test generated' );
 
     my $test_file = $weave_tests[0];
-    T2->is( $test_file->name, 'xt/author/weave_readme_md.t', 'test file path correct' );
+    T2->is( $test_file->name, 'xt/author/weave_README_md.t', 'test file path correct' );
 
     my $content = $test_file->content;
     T2->like( $content, qr/use \s Test2::V1/msx,                        'generated test uses Test2::V1' );

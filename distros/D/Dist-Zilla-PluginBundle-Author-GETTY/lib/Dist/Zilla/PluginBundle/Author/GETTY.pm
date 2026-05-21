@@ -1,9 +1,30 @@
 package Dist::Zilla::PluginBundle::Author::GETTY;
 # ABSTRACT: BeLike::GETTY when you build your dists
-our $VERSION = '0.307';
+our $VERSION = '0.312';
 use Moose;
 use Dist::Zilla;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
+
+# Defaults published for any [@Author::GETTY::Docker / ...] subsections that
+# appear after [@Author::GETTY] in dist.ini. The subsection bundle reads from
+# here when no explicit value is set on the subsection itself.
+our %DOCKER_DEFAULTS;
+
+sub bundle_config {
+  my ($class, $section) = @_;
+
+  my $self = $class->new($section);
+
+  %DOCKER_DEFAULTS = (
+    image => $self->payload->{docker_image},
+    tags  => $self->payload->{docker_tags},
+    local => $self->payload->{docker_local},
+  );
+
+  $self->configure;
+
+  return $self->plugins->@*;
+}
 
 
 use Dist::Zilla::PluginBundle::Basic;
@@ -75,6 +96,13 @@ has no_github => (
   isa     => 'Bool',
   lazy    => 1,
   default => sub { $_[0]->payload->{no_github} },
+);
+
+has no_github_release => (
+  is      => 'ro',
+  isa     => 'Bool',
+  lazy    => 1,
+  default => sub { $_[0]->payload->{no_github_release} },
 );
 
 has no_cpan => (
@@ -207,6 +235,7 @@ has xs_object => (
   lazy    => 1,
   default => sub { $_[0]->payload->{xs_object} || '' },
 );
+
 
 my @gather_array_options = qw( exclude_filename exclude_match );
 my @gather_array_attributes = map { 'gather_'.$_ } @gather_array_options;
@@ -394,6 +423,7 @@ sub configure {
     MetaConfig
     MetaJSON
     PodSyntaxTests
+    Test::ChangesHasContent
   ));
 
   $self->add_plugins($self->no_github ? 'Repository' : [ 'GithubMeta' => { issues => 1 } ]);
@@ -498,6 +528,19 @@ sub configure {
       push_to    => [ qw(origin) ],
     });
   }
+
+  unless ($self->no_github || $self->no_github_release) {
+    $self->add_plugins([
+      'GitHub::CreateRelease' => {
+        branch     => $self->release_branch,
+        notes_from => 'ChangeLog',
+      }
+    ]);
+  }
+
+  # Docker support is delivered exclusively via [@Author::GETTY::Docker / name]
+  # subsections. The docker_image / docker_tags / docker_local attributes on
+  # this bundle only act as defaults that subsections inherit.
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -516,7 +559,7 @@ Dist::Zilla::PluginBundle::Author::GETTY - BeLike::GETTY when you build your dis
 
 =head1 VERSION
 
-version 0.307
+version 0.312
 
 =head1 SYNOPSIS
 
@@ -583,6 +626,11 @@ In default configuration it is equivalent to:
 
   [@Git::VersionManager]
   ; handles versioning, changelog (NextRelease), commits, tags, and push
+
+  [GitHub::CreateRelease]
+  branch     = main
+  notes_from = ChangeLog
+  ; notes_file defaults to "Changes" when notes_from = ChangeLog
 
 If the C<task> argument is given to the bundle, PodWeaver is replaced with
 TaskWeaver and AutoVersion is used for versioning (instead of
@@ -667,7 +715,20 @@ L<Dist::Zilla::Plugin::PodWeaver>.
 =head2 no_github
 
 If set to 1, this attribute will disable L<Dist::Zilla::Plugin::GithubMeta> and
-will add L<Dist::Zilla::Plugin::Repository> instead.
+will add L<Dist::Zilla::Plugin::Repository> instead. It also disables
+L<Dist::Zilla::Plugin::GitHub::CreateRelease>.
+
+=head2 no_github_release
+
+If set to 1, L<Dist::Zilla::Plugin::GitHub::CreateRelease> will not be used
+even though GitHub integration is otherwise active.
+
+When this option is B<not> set (the default), C<dzil release> will create a
+GitHub Release for the new tag and attach the CPAN tarball. This requires a
+F<~/.github-identity> file in your home directory with C<login> and C<token>
+fields; the token needs write access to the repository's Contents. See
+L<Config::Identity::GitHub> for authentication details (including GPG-encrypted
+identity files).
 
 =head2 no_cpan
 
@@ -827,6 +888,8 @@ L<Dist::Zilla::PluginBundle::Git::VersionManager>
 
 L<Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch>
 
+L<Dist::Zilla::Plugin::GitHub::CreateRelease>
+
 L<Dist::Zilla::Plugin::GithubMeta>
 
 L<Dist::Zilla::Plugin::InstallRelease>
@@ -842,6 +905,29 @@ L<Dist::Zilla::Plugin::Repository>
 L<Dist::Zilla::Plugin::Run>
 
 L<Dist::Zilla::Plugin::TaskWeaver>
+
+=head2 Docker Support
+
+The bundle supports Docker image building via L<Dist::Zilla::Plugin::Docker::API>
+through C<[@Author::GETTY::Docker / name]> subsections. Each subsection produces
+one independent C<Docker::API> plugin:
+
+  [@Author::GETTY]
+  docker_image = registry/app
+  docker_tags  = latest %v
+
+  [@Author::GETTY::Docker / runtime-root]
+  target = runtime-root
+
+  [@Author::GETTY::Docker / runtime-user]
+  target = runtime-user
+  local  = 1
+  tags   = user
+
+Subsections inherit C<image>, C<tags>, and C<local> from the parent's
+C<docker_image>, C<docker_tags>, and C<docker_local> settings, but each
+subsection can override them individually. See
+L<Dist::Zilla::PluginBundle::Author::GETTY::Docker> for the full attribute list.
 
 =head1 SUPPORT
 

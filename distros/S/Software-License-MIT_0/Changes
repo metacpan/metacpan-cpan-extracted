@@ -1,4 +1,11 @@
 Revision history for Software::License::MIT_0
 
+v1.0.1    2026-05-12T19:23:58Z
+          - Replace wrong shebangs in scripts, otherwise EU::MM will not rewrite
+            them on installation
+          - Add missing min perl version to mit-0.t
+          - Minor metadata fixes + require newer Software::License version
+          - Convert READMEs to UTF-8
+
 v1.0.0    2026-02-04T03:32:14Z
           - Initial release

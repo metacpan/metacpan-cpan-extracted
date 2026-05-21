@@ -1,12 +1,12 @@
 package File::Sticker::Scribe::Exif;
-$File::Sticker::Scribe::Exif::VERSION = '4.401';
+$File::Sticker::Scribe::Exif::VERSION = '4.603';
 =head1 NAME
 
 File::Sticker::Scribe::Exif - read, write and standardize meta-data from EXIF file
 
 =head1 VERSION
 
-version 4.401
+version 4.603
 
 =head1 SYNOPSIS
 
@@ -80,20 +80,20 @@ sub priority {
 If this scribe can be used for the given file, then this returns true.
 File must be one of: PDF or an image which is not a GIF.
 (GIF files need to be treated separately)
-(ExifTool can't write to EPUB)
+(EPUB files need to be treated separately)
 
 =cut
 
 sub allowed_file {
     my $self = shift;
     my $file = shift;
-    say STDERR whoami(), " file=$file" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     $file = $self->_get_the_real_file(filename=>$file);
     my $ft = $self->{file_magic}->info_from_filename($file);
-    if ($ft->{mime_type} =~ /(image|pdf)/
-            and $ft->{mime_type} !~ /gif/)
+    if ($ft->{mime_type} =~ /(image|pdf)/ and $ft->{mime_type} !~ /gif/)
     {
+        say STDERR 'Scribe ' . $self->name() . ' allows filetype ' . $ft->{mime_type} . ' of ' . $file if $self->{verbose} > 1;
         return 1;
     }
     return 0;
@@ -154,7 +154,7 @@ Read the meta-data from the given file.
 sub read_meta {
     my $self = shift;
     my $filename = shift;
-    say STDERR whoami(), " filename=$filename" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     $filename = $self->_get_the_real_file(filename=>$filename);
     my $exif_options = {DateFormat => "%Y-%m-%d %H:%M:%S"};
@@ -173,7 +173,7 @@ sub read_meta {
     # There are multiple fields which could be used as a file "description".
     # Check through them until you find a non-empty one.
     my $description = '';
-    foreach my $field (qw(Caption-Abstract Comment UserComment ImageDescription Description))
+    foreach my $field (qw(Caption-Abstract Comment UserComment ImageDescription Description MetadataDescription))
     {
         if (exists $info->{$field}
                 and $info->{$field}
@@ -185,10 +185,11 @@ sub read_meta {
         }
     }
     $meta{description} = $description if $description;
+
     # There are multiple fields which could be used as a file content creator.
     # Check through them until you find a non-empty one.
     my $creator = '';
-    foreach my $field (qw(Author Artist Creator))
+    foreach my $field (qw(Author Artist Creator MetadataCreator))
     {
         if (exists $info->{$field} and $info->{$field} and !$creator)
         {
@@ -219,6 +220,19 @@ sub read_meta {
         }
     }
     $meta{alt_text} = $alt_text if $alt_text;
+
+    # The URL could be from the Source or the Identifier
+    # Check through them until you find a non-empty one which contains an actual URL
+    foreach my $field (qw(Source Identifier MetadataIdentifier))
+    {
+        if (exists $info->{$field}
+                and $info->{$field}
+                and $info->{$field} =~ /^http/
+                and !exists $meta{url})
+        {
+            $meta{url} = $info->{$field};
+        }
+    }
 
     # CreateDate is going to be treated as a separate field
     my $create_date = '';
@@ -262,7 +276,7 @@ sub read_meta {
                 $val =~ s/\s--\s/,/g;
                 @these_tags = split(/,\s?/, $val);
             }
-            else
+            else # comma-separated
             {
                 @these_tags = split(/,\s*/, $val);
             }
@@ -603,7 +617,7 @@ If the file is a soft link, look for the file it is pointing to
 sub _get_the_real_file {
     my $self = shift;
     my %args = @_;
-    say STDERR whoami(), " filename=$args{filename}" if $self->{verbose} > 2;
+    say STDERR whoami() if $self->{verbose} > 2;
 
     my $filename = $args{filename};
     if (-d $filename) # is a directory, look for a cover file

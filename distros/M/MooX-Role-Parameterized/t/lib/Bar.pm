@@ -1,5 +1,6 @@
 package Bar;
 
+use v5.12;
 use Moo::Role;
 use MooX::Role::Parameterized;
 

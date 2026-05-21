@@ -98,6 +98,7 @@ etcd_create_insecure_channel(const char *target, const grpc_channel_args *args) 
 
 /* Call types for tag identification */
 typedef enum {
+    CALL_TYPE_NONE = 0,        /* Sentinel for fire-and-forget batches (e.g. watch cancel send) */
     CALL_TYPE_RANGE = 1,
     CALL_TYPE_PUT,
     CALL_TYPE_DELETE,
@@ -214,6 +215,11 @@ typedef struct watch_call {
     watch_params_t params;
     int reconnect_attempt;
     ev_timer reconnect_timer;  /* Backoff timer for reconnection */
+    /* Dual ownership: gRPC state freed by client-side cleanup, struct freed by
+     * the last owner. Prevents use-after-free when Perl holds the handle past
+     * client cleanup. */
+    int client_owns;
+    int perl_owns;
 } watch_call_t;
 
 /* Keepalive structure (for streaming lease keepalive) */
@@ -232,6 +238,8 @@ typedef struct keepalive_call {
     int auto_reconnect;
     int reconnect_attempt;
     ev_timer reconnect_timer;  /* Backoff timer for reconnection */
+    int client_owns;           /* See watch_call_t — same dual-ownership */
+    int perl_owns;
 } keepalive_call_t;
 
 /* Election observe parameters for reconnection */
@@ -256,6 +264,8 @@ typedef struct observe_call {
     int reconnect_attempt;
     ev_timer reconnect_timer;  /* Backoff timer for reconnection */
     observe_params_t params;
+    int client_owns;           /* See watch_call_t — same dual-ownership */
+    int perl_owns;
 } observe_call_t;
 
 /* Client structure */
@@ -313,6 +323,22 @@ static inline void init_call_base(call_base_t *base, call_type_t type) {
             croak("callback must be a code reference"); \
         } \
     } while (0)
+
+/* Store / fetch a 64-bit integer into a Perl HV slot without truncation on
+ * 32-bit Perl (where IV/UV are 32-bit). On 32-bit Perl, NV (double) preserves
+ * integers up to 2^53, which is enough for any etcd revision/lease/member id
+ * the protocol can produce. */
+#if IVSIZE >= 8
+#  define newSVi64(v) newSViv((IV)(v))
+#  define newSVu64(v) newSVuv((UV)(v))
+#  define SvI64(sv)   ((int64_t)SvIV(sv))
+#  define SvU64(sv)   ((uint64_t)SvUV(sv))
+#else
+#  define newSVi64(v) newSVnv((NV)(v))
+#  define newSVu64(v) newSVnv((NV)(v))
+#  define SvI64(sv)   ((int64_t)SvNV(sv))
+#  define SvU64(sv)   ((uint64_t)SvNV(sv))
+#endif
 
 /* Common utility functions */
 const char* grpc_status_name(grpc_status_code code);
@@ -608,6 +634,9 @@ void init_method_slices(void);
 
 /*
  * Handle error after failed batch start for streaming reconnect.
+ * Self-contained: also tears down the metadata arrays and status_details that
+ * STREAMING_CALL_REINIT just set up, so callers don't need follow-up cleanup
+ * to avoid leaks.
  *
  * Usage:
  *   STREAMING_CALL_BATCH_ERROR(wc);
@@ -619,6 +648,12 @@ void init_method_slices(void);
             grpc_call_unref((call_ptr)->call); \
             (call_ptr)->call = NULL; \
         } \
+        grpc_metadata_array_destroy(&(call_ptr)->initial_metadata); \
+        grpc_metadata_array_destroy(&(call_ptr)->trailing_metadata); \
+        grpc_slice_unref((call_ptr)->status_details); \
+        grpc_metadata_array_init(&(call_ptr)->initial_metadata); \
+        grpc_metadata_array_init(&(call_ptr)->trailing_metadata); \
+        (call_ptr)->status_details = grpc_empty_slice(); \
     } while (0)
 
 /* Finish deferred client destruction after in_callback guard.

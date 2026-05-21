@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use base qw{Geo::Leaflet::Base};
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
@@ -50,6 +50,10 @@ sub tooltip {
 =head1 METHODS
 
 =head2 stringify_base
+
+=cut
+
+sub _method_name {die};
 
 =head2 JSON
 

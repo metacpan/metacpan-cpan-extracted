@@ -8,5 +8,5 @@ my $conn = EV::Kafka::Conn::_new('EV::Kafka::Conn', undef);
 isa_ok $conn, 'EV::Kafka::Conn';
 ok !$conn->connected, 'not connected initially';
 
-my $kafka = EV::Kafka::_new('EV::Kafka', undef);
-isa_ok $kafka, 'EV::Kafka';
+my $client = EV::Kafka->new(brokers => '127.0.0.1:9092');
+isa_ok $client, 'EV::Kafka::Client';

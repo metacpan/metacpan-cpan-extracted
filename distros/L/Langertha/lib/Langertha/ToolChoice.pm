@@ -1,6 +1,6 @@
 package Langertha::ToolChoice;
 # ABSTRACT: Immutable canonical tool-selection policy with cross-provider conversion
-our $VERSION = '0.500';
+our $VERSION = '0.502';
 use Moose;
 use Moose::Util::TypeConstraints qw( enum );
 
@@ -130,6 +130,20 @@ sub to_gemini {
   return undef;
 }
 
+sub to_responses {
+  my ($self) = @_;
+  # Responses API uses flat {type => 'function', name => 'foo'} — no nested function wrapper
+  return 'auto'     if $self->type eq 'auto';
+  return 'none'      if $self->type eq 'none';
+  return 'required' if $self->type eq 'any';
+  if ( $self->type eq 'tool' ) {
+    return defined $self->name && length $self->name
+      ? { type => 'function', name => $self->name }
+      : 'auto';
+  }
+  return undef;
+}
+
 sub to_hash {
   my ($self) = @_;
   return { type => $self->type, ( defined $self->name ? ( name => $self->name ) : () ) };
@@ -150,7 +164,7 @@ Langertha::ToolChoice - Immutable canonical tool-selection policy with cross-pro
 
 =head1 VERSION
 
-version 0.500
+version 0.502
 
 =head1 SUPPORT
 

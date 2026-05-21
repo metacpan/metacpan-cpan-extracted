@@ -51,6 +51,7 @@
     },
     "api": {
       "prod": {
+        "url": "my-company.com",
         "limits": {
           "memory": "20Gi"
         },
@@ -124,9 +125,10 @@
   },
   "project": {
     "name": "my-project-name",
+    "namespace": "mynamespace",
     "host": "my-company.com",
-    "default_cluster": "clusterIntern",
-    "allowed_clusters": "clusterIntern;clusterPublic",
+    "default_cluster": "clusterDefault",
+    "allowed_clusters": "clusterDefault;clusterIntern;clusterPublic",
     "component_dirs": "init-project;init-api;solr;api;public-ui;cron-jobs",
     "oc_resource_kinds": "PersistentVolumeClaim;StorageClass;VolumeSnapshot;ImageStream;BuildConfig;Deployment;DeploymentConfig;StatefulSet;Secret;ConfigMap;CronJob;Job;DaemonSet;ReplicaSet;ReplicationController;HorizontalPodAutoscaler;PodDisruptionBudget;Service;Route;Ingress;NetworkPolicy;ServiceAccount;ClusterRole;RoleBinding;ResourceQuota;LimitRange",
     "cluster_ip_range": "172.30.202"

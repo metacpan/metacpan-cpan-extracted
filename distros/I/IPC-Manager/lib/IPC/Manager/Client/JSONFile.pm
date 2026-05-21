@@ -2,7 +2,7 @@ package IPC::Manager::Client::JSONFile;
 use strict;
 use warnings;
 
-our $VERSION = '0.000035';
+our $VERSION = '0.000037';
 
 use Carp qw/croak/;
 use Fcntl qw/:flock/;
@@ -238,15 +238,24 @@ sub init {
         }
     }
     else {
-        if ($state->{clients}{$id}) {
-            $self->{disconnected} = 1;
-            croak "Client '$id' already exists";
+        if (my $existing = $state->{clients}{$id}) {
+            my $epid = $existing->{pid};
+            if ($epid && !$self->pid_is_running($epid)) {
+                delete $state->{clients}{$id};
+                delete $state->{messages}{$id};
+                delete $state->{stats}{$id};
+            }
+            else {
+                $self->{disconnected} = 1;
+                croak "Client '$id' already exists";
+            }
         }
         $state->{clients}{$id} = {pid => $$};
         $state->{messages}{$id} //= [];
     }
 
     $state->{clients}{$id}{pid} = $$;
+    delete $state->{clients}{$id}{suspend_expires_at};
 
     $self->_commit($state, $fh);
 }
@@ -309,7 +318,42 @@ sub send_message {
 sub peers {
     my $self = shift;
     my ($state) = $self->_lock_read;
-    return sort grep { $_ ne $self->{id} } keys %{$state->{clients}};
+    my @out;
+    for my $peer (keys %{$state->{clients}}) {
+        next if $peer eq $self->{id};
+
+        my $pid = $state->{clients}{$peer}{pid};
+        next if $pid && !$self->pid_is_running($pid);
+
+        push @out => $peer;
+    }
+    return sort @out;
+}
+
+sub peer_left {
+    my $self = shift;
+
+    my ($state, $fh);
+    unless (eval { ($state, $fh) = $self->_lock_write; 1 }) {
+        warn $@;
+        return 0;
+    }
+
+    my $removed = 0;
+    for my $peer (keys %{$state->{clients}}) {
+        next if $peer eq $self->{id};
+        my $pid = $state->{clients}{$peer}{pid};
+        next unless $pid;
+        next if $self->pid_is_running($pid);
+
+        delete $state->{clients}{$peer};
+        delete $state->{messages}{$peer};
+        delete $state->{stats}{$peer};
+        $removed++;
+    }
+
+    $self->_commit($state, $fh);
+    return $removed;
 }
 
 sub peer_exists {
@@ -356,6 +400,36 @@ sub all_stats {
         $out{$id} = $state->{stats}{$id};
     }
     return \%out;
+}
+
+# --- Suspend ---
+
+sub pre_suspend_hook {
+    my $self = shift;
+    my (%params) = @_;
+
+    my $expires_at = $params{expires_at};
+    return unless defined $expires_at;
+
+    my ($state, $fh);
+    unless (eval { ($state, $fh) = $self->_lock_write; 1 }) {
+        warn $@;
+        return;
+    }
+
+    my $entry = $state->{clients}{$self->{id}};
+    $entry->{suspend_expires_at} = $expires_at + 0 if $entry;
+    $self->_commit($state, $fh);
+}
+
+sub peer_suspend_expires {
+    my $self = shift;
+    my ($peer_id) = @_;
+    return undef unless defined $peer_id && length $peer_id;
+
+    my ($state) = $self->_lock_read;
+    my $entry = $state->{clients}{$peer_id} or return undef;
+    return $entry->{suspend_expires_at};
 }
 
 # --- Disconnect ---

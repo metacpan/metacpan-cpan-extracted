@@ -1,5 +1,30 @@
-@  changeset:   225:b05a11d0fc7a
+@  changeset:   230:abdc7cc978ca
 |  tag:         tip
+|  user:        Rene Schickbauer <cavac@virgo.cavac.at>
+|  date:        Tue May 05 14:36:41 2026 +0200
+|  summary:     Make disconnects more reliable
+|
+o  changeset:   229:aacddf370fcd
+|  user:        Rene Schickbauer <cavac@virgo.cavac.at>
+|  date:        Tue May 05 13:18:54 2026 +0200
+|  summary:     Strictify Server regarding client disconnects
+|
+o  changeset:   228:cad492b573c6
+|  user:        Rene Schickbauer <cavac@virgo.cavac.at>
+|  date:        Mon May 04 15:08:39 2026 +0200
+|  summary:     Stability update (experimental)
+|
+o  changeset:   227:6abe170fc794
+|  user:        Rene Schickbauer <cavac@palebluedot>
+|  date:        Fri Jan 30 10:29:14 2026 +0100
+|  summary:     Fix MANIFEST
+|
+o  changeset:   226:ad99dd26072c
+|  user:        Rene Schickbauer <cavac@virgo.cavac.at>
+|  date:        Fri Jan 23 13:04:47 2026 +0100
+|  summary:     Update changelog
+|
+o  changeset:   225:b05a11d0fc7a
 |  user:        Rene Schickbauer <cavac@palebluedot>
 |  date:        Thu Jan 15 15:30:57 2026 +0100
 |  summary:     Bump to version 35

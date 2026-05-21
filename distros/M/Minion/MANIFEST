@@ -17,6 +17,7 @@ lib/Minion/Backend/Pg.pm
 lib/Minion/Backend/resources/migrations/pg.sql
 lib/Minion/Command/minion.pm
 lib/Minion/Command/minion/job.pm
+lib/Minion/Command/minion/schedule.pm
 lib/Minion/Command/minion/worker.pm
 lib/Minion/Guide.pod
 lib/Minion/Iterator.pm
@@ -60,6 +61,7 @@ lib/Mojolicious/Plugin/Minion/resources/templates/minion/_pagination.html.ep
 lib/Mojolicious/Plugin/Minion/resources/templates/minion/dashboard.html.ep
 lib/Mojolicious/Plugin/Minion/resources/templates/minion/jobs.html.ep
 lib/Mojolicious/Plugin/Minion/resources/templates/minion/locks.html.ep
+lib/Mojolicious/Plugin/Minion/resources/templates/minion/schedules.html.ep
 lib/Mojolicious/Plugin/Minion/resources/templates/minion/workers.html.ep
 LICENSE
 Makefile.PL
@@ -68,6 +70,8 @@ MANIFEST.bak
 MANIFEST.SKIP
 README.md
 t/backend.t
+t/command_job.t
+t/command_schedule.t
 t/commands.t
 t/lib/MinionTest/AddTestTask.pm
 t/lib/MinionTest/BadTestTask.pm

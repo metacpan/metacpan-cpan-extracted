@@ -254,6 +254,7 @@ if (my $tracefile = "$ipc/log.trace") {
             print $fh qq{12:00:00 execve("fake-run", ["git-shell", "-c", "$ENV{SSH_ORIGINAL_COMMAND}"], [$envs]) = 0\n};
             my $exit_status = $ENV{GIT_PRE_EXIT_STATUS} || $ENV{GIT_EXIT_STATUS};
             $exit_status = -1 if !defined $exit_status;
+            print $fh "12:00:01.618365 exit_group($exit_status)   = ?\n";
             print $fh "12:00:01.618365 +++ exited with $exit_status +++\n";
             close $fh;
         }
@@ -288,7 +289,7 @@ if (open my $log_fh, "<", \$log) {
                 $ENV{$key} ||= d($val);
             }
         }
-        elsif (/.*\+\+\+ exited with (\d+) \+\+\+\s*$/) {
+        elsif (/.*\+\+\+ exited with (\d+) \+\+\+\s*$/ or /\bexit_group\((\d+)\)[\s?]*$/) {
             # Found exit code
             $ENV{GIT_EXIT_STATUS} = $1 if !defined $ENV{GIT_EXIT_STATUS};
         }

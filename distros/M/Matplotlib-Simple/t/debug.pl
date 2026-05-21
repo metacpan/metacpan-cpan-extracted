@@ -1,12 +1,11 @@
 #!/usr/bin/env perl
 
-use 5.042;
+use 5.042.2;
 no source::encoding;
 use warnings FATAL => 'all';
 use autodie ':default';
-#use Digest::SHA 'sha512_base64';
-use Util;# qw(list_regex_files json_file_to_ref ref_to_json_file);
-# s/[!@#\$\%^&*\(\)\{\}\[\]\<\>,\/'"\-\h;\+=]+/_/g; # annoying chars
+use Digest::SHA 'sha512_base64';
+use Util;
 
 sub simplify_file ($file) {
 	my $text = file2string($file);
@@ -20,11 +19,12 @@ sub simplify_file ($file) {
 	foreach my $line (@text) {
 		$line =~ s/\h+id="image[a-z\d]+"//;
 	}
+	$text = join ("\n", @text);
+	say "sha512_base64($file)\t= " . sha512_base64($text);
 	return \@text;
 }
-my $new = simplify_file('/tmp/add.single.svg');
-my $old = simplify_file('output.images/add.single.svg');
-
+my $new = simplify_file('/tmp/hist.sub.svg');
+my $old = simplify_file('output.images/hist.sub.svg');
 my @different_lines;
 foreach my ($idx, $line) (indexed @{ $new }) {
 	if ($new->[$idx] ne $old->[$idx]) {

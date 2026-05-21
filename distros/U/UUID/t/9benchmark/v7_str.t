@@ -1,14 +1,17 @@
 use strict;
 use warnings;
-use Test::More;
-use MyNote;
-use Benchmark qw(:hireswallclock countit);
 
-unless ( $ENV{TEST_VERBOSE} ) {
-    plan skip_all => 'not verbose';
+BEGIN {
+    unless ( $ENV{TEST_VERBOSE} ) {
+        print "1..0 # SKIP not verbose\n";
+        exit 0;
+    }
 }
 
-use_ok 'UUID', 'uuid7';
+use MyTest;
+use MyTmpTimer;
+use Benchmark qw(:hireswallclock countit);
+use UUID 'uuid7';
 
 note '';
 note 'testing version 7 string speed';
@@ -16,7 +19,7 @@ note 'testing version 7 string speed';
 my $t = countit(1, 'uuid7()');
 my $cnt = $t->iters;
 
-note 'rate = ', $cnt, ' UUID strings per second';
+note 'rate = ', int_commify($cnt, 1), ' UUID strings per second';
 note '';
 
 ok 1, 'done';

@@ -11,7 +11,7 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(mime_exec mime_system);
 our @EXPORT_OK = qw(suggest_script_name);
 our %EXPORT_TAGS = (magic => \@EXPORT);
-our $VERSION = '0.36';
+our $VERSION = '0.37';
 our @choicespath = (
     config_home('rox.sourceforge.net'),
     File::Spec->catdir($ENV{HOME}, 'Choices'),
@@ -168,6 +168,7 @@ Maintained by Michiel Beijen E<lt>mb@x14.nlE<gt>
 =head1 COPYRIGHT
 
 Copyright (c) 2003, 2012 Jaap G Karssenberg. All rights reserved.
+Copyright (c) 2013-2026 Michiel W. Beijen. All rights reserved.
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 

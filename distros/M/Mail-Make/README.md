@@ -28,24 +28,103 @@ Mail::Make - Strict, Fluent MIME Email Builder
             filename => 'Q4 Report 2025.pdf',
         );
 
+    # Plain text only
+    my $mail = Mail::Make->new
+        ->from(    'hello@example.com' )
+        ->to(      'jack@example.jp' )
+        ->subject( 'Hello' )
+        ->plain(   "Hello there.\n" )
+        ->smtpsend( Host => 'smtp.example.com' );
+
+    # HTML only
+    Mail::Make->new
+        ->from(    'hello@example.com' )
+        ->to(      'jack@example.jp' )
+        ->subject( 'Hello' )
+        ->html(    '<p>Hello there.</p>' )
+        ->smtpsend( Host => 'smtp.example.com' );
+
+    # Plain text + HTML alternative
+    Mail::Make->new
+        ->from(    'hello@example.com' )
+        ->to(      'jack@example.jp' )
+        ->subject( 'Hello' )
+        ->plain(   "Hello there.\n" )
+        ->html(    '<p>Hello there.</p>' )
+        ->smtpsend( Host => 'smtp.example.com' );
+
+    # HTML with manually managed inline images (cid: already in your HTML)
+    Mail::Make->new
+        ->from(    'hello@example.com' )
+        ->to(      'jack@example.jp' )
+        ->subject( 'Hello' )
+        ->plain(   "Hello there.\n" )
+        ->related(
+            html   => '<p><img src="cid:logo.png@example.com"> Hello.</p>',
+            inline => [
+                { path => '/var/www/images/logo.png', type => 'image/png', id => 'logo.png@example.com' },
+            ],
+        )
+        ->smtpsend( Host => 'smtp.example.com' );
+
+    # HTML with automatic asset embedding (URLs rewritten to cid: automatically) using
+    # either HTML::Object::DOM or HTML::TreeBuilder, whichever is available.
+    Mail::Make->new
+        ->from(    'hello@example.com' )
+        ->to(      'jack@example.jp' )
+        ->subject( 'Hello' )
+        ->plain(   "Hello there.\n" )
+        ->html_to_inline(
+            html     => '<p><img src="/images/logo.png"> Hello.</p>',
+            base_url => 'https://www.example.com',
+        )
+        ->smtpsend( Host => 'smtp.example.com' );
+
+    # Attachments with positional shorthand (path, type, filename auto-detected)
+    Mail::Make->new
+        ->from(    'hello@example.com' )
+        ->to(      'jack@example.jp' )
+        ->subject( 'Q4 Report' )
+        ->plain(   "Please find the report attached.\n" )
+        ->attach( '/path/to/report.pdf' )
+        ->smtpsend( Host => 'smtp.example.com' );
+
+    # Attachments with explicit form
+    Mail::Make->new
+        ->from(    'hello@example.com' )
+        ->to(      'jack@example.jp' )
+        ->subject( 'Q4 Report' )
+        ->plain(   "Please find the report attached.\n" )
+        ->attach(
+            path     => '/tmp/Q4-Report.pdf',
+            type     => 'application/pdf',
+            filename => 'Q4 Report 2025.pdf',
+        )
+        ->smtpsend( Host => 'smtp.example.com' );
+
+    # Full message: plain + HTML with inline images + attachment
+    my $mail = Mail::Make->new
+        ->from(    'hello@example.com' )
+        ->to(      'jack@example.jp' )
+        ->subject( "Q4 Report - Yamato, Inc." )
+        ->plain(   "Please find the report attached.\n" )
+        ->related(
+            html   => '<p><img src="cid:logo@yamato-inc"> Please find the report <b>attached</b>.</p>',
+            inline => [
+                { path => '/var/www/images/logo.png', type => 'image/png', id => 'logo@yamato-inc' },
+            ],
+        )
+        ->attach( '/tmp/Q4-Report.pdf' );
+
     my $raw = $mail->as_string || die( $mail->error );
-    print $raw;
 
     # Scalar-ref form - no string copy, useful for large messages
     my $raw_ref = $mail->as_string_ref || die( $mail->error );
     print $$raw_ref;
 
     # Write directly to a filehandle - no in-memory buffering
-    open( my $fh, '>', '/tmp/message.eml' ) or die $!;
+    open( my $fh, '>', '/tmp/message.eml' ) or die( $! );
     $mail->print( $fh ) || die( $mail->error );
-
-    # Send directly
-    $mail->smtpsend( Host => 'smtp.example.com' )
-        || die( $mail->error );
-
-    # Direct access to the envelope headers object
-    my $h = $mail->headers;
-    $h->set( 'X-Priority' => '1' );
 
     # Hash-based alternative constructor
     my $mail2 = Mail::Make->build(
@@ -53,12 +132,34 @@ Mail::Make - Strict, Fluent MIME Email Builder
         to      => [ 'jack@example.jp' ],
         subject => 'Hello',
         plain   => "Hi there.\n",
-        html    => '<p>Hi there.</p>',
+        related => {
+            html   => '<p><img src="cid:logo@example.com"> Hi there.</p>',
+            inline => [
+                { path => '/var/www/images/logo.png', type => 'image/png', id => 'logo@example.com' },
+            ],
+        },
+        attach  => '/tmp/report.pdf',
     ) || die( Mail::Make->error );
+
+    # Hash-based with automatic asset embedding
+    my $mail3 = Mail::Make->build(
+        from           => 'hello@example.com',
+        to             => [ 'jack@example.jp' ],
+        subject        => 'Hello',
+        plain          => "Hi there.\n",
+        html_to_inline => {
+            html     => '<p><img src="/images/logo.png"> Hi there.</p>',
+            base_url => 'https://www.example.com',
+        },
+    ) || die( Mail::Make->error );
+
+    # Direct access to the envelope headers object
+    my $h = $mail->headers;
+    $h->set( 'X-Priority' => '1' );
 
 # VERSION
 
-    v0.22.0
+    v0.23.0
 
 # DESCRIPTION
 
@@ -102,7 +203,7 @@ An alternate hash-based constructor.
 
 Takes an hash or hash reference of options.
 
-Recognised parameters are: [from](#from), [to](#to), [cc](#cc), [bcc](#bcc), [date](#date), [reply\_to](#reply_to), [sender](#sender), [subject](#subject), [in\_reply\_to](#in_reply_to), [message\_id](#message_id), [references](#references), [plain](#plain), [html](#html), `plain_opts`, `html_opts`, `attach`, `headers`.
+Recognised parameters are: [from](#from), [to](#to), [cc](#cc), [bcc](#bcc), [date](#date), [reply\_to](#reply_to), [sender](#sender), [subject](#subject), [in\_reply\_to](#in_reply_to), [message\_id](#message_id), [references](#references), [plain](#plain), [html](#html), `plain_opts`, `html_opts`, `attach`, `related`, `html_to_inline`, `url_to_inline`, `headers`.
 
 When using the standard mail envelop headers, `build` will call each respective method, such as [from](#from), [to](#to), etc.
 
@@ -134,6 +235,28 @@ The `attach` parameter accepts one of the following forms:
 If `type` is not provided in any of the above forms, it is auto-detected from the file content using [Module::Generic::File::Magic](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AFile%3A%3AMagic).
 
 Each element is forwarded to ["attach"](#attach), so all options supported by ["attach"](#attach) are available in the hash reference form.
+
+The `related` parameter accepts a hash reference with at least a `html` key, forwarded to ["related"](#related):
+
+    related => {
+        html   => '<p><img src="cid:logo@example.com"> Hello.</p>',
+        inline => [
+            { path => '/var/www/images/logo.png', type => 'image/png', id => 'logo@example.com' },
+        ],
+    }
+
+The `html_to_inline` parameter accepts a hash reference with at least `html` and `base_url` keys, forwarded to ["html\_to\_inline"](#html_to_inline):
+
+    html_to_inline => {
+        html     => '<p><img src="/images/logo.png"> Hello.</p>',
+        base_url => 'https://www.example.com',
+    }
+
+The `url_to_inline` parameter accepts a hash reference with at least a `url` key, forwarded to ["url\_to\_inline"](#url_to_inline):
+
+    url_to_inline => {
+        url => 'https://www.example.com/newsletter/confirm.html',
+    }
 
 You can also provide additional mail envelop headers by providing the parameter `headers` as an hash reference.
 
@@ -349,6 +472,53 @@ This takes an optional hash or hash reference of the following parameters:
 
     Defaults to `quoted-printable`
 
+## html\_to\_inline( %opts )
+
+    # Fluent form
+    $mail->plain( "Hello.\n" )
+         ->html_to_inline(
+             html     => '<p><img src="/images/logo.png"> Hello.</p>',
+             base_url => 'https://www.example.com',
+         );
+
+    # HTML only, no plain text alternative
+    $mail->html_to_inline(
+        html     => '<p><img src="/images/logo.png"> Hello.</p>',
+        base_url => 'https://www.example.com',
+    );
+
+Parses the HTML, fetches all external assets (images, body background images, and optionally CSS), rewrites their URLs to `cid:UUID.ext@hostname`, sets the HTML body via ["html"](#html), and attaches each asset as an inline part via ["attach\_inline"](#attach_inline). Returns `$self` for chaining.
+
+Assets that cannot be fetched are left unchanged and a warning is emitted (suppressible with `no warnings 'Mail::Make'`).
+
+Supported options are:
+
+- `base_url`
+
+    The base URL used to resolve relative and absolute-path URLs, such as `/images/logo.png`. Required unless every `src` and `href` in the HTML is already an absolute URL. A `file:///path` URI is also accepted as a base.
+
+- `cache_dir`
+
+    Path to a directory for persistent caching. Each fetched resource is stored on disk as `MD5(url).ext`, with a sidecar `MD5(url).ext.json` file holding the `ETag` and `Last-Modified` values used for subsequent conditional requests (`If-None-Match` or `If-Modified-Since`). The per-instance in-memory cache is always active regardless of this option.
+
+- `charset`
+
+    Charset for the HTML part. Forwarded to ["html"](#html). Default: `utf-8`.
+
+- `embed_css`
+
+    Boolean. When true, `<link rel="stylesheet" href="...">` assets are also fetched and embedded as inline parts. Default: `0`.
+
+- `encoding`
+
+    Content-Transfer-Encoding for the HTML part. Forwarded to ["html"](#html). Default: `quoted-printable`.
+
+- `html`
+
+    Required. The raw HTML string to process.
+
+If an error occurs, it sets an [exception object](https://metacpan.org/pod/Mail%3A%3AMake%3A%3AException), and returns `undef` in scalar context or an empty list in list context.
+
 ## in\_reply\_to( \[$mid\] )
 
     $mail->in_reply_to( 'dave.null@example.com' ); # Returns $mail
@@ -451,6 +621,45 @@ In accessor mode, this returns a list of message IDs, and in scalar mode, this r
 
 If an error occurs, it sets an [exception object](https://metacpan.org/pod/Mail%3A%3AMake%3A%3AException), and returns `undef` in scalar context, or an empty list in list context.
 
+## related( %opts )
+
+    # Fluent form - with plain text alternative
+    $mail->plain( "Hello.\n" )
+         ->related(
+             html   => '<p><img src="cid:logo@example.com"> Hello.</p>',
+             inline => [
+                 { path => '/var/www/images/logo.png', type => 'image/png', id => 'logo@example.com' },
+             ],
+         );
+
+    # HTML only, no plain text alternative
+    $mail->related(
+        html   => '<p><img src="cid:logo@example.com"> Hello.</p>',
+        inline => [
+            { path => '/var/www/images/logo.png', type => 'image/png', id => 'logo@example.com' },
+        ],
+    );
+
+Convenience method that sets the HTML body part and attaches all inline parts in one call. The HTML must already contain `cid:ID` references matching the `id` values in the `inline` list. Returns `$self` for chaining.
+
+This method is suited to the case where you have already processed the HTML yourself and know the Content-IDs. For automatic URL-to-cid rewriting, use ["html\_to\_inline"](#html_to_inline) instead.
+
+Supported options are:
+
+- `html`
+
+    Required. The HTML string, which must already contain `cid:ID` references for each inline part.
+
+- `html_opts`
+
+    Optional hash reference of options forwarded to ["html"](#html) (such as `charset` or `encoding`).
+
+- `inline`
+
+    An array reference of hash references, each forwarded to ["attach\_inline"](#attach_inline). Each hash reference must supply at least `id` (or `cid`) and one of `path` or `data`.
+
+If an error occurs, it sets an [exception object](https://metacpan.org/pod/Mail%3A%3AMake%3A%3AException), and returns `undef` in scalar context or an empty list in list context.
+
 ## reply\_to( \[$address\] )
 
     $mail->reply_to( 'hello@example.com' );
@@ -511,6 +720,47 @@ Note that it is up to you to ensure there are no duplicates.
 When called as a mutator, it returns the current instance of [Mail::Make](https://metacpan.org/pod/Mail%3A%3AMake), otherwise, as an accessor, it returns the current value of the mail envelop header.
 
 If an error occurs, it sets an [exception object](https://metacpan.org/pod/Mail%3A%3AMake%3A%3AException), and returns `undef` in scalar context, or an empty list in list context.
+
+## url\_to\_inline( %opts )
+
+    # Fluent form
+    $mail->plain( "Hello.\n" )
+         ->url_to_inline( url => 'https://www.example.com/newsletter/confirm.html' );
+
+    # HTML only, no plain text alternative
+    $mail->url_to_inline( url => 'https://www.example.com/newsletter/confirm.html' );
+
+Fetches the HTML page at `url`, then processes it exactly like ["html\_to\_inline"](#html_to_inline): external assets are fetched, their URLs rewritten to `cid:` references, and each asset is attached as an inline part via ["attach\_inline"](#attach_inline). Returns `$self` for chaining.
+
+The `base_url` for resolving relative asset URLs defaults to the directory portion of `url` (e.g. `https://www.example.com/newsletter/` for a page at `.../newsletter/confirm.html`), but can be overridden explicitly.
+
+Supported options are:
+
+- `url`
+
+    Required. The URL of the HTML page to fetch and process. `file:///path` URIs are also accepted.
+
+- `base_url`
+
+    Overrides the base URL used to resolve relative asset URLs. When omitted, it is deduced from the directory portion of `url`.
+
+- `cache_dir`
+
+    Same as ["html\_to\_inline"](#html_to_inline). Path to a directory for persistent HTTP caching of fetched assets.
+
+- `charset`
+
+    Charset for the HTML part. Forwarded to ["html"](#html). Default: `utf-8`.
+
+- `embed_css`
+
+    Boolean. When true, `<link rel="stylesheet" href="...">` assets are also fetched and embedded. Default: `0`.
+
+- `encoding`
+
+    Content-Transfer-Encoding for the HTML part. Forwarded to ["html"](#html). Default: `quoted-printable`.
+
+If an error occurs, it sets an [exception object](https://metacpan.org/pod/Mail%3A%3AMake%3A%3AException), and returns `undef` in scalar context or an empty list in list context.
 
 # OUTPUT METHODS
 
@@ -776,20 +1026,20 @@ Accepts all options from both ["gpg\_sign"](#gpg_sign) and ["gpg\_encrypt"](#gpg
     my $signed = $mail->gpg_sign(
         KeyId      => '35ADBC3AF8355E845139D8965F3C0261CDB2E752',
         Passphrase => 'my-passphrase',   # or: sub { MyKeyring::get('gpg') }
-    ) || die $mail->error;
+    ) || die( $mail->error );
     $signed->smtpsend( Host => 'smtp.example.com' );
 
     # Encrypt only
     my $encrypted = $mail->gpg_encrypt(
         Recipients => [ 'alice@example.com' ],
-    ) || die $mail->error;
+    ) || die( $mail->error );
 
     # Sign then encrypt
     my $protected = $mail->gpg_sign_encrypt(
         KeyId      => '35ADBC3AF8355E845139D8965F3C0261CDB2E752',
         Passphrase => sub { MyKeyring::get_passphrase() },
         Recipients => [ 'alice@example.com', 'bob@example.com' ],
-    ) || die $mail->error;
+    ) || die( $mail->error );
 
 # S/MIME METHODS
 
@@ -879,20 +1129,20 @@ Accepts all options from both ["smime\_sign"](#smime_sign) and ["smime\_encrypt"
         Cert   => '/path/to/my.cert.pem',
         Key    => '/path/to/my.key.pem',
         CACert => '/path/to/ca.crt',
-    ) || die $mail->error;
+    ) || die( $mail->error );
     $signed->smtpsend( Host => 'smtp.example.com' );
 
     # Encrypt only
     my $encrypted = $mail->smime_encrypt(
         RecipientCert => '/path/to/recipient.cert.pem',
-    ) || die $mail->error;
+    ) || die( $mail->error );
 
     # Sign then encrypt
     my $protected = $mail->smime_sign_encrypt(
         Cert          => '/path/to/my.cert.pem',
         Key           => '/path/to/my.key.pem',
         RecipientCert => '/path/to/recipient.cert.pem',
-    ) || die $mail->error;
+    ) || die( $mail->error );
 
 # PRIVATE METHODS
 

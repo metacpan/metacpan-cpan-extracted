@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Cpanel::JSON::XS ();
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 # XS methods are registered under the Chandra bootstrap.
 # Ensure the shared object is loaded.
@@ -77,7 +77,7 @@ plain C<href> / C<src>:
 
 Both forms (C<data-*> and native attributes) are supported.
 
-This is implemented entirely in Perl + JavaScript — no C-level
+This is implemented entirely in Perl + JavaScript - no C-level
 protocol registration is required.
 
 =head1 METHODS

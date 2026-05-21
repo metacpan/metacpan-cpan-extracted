@@ -132,7 +132,7 @@ Valid options are:
 
  -p --print-helpers
  	List all builtin mime-helpers and all external mime-helpers as 
-	a nested perl datastructure.
+	a nested Perl datastructure.
 
  -P --param KEY=VALUE
  	Place additional params into the log file.

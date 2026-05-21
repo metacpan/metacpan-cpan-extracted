@@ -1,7 +1,7 @@
 # ABSTRACT: Ref-backed board storage for karr
 
 package App::karr::BoardStore;
-our $VERSION = '0.102';
+our $VERSION = '0.205';
 use Moo;
 use File::Temp qw( tempdir );
 use Path::Tiny qw( path );
@@ -33,11 +33,43 @@ sub load_config {
     return _merge_hashes( $defaults, $overrides );
 }
 
+sub effective_config {
+    my ($self) = @_;
+    return $self->{_effective_config} //= $self->load_config;
+}
+
+sub all_status_names {
+    my ($self) = @_;
+    my $ec = $self->effective_config;
+    return map { ref $_ ? $_->{name} : $_ } @{$ec->{statuses} // []};
+}
+
+
+sub status_requires_claim {
+    my ($self, $status_name) = @_;
+    my $ec = $self->effective_config;
+    my ($sc) = grep {
+        (ref $_ ? $_->{name} : $_) eq $status_name
+    } @{$ec->{statuses} // []};
+    return 0 unless $sc;
+    return 0 if !ref $sc;
+    return $sc->{require_claim} ? 1 : 0;
+}
+
+
+sub is_terminal_status {
+    my ($self, $status_name) = @_;
+    return 1 if $status_name eq 'done' || $status_name eq 'archived';
+    return 0;
+}
+
+
 sub save_config {
     my ( $self, $effective ) = @_;
     my $defaults = App::karr::Config->default_config;
     my $overrides = _diff_hashes( $defaults, $effective );
     $overrides->{version} = $effective->{version} // 1;
+    delete $self->{_effective_config};  # invalidate cache
     return $self->git->write_config_ref($overrides);
 }
 
@@ -233,7 +265,7 @@ App::karr::BoardStore - Ref-backed board storage for karr
 
 =head1 VERSION
 
-version 0.102
+version 0.205
 
 =head1 SYNOPSIS
 
@@ -254,16 +286,38 @@ board views for command handlers that still work with files internally.
 L<karr>, L<App::karr>, L<App::karr::Git>, L<App::karr::Task>,
 L<App::karr::Config>
 
+=head2 all_status_names
+
+Returns a list of all status names from the effective config.
+
+    my @statuses = $store->all_status_names;
+
+=head2 status_requires_claim
+
+Returns true if the given status requires a claim.
+
+    if ($store->status_requires_claim('in-progress')) {
+        # must use --claim to move here
+    }
+
+=head2 is_terminal_status
+
+Returns true if the status is terminal (done or archived).
+
+    unless ($store->is_terminal_status($task->status)) {
+        # task is still active
+    }
+
 =head1 SUPPORT
 
 =head2 Issues
 
 Please report bugs and feature requests on GitHub at
-L<https://github.com/Getty/p5-app-karr/issues>.
+L<https://github.com/Getty/karr/issues>.
 
 =head2 IRC
 
-Join C<#ai> on C<irc.perl.org> or message Getty directly.
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -271,7 +325,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

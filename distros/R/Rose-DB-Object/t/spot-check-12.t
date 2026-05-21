@@ -4,7 +4,7 @@ use strict;
 
 use Test::More tests => 10;
 
-require 't/test-lib.pl';
+require './t/test-lib.pl';
 
 use Rose::DB::Object::Util qw(:children);
 use Rose::DB::Object::Constants qw(MODIFIED_COLUMNS);

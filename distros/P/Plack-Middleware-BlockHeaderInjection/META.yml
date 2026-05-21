@@ -31,7 +31,7 @@ name: Plack-Middleware-BlockHeaderInjection
 provides:
   Plack::Middleware::BlockHeaderInjection:
     file: lib/Plack/Middleware/BlockHeaderInjection.pm
-    version: v1.3.0
+    version: v1.3.1
 requires:
   Plack::Middleware: '0'
   experimental: '0'
@@ -41,7 +41,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/Plack-Middleware-BlockHeaderInjection/issues
   repository: git://github.com/robrwo/Plack-Middleware-BlockHeaderInjection.git
-version: v1.3.0
+version: v1.3.1
 x_authority: cpan:RRWO
 x_contributors:
   - 'Graham Knop <haarg@haarg.org>'

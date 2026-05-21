@@ -6,7 +6,6 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
-scripts/generate_index.pl
 t/00-load.t
 t/10-compile.t
 t/30-basics.t
@@ -21,9 +20,13 @@ t/cross_validation.t
 t/custom_types.t
 t/custom_validation.t
 t/default.t
+t/edge_cases.t
 t/eof.t
 t/eol.t
+t/extended_tests.t
+t/function.t
 t/get.t
+t/integration.t
 t/lib/Test/Logger.pm
 t/lib/TestLogger.pm
 t/memberof.t
@@ -37,8 +40,11 @@ t/pod.t
 t/positional.t
 t/prereq.t
 t/strict.t
+t/t_union_type.t
 t/transform.t
+t/unit.t
 t/validate.t
 t/vars.t
+xt/.gitkeep
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

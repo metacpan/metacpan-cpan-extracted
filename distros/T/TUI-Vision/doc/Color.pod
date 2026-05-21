@@ -1,0 +1,552 @@
+=pod
+
+=head1 COLOR CONSTANTS
+
+=head2 apXXXX
+
+Application palette constants.
+
+These constants select the active application-level color palette.
+The selected value is stored in C<$appPalette> and determines how
+logical color roles are mapped to actual screen attributes.
+
+    Constant        Value   Usage
+    apColor         0       Selects the color screen palette
+    apBlackWhite    1       Selects the black and white palette
+    apMonoChrome    2       Selects the monochrome screen palette
+
+=head2 cpXXXX
+
+Color Palette constants
+
+Except for C<cpColor>, C<cpBlackWhite> and C<cpMonoChrome>, all 
+of the color palette constants contain indices into their owner's palette. For 
+C<cpColor>, C<cpBlackWhite> and C<cpMonoChrome>, each entry contains an actual 
+BIOS video color attribute byte.
+
+You can use these color palette maps to determine what color a particular
+object or component will have when it appears on the screen. For example, if
+you place a TButton object into a TDialog object, you can trace through the
+color palettes to determine what color it will have. A I<normal> button will
+have the attribute I<Text Normal> shown in the first byte of the cpButton color
+palette. This color entry is an index into its owner's palette, C<cpDialog>.
+Looking at the 10th entry of C<cpDialog>, we see that this maps to entry 41 in 
+the application-level palette. In the case of C<cpColor> (color display in use),
+this corresponds to black lettering on a green background.
+
+=head3 cpBackground
+
+  Byte Usage           Maps to     On this palette
+  ---- --------------- ----------- ----------------------
+  [ 1] Background      1           Application palettes
+
+=head3 cpButton
+
+  Byte Usage              Maps to     On this palette
+  ---- ------------------ ----------- ----------------------
+  [ 1] Text Normal        10          cpDialog palette
+  [ 2] Text Default       11          
+  [ 3] Text Selected      12
+  [ 4] Text Disabled      13
+  [ 5] Shortcut Normal    14
+  [ 6] Shortcut Default   14
+  [ 7] Shortcut Selected  14
+  [ 8] Shadow             15
+
+=head3 cpCluster
+
+B<Note>: used for TRadioButtons and TCheckBoxes
+
+  Byte Usage              Maps to     On this palette
+  ---- ------------------ ----------- ----------------------
+  [ 1] Text Normal        16          cpDialog
+  [ 2] Text Selected      17
+  [ 3] Shortcut Normal    18
+  [ 4] Shortcut Selected  18
+
+=head3 cpDialog
+
+  Byte Usage                  Maps to     On this palette
+  ---- ---------------------- ----------- ----------------------
+  [ 1] Frame Passive          32          Application palettes
+  [ 2] Frame Active           33
+  [ 3] Frame Icon             34
+  [ 4] Scrollbar Page         35
+  [ 5] Scrollbar controls     36
+  [ 6] StaticText             37
+  [ 7] Label Normal           38
+  [ 8] Label Highlight        39
+  [ 9] Label Shortcut         40
+  [10] Button Normal          41
+  [11] Button Default         42
+  [12] Button Selected        43
+  [13] Button Disabled        44
+  [14] Button Shortcut        45
+  [15] Button Shadow          46
+  [16] Cluster Normal         47
+  [17] Cluster Selected       48
+  [18] Cluster Shortcut       49
+  [19] InputLine Normal       50
+  [20] InputLine Selected     51
+  [21] InputLine Arrows       52
+  [22] History Arrows         53
+  [23] History sides          54
+  [24] HistoryWindow
+        Scrollbar page         55
+  [25] HistoryWindow
+        Scrollbar controls     56
+  [26] ListViewer Normal      57
+  [27] ListViewer Focused     58
+  [28] ListViewer Selected    59
+  [29] ListViewer Divided     60
+  [30] InfoPane               61
+  [31] Reserved               62
+  [32] Reserved               63
+      
+=head3 cpFrame
+
+  Byte Usage           Maps to     On this palette
+  ---- --------------- ----------- ----------------------
+  [ 1] Passive frame   1           Standard window palettes
+  [ 2] Passive Title   1
+  [ 3] Active Frame    2
+  [ 4] Active Title    2
+  [ 5] Icons
+
+=head3 cpHistory
+
+  Byte Usage           Maps to     On this palette
+  ---- --------------- ----------- ----------------------
+  [ 1] Arrow           14          cpDialog palette
+  [ 2] Sides           20
+
+=head3 cpHistoryViewer
+
+  Byte Usage           Maps to     On this palette
+  ---- --------------- ----------- ----------------------
+  [ 1] Active          6           cpDialog palette
+  [ 2] Inactive        6
+  [ 3] Focused         7
+  [ 4] Selected        6
+  [ 5] Divider         6
+
+=head3 cpHistoryWindow
+
+  Byte Usage                        Maps to     On this palette
+  ---- ---------------------------- ----------- ----------------------
+  [ 1] Frame passive                19          cpDialog palette
+  [ 2] Frame active                 19
+  [ 3] Frame icon                   21
+  [ 4] ScrollBar page area          24
+  [ 5] Scrollbar controls           25
+  [ 6] HistoryViewer normal text    19
+  [ 7] History Viewer selected text 20
+
+=head3 cpInputLine
+
+  Byte Usage           Maps to     On this palette
+  ---- --------------- ----------- ----------------------
+  [ 1] Passive         19          cpDialog palette
+  [ 2] Active          19
+  [ 3] Selected        20
+  [ 4] Arrow           21
+
+=head3 cpLabel
+
+  Byte Usage              Maps to     On this palette
+  ---- ------------------ ----------- ----------------------
+  [ 1] Text Normal        7           cpDialog palette
+  [ 2] Text Selected      8
+  [ 3] Shortcut Normal    9
+  [ 4] Shortcut Selected  9
+
+=head3 cpListViewer 
+
+B<Note>: used for TListViewer and TListBox
+
+  Byte Usage           Maps to     On this palette
+  ---- --------------- ----------- ----------------------
+  [ 1] Active          26          Application palette
+  [ 2] Inactive        26
+  [ 3] Focused         27
+  [ 4] Selected        28
+  [ 5] Divider         29
+
+=head3 cpMenuView
+
+B<Note>: used for TMenuBar and TMenuBox
+
+  Byte Usage              Maps to     On this palette
+  ---- ------------------ ----------- ----------------------
+  [ 1] Text Normal        2           Application palette
+  [ 2] Text Disabled      3
+  [ 3] Text Shortcut      4
+  [ 4] Selected Normal    5
+  [ 5] Selected Disabled  6
+  [ 6] Selected Shortcut  7
+
+=head3 cpColor
+
+B<Note>: for TProgram and TApplication
+
+Bytes 1 to 7 are used by menus and status lines
+
+  Byte Usage              Attribute   Actual color displayed
+  ---- ------------------ ----------- ----------------------
+  [ 1] Background Text    0x71        Blue on White
+  [ 2] Normal Text        0x70        Black on White
+  [ 3] Disabled Text      0x78        Blue on Gray
+  [ 4] Shortcut text      0x74        Blue on Red
+  [ 5] Normal selection   0x20        Green on Black
+  [ 6] Disabled selection 0x28        Green on Gray
+  [ 7] Shortcut selection 0x24        Green on Red
+
+Bytes 8 to 15 are used by blue windows
+
+  Byte Usage                  Attribute   Actual color displayed
+  ---- ---------------------- ----------- ----------------------
+  [ 8] Frame Passive          0x17        White on Blue
+  [ 9] Frame Active           0x1F        Bright White on Blue
+  [10] Frame Icon             0x1A        Light Green on Blue
+  [11] Scrollbar page         0x31        Blue on Cyan
+  [12] Scrollbar reserved     0x31        Blue on Cyan
+  [13] Scroller Normal text   0x1E        Yellow on Blue
+  [14] Scroller Selected text 0x71        Blue on White
+  [15] Reserved               0x00
+
+Bytes 16 to 23 are used by cyan windows
+
+  Byte Usage                  Attribute   Actual color displayed
+  ---- ---------------------- ----------- ----------------------
+  [16] Frame Passive          0x37        White on Cyan
+  [17] Frame Active           0x3F        Bright White on Cyan
+  [18] Frame Icon             0x3A        Light Green on Cyan
+  [19] Scrollbar page         0x13        Cyan on Blue
+  [20] Scrollbar reserved     0x13        Cyan on Blue
+  [21] Scroller Normal text   0x3E        Yellow on Cyan
+  [22] Scroller Selected text 0x21        Blue on Green
+  [23] Reserved               0x00
+
+Bytes 24 to 31 are used by gray windows
+
+  Byte Usage                  Attribute   Actual color displayed
+  ---- ---------------------- ----------- ----------------------
+  [24] Frame Passive          0x70        Black on White
+  [25] Frame Active           0x7F        Bright White on White
+  [26] Frame Icon             0x7A        Light Green on White
+  [27] Scrollbar page         0x13        Cyan on Blue
+  [28] Scrollbar reserved     0x13        Cyan on Blue
+  [29] Scroller Normal text   0x70        Black on White
+  [30] Scroller Selected text 0x7F        Bright White on White
+  [31] Reserved               0x00
+
+Bytes 32 to 63 are used by dialog box components.
+
+  Byte Usage                  Attribute   Actual color displayed
+  ---- ---------------------- ----------- ----------------------
+  [32] Frame Passive          0x70        Black on White
+  [33] Frame Active           0x7F        Bright White on White
+  [34] Frame Icon             0x7A        Light Green on White
+  [35] Scrollbar Page         0x13        Cyan on Blue
+  [36] Scrollbar controls     0x13        Cyan on Blue
+  [37] Static text            0x70        Black on White
+  [38] Label Normal           0x70        Black on White
+  [39] Label Highlight        0x7F        Bright White on White
+  [40] Label Shortcut         0x7E        Yellow on White
+  [41] Button Normal          0x20        Black on Green
+  [42] Button Default         0x2B        Light Cyan on Green
+  [43] Button Selected        0x2F        Bright White on Green
+  [44] Button Disabled        0x78        Gray on White
+  [45] Button Shortcut        0x2E        Yellow on Green
+  [46] Button Shadow          0x70        Black on White
+  [47] Cluster Normal         0x30        Black on Cyan
+  [48] Cluster Selected       0x3F        Bright White on Cyan
+  [49] Cluster Shortcut       0x3E        Yellow on Cyan
+  [50] InputLine Normal       0x1F        Bright White on Blue
+  [51] InputLine Selected     0x2F        Bright White on Green
+  [52] InputLine Arrows       0x1A        Light Green on Blue
+  [53] History Arrow          0x20        Black on Green
+  [54] History Sides          0x72        Green on White
+  [55] Hist.Win. Scrollbar pg 0x31        Blue on Cyan
+  [56] H.W.Scrollbar          0x31        Blue on Cyan
+  [57] ListViewer Normal      0x30        Black on Cyan
+  [58] ListViewer Focused     0x2F        Bright White on Green
+  [59] ListViewer Selected    0x3E        Yellow on Cyan
+  [60] ListViewer Divider     0x31        Blue on Cyan
+  [61] InfoPane               0x13        Cyan on Blue
+  [62] Reserved               0x00
+  [63] Reserved               0x00
+
+=head3 cpBlackWhite
+
+B<Note>: for TProgram and TApplication
+
+Bytes 1 to 7 are used by menus and status lines
+
+  Byte Usage              Attribute   Actual color displayed
+  ---- ------------------ ----------- ----------------------
+  [ 1] Background Text    0x70        Black on White
+  [ 2] Normal Text        0x70        Black on White
+  [ 3] Disabled Text      0x78        Gray on White
+  [ 4] Shortcut text      0x7F        Bright White on White
+  [ 5] Normal selection   0x07        White on Black
+  [ 6] Disabled selection 0x07        White on Black
+  [ 7] Shortcut selection 0x0F        Bright White on Black
+
+Bytes 8 to 15 are used by blue windows
+
+  Byte Usage                  Attribute   Actual color displayed
+  ---- ---------------------- ----------- ----------------------
+  [ 8] Frame Passive          0x07        White on Black
+  [ 9] Frame Active           0x0F        Bright White on Black
+  [10] Frame Icon             0x07        White on Black
+  [11] Scrollbar page         0x70        Black on White
+  [12] Scrollbar reserved     0x70        Black on White
+  [13] Scroller Normal text   0x07        White on Black
+  [14] Scroller Selected text 0x70        White on Black
+  [15] Reserved               0x00
+
+Bytes 16 to 23 are used by cyan windows
+
+  Byte Usage                  Attribute   Actual color displayed
+  ---- ---------------------- ----------- ----------------------
+  [16] Frame Passive          0x07        White on Black
+  [17] Frame Active           0x0F        Bright White on Black
+  [18] Frame Icon             0x07        White on Black
+  [19] Scrollbar page         0x70        Black on White
+  [20] Scrollbar reserved     0x70        Black on White
+  [21] Scroller Normal text   0x07        White on Black
+  [22] Scroller Selected text 0x70        Black on White
+  [23] Reserved               0x00
+
+Bytes 24 to 31 are used by gray windows
+
+  Byte Usage                  Attribute   Actual color displayed
+  ---- ---------------------- ----------- ----------------------
+  [24] Frame Passive          0x70        Black on White
+  [25] Frame Active           0x7F        Bright White on White
+  [26] Frame Icon             0x7F        Bright White on White
+  [27] Scrollbar page         0x70        Black on White
+  [28] Scrollbar reserved     0x07        White on Black
+  [29] Scroller Normal text   0x70        Black on White
+  [30] Scroller Selected text 0x07        White on Black
+  [31] Reserved               0x00
+
+Bytes 32 to 63 are used by dialog box components.
+
+  Byte Usage                  Attribute   Actual color displayed
+  ---- ---------------------- ----------- ----------------------
+  [32] Frame Passive          0x70        Black on White
+  [33] Frame Active           0x7F        Bright White on White
+  [34] Frame Icon             0x7F        Bright White on White
+  [35] Scrollbar Page         0x70        Black on White
+  [36] Scrollbar controls     0x07        White on Black
+  [37] Static text            0x70        Black on White
+  [38] Label Normal           0x70        Black on White
+  [39] Label Highlight        0x7F        Bright White on White
+  [40] Label Shortcut         0x7F        Bright White on White
+  [41] Button Normal          0x07        White on Black
+  [42] Button Default         0x0F        Bright White on Black
+  [43] Button Selected        0x0F        Bright White on Black
+  [44] Button Disabled        0x78        Gray on White
+  [45] Button Shortcut        0x0F        Bright White on Black
+  [46] Button Shadow          0x78        Gray on White
+  [47] Cluster Normal         0x07        White on Black
+  [48] Cluster Selected       0x0F        Bright White on Black
+  [49] Cluster Shortcut       0x0F        Bright White on Black
+  [50] InputLine Normal       0x0F        Bright White on Black
+  [51] InputLine Selected     0x70        Black on White
+  [52] InputLine Arrows       0x0F        Bright White on Black
+  [53] History Arrow          0x07        White on Black
+  [54] History Sides          0x70        Black on White
+  [55] Hist.Win. Scrollbar pg 0x70        Black on White
+  [56] H.W.ScrollBar          0x70        Black on White
+  [57] ListViewer Normal      0x07        White on Black
+  [58] ListViewer Focused     0x70        Black on White
+  [59] ListViewer Selected    0x0F        Bright White on Black
+  [60] ListViewer Divider     0x07        White on Black
+  [61] InfoPane               0x07        White on Black
+  [62] Reserved               0x00
+  [63] Reserved               0x00
+
+=head3 cpMonoChrome
+
+B<Note>: for TProgram and TApplication
+
+Bytes 1 to 7 are used by menus and status lines
+
+  Byte Usage              Attribute   Actual color displayed
+  ---- ------------------ ----------- ----------------------
+  [ 1] Background Text    0x70        Black on White
+  [ 2] Normal Text        0x07        White on Black
+  [ 3] Disabled Text      0x07        White on Black
+  [ 4] Shortcut text      0x0F        Bright White on Black
+  [ 5] Normal selection   0x70        Black on White
+  [ 6] Disabled selection 0x70        Black on White
+  [ 7] Shortcut selection 0x70        Black on White
+
+Bytes 8 to 15 are used by blue windows
+
+  Byte Usage                  Attribute   Actual color displayed
+  ---- ---------------------- ----------- ----------------------
+  [ 8] Frame Passive          0x07        White on Black
+  [ 9] Frame Active           0x0F        Bright White on Black
+  [10] Frame Icon             0x07        White on Black
+  [11] Scrollbar page         0x70        Black on White
+  [12] Scrollbar reserved     0x70        Black on White
+  [13] Scroller Normal text   0x07        White on Black
+  [14] Scroller Selected text 0x70        Black on White
+  [15] Reserved               0x00
+
+Bytes 16 to 23 are used by cyan windows
+
+  Byte Usage                  Attribute   Actual color displayed
+  ---- ---------------------- ----------- ----------------------
+  [16] Frame Passive          0x07        White on Black
+  [17] Frame Active           0x0F        Bright White on Black
+  [18] Frame Icon             0x07        White on Black
+  [19] Scrollbar page         0x70        Black on White
+  [20] Scrollbar reserved     0x70        Black on White
+  [21] Scroller Normal text   0x07        White on Black
+  [22] Scroller Selected text 0x70        Black on White
+  [23] Reserved               0x00
+
+Bytes 24 to 31 are used by gray windows
+
+  Byte Usage                  Attribute   Actual color displayed
+  ---- ---------------------- ----------- ----------------------
+  [24] Frame Passive          0x70        Black on White
+  [25] Frame Active           0x70        Black on White
+  [26] Frame Icon             0x70        Black on White
+  [27] Scrollbar page         0x07        White on Black
+  [28] Scrollbar reserved     0x07        White on Black
+  [29] Scroller Normal text   0x70        Black on White
+  [30] Scroller Selected text 0x07        White on Black
+  [31] Reserved               0x00
+
+Bytes 32 to 63 are used by dialog box components.
+
+  Byte Usage                  Attribute   Actual color displayed
+  ---- ---------------------- ----------- ----------------------
+  [32] Frame Passive          0x70        Black on White
+  [33] Frame Active           0x70        Black on White
+  [34] Frame Icon             0x70        Black on White
+  [35] Scrollbar Page         0x07        White on Black
+  [36] Scrollbar controls     0x07        White on Black
+  [37] Static text            0x70        Black on White
+  [38] Label Normal           0x70        Black on White
+  [39] Label Highlight        0x70        Black on White
+  [40] Label Shortcut         0x7F        Bright White on White
+  [41] Button Normal          0x07        White on Black
+  [42] Button Default         0x07        White on Black
+  [43] Button Selected        0x0F        Bright White on Black
+  [44] Button Disabled        0x70        Black on White
+  [45] Button Shortcut        0x0F        Bright White on Black
+  [46] Button Shadow          0x70        Black on White
+  [47] Cluster Normal         0x07        White on Black
+  [48] Cluster Selected       0x0F        Bright White on Black
+  [49] Cluster Shortcut       0x0F        Bright White on Black
+  [50] InputLine Normal       0x07        White on Black
+  [51] InputLine Selected     0x70        Black on White
+  [52] InputLine Arrows       0x07        White on Black
+  [53] History Arrow          0x07        White on Black
+  [54] History Sides          0x70        Black on White
+  [55] Hist.Win. Scrollbar pg 0x07        White on Black
+  [56] H.W.ScrollBar          0x07        White on Black
+  [57] ListViewer Normal      0x07        White on Black
+  [58] ListViewer Focused     0x70        Black on White
+  [59] ListViewer Selected    0x0F        Bright White on Black
+  [60] ListViewer Divider     0x07        White on Black
+  [61] InfoPane               0x07        White on Black
+  [62] Reserved               0x00
+  [63] Reserved               0x00
+
+=head3 cpScrollBar
+
+  Byte Usage             Maps to   On this palette
+  ---- ----------------- --------- ----------------------
+  [ 1] Page              4         Application palette
+  [ 2] Arrows            5
+  [ 3] Indicator         5
+
+=head3 cpScroller
+
+  Byte Usage             Maps to   On this palette
+  ---- ----------------- --------- ----------------------
+  [ 1] Normal            6         Application palette
+  [ 2] Highlight         7
+
+=head3 cpStaticText
+
+  Byte Usage             Maps to   On this palette
+  ---- ----------------- --------- ----------------------
+  [ 1] Text color        6         cpDialog
+
+=head3 cpStatusLine
+
+  Byte Usage             Maps to   On this palette
+  ---- ----------------- --------- ----------------------
+  [ 1] Text Normal       2         Application palette
+  [ 2] Text Disabled     3
+  [ 3] Text Shortcut     4
+  [ 4] Selected Normal   5
+  [ 5] Selected Disabled 6
+  [ 6] Selected Shortcut 7
+
+=head3 cpGrayWindow
+
+  Byte Usage                  Maps to   On this palette
+  ---- ---------------------- --------- ----------------------
+  [ 1] Frame Passive          24        Application palette
+  [ 2] Frame Active           25
+  [ 3] Frame Icon             26
+  [ 4] ScrollBar page         27
+  [ 5] ScrollBar reserved     28
+  [ 6] Scroller Normal Text   29
+  [ 7] Scroller Selected Text 30
+  [ 8] Reserved               31
+
+=head3 cpBlueWindow
+
+  Byte Usage                  Maps to   On this palette
+  ---- ---------------------- --------- ----------------------
+  [ 1] Frame Passive          8         Application palette
+  [ 2] Frame Active           9
+  [ 3] Frame Icon             10
+  [ 4] ScrollBar page         11
+  [ 5] ScrollBar reserved     12
+  [ 6] Scroller Normal Text   13
+  [ 7] Scroller Selected Text 14
+  [ 8] Reserved               15
+
+=head3 cpCyanWindow
+
+  Byte Usage                  Maps to   On this palette
+  ---- ---------------------- --------- ----------------------
+  [ 1] Frame Passive          16        Application palette
+  [ 2] Frame Active           17
+  [ 3] Frame Icon             18
+  [ 4] ScrollBar page         19
+  [ 5] ScrollBar reserved     20
+  [ 6] Scroller Normal Text   21
+  [ 7] Scroller Selected Text 22
+  [ 8] Reserved               23
+
+=head2 wpXXXX
+
+Window Palette selection constants
+
+C<wpXXXX> constant, indicating the window color scheme, is stored in
+TWindow->palette.  
+
+You can alter a window's default color scheme, by assigning
+one of the C<wpXXXX> constants to C<< TWindow->palette >>, typically after 
+calling the window's constructor.
+
+  Constant       Value  Usage
+  -------------- ------ --------------------------------------------------
+  wpBlueWindow   0      Yellow on blue color scheme
+  wpCyanWindow   1      Blue on cyan color scheme
+  wpGrayWindow   2      Black on gray color scheme
+
+=cut

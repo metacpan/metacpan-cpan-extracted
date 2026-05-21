@@ -1,7 +1,7 @@
 ---
 abstract: 'Remove indentation and trailing whitespace from multi-line text'
 author:
-  - 'Robert Rothenberg <rrwo@cpan.org>'
+  - 'Robert Rothenberg <perl@rhizomnic.com>'
 build_requires:
   Encode: '3.12'
   ExtUtils::MakeMaker: '7.22'
@@ -32,7 +32,7 @@ name: Text-Minify-XS
 provides:
   Text::Minify::XS:
     file: lib/Text/Minify/XS.pm
-    version: v0.7.8
+    version: v0.7.9
 requires:
   Exporter: '5.57'
   XSLoader: '0'
@@ -43,7 +43,7 @@ resources:
   bugtracker: https://github.com/robrwo/Text-Minify-XS/issues
   homepage: https://metacpan.org/release/Text-Minify-XS
   repository: git://github.com/robrwo/Text-Minify-XS.git
-version: v0.7.8
+version: v0.7.9
 x_authority: cpan:RRWO
 x_contributors:
   - 'Karl Williamson <kwh@cpan.org>'

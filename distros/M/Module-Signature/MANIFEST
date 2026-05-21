@@ -10,7 +10,6 @@ META.yml
 Makefile.PL
 NIKLASHOLM2018.pub
 PAUSE2022.pub
-SECURITY.md
 TIMLEGGE2024.pub
 cpanfile
 dist.ini

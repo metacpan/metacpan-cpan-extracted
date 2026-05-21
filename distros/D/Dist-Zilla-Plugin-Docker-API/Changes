@@ -1,0 +1,111 @@
+0.103     2026-05-18 17:04:54Z
+  - New `%V` tag template token: the major version extracted from
+    `$zilla->version` (e.g. `0` for `0.402`). Pairs with `%v` (full
+    version) the way `%G` pairs with `%g`. `%vmaj` stays as an alias.
+  - Default tag list is now `['latest', '%V', '%v']` (was
+    `['latest', '%v']`). A fresh `[Docker::API]` with no `tag = ...`
+    lines will now push three tags by default — e.g. `latest`, `0`,
+    and `0.402` for a `0.402` release. Setting `tag` explicitly still
+    replaces the default; it does not append.
+  - Fix false "Source image '...' not found locally" failures during
+    `dzil release`. The release path used to call
+    `client->image_exists_locally($source)` as a pre-flight check; that
+    method wraps `images->inspect` in an `eval` and swallows ANY
+    exception (network blip, transient socket error, unrelated parse
+    issue) as "image is missing." If the swallowed error wasn't
+    actually a 404, the release aborted with a misleading message even
+    though the image was sitting in the daemon — we hit this on real
+    `raudssus/karr:latest` pushes. The pre-check is gone: the
+    subsequent `tag_image` call is the real verification, and its
+    Docker API error surfaces directly with a meaningful message.
+  - Promote `tag_image` failure from logged warning to `log_fatal`. A
+    failed tag in the release path used to be silently downgraded to
+    "Warning: failed to tag as ..." and then the push loop ran anyway,
+    pushing the wrong (or unchanged) image. Now it aborts the release.
+  - Skip the self-retag when the source ref is in the resolved tag
+    list (e.g. `latest` is both the source and a target tag). Previously
+    this caused a no-op `docker tag X X` per release.
+  - Fail the release if any `push_image` calls fail. Per-push errors
+    are still logged individually, but the release as a whole no
+    longer returns success when some tags failed to publish.
+  - Remove `Client->image_exists_locally` — it had a single caller
+    (the pre-check above) and the eval-swallow-exception pattern was
+    the root cause of the misleading "not found locally" errors.
+
+0.102     2026-05-17 15:56:39Z
+  - Fix release push: every push failed against real registries with
+    `Docker API error (400): missing X-Registry-Auth: invalid
+    X-Registry-Auth header: EOF`, because neither the plugin nor
+    API::Docker sent the header the Docker Engine demands. The plugin
+    now reads `~/.docker/config.json` (honouring `$DOCKER_CONFIG`),
+    matches the registry component of each pushed image ref against
+    the `auths` map (Docker Hub, ghcr.io, ECR, host:port, localhost,
+    identity-token entries), decodes the `auth` field, and passes
+    `{username,password,serveraddress}` (or `identitytoken`) through
+    to `images->push`. Requires API::Docker 0.002+ for the new `auth`
+    parameter.
+  - Auth lookup is exposed as `$client->auth_for_image_ref($ref)` so
+    bundles and tests can call into the same resolution path.
+  - cpanfile: add explicit deps on `JSON::MaybeXS` and `MIME::Base64`.
+
+0.101     2026-05-17 05:04:43Z
+
+  - Fix Client adapter: inspect/tag/push were calling API::Docker with
+    `image => $ref` keyword args, but API::Docker::API::Images expects
+    the image as the first positional argument. Result: release() always
+    failed with "Source image '...' not found locally" even when the
+    image was built and present in the daemon. All five call sites
+    converted to positional form.
+  - Pass `target`, `network_mode`, and `platform` through from the
+    plugin's Config into the actual Docker build call. Previously these
+    attributes were accepted in dist.ini but silently dropped, so
+    multi-stage Dockerfiles all built the default stage and produced
+    duplicate images across [Docker::API] instances.
+  - Fix template variables (`%v`, `%n`, `%g`, ...): _template_vars wrote
+    them under short keys (v, n, g) but TagTemplate looked them up under
+    long names (version, name, git_short_sha). Result: every template
+    expansion silently produced ''. Now writes the long-name keys.
+  - Fix `_git_info`: only matched a 40-char SHA against `.git/HEAD`, but
+    HEAD normally contains `ref: refs/heads/...`. So `%g`/`%G`/`%b` were
+    always empty for any normal branch checkout. Replaced with a safe
+    `git rev-parse` subprocess (no shell, core Perl only).
+  - Fix `fail_if_tag_exists` and `skip_latest_on_trial`: both had
+    init_arg `_fail_if_tag_exists`/`_skip_latest_on_trial`, but the
+    @Author::GETTY bundle (and dist.ini users) set them under the plain
+    names, so the values were silently ignored.
+  - Architecture: delete `Dist::Zilla::Plugin::Docker::API::Config` —
+    every attribute on it was a pass-through of the plugin's own
+    attribute, with three dead extras (`phase`, `client_class`,
+    `registry_auth_stash`). Plugin reads its own attributes directly.
+  - Architecture: inline `Dist::Zilla::Plugin::Docker::API::Context` —
+    only the `build` branch was ever exercised; the `source` and
+    `archive` branches were never wired in. The `context` attribute is
+    removed.
+  - Architecture: make `client_class` a real seam — `_build_client` now
+    dynamically requires the configured class, so tests can inject a
+    recording fake (see `t/lib/.../Client/Recorder.pm`).
+  - Remove dead attributes `_file` and `_allow_dirty` (never read).
+  - Add end-to-end test `t/40-build-and-release.t` exercising
+    after_build + release through the Recorder fake — no Docker daemon
+    required.
+
+0.100     2026-05-17 01:23:05Z
+
+  - Replace separate build_tag / release_tag with a single canonical `tag`
+    attribute. The same list is applied at build (locally) and at release
+    (pushed). Default is `latest` plus `%v`.
+  - Deprecate `build_tag` and `release_tag`: still accepted, merged into
+    `tag` with a deprecation warning. Explicit `tag` wins and silences the
+    legacy values.
+  - Documentation: rewritten README and POD to match the actual current
+    attribute set; remove references to never-implemented `phase` /
+    `repository` config keys.
+
+0.003     2026-05-02 02:32:07Z
+
+  - Initial release
+  - Build Docker images from Dist::Zilla build root
+  - Apply build_tag during build, release_tag during release
+  - release() tags existing built image (no rebuild)
+  - Template variables: %v, %vmaj, %vmin, %n, %g, %G, %b, %d, %o, %a, %p
+  - Support for docker_local in @Author::GETTY: tag locally but never push

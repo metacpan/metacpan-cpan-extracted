@@ -6,7 +6,7 @@ use Test::More tests => 448;
 
 BEGIN 
 {
-  require 't/test-lib.pl';
+  require './t/test-lib.pl';
   use_ok('Rose::DB::Object::Cached');
 }
 
@@ -1027,7 +1027,7 @@ EOF
       start    => { type => 'date', default => '12/24/1980' },
       save     => { type => 'scalar' },
       bits     => { type => 'bitfield', bits => 5, default => 101 },
-      last_modified => { type => 'timestamp' },
+      last_modified => { type => 'timestamp', default => 'now()' },
       date_created  => { type => 'datetime' },
     );
 

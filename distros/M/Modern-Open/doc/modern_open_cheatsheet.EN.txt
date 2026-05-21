@@ -1,0 +1,142 @@
+======================================================================
+ Modern::Open Cheat Sheet                                 [EN] English
+======================================================================
+
+[ 1. Installation and usage ]
+
+  Install:
+    cpan Modern::Open
+
+  Use in your script:
+    use Modern::Open;
+
+  Effect: replaces open(), opendir(), sysopen(), pipe(), socket(),
+          and accept() with autovivification + autodie versions.
+          Works on Perl 5.005_03 and all later versions.
+          Note: socket() supports autovivification but does not autodie.
+
+[ 2. open() -- 2-argument form ]
+
+  my $fh;
+  open($fh, "< file.txt");   # read
+  open($fh, "> file.txt");   # write (truncate)
+  open($fh, ">> file.txt");  # append
+  open($fh, "+< file.txt");  # read/write
+  open($fh, "cmd |");        # pipe from command
+  open($fh, "| cmd");        # pipe to command
+
+  # $fh receives a glob reference (GLOB ref).
+  # Use it with readline, print, close as usual:
+  while (my $line = readline($fh)) { ... }
+  print $fh "text\n";
+  close($fh);
+
+[ 3. open() -- 3-argument form ]
+
+  my $fh;
+  open($fh, '<',  "file.txt");   # read     (sysopen O_RDONLY)
+  open($fh, '>',  "file.txt");   # write    (sysopen O_WRONLY|O_TRUNC|O_CREAT)
+  open($fh, '>>', "file.txt");   # append   (sysopen O_WRONLY|O_APPEND|O_CREAT)
+  open($fh, '+<', "file.txt");   # read/write (sysopen O_RDWR)
+  open($fh, '+>', "file.txt");   # read/write truncate
+  open($fh, '-|', "cmd");        # pipe from command
+  open($fh, '|-', "cmd");        # pipe to command
+
+  # 3-argument open uses CORE::sysopen internally.
+  # Filename is never parsed for mode characters.
+
+[ 4. opendir() ]
+
+  my $dh;
+  opendir($dh, "/path/to/dir");
+
+  while (my $entry = readdir($dh)) {
+      next if $entry eq '.' or $entry eq '..';
+      print "$entry\n";
+  }
+  closedir($dh);
+
+  # On Windows: trailing backslash is handled automatically.
+
+[ 5. sysopen() ]
+
+  use Fcntl qw(O_RDONLY O_WRONLY O_CREAT O_TRUNC);
+
+  my $fh;
+  sysopen($fh, "file.txt", O_RDONLY);
+  sysopen($fh, "file.txt", O_WRONLY | O_CREAT | O_TRUNC);
+  sysopen($fh, "file.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+
+[ 6. pipe() ]
+
+  my($reader, $writer);
+  pipe($reader, $writer);
+
+  # Fork pattern:
+  if (my $pid = fork()) {
+      close($writer);
+      while (my $line = readline($reader)) { print $line }
+      close($reader);
+  } else {
+      close($reader);
+      print $writer "hello from child\n";
+      close($writer);
+      exit 0;
+  }
+
+[ 7. socket() and accept() ]
+
+  use Socket qw(AF_INET SOCK_STREAM sockaddr_in inet_aton);
+
+  my $server;
+  socket($server, AF_INET, SOCK_STREAM, 0);
+  # Note: socket() does not autodie; check its return value manually.
+
+  my $client;
+  accept($client, $server);
+
+[ 8. Autodie behaviour ]
+
+  # Without autodie (void context): die on failure
+  open($fh, "< no_such_file.txt");   # dies: Can't open(...)
+
+  # With return value check (scalar/list context): returns undef/0
+  my $rc = open($fh, "< file.txt");
+  unless ($rc) { warn "open failed: $!" }
+
+  # Bare handles are rejected:
+  open(FILE, "< file.txt");   # dies: Bare handle no longer supported
+
+[ 9. Returned handle ]
+
+  # The first argument ($fh) receives a GLOB reference after a
+  # successful open/opendir/sysopen/pipe/socket/accept call.
+  # This is compatible with all standard Perl I/O operations:
+
+  readline($fh)        # read one line
+  read($fh, $buf, $n)  # read N bytes
+  print $fh "..."      # write
+  binmode($fh)         # set binary mode
+  seek($fh, 0, 0)      # seek to beginning
+  tell($fh)            # current position
+  close($fh)           # close
+  eof($fh)             # test end-of-file
+
+[ 10. Compatibility ]
+
+  Perl versions : 5.005_03 and later (including 5.42)
+  Platforms     : Unix, Linux, macOS, Windows (CRLF handled correctly)
+  Dependencies  : Fcntl (core module, always available)
+
+[ 11. Official resources ]
+
+  Modern::Open on MetaCPAN:
+    https://metacpan.org/dist/Modern-Open
+
+  Perl open() documentation:
+    https://perldoc.perl.org/functions/open
+
+  INABA Hitoshi (ina) on CPAN:
+    https://metacpan.org/author/INA
+
+======================================================================

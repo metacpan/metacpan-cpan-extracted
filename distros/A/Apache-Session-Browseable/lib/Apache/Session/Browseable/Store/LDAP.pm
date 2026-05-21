@@ -174,6 +174,11 @@ sub ldap {
             $self->{args}->{ldapPort} ? ( port => $self->{args}->{ldapPort} )
             : ()
         ),
+        (
+            $self->{args}->{ldapTimeout}
+            ? ( timeout => $self->{args}->{ldapTimeout} )
+            : ()
+        ),
     ) or die( 'Unable to connect to ' . join( ' ', @servers ) . ": " . $@ );
 
     # Check SSL error for old Net::LDAP versions

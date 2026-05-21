@@ -4,7 +4,7 @@
       "Steffen Mueller <smueller@cpan.org>, Yves Orton <yves@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,18 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Data::Dumper" : "0",
-            "ExtUtils::ParseXS" : "2.21",
-            "File::Find" : "0",
-            "File::Path" : "0",
-            "File::Spec" : "0",
-            "Scalar::Util" : "0",
-            "Test::Deep" : "0",
-            "Test::Differences" : "0",
-            "Test::LongString" : "0",
-            "Test::More" : "0.88",
-            "Test::Warn" : "0",
-            "XSLoader" : "0"
+            "ExtUtils::ParseXS" : "2.21"
          }
       },
       "configure" : {
@@ -71,6 +60,6 @@
          "url" : "git://github.com/Sereal/Sereal.git"
       }
    },
-   "version" : "5.004",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "5.006",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

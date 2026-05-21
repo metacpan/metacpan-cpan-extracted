@@ -4,7 +4,7 @@ use warnings;
 use base qw{Package::New};
 use JSON::XS;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
@@ -44,6 +44,8 @@ sub options {
 
 =cut
 
+sub _method_name {die};
+
 sub stringify_base {
   my $self    = shift;
   my $value   = shift;
@@ -58,13 +60,11 @@ sub stringify_base {
   #                                          fillOpacity: 0.5,
   #                                          radius: 500
   #                                         }).addTo(map);
-  my $class   = ref($self); #e.g., Geo::Leaflet::circle
-  $class      =~ s/.*:://;  #e.g., "circle"
   my $addmap  = '.addTo(map)';
   my $popup   = $self->can('popup')   && $self->popup   ? sprintf('.bindPopup(%s)',   $self->JSON->encode($self->popup))   : '';
   my $tooltip = $self->can('tooltip') && $self->tooltip ? sprintf('.bindTooltip(%s)', $self->JSON->encode($self->tooltip)) : '';
   return sprintf(q{L.%s(%s, %s)%s%s%s;},
-                 $class,
+                 $self->_method_name,
                  $self->JSON->encode($value),
                  $self->JSON->encode($self->options),
                  $addmap,

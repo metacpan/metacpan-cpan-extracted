@@ -4,8 +4,9 @@ use strict;
 use warnings FATAL => 'all';
 
 use Test::More;
-use Test::Requires 'Cache::FileCache';
+use Test::Needs qw( Cache::FileCache );
 use Test::RequiresInternet ( 'www.wikipedia.com' => 443 );
+use WWW::Mechanize::Cached ();
 
 # Google is a poor choice for this set of tests, as the main page google.com redirects, and the page it redirects
 # to specifies "do not cache", and doesn't return a content-length.
@@ -28,10 +29,6 @@ use Test::RequiresInternet ( 'www.wikipedia.com' => 443 );
 
 use constant URL  => 'https://www.wikipedia.org';
 use constant SITE => 'Wikipedia';
-
-BEGIN {
-    use_ok('WWW::Mechanize::Cached');
-}
 
 my $SITE = SITE();
 my $stashpage;

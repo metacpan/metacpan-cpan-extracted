@@ -7,12 +7,12 @@ use v5.8.0;
 use strict;
 use warnings;
 
-use Crypt::URandom qw( urandom );
+use Crypt::URandom 0.55 qw( urandom );
 
 use constant SIZE => 1 << 31;
 use constant MASK => SIZE - 1;
 
-our $VERSION = 'v0.1.3';
+our $VERSION = 'v0.1.4';
 
 use version 0.77; $VERSION = version->declare($VERSION);
 
@@ -46,7 +46,7 @@ Crypt::URandom::MonkeyPatch - override core rand function to use system random s
 
 =head1 VERSION
 
-version v0.1.3
+version v0.1.4
 
 =for stopwords cryptographic
 
@@ -98,8 +98,8 @@ L<perlfunc>
 
 =head1 SOURCE
 
-The development version is on github at L<github.com/robrwo/perl-Crypt-URandom-MonkeyPatch>
-and may be cloned from L<github.com/robrwo/perl-Crypt-URandom-MonkeyPatch.git>
+The development version is on github at L<https://github.com/robrwo/perl-Crypt-URandom-MonkeyPatch>
+and may be cloned from L<https://github.com/robrwo/perl-Crypt-URandom-MonkeyPatch.git>
 
 =head1 SUPPORT
 
@@ -121,11 +121,11 @@ report security vulnerabilities.
 
 =head1 AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Robert Rothenberg <rrwo@cpan.org>.
+This software is Copyright (c) 2025-2026 by Robert Rothenberg <perl@rhizomnic.com>.
 
 This is free software, licensed under:
 

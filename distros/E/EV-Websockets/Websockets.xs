@@ -61,6 +61,7 @@ typedef struct ev_ws_send_s {
 /* Context structure - manages lws_context and connections */
 struct ev_ws_ctx_s {
     unsigned int magic;
+    int refcnt;      /* lifecycle refcount: Perl + each in-flight lws_service */
     int* alive_flag; /* points to caller's stack variable during lws_service */
     struct ev_loop* loop;
     struct lws_context* lws_ctx;
@@ -143,7 +144,7 @@ static const struct lws_extension extensions[] = {
 
 static int ev_ws_debug = 0;
 
-/* Hack to track adoption during synchronous callbacks */
+/* Bridges userdata into ws_callback() before lws_adopt returns. */
 static ev_ws_conn_t* pending_adoption = NULL;
 static HV* handshake_headers_map = NULL; /* wsi-ptr → per-conn response headers HV */
 static int ev_ws_ssl_inited = 0;
@@ -211,6 +212,16 @@ static void inject_headers(struct lws *wsi, HV *hv,
 
 #define DEBUG_LOG(fmt, ...) do { if (ev_ws_debug) fprintf(stderr, "[EV::WS] " fmt "\n", ##__VA_ARGS__); } while(0)
 
+static void ctx_ref(ev_ws_ctx_t* ctx) {
+    ctx->refcnt++;
+}
+
+static void ctx_unref(ev_ws_ctx_t* ctx) {
+    if (--ctx->refcnt == 0) {
+        Safefree(ctx);
+    }
+}
+
 /* Helper to schedule next timeout */
 static void schedule_timeout(ev_ws_ctx_t* ctx) {
     /* lws_service_adjust_timeout returns ms; 0 means work pending */
@@ -236,11 +247,15 @@ static void do_lws_service(ev_ws_ctx_t* ctx) {
         int alive = 1;
         int* prev_flag = ctx->alive_flag;
         ctx->alive_flag = &alive;
+        ctx_ref(ctx);
         lws_service(ctx->lws_ctx, 0);
         if (alive) {
             ctx->alive_flag = prev_flag;
             schedule_timeout(ctx);
+        } else if (prev_flag) {
+            *prev_flag = 0; /* propagate destruction up the alive_flag chain */
         }
+        ctx_unref(ctx);
     }
 }
 
@@ -256,10 +271,7 @@ static void timer_cb(EV_P_ ev_timer* w, int revents) {
 
 /* Forward declarations */
 static void io_cb(EV_P_ ev_io* w, int revents);
-static ev_ws_fd_t* find_fd_watcher(ev_ws_ctx_t* ctx, int fd);
 static void add_fd_watcher(ev_ws_ctx_t* ctx, int fd, int events);
-static void connect_timeout_cb(EV_P_ ev_timer* w, int revents);
-static void del_fd_watcher(ev_ws_ctx_t* ctx, int fd);
 static void change_fd_watcher(ev_ws_ctx_t* ctx, int fd, int events);
 static void conn_ref(ev_ws_conn_t* conn);
 static void conn_unref(ev_ws_conn_t* conn);
@@ -548,11 +560,15 @@ static void io_cb(EV_P_ ev_io* w, int revents) {
         int alive = 1;
         int* prev_flag = ctx->alive_flag;
         ctx->alive_flag = &alive;
+        ctx_ref(ctx);
         lws_service_fd(ctx->lws_ctx, &pollfd);
         if (alive) {
             ctx->alive_flag = prev_flag;
             schedule_timeout(ctx);
+        } else if (prev_flag) {
+            *prev_flag = 0; /* propagate destruction up the alive_flag chain */
         }
+        ctx_unref(ctx);
     }
 }
 
@@ -564,11 +580,6 @@ static void fd_table_grow(ev_ws_ctx_t* ctx, int needed) {
     Renew(ctx->fd_table, new_size, ev_ws_fd_t*);
     Zero(ctx->fd_table + ctx->fd_table_size, new_size - ctx->fd_table_size, ev_ws_fd_t*);
     ctx->fd_table_size = new_size;
-}
-
-static ev_ws_fd_t* find_fd_watcher(ev_ws_ctx_t* ctx, int fd) {
-    if (fd < 0 || fd >= ctx->fd_table_size) return NULL;
-    return ctx->fd_table[fd];
 }
 
 static void add_fd_watcher(ev_ws_ctx_t* ctx, int fd, int events) {
@@ -726,40 +737,31 @@ static int ws_callback(struct lws* wsi, enum lws_callback_reasons reason,
                 HE* entry;
                 char kbuf[256];
 
-                DEBUG_LOG("Appending custom headers");
-
                 hv_iterinit(hv);
                 while ((entry = hv_iternext(hv))) {
                     I32 klen = 0;
                     char *key = hv_iterkey(entry, &klen);
                     SV *val_sv = hv_iterval(hv, entry);
-
-                    if (!key) { DEBUG_LOG("Key is null"); continue; }
-                    if (!val_sv) { DEBUG_LOG("Val SV is null"); continue; }
-                    if (klen >= 254) continue;
-
                     STRLEN vlen = 0;
-                    const char *val = SvPV(val_sv, vlen);
+                    const char *val;
 
-                    DEBUG_LOG("Processing header: key_len=%d val_len=%d", (int)klen, (int)vlen);
+                    if (klen >= 254) continue;
+                    val = SvPV(val_sv, vlen);
 
                     memcpy(kbuf, key, klen);
                     kbuf[klen] = ':';
                     kbuf[klen+1] = '\0';
 
-                    DEBUG_LOG("Adding header: %s %s", kbuf, val);
-
                     if (lws_add_http_header_by_name(wsi, (unsigned char*)kbuf, (unsigned char*)val, vlen, p, end)) {
                         return -1;
                     }
-                    DEBUG_LOG("Header added");
                 }
             }
             break;
         }
         
         case LWS_CALLBACK_CLIENT_FILTER_PRE_ESTABLISH: {
-            if (conn) {
+            if (conn && conn->magic == EV_WS_CONN_MAGIC) {
                 static const struct { enum lws_token_indexes tok; const char *name; STRLEN nlen; } resp_hdrs[] = {
                     { WSI_TOKEN_HTTP_SET_COOKIE, "Set-Cookie", 10 },
                     { WSI_TOKEN_HTTP_CONTENT_TYPE, "Content-Type", 12 },
@@ -843,6 +845,7 @@ static int ws_callback(struct lws* wsi, enum lws_callback_reasons reason,
                     c->wsi = wsi;
                     c->refcnt = 1; /* For LWS */
                     c->max_message_size = srv->max_message_size;
+                    c->loop = ctx->loop;
                     link_conn(ctx, c);
                     c->on_connect = srv->on_connect ? SvREFCNT_inc(srv->on_connect) : NULL;
                     c->on_message = srv->on_message ? SvREFCNT_inc(srv->on_message) : NULL;
@@ -867,9 +870,7 @@ static int ws_callback(struct lws* wsi, enum lws_callback_reasons reason,
                     conn->connect_timer_active = 0;
                 }
                 conn->connected = 1;
-                conn_ref(conn);
                 emit_connect(conn);
-                conn_unref(conn);
             }
             break;
 
@@ -894,9 +895,7 @@ static int ws_callback(struct lws* wsi, enum lws_callback_reasons reason,
         case LWS_CALLBACK_RECEIVE_PONG:
         case LWS_CALLBACK_CLIENT_RECEIVE_PONG:
             if (conn && conn->magic == EV_WS_CONN_MAGIC) {
-                conn_ref(conn);
                 emit_pong(conn, (const char *)in, len);
-                conn_unref(conn);
             }
             break;
 
@@ -962,6 +961,7 @@ static int ws_callback(struct lws* wsi, enum lws_callback_reasons reason,
                         lws_set_wsi_user(wsi, NULL);
                         conn->wsi = NULL;
                         conn->connected = 0;
+                        conn->in_fragmented_send = 0;
                         unlink_conn(conn);
                         conn_ref(conn);
                         emit_error(conn, "write failed");
@@ -987,9 +987,7 @@ static int ws_callback(struct lws* wsi, enum lws_callback_reasons reason,
                     return -1;
                 }
                 if (conn->send_head == NULL && conn->on_drain) {
-                    conn_ref(conn);
                     emit_drain(conn);
-                    conn_unref(conn);
                 }
             }
             break;
@@ -1140,6 +1138,7 @@ CODE:
 
     Newxz(RETVAL, 1, ev_ws_ctx_t);
     RETVAL->magic = EV_WS_CTX_MAGIC;
+    RETVAL->refcnt = 1; /* Perl owns the context */
     RETVAL->loop = loop;
 
     foreign_loops[0] = loop;
@@ -1231,7 +1230,7 @@ CODE:
 
     self->loop = NULL;
     if (self->alive_flag) *self->alive_flag = 0;
-    Safefree(self);
+    ctx_unref(self); /* drops Perl ref; Safefree happens when refcnt==0 */
 }
 
 EV::Websockets::Connection
@@ -1574,7 +1573,6 @@ CODE:
         if (srv->on_handshake) { SvREFCNT_dec(srv->on_handshake); srv->on_handshake = NULL; }
         if (srv->response_headers) { SvREFCNT_dec((SV*)srv->response_headers); srv->response_headers = NULL; }
         if (srv->protocol_name) {
-            srv->vhost_protocols[0].name = EV_WS_PROTOCOL_NAME;
             Safefree(srv->protocol_name); srv->protocol_name = NULL;
         }
         srv->magic = EV_WS_SRV_FREED;
@@ -1717,20 +1715,26 @@ CODE:
     conn_unref(RETVAL); /* drop sentinel */
 
     /* Kick lws to process readbuf data (needed for lws 4.5+).
-     * Guard with extra ref: lws_service may synchronously fire
-     * error/destroy callbacks that would free RETVAL. */
+     * Guard with extra refs: lws_service may synchronously fire
+     * error/destroy callbacks that would free RETVAL or ctx. */
     {
         int rejected, alive = 1;
         int* prev_flag = self->alive_flag;
         conn_ref(RETVAL);
+        ctx_ref(self);
         self->alive_flag = &alive;
         lws_service(self->lws_ctx, 0);
         if (alive) {
             self->alive_flag = prev_flag;
             schedule_timeout(self);
+        } else if (prev_flag) {
+            /* Context destroyed during inner lws_service.
+               Propagate destruction up the alive_flag chain. */
+            *prev_flag = 0;
         }
         rejected = (RETVAL->wsi == NULL);
         conn_unref(RETVAL);
+        ctx_unref(self);
         if (rejected)
             croak("Failed to adopt socket");
     }
@@ -1780,6 +1784,10 @@ CODE:
     if (!self->wsi || !self->connected || self->closing) {
         croak("Connection is not open");
     }
+    if (self->in_fragmented_send) {
+        croak("Cannot send while a fragmented message is in progress; "
+              "finish the fragment with send_fragment(..., is_final => 1) first");
+    }
 
     buf = SvPV(data, len);
     queue_send(self, buf, len, LWS_WRITE_TEXT);
@@ -1797,6 +1805,10 @@ CODE:
     }
     if (!self->wsi || !self->connected || self->closing) {
         croak("Connection is not open");
+    }
+    if (self->in_fragmented_send) {
+        croak("Cannot send while a fragmented message is in progress; "
+              "finish the fragment with send_fragment(..., is_final => 1) first");
     }
 
     buf = SvPV(data, len);
@@ -1907,7 +1919,7 @@ CODE:
     if (self->magic != EV_WS_CONN_MAGIC) {
         return;
     }
-    if (!self->wsi || !self->connected) {
+    if (!self->wsi || !self->connected || self->closing) {
         return;
     }
 

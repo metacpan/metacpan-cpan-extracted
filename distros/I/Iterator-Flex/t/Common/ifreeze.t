@@ -93,7 +93,7 @@ subtest 'serialize' => sub {
 
 };
 
-subtest 'downstream can not freeze' => sub {
+subtest 'downstream cannot freeze' => sub {
     my $err = dies {
         ifreeze {} igrep { %_ / 2 } iseq( 3 )
     };

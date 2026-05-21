@@ -1,0 +1,308 @@
+=encoding utf-8
+
+=head1 NAME
+
+DateTime::Lite::Duration - DateTime::Liteで使用する期間オブジェクト
+
+=head1 SYNOPSIS
+
+    use DateTime::Lite::Duration;
+
+    my $dur = DateTime::Lite::Duration->new(
+        years   => 1,
+        months  => 6,
+        days    => 15,
+        hours   => 3,
+        minutes => 10,
+        seconds => 30,
+    ) || die( DateTime::Lite::Duration->error );
+
+    my $dur = DateTime::Lite::Duration->new(
+        years        => 1,
+        months       => 6,
+        weeks        => 2,
+        days         => 15,
+        hours        => 3,
+        minutes      => 10,
+        seconds      => 30,
+        nanoseconds  => 500_000_000,
+        end_of_month => 'limit',  # 'wrap'（デフォルト）, 'limit', 'preserve'
+    ) || die( DateTime::Lite::Duration->error );
+
+    # イントロスペクション
+    printf( "Years: %d, Months: %d\n", $dur->years, $dur->months );
+
+    # DateTime::Lite と一緒に使用
+    $dt->add_duration( $dur );
+    $dt->subtract_duration( $dur );
+    my $diff = $dt1->subtract_datetime( $dt2 );  # Duration を返します
+
+    # 絶対値アクセサ（より大きい単位を取り除いた値）
+    $dur->years;         # 完全な年数
+    $dur->months;        # 年を取り除いた後の月数
+    $dur->weeks;         # 完全な週数
+    $dur->days;          # 週を取り除いた後の日数
+    $dur->hours;         # 完全な時間数
+    $dur->minutes;       # 時間を取り除いた後の分数
+    $dur->seconds;       # 分を取り除いた後の秒数
+    $dur->nanoseconds;   # 秒を取り除いた後のナノ秒数
+
+    # 符号付きの生 delta アクセサ
+    $dur->delta_months;       # 符号付き月数（years * 12 + months）
+    $dur->delta_days;         # 符号付き日数
+    $dur->delta_minutes;      # 符号付き分数（hours * 60 + minutes）
+    $dur->delta_seconds;      # 符号付き秒数
+    $dur->delta_nanoseconds;  # 符号付きナノ秒数
+
+    # すべての符号付きコンポーネントを一度に取得
+    my %d = $dur->deltas;  # keys: months days minutes seconds nanoseconds
+
+    # カレンダー / 時計の部分 duration
+    my $cal   = $dur->calendar_duration;  # months + days のみ
+    my $clock = $dur->clock_duration;     # minutes + seconds + nanoseconds のみ
+
+    # 期間に対しての算術演算
+    $dur->add( months => 1, days => 7 );
+    $dur->subtract( hours => 2 );
+    $dur->add_duration( $other_dur );
+    $dur->subtract_duration( $other_dur );
+
+    my $inverse = $dur->inverse;                          # すべてのコンポーネントの符号を反転
+    my $neg     = $dur->inverse( end_of_month => 'wrap' );
+
+    # 変換
+    # 指定した単位の組み合わせとして表現:
+    my ( $h, $m ) = $dur->in_units( 'hours', 'minutes' );  # 例: (3, 10)
+    my $total_min = $dur->in_units('minutes');             # スカラー形式
+
+    # 比較
+    my $cmp = DateTime::Lite::Duration->compare( $dur1, $dur2 );  # -1, 0, 1
+
+    # 述語
+    $dur->is_positive;          # いずれかのコンポーネントが > 0で、< 0がない場合に真
+    $dur->is_negative;          # いずれかのコンポーネントが < 0で、> 0がない場合に真
+    $dur->is_zero;              # すべてのコンポーネントが 0の場合に真
+    $dur->is_wrap_mode;         # end_of_month eq 'wrap'
+    $dur->is_limit_mode;        # end_of_month eq 'limit'
+    $dur->is_preserve_mode;     # end_of_month eq 'preserve'
+    $dur->end_of_month_mode;    # 'wrap', 'limit', または 'preserve'
+
+    # クローン
+    my $copy = $dur->clone;
+
+    # 定数
+    DateTime::Lite::Duration::MAX_NANOSECONDS();  # 1_000_000_000
+
+    # エラー処理
+    my $dur2 = DateTime::Lite::Duration->new( %bad_args ) ||
+        die( DateTime::Lite::Duration->error );
+    $dur->fatal(1);  # すべてのエラーを fatal にします（warn+undef ではなく die）
+    my $err = $dur->error;
+
+=head1 VERSION
+
+    v0.1.1
+
+=head1 DESCRIPTION
+
+C<DateTime::Lite::Duration>は、L<DateTime::Lite>専用に使用される、L<DateTime::Duration>の軽量な移植です。durationは5つの独立した「バケット」に保存されます：C<months>, C<days>, C<minutes>, C<seconds>, C<nanoseconds>です。
+
+month/dayバケットはC<calendar>単位であり、実際の長さは期間が適用される日付に依存します。minute/second/nanosecondバケットは絶対的なC<clock>単位です。
+
+L<DateTime>と異なり、C<DateTime::Lite>は予期せずC<die()>を呼び出すことはありません。
+
+エラー時には、C<< $dur->error >>で取得できる例外オブジェクトを設定し、スカラーコンテキストではC<undef>、リストコンテキストでは空リストを返します。チェーン呼び出し（オブジェクトコンテキスト）では、典型的なC<Can't call method '%s' on an undefined value>を避けるため、ダミーオブジェクト（C<DateTime::Lite::Null>）を返します。
+
+=head1 CONSTRUCTOR
+
+=head2 new( %args )
+
+受け付けるキー：
+
+=over 4
+
+=item C<years>, C<months>
+
+カレンダー時間です。C<years>は構築時に月へ変換されます（1年= 12か月）。
+
+=item C<weeks>, C<days>
+
+カレンダー時間です。C<weeks>は日に変換されます（1週= 7日）。
+
+=item C<hours>, C<minutes>
+
+時計時間です。C<hours>は分へ変換されます（1時間= 60分）。
+
+=item C<seconds>, C<nanoseconds>
+
+時計時間です。
+
+=item C<end_of_month>
+
+月の加算/減算時に月末計算をどのように扱うかを指定します。C<wrap>（デフォルト）、C<limit>、C<preserve>のいずれかです。
+
+=back
+
+=head1 METHODS
+
+=head2 Accessors（絶対値）
+
+C<years>, C<months>, C<weeks>, C<days>, C<hours>, C<minutes>, C<seconds>, C<nanoseconds>はすべて、より大きい単位を取り除いた後の、その単位における期間の絶対値（符号なし）の部分を返します。たとえばC<months()>は、完全な年数を割り引いた後の月コンポーネントを返します。
+
+=head2 符号付きdeltaアクセサ
+
+C<delta_months>, C<delta_days>, C<delta_minutes>, C<delta_seconds>, C<delta_nanoseconds>は、内部の符号付き生値を返します。
+
+=head2 calendar_duration / clock_duration
+
+それぞれ、カレンダーコンポーネント（months, days）のみ、または時計コンポーネント（minutes, seconds, nanoseconds）のみを含む新しい期間オブジェクトを返します。
+
+=head2 clone
+
+浅いコピーを返します。
+
+=head2 compare( $dur1, $dur2 )
+
+クラスメソッドです。2つの期間を単位ごとに比較します。-1、0、または1を返します。
+
+=head2 deltas
+
+5つすべての符号付き生値を含むハッシュを返します。
+
+=head2 end_of_month_mode
+
+C<wrap>, C<limit>、またはC<preserve>を返します。
+
+=head2 in_units( @units )
+
+指定された単位の組み合わせとして表現した期間を返します。
+
+例：190分の期間に対してC<< $dur->in_units( 'hours', 'minutes' ) >>はC<(3, 10)>を返します。単位が1つだけ指定された場合は、スカラーを返します。
+
+=head2 inverse
+
+    $dur->inverse;
+    $dur->inverse( end_of_month => $mode );
+
+すべてのコンポーネントの符号を反転した新しい期間を返します。任意でC<end_of_month>を上書きできます。
+
+=head2 is_negative / is_positive / is_zero
+
+述語メソッドです。
+
+=head2 is_wrap_mode / is_limit_mode / is_preserve_mode
+
+C<end_of_month>モードが一致する場合に真を返します。
+
+=head2 add
+
+    $dur->add( months => 1, days => 15 );
+
+キーと値のペアで指定された期間（L</new>と同じキー）を、この期間にその場で加算します。C<$self>を返します。
+
+=head2 add_duration
+
+    $dur->add_duration( $other_dur );
+
+別のL<DateTime::Lite::Duration>オブジェクトを、この期間にその場で加算します。C<$self>を返します。
+
+=head2 subtract
+
+    $dur->subtract( days => 1 );
+
+キーと値のペアで指定された期間を、この期間からその場で減算します。逆期間を加算することと同等です。C<$self>を返します。
+
+=head2 subtract_duration
+
+    $dur->subtract_duration( $other_dur );
+
+別のL<DateTime::Lite::Duration>オブジェクトを、この期間からその場で減算します。C<$self>を返します。
+
+=head2 delta_months
+
+    my $m = $dur->delta_months;  # 負になる場合があります
+
+符号付きの生monthsコンポーネントを返します。
+
+=head2 delta_days
+
+    my $d = $dur->delta_days;
+
+符号付きの生daysコンポーネントを返します。
+
+=head2 delta_minutes
+
+    my $min = $dur->delta_minutes;
+
+符号付きの生minutesコンポーネントを返します。
+
+=head2 delta_seconds
+
+    my $s = $dur->delta_seconds;
+
+符号付きの生secondsコンポーネントを返します。
+
+=head2 delta_nanoseconds
+
+    my $ns = $dur->delta_nanoseconds;
+
+符号付きの生nanosecondsコンポーネントを返します。
+
+=head2 MAX_NANOSECONDS
+
+    my $max = DateTime::Lite::Duration::MAX_NANOSECONDS();
+
+1秒に含まれるナノ秒数であるC<1_000_000_000>（10^9）を返します。ナノ秒の正規化に内部で使用されます。
+
+=head2 error
+
+    my $dur = DateTime::Lite::Duration->new( %bad_args ) ||
+        die( DateTime::Lite::Duration->error );
+
+インスタンスメソッドおよびクラスメソッドです。メッセージ付きで呼び出された場合、L<DateTime::Lite::Exception>を作成して保存し、L</fatal>に応じて警告またはC<die>し、C<undef>を返します。引数なしで呼び出された場合は、直近のエラーオブジェクトを返します。
+
+=head2 fatal
+
+    $dur->fatal(1);  # fatal モードを有効化
+
+C<fatal>フラグを取得または設定します。真の場合、L</error>の呼び出しはwarn-and-return-undefではなくC<die>します。
+
+=head2 pass_error
+
+    sub my_op
+    {
+        my $self = shift( @_ );
+        my $res = $self->_inner_op ||
+            return( $self->pass_error );
+        return( $res );
+    }
+
+下位レベルの呼び出しからのエラーを、新しい例外を構築せずに、このオブジェクトのエラースロットへ伝播します。内部およびサブクラスで使用されます。
+
+=head1 エラー処理
+
+エラー時、メソッドはスカラーコンテキストではC<undef>、リストコンテキストでは空リストを返します。例外はC<< $obj->error >>またはC<< DateTime::Lite::Duration->error >>で取得できます。
+
+例外オブジェクトは、ファイル名と行番号を含む、人間が読めるメッセージへ文字列化されます。
+
+C<error>は、コンテキストがチェーン呼び出し、またはオブジェクトコンテキストであることを検出します。その場合、C<undef>を返す代わりにC<DateTime::Lite::Null>のダミーインスタンスを返し、典型的なPerlエラーC<Can't call method '%s' on an undefined value>を避けます。
+
+インスタンスオプションL<fatal|/fatal>が有効になっている場合、発生したエラーはすべてfatalになります。
+
+=head1 SEE ALSO
+
+L<DateTime::Lite>, L<DateTime::Lite::Exception>
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright(c) 2026 DEGUEST Pte. Ltd.
+
+All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=cut

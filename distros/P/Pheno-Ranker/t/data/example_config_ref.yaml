@@ -1,0 +1,13 @@
+---
+allowed_terms:
+- Bar
+- Baz
+- Foo
+- Id
+format: CSV
+identity_paths:
+  CSV:
+  - Bar: Bar
+indexed_terms:
+- Bar
+primary_key: Id

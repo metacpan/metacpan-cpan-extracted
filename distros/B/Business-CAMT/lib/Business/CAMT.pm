@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Business-CAMT version 0.15.
+# This code is part of Perl distribution Business-CAMT version 0.16.
 # The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
@@ -12,7 +12,7 @@
 # https://www.betaalvereniging.nl/wp-content/uploads/IG-Bank-to-Customer-Statement-CAMT-053-v1-1.pdf
 
 package Business::CAMT;{
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 }
 
 

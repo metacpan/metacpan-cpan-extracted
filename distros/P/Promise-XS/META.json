@@ -2,10 +2,11 @@
    "abstract" : "Fast promises in Perl",
    "author" : [
       "Felipe Gasper (FELIPE)",
-      "Tom van der Woerdt <tomvanderwoerdt@sd.apple.com>"
+      "Tom van der Woerdt <tomvanderwoerdt@sd.apple.com>",
+      "Takahiro Shimizu (ANATOFUZ)"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -47,10 +48,10 @@
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/FGasper/p5-Promise-XS.git",
-         "web" : "https://github.com/FGasper/p5-Promise-XS"
+         "url" : "git://github.com/AnaTofuZ/p5-Promise-XS.git",
+         "web" : "https://github.com/AnaTofuZ/p5-Promise-XS"
       }
    },
-   "version" : "0.20",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.21",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

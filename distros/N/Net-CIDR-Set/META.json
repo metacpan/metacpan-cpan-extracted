@@ -4,7 +4,7 @@
       "Andy Armstrong <andy@hexten.net>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "CIDR",
       "INET",
@@ -35,9 +35,10 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Zilla::Plugin::UsefulReadme" : "v0.2.0",
+            "Dist::Zilla::Plugin::UsefulReadme" : "v0.4.3",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Markdown::Github" : "0",
+            "Pod::Wordlist" : "0",
             "Software::Security::Policy::Individual" : "0.10",
             "Test2::Tools::Basic" : "1.302200",
             "Test::CPAN::Changes" : "0.19",
@@ -45,10 +46,12 @@
             "Test::DistManifest" : "0",
             "Test::EOF" : "0",
             "Test::EOL" : "0",
+            "Test::Fixme" : "0",
             "Test::Kwalitee" : "1.21",
             "Test::MinimumVersion" : "0",
             "Test::MixedScripts" : "v0.3.0",
-            "Test::More" : "0.88",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.96",
             "Test::NoTabs" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
@@ -85,15 +88,15 @@
    "provides" : {
       "Net::CIDR::Set" : {
          "file" : "lib/Net/CIDR/Set.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Net::CIDR::Set::IPv4" : {
          "file" : "lib/Net/CIDR/Set/IPv4.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       },
       "Net::CIDR::Set::IPv6" : {
          "file" : "lib/Net/CIDR/Set/IPv6.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       }
    },
    "release_status" : "stable",
@@ -108,15 +111,15 @@
       },
       "x_authority" : "cpan:RRWO"
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_contributors" : [
       "Thomas Eckardt <Thomas.Eckardt@thockar.com>",
       "Brian Gottreu <gottreu@cpan.org>",
-      "Robert Rothenberg <rrwo@cpan.org>",
+      "Robert Rothenberg <perl@rhizomnic.com>",
       "Stig Palmquist <stigtsp@cpan.org>"
    ],
-   "x_generated_by_perl" : "v5.34.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.38",
+   "x_generated_by_perl" : "v5.42.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

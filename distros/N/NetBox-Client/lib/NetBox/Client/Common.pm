@@ -3,7 +3,7 @@ use strict;
 use warnings 'FATAL' => 'all';
 use version;
 
-our $VERSION = version->declare('v0.1.7')->stringify();
+our $VERSION = version->declare('v0.2.0')->stringify();
 
 use constant {
     E_OK             => [   0, '' ],

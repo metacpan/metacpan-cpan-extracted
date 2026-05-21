@@ -1,5 +1,9 @@
 Revision history for distribution Dist-PolicyFiles
 
+0.09    2026-05-21
+
+      - Added methods cpan_rt_url(), repo_name() and github_url().
+
 0.08    2026-03-23
 
       - Added plain text README.

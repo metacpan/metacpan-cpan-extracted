@@ -1,3 +1,20 @@
+0.21 2026-05-06T08:20:20+02:00
+ - Add error for bad apostrophe in 080a field.
+ - Add error for bad quotation mark in 080a field.
+ - Remove validation of [ and ] in 080a field. This is bad.
+
+0.20 2026-05-04T08:53:37+02:00
+ - Fix MANIFEST file.
+
+0.19 2026-05-04T08:46:45+02:00
+ - Add new error in UDC (standalone name on the begin of the string).
+ - Rename parameter 'value' to standard 'field_080_a' in Field080 check.
+ - Update output of EXAMPLE in doc.
+
+0.18 2026-04-28T16:53:59+02:00
+ - Add error with spaces to field 080 check (UDC).
+ - Fix bad exists.
+
 0.17 2026-04-17T16:48:41+02:00
  - Fix MANIFEST.
 

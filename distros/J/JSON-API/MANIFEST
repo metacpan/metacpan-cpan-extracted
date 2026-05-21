@@ -1,3 +1,7 @@
+.github/workflows/lint.yml
+.github/workflows/publish-cpan.yml
+.github/workflows/testsuite.yml
+.whitesource
 Build.PL
 Changes
 debian/compat

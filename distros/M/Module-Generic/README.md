@@ -100,7 +100,7 @@ Quick way to create a class with feature-rich methods
 
 # VERSION
 
-    v1.3.1
+    v1.5.0
 
 # DESCRIPTION
 
@@ -1427,7 +1427,7 @@ Using the resulting object `$prod`, we can access this dynamically created class
         return( $class->parse_bare_address( $args->[0] ) );
     }}, 'Email::Address::XS', @_ );
 
-Provided with an object property name, and a class/package name, this will attempt to load the module if it is not already loaded. It does so using ["load\_class" in Class::Load](https://metacpan.org/pod/Class%3A%3ALoad#load_class). Once loaded, it will init an object passing it the other arguments received. It returns the object instantiated upon success or undef and sets an ["error"](#error)
+Provided with an object property name, and a class/package name, this will attempt to load the module if it is not already loaded. It does so using ["\_load\_class"](#_load_class). Once loaded, it will init an object passing it the other arguments received. It returns the object instantiated upon success or undef and sets an ["error"](#error)
 
 This is a support method used by ["\_instantiate\_object"](#_instantiate_object)
 
@@ -1723,8 +1723,6 @@ Returns true if the value provided is an integer, or false otherwise. A valid va
 ## \_is\_ip
 
 Returns true if the given IP has a syntax compliant with IPv4 or IPv6 including CIDR notation or not, false otherwise.
-
-For this method to work, you need to have installed [Regexp::Common::net](https://metacpan.org/pod/Regexp%3A%3ACommon%3A%3Anet)
 
 ## \_is\_number
 
@@ -4343,7 +4341,7 @@ In untrusted or complex environments where `%INC` manipulation is a concern, you
 
 [Module::Generic::Exception](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AException), [Module::Generic::Array](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AArray), [Module::Generic::Scalar](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AScalar), [Module::Generic::Boolean](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3ABoolean), [Module::Generic::Number](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3ANumber), [Module::Generic::Null](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3ANull), [Module::Generic::Dynamic](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3ADynamic) and [Module::Generic::Tie](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3ATie), [Module::Generic::File](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AFile), [Module::Generic::Finfo](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AFinfo), [Module::Generic::SharedMem](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3ASharedMem), [Module::Generic::Scalar::IO](https://metacpan.org/pod/Module%3A%3AGeneric%3A%3AScalar%3A%3AIO)
 
-[Number::Format](https://metacpan.org/pod/Number%3A%3AFormat), [Class::Load](https://metacpan.org/pod/Class%3A%3ALoad), [Scalar::Util](https://metacpan.org/pod/Scalar%3A%3AUtil)
+[Scalar::Util](https://metacpan.org/pod/Scalar%3A%3AUtil)
 
 # AUTHOR
 

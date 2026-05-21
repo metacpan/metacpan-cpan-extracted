@@ -104,9 +104,11 @@ Creates and returns a tileLayer object which is added to the map.
 
 See: [https://leafletjs.com/reference.html#tilelayer](https://leafletjs.com/reference.html#tilelayer)
 
-## ICON CONSTRUCTOR
+## ICON CONSTRUCTORS
 
 ### icon
+
+Represents an icon to provide when creating a marker.
 
     my $icon = $map->icon(
                           name    => "my_icon", #must be a valid JavaScript variable name
@@ -122,6 +124,35 @@ See: [https://leafletjs.com/reference.html#tilelayer](https://leafletjs.com/refe
                          );
 
 See: [https://leafletjs.com/reference.html#icon](https://leafletjs.com/reference.html#icon)
+
+### divIcon
+
+Represents a lightweight icon for markers that uses a simple \`div\` element instead of an image. 
+
+Font Awesome with defaults
+
+    my $icon = $map->divIcon(icon_name => "bicycle");
+
+Font Awesome with tweaks
+
+    my $icon = $map->divIcon(
+                             icon_name      => "bicycle",
+                             icon_font_size => 22,
+                             options => {
+                                         iconAnchor => [11,11],
+                                        },
+                            );
+
+Other CSS options
+
+    my $icon = $map->divIcon(
+                          options => {
+                                      html  => '<i class="fa fa-map-marker", style="font-size:48px"></i>',
+                                      iconAnchor => [13, 44],
+                                     }
+                         );
+
+See: https://leafletjs.com/reference.html#divicon
 
 ## MAP OBJECT CONSTRUCTORS
 
@@ -175,7 +206,7 @@ See: [https://leafletjs.com/reference.html#circle](https://leafletjs.com/referen
 
 ### html
 
-### html\_head\_link
+### html\_head\_links
 
 ### html\_head\_script
 
@@ -188,6 +219,24 @@ See: [https://leafletjs.com/reference.html#circle](https://leafletjs.com/referen
 ### html\_body\_script\_map
 
 ### html\_body\_script\_contents
+
+## DATA ACCESSORS
+
+### map\_objects
+
+Returns the array reference of map objects to be added to the map
+
+    $map->map_objects($icon);
+
+### icon\_objects
+
+Returns the array reference of icon objects to be added to the map
+
+    $map->icon_objects($icon);
+
+### icon\_sets
+
+Returns the array reference of icon sets to be added to the map
 
 ## OBJECT ACCESSORS
 
@@ -214,11 +263,11 @@ Copyright (C) 2024 by Michael R. Davis
 
 MIT LICENSE
 
-# File: lib/Geo/Leaflet/tileLayer.pm
+# File: lib/Geo/Leaflet/TileLayer.pm
 
 ## NAME
 
-Geo::Leaflet::tileLayer - Leaflet tileLayer Object
+Geo::Leaflet::TileLayer - Leaflet tileLayer Object
 
 ## SYNOPSIS
 
@@ -244,9 +293,9 @@ Returns a tileLayer object
 
 ### osm
 
-Returns the default OpenStreetMaps.org tileLayer.
+Returns the default OpenStreetMaps.org TileLayer.
 
-    my $tileLayer = Geo::Leaflet::tileLayer->osm;
+    my $tileLayer = Geo::Leaflet::TileLayer->osm;
 
 ## PROPERTIES
 
@@ -268,11 +317,11 @@ Copyright (C) 2024 by Michael R. Davis
 
 MIT LICENSE
 
-# File: lib/Geo/Leaflet/polyline.pm
+# File: lib/Geo/Leaflet/Polyline.pm
 
 ## NAME
 
-Geo::Leaflet::polyline - Leaflet polyline object
+Geo::Leaflet::Polyline - Leaflet polyline object
 
 ## SYNOPSIS
 
@@ -311,11 +360,11 @@ Copyright (C) 2024 by Michael R. Davis
 
 MIT LICENSE
 
-# File: lib/Geo/Leaflet/polygon.pm
+# File: lib/Geo/Leaflet/Polygon.pm
 
 ## NAME
 
-Geo::Leaflet::polygon - Leaflet polygon object
+Geo::Leaflet::Polygon - Leaflet polygon object
 
 ## SYNOPSIS
 
@@ -354,11 +403,11 @@ Copyright (C) 2024 by Michael R. Davis
 
 MIT LICENSE
 
-# File: lib/Geo/Leaflet/rectangle.pm
+# File: lib/Geo/Leaflet/Rectangle.pm
 
 ## NAME
 
-Geo::Leaflet::rectangle - Leaflet rectangle object
+Geo::Leaflet::Rectangle - Leaflet rectangle object
 
 ## SYNOPSIS
 
@@ -406,11 +455,11 @@ Copyright (C) 2024 by Michael R. Davis
 
 MIT LICENSE
 
-# File: lib/Geo/Leaflet/circle.pm
+# File: lib/Geo/Leaflet/Circle.pm
 
 ## NAME
 
-Geo::Leaflet::circle - Leaflet circle object
+Geo::Leaflet::Circle - Leaflet circle object
 
 ## SYNOPSIS
 
@@ -453,11 +502,11 @@ Copyright (C) 2024 by Michael R. Davis
 
 MIT LICENSE
 
-# File: lib/Geo/Leaflet/marker.pm
+# File: lib/Geo/Leaflet/Marker.pm
 
 ## NAME
 
-Geo::Leaflet::marker - Leaflet marker object
+Geo::Leaflet::Marker - Leaflet marker object
 
 ## SYNOPSIS
 
@@ -498,11 +547,11 @@ Copyright (C) 2024 by Michael R. Davis
 
 MIT LICENSE
 
-# File: lib/Geo/Leaflet/icon.pm
+# File: lib/Geo/Leaflet/Icon.pm
 
 ## NAME
 
-Geo::Leaflet::icon - Leaflet icon object
+Geo::Leaflet::Icon - Leaflet icon object
 
 ## SYNOPSIS
 
@@ -511,7 +560,7 @@ Geo::Leaflet::icon - Leaflet icon object
 
 ## DESCRIPTION
 
-This package constructs a Leaflet icon object for use in a [Geo::Leaflet::marker](https://metacpan.org/pod/Geo::Leaflet::marker) object.
+This package constructs a Leaflet icon object for use in a [Geo::Leaflet::Marker](https://metacpan.org/pod/Geo::Leaflet::Marker) object.
 
 ## CONSTRUCTORS
 
@@ -520,6 +569,71 @@ This package constructs a Leaflet icon object for use in a [Geo::Leaflet::marker
 ## PROPERTIES
 
 ### name
+
+The JavaScript name for the icon object.
+
+Default: iconNNN
+
+### options
+
+## METHODS
+
+### stringify
+
+### JSON
+
+## SEE ALSO
+
+## AUTHOR
+
+Michael R. Davis
+
+## COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Michael R. Davis
+
+MIT LICENSE
+
+# File: lib/Geo/Leaflet/DivIcon.pm
+
+## NAME
+
+Geo::Leaflet::DivIcon - Leaflet HTML/CSS icon object
+
+## SYNOPSIS
+
+    use Geo::Leaflet;
+    my $map = Geo::Leaflet->new;
+
+## DESCRIPTION
+
+This package constructs a Leaflet divIcon object for use in a [Geo::Leaflet::Marker](https://metacpan.org/pod/Geo::Leaflet::Marker) object.
+
+## CONSTRUCTORS
+
+### new
+
+## PROPERTIES
+
+### name
+
+### icon\_set
+
+    $icon->icon_set('fa'); #Font Awesome v4.7
+
+### icon\_name
+
+    $icon->icon_name('bicycle');
+
+See: https://fontawesome.com/v4/icons/
+
+### icon\_font\_size
+
+    $icon->icon_name(48);
+
+Default: 48
+
+### 
 
 ### options
 

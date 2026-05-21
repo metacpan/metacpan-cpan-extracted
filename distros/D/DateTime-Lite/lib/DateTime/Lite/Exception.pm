@@ -192,7 +192,7 @@ C<DateTime::Lite::Exception> is a lightweight exception class used internally by
 
 Unlike L<DateTime>, C<DateTime::Lite> never calls C<die> directly (except via C<throw()>). Instead, error conditions set the exception and return C<undef> in scalar context, or an empty list in list context.
 
-=head1 CONSTRUCTORS
+=head1 CONSTRUCTOR
 
 =head2 new( %args | $message )
 
@@ -262,7 +262,7 @@ Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
 
 Copyright(c) 2026 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

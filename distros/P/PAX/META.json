@@ -1,0 +1,213 @@
+{
+   "abstract" : "Perl Adaptive eXecution compiler and standalone binary packager",
+   "author" : [
+      "PAX Contributors"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PAX",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "JSON::XS" : "0"
+         },
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "JSON::PP" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "PAX" : {
+         "file" : "lib/PAX.pm",
+         "version" : "0.031"
+      },
+      "PAX::AppImage" : {
+         "file" : "lib/PAX/AppImage.pm",
+         "version" : "0.031"
+      },
+      "PAX::AppServer" : {
+         "file" : "lib/PAX/AppServer.pm",
+         "version" : "0.031"
+      },
+      "PAX::ArtifactCache" : {
+         "file" : "lib/PAX/ArtifactCache.pm",
+         "version" : "0.031"
+      },
+      "PAX::Backend::Tier1CraneliftEquivalent" : {
+         "file" : "lib/PAX/Backend/Tier1CraneliftEquivalent.pm",
+         "version" : "0.031"
+      },
+      "PAX::Backend::Tier2LLVM" : {
+         "file" : "lib/PAX/Backend/Tier2LLVM.pm",
+         "version" : "0.031"
+      },
+      "PAX::Benchmark" : {
+         "file" : "lib/PAX/Benchmark.pm",
+         "version" : "0.031"
+      },
+      "PAX::BenchmarkMatrix" : {
+         "file" : "lib/PAX/BenchmarkMatrix.pm",
+         "version" : "0.031"
+      },
+      "PAX::CLI" : {
+         "file" : "lib/PAX/CLI.pm",
+         "version" : "0.031"
+      },
+      "PAX::CLI::Progress" : {
+         "file" : "lib/PAX/CLI/Progress.pm",
+         "version" : "0.031"
+      },
+      "PAX::CPANMatrix" : {
+         "file" : "lib/PAX/CPANMatrix.pm",
+         "version" : "0.031"
+      },
+      "PAX::Capture" : {
+         "file" : "lib/PAX/Capture.pm",
+         "version" : "0.031"
+      },
+      "PAX::CodeUnitCompiler" : {
+         "file" : "lib/PAX/CodeUnitCompiler.pm",
+         "version" : "0.031"
+      },
+      "PAX::Compatibility" : {
+         "file" : "lib/PAX/Compatibility.pm",
+         "version" : "0.031"
+      },
+      "PAX::CoreSuite" : {
+         "file" : "lib/PAX/CoreSuite.pm",
+         "version" : "0.031"
+      },
+      "PAX::Corpus" : {
+         "file" : "lib/PAX/Corpus.pm",
+         "version" : "0.031"
+      },
+      "PAX::DeoptEngine" : {
+         "file" : "lib/PAX/DeoptEngine.pm",
+         "version" : "0.031"
+      },
+      "PAX::Differential" : {
+         "file" : "lib/PAX/Differential.pm",
+         "version" : "0.031"
+      },
+      "PAX::Gatekeeper" : {
+         "file" : "lib/PAX/Gatekeeper.pm",
+         "version" : "0.031"
+      },
+      "PAX::GuardManager" : {
+         "file" : "lib/PAX/GuardManager.pm",
+         "version" : "0.031"
+      },
+      "PAX::GuardedSSA" : {
+         "file" : "lib/PAX/GuardedSSA.pm",
+         "version" : "0.031"
+      },
+      "PAX::HIR" : {
+         "file" : "lib/PAX/HIR.pm",
+         "version" : "0.031"
+      },
+      "PAX::HotRegionJIT" : {
+         "file" : "lib/PAX/HotRegionJIT.pm",
+         "version" : "0.031"
+      },
+      "PAX::InlineCache" : {
+         "file" : "lib/PAX/InlineCache.pm",
+         "version" : "0.031"
+      },
+      "PAX::Manifest" : {
+         "file" : "lib/PAX/Manifest.pm",
+         "version" : "0.031"
+      },
+      "PAX::Mode" : {
+         "file" : "lib/PAX/Mode.pm",
+         "version" : "0.031"
+      },
+      "PAX::NativeRunner" : {
+         "file" : "lib/PAX/NativeRunner.pm",
+         "version" : "0.031"
+      },
+      "PAX::OSR" : {
+         "file" : "lib/PAX/OSR.pm",
+         "version" : "0.031"
+      },
+      "PAX::Paxfile" : {
+         "file" : "lib/PAX/Paxfile.pm",
+         "version" : "0.031"
+      },
+      "PAX::ProfileGuidedAOT" : {
+         "file" : "lib/PAX/ProfileGuidedAOT.pm",
+         "version" : "0.031"
+      },
+      "PAX::ProfileStore" : {
+         "file" : "lib/PAX/ProfileStore.pm",
+         "version" : "0.031"
+      },
+      "PAX::RegionSelector" : {
+         "file" : "lib/PAX/RegionSelector.pm",
+         "version" : "0.031"
+      },
+      "PAX::Runtime::Value" : {
+         "file" : "lib/PAX/Runtime/Value.pm",
+         "version" : "0.031"
+      },
+      "PAX::RuntimeDispatcher" : {
+         "file" : "lib/PAX/RuntimeDispatcher.pm",
+         "version" : "0.031"
+      },
+      "PAX::StandaloneAnalysis" : {
+         "file" : "lib/PAX/StandaloneAnalysis.pm",
+         "version" : "0.031"
+      },
+      "PAX::StandaloneDispatch" : {
+         "file" : "lib/PAX/StandaloneDispatch.pm",
+         "version" : "0.031"
+      },
+      "PAX::StandaloneImage" : {
+         "file" : "lib/PAX/StandaloneImage.pm",
+         "version" : "0.031"
+      },
+      "PAX::StandaloneRuntime" : {
+         "file" : "lib/PAX/StandaloneRuntime.pm",
+         "version" : "0.031"
+      },
+      "PAX::Tier1" : {
+         "file" : "lib/PAX/Tier1.pm",
+         "version" : "0.031"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/manif3station/PAX/issues"
+      },
+      "homepage" : "https://github.com/manif3station/PAX",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/manif3station/PAX"
+      }
+   },
+   "version" : "0.031",
+   "x_generated_by_perl" : "v5.38.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
+   "x_spdx_expression" : "Artistic-2.0"
+}
+

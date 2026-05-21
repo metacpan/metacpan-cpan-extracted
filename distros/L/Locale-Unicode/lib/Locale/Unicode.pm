@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
-## Unicode Locale Identifier - ~/lib/Locale/Unicode.pm
-## Version v0.4.0
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Unicode Locale Identifier - ~/lib/m
+## Version v0.4.3
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/05/11
-## Modified 2025/10/16
+## Modified 2026/05/19
 ## All rights reserved
 ## 
 ## 
@@ -407,7 +407,7 @@ BEGIN
     our $PROP_TO_SUB = {};
     # False, by default
     our $EXPLICIT_BOOLEAN = 0;
-    our $VERSION = 'v0.4.0';
+    our $VERSION = 'v0.4.3';
 };
 
 use strict;
@@ -1366,6 +1366,12 @@ sub parse
     my $self = shift( @_ );
     my $this = shift( @_ ) || return( $self->error( "No language string was provided." ) );
     my $opts = $self->_get_args_as_hash( @_ );
+    if( ref( $this ) &&
+        Scalar::Util::blessed( $this ) &&
+        overload::Method( $this, '""' ) )
+    {
+        $this = "$this";
+    }
 
     my $re = $self->matches( $this );
     return( $self->pass_error ) if( !defined( $opts ) );
@@ -4000,7 +4006,7 @@ In Scalar or in list context, the value returned is the last value set.
 
 =head1 VERSION
 
-    v0.4.0
+    v0.4.3
 
 =head1 DESCRIPTION
 

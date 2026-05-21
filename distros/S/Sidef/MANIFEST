@@ -208,6 +208,7 @@ scripts/extend_your_language.sf
 'scripts/Extended tests/combinatorics.sf'
 'scripts/Extended tests/digits2num.pl'
 'scripts/Extended tests/elementary.sf'
+'scripts/Extended tests/factorization_methods.sf'
 'scripts/Extended tests/fermat_pseudoprimes.sf'
 'scripts/Extended tests/fermat_pseudoprimes_to_base_n.sf'
 'scripts/Extended tests/fermat_with_n_factors.sf'
@@ -1006,6 +1007,7 @@ scripts/Tests/powerfree_numbers.sf
 scripts/Tests/prefix_colon_hash.sf
 scripts/Tests/prefix_methods.sf
 scripts/Tests/prefix_unary_operators.sf
+scripts/Tests/prime_signature_numbers.sf
 scripts/Tests/problem_of_apollonius.sf
 scripts/Tests/pseudoprimes.sf
 scripts/Tests/pythagorean_means.sf
@@ -1157,6 +1159,7 @@ scripts/WWW/socket_inet.sf
 scripts/xiaolin_wu_s_line_algorithm.sf
 scripts/y_combinator.sf
 scripts/zeta_2n.sf
+SECURITY.md
 SIDEF_ADVANCED_GUIDE.md
 SIDEF_BEGINNER_GUIDE.md
 t/00-load.t
@@ -1184,6 +1187,7 @@ t/smart_word_wrap.t
 TODO
 utils/auto_perltidy.sh
 utils/bak_cleaner.sh
+utils/bump_version_number.sf
 utils/Concepts/sidef_concept.jl
 utils/Concepts/sidef_concept.pl
 utils/Concepts/sidef_executor.jl

@@ -1,0 +1,369 @@
+#! /usr/bin/env perl
+
+# PODNAME: mborg
+# ABSTRACT: Command-line interface for Mailbox.org API
+
+use strict;
+use warnings;
+
+use Getopt::Long::Descriptive qw( describe_options Usage );
+use Pod::Usage qw( pod2usage );
+use File::HomeDir;
+use Path::Tiny qw( path );
+
+use WWW::MailboxOrg;
+
+our $VERSION = '0.001';
+
+my @config_files = (
+    File::HomeDir->my_home . '/.mailboxrc',
+    '.mailboxrc',
+);
+
+my $config = {};
+
+for my $file (@config_files) {
+    if (path($file)->exists) {
+        my $content = path($file)->slurp_utf8;
+        for my $line (split /\n/, $content) {
+            $line =~ s/\s*#.*//;
+            if ($line =~ /^\s*(\w+)\s*=\s*(.+)\s*$/) {
+                $config->{$1} = $2;
+            }
+        }
+    }
+}
+
+my ( $opt, $usage ) = describe_options(
+    '%c %o [command] [options]',
+    [ 'user|u=s', 'Mailbox.org username or email', { default => $config->{user} } ],
+    [ 'password|p=s', 'Mailbox.org password', { default => $config->{password} } ],
+    [ 'base_url|b=s', 'API base URL', { default => $config->{base_url} // 'https://api.mailbox.org/v1' } ],
+    [ 'verbose|v', 'Be verbose' ],
+    [ 'help|h', 'Show help' ],
+    [ 'version|V', 'Show version' ],
+    [],
+    [ 'Commands:' ],
+    [ 'login', 'Login to Mailbox.org API' ],
+    [ 'logout', 'Logout from Mailbox.org API' ],
+    [ 'account', 'Account management commands' ],
+    [ 'domain', 'Domain management commands' ],
+    [ 'mail', 'Mail operations' ],
+    [ 'system', 'System information' ],
+);
+
+if ( $opt->help ) {
+    pod2usage(0);
+}
+
+if ( $opt->version ) {
+    print "mborg version $VERSION\n";
+    exit 0;
+}
+
+if ( !@ARGV ) {
+    pod2usage(1);
+}
+
+my $command = shift @ARGV;
+my %api_options = (
+    user => $opt->user // $ENV{MAILBOX_USER},
+    password => $opt->password // $ENV{MAILBOX_PASSWORD},
+    base_url => $opt->base_url,
+);
+
+if ( !$api_options{user} && !$api_options{password} && $command eq 'login' ) {
+    print "Enter Mailbox.org username: ";
+    my $user = <STDIN>;
+    chomp $user;
+    $api_options{user} = $user;
+
+    print "Enter Mailbox.org password: ";
+    system('stty -echo');
+    my $pass = <STDIN>;
+    system('stty echo');
+    chomp $pass;
+    print "\n";
+    $api_options{password} = $pass;
+}
+
+if ( !$api_options{user} || !$api_options{password} ) {
+    die "Error: user and password required. Use --user and --password, or set MAILBOX_USER/MAILBOX_PASSWORD environment variables.\n";
+}
+
+my $api = WWW::MailboxOrg->new(%api_options);
+
+sub run_login {
+    print "Logging in...\n" if $opt->verbose;
+    my $result = $api->login;
+    print "Logged in successfully.\n" if $opt->verbose;
+    print "Session: $result->{session}\n" if $result && $result->{session};
+    return $result;
+}
+
+sub run_logout {
+    print "Logging out...\n" if $opt->verbose;
+    $api->logout;
+    print "Logged out successfully.\n" if $opt->verbose;
+}
+
+sub run_hello {
+    my $result = $api->system->hello;
+    require Data::Printer;
+    p $result;
+}
+
+sub run_test {
+    my $result = $api->system->test;
+    require Data::Printer;
+    p $result;
+}
+
+sub run_capabilities {
+    my $result = $api->system->capabilities;
+    require Data::Printer;
+    p $result;
+}
+
+sub run_account_list {
+    my $result = $api->account->list;
+    require Data::Printer;
+    p $result;
+}
+
+sub run_account_get {
+    my ($account) = @_;
+    my $result = $api->account->get(account => $account);
+    require Data::Printer;
+    p $result;
+}
+
+sub run_domain_list {
+    my %args = @_;
+    my $result = $api->domain->list(%args);
+    require Data::Printer;
+    p $result;
+}
+
+sub run_domain_get {
+    my ($domain) = @_;
+    my $result = $api->domain->get(domain => $domain);
+    require Data::Printer;
+    p $result;
+}
+
+sub run_mail_list {
+    my %args = @_;
+    my $result = $api->mail->list(%args);
+    require Data::Printer;
+    p $result;
+}
+
+sub run_mail_find {
+    my ($query) = @_;
+    my $result = $api->mail->find(query => $query);
+    require Data::Printer;
+    p $result;
+}
+
+if ( $command eq 'login' ) {
+    run_login;
+}
+elsif ( $command eq 'logout' ) {
+    run_logout;
+}
+elsif ( $command eq 'hello' ) {
+    run_hello;
+}
+elsif ( $command eq 'test' ) {
+    run_test;
+}
+elsif ( $command eq 'capabilities' ) {
+    run_capabilities;
+}
+elsif ( $command eq 'account' ) {
+    my $subcmd = shift @ARGV;
+    if ( $subcmd eq 'list' ) {
+        run_account_list;
+    }
+    elsif ( $subcmd eq 'get' ) {
+        my $account = shift @ARGV;
+        die "Usage: mborg --user X --password Y account get <email>\n" unless $account;
+        run_account_get($account);
+    }
+    else {
+        die "Unknown account subcommand: $subcmd. Use: list, get\n";
+    }
+}
+elsif ( $command eq 'domain' ) {
+    my $subcmd = shift @ARGV;
+    if ( $subcmd eq 'list' ) {
+        run_domain_list;
+    }
+    elsif ( $subcmd eq 'get' ) {
+        my $domain = shift @ARGV;
+        die "Usage: mborg --user X --password Y domain get <domain>\n" unless $domain;
+        run_domain_get($domain);
+    }
+    else {
+        die "Unknown domain subcommand: $subcmd. Use: list, get\n";
+    }
+}
+elsif ( $command eq 'mail' ) {
+    my $subcmd = shift @ARGV;
+    if ( $subcmd eq 'list' ) {
+        my %args;
+        while (@ARGV && $ARGV[0] =~ /^(\w+)=(.+)$/) {
+            $args{$1} = $2;
+            shift @ARGV;
+        }
+        run_mail_list(%args);
+    }
+    elsif ( $subcmd eq 'find' ) {
+        my $query = shift @ARGV;
+        die "Usage: mborg --user X --password Y mail find <query>\n" unless $query;
+        run_mail_find($query);
+    }
+    else {
+        die "Unknown mail subcommand: $subcmd. Use: list, find\n";
+    }
+}
+elsif ( $command eq 'system' ) {
+    my $subcmd = shift @ARGV;
+    if ( $subcmd eq 'hello' ) {
+        run_hello;
+    }
+    elsif ( $subcmd eq 'test' ) {
+        run_test;
+    }
+    elsif ( $subcmd eq 'capabilities' ) {
+        run_capabilities;
+    }
+    else {
+        die "Unknown system subcommand: $subcmd. Use: hello, test, capabilities\n";
+    }
+}
+else {
+    die "Unknown command: $command. Available: login, logout, account, domain, mail, system\n";
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+mborg - Command-line interface for Mailbox.org API
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+    mborg --user=user@example.com --password=secret login
+
+    # Read credentials from environment
+    MAILBOX_USER=user@example.com MAILBOX_PASSWORD=secret mborg login
+
+    # Read credentials from config file (~/.mailboxrc)
+    mborg login
+
+    # Run commands
+    mborg account list
+    mborg domain list
+    mborg mail find "from:user@example.com"
+
+=head1 NAME
+
+mborg - Command-line interface for Mailbox.org API
+
+=head1 CONFIGURATION
+
+Create a F<~/.mailboxrc> file:
+
+    user=user@example.com
+    password=secret
+    base_url=https://api.mailbox.org/v1
+
+=head1 COMMANDS
+
+=over 4
+
+=item login
+
+Authenticate with Mailbox.org API.
+
+=item logout
+
+End the current session.
+
+=item account list
+
+List all accounts.
+
+=item account get <email>
+
+Get account details.
+
+=item domain list [--account=email]
+
+List domains.
+
+=item domain get <domain>
+
+Get domain details.
+
+=item mail list [--account=email] [--folder=INBOX] [--unseen_only=1]
+
+List emails.
+
+=item mail find <query>
+
+Search emails.
+
+=item system hello
+
+Get API hello response.
+
+=item system test
+
+Test API connection.
+
+=item system capabilities
+
+Get API capabilities.
+
+=back
+
+=cut
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/getty/p5-www-mailboxorg/issues>.
+
+=head2 IRC
+
+Join C<#perl-help> on C<irc.perl.org> or message Getty directly.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHOR
+
+Torsten Raudssus <getty@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

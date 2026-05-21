@@ -83,7 +83,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- set(self, key, value) — returns self ----
+ # ---- set(self, key, value) - returns self ----
 
 SV *
 set(self, key, value)
@@ -129,7 +129,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- has(self, key) — returns 0 or 1 ----
+ # ---- has(self, key) - returns 0 or 1 ----
 
 int
 has(self, key)
@@ -165,7 +165,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- delete(self, key) — returns self ----
+ # ---- delete(self, key) - returns self ----
 
 SV *
 delete(self, key)
@@ -206,7 +206,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- set_many(self, \%pairs) — returns self ----
+ # ---- set_many(self, \%pairs) - returns self ----
 
 SV *
 set_many(self, pairs_sv)
@@ -259,7 +259,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- all(self) — returns \%data ----
+ # ---- all(self) - returns \%data ----
 
 SV *
 all(self)
@@ -277,7 +277,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- clear(self) — returns self ----
+ # ---- clear(self) - returns self ----
 
 SV *
 clear(self)
@@ -294,7 +294,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- save(self) — explicit write to disk ----
+ # ---- save(self) - explicit write to disk ----
 
 SV *
 save(self)
@@ -308,7 +308,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- reload(self) — re-read from disk ----
+ # ---- reload(self) - re-read from disk ----
 
 SV *
 reload(self)
@@ -322,7 +322,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- path(self) — returns path string ----
+ # ---- path(self) - returns path string ----
 
 SV *
 path(self)
@@ -337,7 +337,7 @@ CODE:
 OUTPUT:
     RETVAL
 
- # ---- auto_save(self [, val]) — getter/setter ----
+ # ---- auto_save(self [, val]) - getter/setter ----
 
 SV *
 auto_save(self, ...)

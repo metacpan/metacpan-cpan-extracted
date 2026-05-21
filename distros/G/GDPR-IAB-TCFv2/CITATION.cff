@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+title: "GDPR::IAB::TCFv2"
+message: "If you use this software, please cite it using the metadata below."
+type: software
+authors:
+  - given-names: Tiago
+    family-names: Peczenyj
+    email: tiago.peczenyj+cpan@gmail.com
+abstract: >-
+  Pure-Perl decoder for the IAB Europe Transparency and Consent Framework
+  (TCF) v2.3 consent string (TC string).
+repository-code: "https://github.com/peczenyj/GDPR-IAB-TCFv2"
+url: "https://metacpan.org/dist/GDPR-IAB-TCFv2"
+license: "Artistic-1.0-Perl OR GPL-1.0-or-later"
+keywords:
+  - perl
+  - gdpr
+  - iab
+  - tcf
+  - consent
+  - privacy
+  - adtech
+version: "0.520"
+date-released: "2026-05-18"

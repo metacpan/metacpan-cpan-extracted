@@ -54,6 +54,35 @@ my $jobs   = $config->collectors;
 
 is( scalar @$jobs, 1, 'checker filter applied' );
 is( $jobs->[0]{name}, 'only.this', 'config collector loaded and filtered' );
+is( $jobs->[0]{mode}, 'singleton', 'collectors default to singleton mode' );
+is( $jobs->[0]{multiple}, 1, 'singleton collectors normalize to one active run' );
+
+$config->save_global(
+    {
+        collectors => [
+            {
+                name     => 'parallel.collector',
+                command  => "printf 'parallel\\n'",
+                cwd      => 'home',
+                interval => 30,
+                mode     => 'multiple',
+            },
+            {
+                name     => 'wider.collector',
+                command  => "printf 'wide\\n'",
+                cwd      => 'home',
+                interval => 30,
+                mode     => 'multiple',
+                multiple => 4,
+            },
+        ],
+    }
+);
+local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
+my $parallel_jobs = $config->collectors;
+is( $parallel_jobs->[1]{mode}, 'multiple', 'multiple-mode collectors keep their execution mode' );
+is( $parallel_jobs->[1]{multiple}, 2, 'multiple-mode collectors default to two parallel runs' );
+is( $parallel_jobs->[2]{multiple}, 4, 'multiple-mode collectors keep explicit parallel limits' );
 
 done_testing;
 

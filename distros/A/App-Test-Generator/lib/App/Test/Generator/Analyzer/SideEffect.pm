@@ -2,7 +2,6 @@ package App::Test::Generator::Analyzer::SideEffect;
 
 use strict;
 use warnings;
-use Carp    qw(croak);
 use Readonly;
 
 # --------------------------------------------------
@@ -18,15 +17,13 @@ Readonly my $PURITY_IMPURE       => 'impure';
 # and syswrite are included but higher-level abstractions
 # like Log::Any calls are not detected.
 # --------------------------------------------------
-Readonly my $IO_PATTERN =>
-	qr/\b(?:print|say|printf|warn|open|close|syswrite|sysread|readline|read|write)\b/;
+use constant IO_PATTERN => qr/\b(?:print|say|printf|warn|open|close|syswrite|sysread|readline|read|write)\b/;
 
 # --------------------------------------------------
 # External execution patterns — system calls and
 # backtick/qx operators
 # --------------------------------------------------
-Readonly my $EXEC_PATTERN =>
-	qr/\b(?:system|exec)\b|qx\(|`/;
+use constant EXEC_PATTERN => qr/\b(?:system|exec)\b|qx\(|`/;
 
 # --------------------------------------------------
 # Global variable patterns — %ENV, %SIG, @ARGV and
@@ -34,14 +31,13 @@ Readonly my $EXEC_PATTERN =>
 # NOTE: does not detect all possible globals; mutation
 # of $_, $/, $! etc. would require deeper analysis.
 # --------------------------------------------------
-Readonly my $GLOBAL_PATTERN =>
-	qr/\$(?:GLOBAL|ENV|SIG|ARGV|_|\/|!|0)\b|%ENV\b|%SIG\b|@ARGV\b/;
+use constant GLOBAL_PATTERN => qr/\$(?:GLOBAL|ENV|SIG|ARGV|_|!|0)\b|\$\/|%ENV\b|%SIG\b|\@ARGV\b/;
 
-our $VERSION = '0.33';
+our $VERSION = '0.38';
 
 =head1 VERSION
 
-Version 0.33
+Version 0.38
 
 =head1 DESCRIPTION
 
@@ -192,7 +188,7 @@ sub analyze {
 	# @ARGV and common Perl special variables.
 	# NOTE: does not catch all possible globals.
 	# --------------------------------------------------
-	if($body =~ $GLOBAL_PATTERN) {
+	if($body =~ GLOBAL_PATTERN) {
 		$result{mutates_globals} = 1;
 	}
 
@@ -200,7 +196,7 @@ sub analyze {
 	# Detect IO operations — print, say, warn, open etc.
 	# Higher-level logging abstractions are not detected.
 	# --------------------------------------------------
-	if($body =~ $IO_PATTERN) {
+	if($body =~ IO_PATTERN) {
 		$result{performs_io} = 1;
 	}
 
@@ -208,7 +204,7 @@ sub analyze {
 	# Detect external command execution via system(),
 	# exec(), qx() or backtick operators
 	# --------------------------------------------------
-	if($body =~ $EXEC_PATTERN) {
+	if($body =~ EXEC_PATTERN) {
 		$result{calls_external} = 1;
 	}
 

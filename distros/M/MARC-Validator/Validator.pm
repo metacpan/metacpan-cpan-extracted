@@ -5,7 +5,7 @@ use warnings;
 
 use Module::Pluggable require => 1;
 
-our $VERSION = 0.17;
+our $VERSION = 0.21;
 
 1;
 
@@ -57,10 +57,16 @@ Returns list of plugin module name strings.
  # List of plugins:
  # - MARC::Validator::Plugin::Field008
  # - MARC::Validator::Plugin::Field020
- # - MARC::Validator::Plugin::Field040
  # - MARC::Validator::Plugin::Field035
+ # - MARC::Validator::Plugin::Field040
+ # - MARC::Validator::Plugin::Field045
+ # - MARC::Validator::Plugin::Field080
  # - MARC::Validator::Plugin::Field260
  # - MARC::Validator::Plugin::Field264
+ # - MARC::Validator::Plugin::Field300
+ # - MARC::Validator::Plugin::Field500
+ # - MARC::Validator::Plugin::Field504
+ # - MARC::Validator::Plugin::Field655
 
 =head1 DEPENDENCIES
 
@@ -91,6 +97,6 @@ the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
 
 =head1 VERSION
 
-0.17
+0.21
 
 =cut

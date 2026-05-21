@@ -2,15 +2,26 @@
 use strict;
 use warnings;
 
-use Test::DescribeMe qw(extended);
+use Test::DescribeMe qw(extended);	# Fixes https://www.cpantesters.org/cpan/report/04c7279a-476f-11f1-bf55-cb595875c975
 use Test::Most;
-use Test::Needs 'Type::Params';
+use Test::Needs 'Type::Params', 'BSD::Resource';
 use File::Temp qw(tempdir);
 use File::Spec;
 
 # Load the module
 BEGIN {
 	use_ok('App::Test::Generator::SchemaExtractor');
+}
+
+if($^O ne 'MSWin32') {
+	require BSD::Resource;
+	BSD::Resource->import();
+
+	my ($soft, $hard) = getrlimit(BSD::Resource::RLIMIT_AS());
+	# Skip if less than 512MB available
+	if(($soft != BSD::Resource::RLIM_INFINITY()) && ($soft < 512 * 1024 * 1024)) {
+		plan(skip_all => 'Insufficient memory for type_params tests');
+	}
 }
 
 TODO: {
@@ -94,8 +105,6 @@ END_MODULE
 				'element_type' => 'Str'
 			}
 		});
-
-		done_testing();
 	};
 
 	subtest 'Extact schema from Type::Params - using signature_for' => sub {
@@ -141,8 +150,6 @@ END_MODULE
 		});
 
 		cmp_ok($schema->{output}->{type}, 'eq', 'number', 'add_numbers returns a number');
-
-		done_testing();
 	};
 
 	subtest 'Extact schema from Type::Params - using documented example' => sub {
@@ -194,7 +201,6 @@ END_MODULE
 				'position' => 0,
 			}
 		});
-		done_testing();
 	};
 }
 

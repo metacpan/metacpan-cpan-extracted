@@ -1,19 +1,31 @@
-use strict;
-use warnings;
+use Test2::V1
+  -pragmas,
+  qw( is note ok plan );
+plan 5;
+use Test2::Plugin::DieOnFail;
 
-use Test::More import => [ qw( BAIL_OUT note plan use_ok ) ];
+use Config qw( %Config );
 
-my @module = qw( Log::Log4perl::Config::YamlConfigurator );
+my $main_module;
+my $main_module_version;
+{
+  local @INC  = @INC;
+  local @ARGV = qw( DISTNAME NAME VERSION );
+  ok scalar( ( my $distname, $main_module, $main_module_version ) = @{ require './Makefile.PL' } ), ## no critic ( RequireBarewordIncludes )
+    "Load 'Makefile.PL' as a module";
+  is $distname, 'Log-Log4perl-Config-YamlConfigurator', 'Check dist name';
+  is $main_module, 'Log::Log4perl::Config::YamlConfigurator', 'Check main module name'
+}
 
-plan tests => 0 + @module;
+ok eval "require $main_module", "Load main module '$main_module'"; ## no critic ( RequireCheckingReturnValueOfEval )
+is $main_module_version, $main_module->VERSION, 'Check main module version';
+note "Testing $main_module $main_module_version";
 
 note "Perl $] at $^X";
-note 'Test::More ' . Test::More->VERSION;
-note 'Test::Builder ' . Test::Builder->VERSION;
-note "\@INC:\n  " . join "\n  ", @INC;
-
-for my $module ( @module ) {
-  use_ok $module or BAIL_OUT "Cannot load module '$module'";
-  no warnings 'uninitialized'; ## no critic (ProhibitNoWarnings)
-  note "Testing $module " . $module->VERSION;
-}
+note 'Harness is ',      $ENV{ HARNESS_ACTIVE } ? 'on' : 'off';
+note 'Harness ',         $ENV{ HARNESS_VERSION } if $ENV{ HARNESS_VERSION };
+note 'Verbose mode is ', exists $ENV{ TEST_VERBOSE } ? 'on' : 'off';
+note 'Test2::V1 ',       Test2::V1->VERSION;
+note join "\n  ",        'PERL5LIB:', split( /$Config{ path_sep }/, $ENV{ PERL5LIB } ) if exists $ENV{ PERL5LIB };
+note join "\n  ",        '@INC:',     @INC;
+note join "\n  ", 'PATH:', split( /$Config{ path_sep }/, $ENV{ PATH } )

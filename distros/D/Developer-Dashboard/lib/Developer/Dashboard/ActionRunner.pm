@@ -3,13 +3,13 @@ package Developer::Dashboard::ActionRunner;
 use strict;
 use warnings;
 
-our $VERSION = '3.14';
+our $VERSION = '3.90';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
 use Digest::SHA qw(sha256_hex);
 use File::Spec;
-use POSIX qw(setsid strftime);
+use POSIX qw(WNOHANG setsid strftime);
 
 use Developer::Dashboard::Codec qw(encode_payload decode_payload);
 use Developer::Dashboard::JSON qw(json_encode);
@@ -134,26 +134,72 @@ sub run_command_action {
     my $background = $args{background} ? 1 : 0;
 
     if ($background) {
-        my $pid = fork();
+        pipe my $reader, my $writer or die "Unable to create background action pipe: $!";
+        my $pid = $self->_fork_process;
         die "Unable to fork background action: $!" if !defined $pid;
         if ($pid) {
+            close $writer;
+            my $line = <$reader>;
+            close $reader;
+            die "Unable to start background action\n" if !defined $line;
+            chomp $line;
+            die "$line\n" if $line =~ /^err:/;
+            my ( undef, $started_pid ) = split /\|/, $line, 2;
             return {
                 background => 1,
-                pid        => $pid,
+                pid        => $started_pid + 0,
                 started_at => _now_iso8601(),
             };
         }
-        setsid();
-        open STDIN, '<', File::Spec->devnull() or die $!;
-        open STDOUT, '>>', $self->{files}->dashboard_log or die $!;
-        open STDERR, '>>', $self->{files}->dashboard_log or die $!;
-        $self->_run_command(
-            cmd        => $cmd,
-            cwd        => $cwd,
-            env        => $env,
-            timeout_ms => $timeout_ms,
-        );
-        exit 0;
+        local $SIG{CHLD} = 'DEFAULT';
+        close $reader;
+        my $boot_ok = eval {
+            $self->_detach_background_session() or die "Unable to detach background action session: $!";
+            open STDIN, '<', File::Spec->devnull() or die "Unable to redirect background action stdin: $!";
+            open STDOUT, '>>', $self->{files}->dashboard_log or die "Unable to redirect background action stdout: $!";
+            open STDERR, '>>', $self->{files}->dashboard_log or die "Unable to redirect background action stderr: $!";
+            my $command_pid = $self->_fork_process;
+            die "Unable to fork detached background action command: $!" if !defined $command_pid;
+            if ( !$command_pid ) {
+                chdir $cwd or die "Unable to chdir to background action cwd '$cwd': $!";
+                local %ENV = ( %ENV, %{$env} );
+                my @argv = shell_command_argv($cmd);
+                exec { $argv[0] } @argv or die "Unable to exec background action command: $!";
+            }
+            local $SIG{TERM} = sub {
+                kill 'TERM', $command_pid;
+                waitpid( $command_pid, 0 );
+                exit 0;
+            };
+            local $SIG{INT} = sub {
+                kill 'TERM', $command_pid;
+                waitpid( $command_pid, 0 );
+                exit 0;
+            };
+            print {$writer} join( '|', 'ok', $$ ), "\n";
+            close $writer;
+            my $deadline = $timeout_ms > 0 ? time() + ( $timeout_ms / 1000 ) : undef;
+            while (1) {
+                my $status = $self->_background_child_exit_status($command_pid);
+                exit $status if defined $status;
+                if ( defined $deadline && time() >= $deadline ) {
+                    kill 'TERM', $command_pid;
+                    select undef, undef, undef, 0.2;
+                    kill 'KILL', $command_pid if waitpid( $command_pid, WNOHANG ) == 0;
+                    waitpid( $command_pid, 0 );
+                    exit 124;
+                }
+                select undef, undef, undef, 0.05;
+            }
+        };
+        if ( !$boot_ok ) {
+            my $error = $@ || "Unable to start background action\n";
+            if ($writer) {
+                print {$writer} 'err: ' . $error;
+                close $writer;
+            }
+            exit 1;
+        }
     }
 
     return $self->_run_command(
@@ -162,6 +208,100 @@ sub run_command_action {
         env        => $env,
         timeout_ms => $timeout_ms,
     );
+}
+
+# _fork_process()
+# Wraps Perl fork so tests can drive the background-child spawn path
+# deterministically.
+# Input: none.
+# Output: child pid in parent, zero in child, or undef on failure.
+sub _fork_process {
+    return fork();
+}
+
+# _detach_background_session()
+# Starts a detached session for a background action child before stdio is
+# redirected into the dashboard log.
+# Input: none.
+# Output: truthy on success, false on failure.
+sub _detach_background_session {
+    return setsid();
+}
+
+# _wait_status_exit_code($raw_status)
+# Normalizes one raw waitpid status word into the shell-style exit code that
+# the detached background supervisor should use when its command child exits.
+# Input: raw wait status integer from $? or waitpid.
+# Output: normalized exit status integer.
+sub _wait_status_exit_code {
+    my ( $self, $raw_status ) = @_;
+    my $status = $raw_status >> 8;
+    $status = 128 + ( $raw_status & 127 ) if !$status && ( $raw_status & 127 );
+    return $status;
+}
+
+# _background_child_exit_status($command_pid)
+# Polls one detached background command child and returns the supervisor exit
+# code when that child has already exited.
+# Input: direct child process id integer.
+# Output: normalized exit status integer when reaped, otherwise undef.
+sub _background_child_exit_status {
+    my ( $self, $command_pid ) = @_;
+    my $reaped = waitpid( $command_pid, WNOHANG );
+    return if $reaped != $command_pid;
+    return $self->_wait_status_exit_code($?);
+}
+
+# _reap_child_process($pid)
+# Reaps one direct background action child when it has already exited so
+# callers do not observe wrapper zombies during lifecycle checks.
+# Input: process id integer.
+# Output: boolean true when waitpid reaped the child.
+sub _reap_child_process {
+    my ( $self, $pid ) = @_;
+    return 0 if !defined $pid || $pid !~ /^\d+$/ || $pid < 1;
+    my $waited = waitpid( $pid, WNOHANG );
+    return $waited == $pid ? 1 : 0;
+}
+
+# _read_process_state($pid)
+# Reads the current process state so zombie background action wrappers can be
+# treated as stopped even when signal 0 still succeeds.
+# Input: process id integer.
+# Output: one-letter process state string or undef.
+sub _read_process_state {
+    my ( $self, $pid ) = @_;
+    my $proc = "/proc/$pid/stat";
+    if ( -r $proc ) {
+        open my $fh, '<', $proc or return;
+        local $/;
+        my $stat = scalar <$fh>;
+        if ( defined $stat && $stat ne '' && $stat =~ /^\d+\s+\(.*\)\s+(\S)/s ) {
+            return $1;
+        }
+    }
+
+    my ( $stdout, undef, $exit_code ) = capture {
+        system 'ps', '-o', 'stat=', '-p', $pid;
+        return $? >> 8;
+    };
+    return if $exit_code != 0;
+    $stdout =~ s/^\s+|\s+$//g if defined $stdout;
+    return if !defined $stdout || $stdout eq '';
+    return substr( $stdout, 0, 1 );
+}
+
+# _pid_is_running($pid)
+# Determines whether one background action pid is still alive after
+# opportunistic reaping and zombie-state checks.
+# Input: process id integer.
+# Output: boolean true when the process still appears to be running.
+sub _pid_is_running {
+    my ( $self, $pid ) = @_;
+    return 0 if !defined $pid || $pid !~ /^\d+$/ || $pid < 1;
+    return 0 if $self->_reap_child_process($pid);
+    return 0 if ( $self->_read_process_state($pid) || '' ) eq 'Z';
+    return kill( 0, $pid ) ? 1 : 0;
 }
 
 # _run_builtin_action(%args)

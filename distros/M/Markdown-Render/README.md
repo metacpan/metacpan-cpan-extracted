@@ -17,7 +17,7 @@
 * [Rendering](#rendering)
 * [License](#license)
 
-__Updated 2026-02-16__ by anonymouse <rclauer@gmail.com>
+__Updated 2026-04-30__ by anonymouse <rclauer@gmail.com>
 
 # README
 
@@ -42,12 +42,16 @@ too.
 
 | Module                   | Version |
 |--------------------------|---------|
+| `CLI::Simple             | 1.0.11 |
 | `Class::Accessor::Fast`  | 0.51  |
+| `Config::Tiny`           | 2.30  |
 | `Date::Format`           | 2.24  |
 | `HTTP::Request`          | 6.00  |
 | `IO::Scalar`             | 2.113 |
+| `IO::Socket::SSL`        | |
 | `JSON`                   | 4.03  |
-| `LWP::UserAgent`         | 6.36  |
+| `HTTP::Tiny`             | 6.36  |
+| `Net::SSLeay`            | |
 | `Readonly`               | 2.05  |
 
 ## Building and Deploying

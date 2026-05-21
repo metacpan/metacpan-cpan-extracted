@@ -4,7 +4,7 @@ use strict;
 
 use Test::More tests => 2 + (71 * 4);
 
-require 't/test-lib.pl';
+require './t/test-lib.pl';
 use_ok('Rose::DB::Object');
 use_ok('Rose::DB::Object::Loader');
 
@@ -199,7 +199,7 @@ foreach my $db_type (qw(pg mysql informix sqlite))
 
 BEGIN
 {
-  require 't/test-lib.pl';
+  require './t/test-lib.pl';
 
   #
   # PostgreSQL

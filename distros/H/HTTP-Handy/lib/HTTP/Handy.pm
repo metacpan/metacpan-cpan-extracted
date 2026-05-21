@@ -24,9 +24,10 @@ BEGIN { pop @INC if $INC[-1] eq '.' }
 
 use IO::Socket;
 use Carp qw(croak);
-use vars qw($VERSION $ACCESS_LOG_FH $CURRENT_LOG_FILE);
-$VERSION = '1.04';
+use vars qw($VERSION $ACCESS_LOG_FH $CURRENT_LOG_FILE $_fh_seq);
+$VERSION = '1.05';
 $VERSION = $VERSION;
+$_fh_seq = 0;
 # $VERSION self-assignment suppresses "used only once" warning under strict.
 
 ###############################################################################
@@ -238,7 +239,7 @@ sub _handle_connection {
     };
     if ($@) {
         my $err = $@;
-        _log_message("App error: $err");
+        _log_message("App error: $err") if $log;
         _send_error($client, 500, 'Internal Server Error');
         return;
     }
@@ -300,7 +301,7 @@ sub _handle_connection {
         print STDERR $line;
 
         _open_access_log();
-        print $ACCESS_LOG_FH $line if $ACCESS_LOG_FH;
+        if ($ACCESS_LOG_FH) { no strict 'refs'; print {*{$ACCESS_LOG_FH}} $line }
     }
 }
 
@@ -346,19 +347,12 @@ sub _log_message {
     my $ts = _iso_time();
     print STDERR "[$ts] $msg\n";
 
-    my $fh;
-    if ($] >= 5.006) {
-        # Avoid "Too many arguments for open at" error when running with Perl 5.005_03
-        eval q{ open($fh, '>>', 'logs/error/error.log') } or return;
-    }
-    else {
-        $fh = \do { local *_ };
-        open($fh, ">> logs/error/error.log") or return;
-    }
-    binmode $fh;
-
-    print $fh "[$ts] $msg\n";
-    close $fh;
+    $_fh_seq++;
+    my $fhn = "HTTP::Handy::FH::H${_fh_seq}";
+    { no strict 'refs'; open($fhn, ">> logs/error/error.log") or do { warn "HTTP::Handy: cannot open logs/error/error.log: $!"; return } }
+    { no strict 'refs'; binmode(*{$fhn}) }
+    { no strict 'refs'; print {*{$fhn}} "[$ts] $msg\n" }
+    { no strict 'refs'; close($fhn) }
 }
 
 ###############################################################################
@@ -386,9 +380,17 @@ sub serve_static {
 
     my $file = $docroot . $path;
 
-    # Directory: try index.html
-    if (-d $file) {
-        $file =~ s{/?$}{/index.html};
+    # Directory: strip trailing slash before -d check (Windows robustness),
+    # then append index.html
+    (my $file_check = $file) =~ s{/+$}{};
+    if (-d $file_check) {
+        $file = $file_check . '/index.html';
+    }
+
+    # Reject file names with unsafe characters (NUL, leading/trailing spaces,
+    # or shell-special sequences that 2-arg open could misinterpret)
+    if ($file =~ /\x00/ || $file =~ m{(?:^|\s)[|<>]|[|<>](?:\s|$)}) {
+        return [403, ['Content-Type', 'text/plain'], ['Forbidden']];
     }
 
     unless (-f $file) {
@@ -403,23 +405,14 @@ sub serve_static {
     my $mime = $MIME{$ext} || 'application/octet-stream';
 
     # Read file
-    my $fh;
-    if ($] >= 5.006) {
-        # Avoid "Too many arguments for open at" error when running with Perl 5.005_03
-        unless (eval q{ open($fh, '<', $file) }) {
-            return [403, ['Content-Type', 'text/plain'], ['Forbidden']];
-        }
-    }
-    else {
-        $fh = \do { local *_ };
-        unless (open($fh, "<$file")) {
-            return [403, ['Content-Type', 'text/plain'], ['Forbidden']];
-        }
-    }
-    binmode $fh;
+    $_fh_seq++;
+    my $fhn = "HTTP::Handy::FH::H${_fh_seq}";
+    { no strict 'refs'; open($fhn, "< $file") or return [403, ['Content-Type', 'text/plain'], ['Forbidden']] }
+    { no strict 'refs'; binmode(*{$fhn}) }
     local $/;
-    my $content = <$fh>;
-    close $fh;
+    my $content;
+    { no strict 'refs'; $content = readline(*{$fhn}) }
+    { no strict 'refs'; close($fhn) }
 
     # Cache-Control header
     my @cache_headers;
@@ -580,27 +573,20 @@ sub _open_access_log {
     return if defined $ACCESS_LOG_FH && $current_log_filename eq $CURRENT_LOG_FILE;
 
     if ($ACCESS_LOG_FH) {
-        close $ACCESS_LOG_FH;
+        no strict 'refs'; close($ACCESS_LOG_FH);
     }
 
     my $fh;
-    if ($] >= 5.006) {
-        # Avoid "Too many arguments for open at" error when running with Perl 5.005_03
-        eval q{ open($fh, '>>', $current_log_filename) } or do {
-            warn "Cannot open access log: $current_log_filename: $!";
-            return;
-        };
-    }
-    else {
-        $fh = \do { local *_ };
-        open($fh, ">> $current_log_filename") or do {
-            warn "Cannot open access log: $current_log_filename: $!";
-            return;
-        };
-    }
-    binmode $fh;
+    $_fh_seq++;
+    my $fhn = "HTTP::Handy::FH::H${_fh_seq}";
+    { no strict 'refs'; open($fhn, ">> $current_log_filename") or do {
+        warn "Cannot open access log: $current_log_filename: $!";
+        return;
+    } }
+    { no strict 'refs'; binmode(*{$fhn}) }
+    $fh = $fhn;
 
-    select((select($fh), $| = 1)[0]); # autoflush
+    { no strict 'refs'; select((select(*{$fhn}), $| = 1)[0]) } # autoflush
 
     $ACCESS_LOG_FH     = $fh;
     $CURRENT_LOG_FILE  = $current_log_filename;
@@ -835,7 +821,7 @@ HTTP::Handy - A tiny HTTP/1.0 server for Perl 5.5.3 and later
 
 =head1 VERSION
 
-Version 1.03
+Version 1.05
 
 =head1 SYNOPSIS
 
@@ -1632,7 +1618,7 @@ L<LTSV::LINQ> -- LINQ-style queries for LTSV data, by the same author.
 HTTP::Handy was originally developed to serve local tools built on top of
 LTSV::LINQ.
 
-
+=head1 AUTHOR
 
 INABA Hitoshi E<lt>ina@cpan.orgE<gt>
 

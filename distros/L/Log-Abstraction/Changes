@@ -1,5 +1,30 @@
 Revision history for Log-Abstraction
 
+0.28
+	[ Enhancements ]
+	- Added context (ctx) to code ref logger callbacks
+
+	[ Bug Fixes]
+	- Fixed carp_on_warn and croak_on_error when logging to an array backend
+
+	- Fixed cloning to a different level (level string now converted to integer)
+
+	- Fixed DESTROY to call Sys::Syslog::closelog() fully-qualified for correct mock interception
+
+	- Fixed warn(undef) and warn(warning => undef) to be silent no-ops
+
+	- Fixed warn(warning => [undef, ...]) to filter undef elements before joining
+
+	- Fixed odd-count plain list in warn/error (_high_priority now wraps get_params in eval)
+
+	- Fixed autovivification of sendmail key via exists() guards on sendmail hash access
+
+	- Fixed %env_foo% format token to expand missing env vars to empty string without warning
+
+	- Fixed ::new() to always construct normally regardless of arguments
+
+	- Removed spurious Carp::croak/carp fallback when array backend is defined
+
 0.27	Sun Jan 11 09:52:54 EST 2026
 	Easier to read tests
 	Added fatal as a synonym for error

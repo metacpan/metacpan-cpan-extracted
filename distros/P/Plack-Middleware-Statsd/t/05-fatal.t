@@ -56,7 +56,6 @@ test_psgi
             [ 'timing_ms', 'psgi.response.content-length', ignore() ],
             [ 'increment', 'psgi.response.status.500', ],
             [ 'increment', 'psgi.response.content-type.text.plain', ],
-            [ 'set_add',   'psgi.request.remote_addr', ignore() ],
             [ 'set_add',   'psgi.worker.pid', ignore() ],
           ),
           'expected metrics'

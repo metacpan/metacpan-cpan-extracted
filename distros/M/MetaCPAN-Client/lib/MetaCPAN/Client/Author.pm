@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Author;
 # ABSTRACT: An Author data object
-$MetaCPAN::Client::Author::VERSION = '2.042000';
+$MetaCPAN::Client::Author::VERSION = '2.043000';
 use Moo;
 use Ref::Util qw< is_arrayref >;
 
@@ -13,8 +13,9 @@ my %known_fields = (
         city
         country
         gravatar_url
+        is_pause_custodial_account
         name
-        ascii_name
+        asciiname
         pauseid
         region
         updated
@@ -93,7 +94,7 @@ MetaCPAN::Client::Author - An Author data object
 
 =head1 VERSION
 
-version 2.042000
+version 2.043000
 
 =head1 SYNOPSIS
 

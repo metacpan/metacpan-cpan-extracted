@@ -1,55 +1,238 @@
 ======================================================================
- JSON::LINQ សន្លឹកបញ្ជី                                       [KM] ភាសាខ្មែរ
+ JSON::LINQ សន្លឹកបញ្ជី                                 [KM] ភាសាខ្មែរ
 ======================================================================
 
-ចំណុចប្រទាក់សំណួរ LINQ សម្រាប់ JSON និង JSONL
+[ 1. ការបង្កើតសំណួរ ]
 
-[ 1. 1. ការបង្កើតសំណួរ ]
+  use JSON::LINQ;
 
-  FromJSON, FromJSONL, FromJSONString, From, Empty, Range, Repeat
+  # ពីឯកសារ JSON (អារ៉េកំពូល)
+  my $q = JSON::LINQ->FromJSON('data.json');
 
-[ 2. 2. ការត្រង ]
+  # ពីឯកសារ JSONL (ស្ត្រីមីង)
+  my $q = JSON::LINQ->FromJSONL('events.jsonl');
 
-  Where
+  # ពីខ្សែអក្សរ JSON
+  my $q = JSON::LINQ->FromJSONString('[{"id":1},{"id":2}]');
 
-[ 3. 3. ការព្រួញ ]
+  # ពីឯកសារ LTSV (label:value, TAB-ផ្តាច់, ស្ត្រីមីង)
+  my $q = JSON::LINQ->FromLTSV('data.ltsv');
+  # ភីន្សារ CSV (រពឌ៏ឋនឹង = ក្លាយពែល, ឫស្សណឹមឹង)
+  my $q = JSON::LINQ->FromCSV('data.csv');
+  my $q = JSON::LINQ->FromCSV('data.csv', sep => "\t");         # TSV
+  my $q = JSON::LINQ->FromCSV('f.csv', headers=>[qw(a b c)]);  # រពឌ៏ឋថ្វីយធម៓ក្លាយពែល
+  my $q = JSON::LINQ->FromCSV('f.csv', headers=>[qw(a b c)], skip_header=>1);
 
-  Select, SelectMany
+  # ពីអារ៉េក្នុងអង្គចងចាំ
+  my $q = JSON::LINQ->From(\@array);
 
-[ 4. 4. ការតម្រៀប ]
+  # លំដាប់ទទេ
+  my $q = JSON::LINQ->Empty();
 
-  OrderBy, OrderByDescending, OrderByNum, OrderByStr, ThenBy, Reverse
+  # លំដាប់លេខ: 1, 2, 3, 4, 5
+  my $q = JSON::LINQ->Range(1, 5);
 
-[ 5. 5. ការបែងចែកទំព័រ ]
+  # ធាតុត្រូវបំរើ N ដង
+  my $q = JSON::LINQ->Repeat("x", 3);
 
-  Skip, Take, SkipWhile, TakeWhile
+  # ចំណាំ: បន្ទាប់ពីហៅ terminal method អ្នកបំប៉ន់ត្រូវបានប្រើហើយ។
+  # ដើម្បីសំណួរម្ដងទៀត ហៅ From*/From ម្ដងទៀត។
 
-[ 6. 6. ការដាក់ជាក្រុម ]
+[ 2. ការត្រង ]
 
-  GroupBy, ToLookup
+  ->Where(sub { $_[0]{status} eq '200' })
+  ->Where(sub { $_[0]{score} >= 80 })
+  ->Where(sub { defined $_[0]{email} && $_[0]{email} ne '' })
 
-[ 7. 7. ការប្រមូលផ្តុំ ]
+[ 3. ការព្រួញ ]
 
-  Count, Sum, Average, Min, Max, First, Last, Any, All, ForEach, Aggregate
+  # Select: បំប្លែងធាតុនីមួយៗ
+  ->Select(sub { { path => $_[0]{url}, code => $_[0]{status} } })
+  ->Select(sub { $_[0]{name} })
 
-[ 8. 8. ប្រតិបត្តិការសំណុំ ]
+  # SelectMany: ធ្វើឱ្យអារ៉េដំឡើងស្រាក (selector ត្រូវ return ARRAY ref)
+  ->SelectMany(sub { [ @{ $_[0]{tags} } ] })
 
-  Distinct, Union, Intersect, Except
+[ 4. ការតម្រៀប ]
 
-[ 9. 9. ការបំលែង ]
+  # គ្រាប់ចុចដំបូង -- ឆ្លាត (ជាលេខប្រសិនបើទាំងពីរមើលទៅដូចជាលេខ)
+  ->OrderBy(sub { $_[0]{name} })
+  ->OrderByDescending(sub { $_[0]{score} })
 
-  ToJSON, ToJSONL, ToArray, ToDictionary, ToLookup
+  # គ្រាប់ចុចដំបូង -- បង្ខំការប្រៀបធៀបជាលេខ
+  ->OrderByNum(sub { $_[0]{price} })
+  ->OrderByNumDescending(sub { $_[0]{amount} })
 
-[ 10. 10. ការភ្ជាប់ ]
+  # គ្រាប់ចុចដំបូង -- បង្ខំការប្រៀបធៀបខ្សែអក្សរ (cmp)
+  ->OrderByStr(sub { $_[0]{code} })
+  ->OrderByStrDescending(sub { $_[0]{name} })
 
-  Join, GroupJoin, Concat, Zip
+  # គ្រាប់ចុចទីពីរ (ភ្ជាប់ after OrderBy*)
+  ->ThenBy(sub { $_[0]{name} })              # ឆ្លាត ឡើង
+  ->ThenByDescending(sub { $_[0]{score} })   # ឆ្លាត ចុះ
+  ->ThenByNum(sub { $_[0]{age} })            # ជាលេខ ឡើង
+  ->ThenByNumDescending(sub { $_[0]{age} })  # ជាលេខ ចុះ
+  ->ThenByStr(sub { $_[0]{name} })           # ខ្សែអក្សរ ឡើង
+  ->ThenByStrDescending(sub { $_[0]{name} }) # ខ្សែអក្សរ ចុះ
 
-[ 11. 11. តម្លៃប៊ូលីន ]
+  ->Reverse()  # បញ្ច្រាស់លំដាប់បច្ចុប្បន្ន
 
-  JSON::LINQ::true / JSON::LINQ::false
+[ 5. ការបែងចែកទំព័រ ]
 
-[ 12. 12. តំណយោង ]
+  ->Skip(10)  # រំលង 10 ដំបូង
+  ->Take(5)   # យក 5 បន្ទាប់
+  ->SkipWhile(sub { $_[0]{score} < 80 })
+  ->TakeWhile(sub { $_[0]{score} >= 80 })
 
-  https://metacpan.org/dist/JSON-LINQ
+[ 6. ការដាក់ជាក្រុម ]
+
+  # GroupBy: ត្រឡប់ { Key => '...', Elements => [...] }
+  my @groups = $q->GroupBy(sub { $_[0]{category} })->ToArray();
+  for my $g (@groups) {
+      printf "%s: %d\n", $g->{Key}, scalar @{$g->{Elements}};
+  }
+
+  # ToLookup: ត្រឡប់ hashref of arrayrefs
+  my %lookup = %{ $q->ToLookup(sub { $_[0]{dept} }) };
+  my @eng = @{ $lookup{Engineering} };
+
+  # ToLookup ជាមួយ value selector
+  my %names = %{ $q->ToLookup(sub { $_[0]{dept} },
+                               sub { $_[0]{name} }) };
+
+[ 7. ប្រតិបត្តិការសំណុំ ]
+
+  ->Distinct()                          # deduplicate (by value)
+  ->Distinct(sub { $_[0]{id} })         # deduplicate by key
+  ->Union($other_q)                     # set union (no duplicates)
+  ->Union($other_q, sub { $_[0]{id} })  # union by key
+  ->Intersect($other_q)                 # set intersection
+  ->Intersect($other_q, sub { ... })    # intersection by key
+  ->Except($other_q)                    # set difference
+  ->Except($other_q, sub { ... })       # difference by key
+  ->SequenceEqual($other_q)             # true if equal sequence
+
+[ 8. ការភ្ជាប់ (Join) ]
+
+  # Join (ការភ្ជាប់ខាងក្នុង)
+  $outer->Join($inner_q,
+      sub { $_[0]{dept_id} },              # outer key selector
+      sub { $_[0]{id} },                   # inner key selector
+      sub { { name => $_[0]{name},
+              dept => $_[1]{name} } }      # result selector
+  )
+
+  # GroupJoin (ការភ្ជាប់ខាងក្រៅឆ្វេង)
+  $outer->GroupJoin($inner_q,
+      sub { $_[0]{id} },                   # outer key selector
+      sub { $_[0]{user_id} },              # inner key selector
+      sub { my($o, $i_group) = @_;
+            { name   => $o->{name},
+              orders => [ $i_group->ToArray() ] } }
+  )
+
+  # JOIN: JSON មេ × LTSV ស (ដំណោះស្រាយនាយកដ្ឋាន)
+  my $depts = JSON::LINQ->FromLTSV('departments.ltsv');
+  JSON::LINQ->FromJSON('employees.json')
+      ->Join($depts,
+          sub { $_[0]{dept_id} },
+          sub { $_[0]{id}      },
+          sub { { name => $_[0]{name}, dept => $_[1]{name} } })
+      ->ToArray();
+
+  # JOIN: LTSV មេ × JSON ស (តម្លៃមេ)
+  my $prices = JSON::LINQ->FromJSON('prices.json');
+  JSON::LINQ->FromLTSV('orders.ltsv')
+      ->Join($prices,
+          sub { $_[0]{sku} },
+          sub { $_[0]{sku} },
+          sub { { order_id => $_[0]{id},
+                  amount   => $_[0]{qty} * $_[1]{price} } })
+      ->ToArray();
+
+  # JOIN: CSV ចម្បង × JSON រង (ទំល័លា)
+  my $prices = JSON::LINQ->FromJSON('prices.json');
+  JSON::LINQ->FromCSV('orders.csv')
+      ->Join($prices, sub { $_[0]{sku} }, sub { $_[0]{sku} },
+          sub { { order_id => $_[0]{id}, amount => $_[0]{qty} * $_[1]{price} } })
+      ->ToArray();
+
+[ 9. ការប្រមូលផ្តុំ (Terminal) ]
+
+  ->ToArray()                            # collect all elements
+  ->ToList()                             # same as ToArray()
+  ->Count()                              # element count
+  ->Count(sub { $_[0] > 5 })            # conditional count
+  ->Sum(sub { $_[0]{amount} })          # sum of selector values
+  ->Average(sub { $_[0]{score} })       # mean (die if empty)
+  ->AverageOrDefault(sub { ... })       # mean or undef if empty
+  ->Min(sub { $_[0]{price} })           # minimum
+  ->Max(sub { $_[0]{price} })           # maximum
+  ->First()                             # first element (die if empty)
+  ->First(sub { $_[0] > 5 })            # first match (die if none)
+  ->FirstOrDefault()                    # first or undef
+  ->FirstOrDefault(sub { $_[0] > 5 })   # first match or undef
+  ->Last()                              # last element (die if empty)
+  ->Last(sub { $_[0] > 5 })             # last match (die if none)
+  ->LastOrDefault()                     # last or undef
+  ->LastOrDefault(sub { $_[0] > 5 })    # last match or undef
+  ->Single()                            # exactly one (else die)
+  ->SingleOrDefault()                   # one or undef
+  ->ElementAt($n)                       # element at index $n (0-based)
+  ->ElementAtOrDefault($n)              # element at $n or undef
+  ->Any()                               # true if non-empty
+  ->Any(sub { $_[0] > 5 })              # true if any match
+  ->All(sub { $_[0] > 0 })              # true if all match
+  ->Contains($value)                    # true if value present
+  ->ForEach(sub { print $_[0] })        # side-effect per element
+  ->Aggregate($seed, sub { $_[0] + $_[1] })  # fold/reduce
+
+[ 10. វិធីសាស្ត្រផ្សេងទៀត ]
+
+  ->Concat($other_q)                    # concatenate two sequences
+  ->DefaultIfEmpty($default)            # return $default if empty
+  ->Zip($other_q, sub { "$_[0]-$_[1]" }) # combine element-wise
+
+[ 11. វិធីសាស្ត្របំបែរ ]
+
+  ->ToArray()                           # returns Perl array
+  ->ToList()                            # alias for ToArray()
+  ->ToDictionary(sub { $_[0]{id} })     # hashref: key => element
+  ->ToDictionary(sub { $_[0]{id} },     # hashref: key => value
+                 sub { $_[0]{name} })
+  ->ToLookup(sub { $_[0]{dept} })       # hashref: key => [elements]
+  ->ToLookup(sub { $_[0]{dept} },       # hashref: key => [values]
+             sub { $_[0]{name} })
+  ->ToJSON('output.json')               # សរសេរជាឯកសារ JSON array
+  ->ToJSONL('output.jsonl')             # សរសេរជាឯកសារ JSONL
+  ->ToLTSV('output.ltsv')                        # សរសេរជាឯកសារ LTSV (គ្រប់ key, តាមអក្ខរក្រម)
+  ->ToLTSV('out.ltsv', label_order=>[qw(a b c)]) # បញ្ចេញ label ដែលបញ្ជាក់ តាមលំដាប់ដែលបញ្ជាក់
+  ->ToLTSV('out.ltsv', headers    =>[qw(a b c)]) # ឈ្មោះក្លេង label_order
+  ->ToCSV('output.csv')                        # សឮស្រ ភៃន CSV (វឹសេស）
+  ->ToCSV('out.csv', headers=>[qw(a b c)])     # ជួរដើសេហឺលាឋតាមល័ឋវេលា
+  ->ToCSV('out.csv', label_order=>[qw(a b c)]) # ចើស្ម៏ headers
+  ->ToCSV('out.csv', sep=>"\t", no_header=>1)   # TSV, ប្លែនក្លាយពែល
+
+[ 12. តម្លៃប៊ូលីន ]
+
+  JSON::LINQ::true    # ខ្សែអក្សរ "true", ជាលេខ 1
+  JSON::LINQ::false   # ខ្សែអក្សរ "false", ជាលេខ 0
+
+  my $rec = { active => JSON::LINQ::true };
+  # ToJSON encode: {"active":true}
+
+[ 13. តំណយោង ]
+
+  JSON::LINQ (MetaCPAN):
+    https://metacpan.org/dist/JSON-LINQ
+
+  JSONL specification:
+    https://jsonlines.org/
+
+  LINQ (.NET) reference (semantic inspiration):
+    https://docs.microsoft.com/en-us/dotnet/api/system.linq
+
+  LTSV::LINQ (sister module for LTSV files):
+    https://metacpan.org/dist/LTSV-LINQ
 
 ======================================================================

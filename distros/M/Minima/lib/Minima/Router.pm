@@ -13,7 +13,10 @@ field $prefix = 'Controller';
 
 method match ($env)
 {
-    $router->match($env) // $special{not_found};
+    my $match = $router->match($env);
+    return $match if defined $match;
+
+    $self->not_found_route;
 }
 
 method read_file ($file)
@@ -28,23 +31,12 @@ method read_file ($file)
         next if /^\s*#|^\s*$/;
 
         # Extract data
+        $_ = trim $_;
         my ($method, $pattern, $controller, $action) = split;
 
-        # Fix controller prefix
-        $controller =~ s/^:+/${prefix}::/;
-
         # Build destination and options
-        my %dest = ( controller => $controller, action => $action );
-        my %opt;
-        if ($method eq '*') {
-            # Do nothing -- don't add a constraint
-        } elsif ($method eq 'GET') {
-            $opt{method} = [ qw/ GET HEAD / ];
-        } elsif ($method eq '_GET') {
-            $opt{method} = 'GET';
-        } else {
-            $opt{method} = $method;
-        }
+        my %dest = $self->_build_destination($controller, $action);
+        my %opt  = $self->_build_options($method);
 
         # Test the nature of the route
         if ($method eq '@') {
@@ -57,14 +49,52 @@ method read_file ($file)
     }
 }
 
+method _build_command ($command, $action)
+{
+    state %redirects = (
+        redirect           => 302,
+        r                  => 302,
+        redirect_permanent => 301,
+        rp                 => 301,
+    );
+
+    # Remove initial `@`
+    $command = substr($command, 1);
+
+    croak "Unknown route command `$command`.\n"
+        unless exists $redirects{$command};
+
+    (
+        redirect        => $action,
+        redirect_status => $redirects{$command}
+    )
+}
+
+method _build_destination ($controller, $action)
+{
+    if (defined $controller) {
+        # Check if it is a command
+        return $self->_build_command($controller, $action)
+            if $controller =~ /^@/;
+
+        # Fix controller prefix
+        $controller =~ s/^:+/${prefix}::/;
+    }
+
+    ( controller => $controller, action => $action )
+}
+
+method _build_options ($method)
+{
+    return () if ($method eq '*'); # Don't add a constraint
+    return ( method => [ qw/ GET HEAD / ] ) if $method eq 'GET';
+    return ( method => 'GET' ) if $method eq '_GET';
+    return ( method => $method );
+}
+
 method _connect
 {
     $router->connect(@_);
-}
-
-method error_route
-{
-    $special{server_error}
 }
 
 method clear_routes
@@ -77,6 +107,9 @@ method set_prefix ($new)
 {
     $prefix = $new;
 }
+
+method not_found_route  { $special{not_found} }
+method error_route      { $special{server_error} }
 
 __END__
 
@@ -178,10 +211,22 @@ exception. If desired, the method can utilize this argument.
 
 =item B<Controller>
 
-The name of the controller that will respond to this match, returned in
-the match hash reference with the key C<controller>. If the controller
-name starts with C<:>, a prefix (defaulting to C<Controller:>) is
-automatically prepended. This prefix can be customized using
+The controller column determines how Minima handles a matching route.
+It may be written in one of the following forms:
+
+=over 4
+
+=item C<My::Controller>
+
+A plain controller name. This value is returned in the match hash
+reference with the key C<controller>.
+
+=item C<:Main>
+
+A controller name beginning with C<:>. In this form, a prefix
+(defaulting to C<Controller>) is automatically prepended, with the C<::>
+package separator added by the router. For example, C<:Main> maps to
+C<Controller::Main>. This prefix can be customized using
 L<C<set_prefix>|/set_prefix>.
 
 B<Note:> When using L<Minima::Router> through the default Minima::App,
@@ -189,13 +234,22 @@ the controller prefix may also be set via the
 L<C<controller_prefix>|Minima::App/controller_prefix> configuration key,
 without needing to call C<set_prefix> directly.
 
-This may be left blank only if the next column is also blank, which will
-be translated as C<undef> in the match hash.
+=item C<@command>
+
+A route command, not a controller name. Commands are handled directly by
+the framework instead of being loaded as controller classes. See
+L</Commands> for the available route commands.
+
+=back
+
+This column may be left blank only if the next column is also blank,
+which will be translated as C<undef> in the match hash.
 
 =item B<Action>
 
-Name of the method that should be called on the controller to this
-match, returned in the match hash reference with the key C<action>.
+Name of the method that should be called on the controller for this
+match, returned in the match hash reference with the key C<action>. For
+route commands, this value is interpreted by the command.
 
 This may be left blank, which will be translated as C<undef> in the
 match hash.
@@ -205,12 +259,33 @@ match hash.
 For editing support in Vim, see
 L<vim-minima|https://github.com/tessarin/vim-minima>.
 
+=head2 Commands
+
+Route commands are placed in the controller column and begin with C<@>.
+They use the action column according to the command being called.
+
+=over 4
+
+=item C<@redirect>, C<@r>
+
+Redirects to the path or URL specified in the action column with a
+C<302> response.
+
+=item C<@redirect_permanent>, C<@rp>
+
+Redirects to the path or URL specified in the action column with a
+C<301> response.
+
+=back
+
 =head2 Example
 
     # Main Routes
     *       /               :Main         home
     GET     /about          :Main         about_page
     GET     /blog/{post}    Blog::Main    article
+    GET     /old            @redirect     /new
+    GET     /legacy         @rp           /archive
 
     # Form processing
     POST    /contact        :Form         contact
@@ -262,6 +337,14 @@ Note that this does not call the controller. It's up to the user to do
 that in order to perform the intended action. In a typical application,
 L<Minima::App> will perform the call.
 
+=head2 not_found_route
+
+    method not_found_route ()
+
+Returns the controller-action pair registered with the
+L<C<not_found>|/not_found> directive. If nothing was registered, returns
+C<undef>.
+
 =head2 read_file
 
     method read_file ($file)
@@ -276,6 +359,8 @@ more than one file.
 
 Sets the prefix for completing controller names when using the C<:>
 notation. Defaults to C<Controller>. See L</Controller> for details.
+Pass only the namespace prefix itself, without trailing C<:> or C<::>;
+the router adds C<::> automatically.
 
 If you are using Minima::Router through the default L<Minima::App>
 integration, you do not need to call this method directly. Instead, set

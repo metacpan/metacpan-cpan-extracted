@@ -30,6 +30,7 @@ Makefile.PL
 MANIFEST			This list of files
 README.md
 script/text-mapper
+share/apocalypse-example.txt
 share/apocalypse.txt
 share/black-and-white.txt
 share/bright-example.txt
@@ -37,6 +38,8 @@ share/bright.txt
 share/default.txt
 share/extract-svg.pl
 share/forgotten-depths.txt
+share/gazetteer-example.txt
+share/gazetteer.txt
 share/gnomeyland-example.png
 share/gnomeyland-example.txt
 share/gnomeyland.txt

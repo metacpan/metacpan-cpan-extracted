@@ -2,9 +2,9 @@ package App::Test::Generator::LCSAJ;
 
 use strict;
 use warnings;
-use Carp            qw(croak);
+use Carp qw(croak);
 use File::Basename  qw(basename);
-use File::Path      qw(make_path);
+use File::Path qw(make_path);
 use File::Spec;
 use JSON::MaybeXS;
 use PPI;
@@ -15,7 +15,7 @@ use Readonly;
 # --------------------------------------------------
 Readonly my $DEFAULT_OUT_DIR => 'lcsaj';
 
-our $VERSION = '0.33';
+our $VERSION = '0.38';
 
 =head1 NAME
 
@@ -45,7 +45,7 @@ calculation.
 
 =head1 VERSION
 
-Version 0.33
+Version 0.38
 
 =head2 generate
 
@@ -171,14 +171,14 @@ sub generate {
 #             may not be fully represented.
 # --------------------------------------------------
 sub _build_cfg {
-	my ($sub) = @_;
+	my $sub = $_[0];
 
 	# Return empty graph if the sub has no body block
-	my $block = $sub->block or return [];
+	my $block = $sub->block() or return [];
 
-	my @statements = $block->schildren;
+	my @statements = $block->schildren();
 	my @blocks;
-	my $id      = 1;
+	my $id = 1;
 	my $current = _new_block($id);
 
 	for my $stmt (@statements) {
@@ -225,7 +225,8 @@ sub _build_cfg {
 # Side effects: None.
 # --------------------------------------------------
 sub _new_block {
-	my ($id) = @_;
+	my $id = $_[0];
+
 	return { id => $id, lines => [], edges => [] };
 }
 
@@ -261,7 +262,7 @@ sub _connect_blocks {
 #             considered — simple expressions are not.
 # --------------------------------------------------
 sub _is_branch {
-	my ($stmt) = @_;
+	my $stmt = $_[0];
 
 	# Only compound statements can be branch points
 	return 0 unless $stmt->isa('PPI::Statement::Compound');
@@ -292,7 +293,7 @@ sub _is_branch {
 #             their target lines default to 0.
 # --------------------------------------------------
 sub _cfg_to_lcsaj {
-	my ($blocks) = @_;
+	my $blocks = $_[0];
 
 	# Build a lookup from block id to its first line number
 	my %id2line = map { $_->{id} => $_->{lines}[0] }
@@ -301,8 +302,8 @@ sub _cfg_to_lcsaj {
 	my @paths;
 
 	for my $b (@{$blocks}) {
-		# Skip blocks with no outgoing edges — they are leaf nodes
-		next unless @{ $b->{edges} };
+		next unless @{ $b->{edges} };	# Skip blocks with no outgoing edges — they are leaf nodes
+		next unless @{ $b->{lines} };   # skip empty blocks — avoids null-bounds paths
 
 		my $start = $b->{lines}[0];
 		my $end   = $b->{lines}[-1];
@@ -344,16 +345,35 @@ sub _cfg_to_lcsaj {
 sub _save_lcsaj {
 	my ($file, $dir, $paths) = @_;
 
+	# Derive the module-relative path (strip leading .../lib/ prefix)
+	my $rel = $file;
+
+	# Strip leading path up to and including 'lib/' — handles both
+	# absolute paths (/home/runner/.../lib/App/...) and relative (lib/App/...)
+	# Handle both Unix / and Windows \ separators
+	$rel =~ s{^(?:.*[/\\])?lib[/\\]}{};
+
+	my $base = basename($rel);
+
+	# Mirror the directory structure expected by _lcsaj_coverage_for_file:
+	# $dir / $rel.lcsaj / $base.lcsaj.json
+	my $subdir  = File::Spec->catfile($dir, "$rel.lcsaj");
+
 	# Create the output directory if it does not exist
-	make_path($dir) unless -d $dir;
+	make_path($subdir) unless -d $subdir;
+	my $out = File::Spec->catfile($subdir, "$base.lcsaj.json");
 
-	# Derive output filename from the source file basename
-	my $base = basename($file);
-	my $out  = File::Spec->catfile($dir, "$base.lcsaj.json");
+	# Remove degenerate paths (null bounds) and exact duplicates
+	# before serialising — guards against empty CFG blocks producing
+	# null start/end values, and branch splits creating identical records
+	my %seen;
+	my @clean = grep {
+		defined $_->{start} && defined $_->{end}
+		&& !$seen{"$_->{start}:$_->{end}:$_->{target}"}++
+	} @{$paths};
 
-	open my $fh, '>', $out
-		or croak "Cannot write LCSAJ output to $out: $!";
-	print $fh encode_json($paths);
+	open my $fh, '>', $out or croak "Cannot write LCSAJ output to $out: $!";
+	print $fh encode_json(\@clean);
 	close $fh;
 }
 

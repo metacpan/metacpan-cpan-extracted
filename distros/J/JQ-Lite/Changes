@@ -1,3 +1,17 @@
+2.46  2026-05-10
+
+  - Avoid string eval when evaluating select() arithmetic comparisons.
+  - Treat division and modulo by zero in select() arithmetic predicates as false.
+  - Bump module version to 2.46.
+
+2.45  2026-05-06
+
+  - Fix MANIFEST to include missing docs, installer, utility modules,
+    and test files in source distributions.
+  - Remove generated META.json and META.yml entries from MANIFEST so
+    manifest checks pass from a clean checkout.
+  - Bump module version to 2.45.
+
 2.44  2026-04-25
 
   - Refactor path traversal helpers to share array index normalization logic.

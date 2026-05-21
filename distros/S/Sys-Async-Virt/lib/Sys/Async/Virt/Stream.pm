@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1
-#                   and LibVirt version v11.10.0
+#                   and LibVirt version v12.3.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -16,17 +16,17 @@ use experimental 'signatures';
 use Future::AsyncAwait;
 use Object::Pad 0.821;
 
-class Sys::Async::Virt::Stream v0.2.3;
+class Sys::Async::Virt::Stream v0.6.3;
 
 use Carp qw(croak);
 use Future;
 use Future::Queue;
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v11.10.1;
+use Protocol::Sys::Virt::Remote::XDR v12.3.0;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
-field $_id :param :reader;
+field $_rpc_id :param :reader;
 field $_proc :param :reader;
 field $_client :param :reader;
 field $_direction :param :reader;
@@ -37,21 +37,23 @@ field $_queue = Future::Queue->new;
 
 async method receive() {
     if ($_direction eq 'send') {
-        die "Receive called on sending stream (id: $self->{id}";
+        die "Receive called on sending stream (id: $self->{id})";
     }
     if (my $e = $_pending_error) {
         $_pending_error = undef;
         die $e;
     }
 
-    return { data => '' } if $_finished->is_ready; # stop all reads
     return await $_queue->shift;
 }
 
-async method _dispatch_receive($data, $final) {
-    return if $_finished->is_ready; # discard all input
+async method _dispatch_receive($data, $hole, $eof, $final) {
     if ($final) {
         $_finished->done;
+        return;
+    }
+    if ($eof) {
+        $_queue->finish;
         return;
     }
     if ($_direction eq 'send') {
@@ -59,7 +61,7 @@ async method _dispatch_receive($data, $final) {
     }
 
     # throttle receiving if the queue gets too long
-    await $_queue->push($data);
+    await $_queue->push({ data => $data, hole => $hole });
     return;
 }
 
@@ -84,7 +86,7 @@ async method send($data, $offset = 0, $length = undef) {
 
     my $chunk = ($offset or $length) ? substr($data, $offset, $length) : $data;
     return await $_client->_send(
-        $_proc, $_id,
+        $_proc, $_rpc_id,
         data => $chunk );
 }
 
@@ -99,13 +101,13 @@ async method send_hole($length, $flags = 0) {
 
     return if $_finished->is_ready; # discard all transfers
     return await $_client->_send(
-        $_proc, $_id,
+        $_proc, $_rpc_id,
         hole => { length => $length, flags => $flags } );
 }
 
 async method abort() {
     return if $_finished->is_ready;
-    $_client->_send_finish( $_finished, $_proc, $_id, 1 );
+    $_client->_send_finish( $_proc, $_rpc_id, 1 );
     await $_finished;
 
     $self->cleanup;
@@ -126,7 +128,7 @@ method cleanup() {
 
 async method finish() {
     return if $_finished->is_ready;
-    $_client->_send_finish( $_finished, $_proc, $_id, 0 );
+    $_client->_send_finish( $_proc, $_rpc_id, 0 );
     await $_finished;
 
     $self->cleanup;
@@ -140,7 +142,7 @@ async method finish() {
 method DESTROY() {
     if (not $_finished->is_ready) {
         # abort the stream
-        $_client->_send_finish( undef, $_proc, $_id, 1 );
+        $_client->_send_finish( $_proc, $_rpc_id, 1 );
     }
 }
 
@@ -154,7 +156,7 @@ Sys::Async::Virt::Stream - Client side of a data transfer channel
 
 =head1 VERSION
 
-v0.2.3
+v0.6.3
 
 =head1 SYNOPSIS
 
@@ -281,7 +283,7 @@ L<LibVirt|https://libvirt.org>, L<Sys::Virt>
 =head1 LICENSE AND COPYRIGHT
 
 
-  Copyright (C) 2024-2025 Erik Huelsmann
+  Copyright (C) 2024-2026 Erik Huelsmann
 
 All rights reserved. This program is free software;
 you can redistribute it and/or modify it under the same terms as Perl itself.

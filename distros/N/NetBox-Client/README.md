@@ -69,6 +69,7 @@ NetBox version.
 
         my $netbox = NetBox::Client->new(
             'baseurl' => 'http://localhost:8001',
+            'key'     => 'authorization+key',
             'token'   => 'authorization+token',
             'mode'    => 'rest',
         );
@@ -82,6 +83,14 @@ NetBox version.
     - **token** => STRING
 
         Authorization token. Mandatory. Defaults to empty string.
+
+    - **key** => STRING
+
+        Authorization key. Optional. If set, v2 authorization schema will be used,
+        v1 (legacy) otherwise.
+
+        It is highly recommended to deploy v2 token format since v1 tokens will be
+        obsoleted in NetBox 4.6+ releases.
 
     - **mode** => 'rest' | 'graphql'
 
@@ -266,6 +275,10 @@ NetBox version.
 - Volodymyr Pidgornyi, vp&lt;at>dtel-ix.net;
 
 # **CHANGELOG**
+
+### v0.2.0 - 2026-05-06
+
+- added v2 authorization token support;
 
 ### v0.1.7 - 2026-04-03
 

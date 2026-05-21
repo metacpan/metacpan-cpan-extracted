@@ -185,7 +185,6 @@ Documentation is not available in this image. Please refer to the
 
 Mirrors of this repository are available at the following locations.
 
-* [Chaosdorf](https://chaosdorf.de/git/derf/Travel-Status-DE-DBRIS)
 * [Codeberg](https://codeberg.org/derf/Travel-Status-DE-DBRIS)
 * [Finalrewind](https://git.finalrewind.org/derf/Travel-Status-DE-DBRIS)
 * [GitHub](https://github.com/derf/Travel-Status-DE-DBRIS)

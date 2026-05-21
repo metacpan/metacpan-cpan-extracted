@@ -4,7 +4,8 @@ package Sidef::Types::Block::Block {
     use 5.016;
     use parent qw(Sidef::Object::Object);
 
-    use List::Util qw();
+    use List::Util   qw();
+    use Scalar::Util qw();
     use Sidef::Types::Number::Number;
 
     use overload
@@ -17,31 +18,34 @@ package Sidef::Types::Block::Block {
         my $addr = Scalar::Util::refaddr($self);
 
         my @vars = map {
-                (defined($_->{type}) ? (Sidef::normalize_type($_->{type}) . ' ') : '')
-              . ($_->{slurpy}        ? ($_->{array} ? '*' : ':')                 : '')
-              . Sidef::normalize_type($_->{name})
-              . (defined($_->{subset}) ? (' < ' . Sidef::normalize_type($_->{subset})) : '')
-              . ($_->{has_value}       ? ' = nil'                                      : '')
-        } @{$self->{vars}};
+            my $v   = $_;
+            my $str = defined($v->{type}) ? Sidef::normalize_type($v->{type}) . ' ' : '';
+            $str .= $v->{slurpy} ? ($v->{array} ? '*' : ':') : '';
+            $str .= Sidef::normalize_type($v->{name});
+            $str .= defined($v->{subset}) ? ' < ' . Sidef::normalize_type($v->{subset}) : '';
+            $str .= $v->{has_value}       ? ' = nil'                                    : '';
+            $str;
+        } @{$self->{vars} // []};
 
-        (
-         $self->{type} eq 'block'
-         ? ('{' . (@vars ? ('|' . join(',', @vars) . '|') : ''))
-         : ('func (' . join(', ', @vars) . ') {')
-        )
-          . " #`($name|$addr) ... }";
+        my $sig = @vars ? join(', ', @vars) : '';
+
+        my $prefix =
+          $self->{type} eq 'block'
+          ? '{' . ($sig ? "|$sig|" : '')
+          : "func ($sig) {";
+
+        return "$prefix #`($name|$addr) ... }";
       };
 
     sub _name {
         my ($self) = @_;
-        $self->{_name} //= Sidef::normalize_type(
-                                                 (
-                                                    exists($self->{class})     ? ($self->{class} . '.')
-                                                  : exists($self->{namespace}) ? ($self->{namespace} . '::')
-                                                  :                              ''
-                                                 )
-                                                 . ($self->{name} // '__FUNC__')
-                                                );
+        $self->{_name} //= do {
+            my $prefix =
+                exists($self->{class})     ? "$self->{class}."
+              : exists($self->{namespace}) ? "$self->{namespace}::"
+              :                              '';
+            Sidef::normalize_type($prefix . ($self->{name} // '__FUNC__'));
+        };
     }
 
     sub new {
@@ -87,224 +91,279 @@ package Sidef::Types::Block::Block {
 
     *do = \&run;
 
-    sub _multiple_dispatch {
-        my ($self, @args) = @_;
+    # Recursively walks the ISA hierarchy to discover additional method candidates
+    # from parent classes, appending them (with their kids/fallback) to @$methods.
+    sub _collect_inherited_methods {
+        my ($self, $methods) = @_;
 
-#<<<
-        my @methods = (
-            $self,
-            (exists($self->{kids})     ? @{$self->{kids}}  : ()),
-            (exists($self->{fallback}) ? $self->{fallback} : ())
-        );
-#>>>
+        my $limit = 4096;
+        my %visited;
 
-        if (defined($self->{class}) and defined($self->{name})) {
+        sub {
+            my ($block) = @_;
 
-            my $limit = 4096;
+            my $name = $block->{name};
+            my @isa  = do {
+                no strict 'refs';
+                @{$block->{class} . '::ISA'};
+            };
 
-            sub {
-                my ($block) = @_;
+            foreach my $class (@isa) {
+                next if $visited{$class}++;
+                substr($class, 0, 14) eq 'Sidef::Runtime' or next;
 
-                my $name = $block->{name};
-
-                my @isa = do {
+                my $method = do {
                     no strict 'refs';
-                    @{$block->{class} . '::' . 'ISA'};
+                    ${$class . '::__SIDEF_CLASS_METHODS__'}{$name};
                 };
 
-                foreach my $class (@isa) {
+                defined($method) or next;
 
-                    (substr($class, 0, 14) eq 'Sidef::Runtime')
-                      || next;
+                push @$methods, $method;
+                push @$methods, @{$method->{kids}}  if exists $method->{kids};
+                push @$methods, $method->{fallback} if exists $method->{fallback};
 
-                    my $method = do {
-                        no strict 'refs';
-                        ${$class . '::' . '__SIDEF_CLASS_METHODS__'}{$name};
-                    };
-
-                    if (defined($method)) {
-                        push @methods, $method;
-
-                        if (exists($method->{kids})) {
-                            push @methods, @{$method->{kids}};
-                        }
-
-                        if (exists($method->{fallback})) {
-                            push @methods, $method->{fallback};
-                        }
-
-                        if (--$limit == 0) {
-                            die "[ERROR] Too deep or cyclic class inheritance!";
-                        }
-
-                        __SUB__->($method);
-                    }
+                if (--$limit == 0) {
+                    die "[ERROR] Too deep or cyclic class inheritance!";
                 }
-              }
-              ->($self);
+
+                __SUB__->($method);
+            }
+          }
+          ->($self);
+    }
+
+    # Builds the full list of candidate methods: self, kids, fallback, and any
+    # candidates found by walking the class inheritance hierarchy.
+    sub _collect_candidate_methods {
+        my ($self) = @_;
+
+        my @methods = ($self);
+
+        if (exists $self->{kids}) {
+            push @methods, @{$self->{kids}};
         }
 
-      OUTER: foreach my $method (@methods) {
+        if (exists $self->{fallback}) {
+            push @methods, $self->{fallback};
+        }
 
-            if ($method->{type} eq 'block') {
-                return ($method, $method->{code}(@args));
-            }
+        if (defined $self->{class} and defined $self->{name}) {
+            $self->_collect_inherited_methods(\@methods);
+        }
 
-            my $table = $self->{table};
+        return @methods;
+    }
 
-            my %seen;
-            my @left_args;
-            my @vars = exists($method->{vars}) ? @{$method->{vars}} : ();
+    # Validates type and subset constraints for each parameter and assembles the
+    # final positional argument list for the call. Returns an \@pos_args arrayref,
+    # or undef if any constraint check fails.
+    sub _build_pos_args {
+        my ($method, $seen, $vars) = @_;
 
-            foreach my $arg (@args) {
-                if (ref($arg) eq 'Sidef::Variable::NamedParam') {
-                    if (exists $table->{$arg->{name}}) {
-                        my $info = $vars[$table->{$arg->{name}}];
-                        if (exists $info->{slurpy}) {
-                            $seen{$arg->{name}} = $arg->{value};
-                        }
-                        else {
-                            $seen{$arg->{name}} = $arg->{value}[-1];
-                        }
-                    }
-                    else {
-                        next OUTER;
-                    }
-                }
-                else {
-                    push @left_args, $arg;
-                }
-            }
+        my @pos_args;
 
-            foreach my $var (@vars) {
-                exists($seen{$var->{name}}) && next;
-                @left_args || last;
-                if (exists($var->{slurpy})) {
-                    $seen{$var->{name}} = [splice(@left_args)];
-                    last;
-                }
-                else {
-                    $seen{$var->{name}} = shift(@left_args);
-                }
-            }
+        foreach my $var (@$vars) {
+            if (exists($var->{type}) or exists($var->{subset})) {
 
-            @left_args && next;
+                if (exists $seen->{$var->{name}}) {
+                    my $value = $seen->{$var->{name}};
 
-            my @pos_args;
-            foreach my $var (@vars) {
-                if (exists($var->{type}) or exists($var->{subset})) {
-
-                    if (exists $seen{$var->{name}}) {
-                        my $value = $seen{$var->{name}};
-
-                        if (exists($var->{type})) {
-                            (ref($value) eq $var->{type} or UNIVERSAL::isa($value, $var->{type})) || next OUTER;
-
-                            if (exists($var->{where_block})) {
-                                $var->{where_block}($value) || next OUTER;
-                            }
-                            elsif (exists $var->{where_expr}) {
-                                $value eq $var->{where_expr} or next OUTER;
-                            }
-                        }
-
-                        if (exists($var->{subset})) {
-
-                            if (UNIVERSAL::isa($var->{subset}, 'Sidef::Object::Object')) {
-                                UNIVERSAL::isa($var->{subset}, ref($value)) || next OUTER;
-                            }
-
-                            if (exists($var->{where_block})) {
-                                $var->{where_block}($value) || next OUTER;
-                            }
-                            elsif (exists $var->{where_expr}) {
-                                $value eq $var->{where_expr} or next OUTER;
-                            }
-
-                            my $sub = UNIVERSAL::can($var->{subset}, '__subset_validation__');
-                            ($sub ? $sub->($value) : 1) || next OUTER;
-                        }
-
-                        push @pos_args, $value;
-                    }
-                    elsif (exists $var->{has_value}) {
-                        push @pos_args, undef;
-                    }
-                    else {
-                        next OUTER;
-                    }
-                }
-                elsif (exists $seen{$var->{name}}) {
-                    if (exists($var->{where_block}) or exists($var->{subset_blocks})) {
-
-                        my $value =
-                          exists($var->{slurpy})
-                          ? Sidef::Types::Array::Array->new([@{$seen{$var->{name}}}])
-                          : $seen{$var->{name}};
+                    if (exists $var->{type}) {
+                        (ref($value) eq $var->{type} or UNIVERSAL::isa($value, $var->{type}))
+                          or return undef;
 
                         if (exists $var->{where_block}) {
-                            $var->{where_block}($value) || next OUTER;
+                            $var->{where_block}($value) or return undef;
+                        }
+                        elsif (exists $var->{where_expr}) {
+                            $value eq $var->{where_expr} or return undef;
                         }
                     }
-                    elsif (exists $var->{where_expr}) {
-                        $var->{where_expr} eq $seen{$var->{name}} or next OUTER;
+
+                    if (exists $var->{subset}) {
+                        if (UNIVERSAL::isa($var->{subset}, 'Sidef::Object::Object')) {
+                            UNIVERSAL::isa($var->{subset}, ref($value)) or return undef;
+                        }
+
+                        if (exists $var->{where_block}) {
+                            $var->{where_block}($value) or return undef;
+                        }
+                        elsif (exists $var->{where_expr}) {
+                            $value eq $var->{where_expr} or return undef;
+                        }
+
+                        my $sub = UNIVERSAL::can($var->{subset}, '__subset_validation__');
+                        ($sub ? $sub->($value) : 1) or return undef;
                     }
 
-                    push @pos_args, exists($var->{slurpy}) ? @{$seen{$var->{name}}} : $seen{$var->{name}};
-                }
-                elsif (exists $var->{slurpy}) {
-                    ## ok
+                    push @pos_args, $value;
                 }
                 elsif (exists $var->{has_value}) {
                     push @pos_args, undef;
                 }
                 else {
-                    next OUTER;
+                    return undef;
                 }
-            }
 
-            return ($method, $method->{code}->(@pos_args));
+            }
+            elsif (exists $seen->{$var->{name}}) {
+
+                if (exists($var->{where_block})) {
+                    my $value =
+                      exists($var->{slurpy})
+                      ? Sidef::Types::Array::Array->new([@{$seen->{$var->{name}}}])
+                      : $seen->{$var->{name}};
+
+                    if (exists $var->{where_block}) {
+                        $var->{where_block}($value) or return undef;
+                    }
+                }
+                elsif (exists $var->{where_expr}) {
+                    $var->{where_expr} eq $seen->{$var->{name}} or return undef;
+                }
+
+                push @pos_args, exists($var->{slurpy})
+                  ? @{$seen->{$var->{name}}}
+                  : $seen->{$var->{name}};
+            }
+            elsif (exists $var->{slurpy}) {
+                ## ok - slurpy with no args supplied is valid
+            }
+            elsif (exists $var->{has_value}) {
+                push @pos_args, undef;
+            }
+            else {
+                return undef;
+            }
         }
 
-        my $name = $self->_name;
+        return \@pos_args;
+    }
 
-        die "[ERROR] $self->{type} `$name` does not match $name("
-          . join(', ', map { ref($_) ? Sidef::normalize_type(ref($_)) : defined($_) ? Sidef::normalize_type($_) : 'nil' } @args)
-          . "), invoked as "
-          . $name . '('
-          . join(
-            ', ',
-            map {
-                    ref($_) && UNIVERSAL::can($_, 'dump') ? $_->dump
-                  : ref($_)                               ? Sidef::normalize_type(ref($_))
-                  : defined($_)                           ? Sidef::normalize_type($_)
-                  : 'nil'
-              } @args
-          )
-          . ')'
+    # Partitions @$args into named and positional arguments, then binds them to the
+    # method's parameter list in order. Returns a \%seen hashref mapping variable
+    # names to their bound values, or undef if the method signature does not match.
+    sub _resolve_args {
+        my ($self, $method, $args, $vars) = @_;
+
+        my $table = $self->{table};
+        my %seen;
+        my @left_args;
+
+        # Separate named params from positional args, validating named params exist.
+        foreach my $arg (@$args) {
+            if (ref($arg) eq 'Sidef::Variable::NamedParam') {
+                exists($table->{$arg->{name}}) or return undef;
+                my $info = $vars->[$table->{$arg->{name}}];
+                $seen{$arg->{name}} =
+                  exists($info->{slurpy})
+                  ? $arg->{value}
+                  : $arg->{value}[-1];
+            }
+            else {
+                push @left_args, $arg;
+            }
+        }
+
+        # Bind remaining positional args to unbound parameters, in declaration order.
+        foreach my $var (@$vars) {
+            next if exists $seen{$var->{name}};
+            last unless @left_args;
+
+            if (exists $var->{slurpy}) {
+                $seen{$var->{name}} = [splice(@left_args)];
+                last;
+            }
+            else {
+                $seen{$var->{name}} = shift(@left_args);
+            }
+        }
+
+        # Any leftover positional args mean this method does not match.
+        return undef if @left_args;
+
+        return \%seen;
+    }
+
+    # Main entry point: finds and dispatches to the first matching method candidate.
+    sub _multiple_dispatch {
+        my ($self, @args) = @_;
+
+        my @methods = $self->_collect_candidate_methods;
+
+        foreach my $method (@methods) {
+
+            if ($method->{type} eq 'block') {
+                return ($method, $method->{code}(@args));
+            }
+
+            my $vars     = exists($method->{vars}) ? $method->{vars} : [];
+            my $seen     = $self->_resolve_args($method, \@args, $vars) // next;
+            my $pos_args = _build_pos_args($method, $seen, $vars)       // next;
+
+            return ($method, $method->{code}->(@$pos_args));
+        }
+
+        _dispatch_error($self, \@methods, \@args);
+    }
+
+    # Returns the display type string for an argument (used in the error header line).
+    sub _arg_type_str {
+        my ($arg) = @_;
+        return
+            ref($arg)     ? Sidef::normalize_type(ref($arg))
+          : defined($arg) ? Sidef::normalize_type($arg)
+          :                 'nil';
+    }
+
+    # Returns the display value string for an argument (used in the "invoked as" line).
+    sub _arg_value_str {
+        my ($arg) = @_;
+        return
+            ref($arg) && UNIVERSAL::can($arg, 'dump') ? $arg->dump
+          : ref($arg)                                 ? Sidef::normalize_type(ref($arg))
+          : defined($arg)                             ? Sidef::normalize_type($arg)
+          :                                             'nil';
+    }
+
+    # Formats a single parameter's signature fragment, e.g. "*SomeType varname < SubType".
+    sub _param_str {
+        my ($var) = @_;
+        return
+            (exists($var->{slurpy}) ? '*'                                       : '')
+          . (exists($var->{type})   ? Sidef::normalize_type($var->{type}) . ' ' : '')
+          . $var->{name}
+          . (exists($var->{subset}) ? ' < ' . Sidef::normalize_type($var->{subset}) : '');
+    }
+
+    # Formats a complete method signature string, e.g. "methodName(TypeA a, *B b)".
+    sub _method_signature_str {
+        my ($method) = @_;
+        my @params = map { _param_str($_) } @{$method->{vars} // []};
+        return $method->_name . '(' . join(', ', @params) . ')';
+    }
+
+    # Dies with a detailed message describing the failed dispatch and all candidates.
+    sub _dispatch_error {
+        my ($self, $methods, $args) = @_;
+
+        my $name       = $self->_name;
+        my $arg_types  = join(', ',     map { _arg_type_str($_) } @$args);
+        my $arg_values = join(', ',     map { _arg_value_str($_) } @$args);
+        my $candidates = join("\n    ", map { _method_signature_str($_) } @$methods);
+
+        die "[ERROR] $self->{type} `$name` does not match $name($arg_types)"
+          . ", invoked as $name($arg_values)"
           . "\n\nPossible candidates are: "
           . "\n    "
-          . join(
-            "\n    ",
-            map {
-                $_->_name . '(' . join(
-                    ', ',
-                    map {
-                            (exists($_->{slurpy}) ? '*'                                       : '')
-                          . (exists($_->{type})   ? (Sidef::normalize_type($_->{type}) . ' ') : '')
-                          . $_->{name}
-                          . (exists($_->{subset}) ? (' < ' . Sidef::normalize_type($_->{subset})) : '')
-                    } @{$_->{vars}}
-                  )
-                  . ')'
-              } @methods
-          ) . "\n\n";
+          . $candidates . "\n\n";
     }
 
     sub call {
         my ($block, @args) = @_;
 
-        # Handle block calls
+        # Fast block call routing
         if ($block->{type} eq 'block') {
             shift @_;
             goto $block->{code};
@@ -316,22 +375,17 @@ package Sidef::Types::Block::Block {
         if (exists $self->{returns}) {
 
             if ($#{$self->{returns}} != $#objs) {
-                die qq{[ERROR] Wrong number of return values from $self->{type} `}
-                  . $self->_name
-                  . "`: got "
-                  . scalar(@objs)
-                  . ", but expected "
-                  . scalar(@{$self->{returns}}) . "\n";
+                die sprintf("[ERROR] Wrong number of return values from %s `%s`: got %d, but expected %d\n",
+                            $self->{type}, $self->_name, scalar(@objs), scalar(@{$self->{returns}}));
             }
 
             foreach my $i (0 .. $#{$self->{returns}}) {
-                if (not(ref($objs[$i]) eq ($self->{returns}[$i]) or UNIVERSAL::isa($objs[$i], $self->{returns}[$i]))) {
-                    die qq{[ERROR] Invalid return-type for value[$i] from $self->{type} `}
-                      . $self->_name
-                      . "`: got `"
-                      . Sidef::normalize_type(ref($objs[$i]))
-                      . qq{`, but expected `}
-                      . Sidef::normalize_type($self->{returns}[$i]) . "`\n";
+                my $ret_type = $self->{returns}[$i];
+                if (!(ref($objs[$i]) eq $ret_type or UNIVERSAL::isa($objs[$i], $ret_type))) {
+                    die sprintf("[ERROR] Invalid return-type for value[%d] from %s `%s`: got `%s`, but expected `%s`\n",
+                                $i, $self->{type}, $self->_name,
+                                Sidef::normalize_type(ref($objs[$i])),
+                                Sidef::normalize_type($ret_type));
                 }
             }
         }
@@ -347,7 +401,7 @@ package Sidef::Types::Block::Block {
             sub {
                 my @args = @_;
                 local *UNIVERSAL::AUTOLOAD = $ref;
-                if (defined($a) || defined($b)) { push @args, $a, $b }
+                if (defined($a) or defined($b)) { push @args, $a, $b }
                 elsif (defined($_)) { unshift @args, $_ }
                 $self->call(map { Sidef::Types::Perl::Perl->to_sidef($_) } @args);
             };
@@ -438,41 +492,26 @@ package Sidef::Types::Block::Block {
 
         if ($ref eq 'Sidef::Types::Number::Number') {
             my ($type, $str) = $obj->_dump();
-
-            if ($type eq 'int') {
-                return scalar {dump => ($ref . "::_set_int('${str}')")};
-            }
-
-            return scalar {dump => ($ref . "::_set_str('${type}', '${str}')")};
+            return
+              scalar {
+                      dump => $type eq 'int'
+                      ? "${ref}::_set_int('${str}')"
+                      : "${ref}::_set_str('${type}', '${str}')"
+                     };
         }
 
         if ($ref eq 'Sidef::Module::OO' or $ref eq 'Sidef::Module::Func') {
 
-            my $module = (
-                          ref($obj->{module})
-                          ? Data::Dump::Filtered::dump_filtered($obj->{module}, __SUB__)
-                          : qq{"$obj->{module}"}
-                         );
+            my $module =
+              ref($obj->{module})
+              ? Data::Dump::Filtered::dump_filtered($obj->{module}, __SUB__)
+              : qq{"$obj->{module}"};
 
             my $module_name = ref($obj->{module}) || $obj->{module};
-
-            my $code = {
-                dump => qq{
-                    do {
-                        use $ref;
-                        eval "require $module_name";
-                        bless({ module => $module }, "$ref");
-                    }
-                }
-            };
-
-            return $code;
+            return scalar {dump => qq{do { use $ref; eval "require $module_name"; bless({ module => $module }, "$ref"); }}};
         }
 
-        if ($ref eq 'Sidef::Types::Block::Block') {
-            die "[ERROR] Blocks cannot be serialized!";
-        }
-
+        die "[ERROR] Blocks cannot be serialized!" if $ref eq 'Sidef::Types::Block::Block';
         return;
     }
 
@@ -523,15 +562,7 @@ package Sidef::Types::Block::Block {
             *threads::wait = \&threads::join;
             1;
         };
-        Sidef::Module::OO->__NEW__(
-                                   threads->create(
-                                                   {
-                                                    'context' => 'list',
-                                                    'exit'    => 'thread_only'
-                                                   },
-                                                   sub { $self->call(@args) }
-                                                  )
-                                  );
+        Sidef::Module::OO->__NEW__(threads->create({'context' => 'list', 'exit' => 'thread_only'}, sub { $self->call(@args) }));
     }
 
     *thr = \&thread;
@@ -545,7 +576,7 @@ package Sidef::Types::Block::Block {
 
             my $sub = (ref($obj) && UNIVERSAL::can($obj, 'iter')) || do {
                 my $arr = eval { ref($obj) ? $obj->to_a : Sidef::Types::Array::Array->new($obj) };
-                ref($arr) ? do { $obj = $arr; UNIVERSAL::can($obj, 'iter') } : ();
+                ref($arr) ? do { $obj = $arr; UNIVERSAL::can($obj, 'iter') } : undef;
             };
 
             my $break;
@@ -553,13 +584,10 @@ package Sidef::Types::Block::Block {
 
             while (1) {
                 $break = 1;
-                $callback->(
-                            $iter->run // do { undef $break; last }
-                           );
+                $callback->($iter->run // do { undef $break; last });
                 undef $break;
             }
-
-            return if $break;
+            return if $break;    # Sidef block-exit control flow
         }
 
         return 1;
@@ -570,8 +598,7 @@ package Sidef::Types::Block::Block {
         require Time::HiRes;
         my $t0 = [Time::HiRes::gettimeofday()];
         $self->run;
-        my $elapsed = Time::HiRes::tv_interval($t0);
-        Sidef::Types::Number::Number->new($elapsed);
+        Sidef::Types::Number::Number->new(scalar Time::HiRes::tv_interval($t0));
     }
 
     sub for {
@@ -587,14 +614,7 @@ package Sidef::Types::Block::Block {
         my ($self, @objs) = @_;
 
         my @array;
-
-        _iterate(
-            sub {
-                push @array, $self->run(@_);
-            },
-            @objs
-        );
-
+        _iterate(sub { push @array, $self->run(@_) }, @objs);
         Sidef::Types::Array::Array->new(\@array);
     }
 
@@ -602,16 +622,7 @@ package Sidef::Types::Block::Block {
         my ($self, @objs) = @_;
 
         my @array;
-
-        _iterate(
-            sub {
-                if ($self->run(@_)) {
-                    push @array, @_;
-                }
-            },
-            @objs
-        );
-
+        _iterate(sub { push @array, @_ if $self->run(@_) }, @objs);
         Sidef::Types::Array::Array->new(\@array);
     }
 
@@ -651,7 +662,7 @@ package Sidef::Types::Block::Block {
         my $nth = undef;
 
         $n = CORE::int($n);
-        $n > 0 || return undef;
+        $n > 0 or return undef;
 
         _iterate(
             sub {
@@ -666,18 +677,9 @@ package Sidef::Types::Block::Block {
         return $nth;
     }
 
-    sub sum {
-        my ($self, $range) = @_;
-        $range->sum_by($self);
-    }
-
+    sub sum { $_[1]->sum_by($_[0]) }
     *Σ = \&sum;
-
-    sub prod {
-        my ($self, $range) = @_;
-        $range->prod_by($self);
-    }
-
+    sub prod { $_[1]->prod_by($_[0]) }
     *Π = \&prod;
 
     sub cache {

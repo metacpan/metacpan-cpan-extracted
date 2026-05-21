@@ -1,0 +1,18 @@
+Changes                          This is the Changes File
+Makefile.PL
+MANIFEST
+README.md
+lib/Test/SPDX/Coverage.pm        This is the Package File
+perl-Test-SPDX-Coverage.spec
+t/001_load.t
+t/002_manifest.t
+manifest.examples.txt
+examples/test_case_mit.test
+examples/test_case_same_as_perl_itself.test
+examples/test_case_gpl_with_exception.test
+examples/test_case_mit_or_apache.test
+t/003_manifest_not_found.t
+t/spdx-coverage.t
+t/spdx-coverage-options.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

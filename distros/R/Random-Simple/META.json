@@ -32,7 +32,6 @@
       },
       "runtime" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "7.12",
             "perl" : "5.014"
          }
       },
@@ -54,6 +53,6 @@
          "web" : "https://github.com/scottchiefbaker/perl-Random-Simple"
       }
    },
-   "version" : "0.26",
+   "version" : "0.28",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

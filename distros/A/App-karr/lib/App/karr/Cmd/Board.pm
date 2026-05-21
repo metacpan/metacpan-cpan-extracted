@@ -1,7 +1,7 @@
 # ABSTRACT: Show board summary
 
 package App::karr::Cmd::Board;
-our $VERSION = '0.102';
+our $VERSION = '0.205';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -35,11 +35,8 @@ my %PRIORITY_COLOR = (
 sub execute {
   my ($self, $args_ref, $chain_ref) = @_;
 
-  my $config = App::karr::Config->new(
-    file => $self->board_dir->child('config.yml'),
-  );
-
-  my @statuses = $config->statuses;
+  my $ec = $self->store->effective_config;
+  my @statuses = $self->store->all_status_names;
   my @tasks = $self->load_tasks;
 
   my %by_status;
@@ -48,7 +45,7 @@ sub execute {
   }
 
   if ($self->json) {
-    my $board_name = $config->data->{board}{name} // 'Kanban Board';
+    my $board_name = $ec->{board}{name} // 'Kanban Board';
     my %board_data = (
       name     => $board_name,
       total    => scalar @tasks,
@@ -77,7 +74,7 @@ sub execute {
     return;
   }
 
-  my $board_name = $config->data->{board}{name} // 'Kanban Board';
+  my $board_name = $ec->{board}{name} // 'Kanban Board';
   my $title = colored(" $board_name ", 'bold white on_black');
   print "\n $title\n\n";
 
@@ -147,7 +144,7 @@ App::karr::Cmd::Board - Show board summary
 
 =head1 VERSION
 
-version 0.102
+version 0.205
 
 =head1 SYNOPSIS
 
@@ -192,11 +189,11 @@ L<App::karr::Cmd::Pick>, L<App::karr::Cmd::Context>
 =head2 Issues
 
 Please report bugs and feature requests on GitHub at
-L<https://github.com/Getty/p5-app-karr/issues>.
+L<https://github.com/Getty/karr/issues>.
 
 =head2 IRC
 
-Join C<#ai> on C<irc.perl.org> or message Getty directly.
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
 
 =head1 CONTRIBUTING
 
@@ -204,7 +201,7 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

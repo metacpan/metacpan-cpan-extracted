@@ -1,7 +1,6 @@
 use strict;
 use warnings;
-use Test::More;
-use MyNote;
+use MyTest;
 
 use UUID qw(parse unparse generate_v5 uuid5);
 

@@ -31,7 +31,7 @@ use warnings;
 
 BEGIN
 {
-    use ok( 'Mail::Make::Headers' );
+    use_ok( 'Mail::Make::Headers' ) or BAIL_OUT( 'Unable to load Mail::Make::Headers' );
 };
 
 # NOTE: new / basic push/get

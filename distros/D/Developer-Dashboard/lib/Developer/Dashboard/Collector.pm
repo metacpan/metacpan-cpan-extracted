@@ -3,8 +3,9 @@ package Developer::Dashboard::Collector;
 use strict;
 use warnings;
 
-our $VERSION = '3.14';
+our $VERSION = '3.90';
 
+use Fcntl qw(:flock);
 use File::Spec;
 use POSIX qw(strftime);
 use Time::HiRes qw(time);
@@ -93,25 +94,27 @@ sub write_result {
     my $timestamp = _now_iso8601();
     $self->_atomic_write_text( $paths->{last_run}, $timestamp . "\n" );
 
-    my $previous = $self->read_status($name) || {};
-    my $status = {
-        %$previous,
-        name             => $name,
-        enabled          => exists $result{enabled} ? $result{enabled} : 1,
-        running          => exists $result{running} ? $result{running} : 0,
-        last_run         => $timestamp,
-        last_completed_at=> $timestamp,
-        last_exit_code   => $result{exit_code},
-        last_success     => $result{exit_code} ? 0 : 1,
-        last_success_at  => $result{exit_code} ? ( $previous->{last_success_at} || undef ) : $timestamp,
-        last_failure_at  => $result{exit_code} ? $timestamp : ( $previous->{last_failure_at} || undef ),
-        last_started_at  => $result{started_at} || $previous->{last_started_at},
-        output_format    => $result{output_format},
-        timed_out        => $result{timed_out} ? 1 : 0,
-        updated_at_epoch => time,
-    };
-
-    my $written = $self->_atomic_write_json( $paths->{status}, $status );
+    my $written = $self->update_status(
+        $name,
+        sub {
+            my ($previous) = @_;
+            return {
+                %{$previous},
+                enabled          => exists $result{enabled} ? $result{enabled} : 1,
+                running          => exists $result{running} ? $result{running} : 0,
+                active_runs      => exists $result{active_runs} ? $result{active_runs} : ( $previous->{active_runs} || 0 ),
+                last_run         => $timestamp,
+                last_completed_at=> $timestamp,
+                last_exit_code   => $result{exit_code},
+                last_success     => $result{exit_code} ? 0 : 1,
+                last_success_at  => $result{exit_code} ? ( $previous->{last_success_at} || undef ) : $timestamp,
+                last_failure_at  => $result{exit_code} ? $timestamp : ( $previous->{last_failure_at} || undef ),
+                last_started_at  => $result{started_at} || $previous->{last_started_at},
+                output_format    => $result{output_format},
+                timed_out        => $result{timed_out} ? 1 : 0,
+            };
+        }
+    );
     $self->append_log_entry(
         $name,
         happened_at => $timestamp,
@@ -129,15 +132,82 @@ sub write_result {
 # Output: written status file path.
 sub write_status {
     my ( $self, $name, $status ) = @_;
+    return $self->update_status(
+        $name,
+        sub {
+            my ($existing) = @_;
+            return {
+                %{$existing},
+                %{ $status || {} },
+            };
+        }
+    );
+}
+
+# update_status($name, $callback)
+# Updates one collector status file under an exclusive lock so concurrent
+# workers can safely merge active-run counters and lifecycle fields.
+# Input: collector name string and callback that receives the current status
+# hash reference and returns a replacement hash reference.
+# Output: written status file path.
+sub update_status {
+    my ( $self, $name, $callback ) = @_;
+    die 'Missing collector name' if !defined $name || $name eq '';
+    die 'Missing collector status callback' if ref($callback) ne 'CODE';
     my $paths = $self->collector_paths($name);
-    my $existing = $self->read_status($name) || {};
+    my $lock = File::Spec->catfile( $paths->{dir}, '.status.lock' );
+    open my $lock_fh, '>>', $lock or die "Unable to open $lock: $!";
+    flock( $lock_fh, LOCK_EX ) or die "Unable to lock $lock: $!";
+    my $existing = $self->_read_status_file( $paths->{status} ) || {};
+    my $next = $callback->($existing);
+    die 'Collector status callback must return a hash reference' if ref($next) ne 'HASH';
     my %merged = (
-        %$existing,
-        %{ $status || {} },
+        %{$next},
         name             => $name,
         updated_at_epoch => time,
     );
     return $self->_atomic_write_json( $paths->{status}, \%merged );
+}
+
+# mark_run_started($name, $status)
+# Records one collector execution start while keeping an accurate active-run
+# count for singleton and bounded-multiple loop modes.
+# Input: collector name string and optional partial status hash reference.
+# Output: written status file path.
+sub mark_run_started {
+    my ( $self, $name, $status ) = @_;
+    return $self->update_status(
+        $name,
+        sub {
+            my ($existing) = @_;
+            my $active_runs = ( $existing->{active_runs} || 0 ) + 1;
+            return {
+                %{$existing},
+                %{ $status || {} },
+                running         => 1,
+                active_runs     => $active_runs,
+                last_started_at => ( $status || {} )->{last_started_at} || $existing->{last_started_at},
+            };
+        }
+    );
+}
+
+# mark_run_finished($name, %result)
+# Records one collector execution completion while decrementing the active-run
+# count under lock so overlapping runs cannot clear another live worker.
+# Input: collector name string plus result fields such as exit_code/stdout/stderr.
+# Output: written status file path.
+sub mark_run_finished {
+    my ( $self, $name, %result ) = @_;
+    my $status = $self->read_status($name) || {};
+    my $active_runs = $status->{active_runs} || 0;
+    $active_runs-- if $active_runs > 0;
+    return $self->write_result(
+        $name,
+        %result,
+        active_runs => $active_runs,
+        running     => $active_runs > 0 ? 1 : 0,
+    );
 }
 
 # read_status($name)
@@ -147,12 +217,8 @@ sub write_status {
 sub read_status {
     my ( $self, $name ) = @_;
     for my $file ( $self->_collector_file_candidates( $name, 'status.json' ) ) {
-        next if !-f $file;
-        open my $fh, '<:raw', $file or die "Unable to read $file: $!";
-        local $/;
-        my $raw = <$fh>;
-        my $data = eval { json_decode($raw) };
-        return $data if !$@;
+        my $data = $self->_read_status_file($file);
+        return $data if $data;
     }
     return;
 }
@@ -570,6 +636,22 @@ sub _atomic_write_text {
     rename $tmp, $file or die "Unable to rename $tmp to $file: $!";
     $self->{paths}->secure_file_permissions($file);
     return $file;
+}
+
+# _read_status_file($file)
+# Reads one collector status JSON file, returning undef when it is missing or
+# invalid instead of exploding across status polling paths.
+# Input: collector status file path string.
+# Output: decoded status hash reference or undef.
+sub _read_status_file {
+    my ( $self, $file ) = @_;
+    return if !-f $file;
+    open my $fh, '<:raw', $file or die "Unable to read $file: $!";
+    local $/;
+    my $raw = <$fh>;
+    my $data = eval { json_decode($raw) };
+    return $data if !$@;
+    return;
 }
 
 # _slurp($file)

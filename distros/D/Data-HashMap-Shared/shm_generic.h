@@ -15,7 +15,7 @@
  *   SHM_VAL_INT_TYPE                    — integer value
  *
  * Optional:
- *   SHM_HAS_COUNTERS  — generate incr/decr/incr_by (integer values only)
+ *   SHM_HAS_COUNTERS  — generate incr/decr/incr_by and integer cas (integer values only)
  */
 
 /* ================================================================
@@ -2161,6 +2161,47 @@ static int SHM_FN(exists)(ShmHandle *h,
 
 /* ---- Remove ---- */
 
+/* Lockless remove body — caller must hold writer lock + seqlock and have
+ * already shard-dispatched. Used by remove() and remove_multi. */
+static int SHM_FN(remove_inner)(ShmHandle *h,
+#ifdef SHM_KEY_IS_INT
+    SHM_KEY_INT_TYPE key
+#else
+    const char *key_str, uint32_t key_len, bool key_utf8
+#endif
+) {
+    ShmHeader *hdr = h->hdr;
+    SHM_NODE_TYPE *nodes = (SHM_NODE_TYPE *)h->nodes;
+    uint8_t *states = h->states;
+    uint32_t mask = hdr->table_cap - 1;
+#ifdef SHM_KEY_IS_INT
+    uint32_t hash = SHM_HASH_KEY(key);
+#else
+    uint32_t hash = SHM_HASH_KEY_STR(key_str, key_len);
+#endif
+    uint32_t pos = hash & mask;
+    uint8_t tag = SHM_MAKE_TAG(hash);
+    for (uint32_t i = 0; i <= mask; i++) {
+        uint32_t idx = (pos + i) & mask;
+        uint8_t st = states[idx];
+        __builtin_prefetch(&nodes[idx], 0, 1);
+        __builtin_prefetch(&nodes[(idx + 1) & mask], 0, 1);
+        if (st == SHM_EMPTY) return 0;
+        if (st != tag) continue;
+#ifdef SHM_KEY_IS_INT
+        if (SHM_KEY_EQ(&nodes[idx], key)) {
+#else
+        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, key_str, key_len, key_utf8)) {
+#endif
+            if (h->lru_prev) shm_lru_unlink(h, idx);
+            if (h->expires_at) h->expires_at[idx] = 0;
+            SHM_FN(tombstone_at)(h, idx);
+            return 1;
+        }
+    }
+    return 0;
+}
+
 static int SHM_FN(remove)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
     SHM_KEY_INT_TYPE key
@@ -2174,63 +2215,35 @@ static int SHM_FN(remove)(ShmHandle *h,
     SHM_SHARD_DISPATCH(h, key_str, key_len);
 #endif
     ShmHeader *hdr = h->hdr;
-    SHM_NODE_TYPE *nodes = (SHM_NODE_TYPE *)h->nodes;
-    uint8_t *states = h->states;
-
     shm_rwlock_wrlock(hdr);
     shm_seqlock_write_begin(&hdr->seq);
-
-    uint32_t mask = hdr->table_cap - 1;
+    int rc = SHM_FN(remove_inner)(h,
 #ifdef SHM_KEY_IS_INT
-    uint32_t hash = SHM_HASH_KEY(key);
+        key
 #else
-    uint32_t hash = SHM_HASH_KEY_STR(key_str, key_len);
+        key_str, key_len, key_utf8
 #endif
-    uint32_t pos = hash & mask;
-    uint8_t tag = SHM_MAKE_TAG(hash);
-
-    for (uint32_t i = 0; i <= mask; i++) {
-        uint32_t idx = (pos + i) & mask;
-        uint8_t st = states[idx];
-        __builtin_prefetch(&nodes[idx], 0, 1);
-        __builtin_prefetch(&nodes[(idx + 1) & mask], 0, 1);
-            if (st == SHM_EMPTY) break;
-            if (st != tag) continue;  /* tombstone or tag mismatch */
-
-#ifdef SHM_KEY_IS_INT
-        if (SHM_KEY_EQ(&nodes[idx], key)) {
-#else
-        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, key_str, key_len, key_utf8)) {
-#endif
-            if (h->lru_prev) shm_lru_unlink(h, idx);
-            if (h->expires_at) h->expires_at[idx] = 0;
-            SHM_FN(tombstone_at)(h, idx);
-
-            SHM_FN(maybe_shrink)(h);
-            shm_seqlock_write_end(&hdr->seq);
-            shm_rwlock_wrunlock(hdr);
-            return 1;
-        }
-    }
-
+    );
+    if (rc) SHM_FN(maybe_shrink)(h);
     shm_seqlock_write_end(&hdr->seq);
     shm_rwlock_wrunlock(hdr);
-    return 0;
+    return rc;
 }
 
 /* ---- Add (insert only if key absent, returns 1=inserted, 0=already exists or full) ---- */
 
-static int SHM_FN(add)(ShmHandle *h,
+static int SHM_FN(add_impl)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
     SHM_KEY_INT_TYPE key,
 #else
     const char *key_str, uint32_t key_len, bool key_utf8,
 #endif
 #ifdef SHM_VAL_IS_STR
-    const char *val_str, uint32_t val_len, bool val_utf8
+    const char *val_str, uint32_t val_len, bool val_utf8,
 #else
-    SHM_VAL_INT_TYPE value
+    SHM_VAL_INT_TYPE value,
 #endif
+    uint32_t ttl_sec
 ) {
 #ifdef SHM_KEY_IS_INT
     SHM_SHARD_DISPATCH(h, key);
@@ -2275,13 +2288,12 @@ static int SHM_FN(add)(ShmHandle *h,
 #else
         if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, key_str, key_len, key_utf8)) {
 #endif
-            /* Check TTL — treat expired as absent */
+            /* Live key blocks add; expired entries are reclaimed */
             if (SHM_IS_EXPIRED(h, idx, now)) {
                 SHM_FN(expire_at)(h, idx);
                 if (insert_pos == UINT32_MAX) insert_pos = idx;
                 break;
             }
-            /* Key exists and is live — add fails */
             shm_seqlock_write_end(&hdr->seq);
             shm_rwlock_wrunlock(hdr);
             return 0;
@@ -2294,11 +2306,9 @@ static int SHM_FN(add)(ShmHandle *h,
         return 0;
     }
 
-    /* LRU eviction if at capacity */
     if (hdr->max_size > 0 && hdr->size >= hdr->max_size)
         SHM_FN(lru_evict_one)(h);
 
-    /* Insert new entry (same as put_impl insert path) */
     int was_tombstone = (states[insert_pos] == SHM_TOMBSTONE);
 #ifdef SHM_KEY_IS_INT
     nodes[insert_pos].key = key;
@@ -2327,7 +2337,7 @@ static int SHM_FN(add)(ShmHandle *h,
 
     if (h->lru_prev) shm_lru_push_front(h, insert_pos);
     if (h->expires_at) {
-        uint32_t ttl = hdr->default_ttl;
+        uint32_t ttl = (ttl_sec == SHM_TTL_USE_DEFAULT) ? hdr->default_ttl : ttl_sec;
         h->expires_at[insert_pos] = ttl > 0 ? shm_expiry_ts(ttl) : 0;
     }
 
@@ -2336,9 +2346,7 @@ static int SHM_FN(add)(ShmHandle *h,
     return 1;
 }
 
-/* ---- Update (overwrite only if key exists, returns 1=updated, 0=not found) ---- */
-
-static int SHM_FN(update)(ShmHandle *h,
+static inline int SHM_FN(add)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
     SHM_KEY_INT_TYPE key,
 #else
@@ -2349,6 +2357,63 @@ static int SHM_FN(update)(ShmHandle *h,
 #else
     SHM_VAL_INT_TYPE value
 #endif
+) {
+    return SHM_FN(add_impl)(h,
+#ifdef SHM_KEY_IS_INT
+        key,
+#else
+        key_str, key_len, key_utf8,
+#endif
+#ifdef SHM_VAL_IS_STR
+        val_str, val_len, val_utf8,
+#else
+        value,
+#endif
+        SHM_TTL_USE_DEFAULT);
+}
+
+static inline int SHM_FN(add_ttl)(ShmHandle *h,
+#ifdef SHM_KEY_IS_INT
+    SHM_KEY_INT_TYPE key,
+#else
+    const char *key_str, uint32_t key_len, bool key_utf8,
+#endif
+#ifdef SHM_VAL_IS_STR
+    const char *val_str, uint32_t val_len, bool val_utf8,
+#else
+    SHM_VAL_INT_TYPE value,
+#endif
+    uint32_t ttl_sec
+) {
+    if (ttl_sec >= SHM_TTL_USE_DEFAULT - 1) ttl_sec = SHM_TTL_USE_DEFAULT - 2;
+    return SHM_FN(add_impl)(h,
+#ifdef SHM_KEY_IS_INT
+        key,
+#else
+        key_str, key_len, key_utf8,
+#endif
+#ifdef SHM_VAL_IS_STR
+        val_str, val_len, val_utf8,
+#else
+        value,
+#endif
+        ttl_sec);
+}
+
+/* ---- Update (overwrite only if key exists, returns 1=updated, 0=not found) ---- */
+
+static int SHM_FN(update_impl)(ShmHandle *h,
+#ifdef SHM_KEY_IS_INT
+    SHM_KEY_INT_TYPE key,
+#else
+    const char *key_str, uint32_t key_len, bool key_utf8,
+#endif
+#ifdef SHM_VAL_IS_STR
+    const char *val_str, uint32_t val_len, bool val_utf8,
+#else
+    SHM_VAL_INT_TYPE value,
+#endif
+    uint32_t ttl_sec
 ) {
 #ifdef SHM_KEY_IS_INT
     SHM_SHARD_DISPATCH(h, key);
@@ -2391,7 +2456,6 @@ static int SHM_FN(update)(ShmHandle *h,
                 shm_rwlock_wrunlock(hdr);
                 return 0;
             }
-            /* Update value */
 #ifdef SHM_VAL_IS_STR
             {
                 uint32_t old_off = nodes[idx].val_off;
@@ -2407,8 +2471,14 @@ static int SHM_FN(update)(ShmHandle *h,
             nodes[idx].value = value;
 #endif
             if (h->lru_prev) shm_lru_promote(h, idx);
-            if (h->expires_at && hdr->default_ttl > 0 && h->expires_at[idx] != 0)
-                h->expires_at[idx] = shm_expiry_ts(hdr->default_ttl);
+            if (h->expires_at) {
+                if (ttl_sec == SHM_TTL_USE_DEFAULT) {
+                    if (hdr->default_ttl > 0 && h->expires_at[idx] != 0)
+                        h->expires_at[idx] = shm_expiry_ts(hdr->default_ttl);
+                } else {
+                    h->expires_at[idx] = ttl_sec > 0 ? shm_expiry_ts(ttl_sec) : 0;
+                }
+            }
 
             shm_seqlock_write_end(&hdr->seq);
             shm_rwlock_wrunlock(hdr);
@@ -2419,6 +2489,60 @@ static int SHM_FN(update)(ShmHandle *h,
     shm_seqlock_write_end(&hdr->seq);
     shm_rwlock_wrunlock(hdr);
     return 0;
+}
+
+static inline int SHM_FN(update)(ShmHandle *h,
+#ifdef SHM_KEY_IS_INT
+    SHM_KEY_INT_TYPE key,
+#else
+    const char *key_str, uint32_t key_len, bool key_utf8,
+#endif
+#ifdef SHM_VAL_IS_STR
+    const char *val_str, uint32_t val_len, bool val_utf8
+#else
+    SHM_VAL_INT_TYPE value
+#endif
+) {
+    return SHM_FN(update_impl)(h,
+#ifdef SHM_KEY_IS_INT
+        key,
+#else
+        key_str, key_len, key_utf8,
+#endif
+#ifdef SHM_VAL_IS_STR
+        val_str, val_len, val_utf8,
+#else
+        value,
+#endif
+        SHM_TTL_USE_DEFAULT);
+}
+
+static inline int SHM_FN(update_ttl)(ShmHandle *h,
+#ifdef SHM_KEY_IS_INT
+    SHM_KEY_INT_TYPE key,
+#else
+    const char *key_str, uint32_t key_len, bool key_utf8,
+#endif
+#ifdef SHM_VAL_IS_STR
+    const char *val_str, uint32_t val_len, bool val_utf8,
+#else
+    SHM_VAL_INT_TYPE value,
+#endif
+    uint32_t ttl_sec
+) {
+    if (ttl_sec >= SHM_TTL_USE_DEFAULT - 1) ttl_sec = SHM_TTL_USE_DEFAULT - 2;
+    return SHM_FN(update_impl)(h,
+#ifdef SHM_KEY_IS_INT
+        key,
+#else
+        key_str, key_len, key_utf8,
+#endif
+#ifdef SHM_VAL_IS_STR
+        val_str, val_len, val_utf8,
+#else
+        value,
+#endif
+        ttl_sec);
 }
 
 /* ---- Swap (put + return old value; returns 1=swapped existing, 2=inserted new, 0=full) ---- */
@@ -2651,6 +2775,106 @@ static int SHM_FN(take)(ShmHandle *h,
             if (h->expires_at) h->expires_at[idx] = 0;
             SHM_FN(tombstone_at)(h, idx);
 
+            SHM_FN(maybe_shrink)(h);
+            shm_seqlock_write_end(&hdr->seq);
+            shm_rwlock_wrunlock(hdr);
+            return 1;
+        }
+    }
+
+    shm_seqlock_write_end(&hdr->seq);
+    shm_rwlock_wrunlock(hdr);
+    return 0;
+}
+
+/* ---- Compare-and-take (atomic remove if value matches expected) ----
+ * Returns 1 if matched and removed (old value copied out); 0 if key missing,
+ * expired, or value did not match. Integer variants compare by integer
+ * equality; string-value variants compare bytes only. */
+static int SHM_FN(cas_take)(ShmHandle *h,
+#ifdef SHM_KEY_IS_INT
+    SHM_KEY_INT_TYPE key,
+#else
+    const char *key_str, uint32_t key_len, bool key_utf8,
+#endif
+#ifdef SHM_VAL_IS_STR
+    const char *expected_str, uint32_t expected_len,
+    const char **out_str, uint32_t *out_len, bool *out_utf8
+#else
+    SHM_VAL_INT_TYPE expected, SHM_VAL_INT_TYPE *out_value
+#endif
+) {
+#ifdef SHM_KEY_IS_INT
+    SHM_SHARD_DISPATCH(h, key);
+#else
+    SHM_SHARD_DISPATCH(h, key_str, key_len);
+#endif
+    ShmHeader *hdr = h->hdr;
+    SHM_NODE_TYPE *nodes = (SHM_NODE_TYPE *)h->nodes;
+    uint8_t *states = h->states;
+    uint32_t now = h->expires_at ? shm_now() : 0;
+
+    shm_rwlock_wrlock(hdr);
+    shm_seqlock_write_begin(&hdr->seq);
+
+    uint32_t mask = hdr->table_cap - 1;
+#ifdef SHM_KEY_IS_INT
+    uint32_t hash = SHM_HASH_KEY(key);
+#else
+    uint32_t hash = SHM_HASH_KEY_STR(key_str, key_len);
+#endif
+    uint32_t pos = hash & mask;
+    uint8_t tag = SHM_MAKE_TAG(hash);
+
+    for (uint32_t i = 0; i <= mask; i++) {
+        uint32_t idx = (pos + i) & mask;
+        uint8_t st = states[idx];
+        __builtin_prefetch(&nodes[idx], 0, 1);
+        __builtin_prefetch(&nodes[(idx + 1) & mask], 0, 1);
+        if (st == SHM_EMPTY) break;
+        if (st != tag) continue;
+#ifdef SHM_KEY_IS_INT
+        if (SHM_KEY_EQ(&nodes[idx], key)) {
+#else
+        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, key_str, key_len, key_utf8)) {
+#endif
+            if (SHM_IS_EXPIRED(h, idx, now)) {
+                SHM_FN(expire_at)(h, idx);
+                SHM_FN(maybe_shrink)(h);
+                shm_seqlock_write_end(&hdr->seq);
+                shm_rwlock_wrunlock(hdr);
+                return 0;
+            }
+#ifdef SHM_VAL_IS_STR
+            char ibuf[SHM_INLINE_MAX];
+            uint32_t cur_len;
+            const char *cur_str = shm_str_ptr(nodes[idx].val_off, nodes[idx].val_len,
+                                              h->arena, ibuf, &cur_len);
+            if (cur_len != expected_len || memcmp(cur_str, expected_str, cur_len) != 0) {
+                shm_seqlock_write_end(&hdr->seq);
+                shm_rwlock_wrunlock(hdr);
+                return 0;
+            }
+            if (!shm_ensure_copy_buf(h, cur_len)) {
+                shm_seqlock_write_end(&hdr->seq);
+                shm_rwlock_wrunlock(hdr);
+                return 0;
+            }
+            memcpy(h->copy_buf, cur_str, cur_len);
+            *out_str = h->copy_buf;
+            *out_len = cur_len;
+            *out_utf8 = SHM_UNPACK_UTF8(nodes[idx].val_len);
+#else
+            if (nodes[idx].value != expected) {
+                shm_seqlock_write_end(&hdr->seq);
+                shm_rwlock_wrunlock(hdr);
+                return 0;
+            }
+            *out_value = nodes[idx].value;
+#endif
+            if (h->lru_prev) shm_lru_unlink(h, idx);
+            if (h->expires_at) h->expires_at[idx] = 0;
+            SHM_FN(tombstone_at)(h, idx);
             SHM_FN(maybe_shrink)(h);
             shm_seqlock_write_end(&hdr->seq);
             shm_rwlock_wrunlock(hdr);
@@ -3052,7 +3276,7 @@ static uint32_t SHM_FN(drain)(ShmHandle *h, uint32_t limit,
     return SHM_FN(drain_inner)(h, limit, out, buf, buf_cap, &buf_used);
 }
 
-/* ---- Counter operations (integer values only) ---- */
+/* ---- Counter operations and integer-value cas ---- */
 
 #ifdef SHM_HAS_COUNTERS
 
@@ -3241,7 +3465,7 @@ static SHM_VAL_INT_TYPE SHM_FN(incr_by)(ShmHandle *h,
     return delta;
 }
 
-/* ---- Compare-and-swap (atomic, integer values only) ---- */
+/* ---- Compare-and-swap (atomic, integer-value variants) ---- */
 
 static int SHM_FN(cas)(ShmHandle *h,
 #ifdef SHM_KEY_IS_INT
@@ -3314,6 +3538,92 @@ static int SHM_FN(cas)(ShmHandle *h,
 
 #endif /* SHM_HAS_COUNTERS */
 
+/* ---- Compare-and-swap (atomic, string-value variants) ---- */
+
+#ifdef SHM_VAL_IS_STR
+static int SHM_FN(cas)(ShmHandle *h,
+#ifdef SHM_KEY_IS_INT
+    SHM_KEY_INT_TYPE key,
+#else
+    const char *key_str, uint32_t key_len, bool key_utf8,
+#endif
+    const char *expected_str, uint32_t expected_len,
+    const char *desired_str, uint32_t desired_len, bool desired_utf8
+) {
+#ifdef SHM_KEY_IS_INT
+    SHM_SHARD_DISPATCH(h, key);
+#else
+    SHM_SHARD_DISPATCH(h, key_str, key_len);
+#endif
+    ShmHeader *hdr = h->hdr;
+    SHM_NODE_TYPE *nodes = (SHM_NODE_TYPE *)h->nodes;
+    uint8_t *states = h->states;
+    uint32_t now = h->expires_at ? shm_now() : 0;
+
+    shm_rwlock_wrlock(hdr);
+    shm_seqlock_write_begin(&hdr->seq);
+
+    uint32_t mask = hdr->table_cap - 1;
+#ifdef SHM_KEY_IS_INT
+    uint32_t hash = SHM_HASH_KEY(key);
+#else
+    uint32_t hash = SHM_HASH_KEY_STR(key_str, key_len);
+#endif
+    uint32_t pos = hash & mask;
+    uint8_t tag = SHM_MAKE_TAG(hash);
+
+    for (uint32_t i = 0; i <= mask; i++) {
+        uint32_t idx = (pos + i) & mask;
+        uint8_t st = states[idx];
+        __builtin_prefetch(&nodes[idx], 0, 1);
+        __builtin_prefetch(&nodes[(idx + 1) & mask], 0, 1);
+        if (st == SHM_EMPTY) break;
+        if (st != tag) continue;
+#ifdef SHM_KEY_IS_INT
+        if (SHM_KEY_EQ(&nodes[idx], key)) {
+#else
+        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, key_str, key_len, key_utf8)) {
+#endif
+            if (SHM_IS_EXPIRED(h, idx, now)) {
+                SHM_FN(expire_at)(h, idx);
+                SHM_FN(maybe_shrink)(h);
+                shm_seqlock_write_end(&hdr->seq);
+                shm_rwlock_wrunlock(hdr);
+                return 0;
+            }
+            char ibuf[SHM_INLINE_MAX];
+            uint32_t cur_len;
+            const char *cur_str = shm_str_ptr(nodes[idx].val_off, nodes[idx].val_len,
+                                              h->arena, ibuf, &cur_len);
+            if (cur_len != expected_len || memcmp(cur_str, expected_str, cur_len) != 0) {
+                shm_seqlock_write_end(&hdr->seq);
+                shm_rwlock_wrunlock(hdr);
+                return 0;
+            }
+            uint32_t old_off = nodes[idx].val_off;
+            uint32_t old_lf = nodes[idx].val_len;
+            if (!shm_str_store(hdr, h->arena, &nodes[idx].val_off, &nodes[idx].val_len,
+                               desired_str, desired_len, desired_utf8)) {
+                shm_seqlock_write_end(&hdr->seq);
+                shm_rwlock_wrunlock(hdr);
+                return 0;
+            }
+            shm_str_free(hdr, h->arena, old_off, old_lf);
+            if (h->lru_prev) shm_lru_promote(h, idx);
+            if (h->expires_at && hdr->default_ttl > 0 && h->expires_at[idx] != 0)
+                h->expires_at[idx] = shm_expiry_ts(hdr->default_ttl);
+            shm_seqlock_write_end(&hdr->seq);
+            shm_rwlock_wrunlock(hdr);
+            return 1;
+        }
+    }
+
+    shm_seqlock_write_end(&hdr->seq);
+    shm_rwlock_wrunlock(hdr);
+    return 0;
+}
+#endif /* SHM_VAL_IS_STR */
+
 /* ---- Size ---- */
 
 static inline uint32_t SHM_FN(size)(ShmHandle *h) {
@@ -3343,6 +3653,93 @@ static inline uint32_t SHM_FN(max_size)(ShmHandle *h) {
 static inline uint32_t SHM_FN(ttl)(ShmHandle *h) {
     if (h->shard_handles) return SHM_FN(ttl)(h->shard_handles[0]);
     return h->hdr->default_ttl;
+}
+
+/* ---- Get value with TTL remaining (atomic snapshot) ----
+ * Returns 1 if key found and live (output args filled); 0 if missing/expired.
+ * *out_ttl_remaining encodes the entry's TTL state on a return of 1:
+ *   -1 = map has no TTL enabled
+ *    0 = entry is permanent
+ *   >0 = seconds remaining until expiry
+ * Caller may pass NULL out_ttl_remaining if only the value is wanted.
+ */
+static int SHM_FN(get_with_ttl)(ShmHandle *h,
+#ifdef SHM_KEY_IS_INT
+    SHM_KEY_INT_TYPE key,
+#else
+    const char *key_str, uint32_t key_len, bool key_utf8,
+#endif
+#ifdef SHM_VAL_IS_STR
+    const char **out_str, uint32_t *out_len, bool *out_utf8,
+#else
+    SHM_VAL_INT_TYPE *out_value,
+#endif
+    int64_t *out_ttl_remaining
+) {
+#ifdef SHM_KEY_IS_INT
+    SHM_SHARD_DISPATCH(h, key);
+#else
+    SHM_SHARD_DISPATCH(h, key_str, key_len);
+#endif
+    ShmHeader *hdr = h->hdr;
+    SHM_NODE_TYPE *nodes = (SHM_NODE_TYPE *)h->nodes;
+    uint8_t *states = h->states;
+    uint32_t now_ts = h->expires_at ? shm_now() : 0;
+
+    shm_rwlock_rdlock(hdr);
+
+    uint32_t mask = hdr->table_cap - 1;
+#ifdef SHM_KEY_IS_INT
+    uint32_t hash = SHM_HASH_KEY(key);
+#else
+    uint32_t hash = SHM_HASH_KEY_STR(key_str, key_len);
+#endif
+    uint32_t pos = hash & mask;
+    uint8_t tag = SHM_MAKE_TAG(hash);
+
+    for (uint32_t i = 0; i <= mask; i++) {
+        uint32_t idx = (pos + i) & mask;
+        uint8_t st = states[idx];
+        __builtin_prefetch(&nodes[idx], 0, 1);
+        __builtin_prefetch(&nodes[(idx + 1) & mask], 0, 1);
+        if (st == SHM_EMPTY) break;
+        if (st != tag) continue;
+#ifdef SHM_KEY_IS_INT
+        if (SHM_KEY_EQ(&nodes[idx], key)) {
+#else
+        if (SHM_KEY_EQ_STR(&nodes[idx], h->arena, key_str, key_len, key_utf8)) {
+#endif
+            if (SHM_IS_EXPIRED(h, idx, now_ts)) {
+                shm_rwlock_rdunlock(hdr);
+                return 0;
+            }
+#ifdef SHM_VAL_IS_STR
+            {
+                uint32_t vl = SHM_STR_LEN(nodes[idx].val_len);
+                if (!shm_ensure_copy_buf(h, vl)) {
+                    shm_rwlock_rdunlock(hdr);
+                    return 0;
+                }
+                shm_str_copy(h->copy_buf, nodes[idx].val_off, nodes[idx].val_len, h->arena, vl);
+                *out_str = h->copy_buf;
+                *out_len = vl;
+                *out_utf8 = SHM_UNPACK_UTF8(nodes[idx].val_len);
+            }
+#else
+            *out_value = nodes[idx].value;
+#endif
+            if (out_ttl_remaining) {
+                if (!h->expires_at) *out_ttl_remaining = -1;
+                else if (h->expires_at[idx] == 0) *out_ttl_remaining = 0;
+                else *out_ttl_remaining = (int64_t)(h->expires_at[idx] - now_ts);
+            }
+            shm_rwlock_rdunlock(hdr);
+            return 1;
+        }
+    }
+
+    shm_rwlock_rdunlock(hdr);
+    return 0;
 }
 
 /* ---- TTL remaining for a key (-1 = not found/expired, 0 = permanent) ---- */

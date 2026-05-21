@@ -3,18 +3,14 @@ package File::Raw;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.13';
 
-# Use DynaLoader with RTLD_GLOBAL so C API symbols (file_hooks.h) are visible
-# to other XS modules that link against us at runtime.
-# XSLoader on older Perls (5.10) doesn't honour dl_load_flags.
 use DynaLoader;
+
 our @ISA = ('DynaLoader');
-# Returns 0x01 (RTLD_GLOBAL) to DynaLoader::bootstrap, causing dlopen()
-# to load Raw.so into the global symbol table. Without this, symbols
-# default to RTLD_LOCAL and are invisible to subsequently loaded XS
-# modules that depend on our C API (e.g. test files for file_set_read_hook).
+
 sub dl_load_flags { 0x01 }
+
 __PACKAGE__->bootstrap($VERSION);
 
 1;
@@ -23,7 +19,7 @@ __END__
 
 =head1 NAME
 
-File::Raw - Fast IO operations using direct system calls
+File::Raw - File operations using direct system calls
 
 =head1 SYNOPSIS
 
@@ -72,9 +68,9 @@ File::Raw - Fast IO operations using direct system calls
 
 =head1 DESCRIPTION
 
-Fast IO operations using direct system calls, bypassing PerlIO overhead.
-This module provides significantly faster file operations compared to
-Perl's built-in IO functions.
+File::Raw provides file operations using direct system calls, bypassing PerlIO overhead. It includes functions for
+reading/writing files, iterating lines efficiently, memory-mapped access, and file metadata operations. The module
+also supports a plugin system for custom read/write/transform operations.
 
 =head2 Performance
 
@@ -151,7 +147,13 @@ entire file into memory.
     }
     $iter->close;
 
-Returns a line iterator object for memory-efficient line processing.
+Returns a line iterator object. Without a plugin tail, the iterator
+streams bytes lazily and is memory-efficient. With a plugin tail
+(C<lines_iter($path, plugin =E<gt> 'csv', ...)>) the iterator is eager:
+the file is slurped and parsed into an AoA at construction time, and
+C<next> walks the array; the C<header =E<gt> 1> and
+C<header =E<gt> [names]> options are honoured. For memory-bounded
+streaming through a plugin use C<each_line> instead.
 
 B<Note:> For maximum performance, prefer C<each_line()> which uses
 MULTICALL optimization and is significantly faster. Use C<lines_iter()>
@@ -389,6 +391,30 @@ Returns arrayref of first N lines (default 10).
 
 Returns arrayref of last N lines (default 10).
 
+=head2 range_lines
+
+    my $lines = File::Raw::range_lines($path, $from, $count);
+
+Returns arrayref of C<$count> lines starting at line C<$from>.
+1-based: C<range_lines($p, 5, 3)> returns lines 5, 6, 7.
+C<range_lines($p, 1, 10)> is equivalent to C<head($p, 10)>.
+
+If C<$from> is past EOF, or C<$count <= 0>, or C<$from < 1>, returns
+an empty arrayref. If fewer than C<$count> lines remain after C<$from>,
+returns whatever is available (no error).
+
+Accepts the standard plugin tail; with C<plugin =E<gt> 'csv'> (or any
+plugin returning AoA) the range is applied to the parsed records:
+
+    # Rows 100..149 of a CSV
+    my $page = File::Raw::range_lines($p, 100, 50,
+                                      plugin => 'csv', header => 1);
+
+Same eager trade-off as C<lines_iter> with a plugin: the file is
+slurped and parsed in full before the slice is taken. For
+memory-bounded streaming through a plugin use C<each_line> with a
+counter and C<die> to bail.
+
 =head2 atomic_spew
 
     my $ok = File::Raw::atomic_spew($path, $data);
@@ -435,53 +461,193 @@ Transform each line with a callback, returns arrayref of results.
 
     my $lengths = File::Raw::map_lines($path, sub { length($_) });
 
-=head2 register_line_callback
+=head2 register_predicate
 
-    File::Raw::register_line_callback($name, \&predicate);
+    File::Raw::register_predicate($name, \&predicate);
 
-Register a custom predicate for use with grep_lines, count_lines, etc.
+Register a custom named predicate for use with grep_lines / count_lines /
+find_line. The coderef receives the line in C<$_>.
 
-    File::Raw::register_line_callback('has_error', sub { /ERROR/ });
+    File::Raw::register_predicate('has_error', sub { /ERROR/ });
     my $errors = File::Raw::grep_lines($path, 'has_error');
 
-=head2 list_line_callbacks
+=head2 list_predicates
 
-    my $names = File::Raw::list_line_callbacks();
+    my $names = File::Raw::list_predicates();
 
-Returns arrayref of registered predicate names.
+Returns arrayref of registered predicate names (built-ins plus any
+custom ones).
 
-=head1 HOOKS
+=head1 PLUGINS
 
-File::Raw supports read/write hooks for data transformation.
+Most read / write / iteration functions accept a B<plugin tail>:
 
-=head2 register_read_hook
+    File::Raw::slurp($path, plugin => 'csv', sep => ';', header => 1);
+    File::Raw::spew ($path, $rows, plugin => 'csv');
+    File::Raw::each_line($path, sub { ... }, plugin => 'csv');
 
-    File::Raw::register_read_hook(\&hook);
+The tail is parsed as C<key =E<gt> value> pairs; the C<plugin> key is
+mandatory whenever options are supplied. The named plugin must be
+registered via L</register_plugin> (Perl) or
+C<file_register_plugin()> (C, see L</XS API>) before the call.
 
-Register a hook that transforms data after reading.
+The following functions are plugin-aware:
 
-    File::Raw::register_read_hook(sub {
-        my ($path, $data) = @_;
-        return uc($data);  # uppercase all content
+=over 4
+
+=item * Read: C<slurp>, C<lines>, C<head>, C<tail>, C<range_lines>
+
+=item * Write: C<spew>, C<append>, C<atomic_spew>
+
+=item * Streaming: C<each_line>
+
+=item * Iterator: C<lines_iter>
+
+=item * Record-derived: C<grep_lines>, C<count_lines>, C<find_line>, C<map_lines>
+
+=back
+
+C<slurp_raw> and the stat / dir / path families are intentionally
+plugin-free.
+
+C<lines_iter> with a plugin tail is B<eager> (it slurps the file once
+into an AoA at construction time and the iterator walks that array).
+The iterator interface is preserved so callers can still store the
+handle, call C<next>/C<eof>/C<close>, etc., but it is not
+memory-bounded: for true streaming over huge files use C<each_line>
+with the same plugin tail.
+
+=head2 Plugin chains
+
+The C<plugin> value can be an arrayref of plugin names instead of a
+single name. The chain describes the file's encoding stack from
+outermost wrapper to innermost format; same spelling for both
+directions.
+
+    # data.csv.gz: gzip wraps csv. Slurp unwraps left-to-right -
+    # gunzip first, then parse csv - and returns an AoA.
+    my $rows = File::Raw::slurp($path,
+        plugin => ['gzip', 'csv']);
+
+    # spew applies right-to-left: csv-encode the AoA into bytes,
+    # then gzip the bytes, then write the result.
+    File::Raw::spew($path, $rows,
+        plugin => ['gzip', 'csv']);
+
+The single-plugin scalar form (C<plugin =E<gt> 'csv'>) keeps its
+current semantics exactly; chains are purely additive.
+
+=head3 Per-plugin options
+
+When the chain has more than one plugin, give each one its own
+sub-hash. Keys outside any sub-hash are shared across the whole chain
+(visible to every plugin); per-plugin keys win on conflict.
+
+    File::Raw::slurp($path,
+        plugin => ['gzip', 'csv'],
+        gzip   => { level => 9 },         # only gzip sees this
+        csv    => { sep => ';' },         # only csv sees this
+        strict => 1,                      # both gzip and csv see this
+    );
+
+The single-plugin scalar form takes a flat options bag (top-level
+keys go straight to the lone plugin) - no sub-hash required.
+
+=head3 Type contract
+
+File::Raw doesn't statically enforce the chain's type contract; each
+plugin sees its predecessor's return value verbatim. The convention
+is:
+
+=over 4
+
+=item *
+
+For READ: every plugin except the last must return bytes. The last
+plugin can return any shape (bytes, AoA, AoH, ...).
+
+=item *
+
+For WRITE: every plugin except the first must accept bytes; the
+first sees the user's payload (which may itself be structured).
+
+=back
+
+In practice that means structured-output plugins (C<csv>, C<json>,
+C<yaml>) belong B<last> in a READ chain and B<first> in a WRITE
+chain. Byte-transform plugins (C<gzip>, C<base64>, C<encoding>) are
+chain-friendly anywhere.
+
+=head3 Phase coverage
+
+Chains are supported for B<READ> and B<WRITE> only. The record-derived
+helpers (C<grep_lines>, C<count_lines>, C<find_line>, C<map_lines>)
+get chain support transparently because they slurp + transform via
+READ before iterating records.
+
+C<each_line> (the true streaming path) rejects arrayref C<plugin>
+values: composing two streams needs a record-to-chunk adapter that's
+its own design problem. Pass a single plugin name there. C<record>
+phase is also single-plugin only - chaining record functions would
+require records to keep the same shape across links.
+
+=head3 Plugin-author notes
+
+Existing plugins keep working without recompilation: C<FilePlugin> and
+C<FilePluginContext> are unchanged. A plugin's C<read>/C<write>
+callback is invoked the same way whether it's standalone or part of a
+chain; the dispatcher builds a per-iteration C<ctx-E<gt>options> HV
+that contains the shared keys overlaid with the plugin's own sub-hash
+(if any).
+
+=head2 register_plugin
+
+    File::Raw::register_plugin($name, \%phases);
+    File::Raw::register_plugin($name, \%phases, $override);
+
+Register a plugin that will be invoked when callers pass
+C<plugin =E<gt> $name>. C<%phases> is a hashref of coderefs keyed by
+phase name. A plugin may implement any subset of phases; absent ones
+cause a clear error if the user requests them.
+
+    File::Raw::register_plugin('csv', {
+        read   => sub { my ($path, $bytes,  $opts) = @_; ... },  # bytes -> AoA
+        write  => sub { my ($path, $rows,   $opts) = @_; ... },  # rows  -> bytes
+        record => sub { my ($path, $record, $opts) = @_; ... },  # transform/filter
     });
 
-=head2 register_write_hook
+The C<stream> phase is intentionally not exposed from Perl - per-chunk
+C<call_sv> overhead defeats the purpose of streaming. Plugins that need
+record-by-record callbacks should implement C<record>; File::Raw drives
+the iteration itself. Streaming plugins must be written in C.
 
-    File::Raw::register_write_hook(\&hook);
+Re-registering a name without C<$override> croaks; pass a true
+C<$override> to replace.
 
-Register a hook that transforms data before writing.
+=head2 unregister_plugin
 
-=head2 clear_hooks
+    File::Raw::unregister_plugin($name);
 
-    File::Raw::clear_hooks($phase);
+Remove a previously-registered plugin.
 
-Clear all hooks for a phase. Phase can be: read, write, open, close.
+=head2 list_plugins
 
-=head2 has_hooks
+    my $names = File::Raw::list_plugins();
 
-    if (File::Raw::has_hooks('read')) { ... }
+Returns arrayref of currently registered plugin names. The built-in
+C<'predicate'> plugin is always present.
 
-Check if hooks are registered for a phase.
+=head2 The built-in 'predicate' plugin
+
+Boot-time-registered C plugin that owns the eight built-in line
+predicates (C<blank>/C<is_blank>, C<not_blank>/C<is_not_blank>,
+C<empty>/C<is_empty>, C<not_empty>/C<is_not_empty>,
+C<comment>/C<is_comment>, C<not_comment>/C<is_not_comment>) plus any
+predicate added via L</register_predicate>. The legacy 2-arg form
+
+    File::Raw::grep_lines($path, 'is_blank');
+
+is sugar for going through this plugin.
 
 =head1 IMPORT STYLE
 
@@ -532,53 +698,58 @@ use C<File::Raw::stat()> instead of calling individual functions:
 
 =head1 XS API
 
-File::Raw exposes a C API via C<include/file_hooks.h> that other XS modules
-can use to register read/write hooks at the C level, avoiding Perl callback
-overhead. The shared object is loaded with C<RTLD_GLOBAL> so symbols are
-visible to subsequently loaded XS modules.
+File::Raw exposes a plugin C API via C<include/file_plugin.h>. Downstream
+XS modules can register C-level plugins that File::Raw's read / write /
+streaming dispatch routes calls into - no per-record C<call_sv>
+overhead. The shared object is loaded with C<RTLD_GLOBAL> so symbols
+resolve at load time without an explicit link step on Linux/macOS.
 
 =head2 Types
 
 =over 4
 
-=item B<FileHookPhase>
+=item B<FilePluginPhase>
 
-Enum identifying the hook phase:
+    FILE_PLUGIN_PHASE_READ      /* whole-file slurp transform           */
+    FILE_PLUGIN_PHASE_WRITE     /* whole-file spew/append transform     */
+    FILE_PLUGIN_PHASE_RECORD    /* per-record dispatch                  */
+    FILE_PLUGIN_PHASE_STREAM    /* chunked feed for streaming           */
 
-    FILE_HOOK_PHASE_READ    /* After reading, before returning to Perl */
-    FILE_HOOK_PHASE_WRITE   /* Before writing to disk */
-    FILE_HOOK_PHASE_OPEN    /* Before opening file */
-    FILE_HOOK_PHASE_CLOSE   /* After closing file */
+=item B<FilePluginContext>
 
-=item B<FileHookPriority>
+Per-call dispatch context (lifetime: single dispatch call).
 
-Predefined priority levels (lower runs first):
+    typedef struct FilePluginContext {
+        const char  *path;          /* file path                        */
+        SV          *data;          /* read: bytes; write: payload      */
+        SV          *callback;      /* per-record cb (stream phase)     */
+        HV          *options;       /* per-call opts; mortal; never NULL*/
+        int          phase;
+        int          cancel;        /* set non-zero to cancel op        */
+        void        *plugin_state;  /* opaque, copied from plugin->state*/
+    } FilePluginContext;
 
-    FILE_HOOK_PRIORITY_FIRST    =    0
-    FILE_HOOK_PRIORITY_EARLY    =  100
-    FILE_HOOK_PRIORITY_NORMAL   =  500
-    FILE_HOOK_PRIORITY_LATE     =  900
-    FILE_HOOK_PRIORITY_LAST     = 1000
+=item B<FilePlugin>
 
-=item B<FileHookContext>
+Registration block; the caller owns the storage (typically a file-scope
+static) and must keep it alive for as long as the plugin is registered.
 
-Struct passed to C hook callbacks:
+    typedef struct FilePlugin {
+        const char            *name;
+        file_plugin_read_fn    read_fn;    /* NULL if not implemented */
+        file_plugin_write_fn   write_fn;
+        file_plugin_record_fn  record_fn;
+        file_plugin_stream_fn  stream_fn;
+        void                  *state;
+    } FilePlugin;
 
-    typedef struct {
-        const char   *path;       /* File path */
-        SV           *data;       /* Data SV (may be modified in place) */
-        FileHookPhase phase;      /* Which phase */
-        void         *user_data;  /* User-provided context */
-        int           cancel;     /* Set to 1 to cancel operation */
-    } FileHookContext;
+Phase signatures:
 
-=item B<file_hook_func>
-
-C hook function signature:
-
-    typedef SV* (*file_hook_func)(pTHX_ FileHookContext *ctx);
-
-Return the (possibly modified) SV, or NULL to cancel the operation.
+    typedef SV*  (*file_plugin_read_fn)   (pTHX_ FilePluginContext *ctx);
+    typedef SV*  (*file_plugin_write_fn)  (pTHX_ FilePluginContext *ctx);
+    typedef SV*  (*file_plugin_record_fn) (pTHX_ FilePluginContext *ctx, SV *record);
+    typedef int  (*file_plugin_stream_fn) (pTHX_ FilePluginContext *ctx,
+                                           const char *chunk, size_t len, int eof);
 
 =back
 
@@ -586,85 +757,76 @@ Return the (possibly modified) SV, or NULL to cancel the operation.
 
 =over 4
 
-=item B<file_register_hook_c>
+=item B<file_register_plugin>
 
-    int file_register_hook_c(pTHX_
-                             FileHookPhase phase,
-                             const char *name,
-                             file_hook_func func,
-                             int priority,
-                             void *user_data);
+    int file_register_plugin(pTHX_ const FilePlugin *plugin);
 
-Register a named C hook for a given phase. Returns 1 on success.
-Call during module initialisation only (not thread-safe).
+Returns 1 on success, 0 if a plugin with the same name is already
+registered (use C<file_unregister_plugin> first), -1 on invalid input
+(NULL plugin, NULL/empty name). Call during module initialisation only
+(not thread-safe).
 
-=item B<file_unregister_hook>
+=item B<file_unregister_plugin>
 
-    int file_unregister_hook(pTHX_ FileHookPhase phase, const char *name);
+    int file_unregister_plugin(pTHX_ const char *name);
 
-Remove a hook by name. Returns 1 if found and removed.
+Remove a plugin by name. Returns 1 if found and removed.
 
-=item B<file_has_hooks>
+=item B<file_lookup_plugin>
 
-    int file_has_hooks(FileHookPhase phase);
+    const FilePlugin *file_lookup_plugin(pTHX_ const char *name);
 
-Fast check for registered hooks. Use before allocating a context.
+Look up a plugin by name. Returns the registered struct or NULL.
 
-=item B<file_run_hooks>
+=item B<file_plugin_dispatch_read> / B<file_plugin_dispatch_write> / B<file_plugin_dispatch_stream> / B<file_plugin_dispatch_record>
 
-    SV* file_run_hooks(pTHX_ FileHookPhase phase, const char *path, SV *data);
+    SV*  file_plugin_dispatch_read  (pTHX_ HV *opts, const char *path, SV *bytes);
+    SV*  file_plugin_dispatch_write (pTHX_ HV *opts, const char *path, SV *payload);
+    SV*  file_plugin_dispatch_stream(pTHX_ HV *opts, const char *path, SV *cb);
+    SV*  file_plugin_dispatch_record(pTHX_ HV *opts, const char *path, SV *record);
 
-Execute all hooks for a phase in priority order. Returns the
-transformed SV, or NULL if a hook cancelled the operation.
-
-=item B<file_set_read_hook> / B<file_set_write_hook>
-
-    void file_set_read_hook(pTHX_ file_hook_func func, void *user_data);
-    void file_set_write_hook(pTHX_ file_hook_func func, void *user_data);
-
-Simple single-hook registration (overwrites any existing hook for the
-phase). Pass NULL to clear.
-
-=item B<file_get_read_hook> / B<file_get_write_hook>
-
-    file_hook_func file_get_read_hook(void);
-    file_hook_func file_get_write_hook(void);
-
-Return the currently registered hook function, or NULL.
+Each helper extracts the C<plugin> key from C<opts>, looks up the plugin
+(croaks if unknown), confirms the requested phase function pointer is
+non-NULL (croaks otherwise), builds a C<FilePluginContext> on the stack,
+and invokes the phase function. These are the functions File::Raw's own
+XSUBs call - downstream modules normally don't need to call them
+directly.
 
 =back
 
-=head2 Convenience Macros
-
-    FILE_HAS_READ_HOOK()           /* true if a read hook is set */
-    FILE_HAS_WRITE_HOOK()          /* true if a write hook is set */
-    FILE_RUN_READ_HOOK(path, sv)   /* run hook or return sv unchanged */
-    FILE_RUN_WRITE_HOOK(path, sv)  /* run hook or return sv unchanged */
-
-=head2 Example (XS module)
+=head2 Example (downstream XS module)
 
     #include "EXTERN.h"
     #include "perl.h"
     #include "XSUB.h"
-    #include <file_hooks.h>
+    #include <file_plugin.h>
 
-    static SV* my_rot13_hook(pTHX_ FileHookContext *ctx) {
+    static SV* upper_read(pTHX_ FilePluginContext *ctx) {
         STRLEN len;
-        char *p = SvPV(ctx->data, len);
+        char *src = SvPV(ctx->data, len);
+        SV *out = newSVpvn(src, len);
+        char *dst = SvPVX(out);
         STRLEN i;
-        for (i = 0; i < len; i++) {
-            if (p[i] >= 'a' && p[i] <= 'z')
-                p[i] = 'a' + (p[i] - 'a' + 13) % 26;
-            else if (p[i] >= 'A' && p[i] <= 'Z')
-                p[i] = 'A' + (p[i] - 'A' + 13) % 26;
-        }
-        return ctx->data;
+        for (i = 0; i < len; i++)
+            if (dst[i] >= 'a' && dst[i] <= 'z')
+                dst[i] -= 32;
+        return out;
     }
+
+    static FilePlugin upper_plugin = {
+        "upper",
+        upper_read, NULL, NULL, NULL,
+        NULL
+    };
 
     MODULE = MyModule  PACKAGE = MyModule
 
     BOOT:
-        file_set_read_hook(aTHX_ my_rot13_hook, NULL);
+        file_register_plugin(aTHX_ &upper_plugin);
+
+After C<use MyModule>, callers can write
+C<File::Raw::slurp($path, plugin =E<gt> 'upper')> and File::Raw routes
+the slurped bytes through C<upper_read>.
 
 =head1 AUTHOR
 

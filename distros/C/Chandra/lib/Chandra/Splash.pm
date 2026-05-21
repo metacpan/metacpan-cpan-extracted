@@ -3,7 +3,7 @@ package Chandra::Splash;
 use strict;
 use warnings;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25';
 
 use Chandra;
 
@@ -141,7 +141,7 @@ more than once is a no-op.
 
 =head2 update_status($text)
 
-Update the status text line in the built-in template.  Non-blocking — uses
+Update the status text line in the built-in template.  Non-blocking - uses
 C<evaluateJavaScript> under the hood.  Returns C<$self>.
 
 =head2 update_progress($percent)

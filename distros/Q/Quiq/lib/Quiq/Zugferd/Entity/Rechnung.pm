@@ -25,7 +25,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.237';
+our $VERSION = '1.238';
 
 use Quiq::Zugferd::Entity::Freitext;
 
@@ -135,7 +135,7 @@ sub addFreitext {
 
 =head1 VERSION
 
-1.237
+1.238
 
 =head1 AUTHOR
 

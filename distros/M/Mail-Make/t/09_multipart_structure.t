@@ -26,14 +26,14 @@ use warnings;
 
 BEGIN
 {
-    use ok( 'Mail::Make' );
-    use ok( 'Mail::Make::Entity' );
+    use_ok( 'Mail::Make' ) or BAIL_OUT( 'Unable to load Mail::Make' );
+    use_ok( 'Mail::Make::Entity' ) or BAIL_OUT( 'Unable to load Mail::Make::Entity' );
 };
 
 # NOTE: Helper: create a small temp file with given content
 sub tmp_file
 {
-    my $content = shift // "binary\x00data";
+    my $content = shift( @_ ) // "binary\x00data";
     my $path = tempfile( cleanup => 1, open => 1 );
     $path->binmode;
     $path->print( $content );
@@ -71,7 +71,7 @@ subtest 'Single-part entities' => sub
         ok( defined( $e ), '1a: plain-only entity created' );
         is( $e->mime_type, 'text/plain', '1a: top is text/plain' );
         ok( !$e->is_multipart, '1a: not multipart' );
-        is( scalar( @{ $e->parts } ), 0, '1a: no child parts' );
+        is( scalar( @{$e->parts} ), 0, '1a: no child parts' );
     }
 
     # NOTE: html only
@@ -99,7 +99,7 @@ subtest 'plain + html -> multipart/alternative' => sub
     ok( defined( $e ), 'entity created' );
     is( $e->mime_type, 'multipart/alternative', 'top is multipart/alternative' );
 
-    my @parts = @{ $e->parts };
+    my @parts = @{$e->parts};
     is( scalar( @parts ), 2, 'exactly two child parts' );
     is( $parts[0]->mime_type, 'text/plain', 'first child is text/plain' );
     is( $parts[1]->mime_type, 'text/html',  'second child is text/html' );
@@ -132,12 +132,11 @@ subtest 'html + inline -> multipart/related' => sub
     ok( defined( $e ), 'entity created' );
     is( $e->mime_type, 'multipart/related', 'top is multipart/related' );
 
-    my @parts = @{ $e->parts };
+    my @parts = @{$e->parts};
     is( scalar( @parts ), 2, 'two child parts' );
-    is( $parts[0]->mime_type, 'text/html',  'first child is text/html' );
-    is( $parts[1]->mime_type, 'image/png',  'second child is image/png' );
-    like( $parts[1]->headers->header( 'Content-ID' ) // '',
-          qr/img\@test/, 'Content-ID correct on image part' );
+    is( $parts[0]->mime_type, 'text/html', 'first child is text/html' );
+    is( $parts[1]->mime_type, 'image/png', 'second child is image/png' );
+    like( $parts[1]->headers->header( 'Content-ID' ) // '', qr/img\@test/, 'Content-ID correct on image part' );
 };
 
 # NOTE: full structure: plain + html + inline image
@@ -147,8 +146,18 @@ subtest 'html + inline -> multipart/related' => sub
 #      │   ├── text/plain
 #      │   └── text/html
 #      └── image/png  (inline)
-subtest 'plain + html + inline -> multipart/related wrapping multipart/alternative' => sub
+# NOTE: plain + html + inline -> multipart/alternative wrapping multipart/related
+subtest 'plain + html + inline -> multipart/alternative wrapping multipart/related' => sub
 {
+    # Expected structure (RFC-correct):
+    #   multipart/alternative
+    #   ├── text/plain
+    #   └── multipart/related
+    #         ├── text/html
+    #         └── image/png  (inline, cid:logo@test)
+    #
+    # The inline image belongs inside multipart/related alongside the html part,
+    # not at the top level, because it is only referenced from the html.
     my $img_path = tmp_file( "\x89PNG\r\n" );
 
     my $m = Mail::Make->new
@@ -163,25 +172,25 @@ subtest 'plain + html + inline -> multipart/related wrapping multipart/alternati
         );
     my $e = $m->as_entity;
     ok( defined( $e ), 'entity created' );
-    is( $e->mime_type, 'multipart/related', 'top is multipart/related' );
+    is( $e->mime_type, 'multipart/alternative', 'top is multipart/alternative' );
 
-    my @top_parts = @{ $e->parts };
+    my @top_parts = @{$e->parts};
     is( scalar( @top_parts ), 2, 'top has two children' );
 
-    # First child: multipart/alternative
-    my $alt = $top_parts[0];
-    is( $alt->mime_type, 'multipart/alternative', 'first child of related is multipart/alternative' );
+    # First child: text/plain
+    is( $top_parts[0]->mime_type, 'text/plain', 'first child is text/plain' );
 
-    my @alt_parts = @{ $alt->parts };
-    is( scalar( @alt_parts ), 2, 'alternative has two children' );
-    is( $alt_parts[0]->mime_type, 'text/plain', 'first alt child is text/plain' );
-    is( $alt_parts[1]->mime_type, 'text/html',  'second alt child is text/html' );
+    # Second child: multipart/related
+    my $related = $top_parts[1];
+    is( $related->mime_type, 'multipart/related', 'second child is multipart/related' );
 
-    # Second child: the inline image
-    my $img = $top_parts[1];
-    is( $img->mime_type, 'image/png', 'second child of related is image/png' );
-    like( $img->headers->header( 'Content-ID' ) // '',
-          qr/logo\@test/, '4: Content-ID on inline image correct' );
+    my @rel_parts = @{$related->parts};
+    is( scalar( @rel_parts ), 2, 'related has two children' );
+    is( $rel_parts[0]->mime_type, 'text/html', 'first related child is text/html' );
+    is( $rel_parts[1]->mime_type, 'image/png', 'second related child is image/png' );
+
+    # Verify Content-ID on the inline image
+    like( $rel_parts[1]->headers->header( 'Content-ID' ) // '', qr/logo\@test/, 'Content-ID on inline image correct' );
 };
 
 # NOTE: plain + attachment -> multipart/mixed
@@ -206,16 +215,16 @@ subtest 'plain + attachment -> multipart/mixed' => sub
     ok( defined( $e ), 'entity created' );
     is( $e->mime_type, 'multipart/mixed', 'top is multipart/mixed' );
 
-    my @parts = @{ $e->parts };
+    my @parts = @{$e->parts};
     is( scalar( @parts ), 2, 'two child parts' );
-    is( $parts[0]->mime_type, 'text/plain',       'first child is text/plain' );
-    is( $parts[1]->mime_type, 'application/pdf',  'second child is application/pdf' );
+    is( $parts[0]->mime_type, 'text/plain',      'first child is text/plain' );
+    is( $parts[1]->mime_type, 'application/pdf', 'second child is application/pdf' );
 
     # Attachment filename
     my $cd = $parts[1]->headers->get( 'Content-Disposition' ) // '';
-    like( $cd, qr/attachment/i,    'disposition is attachment' );
-    like( $cd, qr/filename/i,      'filename parameter present' );
-    like( $cd, qr/report\.pdf/,    'filename value correct' );
+    like( $cd, qr/attachment/i, 'disposition is attachment' );
+    like( $cd, qr/filename/i,   'filename parameter present' );
+    like( $cd, qr/report\.pdf/, 'filename value correct' );
 };
 
 # NOTE: full scenario: plain + html + inline + attachment
@@ -253,24 +262,31 @@ subtest 'plain + html + inline + attachment -> full nested structure' => sub
     ok( defined( $e ), 'entity created' );
     is( $e->mime_type, 'multipart/mixed', 'top is multipart/mixed' );
 
-    my @top = @{ $e->parts };
+    my @top = @{$e->parts};
     is( scalar( @top ), 2, 'top has two children (related + pdf)' );
 
-    my $related = $top[0];
-    is( $related->mime_type, 'multipart/related', 'first child of mixed is multipart/related' );
+    # Structure:
+    #   multipart/mixed
+    #   ├── multipart/alternative
+    #   │     ├── text/plain
+    #   │     └── multipart/related
+    #   │           ├── text/html
+    #   │           └── image/png
+    #   └── application/pdf
+    my $alt = $top[0];
+    is( $alt->mime_type, 'multipart/alternative', 'first child of mixed is multipart/alternative' );
 
-    my @rel_parts = @{ $related->parts };
-    is( scalar( @rel_parts ), 2, 'related has two children (alternative + image)' );
-
-    my $alt = $rel_parts[0];
-    is( $alt->mime_type, 'multipart/alternative', 'first child of related is multipart/alternative' );
-
-    my @alt_parts = @{ $alt->parts };
-    is( scalar( @alt_parts ), 2,             'alternative has two children' );
+    my @alt_parts = @{$alt->parts};
+    is( scalar( @alt_parts ), 2,                'alternative has two children' );
     is( $alt_parts[0]->mime_type, 'text/plain', 'alt first child is text/plain' );
-    is( $alt_parts[1]->mime_type, 'text/html',  'alt second child is text/html' );
 
-    is( $rel_parts[1]->mime_type, 'image/png', 'second child of related is image/png' );
+    my $related = $alt_parts[1];
+    is( $related->mime_type, 'multipart/related', 'alt second child is multipart/related' );
+
+    my @rel_parts = @{$related->parts};
+    is( scalar( @rel_parts ), 2,               'related has two children' );
+    is( $rel_parts[0]->mime_type, 'text/html', 'first related child is text/html' );
+    is( $rel_parts[1]->mime_type, 'image/png', 'second related child is image/png' );
 
     is( $top[1]->mime_type, 'application/pdf', 'second child of mixed is application/pdf' );
 };
@@ -301,10 +317,10 @@ subtest 'Serialisation of nested structure' => sub
     ok( defined( $str ) && length( $str ), 'as_string returns non-empty string' );
 
     # Envelope headers
-    like( $str, qr{^From: sender\@example\.com}mi,    'From header present' );
-    like( $str, qr{^To: recipient\@example\.com}mi,   'To header present' );
-    like( $str, qr{^Subject: Full MIME test}mi,       'Subject header present' );
-    like( $str, qr{^MIME-Version: 1\.0}mi,            'MIME-Version present' );
+    like( $str, qr{^From: sender\@example\.com}mi,  'From header present' );
+    like( $str, qr{^To: recipient\@example\.com}mi, 'To header present' );
+    like( $str, qr{^Subject: Full MIME test}mi,     'Subject header present' );
+    like( $str, qr{^MIME-Version: 1\.0}mi,          'MIME-Version present' );
 
     # MIME structure markers
     like( $str, qr{multipart/mixed}i,       'multipart/mixed in message' );
@@ -316,12 +332,9 @@ subtest 'Serialisation of nested structure' => sub
     like( $str, qr{application/pdf}i,       'application/pdf part present' );
 
     # Encoding correctness
-    unlike( $str, qr{Content-Transfer-Encoding:\s*binary}i,
-        'no part is encoded as binary' );
-    like( $str, qr{Content-Transfer-Encoding:\s*quoted-printable}i,
-        'at least one text part uses quoted-printable' );
-    like( $str, qr{Content-Transfer-Encoding:\s*base64}i,
-        'binary parts use base64' );
+    unlike( $str, qr{Content-Transfer-Encoding:\s*binary}i,         'no part is encoded as binary' );
+    like( $str, qr{Content-Transfer-Encoding:\s*quoted-printable}i, 'at least one text part uses quoted-printable' );
+    like( $str, qr{Content-Transfer-Encoding:\s*base64}i,           'binary parts use base64' );
 };
 
 # NOTE: RFC 2047 display-name encoding in address headers
@@ -336,8 +349,8 @@ subtest 'RFC 2047 display-name encoding' => sub
             ->plain(   "Hi\n" );
         my $str = $m->as_string;
         ok( defined( $str ), 'ASCII display name message assembled' );
-        like( $str, qr{From:.*John Smith}i,   'plain ASCII name preserved in From' );
-        unlike( $str, qr{From:.*=\?UTF-8},    'ASCII name NOT encoded' );
+        like( $str, qr{From:.*John Smith}i, 'plain ASCII name preserved in From' );
+        unlike( $str, qr{From:.*=\?UTF-8},  'ASCII name NOT encoded' );
     }
 
     # NOTE: non-ASCII display name in From: encoded with RFC 2047
@@ -350,11 +363,9 @@ subtest 'RFC 2047 display-name encoding' => sub
             ->plain(   "body\n" );
         my $str = $m->as_string;
         ok( defined( $str ), 'non-ASCII From name message assembled' );
-        like( $str, qr{^From: =\?UTF-8\?B\?}mi,
-            'non-ASCII From name is RFC 2047 encoded' );
+        like( $str, qr{^From: =\?UTF-8\?B\?}mi, 'non-ASCII From name is RFC 2047 encoded' );
         # Verify the addr-spec is untouched
-        like( $str, qr{<jack\@deguest\.jp>},
-            'addr-spec unchanged after encoding' );
+        like( $str, qr{<jack\@deguest\.jp>}, 'addr-spec unchanged after encoding' );
         # Verify round-trip decode restores the name
         my( $from_line ) = ( $str =~ /^(From: .+)$/mi );
         my $decoded = decode_ew( $from_line );
@@ -371,10 +382,8 @@ subtest 'RFC 2047 display-name encoding' => sub
             ->plain( "body\n" );
         my $str = $m->as_string;
         ok( defined( $str ), 'Japanese display name message assembled' );
-        like( $str, qr{^To: =\?UTF-8\?B\?}mi,
-            'Japanese To name is RFC 2047 encoded' );
-        like( $str, qr{<tanaka\@example\.jp>},
-            'Japanese addr-spec unchanged' );
+        like( $str, qr{^To: =\?UTF-8\?B\?}mi,  'Japanese To name is RFC 2047 encoded' );
+        like( $str, qr{<tanaka\@example\.jp>}, 'Japanese addr-spec unchanged' );
     }
 
     # NOTE: bare addr-spec (no display name): passed through unchanged
@@ -386,10 +395,8 @@ subtest 'RFC 2047 display-name encoding' => sub
             ->plain( "body\n" );
         my $str = $m->as_string;
         ok( defined( $str ), 'bare addr-spec message assembled' );
-        like( $str, qr{^From: plain\@example\.com\015?$}mi,
-            'bare From addr-spec preserved as-is' );
-        unlike( $str, qr{^From:.*=\?}mi,
-            'bare addr-spec not RFC 2047 encoded' );
+        like( $str, qr{^From: plain\@example\.com\015?$}mi, 'bare From addr-spec preserved as-is' );
+        unlike( $str, qr{^From:.*=\?}mi,                    'bare addr-spec not RFC 2047 encoded' );
     }
 
     # NOTE: mixed To list: one encoded, one plain
@@ -403,8 +410,8 @@ subtest 'RFC 2047 display-name encoding' => sub
             ->plain( "body\n" );
         my $str = $m->as_string;
         ok( defined( $str ), 'mixed To list message assembled' );
-        like( $str, qr{<yamada\@example\.jp>},  'Japanese addr-spec preserved' );
-        like( $str, qr{<plain\@example\.com>},  'plain addr-spec preserved' );
+        like( $str, qr{<yamada\@example\.jp>}, 'Japanese addr-spec preserved' );
+        like( $str, qr{<plain\@example\.com>}, 'plain addr-spec preserved' );
     }
 };
 
@@ -421,14 +428,12 @@ subtest 'Non-ASCII subject encoding' => sub
         ->plain(   "body\n" );
     my $str = $m->as_string;
     ok( defined( $str ), 'Japanese subject message assembled' );
-    like( $str, qr{^Subject: =\?UTF-8\?B\?}mi,
-        'Japanese subject is RFC 2047 encoded' );
+    like( $str, qr{^Subject: =\?UTF-8\?B\?}mi, 'Japanese subject is RFC 2047 encoded' );
 
     # Encoded-words must be <= 75 chars each
     for my $ew ( $str =~ /(=\?[^?]+\?[BbQq]\?[^?]*\?=)/g )
     {
-        ok( length( $ew ) <= 75,
-            "encoded-word length " . length( $ew ) . " <= 75" );
+        ok( length( $ew ) <= 75, 'encoded-word length ' . length( $ew ) . ' <= 75' );
     }
 
     # Round-trip: decode the Subject line back
@@ -465,32 +470,120 @@ subtest 'Comma-in-filename (the original bug)' => sub
             cid      => 'logo@yamato-inc',
         );
     my $str = $m->as_string;
-    ok( defined( $str ) && length( $str ),
-        'message with comma-in-filename assembled' );
+    ok( defined( $str ) && length( $str ), 'message with comma-in-filename assembled' );
 
     # THE CORE FIX: text parts must not be encoded as binary
-    unlike( $str, qr{Content-Transfer-Encoding:\s*binary}i,
-        'NO text part encoded as binary (the bug is fixed)' );
+    unlike( $str, qr{Content-Transfer-Encoding:\s*binary}i, 'NO text part encoded as binary (the bug is fixed)' );
 
     # Text parts must use quoted-printable
-    like( $str, qr{Content-Transfer-Encoding:\s*quoted-printable}i,
-        'text parts use quoted-printable' );
+    like( $str, qr{Content-Transfer-Encoding:\s*quoted-printable}i, 'text parts use quoted-printable' );
 
     # Image must use base64
-    like( $str, qr{Content-Transfer-Encoding:\s*base64}i,
-        'image uses base64' );
+    like( $str, qr{Content-Transfer-Encoding:\s*base64}i, 'image uses base64' );
 
     # Comma must be percent-encoded in filename*
-    like( $str, qr{filename\*=.*Yamato%2CInc}i,
-        'comma percent-encoded as %2C in RFC 2231 filename*' );
+    like( $str, qr{filename\*=.*Yamato%2CInc}i, 'comma percent-encoded as %2C in RFC 2231 filename*' );
 
     # No bare comma in filename= value
-    unlike( $str, qr{filename=Yamato,Inc}i,
-        'no bare comma in filename= parameter' );
+    unlike( $str, qr{filename=Yamato,Inc}i, 'no bare comma in filename= parameter' );
 
     # Subject with comma must be ASCII and untouched (comma is ASCII)
-    like( $str, qr{^Subject: Hello from Yamato, Inc\.}mi,
-        'ASCII subject with comma preserved unchanged' );
+    like( $str, qr{^Subject: Hello from Yamato, Inc\.}mi, 'ASCII subject with comma preserved unchanged' );
+};
+
+# NOTE: related() method - chaining form
+subtest 'related() method - chaining form' => sub
+{
+    my $img_path = tmp_file( "\x89PNG\r\n" );
+
+    my $m = Mail::Make->new
+        ->from(  'a@example.com' )
+        ->to(    'b@example.com' )
+        ->plain( "plain version\n" )
+        ->related(
+            html   => '<p>html version <img src="cid:logo2@test"></p>',
+            inline => [
+                {
+                    path => $img_path,
+                    type => 'image/png',
+                    id   => 'logo2@test',
+                },
+            ],
+        );
+    my $e = $m->as_entity;
+    ok( defined( $e ), 'entity created via related()' );
+    is( $e->mime_type, 'multipart/alternative', 'top is multipart/alternative' );
+
+    my @top_parts = @{$e->parts};
+    is( scalar( @top_parts ), 2, 'top has two children' );
+    is( $top_parts[0]->mime_type, 'text/plain',        'first child is text/plain' );
+    is( $top_parts[1]->mime_type, 'multipart/related', 'second child is multipart/related' );
+
+    my @rel_parts = @{$top_parts[1]->parts};
+    is( scalar( @rel_parts ), 2, 'related has two children' );
+    is( $rel_parts[0]->mime_type, 'text/html', 'first related child is text/html' );
+    is( $rel_parts[1]->mime_type, 'image/png', 'second related child is image/png' );
+    like( $rel_parts[1]->headers->header( 'Content-ID' ) // '', qr/logo2\@test/, 'Content-ID on inline image correct' );
+};
+
+# NOTE: related key in build()
+subtest 'related key in build()' => sub
+{
+    my $img_path = tmp_file( "\x89PNG\r\n" );
+
+    my $m = Mail::Make->build(
+        from    => 'a@example.com',
+        to      => 'b@example.com',
+        plain   => "plain version\n",
+        related => {
+            html   => '<p>html version <img src="cid:logo3@test"></p>',
+            inline => [
+                {
+                    path => $img_path,
+                    type => 'image/png',
+                    id   => 'logo3@test',
+                },
+            ],
+        },
+    );
+    ok( defined( $m ), 'build() with related key succeeds' );
+    my $e = $m->as_entity;
+    ok( defined( $e ), 'entity created' );
+    is( $e->mime_type, 'multipart/alternative', 'top is multipart/alternative' );
+
+    my @top_parts = @{$e->parts};
+    is( $top_parts[1]->mime_type, 'multipart/related', 'second child is multipart/related' );
+};
+
+# NOTE: inline part without Content-ID is rejected
+subtest 'inline part without Content-ID is rejected' => sub
+{
+    no warnings 'Mail::Make';
+    # attach_inline() already requires 'id' or 'cid', so this tests the
+    # as_entity() guard as a second line of defence, by injecting a part
+    # directly into _parts without going through attach_inline().
+    my $img_path = tmp_file( "\x89PNG\r\n" );
+
+    my $m = Mail::Make->new
+        ->from( 'a@example.com' )
+        ->to(   'b@example.com' )
+        ->html( '<p>html</p>' );
+
+    # Add a valid inline part via attach_inline(), then surgically remove its
+    # Content-ID header to simulate the broken case: a part that the partitioning
+    # loop recognises as inline (because Content-Disposition is 'inline') but
+    # that has no Content-ID for the HTML to reference.
+    $m->attach_inline(
+        path => $img_path,
+        type => 'image/png',
+        cid  => 'dummy-cid@test',
+    );
+    # Strip the Content-ID after the fact to produce the broken state
+    $m->{_parts}->[-1]->headers->remove_header( 'Content-ID' );
+
+    my $e = $m->as_entity;
+    ok( !defined( $e ), 'as_entity() returns undef when inline part has no Content-ID' );
+    like( $m->error . '', qr/Content-ID/i, 'error message mentions Content-ID' );
 };
 
 done_testing();

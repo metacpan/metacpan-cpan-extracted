@@ -1,6 +1,6 @@
 package Langertha::Engine::TSystems;
 # ABSTRACT: T-Systems AI Foundation Services (LLM Hub)
-our $VERSION = '0.500';
+our $VERSION = '0.502';
 use Moose;
 use Carp qw( croak );
 
@@ -46,7 +46,7 @@ Langertha::Engine::TSystems - T-Systems AI Foundation Services (LLM Hub)
 
 =head1 VERSION
 
-version 0.500
+version 0.502
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,36 @@
+bench/store_fetch.pl
+Changes
+ignore.txt
+include/oh_core.h
+include/ppport.h
+include/tie_orderedhash.h
+lib/Tie/OrderedHash.pm
+Makefile.PL
+MANIFEST			This list of files
+oh_core.c
+OrderedHash.xs
+README
+t/00-load.t
+t/01-tie-basic.t
+t/02-iteration.t
+t/03-tie-list.t
+t/04-oo-push-pop.t
+t/05-oo-keys-values.t
+t/06-overwrite-keeps-order.t
+t/07-delete-shifts.t
+t/08-scalar-context.t
+t/09-large-load.t
+t/10-tie-ixhash-parity.t
+t/11-edge-values.t
+t/12-edge-keys.t
+t/13-empty-hash.t
+t/14-error-paths.t
+t/15-iteration-edges.t
+t/16-indices.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+xt/c-abi-driver.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

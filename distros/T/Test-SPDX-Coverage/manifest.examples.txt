@@ -1,0 +1,4 @@
+examples/test_case_mit.test
+examples/test_case_same_as_perl_itself.test
+examples/test_case_mit_or_apache.test
+#examples/test_case_gpl_with_exception.test #TODO

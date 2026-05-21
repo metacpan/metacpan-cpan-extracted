@@ -5,13 +5,12 @@ use warnings;
 
 package Log::Log4perl::Config::YamlConfigurator;
 
-$Log::Log4perl::Config::YamlConfigurator::VERSION = 'v1.0.3';
+$Log::Log4perl::Config::YamlConfigurator::VERSION = 'v1.2.0';
 
 use parent qw( Clone Log::Log4perl::Config::BaseConfigurator );
 
-use Carp                  qw( croak  );
-use YAML::PP              qw( Load );
-use Log::Log4perl::Config qw();
+use Carp                  qw( croak );
+use Log::Log4perl::Config ();
 
 sub create_appender_instance {
   my ( $self, $name ) = @_;
@@ -24,11 +23,12 @@ sub create_appender_instance {
 sub new {
   my $class = shift;
 
-  my $self = $class->SUPER::new( @_ );
+  my $self = $class->SUPER::new( subst => {}, @_ );
 
   unless ( exists $self->{ data } ) {
     if ( exists $self->{ text } ) {
-      $self->{ data } = Load( join( "\n", @{ $self->{ text } } ) )
+      require YAML::PP;
+      $self->{ data } = YAML::PP::Load( join( "\n", @{ $self->{ text } } ) )
     } else {
       croak "'text' parameter not set, stopped"
     }
@@ -57,10 +57,10 @@ sub parse {
         push @todo, $ref->{ $_ }
       } elsif ( $_ eq 'name' ) {
         # Appender 'name' entries and layout 'name entries are converted to ->{ value } entries
-        $ref->{ value } = $ref->{ $_ };
+        ( $ref->{ value } = $ref->{ $_ } ) =~ s/\$\{(.*?)\}/Log::Log4perl::Config::var_subst( $1, $self->{ subst } )/ge;
         delete $ref->{ $_ }
       } else {
-        my $tmp = $ref->{ $_ };
+        ( my $tmp = $ref->{ $_ } ) =~ s/\$\{(.*?)\}/Log::Log4perl::Config::var_subst( $1, $self->{ subst } )/ge;
         $ref->{ $_ } = {};
         $ref->{ $_ }->{ value } = $tmp
       }

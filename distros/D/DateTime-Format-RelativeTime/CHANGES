@@ -1,5 +1,11 @@
 Revision history for Perl module DateTime::Format::RelativeTime
 
+v0.2.3 2026-05-04T13:22:50+0900
+    - Updating dependencies for DateTime::Lite
+
+v0.2.2 2026-05-02T23:15:10+0900
+    - Updated dependency for new Locale::Unicode::Data version
+
 v0.2.1 2025-10-19T16:05:48+0900
     - Corrected missing dependency declaration for Wanted. Gitlab #2
 

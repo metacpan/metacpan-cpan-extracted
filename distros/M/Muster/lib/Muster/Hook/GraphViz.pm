@@ -1,5 +1,5 @@
 package Muster::Hook::GraphViz;
-$Muster::Hook::GraphViz::VERSION = '0.93';
+$Muster::Hook::GraphViz::VERSION = '0.9501';
 use Mojo::Base 'Muster::Hook::Directives';
 use Muster::LeafFile;
 use Muster::Hooks;
@@ -14,7 +14,7 @@ Muster::Hook::GraphViz - Muster graph directive using GraphViz.
 
 =head1 VERSION
 
-version 0.93
+version 0.9501
 
 =head1 DESCRIPTION
 

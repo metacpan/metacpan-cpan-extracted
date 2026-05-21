@@ -1,4 +1,157 @@
-Mon Oct 27 20:22:21 2025  Rob Lauer  <rclauer@gmail.com>
+Mon May  4 15:07:27 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.2.1]:
+	* VERSION: bump
+	* requires
+	- -Archive::Tar, IO::Compress::Gzip (core)
+	- -YAML
+	* cpanfile: likewise
+	* buildspec.yml: replace '_' with '-'
+	* builder: new
+	* .github/workflows/build.yml: new
+	* build-requires: new
+	* build-mirrors: new
+	* Makefile: updated from CPAN::Maker::Bootstrapper
+	* .includes/update.mk: likewise
+	* release-notes* -> release-notes/
+	* lib/OrePAN2/S3.pm.in: remove YAML dependency
+
+Wed Apr 29 09:02:47 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.2.0]:
+	* VERSION: bump minor
+	* release-notes-1.2.0.md: new
+	* .gitignore: index.html
+	* .includes/perl.mk: updated from CPAN::Maker::Bootstrapper
+	* requires
+	- -Amazon::S3
+	- +Amazon::S3::Lite, CPAN::Meta, IO::Compress::Gzip,
+	- +LWP::MediaTypes, Role::Tiny, Role::Tiny::With
+	* ChangeLog: modified
+	* bin/orepan2-s3.in
+	- refactored out add, upload-artifacts, delete
+	* lib/OrePAN2/S3.pm.in
+	- use roles for new commands inject, delete, upload-artifacts
+	- replace Amazon::S3 with Amazon::S3::Lite
+	- lazy load modules
+	- update pod
+	(write_config): new
+	(get_bucket): removed
+	(get_s3): removed
+	(init_s3): new
+	(fetch_orepan_index)
+	- refactored to use Amazon::S3::Lite
+	(_upload_html): likewise
+	(init): likewise, set author_path
+	(update_index): new
+	(scan_provides): new
+	(_packages_for_archive): new
+	(main)
+	- add new commands, inject, delete, upload-artifacts
+	- new --bucket option
+	* project.mk: new
+	* lib/OrePAN2/S3/Role/Delete.pm.in: new
+	* lib/OrePAN2/S3/Role/Inject.pm.in: new
+	* lib/OrePAN2/S3/Role/UploadArtifacts.pm.in: new
+
+Tue Apr 28 07:57:26 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.1.0]: CPAN::Maker::Bootstrapper build refactor
+	* release-notes-1.1.0.md: new
+	* .gitignore: modified
+	* .includes/release-notes.mk: modified
+	* Makefile: updated from CPAN::Maker::Bootstrapper
+	* README.md:
+	* VERSION: bumped
+	* lib/OrePAN2/S3.pm.in
+	(upload_html): fix eval qr vulnerability
+	(cmd_create_index): likewise
+	* requires
+	- bump versions
+	* test-requires
+	- -Test::More (is core)
+
+	[1.0.0]: deleted
+	* provides: deleted
+
+	[1.0.0]: renamed
+	* .includes/release-notes.mk: renamed
+	* .includes/version.mk: renamed
+
+	[1.1.0]: new
+	* version.mk: modified
+	* .includes/git.mk: new
+	* .includes/help.mk: new
+	* .includes/perl.mk: new
+	* .includes/update.mk: new
+	* .includes/upgrade.mk: new
+	* cpanfile: new
+	* t/00-orepan2-s3.t: new
+
+Tue Apr 28 06:38:25 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.0.6]:
+	* release-notes-1.0.6.md: new
+	* LICENSE: simplify
+	* VERSION: bump
+	* README.md.in: new
+	* .gitignore: +make.log, make.err
+	* Makefile: tweaks before update
+	* README.md: generated
+	* lib/OrePAN2/S3.pm.in
+	- fix missing documentation files
+	* requires: +Text::Markdown::Discount
+
+Mon Apr 13 12:51:19 2026  Rob Lauer  <rlauer@treasurersbriefcase.com>
+
+	[1.0.5]:
+	* release-notes-1.0.5.md: new
+	* .gitignore:
+	- +*.diffs, *.lst, bin/orepan-s3, bin/orepan2-s3-index, bin/create-insecure-bucket
+	* Makefile:
+	- replaced with generic version from CPN-Maker-Bootstrapper
+	* bin/create-insecure-bucket.in: renamed
+	* bin/orepan2-s3-index.in
+	- rename from orepan2-s3-index
+	- use simple modulino pattern
+	* bin/orepan2-s3.in
+	- renamed from orepan2-s3
+	- set log-leve when calling orepan2-s3-index
+	- -euo pipefail
+	- guard create_index and output error message
+	- fixe index_template assignment
+	* release-notes.mk: new
+	* README.md: generated
+	* VERSION: bump
+	* buildspec.yml
+	- renamed project OrePAN2-S3
+	- email address
+	- move README.md to share directory
+	* extra-files: modified
+	* lib/OrePAN2/S3.pm.in
+	- use constants from CLI::Simple::Constants
+	(_upload_html)
+	- encode contents before upload to avoid wide character warning
+	(cmd_upload_index): renamed upload_index
+	(cmd_show_orepan_index): likewise
+	(cmd_create_index): likewise, remove temp file
+	(cmd_download_orepan_index): likewise
+	(cmd_invalidate_index): likewise
+	(cmd_create_docs)
+	- likewise
+	- refactored to read distribution from disk to avoid cached version
+	- remove pod flag
+	- use simple doctype
+	(upload_html)
+	- no need to call parse_pod()
+	- don't need to pass pod flag
+	(main): cmd_ now
+	(fetch_orepan_index): unlink => false
+	(cmd_show_orepan_index): remove temp file
+	(extract_from_tarball): remove Load(), make generic
+	* requires: CLI::Simple 1.0.11, CLI::Simple::Constants
+
+Mon Oct 27 20:22:21 2025  Rob Lauer  <rlauer@treasurersbriefcase.com>
 
 	[1.0.4]:
 	* README.md: tweaks
@@ -8,7 +161,7 @@ Mon Oct 27 20:22:21 2025  Rob Lauer  <rclauer@gmail.com>
 	* bin/orepan2-s3
 	- more feedback during processing
 
-Mon Oct 27 09:30:08 2025  Rob Lauer  <rclauer@gmail.com>
+Mon Oct 27 09:30:08 2025  Rob Lauer  <rlauer@treasurersbriefcase.com>
 
 	[1.0.3]:
 	* VERSION: bump
@@ -23,7 +176,7 @@ Mon Oct 27 09:30:08 2025  Rob Lauer  <rclauer@gmail.com>
 	- support 'default' profile name as hash or scalar
 	* .gitignore: resources
 
-Sun Oct 26 17:50:18 2025  Rob Lauer  <rclauer@gmail.com>
+Sun Oct 26 17:50:18 2025  Rob Lauer  <rlauer@treasurersbriefcase.com>
 
 	[1.0.2]:
 	* VERSION: bump
@@ -39,7 +192,7 @@ Sun Oct 26 17:50:18 2025  Rob Lauer  <rclauer@gmail.com>
 	- default profile = $ENV{AWS_PROFILE}
 	* resources: remove from source control
 
-Thu Oct 23 09:16:50 2025  Rob Lauer  <rclauer@gmail.com>
+Thu Oct 23 09:16:50 2025  Rob Lauer  <rlauer@treasurersbriefcase.com>
 
 	[1.0.1]:
 	* VERSION: bump
@@ -47,7 +200,7 @@ Thu Oct 23 09:16:50 2025  Rob Lauer  <rclauer@gmail.com>
 	- -n, not -N for --profile-name
 	- '.AWS.bucket? ' - space after ?
 
-Tue Oct 21 09:16:04 2025  Rob Lauer  <rclauer@gmail.com>
+Tue Oct 21 09:16:04 2025  Rob Lauer  <rlauer@treasurersbriefcase.com>
 
 	[1.0.0]:
 	* VERSION: new
@@ -61,7 +214,7 @@ Tue Oct 21 09:16:04 2025  Rob Lauer  <rclauer@gmail.com>
 	* lib/OrePAN2/S3.pm.in: version from @PACKAGE_VERSION@
 	* requires: +DarkPAN::Utils
 
-Fri Jun  6 12:04:15 2025  Rob Lauer  <rlauer6@comcast.net>
+Fri Jun  6 12:04:15 2025  Rob Lauer  <rlauer@treasurersbriefcase.com>
 
 	[0.06]:
 	* Makefile
@@ -83,7 +236,7 @@ Fri Jun  6 12:04:15 2025  Rob Lauer  <rlauer6@comcast.net>
 	(create_index): add logging
 	(main): --mirror => --url
 
-Sun May 18 08:14:01 2025  Rob Lauer  <rlauer6@comcast.net>
+Sun May 18 08:14:01 2025  Rob Lauer  <rlauer@treasurersbriefcase.com>
 
 	[0.05]:
 	* bin/orepan2-s3
@@ -100,7 +253,7 @@ Sun May 18 08:14:01 2025  Rob Lauer  <rlauer6@comcast.net>
 	(create_index)
 	- add README.html and module-name.html
 
-Thu May 15 14:49:06 2025  Rob Lauer  <rlauer6@comcast.net>
+Thu May 15 14:49:06 2025  Rob Lauer  <rlauer@treasurersbriefcase.com>
 
 	[0.04]:
 	* bin/orepan2-s3
@@ -109,7 +262,7 @@ Thu May 15 14:49:06 2025  Rob Lauer  <rlauer6@comcast.net>
 	* lib/OrePAN2/S3.pm
 	- pod updates
 
-Tue May 13 07:19:45 2025  Rob Lauer  <rlauer6@comcast.net>
+Tue May 13 07:19:45 2025  Rob Lauer  <rlauer@treasurersbriefcase.com>
 
 	[0.03]:
 	* bin/orepan2-s2
@@ -121,7 +274,7 @@ Tue May 13 07:19:45 2025  Rob Lauer  <rlauer6@comcast.net>
 	- Bedrock::Template, +Template
 	* README: updates
 
-Tue May 13 05:59:31 2025  Rob Lauer  <rlauer6@comcast.net>
+Tue May 13 05:59:31 2025  Rob Lauer  <rlauer@treasurersbriefcase.com>
 
 	[0.02]:
 	* bin/orepan2-s3
@@ -136,7 +289,7 @@ Tue May 13 05:59:31 2025  Rob Lauer  <rlauer6@comcast.net>
 	(slurp_file): removed, use Bedrock::slurp_file
 	(fetch_config): profiles
 
-Tue Feb 25 16:24:50 2025  Rob Lauer  <rlauer6@comcast.net>
+Tue Feb 25 16:24:50 2025  Rob Lauer  <rlauer@treasurersbriefcase.com>
 
 	[BigBang]:
 	* .gitignore: new

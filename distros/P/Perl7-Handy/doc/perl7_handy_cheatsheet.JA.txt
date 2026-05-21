@@ -1,0 +1,179 @@
+======================================================================
+ Perl7::Handy チートシート                             [JA] 日本語
+======================================================================
+
+[ 1. インストールと使い方 ]
+
+  インストール:
+    cpan Perl7::Handy
+
+  スクリプトでの使用:
+    use Perl7::Handy;
+
+  効果 (Perl 5.010001 以降):
+    * use strict               -- 変数宣言を強制する
+    * use warnings             -- 警告を有効にする
+    * no bareword::filehandles -- open(FILE,...) 形式を禁止する
+    * no multidimensional      -- $hash{a,b} エミュレーションを無効にする
+    * use feature qw(signatures)  (Perl 5.020 以降)
+    * no feature qw(indirect)     (Perl 5.031009 以降)
+
+  効果 (Perl 5.005_03 〜 5.008):
+    * use strict
+    * open/opendir/sysopen/pipe/socket/accept のオートバイビフィケーション
+    # socket() は失敗してもautodieしない（void contextでもfalseを返すだけ）
+    * tie ベースの $; トラップ（多次元配列エミュレーション抑止）
+
+[ 2. open() -- オートバイビフィケーション、ベアワード禁止 ]
+
+  # 正しい書き方: レキシカル変数がグロブリファレンスを受け取る
+  my $fh;
+  open($fh, "< file.txt");   # 読み込み
+  open($fh, "> file.txt");   # 書き込み（上書き）
+  open($fh, ">> file.txt");  # 追記
+  open($fh, "+< file.txt");  # 読み書き
+
+  while (my $line = readline($fh)) { ... }
+  print $fh "text\n";
+  close($fh);
+
+  # 禁止: ベアワードハンドル
+  open(FILE, "< file.txt");   # dies: Use of bareword handle in open
+
+[ 3. open() -- 3引数形式 ]
+
+  my $fh;
+  open($fh, '<',  "file.txt");   # 読み込み   (sysopen O_RDONLY)
+  open($fh, '>',  "file.txt");   # 書き込み   (sysopen O_WRONLY|O_TRUNC|O_CREAT)
+  open($fh, '>>', "file.txt");   # 追記       (sysopen O_WRONLY|O_APPEND|O_CREAT)
+  open($fh, '+<', "file.txt");   # 読み書き
+  open($fh, '+>', "file.txt");   # 読み書き（上書き）
+  open($fh, '-|', "cmd");        # コマンドからパイプ入力
+  open($fh, '|-', "cmd");        # コマンドへパイプ出力
+
+  # 3引数形式は内部で CORE::sysopen を使用する。
+  # ファイル名にモード文字が含まれていても誤解析されない。
+
+[ 4. opendir(), sysopen() ]
+
+  my $dh;
+  opendir($dh, "/path/to/dir");
+  while (my $e = readdir($dh)) {
+      next if $e eq '.' or $e eq '..';
+      print "$e\n";
+  }
+  closedir($dh);
+
+  use Fcntl qw(O_RDONLY O_WRONLY O_CREAT O_TRUNC);
+  my $fh;
+  sysopen($fh, "file.txt", O_RDONLY);
+  sysopen($fh, "file.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+
+[ 5. pipe() ]
+
+  my($reader, $writer);
+  pipe($reader, $writer);
+
+  if (my $pid = fork()) {
+      close($writer);
+      while (my $line = readline($reader)) { print $line }
+      close($reader);
+  } else {
+      close($reader);
+      print $writer "子プロセスからこんにちは\n";
+      close($writer);
+      exit 0;
+  }
+
+[ 6. socket() と accept() ]
+
+  use Socket qw(AF_INET SOCK_STREAM sockaddr_in inet_aton);
+
+  my $server;
+  socket($server, AF_INET, SOCK_STREAM, 0);
+  # 注意: socket() は失敗してもautodieしない。戻り値を明示的に確認すること。
+
+  my $client;
+  accept($client, $server);
+
+[ 7. no bareword::filehandles (Perl 5.010001 以降) ]
+
+  # ベアワードファイルハンドルの使用はコンパイル時エラーになる:
+  open(FILE, "< file.txt");    # エラー: Bareword filehandle
+  print FILE "hello\n";        # エラー: Bareword filehandle
+  close(FILE);                 # エラー: Bareword filehandle
+
+  # 常にレキシカル変数を使う:
+  my $fh;
+  open($fh, "< file.txt");
+  print $fh "hello\n";
+  close($fh);
+
+[ 8. no multidimensional (Perl 5.010001 以降) ]
+
+  # 多次元ハッシュエミュレーションは無効:
+  my %h;
+  $h{1,2} = "val";    # エラー: Use of multidimensional array emulation
+
+  # 明示的なキー構築を使う:
+  $h{"1\x1c2"} = "val";   # 明示的な $; セパレータ
+  $h{"$x,$y"}  = "val";   # 文字列キー
+
+[ 9. サブルーチンシグネチャ (Perl 5.020 以降) ]
+
+  use Perl7::Handy;
+
+  sub greet($name) {
+      return "こんにちは、$name！";
+  }
+
+  sub add($x, $y) {
+      return $x + $y;
+  }
+
+  # 自動的に有効: use feature qw(signatures)
+  # 警告を抑制:   no warnings qw(experimental::signatures)
+
+[ 10. no feature qw(indirect) (Perl 5.031009 以降) ]
+
+  # 間接オブジェクト記法は無効:
+  my $obj = new MyClass;   # エラー: 間接記法
+
+  # 直接記法を使う:
+  my $obj = MyClass->new;
+
+[ 11. CVE-2016-1238: @INC から "." を除去 ]
+
+  # Perl7::Handy は起動時に @INC からカレントディレクトリを除去する。
+  # これにより相対パスからの不正なモジュール読み込みを防ぐ。
+  # BEGIN { pop @INC if $INC[-1] eq '.' }
+
+[ 12. バージョン別機能対応表 ]
+
+  機能                        5.005_03  5.006-5.009  5.010+  5.020+  5.031009+
+  --------------------------  --------  -----------  ------  ------  ---------
+  use strict                  yes       yes          yes     yes     yes
+  use warnings                no        yes          yes     yes     yes
+  open() オートバイビフィケーション yes  yes         yes*    yes*    yes*
+  no bareword::filehandles    エミュレート エミュレート yes   yes     yes
+  no multidimensional         tie方式   tie方式      yes     yes     yes
+  signatures                  no        no           no      yes     yes
+  no indirect                 no        no           no      no      yes
+
+  (*) 5.010+ では bareword::filehandles がネイティブに処理する。
+
+[ 13. 公式リソース ]
+
+  Perl7::Handy (MetaCPAN):
+    https://metacpan.org/dist/Perl7-Handy
+
+  bareword::filehandles:
+    https://metacpan.org/dist/bareword-filehandles
+
+  multidimensional:
+    https://metacpan.org/dist/multidimensional
+
+  INABA Hitoshi (ina) on CPAN:
+    https://metacpan.org/author/INA
+
+======================================================================

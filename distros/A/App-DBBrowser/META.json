@@ -61,7 +61,7 @@
             "Term::Choose::Util" : "0.148",
             "Term::Form" : "0.563",
             "Term::Form::ReadLine" : "0.563",
-            "Term::TablePrint" : "0.180",
+            "Term::TablePrint" : "0.181",
             "Text::CSV_XS" : "0",
             "bytes" : "0",
             "open" : "0",
@@ -82,6 +82,6 @@
          "web" : "https://github.com/kuerbis/App-DBBrowser"
       }
    },
-   "version" : "2.440",
+   "version" : "2.441",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

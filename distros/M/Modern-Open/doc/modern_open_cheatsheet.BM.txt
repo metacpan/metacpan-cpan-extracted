@@ -1,0 +1,122 @@
+======================================================================
+ Helaian Rujukan Modern::Open                       [BM] Bahasa Melayu
+======================================================================
+
+[ 1. Installation / [BM] Bahasa Melayu ]
+
+  Pasang:
+    cpan Modern::Open
+
+  Gunakan dalam skrip:
+    use Modern::Open;
+
+  Kesan: menggantikan open(), opendir(), sysopen(), pipe(), socket(),
+         dan accept() dengan versi autovivification + autodie.
+         Berfungsi pada Perl 5.005_03 dan semua versi selepasnya.
+         Nota: socket() menyokong autovivification tetapi tidak autodie.
+
+[ 2. open() -- 2-arg ]
+
+  my $fh;
+  open($fh, "< file.txt");   # baca
+  open($fh, "> file.txt");   # tulis (ganti)
+  open($fh, ">> file.txt");  # tambah
+  open($fh, "+< file.txt");  # baca/tulis
+  open($fh, "cmd |");        # baca dari paip arahan
+  open($fh, "| cmd");        # tulis ke paip arahan
+
+  while (my $line = readline($fh)) { ... }
+  print $fh "text\n";
+  close($fh);
+
+[ 3. open() -- 3-arg ]
+
+  my $fh;
+  open($fh, '<',  "file.txt");   # baca
+  open($fh, '>',  "file.txt");   # tulis (ganti)
+  open($fh, '>>', "file.txt");   # tambah
+  open($fh, '+<', "file.txt");   # baca/tulis
+  open($fh, '+>', "file.txt");   # baca/tulis (ganti)
+  open($fh, '-|', "cmd");        # baca dari paip arahan
+  open($fh, '|-', "cmd");        # tulis ke paip arahan
+
+[ 4. opendir() ]
+
+  my $dh;
+  opendir($dh, "/path/to/dir");
+  while (my $e = readdir($dh)) {
+      next if $e eq '.' or $e eq '..';
+      print "$e\n";
+  }
+  closedir($dh);
+
+[ 5. sysopen() ]
+
+  use Fcntl qw(O_RDONLY O_WRONLY O_CREAT O_TRUNC);
+
+  my $fh;
+  sysopen($fh, "file.txt", O_RDONLY);
+  sysopen($fh, "file.txt", O_WRONLY | O_CREAT | O_TRUNC);
+  sysopen($fh, "file.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+
+[ 6. pipe() ]
+
+  my($reader, $writer);
+  pipe($reader, $writer);
+  if (my $pid = fork()) {
+      close($writer);
+      while (my $line = readline($reader)) { print $line }
+      close($reader);
+  } else {
+      close($reader);
+      print $writer "Hai dari proses anak\n";
+      close($writer);
+      exit 0;
+  }
+
+[ 7. socket() / accept() ]
+
+  use Socket qw(AF_INET SOCK_STREAM sockaddr_in inet_aton);
+  my $server;
+  socket($server, AF_INET, SOCK_STREAM, 0);
+  # Nota: socket() tidak autodie; semak nilai pulangan secara manual.
+  my $client;
+  accept($client, $server);
+
+[ 8. autodie ]
+
+  # Konteks void: die jika gagal
+  open($fh, "< no_such_file.txt");   # dies: Can't open(...)
+
+  # Dengan nilai pulangan: undef/0 jika gagal
+  my $rc = open($fh, "< file.txt");
+  unless ($rc) { warn "open gagal: $!" }
+
+  open(FILE, "< file.txt");   # dies: Bare handle no longer supported
+
+[ 9. Handle ]
+
+  readline($fh)        # baca satu baris
+  read($fh, $buf, $n)  # baca N bait
+  print $fh "..."      # tulis
+  binmode($fh)         # mod binari
+  seek($fh, 0, 0)      # pergi ke permulaan
+  tell($fh)            # kedudukan semasa
+  close($fh)           # tutup
+  eof($fh)             # semak hujung fail
+
+[ 10. Compatibility ]
+
+  Versi Perl  : 5.005_03 ke atas (termasuk 5.42)
+  Platform    : Unix, Linux, macOS, Windows (CRLF dikendalikan secara automatik)
+  Kebergantungan : Fcntl (modul teras)
+
+[ 11. Official resources ]
+
+  Modern::Open (MetaCPAN):
+    https://metacpan.org/dist/Modern-Open
+
+  INABA Hitoshi (ina) on CPAN:
+    https://metacpan.org/author/INA
+
+======================================================================

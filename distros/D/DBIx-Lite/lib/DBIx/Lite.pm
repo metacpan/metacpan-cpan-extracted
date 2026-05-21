@@ -1,5 +1,5 @@
 package DBIx::Lite;
-$DBIx::Lite::VERSION = '0.36';
+$DBIx::Lite::VERSION = '0.38';
 # ABSTRACT: Chained and minimal ORM
 use strict;
 use warnings;
@@ -131,7 +131,11 @@ sub _autopk {
     } elsif ($driver_name eq 'SQLite') {
         return $self->dbh_do(sub { +($_->selectrow_array('SELECT LAST_INSERT_ROWID()'))[0] });
     } elsif ($driver_name eq 'Pg') {
-        return $self->dbh_do(sub { $_->last_insert_id( undef, undef, $table_name, undef ) });
+        my ( $schema, $name ) = $table_name =~ /^(?:([^.]+)[.])?([^.]+)$/;
+        # if RE fails to match, just pass in the original name and let DBD::Pg handle it
+        $name //= $table_name;
+        return $self->dbh_do( sub { $_->last_insert_id( undef, $schema, $name, undef ) } );
+
     } else {
         croak "Autoincrementing ID is not supported on $driver_name";
     }
@@ -157,7 +161,7 @@ DBIx::Lite - Chained and minimal ORM
 
 =head1 VERSION
 
-version 0.36
+version 0.38
 
 =head1 SYNOPSIS
 
@@ -336,7 +340,7 @@ Alessandro Ranellucci <aar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2024 by Alessandro Ranellucci.
+This software is copyright (c) 2026 by Alessandro Ranellucci.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

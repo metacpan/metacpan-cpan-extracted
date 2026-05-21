@@ -54,6 +54,7 @@ my @files = (
     't/local/http.t',
     't/local/httpsub.t',
     't/local/protosub.t',
+    't/redirect-credential-leak.t',
     't/redirect.t',
     't/robot/ua-get.t',
     't/robot/ua.t'

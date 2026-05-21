@@ -1,4 +1,4 @@
-#!/usr/bin/env perl
+#!perl
 use v5.40;
 
 use Getopt::Long qw/ :config bundling pass_through /;

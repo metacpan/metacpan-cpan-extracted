@@ -1,4 +1,121 @@
 Revision history for BATsh
 
-0.01  2026-04-26
+0.02  2026-04-28 JST (Japan Standard Time)
+
+    [Highlights]
+    - Full bash/sh interpreter implementation: if/for/while/until/case,
+      function definitions (name() { ... }), local variable scoping,
+      && / || / ; compound commands, pipelines (|), I/O redirection
+      (> >> < 2> 2>> 2>&1), variable expansion (${var%pat}, ${var#pat},
+      ${#var}, ${var^^}, ${var,,}, ${var:N:L}, ${var/p/r}, ${var//p/r}),
+      positional parameters $1..$9 / $@ / $* / $#, shift, read, source.
+    - cmd.exe pipeline (|) support via temporary file (Pure Perl, 5.005_03).
+    - I/O redirection: stdout overwrite (>), append (>>), stdin (<),
+      stderr (2>), stderr-to-stdout (2>&1), stdout-to-stderr (1>&2).
+      Supported in both CMD mode and SH mode.
+    - cmd.exe batch-parameter tilde modifiers: %~0, %~f1, %~dp0, %~nx1,
+      %~n0, %~x0, %~p1 etc. (f d p n x modifiers, combinable).
+    - SET /P VAR=Prompt  interactive prompt input from STDIN.
+    - $0 normalised to absolute path via File::Spec on run().
+
+    [BATsh::Env]
+    - Variable names are now stored and looked up in uppercase, matching
+      cmd.exe's case-insensitive environment variable behaviour.
+      SET myvar=x  followed by  ECHO %MYVAR%  now correctly outputs "x".
+    - Added $DELAYED_EXPANSION package variable (default 0).
+    - setlocal() now accepts an options string and parses
+      ENABLEDELAYEDEXPANSION / DISABLEDELAYEDEXPANSION.
+      The delayed-expansion flag is saved/restored with the variable store.
+    - expand_cmd() now expands !VAR! references when $DELAYED_EXPANSION is on.
+
+    [BATsh::CMD]
+    - Implemented ^ escape character:
+        ^X          -> literal X (protects & | < > etc.)
+        ^^          -> literal ^
+        trailing ^  -> line continuation (joins next line)
+    - Implemented I/O redirection parsed before command dispatch:
+        >file       stdout overwrite
+        >>file      stdout append
+        2>file      stderr overwrite
+        2>>file     stderr append
+        <file       stdin redirect
+      Redirects with ^> are correctly treated as escaped > (not a redirect).
+      fd-digit stripping limited to isolated '1' or '2' before '>' to avoid
+      consuming trailing digits of command arguments (e.g. "ECHO line1 >f").
+    - SETLOCAL now passes its option string to BATsh::Env::setlocal() so
+      ENABLEDELAYEDEXPANSION and DISABLEDELAYEDEXPANSION take effect.
+    - !VAR! delayed expansion: pre_expanded block bodies now call expand_cmd()
+      at runtime when delayed expansion is active, so SET inside an IF/FOR
+      block followed by ECHO !VAR! correctly reflects the updated value.
+    - IF block pre-expansion: %VAR% in parenthesised IF/ELSE bodies is now
+      expanded at parse time (matching cmd.exe semantics), so a SET inside the
+      block does not affect %VAR% references in the same block.
+    - FOR block pre-expansion: %VAR% in parenthesised FOR bodies is expanded
+      once before the first iteration (at FOR-line parse time) and cached;
+      the loop variable is substituted per-iteration via an internal placeholder.
+    - IF /I (case-insensitive comparison) is now parsed before plain == so
+      that "/I" is not consumed as part of the left-hand operand.
+    - IF EXIST now handles quoted paths that contain spaces.
+    - ECHO no longer resets ERRORLEVEL to 0 after printing.
+    - FOR /F fully implemented:
+        tokens=N,M-P  select specific token columns
+        tokens=N*     select token N and put the remainder in the next variable
+        delims=CHARS  field delimiters (default space/tab)
+        skip=N        skip the first N lines of the source
+        eol=C         skip lines beginning with character C (default ;)
+        usebackq      swap quoting: "file" reads a file, 'cmd' runs a command
+      Sources: bare filename, quoted filename, 'command' (backtick output),
+      and ("literal string").
+    - & (sequential), && (conditional-success), || (conditional-failure)
+      compound commands are now supported.
+    - SET VAR=value: variable name regex relaxed to accept any non-'=' prefix,
+      matching cmd.exe's permissive variable naming.
+
+    [BATsh::SH]
+    - Full bash/sh interpreter implemented as Pure Perl (no external shell).
+    - Control structures: if/then/elif/else/fi, for/do/done, while/do/done,
+      until/do/done, case/esac with glob-pattern matching.
+    - Function definitions: name() { ... } and function name { ... } syntax,
+      including inline single-line bodies.  Functions receive positional
+      arguments $1..$9; caller's arguments are saved and restored on return.
+    - local variable scoping: local VAR=value saves the caller's value and
+      restores it when the function returns.
+    - Compound commands: cmd1 && cmd2, cmd1 || cmd2, cmd1 ; cmd2.
+    - Pipeline: cmd1 | cmd2 [| cmd3 ...] implemented via temporary files
+      (Perl 5.005_03 compatible bareword filehandles, no fork/exec).
+    - I/O redirection: > >> < 2> 2>> 2>&1 1>&2, parsed after variable
+      expansion so that filenames may contain variables.
+    - Variable expansion: $VAR, ${VAR}, $1..$9, $@, $*, $#, $?, $$, $0.
+      Parameter expansion forms: ${VAR:-default}, ${VAR:=default},
+      ${VAR:+alt}, ${VAR%pat}, ${VAR%%pat}, ${VAR#pat}, ${VAR##pat},
+      ${VAR/pat/rep}, ${VAR//pat/rep}, ${VAR^^}, ${VAR^}, ${VAR,,}, ${VAR,},
+      ${VAR:N:L}, ${VAR:N}, ${#VAR}.
+      Glob patterns in %/%%/#/## support *, ?, and [abc] character classes.
+    - Arithmetic expansion: $(( expr )) with +, -, *, /, %, and positional
+      parameters $1..$9 inside the expression.
+    - Command substitution: $( cmd ) with full nesting/quoting support, and
+      backtick `cmd` form.
+    - shift [N]: shifts positional parameters left by N positions (default 1),
+      updating both %N and %* in BATsh::Env.
+    - read VAR: reads one line from STDIN, chomps it, stores in VAR.
+    - source / . file: executes an external file in the current SH context.
+    - Builtin commands: echo, printf, cd, pwd, exit, true, false, :, export,
+      unset, set (noop), test / [ ... ] with -f -d -e -r -w -x -s -z -n
+      and string (= == != < >) and integer (-eq -ne -lt -le -gt -ge) ops.
+    - _cmd_subst uses fixed bareword filehandles (_SUBST_SAVOUT etc.) to
+      avoid collision under Perl strict and recursive invocations.
+    - _sh_strip_redirects and _sh_exec_with_redirs added for I/O redirection.
+    - _replace_cmd_subst added: walks $( ) depth-tracking the nesting so that
+      $( cmd | perl -e "print uc" ) parses the closing ) correctly.
+    - _split_sh_compound and _exec_sh_compound added for && / || / ; handling.
+    - _split_sh_pipe and _exec_sh_pipe added for pipeline handling.
+    - $0 is set to the absolute path of the running script by BATsh::run().
+
+    [BATsh.pm]
+    - _exec_cmd_section no longer intercepts SETLOCAL/ENDLOCAL itself;
+      both are passed through to BATsh::CMD::_dispatch so the option string
+      (ENABLEDELAYEDEXPANSION etc.) is correctly forwarded.
+
+0.01  2026-04-26 JST (Japan Standard Time)
+
     - Initial CPAN release.

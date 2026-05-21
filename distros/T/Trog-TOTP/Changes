@@ -1,5 +1,8 @@
 Revision history for Perl extension Trog-TOTP
 
+1.006 2026-05-15 TEODESIAN
+    - Use Crypt::PRNG::rand() rather than builtin rand()
+
 1.005 2024-06-18 TEODESIAN
     - Re-factor & remove false-negatives
     - Add the return_when parameter to validate_otp

@@ -4,7 +4,7 @@ use strict;
 
 require Test::More;
 
-require 't/test-lib.pl';
+require './t/test-lib.pl';
 
 if(have_db('sqlite_admin'))
 {

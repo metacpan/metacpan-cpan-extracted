@@ -1,0 +1,31 @@
+{
+  "ID": "7TRN:IPZB:QYBB:VPBQ:UMPP:KARE:6ZNR:XE6T:7EWV:PKF4:ZOJD:TPYS",
+  "Containers": 14,
+  "ContainersRunning": 3,
+  "ContainersPaused": 1,
+  "ContainersStopped": 10,
+  "Images": 25,
+  "Driver": "overlay2",
+  "DriverStatus": [
+    ["Backing Filesystem", "extfs"],
+    ["Supports d_type", "true"],
+    ["Using metacopy", "false"],
+    ["Native Overlay Diff", "true"]
+  ],
+  "DockerRootDir": "/var/lib/docker",
+  "SystemTime": "2025-01-15T10:30:00.000000000Z",
+  "Name": "test-host",
+  "ServerVersion": "27.4.1",
+  "OperatingSystem": "Debian GNU/Linux 12 (bookworm)",
+  "OSType": "linux",
+  "Architecture": "x86_64",
+  "NCPU": 4,
+  "MemTotal": 8370917376,
+  "KernelVersion": "6.1.0-9-amd64",
+  "HttpProxy": "",
+  "HttpsProxy": "",
+  "NoProxy": "",
+  "Labels": [],
+  "ExperimentalBuild": false,
+  "LiveRestoreEnabled": false
+}

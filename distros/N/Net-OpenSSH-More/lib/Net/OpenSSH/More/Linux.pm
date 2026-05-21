@@ -1,5 +1,5 @@
 package Net::OpenSSH::More::Linux;
-$Net::OpenSSH::More::Linux::VERSION = '1.00';
+$Net::OpenSSH::More::Linux::VERSION = '1.01';
 #ABSTRACT: Useful subcommands for linux machines
 
 use strict;
@@ -84,7 +84,7 @@ Net::OpenSSH::More::Linux - Useful subcommands for linux machines
 
 =head1 VERSION
 
-version 1.00
+version 1.01
 
 =head1 DESCRIPTION
 
@@ -148,6 +148,15 @@ Please see those modules/websites for more information related to this module.
 L<Net::OpenSSH::More|Net::OpenSSH::More>
 
 =back
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/troglodyne-internet-widgets/perl-Net-Openssh-More/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =head1 AUTHORS
 

@@ -5,21 +5,16 @@ Task::WebDyne::Starman - Optional Starman integration for WebDyne
 
 # SYNOPSIS
 
-module synopsis
 ```bash
-#  Using CPAN
-#
 cpan Task::WebDyne::Starman
 
-
-#  Using CPANMinus
-#
 cpanm Task::WebDyne::Starman
 ```
 
 # DESCRIPTION
 
-Task::WebDyne::Starman install WebDyne, Plack and Starman modules
+Task::WebDyne::Starman installs the Perl modules required to use Starman
+with WebDyne.
 
 # AUTHOR
 

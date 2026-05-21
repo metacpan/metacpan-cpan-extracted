@@ -1,0 +1,53 @@
+name: Publish to CPAN
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  publish-ui:
+    name: Publish to CPAN
+    runs-on: ubuntu-latest
+    environment: Release
+    if: github.event_name == 'release' && github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v4
+      - name: update-version
+        # Tag is expected as vX.Y.Z so the v-string $VERSION = vX.Y.Z; stays valid.
+        env:
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          perl -i -pe 's/^(\s*)\$VERSION\s*=\s*v[0-9.]+;/$1\$VERSION = $ENV{REF_NAME};/' lib/JSON/API.pm
+      - name: install cpanm and multiple modules
+        uses: perl-actions/install-with-cpanm@v1
+        with:
+          install: |
+            Module::Build
+            Software::License
+            JSON
+            LWP::UserAgent
+            URI::Encode
+            Test::Fake::HTTPD
+            IO::Capture
+            Test::More
+            Test::Pod::Coverage
+            CPAN::Uploader
+      - name: Configure
+        run: perl Build.PL
+      - name: Test
+        run: ./Build test
+      - name: Build
+        run: ./Build
+      - name: Build Manifest
+        run: ./Build manifest
+      - name: Deliver locally
+        run: ./Build dist
+      - name: Upload to CPAN
+        env:
+          CPAN_USERNAME: ${{ secrets.USERNAME }}
+          CPAN_PASSWORD: ${{ secrets.PASSWORD }}
+        run: |
+          umask 077
+          trap 'rm -f ~/.pause' EXIT
+          printf 'user %s\npassword %s\n' "$CPAN_USERNAME" "$CPAN_PASSWORD" > ~/.pause
+          cpan-upload JSON-API-*.tar.gz

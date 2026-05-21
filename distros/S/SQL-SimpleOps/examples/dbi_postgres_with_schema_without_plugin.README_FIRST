@@ -1,0 +1,18 @@
+# 
+## Copyright (C) Carlos Celso
+# 
+## see: https://metacpan.org/pod/DBD::Pg
+#
+## see: /var/lib/pgsql/data/pg_hba.conf
+#
+## see: dbi_postgres_with_schema.README_FIRST
+
+*) NOTE:
+
+ The option 'driver => [dbd_drive_name]' must be the correct CPAN "DBD:[drive]" name
+
+ For Postgress drvier the name is "DBD::Pg" (case sensitive)
+
+ SQL::SimpleOps->new( ... driver => 'Pg', ignore_plugin => 1 ...);
+
+ENDED

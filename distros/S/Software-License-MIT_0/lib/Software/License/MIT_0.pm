@@ -7,7 +7,7 @@ use warnings;
 
 use parent qw< Software::License >;
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.0.1';
 
 sub name            { 'MIT No Attribution License' }
 sub url             { 'https://raw.githubusercontent.com/aws/mit-0/feadea429356d82c9bc82cce0c76894892683c3b/MIT-0' }

@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 #
 # Example: Use compiled Data::Path::XS paths to extract fields from watch events
+# (Data::Path::XS is an optional CPAN module — install separately to run this).
 #
 # Watch responses are nested hashes — compiled paths avoid repeated parsing
 # when extracting the same fields from every event in a hot loop.

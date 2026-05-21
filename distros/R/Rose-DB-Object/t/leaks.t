@@ -16,7 +16,7 @@ Test::More->import(tests => 5 * 2);
 
 BEGIN 
 {
-  require 't/test-lib.pl';
+  require './t/test-lib.pl';
   use Rose::DB::Object::Loader;
   use Rose::DB::Object::Manager;
 }

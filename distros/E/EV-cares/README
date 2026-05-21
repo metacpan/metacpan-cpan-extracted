@@ -3,7 +3,7 @@ NAME
 
 SYNOPSIS
         use EV;
-        use EV::cares qw(:status :types);
+        use EV::cares qw(:status :types :classes);
 
         my $r = EV::cares->new(
             servers => ['8.8.8.8', '1.1.1.1'],
@@ -44,7 +44,10 @@ DESCRIPTION
     Multiple queries run concurrently. c-ares handles server rotation,
     retries, timeouts, and search-domain appending.
 
-    Requires c-ares >= 1.22.0 (provided automatically by Alien::cares).
+    Requires c-ares >= 1.24.0 (provided automatically by Alien::cares).
+    HTTPS/SVCB/TLSA/DS/DNSKEY/RRSIG record parsing additionally requires
+    c-ares >= 1.28.0; on older c-ares these types fall through to the raw
+    response buffer.
 
 CONSTRUCTOR
   new
@@ -68,13 +71,18 @@ CONSTRUCTOR
         Threshold for treating a name as absolute (skip search suffixes).
 
     flags => $flags
-        Bitmask of "ARES_FLAG_*" constants.
+        Bitmask of "ARES_FLAG_*" constants. Note: c-ares builds without
+        "ARES_FLAG_NO_DFLT_SVR" or "ARES_FLAG_DNS0x20" have those constants
+        exported as 0, so combining them is a silent no-op on older c-ares.
+        "ARES_FLAG_STAYOPEN" has no effect under EV::cares because the
+        module hands socket lifecycle to libev via "ARES_OPT_SOCK_STATE_CB".
 
     lookups => $string
         Lookup order: "b" for DNS, "f" for /etc/hosts.
 
     rotate => 1
-        Round-robin among servers.
+        Round-robin among servers. Silently ignored on c-ares builds where
+        "ARES_OPT_ROTATE" is unavailable.
 
     tcp_port => $port
     udp_port => $port
@@ -96,6 +104,12 @@ CONSTRUCTOR
         Enable query result cache; $max_ttl is the upper TTL bound in
         seconds. 0 disables the cache.
 
+    loop => $ev_loop
+        An EV::Loop instance to attach all I/O and timer watchers to.
+        Defaults to the EV default loop. Useful for multi-loop apps (e.g.
+        when running EV::cares inside a forked or threaded service that uses
+        its own loop).
+
 QUERY METHODS
     Every query method takes a callback as the last argument. The first
     argument to the callback is always a status code ("ARES_SUCCESS" on
@@ -107,31 +121,131 @@ QUERY METHODS
     Resolves $name via "ares_getaddrinfo" with "AF_UNSPEC", returning both
     IPv4 and IPv6 address strings.
 
+  resolve_ttl
+        $r->resolve_ttl($name, sub {
+            my ($status, @records) = @_;
+            # @records = ({addr, family, ttl, timeouts, [canonname]}, ...)
+        });
+
+    Like "resolve", but each result is a hashref carrying the per-record TTL
+    reported by the answering nameserver. Useful for application-level
+    caching that respects authoritative TTLs. When the resolver returned a
+    CNAME chain, "canonname" holds the final canonical name. "timeouts" is
+    the c-ares retry count for the underlying query.
+
+  resolve_all
+        $r->resolve_all(\@names, sub {
+            my ($results) = @_;
+            # $results->{$name} = { status => $s, addrs => [...] }
+        });
+
+    Convenience helper that fires one concurrent resolve() per unique name
+    and invokes $cb once with a hashref keyed by name. Duplicate names are
+    deduplicated before issuing queries. Calls $cb synchronously with an
+    empty hashref if the name list is empty.
+
+  reverse_all
+        $r->reverse_all(\@ips, sub {
+            my ($results) = @_;
+            # $results->{$ip} = { status => $s, hosts => [...] }
+        });
+
+    Bulk reverse-DNS lookup. One reverse() per unique IP (deduplicated).
+    Useful for log enrichment. An invalid IP in the input croaks (same as
+    the underlying "reverse"); validate inputs upfront if your data isn't
+    trusted.
+
+  resolve_ttl_all
+        $r->resolve_ttl_all(\@names, sub {
+            my ($results) = @_;
+            # $results->{$name} = { status => $s, records => [...] }
+            # records are {addr, family, ttl, timeouts, [canonname]} hashrefs
+        });
+
+    Like "resolve_all", but each result entry's "records" contains the full
+    hashref form (with TTL etc.) produced by "resolve_ttl".
+
+  search_all
+        $r->search_all(\@names, $type, sub {
+            my ($results) = @_;
+            # $results->{$name} = { status => $s, records => [...] }
+        });
+        $r->search_all(\@names, $type, $class, sub { ... });   # explicit class
+
+    Like "resolve_all", but issues one search() per unique name for the
+    given record type. Class defaults to "C_IN"; pass an explicit class as
+    the optional fourth argument. Each result hashref carries the same
+    "records" arrayref shape that the underlying "search" returns for that
+    type. Useful for bulk MX, TXT, or HTTPS lookups.
+
   getaddrinfo
         $r->getaddrinfo($node, $service, \%hints, $cb);
 
     Full getaddrinfo. $service and "\%hints" may be "undef". Hint keys:
-    "family", "socktype", "protocol", "flags" ("ARES_AI_*"). Callback
-    receives "($status, @ip_strings)".
+    "family", "socktype", "protocol", "flags" ("ARES_AI_*"), plus "ttl => 1"
+    to receive "{addr, family, ttl, timeouts, [canonname]}" hashrefs instead
+    of bare strings. "canonname" is included only when the answer followed a
+    CNAME chain. Callback receives "($status, @ip_strings)" by default, or
+    @hashrefs when "ttl" is set.
+
+    "socktype" defaults to "SOCK_STREAM" to coalesce duplicate addresses;
+    pass "socktype => 0" only if you want a separate result entry for each
+    socktype the resolver returns.
 
   search
         $r->search($name, $type, sub { my ($status, @records) = @_ });
+        $r->search($name, $type, $class, sub { ... });   # explicit class
 
-    DNS search (appends search domains from resolv.conf), always using
-    "C_IN" class. Results are auto-parsed based on $type:
+    DNS search (appends search domains from resolv.conf). Class defaults to
+    "C_IN"; pass an explicit class (e.g. "C_CHAOS" for queries like
+    "version.bind") as the optional third argument. Results are auto-parsed
+    based on $type:
 
-        T_A, T_AAAA    ($status, @ip_strings)
-        T_MX           ($status, @{ {priority, host} })
-        T_SRV          ($status, @{ {priority, weight, port, target} })
-        T_TXT          ($status, @strings)
-        T_NS           ($status, @hostnames)
-        T_SOA          ($status, {mname, rname, serial, refresh,
-                                  retry, expire, minttl})
-        T_PTR          ($status, @hostnames)
-        T_NAPTR        ($status, @{ {order, preference, flags,
-                                     service, regexp, replacement} })
-        T_CAA          ($status, @{ {critical, property, value} })
-        T_CNAME etc.   ($status, $raw_buffer)
+        T_A, T_AAAA       @ip_strings
+        T_NS, T_PTR       @hostnames
+        T_TXT             @strings
+        T_MX              @{ {priority, host} }
+        T_SRV             @{ {priority, weight, port, target} }
+        T_SOA             {mname, rname, serial, refresh, retry,
+                           expire, minttl}
+        T_NAPTR           @{ {order, preference, flags, service,
+                              regexp, replacement} }
+        T_CAA             @{ {critical, property, value} }
+        T_HTTPS, T_SVCB   @{ {priority, target, params => \%p} }
+        T_TLSA            @{ {cert_usage, selector,
+                              matching_type, data} }
+        T_DS              @{ {key_tag, algorithm,
+                              digest_type, digest} }
+        T_DNSKEY          @{ {flags, protocol, algorithm,
+                              public_key} }
+        T_RRSIG           @{ {type_covered, algorithm, labels,
+                              original_ttl, sig_expiration,
+                              sig_inception, key_tag,
+                              signer_name, signature} }
+        T_CNAME, T_ANY,
+        other             $raw_dns_response_buffer (a wire-format DNS
+                          packet -- feed it to e.g. Net::DNS::Packet
+                          to decode further)
+
+    For TLSA (DANE, RFC 6698), "data" is the raw fingerprint / certificate
+    bytes; the integer fields are "cert_usage" (0..3), "selector" (0..1),
+    and "matching_type" (0..2). TLSA parsing requires c-ares >= 1.28.
+
+    For DS / DNSKEY / RRSIG (DNSSEC, RFC 4034) the binary fields are the raw
+    wire-format bytes; integer fields use host byte order. "digest",
+    "public_key", and "signature" are unmodified base64-able blobs.
+    "signer_name" in RRSIG is the dotted owner name (uncompressed, per RFC
+    4034 section 3.1.7). Recursive resolvers may strip these records unless
+    the DO (DNSSEC OK) bit is set in EDNS, which c-ares does not yet expose;
+    you may need to query a validating resolver directly via "servers" if
+    your default upstream doesn't return them.
+
+    For HTTPS/SVCB, %p may contain "alpn" (arrayref of protocol IDs),
+    "no_default_alpn" (1 if set), "port" (integer), "ipv4hint" / "ipv6hint"
+    (arrayrefs of address strings), "ech" (opaque bytes), "dohpath"
+    (string), and any unrecognized SVCB param as "keyN => $bytes". Parsing
+    requires c-ares >= 1.28; on older c-ares HTTPS/SVCB falls through to the
+    raw buffer like unknown types.
 
   query
         $r->query($name, $class, $type, sub { my ($status, $buf) = @_ });
@@ -156,17 +270,35 @@ QUERY METHODS
 
     Full getnameinfo. $packed_sockaddr comes from "pack_sockaddr_in" in
     Socket or "pack_sockaddr_in6" in Socket. $flags is a bitmask of
-    "ARES_NI_*" constants.
+    "ARES_NI_*" constants. Note that "ARES_NI_TCP" is 0 (TCP is the
+    default); pass "ARES_NI_DGRAM" (or its alias "ARES_NI_UDP") to select
+    datagram-mode lookups.
 
 CHANNEL METHODS
   cancel
     Cancel all pending queries. Each outstanding callback fires with
-    "ARES_ECANCELLED".
+    "ARES_ECANCELLED". Safe to call from within a callback. Croaks if called
+    on a destroyed resolver -- guard with "is_destroyed" if you may race a
+    destroy.
 
   set_servers
         $r->set_servers('8.8.8.8', '1.1.1.1');
+        $r->set_servers(['8.8.8.8', '1.1.1.1:5353']);
+        $r->set_servers([
+            { host => '1.1.1.1' },
+            { host => '8.8.8.8', port => 53 },
+        ]);
 
-    Replace the DNS server list.
+    Replace the DNS server list. Accepts a flat list, an arrayref of strings
+    (each may be "host:port"), or an arrayref of "{ host => ..., port => ...
+    }" hashrefs. Croaks if no server is given.
+
+  set_sortlist
+        $r->set_sortlist('192.168.0.0/255.255.0.0 ::1/128');
+
+    Set the address-sortlist for ordering returned addresses. See c-ares'
+    "ares_set_sortlist" for the format (CIDR / netmask pairs separated by
+    whitespace). Croaks on parse error.
 
   servers
         my $csv = $r->servers;   # "8.8.8.8,1.1.1.1"
@@ -191,7 +323,33 @@ CHANNEL METHODS
   active_queries
         my $n = $r->active_queries;
 
-    Returns the number of outstanding queries.
+    Returns the number of outstanding queries. Remains callable after
+    "destroy"; returns 0 in that case (during interpreter global destruction
+    the count may reflect whatever was pending, since "ares_destroy" is
+    intentionally skipped on the global-destruction path).
+
+  is_destroyed
+        if ($r->is_destroyed) { ... }
+
+    Returns 1 if "destroy" has been called on this resolver, 0 otherwise.
+    Useful in long-running daemons that want to skip work without croaking
+    on a torn-down channel. Remains callable after "destroy".
+
+  next_timeout
+        my $secs = $r->next_timeout;
+
+    Returns the seconds until c-ares' next internal timer (e.g. retry window
+    for an in-flight query), or -1 if no timer is pending. Useful for wiring
+    EV::cares into custom scheduling or for diagnosing a slow upstream.
+    Croaks on a destroyed resolver.
+
+  last_query_timeouts
+        my $n = $r->last_query_timeouts;
+
+    Returns the c-ares retry/timeout count of the most recently completed
+    callback. Useful for tuning per-server timeouts; note that with multiple
+    in-flight queries this is whichever callback fired most recently and
+    races accordingly. Remains callable after "destroy".
 
   reinit
         $r->reinit;
@@ -204,9 +362,9 @@ CHANNEL METHODS
         $r->destroy;
 
     Explicitly release the c-ares channel and stop all watchers. Pending
-    callbacks fire with "ARES_ECANCELLED" or "ARES_EDESTRUCTION". Safe to
-    call from within a callback. Also called automatically when the object
-    is garbage-collected.
+    callbacks fire with "ARES_EDESTRUCTION". Safe to call from within a
+    callback or twice in a row. Also called automatically when the object is
+    garbage-collected.
 
 FUNCTIONS
   strerror
@@ -221,16 +379,17 @@ FUNCTIONS
     Returns the c-ares library version string.
 
 CALLBACK SAFETY
-    Callbacks are invoked from within "ares_process_fd", called from EV I/O
-    and timer watchers. Exceptions thrown inside callbacks are caught
-    ("G_EVAL") and emitted as warnings; they do not propagate to the caller.
+    Callbacks fire from within "ares_process_fd", driven by EV I/O and timer
+    watchers. Exceptions are caught ("G_EVAL") and emitted as warnings; they
+    do not propagate to the caller.
 
-    It is safe to call "cancel", "destroy", or "undef" the resolver from
-    within a callback. Remaining pending queries will receive
-    "ARES_ECANCELLED".
+    "cancel", "destroy", and dropping the last reference to the resolver are
+    all safe from inside a callback. Outstanding queries on the same channel
+    receive "ARES_ECANCELLED" or "ARES_EDESTRUCTION".
 
-    Lookups that use only local sources ("lookups => 'f'") may complete
-    synchronously during the initiating method call.
+    Local-only lookups ("lookups => 'f'", hosts-file matches, cached
+    results) may complete synchronously inside the initiating method call;
+    write your code so it tolerates that.
 
 EXPORT TAGS
         :status    ARES_SUCCESS  ARES_ENODATA  ARES_ETIMEOUT  ...
@@ -243,7 +402,12 @@ EXPORT TAGS
         :all       all of the above
 
 SEE ALSO
-    EV, Alien::cares, <https://c-ares.org/>
+    EV, Alien::cares, <https://c-ares.org/>.
+
+    The eg/ directory has runnable examples covering the dig-style CLI,
+    HTTPS/SVCB and TLSA/DANE inspection, DNSSEC zone trace, email-posture
+    checks, MX-to-SMTP probe, log-IP enrichment, a minimal UDP DNS proxy,
+    Mojo interop, and a Future-based parallel resolve.
 
 AUTHOR
     vividsnow

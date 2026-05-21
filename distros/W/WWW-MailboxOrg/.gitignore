@@ -1,0 +1,35 @@
+# Build artifacts
+*.tar.gz
+WWW-MailboxOrg-*/
+
+# Dist::Zilla
+/.build/
+/_DZIL/
+*.bak
+~
+
+# Perl
+*.pl
+*.pm
+!bin/
+!lib/
+
+# Test
+*.tmp
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+.snap/
+
+# Editor
+*.swp
+*.swo
+*~
+\#*
+.#*
+
+# Coverage
+cover_db/
+nocov.png

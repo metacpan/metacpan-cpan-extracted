@@ -4,7 +4,7 @@ package Crypt::Mac::OMAC;
 
 use strict;
 use warnings;
-our $VERSION = '0.088';
+our $VERSION = '0.089';
 
 use base qw(Crypt::Mac Exporter);
 our %EXPORT_TAGS = ( all => [qw( omac omac_hex omac_b64 omac_b64u )] );
@@ -22,25 +22,26 @@ Crypt::Mac::OMAC - Message authentication code OMAC
 =head1 SYNOPSIS
 
    ### Functional interface:
-   use Crypt::Mac::OMAC qw( omac omac_hex );
+   use Crypt::Mac::OMAC qw( omac omac_hex omac_b64 omac_b64u );
 
    # calculate MAC from string/buffer
-   $omac_raw  = omac($cipher_name, $key, 'data buffer');
-   $omac_hex  = omac_hex($cipher_name, $key, 'data buffer');
-   $omac_b64  = omac_b64($cipher_name, $key, 'data buffer');
-   $omac_b64u = omac_b64u($cipher_name, $key, 'data buffer');
+   my $omac_raw  = omac($cipher_name, $key, 'data buffer');
+   my $omac_hex  = omac_hex($cipher_name, $key, 'data buffer');
+   my $omac_b64  = omac_b64($cipher_name, $key, 'data buffer');
+   my $omac_b64u = omac_b64u($cipher_name, $key, 'data buffer');
 
    ### OO interface:
    use Crypt::Mac::OMAC;
 
-   $d = Crypt::Mac::OMAC->new($cipher_name, $key);
+   my $d = Crypt::Mac::OMAC->new($cipher_name, $key);
    $d->add('any data');
-   $d->addfile('filename.dat');
-   $d->addfile(*FILEHANDLE);
-   $result_raw  = $d->mac;     # raw bytes
-   $result_hex  = $d->hexmac;  # hexadecimal form
-   $result_b64  = $d->b64mac;  # Base64 form
-   $result_b64u = $d->b64umac; # Base64 URL Safe form
+   my $result_hex = $d->hexmac;   # finalizes the object
+
+   # for another output encoding use a fresh object (or clone before finalizing)
+   my $result_b64u = Crypt::Mac::OMAC->new($cipher_name, $key)->add('any data')->b64umac;
+
+   # or MAC a file instead
+   my $file_result_raw = Crypt::Mac::OMAC->new($cipher_name, $key)->addfile('filename.dat')->mac;
 
 =head1 DESCRIPTION
 
@@ -52,7 +53,7 @@ Nothing is exported by default.
 
 You can export selected functions:
 
-  use Crypt::Mac::OMAC qw(omac omac_hex );
+  use Crypt::Mac::OMAC qw( omac omac_hex omac_b64 omac_b64u );
 
 Or all of them at once:
 
@@ -62,51 +63,72 @@ Or all of them at once:
 
 =head2 omac
 
-Logically joins all arguments into a single string, and returns its OMAC message authentication code encoded as a binary string.
+Joins all arguments into a single string and returns its OMAC message authentication code encoded as a binary string.
 
- $omac_raw = omac($cipher_name, $key, 'data buffer');
+Data arguments for the functional helpers are converted to byte strings using
+Perl's usual scalar stringification. Defined scalars, including numbers and
+string-overloaded objects, are accepted. C<undef> is treated as an empty
+string and may emit Perl's usual "uninitialized value" warning. The same
+rules apply to C<omac_hex>, C<omac_b64>, and
+C<omac_b64u>.
+
+ my $omac_raw = omac($cipher_name, $key, 'data buffer');
  #or
- $omac_raw = omac($cipher_name, $key, 'any data', 'more data', 'even more data');
+ my $omac_raw = omac($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head2 omac_hex
 
-Logically joins all arguments into a single string, and returns its OMAC message authentication code encoded as a hexadecimal string.
+Joins all arguments into a single string and returns its OMAC message authentication code encoded as a hexadecimal string.
 
- $omac_hex = omac_hex($cipher_name, $key, 'data buffer');
+ my $omac_hex = omac_hex($cipher_name, $key, 'data buffer');
  #or
- $omac_hex = omac_hex($cipher_name, $key, 'any data', 'more data', 'even more data');
+ my $omac_hex = omac_hex($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head2 omac_b64
 
-Logically joins all arguments into a single string, and returns its OMAC message authentication code encoded as a Base64 string.
+Joins all arguments into a single string and returns its OMAC message authentication code encoded as a Base64 string.
 
- $omac_b64 = omac_b64($cipher_name, $key, 'data buffer');
+ my $omac_b64 = omac_b64($cipher_name, $key, 'data buffer');
  #or
- $omac_b64 = omac_b64($cipher_name, $key, 'any data', 'more data', 'even more data');
+ my $omac_b64 = omac_b64($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head2 omac_b64u
 
-Logically joins all arguments into a single string, and returns its OMAC message authentication code encoded as a Base64 URL Safe string (see RFC 4648 section 5).
+Joins all arguments into a single string and returns its OMAC message authentication code encoded as a Base64 URL-safe string (see RFC 4648 section 5).
 
- $omac_b64url = omac_b64u($cipher_name, $key, 'data buffer');
+ my $omac_b64url = omac_b64u($cipher_name, $key, 'data buffer');
  #or
- $omac_b64url = omac_b64u($cipher_name, $key, 'any data', 'more data', 'even more data');
+ my $omac_b64url = omac_b64u($cipher_name, $key, 'any data', 'more data', 'even more data');
 
 =head1 METHODS
 
+Unless noted otherwise, assume C<$d> is an existing MAC object created via
+C<new>, for example:
+
+ my $d = Crypt::Mac::OMAC->new($cipher_name, $key);
+
 =head2 new
 
- $d = Crypt::Mac::OMAC->new($cipher_name, $key);
+ my $d = Crypt::Mac::OMAC->new($cipher_name, $key);
+
+ # $cipher_name .. [string] one of 'AES', 'Camellia', 'Twofish', 'Serpent', etc.
+ #                 any <NAME> for which there is a Crypt::Cipher::<NAME> module
+ # $key .......... [binary string] key of valid length for the chosen cipher (e.g. 16/24/32 bytes for AES)
 
 =head2 clone
 
  $d->clone();
 
-=head2 reset
-
- $d->reset();
-
 =head2 add
+
+Appends data to the message. Returns the object itself (for chaining).
+Croaks if the object has already been finalized by C<mac>, C<hexmac>,
+C<b64mac>, or C<b64umac>.
+
+Each argument is converted to bytes using Perl's usual scalar stringification.
+Defined scalars, including numbers and string-overloaded objects, are
+accepted. C<undef> is treated as an empty string and may emit Perl's usual
+"uninitialized value" warning.
 
  $d->add('any data');
  #or
@@ -114,31 +136,52 @@ Logically joins all arguments into a single string, and returns its OMAC message
 
 =head2 addfile
 
+Reads the file content and appends it to the message. Returns the object itself
+(for chaining). Croaks if the object has already been finalized by C<mac>,
+C<hexmac>, C<b64mac>, or C<b64umac>.
+
  $d->addfile('filename.dat');
  #or
- $d->addfile(*FILEHANDLE);
+ my $filehandle = ...; # existing binary-mode filehandle
+ $d->addfile($filehandle);
 
 =head2 mac
 
- $result_raw = $d->mac();
+Returns the binary MAC (raw bytes) and finalizes the object. After the first
+call to C<mac>, C<hexmac>, C<b64mac>, or C<b64umac>, later calls to C<add>,
+C<addfile>, or any MAC getter croak.
+
+ my $result_raw = $d->mac();
 
 =head2 hexmac
 
- $result_hex = $d->hexmac();
+Returns the MAC encoded as a lowercase hexadecimal string and finalizes the
+object. After the first call to C<mac>, C<hexmac>, C<b64mac>, or C<b64umac>,
+later calls to C<add>, C<addfile>, or any MAC getter croak.
+
+ my $result_hex = $d->hexmac();
 
 =head2 b64mac
 
- $result_b64 = $d->b64mac();
+Returns the MAC encoded as a Base64 string with trailing C<=> padding and
+finalizes the object. After the first call to C<mac>, C<hexmac>, C<b64mac>, or
+C<b64umac>, later calls to C<add>, C<addfile>, or any MAC getter croak.
+
+ my $result_b64 = $d->b64mac();
 
 =head2 b64umac
 
- $result_b64url = $d->b64umac();
+Returns the MAC encoded as a Base64 URL-safe string (no trailing C<=>) and
+finalizes the object. After the first call to C<mac>, C<hexmac>, C<b64mac>, or
+C<b64umac>, later calls to C<add>, C<addfile>, or any MAC getter croak.
+
+ my $result_b64url = $d->b64umac();
 
 =head1 SEE ALSO
 
 =over
 
-=item * L<CryptX|CryptX>
+=item * L<CryptX>
 
 =item * L<https://en.wikipedia.org/wiki/OMAC_%28cryptography%29>
 

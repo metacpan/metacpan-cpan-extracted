@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::OpenFile;
 use strict;
 use warnings;
 
-our $VERSION = '3.14';
+our $VERSION = '3.90';
 
 use Archive::Zip qw(:ERROR_CODES :CONSTANTS);
 use Cwd qw(cwd);
@@ -782,7 +782,7 @@ print-vs-editor flows.
   dashboard of . "Ok\.js$"
   dashboard open-file javax.jws.WebService
   dashboard of Developer::Dashboard::CLI::Paths
-  dashboard open-file --print bookmarks api-dashboard
+  dashboard open-file --print bookmarks index
 
 =for comment FULL-POD-DOC END
 

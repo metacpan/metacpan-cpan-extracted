@@ -2,15 +2,25 @@ bench/benchmark.pl
 bench/large_struct.pl
 bench/results.txt
 Changes
+eg/compiled-batch.pl
+eg/config-merge.pl
+eg/jq-lite.pl
+eg/json-pointer-bridge.pl
+eg/keyword-vs-native.pl
+eg/walk.pl
 lib/Data/Path/XS.pm
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 README
 XS.xs
 t/array-api.t
 t/basic.t
+t/blessed.t
 t/compiled.t
 t/comprehensive.t
+t/exceptions.t
+t/import.t
 t/kw-edge-cases.t
 t/kw-integration.t
 t/kw-pathdelete.t
@@ -18,6 +28,21 @@ t/kw-pathexists.t
 t/kw-pathget.t
 t/kw-pathset.t
 t/leaks.t
+t/lvalue.t
+t/numeric-hash-keys.t
+t/refs.t
 t/stress.t
+t/tied-and-validation.t
+t/utf8-keys.t
+xt/changes.t
+xt/manifest.t
+xt/meta.t
+xt/perlcritic.t
+xt/pod-coverage.t
+xt/pod.t
+xt/sanitizer.t
+xt/spelling.t
+xt/synopsis.t
+xt/threads.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,90 @@
+{
+   "abstract" : "High-performance URL router built on a Ragel-generated state machine",
+   "author" : [
+      "vividsnow"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Router-Ragel",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Benchmark" : "0",
+            "JSON::PP" : "0",
+            "Mojolicious" : "0",
+            "Plack::Request" : "0",
+            "Router::R3" : "0",
+            "Router::XS" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::CheckManifest" : "0.9",
+            "Test::EOL" : "0",
+            "Test::Kwalitee::Extra" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.12",
+            "URI::Router" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Inline" : "0",
+            "Inline::C" : "0",
+            "Inline::Filters::Ragel" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Devel::Size" : "0",
+            "Encode" : "0",
+            "Test::LeakTrace" : "0",
+            "Test::More" : "0",
+            "URI::Escape::XS" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Router::Ragel" : {
+         "file" : "lib/Router/Ragel.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vividsnow/Router-Ragel/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/vividsnow/Router-Ragel.git",
+         "web" : "https://github.com/vividsnow/Router-Ragel"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

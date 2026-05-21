@@ -1,13 +1,14 @@
 ##----------------------------------------------------------------------------
 ## MIME Email Builder - ~/lib/Mail/Make/SMIME.pm
-## Version v0.1.2
+## Version v0.1.3
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
-## Created: 2026/03/07
-## Modified: 2026/03/07
-## All rights reserved.
-##
-## This program is free software; you can redistribute it and/or modify it
+## Created 2026/05/11
+## Modified 2026/05/11
+## All rights reserved
+## 
+## 
+## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Mail::Make::SMIME;
@@ -19,7 +20,7 @@ BEGIN
     use parent qw( Module::Generic );
     use vars qw( $VERSION $EXCEPTION_CLASS );
     our $EXCEPTION_CLASS = 'Mail::Make::Exception';
-    our $VERSION         = 'v0.1.2';
+    our $VERSION         = 'v0.1.3';
 };
 
 use strict;
@@ -64,10 +65,10 @@ sub encrypt
     my $self = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
     my $entity = $opts->{entity} ||
-        return( $self->error( 'encrypt(): entity option is required.' ) );
+        return( $self->error( 'Entity option is required.' ) );
 
     my $recipient_cert = $opts->{RecipientCert} ||
-        return( $self->error( 'encrypt(): RecipientCert option is required.' ) );
+        return( $self->error( 'RecipientCert option is required.' ) );
 
     # Ensure Date and Message-ID exist before serialising
     $self->_ensure_envelope_headers( $entity ) || return( $self->pass_error );
@@ -88,17 +89,17 @@ sub encrypt
 
     local $@;
     eval{ $smime->setPublicKey( \@pem_certs ) };
-    return( $self->error( "encrypt(): failed to load recipient certificate(s): $@" ) ) if( $@ );
+    return( $self->error( "Failed to load recipient certificate(s): $@" ) ) if( $@ );
 
     # Serialise the full message
     my $raw = $self->_serialise_for_smime( $entity ) || return( $self->pass_error );
 
     my $encrypted;
     eval{ $encrypted = $smime->encrypt( $raw ) };
-    return( $self->error( "encrypt(): Crypt::SMIME::encrypt() failed: $@" ) ) if( $@ );
+    return( $self->error( "Crypt::SMIME::encrypt() failed: $@" ) ) if( $@ );
     unless( defined( $encrypted ) && CORE::length( $encrypted ) )
     {
-        return( $self->error( 'encrypt(): Crypt::SMIME returned empty result.' ) );
+        return( $self->error( 'Crypt::SMIME returned empty result.' ) );
     }
 
     return( $self->_build_from_smime_output( $entity, $encrypted ) );
@@ -127,7 +128,7 @@ sub sign
     my $self   = shift( @_ );
     my $opts   = $self->_get_args_as_hash( @_ );
     my $entity = $opts->{entity} ||
-        return( $self->error( 'sign(): entity option is required.' ) );
+        return( $self->error( "The option 'entity' is required." ) );
 
     $self->_ensure_envelope_headers( $entity ) || return( $self->pass_error );
 
@@ -142,10 +143,10 @@ sub sign
     my $signed;
     local $@;
     eval{ $signed = $smime->sign( $raw ) };
-    return( $self->error( "sign(): Crypt::SMIME::sign() failed: $@" ) ) if( $@ );
+    return( $self->error( "Crypt::SMIME::sign() failed: $@" ) ) if( $@ );
     unless( defined( $signed ) && CORE::length( $signed ) )
     {
-        return( $self->error( 'sign(): Crypt::SMIME returned empty result.' ) );
+        return( $self->error( 'Crypt::SMIME returned empty result.' ) );
     }
 
     return( $self->_build_from_smime_output( $entity, $signed ) );
@@ -169,10 +170,10 @@ sub sign_encrypt
     my $self   = shift( @_ );
     my $opts   = $self->_get_args_as_hash( @_ );
     my $entity = $opts->{entity} ||
-        return( $self->error( 'sign_encrypt(): entity option is required.' ) );
+        return( $self->error( "The option 'entity' option is required." ) );
 
     $opts->{RecipientCert} ||
-        return( $self->error( 'sign_encrypt(): RecipientCert option is required.' ) );
+        return( $self->error( 'RecipientCert option is required.' ) );
 
     $self->_ensure_envelope_headers( $entity ) || return( $self->pass_error );
 
@@ -196,7 +197,7 @@ sub sign_encrypt
 
     local $@;
     eval{ $smime->setPublicKey( \@pem_certs ) };
-    return( $self->error( "sign_encrypt(): failed to load recipient certificate(s): $@" ) ) if( $@ );
+    return( $self->error( "Failed to load recipient certificate(s): $@" ) ) if( $@ );
 
     my $raw = $self->_serialise_for_smime( $entity ) || return( $self->pass_error );
 
@@ -206,10 +207,10 @@ sub sign_encrypt
     # encrypt() which operates on the same format.
     my $signed;
     eval{ $signed = $smime->sign( $raw ) };
-    return( $self->error( "sign_encrypt(): Crypt::SMIME::sign() failed: $@" ) ) if( $@ );
+    return( $self->error( "Crypt::SMIME::sign() failed: $@" ) ) if( $@ );
     unless( defined( $signed ) && CORE::length( $signed ) )
     {
-        return( $self->error( 'sign_encrypt(): Crypt::SMIME::sign() returned empty result.' ) );
+        return( $self->error( 'Crypt::SMIME::sign() returned empty result.' ) );
     }
 
     # Re-load recipient public key(s) on a fresh instance for the encrypt step.
@@ -218,10 +219,10 @@ sub sign_encrypt
     # (Crypt::SMIME accumulates public keys).
     my $result;
     eval{ $result = $smime->encrypt( $signed ) };
-    return( $self->error( "sign_encrypt(): Crypt::SMIME::encrypt() failed: $@" ) ) if( $@ );
+    return( $self->error( "Crypt::SMIME::encrypt() failed: $@" ) ) if( $@ );
     unless( defined( $result ) && CORE::length( $result ) )
     {
-        return( $self->error( 'sign_encrypt(): Crypt::SMIME::encrypt() returned empty result.' ) );
+        return( $self->error( 'Crypt::SMIME::encrypt() returned empty result.' ) );
     }
 
     return( $self->_build_from_smime_output( $entity, $result ) );
@@ -246,7 +247,7 @@ sub _build_from_smime_output
     my $pos = index( $canon, "\015\012\015\012" );
     if( $pos < 0 )
     {
-        return( $self->error( '_build_from_smime_output(): no header/body separator in Crypt::SMIME output.' ) );
+        return( $self->error( 'No header/body separator in Crypt::SMIME output.' ) );
     }
 
     # Parse outer headers into a plain hash (case-insensitive, last-value wins for duplicates)
@@ -340,7 +341,7 @@ sub _load_ca_cert
 
     local $@;
     eval{ $smime->setPublicKey( [$pem] ) };
-    return( $self->error( "_load_ca_cert(): failed to load CA certificate: $@" ) ) if( $@ );
+    return( $self->error( "Failed to load CA certificate: $@" ) ) if( $@ );
 
     return(1);
 }
@@ -358,12 +359,12 @@ sub _load_private_key
 
     unless( defined( $cert_source ) && CORE::length( $cert_source ) )
     {
-        return( $self->error( '_load_private_key(): no certificate provided. Set Cert option or cert() accessor.' ) );
+        return( $self->error( 'No certificate provided. Set Cert option or cert() accessor.' ) );
     }
 
     unless( defined( $key_source ) && CORE::length( $key_source ) )
     {
-        return( $self->error( '_load_private_key(): no private key provided. Set Key option or key() accessor.' ) );
+        return( $self->error( 'No private key provided. Set Key option or key() accessor.' ) );
     }
 
     my $cert_pem = $self->_read_pem( $cert_source ) || return( $self->pass_error );
@@ -379,7 +380,7 @@ sub _load_private_key
         {
             local $@;
             $password = eval{ $password_src->() };
-            return( $self->error( "_load_private_key(): KeyPassword CODE ref died: $@" ) ) if( $@ );
+            return( $self->error( "KeyPassword CODE ref died: $@" ) ) if( $@ );
         }
         else
         {
@@ -396,7 +397,7 @@ sub _load_private_key
     {
         eval{ $smime->setPrivateKey( $key_pem, $cert_pem ) };
     }
-    return( $self->error( "_load_private_key(): failed to load private key/certificate: $@" ) ) if( $@ );
+    return( $self->error( "Failed to load private key/certificate: $@" ) ) if( $@ );
 
     return(1);
 }
@@ -426,7 +427,7 @@ sub _read_pem
 
     unless( defined( $source ) )
     {
-        return( $self->error( '_read_pem(): undefined source.' ) );
+        return( $self->error( 'Undefined source.' ) );
     }
 
     # Already a PEM string
@@ -435,23 +436,23 @@ sub _read_pem
     # File path
     unless( -f $source )
     {
-        return( $self->error( "_read_pem(): file not found: $source" ) );
+        return( $self->error( "File not found: $source" ) );
     }
 
     unless( -r $source )
     {
-        return( $self->error( "_read_pem(): file not readable: $source" ) );
+        return( $self->error( "File not readable: $source" ) );
     }
 
     open( my $fh, '<', $source ) ||
-        return( $self->error( "_read_pem(): cannot open '$source': $!" ) );
+        return( $self->error( "Cannot open '$source': $!" ) );
     local $/;
     my $pem = <$fh>;
     close( $fh );
 
     unless( defined( $pem ) && $pem =~ /-----BEGIN/ )
     {
-        return( $self->error( "_read_pem(): file '$source' does not contain PEM data." ) );
+        return( $self->error( "File '$source' does not contain PEM data." ) );
     }
 
     return( $pem );
@@ -468,12 +469,12 @@ sub _serialise_for_smime
 
     unless( defined( $mail ) )
     {
-        return( $self->error( '_serialise_for_smime(): no Mail::Make object supplied.' ) );
+        return( $self->error( 'No Mail::Make object supplied.' ) );
     }
 
     unless( $mail->can( 'as_entity' ) )
     {
-        return( $self->error( '_serialise_for_smime(): argument must be a Mail::Make object.' ) );
+        return( $self->error( 'Argument must be a Mail::Make object.' ) );
     }
 
     my $entity = $mail->as_entity || return( $self->pass_error( $mail->error ) );
@@ -486,7 +487,7 @@ sub _serialise_for_smime
     return( $full );
 }
 
-# STORABLE_freeze / STORABLE_thaw - satisfy Module::Generic serialisation hooks
+# STORABLE_freeze / STORABLE_thaw both satisfy Module::Generic serialisation hooks
 sub STORABLE_freeze { return( $_[0] ) }
 
 sub STORABLE_thaw   { return( $_[0] ) }
@@ -595,33 +596,33 @@ Mail::Make::SMIME - S/MIME signing and encryption for Mail::Make (RFC 5751)
     my $signed = $mail->smime_sign(
         Cert => '/path/to/my.cert.pem',
         Key  => '/path/to/my.key.pem',
-    ) || die $mail->error;
+    ) || die( $mail->error );
     $signed->smtpsend( Host => 'smtp.example.com' );
 
     # Encrypt only
     my $encrypted = $mail->smime_encrypt(
         RecipientCert => '/path/to/recipient.cert.pem',
-    ) || die $mail->error;
+    ) || die( $mail->error );
 
     # Sign then encrypt
     my $protected = $mail->smime_sign_encrypt(
         Cert          => '/path/to/my.cert.pem',
         Key           => '/path/to/my.key.pem',
         RecipientCert => '/path/to/recipient.cert.pem',
-    ) || die $mail->error;
+    ) || die( $mail->error );
 
     # Using the Mail::Make::SMIME object directly
     use Mail::Make::SMIME;
     my $smime = Mail::Make::SMIME->new(
         cert => '/path/to/my.cert.pem',
         key  => '/path/to/my.key.pem',
-    ) || die Mail::Make::SMIME->error;
+    ) || die( Mail::Make::SMIME->error );
 
-    my $signed = $smime->sign( entity => $mail ) || die $smime->error;
+    my $signed = $smime->sign( entity => $mail ) || die( $smime->error );
 
 =head1 VERSION
 
-    v0.1.2
+    v0.1.3
 
 =head1 DESCRIPTION
 

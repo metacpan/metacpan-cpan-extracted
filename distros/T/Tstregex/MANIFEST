@@ -1,0 +1,25 @@
+Changes
+lib/Tstregex.pm
+main
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/01-engine.t
+t/02-captures.t
+t/03-stress.t
+t/04-captures.t
+t/05-classes.t
+t/06-greedy.t
+t/07-boundary.t
+t/08-alternations.t
+t/09-lazy.t
+t/10-backref.t
+t/11-quantifiers-range.t
+t/12-modifiers.t
+t/13-bounds-quantifiers.t
+t/14-look-around.t
+t/15-anchors.t
+t/Helper.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
