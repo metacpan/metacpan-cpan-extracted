@@ -4,8 +4,7 @@ use warnings;
 
 package HTML::Gumbo;
 
-use Alien::LibGumbo 0.03;
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 require XSLoader;
 XSLoader::load('HTML::Gumbo', $VERSION);
@@ -132,7 +131,7 @@ L</parse> method and it will be called for every node in the document:
         elsif ( $event eq 'end' ) {
             my ($tag) = @_;
         }
-        elsif ( $event eq /^(text|space|cdata|comment)$/ ) {
+        elsif ( $event =~ /^(text|space|cdata|comment)$/ ) {
             my ($text) = @_;
         }
         else {
@@ -302,6 +301,14 @@ sub parse_to_callback {
 =head1 AUTHOR
 
 Ruslan Zakirov E<lt>ruz@bestpractical.comE<gt>
+
+Best Practical Solutions, LLC E<lt>modules@bestpractical.comE<gt>
+
+=head1 BUGS
+
+All bugs should be reported via email to: L<bug-HTML-Gumbo@rt.cpan.org|mailto:bug-HTML-Gumbo@rt.cpan.org>
+
+Or via the web at: L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=HTML-Gumbo>.
 
 =head1 LICENSE
 

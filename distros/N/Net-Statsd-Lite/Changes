@@ -1,5 +1,11 @@
 Revision history for Net-Statsd-Lite
 
+v0.11.0   2026-05-22 00:20:44+01:00 Europe/London
+  [Enhancements]
+  - Make the socket explicitly configurable in the constructor.
+
+  - Use IO::Socket::IP for the default socket.
+
 v0.10.2   2026-05-18 19:57:09+01:00 Europe/London
   [Enhancements]
   - Use core Digest::SHA instead of CryptX.  This removes the secure_set_hash option.

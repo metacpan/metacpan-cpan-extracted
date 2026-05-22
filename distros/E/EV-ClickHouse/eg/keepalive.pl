@@ -19,7 +19,7 @@ $ch = EV::ClickHouse->new(
             undef $t;
             printf "Still connected after 2s idle: %s\n",
                 $ch->is_connected ? "yes" : "no";
-            $ch->query("SELECT 1", sub {
+            $ch->query("select 1", sub {
                 my ($rows, $err) = @_;
                 printf "Query after idle: %s\n", $err // "ok";
                 $ch->finish;

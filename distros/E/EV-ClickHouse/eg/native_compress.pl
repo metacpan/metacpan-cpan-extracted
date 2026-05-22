@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# Native protocol with LZ4 compression and INSERT
+# Native protocol with LZ4 compression and insert
 use strict;
 use warnings;
 use EV;
@@ -16,7 +16,7 @@ my $ch = EV::ClickHouse->new(
     on_error => sub { warn "Connection error: $_[0]\n"; EV::break },
 );
 
-$ch->query("CREATE TEMPORARY TABLE eg_events (ts DateTime, level String, msg String)", sub {
+$ch->query("create temporary table eg_events (ts DateTime, level String, msg String)", sub {
     my (undef, $err) = @_;
     die "DDL failed: $err" if $err;
 
@@ -31,7 +31,7 @@ $ch->query("CREATE TEMPORARY TABLE eg_events (ts DateTime, level String, msg Str
         die "Insert failed: $err" if $err;
         print "Inserted 3 events (LZ4 compressed)\n";
 
-        $ch->query("SELECT * FROM eg_events ORDER BY ts", sub {
+        $ch->query("select * from eg_events order by ts", sub {
             my ($rows, $err) = @_;
             die "Select failed: $err" if $err;
             printf "  [%s] %s: %s\n", @$_ for @$rows;

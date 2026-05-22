@@ -7,14 +7,9 @@ use EV::ClickHouse;
 my $host = $ENV{TEST_CLICKHOUSE_HOST} || '127.0.0.1';
 my $port = $ENV{TEST_CLICKHOUSE_PORT} || 8123;
 
-# check ClickHouse is reachable
-my $reachable = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $port, Timeout => 2);
-    $reachable = 1 if $s;
-};
-plan skip_all => "ClickHouse not reachable at $host:$port" unless $reachable;
+require IO::Socket::INET;
+plan skip_all => "ClickHouse not reachable at $host:$port"
+    unless IO::Socket::INET->new(PeerAddr => $host, PeerPort => $port, Timeout => 2);
 
 plan tests => 8;
 

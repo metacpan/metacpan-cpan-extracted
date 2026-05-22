@@ -20,7 +20,7 @@ $ch = EV::ClickHouse->new(
     },
     on_connect => sub {
         $ch->query(
-            "SELECT sum(number) FROM numbers(50000000)",
+            "select sum(number) from numbers(50000000)",
             sub {
                 my ($rows, $err) = @_;
                 die "Error: $err\n" if $err;

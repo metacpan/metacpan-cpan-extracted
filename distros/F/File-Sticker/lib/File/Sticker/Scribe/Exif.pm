@@ -1,12 +1,12 @@
 package File::Sticker::Scribe::Exif;
-$File::Sticker::Scribe::Exif::VERSION = '4.603';
+$File::Sticker::Scribe::Exif::VERSION = '4.605';
 =head1 NAME
 
 File::Sticker::Scribe::Exif - read, write and standardize meta-data from EXIF file
 
 =head1 VERSION
 
-version 4.603
+version 4.605
 
 =head1 SYNOPSIS
 
@@ -201,7 +201,7 @@ sub read_meta {
     # There are multiple fields which could be used as a copyright notice.
     # Check through them until you find a non-empty one.
     my $copyright = '';
-    foreach my $field (qw(License Rights))
+    foreach my $field (qw(License Rights MetadataRights))
     {
         if (exists $info->{$field} and $info->{$field} and !$copyright)
         {
@@ -236,7 +236,7 @@ sub read_meta {
 
     # CreateDate is going to be treated as a separate field
     my $create_date = '';
-    foreach my $field (qw(CreateDate))
+    foreach my $field (qw(CreateDate MetadataCreateDate))
     {
         if (exists $info->{$field} and $info->{$field} and !$create_date)
         {
@@ -260,10 +260,13 @@ sub read_meta {
     # Use a consistent naming for tag fields.
     # Combine the tag-like fields together.
     # Preserve the order and check for dupicates later with uniq
+    # NOTE: a field may appear more than once with a number appended!
+    # So we need to check all the keys against a regex.
     my @tags = ();
-    foreach my $field (qw(Keywords Subject))
+    foreach my $field (sort keys %{$info})
     {
-        if (exists $info->{$field} and $info->{$field})
+        if ($field =~ /(Keywords|Subject)/
+                and $info->{$field})
         {
             my $val = $info->{$field};
             my @these_tags;

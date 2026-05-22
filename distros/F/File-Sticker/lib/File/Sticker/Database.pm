@@ -1,12 +1,12 @@
 package File::Sticker::Database;
-$File::Sticker::Database::VERSION = '4.603';
+$File::Sticker::Database::VERSION = '4.605';
 =head1 NAME
 
 File::Sticker::Database - write info to database
 
 =head1 VERSION
 
-version 4.603
+version 4.605
 
 =head1 SYNOPSIS
 

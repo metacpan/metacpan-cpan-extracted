@@ -1,9 +1,13 @@
 package Mojolicious::Plugin::Statsd;
-$Mojolicious::Plugin::Statsd::VERSION = '0.04';
+
+use v5.16;
+
 use Mojo::Base 'Mojolicious::Plugin';
 
 use Mojo::Loader;
 use Time::HiRes qw(gettimeofday tv_interval);
+
+our $VERSION = '0.06';
 
 has adapter => undef;
 has prefix  => '';
@@ -86,11 +90,24 @@ sub _prepare_names {
 }
 
 1;
+
+# ABSTRACT: Emit to Statsd, easy!
+
 __END__
+
+=pod
+
+=encoding UTF-8
+
+=for stopwords UDP statsd
 
 =head1 NAME
 
 Mojolicious::Plugin::Statsd - Emit to Statsd, easy!
+
+=head1 VERSION
+
+version 0.06
 
 =head1 SYNOPSIS
 
@@ -123,20 +140,12 @@ Mojolicious::Plugin::Statsd - Emit to Statsd, easy!
   # This becomes myapp.my-special-process.foo
   $jobstats->increment('foo');
 
-
 =head1 DESCRIPTION
 
 Mojolicious::Plugin::Statsd is a L<Mojolicious> plugin which adds a helper for
 throwing your metrics at statsd.
 
-=head1 INHERITANCE
-
-Mojolicious::Plugin::Statsd
-  is a L<Mojolicious::Plugin>
-
 =head1 OPTIONS
-
-Mojolicious::Plugin::Statsd supports the following options.
 
 =head2 adapter
 
@@ -167,22 +176,13 @@ defaults to your C<< $app->moniker >>, followed by C<.>.
 
 The helper name to be installed. Defaults to 'stats'
 
-=head1 ADDITIONAL OPTIONS
+=head2 Other Options
 
 Any further options are passed to the L</adapter> during construction, unless
 you've passed an object already.  Refer to the adapter documentation for
 supported options.
 
-=head1 ATTRIBUTES
-
-L<Mojolicious::Plugin::Statsd> has the following attributes, which are best
-configured through the plugin options above.
-
-=head1 adapter
-
-The statsd adapter in use.
-
-=head1 prefix
+=head2 prefix
 
 The current prefix to apply to metric names.
 
@@ -267,14 +267,75 @@ supports it.
 
   app->start;
 
+=head1 SECURITY CONSIDERATIONS
+
+When using the L</set_add> method, be wary of exposing sensitive
+information like IP addresses, usernames, email addresses or even
+session ids over insecure channels.  One workaround is to log a
+message digest of the value instead, for example
+
+    use Digest::SHA qw/ hmac_sha1 /;
+
+    ...
+
+    $statsd->set_key( "myapp.sessions", hmac_sha1( $session->id, $my_secret_key );
+
+Note that the keys should be consistent across worker processes and hosts.
+
+When generating metric names based on untrusted sources (such as HTTP
+requests), ensure that the metrics contain only printable characters
+and do not contain colons (":") or pipes ("|"), since these are used
+by the statsd protocol.
+
 =head1 SEE ALSO
 
-L<Mojolicious::Plugin::Statsd::Adapter::Statsd>, L<Mojolicious::Plugin::Statsd::Adapter::Memory>.
+L<Mojolicious::Plugin::Statsd::Adapter::Statsd>
 
-L<Mojolicious>, L<Mojolicious::Guides>
+L<Mojolicious::Plugin::Statsd::Adapter::Memory>
 
-=head1 LICENSE
+L<Mojolicious>
 
-This software is licensed under the same terms as Perl itself.
+=head1 SOURCE
+
+The development version is on github at L<https://github.com/robrwo/perl-Mojolicious-Plugin-Statsd>
+and may be cloned from L<https://github.com/robrwo/perl-Mojolicious-Plugin-Statsd.git>
+
+=head1 SUPPORT
+
+Only the latest version of this module will be supported.
+
+This module requires Perl v5.16 or later.
+Future releases may only support Perl versions that are supported by L<Mojolicious>.
+
+=head2 Reporting Bugs and Submitting Feature Requests
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/robrwo/perl-Mojolicious-Plugin-Statsd/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+If the bug you are reporting has security implications which make it inappropriate to send to a public issue tracker,
+then see F<SECURITY.md> for instructions how to report security vulnerabilities.
+
+=head1 AUTHOR
+
+Meredith Howard  <mhoward@cpan.org>
+
+This module is currently maintained by Robert Rothenberg <perl@rhizomnic.com>.
+
+=head1 CONTRIBUTOR
+
+=for stopwords Robert Rothenberg
+
+Robert Rothenberg <perl@rhizomnic.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019, 2026 by Meredith Howard  <mhoward@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

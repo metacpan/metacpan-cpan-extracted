@@ -14,6 +14,7 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/01-basic.t',
+    't/02-socket.t',
     't/data/counter.dat',
     't/data/gauge.dat',
     't/data/histogram.dat',

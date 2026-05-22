@@ -38,7 +38,7 @@ typedef enum {
 STATIC
 void
 walk_tree(pTHX_ GumboNode* node, int flags, void (*cb)(pTHX_ PerlHtmlGumboType, GumboNode*, void*), void* ctx ) {
-    if ( node->type == GUMBO_NODE_DOCUMENT || node->type == GUMBO_NODE_ELEMENT ) {
+    if ( node->type == GUMBO_NODE_DOCUMENT || node->type == GUMBO_NODE_ELEMENT || node->type == GUMBO_NODE_TEMPLATE) {
         GumboVector* children;
         int skip = flags&PHG_FLAG_SKIP_ROOT_ELEMENT && node->type == GUMBO_NODE_ELEMENT && node->parent && node->parent->type == GUMBO_NODE_DOCUMENT;
         if ( !skip ) {
@@ -386,6 +386,7 @@ tree_to_tree(pTHX_ PerlHtmlGumboType type, GumboNode* node, void* ctx) {
     else if ( type == PHG_ELEMENT_START ) {
         SV* element = new_html_element(aTHX_ node);
         push_element(aTHX_ *out, element);
+        SvREFCNT_dec(*out);
         *out = element;
     }
     else if ( type == PHG_ELEMENT_END ) {
@@ -401,7 +402,7 @@ tree_to_callback(pTHX_ PerlHtmlGumboType type, GumboNode* node, void* ctx) {
     dSP;
     SV* cb = (SV*) ctx;
 
-    if ( type == PHG_ELEMENT_END && PHG_IS_VOID_ELEMENT(node->v.element.tag) )
+    if ( type == PHG_ELEMENT_END && node->type == GUMBO_NODE_ELEMENT && PHG_IS_VOID_ELEMENT(node->v.element.tag) )
         return;
 
     ENTER;
@@ -510,10 +511,13 @@ STATIC
 SV*
 parse_to_tree_cb(pTHX_ GumboNode* document, int flags, void* not_used ) {
     SV* res;
+    SV* current;
     GumboNode fake;
     fake.type = GUMBO_NODE_DOCUMENT;
     res = new_html_element(aTHX_ &fake);
-    walk_tree(aTHX_ document, flags, tree_to_tree, (void*)(&res));
+    current = SvREFCNT_inc(res);
+    walk_tree(aTHX_ document, flags, tree_to_tree, (void*)(&current));
+    SvREFCNT_dec(current);
     return res;
 }
 

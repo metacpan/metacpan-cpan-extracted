@@ -1,6 +1,14 @@
 Revision History for File-Sticker
 =================================
 
+v4.605 2026-05-22
+-----------------
+
+* 2026-05-22 05:21:35 +1000
+  There could be duplicate tags in EXIF, huh.
+* 2026-05-22 04:55:56 +1000
+  Fix parsing of some EPUB fields
+
 v4.603 2026-05-21
 -----------------
 

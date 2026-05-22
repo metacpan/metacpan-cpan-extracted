@@ -15,7 +15,7 @@ $ch = EV::ClickHouse->new(
     uri        => $uri,
     on_connect => sub {
         printf "Connected to %s\n", $ch->server_info;
-        $ch->query("SELECT hostName(), version()", sub {
+        $ch->query("select hostName(), version()", sub {
             my ($rows, $err) = @_;
             die "Error: $err\n" if $err;
             printf "host=%s version=%s\n", @{$rows->[0]};

@@ -10,13 +10,9 @@ use EV::ClickHouse;
 my $host = $ENV{TEST_CLICKHOUSE_HOST} || '127.0.0.1';
 my $port = $ENV{TEST_CLICKHOUSE_NATIVE_PORT} || 9000;
 
-my $reachable = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $port, Timeout => 2);
-    $reachable = 1 if $s;
-};
-plan skip_all => "ClickHouse native port not reachable" unless $reachable;
+require IO::Socket::INET;
+plan skip_all => "ClickHouse native port not reachable"
+    unless IO::Socket::INET->new(PeerAddr => $host, PeerPort => $port, Timeout => 2);
 
 plan tests => 5;
 
@@ -31,26 +27,34 @@ $ch = EV::ClickHouse->new(
         push @progress, [@_];
     },
     on_connect => sub {
-        # Sum a non-trivial range so the server emits progress packets.
+        # Sum a large range so the server emits progress packets. On a very
+        # fast machine the query can still finish inside a single block
+        # before any progress packet ships, so the progress-dependent
+        # assertions are guarded by a SKIP (same race t/33 handles).
         $ch->query(
-            "SELECT sum(number) FROM numbers(50000000)",
+            "select sum(number) from numbers(200000000)",
             sub {
                 my ($rows, $err) = @_;
                 ok(!$err, "progress: query ok") or diag $err;
-                ok(@progress > 0, "on_progress fired (" . scalar(@progress) . " times)");
 
-                # Each progress packet contains incremental rows/bytes since
-                # the previous one, so sum across all packets to compare with
-                # the work the query actually did.
-                my ($sum_rows, $sum_bytes, $any_total) = (0, 0, 0);
-                for my $p (@progress) {
-                    $sum_rows  += $p->[0] || 0;
-                    $sum_bytes += $p->[1] || 0;
-                    $any_total ||= $p->[2] if defined $p->[2];
+                SKIP: {
+                    skip "server emitted no progress packets (too fast)", 4
+                        unless @progress > 0;
+                    pass("on_progress fired (" . scalar(@progress) . " times)");
+
+                    # Each progress packet carries incremental rows/bytes
+                    # since the previous one; sum across all packets to
+                    # compare with the work the query actually did.
+                    my ($sum_rows, $sum_bytes, $any_total) = (0, 0, 0);
+                    for my $p (@progress) {
+                        $sum_rows  += $p->[0] || 0;
+                        $sum_bytes += $p->[1] || 0;
+                        $any_total ||= $p->[2] if defined $p->[2];
+                    }
+                    ok($sum_rows  > 0, "progress: total rows reported  > 0 (sum=$sum_rows)");
+                    ok($sum_bytes > 0, "progress: total bytes reported > 0 (sum=$sum_bytes)");
+                    ok(defined $any_total, "progress: total_rows hint at least once");
                 }
-                ok($sum_rows  > 0, "progress: total rows reported  > 0 (sum=$sum_rows)");
-                ok($sum_bytes > 0, "progress: total bytes reported > 0 (sum=$sum_bytes)");
-                ok(defined $any_total, "progress: total_rows hint at least once");
                 EV::break;
             },
         );

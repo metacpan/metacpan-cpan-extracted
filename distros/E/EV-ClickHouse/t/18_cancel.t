@@ -12,18 +12,9 @@ my $host      = $ENV{TEST_CLICKHOUSE_HOST} || '127.0.0.1';
 my $http_port = $ENV{TEST_CLICKHOUSE_PORT} || 8123;
 my $nat_port  = $ENV{TEST_CLICKHOUSE_NATIVE_PORT} || 9000;
 
-my $http_ok = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $http_port, Timeout => 2);
-    $http_ok = 1 if $s;
-};
-my $nat_ok = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $nat_port, Timeout => 2);
-    $nat_ok = 1 if $s;
-};
+require IO::Socket::INET;
+my $http_ok = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $http_port, Timeout => 2) ? 1 : 0;
+my $nat_ok  = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $nat_port,  Timeout => 2) ? 1 : 0;
 plan skip_all => "ClickHouse not reachable" unless $http_ok || $nat_ok;
 
 plan tests => 6;
@@ -49,11 +40,11 @@ SKIP: {
             # the cancel to be observable. ClickHouse's sleep() can't be
             # interrupted mid-call, so use a real workload instead.
             $ch->query(
-                "SELECT count() FROM numbers(50000000000) WHERE number % 7 = 0",
+                "select count() from numbers(50000000000) where number % 7 = 0",
                 sub {
                     $first_elapsed = time() - $start;
                     # Follow-up query to prove the connection is still good.
-                    $ch->query("SELECT 1+1", sub {
+                    $ch->query("select 1+1", sub {
                         my ($rows, $err2) = @_;
                         $next_ok = !$err2 && $rows && $rows->[0][0] == 2;
                         EV::break;
@@ -88,7 +79,7 @@ SKIP: {
         port       => $http_port,
         on_connect => sub {
             $start = time();
-            $ch->query("SELECT sleep(3) FORMAT TabSeparated", sub {
+            $ch->query("select sleep(3) format TabSeparated", sub {
                 my (undef, $err) = @_;
                 $got_err = $err;
                 EV::break;

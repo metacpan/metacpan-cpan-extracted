@@ -7,12 +7,8 @@ use EV::ClickHouse;
 my $host     = $ENV{TEST_CLICKHOUSE_HOST} || '127.0.0.1';
 my $nat_port = $ENV{TEST_CLICKHOUSE_NATIVE_PORT} || 9000;
 
-my $nat_ok = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $nat_port, Timeout => 2);
-    $nat_ok = 1 if $s;
-};
+require IO::Socket::INET;
+my $nat_ok = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $nat_port, Timeout => 2) ? 1 : 0;
 plan skip_all => "ClickHouse native port not reachable" unless $nat_ok;
 
 plan tests => 22;
@@ -44,7 +40,7 @@ with_native(
     decode_decimal => 1,
     tests          => 2,
     cb             => sub {
-        $ch->query("SELECT toDecimal128(12345.67, 4) as d", sub {
+        $ch->query("select toDecimal128(12345.67, 4) as d", sub {
             my ($rows, $err) = @_;
             ok(!$err, 'Decimal128 scale: no error');
             ok(abs($rows->[0][0] - 12345.67) < 0.01,
@@ -60,7 +56,7 @@ with_native(
     tests           => 2,
     cb              => sub {
         # epoch 0 in UTC is '1970-01-01 00:00:00'; in America/New_York it's '1969-12-31 19:00:00'
-        $ch->query("SELECT toDateTime(0, 'America/New_York') as dt", sub {
+        $ch->query("select toDateTime(0, 'America/New_York') as dt", sub {
             my ($rows, $err) = @_;
             ok(!$err, 'DateTime tz: no error');
             is($rows->[0][0], '1969-12-31 19:00:00',
@@ -75,7 +71,7 @@ with_native(
     decode_datetime => 1,
     tests           => 2,
     cb              => sub {
-        $ch->query("SELECT toDateTime64(0, 3, 'America/New_York') as dt64", sub {
+        $ch->query("select toDateTime64(0, 3, 'America/New_York') as dt64", sub {
             my ($rows, $err) = @_;
             ok(!$err, 'DateTime64 tz: no error');
             is($rows->[0][0], '1969-12-31 19:00:00.000',
@@ -90,7 +86,7 @@ with_native(
     decode_datetime => 1,
     tests           => 2,
     cb              => sub {
-        $ch->query("SELECT toDateTime(0, 'UTC') as dt", sub {
+        $ch->query("select toDateTime(0, 'UTC') as dt", sub {
             my ($rows, $err) = @_;
             ok(!$err, 'DateTime UTC: no error');
             is($rows->[0][0], '1970-01-01 00:00:00',
@@ -104,18 +100,18 @@ with_native(
 with_native(
     tests => 3,
     cb    => sub {
-        $ch->query("DROP TABLE IF EXISTS _test_saf", sub {
+        $ch->query("drop table if exists _test_saf", sub {
             $ch->query(
-                "CREATE TABLE _test_saf (k UInt32, v SimpleAggregateFunction(max, UInt64)) "
-                . "ENGINE = AggregatingMergeTree ORDER BY k",
+                "create table _test_saf (k UInt32, v SimpleAggregateFunction(max, UInt64)) "
+                . "engine = AggregatingMergeTree order by k",
                 sub {
                     $ch->insert("_test_saf", "1\t100\n2\t200\n", sub {
-                        $ch->query("SELECT k, v FROM _test_saf ORDER BY k", sub {
+                        $ch->query("select k, v from _test_saf order by k", sub {
                             my ($rows, $err) = @_;
                             ok(!$err, 'SimpleAggregateFunction: no error');
                             is($rows->[0][1], 100, 'SAF: first value');
                             is($rows->[1][1], 200, 'SAF: second value');
-                            $ch->query("DROP TABLE _test_saf", sub { EV::break });
+                            $ch->query("drop table _test_saf", sub { EV::break });
                         });
                     });
                 },
@@ -128,21 +124,21 @@ with_native(
 with_native(
     tests => 3,
     cb    => sub {
-        $ch->query("DROP TABLE IF EXISTS _test_nested", sub {
+        $ch->query("drop table if exists _test_nested", sub {
             $ch->query(
-                "CREATE TABLE _test_nested (id UInt32, n Nested(x UInt32, y String)) "
+                "create table _test_nested (id UInt32, n Nested(x UInt32, y String)) "
                 . "ENGINE = Memory",
                 sub {
                     # Nested columns are stored as separate arrays
                     $ch->query(
-                        "INSERT INTO _test_nested VALUES (1, [10, 20], ['a', 'b'])",
+                        "insert into _test_nested values (1, [10, 20], ['a', 'b'])",
                         sub {
-                            $ch->query("SELECT n.x, n.y FROM _test_nested", sub {
+                            $ch->query("select n.x, n.y from _test_nested", sub {
                                 my ($rows, $err) = @_;
                                 ok(!$err, 'Nested: no error');
                                 is_deeply($rows->[0][0], [10, 20], 'Nested: n.x array');
                                 is_deeply($rows->[0][1], ['a', 'b'], 'Nested: n.y array');
-                                $ch->query("DROP TABLE _test_nested", sub { EV::break });
+                                $ch->query("drop table _test_nested", sub { EV::break });
                             });
                         },
                     );
@@ -157,10 +153,10 @@ with_native(
     tests => 3,
     cb    => sub {
         my @order;
-        $ch->query("SELECT 1", sub {
+        $ch->query("select 1", sub {
             push @order, 'q1';
         });
-        $ch->query("SELECT 2", sub {
+        $ch->query("select 2", sub {
             push @order, 'q2';
         });
         $ch->drain(sub {
@@ -194,7 +190,7 @@ with_native(
         my $done = 0;
         my $disconnected = 0;
         $ch->on_disconnect(sub { $disconnected = 1 });
-        $ch->query("SELECT 1", sub {
+        $ch->query("select 1", sub {
             my ($rows, $err) = @_;
             ok(!$err, 'drain+finish: query ok');
         });

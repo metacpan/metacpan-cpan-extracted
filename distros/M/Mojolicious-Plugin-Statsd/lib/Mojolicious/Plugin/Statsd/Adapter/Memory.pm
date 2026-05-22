@@ -1,6 +1,8 @@
 package Mojolicious::Plugin::Statsd::Adapter::Memory;
-$Mojolicious::Plugin::Statsd::Adapter::Memory::VERSION = '0.04';
+
 use Mojo::Base -base;
+
+our $VERSION = '0.06';
 
 # scalar values: counter
 # hashref values: timings (keys: samples[] avg min max)
@@ -51,23 +53,29 @@ sub counter {
 }
 
 1;
+
+# ABSTRACT In-Memory stat recording
+
 __END__
+
+=pod
+
+=encoding UTF-8
 
 =head1 NAME
 
-Mojolicious::Plugin::Statsd::Adapter::Memory - In-Memory stat recording
+Mojolicious::Plugin::Statsd::Adapter::Memory
+
+=head1 VERSION
+
+version 0.06
 
 =head1 DESCRIPTION
 
 This adapter for L<Mojolicious::Plugin::Statsd> keeps all recorded stats in its
 L</stats> attribute and does nothing else.  It's useful for testing.
 
-=head1 INHERITANCE
-
-Mojolicious::Plugin::Statsd::Adapter::Memory
-  is a L<Mojo::Base>
-
-=head1 ATTRIBUTES
+=head1 OPTIONS
 
 =head2 stats
 
@@ -84,5 +92,30 @@ See L<Mojolicious::Plugin::Statsd/timing>.
 =head2 counter
 
 See L<Mojolicious::Plugin::Statsd/counter>.
+
+=head1 SOURCE
+
+The development version is on github at L<https://github.com/robrwo/perl-Mojolicious-Plugin-Statsd>
+and may be cloned from L<https://github.com/robrwo/perl-Mojolicious-Plugin-Statsd.git>
+
+=head1 SUPPORT
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/robrwo/perl-Mojolicious-Plugin-Statsd/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+Meredith Howard  <mhoward@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2019, 2026 by Meredith Howard  <mhoward@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

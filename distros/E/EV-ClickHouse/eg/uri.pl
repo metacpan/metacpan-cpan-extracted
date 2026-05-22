@@ -14,7 +14,7 @@ $ch = EV::ClickHouse->new(
     uri        => $uri,
     on_connect => sub {
         printf "Connected: %s\n", $ch->server_info;
-        $ch->query("SELECT currentDatabase() AS db", sub {
+        $ch->query("select currentDatabase() as db", sub {
             my ($rows, $err) = @_;
             die "Error: $err\n" if $err;
             printf "Database: %s\n", $rows->[0][0];

@@ -15,7 +15,7 @@ $ch = EV::ClickHouse->new(
         my $total_rows  = 0;
 
         $ch->query(
-            "SELECT number, toString(number) FROM numbers(100000)",
+            "select number, toString(number) from numbers(100000)",
             {
                 on_data => sub {
                     my ($rows) = @_;

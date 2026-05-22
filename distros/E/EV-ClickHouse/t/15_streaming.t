@@ -10,13 +10,9 @@ use EV::ClickHouse;
 my $host = $ENV{TEST_CLICKHOUSE_HOST} || '127.0.0.1';
 my $port = $ENV{TEST_CLICKHOUSE_NATIVE_PORT} || 9000;
 
-my $reachable = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $port, Timeout => 2);
-    $reachable = 1 if $s;
-};
-plan skip_all => "ClickHouse native port not reachable" unless $reachable;
+require IO::Socket::INET;
+plan skip_all => "ClickHouse native port not reachable"
+    unless IO::Socket::INET->new(PeerAddr => $host, PeerPort => $port, Timeout => 2);
 
 plan tests => 9;
 
@@ -42,7 +38,7 @@ with_native(sub {
     my $streamed_rows = 0;
 
     $ch->query(
-        "SELECT number FROM numbers(100000)",
+        "select number from numbers(100000)",
         {
             on_data => sub {
                 my ($rows) = @_;
@@ -66,7 +62,7 @@ with_native(sub {
     my $blocks = 0;
 
     $ch->query(
-        "SELECT number, toString(number) AS s FROM numbers(50000)",
+        "select number, toString(number) as s from numbers(50000)",
         {
             query_id => 'streaming-test',
             on_data  => sub { $blocks++ },
@@ -87,7 +83,7 @@ with_native(sub {
     my $blocks = 0;
 
     $ch->query(
-        "SELECT number FROM numbers(1) WHERE number > 999",
+        "select number from numbers(1) where number > 999",
         { on_data => sub { $blocks++; } },
         sub {
             my ($rows, $err) = @_;

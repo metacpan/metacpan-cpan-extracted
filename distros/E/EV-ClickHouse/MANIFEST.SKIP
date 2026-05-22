@@ -15,6 +15,7 @@
 ^MANIFEST\.bak$
 ^EV-ClickHouse-
 ^t_debug_compress\.pl$
+^_Inline/
 # Author-only tests aren't shipped to CPAN testers (they require optional
 # Test::Pod / Test::Kwalitee::Extra / etc. or live tooling like valgrind).
 ^xt/

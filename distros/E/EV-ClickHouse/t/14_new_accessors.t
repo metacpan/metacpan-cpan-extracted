@@ -7,12 +7,8 @@ use EV::ClickHouse;
 my $host     = $ENV{TEST_CLICKHOUSE_HOST} || '127.0.0.1';
 my $nat_port = $ENV{TEST_CLICKHOUSE_NATIVE_PORT} || 9000;
 
-my $nat_ok = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $nat_port, Timeout => 2);
-    $nat_ok = 1 if $s;
-};
+require IO::Socket::INET;
+my $nat_ok = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $nat_port, Timeout => 2) ? 1 : 0;
 plan skip_all => "ClickHouse native port not reachable" unless $nat_ok;
 
 plan tests => 18;
@@ -43,7 +39,7 @@ sub with_native {
 with_native(
     tests => 3,
     cb    => sub {
-        $ch->query("SELECT toUInt32(1) as a, 'hello' as b, toDate('2024-01-01') as c", sub {
+        $ch->query("select toUInt32(1) as a, 'hello' as b, toDate('2024-01-01') as c", sub {
             my ($rows, $err) = @_;
             ok(!$err, 'column_types: no error');
             my $types = $ch->column_types;
@@ -58,7 +54,7 @@ with_native(
 with_native(
     tests => 2,
     cb    => sub {
-        $ch->query("SELECT * FROM _nonexistent_table_12345", sub {
+        $ch->query("select * from _nonexistent_table_12345", sub {
             my ($rows, $err) = @_;
             ok($err, 'last_error_code: got error');
             is($ch->last_error_code, 60, 'last_error_code: 60 = UNKNOWN_TABLE');
@@ -71,7 +67,7 @@ with_native(
 with_native(
     tests => 3,
     cb    => sub {
-        $ch->query("SELECT number FROM numbers(100) LIMIT 10", sub {
+        $ch->query("select number from numbers(100) limit 10", sub {
             my ($rows, $err) = @_;
             ok(!$err, 'profile_info: no error');
             is(scalar @$rows, 10, 'profile_info: 10 rows returned');
@@ -86,7 +82,7 @@ with_native(
 with_native(
     tests => 4,
     cb    => sub {
-        $ch->query("SELECT number % 2 as g, count() as c FROM numbers(10) GROUP BY g WITH TOTALS ORDER BY g", sub {
+        $ch->query("select number % 2 as g, count() as c from numbers(10) group by g with totals order by g", sub {
             my ($rows, $err) = @_;
             ok(!$err, 'totals: no error');
             is(scalar @$rows, 2, 'totals: 2 data rows');
@@ -104,7 +100,7 @@ with_native(
     cb    => sub {
         # Use max_block_size=5 to force multiple blocks
         $ch->query(
-            "SELECT toLowCardinality(toString(number % 3)) as lc FROM numbers(20)",
+            "select toLowCardinality(toString(number % 3)) as lc from numbers(20)",
             { max_block_size => '5' },
             sub {
                 my ($rows, $err) = @_;
@@ -130,7 +126,7 @@ SKIP: {
         reconnect_max_delay => 2,
         on_connect => sub {
             ok(1, 'reconnect_delay: connected');
-            $rc_ch->query("SELECT 1", sub {
+            $rc_ch->query("select 1", sub {
                 my ($rows, $err) = @_;
                 ok(!$err, 'reconnect_delay: query ok');
                 is($rows->[0][0], 1, 'reconnect_delay: value correct');

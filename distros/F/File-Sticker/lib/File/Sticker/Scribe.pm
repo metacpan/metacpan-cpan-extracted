@@ -1,12 +1,12 @@
 package File::Sticker::Scribe;
-$File::Sticker::Scribe::VERSION = '4.603';
+$File::Sticker::Scribe::VERSION = '4.605';
 =head1 NAME
 
 File::Sticker::Scribe - read, write and standardize meta-data from files
 
 =head1 VERSION
 
-version 4.603
+version 4.605
 
 =head1 SYNOPSIS
 

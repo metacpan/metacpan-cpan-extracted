@@ -16,10 +16,10 @@ $ch = EV::ClickHouse->new(
     named_rows      => 1,   # hashrefs instead of arrayrefs
     on_connect => sub {
         $ch->query(
-            "SELECT
-                toDateTime('2024-06-15 14:30:00', 'America/New_York') AS dt,
-                toDecimal64(12345.67, 2) AS price,
-                CAST('active' AS Enum8('inactive' = 0, 'active' = 1)) AS status",
+            "select
+                toDateTime('2024-06-15 14:30:00', 'America/New_York') as dt,
+                toDecimal64(12345.67, 2) as price,
+                CAST('active' as Enum8('inactive' = 0, 'active' = 1)) as status",
             sub {
                 my ($rows, $err) = @_;
                 die "Error: $err\n" if $err;

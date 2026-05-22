@@ -21,7 +21,7 @@ my $ch = EV::ClickHouse->new(
 );
 
 # Native protocol returns typed data (not strings like HTTP/TabSeparated)
-$ch->query("SELECT toUInt32(42) AS answer, 'hello' AS greeting, toFloat64(3.14) AS pi", sub {
+$ch->query("select toUInt32(42) as answer, 'hello' as greeting, toFloat64(3.14) as pi", sub {
     my ($rows, $err) = @_;
     if ($err) {
         warn "Query error: $err\n";

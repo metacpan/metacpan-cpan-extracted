@@ -9,7 +9,7 @@ use Moo 1.000000;
 use Carp qw/ croak /;
 use Devel::StrictMode;
 use Digest::SHA 5.96 qw/ hmac_sha256_base64 /;
-use IO::Socket 1.18 ();
+use IO::Socket::IP;
 use MooX::TypeTiny;
 use Ref::Util qw/ is_plain_hashref /;
 use Scalar::Util qw/ refaddr /;
@@ -27,7 +27,7 @@ use experimental qw/ signatures /;
 # RECOMMEND PREREQ: Socket 2.026
 # RECOMMEND PREREQ: Type::Tiny::XS
 
-our $VERSION = 'v0.10.2';
+our $VERSION = 'v0.11.0';
 
 
 has host => (
@@ -73,18 +73,21 @@ has max_buffer_size => (
     default => 512,
 );
 
-has _socket => (
+
+has socket => (
     is      => 'lazy',
-    isa     => InstanceOf ['IO::Socket::INET'],
+    isa     => InstanceOf ['IO::Socket'],
     builder => sub($self) {
-        my $sock = IO::Socket::INET->new(
-            PeerAddr => $self->host,
-            PeerPort => $self->port,
-            Proto    => $self->proto,
+        my $sock = IO::Socket::IP->new(
+            PeerHost    => $self->host,
+            PeerService => $self->port,
+            Proto       => $self->proto,
+            Type        => SOCK_DGRAM,
         ) or croak "Failed to initialize socket: $!";
         return $sock;
     },
     handles => { _send => 'send' },
+    init_arg => 'socket',
 );
 
 
@@ -190,7 +193,7 @@ sub record_metric( $self, $suffix, $metric, $value, $ ) {
     my $data = $self->prefix . $metric . ':' . $value . $suffix . "\n";
 
     if ( $self->autoflush ) {
-        send( $self->_socket, $data, 0 );
+        $self->_send( $data, 0 );
         return;
     }
 
@@ -207,7 +210,7 @@ sub record_metric( $self, $suffix, $metric, $value, $ ) {
 sub flush($self) {
     my $index = refaddr $self;
     if ( $Buffers{$index} ne '' ) {
-        send( $self->_socket, $Buffers{$index}, 0 );
+        $self->_send( $Buffers{$index}, 0 );
         $Buffers{$index} = '';
     }
 }
@@ -242,7 +245,7 @@ Net::Statsd::Lite - A StatsD client that supports multimetric packets
 
 =head1 VERSION
 
-version v0.10.2
+version v0.11.0
 
 =head1 SYNOPSIS
 
@@ -337,6 +340,14 @@ packet.
 =head2 C<max_buffer_size>
 
 Specifies the maximum buffer size. It defaults to C<512>.
+
+=head2 socket
+
+This is the socket. It can be specified in the constructor directly if you want to use an alternative type of socket.
+
+  my $stats = Net::Statsd::Lite->new( socket => $socket );
+
+Setting this will leave the L</host>, L</port> and L</proto> attributes ignored.
 
 =head2 secure_set_key
 

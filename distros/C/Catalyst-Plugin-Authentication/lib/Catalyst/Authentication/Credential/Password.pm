@@ -69,9 +69,9 @@ sub check_password {
             # FIXME - Should we warn in the $storedpassword undef case,
             #         as the user probably fluffed the config?
             return unless defined $storedpassword;
-            return $password eq $storedpassword;
+            return _secure_compare($password, $storedpassword);
         } elsif ($self->_config->{'password_type'} eq 'crypted') {
-            return $storedpassword eq crypt( $password, $storedpassword );
+            return _secure_compare(crypt($password, $storedpassword), $storedpassword);
         } elsif ($self->_config->{'password_type'} eq 'salted_hash') {
             require Crypt::SaltedHash;
             my $salt_len = $self->_config->{'password_salt_len'} ? $self->_config->{'password_salt_len'} : 0;
@@ -86,12 +86,24 @@ sub check_password {
 
              my $computed    = $d->clone()->digest;
              my $b64computed = $d->clone()->b64digest;
-             return ( ( $computed eq $storedpassword )
-                   || ( unpack( "H*", $computed ) eq $storedpassword )
-                   || ( $b64computed eq $storedpassword)
-                   || ( $b64computed.'=' eq $storedpassword) );
+             return ( ( _secure_compare($computed, $storedpassword) )
+                   || ( _secure_compare(unpack("H*", $computed), $storedpassword) )
+                   || ( _secure_compare($b64computed, $storedpassword) )
+                   || ( _secure_compare($b64computed.'=', $storedpassword)) );
         }
     }
+}
+
+# Constant time comparison algorithm to prevent timing attacks. The secret
+# string should be the second argument, to avoid leaking information about
+# the length of the string.
+# (lifted shamelessly from Mojo::Util 9.45)
+sub _secure_compare {
+  my ($one, $two) = @_;
+  my $r = length $one != length $two;
+  $two = $one if $r;
+  $r |= ord(substr $one, $_) ^ ord(substr $two, $_) for 0 .. length($one) - 1;
+  return $r == 0;
 }
 
 __PACKAGE__;

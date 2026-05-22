@@ -9,13 +9,9 @@ use EV::ClickHouse;
 my $host = $ENV{TEST_CLICKHOUSE_HOST} || '127.0.0.1';
 my $port = $ENV{TEST_CLICKHOUSE_NATIVE_PORT} || 9000;
 
-my $reachable = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $port, Timeout => 2);
-    $reachable = 1 if $s;
-};
-plan skip_all => "ClickHouse native port not reachable" unless $reachable;
+require IO::Socket::INET;
+plan skip_all => "ClickHouse native port not reachable"
+    unless IO::Socket::INET->new(PeerAddr => $host, PeerPort => $port, Timeout => 2);
 
 plan tests => 4;
 
@@ -59,7 +55,7 @@ use Time::HiRes qw(time);
         query_timeout => 1,
         on_connect    => sub {
             $start = time();
-            $ch->query("SELECT sleep(3)", sub {
+            $ch->query("select sleep(3)", sub {
                 ($rows, $err) = @_;
                 EV::break;
             });

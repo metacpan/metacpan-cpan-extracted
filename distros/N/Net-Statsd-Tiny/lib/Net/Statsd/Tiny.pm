@@ -12,7 +12,7 @@ use Carp ();
 use IO::Socket 1.18 ();
 use Socket 2.026 ();
 
-our $VERSION = 'v0.3.9';
+our $VERSION = 'v0.4.0';
 
 
 __PACKAGE__->mk_ro_accessors(
@@ -45,11 +45,16 @@ sub new {
         $args{$attr} = $DEFAULTS{$attr};
     }
 
-    $args{_socket} = IO::Socket::INET->new(
-        PeerAddr => $args{host},
-        PeerPort => $args{port},
-        Proto    => $args{proto},
-    ) or die "Failed to initialize socket: $!";
+    if ( my $socket = delete $args{socket} ) {
+        $args{_socket} = $socket;
+    }
+    else {
+        $args{_socket} = IO::Socket::INET->new(
+            PeerAddr => $args{host},
+            PeerPort => $args{port},
+            Proto    => $args{proto},
+        ) or die "Failed to initialize socket: $!";
+    }
 
     my $self = $class->SUPER::new( \%args );
 
@@ -121,7 +126,7 @@ sub _record {
     my $data = $self->prefix . $metric . ':' . $value . $suffix . "\n";
 
     if ( $self->autoflush ) {
-        send( $self->_socket, $data, 0 );
+        $self->_socket->send( $data, 0 );
         return;
     }
 
@@ -167,7 +172,7 @@ Net::Statsd::Tiny - A tiny StatsD client that supports multimetric packets
 
 =head1 VERSION
 
-version v0.3.9
+version v0.4.0
 
 =head1 SYNOPSIS
 
@@ -231,6 +236,14 @@ C<8125>.
 
 The network protocol that the statsd daemon is using. It defaults to
 C<udp>.
+
+=head2 C<socket>
+
+Alternatively, you can pass an L<IO::Socket> instead of the L</host>, L</port> and L</protocol>.
+
+This will override other settings.
+
+Added in v0.4.0.
 
 =head2 C<prefix>
 

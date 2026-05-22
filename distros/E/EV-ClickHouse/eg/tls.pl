@@ -21,7 +21,7 @@ $ch = EV::ClickHouse->new(
     ($ca ? (tls_ca_file => $ca) : (tls_skip_verify => 1)),
     on_connect       => sub {
         printf "Connected over TLS to %s\n", $ch->server_info;
-        $ch->query("SELECT 1 + 1 AS two", sub {
+        $ch->query("select 1 + 1 as two", sub {
             my ($rows, $err) = @_;
             die "Error: $err\n" if $err;
             printf "1 + 1 = %d\n", $rows->[0][0];

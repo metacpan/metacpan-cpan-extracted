@@ -7,13 +7,9 @@ use EV::ClickHouse;
 my $host = $ENV{TEST_CLICKHOUSE_HOST} || '127.0.0.1';
 my $port = $ENV{TEST_CLICKHOUSE_NATIVE_PORT} || 9000;
 
-my $reachable = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $port, Timeout => 2);
-    $reachable = 1 if $s;
-};
-plan skip_all => "ClickHouse native port not reachable at $host:$port" unless $reachable;
+require IO::Socket::INET;
+plan skip_all => "ClickHouse native port not reachable at $host:$port"
+    unless IO::Socket::INET->new(PeerAddr => $host, PeerPort => $port, Timeout => 2);
 
 plan tests => 30;
 
@@ -27,10 +23,7 @@ sub with_ch {
         port       => $port,
         protocol   => 'native',
         on_connect => sub { $cb->() },
-        on_error   => sub {
-            diag("Error: $_[0]");
-            EV::break;
-        },
+        on_error   => sub { diag("Error: $_[0]"); EV::break },
         %args,
     );
     my $timeout = EV::timer(10, 0, sub { EV::break });
@@ -153,7 +146,7 @@ with_ch(cb => sub {
 
 # Test 23-24: Nullable(IPv4)
 with_ch(cb => sub {
-    $ch->query("select toNullable(toIPv4('10.0.0.1')) as ip, NULL::Nullable(IPv4) as n", sub {
+    $ch->query("select toNullable(toIPv4('10.0.0.1')) as ip, null::Nullable(IPv4) as n", sub {
         my ($rows, $err) = @_;
         ok(!$err, 'Nullable IPv4: no error');
         is($rows->[0][0], '10.0.0.1', 'Nullable IPv4: value');

@@ -19,15 +19,11 @@ no_index:
   directory:
     - t
     - inc
-provides:
-  EV::ClickHouse:
-    file: lib/EV/ClickHouse.pm
-    version: '0.02'
 requires:
   EV: '4.11'
-  perl: '5.012'
+  perl: '5.014'
 resources:
   bugtracker: https://github.com/vividsnow/perl5-ev-clickhouse/issues
   repository: https://github.com/vividsnow/perl5-ev-clickhouse.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# WITH TOTALS — totals row read via the last_totals accessor.
+# with totals — totals row read via the last_totals accessor.
 use strict;
 use warnings;
 use EV;
@@ -12,11 +12,11 @@ $ch = EV::ClickHouse->new(
     protocol => 'native',
     on_connect => sub {
         $ch->query(
-            "SELECT number % 3 AS bucket, count() AS n
-               FROM numbers(100)
-              GROUP BY bucket
-              WITH TOTALS
-              ORDER BY bucket",
+            "select number % 3 as bucket, count() as n
+               from numbers(100)
+              group by bucket
+              with totals
+              order by bucket",
             sub {
                 my ($rows, $err) = @_;
                 die "Error: $err\n" if $err;

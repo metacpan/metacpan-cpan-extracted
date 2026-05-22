@@ -4,7 +4,7 @@
       "Yuval Kogman <nothingmuch@woobling.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -70,7 +70,7 @@
          "web" : "https://github.com/perl-catalyst/Catalyst-Plugin-Authentication"
       }
    },
-   "version" : "0.10024",
+   "version" : "0.10026",
    "x_authority" : "cpan:BOBTFISH",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "x_serialization_backend" : "JSON::MaybeXS version 1.004008"
 }

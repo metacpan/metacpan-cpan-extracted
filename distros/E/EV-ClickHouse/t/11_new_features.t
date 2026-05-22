@@ -8,18 +8,9 @@ my $host      = $ENV{TEST_CLICKHOUSE_HOST} || '127.0.0.1';
 my $http_port = $ENV{TEST_CLICKHOUSE_PORT} || 8123;
 my $nat_port  = $ENV{TEST_CLICKHOUSE_NATIVE_PORT} || 9000;
 
-my $http_ok = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $http_port, Timeout => 2);
-    $http_ok = 1 if $s;
-};
-my $nat_ok = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $nat_port, Timeout => 2);
-    $nat_ok = 1 if $s;
-};
+require IO::Socket::INET;
+my $http_ok = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $http_port, Timeout => 2) ? 1 : 0;
+my $nat_ok  = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $nat_port,  Timeout => 2) ? 1 : 0;
 plan skip_all => "ClickHouse not reachable" unless $http_ok || $nat_ok;
 
 plan tests => 30;
@@ -90,7 +81,7 @@ with_http(
 with_native(
     tests => 3,
     cb    => sub {
-        $ch->query("SELECT 1 as foo, 'bar' as baz", sub {
+        $ch->query("select 1 as foo, 'bar' as baz", sub {
             my ($rows, $err) = @_;
             ok(!$err, 'column_names: no error');
             my $names = $ch->column_names;
@@ -118,7 +109,7 @@ with_native(
     decode_datetime => 1,
     tests           => 3,
     cb              => sub {
-        $ch->query("SELECT toDate('2024-01-15') as d, toDateTime(0, 'UTC') as dt", sub {
+        $ch->query("select toDate('2024-01-15') as d, toDateTime(0, 'UTC') as dt", sub {
             my ($rows, $err) = @_;
             ok(!$err, 'decode_datetime: no error');
             is($rows->[0][0], '2024-01-15', 'decode_datetime: Date as string');
@@ -133,7 +124,7 @@ with_native(
     decode_decimal => 1,
     tests          => 2,
     cb             => sub {
-        $ch->query("SELECT toDecimal32(123.45, 2) as d", sub {
+        $ch->query("select toDecimal32(123.45, 2) as d", sub {
             my ($rows, $err) = @_;
             ok(!$err, 'decode_decimal: no error');
             ok(abs($rows->[0][0] - 123.45) < 0.001, "decode_decimal: value is 123.45 (got $rows->[0][0])");
@@ -147,14 +138,14 @@ with_native(
     decode_enum => 1,
     tests       => 2,
     cb          => sub {
-        $ch->query("DROP TABLE IF EXISTS _test_enum_decode", sub {
-            $ch->query("CREATE TABLE _test_enum_decode (e Enum8('hello' = 1, 'world' = 2)) ENGINE = Memory", sub {
+        $ch->query("drop table if exists _test_enum_decode", sub {
+            $ch->query("create table _test_enum_decode (e Enum8('hello' = 1, 'world' = 2)) ENGINE = Memory", sub {
                 $ch->insert("_test_enum_decode", "1\n2\n", sub {
-                    $ch->query("SELECT e FROM _test_enum_decode ORDER BY e", sub {
+                    $ch->query("select e from _test_enum_decode order by e", sub {
                         my ($rows, $err) = @_;
                         ok(!$err, 'decode_enum: no error');
                         is_deeply([map { $_->[0] } @$rows], ['hello', 'world'], 'decode_enum: labels returned');
-                        $ch->query("DROP TABLE _test_enum_decode", sub { EV::break });
+                        $ch->query("drop table _test_enum_decode", sub { EV::break });
                     });
                 });
             });
@@ -167,7 +158,7 @@ with_native(
     named_rows => 1,
     tests      => 3,
     cb         => sub {
-        $ch->query("SELECT 42 as a, 'hi' as b", sub {
+        $ch->query("select 42 as a, 'hi' as b", sub {
             my ($rows, $err) = @_;
             ok(!$err, 'named_rows: no error');
             is(ref $rows->[0], 'HASH', 'named_rows: row is hashref');
@@ -207,7 +198,7 @@ with_http(
 with_native(
     tests => 2,
     cb    => sub {
-        $ch->query("SELECT nonexistent_column FROM system.one", sub {
+        $ch->query("select nonexistent_column from system.one", sub {
             my ($rows, $err) = @_;
             ok($err, 'error_code: got error');
             like($err, qr/Code: \d+/, 'error_code: contains Code: N');
@@ -222,7 +213,7 @@ with_native(
     cb    => sub {
         my @blocks;
         $ch->query(
-            "SELECT number FROM numbers(100)",
+            "select number from numbers(100)",
             { on_data => sub { push @blocks, $_[0] } },
             sub {
                 my ($rows, $err) = @_;
@@ -243,7 +234,7 @@ with_native(
     tests => 2,
     cb    => sub {
         $ch->query(
-            "SELECT sleep(3)",
+            "select sleep(3)",
             { query_timeout => 1 },
             sub {
                 my ($rows, $err) = @_;
@@ -259,7 +250,7 @@ with_native(
 with_native(
     tests => 2,
     cb    => sub {
-        $ch->query("SELECT count() FROM system.numbers LIMIT 1", sub {
+        $ch->query("select count() from system.numbers limit 1", sub {
             my ($rows, $err) = @_;
             ok($err, 'cancel: got error');
             ok(1, 'cancel: callback delivered');

@@ -9,29 +9,20 @@ use EV::ClickHouse;
 # - decode_decimal precision boundary (Decimal128 round-trip)
 # - per-query settings actually applied to the wire (positive proof, not
 #   just "it didn't crash")
-# - very large INSERT batch (10k rows)
+# - very large insert batch (10k rows)
 
 my $host      = $ENV{TEST_CLICKHOUSE_HOST} || '127.0.0.1';
 my $http_port = $ENV{TEST_CLICKHOUSE_PORT} || 8123;
 my $nat_port  = $ENV{TEST_CLICKHOUSE_NATIVE_PORT} || 9000;
 
-my $http_ok = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $http_port, Timeout => 2);
-    $http_ok = 1 if $s;
-};
-my $nat_ok = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $nat_port, Timeout => 2);
-    $nat_ok = 1 if $s;
-};
+require IO::Socket::INET;
+my $http_ok = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $http_port, Timeout => 2) ? 1 : 0;
+my $nat_ok  = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $nat_port,  Timeout => 2) ? 1 : 0;
 plan skip_all => "ClickHouse not reachable" unless $http_ok || $nat_ok;
 
 plan tests => 15;
 
-# 0: HTTP arrayref INSERT with a nested arrayref column must croak rather
+# 0: HTTP arrayref insert with a nested arrayref column must croak rather
 # than silently send ARRAY(0x...) garbage. The TSV serialiser has no
 # column-type info from the server (HTTP doesn't ship a sample block),
 # so nested types are native-only by design.
@@ -53,7 +44,7 @@ SKIP: {
         EV::run;
     };
     like($@, qr/native protocol/i,
-        "HTTP arrayref INSERT croaks on nested ref instead of corrupting TSV")
+        "HTTP arrayref insert croaks on nested ref instead of corrupting TSV")
         or diag "no croak — got: " . ($@ || '<no exception>');
     $ch->finish if $ch->is_connected;
 }
@@ -125,10 +116,10 @@ SKIP: {
         decode_decimal => 1,
         on_connect     => sub {
             $ch->query("
-                SELECT
-                    toDecimal64('0.50',          2)  AS small,
-                    toDecimal64('1234567.89',    2)  AS mid,
-                    toDecimal128('999999.999999',6)  AS big
+                select
+                    toDecimal64('0.50',          2)  as small,
+                    toDecimal64('1234567.89',    2)  as mid,
+                    toDecimal128('999999.999999',6)  as big
             ", sub { ($rows, undef) = @_; EV::break });
         },
         on_error => sub { diag "decimal error: $_[0]" },
@@ -143,7 +134,7 @@ SKIP: {
     $ch->finish if $ch->is_connected;
 }
 
-# 6-8: per-query settings end-to-end. Use max_result_rows + throw mode to
+# 8-10: per-query settings end-to-end. Use max_result_rows + throw mode to
 # prove the server received the setting (without it the query returns 10
 # rows; with it the server raises CODE 396 / TOO_MANY_ROWS_OR_BYTES).
 SKIP: {
@@ -157,13 +148,13 @@ SKIP: {
         protocol   => 'native',
         on_connect => sub {
             # Without settings: full 10 rows.
-            $ch->query("SELECT number FROM numbers(10)", sub {
+            $ch->query("select number from numbers(10)", sub {
                 my ($r, $e) = @_;
                 @rows_no = @{$r // []};
 
                 # With settings: server should raise.
                 $ch->query(
-                    "SELECT number FROM numbers(10)",
+                    "select number from numbers(10)",
                     { max_result_rows => 1, result_overflow_mode => 'throw' },
                     sub {
                         my ($r2, $e2) = @_;
@@ -188,7 +179,7 @@ SKIP: {
     $ch->finish if $ch->is_connected;
 }
 
-# 9-12: 10 000-row INSERT round-trip on a temporary Memory table.
+# 11-14: 10 000-row insert round-trip on a temporary Memory table.
 SKIP: {
     skip "Native port not reachable", 4 unless $nat_ok;
 
@@ -203,16 +194,16 @@ SKIP: {
         protocol   => 'native',
         on_connect => sub {
             $ch->query("
-                CREATE TEMPORARY TABLE $table (id UInt32, val String)
+                create temporary table $table (id UInt32, val String)
                 ENGINE = Memory
             ", sub {
                 my $rows = [ map [ $_, "row-$_" ], 1 .. $N ];
                 $ch->insert($table, $rows, sub {
                     (undef, $insert_err) = @_;
-                    $ch->query("SELECT count() FROM $table", sub {
+                    $ch->query("select count() from $table", sub {
                         my ($r) = @_;
                         $count_rows = $r;
-                        $ch->query("SELECT sum(id) FROM $table", sub {
+                        $ch->query("select sum(id) from $table", sub {
                             my ($r2) = @_;
                             $sum_rows = $r2;
                             EV::break;

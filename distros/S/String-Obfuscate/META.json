@@ -1,0 +1,89 @@
+{
+   "abstract" : "Reversibly obfuscate a string with a substitution cipher.",
+   "author" : [
+      "Dondi Michael Stroma <dstroma@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.26",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "String-Obfuscate",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "List::Util::XS" : "1.54"
+         },
+         "requires" : {
+            "MIME::Base64" : "0",
+            "Math::Random::ISAAC" : "0",
+            "perl" : "v5.20.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "String::Obfuscate" : {
+         "file" : "lib/String/Obfuscate.pm",
+         "version" : "0.01"
+      },
+      "String::Obfuscate::Base64" : {
+         "file" : "lib/String/Obfuscate/Base64.pm"
+      },
+      "String::Obfuscate::Base64::URL" : {
+         "file" : "lib/String/Obfuscate/Base64/URL.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dstroma/string-obfuscate/issues"
+      },
+      "homepage" : "https://github.com/dstroma/string-obfuscate",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dstroma/string-obfuscate.git",
+         "web" : "https://github.com/dstroma/string-obfuscate"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "dstroma <dstroma@users.noreply.github.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 4.16",
+   "x_static_install" : 1
+}

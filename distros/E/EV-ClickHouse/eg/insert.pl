@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# HTTP insert with session (DDL + INSERT + SELECT in same session)
+# HTTP insert with session (DDL + insert + select in same session)
 use strict;
 use warnings;
 use EV;
@@ -16,7 +16,7 @@ my $ch = EV::ClickHouse->new(
 );
 
 # Create a temporary table
-$ch->query("CREATE TEMPORARY TABLE eg_users (id UInt32, name String)", sub {
+$ch->query("create temporary table eg_users (id UInt32, name String)", sub {
     my (undef, $err) = @_;
     die "DDL failed: $err" if $err;
     print "Table created\n";
@@ -34,7 +34,7 @@ $ch->query("CREATE TEMPORARY TABLE eg_users (id UInt32, name String)", sub {
         print "Inserted 3 rows\n";
 
         # Read them back
-        $ch->query("SELECT id, name FROM eg_users ORDER BY id FORMAT TabSeparated", sub {
+        $ch->query("select id, name from eg_users order by id format TabSeparated", sub {
             my ($rows, $err) = @_;
             die "Select failed: $err" if $err;
             printf "  %s: %s\n", $_->[0], $_->[1] for @$rows;

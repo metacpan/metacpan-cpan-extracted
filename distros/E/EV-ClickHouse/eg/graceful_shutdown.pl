@@ -18,7 +18,7 @@ $ch = EV::ClickHouse->new(
     on_connect    => sub {
         # Queue several queries with realistic latency.
         for my $i (1 .. 5) {
-            $ch->query("SELECT $i AS n, sleep(0.2)", sub {
+            $ch->query("select $i as n, sleep(0.2)", sub {
                 my ($rows, $err) = @_;
                 printf "  query %d: %s\n", $i,
                     $err ? "ERROR ($err)" : "ok";

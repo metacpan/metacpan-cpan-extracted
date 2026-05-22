@@ -1,14 +1,23 @@
 ---
 abstract: 'Emit to Statsd, easy!'
 author:
-  - 'Meredith Howard <mhoward@cpan.org>'
+  - 'Meredith Howard  <mhoward@cpan.org>'
 build_requires:
-  Test::More: '0.96'
-  Test::Warnings: '0'
+  ExtUtils::MakeMaker: '7.22'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Metadata: '1.000015'
+  Mojolicious::Lite: '0'
+  Net::Statsd::Tiny: v0.4.0
+  Test::Mojo: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,18 +26,26 @@ name: Mojolicious-Plugin-Statsd
 provides:
   Mojolicious::Plugin::Statsd:
     file: lib/Mojolicious/Plugin/Statsd.pm
-    version: '0.04'
+    version: '0.06'
   Mojolicious::Plugin::Statsd::Adapter::Memory:
     file: lib/Mojolicious/Plugin/Statsd/Adapter/Memory.pm
-    version: '0.04'
+    version: '0.06'
   Mojolicious::Plugin::Statsd::Adapter::Statsd:
     file: lib/Mojolicious/Plugin/Statsd/Adapter/Statsd.pm
-    version: '0.04'
+    version: '0.06'
 requires:
-  Mojolicious: '5.00'
-  perl: '5.010'
+  IO::Socket::INET: '0'
+  Mojo::Base: '0'
+  Mojo::Loader: '0'
+  Time::HiRes: '0'
+  perl: v5.16.0
 resources:
-  repository: git://github.com/merrilymeredith/Mojolicious-Plugin-Statsd.git
-version: '0.04'
-x_generated_by_perl: v5.28.1
-x_serialization_backend: 'YAML::Tiny version 1.73'
+  bugtracker: https://github.com/robrwo/perl-Mojolicious-Plugin-Statsd/issues
+  repository: git://github.com/robrwo/perl-Mojolicious-Plugin-Statsd.git
+version: '0.06'
+x_authority: cpan:RRWO
+x_contributors:
+  - 'Robert Rothenberg <perl@rhizomnic.com>'
+x_generated_by_perl: v5.42.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

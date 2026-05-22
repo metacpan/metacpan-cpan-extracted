@@ -9,7 +9,7 @@ with 'MooseX::Emulate::Class::Accessor::Fast';
 
 __PACKAGE__->mk_accessors(qw/_user/);
 
-our $VERSION = '0.10024';
+our $VERSION = '0.10026';
 
 sub set_authenticated {
     my ( $c, $user, $realmname ) = @_;

@@ -37,7 +37,7 @@ name: Net-Statsd-Tiny
 provides:
   Net::Statsd::Tiny:
     file: lib/Net/Statsd/Tiny.pm
-    version: v0.3.9
+    version: v0.4.0
 requires:
   Carp: '0'
   Class::Accessor::Fast: '0'
@@ -50,7 +50,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/Net-Statsd-Tiny/issues
   repository: git://github.com/robrwo/Net-Statsd-Tiny.git
-version: v0.3.9
+version: v0.4.0
 x_authority: cpan:RRWO
 x_contributors:
   - 'Michael R. Davis <mrdvt@cpan.org>'

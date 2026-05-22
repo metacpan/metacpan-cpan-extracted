@@ -7,13 +7,9 @@ use EV::ClickHouse;
 my $host = $ENV{TEST_CLICKHOUSE_HOST} || '127.0.0.1';
 my $port = $ENV{TEST_CLICKHOUSE_PORT} || 8123;
 
-my $reachable = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $port, Timeout => 2);
-    $reachable = 1 if $s;
-};
-plan skip_all => "ClickHouse not reachable at $host:$port" unless $reachable;
+require IO::Socket::INET;
+plan skip_all => "ClickHouse not reachable at $host:$port"
+    unless IO::Socket::INET->new(PeerAddr => $host, PeerPort => $port, Timeout => 2);
 
 plan tests => 10;
 
@@ -26,10 +22,7 @@ sub with_ch {
         host       => $host,
         port       => $port,
         on_connect => sub { $cb->() },
-        on_error   => sub {
-            diag("Error: $_[0]");
-            EV::break;
-        },
+        on_error   => sub { diag("Error: $_[0]"); EV::break },
         %args,
     );
     my $timeout = EV::timer(10, 0, sub { EV::break });
@@ -59,12 +52,12 @@ with_ch(cb => sub {
     });
 });
 
-# Test 7-8: NULL handling
+# Test 7-8: null handling
 with_ch(cb => sub {
-    $ch->q("select NULL format TabSeparated", sub {
+    $ch->q("select null format TabSeparated", sub {
         my ($rows, $err) = @_;
-        ok(!$err, 'NULL: no error');
-        ok(!defined $rows->[0][0], 'NULL: value is undef');
+        ok(!$err, 'null: no error');
+        ok(!defined $rows->[0][0], 'null: value is undef');
         EV::break;
     });
 });

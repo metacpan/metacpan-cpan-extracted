@@ -17,7 +17,7 @@ $ch = EV::ClickHouse->new(
         printf "Connected: %s\n", $ch->server_info;
 
         # Query a non-existent table
-        $ch->query("SELECT * FROM _no_such_table_xyz", sub {
+        $ch->query("select * from _no_such_table_xyz", sub {
             my ($rows, $err) = @_;
             if ($err) {
                 printf "Error: %s\n", $err;

@@ -8,18 +8,9 @@ my $host      = $ENV{TEST_CLICKHOUSE_HOST} || '127.0.0.1';
 my $http_port = $ENV{TEST_CLICKHOUSE_PORT} || 8123;
 my $nat_port  = $ENV{TEST_CLICKHOUSE_NATIVE_PORT} || 9000;
 
-my $http_ok = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $http_port, Timeout => 2);
-    $http_ok = 1 if $s;
-};
-my $nat_ok = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $nat_port, Timeout => 2);
-    $nat_ok = 1 if $s;
-};
+require IO::Socket::INET;
+my $http_ok = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $http_port, Timeout => 2) ? 1 : 0;
+my $nat_ok  = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $nat_port,  Timeout => 2) ? 1 : 0;
 plan skip_all => "ClickHouse not reachable" unless $http_ok || $nat_ok;
 
 plan tests => 9;
@@ -70,7 +61,7 @@ with_http(
     tests => 2,
     cb    => sub {
         $ch->query(
-            "SELECT number, number*10 FROM system.numbers LIMIT 3 FORMAT TabSeparated",
+            "select number, number*10 from system.numbers limit 3 format TabSeparated",
             { raw => 1 },
             sub {
                 my ($body, $err) = @_;
@@ -87,7 +78,7 @@ with_http(
     tests => 2,
     cb    => sub {
         $ch->query(
-            "SELECT number, number*10 FROM system.numbers LIMIT 3 FORMAT CSV",
+            "select number, number*10 from system.numbers limit 3 format CSV",
             { raw => 1 },
             sub {
                 my ($body, $err) = @_;
@@ -104,7 +95,7 @@ with_http(
     tests => 2,
     cb    => sub {
         $ch->query(
-            "SELECT 1 AS n FORMAT JSONEachRow",
+            "select 1 as n format JSONEachRow",
             { raw => 1 },
             sub {
                 my ($body, $err) = @_;
@@ -122,7 +113,7 @@ with_http(
     tests    => 1,
     cb       => sub {
         $ch->query(
-            "SELECT 42 AS x FORMAT TabSeparated",
+            "select 42 as x format TabSeparated",
             { raw => 1 },
             sub {
                 my ($body, $err) = @_;
@@ -138,7 +129,7 @@ with_http(
     tests => 1,
     cb    => sub {
         $ch->query(
-            "SELECT 1 FORMAT TabSeparated",
+            "select 1 format TabSeparated",
             { raw => 0 },
             sub {
                 my ($rows, $err) = @_;
@@ -155,7 +146,7 @@ with_native(
     tests => 1,
     cb    => sub {
         my $ok = eval {
-            $ch->query("SELECT 1", { raw => 1 }, sub {});
+            $ch->query("select 1", { raw => 1 }, sub {});
             1;
         };
         ok(!$ok && $@ =~ /raw mode is only supported with the HTTP protocol/,

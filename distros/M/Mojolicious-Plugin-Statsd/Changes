@@ -1,5 +1,24 @@
 Changelog for Mojolicious-Plugin-Statsd
 
+0.06      2026-05-21 21:53:21+01:00 Europe/London
+  [Security]
+  - Fixed metric injection CVE-2026-46740
+
+  [Enhancements]
+  - Use Net::Statsd::Tiny for handling the statsd protocol
+  - Added the client attribute for choosing any statsd client
+
+  [Documentation]
+  - New maintainer Robert Rothenberg <perl@rhizomnic.com>
+  - Updated copyright year
+  - Added a security policy
+  - Added a SECURITY CONSIDERATIONS section
+  - Use Pod::Weaver
+  - Added doap.xml metadata
+
+ [Incompatible Changes]
+ - Minimum Perl is v5.16 (same as the current Mojolicious)
+
 0.04 2019-05-02T03:50:11
  - Make 5.10 compatible - no package BLOCK until 5.14 (Meredith Howard)
 

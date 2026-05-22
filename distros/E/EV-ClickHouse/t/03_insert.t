@@ -7,13 +7,9 @@ use EV::ClickHouse;
 my $host = $ENV{TEST_CLICKHOUSE_HOST} || '127.0.0.1';
 my $port = $ENV{TEST_CLICKHOUSE_PORT} || 8123;
 
-my $reachable = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $port, Timeout => 2);
-    $reachable = 1 if $s;
-};
-plan skip_all => "ClickHouse not reachable at $host:$port" unless $reachable;
+require IO::Socket::INET;
+plan skip_all => "ClickHouse not reachable at $host:$port"
+    unless IO::Socket::INET->new(PeerAddr => $host, PeerPort => $port, Timeout => 2);
 
 plan tests => 4;
 
@@ -27,10 +23,7 @@ sub with_ch {
         port       => $port,
         session_id => "test_insert_$$",
         on_connect => sub { $cb->() },
-        on_error   => sub {
-            diag("Error: $_[0]");
-            EV::break;
-        },
+        on_error   => sub { diag("Error: $_[0]"); EV::break },
         %args,
     );
     my $timeout = EV::timer(10, 0, sub { EV::break });
@@ -40,7 +33,7 @@ sub with_ch {
 
 # Test 1-4: insert and verify
 with_ch(cb => sub {
-    $ch->q("create table if not exists test_ev_insert (id UInt32, name String) engine = Memory", sub {
+    $ch->q("create table if not exists test_ev_insert (id UInt32, name String) ENGINE = Memory", sub {
         my ($r, $e) = @_;
         die "create: $e" if $e;
 

@@ -8,18 +8,9 @@ my $host      = $ENV{TEST_CLICKHOUSE_HOST} || '127.0.0.1';
 my $http_port = $ENV{TEST_CLICKHOUSE_PORT} || 8123;
 my $nat_port  = $ENV{TEST_CLICKHOUSE_NATIVE_PORT} || 9000;
 
-my $http_ok = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $http_port, Timeout => 2);
-    $http_ok = 1 if $s;
-};
-my $nat_ok = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $nat_port, Timeout => 2);
-    $nat_ok = 1 if $s;
-};
+require IO::Socket::INET;
+my $http_ok = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $http_port, Timeout => 2) ? 1 : 0;
+my $nat_ok  = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $nat_port,  Timeout => 2) ? 1 : 0;
 plan skip_all => "ClickHouse not reachable" unless $http_ok || $nat_ok;
 
 plan tests => 22;
@@ -70,7 +61,7 @@ with_http(
     tests => 2,
     cb    => sub {
         $ch->query(
-            "SELECT {x:UInt32} + {y:UInt32} as result FORMAT TabSeparated",
+            "select {x:UInt32} + {y:UInt32} as result format TabSeparated",
             { params => { x => 10, y => 20 } },
             sub {
                 my ($rows, $err) = @_;
@@ -87,7 +78,7 @@ with_native(
     tests => 2,
     cb    => sub {
         $ch->query(
-            "SELECT {x:UInt32} + {y:UInt32} as result",
+            "select {x:UInt32} + {y:UInt32} as result",
             { params => { x => 100, y => 200 } },
             sub {
                 my ($rows, $err) = @_;
@@ -104,7 +95,7 @@ with_native(
     tests => 2,
     cb    => sub {
         $ch->query(
-            "SELECT {s:String} as result",
+            "select {s:String} as result",
             { params => { s => 'hello world' } },
             sub {
                 my ($rows, $err) = @_;
@@ -123,7 +114,7 @@ SKIP: {
     $uri_ch = EV::ClickHouse->new(
         uri        => "clickhouse+native://default:\@$host:$nat_port/default",
         on_connect => sub {
-            $uri_ch->query("SELECT 42 as n", sub {
+            $uri_ch->query("select 42 as n", sub {
                 my ($rows, $err) = @_;
                 ok(!$err, 'URI: no error');
                 is($rows->[0][0], 42, 'URI: query works');
@@ -144,7 +135,7 @@ SKIP: {
     $uri_ch = EV::ClickHouse->new(
         uri        => "clickhouse://default:\@$host:$http_port/default",
         on_connect => sub {
-            $uri_ch->query("SELECT 1 FORMAT TabSeparated", sub {
+            $uri_ch->query("select 1 format TabSeparated", sub {
                 my ($rows, $err) = @_;
                 ok(!$err, 'URI HTTP: no error');
                 is($rows->[0][0], '1', 'URI HTTP: query works');
@@ -163,7 +154,7 @@ with_native(
     tests => 2,
     cb    => sub {
         $ch->query(
-            "SELECT 1",
+            "select 1",
             { query_id => 'test_qid_123' },
             sub {
                 my ($rows, $err) = @_;
@@ -190,7 +181,7 @@ with_native(
     cb    => sub {
         my @traces;
         $ch->on_trace(sub { push @traces, $_[0] });
-        $ch->query("SELECT 1", sub {
+        $ch->query("select 1", sub {
             my ($rows, $err) = @_;
             ok(!$err, 'on_trace: no error');
             ok(@traces >= 1, 'on_trace: got trace messages (' . scalar(@traces) . ')');
@@ -204,13 +195,13 @@ with_native(
 with_native(
     tests => 3,
     cb    => sub {
-        $ch->query("SELECT toInt256(12345678901234567890) as big", sub {
+        $ch->query("select toInt256(12345678901234567890) as big", sub {
             my ($rows, $err) = @_;
             ok(!$err, 'Int256: no error');
             is($rows->[0][0], '12345678901234567890', 'Int256: correct value');
         });
         # Also test UInt256
-        $ch->query("SELECT toUInt256('99999999999999999999') as big", sub {
+        $ch->query("select toUInt256('99999999999999999999') as big", sub {
             my ($rows, $err) = @_;
             is($rows->[0][0], '99999999999999999999', 'UInt256: correct value');
         });
@@ -232,7 +223,7 @@ SKIP: {
             # Wait a bit, then query
             $ka_wait = EV::timer(0.5, 0, sub {
                 ok($ka_ch->is_connected, 'keepalive: still connected');
-                $ka_ch->query("SELECT 1", sub {
+                $ka_ch->query("select 1", sub {
                     my ($rows, $err) = @_;
                     ok(!$err, 'keepalive: query after wait ok');
                     EV::break;

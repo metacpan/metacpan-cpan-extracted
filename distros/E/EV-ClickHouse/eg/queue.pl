@@ -14,7 +14,7 @@ my $ch = EV::ClickHouse->new(
 my $remaining = 20;
 
 for my $i (1 .. $remaining) {
-    $ch->q("SELECT $i AS n, $i * $i AS square FORMAT TabSeparated", sub {
+    $ch->q("select $i as n, $i * $i as square format TabSeparated", sub {
         my ($rows, $err) = @_;
         if ($err) {
             warn "Query $i error: $err\n";

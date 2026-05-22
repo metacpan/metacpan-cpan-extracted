@@ -1,16 +1,17 @@
 {
    "abstract" : "HTML5 parser based on gumbo C library",
    "author" : [
-      "Ruslan Zakirov E<lt>ruz@bestpractical.comE<gt>"
+      "Ruslan Zakirov E<lt>ruz@bestpractical.comE<gt>",
+      "Best Practical Solutions, LLC E<lt>modules@bestpractical.comE<gt>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "HTML-Gumbo",
    "prereqs" : {
@@ -21,13 +22,12 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::LibGumbo" : "0",
+            "Alien::LibGumbo" : "0.03",
             "Module::Build" : "0.42"
          }
       },
       "runtime" : {
          "requires" : {
-            "Alien::LibGumbo" : "0.03",
             "XSLoader" : "0"
          }
       }
@@ -35,7 +35,7 @@
    "provides" : {
       "HTML::Gumbo" : {
          "file" : "lib/HTML/Gumbo.pm",
-         "version" : "0.18"
+         "version" : "0.19"
       }
    },
    "release_status" : "stable",
@@ -47,6 +47,6 @@
          "url" : "https://github.com/ruz/HTML-Gumbo"
       }
    },
-   "version" : "0.18",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.19",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

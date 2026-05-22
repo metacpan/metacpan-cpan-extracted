@@ -1,0 +1,48 @@
+---
+abstract: 'Reversibly obfuscate a string with a substitution cipher.'
+author:
+  - 'Dondi Michael Stroma <dstroma@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.26, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: String-Obfuscate
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  String::Obfuscate:
+    file: lib/String/Obfuscate.pm
+    version: '0.01'
+  String::Obfuscate::Base64:
+    file: lib/String/Obfuscate/Base64.pm
+  String::Obfuscate::Base64::URL:
+    file: lib/String/Obfuscate/Base64/URL.pm
+recommends:
+  List::Util::XS: '1.54'
+requires:
+  MIME::Base64: '0'
+  Math::Random::ISAAC: '0'
+  perl: v5.20.0
+resources:
+  bugtracker: https://github.com/dstroma/string-obfuscate/issues
+  homepage: https://github.com/dstroma/string-obfuscate
+  repository: https://github.com/dstroma/string-obfuscate.git
+version: '0.01'
+x_contributors:
+  - 'dstroma <dstroma@users.noreply.github.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_static_install: 1

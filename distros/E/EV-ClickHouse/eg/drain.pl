@@ -13,7 +13,7 @@ $ch = EV::ClickHouse->new(
     on_connect => sub {
         # Fire several queries
         for my $i (1..5) {
-            $ch->query("SELECT $i AS n, sleep(0.1)", sub {
+            $ch->query("select $i as n, sleep(0.1)", sub {
                 my ($rows, $err) = @_;
                 printf "Query %d: %s\n", $i, $err // "ok (n=$rows->[0][0])";
             });

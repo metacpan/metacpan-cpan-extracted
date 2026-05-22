@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-# WITH TOTALS — separate totals/extremes from data rows
+# with totals — separate totals/extremes from data rows
 use strict;
 use warnings;
 use EV;
@@ -12,8 +12,8 @@ $ch = EV::ClickHouse->new(
     protocol => 'native',
     on_connect => sub {
         $ch->query(
-            "SELECT number % 3 AS g, count() AS c, sum(number) AS s "
-            . "FROM numbers(100) GROUP BY g WITH TOTALS ORDER BY g",
+            "select number % 3 as g, count() as c, sum(number) as s "
+            . "from numbers(100) group by g with totals order by g",
             sub {
                 my ($rows, $err) = @_;
                 die "Error: $err\n" if $err;
@@ -30,7 +30,7 @@ $ch = EV::ClickHouse->new(
                 if (my $totals = $ch->last_totals) {
                     printf "\nTotals:\n";
                     printf "  g=%s  count=%d  sum=%d\n",
-                        $totals->[0][0] // 'NULL', $totals->[0][1], $totals->[0][2];
+                        $totals->[0][0] // 'null', $totals->[0][1], $totals->[0][2];
                 }
 
                 printf "\nProfile: %d rows, %d bytes\n",

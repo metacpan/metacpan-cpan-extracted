@@ -13,14 +13,15 @@ $ch = EV::ClickHouse->new(
     on_connect => sub {
         # Numeric parameters
         $ch->query(
-            "SELECT {x:UInt32} + {y:UInt32} AS sum, {name:String} AS greeting",
+            "select {x:UInt32} + {y:UInt32} as sum, {name:String} as greeting",
             { params => { x => 100, y => 200, name => "hello world" } },
             sub {
                 my ($rows, $err) = @_;
                 die "Error: $err\n" if $err;
                 printf "sum=%d, greeting=%s\n", $rows->[0][0], $rows->[0][1];
 
-                # Parameters work with HTTP too (use param_ prefix directly)
+                # The same params => {...} mechanism works on the HTTP protocol
+                # too — values are URL-encoded as param_<name> automatically.
                 EV::break;
             },
         );

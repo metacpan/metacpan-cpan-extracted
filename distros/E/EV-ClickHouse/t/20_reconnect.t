@@ -12,7 +12,7 @@ use EV::ClickHouse;
 #   next query on a fresh socket.
 #
 # ClickHouse native protocol has no SQL-level disconnect primitive in 26.x
-# (no SYSTEM DROP CONNECTION; KILL QUERY only kills queries), so a true
+# (no SYSTEM drop CONNECTION; KILL QUERY only kills queries), so a true
 # native disconnect-recovery test would need a TCP proxy harness or
 # tcp_close_connection_after_queries_seconds in server config — left as
 # integration testing.
@@ -21,18 +21,9 @@ my $host      = $ENV{TEST_CLICKHOUSE_HOST} || '127.0.0.1';
 my $nat_port  = $ENV{TEST_CLICKHOUSE_NATIVE_PORT} || 9000;
 my $http_port = $ENV{TEST_CLICKHOUSE_PORT} || 8123;
 
-my $nat_ok = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $nat_port, Timeout => 2);
-    $nat_ok = 1 if $s;
-};
-my $http_ok = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $http_port, Timeout => 2);
-    $http_ok = 1 if $s;
-};
+require IO::Socket::INET;
+my $nat_ok  = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $nat_port,  Timeout => 2) ? 1 : 0;
+my $http_ok = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $http_port, Timeout => 2) ? 1 : 0;
 plan skip_all => "ClickHouse not reachable" unless $nat_ok || $http_ok;
 
 plan tests => 7;
@@ -54,7 +45,7 @@ SKIP: {
         reconnect_delay     => 0.1,
         reconnect_max_delay => 1,
         on_connect          => sub {
-            $ch->query("SELECT 42", sub {
+            $ch->query("select 42", sub {
                 ($rows, $err) = @_;
                 EV::break;
             });
@@ -87,7 +78,7 @@ SKIP: {
 
     # Queue immediately, before on_connect can fire.
     for my $i (1..3) {
-        $ch->query("SELECT $i", sub {
+        $ch->query("select $i", sub {
             my ($rows, $err) = @_;
             push @results, $err ? "ERR: $err" : $rows->[0][0];
             EV::break if @results == 3;
@@ -131,14 +122,14 @@ SKIP: {
         on_connect          => sub {
             return unless $first_connect;
             $first_connect = 0;
-            $ch->query("SELECT 1 FORMAT TabSeparated", sub {
+            $ch->query("select 1 format TabSeparated", sub {
                 (undef, $q1_err) = @_;
 
                 # Idle past keep_alive_timeout so the server hangs up,
                 # then send Q2 — auto_reconnect must dispatch it onto a
                 # fresh socket.
                 $idle_timer = EV::timer(4, 0, sub {
-                    $ch->query("SELECT 2 FORMAT TabSeparated", sub {
+                    $ch->query("select 2 format TabSeparated", sub {
                         my ($rows, $err) = @_;
                         $q2_err = $err;
                         $q2_val = ($rows && @$rows) ? $rows->[0][0] : undef;

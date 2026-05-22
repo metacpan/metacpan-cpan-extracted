@@ -7,13 +7,9 @@ use EV::ClickHouse;
 my $host = $ENV{TEST_CLICKHOUSE_HOST} || '127.0.0.1';
 my $port = $ENV{TEST_CLICKHOUSE_NATIVE_PORT} || 9000;
 
-my $reachable = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $port, Timeout => 2);
-    $reachable = 1 if $s;
-};
-plan skip_all => "ClickHouse native port not reachable at $host:$port" unless $reachable;
+require IO::Socket::INET;
+plan skip_all => "ClickHouse native port not reachable at $host:$port"
+    unless IO::Socket::INET->new(PeerAddr => $host, PeerPort => $port, Timeout => 2);
 
 plan tests => 33;
 
@@ -27,10 +23,7 @@ sub with_ch {
         port       => $port,
         protocol   => 'native',
         on_connect => sub { $cb->() },
-        on_error   => sub {
-            diag("Error: $_[0]");
-            EV::break;
-        },
+        on_error   => sub { diag("Error: $_[0]"); EV::break },
         %args,
     );
     my $timeout = EV::timer(10, 0, sub { EV::break });
@@ -95,32 +88,32 @@ with_ch(cb => sub {
     });
 });
 
-# Test 15-16: NULL (Nullable(Nothing))
+# Test 15-16: null (Nullable(Nothing))
 with_ch(cb => sub {
-    $ch->query("select NULL as x", sub {
+    $ch->query("select null as x", sub {
         my ($rows, $err) = @_;
-        ok(!$err, 'NULL: no error');
-        ok(!defined $rows->[0][0], 'NULL: value is undef');
+        ok(!$err, 'null: no error');
+        ok(!defined $rows->[0][0], 'null: value is undef');
         EV::break;
     });
 });
 
 # Test 17-18: multiple NULLs
 with_ch(cb => sub {
-    $ch->query("select NULL as x from numbers(3)", sub {
+    $ch->query("select null as x from numbers(3)", sub {
         my ($rows, $err) = @_;
-        ok(!$err, 'NULL*3: no error');
-        is(scalar @$rows, 3, 'NULL*3: 3 rows');
+        ok(!$err, 'null*3: no error');
+        is(scalar @$rows, 3, 'null*3: 3 rows');
         EV::break;
     });
 });
 
-# Test 19-20: mixed columns with NULL
+# Test 19-20: mixed columns with null
 with_ch(cb => sub {
-    $ch->query("select 1 as a, NULL as b, 'hi' as c", sub {
+    $ch->query("select 1 as a, null as b, 'hi' as c", sub {
         my ($rows, $err) = @_;
         ok(!$err, 'mixed: no error');
-        is_deeply($rows->[0], [1, undef, 'hi'], 'mixed: [1,NULL,hi]');
+        is_deeply($rows->[0], [1, undef, 'hi'], 'mixed: [1,null,hi]');
         EV::break;
     });
 });
@@ -178,7 +171,7 @@ with_ch(cb => sub {
 
 # Test 29-31: DDL + insert + select
 with_ch(cb => sub {
-    $ch->query("create table if not exists _ev_native_test (a UInt32, b String) engine = Memory", sub {
+    $ch->query("create table if not exists _ev_native_test (a UInt32, b String) ENGINE = Memory", sub {
         my ($r, $e) = @_;
         ok(!$e, 'DDL: create table');
         $ch->insert("_ev_native_test", "1\thello\n2\tworld\n", sub {

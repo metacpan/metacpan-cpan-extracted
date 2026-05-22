@@ -4,18 +4,14 @@ use Test::More;
 use EV;
 use EV::ClickHouse;
 
-# WITH TOTALS / extremes — accessible through last_totals / last_extremes.
+# with totals / extremes — accessible through last_totals / last_extremes.
 
 my $host = $ENV{TEST_CLICKHOUSE_HOST} || '127.0.0.1';
 my $port = $ENV{TEST_CLICKHOUSE_NATIVE_PORT} || 9000;
 
-my $reachable = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $port, Timeout => 2);
-    $reachable = 1 if $s;
-};
-plan skip_all => "ClickHouse native port not reachable" unless $reachable;
+require IO::Socket::INET;
+plan skip_all => "ClickHouse native port not reachable"
+    unless IO::Socket::INET->new(PeerAddr => $host, PeerPort => $port, Timeout => 2);
 
 plan tests => 8;
 
@@ -35,19 +31,19 @@ sub with_native {
     $ch->finish if $ch && $ch->is_connected;
 }
 
-# 1-4: WITH TOTALS — totals row is captured separately from main result.
+# 1-4: with totals — totals row is captured separately from main result.
 with_native(sub {
     $ch->query(
-        "SELECT number % 4 AS bucket, count() AS n
-           FROM numbers(100)
-          GROUP BY bucket
-          WITH TOTALS
-          ORDER BY bucket",
+        "select number % 4 as bucket, count() as n
+           from numbers(100)
+          group by bucket
+          with totals
+          order by bucket",
         sub {
             my ($rows, $err) = @_;
-            ok(!$err, "WITH TOTALS: no error") or diag $err;
+            ok(!$err, "with totals: no error") or diag $err;
             is(ref $rows eq 'ARRAY' ? scalar @$rows : -1, 4,
-                "WITH TOTALS: 4 buckets in main result");
+                "with totals: 4 buckets in main result");
 
             my $totals = $ch->last_totals;
             my $row    = (ref $totals eq 'ARRAY' && @$totals == 1)
@@ -60,17 +56,17 @@ with_native(sub {
     );
 });
 
-# 5-6: query without WITH TOTALS leaves last_totals undef-or-empty
+# 5-6: query without with totals leaves last_totals undef-or-empty
 # (depends on whether the prior query state was reset between calls).
 with_native(sub {
     $ch->query(
-        "SELECT number FROM numbers(3)",
+        "select number from numbers(3)",
         sub {
             my ($rows, $err) = @_;
             ok(!$err, "no totals: no error") or diag $err;
             my $totals = $ch->last_totals;
             ok(!defined $totals || @$totals == 0,
-                "last_totals: empty when query had no WITH TOTALS");
+                "last_totals: empty when query had no with totals");
             EV::break;
         },
     );
@@ -79,7 +75,7 @@ with_native(sub {
 # 7-8: extremes (set extremes=1 in settings).
 with_native(sub {
     $ch->query(
-        "SELECT number FROM numbers(10)",
+        "select number from numbers(10)",
         { extremes => 1 },
         sub {
             my ($rows, $err) = @_;

@@ -10,11 +10,11 @@ use EV;
 use EV::ClickHouse;
 
 my @queries = (
-    "SELECT 'hello' AS greeting",
-    "SELECT count() AS rows FROM system.numbers LIMIT 1000",
-    "SELECT version()",
-    "SELECT now() AS now",
-    "SELECT uptime() AS up",
+    "select 'hello' as greeting",
+    "select count() as rows from system.numbers limit 1000",
+    "select version()",
+    "select now() as now",
+    "select uptime() as up",
 );
 
 my $ch;
@@ -38,7 +38,7 @@ $ch = EV::ClickHouse->new(
                 my $r = $results{$i};
                 printf "  [%d] %-50s -> %s\n",
                     $i, $queries[$i],
-                    ref $r eq 'ARRAY' ? join(", ", map defined $_ ? $_ : 'NULL', @$r)
+                    ref $r eq 'ARRAY' ? join(", ", map defined $_ ? $_ : 'null', @$r)
                                       : $r;
             }
             $ch->finish;

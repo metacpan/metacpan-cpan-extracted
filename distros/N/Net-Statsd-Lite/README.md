@@ -47,15 +47,11 @@ specified. But it otherwise does not enforce maximum/minimum values.
 
 # RECENT CHANGES
 
-Changes for version v0.10.2 (2026-05-18)
+Changes for version v0.11.0 (2026-05-22)
 
 - Enhancements
-    - Use core Digest::SHA instead of CryptX.  This removes the secure\_set\_hash option.
-- Incompatabilities
-    - The secure\_set\_key must be manually initialised.
-- Documentation
-    - Removed "lightweight" from the abstract, because this class is not as light as it used to be. GH#3
-    - Updated documentation.
+    - Make the socket explicitly configurable in the constructor.
+    - Use IO::Socket::IP for the default socket.
 
 See the `Changes` file for more details.
 
@@ -66,7 +62,7 @@ This module lists the following modules as runtime dependencies:
 - [Carp](https://metacpan.org/pod/Carp)
 - [Devel::StrictMode](https://metacpan.org/pod/Devel%3A%3AStrictMode)
 - [Digest::SHA](https://metacpan.org/pod/Digest%3A%3ASHA) version 5.96 or later
-- [IO::Socket](https://metacpan.org/pod/IO%3A%3ASocket) version 1.18 or later
+- [IO::Socket::IP](https://metacpan.org/pod/IO%3A%3ASocket%3A%3AIP)
 - [Moo](https://metacpan.org/pod/Moo) version 1.000000 or later
 - [MooX::TypeTiny](https://metacpan.org/pod/MooX%3A%3ATypeTiny)
 - [Ref::Util](https://metacpan.org/pod/Ref%3A%3AUtil)

@@ -4,19 +4,15 @@ use Test::More;
 use EV;
 use EV::ClickHouse;
 
-# Edge cases across native types: empty result, NULL columns, FixedString,
+# Edge cases across native types: empty result, null columns, FixedString,
 # 1 MB String, deeply-nested Array(Tuple), IPv6, Decimal128, Map.
 
 my $host = $ENV{TEST_CLICKHOUSE_HOST} || '127.0.0.1';
 my $port = $ENV{TEST_CLICKHOUSE_NATIVE_PORT} || 9000;
 
-my $reachable = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $port, Timeout => 2);
-    $reachable = 1 if $s;
-};
-plan skip_all => "ClickHouse native port not reachable" unless $reachable;
+require IO::Socket::INET;
+plan skip_all => "ClickHouse native port not reachable"
+    unless IO::Socket::INET->new(PeerAddr => $host, PeerPort => $port, Timeout => 2);
 
 plan tests => 16;
 
@@ -36,10 +32,10 @@ sub with_native {
     $ch->finish if $ch && $ch->is_connected;
 }
 
-# 1-2: Empty result. Native returns an empty arrayref OR undef when no
+# 1-2: Empty result. Native returns an empty arrayref or undef when no
 # rows match — accept either as long as no error was raised.
 with_native(sub {
-    $ch->query("SELECT number FROM numbers(5) WHERE number > 1000", sub {
+    $ch->query("select number from numbers(5) where number > 1000", sub {
         my ($rows, $err) = @_;
         ok(!$err, "empty: no error") or diag $err;
         my $rowcount = ref $rows eq 'ARRAY' ? scalar @$rows : 0;
@@ -56,9 +52,9 @@ sub first_row {
          : (ref $rows eq 'ARRAY' && @$rows ? $rows->[0] : undef);
 }
 
-# 3-4: All-NULL row
+# 3-4: All-null row
 with_native(sub {
-    $ch->query("SELECT CAST(NULL AS Nullable(UInt32)), CAST(NULL AS Nullable(String))", sub {
+    $ch->query("select CAST(null as Nullable(UInt32)), CAST(null as Nullable(String))", sub {
         my ($rows, $err) = @_;
         ok(!$err, "all-null: no error") or diag $err;
         is_deeply($rows, [[undef, undef]], "all-null: both columns undef");
@@ -68,7 +64,7 @@ with_native(sub {
 
 # 5-6: FixedString(N) — server pads with NULs to exactly N bytes
 with_native(sub {
-    $ch->query("SELECT toFixedString('abc', 5)", sub {
+    $ch->query("select toFixedString('abc', 5)", sub {
         my ($rows, $err) = @_;
         ok(!$err, "FixedString: no error") or diag $err;
         my $r = first_row($rows, $err);
@@ -81,7 +77,7 @@ with_native(sub {
 # (1_000_000 by default), so stay just under the cap.
 with_native(sub {
     my $N = 999_999;
-    $ch->query("SELECT repeat('x', $N)", sub {
+    $ch->query("select repeat('x', $N)", sub {
         my ($rows, $err) = @_;
         ok(!$err, "large string: no error") or diag $err;
         my $r = first_row($rows, $err);
@@ -93,7 +89,7 @@ with_native(sub {
 
 # 9-10: Deeply nested Array(Tuple)
 with_native(sub {
-    $ch->query("SELECT [tuple(1, 'a'), tuple(2, 'b')]", sub {
+    $ch->query("select [tuple(1, 'a'), tuple(2, 'b')]", sub {
         my ($rows, $err) = @_;
         ok(!$err, "Array(Tuple): no error") or diag $err;
         my $r = first_row($rows, $err);
@@ -105,7 +101,7 @@ with_native(sub {
 
 # 11-12: IPv6 column
 with_native(sub {
-    $ch->query("SELECT toIPv6('::1'), toIPv6('2001:db8::1')", sub {
+    $ch->query("select toIPv6('::1'), toIPv6('2001:db8::1')", sub {
         my ($rows, $err) = @_;
         ok(!$err, "IPv6: no error") or diag $err;
         is_deeply(first_row($rows, $err), ['::1', '2001:db8::1'],
@@ -116,7 +112,7 @@ with_native(sub {
 
 # 13-14: Decimal128 (raw, without decode_decimal — comes back as a string).
 with_native(sub {
-    $ch->query("SELECT toDecimal128('123.456', 3)", sub {
+    $ch->query("select toDecimal128('123.456', 3)", sub {
         my ($rows, $err) = @_;
         ok(!$err, "Decimal128: no error") or diag $err;
         my $r = first_row($rows, $err);
@@ -127,7 +123,7 @@ with_native(sub {
 
 # 15-16: Map(String, UInt32)
 with_native(sub {
-    $ch->query("SELECT map('a', 1, 'b', 2)", sub {
+    $ch->query("select map('a', 1, 'b', 2)", sub {
         my ($rows, $err) = @_;
         ok(!$err, "Map: no error") or diag $err;
         my $r = first_row($rows, $err);

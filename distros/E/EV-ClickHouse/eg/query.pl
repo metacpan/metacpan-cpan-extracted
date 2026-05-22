@@ -14,7 +14,7 @@ my $ch = EV::ClickHouse->new(
     on_error => sub { warn "Connection error: $_[0]\n"; EV::break },
 );
 
-$ch->query("SELECT number, number * number AS square FROM system.numbers LIMIT 10 FORMAT TabSeparated", sub {
+$ch->query("select number, number * number as square from system.numbers limit 10 format TabSeparated", sub {
     my ($rows, $err) = @_;
     if ($err) {
         warn "Query error: $err\n";

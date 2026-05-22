@@ -48,17 +48,10 @@ some daemons may ignore or reject this.
 
 # RECENT CHANGES
 
-Changes for version v0.3.9 (2026-05-18)
+Changes for version v0.4.0 (2026-05-21)
 
-- Incompatabilities
-    - Bumped the minimum Perl version to 5.12.
-- Security
-    - Upgraded minimum versions of some prerequisites to exclude known vulnerabilities.
-- Documentation
-    - Added SPDX Licence Snippet to borrowed test code.
-    - Fixed typos.
-- Tests
-    - Add more author tests.
+- Enhancements
+    - A socket can be passed directly to the constructor.
 
 See the `Changes` file for more details.
 

@@ -2,10 +2,12 @@ Build.PL
 Changes
 lib/HTML/Gumbo.pm
 lib/HTML/Gumbo.xs
+LICENSE
 MANIFEST			This list of files
 META.json
 META.yml
 t/callback.t
+t/leak.t
 t/string.t
+t/template.t
 t/tree.t
-LICENSE

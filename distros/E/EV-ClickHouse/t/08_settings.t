@@ -8,18 +8,9 @@ my $host      = $ENV{TEST_CLICKHOUSE_HOST} || '127.0.0.1';
 my $http_port = $ENV{TEST_CLICKHOUSE_PORT} || 8123;
 my $nat_port  = $ENV{TEST_CLICKHOUSE_NATIVE_PORT} || 9000;
 
-my $http_ok = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $http_port, Timeout => 2);
-    $http_ok = 1 if $s;
-};
-my $nat_ok = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $nat_port, Timeout => 2);
-    $nat_ok = 1 if $s;
-};
+require IO::Socket::INET;
+my $http_ok = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $http_port, Timeout => 2) ? 1 : 0;
+my $nat_ok  = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $nat_port,  Timeout => 2) ? 1 : 0;
 plan skip_all => "ClickHouse not reachable" unless $http_ok || $nat_ok;
 
 plan tests => 22;
@@ -70,7 +61,7 @@ with_http(
     settings => { max_threads => 1 },
     tests    => 2,
     cb       => sub {
-        $ch->query("SELECT value FROM system.settings WHERE name='max_threads' FORMAT TabSeparated", sub {
+        $ch->query("select value from system.settings where name='max_threads' format TabSeparated", sub {
             my ($rows, $err) = @_;
             ok(!$err, 'HTTP conn setting: no error');
             is($rows->[0][0], '1', 'HTTP conn setting: max_threads=1');
@@ -85,7 +76,7 @@ with_http(
     tests    => 2,
     cb       => sub {
         $ch->query(
-            "SELECT value FROM system.settings WHERE name='max_threads' FORMAT TabSeparated",
+            "select value from system.settings where name='max_threads' format TabSeparated",
             { max_threads => 2 },
             sub {
                 my ($rows, $err) = @_;
@@ -102,18 +93,18 @@ with_http(
     session_id => "settings_test_$$",
     tests      => 2,
     cb         => sub {
-        $ch->query("DROP TABLE IF EXISTS _test_settings_insert", sub {
-            $ch->query("CREATE TABLE _test_settings_insert (x UInt32) ENGINE = MergeTree ORDER BY x", sub {
+        $ch->query("drop table if exists _test_settings_insert", sub {
+            $ch->query("create table _test_settings_insert (x UInt32) ENGINE = MergeTree order by x", sub {
                 $ch->insert(
                     "_test_settings_insert", "42\n",
                     { max_threads => 1 },
                     sub {
                         my ($ok, $err) = @_;
                         ok(!$err, 'HTTP insert with settings: no error');
-                        $ch->query("SELECT x FROM _test_settings_insert FORMAT TabSeparated", sub {
+                        $ch->query("select x from _test_settings_insert format TabSeparated", sub {
                             my ($rows, $err2) = @_;
                             is($rows->[0][0], '42', 'HTTP insert with settings: data correct');
-                            $ch->query("DROP TABLE _test_settings_insert", sub { EV::break });
+                            $ch->query("drop table _test_settings_insert", sub { EV::break });
                         });
                     },
                 );
@@ -128,7 +119,7 @@ with_http(
     cb    => sub {
         my $qid = "ev_ch_test_$$" . "_" . time();
         $ch->query(
-            "SELECT 1 FORMAT TabSeparated",
+            "select 1 format TabSeparated",
             { query_id => $qid },
             sub {
                 my ($rows, $err) = @_;
@@ -145,7 +136,7 @@ with_native(
     settings => { max_threads => 1 },
     tests    => 2,
     cb       => sub {
-        $ch->query("SELECT value FROM system.settings WHERE name='max_threads'", sub {
+        $ch->query("select value from system.settings where name='max_threads'", sub {
             my ($rows, $err) = @_;
             ok(!$err, 'Native conn setting: no error');
             is($rows->[0][0], '1', 'Native conn setting: max_threads=1');
@@ -160,7 +151,7 @@ with_native(
     tests    => 2,
     cb       => sub {
         $ch->query(
-            "SELECT value FROM system.settings WHERE name='max_threads'",
+            "select value from system.settings where name='max_threads'",
             { max_threads => 2 },
             sub {
                 my ($rows, $err) = @_;
@@ -178,7 +169,7 @@ with_native(
     cb    => sub {
         my $qid = "ev_ch_native_$$" . "_" . time();
         $ch->query(
-            "SELECT 1",
+            "select 1",
             { query_id => $qid },
             sub {
                 my ($rows, $err) = @_;
@@ -194,18 +185,18 @@ with_native(
 with_native(
     tests => 2,
     cb    => sub {
-        $ch->query("DROP TABLE IF EXISTS _test_native_settings_ins", sub {
-            $ch->query("CREATE TABLE _test_native_settings_ins (x UInt32) ENGINE = MergeTree ORDER BY x", sub {
+        $ch->query("drop table if exists _test_native_settings_ins", sub {
+            $ch->query("create table _test_native_settings_ins (x UInt32) ENGINE = MergeTree order by x", sub {
                 $ch->insert(
                     "_test_native_settings_ins", "7\n",
                     { max_threads => 1 },
                     sub {
                         my ($ok, $err) = @_;
                         ok(!$err, 'Native insert with settings: no error');
-                        $ch->query("SELECT x FROM _test_native_settings_ins", sub {
+                        $ch->query("select x from _test_native_settings_ins", sub {
                             my ($rows, $err2) = @_;
                             is($rows->[0][0], 7, 'Native insert with settings: data correct');
-                            $ch->query("DROP TABLE _test_native_settings_ins", sub { EV::break });
+                            $ch->query("drop table _test_native_settings_ins", sub { EV::break });
                         });
                     },
                 );
@@ -219,18 +210,18 @@ with_http(
     session_id => "async_ins_http_$$",
     tests      => 2,
     cb         => sub {
-        $ch->query("DROP TABLE IF EXISTS _test_async_ins", sub {
-            $ch->query("CREATE TABLE _test_async_ins (x UInt32) ENGINE = MergeTree ORDER BY x", sub {
+        $ch->query("drop table if exists _test_async_ins", sub {
+            $ch->query("create table _test_async_ins (x UInt32) ENGINE = MergeTree order by x", sub {
                 $ch->insert(
                     "_test_async_ins", "1\n2\n3\n",
                     { async_insert => 1, wait_for_async_insert => 1 },
                     sub {
                         my ($ok, $err) = @_;
                         ok(!$err, 'HTTP async_insert: no error');
-                        $ch->query("SELECT count() FROM _test_async_ins FORMAT TabSeparated", sub {
+                        $ch->query("select count() from _test_async_ins format TabSeparated", sub {
                             my ($rows, $err2) = @_;
                             is($rows->[0][0], '3', 'HTTP async_insert: 3 rows inserted');
-                            $ch->query("DROP TABLE _test_async_ins", sub { EV::break });
+                            $ch->query("drop table _test_async_ins", sub { EV::break });
                         });
                     },
                 );
@@ -243,18 +234,18 @@ with_http(
 with_native(
     tests => 2,
     cb    => sub {
-        $ch->query("DROP TABLE IF EXISTS _test_async_ins_nat", sub {
-            $ch->query("CREATE TABLE _test_async_ins_nat (x UInt32) ENGINE = MergeTree ORDER BY x", sub {
+        $ch->query("drop table if exists _test_async_ins_nat", sub {
+            $ch->query("create table _test_async_ins_nat (x UInt32) ENGINE = MergeTree order by x", sub {
                 $ch->insert(
                     "_test_async_ins_nat", "10\n20\n",
                     { async_insert => 1, wait_for_async_insert => 1 },
                     sub {
                         my ($ok, $err) = @_;
                         ok(!$err, 'Native async_insert: no error');
-                        $ch->query("SELECT count() FROM _test_async_ins_nat", sub {
+                        $ch->query("select count() from _test_async_ins_nat", sub {
                             my ($rows, $err2) = @_;
                             is($rows->[0][0], 2, 'Native async_insert: 2 rows inserted');
-                            $ch->query("DROP TABLE _test_async_ins_nat", sub { EV::break });
+                            $ch->query("drop table _test_async_ins_nat", sub { EV::break });
                         });
                     },
                 );
@@ -267,7 +258,7 @@ with_native(
 with_http(
     tests => 1,
     cb    => sub {
-        $ch->query("SELECT 1 FORMAT TabSeparated", sub {
+        $ch->query("select 1 format TabSeparated", sub {
             my ($rows, $err) = @_;
             ok(!$err, 'backwards compat query: no error');
             EV::break;
@@ -280,7 +271,7 @@ with_http(
     tests => 1,
     cb    => sub {
         my $ok = eval {
-            $ch->query("SELECT 1 FORMAT TabSeparated", "not_a_hash", sub {});
+            $ch->query("select 1 format TabSeparated", "not_a_hash", sub {});
             1;
         };
         ok(!$ok && $@ =~ /settings must be a HASH/i,

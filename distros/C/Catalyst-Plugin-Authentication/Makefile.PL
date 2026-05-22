@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use 5.008001;
 
+my $x = crypt('foo', 'bar');  # test that crypt() is implemented, or die.
+
 my %META = (
   name => 'Catalyst-Plugin-Authentication',
   license => 'perl_5',

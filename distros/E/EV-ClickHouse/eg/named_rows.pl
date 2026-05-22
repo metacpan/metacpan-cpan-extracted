@@ -13,10 +13,10 @@ $ch = EV::ClickHouse->new(
     named_rows => 1,
     on_connect => sub {
         $ch->query(
-            "SELECT number AS n,
-                    toString(number) AS as_str,
-                    number * number AS sq
-               FROM numbers(5)",
+            "select number as n,
+                    toString(number) as as_str,
+                    number * number as sq
+               from numbers(5)",
             sub {
                 my ($rows, $err) = @_;
                 die "Error: $err\n" if $err;

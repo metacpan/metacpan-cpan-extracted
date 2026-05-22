@@ -77,6 +77,7 @@ sub _check_password {
     }
     elsif ( $user->supports(qw/password crypted/) ) {
         my $crypted = $user->crypted_password;
+        return if not defined $crypted;
         return $crypted eq crypt( $password, $crypted );
     }
     elsif ( $user->supports(qw/password hashed/) ) {

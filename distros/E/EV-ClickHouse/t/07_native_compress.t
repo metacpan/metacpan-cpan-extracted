@@ -7,13 +7,9 @@ use EV::ClickHouse;
 my $host = $ENV{TEST_CLICKHOUSE_HOST} || '127.0.0.1';
 my $port = $ENV{TEST_CLICKHOUSE_NATIVE_PORT} || 9000;
 
-my $reachable = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $port, Timeout => 2);
-    $reachable = 1 if $s;
-};
-plan skip_all => "ClickHouse native port not reachable at $host:$port" unless $reachable;
+require IO::Socket::INET;
+plan skip_all => "ClickHouse native port not reachable at $host:$port"
+    unless IO::Socket::INET->new(PeerAddr => $host, PeerPort => $port, Timeout => 2);
 
 plan tests => 20;
 
@@ -28,10 +24,7 @@ sub with_ch {
         protocol   => 'native',
         compress   => 1,
         on_connect => sub { $cb->() },
-        on_error   => sub {
-            diag("Error: $_[0]");
-            EV::break;
-        },
+        on_error   => sub { diag("Error: $_[0]"); EV::break },
         %args,
     );
     my $timeout = EV::timer(10, 0, sub { diag("timeout"); EV::break });
@@ -87,12 +80,12 @@ with_ch(cb => sub {
     });
 });
 
-# Test 12-13: NULL handling with compression
+# Test 12-13: null handling with compression
 with_ch(cb => sub {
-    $ch->query("select 1 as a, NULL as b, 'hi' as c", sub {
+    $ch->query("select 1 as a, null as b, 'hi' as c", sub {
         my ($rows, $err) = @_;
-        ok(!$err, 'compressed NULL: no error');
-        is_deeply($rows->[0], [1, undef, 'hi'], 'compressed NULL: mixed values');
+        ok(!$err, 'compressed null: no error');
+        is_deeply($rows->[0], [1, undef, 'hi'], 'compressed null: mixed values');
         EV::break;
     });
 });
@@ -112,7 +105,7 @@ with_ch(cb => sub {
 
 # Test 16-18: DDL + insert + select with compression
 with_ch(cb => sub {
-    $ch->query("create table if not exists _ev_compress_test (a UInt32, b String) engine = Memory", sub {
+    $ch->query("create table if not exists _ev_compress_test (a UInt32, b String) ENGINE = Memory", sub {
         my ($r, $e) = @_;
         ok(!$e, 'compressed DDL: create');
         $ch->insert("_ev_compress_test", "10\talpha\n20\tbeta\n", sub {

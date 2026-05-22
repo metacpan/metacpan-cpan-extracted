@@ -9,13 +9,9 @@ use EV::ClickHouse;
 my $host = $ENV{TEST_CLICKHOUSE_HOST} || '127.0.0.1';
 my $port = $ENV{TEST_CLICKHOUSE_NATIVE_PORT} || 9000;
 
-my $reachable = 0;
-eval {
-    require IO::Socket::INET;
-    my $s = IO::Socket::INET->new(PeerAddr => $host, PeerPort => $port, Timeout => 2);
-    $reachable = 1 if $s;
-};
-plan skip_all => "ClickHouse native port not reachable" unless $reachable;
+require IO::Socket::INET;
+plan skip_all => "ClickHouse native port not reachable"
+    unless IO::Socket::INET->new(PeerAddr => $host, PeerPort => $port, Timeout => 2);
 
 plan tests => 9;
 
@@ -29,7 +25,7 @@ plan tests => 9;
         protocol   => 'native',
         named_rows => 1,
         on_connect => sub {
-            $ch->query("SELECT 1 AS one, 'two' AS two, 3.14 AS three", sub {
+            $ch->query("select 1 as one, 'two' as two, 3.14 as three", sub {
                 my ($r, $err) = @_;
                 $rows = $r unless $err;
                 EV::break;
@@ -58,8 +54,8 @@ plan tests => 9;
         protocol        => 'native',
         decode_datetime => 1,
         on_connect      => sub {
-            $ch->query("SELECT toDateTime('2024-01-15 10:30:00', 'UTC') AS dt,
-                               toDate('2024-01-15') AS d", sub {
+            $ch->query("select toDateTime('2024-01-15 10:30:00', 'UTC') as dt,
+                               toDate('2024-01-15') as d", sub {
                 my ($r, $err) = @_;
                 $rows = $r unless $err;
                 EV::break;
@@ -88,7 +84,7 @@ plan tests => 9;
         protocol       => 'native',
         decode_decimal => 1,
         on_connect     => sub {
-            $ch->query("SELECT toDecimal64('123.456', 3) AS d", sub {
+            $ch->query("select toDecimal64('123.456', 3) as d", sub {
                 my ($r, $err) = @_;
                 $rows = $r unless $err;
                 EV::break;
@@ -117,7 +113,7 @@ plan tests => 9;
         decode_enum => 1,
         on_connect  => sub {
             $ch->query(
-                "SELECT CAST('red' AS Enum8('red'=1,'green'=2,'blue'=3)) AS color",
+                "select CAST('red' as Enum8('red'=1,'green'=2,'blue'=3)) as color",
                 sub {
                     my ($r, $err) = @_;
                     $rows = $r unless $err;

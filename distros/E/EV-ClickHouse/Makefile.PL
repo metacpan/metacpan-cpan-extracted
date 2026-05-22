@@ -8,6 +8,20 @@ my %ev = EV::MakeMaker::ev_args();
 
 my @libs;
 my $extra_inc = '';
+my $optimize;            # overrides EU::MM's default OPTIMIZE when set
+
+# --with-debug rebuilds with -O0 -g -fsanitize=address,undefined and links
+# the same sanitizer runtime. For author / pre-release validation only;
+# the sanitizer runtime is not redistributable inside CPAN tarballs.
+my $debug = grep { $_ eq '--with-debug' } @ARGV;
+@ARGV = grep { $_ ne '--with-debug' } @ARGV;
+if ($debug) {
+    # These must go in OPTIMIZE, not INC: EU::MM's compile line is
+    # `INC CCFLAGS OPTIMIZE`, so a -O0 in INC is overridden by the
+    # system perl's -O2 that lives in OPTIMIZE.
+    $optimize = '-O0 -g -fsanitize=address,undefined -fno-omit-frame-pointer';
+    push @libs, '-fsanitize=address,undefined';
+}
 
 # OpenSSL (optional)
 my $ssl_cflags = `pkg-config --cflags openssl 2>/dev/null`;
@@ -60,12 +74,22 @@ WriteMakefile(
     ABSTRACT      => 'Async ClickHouse client using EV',
     AUTHOR        => 'vividsnow',
     LICENSE       => 'perl_5',
-    MIN_PERL_VERSION => '5.012',
+    MIN_PERL_VERSION => '5.014',
     PREREQ_PM     => { 'EV' => '4.11' },
     XS            => { 'ClickHouse.xs' => 'ClickHouse.c' },
     INC           => "$ev{INC} $extra_inc",
     LIBS          => [join(' ', @libs)],
     OBJECT        => 'ClickHouse$(OBJ_EXT)',
+    ($optimize ? (OPTIMIZE => $optimize) : ()),
+    # The xs/*.c sources are #include'd into ClickHouse.xs (one TU), so the
+    # object file must be rebuilt when any of them changes — MakeMaker does
+    # not infer #include dependencies on its own.
+    depend        => {
+        'ClickHouse$(OBJ_EXT)' => join(' ',
+            qw(xs/codecs.c xs/io.c xs/proto_http.c xs/proto_native_build.c
+               xs/proto_native_parse.c xs/queues.c xs/types.c
+               xs/macros.h cityhash.h ngx_queue.h)),
+    },
     CONFIGURE_REQUIRES => {
         'EV::MakeMaker'       => 0,
         'ExtUtils::MakeMaker' => '6.64',
@@ -85,11 +109,16 @@ WriteMakefile(
                 web => 'https://github.com/vividsnow/perl5-ev-clickhouse/issues',
             },
         },
-        provides => {
-            'EV::ClickHouse' => {
-                file    => 'lib/EV/ClickHouse.pm',
-                version => '0.02',
-            },
-        },
     },
 );
+
+# Regenerate README.md from the module's POD via `make readme`. Pod::Markdown
+# is a dev-time author tool; the regenerated README.md is committed alongside
+# the code so end users don't need it.
+sub MY::postamble {
+    return <<'POSTAMBLE';
+readme: lib/EV/ClickHouse.pm
+	pod2markdown lib/EV/ClickHouse.pm > README.md
+.PHONY: readme
+POSTAMBLE
+}

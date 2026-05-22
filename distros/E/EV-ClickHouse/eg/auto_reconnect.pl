@@ -34,7 +34,7 @@ $ch = EV::ClickHouse->new(
 my $tick = 0;
 my $w = EV::timer(0, 1, sub {
     $tick++;
-    $ch->query("SELECT $tick AS tick", sub {
+    $ch->query("select $tick as tick", sub {
         my ($rows, $err) = @_;
         return if $err;
         printf "  tick %d: %d\n", $tick, $rows->[0][0];

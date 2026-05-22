@@ -16,14 +16,14 @@ my $ch = EV::ClickHouse->new(
 );
 
 # 1) Show connection-level setting
-$ch->query("SELECT name, value FROM system.settings WHERE name='max_threads' FORMAT TabSeparated", sub {
+$ch->query("select name, value from system.settings where name='max_threads' format TabSeparated", sub {
     my ($rows, $err) = @_;
     die "query error: $err\n" if $err;
     printf "  connection default: %s = %s\n", $rows->[0][0], $rows->[0][1];
 
     # 2) Override per-query
     $ch->query(
-        "SELECT name, value FROM system.settings WHERE name='max_threads' FORMAT TabSeparated",
+        "select name, value from system.settings where name='max_threads' format TabSeparated",
         { max_threads => 3 },
         sub {
             my ($rows2, $err2) = @_;
@@ -32,7 +32,7 @@ $ch->query("SELECT name, value FROM system.settings WHERE name='max_threads' FOR
 
             # 3) query_id example
             $ch->query(
-                "SELECT 42 AS answer FORMAT TabSeparated",
+                "select 42 as answer format TabSeparated",
                 { query_id => 'my-custom-query-id-001' },
                 sub {
                     my ($rows3, $err3) = @_;
