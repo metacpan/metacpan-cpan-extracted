@@ -1,14 +1,11 @@
 #!/usr/bin/env perl
 
 # function.t - white-box unit tests for Genealogy::Relationship::Name
-# Tests each function individually, mocking non-core dependencies.
-# Uses Test::Mockingbird for mocking.
 
 use strict;
 use warnings;
 
 use Test::Most;
-use Test::Mockingbird;
 
 # Add lib path so we can load from the distribution tree
 use Log::Abstraction;
@@ -184,12 +181,12 @@ subtest 'name() returns undef for unknown step combination' => sub {
 	my $namer = Genealogy::Relationship::Name->new();
 
 	# A combination not in the table
-	my $result = $namer->name(steps_to_ancestor => 9, steps_from_ancestor => 9, sex => 'M');
+	my $result = $namer->name(steps_to_ancestor => 100, steps_from_ancestor => 100, sex => 'M');
 	is($result, undef, 'Very large step count returns undef');
 
 	# Asymmetric combination not tabulated
-	my $result2 = $namer->name(steps_to_ancestor => 6, steps_from_ancestor => 1, sex => 'F');
-	is($result2, undef, '6,1 not in table => undef');
+	my $result2 = $namer->name(steps_to_ancestor => 50, steps_from_ancestor => 1, sex => 'F');
+	is($result2, undef, '50,1 not in table => undef');
 };
 
 # -------------------------------------------------------------------------
@@ -226,25 +223,25 @@ subtest 'name() croaks for unsupported language' => sub {
 # -------------------------------------------------------------------------
 
 subtest 'supported_languages() list context' => sub {
-	plan tests => 4;
+	plan tests => 5;
 
-	my $namer = Genealogy::Relationship::Name->new();
+	my $namer = new_ok('Genealogy::Relationship::Name');
 	my @langs = $namer->supported_languages();
 
-	is(scalar @langs, 3, 'Three supported languages');
+	is(scalar @langs, 7, 'Seven supported languages');
 	ok((grep { $_ eq 'en' } @langs), 'en is in list');
 	ok((grep { $_ eq 'fr' } @langs), 'fr is in list');
 	ok((grep { $_ eq 'de' } @langs), 'de is in list');
 };
 
 subtest 'supported_languages() scalar context returns arrayref' => sub {
-	plan tests => 2;
+	plan tests => 3;
 
-	my $namer  = Genealogy::Relationship::Name->new();
+	my $namer = new_ok('Genealogy::Relationship::Name');
 	my $ref    = $namer->supported_languages();
 
 	ok(ref $ref eq 'ARRAY', 'Scalar context returns ARRAY ref');
-	is(scalar @{$ref}, 3, 'Arrayref has 3 elements');
+	is(scalar @{$ref}, 7, 'Arrayref has 7 elements');
 };
 
 # -------------------------------------------------------------------------

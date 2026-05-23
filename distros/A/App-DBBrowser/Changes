@@ -1,6 +1,9 @@
 Revision history for App-DBBrowser
 
 
+2.442   2026-05-22
+    - Term::TablePrint minimum version 0.182.
+
 2.441   2026-05-15
     - Raised required minimum version for Term::TablePrint (Bugfix header stringification).
     - SQLite: bugfix in checking table name duplicates in create table with qualified table names.

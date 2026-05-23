@@ -4,7 +4,7 @@
       "Steve Bertrand <steveb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -24,7 +24,7 @@
          "requires" : {
             "IPC::Semaphore" : "0",
             "Mock::Sub" : "0",
-            "Test::More" : "0",
+            "Test::More" : "0.98",
             "Test::SharedFork" : "0.35"
          }
       },
@@ -35,11 +35,13 @@
       },
       "runtime" : {
          "requires" : {
+            "Class::Struct" : "0",
+            "Digest::MD5" : "0",
             "JSON" : "0",
             "Scalar::Util" : "0",
             "Storable" : "0.607",
             "String::CRC32" : "0",
-            "perl" : "5.01"
+            "perl" : "5.010"
          }
       }
    },
@@ -54,6 +56,6 @@
          "web" : "https://github.com/stevieb9/ipc-shareable"
       }
    },
-   "version" : "1.13",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.14",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -38,7 +38,7 @@
    "provides" : {
       "App::FatPacker::Simple" : {
          "file" : "lib/App/FatPacker/Simple.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.2"
       },
       "App::FatPacker::Simple::Tutorial" : {
          "file" : "lib/App/FatPacker/Simple/Tutorial.pm"
@@ -56,7 +56,7 @@
          "web" : "https://github.com/skaji/App-FatPacker-Simple"
       }
    },
-   "version" : "v1.0.1",
+   "version" : "v1.0.2",
    "x_contributors" : [
       "Kazuho Oku <kazuhooku@gmail.com>",
       "perlancar <perlancar@gmail.com>",

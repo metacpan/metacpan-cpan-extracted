@@ -9,7 +9,7 @@ with qw(
     eris::role::decoder
 );
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 
 sub _build_priority { 99; }
@@ -37,15 +37,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 eris::log::decoder::json - Decodes any detected JSON in a log line from then opening curly brace
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -57,6 +55,16 @@ This means the whole message doesn't need to be JSON, so you can syslog JSON
 and the L<eris::log::decoder::syslog> will properly handle the syslog headers
 and structure.  This decoder will then grab that JSON hashref and parse it
 correctly.
+
+=head1 CONSUMES
+
+=over 4
+
+=item * L<eris::role::decoder>
+
+=item * L<eris::role::plugin>
+
+=back
 
 =head1 ATTRIBUTES
 

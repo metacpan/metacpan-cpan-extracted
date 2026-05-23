@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package File::Meta::Cache;
 
-our $VERSION="v0.4.1";
+our $VERSION="v0.4.2";
 
 # Default Opening Mode
 #
@@ -95,6 +95,7 @@ method opener{
 
     # Entry is identified by the path, however, the actual data can come from another file
     # 
+
     my $existing_entry=$_cache{$KEYpath};
     $mode//=O_RDONLY;
     if(!$existing_entry or $force){
@@ -128,6 +129,7 @@ method opener{
         };
 
         $in_fd=$_open->($path, $mode);
+        $in_fd+=0; # Convert to number? '0 but true'
         
 
 

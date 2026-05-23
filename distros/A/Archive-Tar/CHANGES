@@ -1,3 +1,6 @@
+3.08  22/05/2026 (Stig Palmquist)
+- Validate symlink and hardlink linkname in SECURE MODE
+  
 3.06  10/05/2026
 - Hardlinks not extracted by default, added EXTRACT_HARDLINK flag
 - If hardlinks are extracted, they are now subject to the same rules

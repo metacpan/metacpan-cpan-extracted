@@ -13,7 +13,7 @@ with qw(
     eris::role::pluggable
 );
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 
 sub _build_namespace { 'eris::log::context' }
@@ -99,20 +99,26 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 eris::log::contexts - Discovery and access for context objects
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
 This module isn't meant to be a public interface, you should probably see:
 L<eris::log::contextualizer> so you're doing it right.
+
+=head1 CONSUMES
+
+=over 4
+
+=item * L<eris::role::pluggable>
+
+=back
 
 =head1 ATTRIBUTES
 

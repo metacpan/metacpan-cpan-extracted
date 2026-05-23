@@ -27,7 +27,7 @@ use experimental qw/ signatures /;
 # RECOMMEND PREREQ: Socket 2.026
 # RECOMMEND PREREQ: Type::Tiny::XS
 
-our $VERSION = 'v0.11.0';
+our $VERSION = 'v0.11.1';
 
 
 has host => (
@@ -237,7 +237,7 @@ __END__
 
 =encoding UTF-8
 
-=for stopwords CloudWatch DogStatsd UDP multimetric compatability StatsD statsd
+=for stopwords CloudWatch DogStatsd UDP multimetric compatability StatsD statsd proto
 
 =head1 NAME
 
@@ -245,7 +245,7 @@ Net::Statsd::Lite - A StatsD client that supports multimetric packets
 
 =head1 VERSION
 
-version v0.11.0
+version v0.11.1
 
 =head1 SYNOPSIS
 
@@ -305,25 +305,25 @@ specified. But it otherwise does not enforce maximum/minimum values.
 
 =head1 ATTRIBUTES
 
-=head2 C<host>
+=head2 host
 
 The host of the statsd daemon. It defaults to C<127.0.0.1>.
 
-=head2 C<port>
+=head2 port
 
 The port that the statsd daemon is listening on. It defaults to
 C<8125>.
 
-=head2 C<proto>
+=head2 proto
 
 The network protocol that the statsd daemon is using. It defaults to
 C<udp>.
 
-=head2 C<prefix>
+=head2 prefix
 
 The prefix to prepend to metric names. It defaults to a blank string.
 
-=head2 C<autoflush>
+=head2 autoflush
 
 A flag indicating whether metrics will be send immediately. It
 defaults to true.
@@ -337,7 +337,7 @@ regularly at the end of each task (e.g. a website request or job).
 Not all StatsD daemons support receiving multiple metrics in a single
 packet.
 
-=head2 C<max_buffer_size>
+=head2 max_buffer_size
 
 Specifies the maximum buffer size. It defaults to C<512>.
 
@@ -360,7 +360,7 @@ Otherwise the statistics for the sets may be multiplied by the number of workers
 
 =head1 METHODS
 
-=head2 C<counter>
+=head2 counter
 
   $stats->counter( $metric, $value, $opts );
 
@@ -373,12 +373,12 @@ scalar with the C<$rate>.
 If a C<$rate> is specified and less than 1, then a sampling rate will
 be added. C<$rate> must be between 0 and 1.
 
-=head2 C<update>
+=head2 update
 
 This is an alias for L</counter>, for compatability with
 L<Etsy::StatsD> or L<Net::Statsd::Client>.
 
-=head2 C<increment>
+=head2 increment
 
   $stats->increment( $metric, $opts );
 
@@ -386,7 +386,7 @@ This is an alias for
 
   $stats->counter( $metric, 1, $opts );
 
-=head2 C<decrement>
+=head2 decrement
 
   $stats->decrement( $metric, $opts );
 
@@ -394,7 +394,7 @@ This is an alias for
 
   $stats->counter( $metric, -1, $opts );
 
-=head2 C<meter>
+=head2 meter
 
   $stats->meter( $metric, $value, $opts );
 
@@ -403,7 +403,7 @@ is appropriate for counters that will never decrease (e.g. the number
 of requests processed.)  However, this metric type is not supported by
 many StatsD daemons.
 
-=head2 C<gauge>
+=head2 gauge
 
   $stats->gauge( $metric, $value, $opts );
 
@@ -415,7 +415,7 @@ is prefixed by a "+", then the gauge is incremented by that amount,
 and if the number is prefixed by a "-", then the gauge is decremented
 by that amount.
 
-=head2 C<timing>
+=head2 timing
 
   $stats->timing( $metric, $value, $opts );
 
@@ -434,12 +434,12 @@ If a C<$rate> is specified and less than 1, then a sampling rate will
 be added. C<$rate> must be between 0 and 1.  Note that sampling
 rates for timings may not be supported by all statsd servers.
 
-=head2 C<timing_ms>
+=head2 timing_ms
 
 This is an alias for L</timing>, for compatability with
 L<Net::Statsd::Client>.
 
-=head2 C<histogram>
+=head2 histogram
 
   $stats->histogram( $metric, $value, $opts );
 
@@ -450,7 +450,7 @@ specification recommends that integers be used.
 This metric type is not supported by many StatsD daemons. You can use
 L</timing> for the same effect.
 
-=head2 C<set_add>
+=head2 set_add
 
   $stats->set_add( $metric, $string, $opts );
 
@@ -459,7 +459,7 @@ unique things, e.g. IP addresses or user ids.
 
 Use L</secure_set_add> for logging sensitive information.
 
-=head2 C<secure_set_add>
+=head2 secure_set_add
 
   $stats->secure_set_add( $metric, $string, $opts );
 
@@ -481,7 +481,7 @@ that supports extensions to statsd, such as tagging.
 
 See the discussion of tagging extensions below.
 
-=head2 C<flush>
+=head2 flush
 
 This sends the buffer to the L</host> and empties the buffer, if there
 is any data in the buffer.
@@ -507,7 +507,7 @@ tagging can be added using something like
       my ( $next, $self, $suffix, $metric, $value, $opts ) = @_;
 
       if ( my $tags = $opts->{tags} ) {
-          $suffix .= "|#" . join ",", map { s/|//g; $_ } @$tags;
+          $suffix .= "|#" . join ",", map { $_ =~ s/\|//grx } @$tags;
       }
 
       $self->$next( $suffix, $metric, $value, $opts );
@@ -518,6 +518,8 @@ tagging can be added using something like
 When using the L</set_add> method, be wary of exposing sensitive information like IP addresses, usernames, email addresses or even session ids over insecure channels.  Use the L</secure_set_add> method instead.
 
 When generating metric names based on untrusted sources (such as HTTP requests), ensure that the metrics contain only printable characters and do not contain colons (":") or pipes ("|"), since these are used by the statsd protocol.
+
+When using L<tagging extensions|/TAGGING EXTENSIONS>, tags should also be validated to ensure that they do not contain control characters.
 
 =head1 SEE ALSO
 

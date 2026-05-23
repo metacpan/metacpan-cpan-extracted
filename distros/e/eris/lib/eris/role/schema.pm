@@ -12,7 +12,7 @@ with qw(
     eris::role::plugin
 );
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 
 
@@ -133,7 +133,6 @@ sub as_bulk {
         {
             index => {
                 _index => strftime($self->index_name, gmtime $log->epoch ),
-                _type  => exists $self->types->{$log->type} ? $log->type : $self->default_type,
                 $log->uuid ? ( _id => $log->uuid ) : (),
             }
         },
@@ -161,15 +160,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 eris::role::schema - Role for implementing a schema
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

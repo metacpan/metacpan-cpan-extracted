@@ -49,7 +49,7 @@ subtest 'Boundary: maximum tabulated steps (6,6)' => sub {
 };
 
 # =========================================================================
-# Boundary: just beyond the table (7,7) → undef, no crash
+# Boundary: just beyond the table (11,11) → undef, no crash
 # =========================================================================
 
 subtest 'Boundary: just-beyond-table steps return undef without crashing' => sub {
@@ -57,11 +57,11 @@ subtest 'Boundary: just-beyond-table steps return undef without crashing' => sub
 
 	my $namer = Genealogy::Relationship::Name->new();
 
-	my $r1 = $namer->name(steps_to_ancestor => 7, steps_from_ancestor => 7, sex => 'M');
-	is($r1, undef, '7,7 M => undef');
+	my $r1 = $namer->name(steps_to_ancestor => 11, steps_from_ancestor => 11, sex => 'M');
+	is($r1, undef, '11,11 M => undef');
 
-	my $r2 = $namer->name(steps_to_ancestor => 7, steps_from_ancestor => 0, sex => 'F');
-	is($r2, undef, '7,0 F => undef (not in table)');
+	my $r2 = $namer->name(steps_to_ancestor => 11, steps_from_ancestor => 0, sex => 'F');
+	is($r2, undef, '11,0 F => undef (not in table)');
 };
 
 # =========================================================================
@@ -149,7 +149,7 @@ subtest 'Pathological: invalid language codes croak' => sub {
 	my $namer = Genealogy::Relationship::Name->new();
 
 	# validate_strict rejects anything not matching /^(?:en|de|fr)/
-	for my $bad_lang (qw(zz xx zh ja es)) {
+	for my $bad_lang (qw(zz xx zh ja cy)) {
 		throws_ok {
 			$namer->name(steps_to_ancestor => 1, steps_from_ancestor => 1,
 			             sex => 'M', language => $bad_lang)

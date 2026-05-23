@@ -8,7 +8,7 @@ with qw(
     eris::role::context
 );
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our $SuppressWarnings = 1;
 
@@ -20,8 +20,8 @@ sub _build_matcher { '*' }
 
 
 has 'fields' => (
-    is  => 'rw',
-    isa => HashRef,
+    is      => 'rw',
+    isa     => HashRef,
     default => sub { 'disable loading' },
 );
 
@@ -50,19 +50,27 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 eris::log::context::static - Add static keys/values to every message
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
 This context exists to statically add key/value pairs to every message.
+
+=head1 CONSUMES
+
+=over 4
+
+=item * L<eris::role::context>
+
+=item * L<eris::role::plugin>
+
+=back
 
 =head1 ATTRIBUTES
 

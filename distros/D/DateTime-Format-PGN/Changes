@@ -19,6 +19,8 @@ Revision history for DateTime-Format-PGN
         Recognition of mistaken dates more straightforward.
         Changes file fixed.
 		
+1.02      2026-05-22 15:14:32+02:00 Europe/Berlin
+
 1.01      2026-05-20 03:01:30+02:00 Europe/Berlin
         Made it version 1.0 because it works smoothly for an entire decade.
 		E-mail changed.

@@ -1,7 +1,7 @@
 ---
 abstract: 'RFC close address list parsing'
 author:
-  - 'Ruslan Zakirov <ruz@bestpractical.com>'
+  - 'Best Practical Solutions, LLC <modules@bestpractical.com>'
 build_requires:
   ExtUtils::MakeMaker: 6.59
   JSON: 0
@@ -10,12 +10,11 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.19'
+generated_by: 'Module::Install version 1.21'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: 1.4
-module_name: Email::Address::List
 name: Email-Address-List
 no_index:
   directory:
@@ -26,4 +25,5 @@ requires:
   perl: 5.10.0
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.06'
+  repository: https://github.com/bestpractical/email-address-list
+version: '0.07'

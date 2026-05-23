@@ -10,7 +10,7 @@ use eris::log::decoders;
 
 use namespace::autoclean;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 
 has config => (
@@ -84,15 +84,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 eris::log::contextualizer - Primary interface to the eris log parsing library
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

@@ -4,16 +4,12 @@ use strict;
 use IPC::Shareable;
 use Test::More;
 
-BEGIN {
-    if (! $ENV{CI_TESTING}) {
-        plan skip_all => "Not on a legit CI platform...";
-    }
-}
-
-warn "Segs Before: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
+my $segs_before = IPC::Shareable::seg_count();
+my $sems_before = IPC::Shareable::sem_count();
+warn "Segs Before $segs_before\n" if $ENV{PRINT_SEGS};
 
 my $ok = eval {
-    tie my $sv, 'IPC::Shareable', {key => 'test02', destroy => 1};
+    tie my $sv, 'IPC::Shareable', {key => 'test02', destroy => 1, serializer => 'storable' };
     1;
 };
 
@@ -22,7 +18,11 @@ like $@, qr/Could not acquire/, "...and error is sane.";
 
 IPC::Shareable::_end;
 
-warn "Segs After: " . IPC::Shareable::ipcs() . "\n" if $ENV{PRINT_SEGS};
+my $segs_after = IPC::Shareable::seg_count();
+warn "Segs After: $segs_after\n" if $ENV{PRINT_SEGS};
+is $segs_after, $segs_before, "All segs, even those created in separate procs, cleaned up ok";
+my $sems_after = IPC::Shareable::sem_count();
+is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
 
 done_testing;
 

@@ -13,7 +13,7 @@ use Readonly;
 Readonly::Array our @EXPORT_OK => qw(get sections);
 Readonly::Scalar my $EMPTY_STR => q{};
 
-our $VERSION = 0.16;
+our $VERSION = 0.17;
 
 # Get content for file or module.
 sub get {
@@ -66,6 +66,7 @@ sub _get_content {
 	# Get pod.
 	my $child_pod = $EMPTY_STR;
 	my $example_filename;
+	my $first_node = 1;
 	foreach my $child ($pod_section->children) {
 		if ($child->type eq 'begin') {
 
@@ -75,19 +76,28 @@ sub _get_content {
 					map { ' #'.$_ }
 					split m/\n/ms,
 					($child->children)[0]->pod;
+				$child_pod .= "\n\n";
+				$first_node = 0;
 
 			# Skip =begin html and other unsupported sections.
 			} else {
+				$first_node = 0;
 				next;
 			}
-		} elsif ($child->type eq 'for' && $child->body eq 'comment') {
-			my ($node) = $child->tree->children;
-			my $body = $node->body;
-			if ($body =~ m/^filename=([\w\-\.]+)\s*$/ms) {
-				$example_filename = $1;
+		} elsif ($child->type eq 'for') {
+			# =for paragraphs are formatter-specific data. Only a first
+			# =for comment filename=... paragraph is metadata for this module.
+			if ($first_node && $child->body eq 'comment') {
+				my ($node) = $child->tree->children;
+				my $body = $node->body;
+				if ($body =~ m/^filename=([\w\-\.]+)\s*$/ms) {
+					$example_filename = $1;
+				}
 			}
+			$first_node = 0;
 		} else {
 			$child_pod .= $child->pod;
+			$first_node = 0;
 		}
 	}
 
@@ -114,17 +124,24 @@ sub _get_sections {
 		$section = 'EXAMPLE';
 	}
 
+	my $section_re = quotemeta $section;
+
 	# Concerete number of example.
 	if ($number_of_example) {
-		$section .= $number_of_example;
+		$section_re .= quotemeta $number_of_example;
 
 	# Number of example as potential number.
 	} else {
-		$section .= '\d*';
+		$section_re .= '\d*';
 	}
 
 	# Get and return sections.
-	return $pod_abstract->select('/head1[@heading =~ {'.$section.'}]');
+	my @sections = $pod_abstract->select('/head1[@heading =~ {^'.$section_re.'$}]');
+	my $parent_section_re = quotemeta($section.'S');
+	push @sections, $pod_abstract->select('/head1[@heading =~ {^'.
+		$parent_section_re.'$}]/head2[@heading =~ {^'.$section_re.'$}]');
+
+	return @sections;
 }
 
 # Get pod abstract for module.
@@ -241,7 +258,9 @@ Returns array of example sections.
  sections():
          Cannot open pod file or Perl module.
 
-=head1 EXAMPLE1
+=head1 EXAMPLES
+
+=head2 EXAMPLE1
 
 =for comment filename=print_example.pl
 
@@ -256,7 +275,7 @@ Returns array of example sections.
  # Output:
  # This example.
 
-=head1 EXAMPLE2
+=head2 EXAMPLE2
 
 =for comment filename=print_sections.pl
 
@@ -313,6 +332,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.16
+0.17
 
 =cut

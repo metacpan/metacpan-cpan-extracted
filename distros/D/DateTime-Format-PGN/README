@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 1.01
+    version 1.02
 
 SYNOPSIS
 
@@ -63,11 +63,11 @@ Source
 
 See also
 
-      * * Chess::PGN::Parse
+    Chess::PGN::Parse
 
-      * * DateTime::Incomplete
+    DateTime::Incomplete
 
-      * * https://github.com/houseabsolute/DateTime.pm/wiki
+    https://github.com/houseabsolute/DateTime.pm/wiki
 
 AUTHOR
 
@@ -79,13 +79,4 @@ COPYRIGHT AND LICENSE
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
-
-POD ERRORS
-
-    Hey! The above document had some coding errors, which are explained
-    below:
-
-    Around line 66:
-
-      '=item' outside of any '=over'
 

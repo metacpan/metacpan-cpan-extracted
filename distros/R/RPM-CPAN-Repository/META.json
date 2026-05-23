@@ -1,0 +1,49 @@
+{
+   "abstract" : "Manage MediaAlpha public RPM CPAN repository",
+   "author" : [
+      "Labros Chaidas <labros@mediaalpha.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build::Tiny version 0.052",
+   "release_status" : "stable",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "RPM-CPAN-Repository",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.044"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Devel::CheckOS" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Tiny" : "0",
+            "Getopt::Long" : "0",
+            "perl" : "5.016003"
+         }
+      }
+   },
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/MediaAlpha/perl-rpm-cpan-repository/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/MediaAlpha/perl-rpm-cpan-repository.git",
+         "web" : "https://github.com/MediaAlpha/perl-rpm-cpan-repository"
+      }
+   },
+   "version" : "0.0.1"
+}

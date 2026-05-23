@@ -10,7 +10,7 @@ with qw(
     eris::role::decoder
 );
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 
 # Configure Parse::Syslog::Line
@@ -67,21 +67,29 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 eris::log::decoder::syslog - Parse the syslog headers using Parse::Syslog::Line
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
 Uses L<Parse::Syslog::Line> to parse the raw string as if it were a message
 streaming into a syslog server.  This helps capture the meta-data in the syslog
 headers.
+
+=head1 CONSUMES
+
+=over 4
+
+=item * L<eris::role::decoder>
+
+=item * L<eris::role::plugin>
+
+=back
 
 =head1 ATTRIBUTES
 

@@ -5,12 +5,12 @@ use warnings;
 
 use Class::Utils qw(set_params);
 use File::Find::Rule;
-use File::Spec::Functions qw(catfile);
+use File::Spec::Functions qw(abs2rel catdir catfile);
 use Getopt::Std;
 use IO::Barf qw(barf);
-use Pod::Example qw(get sections);
+use Pod::Example 0.17 qw(get sections);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -36,29 +36,33 @@ sub run {
 		'h' => 0,
 	};
 	if (! getopts('dh', $self->{'_opts'})
-		|| $self->{'_opts'}->{'h'}) {
+		|| $self->{'_opts'}->{'h'}
+		|| @ARGV > 1) {
 
-		print STDERR "Usage: $0 [-d] [-h] [--version]\n";
+		print STDERR "Usage: $0 [-d] [-h] [--version] [working_dir]\n";
 		print STDERR "\t-d\t\tDebug mode.\n";
 		print STDERR "\t-h\t\tPrint help.\n";
 		print STDERR "\t--version\tPrint version.\n";
+		print STDERR "\t[working_dir]\tWorking directory (default is actual).\n";
 		return 1;
 	}
+	my $working_dir = $ARGV[0] || '.';
 
-	# Find all perl module files in actual directory.
+	# Find all perl module files in working directory.
 	my $rule = File::Find::Rule->new;
 	my @pm = $rule->or(
 		$rule->new->directory->name('t')->prune->discard,
 		$rule->new->directory->name('inc')->prune->discard,
 		$rule->new->directory->name('blib')->prune->discard,
 		$rule->new,
-	)->name('*.pm')->in('.');
+	)->name('*.pm')->in($working_dir);
 
-	# Dump perl modules in debug mode.
+	# Print Perl modules in debug mode.
 	if ($self->{'_opts'}->{'d'}) {
-		require Dumpvalue;
-		my $dump = Dumpvalue->new;
-		$dump->dumpValues(\@pm);
+		print "Found Perl modules:\n";
+		foreach my $pm (@pm) {
+			print '- '.abs2rel($pm, $working_dir)."\n";
+		}
 	}
 
 	# For each example save example.
@@ -70,19 +74,22 @@ sub run {
 
 		# For each section.
 		foreach my $example_sec (@examples) {
+			my ($section, $number_of_example) = _section_and_number($example_sec);
 
 			# Create example content.
-			my ($example_data, $example_file) = get($perl_module_file, $example_sec);
+			my ($example_data, $example_file) = get($perl_module_file, $section,
+				$number_of_example);
 			if (! defined $example_file) {
 				$example_file = sprintf 'ex%d.pl', $num;
 			}
 			$example_data = "#!/usr/bin/env perl\n\n".
 				$example_data;
-			my $example_path = catfile('examples', $example_file);
+			my $examples_dir = catdir($working_dir, 'examples');
+			my $example_path = catfile($examples_dir, $example_file);
 
 			# Examples directory.
-			if (! -r 'examples') {
-				mkdir 'examples';
+			if (! -r $examples_dir) {
+				mkdir $examples_dir;
 			}
 
 			# Save example.
@@ -94,6 +101,17 @@ sub run {
 	}
 	
 	return 0;
+}
+
+# Get section name and number of example.
+sub _section_and_number {
+	my $example_sec = shift;
+
+	if ($example_sec =~ m/^(.+?)(\d+)$/ms) {
+		return ($1, $2);
+	}
+
+	return ($example_sec, undef);
 }
 
 1;
@@ -139,7 +157,9 @@ Returns 1 for error, 0 for success.
          From Class::Utils::set_params():
                  Unknown parameter '%s'.
 
-=head1 EXAMPLE
+=head1 EXAMPLES
+
+=head2 EXAMPLE
 
 =for comment filename=print_help.pl
 
@@ -157,10 +177,11 @@ Returns 1 for error, 0 for success.
  exit App::Perl::Module::Examples->new->run;
 
  # Output like:
- # Usage: ./print_help.pl [-d] [-h] [--version]
+ # Usage: ./print_help.pl [-d] [-h] [--version] [working_dir]
  #         -d              Debug mode.
  #         -h              Print help.
  #         --version       Print version.
+ #         [working_dir]   Working directory (default is actual).
 
 =head1 DEPENDENCIES
 
@@ -183,12 +204,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2012-2024 Michal Josef Špaček
+© 2012-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

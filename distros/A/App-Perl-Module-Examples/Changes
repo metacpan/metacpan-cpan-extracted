@@ -1,3 +1,12 @@
+0.04 2026-05-22T17:18:17+02:00
+ - Add =head1 EXAMPLES section to doc.
+ - Add help() helper to doc and remove XXX comment.
+ - Add optional working directory.
+ - Add support for =head1 EXAMPLES with =head2 EXAMPLE1 sections.
+ - Add test for bad option.
+ - Change debug mode to simple print of found Perl modules.
+ - Update copyright years.
+
 0.03 2024-05-12T12:40:09+02:00
  - Add test for help.
  - Update Module::Install to 1.21 version.

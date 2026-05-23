@@ -20,10 +20,11 @@ no_index:
     - inc
 requires:
   Data::Page: '2.02'
+  base: '0'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/ltmbr/Data-Page-Nav/issues
   homepage: https://github.com/ltmbr/Data-Page-Nav
   repository: https://github.com/ltmbr/Data-Page-Nav
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

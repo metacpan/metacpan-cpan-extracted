@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 use Const::Fast;
 use Digest::MD5 qw(md5_hex);
@@ -29,7 +29,6 @@ use POE qw(
 
 
 sub spawn {
-    my $type = shift;
     my %params = @_;
 
     # Setup Logging
@@ -224,7 +223,7 @@ sub _stats {
             1;
         } or do {
             my $err = $@;
-            ERROR("Disabling the StatsHandler due to fatal error: $!");
+            ERROR("Disabling the StatsHandler due to fatal error: $err");
             $heap->{stats}{StatsHandler} = undef;
         };
     }
@@ -267,9 +266,7 @@ sub es_version {
 
 sub resp_version {
     my ($kernel,$heap,$params,$resp) = @_[KERNEL,HEAP,ARG0,ARG1];
-
-    my $req  = $params->[0];  # HTTP::Request Object
-    my $r    = $resp->[0];    # HTTP::Response Object
+    my $r = $resp->[0];    # HTTP::Response Object
 
     # We might need to batch things
     TRACE(sprintf "es_version() - %s", $r->status_line);
@@ -285,7 +282,7 @@ sub resp_version {
         if( defined $details && ref $details eq 'HASH' ) {
             my $v = $details->{version};
             DEBUG(sprintf "es_version(%s) instance=%s cluster=%s version=%s min=%s",
-                $v->{distribution},
+                $v->{distribution} || 'native',
                 $details->{name},
                 $details->{cluster_name},
                 $v->{number},
@@ -742,7 +739,7 @@ POE::Component::ElasticSearch::Indexer - POE session to index data to ElasticSea
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 

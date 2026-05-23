@@ -14,7 +14,7 @@ use POE qw(
     Filter::Line
     Filter::Reference
 );
-use YAML qw();
+use YAML::XS qw();
 
 # Load the eris libraries
 use eris::log::contextualizer;
@@ -22,10 +22,10 @@ use eris::schemas;
 
 # Options
 my ($opt,$usage) = describe_options('%c - %o',
-    [ 'config:s', 'Config file, required.', { callbacks => { "Must be a readable file" => sub { -r $_[0] } } } ],
-    [ 'stats-interval:i',   'Interval in seconds to send statistics, default: 60', { default => 60 }],
-    [ 'flush-interval|F:i', 'Interval in seconds to flush the queue to thebulk handler, default: 10', { default => 10 } ],
-    [ 'flush-size|S:i',     'Override the default FlushSize from POE::Component::ElasticSearch::Indexer' ],
+    [ 'config=s', 'Config file, required.', { callbacks => { "Must be a readable file" => sub { -r $_[0] } } } ],
+    [ 'stats-interval=i',   'Interval in seconds to send statistics, default: 60', { default => 60 }],
+    [ 'flush-interval|F=i', 'Interval in seconds to flush the queue to thebulk handler, default: 10', { default => 10 } ],
+    [ 'flush-size|S=i',     'Override the default FlushSize from POE::Component::ElasticSearch::Indexer' ],
     [],
     [ 'help',  'Display this help' ],
 );
@@ -38,7 +38,7 @@ if( $opt->help ) {
 my $config = {};
 if( $opt->config ) {
     eval {
-        $config = YAML::LoadFile( $opt->config );
+        $config = YAML::XS::LoadFile( $opt->config );
         1;
     } or do {
         my $err = $@;
@@ -190,15 +190,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 eris-es-indexer.pl - Sample implementation using the eris toolkit to index data to elasticsearch
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

@@ -11,6 +11,7 @@ do { my $x = {
                                       'Test::CleanNamespaces' => '0.15',
                                       'Test::DistManifest' => '0',
                                       'Test::EOF' => '0',
+                                      'Test::EOL' => '0',
                                       'Test::Fixme' => '0',
                                       'Test::MinimumVersion' => '0',
                                       'Test::More' => '0.94',

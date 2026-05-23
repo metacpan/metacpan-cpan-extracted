@@ -1,291 +1,67 @@
 ==================================================
-Changes from 2022-03-14 00:00:00 +0000 to present.
+Changes from 2024-05-22 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 8.8 at 2024-03-13 03:33:40 +0000
+version 8.9 at 2026-05-22 12:56:44 +0000
 ----------------------------------------
 
-  Change: 4ac157a60a392cbccf14ecc24582c521089a7162
+  Change: 0b5f5f5a5fc34e1427bbb10416dfa53dd4fe0481
   Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2024-03-12 20:33:30 +0000
+  Date : 2026-05-22 08:46:42 +0000
 
-    Prepping 8.8 Release 
+    Adjust workflows to test on 5.24+ 
 
-  Change: de34aa8ce3a0a0398c39a4a388686c7cf3ded224
+  Change: 314d05c2a9fbde2c640ae6610c6ebda25bd1e18f
   Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2024-03-12 20:08:02 +0000
+  Date : 2026-05-22 08:39:43 +0000
 
-    Add ::QueryString::Text to replace ::AutoEscape
+    Preparing the next release 
 
-    * Replace `::QueryString::AutoEscape` with `::QueryString::Text` *
-    Deprecate `::QueryString::AutoEscape` to prevent it from loading * Move
-    `=field:value` for `term` queries to `::QueryString::Text` * Add
-    `*field:value` for `wildcard` queries * Add `~field:value` for `fuzzy`
-    queries * Add `/field:value` for `regexp` queries * Add `+field:value` for
-    `match_phrase` queries * Automatically promote queries against `text`
-    fields to `match` queries
-
-    unless otherwise specified * Add tests for the behavior 
-
-  Change: 90abda3a445f97e935d6a6ffe6aca37add9b9c87
+  Change: 203095dbb0281d96bcd4c892c0691ad5b4d8cd7e
   Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2024-03-12 20:08:02 +0000
+  Date : 2025-07-19 22:52:50 +0000
 
-    Allow --jq/--json with --tail 
+    Documentation regeneration with new layouts 
 
-----------------------------------------
-version 8.7 at 2023-08-18 17:04:19 +0000
-----------------------------------------
-
-  Change: 498b1b1896ab84bb1248f3c915783cf90a574dd2
+  Change: e8df1be995f674b78e548acbe199aaec237c52bd
   Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2023-08-18 10:04:19 +0000
+  Date : 2025-07-19 22:18:40 +0000
 
-    Even better date handling
+    Significant overhaul of the documentation for the module 
 
-    Stumbled into some issues with the date handling in the code base. This
-    make it more usable.
-
-    * Removes the `--date-separator|--date-sep` CLI switches * Uses a regex to
-    match `YYYY.MM.DD`, `YYYY-MM-DD`, or `YYYYMMDD` in
-
-    index names to attain the date string of the index 
-
-  Change: fc436cc90fa731ab8313a33c2c3cc6658c1c7daf
+  Change: d587ef3683b499f7ec9b58e8025e51f4f804c683
   Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2023-08-18 10:04:19 +0000
+  Date : 2025-07-13 05:04:28 +0000
 
-    Tweak the ignore list a bit more 
+    Perl 5.42 isn't available yet 
 
-  Change: 84a05bf482f3489177f0afe689dacce6b8ddc1e1
+  Change: 433f1daee102b7f9a4023315fdd977e55dd13dbb
   Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2023-08-18 10:04:19 +0000
+  Date : 2025-07-13 04:49:12 +0000
 
-    Fixes for metrics collected
+    Normalize handling of floating point output in various places
 
-    * Formatting fixed for metrics ending in `_millis` * Format key names
-    better by removing all non-alphanumeric characters * Update the logic for
-    determining the default ignore list so we do the
+    Make the `--jq` flag more universal. 
 
-    smartest possible thing 
-
-  Change: e82fd69a8abbef0787d7bbf44305da09c0befdf5
+  Change: e060238affe480b7169e80b02319e8e3aed821e2
   Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2023-08-18 10:04:19 +0000
+  Date : 2025-07-03 03:41:20 +0000
 
-    Add Perl::Critic::Nits to authodeps 
+    Fixes for OpenSearch connections and version compatibility 
 
-  Change: d52dc0d7c7672e57a25a680096397866c61591c6
+  Change: 67da2741df570c53a11d92d80978948af5e15549
   Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2023-08-18 10:04:19 +0000
+  Date : 2024-07-26 12:43:30 +0000
 
-    Incorporate feedback on removing implicit returns 
+    Skip hidden indices from the alias-manager 
 
-----------------------------------------
-version 8.6 at 2023-07-20 15:53:17 +0000
-----------------------------------------
-
-  Change: 69b286e396cc816a60053c94df43713ea390d24a
+  Change: c64b7c2ced7e178f77de236562438734e6447632
   Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2023-07-20 08:53:17 +0000
+  Date : 2024-06-19 21:43:03 +0000
 
-    Preparing 8.6 Release
-
-    * Add `App::ElasticSearch::Utilities::Metrics`
-
-    * Convert es-graphite-dynamic.pl to use
-    App::ElasticSearch::Utilities::Metrics * Updates for
-    `App::ElasticSearch::Utilities::Aggregations`:
-
-    * Adding tests for the `es_flatten_aggs()` function
-
-    * For aggs with `key_as_string`, don't lose data by adding `$field.raw` as
-    the `key` value * New Utilities:
-
-    * `es-index-fields.pl` shows storage details about the fields in indexes
-
-    * `es-index-scan.pl` scans indexes for potential issues * Updates for
-    `App::ElasticSearch::Utilities`
-
-    * `es_index_strip_date()` - Add a fall back parser for date patterns in
-    index names
-
-    * **(new)** `es_human_count()` to transform 10_000 into "10 thousand"
-
-    * **(new)** `es_human_size()` to transform 10_000 into "10 Kb" * Require
-    Perl 5.16+, and test on 5.38 
-
-----------------------------------------
-version 8.5 at 2023-04-12 23:51:37 +0000
-----------------------------------------
-
-  Change: 52766654c246913695280adfc9fd74247543d4f4
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2023-04-12 16:51:37 +0000
-
-    Prepping 8.5 release 
-
-  Change: b3de99668fa520fc98432f4a1cbaddc40b6d76bd
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2023-04-12 16:47:40 +0000
-
-    Minor Improvements
-
-    * Remove old script `es-nagios-check.pl` * Update documentation * Disable
-    imports from `YAML::XS` 
-
-  Change: 159f1dad0a7f81d8b436ef00ab1d9086a04d1c0a
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2023-04-12 16:33:58 +0000
-
-    Fix bug in date parsing logic 
-
-  Change: 853c42e60acef360f1f2e91d6cbc82ce77afe74e
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2023-04-12 16:33:58 +0000
-
-    es-cluster-settings.pl to manage cluster settings
-
-    Added `es-cluster-settings.pl` to the distribution to manage cluster
-    settings more easily. 
-
-  Change: 250fe6f9738808b493c518fe58c98a1f750d58c9
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2022-09-08 12:06:35 +0000
-
-    Fix warning for unitialized values
-
-    ``` Use of uninitialized value $out_of in numeric gt (>) at
-    ~/perl5/perlbrew/perls/perl-5.32.1/bin/es-search.pl line 624. ``` 
-
-----------------------------------------
-version 8.4 at 2022-09-02 19:51:04 +0000
-----------------------------------------
-
-  Change: b6112b07c154fe669e7ab9407b3b20f6f845e7bc
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2022-09-02 12:51:04 +0000
-
-    Convert to YAML::XS
-
-    * `YAML::XS` is more compatible with other YAML parsers * Enable boolean
-    detection for `es-search.pl` 
-
-  Change: 400b50196d211697fe4d40cca9b587b72d981e48
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2022-06-01 17:59:00 +0000
-
-    Fix display of statistics so they all follow --precision 
-
-  Change: c6c0e96db37f637bc62492acda8072700244d342
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2022-06-01 04:20:05 +0000
-
-    Add client certificate authentication to the tooling 
-
-  Change: ee969f539f64bd15bd3c3e30cd85cf273b728a1c
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2022-06-01 03:56:41 +0000
-
-    Correct version check for TLS and Auth
-
-    * Use `App::ElasticSearch::Utilities::HTTPRequest` for checking the
-
-    version string. * Add a check for `PASSEXEC` to `_get_es_version()` so we
-    can use the
-
-    provided credentials * Correct `::Connection->request()` to set
-    `authorization_basic()` when
-
-    the `->password` has a length greater than 0. 
-
-  Change: e978a9b33eecd59191cfbf88ffc4f7b54d698c74
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2022-05-31 19:02:24 +0000
-
-    More fixes for HTTP Authentication
-
-    * Remove `--http-password` and parsing `~/.es-utils.yaml` for the
-
-    password. This is not a secure default. * Do not allow HTTP Basic Auth over
-    HTTP as it leaks credentials * Check for `value_as_string` in
-    `es_flatten_aggregations` 
-
-  Change: e49f4394b7a35b3f0539debec53f693f36d43da7
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2022-05-31 03:41:01 +0000
-
-    Support HTTPS and Basic Authorization
-
-    * Adds support for HTTP Basic Authorization username/password to the
-
-    libraries * Add TLS support to `App::ElasticSearch::Utilities::Connection`
-    and
-
-    `es_connect()` 
-
-----------------------------------------
-version 8.3 at 2022-03-23 00:15:12 +0000
-----------------------------------------
-
-  Change: 823b184da9c4238d91fc2455922510aa937491c4
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2022-03-22 17:15:12 +0000
-
-    Prepping 8.3 release 
-
-  Change: b065c26c080ccc10d9f1860bcb033657fe3e4097
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2022-02-01 10:38:12 +0000
-
-    Allow wildcard and regexp matches from files
-
-    Adds the `wildcard` and `regexp` queries into the
-    `::QueryString::FileExpansion` plugin.
-
-    ``` $ cat wildcards.dat *gmail.com *yahoo.com
-
-    $ es-search.pl email:*wildcard.dat
-
-    $ cat regexps.dat .*\.gmail\.com$ .*\.yahoo\.com$
-
-    $ es-search.pl email:~regexp.dat ``` 
-
-  Change: f7ea1b13fe33f941d66af30dc8b2d999d10e70b1
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2022-01-31 17:51:35 +0000
-
-    Options to disable mucking with @ARGV at import
-
-    Support `delay_argv` to prevent messing with `@ARGV` at import time.
-
-    Added import options:
-
-    * `delay_argv` - Don't muck with `@ARGV` at import time * `preprocess_argv`
-    - Current default, messes with `@ARGV` at import
-
-    time. * `copy_argv` - Don't mess with `@ARGV` at all, just make a copy
-
-    Disable `auto_abbrev` from `Getopt::Long`. 
-
-  Change: b9da116757d0a543560797d06983972008df1f3f
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-10-01 12:53:30 +0000
-
-    Use `key_as_string` instead of `key` when provided
-
-    This is most noticeable when using `date_histogram` aggregations. 
-
-  Change: 04890b682bcf156edba62e231798e9705d62d9ae
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2021-09-24 15:54:14 +0000
-
-    Fix merging of query stash and bool sections
-
-    This is related to the earlier bug I discovered in handling array
-    references with ES 7.x and later. 
+    chore: Adding things to the .gitignore from gitignore.io 
 
 =================================================
-Plus 91 releases after 2022-03-14 00:00:00 +0000.
+Plus 97 releases after 2024-05-22 00:00:00 +0000.
 =================================================

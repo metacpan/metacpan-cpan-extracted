@@ -1,9 +1,73 @@
 ==================================================
-Changes from 2023-04-13 00:00:00 +0000 to present.
+Changes from 2024-05-22 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 6.2 at 2025-04-12 01:12:51 +0000
+version 6.3 at 2026-05-22 12:49:45 +0000
+----------------------------------------
+
+  Change: d552a7daab5345432f0bbe69272ffe1a8e2580da
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2026-05-22 08:48:56 +0000
+
+    6.3 Release Commit
+
+    This is a maintenance release cleaning up unused variables, documentation,
+    development utilities, and packaging. 
+
+  Change: f52ec6235bec1a5ba0f624bda994b614653fd7f2
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2026-05-22 08:45:16 +0000
+
+    Build requires Perl 5.24 
+
+  Change: dc4dda94b81e6dc4bd6a3b739f338cff67bb4c18
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2026-05-22 08:41:29 +0000
+
+    Adjust GitHub workflow 
+
+  Change: cb8c704eced7c730872284d93050e8af0e759c83
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2025-12-05 21:06:57 +0000
+
+    Updates for the build and author tests 
+
+  Change: 287b492a5e38fe897256f871da6c9d0fc9888b7d
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2025-07-12 22:17:58 +0000
+
+    5.42 isn't available yet 
+
+  Change: c19b94d19cee4d2c5063e830e6daf40ec0842d3a
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2025-07-12 21:18:36 +0000
+
+    Test on 5.42 too 
+
+  Change: b82c3dbf3d1054ff61eb7d6f76f71dec2ceaa107
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2025-04-16 21:06:26 +0000
+
+    Fixes for the Release Process
+
+    * Require the `main` branch to release * Copy Changes file from the build
+    to the repo 
+
+  Change: d6e53367d63bcd2f3a7c35cf94bd0d50cabbfe67
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2025-04-13 19:30:36 +0000
+
+    Fix CI Actions to look at the main branch 
+
+  Change: 06f7d27cead6118298d64a093c0ba667f74c3346
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2025-04-11 18:15:06 +0000
+
+    Copy Changes from the build to the repo for the GitHub Release 
+
+----------------------------------------
+version 6.2 at 2025-04-12 01:12:35 +0000
 ----------------------------------------
 
   Change: 55c77867bd6a1e8fd7c6601f854c7929fbad4410
@@ -261,18 +325,6 @@ version 5.2 at 2024-06-20 20:56:49 +0000
 
     Minor fixes and cleanups 
 
-----------------------------------------
-version 5.1 at 2024-05-24 18:17:59 +0000
-----------------------------------------
-
-  Change: c3b622953845aefa0c29f66c2772113d293ded8e
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2024-05-24 11:17:59 +0000
-
-    Bumping for 5.1 Release
-
-    * Adds better handling of JunOS firewall logs 
-
   Change: 27c68a921a82b3985a4b5c3d8092684883dcea51
   Author: Brad Lhotsky <brad@divisionbyzero.net>
   Date : 2024-05-24 11:12:42 +0000
@@ -359,5 +411,5 @@ version 5.1 at 2024-05-24 18:17:59 +0000
     Attempt to enable GitHub Actions to run the test suite. 
 
 =================================================
-Plus 39 releases after 2023-04-13 00:00:00 +0000.
+Plus 38 releases after 2024-05-22 00:00:00 +0000.
 =================================================

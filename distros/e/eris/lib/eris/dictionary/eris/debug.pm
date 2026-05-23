@@ -7,7 +7,7 @@ with qw(
     eris::role::dictionary::hash
 );
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 
 sub _build_priority { 100 }
@@ -44,20 +44,30 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 eris::dictionary::eris::debug - Debugging data in the event
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
 Dictionary containing the timing and raw data.  Enable this dictionary on
 a schema if you'd like to evaluate the parser performance.
+
+=head1 CONSUMES
+
+=over 4
+
+=item * L<eris::role::dictionary>
+
+=item * L<eris::role::dictionary::hash>
+
+=item * L<eris::role::plugin>
+
+=back
 
 =head1 ATTRIBUTES
 

@@ -1,5 +1,13 @@
 Revision history for Net-Statsd-Lite
 
+v0.11.1   2026-05-23 07:38:35+01:00 Europe/London
+  [Documentation]
+  - Fixed inconsistent POD markup.
+
+  - Updated SECURITY CONSIDERATIONS about tagging extensions.
+
+  - Fixed a bug in an example.
+
 v0.11.0   2026-05-22 00:20:44+01:00 Europe/London
   [Enhancements]
   - Make the socket explicitly configurable in the constructor.

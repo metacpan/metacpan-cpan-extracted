@@ -20,7 +20,7 @@ name: Crypt-SaltedHash
 provides:
   Crypt::SaltedHash:
     file: lib/Crypt/SaltedHash.pm
-    version: '0.11'
+    version: '0.12'
 requires:
   Crypt::SysRandom: '0'
   Digest: '0'
@@ -32,7 +32,7 @@ resources:
   Authority: cpan:RRWO
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Crypt-SaltedHash
   repository: git://github.com/robrwo/perl-Crypt-SaltedHash.git
-version: '0.11'
+version: '0.12'
 x_contributors:
   - 'Chris Weyl <cweyl@alumni.drew.edu>'
   - 'David Steinbrunner <dsteinbrunner@pobox.com>'

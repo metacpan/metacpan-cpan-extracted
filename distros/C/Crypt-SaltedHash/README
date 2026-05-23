@@ -21,6 +21,9 @@ STATUS
     modules that support more secure algorithms and hashing options, and
     are extensible, such as Crypt::Passphrase.
 
+    You can use the Crypt::Passphrase::SaltedHash validator to migrate to
+    more secure algorithms.
+
 DESCRIPTION
 
     The Crypt::SaltedHash module provides an object oriented interface to

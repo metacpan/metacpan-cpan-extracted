@@ -8,7 +8,7 @@ use warnings;
 use CLI::Helpers qw(:output);
 use Data::Printer;
 use Getopt::Long::Descriptive;
-use YAML;
+use YAML::XS ();
 use eris::dictionary;
 
 #------------------------------------------------------------------------#
@@ -30,7 +30,7 @@ if( $opt->help ) {
 
 #------------------------------------------------------------------------#
 # Main
-my $cfg = $opt->config ? YAML::LoadFile($opt->config) : {};
+my $cfg = $opt->config ? YAML::XS::LoadFile($opt->config) : {};
 my %args = exists $cfg->{dictionary} && ref $cfg->{dictionary} eq 'HASH' ? %{ $cfg->{dictionary} } : ();
 my $dict = eris::dictionary->new(%args);
 
@@ -54,15 +54,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 eris-field-lookup.pl - Utility for testing the logging contextualizer
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

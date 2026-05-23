@@ -35,9 +35,13 @@ my(%params) =
 	PL_FILES	=> {},
 	PREREQ_PM	=>
 	{
-		'Digest::MD5'	=> 2.53,
-		'strict'		=> 0,
-		'warnings'		=> 0,
+		'Crypt::URandom'		=> 0,
+		'Digest::MD5'			=> 2.53,
+		'Encode'				=> 3.21,
+		'Exporter'				=> 5.78,
+		'ExtUtils::MakeMaker'	=> 7.70,
+		'strict'				=> 0,
+		'warnings'				=> 0,
 	},
 	TEST_REQUIRES =>
 	{

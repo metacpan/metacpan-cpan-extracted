@@ -7,7 +7,7 @@ with qw(
     eris::role::context
 );
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 
 sub _build_matcher {
@@ -66,19 +66,27 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 eris::log::context::snort - Parses the Snort and Suricata alert logs
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
 This parses data in the Snort and Suricata alert logs into structured data.
+
+=head1 CONSUMES
+
+=over 4
+
+=item * L<eris::role::context>
+
+=item * L<eris::role::plugin>
+
+=back
 
 =head1 ATTRIBUTES
 

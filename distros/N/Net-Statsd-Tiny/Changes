@@ -1,5 +1,19 @@
 Revision history for Net-Statsd-Tiny
 
+v0.4.1    2026-05-23 07:37:18+01:00 Europe/London
+  [Enhancements]
+  - Use IO::Socket::IP instead of IO::Socket::INET.
+
+  - The socket attribute is public.
+
+  [Bug Fixes]
+  - Fixed flush method for alternative sockets.
+
+  [Documentation]
+  - Fixed typos.
+
+  - Fixed inconsistent markup.
+
 v0.4.0    2026-05-21 20:06:29+01:00 Europe/London
   [Enhancements]
   - A socket can be passed directly to the constructor.

@@ -26,7 +26,7 @@ my ($opt,$usage) = describe_options("%c %o",
     ['asc',              "Sort ascending, default is descnding" ],
     [],
     ["Display"],
-    ['json',      "Results as JSON"],
+    ['json|jq',   "Results as JSON"],
     ['show-aggs', "Show computed aggregation block"],
     ['show-raw',  "Show raw results from Elasticsearch"],
     [],
@@ -88,7 +88,7 @@ es-aggregate.pl - Multi-level aggregations in Elasticsearch
 
 =head1 VERSION
 
-version 8.8
+version 8.9
 
 =head1 SYNOPSIS
 
@@ -164,7 +164,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Brad Lhotsky.
+This software is Copyright (c) 2026 by Brad Lhotsky.
 
 This is free software, licensed under:
 

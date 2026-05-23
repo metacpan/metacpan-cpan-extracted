@@ -9,7 +9,7 @@ with qw(
     eris::role::schema
 );
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 
 sub _build_priority { 100 }
@@ -25,15 +25,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 eris::schema::syslog - Schema for the syslog data
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -53,6 +51,16 @@ following to your C<config.yaml>.
 
 This will index the fields contained in the L<eris::dictionary::eris::debug>
 dictionary.
+
+=head1 CONSUMES
+
+=over 4
+
+=item * L<eris::role::plugin>
+
+=item * L<eris::role::schema>
+
+=back
 
 =head1 PROPERTIES
 

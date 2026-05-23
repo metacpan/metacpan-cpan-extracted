@@ -54,10 +54,10 @@ resources:
   bugtracker: https://github.com/reyjrar/POE-Component-ElasticSearch-Indexer/issues
   homepage: https://github.com/reyjrar/POE-Component-ElasticSearch-Indexer
   repository: https://github.com/reyjrar/POE-Component-ElasticSearch-Indexer.git
-version: '0.016'
+version: '0.017'
 x_Dist_Zilla:
   perl:
-    version: '5.042001'
+    version: '5.042002'
   plugins:
     -
       class: Dist::Zilla::Plugin::PruneCruft
@@ -232,6 +232,8 @@ x_Dist_Zilla:
             - lib
           spell_cmd: ''
           stopwords:
+            - AuthPassword
+            - AuthUsername
             - BacklogInterval
             - BatchDir
             - BatchDiskSpace
@@ -241,15 +243,19 @@ x_Dist_Zilla:
             - Elasticsearch
             - FlushInterval
             - FlushSize
+            - KeepAliveTimeout
             - LoggingConfig
             - MaxConnsPerServer
             - MaxConnsTotal
             - MaxFailedRatio
             - MaxPendingRequests
             - MaxRecoveryBatches
+            - PoolConnections
             - StatsHandler
             - StatsInterval
             - elasticsearch
+            - es
+            - ie
           wordlist: Pod::Wordlist
       name: Test::PodSpelling
       version: '2.007006'
@@ -276,9 +282,16 @@ x_Dist_Zilla:
       name: Test::Compile
       version: '2.059'
     -
-      class: Dist::Zilla::Plugin::ExtraTests
-      name: ExtraTests
-      version: '6.037'
+      class: Dist::Zilla::Plugin::Test::UnusedVars
+      name: Test::UnusedVars
+      version: '2.001001'
+    -
+      class: Dist::Zilla::Plugin::RunExtraTests
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: RunExtraTests
+      version: '0.029'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: AutoPrereqs
@@ -332,7 +345,7 @@ x_Dist_Zilla:
           version_by_branch: 0
           version_regexp: (?^u:^release-(.+)$)
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.3
+          git_version: 2.54.0
           repo_root: .
       name: Git::NextVersion
       version: '2.052'
@@ -355,7 +368,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.3
+          git_version: 2.54.0
           repo_root: .
       name: Git::Check
       version: '2.052'
@@ -393,7 +406,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.3
+          git_version: 2.54.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -406,11 +419,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: release-0.016
+          tag: release-0.017
           tag_format: release-%v
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.3
+          git_version: 2.54.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -434,7 +447,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.3
+          git_version: 2.54.0
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -448,7 +461,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.47.3
+          git_version: 2.54.0
           repo_root: .
       name: Git::Push
       version: '2.052'
@@ -499,6 +512,6 @@ x_Dist_Zilla:
     version: '6.037'
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
-x_generated_by_perl: v5.42.1
+x_generated_by_perl: v5.42.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: BSD-3-Clause

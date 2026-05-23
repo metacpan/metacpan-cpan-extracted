@@ -11,9 +11,10 @@ dist.ini
 lib/POE/Component/ElasticSearch/Indexer.pm
 perlcritic.rc
 t/00-compile.t
-t/author-critic.t
-t/author-eol.t
-t/author-pod-coverage.t
-t/author-pod-spell.t
-t/author-pod-syntax.t
 weaver.ini
+xt/author/critic.t
+xt/author/eol.t
+xt/author/pod-coverage.t
+xt/author/pod-spell.t
+xt/author/pod-syntax.t
+xt/release/unused-vars.t

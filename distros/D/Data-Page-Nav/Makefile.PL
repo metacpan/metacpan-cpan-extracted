@@ -29,6 +29,7 @@ WriteMakefile(
     },
  
     PREREQ_PM => {
+        'base'       => 0,
         'Data::Page' => '2.02'
     },
     

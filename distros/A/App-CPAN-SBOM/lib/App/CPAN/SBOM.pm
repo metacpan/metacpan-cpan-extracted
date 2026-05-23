@@ -31,7 +31,7 @@ use SBOM::CycloneDX::Vulnerability::Source;
 use SBOM::CycloneDX::Vulnerability;
 use SBOM::CycloneDX;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 
 sub DEBUG { $ENV{SBOM_DEBUG} || 0 }
@@ -114,6 +114,16 @@ sub run {
 
     my $bom = SBOM::CycloneDX->new;
 
+    my $spec_version = '1.6';
+
+    if (defined $options{'cyclonedx-spec-version'}) {
+        $spec_version = $options{'cyclonedx-spec-version'};
+    }
+
+    if ($spec_version >= 1.2 && $spec_version <= 1.7) {
+        $bom->spec_version($spec_version);
+    }
+
     if (defined $options{distribution}) {
 
         my ($distribution, $version) = split '@', $options{distribution};
@@ -127,6 +137,7 @@ sub run {
         make_sbom_from_project(bom => $bom, options => \%options);
     }
 
+    $bom->metadata->timestamp(time);
     $bom->metadata->tools->push(cyclonedx_tool());
 
     my $output_file = $options{output} // 'bom.json';
@@ -155,7 +166,7 @@ sub show_version {
     say <<"VERSION";
 $progname version $VERSION
 
-Copyright 2025, Giuseppe Di Terlizzi <gdt\@cpan.org>
+Copyright 2025-2026, Giuseppe Di Terlizzi <gdt\@cpan.org>
 
 This program is part of the "App-CPAN-SBOM" distribution and is free software;
 you can redistribute it and/or modify it under the same terms as Perl itself.
@@ -224,7 +235,7 @@ sub make_sbom_from_project {
 
         @authors             = make_authors([$meta->author]);
         @external_references = make_external_references($meta->{resources});
-        @licenses            = (SBOM::CycloneDX::License->new(id => cpan_meta_to_spdx_license($meta->license)));
+        @licenses = (SBOM::CycloneDX::License->new(id => cpan_meta_to_spdx_license($meta->license) || 'NONE'));
 
         # Detect distribution author dependencies
         # TODO get the author-defined dependency version
@@ -257,9 +268,10 @@ sub make_sbom_from_project {
         version             => $project_version,
         bom_ref             => $bom_ref,
         licenses            => \@licenses,
-        authors             => \@authors,
         external_references => \@external_references,
     );
+
+    add_authors_to_component(bom => $bom, component => $root_component, authors => \@authors);
 
     if ($project_description) {
         $root_component->description($project_description);
@@ -315,29 +327,32 @@ sub make_sbom_from_dist {
     my @authors = make_authors($metadata->{author});
 
     my $purl = URI::PackageURL->new(
-        type      => 'cpan',
-        namespace => $dist_data->author,
-        name      => $dist_data->distribution,
-        version   => $dist_data->version
+        type       => 'cpan',
+        name       => $dist_data->distribution,
+        version    => $dist_data->version,
+        qualifiers => {author => $dist_data->author},
+        validate   => 0
     );
 
     my @external_references = make_external_references($dist_data->metadata->{resources});
 
-    my $license      = join ' AND ', @{$metadata->{license}};
-    my $spdx_license = cpan_meta_to_spdx_license($license);
+    my $license_name = join ' AND ', @{$metadata->{license}};
+    my $license_id   = cpan_meta_to_spdx_license($license_name) || 'NONE';
+    my $license_info = ($license_id ne 'NONE') ? {id => $license_id} : {name => $license_name};
 
-    my $bom_license = SBOM::CycloneDX::License->new(($spdx_license) ? {id => $spdx_license} : {name => $license});
+    my $bom_license = SBOM::CycloneDX::License->new($license_info);
 
     my $root_component = SBOM::CycloneDX::Component->new(
         type                => 'library',
         name                => $dist_data->name,
         version             => $dist_data->version,
         licenses            => [$bom_license],
-        authors             => \@authors,
         bom_ref             => $purl->to_string,
         purl                => $purl,
         external_references => \@external_references
     );
+
+    add_authors_to_component(bom => $bom, component => $root_component, authors => \@authors);
 
     if (my $abstract = $dist_data->abstract) {
         $root_component->description($abstract);
@@ -449,6 +464,8 @@ sub make_dep_compoment {
 
     if ($module) {
 
+        $module = 'perl' if ($module eq 'Perl');
+
         DEBUG
             and say STDERR sprintf '-- %s[%d] Collect module %s@%s info (parent component %s)',
             ("    " x ($depth - 1)), $depth, $module, $version, $parent_component->bom_ref;
@@ -464,11 +481,18 @@ sub make_dep_compoment {
 
         $distribution = $module_data->distribution;
 
-        if ($version == 0) {
+        if (!$version) {
             $version = $module_data->version;
         }
 
+        # Standardize the core perl distribution version
+        if ($distribution eq 'perl') {
+            $version =~ s/^v?5\.([1-9]\d+)(.*)$/5.0$1*/;
+        }
+
     }
+
+    $version =~ s/^v//;
 
     my $release_data = $mcpan->release({
         either => [
@@ -494,23 +518,31 @@ sub make_dep_compoment {
 
     my @authors = make_authors($metadata->{author});
 
-    my $license      = join ' AND ', @{$dist_data->metadata->{license}};
-    my $spdx_license = cpan_meta_to_spdx_license($license);
+    # Distribution License
+    my $license_name = join ' AND ', @{$dist_data->metadata->{license}};
+    my $license_id   = cpan_meta_to_spdx_license($license_name) || 'NONE';
+    my $license      = ($license_id ne 'NONE') ? {id => $license_id} : {name => $license_name};
 
-    my $bom_license = SBOM::CycloneDX::License->new(($spdx_license) ? {id => $spdx_license} : {name => $license});
+    my $bom_license = SBOM::CycloneDX::License->new($license);
 
-    my $purl = URI::PackageURL->new(type => 'cpan', namespace => $author, name => $distribution, version => $version);
+    my $purl = URI::PackageURL->new(
+        type       => 'cpan',
+        name       => $distribution,
+        version    => $version,
+        qualifiers => {author => $author},
+        validate   => 0
+    );
 
     my @ext_refs = make_external_references($dist_data->metadata->{resources});
 
     my $hashes = SBOM::CycloneDX::List->new;
 
     if (my $checksum = $dist_data->checksum_sha256) {
-        $hashes->add(SBOM::CycloneDX::Hash->new(alg => 'sha-256', content => $checksum));
+        $hashes->add(SBOM::CycloneDX::Hash->new(alg => 'SHA-256', content => $checksum));
     }
 
     if (my $checksum = $dist_data->checksum_md5) {
-        $hashes->add(SBOM::CycloneDX::Hash->new(alg => 'md5', content => $checksum));
+        $hashes->add(SBOM::CycloneDX::Hash->new(alg => 'MD5', content => $checksum));
     }
 
     my $component = SBOM::CycloneDX::Component->new(
@@ -518,12 +550,13 @@ sub make_dep_compoment {
         name                => $distribution,
         version             => $version,
         licenses            => [$bom_license],
-        authors             => \@authors,
         bom_ref             => $purl->to_string,
         purl                => $purl,
         hashes              => $hashes,
         external_references => \@ext_refs,
     );
+
+    add_authors_to_component(bom => $bom, component => $component, authors => \@authors);
 
     if (my $abstract = $dist_data->abstract) {
         $component->description($abstract);
@@ -563,6 +596,25 @@ sub make_dep_compoment {
     }
 
     return $component;
+
+}
+
+sub add_authors_to_component {
+
+    my (%params) = @_;
+
+    my $bom       = delete $params{bom};
+    my $component = delete $params{component};
+    my $authors   = delete $params{authors};
+
+    # Use "authors" property in CycloneDX >= 1.6
+    if ($bom->spec_version >= 1.6) {
+        $component->authors(\@{$authors});
+    }
+    else {
+        my $author = join "\n", map { sprintf('%s <%s>', $_->name, $_->email) } @{$authors};
+        $component->author($author);
+    }
 
 }
 

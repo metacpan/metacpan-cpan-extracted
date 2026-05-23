@@ -18,7 +18,7 @@ use Ref::Util           qw( is_arrayref );
 use Time::Moment;
 # RECOMMEND PREREQ: Cpanel::JSON::XS
 
-our $VERSION = '6.2';
+our $VERSION = '6.3';
 
 # Default for Handling Parsing
 our $DateParsing     = 1;
@@ -264,7 +264,6 @@ sub parse_syslog_line {
     my ($raw_string) = @_;
 
     # State Variables
-    state $DateTimeTried = 0;
     state $CpanelJSONXSWarning = 0;
     state $DisableWarnings = $ENV{PARSE_SYSLOG_LINE_QUIET} || $ENV{TEST_ACTIVE} || $ENV{TEST2_ACTIVE};
 
@@ -673,7 +672,7 @@ Parse::Syslog::Line - Simple syslog line parser
 
 =head1 VERSION
 
-version 6.2
+version 6.3
 
 =head1 SYNOPSIS
 

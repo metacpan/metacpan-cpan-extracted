@@ -25,5 +25,9 @@ t/App-Perl-Module-Examples/01-use.t
 t/App-Perl-Module-Examples/02-version.t
 t/App-Perl-Module-Examples/03-new.t
 t/App-Perl-Module-Examples/04-run.t
+t/data/example1/Ex.pm
+t/data/example2/Default.pm
+t/data/example2/lib/Nested.pm
+t/data/example3/Examples.pm
 xt/App-Perl-Module-Examples/01-pod_coverage.t
 xt/App-Perl-Module-Examples/02-pod.t

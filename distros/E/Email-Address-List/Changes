@@ -1,3 +1,8 @@
+0.07 2026-05-22
+
+ - Update whitespace removal code to remove all types of unicode
+   whitespace in addition to ASCII.
+
 0.06 2019-01-02
 
  - Changes to address CVE-2018-18898 which could allow DDoS-type attacks.

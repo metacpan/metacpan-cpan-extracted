@@ -36,7 +36,7 @@
             "IPC::System::Simple" : "0",
             "Object::Configure" : "0",
             "Params::Get" : "0",
-            "Params::Validate::Strict" : "0",
+            "Params::Validate::Strict" : "0.31",
             "Readonly" : "0",
             "Readonly::Values::Months" : "0",
             "autodie" : "0",
@@ -68,6 +68,6 @@
          "x_repository" : "https://github.com/nigelhorne/Genealogy-Relationship-Name"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities;
 use v5.16;
 use warnings;
 
-our $VERSION = '8.8'; # VERSION
+our $VERSION = '8.9'; # VERSION
 
 use App::ElasticSearch::Utilities::HTTPRequest;
 use CLI::Helpers qw(:all);
@@ -63,15 +63,25 @@ use Sub::Exporter -setup => {
         es_flatten_hash
         es_human_count
         es_human_size
+        es_format_numeric
     )],
     groups => {
         config  => [qw(es_utils_initialize es_globals)],
         default => [qw(es_utils_initialize es_connect es_indices es_request)],
-        human   => [qw(es_human_count es_human_size)],
+        human   => [qw(es_human_count es_human_size es_format_numeric)],
         indices => [qw(:default es_indices_meta)],
-        index   => [qw(:default es_index_valid es_index_fields es_index_days_old es_index_bases)],
+        index   => [qw(
+            :default es_index_valid es_index_fields es_index_days_old es_index_bases
+            es_index_strip_date es_index_shards es_index_segments es_index_stats
+        )],
+        maintenance => [qw(
+            es_close_index es_open_index es_delete_index es_optimize_index
+            es_apply_index_settings
+        )],
     },
 };
+
+
 use App::ElasticSearch::Utilities::Connection;
 use App::ElasticSearch::Utilities::VersionHacks qw(_fix_version_request);
 
@@ -377,11 +387,16 @@ sub es_pattern {
 sub _get_ssl_opts {
     es_utils_initialize() unless keys %DEF;
     my %opts = ();
-    $opts{verify_hostname} = 0            if $DEF{INSECURE};
     $opts{SSL_ca_file}     = $DEF{CACERT} if $DEF{CACERT};
     $opts{SSL_ca_path}     = $DEF{CAPATH} if $DEF{CAPATH};
     $opts{SSL_cert_file}   = $DEF{CERT}   if $DEF{CERT};
     $opts{SSL_key_file}    = $DEF{KEY}    if $DEF{KEY};
+
+    # Disable Certificate Verification
+    if ( $DEF{INSECURE} ) {
+        $opts{verify_hostname} = 0;
+        $opts{SSL_verify_mode} = 0x00;
+    }
     return \%opts;
 }
 
@@ -410,10 +425,10 @@ sub _get_es_version {
             };
             if( $ver ) {
                 if( $ver->{distribution} and $ver->{distribution} eq 'opensearch' ) {
-                    $CURRENT_VERSION = '7.10';
+                    $CURRENT_VERSION = version->parse($ver->{minimum_wire_compatibility_version});
                 }
                 else {
-                    $CURRENT_VERSION = join('.', (split /\./,$ver->{number})[0,1]);
+                    $CURRENT_VERSION = version->parse($ver->{number});
                 }
             }
         }
@@ -1079,6 +1094,24 @@ sub es_human_size {
 }
 
 
+sub es_format_numeric {
+    my($v,$len) = @_;
+    $len ||= 3;
+
+    # If this looks like a number, format it
+    if ( $v =~ /^([0-9]+)\.(0*)[0-9]*$/ ) {
+        my $ints   = length($1);
+        my $zeroes = length($2);
+        my $precision = $len + $zeroes - $ints;
+        $v = $ints > $len    ? int($v)
+            : $precision > 0 ? sprintf("%0.${precision}f",$v)
+            : $v;
+    }
+
+    return $v;
+}
+
+
 sub def {
     my($key)= map { uc }@_;
 
@@ -1110,7 +1143,6 @@ sub es_local_index_meta {
 }
 
 
-
 1;
 
 __END__
@@ -1123,269 +1155,80 @@ App::ElasticSearch::Utilities - Utilities for Monitoring ElasticSearch
 
 =head1 VERSION
 
-version 8.8
+version 8.9
 
 =head1 SYNOPSIS
 
-This library contains utilities for unified interfaces in the scripts.
+This distribution contains modules for interacting with ElasticSearch and
+OpenSearch and utility scripts.
+
+=head1 SCRIPTS
 
 This a set of utilities to make monitoring ElasticSearch clusters much simpler.
 
-Included are:
+=head2 SEARCHING
 
-B<SEARCHING>:
+    scripts/es-aggregate.pl - Utility to search and aggregate index contents
+    scripts/es-search.pl - Utility to search and explore index contents
 
-    scripts/es-search.pl - Utility to interact with LogStash style indices from the CLI
-
-B<MONITORING>:
+=head2 MONITORING
 
     scripts/es-graphite-dynamic.pl - Perform index maintenance on daily indexes
+    scripts/es-index-fields.pl - Collect and report on field statistics for indices
+    scripts/es-index-scan.pl - Scan for potential index issues
+    scripts/es-nodes.pl - View node information
     scripts/es-status.pl - Command line utility for ES Metrics
     scripts/es-storage-overview.pl - View how shards/data is aligned on your cluster
-    scripts/es-nodes.pl - View node information
 
-B<MAINTENANCE>:
+=head2 MAINTENANCE
 
-    scripts/es-daily-index-maintenance.pl - Perform index maintenance on daily indexes
     scripts/es-alias-manager.pl - Manage index aliases automatically
+    scripts/es-daily-index-maintenance.pl - Perform index maintenance on daily indexes
+    scripts/es-index-blocks.pl - Report and fix any blocks on indices
     scripts/es-open.pl - Open any closed indices matching a index parameters
 
-B<MANAGEMENT>:
+=head2 MANAGEMENT
 
     scripts/es-apply-settings.pl - Apply settings to all indexes matching a pattern
     scripts/es-cluster-settings.pl - Manage cluster settings
     scripts/es-copy-index.pl - Copy an index from one cluster to another
     scripts/es-storage-overview.pl - View how shards/data is aligned on your cluster
 
-B<DEPRECATED>:
-
-    scripts/es-graphite-static.pl - Send ES Metrics to Graphite or Cacti
-
 The App::ElasticSearch::Utilities module simply serves as a wrapper around the scripts for packaging and
 distribution.
 
-=head1 FUNCTIONS
+=head2 USAGE
 
-=head2 es_utils_initialize()
+The tools are all wrapped in their own documentation, please see:
 
-Takes an optional reference to an C<@ARGV> like array. Performs environment and
-argument parsing.
+    $UTILITY --help
+    $UTILITY --manual
 
-=head2 es_globals($key)
+For individual options and capabilities
 
-Grab the value of the global value from the es-utils.yaml files.
+=head2 PATTERNS
 
-=head2 es_basic_auth($host)
+Patterns are used to match an index to the aliases it should have.  A few symbols are expanded into
+regular expressions.  Those patterns are:
 
-Get the user/password combination for this host.  This is called from LWP::UserAgent if
-it recieves a 401, so the auth condition must be satisfied.
+    *       expands to match any number of any characters.
+    DATE    expands to match YYYY.MM.DD, YYYY-MM-DD, or YYYYMMDD
+    ANY     expands to match any number of any characters.
 
-Returns the username and password as a list.
+=head1 CONFIG FILES
 
-=head2 es_pass_exec(host, username)
-
-Called from es_basic_auth to exec a program, capture the password
-and return it to the caller.  This allows the use of password vaults
-and keychains.
-
-=head2 es_pattern
-
-Returns a hashref of the pattern filter used to get the indexes
-    {
-        string => '*',
-        re     => '.*',
-    }
-
-=head2 es_connect
-
-Without options, this connects to the server defined in the args.  If passed
-an array ref, it will use that as the connection definition.
-
-=head2 es_master([$handle])
-
-Returns true (1) if the handle is to the the cluster master, or false (0) otherwise.
-
-=head2 es_request([$handle],$command,{ method => 'GET', uri_param => { a => 1 } }, {})
-
-Retrieve URL from ElasticSearch, returns a hash reference
-
-First hash ref contains options, including:
-
-    uri_param           Query String Parameters
-    index               Index name
-    type                Index type
-    method              Default is GET
-
-If the request is not successful, this function will throw a fatal exception.
-If you'd like to proceed you need to catch that error.
-
-=head2 es_nodes
-
-Returns the hash of index meta data.
-
-=head2 es_indices_meta
-
-Returns the hash of index meta data.
-
-=head2 es_indices
-
-Returns a list of active indexes matching the filter criteria specified on the command
-line.  Can handle indices named:
-
-    logstash-YYYY.MM.DD
-    dcid-logstash-YYYY.MM.DD
-    logstash-dcid-YYYY.MM.DD
-    logstash-YYYY.MM.DD-dcid
-
-Makes use of --datesep to determine where the date is.
-
-Options include:
-
-=over 4
-
-=item B<state>
-
-Default is 'open', can be used to find 'closed' indexes as well.
-
-=item B<check_state>
-
-Default is 1, set to 0 to disable state checks.  The combination of the default
-with this option and the default for B<state> means only open indices are returned.
-
-=item B<check_dates>
-
-Default is 1, set to 0 to disable checking index age.
-
-=back
-
-=head2 es_index_strip_date( 'index-name' )
-
-Returns the index name with the date removed.
-
-=head2 es_index_bases( 'index-name' )
-
-Returns an array of the possible index base names for this index
-
-=head2 es_index_days_old( 'index-name' )
-
-Return the number of days old this index is.
-
-=head2 es_index_shards( 'index-name' )
-
-Returns the number of replicas for a given index.
-
-=head2 es_index_valid( 'index-name' )
-
-Checks if the specified index is valid
-
-=head2 es_index_fields('index-name')
-
-Returns a hash reference with the following data:
-
-    key_name:
-      type: field_data_type
-      # If the field is nested
-      nested_path: nested_path
-      nested_key: nested_key
-
-=head2 es_close_index('index-name')
-
-Closes an index
-
-=head2 es_open_index('index-name')
-
-Open an index
-
-=head2 es_delete_index('index-name')
-
-Deletes an index
-
-=head2 es_optimize_index('index-name')
-
-Optimize an index to a single segment per shard
-
-=head2 es_apply_index_settings('index-name', { settings })
-
-Apply a HASH of settings to an index.
-
-=head2 es_index_segments( 'index-name' )
-
-Exposes GET /$index/_segments
-
-Returns the segment data from the index in hashref:
-
-=head2 es_segment_stats($index)
-
-Return the number of shards and segments in an index as a hashref
-
-=head2 es_index_stats( 'index-name' )
-
-Exposes GET /$index/_stats
-
-Returns a hashref
-
-=head2 es_settings()
-
-Exposes GET /_settings
-
-Returns a hashref
-
-=head2 es_node_stats()
-
-Exposes GET /_nodes/stats
-
-Returns a hashref
-
-=head2 es_flatten_hash
-
-Performs flattening that's compatible with Elasticsearch's flattening.
-
-=head2 es_human_count
-
-Takes a number and returns the number as a string in docs, thousands, millions, or billions.
-
-    1_000     -> "1.00 thousand",
-    1_000_000 -> "1.00 million",
-
-=head2 es_human_size
-
-Takes a number and returns the number as a string in bytes, Kb, Mb, Gb, or Tb using base 1024.
-
-    1024        -> '1.00 Kb',
-    1048576     -> '1.00 Mb',
-    1073741824  -> '1.00 Gb',
-
-=head2 def('key')
-
-Exposes Definitions grabbed by options parsing
-
-=head2 es_local_index_meta(key => 'base' || 'index')
-
-Fetch meta-data from the local config file, i.e. C<~/.es-utils.yaml>.
-
-Format is:
+Some options may be specified in the B</etc/es-utils.yaml>, B<$HOME/.es-utils.yaml>
+or B<$HOME/.config/es-utils/config.yaml> file:
 
     ---
-    meta:
-      index_name:
-        key: value
-      index_basename:
-        key: value
-
-The most specific version is searched first, followed by the index stripped of
-it's date, and then on through all the bases discovered with
-C<es_index_bases()>.
-
-This is used by the C<es-search.pl> utility to do lookups of the B<timestamp>
-field it needs to sort documents, i.e.:
-
-    ---
-    meta:
-      logstash:
-        timestamp: '@timestamp'
-        host: es-cluster-01.int.example.com
-      bro:
-        timestamp: 'timestamp'
+    base: logstash
+    days: 7
+    host: esproxy.example.com
+    port: 80
+    timeout: 10
+    proto: https
+    http-username: bob
+    password-exec: /home/bob/bin/get-es-passwd.sh
 
 =head1 ARGS
 
@@ -1412,21 +1255,6 @@ From App::ElasticSearch::Utilities:
     --days          If using a pattern or base, how many days back to go, default: 1
 
 See also the "CONNECTION ARGUMENTS" and "INDEX SELECTION ARGUMENTS" sections from App::ElasticSearch::Utilities.
-
-=head1 ARGUMENT GLOBALS
-
-Some options may be specified in the B</etc/es-utils.yaml>, B<$HOME/.es-utils.yaml>
-or B<$HOME/.config/es-utils/config.yaml> file:
-
-    ---
-    base: logstash
-    days: 7
-    host: esproxy.example.com
-    port: 80
-    timeout: 10
-    proto: https
-    http-username: bob
-    password-exec: /home/bob/bin/get-es-passwd.sh
 
 =head1 CONNECTION ARGUMENTS
 
@@ -1501,55 +1329,7 @@ Specify the path to the TLS client private key file.
 
 =back
 
-=head1 INDEX SELECTION ARGUMENTS
-
-=over
-
-=item B<base>
-
-In an environment using monthly, weekly, daily, or hourly indexes.  The base index name is everything without the date.
-Parsing for bases, also provides splitting and matching on segments of the index name delineated by the '-' character.
-If we have the following indexes:
-
-    web-dc1-YYYY.MM.DD
-    web-dc2-YYYY.MM.DD
-    logstash-dc1-YYYY.MM.DD
-    logstash-dc2-YYYY.MM.DD
-
-Valid bases would be:
-
-    web
-    web-dc1
-    web-dc2
-    logstash
-    logstash-dc1
-    logstash-dc2
-    dc1
-    dc2
-
-Combining that with the days option can provide a way to select many indexes at once.
-
-=item B<days>
-
-How many days backwards you want your operation to be relevant.
-
-=item B<datesep>
-
-Default is '.' Can be set to an empty string for no separator.
-
-=item B<pattern>
-
-A pattern to match the indexes.  Can expand the following key words and characters:
-
-    '*'    expanded to '.*'
-    'ANY'  expanded to '.*'
-    'DATE' expanded to a pattern to match a date,
-
-The indexes are compared against this pattern.
-
-=back
-
-=head1 HTTP Basic Authentication
+=head1 AUTHENTICATION
 
 HTTP Basic Authorization is only supported when the C<proto> is set to B<https>
 as not to leak credentials all over.
@@ -1606,54 +1386,430 @@ If all the fails to yield a password, the last resort is to use CLI::Helpers::pr
 password.  If the user is using version 1.1 or higher of CLI::Helpers, this call will turn off echo and readline magic
 for the password prompt.
 
-=head1 INSTALL
+=head1 INDEX SELECTION ARGUMENTS
 
-B<This library attempts to provide scripts compatible with version 0.19 through 1.1 of ElasticSearch>.
+=over
 
-Recommended install with L<CPAN Minus|http://cpanmin.us>:
+=item B<base>
 
-    cpanm App::ElasticSearch::Utilities
+In an environment using monthly, weekly, daily, or hourly indexes.  The base index name is everything without the date.
+Parsing for bases, also provides splitting and matching on segments of the index name delineated by the '-' character.
+If we have the following indexes:
 
-You can also use CPAN:
+    web-dc1-YYYY.MM.DD
+    web-dc2-YYYY.MM.DD
+    logstash-dc1-YYYY.MM.DD
+    logstash-dc2-YYYY.MM.DD
 
-    cpan App::ElasticSearch::Utilities
+Valid bases would be:
 
-Or if you'd prefer to manually install:
+    web
+    web-dc1
+    web-dc2
+    logstash
+    logstash-dc1
+    logstash-dc2
+    dc1
+    dc2
 
-    export RELEASE=<CurrentRelease>
+Combining that with the days option can provide a way to select many indexes at once.
 
-    wget "https://github.com/reyjrar/es-utils/blob/master/releases/App-ElasticSearch-Utilities-$RELEASE.tar.gz?raw=true" -O es-utils.tgz
+=item B<days>
 
-    tar -zxvf es-utils.tgz
+How many days backwards you want your operation to be relevant.
 
-    cd App-ElasticSearch-Utilities-$RELEASE
+=item B<datesep>
 
-    perl Makefile.PL
+Default is '.' Can be set to an empty string for no separator.
 
-    make
+=item B<pattern>
 
-    make install
+A pattern to match the indexes.  Can expand the following key words and characters:
 
-This will take care of ensuring all the dependencies are satisfied and will install the scripts into the same
-directory as your Perl executable.
+    '*'    expanded to '.*'
+    'ANY'  expanded to '.*'
+    'DATE' expanded to a pattern to match a date,
 
-=head2 USAGE
+The indexes are compared against this pattern.
 
-The tools are all wrapped in their own documentation, please see:
+=back
 
-    $UTILITY --help
-    $UTILITY --manual
+=head1 OVERVIEW
 
-For individual options and capabilities
+In addition to the scripts, the libraries provide a simplistic interface to
+write your own scripts. It builds C<CLI::Helpers> to provide consistent options
+for scripts.
 
-=head2 PATTERNS
+    use App::ElasticSearch::Utilities qw(:all);
+    use Data::Printer;
 
-Patterns are used to match an index to the aliases it should have.  A few symbols are expanded into
-regular expressions.  Those patterns are:
+    my $res = es_result('_cluster/health');
+    p($res)
 
-    *       expands to match any number of any characters.
-    DATE    expands to match YYYY.MM.DD, YYYY-MM-DD, or YYYYMMDD
-    ANY     expands to match any number of any characters.
+See the contents of the scripts for examples.
+
+=head1 EXPORT
+
+This module use L<Sub::Exporter> so you can customize exports.
+
+=head2 Export Groups
+
+The following export groups are provided.
+
+=over 2
+
+=item B<:default> - Default exports
+
+    es_connect()
+    es_indices()
+    es_request()
+    es_utils_initialize()
+
+=item B<:config>
+
+    es_globals()
+    es_utils_initialize()
+
+=item B<:human>
+
+    es_format_numeric()
+    es_human_count()
+    es_human_size()
+
+=item B<:index>
+
+    :default
+    es_index_bases()
+    es_index_days_old()
+    es_index_fields()
+    es_index_shards()
+    es_index_segments()
+    es_index_stats()
+    es_index_strip_date()
+    es_index_valid()
+
+=item B<:indices>
+
+    :default
+    es_indices_meta()
+
+=item B<:maintenance>
+
+    :default
+    es_close_index()
+    es_open_index()
+    es_delete_index()
+    es_optimize_index()
+    es_apply_index_settings()
+
+=item B<:all> - All exportable functions
+
+    :config
+    :default
+    :index
+    :indices
+    :human
+    :maintenance
+    es_basic_auth()
+    es_flatten_hash()
+    es_local_index_meta()
+    es_master()
+    es_nodes()
+    es_node_stats()
+    es_pattern()
+    es_settings()
+    es_segment_stats()
+
+=back
+
+=head2 Configuration
+
+It is possible to control how and when C<@ARGV> is processed to prevent conflicts.
+
+=head1 CONFIG FUNCTIONS
+
+=head2 es_utils_initialize()
+
+Takes an optional reference to an C<@ARGV> like array. Performs environment and
+argument parsing.
+
+=head2 es_globals($key)
+
+Grab the value of the global value from the es-utils.yaml files.
+
+=head2 es_basic_auth($host)
+
+Get the user/password combination for this host.  This is called from LWP::UserAgent if
+it recieves a 401, so the auth condition must be satisfied.
+
+Returns the username and password as a list.
+
+=head1 CONNECTION FUNCTIONS
+
+=head2 es_connect
+
+Without options, this connects to the server defined in the args.  If passed
+an array ref, it will use that as the connection definition.
+
+=head2 es_request([$handle],$command,{ method => 'GET', uri_param => { a => 1 } }, {})
+
+Retrieve URL from ElasticSearch, returns a hash reference
+
+First hash ref contains options, including:
+
+    uri_param           Query String Parameters
+    index               Index name
+    type                Index type
+    method              Default is GET
+
+If the request is not successful, this function will throw a fatal exception.
+If you'd like to proceed you need to catch that error.
+
+=head1 INDEX FUNCTIONS
+
+=head2 es_index_strip_date( 'index-name' )
+
+Returns the index name with the date removed.
+
+=head2 es_index_bases( 'index-name' )
+
+Returns an array of the possible index base names for this index
+
+=head2 es_index_days_old( 'index-name' )
+
+Return the number of days old this index is.
+
+=head2 es_index_shards( 'index-name' )
+
+Returns the number of replicas for a given index.
+
+=head2 es_index_valid( 'index-name' )
+
+Checks if the specified index is valid
+
+=head2 es_index_fields('index-name')
+
+Returns a hash reference with the following data:
+
+    key_name:
+      type: field_data_type
+      # If the field is nested
+      nested_path: nested_path
+      nested_key: nested_key
+
+=head2 es_index_segments( 'index-name' )
+
+Exposes GET /$index/_segments
+
+Returns the segment data from the index in hashref:
+
+=head2 es_index_stats( 'index-name' )
+
+Exposes GET /$index/_stats
+
+Returns a hashref
+
+=head1 INDICES FUNCTIONS
+
+=head2 es_indices_meta
+
+Returns the hash of index meta data.
+
+=head1 MAINTENANCE FUNCTIONS
+
+=head2 es_close_index('index-name')
+
+Closes an index
+
+=head2 es_open_index('index-name')
+
+Open an index
+
+=head2 es_delete_index('index-name')
+
+Deletes an index
+
+=head2 es_optimize_index('index-name')
+
+Optimize an index to a single segment per shard
+
+=head2 es_apply_index_settings('index-name', { settings })
+
+Apply a HASH of settings to an index.
+
+=head1 FORMAT FUNCTIONS
+
+=head2 es_human_count
+
+Takes a number and returns the number as a string in docs, thousands, millions, or billions.
+
+    1_000     -> "1.00 thousand",
+    1_000_000 -> "1.00 million",
+
+=head2 es_human_size
+
+Takes a number and returns the number as a string in bytes, Kb, Mb, Gb, or Tb using base 1024.
+
+    1024        -> '1.00 Kb',
+    1048576     -> '1.00 Mb',
+    1073741824  -> '1.00 Gb',
+
+=head2 es_format_numeric
+
+Takes a value and the minimum digits of significance.
+
+=head1 FUNCTIONS
+
+=head2 es_pass_exec(host, username)
+
+Called from es_basic_auth to exec a program, capture the password
+and return it to the caller.  This allows the use of password vaults
+and keychains.
+
+=head2 es_pattern
+
+Returns a hashref of the pattern filter used to get the indexes
+    {
+        string => '*',
+        re     => '.*',
+    }
+
+=head2 es_master([$handle])
+
+Returns true (1) if the handle is to the the cluster master, or false (0) otherwise.
+
+=head2 es_nodes
+
+Returns the hash of index meta data.
+
+=head2 es_indices
+
+Returns a list of active indexes matching the filter criteria specified on the command
+line.  Can handle indices named:
+
+    logstash-YYYY.MM.DD
+    dcid-logstash-YYYY.MM.DD
+    logstash-dcid-YYYY.MM.DD
+    logstash-YYYY.MM.DD-dcid
+
+Makes use of --datesep to determine where the date is.
+
+Options include:
+
+=over 4
+
+=item B<state>
+
+Default is 'open', can be used to find 'closed' indexes as well.
+
+=item B<check_state>
+
+Default is 1, set to 0 to disable state checks.  The combination of the default
+with this option and the default for B<state> means only open indices are returned.
+
+=item B<check_dates>
+
+Default is 1, set to 0 to disable checking index age.
+
+=back
+
+=head2 es_segment_stats($index)
+
+Return the number of shards and segments in an index as a hashref
+
+=head2 es_settings()
+
+Exposes GET /_settings
+
+Returns a hashref
+
+=head2 es_node_stats()
+
+Exposes GET /_nodes/stats
+
+Returns a hashref
+
+=head2 es_flatten_hash
+
+Performs flattening that's compatible with Elasticsearch's flattening.
+
+=head2 def('key')
+
+Exposes Definitions grabbed by options parsing
+
+=head2 es_local_index_meta(key => 'base' || 'index')
+
+Fetch meta-data from the local config file, i.e. C<~/.es-utils.yaml>.
+
+Format is:
+
+    ---
+    meta:
+      index_name:
+        key: value
+      index_basename:
+        key: value
+
+The most specific version is searched first, followed by the index stripped of
+it's date, and then on through all the bases discovered with
+C<es_index_bases()>.
+
+This is used by the C<es-search.pl> utility to do lookups of the B<timestamp>
+field it needs to sort documents, i.e.:
+
+    ---
+    meta:
+      logstash:
+        timestamp: '@timestamp'
+        host: es-cluster-01.int.example.com
+      bro:
+        timestamp: 'timestamp'
+
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Websites
+
+The following websites have more information about this module, and may be of help to you. As always,
+in addition to those websites please use your favorite search engine to discover more resources.
+
+=over 4
+
+=item *
+
+MetaCPAN
+
+A modern, open-source CPAN search engine, useful to view POD in HTML format.
+
+L<https://metacpan.org/release/App-ElasticSearch-Utilities>
+
+=item *
+
+CPAN Testers
+
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
+
+L<http://www.cpantesters.org/distro/A/App-ElasticSearch-Utilities>
+
+=item *
+
+CPAN Testers Matrix
+
+The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
+
+L<http://matrix.cpantesters.org/?dist=App-ElasticSearch-Utilities>
+
+=back
+
+=head2 Bugs / Feature Requests
+
+This module uses the GitHub Issue Tracker: L<https://github.com/reyjrar/es-utils/issues>
+
+=head2 Source Code
+
+This module's source code is available by visiting:
+L<https://github.com/reyjrar/es-utils>
 
 =head1 AUTHOR
 
@@ -1719,55 +1875,9 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =back
 
-=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
-
-=head1 SUPPORT
-
-=head2 Websites
-
-The following websites have more information about this module, and may be of help to you. As always,
-in addition to those websites please use your favorite search engine to discover more resources.
-
-=over 4
-
-=item *
-
-MetaCPAN
-
-A modern, open-source CPAN search engine, useful to view POD in HTML format.
-
-L<https://metacpan.org/release/App-ElasticSearch-Utilities>
-
-=item *
-
-CPAN Testers
-
-The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
-
-L<http://www.cpantesters.org/distro/A/App-ElasticSearch-Utilities>
-
-=item *
-
-CPAN Testers Matrix
-
-The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
-
-L<http://matrix.cpantesters.org/?dist=App-ElasticSearch-Utilities>
-
-=back
-
-=head2 Bugs / Feature Requests
-
-This module uses the GitHub Issue Tracker: L<https://github.com/reyjrar/es-utils/issues>
-
-=head2 Source Code
-
-This module's source code is available by visiting:
-L<https://github.com/reyjrar/es-utils>
-
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Brad Lhotsky.
+This software is Copyright (c) 2026 by Brad Lhotsky.
 
 This is free software, licensed under:
 

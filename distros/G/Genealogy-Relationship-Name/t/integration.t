@@ -22,7 +22,7 @@ BEGIN {
 # =========================================================================
 
 subtest 'Full lifecycle: construct -> query -> helper validation' => sub {
-	plan tests => 7;
+	plan tests => 11;
 
 	# Step 1: construct
 	my $namer = new_ok('Genealogy::Relationship::Name');
@@ -63,7 +63,7 @@ subtest 'Stateful: default language persists across calls' => sub {
 	is($namer->name(steps_to_ancestor => 1, steps_from_ancestor => 0, sex => 'F'),
 		'mere',   'Call 2: fr default -> mere');
 	is($namer->name(steps_to_ancestor => 1, steps_from_ancestor => 1, sex => 'M'),
-		'frere',  'Call 3: fr default -> frere');
+		"fr\N{U+00E8}re",  'Call 3: fr default -> frère');
 
 	# Now override once without changing the stored default
 	my $en_r = $namer->name(

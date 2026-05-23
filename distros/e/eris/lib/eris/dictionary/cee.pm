@@ -8,7 +8,7 @@ with qw(
     eris::role::dictionary::hash
 );
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 
 my $_hash=undef;
@@ -28,19 +28,29 @@ sub hash {
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 eris::dictionary::cee - Contains fields in the Common Event Expression syntax
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
 This dictionary contains all the fields as specified by the "Common Event Expression" format.
+
+=head1 CONSUMES
+
+=over 4
+
+=item * L<eris::role::dictionary>
+
+=item * L<eris::role::dictionary::hash>
+
+=item * L<eris::role::plugin>
+
+=back
 
 =head1 SEE ALSO
 

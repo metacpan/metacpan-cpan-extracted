@@ -3,7 +3,7 @@ NAME
     documentation.
 
 SYNOPSIS
-     perl-module-examples [-d] [-h] [--version]
+     perl-module-examples [-d] [-h] [--version] [working_dir]
 
 DESCRIPTION
     Tool to create examples/ directory in Perl distribution, which is
@@ -22,6 +22,14 @@ ARGUMENTS
 
             Print version of script.
 
+    *       "[working_dir]"
+
+            Working directory.
+
+            It's optional.
+
+            Default value is actual directory.
+
 EXAMPLE
      perl-module-examples -h
 
@@ -34,10 +42,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2012-2024 Michal Josef Špaček
+    © 2012-2026 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "Data::Page" : "2.02",
+            "base" : "0",
             "perl" : "5.008001"
          }
       },
@@ -53,6 +54,6 @@
          "web" : "https://github.com/ltmbr/Data-Page-Nav"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

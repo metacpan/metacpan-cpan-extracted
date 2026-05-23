@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.016;
 
-our $VERSION = '2.441';
+our $VERSION = '2.442';
 
 use Encode       qw( decode );
 #use bytes;      # required
@@ -331,7 +331,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.441
+Version 2.442
 
 =head1 DESCRIPTION
 

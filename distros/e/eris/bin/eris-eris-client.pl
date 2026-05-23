@@ -18,14 +18,14 @@ use POE qw(
 use POSIX qw(strftime);
 use Ref::Util qw(is_hashref);
 use Sys::Hostname qw(hostname);
-use YAML qw();
+use YAML::XS ();
 
 my ($opt,$usage) = describe_options('%c - %o',
-    [ 'config=s',          'Eris YAML config file, required', { validate => { "Must be a readable file." => sub { -r $_[0] } } } ],
-    [ 'eris-host|eh=s',    'Eris Dispatcher Host, defaults to localhost' ],
-    [ 'eris-port|ep=s',    'Eris Dispatcher Port, defaults to 9514' ],
-    [ 'indexer=s',         'Script to run to handle indexing, defaults to the eris-es-indexer.pl script.' ],
-    [ 'workers|w=i',       'Number of workers to run, default 4', { default => 4 }  ],
+    [ 'config=s',       'Eris YAML config file, required', { validate => { "Must be a readable file." => sub { -r $_[0] } } } ],
+    [ 'eris-host|eh=s', 'Eris Dispatcher Host, defaults to localhost' ],
+    [ 'eris-port|ep=s', 'Eris Dispatcher Port, defaults to 9514' ],
+    [ 'indexer=s',      'Script to run to handle indexing, defaults to the eris-es-indexer.pl script.' ],
+    [ 'workers|w=i',    'Number of workers to run, default 4', { default => 4 } ],
     [],
     [ 'stats-interval=i',   'Interval to send statistics, in seconds, default: 60', { default => 60 }],
     [ 'graphite-host|g=s',  'Graphite host to dispatch metrics to, default disabled' ],
@@ -66,7 +66,7 @@ sub main_start {
     my $cfg = {};
     if( $opt->config ) {
         eval {
-            $cfg = YAML::LoadFile( $opt->config );
+            $cfg = YAML::XS::LoadFile( $opt->config );
             1;
         } or do {
             my $err = $@;
@@ -210,15 +210,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 eris-eris-client.pl - Simple wrapper to spawn workers for handling syslog stream
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

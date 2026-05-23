@@ -10,7 +10,7 @@ use Data::Printer;
 use Hash::Flatten qw(flatten);
 use JSON::MaybeXS;
 use Getopt::Long::Descriptive;
-use YAML;
+use YAML::XS ();
 
 use eris::log::contextualizer;
 use eris::schemas;
@@ -38,7 +38,7 @@ if( $opt->help ) {
 
 #------------------------------------------------------------------------#
 # Main
-my $cfg  = $opt->config ? YAML::LoadFile($opt->config) : {};
+my $cfg  = $opt->config ? YAML::XS::LoadFile($opt->config) : {};
 my $ctxr = eris::log::contextualizer->new( config => $cfg );
 my $schm = eris::schemas->new( $cfg->{schemas} ? %{ $cfg->{schemas} } : () );
 
@@ -87,15 +87,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 eris-context.pl - Utility for testing the logging contextualizer
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 AUTHOR
 

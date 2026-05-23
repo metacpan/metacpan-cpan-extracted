@@ -14,36 +14,56 @@ there could be a couple dozen segments in use at any time, and when adding new
 features, they are bound to leak segments all over the place until things are
 stabilized and polished.
 
-You can modify the kern.sysv parameters in the below file to your liking, then
-put the file into a ""/Library/LaunchDaemons/SharedMemory.plist" file and reboot.
+On my MacOS Tahoe system, I add the following data to the
+"/Library/LaunchDaemons/com.local.shmem.plist" file, then set it to root/wheel,
+with 644 perms.
 
----
+    <?xml version="1.0" encoding="UTF-8"?>
+    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+    <plist version="1.0">
+        <dict>
+            <key>Label</key>
+                <string>com.local.shmem</string>
+            <key>ProgramArguments</key>
+                <array>
+                    <string>/usr/local/bin/set-shm.sh</string>
+                </array>
 
-<?xml version="1.0" encoding="UTF-8"?>
+            <key>RunAtLoad</key>
+                <true/>
 
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd";>
+            <key>StandardOutPath</key>
+                <string>/var/log/com.local.shmem.out</string>
 
-<plist version="1.0">
-<dict>
- <key>Label</key>
- <string>shmemsetup</string>
- <key>UserName</key>
- <string>root</string>
- <key>GroupName</key>
- <string>wheel</string>
- <key>ProgramArguments</key>
- <array>
- <string>/usr/sbin/sysctl</string>
- <string>-w</string>
- <string>kern.sysv.shmmax=4194304</string>
- <string>kern.sysv.shmmni=32</string>
- <string>kern.sysv.shmseg=8</string>
- <string>kern.sysv.shmall=1024</string>
- <string>kern.sysv.shmmin=1</string>
- </array>
- <key>KeepAlive</key>
- <false/>
- <key>RunAtLoad</key>
- <true/>
-</dict>
-</plist>
+            <key>StandardErrorPath</key>
+                <string>/var/log/com.local.shmem.err</string>
+        </dict>
+    </plist>
+
+Then in /usr/local/bin/set-shm.sh, I have (with root:wheel, 755):
+
+    #!/bin/sh
+    /usr/sbin/sysctl -w kern.sysv.shmmni=128
+    /usr/sbin/sysctl -w kern.sysv.shmmax=4194304
+    /usr/sbin/sysctl -w kern.sysv.shmseg=256
+    /usr/sbin/sysctl -w kern.sysv.shmall=262144
+    /usr/sbin/sysctl -w kern.sysv.shmmin=1
+
+You can attempt to load it live time:
+
+    sudo launchctl kickstart -k system/com.local.shmem
+
+If you get a permissions error, you may have to disable System Integrity
+Protection:
+
+    - Shutdown
+    - Hold power button to power up and go into
+      Recovery->Options->Utilities->Terminal
+    - Run "csrutil disable"
+    - Reboot into normal mode
+    - Run "sudo launchctl kickstart -k system/com.local.shmem"
+    - If successful, reboot into recovery again, and:
+    - Run "csrutil enable"
+    - Reboot normally
+
+The SYSV settings should have taken now.

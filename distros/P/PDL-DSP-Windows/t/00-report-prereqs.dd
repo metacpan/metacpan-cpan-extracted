@@ -15,6 +15,11 @@ do { my $x = {
                                     }
                     },
        'runtime' => {
+                      'recommends' => {
+                                        'PDL::GSL::SF' => '0',
+                                        'PDL::Graphics::Simple' => '0',
+                                        'PDL::LinearAlgebra::Special' => '0'
+                                      },
                       'requires' => {
                                       'PDL' => '2.055',
                                       'perl' => '5.010'

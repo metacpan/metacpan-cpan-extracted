@@ -1,5 +1,9 @@
 Revision history for Perl module Crypt::SaltedHash
 
+0.12      2026-05-23 07:29:34+01:00 Europe/London
+    - Add reference to Crypt::Passphrase::SaltedHash
+    - Removed DOS line-endings
+
 0.11      2026-05-20 14:05:07+01:00 Europe/London
     - Fixed metadata
     - Moved author tests into xt

@@ -23,6 +23,9 @@ t/modules/Ex1.pm
 t/modules/Ex11.pm
 t/modules/Ex12.pm
 t/modules/Ex13.pm
+t/modules/Ex14.pm
+t/modules/Ex15.pm
+t/modules/Ex16.pm
 t/modules/Ex2.pm
 t/modules/Ex3.pm
 t/modules/Ex4.pm

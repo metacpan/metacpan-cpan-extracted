@@ -21,6 +21,7 @@ my @files = (
     'lib/eris/log.pm',
     'lib/eris/log/context/GeoIP.pm',
     'lib/eris/log/context/attacks/url.pm',
+    'lib/eris/log/context/caddy.pm',
     'lib/eris/log/context/crond.pm',
     'lib/eris/log/context/dhcpd.pm',
     'lib/eris/log/context/iptables.pm',

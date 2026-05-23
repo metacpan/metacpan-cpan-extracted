@@ -1,4 +1,8 @@
 Revision history for Perl extension File::Meta::Cache.
+v0.4.2 2026-05-23
+  [fixes]
+    - ensure a '0 but true' value from posix open is converted to a number
+
 v0.4.1 2026-03-10
   [fixes]
     - Return undef on opening a redirect file that does not exist

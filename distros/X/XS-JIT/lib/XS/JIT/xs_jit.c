@@ -669,12 +669,19 @@ int xs_jit_compile_file(pTHX_ const char *c_file, const char *so_file,
     if (!perl_lib_flag[0]) {
         snprintf(perl_lib_flag, sizeof(perl_lib_flag), "-lperl");
     }
+    /* IMPORTANT: extra_ldflags (which is where callers put -luring, -lz,
+       -lssl, -lcrypto, -lnghttp2, etc.) MUST come AFTER the object file.
+       Modern Linux toolchains default to --as-needed, which drops any -l
+       library listed before the objects that reference its symbols, so
+       putting them before the .o produces a .so with no DT_NEEDED entry
+       for the lib and `undefined symbol: io_uring_queue_init` (etc.) at
+       dlopen time. See Hypersonic CPAN Testers FAIL reports for 0.14. */
     snprintf(cmd, sizeof(cmd),
-             "%s %s %s -Wl,--export-all-symbols -o \"%s\" \"%s\" -L\"%s/CORE\" %s 2>&1",
-             cc, lddlflags, extra_ldflags, so_file, o_file, archlib, perl_lib_flag);
+             "%s %s -Wl,--export-all-symbols -o \"%s\" \"%s\" -L\"%s/CORE\" %s %s 2>&1",
+             cc, lddlflags, so_file, o_file, archlib, perl_lib_flag, extra_ldflags);
 #else
-    snprintf(cmd, sizeof(cmd), "%s %s %s -o \"%s\" \"%s\" 2>&1",
-             cc, lddlflags, extra_ldflags, so_file, o_file);
+    snprintf(cmd, sizeof(cmd), "%s %s -o \"%s\" \"%s\" %s 2>&1",
+             cc, lddlflags, so_file, o_file, extra_ldflags);
 #endif
 
     captured = NULL;
@@ -746,11 +753,16 @@ int xs_jit_load(pTHX_ const char *module_name, const char *so_file) {
         call_pv("DynaLoader::dl_error", G_SCALAR);
         SPAGAIN;
         SV *err = POPs;
-        warn("XS::JIT: dl_load_file failed: %s", SvPV_nolen(err));
+        /* Copy error before tearing down the scope. croak (not warn) so
+           callers can't silently continue with the boot xsub missing -
+           that path turns into "Undefined subroutine ..." much later and
+           is very hard to diagnose (see Hypersonic CPAN tester reports). */
+        char err_buf[1024];
+        snprintf(err_buf, sizeof(err_buf), "%s", SvPV_nolen(err));
         PUTBACK;
         FREETMPS;
         LEAVE;
-        return 0;
+        croak("XS::JIT: dl_load_file failed for %s: %s", so_file, err_buf);
     }
 
     /* dl_find_symbol for boot function */
@@ -838,13 +850,28 @@ int xs_jit_load(pTHX_ const char *module_name, const char *so_file) {
     return 1;
 }
 
-/* Check if any of the target functions are already defined */
+/* Check if ALL of the target functions are already defined.
+ *
+ * Returns 1 only when every requested target already has a CV installed.
+ * A previous version returned 1 as soon as ANY function matched, which
+ * caused a serious bug: if a caller passes a batch like
+ *
+ *     Hypersonic::_Server_42::dispatch        (new, NOT loaded yet)
+ *     Hypersonic::Stream::new                 (loaded earlier in process)
+ *
+ * the "any" check would short-circuit, skip the compile + boot, and leave
+ * Hypersonic::_Server_42::dispatch undefined. The caller would then die
+ * with "Undefined subroutine ::dispatch" deep inside its runtime. We now
+ * require ALL targets to already exist before claiming the batch is a
+ * no-op; otherwise we proceed with the real compile/load. */
 static int functions_already_loaded(pTHX_ XS_JIT_Func *functions, int num_functions) {
     int i;
+    int saw_any = 0;
     for (i = 0; i < num_functions && functions[i].target; i++) {
         /* Split target into package and function name */
         const char *target = functions[i].target;
         const char *last_colon = strrchr(target, ':');
+        int found = 0;
         if (last_colon && last_colon > target && *(last_colon - 1) == ':') {
             /* Extract package name */
             size_t pkg_len = last_colon - target - 1;
@@ -859,13 +886,14 @@ static int functions_already_loaded(pTHX_ XS_JIT_Func *functions, int num_functi
                 const char *func_name = last_colon + 1;
                 GV *gv = (GV*)hv_fetch(stash, func_name, strlen(func_name), 0);
                 if (gv && *(SV**)gv && GvCV(*(GV**)gv)) {
-                    /* Function already exists */
-                    return 1;
+                    found = 1;
                 }
             }
         }
+        if (!found) return 0;  /* at least one target missing - must compile */
+        saw_any = 1;
     }
-    return 0;
+    return saw_any;  /* all present (and we had at least one target) */
 }
 
 /* Main compile function */

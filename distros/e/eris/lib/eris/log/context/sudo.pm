@@ -8,7 +8,7 @@ with qw(
 );
 use namespace::autoclean;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 
 sub sample_messages {
@@ -35,7 +35,7 @@ sub contextualize_message {
 
     my %ctxt = ();
 
-    my ($user,$variables) = split ' : ', $str, 2;
+    my $user = (split ' : ', $str, 2)[0];
     foreach my $k (sort keys %MAP) {
         if( exists $sdata->{$k} ) {
             $ctxt{$MAP{$k}} = $sdata->{$k};
@@ -57,19 +57,27 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 eris::log::context::sudo - Parses the sudo key=value pairs into structured documents
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
 Translates the sudo syslog lines containing "key=value" to structured documents.
+
+=head1 CONSUMES
+
+=over 4
+
+=item * L<eris::role::context>
+
+=item * L<eris::role::plugin>
+
+=back
 
 =head1 METHODS
 

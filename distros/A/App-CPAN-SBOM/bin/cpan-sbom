@@ -28,13 +28,13 @@ cpan-sbom - CPAN SBOM (Software Bill of Materials) generator
     cpan-sbom [--help|--man|-v]
 
     Options:
-      -o, --output                          Output file. Default bom.json 
+      -o, --output OUTPUT-FILE              Output file. Default bom.json 
 
           --distribution NAME@VERSION       Distribution name and version
-          --meta                            META or MYMETA file
+          --meta META-FILE                  META or MYMETA file
 
           --project-directory NAME          Project directory
-          --project-meta                    Project META or MYMETA file (alias of --meta)
+          --project-meta META-FILE          Project META or MYMETA file (alias of --meta)
           --project-type BOM-TYPE           Project type (default: library)
           --project-name NAME               Project name (default: project directory name)
           --project-version VERSION         Project version
@@ -50,6 +50,7 @@ cpan-sbom - CPAN SBOM (Software Bill of Materials) generator
           --no-validate
 
           --list-spdx-licenses              List SPDX licenses
+          --cyclonedx-spec-version VERSION  CycloneDX Specification version to use (default: 1.5)
 
           --debug                           Enable debug messages
 

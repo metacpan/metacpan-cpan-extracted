@@ -7,7 +7,7 @@ use PDL;
 use PDL::DSP::Windows qw( window chebpoly ) ;
 
 my $HAVE_LinearAlgebra = eval { require PDL::LinearAlgebra::Special };
-my $HAVE_BESSEL        = eval { require PDL::GSLSF::BESSEL };
+my $HAVE_BESSEL        = eval { require PDL::GSL::SF };
 
 use lib 't/lib';
 use MyTest::Helper qw( dies is_approx );
@@ -67,7 +67,7 @@ subtest 'explict values of windows.' => sub {
         6;
 
     SKIP: {
-        skip 'PDL::GSLSF::BESSEL not installed', 1 unless $HAVE_BESSEL;
+        skip 'PDL::GSL::SF not installed', 1 unless $HAVE_BESSEL;
         is_approx
             window( 6, 'kaiser', 0.5 / 3.1415926 ),
             [ 0.94030619, 0.97829624, 0.9975765, 0.9975765, 0.97829624, 0.94030619 ],
@@ -151,7 +151,7 @@ subtest 'enbw of windows.' => sub {
     }
 
     SKIP: {
-        skip 'PDL::GSLSF::BESSEL not installed', 1 unless $HAVE_BESSEL;
+        skip 'PDL::GSL::SF not installed', 1 unless $HAVE_BESSEL;
         is_approx
             $win->init( $Nbw, 'kaiser', 8.6 / 3.1415926 )->enbw,
             1.72147863,
@@ -210,7 +210,7 @@ subtest 'scalloping loss of windows.' => sub {
     }
 
     SKIP: {
-        skip 'PDL::GSLSF::BESSEL not installed', 3 unless $HAVE_BESSEL;
+        skip 'PDL::GSL::SF not installed', 3 unless $HAVE_BESSEL;
         is_approx $win->init( 1000, 'kaiser', 0.5 )->scallop_loss, -3.31, 'kaiser 0.5', 3;
         is_approx $win->init( 1000, 'kaiser', 1.0 )->scallop_loss, -2.42, 'kaiser 1.0', 3;
         is_approx $win->init( 1000, 'kaiser', 5.0 )->scallop_loss, -1.05, 'kaiser 5.0', 3;
@@ -263,7 +263,7 @@ subtest 'relation between periodic and symmetric.' => sub {
 
         for my $name ( keys %tests ) {
             SKIP: {
-                skip 'PDL::GSLSF::BESSEL not installed', 1
+                skip 'PDL::GSL::SF not installed', 1
                     if $name eq 'kaiser' and not $HAVE_BESSEL;
 
                 skip 'PDL::LinearAlgebra::Special not installed', 1

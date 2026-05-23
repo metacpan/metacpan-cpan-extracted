@@ -9,15 +9,15 @@ use warnings;
 use parent qw/ Class::Accessor::Fast /;
 
 use Carp ();
-use IO::Socket 1.18 ();
+use IO::Socket::IP qw( SOCK_DGRAM );
 use Socket 2.026 ();
 
-our $VERSION = 'v0.4.0';
+our $VERSION = 'v0.4.1';
 
 
 __PACKAGE__->mk_ro_accessors(
     qw/ host port proto prefix
-      autoflush max_buffer_size _socket /
+      autoflush max_buffer_size socket /
 );
 
 sub new {
@@ -46,13 +46,14 @@ sub new {
     }
 
     if ( my $socket = delete $args{socket} ) {
-        $args{_socket} = $socket;
+        $args{socket} = $socket;
     }
     else {
-        $args{_socket} = IO::Socket::INET->new(
-            PeerAddr => $args{host},
-            PeerPort => $args{port},
-            Proto    => $args{proto},
+        $args{socket} = IO::Socket::IP->new(
+            PeerHost    => $args{host},
+            PeerService => $args{port},
+            Proto       => $args{proto},
+            Type        => SOCK_DGRAM,
         ) or die "Failed to initialize socket: $!";
     }
 
@@ -126,7 +127,7 @@ sub _record {
     my $data = $self->prefix . $metric . ':' . $value . $suffix . "\n";
 
     if ( $self->autoflush ) {
-        $self->_socket->send( $data, 0 );
+        $self->socket->send( $data, 0 );
         return;
     }
 
@@ -142,7 +143,7 @@ sub flush {
     my ($self) = @_;
 
     if ( length($self->{_buffer}) ) {
-        send( $self->_socket, $self->{_buffer}, 0 );
+        $self->socket->send( $self->{_buffer}, 0 );
         $self->{_buffer} = '';
     }
 }
@@ -164,7 +165,7 @@ __END__
 
 =encoding UTF-8
 
-=for stopwords UDP multimetric compatability StatsD statsd
+=for stopwords UDP multimetric compatability StatsD statsd proto
 
 =head1 NAME
 
@@ -172,7 +173,7 @@ Net::Statsd::Tiny - A tiny StatsD client that supports multimetric packets
 
 =head1 VERSION
 
-version v0.4.0
+version v0.4.1
 
 =head1 SYNOPSIS
 
@@ -223,21 +224,21 @@ some daemons may ignore or reject this.
 
 =head1 ATTRIBUTES
 
-=head2 C<host>
+=head2 host
 
 The host of the statsd daemon. It defaults to C<127.0.0.1>.
 
-=head2 C<port>
+=head2 port
 
 The port that the statsd daemon is listening on. It defaults to
 C<8125>.
 
-=head2 C<proto>
+=head2 proto
 
 The network protocol that the statsd daemon is using. It defaults to
 C<udp>.
 
-=head2 C<socket>
+=head2 socket
 
 Alternatively, you can pass an L<IO::Socket> instead of the L</host>, L</port> and L</protocol>.
 
@@ -245,11 +246,11 @@ This will override other settings.
 
 Added in v0.4.0.
 
-=head2 C<prefix>
+=head2 prefix
 
 The prefix to prepend to metric names. It defaults to a blank string.
 
-=head2 C<autoflush>
+=head2 autoflush
 
 A flag indicating whether metrics will be send immediately. It
 defaults to true.
@@ -263,13 +264,13 @@ regularly at the end of each task (e.g. a website request or job).
 Not all StatsD daemons support receiving multiple metrics in a single
 packet.
 
-=head2 C<max_buffer_size>
+=head2 max_buffer_size
 
 Specifies the maximum buffer size. It defaults to C<512>.
 
 =head1 METHODS
 
-=head2 C<counter>
+=head2 counter
 
   $stats->counter( $metric, $value, $rate );
 
@@ -279,12 +280,12 @@ name.
 If a C<$rate> is specified and less than 1, then a sampling rate will
 be added. C<$rate> must be between 0 and 1.
 
-=head2 C<update>
+=head2 update
 
 This is an alias for L</counter>, for compatability with
 L<Etsy::StatsD> or L<Net::Statsd::Client>.
 
-=head2 C<increment>
+=head2 increment
 
   $stats->increment( $metric, $rate );
 
@@ -292,7 +293,7 @@ This is an alias for
 
   $stats->counter( $metric, 1, $rate );
 
-=head2 C<decrement>
+=head2 decrement
 
   $stats->decrement( $metric, $rate );
 
@@ -300,7 +301,7 @@ This is an alias for
 
   $stats->counter( $metric, -1, $rate );
 
-=head2 C<metric>
+=head2 metric
 
   $stats->metric( $metric, $value );
 
@@ -309,7 +310,7 @@ is appropriate for counters that will never decrease (e.g. the number
 of requests processed.)  However, this metric type is not supported by
 many StatsD daemons.
 
-=head2 C<gauge>
+=head2 gauge
 
   $stats->gauge( $metric, $value );
 
@@ -321,7 +322,7 @@ is prefixed by a "+", then the gauge is incremented by that amount,
 and if the number is prefixed by a "-", then the gauge is decremented
 by that amount.
 
-=head2 C<timing>
+=head2 timing
 
   $stats->timing( $metric, $value, $rate );
 
@@ -337,12 +338,12 @@ If a C<$rate> is specified and less than 1, then a sampling rate will
 be added. C<$rate> must be between 0 and 1.  Note that sampling
 rates for timings may not be supported by all statsd servers.
 
-=head2 C<timing_ms>
+=head2 timing_ms
 
 This is an alias for L</timing>, for compatability with
 L<Net::Statsd::Client>.
 
-=head2 C<histogram>
+=head2 histogram
 
   $stats->histogram( $metric, $value );
 
@@ -350,14 +351,14 @@ This logs a value so that statistics about the metric can be
 gathered. The C<$value> must be a positive number, although the
 specification recommends that integers be used.
 
-=head2 C<set_add>
+=head2 set_add
 
   $stats->set_add( $metric, $string );
 
 This adds the the C<$string> to a set, for logging the number of
 unique things, e.g. IP addresses or usernames.
 
-=head2 C<flush>
+=head2 flush
 
 This sends the buffer to the L</host> and empties the buffer, if there
 is any data in the buffer.
@@ -370,7 +371,7 @@ When using the L</set_add> method, be wary of exposing sensitive information lik
 
     ...
 
-    $tats->set_key( "myapp.sessions", hmac_sha1( $session->id, $my_secret_key );
+    $stats->set_key( "myapp.sessions", hmac_sha1( $session->id, $my_secret_key );
 
 Note that the keys should be consistent across worker processes and hosts.
 

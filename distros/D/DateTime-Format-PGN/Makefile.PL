@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
     "Chess::PGN::Parse" => "0.20",
     "Test::More" => "1.001014"
   },
-  "VERSION" => "1.01",
+  "VERSION" => "1.02",
   "test" => {
     "TESTS" => "t/*.t"
   }

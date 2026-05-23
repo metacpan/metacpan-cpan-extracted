@@ -20,7 +20,7 @@ use Term::ReadKey;
 use Term::ReadLine;
 use YAML::XS ();
 
-our $VERSION = '2.2'; # VERSION
+our $VERSION = '2.3'; # VERSION
 
 # Capture ARGV at Load
 my @ORIG_ARGS;
@@ -190,7 +190,7 @@ sub _open_data_file {
         1;
     } or do {
         my $error = $@;
-        output({color=>'red',stderr=>1}, "Attempted to write to $data_file failed: $!");
+        output({color=>'red',stderr=>1}, "Attempted to write to $data_file failed: $error");
     };
 }
 
@@ -741,7 +741,7 @@ CLI::Helpers - Subroutines for making simple command line scripts
 
 =head1 VERSION
 
-version 2.2
+version 2.3
 
 =head1 SYNOPSIS
 
@@ -1283,11 +1283,11 @@ L<http://matrix.cpantesters.org/?dist=CLI-Helpers>
 
 =head2 Bugs / Feature Requests
 
-This module uses the GitHub Issue Tracker: L<https://github.com/reyjrar/CLI-Helpers/issues>
+To report bugs, please visit: L<https://codeberg.org/reyjrar/p5-CLI-Helpers/issues>
 
 =head2 Source Code
 
 This module's source code is available by visiting:
-L<https://github.com/reyjrar/CLI-Helpers>
+L<https://codeberg.org/reyjrar/p5-CLI-Helpers>
 
 =cut

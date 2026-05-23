@@ -1,3 +1,4 @@
+requires 'base'       => '0';
 requires 'Data::Page' => '2.02';
  
 on 'test' => sub {

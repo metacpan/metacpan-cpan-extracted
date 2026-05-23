@@ -3,6 +3,7 @@ package Crypt::PasswdMD5;
 use strict;
 use warnings;
 
+use Crypt::URandom qw(urandom);
 use Digest::MD5;
 use Encode;
 
@@ -10,7 +11,7 @@ use Exporter 'import';
 
 our @EXPORT		= qw/unix_md5_crypt apache_md5_crypt/;
 our @EXPORT_OK	= (@EXPORT, 'random_md5_salt');
-our $VERSION	= '1.42';
+our $VERSION	= '1.43';
 
 # ------------------------------------------------
 
@@ -40,7 +41,7 @@ sub random_md5_salt
 	# Sanity check.
 
 	$len  = $max_salt_length unless ( ($len >= 1) and ($len <= $max_salt_length) );
-	$salt .= substr($itoa64,int(rand(64)),1) for (1..$len);
+	$salt .= substr($itoa64,unpack("C",urandom(1))&0x3F,1) for (1..$len);
 
 	return $salt;
 

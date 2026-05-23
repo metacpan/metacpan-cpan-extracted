@@ -2,6 +2,10 @@ package PAGI::Context;
 
 use strict;
 use warnings;
+use Carp qw(croak);
+use Scalar::Util qw(blessed);
+use Future::AsyncAwait;
+use Future;
 
 =head1 NAME
 
@@ -10,33 +14,91 @@ PAGI::Context - Per-request context with protocol-specific subclasses
 =head1 SYNOPSIS
 
     use PAGI::Context;
+    use Future::AsyncAwait;
 
     # Factory returns the right subclass based on scope type
     my $ctx = PAGI::Context->new($scope, $receive, $send);
 
     # Shared methods (all protocol types)
-    my $type = $ctx->type;        # 'http', 'websocket', 'sse'
-    my $path = $ctx->path;
-    my $stash = $ctx->stash;      # PAGI::Stash
-    my $session = $ctx->session;  # PAGI::Session
+    my $type  = $ctx->type;        # 'http', 'websocket', 'sse'
+    my $path  = $ctx->path;
+    my $stash = $ctx->stash;       # PAGI::Stash
+    my $session = $ctx->session;   # PAGI::Session
 
-    # Protocol-specific (only on the appropriate subclass)
-    my $req = $ctx->request;      # HTTP only
-    my $res = $ctx->response;     # HTTP only
-    my $ws  = $ctx->websocket;    # WebSocket only
-    my $sse = $ctx->sse;          # SSE only
+    # WebSocket context - protocol ops directly on $ctx
+    await $ctx->accept;
+    await $ctx->send_json({ msg => 'hello' });
+    my $text = await $ctx->receive_text;
+    await $ctx->close;
+
+    # SSE context - same idea
+    await $ctx->send_event(event => 'update', data => $payload);
+    await $ctx->keepalive(25);
+
+    # Event dispatcher - works on any protocol type
+    my $reason = await $ctx
+        ->on('websocket.receive', async sub { ... })
+        ->on('chat.message',      async sub { ... })
+        ->on_error(sub { ... })
+        ->run;    # returns 'disconnect', 'stop', or 'error'
+
+    # Underlying protocol objects still available
+    my $ws  = $ctx->websocket;     # PAGI::WebSocket (WS only)
+    my $sse = $ctx->sse;           # PAGI::SSE (SSE only)
+    my $req = $ctx->request;       # PAGI::Request (HTTP only)
+    my $res = $ctx->response;      # PAGI::Response (HTTP only)
 
 =head1 DESCRIPTION
 
 PAGI::Context is a factory and base class that provides a unified entry
-point for per-request context. Calling C<< PAGI::Context->new(...) >>
+point for per-request context.  Calling C<< PAGI::Context->new(...) >>
 inspects C<< $scope->{type} >> and returns the appropriate subclass:
 L<PAGI::Context::HTTP>, L<PAGI::Context::WebSocket>, or
 L<PAGI::Context::SSE>.
 
-Shared methods (scope accessors, stash, session, connection state) live
-on the base class. Protocol-specific methods (request/response, websocket,
-sse) live on subclasses and simply do not exist on other protocol types.
+Shared methods (scope accessors, stash, session, event dispatcher) live
+on the base class.  Protocol-specific methods are delegated from
+subclasses so you can use C<$ctx> as your single object:
+
+    # Instead of:
+    my $ws = $ctx->websocket;
+    await $ws->send_json($data);    # closes over $ws in every handler
+
+    # Just do:
+    await $ctx->send_json($data);   # $ctx is already in scope
+
+=head2 Protocol Shape
+
+Each context type has a different set of available methods.  Calling a
+method that belongs to a different protocol type raises a standard Perl
+C<Can't locate object method> error.
+
+    Method              HTTP    WebSocket   SSE
+    ──────────────────  ──────  ──────────  ──────
+    request, response   yes     -           -
+    method              yes     -           -
+    accept              -       yes         -
+    send_text           -       yes         -
+    send_bytes          -       yes         -
+    send_json           -       yes         yes
+    send                -       -           yes
+    send_event          -       -           yes
+    send_comment        -       -           yes
+    start               -       -           yes
+    close               -       yes         yes
+    query / query_param -       yes(query)  yes(query_param)
+    is_connected        base*   WS override -
+    is_closed           -       yes         yes
+    is_started          -       -           yes
+    keepalive           -       yes         yes
+    each_text, etc.     -       yes         -
+    each, every         -       -           yes
+
+    *is_connected on WebSocket contexts checks WS handshake state,
+     not the TCP-level pagi.connection that the base class uses.
+
+See L<PAGI::Context::WebSocket> and L<PAGI::Context::SSE> for the
+full method reference on each subclass.
 
 =head1 EXTENSIBILITY
 
@@ -275,7 +337,7 @@ Returns true if session middleware has populated C<< $scope->{'pagi.session'} >>
 
     my $state = $ctx->state;   # hashref
 
-Returns C<< $scope->{state} >> — the app/endpoint-level shared state.
+Returns C<< $scope->{state} >> - the app/endpoint-level shared state.
 
 =cut
 
@@ -348,6 +410,226 @@ sub on_disconnect {
     $conn->on_disconnect($cb);
 }
 
+=head1 EVENT DISPATCHER
+
+The event dispatcher provides a generic, protocol-agnostic way to handle
+PAGI events.  It is most useful when the receive stream carries a mix of
+protocol events and application-level events injected by middleware such
+as C<PAGI::Middleware::Channels>.
+
+    my $ctx = PAGI::Context->new($scope, $receive, $send);
+
+    $ctx->on('websocket.receive', async sub {
+        my ($ctx, $event) = @_;
+        my $text = $event->{text} // '';
+        await $ctx->send->({ type => 'websocket.send', text => "echo: $text" });
+    });
+
+    $ctx->on('chat.message', async sub {
+        my ($ctx, $event) = @_;
+        # handle a channel-injected event
+    });
+
+    $ctx->on_error(sub {
+        my ($ctx, $error, $source) = @_;
+        warn "[$source] $error";
+    });
+
+    my $reason = await $ctx->run;   # 'disconnect', 'stop', or 'error'
+
+=head2 on
+
+    $ctx->on($event_type, $callback);   # returns $ctx
+
+Register a handler for a raw PAGI event type string.  Multiple handlers
+may be registered for the same type; they are called in registration order.
+Handlers receive C<($ctx, $event)>.  Handlers may be plain coderefs or
+C<async sub>s; if a handler returns a L<Future>, C<run()> awaits it before
+continuing.
+
+Returns C<$ctx> for chaining.
+
+=head2 on_error
+
+    $ctx->on_error($callback);   # returns $ctx
+
+Register an error callback.  It is called when C<$receive-E<gt>()> fails
+(C<$source = 'receive'>) or when a registered handler throws (C<$source =
+'handler'>).  Callbacks receive C<($ctx, $error, $source)>.
+
+Multiple callbacks may be registered and are called in order.  Callbacks
+may be C<async sub>s; if a callback returns a L<Future>, it is awaited.
+If no callbacks are registered, errors are emitted via C<warn>.
+
+Returns C<$ctx> for chaining.
+
+    # Avoid circular references - weaken if the callback closes over $ctx
+    use Scalar::Util qw(weaken);
+    my $weak = $ctx;
+    weaken $weak;
+    $ctx->on_error(sub { my ($ctx, $err, $src) = @_; warn "[$src] $err" });
+
+=head2 stop
+
+    $ctx->stop;   # returns $ctx
+
+Signal the C<run()> loop to exit cleanly after the current handler
+finishes.  C<run()> will resolve with reason C<'stop'>.
+
+Returns C<$ctx> for chaining.
+
+=head2 run
+
+    my $reason = await $ctx->run;
+
+Start the event dispatch loop.  Reads events from the receive stream and
+dispatches each to registered handlers.  The loop runs until one of:
+
+=over 4
+
+=item * The protocol's terminal disconnect event arrives (C<websocket.disconnect>,
+C<sse.disconnect>, C<http.disconnect>) - resolves with C<'disconnect'>
+
+=item * C<stop()> was called - resolves with C<'stop'>
+
+=item * C<$receive-E<gt>()> fails - fires C<on_error> callbacks and resolves
+with C<'error'>
+
+=back
+
+C<run()> always resolves successfully (never rejects).  The caller does
+not need to C<catch> it.
+
+Calling C<run()> a second time while already running throws synchronously.
+
+When run() resolves, all registered handlers and error callbacks are
+cleared to break closure-based reference cycles.
+
+=cut
+
+# ---------------------------------------------------------------------------
+# Event dispatcher - on(), on_error(), stop(), run()
+# ---------------------------------------------------------------------------
+
+# Terminal event type by scope type (websocket.*, sse.*, http.* are reserved)
+my %_TERMINAL = (
+    websocket => 'websocket.disconnect',
+    sse       => 'sse.disconnect',
+    http      => 'http.disconnect',
+);
+
+sub _terminal_event_type {
+    my ($self) = @_;
+    return $_TERMINAL{ $self->type // '' };
+}
+
+# Register a handler for a raw PAGI event type string.
+# Returns $self for chaining.
+sub on {
+    my ($self, $type, $cb) = @_;
+    push @{ $self->{_handlers}{$type} }, $cb;
+    return $self;
+}
+
+# Register an error handler. Called for both $receive->() failures
+# (source='receive') and handler exceptions (source='handler').
+# Returns $self for chaining.
+sub on_error {
+    my ($self, $cb) = @_;
+    push @{ $self->{_on_error} }, $cb;
+    return $self;
+}
+
+# Signal the run() loop to exit after the current handler finishes.
+sub stop {
+    my ($self) = @_;
+    $self->{_stopped} = 1;
+    return $self;
+}
+
+# Internal: fire error callbacks with ($ctx, $error, $source).
+async sub _trigger_ctx_error {
+    my ($self, $error, $source) = @_;
+
+    for my $cb (@{ $self->{_on_error} }) {
+        eval {
+            my $r = $cb->($self, $error, $source);
+            if (blessed($r) && $r->isa('Future')) {
+                await $r;
+            }
+        };
+        if ($@) {
+            warn "PAGI::Context on_error callback error: $@";
+        }
+    }
+
+    if (!@{ $self->{_on_error} }) {
+        warn "PAGI::Context error ($source): $error";
+    }
+}
+
+# Run the event dispatch loop.
+# Always resolves (never rejects). Returns reason: 'disconnect', 'stop', 'error'.
+async sub run {
+    my ($self) = @_;
+
+    croak "PAGI::Context run() called while already running"
+        if $self->{_running};
+
+    $self->{_running} = 1;
+    $self->{_stopped} = 0;
+    $self->{_on_error} //= [];
+
+    my $reason   = 'stop';
+    my $terminal = $self->_terminal_event_type;
+
+    LOOP: while (!$self->{_stopped}) {
+        my $event = eval { await $self->{receive}->() };
+        if (my $err = $@) {
+            await $self->_trigger_ctx_error($err, 'receive');
+            $reason = 'error';
+            last LOOP;
+        }
+
+        my $type = $event->{type} // '';
+
+        # Snapshot before iterating - on() calls from inside a handler
+        # must not affect the current iteration.
+        my @handlers = @{ $self->{_handlers}{$type} // [] };
+
+        if (@handlers) {
+            for my $cb (@handlers) {
+                eval {
+                    my $r = $cb->($self, $event);
+                    if (blessed($r) && $r->isa('Future')) {
+                        await $r;
+                    }
+                };
+                if (my $err = $@) {
+                    await $self->_trigger_ctx_error($err, 'handler');
+                }
+            }
+        } elsif ($ENV{PAGI_DEBUG} && !($terminal && $type eq $terminal)) {
+            warn "PAGI::Context: unhandled event type '$type'\n";
+        }
+
+        if ($terminal && $type eq $terminal) {
+            $reason = 'disconnect';
+            last LOOP;
+        }
+    }
+
+    $reason = 'stop' if $self->{_stopped} && $reason eq 'stop';
+
+    # Clear callbacks to break any closure-based reference cycles.
+    $self->{_handlers} = {};
+    $self->{_on_error} = [];
+    $self->{_running}  = 0;
+    $self->{_stopped}  = 0;
+
+    return $reason;
+}
+
 # Load subclasses
 require PAGI::Context::HTTP;
 require PAGI::Context::WebSocket;
@@ -359,7 +641,18 @@ __END__
 
 =head1 SEE ALSO
 
-L<PAGI::Context::HTTP>, L<PAGI::Context::WebSocket>, L<PAGI::Context::SSE>,
+B<Protocol subclasses> (full method reference for each protocol):
+
+L<PAGI::Context::HTTP>, L<PAGI::Context::WebSocket>, L<PAGI::Context::SSE>
+
+B<Underlying protocol objects> (standalone use, or direct access via
+C<< $ctx->websocket >>, C<< $ctx->sse >>, C<< $ctx->request >>,
+C<< $ctx->response >>):
+
+L<PAGI::WebSocket>, L<PAGI::SSE>, L<PAGI::Request>, L<PAGI::Response>
+
+B<Shared services>:
+
 L<PAGI::Stash>, L<PAGI::Session>
 
 =cut

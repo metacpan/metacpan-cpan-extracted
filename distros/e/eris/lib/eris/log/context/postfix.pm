@@ -9,7 +9,7 @@ with qw(
     eris::role::context
 );
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 
 sub _build_matcher { qr/^postfix/ }
@@ -97,19 +97,27 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 eris::log::context::postfix - Parses postfix messages into structured data
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
 Parses postfix messages to extract relevant and interesting data.
+
+=head1 CONSUMES
+
+=over 4
+
+=item * L<eris::role::context>
+
+=item * L<eris::role::plugin>
+
+=back
 
 =head1 ATTRIBUTES
 

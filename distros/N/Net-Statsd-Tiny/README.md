@@ -48,10 +48,16 @@ some daemons may ignore or reject this.
 
 # RECENT CHANGES
 
-Changes for version v0.4.0 (2026-05-21)
+Changes for version v0.4.1 (2026-05-23)
 
 - Enhancements
-    - A socket can be passed directly to the constructor.
+    - Use IO::Socket::IP instead of IO::Socket::INET.
+    - The socket attribute is public.
+- Bug Fixes
+    - Fixed flush method for alternative sockets.
+- Documentation
+    - Fixed typos.
+    - Fixed inconsistent markup.
 
 See the `Changes` file for more details.
 
@@ -61,7 +67,7 @@ This module lists the following modules as runtime dependencies:
 
 - [Carp](https://metacpan.org/pod/Carp)
 - [Class::Accessor::Fast](https://metacpan.org/pod/Class%3A%3AAccessor%3A%3AFast)
-- [IO::Socket](https://metacpan.org/pod/IO%3A%3ASocket) version 1.18 or later
+- [IO::Socket::IP](https://metacpan.org/pod/IO%3A%3ASocket%3A%3AIP)
 - [Socket](https://metacpan.org/pod/Socket) version 2.026 or later
 - [parent](https://metacpan.org/pod/parent)
 - [perl](https://metacpan.org/pod/perl) version v5.12.0 or later
@@ -112,7 +118,7 @@ use Digest::SHA qw/ hmac_sha1 /;
 
 ...
 
-$tats->set_key( "myapp.sessions", hmac_sha1( $session->id, $my_secret_key );
+$stats->set_key( "myapp.sessions", hmac_sha1( $session->id, $my_secret_key );
 ```
 
 Note that the keys should be consistent across worker processes and hosts.

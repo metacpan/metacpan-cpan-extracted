@@ -4,7 +4,7 @@ use warnings;
 use English qw(-no_match_vars);
 use File::Object;
 use Pod::Example qw(get);
-use Test::More 'tests' => 22;
+use Test::More 'tests' => 28;
 use Test::NoWarnings;
 
 # Load module.
@@ -69,6 +69,36 @@ is($ret, $right_ret, 'Example as EXAMPLE2 with explicit example section '.
 	'and number.');
 
 # Test.
+$ret = get($modules_dir->file('Ex16.pm')->s);
+$right_ret = <<'END';
+use strict;
+use warnings;
+
+# Print.
+print "Foo.\n";
+END
+chomp $right_ret;
+is($ret, $right_ret, 'Example from EXAMPLE1 subsection in EXAMPLES.');
+
+# Test.
+$ret = get($modules_dir->file('Ex16.pm')->s, 'EXAMPLE', 1);
+is($ret, $right_ret, 'Example from EXAMPLE1 subsection in EXAMPLES with '.
+	'number.');
+
+# Test.
+$ret = get($modules_dir->file('Ex16.pm')->s, 'EXAMPLE', 2);
+$right_ret = <<'END';
+use strict;
+use warnings;
+
+# Print.
+print "Bar.\n";
+END
+chomp $right_ret;
+is($ret, $right_ret, 'Example from EXAMPLE2 subsection in EXAMPLES with '.
+	'number.');
+
+# Test.
 $ret = get($modules_dir->file('Ex5.pm')->s);
 $right_ret = <<'END';
 use strict;
@@ -123,21 +153,39 @@ $right_ret = <<'END';
 use strict;
 use warnings;
 
-# Print.
-print "Foo.\n";
-
 #   +-------------+
 #   |  foo        |
 #   |        bar  |
 #   +-------------+
 #
 # ^^^^ Figure 1. ^^^^
+
+# Print.
+print "Foo.\n";
 END
 chomp $right_ret;
 is($ret, $right_ret, 'Example with inner text code.');
 
 # Test.
-($ret, my $example_file) = get($modules_dir->file('Ex11.pm')->s);
+$ret = get($modules_dir->file('Ex14.pm')->s);
+$right_ret = <<'END';
+use strict;
+use warnings;
+
+# Print.
+print "Foo.\n";
+END
+chomp $right_ret;
+is($ret, $right_ret, 'Example with skipped for html paragraph.');
+
+# Test.
+my $example_file;
+($ret, $example_file) = get($modules_dir->file('Ex15.pm')->s);
+is($ret, $right_ret, 'Example with skipped late filename comment.');
+is($example_file, undef, 'Skip filename comment after example code.');
+
+# Test.
+($ret, $example_file) = get($modules_dir->file('Ex11.pm')->s);
 $right_ret = <<'END';
 use strict;
 use warnings;

@@ -1,5 +1,22 @@
 Revision history for Test::Returns
 
+0.03	Fri May 22 20:17:13 EDT 2026
+
+	[ Enhancements ]
+	- Accept type => 'array' as a synonym for type => 'arrayref' in returns_is/returns_ok,
+		since Params::Validate::Strict has no bare-array type (a Perl array cannot be stored
+		as a hash value).  Callers capture list-returning functions as an arrayref and may
+		now use type => 'array' to validate them.
+	- Schema keys prefixed with _ (as emitted by App::Test::Generator) are documented as
+		being passed through unchanged; Params::Validate::Strict ignores unknown rule keys.
+	- Clearer diagnostic when type => 'array' is given but a non-reference value is
+		received, guiding the caller to capture a list return as an arrayref.
+
+	[ Bug Fixes ]
+	- Apply the same type => 'array' normalisation in returns_isnt/returns_not_ok;
+		previously a valid arrayref was wrongly accepted as failing when type => 'array'
+		was specified, because the unknown-type croak was mistaken for a validation failure.
+
 0.02	Mon Sep 29 14:09:15 EDT 2025
 	Better handling of an undef returned value
 

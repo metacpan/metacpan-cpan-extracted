@@ -38,12 +38,14 @@
             "MIME::Base64" : "0",
             "MetaCPAN::Client" : "0",
             "SBOM::CycloneDX" : "0",
-            "URI::PackageURL" : "2.22",
+            "URI::PackageURL" : "2.25",
             "perl" : "5.016"
          }
       },
       "test" : {
          "requires" : {
+            "File::Temp" : "0",
+            "Test::File" : "0",
             "Test::More" : "0"
          }
       }
@@ -59,7 +61,7 @@
          "web" : "https://github.com/giterlizzi/perl-App-CPAN-SBOM"
       }
    },
-   "version" : "1.03",
-   "x_purl" : "pkg:cpan/GDT/App-CPAN-SBOM",
+   "version" : "1.04",
+   "x_purl" : "pkg:cpan/App-CPAN-SBOM",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

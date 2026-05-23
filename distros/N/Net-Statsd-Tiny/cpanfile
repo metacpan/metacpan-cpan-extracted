@@ -3,7 +3,7 @@
 
 requires "Carp" => "0";
 requires "Class::Accessor::Fast" => "0";
-requires "IO::Socket" => "1.18";
+requires "IO::Socket::IP" => "0";
 requires "Socket" => "2.026";
 requires "parent" => "0";
 requires "perl" => "v5.12.0";
@@ -20,6 +20,7 @@ on 'test' => sub {
   requires "File::Spec" => "0";
   requires "IO::Handle" => "0";
   requires "IO::Select" => "0";
+  requires "IO::Socket" => "0";
   requires "IPC::Open3" => "0";
   requires "Module::Metadata" => "1.000015";
   requires "Net::EmptyPort" => "0";

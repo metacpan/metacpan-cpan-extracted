@@ -1,20 +1,35 @@
 Revision history for Genealogy::Relationship::Name
 
+0.03	Thu May 21 21:45:41 EDT 2026
+
+	[Enhancements]
+	- Expanded all relationship tables from 0-6 to 0-10 (ninth cousin coverage)
+	- Added Spanish (es), Farsi (fa), and Classical Latin (la) language tables
+	  Latin table is sparse; only step-count pairs with a classical term are tabulated
+	- Added family_side argument to name() for paternal/maternal distinction
+	  (currently used by la and fa uncle/aunt/cousin terms)
+	- Added Swiss German (de-CH) table using ss instead of Eszett
+
+	[Bug Fixes]
+	- Fixed some French translations
+	- Removed duplicate PVS entry in Makefile.PL
+		Fixes https://www.cpantesters.org/cpan/report/d9cdf8d6-51ee-11f1-87b3-361a6e8775ea
+
 0.02	Fri May 15 20:25:51 EDT 2026
 
-  [Enhancements]
-
-  - Added logger arg to new(): accepts a Log::Abstraction object for better logging
-  - name() gains optional person arg (Log::Abstraction object); explicit
-    undef on required args now routes through logger->error() if set,
-    otherwise croaks with "$arg not given"
-  - Removed on_error coderef interface (superseded by Log::Abstraction)
-  - Removed internal _error() helper (no longer needed)
-  - Added full POD for new() including API spec and Z-calculus formal spec
-  - Object::Configure stash/restore pattern documented in new() POD
+	[Enhancements]
+	- Added logger arg to new(): accepts a Log::Abstraction object for better logging
+	- name() gains optional person arg (Log::Abstraction object); explicit
+	undef on required args now routes through logger->error() if set,
+	otherwise croaks with "$arg not given"
+	- Removed on_error coderef interface (superseded by Log::Abstraction)
+	- Removed internal _error() helper (no longer needed)
+	- Added full POD for new() including API spec and Z-calculus formal spec
+	- Object::Configure stash/restore pattern documented in new() POD
 
 0.01	Thu May 14 14:02:44 EDT 2026
-      - Initial release; extracted en/fr/de relationship tables from gedcom/ged2site
-      - Added name(), supported_languages(), known_sexes() public methods
-      - Full POD, Params::Get/Params::Validate::Strict, Readonly constants
-      - Test suite: function.t, unit.t, integration.t, edge_cases.t, extended_tests.t
+
+	- Initial release; extracted en/fr/de relationship tables from gedcom/ged2site
+	- Added name(), supported_languages(), known_sexes() public methods
+	- Full POD, Params::Get/Params::Validate::Strict, Readonly constants
+	- Test suite: function.t, unit.t, integration.t, edge_cases.t, extended_tests.t

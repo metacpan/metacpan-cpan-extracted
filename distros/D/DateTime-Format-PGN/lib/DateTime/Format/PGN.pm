@@ -4,7 +4,7 @@ use warnings;
 package DateTime::Format::PGN;
 # ABSTRACT: a Perl module for parsing and formatting date fields in chess game databases in PGN format
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use DateTime::Incomplete 0.08;
 use Params::Validate 1.23 qw( validate BOOLEAN );
@@ -190,7 +190,7 @@ DateTime::Format::PGN - a Perl module for parsing and formatting date fields in 
 
 =head1 VERSION
 
-version 1.01
+version 1.02
 
 =head1 SYNOPSIS
 
@@ -239,23 +239,13 @@ L<PGN spec|https://web.archive.org/web/20160830115945/https://www.chessclub.com/
 
 =head1 See also
 
-=over 4
+=over 2
 
+=item L<Chess::PGN::Parse>
 
+=item L<DateTime::Incomplete>
 
-=back
-
-=item *
-
-* L<Chess::PGN::Parse>
-
-=item *
-
-* L<DateTime::Incomplete>
-
-=item *
-
-* L<https://github.com/houseabsolute/DateTime.pm/wiki>
+=item L<https://github.com/houseabsolute/DateTime.pm/wiki>
 
 =back
 

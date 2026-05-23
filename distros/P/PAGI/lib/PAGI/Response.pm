@@ -369,6 +369,37 @@ binary data or when you've already encoded the content yourself.
 Stream response chunks via callback. The callback receives a writer object
 with C<write($chunk)>, C<close()>, and C<bytes_written()> methods.
 
+=head2 writer
+
+    my $writer = await $res->writer;
+    my $writer = await $res->writer(on_close => sub { cleanup() });
+    my $writer = await $res->writer(on_close => async sub { await cleanup() });
+
+Returns a L<PAGI::Response::Writer> directly, sending headers immediately.
+Unlike C<stream()>, the writer is not scoped to a callback — you own it
+and must call C<close()> when done.
+
+This is useful when the writer needs to be passed to event handlers,
+pub/sub callbacks, timers, or other contexts outside a single function:
+
+    async sub live_feed {
+        my ($self, $ctx) = @_;
+        my $writer = await $ctx->response
+            ->content_type('text/plain')
+            ->writer(on_close => sub { $bus->unsubscribe($id) });
+
+        my $id = $bus->subscribe(async sub ($line) {
+            await $writer->write("$line\n");
+        });
+
+        await $ctx->receive;    # wait for disconnect
+        await $writer->close;
+    }
+
+The optional C<on_close> callback is registered before headers are sent,
+eliminating any race window with fast client disconnects. Sync and async
+callbacks are both supported — see L</on_close> under L</WRITER OBJECT>.
+
 =head2 send_file
 
     await $res->send_file('/path/to/file.pdf');
@@ -664,20 +695,72 @@ use L<PAGI::App::File> instead:
 
 =head1 WRITER OBJECT
 
-The C<stream()> method passes a writer object to its callback with these methods:
+The C<stream()> method passes a writer object to its callback, and
+C<writer()> returns one directly. The writer has the following methods:
 
-=over 4
+=head3 write
 
-=item * C<write($chunk)> - Write a chunk (returns Future)
+    await $writer->write($chunk);
 
-=item * C<close()> - Close the stream (returns Future)
+Write a chunk of data to the response stream. Returns a L<Future>.
 
-=item * C<bytes_written()> - Get total bytes written so far
+Writing after close returns a failed L<Future> rather than throwing.
+This allows cleanup code that races with close to handle the error
+gracefully via C<await>.
 
-=back
+=head3 close
 
-The writer automatically closes when the callback completes, but calling
-C<close()> explicitly is recommended for clarity.
+    await $writer->close;
+
+Close the stream. Returns a L<Future>. Calling close multiple times is
+safe — subsequent calls are no-ops.
+
+=head3 bytes_written
+
+    my $n = $writer->bytes_written;
+
+Returns the total number of bytes written so far.
+
+=head3 on_close
+
+    # Sync callback
+    $writer->on_close(sub { cleanup() });
+
+    # Async callback — return value is awaited automatically
+    $writer->on_close(async sub {
+        await notify_stream_ended();
+    });
+
+    # Chaining
+    $writer->on_close(sub { ... })
+           ->on_close(sub { ... });
+
+Registers a callback to fire when the writer closes (either explicitly
+or via C<stream()> auto-close). Callbacks can be regular subs or async
+subs — async results are automatically awaited. Multiple callbacks run
+in registration order. Exceptions are caught and warned but do not
+prevent other callbacks from running. Returns C<$self> for chaining.
+
+B<Circular reference note:> If your callback captures the writer
+object in a closure, use C<Scalar::Util::weaken> to avoid a memory leak:
+
+    use Scalar::Util qw(weaken);
+    my $weak_writer = $writer;
+    weaken($weak_writer);
+    $writer->on_close(sub { $weak_writer->... if $weak_writer });
+
+The callback array is cleared after firing, so any cycle via a closure
+is broken when the writer closes, but C<weaken> prevents the object
+from being kept alive until that point.
+
+=head3 is_closed
+
+    if ($writer->is_closed) { ... }
+
+Returns true if the writer has been closed.
+
+The writer automatically closes when the C<stream()> callback completes,
+but calling C<close()> explicitly is recommended for clarity.
 
 =head1 ERROR HANDLING
 
@@ -989,7 +1072,21 @@ async sub stream {
     await $callback->($writer);
 
     # Ensure closed
-    await $writer->close() unless $writer->{closed};
+    await $writer->close() unless $writer->is_closed;
+}
+
+async sub writer {
+    my ($self, %opts) = @_;
+    $self->_mark_sent;
+
+    # Send headers
+    await $self->{send}->({
+        type    => 'http.response.start',
+        status  => $self->status,
+        headers => $self->{_headers},
+    });
+
+    return PAGI::Response::Writer->new($self->{send}, %opts);
 }
 
 # Simple MIME type mapping
@@ -1093,19 +1190,23 @@ package PAGI::Response::Writer {
     use warnings;
     use Future::AsyncAwait;
     use Carp qw(croak);
+    use Scalar::Util qw(blessed);
 
     sub new {
-        my ($class, $send) = @_;
-        return bless {
-            send => $send,
+        my ($class, $send, %opts) = @_;
+        my $self = bless {
+            send          => $send,
             bytes_written => 0,
-            closed => 0,
+            closed        => 0,
+            _on_close     => [],
         }, $class;
+        push @{$self->{_on_close}}, $opts{on_close} if $opts{on_close};
+        return $self;
     }
 
     async sub write {
         my ($self, $chunk) = @_;
-        croak("Writer already closed") if $self->{closed};
+        die 'Writer already closed' if $self->{closed};
         $self->{bytes_written} += length($chunk // '');
         await $self->{send}->({
             type => 'http.response.body',
@@ -1123,12 +1224,31 @@ package PAGI::Response::Writer {
             body => '',
             more => 0,
         });
+        for my $cb (@{$self->{_on_close}}) {
+            eval {
+                my $r = $cb->();
+                if (blessed($r) && $r->isa('Future')) {
+                    await $r;
+                }
+            };
+            if ($@) {
+                warn "PAGI::Response::Writer on_close callback error: $@";
+            }
+        }
+
+        # Clear callback array to break any closure-based cycles
+        $self->{_on_close} = [];
     }
 
-    sub bytes_written {
-        my ($self) = @_;
-        return $self->{bytes_written};
+    sub on_close {
+        my ($self, $cb) = @_;
+        push @{$self->{_on_close}}, $cb;
+        return $self;
     }
+
+    sub is_closed { $_[0]->{closed} }
+
+    sub bytes_written { $_[0]->{bytes_written} }
 }
 
 1;

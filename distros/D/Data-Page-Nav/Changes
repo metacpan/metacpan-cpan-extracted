@@ -1,2 +1,6 @@
+0.02 2022-10-15T15:55:00Z
+    - Added information about the number_of_pages method in the documentation.
+    - Added the module 'base' as a dependency.
+
 0.01 2022-10-15T13:25:00Z
     - First release.

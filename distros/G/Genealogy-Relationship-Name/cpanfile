@@ -6,7 +6,7 @@ requires 'Carp';
 requires 'IPC::System::Simple';
 requires 'Object::Configure';
 requires 'Params::Get';
-requires 'Params::Validate::Strict';
+requires 'Params::Validate::Strict', '0.31';
 requires 'Readonly';
 requires 'Readonly::Values::Months';
 requires 'autodie';

@@ -1,21 +1,32 @@
-_______________________________________________________________________________
-2012-02-18 WWW-RobotRules 6.02
+Revision history for Perl distribution WWW-RobotRules
 
-Restore perl-5.8.1 compatiblity.
+6.03      2026-05-23 02:23:28Z
+    - Doing a proper version bump.
 
+6.02      2026-05-21 14:45:27Z
+    - WWW::RobotRules::AnyDBM_File::agent() no longer truncates the on-disk
+      cache through an untie/tie(O_TRUNC) sequence. Stale-data reset now goes
+      through the tied-hash CLEAR, eliminating a symlink-follow race that a
+      local attacker with write access to the cache directory could exploit
+      to overwrite arbitrary files writable by the crawler user.
+    - The on-disk cache file mode has been tightened from 0640 to 0600.
+    - t/rules-dbm.t has been hardened against symlink attacks on its tempfile
+      during package builds.
+    - A new SECURITY CONSIDERATIONS POD section documents the residual
+      caller-trust requirement: the constructor's tie still follows symlinks
+      because AnyDBM_File cannot portably plumb O_NOFOLLOW, so the caller
+      must store the cache file in a directory writable only by the user
+      that runs the code.
+    - References: CWE-377, CWE-378, CWE-379.
 
+6.02      2012-02-18
+    - Restore perl-5.8.1 compatibility.
 
-_______________________________________________________________________________
-2011-03-13 WWW-RobotRules 6.01
+6.01      2011-03-13
+    - Added legal notice and updated the meta repository link.
 
-Added legal notice and updated the meta repository link
-
-
-
-_______________________________________________________________________________
-2011-02-25 WWW-RobotRules 6.00
-
-Initial release of WWW-RobotRules as a separate distribution. There are no code
-changes besides incrementing the version number since libwww-perl-5.837.
-
-The WWW::RobotRules module used to be bundled with the libwww-perl distribution.
+6.00      2011-02-25
+    - Initial release of WWW-RobotRules as a separate distribution. There are
+      no code changes besides incrementing the version number since
+      libwww-perl-5.837. The WWW::RobotRules module used to be bundled with
+      the libwww-perl distribution.

@@ -129,6 +129,8 @@ debug_var($ALIAS);
 
 # Loop through the indices and take appropriate actions;
 foreach my $index (sort keys %{ $indices }) {
+    next if $index =~ /^[._]/;
+
     debug("$index being evaluated");
     my %current = map { $_ => 1 }
                   grep { !/^\./ }
@@ -199,7 +201,7 @@ es-alias-manager.pl - Allow easy alias management for daily indexes
 
 =head1 VERSION
 
-version 8.8
+version 8.9
 
 =head1 SYNOPSIS
 
@@ -357,7 +359,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Brad Lhotsky.
+This software is Copyright (c) 2026 by Brad Lhotsky.
 
 This is free software, licensed under:
 

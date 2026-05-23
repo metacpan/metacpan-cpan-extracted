@@ -10,7 +10,7 @@ with qw(
     eris::role::context
 );
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 
 my %SUSPICIOUS = ();
@@ -143,15 +143,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 eris::log::context::attacks::url - Inspects URL's for common attack patterns
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -163,6 +161,16 @@ weak spots in your infrastructure.
 It was built on the "least work for most reward" principle.  This context is
 prone to false positives and false negatives, but works fast enough to be
 inlined into the log processing pipeline.
+
+=head1 CONSUMES
+
+=over 4
+
+=item * L<eris::role::context>
+
+=item * L<eris::role::plugin>
+
+=back
 
 =head1 ATTRIBUTES
 

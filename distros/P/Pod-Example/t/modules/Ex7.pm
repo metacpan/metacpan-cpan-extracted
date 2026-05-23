@@ -11,13 +11,13 @@ our $VERSION = 0.01;
  use strict;
  use warnings;
 
- # Print.
- print "Foo.\n";
-
 =begin html
 
 <img src="image/foo.png"/>
 
 =end html
+
+ # Print.
+ print "Foo.\n";
 
 =cut

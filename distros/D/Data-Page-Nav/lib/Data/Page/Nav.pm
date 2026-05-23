@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use base 'Data::Page';
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 __PACKAGE__->mk_accessors(qw/number_of_pages/);
 
@@ -151,6 +151,12 @@ Or
 This module simply provides methods for you to create navigation of pages, using as a base the module Data::Page.
 
 =head1 METHODS
+
+=head2 number_of_pages
+
+This method gets or sets the total number of pages in navigation of pages (which defaults to 10):
+
+    print "Number of pages:", $page->number_of_pages, "\n";
 
 =head2 pages_nav
 

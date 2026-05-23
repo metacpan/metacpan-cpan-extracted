@@ -23,38 +23,6 @@
          "xt"
       ]
    },
-   "optional_features" : {
-      "dpss" : {
-         "description" : "Support for DPSS windows",
-         "prereqs" : {
-            "runtime" : {
-               "recommends" : {
-                  "PDL::LinearAlgebra::Special" : "0"
-               }
-            }
-         }
-      },
-      "kaiser" : {
-         "description" : "Support for kaiser windows",
-         "prereqs" : {
-            "runtime" : {
-               "recommends" : {
-                  "PDL::GSLSF::BESSEL" : "0"
-               }
-            }
-         }
-      },
-      "plot" : {
-         "description" : "Plot windows",
-         "prereqs" : {
-            "runtime" : {
-               "recommends" : {
-                  "PDL::Graphics::Simple" : "0"
-               }
-            }
-         }
-      }
-   },
    "prereqs" : {
       "configure" : {
          "requires" : {
@@ -72,6 +40,11 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "PDL::GSL::SF" : "0",
+            "PDL::Graphics::Simple" : "0",
+            "PDL::LinearAlgebra::Special" : "0"
+         },
          "requires" : {
             "PDL" : "2.055",
             "perl" : "5.010"
@@ -92,11 +65,11 @@
    "provides" : {
       "PDL::DSP::Windows" : {
          "file" : "lib/PDL/DSP/Windows.pm",
-         "version" : "0.102"
+         "version" : "0.103"
       },
       "PDL::Demos::DSPWindows" : {
          "file" : "lib/PDL/Demos/DSPWindows.pm",
-         "version" : "0.102"
+         "version" : "0.103"
       }
    },
    "release_status" : "stable",
@@ -104,9 +77,14 @@
       "bugtracker" : {
          "mailto" : "jjatria at cpan.org",
          "web" : "https://github.com/PDLPorters/PDL-DSP-Windows/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/PDLPorters/PDL-DSP-Windows.git",
+         "web" : "https://github.com/PDLPorters/PDL-DSP-Windows"
       }
    },
-   "version" : "0.102",
+   "version" : "0.103",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032000"
@@ -236,7 +214,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.34.1",
+                  "git_version" : "2.43.0",
                   "repo_root" : "."
                }
             },
@@ -318,7 +296,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.34.1",
+                  "git_version" : "2.43.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -335,12 +313,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "release/0.102",
+                  "tag" : "release/0.103",
                   "tag_format" : "release/%v",
                   "tag_message" : ""
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.34.1",
+                  "git_version" : "2.43.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -384,7 +362,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.34.1",
+                  "git_version" : "2.43.0",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -490,7 +468,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.34.1",
+                  "git_version" : "2.43.0",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",

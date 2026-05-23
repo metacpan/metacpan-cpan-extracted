@@ -42,7 +42,7 @@ subtest 'Language source: per-call > constructor > hard default' => sub {
 	# Branch B: constructor-only → use constructor lang
 	my $namer_fr = Genealogy::Relationship::Name->new(language => 'fr');
 	is($namer_fr->name(steps_to_ancestor => 1, steps_from_ancestor => 1, sex => 'M'),
-		'frere', 'Branch B: constructor lang fr used');
+		"fr\N{U+00E8}re", 'Branch B: constructor lang fr used');
 
 	# Branch A: per-call overrides constructor
 	is($namer_fr->name(steps_to_ancestor => 1, steps_from_ancestor => 1,
@@ -76,7 +76,7 @@ subtest 'Unsupported language: validate_strict croaks' => sub {
 	my $namer = Genealogy::Relationship::Name->new();
 
 	# Each invalid language code must croak, not silently fall back
-	for my $bad (qw(xx zz es)) {
+	for my $bad (qw(xx zz zh)) {
 		throws_ok {
 			$namer->name(steps_to_ancestor => 2, steps_from_ancestor => 0,
 			             sex => 'F', language => $bad)
@@ -219,13 +219,13 @@ subtest 'wantarray branch: supported_languages() list vs scalar' => sub {
 
 	# List context
 	my @list = $namer->supported_languages();
-	ok(scalar @list == 3, 'List context: 3 items');
+	ok(scalar @list == 7, 'List context: 7 items');
 	ok(ref(\@list) eq 'ARRAY', 'List context: got list');
 
 	# Scalar context
 	my $ref = $namer->supported_languages();
 	isa_ok($ref, 'ARRAY', 'Scalar context: got ARRAY ref');
-	is(scalar @{$ref}, 3, 'Scalar context: ref has 3 items');
+	is(scalar @{$ref}, 7, 'Scalar context: ref has 7 items');
 };
 
 # =========================================================================

@@ -3,14 +3,20 @@ abstract: 'Tool for creating examples from Perl module POD documentation.'
 author:
   - 'Michal Josef Spacek <skim@cpan.org>'
 build_requires:
+  Cwd: 0
   English: 0
+  Error::Pure: 0
   Error::Pure::Utils: 0
   ExtUtils::MakeMaker: 6.59
+  File::Copy::Recursive: 0
   File::Object: 0
   File::Spec::Functions: 0
+  File::Temp: 0
+  Perl6::Slurp: 0
   Test::More: 0
   Test::NoWarnings: 0
   Test::Output: 0
+  Test::Warn: 0.31
 configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
@@ -33,11 +39,11 @@ requires:
   File::Spec::Functions: 0
   Getopt::Std: 0
   IO::Barf: 0
-  Pod::Example: 0.12
+  Pod::Example: 0.17
   perl: 5.6.0
 resources:
   bugtracker: https://github.com/michal-josef-spacek/App-Perl-Module-Examples/issues
   homepage: https://github.com/michal-josef-spacek/App-Perl-Module-Examples
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-Perl-Module-Examples
-version: '0.03'
+version: '0.04'

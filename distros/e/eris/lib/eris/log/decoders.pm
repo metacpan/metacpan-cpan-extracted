@@ -12,7 +12,7 @@ with qw(
     eris::role::pluggable
 );
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 
 sub _build_namespace { 'eris::log::decoder' }
@@ -64,15 +64,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 eris::log::decoders - Discovery and access for decoders
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -86,6 +84,14 @@ Finds all available and configured decoders, returns an L<eris::log> instance fr
     while(<<>>) {
         p( $dec->decode($_) );
     }
+
+=head1 CONSUMES
+
+=over 4
+
+=item * L<eris::role::pluggable>
+
+=back
 
 =head1 ATTRIBUTES
 

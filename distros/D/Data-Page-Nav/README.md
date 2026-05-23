@@ -48,6 +48,12 @@ This module simply provides methods for you to create navigation of pages, using
 
 # METHODS
 
+## number_of_pages
+
+This method gets or sets the total number of pages in navigation of pages (which defaults to 10):
+
+    print "Number of pages:", $page->number_of_pages, "\n";
+
 ## pages_nav
 
 This method returns the numbers in an array or arrayref depending on the context, too it can set the number of pages, but is optional:

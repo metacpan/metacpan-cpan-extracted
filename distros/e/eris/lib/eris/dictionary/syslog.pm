@@ -7,7 +7,7 @@ with qw(
     eris::role::dictionary::hash
 );
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 
 sub _build_priority { 90; }
@@ -31,20 +31,30 @@ sub hash {
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 eris::dictionary::syslog - Contains fields extracted from syslog messages
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
 This dictionary contains elements extracted from the syslog header and
 meta-data.
+
+=head1 CONSUMES
+
+=over 4
+
+=item * L<eris::role::dictionary>
+
+=item * L<eris::role::dictionary::hash>
+
+=item * L<eris::role::plugin>
+
+=back
 
 =head1 ATTRIBUTES
 

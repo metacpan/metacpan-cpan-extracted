@@ -8,7 +8,7 @@ use vars qw[$VERSION @ISA @EXPORT];
 BEGIN {
     require Exporter;
 
-    $VERSION    = '3.06';
+    $VERSION    = '3.08';
     @ISA        = qw[Exporter];
 
     require Time::Local if $^O eq "MacOS";

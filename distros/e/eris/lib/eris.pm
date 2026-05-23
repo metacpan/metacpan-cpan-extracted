@@ -4,7 +4,7 @@ package eris;
 use strict;
 use warnings;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 1;
 
@@ -12,15 +12,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 eris - Eris is the Greek Goddess of Chaos
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -302,6 +300,52 @@ C<eris-es-indexer.pl>'s.  For more information, see:
 =head1 AUTHOR
 
 Brad Lhotsky <brad@divisionbyzero.net>
+
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Websites
+
+The following websites have more information about this module, and may be of help to you. As always,
+in addition to those websites please use your favorite search engine to discover more resources.
+
+=over 4
+
+=item *
+
+MetaCPAN
+
+A modern, open-source CPAN search engine, useful to view POD in HTML format.
+
+L<https://metacpan.org/release/eris>
+
+=item *
+
+CPAN Testers
+
+The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
+
+L<http://www.cpantesters.org/distro/e/eris>
+
+=item *
+
+CPAN Testers Matrix
+
+The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
+
+L<http://matrix.cpantesters.org/?dist=eris>
+
+=back
+
+=head2 Bugs / Feature Requests
+
+This module uses the GitHub Issue Tracker: L<https://github.com/reyjrar/eris-logging/issues>
+
+=head2 Source Code
+
+This module's source code is available by visiting:
+L<https://github.com/reyjrar/eris-logging>
 
 =head1 COPYRIGHT AND LICENSE
 

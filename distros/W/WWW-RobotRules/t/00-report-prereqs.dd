@@ -1,0 +1,58 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      },
+                        'suggests' => {
+                                        'JSON::PP' => '2.27300'
+                                      }
+                      },
+       'develop' => {
+                      'recommends' => {
+                                        'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
+                                      },
+                      'requires' => {
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Pod::Spell' => '1.25',
+                                      'Test::EOL' => '2.00',
+                                      'Test::MinimumVersion' => '0',
+                                      'Test::Mojibake' => '0',
+                                      'Test::More' => '0.94',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::Portability::Files' => '0',
+                                      'Test::Spelling' => '0.17',
+                                      'Test::Version' => '1'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'AnyDBM_File' => '0',
+                                      'Carp' => '0',
+                                      'Fcntl' => '0',
+                                      'URI' => '1.10',
+                                      'perl' => '5.008001',
+                                      'strict' => '0'
+                                    },
+                      'suggests' => {
+                                      'DB_File' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0.96',
+                                   'strict' => '0',
+                                   'warnings' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

@@ -8,7 +8,7 @@ with qw(
 );
 use namespace::autoclean;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 
 sub sample_messages {
@@ -44,19 +44,27 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 eris::log::context::dhcpd - Parses dhcpd messages into structured data.
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
 Parses dhcpd messages into structured data.
+
+=head1 CONSUMES
+
+=over 4
+
+=item * L<eris::role::context>
+
+=item * L<eris::role::plugin>
+
+=back
 
 =head1 METHODS
 

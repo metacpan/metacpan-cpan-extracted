@@ -11,7 +11,7 @@ with qw(
     eris::role::context
 );
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 
 sub _build_priority { 1000 }
@@ -85,7 +85,7 @@ sub contextualize_message {
         my %geo = ();
         eval {
             my $city = $self->geo_lookup->city( ip => $ctxt->{$f} );
-            $geo{city}  = $city->city->name;
+            $geo{city}  = $city->city->name if $city->city->name;
             $geo{country}  = $city->country->iso_code;
             $geo{continent}  = $city->continent->code;
             my $loc = $city->location();
@@ -121,20 +121,28 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 eris::log::context::GeoIP - Apply MaxMind GeoIP Data to events
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
 Use this module to tag geo location data to events with matching
 field names.  You'll probably need to configure the C<geo_db> attribute.
+
+=head1 CONSUMES
+
+=over 4
+
+=item * L<eris::role::context>
+
+=item * L<eris::role::plugin>
+
+=back
 
 =head1 ATTRIBUTES
 

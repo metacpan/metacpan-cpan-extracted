@@ -14,13 +14,14 @@ MANIFEST			This list of files
 META.yml
 README
 t/basics.t
+t/data/pathological.txt
 t/data/RFC5233.single.obs.json
 t/data/RFC5233.single.obs.txt
 t/data/RFC5233.single.valid.json
 t/data/RFC5233.single.valid.txt
 t/generate.pl
 t/invalid.t
+t/invisible-chars.t
 t/pathological.t
 t/random.combinations.t
 t/single.suit.t
-SIGNATURE                                Public-key signature (added by MakeMaker)

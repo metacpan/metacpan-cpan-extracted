@@ -5,7 +5,7 @@ use Moo::Role;
 use Types::Standard qw(Int Str);
 use namespace::autoclean;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 
 requires qw(lookup fields);
@@ -20,15 +20,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 eris::role::dictionary - Interface for implementing a dictionary object
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 INTERFACE
 

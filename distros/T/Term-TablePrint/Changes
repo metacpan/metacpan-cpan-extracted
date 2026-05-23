@@ -1,6 +1,11 @@
 Revision history for Term::TablePrint
 
 
+0.182   2026-05-22
+        - Bugfix header: restore option color.
+        - Choose columns: add options color and mouse.
+        - Add option codepage_mapping to single row output.
+
 0.181   2026-05-15
         - Bugfix: stringify header separately.
 

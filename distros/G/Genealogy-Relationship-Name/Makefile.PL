@@ -33,7 +33,6 @@ WriteMakefile(
 		'Object::Configure' => 0,
 		'Params::Get' => 0,
 		'Params::Validate::Strict' => 0.31,
-		'Params::Validate::Strict' => 0,
 		'Readonly::Values::Months' => 0,
 		'Readonly' => 0,
 	# }, RECOMMENDED => {

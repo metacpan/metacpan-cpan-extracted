@@ -26,6 +26,7 @@
             "Test::CleanNamespaces" : "0.15",
             "Test::DistManifest" : "0",
             "Test::EOF" : "0",
+            "Test::EOL" : "0",
             "Test::Fixme" : "0",
             "Test::MinimumVersion" : "0",
             "Test::More" : "0.94",
@@ -60,7 +61,7 @@
    "provides" : {
       "Crypt::SaltedHash" : {
          "file" : "lib/Crypt/SaltedHash.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -75,7 +76,7 @@
       },
       "x_authority" : "cpan:RRWO"
    },
-   "version" : "0.11",
+   "version" : "0.12",
    "x_contributors" : [
       "Chris Weyl <cweyl@alumni.drew.edu>",
       "David Steinbrunner <dsteinbrunner@pobox.com>",

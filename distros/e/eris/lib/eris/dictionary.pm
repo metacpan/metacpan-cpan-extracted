@@ -8,7 +8,7 @@ with qw(
 use Types::Standard qw(HashRef);
 use namespace::autoclean;
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 
 
@@ -16,9 +16,9 @@ sub _build_namespace { 'eris::dictionary' }
 
 
 has fields => (
-    is => 'ro',
-    isa => HashRef,
-    lazy => 1,
+    is      => 'ro',
+    isa     => HashRef,
+    lazy    => 1,
     builder => '_build_fields',
 );
 
@@ -64,20 +64,18 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 eris::dictionary - Field dictionary loader
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
     use eris::dictionary;
-    use YAML;
+    use DDP;
 
     my $dict = eris::dictionary->new();
 
@@ -85,9 +83,17 @@ version 0.008
         chomp;
         foreach my $word (split /\s+/) {
             my $def = $dict->lookup($word);
-            print Dump $def if $def;
+            p($def);
         }
     }
+
+=head1 CONSUMES
+
+=over 4
+
+=item * L<eris::role::pluggable>
+
+=back
 
 =head1 ATTRIBUTES
 

@@ -8,6 +8,7 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IO::Select: '0'
+  IO::Socket: '0'
   IPC::Open3: '0'
   Module::Metadata: '1.000015'
   Net::EmptyPort: '0'
@@ -37,11 +38,11 @@ name: Net-Statsd-Tiny
 provides:
   Net::Statsd::Tiny:
     file: lib/Net/Statsd/Tiny.pm
-    version: v0.4.0
+    version: v0.4.1
 requires:
   Carp: '0'
   Class::Accessor::Fast: '0'
-  IO::Socket: '1.18'
+  IO::Socket::IP: '0'
   Socket: '2.026'
   parent: '0'
   perl: v5.12.0
@@ -50,7 +51,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/Net-Statsd-Tiny/issues
   repository: git://github.com/robrwo/Net-Statsd-Tiny.git
-version: v0.4.0
+version: v0.4.1
 x_authority: cpan:RRWO
 x_contributors:
   - 'Michael R. Davis <mrdvt@cpan.org>'

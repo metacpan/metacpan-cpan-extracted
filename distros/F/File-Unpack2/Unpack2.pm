@@ -84,7 +84,7 @@ Version 0.69
 
 # We'll have 1.x versions only after minfree() has a baseline implementation.
 # Please run perl Makefile.PL after changing the version here.
-our $VERSION = '1.1';
+our $VERSION = '1.2';
 
 POSIX::setlocale(&POSIX::LC_ALL, 'C');
 $ENV{PATH} = '/usr/bin:/bin';
@@ -687,7 +687,7 @@ sub DESTROY
   # Added some 'or' cases, as $self->{input} might be empty, although we had processed an input.
   # 
   # We rather catch an error, than produce incomplete output.
-  # This happens with ksh/ast-base.2012-08-01.tar.bz2 after unpack('.../ast-base.2012-08-01/src/cmd/pax/data/a'): not much file or directory
+  # This happens with ksh/ast-base.2012-08-01.tar.bz2 after unpack('.../ast-base.2012-08-01/src/cmd/pax/data/a'): no such file or directory
   # 
   if (($self->{input} or
        ($self->{lfp_printed}||0) or
@@ -882,6 +882,19 @@ sub unpack
 	}
     }
 
+  unless (-e $archive)
+    {
+      # contstucted $archive wrongly, or it disappeared between when the
+      # caller stat'd it and now (e.g. a background mime-helper writing into
+      # the same destdir).
+      # Check this BEFORE incrementing recursion_level: an early return that
+      # leaves the counter incremented makes the outer call's
+      # --recursion_level == 0 check miss, so the JSON epilog never runs and
+      # the log file is left as an unclosed object — invalid JSON.
+      push @{$self->{error}}, "unpack('$archive'): no such file or directory; ";
+      return 1;
+    }
+
   my $start_time = time;
   if ($self->{recursion_level}++ == 0)
     {
@@ -889,7 +902,7 @@ sub unpack
       ## State that needs to be reset when (re)starting goes in here.
       #
       # CAUTION: recursion_level decrements again, as we return from unpack()
-      #          how do we assert, that this code only runs at the start, 
+      #          how do we assert, that this code only runs at the start,
       #          and not once again at the end?
       $self->{inside_archives} = 0;
       $self->{json} ||= JSON->new()->ascii(1);	# used often, create it unconditionally here and once.
@@ -912,17 +925,10 @@ sub unpack
 	}
     }
 
-  unless (-e $archive)
-    {
-      # contstucted $archive wrongly
-      # e.g. we have 'pax/data/a/' instead of 'pax/data/_fu_3CEuA/a/'
-      push @{$self->{error}}, "unpack('$archive'): not much file or directory; ";
-      return 1;
-    }
-
   unless ($self->{input_dir})
     {
       push @{$self->{error}}, "unpack('$archive'); internal error: no {input_dir}";
+      $self->{recursion_level}--;
       return 1;
     }
 
@@ -1167,7 +1173,7 @@ sub unpack
 		  # If the archive was an intermediate file created inside destdir
 		  # (e.g. foo.tar produced by unpacking foo.tar.gz), remove it now
 		  # that its contents have been recursively unpacked.
-		  if ($archive =~ m{^\Q$self->{destdir}\E} and -f $archive and !-l $archive)
+		  if ($archive =~ m{^\Q$self->{destdir}\E/} and -f $archive and !-l $archive)
 		    {
 		      unlink $archive;
 		    }

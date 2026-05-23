@@ -1,3 +1,10 @@
+0.17 2026-05-22T14:19:45+02:00
+ - Add =head1 EXAMPLES section to doc.
+ - Add support for =head1 EXAMPLES section with example inside.
+ - Fix processing of "=for comment filename" for example file name.
+ - Improve processing of =begin/=end text block.
+ - Move =begin/=end html block inside to code in tests.
+
 0.16 2026-03-13T14:06:18+01:00
  - Update copyright years.
  - Update to Pod::Abstract@0.26, there is regression in =for parsing.

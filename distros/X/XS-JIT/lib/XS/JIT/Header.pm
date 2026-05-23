@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 use XS::JIT;
 use XS::JIT::Builder;

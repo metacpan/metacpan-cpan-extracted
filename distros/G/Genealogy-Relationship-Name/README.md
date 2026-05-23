@@ -4,7 +4,7 @@ Genealogy::Relationship::Name - Return a genealogical relationship name from ste
 
 # VERSION
 
-Version 0.02
+Version 0.03
 
 # SYNOPSIS
 
@@ -38,7 +38,8 @@ The relationship tables were originally embedded in the `gedcom` and `ged2site`
 distributions inside `Gedcom::Individual::relationship_up()`; this module
 extracts them into a reusable, installable CPAN distribution.
 
-Supported languages: `en` (English, default), `fr` (French), `de` (German).
+Supported languages: `en` (English, default), `de` (German), `es` (Spanish),
+`fa` (Farsi/Persian), `fr` (French), `la` (Classical Latin).
 
 # METHODS
 
@@ -67,7 +68,7 @@ file via [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure).
     A pre-constructed loggining object.  When a required argument is
     passed as `undef` to `name()`, the error is reported via
     `$logger->error($msg)` rather than `croak`.  This allows
-    programs to route errors through their own 
+    programs to route errors through their own
     infrastructure with full `ctx` context.
 
     See [Log::Abstraction](https://metacpan.org/pod/Log%3A%3AAbstraction) and the ["CONFIGURATION"](#configuration) section for the
@@ -124,7 +125,7 @@ Any future object-valued constructor arguments must follow the same pattern.
 #### Input
 
     {
-        language => { type => 'string', regex => qr/^(?:en|fr|de)/, optional => 1 },
+        language => { type => 'string', regex => qr/^(?:en|de(?:-ch)?|es|fa|fr|la)/, optional => 1 },
         logger   => { type => 'object', optional => 1 },
     }
 
@@ -134,25 +135,6 @@ Any future object-valued constructor arguments must follow the same pattern.
         type  => 'object',
         class => 'Genealogy::Relationship::Name',
     }
-
-### FORMAL SPECIFICATION
-
-    new ________________________________________________________
-    [In]  class    : String                  (class name or object)
-          language : {en, fr, de}?           (optional default language)
-          logger   : Log::Abstraction?       (optional error logger)
-    [Out] self     : Genealogy::Relationship::Name
-
-    Let params == get_params(args)
-    Let params' == configure(class, params \ {logger})
-                   union {logger -> params.logger}  if logger in dom params
-    self == bless(params', class)
-
-    post: self.language == params.language  if language in dom params
-          self.logger   == params.logger    if logger   in dom params
-          ref(self)     == 'Genealogy::Relationship::Name'
-
-# METHODS
 
 ## name
 
@@ -184,7 +166,12 @@ code, returns a localised relationship-name string.
 - `language` (string, optional)
 
     BCP-47-style language tag (only the primary subtag is used).
-    Supported values: `en` (default), `fr`, `de`.
+    Supported values: `en` (default), `de`, `es`, `fa`, `fr`, `la`.
+
+    Note: `fa` (Farsi/Persian) values are stored as `\N{U+XXXX}` Unicode
+    escapes and render correctly in any Unicode-aware context.  `la`
+    (Classical Latin) has a sparse table; many step-count combinations have
+    no classical term and return `undef`.
 
 - `person` (object, optional)
 
@@ -193,6 +180,20 @@ code, returns a localised relationship-name string.
     `ctx` set at construction time.  The handler receives it as `ctx` (logger
     path) or `person` (on\_error path), matching the `complain()` interface
     in `gedcom`/`ged2site`.
+
+- `family_side` (string, optional)
+
+    `'paternal'` or `'maternal'`.  Used by languages that distinguish the
+    paternal from the maternal line for the same step counts.  Currently
+    relevant for:
+
+    - `la` (Latin) -- uncle/aunt (`patruus`/`avunculus`,
+    `amita`/`matertera`) and first cousin (`patruelis`/`consobrinus`)
+    - `fa` (Farsi) -- uncle (`amoo`/`dayi`) and aunt
+    (`ammeh`/`khaleh`)
+
+    When `family_side` is not supplied, the table falls back to the generic
+    (non-side-specific) entry for that step-count pair.
 
 ### RETURNS
 
@@ -219,8 +220,9 @@ is not found in the lookup table.
         steps_to_ancestor   => { type => 'integer', minimum => 0 },
         steps_from_ancestor => { type => 'integer', minimum => 0 },
         sex                 => { type => 'string', memberof => ['M', 'F'] },
-        language            => { type => 'string', regex => qr/^(?:en|de|fr)/, optional => 1 },
-        # person is extracted before validate_strict to avoid PVS inferring constraints
+        language => { type => 'string', regex => qr/^(?:en|de(?:-ch)?|es|fa|fr|la)/, optional => 1 },
+        # person is handled before validate_strict (PVS infers constraints from objects)
+        family_side => { type => 'string', memberof => ['paternal','maternal'], optional => 1 },
     }
 
 #### Output
@@ -236,14 +238,16 @@ is not found in the lookup table.
     [In]  steps_to_ancestor   : N0
           steps_from_ancestor : N0
           sex                 : {M, F}
-          language            : {en, fr, de}?  (default en)
+          language            : {en, es, fa, fr, de, la}?  (default en)
           person              : Object?
     [Out] result              : String | undef
 
-    Let key == steps_to_ancestor ++ "," ++ steps_from_ancestor
-    Let table == RELATIONSHIP_TABLES(language)(sex)
-    result == table(key)  if key in dom table
-           == undef       otherwise
+    Let key      == steps_to_ancestor ++ "," ++ steps_from_ancestor
+    Let side_key == key ++ "," ++ family_side  if family_side defined
+    Let table    == RELATIONSHIP_TABLES(language)(sex)
+    result == table(side_key)  if family_side defined and side_key in dom table
+           == table(key)       if key in dom table
+           == undef            otherwise
 
 ## supported\_languages
 
@@ -261,12 +265,12 @@ None.
 ### RETURNS
 
 A list (or array-ref in scalar context) of language code strings,
-currently `('de', 'en', 'fr')`.
+currently `('de', 'de_ch', 'en', 'es', 'fa', 'fr', 'la')`.
 
 ### EXAMPLE
 
     my @langs = $namer->supported_languages();
-    # ( 'de', 'en', 'fr' )
+    # ( 'de', 'de_ch', 'en', 'es', 'fa', 'fr', 'la' )
 
 ### API SPECIFICATION
 
@@ -279,14 +283,6 @@ currently `('de', 'en', 'fr')`.
     {
         type => ARRAYREF,   # sorted list of language codes
     }
-
-### FORMAL SPECIFICATION
-
-    supported_languages ______________________________________
-    [In]  (none)
-    [Out] result : seq String
-
-    result == sort(dom RELATIONSHIP_TABLES)
 
 ## known\_sexes
 
@@ -325,14 +321,6 @@ None.
     {
         type => ARRAYREF,
     }
-
-### FORMAL SPECIFICATION
-
-    known_sexes ______________________________________________
-    [In]  (none)
-    [Out] result : seq String
-
-    result == sort { $SEX_FEMALE, $SEX_MALE }
 
 # CONFIGURATION
 
@@ -403,11 +391,17 @@ The lookup tables currently cover steps 0-6 in both directions.  Relationships
 further removed (seventh cousin, etc.) return `undef`.  Pull requests adding
 deeper tables are welcome.
 
+# TODO
+
+- Extract and integrate the Latin relationship handling code currently
+embedded in the `gedcom` and `ged2site` programs, adding `la` as a
+supported language alongside `en`, `fr`, and `de`.
+
 # SEE ALSO
 
 - [Configure an Object at Runtime](https://metacpan.org/pod/Object%3A%3AConfigure)
 - [Test Dashboard](https://nigelhorne.github.io/Genealogy-Relationship-Name/coverage/)
-- [Gedcom::Individual](https://metacpan.org/pod/Gedcom%3A%3AIndividual), [Genealogy::Relationship](https://metacpan.org/pod/Genealogy%3A%3ARelationship)
+- [Gedcom::Individual](https://metacpan.org/pod/Gedcom%3A%3AIndividual), [Genealogy::Relationship](https://metacpan.org/pod/Genealogy%3A%3ARelationship), [https://www.tfcg.ca/tableau-des-liens-de-parente](https://www.tfcg.ca/tableau-des-liens-de-parente),
 
 # AUTHOR
 
@@ -448,6 +442,56 @@ You can also look for information at:
 - CPAN Testers Dependencies
 
     [http://deps.cpantesters.org/?module=Genealogy::Relationship::Name](http://deps.cpantesters.org/?module=Genealogy::Relationship::Name)
+
+# FORMAL SPECIFICATION
+
+## new
+
+    new ________________________________________________________
+    [In]  class    : String                  (class name or object)
+          language            : {en, es, fa, fr, de, la}?  (optional default language
+          logger   : Log::Abstraction?       (optional error logger)
+    [Out] self     : Genealogy::Relationship::Name
+
+    Let params == get_params(args)
+    Let params' == configure(class, params \ {logger})
+                   union {logger -> params.logger}  if logger in dom params
+    self == bless(params', class)
+
+    post: self.language == params.language  if language in dom params
+          self.logger   == params.logger    if logger   in dom params
+          ref(self)     == 'Genealogy::Relationship::Name'
+
+## name
+
+    name ______________________________________________________
+    [In]  steps_to_ancestor   : N0
+          steps_from_ancestor : N0
+          sex                 : {M, F}
+          language            : {en, fr, de}?  (default en)
+          person              : Object?
+    [Out] result              : String | undef
+
+    Let key == steps_to_ancestor ++ "," ++ steps_from_ancestor
+    Let table == RELATIONSHIP_TABLES(language)(sex)
+    result == table(key)  if key in dom table
+           == undef       otherwise
+
+## supported\_languages
+
+    supported_languages ______________________________________
+    [In]  (none)
+    [Out] result : seq String
+
+    result == sort(dom RELATIONSHIP_TABLES)
+
+## known\_sexes
+
+    known_sexes ______________________________________________
+    [In]  (none)
+    [Out] result : seq String
+
+    result == sort { $SEX_FEMALE, $SEX_MALE }
 
 # LICENCE AND COPYRIGHT
 

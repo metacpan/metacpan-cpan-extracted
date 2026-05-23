@@ -68,6 +68,14 @@ METHODS
         UTF8-non-ascii. Either use the feature or just skip such addresses
         with skip_not_ascii option.
 
+        Whitespace and Unicode format characters (category "\p{Cf}": ZERO
+        WIDTH SPACE, ZWJ, ZWNJ, BOM, soft hyphen, bidi marks, etc.) are
+        stripped from "local-part" and "domain". Such characters are
+        typically introduced by copy/paste; left in, they produce
+        undeliverable mail. Stripping does not apply inside quoted
+        local-parts (their contents are preserved literally), nor to the
+        display-name or comments.
+
     group start
         Some headers with mailboxes may contain groupped addresses. This
         element is returned for position where group starts. Under value key
@@ -119,8 +127,20 @@ METHODS
         described earlier.
 
 AUTHOR
-    Ruslan Zakirov <ruz@bestpractical.com>
+    Best Practical Solutions, LLC <modules@bestpractical.com>
 
-LICENSE
-    Under the same terms as Perl itself.
+BUGS
+    All bugs should be reported via email to
+
+        L<bug-Email-Address-List@rt.cpan.org|mailto:bug-Email-Address-List@rt.cpan.org>
+
+    or via the web at
+
+        L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=Email-Address-List>.
+
+LICENSE AND COPYRIGHT
+    Copyright (C) 2012-2026 Best Practical Solutions, LLC.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
 

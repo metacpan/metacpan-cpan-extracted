@@ -4,7 +4,7 @@ package App::ElasticSearch::Utilities::QueryString::FileExpansion;
 use v5.16;
 use warnings;
 
-our $VERSION = '8.8'; # VERSION
+our $VERSION = '8.9'; # VERSION
 
 use CLI::Helpers qw(:output);
 use File::Slurp::Tiny qw(read_lines);
@@ -172,7 +172,7 @@ App::ElasticSearch::Utilities::QueryString::FileExpansion - Build a terms query 
 
 =head1 VERSION
 
-version 8.8
+version 8.9
 
 =head1 SYNOPSIS
 
@@ -308,7 +308,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Brad Lhotsky.
+This software is Copyright (c) 2026 by Brad Lhotsky.
 
 This is free software, licensed under:
 

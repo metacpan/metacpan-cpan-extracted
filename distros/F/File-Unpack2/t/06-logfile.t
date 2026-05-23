@@ -39,5 +39,20 @@ for my $f (keys %{$log2->{unpacked}})
   }
 ok($filecount > 10, "more than 10 unpacked files: $filecount");
 
+# Regression: when an inner unpack() call finds $archive missing on disk
+# (the path can vanish between the caller's stat and us re-stating it under
+# concurrent file-system activity), the early return must not leave
+# $self->{recursion_level} incremented. If it does, the outer call's
+# --recursion_level == 0 check never fires and the JSON epilog is never
+# written, producing an invalid log file.
+{
+  my $testdir3 = File::Temp::tempdir("FU_06_XXXXX", TMPDIR => 1, CLEANUP => 1);
+  my $u3 = File::Unpack2->new(destdir => $testdir3, verbose => 0, logfile => "$testdir3/log");
+  my $level_before = $u3->{recursion_level} || 0;
+  $u3->{recursion_level} = 1;        # pretend we're already inside an unpack
+  $u3->unpack("/this/path/does/not/exist.tar.gz");
+  is($u3->{recursion_level}, 1, "recursion_level preserved when inner unpack() hits non-existent path");
+}
+
 # done_testing does not exist in SLE11_SP2
 # done_testing();

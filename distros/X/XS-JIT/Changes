@@ -1,5 +1,11 @@
 Revision history for XS-JIT
 
+0.23	2026-05-22
+	- Fix link order in the JIT compile/link command
+	- dl_load_file failure is now a croak() with the .so path and
+	  the underlying OS error, instead of a silent warn()
+	- Fix functions_already_loaded() short-circuit
+
 0.22	2026-05-09
 	- Builder->memoize: change the TTL comparison from `<` to `<=`.
 	  With time()'s 1-second granularity, 

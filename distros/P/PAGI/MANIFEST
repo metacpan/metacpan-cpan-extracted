@@ -20,6 +20,9 @@ docs/specs/lifespan.mkdn
 docs/specs/main.mkdn
 docs/specs/tls.mkdn
 docs/specs/www.mkdn
+docs/superpowers/plans/2026-04-06-response-writer.md
+docs/superpowers/plans/2026-04-06-router-head-stripping-and-route-table.md
+docs/superpowers/specs/2026-04-06-router-head-stripping-and-route-table-design.md
 examples/01-hello-http/README.md
 examples/01-hello-http/app.pl
 examples/02-streaming-response/README.md
@@ -277,6 +280,9 @@ t/context/04-websocket.t
 t/context/05-sse.t
 t/context/06-extension.t
 t/context/07-router.t
+t/context/08-dispatcher.t
+t/context/09-websocket-delegation.t
+t/context/10-sse-delegation.t
 t/endpoint-router.t
 t/endpoint/01-http-constructor.t
 t/endpoint/02-http-dispatch.t
@@ -360,6 +366,7 @@ t/request/13-config.t
 t/request/14-integration.t
 t/response-convenience.t
 t/response-integration.t
+t/response-writer.t
 t/response.t
 t/router-middleware.t
 t/router-named-routes.t

@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.16.0;
 
-our $VERSION = '0.181';
+our $VERSION = '0.182';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -254,7 +254,8 @@ sub print_table {
 sub __used_columns {
     my ( $self, $tbl_orig, $width, $next ) = @_;
     my $tcu = Term::Choose::Util->new(
-        { index => 1, all_by_default => 1, keep_chosen => 1, cs_begin => "\n", confirm => '-OK-', back => ' << ' } # pad_row_edges
+        { index => 1, all_by_default => 1, keep_chosen => 1, cs_begin => "\n", confirm => '-OK-', back => ' << ',
+          color => $self->{color}, footer => $self->{footer}, mouse => $self->{mouse} } # pad_row_edges
     );
     my $cols;
     if ( defined $next && $next == $window_width_changed ) {
@@ -304,7 +305,8 @@ sub __used_columns {
                     $tbl_orig->[0],
                     # [ @{$tbl_orig->[0]}[@$cols] ],
                     { info => $info, prompt => $prompt, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0,
-                    search => $self->{search} }
+                    search => $self->{search}, footer => $self->{footer}, color => $self->{color},
+                    codepage_mapping => $self->{codepage_mapping} }
                 );
                 return;
             }
@@ -315,7 +317,6 @@ sub __used_columns {
     }
     return $desired_cols, $cols;
 }
-
 
 
 sub __get_data {
@@ -704,6 +705,16 @@ sub __cols_to_string {
 
     HEADER: for my $col ( 0 .. $#{$width->{cols_calc}} ) {
         $header .= adjust_to_printwidth( $tbl_copy->[0][$col], $width->{cols_calc}[$col] );
+        if ( $self->{color} ) {
+            my $orig_col = $self->{_used_cols_tbl_orig}[$col];
+            if ( defined $tbl_orig->[0][$orig_col] ) {
+                my @color = $tbl_orig->[0][$orig_col] =~ /(${\SGR_ES})/g;
+                if ( @color ) {
+                    $header =~ s/${\PH}/shift @color/ge;
+                    $header .= "\e[0m";
+                }
+            }
+        }
         $header .= $col == $#{$width->{cols_calc}} ? $lrb : $tab;
     }
     $tbl_copy->[0] = $header; # overwrite $tbl_copy to save memory
@@ -776,15 +787,6 @@ sub __cols_to_string {
                         $str =~ s/${\PH}/shift @color/ge;
                         $str .= "\e[0m";
                     }
-                    #if ( @color ) {
-                    #    if ( $color[-1] !~ /^\e\[0?m/ ) {
-                    #        push @color, "\e[0m";
-                    #    }
-                    #    $str =~ s/${\PH}/shift @color/ge;
-                    #    if ( @color ) {
-                    #        $str .= $color[-1];
-                    #    }
-                    #}
                 }
             }
             $str .= $col == $#{$width->{cols_calc}} ? $lrb : $tab;
@@ -882,7 +884,7 @@ sub __print_single_row {
         $row_data,
         { prompt => '', layout => 2, clear_screen => 1, mouse => $self->{mouse}, hide_cursor => 0, empty => ' ',
           search => $self->{search}, skip_items => $regex, footer => $footer, page => $self->{page},
-          color => $self->{color} }
+          color => $self->{color}, codepage_mapping => $self->{codepage_mapping} }
     );
 }
 
@@ -996,7 +998,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.181
+Version 0.182
 
 =cut
 

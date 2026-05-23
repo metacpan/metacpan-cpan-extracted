@@ -1,9 +1,31 @@
 ==================================================
-Changes from 2024-03-14 00:00:00 +0000 to present.
+Changes from 2024-05-22 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.016 at 2026-03-14 01:30:22 +0000
+version 0.017 at 2026-05-22 12:25:04 +0000
+------------------------------------------
+
+  Change: ef693903b96b496934ca8cf9f49456680434f56e
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2026-05-22 08:24:23 +0000
+
+    Fixing author deps which seem to have gone missing 
+
+  Change: 3dd6e6c6ac1f65b7119c69023b7bdf24103c50f8
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2026-05-20 14:04:11 +0000
+
+    Add a default distribution name 
+
+  Change: 4721d934e3dd6571ae145c3df11598149b8c3ed9
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2026-05-20 13:58:44 +0000
+
+    Add Test::UnusedVars Plugin and fix an unused variable error 
+
+------------------------------------------
+version 0.016 at 2026-03-14 01:28:32 +0000
 ------------------------------------------
 
   Change: d4808d3f49ec30b5d2793915672cbf60d20a70d8
@@ -24,5 +46,5 @@ version 0.016 at 2026-03-14 01:30:22 +0000
     Version 0.015 released 
 
 =================================================
-Plus 14 releases after 2024-03-14 00:00:00 +0000.
+Plus 14 releases after 2024-05-22 00:00:00 +0000.
 =================================================

@@ -3,7 +3,7 @@ use warnings;
 
 use File::Object;
 use Pod::Example qw(sections);
-use Test::More 'tests' => 4;
+use Test::More 'tests' => 5;
 use Test::NoWarnings;
 
 # Load module.
@@ -46,4 +46,16 @@ is_deeply(
 	\@ret,
 	\@right_ret,
 	'Two sections from module file.',
+);
+
+# Test.
+@ret = sections($modules_dir->file('Ex16.pm')->s);
+@right_ret = (
+	'EXAMPLE1',
+	'EXAMPLE2',
+);
+is_deeply(
+	\@ret,
+	\@right_ret,
+	'Two subsections from EXAMPLES section.',
 );

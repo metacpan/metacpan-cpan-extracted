@@ -6,7 +6,7 @@ use JSON::MaybeXS;
 use namespace::autoclean;
 with qw(eris::role::dictionary);
 
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 
 requires qw(hash);
@@ -65,15 +65,13 @@ __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
 eris::role::dictionary::hash - Simple dictionary implementation based off a hash
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 

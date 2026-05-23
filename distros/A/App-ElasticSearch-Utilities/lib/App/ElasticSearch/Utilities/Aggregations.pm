@@ -4,6 +4,8 @@ package App::ElasticSearch::Utilities::Aggregations;
 use v5.16;
 use warnings;
 
+use App::ElasticSearch::Utilities qw(es_format_numeric);
+
 use Storable qw(dclone);
 use Sub::Exporter -setup => {
     exports => [ qw(
@@ -44,6 +46,7 @@ $Aggregations{rare_terms} = {
 
 $Aggregations{histogram} = {
     params => sub {
+        return unless defined $_[0];
         return unless $_[0] > 0;
         return { interval => $_[0] };
     },
@@ -143,7 +146,7 @@ sub expand_aggregate_string {
             $params = $Aggregations{$agg}->{params}->($paramStr);
         }
         $alias ||= join ".", $agg eq 'terms' ? ($field) : ($agg, $field);
-        $aggs{$alias} = { $agg => { field => $field, %{ $params } } };
+        $aggs{$alias} = { $agg => { field => $field, %{ $params || {} } } };
     }
     return \%aggs;
 }
@@ -168,7 +171,7 @@ sub es_flatten_aggregations {
             push @{ $row }, $key, $hash->{value_as_string};
         }
         elsif( $hash->{value} ) {
-            push @{ $row }, $key, $hash->{value};
+            push @{ $row }, $key, es_format_numeric($hash->{value});
         }
         elsif( $hash->{values} ) {
             foreach my $k ( sort keys %{ $hash->{values} } ) {
@@ -255,7 +258,7 @@ App::ElasticSearch::Utilities::Aggregations - Code to simplify creating and work
 
 =head1 VERSION
 
-version 8.8
+version 8.9
 
 =head1 FUNCTIONS
 
@@ -598,7 +601,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2024 by Brad Lhotsky.
+This software is Copyright (c) 2026 by Brad Lhotsky.
 
 This is free software, licensed under:
 

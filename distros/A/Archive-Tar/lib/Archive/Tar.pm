@@ -32,7 +32,7 @@ use vars qw[$DEBUG $error $VERSION $WARN $FOLLOW_SYMLINK $CHOWN $CHMOD
 $DEBUG                  = 0;
 $WARN                   = 1;
 $FOLLOW_SYMLINK         = 0;
-$VERSION                = "3.06";
+$VERSION                = "3.08";
 $CHOWN                  = 1;
 $CHMOD                  = 1;
 $SAME_PERMISSIONS       = $> == 0 ? 1 : 0;
@@ -955,6 +955,19 @@ sub _make_special_file {
     my $err;
 
     if( $entry->is_symlink ) {
+        if( !$INSECURE_EXTRACT_MODE ) {
+            my $linkname = $entry->linkname;
+            if( File::Spec->file_name_is_absolute($linkname) ) {
+                $self->_error( qq[Symlink '] . $entry->full_path .
+                    qq[' has absolute target. Not extracting under SECURE EXTRACT MODE] );
+                return;
+            }
+            if( grep { $_ eq '..' } File::Spec->splitdir($linkname) ) {
+                $self->_error( qq[Symlink '] . $entry->full_path .
+                    qq[' target attempts traversal. Not extracting under SECURE EXTRACT MODE] );
+                return;
+            }
+        }
         my $fail;
         if( ON_UNIX ) {
             symlink( $entry->linkname, $file ) or $fail++;
@@ -968,6 +981,23 @@ sub _make_special_file {
                 $entry->linkname .q[' failed] if $fail;
 
     } elsif ( $entry->is_hardlink ) {
+        if( !$INSECURE_EXTRACT_MODE ) {
+            my $linkname = $entry->linkname;
+            if( File::Spec->file_name_is_absolute($linkname) ) {
+                $self->_error( qq[Hardlink '] . $entry->full_path .
+                    qq[' has absolute target '$linkname'. Not extracting ] .
+                    qq[under SECURE EXTRACT MODE: extraction itself chmods ] .
+                    qq[the shared inode.] );
+                return;
+            }
+            if( grep { $_ eq '..' } File::Spec->splitdir($linkname) ) {
+                $self->_error( qq[Hardlink '] . $entry->full_path .
+                    qq[' target '$linkname' attempts traversal. Not ] .
+                    qq[extracting under SECURE EXTRACT MODE: extraction ] .
+                    qq[itself chmods the shared inode.] );
+                return;
+            }
+        }
         my $fail;
         if( ON_UNIX && $EXTRACT_HARDLINK ) {
             link( $entry->linkname, $file ) or $fail++;

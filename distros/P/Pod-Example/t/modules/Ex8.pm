@@ -11,9 +11,6 @@ our $VERSION = 0.01;
  use strict;
  use warnings;
 
- # Print.
- print "Foo.\n";
-
 =begin text
 
    +-------------+
@@ -23,6 +20,9 @@ our $VERSION = 0.01;
 
  ^^^^ Figure 1. ^^^^
 
-=end html
+=end text
+
+ # Print.
+ print "Foo.\n";
 
 =cut

@@ -4,7 +4,7 @@ use 5.010;
 
 package Email::Address::List;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 use Email::Address;
 
 =head1 NAME
@@ -87,6 +87,14 @@ allowed within mailbox. However, there are no big problems if
 those are used and actually RFC 6532 extends a few rules
 from 5322 with UTF8-non-ascii. Either use the feature or just
 skip such addresses with skip_not_ascii option.
+
+Whitespace and Unicode format characters (category C<\p{Cf}>:
+ZERO WIDTH SPACE, ZWJ, ZWNJ, BOM, soft hyphen, bidi marks, etc.)
+are stripped from C<local-part> and C<domain>. Such characters
+are typically introduced by copy/paste; left in, they produce
+undeliverable mail. Stripping does not apply inside quoted
+local-parts (their contents are preserved literally), nor to the
+display-name or comments.
 
 =item group start
 
@@ -377,7 +385,9 @@ sub _process_mailbox {
     # deal with spaces out of quoted strings
     s{ ($RE{'quoted-string'}) | \s+ }{ $1? $1 : ' ' }xgoe
         foreach grep defined, $phrase;
-    s{ ($RE{'quoted-string'}) | \s+ }{ $1? $1 : '' }xgoe
+    # Strip whitespace and invisible format characters that
+    # aren't inside a quoted-string.
+    s{ ($RE{'quoted-string'}) | [\p{White_Space}\p{Cf}]+ }{ $1? $1 : '' }xgoe
         foreach $user, $host;
 
     # dequote
@@ -392,11 +402,24 @@ sub _process_mailbox {
 
 =head1 AUTHOR
 
-Ruslan Zakirov E<lt>ruz@bestpractical.comE<gt>
+Best Practical Solutions, LLC E<lt>modules@bestpractical.comE<gt>
 
-=head1 LICENSE
+=head1 BUGS
 
-Under the same terms as Perl itself.
+All bugs should be reported via email to
+
+    L<bug-Email-Address-List@rt.cpan.org|mailto:bug-Email-Address-List@rt.cpan.org>
+
+or via the web at
+
+    L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=Email-Address-List>.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2012-2026 Best Practical Solutions, LLC.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
 
 =cut
 

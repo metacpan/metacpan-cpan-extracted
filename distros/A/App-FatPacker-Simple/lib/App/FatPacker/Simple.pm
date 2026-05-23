@@ -1,4 +1,4 @@
-package App::FatPacker::Simple v1.0.0;
+package App::FatPacker::Simple v1.0.2;
 use v5.24;
 use warnings;
 use experimental qw(lexical_subs signatures);

@@ -1,5 +1,162 @@
 Revision history for Perl extension IPC::Shareable.
 
+1.14     2026-05-22
+    - Modify remove() to properly catch a non "0 but true" case when trying
+      to destroy segments and semaphores so warnings are displayed properly
+    - remove() now leaves the global and process registers intact if the destroy
+      operation fails
+    - Rename _mg_tie() to _magic_tie()
+    - Rename _is_kid() to _is_child()
+    - In IPC::SharedMem, removed leading underscore from object attributes
+    - Parameter list in IPC::SharedMem::new() is now in the form of a hash
+    - Code refactoring in IPC::SharedMem
+    - Add POD for IPC::SharedMem
+    - SharedMem::remove() now returns 1 on '0 but true' and 0 otherwise
+      that was preventing matches from happening, and broke JSON
+    - ipcs() now ignores lines that don't include an actual key
+    - Add data() method to SharedMem. This strips off the NULL pad bytes from
+      shmread()
+    - Added key_hex() to SharedMem. Will allow for easier troubleshooting when
+      using ipcs (closes #32)
+    - Added SharedMem::stat(); returns a new object that contains the related
+      info about the actual shared memory segment
+    - Fixes #49; Logic error from old implementation of JSON
+    - Fixes #47; Clean up broken code in old _decode_json()
+    - Fixes #41; JSON serializer not handling nested data structures properly
+    - Closes #52; Add tests and POD for SharedMem::stat struct methods
+    - Added SharedMem::stats(), return an href of all segment stats
+    - Closes #48; All tests now run unconditionally; there is no more
+      CI_TESTING flag required
+    - Greatly simplify the FIRSTKEY and NEXTKEY shared hash ops; removed the
+      _iterating flag complexity and replaced it with an _hkey_list instead
+    - Fixes #38; Fixed issue where the global_register was not being populated
+      if a data access hadn't happened yet, causing leaked segments upon
+      cleanup. This fix eliminated the weird 'Dumper' hack
+    - Add new scripts/flush_ipc.sh script that cleans out all segments and
+      semaphores from the system for the current user
+    - Closes #28; Add link to Script::Singleton in singleton() POD
+    - Closes #24; lock() now allows a cref parameter. If a LOCK_EX lock can be
+      acquired, we will set the lock, execute the subroutine, then release the
+      lock
+    - 'tidy' attribute now defaults to true
+    - All unit tests do a check for leaked segments and semaphores at their
+      conclusion. Also, when running 'make test' it compares the numbers before
+      and after and doubly makes sure there are no leaks
+    - Closes #51; Better document that the 'size' attribute is for each segment,
+      and not the overall size of all the data. Also emphasize that each nested
+      data structure requires an additional segment, they aren't all stashed
+      into a single one
+    - Added uuid(), sets an internal UUID for each tied object (primarily used
+      for troubleshooting)
+    - Fixes #50; Added enforced locking, with optional warning
+    - Correct five areas in clean/delete routines where segments may have been
+      able to leak
+    - Removed redundant _global_register checks in STORE, FETCH, PUSH; _tie()
+      already registers unconditionally
+    - Add ref() check before _is_child(); skips the function call reftype()
+      entirely for plain scalar values in FETCH, CLEAR, and DELETE
+    - Add ref() check before _need_tie(); same pattern in all three STORE
+      branches
+    - _type_int numeric dispatch; string eq comparisons on every operation
+      replaced with == against integer constants in STORE, FETCH, and CLEAR
+    - Major POD enhancements/cleanup
+    - Renamed ipcs() to seg_count() as it's far more explanatory
+    - Add new method sysv_info() which if the system provides it, retrieves all
+      information related to the SYSV infrastructure (limits etc)
+    - Closes #45; We now accept a hex-based value as the key
+    - Added shm_segments(); fetches raw data about all segments that had been
+      created by this distribution
+    - Added unknown_segments(); returns an aref of all segment keys (in hex
+      string format) for segments we've created but are no longer registered to
+      any known process
+    - Closes #39; remove() now accepts a key, and can remove the segment and
+      semaphores related to that key, even if it isn't related to this
+      distribution
+    - Updated CI so we get a test run on an i386 Ubuntu container to test
+      32-bit platforms
+    - Fix issue when using JSON serializer where it wasn't properly handling
+      scalar references properly (eg. creating a tie with a hashref)
+    - Enhanced much of the test suite to test both Storable and JSON serializers
+    - Much work in order to add provisions so that shm counting and tracking
+      works on FreeBSD
+    - Add FreeBSD VM config and unit test runner in ci/ dir
+    - Removed the archaic _debug() and _trace functions
+    - Enhanced 'protected' segments; we now use a semaphore to mark a segment as
+      protected (SEM_PROTECTED), and all processes that load this segment will
+      inherit the protected status
+    - Add sem_map(); outputs a text representation of the segment/semaphore
+      mappings
+    - Added consistent naming for all four semaphores: SEM_EXISTS, SEM_READERS,
+      SEM_WRITERS, and SEM_PROTECTED
+    - Default serializer now JSON; Added check for backwards compatibility that
+      if JSON _decode() fails, we then attempt a Storable _thaw()
+    - Added sem_count(); behaves like seg_count() but for semaphores. Also
+      updated tests to ensure no straggling semaphores are left behind
+    - All LOCK_EX and LOCK_SH locks are now applied to all child segments when
+      the lock is first instantiated on the tied object. Both of them are rolled
+      out in reverse order from the lowest-level child upwards when the lock is
+      released
+    - New attributes for updated locking mechanisms: enforced_write_locking,
+      enforced_read_locking, violated_write_lock_warn and
+      violated_read_lock_warn. All enabled by default
+    - Fixes #11; On non-English locales on perl 5.20 and below, checking $! for
+      strings in certain cases was failing and sending code down the wrong path.
+      The fix was to replace the comparisons with $!{ERRNO_CONST} variables
+      instead (eg. $!{EEXIST}, $!{ENOMEM}, $!{ENOSPC}) which are
+      locale-independent
+    - Add Solaris (including OmniOS/illumos) support for shm_segments(),
+      seg_map(), and SharedMem stat()/stats() methods by providing
+      Solaris-specific shmid_ds unpack templates
+    - Add explicit use Errno so that $!{ENOMEM} and $!{EEXIST} checks work
+      reliably on all platforms (Solaris Perl builds did not populate these
+      keys in the %! tied hash without the module loaded)
+    - Complete VM unit testing framework with scripts and README for FreeBSD,
+      Linux i386 and Solaris (32 and 64 bit)
+    - Replace regex-based null-byte stripping in SharedMem::data() with more
+      efficient index+substr
+    - SharedMem::stats() now calls stat() once and reuses it, avoiding 11
+      redundant shmctl(IPC_STAT) syscalls
+    - _encode_json_prepare() now short-circuits for structures with no
+      IPC::Shareable child refs, avoiding a full hash/array copy on every encode
+    - _decode_json_restore() hoists ref($prev) checks outside hot loop
+    - Added XS implementation of _is_child() for faster child-knot detection;
+      falls back to pure Perl _is_child_pp() if the compiled XS can't be loaded.
+      The XS function _is_child_xs inspects SV magic directly in C, avoiding
+      Scalar::Util::reftype, tied(), and ref() calls
+    - Added t/75-is_child_xs.t to test both XS and pure-Perl _is_child paths
+    - Added IPC_SHAREABLE_NO_XS env var to force pure-Perl mode for verifying
+      operation on systems without a C compiler
+    - Eliminated redundant second ipcs -m shell-out in seg_map(); get id mapping
+      from shm_segments() result instead
+    - Replaced all backtick shell-outs with open('-|', @cmd) pipe-open to bypass
+      /bin/sh and halve the fork count
+    - Rewrote _lock_children() from recursive to iterative (manual stack) to
+      eliminate Perl call-stack overhead on deeply nested structures; simplified
+      interface returns an arrayref instead of passing accumulator/seen refs
+    - Fix STORE child-segment leak: old child references were silently
+      discarded without removing shm segments/semaphores. STORE now calls
+      _remove_child() before overwriting. Extracted the common pattern into
+      _remove_child() to deduplicate across DELETE, CLEAR, and STORE.
+    - Remove the 'tidy' attribute and _reset_segment() internals. The STORE fix
+      made _reset_segment() a no-op that only produced double-removal warnings.
+    - Fix t/25-fetch_read_warn.t pipe synchronization so the parent blocks until
+      the child confirms LOCK_EX, instead of a blind sleep
+    - shm_segments() now probes the 14-byte 'IPC::Shareable' tag before pulling
+      the full segment into Perl, avoiding gigabyte allocations for foreign segs
+    - Drop unconditional use-time srand(); _shm_key_rand collisions are already
+      caught by the IPC_EXCL re-check loop, so reseeding callers' RNG is needless
+    - Remove redundant Data::Dumper imports from Shareable.pm and SharedMem.pm
+    - Fix _shm_key() off-by-one: overflow-correction now triggers on
+      crc32 == MAX_KEY_INT_SIZE, making the post-subtraction key==0 croak
+      actually reachable
+    - Test coverage additions: unknown_segments() via fork+exit, sysv_info() on
+      Solaris, JSON->Storable carp format, both write-lock flags disabled,
+      _shm_key() key==0 croak (Mock::Sub on crc32), IPC_PRIVATE + JSON nested
+      tie, STORE scalar-ref over previous \$undef
+    - Fix t/73-internal.t cross-version: qr// reftype differs between 5.10 and
+      5.12+, so use a CODE ref to exercise the _encode_json_prepare fallthrough
+    - Bump prereq of Test::More to 0.98 due to 5.10.1 using 0.94 by default
+
 1.13    2022-10-11
     - In singleton(), do a check whether class was sent in. There was a shifting
       issue if called with IPC::Shareable::singleton() as opposed to

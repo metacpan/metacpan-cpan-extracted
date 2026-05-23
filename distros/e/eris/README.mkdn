@@ -4,7 +4,7 @@ eris - Eris is the Greek Goddess of Chaos
 
 # VERSION
 
-version 0.008
+version 0.009
 
 # SYNOPSIS
 
@@ -26,7 +26,7 @@ eris is structured to be flexible, extensible, and visible in every component.
 
 ## DECODER
 
-Decoders are pluggable thanks to [eris::role::pluggable](https://metacpan.org/pod/eris::role::pluggable) and they are searched
+Decoders are pluggable thanks to [eris::role::pluggable](https://metacpan.org/pod/eris%3A%3Arole%3A%3Apluggable) and they are searched
 for in the the default namespace `eris::log::decoder`.  To add other
 namespaces, use the `search_path` parameter in a config file:
 
@@ -41,19 +41,19 @@ for every message.
 
 ### SEE ALSO
 
-- [eris::log::decoders](https://metacpan.org/pod/eris::log::decoders)
+- [eris::log::decoders](https://metacpan.org/pod/eris%3A%3Alog%3A%3Adecoders)
 
     Class providing access to installed and configured decoders on the system.
 
-- [eris::log::contextualizer](https://metacpan.org/pod/eris::log::contextualizer)
+- [eris::log::contextualizer](https://metacpan.org/pod/eris%3A%3Alog%3A%3Acontextualizer)
 
     Class which uses the decoders to transform the raw data into structured data.
 
-- [eris::role::decoder](https://metacpan.org/pod/eris::role::decoder)
+- [eris::role::decoder](https://metacpan.org/pod/eris%3A%3Arole%3A%3Adecoder)
 
     The abstract role which implements a decoder.
 
-- [eris::log::decoder::syslog](https://metacpan.org/pod/eris::log::decoder::syslog), [eris::log::decoder::json](https://metacpan.org/pod/eris::log::decoder::json)
+- [eris::log::decoder::syslog](https://metacpan.org/pod/eris%3A%3Alog%3A%3Adecoder%3A%3Asyslog), [eris::log::decoder::json](https://metacpan.org/pod/eris%3A%3Alog%3A%3Adecoder%3A%3Ajson)
 
     Default implementations of decoders.
 
@@ -68,14 +68,14 @@ parameter in your config file:
       search_path:
         - 'my::app::context'
 
-Contexts implement the interface documented in [eris::role::context](https://metacpan.org/pod/eris::role::context).  There
+Contexts implement the interface documented in [eris::role::context](https://metacpan.org/pod/eris%3A%3Arole%3A%3Acontext).  There
 are 4 major things to consider when implementing a new context.
 
 - **contextualize\_message**
 
     This method is called when the context matches the event data.  This is where
     you can implement your own parsing or analysis of the event data.  To add
-    context to an event, use the [eris::log](https://metacpan.org/pod/eris::log)'s `add_context()` method.  That
+    context to an event, use the [eris::log](https://metacpan.org/pod/eris%3A%3Alog)'s `add_context()` method.  That
     context data will be available to future contexts.
 
 - **sample\_messages**
@@ -89,7 +89,7 @@ are 4 major things to consider when implementing a new context.
     two special fields `*` and `_exists_`.  The `*` is used in conjunction with
     a matcher of `*` to match all messages.  The `_exists_` operator is used to
     check for the existence of a key in the context.  A sample use of this field
-    specifier is used by the [eris::log::context::GeoIP](https://metacpan.org/pod/eris::log::context::GeoIP) context with an regex
+    specifier is used by the [eris::log::context::GeoIP](https://metacpan.org/pod/eris%3A%3Alog%3A%3Acontext%3A%3AGeoIP) context with an regex
     matcher to operate on any event data with field names matching `'_ip$'`.
 
 - **matcher**
@@ -105,49 +105,49 @@ are 4 major things to consider when implementing a new context.
 
 The default `field` is 'program', and the default matcher is a string with the
 value equal to the context's `name` attribute.  For instance,
-[eris::log::context::sshd](https://metacpan.org/pod/eris::log::context::sshd) defaults it's name to 'sshd', and since it doesn't
+[eris::log::context::sshd](https://metacpan.org/pod/eris%3A%3Alog%3A%3Acontext%3A%3Asshd) defaults it's name to 'sshd', and since it doesn't
 override the field, this context is only applied to events with a 'program' key
 with a value of 'sshd'.
 
 ### SEE ALSO
 
-- [eris::log::contexts](https://metacpan.org/pod/eris::log::contexts)
+- [eris::log::contexts](https://metacpan.org/pod/eris%3A%3Alog%3A%3Acontexts)
 
     Class providing access to installed and configured contexts on the system.
 
-- [eris::log::contextualizer](https://metacpan.org/pod/eris::log::contextualizer)
+- [eris::log::contextualizer](https://metacpan.org/pod/eris%3A%3Alog%3A%3Acontextualizer)
 
     Class which uses the contexts to transform the raw data into structured data.
 
-- [eris::role::context](https://metacpan.org/pod/eris::role::context)
+- [eris::role::context](https://metacpan.org/pod/eris%3A%3Arole%3A%3Acontext)
 
     The abstract role which implements a context.
 
-- [eris::log::context::sshd](https://metacpan.org/pod/eris::log::context::sshd), [eris::log::context::GeoIP](https://metacpan.org/pod/eris::log::context::GeoIP)
+- [eris::log::context::sshd](https://metacpan.org/pod/eris%3A%3Alog%3A%3Acontext%3A%3Asshd), [eris::log::context::GeoIP](https://metacpan.org/pod/eris%3A%3Alog%3A%3Acontext%3A%3AGeoIP)
 
     Selected example contexts
 
 ## DICTIONARY
 
-Dictionaries are used in conjunction with schemas to filter [eris::log](https://metacpan.org/pod/eris::log) contexts down to
+Dictionaries are used in conjunction with schemas to filter [eris::log](https://metacpan.org/pod/eris%3A%3Alog) contexts down to
 only the keys and values we want.  This allows better control of the data headed into storage
 to prevent key space explosions.
 
 ### SEE ALSO
 
-- [eris::dictionary](https://metacpan.org/pod/eris::dictionary)
+- [eris::dictionary](https://metacpan.org/pod/eris%3A%3Adictionary)
 
     Class providing access to installed and configured dictionaries on the system.
 
-- [eris::role::schema](https://metacpan.org/pod/eris::role::schema)
+- [eris::role::schema](https://metacpan.org/pod/eris%3A%3Arole%3A%3Aschema)
 
     Class which uses the dictionaries to filter structured data into a document.
 
-- [eris::role::dictionary](https://metacpan.org/pod/eris::role::dictionary)
+- [eris::role::dictionary](https://metacpan.org/pod/eris%3A%3Arole%3A%3Adictionary)
 
     The abstract role which implements a dictionary.
 
-- [eris::dictionary::cee](https://metacpan.org/pod/eris::dictionary::cee), [eris::dictionary::eris::debug](https://metacpan.org/pod/eris::dictionary::eris::debug)
+- [eris::dictionary::cee](https://metacpan.org/pod/eris%3A%3Adictionary%3A%3Acee), [eris::dictionary::eris::debug](https://metacpan.org/pod/eris%3A%3Adictionary%3A%3Aeris%3A%3Adebug)
 
     Selected example contexts
 
@@ -159,15 +159,15 @@ being indexed.
 
 ### SEE ALSO
 
-- [eris::schemas](https://metacpan.org/pod/eris::schemas)
+- [eris::schemas](https://metacpan.org/pod/eris%3A%3Aschemas)
 
     Class providing access to installed and configured schemas on the system.
 
-- [eris::role::schema](https://metacpan.org/pod/eris::role::schema)
+- [eris::role::schema](https://metacpan.org/pod/eris%3A%3Arole%3A%3Aschema)
 
     The abstract role which implements a schema.
 
-- [eris::schema::syslog](https://metacpan.org/pod/eris::schema::syslog)
+- [eris::schema::syslog](https://metacpan.org/pod/eris%3A%3Aschema%3A%3Asyslog)
 
     Selected example contexts
 
@@ -219,7 +219,7 @@ breaking things.
 
 - **eris-field-lookup.pl**
 
-    This script allows you to query the [eris::dictionary](https://metacpan.org/pod/eris::dictionary) to see what it knows
+    This script allows you to query the [eris::dictionary](https://metacpan.org/pod/eris%3A%3Adictionary) to see what it knows
     about a particular field.
 
         eris-field-lookup.pl src_ip
@@ -236,7 +236,7 @@ breaking things.
 
 - **eris-stdin-listener.pl**
 
-    This is a wrapper around `eris-es-indexer.pl` using [POE::Component::WheelRun::Pool](https://metacpan.org/pod/POE::Component::WheelRun::Pool)
+    This is a wrapper around `eris-es-indexer.pl` using [POE::Component::WheelRun::Pool](https://metacpan.org/pod/POE%3A%3AComponent%3A%3AWheelRun%3A%3APool)
     to provide a pool of workers for processing log data at scale.  To use it with syslog-ng:
 
         destination d_eris { program("/usr/local/bin/eris-stdin-listener.pl" keep-alive(); ); };
@@ -249,11 +249,11 @@ breaking things.
 - **eris-eris-client.pl**
 
     This is a wrapper around `eris-es-indexer.pl` for use in environments using
-    the [POE::Component::Server::eris](https://metacpan.org/pod/POE::Component::Server::eris) syslog service.  This service is a simple,
+    the [POE::Component::Server::eris](https://metacpan.org/pod/POE%3A%3AComponent%3A%3AServer%3A%3Aeris) syslog service.  This service is a simple,
     stateless syslog message dispatch system used primarily for development of new
     syslog parser use cases.  It transforms the syslog stream into a subscription
     service any user on the local system can tap.  IF you're using that server, you
-    can run the `eris-eris-client.pl` to leverage [POE::Component::Client::eris](https://metacpan.org/pod/POE::Component::Client::eris)
+    can run the `eris-eris-client.pl` to leverage [POE::Component::Client::eris](https://metacpan.org/pod/POE%3A%3AComponent%3A%3AClient%3A%3Aeris)
     to receive messages from the upstream and dispatch them to a worker pool of
     `eris-es-indexer.pl`'s.  For more information, see:
 
@@ -262,6 +262,40 @@ breaking things.
 # AUTHOR
 
 Brad Lhotsky <brad@divisionbyzero.net>
+
+# SUPPORT
+
+## Websites
+
+The following websites have more information about this module, and may be of help to you. As always,
+in addition to those websites please use your favorite search engine to discover more resources.
+
+- MetaCPAN
+
+    A modern, open-source CPAN search engine, useful to view POD in HTML format.
+
+    [https://metacpan.org/release/eris](https://metacpan.org/release/eris)
+
+- CPAN Testers
+
+    The CPAN Testers is a network of smoke testers who run automated tests on uploaded CPAN distributions.
+
+    [http://www.cpantesters.org/distro/e/eris](http://www.cpantesters.org/distro/e/eris)
+
+- CPAN Testers Matrix
+
+    The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
+
+    [http://matrix.cpantesters.org/?dist=eris](http://matrix.cpantesters.org/?dist=eris)
+
+## Bugs / Feature Requests
+
+This module uses the GitHub Issue Tracker: [https://github.com/reyjrar/eris-logging/issues](https://github.com/reyjrar/eris-logging/issues)
+
+## Source Code
+
+This module's source code is available by visiting:
+[https://github.com/reyjrar/eris-logging](https://github.com/reyjrar/eris-logging)
 
 # COPYRIGHT AND LICENSE
 

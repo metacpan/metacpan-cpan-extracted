@@ -9,6 +9,7 @@ use Crypt::PasswdMD5; # For the version #.
 
 use Test::More;
 
+use Crypt::URandom;
 use Digest::MD5;
 use strict;
 use warnings;
@@ -19,6 +20,7 @@ pass('All external modules loaded');
 
 my(@modules) = qw
 /
+	Crypt::URandom
 	Digest::MD5
 	strict
 	warnings
