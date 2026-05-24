@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 # Hypersonic::Event::Role - Base class for event backends
 #
@@ -39,6 +39,19 @@ sub defines {
 sub event_struct {
     my $class = shift;
     die "$class must implement event_struct()";
+}
+
+# Event struct used by the UA::Async *slot tracking* helpers
+# (gen_create_loop / gen_add_with_slot / gen_wait_once / gen_get_slot).
+#
+# For most backends this is the same as event_struct, but io_uring
+# uses io_uring_cqe for its main server loop (correct for the ring
+# API) while its slot-tracking helpers are implemented on top of a
+# private epoll instance and therefore need struct epoll_event here.
+# Override in those backends; default delegates to event_struct.
+sub slot_event_struct {
+    my $class = shift;
+    return $class->event_struct;
 }
 
 sub gen_create {

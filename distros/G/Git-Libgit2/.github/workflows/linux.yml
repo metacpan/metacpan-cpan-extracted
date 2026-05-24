@@ -1,0 +1,52 @@
+name: linux
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+jobs:
+  debian:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        codename:
+          - bookworm
+        perl-version:
+          - '5.32'
+          - '5.36'
+          - '5.38'
+          - '5.40'
+    container:
+      image: perl:${{ matrix.perl-version }}-${{ matrix.codename }}
+    steps:
+      - uses: actions/checkout@v4
+      # Alien::Libgit2 is not on CPAN yet — install from sibling repo.
+      - name: Checkout Alien::Libgit2
+        uses: actions/checkout@v4
+        with:
+          repository: getty/p5-alien-libgit2
+          path: vendor/alien-libgit2
+      - name: perl -V
+        run: perl -V
+      - name: Install build prerequisites
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            libgit2-dev pkg-config git
+      - name: Install Dist::Zilla
+        run: cpanm -nq Dist::Zilla Dist::Zilla::PluginBundle::Author::GETTY
+      - name: Install Alien::Libgit2 from sibling repo
+        working-directory: vendor/alien-libgit2
+        run: |
+          dzil authordeps --missing | cpanm -nq
+          dzil listdeps --missing | cpanm -nq
+          dzil install
+      - name: Install dependencies
+        run: |
+          dzil authordeps --missing | cpanm -nq
+          dzil listdeps --missing | cpanm -nq
+      - name: Run tests
+        run: dzil test

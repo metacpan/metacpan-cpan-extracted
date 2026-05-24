@@ -31,12 +31,37 @@ sub spawn_server {
     if ($pid == 0) {
         # Child: redirect both streams to the log so anything the
         # server prints (or croaks with) survives the fork boundary.
-        open STDOUT, '>', $log_path or die "redirect stdout: $!";
-        open STDERR, '>&', \*STDOUT  or die "redirect stderr: $!";
+        # We open + dup2 at the fd level (via POSIX::dup2) so that C
+        # code in the JIT-loaded .so that writes directly with
+        # fprintf(stderr,...) or write(2,...) also lands in the log.
+        # Pure `open STDERR, ...` only redirects Perl's PerlIO layer
+        # and can leave C stdio still pointing at the original fd 2,
+        # which is why earlier CPAN tester reports showed
+        # "(child wrote no output)" - the croak DID happen but its
+        # bytes went to a closed fd.
+        require POSIX;
+        open(my $log_fh, '>', $log_path) or die "open log: $!";
+        $log_fh->autoflush(1);
+        POSIX::dup2(fileno($log_fh), 1) or die "dup2 stdout: $!";
+        POSIX::dup2(fileno($log_fh), 2) or die "dup2 stderr: $!";
+        # Re-open Perl's STDOUT/STDERR onto the now-redirected fds so
+        # `print` / `warn` from Perl also reach the log.
+        open STDOUT, '>&=', 1 or die "reopen stdout: $!";
+        open STDERR, '>&=', 2 or die "reopen stderr: $!";
         select STDERR; $| = 1;
         select STDOUT; $| = 1;
-        $child_code->();
-        exit 0;
+        # Make sure any C-level stdio buffers get flushed if the
+        # child dies via croak/exit/SIGPIPE rather than reaching the
+        # explicit exit() below.
+        eval { $child_code->(); };
+        my $err = $@;
+        STDOUT->flush;
+        STDERR->flush;
+        if ($err) {
+            print STDERR "child died: $err\n";
+            POSIX::_exit(70);  # EX_SOFTWARE
+        }
+        POSIX::_exit(0);
     }
     return ($pid, $log_path);
 }

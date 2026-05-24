@@ -1,12 +1,28 @@
 package MyBuilder;
-use v5.20;
+use v5.24;
 use warnings;
-use experimental 'signatures';
+use experimental qw(lexical_subs signatures);
 
 package MyCBuilder {
     use parent 'ExtUtils::CBuilder';
     use IPC::Run3 ();
 
+    sub compile ($self, @argv) {
+        my $file = eval { $self->SUPER::compile(@argv) };
+        if (my $err = $@) {
+            $self->log_verbose($err);
+            return;
+        }
+        $file;
+    }
+    sub link_executable ($self, @argv) {
+        my $file = eval { $self->SUPER::link_executable(@argv) };
+        if (my $err = $@) {
+            $self->log_verbose($err);
+            return;
+        }
+        $file;
+    }
     sub do_system ($self, @cmd) {
         if (!$self->{quiet}) {
             my $full = join ' ', map $self->quote_literal($_), @cmd;
@@ -53,17 +69,11 @@ sub _try_compile_run ($self, $source) {
     my $tempdir = File::Temp->newdir;
 
     my $c_file = File::Spec->catfile($tempdir, "try_compile_run.c");
-    { open my $fh, ">", $c_file or die; print {$fh} $source; }
-    my $obj_file = eval { $cbuilder->compile(source => $c_file) };
-    if ($@) {
-        $self->log_verbose($@);
-        return;
-    }
-    my $exe_file = eval { $cbuilder->link_executable(objects => [$obj_file]) };
-    if ($@) {
-        $self->log_verbose($@);
-        return;
-    }
+    { open my $fh, ">", $c_file or die; print {$fh} $source }
+    my $obj_file = $cbuilder->compile(source => $c_file)
+        or return;
+    my $exe_file = $cbuilder->link_executable(objects => [$obj_file])
+        or return;
     return $cbuilder->do_system($exe_file);
 }
 

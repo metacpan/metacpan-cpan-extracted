@@ -1,5 +1,21 @@
 Revision history for Hypersonic
 
+0.15    2026-05-22
+	- Requires XS::JIT with the functions_already_loaded() fix
+	- Hypersonic compile() now verifies the dispatch xsub is
+	  defined after dlopen and dies with the full link line if not
+	- HypersonicTest forked-server helper now POSIX::dup2()s the
+	  log fd over stdout/stderr (fd 1/2) so C-level fprintf(stderr,
+	  ...) from the JIT'd .so is captured
+	- Fix Hypersonic::UA::Async C codegen: AV *ready was declared
+	  twice in the same scope, breaking the build on gcc 14+
+	- Fix Hypersonic::UA::Async passing an io_uring_cqe* buffer to
+	  epoll_wait(): event backends now expose slot_event_struct()
+	  which IOUring overrides to 'epoll_event' 
+	- t/2011-ua-blocking-methods.t now uses HypersonicTest's
+	  spawn_server + wait_for_port with extended retries and a
+	  request-level readiness probe
+
 0.14    2026-05-17
 	- Fix Hypersonic::Event::IOUring missing async-slot methods
 	  (gen_create_loop, gen_add_with_slot, gen_get_slot,

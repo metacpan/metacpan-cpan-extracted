@@ -1,0 +1,48 @@
+name: alpine
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+jobs:
+  alpine-musl:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        perl-version:
+          - '5.38'
+          - '5.40'
+    container:
+      image: perl:${{ matrix.perl-version }}-alpine3.19
+    steps:
+      - uses: actions/checkout@v4
+      - name: Checkout Alien::Libgit2
+        uses: actions/checkout@v4
+        with:
+          repository: getty/p5-alien-libgit2
+          path: vendor/alien-libgit2
+      - name: perl -V
+        run: perl -V
+      - name: Install build prerequisites
+        run: |
+          apk add --no-cache \
+            cmake make gcc g++ musl-dev git \
+            openssl-dev libssh2-dev zlib-dev pcre2-dev pkgconfig \
+            libgit2-dev
+      - name: Install Dist::Zilla
+        run: cpanm -nq Dist::Zilla Dist::Zilla::PluginBundle::Author::GETTY
+      - name: Install Alien::Libgit2 from sibling repo
+        working-directory: vendor/alien-libgit2
+        run: |
+          dzil authordeps --missing | cpanm -nq
+          dzil listdeps --missing | cpanm -nq
+          dzil install
+      - name: Install dependencies
+        run: |
+          dzil authordeps --missing | cpanm -nq
+          dzil listdeps --missing | cpanm -nq
+      - name: Run tests
+        run: dzil test

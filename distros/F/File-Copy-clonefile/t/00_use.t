@@ -1,6 +1,6 @@
-use v5.20;
+use v5.24;
 use warnings;
-use experimental 'signatures';
+use experimental qw(lexical_subs signatures);
 
 use Cwd qw(cwd);
 use Errno ();

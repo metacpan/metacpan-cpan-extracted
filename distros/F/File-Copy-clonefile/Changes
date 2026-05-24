@@ -1,5 +1,8 @@
 Revision history for File-Copy-clonefile
 
+v1.0.0  2026-05-24 20:09:37 JST
+  - Raise minimum Perl to v5.24
+
 v0.0.10  2025-04-15 00:48:48 JST
   - No functional change; use Module::Build (#5)
 

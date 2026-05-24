@@ -1,0 +1,24 @@
+Revision history for Git-Libgit2
+
+0.001     2026-05-24 17:56:31Z
+  - Initial release
+  - Low-level FFI::Platypus bindings to libgit2 (via Alien::Libgit2)
+  - Core: init/shutdown, version, error_last, repository_open_ext/free,
+    config_open_default, reference_lookup/create/delete/iterator_new/name/target,
+    oid_fromstr/tostr, blob_create_from_buffer/lookup/rawcontent/rawsize/free,
+    treebuilder_new/insert/write/free, commit_create/lookup/tree/message/free,
+    object_lookup/free
+  - Remote + auth: remote_lookup/url/create/create_anonymous/connect/ls/disconnect,
+    remote_fetch/push/init_callbacks, fetch_options_init, push_options_init,
+    credential_userpass_plaintext_new/ssh_key_new/ssh_key_from_agent/
+    default_new/username_new/free, git_credential_acquire_cb closure type
+  - General-purpose: clone/clone_options_init, revwalk_* (new/push/push_head/
+    push_ref/push_glob/push_range/hide*/next/sorting/reset/simplify_first_parent/free),
+    branch_create/lookup/delete/iterator_new/next/iterator_free/name/is_head/move,
+    tag_create/create_lightweight/lookup/delete/list/list_match/target/target_id/
+    message/name/tagger/free,
+    status_options_init/foreach/foreach_ext/file,
+    diff_options_init/tree_to_tree/tree_to_workdir/tree_to_index/index_to_workdir/
+    num_deltas/get_delta/free,
+    repository_index/index_free, strarray_free
+  - Tested against libgit2 1.5 (Debian Bookworm) and 1.9 (vendored share build)

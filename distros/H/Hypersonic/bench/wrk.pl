@@ -117,7 +117,7 @@ die "Fork failed" unless defined $hs_pid;
 if ($hs_pid == 0) {
     require Hypersonic;
     my $server = Hypersonic->new(cache_dir => "_bench_wrk_$$");
-    $server->get('/hello' => sub { 'Hello, World!' });
+    $server->get('/hello' => sub { 'Hello, World!' }, { dynamic => 1 });
     $server->compile();
     $server->run(port => $hs_port, workers => 1);
     exit(0);

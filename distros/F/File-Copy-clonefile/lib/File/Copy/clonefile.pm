@@ -1,6 +1,7 @@
-package File::Copy::clonefile v0.0.10;
-use v5.20;
+package File::Copy::clonefile v1.0.0;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
 
 use Exporter 'import';
 our @EXPORT_OK = qw(
@@ -32,6 +33,13 @@ File::Copy::clonefile - call clonefile system call
 File::Copy::clonefile is a wrapper for
 L<clonefile|https://www.manpagez.com/man/2/clonefile/> system call.
 Thus, this module only supports platforms that have clonefile system call, such as macos.
+
+=head1 ARTIFACT ATTESTATIONS
+
+GitHub Artifact Attestations are generated for release tarballs uploaded to
+CPAN. If you care about provenance for the uploaded tarballs, see:
+
+L<https://github.com/skaji/perl-File-Copy-clonefile/attestations>
 
 =head1 COPYRIGHT AND LICENSE
 

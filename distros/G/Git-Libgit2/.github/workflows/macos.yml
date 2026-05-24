@@ -1,0 +1,42 @@
+name: macos
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+jobs:
+  macos:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Checkout Alien::Libgit2
+        uses: actions/checkout@v4
+        with:
+          repository: getty/p5-alien-libgit2
+          path: vendor/alien-libgit2
+      - name: Install Homebrew libgit2
+        run: brew install libgit2 pkg-config
+      - name: Set up Perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.40'
+      - name: perl -V
+        run: perl -V
+      - name: Install Dist::Zilla
+        run: cpanm -nq Dist::Zilla Dist::Zilla::PluginBundle::Author::GETTY
+      - name: Install Alien::Libgit2 from sibling repo
+        working-directory: vendor/alien-libgit2
+        run: |
+          dzil authordeps --missing | cpanm -nq
+          dzil listdeps --missing | cpanm -nq
+          dzil install
+      - name: Install dependencies
+        run: |
+          dzil authordeps --missing | cpanm -nq
+          dzil listdeps --missing | cpanm -nq
+      - name: Run tests
+        env:
+          DYLD_FALLBACK_LIBRARY_PATH: /opt/homebrew/lib:/usr/local/lib
+        run: dzil test

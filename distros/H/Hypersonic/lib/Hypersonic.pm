@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Scalar::Util qw(blessed);
 use XS::JIT;
@@ -878,13 +878,23 @@ sub compile {
             unless $ld =~ /-lws2_32\b/;
     }
 
-    XS::JIT->compile(%compile_opts);
+    my $ok = XS::JIT->compile(%compile_opts);
+    die "XS::JIT->compile failed for $module_name (check liburing/zlib/openssl "
+      . "are installed and linkable; extra_ldflags='"
+      . ($compile_opts{extra_ldflags} // '') . "')"
+        unless $ok;
 
-    # Store function references
+    # Store function references - confirm the boot xsub actually installed
+    # them. If we somehow got past compile() with the .so loaded but the
+    # symbols missing, fail loudly here rather than crash later in run().
     {
         no strict 'refs';
         $self->{run_loop_fn} = \&{"${module_name}::run_event_loop"};
         $self->{dispatch_fn} = \&{"${module_name}::dispatch"};
+        die "XS::JIT loaded $module_name but ::dispatch is not defined "
+          . "(stale cache_dir? link line was: ldflags='"
+          . ($compile_opts{extra_ldflags} // '') . "')"
+            unless defined &{"${module_name}::dispatch"};
     }
 
     # Mark Future/Pool as compiled if async pool is enabled

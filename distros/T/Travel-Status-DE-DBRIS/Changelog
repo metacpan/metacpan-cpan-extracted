@@ -1,6 +1,12 @@
+Travel::Status::DE::DBRIS 0.29 - Sun May 24 2026
+
+    * dbris-m: location search: show distances if GIS::Distance is available
+    * Update operator names (thanks to typingbeaver, Thulmi, and Lili Urban)
+
 Travel::Status::DE::DBRIS 0.28 - Tue May 05 2026
 
     * Location: adjust for bahn.de-internal API changes
+    * Update train names (patch by Thulmi)
 
 Travel::Status::DE::DBRIS 0.27 - Sat Mar 28 2026
 

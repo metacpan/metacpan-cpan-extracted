@@ -6,7 +6,7 @@ use 5.010;
 
 use parent 'Hypersonic::Event::Role';
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 sub name { 'kqueue' }
 

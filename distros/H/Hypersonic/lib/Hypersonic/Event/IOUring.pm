@@ -6,7 +6,7 @@ use 5.010;
 
 use parent 'Hypersonic::Event::Role';
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 sub name { 'io_uring' }
 
@@ -75,6 +75,16 @@ C
 }
 
 sub event_struct { 'io_uring_cqe' }
+
+# UA::Async slot-tracking helpers below use a private epoll instance
+# (io_uring's own slot tracking would mean weaving user_data through
+# the shared submission ring, which is a lot more invasive). So when
+# UA::Async asks for a buffer to pass to gen_wait_once it must be
+# struct epoll_event[], NOT io_uring_cqe[]. See the Fedora 43 / perl
+# 5.38.5 smoker report (5ce1e632) for what happens when the wrong
+# type is declared - epoll_wait() argument-type mismatch + a missing
+# `data` member access.
+sub slot_event_struct { 'epoll_event' }
 
 sub extra_cflags  { '' }
 sub extra_ldflags { '-luring' }

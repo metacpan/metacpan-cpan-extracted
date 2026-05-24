@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 # Use Hypersonic::Event for backend detection
 use Hypersonic::Event;
@@ -365,9 +365,12 @@ sub gen_xs_poll_batch {
       ->line('int nev;')
       ->line('AV *ready;');
 
-    # Add event struct declaration for advanced backends (C89 compliance)
+    # Add event struct declaration for advanced backends (C89 compliance).
+    # Use slot_event_struct (not event_struct): io_uring's slot tracking
+    # is implemented on a private epoll fd, so the buffer passed to
+    # gen_wait_once must be epoll_event[] there, not io_uring_cqe[].
     if ($use_advanced) {
-        my $event_struct = $event_backend->event_struct;
+        my $event_struct = $event_backend->slot_event_struct;
         $builder->line("struct $event_struct events[MAX_EVENTS];");
     }
 
@@ -438,9 +441,13 @@ sub gen_xs_poll_batch {
           ->xs_end
           ->blank;
     } else {
-        # Fallback to select-based implementation for other backends
+        # Fallback to select-based implementation for other backends.
+        # NOTE: `ready` is already declared at the top of the function
+        # (line ~366 above); declaring `AV *ready = newAV();` here is a
+        # C redeclaration-with-no-linkage error on gcc >= 14 and on the
+        # Fedora 43 smoker (perl 5.38.5). Just assign.
         $builder->comment('Fallback to select() for portability')
-          ->line('AV *ready = newAV();')
+          ->line('ready = newAV();')
           ->line('for (i = 0; i < items; i++) {')
           ->line('    int slot = SvIV(ST(i));')
           ->line('    if (slot < 0 || slot >= MAX_ASYNC_CONTEXTS) continue;')
@@ -883,8 +890,10 @@ sub gen_xs_tick {
     $builder->line('}')
       ->blank;
     
-    # Register all fds - use backend's native struct
-    my $event_struct = $event_backend->event_struct;
+    # Register all fds - use backend's native slot-tracking struct.
+    # See note in gen_xs_poll_batch above: io_uring overrides this to
+    # epoll_event because its slot helpers run on a private epoll fd.
+    my $event_struct = $event_backend->slot_event_struct;
     
     $builder->comment('Register all fds with event loop')
       ->line('int change_count = 0;')
