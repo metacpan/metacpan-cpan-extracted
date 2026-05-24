@@ -4,93 +4,112 @@
 
 OpenAPI::Client::OpenAI::Path::organization-projects-project_id-certificates - Documentation for the /organization/projects/{project_id}/certificates path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</organization/projects/{project_id}/certificates>.
+=head2 GET /organization/projects/{project_id}/certificates
 
-=head1 PATHS
+=head3 listProjectCertificates
 
-
-=head2 C<GET /organization/projects/{project_id}/certificates>
-
-List project certificates
-
+  $client->list_project_certificates({
+      body => { ... },
+  });
 
 List certificates for this project.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
+=item * C<project_id> (in path, required, string) - The ID of the project.
 
-C<listProjectCertificates>
+=item * C<limit> (in query, optional, integer) - A limit on the number of objects to be returned. Limit can range between 1 and
+100, and the default is 20.
 
-    $client->listProjectCertificates( ... );
+Default: 20
 
-=head3 Parameters
+=item * C<after> (in query, optional, string) - A cursor for use in pagination. C<after> is an object ID that defines your
+place in the list. For instance, if you make a list request and receive 100
+objects, ending with obj_foo, your subsequent call can include after=obj_foo
+in order to fetch the next page of the list.
 
-=over 4
+=item * C<order> (in query, optional, string) - Sort order by the C<created_at> timestamp of the objects. C<asc> for ascending
+order and C<desc> for descending order.
 
-=item * C<project_id> (in path) (Required) - The ID of the project.
+Allowed values: asc, desc
 
-Type: C<string>
-
-
-
-=item * C<limit> (in query) (Optional) - A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.
-
-
-Type: C<integer>
-
-
-Default: C<20>
-
-
-=item * C<after> (in query) (Optional) - A cursor for use in pagination. `after` is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include after=obj_foo in order to fetch the next page of the list.
-
-
-Type: C<string>
-
-
-
-=item * C<order> (in query) (Optional) - Sort order by the `created_at` timestamp of the objects. `asc` for ascending order and `desc` for descending order.
-
-
-Type: C<string>
-
-Allowed values: C<asc, desc>
-
-
-Default: C<desc>
-
+Default: desc
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - Certificates listed successfully.>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-Certificates listed successfully.
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
        "data" : [
-          "{\n  \"object\": \"certificate\",\n  \"id\": \"cert_abc\",\n  \"name\": \"My Certificate\",\n  \"created_at\": 1234567,\n  \"certificate_details\": {\n    \"valid_at\": 1234567,\n    \"expires_at\": 12345678,\n    \"content\": \"-----BEGIN CERTIFICATE----- MIIGAjCCA...6znFlOW+ -----END CERTIFICATE-----\"\n  }\n}\n"
+          {
+             "active" : false,
+             "certificate_details" : {
+                "expires_at" : 0,
+                "valid_at" : 0
+             },
+             "created_at" : 0,
+             "id" : "string",
+             "name" : "string",
+             "object" : "organization.project.certificate"
+          }
        ],
        "first_id" : "cert_abc",
-       "last_id" : "cert_abc"
+       "has_more" : false,
+       "last_id" : "cert_abc",
+       "object" : "list"
     }
 
+=head1 SCHEMAS
+
+=head2 ListProjectCertificatesResponse
+
+Properties:
+
+=over
+
+=item * C<data> (array of OrganizationProjectCertificate, required)
+
+=item * C<first_id> (anyOf, required)
+
+=item * C<has_more> (boolean, required)
+
+=item * C<last_id> (anyOf, required)
+
+=item * C<object> (string, required)
+
+Allowed values: list
+
+=back
+
+=head2 OrganizationProjectCertificate
+
+Properties:
+
+=over
+
+=item * C<active> (boolean, required) - Whether the certificate is currently active at the project level.
+
+=item * C<certificate_details> (object, required)
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) of when the certificate was uploaded.
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints
+
+=item * C<name> (anyOf, required) - The name of the certificate.
+
+=item * C<object> (string, required) - The object type, which is always C<organization.project.certificate> .
+
+Allowed values: organization.project.certificate
 
 =back
 

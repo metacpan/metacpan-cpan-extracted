@@ -4,110 +4,167 @@
 
 OpenAPI::Client::OpenAI::Path::audio-transcriptions - Documentation for the /audio/transcriptions path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</audio/transcriptions>.
+=head2 POST /audio/transcriptions
 
-=head1 PATHS
+=head3 createTranscription
 
-
-=head2 C<POST /audio/transcriptions>
-
-Create transcription
-
+  $client->create_transcription({
+      body => { ... },
+  });
 
 Transcribes audio into the input language.
 
+Returns a transcription object in C<json> , C<diarized_json> , or
+C<verbose_json> format, or a stream of transcript events.
 
+=head4 Request body
 
-=head3 Operation ID
+Content-Type: multipart/form-data
 
-C<createTranscription>
-
-    $client->createTranscription( ... );
-
-=head3 Parameters
-
-=over 4
-
-=back
-
-=head3 Request Body
-  
-=head3 Content Type: C<multipart/form-data>
-
-    
-      
-
-      
-
-=head4 Models
-
-ID of the model to use. The options are C<gpt-4o-transcribe>, C<gpt-4o-mini-transcribe>, C<gpt-4o-mini-transcribe-2025-12-15>, C<whisper-1> (which is powered by our open source Whisper V2 model), and C<gpt-4o-transcribe-diarize>.
-
-=over 4
-      
-=item * C<whisper-1>
-
-=item * C<gpt-4o-transcribe>
-
-=item * C<gpt-4o-mini-transcribe>
-
-=item * C<gpt-4o-mini-transcribe-2025-12-15>
-
-=item * C<gpt-4o-transcribe-diarize>
-
-=back
-      
-      
 Example:
 
     {
-       "include" : [
-          null
-       ],
-       "known_speaker_names" : [
-          null
-       ],
-       "known_speaker_references" : [
-          null
-       ],
-       "model" : "gpt-4o-transcribe",
-       "timestamp_granularities" : [
-          null
-       ]
+       "text" : "Imagine the wildest idea that you've ever had, and you're curious about how it might scale to something that's a 100, a 1,000 times bigger. This is a place where you can get to do that.",
+       "usage" : {
+          "input_token_details" : {
+             "audio_tokens" : 14,
+             "text_tokens" : 0
+          },
+          "input_tokens" : 14,
+          "output_tokens" : 45,
+          "total_tokens" : 59,
+          "type" : "tokens"
+       }
     }
 
+=head4 Responses
 
-             
+B<200 - OK>
 
-=head3 Responses
+Content-Type: application/json
 
+Example:
 
-=head4 Status Code: C<200>
+    {
+       "text" : "Imagine the wildest idea that you've ever had, and you're curious about how it might scale to something that's a 100, a 1,000 times bigger. This is a place where you can get to do that.",
+       "usage" : {
+          "input_token_details" : {
+             "audio_tokens" : 14,
+             "text_tokens" : 0
+          },
+          "input_tokens" : 14,
+          "output_tokens" : 45,
+          "total_tokens" : 59,
+          "type" : "tokens"
+       }
+    }
 
-OK
+Content-Type: text/event-stream
 
+Example:
 
-=head4 Content Types:
+    {
+       "text" : "Imagine the wildest idea that you've ever had, and you're curious about how it might scale to something that's a 100, a 1,000 times bigger. This is a place where you can get to do that.",
+       "usage" : {
+          "input_token_details" : {
+             "audio_tokens" : 14,
+             "text_tokens" : 0
+          },
+          "input_tokens" : 14,
+          "output_tokens" : 45,
+          "total_tokens" : 59,
+          "type" : "tokens"
+       }
+    }
 
-=over 4
+=head1 SCHEMAS
 
+=head2 AudioResponseFormat
 
-=item * C<application/json>
+The format of the output, in one of these options: C<json> , C<text> , C<srt>
+, C<verbose_json> , C<vtt> , or C<diarized_json> . For C<gpt-4o-transcribe>
+and C<gpt-4o-mini-transcribe> , the only supported format is C<json> . For
+C<gpt-4o-transcribe-diarize> , the supported formats are C<json> , C<text> ,
+and C<diarized_json> , with C<diarized_json> required to receive speaker
+annotations.
 
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+=head2 CreateTranscriptionRequest
 
+Properties:
 
+=over
 
+=item * C<chunking_strategy> (anyOf)
 
-=item * C<text/event-stream>
+=item * C<file> (string, required) - The audio file object (not file name) to transcribe, in one of these formats:
+flac, mp3, mp4, mpeg, mpga, m4a, ogg, wav, or webm.
 
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+=item * C<include> (array of TranscriptionInclude) - Additional information to include in the transcription response. C<logprobs>
+will return the log probabilities of the tokens in the response to understand
+the model's confidence in the transcription. C<logprobs> only works with
+response_format set to C<json> and only with the models C<gpt-4o-transcribe> ,
+C<gpt-4o-mini-transcribe> , and C<gpt-4o-mini-transcribe-2025-12-15> . This
+field is not supported when using C<gpt-4o-transcribe-diarize> .
 
+=item * C<known_speaker_names> (array of string) - Optional list of speaker names that correspond to the audio samples provided
+in C<known_speaker_references[]> . Each entry should be a short identifier
+(for example C<customer> or C<agent> ). Up to 4 speakers are supported.
 
+=item * C<known_speaker_references> (array of string) - Optional list of audio samples (as
+L<data URLs|https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URLs>
+) that contain known speaker references matching C<known_speaker_names[]> .
+Each sample must be between 2 and 10 seconds, and can use any of the same
+input audio formats supported by C<file> .
+
+=item * C<language> (string) - The language of the input audio. Supplying the input language in
+L<ISO-639-1|https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes> (e.g. C<en>
+) format will improve accuracy and latency.
+
+=item * C<model> (anyOf, required) - ID of the model to use. The options are C<gpt-4o-transcribe> ,
+C<gpt-4o-mini-transcribe> , C<gpt-4o-mini-transcribe-2025-12-15> ,
+C<whisper-1> (which is powered by our open source Whisper V2 model), and
+C<gpt-4o-transcribe-diarize> .
+
+=item * C<prompt> (string) - An optional text to guide the model's style or continue a previous audio
+segment. The
+L<prompt|https://platform.openai.com/docs/guides/speech-to-text#prompting>
+should match the audio language. This field is not supported when using
+C<gpt-4o-transcribe-diarize> .
+
+=item * C<response_format> (AudioResponseFormat)
+
+See L</AudioResponseFormat> below for shape.
+
+=item * C<stream> (anyOf)
+
+=item * C<temperature> (number) - The sampling temperature, between 0 and 1. Higher values like 0.8 will make
+the output more random, while lower values like 0.2 will make it more focused
+and deterministic. If set to 0, the model will use
+L<log probability|https://en.wikipedia.org/wiki/Log_probability> to
+automatically increase the temperature until certain thresholds are hit.
+
+Default: 0
+
+=item * C<timestamp_granularities> (array of string) - The timestamp granularities to populate for this transcription.
+C<response_format> must be set C<verbose_json> to use timestamp granularities.
+Either or both of these options are supported: C<word> , or C<segment> . Note:
+There is no additional latency for segment timestamps, but generating word
+timestamps incurs additional latency. This option is not available for
+C<gpt-4o-transcribe-diarize> .
+
+Default: ["segment"]
 
 =back
+
+=head2 CreateTranscriptionResponseStreamEvent
+
+See L<https://platform.openai.com/docs/api-reference> for details.
+
+=head2 TranscriptionInclude
+
+See L<https://platform.openai.com/docs/api-reference> for details.
 
 =head1 SEE ALSO
 

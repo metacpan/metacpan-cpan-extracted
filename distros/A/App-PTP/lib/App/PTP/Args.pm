@@ -236,7 +236,11 @@ sub action_flags {
     },
     'locale-sort|ls' => sub {
       my $opt = {%modes, comparator => \'locale'};
-      push @{$cur_pipeline}, ['numeric-sort', \&do_sort, $opt];
+      push @{$cur_pipeline}, ['locale-sort', \&do_sort, $opt];
+    },
+    'semver-sort|ss' => sub {
+      my $opt = {%modes, comparator => \'semver'};
+      push @{$cur_pipeline}, ['semver-sort', \&do_sort, $opt];
     },
     'custom-sort|cs=s' => sub {
       my $opt = {%modes, comparator => $_[1]};

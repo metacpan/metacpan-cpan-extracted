@@ -4,124 +4,131 @@
 
 OpenAPI::Client::OpenAI::Path::organization-invites-invite_id - Documentation for the /organization/invites/{invite_id} path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</organization/invites/{invite_id}>.
+=head2 DELETE /organization/invites/{invite_id}
 
-=head1 PATHS
+=head3 delete-invite
 
+  $client->delete_invite({
+      body => { ... },
+  });
 
-=head2 C<DELETE /organization/invites/{invite_id}>
+Delete an invite. If the invite has already been accepted, it cannot be
+deleted.
 
-Delete invite
+=head4 Path/query parameters
 
+=over
 
-Delete an invite. If the invite has already been accepted, it cannot be deleted.
-
-
-
-=head3 Operation ID
-
-C<delete-invite>
-
-    $client->delete-invite( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<invite_id> (in path) (Required) - The ID of the invite to delete.
-
-Type: C<string>
-
-
+=item * C<invite_id> (in path, required, string) - The ID of the invite to delete.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - Invite deleted successfully.>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
+Example:
 
-Invite deleted successfully.
+    {
+       "deleted" : false,
+       "id" : "string",
+       "object" : "organization.invite.deleted"
+    }
 
+=head2 GET /organization/invites/{invite_id}
 
-=head4 Content Types:
+=head3 retrieve-invite
 
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
-
-
-
-=back
-
-=head2 C<GET /organization/invites/{invite_id}>
-
-Retrieve invite
-
+  $client->retrieve_invite({
+      body => { ... },
+  });
 
 Retrieves an invite.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
-
-C<retrieve-invite>
-
-    $client->retrieve-invite( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<invite_id> (in path) (Required) - The ID of the invite to retrieve.
-
-Type: C<string>
-
-
+=item * C<invite_id> (in path, required, string) - The ID of the invite to retrieve.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - Invite retrieved successfully.>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-Invite retrieved successfully.
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-      "object": "organization.invite",
-      "id": "invite-abc",
-      "email": "user@example.com",
-      "role": "owner",
-      "status": "accepted",
-      "invited_at": 1711471533,
-      "expires_at": 1711471533,
-      "accepted_at": 1711471533,
-      "projects": [
-        {
-          "id": "project-xyz",
-          "role": "member"
-        }
-      ]
+       "accepted_at" : 1711471533,
+       "created_at" : 1711471533,
+       "email" : "user@example.com",
+       "expires_at" : 1711471533,
+       "id" : "invite-abc",
+       "object" : "organization.invite",
+       "projects" : [
+          {
+             "id" : "project-xyz",
+             "role" : "member"
+          }
+       ],
+       "role" : "owner",
+       "status" : "accepted"
     }
 
+=head1 SCHEMAS
+
+=head2 Invite
+
+Properties:
+
+=over
+
+=item * C<accepted_at> (anyOf) - The Unix timestamp (in seconds) of when the invite was accepted.
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) of when the invite was sent.
+
+=item * C<email> (string, required) - The email address of the individual to whom the invite was sent
+
+=item * C<expires_at> (anyOf) - The Unix timestamp (in seconds) of when the invite expires.
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints
+
+=item * C<object> (string, required) - The object type, which is always C<organization.invite>
+
+Allowed values: organization.invite
+
+=item * C<projects> (array of object, required) - The projects that were granted membership upon acceptance of the invite.
+
+=item * C<role> (string, required) - C<owner> or C<reader>
+
+Allowed values: owner, reader
+
+=item * C<status> (string, required) - C<accepted> ,C<expired>, or C<pending>
+
+Allowed values: accepted, expired, pending
+
+=back
+
+=head2 InviteDeleteResponse
+
+Properties:
+
+=over
+
+=item * C<deleted> (boolean, required)
+
+=item * C<id> (string, required)
+
+=item * C<object> (string, required) - The object type, which is always C<organization.invite.deleted>
+
+Allowed values: organization.invite.deleted
 
 =back
 

@@ -1,5 +1,10 @@
 Revision history for App::cpan2arch
 
+v1.1.1    2026-05-23T12:37:17Z
+          - Preserve co-maintainers if PACKAGER is the current maintainer (--update)
+          - Fix --update tests
+          - Add Pinto to the test lib to address test coverage gaps
+
 v1.1.0    2026-05-21T09:14:02Z
           - Be more lightweight, so make caching as optional and move M::UA::C +
             CHI to runtime recommends

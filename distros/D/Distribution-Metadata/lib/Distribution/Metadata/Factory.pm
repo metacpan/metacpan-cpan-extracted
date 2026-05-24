@@ -1,11 +1,11 @@
 package Distribution::Metadata::Factory;
-use v5.16;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
 
 use Distribution::Metadata;
 
-sub new {
-    my ($class, %option) = @_;
+sub new ($class, %option) {
     my $inc = $option{inc} || \@INC;
     if ($option{fill_archlib}) {
         $inc = Distribution::Metadata->_fill_archlib($inc);
@@ -13,14 +13,12 @@ sub new {
     bless { inc => $inc, cache => {} }, $class;
 }
 
-sub create_from_module {
-    my ($self, $module) = @_;
+sub create_from_module ($self, $module) {
     local $Distribution::Metadata::CACHE = $self->{cache};
     Distribution::Metadata->new_from_module($module, inc => $self->{inc});
 }
 
-sub create_from_file {
-    my ($self, $file) = @_;
+sub create_from_file ($self, $file) {
     local $Distribution::Metadata::CACHE = $self->{cache};
     Distribution::Metadata->new_from_file($file, inc => $self->{inc});
 }
@@ -66,9 +64,6 @@ Copyright (C) 2015 Shoichi Kaji
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
-=head1 AUTHOR
-
-Shoichi Kaji E<lt>skaji@cpan.orgE<gt>
 
 =cut
 

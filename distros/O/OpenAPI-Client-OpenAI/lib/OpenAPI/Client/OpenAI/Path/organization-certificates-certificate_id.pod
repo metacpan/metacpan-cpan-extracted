@@ -4,186 +4,174 @@
 
 OpenAPI::Client::OpenAI::Path::organization-certificates-certificate_id - Documentation for the /organization/certificates/{certificate_id} path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</organization/certificates/{certificate_id}>.
+=head2 DELETE /organization/certificates/{certificate_id}
 
-=head1 PATHS
+=head3 deleteCertificate
 
-
-=head2 C<DELETE /organization/certificates/{certificate_id}>
-
-Delete certificate
-
+  $client->delete_certificate({
+      body => { ... },
+  });
 
 Delete a certificate from the organization.
 
 The certificate must be inactive for the organization and all projects.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
-
-C<deleteCertificate>
-
-    $client->deleteCertificate( ... );
-
-=head3 Parameters
-
-=over 4
+=item * C<certificate_id> (in path, required, string) - Unique ID of the certificate to delete.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - Certificate deleted successfully.>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
+Example:
 
-Certificate deleted successfully.
+    {
+       "id" : "string",
+       "object" : "certificate.deleted"
+    }
 
+=head2 GET /organization/certificates/{certificate_id}
 
-=head4 Content Types:
+=head3 getCertificate
 
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
-
-
-
-=back
-
-=head2 C<GET /organization/certificates/{certificate_id}>
-
-Get certificate
-
+  $client->get_certificate({
+      body => { ... },
+  });
 
 Get a certificate that has been uploaded to the organization.
 
 You can get a certificate regardless of whether it is active or not.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
+=item * C<certificate_id> (in path, required, string) - Unique ID of the certificate to retrieve.
 
-C<getCertificate>
-
-    $client->getCertificate( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<certificate_id> (in path) (Required) - Unique ID of the certificate to retrieve.
-
-Type: C<string>
-
-
-
-=item * C<include> (in query) (Optional) - A list of additional fields to include in the response. Currently the only supported value is `content` to fetch the PEM content of the certificate.
-
-Type: C<array>
-
-
+=item * C<include> (in query, optional, array) - A list of additional fields to include in the response. Currently the only
+supported value is C<content> to fetch the PEM content of the certificate.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - Certificate retrieved successfully.>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-Certificate retrieved successfully.
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-      "object": "certificate",
-      "id": "cert_abc",
-      "name": "My Certificate",
-      "created_at": 1234567,
-      "certificate_details": {
-        "valid_at": 1234567,
-        "expires_at": 12345678,
-        "content": "-----BEGIN CERTIFICATE----- MIIGAjCCA...6znFlOW+ -----END CERTIFICATE-----"
-      }
+       "certificate_details" : {
+          "content" : "-----BEGIN CERTIFICATE----- MIIGAjCCA...6znFlOW+ -----END CERTIFICATE-----",
+          "expires_at" : 12345678,
+          "valid_at" : 1234567
+       },
+       "created_at" : 1234567,
+       "id" : "cert_abc",
+       "name" : "My Certificate",
+       "object" : "certificate"
     }
 
+=head2 POST /organization/certificates/{certificate_id}
 
-=back
+=head3 modifyCertificate
 
-=head2 C<POST /organization/certificates/{certificate_id}>
-
-Modify certificate
-
+  $client->modify_certificate({
+      body => { ... },
+  });
 
 Modify a certificate. Note that only the name can be modified.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
-
-C<modifyCertificate>
-
-    $client->modifyCertificate( ... );
-
-=head3 Parameters
-
-=over 4
+=item * C<certificate_id> (in path, required, string) - Unique ID of the certificate to modify.
 
 =back
 
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
+=head4 Responses
 
-    
-      
+B<200 - Certificate modified successfully.>
 
-      
-             
+Content-Type: application/json
 
-=head3 Responses
-
-
-=head4 Status Code: C<200>
-
-Certificate modified successfully.
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-      "object": "certificate",
-      "id": "cert_abc",
-      "name": "My Certificate",
-      "created_at": 1234567,
-      "certificate_details": {
-        "valid_at": 1234567,
-        "expires_at": 12345678,
-        "content": "-----BEGIN CERTIFICATE----- MIIGAjCCA...6znFlOW+ -----END CERTIFICATE-----"
-      }
+       "certificate_details" : {
+          "content" : "-----BEGIN CERTIFICATE----- MIIGAjCCA...6znFlOW+ -----END CERTIFICATE-----",
+          "expires_at" : 12345678,
+          "valid_at" : 1234567
+       },
+       "created_at" : 1234567,
+       "id" : "cert_abc",
+       "name" : "My Certificate",
+       "object" : "certificate"
     }
 
+=head1 SCHEMAS
+
+=head2 Certificate
+
+Properties:
+
+=over
+
+=item * C<active> (boolean) - Whether the certificate is currently active at the specified scope. Not
+returned when getting details for a specific certificate.
+
+=item * C<certificate_details> (object, required)
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) of when the certificate was uploaded.
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints
+
+=item * C<name> (anyOf, required) - The name of the certificate.
+
+=item * C<object> (string, required) - The object type.
+
+- If creating, updating, or getting a specific certificate, the object type is
+C<certificate> . - If listing, activating, or deactivating certificates for
+the organization, the object type is C<organization.certificate> . - If
+listing, activating, or deactivating certificates for a project, the object
+type is C<organization.project.certificate> .
+
+Allowed values: certificate, organization.certificate, organization.project.certificate
+
+=back
+
+=head2 DeleteCertificateResponse
+
+Properties:
+
+=over
+
+=item * C<id> (string, required) - The ID of the certificate that was deleted.
+
+=item * C<object> (string, required) - The object type, must be C<certificate.deleted> .
+
+Allowed values: certificate.deleted
+
+=back
+
+=head2 ModifyCertificateRequest
+
+Properties:
+
+=over
+
+=item * C<name> (string) - The updated name for the certificate
 
 =back
 

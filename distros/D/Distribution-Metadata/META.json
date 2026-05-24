@@ -4,7 +4,7 @@
       "Shoichi Kaji <skaji@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -16,7 +16,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.034"
+            "Module::Build::Tiny" : "0.053"
          }
       },
       "develop" : {
@@ -31,14 +31,14 @@
             "ExtUtils::Packlist" : "0",
             "JSON" : "0",
             "Module::Metadata" : "0",
-            "perl" : "v5.16.0"
+            "perl" : "v5.24.0"
          }
       }
    },
    "provides" : {
       "Distribution::Metadata" : {
          "file" : "lib/Distribution/Metadata.pm",
-         "version" : "0.10"
+         "version" : "v1.0.0"
       },
       "Distribution::Metadata::Factory" : {
          "file" : "lib/Distribution/Metadata/Factory.pm"
@@ -56,12 +56,12 @@
          "web" : "https://github.com/skaji/Distribution-Metadata"
       }
    },
-   "version" : "0.10",
+   "version" : "v1.0.0",
    "x_contributors" : [
       "Shoichi Kaji <skaji@outlook.com>"
    ],
-   "x_generated_by_perl" : "v5.36.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "x_generated_by_perl" : "v5.42.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }

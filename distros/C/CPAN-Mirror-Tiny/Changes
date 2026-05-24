@@ -1,5 +1,8 @@
 Revision history for CPAN-Mirror-Tiny
 
+v1.0.0  2026-05-23
+  - Raise minimum Perl to v5.24
+
 0.33  2025-10-27 05:44:43 JST
   - $path =~ s{\\}{/}g in windows (#15)
 

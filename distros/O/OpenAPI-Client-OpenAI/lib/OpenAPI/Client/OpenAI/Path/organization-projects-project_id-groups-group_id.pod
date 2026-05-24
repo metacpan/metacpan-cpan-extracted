@@ -1,0 +1,137 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::organization-projects-project_id-groups-group_id - Documentation for the /organization/projects/{project_id}/groups/{group_id} path.
+
+=head1 OPERATIONS
+
+=head2 DELETE /organization/projects/{project_id}/groups/{group_id}
+
+=head3 remove-project-group
+
+  $client->remove_project_group({
+      body => { ... },
+  });
+
+Revokes a group's access to a project.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<project_id> (in path, required, string) - The ID of the project to update.
+
+=item * C<group_id> (in path, required, string) - The ID of the group to remove from the project.
+
+=back
+
+=head4 Responses
+
+B<200 - Group removed from the project successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "deleted" : true,
+       "object" : "project.group.deleted"
+    }
+
+=head2 GET /organization/projects/{project_id}/groups/{group_id}
+
+=head3 retrieve-project-group
+
+  $client->retrieve_project_group({
+      body => { ... },
+  });
+
+Retrieves a project's group.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<project_id> (in path, required, string) - The ID of the project to inspect.
+
+=item * C<group_id> (in path, required, string) - The ID of the group to retrieve.
+
+=item * C<group_type> (in query, optional, string) - The type of group to retrieve.
+
+Allowed values: group, tenant_group
+
+Default: group
+
+=back
+
+=head4 Responses
+
+B<200 - Project group retrieved successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "created_at" : 1711471533,
+       "group_id" : "group_01J1F8ABCDXYZ",
+       "group_name" : "Support Team",
+       "group_type" : "group",
+       "object" : "project.group",
+       "project_id" : "proj_abc123"
+    }
+
+=head1 SCHEMAS
+
+=head2 ProjectGroup
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - Unix timestamp (in seconds) when the group was granted project access.
+
+=item * C<group_id> (string, required) - Identifier of the group that has access to the project.
+
+=item * C<group_name> (string, required) - Display name of the group.
+
+=item * C<group_type> (string, required) - The type of the group.
+
+Allowed values: group, tenant_group
+
+=item * C<object> (string, required) - Always C<project.group> .
+
+Allowed values: project.group
+
+=item * C<project_id> (string, required) - Identifier of the project.
+
+=back
+
+=head2 ProjectGroupDeletedResource
+
+Properties:
+
+=over
+
+=item * C<deleted> (boolean, required) - Whether the group membership in the project was removed.
+
+=item * C<object> (string, required) - Always C<project.group.deleted> .
+
+Allowed values: project.group.deleted
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

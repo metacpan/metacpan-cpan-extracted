@@ -1,0 +1,369 @@
+Perl500503Syntax::OrDie Cheatsheet (English)
+=============================================
+
+NAME
+    Perl500503Syntax::OrDie - Validate Perl 5.005_03 source compatibility
+
+VERSION
+    0.01
+
+SYNOPSIS
+    # Auto-check the calling file at use-time:
+    use Perl500503Syntax::OrDie;
+
+    # Programmatic API (no auto-check, no runtime guards):
+    use Perl500503Syntax::OrDie ();
+    my @violations = Perl500503Syntax::OrDie::check_source($source_text, 'label.pl');
+    Perl500503Syntax::OrDie::check_file('/path/to/script.pl');
+
+    # Command-line usage (stdin supported):
+    perl lib/Perl500503Syntax/OrDie.pm script.pl
+    perl lib/Perl500503Syntax/OrDie.pm script1.pl script2.pl ...
+    perl lib/Perl500503Syntax/OrDie.pm -
+
+DESCRIPTION
+    When loaded via "use Perl500503Syntax::OrDie;", the module reads the
+    calling source file, masks string/regex literals and comments, then
+    scans for constructs introduced after Perl 5.005_03.  Any violation
+    causes an immediate die() with file name and line number.
+
+    String and regex contents are intentionally not inspected: a string
+    literal may freely contain any text (e.g. "say", "%v") without
+    triggering a violation, because those are runtime values, not syntax.
+
+    Runtime guards for open() and mkdir() are also installed via
+    CORE::GLOBAL:: overrides.
+
+    When run as a command, each file on the command line is checked and
+    a summary is printed.  Use "-" to read from standard input.
+    With no arguments, usage is displayed.
+
+    No source-filter infrastructure is used.  Works on every Perl from
+    5.005_03 through the current release.
+
+PROGRAMMATIC API
+    check_source($source, $label)
+        Scans $source and returns a list of violation strings (empty list
+        = no violations).  Does NOT die; the caller handles the list.
+
+            my @v = Perl500503Syntax::OrDie::check_source($src, 'foo.pl');
+            if (@v) { warn $_ for @v }
+
+    check_file($path)
+        Reads $path, calls check_source, and dies on any violation.
+
+CHECKED CONSTRUCTS (static, compile-time)
+    Perl 5.6
+      our $var / our @arr / our %hash      (use "use vars" instead)
+      open(FH, MODE, PATH)                 3-argument form
+      use utf8
+      use VERSION  where VERSION >= 5.6
+      use vVERSION where VERSION >= v5.6
+      \x{HHHH}                             Unicode hex escape
+      \N{name}                             Named character escape
+      @+ / @-  and  $+[N] / $-[N]         Match-position arrays
+      CHECK { } / INIT { }                 Phase blocks
+      v1.2.3                               v-string notation
+      $^V                                  Version object (use $] instead)
+      sub foo :lvalue { }                  :lvalue attribute
+      *name{SLOT}                          Typeglob component access
+      \p{} / \P{}                          Unicode property in regex
+
+    Perl 5.8
+      use encoding
+      use constant { A => 1, B => 2 }      Multi-constant hashref form
+
+    Perl 5.10
+      //=                                  Defined-or assignment
+      //                                   Defined-or operator (standalone)
+      say                                  (->say() method calls excluded)
+      state $var
+      given(...) / when(...)
+      ~~                                   Smart-match
+      use feature
+      \K                                   Keep in regex
+      (?<name>...) / \k<name>              Named capture/backreference
+      (?|...)                              Branch reset group
+      (*VERB)                              Backtrack control verb
+      \h \H \v \V \R                       Whitespace escapes in regex
+      UNITCHECK { }                        Phase block
+      a++ / a*+ / a?+                      Possessive quantifiers
+      (?1) / (?&name) / (?R)               Recursive patterns
+      ${^MATCH} ${^PREMATCH} ${^POSTMATCH} Match variables (with /p)
+      \g{N}                                Relative/absolute backreference
+
+    Perl 5.12
+      package NAME VERSION
+      ...                                  Yada-yada operator
+
+    Perl 5.14
+      s///r  tr///r                        Non-destructive flag
+
+    Perl 5.16
+      __SUB__
+
+    Perl 5.18
+      my sub foo { }                       Lexical subroutine declaration
+      state sub foo { }
+
+    Perl 5.20
+      sub foo ($x, $y) { }                 Subroutine signatures
+      $ref->@*  $ref->%*                   Postfix dereference (stable from 5.24)
+      %hash{LIST}  %array[LIST]            Key/value (index/value) slices
+
+    Perl 5.22
+      <<>>                                 Double-diamond operator
+      /n                                   Non-capturing regex flag
+      $a &. $b  $a |. $b  $a ^. $b  ~.$a  String bitwise operators
+      foreach \$x (@list)                  Reference aliasing in foreach
+
+    Perl 5.26
+      <<~                                  Indented heredoc
+
+    Perl 5.30
+      (?<=.{2,}X)                          Variable-length lookbehind
+                                           (experimental; stable in 5.38)
+
+    Perl 5.32
+      $obj isa ClassName                   isa infix operator
+                                           (->isa() and isa() calls excluded)
+
+    Perl 5.34
+      try { } catch ($e) { }
+
+    Perl 5.36
+      use builtin
+      for my ($a, $b) (@list)              Paired iteration
+
+    Perl 5.38
+      class Foo { }                        class keyword
+      Variable-length lookbehind (stable)
+
+    Perl 5.40
+      $x ^^ $y  /  $x ^^= $y              High-precedence logical XOR
+      __CLASS__                            Runtime class name in class block
+
+    Perl 5.42
+      any { EXPR } @list                   Keyword operators (suppressed when
+      all { EXPR } @list                   List::Util imports any/all)
+      my method foo () { }                 Lexical method declaration
+      $obj->&foo()                         Lexical method call
+
+CHECKED CONSTRUCTS (runtime, via CORE::GLOBAL:: overrides)
+    open(FH, MODE, PATH)                   3-argument open
+    open(FH, \$ref)                        Reference-as-mode open
+    mkdir(PATH)                            mkdir without explicit mode
+
+NOT CHECKED (intentional)
+    String/regex contents are never inspected.  A string literal such as
+    "say" or a format string "%vd" is valid Perl 5.005_03 syntax; only
+    source-level syntax constructs are flagged.
+    PerlIO layers (:utf8 etc.) in binmode() are string runtime values.
+    PerlIO layers in open() are caught indirectly as 3-argument open.
+
+ERROR FORMAT
+    Static violation:
+      Perl500503Syntax::OrDie: VIOLATION at <file> line <N>:
+        <description>
+
+    Runtime violation:
+      Perl500503Syntax::OrDie: RUNTIME VIOLATION at <file> line <N>:
+        <description>
+
+SAFE IDIOMS (Perl 5.005_03 compatible)
+    use strict;
+    use vars qw($x @arr %hash);           instead of "our"
+    open(FH, ">$path") or die $!;         2-argument bareword form
+    mkdir("dir", 0755) or die $!;         explicit mode
+    $x = defined($y) ? $y : 'default';    instead of //=
+    print "...\n";                         instead of say
+    if ($] >= 5.006) { ... }              version check
+    UNIVERSAL::isa($obj, 'Foo')           instead of $obj isa Foo
+    use List::Util qw(any all);           instead of keyword any/all
+
+PERL VERSION HISTORY (features checked by this module)
+    References: https://perldoc.perl.org/perl56delta
+                https://perldoc.perl.org/perl58delta
+                https://perldoc.perl.org/perl5100delta
+                https://perldoc.perl.org/perl5120delta
+                https://perldoc.perl.org/perl5140delta
+                https://perldoc.perl.org/perl5160delta
+                https://perldoc.perl.org/perl5180delta
+                https://perldoc.perl.org/perl5200delta
+                https://perldoc.perl.org/perl5220delta
+                https://perldoc.perl.org/perl5240delta
+                https://perldoc.perl.org/perl5260delta
+                https://perldoc.perl.org/perl5280delta
+                https://perldoc.perl.org/perl5300delta
+                https://perldoc.perl.org/perl5320delta
+                https://perldoc.perl.org/perl5340delta
+                https://perldoc.perl.org/perl5360delta
+                https://perldoc.perl.org/perl5380delta
+                https://perldoc.perl.org/perl5400delta
+                https://perldoc.perl.org/perl5420delta
+
+  perl56delta (Perl 5.6.0, 2000-03-22)
+    our VARIABLE
+      Lexically-scoped package variable declaration.
+      Use "use vars qw(...)" instead for 5.005_03 compatibility.
+    3-argument open()
+      open(FH, MODE, PATH) form.  Use 2-argument open(FH, ">path") instead.
+    use utf8
+      Declares that the source file is encoded in UTF-8.
+    use VERSION (>= 5.006 / v5.6)
+      Specifying a minimum Perl version with "use 5.006" or "use v5.6".
+    \x{HHHH} Unicode escape
+      Extended hex escape for Unicode code points above 0xFF.
+    \N{name} named character escape
+      Named Unicode character in regex/string (e.g. \N{SNOWMAN}).
+    @+ and @- / $+[N] $-[N]
+      Arrays holding start/end positions of the most recent regex match.
+    CHECK { } and INIT { } phase blocks
+      Named blocks run at specific compile/run phases.
+      (END { } and BEGIN { } were available before 5.6.)
+    v-string notation (v1.2.3)
+      Vector strings such as v5.6.1.
+    $^V version object
+      Use $] (a numeric value) for 5.005_03 compatibility.
+    :lvalue subroutine attribute
+      Marks a subroutine as a valid lvalue (assignable).
+    *name{SLOT} typeglob component access
+      *FH{IO}, *foo{SCALAR}, *foo{CODE} etc.
+      Not supported in Perl 5.005_03.
+    \p{Property} and \P{Property} Unicode property escapes in regex
+      Match characters by Unicode property (e.g. \p{IsAlpha}).
+    mkdir() without explicit mode
+      In 5.6+, mkdir(PATH) defaults to mode 0777.
+      In 5.005_03, the mode argument is required: mkdir(PATH, MODE).
+
+  perl58delta (Perl 5.8.0, 2002-07-18)
+    use encoding
+      Loads a source encoding pragma (e.g. "use encoding 'euc-jp'").
+    use constant { A => 1, B => 2 }
+      Multi-constant hashref form.  Use separate "use constant" statements
+      for 5.005_03 compatibility.
+
+  perl5100delta (Perl 5.10.0, 2007-12-18)
+    // defined-or operator
+      "$x // $y" is equivalent to "defined($x) ? $x : $y".
+    //= defined-or assignment
+      "$x //= $y" sets $x to $y if $x is not defined.
+    say LIST
+      Like print but appends a newline.
+      Note: ->say() method calls and "say =>" hash keys are not flagged.
+    state VARIABLE
+      Lexically-scoped persistent variable (like static in C).
+    given(EXPR) { when(VAL) { ... } }
+      Switch/case construct (experimental in 5.10, removed in 5.36+).
+    ~~ smart-match operator
+      Overloaded comparison operator for various types.
+    use feature
+      Enables named language features (say, state, switch, etc.).
+    \K in regex
+      Resets the start of the matched string (keep).
+    (?<name>...) named capture group  /  \k<name> named backreference
+    (?|...) branch reset group
+      Capture group numbers reset for each alternative.
+    (*VERB) backtrack control verbs
+      (*FAIL), (*ACCEPT), (*PRUNE), (*SKIP), (*MARK), (*COMMIT), (*THEN).
+    \h \H \v \V \R whitespace escapes
+    UNITCHECK { } phase block
+      Runs at the end of compiling each individual compilation unit.
+    Possessive quantifiers a++ a*+ a?+ a{n,m}+
+      Quantifier that does not give back on backtracking.
+    (?PARNO) (?&name) (?R) recursive subpatterns
+    ${^MATCH} ${^PREMATCH} ${^POSTMATCH}
+      Equivalents of $&, $`, $' when /p flag is used.
+    \g{N} \g{-N} absolute and relative backreferences
+
+  perl5120delta (Perl 5.12.0, 2010-04-12)
+    package NAME VERSION
+      Combined package declaration and version specification.
+    ... yada-yada operator
+      Placeholder for unimplemented code; throws "Unimplemented".
+
+  perl5140delta (Perl 5.14.0, 2011-05-14)
+    s/PATTERN/REPLACEMENT/r  tr/LIST/LIST/r
+      Non-destructive substitution/transliteration flag.
+
+  perl5160delta (Perl 5.16.0, 2012-05-20)
+    __SUB__
+      Token (via "use feature 'current_sub'") for current subroutine.
+
+  perl5180delta (Perl 5.18.0, 2013-05-16)
+    my sub NAME / state sub NAME -- lexical subroutines (experimental)
+      Block-scoped subroutine declaration; stable/always-on from Perl 5.26.
+
+  perl5200delta (Perl 5.20.0, 2014-05-27)
+    Subroutine signatures (experimental)
+      sub foo ($x, $y = 0) { ... }
+    %hash{LIST} / %array[LIST]  key/value (index/value) slices
+      New % sigil syntax returning flat key=>value pairs.
+    Postfix dereference (experimental; stable/always-on from Perl 5.24)
+      $ref->@*   $ref->%*   $ref->&*   $ref->$*
+
+  perl5220delta (Perl 5.22.0, 2015-06-01)
+    <<>> double-diamond operator
+      Safe version of <> using 3-argument open per ARGV file.
+    /n non-capturing regex flag
+      Makes all capture groups non-capturing.
+    &. |. ^. ~.  string bitwise operators (experimental; stable from 5.28)
+      Treat operands consistently as strings; also &.= |.= ^.= variants.
+    \foreach reference aliasing (experimental)
+      foreach \my $x (@list) { ... }  aliases $x directly to each element.
+
+  perl5260delta (Perl 5.26.0, 2017-05-30)
+    <<~ indented heredoc
+      Strips leading whitespace from heredoc body.
+
+  perl5300delta (Perl 5.30.0, 2019-05-22)
+    Variable-length lookbehind in regex (experimental)
+      (?<=...) or (?<!...) with variable-length pattern now compiles
+      (was a fatal error before 5.30); stable in Perl 5.38.
+
+  perl5320delta (Perl 5.32.0, 2020-06-20)
+    isa infix operator
+      $obj isa "ClassName"  (defined even when $obj is not a reference).
+      Note: ->isa() method calls and isa() function calls are not flagged.
+
+  perl5340delta (Perl 5.34.0, 2021-05-20)
+    try / catch (experimental, via use feature 'try')
+      try { ... } catch ($e) { ... }
+
+  perl5360delta (Perl 5.36.0, 2022-05-28)
+    use builtin
+      Provides built-in functions as a pragma (true, false, weaken, etc.).
+    for my ($a, $b) (@list) paired-variable iteration
+      Iterates a list two elements at a time into ($a, $b).
+
+  perl5380delta (Perl 5.38.0, 2023-07-02)
+    class keyword (experimental OOP)
+      class Foo { ... }  with field, method keywords.
+    Variable-length lookbehind in regex (now stable)
+      Stable from 5.38; experimentally introduced in Perl 5.30.
+
+  perl5400delta (Perl 5.40.0, 2024-06-09)
+    ^^ / ^^= high-precedence logical XOR operator
+      $x ^^ $y  -- completes the &&/|| set; use "xor" for 5.005_03.
+    __CLASS__ keyword (inside class blocks)
+      Runtime class name inside method/ADJUST/field (requires class feature).
+
+  perl5420delta (Perl 5.42.0, 2025-07-02)
+    any BLOCK LIST / all BLOCK LIST (experimental keywords)
+      any { EXPR } @list  -- suppressed when List::Util imports any/all.
+    my method / ->& lexical method call (requires class feature)
+      my method foo () { ... }  -- lexically scoped private method.
+
+DEPENDENCIES
+    No non-core dependencies.  Perl 5.005_03 or later.
+
+AUTHOR
+    INABA Hitoshi <ina@cpan.org>
+
+LICENSE
+    This library is free software; you may redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+SEE ALSO
+    perlpolicy, perlhist
+    https://metacpan.org/dist/Perl500503Syntax-OrDie

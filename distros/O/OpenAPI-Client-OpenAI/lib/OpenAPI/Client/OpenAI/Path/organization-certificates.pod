@@ -4,152 +4,184 @@
 
 OpenAPI::Client::OpenAI::Path::organization-certificates - Documentation for the /organization/certificates path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</organization/certificates>.
+=head2 GET /organization/certificates
 
-=head1 PATHS
+=head3 listOrganizationCertificates
 
-
-=head2 C<GET /organization/certificates>
-
-List organization certificates
-
+  $client->list_organization_certificates({
+      body => { ... },
+  });
 
 List uploaded certificates for this organization.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
+=item * C<limit> (in query, optional, integer) - A limit on the number of objects to be returned. Limit can range between 1 and
+100, and the default is 20.
 
-C<listOrganizationCertificates>
+Default: 20
 
-    $client->listOrganizationCertificates( ... );
+=item * C<after> (in query, optional, string) - A cursor for use in pagination. C<after> is an object ID that defines your
+place in the list. For instance, if you make a list request and receive 100
+objects, ending with obj_foo, your subsequent call can include after=obj_foo
+in order to fetch the next page of the list.
 
-=head3 Parameters
+=item * C<order> (in query, optional, string) - Sort order by the C<created_at> timestamp of the objects. C<asc> for ascending
+order and C<desc> for descending order.
 
-=over 4
+Allowed values: asc, desc
 
-=item * C<limit> (in query) (Optional) - A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.
-
-
-Type: C<integer>
-
-
-Default: C<20>
-
-
-=item * C<after> (in query) (Optional) - A cursor for use in pagination. `after` is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include after=obj_foo in order to fetch the next page of the list.
-
-
-Type: C<string>
-
-
-
-=item * C<order> (in query) (Optional) - Sort order by the `created_at` timestamp of the objects. `asc` for ascending order and `desc` for descending order.
-
-
-Type: C<string>
-
-Allowed values: C<asc, desc>
-
-
-Default: C<desc>
-
+Default: desc
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - Certificates listed successfully.>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-Certificates listed successfully.
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
        "data" : [
-          "{\n  \"object\": \"certificate\",\n  \"id\": \"cert_abc\",\n  \"name\": \"My Certificate\",\n  \"created_at\": 1234567,\n  \"certificate_details\": {\n    \"valid_at\": 1234567,\n    \"expires_at\": 12345678,\n    \"content\": \"-----BEGIN CERTIFICATE----- MIIGAjCCA...6znFlOW+ -----END CERTIFICATE-----\"\n  }\n}\n"
+          {
+             "active" : false,
+             "certificate_details" : {
+                "expires_at" : 0,
+                "valid_at" : 0
+             },
+             "created_at" : 0,
+             "id" : "string",
+             "name" : "string",
+             "object" : "organization.certificate"
+          }
        ],
        "first_id" : "cert_abc",
-       "last_id" : "cert_abc"
+       "has_more" : false,
+       "last_id" : "cert_abc",
+       "object" : "list"
     }
 
+=head2 POST /organization/certificates
 
-=back
+=head3 uploadCertificate
 
-=head2 C<POST /organization/certificates>
+  $client->upload_certificate({
+      body => { ... },
+  });
 
-Upload certificate
-
-
-Upload a certificate to the organization. This does B<not> automatically activate the certificate.
+Upload a certificate to the organization. This does B<not> automatically
+activate the certificate.
 
 Organizations can upload up to 50 certificates.
 
+=head4 Responses
 
+B<200 - Certificate uploaded successfully.>
 
-=head3 Operation ID
+Content-Type: application/json
 
-C<uploadCertificate>
+Example:
 
-    $client->uploadCertificate( ... );
+    {
+       "certificate_details" : {
+          "content" : "-----BEGIN CERTIFICATE----- MIIGAjCCA...6znFlOW+ -----END CERTIFICATE-----",
+          "expires_at" : 12345678,
+          "valid_at" : 1234567
+       },
+       "created_at" : 1234567,
+       "id" : "cert_abc",
+       "name" : "My Certificate",
+       "object" : "certificate"
+    }
 
-=head3 Parameters
+=head1 SCHEMAS
 
-=over 4
+=head2 Certificate
+
+Properties:
+
+=over
+
+=item * C<active> (boolean) - Whether the certificate is currently active at the specified scope. Not
+returned when getting details for a specific certificate.
+
+=item * C<certificate_details> (object, required)
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) of when the certificate was uploaded.
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints
+
+=item * C<name> (anyOf, required) - The name of the certificate.
+
+=item * C<object> (string, required) - The object type.
+
+- If creating, updating, or getting a specific certificate, the object type is
+C<certificate> . - If listing, activating, or deactivating certificates for
+the organization, the object type is C<organization.certificate> . - If
+listing, activating, or deactivating certificates for a project, the object
+type is C<organization.project.certificate> .
+
+Allowed values: certificate, organization.certificate, organization.project.certificate
 
 =back
 
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
+=head2 ListCertificatesResponse
 
-    
-      
+Properties:
 
-      
-             
+=over
 
-=head3 Responses
+=item * C<data> (array of OrganizationCertificate, required)
 
+=item * C<first_id> (anyOf, required)
 
-=head4 Status Code: C<200>
+=item * C<has_more> (boolean, required)
 
-Certificate uploaded successfully.
+=item * C<last_id> (anyOf, required)
 
+=item * C<object> (string, required)
 
-=head4 Content Types:
+Allowed values: list
 
-=over 4
+=back
 
+=head2 OrganizationCertificate
 
-=item * C<application/json>
+Properties:
 
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+=over
 
-    {
-      "object": "certificate",
-      "id": "cert_abc",
-      "name": "My Certificate",
-      "created_at": 1234567,
-      "certificate_details": {
-        "valid_at": 1234567,
-        "expires_at": 12345678,
-        "content": "-----BEGIN CERTIFICATE----- MIIGAjCCA...6znFlOW+ -----END CERTIFICATE-----"
-      }
-    }
+=item * C<active> (boolean, required) - Whether the certificate is currently active at the organization level.
 
+=item * C<certificate_details> (object, required)
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) of when the certificate was uploaded.
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints
+
+=item * C<name> (anyOf, required) - The name of the certificate.
+
+=item * C<object> (string, required) - The object type, which is always C<organization.certificate> .
+
+Allowed values: organization.certificate
+
+=back
+
+=head2 UploadCertificateRequest
+
+Properties:
+
+=over
+
+=item * C<certificate> (string, required) - The certificate content in PEM format
+
+=item * C<name> (string) - An optional name for the certificate
 
 =back
 

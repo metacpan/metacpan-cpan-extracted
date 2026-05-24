@@ -1,0 +1,200 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::organization-projects-project_id-spend_alerts - Documentation for the /organization/projects/{project_id}/spend_alerts path.
+
+=head1 OPERATIONS
+
+=head2 GET /organization/projects/{project_id}/spend_alerts
+
+=head3 list-project-spend-alerts
+
+  $client->list_project_spend_alerts({
+      body => { ... },
+  });
+
+Lists project spend alerts.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<project_id> (in path, required, string) - The ID of the project to inspect.
+
+=item * C<limit> (in query, optional, integer) - A limit on the number of spend alerts to return. Defaults to 20.
+
+=item * C<order> (in query, optional, string) - Sort order for the returned spend alerts.
+
+Allowed values: asc, desc
+
+Default: asc
+
+=item * C<after> (in query, optional, string) - Cursor for pagination. Provide the ID of the last spend alert from the
+previous response to fetch the next page.
+
+=item * C<before> (in query, optional, string) - Cursor for pagination. Provide the ID of the first spend alert from the
+previous response to fetch the previous page.
+
+=back
+
+=head4 Responses
+
+B<200 - Project spend alerts listed successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "data" : [
+          "{\n    \"id\": \"alert_abc123\",\n    \"object\": \"project.spend_alert\",\n    \"threshold_amount\": 100000,\n    \"currency\": \"USD\",\n    \"interval\": \"month\",\n    \"notification_channel\": {\n        \"type\": \"email\",\n        \"recipients\": [\"finance@example.com\"],\n        \"subject_prefix\": \"OpenAI spend alert\"\n    }\n}\n"
+       ],
+       "first_id" : "string",
+       "has_more" : false,
+       "last_id" : "string",
+       "object" : "list"
+    }
+
+=head2 POST /organization/projects/{project_id}/spend_alerts
+
+=head3 create-project-spend-alert
+
+  $client->create_project_spend_alert({
+      body => { ... },
+  });
+
+Creates a project spend alert.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<project_id> (in path, required, string) - The ID of the project to update.
+
+=back
+
+=head4 Responses
+
+B<200 - Project spend alert created successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "currency" : "USD",
+       "id" : "alert_abc123",
+       "interval" : "month",
+       "notification_channel" : {
+          "recipients" : [
+             "finance@example.com"
+          ],
+          "subject_prefix" : "OpenAI spend alert",
+          "type" : "email"
+       },
+       "object" : "project.spend_alert",
+       "threshold_amount" : 100000
+    }
+
+=head1 SCHEMAS
+
+=head2 CreateSpendAlertBody
+
+Properties:
+
+=over
+
+=item * C<currency> (string, required) - The currency for the threshold amount.
+
+Allowed values: USD
+
+=item * C<interval> (string, required) - The time interval for evaluating spend against the threshold.
+
+Allowed values: month
+
+=item * C<notification_channel> (SpendAlertNotificationChannel, required)
+
+See L</SpendAlertNotificationChannel> below for shape.
+
+=item * C<threshold_amount> (integer, required) - The alert threshold amount, in cents.
+
+=back
+
+=head2 ProjectSpendAlert
+
+Properties:
+
+=over
+
+=item * C<currency> (string, required) - The currency for the threshold amount.
+
+Allowed values: USD
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints.
+
+=item * C<interval> (string, required) - The time interval for evaluating spend against the threshold.
+
+Allowed values: month
+
+=item * C<notification_channel> (SpendAlertNotificationChannel, required)
+
+See L</SpendAlertNotificationChannel> below for shape.
+
+=item * C<object> (string, required) - The object type, which is always C<project.spend_alert> .
+
+Allowed values: project.spend_alert
+
+=item * C<threshold_amount> (integer, required) - The alert threshold amount, in cents.
+
+=back
+
+=head2 ProjectSpendAlertListResource
+
+Properties:
+
+=over
+
+=item * C<data> (array of ProjectSpendAlert, required) - Spend alerts returned in the current page.
+
+=item * C<first_id> (anyOf, required) - The ID of the first spend alert in this page.
+
+=item * C<has_more> (boolean, required) - Whether more spend alerts are available when paginating.
+
+=item * C<last_id> (anyOf, required) - The ID of the last spend alert in this page.
+
+=item * C<object> (string, required) - Always C<list> .
+
+Allowed values: list
+
+=back
+
+=head2 SpendAlertNotificationChannel
+
+Properties:
+
+=over
+
+=item * C<recipients> (array of string, required) - Email addresses that receive the spend alert notification.
+
+=item * C<subject_prefix> (anyOf) - Optional subject prefix for alert emails.
+
+=item * C<type> (string, required) - The notification channel type. Currently only C<email> is supported.
+
+Allowed values: email
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

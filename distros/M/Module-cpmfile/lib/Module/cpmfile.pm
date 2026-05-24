@@ -1,22 +1,21 @@
-package Module::cpmfile;
-use 5.008001;
-use strict;
+package Module::cpmfile v1.0.0;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
 
-our $VERSION = '0.006';
+our $TRIAL = 0;
+
 
 use Module::cpmfile::Prereqs;
 use Module::cpmfile::Util qw(merge_version _yaml_hash);
 use YAML::PP ();
 
-sub load {
-    my ($class, $file) = @_;
+sub load ($class, $file) {
     my ($hash) = YAML::PP->new->load_file($file);
     $class->new($hash);
 }
 
-sub new {
-    my ($class, $hash) = @_;
+sub new ($class, $hash) {
     my $prereqs = Module::cpmfile::Prereqs->new($hash->{prereqs});
     my %feature;
     for my $id (sort keys %{ $hash->{features} || +{} }) {
@@ -27,8 +26,7 @@ sub new {
     bless { prereqs => $prereqs, features => \%feature, _mirrors => [] }, $class;
 }
 
-sub from_cpanfile {
-    my ($class, $cpanfile) = @_;
+sub from_cpanfile ($class, $cpanfile) {
     my %feature;
     for my $feature ($cpanfile->features) {
         my $id = $feature->{identifier};
@@ -38,11 +36,10 @@ sub from_cpanfile {
     }
     my $prereqs = Module::cpmfile::Prereqs->from_cpanmeta($cpanfile->prereqs);
     for my $p ($prereqs, map { $_->{prereqs} } values %feature) {
-        $p->walk(undef, undef, sub {
-            my (undef, undef, $package, $original_options) = @_;
+        $p->walk(undef, undef, sub ($phase, $type, $package, $original_options) {
             my $additional_options = $cpanfile->options_for_module($package) || +{};
-            if (%$additional_options) {
-                %$original_options = (%$original_options, %$additional_options);
+            if ($additional_options->%*) {
+                $original_options->%* = ($original_options->%*, $additional_options->%*);
             }
         });
     }
@@ -50,8 +47,7 @@ sub from_cpanfile {
     bless { prereqs => $prereqs, features => \%feature, _mirrors => $mirrors }, $class;
 }
 
-sub from_cpanmeta {
-    my ($class, $cpanmeta) = @_;
+sub from_cpanmeta ($class, $cpanmeta) {
     my %feature;
     for my $id (keys %{$cpanmeta->optional_features}) {
         my $f = $cpanmeta->optional_features->{$id};
@@ -63,21 +59,18 @@ sub from_cpanmeta {
     bless { prereqs => $prereqs, features => \%feature, _mirrors => [] }, $class;
 }
 
-sub prereqs {
-    my $self = shift;
+sub prereqs ($self) {
     $self->{prereqs};
 }
 
-sub features {
-    my $self = shift;
-    if (%{$self->{features}}) {
+sub features ($self) {
+    if ($self->{features}->%*) {
         return $self->{features};
     }
     return;
 }
 
-sub _feature_prereqs {
-    my ($self, $ids) = @_;
+sub _feature_prereqs ($self, $ids = undef) {
     my @prereqs;
     for my $id (@{ $ids || [] }) {
         my $feature = $self->{features}{$id};
@@ -87,19 +80,17 @@ sub _feature_prereqs {
     @prereqs;
 }
 
-sub effective_requirements {
-    my ($self, $feature_ids, $phases, $types) = @_;
+sub effective_requirements ($self, $feature_ids = undef, $phases = undef, $types = undef) {
     my %req;
     for my $prereqs ($self->{prereqs}, $self->_feature_prereqs($feature_ids)) {
-        $prereqs->walk($phases, $types, sub {
-            my (undef, undef, $package, $options) = @_;
+        $prereqs->walk($phases, $types, sub ($phase, $type, $package, $options) {
             if (exists $req{$package}) {
                 my $v1 = $req{$package}{version} || 0;
                 my $v2 = $options->{version} || 0;
                 my $version  = merge_version $v1, $v2;
                 $req{$package} = +{
                     %{$req{$package}},
-                    %$options,
+                    $options->%*,
                     $version ? (version => $version) : (),
                 };
             } else {
@@ -110,13 +101,12 @@ sub effective_requirements {
     \%req;
 }
 
-sub to_string {
-    my $self = shift;
+sub to_string ($self) {
     my @out;
     push @out, $self->prereqs->to_string;
     if (my $features = $self->features) {
         push @out, "features:";
-        for my $id (sort keys %$features) {
+        for my $id (sort keys $features->%*) {
             my $feature = $features->{$id};
             push @out, "  $id:";
             if (my $desc = $feature->{description}) {
@@ -165,9 +155,13 @@ L<Module::CPANfile>
 
 L<App::cpm>
 
-=head1 AUTHOR
 
-Shoichi Kaji <skaji@cpan.org>
+=head1 ARTIFACT ATTESTATIONS
+
+GitHub Artifact Attestations are generated for release tarballs uploaded to
+CPAN. If you care about provenance for the uploaded tarballs, see:
+
+L<https://github.com/skaji/cpmfile/attestations>
 
 =head1 COPYRIGHT AND LICENSE
 

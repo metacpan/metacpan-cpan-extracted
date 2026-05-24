@@ -1,0 +1,58 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::realtime-calls-call_id-refer - Documentation for the /realtime/calls/{call_id}/refer path.
+
+=head1 OPERATIONS
+
+=head2 POST /realtime/calls/{call_id}/refer
+
+=head3 refer-realtime-call
+
+  $client->refer_realtime_call({
+      body => { ... },
+  });
+
+Transfer an active SIP call to a new destination using the SIP REFER verb.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<call_id> (in path, required, string) - The identifier for the call provided in the
+L<C<realtime.call.incoming>|https://platform.openai.com/docs/api-reference/webhook-events/realtime/call/incoming>
+webhook.
+
+=back
+
+=head4 Responses
+
+B<200 - Call referred successfully.>
+
+=head1 SCHEMAS
+
+=head2 RealtimeCallReferRequest
+
+Properties:
+
+=over
+
+=item * C<target_uri> (string, required) - URI that should appear in the SIP Refer-To header. Supports values like
+C<tel:+14155550123> or C<sip:agent@example.com> .
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

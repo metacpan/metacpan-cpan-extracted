@@ -4,179 +4,238 @@
 
 OpenAPI::Client::OpenAI::Path::batches - Documentation for the /batches path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</batches>.
+=head2 GET /batches
 
-=head1 PATHS
+=head3 listBatches
 
-
-=head2 C<GET /batches>
-
-List batch
-
+  $client->list_batches({
+      body => { ... },
+  });
 
 List your organization's batches.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
+=item * C<after> (in query, optional, string) - A cursor for use in pagination. C<after> is an object ID that defines your
+place in the list. For instance, if you make a list request and receive 100
+objects, ending with obj_foo, your subsequent call can include after=obj_foo
+in order to fetch the next page of the list.
 
-C<listBatches>
+=item * C<limit> (in query, optional, integer) - A limit on the number of objects to be returned. Limit can range between 1 and
+100, and the default is 20.
 
-    $client->listBatches( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<after> (in query) (Optional) - A cursor for use in pagination. `after` is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include after=obj_foo in order to fetch the next page of the list.
-
-
-Type: C<string>
-
-
-
-=item * C<limit> (in query) (Optional) - A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.
-
-
-Type: C<integer>
-
-
-Default: C<20>
-
+Default: 20
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - Batch listed successfully.>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-Batch listed successfully.
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
        "data" : [
           "{\n  \"id\": \"batch_abc123\",\n  \"object\": \"batch\",\n  \"endpoint\": \"/v1/completions\",\n  \"model\": \"gpt-5-2025-08-07\",\n  \"errors\": null,\n  \"input_file_id\": \"file-abc123\",\n  \"completion_window\": \"24h\",\n  \"status\": \"completed\",\n  \"output_file_id\": \"file-cvaTdG\",\n  \"error_file_id\": \"file-HOWS94\",\n  \"created_at\": 1711471533,\n  \"in_progress_at\": 1711471538,\n  \"expires_at\": 1711557933,\n  \"finalizing_at\": 1711493133,\n  \"completed_at\": 1711493163,\n  \"failed_at\": null,\n  \"expired_at\": null,\n  \"cancelling_at\": null,\n  \"cancelled_at\": null,\n  \"request_counts\": {\n    \"total\": 100,\n    \"completed\": 95,\n    \"failed\": 5\n  },\n  \"usage\": {\n    \"input_tokens\": 1500,\n    \"input_tokens_details\": {\n      \"cached_tokens\": 1024\n    },\n    \"output_tokens\": 500,\n    \"output_tokens_details\": {\n      \"reasoning_tokens\": 300\n    },\n    \"total_tokens\": 2000\n  },\n  \"metadata\": {\n    \"customer_id\": \"user_123456789\",\n    \"batch_description\": \"Nightly eval job\",\n  }\n}\n"
        ],
        "first_id" : "batch_abc123",
-       "last_id" : "batch_abc456"
+       "has_more" : false,
+       "last_id" : "batch_abc456",
+       "object" : "list"
     }
 
+=head2 POST /batches
 
-=back
+=head3 createBatch
 
-=head2 C<POST /batches>
-
-Create batch
-
+  $client->create_batch({
+      body => { ... },
+  });
 
 Creates and executes a batch from an uploaded file of requests
 
+=head4 Request body
 
+Content-Type: application/json
 
-=head3 Operation ID
+Properties:
 
-C<createBatch>
+=over
 
-    $client->createBatch( ... );
+=item * C<completion_window> (string, required) - The time frame within which the batch should be processed. Currently only
+C<24h> is supported.
 
-=head3 Parameters
+Allowed values: 24h
 
-=over 4
+=item * C<endpoint> (string, required) - The endpoint to be used for all requests in the batch. Currently
+C</v1/responses> , C</v1/chat/completions> , C</v1/embeddings> ,
+C</v1/completions> , C</v1/moderations> , C</v1/images/generations> ,
+C</v1/images/edits> , and C</v1/videos> are supported. Note that
+C</v1/embeddings> batches are also restricted to a maximum of 50,000 embedding
+inputs across all requests in the batch.
+
+Allowed values: /v1/responses, /v1/chat/completions, /v1/embeddings, /v1/completions, /v1/moderations, /v1/images/generations, /v1/images/edits, /v1/videos
+
+=item * C<input_file_id> (string, required) - The ID of an uploaded file that contains requests for the new batch.
+
+See L<upload file|https://platform.openai.com/docs/api-reference/files/create>
+for how to upload a file.
+
+Your input file must be formatted as a
+L<JSONL file|https://platform.openai.com/docs/api-reference/batch/request-input>
+, and must be uploaded with the purpose C<batch> . The file can contain up to
+50,000 requests, and can be up to 200 MB in size.
+
+=item * C<metadata> (Metadata)
+
+See L</Metadata> below for shape.
+
+=item * C<output_expires_after> (BatchFileExpirationAfter)
+
+See L</BatchFileExpirationAfter> below for shape.
 
 =back
 
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
-
-    
-      
-
-      
-      
 Example:
 
     {
-       "output_expires_after" : null
+       "completion_window" : "24h",
+       "endpoint" : "/v1/responses",
+       "input_file_id" : "string",
+       "metadata" : {},
+       "output_expires_after" : {
+          "anchor" : "created_at",
+          "seconds" : 0
+       }
     }
 
+=head4 Responses
 
-             
+B<200 - Batch created successfully.>
 
-=head3 Responses
+Content-Type: application/json
 
+Example:
 
-=head4 Status Code: C<200>
+    "{\n  \"id\": \"batch_abc123\",\n  \"object\": \"batch\",\n  \"endpoint\": \"/v1/completions\",\n  \"model\": \"gpt-5-2025-08-07\",\n  \"errors\": null,\n  \"input_file_id\": \"file-abc123\",\n  \"completion_window\": \"24h\",\n  \"status\": \"completed\",\n  \"output_file_id\": \"file-cvaTdG\",\n  \"error_file_id\": \"file-HOWS94\",\n  \"created_at\": 1711471533,\n  \"in_progress_at\": 1711471538,\n  \"expires_at\": 1711557933,\n  \"finalizing_at\": 1711493133,\n  \"completed_at\": 1711493163,\n  \"failed_at\": null,\n  \"expired_at\": null,\n  \"cancelling_at\": null,\n  \"cancelled_at\": null,\n  \"request_counts\": {\n    \"total\": 100,\n    \"completed\": 95,\n    \"failed\": 5\n  },\n  \"usage\": {\n    \"input_tokens\": 1500,\n    \"input_tokens_details\": {\n      \"cached_tokens\": 1024\n    },\n    \"output_tokens\": 500,\n    \"output_tokens_details\": {\n      \"reasoning_tokens\": 300\n    },\n    \"total_tokens\": 2000\n  },\n  \"metadata\": {\n    \"customer_id\": \"user_123456789\",\n    \"batch_description\": \"Nightly eval job\",\n  }\n}\n"
 
-Batch created successfully.
+=head1 SCHEMAS
 
+=head2 Batch
 
-=head4 Content Types:
+Properties:
 
-=over 4
+=over
 
+=item * C<cancelled_at> (integer) - The Unix timestamp (in seconds) for when the batch was cancelled.
 
-=item * C<application/json>
+=item * C<cancelling_at> (integer) - The Unix timestamp (in seconds) for when the batch started cancelling.
 
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+=item * C<completed_at> (integer) - The Unix timestamp (in seconds) for when the batch was completed.
 
-    {
-      "id": "batch_abc123",
-      "object": "batch",
-      "endpoint": "/v1/completions",
-      "model": "gpt-5-2025-08-07",
-      "errors": null,
-      "input_file_id": "file-abc123",
-      "completion_window": "24h",
-      "status": "completed",
-      "output_file_id": "file-cvaTdG",
-      "error_file_id": "file-HOWS94",
-      "created_at": 1711471533,
-      "in_progress_at": 1711471538,
-      "expires_at": 1711557933,
-      "finalizing_at": 1711493133,
-      "completed_at": 1711493163,
-      "failed_at": null,
-      "expired_at": null,
-      "cancelling_at": null,
-      "cancelled_at": null,
-      "request_counts": {
-        "total": 100,
-        "completed": 95,
-        "failed": 5
-      },
-      "usage": {
-        "input_tokens": 1500,
-        "input_tokens_details": {
-          "cached_tokens": 1024
-        },
-        "output_tokens": 500,
-        "output_tokens_details": {
-          "reasoning_tokens": 300
-        },
-        "total_tokens": 2000
-      },
-      "metadata": {
-        "customer_id": "user_123456789",
-        "batch_description": "Nightly eval job",
-      }
-    }
+=item * C<completion_window> (string, required) - The time frame within which the batch should be processed.
 
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) for when the batch was created.
+
+=item * C<endpoint> (string, required) - The OpenAI API endpoint used by the batch.
+
+=item * C<error_file_id> (string) - The ID of the file containing the outputs of requests with errors.
+
+=item * C<errors> (object)
+
+=item * C<expired_at> (integer) - The Unix timestamp (in seconds) for when the batch expired.
+
+=item * C<expires_at> (integer) - The Unix timestamp (in seconds) for when the batch will expire.
+
+=item * C<failed_at> (integer) - The Unix timestamp (in seconds) for when the batch failed.
+
+=item * C<finalizing_at> (integer) - The Unix timestamp (in seconds) for when the batch started finalizing.
+
+=item * C<id> (string, required)
+
+=item * C<in_progress_at> (integer) - The Unix timestamp (in seconds) for when the batch started processing.
+
+=item * C<input_file_id> (string, required) - The ID of the input file for the batch.
+
+=item * C<metadata> (Metadata)
+
+See L</Metadata> below for shape.
+
+=item * C<model> (string) - Model ID used to process the batch, like C<gpt-5-2025-08-07> . OpenAI offers a
+wide range of models with different capabilities, performance characteristics,
+and price points. Refer to the
+L<model guide|https://platform.openai.com/docs/models> to browse and compare
+available models.
+
+=item * C<object> (string, required) - The object type, which is always C<batch> .
+
+Allowed values: batch
+
+=item * C<output_file_id> (string) - The ID of the file containing the outputs of successfully executed requests.
+
+=item * C<request_counts> (object) - The request counts for different statuses within the batch.
+
+=item * C<status> (string, required) - The current status of the batch.
+
+Allowed values: validating, failed, in_progress, finalizing, completed, expired, cancelling, cancelled
+
+=item * C<usage> (object) - Represents token usage details including input tokens, output tokens, a
+breakdown of output tokens, and the total tokens used. Only populated on
+batches created after September 7, 2025.
 
 =back
+
+=head2 BatchFileExpirationAfter
+
+Properties:
+
+=over
+
+=item * C<anchor> (string, required) - Anchor timestamp after which the expiration policy applies. Supported anchors:
+C<created_at> . Note that the anchor is the file creation time, not the time
+the batch is created.
+
+Allowed values: created_at
+
+=item * C<seconds> (integer, required) - The number of seconds after the anchor time that the file will expire. Must be
+between 3600 (1 hour) and 2592000 (30 days).
+
+=back
+
+=head2 ListBatchesResponse
+
+Properties:
+
+=over
+
+=item * C<data> (array of Batch, required)
+
+=item * C<first_id> (string)
+
+=item * C<has_more> (boolean, required)
+
+=item * C<last_id> (string)
+
+=item * C<object> (string, required)
+
+Allowed values: list
+
+=back
+
+=head2 Metadata
+
+Set of 16 key-value pairs that can be attached to an object. This can be
+useful for storing additional information about the object in a structured
+format, and querying for objects via API or the dashboard.
+
+Keys are strings with a maximum length of 64 characters. Values are strings
+with a maximum length of 512 characters.
 
 =head1 SEE ALSO
 

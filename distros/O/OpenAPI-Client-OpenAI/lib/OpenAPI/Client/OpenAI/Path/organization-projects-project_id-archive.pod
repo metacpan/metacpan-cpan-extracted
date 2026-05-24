@@ -4,67 +4,68 @@
 
 OpenAPI::Client::OpenAI::Path::organization-projects-project_id-archive - Documentation for the /organization/projects/{project_id}/archive path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</organization/projects/{project_id}/archive>.
+=head2 POST /organization/projects/{project_id}/archive
 
-=head1 PATHS
+=head3 archive-project
 
+  $client->archive_project({
+      body => { ... },
+  });
 
-=head2 C<POST /organization/projects/{project_id}/archive>
+Archives a project in the organization. Archived projects cannot be used or
+updated.
 
-Archive project
+=head4 Path/query parameters
 
+=over
 
-Archives a project in the organization. Archived projects cannot be used or updated.
-
-
-
-=head3 Operation ID
-
-C<archive-project>
-
-    $client->archive-project( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<project_id> (in path) (Required) - The ID of the project.
-
-Type: C<string>
-
-
+=item * C<project_id> (in path, required, string) - The ID of the project.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - Project archived successfully.>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-Project archived successfully.
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-        "id": "proj_abc",
-        "object": "organization.project",
-        "name": "Project example",
-        "created_at": 1711471533,
-        "archived_at": null,
-        "status": "active"
+       "archived_at" : null,
+       "created_at" : 1711471533,
+       "external_key_id" : null,
+       "id" : "proj_abc",
+       "name" : "Project example",
+       "object" : "organization.project",
+       "status" : "active"
     }
 
+=head1 SCHEMAS
+
+=head2 Project
+
+Properties:
+
+=over
+
+=item * C<archived_at> (anyOf)
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) of when the project was created.
+
+=item * C<external_key_id> (anyOf) - The external key associated with the project.
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints
+
+=item * C<name> (anyOf) - The name of the project. This appears in reporting.
+
+=item * C<object> (string, required) - The object type, which is always C<organization.project>
+
+Allowed values: organization.project
+
+=item * C<status> (anyOf) - C<active> or C<archived>
 
 =back
 

@@ -4,7 +4,7 @@
       "Shoichi Kaji <skaji@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -16,7 +16,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.034"
+            "Module::Build::Tiny" : "0.053"
          }
       },
       "runtime" : {
@@ -26,7 +26,7 @@
             "Exporter" : "5.57",
             "Scalar::Util" : "0",
             "YAML::PP" : "0.027",
-            "perl" : "5.008001"
+            "perl" : "v5.24.0"
          }
       },
       "test" : {
@@ -39,7 +39,7 @@
    "provides" : {
       "Module::cpmfile" : {
          "file" : "lib/Module/cpmfile.pm",
-         "version" : "0.006"
+         "version" : "v1.0.0"
       },
       "Module::cpmfile::Prereqs" : {
          "file" : "lib/Module/cpmfile/Prereqs.pm"
@@ -60,9 +60,9 @@
          "web" : "https://github.com/skaji/cpmfile"
       }
    },
-   "version" : "0.006",
-   "x_generated_by_perl" : "v5.34.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "version" : "v1.0.0",
+   "x_generated_by_perl" : "v5.42.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }

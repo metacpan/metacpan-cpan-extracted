@@ -4,96 +4,112 @@
 
 OpenAPI::Client::OpenAI::Path::audio-speech - Documentation for the /audio/speech path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</audio/speech>.
+=head2 POST /audio/speech
 
-=head1 PATHS
+=head3 createSpeech
 
-
-=head2 C<POST /audio/speech>
-
-Create speech
-
+  $client->create_speech({
+      body => { ... },
+  });
 
 Generates audio from the input text.
 
+Returns the audio file content, or a stream of audio events.
 
+=head4 Request body
 
-=head3 Operation ID
+Content-Type: application/json
 
-C<createSpeech>
-
-    $client->createSpeech( ... );
-
-=head3 Parameters
-
-=over 4
-
-=back
-
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
-
-    
-      
-
-      
-
-=head4 Models
-
-One of the available L<TTS models|https://platform.openai.com/docs/models#tts>: C<tts-1>, C<tts-1-hd>, C<gpt-4o-mini-tts>, or C<gpt-4o-mini-tts-2025-12-15>.
-
-=over 4
-      
-=item * C<tts-1>
-
-=item * C<tts-1-hd>
-
-=item * C<gpt-4o-mini-tts>
-
-=item * C<gpt-4o-mini-tts-2025-12-15>
-
-=back
-      
-      
 Example:
 
     {
-       "voice" : "ash"
+       "input" : "string",
+       "instructions" : "string",
+       "model" : "tts-1",
+       "response_format" : "mp3",
+       "speed" : 1,
+       "stream_format" : "audio",
+       "voice" : {
+          "id" : "voice_1234"
+       }
     }
 
+=head4 Responses
 
-             
+B<200 - OK>
 
-=head3 Responses
+Content-Type: application/octet-stream
 
+Example:
 
-=head4 Status Code: C<200>
+    "string"
 
-OK
+Content-Type: text/event-stream
 
+Example:
 
-=head4 Content Types:
+    {
+       "audio" : "base64-encoded-audio-data",
+       "type" : "speech.audio.delta"
+    }
 
-=over 4
+=head1 SCHEMAS
 
+=head2 CreateSpeechRequest
 
-=item * C<application/octet-stream>
+Properties:
 
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+=over
 
+=item * C<input> (string, required) - The text to generate audio for. The maximum length is 4096 characters.
 
+=item * C<instructions> (string) - Control the voice of your generated audio with additional instructions. Does
+not work with C<tts-1> or C<tts-1-hd> .
 
+=item * C<model> (anyOf, required) - One of the available L<TTS models|https://platform.openai.com/docs/models#tts>
+: C<tts-1> , C<tts-1-hd> , C<gpt-4o-mini-tts> , or
+C<gpt-4o-mini-tts-2025-12-15> .
 
-=item * C<text/event-stream>
+=item * C<response_format> (string) - The format to audio in. Supported formats are C<mp3> , C<opus> , C<aac> ,
+C<flac> , C<wav> , and C<pcm> .
 
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Allowed values: mp3, opus, aac, flac, wav, pcm
 
+Default: mp3
 
+=item * C<speed> (number) - The speed of the generated audio. Select a value from C<0.25> to C<4.0> .
+C<1.0> is the default.
+
+Default: 1
+
+=item * C<stream_format> (string) - The format to stream the audio in. Supported formats are C<sse> and C<audio> .
+C<sse> is not supported for C<tts-1> or C<tts-1-hd> .
+
+Allowed values: sse, audio
+
+Default: audio
+
+=item * C<voice> (VoiceIdsOrCustomVoice, required) - The voice to use when generating the audio. Supported built-in voices are
+C<alloy> , C<ash> , C<ballad> , C<coral> , C<echo> , C<fable> , C<onyx> ,
+C<nova> , C<sage> , C<shimmer> , C<verse> , C<marin> , and C<cedar> . You may
+also provide a custom voice object with an C<id> , for example
+C<{ "id": "voice_1234" }> . Previews of the voices are available in the
+L<Text to speech guide|https://platform.openai.com/docs/guides/text-to-speech#voice-options>
+.
+
+See L</VoiceIdsOrCustomVoice> below for shape.
 
 =back
+
+=head2 CreateSpeechResponseStreamEvent
+
+See L<https://platform.openai.com/docs/api-reference> for details.
+
+=head2 VoiceIdsOrCustomVoice
+
+A built-in voice name or a custom voice reference.
 
 =head1 SEE ALSO
 

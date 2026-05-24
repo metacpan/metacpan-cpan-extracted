@@ -1,0 +1,135 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::chatkit-threads-thread_id - Documentation for the /chatkit/threads/{thread_id} path.
+
+=head1 OPERATIONS
+
+=head2 DELETE /chatkit/threads/{thread_id}
+
+=head3 DeleteThreadMethod
+
+  $client->delete_thread_method({
+      body => { ... },
+  });
+
+Delete a ChatKit thread along with its items and stored attachments.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<thread_id> (in path, required, string) - Identifier of the ChatKit thread to delete.
+
+=back
+
+=head4 Responses
+
+B<200 - Success>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "deleted" : false,
+       "id" : "string",
+       "object" : "chatkit.thread.deleted"
+    }
+
+=head2 GET /chatkit/threads/{thread_id}
+
+=head3 GetThreadMethod
+
+  $client->get_thread_method({
+      body => { ... },
+  });
+
+Retrieve a ChatKit thread by its identifier.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<thread_id> (in path, required, string) - Identifier of the ChatKit thread to retrieve.
+
+=back
+
+=head4 Responses
+
+B<200 - Success>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "created_at" : 1712345600,
+       "id" : "cthr_def456",
+       "object" : "chatkit.thread",
+       "status" : {
+          "type" : "active"
+       },
+       "title" : "Demo feedback",
+       "user" : "user_456"
+    }
+
+=head1 SCHEMAS
+
+=head2 DeletedThreadResource
+
+Properties:
+
+=over
+
+=item * C<deleted> (boolean, required) - Indicates that the thread has been deleted.
+
+=item * C<id> (string, required) - Identifier of the deleted thread.
+
+=item * C<object> (string, required) - Type discriminator that is always C<chatkit.thread.deleted> .
+
+Allowed values: chatkit.thread.deleted
+
+Default: chatkit.thread.deleted
+
+=back
+
+=head2 ThreadResource
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - Unix timestamp (in seconds) for when the thread was created.
+
+=item * C<id> (string, required) - Identifier of the thread.
+
+=item * C<object> (string, required) - Type discriminator that is always C<chatkit.thread> .
+
+Allowed values: chatkit.thread
+
+Default: chatkit.thread
+
+=item * C<status> (oneOf, required) - Current status for the thread. Defaults to C<active> for newly created
+threads.
+
+=item * C<title> (anyOf, required)
+
+=item * C<user> (string, required) - Free-form string that identifies your end user who owns the thread.
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

@@ -1,0 +1,69 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::videos-characters-character_id - Documentation for the /videos/characters/{character_id} path.
+
+=head1 OPERATIONS
+
+=head2 GET /videos/characters/{character_id}
+
+=head3 GetVideoCharacter
+
+  $client->get_video_character({
+      body => { ... },
+  });
+
+Fetch a character.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<character_id> (in path, required, string) - The identifier of the character to retrieve.
+
+=back
+
+=head4 Responses
+
+B<200 - Success>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "created_at" : 0,
+       "id" : "string",
+       "name" : "string"
+    }
+
+=head1 SCHEMAS
+
+=head2 VideoCharacterResource
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - Unix timestamp (in seconds) when the character was created.
+
+=item * C<id> (anyOf, required)
+
+=item * C<name> (anyOf, required)
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

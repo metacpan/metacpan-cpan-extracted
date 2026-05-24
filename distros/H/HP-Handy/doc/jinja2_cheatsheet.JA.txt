@@ -1,0 +1,219 @@
+======================================================================
+ HP::Handy Jinja2 チートシート                           [JA] Japanese
+======================================================================
+
+[ 1. コンストラクタ ]
+
+  use HP::Handy;
+
+  my $tmpl = HP::Handy->new(
+      template_dir  => './templates', # デフォルト: '.'
+      auto_escape   => 1,             # デフォルト: 1 ({{ }}をHTMLエスケープ)
+      trim_blocks   => 0,             # デフォルト: 0 ({% %}後の改行を除去)
+      lstrip_blocks => 0,             # デフォルト: 0 ({% %}前の空白を除去)
+  );
+
+  配布ディレクトリから直接実行:
+    perl lib/HP/Handy.pm
+
+[ 2. デリミタ ]
+
+  {{ expr }}        変数・式の出力 (デフォルトでHTMLエスケープ)
+  {% tag %}         制御タグ
+  {# comment #}     コメント (出力から除去)
+
+  空白制御:
+    {%- tag -%}     タグの前後の空白を除去
+    {{- expr -}}    式の前後の空白を除去
+
+[ 3. 変数 ]
+
+  {{ name }}                  単純変数
+  {{ user.email }}            ハッシュ属性アクセス
+  {{ items[0] }}              配列インデックス (負のインデックス対応)
+  {{ config["debug"] }}       文字列キーによるハッシュアクセス
+  {{ a.b.c }}                 チェーンアクセス
+
+[ 4. フィルタ ]
+
+  {{ name | upper }}                    大文字変換
+  {{ name | lower }}                    小文字変換
+  {{ text | trim }}                     前後の空白を除去
+  {{ text | length }}                   文字列またはリストの長さ
+  {{ text | reverse }}                  文字列を逆順に
+  {{ text | escape }}  または  {{ text | e }}   HTMLエスケープ
+  {{ html  | safe }}                    安全マーク (auto_escapeをスキップ)
+  {{ val   | default("なし") }}         未定義・空の場合デフォルト値を返す
+  {{ text  | replace("旧","新") }}      部分文字列を置換
+  {{ text  | truncate(80) }}            N文字で切り詰め ("..."を追加)
+  {{ list  | join(", ") }}              セパレータでリストを結合
+  {{ list  | first }}                   最初の要素
+  {{ list  | last }}                    最後の要素
+  {{ list  | sort }}                    リストをソート
+  {{ list  | sort("attr") }}            属性でソート
+  {{ list  | unique }}                  重複を除去
+  {{ list  | min }}                     最小値
+  {{ list  | max }}                     最大値
+  {{ list  | sum }}                     合計値
+  {{ list  | count }}                   要素数
+  {{ list  | map("attr") }}             各要素から属性を取り出す
+  {{ list  | batch(3) }}                N個ずつのチャンクに分割
+  {{ list  | slice(3) }}                N等分に分割
+  {{ n     | abs }}                     絶対値
+  {{ n     | int }}                     整数に変換
+  {{ s     | title }}                   各単語を先頭大文字に
+  {{ s     | capitalize }}              先頭文字を大文字に
+  {{ s     | urlencode }}               URLパーセントエンコード
+  {{ s     | wordcount }}               単語数をカウント
+  {{ s     | nl2br | safe }}            改行を<br>に変換
+  {{ s     | striptags }}               HTMLタグを除去
+  {{ val   | tojson | safe }}           JSONにシリアライズ
+
+[ 5. テスト ]
+
+  {% if x is defined %}       定義済みかどうか
+  {% if x is none %}          undefかどうか (None)
+  {% if x is number %}        数値かどうか
+  {% if x is sequence %}      配列リファレンスかどうか
+  {% if x is mapping %}       ハッシュリファレンスかどうか
+  {% if n is odd %}           奇数かどうか
+  {% if n is even %}          偶数かどうか
+  {% if n is divisibleby 3 %} Nで割り切れるかどうか
+  {% if x is not none %}      テストの否定
+
+[ 6. 条件分岐 ]
+
+  {% if 条件 %}
+      ...
+  {% elif 他の条件 %}
+      ...
+  {% else %}
+      ...
+  {% endif %}
+
+  インライン条件 (三項演算子):
+    {{ "はい" if flag else "いいえ" }}
+
+[ 7. forループ ]
+
+  {% for item in list %}
+      {{ loop.index }}: {{ item }}
+  {% endfor %}
+
+  空リスト時のelse:
+  {% for item in list %}
+      {{ item }}
+  {% else %}
+      (アイテムなし)
+  {% endfor %}
+
+  フィルタ付きループ:
+  {% for item in list if item != "" %}
+      {{ item }}
+  {% endfor %}
+
+  ハッシュのイテレーション:
+  {% for key, value in mapping %}
+      {{ key }}: {{ value }}
+  {% endfor %}
+
+  loop特殊変数:
+    loop.index      1始まりのカウンタ
+    loop.index0     0始まりのカウンタ
+    loop.first      最初のイテレーションでtrue
+    loop.last       最後のイテレーションでtrue
+    loop.length     全要素数
+    loop.odd        奇数回のイテレーションでtrue
+    loop.even       偶数回のイテレーションでtrue
+
+[ 8. set ]
+
+  {% set x = 42 %}
+  {% set greeting = "こんにちは、" ~ name %}
+
+[ 9. インクルード ]
+
+  {% include "header.html" %}
+  {% include "optional.html" ignore missing %}
+
+[ 10. テンプレート継承 ]
+
+  base.html:
+    <html>
+    <head><title>{% block title %}デフォルト{% endblock %}</title></head>
+    <body>{% block content %}{% endblock %}</body>
+    </html>
+
+  child.html:
+    {% extends "base.html" %}
+    {% block title %}マイページ{% endblock %}
+    {% block content %}<p>こんにちは</p>{% endblock %}
+
+  注意: HP::Handyは単一レベルの継承のみサポートします。
+
+[ 11. マクロ ]
+
+  定義:
+    {% macro input(name, value="", type="text") %}
+        <input type="{{ type }}" name="{{ name }}" value="{{ value }}">
+    {% endmacro %}
+
+  呼び出し:
+    {{ input("username") }}
+    {{ input("password", type="password") }}
+
+[ 12. with ]
+
+  {% with x = 10, y = 20 %}
+      {{ x + y }}
+  {% endwith %}
+
+[ 13. raw ]
+
+  {% raw %}
+      {{ これはレンダリングされません }}
+  {% endraw %}
+
+[ 14. 式 ]
+
+  算術:      +  -  *  /  //  %  **
+  文字列連結: ~  (例: "Hello" ~ " " ~ name)
+  比較:      ==  !=  <  >  <=  >=
+  論理:      and  or  not
+  メンバー:  in  not in
+  三項:      a if 条件 else b
+  範囲:      range(stop)  range(start, stop)  range(start, stop, step)
+
+[ 15. カスタムフィルタ・テスト ]
+
+  # カスタムフィルタの登録
+  $tmpl->add_filter('double', sub { $_[0] . $_[0] });
+  # 使用例: {{ text | double }}
+
+  # カスタムテストの登録
+  $tmpl->add_test('positive', sub { defined $_[0] && $_[0] > 0 });
+  # 使用例: {% if n is positive %}
+
+[ 16. レンダリングメソッド ]
+
+  # ファイルからレンダリング (template_dirからの相対パス)
+  my $html = $tmpl->render_file('index.html', \%vars);
+
+  # 文字列からレンダリング
+  my $html = $tmpl->render_string($source, \%vars);
+
+[ 17. 公式リソース ]
+
+  Jinja2ドキュメント (Pythonリファレンス実装):
+    https://jinja.palletsprojects.com/
+
+  HP::Handy on MetaCPAN:
+    https://metacpan.org/dist/HP-Handy
+
+  HTTP::Handy (サーバー層):
+    https://metacpan.org/dist/HTTP-Handy
+
+  DB::Handy (データベース層):
+    https://metacpan.org/dist/DB-Handy
+
+======================================================================

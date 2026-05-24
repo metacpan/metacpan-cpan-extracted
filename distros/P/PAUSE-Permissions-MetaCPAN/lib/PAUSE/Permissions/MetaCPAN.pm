@@ -1,14 +1,16 @@
-package PAUSE::Permissions::MetaCPAN 0.100;
-use v5.16;
+package PAUSE::Permissions::MetaCPAN v1.0.0;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
+
+our $TRIAL = 0;
 
 use Carp ();
 use HTTP::Tiny 0.055;
 use IO::Socket::SSL 1.42;
 use JSON::PP ();
 
-sub new {
-    my ($class, %args) = @_;
+sub new ($class, %args) {
     my $http = $args{http} || do {
         my $agent = sprintf "%s/%s", $class =~ s/::/-/gr, $class->VERSION;
         HTTP::Tiny->new(verify_SSL => 1, agent => $agent);
@@ -17,15 +19,14 @@ sub new {
     bless { http => $http, url => $url }, $class;
 }
 
-sub get {
-    my ($self, %args) = @_;
+sub get ($self, %args) {
 
     Carp::croak "either author or modules is required" if !$args{author} && !$args{modules};
 
     if (my $author = $args{author}) {
         my $hit = $self->_query(%args);
         my %hit = (owner => [], co_maintainer => []);
-        for my $module (@$hit) {
+        for my $module ($hit->@*) {
             if ($module->{owner} eq $author) {
                 push @{$hit{owner}}, $module;
             } else {
@@ -40,7 +41,7 @@ sub get {
     # elasticsearch may return "too_many_clauses: maxClauseCount is set to 1024"
     while (my @m = splice @module, 0, 1024) {
         my $hit = $self->_query(modules => \@m);
-        push @hit, @$hit;
+        push @hit, $hit->@*;
     }
     my %hit;
     for my $module (@{$args{modules}}) {
@@ -50,8 +51,7 @@ sub get {
     return \%hit;
 }
 
-sub _query {
-    my ($self, %args) = @_;
+sub _query ($self, %args) {
 
     my %bool;
     if (my $author = $args{author}) {
@@ -62,7 +62,7 @@ sub _query {
         $bool{minimum_should_match} = 1;
     } elsif (my $modules = $args{modules}) {
         $bool{should} = [
-            map +{ term => { module_name => $_ } }, @$modules
+            map +{ term => { module_name => $_ } }, $modules->@*
         ];
         $bool{minimum_should_match} = 1;
     }
@@ -194,9 +194,13 @@ It returns a hash reference that contains module permissions.
 
 =back
 
-=head1 AUTHOR
 
-Shoichi Kaji <skaji@cpan.org>
+=head1 ARTIFACT ATTESTATIONS
+
+GitHub Artifact Attestations are generated for release tarballs uploaded to
+CPAN. If you care about provenance for the uploaded tarballs, see:
+
+L<https://github.com/skaji/PAUSE-Permissions-MetaCPAN/attestations>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -10,6 +10,7 @@ use warnings;
 use App::PTP::Files qw(write_side_output read_side_input write_handle);
 use App::PTP::PerlEnv;
 use App::PTP::Util;
+use App::PTP::Util::Semver;
 use Cwd qw(abs_path);
 use Data::Dumper;
 use Exporter 'import';
@@ -448,6 +449,18 @@ sub do_sort {
     } elsif (${$modes->{comparator}} eq 'locale') {
       use locale;
       @$content = sort { $a cmp $b } @$content;
+    } elsif (${$modes->{comparator}} eq 'semver') {
+      my (%parsed, %warned);
+      for my $line (@$content) {
+        next if exists $parsed{$line};
+        my $version = App::PTP::Util::Semver::parse($line);
+        $parsed{$line} = $version;
+        for my $warning (@{$version->{warnings}}) {
+          print "WARNING: ${warning}\n" unless $warned{$warning}++;
+        }
+      }
+      @$content =
+          sort { App::PTP::Util::Semver::compare_parsed($parsed{$a}, $parsed{$b}) } @$content;
     } else {
       die sprintf "INTERNAL ERROR: Invalid comparator (%s)\n", ${$modes->{comparator}};
     }

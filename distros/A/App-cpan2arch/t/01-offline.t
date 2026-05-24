@@ -428,10 +428,11 @@ subtest 'Unit test' => sub {
 
         my %TESTS_OUT = (
             '--update' => {
-                normal_ver   => 'PKGBUILD + version updated',
-                normal_bump  => 'PKGBUILD updated + pkgrel bumped',
-                normal_comp  => '.SRCINFO != generated metadata',
-                normal_epoch => 'PKGBUILD updated + preserve epoch',
+                normal_ver          => 'PKGBUILD + version updated',
+                normal_ver_no_pkger => 'PKGBUILD updated + version updated + co-maintainer not preserved',
+                normal_bump         => 'PKGBUILD updated + pkgrel bumped',
+                normal_comp         => '.SRCINFO != generated metadata',
+                normal_epoch        => 'PKGBUILD updated + preserve epoch',
 
                 epoch_add    => 'PKGBUILD updated + add epoch',
                 epoch_bump   => 'PKGBUILD updated + bump epoch',
@@ -457,14 +458,12 @@ subtest 'Unit test' => sub {
             subtest $opt => sub {
                 if ( $opt eq '--update' ) {
                     my $CONTRIBS = <<~'END';
-                        # Contributor: Alice <alice@domain.tld>
+                        # Maintainer: Alice <alice@domain.tld>
                         # Contributor: Bob <bob@domain.tld>
                         END
 
-                    # Append contributor attributions to test their preservation.
-                    chomp( my $attribs = "$DEFS{packager}\n$CONTRIBS" );
                     my %env = (
-                        packager => $attribs,
+                        packager => $DEFS{packager},
                         #debug    => true,
                     );
 
@@ -489,7 +488,8 @@ subtest 'Unit test' => sub {
                             END
                     );
 
-                    $SRCINFO{normal_ver} = $SRCINFO{default} =~ s{^\tpkgver = \K[^\n]+$}{0.002006}mr;
+                    $SRCINFO{normal_ver} = $SRCINFO{normal_ver_no_pkger} =
+                      $SRCINFO{default} =~ s{^\tpkgver = \K[^\n]+$}{0.002006}mr;
 
                     $SRCINFO{normal_bump} = $SRCINFO{default};
 
@@ -569,7 +569,7 @@ subtest 'Unit test' => sub {
                             my $TODO;
 
                             $TODO = todo 'This test fails when vercmp is not installed'
-                              if ( ( $t eq 'normal_ver' || $t =~ /\Aepoch_/ ) && !can_run('vercmp') );
+                              if ( ( $t =~ /\Anormal_ver_?/ || $t =~ /\Aepoch_/ ) && !can_run('vercmp') );
 
                             my $c2a = App::cpan2arch->new;
                             $c2a->_process_opts( [ qw< --update >, $FAKE{mod} ] );
@@ -586,6 +586,14 @@ subtest 'Unit test' => sub {
                             my $cwd  = Path::Tiny->cwd;
                             my $temp = Path::Tiny->tempdir;
                             chdir $temp or die $!;
+
+                            if ( $t eq 'normal_ver_no_pkger' ) {
+                                # Exclude PACKAGER from top/current maintainer.
+                                $pkgbuild{output} =~ s{\A}{$CONTRIBS\n};
+                            }
+                            else {
+                                $pkgbuild{output} =~ s{\A}{# Maintainer: $DEFS{packager}\n$CONTRIBS\n};
+                            }
 
                             if ( $t ne 'no_files' ) {
                                 $temp->child( $FILES{outfile} )->spew_utf8( $pkgbuild{output} );
@@ -621,7 +629,16 @@ subtest 'Unit test' => sub {
                                 }
 
                                 my $outfile = path( $FILES{outfile} )->slurp_utf8;
-                                my $updated = $updated_default;
+
+                                my $updated = $t eq 'normal_ver_no_pkger'
+                                  ? (
+                                      # Replace Maintainer with Contributor since co-maintainers
+                                      # are not preserved when PACKAGER is not the current
+                                      # PKGBUILD maintainer.
+                                      $updated_default
+                                      =~ s{^# Maintainer:(?= Alice <alice\@domain.tld>$)}{# Contributor:}mr
+                                  )
+                                  : $updated_default;
 
                                 # Bump pkgrel
                                 {

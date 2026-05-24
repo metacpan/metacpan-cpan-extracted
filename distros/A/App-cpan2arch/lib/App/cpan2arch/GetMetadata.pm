@@ -12,7 +12,7 @@ role App::cpan2arch::GetMetadata;
 use File::Spec::Functions qw< catdir splitdir >;
 use Scalar::Util          qw< looks_like_number >;
 
-our $VERSION = 'v1.1.0';
+our $VERSION = 'v1.1.1';
 
 field $_mua_mcpan    :reader;
 field $_mod_endpoint :reader :writer = 'https://fastapi.metacpan.org/v1/module/';

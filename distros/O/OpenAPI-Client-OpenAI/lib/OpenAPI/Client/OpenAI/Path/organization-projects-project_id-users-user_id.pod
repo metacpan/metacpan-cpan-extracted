@@ -4,242 +4,224 @@
 
 OpenAPI::Client::OpenAI::Path::organization-projects-project_id-users-user_id - Documentation for the /organization/projects/{project_id}/users/{user_id} path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</organization/projects/{project_id}/users/{user_id}>.
+=head2 DELETE /organization/projects/{project_id}/users/{user_id}
 
-=head1 PATHS
+=head3 delete-project-user
 
-
-=head2 C<DELETE /organization/projects/{project_id}/users/{user_id}>
-
-Delete project user
-
+  $client->delete_project_user({
+      body => { ... },
+  });
 
 Deletes a user from the project.
 
+Returns confirmation of project user deletion, or an error if the project is
+archived (archived projects have no users).
 
+=head4 Path/query parameters
 
-=head3 Operation ID
+=over
 
-C<delete-project-user>
+=item * C<project_id> (in path, required, string) - The ID of the project.
 
-    $client->delete-project-user( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<project_id> (in path) (Required) - The ID of the project.
-
-Type: C<string>
-
-
-
-=item * C<user_id> (in path) (Required) - The ID of the user.
-
-Type: C<string>
-
-
+=item * C<user_id> (in path, required, string) - The ID of the user.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - Project user deleted successfully.>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-Project user deleted successfully.
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
-
-
-
-=back
-
-=head4 Status Code: C<400>
-
-Error response for various conditions.
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-       "error" : null
+       "deleted" : false,
+       "id" : "string",
+       "object" : "organization.project.user.deleted"
     }
 
+B<400 - Error response for various conditions.>
 
-=back
+Content-Type: application/json
 
-=head2 C<GET /organization/projects/{project_id}/users/{user_id}>
+Example:
 
-Retrieve project user
+    {
+       "error" : {
+          "code" : "string",
+          "message" : "string",
+          "param" : "string",
+          "type" : "string"
+       }
+    }
 
+=head2 GET /organization/projects/{project_id}/users/{user_id}
+
+=head3 retrieve-project-user
+
+  $client->retrieve_project_user({
+      body => { ... },
+  });
 
 Retrieves a user in the project.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
+=item * C<project_id> (in path, required, string) - The ID of the project.
 
-C<retrieve-project-user>
-
-    $client->retrieve-project-user( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<project_id> (in path) (Required) - The ID of the project.
-
-Type: C<string>
-
-
-
-=item * C<user_id> (in path) (Required) - The ID of the user.
-
-Type: C<string>
-
-
+=item * C<user_id> (in path, required, string) - The ID of the user.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - Project user retrieved successfully.>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-Project user retrieved successfully.
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-        "object": "organization.project.user",
-        "id": "user_abc",
-        "name": "First Last",
-        "email": "user@example.com",
-        "role": "owner",
-        "added_at": 1711471533
+       "added_at" : 1711471533,
+       "email" : "user@example.com",
+       "id" : "user_abc",
+       "name" : "First Last",
+       "object" : "organization.project.user",
+       "role" : "owner"
     }
 
+=head2 POST /organization/projects/{project_id}/users/{user_id}
 
-=back
+=head3 modify-project-user
 
-=head2 C<POST /organization/projects/{project_id}/users/{user_id}>
-
-Modify project user
-
+  $client->modify_project_user({
+      body => { ... },
+  });
 
 Modifies a user's role in the project.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
+=item * C<project_id> (in path, required, string) - The ID of the project.
 
-C<modify-project-user>
-
-    $client->modify-project-user( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<project_id> (in path) (Required) - The ID of the project.
-
-Type: C<string>
-
-
-
-=item * C<user_id> (in path) (Required) - The ID of the user.
-
-Type: C<string>
-
-
+=item * C<user_id> (in path, required, string) - The ID of the user.
 
 =back
 
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
+=head4 Responses
 
-    
-      
+B<200 - Project user's role updated successfully.>
 
-      
-             
+Content-Type: application/json
 
-=head3 Responses
-
-
-=head4 Status Code: C<200>
-
-Project user's role updated successfully.
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-        "object": "organization.project.user",
-        "id": "user_abc",
-        "name": "First Last",
-        "email": "user@example.com",
-        "role": "owner",
-        "added_at": 1711471533
+       "added_at" : 1711471533,
+       "email" : "user@example.com",
+       "id" : "user_abc",
+       "name" : "First Last",
+       "object" : "organization.project.user",
+       "role" : "owner"
     }
 
+B<400 - Error response for various conditions.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "error" : {
+          "code" : "string",
+          "message" : "string",
+          "param" : "string",
+          "type" : "string"
+       }
+    }
+
+=head1 SCHEMAS
+
+=head2 Error
+
+Properties:
+
+=over
+
+=item * C<code> (anyOf, required)
+
+=item * C<message> (string, required)
+
+=item * C<param> (anyOf, required)
+
+=item * C<type> (string, required)
 
 =back
 
-=head4 Status Code: C<400>
+=head2 ErrorResponse
 
-Error response for various conditions.
+Properties:
 
+=over
 
-=head4 Content Types:
+=item * C<error> (Error, required)
 
-=over 4
+See L</Error> below for shape.
 
+=back
 
-=item * C<application/json>
+=head2 ProjectUser
 
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Properties:
 
-    {
-       "error" : null
-    }
+=over
 
+=item * C<added_at> (integer, required) - The Unix timestamp (in seconds) of when the project was added.
+
+=item * C<email> (anyOf) - The email address of the user
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints
+
+=item * C<name> (anyOf) - The name of the user
+
+=item * C<object> (string, required) - The object type, which is always C<organization.project.user>
+
+Allowed values: organization.project.user
+
+=item * C<role> (string, required) - C<owner> or C<member>
+
+=back
+
+=head2 ProjectUserDeleteResponse
+
+Properties:
+
+=over
+
+=item * C<deleted> (boolean, required)
+
+=item * C<id> (string, required)
+
+=item * C<object> (string, required)
+
+Allowed values: organization.project.user.deleted
+
+=back
+
+=head2 ProjectUserUpdateRequest
+
+Properties:
+
+=over
+
+=item * C<role> (anyOf) - C<owner> or C<member>
 
 =back
 

@@ -1,0 +1,155 @@
+======================================================================
+ HP::Handy Jinja2 Cheat Sheet                                                             [TH] Thai
+======================================================================
+
+[ 1. ตัวสร้าง ]
+
+  use HP::Handy;
+
+  my $tmpl = HP::Handy->new(
+      template_dir  => './templates',
+      auto_escape   => 1,
+      trim_blocks   => 0,
+      lstrip_blocks => 0,
+  );
+
+  perl lib/HP/Handy.pm
+
+[ 2. ตัวคั่น ]
+
+  {{ expr }}      output (HTML-escaped by default)
+  {% tag %}       control tag
+  {# comment #}   comment
+  {%- tag -%}     whitespace control
+
+[ 3. ตัวแปร ]
+
+  {{ name }}
+  {{ user.email }}
+  {{ items[0] }}
+  {{ a.b.c }}
+
+[ 4. ฟิลเตอร์ ]
+
+  upper lower trim length escape safe default replace truncate
+  join first last sort unique min max sum count map batch slice
+  abs int title capitalize urlencode nl2br striptags tojson
+
+  {{ name | upper }}
+  {{ val  | default("n/a") }}
+  {{ list | join(", ") }}
+  {{ html | safe }}
+
+[ 5. การทดสอบ ]
+
+  defined  none  string  number  sequence  mapping
+  odd  even  divisibleby  upper  lower  equalto  in
+
+  {% if x is defined %}
+  {% if n is odd %}
+  {% if x is not none %}
+
+[ 6. เงื่อนไข ]
+
+  {% if condition %}
+      ...
+  {% elif other %}
+      ...
+  {% else %}
+      ...
+  {% endif %}
+
+  {{ "yes" if flag else "no" }}
+
+[ 7. ลูป for ]
+
+  {% for item in list %}
+      {{ loop.index }}: {{ item }}
+  {% endfor %}
+
+  {% for item in list if item != "" %}
+      {{ item }}
+  {% else %}
+      (empty)
+  {% endfor %}
+
+  {% for key, value in mapping %}
+      {{ key }}: {{ value }}
+  {% endfor %}
+
+  loop.index  loop.index0  loop.first  loop.last
+  loop.length  loop.odd  loop.even  loop.revindex
+
+[ 8. set ]
+
+  {% set x = 42 %}
+  {% set s = "Hello, " ~ name %}
+
+[ 9. รวมไฟล์ ]
+
+  {% include "header.html" %}
+  {% include "opt.html" ignore missing %}
+
+[ 10. การสืบทอดเทมเพลต ]
+
+  base.html:
+    {% block title %}Default{% endblock %}
+    {% block content %}{% endblock %}
+
+  child.html:
+    {% extends "base.html" %}
+    {% block title %}My Page{% endblock %}
+    {% block content %}<p>Hello</p>{% endblock %}
+
+[ 11. มาโคร ]
+
+  {% macro input(name, value="", type="text") %}
+      <input type="{{ type }}" name="{{ name }}" value="{{ value }}">
+  {% endmacro %}
+
+  {{ input("username") }}
+  {{ input("password", type="password") }}
+
+[ 12. with ]
+
+  {% with x = 10, y = 20 %}
+      {{ x + y }}
+  {% endwith %}
+
+[ 13. raw ]
+
+  {% raw %}
+      {{ not rendered }}
+  {% endraw %}
+
+[ 14. นิพจน์ ]
+
+  +  -  *  /  //  %  **   (arithmetic)
+  ~                        (string concat)
+  ==  !=  <  >  <=  >=    (comparison)
+  and  or  not             (logic)
+  in  not in               (membership)
+  a if cond else b         (ternary)
+  range(stop)  range(start, stop, step)
+
+[ 15. ฟิลเตอร์และเทสต์กำหนดเอง ]
+
+  $tmpl->add_filter('double', sub { $_[0] . $_[0] });
+  # {{ text | double }}
+
+  $tmpl->add_test('positive', sub { defined $_[0] && $_[0] > 0 });
+  # {% if n is positive %}
+
+[ 16. เมธอดเรนเดอร์ ]
+
+  my $html = $tmpl->render_file('index.html', \%vars);
+  my $html = $tmpl->render_string($source, \%vars);
+
+[ 17. แหล่งข้อมูลทางการ ]
+
+  Jinja2: https://jinja.palletsprojects.com/
+  HP::Handy:   https://metacpan.org/dist/HP-Handy
+  HTTP::Handy: https://metacpan.org/dist/HTTP-Handy
+  DB::Handy:   https://metacpan.org/dist/DB-Handy
+
+======================================================================

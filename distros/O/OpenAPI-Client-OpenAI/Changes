@@ -1,5 +1,72 @@
 Revision history for OpenAPI-Client-OpenAI
 
+0.28    2026-05-23
+
+        - Documentation cleanup: rewrote the SYNOPSIS code example
+          (was missing a comma after `prompt`, used the deprecated
+          createCompletion endpoint, and referenced Data::Dumper
+          without `use`-ing it). It now demonstrates the snake_case
+          create_chat_completion form against gpt-3.5-turbo.
+        - Regenerated README.md from POD so it reflects the snake_case
+          aliases being first-class and drops the now-removed
+          DEPRECATED METHODS section.
+
+0.27    2026-05-03
+
+        - Added devel/browse-docs to see the new docs prior to release
+        - Snake_case aliases for every operation: every operationId is
+          callable in both its original style (e.g. createChatCompletion)
+          and snake_case (e.g. create_chat_completion). Both forms are
+          first-class; the deprecation warning on the legacy six aliases
+          is removed.
+        - Documentation generator rewrite: per-path POD is now produced by
+          a modular generator under devel/lib/OpenAPI/Client/OpenAI/DocGen*.
+          Notable fixes:
+            * snake_case Perl method in every code example (previously,
+              kebab-case operationIds produced uncompilable examples).
+            * Methods.pod is now auto-generated (alphabetical, ~5 lines
+              per method), replacing a stale hand-maintained file.
+            * JSON examples are normalized (no more nested stringified
+              JSON) and oneOf/anyOf variants are scored by informativeness
+              instead of YAML order.
+            * Method-level x-oaiMeta.examples are now used in addition
+              to schema-level examples.
+            * Markdown horizontal rules no longer leak 80-character `='
+              artifacts into the POD.
+            * Pod::Checker passes with zero errors and zero warnings
+              across all generated POD.
+        - Build dependencies dropped: Markdown::Pod, Template, Text::Wrap,
+          File::Slurp, Clone, Feature::Compat::Try.
+
+0.26    2026-05-23
+
+        - Image Model Retirement: `dall-e-2` and `dall-e-3` were removed from
+        the OpenAI API on 2026-05-12. The `model` parameter to `createImage`
+        no longer defaults to a working value and must be passed explicitly.
+        Use `gpt-image-1.5`, `gpt-image-1`, or `gpt-image-1-mini` instead.
+        The `t/create_image.t` test has been updated accordingly.
+        - ChatKit API: New top-level `/chatkit` endpoints for sessions and
+        threads, including item management and session cancellation.
+        - Skills API: New `/skills` endpoints for creating, listing, and
+        versioning reusable skill artifacts, including per-version content.
+        - Videos API: New `/videos` endpoints covering video generation,
+        editing, extension, remixing, content retrieval, and reusable video
+        characters.
+        - Realtime API Expansion: New `/realtime/calls/{call_id}` endpoints
+        for SIP-style call control (`accept`, `hangup`, `refer`, `reject`),
+        plus new `/realtime/client_secrets` and
+        `/realtime/translations/client_secrets` endpoints.
+        - Organization Administration: New endpoints for spend alerts (at
+        both organization and project scope), data retention policies,
+        groups, roles, hosted tool permissions, and model permissions.
+        - Usage Reporting: New `/organization/usage/file_search_calls` and
+        `/organization/usage/web_search_calls` endpoints.
+        - Responses API: Added `/responses/compact` and
+        `/responses/input_tokens` endpoints.
+        - Build Tooling: `devel/rebuild` now runs `make manifest` after
+        regenerating documentation so newly-generated `.pod` files are
+        automatically added to MANIFEST.
+
 0.25    2026-01-02
 
         - Model Updates: Updated examples and internal constants to reflect the

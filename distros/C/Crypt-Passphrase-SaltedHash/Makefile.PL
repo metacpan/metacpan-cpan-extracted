@@ -29,7 +29,6 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Crypt::SaltedHash" => 0,
     "Crypt::SysRandom" => 0,
     "Digest::MD5" => "2.25",
     "Digest::SHA" => "5.96",
@@ -44,7 +43,7 @@ my %WriteMakefileArgs = (
     "Test::Differences" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.01",
+  "VERSION" => "0.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,7 +52,6 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Crypt::Passphrase::Validator" => 0,
-  "Crypt::SaltedHash" => 0,
   "Crypt::SysRandom" => 0,
   "Digest" => "1.19",
   "Digest::MD5" => "2.25",

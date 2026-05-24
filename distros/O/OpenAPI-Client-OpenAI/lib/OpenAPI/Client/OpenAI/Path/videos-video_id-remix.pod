@@ -1,0 +1,135 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::videos-video_id-remix - Documentation for the /videos/{video_id}/remix path.
+
+=head1 OPERATIONS
+
+=head2 POST /videos/{video_id}/remix
+
+=head3 CreateVideoRemix
+
+  $client->create_video_remix({
+      body => { ... },
+  });
+
+Create a remix of a completed video using a refreshed prompt.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<video_id> (in path, required, string) - The identifier of the completed video to remix.
+
+=back
+
+=head4 Responses
+
+B<200 - Success>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "completed_at" : 0,
+       "created_at" : 0,
+       "error" : {
+          "code" : "string",
+          "message" : "string"
+       },
+       "expires_at" : 0,
+       "id" : "string",
+       "model" : null,
+       "object" : "video",
+       "progress" : 0,
+       "prompt" : "string",
+       "remixed_from_video_id" : "string",
+       "seconds" : "string",
+       "size" : null,
+       "status" : null
+    }
+
+=head1 SCHEMAS
+
+=head2 CreateVideoRemixBody
+
+Properties:
+
+=over
+
+=item * C<prompt> (string, required) - Updated text prompt that directs the remix generation.
+
+=back
+
+=head2 VideoModel
+
+See L<https://platform.openai.com/docs/api-reference> for details.
+
+=head2 VideoResource
+
+Properties:
+
+=over
+
+=item * C<completed_at> (anyOf, required)
+
+=item * C<created_at> (integer, required) - Unix timestamp (seconds) for when the job was created.
+
+=item * C<error> (anyOf, required)
+
+=item * C<expires_at> (anyOf, required)
+
+=item * C<id> (string, required) - Unique identifier for the video job.
+
+=item * C<model> (VideoModel, required) - The video generation model that produced the job.
+
+See L</VideoModel> below for shape.
+
+=item * C<object> (string, required) - The object type, which is always C<video> .
+
+Allowed values: video
+
+Default: video
+
+=item * C<progress> (integer, required) - Approximate completion percentage for the generation task.
+
+=item * C<prompt> (anyOf, required)
+
+=item * C<remixed_from_video_id> (anyOf, required)
+
+=item * C<seconds> (string, required) - Duration of the generated clip in seconds. For extensions, this is the
+stitched total duration.
+
+=item * C<size> (VideoSize, required) - The resolution of the generated video.
+
+See L</VideoSize> below for shape.
+
+=item * C<status> (VideoStatus, required) - Current lifecycle status of the video job.
+
+See L</VideoStatus> below for shape.
+
+=back
+
+=head2 VideoSize
+
+See L<https://platform.openai.com/docs/api-reference> for details.
+
+=head2 VideoStatus
+
+See L<https://platform.openai.com/docs/api-reference> for details.
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

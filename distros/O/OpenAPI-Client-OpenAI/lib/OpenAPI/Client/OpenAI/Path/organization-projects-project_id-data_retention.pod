@@ -1,0 +1,113 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::organization-projects-project_id-data_retention - Documentation for the /organization/projects/{project_id}/data_retention path.
+
+=head1 OPERATIONS
+
+=head2 GET /organization/projects/{project_id}/data_retention
+
+=head3 retrieve-project-data-retention
+
+  $client->retrieve_project_data_retention({
+      body => { ... },
+  });
+
+Retrieves project data retention controls.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<project_id> (in path, required, string) - The ID of the project to inspect.
+
+=back
+
+=head4 Responses
+
+B<200 - Project data retention controls retrieved successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "object" : "project.data_retention",
+       "type" : "organization_default"
+    }
+
+=head2 POST /organization/projects/{project_id}/data_retention
+
+=head3 update-project-data-retention
+
+  $client->update_project_data_retention({
+      body => { ... },
+  });
+
+Updates project data retention controls.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<project_id> (in path, required, string) - The ID of the project to update.
+
+=back
+
+=head4 Responses
+
+B<200 - Project data retention controls updated successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "object" : "project.data_retention",
+       "type" : "organization_default"
+    }
+
+=head1 SCHEMAS
+
+=head2 ProjectDataRetention
+
+Properties:
+
+=over
+
+=item * C<object> (string, required) - The object type, which is always C<project.data_retention> .
+
+Allowed values: project.data_retention
+
+=item * C<type> (string, required) - The configured project data retention type.
+
+Allowed values: organization_default, none, zero_data_retention, modified_abuse_monitoring, enhanced_zero_data_retention, enhanced_modified_abuse_monitoring
+
+=back
+
+=head2 UpdateProjectDataRetentionBody
+
+Properties:
+
+=over
+
+=item * C<retention_type> (string, required) - The desired project data retention type.
+
+Allowed values: organization_default, none, zero_data_retention, modified_abuse_monitoring, enhanced_zero_data_retention, enhanced_modified_abuse_monitoring
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

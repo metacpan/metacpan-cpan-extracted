@@ -1,0 +1,13 @@
+openapi: 3.0.0
+info:
+  title: Collision Fixture
+  version: '1.0'
+paths:
+  /thing-a:
+    post:
+      operationId: createThing
+      responses: { '200': { description: ok } }
+  /thing-b:
+    post:
+      operationId: create_thing
+      responses: { '200': { description: ok } }

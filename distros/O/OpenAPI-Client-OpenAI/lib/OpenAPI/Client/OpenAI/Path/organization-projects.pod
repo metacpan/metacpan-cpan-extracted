@@ -4,140 +4,146 @@
 
 OpenAPI::Client::OpenAI::Path::organization-projects - Documentation for the /organization/projects path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</organization/projects>.
+=head2 GET /organization/projects
 
-=head1 PATHS
+=head3 list-projects
 
-
-=head2 C<GET /organization/projects>
-
-List projects
-
+  $client->list_projects({
+      body => { ... },
+  });
 
 Returns a list of projects.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
+=item * C<limit> (in query, optional, integer) - A limit on the number of objects to be returned. Limit can range between 1 and
+100, and the default is 20.
 
-C<list-projects>
+Default: 20
 
-    $client->list-projects( ... );
+=item * C<after> (in query, optional, string) - A cursor for use in pagination. C<after> is an object ID that defines your
+place in the list. For instance, if you make a list request and receive 100
+objects, ending with obj_foo, your subsequent call can include after=obj_foo
+in order to fetch the next page of the list.
 
-=head3 Parameters
+=item * C<include_archived> (in query, optional, boolean) - If C<true> returns all projects including those that have been C<archived> .
+Archived projects are not included by default.
 
-=over 4
-
-=item * C<limit> (in query) (Optional) - A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.
-
-
-Type: C<integer>
-
-
-Default: C<20>
-
-
-=item * C<after> (in query) (Optional) - A cursor for use in pagination. `after` is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include after=obj_foo in order to fetch the next page of the list.
-
-
-Type: C<string>
-
-
-
-=item * C<include_archived> (in query) (Optional) - If `true` returns all projects including those that have been `archived`. Archived projects are not included by default.
-
-Type: C<boolean>
-
-
+Default: 
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - Projects listed successfully.>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-Projects listed successfully.
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
        "data" : [
-          "{\n    \"id\": \"proj_abc\",\n    \"object\": \"organization.project\",\n    \"name\": \"Project example\",\n    \"created_at\": 1711471533,\n    \"archived_at\": null,\n    \"status\": \"active\"\n}\n"
-       ]
+          "{\n    \"id\": \"proj_abc\",\n    \"object\": \"organization.project\",\n    \"name\": \"Project example\",\n    \"created_at\": 1711471533,\n    \"archived_at\": null,\n    \"status\": \"active\",\n    \"external_key_id\": null\n}\n"
+       ],
+       "first_id" : "string",
+       "has_more" : false,
+       "last_id" : "string",
+       "object" : "list"
     }
 
+=head2 POST /organization/projects
 
-=back
+=head3 create-project
 
-=head2 C<POST /organization/projects>
+  $client->create_project({
+      body => { ... },
+  });
 
-Create project
+Create a new project in the organization. Projects can be created and
+archived, but cannot be deleted.
 
+=head4 Responses
 
-Create a new project in the organization. Projects can be created and archived, but cannot be deleted.
+B<200 - Project created successfully.>
 
+Content-Type: application/json
 
-
-=head3 Operation ID
-
-C<create-project>
-
-    $client->create-project( ... );
-
-=head3 Parameters
-
-=over 4
-
-=back
-
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
-
-    
-      
-
-      
-             
-
-=head3 Responses
-
-
-=head4 Status Code: C<200>
-
-Project created successfully.
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-        "id": "proj_abc",
-        "object": "organization.project",
-        "name": "Project example",
-        "created_at": 1711471533,
-        "archived_at": null,
-        "status": "active"
+       "archived_at" : null,
+       "created_at" : 1711471533,
+       "external_key_id" : null,
+       "id" : "proj_abc",
+       "name" : "Project example",
+       "object" : "organization.project",
+       "status" : "active"
     }
 
+=head1 SCHEMAS
+
+=head2 Project
+
+Properties:
+
+=over
+
+=item * C<archived_at> (anyOf)
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) of when the project was created.
+
+=item * C<external_key_id> (anyOf) - The external key associated with the project.
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints
+
+=item * C<name> (anyOf) - The name of the project. This appears in reporting.
+
+=item * C<object> (string, required) - The object type, which is always C<organization.project>
+
+Allowed values: organization.project
+
+=item * C<status> (anyOf) - C<active> or C<archived>
+
+=back
+
+=head2 ProjectCreateRequest
+
+Properties:
+
+=over
+
+=item * C<external_key_id> (anyOf) - External key ID to associate with the project.
+
+=item * C<geography> (anyOf) - Create the project with the specified data residency region. Your organization
+must have access to Data residency functionality in order to use. See
+L<data residency controls|https://platform.openai.com/docs/guides/your-data#data-residency-controls>
+to review the functionality and limitations of setting this field.
+
+=item * C<name> (string, required) - The friendly name of the project, this name appears in reports.
+
+=back
+
+=head2 ProjectListResponse
+
+Properties:
+
+=over
+
+=item * C<data> (array of Project, required)
+
+=item * C<first_id> (anyOf)
+
+=item * C<has_more> (boolean, required)
+
+=item * C<last_id> (anyOf)
+
+=item * C<object> (string, required)
+
+Allowed values: list
 
 =back
 

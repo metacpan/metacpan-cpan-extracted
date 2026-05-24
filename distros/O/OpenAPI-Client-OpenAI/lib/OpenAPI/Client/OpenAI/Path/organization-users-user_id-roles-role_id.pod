@@ -1,0 +1,151 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::organization-users-user_id-roles-role_id - Documentation for the /organization/users/{user_id}/roles/{role_id} path.
+
+=head1 OPERATIONS
+
+=head2 DELETE /organization/users/{user_id}/roles/{role_id}
+
+=head3 unassign-user-role
+
+  $client->unassign_user_role({
+      body => { ... },
+  });
+
+Unassigns an organization role from a user within the organization.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<user_id> (in path, required, string) - The ID of the user to modify.
+
+=item * C<role_id> (in path, required, string) - The ID of the organization role to remove from the user.
+
+=back
+
+=head4 Responses
+
+B<200 - Organization role unassigned from the user successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "deleted" : true,
+       "object" : "group.role.deleted"
+    }
+
+=head2 GET /organization/users/{user_id}/roles/{role_id}
+
+=head3 retrieve-user-role
+
+  $client->retrieve_user_role({
+      body => { ... },
+  });
+
+Retrieves an organization role assigned to a user.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<user_id> (in path, required, string) - The ID of the user to inspect.
+
+=item * C<role_id> (in path, required, string) - The ID of the organization role to retrieve for the user.
+
+=back
+
+=head4 Responses
+
+B<200 - Organization role retrieved for the user successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "assignment_sources" : [
+          {
+             "principal_id" : "string",
+             "principal_type" : "string"
+          }
+       ],
+       "created_at" : 0,
+       "created_by" : "string",
+       "created_by_user_obj" : {},
+       "description" : "string",
+       "id" : "string",
+       "metadata" : {},
+       "name" : "string",
+       "permissions" : [
+          "string"
+       ],
+       "predefined_role" : false,
+       "resource_type" : "string",
+       "updated_at" : 0
+    }
+
+=head1 SCHEMAS
+
+=head2 AssignedRoleDetails
+
+Properties:
+
+=over
+
+=item * C<assignment_sources> (anyOf, required) - Principals from which the role assignment is inherited, when available.
+
+=item * C<created_at> (anyOf, required) - When the role was created.
+
+=item * C<created_by> (anyOf, required) - Identifier of the actor who created the role.
+
+=item * C<created_by_user_obj> (anyOf, required) - User details for the actor that created the role, when available.
+
+=item * C<description> (anyOf, required) - Description of the role.
+
+=item * C<id> (string, required) - Identifier for the role.
+
+=item * C<metadata> (anyOf, required) - Arbitrary metadata stored on the role.
+
+=item * C<name> (string, required) - Name of the role.
+
+=item * C<permissions> (array of string, required) - Permissions associated with the role.
+
+=item * C<predefined_role> (boolean, required) - Whether the role is predefined by OpenAI.
+
+=item * C<resource_type> (string, required) - Resource type the role applies to.
+
+=item * C<updated_at> (anyOf, required) - When the role was last updated.
+
+=back
+
+=head2 DeletedRoleAssignmentResource
+
+Properties:
+
+=over
+
+=item * C<deleted> (boolean, required) - Whether the assignment was removed.
+
+=item * C<object> (string, required) - Identifier for the deleted assignment, such as C<group.role.deleted> or
+C<user.role.deleted> .
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

@@ -4,84 +4,50 @@
 
 OpenAPI::Client::OpenAI::Path::files - Documentation for the /files path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</files>.
+=head2 GET /files
 
-=head1 PATHS
+=head3 listFiles
 
-
-=head2 C<GET /files>
-
-List files
-
+  $client->list_files({
+      body => { ... },
+  });
 
 Returns a list of files.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
+=item * C<purpose> (in query, optional, string) - Only return files with the given purpose.
 
-C<listFiles>
+=item * C<limit> (in query, optional, integer) - A limit on the number of objects to be returned. Limit can range between 1 and
+10,000, and the default is 10,000.
 
-    $client->listFiles( ... );
+Default: 10000
 
-=head3 Parameters
+=item * C<order> (in query, optional, string) - Sort order by the C<created_at> timestamp of the objects. C<asc> for ascending
+order and C<desc> for descending order.
 
-=over 4
+Allowed values: asc, desc
 
-=item * C<purpose> (in query) (Optional) - Only return files with the given purpose.
+Default: desc
 
-Type: C<string>
-
-
-
-=item * C<limit> (in query) (Optional) - A limit on the number of objects to be returned. Limit can range between 1 and 10,000, and the default is 10,000.
-
-
-Type: C<integer>
-
-
-Default: C<10000>
-
-
-=item * C<order> (in query) (Optional) - Sort order by the `created_at` timestamp of the objects. `asc` for ascending order and `desc` for descending order.
-
-
-Type: C<string>
-
-Allowed values: C<asc, desc>
-
-
-Default: C<desc>
-
-
-=item * C<after> (in query) (Optional) - A cursor for use in pagination. `after` is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include after=obj_foo in order to fetch the next page of the list.
-
-
-Type: C<string>
-
-
+=item * C<after> (in query, optional, string) - A cursor for use in pagination. C<after> is an object ID that defines your
+place in the list. For instance, if you make a list request and receive 100
+objects, ending with obj_foo, your subsequent call can include after=obj_foo
+in order to fetch the next page of the list.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - OK>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
        "data" : [
@@ -93,106 +59,141 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
        "object" : "list"
     }
 
+=head2 POST /files
 
-=back
+=head3 createFile
 
-=head2 C<POST /files>
+  $client->create_file({
+      body => { ... },
+  });
 
-Upload file
+Upload a file that can be used across various endpoints. Individual files can
+be up to 512 MB, and each project can store up to 2.5 TB of files in total.
+There is no organization-wide storage limit. Uploads to this endpoint are
+rate-limited to 1,000 requests per minute per authenticated user.
 
-
-Upload a file that can be used across various endpoints. Individual files
-can be up to 512 MB, and the size of all files uploaded by one organization
-can be up to 1 TB.
-
-=over
-
-=item -
-
-The Assistants API supports files up to 2 million tokens and of specific
-  file types. See the L<Assistants Tools guide|https://platform.openai.com/docs/assistants/tools> for
-  details.
-
-
-=item -
-
-The Fine-tuning API only supports C<.jsonl> files. The input also has
-  certain required formats for fine-tuning
-  L<chat|https://platform.openai.com/docs/api-reference/fine-tuning/chat-input> or
-  L<completions|https://platform.openai.com/docs/api-reference/fine-tuning/completions-input> models.
-
-
-=item -
-
-The Batch API only supports C<.jsonl> files up to 200 MB in size. The input
-  also has a specific required
-  L<format|https://platform.openai.com/docs/api-reference/batch/request-input>.
-
-
-=back
+- The Assistants API supports files up to 2 million tokens and of specific
+file types. See the
+L<Assistants Tools guide|https://platform.openai.com/docs/assistants/tools>
+for details. - The Fine-tuning API only supports C<.jsonl> files. The input
+also has certain required formats for fine-tuning
+L<chat|https://platform.openai.com/docs/api-reference/fine-tuning/chat-input>
+or
+L<completions|https://platform.openai.com/docs/api-reference/fine-tuning/completions-input>
+models. - The Batch API only supports C<.jsonl> files up to 200 MB in size.
+The input also has a specific required
+L<format|https://platform.openai.com/docs/api-reference/batch/request-input> .
+- For Retrieval or C<file_search> ingestion, upload files here first. If you
+need to attach multiple uploaded files to the same vector store, use
+L<C</vector_stores/{vector_store_id}/file_batches>|https://platform.openai.com/docs/api-reference/vector-stores-file-batches/createBatch>
+instead of attaching them one by one. Vector store attachment has separate
+limits from file upload, including 2,000 attached files per minute per
+organization.
 
 Please L<contact us|https://help.openai.com/> if you need to increase these
 storage limits.
 
+=head4 Responses
 
+B<200 - OK>
 
-=head3 Operation ID
+Content-Type: application/json
 
-C<createFile>
+Example:
 
-    $client->createFile( ... );
+    "{\n  \"id\": \"file-abc123\",\n  \"object\": \"file\",\n  \"bytes\": 120000,\n  \"created_at\": 1677610602,\n  \"expires_at\": 1680202602,\n  \"filename\": \"salesOverview.pdf\",\n  \"purpose\": \"assistants\",\n}\n"
 
-=head3 Parameters
+=head1 SCHEMAS
 
-=over 4
+=head2 CreateFileRequest
+
+Properties:
+
+=over
+
+=item * C<expires_after> (FileExpirationAfter)
+
+See L</FileExpirationAfter> below for shape.
+
+=item * C<file> (string, required) - The File object (not file name) to be uploaded.
+
+=item * C<purpose> (string, required) - The intended purpose of the uploaded file. One of: - C<assistants> : Used in
+the Assistants API - C<batch> : Used in the Batch API - C<fine-tune> : Used
+for fine-tuning - C<vision> : Images used for vision fine-tuning -
+C<user_data> : Flexible file type for any purpose - C<evals> : Used for eval
+data sets
+
+Allowed values: assistants, batch, fine-tune, vision, user_data, evals
 
 =back
 
-=head3 Request Body
-  
-=head3 Content Type: C<multipart/form-data>
+=head2 FileExpirationAfter
 
-    
-      
+Properties:
 
-      
-      
-Example:
+=over
 
-    {
-       "expires_after" : null
-    }
+=item * C<anchor> (string, required) - Anchor timestamp after which the expiration policy applies. Supported anchors:
+C<created_at> .
 
+Allowed values: created_at
 
-             
+=item * C<seconds> (integer, required) - The number of seconds after the anchor time that the file will expire. Must be
+between 3600 (1 hour) and 2592000 (30 days).
 
-=head3 Responses
+=back
 
+=head2 ListFilesResponse
 
-=head4 Status Code: C<200>
+Properties:
 
-OK
+=over
 
+=item * C<data> (array of OpenAIFile, required)
 
-=head4 Content Types:
+=item * C<first_id> (string, required)
 
-=over 4
+=item * C<has_more> (boolean, required)
 
+=item * C<last_id> (string, required)
 
-=item * C<application/json>
+=item * C<object> (string, required)
 
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+=back
 
-    {
-      "id": "file-abc123",
-      "object": "file",
-      "bytes": 120000,
-      "created_at": 1677610602,
-      "expires_at": 1680202602,
-      "filename": "salesOverview.pdf",
-      "purpose": "assistants",
-    }
+=head2 OpenAIFile
 
+Properties:
+
+=over
+
+=item * C<bytes> (integer, required) - The size of the file, in bytes.
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) for when the file was created.
+
+=item * C<expires_at> (integer) - The Unix timestamp (in seconds) for when the file will expire.
+
+=item * C<filename> (string, required) - The name of the file.
+
+=item * C<id> (string, required) - The file identifier, which can be referenced in the API endpoints.
+
+=item * C<object> (string, required) - The object type, which is always C<file> .
+
+Allowed values: file
+
+=item * C<purpose> (string, required) - The intended purpose of the file. Supported values are C<assistants> ,
+C<assistants_output> , C<batch> , C<batch_output> , C<fine-tune> ,
+C<fine-tune-results> , C<vision> , and C<user_data> .
+
+Allowed values: assistants, assistants_output, batch, batch_output, fine-tune, fine-tune-results, vision, user_data
+
+=item * C<status> (string, required) - Deprecated. The current status of the file, which can be either C<uploaded> ,
+C<processed> , or C<error> .
+
+Allowed values: uploaded, processed, error
+
+=item * C<status_details> (string) - Deprecated. For details on why a fine-tuning training file failed validation,
+see the C<error> field on C<fine_tuning.job> .
 
 =back
 

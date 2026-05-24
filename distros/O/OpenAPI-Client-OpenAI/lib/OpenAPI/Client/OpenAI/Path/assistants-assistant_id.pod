@@ -4,307 +4,260 @@
 
 OpenAPI::Client::OpenAI::Path::assistants-assistant_id - Documentation for the /assistants/{assistant_id} path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</assistants/{assistant_id}>.
+=head2 DELETE /assistants/{assistant_id}
 
-=head1 PATHS
+=head3 deleteAssistant
 
-
-=head2 C<DELETE /assistants/{assistant_id}>
-
-Delete assistant
-
+  $client->delete_assistant({
+      body => { ... },
+  });
 
 Delete an assistant.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
-
-C<deleteAssistant>
-
-    $client->deleteAssistant( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<assistant_id> (in path) (Required) - The ID of the assistant to delete.
-
-Type: C<string>
-
-
+=item * C<assistant_id> (in path, required, string) - The ID of the assistant to delete.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - OK>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
-
-
-
-=back
-
-=head2 C<GET /assistants/{assistant_id}>
-
-Retrieve assistant
-
-
-Retrieves an assistant.
-
-
-
-=head3 Operation ID
-
-C<getAssistant>
-
-    $client->getAssistant( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<assistant_id> (in path) (Required) - The ID of the assistant to retrieve.
-
-Type: C<string>
-
-
-
-=back
-
-
-=head3 Responses
-
-
-=head4 Status Code: C<200>
-
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
-
-    {
-      "id": "asst_abc123",
-      "object": "assistant",
-      "created_at": 1698984975,
-      "name": "Math Tutor",
-      "description": null,
-      "model": "gpt-4o",
-      "instructions": "You are a personal math tutor. When asked a question, write and run Python code to answer the question.",
-      "tools": [
-        {
-          "type": "code_interpreter"
-        }
-      ],
-      "metadata": {},
-      "top_p": 1.0,
-      "temperature": 1.0,
-      "response_format": "auto"
-    }
-
-
-=back
-
-=head2 C<POST /assistants/{assistant_id}>
-
-Modify assistant
-
-
-Modifies an assistant.
-
-
-
-=head3 Operation ID
-
-C<modifyAssistant>
-
-    $client->modifyAssistant( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<assistant_id> (in path) (Required) - The ID of the assistant to modify.
-
-Type: C<string>
-
-
-
-=back
-
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
-
-    
-      
-
-      
-
-=head4 Models
-
-ID of the model to use. You can use the L<List models|https://platform.openai.com/docs/api-reference/models/list> API to see all of your available models, or see our L<Model overview|https://platform.openai.com/docs/models> for descriptions of them.
-
-=over 4
-      
-=item * C<gpt-5>
-
-=item * C<gpt-5-mini>
-
-=item * C<gpt-5-nano>
-
-=item * C<gpt-5-2025-08-07>
-
-=item * C<gpt-5-mini-2025-08-07>
-
-=item * C<gpt-5-nano-2025-08-07>
-
-=item * C<gpt-4.1>
-
-=item * C<gpt-4.1-mini>
-
-=item * C<gpt-4.1-nano>
-
-=item * C<gpt-4.1-2025-04-14>
-
-=item * C<gpt-4.1-mini-2025-04-14>
-
-=item * C<gpt-4.1-nano-2025-04-14>
-
-=item * C<o3-mini>
-
-=item * C<o3-mini-2025-01-31>
-
-=item * C<o1>
-
-=item * C<o1-2024-12-17>
-
-=item * C<gpt-4o>
-
-=item * C<gpt-4o-2024-11-20>
-
-=item * C<gpt-4o-2024-08-06>
-
-=item * C<gpt-4o-2024-05-13>
-
-=item * C<gpt-4o-mini>
-
-=item * C<gpt-4o-mini-2024-07-18>
-
-=item * C<gpt-4.5-preview>
-
-=item * C<gpt-4.5-preview-2025-02-27>
-
-=item * C<gpt-4-turbo>
-
-=item * C<gpt-4-turbo-2024-04-09>
-
-=item * C<gpt-4-0125-preview>
-
-=item * C<gpt-4-turbo-preview>
-
-=item * C<gpt-4-1106-preview>
-
-=item * C<gpt-4-vision-preview>
-
-=item * C<gpt-4>
-
-=item * C<gpt-4-0314>
-
-=item * C<gpt-4-0613>
-
-=item * C<gpt-4-32k>
-
-=item * C<gpt-4-32k-0314>
-
-=item * C<gpt-4-32k-0613>
-
-=item * C<gpt-3.5-turbo>
-
-=item * C<gpt-3.5-turbo-16k>
-
-=item * C<gpt-3.5-turbo-0613>
-
-=item * C<gpt-3.5-turbo-1106>
-
-=item * C<gpt-3.5-turbo-0125>
-
-=item * C<gpt-3.5-turbo-16k-0613>
-
-=back
-      
-      
 Example:
 
     {
-       "tools" : [
-          null
-       ]
+       "deleted" : false,
+       "id" : "string",
+       "object" : "assistant.deleted"
     }
 
+=head2 GET /assistants/{assistant_id}
 
-             
+=head3 getAssistant
 
-=head3 Responses
+  $client->get_assistant({
+      body => { ... },
+  });
 
+Retrieves an assistant.
 
-=head4 Status Code: C<200>
+=head4 Path/query parameters
 
-OK
+=over
 
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
-
-    {
-      "id": "asst_abc123",
-      "object": "assistant",
-      "created_at": 1698984975,
-      "name": "Math Tutor",
-      "description": null,
-      "model": "gpt-4o",
-      "instructions": "You are a personal math tutor. When asked a question, write and run Python code to answer the question.",
-      "tools": [
-        {
-          "type": "code_interpreter"
-        }
-      ],
-      "metadata": {},
-      "top_p": 1.0,
-      "temperature": 1.0,
-      "response_format": "auto"
-    }
-
+=item * C<assistant_id> (in path, required, string) - The ID of the assistant to retrieve.
 
 =back
+
+=head4 Responses
+
+B<200 - OK>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "created_at" : 1698984975,
+       "description" : null,
+       "id" : "asst_abc123",
+       "instructions" : "You are a personal math tutor. When asked a question, write and run Python code to answer the question.",
+       "metadata" : {},
+       "model" : "gpt-4o",
+       "name" : "Math Tutor",
+       "object" : "assistant",
+       "response_format" : "auto",
+       "temperature" : 1,
+       "tools" : [
+          {
+             "type" : "code_interpreter"
+          }
+       ],
+       "top_p" : 1
+    }
+
+=head2 POST /assistants/{assistant_id}
+
+=head3 modifyAssistant
+
+  $client->modify_assistant({
+      body => { ... },
+  });
+
+Modifies an assistant.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<assistant_id> (in path, required, string) - The ID of the assistant to modify.
+
+=back
+
+=head4 Responses
+
+B<200 - OK>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "created_at" : 1698984975,
+       "description" : null,
+       "id" : "asst_abc123",
+       "instructions" : "You are a personal math tutor. When asked a question, write and run Python code to answer the question.",
+       "metadata" : {},
+       "model" : "gpt-4o",
+       "name" : "Math Tutor",
+       "object" : "assistant",
+       "response_format" : "auto",
+       "temperature" : 1,
+       "tools" : [
+          {
+             "type" : "code_interpreter"
+          }
+       ],
+       "top_p" : 1
+    }
+
+=head1 SCHEMAS
+
+=head2 AssistantObject
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) for when the assistant was created.
+
+=item * C<description> (anyOf, required)
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints.
+
+=item * C<instructions> (anyOf, required)
+
+=item * C<metadata> (Metadata, required)
+
+See L</Metadata> below for shape.
+
+=item * C<model> (string, required) - ID of the model to use. You can use the
+L<List models|https://platform.openai.com/docs/api-reference/models/list> API
+to see all of your available models, or see our
+L<Model overview|https://platform.openai.com/docs/models> for descriptions of
+them.
+
+=item * C<name> (anyOf, required)
+
+=item * C<object> (string, required) - The object type, which is always C<assistant> .
+
+Allowed values: assistant
+
+=item * C<response_format> (anyOf)
+
+=item * C<temperature> (anyOf)
+
+=item * C<tool_resources> (anyOf)
+
+=item * C<tools> (array of object, required) - A list of tool enabled on the assistant. There can be a maximum of 128 tools
+per assistant. Tools can be of types C<code_interpreter> , C<file_search> , or
+C<function> .
+
+Default: []
+
+=item * C<top_p> (anyOf)
+
+=back
+
+=head2 DeleteAssistantResponse
+
+Properties:
+
+=over
+
+=item * C<deleted> (boolean, required)
+
+=item * C<id> (string, required)
+
+=item * C<object> (string, required)
+
+Allowed values: assistant.deleted
+
+=back
+
+=head2 Metadata
+
+Set of 16 key-value pairs that can be attached to an object. This can be
+useful for storing additional information about the object in a structured
+format, and querying for objects via API or the dashboard.
+
+Keys are strings with a maximum length of 64 characters. Values are strings
+with a maximum length of 512 characters.
+
+=head2 ModifyAssistantRequest
+
+Properties:
+
+=over
+
+=item * C<description> (anyOf)
+
+=item * C<instructions> (anyOf)
+
+=item * C<metadata> (Metadata)
+
+See L</Metadata> below for shape.
+
+=item * C<model> (anyOf) - ID of the model to use. You can use the
+L<List models|https://platform.openai.com/docs/api-reference/models/list> API
+to see all of your available models, or see our
+L<Model overview|https://platform.openai.com/docs/models> for descriptions of
+them.
+
+=item * C<name> (anyOf)
+
+=item * C<reasoning_effort> (ReasoningEffort)
+
+See L</ReasoningEffort> below for shape.
+
+=item * C<response_format> (anyOf)
+
+=item * C<temperature> (anyOf)
+
+=item * C<tool_resources> (anyOf)
+
+=item * C<tools> (array of object) - A list of tool enabled on the assistant. There can be a maximum of 128 tools
+per assistant. Tools can be of types C<code_interpreter> , C<file_search> , or
+C<function> .
+
+Default: []
+
+=item * C<top_p> (anyOf)
+
+=back
+
+=head2 ReasoningEffort
+
+Constrains effort on reasoning for
+L<reasoning models|https://platform.openai.com/docs/guides/reasoning> .
+Currently supported values are C<none> , C<minimal> , C<low> , C<medium> ,
+C<high> , and C<xhigh> . Reducing reasoning effort can result in faster
+responses and fewer tokens used on reasoning in a response.
+
+- C<gpt-5.1> defaults to C<none> , which does not perform reasoning. The
+supported reasoning values for C<gpt-5.1> are C<none> , C<low> , C<medium> ,
+and C<high> . Tool calls are supported for all reasoning values in gpt-5.1. -
+All models before C<gpt-5.1> default to C<medium> reasoning effort, and do not
+support C<none> . - The C<gpt-5-pro> model defaults to (and only supports)
+C<high> reasoning effort. - C<xhigh> is supported for all models after
+C<gpt-5.1-codex-max> .
 
 =head1 SEE ALSO
 

@@ -1,0 +1,167 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::organization-projects-project_id-groups - Documentation for the /organization/projects/{project_id}/groups path.
+
+=head1 OPERATIONS
+
+=head2 GET /organization/projects/{project_id}/groups
+
+=head3 list-project-groups
+
+  $client->list_project_groups({
+      body => { ... },
+  });
+
+Lists the groups that have access to a project.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<project_id> (in path, required, string) - The ID of the project to inspect.
+
+=item * C<limit> (in query, optional, integer) - A limit on the number of project groups to return. Defaults to 20.
+
+Default: 20
+
+=item * C<after> (in query, optional, string) - Cursor for pagination. Provide the ID of the last group from the previous
+response to fetch the next page.
+
+=item * C<order> (in query, optional, string) - Sort order for the returned groups.
+
+Allowed values: asc, desc
+
+Default: asc
+
+=back
+
+=head4 Responses
+
+B<200 - Project groups listed successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "data" : [
+          {
+             "created_at" : 1711471533,
+             "group_id" : "group_01J1F8ABCDXYZ",
+             "group_name" : "Support Team",
+             "object" : "project.group",
+             "project_id" : "proj_abc123"
+          }
+       ],
+       "has_more" : false,
+       "next" : null,
+       "object" : "list"
+    }
+
+=head2 POST /organization/projects/{project_id}/groups
+
+=head3 add-project-group
+
+  $client->add_project_group({
+      body => { ... },
+  });
+
+Grants a group access to a project.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<project_id> (in path, required, string) - The ID of the project to update.
+
+=back
+
+=head4 Responses
+
+B<200 - Group granted access to the project successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "created_at" : 1711471533,
+       "group_id" : "group_01J1F8ABCDXYZ",
+       "group_name" : "Support Team",
+       "group_type" : "group",
+       "object" : "project.group",
+       "project_id" : "proj_abc123"
+    }
+
+=head1 SCHEMAS
+
+=head2 InviteProjectGroupBody
+
+Properties:
+
+=over
+
+=item * C<group_id> (string, required) - Identifier of the group to add to the project.
+
+=item * C<role> (string, required) - Identifier of the project role to grant to the group.
+
+=back
+
+=head2 ProjectGroup
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - Unix timestamp (in seconds) when the group was granted project access.
+
+=item * C<group_id> (string, required) - Identifier of the group that has access to the project.
+
+=item * C<group_name> (string, required) - Display name of the group.
+
+=item * C<group_type> (string, required) - The type of the group.
+
+Allowed values: group, tenant_group
+
+=item * C<object> (string, required) - Always C<project.group> .
+
+Allowed values: project.group
+
+=item * C<project_id> (string, required) - Identifier of the project.
+
+=back
+
+=head2 ProjectGroupListResource
+
+Properties:
+
+=over
+
+=item * C<data> (array of ProjectGroup, required) - Project group memberships returned in the current page.
+
+=item * C<has_more> (boolean, required) - Whether additional project group memberships are available.
+
+=item * C<next> (anyOf, required) - Cursor to fetch the next page of results, or C<null> when there are no more
+results.
+
+=item * C<object> (string, required) - Always C<list> .
+
+Allowed values: list
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

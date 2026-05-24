@@ -1,0 +1,85 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::conversations - Documentation for the /conversations path.
+
+=head1 OPERATIONS
+
+=head2 POST /conversations
+
+=head3 createConversation
+
+  $client->create_conversation({
+      body => { ... },
+  });
+
+Create a conversation.
+
+=head4 Responses
+
+B<200 - Success>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "created_at" : 0,
+       "id" : "string",
+       "metadata" : null,
+       "object" : "conversation"
+    }
+
+=head1 SCHEMAS
+
+=head2 ConversationResource
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - The time at which the conversation was created, measured in seconds since the
+Unix epoch.
+
+=item * C<id> (string, required) - The unique ID of the conversation.
+
+=item * C<metadata> (unknown, required) - Set of 16 key-value pairs that can be attached to an object. This can be
+useful for storing additional information about the object in a structured
+format, and querying for objects via API or the dashboard. Keys are strings
+with a maximum length of 64 characters. Values are strings with a maximum
+length of 512 characters.
+
+=item * C<object> (string, required) - The object type, which is always C<conversation> .
+
+Allowed values: conversation
+
+Default: conversation
+
+=back
+
+=head2 CreateConversationBody
+
+Properties:
+
+=over
+
+=item * C<items> (anyOf)
+
+=item * C<metadata> (anyOf)
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

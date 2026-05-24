@@ -1,0 +1,247 @@
+======================================================================
+ HP::Handy Jinja2 Cheat Sheet                              [EN] English
+======================================================================
+
+[ 1. Constructor ]
+
+  use HP::Handy;
+
+  my $tmpl = HP::Handy->new(
+      template_dir  => './templates', # default: '.'
+      auto_escape   => 1,             # default: 1 (HTML-escape {{ }} output)
+      trim_blocks   => 0,             # default: 0 (remove newline after {% %})
+      lstrip_blocks => 0,             # default: 0 (strip spaces before {% %})
+  );
+
+  From the distribution directory:
+    perl lib/HP/Handy.pm
+
+[ 2. Delimiters ]
+
+  {{ expr }}        Variable / expression output (HTML-escaped by default)
+  {% tag %}         Control tag
+  {# comment #}     Comment (removed from output)
+
+  Whitespace control (strip surrounding whitespace):
+    {%- tag -%}     Strip whitespace before and after the tag
+    {{- expr -}}    Strip whitespace before and after the expression
+
+[ 3. Variables ]
+
+  {{ name }}                  Simple variable
+  {{ user.email }}            Hash attribute access
+  {{ items[0] }}              Array index (negative index supported)
+  {{ config["debug"] }}       Hash key access with string key
+  {{ a.b.c }}                 Chained access
+
+[ 4. Filters ]
+
+  {{ name | upper }}                    Convert to uppercase
+  {{ name | lower }}                    Convert to lowercase
+  {{ text | trim }}                     Strip leading/trailing whitespace
+  {{ text | length }}                   String or list length
+  {{ text | reverse }}                  Reverse string
+  {{ text | escape }}  or  {{ text | e }}   HTML-escape
+  {{ html  | safe }}                    Mark as safe (skip auto_escape)
+  {{ val   | default("n/a") }}          Return default if undefined/empty
+  {{ text  | replace("old","new") }}    Replace substring
+  {{ text  | truncate(80) }}            Truncate to N chars (appends "...")
+  {{ list  | join(", ") }}              Join list with separator
+  {{ list  | first }}                   First element
+  {{ list  | last }}                    Last element
+  {{ list  | sort }}                    Sort list
+  {{ list  | sort("attr") }}            Sort list by attribute
+  {{ list  | unique }}                  Remove duplicates
+  {{ list  | reverse }}                 Reverse list
+  {{ list  | min }}                     Minimum value
+  {{ list  | max }}                     Maximum value
+  {{ list  | sum }}                     Sum of values
+  {{ list  | count }}                   Number of elements
+  {{ list  | map("attr") }}             Extract attribute from each item
+  {{ list  | select("attr") }}          Keep items where attr is truthy
+  {{ list  | reject("attr") }}          Keep items where attr is falsy
+  {{ list  | batch(3) }}                Split into chunks of N
+  {{ list  | slice(3) }}                Split into N equal slices
+  {{ n     | abs }}                     Absolute value
+  {{ n     | int }}                     Convert to integer
+  {{ n     | float }}                   Convert to float
+  {{ s     | string }}                  Convert to string
+  {{ s     | title }}                   Title-case each word
+  {{ s     | capitalize }}              Capitalize first letter
+  {{ s     | urlencode }}               Percent-encode URL
+  {{ s     | wordcount }}               Count words
+  {{ s     | nl2br | safe }}            Replace newlines with <br>
+  {{ s     | striptags }}               Strip HTML tags
+  {{ s     | format("%.2f") }}          sprintf formatting
+  {{ s     | center(40) }}              Center in a field of N chars
+  {{ s     | indent(4) }}               Indent lines by N spaces
+  {{ hash  | xmlattr | safe }}          Render hash as XML attributes
+  {{ val   | tojson | safe }}           Serialize to JSON
+
+[ 5. Tests ]
+
+  {% if x is defined %}       Value is defined
+  {% if x is none %}          Value is undef (None)
+  {% if x is string %}        Value is a non-reference scalar
+  {% if x is number %}        Value is numeric
+  {% if x is sequence %}      Value is an array reference
+  {% if x is mapping %}       Value is a hash reference
+  {% if x is iterable %}      Value is array or hash reference
+  {% if x is callable %}      Value is a code reference
+  {% if n is odd %}           Integer is odd
+  {% if n is even %}          Integer is even
+  {% if n is divisibleby 3 %} Integer is divisible by N
+  {% if s is upper %}         String is all uppercase
+  {% if s is lower %}         String is all lowercase
+  {% if x is equalto y %}     Value equals y
+  {% if x is not none %}      Negation of test
+
+[ 6. Conditional ]
+
+  {% if condition %}
+      ...
+  {% elif other_condition %}
+      ...
+  {% else %}
+      ...
+  {% endif %}
+
+  Inline conditional (ternary):
+    {{ "yes" if flag else "no" }}
+    {{ value if value is defined else "default" }}
+
+[ 7. For loop ]
+
+  {% for item in list %}
+      {{ loop.index }}: {{ item }}
+  {% endfor %}
+
+  Loop with else (shown when list is empty):
+  {% for item in list %}
+      {{ item }}
+  {% else %}
+      (no items)
+  {% endfor %}
+
+  Loop with filter:
+  {% for item in list if item != "" %}
+      {{ item }}
+  {% endfor %}
+
+  Dict iteration (key, value pairs sorted by key):
+  {% for key, value in mapping %}
+      {{ key }}: {{ value }}
+  {% endfor %}
+
+  loop special variable:
+    loop.index      1-based counter
+    loop.index0     0-based counter
+    loop.revindex   reverse counter (1-based)
+    loop.revindex0  reverse counter (0-based)
+    loop.first      true on first iteration
+    loop.last       true on last iteration
+    loop.length     total number of items
+    loop.odd        true on odd-numbered iterations (1st, 3rd, ...)
+    loop.even       true on even-numbered iterations (2nd, 4th, ...)
+
+[ 8. Set ]
+
+  {% set x = 42 %}
+  {% set greeting = "Hello, " ~ name %}
+  {% set items = [1, 2, 3] %}
+
+[ 9. Include ]
+
+  {% include "header.html" %}
+  {% include "optional.html" ignore missing %}
+
+  Variables from the calling template are accessible in the included file.
+
+[ 10. Template inheritance ]
+
+  base.html:
+    <html>
+    <head><title>{% block title %}Default{% endblock %}</title></head>
+    <body>{% block content %}{% endblock %}</body>
+    </html>
+
+  child.html:
+    {% extends "base.html" %}
+    {% block title %}My Page{% endblock %}
+    {% block content %}<p>Hello</p>{% endblock %}
+
+  Note: HP::Handy supports single-level inheritance only.
+  super() (calling parent block content) is not supported.
+
+[ 11. Macros ]
+
+  Define:
+    {% macro input(name, value="", type="text") %}
+        <input type="{{ type }}" name="{{ name }}" value="{{ value }}">
+    {% endmacro %}
+
+  Call:
+    {{ input("username") }}
+    {{ input("password", type="password") }}
+
+[ 12. With ]
+
+  {% with x = 10, y = 20 %}
+      {{ x + y }}
+  {% endwith %}
+
+[ 13. Raw ]
+
+  {% raw %}
+      {{ this is not rendered }}
+      {% nor is this %}
+  {% endraw %}
+
+[ 14. Expressions ]
+
+  Arithmetic:   +  -  *  /  //  %  **
+  Concatenation: ~  (e.g. "Hello" ~ " " ~ name)
+  Comparison:   ==  !=  <  >  <=  >=
+  Logic:        and  or  not
+  Membership:   in  not in
+  Ternary:      a if cond else b
+  Range:        range(stop)  range(start, stop)  range(start, stop, step)
+  Literals:     "string"  'string'  42  3.14  true  false  none  [1,2,3]
+
+[ 15. Custom filters and tests ]
+
+  # Register a custom filter
+  $tmpl->add_filter('rot13', sub {
+      my $s = $_[0];
+      $s =~ tr/A-Za-z/N-ZA-Mn-za-m/;
+      $s
+  });
+  # Usage: {{ text | rot13 }}
+
+  # Register a custom test
+  $tmpl->add_test('positive', sub { defined $_[0] && $_[0] > 0 });
+  # Usage: {% if n is positive %}
+
+[ 16. Render methods ]
+
+  # From file (relative to template_dir)
+  my $html = $tmpl->render_file('index.html', \%vars);
+
+  # From string
+  my $html = $tmpl->render_string($source, \%vars);
+
+[ 17. Official resources ]
+
+  Jinja2 documentation (Python reference):
+    https://jinja.palletsprojects.com/
+
+  HP::Handy on MetaCPAN:
+    https://metacpan.org/dist/HP-Handy
+
+  HTTP::Handy (server layer):
+    https://metacpan.org/dist/HTTP-Handy
+
+  DB::Handy (database layer):
+    https://metacpan.org/dist/DB-Handy
+
+======================================================================

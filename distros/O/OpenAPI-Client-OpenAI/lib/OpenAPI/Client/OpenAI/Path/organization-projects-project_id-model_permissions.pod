@@ -1,0 +1,170 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::organization-projects-project_id-model_permissions - Documentation for the /organization/projects/{project_id}/model_permissions path.
+
+=head1 OPERATIONS
+
+=head2 DELETE /organization/projects/{project_id}/model_permissions
+
+=head3 delete-project-model-permissions
+
+  $client->delete_project_model_permissions({
+      body => { ... },
+  });
+
+Deletes model permissions for a project.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<project_id> (in path, required, string) - The ID of the project.
+
+=back
+
+=head4 Responses
+
+B<200 - Project model permissions deleted successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "deleted" : true,
+       "object" : "project.model_permissions.deleted"
+    }
+
+=head2 GET /organization/projects/{project_id}/model_permissions
+
+=head3 retrieve-project-model-permissions
+
+  $client->retrieve_project_model_permissions({
+      body => { ... },
+  });
+
+Returns model permissions for a project.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<project_id> (in path, required, string) - The ID of the project.
+
+=back
+
+=head4 Responses
+
+B<200 - Project model permissions retrieved successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "mode" : "allow_list",
+       "model_ids" : [
+          "gpt-4.1",
+          "o3"
+       ],
+       "object" : "project.model_permissions"
+    }
+
+=head2 POST /organization/projects/{project_id}/model_permissions
+
+=head3 update-project-model-permissions
+
+  $client->update_project_model_permissions({
+      body => { ... },
+  });
+
+Updates model permissions for a project.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<project_id> (in path, required, string) - The ID of the project.
+
+=back
+
+=head4 Responses
+
+B<200 - Project model permissions updated successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "mode" : "allow_list",
+       "model_ids" : [
+          "gpt-4.1",
+          "o3"
+       ],
+       "object" : "project.model_permissions"
+    }
+
+=head1 SCHEMAS
+
+=head2 ProjectModelPermissions
+
+Properties:
+
+=over
+
+=item * C<mode> (string, required) - Whether the project uses an allowlist or a denylist.
+
+Allowed values: allow_list, deny_list
+
+=item * C<model_ids> (array of string, required) - The model IDs included in the model permissions policy.
+
+=item * C<object> (string, required) - The object type, which is always C<project.model_permissions> .
+
+Allowed values: project.model_permissions
+
+=back
+
+=head2 ProjectModelPermissionsDeleteResponse
+
+Properties:
+
+=over
+
+=item * C<deleted> (boolean, required) - Whether the project model permissions were deleted.
+
+=item * C<object> (string, required) - The object type, which is always C<project.model_permissions.deleted> .
+
+Allowed values: project.model_permissions.deleted
+
+=back
+
+=head2 ProjectModelPermissionsUpdateRequest
+
+Properties:
+
+=over
+
+=item * C<mode> (string, required) - The model permissions mode to apply.
+
+Allowed values: allow_list, deny_list
+
+=item * C<model_ids> (array of string, required) - The model IDs included in this permissions policy.
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

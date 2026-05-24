@@ -1,39 +1,34 @@
-package Parallel::Pipes;
-use 5.008001;
-use strict;
+package Parallel::Pipes v1.0.0;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
+
+our $TRIAL = 0;
 use IO::Handle;
 use IO::Select;
 
 use constant WIN32 => $^O eq 'MSWin32';
 
-our $VERSION = '0.201';
-
-{
-    package Parallel::Pipes::Impl;
+package Parallel::Pipes::Impl {
     use Storable ();
-    sub new {
-        my ($class, %option) = @_;
+    sub new ($class, %option) {
         my $read_fh  = delete $option{read_fh}  or die;
         my $write_fh = delete $option{write_fh} or die;
         $write_fh->autoflush(1);
         bless { %option, read_fh => $read_fh, write_fh => $write_fh, buf => '' }, $class;
     }
-    sub read :method {
-        my $self = shift;
+    sub read ($self) {
         my $_size = $self->_read(4) or return;
         my $size = unpack 'I', $_size;
         my $freezed = $self->_read($size);
         Storable::thaw($freezed);
     }
-    sub write :method {
-        my ($self, $data) = @_;
+    sub write ($self, $data) {
         my $freezed = Storable::freeze({data => $data});
         my $size = pack 'I', length($freezed);
         $self->_write("$size$freezed");
     }
-    sub _read {
-        my ($self, $size) = @_;
+    sub _read ($self, $size) {
         my $fh = $self->{read_fh};
         my $offset = length $self->{buf};
         while ($offset < $size) {
@@ -48,8 +43,7 @@ our $VERSION = '0.201';
         }
         return substr $self->{buf}, 0, $size, '';
     }
-    sub _write {
-        my ($self, $data) = @_;
+    sub _write ($self, $data) {
         my $fh = $self->{write_fh};
         my $size = length $data;
         my $offset = 0;
@@ -67,20 +61,16 @@ our $VERSION = '0.201';
         $size;
     }
 }
-{
-    package Parallel::Pipes::Here;
+package Parallel::Pipes::Here {
     our @ISA = qw(Parallel::Pipes::Impl);
     use Carp ();
-    sub new {
-        my ($class, %option) = @_;
+    sub new ($class, %option) {
         $class->SUPER::new(%option, _written => 0);
     }
-    sub is_written {
-        my $self = shift;
+    sub is_written ($self) {
         $self->{_written} == 1;
     }
-    sub read :method {
-        my $self = shift;
+    sub read ($self) {
         if (!$self->is_written) {
             Carp::croak("This pipe has not been written; you cannot read it");
         }
@@ -88,8 +78,7 @@ our $VERSION = '0.201';
         return unless my $read = $self->SUPER::read;
         $read->{data};
     }
-    sub write :method {
-        my ($self, $task) = @_;
+    sub write ($self, $task) {
         if ($self->is_written) {
             Carp::croak("This pipe has already been written; you must read it first");
         }
@@ -97,30 +86,24 @@ our $VERSION = '0.201';
         $self->SUPER::write($task);
     }
 }
-{
-    package Parallel::Pipes::There;
+package Parallel::Pipes::There {
     our @ISA = qw(Parallel::Pipes::Impl);
 }
-{
-    package Parallel::Pipes::Impl::NoFork;
+package Parallel::Pipes::Impl::NoFork {
     use Carp ();
-    sub new {
-        my ($class, %option) = @_;
+    sub new ($class, %option) {
         bless {%option}, $class;
     }
-    sub is_written {
-        my $self = shift;
+    sub is_written ($self) {
         exists $self->{_result};
     }
-    sub read :method {
-        my $self = shift;
+    sub read ($self) {
         if (!$self->is_written) {
             Carp::croak("This pipe has not been written; you cannot read it");
         }
         delete $self->{_result};
     }
-    sub write :method {
-        my ($self, $task) = @_;
+    sub write ($self, $task) {
         if ($self->is_written) {
             Carp::croak("This pipe has already been written; you must read it first");
         }
@@ -129,8 +112,7 @@ our $VERSION = '0.201';
     }
 }
 
-sub new {
-    my ($class, $number, $work, $option) = @_;
+sub new ($class, $number, $work, $option = undef) {
     if (WIN32 and $number != 1) {
         die "The number of pipes must be 1 under WIN32 environment.\n";
     }
@@ -150,10 +132,9 @@ sub new {
     $self;
 }
 
-sub no_fork { shift->{no_fork} }
+sub no_fork ($self) { $self->{no_fork} }
 
-sub _fork {
-    my $self = shift;
+sub _fork ($self) {
     my $work = $self->{work};
     pipe my $read_fh1, my $write_fh1;
     pipe my $read_fh2, my $write_fh2;
@@ -174,16 +155,14 @@ sub _fork {
     );
 }
 
-sub pipes {
-    my $self = shift;
-    map { $self->{pipes}{$_} } sort { $a <=> $b } keys %{$self->{pipes}};
+sub pipes ($self) {
+    map { $self->{pipes}{$_} } sort { $a <=> $b } keys $self->{pipes}->%*;
 }
 
-sub is_ready {
-    my $self = shift;
+sub is_ready ($self, @args) {
     return $self->pipes if $self->no_fork;
 
-    my @pipes = @_ ? @_ : $self->pipes;
+    my @pipes = @args ? @args : $self->pipes;
     if (my @ready = grep { $_->{_written} == 0 } @pipes) {
         return @ready;
     }
@@ -211,17 +190,15 @@ sub is_ready {
     return @return;
 }
 
-sub is_written {
-    my $self = shift;
+sub is_written ($self) {
     grep { $_->is_written } $self->pipes;
 }
 
-sub close :method {
-    my $self = shift;
+sub close ($self) {
     return if $self->no_fork;
 
     close $_ for map { ($_->{write_fh}, $_->{read_fh}) } $self->pipes;
-    while (%{$self->{pipes}}) {
+    while ($self->{pipes}->%*) {
         my $pid = wait;
         if (delete $self->{pipes}{$pid}) {
             # OK
@@ -244,17 +221,15 @@ Parallel::Pipes - parallel processing using pipe(2) for communication and synchr
 
   use Parallel::Pipes;
 
-  my $pipes = Parallel::Pipes->new(5, sub {
+  my $pipes = Parallel::Pipes->new(5, sub ($task) {
     # this is a worker code
-    my $task = shift;
     my $result = do_work($task);
     return $result;
   });
 
   my $queue = Your::TaskQueue->new;
   # wrap Your::TaskQueue->get
-  my $get; $get = sub {
-    my $queue = shift;
+  my $get; $get = sub ($queue) {
     if (my @task = $queue->get) {
       return @task;
     }
@@ -312,9 +287,13 @@ or L<eg directory|https://github.com/skaji/Parallel-Pipes/tree/main/eg> for real
 
 =end html
 
-=head1 AUTHOR
 
-Shoichi Kaji <skaji@cpan.org>
+=head1 ARTIFACT ATTESTATIONS
+
+GitHub Artifact Attestations are generated for release tarballs uploaded to
+CPAN. If you care about provenance for the uploaded tarballs, see:
+
+L<https://github.com/skaji/Parallel-Pipes/attestations>
 
 =head1 COPYRIGHT AND LICENSE
 

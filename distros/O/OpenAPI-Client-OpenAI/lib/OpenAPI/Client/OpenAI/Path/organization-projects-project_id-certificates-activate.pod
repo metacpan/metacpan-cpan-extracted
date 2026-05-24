@@ -4,87 +4,98 @@
 
 OpenAPI::Client::OpenAI::Path::organization-projects-project_id-certificates-activate - Documentation for the /organization/projects/{project_id}/certificates/activate path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</organization/projects/{project_id}/certificates/activate>.
+=head2 POST /organization/projects/{project_id}/certificates/activate
 
-=head1 PATHS
+=head3 activateProjectCertificates
 
-
-=head2 C<POST /organization/projects/{project_id}/certificates/activate>
-
-Activate certificates for project
-
+  $client->activate_project_certificates({
+      body => { ... },
+  });
 
 Activate certificates at the project level.
 
 You can atomically and idempotently activate up to 10 certificates at a time.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
-
-C<activateProjectCertificates>
-
-    $client->activateProjectCertificates( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<project_id> (in path) (Required) - The ID of the project.
-
-Type: C<string>
-
-
+=item * C<project_id> (in path, required, string) - The ID of the project.
 
 =back
 
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
+=head4 Responses
 
-    
-      
+B<200 - Certificates activated successfully.>
 
-      
-      
+Content-Type: application/json
+
 Example:
 
     {
-       "certificate_ids" : [
-          "cert_abc"
-       ]
-    }
-
-
-             
-
-=head3 Responses
-
-
-=head4 Status Code: C<200>
-
-Certificates activated successfully.
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
-
-    {
        "data" : [
-          "{\n  \"object\": \"certificate\",\n  \"id\": \"cert_abc\",\n  \"name\": \"My Certificate\",\n  \"created_at\": 1234567,\n  \"certificate_details\": {\n    \"valid_at\": 1234567,\n    \"expires_at\": 12345678,\n    \"content\": \"-----BEGIN CERTIFICATE----- MIIGAjCCA...6znFlOW+ -----END CERTIFICATE-----\"\n  }\n}\n"
+          {
+             "active" : false,
+             "certificate_details" : {
+                "expires_at" : 0,
+                "valid_at" : 0
+             },
+             "created_at" : 0,
+             "id" : "string",
+             "name" : "string",
+             "object" : "organization.project.certificate"
+          }
        ],
-       "first_id" : "cert_abc",
-       "last_id" : "cert_abc"
+       "object" : "organization.project.certificate.activation"
     }
 
+=head1 SCHEMAS
+
+=head2 OrganizationProjectCertificate
+
+Properties:
+
+=over
+
+=item * C<active> (boolean, required) - Whether the certificate is currently active at the project level.
+
+=item * C<certificate_details> (object, required)
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) of when the certificate was uploaded.
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints
+
+=item * C<name> (anyOf, required) - The name of the certificate.
+
+=item * C<object> (string, required) - The object type, which is always C<organization.project.certificate> .
+
+Allowed values: organization.project.certificate
+
+=back
+
+=head2 OrganizationProjectCertificateActivationResponse
+
+Properties:
+
+=over
+
+=item * C<data> (array of OrganizationProjectCertificate, required)
+
+=item * C<object> (string, required) - The project certificate activation result type.
+
+Allowed values: organization.project.certificate.activation
+
+=back
+
+=head2 ToggleCertificatesRequest
+
+Properties:
+
+=over
+
+=item * C<certificate_ids> (array of string, required)
 
 =back
 

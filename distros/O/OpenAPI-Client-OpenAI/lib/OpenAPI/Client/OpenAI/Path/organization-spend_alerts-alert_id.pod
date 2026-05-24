@@ -1,0 +1,178 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::organization-spend_alerts-alert_id - Documentation for the /organization/spend_alerts/{alert_id} path.
+
+=head1 OPERATIONS
+
+=head2 DELETE /organization/spend_alerts/{alert_id}
+
+=head3 delete-organization-spend-alert
+
+  $client->delete_organization_spend_alert({
+      body => { ... },
+  });
+
+Deletes an organization spend alert.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<alert_id> (in path, required, string) - The ID of the spend alert to delete.
+
+=back
+
+=head4 Responses
+
+B<200 - Organization spend alert deleted successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "deleted" : false,
+       "id" : "string",
+       "object" : "organization.spend_alert.deleted"
+    }
+
+=head2 POST /organization/spend_alerts/{alert_id}
+
+=head3 update-organization-spend-alert
+
+  $client->update_organization_spend_alert({
+      body => { ... },
+  });
+
+Updates an organization spend alert.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<alert_id> (in path, required, string) - The ID of the spend alert to update.
+
+=back
+
+=head4 Responses
+
+B<200 - Organization spend alert updated successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "currency" : "USD",
+       "id" : "alert_abc123",
+       "interval" : "month",
+       "notification_channel" : {
+          "recipients" : [
+             "finance@example.com"
+          ],
+          "subject_prefix" : "OpenAI spend alert",
+          "type" : "email"
+       },
+       "object" : "organization.spend_alert",
+       "threshold_amount" : 100000
+    }
+
+=head1 SCHEMAS
+
+=head2 CreateSpendAlertBody
+
+Properties:
+
+=over
+
+=item * C<currency> (string, required) - The currency for the threshold amount.
+
+Allowed values: USD
+
+=item * C<interval> (string, required) - The time interval for evaluating spend against the threshold.
+
+Allowed values: month
+
+=item * C<notification_channel> (SpendAlertNotificationChannel, required)
+
+See L</SpendAlertNotificationChannel> below for shape.
+
+=item * C<threshold_amount> (integer, required) - The alert threshold amount, in cents.
+
+=back
+
+=head2 OrganizationSpendAlert
+
+Properties:
+
+=over
+
+=item * C<currency> (string, required) - The currency for the threshold amount.
+
+Allowed values: USD
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints.
+
+=item * C<interval> (string, required) - The time interval for evaluating spend against the threshold.
+
+Allowed values: month
+
+=item * C<notification_channel> (SpendAlertNotificationChannel, required)
+
+See L</SpendAlertNotificationChannel> below for shape.
+
+=item * C<object> (string, required) - The object type, which is always C<organization.spend_alert> .
+
+Allowed values: organization.spend_alert
+
+=item * C<threshold_amount> (integer, required) - The alert threshold amount, in cents.
+
+=back
+
+=head2 OrganizationSpendAlertDeletedResource
+
+Properties:
+
+=over
+
+=item * C<deleted> (boolean, required) - Whether the spend alert was deleted.
+
+=item * C<id> (string, required) - The deleted spend alert ID.
+
+=item * C<object> (string, required) - Always C<organization.spend_alert.deleted> .
+
+Allowed values: organization.spend_alert.deleted
+
+=back
+
+=head2 SpendAlertNotificationChannel
+
+Properties:
+
+=over
+
+=item * C<recipients> (array of string, required) - Email addresses that receive the spend alert notification.
+
+=item * C<subject_prefix> (anyOf) - Optional subject prefix for alert emails.
+
+=item * C<type> (string, required) - The notification channel type. Currently only C<email> is supported.
+
+Allowed values: email
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

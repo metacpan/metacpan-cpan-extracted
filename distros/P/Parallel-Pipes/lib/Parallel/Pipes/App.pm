@@ -1,15 +1,13 @@
-package Parallel::Pipes::App;
-use strict;
+package Parallel::Pipes::App v1.0.0;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
 
 use Parallel::Pipes;
 
-our $VERSION = '0.201';
+sub _min ($x, $y) { $x < $y ? $x : $y }
 
-sub _min { $_[0] < $_[1] ? $_[0] : $_[1] }
-
-sub run {
-    my ($class, %argv) = @_;
+sub run ($class, %argv) {
 
     my $work = $argv{work} or die "need 'work' argument\n";
     my $num = $argv{num} or die "need 'num' argument\n";
@@ -34,10 +32,10 @@ sub run {
                 $after_work->($result, $written) if $after_work;
             }
         }
-        if (@$tasks) {
-            my $min = _min $#{$tasks}, $#ready;
+        if ($tasks->@*) {
+            my $min = _min $tasks->$#*, $#ready;
             for my $i (0 .. $min) {
-                my $task = shift @$tasks;
+                my $task = shift $tasks->@*;
                 $before_work->($task, $ready[$i]) if $before_work;
                 $ready[$i]->write($task);
             }
@@ -61,22 +59,21 @@ sub run {
     1;
 }
 
-sub map :method {
-    my ($class, %argv) = @_;
+sub map ($class, %argv) {
 
     my $orig_num = $argv{num} or die "need 'num' argument\n";
     my $orig_tasks = $argv{tasks} or die "need 'tasks' argument\n";
     my $orig_work = $argv{work} or die "need 'work' argument\n";
 
-    my @task = map { [$_, $orig_tasks->[$_]] } 0..$#{$orig_tasks};
-    my $work = sub {
-        my ($index, $task) = @{$_[0]};
+    my @task = map { [$_, $orig_tasks->[$_]] } 0..$orig_tasks->$#*;
+    my $work = sub ($item) {
+        my ($index, $task) = $item->@*;
         my $result = $orig_work->($task);
         [$index, $result];
     };
     my @result;
-    my $after_work = sub {
-        my ($index, $result) = @{$_[0]};
+    my $after_work = sub ($item, @) {
+        my ($index, $result) = $item->@*;
         $result[$index] = $result;
     };
     $class->run(num => $orig_num, work => $work, tasks => \@task, after_work => $after_work);
@@ -96,7 +93,7 @@ Parallel::Pipes::App - friendly interface for Parallel::Pipes
 
   my @result = Parallel::Pipes::App->map(
     num => 3,
-    work => sub { my $task = shift; $task * 2 },
+    work => sub ($task) { $task * 2 },
     tasks => [1, 2, 3, 4, 5],
   );
   # @result is ( 2, 4, 6, 8, 10 )
@@ -141,13 +138,10 @@ C<run> is a more generic form of C<map>. In fact, we can write C<map> by using C
     num => $num,
     work => $work,
     tasks => \@task,
-    before_work => sub {},
-    after_work => sub { push @result, $_[0] },
+    before_work => sub (@) {},
+    after_work => sub ($item) { push @result, $item },
   );
 
-=head1 AUTHOR
-
-Shoichi Kaji <skaji@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

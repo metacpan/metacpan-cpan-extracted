@@ -1,26 +1,26 @@
-package CPAN::Perl::Releases::MetaCPAN;
-use strict;
+package CPAN::Perl::Releases::MetaCPAN v1.0.0;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
 
-our $VERSION = '0.010';
+our $TRIAL = 0;
+
 use JSON::PP ();
 use HTTP::Tinyish;
 
 use Exporter 'import';
 our @EXPORT_OK = qw(perl_tarballs perl_versions perl_pumpkins);
 
-sub new {
-    my ($class, %option) = @_;
+sub new ($class, %option) {
     my $uri = $option{uri} || "https://fastapi.metacpan.org/v1/release";
     $uri =~ s{/$}{};
     my $cache = exists $option{cache} ? $option{cache} : 1;
-    my $http = HTTP::Tinyish->new(verify_SSL => 1, agent => __PACKAGE__ . "/$VERSION");
+    my $http = HTTP::Tinyish->new(verify_SSL => 1, agent => __PACKAGE__ . "/" . __PACKAGE__->VERSION);
     my $json = JSON::PP->new->canonical(1);
     bless { uri => $uri, http => $http, cache => $cache, json => $json }, $class;
 }
 
-sub get {
-    my $self = shift;
+sub get ($self) {
     return $self->{_releases} if $self->{cache} and $self->{_releases};
 
     my @release;
@@ -68,13 +68,13 @@ sub get {
     \@release;
 }
 
-sub _self {
-    my $self = eval { $_[0]->isa(__PACKAGE__) } ? shift : __PACKAGE__->new;
-    wantarray ? ($self, @_) : $self;
+sub _self (@args) {
+    my $self = eval { $args[0]->isa(__PACKAGE__) } ? shift @args : __PACKAGE__->new;
+    wantarray ? ($self, @args) : $self;
 }
 
-sub perl_tarballs {
-    my ($self, $arg) = _self @_;
+sub perl_tarballs (@args) {
+    my ($self, $arg) = _self(@args);
     my $releases = $self->get;
     my %tarballs =
         map {
@@ -88,27 +88,27 @@ sub perl_tarballs {
         }
         grep { my $name = $_->{name}; $name =~ s/^perl-?//; $name eq $arg }
         grep { $_->{status} =~ /^(?:cpan|latest)$/ }
-        @$releases;
+        $releases->@*;
     \%tarballs;
 }
 
-sub perl_versions {
-    my $self = _self @_;
+sub perl_versions (@args) {
+    my $self = _self(@args);
     my $releases = $self->get;
     my @versions =
         map { my $name = $_->{name}; $name =~ s/^perl-?//; $name }
         grep { $_->{status} =~ /^(?:cpan|latest)$/ }
-        @$releases;
+        $releases->@*;
     @versions;
 }
 
-sub perl_pumpkins {
-    my $self = _self @_;
+sub perl_pumpkins (@args) {
+    my $self = _self(@args);
     my $releases = $self->get;
     my %author =
         map { $_->{author} => 1 }
         grep { $_->{status} =~ /^(?:cpan|latest)$/ }
-        @$releases;
+        $releases->@*;
     sort keys %author;
 }
 
@@ -163,9 +163,13 @@ L<metacpan-api|https://github.com/metacpan/metacpan-api>
 
 L<metacpan-web|https://github.com/metacpan/metacpan-web>
 
-=head1 AUTHOR
 
-Shoichi Kaji <skaji@cpan.org>
+=head1 ARTIFACT ATTESTATIONS
+
+GitHub Artifact Attestations are generated for release tarballs uploaded to
+CPAN. If you care about provenance for the uploaded tarballs, see:
+
+L<https://github.com/skaji/CPAN-Perl-Releases-MetaCPAN/attestations>
 
 =head1 COPYRIGHT AND LICENSE
 

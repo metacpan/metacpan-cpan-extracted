@@ -1,6 +1,7 @@
 package CPAN::Mirror::Tiny::CLI;
-use strict;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
 
 use CPAN::Mirror::Tiny;
 use File::Find ();
@@ -11,22 +12,21 @@ use IPC::Run3 ();
 use POSIX ();
 use Pod::Usage 1.33 ();
 
-sub new {
-    my $class = shift;
+sub new ($class) {
     bless {
         base => $ENV{PERL_CPAN_MIRROR_TINY_BASE} || "darkpan",
     }, $class;
 }
 
-sub run {
-    shift->_run(@_) ? 0 : 1;
+sub run ($class, @argv) {
+    $class->_run(@argv) ? 0 : 1;
 }
 
-sub _run {
-    my $self = shift->new;
-    $self->parse_options(@_) or return;
+sub _run ($class, @argv) {
+    my $self = $class->new;
+    $self->parse_options(@argv) or return;
 
-    my $cmd = shift @{$self->{argv}};
+    my $cmd = shift $self->{argv}->@*;
     if (!$cmd) {
         warn "Missing subcommand, try `$0 --help`\n";
         return;
@@ -34,7 +34,7 @@ sub _run {
 
     ( my $_cmd = $cmd ) =~ s/-/_/g;
     if (my $sub = $self->can("cmd_$_cmd")) {
-        return $self->$sub(@{$self->{argv}});
+        return $self->$sub($self->{argv}->@*);
     } else {
         warn "Unknown subcommand '$cmd', try `$0 --help`\n";
         return;
@@ -42,15 +42,14 @@ sub _run {
 
 }
 
-sub parse_options {
-    my $self = shift;
-    local @ARGV = @_;
+sub parse_options ($self, @argv) {
+    local @ARGV = @argv;
     my $parser = Getopt::Long::Parser->new(
         config => [qw(no_auto_abbrev no_ignore_case pass_through)],
     );
     $parser->getoptions(
-        "h|help" => sub { $self->cmd_help; exit },
-        "v|version" => sub { $self->cmd_version; exit },
+        "h|help" => sub (@) { $self->cmd_help; exit },
+        "v|version" => sub (@) { $self->cmd_version; exit },
         "q|quiet" => \$self->{quiet},
         "b|base=s" => \$self->{base},
         "a|author=s" => \$self->{author},
@@ -59,18 +58,17 @@ sub parse_options {
     return 1;
 }
 
-sub cmd_help {
+sub cmd_help ($self) {
     Pod::Usage::pod2usage(verbose => 99, sections => 'SYNOPSIS|OPTIONS|EXAMPLES');
     return 1;
 }
 
-sub cmd_version {
+sub cmd_version ($self) {
     my $klass = "CPAN::Mirror::Tiny";
     printf "%s %s\n", $klass, $klass->VERSION;
 }
 
-sub cmd_inject {
-    my ($self, @argv) = @_;
+sub cmd_inject ($self, @argv) {
     die "Missing urls, try `$0 --help`\n" unless @argv;
     my $cpan = CPAN::Mirror::Tiny->new(base => $self->{base});
     my $option = $self->{author} ? { author => $self->{author} } : +{};
@@ -86,16 +84,14 @@ sub cmd_inject {
     return 1;
 }
 
-sub cmd_gen_index {
-    my ($self, @argv) = @_;
+sub cmd_gen_index ($self, @argv) {
     my $cpan = CPAN::Mirror::Tiny->new(base => $self->{base});
     $cpan->write_index(compress => 1, $self->{quiet} ? () : (show_progress => 1));
     warn sprintf "Generated %s\n", $cpan->index_path(compress => 1) unless $self->{quiet};
     return 1;
 }
 
-sub cmd_cat_index {
-    my ($self, @argv) = @_;
+sub cmd_cat_index ($self, @argv) {
     my $cpan = CPAN::Mirror::Tiny->new(base => $self->{base});
     my $index = $cpan->index_path(compress => 1);
     return unless -f $index;
@@ -104,11 +100,10 @@ sub cmd_cat_index {
     return $? == 0;
 }
 
-sub cmd_list {
-    my $self = shift;
+sub cmd_list ($self) {
     return unless -d $self->{base};
     my ($index, @dist);
-    my $wanted = sub {
+    my $wanted = sub (@) {
         my $name = $_;
         return if !-f $name or $name =~ /\.json$/;
         my $stat = File::stat::stat($name);
@@ -120,11 +115,11 @@ sub cmd_list {
     };
     File::Find::find({wanted => $wanted, no_chdir => 1}, $self->{base});
 
-    my $print = sub {
+    my $print = sub ($item) {
         printf "%s %8d %s\n",
-            POSIX::strftime("%FT%T", localtime($_[0]->{mtime})),
-            $_[0]->{size},
-            $_[0]->{name};
+            POSIX::strftime("%FT%T", localtime($item->{mtime})),
+            $item->{size},
+            $item->{name};
     };
     $print->($index) if $index;
     for my $dist (sort { $a->{name} cmp $b->{name} } @dist) {
@@ -133,8 +128,7 @@ sub cmd_list {
     return 1;
 }
 
-sub cmd_server {
-    my $self = shift;
+sub cmd_server ($self) {
     if (!eval { require CPAN::Mirror::Tiny::Server }) {
         if ($@ =~ m{Can't locate Plack}) {
             die "To run server, you should install Plack first.\n";
@@ -142,7 +136,7 @@ sub cmd_server {
             die $@;
         }
     }
-    CPAN::Mirror::Tiny::Server->start(@{$self->{argv}}, $self->{base});
+    CPAN::Mirror::Tiny::Server->start($self->{argv}->@*, $self->{base});
     return 1;
 }
 

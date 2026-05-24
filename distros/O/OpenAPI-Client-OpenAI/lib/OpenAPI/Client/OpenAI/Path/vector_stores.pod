@@ -4,85 +4,53 @@
 
 OpenAPI::Client::OpenAI::Path::vector_stores - Documentation for the /vector_stores path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</vector_stores>.
+=head2 GET /vector_stores
 
-=head1 PATHS
+=head3 listVectorStores
 
-
-=head2 C<GET /vector_stores>
-
-List vector stores
-
+  $client->list_vector_stores({
+      body => { ... },
+  });
 
 Returns a list of vector stores.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
+=item * C<limit> (in query, optional, integer) - A limit on the number of objects to be returned. Limit can range between 1 and
+100, and the default is 20.
 
-C<listVectorStores>
+Default: 20
 
-    $client->listVectorStores( ... );
+=item * C<order> (in query, optional, string) - Sort order by the C<created_at> timestamp of the objects. C<asc> for ascending
+order and C<desc> for descending order.
 
-=head3 Parameters
+Allowed values: asc, desc
 
-=over 4
+Default: desc
 
-=item * C<limit> (in query) (Optional) - A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.
+=item * C<after> (in query, optional, string) - A cursor for use in pagination. C<after> is an object ID that defines your
+place in the list. For instance, if you make a list request and receive 100
+objects, ending with obj_foo, your subsequent call can include after=obj_foo
+in order to fetch the next page of the list.
 
-
-Type: C<integer>
-
-
-Default: C<20>
-
-
-=item * C<order> (in query) (Optional) - Sort order by the `created_at` timestamp of the objects. `asc` for ascending order and `desc` for descending order.
-
-
-Type: C<string>
-
-Allowed values: C<asc, desc>
-
-
-Default: C<desc>
-
-
-=item * C<after> (in query) (Optional) - A cursor for use in pagination. `after` is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include after=obj_foo in order to fetch the next page of the list.
-
-
-Type: C<string>
-
-
-
-=item * C<before> (in query) (Optional) - A cursor for use in pagination. `before` is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, starting with obj_foo, your subsequent call can include before=obj_foo in order to fetch the previous page of the list.
-
-
-Type: C<string>
-
-
+=item * C<before> (in query, optional, string) - A cursor for use in pagination. C<before> is an object ID that defines your
+place in the list. For instance, if you make a list request and receive 100
+objects, starting with obj_foo, your subsequent call can include
+before=obj_foo in order to fetch the previous page of the list.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - OK>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
        "data" : [
@@ -94,86 +62,151 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
        "object" : "list"
     }
 
+=head2 POST /vector_stores
 
-=back
+=head3 createVectorStore
 
-=head2 C<POST /vector_stores>
-
-Create vector store
-
+  $client->create_vector_store({
+      body => { ... },
+  });
 
 Create a vector store.
 
+=head4 Responses
 
+B<200 - OK>
 
-=head3 Operation ID
+Content-Type: application/json
 
-C<createVectorStore>
-
-    $client->createVectorStore( ... );
-
-=head3 Parameters
-
-=over 4
-
-=back
-
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
-
-    
-      
-
-      
-      
 Example:
 
     {
-       "expires_after" : null,
-       "file_ids" : [
-          null
-       ]
+       "created_at" : 1698107661,
+       "file_counts" : {
+          "cancelled" : 0,
+          "completed" : 100,
+          "failed" : 0,
+          "in_progress" : 0,
+          "total" : 100
+       },
+       "id" : "vs_123",
+       "last_active_at" : 1698107661,
+       "last_used_at" : 1698107661,
+       "name" : "my_vector_store",
+       "object" : "vector_store",
+       "status" : "completed",
+       "usage_bytes" : 123456
     }
 
+=head1 SCHEMAS
 
-             
+=head2 CreateVectorStoreRequest
 
-=head3 Responses
+Properties:
 
+=over
 
-=head4 Status Code: C<200>
+=item * C<chunking_strategy> (object) - The chunking strategy used to chunk the file(s). If not set, will use the
+C<auto> strategy. Only applicable if C<file_ids> is non-empty.
 
-OK
+=item * C<description> (string) - A description for the vector store. Can be used to describe the vector store's
+purpose.
 
+=item * C<expires_after> (VectorStoreExpirationAfter)
 
-=head4 Content Types:
+See L</VectorStoreExpirationAfter> below for shape.
 
-=over 4
+=item * C<file_ids> (array of string) - A list of L<File|https://platform.openai.com/docs/api-reference/files> IDs
+that the vector store should use. Useful for tools like C<file_search> that
+can access files.
 
+=item * C<metadata> (Metadata)
 
-=item * C<application/json>
+See L</Metadata> below for shape.
 
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+=item * C<name> (string) - The name of the vector store.
 
-    {
-      "id": "vs_123",
-      "object": "vector_store",
-      "created_at": 1698107661,
-      "usage_bytes": 123456,
-      "last_active_at": 1698107661,
-      "name": "my_vector_store",
-      "status": "completed",
-      "file_counts": {
-        "in_progress": 0,
-        "completed": 100,
-        "cancelled": 0,
-        "failed": 0,
-        "total": 100
-      },
-      "last_used_at": 1698107661
-    }
+=back
 
+=head2 ListVectorStoresResponse
+
+Properties:
+
+=over
+
+=item * C<data> (array of VectorStoreObject, required)
+
+=item * C<first_id> (string, required)
+
+=item * C<has_more> (boolean, required)
+
+=item * C<last_id> (string, required)
+
+=item * C<object> (string, required)
+
+=back
+
+=head2 Metadata
+
+Set of 16 key-value pairs that can be attached to an object. This can be
+useful for storing additional information about the object in a structured
+format, and querying for objects via API or the dashboard.
+
+Keys are strings with a maximum length of 64 characters. Values are strings
+with a maximum length of 512 characters.
+
+=head2 VectorStoreExpirationAfter
+
+Properties:
+
+=over
+
+=item * C<anchor> (string, required) - Anchor timestamp after which the expiration policy applies. Supported anchors:
+C<last_active_at> .
+
+Allowed values: last_active_at
+
+=item * C<days> (integer, required) - The number of days after the anchor time that the vector store will expire.
+
+=back
+
+=head2 VectorStoreObject
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) for when the vector store was created.
+
+=item * C<expires_after> (VectorStoreExpirationAfter)
+
+See L</VectorStoreExpirationAfter> below for shape.
+
+=item * C<expires_at> (anyOf)
+
+=item * C<file_counts> (object, required)
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints.
+
+=item * C<last_active_at> (anyOf, required)
+
+=item * C<metadata> (Metadata, required)
+
+See L</Metadata> below for shape.
+
+=item * C<name> (string, required) - The name of the vector store.
+
+=item * C<object> (string, required) - The object type, which is always C<vector_store> .
+
+Allowed values: vector_store
+
+=item * C<status> (string, required) - The status of the vector store, which can be either C<expired> ,
+C<in_progress> , or C<completed> . A status of C<completed> indicates that the
+vector store is ready for use.
+
+Allowed values: expired, in_progress, completed
+
+=item * C<usage_bytes> (integer, required) - The total number of bytes used by the files in the vector store.
 
 =back
 

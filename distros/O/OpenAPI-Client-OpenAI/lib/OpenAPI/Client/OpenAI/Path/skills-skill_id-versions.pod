@@ -1,0 +1,169 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::skills-skill_id-versions - Documentation for the /skills/{skill_id}/versions path.
+
+=head1 OPERATIONS
+
+=head2 GET /skills/{skill_id}/versions
+
+=head3 ListSkillVersions
+
+  $client->list_skill_versions({
+      body => { ... },
+  });
+
+List skill versions for a skill.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<skill_id> (in path, required, string) - The identifier of the skill.
+
+=item * C<limit> (in query, optional, integer) - Number of versions to retrieve.
+
+=item * C<order> (in query, optional, string) - Sort order of results by version number.
+
+=item * C<after> (in query, optional, string) - The skill version ID to start after.
+
+=back
+
+=head4 Responses
+
+B<200 - Success>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "data" : [
+          {
+             "created_at" : 0,
+             "description" : "string",
+             "id" : "string",
+             "name" : "string",
+             "object" : "skill.version",
+             "skill_id" : "string",
+             "version" : "string"
+          }
+       ],
+       "first_id" : "string",
+       "has_more" : false,
+       "last_id" : "string",
+       "object" : "list"
+    }
+
+=head2 POST /skills/{skill_id}/versions
+
+=head3 CreateSkillVersion
+
+  $client->create_skill_version({
+      body => { ... },
+  });
+
+Create a new immutable skill version.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<skill_id> (in path, required, string) - The identifier of the skill to version.
+
+=back
+
+=head4 Responses
+
+B<200 - Success>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "created_at" : 0,
+       "description" : "string",
+       "id" : "string",
+       "name" : "string",
+       "object" : "skill.version",
+       "skill_id" : "string",
+       "version" : "string"
+    }
+
+=head1 SCHEMAS
+
+=head2 CreateSkillVersionBody
+
+Properties:
+
+=over
+
+=item * C<default> (boolean) - Whether to set this version as the default.
+
+=item * C<files> (oneOf, required)
+
+=back
+
+=head2 SkillVersionListResource
+
+Properties:
+
+=over
+
+=item * C<data> (array of SkillVersionResource, required) - A list of items
+
+=item * C<first_id> (anyOf, required)
+
+=item * C<has_more> (boolean, required) - Whether there are more items available.
+
+=item * C<last_id> (anyOf, required)
+
+=item * C<object> (string, required) - The type of object returned, must be C<list> .
+
+Allowed values: list
+
+Default: list
+
+=back
+
+=head2 SkillVersionResource
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - Unix timestamp (seconds) for when the version was created.
+
+=item * C<description> (string, required) - Description of the skill version.
+
+=item * C<id> (string, required) - Unique identifier for the skill version.
+
+=item * C<name> (string, required) - Name of the skill version.
+
+=item * C<object> (string, required) - The object type, which is C<skill.version> .
+
+Allowed values: skill.version
+
+Default: skill.version
+
+=item * C<skill_id> (string, required) - Identifier of the skill for this version.
+
+=item * C<version> (string, required) - Version number for this skill.
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

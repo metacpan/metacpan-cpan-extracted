@@ -1,0 +1,405 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Time::TZif - TZif timezone file parser with configurable local time resolution
+
+=head1 SYNOPSIS
+
+    use Time::TZif;
+    
+    my $tz = Time::TZif->new(
+      filename       => '/usr/share/zoneinfo/US/Eastern',
+      gap_policy     => 'later',      # default policy for gaps
+      overlap_policy => 'earlier',    # default policy for overlaps
+    );
+    
+    # UTC to offset (always unambiguous)
+    my $offset = $tz->offset_for_utc($epoch);
+
+    # Local time to offset (uses constructor defaults)
+    my $offset = $tz->offset_for_local($epoch);
+    
+    # Local time to offset (override per call)
+    my $offset = $tz->offset_for_local($epoch, gap_policy => 'reject');
+    
+    # Full type info: ($offset, $is_dst, $abbreviation)
+    my ($off, $dst, $abbr) = $tz->type_info_for_utc($epoch);
+    my ($off, $dst, $abbr) = $tz->type_info_for_local($epoch, gap_policy => 'std');
+
+=head1 DESCRIPTION
+
+B<Note:> This module is experimental and may change without prior notice.
+
+C<Time::TZif> parses TZif binary timezone files (RFC 8536) and
+provides methods for resolving UTC and local times to UTC offsets.
+
+Supports TZif version 1 (32-bit timestamps), version 2, and version 3
+(64-bit timestamps). When a v2/v3 file is detected and the platform
+supports 64-bit integers, the 64-bit data block is used automatically.
+
+The key challenge in timezone handling is converting I<local> times to
+UTC, because DST transitions create two problematic cases:
+
+=over 4
+
+=item B<Gaps> (spring forward)
+
+When clocks spring forward, a range of local times does not exist. For
+example, in US/Eastern on 2024-03-10, local times 02:00:00 through
+02:59:59 do not exist because clocks jump from 02:00 EST to 03:00 EDT.
+
+=item B<Overlaps> (fall back)
+
+When clocks fall back, a range of local times occurs twice. For example,
+in US/Eastern on 2024-11-03, local times 01:00:00 through 01:59:59 occur
+once in EDT and again in EST.
+
+=back
+
+C<offset_for_local> handles both cases through configurable policies
+that can be set as defaults in the constructor or overridden per call.
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+    my $tz = Time::TZif->new(
+      filename       => $filename,
+      gap_policy     => 'reject',    # optional, default: 'reject'
+      overlap_policy => 'reject',    # optional, default: 'reject'
+    );
+
+Creates a new C<Time::TZif> object by parsing the specified TZif file.
+
+=over 4
+
+=item C<filename> (required)
+
+Path to a TZif binary timezone file (e.g., C</usr/share/zoneinfo/US/Eastern>).
+
+=item C<gap_policy> (optional, default: C<'reject'>)
+
+Default policy for resolving non-existing local times (during
+spring-forward gaps). See L</POLICIES>. Can be overridden per call in
+C<offset_for_local> and C<type_info_for_local>.
+
+=item C<overlap_policy> (optional, default: C<'reject'>)
+
+Default policy for resolving ambiguous local times (during fall-back
+overlaps). See L</POLICIES>. Can be overridden per call in
+C<offset_for_local> and C<type_info_for_local>.
+
+=back
+
+Croaks if the file cannot be opened or is not a valid TZif file.
+
+=head1 METHODS
+
+=head2 offset_for_utc
+
+    my $offset = $tz->offset_for_utc($time);
+
+Returns the UTC offset in seconds for the given UTC epoch time. This is
+always unambiguous.
+
+=head2 offset_for_local
+
+    my $offset = $tz->offset_for_local($time);
+    my $offset = $tz->offset_for_local($time, %opts);
+    
+    use Time::Str::Time qw[timegm_modern];
+    
+    # Treat wall-clock 2024-03-10 02:30:00 as a UTC epoch
+    my $local  = timegm_modern(0, 30, 2, 10, 3, 2024);
+    my $offset = $tz->offset_for_local($local);
+    
+    # The actual UTC epoch is:
+    my $utc = $local - $offset;
+
+Returns the UTC offset in seconds for the given local epoch time (i.e.,
+the epoch value obtained by treating the wall-clock time as if it were UTC).
+
+=head3 Options
+
+=over 4
+
+=item C<gap_policy> (default: constructor value)
+
+Policy for non-existing local times. See L</POLICIES>.
+
+=item C<overlap_policy> (default: constructor value)
+
+Policy for ambiguous local times. See L</POLICIES>.
+
+=back
+
+=head2 type_info_for_utc
+
+    my ($offset, $is_dst, $abbreviation) = $tz->type_info_for_utc($time);
+
+Returns the full type information for the given UTC epoch time:
+
+=over 4
+
+=item C<$offset> - UTC offset in seconds
+
+=item C<$is_dst> - 1 if daylight saving time, 0 otherwise
+
+=item C<$abbreviation> - timezone abbreviation (e.g., "EST", "EDT")
+
+=back
+
+=head2 type_info_for_local
+
+    my ($offset, $is_dst, $abbreviation) = $tz->type_info_for_local($time, %opts);
+
+Returns the full type information for the given local epoch time. Accepts
+the same C<gap_policy> and C<overlap_policy> options as C<offset_for_local>.
+
+=head2 filename
+
+    my $filename = $tz->filename;
+
+Returns the filename used to construct the object.
+
+=head2 gap_policy
+
+    my $policy = $tz->gap_policy;
+
+Returns the default gap policy set in the constructor.
+
+=head2 overlap_policy
+
+    my $policy = $tz->overlap_policy;
+
+Returns the default overlap policy set in the constructor.
+
+=head1 POLICIES
+
+The following policies control how C<offset_for_local> and
+C<type_info_for_local> handle the two problematic local time cases
+that arise from DST transitions.
+
+For B<gaps> (spring forward), the local time does not exist - clocks
+skipped over it. For B<overlaps> (fall back), the local time occurs
+twice - once before the transition and once after.
+
+=over 4
+
+=item C<earlier>
+
+Use the pre-transition offset. For gaps, this interprets the time as
+if the clock had not yet sprung forward. For overlaps, this selects
+the first occurrence (the earlier UTC instant).
+
+=item C<later>
+
+Use the post-transition offset. For gaps, this interprets the time as
+if the clock had already sprung forward. For overlaps, this selects
+the second occurrence (the later UTC instant).
+
+=item C<std>
+
+Use whichever offset corresponds to standard time (C<is_dst = 0>),
+regardless of which side of the transition it falls on.
+
+=item C<dst>
+
+Use whichever offset corresponds to daylight saving time
+(C<is_dst = 1>), regardless of which side of the transition it
+falls on.
+
+=item C<reject>
+
+Reject the time outright by throwing an exception.
+
+=back
+
+=head1 COMPATIBILITY WITH OTHER MODULES
+
+If you are migrating from or interoperating with other Perl timezone
+modules, the following constructor settings reproduce their local time
+resolution behaviour.
+
+=head2 L<DateTime::TimeZone>
+
+C<DateTime::TimeZone-E<gt>offset_for_local_datetime()> throws an exception
+on gaps and selects the later (post-transition) offset for overlaps:
+
+    my $tz = Time::TZif->new(
+      filename       => $filename,
+      gap_policy     => 'reject',
+      overlap_policy => 'later',
+    );
+
+=head2 L<Time::Local>
+
+C<Time::Local::timelocal()> folds gap times back into the pre-transition
+period and likewise resolves overlaps to the earlier (pre-transition)
+offset:
+
+    my $tz = Time::TZif->new(
+      filename       => $filename,
+      gap_policy     => 'earlier',
+      overlap_policy => 'earlier',
+    );
+
+B<Note:> C<Time::Local> assumes DST transitions of at least 60 minutes.
+Zones with smaller transitions (e.g., C<Australia/Lord_Howe>, 30 minutes)
+may not resolve correctly.
+
+=head2 L<POSIX>
+
+The behaviour of C<POSIX::mktime()> with C<tm_isdst = -1> for
+non-existing (gap) and ambiguous (overlap) local times is unspecified
+by the C standard and varies across platforms.
+
+=head1 DIAGNOSTICS
+
+All error messages are thrown as exceptions via C<Carp::croak>.
+
+=head2 Unable to parse TZif
+
+=over 4
+
+=item C<Unable to parse TZif: could not open '%s': '%s'>
+
+The specified file could not be opened for reading.
+
+=item C<Unable to parse TZif: could not read from filehandle: '%s'>
+
+An I/O error occurred while reading the TZif file.
+
+=item C<Unable to parse TZif: premature end of data (got: %d, expected: %d)>
+
+The file ended before the expected number of bytes could be read,
+indicating a truncated or corrupt TZif file.
+
+=item C<Unable to parse TZif: not a TZif file>
+
+The file does not begin with the TZif magic number (C<0x545A6966>).
+
+=item C<Unable to parse TZif: invalid v2/v3 header>
+
+The v2/v3 data block does not begin with a valid TZif header.
+
+=item C<Unable to parse TZif: expected newline before POSIX TZ string>
+
+The v2/v3 data block is not followed by the expected newline delimiter
+before the POSIX TZ string footer.
+
+=item C<Unable to parse TZif: must have at least one type>
+
+The TZif file declares zero type records, which is invalid per RFC 8536.
+
+=item C<Unable to parse TZif: too many transitions times: %d (max: %d)>
+
+The TZif file declares more transitions than the compiled limit of 2400.
+This guard prevents excessive memory allocation from malformed files.
+
+=item C<Unable to parse TZif: too many type records: %d (max: %d)>
+
+The TZif file declares more type records than the compiled limit of 256.
+
+=item C<Unable to parse TZif: too many chars: %d (max: %d)>
+
+The TZif file declares more abbreviation characters than the compiled
+limit of 256.
+
+=item C<Unable to parse TZif: invalid type index: %d (max: %d)>
+
+A transition references a type index that is out of range.
+
+=item C<Unable to parse TZif: invalid UTC offset: %d>
+
+A type record contains a UTC offset outside the valid range
+(C<-86400 E<lt> offset E<lt> 86400>).
+
+=item C<Unable to parse TZif: invalid DST flag: %d>
+
+A type record contains a DST flag that is not 0 or 1.
+
+=item C<Unable to parse TZif: invalid abbreviation index: %d>
+
+A type record references an abbreviation index that is out of range.
+
+=back
+
+=head2 Unable to resolve local time
+
+=over 4
+
+=item C<Unable to resolve local time: non-existing time (gap)>
+
+The given local time falls within a gap created by a spring-forward
+transition and the C<gap_policy> policy is set to C<'reject'>.
+
+=item C<Unable to resolve local time: ambiguous time (overlap)>
+
+The given local time falls within an overlap created by a fall-back
+transition and the C<overlap_policy> policy is set to C<'reject'>.
+
+=back
+
+=head2 Usage errors
+
+=over 4
+
+=item C<Parameter 'filename' is required>
+
+The C<new> constructor was called without the required C<filename>
+parameter.
+
+=item C<Invalid policy value for the parameter '%s'>
+
+The value given for C<policy_gap> or C<policy_overlap> is not one of
+the recognised policies (C<earlier>, C<later>, C<std>, C<dst>,
+C<reject>). See L</POLICIES>.
+
+=item C<Unrecognised named parameter: '%s'>
+
+An unrecognised named parameter was given.
+
+=back
+
+=head1 TZIF FORMAT
+
+TZif is the binary format used by the IANA Time Zone Database (often
+called the Olson database). These files are typically found in
+C</usr/share/zoneinfo/> on Unix-like systems.
+
+This module supports:
+
+=over 4
+
+=item * TZif version 1 (32-bit transition timestamps, epoch range limited to 1901-2038)
+
+=item * TZif version 2 and 3 (64-bit transition timestamps)
+
+=back
+
+Version 2/3 files contain both a v1 data block (for backward
+compatibility) and a v2/v3 data block with 64-bit timestamps. This module
+uses the v2/v3 data block when available and when the platform supports
+64-bit integers.
+
+=head1 SEE ALSO
+
+L<RFC 8536|https://datatracker.ietf.org/doc/html/rfc8536> - The Time
+Zone Information Format (TZif)
+
+L<IANA Time Zone Database|https://www.iana.org/time-zones>
+
+=head1 AUTHOR
+
+Christian Hansen
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 by Christian Hansen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

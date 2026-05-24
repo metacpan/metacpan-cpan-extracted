@@ -1,5 +1,8 @@
 Revision history for Perl distribution App-PTP
 
+1.18 - 2026-05-23
+ - Add a --semver-sort (--ss) command to sort version strings.
+
 1.17 - 2026-01-27
  - Add a --cheat command line option to display the cheat sheet.
  - Add a --xargs options (that behaves like the equivalent program).

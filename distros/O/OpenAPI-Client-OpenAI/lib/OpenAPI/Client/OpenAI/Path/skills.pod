@@ -1,0 +1,158 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::skills - Documentation for the /skills path.
+
+=head1 OPERATIONS
+
+=head2 GET /skills
+
+=head3 ListSkills
+
+  $client->list_skills({
+      body => { ... },
+  });
+
+List all skills for the current project.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<limit> (in query, optional, integer) - Number of items to retrieve
+
+=item * C<order> (in query, optional, string) - Sort order of results by timestamp. Use C<asc> for ascending order or C<desc>
+for descending order.
+
+=item * C<after> (in query, optional, string) - Identifier for the last item from the previous pagination request
+
+=back
+
+=head4 Responses
+
+B<200 - Success>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "data" : [
+          {
+             "created_at" : 0,
+             "default_version" : "string",
+             "description" : "string",
+             "id" : "string",
+             "latest_version" : "string",
+             "name" : "string",
+             "object" : "skill"
+          }
+       ],
+       "first_id" : "string",
+       "has_more" : false,
+       "last_id" : "string",
+       "object" : "list"
+    }
+
+=head2 POST /skills
+
+=head3 CreateSkill
+
+  $client->create_skill({
+      body => { ... },
+  });
+
+Create a new skill.
+
+=head4 Responses
+
+B<200 - Success>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "created_at" : 0,
+       "default_version" : "string",
+       "description" : "string",
+       "id" : "string",
+       "latest_version" : "string",
+       "name" : "string",
+       "object" : "skill"
+    }
+
+=head1 SCHEMAS
+
+=head2 CreateSkillBody
+
+Properties:
+
+=over
+
+=item * C<files> (oneOf, required)
+
+=back
+
+=head2 SkillListResource
+
+Properties:
+
+=over
+
+=item * C<data> (array of SkillResource, required) - A list of items
+
+=item * C<first_id> (anyOf, required)
+
+=item * C<has_more> (boolean, required) - Whether there are more items available.
+
+=item * C<last_id> (anyOf, required)
+
+=item * C<object> (string, required) - The type of object returned, must be C<list> .
+
+Allowed values: list
+
+Default: list
+
+=back
+
+=head2 SkillResource
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - Unix timestamp (seconds) for when the skill was created.
+
+=item * C<default_version> (string, required) - Default version for the skill.
+
+=item * C<description> (string, required) - Description of the skill.
+
+=item * C<id> (string, required) - Unique identifier for the skill.
+
+=item * C<latest_version> (string, required) - Latest version for the skill.
+
+=item * C<name> (string, required) - Name of the skill.
+
+=item * C<object> (string, required) - The object type, which is C<skill> .
+
+Allowed values: skill
+
+Default: skill
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

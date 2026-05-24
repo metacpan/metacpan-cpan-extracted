@@ -1,4 +1,7 @@
 Revision history for Proc-ForkSafe
 
+v1.0.0  2026-05-23
+  - Raise minimum Perl to v5.24
+
 0.001  2023-08-04 08:08:29 JST
   - Initial version

@@ -4,103 +4,94 @@
 
 OpenAPI::Client::OpenAI::Path::uploads-upload_id-complete - Documentation for the /uploads/{upload_id}/complete path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</uploads/{upload_id}/complete>.
+=head2 POST /uploads/{upload_id}/complete
 
-=head1 PATHS
+=head3 completeUpload
 
+  $client->complete_upload({
+      body => { ... },
+  });
 
-=head2 C<POST /uploads/{upload_id}/complete>
+Completes the
+L<Upload|https://platform.openai.com/docs/api-reference/uploads/object> .
 
-Complete upload
+Within the returned Upload object, there is a nested
+L<File|https://platform.openai.com/docs/api-reference/files/object> object
+that is ready to use in the rest of the platform.
 
+You can specify the order of the Parts by passing in an ordered list of the
+Part IDs.
 
-Completes the L<Upload|https://platform.openai.com/docs/api-reference/uploads/object>. 
+The number of bytes uploaded upon completion must match the number of bytes
+initially specified when creating the Upload object. No Parts may be added
+after an Upload is completed. Returns the Upload object with status
+C<completed> , including an additional C<file> property containing the created
+usable File object.
 
-Within the returned Upload object, there is a nested L<File|https://platform.openai.com/docs/api-reference/files/object> object that is ready to use in the rest of the platform.
+=head4 Path/query parameters
 
-You can specify the order of the Parts by passing in an ordered list of the Part IDs.
+=over
 
-The number of bytes uploaded upon completion must match the number of bytes initially specified when creating the Upload object. No Parts may be added after an Upload is completed.
-
-
-
-=head3 Operation ID
-
-C<completeUpload>
-
-    $client->completeUpload( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<upload_id> (in path) (Required) - The ID of the Upload.
-
-
-Type: C<string>
-
-
+=item * C<upload_id> (in path, required, string) - The ID of the Upload.
 
 =back
 
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
+=head4 Responses
 
-    
-      
+B<200 - OK>
 
-      
-      
+Content-Type: application/json
+
 Example:
 
-    {
-       "part_ids" : [
-          null
-       ]
-    }
+    "{\n  \"id\": \"upload_abc123\",\n  \"object\": \"upload\",\n  \"bytes\": 2147483648,\n  \"created_at\": 1719184911,\n  \"filename\": \"training_examples.jsonl\",\n  \"purpose\": \"fine-tune\",\n  \"status\": \"completed\",\n  \"expires_at\": 1719127296,\n  \"file\": {\n    \"id\": \"file-xyz321\",\n    \"object\": \"file\",\n    \"bytes\": 2147483648,\n    \"created_at\": 1719186911,\n    \"filename\": \"training_examples.jsonl\",\n    \"purpose\": \"fine-tune\",\n  }\n}\n"
 
+=head1 SCHEMAS
 
-             
+=head2 CompleteUploadRequest
 
-=head3 Responses
+Properties:
 
+=over
 
-=head4 Status Code: C<200>
+=item * C<md5> (string) - The optional md5 checksum for the file contents to verify if the bytes
+uploaded matches what you expect.
 
-OK
+=item * C<part_ids> (array of string, required) - The ordered list of Part IDs.
 
+=back
 
-=head4 Content Types:
+=head2 Upload
 
-=over 4
+Properties:
 
+=over
 
-=item * C<application/json>
+=item * C<bytes> (integer, required) - The intended number of bytes to be uploaded.
 
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) for when the Upload was created.
 
-    {
-      "id": "upload_abc123",
-      "object": "upload",
-      "bytes": 2147483648,
-      "created_at": 1719184911,
-      "filename": "training_examples.jsonl",
-      "purpose": "fine-tune",
-      "status": "completed",
-      "expires_at": 1719127296,
-      "file": {
-        "id": "file-xyz321",
-        "object": "file",
-        "bytes": 2147483648,
-        "created_at": 1719186911,
-        "filename": "training_examples.jsonl",
-        "purpose": "fine-tune",
-      }
-    }
+=item * C<expires_at> (integer, required) - The Unix timestamp (in seconds) for when the Upload will expire.
 
+=item * C<file> (allOf)
+
+=item * C<filename> (string, required) - The name of the file to be uploaded.
+
+=item * C<id> (string, required) - The Upload unique identifier, which can be referenced in API endpoints.
+
+=item * C<object> (string) - The object type, which is always "upload".
+
+Allowed values: upload
+
+=item * C<purpose> (string, required) - The intended purpose of the file.
+L<Please refer here|https://platform.openai.com/docs/api-reference/files/object#files/object-purpose>
+for acceptable values.
+
+=item * C<status> (string, required) - The status of the Upload.
+
+Allowed values: pending, completed, cancelled, expired
 
 =back
 

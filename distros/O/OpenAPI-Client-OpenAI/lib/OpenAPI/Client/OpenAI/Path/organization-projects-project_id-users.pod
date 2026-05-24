@@ -4,188 +4,201 @@
 
 OpenAPI::Client::OpenAI::Path::organization-projects-project_id-users - Documentation for the /organization/projects/{project_id}/users path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</organization/projects/{project_id}/users>.
+=head2 GET /organization/projects/{project_id}/users
 
-=head1 PATHS
+=head3 list-project-users
 
-
-=head2 C<GET /organization/projects/{project_id}/users>
-
-List project users
-
+  $client->list_project_users({
+      body => { ... },
+  });
 
 Returns a list of users in the project.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
+=item * C<project_id> (in path, required, string) - The ID of the project.
 
-C<list-project-users>
+=item * C<limit> (in query, optional, integer) - A limit on the number of objects to be returned. Limit can range between 1 and
+100, and the default is 20.
 
-    $client->list-project-users( ... );
+Default: 20
 
-=head3 Parameters
-
-=over 4
-
-=item * C<project_id> (in path) (Required) - The ID of the project.
-
-Type: C<string>
-
-
-
-=item * C<limit> (in query) (Optional) - A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.
-
-
-Type: C<integer>
-
-
-Default: C<20>
-
-
-=item * C<after> (in query) (Optional) - A cursor for use in pagination. `after` is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include after=obj_foo in order to fetch the next page of the list.
-
-
-Type: C<string>
-
-
+=item * C<after> (in query, optional, string) - A cursor for use in pagination. C<after> is an object ID that defines your
+place in the list. For instance, if you make a list request and receive 100
+objects, ending with obj_foo, your subsequent call can include after=obj_foo
+in order to fetch the next page of the list.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - Project users listed successfully.>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-Project users listed successfully.
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
        "data" : [
           "{\n    \"object\": \"organization.project.user\",\n    \"id\": \"user_abc\",\n    \"name\": \"First Last\",\n    \"email\": \"user@example.com\",\n    \"role\": \"owner\",\n    \"added_at\": 1711471533\n}\n"
-       ]
+       ],
+       "first_id" : "string",
+       "has_more" : false,
+       "last_id" : "string",
+       "object" : "string"
     }
 
+B<400 - Error response when project is archived.>
 
-=back
+Content-Type: application/json
 
-=head4 Status Code: C<400>
-
-Error response when project is archived.
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-       "error" : null
+       "error" : {
+          "code" : "string",
+          "message" : "string",
+          "param" : "string",
+          "type" : "string"
+       }
     }
 
+=head2 POST /organization/projects/{project_id}/users
+
+=head3 create-project-user
+
+  $client->create_project_user({
+      body => { ... },
+  });
+
+Adds a user to the project. Users must already be members of the organization
+to be added to a project.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<project_id> (in path, required, string) - The ID of the project.
 
 =back
 
-=head2 C<POST /organization/projects/{project_id}/users>
+=head4 Responses
 
-Create project user
+B<200 - User added to project successfully.>
 
+Content-Type: application/json
 
-Adds a user to the project. Users must already be members of the organization to be added to a project.
-
-
-
-=head3 Operation ID
-
-C<create-project-user>
-
-    $client->create-project-user( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<project_id> (in path) (Required) - The ID of the project.
-
-Type: C<string>
-
-
-
-=back
-
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
-
-    
-      
-
-      
-             
-
-=head3 Responses
-
-
-=head4 Status Code: C<200>
-
-User added to project successfully.
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-        "object": "organization.project.user",
-        "id": "user_abc",
-        "name": "First Last",
-        "email": "user@example.com",
-        "role": "owner",
-        "added_at": 1711471533
+       "added_at" : 1711471533,
+       "email" : "user@example.com",
+       "id" : "user_abc",
+       "name" : "First Last",
+       "object" : "organization.project.user",
+       "role" : "owner"
     }
 
+B<400 - Error response for various conditions.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "error" : {
+          "code" : "string",
+          "message" : "string",
+          "param" : "string",
+          "type" : "string"
+       }
+    }
+
+=head1 SCHEMAS
+
+=head2 Error
+
+Properties:
+
+=over
+
+=item * C<code> (anyOf, required)
+
+=item * C<message> (string, required)
+
+=item * C<param> (anyOf, required)
+
+=item * C<type> (string, required)
 
 =back
 
-=head4 Status Code: C<400>
+=head2 ErrorResponse
 
-Error response for various conditions.
+Properties:
 
+=over
 
-=head4 Content Types:
+=item * C<error> (Error, required)
 
-=over 4
+See L</Error> below for shape.
 
+=back
 
-=item * C<application/json>
+=head2 ProjectUser
 
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Properties:
 
-    {
-       "error" : null
-    }
+=over
 
+=item * C<added_at> (integer, required) - The Unix timestamp (in seconds) of when the project was added.
+
+=item * C<email> (anyOf) - The email address of the user
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints
+
+=item * C<name> (anyOf) - The name of the user
+
+=item * C<object> (string, required) - The object type, which is always C<organization.project.user>
+
+Allowed values: organization.project.user
+
+=item * C<role> (string, required) - C<owner> or C<member>
+
+=back
+
+=head2 ProjectUserCreateRequest
+
+Properties:
+
+=over
+
+=item * C<email> (anyOf) - Email of the user to add.
+
+=item * C<role> (string, required) - C<owner> or C<member>
+
+=item * C<user_id> (anyOf) - The ID of the user.
+
+=back
+
+=head2 ProjectUserListResponse
+
+Properties:
+
+=over
+
+=item * C<data> (array of ProjectUser, required)
+
+=item * C<first_id> (anyOf)
+
+=item * C<has_more> (boolean, required)
+
+=item * C<last_id> (anyOf)
+
+=item * C<object> (string, required)
 
 =back
 

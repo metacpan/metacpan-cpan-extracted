@@ -1,0 +1,142 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::skills-skill_id-versions-version - Documentation for the /skills/{skill_id}/versions/{version} path.
+
+=head1 OPERATIONS
+
+=head2 DELETE /skills/{skill_id}/versions/{version}
+
+=head3 DeleteSkillVersion
+
+  $client->delete_skill_version({
+      body => { ... },
+  });
+
+Delete a skill version.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<skill_id> (in path, required, string) - The identifier of the skill.
+
+=item * C<version> (in path, required, string) - The skill version number.
+
+=back
+
+=head4 Responses
+
+B<200 - Success>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "deleted" : false,
+       "id" : "string",
+       "object" : "skill.version.deleted",
+       "version" : "string"
+    }
+
+=head2 GET /skills/{skill_id}/versions/{version}
+
+=head3 GetSkillVersion
+
+  $client->get_skill_version({
+      body => { ... },
+  });
+
+Get a specific skill version.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<skill_id> (in path, required, string) - The identifier of the skill.
+
+=item * C<version> (in path, required, string) - The version number to retrieve.
+
+=back
+
+=head4 Responses
+
+B<200 - Success>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "created_at" : 0,
+       "description" : "string",
+       "id" : "string",
+       "name" : "string",
+       "object" : "skill.version",
+       "skill_id" : "string",
+       "version" : "string"
+    }
+
+=head1 SCHEMAS
+
+=head2 DeletedSkillVersionResource
+
+Properties:
+
+=over
+
+=item * C<deleted> (boolean, required)
+
+=item * C<id> (string, required)
+
+=item * C<object> (string, required)
+
+Allowed values: skill.version.deleted
+
+Default: skill.version.deleted
+
+=item * C<version> (string, required) - The deleted skill version.
+
+=back
+
+=head2 SkillVersionResource
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - Unix timestamp (seconds) for when the version was created.
+
+=item * C<description> (string, required) - Description of the skill version.
+
+=item * C<id> (string, required) - Unique identifier for the skill version.
+
+=item * C<name> (string, required) - Name of the skill version.
+
+=item * C<object> (string, required) - The object type, which is C<skill.version> .
+
+Allowed values: skill.version
+
+Default: skill.version
+
+=item * C<skill_id> (string, required) - Identifier of the skill for this version.
+
+=item * C<version> (string, required) - Version number for this skill.
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

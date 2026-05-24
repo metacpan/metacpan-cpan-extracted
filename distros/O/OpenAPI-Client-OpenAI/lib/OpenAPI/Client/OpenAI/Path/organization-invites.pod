@@ -4,152 +4,159 @@
 
 OpenAPI::Client::OpenAI::Path::organization-invites - Documentation for the /organization/invites path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</organization/invites>.
+=head2 GET /organization/invites
 
-=head1 PATHS
+=head3 list-invites
 
-
-=head2 C<GET /organization/invites>
-
-List invites
-
+  $client->list_invites({
+      body => { ... },
+  });
 
 Returns a list of invites in the organization.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
+=item * C<limit> (in query, optional, integer) - A limit on the number of objects to be returned. Limit can range between 1 and
+100, and the default is 20.
 
-C<list-invites>
+Default: 20
 
-    $client->list-invites( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<limit> (in query) (Optional) - A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.
-
-
-Type: C<integer>
-
-
-Default: C<20>
-
-
-=item * C<after> (in query) (Optional) - A cursor for use in pagination. `after` is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include after=obj_foo in order to fetch the next page of the list.
-
-
-Type: C<string>
-
-
+=item * C<after> (in query, optional, string) - A cursor for use in pagination. C<after> is an object ID that defines your
+place in the list. For instance, if you make a list request and receive 100
+objects, ending with obj_foo, your subsequent call can include after=obj_foo
+in order to fetch the next page of the list.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - Invites listed successfully.>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-Invites listed successfully.
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
-
-    {
-       "data" : [
-          "{\n  \"object\": \"organization.invite\",\n  \"id\": \"invite-abc\",\n  \"email\": \"user@example.com\",\n  \"role\": \"owner\",\n  \"status\": \"accepted\",\n  \"invited_at\": 1711471533,\n  \"expires_at\": 1711471533,\n  \"accepted_at\": 1711471533,\n  \"projects\": [\n    {\n      \"id\": \"project-xyz\",\n      \"role\": \"member\"\n    }\n  ]\n}\n"
-       ]
-    }
-
-
-=back
-
-=head2 C<POST /organization/invites>
-
-Create invite
-
-
-Create an invite for a user to the organization. The invite must be accepted by the user before they have access to the organization.
-
-
-
-=head3 Operation ID
-
-C<inviteUser>
-
-    $client->inviteUser( ... );
-
-=head3 Parameters
-
-=over 4
-
-=back
-
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
-
-    
-      
-
-      
-      
 Example:
 
     {
-       "projects" : [
-          null
-       ]
+       "data" : [
+          "{\n  \"object\": \"organization.invite\",\n  \"id\": \"invite-abc\",\n  \"email\": \"user@example.com\",\n  \"role\": \"owner\",\n  \"status\": \"accepted\",\n  \"created_at\": 1711471533,\n  \"expires_at\": 1711471533,\n  \"accepted_at\": 1711471533,\n  \"projects\": [\n    {\n      \"id\": \"project-xyz\",\n      \"role\": \"member\"\n    }\n  ]\n}\n"
+       ],
+       "first_id" : "string",
+       "has_more" : false,
+       "last_id" : "string",
+       "object" : "list"
     }
 
+=head2 POST /organization/invites
 
-             
+=head3 inviteUser
 
-=head3 Responses
+  $client->invite_user({
+      body => { ... },
+  });
 
+Create an invite for a user to the organization. The invite must be accepted
+by the user before they have access to the organization.
 
-=head4 Status Code: C<200>
+=head4 Responses
 
-User invited successfully.
+B<200 - User invited successfully.>
 
+Content-Type: application/json
 
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-      "object": "organization.invite",
-      "id": "invite-abc",
-      "email": "user@example.com",
-      "role": "owner",
-      "status": "accepted",
-      "invited_at": 1711471533,
-      "expires_at": 1711471533,
-      "accepted_at": 1711471533,
-      "projects": [
-        {
-          "id": "project-xyz",
-          "role": "member"
-        }
-      ]
+       "accepted_at" : 1711471533,
+       "created_at" : 1711471533,
+       "email" : "user@example.com",
+       "expires_at" : 1711471533,
+       "id" : "invite-abc",
+       "object" : "organization.invite",
+       "projects" : [
+          {
+             "id" : "project-xyz",
+             "role" : "member"
+          }
+       ],
+       "role" : "owner",
+       "status" : "accepted"
     }
 
+=head1 SCHEMAS
+
+=head2 Invite
+
+Properties:
+
+=over
+
+=item * C<accepted_at> (anyOf) - The Unix timestamp (in seconds) of when the invite was accepted.
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) of when the invite was sent.
+
+=item * C<email> (string, required) - The email address of the individual to whom the invite was sent
+
+=item * C<expires_at> (anyOf) - The Unix timestamp (in seconds) of when the invite expires.
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints
+
+=item * C<object> (string, required) - The object type, which is always C<organization.invite>
+
+Allowed values: organization.invite
+
+=item * C<projects> (array of object, required) - The projects that were granted membership upon acceptance of the invite.
+
+=item * C<role> (string, required) - C<owner> or C<reader>
+
+Allowed values: owner, reader
+
+=item * C<status> (string, required) - C<accepted> ,C<expired>, or C<pending>
+
+Allowed values: accepted, expired, pending
+
+=back
+
+=head2 InviteListResponse
+
+Properties:
+
+=over
+
+=item * C<data> (array of Invite, required)
+
+=item * C<first_id> (anyOf) - The first C<invite_id> in the retrieved C<list>
+
+=item * C<has_more> (boolean, required) - The C<has_more> property is used for pagination to indicate there are
+additional results.
+
+=item * C<last_id> (anyOf) - The last C<invite_id> in the retrieved C<list>
+
+=item * C<object> (string, required) - The object type, which is always C<list>
+
+Allowed values: list
+
+=back
+
+=head2 InviteRequest
+
+Properties:
+
+=over
+
+=item * C<email> (string, required) - Send an email to this address
+
+=item * C<projects> (array of object) - An array of projects to which membership is granted at the same time the org
+invite is accepted. If omitted, the user will be invited to the default
+project for compatibility with legacy behavior. If empty list is passed, the
+user will not be invited to any projects, including the default one.
+
+=item * C<role> (string, required) - C<owner> or C<reader>
+
+Allowed values: reader, owner
 
 =back
 

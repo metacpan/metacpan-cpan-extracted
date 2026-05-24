@@ -4,211 +4,375 @@
 
 OpenAPI::Client::OpenAI::Path::threads-runs - Documentation for the /threads/runs path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</threads/runs>.
+=head2 POST /threads/runs
 
-=head1 PATHS
+=head3 createThreadAndRun
 
-
-=head2 C<POST /threads/runs>
-
-Create thread and run
-
+  $client->create_thread_and_run({
+      body => { ... },
+  });
 
 Create a thread and run it in one request.
 
+=head4 Request body
 
+Content-Type: application/json
 
-=head3 Operation ID
-
-C<createThreadAndRun>
-
-    $client->createThreadAndRun( ... );
-
-=head3 Parameters
-
-=over 4
-
-=back
-
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
-
-    
-      
-
-      
-
-=head4 Models
-
-The ID of the L<Model|https://platform.openai.com/docs/api-reference/models> to be used to execute this run. If a value is provided here, it will override the model associated with the assistant. If not, the model associated with the assistant will be used.
-
-=over 4
-      
-=item * C<gpt-5>
-
-=item * C<gpt-5-mini>
-
-=item * C<gpt-5-nano>
-
-=item * C<gpt-5-2025-08-07>
-
-=item * C<gpt-5-mini-2025-08-07>
-
-=item * C<gpt-5-nano-2025-08-07>
-
-=item * C<gpt-4.1>
-
-=item * C<gpt-4.1-mini>
-
-=item * C<gpt-4.1-nano>
-
-=item * C<gpt-4.1-2025-04-14>
-
-=item * C<gpt-4.1-mini-2025-04-14>
-
-=item * C<gpt-4.1-nano-2025-04-14>
-
-=item * C<gpt-4o>
-
-=item * C<gpt-4o-2024-11-20>
-
-=item * C<gpt-4o-2024-08-06>
-
-=item * C<gpt-4o-2024-05-13>
-
-=item * C<gpt-4o-mini>
-
-=item * C<gpt-4o-mini-2024-07-18>
-
-=item * C<gpt-4.5-preview>
-
-=item * C<gpt-4.5-preview-2025-02-27>
-
-=item * C<gpt-4-turbo>
-
-=item * C<gpt-4-turbo-2024-04-09>
-
-=item * C<gpt-4-0125-preview>
-
-=item * C<gpt-4-turbo-preview>
-
-=item * C<gpt-4-1106-preview>
-
-=item * C<gpt-4-vision-preview>
-
-=item * C<gpt-4>
-
-=item * C<gpt-4-0314>
-
-=item * C<gpt-4-0613>
-
-=item * C<gpt-4-32k>
-
-=item * C<gpt-4-32k-0314>
-
-=item * C<gpt-4-32k-0613>
-
-=item * C<gpt-3.5-turbo>
-
-=item * C<gpt-3.5-turbo-16k>
-
-=item * C<gpt-3.5-turbo-0613>
-
-=item * C<gpt-3.5-turbo-1106>
-
-=item * C<gpt-3.5-turbo-0125>
-
-=item * C<gpt-3.5-turbo-16k-0613>
-
-=back
-      
-      
 Example:
 
     {
+       "assistant_id" : "asst_abc123",
+       "cancelled_at" : null,
+       "completed_at" : null,
+       "created_at" : 1699076792,
+       "expires_at" : 1699077392,
+       "failed_at" : null,
+       "id" : "run_abc123",
+       "incomplete_details" : null,
+       "instructions" : "You are a helpful assistant.",
+       "last_error" : null,
+       "max_completion_tokens" : null,
+       "max_prompt_tokens" : null,
+       "metadata" : {},
+       "model" : "gpt-4o",
+       "object" : "thread.run",
+       "parallel_tool_calls" : true,
+       "required_action" : null,
+       "response_format" : "auto",
+       "started_at" : null,
+       "status" : "queued",
        "temperature" : 1,
-       "thread" : {
-          "messages" : [
-             null
-          ]
+       "thread_id" : "thread_abc123",
+       "tool_choice" : "auto",
+       "tool_resources" : {},
+       "tools" : [],
+       "top_p" : 1,
+       "truncation_strategy" : {
+          "last_messages" : null,
+          "type" : "auto"
        },
-       "tool_resources" : {
-          "code_interpreter" : {
-             "file_ids" : [
-                null
-             ]
-          },
-          "file_search" : {
-             "vector_store_ids" : [
-                null
-             ]
-          }
-       },
-       "tools" : [
-          null
-       ],
-       "top_p" : 1
+       "usage" : null
     }
 
+=head4 Responses
 
-             
+B<200 - OK>
 
-=head3 Responses
+Content-Type: application/json
 
-
-=head4 Status Code: C<200>
-
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-      "id": "run_abc123",
-      "object": "thread.run",
-      "created_at": 1698107661,
-      "assistant_id": "asst_abc123",
-      "thread_id": "thread_abc123",
-      "status": "completed",
-      "started_at": 1699073476,
-      "expires_at": null,
-      "cancelled_at": null,
-      "failed_at": null,
-      "completed_at": 1699073498,
-      "last_error": null,
-      "model": "gpt-4o",
-      "instructions": null,
-      "tools": [{"type": "file_search"}, {"type": "code_interpreter"}],
-      "metadata": {},
-      "incomplete_details": null,
-      "usage": {
-        "prompt_tokens": 123,
-        "completion_tokens": 456,
-        "total_tokens": 579
-      },
-      "temperature": 1.0,
-      "top_p": 1.0,
-      "max_prompt_tokens": 1000,
-      "max_completion_tokens": 1000,
-      "truncation_strategy": {
-        "type": "auto",
-        "last_messages": null
-      },
-      "response_format": "auto",
-      "tool_choice": "auto",
-      "parallel_tool_calls": true
+       "assistant_id" : "asst_abc123",
+       "cancelled_at" : null,
+       "completed_at" : null,
+       "created_at" : 1699076792,
+       "expires_at" : 1699077392,
+       "failed_at" : null,
+       "id" : "run_abc123",
+       "incomplete_details" : null,
+       "instructions" : "You are a helpful assistant.",
+       "last_error" : null,
+       "max_completion_tokens" : null,
+       "max_prompt_tokens" : null,
+       "metadata" : {},
+       "model" : "gpt-4o",
+       "object" : "thread.run",
+       "parallel_tool_calls" : true,
+       "required_action" : null,
+       "response_format" : "auto",
+       "started_at" : null,
+       "status" : "queued",
+       "temperature" : 1,
+       "thread_id" : "thread_abc123",
+       "tool_choice" : "auto",
+       "tool_resources" : {},
+       "tools" : [],
+       "top_p" : 1,
+       "truncation_strategy" : {
+          "last_messages" : null,
+          "type" : "auto"
+       },
+       "usage" : null
     }
 
+=head1 SCHEMAS
+
+=head2 AssistantsApiResponseFormatOption
+
+Specifies the format that the model must output. Compatible with
+L<GPT-4o|https://platform.openai.com/docs/models#gpt-4o> ,
+L<GPT-4 Turbo|https://platform.openai.com/docs/models#gpt-4-turbo-and-gpt-4> ,
+and all GPT-3.5 Turbo models since C<gpt-3.5-turbo-1106> .
+
+Setting to C<{ "type": "json_schema", "json_schema": {...} }> enables
+Structured Outputs which ensures the model will match your supplied JSON
+schema. Learn more in the
+L<Structured Outputs guide|https://platform.openai.com/docs/guides/structured-outputs>
+.
+
+Setting to C<{ "type": "json_object" }> enables JSON mode, which ensures the
+message the model generates is valid JSON.
+
+B<Important:> when using JSON mode, you B<must> also instruct the model to
+produce JSON yourself via a system or user message. Without this, the model
+may generate an unending stream of whitespace until the generation reaches the
+token limit, resulting in a long-running and seemingly "stuck" request. Also
+note that the message content may be partially cut off if
+C<finish_reason="length"> , which indicates the generation exceeded
+C<max_tokens> or the conversation exceeded the max context length.
+
+=head2 CreateMessageRequest
+
+Properties:
+
+=over
+
+=item * C<attachments> (anyOf)
+
+=item * C<content> (oneOf, required)
+
+=item * C<metadata> (Metadata)
+
+See L</Metadata> below for shape.
+
+=item * C<role> (string, required) - The role of the entity that is creating the message. Allowed values include: -
+C<user> : Indicates the message is sent by an actual user and should be used
+in most cases to represent user-generated messages. - C<assistant> : Indicates
+the message is generated by the assistant. Use this value to insert messages
+from the assistant into the conversation.
+
+Allowed values: user, assistant
+
+=back
+
+=head2 CreateThreadAndRunRequest
+
+Properties:
+
+=over
+
+=item * C<assistant_id> (string, required) - The ID of the
+L<assistant|https://platform.openai.com/docs/api-reference/assistants> to use
+to execute this run.
+
+=item * C<instructions> (string) - Override the default system message of the assistant. This is useful for
+modifying the behavior on a per-run basis.
+
+=item * C<max_completion_tokens> (integer) - The maximum number of completion tokens that may be used over the course of
+the run. The run will make a best effort to use only the number of completion
+tokens specified, across multiple turns of the run. If the run exceeds the
+number of completion tokens specified, the run will end with status
+C<incomplete> . See C<incomplete_details> for more info.
+
+=item * C<max_prompt_tokens> (integer) - The maximum number of prompt tokens that may be used over the course of the
+run. The run will make a best effort to use only the number of prompt tokens
+specified, across multiple turns of the run. If the run exceeds the number of
+prompt tokens specified, the run will end with status C<incomplete> . See
+C<incomplete_details> for more info.
+
+=item * C<metadata> (Metadata)
+
+See L</Metadata> below for shape.
+
+=item * C<model> (anyOf) - The ID of the L<Model|https://platform.openai.com/docs/api-reference/models>
+to be used to execute this run. If a value is provided here, it will override
+the model associated with the assistant. If not, the model associated with the
+assistant will be used.
+
+=item * C<parallel_tool_calls> (ParallelToolCalls)
+
+See L</ParallelToolCalls> below for shape.
+
+=item * C<response_format> (AssistantsApiResponseFormatOption)
+
+See L</AssistantsApiResponseFormatOption> below for shape.
+
+=item * C<stream> (boolean) - If C<true> , returns a stream of events that happen during the Run as
+server-sent events, terminating when the Run enters a terminal state with a
+C<data: [DONE]> message.
+
+=item * C<temperature> (number) - What sampling temperature to use, between 0 and 2. Higher values like 0.8 will
+make the output more random, while lower values like 0.2 will make it more
+focused and deterministic.
+
+Default: 1
+
+=item * C<thread> (CreateThreadRequest)
+
+See L</CreateThreadRequest> below for shape.
+
+=item * C<tool_choice> (allOf)
+
+=item * C<tool_resources> (object) - A set of resources that are used by the assistant's tools. The resources are
+specific to the type of tool. For example, the C<code_interpreter> tool
+requires a list of file IDs, while the C<file_search> tool requires a list of
+vector store IDs.
+
+=item * C<tools> (array of object) - Override the tools the assistant can use for this run. This is useful for
+modifying the behavior on a per-run basis.
+
+=item * C<top_p> (number) - An alternative to sampling with temperature, called nucleus sampling, where
+the model considers the results of the tokens with top_p probability mass. So
+0.1 means only the tokens comprising the top 10% probability mass are
+considered.
+
+We generally recommend altering this or temperature but not both.
+
+Default: 1
+
+=item * C<truncation_strategy> (allOf)
+
+=back
+
+=head2 CreateThreadRequest
+
+Properties:
+
+=over
+
+=item * C<messages> (array of CreateMessageRequest) - A list of L<messages|https://platform.openai.com/docs/api-reference/messages>
+to start the thread with.
+
+=item * C<metadata> (Metadata)
+
+See L</Metadata> below for shape.
+
+=item * C<tool_resources> (anyOf)
+
+=back
+
+=head2 Metadata
+
+Set of 16 key-value pairs that can be attached to an object. This can be
+useful for storing additional information about the object in a structured
+format, and querying for objects via API or the dashboard.
+
+Keys are strings with a maximum length of 64 characters. Values are strings
+with a maximum length of 512 characters.
+
+=head2 ParallelToolCalls
+
+Whether to enable
+L<parallel function calling|https://platform.openai.com/docs/guides/function-calling#configuring-parallel-function-calling>
+during tool use.
+
+=head2 RunCompletionUsage
+
+Usage statistics related to the run. This value will be C<null> if the run is
+not in a terminal state (i.e. C<in_progress> , C<queued> , etc.).
+
+=head2 RunObject
+
+Properties:
+
+=over
+
+=item * C<assistant_id> (string, required) - The ID of the
+L<assistant|https://platform.openai.com/docs/api-reference/assistants> used
+for execution of this run.
+
+=item * C<cancelled_at> (integer, required) - The Unix timestamp (in seconds) for when the run was cancelled.
+
+=item * C<completed_at> (integer, required) - The Unix timestamp (in seconds) for when the run was completed.
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) for when the run was created.
+
+=item * C<expires_at> (integer, required) - The Unix timestamp (in seconds) for when the run will expire.
+
+=item * C<failed_at> (integer, required) - The Unix timestamp (in seconds) for when the run failed.
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints.
+
+=item * C<incomplete_details> (object, required) - Details on why the run is incomplete. Will be C<null> if the run is not
+incomplete.
+
+=item * C<instructions> (string, required) - The instructions that the
+L<assistant|https://platform.openai.com/docs/api-reference/assistants> used
+for this run.
+
+=item * C<last_error> (object, required) - The last error associated with this run. Will be C<null> if there are no
+errors.
+
+=item * C<max_completion_tokens> (integer, required) - The maximum number of completion tokens specified to have been used over the
+course of the run.
+
+=item * C<max_prompt_tokens> (integer, required) - The maximum number of prompt tokens specified to have been used over the
+course of the run.
+
+=item * C<metadata> (Metadata, required)
+
+See L</Metadata> below for shape.
+
+=item * C<model> (string, required) - The model that the
+L<assistant|https://platform.openai.com/docs/api-reference/assistants> used
+for this run.
+
+=item * C<object> (string, required) - The object type, which is always C<thread.run> .
+
+Allowed values: thread.run
+
+=item * C<parallel_tool_calls> (ParallelToolCalls, required)
+
+See L</ParallelToolCalls> below for shape.
+
+=item * C<required_action> (object, required) - Details on the action required to continue the run. Will be C<null> if no
+action is required.
+
+=item * C<response_format> (AssistantsApiResponseFormatOption, required)
+
+See L</AssistantsApiResponseFormatOption> below for shape.
+
+=item * C<started_at> (integer, required) - The Unix timestamp (in seconds) for when the run was started.
+
+=item * C<status> (string, required) - The status of the run, which can be either C<queued> , C<in_progress> ,
+C<requires_action> , C<cancelling> , C<cancelled> , C<failed> , C<completed> ,
+C<incomplete> , or C<expired> .
+
+Allowed values: queued, in_progress, requires_action, cancelling, cancelled, failed, completed, incomplete, expired
+
+=item * C<temperature> (number) - The sampling temperature used for this run. If not set, defaults to 1.
+
+=item * C<thread_id> (string, required) - The ID of the L<thread|https://platform.openai.com/docs/api-reference/threads>
+that was executed on as a part of this run.
+
+=item * C<tool_choice> (allOf, required)
+
+=item * C<tools> (array of object, required) - The list of tools that the
+L<assistant|https://platform.openai.com/docs/api-reference/assistants> used
+for this run.
+
+Default: []
+
+=item * C<top_p> (number) - The nucleus sampling value used for this run. If not set, defaults to 1.
+
+=item * C<truncation_strategy> (allOf, required)
+
+=item * C<usage> (RunCompletionUsage, required)
+
+See L</RunCompletionUsage> below for shape.
+
+=back
+
+=head2 RunToolCallObject
+
+Properties:
+
+=over
+
+=item * C<function> (object, required) - The function definition.
+
+=item * C<id> (string, required) - The ID of the tool call. This ID must be referenced when you submit the tool
+outputs in using the
+L<Submit tool outputs to run|https://platform.openai.com/docs/api-reference/runs/submitToolOutputs>
+endpoint.
+
+=item * C<type> (string, required) - The type of tool call the output is required for. For now, this is always
+C<function> .
+
+Allowed values: function
 
 =back
 

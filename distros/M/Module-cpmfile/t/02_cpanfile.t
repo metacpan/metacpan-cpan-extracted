@@ -1,5 +1,6 @@
-use strict;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
 use Test2::V0;
 use lib "t/lib";
 use Util;
@@ -12,7 +13,7 @@ my $cpmfile = Module::cpmfile->from_cpanfile($cpanfile);
 note dumper $cpmfile;
 
 my $features = $cpmfile->features;
-my @name = keys %$features;
+my @name = keys $features->%*;
 is \@name, ["name"];
 
 is $features->{name}{description}, "desc";

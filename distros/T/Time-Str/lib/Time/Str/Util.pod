@@ -1,0 +1,68 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Time::Str::Util - Binary search utilities for sorted arrays
+
+=head1 SYNOPSIS
+
+    use Time::Str::Util qw( lower_bound upper_bound );
+
+    my @sorted = (10, 20, 30, 40, 50);
+
+    my $i = lower_bound(\@sorted, 25);  # 2 (first element >= 25)
+    my $j = upper_bound(\@sorted, 30);  # 3 (first element >  30)
+
+    # With optional bounds
+    my $k = lower_bound(\@sorted, 25, 1, 4);  # search within [1, 4)
+
+=head1 DESCRIPTION
+
+This module provides binary search functions for sorted integer arrays,
+following the C++ STL convention. All functions are exportable on request.
+Use C<:all> to import everything.
+
+=head1 FUNCTIONS
+
+=head2 lower_bound
+
+    my $index = lower_bound($arrayref, $value);
+    my $index = lower_bound($arrayref, $value, $lo, $hi);
+
+Returns the index of the first element in the sorted array that is
+greater than or equal to C<$value>. If all elements are less than
+C<$value>, returns the length of the array (one past the last index).
+
+Optional C<$lo> and C<$hi> parameters restrict the search to the
+half-open range C<[$lo, $hi)>. Defaults to C<[0, length)>.
+
+=head2 upper_bound
+
+    my $index = upper_bound($arrayref, $value);
+    my $index = upper_bound($arrayref, $value, $lo, $hi);
+
+Returns the index of the first element in the sorted array that is
+strictly greater than C<$value>. If all elements are less than or
+equal to C<$value>, returns the length of the array.
+
+Optional C<$lo> and C<$hi> parameters restrict the search to the
+half-open range C<[$lo, $hi)>. Defaults to C<[0, length)>.
+
+=head1 SEE ALSO
+
+L<Time::Str>
+
+=head1 AUTHOR
+
+Christian Hansen
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 by Christian Hansen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

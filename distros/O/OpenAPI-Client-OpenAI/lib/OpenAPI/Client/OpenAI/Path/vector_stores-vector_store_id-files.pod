@@ -4,99 +4,60 @@
 
 OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-files - Documentation for the /vector_stores/{vector_store_id}/files path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</vector_stores/{vector_store_id}/files>.
+=head2 GET /vector_stores/{vector_store_id}/files
 
-=head1 PATHS
+=head3 listVectorStoreFiles
 
-
-=head2 C<GET /vector_stores/{vector_store_id}/files>
-
-List vector store files
-
+  $client->list_vector_store_files({
+      body => { ... },
+  });
 
 Returns a list of vector store files.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
+=item * C<vector_store_id> (in path, required, string) - The ID of the vector store that the files belong to.
 
-C<listVectorStoreFiles>
+=item * C<limit> (in query, optional, integer) - A limit on the number of objects to be returned. Limit can range between 1 and
+100, and the default is 20.
 
-    $client->listVectorStoreFiles( ... );
+Default: 20
 
-=head3 Parameters
+=item * C<order> (in query, optional, string) - Sort order by the C<created_at> timestamp of the objects. C<asc> for ascending
+order and C<desc> for descending order.
 
-=over 4
+Allowed values: asc, desc
 
-=item * C<vector_store_id> (in path) (Required) - The ID of the vector store that the files belong to.
+Default: desc
 
-Type: C<string>
+=item * C<after> (in query, optional, string) - A cursor for use in pagination. C<after> is an object ID that defines your
+place in the list. For instance, if you make a list request and receive 100
+objects, ending with obj_foo, your subsequent call can include after=obj_foo
+in order to fetch the next page of the list.
 
+=item * C<before> (in query, optional, string) - A cursor for use in pagination. C<before> is an object ID that defines your
+place in the list. For instance, if you make a list request and receive 100
+objects, starting with obj_foo, your subsequent call can include
+before=obj_foo in order to fetch the previous page of the list.
 
+=item * C<filter> (in query, optional, string) - Filter by file status. One of C<in_progress> , C<completed> , C<failed> ,
+C<cancelled> .
 
-=item * C<limit> (in query) (Optional) - A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.
-
-
-Type: C<integer>
-
-
-Default: C<20>
-
-
-=item * C<order> (in query) (Optional) - Sort order by the `created_at` timestamp of the objects. `asc` for ascending order and `desc` for descending order.
-
-
-Type: C<string>
-
-Allowed values: C<asc, desc>
-
-
-Default: C<desc>
-
-
-=item * C<after> (in query) (Optional) - A cursor for use in pagination. `after` is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include after=obj_foo in order to fetch the next page of the list.
-
-
-Type: C<string>
-
-
-
-=item * C<before> (in query) (Optional) - A cursor for use in pagination. `before` is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, starting with obj_foo, your subsequent call can include before=obj_foo in order to fetch the previous page of the list.
-
-
-Type: C<string>
-
-
-
-=item * C<filter> (in query) (Optional) - Filter by file status. One of `in_progress`, `completed`, `failed`, `cancelled`.
-
-Type: C<string>
-
-Allowed values: C<in_progress, completed, failed, cancelled>
-
-
+Allowed values: in_progress, completed, failed, cancelled
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - OK>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
        "data" : [
@@ -108,81 +69,148 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
        "object" : "list"
     }
 
+=head2 POST /vector_stores/{vector_store_id}/files
+
+=head3 createVectorStoreFile
+
+  $client->create_vector_store_file({
+      body => { ... },
+  });
+
+Create a vector store file by attaching a
+L<File|https://platform.openai.com/docs/api-reference/files> to a
+L<vector store|https://platform.openai.com/docs/api-reference/vector-stores/object>
+.
+
+This endpoint is subject to a per-vector-store write rate limit of 300
+requests per minute, shared with
+C</vector_stores/{vector_store_id}/file_batches> . For uploading multiple
+files to the same vector store, use the file batches endpoint to reduce
+request volume.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<vector_store_id> (in path, required, string) - The ID of the vector store for which to create a File.
 
 =back
 
-=head2 C<POST /vector_stores/{vector_store_id}/files>
+=head4 Responses
 
-Create vector store file
+B<200 - OK>
 
+Content-Type: application/json
 
-Create a vector store file by attaching a L<File|https://platform.openai.com/docs/api-reference/files> to a L<vector store|https://platform.openai.com/docs/api-reference/vector-stores/object>.
-
-
-
-=head3 Operation ID
-
-C<createVectorStoreFile>
-
-    $client->createVectorStoreFile( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<vector_store_id> (in path) (Required) - The ID of the vector store for which to create a File.
-
-
-Type: C<string>
-
-
-
-=back
-
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
-
-    
-      
-
-      
-             
-
-=head3 Responses
-
-
-=head4 Status Code: C<200>
-
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-      "id": "file-abc123",
-      "object": "vector_store.file",
-      "usage_bytes": 1234,
-      "created_at": 1698107661,
-      "vector_store_id": "vs_abc123",
-      "status": "completed",
-      "last_error": null,
-      "chunking_strategy": {
-        "type": "static",
-        "static": {
-          "max_chunk_size_tokens": 800,
-          "chunk_overlap_tokens": 400
-        }
-      }
+       "chunking_strategy" : {
+          "static" : {
+             "chunk_overlap_tokens" : 400,
+             "max_chunk_size_tokens" : 800
+          },
+          "type" : "static"
+       },
+       "created_at" : 1698107661,
+       "id" : "file-abc123",
+       "last_error" : null,
+       "object" : "vector_store.file",
+       "status" : "completed",
+       "usage_bytes" : 1234,
+       "vector_store_id" : "vs_abc123"
     }
 
+=head1 SCHEMAS
+
+=head2 ChunkingStrategyRequestParam
+
+The chunking strategy used to chunk the file(s). If not set, will use the
+C<auto> strategy.
+
+=head2 CreateVectorStoreFileRequest
+
+Properties:
+
+=over
+
+=item * C<attributes> (VectorStoreFileAttributes)
+
+See L</VectorStoreFileAttributes> below for shape.
+
+=item * C<chunking_strategy> (ChunkingStrategyRequestParam)
+
+See L</ChunkingStrategyRequestParam> below for shape.
+
+=item * C<file_id> (string, required) - A L<File|https://platform.openai.com/docs/api-reference/files> ID that the
+vector store should use. Useful for tools like C<file_search> that can access
+files. For multi-file ingestion, we recommend
+L<C<file_batches>|https://platform.openai.com/docs/api-reference/vector-stores-file-batches/createBatch>
+to minimize per-vector-store write requests.
+
+=back
+
+=head2 ListVectorStoreFilesResponse
+
+Properties:
+
+=over
+
+=item * C<data> (array of VectorStoreFileObject, required)
+
+=item * C<first_id> (string, required)
+
+=item * C<has_more> (boolean, required)
+
+=item * C<last_id> (string, required)
+
+=item * C<object> (string, required)
+
+=back
+
+=head2 VectorStoreFileAttributes
+
+Set of 16 key-value pairs that can be attached to an object. This can be
+useful for storing additional information about the object in a structured
+format, and querying for objects via API or the dashboard. Keys are strings
+with a maximum length of 64 characters. Values are strings with a maximum
+length of 512 characters, booleans, or numbers.
+
+=head2 VectorStoreFileObject
+
+Properties:
+
+=over
+
+=item * C<attributes> (VectorStoreFileAttributes)
+
+See L</VectorStoreFileAttributes> below for shape.
+
+=item * C<chunking_strategy> (object) - The strategy used to chunk the file.
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) for when the vector store file was created.
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints.
+
+=item * C<last_error> (anyOf, required)
+
+=item * C<object> (string, required) - The object type, which is always C<vector_store.file> .
+
+Allowed values: vector_store.file
+
+=item * C<status> (string, required) - The status of the vector store file, which can be either C<in_progress> ,
+C<completed> , C<cancelled> , or C<failed> . The status C<completed> indicates
+that the vector store file is ready for use.
+
+Allowed values: in_progress, completed, cancelled, failed
+
+=item * C<usage_bytes> (integer, required) - The total vector store usage in bytes. Note that this may be different from
+the original file size.
+
+=item * C<vector_store_id> (string, required) - The ID of the
+L<vector store|https://platform.openai.com/docs/api-reference/vector-stores/object>
+that the L<File|https://platform.openai.com/docs/api-reference/files> is
+attached to.
 
 =back
 

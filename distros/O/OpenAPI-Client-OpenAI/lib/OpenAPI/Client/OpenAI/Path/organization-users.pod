@@ -4,80 +4,115 @@
 
 OpenAPI::Client::OpenAI::Path::organization-users - Documentation for the /organization/users path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</organization/users>.
+=head2 GET /organization/users
 
-=head1 PATHS
+=head3 list-users
 
-
-=head2 C<GET /organization/users>
-
-List users
-
+  $client->list_users({
+      body => { ... },
+  });
 
 Lists all of the users in the organization.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
+=item * C<limit> (in query, optional, integer) - A limit on the number of objects to be returned. Limit can range between 1 and
+100, and the default is 20.
 
-C<list-users>
+Default: 20
 
-    $client->list-users( ... );
+=item * C<after> (in query, optional, string) - A cursor for use in pagination. C<after> is an object ID that defines your
+place in the list. For instance, if you make a list request and receive 100
+objects, ending with obj_foo, your subsequent call can include after=obj_foo
+in order to fetch the next page of the list.
 
-=head3 Parameters
-
-=over 4
-
-=item * C<limit> (in query) (Optional) - A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.
-
-
-Type: C<integer>
-
-
-Default: C<20>
-
-
-=item * C<after> (in query) (Optional) - A cursor for use in pagination. `after` is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include after=obj_foo in order to fetch the next page of the list.
-
-
-Type: C<string>
-
-
-
-=item * C<emails> (in query) (Optional) - Filter by the email address of users.
-
-Type: C<array>
-
-
+=item * C<emails> (in query, optional, array) - Filter by the email address of users.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - Users listed successfully.>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-Users listed successfully.
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
        "data" : [
           "{\n    \"object\": \"organization.user\",\n    \"id\": \"user_abc\",\n    \"name\": \"First Last\",\n    \"email\": \"user@example.com\",\n    \"role\": \"owner\",\n    \"added_at\": 1711471533\n}\n"
-       ]
+       ],
+       "first_id" : "string",
+       "has_more" : false,
+       "last_id" : "string",
+       "object" : "list"
     }
 
+=head1 SCHEMAS
+
+=head2 User
+
+Properties:
+
+=over
+
+=item * C<added_at> (integer, required) - The Unix timestamp (in seconds) of when the user was added.
+
+=item * C<api_key_last_used_at> (anyOf) - The Unix timestamp (in seconds) of the user's last API key usage.
+
+=item * C<created> (integer) - The Unix timestamp (in seconds) of when the user was created.
+
+=item * C<developer_persona> (anyOf) - The developer persona metadata for the user.
+
+=item * C<email> (anyOf) - The email address of the user
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints
+
+=item * C<is_default> (boolean) - Whether this is the organization's default user.
+
+=item * C<is_scale_tier_authorized_purchaser> (anyOf) - Whether the user is an authorized purchaser for Scale Tier.
+
+=item * C<is_scim_managed> (boolean) - Whether the user is managed through SCIM.
+
+=item * C<is_service_account> (boolean) - Whether the user is a service account.
+
+=item * C<name> (anyOf) - The name of the user
+
+=item * C<object> (string, required) - The object type, which is always C<organization.user>
+
+Allowed values: organization.user
+
+=item * C<projects> (anyOf) - Projects associated with the user, if included.
+
+=item * C<role> (anyOf) - C<owner> or C<reader>
+
+=item * C<technical_level> (anyOf) - The technical level metadata for the user.
+
+=item * C<user> (object) - Nested user details.
+
+=back
+
+=head2 UserListResponse
+
+Properties:
+
+=over
+
+=item * C<data> (array of User, required)
+
+=item * C<first_id> (anyOf)
+
+=item * C<has_more> (boolean, required)
+
+=item * C<last_id> (anyOf)
+
+=item * C<object> (string, required)
+
+Allowed values: list
 
 =back
 

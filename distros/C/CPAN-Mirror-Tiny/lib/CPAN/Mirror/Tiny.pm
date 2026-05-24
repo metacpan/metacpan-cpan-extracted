@@ -1,9 +1,10 @@
-package CPAN::Mirror::Tiny;
-use 5.008001;
-use strict;
+package CPAN::Mirror::Tiny v1.0.0;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
 
-our $VERSION = '0.33';
+our $TRIAL = 0;
+
 
 use CPAN::Meta;
 use CPAN::Mirror::Tiny::Archive;
@@ -29,15 +30,13 @@ use constant WIN32 => $^O eq 'MSWin32';
 my $JSON = JSON->new->canonical(1)->utf8(1);
 my $CACHE_VERSION = 1;
 
-sub run3 {
-    my ($cmd, $outfile) = @_;
+sub run3 ($cmd, $outfile = undef) {
     my $out;
     IPC::Run3::run3 $cmd, \undef, ($outfile ? $outfile : \$out), \my $err;
     return ($out, $err, $?);
 }
 
-sub new {
-    my ($class, %option) = @_;
+sub new ($class, %option) {
     my $base = $option{base} || $ENV{PERL_CPAN_MIRROR_TINY_BASE} or die "Missing base directory argument";
     my $tempdir = $option{tempdir} || File::Temp::tempdir(CLEANUP => 1);
     File::Path::mkpath($base) unless -d $base;
@@ -53,8 +52,7 @@ sub new {
     $self->init_tools;
 }
 
-sub init_tools {
-    my $self = shift;
+sub init_tools ($self) {
     for my $cmd (qw(git tar gzip)) {
         $self->{$cmd} = File::Which::which($cmd)
             or die "Couldn't find $cmd; CPAN::Mirror::Tiny needs it";
@@ -62,31 +60,27 @@ sub init_tools {
     $self;
 }
 
-sub archive { shift->{archive} }
-sub http { shift->{http} }
+sub archive ($self) { $self->{archive} }
+sub http ($self) { $self->{http} }
 
-sub extract {
-    my ($self, $path) = @_;
+sub extract ($self, $path) {
     $self->archive->unpack($path);
 }
 
-sub base {
-    my $self = shift;
-    return $self->{base} unless @_;
-    File::Spec->catdir($self->{base}, @_);
+sub base ($self, @path) {
+    return $self->{base} unless @path;
+    File::Spec->catdir($self->{base}, @path);
 }
 
-sub tempdir { CPAN::Mirror::Tiny::Tempdir->new(shift->{tempdir}) }
-sub pushd_tempdir { CPAN::Mirror::Tiny::Tempdir->pushd(shift->{tempdir}) }
+sub tempdir ($self) { CPAN::Mirror::Tiny::Tempdir->new($self->{tempdir}) }
+sub pushd_tempdir ($self) { CPAN::Mirror::Tiny::Tempdir->pushd($self->{tempdir}) }
 
-sub _author_dir {
-    my ($self, $author) = @_;
+sub _author_dir ($self, $author) {
     my ($a2, $a1) = $author =~ /^((.).)/;
     $self->base("authors", "id", $a1, $a2, $author);
 }
 
-sub _locate_tarball {
-    my ($self, $file, $author) = @_;
+sub _locate_tarball ($self, $file, $author) {
     my $dir = $self->_author_dir($author);
     File::Path::mkpath($dir) unless -d $dir;
     my $basename = File::Basename::basename($file);
@@ -95,11 +89,9 @@ sub _locate_tarball {
     return -f $dest ? $dest : undef;
 }
 
-sub inject {
-    my ($self, $url, $option) = @_;
+sub inject ($self, $url, $option = undef) {
 
-    my $maybe_git = sub {
-        my $url = shift;
+    my $maybe_git = sub ($url) {
         scalar($url =~ m{\A https?:// (?:github\.com|bitbucket.org) / [^/]+ / [^/]+ \z}x);
     };
 
@@ -116,14 +108,12 @@ sub inject {
     }
 }
 
-sub _encode {
-    my $str = shift;
+sub _encode ($str) {
     $str =~ s/([^a-zA-Z0-9_\-.])/uc sprintf("%%%02x",ord($1))/eg;
     $str;
 }
 
-sub _cpan_url {
-    my ($self, $module, $version) = @_;
+sub _cpan_url ($self, $module, $version) {
     my $url = "https://fastapi.metacpan.org/v1/download_url/$module";
     $url .= "?version=" . _encode("== $version") if $version;
     my $res = $self->http->get($url);
@@ -136,19 +126,17 @@ sub _cpan_url {
     }
 }
 
-sub inject_local {
-    my ($self, $arg) = (shift, shift);
+sub inject_local ($self, $arg, @args) {
     if (-f $arg) {
-        return $self->inject_local_file($arg, @_);
+        return $self->inject_local_file($arg, @args);
     } elsif (-d $arg) {
-        return $self->inject_local_directory($arg, @_);
+        return $self->inject_local_directory($arg, @args);
     } else {
         die "$arg is neither file nor directory";
     }
 }
 
-sub inject_local_file {
-    my ($self, $file, $option) = @_;
+sub inject_local_file ($self, $file, $option) {
     die "'$file' is not a file" unless -f $file;
     die "'$file' must be tarball or zipball" if $file !~ /(?:\.tgz|\.tar\.gz|\.tar\.bz2|\.zip)$/;
     $file = Cwd::abs_path($file);
@@ -157,8 +145,7 @@ sub inject_local_file {
     return $self->inject_local_directory($dir, $option);
 }
 
-sub inject_local_directory {
-    my ($self, $dir, $option) = @_;
+sub inject_local_directory ($self, $dir, $option) {
     my $metafile = File::Spec->catfile($dir, "META.json");
     die "Missing META.json in $dir" unless -f $metafile;
     my $meta = CPAN::Meta->load_file($metafile);
@@ -173,8 +160,7 @@ sub inject_local_directory {
     return $self->_locate_tarball("$distvname.tar.gz", $author);
 }
 
-sub inject_http {
-    my ($self, $url, $option) = @_;
+sub inject_http ($self, $url, $option) {
     if ($url !~ /(?:\.tgz|\.tar\.gz|\.tar\.bz2|\.zip)$/) {
         die "URL must be tarball or zipball\n";
     }
@@ -198,8 +184,7 @@ sub inject_http {
     }
 }
 
-sub inject_cpan {
-    my ($self, $package, $option) = @_;
+sub inject_cpan ($self, $package, $option) {
     $package =~ s/^cpan://;
     my $version = $option->{version};
     if ($package =~ s/@(.+)$//) {
@@ -210,8 +195,7 @@ sub inject_cpan {
     $self->inject_http($url, $option);
 }
 
-sub inject_git {
-    my ($self, $url, $option) = @_;
+sub inject_git ($self, $url, $option) {
 
     my $ref = ($option ||= {})->{ref};
     if ($url =~ /(.*)\@(.*)$/) {
@@ -220,7 +204,7 @@ sub inject_git {
         my ($out, $err, $exit) = run3 [$self->{git}, "ls-remote", $leading];
         if ($exit == 0) {
             $ref = $remove;
-            $url =~ s/\@$remove$//;
+            $url = $leading;
         }
     }
 
@@ -252,8 +236,7 @@ sub inject_git {
     }
 }
 
-sub _cached {
-    my ($self, $path, $sub) = @_;
+sub _cached ($self, $path, $sub) {
     return unless -f $path;
     my $cache_dir = $self->base("modules", ".cache");
     File::Path::mkpath($cache_dir) unless -d $cache_dir;
@@ -281,36 +264,32 @@ sub _cached {
     $result;
 }
 
-sub extract_provides {
-    my ($self, $path) = @_;
+sub extract_provides ($self, $path) {
     $path = Cwd::abs_path($path);
-    $self->_cached($path, sub { $self->_extract_provides($path) });
+    $self->_cached($path, sub (@) { $self->_extract_provides($path) });
 }
 
-sub _extract_provides {
-    my ($self, $path) = @_;
+sub _extract_provides ($self, $path) {
     my $gurad = $self->pushd_tempdir;
     my $dir = $self->extract($path) or return;
     my $parser = Parse::LocalDistribution->new({ALLOW_DEV_VERSION => 1});
     $parser->parse($dir) || +{};
 }
 
-sub index_path {
-    my ($self, %option) = @_;
+sub index_path ($self, %option) {
     my $file = $self->base("modules", "02packages.details.txt");
     $option{compress} ? "$file.gz" : $file;
 }
 
-sub _win32_path_fix { my $path = shift; $path =~ s{\\}{/}g; $path }
+sub _win32_path_fix ($path) { $path =~ s{\\}{/}g; $path }
 
-sub index {
-    my ($self, %option) = @_;
+sub index ($self, %option) {
     my $base = $self->base("authors", "id");
     return unless -d $base;
 
     $base = _win32_path_fix($base) if WIN32;
     my @dist;
-    my $wanted = sub {
+    my $wanted = sub (@) {
         return unless -f;
         return unless /(?:\.tgz|\.tar\.gz|\.tar\.bz2|\.zip)$/;
         my $path = $_;
@@ -344,8 +323,7 @@ sub index {
     join '', @line;
 }
 
-sub write_index {
-    my ($self, %option) = @_;
+sub write_index ($self, %option) {
     my $file = $self->index_path;
     my $dir  = File::Basename::dirname($file);
     File::Path::mkpath($dir) unless -d $dir;
@@ -375,10 +353,9 @@ sub write_index {
 # Copyright (C) 2012 by Kenichi Ishigaki.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
-sub _update_packages {
-  my ($self, $packages, $info, $path, $mtime) = @_;
+sub _update_packages ($self, $packages, $info, $path, $mtime) {
 
-  for my $module (sort keys %$info) {
+  for my $module (sort keys $info->%*) {
     next unless exists $info->{$module}{version};
     my $new_version = $info->{$module}{version};
     if (!$packages->{$module}) { # shortcut
@@ -562,6 +539,13 @@ Second way:
 If you use L<cpm>, then:
 
   cpm install -r 02packages,file:///path/to/drakpan -r metadb Your::Module
+
+=head1 ARTIFACT ATTESTATIONS
+
+GitHub Artifact Attestations are generated for release tarballs uploaded to
+CPAN. If you care about provenance for the uploaded tarballs, see:
+
+L<https://github.com/skaji/CPAN-Mirror-Tiny/attestations>
 
 =head1 COPYRIGHT AND LICENSE
 

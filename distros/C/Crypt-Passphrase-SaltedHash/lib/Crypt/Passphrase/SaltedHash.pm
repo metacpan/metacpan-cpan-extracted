@@ -10,7 +10,7 @@ use parent 'Crypt::Passphrase::Validator';
 use Digest 1.19  ();
 use MIME::Base64 ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # ABSTRACT: Validate against Crypt::SaltedHash hashes with Crypt::Passphrase
 
@@ -75,7 +75,7 @@ Crypt::Passphrase::SaltedHash - Validate against Crypt::SaltedHash hashes with C
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

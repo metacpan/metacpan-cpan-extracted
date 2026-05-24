@@ -1,0 +1,188 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::audio-voice_consents-consent_id - Documentation for the /audio/voice_consents/{consent_id} path.
+
+=head1 OPERATIONS
+
+=head2 DELETE /audio/voice_consents/{consent_id}
+
+=head3 deleteVoiceConsent
+
+  $client->delete_voice_consent({
+      body => { ... },
+  });
+
+Deletes a voice consent recording.
+
+Delete a consent recording that was uploaded for creating custom voices.
+
+See the
+L<custom voices guide|https://platform.openai.com/docs/guides/text-to-speech#custom-voices>
+. Custom voices are limited to eligible customers.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<consent_id> (in path, required, string) - The ID of the consent recording to delete.
+
+=back
+
+=head4 Responses
+
+B<200 - OK>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "deleted" : true,
+       "id" : "cons_1234",
+       "object" : "audio.voice_consent"
+    }
+
+=head2 GET /audio/voice_consents/{consent_id}
+
+=head3 getVoiceConsent
+
+  $client->get_voice_consent({
+      body => { ... },
+  });
+
+Retrieves a voice consent recording.
+
+Retrieve consent recording metadata used for creating custom voices.
+
+See the
+L<custom voices guide|https://platform.openai.com/docs/guides/text-to-speech#custom-voices>
+. Custom voices are limited to eligible customers.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<consent_id> (in path, required, string) - The ID of the consent recording to retrieve.
+
+=back
+
+=head4 Responses
+
+B<200 - OK>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "created_at" : 1734220800,
+       "id" : "cons_1234",
+       "language" : "en-US",
+       "name" : "John Doe",
+       "object" : "audio.voice_consent"
+    }
+
+=head2 POST /audio/voice_consents/{consent_id}
+
+=head3 updateVoiceConsent
+
+  $client->update_voice_consent({
+      body => { ... },
+  });
+
+Updates a voice consent recording (metadata only).
+
+Update consent recording metadata used for creating custom voices. This
+endpoint updates metadata only and does not replace the underlying audio.
+
+See the
+L<custom voices guide|https://platform.openai.com/docs/guides/text-to-speech#custom-voices>
+. Custom voices are limited to eligible customers.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<consent_id> (in path, required, string) - The ID of the consent recording to update.
+
+=back
+
+=head4 Responses
+
+B<200 - OK>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "created_at" : 1734220800,
+       "id" : "cons_1234",
+       "language" : "en-US",
+       "name" : "John Doe",
+       "object" : "audio.voice_consent"
+    }
+
+=head1 SCHEMAS
+
+=head2 UpdateVoiceConsentRequest
+
+Properties:
+
+=over
+
+=item * C<name> (string, required) - The updated label for this consent recording.
+
+=back
+
+=head2 VoiceConsentDeletedResource
+
+Properties:
+
+=over
+
+=item * C<deleted> (boolean, required)
+
+=item * C<id> (string, required) - The consent recording identifier.
+
+=item * C<object> (string, required)
+
+Allowed values: audio.voice_consent
+
+=back
+
+=head2 VoiceConsentResource
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) for when the consent recording was created.
+
+=item * C<id> (string, required) - The consent recording identifier.
+
+=item * C<language> (string, required) - The BCP 47 language tag for the consent phrase (for example, C<en-US> ).
+
+=item * C<name> (string, required) - The label provided when the consent recording was uploaded.
+
+=item * C<object> (string, required) - The object type, which is always C<audio.voice_consent> .
+
+Allowed values: audio.voice_consent
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

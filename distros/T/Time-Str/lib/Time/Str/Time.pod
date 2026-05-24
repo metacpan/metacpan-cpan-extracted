@@ -1,0 +1,90 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Time::Str::Time - Time validation and epoch conversion
+
+=head1 SYNOPSIS
+
+    use Time::Str::Time qw( timegm_modern 
+                            timegm_posix
+                            valid_hms
+                            valid_hms60 );
+    
+    # Validate time components
+    valid_hms(23, 59, 59);    # true
+    valid_hms(23, 59, 60);    # false
+    valid_hms60(23, 59, 60);  # true (leap second)
+    
+    # Convert date/time to Unix epoch (modern convention)
+    my $epoch = timegm_modern(0, 0, 0, 24, 12, 2024);
+    # 2024-12-24T00:00:00Z => 1735005600
+    
+    # Convert date/time to Unix epoch (POSIX convention)
+    my $epoch = timegm_posix(0, 0, 0, 24, 11, 124);
+    # month 0-11, year since 1900
+
+=head1 DESCRIPTION
+
+This module provides time validation and UTC epoch conversion functions.
+All functions operate on integer values and are exportable on request.
+Use C<:all> to import everything.
+
+=head1 FUNCTIONS
+
+=head2 valid_hms
+
+    my $bool = valid_hms($hour, $minute, $second);
+
+Returns true if the given time components are valid: hour (0-23),
+minute (0-59), second (0-59).
+
+=head2 valid_hms60
+
+    my $bool = valid_hms60($hour, $minute, $second);
+
+Returns true if the given time components are valid: hour (0-23),
+minute (0-59), second (0-60). The extended second range accommodates
+leap seconds.
+
+=head2 timegm_modern
+
+    my $epoch = timegm_modern($sec, $min, $hour, $mday, $mon, $year);
+
+Converts a broken-down UTC time to a Unix epoch value (seconds since
+1970-01-01T00:00:00Z). Uses modern conventions: month is 1-12, year
+is the full four-digit year (1-9999).
+
+Croaks if any parameter is out of range. Day is validated against the
+actual number of days in the given month and year (leap-year aware).
+
+=head2 timegm_posix
+
+    my $epoch = timegm_posix($sec, $min, $hour, $mday, $mon, $year);
+
+Same as C<timegm_modern> but uses POSIX/C conventions: month is 0-11,
+year is years since 1900. This matches the argument convention of
+C<POSIX::mktime> and the return values of C<gmtime>/C<localtime>.
+
+Equivalent to:
+
+    timegm_modern($sec, $min, $hour, $mday, $mon + 1, $year + 1900)
+
+=head1 SEE ALSO
+
+L<Time::Str>, L<Time::Str::Calendar>
+
+=head1 AUTHOR
+
+Christian Hansen
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 by Christian Hansen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

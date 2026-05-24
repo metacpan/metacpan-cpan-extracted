@@ -1,6 +1,9 @@
-package Command::Runner;
-use strict;
+package Command::Runner v1.0.0;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
+
+our $TRIAL = 0;
 
 use Capture::Tiny ();
 use Command::Runner::LineBuffer;
@@ -14,37 +17,32 @@ use Time::HiRes ();
 
 use constant WIN32 => $^O eq 'MSWin32';
 
-our $VERSION = '0.201';
 our $TICK = 0.02;
 
-sub new {
-    my ($class, %argv) = @_;
+sub new ($class, %argv) {
     bless { keep => 1, _buffer => {}, %argv }, $class;
 }
 
 for my $attr (qw(command cwd redirect timeout keep stdout stderr env)) {
     no strict 'refs';
-    *$attr = sub {
-        my $self = shift;
-        $self->{$attr} = $_[0];
+    *$attr = sub ($self, $value) {
+        $self->{$attr} = $value;
         $self;
     };
 }
 
-sub run {
-    my $self = shift;
+sub run ($self) {
     my $command = $self->{command};
     if (ref $command eq 'CODE') {
-        $self->_wrap(sub { $self->_run_code($command) });
+        $self->_wrap(sub (@) { $self->_run_code($command) });
     } elsif (WIN32) {
-        $self->_wrap(sub { $self->_system_win32($command) });
+        $self->_wrap(sub (@) { $self->_system_win32($command) });
     } else {
         $self->_exec($command);
     }
 }
 
-sub _wrap {
-    my ($self, $code) = @_;
+sub _wrap ($self, $code) {
 
     my ($stdout, $stderr, $res);
     if ($self->{redirect}) {
@@ -72,13 +70,12 @@ sub _wrap {
     return $res;
 }
 
-sub _run_code {
-    my ($self, $code) = @_;
+sub _run_code ($self, $code) {
 
     my $wrap_code;
     if ($self->{env} || $self->{cwd}) {
-        $wrap_code = sub {
-            local %ENV = %{$self->{env}} if $self->{env};
+        $wrap_code = sub (@) {
+            local %ENV = $self->{env}->%* if $self->{env};
             my $guard = File::pushd::pushd($self->{cwd}) if $self->{cwd};
             $code->();
         };
@@ -92,7 +89,7 @@ sub _run_code {
     my ($result, $err);
     {
         local $SIG{__DIE__} = 'DEFAULT';
-        local $SIG{ALRM} = sub { die "__TIMEOUT__\n" };
+        local $SIG{ALRM} = sub (@) { die "__TIMEOUT__\n" };
         eval {
             alarm $self->{timeout};
             $result = $wrap_code ? $wrap_code->() : $code->();
@@ -109,23 +106,22 @@ sub _run_code {
     }
 }
 
-sub _system_win32 {
-    my ($self, $command) = @_;
+sub _system_win32 ($self, $command) {
 
     my $pid;
     if (ref $command) {
-        my @cmd = map { Command::Runner::Quote::quote_win32($_) } @$command;
-        local %ENV = %{$self->{env}} if $self->{env};
+        my @cmd = map { Command::Runner::Quote::quote_win32($_) } $command->@*;
+        local %ENV = $self->{env}->%* if $self->{env};
         my $guard = File::pushd::pushd($self->{cwd}) if $self->{cwd};
         $pid = system { $command->[0] } 1, @cmd;
     } else {
-        local %ENV = %{$self->{env}} if $self->{env};
+        local %ENV = $self->{env}->%* if $self->{env};
         my $guard = File::pushd::pushd($self->{cwd}) if $self->{cwd};
         $pid = system 1, $command;
     }
 
     my $timeout = $self->{timeout} ? Command::Runner::Timeout->new($self->{timeout}, 1) : undef;
-    my $INT; local $SIG{INT} = sub { $INT++ };
+    my $INT; local $SIG{INT} = sub (@) { $INT++ };
     my $result;
     while (1) {
         if ($INT) {
@@ -150,8 +146,7 @@ sub _system_win32 {
     return { pid => $pid, result => $result, timeout => $timeout && $timeout->signaled };
 }
 
-sub _exec {
-    my ($self, $command) = @_;
+sub _exec ($self, $command) {
 
     pipe my $stdout_read, my $stdout_write;
     $self->{_buffer}{stdout} = Command::Runner::LineBuffer->new(keep => $self->{keep});
@@ -180,11 +175,11 @@ sub _exec {
             chdir $self->{cwd} or die "chdir $self->{cwd}: $!";
         }
         if ($self->{env}) {
-            %ENV = %{$self->{env}};
+            %ENV = $self->{env}->%*;
         }
 
         if (ref $command) {
-            exec { $command->[0] } @$command;
+            exec { $command->[0] } $command->@*;
         } else {
             exec $command;
         }
@@ -194,7 +189,7 @@ sub _exec {
 
     my $signal_pid = $Config::Config{d_setpgrp} ? -$pid : $pid;
 
-    my $INT; local $SIG{INT} = sub { $INT++ };
+    my $INT; local $SIG{INT} = sub (@) { $INT++ };
     my $timeout = $self->{timeout} ? Command::Runner::Timeout->new($self->{timeout}, 1) : undef;
     my $select = IO::Select->new(grep $_, $stdout_read, $stderr_read);
 
@@ -257,8 +252,8 @@ Command::Runner - run external commands and Perl code refs
   my $cmd = Command::Runner->new(
     command => ['ls', '-al'],
     timeout => 10,
-    stdout  => sub { warn "out: $_[0]\n" },
-    stderr  => sub { warn "err: $_[0]\n" },
+    stdout  => sub ($line) { warn "out: $line\n" },
+    stderr  => sub ($line) { warn "err: $line\n" },
   );
   my $res = $cmd->run;
 
@@ -361,9 +356,13 @@ While L<App::cpanminus> has excellent APIs for such use, I still needed to tweak
 
 So I ended up creating a seperate module, Command::Runner.
 
-=head1 AUTHOR
 
-Shoichi Kaji <skaji@cpan.org>
+=head1 ARTIFACT ATTESTATIONS
+
+GitHub Artifact Attestations are generated for release tarballs uploaded to
+CPAN. If you care about provenance for the uploaded tarballs, see:
+
+L<https://github.com/skaji/Command-Runner/attestations>
 
 =head1 COPYRIGHT AND LICENSE
 

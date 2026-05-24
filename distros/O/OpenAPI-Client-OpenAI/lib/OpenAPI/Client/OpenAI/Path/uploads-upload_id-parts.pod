@@ -4,79 +4,80 @@
 
 OpenAPI::Client::OpenAI::Path::uploads-upload_id-parts - Documentation for the /uploads/{upload_id}/parts path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</uploads/{upload_id}/parts>.
+=head2 POST /uploads/{upload_id}/parts
 
-=head1 PATHS
+=head3 addUploadPart
 
+  $client->add_upload_part({
+      body => { ... },
+  });
 
-=head2 C<POST /uploads/{upload_id}/parts>
+Adds a
+L<Part|https://platform.openai.com/docs/api-reference/uploads/part-object> to
+an L<Upload|https://platform.openai.com/docs/api-reference/uploads/object>
+object. A Part represents a chunk of bytes from the file you are trying to
+upload.
 
-Add upload part
+Each Part can be at most 64 MB, and you can add Parts until you hit the Upload
+maximum of 8 GB.
 
+It is possible to add multiple Parts in parallel. You can decide the intended
+order of the Parts when you
+L<complete the Upload|https://platform.openai.com/docs/api-reference/uploads/complete>
+.
 
-Adds a L<Part|https://platform.openai.com/docs/api-reference/uploads/part-object> to an L<Upload|https://platform.openai.com/docs/api-reference/uploads/object> object. A Part represents a chunk of bytes from the file you are trying to upload. 
+=head4 Path/query parameters
 
-Each Part can be at most 64 MB, and you can add Parts until you hit the Upload maximum of 8 GB.
+=over
 
-It is possible to add multiple Parts in parallel. You can decide the intended order of the Parts when you L<complete the Upload|https://platform.openai.com/docs/api-reference/uploads/complete>.
-
-
-
-=head3 Operation ID
-
-C<addUploadPart>
-
-    $client->addUploadPart( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<upload_id> (in path) (Required) - The ID of the Upload.
-
-
-Type: C<string>
-
-
+=item * C<upload_id> (in path, required, string) - The ID of the Upload.
 
 =back
 
-=head3 Request Body
-  
-=head3 Content Type: C<multipart/form-data>
+=head4 Responses
 
-    
-      
+B<200 - OK>
 
-      
-             
+Content-Type: application/json
 
-=head3 Responses
-
-
-=head4 Status Code: C<200>
-
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-        "id": "part_def456",
-        "object": "upload.part",
-        "created_at": 1719186911,
-        "upload_id": "upload_abc123"
+       "created_at" : 1719186911,
+       "id" : "part_def456",
+       "object" : "upload.part",
+       "upload_id" : "upload_abc123"
     }
 
+=head1 SCHEMAS
+
+=head2 AddUploadPartRequest
+
+Properties:
+
+=over
+
+=item * C<data> (string, required) - The chunk of bytes for this Part.
+
+=back
+
+=head2 UploadPart
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) for when the Part was created.
+
+=item * C<id> (string, required) - The upload Part unique identifier, which can be referenced in API endpoints.
+
+=item * C<object> (string, required) - The object type, which is always C<upload.part> .
+
+Allowed values: upload.part
+
+=item * C<upload_id> (string, required) - The ID of the Upload object that this Part was added to.
 
 =back
 

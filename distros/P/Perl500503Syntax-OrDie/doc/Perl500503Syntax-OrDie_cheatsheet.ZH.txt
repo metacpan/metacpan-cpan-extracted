@@ -1,0 +1,194 @@
+Perl500503Syntax::OrDie 速查表（中文）
+=======================================
+
+名称
+    Perl500503Syntax::OrDie - 验证 Perl 5.005_03 源代码兼容性
+
+版本
+    0.01
+
+概要
+    # 在 use 时自动检查调用方文件:
+    use Perl500503Syntax::OrDie;
+
+    # 程序化 API（不自动检查，不安装运行时守卫）:
+    use Perl500503Syntax::OrDie ();
+    Perl500503Syntax::OrDie::check_file('/path/to/script.pl');
+    my @violations = Perl500503Syntax::OrDie::check_source($source_text, 'label.pl');
+
+    # 命令行用法:
+    perl lib/Perl500503Syntax/OrDie.pm script.pl
+    perl lib/Perl500503Syntax/OrDie.pm script1.pl script2.pl ...
+    perl lib/Perl500503Syntax/OrDie.pm -
+
+描述
+    通过 "use Perl500503Syntax::OrDie;" 加载时，模块读取调用方源文件，
+    屏蔽字符串字面量和注释，然后扫描 Perl 5.005_03 之后引入的语法结构。
+    发现违规项则立即以文件名和行号调用 die()。
+
+    同时通过 CORE::GLOBAL:: 覆盖为 open() 和 mkdir() 安装运行时守卫。
+
+    作为命令运行时，检查命令行指定的每个文件并输出结果。
+    不带参数运行时显示使用方法。
+
+静态检查项（编译时）
+    Perl 5.6  : our / 三参数open / use utf8 / \x{} / \N{} / @+@- /
+                CHECK/INIT / v-string / $^V / :lvalue / \p{}\P{}
+    Perl 5.8  : use encoding / PerlIO 层
+    Perl 5.10 : //= // say state given/when ~~ use feature \K
+                (?<name>) \k<name> (?|) (*VERB) \h\v\R
+                UNITCHECK 所有量词 (?1)(?R) ${^MATCH} \g{N}
+    Perl 5.12 : package NAME VERSION / ...
+    Perl 5.14 : s///r tr///r
+    Perl 5.16 : __SUB__
+    Perl 5.20 : 子程序签名 / $ref->@*
+    Perl 5.22 : <<>> / /n
+    Perl 5.26 : <<~
+    Perl 5.30 : (?<=.{2,}X) variable-length lookbehind (experimental; stable 5.38)
+    Perl 5.32 : isa（中缀运算符）
+    Perl 5.34 : try/catch
+    Perl 5.36 : use builtin / for my ($a,$b)
+    Perl 5.38 : class
+
+Perl 版本变更历史（本模块检查的功能）
+    参考: https://perldoc.perl.org/perl56delta
+          https://perldoc.perl.org/perl58delta
+          https://perldoc.perl.org/perl5100delta
+          https://perldoc.perl.org/perl5120delta
+          https://perldoc.perl.org/perl5140delta
+          https://perldoc.perl.org/perl5160delta
+          https://perldoc.perl.org/perl5180delta
+          https://perldoc.perl.org/perl5200delta
+          https://perldoc.perl.org/perl5220delta
+          https://perldoc.perl.org/perl5240delta
+          https://perldoc.perl.org/perl5260delta
+          https://perldoc.perl.org/perl5280delta
+          https://perldoc.perl.org/perl5300delta
+          https://perldoc.perl.org/perl5320delta
+          https://perldoc.perl.org/perl5340delta
+          https://perldoc.perl.org/perl5360delta
+          https://perldoc.perl.org/perl5380delta
+          https://perldoc.perl.org/perl5400delta
+          https://perldoc.perl.org/perl5420delta
+
+  perl56delta（Perl 5.6.0，2000-03-22）
+    our VARIABLE
+      词法作用域的包变量声明。5.005_03 兼容请使用 "use vars qw(...)"。
+    三参数 open()
+      open(FH, MODE, PATH) 形式。请使用 open(FH, ">path") 代替。
+    use utf8
+      声明源文件采用 UTF-8 编码。
+    use VERSION（>= 5.006 或 v5.6）
+      用 "use 5.006" 或 "use v5.6" 指定最低 Perl 版本。
+    \x{HHHH} Unicode 转义
+      0xFF 以上 Unicode 码点的扩展十六进制转义。
+    \N{name} 命名字符转义
+      正则/字符串中的命名 Unicode 字符（例: \N{SNOWMAN}）。
+    @+ 和 @- / $+[N] $-[N]
+      保存最近正则匹配开始/结束位置的数组。
+    CHECK { } / INIT { } 阶段块
+      在特定编译/运行阶段执行的命名块。
+    v-string 表示法（v1.2.3）
+      向量字符串，如 v5.6.1。
+    $^V 版本对象
+      5.005_03 兼容请使用数值型 $]。
+    :lvalue 子程序属性
+      将子程序标记为有效左值（可赋值）。
+    \p{Property} / \P{Property}
+      通过 Unicode 属性匹配字符（例: \p{IsAlpha}）。
+    不带显式权限的 mkdir()
+      5.6+ 中 mkdir(PATH) 默认权限为 0777。
+      5.005_03 中需要: mkdir(PATH, MODE)。
+
+  perl58delta（Perl 5.8.0，2002-07-18）
+    use encoding
+      加载源编码 pragma（例: "use encoding 'euc-jp'"）。
+    open() / binmode() 中的 PerlIO 层
+      :utf8、:encoding(UTF-8)、:crlf 等。5.005_03 不可用。
+
+  perl5100delta（Perl 5.10.0，2007-12-18）
+    // 已定义-或运算符
+      "$x // $y" 等价于 "defined($x) ? $x : $y"。
+    //= 已定义-或赋值
+    say LIST  打印后追加换行
+    state VARIABLE  词法作用域持久变量
+    given/when  switch/case 结构（5.36+ 已删除）
+    ~~ 智能匹配运算符
+    use feature  启用命名语言特性
+    \K  正则中重置匹配开始位置
+    (?<name>...) / \k<name>  命名捕获/后向引用
+    (?|...)  分支重置组
+    (*VERB)  回溯控制动词
+    \h \H \v \V \R  空白转义
+    UNITCHECK { }  阶段块
+    a++ a*+ a?+  占有量词
+    (?1) (?&name) (?R)  递归子模式
+    ${^MATCH} ${^PREMATCH} ${^POSTMATCH}  匹配变量（/p 标志）
+    \g{N}  绝对/相对后向引用
+
+  perl5120delta（Perl 5.12.0，2010-04-12）
+    package NAME VERSION  包声明与版本指定合并
+    ... yada-yada 运算符  未实现代码占位符
+
+  perl5140delta（Perl 5.14.0，2011-05-14）
+    s///r  tr///r  非破坏性标志，返回修改后的字符串
+
+  perl5160delta（Perl 5.16.0，2012-05-20）
+    __SUB__  当前子程序引用（需 use feature 'current_sub'）
+
+  perl5180delta (5.18): my sub / state sub -- lexical subroutines
+
+  perl5200delta（Perl 5.20.0，2014-05-27）
+    子程序签名（实验性）: sub foo ($x, $y = 0) { ... }
+    %hash{LIST} / %array[LIST] -- key/value slices
+    后缀解引用: $ref->@*  $ref->%*
+
+  perl5220delta（Perl 5.22.0，2015-06-01）
+    <<>>  安全钻石运算符（使用三参数 open）
+    &. |. ^. ~. -- string bitwise operators (experimental; stable 5.28)
+    /n  非捕获正则标志
+
+  perl5260delta（Perl 5.26.0，2017-05-30）
+    <<~  缩进 heredoc，去除正文前导空白
+
+  perl5300delta (Perl 5.30.0, 2019-05-22)
+    variable-length lookbehind in regex (experimental; stable from Perl 5.38)
+
+  perl5320delta（Perl 5.32.0，2020-06-20）
+    isa  中缀运算符（即使 $obj 不是引用也可用）
+
+  perl5340delta（Perl 5.34.0，2021-05-20）
+    try / catch（实验性）
+
+  perl5360delta（Perl 5.36.0，2022-05-28）
+    use builtin  内置函数 pragma（true、false、weaken 等）
+    for my ($a, $b) (@list)  成对迭代
+
+  perl5380delta（Perl 5.38.0，2023-07-02）
+    class 关键字（实验性 OOP）: class Foo { ... }
+
+
+  perl5400delta (Perl 5.40.0, 2024-06-09)
+    ^^ / ^^= high-precedence logical XOR operator
+      $x ^^ $y  -- completes the &&/|| set; use "xor" for 5.005_03.
+    __CLASS__ keyword (inside class blocks)
+      Runtime class name inside method/ADJUST/field (requires class feature).
+
+  perl5420delta (Perl 5.42.0, 2025-07-02)
+    any BLOCK LIST / all BLOCK LIST (experimental keywords)
+      any { EXPR } @list  -- use List::Util::any for 5.005_03.
+    my method / ->& lexical method call (requires class feature)
+      my method foo () { ... }  -- lexically scoped private method.
+
+安全用法（Perl 5.005_03 兼容）
+    use vars qw($x @arr %hash);           代替 "our"
+    open(FH, ">$path") or die $!;         两参数裸字形式
+    mkdir("dir", 0755) or die $!;         显式权限
+    $x = defined($y) ? $y : 'default';    代替 //=
+    print "...\n";                         代替 say
+
+作者
+    INABA Hitoshi <ina@cpan.org>
+
+许可证
+    本库为自由软件，可在与 Perl 本身相同的条款下重新分发或修改。

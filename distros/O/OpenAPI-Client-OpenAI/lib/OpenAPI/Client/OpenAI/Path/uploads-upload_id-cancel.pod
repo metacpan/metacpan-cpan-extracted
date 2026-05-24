@@ -4,78 +4,69 @@
 
 OpenAPI::Client::OpenAI::Path::uploads-upload_id-cancel - Documentation for the /uploads/{upload_id}/cancel path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</uploads/{upload_id}/cancel>.
+=head2 POST /uploads/{upload_id}/cancel
 
-=head1 PATHS
+=head3 cancelUpload
 
-
-=head2 C<POST /uploads/{upload_id}/cancel>
-
-Cancel upload
-
+  $client->cancel_upload({
+      body => { ... },
+  });
 
 Cancels the Upload. No Parts may be added after an Upload is cancelled.
 
+Returns the Upload object with status C<cancelled> .
 
+=head4 Path/query parameters
 
-=head3 Operation ID
+=over
 
-C<cancelUpload>
-
-    $client->cancelUpload( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<upload_id> (in path) (Required) - The ID of the Upload.
-
-
-Type: C<string>
-
-
+=item * C<upload_id> (in path, required, string) - The ID of the Upload.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - OK>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
+Example:
 
-OK
+    "{\n  \"id\": \"upload_abc123\",\n  \"object\": \"upload\",\n  \"bytes\": 2147483648,\n  \"created_at\": 1719184911,\n  \"filename\": \"training_examples.jsonl\",\n  \"purpose\": \"fine-tune\",\n  \"status\": \"completed\",\n  \"expires_at\": 1719127296,\n  \"file\": {\n    \"id\": \"file-xyz321\",\n    \"object\": \"file\",\n    \"bytes\": 2147483648,\n    \"created_at\": 1719186911,\n    \"filename\": \"training_examples.jsonl\",\n    \"purpose\": \"fine-tune\",\n  }\n}\n"
 
+=head1 SCHEMAS
 
-=head4 Content Types:
+=head2 Upload
 
-=over 4
+Properties:
 
+=over
 
-=item * C<application/json>
+=item * C<bytes> (integer, required) - The intended number of bytes to be uploaded.
 
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) for when the Upload was created.
 
-    {
-      "id": "upload_abc123",
-      "object": "upload",
-      "bytes": 2147483648,
-      "created_at": 1719184911,
-      "filename": "training_examples.jsonl",
-      "purpose": "fine-tune",
-      "status": "completed",
-      "expires_at": 1719127296,
-      "file": {
-        "id": "file-xyz321",
-        "object": "file",
-        "bytes": 2147483648,
-        "created_at": 1719186911,
-        "filename": "training_examples.jsonl",
-        "purpose": "fine-tune",
-      }
-    }
+=item * C<expires_at> (integer, required) - The Unix timestamp (in seconds) for when the Upload will expire.
 
+=item * C<file> (allOf)
+
+=item * C<filename> (string, required) - The name of the file to be uploaded.
+
+=item * C<id> (string, required) - The Upload unique identifier, which can be referenced in API endpoints.
+
+=item * C<object> (string) - The object type, which is always "upload".
+
+Allowed values: upload
+
+=item * C<purpose> (string, required) - The intended purpose of the file.
+L<Please refer here|https://platform.openai.com/docs/api-reference/files/object#files/object-purpose>
+for acceptable values.
+
+=item * C<status> (string, required) - The status of the Upload.
+
+Allowed values: pending, completed, cancelled, expired
 
 =back
 

@@ -4,111 +4,295 @@
 
 OpenAPI::Client::OpenAI::Path::completions - Documentation for the /completions path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</completions>.
+=head2 POST /completions
 
-=head1 PATHS
+=head3 createCompletion
 
-
-=head2 C<POST /completions>
-
-Create completion
-
+  $client->create_completion({
+      body => { ... },
+  });
 
 Creates a completion for the provided prompt and parameters.
 
+Returns a completion object, or a sequence of completion objects if the
+request is streamed.
 
+=head4 Request body
 
-=head3 Operation ID
+Content-Type: application/json
 
-C<createCompletion>
-
-    $client->createCompletion( ... );
-
-=head3 Parameters
-
-=over 4
-
-=back
-
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
-
-    
-      
-
-      
-
-=head4 Models
-
-ID of the model to use. You can use the L<List models|https://platform.openai.com/docs/api-reference/models/list> API to see all of your available models, or see our L<Model overview|https://platform.openai.com/docs/models> for descriptions of them.
-
-=over 4
-      
-=item * C<gpt-3.5-turbo-instruct>
-
-=item * C<davinci-002>
-
-=item * C<babbage-002>
-
-=back
-      
-      
 Example:
 
     {
-       "max_tokens" : 16,
-       "n" : 1,
-       "suffix" : "test.",
-       "temperature" : 1,
-       "top_p" : 1,
-       "user" : "user-1234"
+       "choices" : [
+          {
+             "finish_reason" : "length",
+             "index" : 0,
+             "logprobs" : null,
+             "text" : "\n\nThis is indeed a test"
+          }
+       ],
+       "created" : 1589478378,
+       "id" : "cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7",
+       "model" : "VAR_completion_model_id",
+       "object" : "text_completion",
+       "system_fingerprint" : "fp_44709d6fcb",
+       "usage" : {
+          "completion_tokens" : 7,
+          "prompt_tokens" : 5,
+          "total_tokens" : 12
+       }
     }
 
+=head4 Responses
 
-             
+B<200 - OK>
 
-=head3 Responses
+Content-Type: application/json
 
-
-=head4 Status Code: C<200>
-
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-      "id": "cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7",
-      "object": "text_completion",
-      "created": 1589478378,
-      "model": "gpt-4-turbo",
-      "choices": [
-        {
-          "text": "\n\nThis is indeed a test",
-          "index": 0,
-          "logprobs": null,
-          "finish_reason": "length"
-        }
-      ],
-      "usage": {
-        "prompt_tokens": 5,
-        "completion_tokens": 7,
-        "total_tokens": 12
-      }
+       "choices" : [
+          {
+             "finish_reason" : "length",
+             "index" : 0,
+             "logprobs" : null,
+             "text" : "\n\nThis is indeed a test"
+          }
+       ],
+       "created" : 1589478378,
+       "id" : "cmpl-uqkvlQyYK7bGYrRHQ0eXlWi7",
+       "model" : "VAR_completion_model_id",
+       "object" : "text_completion",
+       "system_fingerprint" : "fp_44709d6fcb",
+       "usage" : {
+          "completion_tokens" : 7,
+          "prompt_tokens" : 5,
+          "total_tokens" : 12
+       }
     }
 
+=head1 SCHEMAS
+
+=head2 ChatCompletionStreamOptions
+
+Options for streaming response. Only set this when you set C<stream: true> .
+
+=head2 CompletionUsage
+
+Properties:
+
+=over
+
+=item * C<completion_tokens> (integer, required) - Number of tokens in the generated completion.
+
+Default: 0
+
+=item * C<completion_tokens_details> (object) - Breakdown of tokens used in a completion.
+
+=item * C<prompt_tokens> (integer, required) - Number of tokens in the prompt.
+
+Default: 0
+
+=item * C<prompt_tokens_details> (object) - Breakdown of tokens used in the prompt.
+
+=item * C<total_tokens> (integer, required) - Total number of tokens used in the request (prompt + completion).
+
+Default: 0
 
 =back
+
+=head2 CreateCompletionRequest
+
+Properties:
+
+=over
+
+=item * C<best_of> (integer) - Generates C<best_of> completions server-side and returns the "best" (the one
+with the highest log probability per token). Results cannot be streamed.
+
+When used with C<n> , C<best_of> controls the number of candidate completions
+and C<n> specifies how many to return – C<best_of> must be greater than C<n> .
+
+B<Note:> Because this parameter generates many completions, it can quickly
+consume your token quota. Use carefully and ensure that you have reasonable
+settings for C<max_tokens> and C<stop> .
+
+Default: 1
+
+=item * C<echo> (boolean) - Echo back the prompt in addition to the completion
+
+Default: 
+
+=item * C<frequency_penalty> (number) - Number between -2.0 and 2.0. Positive values penalize new tokens based on
+their existing frequency in the text so far, decreasing the model's likelihood
+to repeat the same line verbatim.
+
+L<See more information about frequency and presence penalties.|https://platform.openai.com/docs/guides/text-generation>
+
+Default: 0
+
+=item * C<logit_bias> (object) - Modify the likelihood of specified tokens appearing in the completion.
+
+Accepts a JSON object that maps tokens (specified by their token ID in the GPT
+tokenizer) to an associated bias value from -100 to 100. You can use this
+L<tokenizer tool|https://platform.openai.com/tokenizer?view=bpe> to convert
+text to token IDs. Mathematically, the bias is added to the logits generated
+by the model prior to sampling. The exact effect will vary per model, but
+values between -1 and 1 should decrease or increase likelihood of selection;
+values like -100 or 100 should result in a ban or exclusive selection of the
+relevant token.
+
+As an example, you can pass C<{"50256": -100}> to prevent the <|endoftext|>
+token from being generated.
+
+Default: null
+
+=item * C<logprobs> (integer) - Include the log probabilities on the C<logprobs> most likely output tokens, as
+well the chosen tokens. For example, if C<logprobs> is 5, the API will return
+a list of the 5 most likely tokens. The API will always return the C<logprob>
+of the sampled token, so there may be up to C<logprobs+1> elements in the
+response.
+
+The maximum value for C<logprobs> is 5.
+
+Default: null
+
+=item * C<max_tokens> (integer) - The maximum number of L<tokens|https://platform.openai.com/tokenizer> that can
+be generated in the completion.
+
+The token count of your prompt plus C<max_tokens> cannot exceed the model's
+context length.
+L<Example Python code|https://cookbook.openai.com/examples/how_to_count_tokens_with_tiktoken>
+for counting tokens.
+
+Default: 16
+
+=item * C<model> (anyOf, required) - ID of the model to use. You can use the
+L<List models|https://platform.openai.com/docs/api-reference/models/list> API
+to see all of your available models, or see our
+L<Model overview|https://platform.openai.com/docs/models> for descriptions of
+them.
+
+=item * C<n> (integer) - How many completions to generate for each prompt.
+
+B<Note:> Because this parameter generates many completions, it can quickly
+consume your token quota. Use carefully and ensure that you have reasonable
+settings for C<max_tokens> and C<stop> .
+
+Default: 1
+
+=item * C<presence_penalty> (number) - Number between -2.0 and 2.0. Positive values penalize new tokens based on
+whether they appear in the text so far, increasing the model's likelihood to
+talk about new topics.
+
+L<See more information about frequency and presence penalties.|https://platform.openai.com/docs/guides/text-generation>
+
+Default: 0
+
+=item * C<prompt> (oneOf, required) - The prompt(s) to generate completions for, encoded as a string, array of
+strings, array of tokens, or array of token arrays.
+
+Note that <|endoftext|> is the document separator that the model sees during
+training, so if a prompt is not specified the model will generate as if from
+the beginning of a new document.
+
+Default: <|endoftext|>
+
+=item * C<seed> (integer) - If specified, our system will make a best effort to sample deterministically,
+such that repeated requests with the same C<seed> and parameters should return
+the same result.
+
+Determinism is not guaranteed, and you should refer to the
+C<system_fingerprint> response parameter to monitor changes in the backend.
+
+=item * C<stop> (StopConfiguration)
+
+See L</StopConfiguration> below for shape.
+
+=item * C<stream> (boolean) - Whether to stream back partial progress. If set, tokens will be sent as
+data-only
+L<server-sent events|https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#Event_stream_format>
+as they become available, with the stream terminated by a C<data: [DONE]>
+message.
+L<Example Python code|https://cookbook.openai.com/examples/how_to_stream_completions>
+.
+
+Default: 
+
+=item * C<stream_options> (ChatCompletionStreamOptions)
+
+See L</ChatCompletionStreamOptions> below for shape.
+
+=item * C<suffix> (string) - The suffix that comes after a completion of inserted text.
+
+This parameter is only supported for C<gpt-3.5-turbo-instruct> .
+
+Default: null
+
+=item * C<temperature> (number) - What sampling temperature to use, between 0 and 2. Higher values like 0.8 will
+make the output more random, while lower values like 0.2 will make it more
+focused and deterministic.
+
+We generally recommend altering this or C<top_p> but not both.
+
+Default: 1
+
+=item * C<top_p> (number) - An alternative to sampling with temperature, called nucleus sampling, where
+the model considers the results of the tokens with top_p probability mass. So
+0.1 means only the tokens comprising the top 10% probability mass are
+considered.
+
+We generally recommend altering this or C<temperature> but not both.
+
+Default: 1
+
+=item * C<user> (string) - A unique identifier representing your end-user, which can help OpenAI to
+monitor and detect abuse.
+L<Learn more|https://platform.openai.com/docs/guides/safety-best-practices#end-user-ids>
+.
+
+=back
+
+=head2 CreateCompletionResponse
+
+Properties:
+
+=over
+
+=item * C<choices> (array of object, required) - The list of completion choices the model generated for the input prompt.
+
+=item * C<created> (integer, required) - The Unix timestamp (in seconds) of when the completion was created.
+
+=item * C<id> (string, required) - A unique identifier for the completion.
+
+=item * C<model> (string, required) - The model used for completion.
+
+=item * C<object> (string, required) - The object type, which is always "text_completion"
+
+Allowed values: text_completion
+
+=item * C<system_fingerprint> (string) - This fingerprint represents the backend configuration that the model runs
+with.
+
+Can be used in conjunction with the C<seed> request parameter to understand
+when backend changes have been made that might impact determinism.
+
+=item * C<usage> (CompletionUsage)
+
+See L</CompletionUsage> below for shape.
+
+=back
+
+=head2 StopConfiguration
+
+Not supported with latest reasoning models C<o3> and C<o4-mini> .
+
+Up to 4 sequences where the API will stop generating further tokens. The
+returned text will not contain the stop sequence.
 
 =head1 SEE ALSO
 

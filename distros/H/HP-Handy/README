@@ -1,0 +1,136 @@
+NAME
+
+  HP::Handy - A tiny Jinja2-compatible template engine for Perl 5.5.3 and later
+
+SYNOPSIS
+
+  use HP::Handy;
+
+  my $tmpl = HP::Handy->new(template_dir => './templates');
+
+  # Render from file
+  my $html = $tmpl->render_file('index.html', { name => 'World', items => [1,2,3] });
+
+  # Render from string
+  my $out = $tmpl->render_string('Hello, {{ name }}!', { name => 'World' });
+
+DESCRIPTION
+
+  HP::Handy is a single-file, zero-dependency Jinja2-compatible template engine
+  for Perl. It uses the same {{ }}, {% %}, {# #} delimiters as Jinja2 so that
+  HTML templates written for Jinja2 (Python), Twig (PHP), or Nunjucks
+  (JavaScript) work with minimal changes.
+
+  HP stands for HomePage. Together with HTTP::Handy (server) and DB::Handy
+  (database), HP::Handy completes the three-layer stack for building local web
+  applications in pure Perl.
+
+  HP::Handy is NOT intended for high-throughput production use. It is designed
+  for personal tools, local development, and education.
+
+INCLUDED DOCUMENTATION
+
+  The eg/ directory contains sample programs:
+
+    eg/01_hello_hp.pl          Variables, filters, for, if, inheritance, macros
+    eg/02_with_http_handy.pl   HP::Handy + HTTP::Handy full web app example
+    eg/03_with_db_handy.pl     HP::Handy + DB::Handy CRUD report example
+    eg/04_with_http_and_db_handy.pl  Three-layer MVC web app (HP+HTTP+DB)
+
+  The doc/ directory contains Jinja2 cheat sheets in 21 languages
+  (English, Japanese, Chinese, Korean, French, and 16 more).
+  Each sheet covers: constructor options, template syntax, built-in filters,
+  built-in tests, template inheritance, macros, and official Jinja2 links.
+
+INSTALLATION
+
+  Manual (no build tools required):
+
+    cp lib/HP/Handy.pm /path/to/your/project/
+
+  Via CPAN:
+
+    cpan HP::Handy
+    cpanm HP::Handy
+
+  Via perl Makefile.PL:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+  Via pmake.bat (Windows, no make required):
+
+    pmake.bat test
+    pmake.bat install
+
+DEMO
+
+  Run the built-in demo from the distribution directory:
+
+    perl lib/HP/Handy.pm
+
+  This renders a sample HTML page to STDOUT demonstrating variables,
+  filters, for loops, conditionals, set, and default filter.
+
+COMPATIBILITY
+
+  This module works with Perl 5.005_03 and later.
+
+  WHY PERL 5.005_03 SPECIFICATION?
+
+  This module adheres to the Perl 5.005_03 specification--not because we
+  use the old interpreter, but because this specification represents the
+  simple, original Perl programming model that makes programming enjoyable.
+
+  THE STRENGTH OF MODERN TIMES
+
+  Some people think the strength of modern times is the ability to use
+  modern technology. That thinking is insufficient. The strength of modern
+  times is the ability to use ALL technology up to the present day.
+
+  By adhering to the Perl 5.005_03 specification, we gain access to the
+  entire history of Perl--from 5.005_03 to 5.42 and beyond--rather than
+  limiting ourselves to only the latest versions.
+
+  Key reasons:
+
+  - Simplicity: Original Perl approach keeps programming "raku" (easy/fun)
+  - JPerl: Final version of JPerl (Japanese Perl)
+  - Universal: Runs on ALL Perl versions (5.005_03 through 5.42+)
+  - Philosophy: Programming should be enjoyable (Camel Book readers know!)
+
+  Perl 5.6+ introduced character encoding complexity that made programming
+  harder. By following the 5.005_03 specification, we maintain the joy of
+  Perl programming.
+
+TARGET USE CASES
+
+  - Local web application development with HTTP::Handy
+  - Template-driven report and HTML generation
+  - Personal tools and utilities
+  - Educational use and learning Jinja2 syntax in Perl
+
+LIMITATIONS
+
+  - No compiled template cache (parse on every render call)
+  - No recursive macros
+  - No {% from "macros.html" import input %} (use {% include %} instead)
+  - No super() for parent block content
+  - No namespace() for loop variable write-back
+  - Expression parser is regex-based; very complex nested expressions
+    may not parse correctly (pass pre-computed values from Perl instead)
+  - String operations (length, upper, lower) are byte-based, not
+    character-based, for Perl 5.005_03 compatibility
+
+AUTHOR
+
+  INABA Hitoshi <ina@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+  This software is free software; you can redistribute it and/or modify
+  it under the same terms as Perl itself.
+
+  See http://www.perl.com/perl/misc/Artistic.html

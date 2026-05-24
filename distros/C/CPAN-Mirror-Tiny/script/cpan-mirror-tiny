@@ -1,5 +1,7 @@
 #!perl
-use strict;
+use v5.24;
+use warnings;
+use experimental qw(lexical_subs signatures);
 use CPAN::Mirror::Tiny::CLI;
 exit CPAN::Mirror::Tiny::CLI->run(@ARGV);
 

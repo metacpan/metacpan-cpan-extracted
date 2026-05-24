@@ -1,0 +1,181 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::skills-skill_id - Documentation for the /skills/{skill_id} path.
+
+=head1 OPERATIONS
+
+=head2 DELETE /skills/{skill_id}
+
+=head3 DeleteSkill
+
+  $client->delete_skill({
+      body => { ... },
+  });
+
+Delete a skill by its ID.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<skill_id> (in path, required, string) - The identifier of the skill to delete.
+
+=back
+
+=head4 Responses
+
+B<200 - Success>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "deleted" : false,
+       "id" : "string",
+       "object" : "skill.deleted"
+    }
+
+=head2 GET /skills/{skill_id}
+
+=head3 GetSkill
+
+  $client->get_skill({
+      body => { ... },
+  });
+
+Get a skill by its ID.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<skill_id> (in path, required, string) - The identifier of the skill to retrieve.
+
+=back
+
+=head4 Responses
+
+B<200 - Success>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "created_at" : 0,
+       "default_version" : "string",
+       "description" : "string",
+       "id" : "string",
+       "latest_version" : "string",
+       "name" : "string",
+       "object" : "skill"
+    }
+
+=head2 POST /skills/{skill_id}
+
+=head3 UpdateSkillDefaultVersion
+
+  $client->update_skill_default_version({
+      body => { ... },
+  });
+
+Update the default version pointer for a skill.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<skill_id> (in path, required, string) - The identifier of the skill.
+
+=back
+
+=head4 Responses
+
+B<200 - Success>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "created_at" : 0,
+       "default_version" : "string",
+       "description" : "string",
+       "id" : "string",
+       "latest_version" : "string",
+       "name" : "string",
+       "object" : "skill"
+    }
+
+=head1 SCHEMAS
+
+=head2 DeletedSkillResource
+
+Properties:
+
+=over
+
+=item * C<deleted> (boolean, required)
+
+=item * C<id> (string, required)
+
+=item * C<object> (string, required)
+
+Allowed values: skill.deleted
+
+Default: skill.deleted
+
+=back
+
+=head2 SetDefaultSkillVersionBody
+
+Properties:
+
+=over
+
+=item * C<default_version> (string, required) - The skill version number to set as default.
+
+=back
+
+=head2 SkillResource
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - Unix timestamp (seconds) for when the skill was created.
+
+=item * C<default_version> (string, required) - Default version for the skill.
+
+=item * C<description> (string, required) - Description of the skill.
+
+=item * C<id> (string, required) - Unique identifier for the skill.
+
+=item * C<latest_version> (string, required) - Latest version for the skill.
+
+=item * C<name> (string, required) - Name of the skill.
+
+=item * C<object> (string, required) - The object type, which is C<skill> .
+
+Allowed values: skill
+
+Default: skill
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

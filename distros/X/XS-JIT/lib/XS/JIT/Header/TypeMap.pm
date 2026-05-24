@@ -3,7 +3,7 @@ package XS::JIT::Header::TypeMap;
 use strict;
 use warnings;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 # C type to Perl type mapping
 # Each entry contains:

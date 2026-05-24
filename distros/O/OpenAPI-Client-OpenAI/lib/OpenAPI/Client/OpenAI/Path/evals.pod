@@ -4,235 +4,164 @@
 
 OpenAPI::Client::OpenAI::Path::evals - Documentation for the /evals path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</evals>.
+=head2 GET /evals
 
-=head1 PATHS
+=head3 listEvals
 
-
-=head2 C<GET /evals>
-
-List evals
-
+  $client->list_evals({
+      body => { ... },
+  });
 
 List evaluations for a project.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
+=item * C<after> (in query, optional, string) - Identifier for the last eval from the previous pagination request.
 
-C<listEvals>
+=item * C<limit> (in query, optional, integer) - Number of evals to retrieve.
 
-    $client->listEvals( ... );
+Default: 20
 
-=head3 Parameters
+=item * C<order> (in query, optional, string) - Sort order for evals by timestamp. Use C<asc> for ascending order or C<desc>
+for descending order.
 
-=over 4
+Allowed values: asc, desc
 
-=item * C<after> (in query) (Optional) - Identifier for the last eval from the previous pagination request.
+Default: asc
 
-Type: C<string>
+=item * C<order_by> (in query, optional, string) - Evals can be ordered by creation time or last updated time. Use C<created_at>
+for creation time or C<updated_at> for last updated time.
 
+Allowed values: created_at, updated_at
 
-
-=item * C<limit> (in query) (Optional) - Number of evals to retrieve.
-
-Type: C<integer>
-
-
-Default: C<20>
-
-
-=item * C<order> (in query) (Optional) - Sort order for evals by timestamp. Use `asc` for ascending order or `desc` for descending order.
-
-Type: C<string>
-
-Allowed values: C<asc, desc>
-
-
-Default: C<asc>
-
-
-=item * C<order_by> (in query) (Optional) - Evals can be ordered by creation time or last updated time. Use
-`created_at` for creation time or `updated_at` for last updated time.
-
-
-Type: C<string>
-
-Allowed values: C<created_at, updated_at>
-
-
-Default: C<created_at>
-
+Default: created_at
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - A list of evals>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-A list of evals
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
-
-    {
-      "object": "list",
-      "data": [
-        {
-          "object": "eval",
-          "id": "eval_67abd54d9b0081909a86353f6fb9317a",
-          "data_source_config": {
-            "type": "custom",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "item": {
-                  "type": "object",
-                  "properties": {
-                    "input": {
-                      "type": "string"
-                    },
-                    "ground_truth": {
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "input",
-                    "ground_truth"
-                  ]
-                }
-              },
-              "required": [
-                "item"
-              ]
-            }
-          },
-          "testing_criteria": [
-            {
-              "name": "String check",
-              "id": "String check-2eaf2d8d-d649-4335-8148-9535a7ca73c2",
-              "type": "string_check",
-              "input": "{{item.input}}",
-              "reference": "{{item.ground_truth}}",
-              "operation": "eq"
-            }
-          ],
-          "name": "External Data Eval",
-          "created_at": 1739314509,
-          "metadata": {},
-        }
-      ],
-      "first_id": "eval_67abd54d9b0081909a86353f6fb9317a",
-      "last_id": "eval_67abd54d9b0081909a86353f6fb9317a",
-      "has_more": true
-    }
-
-
-=back
-
-=head2 C<POST /evals>
-
-Create eval
-
-
-Create the structure of an evaluation that can be used to test a model's performance.
-An evaluation is a set of testing criteria and the config for a data source, which dictates the schema of the data used in the evaluation. After creating an evaluation, you can run it on different models and model parameters. We support several types of graders and datasources.
-For more information, see the L<Evals guide|https://platform.openai.com/docs/guides/evals>.
-
-
-
-=head3 Operation ID
-
-C<createEval>
-
-    $client->createEval( ... );
-
-=head3 Parameters
-
-=over 4
-
-=back
-
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
-
-    
-      
-
-      
-      
 Example:
 
-    {
-       "testing_criteria" : [
-          null
-       ]
-    }
+    "{\n  \"object\": \"list\",\n  \"data\": [\n    {\n      \"object\": \"eval\",\n      \"id\": \"eval_67abd54d9b0081909a86353f6fb9317a\",\n      \"data_source_config\": {\n        \"type\": \"custom\",\n        \"schema\": {\n          \"type\": \"object\",\n          \"properties\": {\n            \"item\": {\n              \"type\": \"object\",\n              \"properties\": {\n                \"input\": {\n                  \"type\": \"string\"\n                },\n                \"ground_truth\": {\n                  \"type\": \"string\"\n                }\n              },\n              \"required\": [\n                \"input\",\n                \"ground_truth\"\n              ]\n            }\n          },\n          \"required\": [\n            \"item\"\n          ]\n        }\n      },\n      \"testing_criteria\": [\n        {\n          \"name\": \"String check\",\n          \"id\": \"String check-2eaf2d8d-d649-4335-8148-9535a7ca73c2\",\n          \"type\": \"string_check\",\n          \"input\": \"{{item.input}}\",\n          \"reference\": \"{{item.ground_truth}}\",\n          \"operation\": \"eq\"\n        }\n      ],\n      \"name\": \"External Data Eval\",\n      \"created_at\": 1739314509,\n      \"metadata\": {},\n    }\n  ],\n  \"first_id\": \"eval_67abd54d9b0081909a86353f6fb9317a\",\n  \"last_id\": \"eval_67abd54d9b0081909a86353f6fb9317a\",\n  \"has_more\": true\n}\n"
 
+=head2 POST /evals
 
-             
+=head3 createEval
 
-=head3 Responses
+  $client->create_eval({
+      body => { ... },
+  });
 
+Create the structure of an evaluation that can be used to test a model's
+performance. An evaluation is a set of testing criteria and the config for a
+data source, which dictates the schema of the data used in the evaluation.
+After creating an evaluation, you can run it on different models and model
+parameters. We support several types of graders and datasources. For more
+information, see the
+L<Evals guide|https://platform.openai.com/docs/guides/evals> .
 
-=head4 Status Code: C<201>
+=head4 Responses
 
-OK
+B<201 - OK>
 
+Content-Type: application/json
 
-=head4 Content Types:
+Example:
 
-=over 4
+    "{\n  \"object\": \"eval\",\n  \"id\": \"eval_67abd54d9b0081909a86353f6fb9317a\",\n  \"data_source_config\": {\n    \"type\": \"custom\",\n    \"item_schema\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"label\": {\"type\": \"string\"},\n      },\n      \"required\": [\"label\"]\n    },\n    \"include_sample_schema\": true\n  },\n  \"testing_criteria\": [\n    {\n      \"name\": \"My string check grader\",\n      \"type\": \"string_check\",\n      \"input\": \"{{sample.output_text}}\",\n      \"reference\": \"{{item.label}}\",\n      \"operation\": \"eq\",\n    }\n  ],\n  \"name\": \"External Data Eval\",\n  \"created_at\": 1739314509,\n  \"metadata\": {\n    \"test\": \"synthetics\",\n  }\n}\n"
 
+=head1 SCHEMAS
 
-=item * C<application/json>
+=head2 CreateEvalRequest
 
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Properties:
 
-    {
-      "object": "eval",
-      "id": "eval_67abd54d9b0081909a86353f6fb9317a",
-      "data_source_config": {
-        "type": "custom",
-        "item_schema": {
-          "type": "object",
-          "properties": {
-            "label": {"type": "string"},
-          },
-          "required": ["label"]
-        },
-        "include_sample_schema": true
-      },
-      "testing_criteria": [
-        {
-          "name": "My string check grader",
-          "type": "string_check",
-          "input": "{{sample.output_text}}",
-          "reference": "{{item.label}}",
-          "operation": "eq",
-        }
-      ],
-      "name": "External Data Eval",
-      "created_at": 1739314509,
-      "metadata": {
-        "test": "synthetics",
-      }
-    }
+=over
 
+=item * C<data_source_config> (object, required) - The configuration for the data source used for the evaluation runs. Dictates
+the schema of the data used in the evaluation.
+
+=item * C<metadata> (Metadata)
+
+See L</Metadata> below for shape.
+
+=item * C<name> (string) - The name of the evaluation.
+
+=item * C<testing_criteria> (array of object, required) - A list of graders for all eval runs in this group. Graders can reference
+variables in the data source using double curly braces notation, like
+C<{{item.variable_name}}> . To reference the model's output, use the C<sample>
+namespace (ie, C<{{sample.output_text}}> ).
 
 =back
+
+=head2 Eval
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) for when the eval was created.
+
+=item * C<data_source_config> (object, required) - Configuration of data sources used in runs of the evaluation.
+
+=item * C<id> (string, required) - Unique identifier for the evaluation.
+
+=item * C<metadata> (Metadata, required)
+
+See L</Metadata> below for shape.
+
+=item * C<name> (string, required) - The name of the evaluation.
+
+=item * C<object> (string, required) - The object type.
+
+Allowed values: eval
+
+Default: eval
+
+=item * C<testing_criteria> (array of object, required) - A list of testing criteria.
+
+Default: eval
+
+=back
+
+=head2 EvalList
+
+Properties:
+
+=over
+
+=item * C<data> (array of Eval, required) - An array of eval objects.
+
+=item * C<first_id> (string, required) - The identifier of the first eval in the data array.
+
+=item * C<has_more> (boolean, required) - Indicates whether there are more evals available.
+
+=item * C<last_id> (string, required) - The identifier of the last eval in the data array.
+
+=item * C<object> (string, required) - The type of this object. It is always set to "list".
+
+Allowed values: list
+
+Default: list
+
+=back
+
+=head2 Metadata
+
+Set of 16 key-value pairs that can be attached to an object. This can be
+useful for storing additional information about the object in a structured
+format, and querying for objects via API or the dashboard.
+
+Keys are strings with a maximum length of 64 characters. Values are strings
+with a maximum length of 512 characters.
 
 =head1 SEE ALSO
 

@@ -4,58 +4,65 @@
 
 OpenAPI::Client::OpenAI::Path::models - Documentation for the /models path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</models>.
+=head2 GET /models
 
-=head1 PATHS
+=head3 listModels
 
+  $client->list_models({
+      body => { ... },
+  });
 
-=head2 C<GET /models>
+Lists the currently available models, and provides basic information about
+each one such as the owner and availability.
 
-List models
+=head4 Responses
 
+B<200 - OK>
 
-Lists the currently available models, and provides basic information about each one such as the owner and availability.
+Content-Type: application/json
 
-
-
-=head3 Operation ID
-
-C<listModels>
-
-    $client->listModels( ... );
-
-=head3 Parameters
-
-=over 4
-
-=back
-
-
-=head3 Responses
-
-
-=head4 Status Code: C<200>
-
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
        "data" : [
           "{\n  \"id\": \"VAR_chat_model_id\",\n  \"object\": \"model\",\n  \"created\": 1686935002,\n  \"owned_by\": \"openai\"\n}\n"
-       ]
+       ],
+       "object" : "list"
     }
 
+=head1 SCHEMAS
+
+=head2 ListModelsResponse
+
+Properties:
+
+=over
+
+=item * C<data> (array of Model, required)
+
+=item * C<object> (string, required)
+
+Allowed values: list
+
+=back
+
+=head2 Model
+
+Properties:
+
+=over
+
+=item * C<created> (integer, required) - The Unix timestamp (in seconds) when the model was created.
+
+=item * C<id> (string, required) - The model identifier, which can be referenced in the API endpoints.
+
+=item * C<object> (string, required) - The object type, which is always "model".
+
+Allowed values: model
+
+=item * C<owned_by> (string, required) - The organization that owns the model.
 
 =back
 

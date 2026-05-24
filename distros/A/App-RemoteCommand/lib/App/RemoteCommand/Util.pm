@@ -1,6 +1,7 @@
 package App::RemoteCommand::Util;
-use v5.16;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
 
 use Exporter 'import';
 our @EXPORT_OK = qw(prompt DEBUG logger);
@@ -9,20 +10,19 @@ use constant DEBUG => $ENV{PERL_RCOMMAND_DEBUG} ? 1 : 0;
 
 use Term::ReadKey 'ReadMode';
 
-sub logger {
-    my $msg = @_ == 1 ? $_[0] : sprintf shift, @_;
+sub logger (@args) {
+    my $msg = @args == 1 ? $args[0] : sprintf shift(@args), @args;
     warn " | $msg\n";
 }
 
-sub prompt {
-    my $msg = shift;
+sub prompt ($msg) {
     local $| = 1;
     print $msg;
     ReadMode 'noecho', \*STDIN;
     my $SIGNAL = "Catch SIGINT\n";
     my $answer;
     eval {
-        local $SIG{INT} = sub { die $SIGNAL };
+        local $SIG{INT} = sub (@) { die $SIGNAL };
         $answer = <STDIN>;
     };
     my $error = $@;

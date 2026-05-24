@@ -1,6 +1,9 @@
-package Distribution::Metadata 0.10;
-use v5.16;
+package Distribution::Metadata v1.0.0;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
+
+our $TRIAL = 0;
 
 use CPAN::DistnameInfo;
 use CPAN::Meta;
@@ -20,18 +23,15 @@ my $ARCHNAME = $Config::Config{archname};
 
 our $CACHE;
 
-sub new_from_file {
-    my ($class, $file, %option) = @_;
+sub new_from_file ($class, $file, %option) {
     $class->_new(%option, _module => {file => $file});
 }
 
-sub new_from_module {
-    my ($class, $module, %option) = @_;
+sub new_from_module ($class, $module, %option) {
     $class->_new(%option, _module => {name => $module});
 }
 
-sub _new {
-    my ($class, %option) = @_;
+sub _new ($class, %option) {
     my $module = $option{_module};
     my $inc = $option{inc} || \@INC;
     $inc = $class->_abs_path($inc);
@@ -99,8 +99,7 @@ sub _new {
     $self;
 }
 
-sub _guess_main_module {
-    my ($self, $packlist) = @_;
+sub _guess_main_module ($self, $packlist) {
     my @piece = File::Spec->splitdir( File::Basename::dirname($packlist) );
     if ($piece[-1] eq $ARCHNAME) {
         return ("perl", undef);
@@ -123,8 +122,7 @@ sub _guess_main_module {
 # then version's packlist is located at Version/.packlist! (capital V!)
 # Maybe there are a lot of others...
 my @fix_module_name = qw(version Version::Next);
-sub _fix_module_name {
-    my $module_name = shift;
+sub _fix_module_name ($module_name) {
     if (my ($fix) = grep { $module_name =~ /^$_$/i } @fix_module_name) {
         $fix;
     } else {
@@ -132,11 +130,10 @@ sub _fix_module_name {
     }
 }
 
-sub _fill_archlib {
-    my ($class, $incs) = @_;
-    my %incs = map { $_ => 1 } @$incs;
+sub _fill_archlib ($class, $incs) {
+    my %incs = map { $_ => 1 } $incs->@*;
     my @out;
-    for my $inc (@$incs) {
+    for my $inc ($incs->@*) {
         push @out, $inc;
         next if $inc =~ /$ARCHNAME$/o;
         my $archlib = File::Spec->catdir($inc, $ARCHNAME);
@@ -147,13 +144,11 @@ sub _fill_archlib {
     \@out;
 }
 
-my $decode_install_json = sub {
-    my $file = shift;
+my $decode_install_json = sub ($file) {
     my $content = do { open my $fh, "<", $file or next; local $/; <$fh> };
     JSON::decode_json($content);
 };
-sub _decode_install_json {
-    my ($class, $file, $dir) = @_;
+sub _decode_install_json ($class, $file, $dir) {
     if ($CACHE) {
         $CACHE->{install_json}{$dir}{$file} ||= $decode_install_json->($file);
     } else {
@@ -161,8 +156,7 @@ sub _decode_install_json {
     }
 }
 
-sub _find_meta {
-    my ($class, $main_module, $module, $version, $dir) = @_;
+sub _find_meta ($class, $main_module, $module, $version, $dir) {
     return unless -d $dir;
 
     my @install_json;
@@ -197,7 +191,7 @@ sub _find_meta {
         my $name = $hash->{name} || "";
         next if $name ne $main_module;
         my $provides = $hash->{provides} || +{};
-        for my $provide (sort keys %$provides) {
+        for my $provide (sort keys $provides->%*) {
             if ($provide eq $module
                 && ($provides->{$provide}{version} || "") eq $version) {
                 $meta_directory = File::Basename::dirname($file);
@@ -213,9 +207,8 @@ sub _find_meta {
     return ($meta_directory, $install_json, $install_json_hash, $mymeta_json);
 }
 
-sub _naive_packlist {
-    my ($class, $module_file, $inc) = @_;
-    for my $i (@$inc) {
+sub _naive_packlist ($class, $module_file, $inc) {
+    for my $i ($inc->@*) {
         if (my ($path) = $module_file =~ /$i $SEP (.+)\.pm /x) {
             my $archlib = $i =~ /$ARCHNAME$/o ? $i : File::Spec->catdir($i, $ARCHNAME);
             my $try = File::Spec->catfile( $archlib, "auto", $path, ".packlist" );
@@ -229,15 +222,13 @@ sub _naive_packlist {
 # eg: OSX,
 # in .packlist: /var/folders/...
 # but /var/folders/.. is a symlink to /private/var/folders
-my $extract_files = sub {
-    my $packlist = shift;
+my $extract_files = sub ($packlist) {
     [
         map  { Cwd::abs_path($_) } grep { -f }
         sort keys %{ ExtUtils::Packlist->new($packlist) || +{} }
     ];
 };
-sub _extract_files {
-    my ($class, $packlist) = @_;
+sub _extract_files ($class, $packlist) {
     if ($CACHE) {
         $CACHE->{packlist}{$packlist} ||= $extract_files->($packlist);
     } else {
@@ -245,9 +236,8 @@ sub _extract_files {
     }
 }
 
-sub _core_packlist {
-    my ($self, $inc) = @_;
-    for my $dir (grep -d, @$inc) {
+sub _core_packlist ($self, $inc) {
+    for my $dir (grep -d, $inc->@*) {
         opendir my $dh, $dir or die "Cannot open dir $dir: $!\n";
         my ($packlist) = map { File::Spec->catfile($dir, $_) } grep {$_ eq ".packlist"} readdir $dh;
         return $packlist if $packlist;
@@ -255,12 +245,11 @@ sub _core_packlist {
     return;
 }
 
-sub _find_packlist {
-    my ($class, $module_file, $inc) = @_;
+sub _find_packlist ($class, $module_file, $inc) {
 
     if ($CACHE and my $core_packlist = $CACHE->{core_packlist}) {
         my $files = $class->_extract_files($core_packlist);
-        if (grep {$module_file eq $_} @$files) {
+        if (grep {$module_file eq $_} $files->@*) {
             return ($core_packlist, $files);
         }
     }
@@ -268,7 +257,7 @@ sub _find_packlist {
     # to speed up, first try packlist which is naively guessed by $module_file
     if (my $naive_packlist = $class->_naive_packlist($module_file, $inc)) {
         my $files = $class->_extract_files($naive_packlist);
-        if ( grep { $module_file eq $_ } @$files ) {
+        if ( grep { $module_file eq $_ } $files->@* ) {
             DEBUG and warn "-> naively found packlist: $module_file\n";
             return ($naive_packlist, $files);
         }
@@ -276,13 +265,13 @@ sub _find_packlist {
 
     my @packlists;
     if ($CACHE and $CACHE->{packlist_collected}) {
-        @packlists = keys %{ $CACHE->{packlist} };
+        @packlists = keys $CACHE->{packlist}->%*;
     } else {
         if (my $core_packlist = $class->_core_packlist($inc)) {
             push @packlists, $core_packlist;
             $CACHE->{core_packlist} = $core_packlist if $CACHE;
         }
-        File::Find::find sub {
+        File::Find::find sub (@) {
             return unless -f;
             return unless $_ eq ".packlist";
             push @packlists, $File::Find::name;
@@ -295,17 +284,16 @@ sub _find_packlist {
 
     for my $try (@packlists) {
         my $files = $class->_extract_files($try);
-        if (grep { $module_file eq $_ } @$files) {
+        if (grep { $module_file eq $_ } $files->@*) {
             return ($try, $files);
         }
     }
     return;
 }
 
-sub _abs_path {
-    my ($class, $dirs) = @_;
+sub _abs_path ($class, $dirs) {
     my @out;
-    for my $dir (grep -d, @$dirs) {
+    for my $dir (grep -d, $dirs->@*) {
         my $abs = Cwd::abs_path($dir);
         $abs =~ s/$SEP+$//;
         push @out, $abs if $abs;
@@ -313,32 +301,29 @@ sub _abs_path {
     \@out;
 }
 
-sub packlist            { shift->{packlist} }
-sub meta_directory      { shift->{meta_directory} }
-sub install_json        { shift->{install_json} }
-sub mymeta_json         { shift->{mymeta_json} }
-sub main_module         { shift->{main_module} }
-sub main_module_version { shift->{main_module_version} }
-sub main_module_file    { shift->{main_module_file} }
-sub files               { shift->{files} }
-sub install_json_hash   { shift->{install_json_hash} }
+sub packlist            ($self) { $self->{packlist} }
+sub meta_directory      ($self) { $self->{meta_directory} }
+sub install_json        ($self) { $self->{install_json} }
+sub mymeta_json         ($self) { $self->{mymeta_json} }
+sub main_module         ($self) { $self->{main_module} }
+sub main_module_version ($self) { $self->{main_module_version} }
+sub main_module_file    ($self) { $self->{main_module_file} }
+sub files               ($self) { $self->{files} }
+sub install_json_hash   ($self) { $self->{install_json_hash} }
 
-sub mymeta_json_hash {
-    my $self = shift;
+sub mymeta_json_hash ($self) {
     return unless my $mymeta_json = $self->mymeta_json;
     $self->{mymeta_json_hash} ||= CPAN::Meta->load_file($mymeta_json)->as_struct;
 }
 
-sub _distnameinfo {
-    my $self = shift;
+sub _distnameinfo ($self) {
     return unless my $hash = $self->install_json_hash;
     $self->{_distnameinfo} ||= CPAN::DistnameInfo->new( $hash->{pathname} );
 }
 
 for my $attr (qw(dist version cpanid distvname pathname)) {
     no strict 'refs';
-    *$attr = sub {
-        my $self = shift;
+    *$attr = sub ($self) {
         return $self->{$attr} if exists $self->{$attr}; # for 'perl' distribution
         return unless $self->_distnameinfo;
         $self->_distnameinfo->$attr;
@@ -346,8 +331,8 @@ for my $attr (qw(dist version cpanid distvname pathname)) {
 }
 
 # alias
-sub name   { shift->dist }
-sub author { shift->cpanid }
+sub name   ($self) { $self->dist }
+sub author ($self) { $self->cpanid }
 
 1;
 
@@ -569,6 +554,13 @@ a hash reference for C<MYMETA.json>
 L<Module::Metadata>
 
 L<App::cpanminus>
+
+=head1 ARTIFACT ATTESTATIONS
+
+GitHub Artifact Attestations are generated for release tarballs uploaded to
+CPAN. If you care about provenance for the uploaded tarballs, see:
+
+L<https://github.com/skaji/Distribution-Metadata/attestations>
 
 =head1 COPYRIGHT AND LICENSE
 

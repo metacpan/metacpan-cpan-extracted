@@ -18,8 +18,14 @@ lib/Time/Str/Calendar.pod
 lib/Time/Str/PP.pm
 lib/Time/Str/Regexp.pm
 lib/Time/Str/Regexp.pod
+lib/Time/Str/Time.pm
+lib/Time/Str/Time.pod
 lib/Time/Str/Token.pm
 lib/Time/Str/Token.pod
+lib/Time/Str/Util.pm
+lib/Time/Str/Util.pod
+lib/Time/TZif.pm
+lib/Time/TZif.pod
 prereqs.yml
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
@@ -48,7 +54,10 @@ t/format/UnixStamp.t
 t/format/W3CDTF.t
 t/module/Calendar.t
 t/module/Regexp.t
+t/module/TZif.t
+t/module/Time.t
 t/module/Token.t
+t/module/Util.t
 tstr_calendar.h
 tstr_carp.h
 tstr_cparse.h
@@ -73,6 +82,7 @@ tstr_parsed.h
 tstr_regexp.c
 tstr_regexp.h
 tstr_sv.h
+tstr_time.h
 tstr_time2str.c
 tstr_time2str.h
 tstr_token_parse.c

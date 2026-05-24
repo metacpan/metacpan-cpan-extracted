@@ -1,17 +1,18 @@
-use strict;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
 use Test::More;
 use Command::Runner;
 use Config;
 
 my $windows = $^O eq 'MSWin32';
 
-subtest code => sub {
+subtest code => sub (@) {
     my (@stdout, @stderr);
     my $res = Command::Runner->new
-        ->command(sub { for (1..2) { warn "1\n"; print "2\n" } warn "1\n"; print 2; return 3 })
-        ->stdout(sub { push @stdout, $_[0] })
-        ->stderr(sub { push @stderr, $_[0] })
+        ->command(sub (@) { for (1..2) { warn "1\n"; print "2\n" } warn "1\n"; print 2; return 3 })
+        ->stdout(sub ($line) { push @stdout, $line })
+        ->stderr(sub ($line) { push @stderr, $line })
         ->run;
     is $res->{result}, 3;
     is @stdout, 3;
@@ -21,13 +22,13 @@ subtest code => sub {
     ok !$res->{timeout};
 };
 
-subtest code_rediret => sub {
+subtest code_rediret => sub (@) {
     my (@stdout, @stderr);
     my $res = Command::Runner->new
-        ->command(sub { for (1..2) { warn "1\n"; print "2\n" } warn "1\n"; print 2; return 3 })
+        ->command(sub (@) { for (1..2) { warn "1\n"; print "2\n" } warn "1\n"; print 2; return 3 })
         ->redirect(1)
-        ->stdout(sub { push @stdout, $_[0] })
-        ->stderr(sub { push @stderr, $_[0] })
+        ->stdout(sub ($line) { push @stdout, $line })
+        ->stderr(sub ($line) { push @stderr, $line })
         ->run;
     is $res->{result}, 3;
     is @stdout, 6;
@@ -35,12 +36,12 @@ subtest code_rediret => sub {
     ok !$res->{timeout};
 };
 
-subtest array => sub {
+subtest array => sub (@) {
     my ($stdout, $stderr) = ("", "");
     my  $res = Command::Runner->new
         ->command([$^X, "-e", '$|++; warn "1\n"; print "2\n"; exit 3'])
-        ->stdout(sub { $stdout .= $_[0] })
-        ->stderr(sub { $stderr .= $_[0] })
+        ->stdout(sub ($line) { $stdout .= $line })
+        ->stderr(sub ($line) { $stderr .= $line })
         ->run;
     is $res->{result} >> 8, 3;
     is $stdout, "2";
@@ -48,13 +49,13 @@ subtest array => sub {
     ok !$res->{timeout};
 };
 
-subtest array_redirect => sub {
+subtest array_redirect => sub (@) {
     my ($stdout, $stderr) = ("", "");
     my  $res = Command::Runner->new
         ->command([$^X, "-e", '$|++; warn "1\n"; print "2\n"; exit 3'])
         ->redirect(1)
-        ->stdout(sub { $stdout .= $_[0] })
-        ->stderr(sub { $stderr .= $_[0] })
+        ->stdout(sub ($line) { $stdout .= $line })
+        ->stderr(sub ($line) { $stderr .= $line })
         ->run;
     is $res->{result} >> 8, 3;
     is $stdout, "12";
@@ -67,7 +68,7 @@ my %SIGNAL = do {
     map { ($_, $sig[$_]) } 0...$#sig;
 };
 
-subtest timeout => sub {
+subtest timeout => sub (@) {
     my $res = Command::Runner->new
         ->command([$^X, "-e", '$|++; warn "1\n"; print "2\n"; sleep 1'])
         ->timeout(0.5)
@@ -84,7 +85,7 @@ subtest timeout => sub {
     }
 };
 
-subtest force_timeout => sub {
+subtest force_timeout => sub (@) {
     my $res = Command::Runner->new
         ->command([$^X, "-e", '$|++; $SIG{TERM} = "IGNORE"; warn "1\n"; print "2\n"; sleep 10'])
         ->timeout(0.5)

@@ -4,160 +4,157 @@
 
 OpenAPI::Client::OpenAI::Path::containers-container_id-files - Documentation for the /containers/{container_id}/files path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</containers/{container_id}/files>.
+=head2 GET /containers/{container_id}/files
 
-=head1 PATHS
+=head3 ListContainerFiles
 
-
-=head2 C<GET /containers/{container_id}/files>
-
-List container files
-
+  $client->list_container_files({
+      body => { ... },
+  });
 
 List Container files
 
+Lists container files.
 
+=head4 Path/query parameters
 
-=head3 Operation ID
+=over
 
-C<ListContainerFiles>
+=item * C<container_id> (in path, required, string)
 
-    $client->ListContainerFiles( ... );
+=item * C<limit> (in query, optional, integer) - A limit on the number of objects to be returned. Limit can range between 1 and
+100, and the default is 20.
 
-=head3 Parameters
+Default: 20
 
-=over 4
+=item * C<order> (in query, optional, string) - Sort order by the C<created_at> timestamp of the objects. C<asc> for ascending
+order and C<desc> for descending order.
 
-=item * C<container_id> (in path) (Required) - 
+Allowed values: asc, desc
 
-Type: C<string>
+Default: desc
 
-
-
-=item * C<limit> (in query) (Optional) - A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.
-
-
-Type: C<integer>
-
-
-Default: C<20>
-
-
-=item * C<order> (in query) (Optional) - Sort order by the `created_at` timestamp of the objects. `asc` for ascending order and `desc` for descending order.
-
-
-Type: C<string>
-
-Allowed values: C<asc, desc>
-
-
-Default: C<desc>
-
-
-=item * C<after> (in query) (Optional) - A cursor for use in pagination. `after` is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include after=obj_foo in order to fetch the next page of the list.
-
-
-Type: C<string>
-
-
+=item * C<after> (in query, optional, string) - A cursor for use in pagination. C<after> is an object ID that defines your
+place in the list. For instance, if you make a list request and receive 100
+objects, ending with obj_foo, your subsequent call can include after=obj_foo
+in order to fetch the next page of the list.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - Success>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-Success
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
        "data" : [
           "{\n    \"id\": \"cfile_682e0e8a43c88191a7978f477a09bdf5\",\n    \"object\": \"container.file\",\n    \"created_at\": 1747848842,\n    \"bytes\": 880,\n    \"container_id\": \"cntr_682e0e7318108198aa783fd921ff305e08e78805b9fdbb04\",\n    \"path\": \"/mnt/data/88e12fa445d32636f190a0b33daed6cb-tsconfig.json\",\n    \"source\": \"user\"\n}\n"
-       ]
+       ],
+       "first_id" : "string",
+       "has_more" : false,
+       "last_id" : "string",
+       "object" : "list"
     }
 
+=head2 POST /containers/{container_id}/files
 
-=back
+=head3 CreateContainerFile
 
-=head2 C<POST /containers/{container_id}/files>
-
-Create container file
-
+  $client->create_container_file({
+      body => { ... },
+  });
 
 Create a Container File
 
-You can send either a multipart/form-data request with the raw file content, or a JSON request with a file ID.
+You can send either a multipart/form-data request with the raw file content,
+or a JSON request with a file ID.
 
+Creates a container file.
 
+=head4 Path/query parameters
 
-=head3 Operation ID
+=over
 
-C<CreateContainerFile>
-
-    $client->CreateContainerFile( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<container_id> (in path) (Required) - 
-
-Type: C<string>
-
-
+=item * C<container_id> (in path, required, string)
 
 =back
 
-=head3 Request Body
-  
-=head3 Content Type: C<multipart/form-data>
+=head4 Responses
 
-    
-      
+B<200 - Success>
 
-      
-             
+Content-Type: application/json
 
-=head3 Responses
-
-
-=head4 Status Code: C<200>
-
-Success
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-        "id": "cfile_682e0e8a43c88191a7978f477a09bdf5",
-        "object": "container.file",
-        "created_at": 1747848842,
-        "bytes": 880,
-        "container_id": "cntr_682e0e7318108198aa783fd921ff305e08e78805b9fdbb04",
-        "path": "/mnt/data/88e12fa445d32636f190a0b33daed6cb-tsconfig.json",
-        "source": "user"
+       "bytes" : 880,
+       "container_id" : "cntr_682e0e7318108198aa783fd921ff305e08e78805b9fdbb04",
+       "created_at" : 1747848842,
+       "id" : "cfile_682e0e8a43c88191a7978f477a09bdf5",
+       "object" : "container.file",
+       "path" : "/mnt/data/88e12fa445d32636f190a0b33daed6cb-tsconfig.json",
+       "source" : "user"
     }
 
+=head1 SCHEMAS
+
+=head2 ContainerFileListResource
+
+Properties:
+
+=over
+
+=item * C<data> (array of ContainerFileResource, required) - A list of container files.
+
+=item * C<first_id> (string, required) - The ID of the first file in the list.
+
+=item * C<has_more> (boolean, required) - Whether there are more files available.
+
+=item * C<last_id> (string, required) - The ID of the last file in the list.
+
+=item * C<object> (string, required) - The type of object returned, must be 'list'.
+
+Allowed values: list
+
+=back
+
+=head2 ContainerFileResource
+
+Properties:
+
+=over
+
+=item * C<bytes> (integer, required) - Size of the file in bytes.
+
+=item * C<container_id> (string, required) - The container this file belongs to.
+
+=item * C<created_at> (integer, required) - Unix timestamp (in seconds) when the file was created.
+
+=item * C<id> (string, required) - Unique identifier for the file.
+
+=item * C<object> (string, required) - The type of this object (C<container.file>).
+
+=item * C<path> (string, required) - Path of the file in the container.
+
+=item * C<source> (string, required) - Source of the file (e.g., C<user> , C<assistant> ).
+
+=back
+
+=head2 CreateContainerFileBody
+
+Properties:
+
+=over
+
+=item * C<file> (string) - The File object (not file name) to be uploaded.
+
+=item * C<file_id> (string) - Name of the file to create.
 
 =back
 

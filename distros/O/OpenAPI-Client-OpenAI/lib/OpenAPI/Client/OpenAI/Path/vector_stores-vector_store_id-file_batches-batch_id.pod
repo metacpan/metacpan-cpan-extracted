@@ -4,79 +4,79 @@
 
 OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-file_batches-batch_id - Documentation for the /vector_stores/{vector_store_id}/file_batches/{batch_id} path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</vector_stores/{vector_store_id}/file_batches/{batch_id}>.
+=head2 GET /vector_stores/{vector_store_id}/file_batches/{batch_id}
 
-=head1 PATHS
+=head3 getVectorStoreFileBatch
 
-
-=head2 C<GET /vector_stores/{vector_store_id}/file_batches/{batch_id}>
-
-Retrieve vector store file batch
-
+  $client->get_vector_store_file_batch({
+      body => { ... },
+  });
 
 Retrieves a vector store file batch.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
+=item * C<vector_store_id> (in path, required, string) - The ID of the vector store that the file batch belongs to.
 
-C<getVectorStoreFileBatch>
-
-    $client->getVectorStoreFileBatch( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<vector_store_id> (in path) (Required) - The ID of the vector store that the file batch belongs to.
-
-Type: C<string>
-
-
-
-=item * C<batch_id> (in path) (Required) - The ID of the file batch being retrieved.
-
-Type: C<string>
-
-
+=item * C<batch_id> (in path, required, string) - The ID of the file batch being retrieved.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - OK>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-      "id": "vsfb_123",
-      "object": "vector_store.files_batch",
-      "created_at": 1698107661,
-      "vector_store_id": "vs_abc123",
-      "status": "completed",
-      "file_counts": {
-        "in_progress": 0,
-        "completed": 100,
-        "failed": 0,
-        "cancelled": 0,
-        "total": 100
-      }
+       "created_at" : 1698107661,
+       "file_counts" : {
+          "cancelled" : 0,
+          "completed" : 100,
+          "failed" : 0,
+          "in_progress" : 0,
+          "total" : 100
+       },
+       "id" : "vsfb_123",
+       "object" : "vector_store.files_batch",
+       "status" : "completed",
+       "vector_store_id" : "vs_abc123"
     }
 
+=head1 SCHEMAS
+
+=head2 VectorStoreFileBatchObject
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) for when the vector store files batch was
+created.
+
+=item * C<file_counts> (object, required)
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints.
+
+=item * C<object> (string, required) - The object type, which is always C<vector_store.file_batch> .
+
+Allowed values: vector_store.files_batch
+
+=item * C<status> (string, required) - The status of the vector store files batch, which can be either C<in_progress>
+, C<completed> , C<cancelled> or C<failed> .
+
+Allowed values: in_progress, completed, cancelled, failed
+
+=item * C<vector_store_id> (string, required) - The ID of the
+L<vector store|https://platform.openai.com/docs/api-reference/vector-stores/object>
+that the L<File|https://platform.openai.com/docs/api-reference/files> is
+attached to.
 
 =back
 

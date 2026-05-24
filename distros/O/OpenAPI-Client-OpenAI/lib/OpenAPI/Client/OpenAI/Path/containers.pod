@@ -4,161 +4,168 @@
 
 OpenAPI::Client::OpenAI::Path::containers - Documentation for the /containers path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</containers>.
+=head2 GET /containers
 
-=head1 PATHS
+=head3 ListContainers
 
-
-=head2 C<GET /containers>
-
-List containers
-
+  $client->list_containers({
+      body => { ... },
+  });
 
 List Containers
 
+Lists containers.
 
+=head4 Path/query parameters
 
-=head3 Operation ID
+=over
 
-C<ListContainers>
+=item * C<limit> (in query, optional, integer) - A limit on the number of objects to be returned. Limit can range between 1 and
+100, and the default is 20.
 
-    $client->ListContainers( ... );
+Default: 20
 
-=head3 Parameters
+=item * C<order> (in query, optional, string) - Sort order by the C<created_at> timestamp of the objects. C<asc> for ascending
+order and C<desc> for descending order.
 
-=over 4
+Allowed values: asc, desc
 
-=item * C<limit> (in query) (Optional) - A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.
+Default: desc
 
+=item * C<after> (in query, optional, string) - A cursor for use in pagination. C<after> is an object ID that defines your
+place in the list. For instance, if you make a list request and receive 100
+objects, ending with obj_foo, your subsequent call can include after=obj_foo
+in order to fetch the next page of the list.
 
-Type: C<integer>
-
-
-Default: C<20>
-
-
-=item * C<order> (in query) (Optional) - Sort order by the `created_at` timestamp of the objects. `asc` for ascending order and `desc` for descending order.
-
-
-Type: C<string>
-
-Allowed values: C<asc, desc>
-
-
-Default: C<desc>
-
-
-=item * C<after> (in query) (Optional) - A cursor for use in pagination. `after` is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include after=obj_foo in order to fetch the next page of the list.
-
-
-Type: C<string>
-
-
+=item * C<name> (in query, optional, string) - Filter results by container name.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - Success>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-Success
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
        "data" : [
           "{\n   \"id\": \"cntr_682dfebaacac8198bbfe9c2474fb6f4a085685cbe3cb5863\",\n   \"object\": \"container\",\n   \"created_at\": 1747844794,\n   \"status\": \"running\",\n   \"expires_after\": {\n     \"anchor\": \"last_active_at\",\n     \"minutes\": 20\n   },\n   \"last_active_at\": 1747844794,\n   \"memory_limit\": \"1g\",\n   \"name\": \"My Container\"\n}\n"
-       ]
+       ],
+       "first_id" : "string",
+       "has_more" : false,
+       "last_id" : "string",
+       "object" : "list"
     }
 
+=head2 POST /containers
 
-=back
+=head3 CreateContainer
 
-=head2 C<POST /containers>
-
-Create container
-
+  $client->create_container({
+      body => { ... },
+  });
 
 Create Container
 
+Creates a container.
 
+=head4 Responses
 
-=head3 Operation ID
+B<200 - Success>
 
-C<CreateContainer>
+Content-Type: application/json
 
-    $client->CreateContainer( ... );
-
-=head3 Parameters
-
-=over 4
-
-=back
-
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
-
-    
-      
-
-      
-      
 Example:
 
     {
-       "expires_after" : null,
-       "file_ids" : [
-          null
-       ]
-    }
-
-
-             
-
-=head3 Responses
-
-
-=head4 Status Code: C<200>
-
-Success
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
-
-    {
-       "id": "cntr_682dfebaacac8198bbfe9c2474fb6f4a085685cbe3cb5863",
-       "object": "container",
-       "created_at": 1747844794,
-       "status": "running",
-       "expires_after": {
-         "anchor": "last_active_at",
-         "minutes": 20
+       "created_at" : 1747844794,
+       "expires_after" : {
+          "anchor" : "last_active_at",
+          "minutes" : 20
        },
-       "last_active_at": 1747844794,
-       "memory_limit": "1g",
-       "name": "My Container"
+       "id" : "cntr_682dfebaacac8198bbfe9c2474fb6f4a085685cbe3cb5863",
+       "last_active_at" : 1747844794,
+       "memory_limit" : "1g",
+       "name" : "My Container",
+       "object" : "container",
+       "status" : "running"
     }
 
+=head1 SCHEMAS
+
+=head2 ContainerListResource
+
+Properties:
+
+=over
+
+=item * C<data> (array of ContainerResource, required) - A list of containers.
+
+=item * C<first_id> (string, required) - The ID of the first container in the list.
+
+=item * C<has_more> (boolean, required) - Whether there are more containers available.
+
+=item * C<last_id> (string, required) - The ID of the last container in the list.
+
+=item * C<object> (string, required) - The type of object returned, must be 'list'.
+
+Allowed values: list
+
+=back
+
+=head2 ContainerResource
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - Unix timestamp (in seconds) when the container was created.
+
+=item * C<expires_after> (object) - The container will expire after this time period. The anchor is the reference
+point for the expiration. The minutes is the number of minutes after the
+anchor before the container expires.
+
+=item * C<id> (string, required) - Unique identifier for the container.
+
+=item * C<last_active_at> (integer) - Unix timestamp (in seconds) when the container was last active.
+
+=item * C<memory_limit> (string) - The memory limit configured for the container.
+
+Allowed values: 1g, 4g, 16g, 64g
+
+=item * C<name> (string, required) - Name of the container.
+
+=item * C<network_policy> (object) - Network access policy for the container.
+
+=item * C<object> (string, required) - The type of this object.
+
+=item * C<status> (string, required) - Status of the container (e.g., active, deleted).
+
+=back
+
+=head2 CreateContainerBody
+
+Properties:
+
+=over
+
+=item * C<expires_after> (object) - Container expiration time in seconds relative to the 'anchor' time.
+
+=item * C<file_ids> (array of string) - IDs of files to copy to the container.
+
+=item * C<memory_limit> (string) - Optional memory limit for the container. Defaults to "1g".
+
+Allowed values: 1g, 4g, 16g, 64g
+
+=item * C<name> (string, required) - Name of the container to create.
+
+=item * C<network_policy> (oneOf) - Network access policy for the container.
+
+=item * C<skills> (array of object) - An optional list of skills referenced by id or inline data.
 
 =back
 

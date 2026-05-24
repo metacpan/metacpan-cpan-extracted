@@ -1,0 +1,356 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::chatkit-sessions - Documentation for the /chatkit/sessions path.
+
+=head1 OPERATIONS
+
+=head2 POST /chatkit/sessions
+
+=head3 CreateChatSessionMethod
+
+  $client->create_chat_session_method({
+      body => { ... },
+  });
+
+Create a ChatKit session.
+
+=head4 Responses
+
+B<200 - Success>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "chatkit_configuration" : {
+          "automatic_thread_titling" : {
+             "enabled" : true
+          },
+          "file_upload" : {
+             "enabled" : true,
+             "max_file_size" : 16,
+             "max_files" : 20
+          },
+          "history" : {
+             "enabled" : true,
+             "recent_threads" : 10
+          }
+       },
+       "client_secret" : "ek_token_123",
+       "expires_at" : 1712349876,
+       "id" : "cksess_123",
+       "max_requests_per_1_minute" : 60,
+       "object" : "chatkit.session",
+       "rate_limits" : {
+          "max_requests_per_1_minute" : 60
+       },
+       "status" : "cancelled",
+       "user" : "user_789",
+       "workflow" : {
+          "id" : "workflow_alpha",
+          "version" : "2024-10-01T00:00:00.000Z"
+       }
+    }
+
+=head1 SCHEMAS
+
+=head2 AutomaticThreadTitlingParam
+
+Properties:
+
+=over
+
+=item * C<enabled> (boolean) - Enable automatic thread title generation. Defaults to true.
+
+=back
+
+=head2 ChatSessionAutomaticThreadTitling
+
+Properties:
+
+=over
+
+=item * C<enabled> (boolean, required) - Whether automatic thread titling is enabled.
+
+=back
+
+=head2 ChatSessionChatkitConfiguration
+
+Properties:
+
+=over
+
+=item * C<automatic_thread_titling> (ChatSessionAutomaticThreadTitling, required) - Automatic thread titling preferences.
+
+See L</ChatSessionAutomaticThreadTitling> below for shape.
+
+=item * C<file_upload> (ChatSessionFileUpload, required) - Upload settings for the session.
+
+See L</ChatSessionFileUpload> below for shape.
+
+=item * C<history> (ChatSessionHistory, required) - History retention configuration.
+
+See L</ChatSessionHistory> below for shape.
+
+=back
+
+=head2 ChatSessionFileUpload
+
+Properties:
+
+=over
+
+=item * C<enabled> (boolean, required) - Indicates if uploads are enabled for the session.
+
+=item * C<max_file_size> (anyOf, required)
+
+=item * C<max_files> (anyOf, required)
+
+=back
+
+=head2 ChatSessionHistory
+
+Properties:
+
+=over
+
+=item * C<enabled> (boolean, required) - Indicates if chat history is persisted for the session.
+
+=item * C<recent_threads> (anyOf, required)
+
+=back
+
+=head2 ChatSessionRateLimits
+
+Properties:
+
+=over
+
+=item * C<max_requests_per_1_minute> (integer, required) - Maximum allowed requests per one-minute window.
+
+=back
+
+=head2 ChatSessionResource
+
+Properties:
+
+=over
+
+=item * C<chatkit_configuration> (ChatSessionChatkitConfiguration, required) - Resolved ChatKit feature configuration for the session.
+
+See L</ChatSessionChatkitConfiguration> below for shape.
+
+=item * C<client_secret> (string, required) - Ephemeral client secret that authenticates session requests.
+
+=item * C<expires_at> (integer, required) - Unix timestamp (in seconds) for when the session expires.
+
+=item * C<id> (string, required) - Identifier for the ChatKit session.
+
+=item * C<max_requests_per_1_minute> (integer, required) - Convenience copy of the per-minute request limit.
+
+=item * C<object> (string, required) - Type discriminator that is always C<chatkit.session> .
+
+Allowed values: chatkit.session
+
+Default: chatkit.session
+
+=item * C<rate_limits> (ChatSessionRateLimits, required) - Resolved rate limit values.
+
+See L</ChatSessionRateLimits> below for shape.
+
+=item * C<status> (ChatSessionStatus, required) - Current lifecycle state of the session.
+
+See L</ChatSessionStatus> below for shape.
+
+=item * C<user> (string, required) - User identifier associated with the session.
+
+=item * C<workflow> (ChatkitWorkflow, required) - Workflow metadata for the session.
+
+See L</ChatkitWorkflow> below for shape.
+
+=back
+
+=head2 ChatSessionStatus
+
+See L<https://platform.openai.com/docs/api-reference> for details.
+
+=head2 ChatkitConfigurationParam
+
+Properties:
+
+=over
+
+=item * C<automatic_thread_titling> (AutomaticThreadTitlingParam) - Configuration for automatic thread titling. When omitted, automatic thread
+titling is enabled by default.
+
+See L</AutomaticThreadTitlingParam> below for shape.
+
+=item * C<file_upload> (FileUploadParam) - Configuration for upload enablement and limits. When omitted, uploads are
+disabled by default (max_files 10, max_file_size 512 MB).
+
+See L</FileUploadParam> below for shape.
+
+=item * C<history> (HistoryParam) - Configuration for chat history retention. When omitted, history is enabled by
+default with no limit on recent_threads (null).
+
+See L</HistoryParam> below for shape.
+
+=back
+
+=head2 ChatkitWorkflow
+
+Properties:
+
+=over
+
+=item * C<id> (string, required) - Identifier of the workflow backing the session.
+
+=item * C<state_variables> (anyOf, required)
+
+=item * C<tracing> (ChatkitWorkflowTracing, required) - Tracing settings applied to the workflow.
+
+See L</ChatkitWorkflowTracing> below for shape.
+
+=item * C<version> (anyOf, required)
+
+=back
+
+=head2 ChatkitWorkflowTracing
+
+Properties:
+
+=over
+
+=item * C<enabled> (boolean, required) - Indicates whether tracing is enabled.
+
+=back
+
+=head2 CreateChatSessionBody
+
+Properties:
+
+=over
+
+=item * C<chatkit_configuration> (ChatkitConfigurationParam) - Optional overrides for ChatKit runtime configuration features
+
+See L</ChatkitConfigurationParam> below for shape.
+
+=item * C<expires_after> (ExpiresAfterParam) - Optional override for session expiration timing in seconds from creation.
+Defaults to 10 minutes.
+
+See L</ExpiresAfterParam> below for shape.
+
+=item * C<rate_limits> (RateLimitsParam) - Optional override for per-minute request limits. When omitted, defaults to 10.
+
+See L</RateLimitsParam> below for shape.
+
+=item * C<user> (string, required) - A free-form string that identifies your end user; ensures this Session can
+access other objects that have the same C<user> scope.
+
+=item * C<workflow> (WorkflowParam, required) - Workflow that powers the session.
+
+See L</WorkflowParam> below for shape.
+
+=back
+
+=head2 ExpiresAfterParam
+
+Properties:
+
+=over
+
+=item * C<anchor> (string, required) - Base timestamp used to calculate expiration. Currently fixed to C<created_at>
+.
+
+Allowed values: created_at
+
+Default: created_at
+
+=item * C<seconds> (integer, required) - Number of seconds after the anchor when the session expires.
+
+=back
+
+=head2 FileUploadParam
+
+Properties:
+
+=over
+
+=item * C<enabled> (boolean) - Enable uploads for this session. Defaults to false.
+
+=item * C<max_file_size> (integer) - Maximum size in megabytes for each uploaded file. Defaults to 512 MB, which is
+the maximum allowable size.
+
+=item * C<max_files> (integer) - Maximum number of files that can be uploaded to the session. Defaults to 10.
+
+=back
+
+=head2 HistoryParam
+
+Properties:
+
+=over
+
+=item * C<enabled> (boolean) - Enables chat users to access previous ChatKit threads. Defaults to true.
+
+=item * C<recent_threads> (integer) - Number of recent ChatKit threads users have access to. Defaults to unlimited
+when unset.
+
+=back
+
+=head2 RateLimitsParam
+
+Properties:
+
+=over
+
+=item * C<max_requests_per_1_minute> (integer) - Maximum number of requests allowed per minute for the session. Defaults to 10.
+
+=back
+
+=head2 WorkflowParam
+
+Properties:
+
+=over
+
+=item * C<id> (string, required) - Identifier for the workflow invoked by the session.
+
+=item * C<state_variables> (object) - State variables forwarded to the workflow. Keys may be up to 64 characters,
+values must be primitive types, and the map defaults to an empty object.
+
+=item * C<tracing> (WorkflowTracingParam) - Optional tracing overrides for the workflow invocation. When omitted, tracing
+is enabled by default.
+
+See L</WorkflowTracingParam> below for shape.
+
+=item * C<version> (string) - Specific workflow version to run. Defaults to the latest deployed version.
+
+=back
+
+=head2 WorkflowTracingParam
+
+Properties:
+
+=over
+
+=item * C<enabled> (boolean) - Whether tracing is enabled during the session. Defaults to true.
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

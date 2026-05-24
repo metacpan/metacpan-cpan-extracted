@@ -4,108 +4,103 @@
 
 OpenAPI::Client::OpenAI::Path::containers-container_id - Documentation for the /containers/{container_id} path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</containers/{container_id}>.
+=head2 DELETE /containers/{container_id}
 
-=head1 PATHS
+=head3 DeleteContainer
 
-
-=head2 C<DELETE /containers/{container_id}>
-
-Delete a container
-
+  $client->delete_container({
+      body => { ... },
+  });
 
 Delete Container
 
+Delete a container.
 
+=head4 Path/query parameters
 
-=head3 Operation ID
+=over
 
-C<DeleteContainer>
-
-    $client->DeleteContainer( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<container_id> (in path) (Required) - The ID of the container to delete.
-
-Type: C<string>
-
-
+=item * C<container_id> (in path, required, string) - The ID of the container to delete.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - OK>
 
+=head2 GET /containers/{container_id}
 
-=head4 Status Code: C<200>
+=head3 RetrieveContainer
 
-OK
-
-
-=head2 C<GET /containers/{container_id}>
-
-Retrieve container
-
+  $client->retrieve_container({
+      body => { ... },
+  });
 
 Retrieve Container
 
+Retrieves a container.
 
+=head4 Path/query parameters
 
-=head3 Operation ID
+=over
 
-C<RetrieveContainer>
-
-    $client->RetrieveContainer( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<container_id> (in path) (Required) - 
-
-Type: C<string>
-
-
+=item * C<container_id> (in path, required, string)
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - Success>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-Success
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-       "id": "cntr_682dfebaacac8198bbfe9c2474fb6f4a085685cbe3cb5863",
-       "object": "container",
-       "created_at": 1747844794,
-       "status": "running",
-       "expires_after": {
-         "anchor": "last_active_at",
-         "minutes": 20
+       "created_at" : 1747844794,
+       "expires_after" : {
+          "anchor" : "last_active_at",
+          "minutes" : 20
        },
-       "last_active_at": 1747844794,
-       "memory_limit": "1g",
-       "name": "My Container"
+       "id" : "cntr_682dfebaacac8198bbfe9c2474fb6f4a085685cbe3cb5863",
+       "last_active_at" : 1747844794,
+       "memory_limit" : "1g",
+       "name" : "My Container",
+       "object" : "container",
+       "status" : "running"
     }
 
+=head1 SCHEMAS
+
+=head2 ContainerResource
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - Unix timestamp (in seconds) when the container was created.
+
+=item * C<expires_after> (object) - The container will expire after this time period. The anchor is the reference
+point for the expiration. The minutes is the number of minutes after the
+anchor before the container expires.
+
+=item * C<id> (string, required) - Unique identifier for the container.
+
+=item * C<last_active_at> (integer) - Unix timestamp (in seconds) when the container was last active.
+
+=item * C<memory_limit> (string) - The memory limit configured for the container.
+
+Allowed values: 1g, 4g, 16g, 64g
+
+=item * C<name> (string, required) - Name of the container.
+
+=item * C<network_policy> (object) - Network access policy for the container.
+
+=item * C<object> (string, required) - The type of this object.
+
+=item * C<status> (string, required) - Status of the container (e.g., active, deleted).
 
 =back
 

@@ -1,0 +1,167 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::organization-groups-group_id-users - Documentation for the /organization/groups/{group_id}/users path.
+
+=head1 OPERATIONS
+
+=head2 GET /organization/groups/{group_id}/users
+
+=head3 list-group-users
+
+  $client->list_group_users({
+      body => { ... },
+  });
+
+Lists the users assigned to a group.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<group_id> (in path, required, string) - The ID of the group to inspect.
+
+=item * C<limit> (in query, optional, integer) - A limit on the number of users to be returned. Limit can range between 0 and
+1000, and the default is 100.
+
+Default: 100
+
+=item * C<after> (in query, optional, string) - A cursor for use in pagination. Provide the ID of the last user from the
+previous list response to retrieve the next page.
+
+=item * C<order> (in query, optional, string) - Specifies the sort order of users in the list.
+
+Allowed values: asc, desc
+
+Default: desc
+
+=back
+
+=head4 Responses
+
+B<200 - Group users listed successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "data" : [
+          {
+             "email" : "ada@example.com",
+             "id" : "user_abc123",
+             "name" : "Ada Lovelace"
+          }
+       ],
+       "has_more" : false,
+       "next" : null,
+       "object" : "list"
+    }
+
+=head2 POST /organization/groups/{group_id}/users
+
+=head3 add-group-user
+
+  $client->add_group_user({
+      body => { ... },
+  });
+
+Adds a user to a group.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<group_id> (in path, required, string) - The ID of the group to update.
+
+=back
+
+=head4 Responses
+
+B<200 - User added to the group successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "group_id" : "group_01J1F8ABCDXYZ",
+       "object" : "group.user",
+       "user_id" : "user_abc123"
+    }
+
+=head1 SCHEMAS
+
+=head2 CreateGroupUserBody
+
+Properties:
+
+=over
+
+=item * C<user_id> (string, required) - Identifier of the user to add to the group.
+
+=back
+
+=head2 GroupUser
+
+Properties:
+
+=over
+
+=item * C<email> (anyOf, required) - The email address of the user.
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints
+
+=item * C<name> (string, required) - The name of the user.
+
+=back
+
+=head2 GroupUserAssignment
+
+Properties:
+
+=over
+
+=item * C<group_id> (string, required) - Identifier of the group the user was added to.
+
+=item * C<object> (string, required) - Always C<group.user> .
+
+Allowed values: group.user
+
+=item * C<user_id> (string, required) - Identifier of the user that was added.
+
+=back
+
+=head2 UserListResource
+
+Properties:
+
+=over
+
+=item * C<data> (array of GroupUser, required) - Users in the current page.
+
+=item * C<has_more> (boolean, required) - Whether more users are available when paginating.
+
+=item * C<next> (anyOf, required) - Cursor to fetch the next page of results, or C<null> when no further users are
+available.
+
+=item * C<object> (string, required) - Always C<list> .
+
+Allowed values: list
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

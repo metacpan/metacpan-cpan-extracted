@@ -1,0 +1,189 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::conversations-conversation_id - Documentation for the /conversations/{conversation_id} path.
+
+=head1 OPERATIONS
+
+=head2 DELETE /conversations/{conversation_id}
+
+=head3 deleteConversation
+
+  $client->delete_conversation({
+      body => { ... },
+  });
+
+Delete a conversation. Items in the conversation will not be deleted.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<conversation_id> (in path, required, string) - The ID of the conversation to delete.
+
+=back
+
+=head4 Responses
+
+B<200 - Success>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "deleted" : false,
+       "id" : "string",
+       "object" : "conversation.deleted"
+    }
+
+=head2 GET /conversations/{conversation_id}
+
+=head3 getConversation
+
+  $client->get_conversation({
+      body => { ... },
+  });
+
+Get a conversation
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<conversation_id> (in path, required, string) - The ID of the conversation to retrieve.
+
+=back
+
+=head4 Responses
+
+B<200 - Success>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "created_at" : 0,
+       "id" : "string",
+       "metadata" : null,
+       "object" : "conversation"
+    }
+
+=head2 POST /conversations/{conversation_id}
+
+=head3 updateConversation
+
+  $client->update_conversation({
+      body => { ... },
+  });
+
+Update a conversation
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<conversation_id> (in path, required, string) - The ID of the conversation to update.
+
+=back
+
+=head4 Responses
+
+B<200 - Success>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "created_at" : 0,
+       "id" : "string",
+       "metadata" : null,
+       "object" : "conversation"
+    }
+
+=head1 SCHEMAS
+
+=head2 ConversationResource
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - The time at which the conversation was created, measured in seconds since the
+Unix epoch.
+
+=item * C<id> (string, required) - The unique ID of the conversation.
+
+=item * C<metadata> (unknown, required) - Set of 16 key-value pairs that can be attached to an object. This can be
+useful for storing additional information about the object in a structured
+format, and querying for objects via API or the dashboard. Keys are strings
+with a maximum length of 64 characters. Values are strings with a maximum
+length of 512 characters.
+
+=item * C<object> (string, required) - The object type, which is always C<conversation> .
+
+Allowed values: conversation
+
+Default: conversation
+
+=back
+
+=head2 DeletedConversationResource
+
+Properties:
+
+=over
+
+=item * C<deleted> (boolean, required)
+
+=item * C<id> (string, required)
+
+=item * C<object> (string, required)
+
+Allowed values: conversation.deleted
+
+Default: conversation.deleted
+
+=back
+
+=head2 Metadata
+
+Set of 16 key-value pairs that can be attached to an object. This can be
+useful for storing additional information about the object in a structured
+format, and querying for objects via API or the dashboard.
+
+Keys are strings with a maximum length of 64 characters. Values are strings
+with a maximum length of 512 characters.
+
+=head2 UpdateConversationBody
+
+Properties:
+
+=over
+
+=item * C<metadata> (Metadata, required) - Set of 16 key-value pairs that can be attached to an object. This can be
+useful for storing additional information about the object in a structured
+format, and querying for objects via API or the dashboard. Keys are strings
+with a maximum length of 64 characters. Values are strings with a maximum
+length of 512 characters.
+
+See L</Metadata> below for shape.
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

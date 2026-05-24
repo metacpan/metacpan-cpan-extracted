@@ -1,0 +1,159 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::organization-groups - Documentation for the /organization/groups path.
+
+=head1 OPERATIONS
+
+=head2 GET /organization/groups
+
+=head3 list-groups
+
+  $client->list_groups({
+      body => { ... },
+  });
+
+Lists all groups in the organization.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<limit> (in query, optional, integer) - A limit on the number of groups to be returned. Limit can range between 0 and
+1000, and the default is 100.
+
+Default: 100
+
+=item * C<after> (in query, optional, string) - A cursor for use in pagination. C<after> is a group ID that defines your place
+in the list. For instance, if you make a list request and receive 100 objects,
+ending with group_abc, your subsequent call can include C<after=group_abc> in
+order to fetch the next page of the list.
+
+=item * C<order> (in query, optional, string) - Specifies the sort order of the returned groups.
+
+Allowed values: asc, desc
+
+Default: asc
+
+=back
+
+=head4 Responses
+
+B<200 - Groups listed successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "data" : [
+          {
+             "created_at" : 1711471533,
+             "id" : "group_01J1F8ABCDXYZ",
+             "is_scim_managed" : false,
+             "name" : "Support Team"
+          },
+          {
+             "created_at" : 1711472599,
+             "id" : "group_01J1F8PQRMNO",
+             "is_scim_managed" : true,
+             "name" : "Sales"
+          }
+       ],
+       "has_more" : false,
+       "next" : null,
+       "object" : "list"
+    }
+
+=head2 POST /organization/groups
+
+=head3 create-group
+
+  $client->create_group({
+      body => { ... },
+  });
+
+Creates a new group in the organization.
+
+=head4 Responses
+
+B<200 - Group created successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "created_at" : 1711471533,
+       "group_type" : "group",
+       "id" : "group_01J1F8ABCDXYZ",
+       "is_scim_managed" : false,
+       "name" : "Support Team"
+    }
+
+=head1 SCHEMAS
+
+=head2 CreateGroupBody
+
+Properties:
+
+=over
+
+=item * C<name> (string, required) - Human readable name for the group.
+
+=back
+
+=head2 GroupListResource
+
+Properties:
+
+=over
+
+=item * C<data> (array of GroupResponse, required) - Groups returned in the current page.
+
+=item * C<has_more> (boolean, required) - Whether additional groups are available when paginating.
+
+=item * C<next> (anyOf, required) - Cursor to fetch the next page of results, or C<null> if there are no more
+results.
+
+=item * C<object> (string, required) - Always C<list> .
+
+Allowed values: list
+
+=back
+
+=head2 GroupResponse
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - Unix timestamp (in seconds) when the group was created.
+
+=item * C<group_type> (string, required) - The type of the group.
+
+Allowed values: group, tenant_group
+
+=item * C<id> (string, required) - Identifier for the group.
+
+=item * C<is_scim_managed> (boolean, required) - Whether the group is managed through SCIM and controlled by your identity
+provider.
+
+=item * C<name> (string, required) - Display name of the group.
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

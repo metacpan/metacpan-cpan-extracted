@@ -290,6 +290,17 @@ like correctly comparing equivalent characters and/or ignoring the case.
 
 The markers of the input lines are reset (no line is marked after this command).
 
+=item B<--ss>, B<--semver-sort>
+
+Sort the content of the input as version strings, following the precedence
+rules of L<Semantic Versioning|https://semver.org>. So, for example, C<1.9.0>
+sorts before C<1.10.0> (instead of after it as a lexicographic sort would do)
+and a pre-release version such as C<1.0.0-alpha> sorts before the corresponding
+release C<1.0.0>. An optional leading C<v> and an optional prefix terminated by
+C</> are also recognized.
+
+The markers of the input lines are reset (no line is marked after this command).
+
 =item B<--cs> I<code>, B<--custom-sort>
 
 Sort the content of the input using the given custom comparator. See the

@@ -1,7 +1,7 @@
 package CPAN::Mirror::Tiny::Server;
-use 5.008001;
-use strict;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
 
 use CPAN::Mirror::Tiny;
 use File::Copy ();
@@ -11,16 +11,14 @@ use Plack::Builder;
 use Plack::Request;
 use Plack::Runner;
 
-sub uploader {
-    my ($class, %args) = @_;
+sub uploader ($class, %args) {
     my $base = $args{base} or die;
     my $tempdir = $args{tempdir} || File::Temp::tempdir(CLEANUP => 1);
     my $compress_index = 1;
     $compress_index = $args{compress_index} if exists $args{compress_index};
 
     my $cpan = CPAN::Mirror::Tiny->new(base => $base, tempdir => $tempdir);
-    return sub {
-        my $env = shift;
+    return sub ($env) {
         my $req = Plack::Request->new($env);
         return [404, [], ['NOT FOUND']] if $req->path_info !~ m!\A/?\z!ms;
 
@@ -56,8 +54,7 @@ sub uploader {
     }
 }
 
-sub start {
-    my ($class, @argv) = @_;
+sub start ($class, @argv) {
     my $runner = Plack::Runner->new;
     $runner->parse_options(@argv);
     if ($runner->{help}) {
@@ -119,4 +116,3 @@ Most of code is copied from L<OrePAN2::Server>. Its license is:
   it under the same terms as Perl itself.
 
 =cut
-

@@ -319,6 +319,116 @@ use Exporter qw[import];
 }
 
 {
+  package
+  Time::Str::PP::Time; # hide from PAUSE/indexers
+
+  our @EXPORT_OK = qw[ timegm_posix
+                       timegm_modern
+                       valid_hms
+                       valid_hms60 ];
+
+  use Carp     qw[croak];
+  use Exporter qw[import];
+
+  use constant RDN_UNIX_EPOCH => 719163; # 1970-01-01
+
+  sub valid_hms {
+    @_ == 3 or croak q/Usage: valid_hms(hour, minute, second)/;
+    my ($h, $m, $s) = @_;
+    return ($h >= 0 && $h <= 23)
+        && ($m >= 0 && $m <= 59)
+        && ($s >= 0 && $s <= 59);
+  }
+
+  sub valid_hms60 {
+    @_ == 3 or croak q/Usage: valid_hms60(hour, minute, second)/;
+    my ($h, $m, $s) = @_;
+    return ($h >= 0 && $h <= 23)
+        && ($m >= 0 && $m <= 59)
+        && ($s >= 0 && $s <= 60);
+  }
+
+  sub timegm_modern {
+    @_ == 6 or croak q/Usage: timegm_modern(sec, min, hour, mday, mon, year)/;
+    my ($S, $M, $H, $d, $m, $y) = @_;
+
+    ($y >= 1 && $y <= 9999)
+      or croak q/Parameter 'year' is out of range [1, 9999]/;
+    ($m >= 1 && $m <= 12)
+      or croak q/Parameter 'month' is out of range [1, 12]/;
+    ($d >= 1 && ($d <= 28 || $d <= Time::Str::PP::Calendar::month_days($y, $m)))
+      or croak q/Parameter 'day' is out of range/;
+    ($H >= 0 && $H <= 23)
+      or croak q/Parameter 'hour' is out of range [0, 23]/;
+    ($M >= 0 && $M <= 59)
+      or croak q/Parameter 'minute' is out of range [0, 59]/;
+    ($S >= 0 && $S <= 59)
+      or croak q/Parameter 'second' is out of range [0, 59]/;
+
+    my $rdn = do {
+      use integer;
+      if ($m < 3) {
+        $y--, $m += 12;
+      }
+      ((1461 * $y) >> 2) - $y / 100 + $y / 400
+        + $d + ((979 * $m - 2918) >> 5) - 306;
+    };
+    return ($rdn - RDN_UNIX_EPOCH) * 86400 + $H * 3600 + $M * 60 + $S;
+  }
+
+  sub timegm_posix {
+    @_ == 6 or croak q/Usage: timegm_posix(sec, min, hour, mday, mon, year)/;
+    my ($S, $M, $H, $d, $m, $y) = @_;
+    return timegm_modern($S, $M, $H, $d, $m + 1, $y + 1900);
+  }
+}
+
+{
+  package
+  Time::Str::PP::Util; # hide from PAUSE/indexers
+
+  our @EXPORT_OK = qw[ lower_bound
+                       upper_bound ];
+
+  use Carp     qw[croak];
+  use Exporter qw[import];
+
+  sub lower_bound {
+    (@_ >= 2 && @_ <= 4) or croak q/Usage: lower_bound(array, value [, lo [, h i]])/;
+    my ($array, $value, $lo, $hi) = @_;
+
+    ref $array eq 'ARRAY'
+      or croak q/Parameter 'array' must be an array reference/;
+
+    $lo //= 0;
+    $hi //= @$array;
+    while ($lo < $hi) {
+      my $mid = ($lo + $hi) >> 1;
+      if   ($array->[$mid] < $value) { $lo = $mid + 1 }
+      else                           { $hi = $mid     }
+    }
+    return $lo;
+  }
+
+  sub upper_bound {
+    (@_ >= 2 && @_ <= 4) or croak q/Usage: upper_bound(array, value [, lo [, hi ]])/;
+    my ($array, $value, $lo, $hi) = @_;
+
+    ref $array eq 'ARRAY'
+      or croak q/Parameter 'array' must be an array reference/;
+
+    $lo //= 0;
+    $hi //= @$array;
+    while ($lo < $hi) {
+      my $mid = ($lo + $hi) >> 1;
+      if   ($array->[$mid] <= $value) { $lo = $mid + 1 }
+      else                            { $hi = $mid     }
+    }
+    return $lo;
+  }
+}
+
+{
   my @import = qw [ valid_ymd
                     resolve_century
                     ymd_to_dow

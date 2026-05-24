@@ -4,117 +4,119 @@
 
 OpenAPI::Client::OpenAI::Path::files-file_id - Documentation for the /files/{file_id} path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</files/{file_id}>.
+=head2 DELETE /files/{file_id}
 
-=head1 PATHS
+=head3 deleteFile
 
-
-=head2 C<DELETE /files/{file_id}>
-
-Delete file
-
+  $client->delete_file({
+      body => { ... },
+  });
 
 Delete a file and remove it from all vector stores.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
-
-C<deleteFile>
-
-    $client->deleteFile( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<file_id> (in path) (Required) - The ID of the file to use for this request.
-
-Type: C<string>
-
-
+=item * C<file_id> (in path, required, string) - The ID of the file to use for this request.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - OK>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
+Example:
 
-OK
+    {
+       "deleted" : false,
+       "id" : "string",
+       "object" : "file"
+    }
 
+=head2 GET /files/{file_id}
 
-=head4 Content Types:
+=head3 retrieveFile
 
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
-
-
-
-=back
-
-=head2 C<GET /files/{file_id}>
-
-Retrieve file
-
+  $client->retrieve_file({
+      body => { ... },
+  });
 
 Returns information about a specific file.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
-
-C<retrieveFile>
-
-    $client->retrieveFile( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<file_id> (in path) (Required) - The ID of the file to use for this request.
-
-Type: C<string>
-
-
+=item * C<file_id> (in path, required, string) - The ID of the file to use for this request.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - OK>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
+Example:
 
-OK
+    "{\n  \"id\": \"file-abc123\",\n  \"object\": \"file\",\n  \"bytes\": 120000,\n  \"created_at\": 1677610602,\n  \"expires_at\": 1680202602,\n  \"filename\": \"salesOverview.pdf\",\n  \"purpose\": \"assistants\",\n}\n"
 
+=head1 SCHEMAS
 
-=head4 Content Types:
+=head2 DeleteFileResponse
 
-=over 4
+Properties:
 
+=over
 
-=item * C<application/json>
+=item * C<deleted> (boolean, required)
 
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+=item * C<id> (string, required)
 
-    {
-      "id": "file-abc123",
-      "object": "file",
-      "bytes": 120000,
-      "created_at": 1677610602,
-      "expires_at": 1680202602,
-      "filename": "salesOverview.pdf",
-      "purpose": "assistants",
-    }
+=item * C<object> (string, required)
 
+Allowed values: file
+
+=back
+
+=head2 OpenAIFile
+
+Properties:
+
+=over
+
+=item * C<bytes> (integer, required) - The size of the file, in bytes.
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) for when the file was created.
+
+=item * C<expires_at> (integer) - The Unix timestamp (in seconds) for when the file will expire.
+
+=item * C<filename> (string, required) - The name of the file.
+
+=item * C<id> (string, required) - The file identifier, which can be referenced in the API endpoints.
+
+=item * C<object> (string, required) - The object type, which is always C<file> .
+
+Allowed values: file
+
+=item * C<purpose> (string, required) - The intended purpose of the file. Supported values are C<assistants> ,
+C<assistants_output> , C<batch> , C<batch_output> , C<fine-tune> ,
+C<fine-tune-results> , C<vision> , and C<user_data> .
+
+Allowed values: assistants, assistants_output, batch, batch_output, fine-tune, fine-tune-results, vision, user_data
+
+=item * C<status> (string, required) - Deprecated. The current status of the file, which can be either C<uploaded> ,
+C<processed> , or C<error> .
+
+Allowed values: uploaded, processed, error
+
+=item * C<status_details> (string) - Deprecated. For details on why a fine-tuning training file failed validation,
+see the C<error> field on C<fine_tuning.job> .
 
 =back
 

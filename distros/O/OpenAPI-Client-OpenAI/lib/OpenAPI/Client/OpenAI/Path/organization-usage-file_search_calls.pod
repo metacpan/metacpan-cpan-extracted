@@ -1,0 +1,129 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::organization-usage-file_search_calls - Documentation for the /organization/usage/file_search_calls path.
+
+=head1 OPERATIONS
+
+=head2 GET /organization/usage/file_search_calls
+
+=head3 usage-file-search-calls
+
+  $client->usage_file_search_calls({
+      body => { ... },
+  });
+
+Get file search calls usage details for the organization.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<start_time> (in query, required, integer) - Start time (Unix seconds) of the query time range, inclusive.
+
+=item * C<end_time> (in query, optional, integer) - End time (Unix seconds) of the query time range, exclusive.
+
+=item * C<bucket_width> (in query, optional, string) - Width of each time bucket in response. Currently C<1m> , C<1h> and C<1d> are
+supported, default to C<1d> .
+
+Allowed values: 1m, 1h, 1d
+
+Default: 1d
+
+=item * C<project_ids> (in query, optional, array) - Return only usage for these projects.
+
+=item * C<user_ids> (in query, optional, array) - Return only usage for these users.
+
+=item * C<api_key_ids> (in query, optional, array) - Return only usage for these API keys.
+
+=item * C<vector_store_ids> (in query, optional, array) - Return only usage for these vector stores.
+
+=item * C<group_by> (in query, optional, array) - Group the usage data by the specified fields. Support fields include
+C<project_id> , C<user_id> , C<api_key_id> , C<vector_store_id> or any
+combination of them.
+
+=item * C<limit> (in query, optional, integer) - Specifies the number of buckets to return. - C<bucket_width=1d> : default: 7,
+max: 31 - C<bucket_width=1h> : default: 24, max: 168 - C<bucket_width=1m> :
+default: 60, max: 1440
+
+=item * C<page> (in query, optional, string) - A cursor for use in pagination. Corresponding to the C<next_page> field from
+the previous response.
+
+=back
+
+=head4 Responses
+
+B<200 - Usage data retrieved successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "data" : [
+          {
+             "end_time" : 0,
+             "object" : "bucket",
+             "results" : [
+                "{\n    \"object\": \"organization.usage.completions.result\",\n    \"input_tokens\": 5000,\n    \"output_tokens\": 1000,\n    \"input_cached_tokens\": 4000,\n    \"input_audio_tokens\": 300,\n    \"output_audio_tokens\": 200,\n    \"num_model_requests\": 5,\n    \"project_id\": \"proj_abc\",\n    \"user_id\": \"user-abc\",\n    \"api_key_id\": \"key_abc\",\n    \"model\": \"gpt-4o-mini-2024-07-18\",\n    \"batch\": false,\n    \"service_tier\": \"default\"\n}\n"
+             ],
+             "start_time" : 0
+          }
+       ],
+       "has_more" : false,
+       "next_page" : "string",
+       "object" : "page"
+    }
+
+=head1 SCHEMAS
+
+=head2 UsageResponse
+
+Properties:
+
+=over
+
+=item * C<data> (array of UsageTimeBucket, required)
+
+=item * C<has_more> (boolean, required)
+
+=item * C<next_page> (anyOf, required)
+
+=item * C<object> (string, required)
+
+Allowed values: page
+
+=back
+
+=head2 UsageTimeBucket
+
+Properties:
+
+=over
+
+=item * C<end_time> (integer, required)
+
+=item * C<object> (string, required)
+
+Allowed values: bucket
+
+=item * C<results> (array of object, required)
+
+=item * C<start_time> (integer, required)
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

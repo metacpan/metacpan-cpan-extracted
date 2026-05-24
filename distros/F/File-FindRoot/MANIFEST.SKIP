@@ -1,0 +1,17 @@
+#!include_default
+
+\.downstream\.jsons
+\.?appveyor\.yml
+\.releaserc
+\.lwpcookies
+CPAN-.*
+TODO
+\.tmproj
+profile
+nytprof
+^02packages.*gz
+\bMANIFEST\s\d
+\bChanges\s\d
+\.icloud$
+\A\.github\b
+\.gitattributes\b

@@ -4,75 +4,45 @@
 
 OpenAPI::Client::OpenAI::Path::organization-admin_api_keys - Documentation for the /organization/admin_api_keys path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</organization/admin_api_keys>.
+=head2 GET /organization/admin_api_keys
 
-=head1 PATHS
+=head3 admin-api-keys-list
 
-
-=head2 C<GET /organization/admin_api_keys>
-
-List all organization and project API keys.
-
+  $client->admin_api_keys_list({
+      body => { ... },
+  });
 
 List organization API keys
 
+Retrieve a paginated list of organization admin API keys.
 
+=head4 Path/query parameters
 
-=head3 Operation ID
+=over
 
-C<admin-api-keys-list>
+=item * C<after> (in query, optional, string)
 
-    $client->admin-api-keys-list( ... );
+=item * C<order> (in query, optional, string)
 
-=head3 Parameters
+Allowed values: asc, desc
 
-=over 4
+Default: asc
 
-=item * C<after> (in query) (Optional) - 
+=item * C<limit> (in query, optional, integer)
 
-Type: C<string>
-
-
-
-=item * C<order> (in query) (Optional) - 
-
-Type: C<string>
-
-Allowed values: C<asc, desc>
-
-
-Default: C<asc>
-
-
-=item * C<limit> (in query) (Optional) - 
-
-Type: C<integer>
-
-
-Default: C<20>
-
+Default: 20
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - A list of organization API keys.>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-A list of organization API keys.
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
        "data" : [
@@ -84,82 +54,109 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
        "object" : "list"
     }
 
+=head2 POST /organization/admin_api_keys
 
-=back
+=head3 admin-api-keys-create
 
-=head2 C<POST /organization/admin_api_keys>
-
-Create admin API key
-
+  $client->admin_api_keys_create({
+      body => { ... },
+  });
 
 Create an organization admin API key
 
+Create a new admin-level API key for the organization.
 
+=head4 Request body
 
-=head3 Operation ID
+Content-Type: application/json
 
-C<admin-api-keys-create>
+Properties:
 
-    $client->admin-api-keys-create( ... );
+=over
 
-=head3 Parameters
-
-=over 4
+=item * C<name> (string, required)
 
 =back
 
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
-
-    
-      
-
-      
-      
 Example:
 
     {
        "name" : "New Admin Key"
     }
 
+=head4 Responses
 
-             
+B<200 - The newly created admin API key.>
 
-=head3 Responses
+Content-Type: application/json
 
-
-=head4 Status Code: C<200>
-
-The newly created admin API key.
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-      "object": "organization.admin_api_key",
-      "id": "key_abc",
-      "name": "Main Admin Key",
-      "redacted_value": "sk-admin...xyz",
-      "created_at": 1711471533,
-      "last_used_at": 1711471534,
-      "owner": {
-        "type": "user",
-        "object": "organization.user",
-        "id": "user_123",
-        "name": "John Doe",
-        "created_at": 1711471533,
-        "role": "owner"
-      }
+       "created_at" : 1711471533,
+       "id" : "key_abc",
+       "last_used_at" : 1711471534,
+       "name" : "Administration Key",
+       "object" : "organization.admin_api_key",
+       "owner" : {
+          "created_at" : 1711471533,
+          "id" : "sa_456",
+          "name" : "My Service Account",
+          "object" : "organization.user",
+          "role" : "owner",
+          "type" : "user"
+       },
+       "redacted_value" : "sk-admin...def",
+       "value" : "sk-admin-1234abcd"
     }
 
+=head1 SCHEMAS
+
+=head2 AdminApiKey
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) of when the API key was created
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints
+
+=item * C<last_used_at> (anyOf)
+
+=item * C<name> (anyOf) - The name of the API key
+
+=item * C<object> (string, required) - The object type, which is always C<organization.admin_api_key>
+
+Allowed values: organization.admin_api_key
+
+=item * C<owner> (object, required)
+
+=item * C<redacted_value> (string, required) - The redacted value of the API key
+
+=back
+
+=head2 AdminApiKeyCreateResponse
+
+See L<https://platform.openai.com/docs/api-reference> for details.
+
+=head2 ApiKeyList
+
+Properties:
+
+=over
+
+=item * C<data> (array of AdminApiKey, required)
+
+=item * C<first_id> (anyOf)
+
+=item * C<has_more> (boolean, required)
+
+=item * C<last_id> (anyOf)
+
+=item * C<object> (string, required)
+
+Allowed values: list
 
 =back
 

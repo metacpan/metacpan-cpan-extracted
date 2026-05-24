@@ -22,7 +22,7 @@ use List::Util     qw<
 
 $|++;  # Disable STDOUT buffering.
 
-our $VERSION = 'v1.1.0';
+our $VERSION = 'v1.1.1';
 
 field $_install_license;
 field %_generated_meta;
@@ -1018,21 +1018,48 @@ method write_pkgbuild ()
         my @contributors;
         {
             @file_contents = path( $FILES{outfile} )->lines_utf8( { chomp => 1 } );
-            @contributors  = grep { /\A \# \s*(?> Mai?ntainer | Contributor)\s*:\s* [^\n]+ \z/xi } @file_contents;
+            @contributors =
+              grep { /\A \# \s*(?> (?> Co-)?Mai?ntainer | Contributor)\s*:\s* [^\n]+ \z/xi } @file_contents;
 
             $self->_pdump( '@file_contents', \@file_contents, "\n" );
             $self->_pdump( '@contributors',  \@contributors,  "\n" );
-
-            # Update maintainer
-            if ( !scalar @contributors || $contributors[0] !~ /\b$env{packager}\z/ ) {
-                unshift @contributors, "# Maintainer: $env{packager}";
-            }
         }
 
-        # Set past maintainers as contributors.
+        # Set past maintainer/contributor attributions.
         {
+            # Whether PACKAGER is the current maintainer.
+            my $has_packager = false;
+            if ( defined $contributors[0] ) {
+                $has_packager = true
+                  if $contributors[0] =~ /\b$env{packager}\z/;
+            }
+
+            $contributors[0] = "# Maintainer: $env{packager}" if $has_packager;
+
+            if ( !scalar @contributors || !$has_packager ) {
+                # Update maintainer anyway.
+                unshift @contributors, "# Maintainer: $env{packager}";
+            }
+
             my $maintainer = shift @contributors;
-            @contributors = map { s{ \A [^:]+: \s* }{# Contributor: }xr } @contributors;
+
+            # Preserve co-maintainers if PACKAGER is the current maintainer.
+            if ($has_packager) {
+                my @preserved;
+
+                foreach my $contrib (@contributors) {
+                    if ( $contrib =~ s{\A \# \s* (?> Co-)?Mai?ntainer \s*: \s*}{# Maintainer: }ix ) {
+                        push @preserved, $contrib;
+                        next;
+                    }
+                    push @preserved, $contrib =~ s{\A [^:]+: \s*}{# Contributor: }xr;
+                }
+
+                @contributors = @preserved;
+            }
+            else {
+                @contributors = map { s{ \A [^:]+: \s* }{# Contributor: }xr } @contributors;
+            }
 
             my $attributions = join "\n", $maintainer, @contributors;
             $gen_output =~ s{\A}{$attributions\n\n};

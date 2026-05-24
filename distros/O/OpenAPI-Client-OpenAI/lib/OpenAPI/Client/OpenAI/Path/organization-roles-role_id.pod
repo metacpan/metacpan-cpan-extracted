@@ -1,0 +1,188 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::organization-roles-role_id - Documentation for the /organization/roles/{role_id} path.
+
+=head1 OPERATIONS
+
+=head2 DELETE /organization/roles/{role_id}
+
+=head3 delete-role
+
+  $client->delete_role({
+      body => { ... },
+  });
+
+Deletes a custom role from the organization.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<role_id> (in path, required, string) - The ID of the role to delete.
+
+=back
+
+=head4 Responses
+
+B<200 - Role deleted successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "deleted" : true,
+       "id" : "role_01J1F8ROLE01",
+       "object" : "role.deleted"
+    }
+
+=head2 GET /organization/roles/{role_id}
+
+=head3 retrieve-role
+
+  $client->retrieve_role({
+      body => { ... },
+  });
+
+Retrieves an organization role.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<role_id> (in path, required, string) - The ID of the role to retrieve.
+
+=back
+
+=head4 Responses
+
+B<200 - Role retrieved successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "description" : "Allows managing organization groups",
+       "id" : "role_01J1F8ROLE01",
+       "name" : "API Group Manager",
+       "object" : "role",
+       "permissions" : [
+          "api.groups.read",
+          "api.groups.write"
+       ],
+       "predefined_role" : false,
+       "resource_type" : "api.organization"
+    }
+
+=head2 POST /organization/roles/{role_id}
+
+=head3 update-role
+
+  $client->update_role({
+      body => { ... },
+  });
+
+Updates an existing organization role.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<role_id> (in path, required, string) - The ID of the role to update.
+
+=back
+
+=head4 Responses
+
+B<200 - Role updated successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "description" : "Allows managing organization groups",
+       "id" : "role_01J1F8ROLE01",
+       "name" : "API Group Manager",
+       "object" : "role",
+       "permissions" : [
+          "api.groups.read",
+          "api.groups.write"
+       ],
+       "predefined_role" : false,
+       "resource_type" : "api.organization"
+    }
+
+=head1 SCHEMAS
+
+=head2 PublicUpdateOrganizationRoleBody
+
+Properties:
+
+=over
+
+=item * C<description> (anyOf) - New description for the role.
+
+=item * C<permissions> (anyOf) - Updated set of permissions for the role.
+
+=item * C<role_name> (anyOf) - New name for the role.
+
+=back
+
+=head2 Role
+
+Properties:
+
+=over
+
+=item * C<description> (anyOf, required) - Optional description of the role.
+
+=item * C<id> (string, required) - Identifier for the role.
+
+=item * C<name> (string, required) - Unique name for the role.
+
+=item * C<object> (string, required) - Always C<role> .
+
+Allowed values: role
+
+=item * C<permissions> (array of string, required) - Permissions granted by the role.
+
+=item * C<predefined_role> (boolean, required) - Whether the role is predefined and managed by OpenAI.
+
+=item * C<resource_type> (string, required) - Resource type the role is bound to (for example C<api.organization> or
+C<api.project> ).
+
+=back
+
+=head2 RoleDeletedResource
+
+Properties:
+
+=over
+
+=item * C<deleted> (boolean, required) - Whether the role was deleted.
+
+=item * C<id> (string, required) - Identifier of the deleted role.
+
+=item * C<object> (string, required) - Always C<role.deleted> .
+
+Allowed values: role.deleted
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

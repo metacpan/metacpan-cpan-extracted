@@ -4,100 +4,85 @@
 
 OpenAPI::Client::OpenAI::Path::chat-completions-completion_id-messages - Documentation for the /chat/completions/{completion_id}/messages path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</chat/completions/{completion_id}/messages>.
+=head2 GET /chat/completions/{completion_id}/messages
 
-=head1 PATHS
+=head3 getChatCompletionMessages
 
+  $client->get_chat_completion_messages({
+      body => { ... },
+  });
 
-=head2 C<GET /chat/completions/{completion_id}/messages>
+Get the messages in a stored chat completion. Only Chat Completions that have
+been created with the C<store> parameter set to C<true> will be returned.
 
-Get chat messages
+=head4 Path/query parameters
 
+=over
 
-Get the messages in a stored chat completion. Only Chat Completions that
-have been created with the C<store> parameter set to C<true> will be
-returned.
+=item * C<completion_id> (in path, required, string) - The ID of the chat completion to retrieve messages from.
 
+=item * C<after> (in query, optional, string) - Identifier for the last message from the previous pagination request.
 
+=item * C<limit> (in query, optional, integer) - Number of messages to retrieve.
 
-=head3 Operation ID
+Default: 20
 
-C<getChatCompletionMessages>
+=item * C<order> (in query, optional, string) - Sort order for messages by timestamp. Use C<asc> for ascending order or
+C<desc> for descending order. Defaults to C<asc> .
 
-    $client->getChatCompletionMessages( ... );
+Allowed values: asc, desc
 
-=head3 Parameters
-
-=over 4
-
-=item * C<completion_id> (in path) (Required) - The ID of the chat completion to retrieve messages from.
-
-Type: C<string>
-
-
-
-=item * C<after> (in query) (Optional) - Identifier for the last message from the previous pagination request.
-
-Type: C<string>
-
-
-
-=item * C<limit> (in query) (Optional) - Number of messages to retrieve.
-
-Type: C<integer>
-
-
-Default: C<20>
-
-
-=item * C<order> (in query) (Optional) - Sort order for messages by timestamp. Use `asc` for ascending order or `desc` for descending order. Defaults to `asc`.
-
-Type: C<string>
-
-Allowed values: C<asc, desc>
-
-
-Default: C<asc>
-
+Default: asc
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - A list of messages>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-A list of messages
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-      "object": "list",
-      "data": [
-        {
-          "id": "chatcmpl-AyPNinnUqUDYo9SAdA52NobMflmj2-0",
-          "role": "user",
-          "content": "write a haiku about ai",
-          "name": null,
-          "content_parts": null
-        }
-      ],
-      "first_id": "chatcmpl-AyPNinnUqUDYo9SAdA52NobMflmj2-0",
-      "last_id": "chatcmpl-AyPNinnUqUDYo9SAdA52NobMflmj2-0",
-      "has_more": false
+       "data" : [
+          {
+             "content" : "write a haiku about ai",
+             "content_parts" : null,
+             "id" : "chatcmpl-AyPNinnUqUDYo9SAdA52NobMflmj2-0",
+             "name" : null,
+             "role" : "user"
+          }
+       ],
+       "first_id" : "chatcmpl-AyPNinnUqUDYo9SAdA52NobMflmj2-0",
+       "has_more" : false,
+       "last_id" : "chatcmpl-AyPNinnUqUDYo9SAdA52NobMflmj2-0",
+       "object" : "list"
     }
 
+=head1 SCHEMAS
+
+=head2 ChatCompletionMessageList
+
+Properties:
+
+=over
+
+=item * C<data> (array of object, required) - An array of chat completion message objects.
+
+=item * C<first_id> (string, required) - The identifier of the first chat message in the data array.
+
+=item * C<has_more> (boolean, required) - Indicates whether there are more chat messages available.
+
+=item * C<last_id> (string, required) - The identifier of the last chat message in the data array.
+
+=item * C<object> (string, required) - The type of this object. It is always set to "list".
+
+Allowed values: list
+
+Default: list
 
 =back
 

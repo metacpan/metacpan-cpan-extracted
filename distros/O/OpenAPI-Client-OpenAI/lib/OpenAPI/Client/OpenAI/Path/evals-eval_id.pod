@@ -4,57 +4,45 @@
 
 OpenAPI::Client::OpenAI::Path::evals-eval_id - Documentation for the /evals/{eval_id} path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</evals/{eval_id}>.
+=head2 DELETE /evals/{eval_id}
 
-=head1 PATHS
+=head3 deleteEval
 
-
-=head2 C<DELETE /evals/{eval_id}>
-
-Delete an eval
-
+  $client->delete_eval({
+      body => { ... },
+  });
 
 Delete an evaluation.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
-
-C<deleteEval>
-
-    $client->deleteEval( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<eval_id> (in path) (Required) - The ID of the evaluation to delete.
-
-Type: C<string>
-
-
+=item * C<eval_id> (in path, required, string) - The ID of the evaluation to delete.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - Successfully deleted the evaluation.>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
+Properties:
 
-Successfully deleted the evaluation.
+=over
 
+=item * C<deleted> (boolean, required)
 
-=head4 Content Types:
+=item * C<eval_id> (string, required)
 
-=over 4
+=item * C<object> (string, required)
 
+=back
 
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
        "deleted" : true,
@@ -62,191 +50,154 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
        "object" : "eval.deleted"
     }
 
+B<404 - Evaluation not found.>
 
-=back
+Content-Type: application/json
 
-=head4 Status Code: C<404>
+Example:
 
-Evaluation not found.
+    {
+       "code" : "string",
+       "message" : "string",
+       "param" : "string",
+       "type" : "string"
+    }
 
+=head2 GET /evals/{eval_id}
 
-=head4 Content Types:
+=head3 getEval
 
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
-
-
-
-=back
-
-=head2 C<GET /evals/{eval_id}>
-
-Get an eval
-
+  $client->get_eval({
+      body => { ... },
+  });
 
 Get an evaluation by ID.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
-
-C<getEval>
-
-    $client->getEval( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<eval_id> (in path) (Required) - The ID of the evaluation to retrieve.
-
-Type: C<string>
-
-
+=item * C<eval_id> (in path, required, string) - The ID of the evaluation to retrieve.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - The evaluation>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
+Example:
 
-The evaluation
+    "{\n  \"object\": \"eval\",\n  \"id\": \"eval_67abd54d9b0081909a86353f6fb9317a\",\n  \"data_source_config\": {\n    \"type\": \"custom\",\n    \"item_schema\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"label\": {\"type\": \"string\"},\n      },\n      \"required\": [\"label\"]\n    },\n    \"include_sample_schema\": true\n  },\n  \"testing_criteria\": [\n    {\n      \"name\": \"My string check grader\",\n      \"type\": \"string_check\",\n      \"input\": \"{{sample.output_text}}\",\n      \"reference\": \"{{item.label}}\",\n      \"operation\": \"eq\",\n    }\n  ],\n  \"name\": \"External Data Eval\",\n  \"created_at\": 1739314509,\n  \"metadata\": {\n    \"test\": \"synthetics\",\n  }\n}\n"
 
+=head2 POST /evals/{eval_id}
 
-=head4 Content Types:
+=head3 updateEval
 
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
-
-    {
-      "object": "eval",
-      "id": "eval_67abd54d9b0081909a86353f6fb9317a",
-      "data_source_config": {
-        "type": "custom",
-        "item_schema": {
-          "type": "object",
-          "properties": {
-            "label": {"type": "string"},
-          },
-          "required": ["label"]
-        },
-        "include_sample_schema": true
-      },
-      "testing_criteria": [
-        {
-          "name": "My string check grader",
-          "type": "string_check",
-          "input": "{{sample.output_text}}",
-          "reference": "{{item.label}}",
-          "operation": "eq",
-        }
-      ],
-      "name": "External Data Eval",
-      "created_at": 1739314509,
-      "metadata": {
-        "test": "synthetics",
-      }
-    }
-
-
-=back
-
-=head2 C<POST /evals/{eval_id}>
-
-Update an eval
-
+  $client->update_eval({
+      body => { ... },
+  });
 
 Update certain properties of an evaluation.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
-
-C<updateEval>
-
-    $client->updateEval( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<eval_id> (in path) (Required) - The ID of the evaluation to update.
-
-Type: C<string>
-
-
+=item * C<eval_id> (in path, required, string) - The ID of the evaluation to update.
 
 =back
 
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
+=head4 Request body
 
-    
-      
+Content-Type: application/json
 
-      
-             
+Properties:
 
-=head3 Responses
+=over
 
+=item * C<metadata> (Metadata)
 
-=head4 Status Code: C<200>
+See L</Metadata> below for shape.
 
-The updated evaluation
+=item * C<name> (string) - Rename the evaluation.
 
+=back
 
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-      "object": "eval",
-      "id": "eval_67abd54d9b0081909a86353f6fb9317a",
-      "data_source_config": {
-        "type": "custom",
-        "item_schema": {
-          "type": "object",
-          "properties": {
-            "label": {"type": "string"},
-          },
-          "required": ["label"]
-        },
-        "include_sample_schema": true
-      },
-      "testing_criteria": [
-        {
-          "name": "My string check grader",
-          "type": "string_check",
-          "input": "{{sample.output_text}}",
-          "reference": "{{item.label}}",
-          "operation": "eq",
-        }
-      ],
-      "name": "External Data Eval",
-      "created_at": 1739314509,
-      "metadata": {
-        "test": "synthetics",
-      }
+       "metadata" : {},
+       "name" : "string"
     }
 
+=head4 Responses
+
+B<200 - The updated evaluation>
+
+Content-Type: application/json
+
+Example:
+
+    "{\n  \"object\": \"eval\",\n  \"id\": \"eval_67abd54d9b0081909a86353f6fb9317a\",\n  \"data_source_config\": {\n    \"type\": \"custom\",\n    \"item_schema\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"label\": {\"type\": \"string\"},\n      },\n      \"required\": [\"label\"]\n    },\n    \"include_sample_schema\": true\n  },\n  \"testing_criteria\": [\n    {\n      \"name\": \"My string check grader\",\n      \"type\": \"string_check\",\n      \"input\": \"{{sample.output_text}}\",\n      \"reference\": \"{{item.label}}\",\n      \"operation\": \"eq\",\n    }\n  ],\n  \"name\": \"External Data Eval\",\n  \"created_at\": 1739314509,\n  \"metadata\": {\n    \"test\": \"synthetics\",\n  }\n}\n"
+
+=head1 SCHEMAS
+
+=head2 Error
+
+Properties:
+
+=over
+
+=item * C<code> (anyOf, required)
+
+=item * C<message> (string, required)
+
+=item * C<param> (anyOf, required)
+
+=item * C<type> (string, required)
 
 =back
+
+=head2 Eval
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) for when the eval was created.
+
+=item * C<data_source_config> (object, required) - Configuration of data sources used in runs of the evaluation.
+
+=item * C<id> (string, required) - Unique identifier for the evaluation.
+
+=item * C<metadata> (Metadata, required)
+
+See L</Metadata> below for shape.
+
+=item * C<name> (string, required) - The name of the evaluation.
+
+=item * C<object> (string, required) - The object type.
+
+Allowed values: eval
+
+Default: eval
+
+=item * C<testing_criteria> (array of object, required) - A list of testing criteria.
+
+Default: eval
+
+=back
+
+=head2 Metadata
+
+Set of 16 key-value pairs that can be attached to an object. This can be
+useful for storing additional information about the object in a structured
+format, and querying for objects via API or the dashboard.
+
+Keys are strings with a maximum length of 64 characters. Values are strings
+with a maximum length of 512 characters.
 
 =head1 SEE ALSO
 

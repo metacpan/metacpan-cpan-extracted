@@ -1,15 +1,14 @@
-use strict;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
 use File::Temp ();
 use Parallel::Pipes::App;
 use Test::More;
 use Time::HiRes ();
 
-my $map_subtest = sub {
-    my $number_of_pipes = shift;
+my $map_subtest = sub ($number_of_pipes) {
     my $tempdir = File::Temp::tempdir(CLEANUP => 1);
-    my $work = sub {
-        my $num = shift;
+    my $work = sub ($num) {
         Time::HiRes::sleep(0.01);
         open my $fh, ">>", "$tempdir/file.$$" or die;
         print {$fh} "$num\n";
@@ -38,11 +37,9 @@ my $map_subtest = sub {
     }
 };
 
-my $run_subtest = sub {
-    my $number_of_pipes = shift;
+my $run_subtest = sub ($number_of_pipes) {
     my $tempdir = File::Temp::tempdir(CLEANUP => 1);
-    my $work = sub {
-        my $num = shift;
+    my $work = sub ($num) {
         Time::HiRes::sleep(0.01);
         open my $fh, ">>", "$tempdir/file.$$" or die;
         print {$fh} "$num\n";
@@ -53,7 +50,7 @@ my $run_subtest = sub {
         work => $work,
         num => $number_of_pipes,
         tasks => [0..30],
-        after_work => sub { push @result, $_[0] },
+        after_work => sub ($result, @) { push @result, $result },
     );
     my @file = glob "$tempdir/file*";
     my @num;
@@ -74,9 +71,9 @@ my $run_subtest = sub {
     }
 };
 
-subtest map_number_of_pipes1 => sub { $map_subtest->(1) };
-subtest map_number_of_pipes5 => sub { $map_subtest->(5) } unless $^O eq 'MSWin32';
-subtest run_number_of_pipes1 => sub { $run_subtest->(1) };
-subtest run_number_of_pipes5 => sub { $run_subtest->(5) } unless $^O eq 'MSWin32';
+subtest map_number_of_pipes1 => sub (@) { $map_subtest->(1) };
+subtest map_number_of_pipes5 => sub (@) { $map_subtest->(5) } unless $^O eq 'MSWin32';
+subtest run_number_of_pipes1 => sub (@) { $run_subtest->(1) };
+subtest run_number_of_pipes5 => sub (@) { $run_subtest->(5) } unless $^O eq 'MSWin32';
 
 done_testing;

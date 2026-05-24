@@ -15,7 +15,6 @@ on 'build' => sub {
 };
 
 on 'test' => sub {
-  requires "Crypt::SaltedHash" => "0";
   requires "Crypt::SysRandom" => "0";
   requires "Digest::MD5" => "2.25";
   requires "Digest::SHA" => "5.96";

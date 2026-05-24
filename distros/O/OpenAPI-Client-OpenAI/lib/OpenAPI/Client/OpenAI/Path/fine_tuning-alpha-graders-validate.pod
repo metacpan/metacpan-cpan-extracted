@@ -4,62 +4,49 @@
 
 OpenAPI::Client::OpenAI::Path::fine_tuning-alpha-graders-validate - Documentation for the /fine_tuning/alpha/graders/validate path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</fine_tuning/alpha/graders/validate>.
+=head2 POST /fine_tuning/alpha/graders/validate
 
-=head1 PATHS
+=head3 validateGrader
 
-
-=head2 C<POST /fine_tuning/alpha/graders/validate>
-
-Validate grader
-
+  $client->validate_grader({
+      body => { ... },
+  });
 
 Validate a grader.
 
+=head4 Responses
 
+B<200 - OK>
 
-=head3 Operation ID
+Content-Type: application/json
 
-C<validateGrader>
+Example:
 
-    $client->validateGrader( ... );
+    {
+       "grader" : "{\n  \"type\": \"string_check\",\n  \"name\": \"Example string check grader\",\n  \"input\": \"{{sample.output_text}}\",\n  \"reference\": \"{{item.label}}\",\n  \"operation\": \"eq\"\n}\n"
+    }
 
-=head3 Parameters
+=head1 SCHEMAS
 
-=over 4
+=head2 ValidateGraderRequest
+
+Properties:
+
+=over
+
+=item * C<grader> (object, required) - The grader used for the fine-tuning job.
 
 =back
 
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
+=head2 ValidateGraderResponse
 
-    
-      
+Properties:
 
-      
-             
+=over
 
-=head3 Responses
-
-
-=head4 Status Code: C<200>
-
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
-
-
+=item * C<grader> (object) - The grader used for the fine-tuning job.
 
 =back
 

@@ -1,0 +1,97 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::organization-data_retention - Documentation for the /organization/data_retention path.
+
+=head1 OPERATIONS
+
+=head2 GET /organization/data_retention
+
+=head3 retrieve-organization-data-retention
+
+  $client->retrieve_organization_data_retention({
+      body => { ... },
+  });
+
+Retrieves organization data retention controls.
+
+=head4 Responses
+
+B<200 - Organization data retention controls retrieved successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "object" : "organization.data_retention",
+       "type" : "modified_abuse_monitoring"
+    }
+
+=head2 POST /organization/data_retention
+
+=head3 update-organization-data-retention
+
+  $client->update_organization_data_retention({
+      body => { ... },
+  });
+
+Updates organization data retention controls.
+
+=head4 Responses
+
+B<200 - Organization data retention controls updated successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "object" : "organization.data_retention",
+       "type" : "modified_abuse_monitoring"
+    }
+
+=head1 SCHEMAS
+
+=head2 OrganizationDataRetention
+
+Properties:
+
+=over
+
+=item * C<object> (string, required) - The object type, which is always C<organization.data_retention> .
+
+Allowed values: organization.data_retention
+
+=item * C<type> (string, required) - The configured organization data retention type.
+
+Allowed values: zero_data_retention, modified_abuse_monitoring, enhanced_zero_data_retention, enhanced_modified_abuse_monitoring
+
+=back
+
+=head2 UpdateOrganizationDataRetentionBody
+
+Properties:
+
+=over
+
+=item * C<retention_type> (string, required) - The desired organization data retention type.
+
+Allowed values: zero_data_retention, modified_abuse_monitoring, enhanced_zero_data_retention, enhanced_modified_abuse_monitoring
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

@@ -4,57 +4,49 @@
 
 OpenAPI::Client::OpenAI::Path::organization-admin_api_keys-key_id - Documentation for the /organization/admin_api_keys/{key_id} path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</organization/admin_api_keys/{key_id}>.
+=head2 DELETE /organization/admin_api_keys/{key_id}
 
-=head1 PATHS
+=head3 admin-api-keys-delete
 
-
-=head2 C<DELETE /organization/admin_api_keys/{key_id}>
-
-Delete admin API key
-
+  $client->admin_api_keys_delete({
+      body => { ... },
+  });
 
 Delete an organization admin API key
 
+Delete the specified admin API key.
 
+=head4 Path/query parameters
 
-=head3 Operation ID
+=over
 
-C<admin-api-keys-delete>
-
-    $client->admin-api-keys-delete( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<key_id> (in path) (Required) - 
-
-Type: C<string>
-
-
+=item * C<key_id> (in path, required, string)
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - Confirmation that the API key was deleted.>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
+Properties:
 
-Confirmation that the API key was deleted.
+=over
 
+=item * C<deleted> (boolean, required)
 
-=head4 Content Types:
+=item * C<id> (string, required)
 
-=over 4
+=item * C<object> (string, required)
 
+Allowed values: organization.admin_api_key.deleted
 
-=item * C<application/json>
+=back
 
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
        "deleted" : true,
@@ -62,71 +54,74 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
        "object" : "organization.admin_api_key.deleted"
     }
 
+=head2 GET /organization/admin_api_keys/{key_id}
 
-=back
+=head3 admin-api-keys-get
 
-=head2 C<GET /organization/admin_api_keys/{key_id}>
-
-Retrieve admin API key
-
+  $client->admin_api_keys_get({
+      body => { ... },
+  });
 
 Retrieve a single organization API key
 
+Get details for a specific organization API key by its ID.
 
+=head4 Path/query parameters
 
-=head3 Operation ID
+=over
 
-C<admin-api-keys-get>
-
-    $client->admin-api-keys-get( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<key_id> (in path) (Required) - 
-
-Type: C<string>
-
-
+=item * C<key_id> (in path, required, string)
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - Details of the requested API key.>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-Details of the requested API key.
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-      "object": "organization.admin_api_key",
-      "id": "key_abc",
-      "name": "Main Admin Key",
-      "redacted_value": "sk-admin...xyz",
-      "created_at": 1711471533,
-      "last_used_at": 1711471534,
-      "owner": {
-        "type": "user",
-        "object": "organization.user",
-        "id": "user_123",
-        "name": "John Doe",
-        "created_at": 1711471533,
-        "role": "owner"
-      }
+       "created_at" : 1711471533,
+       "id" : "key_abc",
+       "last_used_at" : 1711471534,
+       "name" : "Main Admin Key",
+       "object" : "organization.admin_api_key",
+       "owner" : {
+          "created_at" : 1711471533,
+          "id" : "user_123",
+          "name" : "John Doe",
+          "object" : "organization.user",
+          "role" : "owner",
+          "type" : "user"
+       },
+       "redacted_value" : "sk-admin...xyz"
     }
 
+=head1 SCHEMAS
+
+=head2 AdminApiKey
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) of when the API key was created
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints
+
+=item * C<last_used_at> (anyOf)
+
+=item * C<name> (anyOf) - The name of the API key
+
+=item * C<object> (string, required) - The object type, which is always C<organization.admin_api_key>
+
+Allowed values: organization.admin_api_key
+
+=item * C<owner> (object, required)
+
+=item * C<redacted_value> (string, required) - The redacted value of the API key
 
 =back
 

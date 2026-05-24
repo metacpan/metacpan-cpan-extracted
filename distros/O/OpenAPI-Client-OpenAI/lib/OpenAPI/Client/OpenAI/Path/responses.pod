@@ -4,77 +4,233 @@
 
 OpenAPI::Client::OpenAI::Path::responses - Documentation for the /responses path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</responses>.
+=head2 POST /responses
 
-=head1 PATHS
+=head3 createResponse
 
+  $client->create_response({
+      body => { ... },
+  });
 
-=head2 C<POST /responses>
+Creates a model response. Provide
+L<text|https://platform.openai.com/docs/guides/text> or
+L<image|https://platform.openai.com/docs/guides/images> inputs to generate
+L<text|https://platform.openai.com/docs/guides/text> or
+L<JSON|https://platform.openai.com/docs/guides/structured-outputs> outputs.
+Have the model call your own
+L<custom code|https://platform.openai.com/docs/guides/function-calling> or use
+built-in L<tools|https://platform.openai.com/docs/guides/tools> like
+L<web search|https://platform.openai.com/docs/guides/tools-web-search> or
+L<file search|https://platform.openai.com/docs/guides/tools-file-search> to
+use your own data as input for the model's response.
 
-Create a model response
+=head4 Request body
 
+Content-Type: application/json
 
-Creates a model response. Provide L<text|https://platform.openai.com/docs/guides/text> or
-L<image|https://platform.openai.com/docs/guides/images> inputs to generate L<text|https://platform.openai.com/docs/guides/text>
-or L<JSON|https://platform.openai.com/docs/guides/structured-outputs> outputs. Have the model call
-your own L<custom code|https://platform.openai.com/docs/guides/function-calling> or use built-in
-L<tools|https://platform.openai.com/docs/guides/tools> like L<web search|https://platform.openai.com/docs/guides/tools-web-search>
-or L<file search|https://platform.openai.com/docs/guides/tools-file-search> to use your own data
-as input for the model's response.
+Example:
 
+    {
+       "completed_at" : 1741476543,
+       "created_at" : 1741476542,
+       "error" : null,
+       "id" : "resp_67ccd2bed1ec8190b14f964abc0542670bb6a6b452d3795b",
+       "incomplete_details" : null,
+       "instructions" : null,
+       "max_output_tokens" : null,
+       "metadata" : {},
+       "model" : "gpt-5.4",
+       "object" : "response",
+       "output" : [
+          {
+             "content" : [
+                {
+                   "annotations" : [],
+                   "text" : "In a peaceful grove beneath a silver moon, a unicorn named Lumina discovered a hidden pool that reflected the stars. As she dipped her horn into the water, the pool began to shimmer, revealing a pathway to a magical realm of endless night skies. Filled with wonder, Lumina whispered a wish for all who dream to find their own hidden magic, and as she glanced back, her hoofprints sparkled like stardust.",
+                   "type" : "output_text"
+                }
+             ],
+             "id" : "msg_67ccd2bf17f0819081ff3bb2cf6508e60bb6a6b452d3795b",
+             "role" : "assistant",
+             "status" : "completed",
+             "type" : "message"
+          }
+       ],
+       "parallel_tool_calls" : true,
+       "previous_response_id" : null,
+       "reasoning" : {
+          "effort" : null,
+          "summary" : null
+       },
+       "status" : "completed",
+       "store" : true,
+       "temperature" : 1,
+       "text" : {
+          "format" : {
+             "type" : "text"
+          }
+       },
+       "tool_choice" : "auto",
+       "tools" : [],
+       "top_p" : 1,
+       "truncation" : "disabled",
+       "usage" : {
+          "input_tokens" : 36,
+          "input_tokens_details" : {
+             "cached_tokens" : 0
+          },
+          "output_tokens" : 87,
+          "output_tokens_details" : {
+             "reasoning_tokens" : 0
+          },
+          "total_tokens" : 123
+       },
+       "user" : null
+    }
 
+=head4 Responses
 
-=head3 Operation ID
+B<200 - OK>
 
-C<createResponse>
+Content-Type: application/json
 
-    $client->createResponse( ... );
+Example:
 
-=head3 Parameters
+    {
+       "completed_at" : 1741476543,
+       "created_at" : 1741476542,
+       "error" : null,
+       "id" : "resp_67ccd2bed1ec8190b14f964abc0542670bb6a6b452d3795b",
+       "incomplete_details" : null,
+       "instructions" : null,
+       "max_output_tokens" : null,
+       "metadata" : {},
+       "model" : "gpt-5.4",
+       "object" : "response",
+       "output" : [
+          {
+             "content" : [
+                {
+                   "annotations" : [],
+                   "text" : "In a peaceful grove beneath a silver moon, a unicorn named Lumina discovered a hidden pool that reflected the stars. As she dipped her horn into the water, the pool began to shimmer, revealing a pathway to a magical realm of endless night skies. Filled with wonder, Lumina whispered a wish for all who dream to find their own hidden magic, and as she glanced back, her hoofprints sparkled like stardust.",
+                   "type" : "output_text"
+                }
+             ],
+             "id" : "msg_67ccd2bf17f0819081ff3bb2cf6508e60bb6a6b452d3795b",
+             "role" : "assistant",
+             "status" : "completed",
+             "type" : "message"
+          }
+       ],
+       "parallel_tool_calls" : true,
+       "previous_response_id" : null,
+       "reasoning" : {
+          "effort" : null,
+          "summary" : null
+       },
+       "status" : "completed",
+       "store" : true,
+       "temperature" : 1,
+       "text" : {
+          "format" : {
+             "type" : "text"
+          }
+       },
+       "tool_choice" : "auto",
+       "tools" : [],
+       "top_p" : 1,
+       "truncation" : "disabled",
+       "usage" : {
+          "input_tokens" : 36,
+          "input_tokens_details" : {
+             "cached_tokens" : 0
+          },
+          "output_tokens" : 87,
+          "output_tokens_details" : {
+             "reasoning_tokens" : 0
+          },
+          "total_tokens" : 123
+       },
+       "user" : null
+    }
 
-=over 4
+Content-Type: text/event-stream
 
-=back
+Example:
 
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
+    {
+       "completed_at" : 1741476543,
+       "created_at" : 1741476542,
+       "error" : null,
+       "id" : "resp_67ccd2bed1ec8190b14f964abc0542670bb6a6b452d3795b",
+       "incomplete_details" : null,
+       "instructions" : null,
+       "max_output_tokens" : null,
+       "metadata" : {},
+       "model" : "gpt-5.4",
+       "object" : "response",
+       "output" : [
+          {
+             "content" : [
+                {
+                   "annotations" : [],
+                   "text" : "In a peaceful grove beneath a silver moon, a unicorn named Lumina discovered a hidden pool that reflected the stars. As she dipped her horn into the water, the pool began to shimmer, revealing a pathway to a magical realm of endless night skies. Filled with wonder, Lumina whispered a wish for all who dream to find their own hidden magic, and as she glanced back, her hoofprints sparkled like stardust.",
+                   "type" : "output_text"
+                }
+             ],
+             "id" : "msg_67ccd2bf17f0819081ff3bb2cf6508e60bb6a6b452d3795b",
+             "role" : "assistant",
+             "status" : "completed",
+             "type" : "message"
+          }
+       ],
+       "parallel_tool_calls" : true,
+       "previous_response_id" : null,
+       "reasoning" : {
+          "effort" : null,
+          "summary" : null
+       },
+       "status" : "completed",
+       "store" : true,
+       "temperature" : 1,
+       "text" : {
+          "format" : {
+             "type" : "text"
+          }
+       },
+       "tool_choice" : "auto",
+       "tools" : [],
+       "top_p" : 1,
+       "truncation" : "disabled",
+       "usage" : {
+          "input_tokens" : 36,
+          "input_tokens_details" : {
+             "cached_tokens" : 0
+          },
+          "output_tokens" : 87,
+          "output_tokens_details" : {
+             "reasoning_tokens" : 0
+          },
+          "total_tokens" : 123
+       },
+       "user" : null
+    }
 
-    
-      
+=head1 SCHEMAS
 
-      
-             
+=head2 CreateResponse
 
-=head3 Responses
+See L<https://platform.openai.com/docs/api-reference> for details.
 
+=head2 Response
 
-=head4 Status Code: C<200>
+See L<https://platform.openai.com/docs/api-reference> for details.
 
-OK
+=head2 ResponseStreamEvent
 
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
-
-
-
-
-=item * C<text/event-stream>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
-
-
-
-=back
+See L<https://platform.openai.com/docs/api-reference> for details.
 
 =head1 SEE ALSO
 

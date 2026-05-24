@@ -1,0 +1,152 @@
+Perl500503Syntax::OrDie Cheatsheet (Ð£ÐºÑÐ°ÑÐ½ÑÑÐºÐ°)
+EOF_UNDERLINE
+
+ÐÐÐÐÐ
+    Perl500503Syntax::OrDie - (see EN cheatsheet for full description)
+
+ÐÐÐ Ð¡ÐÐ¯
+    0.01
+
+ÐÐÐÐ¯Ð
+    use Perl500503Syntax::OrDie;
+
+    use Perl500503Syntax::OrDie ();
+    Perl500503Syntax::OrDie::check_file('/path/to/script.pl');
+    my @violations = Perl500503Syntax::OrDie::check_source($source_text, 'label.pl');
+
+    perl lib/Perl500503Syntax/OrDie.pm script.pl
+    perl lib/Perl500503Syntax/OrDie.pm script1.pl script2.pl ...
+    perl lib/Perl500503Syntax/OrDie.pm -
+
+ÐÐÐÐ¡
+    Ð¯Ðº ÐºÐ¾Ð¼Ð°Ð½Ð´Ð° Ð¿ÐµÑÐµÐ²ÑÑÑÑ ÐºÐ¾Ð¶ÐµÐ½ Ð²ÐºÐ°Ð·Ð°Ð½Ð¸Ð¹ ÑÐ°Ð¹Ð».
+ÐÐµÐ· Ð°ÑÐ³ÑÐ¼ÐµÐ½ÑÑÐ² Ð²Ð¸Ð²Ð¾Ð´Ð¸ÑÑ Ð´Ð¾Ð²ÑÐ´ÐºÑ.
+
+ÐÐÐ ÐÐÐÐ Ð®ÐÐÐÐ ÐÐÐÐ¡Ð¢Ð Ð£ÐÐ¦ÐÐ (ÑÑÐ°ÑÐ¸ÑÐ½Ñ, ÐºÐ¾Ð¼Ð¿ÑÐ»ÑÑÑÑ)
+    Perl 5.6  : our / 3-arg open / use utf8 / \x{} / \N{} / @+@- /
+                CHECK/INIT / v-string / $^V / :lvalue / \p{}\P{}
+    Perl 5.8  : use encoding / PerlIO layers
+    Perl 5.10 : //= // say state given/when ~~ use feature
+                \K (?<name>) \k<name> (?|) (*VERB) \h\v\R
+                UNITCHECK possessive-quantifiers (?1)(?R) ${^MATCH} \g{N}
+    Perl 5.12 : package NAME VERSION / ...
+    Perl 5.14 : s///r tr///r
+    Perl 5.16 : __SUB__
+    Perl 5.20 : subroutine signatures / $ref->@*
+    Perl 5.22 : <<>> / /n
+    Perl 5.26 : <<~
+    Perl 5.32 : isa
+    Perl 5.34 : try/catch
+    Perl 5.36 : use builtin / for my ($a,$b)
+    Perl 5.38 : class
+
+ÐÐÐ ÐÐÐÐ Ð®ÐÐÐÐ ÐÐÐÐ¡Ð¢Ð Ð£ÐÐ¦ÐÐ (ÑÐ°Ñ Ð²Ð¸ÐºÐ¾Ð½Ð°Ð½Ð½Ñ)
+    open(FH, MODE, PATH)   3-argument open
+    open(FH, \$ref)       reference-as-mode open
+    mkdir(PATH)            mkdir without explicit mode
+
+ÐÐ¡Ð¢ÐÐ ÐÐ¯ ÐÐÐ Ð¡ÐÐ PERL
+    ÐÐ¾ÑÐ¸Ð»Ð°Ð½Ð½Ñ: https://perldoc.perl.org/perl56delta
+              https://perldoc.perl.org/perl58delta
+              https://perldoc.perl.org/perl5100delta
+              https://perldoc.perl.org/perl5120delta
+              https://perldoc.perl.org/perl5140delta
+              https://perldoc.perl.org/perl5160delta
+              https://perldoc.perl.org/perl5180delta
+              https://perldoc.perl.org/perl5200delta
+              https://perldoc.perl.org/perl5220delta
+              https://perldoc.perl.org/perl5240delta
+              https://perldoc.perl.org/perl5260delta
+              https://perldoc.perl.org/perl5280delta
+              https://perldoc.perl.org/perl5300delta
+              https://perldoc.perl.org/perl5320delta
+              https://perldoc.perl.org/perl5340delta
+              https://perldoc.perl.org/perl5360delta
+              https://perldoc.perl.org/perl5380delta
+              https://perldoc.perl.org/perl5400delta
+              https://perldoc.perl.org/perl5420delta
+
+  ÐÐ¾Ð¶Ð»Ð¸Ð²Ð¾ÑÑÑ Perl Ð·Ð° Ð²ÐµÑÑÑÑÐ¼Ð¸, ÑÐ¾ Ð¿ÐµÑÐµÐ²ÑÑÑÑÑÑÑÑ ÑÐ¸Ð¼ Ð¼Ð¾Ð´ÑÐ»ÐµÐ¼:
+
+  perl56delta (Perl 5.6.0, 2000-03-22)
+    our VARIABLE, 3-arg open(), use utf8, use VERSION>=5.6,
+    \x{HHHH}, \N{name}, @+/@-/$+[N]/$-[N], CHECK/INIT blocks,
+    v-string, $^V, :lvalue, \p{}\P{}, mkdir without mode
+
+  perl58delta (Perl 5.8.0, 2002-07-18)
+    use encoding, PerlIO layers (:utf8 :encoding :crlf)
+
+  perl5100delta (Perl 5.10.0, 2007-12-18)
+    // //= say state given/when ~~ use feature \K
+    (?<name>...) \k<name> (?|...) (*VERB) \h\H\v\V\R
+    UNITCHECK a++ a*+ a?+ (?1) (?&name) (?R)
+    ${^MATCH} ${^PREMATCH} ${^POSTMATCH} \g{N}
+
+  perl5120delta (Perl 5.12.0, 2010-04-12)
+    package NAME VERSION, ... (yada-yada)
+
+  perl5140delta (Perl 5.14.0, 2011-05-14)
+    s///r tr///r (non-destructive flag)
+
+  perl5160delta (Perl 5.16.0, 2012-05-20)
+    __SUB__
+
+  perl5180delta (5.18): my sub / state sub -- lexical subroutines
+
+  perl5200delta (Perl 5.20.0, 2014-05-27)
+    subroutine signatures, postfix dereference $ref->@*
+    %hash{LIST} / %array[LIST] -- key/value slices
+
+  perl5220delta (Perl 5.22.0, 2015-06-01)
+    <<>> (double-diamond), /n (non-capturing flag)
+    &. |. ^. ~. -- string bitwise operators (experimental; stable 5.28)
+
+  perl5260delta (Perl 5.26.0, 2017-05-30)
+    <<~ (indented heredoc)
+
+  perl5300delta (Perl 5.30.0, 2019-05-22)
+    variable-length lookbehind in regex (experimental; stable from Perl 5.38)
+
+  perl5320delta (Perl 5.32.0, 2020-06-20)
+    isa (infix operator)
+
+  perl5340delta (Perl 5.34.0, 2021-05-20)
+    try / catch
+
+  perl5360delta (Perl 5.36.0, 2022-05-28)
+    use builtin, for my ($a, $b) (@list)
+
+  perl5380delta (Perl 5.38.0, 2023-07-02)
+    class keyword (experimental OOP)
+
+  perl5400delta (Perl 5.40.0, 2024-06-09)
+    ^^ / ^^= high-precedence logical XOR operator
+      $x ^^ $y  -- completes the &&/|| set; use "xor" for 5.005_03.
+    __CLASS__ keyword (inside class blocks)
+      Runtime class name inside method/ADJUST/field (requires class feature).
+
+  perl5420delta (Perl 5.42.0, 2025-07-02)
+    any BLOCK LIST / all BLOCK LIST (experimental keywords)
+      any { EXPR } @list  -- use List::Util::any for 5.005_03.
+    my method / ->& lexical method call (requires class feature)
+      my method foo () { ... }  -- lexically scoped private method.
+
+ÐÐÐÐÐÐ§ÐÐ ÐÐÐÐÐÐ (Perl 5.005_03)
+    use vars qw($x @arr %hash);         "use vars" Ð·Ð°Ð¼ÑÑÑÑ "our"
+    open(FH, ">$path") or die $!;       2-Ð°ÑÐ³ÑÐ¼ÐµÐ½ÑÐ½Ð° bareword ÑÐ¾ÑÐ¼Ð°
+    mkdir("dir", 0755) or die $!;        ÑÐ²Ð½Ð¸Ð¹ ÑÐµÐ¶Ð¸Ð¼
+    $x = defined($y) ? $y : 'v';        Ð·Ð°Ð¼ÑÑÑÑ //=
+    print "...\n";                        Ð·Ð°Ð¼ÑÑÑÑ say
+
+ÐÐÐÐÐÐÐÐ¡Ð¢Ð
+    ÐÐµÐ¼Ð°Ñ Ð·Ð°Ð»ÐµÐ¶Ð½Ð¾ÑÑÐµÐ¹ Ð¿Ð¾Ð·Ð° ÑÐ´ÑÐ¾Ð¼. Perl 5.005_03 Ð°Ð±Ð¾ Ð½Ð¾Ð²ÑÑÐ¸Ð¹.
+
+ÐÐÐ¢ÐÐ 
+    INABA Hitoshi <ina@cpan.org>
+
+ÐÐÐ¦ÐÐÐÐÐ¯
+    ÐÑÐ»ÑÐ½Ð° Ð±ÑÐ±Ð»ÑÐ¾ÑÐµÐºÐ°; Ð¿Ð¾ÑÐ¸ÑÑÑÑÑÑÑ Ð½Ð° ÑÐ¸Ñ ÑÐ°Ð¼Ð¸Ñ ÑÐ¼Ð¾Ð²Ð°Ñ, ÑÐ¾ Ð¹ Perl.
+
+ÐÐÐ. Ð¢ÐÐÐÐ
+    perlpolicy, perlhist
+    https://metacpan.org/dist/Perl500503Syntax-OrDie

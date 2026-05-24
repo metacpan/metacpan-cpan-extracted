@@ -4,99 +4,299 @@
 
 OpenAPI::Client::OpenAI::Path::fine_tuning-jobs-fine_tuning_job_id-resume - Documentation for the /fine_tuning/jobs/{fine_tuning_job_id}/resume path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</fine_tuning/jobs/{fine_tuning_job_id}/resume>.
+=head2 POST /fine_tuning/jobs/{fine_tuning_job_id}/resume
 
-=head1 PATHS
+=head3 resumeFineTuningJob
 
-
-=head2 C<POST /fine_tuning/jobs/{fine_tuning_job_id}/resume>
-
-Resume fine-tuning
-
+  $client->resume_fine_tuning_job({
+      body => { ... },
+  });
 
 Resume a fine-tune job.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
-
-C<resumeFineTuningJob>
-
-    $client->resumeFineTuningJob( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<fine_tuning_job_id> (in path) (Required) - The ID of the fine-tuning job to resume.
-
-
-Type: C<string>
-
-
+=item * C<fine_tuning_job_id> (in path, required, string) - The ID of the fine-tuning job to resume.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - OK>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-      "object": "fine_tuning.job",
-      "id": "ftjob-abc123",
-      "model": "davinci-002",
-      "created_at": 1692661014,
-      "finished_at": 1692661190,
-      "fine_tuned_model": "ft:davinci-002:my-org:custom_suffix:7q8mpxmy",
-      "organization_id": "org-123",
-      "result_files": [
+       "created_at" : 1692661014,
+       "estimated_finish" : 0,
+       "fine_tuned_model" : "ft:davinci-002:my-org:custom_suffix:7q8mpxmy",
+       "finished_at" : 1692661190,
+       "hyperparameters" : {
+          "batch_size" : 1,
+          "learning_rate_multiplier" : 1,
+          "n_epochs" : 4
+       },
+       "id" : "ftjob-abc123",
+       "integrations" : [],
+       "metadata" : {
+          "key" : "value"
+       },
+       "method" : {
+          "supervised" : {
+             "hyperparameters" : {
+                "batch_size" : 1,
+                "learning_rate_multiplier" : 1,
+                "n_epochs" : 4
+             }
+          },
+          "type" : "supervised"
+       },
+       "model" : "davinci-002",
+       "object" : "fine_tuning.job",
+       "organization_id" : "org-123",
+       "result_files" : [
           "file-abc123"
-      ],
-      "status": "succeeded",
-      "validation_file": null,
-      "training_file": "file-abc123",
-      "hyperparameters": {
-          "n_epochs": 4,
-          "batch_size": 1,
-          "learning_rate_multiplier": 1.0
-      },
-      "trained_tokens": 5768,
-      "integrations": [],
-      "seed": 0,
-      "estimated_finish": 0,
-      "method": {
-        "type": "supervised",
-        "supervised": {
-          "hyperparameters": {
-            "n_epochs": 4,
-            "batch_size": 1,
-            "learning_rate_multiplier": 1.0
-          }
-        }
-      },
-      "metadata": {
-        "key": "value"
-      }
+       ],
+       "seed" : 0,
+       "status" : "succeeded",
+       "trained_tokens" : 5768,
+       "training_file" : "file-abc123",
+       "validation_file" : null
     }
 
+=head1 SCHEMAS
+
+=head2 FineTuneDPOHyperparameters
+
+Properties:
+
+=over
+
+=item * C<batch_size> (oneOf) - Number of examples in each batch. A larger batch size means that model
+parameters are updated less frequently, but with lower variance.
+
+Default: auto
+
+=item * C<beta> (oneOf) - The beta value for the DPO method. A higher beta value will increase the
+weight of the penalty between the policy and reference model.
+
+Default: auto
+
+=item * C<learning_rate_multiplier> (oneOf) - Scaling factor for the learning rate. A smaller learning rate may be useful to
+avoid overfitting.
+
+Default: auto
+
+=item * C<n_epochs> (oneOf) - The number of epochs to train the model for. An epoch refers to one full cycle
+through the training dataset.
+
+Default: auto
 
 =back
+
+=head2 FineTuneDPOMethod
+
+Properties:
+
+=over
+
+=item * C<hyperparameters> (FineTuneDPOHyperparameters)
+
+See L</FineTuneDPOHyperparameters> below for shape.
+
+=back
+
+=head2 FineTuneMethod
+
+Properties:
+
+=over
+
+=item * C<dpo> (FineTuneDPOMethod)
+
+See L</FineTuneDPOMethod> below for shape.
+
+=item * C<reinforcement> (FineTuneReinforcementMethod)
+
+See L</FineTuneReinforcementMethod> below for shape.
+
+=item * C<supervised> (FineTuneSupervisedMethod)
+
+See L</FineTuneSupervisedMethod> below for shape.
+
+=item * C<type> (string, required) - The type of method. Is either C<supervised> , C<dpo> , or C<reinforcement> .
+
+Allowed values: supervised, dpo, reinforcement
+
+=back
+
+=head2 FineTuneReinforcementHyperparameters
+
+Properties:
+
+=over
+
+=item * C<batch_size> (oneOf) - Number of examples in each batch. A larger batch size means that model
+parameters are updated less frequently, but with lower variance.
+
+Default: auto
+
+=item * C<compute_multiplier> (oneOf) - Multiplier on amount of compute used for exploring search space during
+training.
+
+Default: auto
+
+=item * C<eval_interval> (oneOf) - The number of training steps between evaluation runs.
+
+Default: auto
+
+=item * C<eval_samples> (oneOf) - Number of evaluation samples to generate per training step.
+
+Default: auto
+
+=item * C<learning_rate_multiplier> (oneOf) - Scaling factor for the learning rate. A smaller learning rate may be useful to
+avoid overfitting.
+
+Default: auto
+
+=item * C<n_epochs> (oneOf) - The number of epochs to train the model for. An epoch refers to one full cycle
+through the training dataset.
+
+Default: auto
+
+=item * C<reasoning_effort> (string) - Level of reasoning effort.
+
+Allowed values: default, low, medium, high
+
+Default: default
+
+=back
+
+=head2 FineTuneReinforcementMethod
+
+Properties:
+
+=over
+
+=item * C<grader> (object, required) - The grader used for the fine-tuning job.
+
+=item * C<hyperparameters> (FineTuneReinforcementHyperparameters)
+
+See L</FineTuneReinforcementHyperparameters> below for shape.
+
+=back
+
+=head2 FineTuneSupervisedHyperparameters
+
+Properties:
+
+=over
+
+=item * C<batch_size> (oneOf) - Number of examples in each batch. A larger batch size means that model
+parameters are updated less frequently, but with lower variance.
+
+Default: auto
+
+=item * C<learning_rate_multiplier> (oneOf) - Scaling factor for the learning rate. A smaller learning rate may be useful to
+avoid overfitting.
+
+Default: auto
+
+=item * C<n_epochs> (oneOf) - The number of epochs to train the model for. An epoch refers to one full cycle
+through the training dataset.
+
+Default: auto
+
+=back
+
+=head2 FineTuneSupervisedMethod
+
+Properties:
+
+=over
+
+=item * C<hyperparameters> (FineTuneSupervisedHyperparameters)
+
+See L</FineTuneSupervisedHyperparameters> below for shape.
+
+=back
+
+=head2 FineTuningJob
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) for when the fine-tuning job was created.
+
+=item * C<error> (anyOf, required)
+
+=item * C<estimated_finish> (anyOf)
+
+=item * C<fine_tuned_model> (anyOf, required)
+
+=item * C<finished_at> (anyOf, required)
+
+=item * C<hyperparameters> (object, required) - The hyperparameters used for the fine-tuning job. This value will only be
+returned when running C<supervised> jobs.
+
+=item * C<id> (string, required) - The object identifier, which can be referenced in the API endpoints.
+
+=item * C<integrations> (anyOf)
+
+=item * C<metadata> (Metadata)
+
+See L</Metadata> below for shape.
+
+=item * C<method> (FineTuneMethod)
+
+See L</FineTuneMethod> below for shape.
+
+=item * C<model> (string, required) - The base model that is being fine-tuned.
+
+=item * C<object> (string, required) - The object type, which is always "fine_tuning.job".
+
+Allowed values: fine_tuning.job
+
+=item * C<organization_id> (string, required) - The organization that owns the fine-tuning job.
+
+=item * C<result_files> (array of string, required) - The compiled results file ID(s) for the fine-tuning job. You can retrieve the
+results with the
+L<Files API|https://platform.openai.com/docs/api-reference/files/retrieve-contents>
+.
+
+=item * C<seed> (integer, required) - The seed used for the fine-tuning job.
+
+=item * C<status> (string, required) - The current status of the fine-tuning job, which can be either
+C<validating_files> , C<queued> , C<running> , C<succeeded> , C<failed> , or
+C<cancelled> .
+
+Allowed values: validating_files, queued, running, succeeded, failed, cancelled
+
+=item * C<trained_tokens> (anyOf, required)
+
+=item * C<training_file> (string, required) - The file ID used for training. You can retrieve the training data with the
+L<Files API|https://platform.openai.com/docs/api-reference/files/retrieve-contents>
+.
+
+=item * C<validation_file> (anyOf, required)
+
+=back
+
+=head2 Metadata
+
+Set of 16 key-value pairs that can be attached to an object. This can be
+useful for storing additional information about the object in a structured
+format, and querying for objects via API or the dashboard.
+
+Keys are strings with a maximum length of 64 characters. Values are strings
+with a maximum length of 512 characters.
 
 =head1 SEE ALSO
 

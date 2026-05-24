@@ -4,153 +4,168 @@
 
 OpenAPI::Client::OpenAI::Path::responses-response_id - Documentation for the /responses/{response_id} path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</responses/{response_id}>.
+=head2 DELETE /responses/{response_id}
 
-=head1 PATHS
+=head3 deleteResponse
 
-
-=head2 C<DELETE /responses/{response_id}>
-
-Delete a model response
-
+  $client->delete_response({
+      body => { ... },
+  });
 
 Deletes a model response with the given ID.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
-
-C<deleteResponse>
-
-    $client->deleteResponse( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<response_id> (in path) (Required) - The ID of the response to delete.
-
-Type: C<string>
-
-
+=item * C<response_id> (in path, required, string) - The ID of the response to delete.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - OK>
 
+B<404 - Not Found>
 
-=head4 Status Code: C<200>
+Content-Type: application/json
 
-OK
+Example:
 
+    {
+       "code" : "string",
+       "message" : "string",
+       "param" : "string",
+       "type" : "string"
+    }
 
-=head4 Status Code: C<404>
+=head2 GET /responses/{response_id}
 
-Not Found
+=head3 getResponse
 
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
-
-
-
-=back
-
-=head2 C<GET /responses/{response_id}>
-
-Get a model response
-
+  $client->get_response({
+      body => { ... },
+  });
 
 Retrieves a model response with the given ID.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
+=item * C<response_id> (in path, required, string) - The ID of the response to retrieve.
 
-C<getResponse>
+=item * C<include> (in query, optional, array) - Additional fields to include in the response. See the C<include> parameter for
+Response creation above for more information.
 
-    $client->getResponse( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<response_id> (in path) (Required) - The ID of the response to retrieve.
-
-Type: C<string>
-
-
-
-=item * C<include> (in query) (Optional) - Additional fields to include in the response. See the `include`
-parameter for Response creation above for more information.
-
-
-Type: C<array>
-
-
-
-=item * C<stream> (in query) (Optional) - If set to true, the model response data will be streamed to the client
-as it is generated using [server-sent events](https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#Event_stream_format).
-See the [Streaming section below](https://platform.openai.com/docs/api-reference/responses-streaming)
+=item * C<stream> (in query, optional, boolean) - If set to true, the model response data will be streamed to the client as it
+is generated using
+L<server-sent events|https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#Event_stream_format>
+. See the
+L<Streaming section below|https://platform.openai.com/docs/api-reference/responses-streaming>
 for more information.
 
+=item * C<starting_after> (in query, optional, integer) - The sequence number of the event after which to start streaming.
 
-Type: C<boolean>
-
-
-
-=item * C<starting_after> (in query) (Optional) - The sequence number of the event after which to start streaming.
-
-
-Type: C<integer>
-
-
-
-=item * C<include_obfuscation> (in query) (Optional) - When true, stream obfuscation will be enabled. Stream obfuscation adds
-random characters to an `obfuscation` field on streaming delta events
-to normalize payload sizes as a mitigation to certain side-channel
-attacks. These obfuscation fields are included by default, but add a
-small amount of overhead to the data stream. You can set
-`include_obfuscation` to false to optimize for bandwidth if you trust
-the network links between your application and the OpenAI API.
-
-
-Type: C<boolean>
-
-
+=item * C<include_obfuscation> (in query, optional, boolean) - When true, stream obfuscation will be enabled. Stream obfuscation adds random
+characters to an C<obfuscation> field on streaming delta events to normalize
+payload sizes as a mitigation to certain side-channel attacks. These
+obfuscation fields are included by default, but add a small amount of overhead
+to the data stream. You can set C<include_obfuscation> to false to optimize
+for bandwidth if you trust the network links between your application and the
+OpenAI API.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - OK>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
+Example:
 
-OK
+    {
+       "completed_at" : 1741476778,
+       "created_at" : 1741476777,
+       "error" : null,
+       "id" : "resp_67ccd3a9da748190baa7f1570fe91ac604becb25c45c1d41",
+       "incomplete_details" : null,
+       "instructions" : null,
+       "max_output_tokens" : null,
+       "metadata" : {},
+       "model" : "gpt-4o-2024-08-06",
+       "object" : "response",
+       "output" : [
+          {
+             "content" : [
+                {
+                   "annotations" : [],
+                   "text" : "The image depicts a scenic landscape with a wooden boardwalk or pathway leading through lush, green grass under a blue sky with some clouds. The setting suggests a peaceful natural area, possibly a park or nature reserve. There are trees and shrubs in the background.",
+                   "type" : "output_text"
+                }
+             ],
+             "id" : "msg_67ccd3acc8d48190a77525dc6de64b4104becb25c45c1d41",
+             "role" : "assistant",
+             "status" : "completed",
+             "type" : "message"
+          }
+       ],
+       "parallel_tool_calls" : true,
+       "previous_response_id" : null,
+       "reasoning" : {
+          "effort" : null,
+          "summary" : null
+       },
+       "status" : "completed",
+       "store" : true,
+       "temperature" : 1,
+       "text" : {
+          "format" : {
+             "type" : "text"
+          }
+       },
+       "tool_choice" : "auto",
+       "tools" : [],
+       "top_p" : 1,
+       "truncation" : "disabled",
+       "usage" : {
+          "input_tokens" : 328,
+          "input_tokens_details" : {
+             "cached_tokens" : 0
+          },
+          "output_tokens" : 52,
+          "output_tokens_details" : {
+             "reasoning_tokens" : 0
+          },
+          "total_tokens" : 380
+       },
+       "user" : null
+    }
 
+=head1 SCHEMAS
 
-=head4 Content Types:
+=head2 Error
 
-=over 4
+Properties:
 
+=over
 
-=item * C<application/json>
+=item * C<code> (anyOf, required)
 
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+=item * C<message> (string, required)
 
+=item * C<param> (anyOf, required)
 
+=item * C<type> (string, required)
 
 =back
+
+=head2 Response
+
+See L<https://platform.openai.com/docs/api-reference> for details.
 
 =head1 SEE ALSO
 

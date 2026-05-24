@@ -4,7 +4,7 @@
       "Shoichi Kaji <skaji@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -16,7 +16,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "Module::Build::Tiny" : "0.034"
+            "Module::Build::Tiny" : "0.053"
          }
       },
       "runtime" : {
@@ -24,14 +24,14 @@
             "HTTP::Tiny" : "0.055",
             "IO::Socket::SSL" : "1.42",
             "JSON::PP" : "0",
-            "perl" : "v5.16.0"
+            "perl" : "v5.24.0"
          }
       }
    },
    "provides" : {
       "PAUSE::Permissions::MetaCPAN" : {
          "file" : "lib/PAUSE/Permissions/MetaCPAN.pm",
-         "version" : "0.100"
+         "version" : "v1.0.0"
       }
    },
    "release_status" : "stable",
@@ -46,9 +46,9 @@
          "web" : "https://github.com/skaji/PAUSE-Permissions-MetaCPAN"
       }
    },
-   "version" : "0.100",
-   "x_generated_by_perl" : "v5.36.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.36",
+   "version" : "v1.0.0",
+   "x_generated_by_perl" : "v5.42.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1
 }

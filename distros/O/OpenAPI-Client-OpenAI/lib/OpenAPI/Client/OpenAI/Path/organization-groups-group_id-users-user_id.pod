@@ -1,0 +1,129 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::organization-groups-group_id-users-user_id - Documentation for the /organization/groups/{group_id}/users/{user_id} path.
+
+=head1 OPERATIONS
+
+=head2 DELETE /organization/groups/{group_id}/users/{user_id}
+
+=head3 remove-group-user
+
+  $client->remove_group_user({
+      body => { ... },
+  });
+
+Removes a user from a group.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<group_id> (in path, required, string) - The ID of the group to update.
+
+=item * C<user_id> (in path, required, string) - The ID of the user to remove from the group.
+
+=back
+
+=head4 Responses
+
+B<200 - User removed from the group successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "deleted" : true,
+       "object" : "group.user.deleted"
+    }
+
+=head2 GET /organization/groups/{group_id}/users/{user_id}
+
+=head3 retrieve-group-user
+
+  $client->retrieve_group_user({
+      body => { ... },
+  });
+
+Retrieves a user in a group.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<group_id> (in path, required, string) - The ID of the group to inspect.
+
+=item * C<user_id> (in path, required, string) - The ID of the user to retrieve from the group.
+
+=back
+
+=head4 Responses
+
+B<200 - User retrieved from the group successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "email" : "ada@example.com",
+       "id" : "user_abc123",
+       "is_service_account" : false,
+       "name" : "Ada Lovelace",
+       "picture" : null,
+       "user_type" : "user"
+    }
+
+=head1 SCHEMAS
+
+=head2 GroupMemberUser
+
+Properties:
+
+=over
+
+=item * C<email> (anyOf, required) - Email address of the user, or C<null> for users without an email.
+
+=item * C<id> (string, required) - Identifier for the user.
+
+=item * C<is_service_account> (anyOf, required) - Whether the user is a service account.
+
+=item * C<name> (string, required) - Display name of the user.
+
+=item * C<picture> (anyOf, required) - URL of the user's profile picture, if available.
+
+=item * C<user_type> (string, required) - The type of user.
+
+Allowed values: user, tenant_user
+
+=back
+
+=head2 GroupUserDeletedResource
+
+Properties:
+
+=over
+
+=item * C<deleted> (boolean, required) - Whether the group membership was removed.
+
+=item * C<object> (string, required) - Always C<group.user.deleted> .
+
+Allowed values: group.user.deleted
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

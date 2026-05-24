@@ -1,0 +1,71 @@
+{
+    "name" : "Perl500503Syntax-OrDie",
+    "version" : "0.01",
+    "abstract" : "Validate Perl 5.005_03 source compatibility",
+    "author" : [
+        "ina <ina@cpan.org>"
+    ],
+    "dynamic_config" : 1,
+    "generated_by" : "pmake.bat",
+    "license" : [
+        "perl_5"
+    ],
+    "meta-spec" : {
+        "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+        "version" : 2
+    },
+    "release_status" : "stable",
+    "resources" : {
+        "license" : [
+            "http://dev.perl.org/licenses/"
+        ],
+        "bugtracker" : {
+            "web" : "https://github.com/ina-cpan/Perl500503Syntax-OrDie/issues"
+        },
+        "repository" : {
+            "url"  : "https://github.com/ina-cpan/Perl500503Syntax-OrDie",
+            "web"  : "https://github.com/ina-cpan/Perl500503Syntax-OrDie",
+            "type" : "git"
+        }
+    },
+    "prereqs" : {
+        "build" : {
+            "requires" : {
+                "perl" : "5.005_03",
+                "strict" : "1.01",
+                "vars" : "0",
+                "warnings" : "0"
+            }
+        },
+        "configure" : {
+            "requires" : {
+                "perl" : "5.005_03",
+                "strict" : "1.01",
+                "vars" : "0",
+                "warnings" : "0"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+                "perl" : "5.005_03",
+                "strict" : "1.01",
+                "vars" : "0",
+                "warnings" : "0"
+            }
+        },
+        "test" : {
+            "requires" : {
+                "perl" : "5.005_03",
+                "strict" : "1.01",
+                "vars" : "0",
+                "warnings" : "0"
+            }
+        }
+    },
+    "provides" : {
+        "Perl500503Syntax::OrDie" : {
+            "file" : "lib/Perl500503Syntax/OrDie.pm",
+            "version" : "0.01"
+        }
+    }
+}

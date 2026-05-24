@@ -1,0 +1,10 @@
+# Changes for File::FindRoot
+
+0.003 2026-05-24T06:52:12Z
+	* bump to user release
+
+0.001_01 2026-05-24T06:47:57Z
+	* initial release of a module to walk up a path until it finds a particular file
+
+0.000 2026-05-22T19:54:42Z
+        * initial creation

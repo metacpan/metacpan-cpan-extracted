@@ -102,6 +102,12 @@ make
 # Obviously, this builds the documentation
 perl devel/build_docs.pl
 
+# Refresh MANIFEST so any newly generated POD files are picked up
+# (build_docs.pl may add new lib/OpenAPI/Client/OpenAI/Path/*.pod files when
+# the upstream spec adds endpoints). MANIFEST.SKIP filters out files we don't
+# want listed.
+make manifest
+
 # And we rebuild our README.md from the POD
 if command -v pod2markdown &> /dev/null; then
     pod2markdown < lib/OpenAPI/Client/OpenAI.pm > README.md

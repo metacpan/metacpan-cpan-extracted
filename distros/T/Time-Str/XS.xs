@@ -10,6 +10,7 @@
 #include "tstr_parsed.h"
 #include "tstr_token_parse.h"
 #include "tstr_calendar.h"
+#include "tstr_time.h"
 #include "tstr_regexp.h"
 #include "tstr_parse.h"
 #include "tstr_sv.h"
@@ -498,4 +499,162 @@ resolve_century(...)
       croak("Parameter 'year' is out of range [0, 99]");
     pivot_year = tstr_sv_pivot_year(aTHX_ ST(1));
     mPUSHi(tstr_calendar_resolve_century(year, pivot_year));
+
+MODULE = Time::Str  PACKAGE = Time::Str::Time
+
+PROTOTYPES: DISABLE
+
+void
+valid_hms(...)
+  PPCODE:
+    if (items != 3)
+      croak("Usage: valid_hms(hour, minute, second)");
+    if (tstr_time_valid_hms((int)SvIV(ST(0)), (int)SvIV(ST(1)), (int)SvIV(ST(2))))
+      XSRETURN_YES;
+    XSRETURN_NO;
+
+void
+valid_hms60(...)
+  PPCODE:
+    if (items != 3)
+      croak("Usage: valid_hms60(hour, minute, second)");
+    if (tstr_time_valid_hms60((int)SvIV(ST(0)), (int)SvIV(ST(1)), (int)SvIV(ST(2))))
+      XSRETURN_YES;
+    XSRETURN_NO;
+
+void
+timegm_modern(...)
+  PREINIT:
+    int y, m, d, H, M, S;
+  PPCODE:
+    if (items != 6)
+      croak("Usage: timegm_modern(sec, min, hour, mday, mon, year)");
+    S = (int)SvIV(ST(0));
+    M = (int)SvIV(ST(1));
+    H = (int)SvIV(ST(2));
+    d = (int)SvIV(ST(3));
+    m = (int)SvIV(ST(4));
+    y = (int)SvIV(ST(5));
+    if (y < 1 || y > 9999)
+      croak("Parameter 'year' is out of range [1, 9999]");
+    if (m < 1 || m > 12)
+      croak("Parameter 'month' is out of range [1, 12]");
+    if (d < 1 || d > tstr_calendar_month_days(y, m))
+      croak("Parameter 'day' is out of range");
+    if (H < 0 || H > 23)
+      croak("Parameter 'hour' is out of range [0, 23]");
+    if (M < 0 || M > 59)
+      croak("Parameter 'minute' is out of range [0, 59]");
+    if (S < 0 || S > 59)
+      croak("Parameter 'second' is out of range [0, 59]");
+#if IVSIZE >= 8
+    mPUSHi((IV)tstr_time_timegm(y, m, d, H, M, S));
+#else
+    mPUSHn((NV)tstr_time_timegm(y, m, d, H, M, S));
+#endif
+
+void
+timegm_posix(...)
+  PREINIT:
+    int y, m, d, H, M, S;
+  PPCODE:
+    if (items != 6)
+      croak("Usage: timegm_posix(sec, min, hour, mday, mon, year)");
+    S = (int)SvIV(ST(0));
+    M = (int)SvIV(ST(1));
+    H = (int)SvIV(ST(2));
+    d = (int)SvIV(ST(3));
+    m = (int)SvIV(ST(4)) + 1;
+    y = (int)SvIV(ST(5)) + 1900;
+    if (y < 1 || y > 9999)
+      croak("Parameter 'year' is out of range [1, 9999]");
+    if (m < 1 || m > 12)
+      croak("Parameter 'month' is out of range [1, 12]");
+    if (d < 1 || d > tstr_calendar_month_days(y, m))
+      croak("Parameter 'day' is out of range");
+    if (H < 0 || H > 23)
+      croak("Parameter 'hour' is out of range [0, 23]");
+    if (M < 0 || M > 59)
+      croak("Parameter 'minute' is out of range [0, 59]");
+    if (S < 0 || S > 59)
+      croak("Parameter 'second' is out of range [0, 59]");
+#if IVSIZE >= 8
+    mPUSHi((IV)tstr_time_timegm(y, m, d, H, M, S));
+#else
+    mPUSHn((NV)tstr_time_timegm(y, m, d, H, M, S));
+#endif
+
+MODULE = Time::Str  PACKAGE = Time::Str::Util
+
+PROTOTYPES: DISABLE
+
+void
+lower_bound(...)
+  PREINIT:
+    AV *av;
+    IV value, lo, hi, mid;
+  PPCODE:
+    if (items < 2 || items > 4)
+      croak("Usage: lower_bound(array, value [, lo [, hi]])");
+    if (!SvROK(ST(0)) || SvTYPE(SvRV(ST(0))) != SVt_PVAV)
+      croak("Parameter 'array' must be an array reference");
+    av = (AV *)SvRV(ST(0));
+    value = SvIV(ST(1));
+    {
+      IV len = av_len(av) + 1;
+      lo = (items >= 3) ? SvIV(ST(2)) : 0;
+      hi = (items >= 4) ? SvIV(ST(3)) : len;
+      if (lo < 0 || lo > len)
+        croak("Parameter 'lo' is out of range [0, %" IVdf "]", len);
+      if (hi < 0 || hi > len)
+        croak("Parameter 'hi' is out of range [0, %" IVdf "]", len);
+      if (lo > hi)
+        croak("Parameter 'lo' must not exceed 'hi'");
+    }
+    while (lo < hi) {
+      mid = (lo + hi) >> 1;
+      {
+        SV **elem = av_fetch(av, mid, 0);
+        if (elem && SvIV(*elem) < value)
+          lo = mid + 1;
+        else
+          hi = mid;
+      }
+    }
+    mPUSHi(lo);
+
+void
+upper_bound(...)
+  PREINIT:
+    AV *av;
+    IV value, lo, hi, mid;
+  PPCODE:
+    if (items < 2 || items > 4)
+      croak("Usage: upper_bound(array, value [, lo [, hi ]])");
+    if (!SvROK(ST(0)) || SvTYPE(SvRV(ST(0))) != SVt_PVAV)
+      croak("Parameter 'array' must be an array reference");
+    av = (AV *)SvRV(ST(0));
+    value = SvIV(ST(1));
+    {
+      IV len = av_len(av) + 1;
+      lo = (items >= 3) ? SvIV(ST(2)) : 0;
+      hi = (items >= 4) ? SvIV(ST(3)) : len;
+      if (lo < 0 || lo > len)
+        croak("Parameter 'lo' is out of range [0, %" IVdf "]", len);
+      if (hi < 0 || hi > len)
+        croak("Parameter 'hi' is out of range [0, %" IVdf "]", len);
+      if (lo > hi)
+        croak("Parameter 'lo' must not exceed 'hi'");
+    }
+    while (lo < hi) {
+      mid = (lo + hi) >> 1;
+      {
+        SV **elem = av_fetch(av, mid, 0);
+        if (elem && SvIV(*elem) <= value)
+          lo = mid + 1;
+        else
+          hi = mid;
+      }
+    }
+    mPUSHi(lo);
 

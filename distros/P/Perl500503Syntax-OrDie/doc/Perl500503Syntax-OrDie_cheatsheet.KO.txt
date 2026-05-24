@@ -1,0 +1,135 @@
+Perl500503Syntax::OrDie 치트시트 (한국어)
+==========================================
+
+이름
+    Perl500503Syntax::OrDie - Perl 5.005_03 소스 호환성 검증
+
+버전
+    0.01
+
+개요
+    # use 시 호출 파일을 자동 검사:
+    use Perl500503Syntax::OrDie;
+
+    # 프로그래밍 방식 API:
+    use Perl500503Syntax::OrDie ();
+    Perl500503Syntax::OrDie::check_file('/path/to/script.pl');
+    my @violations = Perl500503Syntax::OrDie::check_source($source_text, 'label.pl');
+
+    # 명령행 사용법:
+    perl lib/Perl500503Syntax/OrDie.pm script.pl
+    perl lib/Perl500503Syntax/OrDie.pm script1.pl script2.pl ...
+    perl lib/Perl500503Syntax/OrDie.pm -
+
+설명
+    모듈은 호출 소스 파일을 읽고 문자열 리터럴과 주석을 마스크한 뒤
+    Perl 5.005_03 이후에 도입된 구문을 스캔합니다.
+    명령으로 실행 시 지정된 각 파일을 검사하고 결과를 출력합니다.
+    인수 없이 실행하면 사용법을 표시합니다.
+
+정적 검사 항목
+    Perl 5.6  : our / 3인수 open / use utf8 / \x{} / @+@- /
+                CHECK/INIT / v-string / $^V / :lvalue / \p{}
+    Perl 5.8  : use encoding / PerlIO 레이어
+    Perl 5.10 : //= // say state given/when ~~ use feature
+                \K (?<name>) \k<name> (?|) (*VERB) \h\v\R
+                UNITCHECK 소유 수량자 (?1)(?R) ${^MATCH} \g{N}
+    Perl 5.12 : package NAME VERSION / ...
+    Perl 5.14 : s///r tr///r
+    Perl 5.16 : __SUB__
+    Perl 5.20 : 서브루틴 시그니처 / $ref->@*
+    Perl 5.22 : <<>> / /n
+    Perl 5.26 : <<~
+    Perl 5.30 : (?<=.{2,}X) variable-length lookbehind (experimental; stable 5.38)
+    Perl 5.32 : isa
+    Perl 5.34 : try/catch
+    Perl 5.36 : use builtin / for my ($a,$b)
+    Perl 5.38 : class
+
+Perl 버전 변경 이력
+    참조: https://perldoc.perl.org/perl56delta
+          https://perldoc.perl.org/perl5100delta
+          https://perldoc.perl.org/perl5180delta
+          https://perldoc.perl.org/perl5220delta
+          https://perldoc.perl.org/perl5240delta
+          https://perldoc.perl.org/perl5280delta
+          https://perldoc.perl.org/perl5300delta
+          https://perldoc.perl.org/perl5380delta
+          https://perldoc.perl.org/perl5400delta
+          https://perldoc.perl.org/perl5420delta
+          (기타 URL은 EN 치트시트 참조)
+
+  perl56delta（Perl 5.6.0，2000-03-22）
+    our VARIABLE
+      어휘 범위 패키지 변수 선언. "use vars qw(...)" 대신 사용하세요.
+    3인수 open()
+      open(FH, ">path") 2인수 형식을 사용하세요.
+    use utf8 / use VERSION / \x{HHHH} / \N{name}
+    @+ @- / $+[N] $-[N]  매치 위치 배열
+    CHECK { } INIT { }  컴파일/실행 페이즈 블록
+    v-string (v1.2.3)  $^V 버전 객체 ($] 사용 권장)
+    :lvalue  서브루틴 속성
+    \p{} \P{}  정규식 유니코드 속성
+    명시적 모드 없는 mkdir()  (5.005_03에서는 mkdir(PATH, MODE) 필수)
+
+  perl58delta（Perl 5.8.0，2002-07-18）
+    use encoding  소스 인코딩 pragma
+    PerlIO 레이어  :utf8 :encoding :crlf 등
+
+  perl5100delta（Perl 5.10.0，2007-12-18）
+    // //=  정의-또는 연산자/대입
+    say  개행 포함 print
+    state  어휘 범위 영속 변수
+    given/when  switch/case (5.36+ 삭제)
+    ~~  스마트 매치
+    use feature  언어 기능 활성화
+    \K  정규식 keep
+    (?<name>...) \k<name>  명명 캡처/역참조
+    (?|...)  분기 리셋 그룹
+    (*VERB)  백트랙 제어 동사
+    \h \H \v \V \R  공백 이스케이프
+    UNITCHECK { }  페이즈 블록
+    a++ a*+ a?+  소유 수량자
+    (?1) (?&name) (?R)  재귀 패턴
+    ${^MATCH} 등  매치 변수 (/p 플래그)
+    \g{N}  상대/절대 역참조
+
+  perl5120delta（5.12）  package NAME VERSION / yada-yada ...
+  perl5140delta（5.14）  s///r tr///r 비파괴 플래그
+  perl5160delta（5.16）  __SUB__
+  perl5200delta（5.20）  서브루틴 시그니처 / $ref->@*
+  perl5220delta（5.22）  <<>> / /n
+  perl5260delta（5.26）  <<~
+  perl5320delta（5.32）  isa 중위 연산자
+  perl5340delta（5.34）  try/catch
+  perl5360delta（5.36）  use builtin / for my ($a,$b)
+  perl5300delta (5.30): variable-length lookbehind in regex (experimental; stable Perl 5.38)
+
+  perl5380delta（5.38）  class
+
+  perl5180delta (5.18): my sub / state sub -- lexical subroutines
+
+  perl5400delta (Perl 5.40.0, 2024-06-09)
+    ^^ / ^^= high-precedence logical XOR operator
+      $x ^^ $y  -- completes the &&/|| set; use "xor" for 5.005_03.
+    __CLASS__ keyword (inside class blocks)
+      Runtime class name inside method/ADJUST/field (requires class feature).
+
+  perl5420delta (Perl 5.42.0, 2025-07-02)
+    any BLOCK LIST / all BLOCK LIST (experimental keywords)
+      any { EXPR } @list  -- use List::Util::any for 5.005_03.
+    my method / ->& lexical method call (requires class feature)
+      my method foo () { ... }  -- lexically scoped private method.
+
+호환 관용구 (Perl 5.005_03)
+    use vars qw($x @arr %hash);   "our" 대신
+    open(FH, ">$path") or die $!; 2인수 배어워드
+    mkdir("dir", 0755) or die $!; 명시적 모드
+    $x = defined($y) ? $y : 'v'; //= 대신
+    print "...\n";                say 대신
+
+작성자
+    INABA Hitoshi <ina@cpan.org>
+
+라이선스
+    Perl과 동일한 조건으로 재배포 가능한 자유 소프트웨어.

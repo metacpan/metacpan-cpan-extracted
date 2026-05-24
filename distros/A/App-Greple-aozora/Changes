@@ -1,5 +1,9 @@
 Revision history for Perl extension App-Greple-aozora
 
+0.02 2026-05-24T04:58:18Z
+
+    - require perl 5.18.2
+
 0.01 2019-08-20T02:29:41Z
 
     - original version

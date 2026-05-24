@@ -1,0 +1,170 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::audio-voice_consents - Documentation for the /audio/voice_consents path.
+
+=head1 OPERATIONS
+
+=head2 GET /audio/voice_consents
+
+=head3 listVoiceConsents
+
+  $client->list_voice_consents({
+      body => { ... },
+  });
+
+Returns a list of voice consent recordings.
+
+List consent recordings available to your organization for creating custom
+voices.
+
+See the
+L<custom voices guide|https://platform.openai.com/docs/guides/text-to-speech#custom-voices>
+. Custom voices are limited to eligible customers.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<after> (in query, optional, string) - A cursor for use in pagination. C<after> is an object ID that defines your
+place in the list. For instance, if you make a list request and receive 100
+objects, ending with obj_foo, your subsequent call can include after=obj_foo
+in order to fetch the next page of the list.
+
+=item * C<limit> (in query, optional, integer) - A limit on the number of objects to be returned. Limit can range between 1 and
+100, and the default is 20.
+
+Default: 20
+
+=back
+
+=head4 Responses
+
+B<200 - OK>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "data" : [
+          {
+             "created_at" : 1734220800,
+             "id" : "cons_1234",
+             "language" : "en-US",
+             "name" : "John Doe",
+             "object" : "audio.voice_consent"
+          }
+       ],
+       "first_id" : "cons_1234",
+       "has_more" : false,
+       "last_id" : "cons_1234",
+       "object" : "list"
+    }
+
+=head2 POST /audio/voice_consents
+
+=head3 createVoiceConsent
+
+  $client->create_voice_consent({
+      body => { ... },
+  });
+
+Upload a voice consent recording.
+
+Upload a consent recording that authorizes creation of a custom voice.
+
+See the
+L<custom voices guide|https://platform.openai.com/docs/guides/text-to-speech#custom-voices>
+for requirements and best practices. Custom voices are limited to eligible
+customers.
+
+=head4 Responses
+
+B<200 - OK>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "created_at" : 1734220800,
+       "id" : "cons_1234",
+       "language" : "en-US",
+       "name" : "John Doe",
+       "object" : "audio.voice_consent"
+    }
+
+=head1 SCHEMAS
+
+=head2 CreateVoiceConsentRequest
+
+Properties:
+
+=over
+
+=item * C<language> (string, required) - The BCP 47 language tag for the consent phrase (for example, C<en-US> ).
+
+=item * C<name> (string, required) - The label to use for this consent recording.
+
+=item * C<recording> (string, required) - The consent audio recording file. Maximum size is 10 MiB.
+
+Supported MIME types: C<audio/mpeg> , C<audio/wav> , C<audio/x-wav> ,
+C<audio/ogg> , C<audio/aac> , C<audio/flac> , C<audio/webm> , C<audio/mp4> .
+
+=back
+
+=head2 VoiceConsentListResource
+
+Properties:
+
+=over
+
+=item * C<data> (array of VoiceConsentResource, required)
+
+=item * C<first_id> (anyOf)
+
+=item * C<has_more> (boolean, required)
+
+=item * C<last_id> (anyOf)
+
+=item * C<object> (string, required)
+
+Allowed values: list
+
+=back
+
+=head2 VoiceConsentResource
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) for when the consent recording was created.
+
+=item * C<id> (string, required) - The consent recording identifier.
+
+=item * C<language> (string, required) - The BCP 47 language tag for the consent phrase (for example, C<en-US> ).
+
+=item * C<name> (string, required) - The label provided when the consent recording was uploaded.
+
+=item * C<object> (string, required) - The object type, which is always C<audio.voice_consent> .
+
+Allowed values: audio.voice_consent
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

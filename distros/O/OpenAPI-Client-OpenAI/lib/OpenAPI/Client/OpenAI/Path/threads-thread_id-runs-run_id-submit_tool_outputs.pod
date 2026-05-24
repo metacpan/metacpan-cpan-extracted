@@ -4,119 +4,329 @@
 
 OpenAPI::Client::OpenAI::Path::threads-thread_id-runs-run_id-submit_tool_outputs - Documentation for the /threads/{thread_id}/runs/{run_id}/submit_tool_outputs path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</threads/{thread_id}/runs/{run_id}/submit_tool_outputs>.
+=head2 POST /threads/{thread_id}/runs/{run_id}/submit_tool_outputs
 
-=head1 PATHS
+=head3 submitToolOuputsToRun
 
+  $client->submit_tool_ouputs_to_run({
+      body => { ... },
+  });
 
-=head2 C<POST /threads/{thread_id}/runs/{run_id}/submit_tool_outputs>
+When a run has the C<status: "requires_action"> and C<required_action.type> is
+C<submit_tool_outputs> , this endpoint can be used to submit the outputs from
+the tool calls once they're all completed. All outputs must be submitted in a
+single request.
 
-Submit tool outputs to run
+=head4 Path/query parameters
 
+=over
 
-When a run has the C<status: "requires_action"> and C<required_action.type> is C<submit_tool_outputs>, this endpoint can be used to submit the outputs from the tool calls once they're all completed. All outputs must be submitted in a single request.
+=item * C<thread_id> (in path, required, string) - The ID of the L<thread|https://platform.openai.com/docs/api-reference/threads>
+to which this run belongs.
 
-
-
-=head3 Operation ID
-
-C<submitToolOuputsToRun>
-
-    $client->submitToolOuputsToRun( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<thread_id> (in path) (Required) - The ID of the [thread](https://platform.openai.com/docs/api-reference/threads) to which this run belongs.
-
-Type: C<string>
-
-
-
-=item * C<run_id> (in path) (Required) - The ID of the run that requires the tool output submission.
-
-Type: C<string>
-
-
+=item * C<run_id> (in path, required, string) - The ID of the run that requires the tool output submission.
 
 =back
 
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
+=head4 Request body
 
-    
-      
+Content-Type: application/json
 
-      
-      
 Example:
 
     {
-       "tool_outputs" : [
-          null
-       ]
+       "assistant_id" : "asst_123",
+       "cancelled_at" : null,
+       "completed_at" : null,
+       "created_at" : 1699075592,
+       "expires_at" : 1699076192,
+       "failed_at" : null,
+       "id" : "run_123",
+       "instructions" : null,
+       "last_error" : null,
+       "max_completion_tokens" : 1000,
+       "max_prompt_tokens" : 1000,
+       "metadata" : {},
+       "model" : "gpt-4o",
+       "object" : "thread.run",
+       "parallel_tool_calls" : true,
+       "response_format" : "auto",
+       "started_at" : 1699075592,
+       "status" : "queued",
+       "temperature" : 1,
+       "thread_id" : "thread_123",
+       "tool_choice" : "auto",
+       "tools" : [
+          {
+             "function" : {
+                "description" : "Get the current weather in a given location",
+                "name" : "get_current_weather",
+                "parameters" : {
+                   "properties" : {
+                      "location" : {
+                         "description" : "The city and state, e.g. San Francisco, CA",
+                         "type" : "string"
+                      },
+                      "unit" : {
+                         "enum" : [
+                            "celsius",
+                            "fahrenheit"
+                         ],
+                         "type" : "string"
+                      }
+                   },
+                   "required" : [
+                      "location"
+                   ],
+                   "type" : "object"
+                }
+             },
+             "type" : "function"
+          }
+       ],
+       "top_p" : 1,
+       "truncation_strategy" : {
+          "last_messages" : null,
+          "type" : "auto"
+       },
+       "usage" : null
     }
 
+=head4 Responses
 
-             
+B<200 - OK>
 
-=head3 Responses
+Content-Type: application/json
 
-
-=head4 Status Code: C<200>
-
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-      "id": "run_abc123",
-      "object": "thread.run",
-      "created_at": 1698107661,
-      "assistant_id": "asst_abc123",
-      "thread_id": "thread_abc123",
-      "status": "completed",
-      "started_at": 1699073476,
-      "expires_at": null,
-      "cancelled_at": null,
-      "failed_at": null,
-      "completed_at": 1699073498,
-      "last_error": null,
-      "model": "gpt-4o",
-      "instructions": null,
-      "tools": [{"type": "file_search"}, {"type": "code_interpreter"}],
-      "metadata": {},
-      "incomplete_details": null,
-      "usage": {
-        "prompt_tokens": 123,
-        "completion_tokens": 456,
-        "total_tokens": 579
-      },
-      "temperature": 1.0,
-      "top_p": 1.0,
-      "max_prompt_tokens": 1000,
-      "max_completion_tokens": 1000,
-      "truncation_strategy": {
-        "type": "auto",
-        "last_messages": null
-      },
-      "response_format": "auto",
-      "tool_choice": "auto",
-      "parallel_tool_calls": true
+       "assistant_id" : "asst_123",
+       "cancelled_at" : null,
+       "completed_at" : null,
+       "created_at" : 1699075592,
+       "expires_at" : 1699076192,
+       "failed_at" : null,
+       "id" : "run_123",
+       "instructions" : null,
+       "last_error" : null,
+       "max_completion_tokens" : 1000,
+       "max_prompt_tokens" : 1000,
+       "metadata" : {},
+       "model" : "gpt-4o",
+       "object" : "thread.run",
+       "parallel_tool_calls" : true,
+       "response_format" : "auto",
+       "started_at" : 1699075592,
+       "status" : "queued",
+       "temperature" : 1,
+       "thread_id" : "thread_123",
+       "tool_choice" : "auto",
+       "tools" : [
+          {
+             "function" : {
+                "description" : "Get the current weather in a given location",
+                "name" : "get_current_weather",
+                "parameters" : {
+                   "properties" : {
+                      "location" : {
+                         "description" : "The city and state, e.g. San Francisco, CA",
+                         "type" : "string"
+                      },
+                      "unit" : {
+                         "enum" : [
+                            "celsius",
+                            "fahrenheit"
+                         ],
+                         "type" : "string"
+                      }
+                   },
+                   "required" : [
+                      "location"
+                   ],
+                   "type" : "object"
+                }
+             },
+             "type" : "function"
+          }
+       ],
+       "top_p" : 1,
+       "truncation_strategy" : {
+          "last_messages" : null,
+          "type" : "auto"
+       },
+       "usage" : null
     }
 
+=head1 SCHEMAS
+
+=head2 AssistantsApiResponseFormatOption
+
+Specifies the format that the model must output. Compatible with
+L<GPT-4o|https://platform.openai.com/docs/models#gpt-4o> ,
+L<GPT-4 Turbo|https://platform.openai.com/docs/models#gpt-4-turbo-and-gpt-4> ,
+and all GPT-3.5 Turbo models since C<gpt-3.5-turbo-1106> .
+
+Setting to C<{ "type": "json_schema", "json_schema": {...} }> enables
+Structured Outputs which ensures the model will match your supplied JSON
+schema. Learn more in the
+L<Structured Outputs guide|https://platform.openai.com/docs/guides/structured-outputs>
+.
+
+Setting to C<{ "type": "json_object" }> enables JSON mode, which ensures the
+message the model generates is valid JSON.
+
+B<Important:> when using JSON mode, you B<must> also instruct the model to
+produce JSON yourself via a system or user message. Without this, the model
+may generate an unending stream of whitespace until the generation reaches the
+token limit, resulting in a long-running and seemingly "stuck" request. Also
+note that the message content may be partially cut off if
+C<finish_reason="length"> , which indicates the generation exceeded
+C<max_tokens> or the conversation exceeded the max context length.
+
+=head2 Metadata
+
+Set of 16 key-value pairs that can be attached to an object. This can be
+useful for storing additional information about the object in a structured
+format, and querying for objects via API or the dashboard.
+
+Keys are strings with a maximum length of 64 characters. Values are strings
+with a maximum length of 512 characters.
+
+=head2 ParallelToolCalls
+
+Whether to enable
+L<parallel function calling|https://platform.openai.com/docs/guides/function-calling#configuring-parallel-function-calling>
+during tool use.
+
+=head2 RunCompletionUsage
+
+Usage statistics related to the run. This value will be C<null> if the run is
+not in a terminal state (i.e. C<in_progress> , C<queued> , etc.).
+
+=head2 RunObject
+
+Properties:
+
+=over
+
+=item * C<assistant_id> (string, required) - The ID of the
+L<assistant|https://platform.openai.com/docs/api-reference/assistants> used
+for execution of this run.
+
+=item * C<cancelled_at> (integer, required) - The Unix timestamp (in seconds) for when the run was cancelled.
+
+=item * C<completed_at> (integer, required) - The Unix timestamp (in seconds) for when the run was completed.
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) for when the run was created.
+
+=item * C<expires_at> (integer, required) - The Unix timestamp (in seconds) for when the run will expire.
+
+=item * C<failed_at> (integer, required) - The Unix timestamp (in seconds) for when the run failed.
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints.
+
+=item * C<incomplete_details> (object, required) - Details on why the run is incomplete. Will be C<null> if the run is not
+incomplete.
+
+=item * C<instructions> (string, required) - The instructions that the
+L<assistant|https://platform.openai.com/docs/api-reference/assistants> used
+for this run.
+
+=item * C<last_error> (object, required) - The last error associated with this run. Will be C<null> if there are no
+errors.
+
+=item * C<max_completion_tokens> (integer, required) - The maximum number of completion tokens specified to have been used over the
+course of the run.
+
+=item * C<max_prompt_tokens> (integer, required) - The maximum number of prompt tokens specified to have been used over the
+course of the run.
+
+=item * C<metadata> (Metadata, required)
+
+See L</Metadata> below for shape.
+
+=item * C<model> (string, required) - The model that the
+L<assistant|https://platform.openai.com/docs/api-reference/assistants> used
+for this run.
+
+=item * C<object> (string, required) - The object type, which is always C<thread.run> .
+
+Allowed values: thread.run
+
+=item * C<parallel_tool_calls> (ParallelToolCalls, required)
+
+See L</ParallelToolCalls> below for shape.
+
+=item * C<required_action> (object, required) - Details on the action required to continue the run. Will be C<null> if no
+action is required.
+
+=item * C<response_format> (AssistantsApiResponseFormatOption, required)
+
+See L</AssistantsApiResponseFormatOption> below for shape.
+
+=item * C<started_at> (integer, required) - The Unix timestamp (in seconds) for when the run was started.
+
+=item * C<status> (string, required) - The status of the run, which can be either C<queued> , C<in_progress> ,
+C<requires_action> , C<cancelling> , C<cancelled> , C<failed> , C<completed> ,
+C<incomplete> , or C<expired> .
+
+Allowed values: queued, in_progress, requires_action, cancelling, cancelled, failed, completed, incomplete, expired
+
+=item * C<temperature> (number) - The sampling temperature used for this run. If not set, defaults to 1.
+
+=item * C<thread_id> (string, required) - The ID of the L<thread|https://platform.openai.com/docs/api-reference/threads>
+that was executed on as a part of this run.
+
+=item * C<tool_choice> (allOf, required)
+
+=item * C<tools> (array of object, required) - The list of tools that the
+L<assistant|https://platform.openai.com/docs/api-reference/assistants> used
+for this run.
+
+Default: []
+
+=item * C<top_p> (number) - The nucleus sampling value used for this run. If not set, defaults to 1.
+
+=item * C<truncation_strategy> (allOf, required)
+
+=item * C<usage> (RunCompletionUsage, required)
+
+See L</RunCompletionUsage> below for shape.
+
+=back
+
+=head2 RunToolCallObject
+
+Properties:
+
+=over
+
+=item * C<function> (object, required) - The function definition.
+
+=item * C<id> (string, required) - The ID of the tool call. This ID must be referenced when you submit the tool
+outputs in using the
+L<Submit tool outputs to run|https://platform.openai.com/docs/api-reference/runs/submitToolOutputs>
+endpoint.
+
+=item * C<type> (string, required) - The type of tool call the output is required for. For now, this is always
+C<function> .
+
+Allowed values: function
+
+=back
+
+=head2 SubmitToolOutputsRunRequest
+
+Properties:
+
+=over
+
+=item * C<stream> (anyOf)
+
+=item * C<tool_outputs> (array of object, required) - A list of tools for which the outputs are being submitted.
 
 =back
 

@@ -1,0 +1,368 @@
+Perl500503Syntax::OrDie チートシート（日本語）
+==============================================
+
+名前
+    Perl500503Syntax::OrDie - Perl 5.005_03 ソース互換性の検証
+
+バージョン
+    0.01
+
+概要
+    # use時に呼び出し元ファイルを自動チェック:
+    use Perl500503Syntax::OrDie;
+
+    # プログラマティックAPI（自動チェック・ランタイムガードなし）:
+    use Perl500503Syntax::OrDie ();
+    my @violations = Perl500503Syntax::OrDie::check_source($source_text, 'label.pl');
+    Perl500503Syntax::OrDie::check_file('/path/to/script.pl');
+
+    # コマンドラインから実行（標準入力対応）:
+    perl lib/Perl500503Syntax/OrDie.pm script.pl
+    perl lib/Perl500503Syntax/OrDie.pm script1.pl script2.pl ...
+    perl lib/Perl500503Syntax/OrDie.pm -
+
+説明
+    "use Perl500503Syntax::OrDie;" でロードすると、モジュールは呼び出し元の
+    ソースファイルを読み込み、文字列リテラル・正規表現リテラル・コメントを
+    マスクした後、Perl 5.005_03 以降に導入された構文を検出します。
+    違反があればファイル名と行番号を含むメッセージで即座に die() します。
+
+    文字列・正規表現の内容は意図的に検査しません。文字列リテラルに "say" や
+    "%v" が含まれていても違反にはなりません。それらは実行時の値であり、
+    構文要素ではないためです。
+
+    open() と mkdir() に対する CORE::GLOBAL:: オーバーライドによる
+    ランタイムガードも設置されます。
+
+    コマンドとして実行した場合は、コマンドラインで指定した各ファイルを
+    チェックして結果を表示します。"-" を指定すると標準入力から読み込みます。
+    引数なしで実行した場合は使用方法を表示します。
+
+    ソースフィルタ機構は使用しません。Perl 5.005_03 から現在のリリースまで
+    動作します。
+
+プログラマティックAPI
+    check_source($source, $label)
+        $source（文字列）をスキャンし、違反メッセージのリストを返します。
+        違反がなければ空リストを返します。自動的に die しません。
+        呼び出し側でリストを処理します。
+
+            my @v = Perl500503Syntax::OrDie::check_source($src, 'foo.pl');
+            if (@v) { warn $_ for @v }
+
+    check_file($path)
+        $path を読み込んで check_source を呼び出します。
+        違反があれば die します。
+
+チェック対象構文（静的チェック、コンパイル時）
+    Perl 5.6
+      our $var / our @arr / our %hash      ("use vars" を使用すること)
+      open(FH, MODE, PATH)                 3引数形式
+      use utf8
+      use VERSION  (VERSION >= 5.6)
+      use vVERSION (VERSION >= v5.6)
+      \x{HHHH}                             Unicode16進エスケープ
+      \N{name}                             名前付き文字エスケープ
+      @+ / @-  および  $+[N] / $-[N]      マッチ位置配列
+      CHECK { } / INIT { }                 フェーズブロック
+      v1.2.3                               vストリング記法
+      $^V                                  バージョンオブジェクト（$]を使用）
+      sub foo :lvalue { }                  :lvalue 属性
+      *name{SLOT}                          typeglobコンポーネントアクセス
+      \p{} / \P{}                          正規表現内Unicodeプロパティ
+
+    Perl 5.8
+      use encoding
+      use constant { A => 1, B => 2 }      複数定数ハッシュリファレンス形式
+
+    Perl 5.10
+      //=                                  定義済み判定代入演算子
+      //                                   定義済み判定演算子（単体）
+      say                                  (->say() メソッド呼び出しは除外)
+      state $var
+      given(...) / when(...)
+      ~~                                   スマートマッチ
+      use feature
+      \K                                   正規表現内 keep
+      (?<name>...) / \k<name>              名前付きキャプチャ/後方参照
+      (?|...)                              ブランチリセットグループ
+      (*VERB)                              バックトラック制御動詞
+      \h \H \v \V \R                       正規表現内空白エスケープ
+      UNITCHECK { }                        フェーズブロック
+      a++ / a*+ / a?+                      所有量化子
+      (?1) / (?&name) / (?R)               再帰パターン
+      ${^MATCH} ${^PREMATCH} ${^POSTMATCH} マッチ変数（/pフラグ使用時）
+      \g{N}                                相対/絶対後方参照
+
+    Perl 5.12
+      package NAME VERSION
+      ...                                  ヤダヤダ演算子
+
+    Perl 5.14
+      s///r  tr///r                        非破壊フラグ
+
+    Perl 5.16
+      __SUB__
+
+    Perl 5.18
+      my sub foo { }                       レキシカルサブルーチン宣言
+      state sub foo { }
+
+    Perl 5.20
+      sub foo ($x, $y) { }                 サブルーチンシグネチャ
+      $ref->@*  $ref->%*                   後置デリファレンス（5.24で安定化）
+      %hash{LIST}  %array[LIST]            キー/値スライス（新構文）
+
+    Perl 5.22
+      <<>>                                 ダブルダイヤモンド演算子
+      /n                                   非キャプチャ正規表現フラグ
+      $a &. $b  $a |. $b  ^.=  ~.$a       文字列ビット演算子（5.28で安定化）
+      foreach \$x (@list)                  リファレンスエイリアス（foreach）
+
+    Perl 5.26
+      <<~                                  インデント付きヒアドキュメント
+
+    Perl 5.30
+      (?<=.{2,}X)                          可変長 lookbehind（実験的、5.38で安定化）
+
+    Perl 5.32
+      $obj isa ClassName                   isa 中置演算子
+                                           (->isa() および isa() 呼び出しは除外)
+
+    Perl 5.34
+      try { } catch ($e) { }
+
+    Perl 5.36
+      use builtin
+      for my ($a, $b) (@list)              ペアイテレーション
+
+    Perl 5.38
+      class Foo { }                        class キーワード
+      可変長 lookbehind（安定化）
+
+    Perl 5.40
+      $x ^^ $y  /  $x ^^= $y              高優先度論理 XOR 演算子
+      __CLASS__                            class ブロック内のランタイムクラス名
+
+    Perl 5.42
+      any { EXPR } @list                   キーワード演算子（List::Util が
+      all { EXPR } @list                   any/all をインポートする場合は抑制）
+      my method foo () { }                 レキシカルメソッド宣言
+      $obj->&foo()                         レキシカルメソッド呼び出し
+
+チェック対象構文（ランタイム、CORE::GLOBAL:: オーバーライド）
+    open(FH, MODE, PATH)                   3引数 open
+    open(FH, \$ref)                        参照をモードとした open
+    mkdir(PATH)                            明示的モードなし mkdir
+
+チェックしない項目（意図的）
+    文字列・正規表現の内容は検査しません。"say" を含む文字列リテラルや
+    "%vd" を含むフォーマット文字列は Perl 5.005_03 として正当な構文です。
+    binmode() のレイヤー文字列（:utf8 等）は実行時の値です。
+    open() 内の PerlIO レイヤーは 3引数 open として間接的に検出されます。
+
+エラーメッセージ形式
+    静的違反:
+      Perl500503Syntax::OrDie: VIOLATION at <ファイル> line <N>:
+        <説明>
+
+    ランタイム違反:
+      Perl500503Syntax::OrDie: RUNTIME VIOLATION at <ファイル> line <N>:
+        <説明>
+
+推奨イディオム（Perl 5.005_03 互換）
+    use strict;
+    use vars qw($x @arr %hash);           "our" の代わり
+    open(FH, ">$path") or die $!;         2引数ベアワード形式
+    mkdir("dir", 0755) or die $!;         明示的モード指定
+    $x = defined($y) ? $y : 'default';    //= の代わり
+    print "...\n";                         say の代わり
+    if ($] >= 5.006) { ... }              バージョン確認
+    UNIVERSAL::isa($obj, 'Foo')           $obj isa Foo の代わり
+    use List::Util qw(any all);           キーワード any/all の代わり
+
+Perlバージョン変更履歴（本モジュールがチェックする機能）
+    参照: https://perldoc.perl.org/perl56delta
+          https://perldoc.perl.org/perl58delta
+          https://perldoc.perl.org/perl5100delta
+          https://perldoc.perl.org/perl5120delta
+          https://perldoc.perl.org/perl5140delta
+          https://perldoc.perl.org/perl5160delta
+          https://perldoc.perl.org/perl5180delta
+          https://perldoc.perl.org/perl5200delta
+          https://perldoc.perl.org/perl5220delta
+          https://perldoc.perl.org/perl5240delta
+          https://perldoc.perl.org/perl5260delta
+          https://perldoc.perl.org/perl5280delta
+          https://perldoc.perl.org/perl5300delta
+          https://perldoc.perl.org/perl5320delta
+          https://perldoc.perl.org/perl5340delta
+          https://perldoc.perl.org/perl5360delta
+          https://perldoc.perl.org/perl5380delta
+          https://perldoc.perl.org/perl5400delta
+          https://perldoc.perl.org/perl5420delta
+
+  perl56delta（Perl 5.6.0、2000-03-22）
+    our VARIABLE
+      レキシカルスコープのパッケージ変数宣言。
+      5.005_03 互換には "use vars qw(...)" を使用すること。
+    3引数 open()
+      open(FH, MODE, PATH) 形式。2引数形式 open(FH, ">path") を使用すること。
+    use utf8
+      ソースファイルが UTF-8 エンコードされていることを宣言。
+    use VERSION（>= 5.006 または v5.6）
+      最低Perlバージョンを "use 5.006" または "use v5.6" で指定。
+    \x{HHHH} Unicodeエスケープ
+      0xFF を超えるUnicodeコードポイントの拡張16進エスケープ。
+    \N{name} 名前付き文字エスケープ
+      正規表現/文字列内の名前付きUnicode文字（例: \N{SNOWMAN}）。
+    @+ および @- / $+[N] $-[N]
+      直近の正規表現マッチの開始/終了位置を保持する配列。
+    CHECK { } / INIT { } フェーズブロック
+      特定のコンパイル/実行フェーズで実行される名前付きブロック。
+      （END { } と BEGIN { } は 5.6 以前から利用可能。）
+    vストリング記法（v1.2.3）
+      v5.6.1 などのベクタ文字列。
+    $^V バージョンオブジェクト
+      5.005_03 互換には数値の $] を使用すること。
+    :lvalue サブルーチン属性
+      サブルーチンを有効なlvalue（代入可能）としてマーク。
+    *name{SLOT} typeglobコンポーネントアクセス
+      *FH{IO}、*foo{SCALAR}、*foo{CODE} 等。Perl 5.005_03 では未対応。
+    \p{Property} / \P{Property} Unicode プロパティエスケープ
+      Unicodeプロパティで文字をマッチ（例: \p{IsAlpha}）。
+    明示的モードなし mkdir()
+      5.6以降は mkdir(PATH) のデフォルトが 0777。
+      5.005_03 では引数が必須: mkdir(PATH, MODE)。
+
+  perl58delta（Perl 5.8.0、2002-07-18）
+    use encoding
+      ソースエンコーディングプラグマのロード（例: "use encoding 'euc-jp'"）。
+    use constant { A => 1, B => 2 }
+      複数定数のハッシュリファレンス形式。5.005_03 互換には個別の
+      "use constant" 文を使用すること。
+
+  perl5100delta（Perl 5.10.0、2007-12-18）
+    // 定義済み判定演算子
+      "$x // $y" は "defined($x) ? $x : $y" と等価。
+    //= 定義済み判定代入
+      "$x //= $y" は $x が未定義なら $y を代入。
+    say LIST
+      printと同様だが改行を追加。
+      注: ->say() メソッド呼び出しおよび "say =>" ハッシュキーは対象外。
+    state VARIABLE
+      レキシカルスコープの永続変数（CのstaticのようなPONYに）。
+    given(EXPR) { when(VAL) { ... } }
+      switch/case構文（5.10で実験的、5.36以降で削除）。
+    ~~ スマートマッチ演算子
+      様々な型のオーバーロード比較演算子。
+    use feature
+      名前付き言語機能を有効化（say、state、switch等）。
+    \K（正規表現内 keep）
+      マッチ文字列の開始位置をリセット。
+    (?<name>...) 名前付きキャプチャグループ / \k<name> 名前付き後方参照
+    (?|...) ブランチリセットグループ
+      各代替でキャプチャグループ番号をリセット。
+    (*VERB) バックトラック制御動詞
+      (*FAIL)、(*ACCEPT)、(*PRUNE)、(*SKIP)、(*MARK)、(*COMMIT)、(*THEN)。
+    \h \H \v \V \R 空白エスケープ
+    UNITCHECK { } フェーズブロック
+      各コンパイルユニットのコンパイル終了時に実行。
+    所有量化子 a++ a*+ a?+ a{n,m}+
+      バックトラック時に返却しない量化子。
+    (?PARNO) (?&name) (?R) 再帰サブパターン
+    ${^MATCH} ${^PREMATCH} ${^POSTMATCH}
+      /pフラグ使用時の $&、$`、$' の等価物。
+    \g{N} \g{-N} 絶対/相対後方参照
+
+  perl5120delta（Perl 5.12.0、2010-04-12）
+    package NAME VERSION
+      パッケージ宣言とバージョン指定の一体化。
+    ... ヤダヤダ演算子
+      未実装コードのプレースホルダ。到達時に "Unimplemented" を throw。
+
+  perl5140delta（Perl 5.14.0、2011-05-14）
+    s/PATTERN/REPLACEMENT/r  tr/LIST/LIST/r
+      非破壊的な置換/変換フラグ。元の文字列を変更せず変換結果を返す。
+
+  perl5160delta（Perl 5.16.0、2012-05-20）
+    __SUB__
+      現在実行中のサブルーチンへの参照（"use feature 'current_sub'" で有効化）。
+
+  perl5180delta（Perl 5.18.0、2013-05-16）
+    my sub NAME / state sub NAME — レキシカルサブルーチン（実験的）
+      ブロックスコープのサブルーチン宣言。Perl 5.26以降は常に有効。
+
+  perl5200delta（Perl 5.20.0、2014-05-27）
+    サブルーチンシグネチャ（実験的）
+      sub foo ($x, $y = 0) { ... }
+    %hash{LIST} / %array[LIST]  キー/値スライス（新構文）
+      キーと値のペアのフラットリストを返す新しい % シジル構文。
+    後置デリファレンス（実験的; Perl 5.24で安定化）
+      $ref->@*   $ref->%*   $ref->&*   $ref->$*
+
+  perl5220delta（Perl 5.22.0、2015-06-01）
+    <<>> ダブルダイヤモンド演算子
+      ARGVの各ファイルを3引数openで安全に開く <> の安全版。
+    /n 非キャプチャ正規表現フラグ
+      すべてのキャプチャグループを非キャプチャにする。
+    &. |. ^. ~.  文字列ビット演算子（実験的; Perl 5.28で安定化）
+      オペランドを一貫して文字列として扱う。複合代入形式 &.= |.= ^.= も対象。
+    \foreach リファレンスエイリアス（実験的）
+      foreach \my $x (@list) { ... }  で $x を各要素に直接束縛。
+
+  perl5260delta（Perl 5.26.0、2017-05-30）
+    <<~ インデント付きヒアドキュメント
+      ヒアドキュメント本体から先頭の空白を除去。
+
+  perl5300delta（Perl 5.30.0、2019-05-22）
+    正規表現内の可変長 lookbehind（実験的導入）
+      (?<=...) または (?<!...) でパターンの長さが可変なものが
+      コンパイル可能に（それ以前は致命的エラー）。Perl 5.38で安定化。
+
+  perl5320delta（Perl 5.32.0、2020-06-20）
+    isa 中置演算子
+      $obj isa "ClassName"（$objが参照でなくても定義済み）。
+      注: ->isa() メソッド呼び出しおよび isa() 関数呼び出しは対象外。
+
+  perl5340delta（Perl 5.34.0、2021-05-20）
+    try / catch（実験的、use feature 'try' で有効化）
+      try { ... } catch ($e) { ... }
+
+  perl5360delta（Perl 5.36.0、2022-05-28）
+    use builtin
+      組み込み関数をプラグマとして提供（true、false、weaken等）。
+    for my ($a, $b) (@list) ペアイテレーション
+      リストを2要素ずつ ($a, $b) に代入してイテレート。
+
+  perl5380delta（Perl 5.38.0、2023-07-02）
+    class キーワード（実験的OOP）
+      class Foo { ... }、field、method キーワードとともに使用。
+    正規表現内の可変長 lookbehind（安定化）
+      Perl 5.30で実験的に導入; Perl 5.38で安定化。
+
+  perl5400delta（Perl 5.40.0、2024-06-09）
+    ^^ / ^^= 高優先度論理 XOR 演算子
+      $x ^^ $y -- &&/|| を補完; 5.005_03 互換には "xor" を使用。
+    __CLASS__ キーワード（class ブロック内）
+      メソッド/ADJUST/field 内でのランタイムクラス名（class 機能が必要）。
+
+  perl5420delta（Perl 5.42.0、2025-07-02）
+    any BLOCK LIST / all BLOCK LIST（実験的キーワード）
+      any { EXPR } @list -- List::Util が any/all をインポートする場合は抑制。
+    my method / ->& レキシカルメソッド呼び出し（class 機能が必要）
+      my method foo () { ... } -- レキシカルスコープのプライベートメソッド。
+
+依存モジュール
+    非コアの依存モジュールなし。Perl 5.005_03 以降。
+
+作者
+    INABA Hitoshi <ina@cpan.org>
+
+ライセンス
+    このライブラリはフリーソフトウェアです。Perl 自身と同じ条件の下で
+    再配布または改変することができます。
+
+参照
+    perlpolicy, perlhist
+    https://metacpan.org/dist/Perl500503Syntax-OrDie

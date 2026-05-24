@@ -1,15 +1,16 @@
-package CPAN::02Packages::Search;
-use strict;
+package CPAN::02Packages::Search v1.0.0;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
+
+our $TRIAL = 0;
 
 use Search::Dict ();
 use Symbol ();
 use Tie::Handle::SkipHeader;
 
-our $VERSION = '0.100';
 
-sub new {
-    my ($class, %argv) = @_;
+sub new ($class, %argv) {
     my $fh = $argv{fh};
     if (!$fh) {
         my $file = $argv{file};
@@ -19,8 +20,7 @@ sub new {
     bless { fh => $fh }, $class;
 }
 
-sub _open {
-    my ($class, $file, $skip_header) = @_;
+sub _open ($class, $file, $skip_header) {
     if ($skip_header) {
         my $fh = Symbol::gensym;
         tie *$fh, 'Tie::Handle::SkipHeader', '<', $file or die "$!: $file\n";
@@ -30,8 +30,7 @@ sub _open {
     $fh;
 }
 
-sub search {
-    my ($self, $package) = @_;
+sub search ($self, $package) {
     my $fh = $self->{fh};
     seek $fh, 0, 0;
     my $pos = Search::Dict::look $fh, $package, { xfrm => \&_xform_package, fold => 1 };
@@ -48,7 +47,7 @@ sub search {
     return;
 }
 
-sub _xform_package { (split " ", $_[0], 2)[0] }
+sub _xform_package ($line) { (split " ", $line, 2)[0] }
 
 1;
 __END__
@@ -100,9 +99,13 @@ L<Search::Dict>
 
 L<https://www.cpan.org/modules/04pause.html>
 
-=head1 AUTHOR
 
-Shoichi Kaji <skaji@cpan.org>
+=head1 ARTIFACT ATTESTATIONS
+
+GitHub Artifact Attestations are generated for release tarballs uploaded to
+CPAN. If you care about provenance for the uploaded tarballs, see:
+
+L<https://github.com/skaji/CPAN-02Packages-Search/attestations>
 
 =head1 COPYRIGHT AND LICENSE
 

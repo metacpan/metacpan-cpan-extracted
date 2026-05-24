@@ -4,168 +4,136 @@
 
 OpenAPI::Client::OpenAI::Path::moderations - Documentation for the /moderations path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</moderations>.
+=head2 POST /moderations
 
-=head1 PATHS
+=head3 createModeration
 
+  $client->create_moderation({
+      body => { ... },
+  });
 
-=head2 C<POST /moderations>
+Classifies if text and/or image inputs are potentially harmful. Learn more in
+the L<moderation guide|https://platform.openai.com/docs/guides/moderation> .
 
-Create moderation
+=head4 Request body
 
+Content-Type: application/json
 
-Classifies if text and/or image inputs are potentially harmful. Learn
-more in the L<moderation guide|https://platform.openai.com/docs/guides/moderation>.
-
-
-
-=head3 Operation ID
-
-C<createModeration>
-
-    $client->createModeration( ... );
-
-=head3 Parameters
-
-=over 4
-
-=back
-
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
-
-    
-      
-
-      
-
-=head4 Models
-
-The content moderation model you would like to use. Learn more in
-L<the moderation guide|https://platform.openai.com/docs/guides/moderation>, and learn about
-available models L<here|https://platform.openai.com/docs/models#moderation>.
-
-=over 4
-      
-=item * C<omni-moderation-latest>
-
-=item * C<omni-moderation-2024-09-26>
-
-=item * C<text-moderation-latest>
-
-=item * C<text-moderation-stable>
-
-=back
-      
-             
-
-=head3 Responses
-
-
-=head4 Status Code: C<200>
-
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-      "id": "modr-0d9740456c391e43c445bf0f010940c7",
-      "model": "omni-moderation-latest",
-      "results": [
-        {
-          "flagged": true,
-          "categories": {
-            "harassment": true,
-            "harassment/threatening": true,
-            "sexual": false,
-            "hate": false,
-            "hate/threatening": false,
-            "illicit": false,
-            "illicit/violent": false,
-            "self-harm/intent": false,
-            "self-harm/instructions": false,
-            "self-harm": false,
-            "sexual/minors": false,
-            "violence": true,
-            "violence/graphic": true
-          },
-          "category_scores": {
-            "harassment": 0.8189693396524255,
-            "harassment/threatening": 0.804985420696006,
-            "sexual": 1.573112165348997e-6,
-            "hate": 0.007562942636942845,
-            "hate/threatening": 0.004208854591835476,
-            "illicit": 0.030535955153511665,
-            "illicit/violent": 0.008925306722380033,
-            "self-harm/intent": 0.00023023930975076432,
-            "self-harm/instructions": 0.0002293869201073356,
-            "self-harm": 0.012598046106750154,
-            "sexual/minors": 2.212566909570261e-8,
-            "violence": 0.9999992735124786,
-            "violence/graphic": 0.843064871157054
-          },
-          "category_applied_input_types": {
-            "harassment": [
-              "text"
-            ],
-            "harassment/threatening": [
-              "text"
-            ],
-            "sexual": [
-              "text",
-              "image"
-            ],
-            "hate": [
-              "text"
-            ],
-            "hate/threatening": [
-              "text"
-            ],
-            "illicit": [
-              "text"
-            ],
-            "illicit/violent": [
-              "text"
-            ],
-            "self-harm/intent": [
-              "text",
-              "image"
-            ],
-            "self-harm/instructions": [
-              "text",
-              "image"
-            ],
-            "self-harm": [
-              "text",
-              "image"
-            ],
-            "sexual/minors": [
-              "text"
-            ],
-            "violence": [
-              "text",
-              "image"
-            ],
-            "violence/graphic": [
-              "text",
-              "image"
-            ]
+       "id" : "modr-AB8CjOTu2jiq12hp1AQPfeqFWaORR",
+       "model" : "text-moderation-007",
+       "results" : [
+          {
+             "categories" : {
+                "harassment" : true,
+                "harassment/threatening" : true,
+                "hate" : false,
+                "hate/threatening" : false,
+                "self-harm" : false,
+                "self-harm/instructions" : false,
+                "self-harm/intent" : false,
+                "sexual" : false,
+                "sexual/minors" : false,
+                "violence" : true,
+                "violence/graphic" : false
+             },
+             "category_scores" : {
+                "harassment" : 0.521563529968262,
+                "harassment/threatening" : 0.569474577903748,
+                "hate" : 0.22706663608551,
+                "hate/threatening" : 0.0235473290085793,
+                "self-harm" : 2.22711992137192e-06,
+                "self-harm/instructions" : 1.11987552564585e-09,
+                "self-harm/intent" : 1.6469409729325e-06,
+                "sexual" : 1.17260124170571e-05,
+                "sexual/minors" : 7.10735221787218e-08,
+                "violence" : 0.997113466262817,
+                "violence/graphic" : 3.39182988682296e-05
+             },
+             "flagged" : true
           }
-        }
-      ]
+       ]
     }
 
+=head4 Responses
+
+B<200 - OK>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "id" : "modr-AB8CjOTu2jiq12hp1AQPfeqFWaORR",
+       "model" : "text-moderation-007",
+       "results" : [
+          {
+             "categories" : {
+                "harassment" : true,
+                "harassment/threatening" : true,
+                "hate" : false,
+                "hate/threatening" : false,
+                "self-harm" : false,
+                "self-harm/instructions" : false,
+                "self-harm/intent" : false,
+                "sexual" : false,
+                "sexual/minors" : false,
+                "violence" : true,
+                "violence/graphic" : false
+             },
+             "category_scores" : {
+                "harassment" : 0.521563529968262,
+                "harassment/threatening" : 0.569474577903748,
+                "hate" : 0.22706663608551,
+                "hate/threatening" : 0.0235473290085793,
+                "self-harm" : 2.22711992137192e-06,
+                "self-harm/instructions" : 1.11987552564585e-09,
+                "self-harm/intent" : 1.6469409729325e-06,
+                "sexual" : 1.17260124170571e-05,
+                "sexual/minors" : 7.10735221787218e-08,
+                "violence" : 0.997113466262817,
+                "violence/graphic" : 3.39182988682296e-05
+             },
+             "flagged" : true
+          }
+       ]
+    }
+
+=head1 SCHEMAS
+
+=head2 CreateModerationRequest
+
+Properties:
+
+=over
+
+=item * C<input> (oneOf, required) - Input (or inputs) to classify. Can be a single string, an array of strings, or
+an array of multi-modal input objects similar to other models.
+
+=item * C<model> (anyOf) - The content moderation model you would like to use. Learn more in
+L<the moderation guide|https://platform.openai.com/docs/guides/moderation> ,
+and learn about available models
+L<here|https://platform.openai.com/docs/models#moderation> .
+
+Default: omni-moderation-latest
+
+=back
+
+=head2 CreateModerationResponse
+
+Properties:
+
+=over
+
+=item * C<id> (string, required) - The unique identifier for the moderation request.
+
+=item * C<model> (string, required) - The model used to generate the moderation results.
+
+=item * C<results> (array of object, required) - A list of moderation objects.
 
 =back
 

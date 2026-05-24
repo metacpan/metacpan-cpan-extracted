@@ -4,255 +4,397 @@
 
 OpenAPI::Client::OpenAI::Path::chat-completions - Documentation for the /chat/completions path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</chat/completions>.
+=head2 GET /chat/completions
 
-=head1 PATHS
+=head3 listChatCompletions
 
+  $client->list_chat_completions({
+      body => { ... },
+  });
 
-=head2 C<GET /chat/completions>
+List stored Chat Completions. Only Chat Completions that have been stored with
+the C<store> parameter set to C<true> will be returned.
 
-List Chat Completions
+=head4 Path/query parameters
 
+=over
 
-List stored Chat Completions. Only Chat Completions that have been stored
-with the C<store> parameter set to C<true> will be returned.
+=item * C<model> (in query, optional, string) - The model used to generate the Chat Completions.
 
+=item * C<metadata> (in query, optional, string) - A list of metadata keys to filter the Chat Completions by. Example:
 
+C<metadata[key1]=value1&metadata[key2]=value2>
 
-=head3 Operation ID
+=item * C<after> (in query, optional, string) - Identifier for the last chat completion from the previous pagination request.
 
-C<listChatCompletions>
+=item * C<limit> (in query, optional, integer) - Number of Chat Completions to retrieve.
 
-    $client->listChatCompletions( ... );
+Default: 20
 
-=head3 Parameters
+=item * C<order> (in query, optional, string) - Sort order for Chat Completions by timestamp. Use C<asc> for ascending order
+or C<desc> for descending order. Defaults to C<asc> .
 
-=over 4
+Allowed values: asc, desc
 
-=item * C<model> (in query) (Optional) - The model used to generate the Chat Completions.
-
-Type: C<string>
-
-
-
-=item * C<metadata> (in query) (Optional) - A list of metadata keys to filter the Chat Completions by. Example:
-
-`metadata[key1]=value1&metadata[key2]=value2`
-
-
-Type: C<>
-
-
-
-=item * C<after> (in query) (Optional) - Identifier for the last chat completion from the previous pagination request.
-
-Type: C<string>
-
-
-
-=item * C<limit> (in query) (Optional) - Number of Chat Completions to retrieve.
-
-Type: C<integer>
-
-
-Default: C<20>
-
-
-=item * C<order> (in query) (Optional) - Sort order for Chat Completions by timestamp. Use `asc` for ascending order or `desc` for descending order. Defaults to `asc`.
-
-Type: C<string>
-
-Allowed values: C<asc, desc>
-
-
-Default: C<asc>
-
+Default: asc
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - A list of Chat Completions>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-A list of Chat Completions
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-      "object": "list",
-      "data": [
-        {
-          "object": "chat.completion",
-          "id": "chatcmpl-AyPNinnUqUDYo9SAdA52NobMflmj2",
-          "model": "gpt-4o-2024-08-06",
-          "created": 1738960610,
-          "request_id": "req_ded8ab984ec4bf840f37566c1011c417",
-          "tool_choice": null,
-          "usage": {
-            "total_tokens": 31,
-            "completion_tokens": 18,
-            "prompt_tokens": 13
-          },
-          "seed": 4944116822809979520,
-          "top_p": 1.0,
-          "temperature": 1.0,
-          "presence_penalty": 0.0,
-          "frequency_penalty": 0.0,
-          "system_fingerprint": "fp_50cad350e4",
-          "input_user": null,
-          "service_tier": "default",
-          "tools": null,
-          "metadata": {},
-          "choices": [
-            {
-              "index": 0,
-              "message": {
-                "content": "Mind of circuits hum,  \nLearning patterns in silence—  \nFuture's quiet spark.",
-                "role": "assistant",
-                "tool_calls": null,
-                "function_call": null
-              },
-              "finish_reason": "stop",
-              "logprobs": null
-            }
-          ],
-          "response_format": null
-        }
-      ],
-      "first_id": "chatcmpl-AyPNinnUqUDYo9SAdA52NobMflmj2",
-      "last_id": "chatcmpl-AyPNinnUqUDYo9SAdA52NobMflmj2",
-      "has_more": false
+       "data" : [
+          {
+             "choices" : [
+                {
+                   "finish_reason" : "stop",
+                   "index" : 0,
+                   "logprobs" : null,
+                   "message" : {
+                      "content" : "Mind of circuits hum,  \nLearning patterns in silence—  \nFuture's quiet spark.",
+                      "function_call" : null,
+                      "role" : "assistant",
+                      "tool_calls" : null
+                   }
+                }
+             ],
+             "created" : 1738960610,
+             "frequency_penalty" : 0,
+             "id" : "chatcmpl-AyPNinnUqUDYo9SAdA52NobMflmj2",
+             "input_user" : null,
+             "metadata" : {},
+             "model" : "gpt-4o-2024-08-06",
+             "object" : "chat.completion",
+             "presence_penalty" : 0,
+             "request_id" : "req_ded8ab984ec4bf840f37566c1011c417",
+             "response_format" : null,
+             "seed" : 4944116822809979520,
+             "service_tier" : "default",
+             "system_fingerprint" : "fp_50cad350e4",
+             "temperature" : 1,
+             "tool_choice" : null,
+             "tools" : null,
+             "top_p" : 1,
+             "usage" : {
+                "completion_tokens" : 18,
+                "prompt_tokens" : 13,
+                "total_tokens" : 31
+             }
+          }
+       ],
+       "first_id" : "chatcmpl-AyPNinnUqUDYo9SAdA52NobMflmj2",
+       "has_more" : false,
+       "last_id" : "chatcmpl-AyPNinnUqUDYo9SAdA52NobMflmj2",
+       "object" : "list"
     }
 
+=head2 POST /chat/completions
 
-=back
+=head3 createChatCompletion
 
-=head2 C<POST /chat/completions>
+  $client->create_chat_completion({
+      body => { ... },
+  });
 
-Create chat completion
+B<Starting a new project?> We recommend trying
+L<Responses|https://platform.openai.com/docs/api-reference/responses> to take
+advantage of the latest OpenAI platform features. Compare
+L<Chat Completions with Responses|https://platform.openai.com/docs/guides/responses-vs-chat-completions?api-mode=responses>
+.
 
-
-B<Starting a new project?> We recommend trying L<Responses|https://platform.openai.com/docs/api-reference/responses> 
-to take advantage of the latest OpenAI platform features. Compare
-L<Chat Completions with Responses|https://platform.openai.com/docs/guides/responses-vs-chat-completions?api-mode=responses>.
-
-================================================================================
 Creates a model response for the given chat conversation. Learn more in the
-L<text generation|https://platform.openai.com/docs/guides/text-generation>, L<vision|https://platform.openai.com/docs/guides/vision>,
-and L<audio|https://platform.openai.com/docs/guides/audio> guides.
+L<text generation|https://platform.openai.com/docs/guides/text-generation> ,
+L<vision|https://platform.openai.com/docs/guides/vision> , and
+L<audio|https://platform.openai.com/docs/guides/audio> guides.
 
 Parameter support can differ depending on the model used to generate the
 response, particularly for newer reasoning models. Parameters that are only
-supported for reasoning models are noted below. For the current state of 
-unsupported parameters in reasoning models, 
-L<refer to the reasoning guide|https://platform.openai.com/docs/guides/reasoning>.
+supported for reasoning models are noted below. For the current state of
+unsupported parameters in reasoning models,
+L<refer to the reasoning guide|https://platform.openai.com/docs/guides/reasoning>
+.
 
+Returns a chat completion object, or a streamed sequence of chat completion
+chunk objects if the request is streamed.
 
+=head4 Request body
 
-=head3 Operation ID
+Content-Type: application/json
 
-C<createChatCompletion>
-
-    $client->createChatCompletion( ... );
-
-=head3 Parameters
-
-=over 4
-
-=back
-
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
-
-    
-      
-
-      
-             
-
-=head3 Responses
-
-
-=head4 Status Code: C<200>
-
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-      "id": "chatcmpl-B9MHDbslfkBeAs8l4bebGdFOJ6PeG",
-      "object": "chat.completion",
-      "created": 1741570283,
-      "model": "gpt-4o-2024-08-06",
-      "choices": [
-        {
-          "index": 0,
-          "message": {
-            "role": "assistant",
-            "content": "The image shows a wooden boardwalk path running through a lush green field or meadow. The sky is bright blue with some scattered clouds, giving the scene a serene and peaceful atmosphere. Trees and shrubs are visible in the background.",
-            "refusal": null,
-            "annotations": []
+       "choices" : [
+          {
+             "finish_reason" : "stop",
+             "index" : 0,
+             "logprobs" : null,
+             "message" : {
+                "annotations" : [],
+                "content" : "Hello! How can I assist you today?",
+                "refusal" : null,
+                "role" : "assistant"
+             }
+          }
+       ],
+       "created" : 1741569952,
+       "id" : "chatcmpl-B9MBs8CjcvOU2jLn4n570S5qMJKcT",
+       "model" : "gpt-5.4",
+       "object" : "chat.completion",
+       "service_tier" : "default",
+       "usage" : {
+          "completion_tokens" : 10,
+          "completion_tokens_details" : {
+             "accepted_prediction_tokens" : 0,
+             "audio_tokens" : 0,
+             "reasoning_tokens" : 0,
+             "rejected_prediction_tokens" : 0
           },
-          "logprobs": null,
-          "finish_reason": "stop"
-        }
-      ],
-      "usage": {
-        "prompt_tokens": 1117,
-        "completion_tokens": 46,
-        "total_tokens": 1163,
-        "prompt_tokens_details": {
-          "cached_tokens": 0,
-          "audio_tokens": 0
-        },
-        "completion_tokens_details": {
-          "reasoning_tokens": 0,
-          "audio_tokens": 0,
-          "accepted_prediction_tokens": 0,
-          "rejected_prediction_tokens": 0
-        }
-      },
-      "service_tier": "default",
-      "system_fingerprint": "fp_fc9f1d7035"
+          "prompt_tokens" : 19,
+          "prompt_tokens_details" : {
+             "audio_tokens" : 0,
+             "cached_tokens" : 0
+          },
+          "total_tokens" : 29
+       }
     }
 
+=head4 Responses
 
+B<200 - OK>
 
-=item * C<text/event-stream>
+Content-Type: application/json
 
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
-    {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1694268190,"model":"gpt-4o-mini", "system_fingerprint": "fp_44709d6fcb", "choices":[{"index":0,"delta":{"role":"assistant","content":""},"logprobs":null,"finish_reason":null}]}
-    
-    {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1694268190,"model":"gpt-4o-mini", "system_fingerprint": "fp_44709d6fcb", "choices":[{"index":0,"delta":{"content":"Hello"},"logprobs":null,"finish_reason":null}]}
-    
-    ....
-    
-    {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1694268190,"model":"gpt-4o-mini", "system_fingerprint": "fp_44709d6fcb", "choices":[{"index":0,"delta":{},"logprobs":null,"finish_reason":"stop"}]}
+    {
+       "choices" : [
+          {
+             "finish_reason" : "stop",
+             "index" : 0,
+             "logprobs" : null,
+             "message" : {
+                "annotations" : [],
+                "content" : "Hello! How can I assist you today?",
+                "refusal" : null,
+                "role" : "assistant"
+             }
+          }
+       ],
+       "created" : 1741569952,
+       "id" : "chatcmpl-B9MBs8CjcvOU2jLn4n570S5qMJKcT",
+       "model" : "gpt-5.4",
+       "object" : "chat.completion",
+       "service_tier" : "default",
+       "usage" : {
+          "completion_tokens" : 10,
+          "completion_tokens_details" : {
+             "accepted_prediction_tokens" : 0,
+             "audio_tokens" : 0,
+             "reasoning_tokens" : 0,
+             "rejected_prediction_tokens" : 0
+          },
+          "prompt_tokens" : 19,
+          "prompt_tokens_details" : {
+             "audio_tokens" : 0,
+             "cached_tokens" : 0
+          },
+          "total_tokens" : 29
+       }
+    }
 
+Content-Type: text/event-stream
+
+Example:
+
+    {
+       "choices" : [
+          {
+             "finish_reason" : "stop",
+             "index" : 0,
+             "logprobs" : null,
+             "message" : {
+                "annotations" : [],
+                "content" : "Hello! How can I assist you today?",
+                "refusal" : null,
+                "role" : "assistant"
+             }
+          }
+       ],
+       "created" : 1741569952,
+       "id" : "chatcmpl-B9MBs8CjcvOU2jLn4n570S5qMJKcT",
+       "model" : "gpt-5.4",
+       "object" : "chat.completion",
+       "service_tier" : "default",
+       "usage" : {
+          "completion_tokens" : 10,
+          "completion_tokens_details" : {
+             "accepted_prediction_tokens" : 0,
+             "audio_tokens" : 0,
+             "reasoning_tokens" : 0,
+             "rejected_prediction_tokens" : 0
+          },
+          "prompt_tokens" : 19,
+          "prompt_tokens_details" : {
+             "audio_tokens" : 0,
+             "cached_tokens" : 0
+          },
+          "total_tokens" : 29
+       }
+    }
+
+=head1 SCHEMAS
+
+=head2 ChatCompletionList
+
+Properties:
+
+=over
+
+=item * C<data> (array of CreateChatCompletionResponse, required) - An array of chat completion objects.
+
+=item * C<first_id> (string, required) - The identifier of the first chat completion in the data array.
+
+=item * C<has_more> (boolean, required) - Indicates whether there are more Chat Completions available.
+
+=item * C<last_id> (string, required) - The identifier of the last chat completion in the data array.
+
+=item * C<object> (string, required) - The type of this object. It is always set to "list".
+
+Allowed values: list
+
+Default: list
 
 =back
+
+=head2 CompletionUsage
+
+Properties:
+
+=over
+
+=item * C<completion_tokens> (integer, required) - Number of tokens in the generated completion.
+
+Default: 0
+
+=item * C<completion_tokens_details> (object) - Breakdown of tokens used in a completion.
+
+=item * C<prompt_tokens> (integer, required) - Number of tokens in the prompt.
+
+Default: 0
+
+=item * C<prompt_tokens_details> (object) - Breakdown of tokens used in the prompt.
+
+=item * C<total_tokens> (integer, required) - Total number of tokens used in the request (prompt + completion).
+
+Default: 0
+
+=back
+
+=head2 CreateChatCompletionRequest
+
+See L<https://platform.openai.com/docs/api-reference> for details.
+
+=head2 CreateChatCompletionResponse
+
+Properties:
+
+=over
+
+=item * C<choices> (array of object, required) - A list of chat completion choices. Can be more than one if C<n> is greater
+than 1.
+
+=item * C<created> (integer, required) - The Unix timestamp (in seconds) of when the chat completion was created.
+
+=item * C<id> (string, required) - A unique identifier for the chat completion.
+
+=item * C<model> (string, required) - The model used for the chat completion.
+
+=item * C<object> (string, required) - The object type, which is always C<chat.completion> .
+
+Allowed values: chat.completion
+
+=item * C<service_tier> (ServiceTier)
+
+See L</ServiceTier> below for shape.
+
+=item * C<system_fingerprint> (string) - This fingerprint represents the backend configuration that the model runs
+with.
+
+Can be used in conjunction with the C<seed> request parameter to understand
+when backend changes have been made that might impact determinism.
+
+=item * C<usage> (CompletionUsage)
+
+See L</CompletionUsage> below for shape.
+
+=back
+
+=head2 CreateChatCompletionStreamResponse
+
+Properties:
+
+=over
+
+=item * C<choices> (array of object, required) - A list of chat completion choices. Can contain more than one elements if C<n>
+is greater than 1. Can also be empty for the last chunk if you set
+C<stream_options: {"include_usage": true}> .
+
+=item * C<created> (integer, required) - The Unix timestamp (in seconds) of when the chat completion was created. Each
+chunk has the same timestamp.
+
+=item * C<id> (string, required) - A unique identifier for the chat completion. Each chunk has the same ID.
+
+=item * C<model> (string, required) - The model to generate the completion.
+
+=item * C<object> (string, required) - The object type, which is always C<chat.completion.chunk> .
+
+Allowed values: chat.completion.chunk
+
+=item * C<service_tier> (ServiceTier)
+
+See L</ServiceTier> below for shape.
+
+=item * C<system_fingerprint> (string) - This fingerprint represents the backend configuration that the model runs
+with. Can be used in conjunction with the C<seed> request parameter to
+understand when backend changes have been made that might impact determinism.
+
+=item * C<usage> (CompletionUsage) - An optional field that will only be present when you set
+C<stream_options: {"include_usage": true}> in your request. When present, it
+contains a null value B<except for the last chunk> which contains the token
+usage statistics for the entire request.
+
+B<NOTE:> If the stream is interrupted or cancelled, you may not receive the
+final usage chunk which contains the total token usage for the request.
+
+See L</CompletionUsage> below for shape.
+
+=back
+
+=head2 ServiceTier
+
+Specifies the processing type used for serving the request. - If set to
+'auto', then the request will be processed with the service tier configured in
+the Project settings. Unless otherwise configured, the Project will use
+'default'. - If set to 'default', then the request will be processed with the
+standard pricing and performance for the selected model. - If set to
+'L<flex|https://platform.openai.com/docs/guides/flex-processing>' or
+'L<priority|https://openai.com/api-priority-processing/>', then the request
+will be processed with the corresponding service tier. - When not set, the
+default behavior is 'auto'.
+
+When the C<service_tier> parameter is set, the response body will include the
+C<service_tier> value based on the processing mode actually used to serve the
+request. This response value may be different from the value set in the
+parameter.
 
 =head1 SEE ALSO
 

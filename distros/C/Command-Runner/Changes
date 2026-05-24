@@ -1,5 +1,8 @@
 Revision history for Command-Runner
 
+v1.0.0  2026-05-23
+  - Raise minimum Perl to v5.24
+
 0.201  2025-04-26 17:06:19 JST
     - Remove deprecated "commandf"
 

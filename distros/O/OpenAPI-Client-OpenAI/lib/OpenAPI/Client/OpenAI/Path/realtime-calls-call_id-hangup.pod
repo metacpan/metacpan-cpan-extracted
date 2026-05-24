@@ -1,0 +1,47 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::realtime-calls-call_id-hangup - Documentation for the /realtime/calls/{call_id}/hangup path.
+
+=head1 OPERATIONS
+
+=head2 POST /realtime/calls/{call_id}/hangup
+
+=head3 hangup-realtime-call
+
+  $client->hangup_realtime_call({
+      body => { ... },
+  });
+
+End an active Realtime API call, whether it was initiated over SIP or WebRTC.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<call_id> (in path, required, string) - The identifier for the call. For SIP calls, use the value provided in the
+L<C<realtime.call.incoming>|https://platform.openai.com/docs/api-reference/webhook-events/realtime/call/incoming>
+webhook. For WebRTC sessions, reuse the call ID returned in the C<Location>
+header when creating the call with L<C<POST
+/v1/realtime/calls>|https://platform.openai.com/docs/api-reference/realtime/create-call>.
+
+=back
+
+=head4 Responses
+
+B<200 - Call hangup initiated successfully.>
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

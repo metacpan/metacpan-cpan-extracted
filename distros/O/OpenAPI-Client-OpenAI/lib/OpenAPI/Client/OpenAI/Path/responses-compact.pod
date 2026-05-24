@@ -1,0 +1,165 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::responses-compact - Documentation for the /responses/compact path.
+
+=head1 OPERATIONS
+
+=head2 POST /responses/compact
+
+=head3 Compactconversation
+
+  $client->compactconversation({
+      body => { ... },
+  });
+
+Compact a conversation. Returns a compacted response object.
+
+Learn when and how to compact long-running conversations in the
+L<conversation state guide|https://platform.openai.com/docs/guides/conversation-state#managing-the-context-window>
+. For ZDR-compatible compaction details, see
+L<Compaction (advanced)|https://platform.openai.com/docs/guides/conversation-state#compaction-advanced>
+.
+
+=head4 Responses
+
+B<200 - Success>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "created_at" : 1731459200,
+       "id" : "resp_001",
+       "object" : "response.compaction",
+       "output" : [
+          {
+             "content" : [
+                {
+                   "text" : "Summarize our launch checklist from last week.",
+                   "type" : "input_text"
+                }
+             ],
+             "role" : "user",
+             "type" : "message"
+          },
+          {
+             "content" : [
+                {
+                   "text" : "You are performing a CONTEXT CHECKPOINT COMPACTION...",
+                   "type" : "input_text"
+                }
+             ],
+             "role" : "user",
+             "type" : "message"
+          },
+          {
+             "encrypted_content" : "encrypted-summary",
+             "id" : "cmp_001",
+             "type" : "compaction"
+          }
+       ],
+       "usage" : {
+          "input_tokens" : 42897,
+          "output_tokens" : 12000,
+          "total_tokens" : 54912
+       }
+    }
+
+=head1 SCHEMAS
+
+=head2 CompactResource
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - Unix timestamp (in seconds) when the compacted conversation was created.
+
+=item * C<id> (string, required) - The unique identifier for the compacted response.
+
+=item * C<object> (string, required) - The object type. Always C<response.compaction> .
+
+Allowed values: response.compaction
+
+Default: response.compaction
+
+=item * C<output> (array of ItemField, required) - The compacted list of output items.
+
+=item * C<usage> (ResponseUsage, required) - Token accounting for the compaction pass, including cached, reasoning, and
+total tokens.
+
+See L</ResponseUsage> below for shape.
+
+=back
+
+=head2 CompactResponseMethodPublicBody
+
+Properties:
+
+=over
+
+=item * C<input> (anyOf)
+
+=item * C<instructions> (anyOf)
+
+=item * C<model> (ModelIdsCompaction, required)
+
+See L</ModelIdsCompaction> below for shape.
+
+=item * C<previous_response_id> (anyOf)
+
+=item * C<prompt_cache_key> (anyOf)
+
+=item * C<prompt_cache_retention> (anyOf)
+
+=item * C<service_tier> (anyOf)
+
+=back
+
+=head2 ItemField
+
+An item representing a message, tool call, tool output, reasoning, or other
+response element.
+
+=head2 ModelIdsCompaction
+
+Model ID used to generate the response, like C<gpt-5> or C<o3> . OpenAI offers
+a wide range of models with different capabilities, performance
+characteristics, and price points. Refer to the
+L<model guide|https://platform.openai.com/docs/models> to browse and compare
+available models.
+
+=head2 ResponseUsage
+
+Properties:
+
+=over
+
+=item * C<input_tokens> (integer, required) - The number of input tokens.
+
+=item * C<input_tokens_details> (object, required) - A detailed breakdown of the input tokens.
+
+=item * C<output_tokens> (integer, required) - The number of output tokens.
+
+=item * C<output_tokens_details> (object, required) - A detailed breakdown of the output tokens.
+
+=item * C<total_tokens> (integer, required) - The total number of tokens used.
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

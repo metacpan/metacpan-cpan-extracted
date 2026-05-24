@@ -4,61 +4,35 @@
 
 OpenAPI::Client::OpenAI::Path::files-file_id-content - Documentation for the /files/{file_id}/content path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</files/{file_id}/content>.
+=head2 GET /files/{file_id}/content
 
-=head1 PATHS
+=head3 downloadFile
 
-
-=head2 C<GET /files/{file_id}/content>
-
-Retrieve file content
-
+  $client->download_file({
+      body => { ... },
+  });
 
 Returns the contents of the specified file.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
-
-C<downloadFile>
-
-    $client->downloadFile( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<file_id> (in path) (Required) - The ID of the file to use for this request.
-
-Type: C<string>
-
-
+=item * C<file_id> (in path, required, string) - The ID of the file to use for this request.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - OK>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
+Example:
 
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
-
-
-
-=back
+    "string"
 
 =head1 SEE ALSO
 

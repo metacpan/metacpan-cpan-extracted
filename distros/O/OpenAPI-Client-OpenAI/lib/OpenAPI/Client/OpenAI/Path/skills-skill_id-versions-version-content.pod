@@ -1,0 +1,57 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::skills-skill_id-versions-version-content - Documentation for the /skills/{skill_id}/versions/{version}/content path.
+
+=head1 OPERATIONS
+
+=head2 GET /skills/{skill_id}/versions/{version}/content
+
+=head3 GetSkillVersionContent
+
+  $client->get_skill_version_content({
+      body => { ... },
+  });
+
+Download a skill version zip bundle.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<skill_id> (in path, required, string) - The identifier of the skill.
+
+=item * C<version> (in path, required, string) - The skill version number.
+
+=back
+
+=head4 Responses
+
+B<200 - The skill zip bundle.>
+
+Content-Type: application/json
+
+Example:
+
+    "string"
+
+Content-Type: application/zip
+
+Example:
+
+    "string"
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

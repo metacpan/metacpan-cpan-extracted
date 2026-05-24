@@ -8,16 +8,17 @@ my @test_cases = (
         method      => 'createImage',
         description => 'Test creating an image',
         params      => {
-            prompt          => 'A cute baby sea otter',
-            size            => '256x256',
-            response_format => 'b64_json',
+            model   => 'gpt-image-1-mini',
+            prompt  => 'A cute baby sea otter',
+            size    => '1024x1024',
+            quality => 'low',
         },
-        expected_response => noclass( {
+        expected_response => noclass( superhashof( {
             created => ignore(),
-            data    => array_each( {
+            data    => array_each( superhashof( {
                 b64_json => ignore(),
-            } ),
-        } ),
+            } ) ),
+        } ) ),
         against => sub ($response) {$response},    # testing the entire response
     },
 

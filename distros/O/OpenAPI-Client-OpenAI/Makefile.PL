@@ -16,17 +16,7 @@ my %WriteMakefileArgs = (
     MIN_PERL_VERSION => '5.14.0',
     BUILD_REQUIRES   => {
         'ExtUtils::MakeMaker' => '0',
-
-        # Most of these are for devel/build_docs.pl
-        'File::Slurp'          => '0',
-        'Path::Tiny'           => '0',
-        'Text::Wrap'           => '0',
-        'YAML::XS'             => '0',
-        'Markdown::Pod'        => '0',
-        'Feature::Compat::Try' => '0',
-        'Perl::Tidy'           => '0',
-        'Markdown::Pod'        => '0',
-        'Template'             => '0',
+        'Path::Tiny'          => '0',
     },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker'     => '0',
@@ -39,11 +29,14 @@ my %WriteMakefileArgs = (
         'Perl::Tidy'             => '20240511',    # not sure where to put this
         'Import::Base'           => '1.004',
         'JSON'                   => '4.10',
+        'JSON::PP'               => '0',
+        'Pod::Checker'           => '0',
     },
     PREREQ_PM => {
         'File::ShareDir'        => '0',
         'File::Spec::Functions' => '0',
         'OpenAPI::Client'       => '1.07',
+        'YAML::XS'              => '0',
     },
     META_MERGE => {
         'meta-spec' => { version => 2 },
@@ -57,7 +50,17 @@ my %WriteMakefileArgs = (
                 web => 'https://github.com/nferraz/perl-openapi-client-openai/issues',
             },
         },
+        prereqs => {
+            develop => {
+                # Optional dev-time tools. Install with:
+                #   cpanm --installdeps --with-develop .
+                requires => {
+                    'Plack' => '0',   # devel/browse-docs launcher
+                },
+            },
+        },
     },
+    test  => { TESTS    => 't/*.t devel/t/*.t' },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES    => 'OpenAPI-Client-OpenAI-*' },
 );

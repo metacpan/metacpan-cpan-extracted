@@ -23,14 +23,7 @@
       "build" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "Feature::Compat::Try" : "0",
-            "File::Slurp" : "0",
-            "Markdown::Pod" : "0",
-            "Path::Tiny" : "0",
-            "Perl::Tidy" : "0",
-            "Template" : "0",
-            "Text::Wrap" : "0",
-            "YAML::XS" : "0"
+            "Path::Tiny" : "0"
          }
       },
       "configure" : {
@@ -40,11 +33,17 @@
             "IO::Socket::SSL" : "2"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Plack" : "0"
+         }
+      },
       "runtime" : {
          "requires" : {
             "File::ShareDir" : "0",
             "File::Spec::Functions" : "0",
             "OpenAPI::Client" : "1.07",
+            "YAML::XS" : "0",
             "perl" : "5.014000"
          }
       },
@@ -52,7 +51,9 @@
          "requires" : {
             "Import::Base" : "1.004",
             "JSON" : "4.10",
+            "JSON::PP" : "0",
             "Perl::Tidy" : "20240511",
+            "Pod::Checker" : "0",
             "Test::Most" : "0",
             "Test::RequiresInternet" : "0"
          }
@@ -69,6 +70,6 @@
          "web" : "https://github.com/nferraz/perl-openapi-client-openai"
       }
    },
-   "version" : "0.25",
+   "version" : "0.28",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

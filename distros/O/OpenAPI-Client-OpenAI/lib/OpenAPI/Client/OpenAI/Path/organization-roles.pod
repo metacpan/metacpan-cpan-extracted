@@ -1,0 +1,169 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::organization-roles - Documentation for the /organization/roles path.
+
+=head1 OPERATIONS
+
+=head2 GET /organization/roles
+
+=head3 list-roles
+
+  $client->list_roles({
+      body => { ... },
+  });
+
+Lists the roles configured for the organization.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<limit> (in query, optional, integer) - A limit on the number of roles to return. Defaults to 1000.
+
+Default: 1000
+
+=item * C<after> (in query, optional, string) - Cursor for pagination. Provide the value from the previous response's C<next>
+field to continue listing roles.
+
+=item * C<order> (in query, optional, string) - Sort order for the returned roles.
+
+Allowed values: asc, desc
+
+Default: asc
+
+=back
+
+=head4 Responses
+
+B<200 - Roles listed successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "data" : [
+          {
+             "description" : "Allows managing organization groups",
+             "id" : "role_01J1F8ROLE01",
+             "name" : "API Group Manager",
+             "object" : "role",
+             "permissions" : [
+                "api.groups.read",
+                "api.groups.write"
+             ],
+             "predefined_role" : false,
+             "resource_type" : "api.organization"
+          }
+       ],
+       "has_more" : false,
+       "next" : null,
+       "object" : "list"
+    }
+
+=head2 POST /organization/roles
+
+=head3 create-role
+
+  $client->create_role({
+      body => { ... },
+  });
+
+Creates a custom role for the organization.
+
+=head4 Responses
+
+B<200 - Role created successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "description" : "Allows managing organization groups",
+       "id" : "role_01J1F8ROLE01",
+       "name" : "API Group Manager",
+       "object" : "role",
+       "permissions" : [
+          "api.groups.read",
+          "api.groups.write"
+       ],
+       "predefined_role" : false,
+       "resource_type" : "api.organization"
+    }
+
+=head1 SCHEMAS
+
+=head2 PublicCreateOrganizationRoleBody
+
+Properties:
+
+=over
+
+=item * C<description> (anyOf) - Optional description of the role.
+
+=item * C<permissions> (array of string, required) - Permissions to grant to the role.
+
+=item * C<role_name> (string, required) - Unique name for the role.
+
+=back
+
+=head2 PublicRoleListResource
+
+Properties:
+
+=over
+
+=item * C<data> (array of Role, required) - Roles returned in the current page.
+
+=item * C<has_more> (boolean, required) - Whether more roles are available when paginating.
+
+=item * C<next> (anyOf, required) - Cursor to fetch the next page of results, or C<null> when there are no
+additional roles.
+
+=item * C<object> (string, required) - Always C<list> .
+
+Allowed values: list
+
+=back
+
+=head2 Role
+
+Properties:
+
+=over
+
+=item * C<description> (anyOf, required) - Optional description of the role.
+
+=item * C<id> (string, required) - Identifier for the role.
+
+=item * C<name> (string, required) - Unique name for the role.
+
+=item * C<object> (string, required) - Always C<role> .
+
+Allowed values: role
+
+=item * C<permissions> (array of string, required) - Permissions granted by the role.
+
+=item * C<predefined_role> (boolean, required) - Whether the role is predefined and managed by OpenAI.
+
+=item * C<resource_type> (string, required) - Resource type the role is bound to (for example C<api.organization> or
+C<api.project> ).
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

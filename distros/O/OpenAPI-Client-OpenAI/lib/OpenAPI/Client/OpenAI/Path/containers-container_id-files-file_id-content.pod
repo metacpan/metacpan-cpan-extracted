@@ -4,54 +4,33 @@
 
 OpenAPI::Client::OpenAI::Path::containers-container_id-files-file_id-content - Documentation for the /containers/{container_id}/files/{file_id}/content path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</containers/{container_id}/files/{file_id}/content>.
+=head2 GET /containers/{container_id}/files/{file_id}/content
 
-=head1 PATHS
+=head3 RetrieveContainerFileContent
 
-
-=head2 C<GET /containers/{container_id}/files/{file_id}/content>
-
-Retrieve container file content
-
+  $client->retrieve_container_file_content({
+      body => { ... },
+  });
 
 Retrieve Container File Content
 
+Retrieves a container file content.
 
+=head4 Path/query parameters
 
-=head3 Operation ID
+=over
 
-C<RetrieveContainerFileContent>
+=item * C<container_id> (in path, required, string)
 
-    $client->RetrieveContainerFileContent( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<container_id> (in path) (Required) - 
-
-Type: C<string>
-
-
-
-=item * C<file_id> (in path) (Required) - 
-
-Type: C<string>
-
-
+=item * C<file_id> (in path, required, string)
 
 =back
 
+=head4 Responses
 
-=head3 Responses
-
-
-=head4 Status Code: C<200>
-
-Success
-
+B<200 - Success>
 
 =head1 SEE ALSO
 

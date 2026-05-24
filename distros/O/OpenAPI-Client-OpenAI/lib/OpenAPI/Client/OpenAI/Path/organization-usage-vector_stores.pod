@@ -4,112 +4,106 @@
 
 OpenAPI::Client::OpenAI::Path::organization-usage-vector_stores - Documentation for the /organization/usage/vector_stores path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</organization/usage/vector_stores>.
+=head2 GET /organization/usage/vector_stores
 
-=head1 PATHS
+=head3 usage-vector-stores
 
-
-=head2 C<GET /organization/usage/vector_stores>
-
-Vector stores
-
+  $client->usage_vector_stores({
+      body => { ... },
+  });
 
 Get vector stores usage details for the organization.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
+=item * C<start_time> (in query, required, integer) - Start time (Unix seconds) of the query time range, inclusive.
 
-C<usage-vector-stores>
+=item * C<end_time> (in query, optional, integer) - End time (Unix seconds) of the query time range, exclusive.
 
-    $client->usage-vector-stores( ... );
+=item * C<bucket_width> (in query, optional, string) - Width of each time bucket in response. Currently C<1m> , C<1h> and C<1d> are
+supported, default to C<1d> .
 
-=head3 Parameters
+Allowed values: 1m, 1h, 1d
 
-=over 4
+Default: 1d
 
-=item * C<start_time> (in query) (Required) - Start time (Unix seconds) of the query time range, inclusive.
+=item * C<project_ids> (in query, optional, array) - Return only usage for these projects.
 
-Type: C<integer>
+=item * C<group_by> (in query, optional, array) - Group the usage data by the specified fields. Support fields include
+C<project_id> .
 
+=item * C<limit> (in query, optional, integer) - Specifies the number of buckets to return. - C<bucket_width=1d> : default: 7,
+max: 31 - C<bucket_width=1h> : default: 24, max: 168 - C<bucket_width=1m> :
+default: 60, max: 1440
 
-
-=item * C<end_time> (in query) (Optional) - End time (Unix seconds) of the query time range, exclusive.
-
-Type: C<integer>
-
-
-
-=item * C<bucket_width> (in query) (Optional) - Width of each time bucket in response. Currently `1m`, `1h` and `1d` are supported, default to `1d`.
-
-Type: C<string>
-
-Allowed values: C<1m, 1h, 1d>
-
-
-Default: C<1d>
-
-
-=item * C<project_ids> (in query) (Optional) - Return only usage for these projects.
-
-Type: C<array>
-
-
-
-=item * C<group_by> (in query) (Optional) - Group the usage data by the specified fields. Support fields include `project_id`.
-
-Type: C<array>
-
-
-
-=item * C<limit> (in query) (Optional) - Specifies the number of buckets to return.
-- `bucket_width=1d`: default: 7, max: 31
-- `bucket_width=1h`: default: 24, max: 168
-- `bucket_width=1m`: default: 60, max: 1440
-
-
-Type: C<integer>
-
-
-
-=item * C<page> (in query) (Optional) - A cursor for use in pagination. Corresponding to the `next_page` field from the previous response.
-
-Type: C<string>
-
-
+=item * C<page> (in query, optional, string) - A cursor for use in pagination. Corresponding to the C<next_page> field from
+the previous response.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - Usage data retrieved successfully.>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-Usage data retrieved successfully.
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
        "data" : [
           {
-             "result" : [
-                null
-             ]
+             "end_time" : 0,
+             "object" : "bucket",
+             "results" : [
+                "{\n    \"object\": \"organization.usage.completions.result\",\n    \"input_tokens\": 5000,\n    \"output_tokens\": 1000,\n    \"input_cached_tokens\": 4000,\n    \"input_audio_tokens\": 300,\n    \"output_audio_tokens\": 200,\n    \"num_model_requests\": 5,\n    \"project_id\": \"proj_abc\",\n    \"user_id\": \"user-abc\",\n    \"api_key_id\": \"key_abc\",\n    \"model\": \"gpt-4o-mini-2024-07-18\",\n    \"batch\": false,\n    \"service_tier\": \"default\"\n}\n"
+             ],
+             "start_time" : 0
           }
-       ]
+       ],
+       "has_more" : false,
+       "next_page" : "string",
+       "object" : "page"
     }
 
+=head1 SCHEMAS
+
+=head2 UsageResponse
+
+Properties:
+
+=over
+
+=item * C<data> (array of UsageTimeBucket, required)
+
+=item * C<has_more> (boolean, required)
+
+=item * C<next_page> (anyOf, required)
+
+=item * C<object> (string, required)
+
+Allowed values: page
+
+=back
+
+=head2 UsageTimeBucket
+
+Properties:
+
+=over
+
+=item * C<end_time> (integer, required)
+
+=item * C<object> (string, required)
+
+Allowed values: bucket
+
+=item * C<results> (array of object, required)
+
+=item * C<start_time> (integer, required)
 
 =back
 

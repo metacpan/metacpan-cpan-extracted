@@ -1,0 +1,167 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::organization-projects-project_id-hosted_tool_permissions - Documentation for the /organization/projects/{project_id}/hosted_tool_permissions path.
+
+=head1 OPERATIONS
+
+=head2 GET /organization/projects/{project_id}/hosted_tool_permissions
+
+=head3 retrieve-project-hosted-tool-permissions
+
+  $client->retrieve_project_hosted_tool_permissions({
+      body => { ... },
+  });
+
+Returns hosted tool permissions for a project.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<project_id> (in path, required, string) - The ID of the project.
+
+=back
+
+=head4 Responses
+
+B<200 - Project hosted tool permissions retrieved successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "code_interpreter" : {
+          "enabled" : true
+       },
+       "file_search" : {
+          "enabled" : true
+       },
+       "image_generation" : {
+          "enabled" : true
+       },
+       "mcp" : {
+          "enabled" : true
+       },
+       "web_search" : {
+          "enabled" : true
+       }
+    }
+
+=head2 POST /organization/projects/{project_id}/hosted_tool_permissions
+
+=head3 update-project-hosted-tool-permissions
+
+  $client->update_project_hosted_tool_permissions({
+      body => { ... },
+  });
+
+Updates hosted tool permissions for a project.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<project_id> (in path, required, string) - The ID of the project.
+
+=back
+
+=head4 Responses
+
+B<200 - Project hosted tool permissions updated successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "code_interpreter" : {
+          "enabled" : true
+       },
+       "file_search" : {
+          "enabled" : true
+       },
+       "image_generation" : {
+          "enabled" : true
+       },
+       "mcp" : {
+          "enabled" : true
+       },
+       "web_search" : {
+          "enabled" : true
+       }
+    }
+
+=head1 SCHEMAS
+
+=head2 HostedToolPermission
+
+Properties:
+
+=over
+
+=item * C<enabled> (boolean, required) - Whether the hosted tool is enabled for the project.
+
+=back
+
+=head2 ProjectHostedToolPermissions
+
+Properties:
+
+=over
+
+=item * C<code_interpreter> (HostedToolPermission, required)
+
+See L</HostedToolPermission> below for shape.
+
+=item * C<file_search> (HostedToolPermission, required)
+
+See L</HostedToolPermission> below for shape.
+
+=item * C<image_generation> (HostedToolPermission, required)
+
+See L</HostedToolPermission> below for shape.
+
+=item * C<mcp> (HostedToolPermission, required)
+
+See L</HostedToolPermission> below for shape.
+
+=item * C<web_search> (HostedToolPermission, required)
+
+See L</HostedToolPermission> below for shape.
+
+=back
+
+=head2 ProjectHostedToolPermissionsUpdateRequest
+
+Properties:
+
+=over
+
+=item * C<code_interpreter> (anyOf) - The code interpreter permission update.
+
+=item * C<file_search> (anyOf) - The file search permission update.
+
+=item * C<image_generation> (anyOf) - The image generation permission update.
+
+=item * C<mcp> (anyOf) - The MCP permission update.
+
+=item * C<web_search> (anyOf) - The web search permission update.
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

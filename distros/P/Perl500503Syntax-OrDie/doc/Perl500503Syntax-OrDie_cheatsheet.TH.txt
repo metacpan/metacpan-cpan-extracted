@@ -1,0 +1,108 @@
+Perl500503Syntax::OrDie คู่มืออ้างอิงฉบับย่อ (ภาษาไทย)
+=========================================================
+
+ชื่อ
+    Perl500503Syntax::OrDie - ตรวจสอบความเข้ากันได้ของซอร์สโค้ด Perl 5.005_03
+
+เวอร์ชัน
+    0.01
+
+สรุป
+    use Perl500503Syntax::OrDie;
+
+    use Perl500503Syntax::OrDie ();
+    Perl500503Syntax::OrDie::check_file('/path/to/script.pl');
+    Perl500503Syntax::OrDie::check_source($source, 'label.pl');
+
+    # รันเป็นคำสั่ง:
+    perl lib/Perl500503Syntax/OrDie.pm script.pl
+    perl lib/Perl500503Syntax/OrDie.pm script1.pl script2.pl ...
+    perl lib/Perl500503Syntax/OrDie.pm -
+
+คำอธิบาย
+    เมื่อรันเป็นคำสั่ง จะตรวจสอบแต่ละไฟล์ที่ระบุและแสดงผล
+    หากไม่มีพารามิเตอร์จะแสดงวิธีใช้งาน
+
+โครงสร้างที่ตรวจสอบ (แบบ static)
+    Perl 5.6  : our / 3-arg open / use utf8 / \x{} / @+@- /
+                CHECK/INIT / v-string / $^V / :lvalue / \p{}\P{}
+    Perl 5.8  : use encoding / PerlIO layers
+    Perl 5.10 : //= // say state given/when ~~ use feature
+                \K (?<name>) \k<name> (?|) (*VERB) \h\v\R
+                UNITCHECK possessive-quantifiers (?1)(?R) ${^MATCH} \g{N}
+    Perl 5.12 : package NAME VERSION / ...
+    Perl 5.14 : s///r tr///r
+    Perl 5.16 : __SUB__
+    Perl 5.20 : subroutine signatures / $ref->@*
+    Perl 5.22 : <<>> / /n
+    Perl 5.26 : <<~
+    Perl 5.30 : (?<=.{2,}X) variable-length lookbehind (experimental; stable 5.38)
+    Perl 5.32 : isa
+    Perl 5.34 : try/catch
+    Perl 5.36 : use builtin / for my ($a,$b)
+    Perl 5.38 : class
+
+ประวัติเวอร์ชัน Perl (ฟีเจอร์ที่โมดูลนี้ตรวจสอบ)
+    อ้างอิง: https://perldoc.perl.org/perl56delta
+              https://perldoc.perl.org/perl5100delta
+              https://perldoc.perl.org/perl5180delta
+              https://perldoc.perl.org/perl5220delta
+              https://perldoc.perl.org/perl5240delta
+              https://perldoc.perl.org/perl5280delta
+              https://perldoc.perl.org/perl5300delta
+              https://perldoc.perl.org/perl5380delta
+              https://perldoc.perl.org/perl5400delta
+              https://perldoc.perl.org/perl5420delta
+
+  perl56delta (Perl 5.6.0, 2000-03-22)
+    our: ประกาศตัวแปรแพ็กเกจแบบ lexical ใช้ "use vars" แทน
+    3-arg open(): ใช้ open(FH, ">path") แทน
+    use utf8 / use VERSION>=5.6 / \x{HHHH} / \N{name}
+    @+/@- อาร์เรย์ตำแหน่งการจับคู่
+    CHECK/INIT phase blocks
+    v-string / $^V / :lvalue / \p{}\P{}
+    mkdir ไม่มี mode: 5.005_03 ต้องการ mkdir(PATH, MODE)
+
+  perl58delta (5.8): use encoding / PerlIO layers
+  perl5100delta (5.10): // //= say state given/when ~~ use feature
+    \K (?<name>) \k<name> (?|) (*VERB) \h\v\R
+    UNITCHECK a++ (?1)(?R) ${^MATCH} \g{N}
+  perl5120delta (5.12): package NAME VERSION / ...
+  perl5140delta (5.14): s///r tr///r
+  perl5160delta (5.16): __SUB__
+  perl5200delta (5.20): signatures / $ref->@*
+  perl5220delta (5.22): <<>> / /n
+  perl5260delta (5.26): <<~
+  perl5320delta (5.32): isa
+  perl5340delta (5.34): try/catch
+  perl5360delta (5.36): use builtin / for my ($a,$b)
+  perl5300delta (5.30): variable-length lookbehind in regex (experimental; stable Perl 5.38)
+
+  perl5380delta (5.38): class
+
+  perl5180delta (5.18): my sub / state sub -- lexical subroutines
+
+  perl5400delta (Perl 5.40.0, 2024-06-09)
+    ^^ / ^^= high-precedence logical XOR operator
+      $x ^^ $y  -- completes the &&/|| set; use "xor" for 5.005_03.
+    __CLASS__ keyword (inside class blocks)
+      Runtime class name inside method/ADJUST/field (requires class feature).
+
+  perl5420delta (Perl 5.42.0, 2025-07-02)
+    any BLOCK LIST / all BLOCK LIST (experimental keywords)
+      any { EXPR } @list  -- use List::Util::any for 5.005_03.
+    my method / ->& lexical method call (requires class feature)
+      my method foo () { ... }  -- lexically scoped private method.
+
+สำนวนที่ปลอดภัย (Perl 5.005_03)
+    use vars qw($x @arr %hash);           แทน "our"
+    open(FH, ">$path") or die $!;         bareword 2 อาร์กิวเมนต์
+    mkdir("dir", 0755) or die $!;         mode ที่ระบุชัดเจน
+    $x = defined($y) ? $y : 'v';          แทน //=
+    print "...\n";                         แทน say
+
+ผู้เขียน
+    INABA Hitoshi <ina@cpan.org>
+
+สิทธิ์ใช้งาน
+    ไลบรารีเสรี สามารถแจกจ่ายซ้ำได้ภายใต้เงื่อนไขเดียวกับ Perl

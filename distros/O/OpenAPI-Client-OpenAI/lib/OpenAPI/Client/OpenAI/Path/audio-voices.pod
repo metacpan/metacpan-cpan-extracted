@@ -1,0 +1,92 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::audio-voices - Documentation for the /audio/voices path.
+
+=head1 OPERATIONS
+
+=head2 POST /audio/voices
+
+=head3 createVoice
+
+  $client->create_voice({
+      body => { ... },
+  });
+
+Creates a custom voice.
+
+Create a custom voice you can use for audio output (for example, in
+Text-to-Speech and the Realtime API). This requires an audio sample and a
+previously uploaded consent recording.
+
+See the
+L<custom voices guide|https://platform.openai.com/docs/guides/text-to-speech#custom-voices>
+for requirements and best practices. Custom voices are limited to eligible
+customers.
+
+=head4 Responses
+
+B<200 - OK>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "created_at" : 1734220800,
+       "id" : "voice_123abc",
+       "name" : "My new voice",
+       "object" : "audio.voice"
+    }
+
+=head1 SCHEMAS
+
+=head2 CreateVoiceRequest
+
+Properties:
+
+=over
+
+=item * C<audio_sample> (string, required) - The sample audio recording file. Maximum size is 10 MiB.
+
+Supported MIME types: C<audio/mpeg> , C<audio/wav> , C<audio/x-wav> ,
+C<audio/ogg> , C<audio/aac> , C<audio/flac> , C<audio/webm> , C<audio/mp4> .
+
+=item * C<consent> (string, required) - The consent recording ID (for example, C<cons_1234> ).
+
+=item * C<name> (string, required) - The name of the new voice.
+
+=back
+
+=head2 VoiceResource
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) for when the voice was created.
+
+=item * C<id> (string, required) - The voice identifier, which can be referenced in API endpoints.
+
+=item * C<name> (string, required) - The name of the voice.
+
+=item * C<object> (string, required) - The object type, which is always C<audio.voice> .
+
+Allowed values: audio.voice
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

@@ -4,106 +4,66 @@
 
 OpenAPI::Client::OpenAI::Path::threads-thread_id-runs-run_id-steps - Documentation for the /threads/{thread_id}/runs/{run_id}/steps path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</threads/{thread_id}/runs/{run_id}/steps>.
+=head2 GET /threads/{thread_id}/runs/{run_id}/steps
 
-=head1 PATHS
+=head3 listRunSteps
 
-
-=head2 C<GET /threads/{thread_id}/runs/{run_id}/steps>
-
-List run steps
-
+  $client->list_run_steps({
+      body => { ... },
+  });
 
 Returns a list of run steps belonging to a run.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
+=item * C<thread_id> (in path, required, string) - The ID of the thread the run and run steps belong to.
 
-C<listRunSteps>
+=item * C<run_id> (in path, required, string) - The ID of the run the run steps belong to.
 
-    $client->listRunSteps( ... );
+=item * C<limit> (in query, optional, integer) - A limit on the number of objects to be returned. Limit can range between 1 and
+100, and the default is 20.
 
-=head3 Parameters
+Default: 20
 
-=over 4
+=item * C<order> (in query, optional, string) - Sort order by the C<created_at> timestamp of the objects. C<asc> for ascending
+order and C<desc> for descending order.
 
-=item * C<thread_id> (in path) (Required) - The ID of the thread the run and run steps belong to.
+Allowed values: asc, desc
 
-Type: C<string>
+Default: desc
 
+=item * C<after> (in query, optional, string) - A cursor for use in pagination. C<after> is an object ID that defines your
+place in the list. For instance, if you make a list request and receive 100
+objects, ending with obj_foo, your subsequent call can include after=obj_foo
+in order to fetch the next page of the list.
 
+=item * C<before> (in query, optional, string) - A cursor for use in pagination. C<before> is an object ID that defines your
+place in the list. For instance, if you make a list request and receive 100
+objects, starting with obj_foo, your subsequent call can include
+before=obj_foo in order to fetch the previous page of the list.
 
-=item * C<run_id> (in path) (Required) - The ID of the run the run steps belong to.
+=item * C<include[]> (in query, optional, array) - A list of additional fields to include in the response. Currently the only
+supported value is
+C<step_details.tool_calls[I<].file_search.results[>].content> to fetch the
+file search result content.
 
-Type: C<string>
-
-
-
-=item * C<limit> (in query) (Optional) - A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.
-
-
-Type: C<integer>
-
-
-Default: C<20>
-
-
-=item * C<order> (in query) (Optional) - Sort order by the `created_at` timestamp of the objects. `asc` for ascending order and `desc` for descending order.
-
-
-Type: C<string>
-
-Allowed values: C<asc, desc>
-
-
-Default: C<desc>
-
-
-=item * C<after> (in query) (Optional) - A cursor for use in pagination. `after` is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include after=obj_foo in order to fetch the next page of the list.
-
-
-Type: C<string>
-
-
-
-=item * C<before> (in query) (Optional) - A cursor for use in pagination. `before` is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, starting with obj_foo, your subsequent call can include before=obj_foo in order to fetch the previous page of the list.
-
-
-Type: C<string>
-
-
-
-=item * C<include[]> (in query) (Optional) - A list of additional fields to include in the response. Currently the only supported value is `step_details.tool_calls[*].file_search.results[*].content` to fetch the file search result content.
-
-See the [file search tool documentation](https://platform.openai.com/docs/assistants/tools/file-search#customizing-file-search-settings) for more information.
-
-
-Type: C<array>
-
-
+See the
+L<file search tool documentation|https://platform.openai.com/docs/assistants/tools/file-search#customizing-file-search-settings>
+for more information.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - OK>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
        "data" : [
@@ -115,6 +75,93 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
        "object" : "list"
     }
 
+=head1 SCHEMAS
+
+=head2 ListRunStepsResponse
+
+Properties:
+
+=over
+
+=item * C<data> (array of RunStepObject, required)
+
+=item * C<first_id> (string, required)
+
+=item * C<has_more> (boolean, required)
+
+=item * C<last_id> (string, required)
+
+=item * C<object> (string, required)
+
+=back
+
+=head2 Metadata
+
+Set of 16 key-value pairs that can be attached to an object. This can be
+useful for storing additional information about the object in a structured
+format, and querying for objects via API or the dashboard.
+
+Keys are strings with a maximum length of 64 characters. Values are strings
+with a maximum length of 512 characters.
+
+=head2 RunStepCompletionUsage
+
+Usage statistics related to the run step. This value will be C<null> while the
+run step's status is C<in_progress> .
+
+=head2 RunStepObject
+
+Properties:
+
+=over
+
+=item * C<assistant_id> (string, required) - The ID of the
+L<assistant|https://platform.openai.com/docs/api-reference/assistants>
+associated with the run step.
+
+=item * C<cancelled_at> (anyOf, required)
+
+=item * C<completed_at> (anyOf, required)
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) for when the run step was created.
+
+=item * C<expired_at> (anyOf, required)
+
+=item * C<failed_at> (anyOf, required)
+
+=item * C<id> (string, required) - The identifier of the run step, which can be referenced in API endpoints.
+
+=item * C<last_error> (anyOf, required)
+
+=item * C<metadata> (Metadata, required)
+
+See L</Metadata> below for shape.
+
+=item * C<object> (string, required) - The object type, which is always C<thread.run.step> .
+
+Allowed values: thread.run.step
+
+=item * C<run_id> (string, required) - The ID of the L<run|https://platform.openai.com/docs/api-reference/runs> that
+this run step is a part of.
+
+=item * C<status> (string, required) - The status of the run step, which can be either C<in_progress> , C<cancelled>
+, C<failed> , C<completed> , or C<expired> .
+
+Allowed values: in_progress, cancelled, failed, completed, expired
+
+=item * C<step_details> (object, required) - The details of the run step.
+
+=item * C<thread_id> (string, required) - The ID of the L<thread|https://platform.openai.com/docs/api-reference/threads>
+that was run.
+
+=item * C<type> (string, required) - The type of run step, which can be either C<message_creation> or C<tool_calls>
+.
+
+Allowed values: message_creation, tool_calls
+
+=item * C<usage> (RunStepCompletionUsage, required)
+
+See L</RunStepCompletionUsage> below for shape.
 
 =back
 

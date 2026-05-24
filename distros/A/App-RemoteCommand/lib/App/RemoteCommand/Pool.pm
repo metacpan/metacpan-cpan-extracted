@@ -1,39 +1,35 @@
 package App::RemoteCommand::Pool;
-use v5.16;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
 
-sub new {
-    my $class = shift;
+sub new ($class) {
     bless {
         pool => [],
     }, $class;
 }
 
-sub all {
-    my $self = shift;
-    @{$self->{pool}};
+sub all ($self) {
+    $self->{pool}->@*;
 }
 
-sub add {
-    my ($self, $ssh) = @_;
-    push @{$self->{pool}}, $ssh;
+sub add ($self, $ssh) {
+    push $self->{pool}->@*, $ssh;
     $self;
 }
 
-sub remove {
-    my ($self, $ssh) = @_;
+sub remove ($self, $ssh) {
 
-    for my $i (0..$#{$self->{pool}}) {
+    for my $i (0..$self->{pool}->$#*) {
         if ($self->{pool}[$i] eq $ssh) {
-            return splice @{$self->{pool}}, $i, 1;
+            return splice $self->{pool}->@*, $i, 1;
         }
     }
     return;
 }
 
-sub count {
-    my $self = shift;
-    scalar @{$self->{pool}};
+sub count ($self) {
+    scalar $self->{pool}->@*;
 }
 
 1;

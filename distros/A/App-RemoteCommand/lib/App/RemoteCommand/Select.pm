@@ -1,22 +1,21 @@
 package App::RemoteCommand::Select;
-use v5.16;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
 
 use IO::Select;
 use App::RemoteCommand::LineBuffer;
 
-sub new {
-    my $class = shift;
+sub new ($class) {
     bless { select => IO::Select->new, container => [] }, $class;
 }
 
-sub add {
-    my ($self, %args) = @_;
+sub add ($self, %args) {
     my $pid = $args{pid};
     my $fh = $args{fh};
     my $host = $args{host};
     my $buffer = $args{buffer} || App::RemoteCommand::LineBuffer->new;
-    push @{$self->{container}}, {
+    push $self->{container}->@*, {
         pid => $pid,
         fh => $fh,
         host => $host,
@@ -25,11 +24,10 @@ sub add {
     $self->{select}->add($fh);
 }
 
-sub can_read {
-    my $self = shift;
-    my @fh = $self->{select}->can_read(@_);
+sub can_read ($self, @args) {
+    my @fh = $self->{select}->can_read(@args);
     my @ready;
-    for my $c (@{$self->{container}}) {
+    for my $c ($self->{container}->@*) {
         if (grep { $c->{fh} == $_ } @fh) {
             push @ready, $c;
         }
@@ -37,16 +35,14 @@ sub can_read {
     return @ready;
 }
 
-sub count {
-    my $self = shift;
+sub count ($self) {
     $self->{select}->count;
 }
 
-sub remove {
-    my ($self, $kind, $value) = @_;
-    for my $i (0..$#{$self->{container}}) {
+sub remove ($self, $kind, $value) {
+    for my $i (0..$self->{container}->$#*) {
         if ($self->{container}[$i]{$kind} eq $value) {
-            my $remove = splice @{$self->{container}}, $i, 1;
+            my $remove = splice $self->{container}->@*, $i, 1;
             $self->{select}->remove($remove->{fh});
             return $remove;
         }

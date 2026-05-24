@@ -1,0 +1,298 @@
+perldelta Summary - Features Checked by Perl500503Syntax::OrDie
+================================================================
+
+This file summarises the Perl version-delta documents (perldelta pod files)
+that were consulted when building the BLACKLIST in
+lib/Perl500503Syntax/OrDie.pm.
+
+Each section lists the constructs introduced in that Perl version that are
+relevant to Perl 5.005_03 compatibility checking.  The original delta
+documents are part of the Perl distribution and are redistributable under
+the same terms as Perl itself (Artistic License or GPL v1 or later).
+
+Online copies of the delta documents are available at:
+  https://perldoc.perl.org/perl56delta
+  https://perldoc.perl.org/perl58delta
+  https://perldoc.perl.org/perl5100delta
+  https://perldoc.perl.org/perl5120delta
+  https://perldoc.perl.org/perl5140delta
+  https://perldoc.perl.org/perl5160delta
+  https://perldoc.perl.org/perl5180delta
+  https://perldoc.perl.org/perl5200delta
+  https://perldoc.perl.org/perl5220delta
+  https://perldoc.perl.org/perl5240delta
+  https://perldoc.perl.org/perl5260delta
+  https://perldoc.perl.org/perl5280delta
+  https://perldoc.perl.org/perl5300delta
+  https://perldoc.perl.org/perl5320delta
+  https://perldoc.perl.org/perl5340delta
+  https://perldoc.perl.org/perl5360delta
+  https://perldoc.perl.org/perl5380delta
+  https://perldoc.perl.org/perl5400delta
+  https://perldoc.perl.org/perl5420delta
+
+----------------------------------------------------------------------
+perl56delta (Perl 5.6.0, 2000-03-22)
+----------------------------------------------------------------------
+Constructs introduced in Perl 5.6 that are NOT available in 5.005_03:
+
+  our VARIABLE
+    Lexically-scoped package variable declaration.
+    Use "use vars qw(...)" instead for 5.005_03 compatibility.
+
+  3-argument open()
+    open(FH, MODE, PATH) form.
+    Use 2-argument open(FH, ">path") form instead.
+
+  use utf8
+    Declares that the source file is encoded in UTF-8.
+
+  use VERSION (>= 5.006 numeric or v5.6 v-string)
+    Specifying a minimum Perl version with "use 5.006" or "use v5.6".
+
+  \x{HHHH} Unicode escape
+    Extended hex escape for Unicode code points above 0xFF.
+
+  \N{name} named character escape
+    Named Unicode character in regex/string (e.g. \N{SNOWMAN}).
+
+  @+ and @- match-position arrays / $+[N] $-[N]
+    Arrays holding start/end positions of the most recent regex match.
+
+  CHECK { } and INIT { } phase blocks
+    Named subroutine-like blocks run at specific compile/run phases.
+    (END { } and BEGIN { } were available before 5.6.)
+
+  v-string notation (v1.2.3)
+    Vector strings such as v5.6.1 or 1.22.333.4444.
+
+  $^V version object
+    The running Perl version as a v-string object.
+    Use $] (a numeric value) for 5.005_03 compatibility.
+
+  :lvalue subroutine attribute
+    Marks a subroutine as a valid lvalue (assignable).
+
+  \p{Property} and \P{Property} Unicode property escapes in regex
+    Match characters by Unicode property (e.g. \p{IsAlpha}).
+
+  mkdir() without explicit mode
+    In 5.6+, mkdir(PATH) defaults to mode 0777.
+    In 5.005_03, the mode argument is required: mkdir(PATH, MODE).
+
+----------------------------------------------------------------------
+perl58delta (Perl 5.8.0, 2002-07-18)
+----------------------------------------------------------------------
+
+  use encoding
+    Loads a source encoding pragma (e.g. "use encoding 'euc-jp'").
+
+  PerlIO layers in open() and binmode()
+    Specifying I/O layers such as :utf8, :encoding(UTF-8), :crlf
+    in the mode string: open(FH, ">:utf8", $path).
+    Not available in 5.005_03 (no PerlIO infrastructure).
+
+----------------------------------------------------------------------
+perl5100delta (Perl 5.10.0, 2007-12-18)
+----------------------------------------------------------------------
+
+  // defined-or operator
+    Returns left-hand side if defined, otherwise right-hand side.
+    "$x // $y" is equivalent to "defined($x) ? $x : $y".
+
+  //= defined-or assignment
+    "$x //= $y" sets $x to $y if $x is not defined.
+
+  say LIST
+    Like print but appends a newline.
+
+  state VARIABLE
+    Lexically-scoped persistent variable (like static in C).
+
+  given(EXPR) { when(VAL) { ... } }
+    Switch/case construct (experimental in 5.10, removed in 5.36+).
+
+  ~~ smart-match operator
+    Overloaded comparison operator for various types.
+
+  use feature
+    Enables named language features (say, state, switch, etc.).
+
+  \K in regex
+    Resets the start of the matched string (keep).
+    "foo\Kbar" matches "bar" in "foobar" but does not include "foo".
+
+  (?<name>...) named capture group
+    Stores a capture in %+ under the given name.
+
+  \k<name> named backreference
+    References a named capture group by name.
+
+  (?|...) branch reset group
+    Capture group numbers reset for each alternative.
+
+  (*VERB) backtrack control verbs
+    (*FAIL), (*ACCEPT), (*PRUNE), (*SKIP), (*MARK), (*COMMIT), (*THEN).
+
+  \h \H horizontal whitespace escapes
+  \v \V vertical whitespace escapes
+  \R generic newline escape
+
+  UNITCHECK { } phase block
+    Runs at the end of compiling each individual compilation unit.
+
+  Possessive quantifiers a++ a*+ a?+ a{n,m}+
+    Quantifier that does not give back on backtracking.
+
+  (?PARNO) (?+N) (?-N) recursive subpattern by number
+  (?&name) recursive subpattern by name
+  (?R) recurse to start of entire pattern
+
+  ${^MATCH} ${^PREMATCH} ${^POSTMATCH}
+    Equivalents of $&, $`, $' when /p flag is used (no speed penalty).
+
+  \g{N} \g{-N} absolute and relative backreferences
+
+----------------------------------------------------------------------
+perl5120delta (Perl 5.12.0, 2010-04-12)
+----------------------------------------------------------------------
+
+  package NAME VERSION
+    Combined package declaration and version specification in one statement.
+
+  ... yada-yada operator
+    Placeholder for unimplemented code; throws "Unimplemented" when reached.
+
+----------------------------------------------------------------------
+perl5140delta (Perl 5.14.0, 2011-05-14)
+----------------------------------------------------------------------
+
+  s/PATTERN/REPLACEMENT/r non-destructive substitution flag
+    Returns the modified string without changing the original.
+
+  tr/SEARCHLIST/REPLACEMENTLIST/r non-destructive transliteration flag
+
+----------------------------------------------------------------------
+perl5160delta (Perl 5.16.0, 2012-05-20)
+----------------------------------------------------------------------
+
+  __SUB__
+    A token (enabled by "use feature 'current_sub'") that refers to
+    the currently-executing subroutine.
+
+----------------------------------------------------------------------
+perl5200delta (Perl 5.20.0, 2014-05-27)
+----------------------------------------------------------------------
+
+  Subroutine signatures (experimental)
+    sub foo ($x, $y = 0) { ... }
+    Parameters declared in parentheses after the sub name.
+
+  Postfix dereference
+    $ref->@*   $ref->%*   $ref->&*   $ref->$*   $ref->@[...]
+
+----------------------------------------------------------------------
+perl5220delta (Perl 5.22.0, 2015-06-01)
+----------------------------------------------------------------------
+
+  <<>> double-diamond operator
+    Safe version of <> that opens each ARGV file with 3-argument open.
+
+  /n non-capturing regex flag
+    Makes all capture groups non-capturing.
+
+----------------------------------------------------------------------
+perl5260delta (Perl 5.26.0, 2017-05-30)
+----------------------------------------------------------------------
+
+  <<~ indented heredoc
+    Heredoc form that strips leading whitespace from the body.
+
+----------------------------------------------------------------------
+perl5320delta (Perl 5.32.0, 2020-06-20)
+----------------------------------------------------------------------
+
+  isa infix operator
+    $obj isa "ClassName"  (equivalent to $obj->isa("ClassName") but
+    defined even when $obj is not a reference).
+
+----------------------------------------------------------------------
+perl5340delta (Perl 5.34.0, 2021-05-20)
+----------------------------------------------------------------------
+
+  try / catch (experimental, via use feature 'try')
+    try { ... } catch ($e) { ... }
+
+----------------------------------------------------------------------
+perl5360delta (Perl 5.36.0, 2022-05-28)
+----------------------------------------------------------------------
+
+  use builtin
+    Provides built-in functions as a pragma (true, false, weaken, etc.).
+
+  for my ($a, $b) (@list) paired-variable iteration
+    Iterates a list two elements at a time into ($a, $b).
+
+----------------------------------------------------------------------
+perl5380delta (Perl 5.38.0, 2023-07-02)
+----------------------------------------------------------------------
+
+  class keyword (experimental OOP)
+    class Foo { ... }  with field, method keywords.
+
+  Variable-length lookbehind in regex
+    (?<=...) or (?<!...) where the lookbehind pattern has variable length
+    (e.g. contains *, +, {n,m}, or alternation of different lengths).
+    Fixed-length lookbehind has been available since Perl 5.005.
+
+----------------------------------------------------------------------
+perl5400delta (Perl 5.40.0, 2024-06-09)
+----------------------------------------------------------------------
+
+  ^^ high-precedence logical XOR operator
+    $x ^^ $y evaluates to true if exactly one of $x or $y is true.
+    Completes the set alongside && and ||.
+    Use the low-precedence "xor" operator for 5.005_03 compatibility.
+
+  ^^= compound logical XOR assignment  (also Perl 5.42)
+    $x ^^= $y  sets $x to ($x ^^ $y).
+
+  __CLASS__ keyword (inside class blocks)
+    Inside a method, ADJUST block, or field initializer, __CLASS__
+    yields the runtime class name of the current object instance.
+    Similar to __PACKAGE__ but runtime-polymorphic.
+    Requires the "class" feature (Perl 5.38+).
+
+  :reader attribute for field variables
+    class Foo { field $bar :reader; }
+    Auto-generates a read accessor method for the field.
+    Requires the "class" feature (Perl 5.38+).
+
+----------------------------------------------------------------------
+perl5420delta (Perl 5.42.0, 2025-07-02)
+----------------------------------------------------------------------
+
+  any BLOCK LIST / all BLOCK LIST keyword operators (experimental)
+    any { $_ > 0 } @list  -- true if any element satisfies the block.
+    all { $_ > 0 } @list  -- true if all elements satisfy the block.
+    Similar to List::Util any/all but compiled into the core.
+    Use List::Util::any / List::Util::all for 5.005_03 compatibility.
+
+  my method NAME -- lexical method declaration
+    Inside a class block, "my method foo () { ... }" declares a method
+    with lexical (private) visibility, invisible outside the class.
+    Requires the "class" feature (Perl 5.38+).
+
+  ->& lexical method call operator
+    $obj->&foo()  invokes the lexical method $foo on $obj, bypassing
+    name-based method resolution.
+    Requires the "class" feature (Perl 5.38+).
+
+  :writer attribute for field variables
+    class Foo { field $bar :writer; }
+    Auto-generates a write accessor (setter) method for the field.
+    Requires the "class" feature (Perl 5.38+).
+
+----------------------------------------------------------------------
+End of perldelta_summary.txt
+----------------------------------------------------------------------

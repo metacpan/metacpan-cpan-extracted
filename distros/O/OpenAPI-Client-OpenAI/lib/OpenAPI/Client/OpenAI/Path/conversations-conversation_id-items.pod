@@ -1,0 +1,207 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::conversations-conversation_id-items - Documentation for the /conversations/{conversation_id}/items path.
+
+=head1 OPERATIONS
+
+=head2 GET /conversations/{conversation_id}/items
+
+=head3 listConversationItems
+
+  $client->list_conversation_items({
+      body => { ... },
+  });
+
+List all items for a conversation with the given ID.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<conversation_id> (in path, required, string) - The ID of the conversation to list items for.
+
+=item * C<limit> (in query, optional, integer) - A limit on the number of objects to be returned. Limit can range between 1 and
+100, and the default is 20.
+
+Default: 20
+
+=item * C<order> (in query, optional, string) - The order to return the input items in. Default is C<desc> . - C<asc> : Return
+the input items in ascending order. - C<desc> : Return the input items in
+descending order.
+
+Allowed values: asc, desc
+
+=item * C<after> (in query, optional, string) - An item ID to list items after, used in pagination.
+
+=item * C<include> (in query, optional, array) - Specify additional output data to include in the model response. Currently
+supported values are: - C<web_search_call.action.sources> : Include the
+sources of the web search tool call. - C<code_interpreter_call.outputs> :
+Includes the outputs of python code execution in code interpreter tool call
+items. - C<computer_call_output.output.image_url> : Include image urls from
+the computer call output. - C<file_search_call.results> : Include the search
+results of the file search tool call. - C<message.input_image.image_url> :
+Include image urls from the input message. - C<message.output_text.logprobs> :
+Include logprobs with assistant messages. - C<reasoning.encrypted_content> :
+Includes an encrypted version of reasoning tokens in reasoning item outputs.
+This enables reasoning items to be used in multi-turn conversations when using
+the Responses API statelessly (like when the C<store> parameter is set to
+C<false> , or when an organization is enrolled in the zero data retention
+program).
+
+=back
+
+=head4 Responses
+
+B<200 - OK>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "data" : [
+          {
+             "content" : [
+                {
+                   "text" : "string",
+                   "type" : "input_text"
+                }
+             ],
+             "id" : "string",
+             "phase" : "commentary",
+             "role" : "unknown",
+             "status" : "in_progress",
+             "type" : "message"
+          }
+       ],
+       "first_id" : "string",
+       "has_more" : false,
+       "last_id" : "string",
+       "object" : "list"
+    }
+
+=head2 POST /conversations/{conversation_id}/items
+
+=head3 createConversationItems
+
+  $client->create_conversation_items({
+      body => { ... },
+  });
+
+Create items in a conversation with the given ID.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<conversation_id> (in path, required, string) - The ID of the conversation to add the item to.
+
+=item * C<include> (in query, optional, array) - Additional fields to include in the response. See the C<include> parameter for
+L<listing Conversation items above|https://platform.openai.com/docs/api-reference/conversations/list-items#conversations_list_items-include>
+for more information.
+
+=back
+
+=head4 Request body
+
+Content-Type: application/json
+
+Properties:
+
+=over
+
+=item * C<items> (array of InputItem, required) - The items to add to the conversation. You may add up to 20 items at a time.
+
+=back
+
+Example:
+
+    {
+       "items" : [
+          {
+             "content" : "string",
+             "phase" : "commentary",
+             "role" : "user",
+             "type" : "message"
+          }
+       ]
+    }
+
+=head4 Responses
+
+B<200 - OK>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "data" : [
+          {
+             "content" : [
+                {
+                   "text" : "string",
+                   "type" : "input_text"
+                }
+             ],
+             "id" : "string",
+             "phase" : "commentary",
+             "role" : "unknown",
+             "status" : "in_progress",
+             "type" : "message"
+          }
+       ],
+       "first_id" : "string",
+       "has_more" : false,
+       "last_id" : "string",
+       "object" : "list"
+    }
+
+=head1 SCHEMAS
+
+=head2 ConversationItem
+
+A single item within a conversation. The set of possible types are the same as
+the C<output> type of a
+L<Response object|https://platform.openai.com/docs/api-reference/responses/object#responses/object-output>
+.
+
+=head2 ConversationItemList
+
+Properties:
+
+=over
+
+=item * C<data> (array of ConversationItem, required) - A list of conversation items.
+
+=item * C<first_id> (string, required) - The ID of the first item in the list.
+
+=item * C<has_more> (boolean, required) - Whether there are more items available.
+
+=item * C<last_id> (string, required) - The ID of the last item in the list.
+
+=item * C<object> (string, required) - The type of object returned, must be C<list> .
+
+Allowed values: list
+
+=back
+
+=head2 InputItem
+
+See L<https://platform.openai.com/docs/api-reference> for details.
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

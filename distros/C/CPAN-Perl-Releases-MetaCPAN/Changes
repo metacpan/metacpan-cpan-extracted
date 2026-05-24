@@ -1,5 +1,8 @@
 Revision history for CPAN-Perl-Releases-MetaCPAN
 
+v1.0.0  2026-05-23
+  - Raise minimum Perl to v5.24
+
 0.010  2026-01-07 08:31:56 JST
     - Gracefully handle hashref for total hits (Grinnz #3)
 

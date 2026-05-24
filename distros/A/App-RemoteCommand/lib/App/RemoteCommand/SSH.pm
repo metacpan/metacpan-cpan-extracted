@@ -1,13 +1,13 @@
 package App::RemoteCommand::SSH;
-use v5.16;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
 
 use App::RemoteCommand::Util qw(DEBUG logger);
 use Net::OpenSSH;
 use IO::Pty;
 
-sub _ssh {
-    my ($self, %args) = @_;
+sub _ssh ($self, %args) {
     my $loglevel = DEBUG ? "error" : "quiet";
     Net::OpenSSH->new($args{host},
         async => 1,
@@ -31,8 +31,7 @@ use constant STATE_CONNECTED     => 3;
 use constant STATE_DISCONNECTING => 4;
 use constant STATE_DONE          => 5;
 
-sub new {
-    my ($class, %args) = @_;
+sub new ($class, %args) {
     bless {
         %args,
         ssh => undef,
@@ -45,31 +44,28 @@ sub new {
     }, $class;
 }
 
-sub add {
-    my ($self, $cmd) = @_;
-    push @{$self->{cmd}}, $cmd;
+sub add ($self, $cmd) {
+    push $self->{cmd}->@*, $cmd;
 }
 
-sub at_exit {
-    my $self = shift;
-    @_ ? $self->{at_exit} = shift : $self->{at_exit};
+sub at_exit ($self, @args) {
+    @args ? $self->{at_exit} = shift @args : $self->{at_exit};
 }
 
-sub cancel {
-    my ($self, $signal) = @_;
+sub cancel ($self, $signal) {
 
     DEBUG and logger " CANCEL %s, state %s", $self->host, $self->{state};
 
     if ($self->{state} == STATE_TODO) {
         $self->{state} == STATE_DONE;
     } elsif ($self->{state} == STATE_CONNECTING) {
-        @{$self->{cmd}} = ();
+        $self->{cmd}->@* = ();
         undef $self->{at_exit};
         my $master_pid = $self->{ssh}->get_master_pid;
         DEBUG and logger " SEND SIG$signal %s, process group for master pid %d", $self->host, $master_pid;
         kill $signal => -$master_pid;
     } elsif ($self->{state} == STATE_CONNECTED) {
-        @{$self->{cmd}} = ();
+        $self->{cmd}->@* = ();
         if ($signal
             and $self->{current}
             and $self->{current}{type} eq "cmd"
@@ -87,23 +83,19 @@ sub cancel {
     }
 }
 
-sub error {
-    my $self = shift;
+sub error ($self) {
     ($self->{ssh} && $self->{ssh}->error) || $self->{_error};
 }
 
-sub host {
-    my $self = shift;
+sub host ($self) {
     $self->{host};
 }
 
-sub exit {
-    my $self = shift;
+sub exit ($self) {
     $self->{exit};
 }
 
-sub one_tick {
-    my ($self, %args) = @_;
+sub one_tick ($self, %args) {
 
     my $exit_pid  = $args{pid};
     my $exit_code = $args{exit};
@@ -155,8 +147,8 @@ sub one_tick {
             }
 
             my ($cmd, $type);
-            if (@{$self->{cmd}}) {
-                $cmd = shift @{$self->{cmd}};
+            if ($self->{cmd}->@*) {
+                $cmd = shift $self->{cmd}->@*;
                 $type = "cmd";
             } elsif ($self->{at_exit}) {
                 $cmd = delete $self->{at_exit};

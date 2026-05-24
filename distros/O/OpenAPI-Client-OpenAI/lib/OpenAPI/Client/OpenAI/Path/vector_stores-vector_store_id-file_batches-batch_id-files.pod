@@ -4,105 +4,62 @@
 
 OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-file_batches-batch_id-files - Documentation for the /vector_stores/{vector_store_id}/file_batches/{batch_id}/files path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</vector_stores/{vector_store_id}/file_batches/{batch_id}/files>.
+=head2 GET /vector_stores/{vector_store_id}/file_batches/{batch_id}/files
 
-=head1 PATHS
+=head3 listFilesInVectorStoreBatch
 
-
-=head2 C<GET /vector_stores/{vector_store_id}/file_batches/{batch_id}/files>
-
-List vector store files in a batch
-
+  $client->list_files_in_vector_store_batch({
+      body => { ... },
+  });
 
 Returns a list of vector store files in a batch.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
+=item * C<vector_store_id> (in path, required, string) - The ID of the vector store that the files belong to.
 
-C<listFilesInVectorStoreBatch>
+=item * C<batch_id> (in path, required, string) - The ID of the file batch that the files belong to.
 
-    $client->listFilesInVectorStoreBatch( ... );
+=item * C<limit> (in query, optional, integer) - A limit on the number of objects to be returned. Limit can range between 1 and
+100, and the default is 20.
 
-=head3 Parameters
+Default: 20
 
-=over 4
+=item * C<order> (in query, optional, string) - Sort order by the C<created_at> timestamp of the objects. C<asc> for ascending
+order and C<desc> for descending order.
 
-=item * C<vector_store_id> (in path) (Required) - The ID of the vector store that the files belong to.
+Allowed values: asc, desc
 
-Type: C<string>
+Default: desc
 
+=item * C<after> (in query, optional, string) - A cursor for use in pagination. C<after> is an object ID that defines your
+place in the list. For instance, if you make a list request and receive 100
+objects, ending with obj_foo, your subsequent call can include after=obj_foo
+in order to fetch the next page of the list.
 
+=item * C<before> (in query, optional, string) - A cursor for use in pagination. C<before> is an object ID that defines your
+place in the list. For instance, if you make a list request and receive 100
+objects, starting with obj_foo, your subsequent call can include
+before=obj_foo in order to fetch the previous page of the list.
 
-=item * C<batch_id> (in path) (Required) - The ID of the file batch that the files belong to.
+=item * C<filter> (in query, optional, string) - Filter by file status. One of C<in_progress> , C<completed> , C<failed> ,
+C<cancelled> .
 
-Type: C<string>
-
-
-
-=item * C<limit> (in query) (Optional) - A limit on the number of objects to be returned. Limit can range between 1 and 100, and the default is 20.
-
-
-Type: C<integer>
-
-
-Default: C<20>
-
-
-=item * C<order> (in query) (Optional) - Sort order by the `created_at` timestamp of the objects. `asc` for ascending order and `desc` for descending order.
-
-
-Type: C<string>
-
-Allowed values: C<asc, desc>
-
-
-Default: C<desc>
-
-
-=item * C<after> (in query) (Optional) - A cursor for use in pagination. `after` is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with obj_foo, your subsequent call can include after=obj_foo in order to fetch the next page of the list.
-
-
-Type: C<string>
-
-
-
-=item * C<before> (in query) (Optional) - A cursor for use in pagination. `before` is an object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, starting with obj_foo, your subsequent call can include before=obj_foo in order to fetch the previous page of the list.
-
-
-Type: C<string>
-
-
-
-=item * C<filter> (in query) (Optional) - Filter by file status. One of `in_progress`, `completed`, `failed`, `cancelled`.
-
-Type: C<string>
-
-Allowed values: C<in_progress, completed, failed, cancelled>
-
-
+Allowed values: in_progress, completed, failed, cancelled
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - OK>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
        "data" : [
@@ -114,6 +71,69 @@ Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-
        "object" : "list"
     }
 
+=head1 SCHEMAS
+
+=head2 ListVectorStoreFilesResponse
+
+Properties:
+
+=over
+
+=item * C<data> (array of VectorStoreFileObject, required)
+
+=item * C<first_id> (string, required)
+
+=item * C<has_more> (boolean, required)
+
+=item * C<last_id> (string, required)
+
+=item * C<object> (string, required)
+
+=back
+
+=head2 VectorStoreFileAttributes
+
+Set of 16 key-value pairs that can be attached to an object. This can be
+useful for storing additional information about the object in a structured
+format, and querying for objects via API or the dashboard. Keys are strings
+with a maximum length of 64 characters. Values are strings with a maximum
+length of 512 characters, booleans, or numbers.
+
+=head2 VectorStoreFileObject
+
+Properties:
+
+=over
+
+=item * C<attributes> (VectorStoreFileAttributes)
+
+See L</VectorStoreFileAttributes> below for shape.
+
+=item * C<chunking_strategy> (object) - The strategy used to chunk the file.
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) for when the vector store file was created.
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints.
+
+=item * C<last_error> (anyOf, required)
+
+=item * C<object> (string, required) - The object type, which is always C<vector_store.file> .
+
+Allowed values: vector_store.file
+
+=item * C<status> (string, required) - The status of the vector store file, which can be either C<in_progress> ,
+C<completed> , C<cancelled> , or C<failed> . The status C<completed> indicates
+that the vector store file is ready for use.
+
+Allowed values: in_progress, completed, cancelled, failed
+
+=item * C<usage_bytes> (integer, required) - The total vector store usage in bytes. Note that this may be different from
+the original file size.
+
+=item * C<vector_store_id> (string, required) - The ID of the
+L<vector store|https://platform.openai.com/docs/api-reference/vector-stores/object>
+that the L<File|https://platform.openai.com/docs/api-reference/files> is
+attached to.
 
 =back
 

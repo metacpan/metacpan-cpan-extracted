@@ -3,7 +3,6 @@ abstract: 'Validate against Crypt::SaltedHash hashes with Crypt::Passphrase'
 author:
   - 'Robert Rothenberg <perl@rhizomnic.com>'
 build_requires:
-  Crypt::SaltedHash: '0'
   Crypt::SysRandom: '0'
   Digest::MD5: '2.25'
   Digest::SHA: '5.96'
@@ -35,7 +34,7 @@ name: Crypt-Passphrase-SaltedHash
 provides:
   Crypt::Passphrase::SaltedHash:
     file: lib/Crypt/Passphrase/SaltedHash.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Crypt::Passphrase::Validator: '0'
   Digest: '1.19'
@@ -47,7 +46,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/perl-Crypt-Passphrase-SaltedHash/issues
   repository: git://github.com/robrwo/perl-Crypt-Passphrase-SaltedHash.git
-version: '0.01'
+version: '0.02'
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.42.1
 x_serialization_backend: 'YAML::Tiny version 1.76'

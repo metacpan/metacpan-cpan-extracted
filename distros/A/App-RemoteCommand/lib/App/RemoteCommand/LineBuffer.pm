@@ -1,24 +1,22 @@
 package App::RemoteCommand::LineBuffer;
-use v5.16;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
 
-sub new {
-    my $class = shift;
+sub new ($class) {
     bless { buffer => "" }, $class;
 }
 
-sub raw {
-    shift->{buffer};
+sub raw ($self) {
+    $self->{buffer};
 }
 
-sub add {
-    my ($self, $buffer) = @_;
+sub add ($self, $buffer) {
     $self->{buffer} .= $buffer;
     $self;
 }
 
-sub get {
-    my ($self, $drain) = @_;
+sub get ($self, $drain = undef) {
     if ($drain) {
         if (length $self->{buffer}) {
             my @line = $self->get;

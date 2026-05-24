@@ -1,16 +1,15 @@
-use strict;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
 use Test::More;
 use Parallel::Pipes;
 use File::Temp ();
 use Time::HiRes ();
 
-my $subtest = sub {
-    my $number_of_pipes = shift;
+my $subtest = sub ($number_of_pipes) {
     my $tempdir = File::Temp::tempdir(CLEANUP => 1);
 
-    my $pipes = Parallel::Pipes->new($number_of_pipes, sub {
-        my $num = shift;
+    my $pipes = Parallel::Pipes->new($number_of_pipes, sub ($num) {
         Time::HiRes::sleep(0.01);
         open my $fh, ">>", "$tempdir/file.$$" or die;
         print {$fh} "$num\n";
@@ -50,7 +49,7 @@ my $subtest = sub {
     $pipes->close;
 };
 
-subtest number_of_pipes1 => sub { $subtest->(1) };
-subtest number_of_pipes5 => sub { $subtest->(5) } unless $^O eq 'MSWin32';
+subtest number_of_pipes1 => sub (@) { $subtest->(1) };
+subtest number_of_pipes5 => sub (@) { $subtest->(5) } unless $^O eq 'MSWin32';
 
 done_testing;

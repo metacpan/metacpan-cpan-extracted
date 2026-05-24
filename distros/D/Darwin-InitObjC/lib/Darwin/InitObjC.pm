@@ -1,19 +1,21 @@
-package Darwin::InitObjC;
-use strict;
+package Darwin::InitObjC v1.0.0;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
+
+our $TRIAL = 0;
 
 use Config ();
 
-our $VERSION = '0.001';
 
-sub init {
+sub init () {
     require DynaLoader;
     DynaLoader::dl_load_file("/System/Library/Frameworks/Foundation.framework/Foundation");
 }
 
 my $maybe_init;
 
-sub maybe_init {
+sub maybe_init () {
     return if $maybe_init;
     if ($^O eq "darwin" && $Config::Config{perlpath} eq "/usr/bin/perl") {
         init();
@@ -58,6 +60,13 @@ A workaround is to initilize Objective-C runtime before calling fork(2).
 =head1 SEE ALSO
 
 https://bugs.ruby-lang.org/issues/14009
+
+=head1 ARTIFACT ATTESTATIONS
+
+GitHub Artifact Attestations are generated for release tarballs uploaded to
+CPAN. If you care about provenance for the uploaded tarballs, see:
+
+L<https://github.com/skaji/perl-Darwin-InitObjC/attestations>
 
 =head1 COPYRIGHT AND LICENSE
 

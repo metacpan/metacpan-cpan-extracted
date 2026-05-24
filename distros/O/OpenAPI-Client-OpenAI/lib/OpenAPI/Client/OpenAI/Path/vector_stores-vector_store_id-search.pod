@@ -4,88 +4,142 @@
 
 OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-search - Documentation for the /vector_stores/{vector_store_id}/search path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</vector_stores/{vector_store_id}/search>.
+=head2 POST /vector_stores/{vector_store_id}/search
 
-=head1 PATHS
+=head3 searchVectorStore
 
+  $client->search_vector_store({
+      body => { ... },
+  });
 
-=head2 C<POST /vector_stores/{vector_store_id}/search>
+Search a vector store for relevant chunks based on a query and file attributes
+filter.
 
-Search vector store
+=head4 Path/query parameters
 
+=over
 
-Search a vector store for relevant chunks based on a query and file attributes filter.
-
-
-
-=head3 Operation ID
-
-C<searchVectorStore>
-
-    $client->searchVectorStore( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<vector_store_id> (in path) (Required) - The ID of the vector store to search.
-
-Type: C<string>
-
-
+=item * C<vector_store_id> (in path, required, string) - The ID of the vector store to search.
 
 =back
 
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
+=head4 Responses
 
-    
-      
+B<200 - OK>
 
-      
-      
+Content-Type: application/json
+
 Example:
-
-    {
-       "ranking_options" : null
-    }
-
-
-             
-
-=head3 Responses
-
-
-=head4 Status Code: C<200>
-
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
 
     {
        "data" : [
           {
+             "attributes" : {},
              "content" : [
-                null
-             ]
+                {
+                   "text" : "string",
+                   "type" : "text"
+                }
+             ],
+             "file_id" : "string",
+             "filename" : "string",
+             "score" : 0
           }
        ],
+       "has_more" : false,
+       "next_page" : "string",
+       "object" : "vector_store.search_results.page",
        "search_query" : [
-          null
+          "string"
        ]
     }
 
+=head1 SCHEMAS
+
+=head2 VectorStoreFileAttributes
+
+Set of 16 key-value pairs that can be attached to an object. This can be
+useful for storing additional information about the object in a structured
+format, and querying for objects via API or the dashboard. Keys are strings
+with a maximum length of 64 characters. Values are strings with a maximum
+length of 512 characters, booleans, or numbers.
+
+=head2 VectorStoreSearchRequest
+
+Properties:
+
+=over
+
+=item * C<filters> (oneOf) - A filter to apply based on file attributes.
+
+=item * C<max_num_results> (integer) - The maximum number of results to return. This number should be between 1 and
+50 inclusive.
+
+Default: 10
+
+=item * C<query> (oneOf, required) - A query string for a search
+
+=item * C<ranking_options> (object) - Ranking options for search.
+
+=item * C<rewrite_query> (boolean) - Whether to rewrite the natural language query for vector search.
+
+Default: 
+
+=back
+
+=head2 VectorStoreSearchResultContentObject
+
+Properties:
+
+=over
+
+=item * C<text> (string, required) - The text content returned from search.
+
+=item * C<type> (string, required) - The type of content.
+
+Allowed values: text
+
+=back
+
+=head2 VectorStoreSearchResultItem
+
+Properties:
+
+=over
+
+=item * C<attributes> (VectorStoreFileAttributes, required)
+
+See L</VectorStoreFileAttributes> below for shape.
+
+=item * C<content> (array of VectorStoreSearchResultContentObject, required) - Content chunks from the file.
+
+=item * C<file_id> (string, required) - The ID of the vector store file.
+
+=item * C<filename> (string, required) - The name of the vector store file.
+
+=item * C<score> (number, required) - The similarity score for the result.
+
+=back
+
+=head2 VectorStoreSearchResultsPage
+
+Properties:
+
+=over
+
+=item * C<data> (array of VectorStoreSearchResultItem, required) - The list of search result items.
+
+=item * C<has_more> (boolean, required) - Indicates if there are more results to fetch.
+
+=item * C<next_page> (anyOf, required)
+
+=item * C<object> (string, required) - The object type, which is always C<vector_store.search_results.page>
+
+Allowed values: vector_store.search_results.page
+
+=item * C<search_query> (array of string, required)
 
 =back
 

@@ -4,116 +4,95 @@
 
 OpenAPI::Client::OpenAI::Path::containers-container_id-files-file_id - Documentation for the /containers/{container_id}/files/{file_id} path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</containers/{container_id}/files/{file_id}>.
+=head2 DELETE /containers/{container_id}/files/{file_id}
 
-=head1 PATHS
+=head3 DeleteContainerFile
 
-
-=head2 C<DELETE /containers/{container_id}/files/{file_id}>
-
-Delete a container file
-
+  $client->delete_container_file({
+      body => { ... },
+  });
 
 Delete Container File
 
+Delete a container file.
 
+=head4 Path/query parameters
 
-=head3 Operation ID
+=over
 
-C<DeleteContainerFile>
+=item * C<container_id> (in path, required, string)
 
-    $client->DeleteContainerFile( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<container_id> (in path) (Required) - 
-
-Type: C<string>
-
-
-
-=item * C<file_id> (in path) (Required) - 
-
-Type: C<string>
-
-
+=item * C<file_id> (in path, required, string)
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - OK>
 
+=head2 GET /containers/{container_id}/files/{file_id}
 
-=head4 Status Code: C<200>
+=head3 RetrieveContainerFile
 
-OK
-
-
-=head2 C<GET /containers/{container_id}/files/{file_id}>
-
-Retrieve container file
-
+  $client->retrieve_container_file({
+      body => { ... },
+  });
 
 Retrieve Container File
 
+Retrieves a container file.
 
+=head4 Path/query parameters
 
-=head3 Operation ID
+=over
 
-C<RetrieveContainerFile>
+=item * C<container_id> (in path, required, string)
 
-    $client->RetrieveContainerFile( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<container_id> (in path) (Required) - 
-
-Type: C<string>
-
-
-
-=item * C<file_id> (in path) (Required) - 
-
-Type: C<string>
-
-
+=item * C<file_id> (in path, required, string)
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - Success>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-Success
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-        "id": "cfile_682e0e8a43c88191a7978f477a09bdf5",
-        "object": "container.file",
-        "created_at": 1747848842,
-        "bytes": 880,
-        "container_id": "cntr_682e0e7318108198aa783fd921ff305e08e78805b9fdbb04",
-        "path": "/mnt/data/88e12fa445d32636f190a0b33daed6cb-tsconfig.json",
-        "source": "user"
+       "bytes" : 880,
+       "container_id" : "cntr_682e0e7318108198aa783fd921ff305e08e78805b9fdbb04",
+       "created_at" : 1747848842,
+       "id" : "cfile_682e0e8a43c88191a7978f477a09bdf5",
+       "object" : "container.file",
+       "path" : "/mnt/data/88e12fa445d32636f190a0b33daed6cb-tsconfig.json",
+       "source" : "user"
     }
 
+=head1 SCHEMAS
+
+=head2 ContainerFileResource
+
+Properties:
+
+=over
+
+=item * C<bytes> (integer, required) - Size of the file in bytes.
+
+=item * C<container_id> (string, required) - The container this file belongs to.
+
+=item * C<created_at> (integer, required) - Unix timestamp (in seconds) when the file was created.
+
+=item * C<id> (string, required) - Unique identifier for the file.
+
+=item * C<object> (string, required) - The type of this object (C<container.file>).
+
+=item * C<path> (string, required) - Path of the file in the container.
+
+=item * C<source> (string, required) - Source of the file (e.g., C<user> , C<assistant> ).
 
 =back
 

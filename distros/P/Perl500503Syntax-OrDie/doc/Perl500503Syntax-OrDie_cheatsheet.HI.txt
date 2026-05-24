@@ -1,0 +1,108 @@
+Perl500503Syntax::OrDie त्वरित संदर्भ (हिन्दी)
+================================================
+
+नाम
+    Perl500503Syntax::OrDie - Perl 5.005_03 स्रोत कोड संगतता सत्यापन
+
+संस्करण
+    0.01
+
+सारांश
+    use Perl500503Syntax::OrDie;
+
+    use Perl500503Syntax::OrDie ();
+    Perl500503Syntax::OrDie::check_file('/path/to/script.pl');
+    Perl500503Syntax::OrDie::check_source($source, 'label.pl');
+
+    # कमांड के रूप में:
+    perl lib/Perl500503Syntax/OrDie.pm script.pl
+    perl lib/Perl500503Syntax/OrDie.pm script1.pl script2.pl ...
+    perl lib/Perl500503Syntax/OrDie.pm -
+
+विवरण
+    कमांड के रूप में चलाने पर प्रत्येक निर्दिष्ट फ़ाइल की जाँच करता है।
+    बिना तर्क के चलाने पर उपयोग विधि दिखाता है।
+
+जाँचे जाने वाले निर्माण (स्थैतिक)
+    Perl 5.6  : our / 3-arg open / use utf8 / \x{} / @+@- /
+                CHECK/INIT / v-string / $^V / :lvalue / \p{}\P{}
+    Perl 5.8  : use encoding / PerlIO layers
+    Perl 5.10 : //= // say state given/when ~~ use feature
+                \K (?<name>) \k<name> (?|) (*VERB) \h\v\R
+                UNITCHECK possessive-quantifiers (?1)(?R) ${^MATCH} \g{N}
+    Perl 5.12 : package NAME VERSION / ...
+    Perl 5.14 : s///r tr///r
+    Perl 5.16 : __SUB__
+    Perl 5.20 : subroutine signatures / $ref->@*
+    Perl 5.22 : <<>> / /n
+    Perl 5.26 : <<~
+    Perl 5.30 : (?<=.{2,}X) variable-length lookbehind (experimental; stable 5.38)
+    Perl 5.32 : isa
+    Perl 5.34 : try/catch
+    Perl 5.36 : use builtin / for my ($a,$b)
+    Perl 5.38 : class
+
+Perl संस्करण इतिहास (इस मॉड्यूल द्वारा जाँचे जाने वाले फ़ीचर)
+    संदर्भ: https://perldoc.perl.org/perl56delta
+             https://perldoc.perl.org/perl5100delta
+             https://perldoc.perl.org/perl5180delta
+             https://perldoc.perl.org/perl5220delta
+             https://perldoc.perl.org/perl5240delta
+             https://perldoc.perl.org/perl5280delta
+             https://perldoc.perl.org/perl5300delta
+             https://perldoc.perl.org/perl5380delta
+             https://perldoc.perl.org/perl5400delta
+             https://perldoc.perl.org/perl5420delta
+
+  perl56delta (Perl 5.6.0, 2000-03-22)
+    our: लेक्सिकल स्कोप पैकेज वेरिएबल। "use vars" उपयोग करें।
+    3-arg open(): open(FH, ">path") उपयोग करें।
+    use utf8 / use VERSION>=5.6 / \x{HHHH} / \N{name}
+    @+/@- मिलान-स्थिति सरणियाँ
+    CHECK/INIT फेज़ ब्लॉक
+    v-string / $^V / :lvalue / \p{}\P{}
+    बिना मोड mkdir: 5.005_03 में mkdir(PATH, MODE) आवश्यक
+
+  perl58delta (Perl 5.8.0): use encoding / PerlIO layers
+  perl5100delta (Perl 5.10.0): // //= say state given/when ~~
+    use feature \K (?<name>) \k<name> (?|) (*VERB) \h\v\R
+    UNITCHECK a++ (?1)(?R) ${^MATCH} \g{N}
+  perl5120delta (5.12): package NAME VERSION / ...
+  perl5140delta (5.14): s///r tr///r
+  perl5160delta (5.16): __SUB__
+  perl5200delta (5.20): signatures / $ref->@*
+  perl5220delta (5.22): <<>> / /n
+  perl5260delta (5.26): <<~
+  perl5320delta (5.32): isa
+  perl5340delta (5.34): try/catch
+  perl5360delta (5.36): use builtin / for my ($a,$b)
+  perl5300delta (5.30): variable-length lookbehind in regex (experimental; stable Perl 5.38)
+
+  perl5380delta (5.38): class
+
+  perl5180delta (5.18): my sub / state sub -- lexical subroutines
+
+  perl5400delta (Perl 5.40.0, 2024-06-09)
+    ^^ / ^^= high-precedence logical XOR operator
+      $x ^^ $y  -- completes the &&/|| set; use "xor" for 5.005_03.
+    __CLASS__ keyword (inside class blocks)
+      Runtime class name inside method/ADJUST/field (requires class feature).
+
+  perl5420delta (Perl 5.42.0, 2025-07-02)
+    any BLOCK LIST / all BLOCK LIST (experimental keywords)
+      any { EXPR } @list  -- use List::Util::any for 5.005_03.
+    my method / ->& lexical method call (requires class feature)
+      my method foo () { ... }  -- lexically scoped private method.
+
+सुरक्षित मुहावरे (Perl 5.005_03)
+    use vars qw($x @arr %hash);           "our" के बजाय
+    open(FH, ">$path") or die $!;         2-तर्क bareword
+    mkdir("dir", 0755) or die $!;         स्पष्ट मोड
+    $x = defined($y) ? $y : 'v';          //= के बजाय
+    print "...\n";                         say के बजाय
+
+लेखक
+    INABA Hitoshi <ina@cpan.org>
+
+लाइसेंस
+    Perl के समान शर्तों के तहत पुनर्वितरित की जा सकने वाली मुक्त लाइब्रेरी।

@@ -4,178 +4,166 @@
 
 OpenAPI::Client::OpenAI::Path::threads-thread_id - Documentation for the /threads/{thread_id} path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</threads/{thread_id}>.
+=head2 DELETE /threads/{thread_id}
 
-=head1 PATHS
+=head3 deleteThread
 
-
-=head2 C<DELETE /threads/{thread_id}>
-
-Delete thread
-
+  $client->delete_thread({
+      body => { ... },
+  });
 
 Delete a thread.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
-
-C<deleteThread>
-
-    $client->deleteThread( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<thread_id> (in path) (Required) - The ID of the thread to delete.
-
-Type: C<string>
-
-
+=item * C<thread_id> (in path, required, string) - The ID of the thread to delete.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - OK>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
+Example:
 
-OK
+    {
+       "deleted" : false,
+       "id" : "string",
+       "object" : "thread.deleted"
+    }
 
+=head2 GET /threads/{thread_id}
 
-=head4 Content Types:
+=head3 getThread
 
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
-
-
-
-=back
-
-=head2 C<GET /threads/{thread_id}>
-
-Retrieve thread
-
+  $client->get_thread({
+      body => { ... },
+  });
 
 Retrieves a thread.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
-
-C<getThread>
-
-    $client->getThread( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<thread_id> (in path) (Required) - The ID of the thread to retrieve.
-
-Type: C<string>
-
-
+=item * C<thread_id> (in path, required, string) - The ID of the thread to retrieve.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - OK>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-      "id": "thread_abc123",
-      "object": "thread",
-      "created_at": 1698107661,
-      "metadata": {}
+       "created_at" : 1698107661,
+       "id" : "thread_abc123",
+       "metadata" : {},
+       "object" : "thread"
     }
 
+=head2 POST /threads/{thread_id}
 
-=back
+=head3 modifyThread
 
-=head2 C<POST /threads/{thread_id}>
-
-Modify thread
-
+  $client->modify_thread({
+      body => { ... },
+  });
 
 Modifies a thread.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
-
-C<modifyThread>
-
-    $client->modifyThread( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<thread_id> (in path) (Required) - The ID of the thread to modify. Only the `metadata` can be modified.
-
-Type: C<string>
-
-
+=item * C<thread_id> (in path, required, string) - The ID of the thread to modify. Only the C<metadata> can be modified.
 
 =back
 
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
+=head4 Responses
 
-    
-      
+B<200 - OK>
 
-      
-             
+Content-Type: application/json
 
-=head3 Responses
-
-
-=head4 Status Code: C<200>
-
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-      "id": "thread_abc123",
-      "object": "thread",
-      "created_at": 1698107661,
-      "metadata": {}
+       "created_at" : 1698107661,
+       "id" : "thread_abc123",
+       "metadata" : {},
+       "object" : "thread"
     }
 
+=head1 SCHEMAS
+
+=head2 DeleteThreadResponse
+
+Properties:
+
+=over
+
+=item * C<deleted> (boolean, required)
+
+=item * C<id> (string, required)
+
+=item * C<object> (string, required)
+
+Allowed values: thread.deleted
+
+=back
+
+=head2 Metadata
+
+Set of 16 key-value pairs that can be attached to an object. This can be
+useful for storing additional information about the object in a structured
+format, and querying for objects via API or the dashboard.
+
+Keys are strings with a maximum length of 64 characters. Values are strings
+with a maximum length of 512 characters.
+
+=head2 ModifyThreadRequest
+
+Properties:
+
+=over
+
+=item * C<metadata> (Metadata)
+
+See L</Metadata> below for shape.
+
+=item * C<tool_resources> (anyOf)
+
+=back
+
+=head2 ThreadObject
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) for when the thread was created.
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints.
+
+=item * C<metadata> (Metadata, required)
+
+See L</Metadata> below for shape.
+
+=item * C<object> (string, required) - The object type, which is always C<thread> .
+
+Allowed values: thread
+
+=item * C<tool_resources> (anyOf, required)
 
 =back
 

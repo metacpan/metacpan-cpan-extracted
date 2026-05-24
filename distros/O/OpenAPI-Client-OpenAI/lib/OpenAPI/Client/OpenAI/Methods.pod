@@ -1,6744 +1,2982 @@
-=encoding UTF-8
+=encoding utf8
 
 =head1 NAME
 
-OpenAPI::Client::OpenAI::Methods - Methods for OpenAI API
-
-=head1 DESCRIPTION
-
-Yes, this isn't perfect. But it's a start. The OpenAI API is complex and and
-the L<OpenAPI::Client> module is a bit opaque at times. We'll add more later.
+OpenAPI::Client::OpenAI::Methods - Index of API methods (snake_case)
 
 =head1 METHODS
 
+=head2 accept_realtime_call
 
-=head2 addUploadPart
+POST /realtime/calls/{call_id}/accept
+
+operationId: accept-realtime-call
+
+Accept an incoming SIP call and configure the realtime session that will
+handle it.
+
+See L<OpenAPI::Client::OpenAI::Path::realtime-calls-call_id-accept>.
+
+=head2 activate_organization_certificates
+
+POST /organization/certificates/activate
+
+operationId: activateOrganizationCertificates
+
+Activate certificates at the organization level.
+
+You can atomically and idempotently activate up to 10 certificates at a time.
+
+See L<OpenAPI::Client::OpenAI::Path::organization-certificates-activate>.
+
+=head2 activate_project_certificates
+
+POST /organization/projects/{project_id}/certificates/activate
+
+operationId: activateProjectCertificates
+
+Activate certificates at the project level.
+
+You can atomically and idempotently activate up to 10 certificates at a time.
+
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-certificates-activate>.
+
+=head2 add_group_user
+
+POST /organization/groups/{group_id}/users
+
+operationId: add-group-user
+
+Adds a user to a group.
+
+See L<OpenAPI::Client::OpenAI::Path::organization-groups-group_id-users>.
+
+=head2 add_project_group
+
+POST /organization/projects/{project_id}/groups
+
+operationId: add-project-group
+
+Grants a group access to a project.
+
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-groups>.
+
+=head2 add_upload_part
+
+POST /uploads/{upload_id}/parts
+
+operationId: addUploadPart
 
 Adds a
-L<Part|https://platform.openai.com/docs/api-reference/uploads/part-obje
-ct> to an
-L<Upload|https://platform.openai.com/docs/api-reference/uploads/object>
-object. A Part represents a chunk of bytes from the file you are trying
-to upload. 
+L<Part|https://platform.openai.com/docs/api-reference/uploads/part-object> to
+an L<Upload|https://platform.openai.com/docs/api-reference/uploads/object>
+object. A Part represents a chunk of bytes from the file you are trying to
+upload.
 
-Each Part can be at most 64 MB, and you can add Parts until you hit the
-Upload maximum of 8 GB.
+Each Part can be at most 64 MB, and you can add Parts until you hit the Upload
+maximum of 8 GB.
 
-It is possible to add multiple Parts in parallel. You can decide the
-intended order of the Parts when you L<complete the
-Upload|https://platform.openai.com/docs/api-reference/uploads/complete>
+It is possible to add multiple Parts in parallel. You can decide the intended
+order of the Parts when you
+L<complete the Upload|https://platform.openai.com/docs/api-reference/uploads/complete>
 .
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::uploads-upload_id-parts>.
 
+=head2 admin_api_keys_create
 
-=head4 upload_id
+POST /organization/admin_api_keys
 
-The ID of the Upload.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  upload_abc123
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head3 Request Body
-
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
-
-=head2 admin-api-keys-create
+operationId: admin-api-keys-create
 
 Create an organization admin API key
 
-This method does not take any path or URL parameters.
+See L<OpenAPI::Client::OpenAI::Path::organization-admin_api_keys>.
 
+=head2 admin_api_keys_delete
 
-=head3 Request Body
+DELETE /organization/admin_api_keys/{key_id}
 
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
-
-=head2 admin-api-keys-delete
+operationId: admin-api-keys-delete
 
 Delete an organization admin API key
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::organization-admin_api_keys-key_id>.
 
+=head2 admin_api_keys_get
 
-=head4 key_id
+GET /organization/admin_api_keys/{key_id}
 
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 admin-api-keys-get
+operationId: admin-api-keys-get
 
 Retrieve a single organization API key
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::organization-admin_api_keys-key_id>.
 
+=head2 admin_api_keys_list
 
-=head4 key_id
+GET /organization/admin_api_keys
 
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 admin-api-keys-list
+operationId: admin-api-keys-list
 
 List organization API keys
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::organization-admin_api_keys>.
 
+=head2 archive_project
 
-=head4 after
+POST /organization/projects/{project_id}/archive
 
+operationId: archive-project
 
-=over 4
+Archives a project in the organization. Archived projects cannot be used or
+updated.
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-archive>.
 
-=item * In:       query
+=head2 assign_group_role
 
-=item * Required: False
+POST /organization/groups/{group_id}/roles
 
-=item * Default:  N/A
+operationId: assign-group-role
 
-=item * Example:  N/A
+Assigns an organization role to a group within the organization.
 
-=item * Enum:     N/A
+See L<OpenAPI::Client::OpenAI::Path::organization-groups-group_id-roles>.
 
-=back
+=head2 assign_project_group_role
 
+POST /projects/{project_id}/groups/{group_id}/roles
 
-=head4 order
+operationId: assign-project-group-role
 
+Assigns a project role to a group within a project.
 
-=over 4
+See L<OpenAPI::Client::OpenAI::Path::projects-project_id-groups-group_id-roles>.
 
-=item * Type:     string
+=head2 assign_project_user_role
 
-=item * In:       query
+POST /projects/{project_id}/users/{user_id}/roles
 
-=item * Required: False
+operationId: assign-project-user-role
 
-=item * Default:  asc
+Assigns a project role to a user within a project.
 
-=item * Example:  N/A
+See L<OpenAPI::Client::OpenAI::Path::projects-project_id-users-user_id-roles>.
 
-=item * Enum:     asc, desc
+=head2 assign_user_role
 
-=back
+POST /organization/users/{user_id}/roles
 
+operationId: assign-user-role
 
-=head4 limit
+Assigns an organization role to a user within the organization.
 
+See L<OpenAPI::Client::OpenAI::Path::organization-users-user_id-roles>.
 
-=over 4
+=head2 cancel_batch
 
-=item * Type:     integer
+POST /batches/{batch_id}/cancel
 
-=item * In:       query
+operationId: cancelBatch
 
-=item * Required: False
+Cancels an in-progress batch. The batch will be in status C<cancelling> for up
+to 10 minutes, before changing to C<cancelled> , where it will have partial
+results (if any) available in the output file.
 
-=item * Default:  20
+See L<OpenAPI::Client::OpenAI::Path::batches-batch_id-cancel>.
 
-=item * Example:  N/A
+=head2 cancel_chat_session_method
 
-=item * Enum:     N/A
+POST /chatkit/sessions/{session_id}/cancel
 
-=back
+operationId: CancelChatSessionMethod
 
+Cancel an active ChatKit session and return its most recent metadata.
 
+Cancelling prevents new requests from using the issued client secret.
 
+See L<OpenAPI::Client::OpenAI::Path::chatkit-sessions-session_id-cancel>.
 
-=head2 archive-project
+=head2 cancel_eval_run
 
-Archives a project in the organization. Archived projects cannot be
-used or updated.
+POST /evals/{eval_id}/runs/{run_id}
 
-=head3 Parameters
+operationId: cancelEvalRun
 
+Cancel an ongoing evaluation run.
 
-=head4 project_id
+See L<OpenAPI::Client::OpenAI::Path::evals-eval_id-runs-run_id>.
 
-The ID of the project.
+=head2 cancel_fine_tuning_job
 
-=over 4
+POST /fine_tuning/jobs/{fine_tuning_job_id}/cancel
 
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 cancelBatch
-
-Cancels an in-progress batch. The batch will be in status C<cancelling>
-for up to 10 minutes, before changing to C<cancelled>, where it will
-have partial results (if any) available in the output file.
-
-=head3 Parameters
-
-
-=head4 batch_id
-
-The ID of the batch to cancel.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 cancelFineTuningJob
+operationId: cancelFineTuningJob
 
 Immediately cancel a fine-tune job.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::fine_tuning-jobs-fine_tuning_job_id-cancel>.
 
+=head2 cancel_response
 
-=head4 fine_tuning_job_id
+POST /responses/{response_id}/cancel
 
-The ID of the fine-tuning job to cancel.
+operationId: cancelResponse
 
-=over 4
+Cancels a model response with the given ID. Only responses created with the
+C<background> parameter set to C<true> can be cancelled.
+L<Learn more|https://platform.openai.com/docs/guides/background> .
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::responses-response_id-cancel>.
 
-=item * In:       path
+=head2 cancel_run
 
-=item * Required: True
+POST /threads/{thread_id}/runs/{run_id}/cancel
 
-=item * Default:  N/A
+operationId: cancelRun
 
-=item * Example:  ft-AF1WoRqd3aJAHsqc9NY7iL8F
+Cancels a run that is C<in_progress> .
 
-=item * Enum:     N/A
+See L<OpenAPI::Client::OpenAI::Path::threads-thread_id-runs-run_id-cancel>.
 
-=back
+=head2 cancel_upload
 
+POST /uploads/{upload_id}/cancel
 
-
-
-=head2 cancelRun
-
-Cancels a run that is C<in_progress>.
-
-=head3 Parameters
-
-
-=head4 thread_id
-
-The ID of the thread to which this run belongs.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 run_id
-
-The ID of the run to cancel.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 cancelUpload
+operationId: cancelUpload
 
 Cancels the Upload. No Parts may be added after an Upload is cancelled.
 
-=head3 Parameters
+Returns the Upload object with status C<cancelled> .
 
+See L<OpenAPI::Client::OpenAI::Path::uploads-upload_id-cancel>.
 
-=head4 upload_id
+=head2 cancel_vector_store_file_batch
 
-The ID of the Upload.
+POST /vector_stores/{vector_store_id}/file_batches/{batch_id}/cancel
 
-=over 4
+operationId: cancelVectorStoreFileBatch
 
-=item * Type:     string
+Cancel a vector store file batch. This attempts to cancel the processing of
+files in this batch as soon as possible.
 
-=item * In:       path
+See L<OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-file_batches-batch_id-cancel>.
 
-=item * Required: True
+=head2 compactconversation
 
-=item * Default:  N/A
+POST /responses/compact
 
-=item * Example:  upload_abc123
+operationId: Compactconversation
 
-=item * Enum:     N/A
+Compact a conversation. Returns a compacted response object.
 
-=back
+Learn when and how to compact long-running conversations in the
+L<conversation state guide|https://platform.openai.com/docs/guides/conversation-state#managing-the-context-window>
+. For ZDR-compatible compaction details, see
+L<Compaction (advanced)|https://platform.openai.com/docs/guides/conversation-state#compaction-advanced>
+.
 
+See L<OpenAPI::Client::OpenAI::Path::responses-compact>.
 
+=head2 complete_upload
 
+POST /uploads/{upload_id}/complete
 
-=head2 cancelVectorStoreFileBatch
-
-Cancel a vector store file batch. This attempts to cancel the
-processing of files in this batch as soon as possible.
-
-=head3 Parameters
-
-
-=head4 vector_store_id
-
-The ID of the vector store that the file batch belongs to.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 batch_id
-
-The ID of the file batch to cancel.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 completeUpload
+operationId: completeUpload
 
 Completes the
-L<Upload|https://platform.openai.com/docs/api-reference/uploads/object>
-. 
+L<Upload|https://platform.openai.com/docs/api-reference/uploads/object> .
 
 Within the returned Upload object, there is a nested
-L<File|https://platform.openai.com/docs/api-reference/files/object>
-object that is ready to use in the rest of the platform.
+L<File|https://platform.openai.com/docs/api-reference/files/object> object
+that is ready to use in the rest of the platform.
 
-You can specify the order of the Parts by passing in an ordered list of
-the Part IDs.
+You can specify the order of the Parts by passing in an ordered list of the
+Part IDs.
 
-The number of bytes uploaded upon completion must match the number of
-bytes initially specified when creating the Upload object. No Parts may
-be added after an Upload is completed.
+The number of bytes uploaded upon completion must match the number of bytes
+initially specified when creating the Upload object. No Parts may be added
+after an Upload is completed. Returns the Upload object with status
+C<completed> , including an additional C<file> property containing the created
+usable File object.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::uploads-upload_id-complete>.
 
+=head2 create_assistant
 
-=head4 upload_id
+POST /assistants
 
-The ID of the Upload.
+operationId: createAssistant
 
-=over 4
+Create an assistant with a model and instructions.
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::assistants>.
 
-=item * In:       path
+=head2 create_batch
 
-=item * Required: True
+POST /batches
 
-=item * Default:  N/A
+operationId: createBatch
 
-=item * Example:  upload_abc123
+Creates and executes a batch from an uploaded file of requests
 
-=item * Enum:     N/A
+See L<OpenAPI::Client::OpenAI::Path::batches>.
 
-=back
+=head2 create_chat_completion
 
+POST /chat/completions
 
+operationId: createChatCompletion
 
+B<Starting a new project?> We recommend trying
+L<Responses|https://platform.openai.com/docs/api-reference/responses> to take
+advantage of the latest OpenAI platform features. Compare
+L<Chat Completions with Responses|https://platform.openai.com/docs/guides/responses-vs-chat-completions?api-mode=responses>
+.
 
-=head3 Request Body
+Creates a model response for the given chat conversation. Learn more in the
+L<text generation|https://platform.openai.com/docs/guides/text-generation> ,
+L<vision|https://platform.openai.com/docs/guides/vision> , and
+L<audio|https://platform.openai.com/docs/guides/audio> guides.
 
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
+Parameter support can differ depending on the model used to generate the
+response, particularly for newer reasoning models. Parameters that are only
+supported for reasoning models are noted below. For the current state of
+unsupported parameters in reasoning models,
+L<refer to the reasoning guide|https://platform.openai.com/docs/guides/reasoning>
+.
 
-=head2 create-project
+Returns a chat completion object, or a streamed sequence of chat completion
+chunk objects if the request is streamed.
+
+See L<OpenAPI::Client::OpenAI::Path::chat-completions>.
+
+=head2 create_chat_session_method
+
+POST /chatkit/sessions
+
+operationId: CreateChatSessionMethod
+
+Create a ChatKit session.
+
+See L<OpenAPI::Client::OpenAI::Path::chatkit-sessions>.
+
+=head2 create_completion
+
+POST /completions
+
+operationId: createCompletion
+
+Creates a completion for the provided prompt and parameters.
+
+Returns a completion object, or a sequence of completion objects if the
+request is streamed.
+
+See L<OpenAPI::Client::OpenAI::Path::completions>.
+
+=head2 create_container
+
+POST /containers
+
+operationId: CreateContainer
+
+Create Container
+
+See L<OpenAPI::Client::OpenAI::Path::containers>.
+
+=head2 create_container_file
+
+POST /containers/{container_id}/files
+
+operationId: CreateContainerFile
+
+Create a Container File
+
+You can send either a multipart/form-data request with the raw file content,
+or a JSON request with a file ID.
+
+See L<OpenAPI::Client::OpenAI::Path::containers-container_id-files>.
+
+=head2 create_conversation
+
+POST /conversations
+
+operationId: createConversation
+
+Create a conversation.
+
+See L<OpenAPI::Client::OpenAI::Path::conversations>.
+
+=head2 create_conversation_items
+
+POST /conversations/{conversation_id}/items
+
+operationId: createConversationItems
+
+Create items in a conversation with the given ID.
+
+See L<OpenAPI::Client::OpenAI::Path::conversations-conversation_id-items>.
+
+=head2 create_embedding
+
+POST /embeddings
+
+operationId: createEmbedding
+
+Creates an embedding vector representing the input text.
+
+See L<OpenAPI::Client::OpenAI::Path::embeddings>.
+
+=head2 create_eval
+
+POST /evals
+
+operationId: createEval
+
+Create the structure of an evaluation that can be used to test a model's
+performance. An evaluation is a set of testing criteria and the config for a
+data source, which dictates the schema of the data used in the evaluation.
+After creating an evaluation, you can run it on different models and model
+parameters. We support several types of graders and datasources. For more
+information, see the
+L<Evals guide|https://platform.openai.com/docs/guides/evals> .
+
+See L<OpenAPI::Client::OpenAI::Path::evals>.
+
+=head2 create_eval_run
+
+POST /evals/{eval_id}/runs
+
+operationId: createEvalRun
+
+Kicks off a new run for a given evaluation, specifying the data source, and
+what model configuration to use to test. The datasource will be validated
+against the schema specified in the config of the evaluation.
+
+See L<OpenAPI::Client::OpenAI::Path::evals-eval_id-runs>.
+
+=head2 create_file
+
+POST /files
+
+operationId: createFile
+
+Upload a file that can be used across various endpoints. Individual files can
+be up to 512 MB, and each project can store up to 2.5 TB of files in total.
+There is no organization-wide storage limit. Uploads to this endpoint are
+rate-limited to 1,000 requests per minute per authenticated user.
+
+- The Assistants API supports files up to 2 million tokens and of specific
+file types. See the
+L<Assistants Tools guide|https://platform.openai.com/docs/assistants/tools>
+for details. - The Fine-tuning API only supports C<.jsonl> files. The input
+also has certain required formats for fine-tuning
+L<chat|https://platform.openai.com/docs/api-reference/fine-tuning/chat-input>
+or
+L<completions|https://platform.openai.com/docs/api-reference/fine-tuning/completions-input>
+models. - The Batch API only supports C<.jsonl> files up to 200 MB in size.
+The input also has a specific required
+L<format|https://platform.openai.com/docs/api-reference/batch/request-input> .
+- For Retrieval or C<file_search> ingestion, upload files here first. If you
+need to attach multiple uploaded files to the same vector store, use
+L<C</vector_stores/{vector_store_id}/file_batches>|https://platform.openai.com/docs/api-reference/vector-stores-file-batches/createBatch>
+instead of attaching them one by one. Vector store attachment has separate
+limits from file upload, including 2,000 attached files per minute per
+organization.
+
+Please L<contact us|https://help.openai.com/> if you need to increase these
+storage limits.
+
+See L<OpenAPI::Client::OpenAI::Path::files>.
+
+=head2 create_fine_tuning_checkpoint_permission
+
+POST /fine_tuning/checkpoints/{fine_tuned_model_checkpoint}/permissions
+
+operationId: createFineTuningCheckpointPermission
+
+B<NOTE:> Calling this endpoint requires an L<admin API key|../admin-api-keys>
+.
+
+This enables organization owners to share fine-tuned models with other
+projects in their organization.
+
+See L<OpenAPI::Client::OpenAI::Path::fine_tuning-checkpoints-fine_tuned_model_checkpoint-permissions>.
+
+=head2 create_fine_tuning_job
+
+POST /fine_tuning/jobs
+
+operationId: createFineTuningJob
+
+Creates a fine-tuning job which begins the process of creating a new model
+from a given dataset.
+
+Response includes details of the enqueued job including job status and the
+name of the fine-tuned models once complete.
+
+L<Learn more about fine-tuning|https://platform.openai.com/docs/guides/model-optimization>
+
+See L<OpenAPI::Client::OpenAI::Path::fine_tuning-jobs>.
+
+=head2 create_group
+
+POST /organization/groups
+
+operationId: create-group
+
+Creates a new group in the organization.
+
+See L<OpenAPI::Client::OpenAI::Path::organization-groups>.
+
+=head2 create_image
+
+POST /images/generations
+
+operationId: createImage
+
+Creates an image given a prompt.
+L<Learn more|https://platform.openai.com/docs/guides/images> .
+
+See L<OpenAPI::Client::OpenAI::Path::images-generations>.
+
+=head2 create_image_edit
+
+POST /images/edits
+
+operationId: createImageEdit
+
+Creates an edited or extended image given one or more source images and a
+prompt. This endpoint supports GPT Image models (C<gpt-image-1.5>,
+C<gpt-image-1> , C<gpt-image-1-mini> , and C<chatgpt-image-latest> ) and
+C<dall-e-2> .
+
+See L<OpenAPI::Client::OpenAI::Path::images-edits>.
+
+=head2 create_image_variation
+
+POST /images/variations
+
+operationId: createImageVariation
+
+Creates a variation of a given image. This endpoint only supports C<dall-e-2>
+.
+
+See L<OpenAPI::Client::OpenAI::Path::images-variations>.
+
+=head2 create_message
+
+POST /threads/{thread_id}/messages
+
+operationId: createMessage
+
+Create a message.
+
+See L<OpenAPI::Client::OpenAI::Path::threads-thread_id-messages>.
+
+=head2 create_moderation
+
+POST /moderations
+
+operationId: createModeration
+
+Classifies if text and/or image inputs are potentially harmful. Learn more in
+the L<moderation guide|https://platform.openai.com/docs/guides/moderation> .
+
+See L<OpenAPI::Client::OpenAI::Path::moderations>.
+
+=head2 create_organization_spend_alert
+
+POST /organization/spend_alerts
+
+operationId: create-organization-spend-alert
+
+Creates an organization spend alert.
+
+See L<OpenAPI::Client::OpenAI::Path::organization-spend_alerts>.
+
+=head2 create_project
+
+POST /organization/projects
+
+operationId: create-project
 
 Create a new project in the organization. Projects can be created and
 archived, but cannot be deleted.
 
-This method does not take any path or URL parameters.
+See L<OpenAPI::Client::OpenAI::Path::organization-projects>.
 
+=head2 create_project_role
 
-=head3 Request Body
+POST /projects/{project_id}/roles
 
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
+operationId: create-project-role
 
-=head2 create-project-service-account
+Creates a custom role for a project.
 
-Creates a new service account in the project. This also returns an
-unredacted API key for the service account.
+See L<OpenAPI::Client::OpenAI::Path::projects-project_id-roles>.
 
-=head3 Parameters
+=head2 create_project_service_account
 
+POST /organization/projects/{project_id}/service_accounts
 
-=head4 project_id
+operationId: create-project-service-account
 
-The ID of the project.
+Creates a new service account in the project. This also returns an unredacted
+API key for the service account.
 
-=over 4
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-service_accounts>.
 
-=item * Type:     string
+=head2 create_project_spend_alert
 
-=item * In:       path
+POST /organization/projects/{project_id}/spend_alerts
 
-=item * Required: True
+operationId: create-project-spend-alert
 
-=item * Default:  N/A
+Creates a project spend alert.
 
-=item * Example:  N/A
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-spend_alerts>.
 
-=item * Enum:     N/A
+=head2 create_project_user
 
-=back
+POST /organization/projects/{project_id}/users
 
+operationId: create-project-user
 
+Adds a user to the project. Users must already be members of the organization
+to be added to a project.
 
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-users>.
 
-=head3 Request Body
+=head2 create_realtime_call
 
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
+POST /realtime/calls
 
-=head2 create-project-user
+operationId: create-realtime-call
 
-Adds a user to the project. Users must already be members of the
-organization to be added to a project.
+Create a new Realtime API call over WebRTC and receive the SDP answer needed
+to complete the peer connection.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::realtime-calls>.
 
+=head2 create_realtime_client_secret
 
-=head4 project_id
+POST /realtime/client_secrets
 
-The ID of the project.
+operationId: create-realtime-client-secret
 
-=over 4
+Create a Realtime client secret with an associated session configuration.
 
-=item * Type:     string
+Client secrets are short-lived tokens that can be passed to a client app, such
+as a web frontend or mobile client, which grants access to the Realtime API
+without leaking your main API key. You can configure a custom TTL for each
+client secret.
 
-=item * In:       path
+You can also attach session configuration options to the client secret, which
+will be applied to any sessions created using that client secret, but these
+can also be overridden by the client connection.
 
-=item * Required: True
+L<Learn more about authentication with client secrets over WebRTC|https://platform.openai.com/docs/guides/realtime-webrtc>
+.
 
-=item * Default:  N/A
+Returns the created client secret and the effective session object. The client
+secret is a string that looks like C<ek_1234> .
 
-=item * Example:  N/A
+See L<OpenAPI::Client::OpenAI::Path::realtime-client_secrets>.
 
-=item * Enum:     N/A
+=head2 create_realtime_session
 
-=back
+POST /realtime/sessions
 
+operationId: create-realtime-session
 
-
-
-=head3 Request Body
-
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
-
-=head2 create-realtime-session
-
-Create an ephemeral API token for use in client-side applications with
-the
+Create an ephemeral API token for use in client-side applications with the
 Realtime API. Can be configured with the same session parameters as the
 C<session.update> client event.
 
-It responds with a session object, plus a C<client_secret> key which
-contains
-a usable ephemeral API token that can be used to authenticate browser
-clients
+It responds with a session object, plus a C<client_secret> key which contains
+a usable ephemeral API token that can be used to authenticate browser clients
 for the Realtime API.
 
-This method does not take any path or URL parameters.
+Returns the created Realtime session object, plus an ephemeral key.
 
+See L<OpenAPI::Client::OpenAI::Path::realtime-sessions>.
 
-=head3 Request Body
+=head2 create_realtime_transcription_session
 
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
+POST /realtime/transcription_sessions
 
-=head2 createAssistant
+operationId: create-realtime-transcription-session
 
-Create an assistant with a model and instructions.
+Create an ephemeral API token for use in client-side applications with the
+Realtime API specifically for realtime transcriptions. Can be configured with
+the same session parameters as the C<transcription_session.update> client
+event.
 
-This method does not take any path or URL parameters.
+It responds with a session object, plus a C<client_secret> key which contains
+a usable ephemeral API token that can be used to authenticate browser clients
+for the Realtime API.
 
+Returns the created Realtime transcription session object, plus an ephemeral
+key.
 
-=head3 Request Body
+See L<OpenAPI::Client::OpenAI::Path::realtime-transcription_sessions>.
 
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
+=head2 create_realtime_translation_client_secret
 
-=head2 createBatch
+POST /realtime/translations/client_secrets
 
-Creates and executes a batch from an uploaded file of requests
+operationId: create-realtime-translation-client-secret
 
-This method does not take any path or URL parameters.
+Create a Realtime translation client secret with an associated translation
+session configuration.
 
+Client secrets are short-lived tokens that can be passed to a client app, such
+as a web frontend or mobile client, which grants access to the Realtime
+Translation API without leaking your main API key. You can configure a custom
+TTL for each client secret.
 
-=head3 Request Body
+Returns the created client secret and the effective translation session
+object. The client secret is a string that looks like C<ek_1234> .
 
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
+See L<OpenAPI::Client::OpenAI::Path::realtime-translations-client_secrets>.
 
-=head2 createChatCompletion
+=head2 create_response
 
-Creates a model response for the given chat conversation. Learn more in
-the
-L<text
-generation|https://platform.openai.com/docs/guides/text-generation>,
-L<vision|https://platform.openai.com/docs/guides/vision>,
-and L<audio|https://platform.openai.com/docs/guides/audio> guides.
+POST /responses
 
-Parameter support can differ depending on the model used to generate
-the
-response, particularly for newer reasoning models. Parameters that are
-only
-supported for reasoning models are noted below. For the current state
-of 
-unsupported parameters in reasoning models, 
-L<refer to the reasoning
-guide|https://platform.openai.com/docs/guides/reasoning>.
-=head3 Examples
+operationId: createResponse
 
-See the following files in the distribution for examples:
+Creates a model response. Provide
+L<text|https://platform.openai.com/docs/guides/text> or
+L<image|https://platform.openai.com/docs/guides/images> inputs to generate
+L<text|https://platform.openai.com/docs/guides/text> or
+L<JSON|https://platform.openai.com/docs/guides/structured-outputs> outputs.
+Have the model call your own
+L<custom code|https://platform.openai.com/docs/guides/function-calling> or use
+built-in L<tools|https://platform.openai.com/docs/guides/tools> like
+L<web search|https://platform.openai.com/docs/guides/tools-web-search> or
+L<file search|https://platform.openai.com/docs/guides/tools-file-search> to
+use your own data as input for the model's response.
 
-=over 4
+See L<OpenAPI::Client::OpenAI::Path::responses>.
 
-=item *	examples/chat.pl
+=head2 create_role
 
-=back
+POST /organization/roles
 
+operationId: create-role
 
-This method does not take any path or URL parameters.
+Creates a custom role for the organization.
 
+See L<OpenAPI::Client::OpenAI::Path::organization-roles>.
 
-=head3 Request Body
+=head2 create_run
 
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
+POST /threads/{thread_id}/runs
 
-=head2 createCompletion
-
-Creates a completion for the provided prompt and parameters.
-=head3 Examples
-
-See the following files in the distribution for examples:
-
-=over 4
-
-=item *	examples/translate.pl
-
-=back
-
-
-This method does not take any path or URL parameters.
-
-
-=head3 Request Body
-
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
-
-=head2 createEmbedding
-
-Creates an embedding vector representing the input text.
-=head3 Examples
-
-See the following files in the distribution for examples:
-
-=over 4
-
-=item *	examples/get-embeddings.pl
-
-=back
-
-
-This method does not take any path or URL parameters.
-
-
-=head3 Request Body
-
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
-
-=head2 createFile
-
-Upload a file that can be used across various endpoints. Individual
-files can be up to 512 MB, and the size of all files uploaded by one
-organization can be up to 100 GB.
-
-The Assistants API supports files up to 2 million tokens and of
-specific file types. See the L<Assistants Tools
-guide|https://platform.openai.com/docs/assistants/tools> for details.
-
-The Fine-tuning API only supports C<.jsonl> files. The input also has
-certain required formats for fine-tuning
-L<chat|https://platform.openai.com/docs/api-reference/fine-tuning/chat-
-input> or
-L<completions|https://platform.openai.com/docs/api-reference/fine-tunin
-g/completions-input> models.
-
-The Batch API only supports C<.jsonl> files up to 200 MB in size. The
-input also has a specific required
-L<format|https://platform.openai.com/docs/api-reference/batch/request-i
-nput>.
-
-Please L<contact us|https://help.openai.com/> if you need to increase
-these storage limits.
-
-This method does not take any path or URL parameters.
-
-
-=head3 Request Body
-
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
-
-=head2 createFineTuningJob
-
-Creates a fine-tuning job which begins the process of creating a new
-model from a given dataset.
-
-Response includes details of the enqueued job including job status and
-the name of the fine-tuned models once complete.
-
-L<Learn more about
-fine-tuning|https://platform.openai.com/docs/guides/fine-tuning>
-
-This method does not take any path or URL parameters.
-
-
-=head3 Request Body
-
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
-
-=head2 createImage
-
-Creates an image given a prompt.
-
-This method does not take any path or URL parameters.
-
-
-=head3 Request Body
-
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
-
-=head2 createImageEdit
-
-Creates an edited or extended image given an original image and a
-prompt.
-
-This method does not take any path or URL parameters.
-
-
-=head3 Request Body
-
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
-
-=head2 createImageVariation
-
-Creates a variation of a given image.
-
-This method does not take any path or URL parameters.
-
-
-=head3 Request Body
-
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
-
-=head2 createMessage
-
-Create a message.
-
-=head3 Parameters
-
-
-=head4 thread_id
-
-The ID of the
-L<thread|https://platform.openai.com/docs/api-reference/threads> to
-create a message for.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head3 Request Body
-
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
-
-=head2 createModeration
-
-Classifies if text and/or image inputs are potentially harmful. Learn
-more in the L<moderation
-guide|https://platform.openai.com/docs/guides/moderation>.
-
-This method does not take any path or URL parameters.
-
-
-=head3 Request Body
-
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
-
-=head2 createRun
+operationId: createRun
 
 Create a run.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::threads-thread_id-runs>.
 
+=head2 create_skill
 
-=head4 thread_id
+POST /skills
 
-The ID of the thread to run.
+operationId: CreateSkill
 
-=over 4
+Create a new skill.
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::skills>.
 
-=item * In:       path
+=head2 create_skill_version
 
-=item * Required: True
+POST /skills/{skill_id}/versions
 
-=item * Default:  N/A
+operationId: CreateSkillVersion
 
-=item * Example:  N/A
+Create a new immutable skill version.
 
-=item * Enum:     N/A
+See L<OpenAPI::Client::OpenAI::Path::skills-skill_id-versions>.
 
-=back
+=head2 create_speech
 
+POST /audio/speech
 
-=head4 include[]
-
-A list of additional fields to include in the response. Currently the
-only supported value is
-C<step_details.tool_calls[*].file_search.results[*].content> to fetch
-the file search result content.
-
-See the L<file search tool
-documentation|https://platform.openai.com/docs/assistants/tools/file-se
-arch#customizing-file-search-settings> for more information.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head3 Request Body
-
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
-
-=head2 createSpeech
+operationId: createSpeech
 
 Generates audio from the input text.
 
-This method does not take any path or URL parameters.
+Returns the audio file content, or a stream of audio events.
 
+See L<OpenAPI::Client::OpenAI::Path::audio-speech>.
 
-=head3 Request Body
+=head2 create_thread
 
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
+POST /threads
 
-=head2 createThread
+operationId: createThread
 
 Create a thread.
 
-This method does not take any path or URL parameters.
+See L<OpenAPI::Client::OpenAI::Path::threads>.
 
+=head2 create_thread_and_run
 
-=head3 Request Body
+POST /threads/runs
 
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
-
-=head2 createThreadAndRun
+operationId: createThreadAndRun
 
 Create a thread and run it in one request.
 
-This method does not take any path or URL parameters.
+See L<OpenAPI::Client::OpenAI::Path::threads-runs>.
 
+=head2 create_transcription
 
-=head3 Request Body
+POST /audio/transcriptions
 
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
-
-=head2 createTranscription
+operationId: createTranscription
 
 Transcribes audio into the input language.
-=head3 Examples
 
-See the following files in the distribution for examples:
+Returns a transcription object in C<json> , C<diarized_json> , or
+C<verbose_json> format, or a stream of transcript events.
 
-=over 4
+See L<OpenAPI::Client::OpenAI::Path::audio-transcriptions>.
 
-=item *	examples/transcribe-audio.pl
+=head2 create_translation
 
-=back
+POST /audio/translations
 
-
-This method does not take any path or URL parameters.
-
-
-=head3 Request Body
-
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
-
-=head2 createTranslation
+operationId: createTranslation
 
 Translates audio into English.
 
-This method does not take any path or URL parameters.
+See L<OpenAPI::Client::OpenAI::Path::audio-translations>.
 
+=head2 create_upload
 
-=head3 Request Body
+POST /uploads
 
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
-
-=head2 createUpload
+operationId: createUpload
 
 Creates an intermediate
-L<Upload|https://platform.openai.com/docs/api-reference/uploads/object>
-object that you can add
-L<Parts|https://platform.openai.com/docs/api-reference/uploads/part-obj
-ect> to. Currently, an Upload can accept at most 8 GB in total and
-expires after an hour after you create it.
+L<Upload|https://platform.openai.com/docs/api-reference/uploads/object> object
+that you can add
+L<Parts|https://platform.openai.com/docs/api-reference/uploads/part-object>
+to. Currently, an Upload can accept at most 8 GB in total and expires after an
+hour after you create it.
 
 Once you complete the Upload, we will create a
-L<File|https://platform.openai.com/docs/api-reference/files/object>
-object that contains all the parts you uploaded. This File is usable in
-the rest of our platform as a regular File object.
+L<File|https://platform.openai.com/docs/api-reference/files/object> object
+that contains all the parts you uploaded. This File is usable in the rest of
+our platform as a regular File object.
 
-For certain C<purpose>s, the correct C<mime_type> must be specified.
-Please refer to documentation for the supported MIME types for your use
-case:
--
-L<Assistants|https://platform.openai.com/docs/assistants/tools/file-sea
-rch#supported-files>
+For certain C<purpose> values, the correct C<mime_type> must be specified.
+Please refer to documentation for the
+L<supported MIME types for your use case|https://platform.openai.com/docs/assistants/tools/file-search#supported-files>
+.
 
-For guidance on the proper filename extensions for each purpose, please
-follow the documentation on L<creating a
-File|https://platform.openai.com/docs/api-reference/files/create>.
+For guidance on the proper filename extensions for each purpose, please follow
+the documentation on
+L<creating a File|https://platform.openai.com/docs/api-reference/files/create>
+.
 
-This method does not take any path or URL parameters.
+Returns the Upload object with status C<pending> .
 
+See L<OpenAPI::Client::OpenAI::Path::uploads>.
 
-=head3 Request Body
+=head2 create_vector_store
 
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
+POST /vector_stores
 
-=head2 createVectorStore
+operationId: createVectorStore
 
 Create a vector store.
 
-This method does not take any path or URL parameters.
+See L<OpenAPI::Client::OpenAI::Path::vector_stores>.
 
+=head2 create_vector_store_file
 
-=head3 Request Body
+POST /vector_stores/{vector_store_id}/files
 
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
-
-=head2 createVectorStoreFile
+operationId: createVectorStoreFile
 
 Create a vector store file by attaching a
 L<File|https://platform.openai.com/docs/api-reference/files> to a
-L<vector
-store|https://platform.openai.com/docs/api-reference/vector-stores/obje
-ct>.
+L<vector store|https://platform.openai.com/docs/api-reference/vector-stores/object>
+.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-files>.
 
+=head2 create_vector_store_file_batch
 
-=head4 vector_store_id
+POST /vector_stores/{vector_store_id}/file_batches
 
-The ID of the vector store for which to create a File.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  vs_abc123
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head3 Request Body
-
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
-
-=head2 createVectorStoreFileBatch
+operationId: createVectorStoreFileBatch
 
 Create a vector store file batch.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-file_batches>.
 
+=head2 create_video
 
-=head4 vector_store_id
+POST /videos
 
-The ID of the vector store for which to create a File Batch.
+operationId: createVideo
 
-=over 4
+Create a new video generation job from a prompt and optional reference assets.
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::videos>.
 
-=item * In:       path
+=head2 create_video_character
 
-=item * Required: True
+POST /videos/characters
 
-=item * Default:  N/A
+operationId: CreateVideoCharacter
 
-=item * Example:  vs_abc123
+Create a character from an uploaded video.
 
-=item * Enum:     N/A
+See L<OpenAPI::Client::OpenAI::Path::videos-characters>.
 
-=back
+=head2 create_video_edit
 
+POST /videos/edits
 
+operationId: CreateVideoEdit
 
+Create a new video generation job by editing a source video or existing
+generated video.
 
-=head3 Request Body
+See L<OpenAPI::Client::OpenAI::Path::videos-edits>.
 
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
+=head2 create_video_extend
 
-=head2 delete-invite
+POST /videos/extensions
+
+operationId: CreateVideoExtend
+
+Create an extension of a completed video.
+
+See L<OpenAPI::Client::OpenAI::Path::videos-extensions>.
+
+=head2 create_video_remix
+
+POST /videos/{video_id}/remix
+
+operationId: CreateVideoRemix
+
+Create a remix of a completed video using a refreshed prompt.
+
+See L<OpenAPI::Client::OpenAI::Path::videos-video_id-remix>.
+
+=head2 create_voice
+
+POST /audio/voices
+
+operationId: createVoice
+
+Creates a custom voice.
+
+See L<OpenAPI::Client::OpenAI::Path::audio-voices>.
+
+=head2 create_voice_consent
+
+POST /audio/voice_consents
+
+operationId: createVoiceConsent
+
+Upload a voice consent recording.
+
+See L<OpenAPI::Client::OpenAI::Path::audio-voice_consents>.
+
+=head2 deactivate_organization_certificates
+
+POST /organization/certificates/deactivate
+
+operationId: deactivateOrganizationCertificates
+
+Deactivate certificates at the organization level.
+
+You can atomically and idempotently deactivate up to 10 certificates at a
+time.
+
+See L<OpenAPI::Client::OpenAI::Path::organization-certificates-deactivate>.
+
+=head2 deactivate_project_certificates
+
+POST /organization/projects/{project_id}/certificates/deactivate
+
+operationId: deactivateProjectCertificates
+
+Deactivate certificates at the project level. You can atomically and
+idempotently deactivate up to 10 certificates at a time.
+
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-certificates-deactivate>.
+
+=head2 delete_assistant
+
+DELETE /assistants/{assistant_id}
+
+operationId: deleteAssistant
+
+Delete an assistant.
+
+See L<OpenAPI::Client::OpenAI::Path::assistants-assistant_id>.
+
+=head2 delete_certificate
+
+DELETE /organization/certificates/{certificate_id}
+
+operationId: deleteCertificate
+
+Delete a certificate from the organization.
+
+The certificate must be inactive for the organization and all projects.
+
+See L<OpenAPI::Client::OpenAI::Path::organization-certificates-certificate_id>.
+
+=head2 delete_chat_completion
+
+DELETE /chat/completions/{completion_id}
+
+operationId: deleteChatCompletion
+
+Delete a stored chat completion. Only Chat Completions that have been created
+with the C<store> parameter set to C<true> can be deleted.
+
+See L<OpenAPI::Client::OpenAI::Path::chat-completions-completion_id>.
+
+=head2 delete_container
+
+DELETE /containers/{container_id}
+
+operationId: DeleteContainer
+
+Delete Container
+
+See L<OpenAPI::Client::OpenAI::Path::containers-container_id>.
+
+=head2 delete_container_file
+
+DELETE /containers/{container_id}/files/{file_id}
+
+operationId: DeleteContainerFile
+
+Delete Container File
+
+See L<OpenAPI::Client::OpenAI::Path::containers-container_id-files-file_id>.
+
+=head2 delete_conversation
+
+DELETE /conversations/{conversation_id}
+
+operationId: deleteConversation
+
+Delete a conversation. Items in the conversation will not be deleted.
+
+See L<OpenAPI::Client::OpenAI::Path::conversations-conversation_id>.
+
+=head2 delete_conversation_item
+
+DELETE /conversations/{conversation_id}/items/{item_id}
+
+operationId: deleteConversationItem
+
+Delete an item from a conversation with the given IDs.
+
+See L<OpenAPI::Client::OpenAI::Path::conversations-conversation_id-items-item_id>.
+
+=head2 delete_eval
+
+DELETE /evals/{eval_id}
+
+operationId: deleteEval
+
+Delete an evaluation.
+
+See L<OpenAPI::Client::OpenAI::Path::evals-eval_id>.
+
+=head2 delete_eval_run
+
+DELETE /evals/{eval_id}/runs/{run_id}
+
+operationId: deleteEvalRun
+
+Delete an eval run.
+
+See L<OpenAPI::Client::OpenAI::Path::evals-eval_id-runs-run_id>.
+
+=head2 delete_file
+
+DELETE /files/{file_id}
+
+operationId: deleteFile
+
+Delete a file and remove it from all vector stores.
+
+See L<OpenAPI::Client::OpenAI::Path::files-file_id>.
+
+=head2 delete_fine_tuning_checkpoint_permission
+
+DELETE /fine_tuning/checkpoints/{fine_tuned_model_checkpoint}/permissions/{permission_id}
+
+operationId: deleteFineTuningCheckpointPermission
+
+B<NOTE:> This endpoint requires an L<admin API key|../admin-api-keys> .
+
+Organization owners can use this endpoint to delete a permission for a
+fine-tuned model checkpoint.
+
+See L<OpenAPI::Client::OpenAI::Path::fine_tuning-checkpoints-fine_tuned_model_checkpoint-permissions-permission_id>.
+
+=head2 delete_group
+
+DELETE /organization/groups/{group_id}
+
+operationId: delete-group
+
+Deletes a group from the organization.
+
+See L<OpenAPI::Client::OpenAI::Path::organization-groups-group_id>.
+
+=head2 delete_invite
+
+DELETE /organization/invites/{invite_id}
+
+operationId: delete-invite
 
 Delete an invite. If the invite has already been accepted, it cannot be
 deleted.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::organization-invites-invite_id>.
 
+=head2 delete_message
 
-=head4 invite_id
+DELETE /threads/{thread_id}/messages/{message_id}
 
-The ID of the invite to delete.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 delete-project-api-key
-
-Deletes an API key from the project.
-
-=head3 Parameters
-
-
-=head4 project_id
-
-The ID of the project.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 key_id
-
-The ID of the API key.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 delete-project-service-account
-
-Deletes a service account from the project.
-
-=head3 Parameters
-
-
-=head4 project_id
-
-The ID of the project.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 service_account_id
-
-The ID of the service account.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 delete-project-user
-
-Deletes a user from the project.
-
-=head3 Parameters
-
-
-=head4 project_id
-
-The ID of the project.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 user_id
-
-The ID of the user.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 delete-user
-
-Deletes a user from the organization.
-
-=head3 Parameters
-
-
-=head4 user_id
-
-The ID of the user.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 deleteAssistant
-
-Delete an assistant.
-
-=head3 Parameters
-
-
-=head4 assistant_id
-
-The ID of the assistant to delete.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 deleteFile
-
-Delete a file.
-
-=head3 Parameters
-
-
-=head4 file_id
-
-The ID of the file to use for this request.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 deleteMessage
+operationId: deleteMessage
 
 Deletes a message.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::threads-thread_id-messages-message_id>.
 
+=head2 delete_model
 
-=head4 thread_id
+DELETE /models/{model}
 
-The ID of the thread to which this message belongs.
+operationId: deleteModel
 
-=over 4
+Delete a fine-tuned model. You must have the Owner role in your organization
+to delete a model.
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::models-model>.
 
-=item * In:       path
+=head2 delete_organization_spend_alert
 
-=item * Required: True
+DELETE /organization/spend_alerts/{alert_id}
 
-=item * Default:  N/A
+operationId: delete-organization-spend-alert
 
-=item * Example:  N/A
+Deletes an organization spend alert.
 
-=item * Enum:     N/A
+See L<OpenAPI::Client::OpenAI::Path::organization-spend_alerts-alert_id>.
 
-=back
+=head2 delete_project_api_key
 
+DELETE /organization/projects/{project_id}/api_keys/{api_key_id}
 
-=head4 message_id
+operationId: delete-project-api-key
 
-The ID of the message to delete.
+Deletes an API key from the project.
 
-=over 4
+Returns confirmation of the key deletion, or an error if the key belonged to a
+service account.
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-api_keys-api_key_id>.
 
-=item * In:       path
+=head2 delete_project_model_permissions
 
-=item * Required: True
+DELETE /organization/projects/{project_id}/model_permissions
 
-=item * Default:  N/A
+operationId: delete-project-model-permissions
 
-=item * Example:  N/A
+Deletes model permissions for a project.
 
-=item * Enum:     N/A
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-model_permissions>.
 
-=back
+=head2 delete_project_role
 
+DELETE /projects/{project_id}/roles/{role_id}
 
+operationId: delete-project-role
 
+Deletes a custom role from a project.
 
-=head2 deleteModel
+See L<OpenAPI::Client::OpenAI::Path::projects-project_id-roles-role_id>.
 
-Delete a fine-tuned model. You must have the Owner role in your
-organization to delete a model.
+=head2 delete_project_service_account
 
-=head3 Parameters
+DELETE /organization/projects/{project_id}/service_accounts/{service_account_id}
 
+operationId: delete-project-service-account
 
-=head4 model
+Deletes a service account from the project.
 
-The model to delete
+Returns confirmation of service account deletion, or an error if the project
+is archived (archived projects have no service accounts).
 
-=over 4
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-service_accounts-service_account_id>.
 
-=item * Type:     string
+=head2 delete_project_spend_alert
 
-=item * In:       path
+DELETE /organization/projects/{project_id}/spend_alerts/{alert_id}
 
-=item * Required: True
+operationId: delete-project-spend-alert
 
-=item * Default:  N/A
+Deletes a project spend alert.
 
-=item * Example:  ft:gpt-4o-mini:acemeco:suffix:abc123
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-spend_alerts-alert_id>.
 
-=item * Enum:     N/A
+=head2 delete_project_user
 
-=back
+DELETE /organization/projects/{project_id}/users/{user_id}
 
+operationId: delete-project-user
 
+Deletes a user from the project.
 
+Returns confirmation of project user deletion, or an error if the project is
+archived (archived projects have no users).
 
-=head2 deleteThread
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-users-user_id>.
+
+=head2 delete_response
+
+DELETE /responses/{response_id}
+
+operationId: deleteResponse
+
+Deletes a model response with the given ID.
+
+See L<OpenAPI::Client::OpenAI::Path::responses-response_id>.
+
+=head2 delete_role
+
+DELETE /organization/roles/{role_id}
+
+operationId: delete-role
+
+Deletes a custom role from the organization.
+
+See L<OpenAPI::Client::OpenAI::Path::organization-roles-role_id>.
+
+=head2 delete_skill
+
+DELETE /skills/{skill_id}
+
+operationId: DeleteSkill
+
+Delete a skill by its ID.
+
+See L<OpenAPI::Client::OpenAI::Path::skills-skill_id>.
+
+=head2 delete_skill_version
+
+DELETE /skills/{skill_id}/versions/{version}
+
+operationId: DeleteSkillVersion
+
+Delete a skill version.
+
+See L<OpenAPI::Client::OpenAI::Path::skills-skill_id-versions-version>.
+
+=head2 delete_thread
+
+DELETE /threads/{thread_id}
+
+operationId: deleteThread
 
 Delete a thread.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::threads-thread_id>.
 
+=head2 delete_thread_method
 
-=head4 thread_id
+DELETE /chatkit/threads/{thread_id}
 
-The ID of the thread to delete.
+operationId: DeleteThreadMethod
 
-=over 4
+Delete a ChatKit thread along with its items and stored attachments.
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::chatkit-threads-thread_id>.
 
-=item * In:       path
+=head2 delete_user
 
-=item * Required: True
+DELETE /organization/users/{user_id}
 
-=item * Default:  N/A
+operationId: delete-user
 
-=item * Example:  N/A
+Deletes a user from the organization.
 
-=item * Enum:     N/A
+See L<OpenAPI::Client::OpenAI::Path::organization-users-user_id>.
 
-=back
+=head2 delete_vector_store
 
+DELETE /vector_stores/{vector_store_id}
 
-
-
-=head2 deleteVectorStore
+operationId: deleteVectorStore
 
 Delete a vector store.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id>.
 
+=head2 delete_vector_store_file
 
-=head4 vector_store_id
+DELETE /vector_stores/{vector_store_id}/files/{file_id}
 
-The ID of the vector store to delete.
+operationId: deleteVectorStoreFile
 
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 deleteVectorStoreFile
-
-Delete a vector store file. This will remove the file from the vector
-store but the file itself will not be deleted. To delete the file, use
-the L<delete
-file|https://platform.openai.com/docs/api-reference/files/delete>
+Delete a vector store file. This will remove the file from the vector store
+but the file itself will not be deleted. To delete the file, use the
+L<delete file|https://platform.openai.com/docs/api-reference/files/delete>
 endpoint.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-files-file_id>.
 
+=head2 delete_video
 
-=head4 vector_store_id
+DELETE /videos/{video_id}
 
-The ID of the vector store that the file belongs to.
+operationId: DeleteVideo
 
-=over 4
+Permanently delete a completed or failed video and its stored assets.
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::videos-video_id>.
 
-=item * In:       path
+=head2 delete_voice_consent
 
-=item * Required: True
+DELETE /audio/voice_consents/{consent_id}
 
-=item * Default:  N/A
+operationId: deleteVoiceConsent
 
-=item * Example:  N/A
+Deletes a voice consent recording.
 
-=item * Enum:     N/A
+See L<OpenAPI::Client::OpenAI::Path::audio-voice_consents-consent_id>.
 
-=back
+=head2 download_file
 
+GET /files/{file_id}/content
 
-=head4 file_id
-
-The ID of the file to delete.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 downloadFile
+operationId: downloadFile
 
 Returns the contents of the specified file.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::files-file_id-content>.
 
+=head2 get_assistant
 
-=head4 file_id
+GET /assistants/{assistant_id}
 
-The ID of the file to use for this request.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 getAssistant
+operationId: getAssistant
 
 Retrieves an assistant.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::assistants-assistant_id>.
 
+=head2 get_certificate
 
-=head4 assistant_id
+GET /organization/certificates/{certificate_id}
 
-The ID of the assistant to retrieve.
+operationId: getCertificate
 
-=over 4
+Get a certificate that has been uploaded to the organization.
 
-=item * Type:     string
+You can get a certificate regardless of whether it is active or not.
 
-=item * In:       path
+See L<OpenAPI::Client::OpenAI::Path::organization-certificates-certificate_id>.
 
-=item * Required: True
+=head2 get_chat_completion
 
-=item * Default:  N/A
+GET /chat/completions/{completion_id}
 
-=item * Example:  N/A
+operationId: getChatCompletion
 
-=item * Enum:     N/A
+Get a stored chat completion. Only Chat Completions that have been created
+with the C<store> parameter set to C<true> will be returned.
 
-=back
+See L<OpenAPI::Client::OpenAI::Path::chat-completions-completion_id>.
 
+=head2 get_chat_completion_messages
 
+GET /chat/completions/{completion_id}/messages
 
+operationId: getChatCompletionMessages
 
-=head2 getMessage
+Get the messages in a stored chat completion. Only Chat Completions that have
+been created with the C<store> parameter set to C<true> will be returned.
+
+See L<OpenAPI::Client::OpenAI::Path::chat-completions-completion_id-messages>.
+
+=head2 get_conversation
+
+GET /conversations/{conversation_id}
+
+operationId: getConversation
+
+Get a conversation
+
+See L<OpenAPI::Client::OpenAI::Path::conversations-conversation_id>.
+
+=head2 get_conversation_item
+
+GET /conversations/{conversation_id}/items/{item_id}
+
+operationId: getConversationItem
+
+Get a single item from a conversation with the given IDs.
+
+See L<OpenAPI::Client::OpenAI::Path::conversations-conversation_id-items-item_id>.
+
+=head2 get_eval
+
+GET /evals/{eval_id}
+
+operationId: getEval
+
+Get an evaluation by ID.
+
+See L<OpenAPI::Client::OpenAI::Path::evals-eval_id>.
+
+=head2 get_eval_run
+
+GET /evals/{eval_id}/runs/{run_id}
+
+operationId: getEvalRun
+
+Get an evaluation run by ID.
+
+See L<OpenAPI::Client::OpenAI::Path::evals-eval_id-runs-run_id>.
+
+=head2 get_eval_run_output_item
+
+GET /evals/{eval_id}/runs/{run_id}/output_items/{output_item_id}
+
+operationId: getEvalRunOutputItem
+
+Get an evaluation run output item by ID.
+
+See L<OpenAPI::Client::OpenAI::Path::evals-eval_id-runs-run_id-output_items-output_item_id>.
+
+=head2 get_eval_run_output_items
+
+GET /evals/{eval_id}/runs/{run_id}/output_items
+
+operationId: getEvalRunOutputItems
+
+Get a list of output items for an evaluation run.
+
+See L<OpenAPI::Client::OpenAI::Path::evals-eval_id-runs-run_id-output_items>.
+
+=head2 get_eval_runs
+
+GET /evals/{eval_id}/runs
+
+operationId: getEvalRuns
+
+Get a list of runs for an evaluation.
+
+See L<OpenAPI::Client::OpenAI::Path::evals-eval_id-runs>.
+
+=head2 get_message
+
+GET /threads/{thread_id}/messages/{message_id}
+
+operationId: getMessage
 
 Retrieve a message.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::threads-thread_id-messages-message_id>.
 
+=head2 get_response
 
-=head4 thread_id
+GET /responses/{response_id}
 
-The ID of the
-L<thread|https://platform.openai.com/docs/api-reference/threads> to
-which this message belongs.
+operationId: getResponse
 
-=over 4
+Retrieves a model response with the given ID.
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::responses-response_id>.
 
-=item * In:       path
+=head2 get_run
 
-=item * Required: True
+GET /threads/{thread_id}/runs/{run_id}
 
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 message_id
-
-The ID of the message to retrieve.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 getRun
+operationId: getRun
 
 Retrieves a run.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::threads-thread_id-runs-run_id>.
 
+=head2 get_run_step
 
-=head4 thread_id
+GET /threads/{thread_id}/runs/{run_id}/steps/{step_id}
 
-The ID of the
-L<thread|https://platform.openai.com/docs/api-reference/threads> that
-was run.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 run_id
-
-The ID of the run to retrieve.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 getRunStep
+operationId: getRunStep
 
 Retrieves a run step.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::threads-thread_id-runs-run_id-steps-step_id>.
 
+=head2 get_skill
 
-=head4 thread_id
+GET /skills/{skill_id}
 
-The ID of the thread to which the run and run step belongs.
+operationId: GetSkill
 
-=over 4
+Get a skill by its ID.
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::skills-skill_id>.
 
-=item * In:       path
+=head2 get_skill_content
 
-=item * Required: True
+GET /skills/{skill_id}/content
 
-=item * Default:  N/A
+operationId: GetSkillContent
 
-=item * Example:  N/A
+Download a skill zip bundle by its ID.
 
-=item * Enum:     N/A
+See L<OpenAPI::Client::OpenAI::Path::skills-skill_id-content>.
 
-=back
+=head2 get_skill_version
 
+GET /skills/{skill_id}/versions/{version}
 
-=head4 run_id
+operationId: GetSkillVersion
 
-The ID of the run to which the run step belongs.
+Get a specific skill version.
 
-=over 4
+See L<OpenAPI::Client::OpenAI::Path::skills-skill_id-versions-version>.
 
-=item * Type:     string
+=head2 get_skill_version_content
 
-=item * In:       path
+GET /skills/{skill_id}/versions/{version}/content
 
-=item * Required: True
+operationId: GetSkillVersionContent
 
-=item * Default:  N/A
+Download a skill version zip bundle.
 
-=item * Example:  N/A
+See L<OpenAPI::Client::OpenAI::Path::skills-skill_id-versions-version-content>.
 
-=item * Enum:     N/A
+=head2 get_thread
 
-=back
+GET /threads/{thread_id}
 
-
-=head4 step_id
-
-The ID of the run step to retrieve.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 include[]
-
-A list of additional fields to include in the response. Currently the
-only supported value is
-C<step_details.tool_calls[*].file_search.results[*].content> to fetch
-the file search result content.
-
-See the L<file search tool
-documentation|https://platform.openai.com/docs/assistants/tools/file-se
-arch#customizing-file-search-settings> for more information.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 getThread
+operationId: getThread
 
 Retrieves a thread.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::threads-thread_id>.
 
+=head2 get_thread_method
 
-=head4 thread_id
+GET /chatkit/threads/{thread_id}
 
-The ID of the thread to retrieve.
+operationId: GetThreadMethod
 
-=over 4
+Retrieve a ChatKit thread by its identifier.
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::chatkit-threads-thread_id>.
 
-=item * In:       path
+=head2 get_vector_store
 
-=item * Required: True
+GET /vector_stores/{vector_store_id}
 
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 getVectorStore
+operationId: getVectorStore
 
 Retrieves a vector store.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id>.
 
+=head2 get_vector_store_file
 
-=head4 vector_store_id
+GET /vector_stores/{vector_store_id}/files/{file_id}
 
-The ID of the vector store to retrieve.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 getVectorStoreFile
+operationId: getVectorStoreFile
 
 Retrieves a vector store file.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-files-file_id>.
 
+=head2 get_vector_store_file_batch
 
-=head4 vector_store_id
+GET /vector_stores/{vector_store_id}/file_batches/{batch_id}
 
-The ID of the vector store that the file belongs to.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  vs_abc123
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 file_id
-
-The ID of the file being retrieved.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  file-abc123
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 getVectorStoreFileBatch
+operationId: getVectorStoreFileBatch
 
 Retrieves a vector store file batch.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-file_batches-batch_id>.
 
+=head2 get_video
 
-=head4 vector_store_id
+GET /videos/{video_id}
 
-The ID of the vector store that the file batch belongs to.
+operationId: GetVideo
 
-=over 4
+Fetch the latest metadata for a generated video.
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::videos-video_id>.
 
-=item * In:       path
+=head2 get_video_character
 
-=item * Required: True
+GET /videos/characters/{character_id}
 
-=item * Default:  N/A
+operationId: GetVideoCharacter
 
-=item * Example:  vs_abc123
+Fetch a character.
 
-=item * Enum:     N/A
+See L<OpenAPI::Client::OpenAI::Path::videos-characters-character_id>.
 
-=back
+=head2 get_voice_consent
 
+GET /audio/voice_consents/{consent_id}
 
-=head4 batch_id
+operationId: getVoiceConsent
 
-The ID of the file batch being retrieved.
+Retrieves a voice consent recording.
 
-=over 4
+See L<OpenAPI::Client::OpenAI::Path::audio-voice_consents-consent_id>.
 
-=item * Type:     string
+=head2 getinputtokencounts
 
-=item * In:       path
+POST /responses/input_tokens
 
-=item * Required: True
+operationId: Getinputtokencounts
 
-=item * Default:  N/A
+Returns input token counts of the request.
 
-=item * Example:  vsfb_abc123
+Returns an object with C<object> set to C<response.input_tokens> and an
+C<input_tokens> count.
 
-=item * Enum:     N/A
+See L<OpenAPI::Client::OpenAI::Path::responses-input_tokens>.
 
-=back
+=head2 hangup_realtime_call
 
+POST /realtime/calls/{call_id}/hangup
 
+operationId: hangup-realtime-call
 
+End an active Realtime API call, whether it was initiated over SIP or WebRTC.
 
-=head2 inviteUser
+See L<OpenAPI::Client::OpenAI::Path::realtime-calls-call_id-hangup>.
 
-Create an invite for a user to the organization. The invite must be
-accepted by the user before they have access to the organization.
+=head2 invite_user
 
-This method does not take any path or URL parameters.
+POST /organization/invites
 
+operationId: inviteUser
 
-=head3 Request Body
+Create an invite for a user to the organization. The invite must be accepted
+by the user before they have access to the organization.
 
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
+See L<OpenAPI::Client::OpenAI::Path::organization-invites>.
 
-=head2 list-audit-logs
+=head2 list_assistants
 
-List user actions and configuration changes within this organization.
+GET /assistants
 
-=head3 Parameters
-
-
-=head4 effective_at
-
-Return only events whose C<effective_at> (Unix seconds) is in this
-range.
-
-=over 4
-
-=item * Type:     object
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 project_ids[]
-
-Return only events for these projects.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 event_types[]
-
-Return only events with a C<type> in one of these values. For example,
-C<project.created>. For all options, see the documentation for the
-L<audit log object|https://platform.openai.com/docs/api-reference/audit-logs/object>.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 actor_ids[]
-
-Return only events performed by these actors. Can be a user ID, a
-service account ID, or an api key tracking ID.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 actor_emails[]
-
-Return only events performed by users with these emails.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 resource_ids[]
-
-Return only events performed on these targets. For example, a project
-ID updated.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 limit
-
-A limit on the number of objects to be returned. Limit can range
-between 1 and 100, and the default is 20.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  20
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 after
-
-A cursor for use in pagination. C<after> is an object ID that defines
-your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objI<foo, your subsequent call can
-include after=obj>foo in order to fetch the next page of the list.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 before
-
-A cursor for use in pagination. C<before> is an object ID that defines
-your place in the list. For instance, if you make a list request and
-receive 100 objects, starting with objI<foo, your subsequent call can
-include before=obj>foo in order to fetch the previous page of the list.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 list-invites
-
-Returns a list of invites in the organization.
-
-=head3 Parameters
-
-
-=head4 limit
-
-A limit on the number of objects to be returned. Limit can range
-between 1 and 100, and the default is 20.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  20
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 after
-
-A cursor for use in pagination. C<after> is an object ID that defines
-your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objI<foo, your subsequent call can
-include after=obj>foo in order to fetch the next page of the list.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 list-project-api-keys
-
-Returns a list of API keys in the project.
-
-=head3 Parameters
-
-
-=head4 project_id
-
-The ID of the project.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 limit
-
-A limit on the number of objects to be returned. Limit can range
-between 1 and 100, and the default is 20.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  20
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 after
-
-A cursor for use in pagination. C<after> is an object ID that defines
-your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objI<foo, your subsequent call can
-include after=obj>foo in order to fetch the next page of the list.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 list-project-rate-limits
-
-Returns the rate limits per model for a project.
-
-=head3 Parameters
-
-
-=head4 project_id
-
-The ID of the project.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 limit
-
-A limit on the number of objects to be returned. The default is 100.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  100
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 after
-
-A cursor for use in pagination. C<after> is an object ID that defines
-your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objI<foo, your subsequent call can
-include after=obj>foo in order to fetch the next page of the list.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 before
-
-A cursor for use in pagination. C<before> is an object ID that defines
-your place in the list. For instance, if you make a list request and
-receive 100 objects, beginning with objI<foo, your subsequent call can
-include before=obj>foo in order to fetch the previous page of the list.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 list-project-service-accounts
-
-Returns a list of service accounts in the project.
-
-=head3 Parameters
-
-
-=head4 project_id
-
-The ID of the project.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 limit
-
-A limit on the number of objects to be returned. Limit can range
-between 1 and 100, and the default is 20.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  20
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 after
-
-A cursor for use in pagination. C<after> is an object ID that defines
-your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objI<foo, your subsequent call can
-include after=obj>foo in order to fetch the next page of the list.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 list-project-users
-
-Returns a list of users in the project.
-
-=head3 Parameters
-
-
-=head4 project_id
-
-The ID of the project.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 limit
-
-A limit on the number of objects to be returned. Limit can range
-between 1 and 100, and the default is 20.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  20
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 after
-
-A cursor for use in pagination. C<after> is an object ID that defines
-your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objI<foo, your subsequent call can
-include after=obj>foo in order to fetch the next page of the list.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 list-projects
-
-Returns a list of projects.
-
-=head3 Parameters
-
-
-=head4 limit
-
-A limit on the number of objects to be returned. Limit can range
-between 1 and 100, and the default is 20.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  20
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 after
-
-A cursor for use in pagination. C<after> is an object ID that defines
-your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objI<foo, your subsequent call can
-include after=obj>foo in order to fetch the next page of the list.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 include_archived
-
-If C<true> returns all projects including those that have been
-C<archived>. Archived projects are not included by default.
-
-=over 4
-
-=item * Type:     boolean
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 list-users
-
-Lists all of the users in the organization.
-
-=head3 Parameters
-
-
-=head4 limit
-
-A limit on the number of objects to be returned. Limit can range
-between 1 and 100, and the default is 20.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  20
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 after
-
-A cursor for use in pagination. C<after> is an object ID that defines
-your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objI<foo, your subsequent call can
-include after=obj>foo in order to fetch the next page of the list.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 emails
-
-Filter by the email address of users.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 listAssistants
+operationId: listAssistants
 
 Returns a list of assistants.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::assistants>.
 
+=head2 list_audit_logs
 
-=head4 limit
+GET /organization/audit_logs
 
-A limit on the number of objects to be returned. Limit can range
-between 1 and 100, and the default is 20.
+operationId: list-audit-logs
 
-=over 4
+List user actions and configuration changes within this organization.
 
-=item * Type:     integer
+See L<OpenAPI::Client::OpenAI::Path::organization-audit_logs>.
 
-=item * In:       query
+=head2 list_batches
 
-=item * Required: False
+GET /batches
 
-=item * Default:  20
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 order
-
-Sort order by the C<created_at> timestamp of the objects. C<asc> for
-ascending order and C<desc> for descending order.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  desc
-
-=item * Example:  N/A
-
-=item * Enum:     asc, desc
-
-=back
-
-
-=head4 after
-
-A cursor for use in pagination. C<after> is an object ID that defines
-your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objI<foo, your subsequent call can
-include after=obj>foo in order to fetch the next page of the list.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 before
-
-A cursor for use in pagination. C<before> is an object ID that defines
-your place in the list. For instance, if you make a list request and
-receive 100 objects, starting with objI<foo, your subsequent call can
-include before=obj>foo in order to fetch the previous page of the list.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 listBatches
+operationId: listBatches
 
 List your organization's batches.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::batches>.
 
+=head2 list_chat_completions
 
-=head4 after
+GET /chat/completions
 
-A cursor for use in pagination. C<after> is an object ID that defines
-your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objI<foo, your subsequent call can
-include after=obj>foo in order to fetch the next page of the list.
+operationId: listChatCompletions
 
-=over 4
+List stored Chat Completions. Only Chat Completions that have been stored with
+the C<store> parameter set to C<true> will be returned.
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::chat-completions>.
 
-=item * In:       query
+=head2 list_container_files
 
-=item * Required: False
+GET /containers/{container_id}/files
 
-=item * Default:  N/A
+operationId: ListContainerFiles
 
-=item * Example:  N/A
+List Container files
 
-=item * Enum:     N/A
+See L<OpenAPI::Client::OpenAI::Path::containers-container_id-files>.
 
-=back
+=head2 list_containers
 
+GET /containers
 
-=head4 limit
+operationId: ListContainers
 
-A limit on the number of objects to be returned. Limit can range
-between 1 and 100, and the default is 20.
+List Containers
 
-=over 4
+See L<OpenAPI::Client::OpenAI::Path::containers>.
 
-=item * Type:     integer
+=head2 list_conversation_items
 
-=item * In:       query
+GET /conversations/{conversation_id}/items
 
-=item * Required: False
+operationId: listConversationItems
 
-=item * Default:  20
+List all items for a conversation with the given ID.
 
-=item * Example:  N/A
+See L<OpenAPI::Client::OpenAI::Path::conversations-conversation_id-items>.
 
-=item * Enum:     N/A
+=head2 list_evals
 
-=back
+GET /evals
 
+operationId: listEvals
 
+List evaluations for a project.
 
+See L<OpenAPI::Client::OpenAI::Path::evals>.
 
-=head2 listFiles
+=head2 list_files
+
+GET /files
+
+operationId: listFiles
 
 Returns a list of files.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::files>.
 
+=head2 list_files_in_vector_store_batch
 
-=head4 purpose
+GET /vector_stores/{vector_store_id}/file_batches/{batch_id}/files
 
-Only return files with the given purpose.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 limit
-
-A limit on the number of objects to be returned. Limit can range
-between 1 and 10,000, and the default is 10,000.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  10000
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 order
-
-Sort order by the C<created_at> timestamp of the objects. C<asc> for
-ascending order and C<desc> for descending order.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  desc
-
-=item * Example:  N/A
-
-=item * Enum:     asc, desc
-
-=back
-
-
-=head4 after
-
-A cursor for use in pagination. C<after> is an object ID that defines
-your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objI<foo, your subsequent call can
-include after=obj>foo in order to fetch the next page of the list.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 listFilesInVectorStoreBatch
+operationId: listFilesInVectorStoreBatch
 
 Returns a list of vector store files in a batch.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-file_batches-batch_id-files>.
 
+=head2 list_fine_tuning_checkpoint_permissions
 
-=head4 vector_store_id
+GET /fine_tuning/checkpoints/{fine_tuned_model_checkpoint}/permissions
 
-The ID of the vector store that the files belong to.
+operationId: listFineTuningCheckpointPermissions
 
-=over 4
+B<NOTE:> This endpoint requires an L<admin API key|../admin-api-keys> .
 
-=item * Type:     string
+Organization owners can use this endpoint to view all permissions for a
+fine-tuned model checkpoint.
 
-=item * In:       path
+See L<OpenAPI::Client::OpenAI::Path::fine_tuning-checkpoints-fine_tuned_model_checkpoint-permissions>.
 
-=item * Required: True
+=head2 list_fine_tuning_events
 
-=item * Default:  N/A
+GET /fine_tuning/jobs/{fine_tuning_job_id}/events
 
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 batch_id
-
-The ID of the file batch that the files belong to.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 limit
-
-A limit on the number of objects to be returned. Limit can range
-between 1 and 100, and the default is 20.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  20
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 order
-
-Sort order by the C<created_at> timestamp of the objects. C<asc> for
-ascending order and C<desc> for descending order.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  desc
-
-=item * Example:  N/A
-
-=item * Enum:     asc, desc
-
-=back
-
-
-=head4 after
-
-A cursor for use in pagination. C<after> is an object ID that defines
-your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objI<foo, your subsequent call can
-include after=obj>foo in order to fetch the next page of the list.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 before
-
-A cursor for use in pagination. C<before> is an object ID that defines
-your place in the list. For instance, if you make a list request and
-receive 100 objects, starting with objI<foo, your subsequent call can
-include before=obj>foo in order to fetch the previous page of the list.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 filter
-
-Filter by file status. One of C<in_progress>, C<completed>, C<failed>,
-C<cancelled>.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     in_progress, completed, failed, cancelled
-
-=back
-
-
-
-
-=head2 listFineTuningEvents
+operationId: listFineTuningEvents
 
 Get status updates for a fine-tuning job.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::fine_tuning-jobs-fine_tuning_job_id-events>.
 
+=head2 list_fine_tuning_job_checkpoints
 
-=head4 fine_tuning_job_id
+GET /fine_tuning/jobs/{fine_tuning_job_id}/checkpoints
 
-The ID of the fine-tuning job to get events for.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  ft-AF1WoRqd3aJAHsqc9NY7iL8F
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 after
-
-Identifier for the last event from the previous pagination request.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 limit
-
-Number of events to retrieve.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  20
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 listFineTuningJobCheckpoints
+operationId: listFineTuningJobCheckpoints
 
 List checkpoints for a fine-tuning job.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::fine_tuning-jobs-fine_tuning_job_id-checkpoints>.
 
+=head2 list_group_role_assignments
 
-=head4 fine_tuning_job_id
+GET /organization/groups/{group_id}/roles
 
-The ID of the fine-tuning job to get checkpoints for.
+operationId: list-group-role-assignments
 
-=over 4
+Lists the organization roles assigned to a group within the organization.
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::organization-groups-group_id-roles>.
 
-=item * In:       path
+=head2 list_group_users
 
-=item * Required: True
+GET /organization/groups/{group_id}/users
 
-=item * Default:  N/A
+operationId: list-group-users
 
-=item * Example:  ft-AF1WoRqd3aJAHsqc9NY7iL8F
+Lists the users assigned to a group.
 
-=item * Enum:     N/A
+See L<OpenAPI::Client::OpenAI::Path::organization-groups-group_id-users>.
 
-=back
+=head2 list_groups
 
+GET /organization/groups
 
-=head4 after
+operationId: list-groups
 
-Identifier for the last checkpoint ID from the previous pagination
-request.
+Lists all groups in the organization.
 
-=over 4
+See L<OpenAPI::Client::OpenAI::Path::organization-groups>.
 
-=item * Type:     string
+=head2 list_input_items
 
-=item * In:       query
+GET /responses/{response_id}/input_items
 
-=item * Required: False
+operationId: listInputItems
 
-=item * Default:  N/A
+Returns a list of input items for a given response.
 
-=item * Example:  N/A
+See L<OpenAPI::Client::OpenAI::Path::responses-response_id-input_items>.
 
-=item * Enum:     N/A
+=head2 list_invites
 
-=back
+GET /organization/invites
 
+operationId: list-invites
 
-=head4 limit
+Returns a list of invites in the organization.
 
-Number of checkpoints to retrieve.
+See L<OpenAPI::Client::OpenAI::Path::organization-invites>.
 
-=over 4
+=head2 list_messages
 
-=item * Type:     integer
+GET /threads/{thread_id}/messages
 
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  10
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 listMessages
+operationId: listMessages
 
 Returns a list of messages for a given thread.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::threads-thread_id-messages>.
 
+=head2 list_models
 
-=head4 thread_id
+GET /models
 
-The ID of the
-L<thread|https://platform.openai.com/docs/api-reference/threads> the
-messages belong to.
+operationId: listModels
 
-=over 4
+Lists the currently available models, and provides basic information about
+each one such as the owner and availability.
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::models>.
 
-=item * In:       path
+=head2 list_organization_certificates
 
-=item * Required: True
+GET /organization/certificates
 
-=item * Default:  N/A
+operationId: listOrganizationCertificates
 
-=item * Example:  N/A
+List uploaded certificates for this organization.
 
-=item * Enum:     N/A
+See L<OpenAPI::Client::OpenAI::Path::organization-certificates>.
 
-=back
+=head2 list_organization_spend_alerts
 
+GET /organization/spend_alerts
 
-=head4 limit
+operationId: list-organization-spend-alerts
 
-A limit on the number of objects to be returned. Limit can range
-between 1 and 100, and the default is 20.
+Lists organization spend alerts.
 
-=over 4
+See L<OpenAPI::Client::OpenAI::Path::organization-spend_alerts>.
 
-=item * Type:     integer
+=head2 list_paginated_fine_tuning_jobs
 
-=item * In:       query
+GET /fine_tuning/jobs
 
-=item * Required: False
-
-=item * Default:  20
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 order
-
-Sort order by the C<created_at> timestamp of the objects. C<asc> for
-ascending order and C<desc> for descending order.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  desc
-
-=item * Example:  N/A
-
-=item * Enum:     asc, desc
-
-=back
-
-
-=head4 after
-
-A cursor for use in pagination. C<after> is an object ID that defines
-your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objI<foo, your subsequent call can
-include after=obj>foo in order to fetch the next page of the list.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 before
-
-A cursor for use in pagination. C<before> is an object ID that defines
-your place in the list. For instance, if you make a list request and
-receive 100 objects, starting with objI<foo, your subsequent call can
-include before=obj>foo in order to fetch the previous page of the list.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 run_id
-
-Filter messages by the run ID that generated them.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 listModels
-
-Lists the currently available models, and provides basic information
-about each one such as the owner and availability.
-
-This method does not take any path or URL parameters.
-
-
-=head2 listPaginatedFineTuningJobs
+operationId: listPaginatedFineTuningJobs
 
 List your organization's fine-tuning jobs
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::fine_tuning-jobs>.
 
+=head2 list_project_api_keys
 
-=head4 after
+GET /organization/projects/{project_id}/api_keys
 
-Identifier for the last job from the previous pagination request.
+operationId: list-project-api-keys
 
-=over 4
+Returns a list of API keys in the project.
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-api_keys>.
 
-=item * In:       query
+=head2 list_project_certificates
 
-=item * Required: False
+GET /organization/projects/{project_id}/certificates
 
-=item * Default:  N/A
+operationId: listProjectCertificates
 
-=item * Example:  N/A
+List certificates for this project.
 
-=item * Enum:     N/A
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-certificates>.
 
-=back
+=head2 list_project_group_role_assignments
 
+GET /projects/{project_id}/groups/{group_id}/roles
 
-=head4 limit
+operationId: list-project-group-role-assignments
 
-Number of fine-tuning jobs to retrieve.
+Lists the project roles assigned to a group within a project.
 
-=over 4
+See L<OpenAPI::Client::OpenAI::Path::projects-project_id-groups-group_id-roles>.
 
-=item * Type:     integer
+=head2 list_project_groups
 
-=item * In:       query
+GET /organization/projects/{project_id}/groups
 
-=item * Required: False
+operationId: list-project-groups
 
-=item * Default:  20
+Lists the groups that have access to a project.
 
-=item * Example:  N/A
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-groups>.
 
-=item * Enum:     N/A
+=head2 list_project_rate_limits
 
-=back
+GET /organization/projects/{project_id}/rate_limits
 
+operationId: list-project-rate-limits
 
+Returns the rate limits per model for a project.
 
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-rate_limits>.
 
-=head2 listRuns
+=head2 list_project_roles
 
-Returns a list of runs belonging to a thread.
+GET /projects/{project_id}/roles
 
-=head3 Parameters
+operationId: list-project-roles
 
+Lists the roles configured for a project.
 
-=head4 thread_id
+See L<OpenAPI::Client::OpenAI::Path::projects-project_id-roles>.
 
-The ID of the thread the run belongs to.
+=head2 list_project_service_accounts
 
-=over 4
+GET /organization/projects/{project_id}/service_accounts
 
-=item * Type:     string
+operationId: list-project-service-accounts
 
-=item * In:       path
+Returns a list of service accounts in the project.
 
-=item * Required: True
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-service_accounts>.
 
-=item * Default:  N/A
+=head2 list_project_spend_alerts
 
-=item * Example:  N/A
+GET /organization/projects/{project_id}/spend_alerts
 
-=item * Enum:     N/A
+operationId: list-project-spend-alerts
 
-=back
+Lists project spend alerts.
 
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-spend_alerts>.
 
-=head4 limit
+=head2 list_project_user_role_assignments
 
-A limit on the number of objects to be returned. Limit can range
-between 1 and 100, and the default is 20.
+GET /projects/{project_id}/users/{user_id}/roles
 
-=over 4
+operationId: list-project-user-role-assignments
 
-=item * Type:     integer
+Lists the project roles assigned to a user within a project.
 
-=item * In:       query
+See L<OpenAPI::Client::OpenAI::Path::projects-project_id-users-user_id-roles>.
 
-=item * Required: False
+=head2 list_project_users
 
-=item * Default:  20
+GET /organization/projects/{project_id}/users
 
-=item * Example:  N/A
+operationId: list-project-users
 
-=item * Enum:     N/A
+Returns a list of users in the project.
 
-=back
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-users>.
 
+=head2 list_projects
 
-=head4 order
+GET /organization/projects
 
-Sort order by the C<created_at> timestamp of the objects. C<asc> for
-ascending order and C<desc> for descending order.
+operationId: list-projects
 
-=over 4
+Returns a list of projects.
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::organization-projects>.
 
-=item * In:       query
+=head2 list_roles
 
-=item * Required: False
+GET /organization/roles
 
-=item * Default:  desc
+operationId: list-roles
 
-=item * Example:  N/A
+Lists the roles configured for the organization.
 
-=item * Enum:     asc, desc
+See L<OpenAPI::Client::OpenAI::Path::organization-roles>.
 
-=back
+=head2 list_run_steps
 
+GET /threads/{thread_id}/runs/{run_id}/steps
 
-=head4 after
-
-A cursor for use in pagination. C<after> is an object ID that defines
-your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objI<foo, your subsequent call can
-include after=obj>foo in order to fetch the next page of the list.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 before
-
-A cursor for use in pagination. C<before> is an object ID that defines
-your place in the list. For instance, if you make a list request and
-receive 100 objects, starting with objI<foo, your subsequent call can
-include before=obj>foo in order to fetch the previous page of the list.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 listRunSteps
+operationId: listRunSteps
 
 Returns a list of run steps belonging to a run.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::threads-thread_id-runs-run_id-steps>.
 
+=head2 list_runs
 
-=head4 thread_id
+GET /threads/{thread_id}/runs
 
-The ID of the thread the run and run steps belong to.
+operationId: listRuns
 
-=over 4
+Returns a list of runs belonging to a thread.
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::threads-thread_id-runs>.
 
-=item * In:       path
+=head2 list_skill_versions
 
-=item * Required: True
+GET /skills/{skill_id}/versions
 
-=item * Default:  N/A
+operationId: ListSkillVersions
 
-=item * Example:  N/A
+List skill versions for a skill.
 
-=item * Enum:     N/A
+See L<OpenAPI::Client::OpenAI::Path::skills-skill_id-versions>.
 
-=back
+=head2 list_skills
 
+GET /skills
 
-=head4 run_id
+operationId: ListSkills
 
-The ID of the run the run steps belong to.
+List all skills for the current project.
 
-=over 4
+See L<OpenAPI::Client::OpenAI::Path::skills>.
 
-=item * Type:     string
+=head2 list_thread_items_method
 
-=item * In:       path
+GET /chatkit/threads/{thread_id}/items
 
-=item * Required: True
+operationId: ListThreadItemsMethod
 
-=item * Default:  N/A
+List items that belong to a ChatKit thread.
 
-=item * Example:  N/A
+See L<OpenAPI::Client::OpenAI::Path::chatkit-threads-thread_id-items>.
 
-=item * Enum:     N/A
+=head2 list_threads_method
 
-=back
+GET /chatkit/threads
 
+operationId: ListThreadsMethod
 
-=head4 limit
+List ChatKit threads with optional pagination and user filters.
 
-A limit on the number of objects to be returned. Limit can range
-between 1 and 100, and the default is 20.
+See L<OpenAPI::Client::OpenAI::Path::chatkit-threads>.
 
-=over 4
+=head2 list_user_role_assignments
 
-=item * Type:     integer
+GET /organization/users/{user_id}/roles
 
-=item * In:       query
+operationId: list-user-role-assignments
 
-=item * Required: False
+Lists the organization roles assigned to a user within the organization.
 
-=item * Default:  20
+See L<OpenAPI::Client::OpenAI::Path::organization-users-user_id-roles>.
 
-=item * Example:  N/A
+=head2 list_users
 
-=item * Enum:     N/A
+GET /organization/users
 
-=back
+operationId: list-users
 
+Lists all of the users in the organization.
 
-=head4 order
+See L<OpenAPI::Client::OpenAI::Path::organization-users>.
 
-Sort order by the C<created_at> timestamp of the objects. C<asc> for
-ascending order and C<desc> for descending order.
+=head2 list_vector_store_files
 
-=over 4
+GET /vector_stores/{vector_store_id}/files
 
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  desc
-
-=item * Example:  N/A
-
-=item * Enum:     asc, desc
-
-=back
-
-
-=head4 after
-
-A cursor for use in pagination. C<after> is an object ID that defines
-your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objI<foo, your subsequent call can
-include after=obj>foo in order to fetch the next page of the list.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 before
-
-A cursor for use in pagination. C<before> is an object ID that defines
-your place in the list. For instance, if you make a list request and
-receive 100 objects, starting with objI<foo, your subsequent call can
-include before=obj>foo in order to fetch the previous page of the list.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 include[]
-
-A list of additional fields to include in the response. Currently the
-only supported value is
-C<step_details.tool_calls[*].file_search.results[*].content> to fetch
-the file search result content.
-
-See the L<file search tool
-documentation|https://platform.openai.com/docs/assistants/tools/file-se
-arch#customizing-file-search-settings> for more information.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 listVectorStoreFiles
+operationId: listVectorStoreFiles
 
 Returns a list of vector store files.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-files>.
 
+=head2 list_vector_stores
 
-=head4 vector_store_id
+GET /vector_stores
 
-The ID of the vector store that the files belong to.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 limit
-
-A limit on the number of objects to be returned. Limit can range
-between 1 and 100, and the default is 20.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  20
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 order
-
-Sort order by the C<created_at> timestamp of the objects. C<asc> for
-ascending order and C<desc> for descending order.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  desc
-
-=item * Example:  N/A
-
-=item * Enum:     asc, desc
-
-=back
-
-
-=head4 after
-
-A cursor for use in pagination. C<after> is an object ID that defines
-your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objI<foo, your subsequent call can
-include after=obj>foo in order to fetch the next page of the list.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 before
-
-A cursor for use in pagination. C<before> is an object ID that defines
-your place in the list. For instance, if you make a list request and
-receive 100 objects, starting with objI<foo, your subsequent call can
-include before=obj>foo in order to fetch the previous page of the list.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 filter
-
-Filter by file status. One of C<in_progress>, C<completed>, C<failed>,
-C<cancelled>.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     in_progress, completed, failed, cancelled
-
-=back
-
-
-
-
-=head2 listVectorStores
+operationId: listVectorStores
 
 Returns a list of vector stores.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::vector_stores>.
 
+=head2 list_videos
 
-=head4 limit
+GET /videos
 
-A limit on the number of objects to be returned. Limit can range
-between 1 and 100, and the default is 20.
+operationId: ListVideos
 
-=over 4
+List recently generated videos for the current project.
 
-=item * Type:     integer
+See L<OpenAPI::Client::OpenAI::Path::videos>.
 
-=item * In:       query
+=head2 list_voice_consents
 
-=item * Required: False
+GET /audio/voice_consents
 
-=item * Default:  20
+operationId: listVoiceConsents
 
-=item * Example:  N/A
+Returns a list of voice consent recordings.
 
-=item * Enum:     N/A
+See L<OpenAPI::Client::OpenAI::Path::audio-voice_consents>.
 
-=back
+=head2 modify_assistant
 
+POST /assistants/{assistant_id}
 
-=head4 order
-
-Sort order by the C<created_at> timestamp of the objects. C<asc> for
-ascending order and C<desc> for descending order.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  desc
-
-=item * Example:  N/A
-
-=item * Enum:     asc, desc
-
-=back
-
-
-=head4 after
-
-A cursor for use in pagination. C<after> is an object ID that defines
-your place in the list. For instance, if you make a list request and
-receive 100 objects, ending with objI<foo, your subsequent call can
-include after=obj>foo in order to fetch the next page of the list.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 before
-
-A cursor for use in pagination. C<before> is an object ID that defines
-your place in the list. For instance, if you make a list request and
-receive 100 objects, starting with objI<foo, your subsequent call can
-include before=obj>foo in order to fetch the previous page of the list.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 modify-project
-
-Modifies a project in the organization.
-
-=head3 Parameters
-
-
-=head4 project_id
-
-The ID of the project.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head3 Request Body
-
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
-
-=head2 modify-project-user
-
-Modifies a user's role in the project.
-
-=head3 Parameters
-
-
-=head4 project_id
-
-The ID of the project.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 user_id
-
-The ID of the user.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head3 Request Body
-
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
-
-=head2 modify-user
-
-Modifies a user's role in the organization.
-
-=head3 Parameters
-
-
-=head4 user_id
-
-The ID of the user.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head3 Request Body
-
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
-
-=head2 modifyAssistant
+operationId: modifyAssistant
 
 Modifies an assistant.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::assistants-assistant_id>.
 
+=head2 modify_certificate
 
-=head4 assistant_id
+POST /organization/certificates/{certificate_id}
 
-The ID of the assistant to modify.
+operationId: modifyCertificate
 
-=over 4
+Modify a certificate. Note that only the name can be modified.
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::organization-certificates-certificate_id>.
 
-=item * In:       path
+=head2 modify_message
 
-=item * Required: True
+POST /threads/{thread_id}/messages/{message_id}
 
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head3 Request Body
-
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
-
-=head2 modifyMessage
+operationId: modifyMessage
 
 Modifies a message.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::threads-thread_id-messages-message_id>.
 
+=head2 modify_project
 
-=head4 thread_id
+POST /organization/projects/{project_id}
 
-The ID of the thread to which this message belongs.
+operationId: modify-project
 
-=over 4
+Modifies a project in the organization.
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id>.
 
-=item * In:       path
+=head2 modify_project_user
 
-=item * Required: True
+POST /organization/projects/{project_id}/users/{user_id}
 
-=item * Default:  N/A
+operationId: modify-project-user
 
-=item * Example:  N/A
+Modifies a user's role in the project.
 
-=item * Enum:     N/A
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-users-user_id>.
 
-=back
+=head2 modify_run
 
+POST /threads/{thread_id}/runs/{run_id}
 
-=head4 message_id
-
-The ID of the message to modify.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head3 Request Body
-
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
-
-=head2 modifyRun
+operationId: modifyRun
 
 Modifies a run.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::threads-thread_id-runs-run_id>.
 
+=head2 modify_thread
 
-=head4 thread_id
+POST /threads/{thread_id}
 
-The ID of the
-L<thread|https://platform.openai.com/docs/api-reference/threads> that
-was run.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 run_id
-
-The ID of the run to modify.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head3 Request Body
-
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
-
-=head2 modifyThread
+operationId: modifyThread
 
 Modifies a thread.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::threads-thread_id>.
 
+=head2 modify_user
 
-=head4 thread_id
+POST /organization/users/{user_id}
 
-The ID of the thread to modify. Only the C<metadata> can be modified.
+operationId: modify-user
 
-=over 4
+Modifies a user's role in the organization.
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::organization-users-user_id>.
 
-=item * In:       path
+=head2 modify_vector_store
 
-=item * Required: True
+POST /vector_stores/{vector_store_id}
 
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head3 Request Body
-
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
-
-=head2 modifyVectorStore
+operationId: modifyVectorStore
 
 Modifies a vector store.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id>.
 
+=head2 pause_fine_tuning_job
 
-=head4 vector_store_id
+POST /fine_tuning/jobs/{fine_tuning_job_id}/pause
 
-The ID of the vector store to modify.
+operationId: pauseFineTuningJob
 
-=over 4
+Pause a fine-tune job.
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::fine_tuning-jobs-fine_tuning_job_id-pause>.
 
-=item * In:       path
+=head2 refer_realtime_call
 
-=item * Required: True
+POST /realtime/calls/{call_id}/refer
 
-=item * Default:  N/A
+operationId: refer-realtime-call
 
-=item * Example:  N/A
+Transfer an active SIP call to a new destination using the SIP REFER verb.
 
-=item * Enum:     N/A
+See L<OpenAPI::Client::OpenAI::Path::realtime-calls-call_id-refer>.
 
-=back
+=head2 reject_realtime_call
 
+POST /realtime/calls/{call_id}/reject
 
+operationId: reject-realtime-call
 
+Decline an incoming SIP call by returning a SIP status code to the caller.
 
-=head3 Request Body
+See L<OpenAPI::Client::OpenAI::Path::realtime-calls-call_id-reject>.
 
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
+=head2 remove_group_user
 
-=head2 retrieve-invite
+DELETE /organization/groups/{group_id}/users/{user_id}
 
-Retrieves an invite.
+operationId: remove-group-user
 
-=head3 Parameters
+Removes a user from a group.
 
+See L<OpenAPI::Client::OpenAI::Path::organization-groups-group_id-users-user_id>.
 
-=head4 invite_id
+=head2 remove_project_group
 
-The ID of the invite to retrieve.
+DELETE /organization/projects/{project_id}/groups/{group_id}
 
-=over 4
+operationId: remove-project-group
 
-=item * Type:     string
+Revokes a group's access to a project.
 
-=item * In:       path
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-groups-group_id>.
 
-=item * Required: True
+=head2 resume_fine_tuning_job
 
-=item * Default:  N/A
+POST /fine_tuning/jobs/{fine_tuning_job_id}/resume
 
-=item * Example:  N/A
+operationId: resumeFineTuningJob
 
-=item * Enum:     N/A
+Resume a fine-tune job.
 
-=back
+See L<OpenAPI::Client::OpenAI::Path::fine_tuning-jobs-fine_tuning_job_id-resume>.
 
+=head2 retrieve_batch
 
+GET /batches/{batch_id}
 
-
-=head2 retrieve-project
-
-Retrieves a project.
-
-=head3 Parameters
-
-
-=head4 project_id
-
-The ID of the project.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 retrieve-project-api-key
-
-Retrieves an API key in the project.
-
-=head3 Parameters
-
-
-=head4 project_id
-
-The ID of the project.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 key_id
-
-The ID of the API key.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 retrieve-project-service-account
-
-Retrieves a service account in the project.
-
-=head3 Parameters
-
-
-=head4 project_id
-
-The ID of the project.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 service_account_id
-
-The ID of the service account.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 retrieve-project-user
-
-Retrieves a user in the project.
-
-=head3 Parameters
-
-
-=head4 project_id
-
-The ID of the project.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 user_id
-
-The ID of the user.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 retrieve-user
-
-Retrieves a user by their identifier.
-
-=head3 Parameters
-
-
-=head4 user_id
-
-The ID of the user.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 retrieveBatch
+operationId: retrieveBatch
 
 Retrieves a batch.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::batches-batch_id>.
 
+=head2 retrieve_container
 
-=head4 batch_id
+GET /containers/{container_id}
 
-The ID of the batch to retrieve.
+operationId: RetrieveContainer
 
-=over 4
+Retrieve Container
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::containers-container_id>.
 
-=item * In:       path
+=head2 retrieve_container_file
 
-=item * Required: True
+GET /containers/{container_id}/files/{file_id}
 
-=item * Default:  N/A
+operationId: RetrieveContainerFile
 
-=item * Example:  N/A
+Retrieve Container File
 
-=item * Enum:     N/A
+See L<OpenAPI::Client::OpenAI::Path::containers-container_id-files-file_id>.
 
-=back
+=head2 retrieve_container_file_content
 
+GET /containers/{container_id}/files/{file_id}/content
 
+operationId: RetrieveContainerFileContent
 
+Retrieve Container File Content
 
-=head2 retrieveFile
+See L<OpenAPI::Client::OpenAI::Path::containers-container_id-files-file_id-content>.
+
+=head2 retrieve_file
+
+GET /files/{file_id}
+
+operationId: retrieveFile
 
 Returns information about a specific file.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::files-file_id>.
 
+=head2 retrieve_fine_tuning_job
 
-=head4 file_id
+GET /fine_tuning/jobs/{fine_tuning_job_id}
 
-The ID of the file to use for this request.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       path
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 retrieveFineTuningJob
+operationId: retrieveFineTuningJob
 
 Get info about a fine-tuning job.
 
-L<Learn more about
-fine-tuning|https://platform.openai.com/docs/guides/fine-tuning>
+L<Learn more about fine-tuning|https://platform.openai.com/docs/guides/model-optimization>
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::fine_tuning-jobs-fine_tuning_job_id>.
 
+=head2 retrieve_group
 
-=head4 fine_tuning_job_id
+GET /organization/groups/{group_id}
 
-The ID of the fine-tuning job.
+operationId: retrieve-group
 
-=over 4
+Retrieves a group.
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::organization-groups-group_id>.
 
-=item * In:       path
+=head2 retrieve_group_role
 
-=item * Required: True
+GET /organization/groups/{group_id}/roles/{role_id}
 
-=item * Default:  N/A
+operationId: retrieve-group-role
 
-=item * Example:  ft-AF1WoRqd3aJAHsqc9NY7iL8F
+Retrieves an organization role assigned to a group.
 
-=item * Enum:     N/A
+See L<OpenAPI::Client::OpenAI::Path::organization-groups-group_id-roles-role_id>.
 
-=back
+=head2 retrieve_group_user
 
+GET /organization/groups/{group_id}/users/{user_id}
 
+operationId: retrieve-group-user
 
+Retrieves a user in a group.
 
-=head2 retrieveModel
+See L<OpenAPI::Client::OpenAI::Path::organization-groups-group_id-users-user_id>.
 
-Retrieves a model instance, providing basic information about the model
-such as the owner and permissioning.
+=head2 retrieve_invite
 
-=head3 Parameters
+GET /organization/invites/{invite_id}
 
+operationId: retrieve-invite
 
-=head4 model
+Retrieves an invite.
 
-The ID of the model to use for this request
+See L<OpenAPI::Client::OpenAI::Path::organization-invites-invite_id>.
 
-=over 4
+=head2 retrieve_model
 
-=item * Type:     string
+GET /models/{model}
 
-=item * In:       path
+operationId: retrieveModel
 
-=item * Required: True
+Retrieves a model instance, providing basic information about the model such
+as the owner and permissioning.
 
-=item * Default:  N/A
+See L<OpenAPI::Client::OpenAI::Path::models-model>.
 
-=item * Example:  gpt-4o-mini
+=head2 retrieve_organization_data_retention
 
-=item * Enum:     N/A
+GET /organization/data_retention
 
-=back
+operationId: retrieve-organization-data-retention
 
+Retrieves organization data retention controls.
 
+See L<OpenAPI::Client::OpenAI::Path::organization-data_retention>.
 
+=head2 retrieve_project
 
-=head2 submitToolOuputsToRun
+GET /organization/projects/{project_id}
 
-When a run has the C<status: "requires_action"> and
-C<required_action.type> is C<submit_tool_outputs>, this endpoint can be
-used to submit the outputs from the tool calls once they're all
-completed. All outputs must be submitted in a single request.
+operationId: retrieve-project
 
-=head3 Parameters
+Retrieves a project.
 
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id>.
 
-=head4 thread_id
+=head2 retrieve_project_api_key
 
-The ID of the
-L<thread|https://platform.openai.com/docs/api-reference/threads> to
-which this run belongs.
+GET /organization/projects/{project_id}/api_keys/{api_key_id}
 
-=over 4
+operationId: retrieve-project-api-key
 
-=item * Type:     string
+Retrieves an API key in the project.
 
-=item * In:       path
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-api_keys-api_key_id>.
 
-=item * Required: True
+=head2 retrieve_project_data_retention
 
-=item * Default:  N/A
+GET /organization/projects/{project_id}/data_retention
 
-=item * Example:  N/A
+operationId: retrieve-project-data-retention
 
-=item * Enum:     N/A
+Retrieves project data retention controls.
 
-=back
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-data_retention>.
 
+=head2 retrieve_project_group
 
-=head4 run_id
+GET /organization/projects/{project_id}/groups/{group_id}
 
-The ID of the run that requires the tool output submission.
+operationId: retrieve-project-group
 
-=over 4
+Retrieves a project's group.
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-groups-group_id>.
 
-=item * In:       path
+=head2 retrieve_project_group_role
 
-=item * Required: True
+GET /projects/{project_id}/groups/{group_id}/roles/{role_id}
 
-=item * Default:  N/A
+operationId: retrieve-project-group-role
 
-=item * Example:  N/A
+Retrieves a project role assigned to a group.
 
-=item * Enum:     N/A
+See L<OpenAPI::Client::OpenAI::Path::projects-project_id-groups-group_id-roles-role_id>.
 
-=back
+=head2 retrieve_project_hosted_tool_permissions
 
+GET /organization/projects/{project_id}/hosted_tool_permissions
 
+operationId: retrieve-project-hosted-tool-permissions
 
+Returns hosted tool permissions for a project.
 
-=head3 Request Body
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-hosted_tool_permissions>.
 
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
+=head2 retrieve_project_model_permissions
 
-=head2 update-project-rate-limits
+GET /organization/projects/{project_id}/model_permissions
+
+operationId: retrieve-project-model-permissions
+
+Returns model permissions for a project.
+
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-model_permissions>.
+
+=head2 retrieve_project_role
+
+GET /projects/{project_id}/roles/{role_id}
+
+operationId: retrieve-project-role
+
+Retrieves a project role.
+
+See L<OpenAPI::Client::OpenAI::Path::projects-project_id-roles-role_id>.
+
+=head2 retrieve_project_service_account
+
+GET /organization/projects/{project_id}/service_accounts/{service_account_id}
+
+operationId: retrieve-project-service-account
+
+Retrieves a service account in the project.
+
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-service_accounts-service_account_id>.
+
+=head2 retrieve_project_user
+
+GET /organization/projects/{project_id}/users/{user_id}
+
+operationId: retrieve-project-user
+
+Retrieves a user in the project.
+
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-users-user_id>.
+
+=head2 retrieve_project_user_role
+
+GET /projects/{project_id}/users/{user_id}/roles/{role_id}
+
+operationId: retrieve-project-user-role
+
+Retrieves a project role assigned to a user.
+
+See L<OpenAPI::Client::OpenAI::Path::projects-project_id-users-user_id-roles-role_id>.
+
+=head2 retrieve_role
+
+GET /organization/roles/{role_id}
+
+operationId: retrieve-role
+
+Retrieves an organization role.
+
+See L<OpenAPI::Client::OpenAI::Path::organization-roles-role_id>.
+
+=head2 retrieve_user
+
+GET /organization/users/{user_id}
+
+operationId: retrieve-user
+
+Retrieves a user by their identifier.
+
+See L<OpenAPI::Client::OpenAI::Path::organization-users-user_id>.
+
+=head2 retrieve_user_role
+
+GET /organization/users/{user_id}/roles/{role_id}
+
+operationId: retrieve-user-role
+
+Retrieves an organization role assigned to a user.
+
+See L<OpenAPI::Client::OpenAI::Path::organization-users-user_id-roles-role_id>.
+
+=head2 retrieve_vector_store_file_content
+
+GET /vector_stores/{vector_store_id}/files/{file_id}/content
+
+operationId: retrieveVectorStoreFileContent
+
+Retrieve the parsed contents of a vector store file.
+
+See L<OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-files-file_id-content>.
+
+=head2 retrieve_video_content
+
+GET /videos/{video_id}/content
+
+operationId: RetrieveVideoContent
+
+Download the generated video bytes or a derived preview asset.
+
+Streams the rendered video content for the specified video job.
+
+See L<OpenAPI::Client::OpenAI::Path::videos-video_id-content>.
+
+=head2 run_grader
+
+POST /fine_tuning/alpha/graders/run
+
+operationId: runGrader
+
+Run a grader.
+
+See L<OpenAPI::Client::OpenAI::Path::fine_tuning-alpha-graders-run>.
+
+=head2 search_vector_store
+
+POST /vector_stores/{vector_store_id}/search
+
+operationId: searchVectorStore
+
+Search a vector store for relevant chunks based on a query and file attributes
+filter.
+
+See L<OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-search>.
+
+=head2 submit_tool_ouputs_to_run
+
+POST /threads/{thread_id}/runs/{run_id}/submit_tool_outputs
+
+operationId: submitToolOuputsToRun
+
+When a run has the C<status: "requires_action"> and C<required_action.type> is
+C<submit_tool_outputs> , this endpoint can be used to submit the outputs from
+the tool calls once they're all completed. All outputs must be submitted in a
+single request.
+
+See L<OpenAPI::Client::OpenAI::Path::threads-thread_id-runs-run_id-submit_tool_outputs>.
+
+=head2 unassign_group_role
+
+DELETE /organization/groups/{group_id}/roles/{role_id}
+
+operationId: unassign-group-role
+
+Unassigns an organization role from a group within the organization.
+
+See L<OpenAPI::Client::OpenAI::Path::organization-groups-group_id-roles-role_id>.
+
+=head2 unassign_project_group_role
+
+DELETE /projects/{project_id}/groups/{group_id}/roles/{role_id}
+
+operationId: unassign-project-group-role
+
+Unassigns a project role from a group within a project.
+
+See L<OpenAPI::Client::OpenAI::Path::projects-project_id-groups-group_id-roles-role_id>.
+
+=head2 unassign_project_user_role
+
+DELETE /projects/{project_id}/users/{user_id}/roles/{role_id}
+
+operationId: unassign-project-user-role
+
+Unassigns a project role from a user within a project.
+
+See L<OpenAPI::Client::OpenAI::Path::projects-project_id-users-user_id-roles-role_id>.
+
+=head2 unassign_user_role
+
+DELETE /organization/users/{user_id}/roles/{role_id}
+
+operationId: unassign-user-role
+
+Unassigns an organization role from a user within the organization.
+
+See L<OpenAPI::Client::OpenAI::Path::organization-users-user_id-roles-role_id>.
+
+=head2 update_chat_completion
+
+POST /chat/completions/{completion_id}
+
+operationId: updateChatCompletion
+
+Modify a stored chat completion. Only Chat Completions that have been created
+with the C<store> parameter set to C<true> can be modified. Currently, the
+only supported modification is to update the C<metadata> field.
+
+See L<OpenAPI::Client::OpenAI::Path::chat-completions-completion_id>.
+
+=head2 update_conversation
+
+POST /conversations/{conversation_id}
+
+operationId: updateConversation
+
+Update a conversation
+
+See L<OpenAPI::Client::OpenAI::Path::conversations-conversation_id>.
+
+=head2 update_eval
+
+POST /evals/{eval_id}
+
+operationId: updateEval
+
+Update certain properties of an evaluation.
+
+See L<OpenAPI::Client::OpenAI::Path::evals-eval_id>.
+
+=head2 update_group
+
+POST /organization/groups/{group_id}
+
+operationId: update-group
+
+Updates a group's information.
+
+See L<OpenAPI::Client::OpenAI::Path::organization-groups-group_id>.
+
+=head2 update_organization_data_retention
+
+POST /organization/data_retention
+
+operationId: update-organization-data-retention
+
+Updates organization data retention controls.
+
+See L<OpenAPI::Client::OpenAI::Path::organization-data_retention>.
+
+=head2 update_organization_spend_alert
+
+POST /organization/spend_alerts/{alert_id}
+
+operationId: update-organization-spend-alert
+
+Updates an organization spend alert.
+
+See L<OpenAPI::Client::OpenAI::Path::organization-spend_alerts-alert_id>.
+
+=head2 update_project_data_retention
+
+POST /organization/projects/{project_id}/data_retention
+
+operationId: update-project-data-retention
+
+Updates project data retention controls.
+
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-data_retention>.
+
+=head2 update_project_hosted_tool_permissions
+
+POST /organization/projects/{project_id}/hosted_tool_permissions
+
+operationId: update-project-hosted-tool-permissions
+
+Updates hosted tool permissions for a project.
+
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-hosted_tool_permissions>.
+
+=head2 update_project_model_permissions
+
+POST /organization/projects/{project_id}/model_permissions
+
+operationId: update-project-model-permissions
+
+Updates model permissions for a project.
+
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-model_permissions>.
+
+=head2 update_project_rate_limits
+
+POST /organization/projects/{project_id}/rate_limits/{rate_limit_id}
+
+operationId: update-project-rate-limits
 
 Updates a project rate limit.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-rate_limits-rate_limit_id>.
 
+=head2 update_project_role
 
-=head4 project_id
+POST /projects/{project_id}/roles/{role_id}
 
-The ID of the project.
+operationId: update-project-role
 
-=over 4
+Updates an existing project role.
 
-=item * Type:     string
+See L<OpenAPI::Client::OpenAI::Path::projects-project_id-roles-role_id>.
 
-=item * In:       path
+=head2 update_project_service_account
 
-=item * Required: True
+POST /organization/projects/{project_id}/service_accounts/{service_account_id}
 
-=item * Default:  N/A
+operationId: update-project-service-account
 
-=item * Example:  N/A
+Updates a service account in the project.
 
-=item * Enum:     N/A
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-service_accounts-service_account_id>.
 
-=back
+=head2 update_project_spend_alert
 
+POST /organization/projects/{project_id}/spend_alerts/{alert_id}
 
-=head4 rate_limit_id
+operationId: update-project-spend-alert
 
-The ID of the rate limit.
+Updates a project spend alert.
 
-=over 4
+See L<OpenAPI::Client::OpenAI::Path::organization-projects-project_id-spend_alerts-alert_id>.
 
-=item * Type:     string
+=head2 update_role
 
-=item * In:       path
+POST /organization/roles/{role_id}
 
-=item * Required: True
+operationId: update-role
 
-=item * Default:  N/A
+Updates an existing organization role.
 
-=item * Example:  N/A
+See L<OpenAPI::Client::OpenAI::Path::organization-roles-role_id>.
 
-=item * Enum:     N/A
+=head2 update_skill_default_version
 
-=back
+POST /skills/{skill_id}
 
+operationId: UpdateSkillDefaultVersion
 
+Update the default version pointer for a skill.
 
+See L<OpenAPI::Client::OpenAI::Path::skills-skill_id>.
 
-=head3 Request Body
+=head2 update_vector_store_file_attributes
 
-The request body is complicated. See L<OpenAPI::Client::OpenAI::Path> for details.
+POST /vector_stores/{vector_store_id}/files/{file_id}
 
-=head2 usage-audio-speeches
+operationId: updateVectorStoreFileAttributes
+
+Update attributes on a vector store file.
+
+See L<OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-files-file_id>.
+
+=head2 update_voice_consent
+
+POST /audio/voice_consents/{consent_id}
+
+operationId: updateVoiceConsent
+
+Updates a voice consent recording (metadata only).
+
+See L<OpenAPI::Client::OpenAI::Path::audio-voice_consents-consent_id>.
+
+=head2 upload_certificate
+
+POST /organization/certificates
+
+operationId: uploadCertificate
+
+Upload a certificate to the organization. This does B<not> automatically
+activate the certificate.
+
+Organizations can upload up to 50 certificates.
+
+See L<OpenAPI::Client::OpenAI::Path::organization-certificates>.
+
+=head2 usage_audio_speeches
+
+GET /organization/usage/audio_speeches
+
+operationId: usage-audio-speeches
 
 Get audio speeches usage details for the organization.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::organization-usage-audio_speeches>.
 
+=head2 usage_audio_transcriptions
 
-=head4 start_time
+GET /organization/usage/audio_transcriptions
 
-Start time (Unix seconds) of the query time range, inclusive.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 end_time
-
-End time (Unix seconds) of the query time range, exclusive.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 bucket_width
-
-Width of each time bucket in response. Currently C<1m>, C<1h> and C<1d>
-are supported, default to C<1d>.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  1d
-
-=item * Example:  N/A
-
-=item * Enum:     1m, 1h, 1d
-
-=back
-
-
-=head4 project_ids
-
-Return only usage for these projects.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 user_ids
-
-Return only usage for these users.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 api_key_ids
-
-Return only usage for these API keys.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 models
-
-Return only usage for these models.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 group_by
-
-Group the usage data by the specified fields. Support fields include
-C<project_id>, C<user_id>, C<api_key_id>, C<model> or any combination
-of them.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 limit
-
-Specifies the number of buckets to return.
-- C<bucket_width=1d>: default: 7, max: 31
-- C<bucket_width=1h>: default: 24, max: 168
-- C<bucket_width=1m>: default: 60, max: 1440
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 page
-
-A cursor for use in pagination. Corresponding to the C<next_page> field
-from the previous response.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 usage-audio-transcriptions
+operationId: usage-audio-transcriptions
 
 Get audio transcriptions usage details for the organization.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::organization-usage-audio_transcriptions>.
 
+=head2 usage_code_interpreter_sessions
 
-=head4 start_time
+GET /organization/usage/code_interpreter_sessions
 
-Start time (Unix seconds) of the query time range, inclusive.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 end_time
-
-End time (Unix seconds) of the query time range, exclusive.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 bucket_width
-
-Width of each time bucket in response. Currently C<1m>, C<1h> and C<1d>
-are supported, default to C<1d>.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  1d
-
-=item * Example:  N/A
-
-=item * Enum:     1m, 1h, 1d
-
-=back
-
-
-=head4 project_ids
-
-Return only usage for these projects.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 user_ids
-
-Return only usage for these users.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 api_key_ids
-
-Return only usage for these API keys.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 models
-
-Return only usage for these models.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 group_by
-
-Group the usage data by the specified fields. Support fields include
-C<project_id>, C<user_id>, C<api_key_id>, C<model> or any combination
-of them.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 limit
-
-Specifies the number of buckets to return.
-- C<bucket_width=1d>: default: 7, max: 31
-- C<bucket_width=1h>: default: 24, max: 168
-- C<bucket_width=1m>: default: 60, max: 1440
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 page
-
-A cursor for use in pagination. Corresponding to the C<next_page> field
-from the previous response.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 usage-code-interpreter-sessions
+operationId: usage-code-interpreter-sessions
 
 Get code interpreter sessions usage details for the organization.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::organization-usage-code_interpreter_sessions>.
 
+=head2 usage_completions
 
-=head4 start_time
+GET /organization/usage/completions
 
-Start time (Unix seconds) of the query time range, inclusive.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 end_time
-
-End time (Unix seconds) of the query time range, exclusive.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 bucket_width
-
-Width of each time bucket in response. Currently C<1m>, C<1h> and C<1d>
-are supported, default to C<1d>.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  1d
-
-=item * Example:  N/A
-
-=item * Enum:     1m, 1h, 1d
-
-=back
-
-
-=head4 project_ids
-
-Return only usage for these projects.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 group_by
-
-Group the usage data by the specified fields. Support fields include
-C<project_id>.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 limit
-
-Specifies the number of buckets to return.
-- C<bucket_width=1d>: default: 7, max: 31
-- C<bucket_width=1h>: default: 24, max: 168
-- C<bucket_width=1m>: default: 60, max: 1440
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 page
-
-A cursor for use in pagination. Corresponding to the C<next_page> field
-from the previous response.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 usage-completions
+operationId: usage-completions
 
 Get completions usage details for the organization.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::organization-usage-completions>.
 
+=head2 usage_costs
 
-=head4 start_time
+GET /organization/costs
 
-Start time (Unix seconds) of the query time range, inclusive.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 end_time
-
-End time (Unix seconds) of the query time range, exclusive.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 bucket_width
-
-Width of each time bucket in response. Currently C<1m>, C<1h> and C<1d>
-are supported, default to C<1d>.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  1d
-
-=item * Example:  N/A
-
-=item * Enum:     1m, 1h, 1d
-
-=back
-
-
-=head4 project_ids
-
-Return only usage for these projects.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 user_ids
-
-Return only usage for these users.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 api_key_ids
-
-Return only usage for these API keys.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 models
-
-Return only usage for these models.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 batch
-
-If C<true>, return batch jobs only. If C<false>, return non-batch jobs
-only. By default, return both.
-
-=over 4
-
-=item * Type:     boolean
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 group_by
-
-Group the usage data by the specified fields. Support fields include
-C<project_id>, C<user_id>, C<api_key_id>, C<model>, C<batch> or any
-combination of them.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 limit
-
-Specifies the number of buckets to return.
-- C<bucket_width=1d>: default: 7, max: 31
-- C<bucket_width=1h>: default: 24, max: 168
-- C<bucket_width=1m>: default: 60, max: 1440
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 page
-
-A cursor for use in pagination. Corresponding to the C<next_page> field
-from the previous response.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 usage-costs
+operationId: usage-costs
 
 Get costs details for the organization.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::organization-costs>.
 
+=head2 usage_embeddings
 
-=head4 start_time
+GET /organization/usage/embeddings
 
-Start time (Unix seconds) of the query time range, inclusive.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 end_time
-
-End time (Unix seconds) of the query time range, exclusive.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 bucket_width
-
-Width of each time bucket in response. Currently only C<1d> is
-supported, default to C<1d>.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  1d
-
-=item * Example:  N/A
-
-=item * Enum:     1d
-
-=back
-
-
-=head4 project_ids
-
-Return only costs for these projects.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 group_by
-
-Group the costs by the specified fields. Support fields include
-C<project_id>, C<line_item> and any combination of them.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 limit
-
-A limit on the number of buckets to be returned. Limit can range
-between 1 and 180, and the default is 7.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  7
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 page
-
-A cursor for use in pagination. Corresponding to the C<next_page> field
-from the previous response.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 usage-embeddings
+operationId: usage-embeddings
 
 Get embeddings usage details for the organization.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::organization-usage-embeddings>.
 
+=head2 usage_file_search_calls
 
-=head4 start_time
+GET /organization/usage/file_search_calls
 
-Start time (Unix seconds) of the query time range, inclusive.
+operationId: usage-file-search-calls
 
-=over 4
+Get file search calls usage details for the organization.
 
-=item * Type:     integer
+See L<OpenAPI::Client::OpenAI::Path::organization-usage-file_search_calls>.
 
-=item * In:       query
+=head2 usage_images
 
-=item * Required: True
+GET /organization/usage/images
 
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 end_time
-
-End time (Unix seconds) of the query time range, exclusive.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 bucket_width
-
-Width of each time bucket in response. Currently C<1m>, C<1h> and C<1d>
-are supported, default to C<1d>.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  1d
-
-=item * Example:  N/A
-
-=item * Enum:     1m, 1h, 1d
-
-=back
-
-
-=head4 project_ids
-
-Return only usage for these projects.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 user_ids
-
-Return only usage for these users.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 api_key_ids
-
-Return only usage for these API keys.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 models
-
-Return only usage for these models.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 group_by
-
-Group the usage data by the specified fields. Support fields include
-C<project_id>, C<user_id>, C<api_key_id>, C<model> or any combination
-of them.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 limit
-
-Specifies the number of buckets to return.
-- C<bucket_width=1d>: default: 7, max: 31
-- C<bucket_width=1h>: default: 24, max: 168
-- C<bucket_width=1m>: default: 60, max: 1440
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 page
-
-A cursor for use in pagination. Corresponding to the C<next_page> field
-from the previous response.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 usage-images
+operationId: usage-images
 
 Get images usage details for the organization.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::organization-usage-images>.
 
+=head2 usage_moderations
 
-=head4 start_time
+GET /organization/usage/moderations
 
-Start time (Unix seconds) of the query time range, inclusive.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 end_time
-
-End time (Unix seconds) of the query time range, exclusive.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 bucket_width
-
-Width of each time bucket in response. Currently C<1m>, C<1h> and C<1d>
-are supported, default to C<1d>.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  1d
-
-=item * Example:  N/A
-
-=item * Enum:     1m, 1h, 1d
-
-=back
-
-
-=head4 sources
-
-Return only usages for these sources. Possible values are
-C<image.generation>, C<image.edit>, C<image.variation> or any
-combination of them.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 sizes
-
-Return only usages for these image sizes. Possible values are
-C<256x256>, C<512x512>, C<1024x1024>, C<1792x1792>, C<1024x1792> or any
-combination of them.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 project_ids
-
-Return only usage for these projects.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 user_ids
-
-Return only usage for these users.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 api_key_ids
-
-Return only usage for these API keys.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 models
-
-Return only usage for these models.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 group_by
-
-Group the usage data by the specified fields. Support fields include
-C<project_id>, C<user_id>, C<api_key_id>, C<model>, C<size>, C<source>
-or any combination of them.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 limit
-
-Specifies the number of buckets to return.
-- C<bucket_width=1d>: default: 7, max: 31
-- C<bucket_width=1h>: default: 24, max: 168
-- C<bucket_width=1m>: default: 60, max: 1440
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 page
-
-A cursor for use in pagination. Corresponding to the C<next_page> field
-from the previous response.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 usage-moderations
+operationId: usage-moderations
 
 Get moderations usage details for the organization.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::organization-usage-moderations>.
 
+=head2 usage_vector_stores
 
-=head4 start_time
+GET /organization/usage/vector_stores
 
-Start time (Unix seconds) of the query time range, inclusive.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: True
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 end_time
-
-End time (Unix seconds) of the query time range, exclusive.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 bucket_width
-
-Width of each time bucket in response. Currently C<1m>, C<1h> and C<1d>
-are supported, default to C<1d>.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  1d
-
-=item * Example:  N/A
-
-=item * Enum:     1m, 1h, 1d
-
-=back
-
-
-=head4 project_ids
-
-Return only usage for these projects.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 user_ids
-
-Return only usage for these users.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 api_key_ids
-
-Return only usage for these API keys.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 models
-
-Return only usage for these models.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 group_by
-
-Group the usage data by the specified fields. Support fields include
-C<project_id>, C<user_id>, C<api_key_id>, C<model> or any combination
-of them.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 limit
-
-Specifies the number of buckets to return.
-- C<bucket_width=1d>: default: 7, max: 31
-- C<bucket_width=1h>: default: 24, max: 168
-- C<bucket_width=1m>: default: 60, max: 1440
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 page
-
-A cursor for use in pagination. Corresponding to the C<next_page> field
-from the previous response.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
-
-=head2 usage-vector-stores
+operationId: usage-vector-stores
 
 Get vector stores usage details for the organization.
 
-=head3 Parameters
+See L<OpenAPI::Client::OpenAI::Path::organization-usage-vector_stores>.
 
+=head2 usage_web_search_calls
 
-=head4 start_time
+GET /organization/usage/web_search_calls
 
-Start time (Unix seconds) of the query time range, inclusive.
+operationId: usage-web-search-calls
 
-=over 4
+Get web search calls usage details for the organization.
 
-=item * Type:     integer
+See L<OpenAPI::Client::OpenAI::Path::organization-usage-web_search_calls>.
 
-=item * In:       query
+=head2 validate_grader
 
-=item * Required: True
+POST /fine_tuning/alpha/graders/validate
 
-=item * Default:  N/A
+operationId: validateGrader
 
-=item * Example:  N/A
+Validate a grader.
 
-=item * Enum:     N/A
-
-=back
-
-
-=head4 end_time
-
-End time (Unix seconds) of the query time range, exclusive.
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 bucket_width
-
-Width of each time bucket in response. Currently C<1m>, C<1h> and C<1d>
-are supported, default to C<1d>.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  1d
-
-=item * Example:  N/A
-
-=item * Enum:     1m, 1h, 1d
-
-=back
-
-
-=head4 project_ids
-
-Return only usage for these projects.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 group_by
-
-Group the usage data by the specified fields. Support fields include
-C<project_id>.
-
-=over 4
-
-=item * Type:     array
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 limit
-
-Specifies the number of buckets to return.
-- C<bucket_width=1d>: default: 7, max: 31
-- C<bucket_width=1h>: default: 24, max: 168
-- C<bucket_width=1m>: default: 60, max: 1440
-
-=over 4
-
-=item * Type:     integer
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-=head4 page
-
-A cursor for use in pagination. Corresponding to the C<next_page> field
-from the previous response.
-
-=over 4
-
-=item * Type:     string
-
-=item * In:       query
-
-=item * Required: False
-
-=item * Default:  N/A
-
-=item * Example:  N/A
-
-=item * Enum:     N/A
-
-=back
-
-
-
+See L<OpenAPI::Client::OpenAI::Path::fine_tuning-alpha-graders-validate>.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2023-2024 by Nelson Ferraz
+Copyright (C) 2023-2026 by Nelson Ferraz
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

@@ -1,3 +1,15 @@
+0.86 2026-05-23
+  - Add Time::TZif module for parsing TZif binary timezone files
+    (RFC 8536) with configurable local time resolution policies for
+    gaps and overlaps. Supports v1 (32-bit) and v2/v3 (64-bit)
+    timestamps.
+  - Add Time::Str::Time module with UTC epoch conversion and time
+    validation (timegm_posix, timegm_modern, valid_hms, valid_hms60).
+    PP and XS implementations. Year range 1-9999, strict validation.
+  - Add Time::Str::Util module with binary search utilities
+    (lower_bound, upper_bound) following C++ STL conventions.
+    PP and XS implementations.
+
 0.85 2026-05-21
   - Add native C parsers (Ragel) for ASN.1 GeneralizedTime, ISO 8601,
     ISO 9075 and RFC 9557.

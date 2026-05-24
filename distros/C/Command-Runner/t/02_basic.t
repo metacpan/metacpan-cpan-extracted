@@ -1,22 +1,23 @@
-use strict;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
 use Test::More;
 use Command::Runner;
 use File::Temp ();
 
 my $windows = $^O eq 'MSWin32';
 
-subtest basic => sub {
+subtest basic => sub (@) {
     my @test = (
         [$^X, '-e', '$|++; print "1\n"; warn 1; print "2\n"; warn 2'],
-        sub { local $| = 1; print "1\n"; warn 1; print "2\n"; warn 2; return 0 },
+        sub (@) { local $| = 1; print "1\n"; warn 1; print "2\n"; warn 2; return 0 },
     );
 
     for my $test (@test) {
         note "test for $test";
         my $cmd = Command::Runner->new(command => $test, keep => 0);
-        my @stdout; $cmd->stdout(sub { push @stdout, @_ });
-        my @stderr; $cmd->stderr(sub { push @stderr, @_ });
+        my @stdout; $cmd->stdout(sub (@line) { push @stdout, @line });
+        my @stderr; $cmd->stderr(sub (@line) { push @stderr, @line });
         my $res = $cmd->run;
         is $res->{result}, 0;
         ok !$res->{timeout};
@@ -27,17 +28,17 @@ subtest basic => sub {
     }
 };
 
-subtest basic => sub {
+subtest basic => sub (@) {
     my @test = (
         [$^X, '-e', '$|++; print "1\n"; warn 1; print "2\n"; warn 2'],
-        sub { local $| = 1; print "1\n"; warn 1; print "2\n"; warn 2; return 0 },
+        sub (@) { local $| = 1; print "1\n"; warn 1; print "2\n"; warn 2; return 0 },
     );
 
     for my $test (@test) {
         note "test for $test";
         my $cmd = Command::Runner->new(command => $test);
-        my @stdout; $cmd->stdout(sub { push @stdout, @_ });
-        my @stderr; $cmd->stderr(sub { push @stderr, @_ });
+        my @stdout; $cmd->stdout(sub (@line) { push @stdout, @line });
+        my @stderr; $cmd->stderr(sub (@line) { push @stderr, @line });
         my $res = $cmd->run;
         is $res->{result}, 0;
         ok !$res->{timeout};
@@ -48,17 +49,17 @@ subtest basic => sub {
     }
 };
 
-subtest timeout => sub {
+subtest timeout => sub (@) {
     my @test = (
         [$^X, '-e', '$|++; print "1\n"; warn 1; print "2\n"; warn 2; sleep 2'],
-        sub { local $| = 1; print "1\n"; warn 1; print "2\n"; warn 2; sleep 2; return 0 },
+        sub (@) { local $| = 1; print "1\n"; warn 1; print "2\n"; warn 2; sleep 2; return 0 },
     );
 
     for my $test (@test) {
         note "test for $test";
         my $cmd = Command::Runner->new(command => $test, timeout => 1);
-        my @stdout; $cmd->stdout(sub { push @stdout, @_ });
-        my @stderr; $cmd->stderr(sub { push @stderr, @_ });
+        my @stdout; $cmd->stdout(sub (@line) { push @stdout, @line });
+        my @stderr; $cmd->stderr(sub (@line) { push @stderr, @line });
         my $res = $cmd->run;
         ok $res->{timeout};
         is $res->{result}, 15 if !$windows && (ref $test ne 'CODE'); # SIGTERM

@@ -4,182 +4,183 @@
 
 OpenAPI::Client::OpenAI::Path::organization-users-user_id - Documentation for the /organization/users/{user_id} path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</organization/users/{user_id}>.
+=head2 DELETE /organization/users/{user_id}
 
-=head1 PATHS
+=head3 delete-user
 
-
-=head2 C<DELETE /organization/users/{user_id}>
-
-Delete user
-
+  $client->delete_user({
+      body => { ... },
+  });
 
 Deletes a user from the organization.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
-
-C<delete-user>
-
-    $client->delete-user( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<user_id> (in path) (Required) - The ID of the user.
-
-Type: C<string>
-
-
+=item * C<user_id> (in path, required, string) - The ID of the user.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - User deleted successfully.>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
+Example:
 
-User deleted successfully.
+    {
+       "deleted" : false,
+       "id" : "string",
+       "object" : "organization.user.deleted"
+    }
 
+=head2 GET /organization/users/{user_id}
 
-=head4 Content Types:
+=head3 retrieve-user
 
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
-
-
-
-=back
-
-=head2 C<GET /organization/users/{user_id}>
-
-Retrieve user
-
+  $client->retrieve_user({
+      body => { ... },
+  });
 
 Retrieves a user by their identifier.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
-
-C<retrieve-user>
-
-    $client->retrieve-user( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<user_id> (in path) (Required) - The ID of the user.
-
-Type: C<string>
-
-
+=item * C<user_id> (in path, required, string) - The ID of the user.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - User retrieved successfully.>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-User retrieved successfully.
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-        "object": "organization.user",
-        "id": "user_abc",
-        "name": "First Last",
-        "email": "user@example.com",
-        "role": "owner",
-        "added_at": 1711471533
+       "added_at" : 1711471533,
+       "email" : "user@example.com",
+       "id" : "user_abc",
+       "name" : "First Last",
+       "object" : "organization.user",
+       "role" : "owner"
     }
 
+=head2 POST /organization/users/{user_id}
 
-=back
+=head3 modify-user
 
-=head2 C<POST /organization/users/{user_id}>
-
-Modify user
-
+  $client->modify_user({
+      body => { ... },
+  });
 
 Modifies a user's role in the organization.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
-
-C<modify-user>
-
-    $client->modify-user( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<user_id> (in path) (Required) - The ID of the user.
-
-Type: C<string>
-
-
+=item * C<user_id> (in path, required, string) - The ID of the user.
 
 =back
 
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
+=head4 Responses
 
-    
-      
+B<200 - User role updated successfully.>
 
-      
-             
+Content-Type: application/json
 
-=head3 Responses
-
-
-=head4 Status Code: C<200>
-
-User role updated successfully.
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-        "object": "organization.user",
-        "id": "user_abc",
-        "name": "First Last",
-        "email": "user@example.com",
-        "role": "owner",
-        "added_at": 1711471533
+       "added_at" : 1711471533,
+       "email" : "user@example.com",
+       "id" : "user_abc",
+       "name" : "First Last",
+       "object" : "organization.user",
+       "role" : "owner"
     }
 
+=head1 SCHEMAS
+
+=head2 User
+
+Properties:
+
+=over
+
+=item * C<added_at> (integer, required) - The Unix timestamp (in seconds) of when the user was added.
+
+=item * C<api_key_last_used_at> (anyOf) - The Unix timestamp (in seconds) of the user's last API key usage.
+
+=item * C<created> (integer) - The Unix timestamp (in seconds) of when the user was created.
+
+=item * C<developer_persona> (anyOf) - The developer persona metadata for the user.
+
+=item * C<email> (anyOf) - The email address of the user
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints
+
+=item * C<is_default> (boolean) - Whether this is the organization's default user.
+
+=item * C<is_scale_tier_authorized_purchaser> (anyOf) - Whether the user is an authorized purchaser for Scale Tier.
+
+=item * C<is_scim_managed> (boolean) - Whether the user is managed through SCIM.
+
+=item * C<is_service_account> (boolean) - Whether the user is a service account.
+
+=item * C<name> (anyOf) - The name of the user
+
+=item * C<object> (string, required) - The object type, which is always C<organization.user>
+
+Allowed values: organization.user
+
+=item * C<projects> (anyOf) - Projects associated with the user, if included.
+
+=item * C<role> (anyOf) - C<owner> or C<reader>
+
+=item * C<technical_level> (anyOf) - The technical level metadata for the user.
+
+=item * C<user> (object) - Nested user details.
+
+=back
+
+=head2 UserDeleteResponse
+
+Properties:
+
+=over
+
+=item * C<deleted> (boolean, required)
+
+=item * C<id> (string, required)
+
+=item * C<object> (string, required)
+
+Allowed values: organization.user.deleted
+
+=back
+
+=head2 UserRoleUpdateRequest
+
+Properties:
+
+=over
+
+=item * C<developer_persona> (anyOf) - Developer persona metadata.
+
+=item * C<role> (anyOf) - C<owner> or C<reader>
+
+=item * C<role_id> (anyOf) - Role ID to assign to the user.
+
+=item * C<technical_level> (anyOf) - Technical level metadata.
 
 =back
 

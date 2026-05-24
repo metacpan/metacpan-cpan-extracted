@@ -4,159 +4,139 @@
 
 OpenAPI::Client::OpenAI::Path::evals-eval_id-runs-run_id-output_items - Documentation for the /evals/{eval_id}/runs/{run_id}/output_items path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</evals/{eval_id}/runs/{run_id}/output_items>.
+=head2 GET /evals/{eval_id}/runs/{run_id}/output_items
 
-=head1 PATHS
+=head3 getEvalRunOutputItems
 
-
-=head2 C<GET /evals/{eval_id}/runs/{run_id}/output_items>
-
-Get eval run output items
-
+  $client->get_eval_run_output_items({
+      body => { ... },
+  });
 
 Get a list of output items for an evaluation run.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
+=item * C<eval_id> (in path, required, string) - The ID of the evaluation to retrieve runs for.
 
-C<getEvalRunOutputItems>
+=item * C<run_id> (in path, required, string) - The ID of the run to retrieve output items for.
 
-    $client->getEvalRunOutputItems( ... );
+=item * C<after> (in query, optional, string) - Identifier for the last output item from the previous pagination request.
 
-=head3 Parameters
+=item * C<limit> (in query, optional, integer) - Number of output items to retrieve.
 
-=over 4
+Default: 20
 
-=item * C<eval_id> (in path) (Required) - The ID of the evaluation to retrieve runs for.
+=item * C<status> (in query, optional, string) - Filter output items by status. Use C<failed> to filter by failed output items
+or C<pass> to filter by passed output items.
 
-Type: C<string>
+Allowed values: fail, pass
 
+=item * C<order> (in query, optional, string) - Sort order for output items by timestamp. Use C<asc> for ascending order or
+C<desc> for descending order. Defaults to C<asc> .
 
+Allowed values: asc, desc
 
-=item * C<run_id> (in path) (Required) - The ID of the run to retrieve output items for.
-
-Type: C<string>
-
-
-
-=item * C<after> (in query) (Optional) - Identifier for the last output item from the previous pagination request.
-
-Type: C<string>
-
-
-
-=item * C<limit> (in query) (Optional) - Number of output items to retrieve.
-
-Type: C<integer>
-
-
-Default: C<20>
-
-
-=item * C<status> (in query) (Optional) - Filter output items by status. Use `failed` to filter by failed output
-items or `pass` to filter by passed output items.
-
-
-Type: C<string>
-
-Allowed values: C<fail, pass>
-
-
-
-=item * C<order> (in query) (Optional) - Sort order for output items by timestamp. Use `asc` for ascending order or `desc` for descending order. Defaults to `asc`.
-
-Type: C<string>
-
-Allowed values: C<asc, desc>
-
-
-Default: C<asc>
-
+Default: asc
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - A list of output items for the evaluation run>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
+Example:
 
-A list of output items for the evaluation run
+    "{\n  \"object\": \"list\",\n  \"data\": [\n    {\n      \"object\": \"eval.run.output_item\",\n      \"id\": \"outputitem_67abd55eb6548190bb580745d5644a33\",\n      \"run_id\": \"evalrun_67abd54d60ec8190832b46859da808f7\",\n      \"eval_id\": \"eval_67abd54d9b0081909a86353f6fb9317a\",\n      \"created_at\": 1739314509,\n      \"status\": \"pass\",\n      \"datasource_item_id\": 137,\n      \"datasource_item\": {\n          \"teacher\": \"To grade essays, I only check for style, content, and grammar.\",\n          \"student\": \"I am a student who is trying to write the best essay.\"\n      },\n      \"results\": [\n        {\n          \"name\": \"String Check Grader\",\n          \"type\": \"string-check-grader\",\n          \"score\": 1.0,\n          \"passed\": true,\n        }\n      ],\n      \"sample\": {\n        \"input\": [\n          {\n            \"role\": \"system\",\n            \"content\": \"You are an evaluator bot...\"\n          },\n          {\n            \"role\": \"user\",\n            \"content\": \"You are assessing...\"\n          }\n        ],\n        \"output\": [\n          {\n            \"role\": \"assistant\",\n            \"content\": \"The rubric is not clear nor concise.\"\n          }\n        ],\n        \"finish_reason\": \"stop\",\n        \"model\": \"gpt-4o-2024-08-06\",\n        \"usage\": {\n          \"total_tokens\": 521,\n          \"completion_tokens\": 2,\n          \"prompt_tokens\": 519,\n          \"cached_tokens\": 0\n        },\n        \"error\": null,\n        \"temperature\": 1.0,\n        \"max_completion_tokens\": 2048,\n        \"top_p\": 1.0,\n        \"seed\": 42\n      }\n    },\n  ],\n  \"first_id\": \"outputitem_67abd55eb6548190bb580745d5644a33\",\n  \"last_id\": \"outputitem_67abd55eb6548190bb580745d5644a33\",\n  \"has_more\": false\n}\n"
 
+=head1 SCHEMAS
 
-=head4 Content Types:
+=head2 EvalApiError
 
-=over 4
+Properties:
 
+=over
 
-=item * C<application/json>
+=item * C<code> (string, required) - The error code.
 
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+=item * C<message> (string, required) - The error message.
 
-    {
-      "object": "list",
-      "data": [
-        {
-          "object": "eval.run.output_item",
-          "id": "outputitem_67abd55eb6548190bb580745d5644a33",
-          "run_id": "evalrun_67abd54d60ec8190832b46859da808f7",
-          "eval_id": "eval_67abd54d9b0081909a86353f6fb9317a",
-          "created_at": 1739314509,
-          "status": "pass",
-          "datasource_item_id": 137,
-          "datasource_item": {
-              "teacher": "To grade essays, I only check for style, content, and grammar.",
-              "student": "I am a student who is trying to write the best essay."
-          },
-          "results": [
-            {
-              "name": "String Check Grader",
-              "type": "string-check-grader",
-              "score": 1.0,
-              "passed": true,
-            }
-          ],
-          "sample": {
-            "input": [
-              {
-                "role": "system",
-                "content": "You are an evaluator bot..."
-              },
-              {
-                "role": "user",
-                "content": "You are assessing..."
-              }
-            ],
-            "output": [
-              {
-                "role": "assistant",
-                "content": "The rubric is not clear nor concise."
-              }
-            ],
-            "finish_reason": "stop",
-            "model": "gpt-4o-2024-08-06",
-            "usage": {
-              "total_tokens": 521,
-              "completion_tokens": 2,
-              "prompt_tokens": 519,
-              "cached_tokens": 0
-            },
-            "error": null,
-            "temperature": 1.0,
-            "max_completion_tokens": 2048,
-            "top_p": 1.0,
-            "seed": 42
-          }
-        },
-      ],
-      "first_id": "outputitem_67abd55eb6548190bb580745d5644a33",
-      "last_id": "outputitem_67abd55eb6548190bb580745d5644a33",
-      "has_more": false
-    }
+=back
 
+=head2 EvalRunOutputItem
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - Unix timestamp (in seconds) when the evaluation run was created.
+
+=item * C<datasource_item> (object, required) - Details of the input data source item.
+
+=item * C<datasource_item_id> (integer, required) - The identifier for the data source item.
+
+=item * C<eval_id> (string, required) - The identifier of the evaluation group.
+
+=item * C<id> (string, required) - Unique identifier for the evaluation run output item.
+
+=item * C<object> (string, required) - The type of the object. Always "eval.run.output_item".
+
+Allowed values: eval.run.output_item
+
+Default: eval.run.output_item
+
+=item * C<results> (array of EvalRunOutputItemResult, required) - A list of grader results for this output item.
+
+=item * C<run_id> (string, required) - The identifier of the evaluation run associated with this output item.
+
+=item * C<sample> (object, required) - A sample containing the input and output of the evaluation run.
+
+=item * C<status> (string, required) - The status of the evaluation run.
+
+=back
+
+=head2 EvalRunOutputItemList
+
+Properties:
+
+=over
+
+=item * C<data> (array of EvalRunOutputItem, required) - An array of eval run output item objects.
+
+=item * C<first_id> (string, required) - The identifier of the first eval run output item in the data array.
+
+=item * C<has_more> (boolean, required) - Indicates whether there are more eval run output items available.
+
+=item * C<last_id> (string, required) - The identifier of the last eval run output item in the data array.
+
+=item * C<object> (string, required) - The type of this object. It is always set to "list".
+
+Allowed values: list
+
+Default: list
+
+=back
+
+=head2 EvalRunOutputItemResult
+
+Properties:
+
+=over
+
+=item * C<name> (string, required) - The name of the grader.
+
+=item * C<passed> (boolean, required) - Whether the grader considered the output a pass.
+
+=item * C<sample> (anyOf) - Optional sample or intermediate data produced by the grader.
+
+=item * C<score> (number, required) - The numeric score produced by the grader.
+
+=item * C<type> (string) - The grader type (for example, "string-check-grader").
 
 =back
 

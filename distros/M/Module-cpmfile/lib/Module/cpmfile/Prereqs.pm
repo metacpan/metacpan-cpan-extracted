@@ -1,6 +1,7 @@
 package Module::cpmfile::Prereqs;
-use strict;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
 
 use CPAN::Meta::Prereqs;
 use Module::cpmfile::Util '_yaml_hash';
@@ -9,9 +10,7 @@ use Scalar::Util 'blessed';
 my @PHASE = qw(runtime configure build test develop);
 my @TYPE = qw(requires recommends suggests);
 
-sub new {
-    my $class = shift;
-    my $hash = shift || +{};
+sub new ($class, $hash = +{}) {
     my $self = +{};
     for my $phase (@PHASE) {
         for my $type (@TYPE) {
@@ -25,15 +24,14 @@ sub new {
     bless $self, $class;
 }
 
-sub from_cpanmeta {
-    my ($class, $cpanmeta) = @_;
+sub from_cpanmeta ($class, $cpanmeta) {
     my $hash = $cpanmeta;
     if (blessed $cpanmeta and $cpanmeta->isa('CPAN::Meta::Prereqs')) {
         $hash = $cpanmeta->as_string_hash;
     }
     my $out = {};
-    for my $phase (sort keys %$hash) {
-        for my $type (sort keys %{ $hash->{$phase} }) {
+    for my $phase (sort keys $hash->%*) {
+        for my $type (sort keys $hash->{$phase}->%*) {
             for my $package (sort keys %{ $hash->{$phase}{$type} }) {
                 my $version = $hash->{$phase}{$type}{$package};
                 my $options = +{ $version ? (version => $version) : () };
@@ -44,11 +42,10 @@ sub from_cpanmeta {
     $class->new($out);
 }
 
-sub cpanmeta {
-    my $self = shift;
+sub cpanmeta ($self) {
     my $hash = +{};
-    for my $phase (sort keys %$self) {
-        for my $type (sort keys %{$self->{$phase}}) {
+    for my $phase (sort keys $self->%*) {
+        for my $type (sort keys $self->{$phase}->%*) {
             for my $package (sort keys %{$self->{$phase}{$type}}) {
                 my $options = $self->{$phase}{$type}{$package};
                 $hash->{$phase}{$type}{$package} = $options->{version} || 0;
@@ -58,12 +55,11 @@ sub cpanmeta {
     CPAN::Meta::Prereqs->new($hash);
 }
 
-sub walk {
-    my ($self, $phases, $types, $cb) = @_;
+sub walk ($self, $phases, $types, $cb) {
     $phases ||= \@PHASE;
     $types ||= \@TYPE;
-    for my $phase (@$phases) {
-        for my $type (@$types) {
+    for my $phase ($phases->@*) {
+        for my $type ($types->@*) {
             next if !$self->{$phase} || !$self->{$phase}{$type};
             for my $package (sort keys %{$self->{$phase}{$type}}) {
                 my $options = $self->{$phase}{$type}{$package};
@@ -74,9 +70,7 @@ sub walk {
     }
 }
 
-sub to_string {
-    my $self = shift;
-    my $indent = shift || "";
+sub to_string ($self, $indent = "") {
     my @out;
     push @out, "prereqs:";
     for my $phase (@PHASE) {
@@ -85,7 +79,7 @@ sub to_string {
         for my $type (@TYPE) {
             my $spec2 = $spec1->{$type} or next;
             push @out, "    $type:";
-            for my $package (sort keys %{$spec2}) {
+            for my $package (sort keys $spec2->%*) {
                 if (my %option = %{ $spec2->{$package} || +{} }) {
                     my @key = keys %option;
                     if (@key == 1 && $key[0] eq "version") {

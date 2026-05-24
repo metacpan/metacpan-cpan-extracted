@@ -4,200 +4,223 @@
 
 OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id - Documentation for the /vector_stores/{vector_store_id} path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</vector_stores/{vector_store_id}>.
+=head2 DELETE /vector_stores/{vector_store_id}
 
-=head1 PATHS
+=head3 deleteVectorStore
 
-
-=head2 C<DELETE /vector_stores/{vector_store_id}>
-
-Delete vector store
-
+  $client->delete_vector_store({
+      body => { ... },
+  });
 
 Delete a vector store.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
-
-C<deleteVectorStore>
-
-    $client->deleteVectorStore( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<vector_store_id> (in path) (Required) - The ID of the vector store to delete.
-
-Type: C<string>
-
-
+=item * C<vector_store_id> (in path, required, string) - The ID of the vector store to delete.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - OK>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
+Example:
 
-OK
+    {
+       "deleted" : false,
+       "id" : "string",
+       "object" : "vector_store.deleted"
+    }
 
+=head2 GET /vector_stores/{vector_store_id}
 
-=head4 Content Types:
+=head3 getVectorStore
 
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
-
-
-
-=back
-
-=head2 C<GET /vector_stores/{vector_store_id}>
-
-Retrieve vector store
-
+  $client->get_vector_store({
+      body => { ... },
+  });
 
 Retrieves a vector store.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
-
-C<getVectorStore>
-
-    $client->getVectorStore( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<vector_store_id> (in path) (Required) - The ID of the vector store to retrieve.
-
-Type: C<string>
-
-
+=item * C<vector_store_id> (in path, required, string) - The ID of the vector store to retrieve.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - OK>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-      "id": "vs_123",
-      "object": "vector_store",
-      "created_at": 1698107661,
-      "usage_bytes": 123456,
-      "last_active_at": 1698107661,
-      "name": "my_vector_store",
-      "status": "completed",
-      "file_counts": {
-        "in_progress": 0,
-        "completed": 100,
-        "cancelled": 0,
-        "failed": 0,
-        "total": 100
-      },
-      "last_used_at": 1698107661
+       "created_at" : 1698107661,
+       "file_counts" : {
+          "cancelled" : 0,
+          "completed" : 100,
+          "failed" : 0,
+          "in_progress" : 0,
+          "total" : 100
+       },
+       "id" : "vs_123",
+       "last_active_at" : 1698107661,
+       "last_used_at" : 1698107661,
+       "name" : "my_vector_store",
+       "object" : "vector_store",
+       "status" : "completed",
+       "usage_bytes" : 123456
     }
 
+=head2 POST /vector_stores/{vector_store_id}
 
-=back
+=head3 modifyVectorStore
 
-=head2 C<POST /vector_stores/{vector_store_id}>
-
-Modify vector store
-
+  $client->modify_vector_store({
+      body => { ... },
+  });
 
 Modifies a vector store.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
-
-C<modifyVectorStore>
-
-    $client->modifyVectorStore( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<vector_store_id> (in path) (Required) - The ID of the vector store to modify.
-
-Type: C<string>
-
-
+=item * C<vector_store_id> (in path, required, string) - The ID of the vector store to modify.
 
 =back
 
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
+=head4 Responses
 
-    
-      
+B<200 - OK>
 
-      
-             
+Content-Type: application/json
 
-=head3 Responses
-
-
-=head4 Status Code: C<200>
-
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-      "id": "vs_123",
-      "object": "vector_store",
-      "created_at": 1698107661,
-      "usage_bytes": 123456,
-      "last_active_at": 1698107661,
-      "name": "my_vector_store",
-      "status": "completed",
-      "file_counts": {
-        "in_progress": 0,
-        "completed": 100,
-        "cancelled": 0,
-        "failed": 0,
-        "total": 100
-      },
-      "last_used_at": 1698107661
+       "created_at" : 1698107661,
+       "file_counts" : {
+          "cancelled" : 0,
+          "completed" : 100,
+          "failed" : 0,
+          "in_progress" : 0,
+          "total" : 100
+       },
+       "id" : "vs_123",
+       "last_active_at" : 1698107661,
+       "last_used_at" : 1698107661,
+       "name" : "my_vector_store",
+       "object" : "vector_store",
+       "status" : "completed",
+       "usage_bytes" : 123456
     }
 
+=head1 SCHEMAS
+
+=head2 DeleteVectorStoreResponse
+
+Properties:
+
+=over
+
+=item * C<deleted> (boolean, required)
+
+=item * C<id> (string, required)
+
+=item * C<object> (string, required)
+
+Allowed values: vector_store.deleted
+
+=back
+
+=head2 Metadata
+
+Set of 16 key-value pairs that can be attached to an object. This can be
+useful for storing additional information about the object in a structured
+format, and querying for objects via API or the dashboard.
+
+Keys are strings with a maximum length of 64 characters. Values are strings
+with a maximum length of 512 characters.
+
+=head2 UpdateVectorStoreRequest
+
+Properties:
+
+=over
+
+=item * C<expires_after> (allOf)
+
+=item * C<metadata> (Metadata)
+
+See L</Metadata> below for shape.
+
+=item * C<name> (string) - The name of the vector store.
+
+=back
+
+=head2 VectorStoreExpirationAfter
+
+Properties:
+
+=over
+
+=item * C<anchor> (string, required) - Anchor timestamp after which the expiration policy applies. Supported anchors:
+C<last_active_at> .
+
+Allowed values: last_active_at
+
+=item * C<days> (integer, required) - The number of days after the anchor time that the vector store will expire.
+
+=back
+
+=head2 VectorStoreObject
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) for when the vector store was created.
+
+=item * C<expires_after> (VectorStoreExpirationAfter)
+
+See L</VectorStoreExpirationAfter> below for shape.
+
+=item * C<expires_at> (anyOf)
+
+=item * C<file_counts> (object, required)
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints.
+
+=item * C<last_active_at> (anyOf, required)
+
+=item * C<metadata> (Metadata, required)
+
+See L</Metadata> below for shape.
+
+=item * C<name> (string, required) - The name of the vector store.
+
+=item * C<object> (string, required) - The object type, which is always C<vector_store> .
+
+Allowed values: vector_store
+
+=item * C<status> (string, required) - The status of the vector store, which can be either C<expired> ,
+C<in_progress> , or C<completed> . A status of C<completed> indicates that the
+vector store is ready for use.
+
+Allowed values: expired, in_progress, completed
+
+=item * C<usage_bytes> (integer, required) - The total number of bytes used by the files in the vector store.
 
 =back
 

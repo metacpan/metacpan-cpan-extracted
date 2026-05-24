@@ -4,79 +4,93 @@
 
 OpenAPI::Client::OpenAI::Path::fine_tuning-jobs-fine_tuning_job_id-checkpoints - Documentation for the /fine_tuning/jobs/{fine_tuning_job_id}/checkpoints path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</fine_tuning/jobs/{fine_tuning_job_id}/checkpoints>.
+=head2 GET /fine_tuning/jobs/{fine_tuning_job_id}/checkpoints
 
-=head1 PATHS
+=head3 listFineTuningJobCheckpoints
 
-
-=head2 C<GET /fine_tuning/jobs/{fine_tuning_job_id}/checkpoints>
-
-List fine-tuning checkpoints
-
+  $client->list_fine_tuning_job_checkpoints({
+      body => { ... },
+  });
 
 List checkpoints for a fine-tuning job.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
+=item * C<fine_tuning_job_id> (in path, required, string) - The ID of the fine-tuning job to get checkpoints for.
 
-C<listFineTuningJobCheckpoints>
+=item * C<after> (in query, optional, string) - Identifier for the last checkpoint ID from the previous pagination request.
 
-    $client->listFineTuningJobCheckpoints( ... );
+=item * C<limit> (in query, optional, integer) - Number of checkpoints to retrieve.
 
-=head3 Parameters
-
-=over 4
-
-=item * C<fine_tuning_job_id> (in path) (Required) - The ID of the fine-tuning job to get checkpoints for.
-
-
-Type: C<string>
-
-
-
-=item * C<after> (in query) (Optional) - Identifier for the last checkpoint ID from the previous pagination request.
-
-Type: C<string>
-
-
-
-=item * C<limit> (in query) (Optional) - Number of checkpoints to retrieve.
-
-Type: C<integer>
-
-
-Default: C<10>
-
+Default: 10
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - OK>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
        "data" : [
           "{\n  \"object\": \"fine_tuning.job.checkpoint\",\n  \"id\": \"ftckpt_qtZ5Gyk4BLq1SfLFWp3RtO3P\",\n  \"created_at\": 1712211699,\n  \"fine_tuned_model_checkpoint\": \"ft:gpt-4o-mini-2024-07-18:my-org:custom_suffix:9ABel2dg:ckpt-step-88\",\n  \"fine_tuning_job_id\": \"ftjob-fpbNQ3H1GrMehXRf8cO97xTN\",\n  \"metrics\": {\n    \"step\": 88,\n    \"train_loss\": 0.478,\n    \"train_mean_token_accuracy\": 0.924,\n    \"valid_loss\": 10.112,\n    \"valid_mean_token_accuracy\": 0.145,\n    \"full_valid_loss\": 0.567,\n    \"full_valid_mean_token_accuracy\": 0.944\n  },\n  \"step_number\": 88\n}\n"
-       ]
+       ],
+       "first_id" : "string",
+       "has_more" : false,
+       "last_id" : "string",
+       "object" : "list"
     }
 
+=head1 SCHEMAS
+
+=head2 FineTuningJobCheckpoint
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) for when the checkpoint was created.
+
+=item * C<fine_tuned_model_checkpoint> (string, required) - The name of the fine-tuned checkpoint model that is created.
+
+=item * C<fine_tuning_job_id> (string, required) - The name of the fine-tuning job that this checkpoint was created from.
+
+=item * C<id> (string, required) - The checkpoint identifier, which can be referenced in the API endpoints.
+
+=item * C<metrics> (object, required) - Metrics at the step number during the fine-tuning job.
+
+=item * C<object> (string, required) - The object type, which is always "fine_tuning.job.checkpoint".
+
+Allowed values: fine_tuning.job.checkpoint
+
+=item * C<step_number> (integer, required) - The step number that the checkpoint was created at.
+
+=back
+
+=head2 ListFineTuningJobCheckpointsResponse
+
+Properties:
+
+=over
+
+=item * C<data> (array of FineTuningJobCheckpoint, required)
+
+=item * C<first_id> (anyOf)
+
+=item * C<has_more> (boolean, required)
+
+=item * C<last_id> (anyOf)
+
+=item * C<object> (string, required)
+
+Allowed values: list
 
 =back
 

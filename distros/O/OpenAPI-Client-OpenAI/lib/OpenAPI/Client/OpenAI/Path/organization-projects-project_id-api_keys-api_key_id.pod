@@ -1,0 +1,224 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::organization-projects-project_id-api_keys-api_key_id - Documentation for the /organization/projects/{project_id}/api_keys/{api_key_id} path.
+
+=head1 OPERATIONS
+
+=head2 DELETE /organization/projects/{project_id}/api_keys/{api_key_id}
+
+=head3 delete-project-api-key
+
+  $client->delete_project_api_key({
+      body => { ... },
+  });
+
+Deletes an API key from the project.
+
+Returns confirmation of the key deletion, or an error if the key belonged to a
+service account.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<project_id> (in path, required, string) - The ID of the project.
+
+=item * C<api_key_id> (in path, required, string) - The ID of the API key.
+
+=back
+
+=head4 Responses
+
+B<200 - Project API key deleted successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "deleted" : false,
+       "id" : "string",
+       "object" : "organization.project.api_key.deleted"
+    }
+
+B<400 - Error response for various conditions.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "error" : {
+          "code" : "string",
+          "message" : "string",
+          "param" : "string",
+          "type" : "string"
+       }
+    }
+
+=head2 GET /organization/projects/{project_id}/api_keys/{api_key_id}
+
+=head3 retrieve-project-api-key
+
+  $client->retrieve_project_api_key({
+      body => { ... },
+  });
+
+Retrieves an API key in the project.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<project_id> (in path, required, string) - The ID of the project.
+
+=item * C<api_key_id> (in path, required, string) - The ID of the API key.
+
+=back
+
+=head4 Responses
+
+B<200 - Project API key retrieved successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "created_at" : 1711471533,
+       "id" : "key_abc",
+       "last_used_at" : 1711471534,
+       "name" : "My API Key",
+       "object" : "organization.project.api_key",
+       "owner" : {
+          "type" : "user",
+          "user" : {
+             "created_at" : 1711471533,
+             "email" : "user@example.com",
+             "id" : "user_abc",
+             "name" : "First Last",
+             "role" : "owner"
+          }
+       },
+       "redacted_value" : "sk-abc...def"
+    }
+
+=head1 SCHEMAS
+
+=head2 Error
+
+Properties:
+
+=over
+
+=item * C<code> (anyOf, required)
+
+=item * C<message> (string, required)
+
+=item * C<param> (anyOf, required)
+
+=item * C<type> (string, required)
+
+=back
+
+=head2 ErrorResponse
+
+Properties:
+
+=over
+
+=item * C<error> (Error, required)
+
+See L</Error> below for shape.
+
+=back
+
+=head2 ProjectApiKey
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) of when the API key was created
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints
+
+=item * C<last_used_at> (anyOf, required) - The Unix timestamp (in seconds) of when the API key was last used.
+
+=item * C<name> (string, required) - The name of the API key
+
+=item * C<object> (string, required) - The object type, which is always C<organization.project.api_key>
+
+Allowed values: organization.project.api_key
+
+=item * C<owner> (object, required)
+
+=item * C<redacted_value> (string, required) - The redacted value of the API key
+
+=back
+
+=head2 ProjectApiKeyDeleteResponse
+
+Properties:
+
+=over
+
+=item * C<deleted> (boolean, required)
+
+=item * C<id> (string, required)
+
+=item * C<object> (string, required)
+
+Allowed values: organization.project.api_key.deleted
+
+=back
+
+=head2 ProjectApiKeyOwnerServiceAccount
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) of when the service account was created.
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints
+
+=item * C<name> (string, required) - The name of the service account.
+
+=item * C<role> (string, required) - The service account's project role.
+
+=back
+
+=head2 ProjectApiKeyOwnerUser
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) of when the user was created.
+
+=item * C<email> (string, required) - The email address of the user.
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints
+
+=item * C<name> (string, required) - The name of the user.
+
+=item * C<role> (string, required) - The user's project role.
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

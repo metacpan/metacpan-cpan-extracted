@@ -1,0 +1,182 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::organization-projects-project_id-spend_alerts-alert_id - Documentation for the /organization/projects/{project_id}/spend_alerts/{alert_id} path.
+
+=head1 OPERATIONS
+
+=head2 DELETE /organization/projects/{project_id}/spend_alerts/{alert_id}
+
+=head3 delete-project-spend-alert
+
+  $client->delete_project_spend_alert({
+      body => { ... },
+  });
+
+Deletes a project spend alert.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<project_id> (in path, required, string) - The ID of the project to update.
+
+=item * C<alert_id> (in path, required, string) - The ID of the spend alert to delete.
+
+=back
+
+=head4 Responses
+
+B<200 - Project spend alert deleted successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "deleted" : false,
+       "id" : "string",
+       "object" : "project.spend_alert.deleted"
+    }
+
+=head2 POST /organization/projects/{project_id}/spend_alerts/{alert_id}
+
+=head3 update-project-spend-alert
+
+  $client->update_project_spend_alert({
+      body => { ... },
+  });
+
+Updates a project spend alert.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<project_id> (in path, required, string) - The ID of the project to update.
+
+=item * C<alert_id> (in path, required, string) - The ID of the spend alert to update.
+
+=back
+
+=head4 Responses
+
+B<200 - Project spend alert updated successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "currency" : "USD",
+       "id" : "alert_abc123",
+       "interval" : "month",
+       "notification_channel" : {
+          "recipients" : [
+             "finance@example.com"
+          ],
+          "subject_prefix" : "OpenAI spend alert",
+          "type" : "email"
+       },
+       "object" : "project.spend_alert",
+       "threshold_amount" : 100000
+    }
+
+=head1 SCHEMAS
+
+=head2 CreateSpendAlertBody
+
+Properties:
+
+=over
+
+=item * C<currency> (string, required) - The currency for the threshold amount.
+
+Allowed values: USD
+
+=item * C<interval> (string, required) - The time interval for evaluating spend against the threshold.
+
+Allowed values: month
+
+=item * C<notification_channel> (SpendAlertNotificationChannel, required)
+
+See L</SpendAlertNotificationChannel> below for shape.
+
+=item * C<threshold_amount> (integer, required) - The alert threshold amount, in cents.
+
+=back
+
+=head2 ProjectSpendAlert
+
+Properties:
+
+=over
+
+=item * C<currency> (string, required) - The currency for the threshold amount.
+
+Allowed values: USD
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints.
+
+=item * C<interval> (string, required) - The time interval for evaluating spend against the threshold.
+
+Allowed values: month
+
+=item * C<notification_channel> (SpendAlertNotificationChannel, required)
+
+See L</SpendAlertNotificationChannel> below for shape.
+
+=item * C<object> (string, required) - The object type, which is always C<project.spend_alert> .
+
+Allowed values: project.spend_alert
+
+=item * C<threshold_amount> (integer, required) - The alert threshold amount, in cents.
+
+=back
+
+=head2 ProjectSpendAlertDeletedResource
+
+Properties:
+
+=over
+
+=item * C<deleted> (boolean, required) - Whether the spend alert was deleted.
+
+=item * C<id> (string, required) - The deleted spend alert ID.
+
+=item * C<object> (string, required) - Always C<project.spend_alert.deleted> .
+
+Allowed values: project.spend_alert.deleted
+
+=back
+
+=head2 SpendAlertNotificationChannel
+
+Properties:
+
+=over
+
+=item * C<recipients> (array of string, required) - Email addresses that receive the spend alert notification.
+
+=item * C<subject_prefix> (anyOf) - Optional subject prefix for alert emails.
+
+=item * C<type> (string, required) - The notification channel type. Currently only C<email> is supported.
+
+Allowed values: email
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

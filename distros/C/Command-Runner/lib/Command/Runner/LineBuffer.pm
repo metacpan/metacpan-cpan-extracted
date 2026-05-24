@@ -1,9 +1,9 @@
 package Command::Runner::LineBuffer;
-use strict;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
 
-sub new {
-    my ($class, %args) = @_;
+sub new ($class, %args) {
     my $buffer = exists $args{buffer} ? $args{buffer} : "";
     bless {
         buffer => $buffer,
@@ -11,20 +11,17 @@ sub new {
     }, $class;
 }
 
-sub raw {
-    my $self = shift;
+sub raw ($self) {
     exists $self->{keep} ? $self->{keep} : undef;
 }
 
-sub add {
-    my ($self, $buffer) = @_;
+sub add ($self, $buffer) {
     $self->{buffer} .= $buffer;
     $self->{keep} .= $buffer if exists $self->{keep};
     $self;
 }
 
-sub get {
-    my ($self, $drain) = @_;
+sub get ($self, $drain = undef) {
     if ($drain) {
         if (length $self->{buffer}) {
             my @line = $self->get;

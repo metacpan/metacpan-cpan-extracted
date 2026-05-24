@@ -4,114 +4,93 @@
 
 OpenAPI::Client::OpenAI::Path::responses-response_id-input_items - Documentation for the /responses/{response_id}/input_items path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</responses/{response_id}/input_items>.
+=head2 GET /responses/{response_id}/input_items
 
-=head1 PATHS
+=head3 listInputItems
 
-
-=head2 C<GET /responses/{response_id}/input_items>
-
-List input items
-
+  $client->list_input_items({
+      body => { ... },
+  });
 
 Returns a list of input items for a given response.
 
+=head4 Path/query parameters
 
+=over
 
-=head3 Operation ID
+=item * C<response_id> (in path, required, string) - The ID of the response to retrieve input items for.
 
-C<listInputItems>
+=item * C<limit> (in query, optional, integer) - A limit on the number of objects to be returned. Limit can range between 1 and
+100, and the default is 20.
 
-    $client->listInputItems( ... );
+Default: 20
 
-=head3 Parameters
+=item * C<order> (in query, optional, string) - The order to return the input items in. Default is C<desc> . - C<asc> : Return
+the input items in ascending order. - C<desc> : Return the input items in
+descending order.
 
-=over 4
+Allowed values: asc, desc
 
-=item * C<response_id> (in path) (Required) - The ID of the response to retrieve input items for.
+=item * C<after> (in query, optional, string) - An item ID to list items after, used in pagination.
 
-Type: C<string>
-
-
-
-=item * C<limit> (in query) (Optional) - A limit on the number of objects to be returned. Limit can range between
-1 and 100, and the default is 20.
-
-
-Type: C<integer>
-
-
-Default: C<20>
-
-
-=item * C<order> (in query) (Optional) - The order to return the input items in. Default is `desc`.
-- `asc`: Return the input items in ascending order.
-- `desc`: Return the input items in descending order.
-
-
-Type: C<string>
-
-Allowed values: C<asc, desc>
-
-
-
-=item * C<after> (in query) (Optional) - An item ID to list items after, used in pagination.
-
-
-Type: C<string>
-
-
-
-=item * C<include> (in query) (Optional) - Additional fields to include in the response. See the `include`
-parameter for Response creation above for more information.
-
-
-Type: C<array>
-
-
+=item * C<include> (in query, optional, array) - Additional fields to include in the response. See the C<include> parameter for
+Response creation above for more information.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - OK>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
-
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
-      "object": "list",
-      "data": [
-        {
-          "id": "msg_abc123",
-          "type": "message",
-          "role": "user",
-          "content": [
-            {
-              "type": "input_text",
-              "text": "Tell me a three sentence bedtime story about a unicorn."
-            }
-          ]
-        }
-      ],
-      "first_id": "msg_abc123",
-      "last_id": "msg_abc123",
-      "has_more": false
+       "data" : [
+          {
+             "content" : [
+                {
+                   "text" : "Tell me a three sentence bedtime story about a unicorn.",
+                   "type" : "input_text"
+                }
+             ],
+             "id" : "msg_abc123",
+             "role" : "user",
+             "type" : "message"
+          }
+       ],
+       "first_id" : "msg_abc123",
+       "has_more" : false,
+       "last_id" : "msg_abc123",
+       "object" : "list"
     }
 
+=head1 SCHEMAS
+
+=head2 ItemResource
+
+Content item used to generate a response.
+
+=head2 ResponseItemList
+
+Properties:
+
+=over
+
+=item * C<data> (array of ItemResource, required) - A list of items used to generate this response.
+
+=item * C<first_id> (string, required) - The ID of the first item in the list.
+
+=item * C<has_more> (boolean, required) - Whether there are more items available.
+
+=item * C<last_id> (string, required) - The ID of the last item in the list.
+
+=item * C<object> (string, required) - The type of object returned, must be C<list> .
+
+Allowed values: list
 
 =back
 

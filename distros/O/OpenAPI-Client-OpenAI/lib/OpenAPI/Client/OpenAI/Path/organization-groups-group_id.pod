@@ -1,0 +1,186 @@
+=encoding utf8
+
+=head1 NAME
+
+OpenAPI::Client::OpenAI::Path::organization-groups-group_id - Documentation for the /organization/groups/{group_id} path.
+
+=head1 OPERATIONS
+
+=head2 DELETE /organization/groups/{group_id}
+
+=head3 delete-group
+
+  $client->delete_group({
+      body => { ... },
+  });
+
+Deletes a group from the organization.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<group_id> (in path, required, string) - The ID of the group to delete.
+
+=back
+
+=head4 Responses
+
+B<200 - Group deleted successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "deleted" : true,
+       "id" : "group_01J1F8ABCDXYZ",
+       "object" : "group.deleted"
+    }
+
+=head2 GET /organization/groups/{group_id}
+
+=head3 retrieve-group
+
+  $client->retrieve_group({
+      body => { ... },
+  });
+
+Retrieves a group.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<group_id> (in path, required, string) - The ID of the group to retrieve.
+
+=back
+
+=head4 Responses
+
+B<200 - Group retrieved successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "created_at" : 1711471533,
+       "group_type" : "group",
+       "id" : "group_01J1F8ABCDXYZ",
+       "is_scim_managed" : false,
+       "name" : "Support Team"
+    }
+
+=head2 POST /organization/groups/{group_id}
+
+=head3 update-group
+
+  $client->update_group({
+      body => { ... },
+  });
+
+Updates a group's information.
+
+=head4 Path/query parameters
+
+=over
+
+=item * C<group_id> (in path, required, string) - The ID of the group to update.
+
+=back
+
+=head4 Responses
+
+B<200 - Group updated successfully.>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "created_at" : 1711471533,
+       "id" : "group_01J1F8ABCDXYZ",
+       "is_scim_managed" : false,
+       "name" : "Escalations"
+    }
+
+=head1 SCHEMAS
+
+=head2 GroupDeletedResource
+
+Properties:
+
+=over
+
+=item * C<deleted> (boolean, required) - Whether the group was deleted.
+
+=item * C<id> (string, required) - Identifier of the deleted group.
+
+=item * C<object> (string, required) - Always C<group.deleted> .
+
+Allowed values: group.deleted
+
+=back
+
+=head2 GroupResourceWithSuccess
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - Unix timestamp (in seconds) when the group was created.
+
+=item * C<id> (string, required) - Identifier for the group.
+
+=item * C<is_scim_managed> (boolean, required) - Whether the group is managed through SCIM and controlled by your identity
+provider.
+
+=item * C<name> (string, required) - Updated display name for the group.
+
+=back
+
+=head2 GroupResponse
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - Unix timestamp (in seconds) when the group was created.
+
+=item * C<group_type> (string, required) - The type of the group.
+
+Allowed values: group, tenant_group
+
+=item * C<id> (string, required) - Identifier for the group.
+
+=item * C<is_scim_managed> (boolean, required) - Whether the group is managed through SCIM and controlled by your identity
+provider.
+
+=item * C<name> (string, required) - Display name of the group.
+
+=back
+
+=head2 UpdateGroupBody
+
+Properties:
+
+=over
+
+=item * C<name> (string, required) - New display name for the group.
+
+=back
+
+=head1 SEE ALSO
+
+L<OpenAPI::Client::OpenAI::Path>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2023-2026 by Nelson Ferraz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

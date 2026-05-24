@@ -4,67 +4,151 @@
 
 OpenAPI::Client::OpenAI::Path::fine_tuning-alpha-graders-run - Documentation for the /fine_tuning/alpha/graders/run path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</fine_tuning/alpha/graders/run>.
+=head2 POST /fine_tuning/alpha/graders/run
 
-=head1 PATHS
+=head3 runGrader
 
-
-=head2 C<POST /fine_tuning/alpha/graders/run>
-
-Run grader
-
+  $client->run_grader({
+      body => { ... },
+  });
 
 Run a grader.
 
+=head4 Request body
 
+Content-Type: application/json
 
-=head3 Operation ID
-
-C<runGrader>
-
-    $client->runGrader( ... );
-
-=head3 Parameters
-
-=over 4
-
-=back
-
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
-
-    
-      
-
-      
-             
-
-=head3 Responses
-
-
-=head4 Status Code: C<200>
-
-OK
-
-
-=head4 Content Types:
-
-=over 4
-
-
-=item * C<application/json>
-
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Example:
 
     {
        "metadata" : {
-          "errors" : null
-       }
+          "errors" : {
+             "formula_parse_error" : false,
+             "invalid_variable_error" : false,
+             "model_grader_parse_error" : false,
+             "model_grader_refusal_error" : false,
+             "model_grader_server_error" : false,
+             "model_grader_server_error_details" : null,
+             "other_error" : false,
+             "python_grader_runtime_error" : false,
+             "python_grader_runtime_error_details" : null,
+             "python_grader_server_error" : false,
+             "python_grader_server_error_type" : null,
+             "sample_parse_error" : false,
+             "truncated_observation_error" : false,
+             "unresponsive_reward_error" : false
+          },
+          "execution_time" : 4.36523842811584,
+          "name" : "Example score model grader",
+          "sampled_model_name" : "gpt-4o-2024-08-06",
+          "scores" : {},
+          "token_usage" : {
+             "cached_tokens" : 0,
+             "completion_tokens" : 134,
+             "prompt_tokens" : 190,
+             "total_tokens" : 324
+          },
+          "type" : "score_model"
+       },
+       "model_grader_token_usage_per_model" : {
+          "gpt-4o-2024-08-06" : {
+             "cached_tokens" : 0,
+             "completion_tokens" : 134,
+             "prompt_tokens" : 190,
+             "total_tokens" : 324
+          }
+       },
+       "reward" : 1,
+       "sub_rewards" : {}
     }
 
+=head4 Responses
+
+B<200 - OK>
+
+Content-Type: application/json
+
+Example:
+
+    {
+       "metadata" : {
+          "errors" : {
+             "formula_parse_error" : false,
+             "invalid_variable_error" : false,
+             "model_grader_parse_error" : false,
+             "model_grader_refusal_error" : false,
+             "model_grader_server_error" : false,
+             "model_grader_server_error_details" : null,
+             "other_error" : false,
+             "python_grader_runtime_error" : false,
+             "python_grader_runtime_error_details" : null,
+             "python_grader_server_error" : false,
+             "python_grader_server_error_type" : null,
+             "sample_parse_error" : false,
+             "truncated_observation_error" : false,
+             "unresponsive_reward_error" : false
+          },
+          "execution_time" : 4.36523842811584,
+          "name" : "Example score model grader",
+          "sampled_model_name" : "gpt-4o-2024-08-06",
+          "scores" : {},
+          "token_usage" : {
+             "cached_tokens" : 0,
+             "completion_tokens" : 134,
+             "prompt_tokens" : 190,
+             "total_tokens" : 324
+          },
+          "type" : "score_model"
+       },
+       "model_grader_token_usage_per_model" : {
+          "gpt-4o-2024-08-06" : {
+             "cached_tokens" : 0,
+             "completion_tokens" : 134,
+             "prompt_tokens" : 190,
+             "total_tokens" : 324
+          }
+       },
+       "reward" : 1,
+       "sub_rewards" : {}
+    }
+
+=head1 SCHEMAS
+
+=head2 RunGraderRequest
+
+Properties:
+
+=over
+
+=item * C<grader> (object, required) - The grader used for the fine-tuning job.
+
+=item * C<item> (object) - The dataset item provided to the grader. This will be used to populate the
+C<item> namespace. See
+L<the guide|https://platform.openai.com/docs/guides/graders> for more details.
+
+=item * C<model_sample> (string, required) - The model sample to be evaluated. This value will be used to populate the
+C<sample> namespace. See
+L<the guide|https://platform.openai.com/docs/guides/graders> for more details.
+The C<output_json> variable will be populated if the model sample is a valid
+JSON string.
+
+=back
+
+=head2 RunGraderResponse
+
+Properties:
+
+=over
+
+=item * C<metadata> (object, required)
+
+=item * C<model_grader_token_usage_per_model> (object, required)
+
+=item * C<reward> (number, required)
+
+=item * C<sub_rewards> (object, required)
 
 =back
 

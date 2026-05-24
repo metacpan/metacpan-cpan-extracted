@@ -4,100 +4,175 @@
 
 OpenAPI::Client::OpenAI::Path::realtime-transcription_sessions - Documentation for the /realtime/transcription_sessions path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</realtime/transcription_sessions>.
+=head2 POST /realtime/transcription_sessions
 
-=head1 PATHS
+=head3 create-realtime-transcription-session
 
-
-=head2 C<POST /realtime/transcription_sessions>
-
-Create transcription session
-
+  $client->create_realtime_transcription_session({
+      body => { ... },
+  });
 
 Create an ephemeral API token for use in client-side applications with the
-Realtime API specifically for realtime transcriptions. 
-Can be configured with the same session parameters as the C<transcription_session.update> client event.
+Realtime API specifically for realtime transcriptions. Can be configured with
+the same session parameters as the C<transcription_session.update> client
+event.
 
 It responds with a session object, plus a C<client_secret> key which contains
 a usable ephemeral API token that can be used to authenticate browser clients
 for the Realtime API.
 
+Returns the created Realtime transcription session object, plus an ephemeral
+key.
 
+=head4 Responses
 
-=head3 Operation ID
+B<200 - Session created successfully.>
 
-C<create-realtime-transcription-session>
+Content-Type: application/json
 
-    $client->create-realtime-transcription-session( ... );
-
-=head3 Parameters
-
-=over 4
-
-=back
-
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
-
-    
-      Realtime transcription session object configuration.
-
-      
-      
 Example:
 
     {
-       "include" : [
-          null
+       "client_secret" : null,
+       "expires_at" : 1742188264,
+       "id" : "sess_BBwZc7cFV3XizEyKGDCGL",
+       "input_audio_format" : "pcm16",
+       "input_audio_transcription" : {
+          "language" : null,
+          "model" : "gpt-4o-transcribe",
+          "prompt" : ""
+       },
+       "modalities" : [
+          "audio",
+          "text"
        ],
-       "input_audio_noise_reduction" : null,
-       "input_audio_transcription" : null,
-       "turn_detection" : null
+       "object" : "realtime.transcription_session",
+       "turn_detection" : {
+          "prefix_padding_ms" : 300,
+          "silence_duration_ms" : 200,
+          "threshold" : 0.5,
+          "type" : "server_vad"
+       }
     }
 
+=head1 SCHEMAS
 
-             
+=head2 AudioTranscription
 
-=head3 Responses
+Properties:
 
+=over
 
-=head4 Status Code: C<200>
+=item * C<delay> (string) - Controls how long the model waits before emitting transcription text. Higher
+values can improve transcription accuracy at the cost of latency. Only
+supported with C<gpt-realtime-whisper> in GA Realtime sessions.
 
-Session created successfully.
+Allowed values: minimal, low, medium, high, xhigh
 
+=item * C<language> (string) - The language of the input audio. Supplying the input language in
+L<ISO-639-1|https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes> (e.g. C<en>
+) format will improve accuracy and latency.
 
-=head4 Content Types:
+=item * C<model> (anyOf) - The model to use for transcription. Current options are C<whisper-1> ,
+C<gpt-4o-mini-transcribe> , C<gpt-4o-mini-transcribe-2025-12-15> ,
+C<gpt-4o-transcribe> , C<gpt-4o-transcribe-diarize> , and
+C<gpt-realtime-whisper> . Use C<gpt-4o-transcribe-diarize> when you need
+diarization with speaker labels.
 
-=over 4
+=item * C<prompt> (string) - An optional text to guide the model's style or continue a previous audio
+segment. For C<whisper-1> , the
+L<prompt is a list of keywords|https://platform.openai.com/docs/guides/speech-to-text#prompting>
+. For C<gpt-4o-transcribe> models (excluding C<gpt-4o-transcribe-diarize> ),
+the prompt is a free text string, for example "expect words related to
+technology". Prompt is not supported with C<gpt-realtime-whisper> in GA
+Realtime sessions.
 
+=back
 
-=item * C<application/json>
+=head2 AudioTranscriptionResponse
 
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+Properties:
 
-    {
-      "id": "sess_BBwZc7cFV3XizEyKGDCGL",
-      "object": "realtime.transcription_session",
-      "expires_at": 1742188264,
-      "modalities": ["audio", "text"],
-      "turn_detection": {
-        "type": "server_vad",
-        "threshold": 0.5,
-        "prefix_padding_ms": 300,
-        "silence_duration_ms": 200
-      },
-      "input_audio_format": "pcm16",
-      "input_audio_transcription": {
-        "model": "gpt-4o-transcribe",
-        "language": null,
-        "prompt": ""
-      },
-      "client_secret": null
-    }
+=over
 
+=item * C<language> (string) - The language of the input audio.
+
+=item * C<model> (anyOf) - The model used for transcription. Current options are C<whisper-1> ,
+C<gpt-4o-mini-transcribe> , C<gpt-4o-mini-transcribe-2025-12-15> ,
+C<gpt-4o-transcribe> , C<gpt-4o-transcribe-diarize> , and
+C<gpt-realtime-whisper> .
+
+=item * C<prompt> (string) - The prompt configured for input audio transcription, when present.
+
+=back
+
+=head2 NoiseReductionType
+
+Type of noise reduction. C<near_field> is for close-talking microphones such
+as headphones, C<far_field> is for far-field microphones such as laptop or
+conference room microphones.
+
+=head2 RealtimeTranscriptionSessionCreateRequest
+
+Properties:
+
+=over
+
+=item * C<include> (array of string) - The set of items to include in the transcription. Current available items are:
+C<item.input_audio_transcription.logprobs>
+
+=item * C<input_audio_format> (string) - The format of input audio. Options are C<pcm16> , C<g711_ulaw> , or
+C<g711_alaw> . For C<pcm16> , input audio must be 16-bit PCM at a 24kHz sample
+rate, single channel (mono), and little-endian byte order.
+
+Allowed values: pcm16, g711_ulaw, g711_alaw
+
+Default: pcm16
+
+=item * C<input_audio_noise_reduction> (object) - Configuration for input audio noise reduction. This can be set to C<null> to
+turn off. Noise reduction filters audio added to the input audio buffer before
+it is sent to VAD and the model. Filtering the audio can improve VAD and turn
+detection accuracy (reducing false positives) and model performance by
+improving perception of the input audio.
+
+Default: null
+
+=item * C<input_audio_transcription> (AudioTranscription) - Configuration for input audio transcription. The client can optionally set the
+language and prompt for transcription, these offer additional guidance to the
+transcription service.
+
+See L</AudioTranscription> below for shape.
+
+=item * C<turn_detection> (object) - Configuration for turn detection. Can be set to C<null> to turn off. Server
+VAD means that the model will detect the start and end of speech based on
+audio volume and respond at the end of user speech.
+
+=back
+
+=head2 RealtimeTranscriptionSessionCreateResponse
+
+Properties:
+
+=over
+
+=item * C<client_secret> (object, required) - Ephemeral key returned by the API. Only present when the session is created on
+the server via REST API.
+
+=item * C<input_audio_format> (string) - The format of input audio. Options are C<pcm16> , C<g711_ulaw> , or
+C<g711_alaw> .
+
+=item * C<input_audio_transcription> (AudioTranscriptionResponse) - Configuration of the transcription model.
+
+See L</AudioTranscriptionResponse> below for shape.
+
+=item * C<modalities> (unknown) - The set of modalities the model can respond with. To disable audio, set this
+to ["text"].
+
+=item * C<turn_detection> (object) - Configuration for turn detection. Can be set to C<null> to turn off. Server
+VAD means that the model will detect the start and end of speech based on
+audio volume and respond at the end of user speech.
 
 =back
 

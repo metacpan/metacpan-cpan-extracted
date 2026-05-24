@@ -4,22 +4,28 @@ OpenAPI::Client::OpenAI - A client for the OpenAI API
 
 # SYNOPSIS
 
-      use OpenAPI::Client::OpenAI;
+    use OpenAPI::Client::OpenAI;
+    use Data::Dumper;
 
-      # The OPENAI_API_KEY environment variable must be set
-      # See https://platform.openai.com/api-keys and ENVIRONMENT VARIABLES below
-      my $client = OpenAPI::Client::OpenAI->new();
+    # The OPENAI_API_KEY environment variable must be set
+    # See https://platform.openai.com/api-keys and ENVIRONMENT VARIABLES below
+    my $client = OpenAPI::Client::OpenAI->new();
 
-      my $tx = $client->createCompletion(
-          {
-              body => {
-                  model       => 'gpt-3.5-turbo-instruct',
-                  prompt      => 'What is the capital of France?'
-                  temperature => 0, # optional, between 0 and 1, with 0 being the least random
-                  max_tokens  => 100, # optional, the maximum number of tokens to generate
-              }
-          }
-      );
+    my $tx = $client->create_chat_completion(
+        {
+            body => {
+                model    => 'gpt-3.5-turbo',
+                messages => [
+                    {
+                        role    => 'user',
+                        content => 'What is the capital of France?',
+                    },
+                ],
+                temperature => 0,    # optional, 0 (deterministic) to 2 (most random)
+                max_tokens  => 100,  # optional, the maximum number of tokens to generate
+            },
+        }
+    );
 
     my $response_data = $tx->res->json;
 
@@ -71,42 +77,12 @@ exception of the following extra options:
 
 ## Other Methods
 
-Other methods are documented in [OpenAPI::Client::OpenAI::Methods](https://metacpan.org/pod/OpenAPI%3A%3AClient%3A%3AOpenAI%3A%3AMethods). These
-method are deprecated and will be removed in a future version.
+Other methods are documented in [OpenAPI::Client::OpenAI::Methods](https://metacpan.org/pod/OpenAPI%3A%3AClient%3A%3AOpenAI%3A%3AMethods). Every
+API operation is callable in both its original (e.g. `createChatCompletion`)
+and snake\_case (e.g. `create_chat_completion`) form.
 
 See [OpenAPI::Client::OpenAI::Path](https://metacpan.org/pod/OpenAPI%3A%3AClient%3A%3AOpenAI%3A%3APath) for an index of all paths available. You
 can click through each of them for more detail.
-
-# DEPRECATED METHODS
-
-The following methods are deprecated and will be removed in a future release:
-
-- create\_chat\_completion
-
-    Replaced with `createChatCompletion`.
-
-- create\_completion
-
-    Replaced with `createCompletion`.
-
-- create\_embedding
-
-    Replaced with `createEmbedding`.
-
-- create\_image
-
-    Replaced with `createImage`.
-
-- create\_moderation
-
-    Replaced with `createModeration`.
-
-- list\_models
-
-    Replaced with `listModels`.
-
-Originally, these methods were named using `snake_case`, but to simplify the
-code, we retained the `camelCase` names in the main module.
 
 # ENVIRONMENT VARIABLES
 
@@ -132,7 +108,7 @@ Nelson Ferraz, <nferraz@gmail.com>
 
 # COPYRIGHT AND LICENSE
 
-Copyright (C) 2023-2024 by Nelson Ferraz
+Copyright (C) 2023-2026 by Nelson Ferraz
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

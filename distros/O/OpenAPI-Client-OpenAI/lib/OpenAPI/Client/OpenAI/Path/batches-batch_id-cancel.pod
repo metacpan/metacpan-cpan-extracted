@@ -4,102 +4,112 @@
 
 OpenAPI::Client::OpenAI::Path::batches-batch_id-cancel - Documentation for the /batches/{batch_id}/cancel path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</batches/{batch_id}/cancel>.
+=head2 POST /batches/{batch_id}/cancel
 
-=head1 PATHS
+=head3 cancelBatch
 
+  $client->cancel_batch({
+      body => { ... },
+  });
 
-=head2 C<POST /batches/{batch_id}/cancel>
+Cancels an in-progress batch. The batch will be in status C<cancelling> for up
+to 10 minutes, before changing to C<cancelled> , where it will have partial
+results (if any) available in the output file.
 
-Cancel batch
+=head4 Path/query parameters
 
+=over
 
-Cancels an in-progress batch. The batch will be in status C<cancelling> for up to 10 minutes, before changing to C<cancelled>, where it will have partial results (if any) available in the output file.
-
-
-
-=head3 Operation ID
-
-C<cancelBatch>
-
-    $client->cancelBatch( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<batch_id> (in path) (Required) - The ID of the batch to cancel.
-
-Type: C<string>
-
-
+=item * C<batch_id> (in path, required, string) - The ID of the batch to cancel.
 
 =back
 
+=head4 Responses
 
-=head3 Responses
+B<200 - Batch is cancelling. Returns the cancelling batch's details.>
 
+Content-Type: application/json
 
-=head4 Status Code: C<200>
+Example:
 
-Batch is cancelling. Returns the cancelling batch's details.
+    "{\n  \"id\": \"batch_abc123\",\n  \"object\": \"batch\",\n  \"endpoint\": \"/v1/completions\",\n  \"model\": \"gpt-5-2025-08-07\",\n  \"errors\": null,\n  \"input_file_id\": \"file-abc123\",\n  \"completion_window\": \"24h\",\n  \"status\": \"completed\",\n  \"output_file_id\": \"file-cvaTdG\",\n  \"error_file_id\": \"file-HOWS94\",\n  \"created_at\": 1711471533,\n  \"in_progress_at\": 1711471538,\n  \"expires_at\": 1711557933,\n  \"finalizing_at\": 1711493133,\n  \"completed_at\": 1711493163,\n  \"failed_at\": null,\n  \"expired_at\": null,\n  \"cancelling_at\": null,\n  \"cancelled_at\": null,\n  \"request_counts\": {\n    \"total\": 100,\n    \"completed\": 95,\n    \"failed\": 5\n  },\n  \"usage\": {\n    \"input_tokens\": 1500,\n    \"input_tokens_details\": {\n      \"cached_tokens\": 1024\n    },\n    \"output_tokens\": 500,\n    \"output_tokens_details\": {\n      \"reasoning_tokens\": 300\n    },\n    \"total_tokens\": 2000\n  },\n  \"metadata\": {\n    \"customer_id\": \"user_123456789\",\n    \"batch_description\": \"Nightly eval job\",\n  }\n}\n"
 
+=head1 SCHEMAS
 
-=head4 Content Types:
+=head2 Batch
 
-=over 4
+Properties:
 
+=over
 
-=item * C<application/json>
+=item * C<cancelled_at> (integer) - The Unix timestamp (in seconds) for when the batch was cancelled.
 
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+=item * C<cancelling_at> (integer) - The Unix timestamp (in seconds) for when the batch started cancelling.
 
-    {
-      "id": "batch_abc123",
-      "object": "batch",
-      "endpoint": "/v1/completions",
-      "model": "gpt-5-2025-08-07",
-      "errors": null,
-      "input_file_id": "file-abc123",
-      "completion_window": "24h",
-      "status": "completed",
-      "output_file_id": "file-cvaTdG",
-      "error_file_id": "file-HOWS94",
-      "created_at": 1711471533,
-      "in_progress_at": 1711471538,
-      "expires_at": 1711557933,
-      "finalizing_at": 1711493133,
-      "completed_at": 1711493163,
-      "failed_at": null,
-      "expired_at": null,
-      "cancelling_at": null,
-      "cancelled_at": null,
-      "request_counts": {
-        "total": 100,
-        "completed": 95,
-        "failed": 5
-      },
-      "usage": {
-        "input_tokens": 1500,
-        "input_tokens_details": {
-          "cached_tokens": 1024
-        },
-        "output_tokens": 500,
-        "output_tokens_details": {
-          "reasoning_tokens": 300
-        },
-        "total_tokens": 2000
-      },
-      "metadata": {
-        "customer_id": "user_123456789",
-        "batch_description": "Nightly eval job",
-      }
-    }
+=item * C<completed_at> (integer) - The Unix timestamp (in seconds) for when the batch was completed.
 
+=item * C<completion_window> (string, required) - The time frame within which the batch should be processed.
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) for when the batch was created.
+
+=item * C<endpoint> (string, required) - The OpenAI API endpoint used by the batch.
+
+=item * C<error_file_id> (string) - The ID of the file containing the outputs of requests with errors.
+
+=item * C<errors> (object)
+
+=item * C<expired_at> (integer) - The Unix timestamp (in seconds) for when the batch expired.
+
+=item * C<expires_at> (integer) - The Unix timestamp (in seconds) for when the batch will expire.
+
+=item * C<failed_at> (integer) - The Unix timestamp (in seconds) for when the batch failed.
+
+=item * C<finalizing_at> (integer) - The Unix timestamp (in seconds) for when the batch started finalizing.
+
+=item * C<id> (string, required)
+
+=item * C<in_progress_at> (integer) - The Unix timestamp (in seconds) for when the batch started processing.
+
+=item * C<input_file_id> (string, required) - The ID of the input file for the batch.
+
+=item * C<metadata> (Metadata)
+
+See L</Metadata> below for shape.
+
+=item * C<model> (string) - Model ID used to process the batch, like C<gpt-5-2025-08-07> . OpenAI offers a
+wide range of models with different capabilities, performance characteristics,
+and price points. Refer to the
+L<model guide|https://platform.openai.com/docs/models> to browse and compare
+available models.
+
+=item * C<object> (string, required) - The object type, which is always C<batch> .
+
+Allowed values: batch
+
+=item * C<output_file_id> (string) - The ID of the file containing the outputs of successfully executed requests.
+
+=item * C<request_counts> (object) - The request counts for different statuses within the batch.
+
+=item * C<status> (string, required) - The current status of the batch.
+
+Allowed values: validating, failed, in_progress, finalizing, completed, expired, cancelling, cancelled
+
+=item * C<usage> (object) - Represents token usage details including input tokens, output tokens, a
+breakdown of output tokens, and the total tokens used. Only populated on
+batches created after September 7, 2025.
 
 =back
+
+=head2 Metadata
+
+Set of 16 key-value pairs that can be attached to an object. This can be
+useful for storing additional information about the object in a structured
+format, and querying for objects via API or the dashboard.
+
+Keys are strings with a maximum length of 64 characters. Values are strings
+with a maximum length of 512 characters.
 
 =head1 SEE ALSO
 

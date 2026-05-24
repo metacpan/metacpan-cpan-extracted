@@ -62,6 +62,10 @@ my %DISTS = (
         version => '1.156',
         note    => 'M::B; PP; dup. prereqs/pkgs; odd pkgs',
     },
+    'Pinto' => {
+        version => '0.14',
+        note    => 'EU::MM; PP; has many dependencies (80+)',
+    },
     'Regexp-Common' => {
         version => '2024080801',
         note    => 'EU::MM; PP; dup. prereqs/pkgs; multi licenses; multi license files; install license; missing pkgs',
@@ -4738,6 +4742,1040 @@ my %EXPECTED = (
                 unset PERL5LIB PERL_LOCAL_LIB_ROOT
 
                 ./Build install --installdirs=vendor --destdir="$pkgdir"
+            }
+            END
+    },
+    'Pinto' => {
+        meta => {
+            abstract   => 'Curate a repository of Perl modules',
+            author     => 'THALJEF',
+            checksum   => 'f8c4546491a091e55f58a32163bc38b66e550a99a67bf8bc9bf7f8ad3b3b6220',
+            dependency => [
+                {
+                    module       => 'HTTP::Server::PSGI',
+                    phase        => 'test',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'IPC::Open3',
+                    phase        => 'test',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Plack::Test',
+                    phase        => 'test',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Test::Builder::Module',
+                    phase        => 'test',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'HTTP::Body',
+                    phase        => 'test',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'IO::Handle',
+                    phase        => 'test',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'HTTP::Response',
+                    phase        => 'test',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Test::TCP',
+                    phase        => 'test',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'File::Temp',
+                    phase        => 'test',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'File::Spec',
+                    phase        => 'test',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Capture::Tiny',
+                    phase        => 'test',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'lib',
+                    phase        => 'test',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'ExtUtils::MakeMaker',
+                    phase        => 'test',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Module::Faker::Dist',
+                    phase        => 'test',
+                    relationship => 'requires',
+                    version      => '0.014',
+                },
+                {
+                    module       => 'Test::File',
+                    phase        => 'test',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Test::More',
+                    phase        => 'test',
+                    relationship => 'requires',
+                    version      => '0.96',
+                },
+                {
+                    module       => 'Test::LWP::UserAgent',
+                    phase        => 'test',
+                    relationship => 'requires',
+                    version      => '0.018',
+                },
+                {
+                    module       => 'Test::Exception',
+                    phase        => 'test',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Apache::Htpasswd',
+                    phase        => 'test',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'perl',
+                    phase        => 'test',
+                    relationship => 'requires',
+                    version      => '5.008',
+                },
+                {
+                    module       => 'FindBin',
+                    phase        => 'test',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'blib',
+                    phase        => 'test',
+                    relationship => 'requires',
+                    version      => '1.01',
+                },
+                {
+                    module       => 'CPAN::Meta',
+                    phase        => 'test',
+                    relationship => 'recommends',
+                    version      => '2.120900',
+                },
+                {
+                    module       => 'Class::Load',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'String::Format',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Plack',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '1.0028',
+                },
+                {
+                    module       => 'Module::CoreList',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '5.20170720',
+                },
+                {
+                    module       => 'Plack::Request',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Dist::Metadata',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0.926',
+                },
+                {
+                    module       => 'MooseX::Types::Moose',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'File::Find',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'IO::Zlib',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'MooseX::StrictConstructor',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'DBIx::Class::ResultSet',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'version',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Variable::Magic',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0.57',
+                },
+                {
+                    module       => 'IO::Select',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Module::Metadata',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '1.000031',
+                },
+                {
+                    module       => 'CPAN::Meta',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Moose',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'List::Util',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Carp',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'IO::String',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Getopt::Long',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Router::Simple',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Proc::Terminator',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'warnings',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Pod::Usage',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Plack::Response',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'CPAN::Meta::Requirements',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'MooseX::Configuration',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'List::MoreUtils',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'CPAN::DistnameInfo',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'DBD::SQLite',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '1.33',
+                },
+                {
+                    module       => 'MooseX::Aliases',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Starman',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0.3014',
+                },
+                {
+                    module       => 'Devel::StackTrace',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'File::NFSLock',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Path::Class::File',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'perl',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '5.008',
+                },
+                {
+                    module       => 'LWP::UserAgent',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Exporter',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Readonly',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Plack::MIME',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'MooseX::ClassAttribute',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0.27',
+                },
+                {
+                    module       => 'HTTP::Request::Common',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Cwd::Guard',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Term::ANSIColor',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '2.02',
+                },
+                {
+                    module       => 'DateTime',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Path::Class',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Plack::Runner',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'base',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Digest::SHA',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Authen::Simple::Passwd',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'File::Spec',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Try::Tiny',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'overload',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'DateTime::TimeZone::OffsetOnly',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Path::Class::Dir',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Proc::Fork',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'URI::Escape',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '3.31',
+                },
+                {
+                    module       => 'Plack::Middleware::Auth::Basic',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'DBIx::Class',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0.08200',
+                },
+                {
+                    module       => 'DateTime::TimeZone',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'File::Which',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Encode',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'App::Cmd::Command::help',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'HTTP::Date',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'IO::Interactive',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'MooseX::MarkAsMethods',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'JSON',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'strict',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'DateTime::TimeZone::Local::Unix',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Scalar::Util',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'DBIx::Class::Core',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'MooseX::Types',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'URI::file',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'App::Cmd::Setup',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'CPAN::Checksums',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'MooseX::SetOnce',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'IO::Prompt',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'DBIx::Class::Schema',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'HTTP::Status',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Archive::Tar',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'MooseX::NonMoose',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'JSON::PP',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '2.27103',
+                },
+                {
+                    module       => 'Digest::MD5',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'IO::File',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'IO::Handle',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Archive::Extract',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0.68',
+                },
+                {
+                    module       => 'File::HomeDir',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'IO::Pipe',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Throwable::Error',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0.200005',
+                },
+                {
+                    module       => 'utf8',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Moose::Role',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'URI',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'App::Cmd',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0.323',
+                },
+                {
+                    module       => 'UUID::Tiny',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'File::Temp',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'File::Copy',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Cwd',
+                    phase        => 'runtime',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'JSON::PP',
+                    phase        => 'configure',
+                    relationship => 'suggests',
+                    version      => '2.27300',
+                },
+                {
+                    module       => 'perl',
+                    phase        => 'configure',
+                    relationship => 'requires',
+                    version      => '5.008',
+                },
+                {
+                    module       => 'ExtUtils::MakeMaker',
+                    phase        => 'configure',
+                    relationship => 'requires',
+                    version      => '6.64',
+                },
+                {
+                    module       => 'Test::Pod',
+                    phase        => 'develop',
+                    relationship => 'requires',
+                    version      => '1.41',
+                },
+                {
+                    module       => 'lib',
+                    phase        => 'develop',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Test::Version',
+                    phase        => 'develop',
+                    relationship => 'requires',
+                    version      => '1',
+                },
+                {
+                    module       => 'Test::Trap',
+                    phase        => 'develop',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Test::More',
+                    phase        => 'develop',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Test::CPAN::Meta',
+                    phase        => 'develop',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+                {
+                    module       => 'Test::Memory::Cycle',
+                    phase        => 'develop',
+                    relationship => 'requires',
+                    version      => '0',
+                },
+            ],
+            dist               => 'Pinto',
+            download_url       => 'https://cpan.metacpan.org/authors/id/T/TH/THALJEF/Pinto-0.14.tar.gz',
+            has_license        => 'LICENSE',
+            has_module_install => false,
+            has_multi_licenses => false,
+            has_xs             => false,
+            license            => ['perl_5'],
+            name               => 'Pinto-0.14',
+            spdx_expression    => undef,
+            version            => '0.14',
+        },
+        arch_prereqs => {
+            checkdepends => [
+                'perl-apache-htpasswd',
+                'perl-capture-tiny',
+                'perl-extutils-makemaker',
+                'perl-file-temp',
+                'perl-findbin',
+                'perl-http-body',
+                'perl-http-message',
+                'perl-io',
+                'perl-lib',
+                'perl-module-faker>=0.014',
+                'perl-pathtools',
+                'perl-plack',
+                'perl-test-exception',
+                'perl-test-file',
+                'perl-test-lwp-useragent>=0.018',
+                'perl-test-simple',
+                'perl-test-tcp',
+                'perl>=5.8.0',
+            ],
+            depends => [
+                'perl-app-cmd',
+                'perl-archive-extract>=0.68',
+                'perl-archive-tar',
+                'perl-authen-simple-passwd',
+                'perl-base',
+                'perl-carp',
+                'perl-class-load',
+                'perl-cpan-checksums',
+                'perl-cpan-distnameinfo',
+                'perl-cpan-meta',
+                'perl-cpan-meta-requirements',
+                'perl-cwd-guard',
+                'perl-datetime',
+                'perl-datetime-timezone',
+                'perl-dbd-sqlite>=1.33',
+                'perl-dbix-class',
+                'perl-devel-stacktrace',
+                'perl-digest-md5',
+                'perl-digest-sha',
+                'perl-dist-metadata>=0.926',
+                'perl-encode',
+                'perl-exporter',
+                'perl-file-homedir',
+                'perl-file-nfslock',
+                'perl-file-temp',
+                'perl-file-which',
+                'perl-getopt-long',
+                'perl-http-date',
+                'perl-http-message',
+                'perl-io',
+                'perl-io-interactive',
+                'perl-io-prompt',
+                'perl-io-string',
+                'perl-io-zlib',
+                'perl-json',
+                'perl-json-pp>=2.27103',
+                'perl-libwww',
+                'perl-list-moreutils',
+                'perl-module-corelist>=5.20170720',
+                'perl-module-metadata>=1.000031',
+                'perl-moose',
+                'perl-moosex-aliases',
+                'perl-moosex-classattribute>=0.27',
+                'perl-moosex-configuration',
+                'perl-moosex-markasmethods',
+                'perl-moosex-nonmoose',
+                'perl-moosex-setonce',
+                'perl-moosex-strictconstructor',
+                'perl-moosex-types',
+                'perl-path-class',
+                'perl-pathtools',
+                'perl-plack',
+                'perl-pod-usage',
+                'perl-proc-fork',
+                'perl-proc-terminator',
+                'perl-readonly',
+                'perl-router-simple',
+                'perl-scalar-list-utils',
+                'perl-starman>=0.3014',
+                'perl-string-format',
+                'perl-term-ansicolor>=2.02',
+                'perl-throwable>=0.200005',
+                'perl-try-tiny',
+                'perl-uri',
+                'perl-uuid-tiny',
+                'perl-variable-magic>=0.57',
+                'perl-version',
+                'perl>=5.8.0',
+            ],
+            makedepends => ['perl-extutils-makemaker>=6.64'],
+        },
+        pkgbuild => <<~'END',
+            # Maintainer: Your Name <email@domain.tld>
+
+            _author=THALJEF
+            _dist=Pinto
+            pkgname=perl-${_dist@L}
+            pkgver=0.14
+            pkgrel=1
+            pkgdesc='Curate a repository of Perl modules'
+            arch=('any')
+            url=https://metacpan.org/dist/$_dist
+            license=('Artistic-1.0-Perl OR GPL-1.0-or-later')
+            depends=(
+                'perl-app-cmd'
+                'perl-archive-extract>=0.68'
+                'perl-archive-tar'
+                'perl-authen-simple-passwd'
+                'perl-base'
+                'perl-carp'
+                'perl-class-load'
+                'perl-cpan-checksums'
+                'perl-cpan-distnameinfo'
+                'perl-cpan-meta'
+                'perl-cpan-meta-requirements'
+                'perl-cwd-guard'
+                'perl-datetime'
+                'perl-datetime-timezone'
+                'perl-dbd-sqlite>=1.33'
+                'perl-dbix-class'
+                'perl-devel-stacktrace'
+                'perl-digest-md5'
+                'perl-digest-sha'
+                'perl-dist-metadata>=0.926'
+                'perl-encode'
+                'perl-exporter'
+                'perl-file-homedir'
+                'perl-file-nfslock'
+                'perl-file-temp'
+                'perl-file-which'
+                'perl-getopt-long'
+                'perl-http-date'
+                'perl-http-message'
+                'perl-io'
+                'perl-io-interactive'
+                'perl-io-prompt'
+                'perl-io-string'
+                'perl-io-zlib'
+                'perl-json'
+                'perl-json-pp>=2.27103'
+                'perl-libwww'
+                'perl-list-moreutils'
+                'perl-module-corelist>=5.20170720'
+                'perl-module-metadata>=1.000031'
+                'perl-moose'
+                'perl-moosex-aliases'
+                'perl-moosex-classattribute>=0.27'
+                'perl-moosex-configuration'
+                'perl-moosex-markasmethods'
+                'perl-moosex-nonmoose'
+                'perl-moosex-setonce'
+                'perl-moosex-strictconstructor'
+                'perl-moosex-types'
+                'perl-path-class'
+                'perl-pathtools'
+                'perl-plack'
+                'perl-pod-usage'
+                'perl-proc-fork'
+                'perl-proc-terminator'
+                'perl-readonly'
+                'perl-router-simple'
+                'perl-scalar-list-utils'
+                'perl-starman>=0.3014'
+                'perl-string-format'
+                'perl-term-ansicolor>=2.02'
+                'perl-throwable>=0.200005'
+                'perl-try-tiny'
+                'perl-uri'
+                'perl-uuid-tiny'
+                'perl-variable-magic>=0.57'
+                'perl-version'
+                'perl>=5.8.0'
+            )
+            makedepends=('perl-extutils-makemaker>=6.64')
+            checkdepends=(
+                'perl-apache-htpasswd'
+                'perl-capture-tiny'
+                'perl-extutils-makemaker'
+                'perl-file-temp'
+                'perl-findbin'
+                'perl-http-body'
+                'perl-http-message'
+                'perl-io'
+                'perl-lib'
+                'perl-module-faker>=0.014'
+                'perl-pathtools'
+                'perl-plack'
+                'perl-test-exception'
+                'perl-test-file'
+                'perl-test-lwp-useragent>=0.018'
+                'perl-test-simple'
+                'perl-test-tcp'
+                'perl>=5.8.0'
+            )
+            options=('!emptydirs')
+            source=("https://cpan.metacpan.org/authors/id/${_author::1}/${_author::2}/$_author/$_dist-$pkgver.tar.gz")
+            sha256sums=('f8c4546491a091e55f58a32163bc38b66e550a99a67bf8bc9bf7f8ad3b3b6220')
+
+            build()
+            {
+                cd "$_dist-$pkgver"
+
+                unset PERL_MM_OPT PERL5LIB PERL_LOCAL_LIB_ROOT
+                export PERL_MM_USE_DEFAULT=1
+
+                /usr/bin/perl Makefile.PL NO_PACKLIST=1 NO_PERLLOCAL=1
+                make
+            }
+
+            check()
+            {
+                cd "$_dist-$pkgver"
+
+                unset PERL5LIB PERL_LOCAL_LIB_ROOT
+
+                make test
+            }
+
+            package()
+            {
+                cd "$_dist-$pkgver"
+
+                unset PERL5LIB PERL_LOCAL_LIB_ROOT
+
+                make install INSTALLDIRS=vendor DESTDIR="$pkgdir"
             }
             END
     },

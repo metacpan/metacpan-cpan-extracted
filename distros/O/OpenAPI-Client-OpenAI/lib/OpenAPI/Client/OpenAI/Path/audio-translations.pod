@@ -4,81 +4,63 @@
 
 OpenAPI::Client::OpenAI::Path::audio-translations - Documentation for the /audio/translations path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</audio/translations>.
+=head2 POST /audio/translations
 
-=head1 PATHS
+=head3 createTranslation
 
-
-=head2 C<POST /audio/translations>
-
-Create translation
-
+  $client->create_translation({
+      body => { ... },
+  });
 
 Translates audio into English.
 
+=head4 Responses
 
+B<200 - OK>
 
-=head3 Operation ID
+Content-Type: application/json
 
-C<createTranslation>
-
-    $client->createTranslation( ... );
-
-=head3 Parameters
-
-=over 4
-
-=back
-
-=head3 Request Body
-  
-=head3 Content Type: C<multipart/form-data>
-
-    
-      
-
-      
-
-=head4 Models
-
-ID of the model to use. Only C<whisper-1> (which is powered by our open source Whisper V2 model) is currently available.
-
-=over 4
-      
-=item * C<whisper-1>
-
-=back
-      
-      
 Example:
 
     {
-       "model" : "whisper-1"
+       "text" : "string"
     }
 
+=head1 SCHEMAS
 
-             
+=head2 CreateTranslationRequest
 
-=head3 Responses
+Properties:
 
+=over
 
-=head4 Status Code: C<200>
+=item * C<file> (string, required) - The audio file object (not file name) translate, in one of these formats:
+flac, mp3, mp4, mpeg, mpga, m4a, ogg, wav, or webm.
 
-OK
+=item * C<model> (anyOf, required) - ID of the model to use. Only C<whisper-1> (which is powered by our open source
+Whisper V2 model) is currently available.
 
+=item * C<prompt> (string) - An optional text to guide the model's style or continue a previous audio
+segment. The
+L<prompt|https://platform.openai.com/docs/guides/speech-to-text#prompting>
+should be in English.
 
-=head4 Content Types:
+=item * C<response_format> (string) - The format of the output, in one of these options: C<json> , C<text> , C<srt>
+, C<verbose_json> , or C<vtt> .
 
-=over 4
+Allowed values: json, text, srt, verbose_json, vtt
 
+Default: json
 
-=item * C<application/json>
+=item * C<temperature> (number) - The sampling temperature, between 0 and 1. Higher values like 0.8 will make
+the output more random, while lower values like 0.2 will make it more focused
+and deterministic. If set to 0, the model will use
+L<log probability|https://en.wikipedia.org/wiki/Log_probability> to
+automatically increase the temperature until certain thresholds are hit.
 
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
-
-
+Default: 0
 
 =back
 

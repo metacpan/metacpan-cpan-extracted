@@ -12,7 +12,7 @@ role App::cpan2arch::MergePrereqs;
 use Scalar::Util qw< looks_like_number >;
 use List::Util   qw< any >;
 
-our $VERSION = 'v1.1.0';
+our $VERSION = 'v1.1.1';
 
 field $_dl_endpoint  :reader :writer = 'https://fastapi.metacpan.org/v1/download_url/';
 field %_cpan_prereqs :reader :writer;

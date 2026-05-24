@@ -4,96 +4,148 @@
 
 OpenAPI::Client::OpenAI::Path::vector_stores-vector_store_id-file_batches - Documentation for the /vector_stores/{vector_store_id}/file_batches path.
 
-=head1 DESCRIPTION
+=head1 OPERATIONS
 
-This document describes the API endpoint at C</vector_stores/{vector_store_id}/file_batches>.
+=head2 POST /vector_stores/{vector_store_id}/file_batches
 
-=head1 PATHS
+=head3 createVectorStoreFileBatch
 
-
-=head2 C<POST /vector_stores/{vector_store_id}/file_batches>
-
-Create vector store file batch
-
+  $client->create_vector_store_file_batch({
+      body => { ... },
+  });
 
 Create a vector store file batch.
 
+The maximum number of files in a single batch request is 2000. Vector store
+file attach requests are rate limited per vector store (300 requests per
+minute across both this endpoint and C</vector_stores/{vector_store_id}/files>
+). For ingesting multiple files into the same vector store, this batch
+endpoint is recommended.
 
+=head4 Path/query parameters
 
-=head3 Operation ID
+=over
 
-C<createVectorStoreFileBatch>
-
-    $client->createVectorStoreFileBatch( ... );
-
-=head3 Parameters
-
-=over 4
-
-=item * C<vector_store_id> (in path) (Required) - The ID of the vector store for which to create a File Batch.
-
-
-Type: C<string>
-
-
+=item * C<vector_store_id> (in path, required, string) - The ID of the vector store for which to create a File Batch.
 
 =back
 
-=head3 Request Body
-  
-=head3 Content Type: C<application/json>
+=head4 Responses
 
-    
-      
+B<200 - OK>
 
-      
-      
+Content-Type: application/json
+
 Example:
 
     {
-       "file_ids" : [
-          null
-       ],
-       "files" : [
-          null
-       ]
+       "created_at" : 1698107661,
+       "file_counts" : {
+          "cancelled" : 0,
+          "completed" : 100,
+          "failed" : 0,
+          "in_progress" : 0,
+          "total" : 100
+       },
+       "id" : "vsfb_123",
+       "object" : "vector_store.files_batch",
+       "status" : "completed",
+       "vector_store_id" : "vs_abc123"
     }
 
+=head1 SCHEMAS
 
-             
+=head2 ChunkingStrategyRequestParam
 
-=head3 Responses
+The chunking strategy used to chunk the file(s). If not set, will use the
+C<auto> strategy.
 
+=head2 CreateVectorStoreFileBatchRequest
 
-=head4 Status Code: C<200>
+Properties:
 
-OK
+=over
 
+=item * C<attributes> (VectorStoreFileAttributes)
 
-=head4 Content Types:
+See L</VectorStoreFileAttributes> below for shape.
 
-=over 4
+=item * C<chunking_strategy> (ChunkingStrategyRequestParam)
 
+See L</ChunkingStrategyRequestParam> below for shape.
 
-=item * C<application/json>
+=item * C<file_ids> (array of string) - A list of L<File|https://platform.openai.com/docs/api-reference/files> IDs
+that the vector store should use. Useful for tools like C<file_search> that
+can access files. If C<attributes> or C<chunking_strategy> are provided, they
+will be applied to all files in the batch. The maximum batch size is 2000
+files. This endpoint is recommended for multi-file ingestion and helps reduce
+per-vector-store write request pressure. Mutually exclusive with C<files> .
 
-Example (See the L<OpenAI spec for more detail|https://github.com/openai/openai-openapi/blob/master/openapi.yaml>):
+=item * C<files> (array of CreateVectorStoreFileRequest) - A list of objects that each include a C<file_id> plus optional C<attributes>
+or C<chunking_strategy> . Use this when you need to override metadata for
+specific files. The global C<attributes> or C<chunking_strategy> will be
+ignored and must be specified for each file. The maximum batch size is 2000
+files. This endpoint is recommended for multi-file ingestion and helps reduce
+per-vector-store write request pressure. Mutually exclusive with C<file_ids> .
 
-    {
-      "id": "vsfb_123",
-      "object": "vector_store.files_batch",
-      "created_at": 1698107661,
-      "vector_store_id": "vs_abc123",
-      "status": "completed",
-      "file_counts": {
-        "in_progress": 0,
-        "completed": 100,
-        "failed": 0,
-        "cancelled": 0,
-        "total": 100
-      }
-    }
+=back
 
+=head2 CreateVectorStoreFileRequest
+
+Properties:
+
+=over
+
+=item * C<attributes> (VectorStoreFileAttributes)
+
+See L</VectorStoreFileAttributes> below for shape.
+
+=item * C<chunking_strategy> (ChunkingStrategyRequestParam)
+
+See L</ChunkingStrategyRequestParam> below for shape.
+
+=item * C<file_id> (string, required) - A L<File|https://platform.openai.com/docs/api-reference/files> ID that the
+vector store should use. Useful for tools like C<file_search> that can access
+files. For multi-file ingestion, we recommend
+L<C<file_batches>|https://platform.openai.com/docs/api-reference/vector-stores-file-batches/createBatch>
+to minimize per-vector-store write requests.
+
+=back
+
+=head2 VectorStoreFileAttributes
+
+Set of 16 key-value pairs that can be attached to an object. This can be
+useful for storing additional information about the object in a structured
+format, and querying for objects via API or the dashboard. Keys are strings
+with a maximum length of 64 characters. Values are strings with a maximum
+length of 512 characters, booleans, or numbers.
+
+=head2 VectorStoreFileBatchObject
+
+Properties:
+
+=over
+
+=item * C<created_at> (integer, required) - The Unix timestamp (in seconds) for when the vector store files batch was
+created.
+
+=item * C<file_counts> (object, required)
+
+=item * C<id> (string, required) - The identifier, which can be referenced in API endpoints.
+
+=item * C<object> (string, required) - The object type, which is always C<vector_store.file_batch> .
+
+Allowed values: vector_store.files_batch
+
+=item * C<status> (string, required) - The status of the vector store files batch, which can be either C<in_progress>
+, C<completed> , C<cancelled> or C<failed> .
+
+Allowed values: in_progress, completed, cancelled, failed
+
+=item * C<vector_store_id> (string, required) - The ID of the
+L<vector store|https://platform.openai.com/docs/api-reference/vector-stores/object>
+that the L<File|https://platform.openai.com/docs/api-reference/files> is
+attached to.
 
 =back
 

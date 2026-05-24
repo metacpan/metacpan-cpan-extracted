@@ -1,12 +1,12 @@
-use strict;
+use v5.24;
 use warnings;
+use experimental qw(lexical_subs signatures);
 use Parallel::Pipes;
 use Test::More;
 
 my $num = $^O eq 'MSWin32' ? 1 : 4;
 
-my $pipes = Parallel::Pipes->new($num, sub {
-    my $data = shift;
+my $pipes = Parallel::Pipes->new($num, sub ($data) {
     return $data . " " . ("x" x ($data*10*1024));
 });
 

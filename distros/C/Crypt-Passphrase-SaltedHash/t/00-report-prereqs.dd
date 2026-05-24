@@ -64,7 +64,6 @@ do { my $x = {
                                      'Crypt::SaltedHash' => '0.10'
                                    },
                    'requires' => {
-                                   'Crypt::SaltedHash' => '0',
                                    'Crypt::SysRandom' => '0',
                                    'Digest::MD5' => '2.25',
                                    'Digest::SHA' => '5.96',
