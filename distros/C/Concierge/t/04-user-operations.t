@@ -206,4 +206,61 @@ subtest 'remove_user deletes from all components' => sub {
     ok !$verify->{exists_in_users}, 'removed from users';
 };
 
+subtest 'add_user with non-hashref input' => sub {
+    my $result = $concierge->add_user('not a hash');
+    ok !$result->{success}, 'add_user fails with non-hashref';
+    like $result->{message}, qr/hash/i, 'error mentions hash';
+};
+
+subtest 'remove_user input validation' => sub {
+    my $r1 = $concierge->remove_user(undef);
+    ok !$r1->{success}, 'remove_user fails with undef user_id';
+
+    my $r2 = $concierge->remove_user('');
+    ok !$r2->{success}, 'remove_user fails with empty user_id';
+};
+
+subtest 'verify_user input validation' => sub {
+    my $r1 = $concierge->verify_user(undef);
+    ok !$r1->{success}, 'verify_user fails with undef user_id';
+
+    my $r2 = $concierge->verify_user('');
+    ok !$r2->{success}, 'verify_user fails with empty user_id';
+};
+
+subtest 'update_user_data input validation' => sub {
+    # Undefined user_id
+    my $r1 = $concierge->update_user_data(undef, { theme => 'dark' });
+    ok !$r1->{success}, 'update_user_data fails with undef user_id';
+
+    # Empty user_id
+    my $r2 = $concierge->update_user_data('', { theme => 'dark' });
+    ok !$r2->{success}, 'update_user_data fails with empty user_id';
+
+    # Non-hashref update data
+    my $r3 = $concierge->update_user_data('alice', 'not a hash');
+    ok !$r3->{success}, 'update_user_data fails with non-hashref updates';
+
+    # Only protected fields (filtered to empty)
+    my $r4 = $concierge->update_user_data('alice', { user_id => 'hacker', password => 'bad' });
+    ok !$r4->{success}, 'update_user_data fails when all updates are filtered out';
+};
+
+subtest 'get_user_data input validation' => sub {
+    my $r1 = $concierge->get_user_data(undef);
+    ok !$r1->{success}, 'get_user_data fails with undef user_id';
+
+    my $r2 = $concierge->get_user_data('');
+    ok !$r2->{success}, 'get_user_data fails with empty user_id';
+
+    my $r3 = $concierge->get_user_data('nobody_exists_here');
+    ok !$r3->{success}, 'get_user_data fails for nonexistent user';
+};
+
+subtest 'list_users with fields option' => sub {
+    my $result = $concierge->list_users('', { fields => ['moniker', 'email'] });
+    ok $result->{success}, 'list_users with fields option succeeds';
+    ref_ok $result->{user_ids}, 'ARRAY', 'user_ids is array';
+};
+
 done_testing;

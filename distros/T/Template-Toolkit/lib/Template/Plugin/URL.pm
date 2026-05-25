@@ -23,7 +23,7 @@ use strict;
 use warnings;
 use base 'Template::Plugin';
 
-our $VERSION = '3.100';
+our $VERSION = '3.105';
 our $JOINT   = '&amp;';
 
 
@@ -45,7 +45,7 @@ sub new {
         my $urlargs = join(
             $JOINT,
             map  { args($_, $combo->{ $_ }) }
-            grep { defined $combo->{ $_ } && length $combo->{ $_ } }
+            grep { defined $combo->{ $_ } }
             sort keys %$combo
         );
 

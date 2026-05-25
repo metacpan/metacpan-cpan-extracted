@@ -46,10 +46,12 @@ t/gh-28-wide-char-dumpfile.t
 t/gh-dumpcode-prototype.t
 t/gh-load-list-context.t
 t/gh-loadfile-dumpfile-errors.t
+t/gh-199-preserve-string-type.t
 t/gh-negative-base60.t
 t/gh-negative-float-base60.t
 t/gh-negative-hex-oct.t
 t/gh-positive-hex-oct.t
+t/gh-trailing-comma.t
 t/json-basic.t
 t/json-circular-ref.t
 t/json-crlf.t

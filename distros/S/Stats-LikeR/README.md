@@ -1,6 +1,6 @@
 # Synopsis
 
-Get basic R statistical functions working in Perl as if they were part of List::Util, like `min`, `max`, `sum`, etc.
+Get basic statistical functions working in Perl as if they were part of List::Util, like `min`, `max`, `sum`, etc.
 I've used Artificial Intelligence tools such as Claude, Gemini, and Grok to write this as well as using my own gray matter.
 There are other similar tools on CPAN, but I want speed and a form like List::Util, which I've gotten here with the help of AI, which often required many attempts to do correctly.
 This is meant to call subroutines directly through eXternal Subroutines (XS) for performance and portability.
@@ -10,6 +10,8 @@ There **are** other modules on CPAN that can do **PARTS** of this, but this work
 # Functions/Subroutines
 
 ## aov
+
+Warning: assumes normal distribution
 
     aov(
     {
@@ -40,6 +42,36 @@ You can also perform Two-Way ANOVA with categorical interactions using the `*` o
     my $res_2way = aov($data_2way, 'len ~ supp * dose');
 
 It is robust against rank deficiency; collinear terms will gracefully receive 0 degrees of freedom and 0 sum of squares, matching R's behavior.
+
+### omitting formula
+
+As of version 0.07, in the case of an omitted formula, stacking is done:
+
+    aov(
+    {
+        yield => [5.5, 5.4, 5.8, 4.5, 4.8, 4.2],
+        ctrl  => [1,     1,   1,   0,   0,   0]
+    },
+    );
+
+is the equivalent of:
+
+    yield <- c(5.5, 5.4, 5.8, 4.5, 4.8, 4.2)
+    ctrl <- c(1,     1,   1,   0,   0,   0)
+    
+    # Combine them into a named list (the R equivalent of your hash)
+    my_list <- list(yield = yield, ctrl = ctrl)
+    
+    # Convert the list into a "long" dataframe
+    # This creates two columns: "values" and "ind" (the group name)
+    my_data <- stack(my_list)
+
+    # Rename columns for clarity (optional but good practice)
+    colnames(my_data) <- c("Value", "Group")
+    anova_model <- aov(Value ~ Group, data = my_data)
+    summary(anova_model)
+
+in R
 
 ## chisq_test
 
@@ -207,6 +239,21 @@ Essentially the test determines if all groups have the same median (same distrib
 Performs a Kruskal-Wallis rank sum test, see 
 https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/kruskal.test
 
+### hash of array entry
+
+I feel that this is better, and more easily read, than what you get in R:
+
+    my %x = (
+    'normal.subjects' => [2.9, 3.0, 2.5, 2.6, 3.2],
+    'obs. airway disease' => [3.8, 2.7, 4.0, 2.4],
+    'asbestosis' => [2.8, 3.4, 3.7, 2.2, 2.0]
+    );
+    $t0 = Time::HiRes::time();
+    $kt = kruskal_test(\%x);
+    $t1 = Time::HiRes::time();
+    printf("Kruskal calculation via HoA in %g seconds.\n", $t1-$t0);
+    p $kt;
+
 ### R-like array entry
 
     my @xk = (2.9, 3.0, 2.5, 2.6, 3.2); # normal subjects
@@ -222,21 +269,6 @@ https://www.rdocumentation.org/packages/stats/versions/3.6.2/topics/kruskal.test
     my $kt = kruskal_test(\@x, \@g);
     my $t1 = Time::HiRes::time();
     printf("Kruskal calculation in %g seconds.\n", $t1-$t0);
-    p $kt;
-
-### hash of array entry
-
-I feel that this is better, and more easily read, than what you get in R:
-
-    my %x = (
-    'normal.subjects' => [2.9, 3.0, 2.5, 2.6, 3.2],
-    'obs. airway disease' => [3.8, 2.7, 4.0, 2.4],
-    'asbestosis' => [2.8, 3.4, 3.7, 2.2, 2.0]
-    );
-    $t0 = Time::HiRes::time();
-    $kt = kruskal_test(\%x);
-    $t1 = Time::HiRes::time();
-    printf("Kruskal calculation via HoA in %g seconds.\n", $t1-$t0);
     p $kt;
 
 ## ks_test
@@ -325,6 +357,79 @@ or
 
 as of version 0.02, min will die if any undefined values are provided
 
+## oneway_test
+
+Like ANOVA/aov but does not assume normality
+
+### hash of array input
+
+    $test_data = oneway_test({
+    	yield => [5.5, 5.4, 5.8, 4.5, 4.8, 4.2],
+    	ctrl  => [1,     1,   1,   0,   0,   0]
+    });
+
+which will output a hash reference:
+
+    {
+    Group         {
+        Df          1,
+        "F value"   177.504798464491,
+        "Mean Sq"   61.6533333333333,
+        Pr(>F)      1.31343255160843e-07,
+        "Sum Sq"    61.6533333333333
+    },
+    group_stats   {
+        mean   {
+            ctrl    0.5,
+            yield   5.03333333333333
+        },
+        size   {
+            ctrl    6,
+            yield   6
+        }
+    },
+    Residuals     {
+        Df          9.81767348326473,
+        "Mean Sq"   0.353783749200256,
+        "Sum Sq"    3.47333333333333
+    }
+}
+
+### array of array input
+
+    oneway_test([
+       [5.5, 5.4, 5.8, 4.5, 4.8, 4.2],
+       [1,     1,   1,   0,   0,   0]
+    	]);
+
+which will output a nearly identical hash reference as for hash of arrays:
+
+    {
+    Group         {
+        Df          1,
+        "F value"   177.504798464491,
+        "Mean Sq"   61.6533333333333,
+        Pr(>F)      1.31343255160843e-07,
+        "Sum Sq"    61.6533333333333
+    },
+    group_stats   {
+        mean   {
+            "Index 0"   5.03333333333333,
+            "Index 1"   0.5
+        },
+        size   {
+            "Index 0"   6,
+            "Index 1"   6
+        }
+    },
+    Residuals     {
+        Df          9.81767348326473,
+        "Mean Sq"   0.353783749200256,
+        "Sum Sq"    3.47333333333333
+    }
+    }
+
+
 ## p_adjust
 
 Returns array of false-discovery-rate-corrected p-values, where methods available are "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr"
@@ -362,6 +467,17 @@ I've tried to make this as simple as possible, trying to follow from R:
 
     my $test_data = read_table('t/HepatitisCdata.csv');
 
+## options
+
+| Option | Description | Example |
+| -------- | ------- | ------- |
+`comment` | Comment character, by default `#` | `comment = %` or whatever|
+|`output.type`| data type for output: array of hash, hash of array, or hash of hash | `'output.type' => 'aoh'`|
+|`filter`| Only take in rows with a certain filter | `filter => {	Sex => sub {$_ eq 'f'} }`|
+|`row.names` | include row names in retrieved data; off by default | |
+|`sep` | field separator character; synonym with `delim`| `sep => "\t"` |
+| `delim`| field separator character; synonym with `sep`| `delim => "\t"` |
+
 output types can be AOH (aoa), HOA (hoa), HOH (hoh)
 
     read_table($filename, 'output.type' => 'aoh');
@@ -378,6 +494,9 @@ and, like Text::CSV_XS, filters can be applied in order to save RAM on big files
         'output.type' => 'aoh'
     );
 
+the default delimiter is `,`
+Suffixes `.csv` and `.tsv` are automatically detected from file names, but if specified, are overridden by `delim` and/or `sep`. `sep` is given priority.
+
 ## rnorm
 
 Make a normal distribution of numbers, with pre-set mean `mean`, standard deviation `sd`, and number `n`.
@@ -387,9 +506,9 @@ Make a normal distribution of numbers, with pre-set mean `mean`, standard deviat
 
 ## runif
 
-### named arguments
+Make an approximately uniform distribution into an array
 
-Make a distribution of approximately uniform distribution
+### named arguments
 
     my $unif = runif( n => $n, min => 0, max => 1);
 
@@ -500,9 +619,44 @@ which I prefer, compared to List::Util's required casting into an array:
 
     sum(@{ $test_data });
 
-which is shorter and much easier to read
+which passing a reference is shorter and much easier to read.  Stats::LikeR, however, will work for **both**
 
 as of version 0.02, `sum` will cause the script to die if any undefined values are provided
+
+## summary
+
+Analogous to R's `summary`, but does not deal with outputs from other functions.
+`summary` only describes data as it is entered.
+An option `nrows` or its synonym `nrow` specifies the maximum number of rows that will print.
+
+### array of array input
+
+    my @arr;
+    foreach my $i (0..18) {
+    	push @arr, runif(22);
+    }
+
+and then `summary(\@arr)`, or `summary(@arr)`
+
+    ---------------------------------------------------------------------------
+    Index  # values      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. 
+    ---------------------------------------------------------------------------
+         0       22   0.04312     0.286    0.4975    0.5121    0.7296    0.9633 
+         1       22   0.05932    0.1483     0.495    0.4737    0.7699    0.9371 
+         2       22   0.02742    0.1588    0.4045    0.4325    0.6682    0.9878 
+         3       22  0.009233    0.2552    0.5398    0.5147    0.7755    0.9808 
+         4       22   0.06727    0.2432    0.5019    0.4855    0.7121    0.9043 
+         5       22  0.001032    0.1646    0.3021    0.3727    0.5704    0.9556 
+
+### hash of array input
+
+    $test_data = summary(
+    	{
+    		A => runif(9),
+    		B => runif(9)
+    	},
+    );
+
 
 ## t_test
 
@@ -584,7 +738,7 @@ It fully supports paired tests (`paired => true`) and can calculate exact p-valu
 
 ## write_table
 
-mimics R's "write.table", with data as first argument to subroutine, and output file as second
+mimics R's `write.table`, with data as first argument to subroutine, and output file as second
 
     write_table(\@data_aoh, $tmp_file, sep => "\t", 'row.names' => true);
 
@@ -596,7 +750,21 @@ undefined variables are printed as `NA` by default, but can be set as you wish u
 
     write_table(\%data_hoa, '/tmp/undef.val.tsv', sep => "\t", 'undef.val' => 'nan')
 
+as of version 0.07, `write_table` determines comma and tab-separated delimiters from the filename, but will override if `sep` or `delim` are explicitly set.
+
 # changes
+
+## 0.07
+
+Changes to dist.ini to prevent `LikeR.c: loadable library and perl binaries are mismatched` errors on other operating systems
+
+Addition of `summary` function.
+
+Formulas can now be omitted from `aov`, resulting in a stacked calculation as R would think.
+
+Addition of `oneway_test` for multi-group comparisons that does not assume normality like `aov` does.
+
+`read_table` and `write_table` now automatically set separators for `.csv` files as `,` and `.tsv` files as `"\t"`, respectively, so these values no longer need to be specified separately from the file name.
 
 ## 0.06
 

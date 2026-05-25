@@ -33,6 +33,10 @@ skip_all( "Need to set env variable AUTHOR_TESTING=1" ) unless $ENV{AUTHOR_TESTI
 
 skip_all( "d_setlocale unset" ) unless $Config::Config{d_setlocale};
 
+my $tz = $ENV{TZ} || (POSIX::tzname())[0] || '';
+skip_all("expected output is timezone-dependent, skipping on UTC")
+    if $tz =~ /^(UTC|GMT|UCT|UTC0|GMT0)$/i || $tz eq '+00:00';
+
 #$Template::Test::DEBUG = 0;
 
 my $russian_locale = 'ru_RU.UTF-8';

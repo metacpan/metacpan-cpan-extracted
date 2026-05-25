@@ -500,7 +500,7 @@ union yyalloc
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  29
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  80
+#define YYNRULES  82
 /* YYNSTATES -- Number of states.  */
 #define YYNSTATES  126
 
@@ -557,10 +557,10 @@ static const yytype_int16 yyrline[] =
      146,   158,   159,   163,   167,   171,   172,   176,   181,   186,
      194,   198,   206,   219,   220,   227,   228,   229,   230,   231,
      235,   239,   246,   253,   258,   263,   268,   273,   277,   284,
-     288,   293,   300,   304,   311,   315,   323,   324,   328,   333,
-     341,   346,   351,   356,   361,   365,   372,   373,   380,   384,
-     393,   394,   406,   414,   421,   430,   434,   441,   442,   452,
-     459
+     288,   293,   300,   304,   311,   315,   320,   327,   328,   332,
+     337,   345,   350,   355,   360,   365,   369,   376,   377,   384,
+     388,   397,   398,   410,   418,   425,   434,   438,   445,   446,
+     453,   460,   467
 };
 #endif
 
@@ -645,15 +645,15 @@ static const yytype_int8 yydefact[] =
       21,     0,     0,     0,     2,     6,     0,     5,     7,    36,
       37,    38,    39,    10,    30,     8,    27,     9,    28,    11,
       29,    16,    16,    16,    16,    13,     3,    14,    16,    53,
-      56,     0,    54,    57,    76,    79,    80,     0,    77,     1,
-       0,     0,     0,    22,    16,     0,     0,    66,    49,     0,
-       0,     0,     0,    70,     0,    20,    18,    19,    17,    16,
-      16,    16,     0,    16,    52,     0,     0,    75,    24,     0,
-      48,    65,     0,    44,    61,     0,    46,    63,    42,     0,
-      25,     0,    12,    34,    23,    40,    41,    51,    58,    16,
-      59,    73,    15,    74,    55,    78,     0,     0,     0,     0,
-       0,    66,    47,    64,    43,    60,    45,    62,    67,    26,
-      50,    68,    69,    71,    72,     0
+      57,     0,    54,    58,    77,    81,    82,     0,    78,     1,
+       0,     0,     0,    22,    16,     0,     0,    67,    49,     0,
+       0,     0,     0,    71,     0,    20,    18,    19,    17,    16,
+      16,    16,     0,    16,    52,    56,    80,    76,    24,     0,
+      48,    66,     0,    44,    62,     0,    46,    64,    42,     0,
+      25,     0,    12,    34,    23,    40,    41,    51,    59,    16,
+      60,    74,    15,    75,    55,    79,     0,     0,     0,     0,
+       0,    67,    47,    65,    43,    61,    45,    63,    68,    26,
+      50,    69,    70,    72,    73,     0
 };
 
   /* YYPGOTO[NTERM-NUM].  */
@@ -788,10 +788,10 @@ static const yytype_int8 yyr1[] =
       28,    29,    29,    30,    31,    32,    32,    33,    33,    33,
       33,    33,    33,    33,    33,    34,    34,    34,    34,    34,
       35,    35,    36,    37,    37,    37,    37,    37,    37,    38,
-      38,    38,    39,    39,    40,    40,    41,    41,    42,    42,
-      43,    43,    43,    43,    43,    43,    44,    44,    45,    46,
-      47,    47,    47,    47,    48,    49,    49,    50,    50,    51,
-      51
+      38,    38,    39,    39,    40,    40,    40,    41,    41,    42,
+      42,    43,    43,    43,    43,    43,    43,    44,    44,    45,
+      46,    47,    47,    47,    47,    48,    49,    49,    50,    50,
+      50,    51,    51
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
@@ -802,10 +802,10 @@ static const yytype_int8 yyr2[] =
        2,     1,     2,     1,     1,     1,     2,     2,     2,     2,
        2,     1,     1,     1,     3,     1,     1,     1,     1,     1,
        3,     3,     2,     3,     2,     3,     2,     3,     2,     1,
-       3,     2,     3,     2,     1,     3,     1,     1,     3,     3,
-       3,     2,     3,     2,     3,     2,     1,     3,     1,     3,
-       1,     3,     3,     2,     3,     3,     2,     1,     3,     1,
-       1
+       3,     2,     3,     2,     1,     3,     2,     1,     1,     3,
+       3,     3,     2,     3,     2,     3,     2,     1,     3,     1,
+       3,     1,     3,     3,     2,     3,     3,     2,     1,     3,
+       2,     1,     1
 };
 
 
@@ -1624,96 +1624,104 @@ yyreduce:
 #line 1625 "gram.c"
     break;
 
-  case 58: /* implicit_map: indent_open top_imp_map indent_end  */
-#line 329 "gram.y"
+  case 56: /* in_inline_seq: in_inline_seq ','  */
+#line 321 "gram.y"
+        {
+                    (yyval.nodeData) = (yyvsp[-1].nodeData);
+                }
+#line 1633 "gram.c"
+    break;
+
+  case 59: /* implicit_map: indent_open top_imp_map indent_end  */
+#line 333 "gram.y"
         {
                     apply_seq_in_map( (SyckParser *)parser, (yyvsp[-1].nodeData) );
                     (yyval.nodeData) = (yyvsp[-1].nodeData);
                 }
-#line 1634 "gram.c"
+#line 1642 "gram.c"
     break;
 
-  case 59: /* implicit_map: indent_open in_implicit_map indent_end  */
-#line 334 "gram.y"
+  case 60: /* implicit_map: indent_open in_implicit_map indent_end  */
+#line 338 "gram.y"
         {
                     apply_seq_in_map( (SyckParser *)parser, (yyvsp[-1].nodeData) );
                     (yyval.nodeData) = (yyvsp[-1].nodeData);
                 }
-#line 1643 "gram.c"
+#line 1651 "gram.c"
     break;
 
-  case 60: /* top_imp_map: YAML_TRANSFER indent_sep in_implicit_map  */
-#line 342 "gram.y"
+  case 61: /* top_imp_map: YAML_TRANSFER indent_sep in_implicit_map  */
+#line 346 "gram.y"
         {
                     syck_add_transfer( (yyvsp[-2].name), (yyvsp[0].nodeData), ((SyckParser *)parser)->taguri_expansion );
                     (yyval.nodeData) = (yyvsp[0].nodeData);
                 }
-#line 1652 "gram.c"
+#line 1660 "gram.c"
     break;
 
-  case 61: /* top_imp_map: YAML_TRANSFER top_imp_map  */
-#line 347 "gram.y"
+  case 62: /* top_imp_map: YAML_TRANSFER top_imp_map  */
+#line 351 "gram.y"
         {
                     syck_add_transfer( (yyvsp[-1].name), (yyvsp[0].nodeData), ((SyckParser *)parser)->taguri_expansion );
                     (yyval.nodeData) = (yyvsp[0].nodeData);
                 }
-#line 1661 "gram.c"
+#line 1669 "gram.c"
     break;
 
-  case 62: /* top_imp_map: YAML_TAGURI indent_sep in_implicit_map  */
-#line 352 "gram.y"
+  case 63: /* top_imp_map: YAML_TAGURI indent_sep in_implicit_map  */
+#line 356 "gram.y"
         {
                     syck_add_transfer( (yyvsp[-2].name), (yyvsp[0].nodeData), 0 );
                     (yyval.nodeData) = (yyvsp[0].nodeData);
                 }
-#line 1670 "gram.c"
+#line 1678 "gram.c"
     break;
 
-  case 63: /* top_imp_map: YAML_TAGURI top_imp_map  */
-#line 357 "gram.y"
+  case 64: /* top_imp_map: YAML_TAGURI top_imp_map  */
+#line 361 "gram.y"
         {
                     syck_add_transfer( (yyvsp[-1].name), (yyvsp[0].nodeData), 0 );
                     (yyval.nodeData) = (yyvsp[0].nodeData);
                 }
-#line 1679 "gram.c"
-    break;
-
-  case 64: /* top_imp_map: YAML_ANCHOR indent_sep in_implicit_map  */
-#line 362 "gram.y"
-        {
-                    (yyval.nodeData) = syck_hdlr_add_anchor( (SyckParser *)parser, (yyvsp[-2].name), (yyvsp[0].nodeData) );
-                }
 #line 1687 "gram.c"
     break;
 
-  case 65: /* top_imp_map: YAML_ANCHOR top_imp_map  */
+  case 65: /* top_imp_map: YAML_ANCHOR indent_sep in_implicit_map  */
 #line 366 "gram.y"
         {
-                    (yyval.nodeData) = syck_hdlr_add_anchor( (SyckParser *)parser, (yyvsp[-1].name), (yyvsp[0].nodeData) );
+                    (yyval.nodeData) = syck_hdlr_add_anchor( (SyckParser *)parser, (yyvsp[-2].name), (yyvsp[0].nodeData) );
                 }
 #line 1695 "gram.c"
     break;
 
-  case 67: /* complex_key: '?' atom indent_sep  */
-#line 374 "gram.y"
+  case 66: /* top_imp_map: YAML_ANCHOR top_imp_map  */
+#line 370 "gram.y"
         {
-                    (yyval.nodeData) = (yyvsp[-1].nodeData);
+                    (yyval.nodeData) = syck_hdlr_add_anchor( (SyckParser *)parser, (yyvsp[-1].name), (yyvsp[0].nodeData) );
                 }
 #line 1703 "gram.c"
     break;
 
-  case 69: /* complex_mapping: complex_key ':' complex_value  */
-#line 385 "gram.y"
+  case 68: /* complex_key: '?' atom indent_sep  */
+#line 378 "gram.y"
+        {
+                    (yyval.nodeData) = (yyvsp[-1].nodeData);
+                }
+#line 1711 "gram.c"
+    break;
+
+  case 70: /* complex_mapping: complex_key ':' complex_value  */
+#line 389 "gram.y"
         {
                     (yyval.nodeData) = syck_new_map(
                         syck_hdlr_add_node( (SyckParser *)parser, (yyvsp[-2].nodeData) ),
                         syck_hdlr_add_node( (SyckParser *)parser, (yyvsp[0].nodeData) ) );
                 }
-#line 1713 "gram.c"
+#line 1721 "gram.c"
     break;
 
-  case 71: /* in_implicit_map: in_implicit_map indent_sep basic_seq  */
-#line 395 "gram.y"
+  case 72: /* in_implicit_map: in_implicit_map indent_sep basic_seq  */
+#line 399 "gram.y"
         {
                     if ( (yyvsp[-2].nodeData)->shortcut == NULL )
                     {
@@ -1725,11 +1733,11 @@ yyreduce:
                     }
                     (yyval.nodeData) = (yyvsp[-2].nodeData);
                 }
-#line 1729 "gram.c"
+#line 1737 "gram.c"
     break;
 
-  case 72: /* in_implicit_map: in_implicit_map indent_sep complex_mapping  */
-#line 407 "gram.y"
+  case 73: /* in_implicit_map: in_implicit_map indent_sep complex_mapping  */
+#line 411 "gram.y"
         {
                     apply_seq_in_map( (SyckParser *)parser, (yyvsp[-2].nodeData) );
                     syck_map_update( (yyvsp[-2].nodeData), (yyvsp[0].nodeData) );
@@ -1737,67 +1745,75 @@ yyreduce:
                     (yyvsp[0].nodeData) = NULL;
                     (yyval.nodeData) = (yyvsp[-2].nodeData);
                 }
-#line 1741 "gram.c"
-    break;
-
-  case 73: /* in_implicit_map: in_implicit_map indent_sep  */
-#line 415 "gram.y"
-        {
-                    (yyval.nodeData) = (yyvsp[-1].nodeData);
-                }
 #line 1749 "gram.c"
     break;
 
-  case 74: /* basic_mapping: atom ':' atom_or_empty  */
-#line 422 "gram.y"
+  case 74: /* in_implicit_map: in_implicit_map indent_sep  */
+#line 419 "gram.y"
+        {
+                    (yyval.nodeData) = (yyvsp[-1].nodeData);
+                }
+#line 1757 "gram.c"
+    break;
+
+  case 75: /* basic_mapping: atom ':' atom_or_empty  */
+#line 426 "gram.y"
         {
                     (yyval.nodeData) = syck_new_map(
                         syck_hdlr_add_node( (SyckParser *)parser, (yyvsp[-2].nodeData) ),
                         syck_hdlr_add_node( (SyckParser *)parser, (yyvsp[0].nodeData) ) );
                 }
-#line 1759 "gram.c"
-    break;
-
-  case 75: /* inline_map: '{' in_inline_map '}'  */
-#line 431 "gram.y"
-        {
-                    (yyval.nodeData) = (yyvsp[-1].nodeData);
-                }
 #line 1767 "gram.c"
     break;
 
-  case 76: /* inline_map: '{' '}'  */
+  case 76: /* inline_map: '{' in_inline_map '}'  */
 #line 435 "gram.y"
         {
-                    (yyval.nodeData) = syck_alloc_map();
+                    (yyval.nodeData) = (yyvsp[-1].nodeData);
                 }
 #line 1775 "gram.c"
     break;
 
-  case 78: /* in_inline_map: in_inline_map ',' inline_map_atom  */
-#line 443 "gram.y"
+  case 77: /* inline_map: '{' '}'  */
+#line 439 "gram.y"
+        {
+                    (yyval.nodeData) = syck_alloc_map();
+                }
+#line 1783 "gram.c"
+    break;
+
+  case 79: /* in_inline_map: in_inline_map ',' inline_map_atom  */
+#line 447 "gram.y"
         {
                     syck_map_update( (yyvsp[-2].nodeData), (yyvsp[0].nodeData) );
                     syck_free_node( (yyvsp[0].nodeData) );
                     (yyvsp[0].nodeData) = NULL;
                     (yyval.nodeData) = (yyvsp[-2].nodeData);
                                 }
-#line 1786 "gram.c"
+#line 1794 "gram.c"
     break;
 
-  case 79: /* inline_map_atom: atom  */
-#line 453 "gram.y"
+  case 80: /* in_inline_map: in_inline_map ','  */
+#line 454 "gram.y"
+        {
+                    (yyval.nodeData) = (yyvsp[-1].nodeData);
+                }
+#line 1802 "gram.c"
+    break;
+
+  case 81: /* inline_map_atom: atom  */
+#line 461 "gram.y"
         {
                     NULL_NODE( parser, n );
                     (yyval.nodeData) = syck_new_map(
                         syck_hdlr_add_node( (SyckParser *)parser, (yyvsp[0].nodeData) ),
                         syck_hdlr_add_node( (SyckParser *)parser, n ) );
                 }
-#line 1797 "gram.c"
+#line 1813 "gram.c"
     break;
 
 
-#line 1801 "gram.c"
+#line 1817 "gram.c"
 
       default: break;
     }
@@ -1991,7 +2007,7 @@ yyreturn:
   return yyresult;
 }
 
-#line 462 "gram.y"
+#line 470 "gram.y"
 
 
 void

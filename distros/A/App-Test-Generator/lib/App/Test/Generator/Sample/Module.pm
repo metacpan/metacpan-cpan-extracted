@@ -5,7 +5,7 @@ use warnings;
 use Carp    qw(croak);
 use Readonly;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 # --------------------------------------------------
 # Validation constants — centralised so that changes
@@ -26,7 +26,7 @@ Test::App::Generator::Sample::Module - Example module for schema extraction test
 
 =head1 VERSION
 
-Version 0.38
+Version 0.39
 
 =head1 SYNOPSIS
 
@@ -133,7 +133,7 @@ Calculate age in years from a birth year.
 
 =item * C<$birth_year>
 
-Integer (C<$MIN_BIRTH_YEAR> to current year). Required.
+A birth year value (C<$MIN_BIRTH_YEAR> to current year). Required.
 
 =back
 
@@ -338,7 +338,7 @@ Return a normalised boolean for a flag value.
 
 =item * C<$enabled>
 
-Boolean scalar. Required.
+Boolean scalar.
 
 =back
 
@@ -423,9 +423,36 @@ sub validate_score {
 
 =head2 mysterious_method
 
-A deliberately under-documented method used to test that
+A deliberately under-validated method used to test that
 L<App::Test::Generator::SchemaExtractor> correctly assigns low
 confidence when validation is absent.
+
+=head3 Arguments
+
+=over 4
+
+=item * C<$thing>
+
+A value to double. No type validation is performed intentionally.
+
+=back
+
+=head3 Returns
+
+C<$thing * 2>.
+
+=head3 API specification
+
+=head4 input
+
+    {
+        self  => { type => OBJECT },
+        thing => { type => 'any' },
+    }
+
+=head4 output
+
+    { type => 'number' }
 
 =cut
 

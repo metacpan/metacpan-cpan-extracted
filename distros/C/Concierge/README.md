@@ -61,6 +61,7 @@ make install
 - **Concierge** -- Main orchestrator: lifecycle methods, admin operations
 - **Concierge::Setup** -- One-time desk creation and configuration
 - **Concierge::User** -- User object returned by lifecycle methods
+- **Concierge::Base** -- Records-store base class for additional components
 
 ## Documentation
 
@@ -74,7 +75,7 @@ perldoc Concierge::User
 
 ## Status
 
-Under active development (v0.5.0). API may change before 1.0.
+Under active development (v0.7.0). API may change before 1.0.
 
 ## Author
 

@@ -19,12 +19,13 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Devel::Confess" => 0,
     "Digest::SHA" => 0,
+    "Scalar::Util" => 0,
     "Test::Exception" => 0,
     "Test::LeakTrace" => 0,
     "Test::More" => 0,
     "autodie" => 0
   },
-  "VERSION" => "0.06",
+  "VERSION" => "0.07",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -34,6 +35,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Devel::Confess" => 0,
   "Digest::SHA" => 0,
+  "Scalar::Util" => 0,
   "Test::Exception" => 0,
   "Test::LeakTrace" => 0,
   "Test::More" => 0,

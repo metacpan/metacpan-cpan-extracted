@@ -1,7 +1,7 @@
         -:    0:Source:/home/con/perl5/perlbrew/perls/perl-5.42.2/lib/5.42.2/x86_64-linux/CORE/perlstatic.h
-        -:    0:Graph:./Stats-LikeR-0.01/LikeR.gcno
-        -:    0:Data:./Stats-LikeR-0.01/LikeR.gcda
-        -:    0:Runs:3
+        -:    0:Graph:./Stats-LikeR-0.06/LikeR.gcno
+        -:    0:Data:./Stats-LikeR-0.06/LikeR.gcda
+        -:    0:Runs:1
         -:    1:/*    perlstatic.h
         -:    2: *
         -:    3: *    'I don't know half of you half as well as I should like; and I like less

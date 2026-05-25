@@ -1,5 +1,84 @@
 Revision history for App-Test-Generator
 
+0.39	Sun May 24 17:43:17 EDT 2026
+
+	[Bug fixes]
+	- Fix mutation dashboard Total column excluding skipped mutants; Total now
+	  equals Killed + Survivors + Skipped. Score remains based on Killed / (Killed
+	  + Survivors) so skipped mutants do not penalise the mutation score.
+	- Fix extract-schemas --strict-pod false positive when a method uses
+	  Params::Get::get_params('key', \@_) to extract arguments; the key name
+	  is now recognised as a code parameter, resolving POD/code disagreement.
+	- Fix _extract_defaults_from_code incorrectly marking a parameter as
+	  optional when its only assignment is a dereference or method call
+	  (e.g. my $x = $params->{x}); such expressions are not default values.
+	- Fix extract-schemas inferring output type as string instead of hashref
+	  when a method has a =head4 Output formal spec; the spec type now takes
+	  precedence over heuristic code analysis (the string came from scalar
+	  being mapped to string when it wasn't in the valid-types list).
+	- Fix extract-schemas inferring output type as string instead of array when
+	  a =head4 Output block uses list notation (...); the output-type validator
+	  did not include 'array' in its allowed-types set and silently fell back
+	  to string.
+	- Fix SchemaExtractor emitting both 'enum' and 'memberof' for the same
+	  parameter when a regex-based enum is detected; the two fields are mutually
+	  exclusive and Generator.pm now rejects schemas that contain both.
+	  SchemaExtractor now only sets memberof when enum is not already being
+	  output in the cleaned schema.
+	- Fix SchemaExtractor falsely inferring type 'number' for parameters whose
+	  code uses the defined-or operator (//) — e.g. $text // '' was mistaken
+	  for division because the numeric-operator pattern included bare / without
+	  excluding //. Both heuristic-inference sites now use \/(?!\/) to require
+	  that the / is not followed by a second /.
+
+	[Enhancements]
+	- SchemaExtractor now parses =head3 Input and =head4 Input formal spec
+	  blocks, mirroring the existing =head4 Output support. Positional array
+	  format ([ {type=>'...'}, ... ]) and named hash format
+	  ({ name => {type=>'...'}, ... }) are both supported. The spec takes
+	  highest priority, overriding all heuristic type inference. Union types
+	  such as 'scalar | scalarref' are resolved to the canonical ATG type
+	  (both scalar and scalarref map to string).
+	- Add t/app.t: ATG self-test that runs every lib/**/*.pm through
+	  SchemaExtractor (strict_pod=fatal), generates a fuzz harness for each
+	  extracted schema via App::Test::Generator, and runs it through prove.
+	  Temp dirs containing the intermediate schema YAML and generated .t files
+	  are kept on failure for diagnosis. Runs as an extended test.
+	- Support array-returning methods end-to-end, enabled by Test::Returns 0.03
+	  which accepts type => 'array' as a synonym for type => 'arrayref':
+	  extract-schemas now emits output.type: array for list-returning methods,
+	  the output-type validator accepts 'array' as a valid type, and generated
+	  tests capture the result in list context (my @_r = CALL; $result = \@_r)
+	  so that returns_ok can validate it as an arrayref.
+	- Fix strict_pod=fatal incorrectly flagging methods with no POD at all;
+	  the check now only runs when POD is present (validates accuracy of
+	  existing documentation, not completeness).
+	- Fix strict_pod=fatal false positive: $class and $self are always treated
+	  as invocants and never reported as undocumented code parameters,
+	  regardless of method name.
+	- Fix _extract_pod_before accumulating multiple adjacent POD blocks; it
+	  now stops after the first pod token so class-level POD separated by
+	  =cut does not bleed into a method's specific POD context.
+	- Fix generated tests dying without done_testing() when an input parameter
+	  has type arrayref or array; both types are now handled in the mandatory-
+	  argument setup block in Template.pm.
+	- Fix extract-schemas creating spurious schema files for Perl special blocks
+	  (BEGIN, END, DESTROY, AUTOLOAD, CHECK, INIT, UNITCHECK); these are now
+	  skipped in _find_methods.
+	- Fix extract-schemas failing to emit new: ~ for instance methods that use
+	  the my $self = $_[0] direct-index invocant style and call other instance
+	  methods via $self->method() but do not dereference $self directly;
+	  _detect_instance_method now recognises $_[0] as explicit_self (high
+	  confidence), and _needs_object_instantiation now promotes methods that
+	  call instance methods on $self even when no hash/array dereference is
+	  present.
+	- Fix --strict-pod false positive for methods using the my $self = $_[0]
+	  calling style: add direct-index style recognition to
+	  _extract_parameters_from_signature and guard the fallback extractor in
+	  _extract_defaults_from_code so that inner closure parameters
+	  (my ($x, $y) = @_ inside a sub ref) are not mistaken for the outer
+	  method's parameters.
+
 0.38	Mon May 18 21:19:40 EDT 2026
 
 	[Bug fixes]

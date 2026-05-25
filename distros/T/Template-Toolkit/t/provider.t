@@ -121,8 +121,8 @@ ok( delivered( $provrel, $relfile ) );
 sub delivered {
     my ($provider, $file) = @_;
     my ($result, $error) = $provider->fetch($file);
-    my $nice_result = defined $result ? $result : '<undef>';
-    my $nice_error  = defined $error  ? $error : '<undef>';
+    my $nice_result = $result // '<undef>';
+    my $nice_error  = $error // '<undef>';
 #    print STDERR "$provider->fetch($file) -> [$nice_result] [$nice_error]\n"
 #	if $DEBUG;
     return ! $error;
@@ -131,8 +131,8 @@ sub delivered {
 sub declined {
     my ($provider, $file) = @_;
     my ($result, $error) = $provider->fetch($file);
-    my $nice_result = defined $result ? $result : '<undef>';
-    my $nice_error  = defined $error  ? $error : '<undef>';
+    my $nice_result = $result // '<undef>';
+    my $nice_error  = $error // '<undef>';
 #    print STDERR "$provider->fetch($file) -> [$nice_result] [$nice_error]\n"
 #	if $DEBUG;
     return ($error == Template::Constants::STATUS_DECLINED);
@@ -177,7 +177,7 @@ EOF
 
 #------------------------------------------------------------------------
 # now we'll fold those providers up into some Template objects that
-# we can pass to text_expect() to do some template driven testing
+# we can pass to test_expect() to do some template driven testing
 #------------------------------------------------------------------------
 
 my $ttinc = Template->new( LOAD_TEMPLATES => [ $provinc ] )

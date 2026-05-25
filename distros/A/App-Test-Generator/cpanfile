@@ -48,7 +48,7 @@ on 'test' => sub {
 	requires 'Test::Mockingbird', '0.10';
 	requires 'Test::Most';
 	requires 'Test::Needs';
-	requires 'Test::Returns', '0.02';
+	requires 'Test::Returns', '0.03';
 	requires 'Unicode::GCString';
 	requires 'Unicode::Normalize';
 };

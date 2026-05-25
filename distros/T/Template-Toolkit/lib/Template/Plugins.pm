@@ -25,7 +25,7 @@ use warnings;
 use base 'Template::Base';
 use Template::Constants;
 
-our $VERSION = '3.100';
+our $VERSION = '3.105';
 our $DEBUG   = 0 unless defined $DEBUG;
 our $PLUGIN_BASE = 'Template::Plugin';
 our $STD_PLUGINS = {
@@ -147,7 +147,7 @@ sub _init {
     $plugins ||= { };
 
     # update PLUGIN_BASE to an array ref if necessary
-    $pbase = [ ] unless defined $pbase;
+    $pbase //= [ ];
     $pbase = [ $pbase ] unless ref($pbase) eq 'ARRAY';
 
     # add default plugin base (Template::Plugin) if set

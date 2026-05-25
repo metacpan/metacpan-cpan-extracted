@@ -22,7 +22,7 @@ use strict;
 use warnings;
 use base 'Template::Base';
 
-our $VERSION   = '3.100';
+our $VERSION   = '3.105';
 
 our $DEBUG;
 $DEBUG     = 0 unless defined $DEBUG;
@@ -322,6 +322,11 @@ sub TIEHANDLE {
 sub PRINT {
     my $self = shift;
     $$self .= join('', @_);
+}
+sub PRINTF {
+    my $self = shift;
+    my $fmt  = shift;
+    $$self .= sprintf($fmt, @_);
 }
 
 

@@ -85,6 +85,33 @@ subtest 'Logged-in user lifecycle' => sub {
     isa_ok $user->session(), ['Concierge::Sessions::Session'], 'user has session object';
 };
 
+subtest 'Logged-in user status and access fields' => sub {
+    my $add_result = $concierge->add_user({
+        user_id  => 'statususer',
+        moniker  => 'StatusUser',
+        password => 'status123',
+    });
+    ok $add_result->{success}, 'add_user succeeds';
+
+    my $login_result = $concierge->login_user({
+        user_id  => 'statususer',
+        password => 'status123',
+    });
+    ok $login_result->{success}, 'login_user succeeds';
+
+    my $user = $login_result->{user};
+    ok defined($user->user_status()),  'user_status() is defined';
+    ok defined($user->access_level()), 'access_level() is defined';
+};
+
+subtest 'enable_user without options argument' => sub {
+    use Concierge::User;
+    my $user = Concierge::User->enable_user('bare_user');
+    isa_ok $user, ['Concierge::User'], 'returns User object';
+    is $user->user_id(),    'bare_user', 'user_id set';
+    is $user->is_visitor(), 1,           'is_visitor when no options given';
+};
+
 subtest 'Guest to logged-in conversion' => sub {
     # Create guest with session data
     my $guest_result = $concierge->checkin_guest();

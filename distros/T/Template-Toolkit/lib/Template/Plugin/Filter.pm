@@ -26,7 +26,7 @@ use base 'Template::Plugin';
 use Scalar::Util 'weaken', 'isweak';
 
 
-our $VERSION = '3.100';
+our $VERSION = '3.105';
 our $DYNAMIC = 0 unless defined $DYNAMIC;
 
 
@@ -40,7 +40,7 @@ sub new {
         no strict 'refs';
         $dynamic = ${"$class\::DYNAMIC"};
     }
-    $dynamic = $DYNAMIC unless defined $dynamic;
+    $dynamic //= $DYNAMIC;
 
     my $self = bless {
         _CONTEXT => $context,

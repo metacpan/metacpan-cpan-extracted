@@ -35,7 +35,7 @@ use constant EXCEPTION        => 'Template::Exception';
 use constant BADGER_EXCEPTION => 'Badger::Exception';
 use constant MSWin32          => $^O eq 'MSWin32';
 
-our $VERSION = '3.100';
+our $VERSION = '3.105';
 our $DEBUG   = 0 unless defined $DEBUG;
 our $DEBUG_FORMAT = "\n## \$file line \$line : [% \$text %] ##\n";
 our $VIEW_CLASS   = 'Template::View';
@@ -216,7 +216,7 @@ sub filter {
 
     $self->debug("filter($name, ",
                  defined $args  ? @$args : '[ ]',
-                 defined $alias ? $alias : '<no alias>', ')')
+                 $alias // '<no alias>', ')')
         if $self->{ DEBUG };
 
     # use any cached version of the filter if no params provided
@@ -302,8 +302,8 @@ sub process {
 
     $template = [ $template ] unless ref $template eq 'ARRAY';
 
-    $self->debug("process([ ", join(', '), @$template, ' ], ',
-                 defined $params ? $params : '<no params>', ', ',
+    $self->debug("process([ ", join(', ', @$template), ' ], ',
+                 $params // '<no params>', ', ',
                  $localize ? '<localized>' : '<unlocalized>', ')')
         if $self->{ DEBUG };
 
@@ -429,7 +429,7 @@ sub insert {
 
     my $files = ref $file eq 'ARRAY' ? $file : [ $file ];
 
-    $self->debug("insert([ ", join(', '), @$files, " ])")
+    $self->debug("insert([ ", join(', ', @$files), " ])")
         if $self->{ DEBUG };
 
 
@@ -785,8 +785,7 @@ sub debugging {
     if (@args) {
         if (lc($args[0]) eq 'msg') {
             return unless $self->{ DEBUG_DIRS };
-            my $format = $self->{ DEBUG_FORMAT };
-            $format = $DEBUG_FORMAT unless defined $format;
+            my $format = $self->{ DEBUG_FORMAT } // $DEBUG_FORMAT;
             $format =~ s/\$(\w+)/$hash->{ $1 }/ge;
             return $format;
         }
@@ -883,10 +882,9 @@ sub _init {
             || { };
 
         # hack to get stash to know about debug mode
-        $predefs->{ _DEBUG } = (
+        $predefs->{ _DEBUG } //= (
             ($config->{ DEBUG } || 0) & &Template::Constants::DEBUG_UNDEF
-        ) ? 1 : 0
-            unless defined $predefs->{ _DEBUG };
+        ) ? 1 : 0;
         $predefs->{ _STRICT } = $config->{ STRICT };
 
         Template::Config->stash($predefs)
@@ -925,10 +923,7 @@ sub _init {
     $self->{ TRIM      } = $config->{ TRIM } || 0;
     $self->{ BLKSTACK  } = [ ];
     $self->{ CONFIG    } = $config;
-    $self->{ EXPOSE_BLOCKS } = defined $config->{ EXPOSE_BLOCKS }
-        ? $config->{ EXPOSE_BLOCKS }
-        : 0;
-
+    $self->{ EXPOSE_BLOCKS } = $config->{ EXPOSE_BLOCKS } // 0;
     $self->{ DEBUG_FORMAT  } =  $config->{ DEBUG_FORMAT };
     $self->{ DEBUG_DIRS    } = ($config->{ DEBUG } || 0)
         & Template::Constants::DEBUG_DIRS;

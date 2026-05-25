@@ -49,6 +49,22 @@ subtest 'open_desk fails for nonexistent directory' => sub {
         'croaks for nonexistent directory';
 };
 
+subtest 'open_desk fails with invalid JSON config' => sub {
+    use File::Spec;
+    my $bad_dir = tempdir(CLEANUP => 1);
+    Concierge::Setup::build_quick_desk($bad_dir);
+
+    # Overwrite concierge.conf with invalid JSON
+    my $conf_file = File::Spec->catfile($bad_dir, 'concierge.conf');
+    open my $fh, '>', $conf_file or die "Cannot write: $!";
+    print $fh 'this is not valid json {{{';
+    close $fh;
+
+    my $result = Concierge->open_desk($bad_dir);
+    ok !$result->{success}, 'open_desk fails with invalid JSON';
+    like $result->{message}, qr/invalid json/i, 'error mentions invalid JSON';
+};
+
 subtest 'open_desk runs cleanup_sessions' => sub {
     # Create desk and add expired session manually (if needed)
     my $temp_dir = tempdir(CLEANUP => 1);

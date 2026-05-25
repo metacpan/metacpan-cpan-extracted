@@ -1247,7 +1247,11 @@ yaml_syck_emitter_handler
 /* JSON should preserve quotes even on simple integers ("0" is true in javascript) */
 #ifndef YAML_IS_JSON
         if (looks_like_number(sv)) {
-        	if(syck_str_is_unquotable_integer(SvPV_nolen(sv), sv_len(sv))) {
+        	if(!(SvIOK(sv) || SvNOK(sv))) {
+        		/* POK-only: string that looks numeric — quote to preserve type */
+        		syck_emit_scalar(e, OBJOF("str"), SCALAR_QUOTED, 0, 0, 0, SvPV_nolen(sv), len);
+        	}
+        	else if(syck_str_is_unquotable_integer(SvPV_nolen(sv), sv_len(sv))) {
         		/* emit an unquoted number only if it's a very basic integer. /^-?[1-9][0-9]*$/ */
         		syck_emit_scalar(e, OBJOF("str"), SCALAR_NUMBER, 0, 0, 0, SvPV_nolen(sv), len);
         	}

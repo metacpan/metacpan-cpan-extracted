@@ -788,4 +788,116 @@ END_MODULE
 	done_testing();
 };
 
+# Test: Params::Get parameter extraction
+# _extract_parameters_from_signature must recognise get_params('key', \@_)
+# so that strict-pod does not raise a false positive when the POD documents
+# $key but the signature has no explicit $key variable.
+subtest 'Params::Get parameter recognised in strict-pod check' => sub {
+	my $module = <<'END_MODULE';
+package Test::ParamsGet;
+use strict;
+use warnings;
+use Params::Get;
+
+=head2 parse_email( $text )
+
+Feeds a raw RFC 2822 email message to the analyser.
+
+=head3 Arguments
+
+=over 4
+
+=item C<$text> (scalar or scalar reference, required)
+
+Complete raw RFC 2822 email message.
+
+=back
+
+=head3 Returns
+
+The object itself.
+
+=cut
+
+sub parse_email {
+	my $self = shift;
+	my $params = Params::Get::get_params('text', \@_);
+	my $text = $params->{text};
+	return $self;
+}
+
+END_MODULE
+
+	# strict_pod=2 (fatal): should NOT croak because 'text' is found via
+	# get_params('text', ...) and the POD also documents $text.
+	my $extractor = create_extractor($module, 2);
+	my $schemas;
+
+	lives_ok {
+		$schemas = $extractor->extract_all();
+	} 'No croak with strict_pod=2 when parameter extracted via Params::Get';
+
+	ok(!exists $schemas->{parse_email}{_pod_validation_errors},
+		'No POD validation errors for Params::Get method');
+
+	done_testing();
+};
+
+# Test: $_[0] style self + inner closure false positive
+# A method that uses  my $self = $_[0]  and contains an inner sub/closure
+# whose  my (...) = @_  must NOT be mistaken for the outer method's params.
+subtest '$_[0] style: inner closure params not treated as method params' => sub {
+	my $module = <<'END_MODULE';
+package Test::DirectIndex;
+use strict;
+use warnings;
+
+=head2 risk_assessment()
+
+Returns a risk hashref. Takes no arguments.
+
+=head3 Arguments
+
+None.
+
+=head3 Returns
+
+A hashref.
+
+=cut
+
+sub risk_assessment {
+	my $self = $_[0];
+
+	return $self->{_risk} if $self->{_risk};
+
+	my (@flags, $score);
+	$score = 0;
+
+	my $add_flag = sub {
+		my ($name, $severity, $detail) = @_;
+		push @flags, { name => $name, severity => $severity, detail => $detail };
+		$score += ($severity eq 'HIGH' ? 3 : $severity eq 'MEDIUM' ? 2 : 1);
+	};
+
+	$add_flag->('test', 'LOW', 'example');
+
+	return $self->{_risk} = { score => $score, flags => \@flags };
+}
+
+END_MODULE
+
+	my $extractor = create_extractor($module, 2);
+	my $schemas;
+
+	lives_ok {
+		$schemas = $extractor->extract_all();
+	} 'No croak with strict_pod=2 for $_[0] method with inner closure';
+
+	ok(!exists $schemas->{risk_assessment}{_pod_validation_errors},
+		'No POD validation errors: inner closure params not leaked as method params');
+
+	done_testing();
+};
+
 done_testing();

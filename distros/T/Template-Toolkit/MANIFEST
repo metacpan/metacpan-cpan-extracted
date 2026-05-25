@@ -5,11 +5,9 @@ bin/tt-bench.pl
 bin/tt2inst
 bin/ttree
 Changes
-HACKING
 HACKING.md
 images/tt2power.gif
 images/ttdotorg.gif
-INSTALL
 INSTALL.md
 lib/Template.pm
 lib/Template/App/ttree.pm
@@ -109,6 +107,7 @@ t/constants.t
 t/context.t
 t/context_methods.t
 t/datafile.t
+t/datafile_edge.t
 t/date.t
 t/date_offset.t
 t/date_utf8.t
@@ -149,6 +148,7 @@ t/outline_line.t
 t/output.t
 t/parser.t
 t/parser2.t
+t/plugin_list.t
 t/plugins.t
 t/plugins_preloaded.t
 t/plusfile.t
@@ -211,6 +211,8 @@ t/test/lib/two/bar
 t/test/lib/two/foo
 t/test/lib/udata1
 t/test/lib/udata2
+t/test/lib/udata_comments
+t/test/lib/udata_empty
 t/test/lib/warning
 t/test/plugin/MyPlugs/Bar.pm
 t/test/plugin/MyPlugs/Baz.pm
@@ -261,6 +263,7 @@ t/zz-plugin-leak.t
 t/zz-pmv.t
 t/zz-pod-coverage.t
 t/zz-pod-kwalitee.t
+t/zz-process-leak.t
 t/zz-stash-xs-leak.t
 t/zz-url2.t
 testrules.yml

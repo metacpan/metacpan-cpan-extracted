@@ -26,7 +26,7 @@ use warnings;
 use base 'Template::Base';
 use Template::Constants;
 
-our $VERSION = '3.100';
+our $VERSION = '3.105';
 our $DEBUG   = 0 unless defined $DEBUG;
 our $ERROR   = '';
 our ($COMPERR, $AUTOLOAD, $UNICODE);
@@ -286,7 +286,7 @@ sub write_perl_file {
     my ($class, $file, $content) = @_;
     my ($fh, $tmpfile);
 
-    return $class->error("invalid filename: $file")
+    return $class->error("invalid filename: " . (defined $file ? $file : ''))
         unless defined $file && length $file;
 
     eval {

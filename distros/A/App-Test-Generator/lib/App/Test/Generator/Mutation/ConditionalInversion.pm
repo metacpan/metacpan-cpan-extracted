@@ -7,11 +7,11 @@ use parent 'App::Test::Generator::Mutation::Base';
 use App::Test::Generator::Mutant;
 use PPI;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 =head1 VERSION
 
-Version 0.38
+Version 0.39
 
 =head1 METHODS
 
@@ -19,6 +19,33 @@ Version 0.38
 
 Returns true if the document contains any C<if> or C<unless> compound
 statements that this mutator can target.
+
+=head3 Arguments
+
+=over 4
+
+=item * C<$doc>
+
+A L<PPI::Document> object to inspect.
+
+=back
+
+=head3 Returns
+
+A boolean.
+
+=head3 API specification
+
+=head4 input
+
+    {
+        self => { type => OBJECT, isa => 'App::Test::Generator::Mutation::ConditionalInversion' },
+        doc  => { type => OBJECT, isa => 'PPI::Document' },
+    }
+
+=head4 output
+
+    { type => SCALAR }
 
 =cut
 

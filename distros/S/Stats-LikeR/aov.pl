@@ -19,4 +19,10 @@ my $aov = aov(
 my $t1 = Time::HiRes::time();
 printf("aov calculation in %g seconds.\n", $t1-$t0);
 p $aov;
-
+$aov = aov(
+	{
+		yield => [5.5, 5.4, 5.8, 4.5, 4.8, 4.2],
+		ctrl  => [1,     1,   1,   0,   0,   0]
+	}
+);
+p $aov;

@@ -23,7 +23,7 @@ use strict;
 use warnings;
 use base 'Template::Plugin';
 
-our $VERSION = '3.100';
+our $VERSION = '3.105';
 
 sub new {
     my ($class, $context, $filename, $params) = @_;
@@ -46,9 +46,13 @@ sub new {
     # first line of file should contain field definitions
     while (! $line || $line =~ /^#/) {
         $line = <FD>;
+        last unless defined $line;
         chomp $line;
         $line =~ s/\r$//;
     }
+
+    return $class->error("first line of file must contain field names")
+        unless defined $line;
 
     (@fields = split(/\s*$delim\s*/, $line))
         || return $class->error("first line of file must contain field names");

@@ -1,0 +1,145 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Protocol::Tus::Util
+
+
+=head1 SYNOPSIS
+
+   use Protocol::Tus::Util qw<
+      as_ouch
+      coerce_model
+      lc_hash
+      ouch_rethrow
+      response
+      response_from_exception
+      validate_checksum
+      validate_id
+      validate_length
+      validate_tus_resumable
+      wrap_response
+   >;
+
+
+=head1 DESCRIPTION
+
+Utility functions for L<Protocol::Tus>.
+
+=head1 INTERFACE
+
+=head2 B<< as_ouch >>
+
+   my $ouch_exception_object = as_ouch($exception);
+
+Transform an input exception into an L<Ouch> object. Any input L<Ouch>
+object is preserved as-is.
+
+=head2 B<< coerce_model >>
+
+   my $model = coerce_model($spec);
+
+Transform a specification into a model. The input can be an object,
+which is returned as-is, or a hash reference with the following keys:
+
+=over
+
+=item C<< class >>
+
+The class of the model. The class name must be fully qualified, e.g.
+C<Protocol::Tus::LocalDir>.
+
+=item C<< args >>
+
+Arguments to pass to the class's constructor.
+
+=back
+
+In this case the provided class is C<use>d and its C<new> method invoked
+passing the C<args>.
+
+=head2 B<< lc_hash >>
+
+   my $lowercase_hash = lc_hash($anycase_hash);
+
+Generate a reference to a hash with keys corresponding to lowercase of
+the input C<$anycase_hash>'s hash and the same values. It is assumed
+that the input hash does I<not> contain two keys that have the same
+lowercase representation.
+
+=head2 B<< ouch_rethrow >>
+
+   ouch_rethrow($exception);
+
+Throw (or most probably re-throw) an exception as a L<Ouch> one. Uses
+L</as_ouch> under the hood.
+
+=head2 B<< response >>
+
+   my $response = response(
+      status => 500,
+      body   => 'Internal Server Error',
+      headers => { Foo => 'bar' },
+      exception => $e,
+   );
+
+Wrapper around L<Protocol::Tus::Response>'s constructor C<new>.
+
+=head2 B<< response_augment >>
+
+   my $same_response_object = response_augment($response_object);
+
+Add headers needed in most responses for the Tus protocol.
+
+=head2 B<< response_from_exception >>
+
+   my $response = response_from_exception($exception);
+
+Turn an exception into a response.
+
+=head2 B<< validate_checksum >>
+
+   validate_checksum($ref_to_data, $checksum_header_contents);
+
+Parse C<$checksum_header_contents> (as received from a Tus client) for
+figuring out the checksum protocol, then calculate the checksum over
+C<$ref_to_data> (reference to a scalar holding the data) and check
+it against the one parsed.
+
+Throws an exception if the check fails.
+
+=head2 B<< validate_id >>
+
+   validate_id($id);
+
+Throws an exception if the provided C<$id> is not a valid identifier.
+
+=head2 B<< validate_length >>
+
+   validate_length($length, $lowercase_headers);
+
+Performs various checks on the provided C<$length> and throws an
+exception if the relevant conditions are not met. Expects to receive a
+hash reference with the headers, every key as a lowercase string.
+
+=head2 B<< validate_tus_resumable >>
+
+   validate_tus_resumable($lowercase_headers, $supported_version);
+
+Checks the presence and the support for the value of header
+C<Tus-Resumable>. The input C<$lowercase_headers> is a hash reference
+with the headers having all keys as lowercase strings.
+C<$supported_version> is the string representing the supported version
+to compare against.
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for L<Protocol::Tus>.
+
+
+=cut

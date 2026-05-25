@@ -18,11 +18,21 @@ no_index:
   directory:
     - t
     - inc
+provides:
+  IO::Pty:
+    file: Pty.pm
+    version: '1.31'
+  IO::Tty:
+    file: Tty.pm
+    version: '1.31'
+  IO::Tty::Constant:
+    file: Tty/Constant.pm
+    version: '1.31'
 requires:
   perl: '5.008008'
 resources:
   bugtracker: https://github.com/cpan-authors/IO-Tty/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/cpan-authors/IO-Tty.git
-version: '1.29'
+version: '1.31'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

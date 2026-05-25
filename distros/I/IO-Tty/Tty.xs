@@ -829,10 +829,11 @@ pty_allocate()
 MODULE = IO::Tty	PACKAGE = IO::Tty
 
 int
-_open_tty(ttyname)
+_open_tty(ttyname, noctty = 1)
 	char *ttyname
+	int noctty
     CODE:
-	RETVAL = open(ttyname, O_RDWR | O_NOCTTY);
+	RETVAL = open(ttyname, noctty ? (O_RDWR | O_NOCTTY) : O_RDWR);
 	if (RETVAL >= 0) {
 #if defined(I_PUSH)
 	    ioctl(RETVAL, I_PUSH, "ptem");

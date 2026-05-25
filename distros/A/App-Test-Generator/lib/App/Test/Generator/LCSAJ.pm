@@ -15,7 +15,7 @@ use Readonly;
 # --------------------------------------------------
 Readonly my $DEFAULT_OUT_DIR => 'lcsaj';
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 =head1 NAME
 
@@ -45,7 +45,7 @@ calculation.
 
 =head1 VERSION
 
-Version 0.38
+Version 0.39
 
 =head2 generate
 
@@ -65,7 +65,7 @@ write the results to a JSON file.
 
 =item * C<$file>
 
-Path to the Perl source file to analyse. Required.
+Path to the Perl source file to analyse.
 
 =item * C<$out_dir>
 

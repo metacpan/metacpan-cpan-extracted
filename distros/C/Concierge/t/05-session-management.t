@@ -235,4 +235,65 @@ subtest 'multiple logins replace previous session' => sub {
     ok $check->{success}, 'new session exists';
 };
 
+subtest 'login_user with nonexistent user' => sub {
+    my $result = $concierge->login_user({
+        user_id  => 'ghost_user_xyz',
+        password => 'doesntmatter',
+    });
+    ok !$result->{success}, 'login_user fails for nonexistent user';
+};
+
+subtest 'login_user with wrong password' => sub {
+    my $result = $concierge->login_user({
+        user_id  => 'sessiontest',
+        password => 'wrongpassword',
+    });
+    ok !$result->{success}, 'login_user fails with wrong password';
+};
+
+subtest 'verify_password input validation' => sub {
+    my $r1 = $concierge->verify_password(undef, 'pass');
+    ok !$r1->{success}, 'verify_password fails with undef user_id';
+
+    my $r2 = $concierge->verify_password('', 'pass');
+    ok !$r2->{success}, 'verify_password fails with empty user_id';
+
+    my $r3 = $concierge->verify_password('sessiontest', undef);
+    ok !$r3->{success}, 'verify_password fails with undef password';
+
+    my $r4 = $concierge->verify_password('sessiontest', '');
+    ok !$r4->{success}, 'verify_password fails with empty password';
+};
+
+subtest 'reset_password input validation' => sub {
+    my $r1 = $concierge->reset_password(undef, 'newpass123');
+    ok !$r1->{success}, 'reset_password fails with undef user_id';
+
+    my $r2 = $concierge->reset_password('', 'newpass123');
+    ok !$r2->{success}, 'reset_password fails with empty user_id';
+
+    my $r3 = $concierge->reset_password('sessiontest', undef);
+    ok !$r3->{success}, 'reset_password fails with undef new_password';
+
+    my $r4 = $concierge->reset_password('sessiontest', '');
+    ok !$r4->{success}, 'reset_password fails with empty new_password';
+};
+
+subtest 'logout_user input validation' => sub {
+    my $r1 = $concierge->logout_user(undef);
+    ok !$r1->{success}, 'logout_user fails with undef session_id';
+
+    my $r2 = $concierge->logout_user('');
+    ok !$r2->{success}, 'logout_user fails with empty session_id';
+
+    my $r3 = $concierge->logout_user('nonexistent_session_id_xyz');
+    ok !$r3->{success}, 'logout_user fails with nonexistent session_id';
+};
+
+subtest 'restore_user with undef user_key' => sub {
+    my $result = $concierge->restore_user(undef);
+    ok !$result->{success}, 'restore_user fails with undef user_key';
+    like $result->{message}, qr/required/i, 'error mentions required';
+};
+
 done_testing;

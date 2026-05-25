@@ -1,4 +1,11 @@
 Revision history for Perl extension Error::Show.
+v0.5.1
+  [feature]
+    - Add depth optinoal limit of call stack reporting
+
+  [improvements]
+    - Tidy output formatting a little
+
 v0.5.0
   [new features]
 

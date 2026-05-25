@@ -465,6 +465,15 @@ limit=>$int
 for. Default is 100. If <=0,  no limiting is applied all all errors are
 processed.
 
+#### depth
+
+```perl
+depth=>$int
+```
+
+**From v0.5.1:** Limits the level of frames reported. Default is unlimited. If
+<0 or not defined.  0 is the current frame 
+
 #### reverse
 
 ```perl

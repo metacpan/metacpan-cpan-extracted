@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use 5.008;
+use 5.010;
 use lib qw( ./lib );
 use Config;
 use File::Spec::Functions qw( catfile );
@@ -142,6 +142,10 @@ my %opts = (
     'NAME'             => 'Template',
     'DISTNAME'     => 'Template-Toolkit',
     'VERSION_FROM' => 'lib/Template.pm',
+    'MIN_PERL_VERSION' => '5.010',
+    'CONFIGURE_REQUIRES' => {
+        'ExtUtils::MakeMaker' => '6.48',
+    },
     'EXE_FILES'    => [ 'bin/tpage', 'bin/ttree' ],
     'PMLIBDIRS'    => [ 'lib' ],
     'DIR'          => [ ],
@@ -433,20 +437,11 @@ sub message {
 #------------------------------------------------------------------------
 
 sub ttprompt {
-    my ($msg, $def)=@_;
-    my $ISA_TTY = -t STDIN && (-t STDOUT || !(-f STDOUT || -c STDOUT)) ; # Pipe?
-    my $dispdef = defined $def ? "[$def] " : " ";
-    $def = defined $def ? $def : "";
-    my $ans = '';
-    local $|=1;
-    print "$msg $dispdef" unless $TT_QUIET;
-    if ($TT_ACCEPT || ! $ISA_TTY) {
-        print "$def\n" unless $TT_QUIET;
-    }
-    else {
-        chomp($ans = <STDIN>);
-    }
-    return ($ans ne '') ? $ans : $def;
+    my ($msg, $def) = @_;
+    $def = defined $def ? $def : '';
+    return $def if $TT_QUIET;  # TT_QUIET implies TT_ACCEPT
+    local $ENV{PERL_MM_USE_DEFAULT} = 1 if $TT_ACCEPT;
+    return ExtUtils::MakeMaker::prompt($msg, $def);
 }
 
 

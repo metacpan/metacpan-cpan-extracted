@@ -23,7 +23,7 @@ use strict;
 use warnings;
 use base 'Template::Plugin';
 
-our $VERSION = '3.100';
+our $VERSION = '3.105';
 
 
 sub new {
@@ -35,8 +35,7 @@ sub new {
 
 
 sub make_formatter {
-    my $format = shift;
-    $format = '%s' unless defined $format;
+    my $format = shift // '%s';
     return sub {
         my @args = @_;
         push(@args, '') unless @args;

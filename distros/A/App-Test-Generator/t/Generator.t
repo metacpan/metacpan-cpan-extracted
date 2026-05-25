@@ -1342,4 +1342,74 @@ subtest 'Generator: generate() with two args (class + schema) lives' => sub {
 	like($out, qr/use strict/, 'output contains use strict');
 };
 
+# ==================================================================
+# output type: array — list-context capture and validation (v0.39)
+# ==================================================================
+
+subtest 'generate() with output type array uses list-context capture' => sub {
+	my ($fh, $schema) = tempfile(SUFFIX => '.yml', UNLINK => 1);
+	print $fh <<'YAML';
+module: My::Module
+function: get_items
+new: ~
+input: {}
+output:
+  type: array
+YAML
+	close $fh;
+
+	my ($out) = capture(sub {
+		eval { App::Test::Generator->generate($schema) };
+	});
+
+	is($@, '', 'generate() does not croak for output type array');
+	like($out, qr/my \@_r\s*=/, 'list-context capture @_r present in generated code');
+	like($out, qr/\$result\s*=\s*\\\@_r/, 'result assigned as arrayref from @_r');
+	unlike($out, qr/\$result\s*=\s*\$obj->get_items/, 'scalar-context capture not used');
+};
+
+subtest 'generate() with output type arrayref uses scalar-context capture' => sub {
+	my ($fh, $schema) = tempfile(SUFFIX => '.yml', UNLINK => 1);
+	print $fh <<'YAML';
+module: My::Module
+function: get_items
+new: ~
+input: {}
+output:
+  type: arrayref
+YAML
+	close $fh;
+
+	my ($out) = capture(sub {
+		eval { App::Test::Generator->generate($schema) };
+	});
+
+	is($@, '', 'generate() does not croak for output type arrayref');
+	unlike($out, qr/my \@_r\s*=/, 'list-context capture not used for arrayref output');
+};
+
+subtest 'generate() with output type array includes returns_ok call' => sub {
+	my ($fh, $schema) = tempfile(SUFFIX => '.yml', UNLINK => 1);
+	print $fh <<'YAML';
+module: My::Module
+function: abuse_contacts
+new: ~
+input: {}
+output:
+  type: array
+  _error_return: undef
+  _error_handling:
+    implicit_undef: 1
+YAML
+	close $fh;
+
+	my ($out) = capture(sub {
+		eval { App::Test::Generator->generate($schema) };
+	});
+
+	is($@, '', 'generate() does not croak for array output with meta-keys');
+	like($out, qr/returns_ok/, 'returns_ok present in generated code');
+	like($out, qr/my \@_r\s*=/, 'list-context capture present');
+};
+
 done_testing();

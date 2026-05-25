@@ -1,7 +1,7 @@
-package Concierge v0.6.1;
+package Concierge v0.7.0;
 use v5.36;
 
-our $VERSION = 'v0.6.1';
+our $VERSION = 'v0.7.0';
 
 # ABSTRACT: Service layer orchestrator for authentication, sessions, and user data
 
@@ -786,7 +786,7 @@ Concierge - Service layer orchestrator for authentication, sessions, and user da
 
 =head1 VERSION
 
-v0.6.1
+v0.7.0
 
 =head1 SYNOPSIS
 
@@ -919,17 +919,10 @@ directly.
 The identity core is designed to be sufficient on its own, but the
 component pattern it follows -- backend abstraction, setup-time
 configuration, and Concierge-level orchestration -- is intentionally
-replicable.  An application that needs to manage organizations,
-assets, or other structured data alongside its users could introduce
-an additional component under the C<Concierge::> namespace, following
-the same conventions: a C<setup()> method for configuration, pluggable
-backends, and integration through Concierge's desk configuration.
-
-Each identity core component can also be substituted.  The interfaces
-are designed so an application could replace Argon2 with LDAP or OAuth
-in Auth, swap SQLite for PostgreSQL in Sessions or Users, or provide
-an entirely custom backend -- by supplying a module that conforms to
-the same method contract.
+replicable.  Each identity core component can also be substituted with
+a conforming replacement, and additional components (Organizations,
+Assets, etc.) can be added by following the same conventions.  See
+L</EXTENSIBILITY> for details.
 
 =head1 METHODS
 
@@ -1110,11 +1103,146 @@ boundaries:
 These ensure that credentials never leak into user data stores and that
 identity fields cannot be changed via update operations.
 
+=head1 EXTENSIBILITY
+
+=head2 Component Substitution
+
+Each identity core component can be replaced with a drop-in alternative as
+long as the replacement implements the methods Concierge calls on it.
+
+B<Auth> -- Concierge calls:
+
+=over 4
+
+=item C<< Concierge::Auth->new(\%args) >> -- constructor; accepts C<file> key
+
+=item C<< $auth->checkID($user_id) >> -- returns true/false
+
+=item C<< $auth->checkPwd($user_id, $password) >> -- returns C<($ok, $message)>
+
+=item C<< $auth->setPwd($user_id, $password) >> -- returns C<($ok, $message)>
+
+=item C<< $auth->resetPwd($user_id, $new_password) >> -- returns C<($ok, $message)>
+
+=item C<< $auth->deleteID($user_id) >> -- returns C<($ok, $message)>
+
+=item C<< Concierge::Auth->gen_random_string($length) >> -- class method, returns string
+
+=back
+
+B<Sessions> -- Concierge calls:
+
+=over 4
+
+=item C<< Concierge::Sessions->new(%args) >> -- constructor; accepts C<storage_dir> and C<backend>
+
+=item C<< $sessions->new_session(%args) >> -- returns C<{ success => 1, session => $obj }>
+
+=item C<< $sessions->get_session($session_id) >> -- returns C<{ success => 1, session => $obj }>
+
+=item C<< $sessions->delete_session($session_id) >> -- returns C<{ success => 1|0, ... }>
+
+=item C<< $sessions->cleanup_sessions() >> -- returns C<{ success => 1, deleted_count => N, active => [...] }>
+
+=back
+
+B<Users> -- Concierge calls:
+
+=over 4
+
+=item C<< Concierge::Users->new($config_file) >> -- constructor
+
+=item C<< $users->register_user(\%data) >> -- returns C<{ success => 1|0, message => '...' }>
+
+=item C<< $users->get_user($user_id) >> -- returns C<{ success => 1, user => \%data }>
+
+=item C<< $users->update_user($user_id, \%updates) >> -- returns C<{ success => 1|0, ... }>
+
+=item C<< $users->delete_user($user_id) >> -- returns C<{ success => 1|0, ... }>
+
+=item C<< $users->list_users($filter) >> -- returns C<{ success => 1, user_ids => [...] }>
+
+=back
+
+To substitute a component, supply an object that responds to these methods and
+assign it to the corresponding slot on the concierge object after C<open_desk()>:
+
+    my $result = Concierge->open_desk($desk_dir);
+    my $c = $result->{concierge};
+    $c->{auth} = My::LDAPAuth->new(...);   # drop-in replacement
+
+=head2 Additional Components
+
+To add a new records-store component (Organizations, Assets, Catalog, etc.):
+
+=over 4
+
+=item 1.
+
+Subclass L<Concierge::Base> and implement its seven stub methods.
+C<Concierge::Base> documents the method signatures and the
+C<{ success => 1|0, message => '...' }> return convention.
+
+=item 2.
+
+Add a configuration block for your component in C<concierge.conf>:
+
+    { "organizations_config": { "backend": "sqlite", "db_file": "..." } }
+
+=item 3.
+
+After C<open_desk()>, instantiate and attach the component:
+
+    my $result = Concierge->open_desk($desk_dir);
+    my $c = $result->{concierge};
+    my $orgs = Concierge::Organizations->new();
+    $orgs->setup($desk_config->{organizations_config});
+    $c->{organizations} = $orgs;
+
+=item 4.
+
+Access the component through the concierge object:
+
+    my $r = $c->{organizations}->add_record('acme', \%data);
+
+=back
+
+=head2 Future Components
+
+The following illustrate the kinds of components the C<Concierge::> namespace
+is suited for.  These are not roadmap commitments -- they are examples of what
+the component pattern enables:
+
+=over 4
+
+=item * C<Concierge::Organizations> -- multi-tenancy; users belong to orgs
+
+=item * C<Concierge::Assets> -- files, images, or other owned resources
+
+=item * C<Concierge::Guides> -- role and permission records
+
+=item * C<Concierge::Catalog> -- product or content records
+
+=item * C<Concierge::Calendar> -- event and booking records
+
+=back
+
+=head2 Contributing
+
+If you build a component that might be useful to others, contributions to the
+C<Concierge::> namespace on CPAN are welcome.  The conventions to follow are:
+subclass L<Concierge::Base>, use the C<{ success => 1|0, message => '...' }>
+return convention, accept a desk config block via C<setup()>, and include
+comprehensive tests and POD.  Open an issue or pull request at
+L<https://github.com/bwva/Concierge> to discuss before publishing.
+
 =head1 SEE ALSO
 
 L<Concierge::Setup> -- desk creation and configuration
 
 L<Concierge::User> -- user objects returned by lifecycle methods
+
+L<Concierge::Base> -- records-store base class for additional components
 
 L<Concierge::Auth>, L<Concierge::Sessions>, L<Concierge::Users> -- component modules
 

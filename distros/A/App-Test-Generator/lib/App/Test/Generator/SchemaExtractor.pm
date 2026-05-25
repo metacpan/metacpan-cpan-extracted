@@ -65,11 +65,11 @@ App::Test::Generator::SchemaExtractor - Extract test schemas from Perl modules
 
 =head1 VERSION
 
-Version 0.38
+Version 0.39
 
 =cut
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 =head1 SYNOPSIS
 
@@ -171,6 +171,22 @@ The extracted schemas follow this YAML structure:
 Automatically identifies getter, setter, and combined accessor methods
 by analyzing common patterns like C<return $self-E<gt>{property}> and
 C<$self-E<gt>{property} = $value>.
+
+=item * B<Params::Get Integration>
+
+Recognises parameters extracted via C<Params::Get::get_params('key', \@_)>,
+treating the quoted key as a named parameter equivalent to a traditional
+C<my ($self, $key) = @_> signature.  This prevents false positives from
+C<--strict-pod> when the method body never declares an explicit C<$key>
+variable.
+
+=item * B<Direct-Index Self Style>
+
+Recognises C<my $self = $_[0]> as a valid method-invocant pattern.  Parameters
+at C<$_[1]>, C<$_[2]>, etc. are extracted as positional parameters.  Without
+this, the signature fallback would incorrectly pick up C<my (...) = @_> from
+inner closures defined in the method body and treat those variables as the
+outer method's parameters.
 
 =item * B<Boolean Return Inference>
 
@@ -580,6 +596,34 @@ the type is automatically inferred from the default:
 
 The extractor provides comprehensive analysis of method return behavior,
 including context sensitivity, error handling conventions, and method chaining patterns.
+
+When a method's POD contains a C<=head4 Output> block in
+L<Params::Validate::Strict> schema format, the C<type> declared there is
+used as the authoritative output type and takes precedence over all
+heuristic code analysis:
+
+    =head4 Output
+
+        {
+            type => 'hashref',
+        }
+
+This is the recommended way to document methods whose return type would
+otherwise be misidentified (e.g. a method that returns C<$self-E<gt>{cache}>
+where the cache happens to hold a hashref).
+
+Using parentheses as the outer container emits C<type: array>, indicating a
+list-returning method.  L<App::Test::Generator> 0.39+ (with L<Test::Returns>
+0.03+) captures these results in list context automatically:
+
+    =head4 Output
+
+        (
+            {
+                type => 'hashref',
+            },
+            ...
+        )
 
 =head3 List vs Scalar Context Detection
 
@@ -1201,7 +1245,7 @@ Construct a new SchemaExtractor for a given Perl source file.
 
 =over 4
 
-=item * C<input_file>
+=item * C<$input_file>
 
 Path to the Perl source file to analyse. Required. Must exist on disk.
 
@@ -1487,6 +1531,7 @@ sub _find_methods {
 		my $name = $sub->name();
 
 		next unless defined $name;	# Skip anonymous routines
+		next if $name =~ /^(BEGIN|END|DESTROY|AUTOLOAD|CHECK|INIT|UNITCHECK)$/;
 
 		# Skip private methods unless explicitly included, or they're special
 		if ($name =~ /^_/ && $name !~ /^_(new|init|build)/) {
@@ -1680,10 +1725,13 @@ sub _extract_pod_before {
 	my $seen_code = 0;
 	my $steps = 0;
 
-	# Walk backwards collecting POD
+	# Walk backwards collecting POD.
+	# Stop after the first pod token so that a =cut before =head1 METHODS
+	# prevents class-level POD from being mistaken for method-specific POD.
 	while($current && $steps++ < $POD_WALK_LIMIT) {
 		if ($current->isa('PPI::Token::Pod')) {
 			$pod = $current->content() . $pod;
+			last;	# Only take the immediately adjacent pod block
 		} elsif ($current->isa('PPI::Token::Comment')) {
 			# Include comments that might contain parameter info
 			my $comment = $current->content();
@@ -1773,8 +1821,10 @@ sub _analyze_method {
 	my $pod_params = $self->_analyze_pod($pod);
 	my $code_params = $self->_analyze_code($code, $method);
 
-	# Validate POD/code agreement if strict mode is enabled
-	if ($self->{strict_pod}) {
+	# Validate POD/code agreement if strict mode is enabled.
+	# Skip when there is no POD at all — strict_pod checks accuracy of
+	# existing documentation, not whether every method is documented.
+	if ($self->{strict_pod} && $pod) {
 		my @validation_errors = $self->_validate_pod_code_agreement(
 			$pod_params,
 			$code_params,
@@ -3383,9 +3433,10 @@ sub _analyze_pod {
 					$self->_parse_constraints($params{$name}, $constraint);
 				}
 
-				# Check for optional/required in description OR constraint
+				# Check for optional/required in description OR constraint.
+				# Use word boundaries to avoid matching "optionally" as "optional".
 				my $full_text = ($constraint || '') . ' ' . ($desc || '');
-				if ($full_text =~ /optional/i) {
+				if ($full_text =~ /\boptional\b/i) {
 					$params{$name}{optional} = 1;
 					$self->_log("  POD: $name marked as optional");
 				} elsif ($full_text =~ /required|mandatory/i) {
@@ -3413,7 +3464,7 @@ sub _analyze_pod {
 	}
 
 	# Pattern 2: Also try the inline format in case Parameters: section wasn't found
-	while ($pod =~ /\$(\w+)\s*-\s*(string|integer|int|number|num|float|boolean|bool|arrayref|array|hashref|hash|object)(?:\s*\(([^)]+)\))?\s*,?\s*(.*)$/gim) {
+	while ($pod =~ /\$(\w+)\s*-\s*(string|integer|int|number|num|float|boolean|bool|arrayref|array|hashref|hash|object|any)(?:\s*\(([^)]+)\))?\s*,?\s*(.*)$/gim) {
 		my ($name, $type, $constraint, $desc) = ($1, lc($2), $3, $4);
 
 		# Only process if we haven't already found this param in the Parameters section
@@ -3441,9 +3492,10 @@ sub _analyze_pod {
 			$self->_parse_constraints($params{$name}, $constraint);
 		}
 
-		# Check for optional/required in description
+		# Check for optional/required in description.
+		# Use word boundaries to avoid matching "optionally" as "optional".
 		if ($desc) {
-			if ($desc =~ /optional/i) {
+			if ($desc =~ /\boptional\b/i) {
 				$params{$name}{optional} = 1;
 			} elsif ($desc =~ /required|mandatory/i) {
 				$params{$name}{optional} = 0;
@@ -3476,7 +3528,7 @@ sub _analyze_pod {
 
 		# Explicit typed form only:
 		#	$param - type (constraints)
-		if ($desc =~ /^\s*(string|integer|int|number|num|float|boolean|bool|array|arrayref|hash|hashref)\b(?:\s*\(([^)]+)\))?/i) {
+		if ($desc =~ /^\s*(string|integer|int|number|num|float|boolean|bool|array|arrayref|hash|hashref|any)\b(?:\s*\(([^)]+)\))?/i) {
 			my $type = lc($1);
 			my $constraint = $2;
 
@@ -3507,8 +3559,9 @@ sub _analyze_pod {
 			}
 		}
 
-		# Check for optional/required in description
-		if ($desc =~ /optional/i) {
+		# Check for optional/required in description.
+		# Use word boundaries to avoid matching "optionally" as "optional".
+		if ($desc =~ /\boptional\b/i) {
 			$params{$name}{optional} = 1;
 		} elsif ($desc =~ /required|mandatory/i) {
 			$params{$name}{optional} = 0;
@@ -3547,7 +3600,107 @@ sub _analyze_pod {
 		# }
 	}
 
+	# Pattern 0: =head3|4 Input formal spec — highest-priority type source.
+	# Runs last so positional matching can use positions set by earlier patterns.
+	# Accepts positional array format: [ {type=>'...'}, ... ]
+	# and named hash format:           { name => {type=>'...'}, ... }
+	if ($pod =~ /=head[34]\s+Input\b(.*?)(?==head|\z)/si) {
+		my $block = $1;
+		$block =~ s/\A\s+//;
+
+		if ($block =~ /\A\[/) {
+			# Positional format: each {…} maps to the param at that array index.
+			my $idx = 0;
+			while ($block =~ /\{([^}]*)\}/g) {
+				my $spec = $1;
+				my ($name) = grep { ($params{$_}{position} // -1) == $idx }
+				             keys %params;
+				if (defined $name) {
+					$params{$name}{_from_input_spec} = 1;
+					if (my $t = $self->_map_formal_input_type($spec)) {
+						$params{$name}{type} = $t;
+						$self->_log("  POD: $name type '$t' from =head Input (positional $idx)");
+					}
+					if ($spec =~ /\boptional\s*=>\s*(0|1)/i) {
+						$params{$name}{optional} = $1 + 0;
+					}
+				}
+				$idx++;
+			}
+		} elsif ($block =~ /\A\{/) {
+			# Named format: each 'name => {…}' entry maps directly by name.
+			while ($block =~ /\b(\w+)\s*=>\s*\{([^}]*)\}/g) {
+				my ($name, $spec) = ($1, $2);
+				next if $name =~ /^(self|class)$/i;
+				$params{$name} //= { _source => 'pod' };
+				$params{$name}{_from_input_spec} = 1;
+				if (my $t = $self->_map_formal_input_type($spec)) {
+					$params{$name}{type} = $t;
+					$self->_log("  POD: $name type '$t' from =head Input (named)");
+				}
+				if ($spec =~ /\boptional\s*=>\s*(0|1)/i) {
+					$params{$name}{optional} = $1 + 0;
+				}
+			}
+			# A named-format Input spec signals a hash/named API.  Positional
+			# info from signature analysis is not meaningful here and causes
+			# "param X missing position" errors when params are mixed.
+			delete $params{$_}{position} for keys %params;
+		}
+	}
+
 	return \%params;
+}
+
+# --------------------------------------------------
+# _map_formal_input_type
+#
+# Purpose:    Extract and normalise the type string
+#             from a parameter spec fragment such as
+#             "type => 'scalar | scalarref'".
+#             Handles union types by returning the
+#             canonical ATG type for the first
+#             recognised alternative.
+#
+# Entry:      $spec - text content of a { } block
+#                     from a =head3|4 Input spec.
+#
+# Exit:       Canonical type string, or undef when
+#             no 'type' key is present or the value
+#             is not a recognised type name.
+# --------------------------------------------------
+sub _map_formal_input_type {
+	my ($self, $spec) = @_;
+	return undef unless $spec =~ /\btype\s*=>\s*['"]([^'"]+)['"]/i;
+	my $raw = lc($1);
+	$raw =~ s/\s+//g;
+
+	my %map = (
+		scalar    => 'string',
+		scalarref => 'string',
+		str       => 'string',
+		string    => 'string',
+		int       => 'integer',
+		integer   => 'integer',
+		num       => 'number',
+		number    => 'number',
+		float     => 'number',
+		bool      => 'boolean',
+		boolean   => 'boolean',
+		array     => 'arrayref',
+		arrayref  => 'arrayref',
+		hash      => 'hashref',
+		hashref   => 'hashref',
+		object    => 'object',
+		any       => 'any',
+		undef     => 'undef',
+		coderef   => 'coderef',
+	);
+
+	for my $t (split /\|/, $raw) {
+		return $map{$t} if exists $map{$t};
+	}
+	return undef;
 }
 
 # --------------------------------------------------
@@ -3624,6 +3777,41 @@ sub _analyze_output_from_pod {
 		qw(string integer number float boolean arrayref hashref object coderef void undef);
 
 	if ($pod) {
+		# Pattern 0: =head4 Output formal spec (highest priority — explicit over heuristic)
+		# The outer container shape determines the return type:
+		#   (...)  — list/array of items
+		#   [...]  — arrayref  (bare [] = empty/void, skip)
+		#   {...}  — hashref spec; look for type => inside, or isa => for object
+		if($pod =~ /=head4\s+Output\b(.*?)(?==head|\z)/si) {
+			my $block = $1;
+			$block =~ s/^\s+//;
+			if($block =~ /^\(/) {
+				$output->{type} = 'array';
+				$self->_log("  OUTPUT: type 'array' from =head4 Output list notation");
+			} elsif($block =~ /^\[/) {
+				unless($block =~ /^\[\s*\]/) {
+					$output->{type} = 'arrayref';
+					$self->_log("  OUTPUT: type 'arrayref' from =head4 Output arrayref notation");
+				}
+			} elsif($block =~ /^\{/) {
+				if($block =~ /type\s*=>\s*['"]?(\w[\w:]*?)['"]?\s*[,}]/i) {
+					my $type = lc($1);
+					$type = 'hashref'  if $type eq 'hash';
+					$type = 'arrayref' if $type eq 'array';
+					if($VALID_OUTPUT_TYPES{$type}) {
+						$output->{type} = $type;
+						$self->_log("  OUTPUT: type '$type' from =head4 Output formal spec");
+					} elsif($block =~ /\bisa\s*=>/) {
+						$output->{type} = 'object';
+						$self->_log("  OUTPUT: type 'object' from =head4 Output isa spec");
+					}
+				} elsif($block =~ /\bisa\s*=>/) {
+					$output->{type} = 'object';
+					$self->_log("  OUTPUT: type 'object' from =head4 Output isa spec");
+				}
+			}
+		}
+
 		# Pattern 1: Returns: section
 		# Up to 3 lines
 		if ($pod =~ /Returns?:\s+([^\n]+(?:\n[^\n]+){0,2})/si) {
@@ -3632,22 +3820,22 @@ sub _analyze_output_from_pod {
 
 			$self->_log("  OUTPUT: Found Returns section: $returns_desc");
 
-			# Try to infer type from description
-			if ($returns_desc =~ /\b(string|text)\b/i) {
+			# Try to infer type from description (skip if Pattern 0 already set type)
+			if (!$output->{type} && $returns_desc =~ /\b(string|text)\b/i) {
 				$output->{type} = 'string';
-			} elsif ($returns_desc =~ /\b(integer|int|count)\b/i) {
+			} elsif (!$output->{type} && $returns_desc =~ /\b(integer|int|count)\b/i) {
 				$output->{type} = 'integer';
-			} elsif ($returns_desc =~ /\b(float|decimal|number)\b/i) {
+			} elsif (!$output->{type} && $returns_desc =~ /\b(float|decimal|number)\b/i) {
 				$output->{type} = 'number';
-			} elsif ($returns_desc =~ /\b(boolean|true|false)\b/i) {
+			} elsif (!$output->{type} && $returns_desc =~ /\b(boolean|true|false)\b/i) {
 				$output->{type} = 'boolean';
-			} elsif ($returns_desc =~ /\b(array|list)\b/i) {
+			} elsif (!$output->{type} && $returns_desc =~ /\b(array|list)\b/i) {
 				$output->{type} = 'arrayref';
-			} elsif ($returns_desc =~ /\b(hash|hashref|dictionary)\b/i) {
+			} elsif (!$output->{type} && $returns_desc =~ /\b(hash|hashref|dictionary)\b/i) {
 				$output->{type} = 'hashref';
-			} elsif ($returns_desc =~ /\b(object|instance)\b/i) {
+			} elsif (!$output->{type} && $returns_desc =~ /\b(object|instance)\b/i) {
 				$output->{type} = 'object';
-			} elsif ($returns_desc =~ /\bundef\b/i) {
+			} elsif (!$output->{type} && $returns_desc =~ /\bundef\b/i) {
 				$output->{type} = 'undef';
 			}
 
@@ -4630,7 +4818,7 @@ sub _validate_output {
 	if ($output->{value} && defined $output->{type} && $output->{type} ne 'boolean') {
 		$self->_log("  WARNING Value set but type is not boolean: $output->{type}");
 	}
-	my %valid_types = map { $_ => 1 } qw(string integer number boolean arrayref hashref object void);
+	my %valid_types = map { $_ => 1 } qw(string integer number boolean array arrayref hashref object void);
 	if(exists $output->{type}) {
 		if(!$valid_types{$output->{type}}) {
 			$self->_log("  WARNING Output value type is unknown: '$output->{type}', setting to string");
@@ -4752,6 +4940,19 @@ sub _analyze_code {
 	# Extract parameter names from various signature styles
 	$self->_extract_parameters_from_signature(\%params, $code);
 
+	# Params::Get: get_params('key', \@_) passes the param name as a string,
+	# not as a $var in the signature, so run this unconditionally as a second
+	# pass after the early-returning signature parsers have finished.
+	if($code =~ /Params::Get/) {
+		my $pos = scalar keys %params;
+		while($code =~ /get_params\s*\(\s*['"](\w+)['"]/g) {
+			my $name = $1;
+			next if $name =~ /^(self|class)$/i;
+			$params{$name} //= { _source => 'code', position => $pos++ };
+			$self->_log("  CODE: Found Params::Get parameter '$name'");
+		}
+	}
+
 	$self->_extract_defaults_from_code(\%params, $code, $method);
 
 	# Infer types from defaults
@@ -4807,7 +5008,7 @@ sub _analyze_code {
 			# e.g. $var //= 5; or $var ||= 5;
 			$$p->{optional} = 1;
 			$self->_log("  CODE: $param is optional (default value assigned in code)");
-		} elsif ($code =~ /\s*\$$param\s*(?:[\+\-\*\/%]|(?:\+\+)|(?:--)|(?:[\+\-\*\/%]=)|\+\$|\$[+-])/ ) {
+		} elsif ($code =~ /\s*\$$param\s*(?:[\+\-\*\%]|\/(?!\/)|(?:\+\+)|(?:--)|(?:[\+\-\*\%]=|\/(?!\/)=)|\+\$|\$[+-])/ ) {
 			# Covers arithmetic usage:
 			# $x + $param, $param++, $param--, $x += $param, $x -= $param, etc.
 			$$p->{optional} = 0;
@@ -4925,9 +5126,10 @@ sub _analyze_parameter_type {
 	# ------------------------------------------------------------
 	if (!$p->{type}) {
 		# Numeric operators: + - * / % **
+		# Use \/(?!\/) to exclude // (defined-or) from matching as division.
 		if (
-			$code =~ /\$$param\s*[\+\-\*\/%]/ ||
-			$code =~ /[\+\-\*\/%]\s*\$$param/ ||
+			$code =~ /\$$param\s*(?:[\+\-\*\%]|\/(?!\/))/ ||
+			$code =~ /(?:[\+\-\*\%]|\/(?!\/))\s*\$$param/ ||
 			$code =~ /\bint\s*\(\s*\$$param\s*\)/ ||
 			$code =~ /\babs\s*\(\s*\$$param\s*\)/
 		) {
@@ -5504,6 +5706,20 @@ sub _extract_parameters_from_signature {
 			$self->_parse_modern_signature($params, $potential_sig);
 			return;
 		}
+	}
+
+	# Direct-index style: my $self = $_[0];  my $arg = $_[1]; ...
+	# Must be checked before Style 1 to avoid matching @_ inside closures
+	# defined in the body of a method that uses this style.
+	if($code =~ /my\s+\$(?:self|class)\s*=\s*\$_\[0\]/) {
+		my $pos = 0;
+		while($code =~ /my\s+\$(\w+)\s*=\s*\$_\[(\d+)\]/g) {
+			my $name = $1;
+			next if $name =~ /^(self|class)$/i;
+			$params->{$name} //= { _source => 'code', optional => 1, position => $pos++ };
+			$self->_log("  CODE: Found direct-index parameter '\$$name' at \$_[$2]");
+		}
+		return;
 	}
 
 	# Traditional Style 1: my ($self, $arg1, $arg2) = @_;
@@ -6113,6 +6329,7 @@ sub _extract_defaults_from_code {
 	while ($code =~ /my\s+\$(\w+)\s*=\s*([^;]+);/g) {
 		my ($param, $value) = ($1, $2);
 		next unless exists $params->{$param};
+		next if $value =~ /->/;	# deref/method call, not a default value
 
 		$params->{$param}{_default} = $self->_clean_default_value($value, 1);
 		$params->{$param}{optional} = 1;
@@ -6206,9 +6423,12 @@ sub _extract_defaults_from_code {
 	}
 
 	# Fallback: extract parameters from classic Perl body styles
-	# Only run if signature extraction found nothing
+	# Only run if signature extraction found nothing AND the code does not use
+	# the direct-index ($_[0]) style — that style is used for no-param methods
+	# whose empty %params would otherwise trigger this fallback and pick up
+	# my (...) = @_ from inner closures as if they were method params.
 	# TODO:  On constructors, use $class to help to determine the output type
-	if (!keys %{$params}) {
+	if (!keys %{$params} && $code !~ /my\s+\$(?:self|class)\s*=\s*\$_\[0\]/) {
 		my $position = 0;
 
 		# Style 1: my ($a, $b) = @_;
@@ -7566,6 +7786,17 @@ sub _write_schema {
 				my $cleaned_param = $self->_serialize_parameter_for_yaml($param);
 				$output->{'input'}{$param_name} = $cleaned_param;
 			}
+
+			# If some params have positions and others don't, treat the whole
+			# input as a named (hash) API and strip all positions.  Mixed
+			# position state arises when a named-API method also happens to
+			# have a Params::Get positional-key call alongside =head4 Input
+			# named-block params that carry no position.
+			my @with_pos    = grep { defined $output->{input}{$_}{position} } keys %{$output->{input}};
+			my @without_pos = grep { !defined $output->{input}{$_}{position} } keys %{$output->{input}};
+			if (@with_pos && @without_pos) {
+				delete $output->{input}{$_}{position} for @with_pos;
+			}
 		} else {
 			delete $output->{input};
 		}
@@ -7847,8 +8078,10 @@ sub _serialize_parameter_for_yaml {
 		}
 	}
 
-	# Handle memberof even if not marked with semantic
-	if($param->{enum} && ref($param->{enum}) eq 'ARRAY') {
+	# Handle memberof even if not marked with semantic.
+	# enum and memberof are mutually exclusive — only set memberof when enum
+	# is not already being output (avoids the "has both" validation error).
+	if($param->{enum} && ref($param->{enum}) eq 'ARRAY' && !$cleaned{enum}) {
 		$cleaned{memberof} = $param->{enum};
 	}
 	if($param->{memberof} && ref($param->{memberof}) eq 'ARRAY') {
@@ -7867,6 +8100,7 @@ sub _serialize_parameter_for_yaml {
 
 	# Remove internal fields
 	delete $cleaned{_source};
+	delete $cleaned{_from_input_spec};
 	delete $cleaned{semantic};
 
 	return \%cleaned;
@@ -7995,7 +8229,9 @@ sub _needs_object_instantiation {
 	if ($is_instance_method &&
 	    ($is_instance_method->{explicit_self} ||
 	     $is_instance_method->{shift_self} ||
-	     $is_instance_method->{accesses_object_data})) {
+	     $is_instance_method->{accesses_object_data} ||
+	     ($is_instance_method->{calls_instance_methods} &&
+	      scalar @{$is_instance_method->{calls_instance_methods}}))) {
 
 		# Instance-only methods override factory detection
 		if ($is_factory) {
@@ -8264,6 +8500,12 @@ sub _detect_instance_method {
 
 	# Pattern 1: my ($self, ...) = @_;
 	if ($method_body =~ /my\s*\(\s*\$self\s*[,)]/) {
+		$instance_info{explicit_self} = 1;
+		$instance_info{confidence} = 'high';
+	}
+
+	# Pattern 1b: my $self = $_[0];  (direct-index style)
+	elsif ($method_body =~ /my\s+\$self\s*=\s*\$_\[0\]/) {
 		$instance_info{explicit_self} = 1;
 		$instance_info{confidence} = 'high';
 	}
@@ -9189,6 +9431,11 @@ sub _validate_pod_code_agreement {
 		my $pod = $pod_params->{$param} || {};
 		my $code = $code_params->{$param} || {};
 
+		# Params from a =head3|4 Input formal spec are the authoritative API
+		# definition — they are exempt from POD/code disagreement checks since
+		# the spec takes precedence over heuristic code analysis.
+		next if $pod->{_from_input_spec};
+
 		# Check if parameter exists in both
 		if (exists $pod_params->{$param} && !exists $code_params->{$param}) {
 			push @errors, "Parameter '\$$param' documented in POD but not found in code signature";
@@ -9196,12 +9443,12 @@ sub _validate_pod_code_agreement {
 		}
 
 		if(!exists $pod_params->{$param} && exists $code_params->{$param}) {
-			if(($method_name eq 'new') && ($param eq 'class')) {
-				# $class is usually not documented in new()
+			if($param eq 'class') {
+				# $class is the class invocant, not a user-facing parameter
 				next;
 			}
-			if(($method_name ne 'new') && ($param eq 'self')) {
-				# $self is usually not documented in a method
+			if($param eq 'self') {
+				# $self is the instance invocant, not a user-facing parameter
 				next;
 			}
 			push @errors, "Parameter '\$$param' found in code but not documented in POD";
@@ -9414,10 +9661,8 @@ it is useful for creating a template which you can modify to create a working sc
 
 =head1 TODO
 
-Parse =head4 Input / =head4 Output POD blocks
-(in L<Params::Validate::Strict> schema format)
-as a high-confidence input source,
-falling back to runtime introspection only when POD is absent.
+Extend C<=head4 Input> parsing to cover union types (e.g. C<scalar | scalarref>)
+and the C<enum>/C<memberof> constraint synonym.
 
 =head1 SEE ALSO
 

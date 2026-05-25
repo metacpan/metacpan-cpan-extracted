@@ -25,7 +25,7 @@ use Template::VMethods;
 use Template::Exception;
 use Scalar::Util qw( blessed reftype );
 
-our $VERSION    = '3.100';
+our $VERSION    = '3.105';
 our $DEBUG      = 0 unless defined $DEBUG;
 our $PRIVATE    = qr/^[_.]/;
 our $UNDEF_TYPE = 'var.undef';
@@ -228,9 +228,7 @@ sub get {
         $result = $self->_dotop($root, $ident, $args);
     }
 
-    return defined $result
-        ? $result
-        : $self->undefined($ident, $args);
+    return $result // $self->undefined($ident, $args);
 }
 
 
@@ -285,7 +283,7 @@ sub set {
         }
     }
 
-    return defined $result ? $result : '';
+    return $result // '';
 }
 
 
@@ -361,6 +359,14 @@ sub undefined {
     my ($self, $ident, $args) = @_;
 
     if ($self->{ _STRICT }) {
+        # .defined must work on undefined values even in STRICT mode —
+        # it would be nonsensical to throw "undefined variable" when the
+        # user is explicitly testing whether a variable is defined (GH #170)
+        if (ref $ident eq 'ARRAY') {
+            my $last_item = $ident->[$#$ident - 1];
+            return '' if defined $last_item && $last_item eq 'defined';
+        }
+
         # Sorry, but we can't provide a sensible source file and line without
         # re-designing the whole architecture of TT (see TT3)
         die Template::Exception->new(
@@ -592,7 +598,7 @@ sub _dotop {
 sub _assign {
     my ($self, $root, $item, $args, $value, $default) = @_;
     my $rootref = ref $root;
-    my $atroot  = ($root eq $self);
+    my $atroot  = (blessed $root && $root->isa(ref $self));
     my $result;
     $args ||= [ ];
     $default ||= 0;

@@ -41,6 +41,20 @@
          }
       }
    },
+   "provides" : {
+      "IO::Pty" : {
+         "file" : "Pty.pm",
+         "version" : "1.31"
+      },
+      "IO::Tty" : {
+         "file" : "Tty.pm",
+         "version" : "1.31"
+      },
+      "IO::Tty::Constant" : {
+         "file" : "Tty/Constant.pm",
+         "version" : "1.31"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -55,6 +69,6 @@
          "web" : "https://github.com/cpan-authors/IO-Tty"
       }
    },
-   "version" : "1.29",
+   "version" : "1.31",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -4,7 +4,7 @@ App::Test::Generator - Fuzz Testing, Mutation Testing, LCSAJ Metrics and Test Da
 
 # VERSION
 
-Version 0.38
+Version 0.39
 
 # SYNOPSIS
 
@@ -294,6 +294,13 @@ The output can be set to the string 'undef' if the routine should return the und
     output: undef
 
 The keyword `undef` is used to indicate that the `function` returns nothing.
+
+For methods that return a list (rather than a reference), use `type: array`.
+The generated test captures the result in list context and validates it as an
+arrayref, which requires [Test::Returns](https://metacpan.org/pod/Test%3A%3AReturns) 0.03 or later:
+
+    output:
+      type: array
 
 ### `%config` - optional hash of configuration.
 
@@ -1204,9 +1211,32 @@ The generated test:
 
 ## generate
 
-    generate($schema_file, $test_file)
-
 Takes a schema file and produces a test file (or STDOUT).
+
+    # Modern named API
+    App::Test::Generator->generate(
+        schema_file => 'schemas/foo.yml',
+        output_file => 'test/foo.t',
+    );
+
+    # Legacy positional API
+    App::Test::Generator->generate($schema_file, $test_file);
+
+### API Specification
+
+#### Input
+
+    {
+        schema_file => { type => 'string', optional => 1 },
+        input_file  => { type => 'string', optional => 1 },
+        output_file => { type => 'string', optional => 1 },
+        schema      => { type => 'hashref', optional => 1 },
+        quiet       => { type => 'boolean', optional => 1 },
+    }
+
+#### Output
+
+    { type => 'string' }
 
 ## render\_fallback
 
@@ -1244,11 +1274,11 @@ correctness.
 
 #### input
 
-    { v => { type => SCALAR|REF, optional => 1 } }
+    { v => { type => 'any', optional => 1 } }
 
 #### output
 
-    { type => SCALAR }
+    { type => 'string' }
 
 ## render\_hash
 
@@ -1382,6 +1412,30 @@ mixed-value hashes and only want the arrayref entries rendered.
 #### output
 
     { type => SCALAR }
+
+## perl\_quote
+
+Convert any Perl value into a source-code fragment that reproduces that value
+when evaluated in a generated test file.
+
+### Arguments
+
+- `$v`
+
+    Any Perl value. May be undef, a scalar, an arrayref, a Regexp, or a blessed
+    object. All types are handled — undef becomes `'undef'`, numbers are
+    unquoted, strings are single-quoted, arrayrefs recurse, Regexps become
+    `qr{...}`, and anything else falls through to `render_fallback`.
+
+### API specification
+
+#### input
+
+    { v => { type => 'any', optional => 1 } }
+
+#### output
+
+    { type => 'string' }
 
 # NOTES
 

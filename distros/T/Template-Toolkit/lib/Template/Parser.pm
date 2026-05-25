@@ -46,7 +46,7 @@ use constant ACCEPT   => 1;
 use constant ERROR    => 2;
 use constant ABORT    => 3;
 
-our $VERSION = '3.100';
+our $VERSION = '3.105';
 our $DEBUG   = 0 unless defined $DEBUG;
 our $ERROR   = '';
 
@@ -337,8 +337,7 @@ sub parse {
     my ($self, $text, $info) = @_;
     my ($tokens, $block);
 
-    $info->{ DEBUG } = $self->{ DEBUG_DIRS }
-        unless defined $info->{ DEBUG };
+    $info->{ DEBUG } //= $self->{ DEBUG_DIRS };
 
 #    print "info: { ", join(', ', map { "$_ => $info->{ $_ }" } keys %$info), " }\n";
 
@@ -400,10 +399,8 @@ sub split_text {
 
     # extract all directives from the text
     while ($text =~ s/$split//) {
-        $pre = $1;
-        $dir = defined($2) ? $2 : $3;
-        $pre = '' unless defined $pre;
-        $dir = '' unless defined $dir;
+        $pre = $1 // '';
+        $dir = $2 // $3 // '';
 
         $prelines  = ($pre =~ tr/\n//);  # newlines in preceding text
         $dirlines  = ($dir =~ tr/\n//);  # newlines in directive tag
@@ -412,6 +409,20 @@ sub split_text {
         for ($dir) {
             if (/^\#/) {
                 # comment out entire directive except for any end chomp flag
+                #
+                # Handle comments containing nested tag pairs, e.g.:
+                #   [%# [% foo %] %]
+                # The tokenizer splits at the first END_TAG, so the
+                # directive text may contain unbalanced START_TAGs.
+                # For each one, consume the matching END_TAG from
+                # the remaining template text.
+                my $nested = () = /$start/g;
+                while ($nested > 0 && $text =~ s/\A(.*?)$end//s) {
+                    my $extra = $1;
+                    $dirlines += ($extra =~ tr/\n//);
+                    $nested--;
+                    $nested += () = $extra =~ /$start/g;
+                }
                 $dir = ($dir =~ /($CHOMP_FLAGS)$/o) ? $1 : '';
             }
             else {
@@ -919,7 +930,7 @@ sub _parse {
             };
             # clear undefined token to avoid 'undefined variable blah blah'
             # warnings and let the parser logic pick it up in a minute
-            $token = '' unless defined $token;
+            $token //= '';
 
             # get the next state for the current lookahead token
             $action = defined ($lookup = $state->{'ACTIONS'}->{ $token })

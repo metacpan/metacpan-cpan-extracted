@@ -29,7 +29,7 @@ use Test::Builder;
 
 use constant MSWin32 => $^O eq 'MSWin32';
 
-our $VERSION = '3.100';
+our $VERSION = '3.105';
 our $DEBUG   = 0;
 our @ISA     = qw( Exporter );
 our @EXPORT  = qw( ntests ok is match flush skip_all test_expect callsign banner );
@@ -292,8 +292,7 @@ sub test_expect {
         # split input by a line like "-- expect --"
         ($input, $expect) =
             split(/^\s*--\s*expect\s*--\s*\n/im, $input);
-        $expect = ''
-            unless defined $expect;
+        $expect //= '';
 
         $output = '';
 
@@ -472,7 +471,7 @@ L<Test::More>, subtests, and other Test::Builder-based modules.
 
 =head1 PACKAGE SUBROUTINES
 
-=head2 text_expect()
+=head2 test_expect()
 
 The C<test_expect()> subroutine splits an input document into a number
 of separate tests, processes each one using the Template Toolkit and

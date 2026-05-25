@@ -2146,6 +2146,60 @@ if (defined $aov_res->{group_stats}) {
 } else {
 	fail('aov: group_stats are NOT defined');
 }
+# omitting formula results in stacking
+$aov_res = aov(
+	{
+		yield => [5.5, 5.4, 5.8, 4.5, 4.8, 4.2],
+		ctrl  => [1,     1,   1,   0,   0,   0]
+	}
+);
+foreach my $key ('Group', 'group_stats', 'Residuals') {
+	if (defined $aov_res->{$key}) {
+		pass("aov: \"$key\" hash reference is defined");
+	} else {
+		fail("aov: \"$key\" hash reference is NOT defined");
+	}
+}
+# go through Group
+@correct = ('Df', 'F value', 'Mean Sq', 'Pr(>F)', 'Sum Sq');
+@ans = (1, 177.504798464491216, 61.653333333333329, 0.000000108622655, 61.653333333333329);
+foreach my $i (0..$#ans) {
+	die "$correct[$i] is missing" unless defined $aov_res->{Group}{$correct[$i]};
+	is_approx( $aov_res->{Group}{$correct[$i]}, $ans[$i], "aov: Group $correct[$i]", 1e-9);
+}
+foreach my $key ('mean', 'size') {
+	if (defined $aov_res->{group_stats}{$key}) {
+		pass("aov: group_stats \"$key\" hash reference is defined");
+	} else {
+		fail("aov: group_stats \"$key\" hash reference is NOT defined");
+	}
+}
+@correct = ('ctrl', 'yield');
+@ans = (0.5, 5.03333333333333);
+foreach my $i (0..$#ans) {
+	is_approx( $aov_res->{group_stats}{mean}{$correct[$i]}, $ans[$i], "aov: group_stats mean $correct[$i]", 1e-13);
+}
+@ans = (6, 6);
+foreach my $i (0..$#ans) {
+	is_approx( $aov_res->{group_stats}{size}{$correct[$i]}, $ans[$i], "aov: group_stats size $correct[$i]", 1e-13);
+}
+# go through Residuals
+@correct = ('Df', 'Mean Sq', 'Sum Sq');
+@ans = (10, 0.347333333333334, 3.473333333333336);
+foreach my $i (0..$#ans) {
+	die "$correct[$i] is missing" unless defined $aov_res->{Residuals}{$correct[$i]};
+	is_approx( $aov_res->{Residuals}{$correct[$i]}, $ans[$i], "aov: Residual $correct[$i]", 1e-13);
+}
+no_leaks_ok {
+	eval {
+		aov(
+			{
+				yield => [5.5, 5.4, 5.8, 4.5, 4.8, 4.2],
+				ctrl  => [1,     1,   1,   0,   0,   0]
+			}
+		);
+	};
+} 'aov: no memory leaks with formula omission and stacking' unless $INC{'Devel/Cover.pm'};
 #-------------------------------------------------------------------
 #  glm: Generalized Linear Models
 #-------------------------------------------------------------------
@@ -2551,13 +2605,62 @@ if (
 	fail('"read_table" fails to read into hash of hash correctly');
 	die;
 }
-
 dies_ok {
 	read_table('t/HepatitisCdata.csv', 'output.type' => 'not_real_type')
 } 'dies when given non-accepted type of output';
-foreach my $f ('t/E2021.csv','t/E2022.csv','t/E2023.csv','t/E2024.csv') {
-	$test_data = read_table( $f, sep => ',' );
+#------- again, with delim
+$test_data = read_table('t/HepatitisCdata.csv', 'output.type' => 'hoh', delim => ',');
+foreach my $col ('Category', 'Age', 'Sex', 'ALB', 'ALP', 'ALT', 'AST', 'BIL','CHE', 'CHOL', 'CREA', 'GGT', 'PROT') {
+	if (defined $test_data->{$col}) {
+		pass("\"$col\" is defined from \"read_table\"");
+	} else {
+		fail("\"$col\" isn't defined from \"read_table\"");
+	}
 }
+no_leaks_ok {
+	eval {
+		read_table('t/HepatitisCdata.csv', 'output.type' => 'hoh');
+	};
+} 'read_table: basic with no memory leaks with hash of hash' unless $INC{'Devel/Cover.pm'};
+if (
+	($test_data->{Sex}{1} eq 'm') && ('m' eq $test_data->{Sex}{2}) && ('m' eq $test_data->{Sex}{3})
+	&&
+	($test_data->{PROT}{1} == 69) && ($test_data->{PROT}{2} == 76.5)
+	&&
+	($test_data->{Age}{1} == 32) && (32 == $test_data->{Age}{8}) && (32 == $test_data->{Age}{7})
+	) {
+	pass('"read_table" reads into hash of hash (hoh) correctly');
+} else {
+	fail('"read_table" fails to read into hash of hash correctly');
+	die;
+}
+#------- again, with sep
+$test_data = read_table('t/HepatitisCdata.csv', 'output.type' => 'hoh', sep => ',');
+foreach my $col ('Category', 'Age', 'Sex', 'ALB', 'ALP', 'ALT', 'AST', 'BIL','CHE', 'CHOL', 'CREA', 'GGT', 'PROT') {
+	if (defined $test_data->{$col}) {
+		pass("\"$col\" is defined from \"read_table\"");
+	} else {
+		fail("\"$col\" isn't defined from \"read_table\"");
+	}
+}
+no_leaks_ok {
+	eval {
+		read_table('t/HepatitisCdata.csv', 'output.type' => 'hoh');
+	};
+} 'read_table: basic with no memory leaks with hash of hash' unless $INC{'Devel/Cover.pm'};
+if (
+	($test_data->{Sex}{1} eq 'm') && ('m' eq $test_data->{Sex}{2}) && ('m' eq $test_data->{Sex}{3})
+	&&
+	($test_data->{PROT}{1} == 69) && ($test_data->{PROT}{2} == 76.5)
+	&&
+	($test_data->{Age}{1} == 32) && (32 == $test_data->{Age}{8}) && (32 == $test_data->{Age}{7})
+	) {
+	pass('"read_table" reads into hash of hash (hoh) correctly');
+} else {
+	fail('"read_table" fails to read into hash of hash correctly');
+	die;
+}
+#----------
 $test_data = read_table('t/bodyfat.csv', 'output.type' => 'hoa');
 no_leaks_ok {
 	eval {
@@ -2567,10 +2670,10 @@ no_leaks_ok {
 my @col = qw(Density	BodyFat Age Weight Height Neck Chest Abdomen	Hip Thigh Knee Ankle	Biceps Forearm	Wrist);
 my @err = grep {!defined $test_data->{$_}} @col;
 if (scalar @err == 0) {
-	pass('bodyfat has no missing columns');
+	pass('read_table: bodyfat has no missing columns');
 } else {
 	say STDERR join (', ', @err);
-	fail('bodyfat has missing columns (see above)');
+	fail('read_table: bodyfat has missing columns (see above)');
 }
 @err = grep {ref $test_data->{$_} ne 'ARRAY'} @col;
 if (scalar @err == 0) {
@@ -2592,6 +2695,7 @@ foreach my $col (@col) {
 	is_approx($test_data->{$col}[251], $correct[$idx], "Last row: column/key $col", 1e-14);
 	$idx++;
 }
+
 #-------------------
 #     write_table
 #-------------------
@@ -2696,6 +2800,33 @@ no_leaks_ok {
       );
   };
 } 'write_table: No memory leaks when encountering illegal nested references' unless $INC{'Devel/Cover.pm'};
+# test write_table with implicit separator from filename
+%hoa = (
+	a => [1..3],
+	b => [4..9],
+	c => [0..5]
+);
+$fh = File::Temp->new(DIR => '/tmp', SUFFIX => '.tsv', UNLINK => 1);
+close $fh;
+write_table(
+	\%hoa, $fh->filename,
+	'col.names' => [qw(a b)],
+	'row.names' => 0
+);
+$str = file2string($fh->filename);
+say $str;
+if ($str eq 'a	b
+1	4
+2	5
+3	6
+NA	7
+NA	8
+NA	9
+') {
+	pass('write_table takes implicit separators');
+} else {
+	fail('write_table messed up implicit separators');
+}
 #---------
 # read_table with filter: aoh
 #---------
@@ -2941,9 +3072,9 @@ foreach my $key (sort keys %correct) {
 	my $max_i_hoa = scalar @{ $correct{$key} } - 1;
 	my $max_i_table = scalar @{ $test_data->{$key} } - 1;
 	if ($max_i_hoa == $max_i_table) {
-		pass("$key has the same number of elements");
+		pass("read_table: $key has the same number of elements");
 	} else {
-		fail("$key does not have the same number of elements.");
+		fail("read_table: $key does not have the same number of elements.");
 	}
 	foreach my $i (0..$max_i_hoa) {
 		if (
@@ -2953,7 +3084,7 @@ foreach my $key (sort keys %correct) {
 				&&
 				($correct{$key}[$i] eq $test_data->{$key}[$i])
 			) {
-			pass("$key element $i has the correct value");
+			pass("read_table: $key element $i has the correct value");
 		} elsif (
 				(defined $correct{$key}[$i])
 				&&
@@ -2961,7 +3092,7 @@ foreach my $key (sort keys %correct) {
 				&&
 				($correct{$key}[$i] ne $test_data->{$key}[$i])
 			) {
-			fail("$key element $i has the correct value");
+			fail("read_table: $key element $i has the correct value");
 		} elsif (
 				(not defined $correct{$key}[$i])
 				&&
@@ -2969,16 +3100,26 @@ foreach my $key (sort keys %correct) {
 				&&
 				('NA' eq $test_data->{$key}[$i])
 			) {
-			pass("$key element $i correctly takes undefined values to \"NA\"");
+			pass("read_table: $key element $i correctly takes undefined values to \"NA\"");
 		}
 	}
 }
+# automatically detect .tsv extension
 
+$test_data = read_table( $fh->filename, 'output.type' => 'hoa');
+
+foreach my $key (sort keys %correct) {	
+	my $max_i_hoa = scalar @{ $correct{$key} } - 1;
+	my $max_i_table = scalar @{ $test_data->{$key} } - 1;
+	if ($max_i_hoa == $max_i_table) {
+		pass("read_table: $key has the same number of elements when suffix is automatically determined");
+	} else {
+		fail("read_table: $key does not have the same number of elements when suffix is automatically determined.");
+	}
+}
 write_table(
-	\%correct,
-	$fh->filename,
-	sep => "\t",
-	'row.names' => 0
+	\%correct,   $fh->filename,
+	sep => "\t", 'row.names' => 0
 );
 $str = file2string($fh->filename);
 if (sha512_base64($str) eq 'mSFIF/IuIR3GfRWvnv+4OkMi12JwoIV4zxt57vv2QQxuEGOde8w8hD7xSBNsMjczFLqZRqmlvOq0tcWAkhF0ag') {
@@ -2986,7 +3127,7 @@ if (sha512_base64($str) eq 'mSFIF/IuIR3GfRWvnv+4OkMi12JwoIV4zxt57vv2QQxuEGOde8w8
 } else {
 	fail('failed to write_table');
 	say sha512_base64($str);
-	die;
+	die 'write_table failed';
 }
 no_leaks_ok {
 	eval {
@@ -3572,5 +3713,194 @@ foreach my $s (1..3) {
 			$sa = sample(\@arr, $s);
 		}
 	} "sample: array with $s samples doesn't have leaks" unless $INC{'Devel/Cover.pm'};
+}
+#-----------------
+#   oneway_test
+#-----------------
+# hash of array
+$test_data = oneway_test({
+	yield => [5.5, 5.4, 5.8, 4.5, 4.8, 4.2],
+	ctrl  => [1,     1,   1,   0,   0,   0]
+});
+foreach my $key ('Group', 'Residuals', 'group_stats') {
+	if (defined $test_data->{$key}) {
+		pass("oneway_test: no formula; \"$key\" exists");
+	} else {
+		fail("oneway_test: no formula; \"$key\" does NOT exist");
+	}
+}
+
+is_approx( $test_data->{Group}{Df}, 1, 'oneway_test: no formula df', 1e-13);
+is_approx( $test_data->{Group}{'F value'}, 177.504798464491358, 'oneway_test: no formula F value', 1e-13);
+is_approx( $test_data->{Group}{'Pr(>F)'}, 0.000000131343255, 'oneway_test: no formula p-value', 1e-13);
+is_approx( $test_data->{Residuals}{Df}, 9.817673483264731, 'oneway_test: no formula parameter', 1e-13);
+
+foreach my $key ('mean', 'size') {
+	if (defined $test_data->{group_stats}{$key}) {
+		pass("oneway_test: group_stats \"$key\" hash reference is defined");
+	} else {
+		fail("oneway_test: group_stats \"$key\" hash reference is NOT defined");
+	}
+}
+@correct = ('ctrl', 'yield');
+@ans = (0.5, 5.03333333333333);
+foreach my $i (0..$#ans) {
+	is_approx( $test_data->{group_stats}{mean}{$correct[$i]}, $ans[$i], "oneway_test: group_stats mean $correct[$i]", 1e-13);
+}
+@ans = (6, 6);
+foreach my $i (0..$#ans) {
+	is_approx( $test_data->{group_stats}{size}{$correct[$i]}, $ans[$i], "oneway_test: group_stats size $correct[$i]", 1e-13);
+}
+no_leaks_ok {
+	eval {
+		oneway_test({
+			yield => [5.5, 5.4, 5.8, 4.5, 4.8, 4.2],
+			ctrl  => [1,     1,   1,   0,   0,   0]
+		});
+	}
+} 'oneway_test: no leaks without formula'  unless $INC{'Devel/Cover.pm'};
+# array of array
+$test_data = oneway_test([
+	[5.5, 5.4, 5.8, 4.5, 4.8, 4.2],
+	[1,     1,   1,   0,   0,   0]
+]);
+foreach my $key ('Group', 'Residuals', 'group_stats') {
+	if (defined $test_data->{$key}) {
+		pass("oneway_test: no formula; \"$key\" exists");
+	} else {
+		fail("oneway_test: no formula; \"$key\" does NOT exist");
+	}
+}
+
+is_approx( $test_data->{Group}{Df}, 1, 'oneway_test: no formula df', 1e-13);
+is_approx( $test_data->{Group}{'F value'}, 177.504798464491358, 'oneway_test: no formula F value', 1e-13);
+is_approx( $test_data->{Group}{'Pr(>F)'}, 0.000000131343255, 'oneway_test: no formula p-value', 1e-13);
+is_approx( $test_data->{Residuals}{Df}, 9.817673483264731, 'oneway_test: no formula parameter', 1e-13);
+
+foreach my $key ('mean', 'size') {
+	if (defined $test_data->{group_stats}{$key}) {
+		pass("oneway_test: group_stats \"$key\" hash reference is defined");
+	} else {
+		fail("oneway_test: group_stats \"$key\" hash reference is NOT defined");
+	}
+}
+@correct = ('Index 0','Index 1');
+@ans = (5.03333333333333, 0.5);
+foreach my $i (0..$#ans) {
+	is_approx( $test_data->{group_stats}{mean}{$correct[$i]}, $ans[$i], "oneway_test: group_stats mean $correct[$i]", 1e-13);
+}
+@ans = (6, 6);
+foreach my $i (0..$#ans) {
+	is_approx( $test_data->{group_stats}{size}{$correct[$i]}, $ans[$i], "oneway_test: group_stats size $correct[$i]", 1e-13);
+}
+no_leaks_ok {
+	eval {
+		oneway_test([
+			[5.5, 5.4, 5.8, 4.5, 4.8, 4.2],
+			[1,     1,   1,   0,   0,   0]
+		]);
+	}
+} 'oneway_test: AoA: no leaks without formula'  unless $INC{'Devel/Cover.pm'};
+#-------- now, hash of array with a formula
+$test_data = oneway_test({
+	yield => [5.5, 5.4, 5.8, 4.5, 4.8, 4.2],
+	ctrl  => [1,     1,   1,   0,   0,   0]
+}, formula => 'yield ~ ctrl');
+foreach my $key ('ctrl', 'Residuals', 'group_stats') {
+	if (defined $test_data->{$key}) {
+		pass("oneway_test: no formula; \"$key\" exists");
+	} else {
+		fail("oneway_test: no formula; \"$key\" does NOT exist");
+	}
+}
+is_approx( $test_data->{ctrl}{Df}, 1, 'oneway_test: w/ formula df', 1e-13);
+is_approx( $test_data->{ctrl}{'F value'}, 25.600000000000030, 'oneway_test: w/ formula F value', 1e-13);
+is_approx( $test_data->{ctrl}{'Pr(>F)'}, 0.009707504058380, 'oneway_test: w/ formula p-value', 1e-13);
+is_approx( $test_data->{Residuals}{Df}, 3.563474387527839, 'oneway_test: w/ formula parameter', 1e-13);
+
+# dies_ok variants
+dies_ok {
+	oneway_test();
+} 'oneway_test: dies with empty data';
+
+dies_ok {
+	oneway_test({ 'y' => [1,2,3], g => [1,2] }, formula => 'y ~ g')
+} 'oneway_test: dies with mismatched lengths';
+dies_ok {
+	oneway_test({
+		yield => [5.5, 5.4, 5.8, 4.5, 4.8, 4.2],
+		ctrl  => [1,     1,   1,   0,   0,   0]
+	}, formula => 'yield');
+} 'oneway_test: dies with bad formula';
+dies_ok {
+	oneway_test({
+		yield => [5.5, 5.4, 5.8, 4.5, 4.8, 4.2],
+		ctrl  => [1,     1,   1,   0,   0,   0]
+	}, formula => 'weight ~ ctrl');
+} 'oneway_test: dies with non-existent key in formula';
+#---------------
+# summary
+#---------------
+$unif = [0.216281301648454, 0.109465371442155, 0.152664169241813, 0.000945096692653635, 0.297535893169954, 0.139163636355065, 0.433281186173499, 0.408562817186144, 0.407467355710114, 0.544592780352787, 0.487398883576855, 0.643468442596237, 0.68575522492846, 0.151846994960366, 0.0108012662535621, 0.765504103474193, 0.170995624940421, 0.100078161688572, 0.167327253677694, 0.178543828268637, 0.767033648977208, 0.0661950819672228, 0.581462013571265, 0.584800690627297, 0.762539213217881, 0.233645411264945, 0.693534299360277, 0.513290613560038, 0.41433325215603, 0.73243812858739, 0.478323977378576, 0.798072957187451, 0.237619591881074, 0.0780442614619403, 0.0360511965325365, 0.660791977980871, 0.912043981453014, 0.415870135589202, 0.831491877016528, 0.737746524987607, 0.663143394629547, 0.777232190070094, 0.816913688077346, 0.352381995029283, 0.744148647065789, 0.729401956002121, 0.465347760265214, 0.0785176667616199, 0.181269420249411, 0.679185700779414, 0.953224347579702, 0.567208135290578, 0.292655755357845, 0.105132055128408, 0.659550831920821, 0.260928737252719, 0.0114517904292804, 0.351924227264533, 0.539668158788782, 0.923435653386754, 0.679118775225493, 0.541537731065048, 0.235382321740357, 0.443470864148644, 0.49701302243216, 0.124681475319193, 0.403251186205477, 0.587374376354269, 0.0806932538910878, 0.613866141439061, 0.285459073394659, 0.882170197671563, 0.729358588888918, 0.872760579993155, 0.0726024246860497, 0.599972473528148, 0.857066010638153, 0.767531044559306, 0.877534848570345, 0.520403080150906, 0.115952349478963, 0.0624610171846882, 0.869999228452524, 0.294535850510563, 0.735723449504025, 0.727797725687921, 0.232053652861307, 0.486724559407229, 0.497430051763761, 0.65156677164174, 0.456347032400441, 0.785195872302019, 0.120408844445638, 0.45376514163452, 0.198314702590377, 0.144783732275236, 0.064735910938797, 0.30123682582493, 0.437664391094597];
+$test_data = summary( $unif );
+if (
+	($test_data->[0] eq
+	'---------------------------------------------------------------------------'
+	)
+	&&
+	($test_data->[1] eq
+	' # values      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. ')
+	&&
+	($test_data->[2] eq
+	'---------------------------------------------------------------------------')
+	) {
+	pass('summary: takes array reference and prints correct results');
+} else {
+	fail('summary: failed to take array reference');
+}
+$test_data = summary( @{ $unif } );
+if (
+	($test_data->[0] eq
+	'---------------------------------------------------------------------------'
+	)
+	&&
+	($test_data->[1] eq
+	' # values      Min.   1st Qu.    Median      Mean   3rd Qu.      Max. ')
+	&&
+	($test_data->[2] eq
+	'---------------------------------------------------------------------------')
+	) {
+	pass('summary: takes array and prints correct results');
+} else {
+	fail('summary: failed to take array');
+}
+%hoa = (A => runif(9),B => runif(9));
+$test_data = summary(\%hoa);
+if (
+	($test_data->[0] =~ m/^\-+$/)
+	&&
+	($test_data->[1] =~ m/^\h*Key\h*/)
+	&&
+	($test_data->[2] =~ m/^\-+$/)
+	&&
+	($test_data->[3] =~ m/^\h*A\h*\d/)
+	&&
+	($test_data->[4] =~ m/^\h*B\h*\d/)
+	&&
+	(scalar @{ $test_data } == 5)
+	){
+	pass('summary: takes hash reference');
+} else {
+	fail('summary: failed to take hash reference');
+}
+%hoa = (A => runif(9),B => runif(9), C => runif(9));
+$test_data = summary(
+	\%hoa,
+	nrows => 1
+);
+if (scalar @{ $test_data } == 4) {
+	pass('summary: "nrows" limits rows of output');
+} else {
+	fail('summary: "nrows" does NOT limit rows of output');
 }
 done_testing();

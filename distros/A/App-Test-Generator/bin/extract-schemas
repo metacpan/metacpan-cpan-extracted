@@ -168,8 +168,8 @@ print "Output directory: $extractor_opts{output_dir}\n\n";
 make_path($extractor_opts{output_dir}) unless -d $extractor_opts{output_dir};
 
 my $extractor = App::Test::Generator::SchemaExtractor->new(
-    input_file => $input_file,
-    %extractor_opts,
+	input_file => $input_file,
+	%extractor_opts,
 );
 
 my $schemas = $extractor->extract_all();

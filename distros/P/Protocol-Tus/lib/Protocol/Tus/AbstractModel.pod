@@ -1,0 +1,174 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Protocol::Tus::AbstractModel
+
+
+=head1 SYNOPSIS
+
+   use Protocol::Tus::AbstractModel;
+
+
+=head1 DESCRIPTION
+
+Base class for L<Protocol::Tus> backends.
+
+This class sets the shape of a backend (a.k.a. I<model>) class for
+L<Protocol::Tus>. While it's not mandatory to derive your class from
+this, you surely have to implement all its methods with the same
+semantics.
+
+=head1 INTERFACE
+
+All methods in the interface have to be present; some belong to the
+abstract interface, some are pre-implemented because they leverage on
+the other ones.
+
+Failures MUST be signalled by throwing an exception.
+
+In the rest of this section, we can refer to I<model> or I<backend>
+interchangeably.
+
+=head2 B<< cleanup >>
+
+Abstract method, must be implemented in a derived class.
+
+   $model->cleanup($id);
+
+Takes the identifier of an upload and is supposed to dispose all
+resources related to it.
+
+=head2 B<< create_upload >>
+
+Abstract method, must be implemented in a derived class.
+
+   my $id = $model->create_upload($length, $metadata);
+
+Kickstart a new upload. Both C<$length> and C<$metadata> might be
+C<undef> and the model class has to deal with it, e.g. in case extension
+C<creation-defer-length> is I<not> supported.
+
+In case of success it's supposed to return the identifier of the upload
+in a way that's meaningful for the model, keeping in mind that this
+identifier will probably be used (directly or not) to shape the exposed
+API.
+
+=head2 B<< extensions >>
+
+Abstract method, must be implemented in a derived class.
+
+   my @list = $model->extensions;
+
+Returns the list of strings, each naming one extension supported by the
+model.
+
+=head2 B<< finalize >>
+
+Abstract method, must be implemented in a derived class.
+
+   $model->finalize($id);
+
+Mark an upload as completed and do any activity that is supposed to be
+performed in this case.
+
+If this method raises an exception, it I<might> be called again later if
+the client calls the C<PATCH> HTTP method again with zero data.
+
+=head2 B<< get_info >>
+
+Abstract method, must be implemented in a derived class.
+
+   my $hash_ref = $model->get_info($id);
+
+Get information about the specific upload. The return value MUST be a
+hash reference holding the following data:
+
+=over
+
+=item C<< complete >>
+
+boolean (in Perl sense) marking the upload as completed or not.
+
+=item C<< length >>
+
+the total length of the upload. If available, it is a non-negative
+integer; otherwise, it is C<undef>.
+
+=item C<< metadata >>
+
+the I<metadata> provided upon creation of the upload (through
+L</create_upload>). It can be C<undef> is not available.
+
+=item C<< offset >>
+
+the current offset of the upload as a non-negative decimal integer.
+
+=back
+
+=head2 B<< max_size >>
+
+   my $n = $model->max_size;
+
+Get the maximum size of an upload. Defaults to C<undef> which means no
+limit.
+
+=head2 B<< save_chunk >>
+
+Abstract method, must be implemented in a derived class.
+
+   $model->save_chunk($id, $offset, $data_ref);
+
+Save a chunk of data at C<$offset>, whatever this means for the model.
+C<$data_ref> is a reference to a scalar holding the actual data, so that
+we avoid copying all data around.
+
+=head2 B<< set_length >>
+
+Abstract method, must be implemented in a derived class.
+
+   $model->set_length($id, $length);
+
+In case the model supports extension C<creation-defer-length>, this
+method is called in case the length upon creation is not provided by the
+client, but it is at a later stage during one of the C<PATCH> calls.
+
+=head2 B<< extensions_as_string >>
+
+   my $string = $model->extensions_as_string;
+
+Get the list of L</extensions> as a single string with all elements
+joined by a comma, ready to be used as a C<Tus-Extension> header.
+
+=head2 B<< get_offset >>
+
+   my $offset = $model->get_offset($id);
+
+Convenience method, get the C<offset> value of the hash reference
+returned by L</get_info>.
+
+=head2 B<< is_complete >>
+
+   my $bool = $model->is_complete($id);
+
+Check if an upload (identified by C<$id>) is complete or not.
+
+=head2 B<< supports_extension >>
+
+   my $bool = $model->supports_extension($extension_name);
+
+Check if C<$extension_name> is part of the list provided by
+L</extensions>.
+
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for L<Protocol::Tus>.
+
+
+=cut

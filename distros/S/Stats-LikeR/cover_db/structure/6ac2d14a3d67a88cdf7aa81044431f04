@@ -1,1 +1,0 @@
-{"digest":"6ac2d14a3d67a88cdf7aa81044431f04","statement":[3,1,1,1],"subroutine":[[1,"BEGIN"]],"file":"dev.Makefile.PL","start":{"1":{"BEGIN":[{"subroutine":null,"time":null,"condition":null,"statement":1,"branch":null}]},"-1":{"__COVER__":[{"branch":null,"statement":4,"time":null,"condition":null,"subroutine":1}]}}}

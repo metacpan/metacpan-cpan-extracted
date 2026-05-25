@@ -494,8 +494,10 @@ subtest '_normalize_config' => sub {
 	$fn->(\%config);
 	for my $field (App::Test::Generator::CONFIG_TYPES()) {
 		next if $field eq 'properties';
+		next if $field eq 'timeout';	# numeric — absence means use generated-test default, not 1
 		is($config{$field}, 1, "$field defaults to 1 when absent");
 	}
+	is($config{timeout}, undef, 'timeout left undef when absent (numeric, not boolean)');
 
 	# Common string boolean representations are normalised to integers
 	my %bool_config = (

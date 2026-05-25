@@ -4,7 +4,7 @@ Config::Abstraction - Merge and manage configuration data from different sources
 
 # VERSION
 
-Version 0.38
+Version 0.39
 
 # SYNOPSIS
 

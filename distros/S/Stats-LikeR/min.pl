@@ -9,4 +9,4 @@ use Devel::Confess 'color';
 use Stats::LikeR;
 
 say min(3);
-say min(3, undef);
+say min('non-numeric value');

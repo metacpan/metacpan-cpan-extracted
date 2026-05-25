@@ -10,7 +10,7 @@ use IO::File;
 require POSIX;
 
 our @ISA     = qw(IO::Handle);
-our $VERSION = '1.29';    # keep same as in Tty.pm
+our $VERSION = '1.31';    # keep same as in Tty.pm
 eval { local $^W = 0; local $SIG{__DIE__}; require IO::Stty };
 push @ISA, "IO::Stty" if ( not $@ );    # if IO::Stty is installed
 
@@ -116,9 +116,11 @@ sub make_slave_controlling_terminal {
 
     # now open slave, this should set it as controlling tty on some systems
     # Use _open_tty() to ensure STREAMS modules (ptem, ldterm, ttcompat)
-    # are pushed on Solaris/HP-UX, matching the slave() method.
+    # are pushed on Solaris/HP-UX.  Pass noctty=0 so the open can
+    # automatically acquire a controlling terminal (the whole point of
+    # this method).
     my $ttyname  = ${*$self}{'io_pty_ttyname'};
-    my $slave_fd = IO::Tty::_open_tty($ttyname);
+    my $slave_fd = IO::Tty::_open_tty($ttyname, 0);
     croak "Cannot open slave $ttyname: $!" if $slave_fd < 0;
     my $slv = IO::Tty->new_from_fd( $slave_fd, "r+" );
     croak "Cannot create IO::Tty from fd $slave_fd: $!" if not $slv;
@@ -184,7 +186,7 @@ IO::Pty - Pseudo TTY object class
 
 =head1 VERSION
 
-1.29
+1.31
 
 =head1 SYNOPSIS
 

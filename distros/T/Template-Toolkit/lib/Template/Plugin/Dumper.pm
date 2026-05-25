@@ -24,7 +24,7 @@ use warnings;
 use base 'Template::Plugin';
 use Data::Dumper;
 
-our $VERSION = '3.100';
+our $VERSION = '3.105';
 our $DEBUG   = 0 unless defined $DEBUG;
 our @DUMPER_ARGS = qw( Indent Pad Varname Purity Useqq Terse Freezer
                        Toaster Deepcopy Quotekeys Bless Maxdepth Sortkeys );
@@ -75,6 +75,8 @@ sub dump_html {
         s/&/&amp;/g;
         s/</&lt;/g;
         s/>/&gt;/g;
+        s/"/&quot;/g;
+        s/'/&#39;/g;
         s/\n/<br>\n/g;
     }
 
@@ -107,11 +109,16 @@ As a standard plugin, you can also specify its name in lower case:
 
     [% USE dumper %]
 
-The C<Data::Dumper> C<Pad>, C<Indent> and C<Varname> options are supported
-as constructor arguments to affect the output generated.  See L<Data::Dumper>
-for further details.
+The following L<Data::Dumper> options are supported as constructor arguments
+to affect the output generated:
+
+C<Indent>, C<Pad>, C<Varname>, C<Purity>, C<Useqq>, C<Terse>, C<Freezer>,
+C<Toaster>, C<Deepcopy>, C<Quotekeys>, C<Bless>, C<Maxdepth>, C<Sortkeys>.
+
+See L<Data::Dumper> for further details on each option.
 
     [% USE dumper(Indent=0, Pad="<br>") %]
+    [% USE dumper(Sortkeys=1, Terse=1) %]
 
 These options can also be specified in lower case.
 

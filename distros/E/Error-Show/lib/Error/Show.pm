@@ -7,7 +7,7 @@ use feature "say";
 
 
 
-our $VERSION = 'v0.5.0';
+our $VERSION = 'v0.5.1';
 
 use constant::more DEBUG=>undef;
 use constant::more {
@@ -370,6 +370,7 @@ sub text_output {
 
     my $indent=$opts{current_indent}//"";
     my $out="$indent$info->[FILENAME]\n";
+    $out.="\n";
     
     my $format="$indent%${f_len}d% 2s %s\n";
     my $mark="";
@@ -398,7 +399,9 @@ sub text_output {
     # TODO: Tidy this up
     $info->[MESSAGE]=~s/line (\d+)(?:\.|,)/(($1-1)>$max?$max:$1-1)-$start_line+1/e;
 
+    $total.="\n";
     $total.=$info->[MESSAGE]."\n" unless $opts{clean};
+    $total.="\n";
 
   }
   if($opts{splain}){
@@ -436,6 +439,7 @@ sub context{
   $opts{current_indent}="";
 
 
+  my $depth=$opts{depth};
 
   unless($opts{reverse}){
     # Show the actual error 
@@ -460,7 +464,7 @@ sub context{
 
   #
   if($do_internal_frames and @$frames==0){
-    my $i=0;
+    my $i=1;
 
     #build call frames
     my @frame;
@@ -470,6 +474,7 @@ sub context{
        push @$frames, [@frame];
     }
   }
+
   
   my $dstf="Devel::StackTrace::Frame";
 
@@ -478,9 +483,18 @@ sub context{
 
   #DEBUG and ;
 
+
+  #If no depth, 0 or negative or clamp
+  if(!defined $depth  or  $depth<0  or  $depth > @$frames){
+    $depth=@$frames;
+  }
+
   # Reverse the ordering of errors here if requested
   #
-  my @frames_copy=$frames->@*;
+  my @frames_copy = @$frames;
+
+  splice @frames_copy, $depth;
+  
   @frames_copy=reverse @frames_copy if $opts{reverse};
   # Check for trace kv pair. If this is present. We ignore the error
   #

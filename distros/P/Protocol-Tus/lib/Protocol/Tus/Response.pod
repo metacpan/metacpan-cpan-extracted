@@ -1,0 +1,111 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Protocol::Tus::Response
+
+
+=head1 SYNOPSIS
+
+   use Protocol::Tus::Response;
+   
+   my $tus = ...; # assume it's a Protocol::Tus object
+
+   my $response = $tus->HTTP_request(...);
+
+   my $status = $response->status;
+   my $headers_href = $response->headers;
+   my $body_if_any = $response->body;
+   my $exception_if_any = $response->exception;
+   my $upload_id = $response->id;
+
+=head1 DESCRIPTION
+
+Wrap response to a L<Protocol::Tus> request with convenience accessors
+and methods.
+
+=head1 INTERFACE
+
+=head2 B<< as_hash >>
+
+   my $hash_ref = $response->as_hash;
+
+Return a hash reference with C<status>, C<headers>, and C<body>.
+
+=head2 B<< body >>
+
+   my $body = $response->body;
+
+Accessor to the body of the response, if any. Defaults to the empty
+string.
+
+=head2 B<< exception >>
+
+   my $exception = $response->exception;
+
+Accessor to an exception object (most probably L<Ouch>) if any occurred.
+useful to generate logs.
+
+=head2 B<< headers >>
+
+   my $headers_href = $response->headers;
+
+Accessor to a hash reference with headers. The method is read-only but
+the headers can be manipulated.
+
+=head2 B<< id >>
+
+   my $id = $response->id;
+
+Accessor to the upload identifier. This is mostly useful when creating a
+new upload, because it's necessary to set the C<Location> header in the
+actual response sent back to the client and this header has to somehow
+allow referencing this C<id>. For this use case, anyway, see
+L<Protocol::Tus/id_to_location> to allow L<Protocol::Tus> do the right
+thing for you.
+
+=head2 B<< is_error >>
+
+   my $bool = $response->is_error;
+
+Check if the response's L</status> represents an error (any status code
+greater than or equal to C<400>).
+
+=head2 B<< more_headers >>
+
+   $response->more_headers({ Foo => 'Bar', Baz => 10 });
+
+Add headers to the ones already present. It does I<NOTHING> fancy, so
+headers with the same name are substituted and headers that have
+different keys that case-fold to the same string are saved differently.
+
+It's not a method intended for general consumption but still.
+
+=head2 B<< new_from_exception >>
+
+   my $response = Protocol::Tus::Response->new_from_exception($e);
+
+Generate a new response from an exception. If the input C<$e> is a
+L<Ouch> object, it will use its methods to set the L</status> and
+L</body> parts; otherwise the status will be C<500> and the body a
+generic one. In all cases, the input exception C<$e> is saved as
+L</exception>.
+
+=head2 B<< status >>
+
+   my $status = $response->status;
+
+Accessor to the status code of the response.
+
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for L<Protocol::Tus>.
+
+
+=cut

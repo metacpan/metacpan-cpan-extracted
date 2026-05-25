@@ -21,7 +21,7 @@ package Template;
 
 use strict;
 use warnings;
-use 5.006;
+use 5.010;
 use base 'Template::Base';
 
 use Template::Config;
@@ -32,7 +32,7 @@ use File::Basename;
 use File::Path;
 use Scalar::Util qw(blessed);
 
-our $VERSION = '3.103';
+our $VERSION = '3.105';
 our $ERROR   = '';
 our $DEBUG   = 0;
 our $BINMODE = 0 unless defined $BINMODE;
@@ -56,8 +56,7 @@ sub process {
     my $options = (@opts == 1) && ref($opts[0]) eq 'HASH'
         ? shift(@opts) : { @opts };
 
-    $options->{ binmode } = $BINMODE
-        unless defined $options->{ binmode };
+    $options->{ binmode } //= $BINMODE;
 
     # we're using this for testing in t/output.t and t/filter.t so
     # don't remove it if you don't want tests to fail...
@@ -957,7 +956,7 @@ Andy Wardley E<lt>abw@wardley.orgE<gt> L<http://wardley.org/>
 
 =head1 VERSION
 
-Template Toolkit version 3.103, released on May 21 2026.
+Template Toolkit version 3.105, released on May 24 2026.
 
 =head1 SUPPORT
 

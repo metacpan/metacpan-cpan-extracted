@@ -41,9 +41,7 @@ my $ttcfg = {
 };
 
 # delete any existing files
-foreach my $f ( "$dir/foo.ttc", "$dir/complex.ttc", "$dir/divisionbyzero.ttc" ) {
-    ok( unlink($f) ) if -f $f;
-}
+unlink "$dir/foo.ttc", "$dir/complex.ttc", "$dir/divisionbyzero.ttc";
 
 test_expect(\*DATA, $ttcfg);
 

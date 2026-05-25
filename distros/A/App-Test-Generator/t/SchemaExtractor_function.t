@@ -477,6 +477,98 @@ subtest '_analyze_pod() extracts type from inline format' => sub {
 	is($result->{name}{type}, 'string', 'inline type extracted');
 };
 
+subtest '_analyze_pod() =head4 Input positional: scalar|scalarref -> string' => sub {
+	my $e = _extractor();
+	my $pod = <<'POD';
+=head2 parse_email( $text )
+
+=head3 Arguments
+
+=over 4
+
+=item C<$text> (scalar or scalar reference, required)
+
+Complete raw RFC 2822 email message.
+
+=back
+
+=head4 Input
+
+    [
+        {
+            type => 'scalar | scalarref',
+        },
+    ]
+
+=cut
+POD
+	my $result = $e->_analyze_pod($pod);
+	ok(exists $result->{text}, 'text parameter found');
+	is($result->{text}{type}, 'string', 'scalar | scalarref maps to string');
+};
+
+subtest '_analyze_pod() =head3 Input positional: integer type' => sub {
+	my $e = _extractor();
+	my $pod = <<'POD';
+=head2 process( $value )
+
+=head3 Input
+
+    [
+        {
+            type => 'integer',
+        },
+    ]
+
+=cut
+POD
+	my $result = $e->_analyze_pod($pod);
+	ok(exists $result->{value}, 'value parameter found');
+	is($result->{value}{type}, 'integer', 'integer type set from =head3 Input');
+};
+
+subtest '_analyze_pod() =head4 Input named format' => sub {
+	my $e = _extractor();
+	my $pod = <<'POD';
+=head2 greet
+
+=head4 Input
+
+    {
+        name => { type => 'string' },
+        age  => { type => 'integer', optional => 1 },
+    }
+
+=cut
+POD
+	my $result = $e->_analyze_pod($pod);
+	is($result->{name}{type},     'string',  'name type is string');
+	is($result->{age}{type},      'integer', 'age type is integer');
+	is($result->{age}{optional},  1,         'age optional from spec');
+};
+
+subtest '_analyze_pod() =head4 Input overrides earlier heuristic type' => sub {
+	my $e = _extractor();
+	my $pod = <<'POD';
+=head2 test( $n )
+
+Parameters:
+  $n - number
+
+=head4 Input
+
+    [
+        {
+            type => 'string',
+        },
+    ]
+
+=cut
+POD
+	my $result = $e->_analyze_pod($pod);
+	is($result->{n}{type}, 'string', '=head4 Input overrides earlier type inference');
+};
+
 # ==================================================================
 # _analyze_output_from_pod
 # ==================================================================

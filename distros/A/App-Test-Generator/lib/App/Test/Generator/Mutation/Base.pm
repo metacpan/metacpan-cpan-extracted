@@ -4,11 +4,11 @@ use strict;
 use warnings;
 use Carp qw(croak);
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 =head1 VERSION
 
-Version 0.38
+Version 0.39
 
 =head1 DESCRIPTION
 
@@ -86,7 +86,8 @@ A boolean. Croaks if called on the base class directly.
 =cut
 
 sub applies_to {
-	croak ref(shift) . '::applies_to() must be implemented by subclass';
+	my ($self, $doc) = @_;
+	croak ref($self) . '::applies_to() must be implemented by subclass';
 }
 
 =head2 mutate
@@ -131,7 +132,8 @@ Croaks if called on the base class directly.
 =cut
 
 sub mutate {
-	croak ref(shift) . '::mutate() must be implemented by subclass';
+	my ($self, $doc) = @_;
+	croak ref($self) . '::mutate() must be implemented by subclass';
 }
 
 1;

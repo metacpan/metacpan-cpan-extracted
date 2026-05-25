@@ -30,7 +30,7 @@ use Config ();
 
 use constant HAS_SETLOCALE => $Config::Config{d_setlocale};
 
-our $VERSION = '3.100';
+our $VERSION = '3.105';
 our $FORMAT  = '%H:%M:%S %d-%b-%Y';    # default strftime() format
 our @LOCALE_SUFFIX = qw( .ISO8859-1 .ISO_8859-15 .US-ASCII .UTF-8 );
 
@@ -93,7 +93,7 @@ sub format {
     my $params = ref($_[$#_]) eq 'HASH' ? pop(@_) : { };
 
     my $time   = shift(@_);
-    $time = $params->{ time } || $self->{ time } || $self->now() if !defined $time;
+    $time //= $params->{ time } || $self->{ time } || $self->now();
 
     my $format = @_
         ? shift(@_)

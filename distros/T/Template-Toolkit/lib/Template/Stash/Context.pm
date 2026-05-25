@@ -71,7 +71,7 @@ use strict;
 use warnings;
 use base 'Template::Stash';
 
-our $VERSION = '3.100';
+our $VERSION = '3.105';
 our $DEBUG   = 0 unless defined $DEBUG;
 
 
@@ -249,9 +249,7 @@ sub get {
         $result = $self->_dotop($root, $ident, $args);
     }
 
-    return defined $result
-        ? $result
-        : $self->undefined($ident, $args);
+    return $result // $self->undefined($ident, $args);
 }
 
 
@@ -306,7 +304,7 @@ sub set {
         }
     }
 
-    return defined $result ? $result : '';
+    return $result // '';
 }
 
 

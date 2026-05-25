@@ -49,6 +49,7 @@ t/30-basics.t
 t/40-more.t
 t/abs.t
 t/advanced_types.t
+t/app.t
 t/Analyzer-Complexity.t
 t/Analyzer-Return.t
 t/Analyzer-ReturnMeta.t

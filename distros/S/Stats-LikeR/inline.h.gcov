@@ -1,7 +1,7 @@
         -:    0:Source:/home/con/perl5/perlbrew/perls/perl-5.42.2/lib/5.42.2/x86_64-linux/CORE/inline.h
-        -:    0:Graph:./Stats-LikeR-0.01/LikeR.gcno
-        -:    0:Data:./Stats-LikeR-0.01/LikeR.gcda
-        -:    0:Runs:3
+        -:    0:Graph:./Stats-LikeR-0.06/LikeR.gcno
+        -:    0:Data:./Stats-LikeR-0.06/LikeR.gcda
+        -:    0:Runs:1
         -:    1:/*>    inline.h
         -:    2: *
         -:    3: *    Copyright (C) 2012 by Larry Wall and others
@@ -376,16 +376,16 @@
         -:  372:}
         -:  373:
         -:  374:PERL_STATIC_INLINE Stack_off_t
-function Perl_POPMARK called 900 returned 100% blocks executed 100%
-      900:  375:Perl_POPMARK(pTHX)
+function Perl_POPMARK called 324 returned 100% blocks executed 100%
+      324:  375:Perl_POPMARK(pTHX)
         -:  376:{
         -:  377:    DEBUG_s(DEBUG_v(PerlIO_printf(Perl_debug_log,
         -:  378:                                 "MARK pop  %p %" IVdf "\n",
         -:  379:                                  (PL_markstack_ptr-1),
         -:  380:                                  (IV)*(PL_markstack_ptr-1))));
         -:  381:    assert((PL_markstack_ptr > PL_markstack) || !"MARK underflow");
-      900:  382:    return *PL_markstack_ptr--;
-      900:  382-block  0
+      324:  382:    return *PL_markstack_ptr--;
+      324:  382-block  0
         -:  383:}
         -:  384:
         -:  385:/*
@@ -4470,43 +4470,50 @@ function Perl_POPMARK called 900 returned 100% blocks executed 100%
         -: 4464:*/
         -: 4465:
         -: 4466:PERL_STATIC_INLINE char *
-function Perl_savepv called 8939 returned 100% blocks executed 80%
-     8939: 4467:Perl_savepv(pTHX_ const char *pv)
+function Perl_savepv called 3123 returned 100% blocks executed 80%
+     3123: 4467:Perl_savepv(pTHX_ const char *pv)
         -: 4468:{
         -: 4469:    PERL_UNUSED_CONTEXT;
-     8939: 4470:    if (!pv)
-     8939: 4470-block  0
+     3123: 4470:    if (!pv)
+     3123: 4470-block  0
 branch  0 taken 0 (fallthrough)
-branch  1 taken 8939
+branch  1 taken 3123
     #####: 4471:        return NULL;
     %%%%%: 4471-block  0
         -: 4472:    else {
         -: 4473:        char *newaddr;
-     8939: 4474:        const STRLEN pvlen = strlen(pv)+1;
-     8939: 4475:        Newx(newaddr, pvlen, char);
-     8939: 4475-block  0
-call    0 returned 8939
-     8939: 4476:        return (char*)memcpy(newaddr, pv, pvlen);
+     3123: 4474:        const STRLEN pvlen = strlen(pv)+1;
+     3123: 4475:        Newx(newaddr, pvlen, char);
+     3123: 4475-block  0
+call    0 returned 3123
+     3123: 4476:        return (char*)memcpy(newaddr, pv, pvlen);
         -: 4477:    }
         -: 4478:}
         -: 4479:
         -: 4480:/* same thing but with a known length */
         -: 4481:
         -: 4482:PERL_STATIC_INLINE char *
-        -: 4483:Perl_savepvn(pTHX_ const char *pv, Size_t len)
+function Perl_savepvn called 9 returned 100% blocks executed 80%
+        9: 4483:Perl_savepvn(pTHX_ const char *pv, Size_t len)
         -: 4484:{
         -: 4485:    char *newaddr;
         -: 4486:    PERL_UNUSED_CONTEXT;
         -: 4487:
-        -: 4488:    Newx(newaddr,len+1,char);
+        9: 4488:    Newx(newaddr,len+1,char);
+        9: 4488-block  0
+call    0 returned 9
         -: 4489:    /* Give a meaning to NULL pointer mainly for the use in sv_magic() */
-        -: 4490:    if (pv) {
+        9: 4490:    if (pv) {
+branch  0 taken 9 (fallthrough)
+branch  1 taken 0
         -: 4491:        /* might not be null terminated */
-        -: 4492:        newaddr[len] = '\0';
-        -: 4493:        return (char *) CopyD(pv,newaddr,len,char);
+        9: 4492:        newaddr[len] = '\0';
+        9: 4493:        return (char *) CopyD(pv,newaddr,len,char);
+        9: 4493-block  0
         -: 4494:    }
         -: 4495:    else {
-        -: 4496:        return (char *) ZeroD(newaddr,len+1,char);
+    #####: 4496:        return (char *) ZeroD(newaddr,len+1,char);
+    %%%%%: 4496-block  0
         -: 4497:    }
         -: 4498:}
         -: 4499:

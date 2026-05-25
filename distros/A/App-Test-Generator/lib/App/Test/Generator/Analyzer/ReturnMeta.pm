@@ -19,11 +19,11 @@ Readonly my $PENALTY_EMPTY_LIST_CONSISTENCY        => 15;
 Readonly my $PENALTY_EXCEPTION_SWALLOW_STABILITY   => 20;
 Readonly my $BONUS_BOOLEAN_STABILITY               => 5;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 =head1 VERSION
 
-Version 0.38
+Version 0.39
 
 =head1 DESCRIPTION
 
@@ -81,7 +81,7 @@ report covering stability, consistency, and risk flags.
 
 =item * C<$schema>
 
-A hashref with an optional C<output> key containing return metadata.
+A hashref that may include an C<output> key containing return metadata.
 The C<output> hashref may include any of the following keys:
 
 =over 4

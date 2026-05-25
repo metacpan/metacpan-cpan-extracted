@@ -206,6 +206,35 @@ L<Template::Plugin::Iterator> for further details.
        [% '</ul>' IF iterator.last %]
     [% END %]
 
+=head2 List
+
+The L<List|Template::Plugin::List> plugin provides an object-oriented
+interface to lists.  See L<Template::Plugin::List> for further details.
+
+    [% USE list = List(1, 2, 3, 4, 5) %]
+
+    [% list.size %]         # 5
+    [% list.item(0) %]      # 1
+    [% list.text %]         # 1, 2, 3, 4, 5
+
+    [% CALL list.push(6) %]
+    [% list.size %]         # 6
+
+=head2 Math
+
+The L<Math|Template::Plugin::Math> plugin provides numerous mathematical
+functions for use within templates.  It wraps Perl core math functions
+(C<abs>, C<cos>, C<exp>, C<hex>, C<int>, C<log>, C<oct>, C<rand>, C<sin>,
+C<sqrt>, etc.) and also makes additional trigonometric functions available
+if L<Math::Trig> is installed.  See L<Template::Plugin::Math> for further
+details.
+
+    [% USE Math %]
+
+    [% Math.sqrt(9) %]      # 3
+    [% Math.abs(-42) %]     # 42
+    [% Math.hex('ff') %]    # 255
+
 =head2 Pod
 
 This plugin provides an interface to the L<Pod::POM|Pod::POM> module
@@ -280,6 +309,18 @@ L<Template::Plugin::URL> for further details.
 
     [% mycgi(mode='submit') %]
        # ==> /cgi/bin/bar.pl?mode=submit&debug=1
+
+=head2 View
+
+The L<View|Template::Plugin::View> plugin creates L<Template::View> objects.
+Views provide a mechanism for applying template-based "skins" to data objects,
+using a prefix and/or suffix to map method calls to templates.  Views are an
+experimental feature.  See L<Template::Plugin::View> and L<Template::View> for
+further details.
+
+    [% USE view(prefix = 'my/') %]
+
+    [% view.header(title = 'Hello') %]  # processes 'my/header'
 
 =head2 Wrap
 

@@ -74,7 +74,7 @@ WriteMakefile(
 		'Test::Mockingbird' => 0.10,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
-		'Test::Returns' => 0.02,
+		'Test::Returns' => 0.03,
 		'Unicode::Normalize' => 0,
 		'Unicode::GCString' => 0,
 		'Symbol' => 0,

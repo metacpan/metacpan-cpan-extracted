@@ -1,0 +1,103 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Protocol::Tus::LocalDir
+
+
+=head1 SYNOPSIS
+
+   # implicit use
+   use Protocol::Tus;
+   my $tus = Protocol::Tus->new(
+      model => {
+         class => 'Protocol::Tus::LocalDir',
+         args  => { root => '/path/to/storage' }
+      }
+   );
+
+   # explicit usage
+   use Protocol::Tus;
+   use Protocol::Tus::LocalDir;
+   
+   my $model = Protocol::Tus::LocalDir->new(root => '/path/to/storage');
+   my $tus = Protocol::Tus->new(model => $model);
+
+=head1 DESCRIPTION
+
+Model implementation for storing uploads in a local file system.
+
+It 
+
+=head1 INTERFACE
+
+Protocol::Tus::LocalDir extends base class
+L<Protocol::Tus::AbstractModel>, implementing all abstract methods and
+inheriting the other ones.
+
+=begin silence
+
+=over
+
+=item C<< cleanup >>
+
+=item C<< create_upload >>
+
+=item C<< extensions >>
+
+=item C<< finalize >>
+
+=item C<< get_info >>
+
+=item C<< save_chunk >>
+
+=item C<< set_length >>
+
+=back
+
+=end silence
+
+In addition, the following methods are available:
+
+=head2 B<< new >>
+
+   my $tus = Protocol::Tus::LocalDir->new(root => $some_path);
+
+In addition from what inherited from L<Protocol::Tus::AbstractModel>,
+this class mandates that C<root> is present and points to a directory in
+the local file system. The directory is supposed to exist.
+
+=head2 B<< resolve_path >>
+
+   my $dir_path = $model->resolve_path($id, %opts);
+
+Resolve an identifier to the directory that contains everything about
+it. The return value is a L<Path::Tiny> object.
+
+=head2 B<< root >>
+
+   my $root_dir_path = $model->root;
+
+Get the path to the root of the local storage for uploads. The path is
+provided as a L<Path::Tiny> object.
+
+=head2 B<< update_info >>
+
+   $model->update_info($dir_path, $hash_ref);
+
+Update the info about an upload. The input C<$dir_path> is supposed to
+be a L<Path::Tiny> object pointing to the upload's directory. The
+C<$hash_ref> holds key/values that will be added to the current info
+(possibly overriding previous values).
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for L<Protocol::Tus>.
+
+
+=cut

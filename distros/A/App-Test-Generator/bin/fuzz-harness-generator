@@ -226,11 +226,11 @@ exit 0;
 # --------------------------------------------------
 # _collect_corpus_files
 #
-# Purpose:    Collect the list of corpus JSON files
-#             to process for --replay-corpus mode.
-#             Accepts either a single file path or
-#             a directory, returning all *.json files
-#             found in the directory case.
+# Collect the list of corpus JSON files
+#     to process for --replay-corpus mode.
+#     Accepts either a single file path or
+#     a directory, returning all *.json files
+#     found in the directory case.
 #
 # Entry:      $path - filesystem path to either a
 #                     single .json file or a directory

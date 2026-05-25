@@ -10,8 +10,8 @@ use Tie::Hash;
     %h = ( a => 1, b => '2', c => 3.1415, d => 4 );
     bless $rh => 'Tie::StdHash';
 
-    is( Dump($rh),   "--- !!perl/hash:Tie::StdHash\na: 1\nb: 2\nc: '3.1415'\nd: 4\n", "blessed hash ref dumps with class tag" );
-    is( Dump( \%h ), "--- !!perl/hash:Tie::StdHash\na: 1\nb: 2\nc: '3.1415'\nd: 4\n", "blessed hash deref dumps with class tag" );
+    is( Dump($rh),   "--- !!perl/hash:Tie::StdHash\na: 1\nb: '2'\nc: '3.1415'\nd: 4\n", "blessed hash ref dumps with class tag" );
+    is( Dump( \%h ), "--- !!perl/hash:Tie::StdHash\na: 1\nb: '2'\nc: '3.1415'\nd: 4\n", "blessed hash deref dumps with class tag" );
 }
 
 # Tied hash - tie object ($th) is blessed, so it gets a class tag
@@ -23,13 +23,13 @@ use Tie::Hash;
   SKIP: {
         skip "Perl 5.8 sometimes coerces ints into strings (Perl bug, not ours)", 1
             unless ( $] > '5.009888' || $] < '5.007' );
-        is( Dump($th), "--- !!perl/hash:Tie::StdHash\na: 1\nb: 2\nc: '3.1415'\nd: 4\n", "tie object dumps with class tag" );
+        is( Dump($th), "--- !!perl/hash:Tie::StdHash\na: 1\nb: '2'\nc: '3.1415'\nd: 4\n", "tie object dumps with class tag" );
     }
 
     # Tied hash reference dumps content (no class tag since \%h is not blessed)
   SKIP: {
         skip "Perl 5.8 tied hash iteration loses some values", 1 if $] < '5.010';
-        is( Dump( \%h ), "---\na: 1\nb: 2\nc: '3.1415'\nd: 4\n", "tied hash ref dumps content" );
+        is( Dump( \%h ), "---\na: 1\nb: '2'\nc: '3.1415'\nd: 4\n", "tied hash ref dumps content" );
     }
 }
 
@@ -42,8 +42,8 @@ use Tie::Hash;
     $h{c} = 3.1415;
     $h{d} = 4;
 
-    is( Dump($th), "--- !!perl/hash:Tie::StdHash\na: 1\nb: 2\nc: '3.1415'\nd: 4\n", "tie object with individual assigns dumps correctly" );
-    is( Dump( \%h ), "---\na: 1\nb: 2\nc: '3.1415'\nd: 4\n", "tied hash ref with individual assigns dumps content" );
+    is( Dump($th), "--- !!perl/hash:Tie::StdHash\na: 1\nb: '2'\nc: '3.1415'\nd: 4\n", "tie object with individual assigns dumps correctly" );
+    is( Dump( \%h ), "---\na: 1\nb: '2'\nc: '3.1415'\nd: 4\n", "tied hash ref with individual assigns dumps content" );
 }
 
 # Empty tied hash

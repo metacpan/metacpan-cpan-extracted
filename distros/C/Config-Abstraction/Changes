@@ -1,14 +1,20 @@
 Revision history for Config::Abstraction - Merge and manage configuration data from different sources
 
+0.39	Sun May 24 16:16:50 EDT 2026
+
+	[ Bug Fixes ]
+	- Don't use fixate for now, what works on Linux doesn't work on MACOS
+		and vice versa.  I don't know why.
+
 0.38	Wed May 20 21:46:58 EDT 2026
 
 	[ Enhancements ]
 	- Document the "defaults" argument to new()
+
+	[ Bug Fixes ]
 	- Fix fatal croak on malformed or degenerate YAML/JSON files in config_dirs;
 		parse failures now warn and skip the file rather than aborting construction,
 		consistent with existing XML and INI error handling
-
-	[ Bug Fixes]
 	- Fix corruption of coderefs and blessed objects passed via the 'data' argument;
 		added _is_plain_scalar() guard to skip non-string scalars in the YAML colon-file
 		value-munging loop, and fixed Data::Reuse::fixate() being called with a

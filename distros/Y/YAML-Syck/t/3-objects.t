@@ -65,7 +65,7 @@ my $obj = bless( \( my $undef ) => 'Foo' );
 is( Dump($obj),                 "--- !!perl/scalar:Foo ~\n" );
 is( Dump( Load( Dump($obj) ) ), "--- !!perl/scalar:Foo ~\n" );
 
-is( Dump( bless( { 1 .. 10 }, 'foo' ) ), "--- !!perl/hash:foo\n1: 2\n3: 4\n5: 6\n7: 8\n9: 10\n" );
+is( Dump( bless( { 1 .. 10 }, 'foo' ) ), "--- !!perl/hash:foo\n\"1\": 2\n\"3\": 4\n\"5\": 6\n\"7\": 8\n\"9\": 10\n" );
 
 $YAML::Syck::UseCode = 1;
 

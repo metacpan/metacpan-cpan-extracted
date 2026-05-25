@@ -4138,9 +4138,11 @@ sub _mutation_index {
 	) {
 		my $killed = scalar @{ $files->{$file}{killed} || [] };
 		my $survived = scalar @{ $files->{$file}{survived} || [] };
-		my $total = $killed + $survived;
+		my $skipped = $files->{$file}{skipped} // 0;
+		my $tested = $killed + $survived;
+		my $total = $tested + $skipped;
 
-		my $score = $total ? sprintf('%.2f', ($killed / $total) * 100) : 0;
+		my $score = $tested ? sprintf('%.2f', ($killed / $tested) * 100) : 0;
 
 		my $badge_class = $score >= $config{med_threshold} ? 'badge-good'
 					: $score >= $config{low_threshold} ? 'badge-warn'
@@ -4161,7 +4163,7 @@ sub _mutation_index {
 		my $html_file = "mutation_html/$file.html";
 
 		my $source_url = $github_base . $file;
-		my $source_link = $total
+		my $source_link = $tested
 			? sprintf('<a href="%s" class="icon-link" title="View source on GitHub">&#128269;</a>', $source_url)
 			: '<span class="disabled-icon" title="No coverage data">&#128269;</span>';
 
@@ -4246,7 +4248,7 @@ sub _mutation_index {
 			$total,
 			$killed,
 			$survived,
-			$files->{$file}{skipped} // 0,
+			$skipped,
 			$badge_html,
 			$complexity_html,
 			$ter_cell,

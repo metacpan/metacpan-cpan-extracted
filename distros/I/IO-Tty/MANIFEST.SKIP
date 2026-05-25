@@ -1,12 +1,12 @@
+#!include_default
+
+# AI agent instructions - not for distribution
+^\.claude/
+
 ^.github/
-^.git/.*
-^MYMETA.*
-^MANIFEST.bak
-^.gitignore
 ^conf/
 ^xssubs.c
 ^Tty/Constant.pm
-^Makefile$
 ^IO-Tty-\d
 ^IO-Tty\.ppd$
 ^cpanfile$

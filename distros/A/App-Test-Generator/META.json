@@ -81,7 +81,7 @@
             "Test::Mockingbird" : "0.1",
             "Test::Most" : "0",
             "Test::Needs" : "0",
-            "Test::Returns" : "0.02",
+            "Test::Returns" : "0.03",
             "Unicode::GCString" : "0",
             "Unicode::Normalize" : "0"
          }
@@ -102,6 +102,6 @@
          "x_repository" : "https://github.com/nigelhorne/App-Test-Generator"
       }
    },
-   "version" : "0.38",
+   "version" : "0.39",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

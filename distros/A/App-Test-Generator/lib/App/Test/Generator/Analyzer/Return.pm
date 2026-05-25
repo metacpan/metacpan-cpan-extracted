@@ -2,8 +2,9 @@ package App::Test::Generator::Analyzer::Return;
 
 use strict;
 use warnings;
-use Carp    qw(croak);
+use Carp         qw(croak);
 use Readonly;
+use Scalar::Util qw(blessed);
 
 # --------------------------------------------------
 # Evidence weights for each detected return pattern.
@@ -14,11 +15,11 @@ Readonly my $WEIGHT_RETURNS_PROPERTY => 20;
 Readonly my $WEIGHT_RETURNS_SELF     => 15;
 Readonly my $WEIGHT_RETURNS_CONSTANT => 10;
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 =head1 VERSION
 
-Version 0.38
+Version 0.39
 
 =head1 DESCRIPTION
 
@@ -117,9 +118,13 @@ sub analyze {
 
 	# Accept either a Model::Method object or a raw hashref,
 	# since callers in SchemaExtractor pass raw hashrefs
-	my $source = ref($method) && $method->can('source')
+	my $source = blessed($method) && $method->can('source')
 		? $method->source()
 		: ($method->{source} // $method->{body} // '');
+
+	my $add = blessed($method) && $method->can('add_evidence')
+		? sub { $method->add_evidence(@_) }
+		: sub {};
 
 	# --------------------------------------------------
 	# Detect: return $self->{property}
@@ -127,7 +132,7 @@ sub analyze {
 	# plain return $self (handled separately below)
 	# --------------------------------------------------
 	if($source =~ /return\s+\$self->\{(\w+)\}/) {
-		$method->add_evidence(
+		$add->(
 			category => 'return',
 			signal   => 'returns_property',
 			value    => $1,
@@ -141,7 +146,7 @@ sub analyze {
 	# return $self->{...} which is a property return
 	# --------------------------------------------------
 	if($source =~ /return\s+\$self(?!->)/) {
-		$method->add_evidence(
+		$add->(
 			category => 'return',
 			signal   => 'returns_self',
 			weight   => $WEIGHT_RETURNS_SELF,
@@ -154,7 +159,7 @@ sub analyze {
 	# returns a fixed value rather than a computed state.
 	# --------------------------------------------------
 	if($source =~ /return\s+(?:['"\d]|undef\b)/) {
-		$method->add_evidence(
+		$add->(
 			category => 'return',
 			signal   => 'returns_constant',
 			weight   => $WEIGHT_RETURNS_CONSTANT,

@@ -207,3 +207,56 @@ f!! ba!r! f!!ba!r!
 %]
 -- expect --
 foo
+
+
+#------------------------------------------------------------------------
+# zero-length match after non-zero-length match should be skipped (GH #171)
+#------------------------------------------------------------------------
+
+-- test --
+-- name: dotstar capture no double match --
+[% text = 'name';
+   text.replace('(.*)', '$1.txt');
+%]
+-- expect --
+name.txt
+
+-- test --
+-- name: dotstar no capture no double match --
+[% text = 'name';
+   text.replace('.*', 'x');
+%]
+-- expect --
+x
+
+-- test --
+-- name: dotstar anchored unchanged --
+[% text = 'name';
+   text.replace('^(.*)', '$1.txt');
+%]
+-- expect --
+name.txt
+
+-- test --
+-- name: dotplus unchanged --
+[% text = 'name';
+   text.replace('(.+)', '$1.txt');
+%]
+-- expect --
+name.txt
+
+-- test --
+-- name: normal global replace unchanged --
+[% text = 'foo bar foo';
+   text.replace('foo', 'baz');
+%]
+-- expect --
+baz bar baz
+
+-- test --
+-- name: non-global replace unchanged --
+[% text = 'foo bar foo';
+   text.replace('foo', 'baz', 0);
+%]
+-- expect --
+baz bar foo

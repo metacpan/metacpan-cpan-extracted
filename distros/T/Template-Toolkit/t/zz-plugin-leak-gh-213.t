@@ -31,8 +31,6 @@ use lib qw( t/lib ./lib ../lib ../blib/arch ./test );
 use Template;
 use Test::More;
 
-plan skip_all => "Broken on older perls. We need to sort this out once everything is passing";
-
 use File::Temp qw(tempfile tempdir);
 
 plan skip_all => "Developer test only - set RELEASE_TESTING=1"
@@ -78,8 +76,8 @@ die q[Failed to create plugindir] unless -d "$plugindir/Template/Plugin";
 write_text( $plugin_pm, $plugin_echo );
 
 unshift @INC, $plugindir;
-ok eval { do $plugin_pm; 1 }, "can load Template::Plugin::checkleak"
-  or die "Failed to load Template::Plugin::checkleak - $@";
+ok eval { do $plugin_pm; 1 }, "can load Template::Plugin::Echo"
+  or die "Failed to load Template::Plugin::Echo - $@";
 
 # chdir to our temporary folder with templates
 chdir($template_tmpdir) or die;
@@ -104,7 +102,7 @@ my $stderr;
 #   the original bug was doing a weaken on the plugin itself..
 # resulting in not being able to load it a second time
 is $out,
-  <<'EXPECT', "Template processed correctly using Plugin checkleak twice";
+  <<'EXPECT', "Template processed correctly using Plugin Echo twice";
 foofoo
 barbar
 EXPECT

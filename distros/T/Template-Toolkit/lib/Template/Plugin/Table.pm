@@ -24,7 +24,7 @@ use warnings;
 use base 'Template::Plugin';
 use Scalar::Util 'blessed';
 
-our $VERSION = '3.100';
+our $VERSION = '3.105';
 our $AUTOLOAD;
 
 
@@ -106,7 +106,7 @@ sub new {
         _NCOLS   => $cols,
         _COLOFF  => $coloff,
         _OVERLAP => $overlap,
-        _PAD     => defined $params->{ PAD } ? $params->{ PAD } : 1,
+        _PAD     => $params->{ PAD } // 1,
     }, $class;
 }
 
